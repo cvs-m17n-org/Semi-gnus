@@ -9539,29 +9539,35 @@ treated as multipart/mixed."
   (let ((amount (if (memq 'shift (event-modifiers event))
 		    (car gnus-wheel-scroll-amount)
 		  (cdr gnus-wheel-scroll-amount)))
-	(direction (- (* (event-button event) 2) 9))
+	(direction (- (* (static-if (featurep 'xemacs)
+			     (event-button event)
+			   (cond ((eq 'mouse-4 (event-basic-type event))
+				  4)
+				 ((eq 'mouse-5 (event-basic-type event))
+				  5)))
+			 2) 9))
 	edge)
     (gnus-summary-scroll-up (* amount direction))
     (when (gnus-eval-in-buffer-window gnus-article-buffer
-	    (save-restriction 
-	      (widen) 
+	    (save-restriction
+	      (widen)
 	      (and (if (< 0 direction)
 		       (gnus-article-next-page 0)
 		     (gnus-article-prev-page 0)
 		     (bobp))
-		   (if (setq edge (get-text-property 
+		   (if (setq edge (get-text-property
 				   (point-min) 'gnus-wheel-edge))
 		       (setq edge (* edge direction))
 		     (setq edge -1))
 		   (or (plusp edge)
 		       (progn
-			 (put-text-property (point-min) (point-max) 
+			 (put-text-property (point-min) (point-max)
 					    'gnus-wheel-edge direction)
 			 nil))
 		   (or (> edge gnus-wheel-edge-resistance)
 		       (progn
-			 (put-text-property (point-min) (point-max) 
-					    'gnus-wheel-edge 
+			 (put-text-property (point-min) (point-max)
+					    'gnus-wheel-edge
 					    (* (1+ edge) direction))
 			 nil))
 		   (eq last-command 'gnus-wheel-summary-scroll))
