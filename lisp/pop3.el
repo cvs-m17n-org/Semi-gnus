@@ -56,6 +56,9 @@
 Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
 values are 'apop.")
 
+(defvar pop3-authentication-scheme-alist nil
+  "*Alist of host and POP3 authentication scheme.")
+
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
@@ -74,6 +77,7 @@ Used for APOP authentication.")
 	 (n 1)
 	 message-count
 	 (pop3-password pop3-password)
+	 (pop3-authentication-scheme pop3-authentication-scheme)
 	 )
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
@@ -81,6 +85,10 @@ Used for APOP authentication.")
     (if (and pop3-password-required (not pop3-password))
 	(setq pop3-password
 	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+    (let ((tmp-scheme (cdr (assoc pop3-mailhost
+				  pop3-authentication-scheme-alist))))
+      (when tmp-scheme
+	(setq pop3-authentication-scheme tmp-scheme)))
     (cond ((equal 'apop pop3-authentication-scheme)
 	   (pop3-apop process pop3-maildrop))
 	  ((equal 'pass pop3-authentication-scheme)
