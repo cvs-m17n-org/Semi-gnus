@@ -1211,9 +1211,7 @@ if it is a string, only list groups matching REGEXP."
 	    (gnus-add-text-properties
 	     (point) (prog1 (1+ (point))
 		       (insert " " mark "     *: "
-			       (gnus-group-name-decode group
-						       (gnus-group-name-charset
-							nil group))
+			       (gnus-group-decoded-name group)
 			       "\n"))
 	     (list 'gnus-group (gnus-intern-safe group gnus-active-hashtb)
 		   'gnus-unread t
@@ -3331,9 +3329,7 @@ entail asking the server for the groups."
       (gnus-add-text-properties
        (point) (prog1 (1+ (point))
 		 (insert "       *: "
-			 (gnus-group-name-decode group
-						 (gnus-group-name-charset
-						  nil group))
+			 (gnus-group-decoded-name group)
 			 "\n"))
        (list 'gnus-group (gnus-intern-safe group gnus-active-hashtb)
 	     'gnus-unread t
