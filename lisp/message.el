@@ -464,12 +464,17 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook
-  '(message-maybe-setup-default-charset turn-on-mime-edit)
+(defcustom message-setup-hook nil
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
   :type 'hook)
+
+(defcustom message-mime-setup-function
+  'turn-on-mime-edit
+  "*A function called to set up MIME edit mode."
+  :group 'message-various
+  :type 'function)
 
 (defcustom message-signature-setup-hook nil
   "Normal hook, run each time a new outgoing message is initialized.
@@ -891,6 +896,9 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defvar message-send-coding-system 'binary
   "Coding system to encode outgoing mail.")
+
+(defvar message-file-coding-system 'None
+  "Coding system for saving message.")
 
 ;;; Internal variables.
 
@@ -1435,6 +1443,12 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
+  (cond ((coding-system-p message-file-coding-system)
+	 (set-buffer-file-coding-system message-file-coding-system))
+	((fboundp message-file-coding-system)
+	 (let ((codesys (funcall message-file-coding-system)))
+	   (if (coding-system-p codesys)
+	       (set-buffer-file-coding-system codesys)))))
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -3518,6 +3532,8 @@ Headers already prepared in the buffer are not modified."
     (run-hooks 'message-header-setup-hook))
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil)
+  (when (functionp message-mime-setup-function)
+    (funcall message-mime-setup-function))
   (run-hooks 'message-setup-hook)
   (message-position-point)
   (undo-boundary))
@@ -4312,19 +4328,6 @@ regexp varstr."
 
 ;;; @ for MIME Edit mode
 ;;;
-
-(defun message-maybe-setup-default-charset ()
-  (let ((charset
-	 (and (boundp 'gnus-summary-buffer)
-              (buffer-live-p gnus-summary-buffer)
-	      (save-excursion
-		(set-buffer gnus-summary-buffer)
-		default-mime-charset))))
-    (if charset
-	(progn
-	  (make-local-variable 'default-mime-charset)
-	  (setq default-mime-charset charset)
-	  ))))
 
 (defun message-maybe-encode ()
   (when message-mime-mode
