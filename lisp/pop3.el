@@ -188,7 +188,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection.
 Argument PORT specifies connecting port."
-  (let (default-enable-multibyte-characters process)
+  (let (process)
     (save-excursion
       (set-buffer (get-buffer-create (concat " trace of POP session to "
 					     mailhost)))
