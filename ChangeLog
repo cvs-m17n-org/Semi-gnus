@@ -1,3 +1,18 @@
+1999-08-29  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.1.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* README: Sync up with Pterodactyl Gnus v0.96.
+	* lisp/{smiley.el,nntp.el,nnmail.el,nnfolder.el,mml.el,mm-view.el,
+	mm-uu.el,mm-util.el,mm-encode.el,mm-decode.el,mm-bodies.el,
+	gnus-uu.el,gnus-util.el,gnus-sum.el,gnus-start.el,gnus-score.el,
+	gnus-mlspl.el,gnus-group.el,gnus-bcklg.el,gnus-art.el,
+	gnus-agent.el,ChangeLog}: Ditto.
+	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Ditto.
+
 1999-08-27  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/pop3.el (pop3-movemail): If the argument `crashbox' is t,
