@@ -1,3 +1,12 @@
+2000-06-10 09:33:36  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-forward): Remove show-mml condition.
+	(message-forward-ignored-headers): Remove X-Gnus headers.
+
+2000-06-08  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus-cus.el (gnus-extra-group-parameters): Add uidvalidity.
+
 2000-06-08 12:34:26  Urban Engberg <ue@ccieurope.com>
 
 	* gnus-demon.el (gnus-demon-scan-mail): Bind nnmail-fetched-sources.

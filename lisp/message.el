@@ -427,7 +427,7 @@ The provided functions are:
   :group 'message-interface
   :type 'regexp)
 
-(defcustom message-forward-ignored-headers "Content-Transfer-Encoding"
+(defcustom message-forward-ignored-headers "^Content-Transfer-Encoding:\\|^X-Gnus"
   "*All headers that match this regexp will be deleted when forwarding a message."
   :group 'message-forwarding
   :type '(choice (const :tag "None" nil)
