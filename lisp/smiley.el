@@ -51,14 +51,71 @@
 
 ;; The XEmacs version has a baroque, if not rococo, set of these.
 (defcustom smiley-regexp-alist
-  '(("\\(:-?)\\)\\W" 1 "smile")
-    ("\\(;-?)\\)\\W" 1 "blink")
-    ("\\(:-]\\)\\W" 1 "forced")
-    ("\\(8-)\\)\\W" 1 "braindamaged")
-    ("\\(:-|\\)\\W" 1 "indifferent")
-    ("\\(:-[/\\]\\)\\W" 1 "wry")
-    ("\\(:-(\\)\\W" 1 "sad")
-    ("\\(:-{\\)\\W" 1 "frown"))
+  (if (file-exists-p (expand-file-name "WideFaceSmile.xbm"
+				       smiley-data-directory))
+      ;; Use faces in ftp://ftp.gnus.org/pub/gnus/etc-0.27.tar.gz
+      '(;; ^_^;;; ^^;;;
+	("\\(\\^_?\\^;;;\\)\\W" 1 "WideFaceAse3")
+	;; ^_^;; ^^;;
+	("\\(\\^_?\\^;;\\)\\W" 1 "WideFaceAse2")
+	;; ^_^; ^^;
+	("\\(\\^_?\\^;\\)\\W" 1 "WideFaceAse1")
+	;; ;_;
+	("\\(;_;\\)\\W" 1 "WideFaceWeep")
+	;; T_T
+	("\\(T_T\\)\\W" 1 "WideFaceWeep")
+	;; >_<
+	("\\(>_<\\)\\W" 1 "WideFaceWeep")
+	;; ^_^ ^^
+	("\\(\\^_?\\^\\)\\W" 1 "WideFaceSmile")
+	;; :-< :<
+	("\\(:-?<\\)\\W" 1 "FaceAngry")
+	;; :-] :]
+	("\\(:-?\\]+\\)\\W" 1 "FaceGoofy")
+	;; :-D :D
+	("\\(:-?D\\)\\W" 1 "FaceGrinning")
+	;; :-) :-> :-} :) :> :}
+	("\\(:-?[)>}]+\\)\\W" 1 "FaceHappy")
+	;; =)
+	("\\(=)\\)\\W" 1 "FaceHappy")
+	;; :-/ :-\ :/ :\  excludes urls etc.
+	("\\(:-[/\\]\\)\\W" 1 "FaceIronic")
+	("\\(:/\\)\\([\t\n ]\\|[^/]\\W\\)" 1 "FaceIronic")
+	("\\(:\\\\\\)\\([\t\n ]\\|[^\\]\\W\\)" 1 "FaceIronic")
+	;; 8-| 8-O 8-%
+	;; excludes just numbers
+	("[^.0-9]\\(8-[|O%]\\)\\W" 1 "FaceKOed")
+	;; :-# :#
+	("\\(:-?#\\)\\W" 1 "FaceNyah")
+	;; :-( :-{ :( :{
+	("\\(:-?[({]+\\)\\W" 1 "FaceSad")
+	;; =( ={
+	("\\(=[({]+\\)\\W" 1 "FaceSad")
+	;; :-O :-o :O :o
+	("\\(:-?[Oo]\\)\\W" 1 "FaceStartled")
+	;; :-| :|
+	("\\(:-?|\\)\\W" 1 "FaceStraight")
+	;; :-p :p
+	("\\(:-?p\\)\\W" 1 "FaceTalking")
+	;; :-d
+	("\\(:-d\\)\\W" 1 "FaceTasty")
+	;; ;-> ;-) ;-} ;> ;) :}
+	("\\(;-?[>)}]+\\)\\W" 1 "FaceWinking")
+	;; :-V :-v :V :v
+	("\\(:-?[Vv]\\)\\W" 1 "FaceWry")
+	;; :-P :P
+	("\\(:-?P\\)\\W" 1 "FaceYukky")
+	;; ]:-) ]:-> ]:-} ]8-) ]8-> ]8-} ]B-) ]B-> ]B-}
+	;; ]:) ]:> ]:} ]8) ]8> ]8} ]B) ]B> ]B}
+	("\\(\\][:8B]-?[)>}]\\)\\W" 1 "FaceDevilish"))
+    '(("\\(:-?)\\)\\W" 1 "smile")
+      ("\\(;-?)\\)\\W" 1 "blink")
+      ("\\(:-]\\)\\W" 1 "forced")
+      ("\\(8-)\\)\\W" 1 "braindamaged")
+      ("\\(:-|\\)\\W" 1 "indifferent")
+      ("\\(:-[/\\]\\)\\W" 1 "wry")
+      ("\\(:-(\\)\\W" 1 "sad")
+      ("\\(:-{\\)\\W" 1 "frown")))
   "*A list of regexps to map smilies to images.
 The elements are (REGEXP MATCH FILE), where MATCH is the submatch in
 regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
@@ -76,6 +133,8 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
   (let ((types (list "pbm")))
     (when (gnus-image-type-available-p 'xpm)
       (push "xpm" types))
+    (when (gnus-image-type-available-p 'xbm)
+      (push "xbm" types))
     types)
   "*List of suffixes on picon file names to try."
   :type '(repeat string)
@@ -125,14 +184,21 @@ A list of images is returned."
 		image (nth 2 entry))
 	  (goto-char beg)
 	  (while (re-search-forward (car entry) end t)
-	    (setq string (match-string group))
 	    (goto-char (match-end group))
-	    (delete-region (match-beginning group) (match-end group))
-	    (when image
-	      (push image images)
-	      (gnus-add-wash-type 'smiley)
-	      (gnus-add-image 'smiley image)
-	      (gnus-put-image image string))))
+	    (unless (text-property-any (match-beginning group) (point)
+				       'smilified t)
+	      (setq string (match-string group))
+	      (delete-region (match-beginning group) (match-end group))
+	      (when image
+		(push image images)
+		(gnus-add-wash-type 'smiley)
+		(gnus-add-image 'smiley image)
+		(put-text-property (point)
+				   (progn
+				     (gnus-put-image image string)
+				     (point))
+				   'smilified t)))))
+	(put-text-property beg (or end (point-max)) 'smilified nil)
 	images))))
 
 (defun smiley-toggle-buffer (&optional arg)
