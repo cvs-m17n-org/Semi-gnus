@@ -15067,6 +15067,20 @@ Feed を講読するには、概略バッファから @kbd{G R} を使って下さい---fee
 簡単に @code{nnrss} をはじめる方法は、グループバッファで @kbd{B nnrss
 RET y} のようなことを唱え、そしてグループを講読することです。
 
+@cindex OPML
+あなたの講読目録を @acronym{OPML} フォーマット (Outline Processor Markup
+Language) でロード/セーブするために、以下のコマンドを使うこともできます。
+
+@defun nnrss-opml-import file
+@acronym{OPML} ファイルの入力を促し、そのファイルにあるそれぞれ
+の feed を講読します。
+@end defun
+
+@defun nnrss-opml-export
+現在の @acronym{RSS} 講読目録を @acronym{OPML} フォーマットでバッファに
+書き出します。
+@end defun
+
 以下の @code{nnrss} 変数が変更可能です:
 
 @table @code
