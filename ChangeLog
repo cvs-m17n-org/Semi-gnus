@@ -1,3 +1,11 @@
+2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.16.4 revision 00.
+
+2004-01-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Add `gnus-group-read-ephemeral-group'.
+
 2003-12-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.16.3 revision 00.

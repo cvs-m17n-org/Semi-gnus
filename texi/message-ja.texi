@@ -1256,7 +1256,7 @@ Emacs でスペルチェックするために普及している二つの方法、
 @lisp
 (setq ispell-message-dictionary-alist
       '(("^Newsgroups:.*\\bde\\." . "deutsch8")
-	(".*" . "default")))
+        (".*" . "default")))
 @end lisp
 
 @code{ispell} はインストールされた @samp{ispell} コマンドに依存していま

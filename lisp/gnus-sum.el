@@ -2185,20 +2185,20 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 		gnus-article-outlook-deuglify-article t])
 	      )
 	     ("Output"
-	      ["Save in default format" gnus-summary-save-article
+	      ["Save in default format..." gnus-summary-save-article
 	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article using default method"))]
-	      ["Save in file" gnus-summary-save-article-file
+	      ["Save in file..." gnus-summary-save-article-file
 	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article in file"))]
-	      ["Save in Unix mail format" gnus-summary-save-article-mail t]
-	      ["Save in MH folder" gnus-summary-save-article-folder t]
-	      ["Save in VM folder" gnus-summary-save-article-vm t]
-	      ["Save in RMAIL mbox" gnus-summary-save-article-rmail t]
-	      ["Save body in file" gnus-summary-save-article-body-file t]
-	      ["Pipe through a filter" gnus-summary-pipe-output t]
+	      ["Save in Unix mail format..." gnus-summary-save-article-mail t]
+	      ["Save in MH folder..." gnus-summary-save-article-folder t]
+	      ["Save in VM folder..." gnus-summary-save-article-vm t]
+	      ["Save in RMAIL mbox..." gnus-summary-save-article-rmail t]
+	      ["Save body in file..." gnus-summary-save-article-body-file t]
+	      ["Pipe through a filter..." gnus-summary-pipe-output t]
 	      ["Add to SOUP packet" gnus-soup-add-article t]
-	      ["Print with Muttprint" gnus-summary-muttprint t]
+	      ["Print with Muttprint..." gnus-summary-muttprint t]
 	      ["Print" gnus-summary-print-article t])
 	     ("Backend"
 	      ["Respool article..." gnus-summary-respool-article t]
@@ -2632,7 +2632,7 @@ and backwards while displaying articles, type `\\[gnus-summary-next-unread-artic
 respectively.
 
 You can also post articles and send mail from this buffer.  To
-follow up an article, type `\\[gnus-summary-followup]'.	 To mail a reply to the author
+follow up an article, type `\\[gnus-summary-followup]'.  To mail a reply to the author
 of an article, type `\\[gnus-summary-reply]'.
 
 There are approx. one gazillion commands you can execute in this
@@ -7447,7 +7447,7 @@ is a number, it is the line the article is to be displayed on."
     t))
   (prog1
       (if (and (stringp article)
-	       (string-match "@" article))
+	       (string-match "@\\|%40" article))
 	  (gnus-summary-refer-article article)
 	(when (stringp article)
 	  (setq article (string-to-number article)))
@@ -8119,6 +8119,9 @@ of what's specified by the `gnus-refer-thread-limit' variable."
       (setq message-id (concat "<" message-id)))
     (unless (string-match ">$" message-id)
       (setq message-id (concat message-id ">")))
+    ;; People often post MIDs from URLs, so unhex it:
+    (unless (string-match "@" message-id)
+      (setq message-id (gnus-url-unhex-string message-id)))
     (let* ((header (gnus-id-to-header message-id))
 	   (sparse (and header
 			(gnus-summary-article-sparse-p

@@ -430,8 +430,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 				       (+ (match-beginning 0) 3))))))
 		  (cond
 		   ((eq (car cont) 'mml)
-		    (let ((mml-boundary (funcall mml-boundary-function
-						 (incf mml-multipart-number)))
+		    (let ((mml-boundary (mml-compute-boundary cont))
 			  (mml-generate-default-type "text/plain"))
 		      (mml-to-mime))
 		    (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
@@ -936,6 +935,19 @@ See Info node `(emacs-mime)Composing'.
       (setq description nil))
     description))
 
+(defun mml-minibuffer-read-disposition (type &optional default)
+  (let* ((default (or default
+		      (if (string-match "^text/.*" type)
+			  "inline"
+			"attachment")))
+	 (disposition (completing-read "Disposition: "
+				       '(("attachment") ("inline") (""))
+				       nil
+				       nil)))
+    (if (not (equal disposition ""))
+	disposition
+      default)))
+
 (defun mml-quote-region (beg end)
   "Quote the MML tags in the region."
   (interactive "r")
@@ -978,7 +990,7 @@ See Info node `(emacs-mime)Composing'.
 
 ;;; Attachment functions.
 
-(defun mml-attach-file (file &optional type description)
+(defun mml-attach-file (file &optional type description disposition)
   "Attach a file to the outgoing MIME message.
 The file is not inserted or encoded until you send the message with
 `\\[message-send-and-exit]' or `\\[message-send]'.
@@ -989,10 +1001,14 @@ description of the attachment."
   (interactive
    (let* ((file (mml-minibuffer-read-file "Attach file: "))
 	  (type (mml-minibuffer-read-type file))
-	  (description (mml-minibuffer-read-description)))
-     (list file type description)))
-  (mml-insert-empty-tag 'part 'type type 'filename file
-			'disposition "attachment" 'description description))
+	  (description (mml-minibuffer-read-description))
+	  (disposition (mml-minibuffer-read-disposition type)))
+     (list file type description disposition)))
+  (mml-insert-empty-tag 'part
+			'type type
+			'filename file
+			'disposition (or disposition "attachment")
+			'description description))
 
 (defun mml-attach-buffer (buffer &optional type description)
   "Attach a buffer to the outgoing MIME message.
@@ -1061,6 +1077,8 @@ If RAW, don't highlight the article."
       (switch-to-buffer (generate-new-buffer
 			 (concat (if raw "*Raw MIME preview of "
 				   "*MIME preview of ") (buffer-name))))
+      (when (boundp 'gnus-buffers)
+	(push (current-buffer) gnus-buffers))
       (erase-buffer)
       (insert-buffer-substring buf)
       (mml-preview-insert-mail-followup-to)

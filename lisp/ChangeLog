@@ -1,3 +1,124 @@
+2004-01-03 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Gnus v5.10.4 is released.
+
+2004-01-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.el (gnus-mode-line-buffer-identification): Show version in
+	help-echo.
+	(gnus-read-group): Allow most group names.  Changed warning.
+
+2004-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-dired.el (gnus-dired-mode-map): Change keymaps.
+
+2004-01-02  Arne J,Ax(Brgensen  <arne@arnested.dk>
+
+	* smime.el (smime-crl-check): Doc fix.
+
+2004-01-02  Edwin Steiner  <edwin.steiner@gmx.net>
+
+	* gnus-nocem.el (gnus-nocem-enter-article): Use the real group
+	hashtb (tiny patch).
+
+2004-01-02  Kai Grossjohann  <kai@emptydomain.de>
+
+	* nnml.el (nnml-save-mail): Grok compressed articles.  From
+	Michael Albinus <Michael.Albinus@alcatel.de>.
+
+2004-01-02  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-ham-copy-or-move-routine): use spam-list-articles
+	(spam-list-articles): rewritten to only check a mark once per
+	invocation
+
+2004-01-01  Simon Josefsson  <jas@extundo.com>
+
+	* mml-sec.el (mml-default-encrypt-method)
+	(mml-default-sign-method): Defcustom.
+
+2003-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mml.el (mml-generate-mime-1): Remove extra ).
+
+	* gnus-group.el (gnus-group-set-current-level): Signal errors on
+	topic lines.
+	(gnus-group-set-current-level): Fix fix.
+
+2003-12-31  Jeremy Maitin-Shepard  <jbms@attbi.com>
+
+	* mml.el (mml-generate-mime-1): Use mml-compute-boundary (tiny
+	change). 
+
+2003-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-group.el: Removed `(when t ...)' around `gnus-define-keys'.
+	(gnus-group-group-map): Added `gnus-group-read-ephemeral-group'
+	(already in previous commit inadvertently).
+	(gnus-group-make-menu-bar): Added `gnus-group-read-ephemeral-group'.
+	(gnus-group-read-ephemeral-group): Made interactive.
+
+	* gnus-score.el (gnus-score-find-trace): Added comment on sync
+	with `gnus-score-edit-file-at-point'.
+
+	* gnus-logic.el (gnus-score-advanced): Ditto.
+
+	* gnus-score.el (gnus-score-edit-file-at-point): Fix for
+	advanced scoring.
+
+2003-12-30  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-score.el (gnus-score-edit-file-at-point): Use
+	gnus-point-at-*, for portability.
+
+2003-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-treat-body-boundary): Fix doc-string and
+	custom type.
+	(gnus-button-mid-or-mail-regexp): Don't be too restrictive.
+	Suggested by Felix Wiemann <Felix.Wiemann@gmx.net>.
+	(gnus-button-alist): Added "M-x ... RET" and "mid:" buttons.
+	Added comments about relevant RFCs.
+
+	* gnus-sum.el (gnus-summary-mode): Untabify doc-string.
+	(gnus-summary-goto-article): Allow `%40'.
+	(gnus-summary-refer-article): Convert `%40' to `@'.
+
+2003-12-30  Simon Josefsson  <jas@extundo.com>
+
+	* smime.el (smime-crl-check): New.
+	(smime-verify-region): Use it.  From Arne J,Ax(Brgensen
+	<arne@arnested.dk> in <87llpk9v5q.fsf@seamus.arnested.dk> (tiny
+	change).
+
+2003-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-score.el (gnus-score-edit-file-at-point): Consider the
+	whole match element.  From Karl Pfl,Ad(Bsterer <sigurd@12move.de>.
+	(gnus-score-find-trace): Use it.  Added `f' and `t' commands,
+	added quick help.  With some suggestions from Karl Pfl,Ad(Bsterer
+	<sigurd@12move.de>.
+
+	* gnus-util.el (gnus-emacs-version): Added doc-string.
+
+	* mml.el (mml-minibuffer-read-disposition): New function.
+	(mml-attach-file): Use it.
+	(mml-preview): Added MIME preview to gnus-buffers.
+
+2003-12-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Add ellipses.
+
+2003-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-start.el (gnus-get-unread-articles): Inline gnus-server-get-method.
+	(gnus-get-unread-articles): Cache methods.
+	(gnus-get-unread-articles-in-group): Indent.
+
+	* gnus.el (gnus-version-number): Bump.
+	(gnus-secondary-method-p): Extend servers to methods before comparing.
+	(gnus-secondary-method-p): Revert.
+
 2003-12-30 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Gnus v5.10.3 is released.
