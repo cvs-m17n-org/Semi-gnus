@@ -5,6 +5,9 @@
 
 	* lisp/gnus.el (gnus-variable-list): Undo my last change.
 
+	* lisp/read-password.el (read-pw-set-mail-source-passwd-cache): Do
+	not input password if mail-source-password-cache is non nil.
+
 1999-02-03   Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
 	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache): To

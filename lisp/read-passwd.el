@@ -86,19 +86,20 @@ Argument PROMPT ."
 ;;
 (defvar pw nil)
 (defun read-pw-set-mail-source-passwd-cache ()
-  (car (mapcar
-	(lambda (x)
-	  (mail-source-bind (pop x)
-	    (let ((from (format "%s:%s:%s" server user port))
-		  (mail-source-string (format "%s:%s@%s" (car x) user server)))
-	      (setq pw (read-pw-return-passwd-string user server))
-	      (unless (assoc user mail-source-password-cache)
-		(set-alist 'mail-source-password-cache
-			   (format "%s:%s:%s" server user port)
-			   pw))
-	      (cdr (assoc from mail-source-password-cache)))))
-;;	gnus-offline-mail-source)))
-	nnmail-spool-file)))
+  (if (not mail-source-password-cache)
+      (car (mapcar
+	    (lambda (x)
+	      (mail-source-bind (pop x)
+		(let ((from (format "%s:%s:%s" server user port))
+		      (mail-source-string
+		       (format "%s:%s@%s" (car x) user server)))
+		  (setq pw (read-pw-return-passwd-string user server))
+		  (unless (assoc user mail-source-password-cache)
+		    (set-alist 'mail-source-password-cache
+			       (format "%s:%s:%s" server user port)
+			       pw))
+		  (cdr (assoc from mail-source-password-cache)))))
+	    nnmail-spool-file))))
 ;;
 ;;
 (defvar passwd nil)
