@@ -11777,10 +11777,8 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @findex nntp-open-ssl-stream
 @item nntp-open-ssl-stream
 @dfn{$B0BA4$J(B} $B%A%c%s%M%k$r;H$C$F%5!<%P!<$K@\B3$7$^$9!#$3$l$r;H$&$?$a$K$O!"(B
-OpenSSL (@uref{http://www.openssl.org}) $B$+(B SSLeay
-(@uref{ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL} $B$H(B @file{ssl.el} ($BNc$((B
-$B$P(B W3 $B$NG[I[$+$i(B) $B$,I,MW(B) $B$,%$%s%9%H!<%k$5$l$F$$$J$1$l$P$J$j$^$;$s!#$=$l(B
-$B$+$i%5!<%P!<$r<!$N$h$&$KDj5A$7$^$9(B:
+OpenSSL (@uref{http://www.openssl.org}) $B$+(B SSLeay $B$,%$%s%9%H!<%k$5$l$F$$(B
+$B$J$1$l$P$J$j$^$;$s!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5A$7$^$9(B:
 
 @lisp
 ;; $BJT=8$7=*$o$C$?$i(B `C-c C-c' $B$r%?%$%W$7$F2<$5$$!#(B
@@ -14864,7 +14862,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B%j(B @samp{starttls.el} $B$H(B @samp{starttls} $B%W%m%0%i%`$,I,MW$G$9!#(B
 @item
 @dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i%`(B) $B$+(B SSLeay
-(@samp{s_client}) $B$H30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G$9!#(B
+(@samp{s_client}) $B$,I,MW$G$9!#(B
 @item
 @dfn{shell:} $B%7%'%kL?Na$r;H$C$F(B @sc{imap} $B@\B3$r3+;O$7$^$9!#(B
 @item
@@ -14889,8 +14887,7 @@ SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @uref{http://www.openssl.org/}
 nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x $B$K$O(B
 $B=EBg$J%P%0$,$"$k$?$a;H$($^$;$s!#0JA0$NHG!"FC$K(B SSLeay 0.8.x $B$O;H$($k$3$H(B
 $B$,$o$+$C$F$$$^$9!#JQ?t(B @code{imap-ssl-program} $B$O(B OpenSSL/SSLeay $B$KEO$9(B
-$B%Q%?%a!<%?$r4^$_$^$9!#2C$($F(B @samp{ssl.el}  ($BNc$($P(B W3 $B$K4^$^$l$F$$$k$b(B
-$B$N(B) $B$,I,MW$G$9!#(B
+$B%Q%?%a!<%?$r4^$_$^$9!#(B
 
 @vindex imap-shell-program
 @vindex imap-shell-host
