@@ -1,3 +1,27 @@
+1999-07-02  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+	(gnus-other-frame): Use `static-if'.
+	(TopLevel): Require `static'.
+
+	* lisp/score-mode.el (score-mode-coding-system): Use `static-if'.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-util.el (gnus-point-at-eol, gnus-point-at-bol): Use
+	`static-cond' if it exists.  NOTE: It should be simplified in the
+	future.
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system): Use
+	`static-if'.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-art.el (gnus-article-display-x-face-with-x-face-mule):
+	Abolish function.
+
+	* lisp/dgnushack.el (dgnushack-make-package): Suppress verbose
+	messages while generating auto-autoloads.el.
+	(TopLevel): Set coding priority of Shift-JIS to the bottom.
+
 1999-06-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
