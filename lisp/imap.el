@@ -162,11 +162,30 @@
 (static-if (and (fboundp 'base64-encode-string)
 		(subrp (symbol-function 'base64-encode-string)))
     (eval-and-compile (fset 'imap-base64-encode-string 'base64-encode-string))
-  (defun imap-base64-encode-string (string)
-    (fset 'imap-base64-encode-string
-	  (symbol-function (mel-find-function 'mime-encode-string "base64")))
-    (imap-base64-encode-string string))
-  )
+  (static-condition-case nil
+      (progn
+	(require 'mel)
+	(funcall (mel-find-function 'mime-encode-string "base64")
+		 "" 'no-line-break)
+	(defun imap-base64-encode-string (string &optional no-line-break)
+	  (fset 'imap-base64-encode-string
+		(symbol-function (mel-find-function
+				  'mime-encode-string "base64")))
+	  (imap-base64-encode-string string))
+	)
+    (wrong-number-of-arguments
+     (eval-and-compile
+       (fset 'imap-base64-encode-string-1
+	     (symbol-function (mel-find-function
+			       'mime-encode-string "base64"))))
+     (defun imap-base64-encode-string (string &optional no-line-break)
+       (if no-line-break
+	   (mapconcat (function identity)
+		      (split-string (imap-base64-encode-string-1 string)
+				    "[\n\r]")
+		      "")
+	 (imap-base64-encode-string-1 string)))
+     )))
 
 (autoload 'md5 "md5")
 
