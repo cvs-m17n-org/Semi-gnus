@@ -2176,33 +2176,34 @@ If FORCE is non-nil, the .newsrc file is read."
 
 (defun gnus-read-newsrc-el-file (file)
   (let ((ding-file (concat file "d")))
-    ;; We always, always read the .eld file.
-    (gnus-message 5 "Reading %s..." ding-file)
-    (let (gnus-newsrc-assoc)
-      (gnus-load ding-file gnus-ding-file-coding-system)
-;;      ;; Older versions of `gnus-format-specs' are no longer valid
-;;      ;; in Oort Gnus 0.01.
-;;      (let ((version
-;;	     (and gnus-newsrc-file-version
-;;		  (gnus-continuum-version gnus-newsrc-file-version))))
-;;	(when (or (not version)
-;;		  (< version 5.090009))
-;;	  (setq gnus-format-specs gnus-default-format-specs)))
-      (when gnus-newsrc-assoc
-	(setq gnus-newsrc-alist gnus-newsrc-assoc)))
-    (gnus-make-hashtable-from-newsrc-alist)
-    (when (file-newer-than-file-p file ding-file)
-      ;; Old format quick file
-      (gnus-message 5 "Reading %s..." file)
-      ;; The .el file is newer than the .eld file, so we read that one
-      ;; as well.
-      (gnus-read-old-newsrc-el-file file)))
-  (when (and gnus-product-directory
-	     (file-directory-p gnus-product-directory))
-    (let ((list gnus-product-variable-file-list))
-      (while list
-	(apply 'gnus-product-read-variable-file-1 (car list))
-	(setq list (cdr list))))))
+    (when (file-exists-p ding-file)
+      ;; We always, always read the .eld file.
+      (gnus-message 5 "Reading %s..." ding-file)
+      (let (gnus-newsrc-assoc)
+	(gnus-load ding-file gnus-ding-file-coding-system)
+;;	;; Older versions of `gnus-format-specs' are no longer valid
+;;	;; in Oort Gnus 0.01.
+;;	(let ((version
+;;	       (and gnus-newsrc-file-version
+;;		    (gnus-continuum-version gnus-newsrc-file-version))))
+;;	  (when (or (not version)
+;;		    (< version 5.090009))
+;;	    (setq gnus-format-specs gnus-default-format-specs)))
+	(when gnus-newsrc-assoc
+	  (setq gnus-newsrc-alist gnus-newsrc-assoc)))
+      (gnus-make-hashtable-from-newsrc-alist)
+      (when (file-newer-than-file-p file ding-file)
+	;; Old format quick file
+	(gnus-message 5 "Reading %s..." file)
+	;; The .el file is newer than the .eld file, so we read that one
+	;; as well.
+	(gnus-read-old-newsrc-el-file file)))
+    (when (and gnus-product-directory
+	       (file-directory-p gnus-product-directory))
+      (let ((list gnus-product-variable-file-list))
+	(while list
+	  (apply 'gnus-product-read-variable-file-1 (car list))
+	  (setq list (cdr list)))))))
 
 ;;(defun gnus-re-read-newsrc-el-file (file)
 ;;  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
