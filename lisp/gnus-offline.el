@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.5 1999-09-03 15:42:54 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.6 1999-09-11 19:30:33 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -278,7 +278,18 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
     (empting-spool-6 . "Sending messages in spool ... done.")
     (interval-time-1 . "Interval time (now %d minutes) : ")
     (interval-time-2 . "Retrieving message logic by timer is disabled.")
-    (interval-time-3 . "Interval time set to %d minutes")))
+    (interval-time-3 . "Interval time set to %d minutes")
+    (menu-miee-1 . "Post news in spool")
+    (menu-miee-2 . "Send mails in spool")
+    (menu-miee-3 . "Message Offline")
+    (menu-miee-4 . "Message Online")
+    (menu-1 . "Toggle articles to fetch")
+    (menu-2 . "Toggle online/offline send mail")
+    (menu-3 . "Toggle auto hangup")
+    (menu-4 . "Expire articles")
+    (menu-5 . "Set interval time")
+    (menu-6 . "Hang up Line.")
+    (menu-7 . "Customize options...")))
 
 (defvar gnus-offline-resource-ja
   '((error-check-1
@@ -311,7 +322,20 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
     (interval-time-2 . "自動送受信機能を オフ にしました。")
     (interval-time-3 . "自動送受信の間隔を %d 分に設定しました。")))
 
-(defvar gnus-offline-resource-ja_complete gnus-offline-resource-ja)
+(defvar gnus-offline-resource-ja_complete
+  (append
+   gnus-offline-resource-ja
+   '((menu-miee-1 . "Spool にある記事の送信")
+     (menu-miee-2 . "Spool にある Mail の送信")
+     (menu-miee-3 . "Offline 状態へ")
+     (menu-miee-4 . "Online 状態へ")
+     (menu-1 . "取得記事種類の変更")
+     (menu-2 . "Mail 送信方法(On/Off)の切替え")
+     (menu-3 . "自動切断の切替え")
+     (menu-4 . "取得済記事を消す")
+     (menu-5 . "記事取得間隔時間の設定")
+     (menu-6 . "回線の切断")
+     (menu-7 . "プロパティ..."))))
 
 ;;; Functions
 
@@ -754,11 +778,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 (defun gnus-offline-agent-expire ()
   "*Expire expirable article on News group."
   (interactive)
-  (when gnus-offline-agent-automatic-expire
-    (let ((gnus-agent-expire-all (if (eq 0 gnus-agent-expire-days)
-				     nil
-				   gnus-agent-expire-all)))
-      (gnus-agent-expire))))
+  (and gnus-offline-agent-automatic-expire
+       (if (eq 0 gnus-agent-expire-days)
+	   (let (gnus-agent-expire-all)
+	     (gnus-agent-expire))
+	 (gnus-agent-expire))))
 ;;
 ;; Menu.
 ;;
@@ -807,63 +831,46 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 			  gnus-group-toolbar))))))
 ;;
 ;;
+(defun gnus-offline-get-menu-items (list)
+  (mapcar
+   #'(lambda (el)
+       (if (listp el)
+	   (apply
+	    'vector
+	    (cons (gnus-offline-get-message (car el)) (cdr el)))
+	 el))
+   list))
+
+(defvar gnus-offline-menu
+  (gnus-offline-get-menu-items
+   '((menu-1 gnus-offline-toggle-articles-to-fetch t)
+     (menu-2 gnus-offline-toggle-on/off-send-mail t)
+     (menu-3 gnus-offline-toggle-auto-hangup t)
+     "----"
+     (menu-4 gnus-offline-agent-expire
+	     (eq gnus-offline-news-fetch-method 'nnagent))
+     (menu-5 gnus-offline-set-interval-time t)
+     "----"
+     (menu-6 gnus-offline-set-unplugged-state gnus-offline-connected)
+     "----"
+     (menu-7 gnus-ofsetup-customize t))))
+
 (defun gnus-offline-define-menu-on-miee ()
   "*Set and change menu bar on MIEE menu."
-  (let ((menu
-	 (if (string= gnus-offline-lang "ja_complete")
-	     (easy-menu-change
-	      nil
-	      "Miee"
-	      '(
-		["Spool にある記事の送信" news-spool-post t]
-		["Spool にある Mail の送信" mail-spool-send t]
-		"----"
-		["Offline 状態へ" message-offline-state
-		 (not message-offline-state)]
-		["Online 状態へ" message-online-state message-offline-state]
-		"----"
-		("Gnus Offline"
-		 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
-		 ["Mail 送信方法(On/Off)の切替え"
-		  gnus-offline-toggle-on/off-send-mail t]
-		 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
-		 "----"
-		 ["取得済記事を消す" gnus-offline-agent-expire
-		  (eq gnus-offline-news-fetch-method 'nnagent)]
-		 ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
-		 "----"
-		 ["回線の切断" gnus-offline-set-unplugged-state
-		  gnus-offline-connected]
-		 "----"
-		 ["プロパティ..." gnus-ofsetup-customize t])
-		))
-	   (easy-menu-change
-	    nil
-	    "Miee"
-	    '(
-	      ["Post news in spool" news-spool-post t]
-	      ["Send mails in spool" mail-spool-send t]
-	      "----"
-	      ["Message Offline" message-offline-state
-	       (not message-offline-state)]
-	      ["Message Online" message-online-state message-offline-state]
-	      "----"
-	      ("Gnus Offline"
-	       ["Toggle articles to fetch"
-		gnus-offline-toggle-articles-to-fetch t]
-	       ["Toggle online/offline send mail"
-		gnus-offline-toggle-on/off-send-mail t]
-	       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-	       "----"
-	       ["Expire articles" gnus-offline-agent-expire
-		(eq gnus-offline-news-fetch-method 'nnagent)]
-	       ["Set interval time" gnus-offline-set-interval-time t]
-	       "----"
-	       ["Hang up Line." gnus-offline-set-unplugged-state
-		gnus-offline-connected]
-	       "----"
-	       ["Customize options..." gnus-ofsetup-customize t]
-	       ))))))
+  (let ((miee-menu
+	 (gnus-offline-get-menu-items
+	  '((menu-miee-1 news-spool-post t)
+	    (menu-miee-2 mail-spool-send t)
+	    "----"
+	    (menu-miee-3 message-offline-state (not message-offline-state))
+	    (menu-miee-4 message-online-state message-offline-state)
+	    "----")))
+	menu)
+    (setq menu
+	  (easy-menu-change
+	   nil "Miee"
+	   (append miee-menu
+		   (list (cons "Gnus Offline" gnus-offline-menu)))))
     (and (featurep 'xemacs)
 	 (easy-menu-add menu))))
 ;;
@@ -871,37 +878,9 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defun gnus-offline-define-menu-on-agent ()
   "*Set menu bar on OFFLINE menu."
-  (easy-menu-define 
-   gnus-offline-menu-on-agent
-   gnus-group-mode-map
-   "Gnus offline Menu"
-   (if (string= gnus-offline-lang "ja_complete")
-       '("Offline"
-	 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
-	 ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail
-	  t]
-	 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
-	 "----"
-	 ["取得済記事を消す" gnus-offline-agent-expire
-	  (eq gnus-offline-news-fetch-method 'nnagent)]
-	 ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
-	 "----"
-	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected]
-	 "----"
-	 ["プロパティ..." gnus-ofsetup-customize t])
-     '("Offline"
-       ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
-       ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail
-	t]
-       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-       "----"
-       ["Expire articles" gnus-offline-agent-expire
-	(eq gnus-offline-news-fetch-method 'nnagent)]
-       ["Set interval time" gnus-offline-set-interval-time t]
-       "----"
-       ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
-       "----"
-       ["Customize options..." gnus-ofsetup-customize t])))
+  (easy-menu-define
+   gnus-offline-menu-on-agent gnus-group-mode-map "Gnus offline Menu"
+   (cons "Offline" gnus-offline-menu))
   (and (featurep 'xemacs)
        (easy-menu-add gnus-offline-menu-on-agent)))
 ;;
@@ -909,7 +888,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defvar gnus-offline-popup-menu nil)
 (defun gnus-offline-popup-menu (event)
-  "Popup menu for Gnus offline."
+  "Popup menu for Gnus Offline."
   (interactive "e")
   (unless gnus-offline-popup-menu
     (setq gnus-offline-popup-menu
