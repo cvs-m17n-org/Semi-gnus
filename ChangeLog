@@ -4,9 +4,9 @@
 
 2001-07-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
-	We thanks to Thierry Emery <thierry.emery@club-internet.fr> who
+	We thank to Thierry Emery <thierry.emery@club-internet.fr> who
 	made it notice that there was a change to have to be merged from
-	Gnus. -- ky
+	Gnus. -- 2003-05-21 ky
 
 	* lisp/nnfolder.el (nnfolder-read-folder): Force to use a
 	multibyte buffer.
