@@ -16812,8 +16812,8 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B @sc{nov} $B$H5-;v$r;H$&$+$I$&$+$r@
 @vindex gnus-server-unopen-status
 $B$?$V$s%(!<%8%'%s%HJQ?t$G$O$J$$$,%(!<%8%'%s%H$KL)@\$K4XO"$9$k$3$NJQ?t$O!"(B
 gnus $B$,%5!<%P!<$K@\B3$G$-$J$H$-$K2?$,5/$-$?$+$rJ*8l$j$^$9!#%(!<%8%'%s%H(B
-$B$,3h@-2=$5$l$k$H!"%G%U%)%k%H$N(B @code{nil} $B$G$O!"%f!<%6!<$,%5!<%P!<$H$N@\(B
-$BB3$r@d$D$+%(!<%8%'%s%H$r(B unplug $B$K$9$k$+$r(B gnus $B$K?R$M$5$;$^$9!#%(!<%8%'(B
+$B$,3h@-2=$5$l$k$H!"%G%#%U%)%k%H$N(B @code{nil} $B$G$O!"%f!<%6!<$,%5!<%P!<$H$N(B
+$B@\B3$r@d$D$+%(!<%8%'%s%H$r(B unplug $B$K$9$k$+$r(B gnus $B$K?R$M$5$;$^$9!#%(!<%8%'(B
 $B%s%H$,IT3h@-2=$5$l$k$H!"(Bgnus $B$O$$$D$bC1$K%5!<%P!<$H$N@\B3$r@d$A$^$9!#$3(B
 $B$NJQ?t$NB>$NA*Br;h$K$O(B @code{denied} $B$H(B @code{offline} $B$,$"$j!"%(!<%8%'(B
 $B%s%H$,;H$o$l$k>l9g$O8e<T$@$1$,M-8z$G$9!#(B
@@ -20846,19 +20846,18 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 $B$F$$$^$9!#$7$+$7!"$3$NJ,Ln$K$*$1$k2~NI$OM-MQ$J9W8%$K$J$k$G$7$g$&!#(B
 
 @node Filtering Spam Using spam.el
-@subsection Filtering Spam Using spam.el
+@subsection spam.el $B$r;H$C$?(B spam $B$N_I2a(B
 @cindex spam filtering
 @cindex spam.el
 
-The idea behind @code{spam.el} is to have a control center for spam detection
-and filtering in Gnus.  To that end, @code{spam.el} does two things: it
-filters incoming mail, and it analyzes mail known to be spam.
+@code{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)=j$r(B gnus $B$NCf$K(B
+$B;}$D$3$H$G$9!#$=$N$?$a$K(B @code{spam.el} $B$OFs$D$N$3$H$r9T$J$$$^$9(B: $BF~$C$F(B
+$B$/$k%a!<%k$r_I2a$7!"(Bspam $B$H$7$FCN$i$l$k%a!<%k$rJ,@O$9$k$3$H$G$9!#(B
 
-So, what happens when you load @code{spam.el}?  First of all, you get
-the following keyboard commands:
+$B$G$O(B @code{spam.el} $B$r(B load $B$9$k$H2?$,5/$-$k$G$7$g$&$+(B?  $BBh0l$K!"0J2<$N(B
+$B%-!<%\!<%IL?Na$,;H$($k$h$&$K$J$j$^$9(B:
 
 @table @kbd
-
 @item M-d
 @itemx M s x
 @itemx S x
@@ -20868,9 +20867,9 @@ the following keyboard commands:
 @findex gnus-summary-mark-as-spam
 (@code{gnus-summary-mark-as-spam})
 
-Mark current article as spam, showing it with the @samp{H} mark.
-Whenever you see a spam article, make sure to mark its summary line
-with @kbd{M-d} before leaving the group.
+$B8=:_$N5-;v$K(B spam $B$H$7$F0u$rIU$1!"$=$l$r(B @samp{H} $B0u$GI=<($7$^$9!#(B
+Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$N(B
+$B35N,9T$K0u$rIU$1$k$h$&$K$7$F2<$5$$!#(B
 
 @item M s t
 @itemx S t
@@ -20879,70 +20878,70 @@ with @kbd{M-d} before leaving the group.
 @findex spam-bogofilter-score
 (@code{spam-bogofilter-score}
 
-You must have bogofilter processing enabled for that command to work
-properly.
+$B$3$N%3%^%s%I$,$A$c$s$HF/$/$?$a$K$O(B bogofilter $B$N=hM}$rM-8z$K$7$J$1$l$P$J(B
+$B$j$^$;$s!#(B
 
 @xref{Bogofilter}.
-
 @end table
 
-Gnus can learn from the spam you get.  All you have to do is collect
-your spam in one or more spam groups, and set the variable
-@code{spam-junk-mailgroups} as appropriate.  In these groups, all messages
-are considered to be spam by default: they get the @samp{H} mark.  You must
-review these messages from time to time and remove the @samp{H} mark for
-every message that is not spam after all.  When you leave a a spam
-group, all messages that continue with the @samp{H} mark, are passed on to
-the spam-detection engine (bogofilter, ifile, and others).  To remove
-the @samp{H} mark, you can use @kbd{M-u} to "unread" the article, or @kbd{d} for
-declaring it read the non-spam way.  When you leave a group, all @samp{H}
-marked articles, saved or unsaved, are sent to Bogofilter or ifile
-(depending on @code{spam-use-bogofilter} and @code{spam-use-ifile}), which will study
-them as spam samples.
+gnus $B$O$"$J$?$,<u$1<h$C$?(B spam $B$+$i3X$V$3$H$,$G$-$^$9!#$"$J$?$,$7$J$1$l(B
+$B$P$J$i$J$$$N$O!"0l$D0J>e$N(B spam $B%0%k!<%W$K(B spam $B5-;v$r=8$a$F!"JQ(B
+$B?t(B @code{spam-junk-mailgroups} $B$rE,@Z$K@_Dj$9$k$3$H$G$9!#$3$l$i$N%0%k!<(B
+$B%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a$5$l$^$9(B: $B$=(B
+$B$l$i$K$O(B @samp{H} $B0u$,IU$-$^$9!#;~!9$3$l$i$N%a%C%;!<%8$rD4$Y$F$_$F!"$d$C(B
+$B$Q$j(B spam $B$G$O$J$+$C$?$9$Y$F$N5-;v$+$i(B @samp{H} $B0u$r>C$5$J$1$l$P$J$j$^$;(B
+$B$s!#(BSpam $B%0%k!<%W$+$iH4$1$k$H$-$K!"(B@samp{H} $B0u$,IU$$$?$^$^$N$9$Y$F$N%a%C(B
+$B%;!<%8$O(B spam $B8!=P%(%s%8%s(B (bogofilter$B!"(Bifile$B!"$=$NB>(B) $B$KEO$5$l$^$9!#(B
+@samp{H} $B0u$r>C$9$K$O(B @kbd{M-u} $B$G5-;v$r(B "$BL$FI(B" $B$K$9$k$+!"(B@kbd{d} $B$G$=$l(B
+$B$r(B spam $B$G$O$J$$$b$N$H$7$FFI$s$@$3$H$r@k8@$7$F2<$5$$!#%0%k!<%W$rH4$1$?$H(B
+$B$-!"$9$Y$F$N(B @samp{H} $B0u$,IU$$$?5-;v$O%;!<%V$5$l$?$+$I$&$+$K4X78L5$/!"(B
+Bogofilter $B$+(B ifile (@code{spam-use-bogofilter} $B$H(B @code{spam-use-ifile} $B$K(B
+$B$h$k(B) $B$KAw$i$l!"$=$l$i$r(B spam $B$NI8K\$H$7$F3X=,$7$^$9!#(B
 
-Messages may also be deleted in various other ways, and unless
-@code{`spam-ham-marks-form} gets overridden below, marks @samp{R} and @samp{r} for
-default read or explicit delete, marks @samp{X} and @samp{K} for automatic or
-explicit kills, as well as mark @samp{Y} for low scores, are all considered
-to be associated with articles which are not spam.  This assumption
-might be false, in particular if you use kill files or score files as
-means for detecting genuine spam, you should then adjust
-@code{spam-ham-marks-form}.  When you leave a group, all _unsaved_ articles
-bearing any the above marks are sent to Bogofilter or ifile, which
-will study these as not-spam samples.  If you explicit kill a lot, you
-might sometimes end up with articles marked @samp{K} which you never saw,
-and which might accidentally contain spam.  Best is to make sure that
-real spam is marked with @samp{H}, and nothing else.
+$B%a%C%;!<%8$OB>$N$$$m$$$m$JJ}K!$K$h$C$F$b>C5n$5$l$k$+$b$7$l$^$;$s$7!"(B
+@code{spam-ham-marks-form} $B$,8e=R$N$h$&$K>e=q$-$5$l$J$1$l$P!"Dc$$%9%3%"(B
+$B$N$?$a$N(B @samp{Y} $B0u$HF1MM!"%G%#%U%)%k%H$N4{FI$+L@<(E*$J>C5n$N$?$a(B
+$B$N(B @samp{R} $B$H(B @samp{r} $B0u!"<+F0$^$?$OL@<(E*$J:o=|$N$?$a(B
+$B$N(B @samp{X} $B$H(B @samp{K} $B0u!"$=$l$i$9$Y$F$,(B spam $B$H$OL54X78$G$"$k$H2r<a$5(B
+$B$l$^$9!#$3$N2>Dj$O!"FC$KK\J*$N(B spam $B$r8!=P$9$k$?$a$K>C5n(B (kill) $B%U%!%$%k(B
+$B$+%9%3%"%U%!%$%k$r;H$C$F$$$k>l9g$O4V0c$C$F$$$k$+$b$7$l$^$;$s!#$=$&$G$"$l(B
+$B$P(B @code{spam-ham-marks-form} $B$rD4@0$9$k$Y$-$G$9!#%0%k!<%W$rH4$1$k$H$-$K!"(B
+$B>e5-$N0u$,IU$$$?$9$Y$F$N%;!<%V$5$l$F$$$J$$5-;v$O(B Bogofilter $B$+(B ifile $B$K(B
+$BAw$i$l!"$=$l$i$r(B spam $B$G$O$J$$I8K\$H$7$F3X=,$7$^$9!#0U?^E*$K$?$/$5$s$N>C(B
+$B5n$r9T$J$&$H!"$?$^$K$=$l$O8+$F$$$J$$(B @samp{K} $B0u$,IU$$$?5-;v$G=*$o$k$+$b(B
+$B$7$l$^$;$s!#$=$7$F$=$l$i$O6vA3$K(B spam $B$r4^$s$G$$$k$+$b$7$l$^$;$s!#:G$bNI(B
+$B$$$N$O!"K\Ev$N(B spam $B$K(B @samp{H} $B$,IU$$$F$$$F!"B>$K2?$bL5$$$3$H$r3N$+$a$k(B
+$B$3$H$G$9!#(B
 
-All other marks do not contribute to Bogofilter or ifile
-pre-conditioning.  In particular, ticked, dormant or souped articles
-are likely to contribute later, when they will get deleted for real,
-so there is no need to use them prematurely.  Explicitly expired
-articles do not contribute, command @kbd{E} is a way to get rid of an
-article without Bogofilter or ifile ever seeing it.
+$BB>$N$9$Y$F$N%^!<%/$,(B Bogofilter $B$"$k$$$O(B ifile $B$NF0:n$NA0Ds$H$J$k>r7oIU(B
+$B$1$K4sM?$9$k$o$1$G$O$"$j$^$;$s!#$H$j$o$12D;k(B (ticked)$B!"J]N1(B (dormant) $B$^(B
+$B$?$O(B soup $B$5$l$F$$$k5-;v$O!"K\Ev$K>C5n$5$l$?8e$G4sM?$9$k$N$,E,Ev$J$N$G!"(B
+$B$=$l$i$rAa$^$C$F;H$&I,MW$O$"$j$^$;$s!#L@<(E*$K4|8B@Z$l>C5n$5$l$?5-;v$O4s(B
+$BM?$7$^$;$s!#%3%^%s%I(B @kbd{E} $B$O(B Bogofilter $B$^$?$O(B ifile $B$,>o$K8+$k$3$HL5(B
+$B$7$K5-;v$r<h$j=|$/J}K!$G$9!#(B
 
-@strong{TODO: @code{spam-use-ifile} does not process spam articles on group exit.
-I'm waiting for info from the author of @code{ifile-gnus.el}, because I think
-that functionality should go in @code{ifile-gnus.el} rather than @code{spam.el}.}
+@strong{TODO: @code{spam-use-ifile} $B$O%0%k!<%W$rH4$1$k$H$-$K5-;v$r=hM}$7(B
+$B$^$;$s!#;d(B ($BLuCm(B: Teodor Zlatanov) $B$O$=$N5!G=$,(B @code{spam.el} $B$G$O$J$/(B
+$B$F(B @code{ifile-gnus.el} $B$G9T$J$o$l$k$Y$-$@$H;W$&$N$G!"(B
+@code{ifile-gnus.el} $B$N:n<T$+$i$N(B info $B$rBT$C$F$$$^$9!#(B}
 
-To use the @code{spam.el} facilities for incoming mail filtering, you
-must add the following to your fancy split list
-(@code{nnmail-split-fancy} or @code{nnimap-split-fancy}:
+$BF~$C$F$/$k%a!<%k$r_I2a$9$kL\E*$G(B @code{spam.el} $B$r;H$&$K$O!"FC5iJ,3d%j%9(B
+$B%H(B @code{nnmail-split-fancy} $B$^$?$O(B @code{nnimap-split-fancy} $B$K0J2<$rDI(B
+$B2C$7$J$1$l$P$J$j$^$;$s(B:
 
 @example
 (: spam-split)
 @end example
 
-Note that the fancy split may be called @code{nnmail-split-fancy} or
-@code{nnimap-split-fancy}, depending on whether you use the nnmail or
-nnimap backends to retrieve your mail.
+$BFC5iJ,3d$O!"%a!<%k$N<h$j9~$_$K(B nnmail $B$+(B nnimap $B$N$I$A$i$N%P%C%/%(%s%I$r(B
+$B;H$C$F$$$k$+$K1~$8$F!"(B@code{nnmail-split-fancy} $B$^$?(B
+$B$O(B @code{nnimap-split-fancy} $B$+$i8F$P$l$k$3$H$KCm0U$7$F2<$5$$!#(B
 
-The @code{spam-split} function will process incoming mail and send the mail
-considered to be spam into the group name given by the variable
-@code{spam-split-group}.  Usually that group name is @samp{spam}.
+@code{spam-split} $B4X?t$OF~$C$F$/$k%a!<%k$r=hM}$7!"(Bspam $B$H;W$o$l$k%a!<%k(B
+$B$rJQ?t(B @code{spam-split-group} $B$GM?$($i$l$kL>A0$N%0%k!<%W$KAw$j$^$9!#DL(B
+$B>o$=$N%0%k!<%WL>$O(B @samp{spam} $B$G$9!#(B
 
-The following are the methods you can use to control the behavior of
-@code{spam-split}:
+$B0J2<$O(B @code{spam-split} $B$NF0:n$r@)8f$9$k$?$a$K;H$&$3$H$,$G$-$kJ}K!$G$9!#(B
 
 @menu
 * Blacklists and Whitelists::   
