@@ -1,5 +1,13 @@
 1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/message.el (message-send-news): Don't generate the Lines
+	field; don't make `tembuf' as unmodified.
+	(message-send-mail): Ditto.
+
+1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.066.
 
 	* lisp/{mail-source.el,gnus-sum.el,gnus-art.el}: Sync up with
