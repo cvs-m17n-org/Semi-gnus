@@ -1705,17 +1705,15 @@ The source file has to be in the Emacs load path."
       (insert ";----------------- Environment follows ------------------\n\n"))
     (while olist
       (if (boundp (car olist))
-	  (condition-case ()
-	      (pp `(setq ,(car olist)
-			 ,(if (or (consp (setq sym (symbol-value (car olist))))
-				  (and (symbolp sym)
-				       (not (or (eq sym nil)
-						(eq sym t)))))
-			      (list 'quote (symbol-value (car olist)))
-			    (symbol-value (car olist))))
-		  (current-buffer))
-	    (error
-	     (format "(setq %s 'whatever)\n" (car olist))))
+	  (ignore-errors
+	    (pp `(setq ,(car olist)
+		       ,(if (or (consp (setq sym (symbol-value (car olist))))
+				(and (symbolp sym)
+				     (not (or (eq sym nil)
+					      (eq sym t)))))
+			    (list 'quote (symbol-value (car olist)))
+			  (symbol-value (car olist))))
+		(current-buffer)))
 	(insert ";; (makeunbound '" (symbol-name (car olist)) ")\n"))
       (setq olist (cdr olist)))
     ;; Remove any control chars - they seem to cause trouble for some
