@@ -653,3 +653,168 @@ Gnus は、信頼できるプログラムの一つとして、サーバーと接続できないときは
 ループの名前を引数としてとります。
 
 
+@node New Groups
+@section New Groups
+@cindex new groups
+@cindex subscription
+
+@vindex gnus-check-new-newsgroups
+新しいニュースグループを全く見ないで満足であるならば、
+@code{gnus-check-new-newsgroups} を @code{nil} に設定することができます。
+これを設定した場合、起動にかかる時間が短くなります。この変数が nil に設
+定されていても、グループバッファで @kbd{U} を押せばいつでも新しいグルー
+プを購読することができます (@pxref{Group Maintenance})。ディフォルトでは
+この変数は @code{ask-server} です。この変数が @code{always} に設定され
+ていると、コマンド @kbd{g} を実行したときでもgnusはバックエンドに新しい
+グループを探すことを求めます (@pxref{Scanning New Messages})。
+
+@menu
+* Checking New Groups::      どのグループが新しいかを決定する。
+* Subscription Methods::     新しいグループに対して gnus は何をすべきか
+* Filtering New Groups::     gnus に特定の新しいグループを無視させる
+@end menu
+
+
+@node Checking New Groups
+@subsection Checking New Groups
+
+gnusは、普通はグループが新しいかどうかを、購読しているグループと削除され
+ているグループのリストと現状ファイル (active file) を比較することにより
+決定しています。この方法は特に速いというわけではありません。
+@code{gnus-check-new-newsgroups} が @code{ask-server} であると、gnusは
+サーバーに、最後に接続してから新しいグループができているかどうかを尋ねま
+す。この方法は速いし、安上がりです。これにより、削除されたグループのリス
+トを保持しておくことからから完全に開放されます。ですから、
+@code{gnus-save-killed-list} を@code{nil} にすることができるでしょう。そ
+うすれば、起動、終了の両方、そして全体にわたって時間を節約できます。ディ
+スク消費量も少なくなります。それなら、どうしてこれがディフォルトではない
+のでしょう?残念ながら、すべてのサーバーがこのコマンドを理解するわけでは
+ないのです。
+
+私は今あなたが何を考えているかを当てられます。どうすればサーバーが
+@code{ask-server} を理解するかがわかるのでしょう? え、違うのですか? あぁ、
+良かった。というのは、確実な答は存在しないのです。私に言えることは、この
+変数を @code{ask-server} に設定して、数日間新しいグループが現れるかどう
+かを調べてください、ということだけです。もしいくつかのグループが現れたな
+ら、それで動作しています。一つも現れなければ、それは動作しません。私は、
+gnusにサーバーが@code{ask-server} を理解するかどうかを推量させる関数を書
+くこともできますが、それは単に推量しているにすぎません。ですから、その関
+数を書くことはないでしょう。他の方法としては、サーバーに @code{telnet} 
+をして、@code{HELP} と打ち、サーバーが理解するコマンドの中に 
+@samp{NEWGROUPS} があるかどうかを調べることもできます。もしあれば、おそ
+らく動作するでしょう。(しかし、適切に機能を提供することなく
+@samp{NEGROUPS}をリストに含めるサーバーもあります。)
+
+この変数は、選択方法のリストであることもできます。そのときは、gnusはコマ
+ンド @code{ask-server} をそれぞれの選択方法に対して実行し、普通の方法で
+購読 (もしくは、不購読) します。これの副効果は、起動にかなり時間がかかる
+ので、待っている間に瞑想できることです。永久の幸福を達成するために、マン
+トラ``dingnusdingnusdingnus''を使ってください。
+
+
+@node Subscription Methods
+@subsection Subscription Methods
+
+@vindex gnus-subscribe-newsgroup-method
+新しいグループに遭遇したときにgnusが何をするかは、変数
+@code{gnus-subscribe-nesgroup-method}によって決定されます。
+
+この変数は関数を含んでいる必要があります。この関数は新しいグループの名前
+を唯一の引数として呼ばれます。
+
+いくつかの手軽なプレハブ関数は、以下のようになっています。
+
+@table @code
+
+@item gnus-subscribe-zombies
+@vindex gnus-subscribe-zombies
+すべての新しいグループをゾンビ (zombie) にします。これがディフォールトに
+なっています。後でゾンビを (@kbd{A z} によって) 概観したり、(@kbd{S z}に
+よって) 適切に全てを削除したり、(@kbd{u} によって) 購読したりできます。
+
+@item gnus-subscribe-randomly
+@vindex gnus-subscribe-randomly
+任意の順番ですべての新しいグループを購読します。実際には、すべての新しい
+グループはグループバッファの``一番上''に加えられます。
+
+@item gnus-subscribe-alphabetically
+@vindex gnus-subscribe-alphabetically
+すべての新しいグループをアルファベット順に購読します。
+
+@item gnus-subscribe-hierarchically
+@vindex gnus-subscribe-hierarchically
+すべての新しいグループを階層的に購読します。この関数と
+@code{gnus-subscribe-alphabetically} の違いは少ししかありません。
+@code{gnus-subscribe-alphabetically} は新しいグループを厳密にアルファベッ
+ト順にならべますが、この関数はグループをその階層の中に入れます。ですから、
+@samp{rec} の階層を @samp{comp} の階層の前に持ってきたい場合、この関数は
+その配置をぐちゃぐちゃにはしません。もしくは、そのようなものです。
+
+@item gnus-subscribe-interactively
+@vindex gnus-subscribe-interactively
+新しいグループを対話的に購読します。これは gnus が @strong{全て} のグルー
+プに対して尋ねることを意味しています。購読するグループは階層的に購読され
+ます。
+
+@item gnus-subscribe-killed
+@vindex gnus-subscribe-killed
+すべての新しいグループを削除します。
+
+@end table
+
+@vindex gnus-subscribe-hierarchical-interactive
+上の変数と良く関係した変数は、
+@code{gnus-subscribe-hierarchical-interactive}です。この変数が
+@code{nil} でないと、gnus は階層的な方法で新しいグループを購読するかどう
+かを尋ねます。gnusはそれぞれの階層で、それを下に降りるかどうかを尋ねます。
+
+良くある間違いは、数段落前の変数 (@code{gnus-subscribe-newsgroup-method}
+) を @code{gnus-subscribe-herarchical-interactive} に設定することです。
+これは誤りです。これは動作しません。これはおめでたい人のすることです。で
+すから、絶対にしないでください。
+
+
+@node Filtering New Groups
+@subsection Filtering New Groups
+
+どの新しいグループが購読 (もしくは、無視) されるべきかを管理する快適で手
+軽な方法は、ファイル @file{.newsrc} の先頭に @dfn{options} 行を挿入する
+ことです。次は、例です。
+
+@example
+options -n !alt.all !rec.all sci.all
+@end example
+
+@vindex gnus-subscribe-options-newsgroup-method
+この行は、明らかにまじめで理知的で科学的な人間 (もしくは単なる古く退屈な
+人間) が書いたものです。なぜなら、これは @samp{alt} と @samp{rec} で始ま
+る名前を持つグループは全て無視され、@samp{sci} で始まる名前を持つグルー
+プは全て購読する、ということを表しているからです。Gnusはこれらのグループ
+を購読するのに、普通の購読方法を用いません。代わりに、
+@code{gnus-subscribe-options-newsgroup-method} が用いられます。この変数
+はディフォルトでは @code{gnus-subscribe-alphabetically} です。
+
+@vindex gnus-options-not-subscribe
+@vindex gnus-options-subscribe
+ファイル @file{.newrc} をいじりたくない場合は、
+@code{gnus-options-subscribe} と @code{gnus-options-not-subscribe} の二
+つの変数だけを設定することもできます。この二つの変数はファイル 
+@file{.newrc} の @samp{optinos -n} 行と全く同じことをします。どちらの変
+数も正規表現で、新しいグループは前者に合致すれば無条件に購読され、後者に
+合致すると無視されます。
+
+@vindex gnus-auto-subscribed-groups
+さらにここでおせっかいをする変数は、@code{gnus-auto-subscribed-groups} 
+です。それは @code{gnus-options-subscribe} と全く同じように動作しますの
+で、本当は余分なものです。しかし、私はこの二つがあった方が良いと思いまし
+た。もう一方の変数はユーザがいじくるのに使われるのに対して、この変数はい
+くつかの基本的な規則を設定するためのものです。ディフォルトではこの変数は
+メールバックエンド (@code{nnml} 、@code{nnbabyl} 、@code{nnfolder} 、
+@code{nnmbox} と@code{nnmh}) からできる全ての新しいグループを購読するよ
+うになっています。それが嫌であれば、この変数を @code{nil} に設定してくだ
+さい。
+
+この正規表現に合致する新しいグループは 
+@code{gnus-subscribe-options-newsgroup-method} を使って購読されます。
+
+
