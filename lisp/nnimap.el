@@ -620,7 +620,7 @@ function is generally only called when Gnus is shutting down."
 	      (erase-buffer)
 	      (setq fetch-data (imap-fetch article part
 					   prop nil nnimap-server-buffer))
-	      (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
+	      (if (eq prop 'BODYDETAIL)
 		  (insert (nth 2 (car fetch-data)))
 		(insert fetch-data))
 	      (nnheader-ms-strip-cr)
