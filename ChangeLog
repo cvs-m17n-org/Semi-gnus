@@ -1,5 +1,17 @@
 1999-12-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 10.
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-and-key): Don't
+	call too many `static-if's.
+
+	* lisp/gnus-uu.el (gnus-uu-grab-move): Simply copy FILE if
+	`make-symbolic-link' is not availabe.
+
+	* lisp/lpath.el (TopLevel): Don't warn about `make-symbolic-link'.
+
+1999-12-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus-offline.el (gnus-offline-set-unplugged-state): Call
 	the original `gnus-agent-toggle-plugged'.
 
