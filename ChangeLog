@@ -1,3 +1,15 @@
+1998-08-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.5.
+
+	* Sync up with Gnus 5.6.28.
+
+1998-07-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.4.
+
+	* Sync up with Gnus 5.6.27.
+
 1998-07-27  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/message-ja.texi: Japanese translation of "message.texi".
