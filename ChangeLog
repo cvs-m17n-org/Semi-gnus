@@ -1,3 +1,14 @@
+1999-07-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.12.19 released.
+
+	* Sync up with nana-gnus-6_13_3.
+
+* 1999-07-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-goto-eoh): Move point to just the end
+	of the headers. (Sync up with gnus-6_10)
+
 1999-07-01  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.19.
