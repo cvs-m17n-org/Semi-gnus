@@ -1,3 +1,11 @@
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/nnheader.el (mm-string-as-unibyte): Alias to
+	`string-as-unibyte'.
+
+	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Return unibyte
+	group names.
+
 2002-02-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/lpath.el: Bind `navi2ch-mona-font'.

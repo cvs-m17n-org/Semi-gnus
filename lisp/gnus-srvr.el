@@ -717,7 +717,7 @@ The following commands are available:
 	    (ignore-errors
 	      (push (cons
 		     (if (eq (char-after) ?\")
-			 (read cur)
+			 (mm-string-as-unibyte (read cur))
 		       (let ((p (point)) (name ""))
 			 (skip-chars-forward "^ \t\\\\")
 			 (setq name (buffer-substring p (point)))
@@ -727,7 +727,7 @@ The following commands are available:
 			   (skip-chars-forward "^ \t\\\\")
 			   (setq name (concat name (buffer-substring
 						    p (point)))))
-			 name))
+			 (mm-string-as-unibyte name)))
 		     (let ((last (read cur)))
 		       (cons (read cur) last)))
 		    groups))

@@ -134,6 +134,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
       'ignore))
   (defalias 'mm-encode-coding-string 'encode-coding-string)
   (defalias 'mm-decode-coding-string 'decode-coding-string)
+  (defalias 'mm-string-as-unibyte 'string-as-unibyte)
 
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
