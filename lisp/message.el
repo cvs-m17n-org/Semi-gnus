@@ -3478,31 +3478,34 @@ This sub function is for exclusive use of `message-send-mail'."
 	(save-excursion
 	  (set-buffer errbuf)
 	  (erase-buffer))))
-    (let ((default-directory "/"))
-      (as-binary-process
-       (apply 'call-process-region
-	      (append (list (point-min) (point-max)
-			    (if (boundp 'sendmail-program)
-				sendmail-program
-			      "/usr/lib/sendmail")
-			    nil errbuf nil "-oi")
-		      ;; Always specify who from,
-		      ;; since some systems have broken sendmails.
-		      ;; But some systems are more broken with -f, so
-		      ;; we'll let users override this.
-		      (if (null message-sendmail-f-is-evil)
-			  (list "-f" (message-make-address)))
-		      ;; These mean "report errors by mail"
-		      ;; and "deliver in background".
-		      (if (null message-interactive) '("-oem" "-odb"))
-		      ;; Get the addresses from the message
-		      ;; unless this is a resend.
-		      ;; We must not do that for a resend
-		      ;; because we would find the original addresses.
-		      ;; For a resend, include the specific addresses.
-		      (if resend-to-addresses
-			  (list resend-to-addresses)
-			'("-t"))))))
+    (let* ((default-directory "/")
+	   (cpr
+	    (as-binary-process
+	     (apply 'call-process-region
+		    (append (list (point-min) (point-max)
+				  (if (boundp 'sendmail-program)
+				      sendmail-program
+				    "/usr/lib/sendmail")
+				  nil errbuf nil "-oi")
+			    ;; Always specify who from,
+			    ;; since some systems have broken sendmails.
+			    ;; But some systems are more broken with -f, so
+			    ;; we'll let users override this.
+			    (if (null message-sendmail-f-is-evil)
+				(list "-f" (message-make-address)))
+			    ;; These mean "report errors by mail"
+			    ;; and "deliver in background".
+			    (if (null message-interactive) '("-oem" "-odb"))
+			    ;; Get the addresses from the message
+			    ;; unless this is a resend.
+			    ;; We must not do that for a resend
+			    ;; because we would find the original addresses.
+			    ;; For a resend, include the specific addresses.
+			    (if resend-to-addresses
+				(list resend-to-addresses)
+			      '("-t")))))))
+      (unless (zerop cpr)
+	(error "Sending...failed: %s" cpr)))
     (when message-interactive
       (save-excursion
 	(set-buffer errbuf)
