@@ -889,7 +889,7 @@ XEmacs compatibility workaround."
       (with-temp-buffer
 	(if data-p
 	    (insert file)
-	  (insert-file-contents file))
+	  (insert-file-contents-literally file))
 	(shell-command-on-region (point-min) (point-max)
 				 "ppmtoxpm 2>/dev/null" t)
 	(setq file (buffer-string)
@@ -901,7 +901,7 @@ XEmacs compatibility workaround."
 	    (with-temp-buffer
 	      (if data-p
 		  (insert file)
-		(insert-file-contents file))
+		(insert-file-contents-literally file))
 	      (make-glyph
 	       (vector
 		(or (intern type)
