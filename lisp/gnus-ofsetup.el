@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.4.5 1999-02-15 06:31:58 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.4.6 1999-02-18 20:30:25 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -88,7 +88,7 @@
 		nil t nil))
 	      (mail-method 'nnmail)
 	      (program
-	       (read-file-name "Dialup/Hangup program(type nil you do not use): "))
+	       (read-file-name "Dialup/Hangup program(type nil or null string you do not use): "))
 	      (mta-type
 	       (completing-read
 		"Select MTA type for sending mail (TAB to completion): "
@@ -110,7 +110,8 @@
 	  (setq gnus-offline-use-miee use-miee)
 	  
 	  ;; Set programs.
-	  (if (string-equal program "nil")
+	  (if (or (string-equal program "nil")
+		  (string-equal program ""))
 	      (progn
 		(setq gnus-offline-hangup-program nil)
 		(setq gnus-offline-dialup-program nil))

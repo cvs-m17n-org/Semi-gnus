@@ -35,7 +35,8 @@ o Simple operation -- Type "g" in the *Group* buffer, and gnus-offline
           manually.
 
 This document is written mainly for the case using "gnus-agent" with
-gnus-offline.el bundled in Semi-gnus. (*)
+gnus-offline.el bundled in T-gnus 6.10.056 or later, and Semi-gnus
+6.10.1 or later. (*)
 
       (*) T-gnus is based on the latest test version of Gnus. It is
           called Pterodactyl Gnus or pGnus.
