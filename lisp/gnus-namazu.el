@@ -211,6 +211,24 @@ options make any sense in this context."
   "Face used for namazu query matching words."
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-command-prefix nil
+  "*Prefix command, 
+if set '(\"ssh\" \"-x\" \"host\"),
+then execute \"ssh -x host namazu ...\""
+  :type '(repeat string)
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-imap-group-prefix nil
+  "*Prefix of imap group name.
+ex. nnimap+server:INBOX."
+  :type 'string
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu/directory-table-use t
+  "*Non-nil, use gnus-namazu/directory-table."
+  :type 'boolean
+  :group 'gnus-namazu)
+
 ;;; Internal Variable:
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
@@ -295,17 +313,30 @@ options make any sense in this context."
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
 	program-coding-system-alist
 	(file-name-coding-system gnus-namazu-coding-system))
-    (apply 'call-process
-	   `(,gnus-namazu-command
-	     nil			; input from /dev/null
-	     t				; output
-	     nil			; don't redisplay
-	     "-q"			; don't be verbose
-	     "-a"			; show all matches
-	     "-l"			; use list format
-	     ,@gnus-namazu-additional-arguments
-	     ,query
-	     ,@gnus-namazu-index-directories))))
+    (if gnus-namazu-command-prefix
+	(apply 'call-process
+	       (append
+		(list (car gnus-namazu-command-prefix))
+		'(nil t nil)
+		(cdr gnus-namazu-command-prefix)
+		`(,gnus-namazu-command
+		  "-q"			; don't be verbose
+		  "-a"			; show all matches
+		  "-l"			; use list format
+		  ,@gnus-namazu-additional-arguments
+		  ,query
+		  ,@gnus-namazu-index-directories)))
+      (apply 'call-process
+	     `(,gnus-namazu-command
+	       nil			; input from /dev/null
+	       t			; output
+	       nil			; don't redisplay
+	       "-q"			; don't be verbose
+	       "-a"			; show all matches
+	       "-l"			; use list format
+	       ,@gnus-namazu-additional-arguments
+	       ,query
+	       ,@gnus-namazu-index-directories)))))
 
 (defvar gnus-namazu/directory-table nil)
 (defun gnus-namazu/make-directory-table (&optional force)
@@ -361,12 +392,22 @@ options make any sense in this context."
 		       ;; as file names of articles.
 		       (skip-chars-backward "0-9")
 		       (point))))
-	(and (setq group
-		   (symbol-value
-		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
-				     group
-				   (downcase group))
-				 (cdr gnus-namazu/directory-table))))
+	(and (if gnus-namazu/directory-table-use
+		 (setq group
+		       (symbol-value
+			(intern-soft (if gnus-namazu-case-sensitive-filesystem
+					 group
+				       (downcase group))
+				     (cdr gnus-namazu/directory-table))))
+	       ;; FIXME:
+	       ;; gnus-select-method is '(nnimap "server")
+	       ;; nnimap+server:INBOX.group = ~/Maildir/.group 
+	       ;; Namazu resault: ~/Maildir/.group/123
+	       (setq group (and (string-match 
+				 (concat (expand-file-name "~/Maildir") 
+					 "/\\.\\(.*\\)/") group)
+				(concat gnus-namazu-imap-group-prefix 
+					(match-string 1 group)))))
 	     (or (not groups)
 		 (member group groups))
 	     (push (gnus-namazu/make-article
