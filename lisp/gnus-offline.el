@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.16 1998-12-11 02:06:34 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.17 1998-12-11 15:43:46 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -308,10 +308,11 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-set-offline-sendmail-function ()
   "*Initialize sendmail-function when unplugged status."
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (if (eq gnus-offline-news-fetch-method 'nnagent)
-	  (setq gnus-agent-send-mail-function 'sendmail-to-spool-in-gnspool-format))
-    (setq message-send-mail-function 'sendmail-to-spool-in-gnspool-format)
-    (setq gnus-agent-send-mail-function message-send-mail-function
+      (progn
+	(if (eq gnus-offline-news-fetch-method 'nnagent)
+	    (setq gnus-agent-send-mail-function 'sendmail-to-spool-in-gnspool-format))
+	(setq message-send-mail-function 'sendmail-to-spool-in-gnspool-format))
+    (setq gnus-agent-send-mail-function (gnus-offline-set-online-sendmail-function)
 	  message-send-mail-function 'gnus-agent-send-mail)))
 ;;
 (defun gnus-offline-set-online-sendmail-function ()
@@ -766,7 +767,7 @@ If value is nil , dialup line is disconnected status.")
       ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
       ["Set interval time" gnus-offline-set-interval-time t]
       "----"
-      ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]
+      ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
       ))))
 ;;
 ;; define menu without miee.
@@ -784,7 +785,7 @@ If value is nil , dialup line is disconnected status.")
      ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
      ["Set interval time" gnus-offline-set-interval-time t]
      "----"
-     ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]))
+     ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]))
   (and (featurep 'xemacs)
        (easy-menu-add gnus-offline-menu-on-agent)))
 
