@@ -972,17 +972,6 @@ Image Enhancements
 * Toolbar::                     クリック猿
 * XVarious::                    その他の XEmacs で Gnus な変数
 
-Picons
-
-* Picon Basics::                picon とは何で、どうやって手に入れるのか
-* Picon Requirements::          XEmacs を使ってなければここからは読まな
-                                いで
-* Easy Picons::                 picon の表示 --- 楽な方法
-* Hard Picons::                 本来すべきこと。何かを学ぶことができるだ
-                                ろう
-* Picon Useless Configuration::  その他のぶっ壊したりひねったりいじった
-                                り遊んだりする変数
-
 Thwarting Email Spam
 
 * The problem of spam::         背景、そして解決
@@ -20281,20 +20270,6 @@ gnus はこれを利用することにします。
 を読んでいるんだということを、あなたの肩越しに見つめている人に印象づける
 ための素晴らしい方法でもあります。
 
-@menu
-* Picon Basics::                picon とは何で、どうやって手に入れるのか
-* Picon Requirements::          XEmacs を使ってなければここからは読まな
-                                いで
-* Easy Picons::                 picon の表示 --- 楽な方法
-* Hard Picons::                 本来すべきこと。何かを学ぶことができるだ
-                                ろう
-* Picon Useless Configuration::  その他のぶっ壊したりひねったりいじった
-                                り遊んだりする変数
-@end menu
-
-@node Picon Basics
-@subsubsection Picon の基礎
-
 Picon とはなんでしょう? Picons ウェブサイトから直接引用しましょう。
 
 @iftex
@@ -20313,223 +20288,51 @@ Picon とはなんでしょう? Picons ウェブサイトから直接引用しましょう。
 いません。
 @end quotation
 
-@vindex gnus-picons-piconsearch-url
-あなたがインターネットへ常時接続しているのならば、
-@code{gnus-picons-piconsearch-url} に文字
-列 @uref{http://www.cs.indiana.edu/picons/search.html} を設定することで、
-Steve Kinzler の picon 検索エンジンを使うことができます。
+@vindex gnus-picon-databases
+Picon データベースの入手とインストールの手順については、ウェブブラウザー
+で @uref{http://www.cs.indiana.edu/picons/ftp/index.html} を訪ねてみて下
+さい。
 
-@vindex gnus-picons-database
-そうでなければ、彼のデータベースを手元に複製する必要があります。picon デー
-タベースの入手とインストールの手順は、ウェブブラウザー
-で @uref{http://www.cs.indiana.edu/picons/ftp/index.html} に行ってみてく
-ださい。Gnus は picons が @code{gnus-picons-database} で示される場所にイ
-ンストールしてあるものと期待します。
-
-もしあなたが Debian GNU/Linux を使っているのなら、@samp{apt-get install
+もし Debian GNU/Linux を使っているのなら、@samp{apt-get install
 picons.*} と言えば gnus が見つけることができる picon がインストールされ
 ます。
 
-@node Picon Requirements
-@subsubsection Picon の動作条件
+Picon の表示ができるようにするためには、picon データベースがあるディレク
+トリが、ただ単に @code{gnus-picon-databases} に設定されているようにして
+下さい。
 
-Gnus に picon を表示させるには @code{x} サポート付きで XEmacs をコンパイ
-ルしていなくてはなりません。白黒よりももっと奇麗な色付きの picon を表示
-するためには、@code{xpm} か @code{gif} のどちらかが使えるようにコンパイ
-ルされた XEmacs である必要もあります。
-
-@vindex gnus-picons-convert-x-face
-@code{X-Face} ヘッダーの顔を表示したいのなら、XEmacs を @code{xface} サ
-ポート付きでコンパイルしなければなりません。そうでなければ、
-@code{netpbm} ユーティリティをインストールしておくか、あるいは他の何かを
-使うように @code{gnus-picons-convert-x-face} 変数をいじくってください。
-(注: 変数/関数名には @code{xface} ではなく @code{x-face} が使われます。)
-
-@node Easy Picons
-@subsubsection 楽々 Picons
-
-picon 表示を有効にするには、単に以下の行を @file{~/.gnus} ファイルに入れ
-て、gnus を起動してください。
-
-@lisp
-(setq gnus-use-picons t)
-(setq gnus-treat-display-picons t)
-@end lisp
-
-@code{gnus-picons-database} が picon データベースが含まれているディレク
-トリを指していることを確認してください。
-
-その代わりに Web 上の picon 検索エンジンを使いたければ、これを追加します。
-
-@lisp
-(setq gnus-picons-piconsearch-url
-      "http://www.cs.indiana.edu:800/piconsearch")
-@end lisp
-
-@node Hard Picons
-@subsubsection 難解 Picons
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-Gnus は、グループや記事に入ったり出たりするのに従って picon を表示するこ
-とができます。Gnus は picon データベースの三つの章とどう相互作用すればよ
-いかを知っています。すなわち、gnus はニュースグループの絵、著者の顔の絵、
-著者のドメインの picon を表示することができます。この機能を有効にするに
-は、picon をどこから持ってくるか、そしてどこに表示するかを選択する必要が
-あります。
+ものごとの所在を管理するために、以下の変数を設けています。
 
 @table @code
 @item gnus-picons-database
 @vindex gnus-picons-database
-picon データベースの場所。@file{news}, @file{domains}, @file{users} (な
-どなど) のサブディレクトリーが含まれているディレクトリーを指していなけれ
-ばなりません。これは @code{gnus-picons-piconsearch-url} が @code{nil} で
-あるときのみ使用されます。初期設定値は @file{/usr/local/faces/} です。
+Picon データベースの場所です。これは @file{news}, @file{domains},
+@file{users} (などなど) のサブディレクトリーが含まれているディレクトリー
+のリストです。@code{("/usr/lib/picon" "/usr/local/faces")} がディフォル
+トです。
 
-@item gnus-picons-piconsearch-url
-@vindex gnus-picons-piconsearch-url
-Web 上の picon 検索エンジンの URL。現在知られている唯一のエンジン
-は @uref{http://www.cs.indiana.edu:800/piconsearch} です。ネットワーク遅
-延を回避するために icon はバックグラウンドで取得されます。もしこれが
-@code{nil} (初期設定値) であれば、
-picon は @code{gnus-picons-database} で示されるローカルのデータベースか
-ら取得されます。
-
-@item gnus-picons-display-where
-@vindex gnus-picons-display-where
-picon 画像が表示される場所。これは初期設定では @code{picons} です (これ
-は初期設定で @samp{*Picons*} バッファに位置します)。他の有効な場所として
-は @code{article}, @code{summary} あるいは @samp{*scratch*} だろうと知っ
-たことではありません。ただそのバッファを標準の gnus 窓配置処
-理 --- @pxref{Window Layout} によって見えるようにしておくことを確認して
-ください。
-
-@item gnus-picons-group-excluded-groups
-@vindex gnus-picons-group-excluded-groups
-この正規表現にマッチするグループではそのグループアイコンを表示させません。
-@end table
-
-注意: もし @code{gnus-use-picons} を @code{t} に設定すると、窓配置
-に @code{picons} バッファを含めるように設定されます。
-
-さて、これらを決定した後には、これらの絵が正しい時に表示されるように、以
-下の関数を適切なフックに追加する必要があります。
-
-@vindex gnus-picons-display-where
-
-@table @code
-@item gnus-article-display-picons
-@findex gnus-article-display-picons
-著者と著者のドメインの picon を探し、@code{gnus-picons-display-where} バッ
-ファに表示します。
-
-@item gnus-picons-article-display-x-face
-@findex gnus-picons-article-display-x-face
-X-Face ヘッダーがあればそれを復号化し表示します。(注: 変数/関数名に
-は @code{xface} ではなく @code{x-face} が使われます。)
-@end table
-
-@node Picon Useless Configuration
-@subsubsection 無意味な Picon 設定
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-以下の変数は、さらにこれらをどう実行するか、どこに配置するか、その他役に
-も立たないどうでもよいことを制御できるようにします。
-
-@table @code
-@item gnus-picons-news-directories
-@vindex gnus-picons-news-directories
-@code{gnus-picons-database} からニュースグループフェイスを探すためのサブ
-ディレクトリーのリスト。@code{("news")} が初期設定値です。
+@item gnus-picon-news-directories
+@vindex gnus-picon-news-directories
+@code{gnus-picons-database} からニュースグループ用のフェースを探すための
+サブディレクトリーのリストです。ディフォルトは @code{("news")} です。
 
 @item gnus-picons-user-directories
 @vindex gnus-picons-user-directories
-@code{gnus-picons-database} から利用者フェイスを探すためのサブディレクト
-リーのリスト。@code{("local" "users" "usenix" "misc")} が初期設定値です。
+@code{gnus-picons-database} からユーザのフェースを探すためのサブディレク
+トリーのリストです。@code{("local" "users" "usenix" "misc")} がディフォ
+ルトです。
 
 @item gnus-picons-domain-directories
 @vindex gnus-picons-domain-directories
-@code{gnus-picons-database} からドメイン名フェイスを探すためのサブディレ
-クトリーのリスト。初期設定値は @code{("domains")} です。このリスト
-に @samp{"unknown"} を追加しておきたくなる人もいるでしょう。
+@code{gnus-picons-database} からドメイン名のフェースを探すためのサブディ
+レクトリーのリストです。ディフォルトは @code{("domains")} です。このリス
+トに @samp{"unknown"} を追加しておきたくなる人もいるでしょう。
 
-@item gnus-picons-convert-x-face
-@vindex gnus-picons-convert-x-face
-もし XEmacs に @code{xface} サポートが組み込まれていなければ、この命令が
-@code{X-Face} ヘッダーを X ビットマップ (@code{xbm}) に変換するのに使用
-されます。初期設定値
-は @code{(format "@{ echo '/* Width=48, Height=48 */'; uncompface; @} | icontopbm | pbmtoxbm > %s" gnus-picons-x-face-file-name)} で
-す。(注: 変数/関数名には @code{xface} ではなく @code{x-face} が使われま
-す。)
-
-@item gnus-picons-x-face-file-name
-@vindex gnus-picons-x-face-file-name
-@code{X-Face} ビットマップを格納しておく一時ファイルの名前。初期設定値
-は @code{(format "/tmp/picon-xface.%s.xbm" (user-login-name))}。(注: 変
-数/関数名には @code{xface} ではなく @code{x-face} が使われます。)
-
-@item gnus-picons-has-modeline-p
-@vindex gnus-picons-has-modeline-p
-@code{gnus-picons-display-where} を @code{picons} に設定してしまうと、
-XEmacs のフレームはめちゃめちゃになってしまうでしょう。これを多少なりと
-も軽減するには、@code{gnus-picons-has-modeline-p} を @code{nil} に設定し
-てください。これは picon バッファからモード行を取り除きます。これは
-@code{gnus-picons-display-where} が @code{picons} のときのみ意味がありま
-す。
-
-@item gnus-picons-refresh-before-display
-@vindex gnus-picons-refresh-before-display
-@code{nil} 以外であれば、picon を計算する前に記事バッファを表示。初期設
-定値は @code{nil} です。
-
-@item gnus-picons-display-as-address
-@vindex gnus-picons-display-as-address
-@code{t} であれば絵と一緒に文字で電子メールアドレスを表示。初期設定値
-は @code{t} です。
-
-@item gnus-picons-file-suffixes
-@vindex gnus-picons-file-suffixes
-picon ファイル名として試してみる拡張子の順序リスト。初期設定値
-は @code{("xpm" "gif" "xbm")} から XEmacs に組み込まれていないものを引い
-たものです。
-
-@item gnus-picons-setup-hook
-@vindex gnus-picons-setup-hook
-picon がもし表示されていれば、picon バッファで実行されるフックです。
-
-@item gnus-picons-display-article-move-p
-@vindex gnus-picons-display-article-move-p
-picon を表示しているときにカーソル位置を最初の空行まで動かすかどうかを指
-定。これは @code{gnus-picons-display-where} の値が @code{article} である
-ときのみ効果があります。
-
-@code{nil} であれば、picon を @code{From} と @code{Newsgroup} の間に表示
-します。これが初期設定です。
-
-@item gnus-picons-clear-cache-on-shutdown
-@vindex gnus-picons-clear-cache-on-shutdown
-Gnus を終了するときに picon キャッシュを消し去るかどうか。Gnus は実行中
-に見つけた picon を全てキャッシュします。これは検索処理の時間を多少節約
-できますが、メモリをいくらか食います。もしこの変数を @code{nil} に設定す
-れば、gnus はそのキャッシュを決して消しません。それを消し去るには手
-で @code{gnus-picons-clear-cache} を呼び出す必要があります。
-@code{nil} でなければキャッシュは gnus が終了するたびに消去されます。初
-期設定値は @code{t} です。
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
+@item gnus-picon-file-types
+@vindex gnus-picon-file-types
+Picon のファイル名として試してみる拡張子の順番リストです。ディフォルトは、
+@code{("xpm" "gif" "xbm")} から Emacs に組み込まれていないものを除外した
+ものです。
 @end table
 
 @node Smileys
