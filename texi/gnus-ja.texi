@@ -10783,7 +10783,34 @@ ISP $B$,(B @acronym{POP}-before-@acronym{SMTP} $B$NG'>Z$rMW5a$7$F$$$k>l9g$KM-
 $B$9!#(B@code{smtpmail-send-it} $B$G$O$J$/$F!"(B@code{message-send-mail-hook} $B$r(B
 $B<B9T$9$k(B @code{message-smtpmail-send-it} $B$r;H$o$J$1$l$P$J$i$J$$$3$H$H!"(B
 @acronym{POP} $B@\B3$N$?$a$K(B @code{mail-sources} $B$NCM$r@5$7$/@_Dj$7$J$1$l(B
-$B$P$J$i$J$$(B (@pxref{Mail Sources}) $B$3$H$KCm0U$7$F2<$5$$!#(B
+$B$P$J$i$J$$$3$H$KCm0U$7$F2<$5$$!#(B@xref{Mail Sources}.
+
+$B$b$7(B @code{mail-sources} $B$KFs$D0J>e$N(B @acronym{POP} $B%a!<%k%5!<%P!<$r@_Dj(B
+$B$7$F$$$k$J$i$P!"$=$l$i$N0l$D$r(B @acronym{POP}-before-@acronym{SMTP} $BG'>Z(B
+$B$K;H$o$l$k(B @acronym{POP} $B%a!<%k%5!<%P!<$H$7(B
+$B$F(B @code{mail-source-primary-source} $B$K@_Dj$9$kI,MW$,$"$k$G$7$g$&!#$=$l(B
+$B$,Bh0l(B @acronym{POP} $B%a!<%k%5!<%P!<$J$i$P(B ($B$9$J$o$A!"<g$K$=$N%5!<%P!<$+(B
+$B$i%a!<%k$r<hF@$7$F$$$k$J$i$P(B)$B!"$=$l$r0J2<$N$h$&$K915WE*$K@_Dj$9$k$3$H$,(B
+$B$G$-$^$9(B:
+
+@lisp
+(setq mail-source-primary-source
+      '(pop :server "pop3.mail.server"
+            :password "secret"))
+@end lisp
+
+@noindent
+$B$5$b$J$1$l$P!"(B@acronym{POP}-before-@acronym{SMTP} $BG'>Z$r9T$J$&$H$-$@$1!"(B
+$B$=$l$r0J2<$N$h$&$KF0E*$KB+G{$7$F2<$5$$(B:
+
+@lisp
+(add-hook 'message-send-mail-hook
+          (lambda ()
+            (let ((mail-source-primary-source
+                   '(pop :server "pop3.mail.server"
+                         :password "secret")))
+              mail-source-touch-pop)))
+@end lisp
 
 @node Mail and Post
 @section $B%a!<%k$HEj9F(B
