@@ -206,13 +206,22 @@ If there is any problem , please set this variable to nil(default).
 	      (pop3-password
 	       (if (and pop3-fma-save-password-information
 			pop3-fma-password)
-		   (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox))))
+		   (let ((stored-passwd (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox))))))
+		     (if stored-passwd
+			 stored-passwd
+		       (pop3-fma-set-pop3-password)
+		       (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox))))))
 		 (pop3-fma-input-password
 		  (substring inbox (match-end (string-match "^.*@" inbox)))
 		  (substring inbox (match-end (string-match "^po:" inbox))
 			     (- (match-end (string-match "^.*@" inbox)) 1)))))
 	      (pop3-authentication-scheme
-	       (nth 1 (assoc inbox pop3-fma-spool-file-alist))))
+	       (nth 1 (assoc inbox pop3-fma-spool-file-alist)))
+	      (pop3-port
+	       (or (nth 2 (assoc inbox pop3-fma-spool-file-alist))
+		   110))
+	      (pop3-connection-type
+	       (nth 3 (assoc inbox pop3-fma-spool-file-alist))))
 ;;	      (pop3-fma-movemail-type (pop3-fma-get-movemail-type inbox)))
 	  (if (eq pop3-authentication-scheme 'pass)
 	      (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)

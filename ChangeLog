@@ -1,3 +1,16 @@
+1999-05-22  Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
+	    Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/pop3.el : Add an autoload for `open-ssl-stream' defined in
+	`ssl'.
+	(pop3-connection-type, pop3-ssl-program-arguments): New variables.
+	(pop3-open-ssl-stream-1, pop3-open-ssl-stream): New functions.
+	(pop3-open-server): Call the latter when `pop3-connection-type' is
+	ssl.
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Bind `pop3-port' and
+	`pop3-connection-type' according to `pop3-fma-spool-file-alist'.
+
 1999-05-16  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
 
 	* texi/gnusref-ja.tex (subsec Notes): Complete words.
