@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.035"
+(defconst gnus-version-number "6.10.036"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.49"
+(defconst gnus-original-version-number "0.50"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -2723,6 +2723,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
   (let ((opened gnus-opened-servers))
     (while (and method opened)
       (when (and (equal (cadr method) (cadaar opened))
+                (equal (car method) (caaar opened))
 		 (not (equal method (caar opened))))
 	(setq method nil))
       (pop opened))
