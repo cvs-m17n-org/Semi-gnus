@@ -9619,10 +9619,11 @@ your @file{~/.emacs} or @file{~/.gnus}:
 (setq gpg-command-default-alist (quote ((gpg . "gpg") (gpg-2comp . "gpg"))))
 @end lisp
 
-To sign or encrypt your message you may choose to use the MML Security menu or
-@kbd{M-m s p} to sign your message using PGP/MIME, @kbd{M-m s s} to sign your
-message using S/MIME. There's also @kbd{M-m c p} to encrypt your message with
-PGP/MIME and @kbd{M-m c s} to encrypt using S/MIME.
+To sign or encrypt your message you may choose to use the MML Security
+menu or @kbd{C-c C-m s p} to sign your message using PGP/MIME, @kbd{C-c
+C-m s s} to sign your message using S/MIME. There's also @kbd{C-c C-m c
+p} to encrypt your message with PGP/MIME and @kbd{C-c C-m c s} to
+encrypt using S/MIME.
 
 Gnus will ask for your passphrase and then it will send your message, if
 you've typed it correctly.
@@ -11005,12 +11006,12 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 $B$-(B @sc{imap} $B%/%i%$%"%s%H$G%a!<%k%\%C%/%9$r=|$-!"$$$/$D$+$N5-;v$K4{(B
 $BFI(B ($B$b$7$/$O!"(BSEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{nil} $B$K@_Dj$7$?$$$+$b$7$l$^(B
 $B$;$s!#$=$&$9$l$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:<hF@$5$l(B
-$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 .AN'6.4.4 $B$rFI$s$G$/$@$5$$!#(B
+$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 N'6.4.4 $B$rFI$s$G$/$@$5$$!#(B
 
 @item :fetchflag
 $B%5!<%P!<$G!"<hF@$7$?5-;v$K0u$rIU$1$kJ}K!!#=i4|CM$N(B @samp{\Deleted} $B$O$=(B
 $B$l$i$K>C5n$N0u$rIU$1$^$9$,!"B>$K(B @samp{\Seen} $B$G$OC1$K4{FI$N0u$rIU$1$^$9!#(B
-$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 .AN'2.3.2 $B$GDj5A$5(B
+$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 N'2.3.2 $B$GDj5A$5(B
 $B$l$F$$$^$9!#(B
 
 @item :dontexpunge
@@ -16316,7 +16317,7 @@ bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B 9000 $B$G$9!#(
 
 @item !
 @itemx not
-@itemx .AN,
+@itemx N,
 $B$3$NO@M}:nMQ;R$OC10l$N0z?t$N$_$r$H$j$^$9!#$=$l$O$=$N0z?t$NCM$NO@M}H]Dj$r(B
 $BJV$7$^$9!#(B
 
@@ -18697,7 +18698,7 @@ Kevin Davidson---@dfn{ding} $B$NL>A0$r;W$$IU$-$^$7$?!#$G$9$+$i!"H`$r@U$a$F(B
 $B2<$5$$!#(B
 
 @item
-Fran.ANgois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
+FranNgois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
 $B%5%]!<%H!#(B
 
 @end itemize
@@ -18710,7 +18711,7 @@ Borges $B$K$h$C$F9;@5$5$l!"(BJost Krieger $B$K$h$C$F0lItJ,$r9;@5$5$l$^$7$?!#
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K.ANegedal,
+David KNegedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -18796,7 +18797,7 @@ Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
 Miguel de Icaza,
-Fran.ANgois Felix Ingrand,
+FranNgois Felix Ingrand,
 Tatsuya Ichikawa, @c ?
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
@@ -20206,8 +20207,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at n.ANer du bruker `gnus-startup-file' som prefix (FOO) til Ne lete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v.ANfre en
+ tanken var at nNer du bruker `gnus-startup-file' som prefix (FOO) til Ne lete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den vNfre en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -20277,8 +20278,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde v.ANfre en mNete Ne si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  S.ANe kunne score-regler legges til den
+Ja, det burde vNfre en mNete Ne si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  SNe kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -20603,7 +20604,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt .ANe slette den dersom teksten matcher
+Selv ville jeg nok ha valgt Ne slette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
