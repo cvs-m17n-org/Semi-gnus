@@ -150,18 +150,18 @@ Used for APOP authentication.")
 (defcustom pop3-maximum-message-size nil
   "If non-nil only download messages smaller than this."
   :type '(choice (const :tag "Unlimited" nil)
-		 (integer :tag "Maximum size" :format "%t: %v\n" :size 0))
+		 (integer :tag "Maximum size"))
   :group 'pop3)
 
 (defcustom pop3-except-header-regexp nil
   "If non-nil we do not retrieve messages whose headers are matching this regexp."
   :type '(choice (const :tag "Retrieve any messages" nil)
-		 (regexp :format "%t: %v\n" :size 0))
+		 (regexp :format "\n%t: %v"))
   :group 'pop3)
 
 (defcustom pop3-uidl-file-name "~/.uidls"
   "File in which to store the UIDL of processed messages."
-  :type '(file :format "%t: %v\n" :size 0)
+  :type 'file
   :group 'pop3)
 
 (defvar pop3-uidl-support nil
@@ -183,13 +183,13 @@ Users don't have to set this value.")
       "openssl"
     "ssleay")
   "The program to run in a subprocess to open an SSL connection."
-  :type '(string :format "%t: %v\n" :size 0)
+  :type 'string
   :group 'pop3)
 
 (defcustom pop3-ssl-program-arguments
   '("s_client" "-quiet")
   "Arguments to be passed to the program `pop3-ssl-program-name'."
-  :type '(repeat (string :format "%v\n" :size 0))
+  :type '(repeat (string :format "%v"))
   :group 'pop3)
 
 (defun pop3-progress-message (format percent &rest args)
