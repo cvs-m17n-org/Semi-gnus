@@ -1,5 +1,15 @@
 2001-01-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
+
+	* Makefile.in (install-package-lisp): Use
+	`install-without-compiling' instead of `install'.
+
+	* lisp/Makefile.in (install): Use `install-without-compiling'.
+	(install-without-compiling): New target.
+
+2001-01-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* texi/Makefile.in (.texi, %.info, %-ja.info, %-ja): Use
 	`infohack-texi-format'.
 
@@ -26,7 +36,7 @@
 	(clever): Check for whether the all elc files should be recompiled.
 
 	* Makefile.in (xclever): New target.
-	(install-package-lisp): Replace `install-lisp' with `instal'.
+	(install-package-lisp): Replace `install-lisp' with `install'.
 	(install-package-ja): Replace `xlick' with `xclever'.
 	(install-package): Ditto.
 
