@@ -6846,8 +6846,6 @@ For example:
   (cond
    ((null val)
     nil)
-   (condition
-    (eq condition val))
    ((and (listp val)
 	 (stringp (car val)))
     (apply 'gnus-or (mapcar `(lambda (s)
@@ -6868,6 +6866,8 @@ For example:
 	(error "%S is not a valid predicate" pred)))))
    ((eq val 'mime)
     gnus-show-mime)
+   (condition
+    (eq condition val))
    ((eq val t)
     t)
    ((eq val 'head)

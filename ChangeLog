@@ -1,5 +1,8 @@
 2003-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus.art.el (gnus-treat-predicate): Don't follow the Change
+	of Oort Gnus at 2003-01-02; reverted.
+
 	* lisp/message.el (message-tool-bar-map): Commented out MIME-Edit
 	buttons.
 
