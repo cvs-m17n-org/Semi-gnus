@@ -1,3 +1,13 @@
+1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-reply): Cancel the last change.
+	(message-followup): Cancel the last change.
+	(message-wide-reply): Cancel the last change.
+
+	* lisp/gnus-msg.el (gnus-summary-gather-references): Abolished.
+	(gnus-summary-reply): Cancel the last change.
+	(gnus-post-news): Cancel the last change.
+
 1999-01-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-move-article): Don't copy
