@@ -215,7 +215,9 @@ regexp.  If it matches, the text in question is not a signature."
    ;; gnus-xmas.el overrides this for XEmacs.
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
-    'gnus-article-display-xface)
+    (if (module-installed-p 'x-face-e21)
+	'x-face-decode-message-header
+      'gnus-article-display-xface))
    ((and (not (featurep 'xemacs))
 	 window-system
 	 (module-installed-p 'x-face-mule))
@@ -229,6 +231,9 @@ display -"))
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
   :type '(choice string
+		 (function-item
+		  :tag "x-face-decode-message-header (x-face-e21)"
+		  x-face-decode-message-header)
 		 (function-item gnus-article-display-xface)
 		 (function-item x-face-mule-gnus-article-display-x-face)
 		 function)

@@ -7172,11 +7172,11 @@ If BACKWARD, search backward instead."
 	       (goto-char (, opoint)))))
       (` (let ((end (if (search-forward "\n\n" nil t)
 			(goto-char (1- (point)))
-		      (point-min))))
+		      (point-min)))
+	       (start (or (search-backward "\n\n" nil t) (point-min))))
 	   (goto-char
-	    (or (text-property-any (or (search-backward "\n\n" nil t)
-				       (point-min))
-				   end 'x-face-mule-bitmap-image t)
+	    (or (text-property-any start end 'x-face-image t);; x-face-e21
+		(text-property-any start end 'x-face-mule-bitmap-image t)
 		(, opoint)))))))
 
   (defmacro gnus-summary-search-article-highlight-matched-text
