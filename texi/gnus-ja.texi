@@ -4467,8 +4467,7 @@ Gnus は変数 @code{gnus-extract-address-components} の値を @code{From
 記事の文字数。この名前指定子は (nnfolder のような) いくつかの選択方法を
 サポートしません。
 @item k
-整形された (Pretty-printed) 記事の文字数; 例え
-ば @samp{1.2k} や @samp{0.4M}。
+整形された記事の文字数; 例えば @samp{1.2k} や @samp{0.4M}。
 @item I
 スレッドのレベルによる字下げ (@pxref{Customizing Threading})。
 @item B
