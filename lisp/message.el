@@ -2153,6 +2153,7 @@ the user from the mailer."
 				    (car elem))))
 			      (setq success (funcall (caddr elem) arg)))))
 	    (setq sent t))))
+      (prog1
       (when (and success sent)
 	(message-do-fcc)
 	;;(when (fboundp 'mail-hist-put-headers-into-history)
@@ -2167,7 +2168,8 @@ the user from the mailer."
 	(message-do-send-housekeeping)
 	(message-do-actions message-send-actions)
 	;; Return success.
-	t))))
+	t)
+      (kill-buffer message-encoding-buffer)))))
 
 (defun message-send-via-mail (arg)
   "Send the current message via mail."
@@ -4457,9 +4459,14 @@ regexp varstr."
 
 (defun message-maybe-encode ()
   (when message-mime-mode
+    ;; Inherit the buffer local variable `mime-edit-pgp-processing'.
+    (let ((pgp-processing (with-current-buffer message-edit-buffer
+			    mime-edit-pgp-processing)))
+      (setq mime-edit-pgp-processing pgp-processing))
     (run-hooks 'mime-edit-translate-hook)
     (if (catch 'mime-edit-error
 	  (save-excursion
+	    (mime-edit-pgp-enclose-buffer)
 	    (mime-edit-translate-body)
 	    ))
 	(error "Translation error!")
