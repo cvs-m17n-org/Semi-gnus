@@ -2073,7 +2073,12 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(unless (vectorp gnus-current-headers)
 		  (setq gnus-current-headers nil))
 		(gnus-summary-goto-subject gnus-current-article)
-		(gnus-summary-show-thread)
+		(when (gnus-summary-show-thread)
+		  ;; If the summary buffer really was folded, the
+		  ;; previous goto may not actually have gone to
+		  ;; the right article, but the thread root instead.
+		  ;; So we go again.
+		  (gnus-summary-goto-subject gnus-current-article))
 		(gnus-run-hooks 'gnus-mark-article-hook)
 		(gnus-set-mode-line 'summary)
 		(when (gnus-visual-p 'article-highlight 'highlight)
@@ -2387,7 +2392,7 @@ If given a prefix, show the hidden text instead."
   (gnus-article-hide-signature arg))
 
 (defun gnus-article-maybe-highlight ()
-  "Do some article highlighting if `article-visual' is non-nil."
+  "Do some article highlighting if article highlighting is requested."
   (when (gnus-visual-p 'article-highlight 'highlight)
     (gnus-article-highlight-some)))
 

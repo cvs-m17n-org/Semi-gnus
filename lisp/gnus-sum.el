@@ -222,10 +222,10 @@ to expose hidden threads."
   :group 'gnus-thread
   :type 'boolean)
 
-(defcustom gnus-thread-ignore-subject nil
-  "*If non-nil, ignore subjects and do all threading based on the Reference header.
-If nil, which is the default, articles that have different subjects
-from their parents will start separate threads."
+(defcustom gnus-thread-ignore-subject t
+  "*If non-nil, which is the default, ignore subjects and do all threading based on the Reference header.
+If nil, articles that have different subjects from their parents will
+start separate threads."
   :group 'gnus-thread
   :type 'boolean)
 
@@ -286,7 +286,9 @@ will go to the next group without confirmation."
 		 (sexp :menu-tag "on" t)))
 
 (defcustom gnus-auto-select-same nil
-  "*If non-nil, select the next article with the same subject."
+  "*If non-nil, select the next article with the same subject.
+If there are no more articles with the same subject, go to
+the first unread article."
   :group 'gnus-summary-maneuvering
   :type 'boolean)
 
@@ -1984,21 +1986,26 @@ The following commands are available:
   (when list
     (let ((data (and after-article (gnus-data-find-list after-article)))
 	  (ilist list))
-      (or data (not after-article) (error "No such article: %d" after-article))
-      ;; Find the last element in the list to be spliced into the main
-      ;; list.
-      (while (cdr list)
-	(setq list (cdr list)))
-      (if (not data)
-	  (progn
-	    (setcdr list gnus-newsgroup-data)
-	    (setq gnus-newsgroup-data ilist)
+      (if (not (or data
+		   after-article))
+	  (let ((odata gnus-newsgroup-data))
+	    (setq gnus-newsgroup-data (nconc list gnus-newsgroup-data))
 	    (when offset
-	      (gnus-data-update-list (cdr list) offset)))
-	(setcdr list (cdr data))
-	(setcdr data ilist)
-	(when offset
-	  (gnus-data-update-list (cdr list) offset)))
+	      (gnus-data-update-list odata offset)))
+	;; Find the last element in the list to be spliced into the main
+	;; list.
+	(while (cdr list)
+	  (setq list (cdr list)))
+	(if (not data)
+	    (progn
+	      (setcdr list gnus-newsgroup-data)
+	      (setq gnus-newsgroup-data ilist)
+	      (when offset
+		(gnus-data-update-list (cdr list) offset)))
+	  (setcdr list (cdr data))
+	  (setcdr data ilist)
+	  (when offset
+	    (gnus-data-update-list (cdr list) offset))))
       (setq gnus-newsgroup-data-reverse nil))))
 
 (defun gnus-data-remove (article &optional offset)
@@ -2518,7 +2525,7 @@ the thread are to be displayed."
 
 (defun gnus-summary-read-group (group &optional show-all no-article
 				      kill-buffer no-display backward
-				      select-article)
+				      select-articles)
   "Start reading news in newsgroup GROUP.
 If SHOW-ALL is non-nil, already read articles are also listed.
 If NO-ARTICLE is non-nil, no article is selected initially.
@@ -2529,9 +2536,10 @@ If NO-DISPLAY, don't generate a summary buffer."
 			    (let ((gnus-auto-select-next nil))
 			      (or (gnus-summary-read-group-1
 				   group show-all no-article
-				   kill-buffer no-display)
-				  (setq show-all nil)
-				  select-article))))
+				   kill-buffer no-display
+				   select-articles)
+				  (setq show-all nil
+				   select-articles nil)))))
 		(eq gnus-auto-select-next 'quietly))
       (set-buffer gnus-group-buffer)
       ;; The entry function called above goes to the next
@@ -3269,10 +3277,11 @@ If LINE, insert the rebuilt thread starting on line LINE."
       ;;!!! then we want to insert at the beginning of the buffer.
       ;;!!! That happens to be true with Gnus now, but that may
       ;;!!! change in the future.  Perhaps.
-      (gnus-data-enter-list (if line nil current) data (- (point) old-pos))
-      (setq gnus-newsgroup-threads (nconc threads gnus-newsgroup-threads))
-      (when line
-	(gnus-data-compute-positions)))))
+      (gnus-data-enter-list
+       (if line nil current) data (- (point) old-pos))
+      (setq gnus-newsgroup-threads
+	    (nconc threads gnus-newsgroup-threads))
+      (gnus-data-compute-positions))))
 
 (defun gnus-number-to-header (number)
   "Return the header for article NUMBER."
@@ -3894,7 +3903,12 @@ If SELECT-ARTICLES, only select those articles from GROUP."
     (unless (gnus-ephemeral-group-p gnus-newsgroup-name)
       (gnus-group-update-group group))
 
-    (setq articles (or select-articles (gnus-articles-to-read group read-all)))
+    (if (setq articles select-articles)
+	(setq gnus-newsgroup-unselected
+	      (gnus-sorted-intersection
+	       gnus-newsgroup-unreads
+	       (gnus-sorted-complement gnus-newsgroup-unreads articles)))
+      (setq articles (gnus-articles-to-read group read-all)))
 
     (cond
      ((null articles)

@@ -1554,10 +1554,6 @@ be permanent."
 	 gnus-summary-mode-hook gnus-select-group-hook
 	 (group (gnus-group-group-name))
 	 (method (gnus-find-method-for-group group)))
-    (setq method
-	  `(,(car method) ,(concat (cadr method) "-ephemeral")
-	    (,(intern (format "%s-address" (car method))) ,(cadr method))
-	    ,@(cddr method)))
     (gnus-group-read-ephemeral-group
      (gnus-group-prefixed-name group method) method)))
 
@@ -1588,6 +1584,10 @@ Return the name of the group is selection was successful."
   ;; Transform the select method into a unique server.
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
+  (setq method
+	`(,(car method) ,(concat (cadr method) "-ephemeral")
+	  (,(intern (format "%s-address" (car method))) ,(cadr method))
+	  ,@(cddr method)))
   (let ((group (if (gnus-group-foreign-p group) group
 		 (gnus-group-prefixed-name group method))))
     (gnus-sethash
@@ -1786,6 +1786,8 @@ ADDRESS."
     (gnus-read-group "Group name: ")
     (gnus-read-method "From method: ")))
 
+  (when (stringp method)
+    (setq method (gnus-server-to-method method)))
   (let* ((meth (when (and method
 			  (not (gnus-server-equal method gnus-select-method)))
 		 (if address (list (intern method) address)
@@ -2954,8 +2956,6 @@ to use."
     (while (and (not found)
 		(setq dir (pop dirs)))
       (let ((name (gnus-group-real-name group)))
-	(while (string-match "\\." name)
-	  (setq name (replace-match "/" t t name)))
 	(setq file (concat (file-name-as-directory dir) name)))
       (if (not (file-exists-p file))
 	  (gnus-message 1 "No such file: %s" file)

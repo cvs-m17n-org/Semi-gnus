@@ -1,3 +1,129 @@
+Sun Aug  9 15:46:16 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.30 is released.
+
+1998-08-09 10:48:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-cite-original-without-signature): Peel off
+	blank lines.
+
+	* gnus-art.el (gnus-article-maybe-highlight): Doc fix.
+
+	* gnus-sum.el (gnus-data-enter-list): Threw away all new list data
+	at the beginning of the buffer.
+
+1998-08-07 01:41:29  Gareth Jones  <gdj1@gdjones.demon.co.uk>
+
+	* gnus-score.el (gnus-summary-increase-score): Don't downcase
+	before lookin in char-to-header.
+
+1998-08-07 01:33:22  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-predefined-server-alist): Too many parentheses.
+
+1998-08-06 11:20:08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-continuum-version): Include quassia.
+
+	* gnus-sum.el (gnus-data-enter-list): Check before entering list. 
+
+1998-08-06 11:13:56  Francois Felix Ingrand  <felix@dial.oleane.com>
+
+	* gnus-salt.el (gnus-generate-vertical-tree): Don't go too far to
+	the left.
+
+Thu Aug  6 07:58:17 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.29 is released.
+
+1998-08-06 07:10:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-expire): Check whether (caar
+	gnus-agent-article-alist) is nil.
+
+	* gnus.el (gnus-read-method): Allow selecting predefined servers. 
+
+	* gnus-topic.el (gnus-topic-update-topic-line): Compute right
+	number when inserting missing topic lines.
+
+	* gnus-start.el (gnus-get-unread-articles): Check that the group
+	is alive.
+
+	* gnus-score.el (gnus-score-load-score-alist): Better error
+	messaging. 
+
+Tue Aug  4 09:42:31 1998  Kurt Swanson  <ksw@dna.lth.se>
+
+	* gnus-salt.el (gnus-pick-mouse-pick-region): Fix picking bug due
+	to use of gnus-read-event-char.
+
+1998-07-28  Dave Love  <d.love@dl.ac.uk>
+
+	* gnus-group.el (gnus-group-fetch-faq): Don't mung dots in group
+	name.
+
+1998-07-27  Dave Love  <d.love@dl.ac.uk>
+
+	* gnus-topic.el (gnus-topic-mode-map): Provide Emacs tty
+	alternatives to [tab], [(meta tab)].
+
+1998-08-06 04:41:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-start.el (gnus-startup-file-coding-system): New variable.
+	(gnus-read-init-file): Use it.
+	(gnus-read-newsrc-el-file): Ditto.
+
+	* gnus-sum.el (gnus-thread-ignore-subject): Changed default.
+
+1998-08-06 04:38:02  Richard Stallman  <rms@gnu.org>
+
+	* message.el (sendmail): Required.
+
+1998-08-06 02:11:37  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-auto-select-same): Dix fix.
+
+1998-08-04  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus-sum.el (gnus-select-newsgroup): Set
+	`gnus-newsgroup-unselected' when selecting specific articles via
+	SELECT-ARTICLE - there may be more headers to fetch if
+	`gnus-fetch-old-headers' is non-nil. 
+	(gnus-summary-read-group): pass SELECT-ARTICLE to
+	`gnus-summary-read-group-1' and reset to nil when going to next group.
+	(gnus-summary-read-group): Change `select-article' to
+	`select-articles' for consistency.
+
+Tue Aug  4 05:25:01 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.28 is released.
+
+1998-08-03 22:00:25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nndoc.el (nndoc-set-delims): Removed article-end.
+	(nndoc-dissect-buffer): Use eobp.
+
+1998-08-03 19:59:36  Trung Tran-Duc  <trung.tranduc@prague.ixoskillspam.cz>
+
+	* nntp.el (nntp-open-connection): Bind coding-system-for-write.
+
+1998-07-31 16:45:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-read-ephemeral-group): Make the server
+	unique.
+
+1998-07-28  François Pinard  <pinard@iro.umontreal.ca>
+
+	* gnus-uu.el (gnus-uu-reginize-string): Consider the number of
+	parts as part of the fixed subject, instead of a wild quantity.
+
+1998-07-30 21:47:23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-cache.el (gnus-summary-insert-cached-articles): Sort
+	articles. 
+
+	* nndir.el (nndir): Use nnml functions.
+
 Mon Jul 27 03:26:00 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.27 is released.
@@ -39,9 +165,10 @@ Mon Jul 27 03:26:00 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* gnus-sum.el (gnus-summary-update-article): Don't pass along
 	iheader to regeneration routine.
 
-1998-07-26 17:33:03  KOSEKI Yoshinori  <kose@yk.NetLaputa.ne.jp>
+1998-07-27  KOSEKI Yoshinori  <kose@yk.NetLaputa.ne.jp>
 
-	* nnmail.el (nnmail-move-inbox): Nix out password on errors.
+	* nnmail.el (nnmail-move-inbox): Clear nnmail-internal-password,
+	when supplied Password is incorrect.
 
 Sat Jul 25 19:31:36 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
