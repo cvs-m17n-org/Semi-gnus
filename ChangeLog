@@ -1,3 +1,9 @@
+1998-11-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.20.
+
+	* Sync up with Gnus 5.6.45.
+
 1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-mimic-kill-buffer): Rewrite.
