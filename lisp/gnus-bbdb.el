@@ -3,9 +3,9 @@
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
 ;; Copyright (C) 1997,1998 MORIOKA Tomohiko
-;; Copyright (C) 1998 Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Copyright (C) 1998,1999 Keiichi Suzuki <keiichi@nanap.org>
 
-;; Author: Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;; Keywords: BBDB, MIME, multimedia, multilingual, mail, news
 
@@ -143,6 +143,39 @@ displaying the record corresponding to the sender of the current message."
 		   ))))
       (set-buffer b)
       record)))
+
+;;;###autoload
+(defun gnus-bbdb/split-mail (header-filed bbdb-field &optional regexp group)
+  "Mail split method for `nnmail-split-fancy'.
+HEADER-FILED is regexp of mail header field name for gathering mail
+addresses. BBDB-FIELD is field name of BBDB.
+Optional argument REGEXP is regexp of matching BBDB-FIELD value.
+If REGEXP is nil or not specified, then all BBDB-FIELD value is match.
+If GROUP is nil or not specified, then use BBDB-FIELD value as group
+name. Otherwise use GROUP."
+  (or regexp (setq regexp ""))
+  (let ((pat (concat "\\(" header-filed "\\)" ":[ \t]"))
+	rest prop answer)
+    (goto-char (point-min))
+    (catch 'done
+      (while (< (point) (point-max))
+	(when (looking-at pat)
+	  (mapcar 
+	   (lambda (lal)
+	     (condition-case nil
+		 (let ((prop (bbdb-record-getprop
+			      (bbdb-search-simple nil
+						  (std11-address-string lal))
+			      bbdb-field)))
+		   (and (string-match regexp prop)
+			(throw 'done (or group prop))))
+	       (error nil)
+	       ))
+	   (std11-parse-addresses-string (buffer-substring (match-end 0)
+							   (std11-field-end)))
+	   ))
+	(forward-line)
+	))))
 
 ;;
 ;; Announcing BBDB entries in the summary buffer
