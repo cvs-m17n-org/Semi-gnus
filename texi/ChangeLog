@@ -1,3 +1,12 @@
+2001-06-17  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Group Line Specification): Explain why %t is only an
+	estimate.
+
+2001-06-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (IMAP): Add.
+
 2001-06-13 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Article Washing): Add.

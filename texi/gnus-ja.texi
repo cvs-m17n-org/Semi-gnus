@@ -1756,6 +1756,16 @@ Gnus の起動に成功した後に、一番最後に実行されるフックです。
 @item t
 推定全記事数 (これは実際は @var{max-number} - @var{min-number} + 1)。
 
+Gnus がこの推定を使うのは、NNTP プロトコルは能率の良
+い @var{max-number} と @var{min-number} へのアクセスを提供するものの、本
+当の未読記事の数を得るには必ずしも能率的ではないからです。ヒステリックな
+レーズン (訳注: 歴史的な理由のモジりか?) により、メールバックエンドにお
+いても、限定された同じインターフェースを使って、本当の未読記事の数を能率
+的に得ることはできるかもしれません。この制限を Gnus から取り払うことはバッ
+クエンドのインターフェースを変更することを意味し、それは楽な仕事ではあり
+ません。あなたがこの仕事をやりたいならば、どうぞ Gnus メーリングリストに
+連絡して下さい。
+
 @item y
 未読でも、印付きでも、保留でもない記事の数。
 
@@ -13882,6 +13892,20 @@ nnimap はそれもサポートします。しかし、SSLeay の最新版である 0.9.x 
 $B$r?R$M$^$9!#
 
 @end table
+
+@item nnimap-expunge-search-string
+@cindex Expunging
+@vindex nnimap-expunge-search-string
+
+この変数には、期限切れ消去するのが望ましい記事を探すときにサーバーに送っ
+た IMAP の検索コマンドが入っています。ディフォルト
+は @code{"UID %s NOT SINCE %s"} で、ここで最初の @code{%s} は UID で置き
+換えられ、二番目の @code{%s} は日付で置き換えられます。
+
+たぶん使いものになる別の値は @code{"UID %s NOT SENTSINCE %s"} で、
+nnimap に記事の内部的な日付の代わりに Date: を使うようにさせます。さらな
+る情報や使うことができる文字列については、RFC 2060 のセクション 6.4.4 を
+見てください。
 
 @item nnimap-authinfo-file
 @vindex nnimap-authinfo-file
