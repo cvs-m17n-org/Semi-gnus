@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.5 1998-11-12 14:08:07 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.4 1998-11-12 14:04:09 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -129,11 +129,11 @@
 		(let ((news-spool
 		       (read-from-minibuffer
 			"News spool directory for sending: "
-			"/usr/spool/news.out"))
+			"~/spool/mail.out"))
 		      (mail-spool
 		       (read-from-minibuffer
 			"Mail spool directory for sending: "
-			"/usr/spool/mail.out")))
+			"~/spool/news.out")))
 		  (setq gnus-offline-mail-spool-directory mail-spool)
 		  (setq gnus-offline-news-spool-directory news-spool)
 		  (setq gnus-offline-drafts-queue-type 'miee)
