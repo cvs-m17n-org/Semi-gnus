@@ -1,3 +1,26 @@
+2000-01-25  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+2000-01-24  SANETO Takanori <sanewo@ba2.so-net.ne.jp>
+
+	* lisp/gnus-spec.el: Call `gnus-ems-redefine'.
+
+	* lisp/pop3.el (pop3-movemail): Don't use `format' for `message'.
+	* lisp/gnus-offline.el (gnus-offline-toggle-articles-to-fetch):
+	Ditto.
+
+	* lisp/read-passwd.el (read-pw-read-noecho): Use "%s" for the 1st
+	arg of `message'.
+	* lisp/gnus.el (gnus-version): Ditto.
+	* lisp/gnus-sum.el (gnus-summary-simplify-subject-query): Ditto.
+	* lisp/gnus-offline.el (gnus-offline-set-interval-time,
+	gnus-offline-empting-spool, gnus-offline-toggle-on/off-send-mail,
+	gnus-offline-set-auto-ppp, gnus-offline-after-jobs-done,
+	gnus-offline-hangup-line, gnus-offline-get-new-news-function,
+	gnus-offline-connect-server): Ditto.
+	* lisp/dgnushack.el (dgnushack-make-package): Ditto.
+
 2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
