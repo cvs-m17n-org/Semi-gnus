@@ -1,3 +1,20 @@
+1999-06-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.068.
+	(gnus-revision-number): Fresh start from 00.
+
+	* configure: Regenerate.
+
+	* lisp/{rfc2047.el,nnmail.el,mml.el,mm-view.el,mm-util.el,
+	mm-bodies.el,message.el,mail-prsvr.el,gnus-xmas.el,gnus-sum.el,
+	gnus-start.el,gnus-draft.el,gnus-cus.el,gnus-cache.el,gnus-art.el,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.89.
+	* aclocal.m4: Ditto.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi}:
+	Update for T-gnus 6.10.068.
+	* README.T-gnus: Ditto.
+
 1999-06-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
