@@ -41,8 +41,8 @@
 ;;	 % mkdir ~/News/namazu
 ;;       % mknmz -a -h -O ~/News/namazu ~/Mail
 ;;
-;; (2) Furthermore, put these expressions to your ~/.gnus, to set the
-;;     path of the index files to `gnus-namazu-index-directory'.
+;; Furthermore, put these expressions to your ~/.gnus, to set the path
+;; of the index files to `gnus-namazu-index-directory'.
 ;;
 ;;       (setq gnus-namazu-index-directory (expand-file-name "~/News/namazu"))
 
