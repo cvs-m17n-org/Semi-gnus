@@ -101,7 +101,7 @@
 	(t
 	 nil)))
       (common-vars
-       '(navi2ch-mona-font)))
+       '(default-mime-charset-unlimited navi2ch-mona-font)))
   (maybe-fbind functions)
   (maybe-fbind common-fns)
   (maybe-bind variables)
