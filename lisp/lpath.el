@@ -45,7 +45,7 @@
 		     w3-coding-system-for-mime-charset 
 		     rmail-summary-exists rmail-select-summary
 		     rmail-update-summary url-retrieve
-		     temp-directory babel-fetch babel-wash
+		     temp-directory babel-fetch babel-wash babel-as-string
 		     ))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
@@ -69,7 +69,8 @@
 		w3-meta-content-type-charset-regexp
 		w3-meta-charset-content-type-regexp
 		babel-translations babel-history))
-  (maybe-fbind '(color-instance-rgb-components temp-directory
+  (maybe-fbind '(color-instance-rgb-components
+		 temp-directory
 		 glyph-width annotation-glyph window-pixel-width glyph-height
 		 window-pixel-height
 		 make-color-instance color-instance-name specifier-instance
@@ -93,7 +94,7 @@
 		 w3-coding-system-for-mime-charset
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
-		 babel-fetch babel-wash)))
+		 babel-fetch babel-wash babel-as-string)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)
