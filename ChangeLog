@@ -1,3 +1,26 @@
+2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-encapsulate-images): Renamed from
+	`nnshimbun-encapsulate-article'.
+	(nnshimbun-request-article-1): Replace `encapsulate-article' with
+	`encapsulate-images'.
+	(nnshimbun-find-parameter): Ditto.
+	(nnshimbun-group-parameters): Ditto.
+	(nnshimbun-group-parameters-custom): Ditto.
+
+2001-06-15  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el (nnshimbun-group-parameters-custom): Add
+	`encapsulate-article' as a customizable option, and modified
+	`prefetch-articles'.
+	(nnshimbun-group-parameters): Add document for
+	`encapsulate-article'.
+	(nnshimbun-encapsulate-article): New server variable.
+	(nnshimbun-find-parameter): Add code for `encapsulate-article'.
+	(nnshimbun-request-article-1): Refer `encapsulate-article' group
+	parameter to control `shimbun-encapsulate-article' value when
+	`shimbun-article' is called.
+
 2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
