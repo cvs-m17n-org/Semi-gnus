@@ -1,3 +1,11 @@
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-braid-nov): Use
+	`nnheader-insert-file-contents'.
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Sync up
+	with "akr" branch.
+
 1998-08-23  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.15.
