@@ -1,3 +1,8 @@
+2001-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnir.el: Import from
+	ftp://ls6-ftp.cs.uni-dortmund.de/pub/src/emacs/nnir.el.
+
 2001-08-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-util.el (gnus-truncate-string): Abolished.
