@@ -42,9 +42,6 @@
   (require 'mime-play)
   (require 'static))
 
-;; Avoid byte-compile warnings.
-(defvar gnus-decode-encoded-word-function)
-
 (eval-and-compile
   (autoload 'gnus-cache-articles-in-group "gnus-cache"))
 
@@ -811,6 +808,10 @@ mark:    The articles mark."
   "Function called to allow alteration of article header structures.
 The function is called with one parameter, the article header vector,
 which it may alter in any way.")
+
+(defvar gnus-decode-encoded-word-function
+  (mime-find-field-decoder 'From 'nov)
+  "Variable that says which function should be used to decode a string with encoded words.")
 
 (defcustom gnus-extra-headers nil
   "*Extra headers to parse."
@@ -2514,10 +2515,8 @@ marks of articles."
 (defun gnus-summary-from-or-to-or-newsgroups (header)
   (let ((to (cdr (assq 'To (mail-header-extra header))))
 	(newsgroups (cdr (assq 'Newsgroups (mail-header-extra header))))
-	(mail-parse-charset gnus-newsgroup-charset)
-	(mail-parse-ignored-charsets 
-	 (save-excursion (set-buffer gnus-summary-buffer)
-			 gnus-newsgroup-ignored-charsets)))
+	(default-mime-charset (with-current-buffer gnus-summary-buffer
+				default-mime-charset)))
     (cond
      ((and to
 	   gnus-ignored-from-addresses
