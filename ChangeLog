@@ -1,5 +1,12 @@
+2000-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
+
+	* lisp/message.el (message-send-mail-with-smtp): Leave the error
+	handling in `smtp-send-buffer's own care.
+
 2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
-	
+
 	* lisp/message.el: Undo changes.
 
 2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
