@@ -227,8 +227,8 @@ If this variable is nil, which is the default, no timers are set.
 NOTE: This variable is never seen to work in Emacs 20 and XEmacs 21.")
 
 (defvoo nntp-prepare-post-hook nil
-  "*Hook run just before posting an article. It is supposed to be used for
-inserting Cancel-Lock headers, signing with Gpg, etc.")
+  "*Hook run just before posting an article.  It is supposed to be used
+to insert Cancel-Lock headers.")
 
 ;;; Internal variables.
 
@@ -332,8 +332,7 @@ noticing asynchronous data.")
 	      (setq limit (max (- (point-max) 1000) (point-min)))
 	      (goto-char (point-max)))
 	    (setq response (match-string 0))
-	    (save-current-buffer
-	      (set-buffer nntp-server-buffer)
+	    (with-current-buffer nntp-server-buffer
 	      (setq nntp-process-response response)))
 	  (nntp-decode-text (not decode))
 	  (unless discard
@@ -908,8 +907,7 @@ newsgroups that match the regexp."
 (deffoo nntp-request-post (&optional server)
   (nntp-possibly-change-group nil server)
   (when (nntp-send-command "^[23].*\r?\n" "POST")
-    (let ((response (save-current-buffer
-		      (set-buffer nntp-server-buffer)
+    (let ((response (with-current-buffer nntp-server-buffer
 		      nntp-process-response))
 	  server-id)
       (when (and response
@@ -1164,8 +1162,7 @@ password contained in '~/.nntp-authinfo'."
 	(when (re-search-backward
 	       nntp-process-wait-for nntp-process-start-point t)
 	  (let ((response (match-string 0)))
-	    (save-current-buffer
-	      (set-buffer nntp-server-buffer)
+	    (with-current-buffer nntp-server-buffer
 	      (setq nntp-process-response response)))
 	  (nntp-async-stop process)
 	  ;; convert it.

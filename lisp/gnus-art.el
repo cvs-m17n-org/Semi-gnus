@@ -3106,6 +3106,14 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		  (put-text-property (match-end 0) (point-max)
 				     'face eface)))))))))
 
+(autoload 'canlock-verify "canlock")
+
+(defun article-verify-cancel-lock ()
+  "Verify Cancel-Lock header."
+  (interactive)
+  (if (gnus-buffer-live-p gnus-original-article-buffer)
+      (canlock-verify gnus-original-article-buffer)))
+
 (eval-and-compile
   (mapcar
    (lambda (func)
@@ -3127,6 +3135,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		    (apply ',afunc args))))))))
    '(article-hide-headers
      article-verify-x-pgp-sig
+     article-verify-cancel-lock
      article-hide-boring-headers
      article-toggle-headers
      article-treat-overstrike
