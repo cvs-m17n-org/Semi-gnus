@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996,1997,1998 Free Software Foundation, Inc.
+;; Copyright (C) 1996-1999 Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
@@ -94,24 +94,25 @@ Used for APOP authentication.")
 	   (pop3-pass process))
 	  (t (error "Invalid POP3 authentication scheme.")))
     (setq message-count (car (pop3-stat process)))
-    (while (<= n message-count)
-      (message (format "Retrieving message %d of %d from %s..."
-		       n message-count pop3-mailhost))
-      (pop3-retr process n crashbuf)
-      (save-excursion
-	(set-buffer crashbuf)
-	(write-region-as-binary (point-min) (point-max)
-				crashbox 'append 'nomesg)
-	(set-buffer (process-buffer process))
-	(while (> (buffer-size) 5000)
-	  (goto-char (point-min))
-	  (forward-line 50)
-	  (delete-region (point-min) (point))))
-      (pop3-dele process n)
-      (setq n (+ 1 n))
-      (if pop3-debug (sit-for 1) (sit-for 0.1))
-      )
-    (pop3-quit process)
+    (unwind-protect
+	(while (<= n message-count)
+	  (message (format "Retrieving message %d of %d from %s..."
+			   n message-count pop3-mailhost))
+	  (pop3-retr process n crashbuf)
+	  (save-excursion
+	    (set-buffer crashbuf)
+	    (write-region-as-binary (point-min) (point-max)
+				    crashbox 'append 'nomesg)
+	    (set-buffer (process-buffer process))
+	    (while (> (buffer-size) 5000)
+	      (goto-char (point-min))
+	      (forward-line 50)
+	      (delete-region (point-min) (point))))
+	  (pop3-dele process n)
+	  (setq n (+ 1 n))
+	  (if pop3-debug (sit-for 1) (sit-for 0.1))
+	  )
+      (pop3-quit process))
     (kill-buffer crashbuf)
     )
   t)
@@ -127,11 +128,13 @@ Returns the process associated with the connection."
       (erase-buffer)
       (setq pop3-read-point (point-min))
       )
-    (setq process
-	  (cond ((eq pop3-connection-type 'ssl)
-		 (pop3-open-ssl-stream "POP" process-buffer mailhost port))
-		(t
-		 (open-network-stream-as-binary "POP" process-buffer mailhost port))))
+    (setq
+     process
+     (cond
+      ((eq pop3-connection-type 'ssl)
+       (pop3-open-ssl-stream "POP" process-buffer mailhost port))
+      (t
+       (open-network-stream-as-binary "POP"process-buffer mailhost port))))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
@@ -204,6 +207,22 @@ Return the response string if optional second argument is non-nil."
 	      (buffer-substring (point) match-end)
 	    t)
 	  )))))
+
+(defun pop3-string-to-list (string &optional regexp)
+  "Chop up a string into a list."
+  (let ((list)
+	(regexp (or regexp " "))
+	(string (if (string-match "\r" string)
+		    (substring string 0 (match-beginning 0))
+		  string)))
+    (store-match-data nil)
+    (while string
+      (if (string-match regexp string)
+	  (setq list (cons (substring string 0 (- (match-end 0) 1)) list)
+		string (substring string (match-end 0)))
+	(setq list (cons string list)
+	      string nil)))
+    (nreverse list)))
 
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)

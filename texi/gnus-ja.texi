@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.070 Manual
+@settitle Semi-gnus 6.10.071 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.070 Manual
+@title Semi-gnus 6.10.071 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B$J8@8l7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation$B$r(B
 $B$*BT$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B Semi-gnus 6.10.070 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B Semi-gnus 6.10.071 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -8302,9 +8302,11 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
 $B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#(B
 
-$BB0@-CM$OJ8;zNs(B ($B$=$N$^$^;H$o$l$^$9(B)$B!"4X?t(B ($BJV$jCM$,;H$o$l$^$9(B)$B!"JQ?t(B ($B$=(B
-$B$NCM$,;H$o$l$^$9(B)$B!"%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$jCM$,;H$o$l$^$9(B) 
-$B$G$"$k;v$,$G$-$^$9!#(B
+$BB0@-CM$OJ8;zNs(B ($B$=$N$^$^;H$o$l$^$9(B)$B!"0z?t$NL5$$4X?t(B ($BJV$jCM$,;H$o$l$^$9(B)$B!"(B
+$BJQ?t(B ($B$=$NCM$,;H$o$l$^$9(B) $B$^$?$O%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$j(B
+$BCM$,;H$o$l$^$9(B) $B$G$"$k;v$,$G$-$^$9!#4X?t$O%;%C%H%"%C%W$5$l$?%a%C%;!<%8(B
+$B%P%C%U%!$G8F$P$l(B (@code{eval} $B$5$l(B) $B$^$9!#8=:_$N5-;v$N%X%C%@!<$OJQ?t(B 
+@code{message-reply-headers} $B$+$iF@$i$l$^$9!#(B
 
 $B$b$7!":n@.$7$h$&$H$7$F$$$k%a%C%;!<%8$,%K%e!<%95-;v$+%a!<%k%a%C%;!<%8$G$"(B
 $B$k$+$rD4$Y$?$$$H$-$O!"(B2$B$D$N4X?t(B @code{message-news-p} $B$H(B 

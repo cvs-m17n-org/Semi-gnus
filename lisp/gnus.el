@@ -264,13 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.070"
+(defconst gnus-version-number "6.10.071"
   "Version number for this version of gnus.")
 
 (defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.92"
+(defconst gnus-original-version-number "0.93"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -1811,7 +1811,9 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-unplugged gnus-agentize gnus-agent-batch)
      ("gnus-vm" :interactive t gnus-summary-save-in-vm
       gnus-summary-save-article-vm)
-     ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts))))
+     ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts)
+     ("gnus-mlspl" gnus-mlsplit gnus-mlsplit-fancy)
+     ("gnus-mlspl" :interactive t gnus-mlsplit-setup gnus-mlsplit-update))))
 
 ;;; gnus-sum.el thingies
 

@@ -1,3 +1,20 @@
+1999-07-07  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.071.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi}:
+	Update for T-gnus 6.10.071.
+
+	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Sync up with
+	Pterodactyl Gnus v0.93.
+
+	* lisp/{pop3.el,nnmail.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,
+	mm-decode.el,message.el,gnus-util.el,gnus-sum.el,gnus-start.el,
+	gnus-srvr.el,gnus-score.el,gnus-mlspl.el,gnus-art.el,gnus-agent.el,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.93.
+
+	* README.T-gnus: Update for T-gnus 6.10.071.
+
 1999-07-06  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.070.

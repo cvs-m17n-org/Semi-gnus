@@ -8925,8 +8925,8 @@ If REVERSE, save parts that do not match TYPE."
       (mapcar (lambda (h) (gnus-summary-save-parts-1 type dir h reverse))
 	      (cdr handle))
     (when (if reverse
-	      (not (string-match type (car (mm-handle-type handle))))
-	    (string-match type (car (mm-handle-type handle))))
+	      (not (string-match type (mm-handle-media-type handle)))
+	    (string-match type (mm-handle-media-type handle)))
       (let ((file (expand-file-name
 		   (file-name-nondirectory
 		    (or
@@ -9399,6 +9399,8 @@ If REVERSE, save parts that do not match TYPE."
 
 (defun gnus-summary-setup-default-charset ()
   "Setup newsgroup default charset."
+  (if (equal gnus-newsgroup-name "nndraft:drafts")
+      (setq gnus-newsgroup-charset nil)
   (let* ((name (and gnus-newsgroup-name
 		   (gnus-group-real-name gnus-newsgroup-name)))
 	 (ignored-charsets 
@@ -9431,7 +9433,7 @@ If REVERSE, save parts that do not match TYPE."
 			 charset)))
 	      gnus-default-charset))
     (set (make-local-variable 'gnus-newsgroup-ignored-charsets) 
-	 ignored-charsets)))
+	 ignored-charsets))))
 
 ;;;
 ;;; Mime Commands

@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.070 Manual
+@settitle Semi-gnus 6.10.071 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -319,7 +319,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.070 Manual
+@title Semi-gnus 6.10.071 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -362,7 +362,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.070.
+This manual corresponds to Semi-gnus 6.10.071.
 
 @end ifinfo
 
@@ -7023,7 +7023,7 @@ positives.
 
 @vindex gnus-signature-limit
 @code{gnus-signature-limit} provides a limit to what is considered a
-signature.
+signature when displaying articles.
 
 @enumerate
 @item
@@ -8453,7 +8453,6 @@ group.
 @item gnus-treat-strip-trailing-blank-lines
 @item gnus-treat-strip-leading-blank-lines
 @item gnus-treat-strip-multiple-blank-lines
-@item gnus-treat-strip-blank-lines
 @item gnus-treat-overstrike
 @item gnus-treat-display-xface
 @item gnus-treat-display-smileys
@@ -8934,9 +8933,12 @@ attribute name can also be a string.  In that case, this will be used as
 a header name, and the value will be inserted in the headers of the
 article.
 
-The attribute value can be a string (used verbatim), a function (the
-return value will be used), a variable (its value will be used) or a
-list (it will be @code{eval}ed and the return value will be used).
+The attribute value can be a string (used verbatim), a function with
+zero arguments (the return value will be used), a variable (its value
+will be used) or a list (it will be @code{eval}ed and the return value
+will be used).  The functions and sexps are called/@code{eval}ed in the
+message buffer that is being set up.  The headers of the current article
+are available through the @code{message-reply-headers} variable.
 
 If you wish to check whether the message you are about to compose is
 meant to be a news article or a mail message, you can check the values
@@ -14129,7 +14131,7 @@ will be fetched @emph{twice}.  If you want to match a bit on the
 the matches.
 
 @item Marking as read
-You will probably want to mark articles that has a score below a certain
+You will probably want to mark articles that have scores below a certain
 number as read.  This is most easily achieved by putting the following
 in your @file{all.SCORE} file:
 @lisp
