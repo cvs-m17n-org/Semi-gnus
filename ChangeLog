@@ -1,5 +1,10 @@
 2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-texi-format): Remove @ignore'd areas
+	before processing.
+
+2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
 
 	* lisp/gnus.el (gnus-product-variable-file-list): Check for

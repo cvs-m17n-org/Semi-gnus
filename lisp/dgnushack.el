@@ -390,16 +390,26 @@ You must specify the name of the package path as follows:
 	    (progn
 	      (if buffer-file-name (kill-buffer (current-buffer)))
 	      (find-file file)
+	      (buffer-disable-undo (current-buffer))
 	      (if (boundp 'MULE)
 		  (setq output-coding-system (symbol-value
 					      'file-coding-system))
 		(setq coding-system-for-write buffer-file-coding-system))
+	      ;; Remove ignored areas first.
+	      (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
+		(delete-region (match-beginning 0)
+			       (if (re-search-forward
+				    "^@end[\t ]+ignore[\t\r ]*$" nil t)
+				   (1+ (match-end 0))
+				 (point-max))))
+	      (goto-char (point-min))
+	      ;; Add suffix if it is needed.
 	      (when (and addsuffix
 			 (re-search-forward
 			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
 			 (not (string-match "\\.info$" (match-string 1))))
-		(insert ".info"))
-	      (buffer-disable-undo (current-buffer))
+		(insert ".info")
+		(goto-char (point-min)))
 	      ;; process @include before updating node
 	      ;; This might produce some problem if we use @lowersection or
 	      ;; such.
