@@ -1,3 +1,17 @@
+1999-07-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+1999-07-30  NAKAJI Hiroyuki   <nakaji@tutrp.tut.ac.jp>
+
+	* lisp/Makefile.in (install): install *.el files too.
+	to avoid warning about el is newer than elc, exec touch
+	$(lispdir)/*.elc.
+
+1999-07-29  Yoshiki Hayashi   <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Sync up with pGnus 0.95.
+
 1999-07-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
