@@ -1,5 +1,8 @@
 1998-11-25  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/nnmail.el (nnmail-move-inbox): Fix bug. (Could not use
+	external `movemail' program.)
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.7.
 
 	* Sync up with gnus-6_8.
