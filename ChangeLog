@@ -1,3 +1,14 @@
+2001-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-expire-nov-databases): New command.
+	(nnshimbun-request-expire-articles): New function.
+	(nnshimbun-keep-unparsable-dated-articles): New variable.
+	(nnshimbun-keep-last-article): New variable.
+	(nnshimbun-insert-nov): Rewrite using `nnshimbun-string-or'.
+	(nnshimbun-string-or): New macro.
+	(nnshimbun-tmp-string): New internal variable.
+	(TopLevel): Require `message' for `message-make-date'.
+
 2001-05-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): Remove a
