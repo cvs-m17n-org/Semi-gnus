@@ -1476,7 +1476,8 @@ slower, and `std11-extract-address-components'."
     ("nnlistserv" none)
     ("nnagent" post-mail)
     ("nnimap" post-mail address prompt-address physical-address)
-    ("nnmaildir" mail respool address))
+    ("nnmaildir" mail respool address)
+    ("nnnil" none))
   "*An alist of valid select methods.
 The first element of each list lists should be a string with the name
 of the select method.  The other elements may be the category of
