@@ -1,5 +1,7 @@
 1999-05-31  MORIOKA Tomohiko  <tomo@m17n.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 1.13.0.
+
 	* lisp/nnheader.el: Require `mmgnus'.
 	(mail-header-subject): Now an alias for
 	`mime-gnus-entity-subject-internal'.
