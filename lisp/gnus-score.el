@@ -1929,7 +1929,14 @@ SCORE is the score to add."
 	    ;; Do exact matching.
 	    (goto-char (point-min))
 	    (while (and (not (eobp))
-			(funcall search-func match nil t))
+			(condition-case err
+			    (funcall search-func match nil t)
+			  (error 
+			   (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				       err (cadaar alist))
+			   (gnus-score-set 'touched '(t) alist)
+			   (setcdr entries (cddr entries))
+			   nil)))
 	      ;; Is it really exact?
 	      (and (eolp)
 		   (= (gnus-point-at-bol) (match-beginning 0))
@@ -1974,7 +1981,14 @@ SCORE is the score to add."
 	    (when (string= match "")
 	      (setq match "\n"))
 	    (while (and (not (eobp))
-			(funcall search-func match nil t))
+			(condition-case err
+			    (funcall search-func match nil t)
+			  (error 
+			   (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				       err (cadaar alist))
+			   (gnus-score-set 'touched '(t) alist)
+			   (setcdr entries (cddr entries))
+			   nil)))
 	      (goto-char (match-beginning 0))
 	      (end-of-line)
 	      (setq found (setq arts (get-text-property (point) 'articles)))
@@ -2021,7 +2035,14 @@ SCORE is the score to add."
 	       found)
 	  (goto-char (point-min))
 	  (while (and (not (eobp))
-		      (search-forward match nil t))
+		      (condition-case err
+			  (search-forward match nil t)
+			(error 
+			 (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				     err (cadaar fuzzies))
+			       (gnus-score-set 'touched '(t) (cdar fuzzies))
+			       (setcdr (caar fuzzies) (cddaar fuzzies))
+			       nil)))
 	    (when (and (= (gnus-point-at-bol) (match-beginning 0))
 		       (eolp))
 	      (setq found (setq arts (get-text-property (point) 'articles)))
