@@ -1981,7 +1981,6 @@ the user from the mailer."
     (undo-boundary)
     (let ((inhibit-read-only t))
       (put-text-property (point-min) (point-max) 'read-only nil))
-    (message-fix-before-sending)
     (run-hooks 'message-send-hook)
     (message "Sending...")
     (let ((message-encoding-buffer
@@ -1996,6 +1995,7 @@ the user from the mailer."
 	(erase-buffer)
 	(insert-buffer message-edit-buffer)
 	(funcall message-encode-function)
+	(message-fix-before-sending)
 	(while (and success
 		    (setq elem (pop alist)))
 	  (when (and (or (not (funcall (cadr elem)))
