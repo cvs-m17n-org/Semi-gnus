@@ -88,7 +88,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Message v5.10.3.  Message is distributed
+This manual corresponds to Message v5.10.4.  Message is distributed
 with the Gnus distribution bearing the same version number as this
 manual.
 
@@ -1227,7 +1227,7 @@ controlled by the @code{ispell-message-dictionary-alist} variable:
 @lisp
 (setq ispell-message-dictionary-alist
       '(("^Newsgroups:.*\\bde\\." . "deutsch8")
-	(".*" . "default")))
+        (".*" . "default")))
 @end lisp
 
 @code{ispell} depends on having the external @samp{ispell} command
