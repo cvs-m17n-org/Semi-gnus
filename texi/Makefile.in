@@ -8,9 +8,9 @@ top_srcdir = @top_srcdir@
 TEXI2DVI=texi2dvi
 EMACS=emacs
 MAKEINFO=@MAKEINFO@
-EMACSINFO=$(EMACS) -batch -q -no-site-file
-INFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-XINFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
+FLAGS=-batch -q -no-site-file
+INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
+XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
 LATEX=latex
 DVIPS=dvips
 PERL=perl
@@ -20,28 +20,32 @@ SHELL = /bin/sh
 PAPERTYPE=a4
 
 all: gnus message emacs-mime
+all-info: gnus.info message.info emacs-mime.info
+
+gnus.info: gnus.texi gnus-faq.texi
+message.info: message.texi
+emacs-mime.info: emacs-mime.texi
 
 ja: gnus-ja message-ja
+ja-info: gnus-ja.info message-ja.info
 
-# Rule for XEmacs package.
-add-info-suffix:
-	cd ../lisp && $(EMACS) -batch -q -no-site-file \
-		-l dgnushack.el -f dgnushack-add-info-suffix-maybe
-
-remove-info-suffix:
-	for file in gnus message emacs-mime gnus-ja message-ja; do \
-	  if test -f $$file.texi_; then \
-	    mv $$file.texi_ $$file.texi; \
-	  fi; \
-	done
+gnus-ja.info: gnus-ja.texi gnus-faq-ja.texi
+message-ja.info: message-ja.texi
 
 most: texi2latex.elc latex latexps
+
+%.info: %.texi
+	if test $(MAKEINFO) = no; then \
+	  cd ../lisp && $(EMACS) $(FLAGS) $(XINFOSWI) ../texi/$<; \
+	else \
+	  makeinfo -o $@ $<; \
+	fi
 
 .SUFFIXES: .texi .dvi .ps
 
 .texi:
 	if test $(MAKEINFO) = no; then \
-	  $(EMACSINFO) $< $(XINFOSWI); \
+	  cd ../lisp && $(EMACS) $(FLAGS) $(INFOSWI) ../texi/$<; \
 	else \
 	  makeinfo $<; \
 	fi
@@ -64,7 +68,7 @@ clean:
 	gnus.tmptexi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
 	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi \
 	gnus.info* gnus-ja.info* message.info* message-ja.info* \
-	*.texi_ emacs-mime.info
+	emacs-mime.info
 
 makeinfo:
 	makeinfo -o gnus gnus.texi
@@ -128,6 +132,8 @@ distclean: clean
 	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9] Makefile
 	rm -f message message-[0-9]
 	rm -f emacs-mime
+	rm -f gnus-ja gnus-ja-[0-9] gnus-ja-[0-9][0-9]
+	rm -f message-ja message-ja-[0-9]
 
 install:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)

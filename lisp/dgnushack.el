@@ -113,10 +113,12 @@
 (unless (boundp 'buffer-file-coding-system)
   (defvar buffer-file-coding-system (symbol-value 'file-coding-system)))
 (autoload 'font-lock-set-defaults "font-lock")
-(defalias 'coding-system-get 'ignore)
+(unless (fboundp 'coding-system-get)
+  (defalias 'coding-system-get 'ignore))
 (when (boundp 'MULE)
   (defalias 'find-coding-system 'ignore))
-(defalias 'get-charset-property 'ignore)
+(unless (fboundp 'get-charset-property)
+  (defalias 'get-charset-property 'ignore))
 (unless (featurep 'xemacs)
   (defalias 'Custom-make-dependencies 'ignore)
   (defalias 'toolbar-gnus 'ignore)
@@ -174,7 +176,7 @@ Modify to suit your needs."))
 	(when (or (not (file-exists-p (setq elc (concat file "c"))))
 		  (file-newer-than-file-p file elc))
 	  (ignore-errors
-	    (byte-compile-file file)))))))
+	   (byte-compile-file file)))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)
@@ -319,21 +321,93 @@ You must specify the name of the package path as follows:
 
     (message "Done")))
 
-(defun dgnushack-add-info-suffix-maybe ()
-  ;; This function must be invoked from lisp directory.
-  (setq default-directory "../texi/")
-  (let ((coding-system-for-read 'raw-text)
-	(coding-system-for-write 'raw-text)
-	(files (directory-files "." nil dgnushack-texi-file-regexp))
-	file make-backup-files)
-    (while (setq file (pop files))
-      (find-file file)
-      (when (and (re-search-forward
-		  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
-		 (not (string-match "\\.info$" (match-string 1))))
-	(copy-file file (concat file "_") nil t)
-	(insert ".info")
-	(save-buffer))
-      (kill-buffer (current-buffer)))))
+(defun dgnushack-texi-add-suffix-and-format ()
+  (dgnushack-texi-format t))
+
+(defun dgnushack-texi-format (&optional addsuffix)
+  (if (not noninteractive)
+      (error "batch-texinfo-format may only be used -batch."))
+  (require 'texinfmt)
+  (let ((auto-save-default nil)
+        (find-file-run-dired nil)
+	coding-system-for-write)
+    (let ((error 0)
+          file
+          (files ()))
+      (while command-line-args-left
+        (setq file (expand-file-name (car command-line-args-left)))
+        (cond ((not (file-exists-p file))
+               (message ">> %s does not exist!" file)
+               (setq error 1
+                     command-line-args-left (cdr command-line-args-left)))
+              ((file-directory-p file)
+               (setq command-line-args-left
+                     (nconc (directory-files file)
+                            (cdr command-line-args-left))))
+              (t
+               (setq files (cons file files)
+                     command-line-args-left (cdr command-line-args-left)))))
+      (while files
+        (setq file (car files)
+              files (cdr files))
+        (condition-case err
+            (progn
+              (if buffer-file-name (kill-buffer (current-buffer)))
+              (find-file file)
+	      (setq coding-system-for-write buffer-file-coding-system)
+	      (when (and addsuffix
+			 (re-search-forward
+			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
+			 (not (string-match "\\.info$" (match-string 1))))
+		(insert ".info"))
+              (buffer-disable-undo (current-buffer))
+	      ;; process @include before updating node
+	      ;; This might produce some problem if we use @lowersection or such.
+	      (let ((input-directory default-directory)
+		    (texinfo-command-end))
+		(while (re-search-forward "^@include" nil t)
+		  (setq texinfo-command-end (point))
+		  (let ((filename (concat input-directory
+					  (texinfo-parse-line-arg))))
+		    (re-search-backward "^@include")
+		    (delete-region (point) (save-excursion (forward-line 1) (point)))
+		    (message "Reading included file: %s" filename)
+		    (save-excursion
+		      (save-restriction
+			(narrow-to-region
+			 (point)
+			 (+ (point) (car (cdr (insert-file-contents filename)))))
+			(goto-char (point-min))
+			;; Remove `@setfilename' line from included file, if any,
+			;; so @setfilename command not duplicated.
+			(if (re-search-forward 
+			     "^@setfilename" (save-excursion (forward-line 100) (point)) t)
+			    (progn
+			      (beginning-of-line)
+			      (delete-region
+			       (point) (save-excursion (forward-line 1) (point))))))))))
+              (texinfo-mode)
+	      (texinfo-every-node-update)
+              (set-buffer-modified-p nil)
+	      (message "texinfo formatting %s..." file)
+	      (texinfo-format-buffer nil)
+	      (if (buffer-modified-p)
+		  (progn (message "Saving modified %s" (buffer-file-name))
+			 (save-buffer))))
+	  (error
+	   (message ">> Error: %s" (prin1-to-string err))
+           (message ">>  point at")
+           (let ((s (buffer-substring (point)
+                                      (min (+ (point) 100)
+                                           (point-max))))
+                 (tem 0))
+             (while (setq tem (string-match "\n+" s tem))
+               (setq s (concat (substring s 0 (match-beginning 0))
+                               "\n>>  "
+                               (substring s (match-end 0)))
+                     tem (1+ tem)))
+             (message ">>  %s" s))
+           (setq error 1))))
+      (kill-emacs error))))
 
 ;;; dgnushack.el ends here
