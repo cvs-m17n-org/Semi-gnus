@@ -3347,7 +3347,24 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((buffer (get-buffer name)))
+  (let ((pop-up-frames pop-up-frames)
+	(special-display-buffer-names special-display-buffer-names)
+	(special-display-regexps special-display-regexps)
+	(same-window-buffer-names same-window-buffer-names)
+	(same-window-regexps same-window-regexps)
+	(buffer (get-buffer name))
+	(cur (current-buffer)))
+    (if (or (and (featurep 'xemacs)
+		 (not (eq 'tty (device-type))))
+	    window-system
+	    (>= emacs-major-version 20))
+	(when message-use-multi-frames
+	  (setq pop-up-frames t
+		special-display-buffer-names nil
+		special-display-regexps nil
+		same-window-buffer-names nil
+		same-window-regexps nil))
+      (setq pop-up-frames nil))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
