@@ -1,5 +1,8 @@
 2003-07-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/pop3.el: Silence the byte-compiler when modifying
+	`byte-compile-function-environment' for `md5' under latest Emacs.
+
 	* texi/ptexinfmt.el (texinfo-discard-command-and-arg): Revive it
 	for Mule 2.
 
