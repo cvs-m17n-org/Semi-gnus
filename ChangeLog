@@ -1,3 +1,10 @@
+2001-08-17  KANEMATSU Daiji  <kanematu@sra.co.jp>
+
+	* lisp/message.el (message-signature-separator-for-insertion): New
+	customizable variable which is used for signature separator.
+	* lisp/message.el (message-insert-signature): Use variable
+	`message-signature-separator-for-insertion' instead of hard code.
+
 2001-08-15  Yoichi NAKAYAMA  <yoichi@eken.phys.nagoya-u.ac.jp>
 
 	* texi/gnus-ja.texi (Browsing the Web): Fix typo.
