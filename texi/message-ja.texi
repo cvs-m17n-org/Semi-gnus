@@ -22,7 +22,7 @@ This file documents Message, the Emacs message composition mode.
 $B$3$N%U%!%$%k$O(B Emacs $B$N%a%C%;!<%8:n@.%b!<%I$G$"$k(B Message $B$K4X$9$k@bL@J8(B
 $B=q$G$9!#(B
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -532,6 +532,7 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 
 @node Header Commands
 @section $B%X%C%@!<L?Na(B
+
 @subsection $B%X%C%@!<$K0\F0$9$k$?$a$NL?Na(B
 
 $B0J2<$NL?Na$OEv$N%X%C%@!<$K0\F0$7$^$9!#B8:_$7$J$1$l$PA^F~$5$l$^$9!#(B
@@ -612,26 +613,23 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 $B$7%P%C%U%!$K$9$G$K$3$N%X%C%@!<$,$"$k>l9g$O!"(BRFC 1376 $B$K=`$8$?;0$D$N(B
 $BCM(B @samp{low}$B!"(B@samp{normal} $B$*$h$S(B @samp{high} $B$r=[4D$5$;$^$9!#(B
 
-@c TRANSLATEME!
 @item C-c C-f C-a
 @kindex C-c C-f C-a
 @findex message-generate-unsubscribed-mail-followup-to
-Insert a reasonable @samp{Mail-Followup-To:} header
-(@pxref{Mailing Lists}) in a post to an
-unsubscribed list.  When making original posts to a mailing list you are
-not subscribed to, you have to type in a @samp{Mail-Followup-To:} header
-by hand.  The contents, usually, are the addresses of the list and your
-own address.  This function inserts such a header automatically.  It
-fetches the contents of the @samp{To:} header in the current mail
-buffer, and appends the current @code{user-mail-address}.
+$B9VFI$7$F$$$J$$%a!<%j%s%0%j%9%H$KEj9F$9$k>l9g$K8+9g$C(B
+$B$?(B @samp{Mail-Followup-To:} $B%X%C%@!<$rA^F~$7$^$9!#9VFI$7$F$$$J$$%a!<%j%s(B
+$B%0%j%9%H$KK\5-;v$rEj9F$9$k$H$-$O!"(B@samp{Mail-Followup-To:} $B$r<j$G=q$+$J(B
+$B$1$l$P$J$j$^$;$s!#FbMF$O!"$U$D$&$O%a!<%j%s%0%j%9%H$N%"%I%l%9$H$"$J$?<+?H(B
+$B$N%"%I%l%9$G$9!#$3$N4X?t$O$=$N$h$&$J%X%C%@!<$r<+F0E*$KA^F~$7$^$9!#$3$l$O(B
+$B8=:_$N%a!<%k$N%P%C%U%!$+$i(B @samp{To:} $B%X%C%@!<$NFbMF$rH4$-=P$7!"$=$l$K8=(B
+$B:_$N(B @code{user-mail-address} $B$rDI2C$7$^$9!#(B
 
-If the optional argument @code{include-cc} is non-nil, the addresses in
-the @samp{Cc:} header are also put into the @samp{Mail-Followup-To:}
-header.
-
+$BG$0U$N0z?t$G$"$k(B @code{include-cc} $B$,Hs(B-@code{nil} $B$@$C$?>l9g$O!"(B
+@samp{Cc:} $B%X%C%@!<$K$"$k%"%I%l%9$b(B @samp{Mail-Followup-To:} $B%X%C%@!<$K(B
+$BCV$+$l$^$9!#(B
 @end table
 
-@subsection  Commands to change headers
+@subsection $B%X%C%@!<$rJQ99$9$k$?$a$NL?Na(B
 
 @table @kbd
 
@@ -639,36 +637,37 @@ header.
 @kindex C-c C-o
 @findex message-sort-headers
 @vindex message-header-format-alist
-Sort headers according to @code{message-header-format-alist}
-(@code{message-sort-headers}).
+@code{message-header-format-alist} $B$K=>$C$F%X%C%@!<$rJB$YBX$($^(B
+$B$9(B (@code{message-sort-headers})$B!#(B
 
 @item C-c C-t
 @kindex C-c C-t
 @findex message-insert-to
-Insert a @code{To} header that contains the @code{Reply-To} or
-@code{From} header of the message you're following up
-(@code{message-insert-to}).
+$B%U%)%m!<%"%C%W$7$h$&$H$9$k%a%C%;!<%8$N(B @code{Reply-To} $B$b$7$/(B
+$B$O(B @code{From} $B%X%C%@!<$r4^$`(B @code{To} $B%X%C%@!<$rA^F~$7$^(B
+$B$9(B (@code{message-insert-to})$B!#(B
 
 @item C-c C-n
 @kindex C-c C-n
 @findex message-insert-newsgroups
-Insert a @code{Newsgroups} header that reflects the @code{Followup-To}
-or @code{Newsgroups} header of the article you're replying to
-(@code{message-insert-newsgroups}).
+$BJVEz$7$F$$$k5-;v$N(B @code{Followup-To} $B$b$7$/$O!"(B@code{Nesgroups} $B%X%C%@!<(B
+$B$rH?1G$7$?(B @code{Newsgroups} $B%X%C%@!<$rA^F~$7$^(B
+$B$9(B (@code{message-insert-newsgroups})$B!#(B
 
 @item C-c C-l
 @kindex C-c C-l
 @findex message-to-list-only
-Send a message to the list only.  Remove all addresses but the list
-address from @code{To:} and @code{Cc:} headers.
+$B%a!<%j%s%0%j%9%H08$F$@$1$K%a%C%;!<%8$rAw$j$^$9!#(B
+@code{To:} $B$H(B @code{Cc:} $B%X%C%@!<$+$i!"$=$N%a!<%j%s%0%j%9%H0J30$N%"%I%l(B
+$B%9$r:o=|$7$^$9!#(B
 
 @item C-c M-n
 @kindex C-c M-n
 @findex message-insert-disposition-notification-to
-Insert a request for a disposition
-notification. (@code{message-insert-disposition-notification-to}).
-This means that if the recipient support RFC 2298 she might send you a
-notification that she received the message.
+$B3+Iu3NG'MW5a$rA^F~$7$^$9!#(B
+(@code{message-insert-disposition-notification-to})$B!#$3$l$O!"$b$7<u?.<T(B
+$B$,(B RFC 2298 $B$r%5%]!<%H$7$F$$$?$i!"H`=w$K$=$N%a%C%;!<%8$r<u$1<h$C$?$3$H$r(B
+$BCN$i$;$FM_$7$$$3$H$r0UL#$7$^$9!#(B
 
 @item M-x message-insert-importance-high
 @kindex M-x message-insert-importance-high
@@ -677,22 +676,21 @@ notification that she received the message.
 $BCM(B @samp{high} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
 $B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
 
-@c TRANSLATEME!
 @item M-x message-insert-importance-low
 @kindex M-x message-insert-importance-low
 @findex message-insert-importance-low
 @cindex Importance
-Insert an @samp{Importance:} header with a value of @samp{low}, deleting
-headers if necessary.
+$BCM(B @samp{low} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
+$B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
 
 @item C-c C-f s
 @kindex C-c C-f s
 @findex message-change-subject
 @cindex Subject
-Change the current @samp{Subject:} header.  Ask for new @samp{Subject:}
-header and append @code{(was: <Old Subject>)}.  The old subject can be
-stripped on replying, see @code{message-subject-trailing-was-query}
-(@pxref{Message Headers}).
+$B8=:_$N(B @samp{Subject:} $B%X%C%@!<$rJQ99$7$^$9!#?7$7$$(B @samp{Subject:} $B$r?R(B
+$B$M$F(B @code{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|(B
+$B$9$k$3$H$,$G$-$^$9!#(B@code{message-subject-trailing-was-query}
+(@pxref{Message Headers}) $B$r8+$F2<$5$$!#(B
 
 @item C-c C-f x
 @kindex C-c C-f x
@@ -700,18 +698,19 @@ stripped on replying, see @code{message-subject-trailing-was-query}
 @vindex message-cross-post-default
 @cindex X-Post
 @cindex cross-post
-Ask for an additional @samp{Newsgroups:} and @samp{FollowUp-To:} for a
-cross-post.  @code{message-cross-post-followup-to} mangles
-@samp{FollowUp-To:} and @samp{Newsgroups:} header to point to group.
-If @code{message-cross-post-default} is @code{nil} or if called with a
-prefix-argument @samp{Follow-Up:} is set, but the message is not
-cross-posted.
+$B%/%m%9%]%9%H$9$k$?$a$KDI2C$9(B
+$B$k(B @samp{Newsgroups:} $B$H(B @samp{FollowUp-To:} $B$r?R$M$^$9!#(B
+@code{message-cross-post-followup-to} $B$O(B @samp{FollowUp-To:} $B$H(B @samp{Newsgroups:} $B$r!"(B
+$B%0%k!<%W$r;X$7<($9$h$&$K@Z$jNv$-$^$9!#(B
+@code{message-cross-post-default} $B$,(B @code{nil} $B$@$C$?$j@\F,0z(B
+$B?t(B @samp{Follow-Up:} $BIU$-$G8F$P$l$k$H!"%a%C%;!<%8$O%/%m%9%]%9%H$5$l$^$;(B
+$B$s!#(B
 
 @item C-c C-f t
 @kindex C-c C-f t
 @findex message-reduce-to-to-cc
-Replace contents of @samp{To:} header with contents of @samp{Cc:} or
-@samp{Bcc:} header.
+@samp{To:} $B%X%C%@!<$NFbMF$r(B @samp{Cc:} $B$+(B @samp{Bcc:} $B%X%C%@!<$NFbMF$GCV(B
+$B$-49$($^$9!#(B
 
 @item C-c C-f a
 @kindex C-c C-f a
@@ -719,12 +718,12 @@ Replace contents of @samp{To:} header with contents of @samp{Cc:} or
 @vindex message-archive-header
 @vindex message-archive-note
 @cindex X-No-Archive
-Insert @samp{X-No-Archive: Yes} in the header and a note in the body.
-The header and the note can be customized using
-@code{message-archive-header} and @code{message-archive-note}.  When
-called with a prefix argument, ask for a text to insert.  If you don't
-want the note in the body, set @code{message-archive-note} to
-@code{nil}.
+@samp{X-No-Archive: Yes} $B$r%X%C%@!<$KA^F~$7$F!"K\J8$KCm0U=q$-$rF~$l$^$9!#(B
+$B%X%C%@!<$HCm0U=q$-(B
+$B$O(B @code{message-archive-header} $B$H(B @code{message-archive-note} $B$G%+%9%?(B
+$B%^%$%:$9$k$3$H$,$G$-$^$9!#@\F,0z?tIU$-$G8F$P$l$k$H!"A^F~$9$k%F%-%9%H$rMW(B
+$B5a$7$^$9!#K\J8$KCm0U=q$-$rF~$l$?$/$J$$>l9g$O!"(B
+@code{message-archive-note} $B$r(B @code{nil} $B$K$7$F2<$5$$!#(B
 @end table
 
 @node Movement
@@ -789,18 +788,19 @@ want the note in the body, set @code{message-archive-note} to
 @findex message-insert-headers
 $B%a%C%;!<%8$N%X%C%@!<$rA^F~$7$^$9(B (@code{message-insert-headers})$B!#(B
 
-@c TRANSLATEME!
 @item C-c M-m
 @kindex C-c M-m
 @findex message-mark-inserted-region
-Mark some region in the current article with enclosing tags.
-See @code{message-mark-insert-begin} and @code{message-mark-insert-end}.
+$B8=:_$N5-;v$N$$$/$D$+$NNN0h$r!"$=$l$i$r0O$`$?$a$N%?%0$G0u$rIU$1$^$9!#(B
+@code{message-mark-insert-begin} $B$H(B @code{message-mark-insert-end} $B$r8+(B
+$B$F2<$5$$!#(B
 
 @item C-c M-f
 @kindex C-c M-f
 @findex message-mark-insert-file
-Insert a file in the current article with enclosing tags.
-See @code{message-mark-insert-begin} and @code{message-mark-insert-end}.
+$B8=:_$N5-;v$K!"%?%0$G0O$^$l$?%U%!%$%k$rA^F~$7$^$9!#(B
+@code{message-mark-insert-begin} $B$H(B @code{message-mark-insert-end} $B$r8+(B
+$B$F2<$5$$!#(B
 @end table
 
 @c FIXTGNUS We should provide MIME manual.
@@ -1304,18 +1304,17 @@ Message $B$,(B gnus $B>e$GAv$C$F$$$k>l9g!"%a%C%;!<%8%P%C%U%!$O%I%i%U%H%0%k!<%
      "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\)")
 @end lisp
 
-@c TRANSLATEME!
 @item message-subject-trailing-was-query
 @vindex message-subject-trailing-was-query
 @vindex message-subject-trailing-was-ask-regexp
 @vindex message-subject-trailing-was-regexp
-Controls what to do with trailing @samp{(was: <old subject>)} in subject
-lines.  If @code{nil}, leave the subject unchanged.  If it is the symbol
-@code{ask}, query the user what do do.  In this case, the subject is
-matched against @code{message-subject-trailing-was-ask-regexp}.  If
-@code{message-subject-trailing-was-query} is t, always strip the
-trailing old subject.  In this case,
-@code{message-subject-trailing-was-regexp} is used.
+$BBjL>$N9T$KB3$1$k(B @samp{(was: <$B8E$$BjL>(B>)} $B$r$I$&$9$k$+$r@)8f$7$^$9!#(B
+@code{nil} $B$@$C$?$iBjL>$r$=$N$^$^$K$7$F$*$-$^$9!#(B@code{ask} $B$H$$$&%7%s%\(B
+$B%k$@$C$?$i!"$I$&$9$k$+$r%f!<%6$K?R$M$^$9!#BjL>(B
+$B$,(B @code{message-subject-trailing-was-ask-regexp} $B$K9gCW$9$k>l9g$@$1$G$9(B
+$B$,!#(B@code{message-subject-trailing-was-query} $B$,(B @code{t} $B$@$C$?$i!">o$K(B
+$B$V$i2<$,$C$?8E$$BjL>$r$O$.<h$j$^$9!#$=$N>l9g(B
+$B$O(B @code{message-subject-trailing-was-regexp} $B$,;H$o$l$^$9!#(B
 
 @item message-alternative-emails
 @vindex message-alternative-emails
@@ -1717,14 +1716,13 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 $B$=$7$F!"$=$l$>$l$N4X?t$O0zMQJ8$,=$@5$5$l$k$H!"$=$N<~$j$K%]%$%s%H$H%^!<%/(B
 $B$r;D$5$J$1$l$P$J$j$^$;$s!#(B
 
-@c TRANSLATEME!
 @item message-mark-insert-begin
 @vindex message-mark-insert-begin
-String to mark the beginning of some inserted text.
+$B$$$/$D$+$NA^F~$5$l$?%F%-%9%H$N;O$^$j$K0u$rIU$1$k$?$a$NJ8;zNs$G$9!#(B
 
 @item message-mark-insert-end
 @vindex message-mark-insert-end
-String to mark the end of some inserted text.
+$B$$$/$D$+$NA^F~$5$l$?%F%-%9%H$N=*$j$K0u$rIU$1$k$?$a$NJ8;zNs$G$9!#(B
 
 @item message-signature
 @vindex message-signature
