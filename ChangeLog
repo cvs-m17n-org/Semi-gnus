@@ -1,3 +1,8 @@
+2003-01-07  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-setup-1): Don't call
+	`message-use-alternative-email-as-from' if it isn't for replying.
+
 2003-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* etc/gnus/gnus.xpm (oort): Make the color replaceable.
