@@ -1,3 +1,8 @@
+1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-header-format-alist): Repair to use
+	`message-fill-references' for References.
+
 1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-header-presentation-method):
