@@ -82,10 +82,6 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
 (defvar gnus-inhibit-demon nil
   "*If non-nil, no daemonic function will be run.")
 
-(eval-and-compile
-  (autoload 'timezone-parse-date "timezone")
-  (autoload 'timezone-make-arpa-date "timezone"))
-
 ;;; Functions.
 
 (defun gnus-demon-add-handler (function time idle)
@@ -155,9 +151,9 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
       time
     (let* ((now (current-time))
            ;; obtain NOW as discrete components -- make a vector for speed
-           (nowParts (apply 'vector (decode-time now)))
+           (nowParts (decode-time now))
            ;; obtain THEN as discrete components
-           (thenParts (timezone-parse-time time))
+           (thenParts (parse-time-string time))
            (thenHour (string-to-int (elt thenParts 0)))
            (thenMin (string-to-int (elt thenParts 1)))
            ;; convert time as elements into number of seconds since EPOCH.
@@ -268,8 +264,7 @@ minutes, the connection is closed."
 
 (defun gnus-demon-nntp-close-connection ()
   (save-window-excursion
-    (when (nnmail-time-less '(0 300)
-			    (nnmail-time-since nntp-last-command-time))
+    (when (time-less-p '(0 300) (time-since nntp-last-command-time))
       (nntp-close-server))))
 
 (defun gnus-demon-add-scanmail ()

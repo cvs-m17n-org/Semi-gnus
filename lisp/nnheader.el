@@ -61,8 +61,7 @@ on your system, you could say something like:
  (autoload 'cancel-function-timers "timers")
  (autoload 'gnus-point-at-eol "gnus-util")
  (autoload 'gnus-delete-line "gnus-util")
- (autoload 'gnus-buffer-live-p "gnus-util")
- (autoload 'gnus-encode-coding-string "gnus-ems"))
+ (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
 
@@ -498,52 +497,6 @@ the line could be found."
     (erase-buffer))
   (current-buffer))
 
-(defmacro nnheader-temp-write (file &rest forms)
-  "Create a new buffer, evaluate FORMS there, and write the buffer to FILE.
-Return the value of FORMS.
-If FILE is nil, just evaluate FORMS and don't save anything.
-If FILE is t, return the buffer contents as a string."
-  (let ((temp-file (make-symbol "temp-file"))
-	(temp-buffer (make-symbol "temp-buffer"))
-	(temp-results (make-symbol "temp-results")))
-    `(save-excursion
-       (let* ((,temp-file ,file)
-	      (default-major-mode 'fundamental-mode)
-	      (,temp-buffer
-	       (set-buffer
-		(get-buffer-create
-		 (generate-new-buffer-name " *nnheader temp*"))))
-	      ,temp-results)
-	 (unwind-protect
-	     (progn
-	       (setq ,temp-results (progn ,@forms))
-	       (cond
-		;; Don't save anything.
-		((null ,temp-file)
-		 ,temp-results)
-		;; Return the buffer contents.
-		((eq ,temp-file t)
-		 (set-buffer ,temp-buffer)
-		 (buffer-string))
-		;; Save a file.
-		(t
-		 (set-buffer ,temp-buffer)
-		 ;; Make sure the directory where this file is
-		 ;; to be saved exists.
-		 (when (not (file-directory-p
-			     (file-name-directory ,temp-file)))
-		   (make-directory (file-name-directory ,temp-file) t))
-		 ;; Save the file.
-		 (write-region (point-min) (point-max)
-			       ,temp-file nil 'nomesg)
-		 ,temp-results)))
-	   ;; Kill the buffer.
-	   (when (buffer-name ,temp-buffer)
-	     (kill-buffer ,temp-buffer)))))))
-
-(put 'nnheader-temp-write 'lisp-indent-function 1)
-(put 'nnheader-temp-write 'edebug-form-spec '(form body))
-
 (defvar jka-compr-compression-info-list)
 (defvar nnheader-numerical-files
   (if (boundp 'jka-compr-compression-info-list)
@@ -700,7 +653,7 @@ without formatting."
 	 (concat dir group "/")
        ;; If not, we translate dots into slashes.
        (concat dir
-	       (gnus-encode-coding-string
+	       (nnheader-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
 		nnheader-pathname-coding-system)
 	       "/")))
@@ -855,6 +808,14 @@ find-file-hooks, etc.
 (fset 'nnheader-run-at-time 'run-at-time)
 (fset 'nnheader-cancel-timer 'cancel-timer)
 (fset 'nnheader-cancel-function-timers 'cancel-function-timers)
+
+(if (fboundp 'encode-coding-string)
+    (fset 'nnheader-encode-coding-string 'encode-coding-string)
+  (fset 'nnheader-encode-coding-string (lambda (s a) s)))
+
+(if (fboundp 'decode-coding-string)
+    (fset 'nnheader-decode-coding-string 'decode-coding-string)
+  (fset 'nnheader-decode-coding-string (lambda (s a) s)))
 
 (when (string-match "XEmacs\\|Lucid" emacs-version)
   (require 'nnheaderxm))

@@ -228,11 +228,20 @@ Thank you for your help in stamping out bugs.
 
 ;;; Post news commands of Gnus group mode and summary mode
 
-(defun gnus-group-mail ()
-  "Start composing a mail."
-  (interactive)
-  (gnus-setup-message 'message
-    (message-mail)))
+(defun gnus-group-mail (&optional arg)
+  "Start composing a mail.
+If ARG, use the group under the point to find a posting style.
+If ARG is 1, prompt for a group name to find the posting style."
+  (interactive "P")
+  (let ((gnus-newsgroup-name
+	 (if arg
+	     (if (= 1 (prefix-numeric-value arg))
+		 (completing-read "Use style of group: " gnus-active-hashtb nil
+				  (gnus-read-active-file-p))
+	       (gnus-group-group-name))
+	   "")))
+    (gnus-setup-message 'message (message-mail))
+    ))
 
 (defun gnus-group-post-news (&optional arg)
   "Start composing a news message.
@@ -354,6 +363,9 @@ header line with the old Message-ID."
   ;; this buffer should be passed to all mail/news reply/post routines.
   (setq gnus-article-copy (gnus-get-buffer-create " *gnus article copy*"))
   (buffer-disable-undo gnus-article-copy)
+  (save-excursion
+    (set-buffer gnus-article-copy)
+    (mm-enable-multibyte))
   (let ((article-buffer (or article-buffer gnus-article-buffer))
 	end beg)
     (if (not (and (get-buffer article-buffer)
@@ -483,14 +495,16 @@ If SILENT, don't prompt the user."
 		   (list gnus-post-method)))
 	       gnus-secondary-select-methods
 	       (mapcar 'cdr gnus-server-alist)
+	       (mapcar 'car gnus-opened-servers)
 	       (list gnus-select-method)
 	       (list group-method)))
 	     method-alist post-methods method)
 	;; Weed out all mail methods.
 	(while methods
 	  (setq method (gnus-server-get-method "" (pop methods)))
-	  (when (or (gnus-method-option-p method 'post)
-		    (gnus-method-option-p method 'post-mail))
+	  (when (and (or (gnus-method-option-p method 'post)
+			 (gnus-method-option-p method 'post-mail))
+		     (not (member method post-methods)))
 	    (push method post-methods)))
 	;; Create a name-method alist.
 	(setq method-alist
@@ -555,36 +569,6 @@ If SILENT, don't prompt the user."
 	     (if (boundp 'xemacs-codename)
 		 (concat " - \"" xemacs-codename "\""))))
     (t emacs-version))))
-
-;; Written by "Mr. Per Persson" <pp@gnu.ai.mit.edu>.
-(defun gnus-inews-insert-mime-headers ()
-  "Insert MIME headers.
-Assumes ISO-Latin-1 is used iff 8-bit characters are present."
-  (goto-char (point-min))
-  (let ((mail-header-separator
-	 (progn
-	   (goto-char (point-min))
-	   (if (and (search-forward (concat "\n" mail-header-separator "\n")
-				    nil t)
-		    (not (search-backward "\n\n" nil t)))
-	       mail-header-separator
-	     ""))))
-    (or (mail-position-on-field "Mime-Version")
-	(insert "1.0")
-	(cond ((save-restriction
-		 (widen)
-		 (goto-char (point-min))
-		 (re-search-forward "[^\000-\177]" nil t))
-	       (or (mail-position-on-field "Content-Type")
-		   (insert "text/plain; charset=ISO-8859-1"))
-	       (or (mail-position-on-field "Content-Transfer-Encoding")
-		   (insert "8bit")))
-	      (t (or (mail-position-on-field "Content-Type")
-		     (insert "text/plain; charset=US-ASCII"))
-		 (or (mail-position-on-field "Content-Transfer-Encoding")
-		     (insert "7bit")))))))
-
-(custom-add-option 'message-header-hook 'gnus-inews-insert-mime-headers)
 
 
 ;;;

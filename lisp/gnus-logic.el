@@ -164,16 +164,16 @@
     (funcall type match (or (aref gnus-advanced-headers index) 0))))
 
 (defun gnus-advanced-date (index match type)
-  (let ((date (encode-time (parse-time-string
-			    (aref gnus-advanced-headers index))))
-	(match (encode-time (parse-time-string match))))
+  (let ((date (apply 'encode-time (parse-time-string
+				   (aref gnus-advanced-headers index))))
+	(match (apply 'encode-time (parse-time-string match))))
     (cond
      ((eq type 'at)
       (equal date match))
      ((eq type 'before)
-      (gnus-time-less match date))
+      (time-less-p match date))
      ((eq type 'after)
-      (gnus-time-less date match))
+      (time-less-p date match))
      (t
       (error "No such date score type: %s" type)))))
 
