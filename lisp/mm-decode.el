@@ -221,9 +221,9 @@ to:
 		id (mail-fetch-field "content-id"))))
       (unless ctl
 	(setq ctl (mail-header-parse-content-type "text/plain")))
-      (setq cte (and cte (intern (downcase (mail-header-remove-whitespace
-					    (mail-header-remove-comments
-					     cte)))))
+      (setq cte (and cte (downcase (mail-header-remove-whitespace
+				    (mail-header-remove-comments
+				     cte))))
 	    cd (and cd (ignore-errors
 			 (mail-header-parse-content-disposition cd))))
       (cond
@@ -267,10 +267,7 @@ to:
 (defun mm-dissect-singlepart (handle ctl &optional force)
   (mime-buffer-entity-set-buffer-internal handle (mm-copy-to-buffer))
   (push (mm-handle-buffer handle) mm-dissection-list)
-  (when (or force
-	    (not (and (eq (mime-content-type-primary-type ctl) 'text)
-		      (eq (mime-content-type-subtype ctl) 'plane))))
-    handle))
+  handle)
 
 (defun mm-remove-all-parts ()
   "Remove all MIME handles."
