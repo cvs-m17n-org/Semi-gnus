@@ -319,14 +319,11 @@ options make any sense in this context."
 (defun gnus-namazu/make-directory-table (&optional force)
   (interactive (list t))
   (unless (and (not force)
-	       (vectorp gnus-namazu/directory-table)
+	       gnus-namazu/directory-table
 	       (eq gnus-namazu-case-sensitive-filesystem
-		   (symbol-value
-		    (intern "case-sensitive" gnus-namazu/directory-table))))
+		   (car gnus-namazu/directory-table)))
     (let ((table (make-vector (length gnus-newsrc-hashtb) 0))
 	  cache agent alist dir method)
-      (set (intern "case-sensitive" table)
-	   gnus-namazu-case-sensitive-filesystem)
       (mapatoms
        (lambda (group)
 	 (unless (gnus-ephemeral-group-p (setq group (symbol-name group)))
@@ -337,8 +334,7 @@ options make any sense in this context."
 	   (when (file-directory-p
 		  (setq dir (gnus-agent-group-pathname group)))
 	     (push (cons dir group) agent))
-	   (when (memq (car (setq method
-				  (gnus-find-method-for-group group)))
+	   (when (memq (car (setq method (gnus-find-method-for-group group)))
 		       '(nnml nnmh))
 	     (when (file-directory-p
 		    (setq dir (nnmail-group-pathname
@@ -352,7 +348,8 @@ options make any sense in this context."
 		       (downcase (car pair)))
 		     table)
 	     (cdr pair)))
-      (setq gnus-namazu/directory-table table))))
+      (setq gnus-namazu/directory-table
+	    (cons gnus-namazu-case-sensitive-filesystem table)))))
 
 (defun gnus-namazu/search (groups query)
   (gnus-namazu/make-directory-table)
@@ -373,7 +370,7 @@ options make any sense in this context."
 		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
 				     group
 				   (downcase group))
-				 gnus-namazu/directory-table)))
+				 (cdr gnus-namazu/directory-table))))
 	     (or (not groups)
 		 (member group groups))
 	     (push (gnus-namazu/make-article group (string-to-number file))
