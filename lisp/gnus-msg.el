@@ -1327,7 +1327,7 @@ from the original Gnus."
       (gnus-summary-digest-mail-forward nil post)
     ;; No process marks.
     (let* ((gnus-article-reply (gnus-summary-article-number))
-	   (gnus-article-yanked-articles (list (list gnus-article-reply)))
+	   (gnus-article-yanked-articles (list gnus-article-reply))
 	   charset
 	   (message-included-forward-headers
 	    (if full-headers "" message-included-forward-headers)))
@@ -1347,9 +1347,10 @@ If N is nil and any articles have been marked with the process mark,
 forward those articles instead.
 Optional POST will use news to forward instead of mail."
   (interactive "P")
-  (let ((articles (gnus-summary-work-articles n))
-	(topics "Topics:\n")
-	subject article frame)
+  (let* ((articles (gnus-summary-work-articles n))
+	 (gnus-article-yanked-articles (copy-sequence articles))
+	 (topics "Topics:\n")
+	 subject article frame)
     (when (car articles)
       (gnus-setup-message 'forward
 	(gnus-summary-select-article)
