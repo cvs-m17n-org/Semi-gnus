@@ -5440,7 +5440,9 @@ If FORCE (the prefix), also save the .newsrc file(s)."
       (if (not quit-config)
 	  (progn
 	    (goto-char group-point)
-	    (gnus-configure-windows 'group 'force))
+	    (gnus-configure-windows 'group 'force)
+	    (unless (pos-visible-in-window-p)
+	      (recenter)))
 	(gnus-handle-ephemeral-exit quit-config))
       ;; Clear the current group name.
       (unless quit-config
