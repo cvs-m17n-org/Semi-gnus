@@ -1,0 +1,50 @@
+-*- mode: text; fill-column: 70; -*-
+
+この文書では、 Semi-gnus との違いおよび、使用する上で注意する必要のあ
+る項目を説明しています。
+
+---
+TODO.ja の「*1998/10/03-01 任意メッセージ cite 機能の実装方法変更」を
+対策済です。
+
+;; 実装方法は、 mime-message-structure の仕様が安定し次第、変更する可
+;; 能性があります。
+
+---
+message-setup-hook (Default: nil)
+message-mime-setup-function (Default: 'turn-on-mime-edit)
+
+Message 編集用 buffer を MIME メッセージ編集モードに切り替えるための関
+数を、 Semi-gnus では message-setup-hook から呼び出していますが、専用
+の変数をもうけ、 message-setup-hook の実行前にこの変数に設定された関数
+を呼び出します。
+
+message-setup-hook の内容を変更している方は注意が必要です。
+
+---
+message-header-hook
+message-encode-header-function (Default: 'eword-encode-header)
+message-after-header-encode-hook (Default: nil)
+
+Header を encode するための関数を、 Semi-gnus では message-header-hook
+から呼び出していますが、専用の変数をもうけ、 message-header-hook の実
+行後にこの変数に設定された関数を呼び出します。
+
+また、新たに message-after-header-encode-hook をもうけ、
+message-encode-header-function の呼び出し後にこの hook を実行します。
+
+message-setup-hook の内容を変更している方は、注意が必要です。
+
+X-PGP-Sig パッケージを使用しており、 message-header-hook に
+x-pgp-sig-sign を設定されている方は、 設定先を
+message-after-header-encode-hook に移動してください。
+
+---
+Chao-gnus 6.9 での変更を取り込んでありますので、 apel は 9.5 以降のも
+の、 FLIM は 1.11.1 以降のもの SEMI は 1.10.0 以降のものが必要です。
+
+また、 BBDB を使用されている方は、 bbdb-gnus.elc を Semi-gnus 6.8.X 以
+前のものと共有することはできません。必ず、 byte-compile し直してくださ
+い。
+;; gnus を起動したあとで、 bbdb-gnus.el のみを byte-compile するという
+;; のがお手軽です。 :-)
