@@ -3089,6 +3089,24 @@ give as trustworthy answer as possible."
   "Return user-agent info."
   (let ((user-agent
 	 (concat
+	  ;; SEMI: '("SEMI" "CODENAME" V1 V2 V3)
+	  (format "%s/%s (%s)"
+		  (nth 0 mime-user-interface-version)
+		  (mapconcat #'number-to-string
+			     (cdr (cdr mime-user-interface-version))
+			     ".")
+		  (nth 1 mime-user-interface-version))
+	  ;; FLIM: "FLIM VERSION - \"CODENAME\"[...]"
+	  (if (string-match
+	       "\\`\\([^ ]+\\) \\([^ ]+\\) - \"\\([^\"]+\\)\"\\(.*\\)\\'"
+	       mime-library-version-string)
+	      (format " %s/%s (%s%s)"
+		      (match-string 1 mime-library-version-string)
+		      (match-string 2 mime-library-version-string)
+		      (match-string 3 mime-library-version-string)
+		      (match-string 4 mime-library-version-string))
+	    " FLIM")
+	  "\n "
 	  ;; EMACS/VERSION
 	  (if (featurep 'xemacs)
 	      ;; XEmacs
