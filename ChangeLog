@@ -1,3 +1,18 @@
+2000-04-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 18.
+	(gnus-extended-version): Use `gnus-product-name' and
+	`gnus-version-number' instead of the use of `product-string'.
+	(gnus-version-number): Exclude `gnus-revision-number'.
+	(Defining product): Include `gnus-revision-number'.
+	(TopLevel): Require `poe' for the function `butlast'.
+
+2000-04-13  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/gnus-spec.el (gnus-update-format): Fix a bug in last
+	modification.
+	(gnus-search-or-regist-spec): Change interface.
+
 2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-prev-page): Bind
