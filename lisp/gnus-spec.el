@@ -155,6 +155,7 @@ Each element should be the form (TYPE . BYTECODE).")
 	 value spec)
     (when entry
       (setq gnus-format-specs (delq entry gnus-format-specs)))
+    (gnus-product-variable-touch 'gnus-format-specs)
     (set
      (intern (format "%s-spec" var))
      (gnus-parse-format (setq value (symbol-value (intern var)))
@@ -182,21 +183,18 @@ Each element should be the form (TYPE . BYTECODE).")
 	  (when (get-buffer "*Compile-Log*")
 	    (bury-buffer "*Compile-Log*"))
 	  (when (get-buffer "*Compile-Log-Show*")
-	    (bury-buffer "*Compile-Log-Show*")))
-	(set (intern (format "gnus-%s-line-format-spec" type)) bytecode)
-	(set-alist 'gnus-format-specs-compiled type bytecode))
+	    (bury-buffer "*Compile-Log-Show*"))
+	  (set-alist 'gnus-format-specs-compiled type bytecode)
+	  (gnus-product-variable-touch 'gnus-format-specs-compiled))
+	(set (intern (format "gnus-%s-line-format-spec" type)) bytecode))
     (set (intern (format "gnus-%s-line-format-spec" type)) val)))
 
 (defun gnus-update-format-specifications (&optional force &rest types)
   "Update all (necessary) format specifications."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
-  (when (or force
-	    (not (equal emacs-version
-			(cdr (assq 'version gnus-format-specs))))
-	    (not (equal gnus-version gnus-newsrc-file-version)))
+  (when force
     (message "%s" "Force update format specs.")
-    (setq gnus-newsrc-file-version gnus-version)
     (setq gnus-format-specs nil))
 
   ;; Go through all the formats and see whether they need updating.
@@ -235,10 +233,8 @@ Each element should be the form (TYPE . BYTECODE).")
 		(setcar (cdr entry) val)
 		(setcar entry new-format))
 	    (push (list type new-format val) gnus-format-specs))
-	  (gnus-update-format-specification-1 type val 'new)))))
-
-  (unless (assq 'version gnus-format-specs)
-    (push (cons 'version emacs-version) gnus-format-specs)))
+	  (gnus-product-variable-touch 'gnus-format-specs)
+	  (gnus-update-format-specification-1 type val 'new))))))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
