@@ -455,8 +455,7 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook
-  '(message-maybe-setup-default-charset turn-on-mime-edit)
+(defcustom message-setup-hook '(turn-on-mime-edit)
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
@@ -565,8 +564,7 @@ If stringp, use this; if non-nil, use no host name (user name only)."
 
 (defvar message-reply-buffer nil)
 (defvar message-reply-headers nil)
-(defvar message-newsreader nil)
-(defvar message-mailer nil)
+(defvar message-user-agent nil) ; XXX: This symbol is overloaded!  See below.
 (defvar message-sent-message-via nil)
 (defvar message-checksum nil)
 (defvar message-send-actions nil
@@ -631,10 +629,6 @@ The value should be an expression to test whether the problem will
 actually occur."
   :group 'message-sending
   :type 'sexp)
-
-;;; XXX: This symbol is overloaded!  See below.
-(defvar message-user-agent nil
-  "String of the form of PRODUCT/VERSION.  Used for User-Agent header field.")
 
 ;; Ignore errors in case this is used in Emacs 19.
 ;; Don't use ignore-errors because this is copied into loaddefs.el.
@@ -3628,7 +3622,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 			    (if wide to-address nil)))
 
     (setq message-reply-headers
-	  (make-full-mail-header
+	  (make-full-mail-header-from-decoded-header
 	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
@@ -3754,7 +3748,7 @@ responses here are directed to other newsgroups."))
      cur)
 
     (setq message-reply-headers
-	  (make-full-mail-header
+	  (make-full-mail-header-from-decoded-header
 	   0 subject from date message-id references 0 0 ""))))
 
 
@@ -4278,19 +4272,6 @@ regexp varstr."
 
 ;;; @ for MIME Edit mode
 ;;;
-
-(defun message-maybe-setup-default-charset ()
-  (let ((charset
-	 (and (boundp 'gnus-summary-buffer)
-              (buffer-live-p gnus-summary-buffer)
-	      (save-excursion
-		(set-buffer gnus-summary-buffer)
-		default-mime-charset))))
-    (if charset
-	(progn
-	  (make-local-variable 'default-mime-charset)
-	  (setq default-mime-charset charset)
-	  ))))
 
 (defun message-maybe-encode ()
   (when message-mime-mode
