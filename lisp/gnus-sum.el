@@ -2950,6 +2950,7 @@ buffer that was in action when the last article was fetched."
 	      ?\ ;;;Whitespace
 	    (if (< gnus-tmp-score gnus-summary-default-score)
 		gnus-score-below-mark gnus-score-over-mark)))
+	 (gnus-tmp-number (mail-header-number gnus-tmp-header))
 	 (gnus-tmp-replied
 	  (cond (gnus-tmp-process gnus-process-mark)
 		((memq gnus-tmp-current gnus-newsgroup-cached)
@@ -2959,9 +2960,9 @@ buffer that was in action when the last article was fetched."
 		 gnus-forwarded-mark)
 		((memq gnus-tmp-current gnus-newsgroup-saved)
 		 gnus-saved-mark)
-		((memq number gnus-newsgroup-recent)
+		((memq gnus-tmp-number gnus-newsgroup-recent)
 		 gnus-recent-mark)
-		((memq number gnus-newsgroup-unseen)
+		((memq gnus-tmp-number gnus-newsgroup-unseen)
 		 gnus-unseen-mark)
 		(t gnus-no-mark)))
 	 (gnus-tmp-from (mail-header-from gnus-tmp-header))
@@ -2977,7 +2978,6 @@ buffer that was in action when the last article was fetched."
 		       (1+ (match-beginning 0)) (1- (match-end 0))))
 	   (t gnus-tmp-from)))
 	 (gnus-tmp-subject (mail-header-subject gnus-tmp-header))
-	 (gnus-tmp-number (mail-header-number gnus-tmp-header))
 	 (gnus-tmp-opening-bracket (if gnus-tmp-dummy ?\< ?\[))
 	 (gnus-tmp-closing-bracket (if gnus-tmp-dummy ?\> ?\]))
 	 (buffer-read-only nil))
