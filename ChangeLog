@@ -1,3 +1,16 @@
+1998-11-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Sync up with Chao-gnus 6.12.
+
+1998-10-31  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.2.
+	(gnus-version): Modify for SEMI 1.11.
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
+	`mime-edit-decode-message-in-buffer' instead of
+	`mime-edit-decode-buffer'.
+
 1998-11-02  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/canonicalize-full-name-methods):
