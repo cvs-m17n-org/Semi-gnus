@@ -3578,6 +3578,7 @@ be added to the \"References\" field."
       (run-hooks 'mail-citation-hook)
     (let ((start (point))
 	  (end (mark t))
+	  (x-no-archive nil)
 	  (functions
 	   (when message-indent-citation-function
 	     (if (listp message-indent-citation-function)
@@ -3585,22 +3586,27 @@ be added to the \"References\" field."
 	       (list message-indent-citation-function))))
 	  (message-reply-headers (or message-reply-headers
 				     (make-mail-header))))
-      (mail-header-set-from message-reply-headers
-			    (save-restriction
-			      (narrow-to-region
-			       (point)
-			       (if (search-forward "\n\n" nil t)
-				   (1- (point))
-				 (point-max)))
+      (save-restriction
+	(narrow-to-region (point) (if (search-forward "\n\n" nil t)
+				      (1- (point))
+				    (point-max)))
+	(mail-header-set-from message-reply-headers
 			      (or (message-fetch-field "from")
-				  "unknown sender")))
+				  "unknown sender"))
+	(setq x-no-archive (message-fetch-field "x-no-archive")))
       (goto-char start)
       (while functions
 	(funcall (pop functions)))
       (when message-citation-line-function
 	(unless (bolp)
 	  (insert "\n"))
-	(funcall message-citation-line-function)))))
+	(funcall message-citation-line-function))
+      (when (and x-no-archive
+		 (string-match "yes" x-no-archive))
+	(undo-boundary)
+	(delete-region (point) (mark t))
+	(insert "> [Quoted text removed due to X-No-Archive]\n")
+	(forward-line -1)))))
 
 (defun message-insert-citation-line ()
   "Insert a simple citation line."
