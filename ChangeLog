@@ -1,3 +1,28 @@
+2001-02-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
+
+	* lisp/dgnushack.el (dgnushack-make-autoloads): Remove function.
+	(dgnushack-make-load): Ignore cus-load.el if it does not exist.
+	(dgnushack-make-auto-load): Remove auto-autoloads.el.
+	(dgnushack-make-cus-load): Do nothing if loading cus-dep is failed.
+
+	* lisp/Makefile.in (clean): Remove gnus-load.el instead of
+	custom-load.el.
+	(compose-package): Call `gnus-load.elc' and then rename
+	gnus-load.el(c) to auto-autoloads.el(c) instead of the use of
+	`dgnushack-make-autoloads'.
+	(clever): No need to remove custom-load.el.
+
+	* Makefile.in (elclean): Remove gnus-load.el instead of
+	custom-load.el.
+
+	* aclocal.m4 (AC_CHECK_URL): Ignore cache.
+
+2001-02-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
+
 2001-02-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* GNUS-NEWS: Copyright and others.

@@ -163,7 +163,7 @@ clean:
 	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
 elclean:
-	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
+	cd lisp && rm -f *.elc auto-autoloads.el gnus-load.el
 
 x:
 	$(MAKE) EMACS="$(XEMACS)"

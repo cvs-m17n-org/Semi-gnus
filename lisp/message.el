@@ -3611,10 +3611,13 @@ This sub function is for exclusive use of `message-send-news'."
      (goto-char (point-min))
      (re-search-forward
       (concat "^" (regexp-quote mail-header-separator) "$"))
+     (forward-line 1)
      (while (and
-	     (progn
-	       (end-of-line)
-	       (< (current-column) 80))
+	     (or (looking-at
+		  mime-edit-tag-regexp)
+		 (let ((p (point)))
+		   (end-of-line)
+		   (< (- (point) p) 80)))
 	     (zerop (forward-line 1))))
      (or (bolp)
 	 (eobp)

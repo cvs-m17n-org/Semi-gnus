@@ -43,8 +43,8 @@ clever some: gnus-load.elc
 	  fi; \
 	  if test $$RM_ELC = t; then \
 	    echo " => maybe yes;" \
-		"rm -f *.elc auto-autoloads.el custom-load.el"; \
-	    rm -f *.elc auto-autoloads.el custom-load.el; \
+		"rm -f *.elc auto-autoloads.el"; \
+	    rm -f *.elc auto-autoloads.el; \
 	  else \
 	    echo " => maybe unnecessary"; \
 	  fi; \
@@ -69,8 +69,9 @@ install-package-manifest:
 	$(EMACS_COMP) -f dgnushack-install-package-manifest \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
-compose-package:
-	$(EMACS_COMP) -f dgnushack-make-autoloads
+compose-package: gnus-load.elc
+	mv gnus-load.el auto-autoloads.el; \
+	mv gnus-load.elc auto-autoloads.elc
 
 remove-extra-files-in-package:
 	$(EMACS_COMP) -f dgnushack-remove-extra-files-in-package \
@@ -100,8 +101,7 @@ gnus-load.elc:
 	$(EMACS_COMP) -f dgnushack-make-load
 
 clean:
-	rm -f *.orig *.rej *.elc *~
-	rm -f auto-autoloads.el custom-load.el
+	rm -f *.orig *.rej *.elc *~ auto-autoloads.el gnus-load.el
 
 distclean: clean
 	rm -f Makefile dgnuspath.el

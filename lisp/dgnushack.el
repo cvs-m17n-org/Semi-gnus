@@ -361,8 +361,9 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el"))
-(defvar	dgnushack-cus-load-file (expand-file-name "cus-load.el"))
+(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el" srcdir))
+(defvar dgnushack-cus-load-file (expand-file-name "cus-load.el" srcdir))
+(defvar dgnushack-auto-load-file (expand-file-name "auto-autoloads.el" srcdir))
 
 (defun dgnushack-make-cus-load ()
   (when (condition-case nil
@@ -379,8 +380,11 @@ Modify to suit your needs."))
 	(make-backup-files nil)
 	(autoload-package-name "gnus"))
     (if (featurep 'xemacs)
-	(if (file-exists-p generated-autoload-file)
-	    (delete-file generated-autoload-file))
+	(progn
+	  (if (file-exists-p generated-autoload-file)
+	      (delete-file generated-autoload-file))
+	  (if (file-exists-p dgnushack-auto-load-file)
+	      (delete-file dgnushack-auto-load-file)))
       (with-temp-file generated-autoload-file
 	(insert ?\014)))
     (if (featurep 'xemacs)
@@ -401,26 +405,33 @@ Modify to suit your needs."))
 (defun dgnushack-make-load ()
   (message (format "Generating %s..." dgnushack-gnus-load-file))
   (with-temp-file dgnushack-gnus-load-file
-    (insert-file-contents dgnushack-cus-load-file)
-    (delete-file dgnushack-cus-load-file)
-    (goto-char (point-min))
-    (search-forward ";;; Code:")
-    (forward-line)
-    (delete-region (point-min) (point))
-    (insert "\
+    (if (file-exists-p dgnushack-cus-load-file)
+	(progn
+	  (insert-file-contents dgnushack-cus-load-file)
+	  (delete-file dgnushack-cus-load-file)
+	  (goto-char (point-min))
+	  (search-forward ";;; Code:")
+	  (forward-line)
+	  (delete-region (point-min) (point))
+	  (insert "\
 ;;; gnus-load.el --- automatically extracted custom dependencies and autoload
 ;;
 ;;; Code:
 ")
-    (goto-char (point-max))
-    (if (search-backward "custom-versions-load-alist" nil t)
-	(forward-line -1)
-      (forward-line -1)
-      (while (eq (char-after) ?\;)
-	(forward-line -1))
-      (forward-line))
-    (delete-region (point) (point-max))
-    (insert "\n")
+	  (goto-char (point-max))
+	  (if (search-backward "custom-versions-load-alist" nil t)
+	      (forward-line -1)
+	    (forward-line -1)
+	    (while (eq (char-after) ?\;)
+	      (forward-line -1))
+	    (forward-line))
+	  (delete-region (point) (point-max))
+	  (insert "\n"))
+      (insert "\
+;;; gnus-load.el --- automatically extracted autoload
+;;
+;;; Code:
+"))
     ;; smiley-* are duplicated. Remove them all.
     (let ((point (point)))
       (insert-file-contents dgnushack-gnus-load-file)
@@ -466,42 +477,6 @@ Modify to suit your needs."))
 			   (when names "\\|"))))
     regexp)
   "Regexp matching Japanese info files.")
-
-(defun dgnushack-make-autoloads ()
-  "Make auto-autoloads.el, custom-load.el and then compile them."
-  (let ((auto-autoloads (expand-file-name "auto-autoloads.el" srcdir))
-	(custom-load (expand-file-name "custom-load.el" srcdir)))
-    (unless (and (file-exists-p auto-autoloads)
-		 (file-exists-p (concat auto-autoloads "c"))
-		 (file-newer-than-file-p (concat auto-autoloads "c")
-					 auto-autoloads)
-		 (file-exists-p custom-load)
-		 (file-exists-p (concat custom-load "c"))
-		 (file-newer-than-file-p (concat custom-load "c")
-					 custom-load))
-      (let (make-backup-files)
-	(message "Updating autoloads for directory %s..." default-directory)
-	(let ((generated-autoload-file auto-autoloads)
-	      (si:message (symbol-function 'message))
-	      noninteractive)
-	  (defun message (fmt &rest args)
-	    (cond ((and (string-equal "Generating autoloads for %s..." fmt)
-			(file-exists-p (file-name-nondirectory (car args))))
-		   (funcall si:message
-			    fmt (file-name-nondirectory (car args))))
-		  ((string-equal "No autoloads found in %s" fmt))
-		  ((string-equal "Generating autoloads for %s...done" fmt))
-		  (t (apply si:message fmt args))))
-	  (unwind-protect
-	      (update-autoloads-from-directory default-directory)
-	    (fset 'message si:message)))
-	(byte-compile-file auto-autoloads)
-	(with-temp-buffer
-	  (let ((standard-output (current-buffer)))
-	    (Custom-make-dependencies "."))
-	  (message "%s" (buffer-string)))
-	(require 'cus-load)
-	(byte-compile-file custom-load)))))
 
 (defun dgnushack-remove-extra-files-in-package ()
   "Remove extra files in the lisp directory of the XEmacs package."
