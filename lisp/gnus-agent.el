@@ -1022,9 +1022,8 @@ the actual number of articles toggled is returned."
 	   (setq articles (nthcdr i articles))))
     ;; add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
-      (setq articles (gnus-union (gnus-uncompress-sequence (cdr arts))
-				 articles)))
-    (setq articles (sort articles '<))
+      (setq articles (gnus-range-add articles (cdr arts))))
+    (setq articles (sort (gnus-uncompress-sequence articles) '<))
     ;; Remove known articles.
     (when (gnus-agent-load-alist group)
       (setq articles (gnus-sorted-intersection
@@ -1242,6 +1241,7 @@ the actual number of articles toggled is returned."
     (setq arts (assq 'download (gnus-info-marks
 				(setq info (gnus-get-info group)))))
     (when (cdr arts)
+      (gnus-message 8 "Agent is downloading marked articles...")
       (gnus-agent-fetch-articles
        group (gnus-uncompress-range (cdr arts)))
       (setq marks (delq arts (gnus-info-marks info)))
