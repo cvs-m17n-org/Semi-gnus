@@ -384,7 +384,7 @@ If no name can be extracted, FULL-NAME will be nil."
 	    (std11-extract-addresses-components string)))
 
   ;; Should keep track of `rfc2047-field-value' in rfc2047.el.
-  (defun-maybe std11-field-value (&optional dont-include-last-newline)
+  (defun std11-field-value (&optional dont-include-last-newline)
     "Return the value of the field at point.  If the optional argument is
 given, the return value will not contain the last newline."
     (let ((begin (point))
@@ -394,7 +394,7 @@ given, the return value will not contain the last newline."
       (unless (eobp)
 	(while (and (memq (char-after) '(?\t ?\ ))
 		    (zerop (forward-line -1))))
-	(when (looking-at ".+:[\t\n ]+")
+	(when (looking-at "[^\t\n ]+:[\t\n ]+")
 	  (goto-char (setq start (match-end 0)))
 	  (forward-line 1)
 	  (while (and (memq (char-after) '(?\t ?\ ))
