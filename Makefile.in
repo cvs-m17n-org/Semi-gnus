@@ -60,22 +60,19 @@ clean:
 	rm -f MANIFEST.*
 	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
-xsome:
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
-
 elclean:
 	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
 
 x:
 	$(MAKE) EMACS="$(XEMACS)"
 
+xsome:
+	$(MAKE) EMACS="$(XEMACS)" some
+
 distclean: clean
 	rm -rf *~
 	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
-
-osome:
-	$(MAKE) EMACS="$(XEMACS)" some
 
 config.status: $(srcdir)/configure
 	$(SHELL) ./config.status --recheck

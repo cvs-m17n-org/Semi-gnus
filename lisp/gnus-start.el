@@ -641,6 +641,7 @@ the first newsgroup."
 	gnus-newsgroup-unreads nil
 	nnoo-state-alist nil
 	gnus-current-select-method nil
+	nnmail-split-history nil
 	gnus-ephemeral-servers nil)
   (gnus-shutdown 'gnus)
   ;; Kill the startup file.

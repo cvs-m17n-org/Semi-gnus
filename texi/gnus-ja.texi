@@ -5242,6 +5242,9 @@ Prefixes})。
 
 @end table
 
+そして、どうやって記事の本文 (body) の内容を基にプロセス印を付けるかは、
+@pxref{Searching for Articles} の @kbd{&} 命令を参照して下さい。
+
 
 @node Limiting
 @section 制限をする
@@ -8293,7 +8296,11 @@ Gnus の info の節 (node) に移動します (@code{gnus-info-find-no
 @findex gnus-summary-execute-command
 この命令はあなたにヘッダー部分とその部分に合致する正規表現、合致した場合
 に実行される命令の入力を促進します (@code{gnus-summary-execute-command})。
-もし接頭引数を与えられれば、代わりに後ろ向きに探します。
+もしヘッダーが空文字列ならば、記事全体を探します。もし接頭引数を与えられ
+れば、代わりに後ろ向きに探します。
+
+例えば @kbd{& RET 文字列 #} は、ヘッダーか本文に @samp{文字列} を持つす
+べての記事にプロセス印を付けます。
 
 @item M-&
 @kindex M-& （概略）
@@ -10502,7 +10509,9 @@ Backend} と @pxref{Expiring Mail} を。
 @kindex M-x nnmail-split-history
 @kindex nnmail-split-history
 前のメール分割がメッセージをどこに入れたかを見たい場合は、命令 @kbd{M-x
-nnmail-split-history} を使う事ができます。
+nnmail-split-history} を使う事ができます。これからスプールし直そうとする
+メッセージがどこに入るかを見たい場合は、@code{gnus-summary-respool-trace}
+と関連する命令 (@pxref{Mail Group Commands}) を使う事ができます。
 
 Gnus はあなたに自分自身に跳ね返ってくるような可能性のある全ての機会を提
 供します。例えば、あなたの上司からくる全てのメールを含んだグループを作っ
@@ -20588,6 +20597,17 @@ to be the child of the message you're commenting.
 
 @item
 Handle external-body parts.
+
+@item
+When renaming a group name, nnmail-split-history does not get the group
+name renamed.
+
+@item
+Allow mail splitting on bodies when using advanced mail splitting.
+
+@lisp
+  (body "whatever.text")
+@end lisp
 
 @item
 Solve the halting problem.

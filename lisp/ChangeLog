@@ -1,3 +1,29 @@
+2000-07-03 00:29:08  Julien Gilles  <julien.gilles@bcv01y01.vz.cit.alcatel.fr>
+
+	* gnus-ml.el: New file. 
+
+2000-07-02 16:11:25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnultimate.el (nnultimate-request-close): New function.
+
+	* gnus-start.el (gnus-clear-system): Clear nnmail-split-history. 
+
+2000-06-18  Norbert Koch  <norbert@s.netic.de>
+
+	* Makefile.in: Better support for xemacs builds
+
+Sun Jul  2 15:11:35 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
+
+	* gnus.el: Gnus v5.8.7 is released.
+
+2000-05-19 06:32:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-decode.el (mm-insert-part): Characters doubly decoded.
+
+2000-07-01 10:23:08  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-do-fcc): Encode MIME.
+
 2000-06-28 13:52:57  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* lpath.el: Fbind image-size.

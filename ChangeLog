@@ -1,3 +1,25 @@
+2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* lisp/{webmail.el,rfc2047.el,qp.el,pop3.el,nnwarchive.el,
+	nnsoup.el,nnslashdot.el,nnml.el,nnmh.el,nnmbox.el,nnmail.el,
+	nnimap.el,nnheader.el,nnfolder.el,nndraft.el,nndoc.el,mml.el,
+	mm-view.el,mm-uu.el,mm-util.el,mm-decode.el,mm-bodies.el,
+	message.el,mail-source.el,lpath.el,imap.el,gnus.el,gnus-uu.el,
+	gnus-util.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
+	gnus-soup.el,gnus-score.el,gnus-msg.el,gnus-mailcap.el,
+	gnus-group.el,gnus-ems.el,gnus-demon.el,gnus-cus.el,gnus-art.el,
+	gnus-agent.el,ChangeLog}: Sync up with Gnus v5.8.7.
+
+	* texi/{message.texi,gnus.texi,gnus-ja.texi,ChangeLog}: Sync up
+	with Gnus v5.8.7.
+
+	* contrib/rfc2015.el: New file.
+
 2000-06-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
