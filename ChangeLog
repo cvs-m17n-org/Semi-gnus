@@ -1,3 +1,21 @@
+1998-10-08  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Sync up with Semi-gnus 6.8.19
+
+1998-10-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-mode-map): Define key `C-x k'.
+	(message-kill-buffer): Change the prompt string.
+	(message-kill-buffer): Refer to
+	`message-kill-buffer-query-function'.
+	(message-kill-buffer-query-function): New user option.
+
+	* lisp/nnheader.el (nnheader-Y-or-n-p): New function.
+
+1998-10-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/nnagent.el (nnagent-open-server): Small bug fix.
+
 1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Change to "6.8.19.2"
