@@ -111,6 +111,12 @@
 	       (push (pop seq1) res)))
 	   (coerce (nconc (nreverse res) seq1 seq2) type)))))
 
+  (define-compiler-macro string (&whole form &rest args)
+    (if (and (fboundp 'string)
+	     (subrp (symbol-function 'string)))
+	form
+      (list 'concat (cons 'list args))))
+
   (define-compiler-macro subseq (&whole form seq start &optional end)
     (if (and (fboundp 'subseq)
 	     (subrp (symbol-function 'subseq)))
