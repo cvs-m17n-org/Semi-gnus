@@ -1,3 +1,8 @@
+2000-01-12  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
+
+	* lisp/base64.el: Unbound base64-*-string and base64-*-region
+	when defined by autoload.
+
 2000-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Restore
