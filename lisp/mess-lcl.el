@@ -164,16 +164,13 @@ then set this function to `message-encode-function'."
 	    (charsets-mime-charset-alist charsets-mime-charset-alist)
 	    message-locale-args)
 	(message-locale-setup-mime-charset locale-list)
-	(if (catch 'mime-edit-error
-	      (save-excursion
-		(mime-edit-pgp-enclose-buffer)
-		(mime-edit-translate-body)
-		))
-	    (error "Translation error!")
-	  ))
+	(when (catch 'mime-edit-error
+		(save-excursion
+		  (mime-edit-pgp-enclose-buffer)
+		  (mime-edit-translate-body)))
+	  (error "Translation error!")))
       (end-of-invisible)
-      (run-hooks 'mime-edit-exit-hook)
-      )))
+      (run-hooks 'mime-edit-exit-hook))))
 
 ;;;
 ;;; Detect locale.
@@ -290,13 +287,12 @@ then set this function to `message-encode-function'."
 					  default-mime-charset-for-write)))
 			     charsets))
 		   (intern (downcase charset))
-	    (error "Canceled.")))))))
+	    (throw 'message-sending-cancel t)))))))
 
 (defun message-mime-charset-recover-ask-y-or-n (default-charset charsets)
-  (or (y-or-n-p (format "MIME charset %s is selected. OK? "
+  (and (y-or-n-p (format "MIME charset %s is selected. OK? "
 			default-charset))
-      (error "Canceled."))
-  default-charset)
+       default-charset))
 
 (defun message-mime-charset-recover-ask-charset (default-charset charsets)
   (let ((alist (mapcar
