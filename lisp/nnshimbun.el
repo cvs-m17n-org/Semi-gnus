@@ -1476,7 +1476,8 @@ is enclosed by at least one regexp grouping construct."
 		     (nnshimbun-mime-encode-string subject)
 		     from date id "" 0 0 url)
 		    headers))
-;	    (message "%s" id)))
+	    ;;(message "%s" id)
+	    ))
 	(setq auxs (cdr auxs))))
     headers))
 
