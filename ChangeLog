@@ -1,3 +1,8 @@
+2003-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Include other files
+	first.
+
 2003-06-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/lpath.el: Fbind `read-passwd' for Mule 2.

@@ -106,22 +106,6 @@ Both characters must have the same length of multi-byte form."
 	  (if (boundp 'MULE)
 	      (setq output-coding-system file-coding-system)
 	    (setq coding-system-for-write buffer-file-coding-system))
-	  ;; Remove ignored areas first.
-	  (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
-	    (delete-region (match-beginning 0)
-			   (if (re-search-forward
-				"^@end[\t ]+ignore[\t\r ]*$" nil t)
-			       (1+ (match-end 0))
-			     (point-max))))
-	  (infohack-remove-unsupported)
-	  (goto-char (point-min))
-	  ;; Add suffix if it is needed.
-	  (when (and addsuffix
-		     (re-search-forward "^@setfilename[\t ]+\\([^\t\n ]+\\)"
-					nil t)
-		     (not (string-match "\\.info$" (match-string 1))))
-	    (insert ".info")
-	    (goto-char (point-min)))
 	  ;; process @include before updating node
 	  ;; This might produce some problem if we use @lowersection or
 	  ;; such.
@@ -154,6 +138,23 @@ Both characters must have the same length of multi-byte form."
 			  (delete-region (point) (save-excursion
 						   (forward-line 1)
 						   (point))))))))))
+	  ;; Remove ignored areas.
+	  (goto-char (point-min))
+	  (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
+	    (delete-region (match-beginning 0)
+			   (if (re-search-forward
+				"^@end[\t ]+ignore[\t\r ]*$" nil t)
+			       (1+ (match-end 0))
+			     (point-max))))
+	  ;; Remove unsupported commands.
+	  (infohack-remove-unsupported)
+	  ;; Add suffix if it is needed.
+	  (goto-char (point-min))
+	  (when (and addsuffix
+		     (re-search-forward "^@setfilename[\t ]+\\([^\t\n ]+\\)"
+					nil t)
+		     (not (string-match "\\.info$" (match-string 1))))
+	    (insert ".info"))
 	  (texinfo-mode)
 	  (texinfo-every-node-update)
 	  (set-buffer-modified-p nil)
