@@ -1,3 +1,10 @@
+1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-start.el (gnus-read-init-file): Fix indent.
+	* lisp/gnus-ems.el (gnus-tilde-max-form): Redefine instead of
+       	(gnus-summary-line-format-spec) to display Japanese character
+	correctly in Gnus summaly.
+
 1998-08-05  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-start.el (gnus-read-init-file): Don't restrict
