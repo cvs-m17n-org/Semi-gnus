@@ -23,13 +23,16 @@
 
 ;;; Commentary:
 
-;; Avoid cl runtime functions for FSF Emacsen.
+;; This module is for mainly avoiding cl runtime functions in FSF
+;; Emacsen.  Function should also be defined as an ordinary function
+;; if it will not be provided in cl.
 
 ;;; Code:
 
 (if (featurep 'xemacs)
     nil
   (require 'cl)
+  (require 'pym)
 
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (and (fboundp 'butlast)
@@ -116,6 +119,10 @@
 	     (subrp (symbol-function 'string)))
 	form
       (list 'concat (cons 'list args))))
+
+  (defun-maybe string (&rest args)
+    "Concatenate all the argument characters and make the result a string."
+    (concat args))
 
   (define-compiler-macro subseq (&whole form seq start &optional end)
     (if (and (fboundp 'subseq)

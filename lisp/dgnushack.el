@@ -111,8 +111,6 @@
       (si:byte-optimize-form-code-walker form for-effect)))
   (byte-compile 'byte-optimize-form-code-walker))
 
-(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
-
 (condition-case nil
     (char-after)
   (wrong-number-of-arguments
@@ -162,6 +160,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t t)
+
+(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
 (require 'custom)
 

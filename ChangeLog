@@ -1,6 +1,11 @@
 2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el: Load gnus-clfns.el after `load-path' is
+	adjusted.
+
 	* lisp/gnus-clfns.el (string): New compiler macro.
+	(string): Defun-maybe as an ordinary function since it won't be
+	provided in cl.
 	* lisp/gnus-score.el (gnus-score-find-bnews): Use it as Gnus does.
 
 2001-03-06  Katsumi Yamaoka <yamaoka@jpl.org>
