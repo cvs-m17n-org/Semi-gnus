@@ -810,6 +810,22 @@ which it may alter in any way.")
   :group 'gnus-summary
   :type 'regexp)
 
+(defcustom gnus-newsgroup-coding-system-alist 
+  '(("^hk\\>\\|^tw\\>\\|\\<big5\\>" . cn-big5)
+    ("^cn\\>\\|\\<chinese\\>" . cn-gb-2312)
+    ("^fj\\>" . iso-2022-jp-2)
+    ("^relcom\\>" . koi8-r))
+  "Alist of Regexps (to match group names) and CODING-SYSTEMs to be applied."
+  :type '(repeat (cons (regexp :tag "Group")
+		       (symbol :tag "Charset")))
+  :group 'gnus)
+
+(defcustom gnus-newsgroup-iso-8859-1-forced-regexp 
+  "^tw\\>\\|^hk\\>\\|^cn\\>\\|\\<chinese\\>"
+  "Regexp of newsgroup in which ISO-8859-1 is forced to other charset."
+  :type 'regexp
+  :group 'gnus)
+
 ;;; Internal variables
 
 (defvar gnus-scores-exclude-files nil)
@@ -997,6 +1013,9 @@ variable (string, integer, character, etc).")
 (defvar gnus-last-article nil)
 (defvar gnus-newsgroup-history nil)
 
+(defvar gnus-newsgroup-coding-system nil)
+(defvar gnus-newsgroup-iso-8859-1-forced nil)
+
 (defconst gnus-summary-local-variables
   '(gnus-newsgroup-name
     gnus-newsgroup-begin gnus-newsgroup-end
@@ -1027,7 +1046,8 @@ variable (string, integer, character, etc).")
     (gnus-newsgroup-expunged-tally . 0)
     gnus-cache-removable-articles gnus-newsgroup-cached
     gnus-newsgroup-data gnus-newsgroup-data-reverse
-    gnus-newsgroup-limit gnus-newsgroup-limits)
+    gnus-newsgroup-limit gnus-newsgroup-limits
+    gnus-newsgroup-coding-system gnus-newsgroup-iso-8859-1-forced)
   "Variables that are buffer-local to the summary buffers.")
 
 ;; Byte-compiler warning.
@@ -1478,7 +1498,11 @@ increase the score of each group you read."
     "h" gnus-summary-save-article-folder
     "v" gnus-summary-save-article-vm
     "p" gnus-summary-pipe-output
-    "s" gnus-soup-add-article))
+    "s" gnus-soup-add-article)
+
+  (gnus-define-keys (gnus-summary-mime-map "K" gnus-summary-mode-map)
+    "b" gnus-summary-display-buttonized)
+  )
 
 (defun gnus-summary-make-menu-bar ()
   (gnus-turn-off-edit-menu 'summary)
@@ -2336,7 +2360,9 @@ marks of articles."
 	  (original gnus-original-article-buffer)
 	  (gac gnus-article-current)
 	  (reffed gnus-reffed-article-number)
-	  (score-file gnus-current-score-file))
+	  (score-file gnus-current-score-file)
+	  (coding-system gnus-newsgroup-coding-system)
+	  (iso-8859-1-forced gnus-newsgroup-iso-8859-1-forced))
       (save-excursion
 	(set-buffer gnus-group-buffer)
 	(setq gnus-newsgroup-name name
@@ -2349,7 +2375,9 @@ marks of articles."
 	      gnus-article-buffer article-buffer
 	      gnus-original-article-buffer original
 	      gnus-reffed-article-number reffed
-	      gnus-current-score-file score-file)
+	      gnus-current-score-file score-file
+	      gnus-newsgroup-coding-system coding-system
+	      gnus-newsgroup-iso-8859-1-forced iso-8859-1-forced)
 	;; The article buffer also has local variables.
 	(when (gnus-buffer-live-p gnus-article-buffer)
 	  (set-buffer gnus-article-buffer)
@@ -2425,7 +2453,9 @@ marks of articles."
 
 (defun gnus-summary-from-or-to-or-newsgroups (header)
   (let ((to (cdr (assq 'To (mail-header-extra header))))
-	(newsgroups (cdr (assq 'Newsgroups (mail-header-extra header)))))
+	(newsgroups (cdr (assq 'Newsgroups (mail-header-extra header))))
+	(rfc2047-default-charset gnus-newsgroup-coding-system)
+	(mm-charset-iso-8859-1-forced gnus-newsgroup-iso-8859-1-forced))
     (cond
      ((and to
 	   gnus-ignored-from-addresses
@@ -4453,7 +4483,9 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	 (or dependencies
 	     (save-excursion (set-buffer gnus-summary-buffer)
 			     gnus-newsgroup-dependencies)))
-	headers id end ref)
+	headers id end ref
+	(rfc2047-default-charset gnus-newsgroup-coding-system)
+	(mm-charset-iso-8859-1-forced gnus-newsgroup-iso-8859-1-forced))
     (save-excursion
       (set-buffer nntp-server-buffer)
       ;; Translate all TAB characters into SPACE characters.
@@ -4615,7 +4647,9 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
   ;; Get the Xref when the users reads the articles since most/some
   ;; NNTP servers do not include Xrefs when using XOVER.
   (setq gnus-article-internal-prepare-hook '(gnus-article-get-xrefs))
-  (let ((cur nntp-server-buffer)
+  (let ((rfc2047-default-charset gnus-newsgroup-coding-system)
+	(mm-charset-iso-8859-1-forced gnus-newsgroup-iso-8859-1-forced)
+	(cur nntp-server-buffer)
 	(dependencies (or dependencies gnus-newsgroup-dependencies))
 	number headers header)
     (save-excursion
@@ -9123,6 +9157,48 @@ save those articles instead."
 ;;; @ end
 ;;;
 
+(defun gnus-newsgroup-setup-coding-system ()
+  "Setup newsgroup default coding system."
+  (setq gnus-newsgroup-coding-system
+	(or (and gnus-newsgroup-name
+		 (or (gnus-group-find-parameter
+		      gnus-newsgroup-name 'charset)
+		     (let ((alist gnus-newsgroup-coding-system-alist) 
+			   elem (charset nil))
+		       (while alist
+			 (if (string-match 
+			      (car (setq elem (pop alist)))
+			      gnus-newsgroup-name)
+			     (setq alist nil
+				   charset (cdr elem))))
+		       charset)))
+	    rfc2047-default-charset))
+  (setq gnus-newsgroup-iso-8859-1-forced 
+	(and gnus-newsgroup-name
+	     (or (gnus-group-find-parameter
+		  gnus-newsgroup-name 'iso-8859-1-forced)
+		 (string-match  gnus-newsgroup-iso-8859-1-forced-regexp 
+				gnus-newsgroup-name))))
+  (if (stringp gnus-newsgroup-coding-system)
+      (setq gnus-newsgroup-coding-system
+	    (intern (downcase gnus-newsgroup-coding-system))))
+  (setq gnus-newsgroup-iso-8859-1-forced
+	(if (stringp gnus-newsgroup-iso-8859-1-forced)
+	    (intern (downcase gnus-newsgroup-iso-8859-1-forced))
+	  (and gnus-newsgroup-iso-8859-1-forced
+	       gnus-newsgroup-coding-system))))
+
+;;;
+;;; MIME Commands
+;;;
+
+(defun gnus-summary-display-buttonized (&optional arg)
+  "Display the current buffer fully MIME-buttonized."
+  (interactive "P")
+  (require 'gnus-art)
+  (let ((gnus-unbuttonized-mime-types nil))
+    (gnus-summary-show-article arg)))
+    
 (gnus-ems-redefine)
 
 (provide 'gnus-sum)

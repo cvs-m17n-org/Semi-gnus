@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.038"
+(defconst gnus-version-number "6.10.039"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.52"
+(defconst gnus-original-version-number "0.53"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -306,7 +306,6 @@ be set in `.emacs' instead."
   (defalias 'gnus-deactivate-mark 'deactivate-mark)
   (defalias 'gnus-window-edges 'window-edges)
   (defalias 'gnus-key-press-event-p 'numberp)
-  (defalias 'gnus-annotation-in-region-p 'ignore)
   (defalias 'gnus-decode-rfc1522 'ignore))
 
 ;; We define these group faces here to avoid the display
