@@ -12120,7 +12120,8 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 @vindex nnmail-scan-directory-mail-source-once
 ディレクトリー中の複数のファイルからメールを取得します。これは普通
 は procmail に新しいメールをいくつかのファイルに分割させているときに使用
-されます。すなわちファイル @file{foo.bar.spool} にあるメールは、グルー
+されます。すなわち、そのディレクトリーにあるファイルとグループは一対一で
+対応しているので、ファイル @file{foo.bar.spool} にあるメールは、グルー
 プ @code{foo.bar} に置かれます (サフィックス @code{.spool} は変更可能で
 す)。@code{nnmail-scan-directory-mail-source-once} を @code{nil} 以外に
 すると、gnus は新しいメールソースを一回だけ調べるようになります。これは、
