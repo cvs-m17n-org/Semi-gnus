@@ -1,5 +1,12 @@
 1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* texi/gnus-ja.texi: Sync up with Semi-gnus 6.8.19.
+
+	* lisp/gnus.el: Add autoload setting for
+	`gnus-quote-arg-for-sh-or-csh'.
+
+1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-sum.el (gnus-summary-insert-pseudos): Use
 	`gnus-quote-arg-for-sh-or-csh' instead of `mm-quote-arg'.
 
