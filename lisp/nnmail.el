@@ -1140,8 +1140,7 @@ FUNC will be called with the group name to determine the article number."
 		       ;; group twice.
 		       (not (assoc (car method) group-art)))
 		  (push (cons (if regrepp
-				  (replace-match
-				   (car method) nil nil (car method))
+				  (nnmail-expand-newtext (car method))
 				(car method))
 			      (funcall func (car method)))
 			group-art))

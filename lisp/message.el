@@ -694,10 +694,10 @@ the prefix.")
 The default is `abbrev', which uses mailabbrev.  nil switches
 mail aliases off.")
 
-(defcustom message-autosave-directory
+(defcustom message-auto-save-directory
   (nnheader-concat message-directory "drafts/")
-  "*Directory where Message autosaves buffers if Gnus isn't running.
-If nil, Message won't autosave."
+  "*Directory where Message auto-saves buffers if Gnus isn't running.
+If nil, Message won't auto-save."
   :group 'message-buffers
   :type 'directory)
 
@@ -2085,7 +2085,7 @@ the user from the mailer."
 	;; (mail-hist-put-headers-into-history))
 	(run-hooks 'message-sent-hook)
 	(message "Sending...done")
-	;; Mark the buffer as unmodified and delete autosave.
+	;; Mark the buffer as unmodified and delete auto-save.
 	(set-buffer-modified-p nil)
 	(delete-auto-save-file-if-necessary t)
 	(message-disassociate-draft)
@@ -3616,12 +3616,12 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-set-auto-save-file-name ()
   "Associate the message buffer with a file in the drafts directory."
-  (when message-autosave-directory
+  (when message-auto-save-directory
     (if (gnus-alive-p)
 	(setq message-draft-article
 	      (nndraft-request-associate-buffer "drafts"))
       (setq buffer-file-name (expand-file-name "*message*"
-					       message-autosave-directory))
+					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)))
 

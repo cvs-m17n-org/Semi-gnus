@@ -642,6 +642,8 @@ If LOW, update the lower bound instead."
     (when top
       (gnus-message 5 "Generating the cache active file...")
       (setq gnus-cache-active-hashtb (gnus-make-hashtable 123)))
+    (when (string-match "^\\(nn[^_]+\\)_" group)
+      (setq group (replace-match "\\1:" t t group)))
     ;; Separate articles from all other files and directories.
     (while files
       (if (string-match "^[0-9]+$" (file-name-nondirectory (car files)))
@@ -654,7 +656,7 @@ If LOW, update the lower bound instead."
     ;; Go through all the other files.
     (while alphs
       (when (and (file-directory-p (car alphs))
-		 (not (string-match "^\\.\\.?$"
+		 (not (string-match "^\\."
 				    (file-name-nondirectory (car alphs)))))
 	;; We descend directories.
 	(gnus-cache-generate-active (car alphs)))
