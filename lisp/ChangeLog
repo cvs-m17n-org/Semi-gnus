@@ -1,3 +1,25 @@
+2001-10-30 04:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-decode-group-name): Use nnmail-fetch-field
+	instead.
+
+	* message.el (message-forward-subject-author-subject): Don't use
+	message-news-p, which widens the buffer.
+	(message-forward-make-body): New function.
+	(message-forward): Use it.
+	(message-insinuate-rmail): New.
+	(message-forward-rmail-make-body): New.
+
+2001-10-30 02:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-extern.el (mm-extern): Provide it.
+
+	* mm-partial.el (mm-partial): Provide it.
+
+2001-10-28 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-setup-message): Call post-command-hook.
+
 2001-10-29  Simon Josefsson  <jas@extundo.com>
 
 	* mml.el (mml-preview): Bind message-this-is-news if it is

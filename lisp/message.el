@@ -5288,13 +5288,11 @@ The form is: [Source] Subject, where if the original message was mail,
 Source is the sender, and if the original message was news, Source is
 the list of newsgroups is was posted to."
   (concat "["
-	  (if (message-news-p)
-	      (or (message-fetch-field "newsgroups")
-		  "(nowhere)")
-	    (let ((from (message-fetch-field "from")))
-	      (if from
-		  (nnheader-decode-from from)
-		"(nobody)")))
+	  (let ((prefix (message-fetch-field "newsgroups")))
+	    (or prefix
+		(and (setq prefix (message-fetch-field "from"))
+		     (nnheader-decode-from prefix))
+		"(nowhere)"))
 	  "] " subject))
 
 (defun message-forward-subject-fwd (subject)
@@ -5336,25 +5334,28 @@ the message."
 Optional NEWS will use news to forward instead of mail."
   (interactive "P")
   (let ((cur (current-buffer))
-	(subject (message-make-forward-subject))
-	art-beg)
+	(subject (message-make-forward-subject)))
     (if news
 	(message-news nil subject)
       (message-mail nil subject))
-    ;; Put point where we want it before inserting the forwarded
-    ;; message.
-    (if message-forward-before-signature
-	(message-goto-body)
-      (goto-char (point-max)))
-    ;; Make sure we're at the start of the line.
-    (unless (bolp)
-      (insert "\n"))
-    ;; Narrow to the area we are to insert.
-    (narrow-to-region (point) (point))
-    ;; Insert the separators and the forwarded buffer.
-    (insert message-forward-start-separator)
-    (setq art-beg (point))
-    (insert-buffer-substring cur)
+    (message-forward-make-body cur)))
+
+;;;###autoload
+(defun message-forward-make-body (forward-buffer)
+  ;; Put point where we want it before inserting the forwarded
+  ;; message.
+  (if message-forward-before-signature
+      (message-goto-body)
+    (goto-char (point-max)))
+  ;; Make sure we're at the start of the line.
+  (unless (bolp)
+    (insert "\n"))
+  ;; Narrow to the area we are to insert.
+  (narrow-to-region (point) (point))
+  ;; Insert the separators and the forwarded buffer.
+  (insert message-forward-start-separator)
+  (let ((art-beg (point)))
+    (insert-buffer-substring forward-buffer)
     (goto-char (point-max))
     (insert message-forward-end-separator)
     (set-text-properties (point-min) (point-max) nil)
@@ -5367,6 +5368,21 @@ Optional NEWS will use news to forward instead of mail."
     (message-remove-header message-included-forward-headers t nil t)
     (widen)
     (message-position-point)))
+
+;;;###autoload
+(defun message-forward-rmail-make-body (forward-buffer)
+  (with-current-buffer forward-buffer
+    (let (rmail-enable-mime)
+      (rmail-toggle-header 0)))
+  (message-forward-make-body forward-buffer))
+
+;;;###autoload
+(defun message-insinuate-rmail ()
+  "Let RMAIL uses message to forward."
+  (interactive)
+  (setq rmail-enable-mime-composing t)
+  (setq rmail-insert-mime-forwarded-message-function
+	'message-forward-rmail-make-body))
 
 ;;;###autoload
 (defun message-resend (address)

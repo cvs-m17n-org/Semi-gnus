@@ -295,6 +295,7 @@ Thank you for your help in stamping out bugs.
 	 (gnus-run-hooks 'gnus-message-setup-hook))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
+       (run-hooks 'post-command-hook)
        (set-buffer-modified-p nil))))
 
 (defun gnus-inews-insert-draft-meta-information (group article)
