@@ -10305,7 +10305,7 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 @lisp
 ((".*"
-   (signature "Peacs and happiness")
+   (signature "Peace and happiness")
    (organization "What me?"))
  ("^comp"
   (signature "Death to everybody"))
@@ -10333,17 +10333,22 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 それぞれの様式は任意の量の @dfn{属性} を持つ事ができます。それぞれの属性
 は @code{(@var{name} @var{value})} の対により成り立っています。属性名
-は、@code{signature}, @code{signature-file}, @code{organization}, @code{address}, @code{name}, @code{body} の
-どれかである事ができます。属性名は文字列である事もできます。その場合は、
-これはヘッダー名として使われ、その値が記事のヘッダーに挿入されます。もし
-属性名が @code{nil} だったらそのヘッダー名は削除されます。もし属性名
-が @code{eval} だったらその様式が評価され、結果は捨てられます。
+は、@code{signature}, @code{signature-file}, @code{address} (ユーザーの
+電子メールアドレス), @code{name} (ユーザーの名前) または @code{body} の
+どれかである事ができます。属性名は文字列またはシンボルである事もできます。
+その場合は、これはヘッダー名として使われ、その値が記事のヘッダーに挿入さ
+れます。もし属性名が @code{nil} だったらそのヘッダー名は削除されます。も
+し属性名が @code{eval} だったらその様式が評価され、結果は捨てられます。
 
 属性値は文字列 (そのまま使われます)、引数の無い関数 (返り値が使われます)、
 変数 (その値が使われます) またはリスト (それは @code{評価} されて、返り
 値が使われます) である事ができます。関数はセットアップされたメッセージバッ
 ファで呼ばれ (@code{eval} され) ます。現在の記事のヘッダーは変
-数 @code{message-reply-headers} から得られます。
+数 @code{message-reply-headers} から得られます。これは number subject
+from date id references chars lines xref extra の各ヘッダーから成るベク
+トルです。
+
+@vindex message-reply-headers
 
 もし、作成しようとしているメッセージがニュース記事かメールメッセージであ
 るかを調べたいときは、二つの関
@@ -10364,13 +10369,17 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
          (organization "People's Front Against MWM"))
         ("^rec.humor"
          (signature my-funny-signature-randomizer))
-        ((equal (system-name) "gnarly")
+        ((equal (system-name) "gnarly")  ;; s 式
          (signature my-quote-randomizer))
-        ((message-news-p)
+        (message-news-p        ;; 関数シンボル
          (signature my-news-signature))
+        (window-system         ;; 変数シンボル
+         ("X-Window-System" (format "%s" window-system)))
+        ;; Larsi さんに返事をするときは
+        ;; Organization ヘッダーを付けよう。
         (header "to" "larsi.*org"
                 (Organization "Somewhere, Inc."))
-        ((posting-from-work-p)
+        ((posting-from-work-p) ;; ユーザーが定義した関数
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
          (body "You are fired.\n\nSincerely, your boss.")
