@@ -1,3 +1,8 @@
+2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Position
+	point to the top.
+
 2002-01-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/canlock.el (canlock-string-as-unibyte): New macro.
