@@ -1332,7 +1332,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 		;; correct match positions.
 		(re-search-backward (concat "\\<" value "\\>") start-of-value))
 	      (dolist (sp (nnmail-split-it (car split-rest)))
-		(unless (memq sp split-result)
+		(unless (member sp split-result)
 		  (push sp split-result))))))
 	split-result))
 

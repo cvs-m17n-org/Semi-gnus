@@ -1,3 +1,11 @@
+2003-02-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.16 (quimby) revision 00.
+
+2003-02-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.15 revision 00.
+
 2003-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.15 (quimby) revision 00.
