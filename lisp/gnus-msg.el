@@ -256,12 +256,12 @@ If ARG is 1, prompt for a group name to find the posting style."
   (let ((gnus-newsgroup-name
 	 (if arg
 	     (if (= 1 (prefix-numeric-value arg))
-		 (completing-read "Use style of group: " gnus-active-hashtb nil
+		 (completing-read "Use posting style of group: "
+				  gnus-active-hashtb nil
 				  (gnus-read-active-file-p))
 	       (gnus-group-group-name))
 	   "")))
-    (gnus-setup-message 'message (message-mail))
-    ))
+    (gnus-setup-message 'message (message-mail))))
 
 (defun gnus-group-post-news (&optional arg)
   "Start composing a news message.
@@ -546,7 +546,7 @@ If SILENT, don't prompt the user."
      ((and (eq gnus-post-method 'current)
 	   (not (eq (car group-method) 'nndraft))
 	   (not arg))
-      group-method) 
+      group-method)
      ((and gnus-post-method
 	   (not (eq gnus-post-method 'current)))
       gnus-post-method)
@@ -690,7 +690,8 @@ The current group name will be inserted at \"%s\".")
 	(gnus-summary-select-article)
 	(set-buffer gnus-original-article-buffer)
 	(if (and (<= (length (message-tokenize-header
-			      (setq newsgroups (mail-fetch-field "newsgroups"))
+			      (setq newsgroups
+				    (mail-fetch-field "newsgroups"))
 			      ", "))
 		     1)
 		 (or (not (setq followup-to (mail-fetch-field "followup-to")))
@@ -997,7 +998,7 @@ this is a reply."
 	  (and gnus-newsgroup-name
 	       (gnus-group-find-parameter
 		gnus-newsgroup-name 'gcc-self)))
-	 result 
+	 result
 	 (groups
 	  (cond
 	   ((null gnus-message-archive-method)
@@ -1101,7 +1102,7 @@ this is a reply."
 	    (if (and (not (stringp (car attribute)))
 		     (not (eq 'body (car attribute)))
 		     (not (setq variable
-				(cdr (assq (car attribute) 
+				(cdr (assq (car attribute)
 					   gnus-posting-style-alist)))))
 		(message "Couldn't find attribute %s" (car attribute))
 	      ;; We get the value.

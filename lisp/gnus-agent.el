@@ -341,7 +341,7 @@ agent minor mode in all Gnus buffers."
      (concat "^" (regexp-quote mail-header-separator) "\n"))
     (replace-match "\n")
     (gnus-agent-insert-meta-information 'mail)
-    (gnus-request-accept-article "nndraft:queue")))
+    (gnus-request-accept-article "nndraft:queue" nil t t)))
 
 (defun gnus-agent-insert-meta-information (type &optional method)
   "Insert meta-information into the message that says how it's to be posted.
@@ -535,9 +535,13 @@ the actual number of articles toggled is returned."
     (gnus-make-directory (file-name-directory file))
     (let ((coding-system-for-write
 	   gnus-agent-file-coding-system))
-      (write-region (point-min) (point-max) file nil 'silent)))
-  (when (file-exists-p (gnus-agent-lib-file "active"))
-    (delete-file (gnus-agent-lib-file "active"))))
+      (write-region (point-min) (point-max) file nil 'silent))
+
+    );;<-- correct?
+
+    (when (file-exists-p (gnus-agent-lib-file "active"))
+      (delete-file (gnus-agent-lib-file "active"))))
+;  )
 
 (defun gnus-agent-save-group-info (method group active)
   (when (gnus-agent-method-p method)
@@ -1421,7 +1425,7 @@ The following commands are available:
 	       (gnus-agent-save-alist group)
                ;; Mark all articles up to the first article
 	       ;; in `gnus-article-alist' as read.
-	       (when (caar gnus-agent-article-alist)
+	       (when (and info (caar gnus-agent-article-alist))
 		 (setcar (nthcdr 2 info)
 			 (gnus-range-add
 			  (nth 2 info)

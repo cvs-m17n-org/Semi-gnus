@@ -1,3 +1,30 @@
+1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.020.
+
+	* lisp/ietf-drums.el: New file.
+	* lisp/date.el: Abolished.
+	* lisp/mm.el: Abolished.
+
+	* Sync up with Pterodactyl Gnus 0.31.
+
+1998-09-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-encode-message-body): Copied from
+	Pterodactyl Gnus 0.30. It is useless for Semi-gnus but usefull for
+	reducing differences while at work for synchronizing up. It will
+	be removed when the Gnus becomes stable.
+	* lisp/gnus-art.el (gnus-mime-display-alternative)
+	(gnus-display-mime) (gnus-widget-press-button)
+	(gnus-insert-mime-button) (gnus-mime-copy-part)
+	(gnus-mime-view-part) (gnus-mime-pipe-part) (gnus-mime-save-part)
+	(gnus-mime-button-map) (gnus-mime-button-line-format-alist)
+	(gnus-mime-button-line-format)
+	(article-mime-decode-quoted-printable-buffer)
+	(article-de-quoted-unreadable) (article-decode-charset)
+	(article-decode-mime-words) (gnus-decode-header-function)
+	(gnus-display-mime-function): Ditto.
+
 1998-09-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-decode-encoded-words): Renamed from

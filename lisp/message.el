@@ -2853,7 +2853,8 @@ If NOW, use that time instead."
     (when (< zone 0)
       (setq sign ""))
     ;; We do all of this because XEmacs doesn't have the %z spec.
-    (concat (format-time-string "%d %b %Y %H:%M:%S " (or now (current-time)))
+    (concat (format-time-string
+	     "%d %b %Y %H:%M:%S " (or now (current-time)))
 	    (format "%s%02d%02d"
 		    sign (/ zone 3600)
 		    (% zone 3600)))))
@@ -4509,6 +4510,35 @@ regexp varstr."
 	(aset string idx to))
       (setq idx (1+ idx)))
     string))
+
+;;;
+;;; MIME functions
+;;;
+
+(defun message-encode-message-body ()
+  "Examine the message body, encode it, and add the requisite headers."
+  (when (featurep 'mule)
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers-or-head)
+	(message-remove-header
+	 "^Content-Transfer-Encoding:\\|^Content-Type:\\|^Mime-Version:" t)
+	(goto-char (point-max))
+	(widen)
+	(narrow-to-region (point) (point-max))
+	(let* ((charset (mm-encode-body))
+	       (encoding (mm-body-encoding)))
+	  (when (consp charset)
+	    (error "Can't encode messages with multiple charsets (yet)"))
+	  (widen)
+	  (message-narrow-to-headers-or-head)
+	  (goto-char (point-max))
+	  (setq charset (or charset (mm-mule-charset-to-mime-charset 'ascii)))
+	  ;; We don't insert MIME headers if they only say the default.
+	  (unless (and (eq charset 'us-ascii)
+		       (eq encoding '7bit))
+	    (mm-insert-rfc822-headers charset encoding))
+	  (mm-encode-body))))))
 
 (run-hooks 'message-load-hook)
 

@@ -318,7 +318,7 @@ and non-`vertical', do both horizontal and vertical recentering."
   "*If non-nil, ignore articles with identical Message-ID headers."
   :group 'gnus-summary
   :type 'boolean)
-  
+
 (defcustom gnus-single-article-buffer t
   "*If non-nil, display all articles in the same buffer.
 If nil, each group will get its own article buffer."
@@ -1010,6 +1010,25 @@ variable (string, integer, character, etc).")
 ;; Byte-compiler warning.
 (defvar gnus-article-mode-map)
 
+;; MIME stuff.
+
+(defvar gnus-encoded-word-method-alist
+  '(("chinese" mail-decode-encoded-word-string rfc1843-decode-string)
+    (".*" mail-decode-encoded-word-string))
+  "Alist of regexps (to match group names) and lists of functions to be applied.")
+
+(defun gnus-multi-decode-encoded-word-string (string)
+  "Apply the functions from `gnus-encoded-word-method-alist' that match."
+  (let ((alist gnus-encoded-word-method-alist)
+	elem)
+    (while (setq elem (pop alist))
+      (when (string-match (car elem) gnus-newsgroup-name)
+	(pop elem)
+	(while elem
+	  (setq string (funcall (pop elem) string)))
+	(setq alist nil)))
+    string))
+
 ;; Subject simplification.
 
 (defun gnus-simplify-whitespace (str)
@@ -1248,7 +1267,7 @@ increase the score of each group you read."
     "L" gnus-summary-lower-score
     "\M-i" gnus-symbolic-argument
     "h" gnus-summary-select-article-buffer
-    
+
     "V" gnus-summary-score-map
     "X" gnus-uu-extract-map
     "S" gnus-summary-send-map)
@@ -2442,7 +2461,7 @@ marks of articles."
       (setq gnus-tmp-name gnus-tmp-from))
     (unless (numberp gnus-tmp-lines)
       (setq gnus-tmp-lines 0))
-    (gnus-put-text-property-excluding-characters-with-faces
+    (gnus-put-text-property
      (point)
      (progn (eval gnus-summary-line-format-spec) (point))
      'gnus-number gnus-tmp-number)
@@ -2691,7 +2710,7 @@ If NO-DISPLAY, don't generate a summary buffer."
 	  (goto-char (point-min))
 	  (gnus-summary-position-point)
 	  (gnus-configure-windows 'summary 'force)
-	  (gnus-set-mode-line 'summary))	
+	  (gnus-set-mode-line 'summary))
 	(when (get-buffer-window gnus-group-buffer t)
 	  ;; Gotta use windows, because recenter does weird stuff if
 	  ;; the current buffer ain't the displayed window.
@@ -3798,7 +3817,7 @@ or a straight list of headers."
 	      (setq gnus-tmp-name gnus-tmp-from))
 	    (unless (numberp gnus-tmp-lines)
 	      (setq gnus-tmp-lines 0))
-	    (gnus-put-text-property-excluding-characters-with-faces
+	    (gnus-put-text-property
 	     (point)
 	     (progn (eval gnus-summary-line-format-spec) (point))
 	     'gnus-number number)
@@ -4336,7 +4355,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       ;; Then we add the read articles to the range.
       (gnus-add-to-range
        ninfo (setq articles (sort articles '<))))))
-  
+
 (defun gnus-group-make-articles-read (group articles)
   "Update the info of GROUP to say that ARTICLES are read."
   (let* ((num 0)
@@ -5051,7 +5070,7 @@ The prefix argument ALL means to select all articles."
 	  (gnus-update-read-articles
 	   group (append gnus-newsgroup-unreads gnus-newsgroup-unselected))
 	  ;; Set the current article marks.
-	  (let ((gnus-newsgroup-scored 
+	  (let ((gnus-newsgroup-scored
 		 (if (and (not gnus-save-score)
 			  (not non-destructive))
 		     nil
@@ -6192,7 +6211,7 @@ If ALL, mark even excluded ticked and dormants as read."
 (defsubst gnus-cut-thread (thread)
   "Go forwards in the thread until we find an article that we want to display."
   (when (or (eq gnus-fetch-old-headers 'some)
-	    (eq gnus-fetch-old-headers 'invisible)	    
+	    (eq gnus-fetch-old-headers 'invisible)
 	    (eq gnus-build-sparse-threads 'some)
 	    (eq gnus-build-sparse-threads 'more))
     ;; Deal with old-fetched headers and sparse threads.
@@ -6794,14 +6813,14 @@ to save in."
 	      (set-buffer buffer)
 	      (gnus-article-delete-invisible-text)
 	      (let ((ps-left-header
-		     (list 
+		     (list
 		      (concat "("
 			      (mail-header-subject gnus-current-headers) ")")
 		      (concat "("
 			      (mail-header-from gnus-current-headers) ")")))
-		    (ps-right-header 
-		     (list 
-		      "/pagenumberstring load" 
+		    (ps-right-header
+		     (list
+		      "/pagenumberstring load"
 		      (concat "("
 			      (mail-header-date gnus-current-headers) ")"))))
 		(gnus-run-hooks 'gnus-ps-print-hook)
@@ -7108,7 +7127,7 @@ and `request-accept' functions."
 
 	;;;!!!Why is this necessary?
 	(set-buffer gnus-summary-buffer)
-	
+
 	(gnus-summary-goto-subject article)
 	(when (eq action 'move)
 	  (gnus-summary-mark-article article gnus-canceled-mark))))
@@ -7568,7 +7587,7 @@ the actual number of articles marked is returned."
   "Mark ARTICLE replied and update the summary line."
   (push article gnus-newsgroup-replied)
   (let ((buffer-read-only nil))
-    (when (gnus-summary-goto-subject article)
+    (when (gnus-summary-goto-subject article nil t)
       (gnus-summary-update-secondary-mark article))))
 
 (defun gnus-summary-set-bookmark (article)

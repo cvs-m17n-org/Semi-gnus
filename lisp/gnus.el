@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.019"
+(defconst gnus-version-number "6.10.020"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.30"
+(defconst gnus-original-version-number "0.31"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -300,7 +300,8 @@ be set in `.emacs' instead."
   (defalias 'gnus-deactivate-mark 'deactivate-mark)
   (defalias 'gnus-window-edges 'window-edges)
   (defalias 'gnus-key-press-event-p 'numberp)
-  (defalias 'gnus-annotation-in-region-p 'ignore))
+  (defalias 'gnus-annotation-in-region-p 'ignore)
+  (defalias 'gnus-decode-rfc1522 'ignore))
 
 ;; We define these group faces here to avoid the display
 ;; update forced when creating new faces.
@@ -1817,7 +1818,7 @@ This restriction may disappear in later versions of Gnus."
       (define-key keymap (pop keys) 'undefined))))
 
 (defvar gnus-article-mode-map
-  (let ((keymap (make-keymap)))
+  (let ((keymap (make-sparse-keymap)))
     (gnus-suppress-keymap keymap)
     keymap))
 (defvar gnus-summary-mode-map

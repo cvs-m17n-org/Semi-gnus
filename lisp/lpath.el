@@ -40,8 +40,9 @@
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
 		     find-charset-region base64-decode-string
+		     base64-encode-string
 		     find-coding-systems-region get-charset-property
-		     coding-system-get))
+		     coding-system-get w3-region))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -68,7 +69,11 @@
 		 pp-to-string color-name 
 		 gnus-mule-get-coding-system decode-coding-string
 		 mail-aliases-setup
-		 url-view-url w3-prepare-buffer char-int)))
+		 url-view-url w3-prepare-buffer
+		 char-int
+		 annotationp delete-annotation make-image-specifier
+		 make-annotation base64-decode-string base64-encode-string
+		 w3-do-setup w3-region)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)
