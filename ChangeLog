@@ -1,3 +1,8 @@
+2001-09-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: If W3DIR is identical to URLDIR, don't add it
+	to `load-path'.
+
 2001-09-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-diary.el: Don't use `easy-menu-add-item' if it is not

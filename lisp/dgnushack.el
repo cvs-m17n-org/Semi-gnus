@@ -55,15 +55,17 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(let ((urldir (getenv "URLDIR")))
-  (unless (zerop (length urldir))
-    (push (file-name-as-directory urldir) load-path)))
-
 (defvar dgnushack-w3-directory (let ((w3dir (getenv "W3DIR")))
 				 (unless (zerop (length w3dir))
 				   (file-name-as-directory w3dir))))
-(when dgnushack-w3-directory
-  (push dgnushack-w3-directory load-path))
+
+(let ((urldir (getenv "URLDIR")))
+  (unless (zerop (length urldir))
+    (setq urldir (file-name-as-directory urldir))
+    (push (file-name-as-directory urldir) load-path))
+  (when (and dgnushack-w3-directory
+	     (not (string-equal urldir dgnushack-w3-directory)))
+    (push dgnushack-w3-directory load-path)))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
