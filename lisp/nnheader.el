@@ -286,7 +286,12 @@ nil, ."
     "Return non-nil if SYM is a coding system."
     (or (and (fboundp 'find-coding-system) (find-coding-system sym))
 	(and (fboundp 'coding-system-p) (coding-system-p sym))))
-  (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
+  (defalias 'mm-coding-system-p 'nnheader-coding-system-p)
+
+  (defalias 'mm-string-make-unibyte
+    (if (fboundp 'string-make-unibyte)
+	'string-make-unibyte
+      'identity)))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)

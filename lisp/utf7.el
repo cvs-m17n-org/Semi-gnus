@@ -65,8 +65,9 @@
 ;;; Code:
 
 (require 'base64)
-(eval-when-compile (require 'cl))
-(require 'mm-util)
+(eval-when-compile
+  (require 'cl)
+  (require 'mm-util))
 
 (defconst utf7-direct-encoding-chars " -%'-*,-[]-}"
   "Character ranges which do not need escaping in UTF-7.")
