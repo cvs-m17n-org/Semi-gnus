@@ -1,3 +1,7 @@
+1998-11-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-in-reply-to): Quote date.
+
 1998-11-02  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/canonicalize-full-name-methods):
