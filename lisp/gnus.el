@@ -1843,7 +1843,7 @@ You also need to enable `gnus-agent'."
   :group 'gnus-agent
   :type 'boolean)
 
-(defcustom gnus-default-charset (mm-guess-mime-charset)
+(defcustom gnus-default-charset 'iso-8859-1
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
 gnus-group-charset-alist variable and is only used on groups not
