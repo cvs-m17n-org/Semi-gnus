@@ -11517,6 +11517,9 @@ IMAP $B%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#2?$i$+$NM}M3$G(B IMAP $B$r0U?^$5$l$?$h
 gnus $B$G$O(B POP $B%5!<%P!<$HF1MM$K07$&$3$H$,$G$-!"M?$($i$l$?(B IMAP $B%a!<%k%\%C(B
 $B%/%9$+$i5-;v$r<hF@$7$^$9!#>\$7$/$O(B @xref{IMAP} $B$r;2>H$7$F2<$5$$!#(B
 
+Kerberos, GSSAPI, SSL/TLS $B$*$h$S(B STARTTLS $B$N$?$a$N30It%W%m%0%i%`$H%i%$%V(B
+$B%i%j$,I,MW$G$"$k$3$H$KN10U$7$F2<$5$$!#(B@xref{IMAP}
+
 $B%-!<%o!<%I(B:
 
 @table @code
@@ -11524,7 +11527,7 @@ gnus $B$G$O(B POP $B%5!<%P!<$HF1MM$K07$&$3$H$,$G$-!"M?$($i$l$?(B IMAP $B%a!
 IMAP $B%5!<%P!<$NL>A0!#=i4|CM$O4D6-JQ?t(B @code{MAILHOST} $B$+$iF@$^$9!#(B
 
 @item :port
-IMAP $B%5!<%P!<$N%]!<%HHV9f!#IaDL$O=i4|CM$O(B @samp{143} $B$G!"(BSSL $B@\B3$K(B
+IMAP $B%5!<%P!<$N%]!<%HHV9f!#IaDL$O=i4|CM$O(B @samp{143} $B$G!"(BSSL/TLS $B@\B3$K(B
 $B$O(B @samp{993} $B$G$9!#(B
 
 @item :user
@@ -13625,6 +13628,9 @@ gnus-secondary-select-methods $B$K(B nnimap $B$rEPO?$7$F2<$5$$!#$3$l$K$h$C(B
                 (nnimap-stream ssl))))
 @end lisp
 
+(SSL/TLS $B$r;H$&$K$O30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G$9!#0J2<$r;2>H$7(B
+$B$F2<$5$$!#(B)
+
 $B0J2<$NJQ?t$O2>A[(B @code{nnimap} $B%5!<%P!<$r:n@.$9$k$?$a$K;H$&$3$H$,$G$-$^(B
 $B$9!#(B
 
@@ -13670,9 +13676,9 @@ gnus-secondary-select-methods $B$K(B nnimap $B$rEPO?$7$F2<$5$$!#$3$l$K$h$C(B
 @item nnimap-stream
 @vindex nnimap-stream
 $B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H%j!<%`$N7?$G$9!#=i4|@_Dj$G(B
-$B$O(B nnimap $B$O(B SSL $B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
-(SSL $B$O(B STARTTLS $B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F08!=P$G$-$^$9$,!"$^$@(B
-$B9-HO0O$KG[Hw$5$l$F$$$^$;$s!#(B)
+$B$O(B nnimap $B$O(B SSL/TLS $B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
+(SSL/TLS $B$r;H$&(B IMAP $B$O(B STARTTLS $B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F08!=P(B
+$B$G$-$^$9$,!"$^$@9-HO0O$KG[Hw$5$l$F$$$^$;$s!#(B)
 
 $B0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
 
@@ -13696,7 +13702,8 @@ gnus-secondary-select-methods $B$K(B nnimap $B$rEPO?$7$F2<$5$$!#$3$l$K$h$C(B
 $B%j(B @samp{starttls.el} $B$H(B @samp{starttls} $B%W%m%0%i%`$,I,MW$G$9!#(B
 @item
 @dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i(B
-$B%`(B) $B$+(B SSLeay (@samp{s_client}) $B$,I,MW$G$9!#(B
+$B%`(B) $B$+(B SSLeay (@samp{s_client}) $B$H30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G(B
+$B$9!#(B
 @item
 @dfn{shell:} $B%7%'%kL?Na$r;H$C$F(B @sc{imap} $B@\B3$r3+;O$7$^$9!#(B
 @item
@@ -13721,7 +13728,8 @@ SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @uref{http://www.openssl.org/}
 nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x $B$K$O(B
 $B=EBg$J%P%0$,$"$k$?$a;H$($^$;$s!#0JA0$NHG!"FC$K(B SSLeay 0.8.x $B$O;H$($k$3$H(B
 $B$,$o$+$C$F$$$^$9!#JQ?t(B @code{imap-ssl-program} $B$O(B OpenSSL/SSLeay $B$KEO$9(B
-$B%Q%?%a!<%?$r4^$_$^$9!#(B
+$B%Q%?%a!<%?$r4^$_$^$9!#2C$($F(B @samp{ssl.el}  ($BNc$($P(B W3 $B$K4^$^$l$F$$$k$b(B
+$B$N(B) $B$,I,MW$G$9!#(B
 
 @vindex imap-shell-program
 @vindex imap-shell-host
