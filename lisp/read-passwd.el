@@ -90,7 +90,7 @@ Argument PROMPT ."
 	(lambda (x)
 	  (mail-source-bind (pop x)
 	    (let ((from (format "%s:%s:%s" server user port))
-		  (mail-source-string (format "pop:%s@%s" user server)))
+		  (mail-source-string (format "%s:%s@%s" (car x) user server)))
 	      (setq pw (read-pw-return-passwd-string user server))
 	      (unless (assoc user mail-source-password-cache)
 		(set-alist 'mail-source-password-cache
