@@ -1,3 +1,8 @@
+2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treatment-function-alist): Move X-Face
+	stuff down after unfolding stuff.
+
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/highlight-words): Reimplemented.

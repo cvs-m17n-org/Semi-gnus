@@ -1253,7 +1253,7 @@ It is a string, such as \"PGP\". If nil, ask user."
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
-  `((gnus-treat-decode-article-as-default-mime-charset
+  '((gnus-treat-decode-article-as-default-mime-charset
      gnus-article-decode-article-as-default-mime-charset)
     (gnus-treat-x-pgp-sig gnus-article-verify-x-pgp-sig)
     (gnus-treat-strip-banner gnus-article-strip-banner)
@@ -1269,7 +1269,6 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-date-original gnus-article-date-original)
     (gnus-treat-date-user-defined gnus-article-date-user)
     (gnus-treat-date-iso8601 gnus-article-date-iso8601)
-    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
@@ -1294,6 +1293,9 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-unfold-headers gnus-article-treat-unfold-headers)
     (gnus-treat-fold-headers gnus-article-treat-fold-headers)
+    ;; Displaying X-Face should be done after unfolding headers
+    ;; to protect bitmap lines.
+    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-fold-newsgroups gnus-article-treat-fold-newsgroups)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
     (gnus-treat-display-smileys gnus-treat-smiley)
@@ -6174,11 +6176,11 @@ specified by `gnus-button-alist'."
 
 This variable is a list of FUNCTION or (REGEXP . FUNCTION).  If item
 is FUNCTION, FUNCTION will be apply to all newsgroups.  If item is a
-(REGEXP . FUNCTION), FUNCTION will be only apply to thes newsgroups
+\(REGEXP . FUNCTION), FUNCTION will be only apply to thes newsgroups
 whose names match REGEXP.
 
 For example:
-((\"chinese\" . gnus-decode-encoded-word-region-by-guess)
+\((\"chinese\" . gnus-decode-encoded-word-region-by-guess)
  mail-decode-encoded-word-region
  (\"chinese\" . rfc1843-decode-region))
 ")
