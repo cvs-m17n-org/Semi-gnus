@@ -3247,7 +3247,6 @@ to REFS-LIST."
       (push (pop saved-id) refs-list))
     refs-list))
 
-(defvar gnus-article-copy)
 (defun message-yank-original (&optional arg)
   "Insert the message being replied to, if any.
 Puts point before the text and mark after.
@@ -3261,51 +3260,61 @@ prefix, and don't delete any headers.
 
 In addition, if `message-yank-add-new-references' is non-nil and this
 command is called interactively, new IDs from the yanked article will
-be added to \"References\" field.
-\(See also `message-yank-add-new-references'.)"
+be added to the \"References\" field."
   (interactive "P")
-  (let ((modified (buffer-modified-p))
-	(buffer (message-eval-parameter message-reply-buffer))
-	start end refs)
-    (when (and buffer
-	       message-cite-function)
-      (delete-windows-on buffer t)
-      (insert-buffer buffer) ; mark will be set at the end of article.
-      (setq start (point)
-	    end (mark t))
-
-      ;; Add new IDs to References field.
-      (when (and message-yank-add-new-references (interactive-p))
-	(save-excursion
-	  (save-restriction
-	    (message-narrow-to-headers)
-	    (setq refs (message-list-references
-			nil
-			(message-fetch-field "References")))
-	    (widen)
-	    (narrow-to-region start end)
-	    (std11-narrow-to-header)
-	    (when (setq refs (message-list-references
-			      refs
-			      (unless (eq message-yank-add-new-references
-					  'message-id-only)
-				(or (message-fetch-field "References")
-				    (message-fetch-field "In-Reply-To")))
-			      (message-fetch-field "Message-ID")))
+  (let ((modified (buffer-modified-p)))
+    (when (let ((buffer (message-eval-parameter message-reply-buffer)))
+	    (and buffer
+		 message-cite-function
+		 (prog1
+		     t
+		   (delete-windows-on buffer t)
+		   ; The mark will be set at the end of the article.
+		   (insert-buffer buffer))))
+      ;; Add new IDs to the References field.
+      (when (and message-yank-add-new-references
+		 (interactive-p))
+	(let ((start (point))
+	      (end (mark t))
+	      refs newrefs)
+	  (save-excursion
+	    (save-restriction
 	      (widen)
-	      (message-narrow-to-headers)
-	      (goto-char (point-min))
-	      (let ((case-fold-search t))
-		(if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+	      (setq refs (message-list-references
+			  nil
+			  (or (message-make-references)
+			      (prog2
+				  (message-narrow-to-headers)
+				  (message-fetch-field "References")
+				(widen)))))
+	      (narrow-to-region start end)
+	      (std11-narrow-to-header)
+	      (unless (equal (setq newrefs
+				   (message-list-references
+				    (copy-sequence refs)
+				    (unless (eq message-yank-add-new-references
+						'message-id-only)
+				      (or (message-fetch-field "References")
+					  (message-fetch-field "In-Reply-To")))
+				    (message-fetch-field "Message-ID")))
+			     refs)
+		;; If the References field has been changed, we make it
+		;; visible in the header.
+		(mail-header-set-message-id message-reply-headers nil)
+		(mail-header-set-references message-reply-headers nil)
+		(widen)
+		(message-narrow-to-headers)
+		(if (let ((case-fold-search t))
+		      (re-search-forward "^References:\\([\t ]+.+\n\\)+"
+					 nil t))
 		    (replace-match "")
-		  (goto-char (point-max))))
-	      (mail-header-format
-	       (list (or (assq 'References message-header-format-alist)
-			 '(References . message-fill-references)))
-	       (list (cons 'References
-			   (mapconcat 'identity (nreverse refs) " "))))
-	      (backward-delete-char 1)))))
-
+		  (goto-char (point-max)))
+		(mail-header-format
+		 (list (or (assq 'References message-header-format-alist)
+			   '(References . message-fill-references)))
+		 (list (cons 'References (mapconcat 'identity
+						    (nreverse newrefs) " "))))
+		(backward-delete-char 1))))))
       (unless arg
 	(if (and message-suspend-font-lock-when-citing
 		 (boundp 'font-lock-mode)

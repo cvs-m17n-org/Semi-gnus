@@ -1,9 +1,12 @@
 2003-03-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* imap.el (imap-tls-open): Don't bind coding-systems; use
+	* lisp/message.el (message-yank-original): Check not only the
+	References field but the `message-reply-headers' variable.
+
+	* lisp/imap.el (imap-tls-open): Don't bind coding-systems; use
 	`set-buffer-multibyte' instead of `imap-disable-multibyte'.
 
-	* tls.el: Require `pces'.
+	* lisp/tls.el: Require `pces'.
 	(open-tls-stream): Use `as-binary-process'.
 
 2003-03-23  Simon Josefsson  <jas@extundo.com>
