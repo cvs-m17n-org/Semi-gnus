@@ -272,6 +272,22 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 			      (car spool))
 			    pop3-fma-spool-file-alist))))
 ;;
+(defmacro pop3-fma-read-char-exclusive ()
+  (cond ((featurep 'xemacs)
+	 '(let ((table (quote ((backspace . ?\C-h) (delete . ?\C-?)
+			       (left . ?\C-h))))
+		event key)
+	    (while (not
+		    (and
+		     (key-press-event-p (setq event (next-command-event)))
+		     (setq key (or (event-to-character event)
+				   (cdr (assq (event-key event) table)))))))
+	    key))
+	((fboundp 'read-char-exclusive)
+	 '(read-char-exclusive))
+	(t
+	 '(read-char))))
+;;
 (defun pop3-fma-read-noecho (prompt &optional stars)
   "Read a single line of text from user without echoing, and return it.
 Argument PROMPT ."
@@ -290,15 +306,15 @@ Argument PROMPT ."
 	(and (> truncate 0)
 	     (setq msg (concat "$" (substring msg (1+ truncate))))))
       (message msg)
-      (setq c (read-char-exclusive))
-      (cond ((= c ?\C-g)
+      (setq c (pop3-fma-read-char-exclusive))
+      (cond ((eq ?\C-g c)
 	     (setq quit-flag t
 		   done t))
-	    ((or (= c ?\r) (= c ?\n) (= c ?\e))
+	    ((memq c '(?\r ?\n ?\e))
 	     (setq done t))
-	    ((= c ?\C-u)
+	    ((eq ?\C-u c)
 	     (setq ans ""))
-	    ((and (/= c ?\b) (/= c ?\177))
+	    ((and (/= ?\b c) (/= ?\177 c))
 	     (setq ans (concat ans (char-to-string c))))
 	    ((> (length ans) 0)
 	     (setq ans (substring ans 0 -1)))))
