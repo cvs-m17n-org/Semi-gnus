@@ -1,5 +1,13 @@
 1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-msg.el: Delete commented-out function
+	`gnus-inews-insert-mime-headers'.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.27.
+
+1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/nnheader.el: Use original.
 
 	* lisp/gnus.el, lisp/pop3.el, lisp/message.el, lisp/gnus-sum.el,
