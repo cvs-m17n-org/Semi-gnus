@@ -136,6 +136,8 @@
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
+  (autoload 'starttls-open-stream "starttls")
+  (autoload 'starttls-negotiate "starttls")
   (autoload 'base64-decode-string "mel")
   (autoload 'base64-encode-string "mel")
   (autoload 'rfc2104-hash "rfc2104")
@@ -193,7 +195,8 @@ server.")
 (defvar imap-stream-alist
   '((kerberos4 imap-kerberos4s-p imap-kerberos4-open)
     (ssl       imap-ssl-p        imap-ssl-open)
-    (network   imap-network-p    imap-network-open))
+    (network   imap-network-p    imap-network-open)
+    (tls       imap-tls-p        imap-tls-open))
   "Definition of network streams.
 
 (NAME CHECK OPEN)
@@ -422,9 +425,10 @@ argument to `format'."
 	 (ssl-program-arguments (append imap-ssl-arguments extra-ssl-args
 					(list "-connect" 
 					      (format "%s:%d" server port))))
-	 (process (ignore-errors (open-ssl-stream name buffer server port))))
+	 (process (ignore-errors 
+		    (as-binary-process 
+		     (open-ssl-stream name buffer server port)))))
     (when process
-      (set-process-coding-system process 'binary 'binary)
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(while (and (memq (process-status process) '(open run))
@@ -481,6 +485,35 @@ argument to `format'."
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))
+      (when (memq (process-status process) '(open run))
+	process))))
+
+(defun imap-tls-p (buffer)
+  (imap-capability 'STARTTLS buffer))
+
+(defun imap-tls-open (name buffer server port)
+  (let* ((port (or port imap-default-port))
+	 (process (as-binary-process
+		   (starttls-open-stream name buffer server port))))
+    (when process
+      (while (and (memq (process-status process) '(open run))
+		  (goto-char (point-min))
+		  (not (imap-parse-greeting)))
+	(accept-process-output process 1)
+	(sit-for 1))
+      (and imap-log
+	   (with-current-buffer (get-buffer-create imap-log)
+	     (buffer-disable-undo)
+	     (goto-char (point-max))
+	     (insert-buffer-substring buffer)))
+      (let ((imap-process process))
+	(unwind-protect
+	    (progn
+	      (set-process-filter imap-process 'imap-arrival-filter)
+	      (when (and (eq imap-stream 'tls)
+			 (imap-ok-p (imap-send-command-wait "STARTTLS")))
+		(starttls-negotiate imap-process)))
+	  (set-process-filter imap-process nil)))
       (when (memq (process-status process) '(open run))
 	process))))
   
