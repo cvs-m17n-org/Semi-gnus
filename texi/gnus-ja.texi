@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.8.11 Manual
+@settitle Semi-gnus 6.8.13 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.8.11 Manual
+@title Semi-gnus 6.8.13 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B$J8@8l7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation$B$r(B
 $B$*BT$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B Semi-gnus 6.8.11 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B Semi-gnus 6.8.13 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -3724,6 +3724,11 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 @findex gnus-summary-scroll-up
 $B8=:_$N5-;v$r0l9T@h$K%9%/%m!<%k$7$^$9(B (@code{gnus-summary-scroll-up})$B!#(B
 
+@item M-RET
+@kindex M-RET ($B35N,(B)
+@findex gnus-summary-scroll-down
+$B8=:_$N5-;v$r0l9T8e$m$X%9%/%m!<%k$7$^$9(B (@code{gnus-summary-scroll-down})$B!#(B
+
 @item A g
 @itemx g
 @kindex A g $B!J35N,!K(B
@@ -5267,13 +5272,17 @@ Gnus $B$O$"$J$?$,FI$`$G$"$m$&5-;v$h$j$b$?$/$5$s$N5-;v$r<hF@$7$^$9!#$3$l$O(B
 $B$=$l$i$O$3$NL?Na$G$O%@%&%s%m!<%I$5$l$^$;$s!#(B
 
 @vindex gnus-uncacheable-groups
+@vindex gnus-cacheable-groups
 $B$$$/$D$+$N%0%k!<%W$G$O%-%c%C%7%e$r$7$?$/$J$$$H$$$&$N$ONI$/$"$k;v$G$9!#Nc$((B
 $B$P!"(B@code{nnml} $B%a!<%k%G%#%l%/%H%j!<$,%[!<%`%G%#%l%/%H%j!<$N2<$K$"$l$P!"$=(B
 $B$l$r$"$J$?$N%[!<%`%G%#%l%/%H%j!<$N2<$NJL$N>l=j$K%-%c%C%7%e$9$k$N$O0UL#$NL5(B
-$B$$;v$G$9!#$"$J$?$,#2G\$NMFNL$r;H$&;v$,NI$$$H46$8$J$$8B$j$O!#%-%c%C%7%e$r@)(B
-$B8B$9$k$?$a$K!"@55,I=8=(B @code{gnus-uncacheable-groups} $B$rNc$($P(B
-@samp{^nnml} $B$H@_Dj$7$F$/$@$5$$!#$3$NJQ?t$O%G%#%U%)%k%H$G$O(B @code{nil} $B$G(B
-$B$9!#(B
+$B$$;v$G$9!#$"$J$?$,#2G\$NMFNL$r;H$&;v$,NI$$$H46$8$J$$8B$j$O!#(B
+
+$B%-%c%C%7%e$r@)8B$9$k$?$a$K!"(B@code{gnus-uncacheable-groups} $B$r(B $B$r%-%c%C%7%e(B
+$B$9$k%0%k!<%W$NO"A[%j%9%H!"Nc$($P(B @samp{^nntp}$B!"$H$9$k$+!"@55,I=8=(B 
+@code{gnus-uncacheable-group} $B$rNc$($P!"(B@samp{^nnml} $B$K@_Dj$7$F2<$5$$!#(B
+$BN>J}$NJQ?t$N=i4|CM$O(B @code{nil} $B$G$9!#$b$7%0%k!<%W$,N>J}$N@55,I=8=$K9gCW(B
+$B$9$k$H!"$=$N%0%k!<%W$O%-%c%C%7%e$5$l$^$;$s!#(B
 
 @findex gnus-cache-generate-nov-databases
 @findex gnus-cache-generate-active
@@ -8240,65 +8249,64 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
   (organization "Emacs is it")))
 @end lisp
 
+$B$3$NNc$+$i?dB,$5$l$k$h$&$K!"$3$NO"A[%j%9%H$O$$$/$D$+$N(B @dfn{$BMM<0(B}
+(style) $B$+$i$J$C$F$$$^$9!#$=$l$>$l$NMM<0$O:G=i$NMWAG$,2?$i$+$N7A$G(B ``$B9g(B
+$BCW(B'' $B$7$?$H$-$KE,MQ$5$l$^$9!#O"A[%j%9%HA4BN$O:G=i$+$i:G8e$^$GH?I|$7$F<B(B
+$B9T$5$l!"$=$l$>$l$N9gCW$,E,MQ$5$l$^$9!#$3$l$O!"8e$NMM<0$NB0@-$,A0$K9gCW$7(B
+$B$?MM<0$NB0@-$r>e=q$-$9$k$H8@$&;v$G$9!#$G$9$+$i!"(B
+@samp{comp.programming.literate} $B$O!"=pL>(B @samp{Death to everybody} $B$H(B 
+@code{Organization} $B%X%C%@!<(B @samp{What me?} $B$r;}$A$^$9!#(B
 
-@c As you might surmise from this example, this alist consists of several
-@c @dfn{styles}.  Each style will be applicable if the first element
-@c ``matches'', in some form or other.  The entire alist will be iterated
-@c over, from the beginning towards the end, and each match will be
-@c applied, which means that attributes in later styles that match override
-@c the same attributes in earlier matching styles.  So
-@c @samp{comp.programming.literate} will have the @samp{Death to everybody}
-@c signature and the @samp{What me?} @code{Organization} header.
-@c
-@c The first element in each style is called the @code{match}.  If it's a
-@c string, then Gnus will try to regexp match it against the group name.
-@c If it's a function symbol, that function will be called with no
-@c arguments.  If it's a variable symbol, then the variable will be
-@c referenced.  If it's a list, then that list will be @code{eval}ed.  In
-@c any case, if this returns a non-@code{nil} value, then the style is said
-@c to @dfn{match}.
-@c
-@c Each style may contain a arbitrary amount of @dfn{attributes}.  Each
-@c attribute consists of a @var{(name . value)} pair.  The attribute name
-@c can be one of @code{signature}, @code{organization} or @code{from}.  The
-@c attribute name can also be a string.  In that case, this will be used as
-@c a header name, and the value will be inserted in the headers of the
-@c article.
-@c
-@c The attribute value can be a string (used verbatim), a function (the
-@c return value will be used), a variable (its value will be used) or a
-@c list (it will be @code{eval}ed and the return value will be used).
-@c
-@c So here's a new example:
-@c
-@c @lisp
-@c (setq gnus-posting-styles
-@c       '((".*"
-@c           (signature . "~/.signature")
-@c           (from . "user@@foo (user)")
-@c           ("X-Home-Page" . (getenv "WWW_HOME"))
-@c           (organization . "People's Front Against MWM"))
-@c         ("^rec.humor"
-@c           (signature . my-funny-signature-randomizer))
-@c         ((equal (system-name) "gnarly")
-@c           (signature . my-quote-randomizer))
-@c         (posting-from-work-p
-@c           (signature . "~/.work-signature")
-@c           (from . "user@@bar.foo (user)")
-@c           (organization . "Important Work, Inc"))
-@c         ("^nn.+:"
-@c           (signature . "~/.mail-signature"))))
-@c @end lisp
+$B$=$l$>$l$NMM<0$N:G=i$NMWAG$O(B @code{$B9gCW(B} (match) $B$H8F$P$l$^$9!#$b$7$=$l(B
+$B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=8=$H$7$F9gCWA`:n$r9T$$(B
+$B$^$9!#$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#(B
+$B$=$l$,JQ?t$N$7$&$\$k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l(B
+$B$P!"$=$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil} 
+$B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
+
+$B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
+$B$O(B @var{(name . value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
+@code{signature}, @code{signature-file}, @code{organization},
+@code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$b$G$-$^$9!#(B
+$BB0@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o(B
+$B$l!"$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#(B
+
+$BB0@-CM$OJ8;zNs(B ($B$=$N$^$^;H$o$l$^$9(B)$B!"4X?t(B ($BJV$jCM$,;H$o$l$^$9(B)$B!"JQ?t(B ($B$=(B
+$B$NCM$,;H$o$l$^$9(B)$B!"%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$jCM$,;H$o$l$^$9(B) 
+$B$G$"$k;v$,$G$-$^$9!#(B
+
+$B$=$7$F!"$3$l$ONc$G$9(B:
+
+@lisp
+(setq gnus-posting-styles
+      '((".*"
+         (signature-file "~/.signature")
+         (name "User Name")
+         ("X-Home-Page" (getenv "WWW_HOME"))
+         (organization "People's Front Against MWM"))
+        ("^rec.humor"
+         (signature my-funny-signature-randomizer))
+        ((equal (system-name) "gnarly")
+         (signature my-quote-randomizer))
+        (posting-from-work-p
+         (signature-file "~/.work-signature")
+         (address "user@@bar.foo")
+         (body "You are fired.\n\nSincerely, your boss.")
+         (organization "Important Work, Inc"))
+        ("^nn.+:"
+         (signature-file "~/.mail-signature"))))
+@end lisp
+
 
 @node Drafts
 @section $B2<=q$-(B
 @cindex drafts
 
-$B$b$7%a%C%;!<%8!J%a!<%k$b$7$/$O%K%e!<%9!K$r=q$$$F$$$k$H$-$K!"FMA3%*!<%V%s$K(B
-$B%9%F!<%-$,F~$C$F$$$k;v$r;W$$=P$7$?$J$i!J$b$7$/$O!"$"$J$?$,$H!<$C$F$b$9$4$$(B
-$B:Z?)<g5A<T$G!"7T$r%U!<%I%W%m%;%C%5!<$r$$$l$F$$$k$J$i!K!"=q$$$F$$$k%a%C%;!<(B
-$B%8$rJ]B8$9$kJ}K!$,$"$l$PNI$$$H;W$&$G$7$g$&!#$=$&$9$l$P!"$$$D$+JL$NF|$KJT=8(B
-$B$rB3$1$k;v$,$G$-!"$=$l$,40@.$7$?$H;W$C$?$H$-$KAw$k;v$,$G$-$^$9!#(B
+$B$b$7%a%C%;!<%8!J%a!<%k$b$7$/$O%K%e!<%9!K$r=q$$$F$$$k$H$-$K!"FMA3%*!<%V%s(B
+$B$K%9%F!<%-$,F~$C$F$$$k;v$r;W$$=P$7$?$J$i!J$b$7$/$O!"$"$J$?$,$H!<$C$F$b$9(B
+$B$4$$:Z?)<g5A<T$G!"7T$r%U!<%I%W%m%;%C%5!<$r$$$l$F$$$k$J$i!K!"=q$$$F$$$k%a%C(B
+$B%;!<%8$rJ]B8$9$kJ}K!$,$"$l$PNI$$$H;W$&$G$7$g$&!#$=$&$9$l$P!"$$$D$+JL$NF|(B
+$B$KJT=8$rB3$1$k;v$,$G$-!"$=$l$,40@.$7$?$H;W$C$?$H$-$KAw$k;v$,$G$-$^$9!#(B
 
 $B$($'!"?4G[$7$J$$$G$/$@$5$$!#(BGnus $B$N%a!<%k$HEj9FL?Na$r;H$&2?$i$+$N%a%C%;!<(B
 $B%8$r=q$-;O$a$?$H$-$K!"<j$KF~$l$k%P%C%U%!$O<+F0E*$KFCJL$J(B @dfn{draft} $B%0%k!<(B
@@ -17485,9 +17493,6 @@ Mac, MS (etc) characters into ISO 8859-1.
 numbers and match on the age of the article.
 
 @item
- gnus-cacheable-groups
-
-@item
 @example
 >  > > If so, I've got one gripe: It seems that when I fire up gnus 5.2.25
 >  > > under xemacs-19.14, it's creating a new frame, but is erasing the
@@ -17650,6 +17655,10 @@ summary buffer for each article.
 
 @item
 Implement gnus-batch-brew-soup.
+
+@item
+Group parameters and summary commands for un/subscribing to mailing
+lists. 
 
 @item
 Solve the halting problem.

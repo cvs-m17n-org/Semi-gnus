@@ -1,5 +1,15 @@
 1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.13.
+
+	* Sync up with Gnus 5.6.37.
+
+	*lisp/gnus-offline.el (gnus-offline-setup) : To create spol directory
+	if not exists.
+	Change default value of gnus-offline-drafts-queue-type 'miee to 'agent
+	
+1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.12.
 
 	* Sync up with Gnus 5.6.36.

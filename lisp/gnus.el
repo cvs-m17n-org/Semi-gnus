@@ -253,11 +253,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.12"
+(defconst gnus-version-number "6.8.13"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.36; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "%s %s (based on Gnus 5.6.37; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -1664,6 +1664,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-post-news gnus-summary-reply gnus-summary-reply-with-original
       gnus-summary-mail-forward gnus-summary-mail-other-window
       gnus-summary-resend-message gnus-summary-resend-bounced-mail
+      gnus-summary-wide-reply
       gnus-bug)
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons gnus-picons-article-display-x-face

@@ -3345,9 +3345,8 @@ If LINE, insert the rebuilt thread starting on line LINE."
   "Remove the thread that has ID in it."
   (let (headers thread last-id)
     ;; First go up in this thread until we find the root.
-    (setq last-id (gnus-root-id id))
-    (setq headers (list (car (gnus-id-to-thread last-id))
-			(caadr (gnus-id-to-thread last-id))))
+    (setq last-id (gnus-root-id id)
+	  headers (message-flatten-list (gnus-id-to-thread last-id)))
     ;; We have now found the real root of this thread.	It might have
     ;; been gathered into some loose thread, so we have to search
     ;; through the threads to find the thread we wanted.
@@ -4473,7 +4472,8 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 			(setq ref2 (substring in-reply-to (match-beginning 0)
 					      (match-end 0)))
 			(when (> (length ref2) (length ref))
-			  (setq ref ref2))))
+			  (setq ref ref2)))
+		      ref)
 		  (setq ref nil))))
 	    ;; Chars.
 	    (progn
@@ -5212,12 +5212,6 @@ The state which existed when entering the ephemeral is reset."
 	(gnus-summary-select-article t t)
 	))
   (select-window (get-buffer-window gnus-article-buffer))
-  )
-
-(defun gnus-summary-scroll-down ()
-  "Scroll down one line current article."
-  (interactive)
-  (gnus-summary-scroll-up -1)
   )
 
 ;;; Dead summaries.
