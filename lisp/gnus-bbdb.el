@@ -1,4 +1,4 @@
-;; gnus-bbdb.el --- Interface to Nana-gnus version 6.10.2.
+;; gnus-bbdb.el --- Interface to after Nana-gnus version 6.10.2.
 
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
