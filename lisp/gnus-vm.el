@@ -1,6 +1,6 @@
 ;;; gnus-vm.el --- vm interface for Gnus
 
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Per Persson <pp@gnu.ai.mit.edu>
@@ -105,4 +105,4 @@ save those articles instead."
 
 (provide 'gnus-vm)
 
-;;; gnus-vm.el ends here.
+;;; gnus-vm.el ends here

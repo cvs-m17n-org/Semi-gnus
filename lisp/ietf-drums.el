@@ -1,5 +1,5 @@
 ;;; ietf-drums.el --- Functions for parsing RFC822bis headers
-;; Copyright (C) 1998, 1999, 2000
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -199,25 +199,38 @@
 
 (defun ietf-drums-parse-addresses (string)
   "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
-  (with-temp-buffer
-    (ietf-drums-init string)
-    (let ((beg (point))
-	  pairs c)
-      (while (not (eobp))
-	(setq c (char-after))
-	(cond
-	 ((memq c '(?\" ?< ?\())
-	  (forward-sexp 1))
-	 ((eq c ?,)
-	  (push (ietf-drums-parse-address (buffer-substring beg (point)))
-		pairs)
-	  (forward-char 1)
-	  (setq beg (point)))
-	 (t
-	  (forward-char 1))))
-      (push (ietf-drums-parse-address (buffer-substring beg (point)))
-	    pairs)
-      (nreverse pairs))))
+  (if (null string)
+      nil
+    (with-temp-buffer
+      (ietf-drums-init string)
+      (let ((beg (point))
+	    pairs c address)
+	(while (not (eobp))
+	  (setq c (char-after))
+	  (cond
+	   ((memq c '(?\" ?< ?\())
+	    (condition-case nil
+		(forward-sexp 1)
+	      (error
+	       (skip-chars-forward "^,"))))
+	   ((eq c ?,)
+	    (setq address
+		  (condition-case nil
+		      (ietf-drums-parse-address 
+		       (buffer-substring beg (point)))
+		    (error nil)))
+	    (if address (push address pairs))
+	    (forward-char 1)
+	    (setq beg (point)))
+	   (t
+	    (forward-char 1))))
+	(setq address
+	      (condition-case nil
+		  (ietf-drums-parse-address 
+		   (buffer-substring beg (point)))
+		(error nil)))
+	(if address (push address pairs))
+	(nreverse pairs)))))
 
 (defun ietf-drums-unfold-fws ()
   "Unfold folding white space in the current buffer."

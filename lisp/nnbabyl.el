@@ -1,6 +1,6 @@
 ;;; nnbabyl.el --- rmail mbox access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1099, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1099, 2000, 2001
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -50,6 +50,7 @@
 
 (defvoo nnbabyl-get-new-mail t
   "If non-nil, nnbabyl will check the incoming mail file and split the mail.")
+
 
 (defvoo nnbabyl-prepare-save-mail-hook nil
   "Hook run narrowed to an article before saving.")
@@ -282,12 +283,13 @@
 	      (progn
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnbabyl-request-article (car articles) 
-					     newsgroup server 
+		    (nnbabyl-request-article (car articles)
+					     newsgroup server
 					     (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group
-		       nnmail-expiry-target newsgroup))))
+		       nnmail-expiry-target newsgroup)))
+		  (nnbabyl-possibly-change-newsgroup newsgroup server))
 		(nnheader-message 5 "Deleting article %d in %s..."
 				  (car articles) newsgroup)
 		(nnbabyl-delete-mail))

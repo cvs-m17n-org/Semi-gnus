@@ -36,11 +36,9 @@
 (require 'gnus)
 (require 'nnmail)
 (require 'mm-util)
-(eval-when-compile
-  (ignore-errors
-    (require 'nnweb)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(require 'nnweb))
+(require 'mm-url)
+(require 'nnweb)
+(autoload 'w3-parse-buffer "w3-parse")
 
 (nnoo-declare nnwfm)
 
@@ -56,7 +54,7 @@
 (defvoo nnwfm-groups nil)
 (defvoo nnwfm-headers nil)
 (defvoo nnwfm-articles nil)
-(defvar nnwfm-table-regexp 
+(defvar nnwfm-table-regexp
   "postings.*editpost\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio")
 
 ;;; Interface functions
@@ -116,7 +114,7 @@
 	    (erase-buffer)
 	    (setq subject (nth 2 (assq (car elem) topics))
 		  thread-id (nth 0 (assq (car elem) topics)))
-	    (nnweb-insert
+	    (mm-url-insert
 	     (concat nnwfm-address
 		     (format "Item.asp?GroupID=%d&ThreadID=%d" sid
 			     thread-id)))
@@ -216,7 +214,7 @@
 (deffoo nnwfm-request-list (&optional server)
   (nnwfm-possibly-change-server nil server)
   (mm-with-unibyte-buffer
-    (nnweb-insert
+    (mm-url-insert
      (if (string-match "/$" nnwfm-address)
 	 (concat nnwfm-address "Group.asp")
        nnwfm-address))
@@ -233,7 +231,7 @@
 	  (setq description (car (last (nnweb-text (nth 1 row)))))
 	  (setq articles
 		(string-to-number
-		 (nnweb-replace-in-string
+		 (gnus-replace-in-string
 		  (car (last (nnweb-text (nth 3 row)))) "," "")))
 	  (when (and href
 		     (string-match "GroupId=\\([0-9]+\\)" href))
@@ -279,12 +277,12 @@
       (while furls
 	(erase-buffer)
 	(push (car furls) fetched-urls)
-	(nnweb-insert (pop furls))
+	(mm-url-insert (pop furls))
 	(goto-char (point-min))
 	(while (re-search-forward "  wr(" nil t)
 	  (forward-char -1)
 	  (setq elem (message-tokenize-header
-		      (nnweb-replace-in-string
+		      (gnus-replace-in-string
 		       (buffer-substring
 			(1+ (point))
 			(progn
@@ -293,18 +291,19 @@
 		       "\\\\[\"\\\\]" "")))
 	  (push (list
 		 (string-to-number (nth 1 elem))
-		 (nnweb-replace-in-string (nth 2 elem) "\"" "")
+		 (gnus-replace-in-string (nth 2 elem) "\"" "")
 		 (string-to-number (nth 5 elem)))
 		forum-contents))
 	(when (re-search-forward "href=\"\\(Thread.*DateLast=\\([^\"]+\\)\\)"
 				 nil t)
 	  (setq url (match-string 1)
-		time (nnwfm-date-to-time (url-unhex-string (match-string 2))))
+		time (nnwfm-date-to-time (gnus-url-unhex-string 
+					  (match-string 2))))
 	  (when (and (nnwfm-new-threads-p group time)
 		     (not (member
 			   (setq url (concat
 				      nnwfm-address
-				      (nnweb-decode-entities-string url)))
+				      (mm-url-decode-entities-string url)))
 			   fetched-urls)))
 	    (push url furls))))
       ;; The main idea here is to map Gnus article numbers to
@@ -377,7 +376,7 @@
 	nnwfm-groups-alist)
   (with-temp-file (expand-file-name "groups" nnwfm-directory)
     (prin1 nnwfm-groups-alist (current-buffer))))
-    
+
 (defun nnwfm-init (server)
   "Initialize buffers and such."
   (unless (file-exists-p nnwfm-directory)

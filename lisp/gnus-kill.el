@@ -1,5 +1,5 @@
 ;;; gnus-kill.el --- kill commands for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -357,16 +357,16 @@ If NEWSGROUP is nil, return the global kill file instead."
 (defun gnus-apply-kill-file-unless-scored ()
   "Apply .KILL file, unless a .SCORE file for the same newsgroup exists."
   (cond ((file-exists-p (gnus-score-file-name gnus-newsgroup-name))
-         ;; Ignores global KILL.
-         (when (file-exists-p (gnus-newsgroup-kill-file gnus-newsgroup-name))
+	 ;; Ignores global KILL.
+	 (when (file-exists-p (gnus-newsgroup-kill-file gnus-newsgroup-name))
 	   (gnus-message 3 "Note: Ignoring %s.KILL; preferring .SCORE"
 			 gnus-newsgroup-name))
-         0)
-        ((or (file-exists-p (gnus-newsgroup-kill-file nil))
-             (file-exists-p (gnus-newsgroup-kill-file gnus-newsgroup-name)))
-         (gnus-apply-kill-file-internal))
-        (t
-         0)))
+	 0)
+	((or (file-exists-p (gnus-newsgroup-kill-file nil))
+	     (file-exists-p (gnus-newsgroup-kill-file gnus-newsgroup-name)))
+	 (gnus-apply-kill-file-internal))
+	(t
+	 0)))
 
 (defun gnus-apply-kill-file-internal ()
   "Apply a kill file to the current newsgroup.
@@ -398,7 +398,7 @@ Returns the number of articles marked as read."
 			  gnus-newsgroup-kill-headers))
 		  (setq headers (cdr headers))))
 	      (setq files nil))
- 	  (setq files (cdr files)))))
+	  (setq files (cdr files)))))
     (if (not gnus-newsgroup-kill-headers)
 	()
       (save-window-excursion
@@ -641,18 +641,30 @@ If optional 2nd argument UNREAD is non-nil, articles which are
 marked as read or ticked are ignored."
   (save-excursion
     (let ((killed-no 0)
-	  function article header)
+	  function article header extras)
       (cond
        ;; Search body.
        ((or (null field)
 	    (string-equal field ""))
 	(setq function nil))
        ;; Get access function of header field.
-       ((fboundp
-	 (setq function
-	       (intern-soft
-		(concat "mail-header-" (downcase field)))))
-	(setq function `(lambda (h) (,function h))))
+       ((cond ((fboundp
+		(setq function
+		      (intern-soft
+		       (concat "mail-header-" (downcase field)))))
+	       (setq function `(lambda (h) (,function h))))
+	      ((when (setq extras
+			   (member (downcase field)
+				   (mapcar (lambda (header)
+					     (downcase (symbol-name header)))
+					   gnus-extra-headers)))
+		 (setq function
+		       `(lambda (h)
+			  (gnus-extra-header
+			   (quote ,(nth (- (length gnus-extra-headers)
+					   (length extras))
+					gnus-extra-headers))
+			   h)))))))
        ;; Signal error.
        (t
 	(error "Unknown header field: \"%s\"" field)))

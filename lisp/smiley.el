@@ -1,5 +1,6 @@
 ;;; smiley.el --- displaying smiley faces
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
@@ -36,6 +37,8 @@
 
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
+;;; Code:
+
 (require 'cl)
 (require 'custom)
 
@@ -49,7 +52,7 @@
   :group 'gnus-visual)
 
 ;; FIXME: Where is the directory when using Emacs?
-(defcustom smiley-data-directory 
+(defcustom smiley-data-directory
   (if (featurep 'xemacs)
     (message-xmas-find-glyph-directory "smilies")
     "/usr/local/lib/xemacs/xemacs-packages/etc/smilies")
@@ -227,8 +230,7 @@ above them."
   "Toggle smiley at given point.
 Note -- this function hasn't been implemented yet."
   (interactive "e")
-  (error "This function hasn't been implemented yet.")
-)
+  (error "This function hasn't been implemented yet"))
 
 (defun smiley-toggle-extents (e)
   (interactive "e")
@@ -249,8 +251,7 @@ Note -- this function hasn't been implemented yet."
 ;; FIXME::
 (defun smiley-toggle-extents-ems (e)
   (interactive "e")
-  (error "This function hasn't been implemented yet.")
-)
+  (error "This function hasn't been implemented yet"))
 
 ;;;###autoload
 (defun smiley-buffer (&optional buffer st nd)
@@ -334,7 +335,7 @@ Mouse button3 - menu"))
 	(dolist (overlay (overlays-in (or st (point-min))
 				      (or nd (point-max))))
 	  (when (overlay-get overlay 'smiley)
-	    (remove-text-properties (overlay-start overlay)  
+	    (remove-text-properties (overlay-start overlay)
 				    (overlay-end overlay) '(display))
 	    (delete-overlay overlay)))
 	(goto-char (or st (point-min)))
@@ -399,7 +400,7 @@ With arg, turn displaying on if and only if arg is positive."
 ;; FIXME: make it work as the one in XEmacs.
 (defun smiley-toggle-buffer-ems (&optional arg buffer st nd)
   "Toggle displaying smiley faces.
-With arg, turn displaying on if and only if arg is positive." 
+With arg, turn displaying on if and only if arg is positive."
   (interactive "P")
   (save-excursion
     (when buffer
@@ -408,7 +409,7 @@ With arg, turn displaying on if and only if arg is positive."
       (dolist (overlay (overlays-in (or st (point-min))
 				    (or nd (point-max))))
 	(when (overlay-get overlay 'smiley)
-	  (remove-text-properties (overlay-start overlay)  
+	  (remove-text-properties (overlay-start overlay)
 				  (overlay-end overlay) '(display))
 	  (setq found t)))
       (unless found

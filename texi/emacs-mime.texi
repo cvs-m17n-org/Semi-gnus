@@ -1,4 +1,4 @@
-\input texinfo                  @c -*-texinfo-*-
+\input texinfo
 
 @setfilename emacs-mime
 @settitle Emacs MIME Manual
@@ -18,7 +18,7 @@
 
 This file documents the Emacs MIME interface functionality.
 
-Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -240,7 +240,20 @@ at the beginning of the narrowed buffer.
 
 @item mail-header-narrow-to-field
 @findex mail-header-narrow-to-field
-Narrow the buffer to the header under point.
+Narrow the buffer to the header under point.  Understands continuation
+headers. 
+
+@item mail-header-fold-field
+@findex mail-header-fold-field
+Fold the header under point.
+
+@item mail-header-unfold-field
+@findex mail-header-unfold-field
+Unfold the header under point.
+
+@item mail-header-field-value
+@findex mail-header-field-value
+Return the value of the field under point.
 
 @item mail-encode-encoded-word-region
 @findex mail-encode-encoded-word-region
@@ -785,7 +798,7 @@ audio/wav; wavplayer %s
 @end example
 
 This says that all image files should be displayed with @code{gimp}, and
-that realaudio files should be played by @code{rvplayer}.
+that WAVE audio files should be played by @code{wavplayer}.
 
 The @code{mailcap} library parses this file, and provides functions for
 matching types.
@@ -824,6 +837,7 @@ returned as a result of this analysis.
 
 @menu
 * Dissection::     Analyzing a @sc{mime} message.
+* Non-MIME::       Analyzing a non-@sc{mime} message.
 * Handles::        Handle manipulations.
 * Display::        Displaying handles.
 * Customization::  Variables that affect display.
@@ -839,6 +853,62 @@ a @sc{mime} article.  If given a multipart message, it will recursively
 descend the message, following the structure, and return a tree of
 @sc{mime} handles that describes the structure of the message.
 
+@node Non-MIME
+@section Non-MIME
+
+Gnus also understands some non-MIME attachments, such as postscript,
+uuencode, binhex, shar, forward, gnatsweb, pgp.  Each of these features
+can be disabled by add an item into @code{mm-uu-configure-list}.
+For example,
+
+@lisp
+(require 'mm-uu)
+(add-to-list 'mm-uu-configure-list '(pgp-signed . disabled))
+@end lisp
+
+@table @code
+@item postscript
+@findex postscript
+Postscript file.
+
+@item uu
+@findex uu
+Uuencoded file.
+
+@item binhex
+@findex binhex
+Binhex encoded file.
+
+@item shar
+@findex shar
+Shar archive file.
+
+@item forward
+@findex forward
+Non-@sc{mime} forwarded message.
+
+@item gnatsweb
+@findex gnatsweb
+Gnatsweb attachment.
+
+@item pgp-signed
+@findex pgp-signed
+PGP signed clear text.
+
+@item pgp-encrypted
+@findex pgp-encrypted
+PGP encrypted clear text.
+
+@item pgp-key
+@findex pgp-key
+PGP public keys.
+
+@item emacs-sources
+@findex emacs-sources
+Emacs source code.  This item works only in the groups matching
+@code{mm-uu-emacs-sources-regexp}.
+
+@end table
 
 @node Handles
 @section Handles
@@ -964,10 +1034,13 @@ last possible part of a message, as that is supposed to be the richest.
 However, users may prefer other types instead, and this list says what
 types are most unwanted.  If, for instance, @samp{text/html} parts are
 very unwanted, and @samp{text/richtech} parts are somewhat unwanted,
-then the value of this variable should be set to:
+you could say something like:
 
 @lisp
-("text/html" "text/richtext")
+(setq mm-discouraged-alternatives
+      '("text/html" "text/richtext")
+      mm-automatic-display
+      (remove "text/html" mm-automatic-display))
 @end lisp
 
 @item mm-inline-large-images-p
@@ -980,7 +1053,7 @@ library will display it externally (e.g. with @samp{ImageMagick} or
 makes the library display all inline images as inline, regardless of
 their size.
 
-@item mm-inline-override-p
+@item mm-inline-override-type
 @code{mm-inlined-types} may include regular expressions, for example to
 specify that all @samp{text/.*} parts be displayed inline.  If a user
 prefers to have a type that matches such a regular expression be treated
@@ -1146,12 +1219,12 @@ RFC822 date when the part was read (@code{Content-Disposition}).
 The size (in octets) of the part (@code{Content-Disposition}).
 
 @item sign
-What technology to sign this MML part with (@code{smime} or
-@code{pgpmime})
+What technology to sign this MML part with (@code{smime}, @code{pgp}
+or @code{pgpmime})
 
 @item encrypt
-What technology to encrypt this MML part with (@code{smime} or
-@code{pgpmime})
+What technology to encrypt this MML part with (@code{smime},
+@code{pgp} or @code{pgpmime})
 
 @end table
 
@@ -1361,7 +1434,7 @@ if not identical.
 The Emacs @sc{mime} library implements handling of various elements
 according to a (somewhat) large number of RFCs, drafts and standards
 documents.  This chapter lists the relevant ones.  They can all be
-fetched from @samp{http://quimby.gnus.org/notes/}.
+fetched from @uref{http://quimby.gnus.org/notes/}.
 
 @table @dfn
 @item RFC822
@@ -1419,4 +1492,8 @@ Content-Disposition Header Field
 @contents
 @bye
 
+
+@c Local Variables:
+@c mode: texinfo
+@c coding: iso-8859-1
 @c End:

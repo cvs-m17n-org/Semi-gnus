@@ -41,9 +41,26 @@
 
 (eval-and-compile
   (autoload 'message-fetch-field "message")
+  (autoload 'gnus-get-buffer-window "gnus-win")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
   (autoload 'rmail-show-message "rmail"))
+
+(eval-and-compile
+  (cond
+   ((fboundp 'replace-in-string)
+    (defalias 'gnus-replace-in-string 'replace-in-string))
+   ((fboundp 'replace-regexp-in-string)
+    (defun gnus-replace-in-string  (string regexp newtext &optional literal)
+      (replace-regexp-in-string regexp newtext string nil literal)))
+   (t
+    (defun gnus-replace-in-string (string regexp newtext &optional literal)
+      (let ((start 0) tail)
+	(while (string-match regexp string start)
+	  (setq tail (- (length string) (match-end 0)))
+	  (setq string (replace-match newtext nil literal string))
+	  (setq start (- (length string) tail))))
+      string))))
 
 (defun gnus-boundp (variable)
   "Return non-nil if VARIABLE is bound and non-nil."
@@ -53,20 +70,20 @@
 (defmacro gnus-eval-in-buffer-window (buffer &rest forms)
   "Pop to BUFFER, evaluate FORMS, and then return to the original window."
   (let ((tempvar (make-symbol "GnusStartBufferWindow"))
-        (w (make-symbol "w"))
-        (buf (make-symbol "buf")))
+	(w (make-symbol "w"))
+	(buf (make-symbol "buf")))
     `(let* ((,tempvar (selected-window))
-            (,buf ,buffer)
-            (,w (get-buffer-window ,buf 'visible)))
+	    (,buf ,buffer)
+	    (,w (gnus-get-buffer-window ,buf 'visible)))
        (unwind-protect
-           (progn
-             (if ,w
-                 (progn
-                   (select-window ,w)
-                   (set-buffer (window-buffer ,w)))
-               (pop-to-buffer ,buf))
-             ,@forms)
-         (select-window ,tempvar)))))
+	   (progn
+	     (if ,w
+		 (progn
+		   (select-window ,w)
+		   (set-buffer (window-buffer ,w)))
+	       (pop-to-buffer ,buf))
+	     ,@forms)
+	 (select-window ,tempvar)))))
 
 (put 'gnus-eval-in-buffer-window 'lisp-indent-function 1)
 (put 'gnus-eval-in-buffer-window 'edebug-form-spec '(form body))
@@ -182,7 +199,18 @@
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (search-forward ":" (gnus-point-at-eol) t))
+  (let ((eol (gnus-point-at-eol)))
+    (goto-char (or (text-property-any (point) eol 'gnus-position t)
+		   (search-forward ":" eol t)
+		   (point)))))
+
+(defun gnus-decode-newsgroups (newsgroups group &optional method)
+  (let ((method (or method (gnus-find-method-for-group group))))
+    (mapconcat (lambda (group)
+		 (gnus-group-name-decode group (gnus-group-name-charset
+						method group)))
+	       (message-tokenize-header newsgroups)
+	       ",")))
 
 (defun gnus-remove-text-with-property (prop)
   "Delete all text in the current buffer with text property PROP."
@@ -192,6 +220,17 @@
       (while (get-text-property (point) prop)
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
+
+(defun gnus-text-with-property (prop)
+  "Return a list of all points where the text has PROP."
+  (let ((points nil)
+	(point (point-min)))
+    (save-excursion
+      (while (< point (point-max))
+	(when (get-text-property point prop)
+	  (push point points))
+	(incf point)))
+    (nreverse points)))
 
 (require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
@@ -288,6 +327,70 @@
       (yes-or-no-p prompt)
     (message "")))
 
+;; By Frank Schmitt <ich@Frank-Schmitt.net>. Allows to have
+;; age-depending date representations. (e.g. just the time if it's
+;; from today, the day of the week if it's within the last 7 days and
+;; the full date if it's older)
+(defun gnus-seconds-today ()
+  "Returns the number of seconds passed today"
+  (let ((now (decode-time (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600))))
+
+(defun gnus-seconds-month ()
+  "Returns the number of seconds passed this month"
+  (let ((now (decode-time (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
+       (* (- (car (nthcdr 3 now)) 1) 3600 24))))
+
+(defun gnus-seconds-year ()
+  "Returns the number of seconds passed this year"
+  (let ((now (decode-time (current-time)))
+	(days (format-time-string "%j" (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
+       (* (- (string-to-number days) 1) 3600 24))))
+
+(defvar gnus-user-date-format-alist
+  '(((gnus-seconds-today) . "%k:%M")
+    (604800 . "%a %k:%M")                   ;;that's one week
+    ((gnus-seconds-month) . "%a %d")
+    ((gnus-seconds-year) . "%b %d")
+    (t . "%b %m '%y"))                      ;;this one is used when no other does match
+  "Alist of time in seconds and format specification used to display dates not older.
+The first element must be a number or a function returning a
+number. The second element is a format-specification as described in
+the documentation for format-time-string.  The list must be ordered
+smallest number up. When there is an element, which is not a number,
+the corresponding format-specification will be used, disregarding any
+following elements.  You can use the functions gnus-seconds-today,
+gnus-seconds-month, gnus-seconds-year which will return the number of
+seconds which passed today/this month/this year.")
+
+(defun gnus-user-date (messy-date)
+  "Format the messy-date acording to gnus-user-date-format-alist.
+Returns \"  ?  \" if there's bad input or if an other error occurs.
+Input should look like this: \"Sun, 14 Oct 2001 13:34:39 +0200\"."
+  (condition-case ()
+      (let* ((messy-date (safe-date-to-time messy-date))
+	     (now (current-time))
+	     ;;If we don't find something suitable we'll use this one
+	     (my-format "%b %m '%y")
+	     (high (lsh (- (car now) (car messy-date)) 16)))
+	(if (and (> high -1) (= (logand high 65535) 0))
+	    ;;overflow and bad input
+	    (let* ((difference (+ high (- (car (cdr now))
+					  (car (cdr messy-date)))))
+		   (templist gnus-user-date-format-alist)
+		   (top (eval (caar templist))))
+	      (while (if (numberp top) (< top difference) (not top))
+		(progn
+		  (setq templist (cdr templist))
+		  (setq top (eval (caar templist)))))
+	      (if (stringp (cdr (car templist)))
+		  (setq my-format (cdr (car templist))))))
+	(format-time-string (eval my-format) messy-date))
+    (error "  ?   ")))
+;;end of Frank's code
+
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
   (condition-case ()
@@ -320,13 +423,7 @@ Cache the result as a text property stored in DATE."
 
 (defun gnus-mode-string-quote (string)
   "Quote all \"%\"'s in STRING."
-  (save-excursion
-    (gnus-set-work-buffer)
-    (insert string)
-    (goto-char (point-min))
-    (while (search-forward "%" nil t)
-      (insert "%"))
-    (buffer-string)))
+  (gnus-replace-in-string string "%" "%%"))
 
 ;; Make a hash table (default and minimum size is 256).
 ;; Optional argument HASHSIZE specifies the table size.
@@ -396,7 +493,7 @@ If N, return the Nth ancestor instead."
 	(setq ids (cdr ids)))
       (car ids))))
 
-(defsubst gnus-buffer-live-p (buffer)
+(defun gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
   (and buffer
        (get-buffer buffer)
@@ -405,9 +502,9 @@ If N, return the Nth ancestor instead."
 (defun gnus-horizontal-recenter ()
   "Recenter the current buffer horizontally."
   (if (< (current-column) (/ (window-width) 2))
-      (set-window-hscroll (get-buffer-window (current-buffer) t) 0)
+      (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0)
     (let* ((orig (point))
-	   (end (window-end (get-buffer-window (current-buffer) t)))
+	   (end (window-end (gnus-get-buffer-window (current-buffer) t)))
 	   (max 0))
       (when end
 	;; Find the longest line currently displayed in the window.
@@ -421,10 +518,10 @@ If N, return the Nth ancestor instead."
 	;; Scroll horizontally to center (sort of) the point.
 	(if (> max (window-width))
 	    (set-window-hscroll
-	     (get-buffer-window (current-buffer) t)
+	     (gnus-get-buffer-window (current-buffer) t)
 	     (min (- (current-column) (/ (window-width) 3))
 		  (+ 2 (- max (window-width)))))
-	  (set-window-hscroll (get-buffer-window (current-buffer) t) 0))
+	  (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0))
 	max))))
 
 (defun gnus-read-event-char ()
@@ -478,8 +575,9 @@ If N, return the Nth ancestor instead."
    ;; A list of functions.
    ((or (cdr funs)
 	(listp (car funs)))
-    `(lambda (t1 t2)
-       ,(gnus-make-sort-function-1 (reverse funs))))
+    (gnus-byte-compile
+     `(lambda (t1 t2)
+	,(gnus-make-sort-function-1 (reverse funs)))))
    ;; A list containing just one function.
    (t
     (car funs))))
@@ -565,6 +663,19 @@ Bind `print-quoted' and `print-readably' to t while printing."
 	  (gnus-put-text-property beg (match-beginning 0) prop val)
 	  (setq beg (point)))
 	(gnus-put-text-property beg (point) prop val)))))
+
+(defsubst gnus-put-overlay-excluding-newlines (beg end prop val)
+  "The same as `put-text-property', but don't put this prop on any newlines in the region."
+  (save-match-data
+    (save-excursion
+      (save-restriction
+	(goto-char beg)
+	(while (re-search-forward gnus-emphasize-whitespace-regexp end 'move)
+	  (gnus-overlay-put
+	   (gnus-make-overlay beg (match-beginning 0))
+	   prop val)
+	  (setq beg (point)))
+	(gnus-overlay-put (gnus-make-overlay beg (point)) prop val)))))
 
 (defun gnus-put-text-property-excluding-characters-with-faces (beg end
 								   prop val)
@@ -686,7 +797,8 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (mm-append-to-file (point-min) (point-max) filename)
+	    (let ((file-name-coding-system nnmail-pathname-coding-system))
+	      (mm-append-to-file (point-min) (point-max) filename))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil)
@@ -700,10 +812,10 @@ with potentially long computations."
 	    (when msg
 	      (goto-char (point-min))
 	      (widen)
- 	      (search-backward "\n\^_")
- 	      (narrow-to-region (point) (point-max))
- 	      (rmail-count-new-messages t)
- 	      (when (rmail-summary-exists)
+	      (search-backward "\n\^_")
+	      (narrow-to-region (point) (point-max))
+	      (rmail-count-new-messages t)
+	      (when (rmail-summary-exists)
 		(rmail-select-summary
 		 (rmail-update-summary)))
 	      (rmail-count-new-messages t)
@@ -755,7 +867,8 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(mm-append-to-file (point-min) (point-max) filename)))
+		(let ((file-name-coding-system nnmail-pathname-coding-system))
+		  (mm-append-to-file (point-min) (point-max) filename))))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil))
@@ -914,7 +1027,7 @@ Entries without port tokens default to DEFAULTPORT."
 Return the modified alist."
     (let (entry)
       (while (setq entry (assq key alist))
-        (setq alist (delq entry alist)))
+	(setq alist (delq entry alist)))
       alist)))
 
 (defmacro gnus-pull (key alist &optional assoc-p)
@@ -932,7 +1045,7 @@ Return the modified alist."
 
 (defun gnus-set-window-start (&optional point)
   "Set the window start to POINT, or (point) if nil."
-  (let ((win (get-buffer-window (current-buffer) t)))
+  (let ((win (gnus-get-buffer-window (current-buffer) t)))
     (when win
       (set-window-start win (or point (point))))))
 
@@ -1022,6 +1135,87 @@ Return the modified alist."
   (and (= (length x) (length y))
        (or (string-equal x y)
 	   (string-equal (downcase x) (downcase y)))))
+
+(defcustom gnus-use-byte-compile t
+  "If non-nil, byte-compile crucial run-time codes."
+  :type 'boolean
+  :version "21.1"
+  :group 'gnus-various)
+
+(defun gnus-byte-compile (form)
+  "Byte-compile FORM if `gnus-use-byte-compile' is non-nil."
+  (if gnus-use-byte-compile
+      (progn
+	(require 'bytecomp)
+	(defalias 'gnus-byte-compile 'byte-compile)
+	(byte-compile form))
+    form))
+
+(defun gnus-remassoc (key alist)
+  "Delete by side effect any elements of LIST whose car is `equal' to KEY.
+The modified LIST is returned.  If the first member
+of LIST has a car that is `equal' to KEY, there is no way to remove it
+by side effect; therefore, write `(setq foo (remassoc key foo))' to be
+sure of changing the value of `foo'."
+  (when alist
+    (if (equal key (caar alist))
+	(cdr alist)
+      (setcdr alist (gnus-remassoc key (cdr alist)))
+      alist)))
+
+(defun gnus-update-alist-soft (key value alist)
+  (if value
+      (cons (cons key value) (gnus-remassoc key alist))
+    (gnus-remassoc key alist)))
+
+(defun gnus-create-info-command (node)
+  "Create a command that will go to info NODE."
+  `(lambda ()
+     (interactive)
+     ,(concat "Enter the info system at node " node)
+     (Info-goto-node ,node)
+     (setq gnus-info-buffer (current-buffer))
+     (gnus-configure-windows 'info)))
+
+(defun gnus-not-ignore (&rest args)
+  t)
+
+(defvar gnus-directory-sep-char-regexp "/"
+  "The regexp of directory separator character.
+If you find some problem with the directory separator character, try
+\"[/\\\\\]\" for some systems.")
+
+(defun gnus-url-unhex (x)
+  (if (> x ?9)
+      (if (>= x ?a)
+	  (+ 10 (- x ?a))
+	(+ 10 (- x ?A)))
+    (- x ?0)))
+
+(defun gnus-url-unhex-string (str &optional allow-newlines)
+  "Remove %XXX embedded spaces, etc in a url.
+If optional second argument ALLOW-NEWLINES is non-nil, then allow the
+decoding of carriage returns and line feeds in the string, which is normally
+forbidden in URL encoding."
+  (setq str (or (mm-subst-char-in-string ?+ ?  str) ""))
+  (let ((tmp "")
+	(case-fold-search t))
+    (while (string-match "%[0-9a-f][0-9a-f]" str)
+      (let* ((start (match-beginning 0))
+	     (ch1 (gnus-url-unhex (elt str (+ start 1))))
+	     (code (+ (* 16 ch1)
+		      (gnus-url-unhex (elt str (+ start 2))))))
+	(setq tmp (concat
+		   tmp (substring str 0 start)
+		   (cond
+		    (allow-newlines
+		     (char-to-string code))
+		    ((or (= code ?\n) (= code ?\r))
+		     " ")
+		    (t (char-to-string code))))
+	      str (substring str (match-end 0)))))
+    (setq tmp (concat tmp str))
+    tmp))
 
 (provide 'gnus-util)
 

@@ -886,8 +886,6 @@ When called interactively, prompt for REGEXP."
 		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
 		       (current-time-string) name name))
 	      (when (and message-forward-as-mime gnus-uu-digest-buffer)
-		;; The default part in multipart/digest is message/rfc822.
-		;; Subject is a fake head.
 		(insert "<#part type=message/rfc822>\nSubject: Topics\n\n"))
 	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
@@ -1420,7 +1418,7 @@ When called interactively, prompt for REGEXP."
 
     ;; The original article buffer is hosed, shoot it down.
     (gnus-kill-buffer gnus-original-article-buffer)
-
+    (setq gnus-current-article nil)
     result-files))
 
 (defun gnus-uu-grab-view (file)
@@ -1489,7 +1487,7 @@ When called interactively, prompt for REGEXP."
 		(let ((nnheader-file-name-translation-alist
 		       '((?/ . ?,) (?  . ?_) (?* . ?_) (?$ . ?_))))
 		  (nnheader-translate-file-chars (match-string 1))))
-          (replace-match (concat "begin 644 " gnus-uu-file-name) t t)
+	  (replace-match (concat "begin 644 " gnus-uu-file-name) t t)
 
 	  ;; Remove any non gnus-uu-body-line right after start.
 	  (forward-line 1)
@@ -2158,4 +2156,4 @@ If no file has been included, the user will be asked for a file."
 
 (provide 'gnus-uu)
 
-;; gnus-uu.el ends here
+;;; gnus-uu.el ends here

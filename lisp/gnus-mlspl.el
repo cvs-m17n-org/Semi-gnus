@@ -1,5 +1,6 @@
 ;;; gnus-mlspl.el --- a group params-based mail splitting mechanism
-;; Copyright (C) 1998, 1999, 2000
+
+;; Copyright (C) 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Alexandre Oliva <oliva@lsd.ic.unicamp.br>
@@ -19,6 +20,10 @@
 ;; along with this program; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;;; Code:
 
 (eval-when-compile (require 'cl))
 (require 'gnus)
@@ -92,8 +97,8 @@ gnus-group-split is a valid value for nnmail-split-methods."
 ;;;###autoload
 (defun gnus-group-split-fancy
   (&optional groups no-crosspost catch-all)
-  "Uses information from group parameters in order to split mail.  It
-can be embedded into nnmail-split-fancy lists with the SPLIT
+  "Uses information from group parameters in order to split mail.
+It can be embedded into `nnmail-split-fancy' lists with the SPLIT
 
 \(: gnus-group-split-fancy GROUPS NO-CROSSPOST CATCH-ALL\)
 
@@ -139,7 +144,7 @@ Calling (gnus-group-split-fancy nil nil \"mail.misc\") returns:
 \(| (& (any \"\\\\(bar@femail\\\\.com\\\\|.*@femail\\\\.com\\\\)\"
 	   \"mail.bar\")
       (any \"\\\\(foo@nowhere\\\\.gov\\\\|foo@localhost\\\\|foo-redist@home\\\\)\"
-           - \"bugs-foo\" - \"rambling-foo\" \"mail.foo\"))
+	   - \"bugs-foo\" - \"rambling-foo\" \"mail.foo\"))
    \"mail.others\")"
   (let* ((newsrc (cdr gnus-newsrc-alist))
 	 split)
@@ -196,12 +201,9 @@ Calling (gnus-group-split-fancy nil nil \"mail.misc\") returns:
 			 (list 'any split-regexp)
 			 ;; Generate RESTRICTs for SPLIT-EXCLUDEs.
 			 (if (listp split-exclude)
-			     (let ((seq split-exclude)
-				   res)
-			       (while seq
-				 (push (cons '- (pop seq))
-				       res))
-			       (apply #'nconc (nreverse res)))
+			     (apply #'append
+				    (mapcar (lambda (arg) (list '- arg))
+					    split-exclude))
 			   (list '- split-exclude))
 			 (list group-clean))
 			split)
@@ -223,3 +225,5 @@ Calling (gnus-group-split-fancy nil nil \"mail.misc\") returns:
     split))
 
 (provide 'gnus-mlspl)
+
+;;; gnus-mlspl.el ends here

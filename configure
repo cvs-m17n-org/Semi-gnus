@@ -23,6 +23,8 @@ ac_help="$ac_help
   --with-url=DIR          Specify where to find the url package"
 ac_help="$ac_help
   --with-w3=DIR           Specify where to find the w3 package"
+ac_help="$ac_help
+  --with-fonts            Assume all fonts required are available"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -534,7 +536,7 @@ fi
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:538: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:540: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -591,7 +593,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:595: checking for a BSD compatible install" >&5
+echo "configure:597: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -663,7 +665,7 @@ fi
 # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:667: checking for $ac_word" >&5
+echo "configure:669: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -694,7 +696,7 @@ fi
 # Extract the first word of "emacs", so it can be a program name with args.
 set dummy emacs; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:698: checking for $ac_word" >&5
+echo "configure:700: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_EMACS'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -725,12 +727,12 @@ fi
 
   
   echo $ac_n "checking if $EMACS is really XEmacs""... $ac_c" 1>&6
-echo "configure:729: checking if $EMACS is really XEmacs" >&5
+echo "configure:731: checking if $EMACS is really XEmacs" >&5
   
 elisp="(if (string-match \"XEmacs\" emacs-version) \"yes\" \"no\") "
 if test -z ""noecho""; then
 	echo $ac_n "checking for xemacsp""... $ac_c" 1>&6
-echo "configure:734: checking for xemacsp" >&5
+echo "configure:736: checking for xemacsp" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_xemacsp'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -762,12 +764,12 @@ fi
 
   if test "$prefix" = "NONE"; then
 	echo $ac_n "checking prefix for your Emacs""... $ac_c" 1>&6
-echo "configure:766: checking prefix for your Emacs" >&5
+echo "configure:768: checking prefix for your Emacs" >&5
 	
 elisp="(expand-file-name \"..\" invocation-directory)"
 if test -z ""noecho""; then
 	echo $ac_n "checking for prefix""... $ac_c" 1>&6
-echo "configure:771: checking for prefix" >&5
+echo "configure:773: checking for prefix" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_prefix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -798,7 +800,7 @@ if test "${with_lispdir+set}" = set; then
 fi
 
   echo $ac_n "checking where .elc files should go""... $ac_c" 1>&6
-echo "configure:802: checking where .elc files should go" >&5
+echo "configure:804: checking where .elc files should go" >&5
   if test -z "$lispdir"; then
         theprefix=$prefix
     if test "x$theprefix" = "xNONE"; then
@@ -824,7 +826,7 @@ if test "${with_etcdir+set}" = set; then
 fi
 
   echo $ac_n "checking where etc files should go""... $ac_c" 1>&6
-echo "configure:828: checking where etc files should go" >&5
+echo "configure:830: checking where etc files should go" >&5
   if test -z "$etcdir"; then
         etcdir="\$(lispdir)/../etc"
   fi
@@ -833,7 +835,7 @@ echo "configure:828: checking where etc files should go" >&5
 
 
 echo $ac_n "checking for acceptable URL version""... $ac_c" 1>&6
-echo "configure:837: checking for acceptable URL version" >&5
+echo "configure:839: checking for acceptable URL version" >&5
 if eval "test \"`echo '$''{'EMACS_cv_ACCEPTABLE_URL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -841,14 +843,14 @@ else
 
 if test -z ""noecho""; then
 	echo $ac_n "checking for url-retrieve in url""... $ac_c" 1>&6
-echo "configure:845: checking for url-retrieve in url" >&5
+echo "configure:847: checking for url-retrieve in url" >&5
 fi
 library=`echo url | tr _ -`
 
 elisp="(progn (fmakunbound 'url-retrieve) (condition-case nil (progn (require '$library) (fboundp 'url-retrieve)) (error (prog1 nil (message \"$library not found\")))))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for url""... $ac_c" 1>&6
-echo "configure:852: checking for url" >&5
+echo "configure:854: checking for url" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_url'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -892,7 +894,7 @@ if test "${EMACS_cv_ACCEPTABLE_URL}" = "yes"; then
 elisp="(file-name-directory (locate-library \"url\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for url_dir""... $ac_c" 1>&6
-echo "configure:896: checking for url_dir" >&5
+echo "configure:898: checking for url_dir" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_url_dir'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -930,7 +932,7 @@ fi
 
 
 echo $ac_n "checking for acceptable W3 version""... $ac_c" 1>&6
-echo "configure:934: checking for acceptable W3 version" >&5
+echo "configure:936: checking for acceptable W3 version" >&5
 if eval "test \"`echo '$''{'EMACS_cv_ACCEPTABLE_W3'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -938,14 +940,14 @@ else
 
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3-form-encode-xwfu in w3_forms""... $ac_c" 1>&6
-echo "configure:942: checking for w3-form-encode-xwfu in w3_forms" >&5
+echo "configure:944: checking for w3-form-encode-xwfu in w3_forms" >&5
 fi
 library=`echo w3_forms | tr _ -`
 
 elisp="(progn (fmakunbound 'w3-form-encode-xwfu) (condition-case nil (progn (require '$library) (fboundp 'w3-form-encode-xwfu)) (error (prog1 nil (message \"$library not found\")))))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_forms""... $ac_c" 1>&6
-echo "configure:949: checking for w3_forms" >&5
+echo "configure:951: checking for w3_forms" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_w3_forms'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -989,7 +991,7 @@ if test "${EMACS_cv_ACCEPTABLE_W3}" = "yes"; then
 elisp="(file-name-directory (locate-library \"w3-forms\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_dir""... $ac_c" 1>&6
-echo "configure:993: checking for w3_dir" >&5
+echo "configure:995: checking for w3_dir" >&5
 fi
 if eval "test \"`echo '$''{'EMACS_cv_SYS_w3_dir'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1024,6 +1026,136 @@ fi
    W3=${EMACS_cv_ACCEPTABLE_W3}
    
    echo "$ac_t"""${W3}"" 1>&6
+
+
+test "$LATEX" = t && LATEX=
+test "$LATEX" || for ac_prog in latex
+do
+# Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:1038: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_path_LATEX'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  case "$LATEX" in
+  /*)
+  ac_cv_path_LATEX="$LATEX" # Let the user override the test with a path.
+  ;;
+  ?:/*)			 
+  ac_cv_path_LATEX="$LATEX" # Let the user override the test with a dos path.
+  ;;
+  *)
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do 
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_path_LATEX="$ac_dir/$ac_word"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  ;;
+esac
+fi
+LATEX="$ac_cv_path_LATEX"
+if test -n "$LATEX"; then
+  echo "$ac_t""$LATEX" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+test -n "$LATEX" && break
+done
+test -n "$LATEX" || LATEX="no"
+
+echo $ac_n "checking for available fonts""... $ac_c" 1>&6
+echo "configure:1075: checking for available fonts" >&5
+# Check whether --with-fonts or --without-fonts was given.
+if test "${with_fonts+set}" = set; then
+  withval="$with_fonts"
+  USE_FONTS="$withval"
+fi
+
+WITH_FONTS_bembo='%'
+WITHOUT_FONTS_bembo=
+WITH_FONTS_pfu='%'
+WITHOUT_FONTS_pfu=
+WITH_FONTS_bcr='%'
+WITHOUT_FONTS_bcr=
+if test -z "${USE_FONTS}"; then
+  if test "${LATEX}" = no; then
+	:
+  else
+    OUTPUT=./conftest-$$
+    echo '\nonstopmode\documentclass{article}\usepackage{bembo}\begin{document}\end{document}' > ${OUTPUT}
+    if ${LATEX} ${OUTPUT} </dev/null >& 5 2>&1  ; then  
+      if test -z "${USE_FONTS}"; then
+	USE_FONTS="Adobe Bembo"
+      else
+	USE_FONTS="${USE_FONTS}, Adobe Bembo"
+      fi
+      WITH_FONTS_bembo=
+      WITHOUT_FONTS_bembo='%'
+    fi
+    echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{pfu}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
+    if retval=`${LATEX} ${OUTPUT} </dev/null 2>& 5`; then
+      if echo "$retval" | grep 'Some font shapes were not available' >& 5 2>&1  ; then  
+	:
+      else
+        if test -z "${USE_FONTS}"; then
+	  USE_FONTS="Adobe Futura"
+        else
+	  USE_FONTS="${USE_FONTS}, Adobe Futura"
+        fi
+        WITH_FONTS_pfu=
+        WITHOUT_FONTS_pfu='%'
+      fi
+    fi
+    echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{bcr}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
+    if retval=`${LATEX} ${OUTPUT} </dev/null 2>& 5`; then
+      if echo "$retval" | grep 'Some font shapes were not available' >& 5 2>&1  ; then  
+	:
+      else
+        if test -z "${USE_FONTS}"; then
+	  USE_FONTS="Bitstream Courier"
+        else
+	  USE_FONTS="${USE_FONTS}, Bitstream Courier"
+        fi
+        WITH_FONTS_bcr=
+        WITHOUT_FONTS_bcr='%'
+      fi
+    fi
+    rm -f ${OUTPUT} ${OUTPUT}.aux ${OUTPUT}.log ${OUTPUT}.dvi
+  fi
+elif test "${USE_FONTS}" = yes ; then
+  WITH_FONTS_bembo=
+  WITHOUT_FONTS_bembo='%'
+  WITH_FONTS_pfu=
+  WITHOUT_FONTS_pfu='%'
+  WITH_FONTS_bcr=
+  WITHOUT_FONTS_bcr='%'
+fi
+
+
+
+
+
+
+if test -z "${USE_FONTS}" ; then
+  USE_FONTS=no
+fi
+USE_FONTS=`echo "${USE_FONTS}" | sed 's/,\([^,]*\)$/ and\1/'`
+echo "$ac_t"""${USE_FONTS}"" 1>&6
+if test "${USE_FONTS}" = yes ; then
+  USE_FONTS='Set in Adobe Bembo, Adobe Futura and Bitstream Courier.'
+elif test "${USE_FONTS}" = no ; then
+  USE_FONTS=''
+else
+  USE_FONTS="Set in ${USE_FONTS}."
+fi
+
 
 
 trap '' 1 2 15
@@ -1139,7 +1271,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile lisp/Makefile texi/Makefile etc/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile etc/Makefile lisp/Makefile texi/Makefile texi/gnusconfig.tex texi/ps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -1185,6 +1317,14 @@ s%@HAVE_url@%$HAVE_url%g
 s%@URL@%$URL%g
 s%@HAVE_w3_forms@%$HAVE_w3_forms%g
 s%@W3@%$W3%g
+s%@LATEX@%$LATEX%g
+s%@WITH_FONTS_bembo@%$WITH_FONTS_bembo%g
+s%@WITHOUT_FONTS_bembo@%$WITHOUT_FONTS_bembo%g
+s%@WITH_FONTS_pfu@%$WITH_FONTS_pfu%g
+s%@WITHOUT_FONTS_pfu@%$WITHOUT_FONTS_pfu%g
+s%@WITH_FONTS_bcr@%$WITH_FONTS_bcr%g
+s%@WITHOUT_FONTS_bcr@%$WITHOUT_FONTS_bcr%g
+s%@USE_FONTS@%$USE_FONTS%g
 
 CEOF
 EOF
@@ -1226,7 +1366,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile lisp/Makefile texi/Makefile etc/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile etc/Makefile lisp/Makefile texi/Makefile texi/gnusconfig.tex texi/ps/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

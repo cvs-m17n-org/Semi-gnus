@@ -1,4 +1,4 @@
-;;; mm-uu.el -- Return uu stuff as mm handles
+;;; mm-uu.el --- Return uu stuff as mm handles
 ;; Copyright (c) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
@@ -23,7 +23,6 @@
 
 ;;; Commentary:
 
-
 ;;; Code:
 
 (eval-when-compile (require 'cl))
@@ -32,20 +31,23 @@
 (require 'mm-decode)
 (require 'mailcap)
 (require 'mml2015)
-(require 'uudecode)
-(require 'binhex)
 
-;; This is not the right place for this.  uudecode.el should decide
-;; whether or not to use a program with a single interface, but I
-;; guess it's too late now.  Also the default should depend on a test
-;; for the program.  -- fx
+(autoload 'uudecode-decode-region "uudecode")
+(autoload 'uudecode-decode-region-external "uudecode")
+(autoload 'uudecode-decode-region-internal "uudecode")
+
+(autoload 'binhex-decode-region "binhex")
+(autoload 'binhex-decode-region-external "binhex")
+(autoload 'binhex-decode-region-internal "binhex")
+
 (defcustom mm-uu-decode-function 'uudecode-decode-region
   "*Function to uudecode.
 Internal function is done in Lisp by default, therefore decoding may
 appear to be horribly slow.  You can make Gnus use an external
 decoder, such as uudecode."
   :type '(choice
-	  (function-item :tag "Internal" uudecode-decode-region)
+	  (function-item :tag "Auto detect" uudecode-decode-region)
+	  (function-item :tag "Internal" uudecode-decode-region-internal)
 	  (function-item :tag "External" uudecode-decode-region-external))
   :group 'gnus-article-mime)
 
@@ -54,8 +56,9 @@ decoder, such as uudecode."
 Internal function is done in elisp by default, therefore decoding may
 appear to be horribly slow . You can make Gnus use the external Unix
 decoder, such as hexbin."
-  :type '(choice (item :tag "internal" binhex-decode-region)
-		 (item :tag "external" binhex-decode-region-external))
+  :type '(choice (function-item :tag "Auto detect" binhex-decode-region)
+		 (function-item :tag "Internal" binhex-decode-region-internal)
+		 (function-item :tag "External" binhex-decode-region-external))
   :group 'gnus-article-mime)
 
 (defvar mm-uu-pgp-beginning-signature
@@ -372,7 +375,7 @@ Return that buffer."
     (mm-make-handle buf
 		    '("application/pgp-keys"))))
 
-;;;### autoload
+;;;###autoload
 (defun mm-uu-dissect ()
   "Dissect the current buffer and return a list of uu handles."
   (let ((case-fold-search t)
@@ -403,7 +406,7 @@ Return that buffer."
 	    (funcall func))
 	(forward-line);; in case of failure
 	(when (and (not (mm-uu-configure-p (mm-uu-type entry) 'disabled))
-                   (let ((end-regexp (mm-uu-end-regexp entry)))
+		   (let ((end-regexp (mm-uu-end-regexp entry)))
 		     (if (not end-regexp)
 			 (or (setq end-point (point-max)) t)
 		       (prog1

@@ -123,7 +123,7 @@ Used for APOP authentication.")
 	  ((equal 'pass pop3-authentication-scheme)
 	   (pop3-user process pop3-maildrop)
 	   (pop3-pass process))
-	  (t (error "Invalid POP3 authentication scheme.")))
+	  (t (error "Invalid POP3 authentication scheme")))
     (setq message-count (car (pop3-stat process)))
     (pop3-quit process)
     message-count))
@@ -244,11 +244,14 @@ If NOW, use that time instead."
 		   (looking-at "\001\001\001\001\n") ; MMDF
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
-	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (split-string (or (mail-fetch-field "Date")
-					(pop3-make-date))
-				    " "))
-		(From_))
+	  (let* ((from (mail-strip-quoted-names (mail-fetch-field "From")))
+		 (tdate (mail-fetch-field "Date"))
+		 (date (split-string (or (and tdate
+					      (not (string= "" tdate))
+					      tdate)
+					 (pop3-make-date))
+				     " "))
+		 (From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
@@ -293,7 +296,7 @@ If NOW, use that time instead."
   (pop3-send-command process (format "USER %s" user))
   (let ((response (pop3-read-response process t)))
     (if (not (and response (string-match "+OK" response)))
-	(error (format "USER %s not valid." user)))))
+	(error (format "USER %s not valid" user)))))
 
 (defun pop3-pass (process)
   "Send authentication information to the server."

@@ -5,7 +5,7 @@ AC_DEFUN(AM_PATH_LISPDIR,
   # If you have an Emacs named "t", then use the full path.
   test "$EMACS" = t && EMACS=
   test "$EMACS" || AC_PATH_PROGS(EMACS, emacs xemacs, no)
-  if test $EMACS != "no"; then
+  if test "$EMACS" != "no"; then
     AC_MSG_CHECKING([where .elc files should go])
     dnl Set default value
     lispdir="\$(datadir)/emacs/site-lisp"
@@ -176,4 +176,94 @@ fi
    URL=${EMACS_cv_ACCEPTABLE_URL}
    AC_SUBST(URL)
    AC_MSG_RESULT("${URL}")
+])
+
+dnl
+dnl Perform checking available fonts: Adobe Bembo, Adobe Futura and 
+dnl Bitstream Courier.
+dnl
+
+AC_DEFUN(GNUS_CHECK_FONTS, [
+test "$LATEX" = t && LATEX=
+test "$LATEX" || AC_PATH_PROGS(LATEX, latex, no)
+AC_MSG_CHECKING(for available fonts)
+AC_ARG_WITH(fonts,[  --with-fonts            Assume all fonts required are available],[USE_FONTS="$withval"])
+WITH_FONTS_bembo='%'
+WITHOUT_FONTS_bembo=
+WITH_FONTS_pfu='%'
+WITHOUT_FONTS_pfu=
+WITH_FONTS_bcr='%'
+WITHOUT_FONTS_bcr=
+if test -z "${USE_FONTS}"; then
+  if test "${LATEX}" = no; then
+	:
+  else
+    OUTPUT=./conftest-$$
+    echo '\nonstopmode\documentclass{article}\usepackage{bembo}\begin{document}\end{document}' > ${OUTPUT}
+    if ${LATEX} ${OUTPUT} </dev/null >& AC_FD_CC 2>&1  ; then  
+      if test -z "${USE_FONTS}"; then
+	USE_FONTS="Adobe Bembo"
+      else
+	USE_FONTS="${USE_FONTS}, Adobe Bembo"
+      fi
+      WITH_FONTS_bembo=
+      WITHOUT_FONTS_bembo='%'
+    fi
+    echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{pfu}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
+    if retval=`${LATEX} ${OUTPUT} </dev/null 2>& AC_FD_CC`; then
+      if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
+	:
+      else
+        if test -z "${USE_FONTS}"; then
+	  USE_FONTS="Adobe Futura"
+        else
+	  USE_FONTS="${USE_FONTS}, Adobe Futura"
+        fi
+        WITH_FONTS_pfu=
+        WITHOUT_FONTS_pfu='%'
+      fi
+    fi
+    echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{bcr}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
+    if retval=`${LATEX} ${OUTPUT} </dev/null 2>& AC_FD_CC`; then
+      if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
+	:
+      else
+        if test -z "${USE_FONTS}"; then
+	  USE_FONTS="Bitstream Courier"
+        else
+	  USE_FONTS="${USE_FONTS}, Bitstream Courier"
+        fi
+        WITH_FONTS_bcr=
+        WITHOUT_FONTS_bcr='%'
+      fi
+    fi
+    rm -f ${OUTPUT} ${OUTPUT}.aux ${OUTPUT}.log ${OUTPUT}.dvi
+  fi
+elif test "${USE_FONTS}" = yes ; then
+  WITH_FONTS_bembo=
+  WITHOUT_FONTS_bembo='%'
+  WITH_FONTS_pfu=
+  WITHOUT_FONTS_pfu='%'
+  WITH_FONTS_bcr=
+  WITHOUT_FONTS_bcr='%'
+fi
+AC_SUBST(WITH_FONTS_bembo)
+AC_SUBST(WITHOUT_FONTS_bembo)
+AC_SUBST(WITH_FONTS_pfu)
+AC_SUBST(WITHOUT_FONTS_pfu)
+AC_SUBST(WITH_FONTS_bcr)
+AC_SUBST(WITHOUT_FONTS_bcr)
+if test -z "${USE_FONTS}" ; then
+  USE_FONTS=no
+fi
+USE_FONTS=`echo "${USE_FONTS}" | sed 's/,\([[^,]]*\)$/ and\1/'`
+AC_MSG_RESULT("${USE_FONTS}")
+if test "${USE_FONTS}" = yes ; then
+  USE_FONTS='Set in Adobe Bembo, Adobe Futura and Bitstream Courier.'
+elif test "${USE_FONTS}" = no ; then
+  USE_FONTS=''
+else
+  USE_FONTS="Set in ${USE_FONTS}."
+fi
+AC_SUBST(USE_FONTS)
 ])

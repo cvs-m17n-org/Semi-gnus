@@ -22,17 +22,28 @@
 
 ;;; Commentary:
 
+;; Jaap-Henk Hoepman (jhh@xs4all.nl):
+;;
+;; Added support for delayed destroy of external MIME viewers. All external
+;; viewers for mime types in mm-keep-viewer-alive-types will remain active
+;; after switching articles or groups, and will only be removed when exiting
+;; gnus.
+;;
+
 ;;; Code:
 
 (require 'mail-parse)
 (require 'mailcap)
 (require 'mm-bodies)
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl)
+		   (require 'term))
 
 (eval-and-compile
   (autoload 'mm-inline-partial "mm-partial")
   (autoload 'mm-inline-external-body "mm-extern")
   (autoload 'mm-insert-inline "mm-view"))
+
+(add-hook 'gnus-exit-gnus-hook 'mm-destroy-postponed-undisplay-list)
 
 (defgroup mime-display ()
   "Display of MIME in mail and news articles."
@@ -140,6 +151,7 @@
      (lambda (handle)
        (locate-library "diff-mode")))
     ("application/emacs-lisp" mm-display-elisp-inline identity)
+    ("application/x-emacs-lisp" mm-display-elisp-inline identity)
     ("text/html"
      mm-inline-text
      (lambda (handle)
@@ -166,9 +178,16 @@
     ("application/pgp-signature" ignore identity)
     ("application/x-pkcs7-signature" ignore identity)
     ("application/pkcs7-signature" ignore identity)
+    ("application/x-pkcs7-mime" ignore identity)
+    ("application/pkcs7-mime" ignore identity)
     ("multipart/alternative" ignore identity)
     ("multipart/mixed" ignore identity)
-    ("multipart/related" ignore identity))
+    ("multipart/related" ignore identity)
+    ;; Disable audio and image
+    ("audio/.*" ignore ignore)
+    ("image/.*" ignore ignore)
+    ;; Default to displaying as text
+    (".*" mm-inline-text mm-readable-p))
   "Alist of media types/tests saying whether types can be displayed inline."
   :type '(repeat (list (string :tag "MIME type")
 		       (function :tag "Display function")
@@ -179,22 +198,38 @@
   '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
     "message/partial" "message/external-body" "application/emacs-lisp"
     "application/pgp-signature" "application/x-pkcs7-signature"
-    "application/pkcs7-signature")
-  "List of media types that are to be displayed inline."
+    "application/pkcs7-signature" "application/x-pkcs7-mime"
+    "application/pkcs7-mime")
+  "List of media types that are to be displayed inline.
+See also `mm-inline-media-tests', which says how to display a media
+type inline."
   :type '(repeat string)
   :group 'mime-display)
- 
+
+(defcustom mm-keep-viewer-alive-types
+  '("application/postscript" "application/msword" "application/vnd.ms-excel"
+    "application/pdf" "application/x-dvi")
+  "List of media types for which the external viewer will not be killed
+when selecting a different article."
+  :type '(repeat string)
+  :group 'mime-display)
+
 (defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
     "message/rfc822" "text/x-patch" "application/pgp-signature"
     "application/emacs-lisp" "application/x-pkcs7-signature"
-    "application/pkcs7-signature")
+    "application/pkcs7-signature" "application/x-pkcs7-mime"
+    "application/pkcs7-mime")
   "A list of MIME types to be displayed automatically."
   :type '(repeat string)
   :group 'mime-display)
 
-(defcustom mm-attachment-override-types '("text/x-vcard")
+(defcustom mm-attachment-override-types '("text/x-vcard"
+					  "application/pkcs7-mime"
+					  "application/x-pkcs7-mime"
+					  "application/pkcs7-signature"
+					  "application/x-pkcs7-signature")
   "Types to have \"attachment\" ignored if they can be displayed inline."
   :type '(repeat string)
   :group 'mime-display)
@@ -235,10 +270,38 @@ to:
   :type 'boolean
   :group 'mime-display)
 
+(defvar mm-file-name-rewrite-functions nil
+  "*List of functions used for rewriting file names of MIME parts.
+Each function takes a file name as input and returns a file name.
+
+Ready-made functions include
+`mm-file-name-delete-whitespace',
+`mm-file-name-trim-whitespace',
+`mm-file-name-collapse-whitespace',
+`mm-file-name-replace-whitespace',
+`capitalize', `downcase', `upcase', and
+`upcase-initials'.")
+
+(defvar mm-path-name-rewrite-functions nil
+  "*List of functions used for rewriting path names of MIME parts.
+This is used when viewing parts externally , and is meant for
+transforming the path name so that non-compliant programs can
+find the file where it's saved.
+
+Each function takes a file name as input and returns a file name.")
+
+(defvar mm-file-name-replace-whitespace nil
+  "String used for replacing whitespace characters; default is `\"_\"'.")
+
 (defcustom mm-default-directory nil
   "The default directory where mm will save files.
 If not set, `default-directory' will be used."
-  :type 'directory
+  :type '(choice directory (const :tag "Default" nil))
+  :group 'mime-display)
+
+(defcustom mm-external-terminal-program "xterm"
+  "The program to start an external terminal."
+  :type 'string
   :group 'mime-display)
 
 ;;; Internal variables.
@@ -246,6 +309,7 @@ If not set, `default-directory' will be used."
 (defvar mm-dissection-list nil)
 (defvar mm-last-shell-command "")
 (defvar mm-content-id-alist nil)
+(defvar mm-postponed-undisplay-list nil)
 
 ;; According to RFC2046, in particular, in a digest, the default
 ;; Content-Type value for a body part is changed from "text/plain" to
@@ -332,6 +396,31 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
       (setq alist (cdr alist)))
     (nreverse plist)))
 
+(defun mm-keep-viewer-alive-p (handle)
+  "Say whether external viewer for HANDLE should stay alive."
+  (let ((types mm-keep-viewer-alive-types)
+	(type (mm-handle-media-type handle))
+	ty)
+    (catch 'found
+      (while (setq ty (pop types))
+	(when (string-match ty type)
+	  (throw 'found t))))))
+
+(defun mm-handle-set-external-undisplayer (handle function)
+  "Set the undisplayer for this handle; postpone undisplaying of viewers
+for types in mm-keep-viewer-alive-types."
+  (if (mm-keep-viewer-alive-p handle)
+      (let ((new-handle (copy-sequence handle)))
+	(mm-handle-set-undisplayer new-handle function)
+	(mm-handle-set-undisplayer handle nil)
+	(push new-handle mm-postponed-undisplay-list))
+    (mm-handle-set-undisplayer handle function)))
+
+(defun mm-destroy-postponed-undisplay-list ()
+  (when mm-postponed-undisplay-list
+    (message "Destroying external MIME viewers")
+    (mm-destroy-parts mm-postponed-undisplay-list)))
+
 (defun mm-dissect-buffer (&optional no-strict-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
@@ -375,30 +464,33 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 	   (let ((mm-dissect-default-type (if (equal subtype "digest")
 					      "message/rfc822"
 					    "text/plain")))
-             (add-text-properties 0 (length (car ctl))
-                                  (mm-alist-to-plist (cdr ctl)) (car ctl))
+	     (add-text-properties 0 (length (car ctl))
+				  (mm-alist-to-plist (cdr ctl)) (car ctl))
 
 	     ;; what really needs to be done here is a way to link a
 	     ;; MIME handle back to it's parent MIME handle (in a multilevel
 	     ;; MIME article).  That would probably require changing
 	     ;; the mm-handle API so we simply store the multipart buffert
 	     ;; name as a text property of the "multipart/whatever" string.
-             (add-text-properties 0 (length (car ctl))
+	     (add-text-properties 0 (length (car ctl))
 				  (list 'buffer (mm-copy-to-buffer))
-                                  (car ctl))
-             (add-text-properties 0 (length (car ctl))
+				  (car ctl))
+	     (add-text-properties 0 (length (car ctl))
 				  (list 'from from)
-                                  (car ctl))
+				  (car ctl))
 	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
-	   (mm-dissect-singlepart
-	    ctl
-	    (and cte (intern (downcase (mail-header-remove-whitespace
-					(mail-header-remove-comments
-					 cte)))))
-	    no-strict-mime
-	    (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
-	    description id))))
+	   (mm-possibly-verify-or-decrypt
+	    (mm-dissect-singlepart
+	     ctl
+	     (and cte (intern (downcase (mail-header-remove-whitespace
+					 (mail-header-remove-comments
+					  cte)))))
+	     no-strict-mime
+	     (and cd (ignore-errors
+		       (mail-header-parse-content-disposition cd)))
+	     description id)
+	    ctl))))
 	(when id
 	  (when (string-match " *<\\(.*\\)> *" id)
 	    (setq id (match-string 1 id)))
@@ -480,7 +572,8 @@ external if displayed external."
 	(mm-remove-part handle)
       (let* ((type (mm-handle-media-type handle))
 	     (method (mailcap-mime-info type)))
-	(if (mm-inlined-p handle)
+	(if (and (mm-inlinable-p handle)
+		 (mm-inlined-p handle))
 	    (progn
 	      (forward-line 1)
 	      (mm-display-inline handle)
@@ -529,9 +622,13 @@ external if displayed external."
 		  (mm-handle-set-undisplayer handle mm)))))
 	;; The function is a string to be executed.
 	(mm-insert-part handle)
-	(let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
-	       (filename (mail-content-type-get
-			  (mm-handle-disposition handle) 'filename))
+	(let* ((dir (make-temp-name
+		     (expand-file-name "emm." mm-tmp-directory)))
+	       (filename (or 
+			  (mail-content-type-get
+			   (mm-handle-disposition handle) 'filename)
+ 			  (mail-content-type-get
+ 			   (mm-handle-type handle) 'name)))
 	       (mime-info (mailcap-mime-info
 			   (mm-handle-media-type handle) t))
 	       (needsterm (or (assoc "needsterm" mime-info)
@@ -548,53 +645,76 @@ external if displayed external."
 	  (let ((coding-system-for-write mm-binary-coding-system))
 	    (write-region (point-min) (point-max) file nil 'nomesg))
 	  (message "Viewing with %s" method)
-	  (cond (needsterm
-		 (unwind-protect
-		     (start-process "*display*" nil
-				    "xterm"
-				    "-e" shell-file-name
-				    shell-command-switch
-				    (mm-mailcap-command
-				     method file (mm-handle-type handle)))
-		   (mm-handle-set-undisplayer handle (cons file buffer)))
-		 (message "Displaying %s..." (format method file))
-		 'external)
-		(copiousoutput
-		 (with-current-buffer outbuf
-		   (forward-line 1)
-		   (mm-insert-inline
-		    handle
-		    (unwind-protect
-			(progn
-			  (call-process shell-file-name nil
-					(setq buffer
-					      (generate-new-buffer " *mm*"))
-					nil
-					shell-command-switch
-					(mm-mailcap-command
-					 method file (mm-handle-type handle)))
-			  (if (buffer-live-p buffer)
-			      (save-excursion
-				(set-buffer buffer)
-				(buffer-string))))
-		      (progn
-			(ignore-errors (delete-file file))
-			(ignore-errors (delete-directory
-					(file-name-directory file)))
-			(ignore-errors (kill-buffer buffer))))))
-		 'inline)
-		(t
-		 (unwind-protect
-		     (start-process "*display*"
-				    (setq buffer
-					  (generate-new-buffer " *mm*"))
+	  (cond
+	   (needsterm
+	    (unwind-protect
+		(if window-system
+		    (start-process "*display*" nil
+				   mm-external-terminal-program
+				   "-e" shell-file-name
+				   shell-command-switch
+				   (mm-mailcap-command
+				    method file (mm-handle-type handle)))
+		  (require 'term)
+		  (require 'gnus-win)
+		  (set-buffer
+		   (setq buffer
+			 (make-term "display"
 				    shell-file-name
+				    nil
 				    shell-command-switch
 				    (mm-mailcap-command
-				     method file (mm-handle-type handle)))
-		   (mm-handle-set-undisplayer handle (cons file buffer)))
-		 (message "Displaying %s..." (format method file))
-		 'external)))))))
+				     method file
+				     (mm-handle-type handle)))))
+		  (term-mode)
+		  (term-char-mode)
+		  (set-process-sentinel
+		   (get-buffer-process buffer)
+		   `(lambda (process state)
+		      (if (eq 'exit (process-status process))
+			  (gnus-configure-windows
+			   ',gnus-current-window-configuration))))
+		  (gnus-configure-windows 'display-term))
+	      (mm-handle-set-external-undisplayer handle (cons file buffer)))
+	    (message "Displaying %s..." (format method file))
+	    'external)
+	   (copiousoutput
+	    (with-current-buffer outbuf
+	      (forward-line 1)
+	      (mm-insert-inline
+	       handle
+	       (unwind-protect
+		   (progn
+		     (call-process shell-file-name nil
+				   (setq buffer
+					 (generate-new-buffer " *mm*"))
+				   nil
+				   shell-command-switch
+				   (mm-mailcap-command
+				    method file (mm-handle-type handle)))
+		     (if (buffer-live-p buffer)
+			 (save-excursion
+			   (set-buffer buffer)
+			   (buffer-string))))
+		 (progn
+		   (ignore-errors (delete-file file))
+		   (ignore-errors (delete-directory
+				   (file-name-directory file)))
+		   (ignore-errors (kill-buffer buffer))))))
+	    'inline)
+	   (t
+	    (unwind-protect
+		(start-process "*display*"
+			       (setq buffer
+				     (generate-new-buffer " *mm*"))
+			       shell-file-name
+			       shell-command-switch
+			       (mm-mailcap-command
+				method file (mm-handle-type handle)))
+	      (mm-handle-set-external-undisplayer
+	       handle (cons file buffer)))
+	    (message "Displaying %s..." (format method file))
+	    'external)))))))
 
 (defun mm-mailcap-command (method file type-list)
   (let ((ctl (cdr type-list))
@@ -611,16 +731,18 @@ external if displayed external."
 	(push "%" out))
        ((string= total "%s")
 	(setq uses-stdin nil)
-	(push (mm-quote-arg file) out))
+	(push (mm-quote-arg
+	       (gnus-map-function mm-path-name-rewrite-functions file)) out))
        ((string= total "%t")
 	(push (mm-quote-arg (car type-list)) out))
        (t
 	(push (mm-quote-arg (or (cdr (assq (intern sub) ctl)) "")) out))))
     (push (substring method beg (length method)) out)
-    (if uses-stdin
-	(progn
-	  (push "<" out)
-	  (push (mm-quote-arg file) out)))
+    (when uses-stdin
+      (push "<" out)
+      (push (mm-quote-arg
+	     (gnus-map-function mm-path-name-rewrite-functions file))
+	    out))
     (mapconcat 'identity (nreverse out) "")))
 
 (defun mm-remove-parts (handles)
@@ -674,7 +796,7 @@ external if displayed external."
 	 ((consp object)
 	  (ignore-errors (delete-file (car object)))
 	  (ignore-errors (delete-directory (file-name-directory (car object))))
-	  (ignore-errors (kill-buffer (cdr object))))
+	  (ignore-errors (and (cdr object) (kill-buffer (cdr object)))))
 	 ((bufferp object)
 	  (when (buffer-live-p object)
 	    (kill-buffer object)))))
@@ -691,6 +813,18 @@ external if displayed external."
     (when (string-match (car elem) type)
       (return elem))))
 
+(defun mm-automatic-display-p (handle)
+  "Say whether the user wants HANDLE to be displayed automatically."
+  (let ((methods mm-automatic-display)
+	(type (mm-handle-media-type handle))
+	method result)
+    (while (setq method (pop methods))
+      (when (and (not (mm-inline-override-p handle))
+		 (string-match method type))
+	(setq result t
+	      methods nil)))
+    result))
+
 (defun mm-inlinable-p (handle)
   "Say whether HANDLE can be displayed inline."
   (let ((alist mm-inline-media-tests)
@@ -704,28 +838,14 @@ external if displayed external."
       (pop alist))
     test))
 
-(defun mm-automatic-display-p (handle)
-  "Say whether the user wants HANDLE to be displayed automatically."
-  (let ((methods mm-automatic-display)
-	(type (mm-handle-media-type handle))
-	method result)
-    (while (setq method (pop methods))
-      (when (and (not (mm-inline-override-p handle))
-		 (string-match method type)
-		 (mm-inlinable-p handle))
-	(setq result t
-	      methods nil)))
-    result))
-
 (defun mm-inlined-p (handle)
-  "Say whether the user wants HANDLE to be displayed automatically."
+  "Say whether the user wants HANDLE to be displayed inline."
   (let ((methods mm-inlined-types)
 	(type (mm-handle-media-type handle))
 	method result)
     (while (setq method (pop methods))
       (when (and (not (mm-inline-override-p handle))
-		 (string-match method type)
-		 (mm-inlinable-p handle))
+		 (string-match method type))
 	(setq result t
 	      methods nil)))
     result))
@@ -793,21 +913,52 @@ external if displayed external."
     (save-excursion
       (if (member (mm-handle-media-supertype handle) '("text" "message"))
 	  (with-temp-buffer
- 	    (insert-buffer-substring (mm-handle-buffer handle))
-	    (mm-decode-content-transfer-encoding
-	     (mm-handle-encoding handle)
-	     (mm-handle-media-type handle))
-	    (let ((temp (current-buffer)))
-	      (set-buffer cur)
-	      (insert-buffer-substring temp)))
+	    (insert-buffer-substring (mm-handle-buffer handle))
+	    (prog1
+		(mm-decode-content-transfer-encoding
+		 (mm-handle-encoding handle)
+		 (mm-handle-media-type handle))
+	      (let ((temp (current-buffer)))
+		(set-buffer cur)
+		(insert-buffer-substring temp))))
 	(mm-with-unibyte-buffer
 	  (insert-buffer-substring (mm-handle-buffer handle))
-	  (mm-decode-content-transfer-encoding
-	   (mm-handle-encoding handle)
-	   (mm-handle-media-type handle))
-	  (let ((temp (current-buffer)))
-	    (set-buffer cur)
-	    (insert-buffer-substring temp)))))))
+	  (prog1
+	      (mm-decode-content-transfer-encoding
+	       (mm-handle-encoding handle)
+	       (mm-handle-media-type handle))
+	    (let ((temp (current-buffer)))
+	      (set-buffer cur)
+	      (insert-buffer-substring temp))))))))
+
+(defun mm-file-name-delete-whitespace (file-name)
+  "Remove all whitespace characters from FILE-NAME."
+  (while (string-match "\\s-+" file-name)
+    (setq file-name (replace-match "" t t file-name)))
+  file-name)
+
+(defun mm-file-name-trim-whitespace (file-name)
+  "Remove leading and trailing whitespace characters from FILE-NAME."
+  (when (string-match "\\`\\s-+" file-name)
+    (setq file-name (substring file-name (match-end 0))))
+  (when (string-match "\\s-+\\'" file-name)
+    (setq file-name (substring file-name 0 (match-beginning 0))))
+  file-name)
+
+(defun mm-file-name-collapse-whitespace (file-name)
+  "Collapse multiple whitespace characters in FILE-NAME."
+  (while (string-match "\\s-\\s-+" file-name)
+    (setq file-name (replace-match " " t t file-name)))
+  file-name)
+
+(defun mm-file-name-replace-whitespace (file-name)
+  "Replace whitespace characters in FILE-NAME with underscores.
+Set `mm-file-name-replace-whitespace' to any other string if you do not
+like underscores."
+  (let ((s (or mm-file-name-replace-whitespace "_")))
+    (while (string-match "\\s-" file-name)
+      (setq file-name (replace-match s t t file-name))))
+  file-name)
 
 (defun mm-save-part (handle)
   "Write HANDLE to a file."
@@ -816,7 +967,8 @@ external if displayed external."
 		    (mm-handle-disposition handle) 'filename))
 	 file)
     (when filename
-      (setq filename (file-name-nondirectory filename)))
+      (setq filename (gnus-map-function mm-file-name-rewrite-functions
+					(file-name-nondirectory filename))))
     (setq file
 	  (read-file-name "Save MIME part to: "
 			  (expand-file-name
@@ -849,7 +1001,8 @@ external if displayed external."
 	  (read-string "Shell command on MIME part: " mm-last-shell-command)))
     (mm-with-unibyte-buffer
       (mm-insert-part handle)
-      (shell-command-on-region (point-min) (point-max) command nil))))
+      (let ((coding-system-for-write 'binary))
+	(shell-command-on-region (point-min) (point-max) command nil)))))
 
 (defun mm-interactively-view-part (handle)
   "Display HANDLE using METHOD."
@@ -902,6 +1055,35 @@ external if displayed external."
   "Return the handle(s) referred to by ID."
   (cdr (assoc id mm-content-id-alist)))
 
+(defconst mm-image-type-regexps
+  '(("/\\*.*XPM.\\*/" . xpm)
+    ("P[1-6]" . pbm)
+    ("GIF8" . gif)
+    ("\377\330" . jpeg)
+    ("\211PNG\r\n" . png)
+    ("#define" . xbm)
+    ("\\(MM\0\\*\\)\\|\\(II\\*\0\\)" . tiff)
+    ("%!PS" . postscript))
+  "Alist of (REGEXP . IMAGE-TYPE) pairs used to auto-detect image types.
+When the first bytes of an image file match REGEXP, it is assumed to
+be of image type IMAGE-TYPE.")
+
+;; Steal from image.el. image-type-from-data suffers multi-line matching bug.
+(defun mm-image-type-from-buffer ()
+  "Determine the image type from data in the current buffer.
+Value is a symbol specifying the image type or nil if type cannot
+be determined."
+  (let ((types mm-image-type-regexps)
+	type)
+    (goto-char (point-min))
+    (while (and types (null type))
+      (let ((regexp (car (car types)))
+	    (image-type (cdr (car types))))
+	(when (looking-at regexp)
+	  (setq type image-type))
+	(setq types (cdr types))))
+    type))
+
 (defun mm-get-image (handle)
   "Return an image instance based on HANDLE."
   (let ((type (mm-handle-media-subtype handle))
@@ -922,31 +1104,40 @@ external if displayed external."
 	  (prog1
 	      (setq spec
 		    (ignore-errors
-		     ;; Avoid testing `make-glyph' since W3 may define
-		     ;; a bogus version of it.
+		      ;; Avoid testing `make-glyph' since W3 may define
+		      ;; a bogus version of it.
 		      (if (fboundp 'create-image)
-			  (create-image (buffer-string) (intern type) 'data-p)
-			(cond
-			 ((equal type "xbm")
-			  ;; xbm images require special handling, since
-			  ;; the only way to create glyphs from these
-			  ;; (without a ton of work) is to write them
-			  ;; out to a file, and then create a file
-			  ;; specifier.
-			  (let ((file (make-temp-name
-				       (expand-file-name "emm.xbm"
-							 mm-tmp-directory))))
-			    (unwind-protect
-				(progn
-				  (write-region (point-min) (point-max) file)
-				  (make-glyph (list (cons 'x file))))
-			      (ignore-errors
-			       (delete-file file)))))
-			 (t
-			  (make-glyph
-			   (vector (intern type) :data (buffer-string))))))))
+			  (create-image (buffer-string) 
+					(or (mm-image-type-from-buffer)
+					    (intern type))
+					'data-p)
+			(mm-create-image-xemacs type))))
 	    (mm-handle-set-cache handle spec))))))
 
+(defun mm-create-image-xemacs (type)
+  (cond
+   ((equal type "xbm")
+    ;; xbm images require special handling, since
+    ;; the only way to create glyphs from these
+    ;; (without a ton of work) is to write them
+    ;; out to a file, and then create a file
+    ;; specifier.
+    (let ((file (make-temp-name
+		 (expand-file-name "emm.xbm"
+				   mm-tmp-directory))))
+      (unwind-protect
+	  (progn
+	    (write-region (point-min) (point-max) file)
+	    (make-glyph (list (cons 'x file))))
+	(ignore-errors
+	  (delete-file file)))))
+   (t
+    (make-glyph
+     (vector 
+      (or (mm-image-type-from-buffer)
+	  (intern type))
+      :data (buffer-string))))))
+  
 (defun mm-image-fit-p (handle)
   "Say whether the image in HANDLE will fit the current window."
   (let ((image (mm-get-image handle)))
@@ -1051,10 +1242,22 @@ If RECURSIVE, search recursively."
 			 (car handle))))
 
 (defun mm-possibly-verify-or-decrypt (parts ctl)
-  (let ((subtype (cadr (split-string (car ctl) "/")))
+  (let ((type (car ctl))
+	(subtype (cadr (split-string (car ctl) "/")))
 	(mm-security-handle ctl) ;; (car CTL) is the type.
 	protocol func functest)
     (cond
+     ((or (equal type "application/x-pkcs7-mime")
+	  (equal type "application/pkcs7-mime"))
+      (with-temp-buffer
+	(when (and (cond
+		    ((eq mm-decrypt-option 'never) nil)
+		    ((eq mm-decrypt-option 'always) t)
+		    ((eq mm-decrypt-option 'known) t)
+		    (t (y-or-n-p
+			(format "Decrypt (S/MIME) part? "))))
+		   (mm-view-pkcs7 parts))
+	  (setq parts (mm-dissect-buffer t)))))
      ((equal subtype "signed")
       (unless (and (setq protocol
 			 (mm-handle-multipart-ctl-parameter ctl 'protocol))
@@ -1123,17 +1326,26 @@ If RECURSIVE, search recursively."
     parts))
 
 (defun mm-multiple-handles (handles)
-   (and (listp (car handles)) 
-	(> (length handles) 1)))
+  (and (listp (car handles))
+       (> (length handles) 1)))
 
-(defun mm-merge-handles (handles1 handles2) 
+(defun mm-merge-handles (handles1 handles2)
   (append
-   (if (listp (car handles1)) 
+   (if (listp (car handles1))
        handles1
      (list handles1))
    (if (listp (car handles2))
        handles2
      (list handles2))))
+
+(defun mm-readable-p (handle)
+  "Say whether the content of HANDLE is readable."
+  (and (< (with-current-buffer (mm-handle-buffer handle)
+	    (buffer-size)) 10000)
+       (mm-with-unibyte-buffer
+	 (mm-insert-part handle)
+	 (and (eq (mm-body-7-or-8) '7bit)
+	      (not (mm-long-lines-p 76))))))
 
 (provide 'mm-decode)
 

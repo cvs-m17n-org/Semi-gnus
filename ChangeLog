@@ -1,3 +1,94 @@
+2001-12-18  Josh Huber  <huber@alum.wpi.edu>
+
+	* ChangeLog, todo: (oops) changed buffer-file-coding-system back
+	to coding.
+
+2001-12-18  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Ensure nonempty variable value.  Reported by Frank
+	Haun <pille3000@gmx.net>.
+
+2001-12-18 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* ChangeLog, todo: Add `coding'.
+
+2001-12-17  Josh Huber  <huber@alum.wpi.edu>
+
+	* ChangeLog: changed coding to buffer-file-coding-system
+	* todo: same
+
+2001-12-10  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Code cleanup.  Fix a bug with "/copy".  From Frank
+	Schmitt <ich@Frank-Schmitt.net>.
+
+2001-11-26  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Use parameter "/copy" rather than "copy" for increased
+	dwimishness for old-time DOS users.  From Frank Schmitt
+	<ich@Frank-Schmitt.net>.
+
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	* etc/gnus/unimportant.xpm, etc/gnus/important.xpm: New files.
+
+2001-11-11  Simon Josefsson  <jas@extundo.com>
+
+	* make-x.bat: Don't use -nw.  Suggested by Frank Haun
+	<pille3000@gmx.net>.
+
+2001-11-01 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* etc/smilies/blink.xpm: New set of xpm. From Oliver Scholz
+	<oscholz@my.gnus.org>.
+
+2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* etc/smilies/sad.pbm: New bitmap.
+	* etc/smilies/blink.pbm: Ditto.
+	Contributed by Kim F. Storm <storm@cua.dk>.
+
+2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Frank Schmitt <ich@Frank-Schmitt.net>. 
+	
+	* make-x.bat: Use correct directory structure for XEmacs on Windows.
+
+2001-10-06 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (uninstall): Add.
+	
+	* etc/Makefile.in (uninstall): Add.
+
+2001-09-27 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4 (GNUS_CHECK_FONTS): Typo. Use /dev/null as latex input.
+
+2001-09-27 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4, configure.in: Check commercial fonts.
+
+2001-09-24 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* configure.in: Generate texi/ps/Makefile.
+
+2001-09-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make.bat: Use parameter "/copy" rather than "copy" for increased
+	dwimishness for old-time DOS users.
+
+2001-09-18 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* make-x.bat: New.
+
+2001-07-04  Yair Friedman  <yairfr@Amdocs.com>
+
+	* make.bat: Use infohack.el to create info files.
+
+2001-05-17  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* etc/Makefile.in (datadir): Set this variable, like in the other
+	Makefile.in's.  Patch from Gaute B Strokkenes <gs234@cam.ac.uk>.
+
 2001-02-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* GNUS-NEWS: Copyright and others.

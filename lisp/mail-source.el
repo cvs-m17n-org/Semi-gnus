@@ -36,6 +36,7 @@
   (autoload 'nnheader-run-at-time "nnheader"))
 (require 'format-spec)
 (require 'mm-util)
+(require 'message) ;; for `message-directory'
 
 (defgroup mail-source nil
   "The mail-fetching library."
@@ -223,12 +224,17 @@ If non-nil, this maildrop will be checked periodically for new mail."
   :group 'mail-source
   :type 'sexp)
 
+(defcustom mail-source-flash t
+  "*If non-nil, flash periodically when mail is available."
+  :group 'mail-source
+  :type 'boolean)
+
 (defcustom mail-source-crash-box "~/.emacs-mail-crash-box"
   "File where mail will be stored while processing it."
   :group 'mail-source
   :type 'file)
 
-(defcustom mail-source-directory "~/Mail/"
+(defcustom mail-source-directory message-directory
   "Directory where files (if any) will be stored."
   :group 'mail-source
   :type 'directory)
@@ -257,6 +263,11 @@ If non-nil, this maildrop will be checked periodically for new mail."
   "Number of idle seconds to wait before checking for new mail."
   :group 'mail-source
   :type 'number)
+
+(defcustom mail-source-movemail-program nil
+  "If non-nil, name of program for fetching new mail."
+  :group 'mail-source
+  :type '(choice (const nil) string))
 
 ;;; Internal variables.
 
@@ -444,13 +455,15 @@ Return the number of files that were found."
 	      (setq found (mail-source-callback
 			   callback mail-source-crash-box)))
 	    (+ found
-	       (condition-case err
+	       (if (or debug-on-quit debug-on-error)
 		   (funcall function source callback)
-		 (error
-		  (unless (yes-or-no-p
-			   (format "Mail source error (%s).  Continue? " err))
-		    (error "Cannot get new mail."))
-		  0))))))))
+		 (condition-case err
+		     (funcall function source callback)
+		   (error
+		    (unless (yes-or-no-p
+			     (format "Mail source error (%s).  Continue? " err))
+		      (error "Cannot get new mail"))
+		    0)))))))))
 
 (defun mail-source-make-complex-temp-name (prefix)
   (let ((newname (make-temp-name prefix))
@@ -517,11 +530,13 @@ Pass INFO on to CALLBACK."
 		       'call-process
 		       (append
 			(list
-			 (expand-file-name "movemail" exec-directory)
+			 (or mail-source-movemail-program
+			     (expand-file-name "movemail" exec-directory))
 			 nil errors nil from to)))))
 	      (when (file-exists-p to)
 		(set-file-modes to mail-source-default-file-modes))
-	      (if (and (not (buffer-modified-p errors))
+	      (if (and (or (not (buffer-modified-p errors))
+			   (zerop (buffer-size errors)))
 		       (zerop result))
 		  ;; No output => movemail won.
 		  t
@@ -662,15 +677,17 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    (pop3-port port)
 		    (pop3-authentication-scheme
 		     (if (eq authentication 'apop) 'apop 'pass)))
-		(condition-case err
+		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-movemail mail-source-crash-box))
-		  (error
-		   ;; We nix out the password in case the error
-		   ;; was because of a wrong password being given.
-		   (setq mail-source-password-cache
-			 (delq (assoc from mail-source-password-cache)
-			       mail-source-password-cache))
-		   (signal (car err) (cdr err))))))))
+		  (condition-case err
+		      (save-excursion (pop3-movemail mail-source-crash-box))
+		    (error
+		     ;; We nix out the password in case the error
+		     ;; was because of a wrong password being given.
+		     (setq mail-source-password-cache
+			   (delq (assoc from mail-source-password-cache)
+				 mail-source-password-cache))
+		     (signal (car err) (cdr err)))))))))
       (if result
 	  (progn
 	    (when (eq authentication 'password)
@@ -721,15 +738,17 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    (pop3-port port)
 		    (pop3-authentication-scheme
 		     (if (eq authentication 'apop) 'apop 'pass)))
-		(condition-case err
+		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-get-message-count))
-		  (error
-		   ;; We nix out the password in case the error
-		   ;; was because of a wrong password being given.
-		   (setq mail-source-password-cache
-			 (delq (assoc from mail-source-password-cache)
-			       mail-source-password-cache))
-		   (signal (car err) (cdr err))))))))
+		  (condition-case err
+		      (save-excursion (pop3-get-message-count))
+		    (error
+		     ;; We nix out the password in case the error
+		     ;; was because of a wrong password being given.
+		     (setq mail-source-password-cache
+			   (delq (assoc from mail-source-password-cache)
+				 mail-source-password-cache))
+		     (signal (car err) (cdr err)))))))))
       (if result
 	  ;; Inform display-time that we have new mail.
 	  (setq mail-source-new-mail-available (> result 0))
@@ -742,6 +761,10 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun mail-source-new-mail-p ()
   "Handler for `display-time' to indicate when new mail is available."
+  ;; Flash (ie. ring the visible bell) if mail is available.
+  (if (and mail-source-flash mail-source-new-mail-available)
+      (let ((visible-bell t))
+	(ding)))
   ;; Only report flag setting; flag is updated on a different schedule.
   mail-source-new-mail-available)
 
@@ -764,8 +787,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 	   mail-source-idle-time-delay
 	   nil
 	   (lambda ()
-	     (mail-source-check-pop mail-source-primary-source)
-	     (setq mail-source-report-new-mail-idle-timer nil))))
+	     (unwind-protect
+		 (mail-source-check-pop mail-source-primary-source)
+	       (setq mail-source-report-new-mail-idle-timer nil)))))
     ;; Since idle timers created when Emacs is already in the idle
     ;; state don't get activated until Emacs _next_ becomes idle, we
     ;; need to force our timer to be considered active now.  We do
@@ -778,7 +802,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 This only works when `display-time' is enabled."
   (interactive "P")
   (if (not mail-source-primary-source)
-      (error "Need to set `mail-source-primary-source' to check for new mail."))
+      (error "Need to set `mail-source-primary-source' to check for new mail"))
   (let ((on (if (null arg)
 		(not mail-source-report-new-mail)
 	      (> (prefix-numeric-value arg) 0))))
@@ -889,7 +913,11 @@ This only works when `display-time' is enabled."
 		  (push (cons from imap-password) mail-source-password-cache)))
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
-		(when (setq str (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf))
+		(when (setq str
+			    (if (imap-capability 'IMAP4rev1 buf)
+				(caddar (imap-fetch uid "BODY.PEEK[]"
+						    'BODYDETAIL nil buf))
+			      (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf)))
 		  (push uid remove)
 		  (insert "From imap " (current-time-string) "\n")
 		  (save-excursion
@@ -905,7 +933,7 @@ This only works when `display-time' is enabled."
 	       fetchflag nil buf))
 	    (if dontexpunge
 		(imap-mailbox-unselect buf)
-	      (imap-mailbox-close buf))
+	      (imap-mailbox-close nil buf))
 	    (imap-close buf))
 	(imap-close buf)
 	;; We nix out the password in case the error

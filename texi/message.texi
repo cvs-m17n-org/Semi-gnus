@@ -18,7 +18,7 @@
 
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -351,8 +351,9 @@ times, you will get back the un-edited message you're responding to.
 @node Header Commands
 @section Header Commands
 
-All these commands move to the header in question.  If it doesn't exist,
-it will be inserted.
+All these commands move to the header in question (except for the
+@samp{Importance:} related commands).  If it doesn't exist, it will be
+inserted.
 
 @table @kbd
 
@@ -416,6 +417,27 @@ Go to the @code{Keywords} header (@code{message-goto-keywords}).
 @findex message-goto-summary
 Go to the @code{Summary} header (@code{message-goto-summary}).
 
+@item C-c C-f C-i
+@kindex C-c C-f C-i
+@findex message-insert-or-toggle-importance
+This inserts the @samp{Importance:} header with a value of
+@samp{high}.  This header is used to signal the importance of the
+message to the receiver.  If the header is already present in the
+buffer, it cycles between the three valid values according to RFC
+1376: @samp{low}, @samp{normal} and @samp{high}.
+
+@item M-x message-insert-importance-high
+@kindex M-x message-insert-importance-high
+@findex message-insert-importance-high
+Insert a @samp{Importance:} header with a value of @samp{high},
+deleting headers if necessary.
+
+@item M-x message-insert-importance-low
+@kindex M-x message-insert-importance-low
+@findex message-insert-importance-low
+Insert a @samp{Importance:} header with a value of @samp{low},
+deleting headers if necessary.
+
 @end table
 
 
@@ -434,6 +456,13 @@ Move to the beginning of the body of the message
 @findex message-goto-signature
 Move to the signature of the message (@code{message-goto-signature}).
 
+@item C-a
+@kindex C-a
+@findex message-beginning-of-line
+If at beginning of header value, go to beginning of line, else go to
+beginning of header value.  (The header value comes after the header
+name and the colon.)
+
 @end table
 
 
@@ -448,8 +477,8 @@ Move to the signature of the message (@code{message-goto-signature}).
 Yank the message that's being replied to into the message buffer
 (@code{message-yank-original}).
 
-@item C-c M-C-y
-@kindex C-c M-C-y
+@item C-c C-M-y
+@kindex C-c C-M-y
 @findex message-yank-buffer
 Prompt for a buffer name and yank the contents of that buffer into the
 message buffer (@code{message-yank-buffer}).
@@ -475,88 +504,6 @@ Insert a signature at the end of the buffer
 Insert the message headers (@code{message-insert-headers}).
 
 @end table
-
-@table @code
-@item message-ignored-cited-headers
-@vindex message-ignored-cited-headers
-All headers that match this regexp will be removed from yanked
-messages.  The default is @samp{.}, which means that all headers will be
-removed.
-
-@item message-cite-prefix-regexp
-@vindex message-cite-prefix-regexp
-Regexp matching the longest possible citation prefix on a line.
-
-@item message-citation-line-function
-@vindex message-citation-line-function
-Function called to insert the citation line.  The default is
-@code{message-insert-citation-line}, which will lead to citation lines
-that look like:
-
-@example
-Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
-@end example
-
-Point will be at the beginning of the body of the message when this
-function is called.
-
-@item message-yank-prefix
-@vindex message-yank-prefix
-@cindex yanking
-@cindex quoting
-When you are replying to or following up an article, you normally want
-to quote the person you are answering.  Inserting quoted text is done by
-@dfn{yanking}, and each quoted line you yank will have
-@code{message-yank-prefix} prepended to it.  The default is @samp{> }.
-
-@item message-indentation-spaces
-@vindex message-indentation-spaces
-Number of spaces to indent yanked messages.
-
-@item message-cite-function
-@vindex message-cite-function
-@findex message-cite-original
-@findex sc-cite-original
-@findex message-cite-original-without-signature
-@cindex Supercite
-Function for citing an original message.  The default is
-@code{message-cite-original}, which simply inserts the original message
-and prepends @samp{> } to each line.
-@code{message-cite-original-without-signature} does the same, but elides
-the signature.  You can also set it to @code{sc-cite-original} to use
-Supercite.
-
-@item message-indent-citation-function
-@vindex message-indent-citation-function
-Function for modifying a citation just inserted in the mail buffer.
-This can also be a list of functions.  Each function can find the
-citation between @code{(point)} and @code{(mark t)}.  And each function
-should leave point and mark around the citation text as modified.
-
-@item message-signature
-@vindex message-signature
-String to be inserted at the end of the message buffer.  If @code{t}
-(which is the default), the @code{message-signature-file} file will be
-inserted instead.  If a function, the result from the function will be
-used instead.  If a form, the result from the form will be used instead.
-If this variable is @code{nil}, no signature will be inserted at all.
-
-@item message-signature-file
-@vindex message-signature-file
-File containing the signature to be inserted at the end of the buffer.
-The default is @samp{~/.signature}.
-
-@end table
-
-Note that RFC1036bis says that a signature should be preceded by the three
-characters @samp{-- } on a line by themselves.  This is to make it
-easier for the recipient to automatically recognize and process the
-signature.  So don't remove those characters, even though you might feel
-that they ruin your beautiful design, like, totally.
-
-Also note that no signature should be more than four lines long.
-Including ASCII graphics is an efficient way to get everybody to believe
-that you are silly and have nothing important to say.
 
 
 @node MIME
@@ -584,15 +531,17 @@ Manual}).
 @section Security
 @cindex Security
 @cindex S/MIME
+@cindex PGP
 @cindex PGP/MIME
 @cindex sign
 @cindex encrypt
 
 Using the MML language, Message is able to create digitally signed and
-digitally encrypted messages.  Message (or rather MML) currently support
-PGP/MIME and S/MIME.  Instructing MML to perform security operations on
-a MIME part is done using the @code{C-c C-m s} key map for signing and the
-@code{C-c C-m c} key map for encryption, as follows.
+digitally encrypted messages.  Message (or rather MML) currently
+support PGP (RFC 1991), PGP/MIME (RFC 2015/3156) and S/MIME.
+Instructing MML to perform security operations on a MIME part is done
+using the @code{C-c C-m s} key map for signing and the @code{C-c C-m
+c} key map for encryption, as follows.
 
 @table @kbd
 
@@ -601,6 +550,12 @@ a MIME part is done using the @code{C-c C-m s} key map for signing and the
 @findex mml-secure-sign-smime
 
 Digitally sign current MIME part using S/MIME.
+
+@item C-c C-m s o
+@kindex C-c C-m s o
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP.
 
 @item C-c C-m s p
 @kindex C-c C-m s p
@@ -613,6 +568,12 @@ Digitally sign current MIME part using PGP/MIME.
 @findex mml-secure-encrypt-smime
 
 Digitally encrypt current MIME part using S/MIME.
+
+@item C-c C-m c o
+@kindex C-c C-m c o
+@findex mml-secure-encrypt-pgp
+
+Digitally encrypt current MIME part using PGP.
 
 @item C-c C-m c p
 @kindex C-c C-m c p
@@ -653,7 +614,7 @@ modern cryptography, S/MIME, various PKCS standards, OpenSSL and so on.
 
 The S/MIME support in Message (and MML) require OpenSSL.  OpenSSL
 perform the actual S/MIME sign/encrypt operations.  OpenSSL can be found
-at @code{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
+at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
 Version 0.9.5a cannot extract mail addresses from certificates, and it
 insert a spurious CR character into MIME separators so you may wish to
 avoid it if you would like to avoid being regarded as someone who send
@@ -703,9 +664,9 @@ care in handling it.
 @subsection Using PGP/MIME
 
 PGP/MIME requires an external OpenPGP implementation, such as GNU
-Privacy Guard (@code{http://www.gnupg.org/}).  It also requires an Emacs
+Privacy Guard (@uref{http://www.gnupg.org/}).  It also requires an Emacs
 interface to it, such as Mailcrypt (available from
-@code{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
+@uref{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
 Florian Weimer's @code{gpg.el}.
 
 Creating your own OpenPGP key is described in detail in the
@@ -746,7 +707,7 @@ Delete all text in the body of the message that is outside the region
 
 @item M-RET
 @kindex M-RET
-@kindex message-newline-and-reformat
+@findex message-newline-and-reformat
 Insert four newlines, and then reformat if inside quoted text.
 
 Here's an example:
@@ -901,6 +862,7 @@ installed.
 * Mail Variables::              Other mail variables.
 * News Headers::                Customizing news headers.
 * News Variables::              Other news variables.
+* Insertion Variables::         Customizing how things are inserted.
 * Various Message Variables::   Other message variables.
 * Sending Variables::           Variables for sending.
 * Message Buffers::             How Message names its buffers.
@@ -971,6 +933,9 @@ buffers.
 
 @item message-subject-re-regexp
 @vindex message-subject-re-regexp
+@cindex Aw:
+@cindex Sv:
+@cindex Re:
 Responses to messages have subjects that start with @samp{Re: }.  This
 is @emph{not} an abbreviation of the English word ``response'', but is
 Latin, and means ``in response to''.  Some illiterate nincompoops have
@@ -980,6 +945,14 @@ to use abonimations like @samp{Aw: } (``antwort'') or @samp{Sv: }
 have to deal with users that use these evil tools, in which case you may
 set this variable to a regexp that matches these prefixes.  Myself, I
 just throw away non-compliant mail.
+
+Here's an example of a value to deal with these headers when
+responding to a message:
+
+@lisp
+(setq message-subject-re-regexp
+     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\))
+@end lisp
 
 @item message-alternative-emails
 @vindex message-alternative-emails
@@ -1018,9 +991,15 @@ buffers that are initialized as mail.
 @table @code
 @item message-send-mail-function
 @vindex message-send-mail-function
-Function used to send the current buffer as mail.  The default is
-@code{message-send-mail-with-sendmail}.   If you prefer using MH
-instead, set this variable to @code{message-send-mail-with-mh}.
+@findex message-send-mail-with-sendmail
+@findex message-send-mail-with-mh
+@findex message-send-mail-with-qmail
+@findex smtpmail-send-it
+@findex feedmail-send-it
+Function used to send the current buffer as mail. The default is
+@code{message-send-mail-with-sendmail}. Other valid values include
+@code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
+@code{smtpmail-send-it} and @code{feedmail-send-it}.
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1238,6 +1217,111 @@ posting a prepared news message.
 @end table
 
 
+@node Insertion Variables
+@section Insertion Variables
+
+@table @code
+@item message-ignored-cited-headers
+@vindex message-ignored-cited-headers
+All headers that match this regexp will be removed from yanked
+messages.  The default is @samp{.}, which means that all headers will be
+removed.
+
+@item message-cite-prefix-regexp
+@vindex message-cite-prefix-regexp
+Regexp matching the longest possible citation prefix on a line.
+
+@item message-citation-line-function
+@vindex message-citation-line-function
+@cindex attribution line
+Function called to insert the citation line.  The default is
+@code{message-insert-citation-line}, which will lead to citation lines
+that look like:
+
+@example
+Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
+@end example
+
+Point will be at the beginning of the body of the message when this
+function is called.
+
+Note that Gnus provides a feature where clicking on `writes:' hides the
+cited text.  If you change the citation line too much, readers of your
+messages will have to adjust their Gnus, too.  See the variable
+@code{gnus-cite-attribution-suffix}.  @xref{Article Highlighting, ,
+Article Highlighting, gnus}, for details.
+
+@item message-yank-prefix
+@vindex message-yank-prefix
+@cindex yanking
+@cindex quoting
+When you are replying to or following up an article, you normally want
+to quote the person you are answering.  Inserting quoted text is done
+by @dfn{yanking}, and each line you yank will have
+@code{message-yank-prefix} prepended to it (except for quoted and
+empty lines which uses @code{message-yank-cited-prefix}). The default
+is @samp{> }.
+
+@item message-yank-cited-prefix
+@vindex message-yank-cited-prefix
+@cindex yanking
+@cindex cited
+@cindex quoting
+When yanking text from a article which contains no text or already
+cited text, each line will be prefixed with the contents of this
+variable.  The default is @samp{>}.  See also
+@code{message-yank-prefix}.
+
+@item message-indentation-spaces
+@vindex message-indentation-spaces
+Number of spaces to indent yanked messages.
+
+@item message-cite-function
+@vindex message-cite-function
+@findex message-cite-original
+@findex sc-cite-original
+@findex message-cite-original-without-signature
+@cindex Supercite
+Function for citing an original message.  The default is
+@code{message-cite-original}, which simply inserts the original message
+and prepends @samp{> } to each line.
+@code{message-cite-original-without-signature} does the same, but elides
+the signature.  You can also set it to @code{sc-cite-original} to use
+Supercite.
+
+@item message-indent-citation-function
+@vindex message-indent-citation-function
+Function for modifying a citation just inserted in the mail buffer.
+This can also be a list of functions.  Each function can find the
+citation between @code{(point)} and @code{(mark t)}.  And each function
+should leave point and mark around the citation text as modified.
+
+@item message-signature
+@vindex message-signature
+String to be inserted at the end of the message buffer.  If @code{t}
+(which is the default), the @code{message-signature-file} file will be
+inserted instead.  If a function, the result from the function will be
+used instead.  If a form, the result from the form will be used instead.
+If this variable is @code{nil}, no signature will be inserted at all.
+
+@item message-signature-file
+@vindex message-signature-file
+File containing the signature to be inserted at the end of the buffer.
+The default is @samp{~/.signature}.
+
+@end table
+
+Note that RFC1036bis says that a signature should be preceded by the three
+characters @samp{-- } on a line by themselves.  This is to make it
+easier for the recipient to automatically recognize and process the
+signature.  So don't remove those characters, even though you might feel
+that they ruin your beautiful design, like, totally.
+
+Also note that no signature should be more than four lines long.
+Including ASCII graphics is an efficient way to get everybody to believe
+that you are silly and have nothing important to say.
+
+
 @node Various Message Variables
 @section Various Message Variables
 
@@ -1381,7 +1465,7 @@ the mailed copy.  If the string contains the format spec @samp{%s}, the
 newsgroups the article has been posted to will be inserted there.  If
 this variable is @code{nil}, no such courtesy message will be added.
 The default value is @samp{"The following message is a courtesy copy of
-an article\nthat has been posted to %s as well.\n\n"}.
+an article\\nthat has been posted to %s as well.\\n\\n"}.
 
 @end table
 

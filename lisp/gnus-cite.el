@@ -1,6 +1,6 @@
-;;; gnus-cite.el --- parse citations in articles for Gnus  -*- coding: iso-latin-1 -*-
+;;; gnus-cite.el --- parse citations in articles for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abhiddenware
@@ -471,8 +471,8 @@ always hide."
 			  gnus-hidden-properties))
 	    (point (point-min))
 	    found beg end start)
-	(while (setq point 
-		     (text-property-any point (point-max) 
+	(while (setq point
+		     (text-property-any point (point-max)
 					'gnus-callback
 					'gnus-article-toggle-cited-text))
 	  (setq found t)
@@ -510,6 +510,7 @@ always hide."
 		      (setq beg nil)
 		  (setq end (point-marker))))))
 	    (when (and beg end)
+	      (gnus-add-wash-type 'cite)
 	      ;; We use markers for the end-points to facilitate later
 	      ;; wrapping and mangling of text.
 	      (setq beg (set-marker (make-marker) beg)
@@ -548,14 +549,20 @@ means show, nil means toggle."
 	      (and (> arg 0) (not hidden))
 	      (and (< arg 0) hidden))
       (if hidden
-	  (gnus-remove-text-properties-when
-	   'article-type 'cite beg end 
-	   (cons 'article-type (cons 'cite
-				     gnus-hidden-properties)))
+	  (progn
+	    ;; Can't remove 'cite from g-a-wash-types here because
+	    ;; multiple citations may be hidden -jas
+	    (gnus-remove-text-properties-when
+	     'article-type 'cite beg end
+	     (cons 'article-type (cons 'cite
+				       gnus-hidden-properties))))
+	(gnus-add-wash-type 'cite)
 	(gnus-add-text-properties-when
-	 'article-type nil beg end 
+	 'article-type nil beg end
 	 (cons 'article-type (cons 'cite
 				   gnus-hidden-properties))))
+      (let ((gnus-article-mime-handle-alist-1 gnus-article-mime-handle-alist))
+	(gnus-set-mode-line 'article))
       (save-excursion
 	(goto-char start)
 	(gnus-delete-line)
@@ -953,14 +960,20 @@ See also the documentation for `gnus-article-highlight-citation'."
 	(goto-char (point-min))
 	(forward-line (1- number))
 	(cond ((get-text-property (point) 'invisible)
+	       ;; Can't remove 'cite from g-a-wash-types here because
+	       ;; multiple citations may be hidden -jas
 	       (remove-text-properties (point) (progn (forward-line 1) (point))
 				       gnus-hidden-properties))
 	      ((assq number gnus-cite-attribution-alist))
 	      (t
+	       (gnus-add-wash-type 'cite)
 	       (gnus-add-text-properties
 		(point) (progn (forward-line 1) (point))
 		(nconc (list 'article-type 'cite)
-		       gnus-hidden-properties))))))))
+		       gnus-hidden-properties))))
+	(let ((gnus-article-mime-handle-alist-1
+	       gnus-article-mime-handle-alist))
+	  (gnus-set-mode-line 'article))))))
 
 (defun gnus-cite-find-prefix (line)
   ;; Return citation prefix for LINE.

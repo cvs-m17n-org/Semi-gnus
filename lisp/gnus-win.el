@@ -29,6 +29,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'gnus)
+(require 'gnus-util)
 
 (defgroup gnus-windows nil
   "Window configuration."
@@ -57,6 +58,13 @@
   :group 'gnus-windows
   :type 'boolean)
 
+(defcustom gnus-use-frames-on-any-display nil
+  "*If non-nil, frames on all displays will be considered useable by Gnus.
+When nil, only frames on the same display as the selected frame will be
+used to display Gnus windows."
+  :group 'gnus-windows
+  :type 'boolean)
+
 (defvar gnus-buffer-configuration
   '((group
      (vertical 1.0
@@ -68,17 +76,6 @@
 	       (if gnus-carpal '(summary-carpal 4))))
     (article
      (cond
-      ((and gnus-use-picons
-	    (eq gnus-picons-display-where 'picons))
-       '(frame 1.0
-	       (vertical 1.0
-			 (summary 0.25 point)
-			 (if gnus-carpal '(summary-carpal 4))
-			 (article 1.0))
-	       (vertical ((height . 5) (width . 15)
-			  (user-position . t)
-			  (left . -1) (top . 1))
-			 (picons 1.0))))
       (gnus-use-trees
        '(vertical 1.0
 		  (summary 0.25 point)
@@ -145,7 +142,7 @@
 	       ("*Shell Command Output*" 1.0)))
     (bug
      (vertical 1.0
-	       ("*Gnus Help Bug*" 0.5)
+	       (if gnus-bug-create-help-buffer '("*Gnus Help Bug*" 0.5))
 	       ("*Gnus Bug*" 1.0 point)))
     (score-trace
      (vertical 1.0
@@ -165,7 +162,10 @@
     (compose-bounce
      (vertical 1.0
 	       (article 0.5)
-	       (message 1.0 point))))
+	       (message 1.0 point)))
+    (display-term
+      (vertical 1.0
+		("*display*" 1.0))))
   "Window configuration for all possible Gnus buffers.
 See the Gnus manual for an explanation of the syntax used.")
 
@@ -187,7 +187,6 @@ See the Gnus manual for an explanation of the syntax used.")
     (mail . gnus-message-buffer)
     (post-news . gnus-message-buffer)
     (faq . gnus-faq-buffer)
-    (picons . gnus-picons-buffer-name)
     (tree . gnus-tree-buffer)
     (score-trace . "*Score Trace*")
     (split-trace . "*Split Trace*")
@@ -196,6 +195,11 @@ See the Gnus manual for an explanation of the syntax used.")
     (article-copy . gnus-article-copy)
     (draft . gnus-draft-buffer))
   "Mapping from short symbols to buffer names or buffer variables.")
+
+(defcustom gnus-configure-windows-hook nil
+  "*A hook called when configuring windows."
+  :group 'gnus-windowns
+  :type 'hook)
 
 ;;; Internal variables.
 
@@ -433,7 +437,7 @@ See the Gnus manual for an explanation of the syntax used.")
 	  ;; put point in the assigned buffer, and do not touch the
 	  ;; winconf.
 	  (select-window all-visible)
-	
+
 	;; Make sure "the other" buffer, nntp-server-buffer, is live.
 	(unless (gnus-buffer-live-p nntp-server-buffer)
 	  (nnheader-init-server-buffer))
@@ -447,7 +451,7 @@ See the Gnus manual for an explanation of the syntax used.")
 		      ;; This is not a `frame' split, so we ignore the
 		      ;; other frames.
 		      (delete-other-windows)
-		    ;; This is a `frame' split, so we delete all windows
+		  ;; This is a `frame' split, so we delete all windows
 		    ;; on all frames.
 		    (gnus-delete-windows-in-gnusey-frames))
 		;; Just remove some windows.
@@ -462,6 +466,7 @@ See the Gnus manual for an explanation of the syntax used.")
 	      (switch-to-buffer nntp-server-buffer)
 	    (set-buffer nntp-server-buffer))
 	  (gnus-configure-frame split)
+	  (run-hooks 'gnus-configure-windows-hook)
 	  (when gnus-window-frame-focus
 	    (select-frame (window-frame gnus-window-frame-focus))))))))
 
@@ -516,7 +521,7 @@ should have point."
 	(unless buffer
 	  (error "Invalid buffer type: %s" type))
 	(if (and (setq buf (get-buffer (gnus-window-to-buffer-helper buffer)))
-		 (setq win (get-buffer-window buf t)))
+		 (setq win (gnus-get-buffer-window buf t)))
 	    (if (memq 'point split)
 		(setq all-visible win))
 	  (setq all-visible nil)))
@@ -550,6 +555,27 @@ should have point."
 	  (set-buffer nntp-server-buffer)))
       (mapcar (lambda (b) (delete-windows-on b t))
 	      (delq lowest-buf bufs)))))
+
+(eval-and-compile
+  (cond 
+   ((fboundp 'frames-on-display-list)
+    (defalias 'gnus-frames-on-display-list 'frames-on-display-list))
+   ((and (featurep 'xemacs) (fboundp 'frame-device))
+    (defun gnus-frames-on-display-list ()
+      (apply 'filtered-frame-list 'identity (list (frame-device nil)))))
+   (t
+    (defalias 'gnus-frames-on-display-list 'frame-list))))
+
+(defun gnus-get-buffer-window (buffer &optional frame)
+  (cond ((and (null gnus-use-frames-on-any-display)
+	      (memq frame '(t 0 visible)))
+	 (car 
+	  (let ((frames (gnus-frames-on-display-list)))
+	    (gnus-delete-if (lambda (win) (not (memq (window-frame win) 
+						     frames)))
+			    (get-buffer-window-list buffer nil frame)))))
+	(t
+	 (get-buffer-window buffer frame))))
 
 (provide 'gnus-win)
 

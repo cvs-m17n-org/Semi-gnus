@@ -7,7 +7,7 @@
 ;; Keywords: crypto
 ;; Created: 2000-04-15
 
-;; $Id: gpg.el,v 1.1.1.1 2001-04-15 22:41:22 yamaoka Exp $
+;; $Id: gpg.el,v 1.1.1.2 2002-01-06 22:11:27 yamaoka Exp $
 
 ;; This file is NOT (yet?) part of GNU Emacs.
 
@@ -41,8 +41,8 @@
 ;; * Customization for all flavors of PGP is possible.
 ;; * The main operations (verify, decrypt, sign, encrypt, sign &
 ;;   encrypt) are implemented.
-;; * Gero Treuner's gpg-2comp script is supported, and data which is is
-;;   compatible with PGP 2.6.3 is generated.
+;; * Optionally, Gero Treuner's gpg-2comp script is supported, 
+;;   to generate data which is compatible with PGP 2.6.3.
 
 ;; Customizing external programs 
 ;; =============================
@@ -106,11 +106,10 @@
 ;; function (bound to `C-h l' by default).
 
 
-;;;; Code:
+;;; Code:
 
 (require 'timer)
-(eval-when-compile 
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 (eval-and-compile 
   (defalias 'gpg-point-at-eol
@@ -228,12 +227,12 @@ If you are running Emacs 20, this directory must have mode 0700."
 
 (defcustom gpg-command-default-alist 
   '((gpg . "gpg")
-    (gpg-2comp . "gpg-2comp"))
+    (gpg-2comp . "gpg"))
   "Default paths for some GnuPG-related programs.
 Modify this variable if you have to change the paths to the
-executables required by the GnuPG interface.  You can enter \"gpg\"
-for `gpg-2comp' if you don't have this script, but you'll lose PGP
-2.6.x compatibility."
+executables required by the GnuPG interface.  You can enter \"gpg-2comp\"
+for `gpg-2comp' if you have obtained this script, in order to gain
+PGP 2.6.x compatibility."
   :tag "GnuPG programs"
   :type 'gpg-command-alist
   :group 'gpg-options)
@@ -303,7 +302,7 @@ indicate that it should read the passphrase from standard input."
 ;;; Customization: Variables: GnuPG Commands:
 
 (defcustom gpg-command-verify
-  '(gpg . ("--batch" "--verbose" "--verify" signature-file message-file))
+  '(gpg . ("--status-fd" "1" "--batch" "--verbose" "--verify" signature-file message-file))
   "Command to verify a detached signature.
 The invoked program has to read the signed message and the signature
 from the given files.  It should write human-readable information to
@@ -324,7 +323,7 @@ charsets or line endings; the input data shall be treated as binary."
   :group 'gpg-commands)
 
 (defcustom gpg-command-verify-cleartext
-  '(gpg . ("--batch" "--verbose" "--verify" message-file))
+  '(gpg . ("--status-fd" "1" "--batch" "--verbose" "--verify" message-file))
   "Command to verify a message.
 The invoked program has to read the signed message from the given
 file.  It should write human-readable information to standard output
@@ -365,7 +364,7 @@ standard error."
   '(gpg-2comp . ("--batch" "--passphrase-fd=0" "--output=-"
 		 armor textmode  "--clearsign"
 		 sign-with-key))
-  "Command to create a create a \"clearsign\" text file.  
+  "Command to create a \"clearsign\" text file.  
 The invoked program has to read the passphrase from standard input,
 followed by the message to sign.  It should write the ASCII-amored
 signed text message to standard output, and diagnostic messages to
@@ -378,7 +377,7 @@ standard error."
   '(gpg-2comp . ("--batch" "--passphrase-fd=0" "--output=-"
 		 armor textmode "--detach-sign" 
 		 sign-with-key))
-  "Command to create a create a detached signature. 
+  "Command to create a detached signature. 
 The invoked program has to read the passphrase from standard input,
 followed by the message to sign.  It should write the ASCII-amored
 detached signature to standard output, and diagnostic messages to
@@ -632,7 +631,7 @@ adjust according to `gpg-command-passphrase-env'."
       ;; temporary file resides in a world-writable directory.
       (unless (or (memq system-type '(windows-nt cygwin32 win32 w32 mswindows))
 		  (eq (file-modes gpg-temp-directory) 448)) ; mode 0700
-	(error "Directory for temporary files (%s) must have mode 0700." gpg-temp-directory))
+	(error "Directory for temporary files (%s) must have mode 0700" gpg-temp-directory))
       (setq name (make-temp-name name))
       (let ((mode (default-file-modes)))
 	(unwind-protect
@@ -764,7 +763,7 @@ Never set this variable directly, use `gpg-show-result' instead.")
       (save-window-excursion
 	(display-buffer (current-buffer))
 	(unless (y-or-n-p "Continue? ")
-	  (error "GnuPG operation aborted."))))))
+	  (error "GnuPG operation aborted"))))))
 
 (defmacro gpg-show-result (always-show &rest body)
   "Show GnuPG result to user for confirmation.
@@ -802,6 +801,7 @@ evaluates BODY, like `progn'.  If BODY evaluates to `nil' (or
   "Forget stored passphrase."
   (interactive)
   (cancel-timer gpg-passphrase-timer)
+  (setq gpg-passphrase-timer nil)
   (gpg-passphrase-clear-string gpg-passphrase)
   (setq gpg-passphrase nil))
 
@@ -809,6 +809,8 @@ evaluates BODY, like `progn'.  If BODY evaluates to `nil' (or
   "Store PASSPHRASE in cache.
 Updates the timeout for clearing the cache to `gpg-passphrase-timeout'."
   (unless (equal gpg-passphrase-timeout 0)
+    (if (null gpg-passphrase-timer)
+	(setq gpg-passphrase-timer (timer-create)))
     (timer-set-time gpg-passphrase-timer 
 		    (timer-relative-time (current-time) 
 					 gpg-passphrase-timeout))
@@ -1175,6 +1177,14 @@ documentation for details)."
     (?f . trust-full)
     (?u . trust-ultimate))
   "Alist mapping GnuPG trust value short forms to long symbols.")
+
+(defconst gpg-unabbrev-trust-alist
+  '(("TRUST_UNDEFINED" . trust-undefined)
+    ("TRUST_NEVER"     . trust-none)
+    ("TRUST_MARGINAL"  . trust-marginal)
+    ("TRUST_FULLY"     . trust-full)
+    ("TRUST_ULTIMATE"  . trust-ultimate))
+  "Alist mapping capitalized GnuPG trust values to long symbols.")
 
 (defmacro gpg-key-list-keys-in-buffer-store ()
   '(when primary-user-id

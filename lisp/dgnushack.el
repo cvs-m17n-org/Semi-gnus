@@ -46,7 +46,7 @@
 (push (or (my-getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))
       load-path)
 
-(push "/usr/share/emacs/site-lisp" load-path)
+;(push "/usr/share/emacs/site-lisp" load-path)
 
 (unless (featurep 'xemacs)
   (define-compiler-macro last (&whole form x &optional n)
@@ -157,6 +157,17 @@
 			  (setq i (1+ i)
 				start (1+ start)))
 			res)))))))))
+
+  (define-compiler-macro copy-list (&whole form list)
+    (if (and (fboundp 'copy-list)
+	     (subrp (symbol-function 'copy-list)))
+	form
+      `(let ((list ,list))
+	 (if (consp list)
+	     (let ((res nil))
+	       (while (consp list) (push (pop list) res))
+	       (prog1 (nreverse res) (setcdr res list)))
+	   (car list)))))
   )
 
 ;; If we are building w3 in a different directory than the source
@@ -221,18 +232,25 @@ Modify to suit your needs."))
     (when (featurep 'base64)
       (setq files (delete "base64.el" files)))
     (condition-case code
-	(require 'w3-forms)
+	(require 'w3-parse)
       (error
-       (message "No w3: %s %s" code (locate-library "w3-forms"))
-       (dolist (file '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-		       "nnslashdot.el" "nnwarchive.el" "webmail.el"
-		       "nnwfm.el" "nnrss.el"))
+       (message "No w3: %s %s" code (locate-library "w3-parse"))
+       (dolist (file '("nnultimate.el" "webmail.el" "nnwfm.el"))
 	 (setq files (delete file files)))))
+    (condition-case code
+	(require 'mh-e)
+      (error
+       (message "No mh-e: %s %s" code (locate-library "mh-e"))
+       (setq files (delete "gnus-mh.el" files))))
+    (condition-case code
+	(require 'xml)
+      (error
+       (message "No xml: %s %s" code (locate-library "xml"))
+       (setq files (delete "nnrss.el" files))))
     (dolist (file
 	     (if (featurep 'xemacs)
 		 '("md5.el" "smiley-ems.el")
-	       '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-		 "nnheaderxm.el" "smiley.el")))
+	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el" "smiley.el")))
       (setq files (delete file files)))
 
     (dolist (file files)
@@ -266,10 +284,24 @@ Modify to suit your needs."))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)
+  (unless (make-autoload '(define-derived-mode child parent name
+			    "docstring" body)
+			 "file")
+    (defadvice make-autoload (around handle-define-derived-mode activate)
+      "Handle `define-derived-mode'."
+      (if (eq (car-safe (ad-get-arg 0)) 'define-derived-mode)
+	  (setq ad-return-value
+		(list 'autoload
+		      (list 'quote (nth 1 (ad-get-arg 0)))
+		      (ad-get-arg 1)
+		      (nth 4 (ad-get-arg 0))
+		      t nil))
+	ad-do-it))
+    (put 'define-derived-mode 'doc-string-elt 3))
   (let ((generated-autoload-file dgnushack-gnus-load-file)
 	(make-backup-files nil)
 	(autoload-package-name "gnus"))
-    (if (featurep 'xemacs) 
+    (if (featurep 'xemacs)
 	(if (file-exists-p generated-autoload-file)
 	    (delete-file generated-autoload-file))
       (with-temp-file generated-autoload-file
@@ -322,7 +354,19 @@ Modify to suit your needs."))
 ;;; no-byte-compile: t
 ;;; no-update-autoloads: t
 ;;; End:
-;;; gnus-load.el ends here\n"))
+;;; gnus-load.el ends here
+")
+    ;; Workaround the bug in some version of XEmacs.
+    (when (featurep 'xemacs)
+      (condition-case nil
+	  (require 'cus-load)
+	(error nil))
+      (goto-char (point-min))
+      (when (and (fboundp 'custom-add-loads)
+		 (not (search-forward "\n(autoload 'custom-add-loads " nil t)))
+	(search-forward "\n;;; Code:" nil t)
+	(forward-line 1)
+	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
   (message (format "Compiling %s..." dgnushack-gnus-load-file))
   (byte-compile-file dgnushack-gnus-load-file))
 

@@ -282,10 +282,14 @@ to return a true or false shell value for the validity.")
 
 (defcustom mailcap-download-directory nil
   "*Directory to which `mailcap-save-binary-file' downloads files by default.
-Nil means your home directory."
+nil means your home directory."
   :type '(choice (const :tag "Home directory" nil)
 		 directory)
   :group 'mailcap)
+
+(defvar mailcap-poor-system-types
+  '(ms-dos ms-windows windows-nt win32 w32 mswindows)
+  "Systems that don't have a Unix-like directory hierarchy.")
 
 ;;;
 ;;; Utility functions
@@ -314,7 +318,7 @@ If you are unsure what to do, please answer \"no\"."
   "Text of warning message displayed by `mailcap-maybe-eval'.
 Make sure that this text consists only of few text lines.  Otherwise,
 Gnus might fail to display all of it.")
- 
+
 (defun mailcap-maybe-eval ()
   "Maybe evaluate a buffer of Emacs Lisp code."
   (let ((lisp-buffer (current-buffer)))
@@ -363,7 +367,7 @@ MAILCAPS if set; otherwise (on Unix) use the path from RFC 1524, plus
     (cond
      (path nil)
      ((getenv "MAILCAPS") (setq path (getenv "MAILCAPS")))
-     ((memq system-type '(ms-dos ms-windows windows-nt))
+     ((memq system-type mailcap-poor-system-types)
       (setq path '("~/.mailcap" "~/mail.cap" "~/etc/mail.cap")))
      (t (setq path
 	      ;; This is per RFC 1524, specifically
@@ -730,9 +734,8 @@ this type is returned."
        ((or (null request) (equal request ""))
 	(mailcap-unescape-mime-test (cdr (assq 'viewer viewer)) info))
        ((stringp request)
-	(if (or (eq request 'test) (eq request 'viewer))
-	    (mailcap-unescape-mime-test
-	     (cdr-safe (assoc request viewer)) info)))
+	(mailcap-unescape-mime-test
+	 (cdr-safe (assoc request viewer)) info))
        ((eq request 'all)
 	passed)
        (t
@@ -860,7 +863,7 @@ If FORCE, re-parse even if already parsed."
     (cond
      (path nil)
      ((getenv "MIMETYPES") (setq path (getenv "MIMETYPES")))
-     ((memq system-type '(ms-dos ms-windows windows-nt))
+     ((memq system-type mailcap-poor-system-types)
       (setq path '("~/mime.typ" "~/etc/mime.typ")))
      (t (setq path
 	      ;; mime.types seems to be the normal name, definitely so

@@ -34,10 +34,17 @@
 (require 'gnus-int)
 (require 'gnus-range)
 
-(defvar gnus-server-mode-hook nil
-  "Hook run in `gnus-server-mode' buffers.")
+(defcustom gnus-server-mode-hook nil
+  "Hook run in `gnus-server-mode' buffers."
+  :group 'gnus-server
+  :type 'hook)
 
-(defconst gnus-server-line-format "     {%(%h:%w%)} %s%a\n"
+(defcustom gnus-server-exit-hook nil
+  "Hook run when exiting the server buffer."
+  :group 'gnus-server
+  :type 'hook)
+
+(defcustom gnus-server-line-format "     {%(%h:%w%)} %s%a\n"
   "Format of server lines.
 It works along the same lines as a normal formatting string,
 with some simple extensions.
@@ -48,16 +55,20 @@ The following specs are understood:
 %n name
 %w address
 %s status
-%a agent covered")
+%a agent covered"
+  :group 'gnus-server-visual
+  :type 'string)
 
-(defvar gnus-server-mode-line-format "Gnus: %%b"
-  "The format specification for the server mode line.")
+(defcustom gnus-server-mode-line-format "Gnus: %%b"
+  "The format specification for the server mode line."
+  :group 'gnus-server-visual
+  :type 'string)
 
-(defvar gnus-server-exit-hook nil
-  "*Hook run when exiting the server buffer.")
-
-(defvar gnus-server-browse-in-group-buffer t
-  "Whether browse server in group buffer.")
+(defcustom gnus-server-browse-in-group-buffer nil
+  "Whether server browsing should take place in the group buffer.
+If nil, a faster, but more primitive, buffer is used instead."
+  :group 'gnus-server-visual
+  :type 'string)
 
 ;;; Internal variables.
 
@@ -149,13 +160,69 @@ The following specs are understood:
     "\C-c\C-i" gnus-info-find-node
     "\C-c\C-b" gnus-bug))
 
+(defface gnus-server-agent-face
+  '((((class color) (background light)) (:foreground "PaleTurquoise" :bold t))
+    (((class color) (background dark)) (:foreground "PaleTurquoise" :bold t))
+    (t (:bold t)))
+  "Face used for displaying AGENTIZED servers"
+  :group 'gnus-server-visual)
+
+(defface gnus-server-opened-face
+  '((((class color) (background light)) (:foreground "Green3" :bold t))
+    (((class color) (background dark)) (:foreground "Green1" :bold t))
+    (t (:bold t)))
+  "Face used for displaying OPENED servers"
+  :group 'gnus-server-visual)
+
+(defface gnus-server-closed-face
+  '((((class color) (background light)) (:foreground "Steel Blue" :italic t))
+    (((class color) (background dark))
+     (:foreground "Light Steel Blue" :italic t))
+    (t (:italic t)))
+  "Face used for displaying CLOSED servers"
+  :group 'gnus-server-visual)
+
+(defface gnus-server-denied-face
+  '((((class color) (background light)) (:foreground "Red" :bold t))
+    (((class color) (background dark)) (:foreground "Pink" :bold t))
+    (t (:inverse-video t :bold t)))
+  "Face used for displaying DENIED servers"
+  :group 'gnus-server-visual)
+
+(defcustom gnus-server-agent-face 'gnus-server-agent-face
+  "Face name to use on AGENTIZED servers."
+  :group 'gnus-server-visual
+  :type 'face)
+
+(defcustom gnus-server-opened-face 'gnus-server-opened-face
+  "Face name to use on OPENED servers."
+  :group 'gnus-server-visual
+  :type 'face)
+
+(defcustom gnus-server-closed-face 'gnus-server-closed-face
+  "Face name to use on CLOSED servers."
+  :group 'gnus-server-visual
+  :type 'face)
+
+(defcustom gnus-server-denied-face 'gnus-server-denied-face
+  "Face name to use on DENIED servers."
+  :group 'gnus-server-visual
+  :type 'face)
+
+(defvar gnus-server-font-lock-keywords
+  (list
+   '("(\\(agent\\))" 1 gnus-server-agent-face)
+   '("(\\(opened\\))" 1 gnus-server-opened-face)
+   '("(\\(closed\\))" 1 gnus-server-closed-face)
+   '("(\\(denied\\))" 1 gnus-server-denied-face)))
+
 (defun gnus-server-mode ()
   "Major mode for listing and editing servers.
 
 All normal editing commands are switched off.
 \\<gnus-server-mode-map>
 For more in-depth information on this mode, read the manual
-(`\\[gnus-info-find-node]').
+\(`\\[gnus-info-find-node]').
 
 The following commands are available:
 
@@ -173,19 +240,25 @@ The following commands are available:
   (buffer-disable-undo)
   (setq truncate-lines t)
   (setq buffer-read-only t)
+  (if (featurep 'xemacs)
+      (put 'gnus-server-mode 'font-lock-defaults '(gnus-server-font-lock-keywords t))
+    (set (make-local-variable 'font-lock-defaults)
+         '(gnus-server-font-lock-keywords t)))
   (gnus-run-hooks 'gnus-server-mode-hook))
 
 (defun gnus-server-insert-server-line (gnus-tmp-name method)
   (let* ((gnus-tmp-how (car method))
 	 (gnus-tmp-where (nth 1 method))
 	 (elem (assoc method gnus-opened-servers))
-	 (gnus-tmp-status (cond ((eq (nth 1 elem) 'denied)
-				 "(denied)")
-				((or (gnus-server-opened method)
-				     (eq (nth 1 elem) 'ok))
-				 "(opened)")
-				(t
-				 "(closed)")))
+ 	 (gnus-tmp-status
+ 	  (if (eq (nth 1 elem) 'denied)
+ 	      "(denied)"
+ 	    (condition-case nil
+ 		(if (or (gnus-server-opened method)
+ 			(eq (nth 1 elem) 'ok))
+		    "(opened)"
+ 		  "(closed)")
+ 	      ((error) "(error)"))))
 	 (gnus-tmp-agent (if (and gnus-agent
 				  (member method
 					  gnus-agent-covered-methods))
@@ -568,7 +641,7 @@ The following commands are available:
        ["Read" gnus-browse-read-group t]
        ["Select" gnus-browse-select-group t]
        ["Next" gnus-browse-next-group t]
-       ["Prev" gnus-browse-next-group t]
+       ["Prev" gnus-browse-prev-group t]
        ["Exit" gnus-browse-exit t]))
     (gnus-run-hooks 'gnus-browse-menu-hook)))
 
@@ -641,7 +714,7 @@ The following commands are available:
 			  groups)))
 	    (gnus-configure-windows 'group)
 	    (funcall gnus-group-prepare-function
-		     gnus-level-killed 'ignore 1 'ingore))
+		     gnus-level-killed 'ignore 1 'ignore))
 	(gnus-get-buffer-create gnus-browse-buffer)
 	(when gnus-carpal
 	  (gnus-carpal-setup-buffer 'browse))
@@ -654,20 +727,18 @@ The following commands are available:
 	      (list
 	       (format
 		"Gnus: %%b {%s:%s}" (car method) (cadr method))))
-	(let ((buffer-read-only nil) charset)
+	(let ((buffer-read-only nil) charset
+	      (prefix (let ((gnus-select-method orig-select-method))
+			(gnus-group-prefixed-name "" method))))
 	  (while groups
 	    (setq group (car groups))
-	    (setq charset (gnus-group-name-charset method group))
+	    (setq charset (gnus-group-name-charset method (car group)))
 	    (gnus-add-text-properties
 	     (point)
 	     (prog1 (1+ (point))
 	       (insert
 		(format "%c%7d: %s\n"
-			(let ((level
-			       (let ((gnus-select-method orig-select-method))
-				 (gnus-group-level
-				  (gnus-group-prefixed-name (car group)
-							    method)))))
+			(let ((level (gnus-group-level (concat prefix (car group)))))
 			      (cond
 			       ((<= level gnus-level-subscribed) ? )
 			       ((<= level gnus-level-unsubscribed) ?U)
@@ -836,7 +907,7 @@ buffer.
     (unless server
       (error "No server on the current line"))
     (condition-case ()
-	(gnus-get-function (gnus-server-to-method server) 
+	(gnus-get-function (gnus-server-to-method server)
 			   'request-regenerate)
       (error
 	(error "This backend doesn't support regeneration")))
@@ -849,4 +920,4 @@ buffer.
 
 (provide 'gnus-srvr)
 
-;;; gnus-srvr.el ends here.
+;;; gnus-srvr.el ends here

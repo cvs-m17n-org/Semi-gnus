@@ -110,7 +110,8 @@ If CONFIRM is non-nil, the user will be asked for an NNTP server."
   "Check whether the connection to METHOD is down.
 If METHOD is nil, use `gnus-select-method'.
 If it is down, start it up (again)."
-  (let ((method (or method gnus-select-method)))
+  (let ((method (or method gnus-select-method))
+	result)
     ;; Transform virtual server names into select methods.
     (when (stringp method)
       (setq method (gnus-server-to-method method)))
@@ -125,11 +126,14 @@ If it is down, start it up (again)."
       (gnus-run-hooks 'gnus-open-server-hook)
       (prog1
 	  (condition-case ()
-	      (gnus-open-server method)
+	      (setq result (gnus-open-server method))
 	    (quit (message "Quit gnus-check-server")
 		  nil))
 	(unless silent
-	  (message ""))))))
+	  (gnus-message 5 "Opening %s server%s...%s" (car method)
+			(if (equal (nth 1 method) "") ""
+			  (format " on %s" (nth 1 method)))
+			(if result "done" "failed")))))))
 
 (defun gnus-get-function (method function &optional noerror)
   "Return a function symbol based on METHOD and FUNCTION."
@@ -179,9 +183,13 @@ If it is down, start it up (again)."
 	  nil)
       ;; Open the server.
       (let ((result
-	     (funcall (gnus-get-function gnus-command-method 'open-server)
-		      (nth 1 gnus-command-method)
-		      (nthcdr 2 gnus-command-method))))
+	     (condition-case ()
+		 (funcall (gnus-get-function gnus-command-method 'open-server)
+			  (nth 1 gnus-command-method)
+			  (nthcdr 2 gnus-command-method))
+	       (quit
+		(message "Quit trying to open server")
+		nil))))
 	;; If this hasn't been opened before, we add it to the list.
 	(unless elem
 	  (setq elem (list gnus-command-method nil)

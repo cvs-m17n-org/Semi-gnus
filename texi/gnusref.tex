@@ -1,16 +1,16 @@
-% -*- mode: latex; TeX-master: "refcard.tex" -*-
-                                % include file for the Gnus refcard and booklet
+%% include file for the Gnus refcard and booklet
+%%
 \newlength{\keycolwidth}
 \newenvironment{keys}[1]% #1 is the widest key
 {\nopagebreak%\noindent%
   \settowidth{\keycolwidth}{#1}%
   \addtolength{\keycolwidth}{\tabcolsep}%
   \addtolength{\keycolwidth}{-\columnwidth}%
-  \begin{tabular}{@{}l@{\hspace{\tabcolsep}}p{-\keycolwidth}@{}}}%
-  {\end{tabular}\\}
+  \begin{supertabular}{@{}l@{\hspace{\tabcolsep}}p{-\keycolwidth}@{}}}%
+  {\end{supertabular}\\}
 
-                                % uncomment the first definition if you do not want pagebreaks in maps
-                                %\newcommand{\esamepage}{\samepage}
+%% uncomment the first definition if you do not want pagebreaks in maps
+%%\newcommand{\esamepage}{\samepage}
 \newcommand{\esamepage}{}
 
 \newcommand*{\B}[1]{{\bf#1})}    % bold l)etter
@@ -24,13 +24,15 @@
 
 \newcommand*{\Logo}[1]{\centerline{%
     \makebox[\logoscale\logowidth][l]{\vbox to \logoscale\logoheight
-      {\vfill\special{psfile=gnuslogo.#1}}\vspace{-\baselineskip}}}}
+      {\vfill\epsfig{figure=gnuslogo-#1}}\vspace{-\baselineskip}}}}
 
 \newcommand{\Copyright}{%
   \begin{center}
     Copyright \copyright\ 1995 Free Software Foundation, Inc.\\*
-    Copyright \copyright\ 1995 \author.\\*
+    Copyright \copyright\ 1995 Vladimir Alexiev
+    $<$vladimir@cs.ualberta.ca$>$.\\*
     Copyright \copyright\ 2000 Felix Natter $<$fnatter@gmx.net$>$.\\*
+    Copyright \copyright\ 2001 \author.\\*
     Created from the Gnus manual Copyright \copyright\ 1994 Lars Magne
     Ingebrigtsen.\\*
     and the Emacs Help Bindings feature (C-h b).\\*
@@ -78,13 +80,20 @@
     \quad [score] An article score. If no prefix is given,
     `gnus-summary-default-score' is used. \\*[\baselineskip]
                                 % some keys
-    \begin{keys}{C-c C-i}
+    Gnus startup-commands:
+    \begin{keys}{M-x gnus-unplugged}
       M-x gnus           & start Gnus. \\
-      M-x gnus-no-server & start Gnus without trying to connect to server
+      M-x gnus-no-server & start Gnus without connecting to server
       (i.e. to read mail). \\
-      M-x gnus-unplugged & start Gnus in \texttt{unplugged}-mode
-      (first see the manual, C-c C-i g Gnus Unplugged RET).\\
+    \end{keys}
+    Additionally, there are the two commands \texttt{gnus-plugged} and
+    \texttt{gnus-unplugged}, which are only used if you want to download
+    news and/or read previously downloaded news offline (see C-c C-i g Gnus
+    Unplugged RET). Note: \texttt{gnus-no-server} ignores the stuff in
+    \texttt{gnus-agent-directory}, and thus does not allow you to use Gnus
+    Unplugged.
                                 %
+    \begin{keys}{C-c C-i}
       C-c C-i & Go to the Gnus online {\bf info}.\\
       C-c C-b & Send a Gnus {\bf bug} report.\\
     \end{keys}
@@ -519,7 +528,7 @@
 
   \newcommand{\ArticleModeGeneral}{%
     {\esamepage
-      The normal navigation keys work in Article mode. Some additional keys are:\\*
+      The normal navigation keys work in Article mode. Some additional keys are:\\
       \begin{keys}{C-c RET}
         C-c \^{} & Get the article with the Message-ID near point.\\
         C-c RET & Send reply to address near point.\\
@@ -711,7 +720,8 @@
       /v   & Limit to score. [score]\\
       /E   & (M S) Include all expunged articles in the limit.\\
       /D   & Include all dormant articles in the limit.\\
-      /*   & Include all cached articles in the limit.\\
+      /*   & Limit to cached articles.\\
+      Y C  & Include all cached articles in the limit.\\
       /d   & Exclude all dormant articles from the limit.\\
       /M   & Exclude all marked articles.\\
       /T   & Include all articles from the current thread in the limit.\\
@@ -955,16 +965,16 @@
 
 \newcommand{\MsgCompositionMML}{%
   {\esamepage
-    \begin{keys}{M-m P}
-      M-m f   & (C-c C-a) Attach \textbf{file}.\\
-      M-m b   & Attach contents of \textbf{buffer}.\\
-      M-m e   & Attach \textbf{external} file (ftp..).\\
-      M-m P   & Create MIME-\textbf{preview} (new buffer).\\
-      M-m v   & \textbf{Validate} article.\\
-      M-m p   & Insert \textbf{part}.\\
-      M-m m   & Insert \textbf{multi}-part.\\
-      M-m q   & \textbf{Quote} region.\\
-                                % TODO: narrow headers (M-m n) ?
+    \begin{keys}{C-c C-m P}
+      C-c C-m f   & (C-c C-a) Attach \textbf{file}.\\
+      C-c C-m b   & Attach contents of \textbf{buffer}.\\
+      C-c C-m e   & Attach \textbf{external} file (ftp..).\\
+      C-c C-m P   & Create MIME-\textbf{preview} (new buffer).\\
+      C-c C-m v   & \textbf{Validate} article.\\
+      C-c C-m p   & Insert \textbf{part}.\\
+      C-c C-m m   & Insert \textbf{multi}-part.\\
+      C-c C-m q   & \textbf{Quote} region.\\
+                                % TODO: narrow headers (C-c C-m n) ?
     \end{keys}
     }
   }
@@ -1039,3 +1049,8 @@
     \end{keys}
     }
   }
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "refcard.tex"
+%%% End:

@@ -1,7 +1,7 @@
-;;; ssl.el,v --- ssl functions for emacsen without them builtin
+;;; ssl.el --- ssl functions for emacsen without them builtin
 ;; Author: $Author: yamaoka $
-;; Created: $Date: 2001-04-15 22:41:22 $
-;; Version: $Revision: 1.1.1.1 $
+;; Created: $Date: 2002-01-06 22:11:27 $
+;; Version: $Revision: 1.1.1.2 $
 ;; Keywords: comm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,7 +26,7 @@
 ;;; Boston, MA 02111-1307, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'base64)
 
 (eval-and-compile

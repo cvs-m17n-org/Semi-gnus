@@ -188,7 +188,7 @@
 		       (car active) (cdr active) group)))))
 
 (defun nnmbox-save-buffer ()
-  (let ((coding-system-for-write 
+  (let ((coding-system-for-write
 	 (or nnmbox-file-coding-system-for-write
 	     nnmbox-file-coding-system)))
     (save-buffer)))
@@ -262,12 +262,13 @@
 	      (progn
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnmbox-request-article (car articles) 
-					     newsgroup server 
+		    (nnmbox-request-article (car articles)
+					     newsgroup server
 					     (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group
-		       nnmail-expiry-target newsgroup))))
+		       nnmail-expiry-target newsgroup)))
+		  (nnmbox-possibly-change-newsgroup newsgroup server))
 		(nnheader-message 5 "Deleting article %d in %s..."
 				  (car articles) newsgroup)
 		(nnmbox-delete-mail))
@@ -502,9 +503,9 @@
 	       (nnmbox-in-header-p (point)))
 	  (progn
 	    (goto-char (point-min))
-	    (while (not found)
-	      (setq found (and (search-forward art-string nil t)
-			       (nnmbox-in-header-p (point)))))
+	    (while (and (not found)
+			(search-forward art-string nil t))
+	      (setq found (nnmbox-in-header-p (point))))
 	    found)))))
 
 (defun nnmbox-record-active-article (group-art)
@@ -598,7 +599,9 @@
   (when (not (file-exists-p nnmbox-mbox-file))
     (let ((nnmail-file-coding-system
 	   (or nnmbox-file-coding-system-for-write
-	       nnmbox-file-coding-system)))
+	       nnmbox-file-coding-system))
+	  (dir (file-name-directory nnmbox-mbox-file)))
+      (and dir (gnus-make-directory dir))
       (nnmail-write-region 1 1 nnmbox-mbox-file t 'nomesg))))
 
 (defun nnmbox-read-mbox ()
@@ -619,7 +622,7 @@
 			  (let ((nnheader-file-coding-system
 				 nnmbox-file-coding-system))
 			    (nnheader-find-file-noselect
-			     nnmbox-mbox-file nil t))))
+			     nnmbox-mbox-file t t))))
 	(mm-enable-multibyte)
 	(buffer-disable-undo)
 

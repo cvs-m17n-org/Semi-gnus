@@ -24,9 +24,9 @@
 ;;; Commentary:
 
 ;; Note: You need to have `url' (w3 0.46) or greater version
-;; installed for this backend to work.
+;; installed for some functions of this backend to work.
 
-;; Todo: 
+;; Todo:
 ;; 1. To support more web archives.
 ;; 2. Generalize webmail to other MHonArc archive.
 
@@ -42,38 +42,27 @@
 (require 'nnmail)
 (require 'mm-util)
 (require 'mail-source)
-(eval-when-compile
-  (ignore-errors
-    (require 'w3)
-    (require 'url)
-    (require 'w3-forms)
-    (require 'nnweb)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(progn
-	 (require 'w3)
-	 (require 'url)
-	 (require 'w3-forms)
-	 (require 'nnweb)))
+(require 'mm-url)
 
 (nnoo-declare nnwarchive)
 
 (defvar nnwarchive-type-definition
   '((egroups
      (address . "www.egroups.com")
-     (open-url 
-      "http://www.egroups.com/login.cgi?&login_email=%s&login_password=%s" 
+     (open-url
+      "http://www.egroups.com/login.cgi?&login_email=%s&login_password=%s"
       nnwarchive-login nnwarchive-passwd)
-     (list-url 
+     (list-url
       "http://www.egroups.com/mygroups")
      (list-dissect . nnwarchive-egroups-list)
      (list-groups . nnwarchive-egroups-list-groups)
-     (xover-url 
+     (xover-url
       "http://www.egroups.com/messages/%s/%d" group aux)
-     (xover-last-url 
+     (xover-last-url
       "http://www.egroups.com/messages/%s/" group)
      (xover-page-size . 13)
      (xover-dissect . nnwarchive-egroups-xover)
-     (article-url 
+     (article-url
       "http://www.egroups.com/message/%s/%d?source=1" group article)
      (article-dissect . nnwarchive-egroups-article)
      (authentication . t)
@@ -82,17 +71,17 @@
     (mail-archive
      (address . "www.mail-archive.com")
      (open-url)
-     (list-url 
+     (list-url
       "http://www.mail-archive.com/lists.html")
      (list-dissect . nnwarchive-mail-archive-list)
      (list-groups . nnwarchive-mail-archive-list-groups)
-     (xover-url 
+     (xover-url
       "http://www.mail-archive.com/%s/mail%d.html" group aux)
-     (xover-last-url 
+     (xover-last-url
       "http://www.mail-archive.com/%s/maillist.html" group)
      (xover-page-size)
      (xover-dissect . nnwarchive-mail-archive-xover)
-     (article-url 
+     (article-url
       "http://www.mail-archive.com/%s/msg%05d.html" group article1)
      (article-dissect . nnwarchive-mail-archive-article)
      (xover-files . nnwarchive-mail-archive-xover-files)
@@ -163,12 +152,12 @@
   (let ((defs (cdr (assq type nnwarchive-type-definition)))
 	def)
     (dolist (def defs)
-      (set (intern (concat "nnwarchive-" (symbol-name (car def)))) 
+      (set (intern (concat "nnwarchive-" (symbol-name (car def))))
 	   (cdr def)))))
 
 (defmacro nnwarchive-backlog (&rest form)
   `(let ((gnus-keep-backlog nnwarchive-keep-backlog)
-	 (gnus-backlog-buffer 
+	 (gnus-backlog-buffer
 	  (format " *nnwarchive backlog %s*" nnwarchive-address))
 	 (gnus-backlog-articles nnwarchive-backlog-articles)
 	 (gnus-backlog-hashtb nnwarchive-backlog-hashtb))
@@ -183,10 +172,10 @@
   (nnwarchive-backlog
     (gnus-backlog-enter-article group number buffer)))
 
-(defun nnwarchive-get-article (article &optional group server buffer) 
+(defun nnwarchive-get-article (article &optional group server buffer)
   (if (numberp article)
       (if (nnwarchive-backlog
-	    (gnus-backlog-request-article group article 
+	    (gnus-backlog-request-article group article
 					  (or buffer nntp-server-buffer)))
 	  (cons group article)
 	(let (contents)
@@ -298,7 +287,7 @@
     (setq nnwarchive-passwd
 	  (or nnwarchive-passwd
 	      (mail-source-read-passwd
-	       (format "Password for %s at %s: " 
+	       (format "Password for %s at %s: "
 		       nnwarchive-login server)))))
   (unless nnwarchive-groups
     (nnwarchive-read-groups))
@@ -322,7 +311,7 @@
     (nnwarchive-open-server server)))
 
 (defun nnwarchive-read-groups ()
-  (let ((file (expand-file-name (concat "groups-" nnwarchive-address) 
+  (let ((file (expand-file-name (concat "groups-" nnwarchive-address)
 				nnwarchive-directory)))
     (when (file-exists-p file)
       (with-temp-buffer
@@ -331,14 +320,14 @@
 	(setq nnwarchive-groups (read (current-buffer)))))))
 
 (defun nnwarchive-write-groups ()
-  (with-temp-file (expand-file-name (concat "groups-" nnwarchive-address) 
+  (with-temp-file (expand-file-name (concat "groups-" nnwarchive-address)
 				    nnwarchive-directory)
     (prin1 nnwarchive-groups (current-buffer))))
 
 (defun nnwarchive-init (server)
   "Initialize buffers and such."
   (let ((type (intern server)) (defs nnwarchive-type-definition) def)
-    (cond 
+    (cond
      ((equal server "")
       (setq type nnwarchive-default-type))
      ((assq type nnwarchive-type-definition) t)
@@ -360,23 +349,6 @@
 	     (format " *nnwarchive %s %s*" nnwarchive-type server)))))
   (nnwarchive-set-default nnwarchive-type))
 
-(defun nnwarchive-encode-www-form-urlencoded (pairs)
-  "Return PAIRS encoded for forms."
-  (mapconcat
-   (function
-    (lambda (data)
-      (concat (w3-form-encode-xwfu (car data)) "="
-	      (w3-form-encode-xwfu (cdr data)))))
-   pairs "&"))
-
-(defun nnwarchive-fetch-form (url pairs)
-  (let ((url-request-data (nnwarchive-encode-www-form-urlencoded pairs))
-	(url-request-method "POST")
-	(url-request-extra-headers
-	 '(("Content-type" . "application/x-www-form-urlencoded"))))
-    (nnweb-insert url))
-  t)
-
 (defun nnwarchive-eval (expr)
   (cond
    ((consp expr)
@@ -388,15 +360,15 @@
 
 (defun nnwarchive-url (xurl)
   (mm-with-unibyte-current-buffer
-    (let ((url-confirmation-func 'identity)
+    (let ((url-confirmation-func 'identity) ;; Some hacks.
 	  (url-cookie-multiple-line nil))
-      (cond 
+      (cond
        ((eq (car xurl) 'post)
 	(pop xurl)
-	(nnwarchive-fetch-form (car xurl) (nnwarchive-eval (cdr xurl))))
+	(mm-url-fetch-form (car xurl) (nnwarchive-eval (cdr xurl))))
        (t
-	(nnweb-insert (apply 'format (nnwarchive-eval xurl))))))))
-  
+	(mm-url-insert (apply 'format (nnwarchive-eval xurl))))))))
+
 (defun nnwarchive-generate-active ()
   (save-excursion
     (set-buffer nntp-server-buffer)
@@ -420,12 +392,12 @@
   (save-excursion
     (let (articles)
       (set-buffer nnwarchive-buffer)
-      (dolist (group groups) 
+      (dolist (group groups)
 	(erase-buffer)
 	(nnwarchive-url nnwarchive-xover-last-url)
 	(goto-char (point-min))
 	(when (re-search-forward "of \\([0-9]+\\)[ \t\n\r]*</title>" nil t)
-	  (setq articles (string-to-number (match-string 1)))) 
+	  (setq articles (string-to-number (match-string 1))))
 	(let ((elem (assoc group nnwarchive-groups)))
 	  (if elem
 	      (setcar (cdr elem) articles)
@@ -441,7 +413,7 @@
   (let ((case-fold-search t)
 	group description elem articles)
     (goto-char (point-min))
-    (while 
+    (while
 	(re-search-forward "href=\"/group/\\([^/\"\> ]+\\)" nil t)
       (setq group (match-string 1)
 	    description (match-string 2))
@@ -469,12 +441,12 @@
 	(push (cons
 	       article
 	       (make-full-mail-header
-		article 
-		(nnweb-decode-entities-string subject)
-		(nnweb-decode-entities-string from)
+		article
+		(mm-url-decode-entities-string subject)
+		(mm-url-decode-entities-string from)
 		date
 		(concat "<" group "%"
-			(number-to-string article) 
+			(number-to-string article)
 			"@egroup.com>")
 		""
 		0 0 "")) nnwarchive-headers))))
@@ -490,7 +462,7 @@
   (goto-char (point-min))
   (while (re-search-forward "<a[^>]+>\\([^<]+\\)</a>" nil t)
     (replace-match "\\1"))
-  (nnweb-decode-entities)
+  (mm-url-decode-entities)
   (buffer-string))
 
 (defun nnwarchive-egroups-xover-files (group articles)
@@ -523,7 +495,7 @@
 	(let ((elem (assoc group nnwarchive-headers-cache)))
 	  (if elem
 	      (setcdr elem nnwarchive-headers)
-	    (push (cons group nnwarchive-headers) 
+	    (push (cons group nnwarchive-headers)
 		  nnwarchive-headers-cache)))))))
 
 (defun nnwarchive-mail-archive-list ()
@@ -550,7 +522,7 @@
 	    subject (match-string 2))
       (forward-line 1)
       (unless (assq article nnwarchive-headers)
-	(if (looking-at "<UL><LI><EM>From</EM>:\\([^&]+\\)<\\([^&]+\\)>")
+	(if (looking-at "<UL><LI><EM>From</EM>: *\\([^<]*[^< ]\\) *&lt;\\([^&]+\\)&gt;")
 	    (progn
 	      (setq from (match-string 1)
 		    date (identity (match-string 2))))
@@ -558,9 +530,9 @@
 	(push (cons
 	       article
 	       (make-full-mail-header
-		article 
-		(nnweb-decode-entities-string subject)
-		(nnweb-decode-entities-string from)
+		article
+		(mm-url-decode-entities-string subject)
+		(mm-url-decode-entities-string from)
 		date
 		(format "<%05d%%%s>\n" (1- article) group)
 		""
@@ -608,14 +580,14 @@
       (insert from-r13)
       (let ((message-caesar-translation-table
 	     (or nnwarchive-caesar-translation-table
-		 (setq nnwarchive-caesar-translation-table 
+		 (setq nnwarchive-caesar-translation-table
 		       (nnwarchive-make-caesar-translation-table)))))
 	(message-caesar-region (point-min) (point-max))
 	(buffer-string)))))
 
 (defun nnwarchive-mail-archive-article (group article)
-  (let (p refs url mime e 
-	  from subject date id 
+  (let (p refs url mime e
+	  from subject date id
 	  done
 	  (case-fold-serch t))
     (save-restriction
@@ -623,16 +595,16 @@
       (when (search-forward "X-Head-End" nil t)
 	(beginning-of-line)
 	(narrow-to-region (point-min) (point))
-	(nnweb-decode-entities)
+	(mm-url-decode-entities)
 	(goto-char (point-min))
 	(while (search-forward "<!--X-" nil t)
 	  (replace-match ""))
 	(goto-char (point-min))
 	(while (search-forward " -->" nil t)
 	  (replace-match ""))
-	(setq from 
+	(setq from
 	      (or (mail-fetch-field "from")
-		  (nnwarchive-from-r13 
+		  (nnwarchive-from-r13
 		   (mail-fetch-field "from-r13"))))
 	(setq date (mail-fetch-field "date"))
 	(setq id (mail-fetch-field "message-id"))
@@ -645,8 +617,8 @@
 	(search-forward "</ul>" nil t)
 	(end-of-line)
 	(narrow-to-region (point-min) (point))
-	(nnweb-remove-markup)
-	(nnweb-decode-entities)
+	(mm-url-remove-markup)
+	(mm-url-decode-entities)
 	(goto-char (point-min))
 	(delete-blank-lines)
 	(when from
@@ -667,7 +639,7 @@
 	(goto-char (point-max))
 	(widen)
 	(insert "\n"))
-      (setq p (point)) 
+      (setq p (point))
       (when (search-forward "X-Body-of-Message" nil t)
 	(forward-line)
 	(delete-region p (point))
@@ -679,22 +651,22 @@
 	  (if (> (skip-chars-forward "\040\n\r\t") 0)
 	      (delete-region (point-min) (point)))
 	  (while (not (eobp))
-	    (cond 
-	     ((looking-at "<PRE>\r?\n?") 
+	    (cond
+	     ((looking-at "<PRE>\r?\n?")
 	      (delete-region (match-beginning 0) (match-end 0))
 	      (setq p (point))
 	      (when (search-forward "</PRE>" nil t)
 		(delete-region (match-beginning 0) (match-end 0))
 		(save-restriction
 		  (narrow-to-region p (point))
-		  (nnweb-remove-markup)
-		  (nnweb-decode-entities)
+		  (mm-url-remove-markup)
+		  (mm-url-decode-entities)
 		  (goto-char (point-max)))))
 	     ((looking-at "<P><A HREF=\"\\([^\"]+\\)")
 	      (setq url (match-string 1))
-	      (delete-region (match-beginning 0) 
+	      (delete-region (match-beginning 0)
 			     (progn (forward-line) (point)))
-	      ;; I hate to download the url encode it, then immediately 
+	      ;; I hate to download the url encode it, then immediately
 	      ;; decode it.
 	      (insert "<#external"
 		      " type="
@@ -703,7 +675,7 @@
 			       (mailcap-extension-to-mime
 				(match-string 0 url)))
 			  "application/octet-stream")
-		      (format " url=\"http://www.mail-archive.com/%s/%s\"" 
+		      (format " url=\"http://www.mail-archive.com/%s/%s\""
 			      group url)
 		      ">\n"
 		      "<#/external>")
@@ -712,8 +684,8 @@
 	      (setq p (point))
 	      (insert "<#part type=\"text/html\" disposition=inline>")
 	      (goto-char
-	       (if (re-search-forward 
-		    "[\040\n\r\t]*<PRE>\\|[\040\n\r\t]*<P><A HREF=\"" 
+	       (if (re-search-forward
+		    "[\040\n\r\t]*<PRE>\\|[\040\n\r\t]*<P><A HREF=\""
 		    nil t)
 		   (match-beginning 0)
 		 (point-max)))
@@ -739,7 +711,7 @@
 	  (insert " " (pop refs)))
 	(insert "\n"))
       (when mime
-	(unless (looking-at "$") 
+	(unless (looking-at "$")
 	  (search-forward "\n\n" nil t)
 	  (forward-line -1))
 	(narrow-to-region (point) (point-max))
