@@ -1275,7 +1275,9 @@ Return the number of headers removed."
   (define-key message-mode-map "\C-c\C-z" 'message-kill-to-signature)
   (define-key message-mode-map "\M-\r" 'message-newline-and-reformat)
 
-  (define-key message-mode-map "\t" 'message-tab))
+  (define-key message-mode-map "\t" 'message-tab)
+
+  (define-key message-mode-map "\C-xk" 'message-kill-buffer))
 
 (easy-menu-define
  message-mode-menu message-mode-map "Message Menu."
