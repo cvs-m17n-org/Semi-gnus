@@ -1,5 +1,30 @@
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
+	* gnus.el: Oort Gnus v0.23 is released.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* spam-stat.el (spam-stat-test-directory): Compare against zero. 
+
+2003-05-01  Trey Jackson <tjackson@ichips.intel.com>  (tiny change)
+
+	* spam-stat.el (spam-stat-test-directory): Skip 0 length files.
+	
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-forward-subject-name-subject): Decode
+	string when forwarding.
+
+2003-05-01  Oystein Viggen  <oysteivi@tihlde.org>
+
+	* dgnushack.el (when): Add defadvice.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
 	* gnus.el: Oort Gnus v0.22 is released.
 
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
