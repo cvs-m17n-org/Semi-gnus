@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.6 1999-09-11 19:30:33 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.7 1999-10-21 15:25:28 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -83,6 +83,9 @@
 (require 'easymenu)
 (provide 'gnus-offline)
 
+(eval-after-load "eword-decode"
+  '(mime-set-field-decoder 'X-Gnus-Offline-Backend nil nil))
+
 (defgroup gnus-offline nil
   "Offline backend utility for Gnus."
   :prefix "gnus-offline-"
@@ -106,10 +109,10 @@
 
 (eval-when-compile
   (mapc
-   #'(lambda (symbol)
-       (unless (boundp symbol)
-	 (make-local-variable symbol)
-	 (eval (list 'setq symbol nil))))
+   (lambda (symbol)
+     (unless (boundp symbol)
+       (make-local-variable symbol)
+       (eval (list 'setq symbol nil))))
    '(nnagent-version
      nnspool-version
      msspool-news-server
@@ -117,9 +120,9 @@
      miee-popup-menu
      gnus-group-toolbar))
   (mapc
-   #'(lambda (symbol)
-       (unless (fboundp symbol)
-	 (defalias symbol 'ignore)))
+   (lambda (symbol)
+     (unless (fboundp symbol)
+       (defalias symbol 'ignore)))
    '(general-process-argument-editing-function
      define-process-argument-editing
      gnspool-get-news
@@ -835,9 +838,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (mapcar
    #'(lambda (el)
        (if (listp el)
-	   (apply
-	    'vector
-	    (cons (gnus-offline-get-message (car el)) (cdr el)))
+	   (apply 'vector
+		  (cons (gnus-offline-get-message (car el)) (cdr el)))
 	 el))
    list))
 
