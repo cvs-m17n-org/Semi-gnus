@@ -4172,8 +4172,11 @@ If ARG, allow editing of the cancellation message."
 	(unless arg
 	  (message "Canceling your article...")
 	  (if (let ((message-syntax-checks
-		     'dont-check-for-anything-just-trust-me))
-		(funcall message-send-news-function))
+		     'dont-check-for-anything-just-trust-me)
+		    (method (if (message-functionp message-post-method)
+				(funcall message-post-method arg)
+			      message-post-method)))
+		(funcall message-send-news-function method))
 	      (message "Canceling your article...done"))
 	  (kill-buffer buf))))))
 
