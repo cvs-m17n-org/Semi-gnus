@@ -1953,7 +1953,6 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
      ("smiley" :interactive t gnus-smiley-display)
-     ("smiley" smiley-toggle-buffer)
      ("gnus-win" gnus-configure-windows gnus-add-configuration)
      ("gnus-sum" gnus-summary-insert-line gnus-summary-read-group
       gnus-list-of-unread-articles gnus-list-of-read-articles
@@ -2034,11 +2033,11 @@ use the article treating faculties instead.  Is is described in Info node
 
 (eval-and-compile
   (unless (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
-    (autoload 'smiley-toggle-buffer "gnus-bitmap")
-    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")
-    (when (>= emacs-major-version 21)
-      (autoload 'x-face-decode-message-header "x-face-e21"))))
+    (if (>= emacs-major-version 21)
+	(autoload 'x-face-decode-message-header "x-face-e21")
+      (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
+      (autoload 'smiley-toggle-buffer "gnus-bitmap")
+      (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule"))))
 
 ;;; gnus-sum.el thingies
 
