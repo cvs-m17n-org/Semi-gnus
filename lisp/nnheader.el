@@ -538,7 +538,7 @@ If FILE is t, return the buffer contents as a string."
 		;; Return the buffer contents.
 		((eq ,temp-file t)
 		 (set-buffer ,temp-buffer)
-		 (buffer-string))
+		 (buffer-substring (point-min) (point-max)))
 		;; Save a file.
 		(t
 		 (set-buffer ,temp-buffer)

@@ -740,8 +740,9 @@ If this variable is `t', do not use password cache.")
 		      (delete-region (point-min) (match-end 0)))
 		    (unless (yes-or-no-p
 			     (format "movemail: %s (%d return).  Continue? "
-				     (buffer-string) result))
-		      (error "%s" (buffer-string)))
+				     (buffer-substring
+				      (point-min) (point-max)) result))
+		      (error "%s" (buffer-substring (point-min) (point-max))))
 		    (setq tofile nil)))
 		))))
 	(nnmail-set-password inbox nnmail-internal-password)
@@ -1801,9 +1802,10 @@ If ARGS, PROMPT is used as an argument to `format'."
 	;; Narrow to the status.
 	(narrow-to-region
 	 (point)
-	 (if (re-search-forward "^[^ \t]" nil t)
-	     (1- (point))
-	   (point-max)))
+	 (progn
+	   (while (and (zerop (forward-line 1))
+		       (memq (char-after) '(?\t ?\ ))))
+	   (point)))
 	;; Go through all elements and add them to the list.
 	(goto-char (point-min))
 	(while (re-search-forward "[^ \t=]+" nil t)

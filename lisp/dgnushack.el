@@ -120,7 +120,7 @@ Modify to suit your needs."))
     (with-temp-buffer
       (let ((standard-output (current-buffer)))
 	(Custom-make-dependencies "."))
-      (message (buffer-string)))
+      (message (buffer-substring (point-min) (point-max))))
     (require 'cus-load)
     (byte-compile-file "custom-load.el")
 

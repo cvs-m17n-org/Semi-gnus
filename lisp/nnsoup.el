@@ -687,7 +687,7 @@ backend for the messages.")
 	    (message-remove-header message-ignored-mail-headers t))
 	  (goto-char (point-max))
 	  ;; require one newline at the end.
-	  (or (eq (char-before) ?\n)
+	  (or (bolp)
 	      (insert ?\n))
 	  (let ((case-fold-search t))
 	    ;; Change header-delimiter to be what sendmail expects.
@@ -695,7 +695,7 @@ backend for the messages.")
 	    (re-search-forward
 	     (concat "^" (regexp-quote real-header-separator) "\n"))
 	    (replace-match "\n")
-	    (backward-char 1)
+	    (forward-char -1)
 	    (setq delimline (point-marker))
 	    ;; Insert an extra newline if we need it to work around
 	    ;; Sun's bug that swallows newlines.

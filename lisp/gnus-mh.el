@@ -76,7 +76,7 @@ Optional argument FOLDER specifies folder name."
 	  (set-buffer errbuf)
 	  (if (zerop (buffer-size))
 	      (message "Article saved in folder: %s" folder)
-	    (message "%s" (buffer-string)))
+	    (message "%s" (buffer-substring (point-min) (point-max))))
 	  (kill-buffer errbuf))))
     (setq gnus-newsgroup-last-folder folder)))
 

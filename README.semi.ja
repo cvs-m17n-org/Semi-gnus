@@ -12,7 +12,7 @@ Semi-gnus とは？
 にそれらをインストールしてください。Semi-gnus 6.10 は APEL 9.13 以上、
 最新の FLIM 1.12 および SEMI 1.12 を必要とします。
 それらのパッケージは
-ftp://ftp.jaist.ac.jp/pub/elisp/semi/
+ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 から取得することができます。必要な環境は SEMI の README.ja を参照して
 ください。
 
