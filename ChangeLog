@@ -1,3 +1,10 @@
+1999-02-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Ask save password
+	information to .newsrc file.
+
+	* lisp/gnus.el (gnus-variable-list): Undo my last change.
+
 1999-02-03   Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
 	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache): To

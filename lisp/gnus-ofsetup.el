@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.10 1999-02-02 14:38:13 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.11 1999-02-03 02:06:20 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -248,6 +248,10 @@
 		 (setcar x 'apop)))
 	     mail-source)
 	    (setq gnus-offline-mail-source mail-source)))
+
+	(setq save-passwd
+	      (y-or-n-p "Do you save password information to newsrc file? "))
+	
 	;; Write to setting file.
 	(setq tmp-buffer (get-buffer-create "* Setting"))
 	(set-buffer "* Setting")
@@ -346,6 +350,8 @@
 	      (insert "(setq pop3-fma-movemail-type '")
 	      (insert (prin1-to-string pop3-fma-movemail-type))
 	      (insert ")\n")
+	      (if save-passwd
+		  (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'pop3-fma-password)))\n"))
 	      (if (eq pop3-fma-movemail-type 'exe)
 		  (progn
 		    (insert "(setq pop3-fma-movemail-arguments '")
@@ -358,7 +364,9 @@
 	  (insert "(setq nnmail-spool-file gnus-offline-mail-source)\n")
 	  (insert "(require 'read-passwd)\n")
 	  (insert "(setq mail-source-read-passwd 'read-pw-read-passwd)\n")
-	  (insert "(add-hook 'gnus-before-startup-hook 'read-pw-set-mail-source-passwd-cache)\n");
+	  (insert "(add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)\n")
+	  (if save-passwd
+	      (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'mail-source-password-cache)))\n"))
 	  )
 	(write-region (point-min) (point-max) gnus-offline-setting-file)
 	(kill-buffer "* Setting"))
