@@ -1,0 +1,17 @@
+;; -*- Emacs-Lisp -*-
+(let ((addpath
+       "@ADDITIONAL_LOAD_PATH@"
+       )
+      path paths)
+  (or (string-equal addpath "NONE")
+      (progn
+	(while (string-match "[^\0-\37:]+" addpath)
+	  (setq path (file-name-as-directory
+		      (expand-file-name (match-string 0 addpath)))
+		addpath (substring addpath (match-end 0)))
+	  (if (string-match "apel/" path)
+	      (setq path (substring path 0 (match-beginning 0))))
+	  (if (file-directory-p path)
+	      (setq paths (nconc paths (list path)))))
+	(or (null paths)
+	    (setq load-path (nconc paths load-path))))))
