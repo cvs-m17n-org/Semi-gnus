@@ -1,6 +1,7 @@
 1998-10-30  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
-	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Bug fix.
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Check existance of
+	`To' field before decoding.
 
 1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
