@@ -1,3 +1,11 @@
+1998-11-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.4.
+
+	* lisp/nnheader.el (nnheader-decode-subject): Use field-decoder
+	for `nov' mode.
+	(nnheader-decode-from): Likewise.
+
 1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.3.
