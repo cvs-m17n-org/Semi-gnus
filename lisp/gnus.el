@@ -994,7 +994,7 @@ defaults to a proper value only if this file is byte-compiled by make.")
 (defmacro gnus-define-group-parameter (param &rest rest)
   "Define a group parameter PARAM.
 REST is a plist of following:
-:type               One of `bool', `list' or `nil'.
+:type               One of `bool', `list' or nil.
 :function           The name of the function.
 :function-document  The documentation of the function.
 :parameter-type     The type for customizing the parameter.
@@ -1369,7 +1369,7 @@ newsgroups."
   "*The number of articles which indicates a large newsgroup.
 If the number of articles in a newsgroup is greater than this value,
 confirmation is required for selecting the newsgroup.
-If it is `nil', no confirmation is required."
+If it is nil, no confirmation is required."
   :group 'gnus-group-select
   :type '(choice (const :tag "No limit" nil)
 		 integer))
@@ -1775,7 +1775,7 @@ posting an article."
 
 This number will be prompted as the initial value of the number of
 articles to list when the group is a large newsgroup (see
-`gnus-large-newsgroup').  If it is `nil', the default value is the
+`gnus-large-newsgroup').  If it is nil, the default value is the
 total number of articles in the group.")
 
 ;; group parameters for spam processing added by Ted Zlatanov <tzz@lifelogs.com>
@@ -1925,7 +1925,7 @@ for mail groups."
 another group, or expire them (the default).  If non-nil, this should
 be a list of group name regexps that should match all groups in which
 to do spam-processed article moving, associated with the destination
-group or `nil' for explicit expiration.  This only makes sense for
+group or nil for explicit expiration.  This only makes sense for
 mail groups."
    :variable-group spam
    :variable-type '(repeat 
@@ -1954,7 +1954,7 @@ mail groups."
 another group, or do nothing (the default).  If non-nil, this should
 be a list of group name regexps that should match all groups in which
 to do ham article moving, associated with the destination
-group or `nil' for explicit ignoring.  This only makes sense for
+group or nil for explicit ignoring.  This only makes sense for
 mail groups, and only works in spam groups."
    :variable-group spam
    :variable-type '(repeat 

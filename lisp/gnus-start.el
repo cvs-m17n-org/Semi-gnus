@@ -2205,7 +2205,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(setq list (cdr list))))))
 
 ;;(defun gnus-re-read-newsrc-el-file (file)
-;;  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
+;;  "Attempt to re-read .newsrc.eld file.  Returns nil if successful.
 ;;The backup file \".newsrc.eld_\" will be created before re-reading."
 ;;  (message "Error in %s; retrying..." file)
 ;;  (if (and
