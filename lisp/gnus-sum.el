@@ -2028,8 +2028,8 @@ The following commands are available:
   (gnus-summary-set-display-table)
   (gnus-set-default-directory)
   (setq gnus-newsgroup-name group)
-  (setq gnus-newsgroup-incorporated
-	(unless (gnus-news-group-p group)
+  (unless (gnus-news-group-p group)
+    (setq gnus-newsgroup-incorporated
 	  (nnmail-new-mail-numbers (gnus-group-real-name group))))
   (make-local-variable 'gnus-summary-line-format)
   (make-local-variable 'gnus-summary-line-format-spec)
