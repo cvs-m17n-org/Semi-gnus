@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.4 1998-11-12 14:04:09 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.6 1998-11-19 05:47:29 yamaoka Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -40,6 +40,7 @@
 (defvar pop3-fma-spool-file-alist nil)
 (defvar pop3-fma-movemail-type nil)
 (defvar pop3-fma-movemail-arguments nil)
+(defvar use-miee nil)
 (defvar address)
 (defvar options)
 
@@ -85,8 +86,6 @@
 		'(("gnus-agent" 1) ("nnspool" 2))
 		nil t nil))
 	      (mail-method 'nnmail)
-	      (use-miee
-	       (y-or-n-p "Use MIEE post/send message "))
 	      (program
 	       (read-file-name "Dialup/Hangup program(type nil you do not use): "))
 	      (mta-type
@@ -97,6 +96,9 @@
 	      (num-of-address
 	       (read-from-minibuffer "How many e-mail address do you have: "))
 	      )
+	  (if (string-equal news-method "nnspool")
+	      (setq use-miee t)
+	    (setq use-miee (y-or-n-p "Use MIEE post/send message ")))
 	  ;;
 	  ;; Set variables.
 	  (if (string-equal news-method "gnus-agent")
@@ -129,11 +131,11 @@
 		(let ((news-spool
 		       (read-from-minibuffer
 			"News spool directory for sending: "
-			"~/spool/mail.out"))
+			"/usr/spool/news.out"))
 		      (mail-spool
 		       (read-from-minibuffer
 			"Mail spool directory for sending: "
-			"~/spool/news.out")))
+			"/usr/spool/mail.out")))
 		  (setq gnus-offline-mail-spool-directory mail-spool)
 		  (setq gnus-offline-news-spool-directory news-spool)
 		  (setq gnus-offline-drafts-queue-type 'miee)
@@ -156,9 +158,10 @@
 	    (setq gnus-offline-drafts-queue-type 'agent))
 	  
 	  ;; Setting for gnus-agent.
-	  (let ((agent-directory
-		 (read-from-minibuffer "Agent directory: " "~/News/agent")))
-	    (setq gnus-agent-directory agent-directory))
+	  (if (eq gnus-offline-news-fetch-method 'nnagent)
+	      (let ((agent-directory
+		     (read-from-minibuffer "Agent directory: " "~/News/agent")))
+		(setq gnus-agent-directory agent-directory)))
 	    
 	  ;; Determin MTA type.
 	  (if (string-equal mta-type "smtp")
