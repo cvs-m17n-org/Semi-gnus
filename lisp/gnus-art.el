@@ -42,12 +42,12 @@
 (eval-when-compile
   (defvar gnus-article-decoded-p)
   (defvar gnus-article-mime-handles)
-  (require 'mail-parse)
   (require 'mm-bodies)
+  (require 'mail-parse)
   (require 'mm-decode)
-  (require 'mm-uu)
   (require 'mm-view)
   (require 'wid-edit)
+  (require 'mm-uu)
   )
 
 (defgroup gnus-article nil
@@ -2395,7 +2395,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		 article-type annotation
 		 gnus-data ,handle))
     (setq e (point))
-    (widget-convert-button 'link from to :action 'gnus-widget-press-button
+    (widget-convert-button 'link b e :action 'gnus-widget-press-button
 			   :button-keymap gnus-mime-button-map)))
 
 (defun gnus-widget-press-button (elems el)
@@ -2951,11 +2951,6 @@ If given a prefix, show the hidden text instead."
   :group 'gnus-article-various
   :type 'function)
 
-(defcustom gnus-article-mime-edit-article-setup-hook nil
-  "Hook run after setting up a MIME editing article buffer."
-  :group 'gnus-article-various
-  :type 'hook)
-
 (defvar gnus-article-edit-done-function nil)
 
 (defvar gnus-article-edit-mode-map nil)
@@ -3005,32 +3000,6 @@ groups."
        ,(or (mail-header-references gnus-current-headers) "")
        ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight))))
 
-(defun gnus-article-mime-edit-article-setup ()
-  "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
-after replacing with the original article."
-  (setq gnus-article-edit-done-function
-	`(lambda (&rest args)
-	   (when (featurep 'font-lock)
-	     (setq font-lock-defaults nil)
-	     (font-lock-mode 0))
-	   (mime-edit-exit)
-	   (let (case-fold-search)
-	     (goto-char (point-min))
-	     (re-search-forward
-	      (format "^%s$" (regexp-quote mail-header-separator)))
-	     (replace-match ""))
-	   (apply ,gnus-article-edit-done-function args)
-	   (gnus-summary-show-article)))
-  (erase-buffer)
-  (insert-buffer gnus-original-article-buffer)
-  (mime-edit-again)
-  (when (featurep 'font-lock)
-    (set (make-local-variable 'font-lock-defaults)
-	 '(message-font-lock-keywords t))
-    (font-lock-set-defaults)
-    (turn-on-font-lock))
-  (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
-
 (defun gnus-article-edit-article (exit-func)
   "Start editing the contents of the current article buffer."
   (let ((winconf (current-window-configuration)))
@@ -3073,6 +3042,8 @@ after replacing with the original article."
   (let ((func gnus-article-edit-done-function)
 	(buf (current-buffer))
 	(start (window-start)))
+    (remove-hook 'gnus-article-mode-hook
+		 'gnus-article-mime-edit-article-unwind)
     (gnus-article-edit-exit)
     (save-excursion
       (set-buffer buf)
@@ -3121,6 +3092,99 @@ after replacing with the original article."
     (search-forward-regexp "^$" nil t)
     (let ((case-fold-search nil))
       (query-replace-regexp "\\([.!?][])}]* \\)\\([[({A-Z]\\)" "\\1 \\2"))))
+
+;;;
+;;; Article editing with MIME-Edit
+;;;
+
+(defcustom gnus-article-mime-edit-article-setup-hook nil
+  "Hook run after setting up a MIME editing article buffer."
+  :group 'gnus-article-various
+  :type 'hook)
+
+(defun gnus-article-mime-edit-article-unwind ()
+  "Unwind `gnus-article-buffer' if article editing was given up."
+  (remove-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (when mime-edit-mode-flag
+    (mime-edit-exit 'nomime 'no-error)
+    (message ""))
+  (when (featurep 'font-lock)
+    (setq font-lock-defaults nil)
+    (font-lock-mode 0)))
+
+(defun gnus-article-mime-edit-article-setup ()
+  "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
+after replacing with the original article."
+  (setq gnus-article-edit-done-function
+	`(lambda (&rest args)
+	   (when mime-edit-mode-flag
+	     (mime-edit-exit)
+	     (message ""))
+	   (goto-char (point-min))
+	   (let (case-fold-search)
+	     (when (re-search-forward
+		    (format "^%s$" (regexp-quote mail-header-separator))
+		    nil t)
+	       (replace-match "")))
+	   (when (featurep 'font-lock)
+	     (setq font-lock-defaults nil)
+	     (font-lock-mode 0))
+	   (apply ,gnus-article-edit-done-function args)
+	   (set-buffer gnus-original-article-buffer)
+	   (erase-buffer)
+	   (insert-buffer gnus-article-buffer)
+	   (setq gnus-current-headers
+		 (mime-open-entity 'buffer (current-buffer)))
+	   (mime-entity-set-representation-type-internal
+	    gnus-current-headers 'gnus)
+	   (mail-header-set-number gnus-current-headers
+				   (save-excursion
+				     (set-buffer gnus-summary-buffer)
+				     gnus-current-article))
+	   (gnus-article-prepare-display)))
+  (substitute-key-definition
+   'gnus-article-edit-exit 'gnus-article-mime-edit-exit
+   gnus-article-edit-mode-map)
+  (erase-buffer)
+  (insert-buffer gnus-original-article-buffer)
+  (mime-edit-again)
+  (when (featurep 'font-lock)
+    (set (make-local-variable 'font-lock-defaults)
+	 '(message-font-lock-keywords t))
+    (font-lock-set-defaults)
+    (turn-on-font-lock))
+  (add-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
+
+(defun gnus-article-mime-edit-exit ()
+  "Exit the article MIME editing without updating."
+  (interactive)
+  (let ((winconf gnus-prev-winconf)
+	buf)
+    (when mime-edit-mode-flag
+      (mime-edit-exit)
+      (message ""))
+    (goto-char (point-min))
+    (let (case-fold-search)
+      (when (re-search-forward
+	     (format "^%s$" (regexp-quote mail-header-separator)) nil t)
+	(replace-match "")))
+    (when (featurep 'font-lock)
+      (setq font-lock-defaults nil)
+      (font-lock-mode 0))
+    ;; We remove all text props from the article buffer.
+    (setq buf (format "%s" (buffer-string)))
+    (set-buffer (get-buffer-create gnus-original-article-buffer))
+    (erase-buffer)
+    (insert buf)
+    (setq gnus-current-headers (mime-open-entity 'buffer (current-buffer)))
+    (mime-entity-set-representation-type-internal gnus-current-headers 'gnus)
+    (mail-header-set-number gnus-current-headers
+			    (save-excursion
+			      (set-buffer gnus-summary-buffer)
+			      gnus-current-article))
+    (gnus-article-prepare-display)
+    (set-window-configuration winconf)))
 
 ;;;
 ;;; Article highlights
