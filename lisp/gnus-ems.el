@@ -220,8 +220,49 @@
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
 
-    (fset 'gnus-string-width 'string-width)
-    (fset 'gnus-truncate-string 'truncate-string)
+    (if (fboundp 'truncate-string-to-width)
+	(fset 'gnus-truncate-string 'truncate-string-to-width)
+      (fset 'gnus-truncate-string 'truncate-string))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			,el (string-width ,el)
+			(- (string-width ,el) ,max))
+		    `(gnus-truncate-string ,el ,max))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			val (string-width val)
+			(- (string-width val) ,max))
+		    `(gnus-truncate-string val ,max))
+	       val)))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			,el (- (string-width ,el) ,cut))
+		    `(gnus-truncate-string
+		      ,el (- (string-width ,el) ,cut) ,cut))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			val (- (string-width val) ,cut))
+		    `(gnus-truncate-string
+		      val (- (string-width val) ,cut) ,cut))
+	       val)))))
 
     (when window-system
       (require 'path-util)
