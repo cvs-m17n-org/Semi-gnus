@@ -1,3 +1,21 @@
+1999-12-28  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 15.
+
+	* lisp/gnus-offline.el (gnus-offline-auto-expre): Rename from
+	`gnus-offline-agent-automatic-expire'.
+	(gnus-agent-expire): Fix the advice.
+	(gnus-offline-after-jobs-done): Refer to
+	`gnus-offline-auto-expire'.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-resource-en): Reorder the
+	messages.
+	(gnus-offline-resource-ja): Ditto.
+
+	* lisp/imap.el (imap-ssl-open-2): If `system-type' is windows-nt,
+	bind `coding-system-for-read' to raw-text-dos, else bind it to
+	binary.
+
 1999-12-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
