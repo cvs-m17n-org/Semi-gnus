@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.9 1999-01-31 23:14:36 yamaoka Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.10 1999-02-02 14:38:13 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -213,16 +213,32 @@
 	    ;; Use mail-source.el
 	    (setq mail-source nil)
 	    (while (> i 0)
-	      (setq user (read-from-minibuffer "Mail Account name : "))
-	      (setq server (read-from-minibuffer "Mail server : "))
-	      (setq auth (completing-read
+	      (let ((user (read-from-minibuffer "Mail Account name : "))
+		    (server (read-from-minibuffer "Mail server : "))
+		    (auth (completing-read
 			  "Authentification Method (TAB to completion): "
 			  '(("pop" 1) ("apop" 2)) nil t nil))
-	      (setq mail-source
-		    (append mail-source
-			    (list
-			     (list
-			      auth :user user :server server))))
+		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? ")))
+		(if (not islisp)
+		    (let ((prog (read-file-name "movemail program name: "))
+			  (args (read-from-minibuffer "movemail options: ")))
+		      (setq mail-source
+			    (append mail-source
+				    (list
+				     (list
+				      auth
+				      :user user
+				      :server server
+				      :program prog
+				      :args (format "%s %s" args
+						    (concat "po:" user)))))))
+		  (setq mail-source
+			(append mail-source
+				(list
+				 (list
+				  auth
+				  :user user
+				  :server server))))))
 	      (setq i (- i 1)))
 	    ;; Replace "hoge" -> 'hoge
 	    (mapcar
