@@ -1,3 +1,26 @@
+1999-12-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.14.0.
+	(gnus-revision-number): Clear to 00.
+
+	* README.branch.ja: Update for t-gnus-6_14 branch.
+	* README.branch: Ditto.
+	* README.T-gnus: Ditto.
+	* README.semi.ja: Ditto.
+	* README.semi: Ditto.
+
+	* lisp/{rfc2047.el,nnweb.el,nnultimate.el,nntp.el,nnslashdot.el,
+	nnmh.el,nnfolder.el,nndoc.el,mml.el,mm-view.el,mm-util.el,
+	mm-bodies.el,message.el,mail-source.el,gnus.el,gnus-uu.el,
+	gnus-sum.el,gnus-start.el,gnus-msg.el,gnus-int.el,gnus-cache.el,
+	gnus-art.el,dgnushack.el,ChangeLog}: Sync up with Gnus v5.8.2.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
+	gnus-faq-ja.texi,ChangeLog}: Modify for T-gnus 6.14; sync up with
+	Gnus v5.8.2.
+
+	* t-gnus-6_14: NEW PUBLIC BRANCH.
+
 1999-12-03  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
             Katsumi Yamaoka <yamaoka@jpl.org>
 
