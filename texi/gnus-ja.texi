@@ -860,7 +860,7 @@ Filtering Spam Using The Spam ELisp Package
 * Blackholes::
 * Regular Expressions Header Matching::
 * Bogofilter::
-* SpamAssassin backend::
+* SpamAssassin back end::
 * ifile spam filtering::
 * spam-stat spam filtering::
 * SpamOracle::
@@ -21734,7 +21734,7 @@ Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$
 * Blackholes::
 * Regular Expressions Header Matching::
 * Bogofilter::
-* SpamAssassin backend::
+* SpamAssassin back end::
 * ifile spam filtering::
 * spam-stat spam filtering::
 * SpamOracle::
@@ -22693,8 +22693,8 @@ Bogofilter $B$N%a!<%kJ,N`4o$O!"0U?^$HL\E*$NE@$G(B @command{ifile} $B$K;w$F$$$
 $B$S(B @code{spam-use-bogofilter-headers} $BJQ?t$,Ds6!$5$l$^$9!#$3$N5!G=$r8!::(B
 $B$9$k$?$a$K(B Bogofilter $B$N%P!<%8%g%s(B 0.9.2.1 $B$,;H$o$l$^$7$?!#(B
 
-@node SpamAssassin backend
-@subsubsection SpamAssassin backend
+@node SpamAssassin back end
+@subsubsection SpamAssassin back end
 @cindex spam filtering
 @cindex spamassassin, spam filtering
 @cindex spam
