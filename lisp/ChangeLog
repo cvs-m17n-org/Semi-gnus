@@ -50,6 +50,11 @@
 	* nnrss.el (nnrss-verbose): New variable.
 	(nnrss-request-group): Make it say nnrss is requesting a group.
 
+2005-02-21  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-parse-news-url, gnus-button-handle-news):
+	Handle news URL with given port correctly.
+
 2005-02-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-msg.el (gnus-copy-article-buffer): Quote decoded words
@@ -545,7 +550,7 @@
 
 	* gnus-start.el (gnus-setup-news): Honor user's setting to
 	gnus-message-archive-method.  Suggested by Lute Kamstra
-	<Lute.Kamstra@xs4all.nl>.
+	<lute@gnu.org>.
 
 2004-12-10  Arnaud Giersch  <arnaud.giersch@free.fr>  (tiny change)
 
