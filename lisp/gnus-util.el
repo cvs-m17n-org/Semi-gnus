@@ -31,12 +31,12 @@
 
 ;;; Code:
 
+(require 'cl)
+(eval-when-compile (require 'static))
 (require 'custom)
-(eval-when-compile (require 'cl))
 (require 'nnheader)
 (require 'message)
 (require 'time-date)
-(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'rmail-insert-rmail-file-header "rmail")
@@ -985,51 +985,25 @@ ARG is passed to the first function."
 	(throw 'found nil)))
     t))
 
-(static-if (boundp 'MULE)
-    (defun gnus-write-active-file-as-coding-system
-      (coding-system file hashtb &optional full-names)
-      (let ((output-coding-system coding-system))
-	(with-temp-file file
-	  (mapatoms
-	   (lambda (sym)
-	     (when (and sym
-			(boundp sym)
-			(symbol-value sym))
-	       (insert (format "%s %d %d y\n"
-			       (if full-names
-				   (symbol-name sym)
-				 (gnus-group-real-name (symbol-name sym)))
-			       (or (cdr (symbol-value sym))
-				   (car (symbol-value sym)))
-			       (car (symbol-value sym))))))
-	   hashtb))))
-  (defun gnus-write-active-file-as-coding-system
-    (coding-system file hashtb &optional full-names)
-    (let ((coding-system-for-write coding-system))
-      (with-temp-file file
-	(mapatoms
-	 (lambda (sym)
-	   (when (and sym
-		      (boundp sym)
-		      (symbol-value sym))
-	     (insert (format "%s %d %d y\n"
-			     (if full-names
-				 (symbol-name sym)
-			       (gnus-group-real-name (symbol-name sym)))
-			     (or (cdr (symbol-value sym))
-				 (car (symbol-value sym)))
-			     (car (symbol-value sym))))))
-	 hashtb))))
-  )
-
-(defun-maybe copy-list (list)
-  "Return a copy of a list, which may be a dotted list.
-The elements of the list are not copied, just the list structure itself."
-  (if (consp list)
-      (let ((res nil))
-	(while (consp list) (push (pop list) res))
-	(prog1 (nreverse res) (setcdr res list)))
-    (car list)))
+(defun gnus-write-active-file-as-coding-system (coding-system file hashtb
+							      &optional
+							      full-names)
+  (let ((output-coding-system coding-system)
+	(coding-system-for-write coding-system))
+    (with-temp-file file
+      (mapatoms
+       (lambda (sym)
+	 (when (and sym
+		    (boundp sym)
+		    (symbol-value sym))
+	   (insert (format "%s %d %d y\n"
+			   (if full-names
+			       (symbol-name sym)
+			     (gnus-group-real-name (symbol-name sym)))
+			   (or (cdr (symbol-value sym))
+			       (car (symbol-value sym)))
+			   (car (symbol-value sym))))))
+       hashtb))))
 
 (provide 'gnus-util)
 
