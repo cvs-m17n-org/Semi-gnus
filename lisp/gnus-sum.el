@@ -7217,7 +7217,7 @@ latter case, they will be copied into the relevant groups."
       (set-buffer (get-buffer-create " *import file*"))
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       (goto-char (point-min))
       (unless (nnheader-article-p)
 	;; This doesn't look like an article, so we fudge some headers.
