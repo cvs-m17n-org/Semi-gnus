@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.2"
+(defconst gnus-version-number "6.10.3"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -1742,6 +1742,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-async" gnus-async-request-fetched-article gnus-async-prefetch-next
       gnus-async-prefetch-article gnus-async-prefetch-remove-group
       gnus-async-halt-prefetch)
+     ("pop3-fma" :interactive t
+      pop3-fma-set-pop3-password)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
