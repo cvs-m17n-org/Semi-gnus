@@ -1,3 +1,15 @@
+1998-08-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
+
+	* Sync up with Gnus 5.6.31.
+	
+1998-08-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.8.
+
+	* Sync up with Gnus 5.6.30.
+	
 1998-08-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-yank-original): For citing any message.

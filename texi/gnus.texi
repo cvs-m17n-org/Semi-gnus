@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.8.6 Manual
+@settitle Semi-gnus 6.8.9 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.8.6 Manual
+@title Semi-gnus 6.8.9 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.8.6.
+This manual corresponds to Semi-gnus 6.8.9.
 
 @end ifinfo
 
@@ -6234,7 +6234,9 @@ too much cruft in most articles.
 @item W W a
 @kindex W W a (Summary)
 @findex gnus-article-hide
-Do maximum hiding on the summary buffer (@kbd{gnus-article-hide}).
+Do quote a lot of hiding on the article buffer
+(@kbd{gnus-article-hide}).  In particular, this function will hide
+headers, PGP, cited text and the signature.  
 
 @item W W h
 @kindex W W h (Summary)
@@ -6276,16 +6278,6 @@ customizing the hiding:
 
 @table @code
 
-@item gnus-cite-hide-percentage
-@vindex gnus-cite-hide-percentage
-If the cited text is of a bigger percentage than this variable (default
-50), hide the cited text.
-
-@item gnus-cite-hide-absolute
-@vindex gnus-cite-hide-absolute
-The cited text must have at least this length (default 10) before it
-is hidden.
-
 @item gnus-cited-text-button-line-format
 @vindex gnus-cited-text-button-line-format
 Gnus adds buttons to show where the cited text has been hidden, and to
@@ -6306,6 +6298,25 @@ Length of the hidden text.
 @vindex gnus-cited-lines-visible
 The number of lines at the beginning of the cited text to leave shown.
 
+@end table
+
+@item W W C-c
+@kindex W W C-c (Summary)
+@findex gnus-article-hide-citation-maybe
+
+Hide citation (@code{gnus-article-hide-citation-maybe}) depending on the
+following two variables:
+
+@table @code
+@item gnus-cite-hide-percentage
+@vindex gnus-cite-hide-percentage
+If the cited text is of a bigger percentage than this variable (default
+50), hide the cited text.
+
+@item gnus-cite-hide-absolute
+@vindex gnus-cite-hide-absolute
+The cited text must have at least this length (default 10) before it
+is hidden.
 @end table
 
 @item W W C
@@ -7774,15 +7785,15 @@ These conditions are:
 @table @code
 @item empty
 Remove all empty headers.
-@item newsgroups
-Remove the @code{Newsgroups} header if it only contains the current group
-name.
 @item followup-to
 Remove the @code{Followup-To} header if it is identical to the
 @code{Newsgroups} header.
 @item reply-to
 Remove the @code{Reply-To} header if it lists the same address as the
 @code{From} header.
+@item newsgroups
+Remove the @code{Newsgroups} header if it only contains the current group
+name.
 @item date
 Remove the @code{Date} header if the article is less than three days
 old.
@@ -7792,11 +7803,11 @@ Remove the @code{To} header if it is very long.
 Remove all @code{To} headers if there are more than one.
 @end table
 
-To include the four first elements, you could say something like;
+To include the four three elements, you could say something like;
 
 @lisp
 (setq gnus-boring-article-headers
-      '(empty newsgroups followup-to reply-to))
+      '(empty followup-to reply-to))
 @end lisp
 
 This is also the default value for this variable.
@@ -9675,7 +9686,7 @@ information in the headers (i.e., do @code{replace-match}-like
 substitutions in the group names), you can say things like:
 
 @example
-(any "debian-\\(\\w*\\)@@lists.debian.org" "mail.debian.\\1")
+(any "debian-\\b\\(\\w+\\)@@lists.debian.org" "mail.debian.\\1")
 @end example
 
 If the string contains the element @samp{\&}, then the previously
@@ -10473,6 +10484,9 @@ The rnews batch transport format.
 @item forward
 Forwarded articles.
 
+@item mime-parts
+MIME multipart messages, besides digests.
+
 @item mime-digest
 @cindex digest
 @cindex MIME digest
@@ -10515,8 +10529,9 @@ Virtual server variables:
 @vindex nndoc-article-type
 This should be one of @code{mbox}, @code{babyl}, @code{digest},
 @code{news}, @code{rnews}, @code{mmdf}, @code{forward}, @code{rfc934},
-@code{rfc822-forward}, @code{mime-digest}, @code{standard-digest},
-@code{slack-digest}, @code{clari-briefs} or @code{guess}.
+@code{rfc822-forward}, @code{mime-parts}, @code{mime-digest},
+@code{standard-digest}, @code{slack-digest}, @code{clari-briefs} or
+@code{guess}.
 
 @item nndoc-post-type
 @vindex nndoc-post-type
@@ -15388,7 +15403,7 @@ On July 28th 1996 work on Red Gnus was begun, and it was released on
 January 25th 1997 (after 84 releases) as ``Gnus 5.4'' (67 releases).
 
 On September 13th 1997, Quassia Gnus was started and lasted 37
-releases.  If was released as ``Gnus 5.6.29' on March 8th 1998.
+releases.  If was released as ``Gnus 5.6.31' on March 8th 1998.
 
 If you happen upon a version of Gnus that has a prefixed name --
 ``(ding) Gnus'', ``September Gnus'', ``Red Gnus'', ``Quassia Gnus'' --
@@ -15865,7 +15880,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.29.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6.31.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16400,7 +16415,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.29:
+New features in Gnus 5.6.31:
 
 @itemize @bullet
 
@@ -17719,6 +17734,9 @@ gnus-posting-styles doesn't work in drafts.
 gnus-summary-limit-include-cached is slow when there are
 many articles in the cache, since it regenerates big parts of the
 summary buffer for each article.
+
+@item
+Implement gnus-batch-brew-soup.
 
 @item
 Solve the halting problem.
