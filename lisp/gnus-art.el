@@ -1288,7 +1288,7 @@ if given a positive prefix, always hide."
 	  (narrow-to-region header-start header-end)
 	  (article-hide-headers)
 	  ;; Re-display X-Face image under XEmacs.
-	  (when (and (featurep 'xemacs)
+	  (when (and gnus-xemacs
 		     (gnus-functionp gnus-article-x-face-command))
 	    (let ((func (cadr (assq 'gnus-treat-display-xface
 				    gnus-treatment-function-alist)))
@@ -2985,7 +2985,7 @@ value of the variable `gnus-show-mime' is non-nil."
   "Decode and show X-Face with the function
 `x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
 narrowed to just the headers of the article."
-  (when (featurep 'xemacs)
+  (when gnus-xemacs
     (error "`%s' won't work under XEmacs."
 	   'gnus-article-display-x-face-with-x-face-mule))
   (when window-system
