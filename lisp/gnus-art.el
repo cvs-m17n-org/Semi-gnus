@@ -3585,9 +3585,11 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Decode an article as `default-mime-charset'.  It won't work if the
 value of the variable `gnus-show-mime' is non-nil."
   (unless gnus-show-mime
+    (set (make-local-variable 'default-mime-charset)
+	 (with-current-buffer gnus-summary-buffer
+	   default-mime-charset))
     (decode-mime-charset-region (point-min) (point-max)
-				(with-current-buffer gnus-summary-buffer
-				  default-mime-charset))))
+				default-mime-charset)))
 
 ;;;
 ;;; Gnus MIME viewing functions
@@ -5103,7 +5105,18 @@ after replacing with the original article."
 			     gnus-article-edit-mode-map)
   (erase-buffer)
   (insert-buffer gnus-original-article-buffer)
-  (mime-edit-again)
+  (let ((ofn (symbol-function 'mime-edit-decode-single-part-in-buffer)))
+    (fset 'mime-edit-decode-single-part-in-buffer
+	  (lambda (&rest args)
+	    (if (let ((content-type (car args)))
+		  (and (eq 'message (mime-content-type-primary-type
+				     content-type))
+		       (eq 'rfc822 (mime-content-type-subtype content-type))))
+		(setcar (cdr args) 'not-decode-text))
+	    (apply ofn args)))
+    (unwind-protect
+	(mime-edit-again)
+      (fset 'mime-edit-decode-single-part-in-buffer ofn)))
   (when (featurep 'font-lock)
     (set (make-local-variable 'font-lock-defaults)
 	 '(message-font-lock-keywords t))
