@@ -1,3 +1,7 @@
+2004-12-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Revert.
+
 2004-12-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el (infohack-texi-format): Bind undo-outer-limit.
