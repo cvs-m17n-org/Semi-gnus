@@ -676,7 +676,7 @@ If this variable is `t', do not use password cache.")
 			 (setq result 255))))
 		  (let ((default-directory "/")
 			(inbox-info (nnmail-parse-spool-file-name inbox)))
-		    (setenv (nnmail-spool-mailhost inbox-info))
+		    (setenv "MAILHOST" (nnmail-spool-mailhost inbox-info))
 		    (setq result
 			  (apply
 			   'call-process
@@ -685,7 +685,8 @@ If this variable is `t', do not use password cache.")
 			     (expand-file-name
 			      nnmail-movemail-program exec-directory)
 			     nil errors nil 
-			     (nnmail-spool-maildrop inbox-info) tofile)
+			     (concat "po:" (nnmail-spool-maildrop inbox-info))
+			     tofile)
 			    (when nnmail-internal-password
 			      (list nnmail-internal-password)))))))
 		(push inbox nnmail-moved-inboxes)
