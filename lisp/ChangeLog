@@ -1,3 +1,7 @@
+1997-11-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* gnus.el (gnus-version): Rename to "Semi-gnus".
+
 1997-11-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* gnus-draft.el (gnus-draft-decoding-function): New variable.
@@ -144,7 +148,7 @@ Tue Nov 25 19:54:00 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 	* gnus-move.el (gnus-move-group-to-server): Protect agains
 	nil-ness. 
 
-1997-11-27  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+1997-11-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* gnus-i18n.el: New file.
 
@@ -265,11 +269,11 @@ Tue Nov 25 14:44:02 1997  SeokChan LEE  <chan@xfer.kren.nm.kr>
 
 	* message.el (message-ignored-supersedes-headers): Typo.
 
-1997-11-27  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+1997-11-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* message.el: Abolish `message-max-size' because it is not used.
 
-1997-11-26  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+1997-11-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* nnmh.el (nnmh-request-list-1): fix maybe.
 
@@ -636,7 +640,7 @@ Sat Sep 27 05:36:11 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 
 	* gnus-sum.el (gnus-nov-read-integer): Really skip to next field.
 
-1997-09-29  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+1997-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* message.el (message-send-news-function): Use
  	`message-send-news-with-gnus' in default.
