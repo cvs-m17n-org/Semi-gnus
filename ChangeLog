@@ -1,3 +1,8 @@
+2001-06-25  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-clfns.el (find-cl-run-time-functions): New
+	implementation.
+
 2001-06-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-display-x-face): Don't gather X-Face
