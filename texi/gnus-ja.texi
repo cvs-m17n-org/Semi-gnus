@@ -21074,7 +21074,7 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8
 $B$&(B:
 
 @enumerate
-@item documentation
+@item
 
 @item
 
