@@ -1,5 +1,10 @@
 2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Protect
+	against unexpected data structure.
+
+2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
 	* lisp/nnshimbun.el: Clean up codes.
 	(nnshimbun-buffer, nnshimbun-current-directory)
 	(nnshimbun-current-group, nnshimbun-server-directory): Removed.
