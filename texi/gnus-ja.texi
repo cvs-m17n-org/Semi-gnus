@@ -10575,9 +10575,11 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @vindex gnus-use-idna
 @item gnus-use-idna
 $B$3$NJQ?t$O(B @samp{From:}$B!"(B@samp{To:} $B$*$h$S(B @samp{Cc:} $B%X%C%@!<$K$"$k9q:](B
-$B2=%I%a%$%sL>$r!"(Bgnus $B$,(B IDNA $B%G%3!<%I$9$k$+$I$&$+$r@)8f$7$^$9!#$3$l$K(B
-$B$O(B @uref{http://www.gnu.org/software/libidn/, GNU Libidn} $B$,I,MW$G!"$3$N(B
-$BJQ?t$O$=$l$r%$%s%9%H!<%k$7$F$"$k>l9g$@$1M-8z$K$J$j$^$9!#(B
+$B2=%I%a%$%sL>$r!"(Bgnus $B$,(B IDNA $B%G%3!<%I$9$k$+$I$&$+$r@)8f$7$^$9!#$=$N$h$&(B
+$B$J%a%C%;!<%8$N:n$jJ}$K$D$$$F(B
+$B$O(B @xref{IDNA, ,IDNA,message-ja, The Message Manual} $B$r;2>H$7$F2<$5$$!#(B
+$B$3$l$K$O(B @uref{http://www.gnu.org/software/libidn/, GNU Libidn} $B$,I,MW$G!"(B
+$B$3$NJQ?t$O$=$l$r%$%s%9%H!<%k$7$F$"$k>l9g$@$1M-8z$K$J$j$^$9!#(B
 @end table
 
 @node Composing Messages
