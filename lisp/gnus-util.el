@@ -1497,6 +1497,10 @@ empty directories from OLD-PATH."
 			 (file-truename 
 			  (concat old-dir "..")))))))))
 
+(defun gnus-set-file-modes (filename mode)
+  "Wrapper for set-file-modes."
+  (ignore-errors
+    (set-file-modes filename mode)))
 
 (provide 'gnus-util)
 

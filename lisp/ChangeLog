@@ -1,3 +1,34 @@
+2004-05-23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* assistant.el (wid-edit): Fix compilation.
+
+	* gnus-util.el (gnus-set-file-modes): Just ignore errors. 
+
+2004-05-23  Paul Stodghill  <stodghil@cs.cornell.edu>
+
+	* gnus-util.el (gnus-set-file-modes): New function.  (small
+	patch). 
+
+2004-05-23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-topic.el (gnus-topic-jump-to-topic): Goto missing topic.
+
+	* assistant.el (assistant-render-node): Fix up rendering and
+	read-only text. 
+	(assistant-render-node): Reset.
+	(assistant-make-read-only): Not sticky.
+
+2004-05-20  Danny Siu  <dsiu@adobe.com>
+
+        * gnus-sum.el (gnus-summary-recenter): Summery buffer was not auto
+	centered even when gnus-auto-center-summary is t
+
+2004-05-22  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dns.el (dns-get-txt-answer): New function.
+	(dns-read-txt): Ditto.
+	(query-dns): Use it.
+
 2004-05-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-start.el (gnus-get-unread-articles): Don't invalidate
