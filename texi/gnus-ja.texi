@@ -859,6 +859,7 @@ Gnus Unplugged
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
+* Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
 * Agent and IMAP::              $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 * Outgoing Messages::           $BEj9F!"%a!<%k$r=P$9$H$-$K$J$K$,5/$3$k$N$+(B?
 * Agent Variables::             $B%+%9%?%^%$%:$O3Z$7(B
@@ -876,9 +877,9 @@ Agent Categories
 
 Agent Commands
 
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        $B%0%k!<%W$N@_Dj$H$=$l$i$NFbMF$N<hF@(B
+* Summary Agent Commands::      $B<jF0$GA*Br$7$?5-;v$r<hF@$9$k(B
+* Server Agent Commands::       $B%(!<%8%'%s%H$G%5%]!<%H$5$l$k%5!<%P!<$NA*Br(B
 
 Scoring
 
@@ -5038,10 +5039,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @item gnus-select-article-hook
 @vindex gnus-select-article-hook
 $B$3$N%U%C%/$O5-;v$,A*Br$5$l$?$H$-$K>o$K8F$P$l$^$9!#=i4|@_Dj$G$O!"A*Br$5$l(B
-$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#%(!<%8%'%s%H$,(B
-$B$9$Y$F$N4{FI$N5-;v$r%;!<%V$9$k$h$&$K$5$;$?$$>l9g$O!"$3$N%U%C%/(B
-$B$K(B @code{gnus-agent-fetch-selected-article} $B$rDI2C$9$k$3$H$G!"$=$l$r$9$k(B
-$B$O$:$G$9!#(B
+$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#$"$J$?$,FI$s$@(B
+$B$=$l$>$l$N5-;v$r%(!<%8%'%s%H$K%;!<%V$5$;$?$$>l9g$O!"$3$N%U%C%/(B
+$B$K(B @code{gnus-agent-fetch-selected-article} $B$rDI2C$9$k$3$H$G!"$=$l$r9T$J(B
+$B$&$G$7$g$&!#(B
 
 @item gnus-mark-article-hook
 @vindex gnus-mark-article-hook
@@ -5739,12 +5740,20 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$9(B (@code{gnus-unseen-mark})$B!#(B@code{gnus-recent-mark} $B$H8+Hf$Y$F2<$5$$!#(B
 
 @item
+@vindex gnus-downloaded-mark
+gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$r;H$C$F$$$k$H$-!"5-;v(B
+$B$O(B unplugged ($B%*%U%i%$%s(B) $B$G8+$k$?$a$K%@%&%s%m!<%I$5$l$F$$$k$+$b$7$l$^$;(B
+$B$s!#(B@samp{%O} $B$N;EMM$r;H$C$F$$$k$H!"$=$l$i$N5-;v$K$O$=$N;EMM(B
+$B$K(B @samp{+} $B$N0u$,IU$-$^$9!#(B($BJQ?t(B @code{gnus-downloaded-mark} $B$G$I$NJ8;z(B
+$B$r;H$&$+$r@)8f$7$^$9!#(B)
+
+@item
 @vindex gnus-undownloaded-mark
 gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$r;H$C$F$$$k$H$-!"$$$/$D$+$N5-;v(B
-$B$O%@%&%s%m!<%I$5$l$F$$$J$$$+$b$7$l$^$;$s!#%*%U%i%$%s(B (unplugged) $B$N>uBV(B
-$B$G$O$=$N$h$&$J5-;v$r8+$k$3$H$,$G$-$^$;$s!#$=$l$i$N5-;v$K$O:G=i$N7e(B
-$B$K(B @samp{@@} $B$N0u$,IU$-$^$9!#(B($BJQ?t(B @code{gnus-undownloaded-mark} $B$G$I$N(B
-$BJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
+$B$O%@%&%s%m!<%I$5$l$F$$$J$$$+$b$7$l$^$;$s!#(BUnplugged ($B%*%U%i%$%s(B) $B$N>uBV(B
+$B$G$O$=$N$h$&$J5-;v$r8+$k$3$H$,$G$-$^$;$s!#(B@samp{%O} $B$N;EMM$r;H$C$F$$$k$H!"(B
+$B$=$l$i$N5-;v$K$O$=$N;EMM$K(B @samp{-} $B$N0u$,IU$-$^$9!#(B($BJQ(B
+$B?t(B @code{gnus-undownloaded-mark} $B$G$I$NJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
 
 @item
 @vindex gnus-downloadable-mark
@@ -5963,13 +5972,10 @@ gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&%s
 @itemx #
 @kindex # ($B35N,(B)
 @kindex M P p ($B35N,(B)
-@findex gnus-pick-unmark-article-or-thread
-$B%9%l%C%I$+5-;v$rL$A*Br$K$7$^(B
-$B$9(B (@code{gnus-pick-unmark-article-or-thread})$B!#JQ(B
-$B?t(B @code{gnus-thread-hide-subtree} $B$,(B true $B$G$"$l$P!"$3$N%-!<$O%9%l%C%I(B
-$B$N:G=i$N5-;v$G;H$o$l$?$H$-$O%9%l%C%I$rL$A*Br$K$7$^$9!#$=$&$G$J$$>l9g$O!"(B
-$B$=$N5-;v$@$1$rL$A*Br$K$7$^$9!#$=$N9T$N%9%l%C%I$+5-;v$rL$A*Br$K$9$k$?$a$K(B
-$B$3$N%-!<$K?tCM@\F,0z?t$rM?$($k;v$,$G$-$^$9!#(B
+@findex gnus-summary-mark-as-processable
+$B8=:_$N5-;v$K%W%m%;%90u$rIU$1$^(B
+$B$9(B (@code{gnus-summary-mark-as-processable})$B!#(B
+@findex gnus-summary-unmark-as-processable
 
 @item M P u
 @itemx M-#
@@ -16103,8 +16109,8 @@ Namazu $B$r;H$C$F!"%a!<%k$N;3$+$i$"$J$?$N9%$-$J%-!<%o!<%I$r4^$`5-;v$r8+(B
 $B:G=i$KHa$7$$$*CN$i$;$,$R$H$D!#(B@file{gnus-namazu.el} $B$O!"8=;~E@$G$O!"(B
 @code{nnml} $B%P%C%/%(%s%I$"$k$$$O(B @code{nnmh} $B%P%C%/%(%s%I$K$h$C$FJ]B8(B
 $B$5$l$F$$$k5-;v$H!"(B@code{gnus-cache-enter-article} $B$K$h$C$F1JB32=$5$l$?(B
-$B5-;v$7$+!"<h$j07$&$3$H$,$G$-$^$;$s!#(B@code{nnimap} $B%P%C%/%(%s%I$d(B 
-@code{nnmbox} $B%P%C%/%(%s%I$r;H$C$F$$$k?M$O!"$4$a$s$J$5$$!#(B
+$B5-;v$7$+!"<h$j07$&$3$H$,$G$-$^$;$s!#(B@code{nnimap} $B%P%C%/%(%s%I(B
+$B$d(B @code{nnmbox} $B%P%C%/%(%s%I$r;H$C$F$$$k?M$O!"$4$a$s$J$5$$!#(B
 
 $B$=$l$G$O5$$r<h$jD>$7$F!"$^$:!"(BNamazu $B$r;H$($k$h$&$K$7$^$7$g$&!#>\$7$$(B
 $B$3$H$O!"<!$N%Z!<%8$GCN$k$3$H$,$G$-$^$9!#(B
@@ -16215,6 +16221,7 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
+* Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
 * Agent and IMAP::              $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 * Outgoing Messages::           $BEj9F!"%a!<%k$r=P$9$H$-$K$J$K$,5/$3$k$N$+(B?
 * Agent Variables::             $B%+%9%?%^%$%:$O3Z$7(B
@@ -16682,9 +16689,9 @@ file
 $B$GF0:n$7!"(Bgnus $B%(!<%8%'%s%H$N@Z$jN%$7(B/$B:9$79~$_>uBV$r@Z$jBX$($^$9!#(B
 
 @menu
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        $B%0%k!<%W$N@_Dj$H$=$l$i$NFbMF$N<hF@(B
+* Summary Agent Commands::      $B<jF0$GA*Br$7$?5-;v$r<hF@$9$k(B
+* Server Agent Commands::       $B%(!<%8%'%s%H$G%5%]!<%H$5$l$k%5!<%P!<$NA*Br(B
 @end menu
 
 @node Group Agent Commands
@@ -16758,13 +16765,26 @@ file
 @item J c
 @kindex J c ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-catchup
-$B%@%&%s%m!<%I0u$NL5$$5-;v$rA4$F4{FI$K$9$k(B (@code{gnus-agent-catchup})$B!#(B
+$B%-%c%C%7%e$5$l$F$$$J$$!"%@%&%s%m!<%I$5$l$F$$$J$$!"$^$?$O%@%&%s%m!<%I$G$-(B
+$B$J$$$9$Y$F$N5-;v$r4{FI$K$9$k(B (@code{gnus-agent-catchup})$B!#(B
+
+@item J S
+@kindex J S ($B%(!<%8%'%s%H(B $B35N,(B)
+@findex gnus-agent-fetch-group
+$B$3$N%0%k!<%W$N$9$Y$F$NK>$^$7$$5-;v(B (@pxref{Agent Categories} $B;2>H(B) $B$r%@(B
+$B%&%s%m!<%I$9$k!#(B(@code{gnus-agent-fetch-group})$B!#(B
+
+@item J s
+@kindex J s ($B%(!<%8%'%s%H(B $B35N,(B)
+@findex gnus-agent-fetch-series
+$B$3$N%0%k!<%W$N$9$Y$F$N%W%m%;%90u$,IU$$$?5-;v$r%@%&%s%m!<%I$9$k!#(B
+(@code{gnus-agent-fetch-series})$B!#(B
 
 @item J u
 @kindex J u ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-summary-fetch-group
-$B8=:_$N%0%k!<%W$N%@%&%s%m!<%I2DG=$J5-;v$r!"$9$Y$F%@%&%s%m!<%I$7$^(B
-$B$9(B (@code{gnus-agent-summary-fetch-group})$B!#(B
+$B8=:_$N%0%k!<%W$N%@%&%s%m!<%I2DG=$J5-;v$r!"$9$Y$F%@%&%s%m!<%I$9(B
+$B$k(B (@code{gnus-agent-summary-fetch-group})$B!#(B
 @end table
 
 @node Server Agent Commands
@@ -16816,6 +16836,10 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 $BE*$G$b$J$/!"0lC6;O$a$F$7$^$C$?$i(B (@kbd{C-g} $B$d$=$NB>$G(B) $BCfCG$9$k$3$H$b$"(B
 $B$^$jNI$$$3$H$G$O$"$j$^$;$s!#(B
 
+$BNc$($P(B @code{gnus-request-expire-articles} $B$N$h$&$JB>$N4X?t$O!"%(!<%8%'(B
+$B%s%H$r%0%k!<%W$KF14|$5$;$k$?$a$K(B @code{gnus-agent-expire} $B$r<B9T$9$k$+$b(B
+$B$7$l$J$$$3$H$KCm0U$7$F2<$5$$!#(B
+
 @code{gnus-agent-expire-days} $B$O@55,I=8=(B/$BF|?t$N%Z%"$N%j%9%H$G$"$C$F$b9=(B
 $B$$$^$;$s!#@55,I=8=$O%0%k!<%WL>$K%^%C%A$7!"0[$J$k%0%k!<%W$G0[$J$k4|8B@Z$l(B
 $B>C5n$r9T$J$&$3$H$r2DG=$K$7$^$9!#(B
@@ -16828,7 +16852,8 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 @end lisp
 
 $B$b$7%j%9%H$N7A<0$r;H$&>l9g$O!":G8e$NMWAG$O%G%#%U%)%k%H$N%a%=%C%I!"$9$J$o(B
-$B$A$9$Y$F$N%0%k!<%W$K%^%C%A$9$k$b$N$K$7$J$1$l$P$J$j$^$;$s!#(B
+$B$A$9$Y$F$N%0%k!<%W$K%^%C%A$9$k$b$N$K$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$K4X$7(B
+$B$F!"$5$i$K$=$l$O%0%k!<%WL>$N@hF,$+$i%^%C%A$7$J$1$l$P$J$j$^$;$s!#(B
 
 @vindex gnus-agent-expire-all
 @code{gnus-agent-expire-all} $B$,(B @code{nil} $B$G$J$1$l$P!"$3$NL?Na$OA4$F$N(B
@@ -16836,11 +16861,46 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 $B=i4|@_DjCM(B) $B$G$"$l$P!"4{FI5-;v$N$_$,>C5n$NBP>]$H$J$j!"L$FI!"2D;k!"J]N15-(B
 $B;v$O$5$i$KL54|8B$KJ];}$7$^$9!#(B
 
-@findex gnus-agent-regenerate
 $B4|8B@Z$l>C5n$5$l$F$$$k$O$:$J$N$K;D$C$F$$$k5-;v$r8+$D$1$?$J$i$P!"$?$V$s$$(B
 $B$/$D$+$N(B gnus $B%(!<%8%'%s%H%U%!%$%k$,2u$l$F$$$^$9!#(B
 @code{gnus-agent-regenerate} $B$O!"5/$3$j$&$kLdBj$r=$I|$9$k$?$a$NFCJL$J%3(B
 $B%^%s%I$G$9!#(B
+
+@c TRANSLATEME!
+@node Agent Regeneration
+@subsection Agent Regeneration
+
+@cindex Agent Regeneration
+@cindex Gnus Agent Regeneration
+@cindex regeneration
+
+The local data structures used by @code{nnagent} may become corrupted
+due to certain exceptional conditions.  When this happens,
+@code{nnagent} functionality may degrade or even fail.  The solution
+to this problem is to repair the local data structures by removing all
+internal inconsistencies.
+
+For example, if your connection to your server is lost while
+downloaded articles into the agent, the local data structures will not
+know about articles downloaded prior to the connection failure.
+Running @code{gnus-agent-regenerate} or
+@code{gnus-agent-regenerate-group} will update the data structures
+such that you don't need to download these articles a second time.
+
+@findex gnus-agent-regenerate
+@kindex M-x gnus-agent-regenerate
+The command @code{gnus-agent-regenerate} will perform
+@code{gnus-agent-regenerate-group} on every agentized group.  While
+you can run @code{gnus-agent-regenerate} in any buffer, it is strongly
+recommended that you first close all summary buffers.
+
+@findex gnus-agent-regenerate-group
+@kindex M-x gnus-agent-regenerate-group
+The command @code{gnus-agent-regenerate-group} uses the local copies
+of individual articles to repair the local NOV(header) database.  It
+then updates the internal data structures that document which articles
+are stored locally.  An optional argument will mark articles in the
+agent as unread.
 
 @node Agent and IMAP
 @subsection $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
@@ -16948,6 +17008,31 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B @sc{nov} $B$H5-;v$r;H$&$+$I$&$+$r@
 $B$,%G%#%U%)%k%H$G$9$,!"%(!<%8%'%s%H$O:F@\B3$9$k$H$-$K%*%U%i%$%s>uBV$N%5!<(B
 $B%P!<$r%*%s%i%$%s>uBV$K$9$k$+$I$&$+$r?R$M$^$9!#$=$l0J30$NCM$@$C$?$i!"%*%U(B
 $B%i%$%s>uBV$N%5!<%P!<$O<+F0E*$K%*%s%i%$%s>uBV$K$J$j$^$9!#(B
+
+@c TRANSLATEME!
+@item gnus-agent-mark-unread-after-downloaded
+@vindex gnus-agent-mark-unread-after-downloaded
+If @code{gnus-agent-mark-unread-after-downloaded} is non-@code{nil},
+mark articles as unread after downloading.  The default is t.
+
+@item gnus-agent-consider-all-articles
+@vindex gnus-agent-consider-all-articles
+If @code{gnus-agent-consider-all-articles} is non-@code{nil}, the
+agent will fetch all missing headers.  When @code{nil}, the agent will
+fetch only new headers. The default is @code{nil}.
+
+@item gnus-agent-max-fetch-size
+@vindex gnus-agent-max-fetch-size
+The agent fetches articles into a temporary buffer prior to parsing
+them into individual files.  To avoid exceeding the max. buffer size,
+the agent alternates between fetching and parsing until all articles
+have been fetched.  @code{gnus-agent-max-fetch-size} provides a size
+limit to control how often the cycling occurs.  A large value improves
+performance.  A small value minimizes the time lost should the
+connection be lost while fetching (You may need to run
+@pxref{gnus-agent-regenerate-group} to update the group's state.
+However, all articles parsed prior to loosing the connection will be
+available while unplugged).
 
 @item gnus-server-unopen-status
 @vindex gnus-server-unopen-status
@@ -17128,8 +17213,8 @@ Gnus Agent $B$O$h$/$"$kB>$N%*%U%i%$%s%K%e!<%9%j!<%@!<$N$h$&$K$OF0:n$7$^$;(B
 @end table
 
 $BMWLs$9$k$H!"(Bgnus $B$,@Z$jN%$5$l$F$$$k$H$-$O%m!<%+%k$KJ]B8$5$l$?5-;v$r8+$k(B
-$B$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O(B ISP $B$HOC$9$@$1$G!"$+$D%m!<%+%k$K;}$C$F$$(B
-$B$k5-;v$r;H$$$^$9!#(B
+$B$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O(B ISP $B$HOC$7!"$+$D%m!<%+%k$K;}$C$F$$$k5-;v(B
+$B$b;H$&$+$b$7$l$^$;$s!#(B
 
 @node Scoring
 @chapter $B%9%3%"(B
