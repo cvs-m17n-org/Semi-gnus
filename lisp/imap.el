@@ -139,6 +139,8 @@
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
+  (autoload 'base64-decode-string "base64")
+  (autoload 'base64-encode-string "base64")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
   (autoload 'digest-md5-parse-digest-challenge "digest-md5")
@@ -147,35 +149,7 @@
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
-  (autoload 'format-spec-make "format-spec")
-  (require 'mel))
-
-(defun-maybe base64-decode-string (string)
-  "Base64-decode STRING and return the result."
-  (fset 'base64-decode-string
-	(symbol-function (mel-find-function 'mime-decode-string "base64")))
-  (base64-decode-string string))
-
-(eval-and-compile
-  (condition-case nil
-      (base64-encode-string "" 'no-line-break)
-    (error
-     (condition-case nil
-	 (let ((fn (mel-find-function 'mime-encode-string "base64")))
-	   (funcall fn "" 'no-line-break)
-	   (fset 'base64-encode-string (symbol-function fn)))
-       (wrong-number-of-arguments
-	(defun base64-encode-string (string &optional no-line-break)
-	  "Base64-encode STRING and return the result.
-Optional second argument NO-LINE-BREAK means do not break long lines
-into shorter lines."
-	  (let ((fn (mel-find-function 'mime-encode-string "base64")))
-	    (if no-line-break
-		(mapconcat 'identity
-			   (split-string (funcall fn string) "\n")
-			   "")
-		(funcall fn string))))))
-     )))
+  (autoload 'format-spec-make "format-spec"))
 
 (autoload 'md5 "md5")
 
