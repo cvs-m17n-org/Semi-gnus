@@ -8272,10 +8272,11 @@ html2text ($B%7%s%W%k$J(B @sc{html} $B%3%s%P!<%?!<!"(Bgnus $B$K4^$^$l$F$$$k
 $B$=$l$K4X$9$k;v$r!"$=$l$i$N;2>H$N>e$G(B @kbd{RET} $B$rBG$D$+!"%^%&%9$N??Cf$N(B
 $B%\%?%s$r;H$&;v$K$h$C$F!":G>.8B$NEXNO$G<hF@$9$k;v$,$G$-$l$PAGE($G$7$g$&!#(B
 
+@vindex gnus-button-man-handler
 Gnus $B$O%G%#%U%)%k%H$GFCDj$NI8=`$N;2>H$K(B@dfn{$B%\%?%s(B}$B$rIU$1$^$9(B: $B$A$c$s$H(B
-$B$7$?(B URL$B!"%a!<%k%"%I%l%9!"(BMessage-ID $B$G$9!#$3$l$OFs$D$NJQ?t$K$h$C$F@)8f(B
-$B$5$l$F$$$F!"$=$N0l$D$O5-;v$NK\BN$r07$$!"$b$&0l$D$O5-;v$N%X%C%@!<$r07$$$^(B
-$B$9!#(B
+$B$7$?(B URL$B!"%a!<%k%"%I%l%9!"(BMessage-ID$B!"(BInfo $B$X$N%j%s%/!"$=$l$K(B man $B%Z!<%8(B
+$B$G$9!#$3$l$OFs$D$NJQ?t$K$h$C$F@)8f$5$l$F$$$F!"$=$N0l$D$O5-;v$NK\BN$r07$$!"(B
+$B$b$&0l$D$O5-;v$N%X%C%@!<$r07$$$^$9!#(B
 
 @table @code
 @item gnus-button-alist
@@ -11983,6 +11984,14 @@ nnmail-split-history} $B$r;H$&;v$,$G$-$^$9!#$3$l$+$i%9%W!<%k$7D>$=$&$H$9$k(B
 $B$3$H$K$h$C$F40A4$K;_$a$k$3$H$,$G$-!"@8$N%X%C%@!<$N%G!<%?$r85$K5-;v$K%^%C(B
 $B%A$5$;$?$$>l9g$K$OM-8z$G$7$g$&!#(B
 
+@vindex nnmail-resplit-incoming
+$B%G%#%U%)%k%H$G$OF~$C$F$/$k$9$Y$F$N%a%C%;!<%8$KBP$7$FJ,3d$OF/$-$^$;$s!#$b(B
+$B$7(B @code{mail-sources} $BJQ(B
+$B?t(B (@pxref{Mail Source Specifiers}) $B$K(B @code{directory} $B$N9`$r@_Dj$7$F$b!"(B
+$B%G%#%U%)%k%H$G$O$7$+$7J,3d$O(B @emph{$B5/$3$j$^$;$s(B}$B!#JQ(B
+$B?t(B @code{nnmail-resplit-incoming} $B$rHs(B-@code{nil} $B$JCM$K@_Dj$9$k$3$H$K$h$C(B
+$B$F!"$3$N>l9g$G$bJ,3d$r5/$3$5$;$k$3$H$,$G$-$^$9!#(B
+
 Gnus $B$O$"$J$?$K<+J,<+?H$KD7$MJV$C$F$/$k$h$&$J2DG=@-$N$"$kA4$F$N5!2q$rDs(B
 $B6!$7$^$9!#Nc$($P!"$"$J$?$N>e;J$+$i$/$kA4$F$N%a!<%k$r4^$s$@%0%k!<%W$r:n$C(B
 $B$?$H$7$^$7$g$&!#$=$l$+$i!"6vH/E*$K$=$N%0%k!<%W$N9XFI<h$j;_$a$,5/$3$C$?$H(B
@@ -12082,6 +12091,7 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 $B$($F$/$@$5$$!#(B
 
 @item directory
+@vindex nnmail-scan-directory-mail-source-once
 $B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL(B
 $B$O(B procmail $B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ(B
 $B$5$l$^$9!#$9$J$o$A%U%!%$%k(B @file{foo.bar.spool} $B$K$"$k%a!<%k$O!"%0%k!<(B
@@ -12090,9 +12100,10 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 $B$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#$3$l$O!"(B
 $B;XDj$7$?%l%Y%k$N%a!<%k%0%k!<%W$@$1$rD4$Y$?$$$H$-$K!"$H$j$o$1JXMx$G$9!#(B
 
+@vindex nnmail-resplit-incoming
 @code{nnmail-resplit-incoming} $B$H$$$&JQ?t$b$"$j!"$3$l$rHs(B-@code{nil} $B$K(B
 $B$9$k$HDL>o$NJ,3d=hM}$,%G%#%l%/%H%j!<Cf$N$9$Y$F$N%U%!%$%k$KBP$7$F9T$J$o$l(B
-$B$^$9!#(B
+$B$^$9(B (@pxref{Splitting Mail})$B!#(B
 
 $B%-!<%o!<%I(B:
 
