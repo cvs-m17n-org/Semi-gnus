@@ -1372,6 +1372,14 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 $B$b$7%j%9%H$,(B cons $B$N(B car $B$,(B @code{optional} $B$G$"$k(B cons $B$r4^$s$G$$$k$J$i!"(B
 $B$3$N(B cons $B$N(B cdr $B$O(B @code{nil} $B$G$J$$$H$-$@$1A^F~$5$l$^$9!#(B
 
+$B$3$N%j%9%H$+$i$"$k9`L\$r>C$7$?$$$J$i$P!"0J2<$N(B Lisp $B$N@Z$lC<$,Lr$KN)$D$G(B
+$B$7$g$&!#B>$NMWAG$r:o=|$7$?$$$H$-$O$=$l$K9g$o$;$F2<$5$$!#(B
+
+@lisp
+(setq message-required-news-headers
+      (delq 'Message-ID message-required-news-headers))
+@end lisp
+
 $B=P$F9T$/%K%e!<%95-;v$r%+%9%?%^%$%:$9$k$?$a$NB>$NJQ?t(B:
 
 @table @code
