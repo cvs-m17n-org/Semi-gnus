@@ -648,7 +648,7 @@ Predefined functions include `message-cite-original' and
 Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
   :type '(radio (function-item message-cite-original)
 		(function-item message-cite-original-without-signature)
-		(function-item mu-cite/cite-original)
+		(function-item mu-cite-original)
 		(function-item sc-cite-original)
 		(function :tag "Other"))
   :group 'message-insertion)
