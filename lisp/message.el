@@ -2914,7 +2914,7 @@ This sub function is for exclusive use of `message-send-news'."
 (defun message-do-fcc ()
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
-	(coding-system-for-write 'raw-text)
+	(coding-system-for-write nnheader-message-coding-system-for-write)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
@@ -4764,9 +4764,18 @@ This funtion will by called from \`message-mime-charset-recover-by-ask\'."
 	     message-mime-encode
 	     t nil))
 
+(defun message-after-save-hook ()
+  (set-buffer-file-coding-system nnheader-message-coding-system-for-write)
+  (set-buffer-modified-p nil)
+  )
+
 (defun message-mime-setup ()
   (turn-on-mime-edit)
-  (add-to-list 'buffer-file-format 'mime-message))
+  (add-to-list 'buffer-file-format 'mime-message)
+  (set-buffer-file-coding-system nnheader-message-coding-system-for-write)
+  (make-local-hook 'after-save-hook)
+  (add-hook 'after-save-hook 'message-after-save-hook nil t)
+  )
 
 (run-hooks 'message-load-hook)
 
