@@ -5348,7 +5348,6 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @kbd{X u} (@code{gnus-uu-decode-uu}) $B$O%W%m%;%90u$NIU$$$?$9$Y$F$N5-;v(B
 $B$r(B uudecode $B$7$F!"I=<($7$^$9!#%W%m%;%90u$NIU$$$?5-;v$OFs7eL\(B
 $B$K(B @samp{#} $B$,$"$j$^$9!#(B
-
 @end itemize
 
 $B$3$l$i$N!XHs9XFIEY!Y$N0u$O=i4|@_Dj$G$O$?$$$F$$Fs7eL\$K8=$l$k$H$$$&$3$H$K(B
@@ -5773,6 +5772,19 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$9$Y$F$NL$FI$N$_$N0u$N5-;v$r4{FI$H$7$F0u$rIU$1$^(B
 $B$9(B (@code{gnus-summary-limit-mark-excluded-as-read})$B!#$b$7@\F,0z?t$,M?$((B
 $B$i$l$l$P!"2D;k$HJ]N1$N$_$N0u$N5-;v$b4{FI$H$7$F0u$rIU$1$^$9!#(B
+
+@item / N
+@kindex / N (Summary)
+@findex gnus-summary-insert-new-articles
+$B$9$Y$F$N?7$7$$5-;v$r35N,%P%C%U%!$KA^F~$7$^$9!#$b(B
+$B$7(B @var{back-end}@code{-get-new-mail} $B$,Hs(B-@code{nil} $B$@$C$?$i!"?7$7$$%a!<(B
+$B%k$NE~Mh$rD4$Y$k$H$$$&$3$H$G$9!#(B
+
+@item / o
+@kindex / o (Summary)
+@findex gnus-summary-insert-old-articles
+$B$9$Y$F$N8E$$5-;v$r35N,%P%C%U%!$KA^F~$7$^$9!#$b$7?t;z$N@\F,<-$,M?$($i$l$l(B
+$B$P!"$=$N?t$N5-;v$r<h$j9~$_$^$9!#(B
 @end table
 
 @node Threading
@@ -15539,7 +15551,6 @@ gnus $B$O%(!<%8%'%s%H$N85$G(B nnimap $B%0%k!<%W$rFI$`$H$-!"%G%#%U%)%k%H$G%U%i
 
 @item
 @dfn{unplugged} $B$N$H$-$N(B nnimap $B%0%k!<%W$N:n@.$H:o=|!#(B
-
 @end itemize
 
 $B5;=QE*Cm<a(B: $BA4$F$N%m!<%+%k$J%U%i%0$r0lEY$K%5!<%P!<$K2!$79~$`F14|$O$G$-$^(B
@@ -19636,7 +19647,6 @@ XEmacs 21.1.1 $B0J>e$N(B Mule $B5!G=IU$-(B
 
 @item
 Meadow 1.00 $B0J>e!#(B(Mule for Windows $B$G$OF0$-$^$;$s!#(B)
-
 @end itemize
 
 $B$3$N(B Gnus $B$NHG$O$3$l$h$j8E$$$I$s$J(B Emacsen $B$G$b40A4$KF0:n$7$J$$$G$7$g$&!#(B
@@ -19780,7 +19790,6 @@ Kevin Davidson---@dfn{ding} $B$NL>A0$r;W$$IU$-$^$7$?!#$G$9$+$i!"H`$r@U$a$F(B
 @item
 Fran,Ag(Bois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
 $B%5%]!<%H!#(B
-
 @end itemize
 
 $B$3$N%^%K%e%"%k(B (Gnus $B1Q8lHG(B) $B$O(B Adrian Aichner $B$H(B Ricardo Nassif, Mark
@@ -20137,7 +20146,6 @@ Gnus $B$N%&%#%s%I%&$H%U%l!<%`$N@_Dj$G$?$/$5$s$NJQ$J;v$r$G$-$k$h$&$K$J$j$^(B
 @item
 $B%-!<%\!<%I$r;H$&Be$o$j$K!"%\%?%s$r%/%j%C%/$G$-$k$h$&$K$J$j$^$7(B
 $B$?(B (@pxref{Buttons})$B!#(B
-
 @end itemize
 
 @node September Gnus
@@ -20380,7 +20388,6 @@ Gnus $B$OJ]B8$9$k$H$-$KF1$8$/$i$$$NB%?J$r$7$J$/$F$bNI$$$h$&$K$J$j$^$7(B
 
 @item
 $B=P$F9T$/5-;v$N99$J$k9=J8%A%'%C%/$,$G$-$k$h$&$K$J$j$^$7$?!#(B
-
 @end itemize
 
 @node Red Gnus
@@ -20532,7 +20539,6 @@ Process Marks})$B!#(B
 
 @item
 $B6/D4J8$,E,@Z$K%U%)%s%H$,JQ99$5$l$k$h$&$K$J$j$^$7$?(B:
-
 @end itemize
 
 @node Quassia Gnus
@@ -20664,7 +20670,6 @@ M******** sm*rtq**t*s $B$rE,@Z$JJ8>O$KK]0F$9$k?7$7$$L?Na$,$"$j$^$9(B---
 @item
 $B8E$$(B dejanews $B%"!<%+%$%V$,(B @code{nnweb} $B$+$iFI$`;v$,$G$-$k$h$&$K$J$j$^$7(B
 $B$?!#(B
-
 @end itemize
 
 @node Pterodactyl Gnus
@@ -20674,9 +20679,10 @@ Gnus 5.8 $B$N?7$7$$5!G=(B:
 
 @itemize @bullet
 
-@item $B%a!<%k$r<h$j9~$`5!G=$,JQ$o$j$^$7$?!#$?$/$5$s$N>\:Y$K$D$$$F$O%^%K%e(B
-$B%"%k$r8+$F2<$5$$!#FC$K!"(Bprocmail $B$G<h$j9~$`$?$a$N$9$Y$F$NJQ?t$,L5$/$J$C(B
-$B$F$$$^$9!#(B
+@item
+$B%a!<%k$r<h$j9~$`5!G=$,JQ$o$j$^$7$?!#$?$/$5$s$N>\:Y$K$D$$$F$O%^%K%e%"%k$r(B
+$B8+$F2<$5$$!#FC$K!"(Bprocmail $B$G<h$j9~$`$?$a$N$9$Y$F$NJQ?t$,L5$/$J$C$F$$$^(B
+$B$9!#(B
 
 $B$3$N$h$&$J(B procmail $B$N;H$$J}$O(B
 
@@ -20698,32 +20704,39 @@ Gnus 5.8 $B$N?7$7$$5!G=(B:
 $B$b$C$H>\$7$$>pJs$O(B info $B$N(B Select Methods -> Getting Mail -> Mail
 Sources $B$GF@$k$3$H$,$G$-$^$9!#(B
 
-@item Gnus $B$O(B MIME $B$KBP1~$7$?%j!<%@!<$K$J$j$^$7$?!#$3$l$O(B Gnus $B$NB?$/$N(B
-$BItJ,$K1F6A$7$F$$$F!"$?$/$5$s$N?7$7$$%3%^%s%I$,DI2C$5$l$F$$$^$9!#>\:Y$O%^(B
-$B%K%e%"%k$r;2>H$7$F2<$5$$!#(B($BLuCm(B: T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p(B
-$B$E$$$F$$$^$9!#(B)
+@item
+Gnus $B$O(B MIME $B$KBP1~$7$?%j!<%@!<$K$J$j$^$7$?!#$3$l$O(B Gnus $B$NB?$/$NItJ,$K(B
+$B1F6A$7$F$$$F!"$?$/$5$s$N?7$7$$%3%^%s%I$,DI2C$5$l$F$$$^$9!#>\:Y$O%^%K%e%"(B
+$B%k$r;2>H$7$F2<$5$$!#(B($BLuCm(B: T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p$E$$$F(B
+$B$$$^$9!#(B)
 
-@item Gnus $B$O$^$?3F9q8lBP1~$K$J$j$^$7$?!#$3$3$G$OMWLs$G$-$J$$$/$i$$(B
-$B$K(B Gnus $B$NB?$/$NItJ,$K1F6A$7$F$$$F!"?7$7$$$?$/$5$s$NJQ?t$,DI2C$5$l$F$$$^(B
-$B$9!#(B($BLuCm(B: T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p$E$$$F$$$^$9!#(B)
+@item
+Gnus $B$O$^$?3F9q8lBP1~$K$J$j$^$7$?!#$3$3$G$OMWLs$G$-$J$$$/$i$$$K(B Gnus $B$N(B
+$BB?$/$NItJ,$K1F6A$7$F$$$F!"?7$7$$$?$/$5$s$NJQ?t$,DI2C$5$l$F$$$^$9!#(B($BLuCm(B:
+T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p$E$$$F$$$^$9!#(B)
 
-@item @code{gnus-auto-select-first} $B$,4X?t$G$"$C$F$b$h$/$J$j$^$7$?!#(B
+@item
+@code{gnus-auto-select-first} $B$,4X?t$G$"$C$F$b$h$/$J$j$^$7$?!#(B
 
-@item Summary $B%P%C%U%!$H(B NOV $B%U%!%$%k$K4^$a$kDI2C$N%X%C%@!<$r!"%f!<%6$,(B
-$B7h$a$k$3$H$,$G$-$k$h$&$K$J$j$^$7$?!#(B
+@item
+Summary $B%P%C%U%!$H(B NOV $B%U%!%$%k$K4^$a$kDI2C$N%X%C%@!<$r!"%f!<%6$,7h$a$k(B
+$B$3$H$,$G$-$k$h$&$K$J$j$^$7$?!#(B
 
-@item @code{gnus-article-display-hook} $B$,:o=|$5$l$^$7$?!#Be$o$j(B
+@item
+@code{gnus-article-display-hook} $B$,:o=|$5$l$^$7$?!#Be$o$j(B
 $B$K(B @code{gnus-treat-} $B$G;O$^$k$?$/$5$s$NJQ?t$,DI2C$5$l$^$7$?!#(B
 
-@item Gnus posting styles $B$,:F$S2~Au$5$l$^$7$?!#8=:_$OHyL/$K0c$&5,B'$GF0(B
-$B:n$7$^$9!#(B
+@item
+Gnus posting styles $B$,:F$S2~Au$5$l$^$7$?!#8=:_$OHyL/$K0c$&5,B'$GF0:n$7$^(B
+$B$9!#(B
 
-@item $B?7$7$$%&%'%V$K4p$E$$$?%P%C%/%(%s%I$,DI2C$5$l$^$7$?!#(B
-@code{nnslashdot}, @code{nnwarchive} $B$*$h$S(B @code{nnultimate} $B$G$9!#(B
-nnweb $B$O:F$S2~:n$5$l!">o$KJQ2=$9$k9=@.$rB3$1$^$9!#(B
+@item
+$B?7$7$$%&%'%V$K4p$E$$$?%P%C%/%(%s%I$,DI2C$5$l$^$7$?!#(B@code{nnslashdot},
+@code{nnwarchive} $B$*$h$S(B @code{nnultimate} $B$G$9!#(Bnnweb $B$O:F$S2~:n$5$l!"(B
+$B>o$KJQ2=$9$k9=@.$rB3$1$^$9!#(B
 
-@item Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B IMAP $B%a!<%k$rFI$`$3$H$,$G$-$^$9!#(B
-
+@item
+Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B IMAP $B%a!<%k$rFI$`$3$H$,$G$-$^$9!#(B
 @end itemize
 
 @iftex
