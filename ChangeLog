@@ -1,3 +1,15 @@
+1999-09-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-agent.el (gnus-agent-toggle-plugged): Do not mark
+	the current buffer as modified.
+
+	* lisp/gnus-offline.el (gnus-offline-menu): New variable.
+	(gnus-offline-get-menu-items): New function.
+	(gnus-offline-define-menu-on-miee): Use it.
+	(gnus-offline-define-menu-on-agent): Ditto.
+
 1999-09-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus-msg.el (gnus-configure-posting-styles): Quote `:file'.
