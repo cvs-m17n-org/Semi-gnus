@@ -1,3 +1,9 @@
+1998-10-05  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus.el (gnus-info-filename): New variable.
+	(gnus-info-find-node): Use `gnus-info-filename' and
+	`current-language-environment'.
+
 1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-draft.el (gnus-draft-send): Call
