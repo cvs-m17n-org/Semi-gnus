@@ -1,4 +1,4 @@
-\input texinfo                  @c -*-texinfo-*-
+@c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
 @settitle Semi-gnus 6.10.064 Manual
@@ -1039,6 +1039,10 @@ Gnus $B$O5/F0$7$?$H$-$d!"<B:]$K?7$7$$5-;v$,E~Ce$7$F$$$k$+$r7hDj$7$h$&$H$9(B
 $B$I$N$h$&$K$;$h!"CY$$2s@~$G$O(B @code{some} $B$O(B @code{nil} $B$h$j$bB.$/!"$=$l(B
 $B$O$b$A$m$s(B@code{t} $B$h$j$bB.$/$J$j$^$9!#(B
 
+$B$$$/$D$+$N%K%e!<%9%5!<%P!<(B ($BNc$($P(B Leafnode $B$d8E$$(B INN) $B$K$OL?Na(B 
+@code{LIST ACTIVE group} $B$,$"$j$^$;$s!#$=$&$$$&%5!<%P!<$K$O(B @code{nil} $B$r(B
+$B$3$NJQ?t$NCM$K@_Dj$9$k$N$,!"$*$=$i$/$b$C$H$bM-8z$G$7$g$&!#(B
+
 $B$b$7$3$NJQ?t$,(B @code{nil} $B$G$"$k$H!"(Bgnus $B$O40A4$K$,$s$8$,$i$a$NJ}K!$G%0(B
 $B%k!<%W$N>pJs$rF@$h$&$H$7$^$9!#$=$7$F!"$3$l$O$"$^$jB.$/$"$j$^$;$s!#$b$7$=(B
 $B$l$,(B @code{some} $B$G(B @sc{nntp} $B%5!<%P!<$r;H$C$F$$$k$H$-$O!"(Bgnus $B$O$G$-$k(B
@@ -1954,9 +1958,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%$%kL>$H%U%!%$%k%?%$%W$r%W%m%s%W%H$GF~NO$7$^$9!#8=:_%5%]!<%H$5$l$F$$$k%U%!(B
 $B%$%k%?%$%W$O!"(B@code{babyl}, @code{mbox}, @code{digest}, @code{mmdf},
 @code{news}, @code{rnews}, @code{clari-briefs}, @code{rfc934},
-@code{rfc822-forward}, @code{forward} $B$G$9!#@\F,<-$J$7$G$3$N%3%^(B
-$B%s%I$r<B9T$9$k$H!"(Bgnus $B$O%U%!%$%k%?%$%W$r?dB,$7$^$9!#(B@xref{Document
-Groups}$B!#(B
+@code{rfc822-forward}, @code{nsmail}, @code{forward} $B$G$9!#@\F,<-$J$7$G(B
+$B$3$N%3%^%s%I$r<B9T$9$k$H!"(Bgnus $B$O%U%!%$%k%?%$%W$r?dB,$7$^$9!#(B
+@xref{Document Groups}$B!#(B
 
 @item G u
 @kindex G u (Group)
