@@ -1,3 +1,41 @@
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-required-news-headers): `X-Newsreader'
+	was replaced by `User-Agent'.
+	(message-required-mail-headers): `X-Mailer' was replaced by
+	`User-Agent'.
+	(message-header-format-alist): `X-Mailer' and `X-Newsreader' were
+	replaced by `User-Agent'.
+	(message-generate-headers): Ditto.
+
+	(message-user-agent): New variable.
+	(message-newsreader): Replaced by `message-user-agent'.
+	(message-mailer): Ditto.
+	(message-mode): `message-mailer' and `message-newsreader' were
+	replaced by `message-user-agent'.
+
+	(message-fill-address): Use SPACE instead of HTAB.
+	(message-fill-header): Ditto.
+	(message-fill-references): Removed.
+
+	(message-use-mail-copies-to): New variable.
+	(message-use-mail-followup-to): Modify doc-string.
+	(message-use-mail-reply-to): Ditto.
+	(message-goto-mail-copies-to): New function.
+
+	(message-reply): New implementation.
+	(message-followup): Ditto.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): `message-mailer'
+	and `message-newsreader' were replaced by `message-user-agent'.
+	(gnus-extended-version): Generate "PRODUCT/VERSION" style strings.
+
+	* lisp/gnus-soup.el (gnus-soup-send-packet): `message-mailer' and
+	`message-newsreader' were replaced by `message-user-agent'.
+
+	* lisp/gnus-art.el (gnus-visible-headers): Add Mail-Followup-To
+	and Mail-Reply-To headers.
+
 1998-06-07  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-reply): Fix typo.
