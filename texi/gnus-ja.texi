@@ -21594,10 +21594,11 @@ Spam を避けるための前項のヒントが十分だった日々は過ぎ去りました。今では
 @subsection Hashcash
 @cindex hashcash
 
-Spam と戦うための新しい技法は、メッセージを送信する際にいくばくかの負担
-を送信者に強います。これはインターネット標準の一部ではないので、世界中の
-すべての人がこの技法を使うことは当てにできないという明らかな欠点がありま
-すが、小規模な共同体では役に立つでしょう。
+Spam と戦うための新しい技法は、いくらか負担にはなるが明らかに独特なこと
+を、送信するメッセージに対して送信者が行なうことを求めることです。これは
+インターネット標準の一部ではないので、世界中のすべての人がこの技法を使う
+ことは当てにできないという明らかな欠点がありますが、小規模な共同体では役
+に立つでしょう。
 
 前項の道具類が実際にうまく働いたとしても、それらは新しい形式の spam が現
 れるたびにしょっちゅう更新かつ整備されることによってのみ動作します。この
@@ -21623,13 +21624,12 @@ Spam と戦うための新しい技法は、メッセージを送信する際にいくばくかの負担
 ふうにして下さい:
 
 @lisp
-(require 'hashcash)
 (add-hook 'message-send-hook 'mail-add-payment)
 @end lisp
 
-@file{hashcash.el} ライブラリ
-は @uref{http://users.actrix.gen.nz/mycroft/hashcash.el} か開発版
-の gnus の contrib ディレクトリにあります。
+@file{hashcash.el} ライブラリは Gnus の中で、また
+は @uref{http://users.actrix.gen.nz/mycroft/hashcash.el} として見つける
+ことができます。
 
 いくつかの追加の変数の設定もしなければなりません:
 
@@ -21650,14 +21650,22 @@ Spam と戦うための新しい技法は、メッセージを送信する際にいくばくかの負担
 で、@var{string} は文字列 (通常はメールアドレスかニュースグループ名) と
 して使われます。
 
-@item hashcash
-@vindex hashcash
-@code{hashcash} バイナリがインストールされている場所を示します。
+@item hashcash-path
+@vindex hashcash-path
+@code{hashcash} バイナリがインストールされている場所。この変数
+は @code{executable-find} によって自動的に設定されるはずですが、それ
+が @code{nil} だった (ありがちなのは @code{hashcash} バイナリが実
+行 path 中に無い) 場合は、hashcash payments をチェックするときに警告され、
+hashcash payments を生成するときはエラーになるでしょう。
 @end table
 
-今のところ gnus に hashcash クッキーを認証する手段はありません。あなたが
-手作業でメールをふるいにかけるスクリプトをカスタマイズすることが求められ
-ています。しかし、この分野における改良は有用な貢献になるでしょう。
+Gnus は hashcash クッキーを認証することができますが、手でカスタマイズし
+たメール濾過スクリプトで行なうこともできます。メッセージ中の hashcash クッ
+キーを認証するには、@code{hashcash.el} ライブラリ
+の @code{mail-check-payment} 関数を使って下さい。入ってきたメール
+の hashcash クッキーを確認し、それによってメールを濾過するために、
+@code{spam-use-hashcash} バックエンドで @code{spam.el} を使うこともでき
+ます。
 
 @node Filtering Spam Using The Spam ELisp Package
 @subsection Spam ELisp パッケージを使った Spam の濾過
