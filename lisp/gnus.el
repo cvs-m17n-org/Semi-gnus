@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Semi-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.5"
+(defconst gnus-version-number "6.10.6"
   "Version number for this version of gnus.")
 
 (defconst gnus-version

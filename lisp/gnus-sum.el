@@ -3,6 +3,7 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -35,6 +36,9 @@
 (require 'gnus-int)
 (require 'gnus-undo)
 (require 'mime-view)
+
+(eval-when-compile
+  (require 'mime-play))
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
