@@ -14,7 +14,6 @@
 (maybe-fbind '(babel-fetch
 	       babel-wash create-image decode-coding-string display-graphic-p
 	       replace-regexp-in-string
-	       bbdb-complete-name
 	       display-time-event-handler
 	       find-image font-create-object gnus-mule-get-coding-system
 	       font-lock-set-defaults
@@ -136,7 +135,7 @@
 	(t
 	 '(function-max-args smiley-encode-buffer))))
       (common-fns
-       '(lsdb-complete-name))
+       nil)
       (variables
        (cond
 	((featurep 'xemacs)

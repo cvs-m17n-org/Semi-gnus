@@ -6142,6 +6142,16 @@ which specify the range to operate on."
   :group 'message
   :type '(alist :key-type regexp :value-type function))
 
+(defcustom message-expand-name-function
+  (if (fboundp 'bbdb-complete-name)
+      'bbdb-complete-name
+    (if (fboundp 'lsdb-complete-name)
+	'lsdb-complete-name
+      'expand-abbrev))
+  "*A function called to expand addresses in field body."
+  :group 'message
+  :type 'function)
+
 (defcustom message-tab-body-function nil
   "*Function to execute when `message-tab' (TAB) is executed in the body.
 If nil, the function bound in `text-mode-map' or `global-map' is executed."
@@ -6206,11 +6216,7 @@ those headers."
 	    (delete-region (point) (progn (forward-line 3) (point))))))))))
 
 (defun message-expand-name ()
-  (if (fboundp 'bbdb-complete-name)
-      (bbdb-complete-name)
-    (if (fboundp 'lsdb-complete-name)
-	(lsdb-complete-name)
-      (expand-abbrev))))
+  (funcall message-expand-name-function))
 
 ;;; Help stuff.
 
