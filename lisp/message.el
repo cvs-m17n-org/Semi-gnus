@@ -1170,7 +1170,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
   (autoload 'rmail-output "rmail")
-  (autoload 'mu-cite/cite-original "mu-cite"))
+  (autoload 'mu-cite-original "mu-cite"))
 
 
 
