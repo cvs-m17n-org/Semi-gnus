@@ -1,3 +1,14 @@
+1998-10-21  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
+
+	* Sync up with Chao-gnus 6.9
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.7.
+	(gnus-version): Modify for SEMI 1.10.
+
 1998-10-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Change to 6.9.1
@@ -21,7 +32,7 @@
 
 1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.6.
 	(gnus-version): Modify for SEMI 1.9.
 
 1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
