@@ -132,6 +132,8 @@
        form))
    ))
 
+(push srcdir load-path)
+
 ;; `char-after' and `char-before' must be well-behaved before lpath.el
 ;; is loaded.  Because it requires `poe' via `path-util'.
 (load (expand-file-name "lpath.el" srcdir) nil t t)
