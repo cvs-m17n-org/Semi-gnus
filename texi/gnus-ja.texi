@@ -4595,7 +4595,8 @@ Gnus は変数 @code{gnus-extract-address-components} の値を @code{From
 @vindex nnmail-extra-headers
 関連した変数は @code{nnmail-extra-headers} で、overview (@sc{nov}) ファ
 イルにいつ追加のヘッダーを含めるかを制御します。古い overview ファイルが
-あれば、この変数を変更した後には再生成する必要があります。
+ある場合は、この変数を変更した後にサーバーバッファに `^' で入って適切な
+メールサーバー (例えば nnml) で `g' を押し、再生成する必要があります。
 
 @vindex gnus-summary-line-format
 gnus に、@code{gnus-summary-line-format} 変数の @code{%n} 仕様
@@ -4617,15 +4618,19 @@ gnus に、@code{gnus-summary-line-format} 変数の @code{%n} 仕様
 (上記の値は gnus のディフォルト値です。あなたの役に立つように変えて下さ
 い。)
 
-さて、これは作成される @sc{nov} ファイルを操作できるメールグループではた
-いていの場合役立ちます。しかし、以下のものを @file{overview.fmt} ファイ
-ルの最後に追加するように nntp 管理者を説得することができれば:
+ニュース管理人、またはニュース管理人を説得してサポートの追加をしてもらお
+うと思っているユーザーのみなさんへのご注意:
+
+上記のことは、作成される @sc{nov} ファイルを操作できるメールグループでは
+たいていの場合役立ちます。しかし、管理人を説得して (特に INN の普通の実
+装において) 以下のものを
 
 @example
 Newsgroups:full
 @end example
 
-メールグループでの追加ヘッダーのようにそれを使うことができます。
+@file{overview.fmt} ファイルの最後に追加してもうらうことができれば、メー
+ルグループでの追加ヘッダーのようにそれを使うことができます。
 
 @node Summary Buffer Mode Line
 @subsection 概略バッファのモード行
