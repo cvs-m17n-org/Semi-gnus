@@ -61,11 +61,11 @@
 (defvar nnshimbun-type-definition
   `(("asahi"
      (url . "http://spin.asahi.com/")
-     (groups "national" "business" "politics" "international" "sports" "personal" "feneral")
+     (groups "national" "business" "politics" "international" "sports")
      (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-asahi-get-headers)
-     (index-url      . (format "%sp%s.html" nnshimbun-url nnshimbun-current-group))
+     (index-url      . (format "%s%s/update/list.html" nnshimbun-url nnshimbun-current-group))
      (from-address   . "webmaster@www.asahi.com")
      (make-contents  . nnshimbun-make-text-or-html-contents)
      (contents-start . "\n<!-- Start of kiji -->\n")
@@ -313,6 +313,14 @@ for a charset indication")
   (eval-and-compile
     (defalias-maybe 'coding-system-category 'get-code-mnemonic)))
 
+(if (and (ignore-errors (require 'w3m))
+	 (fboundp 'w3m-retrieve))
+;; When w3m.el is available.
+(defun nnshimbun-retrieve-url (url &optional no-cache)
+  "Rertrieve URL contents and insert to current buffer."
+  (when (w3m-retrieve url nil no-cache)
+    (insert-buffer w3m-work-buffer-name)))
+;; Otherwise.
 (defun nnshimbun-retrieve-url (url &optional no-cache)
   "Rertrieve URL contents and insert to current buffer."
   (let ((buf (current-buffer))
@@ -380,6 +388,7 @@ for a charset indication")
     (set-buffer buf)
     (insert-buffer url-working-buffer)
     (kill-buffer url-working-buffer)))
+)
 
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)
@@ -1002,7 +1011,7 @@ is enclosed by at least one regexp grouping construct."
       (goto-char (point-min))
       (let (headers)
 	(while (re-search-forward
-		"^■<a href=\"\\(\\([0-9][0-9][0-9][0-9]\\)/past/\\([A-z]*[0-9]*\\)\\.html\\)\"> *"
+		"^<a href=\"\\(\\([0-9][0-9][0-9][0-9]\\)/\\([A-z]*[0-9]*\\)\\.html\\)\">[ \t\r\f\n]*"
 		nil t)
 	  (let ((id (format "<%s%s%%%s>"
 			    (match-string 2)
@@ -1020,13 +1029,14 @@ is enclosed by at least one regexp grouping construct."
 				"\\(<[^>]+>\\|\r\\)")
 			       ""))
 		   nnshimbun-from-address
-		   "" id "" 0 0 (concat nnshimbun-url url))
+		   "" id "" 0 0
+		   (format "%s%s/update/%s" nnshimbun-url nnshimbun-current-group url))
 		  headers)))
 	(setq headers (nreverse headers))
 	(let ((i 0))
 	  (while (and (nth i headers)
 		      (re-search-forward
-		       "^\\[\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\)\\]"
+		       "^(\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\))"
 		       nil t))
 	    (let ((month (string-to-number (match-string 1)))
 		  (date (decode-time (current-time))))
