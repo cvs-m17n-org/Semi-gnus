@@ -1,7 +1,7 @@
 1998-11-17  Hiroaki Matsui  <matu@uxd.fc.nec.co.jp>
 
 	* lisp/message.el (message-clone-locals): Add
-	"user-mail-address" and "user-full-name" to macthing pattern.
+	"user-mail-address" and "user-full-name" to matching pattern.
 
 1998-11-14  Kenji Itoh  <keit@tpj.co.jp>
 
