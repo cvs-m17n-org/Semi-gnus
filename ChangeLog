@@ -1,3 +1,12 @@
+1999-08-27  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/pop3.el (pop3-movemail): If the argument `crashbox' is t,
+	don't retrieve any incoming mails.; Don't filter articles here.
+	Use `convert-standard-filename' to generate fresh UIDL file names.
+	(pop3-get-message-numbers): Rewrite.
+	(pop3-save-uidls): Clear UIDL hash.; Use `with-temp-file' instead
+	of `with-temp-buffer'.
+
 1999-08-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* README-offline.ja : Fix.
