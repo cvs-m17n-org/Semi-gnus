@@ -6726,22 +6726,19 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	(when (eq mode 'gnus-summary-mode)
 	  (gnus-kill-buffer buf)))
       (setq gnus-current-select-method gnus-select-method)
-      (if leave-hidden
-	  (set-buffer gnus-group-buffer)
-	(pop-to-buffer gnus-group-buffer))
-      (if (not quit-config)
-	  (progn
-	    (goto-char group-point)
-	    (unless leave-hidden
-	      (gnus-configure-windows 'group 'force))
-	    (unless (pos-visible-in-window-p)
-	      (forward-line (/ (static-if (featurep 'xemacs)
-				   (window-displayed-height)
-				 (1- (window-height)))
-			       -2))
-	      (set-window-start (selected-window) (point))
-	      (goto-char group-point)))
-	(gnus-handle-ephemeral-exit quit-config))
+      (set-buffer gnus-group-buffer)
+      (if quit-config
+	  (gnus-handle-ephemeral-exit quit-config)
+	(goto-char group-point)
+	(unless leave-hidden
+	  (gnus-configure-windows 'group 'force))
+	(unless (pos-visible-in-window-p)
+	  (forward-line (/ (static-if (featurep 'xemacs)
+				      (window-displayed-height)
+				      (1- (window-height)))
+			   -2))
+	  (set-window-start (selected-window) (point))
+	  (goto-char group-point)))
       ;; Clear the current group name.
       (unless quit-config
 	(setq gnus-newsgroup-name nil)))))

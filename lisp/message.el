@@ -2660,7 +2660,7 @@ message composition doesn't break too bad."
   ;; fontified: is used by font-lock.
   ;; syntax-table, local-map: I dunno.
   ;; We need to add XEmacs names to the list.
-  "Property list of with properties.forbidden in message buffers.
+  "Property list of with properties forbidden in message buffers.
 The values of the properties are ignored, only the property names are used.")
 
 (defun message-tamago-not-in-use-p (pos)
