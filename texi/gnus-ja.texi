@@ -5076,12 +5076,13 @@ Summary Buffer} を参照して下さい。
 次の記事を選択します (@code{gnus-summary-next-page})。
 
 @vindex gnus-article-boring-faces
-記事の残りに引用と署名しか無い場合、それはスキップされ、代わりに次の記事
-が表示されます。@code{gnus-article-boring-faces} で、つまらないと思うも
-のをカスタマイズするか、または @code{nil} に設定することによって、この機
-能を働かないようにすることができます。どんなにうんざりするものでも、記事
-バッファで @kbd{C-v} を使うことによって、手動で記事のページを見ることは
-できます。
+@vindex gnus-article-skip-boring
+@code{gnus-article-skip-boring} が非-@code{nil} で、かつ記事の残りに引用
+と署名しか無い場合、それはスキップされ、代わりに次の記事が表示されます。
+@code{gnus-article-boring-faces} で、つまらないと思うものをカスタマイズ
+するか、または @code{nil} に設定することによって、この機能を働かないよう
+にすることができます。どんなにうんざりするものでも、@kbd{C-M-v} を使うこ
+とによって、手動で記事のページを見ることはできます。
 
 @item DEL
 @kindex DEL (概略)
