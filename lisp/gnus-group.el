@@ -156,8 +156,8 @@ with some simple extensions.
 %p    Process mark (char)
 %O    Moderated group (string, \"(m)\" or \"\")
 %P    Topic indentation (string)
-%m    Whether there is new(ish) mails in the group (char, \"%\")
-%w    Number of new(ish) mail in the group (integer)
+%m    Whether there is new(ish) mail in the group (char, \"%\")
+%w    Number of new(ish) mails in the group (integer)
 %l    Whether there are GroupLens predictions for this group (string)
 %n    Select from where (string)
 %z    A string that look like `<%s:%n>' if a foreign select method is used
