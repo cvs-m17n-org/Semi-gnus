@@ -1,9 +1,10 @@
-;;; nnheader.el --- header access macros for Gnus and its backends
+;;; nnheader.el --- header access macros for Semi-gnus and its backends
 ;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -40,6 +41,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'mail-utils)
+(require 'mime)
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -134,11 +136,11 @@ on your system, you could say something like:
 
 (defmacro mail-header-references (header)
   "Return references in HEADER."
-  `(aref ,header 5))
+  `(mime-fetch-field 'References (mail-header-entity ,header)))
 
 (defmacro mail-header-set-references (header ref)
   "Set article references of HEADER to REF."
-  `(aset ,header 5 ,ref))
+  `(mail-header-set-field ,header 'References ,ref))
 
 (defmacro mail-header-chars (header)
   "Return number of chars of article in HEADER."
@@ -164,6 +166,10 @@ on your system, you could say something like:
   "Set article xref of HEADER to xref."
   `(aset ,header 8 ,xref))
 
+(mm-define-backend nil)
+
+(mm-define-method fetch-field ((entity nil) field-name))
+
 (defun make-full-mail-header (&optional number subject from date id
 					references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
@@ -171,11 +177,14 @@ on your system, you could say something like:
     (mime-entity-set-original-header-internal
      entity
      (list (cons 'Date date)
-	   (cons 'Message-Id id)))
+	   (cons 'Message-Id id)
+	   (cons 'References references)
+	   ))
     (mime-entity-set-parsed-header-internal
      entity
      (list (cons 'Subject subject)
-	   (cons 'From from)))
+	   (cons 'From from)
+	   ))
     (vector number entity from date id references chars lines xref)
     ))
 
