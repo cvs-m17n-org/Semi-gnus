@@ -1,3 +1,10 @@
+1999-03-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Semi-gnus 6.10.10 is released.
+
+	* lisp/message.el (message-yank-original): Keep the existing
+	references.
+
 1999-03-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-ofsetup.el: Modify for Semi-gnus 6.10.xx so that
@@ -177,7 +184,7 @@
 
 1999-02-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el Semi-gnus 6.10.4 is released.
+	* lisp/gnus.el: Semi-gnus 6.10.4 is released.
 
 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `nnheader-nov-field',
 	`nnheader-nov-read-integer' and `nnheader-nov-read-message-id'
