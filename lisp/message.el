@@ -4684,30 +4684,30 @@ OTHER-HEADERS is an alist of header/value pairs."
     (when mct
       (cond
        ((and (or (equal (downcase mct) "never")
-		 (equal (downcase mct) "nobody"))
-	     (or (not (eq message-use-mail-copies-to 'ask))
-		 (message-y-or-n-p
-		  (concat "Obey Mail-Copies-To: never? ") t "\
+		 (equal (downcase mct) "nobody")))
+	(when (or (not (eq message-use-mail-copies-to 'ask))
+		  (message-y-or-n-p
+		   (concat "Obey Mail-Copies-To: never? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
-	`Mail-Copies-To: never'
-directs you not to send your response to the author.")))
-	(setq never-mct t)
+	`Mail-Copies-To: " mct "'
+directs you not to send your response to the author."))
+	  (setq never-mct t))
 	(setq mct nil))
        ((and (or (equal (downcase mct) "always")
-		 (equal (downcase mct) "poster"))
-	     (or (not (eq message-use-mail-copies-to 'ask))
-		 (message-y-or-n-p
-		  (concat "Obey Mail-Copies-To: always? ") t "\
+		 (equal (downcase mct) "poster")))
+	(if (or (not (eq message-use-mail-copies-to 'ask))
+		(message-y-or-n-p
+		 (concat "Obey Mail-Copies-To: always? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
-	`Mail-Copies-To: always'
-sends a copy of your response to the author.")))
-	(setq mct (or mrt reply-to from)))
+	`Mail-Copies-To: " mct "'
+sends a copy of your response to the author."))
+	    (setq mct (or mrt reply-to from))
+	  (setq mct nil)))
        ((and (eq message-use-mail-copies-to 'ask)
-	     (not
-	      (message-y-or-n-p
-	       (concat "Obey Mail-Copies-To: " mct " ? ") t "\
+	     (not (message-y-or-n-p
+		   (concat "Obey Mail-Copies-To: " mct " ? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: " mct "'
@@ -4745,18 +4745,18 @@ that further discussion should take place only in "
       (let (ccalist)
 	(save-excursion
 	  (message-set-work-buffer)
-          (if (and mft
-                   message-use-followup-to
-                   (or (not (eq message-use-followup-to 'ask))
-                       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
+	  (if (and mft
+		   message-use-followup-to
+		   (or (not (eq message-use-followup-to 'ask))
+		       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
 You should normally obey the Mail-Followup-To: header.  In this
 article, it has the value of
 
 " mft "
 
 which directs your response to " (if (string-match "," mft)
-			       "the specified addresses"
-			     "that address only") ".
+				     "the specified addresses"
+				   "that address only") ".
 
 If a message is posted to several mailing lists, Mail-Followup-To is
 often used to direct the following discussion to one list only,
@@ -4768,7 +4768,7 @@ responses here are directed to other addresses.")))
 	      (insert mft)
 	    (unless never-mct
 	      (insert (or mrt reply-to from "")))
-	    (insert (if to (concat (if (bolp) "" ", ") to "") ""))
+	    (insert (if to (concat (if (bolp) "" ", ") to) ""))
 	    (insert (if mct (concat (if (bolp) "" ", ") mct) ""))
 	    (insert (if cc (concat (if (bolp) "" ", ") cc) "")))
 	  (goto-char (point-min))
@@ -4922,25 +4922,19 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
     (when mct
       (cond
        ((and (or (equal (downcase mct) "never")
-		 (equal (downcase mct) "nobody"))
-	     (or (not (eq message-use-mail-copies-to 'ask))
-		 (message-y-or-n-p
-		  (concat "Obey Mail-Copies-To: never? ") t "\
-You should normally obey the Mail-Copies-To: header.
-
-	`Mail-Copies-To: never'
-directs you not to send your response to the author.")))
+		 (equal (downcase mct) "nobody")))
 	(setq mct nil))
        ((and (or (equal (downcase mct) "always")
-		 (equal (downcase mct) "poster"))
-	     (or (not (eq message-use-mail-copies-to 'ask))
-		 (message-y-or-n-p
-		  (concat "Obey Mail-Copies-To: always? ") t "\
+		 (equal (downcase mct) "poster")))
+	(if (or (not (eq message-use-mail-copies-to 'ask))
+		(message-y-or-n-p
+		 (concat "Obey Mail-Copies-To: always? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
-	`Mail-Copies-To: always'
-sends a copy of your response to the author.")))
-	(setq mct (or mrt reply-to from)))
+	`Mail-Copies-To: " mct "'
+sends a copy of your response to the author."))
+	    (setq mct (or mrt reply-to from))
+	  (setq mct nil)))
        ((and (eq message-use-mail-copies-to 'ask)
 	     (not
 	      (message-y-or-n-p
@@ -4951,8 +4945,7 @@ You should normally obey the Mail-Copies-To: header.
 sends a copy of your response to " (if (string-match "," mct)
 				       "the specified addresses"
 				     "that address") ".")))
-	(setq mct nil))
-       ))
+	(setq mct nil))))
 
     (unless follow-to
       (cond

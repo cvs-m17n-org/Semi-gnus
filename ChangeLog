@@ -1,3 +1,9 @@
+2001-01-15  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-followup): Handle "Mail-Copies-To:"
+	correctly.
+	(message-get-reply-headers): Ditto.
+
 2001-01-15  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Save excursion
