@@ -231,7 +231,6 @@ If ARG is 1, prompt for a group name."
 (defun gnus-summary-post-news ()
   "Start composing a news message."
   (interactive)
-  (gnus-set-global-variables)
   (gnus-post-news 'post gnus-newsgroup-name))
 
 (defun gnus-summary-followup (yank &optional force-news)
@@ -240,7 +239,6 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
-  (gnus-set-global-variables)
   (when yank
     (gnus-summary-goto-subject (car yank)))
   (save-window-excursion
@@ -287,14 +285,16 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
     (push-mark)
     (goto-char beg)))
 
-(defun gnus-summary-cancel-article (n)
-  "Cancel an article you posted."
-  (interactive "P")
-  (gnus-set-global-variables)
+(defun gnus-summary-cancel-article (&optional n symp)
+  "Cancel an article you posted.
+Uses the process-prefix convention.  If given the symbolic
+prefix `a', cancel using the standard posting method; if not
+post using the current select method."
+  (interactive (gnus-interactive "P\ny"))
   (let ((articles (gnus-summary-work-articles n))
 	(message-post-method
 	 `(lambda (arg)
-	    (gnus-post-method nil ,gnus-newsgroup-name)))
+	    (gnus-post-method (not (eq symp 'a)) ,gnus-newsgroup-name)))
 	article)
     (while (setq article (pop articles))
       (when (gnus-summary-select-article t nil nil article)
@@ -310,7 +310,6 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (gnus-set-global-variables)
   (let ((article (gnus-summary-article-number)))
     (gnus-setup-message 'reply-yank
       (gnus-summary-select-article t)
@@ -590,7 +589,6 @@ automatically."
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
   ;; Stripping headers should be specified with mail-yank-ignored-headers.
-  (gnus-set-global-variables)
   (when yank
     (gnus-summary-goto-subject (car yank)))
   (let ((gnus-article-reply t))
@@ -627,7 +625,6 @@ The original article will be yanked."
   "Forward the current message to another user.
 If FULL-HEADERS (the prefix), include full headers when forwarding."
   (interactive "P")
-  (gnus-set-global-variables)
   (gnus-setup-message 'forward
     (gnus-summary-select-article)
     (set-buffer gnus-original-article-buffer)
@@ -837,6 +834,7 @@ The source file has to be in the Emacs load path."
 		 "gnus-art.el" "gnus-start.el" "gnus-async.el"
 		 "gnus-msg.el" "gnus-score.el" "gnus-win.el" "gnus-topic.el"
 		 "nnmail.el" "message.el"))
+	(point (point))
 	file expr olist sym)
     (gnus-message 4 "Please wait while we snoop your variables...")
     (sit-for 0)
@@ -882,11 +880,12 @@ The source file has to be in the Emacs load path."
 	(insert ";; (makeunbound '" (symbol-name (car olist)) ")\n"))
       (setq olist (cdr olist)))
     (insert "\n\n")
-    ;; Remove any null chars - they seem to cause trouble for some
+    ;; Remove any control chars - they seem to cause trouble for some
     ;; mailers.  (Byte-compiled output from the stuff above.)
-    (goto-char (point-min))
-    (while (re-search-forward "[\000\200]" nil t)
-      (replace-match "" t t))))
+    (goto-char point)
+    (while (re-search-forward "[\000-\010\013-\037\200-\237]" nil t)
+      (replace-match (format "\\%03o" (string-to-char (match-string 0)))
+		     t t))))
 
 ;;; Treatment of rejected articles.
 ;;; Bounced mail.
@@ -921,6 +920,7 @@ this is a reply."
 	(message-narrow-to-headers)
 	(let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	      (cur (current-buffer))
+	      (coding-system-for-write 'raw-text)
 	      groups group method)
 	  (when gcc
 	    (message-remove-header "gcc")
@@ -949,6 +949,7 @@ this is a reply."
 	      (save-excursion
 		(nnheader-set-temp-buffer " *acc*")
 		(insert-buffer-substring cur)
+		(run-hooks 'gnus-before-do-gcc-hook)
 		(goto-char (point-min))
 		(when (re-search-forward
 		       (concat "^" (regexp-quote mail-header-separator) "$")
@@ -981,8 +982,11 @@ this is a reply."
   "Insert the Gcc to say where the article is to be archived."
   (let* ((var gnus-message-archive-group)
 	 (group (or group gnus-newsgroup-name ""))
-	 result
-	 gcc-self-val
+	 (gcc-self-val
+	  (and gnus-newsgroup-name
+	       (gnus-group-find-parameter
+		gnus-newsgroup-name 'gcc-self)))
+	 result 
 	 (groups
 	  (cond
 	   ((null gnus-message-archive-method)
@@ -1018,7 +1022,7 @@ this is a reply."
 	      (setq var (cdr var)))
 	    result)))
 	 name)
-    (when groups
+    (when (or groups gcc-self-val)
       (when (stringp groups)
 	(setq groups (list groups)))
       (save-excursion
@@ -1026,10 +1030,8 @@ this is a reply."
 	  (message-narrow-to-headers)
 	  (goto-char (point-max))
 	  (insert "Gcc: ")
-	  (if (and gnus-newsgroup-name
-		   (setq gcc-self-val
-			 (gnus-group-find-parameter
-			  gnus-newsgroup-name 'gcc-self)))
+	  (if gcc-self-val
+	      ;; Use the `gcc-self' param value instead.
 	      (progn
 		(insert
 		 (if (stringp gcc-self-val)
@@ -1040,6 +1042,7 @@ this is a reply."
 		  (progn
 		    (beginning-of-line)
 		    (kill-line))))
+	    ;; Use the list of groups.
 	    (while (setq name (pop groups))
 	      (insert (if (string-match ":" name)
 			  name
