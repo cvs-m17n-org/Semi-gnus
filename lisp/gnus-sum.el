@@ -36,6 +36,10 @@
 (require 'gnus-undo)
 (require 'std11)
 (require 'mime-view)
+
+(or (string< "1" eword-decode-version)
+    (error "Please install latest SEMI."))
+
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
@@ -662,11 +666,7 @@ is not run if `gnus-visual' is nil."
 
 ;; 1997/5/4 by MORIOKA Tomohiko <morioka@jaist.ac.jp>
 (defcustom gnus-structured-field-decoder
-  (function
-   (lambda (string)
-     (eword-decode-structured-field-body
-      (std11-unfold-string string) 'must-unfold)
-     ))
+  #'eword-decode-and-unfold-structured-field
   "*Function to decode non-ASCII characters in structured field for summary."
   :group 'gnus-various
   :type 'function)
