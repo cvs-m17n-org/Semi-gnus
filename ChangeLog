@@ -1,5 +1,29 @@
 1999-05-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 10.
+	(gnus-article-display-hook): Default to nil; annotate that it is an
+	obsolete variable.
+
+	* texi/gnus.texi (Customizing Articles): Document the new treatment
+	variables `mime' and `nomime'.
+
+	* lisp/gnus-art.el (gnus-treat-predicate): Handle the new treatment
+	variables `mime' and `nomime'.
+	(gnus-article-decode-message-body-as-default-mime-charset): New
+	function.
+	(gnus-article-prepare-display): Rewrite for the use of
+	`gnus-treat-article'.
+	(gnus-article-prepare-mime-display): New function.
+	(article-date-ut): Use `next-single-property-change' instead of
+	re-search.
+	(gnus-treatment-function-alist): Add a pair of
+	`gnus-treat-decode-message-body-as-default-mime-charset' and
+	`gnus-article-decode-message-body-as-default-mime-charset'.
+	(gnus-treat-decode-message-body-as-default-mime-charset): New user
+	option.
+
+1999-05-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
 
 	* lisp/gnus-art.el (article-date-ut): Keep the original X-Sent
