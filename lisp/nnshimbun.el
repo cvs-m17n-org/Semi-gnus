@@ -86,6 +86,13 @@
      (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov  . nnshimbun-yomiuri-generate-nov-database)
      (make-contents . nnshimbun-yomiuri-make-contents))
+    (zdnet
+     (address . "zdnet")
+     (url . "http://zdseek.pub.softbank.co.jp/news/")
+     (groups "comp")
+     (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (generate-nov  . nnshimbun-zdnet-generate-nov-database)
+     (make-contents . nnshimbun-zdnet-make-contents))
     ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
@@ -239,7 +246,7 @@
 	(setq article (nnshimbun-search-id group article)))
     (if (integerp article)
 	(if (nnshimbun-backlog
-	      (gnus-backlog-request-article group article 
+	      (gnus-backlog-request-article group article
 					    (or to-buffer nntp-server-buffer)))
 	    (cons group article)
 	  (let (header contents)
@@ -483,7 +490,7 @@
     (defun nnshimbun-mime-encode-string (string)
       (mapconcat
        #'identity
-       (split-string 
+       (split-string
 	(with-temp-buffer
 	  (insert (nnweb-decode-entities-string string))
 	  (rfc2047-encode-region (point-min) (point-max))
@@ -669,7 +676,7 @@ is enclosed by at least one regexp grouping construct."
 	(forward-line 2)
 	(delete-region (point) (point-max))
 	(goto-char (point-min))
-	(let (headers)
+	(let ((case-fold-search t) headers)
 	  (while (re-search-forward
 		  "^<a href=\"/\\(\\([A-z]*\\)/kiji/\\([0-9][0-9][0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)\\.html\\)\">"
 		  nil t)
@@ -749,7 +756,7 @@ is enclosed by at least one regexp grouping construct."
     (erase-buffer)
     (nnshimbun-retrieve-url (format "%s/News/Oneweek/" nnshimbun-url) t)
     (goto-char (point-min))
-    (let (headers)
+    (let ((case-fold-search t) headers)
       (while (search-forward "\n<!--*****見出し*****-->\n" nil t)
 	(let ((subject (buffer-substring (point) (gnus-point-at-eol)))
 	      (point (point)))
@@ -902,9 +909,11 @@ is enclosed by at least one regexp grouping construct."
     (set-buffer nnshimbun-buffer)
     (erase-buffer)
     (nnshimbun-retrieve-url (concat nnshimbun-url "main.htm") t)
-    (let ((group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups)))
+    (let ((case-fold-search t)
+	  (group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups)))
       (dolist (group nnshimbun-groups)
 	(let (start)
+	  (goto-char (point-min))
 	  (when (and (search-forward (format "\n<!-- /news/%s=start -->\n" group) nil t)
 		     (setq start (point))
 		     (search-forward (format "\n<!-- /news/%s=end -->\n" group) nil t))
@@ -965,7 +974,7 @@ is enclosed by at least one regexp grouping construct."
 	      (forward-line -1)
 	      (setq i (or (ignore-errors (read (current-buffer))) 0))
 	      (goto-char (point-max))
-	      (dolist (header (cdr list))
+	      (dolist (header (nreverse (cdr list)))
 		(unless (nnshimbun-search-id group (mail-header-id header))
 		  (mail-header-set-number header (setq i (1+ i)))
 		  (nnheader-insert-nov header)))))))
@@ -1002,6 +1011,81 @@ is enclosed by at least one regexp grouping construct."
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
+
+
+;;; Zdnet Japan
+
+(defun nnshimbun-zdnet-get-headers (group)
+  (save-excursion
+    (set-buffer nnshimbun-buffer)
+    (erase-buffer)
+    (nnshimbun-retrieve-url nnshimbun-url t)
+    (let ((case-fold-search t) headers)
+      (goto-char (point-min))
+      (let (start)
+	(while (and (search-forward "<!--" nil t)
+		    (setq start (- (point) 4))
+		    (search-forward "-->" nil t))
+	  (delete-region start (point))))
+      (goto-char (point-min))
+      (while (re-search-forward
+	      "<a href=\"\\(\\([0-9][0-9]\\)\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([^\\.]+\\).html\\)\"><font size=\"4\"><strong>"
+	      nil t)
+	(let ((year  (+ 2000 (string-to-number (match-string 2))))
+	      (month (string-to-number (match-string 3)))
+	      (day   (string-to-number (match-string 4)))
+	      (id    (format "<%s%s%s%s%%%s>"
+			     (match-string 2)
+			     (match-string 3)
+			     (match-string 4)
+			     (match-string 5)
+			     group))
+	      (url (match-string 1)))
+	  (push (make-full-mail-header
+		 0
+		 (nnshimbun-mime-encode-string
+		  (mapconcat 'identity
+			     (split-string
+			      (buffer-substring
+			       (match-end 0)
+			       (progn (search-forward "</a>" nil t) (point)))
+			      "<[^>]+>")
+			     ""))
+		 "zdnn@softbank.co.jp"
+		 (nnshimbun-make-date-string year month day)
+		 id  "" 0 0 (concat nnshimbun-url url))
+		headers)))
+      (nreverse headers))))
+
+(defun nnshimbun-zdnet-generate-nov-database (group)
+  (save-excursion
+    (set-buffer (nnshimbun-open-nov group))
+    (let (i)
+      (goto-char (point-max))
+      (forward-line -1)
+      (setq i (or (ignore-errors (read (current-buffer))) 0))
+      (goto-char (point-max))
+      (dolist (header (nnshimbun-zdnet-get-headers group))
+	(unless (nnshimbun-search-id group (mail-header-id header))
+	  (mail-header-set-number header (setq i (1+ i)))
+	  (nnheader-insert-nov header))))))
+
+(defun nnshimbun-zdnet-make-contents (header)
+  (goto-char (point-min))
+  (let (start)
+    (when (and (search-forward "<!--TITLEEND-->" nil t)
+	       (setq start (point))
+	       (search-forward "<!--BODYEND-->" nil t))
+      (delete-region (point-min) start)
+      (delete-region (point) (point-max))
+      (goto-char (point-min))
+      (when (looking-at "[ \t\n]*</h2>")
+	(delete-region (match-beginning 0) (match-end 0))))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (encode-coding-string (buffer-string)
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
 
 
