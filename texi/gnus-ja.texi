@@ -4719,7 +4719,7 @@ Prefixes})。
 @item / m
 @kindex / m （概略）
 @findex gnus-summary-limit-to-marks
-印を尋ねて、その印が付いていない記事に制限します
+印を尋ねて、その印が付いている記事に制限します
 (@code{gnus-summary-limit-to-marks})。
 
 @item / t
