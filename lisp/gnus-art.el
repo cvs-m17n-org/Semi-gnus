@@ -4692,7 +4692,7 @@ after replacing with the original article."
       (setq font-lock-defaults nil)
       (font-lock-mode 0))
     ;; We remove all text props from the article buffer.
-    (setq buf (format "%s" (buffer-string)))
+    (setq buf (buffer-substring-no-properties (point-min) (point-max)))
     (set-buffer (get-buffer-create gnus-original-article-buffer))
     (erase-buffer)
     (insert buf)
