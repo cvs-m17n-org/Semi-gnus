@@ -2075,9 +2075,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(when gnus-show-mime
 		  (if (or (not gnus-strict-mime)
 			  (gnus-fetch-field "Mime-Version"))
-		      (let ((coding-system-for-write 'binary)
-			    (coding-system-for-read 'binary))
-			(funcall gnus-show-mime-method))
+		      (funcall gnus-show-mime-method)
 		    (funcall gnus-decode-encoded-word-method)))
 		;; Perform the article display hooks.
 		(run-hooks 'gnus-article-display-hook))
