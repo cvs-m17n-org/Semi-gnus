@@ -25,17 +25,32 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(require 'nnheader)
+(eval-when-compile
+  (require 'cl)
+  (require 'imap)
+  (eval-when-compile (defvar display-time-mail-function)))
 (eval-and-compile
   (defvar pop3-leave-mail-on-server)
   (autoload 'pop3-movemail "pop3")
-  (autoload 'pop3-get-message-count "pop3"))
+  (autoload 'pop3-get-message-count "pop3")
+  (autoload 'nnheader-cancel-timer "nnheader"))
 (require 'format-spec)
 
 (defgroup mail-source nil
   "The mail-fetching library."
   :group 'gnus)
+
+;; Define these at compile time to avoid dragging in imap always.
+(defconst mail-source-imap-authenticators
+  (eval-when-compile
+    (mapcar (lambda (a)
+	      (list 'const (car a)))
+     imap-authenticator-alist)))
+(defconst mail-source-imap-streams
+  (eval-when-compile
+    (mapcar (lambda (a)
+	      (list 'const (car a)))
+     imap-stream-alist)))
 
 (defcustom mail-sources nil
   "*Where the mail backends will look for incoming mail.
@@ -142,33 +157,25 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (const :format "" :value :stream)
 					  (choice :tag "Stream"
 						  :value network
-						  ,@(progn (require 'imap)
-							   (mapcar
-							    (lambda (a)
-							      (list 'const
-								    (car a)))
-							    imap-stream-alist
-							    ))))
+						  ,@mail-source-imap-streams))
 				   (group :inline t
 					  (const :format ""
 						 :value :authenticator)
 					  (choice :tag "Authenticator"
 						  :value login
-						  ,@(progn (require 'imap)
-							   (mapcar
-							    (lambda (a)
-							      (list 'const
-								    (car a)))
-							    imap-authenticator-alist))))
+						  ,@mail-source-imap-authenticators))
 				   (group :inline t
 					  (const :format "" :value :mailbox)
-					  (string :tag "Mailbox"))
+					  (string :tag "Mailbox"
+						  :value "INBOX"))
 				   (group :inline t
 					  (const :format "" :value :predicate)
-					  (function :tag "Predicate"))
+					  (string :tag "Predicate" 
+						  :value "UNSEEN UNDELETED"))
 				   (group :inline t
 					  (const :format "" :value :fetchflag)
-					  (string :tag "Fetchflag"))
+					  (string :tag "Fetchflag"
+						  :value  "\\Deleted"))
 				   (group :inline t
 					  (const :format ""
 						 :value :dontexpunge)
