@@ -1,20 +1,61 @@
 * はじめに
 
-この文書では、 Semi-gnus との違いおよび、使用する上で注意する必要のあ
-る項目を説明しています。
+この文書では Nana-gnus 6.12.20 における、 Semi-gnus との違いおよび、使
+用する上で注意する必要のある項目を説明しています。
+
+* Nana-gnus 6.12 系列
+
+新しい、 APEL / SEMI / FLIM では、多くの改良が行われています。
+すでに、 SEMI / FLIM 1.13 の後継バージョンの開発も行われており、 SEMI
+/ FLIM 1.12 すでに、 1.12 系列のメイテナンスは行われておりません。
+また、 Nana-gnus の開発も、現在すでに 7.x 系列に移行しており、開発環境
+の関係で、 6.12 系列をメインテナンスすることが難しくなっています。
+そのため、 Nana-gnus 6.12 系列は 6.12.20 を持って、メイテナンスを終了
+することとさせていただきました。
 
 * 推奨環境
 ====================================================================
-APEL は 9.13 以降のもの (最新のものを推奨します。)
+APEL は 9.13 から 9.21 のもの (9.21 のを推奨します。)
 FLIM は 1.12.4 以降の 1.12 系列のもの (1.12.7 を推奨します。)
 SEMI は 1.12.1 以降の 1.12 系列のものおよび、 1.13 系列の 1.13.4 以前
 のもの (1.13.4 を推奨します。)
 が必要です。
 ====================================================================
 
-* 最新版に関する情報
+* 最新版、変更履歴に関する情報
 
-http://www.nanap.org/nana-gnus.shtml で公開しています。
+この文書では、 bug fix に関するものは記述していません、 6.12 系列以外
+の情報と合わせて、http://www.nanap.org/nana-gnus.shtml で公開しています。
+
+* message-yank-add-new-references
+
+この変数に `message-id-only' を設定すると、 Message Mode で C-c C-y
+(message-yank-original) したときに引用元の Message-Id が references
+field に追加されます。
+
+この変数に `t' を設定すると引用したメッセージのすべての 
+(References|In-Reply-To|Message-Id) field に含まれるすべての 
+Message-Id が追加されます。
+
+Default は `nil' です。
+
+* message-list-references-add-position
+
+正の整数値が有効です。
+
+`message-yank-add-new-references' が有効になっている状態で Message-Id 
+を追加するとき、そのメッセージに既に付加されている References field の 
+Message-Id の最後のものから数えて、指定番目の Message-Id の直前に新し
+い Message-Id が追加されるようになります。
+
+たとえば、 References: <a@a.a> <b@b.b> <c@c.c> となっているとき、この
+変数に 1 を設定してあると <c@c.c> の前に新しい Message-Id が挿入されま
+す。
+
+この値が nil の場合は、既に付加されている References field の最後尾に
+新しい Message-Id が付加されます。
+
+Defalt は nil です。
 
 * pop3-fma.el
 
@@ -233,6 +274,37 @@ message-mail-follow-up-address-checker (Default: nil)
 
 これらは Reply-to をつけないメイリング・リストに参加しているときなどに
 便利かも知れません。
+
+BBDB を使用する場合の設定を例としてあげておきます。
+;; BBDB は大変便利ですので、是非ご使用をおすすめします。
+
+BBDB の設定に関しては http://www.nanap.org/bbdb.shtml と、 Nana-gnus
+に付属の README-gnus-bbdb.* を参照してください。
+
+まず、 ~/.gnus.el に次のものを追加してください。
+
+(require 'mess-bbdb)
+(setq message-mail-follow-up-address-checker
+      'message-check-mailing-list-with-function
+      message-mailing-list-address-p 'message-bbdb/mailing-list-p)
+
+そして、 BBDB に参加しているメイリング・リストの情報を追加し、それぞれ
+のレコードに、 ml-name field を追加してください。 field の内容は何でも
+構いません。
+
+|semi-gnus-ja - ML
+|            net: semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp
+|        ml-name: semi-gnus-ja
+|
+|Emacs MIME (ja)
+|            net: emacs-mime-ja@m17n.org
+|        ml-name: emacs-mime-ja
+
+この状態で、 reply すると...
+
+  Do you want to remove private address? (y or n) 
+
+と聞かれますので、"y" を選ぶと送信者のメールアドレスが削除されます。
 
 * Locale
 
