@@ -8428,7 +8428,7 @@ So here's a new example:
          (signature my-funny-signature-randomizer))
         ((equal (system-name) "gnarly")
          (signature my-quote-randomizer))
-        (message-this-is-new
+        (message-this-is-news
          (signature my-news-signature))
         (posting-from-work-p
          (signature-file "~/.work-signature")
@@ -10422,7 +10422,6 @@ your @file{.emacs} file:
 
 @end table
 
-
 @findex nnfolder-generate-active-file
 @kindex M-x nnfolder-generate-active-file
 If you have lots of @code{nnfolder}-like files you'd like to read with
@@ -11737,7 +11736,7 @@ Fetch all eligible articles in all groups
 @kindex J S (Agent Group)
 @findex gnus-group-send-drafts
 Send all sendable messages in the draft group
-(@code{gnus-agent-fetch-session}).  @xref{Drafts}
+(@code{gnus-agent-send-draft}).  @xref{Drafts}
 
 @item J a
 @kindex J a (Agent Group)
