@@ -2500,13 +2500,13 @@ This sub function is for exclusive use of `message-send-mail'."
 	    (set-buffer tembuf)
 	    (erase-buffer)
 	    (insert-buffer message-encoding-buffer)
-	    (set-buffer-modified-p nil)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
-	      ;; We (re)generate the Lines header.
-	      (when (memq 'Lines message-required-mail-headers)
-		(message-generate-headers '(Lines)))
+;; We Semi-gnus people have no use for it.
+;;	      ;; We (re)generate the Lines header.
+;;	      (when (memq 'Lines message-required-mail-headers)
+;;		(message-generate-headers '(Lines)))
 	      ;; Remove some headers.
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
@@ -2738,13 +2738,13 @@ This sub function is for exclusive use of `message-send-news'."
 	    (buffer-disable-undo)
 	    (erase-buffer)
 	    (insert-buffer message-encoding-buffer)
-	    (set-buffer-modified-p nil)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
-	      ;; We (re)generate the Lines header.
-	      (when (memq 'Lines message-required-mail-headers)
-		(message-generate-headers '(Lines)))
+;; We Semi-gnus people have no use for it.
+;;	      ;; We (re)generate the Lines header.
+;;	      (when (memq 'Lines message-required-mail-headers)
+;;		(message-generate-headers '(Lines)))
 	      ;; Remove some headers.
 	      (message-remove-header message-ignored-news-headers t))
 	    (goto-char (point-max))
