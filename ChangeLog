@@ -1,5 +1,18 @@
 1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/smtp.el (smtp-deduce-address-list): Don't use
+ 	`smtp-recipient-address-list' as global variable.
+
+	* lisp/message.el (message-send-mail-with-smtp): Don't use
+ 	`smtp-recipient-address-list' as global variable.
+
+	* lisp/smtpmail.el (smtpmail-recipient-address-list): New
+ 	variable; renamed from `smtp-recipient-address-list'.
+	(smtpmail-send-it): Remove `(not (null ...))'.
+	(smtpmail-send-queued-mail): Likewise.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/message.el (message-send-mail-with-smtp): Don't generate
  	temporary buffer for message; don't generate and kill
  	`smtp-address-buffer' for `smtp-deduce-address-list'.
