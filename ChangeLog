@@ -1,3 +1,9 @@
+2002-06-26  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* lisp/imap.el (imap-ssl-open-2): Do away with w32-related
+	workaround I installed on 1999-12-28, i.e. also call
+	`as-binary-process' in windows-nt.
+
 2002-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* contrib/hashcash.el: Require `cl' when compiling.
