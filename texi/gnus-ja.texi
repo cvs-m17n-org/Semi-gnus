@@ -2784,6 +2784,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 
 @code{gnus-parameter-to-list-alist} $B$b;2>H$7$F2<$5$$!#(B
 
+@anchor{subscribed}
 @item subscribed
 @cindex subscribed
 $B$b$7$3$N%Q%i%a!<%?$,(B @code{t} $B$K@_Dj$5$l$F$$$k$H!"(Bgnus $B$O$"$J$?$,$3$N%0(B

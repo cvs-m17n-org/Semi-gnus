@@ -344,6 +344,7 @@ gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$
 $B$G$-$^$9!#0J2<$NJQ?t$,<j$4$m$G$7$g$&!#(B
 
 @table @code
+@vindex message-subscribed-addresses
 @item message-subscribed-addresses
 $B$3$l$O9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I%l%9$N%j%9%H$G$J$1$l$P$J$j$^$;$s!#(B
 $B%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#Nc(B:
@@ -353,6 +354,7 @@ gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$
       '("ding@@gnus.org" "bing@@noose.org"))
 @end lisp
 
+@vindex message-subscribed-regexps
 @item message-subscribed-regexps
 $B$3$l$O9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I%l%9$r<($9@55,I=8=$N%j%9%H$G$J$1(B
 $B$l$P$J$j$^$;$s!#%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#>e5-$HF1$87k2L$r@.$7?k(B
@@ -360,13 +362,25 @@ gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$
 
 @lisp
 (setq message-subscribed-regexps
-      '("[bd]ing@@\\(gnus\\|noose\\)\\.org"))
+      '("\\(ding@@gnus\\)\\|\\(bing@@noose\\)\\.org")
 @end lisp
 
+@vindex message-subscribed-address-functions
 @item message-subscribed-address-functions
 $B$3$l$O(B MFT $B%X%C%@!<$NCM$r7h$a$k$?$a$K(B ($B0lEY$K0l2s(B!!) $B8F$P$l$k4X?t$N%j%9(B
 $B%H$G$"$k$3$H$,$G$-$^$9!#$=$l$i$N4X?t$K$O0z?t$,L5$$$3$H$rCi9p$7$F$*$-$^$9!#(B
 $B%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#(B
+
+gnus $B$K$O$3$NJQ?t$N9%E,$J8uJd$G$"$k$H$3$m$N!"$"$i$+$8$aDj5A$5$l$F$$$k4X(B
+$B?t$,$"$j$^$9!#4X?t(B @code{gnus-find-subscribed-addresses} $B$O!"(B
+@code{subscribed} (@pxref{(gnus)subscribed}) $B%0%k!<%W%Q%i%a!<%?$,(B
+$BHs(B-nil $B$K@_Dj$5$l$F$$$k%0%k!<%W$KBP1~$9$k%"%I%l%9$N%j%9%H$rJV$7$^$9!#$3(B
+$B$s$J$U$&$K$7$^$7$g$&!#(B
+
+@lisp
+(setq message-subscribed-address-functions
+      '(gnus-find-subscribed-addresses))
+@end lisp
 
 @item message-subscribed-address-file
 $B$"$J$?$O$b$7$+$7$?$i?l68$J?M(B ($B86E5(B: one organised human freak) $B$G!"9XFI(B
@@ -391,12 +405,13 @@ gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$
 $B$&!<$`!#$=$&$9$k$H$"$J$?$O!V9XFI$7$F$$$J$$%a!<%j%s%0%j%9%H$K%a!<%k$rAw?.(B
 $B$9$k$H$-$O$I$&$J$k$N(B?$B!W$H?R$M$^$9$M!#$(!<$H!"?F@Z$J(B Gnus $B%?%o!<$N?M$?$A(B
 $B$,!"$3$NL\E*$G;H$($k$9$Y$F$N4{CN$N%a!<%j%s%0%j%9%H$N%"%I%l%9$N%G!<%?%Y!<(B
-$B%9$N:n@.$K$$$=$7$s$G$$$^$9!#$=$l$^$G$O!"(B@kbd{C-c C-f m} $B$r;H$C$F<jF0(B
+$B%9$N:n@.$K$$$=$7$s$G$$$^$9!#$=$l$^$G$O!"(B@kbd{C-c C-f C-m} $B$r;H$C$F<jF0(B
 $B$G(B MFT $B%X%C%@!<$rA^F~$9$k$J$I$7$F2<$5$$(B!!
 
 @c @node Honoring an MFT post
 @subsection MFT $BEj9F$NB:=E(B
 
+@vindex message-use-mail-followup-to
 $B%a!<%j%s%0%j%9%H$KEj9F$5$l$?5-;v$K%U%)%m!<%"%C%W$9$k$H$-!"$=$N5-;v(B
 $B$,(B MFT $B%X%C%@!<$r;}$C$F$$$?$i!"(Bgnus $B$NF0:n$OJQ(B
 $B?t(B @code{message-use-mail-followup-to} $B$NCM$K$h$C$F7h$^$j$^$9!#$3$NCM$O(B
