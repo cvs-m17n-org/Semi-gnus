@@ -4,7 +4,7 @@
 
 	* lisp/message.el (message-send-news): Call
 	`message-maybe-split-and-send-news' with an arg `method'.
- 	(message-maybe-split-and-send-news): Accept an arg `method'.
+	(message-maybe-split-and-send-news): Accept an arg `method'.
 
 	* lisp/rfc1843.el: Defvar `gnus-decode-encoded-word-function'.
 
