@@ -4,6 +4,7 @@ srcdir = @srcdir@
 subdir = texi
 top_srcdir = @top_srcdir@
 
+@SET_MAKE@
 TEXI2DVI=texi2dvi
 EMACS=emacs
 MAKEINFO=@MAKEINFO@
@@ -76,7 +77,7 @@ latex: gnus.texi texi2latex.elc
 	$(EMACS) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
 
 latexps:
-	make texi2latex.elc
+	$(MAKE) texi2latex.elc
 	rm -f gnus.aux
 	egrep -v "label.*Index|chapter.*Index" gnus.latexi > gnus.tmplatexi1
 	$(LATEX) gnus.tmplatexi1
@@ -93,22 +94,22 @@ latexps:
 	$(DVIPS) -t $(PAPERTYPE) -f gnus.dvi > gnus.ps
 
 pss:
-	make latex
-	make latexps
+	$(MAKE) latex
+	$(MAKE) latexps
 
 psout:
-	make latex
-	make latexboth
-	make out
+	$(MAKE) latex
+	$(MAKE) latexboth
+	$(MAKE) out
 
 latexboth:
 	rm -f gnus-manual-a4.ps.gz gnus-manual-standard.ps.gz
-	make latexps
+	$(MAKE) latexps
 	mv gnus.ps gnus-manual-a4.ps
 	gzip gnus-manual-a4.ps
 	sed 's/,a4paper/,letterpaper/' gnus.latexi > gnus-standard.latexi
 	mv gnus-standard.latexi gnus.latexi
-	make latexps PAPERTYPE=letter
+	$(MAKE) latexps PAPERTYPE=letter
 	mv gnus.ps gnus-manual-standard.ps
 	gzip gnus-manual-standard.ps
 
@@ -120,12 +121,10 @@ out:
 	gnus-manual-a4.ps.gz \
 	/hom/larsi/www_docs/www.gnus.org/documents
 
-veryclean:
-	make clean
+veryclean: clean
 	rm -f gnus.dvi gnus.ps texi2latex.elc
 
-distclean:
-	make clean
+distclean: clean
 	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9] Makefile
 	rm -f message message-[0-9]
 	rm -f emacs-mime
@@ -143,13 +142,13 @@ install:
 
 tmps:
 	if [ ! -e tmp ]; then mkdir tmp; fi
-	make screens
-	make herdss
-	make etcs
-	make piconss
-	make xfaces
-	make smiley
-	make miscs
+	$(MAKE) screens
+	$(MAKE) herdss
+	$(MAKE) etcs
+	$(MAKE) piconss
+	$(MAKE) xfaces
+	$(MAKE) smiley
+	$(MAKE) miscs
 
 herdss:
 	cd herds ; for i in new-herd-[0-9]*.gif; do echo $$i; giftopnm $$i | pnmcrop -white | pnmmargin -white 9 | pnmscale 2 | pnmconvol convol5.pnm  | ppmtopgm | pnmdepth 255 | pnmtops -width 100 -height 100 -noturn > ../tmp/`basename $$i .gif`.ps; done
@@ -193,9 +192,9 @@ pspackage:
 	tar czvf pspackage.tar.gz gnus-faq.texi gnus.texi herds misc pagestyle.sty picons pixidx.sty postamble.tex ps screen smilies splitindex texi2latex.el xface Makefile README etc
 
 complete:
-	make texi2latex.elc
-	make tmps
-	make pss
+	$(MAKE) texi2latex.elc
+	$(MAKE) tmps
+	$(MAKE) pss
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \
