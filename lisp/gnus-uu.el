@@ -1,6 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
-;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
+;;        2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -1389,6 +1389,9 @@ When called interactively, prompt for REGEXP."
 	  (while article-series
 	    (gnus-summary-tick-article (pop article-series) t)))))
 
+    ;; The original article buffer is hosed, shoot it down.
+    (gnus-kill-buffer gnus-original-article-buffer)
+
     result-files))
 
 (defun gnus-uu-grab-view (file)
@@ -1569,7 +1572,7 @@ Gnus might fail to display all of it.")
 	      (unless
 		  (unwind-protect
 		      (with-current-buffer buffer
-			(insert (substitute-command-keys 
+			(insert (substitute-command-keys
 				 gnus-uu-unshar-warning))
 			(goto-char (point-min))
 			(display-buffer buffer)

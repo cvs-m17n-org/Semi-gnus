@@ -602,7 +602,7 @@ variable isn't used."
   :type 'sexp)
 
 (defcustom message-generate-headers-first nil
-  "*If non-nil, generate all possible headers before composing."
+  "*If non-nil, generate all required headers before composing."
   :group 'message-headers
   :type 'boolean)
 
@@ -5210,7 +5210,7 @@ The form is: Fwd: Subject, where Subject is the original subject of
 the message."
   (concat "Fwd: " subject))
 
-(defun message-make-forward-subject ()
+(defun message-make-forward-subject (&optional decoded)
   "Return a Subject header suitable for the message in the current buffer."
   (save-excursion
     (save-restriction
@@ -5219,7 +5219,9 @@ the message."
 	    (subject (message-fetch-field "Subject")))
 	(setq subject
 	      (if subject
-		  (nnheader-decode-subject subject)
+		  (if decoded
+		      subject
+		    (nnheader-decode-subject subject))
 		""))
 	(if message-wash-forwarded-subjects
 	    (setq subject (message-wash-subject subject)))
