@@ -3,6 +3,9 @@
 	* lisp/dgnushack.el: Make sure `dolist' is available; require
 	`advice' before `path-util'; revoke the bogus change of 2003-04-17
 	(removing function bindings for XEmacs).
+	(dgnushack-remove-extra-files-in-package): Clear the value for
+	`command-line-args-left'.
+	(dgnushack-install-package-manifest): Ditto.
 
 	* texi/infohack.el: Load dgnushack.el and ptexinfmt.el first.
 
