@@ -1,9 +1,16 @@
-2001-04-10  Katsumi Yamaoka <yamaoka@jpl.org>
+2001-04-13  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-interactive): Fix mismatched parentheses.
+	* lisp/lpath.el: Fbind `xml-parse-region' for XEmacsen and old FSF
+	Emacsen; don't bind `mh-lib-progs'.
+
+2001-04-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el: Enclose w3m stuff with `eval-and-compile';
 	bind `w3m-work-buffer-name' and `w3m-retrieve' when compiling.
+
+2001-04-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 10.
 
 2001-04-03  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
@@ -11,6 +18,17 @@
 	asahi.com.
 	(nnshimbun-asahi-get-headers): Ditto.
 	(nnshimbun-retrieve-url): Use `w3m-retrieve' if it is available.
+
+2001-04-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Make it to work with
+	multiple articles even if there is a detached minibuffer frame on
+	some window managers.
+
+2001-03-21  Thierry Emery <thierry.emery@club-internet.fr>
+
+	* lisp/mm-decode.el (mm-copy-to-buffer): Copy buffer in unibyte
+	mode.
 
 2001-03-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -27,10 +45,34 @@
 	of encoded binary data parts to make MIME-Edit find the MIME part
 	boundaries.
 
+	* lisp/dgnushack.el (dgnushack-compose-package): Tidy up.
+	(dgnushack-make-load): Ditto.
+
+2001-03-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-compose-package): New function.
+	(dgnushack-make-load): Add autoload for cus-load if it is missing.
+
+	* lisp/Makefile.in (compose-package): Use
+	`dgnushack-compose-package'.
+	(clean, clever): Remove custom-load.el.
+
+	* Makefile.in (elclean): Remove custom-load.el.
+
 2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-prepare-display): Setup MIME
 	entity even if `gnus-show-mime' is nil.
+
+2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Load gnus-clfns.el after `load-path' is
+	adjusted.
+
+	* lisp/gnus-clfns.el (string): New compiler macro.
+	(string): Defun-maybe as an ordinary function since it won't be
+	provided in cl.
+	* lisp/gnus-score.el (gnus-score-find-bnews): Use it as Gnus does.
 
 2001-03-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -49,17 +91,24 @@
 
 2001-03-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-offline.el (gnus-offline-get-menu-items): Rewrite using
+	`dolist'.
 
 	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Simplified.
 
 	* lisp/dgnushack.el: Load cl-macs to ensure that the macro `dolist'
 	is defined properly.
 
+2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnwfm.el: Require `gnus-clfns' when compiling.
 	* lisp/nnshimbun.el: Ditto.
+	* lisp/nnfolder.el: Ditto.
 	* lisp/mm-util.el: Ditto.
 	* lisp/gnus-vers.el: Ditto.
+	* lisp/gnus-sum.el: Ditto.
 	* lisp/gnus-score.el: Ditto.
 	* lisp/gnus-nocem.el: Ditto.
 
@@ -69,9 +118,9 @@
 
 	* lisp/gnus-offline.el: Don't use `mapc' for binding some vars;
 	don't require `gnus-clfns'.
-	(gnus-offline-get-menu-items): Rewrite using `dolist'.
 
-	* lisp/gnus-clfns.el (butlast): New compiler macro.
+	* lisp/gnus-clfns.el (subseq, merge, coerce, butlast): New compiler
+	macros.
 	(mapc): Remove.
 
 	* lisp/gnus-art.el: Use `dolist' instead of `mapcar' for defining
@@ -131,7 +180,7 @@
 
 2001-02-16  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
 
 	* lisp/gnus-sum.el (gnus-get-newsgroup-headers-xover): Don't use
 	`gnus-retrieve-parsed-headers' when the backend is nnimap.  It is
@@ -140,6 +189,8 @@
 
 2001-02-16  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* texi/gnus-ja.texi (New features in Gnus 5.8): Remove annotation
+	about `gnus-article-display-hook.'
 	* texi/gnus-faq-ja.texi (Q2.1): Remove mention of
 	`gnus-article-display-hook.'
 
@@ -162,6 +213,41 @@
 	* lisp/message.el (message-cite-original-without-signature):
 	Extract from field for the simple citation line.
 
+2001-02-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
+
+	* lisp/dgnushack.el (dgnushack-make-autoloads): Remove function.
+	(dgnushack-make-load): Ignore cus-load.el if it does not exist.
+	(dgnushack-make-auto-load): Remove auto-autoloads.el.
+	(dgnushack-make-cus-load): Do nothing if loading cus-dep is failed.
+
+	* lisp/Makefile.in (clean): Remove gnus-load.el instead of
+	custom-load.el.
+	(compose-package): Call `gnus-load.elc' and then rename
+	gnus-load.el(c) to auto-autoloads.el(c) instead of the use of
+	`dgnushack-make-autoloads'.
+	(clever): No need to remove custom-load.el.
+
+	* Makefile.in (elclean): Remove gnus-load.el instead of
+	custom-load.el.
+
+	* aclocal.m4 (AC_CHECK_URL): Ignore cache.
+
+2001-02-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
+
+2001-02-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* GNUS-NEWS: Copyright and others.
+
+2001-02-09 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4 (AC_CHECK_URL): Add.
+
+	* configure.in: Use it.
+
 2001-02-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-fml-get-headers): Fix unbalanced
@@ -183,14 +269,14 @@
 
 2001-02-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/dgnushack.el (dgnushack-texi-format): A workaround for
-	@ifnottex.
-
 	* texi/Makefile.in (.texi, %.info): Don't use makeinfo command when
 	gnus-ja.texi or message-ja.texi is given.  It is needed for some
 	make command if which can not understand "%-ja:" or "%-ja.info:".
-	(.texi, %.info, %-ja.info, %-ja): Don't eval `EMACSINFOHACK'.
-	(EMACSINFOHACK): Move to lisp/dgnushack.el.
+
+2001-01-31  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-display-article): Replace
+	`mm-enable-multibyte-mule4' with `set-buffer-multibyte'.
 
 2001-01-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -199,11 +285,11 @@
 
 2001-01-23  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
-	* lisp/ptexinfmt.el: Support @letterpaper and @afivepaper.
+	* texi/ptexinfmt.el: Support @letterpaper and @afivepaper.
 
 2001-01-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
 
 	* Makefile.in (install-package-lisp): Use
 	`install-without-compiling' instead of `install'.
@@ -211,9 +297,22 @@
 	* lisp/Makefile.in (install): Use `install-without-compiling'.
 	(install-without-compiling): New target.
 
+2001-01-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/Makefile.in (.texi, %.info, %-ja.info, %-ja): Use
+	`infohack-texi-format'.
+
+	* texi/infohack: (infohack-texi-format): New function.
+	* lisp/dgnushack.el (dgnushack-texi-format): Move to
+	texi/infohack.el and rename.
+	(dgnushack-texi-add-suffix-and-format): Remove.
+
+	* texi/ptexinfmt.el: New file.
+	* lisp/ptexinfmt.el: Move to texi/.
+
 2001-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
 
 2001-01-17  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -234,6 +333,10 @@
 
 	* Makefile.in: Unset `PWD' for Meadow/NTEmacs.
 
+2001-01-15  Jesper Harder <harder@ifa.au.dk>
+
+	* make.bat: Fix doc.
+
 2001-01-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnheader.el: Require `pces', `poem' and `std11' to reduce
@@ -248,27 +351,20 @@
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Save excursion
 	while `bbdb-annotate-message-sender' is being done.
 
-2001-01-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-art.el (gnus-treatment-function-alist): Use backquote.
-
 2001-01-13  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
 
 	* Makefile.in (install-package-lisp): Specify EMACS=$(XEMACS).
-
-2001-01-12  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (T-gnus): Update to 6.14.6.
-	(gnus-revision-number): Clear to 00.
-
-	* Sync up with Gnus v5.8.8.
 
 2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-copy-article-buffer): Remove smiley
 	extents for XEmacs 21.1 using `format'.
 
+	* lisp/dgnushack.el (dgnushack-texi-format): Cancel last change.
+
 2001-01-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
 
 	* lisp/gnus.el: Don't autoload "smiley" for `smiley-toggle-buffer';
 	don't autoload "gnus-bitmap" or "x-face-mule" when Emacs 21 is
@@ -283,2937 +379,82 @@
 	`gnus-bitmap'.
 	(gnus-article-x-face-command): Don't check for xbm for x-face-e21.
 
+2001-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Remove "@anchor" if it
+	is not supported.
+
+2000-12-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Bind `:parameter-type', `:parameter-document',
+	`:function', `:function-document', `:variable',
+	`:variable-document', `:variable-group', `:variable-type' and
+	`:variable-default' for old Emacsen.
+
+2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* configure: Regenerate.
+	* configure.in: Add `AC_PATH_ETCDIR'.
+	* Makefile.in (install-etc): New target.
+
+	* lisp/nnheader.el (mm-image-load-path): Alias to
+	`nnheader-image-load-path'.
+	(nnheader-image-load-path): New function copied from
+	the function `mm-image-load-path' in mm-util.el.
+
+	* lisp/drums.el: Remove.
+
+2000-12-22 03:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* configure.in: Add etc/Makefile.
+
 2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-debug): Use `sit-for' in the inside of
 	`save-excursion'.
 	(gnus-bug): Pop up the sending buffer first.
 
+	* lisp/gnus-art.el (article-treat-dumbquotes): Quote backslashes in
+	doc-string.
+
 	* lisp/dgnushack.el
 	(byte-compile-file-form-custom-declare-variable): Use `defvar'
 	instead of `custom-declare-variable' to make the variable
 	uncustomizable if the arguments has the keyword `:version'.
 
+2000-12-22  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* README.semi.ja: Fix typo.
+
 2000-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind `compose-mail' for Mule.
 
 	* lisp/dgnushack.el (TopLevel): Byte-optimize
 	`custom-declare-variable', `custom-declare-group, and
 	`custom-declare-face' to omit unsupported keywords when Mule is
 	running.
 
-2000-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-12-20  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/nnshimbun.el (TopLevel): Defalias `coding-system-category'
-	to `get-code-mnemonic' for Mule.
-	(TopLevel): Make codesys `euc-japan' and `shift_jis' for Mule.
-	(nnshimbun-type-definition): Use `static-if' to determine codesys.
-	(TopLevel): Require `static'.
+	* lisp/gnus-vers.el: T-gnus 6.15.0 revision 00.
 
-2000-12-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+	* lisp/dgnushack.el (TopLevel): Advise `custom-handle-keyword' not
+	to signal an error when Mule is running.
+	(TopLevel): Bind `:ascent', `:foreground', `:help', `:version' and
+	`:set-after' if colon keyword is not available.
+	(TopLevel): Require `custom'.
 
-	* lisp/nnshimbun.el (nnshimbun-retrieve-url): coding detection is
-	improved.
-	(nnshimbun-meta-content-type-charset-regexp): New constant.
-	(nnshimbun-meta-charset-content-type-regexp): Ditto.
+	* lisp/lpath.el (TopLevel): Fbind `shell-command-to-string' for
+	Mule.
+	(TopLevel): Don't require `custom' here.
 
-2000-12-03  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+2000-12-20  Jesper Harder <jesper_harder@hotmail.com>
 
-	* texi/gnus-ja.texi: Fixes for the last modification.
+	* make.bat: set max-lisp-eval-depth.
 
-2000-12-02  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
-
-	* texi/gnus-ja.texi: Translate description about
-	`nnmail-split-fancy-with-parent'.
-
-	* texi/message-ja.texi: Use two lines for direntry.
-
-2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el: Attempt to add another FLIM path to `load-path'
-	if the module `mel' does not found.  This procedure may be needed
-	when recent FLIM 1.14 is used under old Emacsen.
-
-2000-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
-
-	* lisp/message.el (message-send-mail-with-smtp): Leave the error
-	handling in `smtp-send-buffer's own care.
-
-2000-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
-
-	* lisp/gnus.el: Add autoloads for x-face-e21.
-
-	* lisp/gnus-sum.el (gnus-summary-search-article-position-point):
-	Search for `x-face-image' as well as `x-face-mule-bitmap-image'.
-
-	* lisp/gnus-art.el (gnus-article-x-face-command): Default to
-	`x-face-decode-message-header' when Emacs 21 is running and
-	x-face-e21 is installed.
-
-2000-11-21  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-send-mail-with-smtp): Use
-	`smtp-send-buffer' if it exists instead of `smtp-via-smtp'.
-
-	* lisp/dgnushack.el (describe-key-briefly): New compiler macro for
-	old Emacsen.
-
-2000-11-17  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
-
-	* lisp/nnheader.el (nnheader-header-value): Save point.
-
-2000-11-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
-
-	* texi/gnus-ja.texi (Drafts): Fix typo.
-
-2000-11-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-art.el (article-verify-x-pgp-sig): Autoload "mm-uu".
-	(gnus-treat-x-pgp-sig): Default to nil.
-
-2000-11-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* Mule23@1934.en, Mule23@1934.ja, sample.lpath.el: Upgrade.
-
-	* configure: Regenerate.
-	* aclocal.m4 (AC_PATH_PACKAGEDIR): No need to quote a string for
-	`AC_MSG_RESULT'.
-	(AC_CHECK_W3): Ignore cache; no need to quote a string for
-	`AC_MSG_RESULT'.
-	(AC_CHECK_EMACS_FLAVOR): Ignore cache.
-	(AC_CHECK_EMACS): Ignore cache.
-	(AC_DEFINE_GNUS_PRODUCT_NAME): Cache.
-
-2000-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* configure: Regenerate.
-
-	* aclocal.m4 (AC_CHECK_W3): Substitute `W3' with empty string
-	instead of "no" if it is not acceptable.
-
-	* lisp/dgnushack.el: Load dgnuspath.el and ~/.lpath.el just before
-	path-util is loaded.
-	(dgnushack-compile): Show `load-path'.
-	(dgnushack-w3-dir): Ignore the env var W3DIR if it is empty.
-
-	* lisp/lpath.el: Move out `load-path' modification for APEL, FLIM
-	and SEMI to dgnushack.el.
-	* lisp/dgnushack.el: Move here.
-
-	* lisp/lpath.el (md5): Don't bind.
-	(url-insert-file-contents): Fbind for FSF Emacsen.
-
-2000-11-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* texi/Makefile.in (install-ja-info): Specify `EMACS' and
-	`infodir'.
-	(install-info): Ditto.
-	(install-ja): Ditto.
-
-	* lisp/lpath.el (md5): Fbind using `maybe-fbind'.
-
-	* lisp/dgnushack.el (dgnushack-compose-package): Remove function.
-	(dgnushack-install-package-info-ja): Remove function.
-	(dgnushack-install-package-info): Remove function.
-	(dgnushack-install-package-lick): Remove function.
-	(dgnushack-install-package-pkginfo): Remove function.
-	(dgnushack-install-package-info-files): Remove function.
-	(dgnushack-install-package-manifest): New function.
-	(dgnushack-remove-extra-files-in-package): New function.
-	(dgnushack-gnus-product-name): Remove function.
-	(dgnushack-examine-package-dir): Remove function.
-	(dgnushack-exporting-files): Rename from `dgnushack-exported-files'.
-	(dgnushack-unexporting-files): Rename from
-	`dgnushack-unexported-files'; attempt to fix `load-path' for W3 and
-	retry to load `w3-forms' if it is failed.
-	(dgnushack-w3-dir): New variable.
-
-	* lisp/Makefile.in (remove-extra-files-in-package): New target.
-	(install-package-manifest): New target.
-	(install-package-info-ja): Remove target.
-	(install-package-info): Remove target.
-	(install-package-lick): Remove target.
-	(install-lisp): New target detached from `install'.
-	(install): Call `clever' and `install-lisp'.
-	(EXPORTING_FILES, GNUS_PRODUCT_NAME): New variables.
-
-	* configure: Regenerate.
-
-	* aclocal.m4 (AC_PATH_PACKAGEDIR): Examine `PACKAGEDIR' if it is
-	not specified under XEmacs.
-	(AC_EXAMINE_PACKAGEDIR): New function.
-	(AC_PATH_LISPDIR): Don't say annotations about install-package if
-	FSFmacs is used.
-	(AC_DEFINE_GNUS_PRODUCT_NAME): Add substitution for
-	`GNUS_PRODUCT_NAME'.
-
-	* Makefile.in (remove-extra-files-in-package): New target.
-	(install-package-manifest): New target.
-	(install-package-info-ja): Examine `PACKAGEDIR' if it is not
-	specified; call install-ja-info in texi/Makefile.
-	(install-package-info): Examine `PACKAGEDIR' if it is not
-	specified; call install-info in texi/Makefile.
-	(install-package-lisp): Rename from `install-package-lick'; examine
-	`PACKAGEDIR' if it is not specified; call `install-lisp' in
-	lisp/Makefile.
-	(install-package-ja): Call `xlick', `compose-package',
-	`remove-extra-files-in-package', `install-package-lisp',
-	`install-package-info', `install-package-info-ja' and
-	`install-package-manifest'.
-	(install-package): Call `xlick', `compose-package',
-	`remove-extra-files-in-package', `install-package-lisp',
-	`install-package-info' and `install-package-manifest'.
-	(install-info-ja, install-info): Specify `infodir'.
-	(EXAMINE_PACKAGEDIR, GNUS_PRODUCT_NAME, infodir): New variables.
-
-2000-11-07  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
-
-	* texi/gnus-ja.texi: Do not use characters other than ascii ones
-	for direntries.
-	* texi/message-ja.texi: Ditto.
-
-2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/Makefile.in (install): Don't check for the file names.
-
-2000-11-04  Katsuhiro Hermit Endo  <hermit@koka-in.org>
-
-	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
-	command in `gnus-topic-mode-map' instead of `gnus-group-mode-map'.
-
-2000-10-25  Katsuhiro Hermit Endo  <hermit@tomato.saino.ne.jp>
-
-	* lisp/gnus-topic.el (gnus-topic-rename): Use current topic as
-	initial value for read-string.
-
-2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/Makefile.in (install): Use the lisp function
-	`dgnushack-exported-files'.
-
-	* lisp/nnmail.el (nnmail-pathname-coding-system): Default to
-	`binary'.
-	* lisp/nnheader.el (nnheader-pathname-coding-system): Ditto.
-
-	* lisp/message.el (message-get-reply-headers): Remove useless
-	`concat'.
-
-	* lisp/md5.el: Restore the file.
-
-	* lisp/dgnushack.el (dgnushack-compile): Refer to the constant
-	`dgnushack-exported-files'.
-	(dgnushack-exported-files): New function.
-	(dgnushack-exported-files): New constant.
-	(dgnushack-unexported-files): Add some files.
-	(dgnushack-tool-files): Remove, merge it into
-	`dgnushack-unexported-files'.
-
-	* lisp/base64.el: New file -- base64 encoding functions using MEL.
-
-2000-11-05  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
-
-	* lisp/smiley.el (smiley-deformed-regexp-alist): Modify regexp for
-	the winking face.
-
-2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (dgnushack-make-manifest): Fix info directory.
-
-2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* Makefile.in (install-package-ja): Compile and install lisp files
-	first.
-	(install-package): Ditto.
-	(compose-package, install-package-info-ja, install-package-info,
-	install-package-lick): New sub targets.
-
-	* lisp/Makefile.in (install-package-info-ja, install-package-info,
-	install-package-lick): New targets.
-	(compose-package): Rename from `package'.
-	(install-package): Remove.
-
-	* lisp/dgnushack.el (dgnushack-install-package-info-ja,
-	dgnushack-install-package-info, dgnushack-install-package-lick,
-	dgnushack-install-package-pkginfo,
-	dgnushack-install-package-info-files, dgnushack-make-manifest,
-	dgnushack-gnus-product-name, dgnushack-examine-package-dir,
-	dgnushack-make-autoloads): New functions.
-	(dgnushack-install-package): Remove.
-	(dgnushack-compose-package): Rename from `dgnushack-make-package'.
-	(dgnushack-info-file-regexp-ja, dgnushack-info-file-regexp-en):
-	Split from `dgnushack-info-file-regexp'.
-	(dgnushack-texi-file-regexp): Remove.
-
-2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Remove @ignore'd areas
-	before processing.
-
-2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
-
-	* lisp/gnus.el (gnus-product-variable-file-list): Check for
-	`emacs-version' in the file "cache" as well.
-	* lisp/gnus-start.el (gnus-product-read-variable-file-1): Make it
-	talkative.
-
-2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el: Bind `:key-type' and `:value-type' for old
-	Emacsen.
-
-2000-10-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (texinfo-format-direntry): Fixed broken
-	direntry generate probrem.
-	(Advised by Tetsuo Tsukamoto <czkmt@remus.dti.ne.jp>)
-
-2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-sum.el (gnus-summary-insert-line): Work with quoted
-	double-quote characters.
-	(gnus-summary-prepare-threads): Ditto.
-
-2000-10-30  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (ptexinfmt-disable-broken-notice-flag): Renamed
-	from `ptexinfmt-disable-broken-notice'.
-
-2000-10-27  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (texinfo-format-printindex): Mule for Windows
-	detection fixed.
-
-2000-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-group-startup-message): Rewrite for Emacs 21.
-	* lisp/lpath.el: Fbind `propertize'.
-
-2000-10-22  Katsuhiro Hermit Endo <hermit@tomato.saino.ne.jp>
-
-	* texi/gnus-ja.texi (Changing Servers): Fix typo.
-
-2000-10-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-netbsd-get-headers): Fix regular
-	expression to extract xover urls.
-
-2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
-
-	* make.bat: Makes it possible to generate the Info files on
-	windows again.
-
-2000-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* Makefile.in (info-ja, xinfo-ja): No need to use `MAKEINFO=no'.
-	(install-info-ja, install-info, install-lisp, install-ja): New
-	targets (possibly for FSF Emacsen).
-
-	* texi/Makefile.in (install-ja-info, install-info, install-ja,
-	%-ja.info, %-ja): New targets.
-
-	* texi/message-ja.texi (direntry): Replace "message" with
-	"message-ja".
-
-2000-10-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-type-definition): Fix regular
-	expression to extract article body from `ZDNet'.
-
-2000-10-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/imap.el: Require `base64' instead of to autoload it.
-
-2000-10-05  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Don't use
-	`gnus-point-at-eol'.
-	* lisp/gnus.el (gnus-group-startup-message): Ditto.
-
-	* lisp/gnus-ems.el (gnus-ems-redefine): Revive annulling of
-	`gnus-summary-set-display-table'.
-
-2000-10-04  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
-
-	* lisp/gnus-sum.el (gnus-build-sparse-threads): Use
-	`make-full-mail-header-from-decoded-header' instead of
-	`make-full-mail-header'.
-
-2000-10-03  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-group.el (gnus-group-get-new-news): Update modeline
-	using `gnus-agent-toggle-plugged' if agent is activated.
-	* lisp/gnus-agent.el (gnus-group-get-new-news): Don't advise it,
-	merge it into gnus-group.el instead.
-
-	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Use `ding'
-	with `play-sound-file' for XEmacs statically.
-
-	* lisp/gnus-art.el (gnus-article-add-button): Quote
-	`:button-keymap' for Mule 2.3 but it won't work.
-
-2000-09-29  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-ignored-supersedes-headers): Synch with
-	Gnus.
-
-2000-09-27  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* list/ptexinfmt.el (texinfo-multitable-widths): Fix
-	broken-facility probrem when use multitable unsupported
-	texinfmt.el.
-
-2000-09-26  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (texinfo-format-printindex): Use (featurep
-	'meadow) instead of `texinfmt-version'.
-
-2000-09-25  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
-
-	* texi/gnus-faq-ja.texi, lisp/gnus.el, README.semi.ja, README.semi,
-	README: Replace "<semi-gnus-*@meadow.scphys.kyoto-u.ac.jp>" with
-	"<semi-gnus-*@meadowy.org>".
-
-2000-09-22  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (texinfo-format-printindex): Add
-	broken-facility check, for Mule for Windows.
-	(texinfo-format-printindex): New function.
-
-2000-09-19  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-msg.el (gnus-copy-article-buffer): Encode bitmap
-	smileys to ordinary text before removing any text properties.  It
-	is synchronized with the latest smiley-mule.el.
-
-2000-09-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-type-definition): Follow URL change
-	of `ZDNet'.
-
-2000-09-15   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/gnus-art.el: Always require `wid-edit'.
-
-2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (dgnushack-compile): Don't compile gnus-ml.el
-	when FSFmacs is running.
-
-	* lisp/gnus-ml.el: Bind some undeclared variables.
-
-	* lisp/gnus-art.el (gnus-article-add-button): Add widget button.
-	(gnus-article-display-mime-message): Don't set
-	`mime-button-mother-dispatcher'.
-
-	* lisp/message.el: Require `reporter' for the function
-	`define-mail-user-agent' when Mule 2.3 is running.
-
-2000-09-07  Tadashi Watanabe  <watanabe@sigmaitec.co.jp>
-
-	* lisp/smiley.el (smiley-buffer, smiley-create-glyph): Work with
-	GTK XEmacs as well.
-
-2000-09-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-header-xref): New function.
-	(nnshimbun-insert-header): Use `nnshimbun-header-xref', instead of
-	`mail-header-xref'.
-	(nnshimbun-make-mhonarc-contents): Took a measure against
-	unexpected TAB characters.
-
-2000-09-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: Add `netbsd' support.
-	(nnshimbun-nov-fix-header): Change a form storing Message-Id.
-	(nnshimbun-search-id): Ditto.
-	(nnshimbun-make-mhonarc-contents): Use optional header
-	information.
-
-2000-09-05   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/pop3.el (pop3-quit): Don't clear `pop3-uidl-obarray'.
-	(pop3-save-uidls): Clear `pop3-uidl-obarray' here.
-
-2000-09-04   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/mail-source.el (pop3-leave-mail-on-server): Declare.
-	(mail-source-keyword-map): New keyword `:leave' for pop.
-	(mail-source-fetch-pop): Refer it.
-
-	* lisp/pop3.el (pop3-ssl-program-name): New variable.
-
-2000-08-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
-
-	* lisp/ptexinfmt.el (texinfo-multitable-widths,
-	texinfo-multitable-item): Apply char-width probrem fix patch
-	(by KOIE Hidetaka <koie@skipjack.koie.org>).
-	Newsgroups: fj.editor.emacs
-	Message-ID: <5dzom3nxq7.fsf@skipjack.koie.org>
-
-	* lisp/ptexinfmt.el (ptexinfmt-disable-broken-notice): New
-	variable.
-
-2000-08-29  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-zdnet-get-headers): Follow changes
-	of ZDNet.
-
-2000-08-25  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
-
-2000-08-25  Yagi Tatsuya  <yagi@is.titech.ac.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nntp.el (nntp-list-options, nntp-options-subscribe,
-	nntp-options-not-subscribe): New server variables.
-	(nntp-request-list): Use them.
-	* texi/gnus.texi, texi/gnus-ja.texi: Update for them.
-
-2000-08-23  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-group-startup-message): Use `image-size' to
-	simplify the program.
-
-	* lisp/gnus-group.el (gnus-group-rename-group): Inhibit renaming of
-	zombie or killed groups.
-
-2000-08-21  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nnheader.el (nnheader-replace-chars-in-string): Use
-	`static-if'.
-	* lisp/message.el (message-replace-chars-in-string): Ditto.
-
-2000-08-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-type-definition): Follow changes of
-	ZDNet.
-	(nnshimbun-make-text-or-html-contents): Ditto.
-	(nnshimbun-make-html-contents): Ditto.
-
-2000-08-18  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-            Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
-
-	* lisp/nnshimbun.el: Add `mew' and `xemacs' support.
-
-2000-08-17  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Require `ptexinfmt'
-	instead of `texinfmt'.
-	(dgnushack-install-package): Don't install ptexinfmt.el.
-	(dgnushack-make-package): Don't include ptexinfmt.el in MANIFEST.
-	(dgnushack-compile): Don't compile dgnushack.el nor ptexinfmt.el.
-	(dgnushack-unexported-files, dgnushack-tool-files): New constants.
-
-	* lisp/Makefile.in (install-package): No need to remove
-	dgnushack.elc.
-	(install): Don't install ptexinfmt.el; no need to remove
-	dgnushack.elc.
-
-	* lisp/ptexinfmt.el: New file imported from Wanderlust.
-
-2000-08-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nntp.el (nntp-open-telnet): Wait for the telnet prompt
-	before sending a command; allow the rtelnet prompt as well.
-
-	* lisp/message.el (message-make-forward-subject): Remove garbage
-	line.
-
-2000-08-01  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* configure: Regenerate.
-	* aclocal.m4 (AC_CHECK_EMACS): Unset `EMACS' environment variable
-	if it is `t'.
-
-2000-07-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
-
-	* configure: Regenerate with autoconf v2.14.1.
-
-	* configure.in: Rewrite for using new macros in aclocal.m4.
-
-	* aclocal.m4: (AC_ADD_LOAD_PATH, AC_PATH_PACKAGEDIR,
-	AC_CHECK_EMACS, AC_DEFINE_GNUS_PRODUCT_NAME): New macros.
-	(AC_PATH_LISPDIR): Set `lispdir' to ".../site-lisp/t-gnus" by
-	default.
-	(AC_CHECK_EMACS_FLAVOR): Rename from `AC_XEMACS_P'; check for
-	`MULE' as well.
-	(AM_PATH_LISPDIR): Remove.
-
-	* acinclude.m4: Remove.
-
-	* lisp/dgnushack.el: Don't add "/usr/share/emacs/site-lisp" to
-	`load-path'.
-
-	* lisp/gnus-ems.el (gnus-ems-redefine): Defalias
-	`gnus-summary-set-display-table' to `(lambda ())' instead of
-	`ignore' (don't synch. with Gnus).
-
-2000-07-21   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
-	mime-entity-fetch-field instead of mail-header-from.
-
-2000-07-18   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
-
-	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Don't refer
-	gnus-original-article-buffer.
-	(gnus-bbdb-insinuate): Set gnus-article-display-hook instead of
-	gnus-article-prepare-hook.
-	(gnus-bbdb/extract-field-value): Use mime-entity-fetch-field
-	instead of mail-fetch-field.
-	(gnus-bbdb/extract-field-value-init): Just return extractor.
-
-2000-07-15   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
-
-	* README-gnus-bbdb.{ja|en}: Add example setting about
-	gnus-bbdb-insinuate-message.
-	(bbdb-auto-notes-hook): Don't use pop.
-
-	* lisp/gnus-bbdb.el: Check defvaralias when compiling.
-
-	* lisp/gnus-art.el (gnus-article-setup-buffer): Set
-	gnus-original-article-buffer as unibyte.
-	(gnus-request-article-this-buffer): Ditto.
-
-	* lisp/nnimap.el (nnimap-callback): Don't use nnimap-demule.
-	(nnimap-request-article-part): Ditto.
-
-	* lisp/imap.el (imap-open): Set process buffer as unibyte.
-
-2000-07-13 10:09:52  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* acinclude.m4 (AC_CHECK_W3): Fix typo.
-
-2000-07-13  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* configure: Regenerate with autoconf v2.14.1.
-	* aclocal.m4: Regenerate with aclocal v1.4.
-
-	* configure.in: Don't call `AC_CHECK_PROG' for `EMACS'.
-
-	* acinclude.m4: Merge ShengHuo's changes.
-	(AC_CHECK_W3): Use `quote' instead of '.
-	(AC_XEMACS_P): Don't modify the value of `XEMACS'.
-	(AC_EMACS_LISP): Safely quote the elisp form.
-
-2000-07-12 15:47:06  ShengHuo ZHU  <zsh@cs.rochester.edu>
-
-	* aclocal.m4: Stolen macros from w3.
-	* configure.in: Use them.
-	* configure: Generate it.
-
-2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* lisp/{webmail.el,rfc2047.el,qp.el,pop3.el,nnwarchive.el,
-	nnsoup.el,nnslashdot.el,nnml.el,nnmh.el,nnmbox.el,nnmail.el,
-	nnimap.el,nnheader.el,nnfolder.el,nndraft.el,nndoc.el,mml.el,
-	mm-view.el,mm-uu.el,mm-util.el,mm-decode.el,mm-bodies.el,
-	message.el,mail-source.el,lpath.el,imap.el,gnus.el,gnus-uu.el,
-	gnus-util.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
-	gnus-soup.el,gnus-score.el,gnus-msg.el,gnus-mailcap.el,
-	gnus-group.el,gnus-ems.el,gnus-demon.el,gnus-cus.el,gnus-art.el,
-	gnus-agent.el,ChangeLog}: Sync up with Gnus v5.8.7.
-
-	* texi/{message.texi,gnus.texi,gnus-ja.texi,ChangeLog}: Sync up
-	with Gnus v5.8.7.
-
-	* contrib/rfc2015.el: New file.
-
-2000-06-27  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
-
-	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): Use
-	`mime-insert-entity-content' instead of obsolete functions.
-
-2000-06-13  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
-
-	* lisp/gnus-bbdb.el(gnus-bbdb/update-record): Fix to fetch last
-	mail field.
-
-2000-06-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-news-group-p): Sync with Gnus.
-	(gnus-select-method): Remove "*" from doc string.
-	(gnus-group-startup-message): Use `dino' colors.
-
-2000-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-fix-before-sending): Expose all
-	invisible text with the property `message-invisible'; don't expose
-	invisible X-Face fields; widen at first.
-	(message-invisible-region): New function, substitute for
-	`invisible-region'.
-	(message-send): Call `message-fix-before-sending' after evaluating
-	`message-send-hook'.
-	(message-check-ignore-invisible-x-face-field): Remove.  You can use
-	(add-hook 'message-send-hook 'x-face-xmas-remove-x-face-glyph)
-	instead.
-
-2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-save-drafts): Rewrite.
-
-	* lisp/nnheader.el (nnheader-text-coding-system-for-write,
-	nnheader-text-coding-system): New variables, substitutes for
-	`mm-text-coding-system-for-write' or `mm-text-coding-system'.
-
-	* lisp/nnmbox.el (nnmbox-active-file-coding-system,
-	nnmbox-file-coding-system): Use `nnheader-text-coding-system'.
-	* lisp/nnmail.el (nnmail-incoming-coding-system): Ditto.
-	* lisp/nnfolder.el (nnfolder-file-coding-system): Ditto.
-	(nnfolder-active-file-coding-system): Ditto.
-
-	* lisp/mail-source.el (mail-source-text-coding-system): Remove.
-	(TopLevel): require `nnheader'.
-
-	* lisp/nndraft.el (nndraft-request-article): Bind coding system to
-	`nnheader-text-coding-system'.
-	(nndraft-request-replace-article): Ditto.
-	* lisp/mail-source.el (mail-source-fetch-maildir): Ditto.
-	* lisp/gnus-uu.el (gnus-uu-save-article): Ditto.
-	* lisp/gnus-util.el (gnus-output-to-mail, gnus-output-to-rmail):
-	Ditto.
-	* lisp/gnus-soup.el (gnus-soup-write-prefixes): Ditto.
-
-	* lisp/gnus-util.el (gnus-write-buffer): Bind
-	`file-name-coding-system' to `nnmail-pathname-coding-system'.
-	* lisp/gnus-start.el (gnus-slave-save-newsrc): Bind coding system
-	to `gnus-startup-file-coding-system'.
-
-2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
-
-	* lisp/message.el (message-fix-before-sending): Don't check for
-	invisible X-Face fields if
-	`message-check-ignore-invisible-x-face-field' is non-nil.
-	(message-send): Call `message-fix-before-sending' before encoding.
-	(message-check-ignore-invisible-x-face-field): New user option.
-
-2000-06-01  KANEMATSU Daiji <kanematu@sra.co.jp>
-
-	* texi/gnus-ja.texi (gnus-summary-hide-all-threads): Fix typo.
-
-2000-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* nnshimbun.el (nnshimbun-request-article-1): Fix to insert x-face
-	unless SERVER.
-	(nnshimbun-asahi-get-headers): Fix for subjects which contain ^M.
-
-2000-05-26  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-write-nov): New function.
-	(nnshimbun-close-group): Call nnshimbun-write-nov.
-	(nnshimbun-generate-nov-database): Ditto.
-	(nnshimbun-generate-nov-for-each-group): Fix bug which occur new
-	entries add NOV database.
-	(nnshimbun-generate-nov-for-all-groups): Ditto.
-	(nnshimbun-search-id): Add argument to return header, and modify
-	for search of original message id.
-	(nnshimbun-nov-fix-header): New function.
-	(nnshimbun-make-date-string): Fix for a two-digit year.
-
-2000-05-26  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nnshimbun.el (nnshimbun-make-html-contents): Show X-Face.
-	(nnshimbun-make-text-or-html-contents): Ditto.
-	(nnshimbun-request-article-1): Ditto.
-	(nnshimbun-x-face-alist): New variable.
-
-2000-05-25  Tanaka Akira      <akr@m17n.org>
-
-	* README.semi, README.semi.ja: Update for CVS via SSH.
-
-2000-05-25  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* texi/gnus-ja.texi: Change coding-system to `iso-2022-7bit-ss2'.
-	* texi/TRANSLATION.ja: Replace CRLF with LF.
-
-2000-05-25  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-fill-line): Use
-	`nnshimbun-fill-column' instead of `fill-column'.
-
-2000-05-25  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: Clean up codes.
-
-	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Follow
-	changes in nnshimbun.el.
-	* texi/gnus-ja.texi (nnshimbun): Ditto.
-
-2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: Add `ZDNet Japan', `Yomiuri', and `Wired
-	News' support.
-	(nnshimbun-regexp-opt): New function.
-	(nnshimbun-wired-get-all-headers): Replace regexp-opt with
-	nnshimbun-regexp-opt.
-
-2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Complete
-	completions.
-
-2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: Add `CNET Japan' support.
-	(nnshimbun-make-date-string): New function.
-	(nnshimbun-asahi-get-headers): Use nnshimbun-make-date-string.
-	(nnshimbun-sponichi-get-headers): Ditto.
-
-2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Add argument to
-	ignore w3's cache.
-
-2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Add
-	completion to the shimbun address; delete empty strings from
-	`gnus-group-shimbun-type-history' and
-	`gnus-group-shimbun-address-history'.
-
-	* lisp/nnshimbun.el (nnshimbun-asahi-get-headers): Don't use
-	`timezone'.
-	(nnshimbun-type-definition): Add address.
-
-2000-05-23  Tatsuya Ichikawa <ichikawa@erc.epson.com>
-
-	* lisp/nnshimbun.el: Add `sponichi' support.
-
-2000-05-23  KOSEKI Yoshinori  <kose@wizard.tamra.co.jp>
-
-	* lisp/nnshimbun.el (nnshimbun-mime-encode-string): Fix wrong
-	close brackets.
-
-2000-05-23  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: Change coding-system.
-
-2000-05-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* texi/gnus-ja.texi (nnshimbun): Add description.
-
-2000-05-21  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Fix last change.
-
-2000-05-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/nnshimbun.el: New backend.
-
-	* lisp/gnus-group.el (gnus-group-make-shimbun-group): New command.
-
-2000-05-17  Kenichi OKADA <okada@opaopa.org>
-
-	* lisp/imap.el (imap-digest-md5-auth): Rewrite for the use of
-	`sasl-digest-md5-digest-response' instead of
-	`digest-md5-digest-response'.
-	(TopLevel): Require `sasl' when compiling instead of `digest-md5';
-	don't autoload "digest-md5".
-
-2000-05-17  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nndraft.el (nndraft-request-replace-article): Replace
-	`mm-text-coding-system' with `mail-source-text-coding-system';
-	Replace `mm-auto-save-coding-system' with
-	`message-draft-coding-system'.
-
-	* lisp/mail-source.el (mail-source-fetch-maildir): Replace
-	`mm-text-coding-system' with `mail-source-text-coding-system'.
-	(mail-source-text-coding-system): New variable.
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Use
-	`output-coding-system' instead of `coding-system-for-write' when
-	old Mule is used.
-
-2000-05-16  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-forward) Replace the use of `eolp' with
-	`bolp' for detecting the start of the line.
-	(message-indent-citation): Ditto.
-
-2000-05-10   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Don't bind
-	`bbdb-use-pop-up' while executing `bbdb-pop-up-bbdb-buffer'.
-
-2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-msg.el (gnus-debug): Break MIME tags from the snoopies.
-	(gnus-bug): Insert text/plain tag at the end of the buffer.
-
-2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
-
-2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
-
-	* lisp/message.el (message-list-references): Do not insert
-	duplicate Message-Id, when specified
-	`message-list-references-add-position'.
-
-	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): Support group address.
-	(gnus-bbdb/insert-address-regexp): New function.
-
-2000-05-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-msg.el (gnus-debug): Add "nntp.el" and `defvoo'.
-
-2000-05-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (T-gnus): Update to 6.14.4.
-
-	* README.T-gnus: Update.
-
-	* lisp/{webmail.el,rfc2047.el,nnmbox.el,nndoc.el,mml.el,mm-view.el,
-	mm-partial.el,mm-decode.el,mm-bodies.el,message.el,lpath.el,
-	gnus.el,gnus-vers.el,gnus-util.el,gnus-start.el,gnus-score.el,
-	gnus-msg.el,gnus-mailcap.el,gnus-ems.el,gnus-draft.el,gnus-art.el,
-	ChangeLog}: Sync up with Gnus v5.8.6.
-	* texi/{postamble.tex,message.texi,message-ja.texi,gnusref.tex,
-	gnus.texi,gnus-ja.texi,emacs-mime.texi,Makefile.in,ChangeLog}: Sync
-	up with Gnus v5.8.6.
-
-2000-04-28  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* texi/gnus.texi, texi/gnus-ja.texi, texi/gnus-faq-ja.texi, README:
-	You might be able to use T-gnus with the versions of XEmacs prior
-	to 21.1.1.
-
-	* contrib/timer.el: New file. Imported from fsf-compat-1.07-pkg.
-
-2000-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/mm-view.el (gnus-article-mime-handles): Don't bind it.
-
-	* lisp/gnus-sum.el (gnus-article-mime-handles): Restore from Gnus.
-	(gnus-article-decoded-p): Ditto.
-
-	* lisp/gnus-art.el (gnus-article-mime-handles): Don't bind it.
-	(gnus-article-decoded-p): Ditto.
-
-2000-04-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
-
-	* lisp/dgnushack.el: Add code to avoid mule-2.3@19.34 failing to
-	make info from texi. Thanks to Hayashi-san.
-
-2000-04-25  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (union, member-if, mapcon, last): Remove
-	compiler macros.
-
-2000-04-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (T-gnus): Update to 6.14.3.
-
-	* README.T-gnus: Update.
-
-	* GNUS-NEWS: Sync up with Gnus v5.8.5.
-	* lisp/{webmail.el,utf7.el,time-date.el,smiley.el,rfc2047.el,
-	rfc1843.el,qp.el,pop3.el,parse-time.el,nnweb.el,nnwarchive.el,
-	nnvirtual.el,nnultimate.el,nntp.el,nnspool.el,nnslashdot.el,
-	nnml.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,nndraft.el,
-	nndoc.el,nnagent.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,
-	mm-encode.el,mm-decode.el,mm-bodies.el,message.el,mail-source.el,
-	mail-prsvr.el,mail-parse.el,lpath.el,imap.el,ietf-drums.el,gnus.el,
-	gnus-xmas.el,gnus-win.el,gnus-uu.el,gnus-util.el,gnus-topic.el,
-	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,
-	gnus-msg.el,gnus-move.el,gnus-mlspl.el,gnus-mh.el,gnus-mailcap.el,
-	gnus-logic.el,gnus-kill.el,gnus-int.el,gnus-group.el,gnus-ems.el,
-	gnus-eform.el,gnus-dup.el,gnus-draft.el,gnus-cite.el,gnus-cache.el,
-	gnus-bcklg.el,gnus-async.el,gnus-art.el,gnus-agent.el,
-	format-spec.el,flow-fill.el,fill-flowed.el,dgnushack.el,ChangeLog}:
-	Sync up with Gnus v5.8.5.
-	* texi/{refcard.tex,gnusref.tex,gnus.texi,gnus-ja.texi,
-	gnus-faq-ja.texi,Makefile.in,ChangeLog}: Sync up with Gnus v5.8.5.
-
-	* README: Requires XEmacs 21.1.1 and later.
-	* texi/{gnus.texi, gnus-faq-ja.texi}: Ditto.
-
-2000-04-20  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (T-gnus): Update to 6.14.2.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* lisp/{webmail.el,utf7.el,time-date.el,rfc2047.el,qp.el,pop3.el,
-	parse-time.el,nnweb.el,nnwarchive.el,nnultimate.el,nntp.el,
-	nnslashdot.el,nnml.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,
-	mm-view.el,mm-util.el,mm-decode.el,mm-bodies.el,message.el,
-	mail-source.el,mail-parse.el,lpath.el,imap.el,ietf-drums.el,
-	gnus.el,gnus-win.el,gnus-vers.el,gnus-uu.el,gnus-topic.el,
-	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-mailcap.el,
-	gnus-group.el,gnus-cus.el,gnus-art.el,gnus-agent.el,base64.el,
-	ChangeLog}: Sync up with Gnus v5.8.4.
-
-	* lisp/fill-flowed.el: New file.
-
-	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Sync up with Gnus v5.8.4.
-
-	* contrib/{vcard.el,one-line-cookie.diff,README}: New files.
-
-2000-04-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-msg.el (gnus-summary-yank-message): Rewrite for the use
-	of the separated message frames; use `gnus-copy-article-buffer'.
-
-2000-04-13  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 18.
-	(gnus-extended-version): Use `gnus-product-name' and
-	`gnus-version-number' instead of the use of `product-string'.
-	(gnus-version-number): Exclude `gnus-revision-number'.
-	(Defining product): Include `gnus-revision-number'.
-	(TopLevel): Require `poe' for the function `butlast'.
-
-2000-04-13  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
-
-	* lisp/gnus-spec.el (gnus-update-format): Fix a bug in last
-	modification.
-	(gnus-search-or-regist-spec): Change interface.
-
-2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-art.el (gnus-article-prev-page): Bind
-	`window-pixel-scroll-increment' to nil while scrolling for
-	canceling a backlash and a modeline erosion.  It may work under
-	XEmacs 21.2.20 and later.
-	(gnus-article-next-page): Ditto.
-
-2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 17.
-
-	* lisp/gnus-spec.el (gnus-format-specs-compiled): Fix doc string.
-
-2000-04-11  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
-
-	* lisp/gnus-start.el (gnus-product-variable-touch): Support multiple
-	arguments.
-
-	* lisp/gnus-spec.el (gnus-search-or-regist-spec): New utility macro.
-	(gnus-update-format-specifications): Support new data structure of
-	`gnus-format-specs-compiled'.
-	(gnus-update-format-specification-1): Likewise.
-	(gnus-update-format): Support new data structure of
-	`gnus-format-specs'.
-	(gnus-format-specs): Modify data structure.
-
-2000-04-10   Daiki Ueno  <ueno@unixuser.org>
-
-	* lisp/imap.el (imap-body-lines): Check Content-Type: of the
-	article case insensitively.
-
-2000-04-07  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-cite-original): Use "unknown sender" if
-	from field does not exist in the yanked article.
-
-2000-04-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-cite-original): Extract from field for
-	the simple citation line.
-
-2000-03-21  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nnimap.el (nnimap-request-article-part): Returns nil if the
-	article does not exist.
-
-2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 16.
-
-	* lisp/nnweb.el (nnweb-fetch-url): Bind `input-coding-system' and
-	`output-coding-system' for Mule 2.3.
-	* lisp/mail-source.el (mail-source-fetch-imap): Ditto.
-	* lisp/imap.el (imap-ssl-open): Ditto.
-	* lisp/gnus-start.el (gnus-product-read-variable-file-1): Ditto.
-
-2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): New function.
-	(gnus-read-newsrc-el-file): If it fails, attempt to re-read the
-	file using `gnus-re-read-newsrc-el-file'.  In that case, the
-	compiled format specs in the file which may be created by the other
-	Gnusae should be ignored.
-
-2000-03-16  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-product-variable-file-list): Use `*ctext*'
-	when Mule 2.3 is running.
-
-2000-03-16  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 15.
-
-	* lisp/gnus.el (gnus-continuum-version): Remove.
-	(gnus-product-variable-file-list): Use `product-version' instead of
-	the constant values.
-	(TopLevel): Don't autoload "gnus-msg" for the function
-	`gnus-extended-version'.
-	(gnus-version): Move to gnus-vers.el.
-	(gnus-version): Ditto.
-	(gnus-version-number): Ditto.
-	(gnus-product-name): Ditto.
-	(gnus-original-product-name): Ditto.
-	(running-pterodactyl-gnus-0_73-or-later): Ditto.
-	(gnus-original-version-number): Ditto.
-	(gnus-revision-number): Ditto.
-
-	* lisp/gnus-vers.el (gnus-extended-version): Move from gnus-msg.el.
-	(gnus-version): Move from gnus.el.
-	(gnus-version): Ditto.
-	(gnus-version-number): Ditto.
-	(gnus-product-name): Ditto.
-	(gnus-original-product-name): Ditto.
-	(running-pterodactyl-gnus-0_73-or-later): Ditto.
-	(gnus-original-version-number): Ditto.
-	(gnus-revision-number): Ditto.
-
-	* lisp/gnus-start.el (gnus-product-quick-file-format): Use
-	`gnus-vers' instead of `gnus' for the product.
-	(gnus-product-save-variable-file-1): Message an absolute file name;
-	use `save-buffer-as-coding-system'; use `gnus-vers' instead of
-	`gnus' for the product.
-	(gnus-convert-old-ticks): Remove.
-	(gnus-convert-old-newsrc): Remove.
-	(gnus-read-newsrc-file): Don't call `gnus-read-newsrc-file'.
-
-	* lisp/gnus-spec.el (gnus-compile): Modify for the new form of
-	`gnus-format-specs-compiled'.
-	(gnus-update-format-specifications): Specify the arg `format' for
-	`gnus-update-format-specification-1'.
-	(gnus-update-format-specification-1): Modify for the new form of
-	`gnus-format-specs-compiled'; add a new arg `format'.
-	(gnus-format-specs-compiled): Allow the plural compiled functions
-	for each element.
-
-	* lisp/gnus-msg.el (gnus-extended-version): Move to gnus-vers.el.
-
-2000-03-14  Keiichi Suzuki  <keiichi@nanap.org>
-
-	NOTE: It requires `product' in APEL 10.0 or later.
-	Will be created ``~/News/.T-gnus/'' directory automatically by
-	default.   You can customize location by `gnus-product-directory'.
-	``cache'' and  ``strict-cache'' files will be created under the
-	directory.
-
-	* lisp/gnus.el (TopLevel): Require `gnus-vers'.
-	(gnus-product-name): Abolished.
-	(gnus-version-number): Ditto.
-	(gnus-version): Use `product-string'. (Format changed)
-	(gnus-variable-list): Delete `gnus-format-specs'.
-	(gnus-product-variable-file-list): New variable.
-	(TopLevel): Use `product-provide'.
-
-	* lisp/gnus-vers.el: New file.
-
-	* lisp/gnus-start.el (gnus-product-directory): New user option.
-	(gnus-clear-quick-file-variables): New function.
-	(gnus-clear-system): Use `gnus-clear-quick-file-variables'.
-	(gnus-read-newsrc-file): Likewise.
-	(gnus-read-newsrc-el-file): Read product's variable files.
-	(gnus-product-read-variable-file-1): New function.
-	(gnus-save-newsrc-file): Save product's variable files.
-	(gnus-product-variable-touch): New function.
-	(gnus-product-variables-dirty-p): Ditto.
-	(gnus-product-save-variable-file): Ditto.
-	(gnus-product-save-variable-file-1): Ditto.
-	(gnus-product-quick-file-format): Ditto.
-
-	* lisp/gnus-spec.el (gnus-update-format): Use
-	`gnus-product-variable-touch'.
-	(gnus-update-format-specification-1): Likewise.
-	(gnus-update-format-specifications): Do not check `emacs-version'
-	and `gnus-newsrc-file-version'.  Use
-	`gnus-product-variable-touch'.
-
-	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Use
-	`product-string'.
-
-2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 14.
-	(gnus-compile-user-specs): New user option.
-
-	* texi/gnus.texi: Update.
-	* texi/gnus-ja.texi: Update.
-
-	* lisp/gnus-start.el (gnus-setup-news): Revert.
-	(gnus-setup-news-hook): Revert.
-
-	* lisp/gnus-spec.el (gnus-compile): Modify the actual format specs
-	as well; don't bind `gnus-tmp-func'.
-	(gnus-update-format-specifications): Revert; use
-	`gnus-update-format-specification-1'.
-	(gnus-update-format-specification-1): New function.
-	(gnus-format-specs-compiled): Modify the form.
-	(TopLevel): Require `alist'.
-
-2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 13.
-
-	* texi/gnus.texi: Update.
-	* texi/gnus-ja.texi: Update.
-
-	* lisp/gnus-start.el (gnus-setup-news): Update all format specs
-	just before `gnus-setup-news-hook' is evaluated.
-	(gnus-setup-news-hook): Default to `gnus-compile'.
-
-	* lisp/gnus-spec.el (gnus-compile): Don't modify the value of
-	`gnus-format-specs', generate compiled specs in
-	`gnus-format-specs-compiled' instead; don't touch the dribble
-	buffer.
-	(gnus-update-format-specifications): Bind `gnus-format-specs' to
-	`gnus-format-specs-compiled' if the latter is non-nil; use
-	`gnus-update-format-specifications-1'.
-	(gnus-update-format-specifications-1): Rename from
-	`gnus-update-format-specifications'; update the value of
-	`gnus-newsrc-file-version' if the updating is forced.
-	(gnus-format-specs-compiled): New internal variable.
-
-2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* lisp/gnus-spec.el (gnus-update-format-specifications): Force
-	update format specifications, when differ `gnus-version' and
-	`gnus-newsrc-file-version' instead of `gnus-version' and
-	`gnus-version' in `gnus-format-specs'.
-	Do not add `gnus-version' into `gnus-format-specs'.
-
-2000-03-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-spec.el (gnus-compile): Remove gnus-version entry
-	from gnus-format-specs.
-
-2000-02-21  Yoshiki Hayashi  <yoshiki@xemacs.org>
-
-	* nnvirtual.el (nnvirtual-request-article):
-	Bind gnus-override-method to nil.
-	(nnvirtual-request-update-mark): Don't update mark when
-	article is not there.
-
-2000-03-03   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 12.
-
-	* lisp/gnus-sum.el: Add autoload setting for `pgg-decrypt-region'
-	and `pgg-verify-region'.
-	(gnus-summary-decrypt-article): New command.
-	(gnus-summary-verify-article): New command.
-	(gnus-summary-article-map): Bind them.
-	(gnus-wheel-summary-scroll): Fix paren style.
-
-2000-03-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 11.
-
-2000-03-01  MORIOKA Tomohiko  <tomo@m17n.org>
-
-	* lisp/nnheader.el (nnheader-insert-nov): Use
-	`mime-entity-fetch-field' instead of `mime-fetch-field'.
-
-	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
-	`mime-entity-read-field' instead of `mime-read-field'.
-	(gnus-article-sort-by-author): Likewise.
-
-2000-03-02   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/nnimap.el (nnimap-request-article-part): Don't use
-	`imap-capability' to detect BODYDETAIL response.
-
-2000-03-01   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 10.
-
-	* lisp/nnimap.el
-	(nnimap-request-article-part): Handle `BODY' fetch response when
-	the server implements IMAP4 rev1 capabilities.
-	(nnimap-request-article): Use BODY.PEEK rather than RFC822.PEEK.
-	this attribute was obsoleted in RFC2060.
-	(nnimap-request-body): Ditto.
-
-2000-02-29  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 09.
-
-	* lisp/gnus-ems.el (gnus-tilde-cut-form, gnus-tilde-max-form): Copy
-	from gnus-xmas.el; share them with XEmacs-MULE.
-
-	* lisp/gnus-xmas.el (gnus-tilde-cut-form, gnus-tilde-max-form):
-	Move to gnus-ems.el.
-
-2000-02-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 08.
-
-	* lisp/gnus-bbdb.el: Sync up with Nana-gnus 7 for supporting
-	`gnus-bbdb/split-mail'.
-	* README-gnus-bbdb.ja: Ditto.
-
-2000-02-08  Yoshiki Hayashi <yoshiki@xemacs.org>
-
-	* gnus-art.el (article-display-face): Show folded X-Face.
-
-2000-02-08  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-
-	* lisp/nnmail.el (nnmail-get-new-mail): Do not check
-	`nnmail-spool-file'.
-
-2000-02-06   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-	* lisp/gnus-ofsetup.el: Provide `gnus-ofsetup'.
-	(gnus-setup-for-offline): Add `starttls' to IMAP streams; add
-	`digest-md5' to IMAP authenticators.
-
-	* lisp/gnus-offline.el (gnus-group-get-new-news,
-	gnus-agent-toggle-plugged,gnus-agent-expire,
-	gnus-agent-mode): Check whether `gnus-ofsetup' is provided before
-	redefining.
-
-	* lisp/imap.el (imap-stream-alist): Remove redundant entry for TLS.
-
-	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Remove
-	confusing tabs from original header.
-
-2000-02-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/pop3.el (pop3-md5): Fset to `md5' if the module `md5' is
-	installed.
-	(pop3-apop): Use built-in `md5' if it exists.
-
-2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-	* lisp/gnus-art.el (gnus-treat-display-smileys): Check for the
-	module `gnus-bitmap' instead of `smiley-mule'.
-
-	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
-	without redisplaying if the point is out of view.
-
-2000-01-25  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-
-2000-01-24  SANETO Takanori <sanewo@ba2.so-net.ne.jp>
-
-	* lisp/gnus-spec.el: Call `gnus-ems-redefine'.
-
-	* lisp/pop3.el (pop3-movemail): Don't use `format' for `message'.
-	* lisp/gnus-offline.el (gnus-offline-toggle-articles-to-fetch):
-	Ditto.
-
-	* lisp/read-passwd.el (read-pw-read-noecho): Use "%s" for the 1st
-	arg of `message'.
-	* lisp/gnus.el (gnus-version): Ditto.
-	* lisp/gnus-sum.el (gnus-summary-simplify-subject-query): Ditto.
-	* lisp/gnus-offline.el (gnus-offline-set-interval-time,
-	gnus-offline-empting-spool, gnus-offline-toggle-on/off-send-mail,
-	gnus-offline-set-auto-ppp, gnus-offline-after-jobs-done,
-	gnus-offline-hangup-line, gnus-offline-get-new-news-function,
-	gnus-offline-connect-server): Ditto.
-	* lisp/dgnushack.el (dgnushack-make-package): Ditto.
-
-2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-
-	* lisp/gnus-sum.el (gnus-summary-exit): Don't recenter the group
-	buffer if it is called non-interactively.
-
-2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
-	if the point is out of view.
-
-2000-01-15  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-art.el (gnus-article-next-page): Scroll up LINES if
-	`pos-visible-in-window-p' returns nil.
-
-2000-01-15  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-offline.el (gnus-agent-mode): New advice.
-
-2000-01-12  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
-
-	* lisp/base64.el: Unbound base64-*-string and base64-*-region
-	when defined by autoload.
-
-2000-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Restore
-	the original code; hide group contents while rescanning.
-
-2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Truncate
-	lines in the imitation buffer; turn off h-scrollbar for XEmacs.
-
-2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/{rfc2231.el,nnweb.el,nnultimate.el,nntp.el,nnspool.el,
-	nnslashdot.el,nnml.el,nnmh.el,nnkiboze.el,nnimap.el,gnus-topic.el,
-	gnus-ofsetup.el,gnus-offline.el,gnus-mlspl.el,gnus-cache.el,
-	gnus-agent.el}: Require `gnus-clfns' when compiling.
-
-	* lisp/rfc2231.el: Require `cl' when compiling.
-
-	* lisp/gnus-clfns.el: New file.
-
-	* lisp/dgnushack.el: Move compiler macros to gnus-clfns.el; load
-	gnus-clfns.el.
-
-	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Don't
-	rescan the current newsgroup before exiting; wear an imitation
-	summary buffer while rescanning.
-
-2000-01-06  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
-
-	* lisp/dgnushack.el (char-before): Use the byte-optimaization.
-
-2000-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.14.1.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* lisp/{webmail.el,uudecode.el,utf7.el,time-date.el,smiley.el,
-	score-mode.el,rfc2047.el,rfc1843.el,qp.el,pop3.el,parse-time.el,
-	nnweb.el,nnwarchive.el,nnvirtual.el,nnultimate.el,nntp.el,
-	nnspool.el,nnsoup.el,nnslashdot.el,nnml.el,nnmh.el,nnmbox.el,
-	nnmail.el,nnlistserv.el,nnkiboze.el,nnimap.el,nnheader.el,
-	nnfolder.el,nneething.el,nndraft.el,nndoc.el,nndb.el,nnbabyl.el,
-	nnagent.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,mm-encode.el,
-	mm-decode.el,mm-bodies.el,messcompat.el,message.el,md5.el,
-	mail-source.el,mail-prsvr.el,lpath.el,imap.el,ietf-drums.el,
-	gnus-xmas.el,gnus-win.el,gnus-vm.el,gnus-uu.el,gnus-util.el,
-	gnus-undo.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
-	gnus-spec.el,gnus-soup.el,gnus-setup.el,gnus-score.el,gnus-salt.el,
-	gnus-range.el,gnus-picon.el,gnus-nocem.el,gnus-msg.el,
-	gnus-mlspl.el,gnus-mh.el,gnus-mailcap.el,gnus-logic.el,
-	gnus-load.el,gnus-kill.el,gnus-group.el,gnus-gl.el,gnus-ems.el,
-	gnus-draft.el,gnus-demon.el,gnus-cus.el,gnus-cite.el,gnus-cache.el,
-	gnus-bcklg.el,gnus-audio.el,gnus-async.el,gnus-art.el,
-	gnus-agent.el,binhex.el,base64.el,ChangeLog}: Sync up with Gnus
-	v5.8.3.
-
-	* texi/{postamble.tex,message.texi,gnus.texi,gnus-ja.texi,
-	emacs-mime.texi,ChangeLog}: Sync up with Gnus v5.8.3.
-
-2000-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* README.semi, README.semi.ja, texi/gnus-faq-ja.texi: Update for
-	the new CVS server.
-
-	* lisp/gnus-sum.el (gnus-articles-to-read): Bind
-	`cursor-in-echo-area' to nil while `read-from-minibuffer'.
-
-1999-12-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-offline.el (TopLevel): Call
-	`define-process-argument-editiong' only under Meadow -- i.e. don't
-	call this function under NTEmacs.
-
-1999-12-28  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 15.
-
-	* lisp/gnus-offline.el (gnus-offline-auto-expire): Rename from
-	`gnus-offline-agent-automatic-expire'.
-	(gnus-agent-expire): Fix the advice.
-	(gnus-offline-after-jobs-done): Refer to
-	`gnus-offline-auto-expire'.
-
-	* lisp/gnus-ofsetup.el (gnus-offline-resource-en): Reorder the
-	messages.
-	(gnus-offline-resource-ja): Ditto.
-
-	* lisp/imap.el (imap-ssl-open-2): If `system-type' is windows-nt,
-	bind `coding-system-for-read' to raw-text-dos, else bind it to
-	binary.
-
-1999-12-28  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 14.
-
-	* lisp/dgnushack.el (mapcon): Bind the 1st arg `fn' as a temp var.
-
-1999-12-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/pop3.el (pop3-ssl-program-arguments): Add "s_client".
-	(pop3-open-ssl-stream-1): Bind `ssl-program-name' because its
-	value depends on the version of ssl.el.
-	(pop3-open-ssl-stream): If `system-type' is windows-nt, bind
-	`coding-system-for-read' to raw-text-dos, else bind it to binary.
-
-1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Fix timing of
-	`save-restriction'.
-
-1999-12-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/imap.el (imap-streams,imap-stream-alist,
-	imap-authenticators,imap-authenticator-alist,
-	imap-digest-md5-p): Sync with latest Gnus.
-	(imap-starttls-p): Rename from `imap-tls-p'.
-	(imap-starttls-open): Rename from `imap-tls-open'.
-
-1999-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 13.
-
-	* lisp/dgnuspath.el.in: Add the path of APEL to `load-path' as well
-	as its parent directory.
-
-	* lisp/imap.el (base64-encode-string, base64-decode-string):
-	Autoload "base64" instead of the tricky definitions.
-
-	* lisp/base64.el: Restore the original code and invalidate it; use
-	mel for the base64 codec.
-
-1999-12-20  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/imap.el (mel-find-function): Always require `mel' instead of
-	the use of autoloading.  Because the function `mel-find-function'
-	is defined by `defsubst'.
-
-1999-12-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-offline.el (gnus-offline-after-get-new-news): Refer to
-	`gnus-offline-connected', not `gnus-plugged'.
-
-	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): No need to use
-	`unless'. Use `when'.
-
-	* lisp/imap.el (base64-encode-string): Fix. May work.
-
-1999-12-16  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-goto-mail-copies-to): If the field is
-	newly created, a string "never" is inserted in default.
-	(message-goto-mail-followup-to): If the field is newly created and
-	To field contains only one address, the address is inserted in
-	default.
-	(message-mode-map): New key stroke `C-c C-f c' for the command
-	`message-goto-mail-copies-to'.
-
-1999-12-15  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 12.
-
-	* lisp/nnimap.el (nnimap-request-newgroups): Use `member-if'.
-
-	* lisp/lpath.el (toolbar-gnus, get-charset-property,
-	font-lock-set-defaults, find-coding-system, coding-system-get):
-	Bind them for FSF Emacsen.
-	(read-color, x-defined-colors, compute-motion): Don't bind.
-
-	* lisp/imap.el (imap-digest-md5-auth, imap-cram-md5-auth): Use
-	`base64-encode-string' and `base64-decode-string' instead of
-	`imap-base64-encode-string' or `imap-base64-decode-string'.
-	(base64-encode-string): New function.  It won't be defined if it
-	is already bound and the optional second arg is allowed.
-	(base64-decode-string): New function defined by `defun-maybe'.
-	(imap-base64-encode-string, imap-base64-decode-string): Remove.
-	(mel-find-function): Autoload "mel".
-
-	* lisp/dgnushack.el (read-color, x-defined-colors, event-object,
-	get-popup-menu-response, toolbar-gnus, get-charset-property,
-	find-coding-system, coding-system-get, font-lock-set-defaults):
-	Don't bind.
-	(union, member-if, mapcon, mapc, last): Don't define as compiler
-	macros under XEmacs.  It is based on Hrvoje's advice.
-	(member-if): New compiler macro for emulating cl function.
-
-1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/imap.el (imap-base64-encode-string): Use `static-if' instead
-	of `static-condition-case'.
-
-1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 11.
-
-	* lisp/imap.el (imap-base64-encode-string): Allow the optional 2nd
-	arg `no-line-break'.
-
-1999-12-14   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/imap.el: Require `digest-md5' when compiling; add autoload
-	settings for `digest-md5-parse-digest-challenge' and
-	`digest-md5-digest-response'.
-	(imap-authenticators): Add `digest-md5'.
-	(imap-authenticator-alist): Setup for `digest-md5'.
-	(imap-digest-md5-p): New function.
-	(imap-digest-md5-auth): New function.
-
-1999-12-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/mail-source.el (mail-source-fetch-imap): Each temporary
-	buffer name must be specific to its mail source.
-
-1999-12-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 10.
-
-	* lisp/gnus-offline.el (gnus-offline-define-menu-and-key): Don't
-	call too many `static-if's.
-
-	* lisp/gnus-uu.el (gnus-uu-grab-move): Simply copy FILE if
-	`make-symbolic-link' is not availabe.
-
-	* lisp/lpath.el (TopLevel): Don't warn about `make-symbolic-link'.
-
-1999-12-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-offline.el (gnus-offline-set-unplugged-state): Call
-	the original `gnus-agent-toggle-plugged'.
-
-	* lisp/mail-source.el (mail-source-fetch-imap): Don't create
-	multiple temporary buffers, and don't kill one.
-
-1999-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 09.
-
-	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Accept an
-	optional argument `force'. Use `read-file-name' instead of
-	`read-directory-name'.
-
-1999-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-numbser): Increment to 08.
-
-	* lisp/gnus-agent.el (gnus): Give up to advise here.
-	(gnus-group-get-new-news): New advice instead.
-
-	* lisp/gnus-offline.el (gnus-offline-setup): Call
-	`gnus-offline-processed-by-timer' and `gnus-offline-error-check'
-	here.
-	(gnus-offline-define-menu-and-key): Simplify.
-	(gnus-offline-processed-by-timer): Call `gnus-group-get-new-news'
-	interactively.
-
-	* lisp/gnus-ofsetup.el (TopLevel): Require `read-passwd' here, not in
-	`gnus-offline-setting-file'.
-	(gnus-nntp-service): Set this variable here, not in
-	`gnus-offline-setting-file'
-	(gnus-nntp-server): Ditto.
-	(gnus-after-getting-new-news-hook): Ditto.
-	(message-send-hook): Ditto.
-	(mail-source-read-passwd): Ditto.
-	(gnus-setup-news-hook): Ditto.
-	(gnus-setup-for-offline): Now one can get mails from `imap',
-	`file', `directory' or `maildir'.
-
-	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
-	Ignore non-POP mail sources.
-
-1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-
-	* lisp/gnus-util.el (gnus-union): Remove.
-	(gnus-ems-redefine): Don't call it; don't require `gnus-ems'.
-
-	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Use `union'
-	instead of `gnus-union'.
-
-1999-12-10  A.Hitachi       <a_hitachi@msi.biglobe.ne.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (union): New compiler macro for emulating cl
-	function.
-
-1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-util.el: Require `gnus-ems'.
-	(gnus-ems-redefine): Call it to redefine the functions
-	`gnus-truncate-string', etc.
-	(gnus-union): Fix doc string.
-
-	* lisp/dgnushack.el (mapcon, mapc): Eliminate the redundant code.
-
-1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-1999-12-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/dgnushack.el (dgnushack-install-package): Preserve any file
-	in $(PACKAGEDIR)/lisp/t-gnus if it is without .el or .elc suffix.
-
-1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/dgnushack.el (mapcon): New compiler macro for emulating cl
-	function.
-	(mapc): Bug fix - treat the last arg as a list.
-
-1999-12-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-	* lisp/gnus-agent.el (gnus): New advice. Always synchronize the
-	modeline "Plugged" status display with the value of
-	`gnus-plugged'.
-
-	* lisp/gnus-offline.el (TopLevel): Require `gnus-group' at the
-	compile time.
-	(gnus-offline-set-online-sendmail-function): defsubst.
-	(gnus-offline-set-offline-sendmail-function): Ditto.
-	(gnus-offline-set-offline-post-news-function): Ditto.
-	(gnus-offline-set-online-post-news-function): Ditto.
-	(gnus-offline-disable-fetch-mail): Ditto.
-	(gnus-offline-enable-fetch-mail): Ditto.
-	(gnus-offline-setup): Fix typo.
-	(gnus-offline-gnus-get-new-news): Abolish.
-	(gnus-offline-toggle-plugged): Ditto.
-	(gnus-offline-agent-expire): Ditto.
-	(gnus-group-get-new-news): New advice which does things
-	`gnus-offline-gnus-get-new-news' was doing.
-	(gnus-agent-toggle-plugged): New advice which does thing
-	`gnus-offline-toggle-plugged' was doing.
-	(gnus-agent-expire): New advice which does things
-	`gnus-offline-agent-expire' was doing.
-	(gnus-offline-define-menu-and-key): No longer substitute key
-	definitions on `gnus-group-mode-map'. No longer swap commands for
-	a toolbar button.
-	(gnus-offline-after-get-new-news): Do jobs only when
-	`gnus-plugged' is t.
-
-	* lisp/gnus-ofsetup.el (gnus-ofsetup-customize): Compile lambda
-	expressions.
-
-1999-12-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/message.el (message-yank-add-new-references): Fix doc string.
-
-	* texi/{message-ja.texi, message.texi}
-	(message-list-references-add-position,
-	message-yank-add-new-references): Add documentations.
-
-1999-12-07  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-offline.el (gnus-offline-gettext): Rename from
-	`gnus-offline-get-message'.
-
-	* lisp/gnus-ofsetup.el (gnus-ofsetup-gettext): Rename from
-	`gnus-ofsetup-get-message'.
-
-1999-12-07  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-	(smiley-toggle-buffer): Autoload "smiley" or "gnus-bitmap".
-
-	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Don't use
-	`get-text-property' in the outside of the boundary.
-	(gnus-article-smiley-display): New function.
-	(gnus-treatment-function-alist): Use it.
-
-	* lisp/dgnushack.el (byte-optimize-form-code-walker): Replace with
-	the bug fixed version rigidly instead of the use of `defadvice'.
-
-	* lisp/message.el (font-lock-after-change-function): Don't use
-	`compile' for the arg of `defadvice'.
-
-1999-12-06  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* lisp/message.el (message-yank-add-new-references): New option
-	value `message-id-only'.
-	(message-yank-original): Likewise.
-	(message-list-references-add-position): New user option.
-	(message-list-references): When
-	`message-list-references-add-position' is integer value, the order
-	of designate number message-ids is kept.
-
-1999-12-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-
-	* lisp/gnus-offline.el (gnus): Don't advise here.
-	(TopLevel): Call `gnus-offline-define-menu-and-key'.
-	(gnus-offline-setup): Don't call
-	`gnus-offline-define-menu-and-key' here.
-
-	* lisp/gnus-ofsetup.el (gnus-offline-update-setting-file): Don't
-	rely on `gnus-load-hook'.
-	(gnus): New advice. Call `gnus-offline-setup' when everything is
-	done.
-
-	* lisp/gnus-start.el (save-buffers-kill-emacs): Compile the advice
-	at the compile time. Use `gnus-alive-p'.
-
-1999-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/dgnushack.el (char-after): Uncomment the byte-optimization;
-	don't use `byte-defop-compiler'.
-	(byte-optimize-form-code-walker): Advise it for fixing the bug in
-	and/or forms.  The original idea is devised by FUKUI-san, modified
-	by KOBAYASHI-san.
-	(max-specpdl-size): Set 3000.
-
-1999-12-05  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/gnus-offline.el (gnus): New advice. synchronize
-	`gnus-offline-connected' with `gnus-plugged'.
-
-1999-12-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.14.0.
-	(gnus-revision-number): Clear to 00.
-
-	* README.branch.ja: Update for t-gnus-6_14 branch.
-	* README.branch: Ditto.
-	* README.T-gnus: Ditto.
-	* README.semi.ja: Ditto.
-	* README.semi: Ditto.
-
-	* lisp/{rfc2047.el,nnweb.el,nnultimate.el,nntp.el,nnslashdot.el,
-	nnmh.el,nnfolder.el,nndoc.el,mml.el,mm-view.el,mm-util.el,
-	mm-bodies.el,message.el,mail-source.el,gnus.el,gnus-uu.el,
-	gnus-sum.el,gnus-start.el,gnus-msg.el,gnus-int.el,gnus-cache.el,
-	gnus-art.el,dgnushack.el,ChangeLog}: Sync up with Gnus v5.8.2.
-
-	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
-	gnus-faq-ja.texi,ChangeLog}: Modify for T-gnus 6.14; sync up with
-	Gnus v5.8.2.
-
-	* t-gnus-6_14: NEW PUBLIC BRANCH.
-
-1999-12-03  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/dgnushack.el (char-before): Use compiler macro instead of
-	byte-optimizer.
-	(char-after): Comment out the byte-optimization.
-
-	* imap.el (imap-base64-encode-string, imap-base64-decode-string):
-	New functions.  They are identical to the built-in codec if
-	possible, otherwise the functions defined in mel are used.
-	(imap-cram-md5-auth): Use them.
-
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/imap.el: Remove autoload settings for `base64-decode-string'
-	and `base64-encode-string'.
-
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* GNUS-NEWS: Sync up with Pterodactyl Gnus v0.99.
-
-	* lisp/{rfc2047.el,rfc1843.el,nnweb.el,nnvirtual.el,nntp.el,
-	nnmh.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,nndraft.el,
-	nndoc.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,mm-encode.el,
-	mm-decode.el,mm-bodies.el,message.el,mail-source.el,lpath.el,
-	gnus-xmas.el,gnus-uu.el,gnus-util.el,gnus-topic.el,gnus-sum.el,
-	gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,gnus-salt.el,
-	gnus-picon.el,gnus-msg.el,gnus-mailcap.el,gnus-int.el,
-	gnus-group.el,gnus-ems.el,gnus-cus.el,gnus-cache.el,gnus-async.el,
-	gnus-art.el,gnus-agent.el,dgnushack.el,base64.el,Makefile.in,
-	ChangeLog}: Sync up with Pterodactyl Gnus v0.99.
-
-	* lisp/{webmail.el,nnwarchive.el,nnultimate.el,nnslashdot.el}: New
-	files.
-
-	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
-	emacs-mime.texi,Makefile.in,ChangeLog}: Sync up with Pterodactyl
-	Gnus v0.99.
-
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-select-method): Undo (`if' -> `when').
-	* lisp/gnus-picon.el (gnus-picons-file-suffixes): Ditto.
-	* lisp/gnus-start.el (save-buffers-kill-emacs): Ditto.
-	(gnus-after-getting-new-news-hook): Ditto.
-
-	* lisp/gnus-group.el (gnus-useful-groups): Undo (`or' -> `unless').
-
-1999-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 10.
-
-	* lisp/gnus-art.el (article-treat-overstrike): Work for multibyte
-	char with old Emacsen as well.
-
-1999-12-01   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-agent.el (gnus-category-edit-predicate): Expand `setf'
-	appears in the backquoted form.
-	(gnus-category-edit-score): Ditto.
-
-	* lisp/gnus-sum.el (gnus-data-set-header): Expand `setf'
-	appears in the backquoted form.
-
-1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 09.
-
-	* lisp/gnus-offline.el (gnus-offline-define-menu-and-key): Fix a
-	bug -- do add-hook.
-	(gnus-offline-popup): Examine whether `easy-menu-create-menu' is
-	defined. If not, call `easy-menu-create-keymaps'.
-
-1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 08.
-
-	* lisp/gnus-offline.el (TopLevel): Use `static-if', requiring
-	"static" at the compile time.
-	(gnus-offline-hangup-function): Abolish.
-	(gnus-offline-auto-ppp): New variable.
-	(gnus-offline-gnus-get-new-news): Refer to it.
-	(gnus-offline-set-unplugged-state): Ditto.
-	(gnus-offline-set-auto-ppp): New function. It replaces the
-	function `gnus-offline-toggle-auto-hangup'.
-	(gnus-offline-toggle-auto-hangup): Abolish.
-	(gnus-offline-define-menu-and-key): Use `static-if' and
-	`static-cond'.
-	(gnus-offline-popup-menu): Do not define this function under XEmacs.
-	(gnus-offline-popup): New function.
-
-	* gnus-ofsetup.el (gnus-ofsetup-update-setting-file): Typo.
-	(gnus-ofsetup-resource-en): Fix doc strings.
-	(gnus-ofsetup-resource-ja): Ditto.
-
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-
-	* lisp/gnus-art.el (gnus-article-wash-status): Sync up with
-	Pterodactyl Gnus v0.98.
-
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/nnimap.el (nnimap-request-newgroups): Don't use `member-if'.
-
-	* lisp/gnus.el (gnus-select-method): Use `if' instead of `when'.
-
-	* lisp/gnus-sum.el (gnus-summary-make-marking-command-1): Use
-	`car' and `cdr' instead of `cadr'.
-
-	* lisp/gnus-picon.el (gnus-picons-file-suffixes): Use `cons'
-	instead of `push'; use `if' instead of `when'.
-
-	* lisp/gnus-group.el (gnus-group-iterate): Use `car' and `cdr'
-	instead of `pop'.
-	(gnus-useful-groups): Use `or' instead of `unless'.
-
-	* lisp/gnus-art.el (gnus-emphasis-alist): Use `car' and `cdr'
-	instead of `cadr'.
-
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-start.el (save-buffers-kill-emacs): Don't use the macro
-	`when' in the body of `defadvice'.  Use `if' instead.
-
-	* lisp/dgnushack.el (last, mapc): New compiler macros for emulating
-	cl functions.
-
-1999-11-29  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-start.el (gnus-after-getting-new-news-hook): Don't use
-	the macro `when' in the arg of `defcustom'.  Use `if' instead.
-
-1999-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-	* lisp/gnus-art.el (gnus-signature-toggle): Specify the 4th arg of
-	`next-single-property-change' LIMIT as `point-max'.
-	(gnus-article-prepare-mime-display): Ditto.
-	(article-hide-signature): Ditto.
-
-1999-11-26  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
-
-	* lisp/gnus.el (gnus-version): Parentheses of gnus-revision-number
-	are removed to fill gnus-version within 80 columns.
-
-1999-11-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
-
-	* lisp/gnus.el (gnus-version): Shows also gnus-revision-number.
-
-1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Use `gnus-union'
-	instead of `union'.
-
-	* lisp/gnus-util.el (gnus-union): New function.
-
-	* lisp/gnus-sum.el (gnus-summary-exit-no-update):  Use
-	`copy-sequence' instead of `copy-list'.
-	* lisp/gnus-art.el (gnus-article-setup-highlight-words): Ditto.
-
-	* lisp/dgnushack.el (union, copy-list): Remove compiler macros.
-
-1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-
-	* lisp/dgnushack.el (union, copy-list): New compiler macros for
-	emulating cl functions.
-
-1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-	(gnus-select-method): Use `condition-case' instead of
-	`ignore-errors'.
-
-	* lisp/gnus-start.el (gnus-site-init-file): Use `condition-case'
-	instead of `ignore-errors'.
-
-	* lisp/{gnus-ofsetup.el,gnus-offline.el}: Remove RCS magic cookie.
-
-	* lisp/{time-date.el,smiley.el,score-mode.el,pop3.el,nnweb.el,
-	nnvirtual.el,nntp.el,nnspool.el,nnsoup.el,nnoo.el,nnml.el,nnmh.el,
-	nnmbox.el,nnmail.el,nnlistserv.el,nnimap.el,nnheader.el,
-	nneething.el,nndraft.el,nndoc.el,nnbabyl.el,message.el,imap.el,
-	gnus-win.el,gnus-vm.el,gnus-util.el,gnus-topic.el,gnus-sum.el,
-	gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,gnus-salt.el,
-	gnus-range.el,gnus-picon.el,gnus-ofsetup.el,gnus-offline.el,
-	gnus-msg.el,gnus-mlspl.el,gnus-mailcap.el,gnus-logic.el,
-	gnus-kill.el,gnus-group.el,gnus-cite.el,gnus-async.el,gnus-art.el,
-	gnus-agent.el,earcon.el}: Require `cl' using `eval-when-compile'.
-
-1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/{time-date.el,smiley.el,pop3.el,nnweb.el,nnvirtual.el,
-	nntp.el,nnspool.el,nnsoup.el,nnoo.el,nnml.el,nnmh.el,nnmbox.el,
-	nnmail.el,nnlistserv.el,nnimap.el,nnheader.el,nneething.el,
-	nndoc.el,nnbabyl.el,message.el,imap.el,gnus.el,gnus-win.el,
-	gnus-util.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
-	gnus-spec.el,gnus-score.el,gnus-salt.el,gnus-range.el,
-	gnus-picon.el,gnus-ofsetup.el,gnus-offline.el,gnus-mlspl.el,
-	gnus-mailcap.el,gnus-logic.el,gnus-kill.el,gnus-group.el,
-	gnus-cite.el,gnus-async.el,gnus-art.el,gnus-agent.el,earcon.el}:
-	Require `cl' at the top level.
-
-	* lisp/gnus.el (gnus-select-method): Undo last change.
-	* lisp/gnus-util.el (copy-list): Undo last change (remove it).
-	* lisp/gnus-start.el (gnus-site-init-file): Undo last change.
-
-	* lisp/gnus-ems.el (gnus-split-string): Remove.
-
-1999-11-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/pop3.el: Add description about STLS extension; add autoload
-	setting for `starttls-open-stream' and `starttls-negotiate'.
-	(pop3-stls): New function.
-	(pop3-open-tls-stream): New function.
-	(pop3-open-server): Use `pop3-open-tls-stream' if
-	'pop3-connection-type' is bound to `tls'.
-
-1999-11-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/imap.el: Add autoload setting for `starttls-open-stream'
-	and `starttls-negotiate'.
-	(imap-stream-alist): Add TLS entry.
-	(imap-tls-p): New function.
-	(imap-tls-open): New function.
-	(imap-ssl-open): Enclose `open-ssl-stream' with
-	`as-binary-process'.
-
-1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-	(gnus-select-method): Use `condition-case' instead of
-	`ignore-errors'.
-
-	* lisp/pop3.el (pop3-apop): Move the autoload seting to the top
-	level.
-
-	* lisp/md5.el (md5): Allow the optional 4th and 5th arguments
-	`coding' and `noerror' for the stopgaps.
-
-	* lisp/lpath.el (md5): Allow the optional 4th and 5th arguments
-	`coding' and `noerror'.
-	(function-max-args): Maybe-fbind for FSF Emacsen.
-
-	* lisp/imap.el (imap-cram-md5-auth): Specify the 4th arg to `md5'
-	as `binary' if possible.
-	(imap-log): Default to nil (synched with pgnus 0.99).
-	(base64-decode-string): Autoload "mel" instead of "base64".
-	(md5): Autoload "md5" without `eval-and-compile'.
-
-	* lisp/gnus-util.el (copy-list): New function defined by
-	`defun-maybe'.
-
-	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Specify
-	the 3rd arg of `make-full-mail-header' to "nobody" instead of "".
-
-	* lisp/gnus-start.el (gnus-site-init-file): Use `condition-case'
-	instead of `ignore-errors'.
-
-	* lisp/gnus-picon.el: Require `cl'.
-
-	* lisp/{smiley.el,rfc2104.el,nnvirtual.el,mailheader.el,
-	gnus-offline.el} (cl): Enclose the requiring procedure with
-	`eval-when-compile'.
-
-	* lisp/{imap.el,gnus-mailcap.el} (cl): Enclose the requiring
-	procedure with `eval-when-compile' instead of `eval-and-compile'.
-
-1999-11-09  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
-
-	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
-	Use mail-sources instead of nnmail-spool-file.
-	From: Toshiaki -PCX- Tanaka.
-
-1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-group-startup-message): Insert space before
-	"based on".
-	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Ditto.
-
-1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* lisp/{rfc1843.el,qp.el,nntp.el,nnmail.el,nnfolder.el,nnagent.el,
-	mml.el,mm-view.el,mm-uu.el,mm-util.el,mm-decode.el,mm-bodies.el,
-	message.el,mail-source.el,lpath.el,gnus-util.el,gnus-topic.el,
-	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-msg.el,gnus-mailcap.el,
-	gnus-group.el,gnus-art.el,gnus-agent.el,dgnushack.el,binhex.el,
-	ChangeLog}: Sync up with Pterodactyl Gnus v0.98.
-
-	* lisp/{rfc2104.el,nnimap.el,imap.el}: New files.
-
-	* texi/gnus-ja.texi: Sync up with Pterodactyl Gnus v0.98 without
-	translation.
-
-	* texi/{gnus.texi,ChangeLog}: Sync up with Pterodactyl Gnus v0.98.
-
-1999-11-08  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
-
-	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
-	`message-save-drafts' instead of `set-buffer-modified-p' and
-	`save-buffer'.
-	* lisp/message.el (message-save-drafts): Insert In-Reply-To header
-	because the reply data is lost in Drafts.
-	* lisp/gnus-art.el (gnus-signature-face): Don't check
-	window-system type.
-
-1999-11-08   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/pop3.el (pop3-progress-message): New function.
-	(pop3-movemail): Use it.
-
-1999-10-28  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (TopLevel): Autolaod "gnus-msg" for the function
-	`gnus-following-method'.
-
-	* lisp/gnus-msg.el (gnus-following-method): Move from gnus-msg.el;
-	wide reply as a mail if the message is not a news; use the macro
-	`gnus-setup-message'.
-
-	* lisp/gnus-art.el (gnus-following-method): Move to gnus-msg.el.
-
-1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 14.
-	(TopLevel): Autoload "gnus-bitmap" instead of "smiley-mule" for the
-	function `gnus-smiley-display'.
-
-	* lisp/gnus-art.el (gnus-treat-display-smileys): Default to nil if
-	`window-system' is nil.
-	(gnus-article-x-face-command): Default to external command if
-	`window-system' is nil.
-
-1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 13.
-	(TopLevel): Rearrange autoload settings.
-
-	* lisp/gnus-art.el (gnus-treatment-function-alist): Don't use
-	`smiley-buffer'.
-
-	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Add button
-	"Toggle smileys" in "Washing" menu.
-	(gnus-summary-wash-map): Add "s" key for `smiley-toggle-buffer'.
-
-	* lisp/smiley.el (gnus-smiley-display): Use `smiley-toggle-buffer'.
-	(smiley-toggle-buffer): New function.
-	(smiley-buffer): Don't quote the function.
-	(smiley-toggle-extents): Ditto.
-
-1999-10-24  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 12.
-	(TopLevel): Add and delete autoloads for functions defined in
-	"gnus-cus", "gnus-offline", "miee", "pop3-fma" and "mw32misc".
-
-	* lisp/gnus-offline.el (TopLevel): Do not consider the functions
-	defined in "miee".
-
-	* lisp/gnus-ofsetup.el (TopLEvel): Do not autoload
-	`gnus-custom-mode' defined in "gnus-cus".
-
-1999-10-21  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 11.
-
-	* lisp/gnus-offline.el (TopLevel): Call `mime-set-field-decoder'
-	when "eword-decode" is loaded. It is for X-Gnus-Offline-Backend
-	header.
-
-1999-10-19  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 10.
-	(TopLevel): Autoload "x-face-mule" and "smiley-mule" for the
-	functions `x-face-mule-gnus-article-display-x-face' and
-	`smiley-buffer'.
-
-	* lisp/lpath.el (smiley-encode-buffer): Bind it for FSF Emacsen.
-
-	* lisp/gnus-ems.el (gnus-group-startup-message): Don't replace with
-	`gnus-mule-group-startup-message'.
-	(gnus-mule-group-startup-message): Remove.
-	(gnus-mule-bitmap-image-file): Remove.
-
-	* lisp/gnus-msg.el (gnus-copy-article-buffer): Encode smileys to
-	ordinary text if the feature `smiley-mule' is provided and FSF
-	Emacs is used.
-	(TopLevel): Require `static' at the compile time.
-
-	* lisp/gnus-art.el (gnus-article-prepare-display): Bind
-	`mime-display-text/plain-hook' to nil.
-	(gnus-article-prepare-mime-display): Use `let' instead of `let*';
-	treat the next entity position as a marker.
-	(gnus-treatment-function-alist): Use `smiley-buffer' instead of
-	`gnus-smiley-display' under FSF Emacsen.
-	(gnus-treat-display-smileys): Default to t if the module
-	`smiley-mule' is installed.
-	(gnus-treat-display-xface): Default to `head' if the value of
-	`gnus-article-x-face-command' is
-	`x-face-mule-gnus-article-display-x-face'.
-	(gnus-article-x-face-command): Default to
-	`x-face-mule-gnus-article-display-x-face' if the module
-	`x-face-mule' is installed.
-	(TopLevel): Require `static' first; require `path-util'.
-
-1999-10-18  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 09.
-
-	* lisp/message.el (message-mode): Make
-	`message-font-lock-last-position' as buffer local.
-	(message-font-lock-keywords-2): Use
-	`message-font-lock-cited-text-matcher' instead of regexp.
-	(message-font-lock-cited-text-matcher): New function.
-	(font-lock-after-change-function): Advice to the keep last cursor
-	position in `message-font-lock-last-position' before fontifying.
-	(message-font-lock-last-position): New variable.
-	(message-font-lock-citation-name-max-column): New variable.
-	(message-font-lock-cited-text-regexp): New variable.
-	(message-font-lock-fence-close-position): New variable.
-	(message-font-lock-fence-open-position): New variable.
-	(message-font-lock-fence-close-regexp): New variable.
-	(message-font-lock-fence-open-regexp): New variables.
-
-1999-10-04  Masatoshi Tsuchiya <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-
-	* lisp/message.el (message-mode): Rearrange `font-lock-defaults'
-	using `message-font-lock-keywords', `message-font-lock-keywords-1'
-	and `message-font-lock-keywords-2'.
-	(message-font-lock-keywords): Restruct.
-	(message-font-lock-keywords-1): New variable split from
-	`message-font-lock-keywords'.
-	(message-font-lock-keywords-2): Ditto.
-
-1999-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 08.
-
-	* lisp/gnus-art.el (gnus-treat-article): Buttonize the signature
-	before highlighting or hiding it.
-	(gnus-article-buttonize-signature): New function.
-	(gnus-article-highlight-signature): Don't buttonize.
-	(gnus-treatment-function-alist): Undo the last change.
-	(gnus-treat-emphasize): Default to nil.
-
-1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-	(TopLevel): Autoload "gnus-art" for the function
-	`gnus-article-show-all'.
-
-	* lisp/gnus-sum.el (gnus-summary-select-article): Expose all
-	hidden text if the command `gnus-summary-toggle-mime' is used.
-
-	* lisp/gnus-art.el (gnus-signature-toggle): Don't hide the
-	following parts.
-	(gnus-article-highlight-signature): Work for forwarded messages.
-	(gnus-article-show-all): New function based on `article-show-all'.
-	(gnus-article-show-all-headers): Based on
-	`article-show-all-headers'.
-	(article-show-all-headers): New function to show all *HEADERS*.
-	(article-show-all): Show *ALL* literally.
-	(article-hide-signature): Work for forwarded messages.
-	(gnus-treatment-function-alist): Put `gnus-treat-hide-signature'
-	off after `gnus-treat-highlight-signature'.
-
-1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Protect
-	against forwarded messages without MIME structure.
-	(gnus-treatment-function-alist): Move
-	'gnus-treat-decode-article-as-default-mime-charset' to the top;
-	put `gnus-treat-emphasize' off after
-	`gnus-treat-highlight-headers'.
-
-1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-1999-10-07  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-art.el (gnus-treat-predicate): Examine whether the
-	argument is list or not before condition.
-
-1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
-
-	* lisp/gnus-art.el (gnus-treat-predicate): Work for
-	(typep "something").
-
-1999-10-07  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
-
-	* lisp/gnus-art.el (gnus-article-prepare-display):
-	Pass argument nil as a condition to gnus-treat-article.
-	* lisp/gnus-art.el (gnus-article-prepare-mime-display):
-	Ditto. Also, treat last part of multipart article correctly.
-
-1999-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-
-	* lisp/message.el (message-generate-headers): Don't insert
-	excessive newline.
-
-	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Don't use
-	negative number for the 2nd arg of `insert-char'.
-
-1999-10-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus-ofsetup.el (gnus-ofsetup-customize): Info link to
-	gnus-ja instead of gnus if Japanese environment is on.
-
-1999-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-	(semi-gnus-developers): Remove.
-	(gnus-maintainer): Change mail address.
-	(gnus-group-startup-message): Display version string.
-
-	* lisp/gnus-msg.el (gnus-bug): Delete `Cc'; modify version string.
-
-	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Display
-	version string; fix glyph position.
-
-1999-10-06  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
-
-	* lisp/gnus-sum.el (gnus-read-move-group-name): Revert
-	to previous version until problem of respooling from
-	nnimap to nnml is solved.
-	(gnus-summary-move-article): Ditto.
-
-1999-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/gnus-art.el (gnus-treat-predicate): Check whether arg's
-	value is t before checking for `condition'.
-	(gnus-article-prepare-mime-display): Search for the entity children
-	if the primary type is `multipart'.
-
-1999-10-01  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/gnus-sum.el (gnus-read-move-group-name): Returns nil
-	instead of signaling an error if the destination group is not
-	newly created.
-	(gnus-summary-move-article): Do nothing if the destination group
-	is not newly created.
-
-	* lisp/gnus-msg.el (gnus-bug): Use text/plain for the snooped
-	environment part.
-
-1999-09-30   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* nnfolder.el (nnfolder-possibly-change-group): Don't create an
-	active entry for the group even if it doesn't exist.
-
-1999-09-28   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* gnus-art.el (gnus-article-mime-part-status): Use `mime-entity-children'.
-
-1999-09-28  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.2.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
-	emacs-mime.texi,ChangeLog}: Sync up with Pterodactyl Gnus v0.97.
-
-	* lisp/{qp.el,nntp.el,nnmail.el,mml.el,mm-util.el,mm-encode.el,
-	mm-decode.el,message.el,mail-source.el,gnus.el,gnus-xmas.el,
-	gnus-util.el,gnus-sum.el,gnus-srvr.el,gnus-score.el,gnus-nocem.el,
-	gnus-msg.el,gnus-group.el,gnus-cache.el,gnus-art.el,gnus-agent.el,
-	ChangeLog}: Sync up with Pterodactyl Gnus v0.97.
-
-1999-09-24  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-
-	* lisp/gnus-art.el (gnus-article-prev-page): Rewrite to realize
-	smooth scrolling under XEmacs.
-	(gnus-article-next-page):Ditto.
-
-	* Mule23@1934.en, Mule23@1934.ja: Separate from Mule23@1934; add
-	descriptions about the problem of loaddefs.el and the patch for
-	CUSTOM 1.9962.
-
-1999-09-22  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-	* lisp/nnmail.el (TopLevel): Bind keywords `:user', `:path' and
-	`:predicate' for old Emacsen; require `static'.
-
-	* lisp/dgnushack.el (TopLevel): Don't bind keywords `:user',
-	`:path' and `:predicate'.
-
-1999-09-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* gnus-agent.el (gnus-agent-toggle-plugged): Mark the current
-	modeline as modified.
-
-1999-09-17  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-	* lisp/gnus-art.el (gnus-treat-article): Inherit the text property
-	`mime-view-entity' in the modified header under FSF Emacsen.
-
-1999-09-13  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* README-offline.en: Rewrite the usage description.
-	* README-offline.ja: Ditto.
-
-1999-09-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-
-	* lisp/gnus-ofsetup.el (gnus-offline-lang): Declare before loading
-	`gnus-offline'.
-
-1999-09-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* README-offline.en: Do not refer to `gnus-agent-toggle-plugged'.
-	* README-offline.ja: Ditto.
-
-1999-09-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-
-	* lisp/gnus-agent.el (gnus-agent-toggle-plugged): Do not mark
-	the current buffer as modified.
-
-	* lisp/gnus-offline.el (gnus-offline-menu): New variable.
-	(gnus-offline-get-menu-items): New function.
-	(gnus-offline-define-menu-on-miee): Use it.
-	(gnus-offline-define-menu-on-agent): Ditto.
-
-1999-09-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-msg.el (gnus-configure-posting-styles): Quote `:file'.
-
-	* lisp/pop3.el (pop3-save-uidls): Don't use `dotimes' to check
-	backets of `pop3-uidl-obarray'; don't clear `pop3-uidl-obarray'.
-	(pop3-quit): Clear `pop3-uidl-obarray'.
-
-1999-09-03  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/gnus-offline.el (gnus-offline-resource-en,
-	gnus-offline-resource-ja,
-	gnus-offline-resource-ja_complete): New variables.
-	(gnus-offline-get-message): News function.
-	(gnus-offline-error-check): Use it.
-	(gnus-offline-connect-server): Ditto.
-	(gnus-offline-get-new-news-function): Ditto.
-	(gnus-offline-set-mail-group-level): Ditto.
-	(gnus-offline-hangup-line): Ditto.
-	(gnus-offline-after-jobs-done): Ditto.
-	(gnus-offline-toggle-auto-hangup): Ditto.
-	(gnus-offline-toggle-on/off-send-mail): Ditto.
-	(gnus-offline-toggle-articles-to-fetch): Ditto.
-	(gnus-offline-empting-spool): Ditto.
-	(gnus-offline-set-interval-time): Ditto.
-
-	* lisp/gnus-ofsetup.el (gnus-offline-lang,
-	gnus-ofsetup-resource-en, gnus-ofsetup-resource-ja): New
-	variables.
-	(gnus-ofsetup-get-message): New function.
-	(gnus-setup-for-offline): Use it.
-	(gnus-ofsetup-find-parameters): Ditto.
-	(gnus-ofsetup-prepapre-for-miee): Ditto.
-	(gnus-ofsetup-completing-read-symbol): Ditto.
-	(gnus-ofsetup-customize): Ditto.
-	(gnus-ofsetup-customize-done): Ditto.
-
-1999-09-01  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus-sum.el (gnus-summary-isearch-article): Don't bind
-	`isearch-lazy-highlight'.
-
-1999-08-30  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/lpath.el (babel-as-string): Bind it.
-
-	* lisp/gnus-sum.el (gnus-summary-search-article): Keep the
-	original X-Face field while searching.  It is done for only FSF
-	Emacsen.
-	(gnus-summary-search-article-highlight-matched-text): Ditto.
-	(gnus-summary-search-article-matched-data): Bind it explicitly.
-
-1999-08-29  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.1.
-	(gnus-revision-number): Clear to 00.
-
-	* README.T-gnus: Update.
-
-	* README: Sync up with Pterodactyl Gnus v0.96.
-	* lisp/{smiley.el,nntp.el,nnmail.el,nnfolder.el,mml.el,mm-view.el,
-	mm-uu.el,mm-util.el,mm-encode.el,mm-decode.el,mm-bodies.el,
-	gnus-uu.el,gnus-util.el,gnus-sum.el,gnus-start.el,gnus-score.el,
-	gnus-mlspl.el,gnus-group.el,gnus-bcklg.el,gnus-art.el,
-	gnus-agent.el,ChangeLog}: Ditto.
-	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Ditto.
-
-1999-08-27  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/pop3.el (pop3-movemail): If the argument `crashbox' is t,
-	don't retrieve any incoming mails.; Don't filter articles here.
-	Use `convert-standard-filename' to generate fresh UIDL file names.
-	(pop3-get-message-numbers): Rewrite.
-	(pop3-save-uidls): Clear UIDL hash.; Use `with-temp-file' instead
-	of `with-temp-buffer'.
-
-1999-08-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* README-offline.ja : Fix.
-
-	* lisp/gnus-offline.el (gnus-offline-agent-automatic-expire):
-	Fix typo.
-
-	* lisp/gnus-ofsetup.el : Remove gnus-cus from compile time
-	requirements; Enclose the autoload for `gnus-custom-mode' with
-	`eval-and-compile'.
-
-1999-08-27  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 15.
-
-	* lisp/dgnushack.el (char-before, char-after): Optimize byte code
-	for them before lpath.el is loaded.  Because lpath.el requires
-	`poe' via `path-util'.  [cf. <tm-ja:5051>]
-
-	* lisp/gnus-sum.el (gnus-summary-search-article): Search for
-	X-Face image if the regexp "^X-Face:" is specified.
-	(gnus-summary-search-article-highlight-matched-text): Use
-	`gnus-summary-search-article-highlight-goto-x-face'; maybe display
-	X-Face image if it is requested.
-	(gnus-summary-search-article-highlight-goto-x-face): New macro.
-
-1999-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 14.
-
-	* lisp/gnus-sum.el (gnus-summary-search-article): Treat and
-	recenter the article when touchdown; popup the article buffer if
-	it is disappeared.
-	(gnus-summary-search-article-highlight-matched-text): Treat the
-	article before highlighting; use old style backquote syntax.
-	(gnus-summary-search-article-position-point): Fix the beginning
-	position; use old style backquote syntax.
-	(gnus-summary-select-article): Undo the last change.
-	(gnus-summary-display-article): Bind
-	`gnus-summary-search-article-matched-data' in the article buffer
-	locally.  It is moved from `gnus-summary-select-article'.
-
-1999-08-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
-
-	* texi/Makefile.in (EMACS): Use @EMACS@, not emacs directly.
-	(clean): Remove formatted info files.
-	(distclean): Just remove Makefile.
-
-1999-08-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 13.
-
-	* lisp/gnus-agent.el (gnus-agent-large-newsgroup): New variable.
-	(gnus-agent-fetch-headers): Limit downloadable articles if the
-	number of unread articles exceeds `gnus-agent-large-newsgroup'.
-	(gnus-agent-expire): Do not expire saved or replied articles when
-	`gnus-agent-expire-all' is nil.
-
-	* lisp/gnus-offline.el (gnus-offline-agent-automatic-expire): New
-	variable.
-	(gnus-offline-agent-expire): Check it; Bind
-	`gnus-agent-expire-all' to nil if `gnus-agent-expire-days' is 0.
-	(gnus-offline-after-jobs-done): Don't check
-	`gnus-agent-expire-all'.
-
-	* lisp/gnus-ofsetup.el (gnus-offline-setting-file): Check if
-	`user-login-name' and `user-real-login-name' returns the same
-	value or not.
-	(gnus-ofsetup-prepare-for-miee): Write forms as a variable.
-	(gnus-ofsetup-update-setting-file): Ditto.
-	(gnus-ofsetup-prepare): New macro.
-	(gnus-setup-for-offline): Use it.
-	(gnus-ofsetup-customize-done): Ditto.
-
-1999-08-25  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 12.
-
-	* lisp/gnus-sum.el (gnus-summary-search-article): Rearrange.
-	(gnus-summary-search-article-highlight-matched-text): Rearrange.
-	(gnus-summary-search-article-position-point): New macro.
-	(gnus-summary-search-article-matched-data): Rename from
-	`gnus-summary-search-article-matched-text'.
-	(gnus-summary-isearch-article): Bind `gnus-inhibit-treatment' to t;
-	use `gnus-article-show-all-headers' for exposing the visited
-	article.
-	(gnus-summary-select-article): Bind
-	`gnus-summary-search-article-matched-data' in the article buffer
-	locally.
-
-	* lisp/gnus-art.el (gnus-treat-article): Don't treat the article
-	if the value of `gnus-inhibit-treatment' is non-nil.
-	(article-toggle-headers): Don't redisplay X-Face if the value of
-	`gnus-inhibit-treatment' is non-nil.
-	(gnus-article-treat-custom): Add new treatment variable `mime'.
-
-1999-08-25  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-group.el (gnus-group-line-format): Fix typo in
-	documentation.
-
-	* lisp/gnus-sum.el (gnus-summary-mode): Don't set
-	`gnus-newsgroup-incorporated' explicitly.
-
-1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* README.semi: Update for the recent a-ftp sites and directories.
-	* README.semi.ja: Ditto.
-	* texi/gnus-faq.texi: Ditto.
-	* texi/gnus-faq-ja.texi: Ditto.
-
-1999-08-24  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 11.
-	(gnus-summary-incorporated-face): New face spec.
-
-	* lisp/gnus-group.el (gnus-group-line-format-alist): Add
-	entry about the format specifier `w'.
-	(gnus-group-line-format): Fix documentation.
-
-	* lisp/gnus-sum.el (gnus-summary-highlight): Highlight lines on
-	newly incorporated mails with `gnus-summary-incorporated-face'.
-	(gnus-newsgroup-incorporated): New variable.
-	(gnus-summary-local-variables): Add `gnus-newsgroup-incorporated'.
-	(gnus-summary-mode): Set `gnus-newsgroup-incorporated'.
-
-	* lisp/nnmail.el (nnmail-new-mail-numbers): New function.
-
-	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Don't prepend
-	`K' if the group has already been subscribed.
-
-1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus-sum.el (gnus-summary-isearch-article): Set
-	`isearch-lazy-highlight' t in the buffer locally; goto the
-	beginning of the buffer before searching.
-
-	* lisp/gnus-util.el (gnus-eval-in-buffer-window): Select the last
-	selected frame.
-
-1999-08-23  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 10.
-
-	* lisp/gnus-sum.el (gnus-summary-search-article): Highlight
-	matched text after the searching is done; call
-	`gnus-summary-select-article' with the args nil and t; bind
-	`gnus-treat-*' to nil.
-	(gnus-summary-search-article-highlight-matched-text): New macro
-	for highlighting matched text.  It is bound at the compile time
-	only.
-	(gnus-summary-isearch-article): Call `gnus-summary-select-article'
-	with the args nil and t; bind `gnus-treat-*' to nil.
-
-	* lisp/gnus-ems.el (gnus-x-splash): Change the foreground color of
-	`gnus-splash' to "Brown"; use `with-temp-buffer' instead of
-	`with-temp-file'; use `insert-file-contents-as-binary' instead of
-	`insert-file-contents'.
-
-1999-08-20  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 09.
-
-	* lisp/gnus-offline.el: Fix comments.
-	(TopLevel): Delete the code for emulating custom. Do not inhibit
-	byte-compile-warnings, but hide useless ones.
-	(gnus-offline-dialup-program-arguments): defvar instead of
-	defcustom.
-	(gnus-offline-hangup-program-arguments): Ditto.
-	(gnus-offline-interval-time): Ditto.
-	(gnus-offline-dialup-program, gnus-offline-hangup-program,
-	gnus-offline-drafts-queue-type, gnus-offline-MTA-type): defvar.
-	(gnus-offline-disable-fetch-mail): Remove pop3-fma dependent
-	codes.
-	Set `mail-sources' instead of `nnmail-spool-file'.
-	(gnus-offline-enable-fetch-mail): Ditto.
-	(gnus-offline-toggle-movemail-program): Abolish.
-	(gnus-offline-define-menu-and-key): Modify according to it.
-	(gnus-offline-define-menu-on-miee): Ditto.
-	(gnus-offline-define-menu-on-agent): Ditto.
-	(gnus-offline-message-add-header): Bind temporary variables.
-	(gnus-offline-add-custom-header): Ditto.
-	(gnus-offline-restore-mail-group-level): Ditto.
-
-	* lisp/gnus-ofsetup.el (TopLevel): Require gnus-cus and
-	gnus-offline at the compile time. Do not inhibit
-	byte-compile-warnings.
-	(gnus-setup-for-offline): Really bind all temporary variables.
-	(gnus-ofsetup-write-settting-file): Check if interval is a
-	integer.
-	Use `mail-sources' instead of `nnmail-spool-file'.
-	(gnus-ofsetup-update-setting-file): Redefine as a macro.
-	(gnus-ofsetup-prepare-for-miee): Ditto.
-
-	* README-offline.en : Update.
-	* README-offline.ja : Ditto.
-
-1999-08-20  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-sum.el (gnus-wheel-summary-scroll): Bind
-	`inhibit-read-only' to t; bind `buffer-read-only' to nil.
-
-1999-08-20  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 08.
-
-1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* lisp/nnmail.el (nnmail-split-it): Match whole word for getting
-	group name with `\N'.
-
-1999-08-19  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-
-	* lisp/pop3.el (pop3-except-header-regexp): New variable.
-	(pop3-movemail): Don't retrieve messages whose headers are
-	matching `pop3-except-header-regexp'.
-	(pop3-top): New function.
-	(pop3-retr): Don't use `save-restriction'.
-
-1999-08-18  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/pop3.el (pop3-get-extended-response): Fix regexp.
-
-1999-08-18  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 06.
-
-	* lisp/gnus-art.el (mime-preview-over-to-next-method-alist): Use
-	`gnus-article-next-page' when the last page is not displayed.
-	(mime-preview-over-to-previous-method-alist): Use
-	`gnus-article-prev-page' when the first page is not displayed.
-	(gnus-next-page-map): Use `make-sparse-keymap' instead of
-	`make-keymap'; don't use `suppress-keymap'.
-	(gnus-insert-next-page-button, gnus-insert-prev-page-button):
-	Succeed to the value of the text property `mime-view-situation' in
-	the Next/Prev buttons; make `gnus-{next|prev}-page-map' have the
-	current local map as a parent under FSF Emacsen.
-
-1999-08-18  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/pop3.el (pop3-retr): Undo last change.
-
-1999-08-17  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 05.
-
-	* lisp/pop3.el (pop3-get-extended-response): Enable timeout of
-	`accept-process-output'; Move point to the end of the normal
-	response.
-	(pop3-movemail): Add suffix to `pop3-uidl-file-name'.
-	(pop3-get-list): Abolish.
-	(pop3-retr): Don't use `save-restriction'.
-	(pop3-uidl): Don't use `condition-case' when checking UIDL support.
-	(pop3-list): Likewise.
-
-1999-08-17  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-
-	* lisp/gnus-sum.el (gnus-wheel-summary-scroll): Use
-	`event-basic-type' instead of `event-button' under FSF Emacsen.
-
-1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 03.
-
-1999-08-16  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* lisp/gnus-sum.el: Add `gnus-wheel-install' to
-	`gnus-summary-mode-hook'.
-	(gnus-use-wheel): New variable.
-	(gnus-wheel-scroll-amount): New variable.
-	(gnus-wheel-edge-resistance): New variable.
-	(gnus-wheel-summary-scroll): New function.
-	(gnus-wheel-install): New function.
-
-1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 02.
-
-	* lisp/nnheader.el (make-full-mail-header-from-decoded-header): Use
-	`defun' instead of `defsubst'.
-	(make-full-mail-header): Ditto.
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Fold up long lines.
-	(TopLevel): Autoload "texinfmt" for avoiding byte compile warning.
-
-1999-08-16  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-
-	* lisp/gnus.el (gnus-revision-number): Increment to 01.
-
-	* lisp/gnus-draft.el (gnus-group-send-drafts): Say which message
-	is being sent.
-
-	* lisp/gnus-ofsetup.el (gnus-ofsetup-completing-read-symbol): New
-	function from Nana-gnus.
-	(gnus-setup-for-offline): Rewrite. Bind all temporary variables.
-	(gnus-ofsetup-update-setting-file): Rename from
-	`gnus-ofsetup-write-setting-file'.
-	(gnus-ofsetup-find-parameters): Rename from
-	`gnus-ofsetup-parameters'.
-	(gnus-ofsetup-customize-done): Rewrite.
-
-1999-08-15  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-
-	* pop3.el: Sync up with pop3.el version 2.04.
-	(pop3-leave-mail-on-server): New variable.
-	(pop3-maximum-message-size): New variable.
-	(pop3-uidl-file-name): New variable.
-	(pop3-uidl-support): New variable.
-	(pop3-uidl-obarray): New variable.
-	(pop3-movemail): Check message size on every retrieval.
-	(pop3-open-ssl-stream-1): Use new style macro.
-	(pop3-get-message-numbers): New function.
-	(pop3-get-list): New function.
-	(pop3-get-uidl): New function.
-	(pop3-get-unread-message-numbers): New function.
-	(pop3-save-uidls): New function.
-	(pop3-retr): Use `pop3-get-extended-response'.
-	(pop3-list): New implementation.
-	(pop3-uidl): New function.
-	(pop3-get-extended-response): New function.
-
-1999-08-04  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el: T-gnus 6.13.0 is released.
-
-1999-08-04  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* ChangeLog.2: New file, rename from ChangeLog.
-
-	* lisp/dgnushack.el (TopLevel): Rearrange.
-
-	* README.branch.ja: Update for t-gnus-6_12 and t-gnus-6_13 branch.
-	* README.branch: Ditto.
-
-	* texi/gnus-faq.texi: Replace ftp.jaist.ac.jp with ftp.etl.go.jp.
-
-	* texi/gnus-faq-ja.texi: Modify for T-gnus 6.13.
-	* texi/message-ja.texi: Ditto.
-	* texi/message.texi: Ditto.
-	* texi/gnus-ja.texi: Ditto.
-	* texi/gnus.texi: Ditto.
-	* README-offline.ja: Ditto.
-	* README-offline.en: Ditto.
-	* README.semi.ja: Ditto.
-	* README.semi: Ditto.
-	* README.T-gnus: Ditto.
-
-	* t-gnus-6_13: NEW PUBLIC BRANCH.
-
-See ChangeLog.2 for earlier changes.
+See ChangeLog.3 for earlier changes.

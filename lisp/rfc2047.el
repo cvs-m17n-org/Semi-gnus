@@ -1,5 +1,5 @@
 ;;; rfc2047.el --- Functions for encoding and decoding rfc2047 messages
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -73,6 +73,8 @@ The values can be:
     (iso-2022-jp . B)
     (iso-2022-kr . B)
     (gb2312 . B)
+    (big5 . B)
+    (cn-big5 . B)
     (cn-gb . B)
     (cn-gb-2312 . B)
     (euc-kr . B)
@@ -88,10 +90,10 @@ Valid encodings are nil, `Q' and `B'.")
   "Alist of RFC2047 encodings to encoding functions.")
 
 (defvar rfc2047-q-encoding-alist
-  '(("\\(Resent-\\)?\\(From\\|Cc\\|To\\|Bcc\\|Reply-To\\|Sender\\):" 
+  '(("\\(Resent-\\)?\\(From\\|Cc\\|To\\|Bcc\\|Reply-To\\|Sender\\):"
      . "-A-Za-z0-9!*+/" )
     ;; = (\075), _ (\137), ? (\077) are used in the encoded word.
-    ;; Avoid using 8bit characters. Some versions of Emacs has bug!
+    ;; Avoid using 8bit characters.
     ;; Equivalent to "^\000-\007\011\013\015-\037\200-\377=_?"
     ("." . "\010\012\014\040-\074\076\100-\136\140-\177"))
   "Alist of header regexps and valid Q characters.")
@@ -156,11 +158,15 @@ Should be called narrowed to the head of the message."
 		  (mm-encode-coding-region (point-min) (point-max)
 					   mail-parse-charset)))
 	     ((null method)
-	      (and (delq 'ascii 
-			 (mm-find-charset-region (point-min) 
+	      (and (delq 'ascii
+			 (mm-find-charset-region (point-min)
 						 (point-max)))
-		   (if (y-or-n-p 
-			"Some texts are not encoded. Encode them anyway?")
+		   (if (or (message-options-get
+			    'rfc2047-encode-message-header-encode-any)
+			   (message-options-set
+			    'rfc2047-encode-message-header-encode-any
+			    (y-or-n-p
+			     "Some texts are not encoded. Encode anyway?")))
 		       (rfc2047-encode-region (point-min) (point-max))
 		     (error "Cannot send unencoded text."))))
 	     ((mm-coding-system-p method)
@@ -172,9 +178,14 @@ Should be called narrowed to the head of the message."
 	     (t)))
 	  (goto-char (point-max)))))))
 
+;; Fixme: This, and the require below may not be the Right Thing, but
+;; should be safe just before release.  -- fx 2001-02-08
+(eval-when-compile (defvar message-posting-charset))
+
 (defun rfc2047-encodable-p ()
   "Return non-nil if any characters in current buffer need encoding in headers.
 The buffer may be narrowed."
+  (require 'message)			; for message-posting-charset
   (let ((charsets
 	 (mapcar
 	  'mm-mime-charset
@@ -192,7 +203,7 @@ The buffer may be narrowed."
     ;; Anything except most CTLs, WSP
     (setq word-chars "\010\012\014\041-\177"))
   (let (mail-parse-mule-charset
-	words point current 
+	words point current
 	result word)
     (save-restriction
       (narrow-to-region b e)
@@ -242,7 +253,7 @@ The buffer may be narrowed."
     result))
 
 (defun rfc2047-encode-region (b e &optional word-chars)
-  "Encode all encodable words in region."
+  "Encode all encodable words in region B to E."
   (let ((words (rfc2047-dissect-region b e word-chars)) word)
     (save-restriction
       (narrow-to-region b e)
@@ -273,6 +284,7 @@ The buffer may be narrowed."
 (defun rfc2047-encode (b e charset)
   "Encode the word in the region B to E with CHARSET."
   (let* ((mime-charset (mm-mime-charset charset))
+	 (cs (mm-charset-to-coding-system mime-charset))
 	 (encoding (or (cdr (assq mime-charset
 				  rfc2047-charset-encoding-alist))
 		       'B))
@@ -290,8 +302,8 @@ The buffer may be narrowed."
 	  (unless (eobp)
 	    (insert "\n"))))
       (if (and (mm-multibyte-p)
-	       (mm-coding-system-p mime-charset))
-	  (mm-encode-coding-region (point-min) (point-max) mime-charset))
+	       (mm-coding-system-p cs))
+	  (mm-encode-coding-region (point-min) (point-max) cs))
       (funcall (cdr (assq encoding rfc2047-encoding-function-alist))
 	       (point-min) (point-max))
       (goto-char (point-min))
@@ -305,7 +317,7 @@ The buffer may be narrowed."
 	(forward-line 1)))))
 
 (defun rfc2047-fold-region (b e)
-  "Fold long lines in the region."
+  "Fold long lines in region B to E."
   (save-restriction
     (narrow-to-region b e)
     (goto-char (point-min))
@@ -319,11 +331,13 @@ The buffer may be narrowed."
 	  (goto-char (or break qword-break))
 	  (setq break nil
 		qword-break nil)
-	  (insert "\n ")
+	  (if (looking-at " \t")
+	      (insert "\n")
+	    (insert "\n "))
 	  (setq bol (1- (point)))
 	  ;; Don't break before the first non-LWSP characters.
 	  (skip-chars-forward " \t")
-	  (forward-char 1))
+	  (unless (eobp) (forward-char 1)))
 	(cond
 	 ((eq (char-after) ?\n)
 	  (forward-char 1)
@@ -351,14 +365,16 @@ The buffer may be narrowed."
 	(goto-char (or break qword-break))
 	(setq break nil
 	      qword-break nil)
-	(insert "\n ")
+	  (if (looking-at " \t")
+	      (insert "\n")
+	    (insert "\n "))
 	(setq bol (1- (point)))
 	;; Don't break before the first non-LWSP characters.
 	(skip-chars-forward " \t")
-	(forward-char 1)))))
+	(unless (eobp) (forward-char 1))))))
 
 (defun rfc2047-unfold-region (b e)
-  "Unfold lines in the region."
+  "Unfold lines in region B to E."
   (save-restriction
     (narrow-to-region b e)
     (goto-char (point-min))
@@ -375,7 +391,7 @@ The buffer may be narrowed."
 	    (progn
 	      (goto-char eol)
 	      (delete-region eol (progn
-				   (skip-chars-forward "[ \t\n\r]+")
+				   (skip-chars-forward " \t\n\r")
 				   (1- (point)))))
 	  (setq bol (gnus-point-at-bol)))
 	(setq eol (gnus-point-at-eol))
@@ -402,7 +418,9 @@ The buffer may be narrowed."
 		   (gnus-point-at-bol))))
 	(while alist
 	  (when (looking-at (caar alist))
-	    (quoted-printable-encode-region b e nil (cdar alist))
+	    (mm-with-unibyte-current-buffer-mule4
+	      (quoted-printable-encode-region 
+	       (point-min) (point-max) nil (cdar alist)))
 	    (subst-char-in-region (point-min) (point-max) ?  ?_)
 	    (setq alist nil))
 	  (pop alist))
@@ -523,7 +541,7 @@ If your Emacs implementation can't decode CHARSET, return nil."
 	(mm-decode-coding-string
 	 (cond
 	  ((equal "B" encoding)
-	   (base64-decode-string 
+	   (base64-decode-string
 	    (rfc2047-pad-base64 string)))
 	  ((equal "Q" encoding)
 	   (quoted-printable-decode-string

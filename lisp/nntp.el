@@ -1,6 +1,6 @@
 ;;; nntp.el --- nntp access for Gnus
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000
+;;        1997, 1998, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -329,8 +329,8 @@ noticing asynchronous data.")
 	      ;; Nix out "nntp reading...." message.
 	      (when nntp-have-messaged
 		(setq nntp-have-messaged nil)
-		(nnheader-message 5 ""))
-	      t))))
+		(nnheader-message 5 ""))))
+	  t))
       (unless discard
 	(erase-buffer)))))
 
@@ -389,8 +389,8 @@ noticing asynchronous data.")
 	     (wait-for
 	      (nntp-wait-for process wait-for buffer decode))
 	     (t t)))
-	(error 
-	 (nnheader-report 'nntp "Couldn't open connection to %s: %s" 
+	(error
+	 (nnheader-report 'nntp "Couldn't open connection to %s: %s"
 			  address err))
 	(quit
 	 (message "Quit retrieving data from nntp")
@@ -572,7 +572,7 @@ noticing asynchronous data.")
 
 	;; Wait for the reply from the final command.
 	(unless (gnus-buffer-live-p buf)
-	  (error 
+	  (error
 	   (nnheader-report 'nntp "Connection to %s is closed." server)))
 	(set-buffer buf)
 	(goto-char (point-max))
@@ -584,13 +584,13 @@ noticing asynchronous data.")
 			(goto-char (point-max))
 			(if (not nntp-server-list-active-group)
 			    (not (re-search-backward "\r?\n" (- (point) 3) t))
-			  (not (re-search-backward "^\\.\r?\n" 
+			  (not (re-search-backward "^\\.\r?\n"
 						   (- (point) 4) t)))))
 		      (nntp-accept-response)))
 
 	;; Now all replies are received.  We remove CRs.
 	(unless (gnus-buffer-live-p buf)
-	  (error 
+	  (error
 	   (nnheader-report 'nntp "Connection to %s is closed." server)))
 	(set-buffer buf)
 	(goto-char (point-min))
@@ -984,8 +984,8 @@ password contained in '~/.nntp-authinfo'."
     (when (and (buffer-name pbuffer)
 	       process)
       (process-kill-without-query process)
-      (nntp-wait-for process "^.*\n" buffer nil t)
-      (if (memq (process-status process) '(open run))
+      (if (and (nntp-wait-for process "^2.*\n" buffer nil t)
+	       (memq (process-status process) '(open run)))
 	  (prog1
 	      (caar (push (list process buffer nil) nntp-connection-alist))
 	    (push process nntp-connection-list)
@@ -1263,7 +1263,7 @@ password contained in '~/.nntp-authinfo'."
 	(while (and (cdr articles)
 		    (< (- (nth 1 articles) (car articles)) nntp-nov-gap))
 	  (setq articles (cdr articles)))
-
+	
 	(setq in-process-buffer-p (stringp nntp-server-xover))
 	(nntp-send-xover-command first (car articles))
 	(setq articles (cdr articles))
@@ -1271,7 +1271,7 @@ password contained in '~/.nntp-authinfo'."
 	(when (and nntp-server-xover in-process-buffer-p)
 	  ;; Don't count tried request.
 	  (setq count (1+ count))
-	  
+
 	  ;; Every 400 requests we have to read the stream in
 	  ;; order to avoid deadlocks.
 	  (when (or (null articles)	;All requests have been sent.

@@ -1,6 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
-;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
+;;        2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -521,47 +521,51 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   (interactive "P")
   (let ((gnus-uu-save-in-digest t)
 	(file (make-temp-name (nnheader-concat gnus-uu-tmp-dir "forward")))
+	(message-forward-as-mime message-forward-as-mime)
+	(mail-parse-charset gnus-newsgroup-charset)
+	(mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets)
 	gnus-uu-digest-buffer subject from)
-    (gnus-setup-message 'forward
-      (setq gnus-uu-digest-from-subject nil)
-      (setq gnus-uu-digest-buffer
-	    (gnus-get-buffer-create " *gnus-uu-forward*"))
-      (gnus-uu-decode-save n file)
-      (set-buffer gnus-uu-digest-buffer)
-      (let ((fs gnus-uu-digest-from-subject))
-	(when fs
-	  (setq from (caar fs)
-		subject (gnus-simplify-subject-fuzzy (cdar fs))
-		fs (cdr fs))
-	  (while (and fs (or from subject))
-	    (when from
-	      (unless (string= from (caar fs))
-		(setq from nil)))
-	    (when subject
-	      (unless (string= (gnus-simplify-subject-fuzzy (cdar fs))
-			       subject)
-		(setq subject nil)))
-	    (setq fs (cdr fs))))
-	(unless subject
-	  (setq subject "Digested Articles"))
-	(unless from
-	  (setq from
-		(if (gnus-news-group-p gnus-newsgroup-name)
-		    gnus-newsgroup-name
-		  "Various"))))
-      (mime-edit-enclose-digest-region (point-min) (point-max))
-      (if post
-	  (message-news nil (concat "[" from "] " subject))
-	(message-mail nil (concat "[" from "] " subject)))
-      (message-goto-body)
-      ;; Make sure we're at the start of the line.
-      (unless (bolp)
-	(insert "\n"))
-      ;; Insert the forwarded buffer.
-      (insert-buffer gnus-uu-digest-buffer)
-      (kill-buffer gnus-uu-digest-buffer)
-      (set-text-properties (point-min) (point-max) nil)
-      (message-position-point))
+    (if (and n (not (numberp n)))
+	(setq message-forward-as-mime (not message-forward-as-mime)
+	      n nil))
+    (let ((gnus-article-reply (gnus-summary-work-articles n)))
+      (gnus-setup-message 'forward
+	(setq gnus-uu-digest-from-subject nil)
+	(setq gnus-uu-digest-buffer
+	      (gnus-get-buffer-create " *gnus-uu-forward*"))
+	(gnus-uu-decode-save n file)
+	(switch-to-buffer gnus-uu-digest-buffer)
+	(let ((fs gnus-uu-digest-from-subject))
+	  (when fs
+	    (setq from (caar fs)
+		  subject (gnus-simplify-subject-fuzzy (cdar fs))
+		  fs (cdr fs))
+	    (while (and fs (or from subject))
+	      (when from
+		(unless (string= from (caar fs))
+		  (setq from nil)))
+	      (when subject
+		(unless (string= (gnus-simplify-subject-fuzzy (cdar fs))
+				 subject)
+		  (setq subject nil)))
+	      (setq fs (cdr fs))))
+	  (unless subject
+	    (setq subject "Digested Articles"))
+	  (unless from
+	    (setq from
+		  (if (gnus-news-group-p gnus-newsgroup-name)
+		      gnus-newsgroup-name
+		    "Various"))))
+	(goto-char (point-min))
+	(when (re-search-forward "^Subject: ")
+	  (delete-region (point) (gnus-point-at-eol))
+	  (insert subject))
+	(goto-char (point-min))
+	(when (re-search-forward "^From:")
+	  (delete-region (point) (gnus-point-at-eol))
+	  (insert " " from))
+	(let ((message-forward-decoded-p t))
+	  (message-forward post))))
     (setq gnus-uu-digest-from-subject nil)))
 
 (defun gnus-uu-digest-post-forward (&optional n)
@@ -571,17 +575,40 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 ;; Process marking.
 
+(defun gnus-message-process-mark (unmarkp new-marked)
+  (let ((old (- (length gnus-newsgroup-processable) (length new-marked))))
+    (message "%d mark%s %s%s"
+	     (length new-marked)
+	     (if (= (length new-marked) 1) "" "s")
+	     (if unmarkp "removed" "added")
+	     (cond
+	      ((and (zerop old)
+		    (not unmarkp))
+	       "")
+	      (unmarkp
+	       (format ", %d remain marked"
+		       (length gnus-newsgroup-processable)))
+	      (t
+	       (format ", %d already marked" old))))))
+
+(defun gnus-new-processable (unmarkp articles)
+  (if unmarkp
+      (gnus-intersection gnus-newsgroup-processable articles)
+    (gnus-set-difference articles gnus-newsgroup-processable)))
+
 (defun gnus-uu-mark-by-regexp (regexp &optional unmark)
   "Set the process mark on articles whose subjects match REGEXP.
 When called interactively, prompt for REGEXP.
 Optional UNMARK non-nil means unmark instead of mark."
   (interactive "sMark (regexp): \nP")
-  (let ((articles (gnus-uu-find-articles-matching regexp)))
-    (while articles
-      (if unmark
-	  (gnus-summary-remove-process-mark (pop articles))
-	(gnus-summary-set-process-mark (pop articles))))
-    (message ""))
+  (save-excursion
+    (let* ((articles (gnus-uu-find-articles-matching regexp))
+	   (new-marked (gnus-new-processable unmark articles)))
+      (while articles
+	(if unmark
+	    (gnus-summary-remove-process-mark (pop articles))
+	  (gnus-summary-set-process-mark (pop articles))))
+      (gnus-message-process-mark unmark new-marked)))
   (gnus-summary-position-point))
 
 (defun gnus-uu-unmark-by-regexp (regexp)
@@ -854,8 +881,9 @@ When called interactively, prompt for REGEXP."
 	    (save-excursion
 	      (set-buffer (gnus-get-buffer-create "*gnus-uu-pre*"))
 	      (erase-buffer)
-	      (unless gnus-uu-digest-buffer
-		(insert (format "From: %s\nSubject: %s Digest\n\n" name name)))
+	      (insert (format
+		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
+		       (current-time-string) name name))
 	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
@@ -902,7 +930,8 @@ When called interactively, prompt for REGEXP."
 	(goto-char beg)
 	(when (re-search-forward "^Subject:" nil t)
 	  (setq subj (nnheader-decode-subject
-		      (buffer-substring (match-end 0) (std11-field-end))))
+		      (buffer-substring (match-end 0) (std11-field-end)))))
+	(when subj
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "   %s\n" subj)))))
@@ -1364,6 +1393,9 @@ When called interactively, prompt for REGEXP."
 	  (while article-series
 	    (gnus-summary-tick-article (pop article-series) t)))))
 
+    ;; The original article buffer is hosed, shoot it down.
+    (gnus-kill-buffer gnus-original-article-buffer)
+
     result-files))
 
 (defun gnus-uu-grab-view (file)
@@ -1544,7 +1576,7 @@ Gnus might fail to display all of it.")
 	      (unless
 		  (unwind-protect
 		      (with-current-buffer buffer
-			(insert (substitute-command-keys 
+			(insert (substitute-command-keys
 				 gnus-uu-unshar-warning))
 			(goto-char (point-min))
 			(display-buffer buffer)

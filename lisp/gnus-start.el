@@ -1,5 +1,5 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -205,6 +205,7 @@ Gnus always reads its own startup file, which is called
 be readily understood by other newsreaders.  If you don't plan on
 using other newsreaders, set this variable to nil to save some time on
 entry."
+  :version "21.1"
   :group 'gnus-newsrc
   :type 'boolean)
 
@@ -248,7 +249,7 @@ thus making them effectively non-existent."
   :type 'regexp)
 
 (defcustom gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
-  "*Function called with a group name when new group is detected.
+  "*Function(s) called with a group name when new group is detected.
 A few pre-made functions are supplied: `gnus-subscribe-randomly'
 inserts new groups at the beginning of the list of groups;
 `gnus-subscribe-alphabetically' inserts new groups in strict
@@ -266,11 +267,18 @@ claim them."
 		(function-item gnus-subscribe-killed)
 		(function-item gnus-subscribe-zombies)
 		(function-item gnus-subscribe-topics)
-		function))
+		function
+		(repeat function)))
+
+(defcustom gnus-subscribe-newsgroup-hooks nil
+  "*Hooks run after you subscribe to a new group. The hooks will be called
+with new group's name as argument."
+  :group 'gnus-group-new
+  :type 'hook)
 
 (defcustom gnus-subscribe-options-newsgroup-method
   'gnus-subscribe-alphabetically
-  "*This function is called to subscribe newsgroups mentioned on \"options -n\" lines.
+  "*Function(s) called to subscribe newsgroups mentioned on \"options -n\" lines.
 If, for instance, you want to subscribe to all newsgroups in the
 \"no\" and \"alt\" hierarchies, you'd put the following in your
 .newsrc file:
@@ -286,7 +294,9 @@ the subscription method in this variable."
 		(function-item gnus-subscribe-interactively)
 		(function-item gnus-subscribe-killed)
 		(function-item gnus-subscribe-zombies)
-		function))
+		(function-item gnus-subscribe-topics)
+		function
+		(repeat function)))
 
 (defcustom gnus-subscribe-hierarchical-interactive nil
   "*If non-nil, Gnus will offer to subscribe hierarchically.
@@ -372,8 +382,7 @@ This hook is called as the first thing when Gnus is started."
   :type 'hook)
 
 (defcustom gnus-after-getting-new-news-hook
-  (when (gnus-boundp 'display-time-timer)
-    '(display-time-event-handler))
+  '(gnus-display-time-event-handler)
   "A hook run after Gnus checks for new news when Gnus is already running."
   :group 'gnus-group-new
   :type 'hook)
@@ -535,22 +544,22 @@ Can be used to turn version control on or off."
   ;; Basic ideas by mike-w@cs.aukuni.ac.nz (Mike Williams)
   (save-excursion
     (set-buffer (nnheader-find-file-noselect gnus-current-startup-file))
-    (let ((groupkey newgroup)
-	  before)
-      (while (and (not before) groupkey)
-	(goto-char (point-min))
-	(let ((groupkey-re
-	       (concat "^\\(" (regexp-quote groupkey) ".*\\)[!:]")))
-	  (while (and (re-search-forward groupkey-re nil t)
-		      (progn
-			(setq before (match-string 1))
-			(string< before newgroup)))))
-	;; Remove tail of newsgroup name (eg. a.b.c -> a.b)
-	(setq groupkey
-	      (when (string-match "^\\(.*\\)\\.[^.]+$" groupkey)
-		(substring groupkey (match-beginning 1) (match-end 1)))))
-      (gnus-subscribe-newsgroup newgroup before))
-    (kill-buffer (current-buffer))))
+    (prog1
+	(let ((groupkey newgroup) before)
+	  (while (and (not before) groupkey)
+	    (goto-char (point-min))
+	    (let ((groupkey-re
+		   (concat "^\\(" (regexp-quote groupkey) ".*\\)[!:]")))
+	      (while (and (re-search-forward groupkey-re nil t)
+			  (progn
+			    (setq before (match-string 1))
+			    (string< before newgroup)))))
+	    ;; Remove tail of newsgroup name (eg. a.b.c -> a.b)
+	    (setq groupkey
+		  (when (string-match "^\\(.*\\)\\.[^.]+$" groupkey)
+		    (substring groupkey (match-beginning 1) (match-end 1)))))
+	  (gnus-subscribe-newsgroup newgroup before))
+      (kill-buffer (current-buffer)))))
 
 (defun gnus-subscribe-interactively (group)
   "Subscribe the new GROUP interactively.
@@ -579,7 +588,9 @@ the first newsgroup."
      newsgroup gnus-level-default-subscribed
      gnus-level-killed (gnus-gethash (or next "dummy.group")
 				     gnus-newsrc-hashtb))
-    (gnus-message 5 "Subscribe newsgroup: %s" newsgroup)))
+    (gnus-message 5 "Subscribe newsgroup: %s" newsgroup)
+    (run-hook-with-args 'gnus-subscribe-newsgroup-hooks newsgroup)
+    t))
 
 (defun gnus-read-active-file-p ()
   "Say whether the active file has been read from `gnus-select-method'."
@@ -613,6 +624,12 @@ the first newsgroup."
 	  (set (car variables) nil)
 	  (setq variables (cdr variables))))
       (setq files (cdr files)))))
+
+(defun gnus-close-all-servers ()
+  "Close all servers."
+  (interactive)
+  (dolist (server gnus-opened-servers)
+    (gnus-close-server (car server))))
 
 (defun gnus-clear-system ()
   "Clear all variables and buffers."
@@ -701,7 +718,7 @@ prompt the user for the name of an NNTP server to use."
       (cond
        ((featurep 'xemacs)
 	(gnus-xmas-splash))
-       ((and (eq window-system 'x)
+       ((and window-system
 	     (= (frame-height) (1+ (window-height))))
 	(gnus-x-splash))))
 
@@ -816,6 +833,7 @@ cautiously -- unloading may cause trouble."
       (set-buffer-modified-p nil)
       (let ((auto (make-auto-save-file-name))
 	    (gnus-dribble-ignore t)
+	    (purpose nil)
 	    modes)
 	(when (or (file-exists-p auto) (file-exists-p dribble-file))
 	  ;; Load whichever file is newest -- the auto save file
@@ -831,10 +849,15 @@ cautiously -- unloading may cause trouble."
 		     (file-exists-p dribble-file)
 		     (setq modes (file-modes gnus-current-startup-file)))
 	    (set-file-modes dribble-file modes))
+	  (goto-char (point-min))
+	  (when (search-forward "Gnus was exited on purpose" nil t)
+	    (setq purpose t))
 	  ;; Possibly eval the file later.
 	  (when (or gnus-always-read-dribble-file
 		    (gnus-y-or-n-p
-		     "Gnus auto-save file exists.  Do you want to read it? "))
+		     (if purpose
+			 "Gnus exited on purpose without saving; read auto-save file anyway? "
+		     "Gnus auto-save file exists.  Do you want to read it? ")))
 	    (setq gnus-dribble-eval-file t)))))))
 
 (defun gnus-dribble-eval-file ()
@@ -935,6 +958,7 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
 
     ;; See whether we need to read the description file.
     (when (and (boundp 'gnus-group-line-format)
+	       (stringp gnus-group-line-format)
 	       (let ((case-fold-search nil))
 		 (string-match "%[-,0-9]*D" gnus-group-line-format))
 	       (not gnus-description-hashtb)
@@ -966,6 +990,21 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
 	       gnus-read-active-file (not level)
 	       (gnus-server-opened gnus-select-method))
       (gnus-check-bogus-newsgroups))))
+
+(defun gnus-call-subscribe-functions (method group)
+  "Call METHOD to subscribe GROUP.
+If no function returns `non-nil', call `gnus-subscribe-zombies'."
+  (unless (cond
+	   ((gnus-functionp method)
+	    (funcall method group))
+	   ((listp method)
+	    (catch 'found
+	      (dolist (func method)
+		(if (funcall func group)
+		    (throw 'found t)))
+	      nil))
+	   (t nil))
+    (gnus-subscribe-zombies group)))
 
 (defun gnus-find-new-newsgroups (&optional arg)
   "Search for new newsgroups and add them.
@@ -1019,7 +1058,8 @@ for new groups, and subscribe the new groups as zombies."
 		  ((eq do-sub 'subscribe)
 		   (setq groups (1+ groups))
 		   (gnus-sethash group group gnus-killed-hashtb)
-		   (funcall gnus-subscribe-options-newsgroup-method group))
+		   (gnus-call-subscribe-functions
+		    gnus-subscribe-options-newsgroup-method group))
 		  ((eq do-sub 'ignore)
 		   nil)
 		  (t
@@ -1027,7 +1067,8 @@ for new groups, and subscribe the new groups as zombies."
 		   (gnus-sethash group group gnus-killed-hashtb)
 		   (if gnus-subscribe-hierarchical-interactive
 		       (push group new-newsgroups)
-		     (funcall gnus-subscribe-newsgroup-method group)))))))
+		     (gnus-call-subscribe-functions
+		      gnus-subscribe-newsgroup-method group)))))))
 	   gnus-active-hashtb)
 	  (when new-newsgroups
 	    (gnus-subscribe-hierarchical-interactive new-newsgroups))
@@ -1112,7 +1153,8 @@ for new groups, and subscribe the new groups as zombies."
 		((eq do-sub 'subscribe)
 		 (incf groups)
 		 (gnus-sethash group group gnus-killed-hashtb)
-		 (funcall gnus-subscribe-options-newsgroup-method group))
+		 (gnus-call-subscribe-functions
+		  gnus-subscribe-options-newsgroup-method group))
 		((eq do-sub 'ignore)
 		 nil)
 		(t
@@ -1120,7 +1162,8 @@ for new groups, and subscribe the new groups as zombies."
 		 (gnus-sethash group group gnus-killed-hashtb)
 		 (if gnus-subscribe-hierarchical-interactive
 		     (push group new-newsgroups)
-		   (funcall gnus-subscribe-newsgroup-method group)))))))
+		   (gnus-call-subscribe-functions
+		    gnus-subscribe-newsgroup-method group)))))))
 	 hashtb))
       (when new-newsgroups
 	(gnus-subscribe-hierarchical-interactive new-newsgroups)))
@@ -1162,7 +1205,8 @@ for new groups, and subscribe the new groups as zombies."
 	       (cond
 		((eq do-sub 'subscribe)
 		 (gnus-sethash group group gnus-killed-hashtb)
-		 (funcall gnus-subscribe-options-newsgroup-method group))
+		 (gnus-call-subscribe-functions
+		  gnus-subscribe-options-newsgroup-method group))
 		((eq do-sub 'ignore)
 		 nil)
 		(t
@@ -1240,9 +1284,9 @@ for new groups, and subscribe the new groups as zombies."
       ;; it from the newsrc hash table and assoc.
       (cond
        ((>= oldlevel gnus-level-zombie)
-	(if (= oldlevel gnus-level-zombie)
-	    (setq gnus-zombie-list (delete group gnus-zombie-list))
-	  (setq gnus-killed-list (delete group gnus-killed-list))))
+	;; oldlevel could be wrong.
+	(setq gnus-zombie-list (delete group gnus-zombie-list))
+	(setq gnus-killed-list (delete group gnus-killed-list)))
        (t
 	(when (and (>= level gnus-level-zombie)
 		   entry)
@@ -1265,7 +1309,11 @@ for new groups, and subscribe the new groups as zombies."
 	(unless (gnus-group-foreign-p group)
 	  (if (= level gnus-level-zombie)
 	      (push group gnus-zombie-list)
-	    (push group gnus-killed-list))))
+	    (if (= oldlevel gnus-level-killed)
+		;; Remove from active hashtb.
+		(unintern group gnus-active-hashtb)
+	      ;; Don't add it into killed-list if it was killed.
+	      (push group gnus-killed-list)))))
        (t
 	;; If the list is to be entered into the newsrc assoc, and
 	;; it was killed, we have to create an entry in the newsrc
@@ -1522,7 +1570,7 @@ newsgroup."
 		  gnus-activate-foreign-newsgroups)
 		 (t 0))
 	   level))
-	 scanned-methods info group active method retrievegroups)
+	 scanned-methods info group active method retrieve-groups)
     (gnus-message 5 "Checking new news...")
 
     (while newsrc
@@ -1569,10 +1617,10 @@ newsgroup."
 	  (if (gnus-check-backend-function 'retrieve-groups group)
 	      ;; if server support gnus-retrieve-groups we push
 	      ;; the group onto retrievegroups for later checking
-	      (if (assoc method retrievegroups)
-		  (setcdr (assoc method retrievegroups)
-			  (cons group (cdr (assoc method retrievegroups))))
-		(push (list method group) retrievegroups))
+	      (if (assoc method retrieve-groups)
+		  (setcdr (assoc method retrieve-groups)
+			  (cons group (cdr (assoc method retrieve-groups))))
+		(push (list method group) retrieve-groups))
 	    ;; hack: `nnmail-get-new-mail' changes the mail-source depending
 	    ;; on the group, so we must perform a scan for every group
 	    ;; if the users has any directory mail sources.
@@ -1605,21 +1653,21 @@ newsgroup."
 	;; unread articles and stuff.
 	(gnus-set-active group nil)
 	(let ((tmp (gnus-gethash group gnus-newsrc-hashtb)))
-	  (if tmp (setcar tmp t))))))
+	  (when tmp
+	    (setcar tmp t))))))
 
     ;; iterate through groups on methods which support gnus-retrieve-groups
     ;; and fetch a partial active file and use it to find new news.
-    (while retrievegroups
-      (let* ((mg (pop retrievegroups))
-	     (method (or (car mg) gnus-select-method))
-	     (groups (cdr mg)))
+    (dolist (rg retrieve-groups)
+      (let ((method (or (car rg) gnus-select-method))
+	    (groups (cdr rg)))
 	(when (gnus-check-server method)
           ;; Request that the backend scan its incoming messages.
           (when (gnus-check-backend-function 'request-scan (car method))
             (gnus-request-scan nil method))
-          (gnus-read-active-file-2 (mapcar (lambda (group)
-                                             (gnus-group-real-name group))
-                                           groups) method)
+          (gnus-read-active-file-2
+	   (mapcar (lambda (group) (gnus-group-real-name group)) groups)
+	   method)
           (dolist (group groups)
             (cond
              ((setq active (gnus-active (gnus-info-group
@@ -2770,16 +2818,14 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	    (skip-chars-forward " \t")
 	    ;; ...  which leads to this line being effectively ignored.
 	    (when (symbolp group)
-	      (let ((str (buffer-substring
-			  (point) (progn (end-of-line) (point))))
-		    (coding
-		     (and (or (featurep 'xemacs)
-			      (and (boundp 'enable-multibyte-characters)
-				   enable-multibyte-characters))
-			  (fboundp 'gnus-mule-get-coding-system)
-			  (gnus-mule-get-coding-system (symbol-name group)))))
-		(when coding
-		  (setq str (decode-coding-string str (car coding))))
+	      (let* ((str (buffer-substring
+			   (point) (progn (end-of-line) (point))))
+		     (name (symbol-name group))
+		     (charset
+		      (or (gnus-group-name-charset method name)
+			  (gnus-parameter-charset name))))
+		(when (and str charset (featurep 'mule))
+		  (setq str (decode-coding-string str charset)))
 		(set group str)))
 	    (forward-line 1))))
       (gnus-message 5 "Reading descriptions file...done")
@@ -2810,6 +2856,11 @@ If this variable is nil, don't do anything."
 		 (file-exists-p gnus-default-directory))
 	    (file-name-as-directory (expand-file-name gnus-default-directory))
 	  default-directory)))
+
+(defun gnus-display-time-event-handler ()
+  "Like `display-time-event-handler', but test `display-time-timer'."
+  (when (gnus-boundp 'display-time-timer)
+    (display-time-event-handler)))
 
 (provide 'gnus-start)
 

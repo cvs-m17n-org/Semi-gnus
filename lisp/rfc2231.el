@@ -27,6 +27,7 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'gnus-clfns))
 
+(eval-when-compile (require 'cl))
 (require 'ietf-drums)
 (require 'rfc2047)
 

@@ -1,5 +1,5 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -153,7 +153,7 @@ number of days) -- this doesn't have to be an integer.  This variable
 can also be `immediate' and `never'."
   :group 'nnmail-expire
   :type '(choice (const immediate)
-		 (integer :tag "days")
+		 (number :tag "days")
 		 (const never)))
 
 (defcustom nnmail-expiry-wait-function nil
@@ -183,6 +183,7 @@ messages end up in that group.  If it is a function, the function is
 called in a buffer narrowed to the message in question.  The function
 receives one argument, the name of the group the message comes from.
 The return value should be `delete' or a group name (a string)."
+  :version "21.1"
     :group 'nnmail-expire
     :type '(choice (const delete)
 		   (function :format "%v" nnmail-)
@@ -209,6 +210,7 @@ This variable is obsolete; `mail-sources' should be used instead."
 (defcustom nnmail-scan-directory-mail-source-once nil
   "*If non-nil, scan all incoming procmail sorted mails once.
 It scans low-level sorted spools even when not required."
+  :version "21.1"
   :group 'nnmail-procmail
   :type 'boolean)
 
@@ -323,7 +325,7 @@ the following:
 GROUP: Mail will be stored in GROUP (a string).
 
 \(FIELD VALUE [- RESTRICT [- RESTRICT [...]]] SPLIT): If the message
-  field FIELD (a regexp) contains VALUE (a regexp), store the messages 
+  field FIELD (a regexp) contains VALUE (a regexp), store the messages
   as specified by SPLIT.  If RESTRICT (a regexp) matches some string
   after FIELD and before the end of the matched VALUE, return NIL,
   otherwise process SPLIT.  Multiple RESTRICTs add up, further
@@ -371,12 +373,12 @@ Example:
 	     (any \"procmail@informatik\\\\.rwth-aachen\\\\.de\" \"procmail.list\")
 	     (any \"SmartList@informatik\\\\.rwth-aachen\\\\.de\" \"SmartList.list\")
              ;; Both lists below have the same suffix, so prevent
-             ;; cross-posting to mkpkg.list of messages posted only to 
+             ;; cross-posting to mkpkg.list of messages posted only to
              ;; the bugs- list, but allow cross-posting when the
              ;; message was really cross-posted.
              (any \"bugs-mypackage@somewhere\" \"mypkg.bugs\")
              (any \"mypackage@somewhere\" - \"bugs-mypackage\" \"mypkg.list\")
-             ;; 
+             ;;
 	     ;; People...
 	     (any \"larsi@ifi\\\\.uio\\\\.no\" \"people.Lars Magne Ingebrigtsen\"))
 	  ;; Unmatched mail goes to the catch all group.
@@ -427,11 +429,13 @@ parameter.  It should return nil, `warn' or `delete'."
 
 (defcustom nnmail-extra-headers nil
   "*Extra headers to parse."
+  :version "21.1"
   :group 'nnmail
   :type '(repeat symbol))
 
 (defcustom nnmail-split-header-length-limit 512
   "Header lines longer than this limit are excluded from the split function."
+  :version "21.1"
   :group 'nnmail
   :type 'integer)
 
@@ -1098,14 +1102,20 @@ Return the number of characters in the body."
 
 (defun nnmail-remove-list-identifiers ()
   "Remove list identifiers from Subject headers."
-  (let ((regexp (if (stringp nnmail-list-identifiers) nnmail-list-identifiers
-		  (mapconcat 'identity nnmail-list-identifiers " *\\|"))))
+  (let ((regexp 
+	 (if (consp nnmail-list-identifiers) 
+	     (mapconcat 'identity nnmail-list-identifiers " *\\|")
+	   nnmail-list-identifiers)))
     (when regexp
       (goto-char (point-min))
-      (when (re-search-forward
-	     (concat "^Subject: +\\(Re: +\\)?\\(" regexp " *\\)")
-	     nil t)
-	(delete-region (match-beginning 2) (match-end 0))))))
+      (while (re-search-forward
+              (concat "^Subject: +\\(R[Ee]: +\\)*\\(" regexp " *\\)")
+              nil t)
+        (delete-region (match-beginning 2) (match-end 0))
+        (beginning-of-line))
+      (when (re-search-forward "^Subject: +\\(\\(R[Ee]: +\\)+\\)R[Ee]: +" nil t)
+        (delete-region (match-beginning 1) (match-end 1))
+	(beginning-of-line)))))
 
 (defun nnmail-remove-tabs ()
   "Translate TAB characters into SPACE characters."
@@ -1233,22 +1243,29 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
      (t
       (let* ((field (nth 0 split))
 	     (value (nth 1 split))
-	     partial regexp)
+	     partial-front regexp
+	     partial-rear  regexp)
 	(if (symbolp value)
 	    (setq value (cdr (assq value nnmail-split-abbrev-alist))))
 	(if (and (>= (length value) 2)
 		 (string= ".*" (substring value 0 2)))
 	    (setq value (substring value 2)
-		  partial ""))
+		  partial-front ""))
+	;; Same trick for the rear of the regexp
+	(if (and (>= (length value) 2)
+		 (string= ".*" (substring value -2)))
+	    (setq value (substring value 0 -2)
+		  partial-rear ""))
 	(setq regexp (concat "^\\(\\("
 			     (if (symbolp field)
 				 (cdr (assq field nnmail-split-abbrev-alist))
 			       field)
 			     "\\):.*\\)"
-			     (or partial "\\<")
+			     (or partial-front "\\<")
 			     "\\("
 			     value
-			     "\\)\\>"))
+			     "\\)"
+			     (or partial-rear "\\>")))
 	(push (cons split regexp) nnmail-split-cache)
 	;; Now that it's in the cache, just call nnmail-split-it again
 	;; on the same split, which will find it immediately in the cache.
@@ -1579,7 +1596,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 			(nnmail-split-incoming
 			 file ',(intern (format "%s-save-mail" method))
 			 ',spool-func
-			 (nnmail-get-split-group orig-file source)
+			 (if (equal file orig-file)
+			     nil
+			   (nnmail-get-split-group orig-file ',source))
 			 ',(intern (format "%s-active-number" method))))))
 	  (incf total new)
 	  (incf i)))
@@ -1624,10 +1643,13 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	     (ignore-errors (time-less-p days (time-since time))))))))
 
 (defun nnmail-expiry-target-group (target group)
-  (when (nnheader-functionp target)
-    (setq target (funcall target group)))
-  (unless (eq target 'delete)
-    (gnus-request-accept-article target nil nil t)))
+  (let (nnmail-cache-accepted-message-ids)
+    ;; Don't enter Message-IDs into cache.
+    ;; Let users hack it in TARGET function.
+    (when (nnheader-functionp target)
+      (setq target (funcall target group)))
+    (unless (eq target 'delete)
+      (gnus-request-accept-article target nil nil t))))
 
 (defun nnmail-check-syntax ()
   "Check (and modify) the syntax of the message in the current buffer."

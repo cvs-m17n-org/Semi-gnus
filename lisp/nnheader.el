@@ -1,7 +1,7 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000
+;;        1997, 1998, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -34,6 +34,10 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 
+;; Requiring `gnus-util' at compile time creates a circular
+;; dependency between nnheader.el and gnus-util.el.
+;(eval-when-compile (require 'gnus-util))
+
 (require 'mail-utils)
 
 ;; Reduce the required value of `recursive-load-depth-limit' for Emacs 21.
@@ -42,6 +46,10 @@
 (require 'std11)
 
 (require 'mime)
+(eval-and-compile
+  (autoload 'gnus-sorted-intersection "gnus-range")
+  (autoload 'gnus-intersection "gnus-range")
+  (autoload 'gnus-sorted-complement "gnus-range"))
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -72,7 +80,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
   (autoload 'gnus-point-at-eol "gnus-util")
-  (autoload 'gnus-delete-line "gnus-util")
+  (autoload 'gnus-delete-line "gnus-util" nil nil 'macro)
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
@@ -1136,6 +1144,7 @@ find-file-hooks, etc.
 (defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-string-as-multibyte 'string-as-multibyte)
 
 (defun nnheader-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
@@ -1153,6 +1162,17 @@ find-file-hooks, etc.
 	  nil)
       (message "%s(Y/n) Yes" prompt)
       t)))
+
+(defun nnheader-image-load-path (&optional package)
+  (let (dir result)
+    (dolist (path load-path (nreverse result))
+      (if (file-directory-p
+	   (setq dir (concat (file-name-directory
+			      (directory-file-name path))
+			     "etc/" (or package "gnus/"))))
+	  (push dir result))
+      (push path result))))
+(defalias 'mm-image-load-path 'nnheader-image-load-path)
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

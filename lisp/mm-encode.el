@@ -1,5 +1,5 @@
 ;;; mm-encode.el --- Functions for encoding MIME things 
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -85,7 +85,8 @@ This variable should never be set directly, but bound before a call to
 (defun mm-encode-content-transfer-encoding (encoding &optional type)
   (cond
    ((eq encoding 'quoted-printable)
-    (quoted-printable-encode-region (point-min) (point-max) t))
+    (mm-with-unibyte-current-buffer-mule4
+      (quoted-printable-encode-region (point-min) (point-max) t)))
    ((eq encoding 'base64)
     (when (equal type "text/plain")
       (goto-char (point-min))
@@ -162,7 +163,10 @@ The encoding used is returned."
 	(incf n8bit)
 	(forward-char 1)
 	(skip-chars-forward "\x20-\x7f\r\n\t" limit))
-      (if (< (* 6 n8bit) (- limit (point-min)))
+      (if (or (< (* 6 n8bit) (- limit (point-min)))
+	      ;; Don't base64, say, a short line with a single
+	      ;; non-ASCII char when splitting parts by charset.
+	      (= n8bit 1))
 	  'quoted-printable
 	'base64))))
 

@@ -1,5 +1,6 @@
 ;;; gnus-agent.el --- unplugged support for Semi-gnus
-;; Copyright (C) 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -38,6 +39,9 @@
     (require 'timer))
   (require 'gnus-group))
 
+(eval-and-compile
+  (autoload 'gnus-server-update-server "gnus-srvr"))
+
 (defcustom gnus-agent-directory (nnheader-concat gnus-directory "agent/")
   "Where the Gnus agent will store its files."
   :group 'gnus-agent
@@ -74,18 +78,31 @@ If nil, only read articles will be expired."
   :group 'gnus-agent
   :type 'hook)
 
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-group-mode-hook 'gnus-xmas-agent-group-menu-add))
+
 (defcustom gnus-agent-summary-mode-hook nil
   "Hook run in Agent summary minor modes."
   :group 'gnus-agent
   :type 'hook)
+
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-summary-mode-hook 'gnus-xmas-agent-summary-menu-add))
 
 (defcustom gnus-agent-server-mode-hook nil
   "Hook run in Agent summary minor modes."
   :group 'gnus-agent
   :type 'hook)
 
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-server-mode-hook 'gnus-xmas-agent-server-menu-add))
+
 (defcustom gnus-agent-confirmation-function 'y-or-n-p
   "Function to confirm when error happens."
+  :version "21.1"
   :group 'gnus-agent
   :type 'function)
 
@@ -100,6 +117,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
 (defcustom gnus-agent-synchronize-flags 'ask
   "Indicate if flags are synchronized when you plug in.
 If this is `ask' the hook will query the user."
+  :version "21.1"
   :type '(choice (const :tag "Always" t)
 		 (const :tag "Never" nil)
 		 (const :tag "Ask" ask))
@@ -182,7 +200,9 @@ If this is `ask' the hook will query the user."
 
 (defun gnus-agent-lib-file (file)
   "The full path of the Gnus agent library FILE."
-  (concat (gnus-agent-directory) "agent.lib/" file))
+  (expand-file-name file
+		    (file-name-as-directory
+		     (expand-file-name "agent.lib" (gnus-agent-directory)))))
 
 ;;; Fetching setup functions.
 
@@ -345,9 +365,9 @@ last form in your `.gnus.el' file:
 
 \(gnus-agentize)
 
-This will modify the `gnus-before-startup-hook', `gnus-post-method',
-and `message-send-mail-function' variables, and install the Gnus
-agent minor mode in all Gnus buffers."
+This will modify the `gnus-setup-news-hook', and
+`message-send-mail-function' variables, and install the Gnus agent
+minor mode in all Gnus buffers."
   (interactive)
   (gnus-open-agent)
   (add-hook 'gnus-setup-news-hook 'gnus-agent-queue-setup)
@@ -378,7 +398,7 @@ agent minor mode in all Gnus buffers."
 
 (defun gnus-agent-insert-meta-information (type &optional method)
   "Insert meta-information into the message that says how it's to be posted.
-TYPE can be either `mail' or `news'.  If the latter METHOD can
+TYPE can be either `mail' or `news'.  If the latter, then METHOD can
 be a select method."
   (save-excursion
     (message-remove-header gnus-agent-meta-information-header)
@@ -538,6 +558,7 @@ be a select method."
     (when (member method gnus-agent-covered-methods)
       (error "Server already in the agent program"))
     (push method gnus-agent-covered-methods)
+    (gnus-server-update-server server)
     (gnus-agent-write-servers)
     (message "Entered %s into the Agent" server)))
 
@@ -551,6 +572,7 @@ be a select method."
       (error "Server not in the agent program"))
     (setq gnus-agent-covered-methods
 	  (delete method gnus-agent-covered-methods))
+    (gnus-server-update-server server)
     (gnus-agent-write-servers)
     (message "Removed %s from the agent" server)))
 
@@ -1046,7 +1068,7 @@ the actual number of articles toggled is returned."
   (setq gnus-agent-article-alist
 	(gnus-agent-read-file
 	 (if dir
-	     (concat dir ".agentview")
+	     (expand-file-name ".agentview" dir)
 	   (gnus-agent-article-name ".agentview" group)))))
 
 (defun gnus-agent-save-alist (group &optional articles state dir)
@@ -1054,7 +1076,7 @@ the actual number of articles toggled is returned."
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(pathname-coding-system nnmail-pathname-coding-system))
     (with-temp-file (if dir
-			(concat dir ".agentview")
+			(expand-file-name ".agentview" dir)
 		      (gnus-agent-article-name ".agentview" group))
       (princ (setq gnus-agent-article-alist
 		   (nconc gnus-agent-article-alist
@@ -1064,8 +1086,10 @@ the actual number of articles toggled is returned."
       (insert "\n"))))
 
 (defun gnus-agent-article-name (article group)
-  (concat (gnus-agent-directory) (gnus-agent-group-path group) "/"
-	  (if (stringp article) article (string-to-number article))))
+  (expand-file-name (if (stringp article) article (string-to-number article))
+		    (file-name-as-directory
+		     (expand-file-name (gnus-agent-group-path group)
+				       (gnus-agent-directory)))))
 
 ;;;###autoload
 (defun gnus-agent-batch-fetch ()
@@ -1101,9 +1125,10 @@ the actual number of articles toggled is returned."
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Error (%s).  Continue? " err))
 	     (error "Cannot fetch articles into the Gnus agent.")))
-	  (quit 
+	  (quit
 	   (unless (funcall gnus-agent-confirmation-function
-			    (format "Quit (%s).  Continue? " err))
+			    (format "Quit fetching session (%s).  Continue? "
+				    err))
 	     (signal 'quit "Cannot fetch articles into the Gnus agent."))))
 	(pop methods))
       (gnus-message 6 "Finished fetching articles into the Gnus agent"))))
@@ -1545,8 +1570,8 @@ The following commands are available:
 		      (if (numberp fetch-date)
 			  (>  fetch-date day)
 			;; History file is corrupted.
-			(gnus-message 
-			 5 
+			(gnus-message
+			 5
 			 (format "File %s is corrupted!"
 				 (gnus-agent-lib-file "history")))
 			(sit-for 1)

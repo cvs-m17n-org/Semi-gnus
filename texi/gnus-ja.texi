@@ -1,11 +1,11 @@
 @c \input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit-ss2; -*-
 
 @setfilename gnus-ja
-@settitle T-gnus 6.14 Manual
+@settitle T-gnus 6.15 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@dircategory Editors
+@dircategory Emacs
 @direntry
 * Gnus-ja: (gnus-ja).         The newsreader gnus (Japanese).
 @end direntry
@@ -272,7 +272,8 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995,96,97,98,99,2000 Free Software Foundation, Inc.
+Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000 
+Free Software Foundation, Inc.
 
 
 Permission is granted to copy, distribute and/or modify this document
@@ -319,7 +320,7 @@ This file documents gnus, the GNU Emacs newsreader.
 
 $B$3$N%U%!%$%k$O(B GNU Emacs $B$N%K%e!<%9%j!<%@$G$"$k(B gnus $B$K4X$9$k@bL@=q$G$9!#(B
 
-Copyright (C) 1995,96,97,98,99,2000 Free Software Foundation, Inc.
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -359,14 +360,14 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.14 Manual
+@title T-gnus 6.15 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1995,96,97,98,99,2000 Free Software Foundation, Inc.
+Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -424,7 +425,7 @@ T-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation $B$r$*BT(B
 $B$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B T-gnus 6.14 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B T-gnus 6.15 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -457,9 +458,9 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 
 @menu
 * Starting Up::        $B%K%e!<%9$r8+$D$1$k$N$K$O6lO+$,H<$&$+$bCN$l$J$$(B
-* The Group Buffer::   $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
-* The Summary Buffer:: $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
-* The Article Buffer:: $B5-;v$rI=<($7!"07$&(B
+* Group Buffer::       $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
+* Summary Buffer::     $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
+* Article Buffer::     $B5-;v$rI=<($7!"07$&(B
 * Composing Messages:: $B%a!<%k$H%K%e!<%9$rAw$k$?$a$N>pJs(B
 * Select Methods::     Gnus $B$OA4$F$N%a%C%;!<%8$r$$$m$$$m$JA*BrJ}K!$GFI$`(B
 * Scoring::            $B5-;v$KCM$r$D$1$k(B
@@ -544,7 +545,7 @@ The Summary Buffer
 * Marking Articles::           $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k(B
 * Limiting::                   $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
 * Threading::                  $B%9%l%C%I$,$I$N$h$&$K:n$i$l$k$+(B
-* Sorting::                    $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
+* Sorting the Summary Buffer:: $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
 * Asynchronous Fetching::      Gnus $B$O5-;v$r@h$K<hF@$9$k$3$H$,$G$-$k(B
 * Article Caching::            $B%-%c%C%7%e$K5-;v$rCy$a$F$*$1$k(B
 * Persistent Articles::        $B5-;v$r4|8B@Z$l>C5n$7$J$/$5$;$k(B
@@ -562,9 +563,11 @@ The Summary Buffer
 * Mail Group Commands::        $B$$$/$D$+$NL?Na$O%a!<%k%0%k!<%W$@$1$G;H$&(B
                                $B$3$H$,$G$-$k(B
 * Various Summary Stuff::      $BB>$N$I$N>l=j$K$b9g$o$J$+$C$?$b$N(B
-* Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k(B
+* Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k!"(B
+                               $B$^$?$O8=:_$N%0%k!<%W$r:F$SA*Br$9$k(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
+@c * Security::                    Decrypt and Verify.
 
 Summary Buffer Format
 
@@ -656,7 +659,6 @@ The Article Buffer
 Composing Messages
 
 * Mail::              $B%a!<%k$HJVEz(B
-* Post::              $BEj9F$H%U%)%m!<%"%C%W(B
 * Posting Server::    $B$I$N%5!<%P!<$rDL$7$FEj9F$9$k$Y$-$+(B?
 * Mail and Post::     $BF1;~$K%a!<%k$r=P$7JVEz$9$k(B
 * Archived Messages:: $BAw$C$?%a%C%;!<%8$r(B gnus $B$,Cy$a$F$*$/$H$3$m(B
@@ -667,7 +669,7 @@ Composing Messages
 
 Select Methods
 
-* The Server Buffer:: $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
+* Server Buffer::     $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
 * Getting News::      USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
 * Getting Mail::      $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
 * Browsing the Web::  $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
@@ -782,9 +784,9 @@ Gnus Unplugged
 
 Agent Categories
 
-* Category Syntax::     $BJ,N`$H$O$I$s$J$b$N$+(B
-* The Category Buffer:: $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
-* Category Variables::  $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
+* Category Syntax::    $BJ,N`$H$O$I$s$J$b$N$+(B
+* Category Buffer::    $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
+* Category Variables:: $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
 
 Agent Commands
 
@@ -896,14 +898,15 @@ History
 * Gnus Development::    Gnus $B$,3+H/$5$l$F$$$kJ}K!(B
 * Contributors::        $BBgNL$N?M!9(B
 * New Features::        Gnus $B$N?7$7$$;v$K4X$9$k<j$,$+$j(B
-* Newest Features::     $B$"$^$j$K$b?7$7$$$?$a$K$^$@=q$+$l$F$$$J$$$b$N(B
 
 New Features
 
 * ding Gnus::      $B:G=i$N?7$7$$(B Gnus $B$G$"$k(B Gnus 5.0/5.1 $B$N?7$7$$;v(B
-* September Gnus:: $B8x<0$K(B GNus 5.2/5.3 $B$H$7$FCN$i$l$F$$$k$b$N(B
+* September Gnus:: $B8x<0$K(B Gnus 5.2/5.3 $B$H$7$FCN$i$l$F$$$k$b$N(B
 * Red Gnus::       $B;0HVL\$N:G>e$N$b$N(B---Gnus 5.4/5.5
 * Quassia Gnus::   2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
+* Pterodactyl Gnus::   $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$F(B
+                       $BCN$i$l$F$$$k$b$N(B
 
 Customization
 
@@ -1117,7 +1120,7 @@ Gnus $B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 $B$r;H$&$3$H$,$G$-$^$9!#5^$$$G$$$k$H$-$K$b$T$C$?$j$G$7$g$&!#$3$NL?Na$OK\Mh(B
 $B$N%5!<%P!<$K$O@\B3$7$^$;$s!=!=$=$NBe$o$j$K!"%l%Y%k(B 1 $B$H(B 2 $B$K$"$k$9$Y$F$N(B
 $B%0%k!<%W$r3hF0>uBV$K$7$^$9(B ($B4pK\%0%k!<%W$G$J$$%0%k!<%W$O$=$NFs$D$N%l%Y%k(B
-$B$K$7$F$*$/$N$,K>$^$7$$$G$7$g$&(B)$B!#(B
+$B$K$7$F$*$/$N$,K>$^$7$$$G$7$g$&(B)$B!#(B@pxref{Group Levels} $B$b;2>H$7$F2<$5$$!#(B
 
 @node Slave Gnusae
 @section gnus $B$r%9%l!<%V$K$9$k(B
@@ -1552,7 +1555,7 @@ Gnus $B$O5/F0$7$?$H$-$d!"<B:]$K?7$7$$5-;v$,E~Ce$7$F$$$k$+$r7hDj$7$h$&$H$9(B
 $B$I$N$h$&$K$;$h!"CY$$2s@~$G$O(B @code{some} $B$O(B @code{nil} $B$h$j$bB.$/!"$=$l(B
 $B$O$b$A$m$s(B@code{t} $B$h$j$bB.$/$J$j$^$9!#(B
 
-$B$$$/$D$+$N%K%e!<%9%5!<%P!<(B ($BNc$($P(B Leafnode $B$d8E$$(B INN) $B$K$OL?(B
+$B$$$/$D$+$N%K%e!<%9%5!<%P!<(B ($BNc$($P8E$$(B Leafnode $B$d8E$$(B INN) $B$K$OL?(B
 $BNa(B @code{LIST ACTIVE group} $B$,$"$j$^$;$s!#$=$&$$$&%5!<%P!<$K(B
 $B$O(B @code{nil} $B$r$3$NJQ?t$NCM$K@_Dj$9$k$N$,!"$*$=$i$/$b$C$H$bM-8z$G$7$g$&!#(B
 
@@ -1633,7 +1636,7 @@ Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 
 @end table
 
-@node The Group Buffer
+@node Group Buffer
 @chapter $B%0%k!<%W%P%C%U%!(B
 @cindex group buffer
 
@@ -1795,6 +1798,10 @@ Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 @cindex %
 $B$=$N%0%k!<%W$K:G6a?7Ce%a!<%k$,FO$$$F$$$k>l9g(B
 $B$O(B @samp{%} (@code{gnus-new-mail-mark})$B!#(B
+
+@item p
+@samp{#} (@code{gnus-process-mark}) $B$G!"$=$N%0%k!<%W$K%W%m%;%9%^!<%/$,IU(B
+$B$$$F$$$k$3$H$r<($7$^$9!#(B
 
 @item d
 $B:G8e$K$$$D$3$N%0%k!<%W$rFI$s$@$+$r<($9J8;zNs(B (@pxref{Group Timestamp})$B!#(B
@@ -2578,6 +2585,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$m$KCM$,$"$k$b$N!"$G9=@.$5$l$^$9!#A4$F$N%Q%i%a!<%?$O$3$N7A<0$r<h$j$^$9$,!"(B
 @emph{$BNc30(B}$B$H$7$F6I=jJQ?t$N;XDj$OE@BP$G$O$J$/DL>o$N%j%9%H$K$J$j$^$9!#(B
 
+$B$$$/$D$+$N%Q%i%a!<%?$OBP1~$9$k%+%9%?%^%$%:2DG=$JJQ?t$r;}$C$F$$$^$9!#$=$l(B
+$B$i$O@55,I=8=$HCM$NO"A[%j%9%H$G$9!#(B
+
 $B0J2<$OMxMQ2DG=$J%0%k!<%W%Q%i%a!<%?$G$9(B:
 
 @table @code
@@ -2602,6 +2612,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$7$FD>@\Ej9F$9$k$3$H$OIT2DG=$G!"Be$o$j$K$=$N%a!<%j%s%0%j%9%H$K%a!<%k$rAw(B
 $B?.$7$J$1$l$P$J$j$^$;$s!#(B
 
+@code{gnus-parameter-to-address-alist} $B$b;2>H$7$F2<$5$$!#(B
+
 @item to-list
 @cindex to-list
 $B$=$N%0%k!<%W$G(B @kbd{a} $B$r2!$7$?$H$-$K;HMQ$5$l$k%"%I%l%9!#(B
@@ -2623,6 +2635,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 
 $B$b$7(B @kbd{a} $B%3%^%s%I$r%a!<%k%0%k!<%W$G<B9T$7$?$H$-!"(B@code{to-list} $B%0%k!<(B
 $B%W%Q%i%a!<%?$,$J$1$l$P!"Aw?.;~$K<+F0E*$KIU2C$5$l$^$9!#(B
+
+@code{gnus-parameter-to-list-alist} $B$b;2>H$7$F2<$5$$!#(B
 
 @item visible
 @cindex visible
@@ -2664,12 +2678,16 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$N4{FI5-;v$O;~8B>C5n$5$l$k$h$&$K0u$rIU$1$i$l$^$9!#B>$NJ}K!$O!"(B
 @pxref{Expiring Mail}$B!#(B
 
+@code{gnus-auto-expirable-newsgroups} $B$b;2>H$7$F2<$5$$!#(B
+
 @item total-expire
 @cindex total-expire
 $B%0%k!<%W%Q%i%a!<%?$K(B @code{(total-expire . t)} $B$N$h$&$JMWAG$,$"$l$P!"4{(B
 $BFI5-;v$O!";~8B>C5n$N0u$,$D$$$F$$$J$/$H$bA4$F;~8B>C5n=hM}$r;\$5$l$^$9!#Cm(B
 $B0U$7$F;HMQ$7$F$/$@$5$$!#L$FI5-;v!"0uIU$-5-;v!"J]N15-;v$O;~8B>C5n$5$l$^$;(B
 $B$s!#(B
+
+@code{gnus-total-expirable-newsgroups} $B$b;2>H$7$F2<$5$$!#(B
 
 @item expiry-wait
 @cindex expiry-wait
@@ -2714,26 +2732,21 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$9$kG$0U$N%3%a%s%H$G$9!#$3$l$O8=:_$N(B gnus $B$G$OL5;k$5$l$^$9$,!"FCDj$N%0%k!<(B
 $B%W$KBP$9$k>pJs$r3JG<$9$k>l=j$rDs6!$7$^$9!#(B
 
-@c FIXTGNUS Is this true?
-@c  @item charset
-@c  Elements that look like @code{(charset . iso-8859-1)} will make
-@c  @code{iso-8859-1} the default charset; that is, the charset that will be
-@c  used for all articles that do not specify a charset.
+@ignore
+@item charset
+Elements that look like @code{(charset . iso-8859-1)} will make
+@code{iso-8859-1} the default charset; that is, the charset that will be
+used for all articles that do not specify a charset.
 
-@item (@var{variable} @var{form})
-$B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
-$B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
-$B$$$?$/$J$$$H$-$O!"$=$N%0%k!<%W$K%0%k!<%W%Q%i%a!<%?(B
-$B$K(B @code{(gnus-show-threads nil)} $B$H=q$1$^$9!#(B
-@code{gnus-show-threads} $B$O!"$=$N35N,%P%C%U%!$NCf$N%m!<%+%kJQ?t$K$J$j!"(B
-form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
+See also @code{gnus-group-charset-alist}.
 
-$B$3$l$O$b$7I,MW$G$"$l$P!"%0%k!<%WKh$N%U%C%/4X?t$H$7$F$b;HMQ$G$-$^$9!#$b$7(B
-$B$"$k%0%k!<%W$KF~$C$?$H$-$K%S!<%W2;$rLD$i$7$?$1$l$P!"$=$N%0%k!<%W$N%Q%i%a!<(B
-$B%?$K(B @code{(dummy-variable (ding))} $B$_$?$$$J$b$N$r=q$$$F$*$/$3$H$b$G$-$^(B
-$B$9!#(B@code{dummy-variable} $B$H$$$&JQ?t$K(B @code{(ding)} $B$NI>2A7k2L$,@_Dj$5(B
-$B$l$^$9$,!"$^$"!"C/$b5$$K$7$J$$$G$7$g(B?
+@item ignored-charsets
+Elements that look like @code{(ignored-charsets x-known iso-8859-1)}
+will make @code{iso-8859-1} and @code{x-unknown} ignored; that is, the
+default charset will be used for decoding articles.
 
+See also @code{gnus-group-ignored-charsets-alist}.
+@end ignore
 @item posting-style
 $B$3$N%0%k!<%W$NDI2C$NEj9FMM<0$r$3$3$N$_$KJ]B8$9$k$3$H$,$G$-$^(B
 $B$9(B (@pxref{Posting Styles})$B!#=q<0$O(B @code{gnus-posting-style} $BO"A[%j%9%H(B
@@ -2751,10 +2764,32 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
   (signature "Funky Signature"))
 @end example
 
+@item banner
+@code{(banner . "regex")} $B$N$h$&$J9`L\$O!"5-;v$N$9$Y$F$N>l=j$G@55,I=(B
+$B8=(B "regex" $B$K%^%C%A$9$k$b$N$r:o=|$7$^$9!#(B"regex" $B$NBe$o$j$K%7%s%\(B
+$B%k(B @code{signature} ($B:G8e$N=pL>$r:o(B
+$B=|(B) $B$dO"A[%j%9%H(B @code{gnus-article-banner-alist} $B$N3FMWAG$r;H$&$3$H$b$G(B
+$B$-$^$9!#(B
+
+@item (@var{variable} @var{form})
+$B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
+$B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
+$B$$$?$/$J$$$H$-$O!"$=$N%0%k!<%W$K%0%k!<%W%Q%i%a!<%?(B
+$B$K(B @code{(gnus-show-threads nil)} $B$H=q$1$^$9!#(B
+@code{gnus-show-threads} $B$O!"$=$N35N,%P%C%U%!$NCf$N%m!<%+%kJQ?t$K$J$j!"(B
+form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
+
+$B$3$l$O$b$7I,MW$G$"$l$P!"%0%k!<%WKh$N%U%C%/4X?t$H$7$F$b;HMQ$G$-$^$9!#$b$7(B
+$B$"$k%0%k!<%W$KF~$C$?$H$-$K%S!<%W2;$rLD$i$7$?$1$l$P!"$=$N%0%k!<%W$N%Q%i%a!<(B
+$B%?$K(B @code{(dummy-variable (ding))} $B$_$?$$$J$b$N$r=q$$$F$*$/$3$H$b$G$-$^(B
+$B$9!#(B@code{dummy-variable} $B$H$$$&JQ?t$K(B @code{(ding)} $B$NI>2A7k2L$,@_Dj$5(B
+$B$l$^$9$,!"$^$"!"C/$b5$$K$7$J$$$G$7$g(B?
+
 @end table
 
-$B%0%k!<%W%Q%i%a!<%?$N=$@5$K$O(B @kbd{G p} $BL?Na$r;H$C$F$/$@$5$$!#%H%T%C%/%Q(B
-$B%i%a!<%?$K$D$$$FFI$s$G$_$k$3$H$bLLGr$$$G$7$g(B
+$B%0%k!<%W%Q%i%a!<%?$N=$@5$K$O(B @kbd{G p} $B$+(B @kbd{G c} $BL?Na$r;H$C$F$/$@$5(B
+$B$$(B (@kbd{G p} $B$O(B Lisp $B%Y!<%9$N!"(B@kbd{G c} $B$O(B Custom $B$U$&$N%$%s%?!<%U%'!<(B
+$B%9$rDs6!$7$^$9(B)$B!#%H%T%C%/%Q%i%a!<%?$K$D$$$FFI$s$G$_$k$3$H$bLLGr$$$G$7$g(B
 $B$&(B (@pxref{Topic Parameters})$B!#(B
 
 @node Listing Groups
@@ -2851,6 +2886,23 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @findex gnus-group-list-dormant
 $BJ]N15-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B (@code{gnus-group-list-dormant})$B!#(B
 
+@item A /
+@kindex A / (Group)
+@findex gnus-group-list-limit
+$B8=:_$NA*Br$5$l$?HO0O$K8BDj$7$?%0%k!<%W$rI=<($9(B
+$B$k(B (@code{gnus-group-list-limit})$B!#(B
+
+@item A f
+@kindex A f (Group)
+@findex gnus-group-list-flush
+$B8=:_$NA*Br$5$l$?%0%k!<%W$r=q$-=P$9(B (@code{gnus-group-list-flush})$B!#(B
+
+@item A p
+@kindex A p (Group)
+@findex gnus-group-list-plus
+$B8=:_$NA*Br$5$l$?%0%k!<%W$r2C$($?%0%k!<%W$rI=<($9(B
+$B$k(B (@code{gnus-group-list-plus})$B!#(B
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -2909,6 +2961,10 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @item gnus-group-sort-by-method
 @findex gnus-group-sort-by-method
 $BA*BrJ}K!$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^$9!#(B
+
+@item gnus-group-sort-by-server
+@findex gnus-group-sort-by-server
+$B%5!<%P!<L>$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^$9!#(B
 
 @end table
 
@@ -3004,6 +3060,9 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 $B$9(B (@code{gnus-group-sort-selected-groups-by-method})$B!#(B
 
 @end table
+
+$B:G8e$K!"(B@kbd{C-k} $B$H(B @kbd{C-y} $B$r;H$C$F!"<jF0$G%0%k!<%W$r$"$A$3$A$K0\F0(B
+$B$G$-$k$3$H$b$*K:$l$J$/!#(B
 
 @node Group Maintenance
 @section $B%0%k!<%W$N4IM}(B
@@ -3590,7 +3649,7 @@ Gnus
 @kindex ^ (Group)
 @findex gnus-group-enter-server-mode
 $B%5!<%P%P%C%U%!%b!<%I$KF~$k(B (@code{gnus-group-enter-server-mode})$B!#(B
-@xref{The Server Buffer}$B!#(B
+@xref{Server Buffer}$B!#(B
 
 @item a
 @kindex a (Group)
@@ -3837,7 +3896,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 
 @end table
 
-@node The Summary Buffer
+@node Summary Buffer
 @chapter $B35N,%P%C%U%!(B
 @cindex summary buffer
 
@@ -3858,7 +3917,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 * Marking Articles::           $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k(B
 * Limiting::                   $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
 * Threading::                  $B%9%l%C%I$,$I$N$h$&$K:n$i$l$k$+(B
-* Sorting::                    $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
+* Sorting the Summary Buffer:: $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
 * Asynchronous Fetching::      Gnus $B$O5-;v$r@h$K<hF@$9$k$3$H$,$G$-$k(B
 * Article Caching::            $B%-%c%C%7%e$K5-;v$rCy$a$F$*$1$k(B
 * Persistent Articles::        $B5-;v$r4|8B@Z$l>C5n$7$J$/$5$;$k(B
@@ -3879,6 +3938,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 * Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
+@c * Security::                    Decrypt and Verify.
 @end menu
 
 @node Summary Buffer Format
@@ -4095,7 +4155,7 @@ gnus $B$K!"(B@code{gnus-summary-line-format} $BJQ?t$N(B @code{%n} $B;EMM(B
 $B$r(B @code{%f} $B;EMM$KJQ99$9$k$3$H$G!"%G!<%?$rI=<($9$k$h$&$K;X<($9$kI,MW$,(B
 $B$"$j$^$9!#(B
 
-$BMWLs$9$k$H!"IaDL$O0J2<$N$h$&$J$3$H$r$9$k$3$H$K$J$j$^$9(B:
+$BMWLs$9$k$H!"IaDL$O0J2<$N$h$&$J$b$N$r(B @file{~/.gnus} $B$KCV$/$3$H$K$J$j$^$9(B:
 
 @lisp
 (setq gnus-extra-headers
@@ -4227,14 +4287,6 @@ Gnus $B%P!<%8%g%s!#(B
 @findex gnus-summary-prev-unread-subject
 $B35N,9T$NA0$NL$FI5-;v$K0\$k(B (@code{gnus-summary-prev-unread-subject})$B!#(B
 
-@item G j
-@item j
-@kindex j ($B35N,(B)
-@kindex G j ($B35N,(B)
-@findex gnus-summary-goto-article
-$B5-;vHV9f$+(B @code{Message-ID} $B$r?R$M!"$=$l$+$i$=$N5-;v$K9T$/!#(B
-(@code{gnus-summary-goto-article})$B!#(B
-
 @item G g
 @kindex G g ($B35N,(B)
 @findex gnus-summary-goto-subject
@@ -4303,6 +4355,9 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW(B
 
 $B0J2<$N0\F0%3%^%s%I$O$I$l$b?tCM@\F,0z?t$r<u$1IU$1$:!"5-;v$rA*Br$7!"I=<($7(B
 $B$^$9!#(B
+
+$B?7$7$$5-;v$r<h$j9~$s$@$j!"%0%k!<%W$r:FI=<($7$?$$$H$-$O(B @ref{Exiting the
+Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 
 @table @kbd
 @item SPACE
@@ -4380,6 +4435,14 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW(B
 $B;v$rMzNr$+$iA*$S=P$9$3$H$,$G$-$kE@$G$9!#2?$i$+$N$3$l$K4X78$7$?$3$H(B
 $B$O(B ($B$b$7$3$l$i$NL?Na$r$?$/$5$s;H$&$N$G$"$l$P(B)$B!"(B
 @pxref{Article Backlog} $B$r;2>H$7$F$/$@$5$$!#(B
+
+@item G j
+@item j
+@kindex j ($B35N,(B)
+@kindex G j ($B35N,(B)
+@findex gnus-summary-goto-article
+$B5-;vHV9f$+(B @code{Message-ID} $B$r?R$M!"$=$l$+$i$=$N5-;v$K9T$/!#(B
+(@code{gnus-summary-goto-article})$B!#(B
 @end table
 
 @node Choosing Variables
@@ -4547,6 +4610,22 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW(B
 $B8=:_$N5-;v$KK\5-;v$r4^$s$@9-$$JVEz$N%a!<%k$rAw$j$^(B
 $B$9(B (@code{gnus-summary-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;%9(B/$B@\(B
 $BF,0z?t$N=,47$r;H$$$^$9!#(B
+
+@item S v
+@kindex S v (Summary)
+@findex gnus-summary-very-wide-reply
+$B8=:_$N5-;v$r=q$$$??M$KBP$7$F!"Hs>o$K9-$$JVEz(B (very wide reply) $B$r$7$^(B
+$B$9(B (@code{gnus-summary-very-wide-reply})$B!#(B@dfn{$BHs>o$K9-$$JVEz(B} $B$H$O!"%W(B
+$B%m%;%9(B/$B@\F,0z?t$G;XDj$5$l$?$9$Y$F$N5-;v$N%X%C%@!<$N(B @code{To},
+@code{From}, ($B$b$7$/$O(B @code{Reply-to}) $B$H(B @code{Cc}) $B$N$9$Y$F$N?M$KJVEz(B
+$B$r$9$k$3$H$G$9!#$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
+
+@item S V
+@kindex S V (Summary)
+@findex gnus-summary-very-wide-reply-with-original
+$B8=:_$N5-;v$KK\5-;v$r4^$s$@Hs>o$K9-$$JVEz$N%a!<%k$rAw$j$^(B
+$B$9(B (@code{gnus-summary-very-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;(B
+$B%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
 
 @item S o m
 @itemx C-c C-f
@@ -4811,8 +4890,10 @@ Gnus $B$O!"<h$j>C$9$H$-$K!X8=:_!Y$NA*BrJ}K!$r;H$$$^$9!#I8=`$NEj9FJ}K!$r;H(B
 @dfn{$B2D;k5-;v(B}$B$H$O!">o$K2D;k>uBV$G$"$k5-;v$N$3$H$G$9!#$*$b$7$m$$$H;W$&5-(B
 $B;v$,$"$C$?>l9g$d!"C1$KFI$`$N$r@h$K1d$P$7$?$$$H$-$d!"8e$GJVEz$r$7$?$$$H$-(B
 $B$K!"IaDL$O2D;k0u$rIU$1$^$9!#$7$+$7!"5-;v$O4|8B@Z$l>C5n$5$l$k$3$H$b$"$j$^(B
-$B$9$N$G!"1J1s$K5-;v$rJ]B8$7$F$*$-$?$$>l9g$O!"$=$N5-;v$r1JB3$K$9$kI,MW$,$"(B
-$B$j$^$9(B (@pxref{Persistent Articles})$B!#(B
+$B$9(B ($B%K%e!<%9%5!<%P!<$N%=%U%H%&%'%"$,%K%e!<%9%5!<%P!<>e$N5-;v$r>C5n!"(B
+gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*(B
+$B$-$?$$>l9g$O!"$=$N5-;v$r1JB3$K$9$kI,MW$,$"$j$^(B
+$B$9(B (@pxref{Persistent Articles})$B!#(B
 
 @item ?
 @vindex gnus-dormant-mark
@@ -4927,6 +5008,10 @@ Gnus $B$O!"<h$j>C$9$H$-$K!X8=:_!Y$NA*BrJ}K!$r;H$$$^$9!#I8=`$NEj9FJ}K!$r;H(B
 @vindex gnus-replied-mark
 $BJVEz$r$7$?$+!"%U%)%m!<%"%C%W$r$7$?(B ($BNc$($P!"Ez$($?(B) $B5-;v$O$9$Y$FFs7eL\(B
 $B$K(B @samp{A} $B$N0u$,$D$-$^$9(B (@code{gnus-replied-mark})$B!#(B
+
+@vindex gnus-forwarded-mark
+$BE>Aw$7$?5-;v$O$9$Y$FFs7eL\$K(B @samp{O} $B$N0u$,$D$-$^(B
+$B$9(B (@code{gnus-forwarded-mark})$B!#(B
 
 @item
 @vindex gnus-cached-mark
@@ -5670,8 +5755,8 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @item gnus-thread-ignore-subject
 @vindex gnus-thread-ignore-subject
 $B;~!9!"C/$+$,%9%l%C%I$N??Cf$GI=Bj$rJQ99$9$k$3$H$,$"$j$^$9!#$b$7$3$NJQ?t(B
-$B$,(B @code{nil} $B$G$J$$$H!"I=Bj$NJQ99$OL5;k$5$l$^$9!#$b$7(B @code{nil} $B$@$H!"(B
-$B$3$l$,%G%#%U%)%k%H$G$9$,!"I=Bj$NJQ99$r$9$k$HJL$N%9%l%C%I$K$J$j$^$9!#(B
+$B$,(B @code{nil} $B$G$J$$$H!"$3$l$,%G%#%U%)%k%H$G$9$,!"I=Bj$NJQ99$OL5;k$5$l$^(B
+$B$9!#$b$7(B @code{nil} $B$@$H!"I=Bj$NJQ99$r$9$k$HJL$N%9%l%C%I$K$J$j$^$9!#(B
 
 @item gnus-thread-indent-level
 @vindex gnus-thread-indent-level
@@ -5697,7 +5782,10 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 
 @item gnus-parse-headers-hook
 @vindex gnus-parse-headers-hook
-$B$9$Y$F$N%X%C%@!<$r2r@O$9$kA0$K<B9T$5$l$k%U%C%/$G$9!#(B
+$B$9$Y$F$N%X%C%@!<$r2r@O$9$kA0$K<B9T$5$l$k%U%C%/$G$9!#%G%#%U%)%k%H$NCM(B
+$B$O(B @code{(gnus-set-summary-default-charset)} $B$G$9!#$3$l$OJQ(B
+$B?t(B @code{gnus-newsgroup-default-charset-alist} $B$G;XDj$5$l$F$$$kCM$+$i35(B
+$BN,%P%C%U%!$N(B @code{default-mime-charset} $B$r@_Dj$7$^$9!#(B
 
 @item gnus-alter-header-function
 @vindex gnus-alter-header-function
@@ -5857,7 +5945,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B9T$7$F$$$k$H$-$KI=Bj$OL5;k$5$l$^$9!#$3$NJQ?t$,(B @code{fuzzy} $B$G$"$k$H!"$"(B
 $B$$$^$$$KEy$7$$I=Bj$r;}$D5-;v$@$1$,4^$^$l$^$9(B (@pxref{Fuzzy Matching})$B!#(B
 
-@node Sorting
+@node Sorting the Summary Buffer
 @section $BJB$SBX$((B
 
 @findex gnus-thread-sort-by-total-score
@@ -6340,6 +6428,10 @@ MH $B%i%$%V%i%j!<$N(B @code{rcvstore} $B$rMQ$$$k;v$K$h$C$F5-;v$r(B MH $B%U%
 @item gnus-plain-save-name
 @findex gnus-plain-save-name
 @file{~/News/alt.andera-dworkin} $B$N$h$&$J%U%!%$%kL>!#(B
+
+@item gnus-sender-save-name
+@findex gnus-sender-save-name
+@file{~/News/larsi} $B$N$h$&$J%U%!%$%kL>!#(B
 @end table
 
 @vindex gnus-split-methods
@@ -6874,10 +6966,6 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 $B5-;v$NBg$-$5$,$3$NJQ?t(B ($B%G%#%U%)%k%H$G$O(B 25000) $B$h$jBg$-$$5-;v$O!"0zMQ%O(B
 $B%$%i%$%H$O9T$o$l$^$;$s!#(B
 
-@item gnus-cite-prefix-regexp
-@vindex gnus-cite-prefix-regexp
-$B$"$k9T$G!"$"$j$&$k:GD9$N0zMQ@\F,8l$K%^%C%A$9$k@55,I=8=$G$9!#(B
-
 @item gnus-cite-max-prefix
 @vindex gnus-cite-max-prefix
 $B0zMQ@\F,8l$N:GBg$ND9$5$G$9(B ($B%G%#%U%)%k%H$G$O(B 20 $B$G$9(B)$B!#(B
@@ -7077,8 +7165,8 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 @findex gnus-article-strip-banner
 @cindex banner
 @cindex OneList
-@cindex stripping advertisments
-@cindex advertisments
+@cindex stripping advertisements
+@cindex advertisements
 @code{banner} $B%0%k!<%W%Q%i%a!<%?$G;XDj$5$l$?%P%J!<$r<h$j=|$-$^(B
 $B$9(B (@code{gnus-article-strip-banner})$B!#$3$l$O<g$K!"$$$/$D$+$N%a!<%j%s%0%j%9(B
 $B%H$d;J2q<TIU$-$N%0%k!<%W$,A4$F$N%0%k!<%W$KDI2C$9$k!"15F+$7$$%P%J!<$H(B/$B$b(B
@@ -7175,7 +7263,14 @@ Gnus $B$O$I$3$N0zMQJ8$,1#$5$l$F$$$k$+$r<($9$?$a$K%\%?%s$rIU$12C$(!"J8>O$N(B
 $B$^$9$,!"IaDL$O$b$C$HNI$/8+$($k2?$+$KMn$ACe$-$^$9!#$=$l$K$b$C$H$-$l$$$G$9!"(B
 $B$?$V$s!#(B
 
+gnus $B$,5-;v$rI=<($9$k4{Dj$N$d$jJ}$rJQ$($?$$$H$-(B
+$B$O(B @xref{Customizing Articles} $B$r;2>H$7$F2<$5$$!#(B
+
 @table @kbd
+
+@item C-u g
+$B$3$l$O5-;v@vBu$G$O$J$/$F!"$=$N5U$G$9!#$3$l$r%?%$%W$9$k$H!"%G%#%9%/$d%5!<(B
+$B%P!<$K$"$k$,$^$^$N5-;v$,8+$($^$9!#(B
 
 @item W l
 @kindex W l ($B35N,(B)
@@ -7302,6 +7397,7 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 \include{xface}
 @end iflatex
 @end iftex
+@c @anchor{X-Face}
 $B$9$Y$F$N(B X-Face $BMs$rC5$7$FI=<($7$^$9(B(@code{gnus-article-display-x-face})$B!#(B
 $B$3$NL?Na$OJQ?t(B @code{gnus-article-x-face-command} $B$K$h$C$FM?$($i$l$?4X?t(B
 $B$K$h$C$F<B9T$5$l$^$9!#$3$NJQ?t$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B(B
@@ -7493,6 +7589,12 @@ UT ($BJLL>(B GMT, ZULU) $B$GF|IU$rI=<($7$^$9(B (@code{gnus-article-date-ut})
 @findex gnus-article-date-local
 $BF|IU$r$=$NCO0h$N;~4VBS$GI=<($7$^$9(B (@code{gnus-article-date-local})$B!#(B
 
+@item W T p
+@kindex W T p (Summary)
+@findex gnus-article-date-english
+$BF|IU$r1Q8l$GH/2;$G$-$k7A<0$GI=<($7$^(B
+$B$9(B (@code{gnus-article-date-english})$B!#(B
+
 @item W T s
 @kindex W T s ($B35N,(B)
 @vindex gnus-article-time-format
@@ -7677,6 +7779,11 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @kindex C-c C-s C-i ($B35N,(B)
 @findex gnus-summary-sort-by-score
 $B%9%3%"$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-score})$B!#(B
+
+@item C-c C-s C-o
+@kindex C-c C-s C-o (Summary)
+@findex gnus-summary-sort-by-original
+$B%G%#%U%)%k%H$NJ}K!$GJB$SBX$($^$9(B (@code{gnus-summary-sort-by-original})$B!#(B
 @end table
 
 $B$3$l$i$N4X?t$O%9%l%C%I$r;H$C$F$$$k$H$-$H;H$C$F$$$J$$$H$-$NN>J}$GF0:n$7$^(B
@@ -8616,7 +8723,37 @@ Gnus $B$K$$$D$G$b@5$7$$(B @code{Xref} $B$r<hF@$9$k$h$&$K$5$;$?$$$N$G$"$l$P!"
 @code{gnus-save-duplicate-list} $B$r(B @code{nil} $B$K@_Dj$9$k$Y$-$G$"$k$H$$$&(B
 $B;v$K$J$j$^$9!#$&!<$`!#;d$O$"$J$?$,$I$&$9$k$+$KG$$;$?$$!"$H;W$$$^$9!#(B
 
-@node The Article Buffer
+@ignore
+@node Security
+@section Security
+
+Gnus is able to verify PGP or S/MIME signed messages or decrypt PGP
+encrypted messages.
+
+@enumerate
+@item 
+To verify or decrypt PGP messages, you have to install mailcrypt or
+gpg.el.
+
+@end enumerate
+
+@table @code
+@item mm-verify-option
+@vindex mm-verify-option
+Option of verifying signed parts.  @code{never}, not verify;
+@code{always}, always verify; @code{known}, only verify known
+protocols. Otherwise, ask user.
+
+@item mm-decrypt-option
+@vindex mm-decrypt-option
+Option of decrypting encrypted parts.  @code{never}, no decryption;
+@code{always}, always decrypt @code{known}, only decrypt known
+protocols. Otherwise, ask user.
+
+@end table
+@end ignore
+
+@node Article Buffer
 @chapter $B5-;v%P%C%U%!(B
 @cindex article buffer
 
@@ -8709,25 +8846,28 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T
 
 @findex gnus-article-hide-boring-headers
 @vindex gnus-boring-article-headers
-@code{gnus-article-hide-boring-headers} $B$r(B @code{head} $B$K@_Dj$9$k$3$H$K(B
-$B$h$C$F!"$b$C$H$D$^$i$J$$%X%C%@!<$r1#$9$3$H$,$G$-$^$9!#$3$N4X?t$,2?$r$9$k(B
-$B$+$O(B @code{gnus-boring-article-headers} $BJQ?t$K0MB8$7$^$9!#$3$NJQ?t$O%j%9(B
-$B%H$G$9$,!"$3$N%j%9%H$K$O<B:]$N%X%C%@!<$NL>A0$,F~$k$N$G$O$"$j$^$;$s!#Be$o(B
-$B$j$K(B gnus $B$,%A%'%C%/$7$F;k3&$+$i>C$75n$k$?$a$N$5$^$6$^$J!V$D$^$i$J$$>r7o!W(B
+@code{gnus-article-hide-boring-headers} $B$r(B@code{head} $B$K@_Dj$9$k$3$H$K$h$C(B
+$B$F!"$b$C$H$D$^$i$J$$%X%C%@!<$r1#$9$3$H$,$G$-$^$9!#$3$N4X?t$,2?$r$9$k$+(B
+$B$O(B @code{gnus-boring-article-headers} $BJQ?t$K0MB8$7$^$9!#$3$NJQ?t$O%j%9%H(B
+$B$G$9$,!"$3$N%j%9%H$K$O<B:]$N%X%C%@!<$NL>A0$,F~$k$N$G$O$"$j$^$;$s!#Be$o$j(B
+$B$K(B gnus $B$,%A%'%C%/$7$F;k3&$+$i>C$75n$k$?$a$N$5$^$6$^$J!V$D$^$i$J$$>r7o!W(B
 @dfn{boring conditions} $B$N%j%9%H$r;XDj$7$^$9!#(B
 
 $B$3$N>r7o$K$O0J2<$N$h$&$J$b$N$,$"$j$^$9!#(B
 @table @code
 @item empty
 $B6u$N%X%C%@!<$rA4$F>C5n$7$^$9!#(B
-@item newsgroups
-@code{Newsgroups} $BMs$,8=:_$N%0%k!<%WL>$7$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item followup-to
 @code{Followup-To} $BMs$,(B @code{Newsgroups} $BMs$HF10l$G$"$k>l9g$K$O>C5n$7$^(B
 $B$9!#(B
 @item reply-to
 @code{Reply-To} $BMs$,(B @code{From} $BMs$HF1$8%"%I%l%9$r<($7$F$$$k>l9g$K$O>C(B
 $B5n$7$^$9!#(B
+@item newsgroups
+@code{Newsgroups} $BMs$,8=:_$N%0%k!<%WL>$7$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
+@item to-address
+@code{To} $BMs$,8=:_$N%0%k!<%W$N(B @code{to-address} $B%Q%i%a!<%?$HF1$8$b$N$7(B
+$B$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item date
 $B$=$N5-;v$,2a5n;0F|0JFb$N$b$N$G$"$l$P!"(B@code{Date} $BMs$r>C5n$7$^$9!#(B
 @item long-to
@@ -8736,7 +8876,7 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T
 @code{To} $BMs$,0l$D$h$j$bB?$1$l$P!"$=$l$i$rA4$F>C5n$7$^$9!#(B
 @end table
 
-$B>e5-$N:G=i$N;M$D$NMWAG$rF~$l$?$1$l$P!"$3$s$JIw$K$J$j$^$9!#(B
+$B$3$l$i$N;0$D$NMWAG$rF~$l$?$1$l$P!"$3$s$JIw$K$J$j$^$9!#(B
 
 @lisp
 (setq gnus-boring-article-headers
@@ -8877,6 +9017,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-hide-boring-headers (head)
 @item gnus-treat-hide-signature (t, last)
 @item gnus-treat-hide-citation (t, integer)
+@item gnus-treat-hide-citation-maybe (t, integer)
 @item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-pem (t, last, integer)
 @item gnus-treat-highlight-headers (head)
@@ -8884,8 +9025,11 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-highlight-signature (t, last, integer)
 @item gnus-treat-date-ut (head)
 @item gnus-treat-date-local (head)
+@item gnus-treat-date-english (head)
 @item gnus-treat-date-lapsed (head)
 @item gnus-treat-date-original (head)
+@item gnus-treat-date-iso8601 (head)
+@item gnus-treat-date-user-defined (head)
 @item gnus-treat-strip-headers-in-body (t, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-strip-leading-blank-lines (t, integer)
@@ -9040,6 +9184,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @cindex reply
 @cindex followup
 @cindex post
+@c @cindex using gpg
 
 @kindex C-c C-c ($BEj9F(B)
 $BA4$F$NEj9F$H%a!<%k$NL?Na$O!"(B@kbd{C-c C-c} $B$r2!$9;v$K$h$C$F!"5-;v$rAw?.$9(B
@@ -9049,13 +9194,13 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 @menu
 * Mail::              $B%a!<%k$HJVEz(B
-* Post::              $BEj9F$H%U%)%m!<%"%C%W(B
 * Posting Server::    $B$I$N%5!<%P!<$rDL$7$FEj9F$9$k$Y$-$+(B?
 * Mail and Post::     $BF1;~$K%a!<%k$r=P$7JVEz$9$k(B
 * Archived Messages:: $BAw$C$?%a%C%;!<%8$r(B gnus $B$,Cy$a$F$*$/$H$3$m(B
 * Posting Styles::    $B$"$J$?$,C/$G$"$k$+$r;XDj$9$k$h$j4JC1$JJ}K!(B
 * Drafts::            $B%a%C%;!<%8$N1d4|$H5qH]$5$l$?%a%C%;!<%8(B
 * Rejected Articles:: $B%5!<%P!<$,$"$J$?$N5-;v$r9%$-$G$J$$$H$-$K2?$,5/$3$k(B?
+@c * Using GPG::         How to use GPG and MML to sign and encrypt messages
 @end menu
 
 $BEj9F$9$k$Y$-$G$J$+$C$?5-;v$r:o=|$9$k$?$a$N>pJs$O(B @pxref{Canceling and
@@ -9077,36 +9222,6 @@ Superseding} $B$r;2>H$7$F$/$@$5$$!#(B
 @code{nil} $B$G$J$1$l$P!"(B@kbd{a} $B$r$7$?$H$-$K!"(B@code{to-list} $B%0%k!<%W%Q%i(B
 $B%a!<%?$r$=$l$N$J$$%a!<%k%0%k!<%W$KIU$12C$($^$9!#(B
 
-@c @item message-send-mail-partially-limit
-@c @vindex message-send-mail-partially-limit
-@c The limitation of messages sent as message/partial.
-@c The lower bound of message size in characters, beyond which the message
-@c should be sent in several parts. If it is nil, the size is unlimited.
-
-@end table
-
-@node Post
-@section $BEj9F(B
-
-$B%K%e!<%95-;v:n@.$N$?$a$NJQ?t(B:
-
-@table @code
-@item gnus-sent-message-ids-file
-@vindex gnus-sent-message-ids-file
-Gnus $B$OAw?.$7$?A4$F$N%a!<%k$N(B @code{Message-ID} $BMzNr%U%!%$(B
-$B%k(B (history file) $B$rJ]B8$7$^$9!#$b$7%a!<%k$r4{$KAw$C$?;v$,H/8+$5$l$?$J$i!"(B
-$BMxMQ<T$K%a!<%k$r:FAw$9$k$+$I$&$+$r?R$M$^$9!#(B($B$3$l$O<g$KF1$8%Q%1%C%H$rJ#(B
-$B?t2sAw$k798~$N$"$k(B @sc{soup} $B%Q%1%C%H$d!"$=$l$K;w$?$h$&$J$b$N$r07$C$F$$(B
-$B$k$H$-$KLr$KN)$A$^$9!#(B) $B$3$NJQ?t$O$3$NMzNr%U%!%$%k$,$I$3$K$"$k$+$r;XDj$7(B
-$B$^$9!#%G%#%U%)%k%H$G$O(B @file{~/News/Sent-Message-IDs} $B$G$9!#(BGnus $B$,MzNr(B
-$B%U%!%$%k$rJ];}$9$k;v$rK>$^$J$$$N$G$"$l$P!"$3$NJQ?t$r(B @code{nil} $B$K@_Dj$9(B
-$B$k;v$,$G$-$^$9!#(B
-
-@item gnus-sent-message-ids-length
-@vindex gnus-sent-messages-ids-length
-$B$3$NJQ?t$O$I$l$/$i$$B?$/$N(B @code{Message-ID} $B$rMzNr%U%!%$%k$KJ];}$9$k$+(B
-$B$r;XDj$7$^$9!#%G%#%U%)%k%H$G$O(B 1000 $B$G$9!#(B
-
 @end table
 
 @node Posting Server
@@ -9119,11 +9234,13 @@ Gnus $B$OAw?.$7$?A4$F$N%a!<%k$N(B @code{Message-ID} $BMzNr%U%!%$(B
 
 @vindex gnus-post-method
 
-$B$=$l$OHs>o$KJ#;($K$J$jF@$^$9!#IaDL$O!"(Bgnus $B$OF1$84pK\%5!<%P!<$r;HMQ$7$^(B
-$B$9!#$7$+$7!#$"$J$?$N4pK\%5!<%P!<$,Ej9F$r5v2D$;$:!"FI$`$3$H$N$_$r5v2D$7$F(B
-$B$$$k$N$J$i$P!"$*$=$i$/$"$J$?$N(B ($BHs>o$KCNE*$G$H$s$G$b$J$/6=L#?<$$(B) $B5-;v$r(B
-$BEj9F$9$k$?$a$K!"B>$N%5!<%P!<$r;H$$$?$$$H;W$&$G$7$g$&!#(B
-@code{gnus-post-method} $B$rB>$NJ}K!$K@_Dj$9$k;v$,$G$-$^$9!#(B
+$B$=$l$OHs>o$KJ#;($K$J$jF@$^$9!#IaDL$O!"(Bgnus $B$O9VFIMQ$HF1$8A*BrJ}K!$r;H$C(B
+$B$FEj9F$7$^$9(B ($B$3$N$3$H$O!"$"$J$?$,$?$/$5$s$N%0%k!<%W$r0[$J$C$?%5!<%P!<$G(B
+$B9VFI$7$F$$$k>l9g$K!"$?$V$sET9g$,NI$$$N$G$9(B)$B!#$7$+$7!"$"$J$?$,9VFI$7$F$$(B
+$B$k$=$N%5!<%P!<$,Ej9F$r5v2D$;$:!"FI$`$3$H$N$_$r5v2D$7$F$$$k$N$J$i$P!"$*$=(B
+$B$i$/$"$J$?$N(B ($BHs>o$KCNE*$G$H$s$G$b$J$/6=L#?<$$(B) $B5-;v$rEj9F$9$k$?$a$K!"B>(B
+$B$N%5!<%P!<$r;H$$$?$$$H;W$&$G$7$g$&!#(B@code{gnus-post-method} $B$rB>$NJ}K!$K(B
+$B@_Dj$9$k;v$,$G$-$^$9!#(B
 
 @lisp
 (setq gnus-post-method '(nnspool ""))
@@ -9132,13 +9249,16 @@ Gnus $B$OAw?.$7$?A4$F$N%a!<%k$N(B @code{Message-ID} $BMzNr%U%!%$(B
 $B$5$F!"$3$N@_Dj$r$7$?8e$G%5!<%P!<$,$"$J$?$N5-;v$r5qH]$7$?$j!"%5!<%P!<$,Mn(B
 $B$A$F$$$?$j$7$?$i!"$I$&$7$?$i$h$$$N$G$7$g$&(B? $B$3$NJQ?t$r>e=q$-$9$k$?$a$K!"(B
 $BL?Na(B @kbd{C-c C-c} $B$KNm$G$J$$@\F,0z?t$rM?$($k;v$G!"Ej9F$K!X8=:_$N!Y%5!<(B
-$B%P!<$r;H$o$;$k;v$,$G$-$^$9!#(B
+$B%P!<$r;H$o$;$k;v!"$9$J$o$A%G%#%U%)%k%H$NF0:n$KLa$9;v$,$G$-$^$9!#(B
 
 $B$b$7!"Nm@\F,0z?t$r$=$NL?Na$KM?$($?$J$i(B ($B$9$J$o$A!"(B@kbd{C-u 0 C-c C-c})$B!"(B
 gnus $B$OEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 
 @code{gnus-post-method} $B$rA*BrJ}K!$N%j%9%H$K$9$k;v$b$G$-$^$9!#$=$N>l9g$O!"(B
 gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
+
+$B:G8e$K!"$"$J$?$,$$$D$G$b4pK\$NA*BrJ}K!$r;H$C$FEj9F$7$?$$$N$J$i$P!"$3$NJQ(B
+$B?t$r(B @code{nil} $B$K$7$F2<$5$$!#(B
 
 @node Mail and Post
 @section $B%a!<%k$HEj9F(B
@@ -9327,6 +9447,11 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 
 $B$3$NJQ?t$O(B @code{gnus-message-archive-group} $B$NBe$o$j$K;H$&;v$,$G$-$^$9(B
 $B$,!"8e<T$NJ}$,9%$^$7$$J}K!$G$9!#(B
+
+@item gnus-inews-mark-gcc-as-read
+@vindex gnus-inews-mark-gcc-as-read
+$B$b$7Hs(B@code{nil}$B$J$i!"(B@code{Gcc} $B$N5-;v$K4{FI$N0u$rIU$1$^$9!#(B
+
 @end table
 
 @node Posting Styles
@@ -9367,16 +9492,16 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 $B%@!<(B @samp{What me?} $B$r;}$A$^$9!#(B
 
 $B$=$l$>$l$NMM<0$N:G=i$NMWAG$O(B @code{$B9gCW(B} (match) $B$H8F$P$l$^$9!#$b$7$=$l(B
-$B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=8=$H$7$F9gCWA`:n$r9T$$(B
-$B$^$9!#%7%s%\%k(B @code{header} $B$G$"$l$P!"(Bgnus $B$O$=$N9gCW$NCf$N<!$NMWAG$K9g(B
-$BCW$9$k%X%C%@!<$rC5$7!"$=$l$r$=$N9gCW$N:G8e$N%X%C%@!<$HHf3S$7$^$9!#$b$7$=(B
-$B$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#$=$l$,JQ?t$N(B
-$B%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l$P!"$=$N%j%9(B
-$B%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil}$B$G$J$$CM$r5"$;(B
-$B$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
+$B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=858=$H$7$F9gCWA`:n$r9T(B
+$B$$$^$9!#%7%s%\%k(B @code{header} $B$G$"$l$P!"(Bgnus $B$O85$N5-;v$NCf$+$i$=$N9gCW(B
+$B$NCf$N<!$NMWAG$K9gCW$9$k%X%C%@!<$rC5$7!"$=$l$r$=$N9gCW$N:G8e$N@55,I=858=(B
+$B$HHf3S$7$^$9!#$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P(B
+$B$l$^$9!#$=$l$,JQ?t$N%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9(B
+$B%H$G$"$l$P!"$=$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l(B
+$B$,(B @code{nil}$B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
-$B$O(B @code{(@var{name} . @var{value})} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>(B
+$B$O(B @code{(@var{name} @var{value})} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>(B
 $B$O!"(B@code{signature}, @code{signature-file}, @code{organization}, @code{address}, @code{name}, @code{body} $B$N(B
 $B$I$l$+$G$"$k;v$,$G$-$^$9!#B0@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"(B
 $B$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7(B
@@ -9412,8 +9537,8 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
          (signature my-quote-randomizer))
         ((message-news-p)
          (signature my-news-signature))
-        (header "From\\|To" "larsi.*org"
-         (Organization "Somewhere, Inc."))
+        (header "to" "larsi.*org"
+                (Organization "Somewhere, Inc."))
         ((posting-from-work-p)
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
@@ -9519,6 +9644,52 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 $B$^$9!#%5!<%P!<$,La$C$F$-$?$J$i!"IaDL$O$=$N%0%k!<%W$KF~$C$FA4$F$N5-;v$rAw(B
 $B$j$^$9!#(B
 
+@ignore
+@node Using GPG
+@section Using GPG
+@cindex using gpg
+
+Gnus has an ALPHA support to GPG that's provided by @file{gpg.el}. See
+@code{mm-verify-option} and @code{mm-decrypt-option} to enable Gnus to
+verify or decrypt messages accordingly.
+
+To use this correctly with GPG, you'll need the following lisp code in your
+@file{~/.emacs} or @file{~/.gnus}:
+
+@lisp
+(require 'gpg)
+(setq mml2015-use 'gpg)
+(setq gpg-temp-directory (expand-file-name "~/.gnupg/tmp"))
+@end lisp
+
+The @code{gpg-temp-directory} need to point to a directory with permissions set
+to 700, for your own safety.
+
+If you want to benefit of PGP2.6 compatibility, you might create a script named
+@file{gpg-2comp} with these instructions:
+
+@code{
+#!/bin/sh
+exec gpg --rfc1991 "$@@"
+}
+
+If you don't want to use such compatibility, you can add the following line to
+your @file{~/.emacs} or @file{~/.gnus}:
+
+@lisp
+(setq gpg-command-default-alist (quote ((gpg . "gpg") (gpg-2comp . "gpg"))))
+@end lisp
+
+To sign or encrypt your message you may choose to use the MML Security
+menu or @kbd{C-c C-m s p} to sign your message using PGP/MIME, @kbd{C-c
+C-m s s} to sign your message using S/MIME. There's also @kbd{C-c C-m c
+p} to encrypt your message with PGP/MIME and @kbd{C-c C-m c s} to
+encrypt using S/MIME.
+
+Gnus will ask for your passphrase and then it will send your message, if
+you've typed it correctly.
+
+@end ignore
 @node Select Methods
 @chapter $BA*BrJ}K!(B
 @cindex foreign groups
@@ -9538,7 +9709,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 
 $BA*BrJ}K!$O(B @dfn{$B;v<B>e$N%5!<%P!<(B} $B$rDj5A$9$k$H8@$&$3$H$,$G$-$k$+$b$7$l$^(B
 $B$;$s(B---$B$G$9$+$i;d$?$A$O$A$g$&$I$=$l$r$7$^$7(B
-$B$?(B (@pxref{The Server Buffer})$B!#(B
+$B$?(B (@pxref{Server Buffer})$B!#(B
 
 $B%0%k!<%W$N(B @dfn{$BL>A0(B} $B$O%P%C%/%(%s%I$,%0%k!<%W$rG'<1$9$kL>A0$G$9!#(B
 
@@ -9551,20 +9722,39 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 $B$b$A$m$s!"0c$C$?J}K!$OA4$F$=$lFCM-$N$b$N$,$"$j$^$9!#(B
 
 @menu
-* The Server Buffer:: $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
-* Getting News::      USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
-* Getting Mail::      $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
-* Browsing the Web::  $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
-* Other Sources::     $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`(B
-* Combined Groups::   $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
-* Gnus Unplugged::    $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
+* Server Buffer::    $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
+* Getting News::     USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
+* Getting Mail::     $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
+* Browsing the Web:: $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
+* Other Sources::    $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`(B
+* Combined Groups::  $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
+* Gnus Unplugged::   $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
 @end menu
 
-@node The Server Buffer
+@node Server Buffer
 @section $B%5!<%P!<%P%C%U%!(B
 
 $BEAE}E*$K!"(B@dfn{$B%5!<%P!<(B} $B$O$=$l$K@\B3$7$F!"$=$l$+$i>pJs$rMW5a$9$k%^%7%s(B
-$B$+%=%U%H%&%'%"$G$9!#(B
+$B$+%=%U%H%&%'%"$G$9!#(Bgnus $B$OK\Ev$N$I$s$J%5!<%P!<$K$bD>@\$K$O@\B3$;$:!"%P%C(B
+$B%/%(%s%I$+B>$N$b$N$rDL$7$F$9$Y$F$N=hM}$r9T$J$$$^$9!#$7$+$7!"$=$l$O<B:]$N(B
+$BG^BN$H(B gnus $B$N4V$KC1$K0l$D$+$=$l0J>e$N3,AX$rCV$/$3$H$G$"$C$F!"$=$l$>$l$N(B
+$B%P%C%/%(%s%I$,$^$5$K5?;wE*$J%5!<%P!<$KAjEv$9$k$H8@$C$F$bNI$$$G$7$g$&!#(B
+
+$BNc$($P(B @code{nntp} $B%P%C%/%(%s%I$O!"0[$J$k$$$/$D$+$N<B:_$9$k(B @sc{nntp} $B%5!<(B
+$B%P!<!"$"$k$$$OF1$8<B:_$9$k(B @sc{nntp} $B%5!<%P!<$N0[$J$k%]!<%H$K@\B3$9$k$?(B
+$B$a$KMQ$$$i$l$^$9!#$"$J$?$O!"$I$N%P%C%/%(%s%I$r;H$&$+!"$=$7$F$I$s$J%Q%i%a!<(B
+$B%?$r@_Dj$9$k$+$rA*BrJ}K!(B (@dfn{select method}) $B$G;XDj$7$^$9!#(B
+
+$BA*BrJ}K!$N;XDj$O!"$H$-$K6K$a$FLLE]$J$b$N$K$J$j$^$9!#$=$&$@$J$"!"Nc$($P!"(B
+@sc{nov} $B%X%C%@!<$r<h$j4s$;$h$&$H$9$k$H8G$^$C$F$7$^$$!"A*Br$N:n6H$,8N>c(B
+$B$,$A$J(B @sc{nntp} $B%5!<%P!<(B @samp{news.funet.fi} $B$N%]!<%H(B 13 $B$rFI$_$?$$>l(B
+$B9g$H$+!#$&$*$C$[$s!#$H$K$+$/$G$9$M!"$3$N%5!<%P!<$r;H$&$=$l$>$l$N%0%k!<%W(B
+$B$K$D$$$F$=$&$$$&$3$H$r@_Dj$7$J$1$l$P$J$i$J$$$H$7$?$i!"BgJQ$J:n6H$K$J$C$F(B
+$B$7$^$&$G$7$g$&!#$=$3$G(B gnus $B$O!"$=$&$$$&:n6H$r%5!<%P!<%P%C%U%!$G9T$J$&$?(B
+$B$a$K!"A*BrJ}K!$KL>A0$rIU$1$k<jCJ$r@_$1$F$$$k$N$G$9!#(B
+
+$B%5!<%P!<%P%C%U%!$KF~$k$?$a$K$O!"%0%k!<%W%P%C%U%!(B
+$B$G(B @kbd{^} (@code{gnus-group-enter-server-mode}) $B%3%^%s%I$r;H$C$F2<$5$$!#(B
 
 @menu
 * Server Buffer Format::      $B$3$N%P%C%U%!$N308+$r%+%9%?%^%$%:$G$-$k(B
@@ -9862,8 +10052,8 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 $B$=$l$G!"0l;~E*$K$=$N%^%7%s$N5!7y$,0-$$$@$1$@$H2?$,5/$3$k$N$G$7$g$&(B? $B$I$&(B
 $B$d$C$F%^%7%s$,La$C$F$-$F$$$k$+$I$&$+$C$r:F$SD4$Y$k;v$,$G$-$k$G$N$7$g$&(B?
 
-$B%5!<%P!<%P%C%U%!$KHt$S0\$C$F(B (@pxref{The Server Buffer})$B!"0J2<$NL?Na$G(B
-$B$D$D$/$@$1$G$G$-$^$9(B:
+$B%5!<%P!<%P%C%U%!$KHt$S0\$C$F(B (@pxref{Server Buffer})$B!"0J2<$NL?Na$G$D$D$/(B
+$B$@$1$G$G$-$^$9(B:
 
 @table @kbd
 
@@ -9964,14 +10154,16 @@ Gnus $B$,$I$l$+$N%5!<%P!<$+$i@\B35qH]$r<u$1$?$+$I$&$+$NA4$F$N0u$r>C5n$7$^(B
 
 @item
 $B$=$l$>$l$N9T$OG$0U$N?t$N(B $B6h@Z$j0u(B/$BCM(B $B$NBP$r4^$`;v$,$G$-$^$9!#(B
-@end enumerate
 
 $BM-8z$J6h@Z$j0u$O(B @samp{machine}, @samp{login}, @samp{password},
-@samp{default} $B$G$9!#(Bgnus $B$O(B @file{.netrc}/@code{ftp} $B$N9=J8$N867?$K$O8=(B
-$B$l$J$$Fs$D$N?7$7$$6h@Z$j0u!"L>IU$1$F(B @samp{port} $B$H(B @samp{force} $B$rF3F~(B
-$B$7$^$9!#(B($B$3$l$,(B @file{.authinfo} $B%U%!%$%k$NMM<0$,(B @file{.netrc} $B%U%!%$%k(B
-$B$NMM<0$+$i0o$l$kM#0l$NJ}K!$G$9!#(B) @samp{port} $B$O%5!<%P!<$N$I$N%]!<%H$rG'(B
-$B>Z$KMQ$$$k$+$r<($7!"(B@samp{force} $B$O0J2<$G@bL@$7$^$9!#(B
+@samp{default} $B$G$9!#2C$($F!"(Bgnus $B$O(B @file{.netrc}/@code{ftp} $B$N9=J8$N86(B
+$B7?$K$O8=$l$J$$Fs$D$N?7$7$$6h@Z$j0u!"L>IU$1(B
+$B$F(B @samp{port} $B$H(B @samp{force} $B$rF3F~$7$^$9!#(B
+($B$3$l$,(B @file{.authinfo} $B%U%!%$%k$NMM<0$,(B @file{.netrc} $B%U%!%$%k$NMM<0$+(B
+$B$i0o$l$kM#0l$NJ}K!$G$9!#(B) @samp{port} $B$O%5!<%P!<$N$I$N%]!<%H$rG'>Z$KMQ$$(B
+$B$k$+$r<($7!"(B@samp{force} $B$O0J2<$G@bL@$7$^$9!#(B
+
+@end enumerate
 
 $B$3$l$,$=$N%U%!%$%k$NNc$G$9(B:
 
@@ -10151,7 +10343,7 @@ default force yes
 @item nntp-open-ssl-stream
 $B%5!<%P!<$K(B @dfn{$B0BA4$J(B} $B%A%c%s%M%k$r;H$C$F%5!<%P!<$K@\B3$7$^$9!#$3$l$r;H(B
 $B$&$?$a$K$O!"(BSSLay $B$,%$%s%9%H!<%k$5$l$F$$$J$1$l$P$J$j$^$;(B
-$B$s(B (@file{ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL} $B$H!"(B@file{ssl.el} ($BNc$((B
+$B$s(B (@uref{ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL} $B$H!"(B@file{ssl.el} ($BNc$((B
 $B$P!"(BW3 $B$NG[I[$+$i(B) $B$,I,MW$K$J$j$^$9(B)$B!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5A$7(B
 $B$^$9(B:
 
@@ -10271,7 +10463,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @item nntp-record-commands
 @vindex nntp-record-commands
 $B$b$7(B @code{nil} $B$G$J$$$H!"(B@code{nntp} $B$O(B @sc{nntp} $B%5!<%P!<$KAw$C$?A4$F(B
-$B$NL?Na$r(B ($B;~4V$H6&$K(B) @samp{*nntp-log*} $B%P%C%U%!$K5-O?$7$^$9!#$3$l$OF0:n(B
+$B$NL?Na$r(B ($B;~9o$H6&$K(B) @samp{*nntp-log*} $B%P%C%U%!$K5-O?$7$^$9!#$3$l$OF0:n(B
 $B$7$F$$$J$$$H;W$o$l$k(B gnus/@sc{nntp} $B@\B3$r%G%#%P%C%0$7$F$$$k$H$-$KLr$KN)(B
 $B$A$^$9!#(B
 
@@ -10649,7 +10841,9 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 $B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL(B
 $B$O(B procmail $B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ(B
 $B$5$l$^$9!#(B@code{nnmail-scan-directory-mail-source-once} $B$r(B @code{nil} $B0J(B
-$B30$K$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#(B
+$B30$K$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#$3(B
+$B$l$O!";XDj$7$?%l%Y%k$N%a!<%k%0%k!<%W$@$1$rD4$Y$?$$$H$-$K!"$H$j$o$1JXMx$G(B
+$B$9!#(B
 
 $B%-!<%o!<%I(B:
 
@@ -10693,7 +10887,8 @@ POP $B%5!<%P!<$NL>A0$G$9!#=i4|CM$O(B @code{MAILHOST} $B4D6-JQ?t$+$i<hF@$5$l$^
 POP $B%5!<%P!<$N%]!<%HHV9f$G$9!#$3$l$O?tCM(B ($BNc$($P(B @samp{:port 1234}) $B$+J8(B
 $B;zNs(B ($BNc$($P(B @samp{:port "pop3"}) $B$G$9!#$b$7J8;zNs$J$i(B Unix $B%7%9%F%`$K$*(B
 $B$1$k(B @file{/etc/services} $B$K:\$C$F$$$k%5!<%S%9L>$G$J$1$l$P$J$j$^$;$s!#=i(B
-$B4|CM$O(B @samp{pop3} $B$G$9!#(B
+$B4|CM$O(B @samp{pop3} $B$G$9!#%7%9%F%`$K$h$C$F$O(B @samp{"pop-3"} $B$H$7$J$1$l$P(B
+$B$J$i$J$$$+$b$7$l$^$;$s!#(B
 
 @item :user
 POP $B%5!<%P!<$KM?$($kMxMQ<TL>$G$9!#=i4|CM$O%m%0%$%sL>$G$9!#(B
@@ -10810,7 +11005,7 @@ Maildir $B%a!<%k%=!<%9$NNc$r$U$?$D(B:
 IMAP $B%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#2?$i$+$NM}M3$G(B IMAP $B$r0U?^$5$l$?$h(B
 $B$&$J%M%C%H%o!<%/>e$G%a!<%k$rFI$`%W%m%H%3%k$H$7$F07$$$?$/$J$$$H$-$O!"(B
 gnus $B$G$O(B POP $B%5!<%P!<$HF1MM$K07$&$3$H$,$G$-!"M?$($i$l$?(B IMAP $B%a!<%k%\%C(B
-$B%/%9$+$i5-;v$r<hF@$7$^$9!#(B
+$B%/%9$+$i5-;v$r<hF@$7$^$9!#>\$7$/$O(B @xref{IMAP} $B$r;2>H$7$F2<$5$$!#(B
 
 $B%-!<%o!<%I(B:
 
@@ -10839,6 +11034,30 @@ IMAP $B%5!<%P!<$KEO$9%Q%9%o!<%I$G$9!#;XDj$5$l$F$$$J$$$H$-$O!"MxMQ<T$OF~NO(B
 $B$O(B @code{imap-authenticator-alist} $B$N%7%s%\%k$N0l$D$r@_Dj$7$^$9!#8=>u$G(B
 $B$O!"(B@samp{kerberos4}, @samp{cram-md5}, @samp{anonymous} $B$+=i4|CM(B
 $B$N(B @samp{login} $B$K$J$j$^$9!#(B
+
+@item :program
+:stream $B$K(B `shell' $B$,@_Dj$5$l$F$$$k$H$-$O!"$3$NCM$,JQ(B
+$B?t(B `imap-shell-program' $B$K3d$jEv$F$i$l$^$9!#$3$l$O(B @code{format} $B$U$&$N(B
+$BJ8;zNs(B ($B$^$?$OJ8;zNs$N%j%9%H(B) $B$G$J$1$l$P$J$j$^$;$s!#Nc$r<($7$^$7$g$&!#(B
+
+@example
+ssh %s imapd
+@end example
+
+$BM-8z$J(B format $B;X<(;R$O0J2<$NDL$j$G$9!#(B
+
+@table @samp
+@item s
+$B%5!<%P!<$NL>A0!#(B
+
+@item l
+`imap-default-user' $B$G@_Dj$5$l$?%f!<%6L>!#(B
+
+@item p
+$B%5!<%P!<$N%]!<%HHV9f!#(B
+@end table
+
+$B$3$l$i$N;XDj$K;H$o$l$kCM$O!"BP1~$9$k%-!<%o!<%I$KM?$($?CM$+$i<h$C$F$-$^$9!#(B
 
 @item :mailbox
 $B%a!<%k$r<hF@$9$k%a!<%k%\%C%/%9$NL>A0!#=i4|CM$O(B @samp{INBOX} $B$G!"$3$l$OIa(B
@@ -11171,6 +11390,7 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 $B%H$G!":G=i$NMWAG$,(B @code{:} $B$G$"$k$H!"FsHVL\$NMWAG$,(B @var{args} $B$r0z?t$H(B
 $B$7$F4X?t$H$7$F8F$P$l$^$9!#4X?t$O(B @var{split} $B$rJV$9$Y$-$G$9!#(B
 
+@cindex body split
 $BNc$($P0J2<$N4X?t$O!"5-;v$N%\%G%#$K4p$E$$$?J,3d$K;H$($k$G$7$g$&(B:
 
 @lisp
@@ -11181,6 +11401,9 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
     (when (re-search-forward "Some.*string" nil t)
       "string.group")))
 @end lisp
+
+@code{:} $B$,;H$o$l$k$H$-!"%P%C%U%!(B @samp{" *nnmail incoming*"} $B$O%a%C%;!<(B
+$B%8$NItJ,$K69$a$i$l$^$9!#(B
 
 @item
 @code{(! @var{func} @var{split})}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG(B
@@ -11259,10 +11482,12 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 @code{nnmail-message-id-cache-length} $B$NCM$r4{DjCM$h$j$b4v$i$+Bg$-$JCM$K(B
 $B@_Dj$9$k$3$H$r$*4+$a$7$^$9!#$=$&$9$k$H!":#D4$Y$i$l$?%a%C%;!<%8(B ID $BC#$O:#(B
 $B$7$P$i$/%-%c%C%7%e$NCf$KB8B3$G$-$^$9(B (5000 $B$K@_Dj$9$k$H%-%c%C%7%e%U%!%$(B
-$B%k$NBg$-$5$O$@$$$?$$(B 300 $B%-%m%P%$%H$0$i$$$K$J$k$_$?$$$G$9(B)$B!#$5$i$K!"(B
-$BJQ?t(B @code{nnmail-cache-accepted-message-ids} $B$NCM$rHs(B nil $B$K@_Dj$9$l$P!"(B
-Gnus $B$O0\F0$5$l$?5-;v$N%a%C%;!<%8(B ID $B$r$b5-O?$9$k$N$G!"%U%)%m!<%"%C%W5-(B
-$B;v$O?F5-;v$N0\F0@h$HF1$8%0%k!<%W$KF~$k$h$&$K$J$j$^$9!#(B
+$B%k$NBg$-$5$O$@$$$?$$(B 300 $B%-%m%P%$%H$0$i$$$K$J$k$_$?$$$G$9(B)$B!#(B
+@vindex nnmail-cache-accepted-message-ids
+$B$5$i$K!"JQ?t(B @code{nnmail-cache-accepted-message-ids} $B$NCM$r(B
+$BHs(B @code{nil} $B$K@_Dj$9$l$P!"(Bgnus $B$O0\F0$5$l$?5-;v$N%a%C%;!<%8(B ID $B$r$b5-(B
+$BO?$9$k$N$G!"%U%)%m!<%"%C%W5-;v$O?F5-;v$N0\F0@h$HF1$8%0%k!<%W$KF~$k$h$&$K(B
+$B$J$j$^$9!#(B
 
 @node Group Mail Splitting
 @subsection $B%0%k!<%W%a!<%kJ,3d(B
@@ -11386,8 +11611,10 @@ nnml:mail.others:
 @var{auto-update} $B$,(B @code{nil} $B$GL5$$$H!"(B
 @code{gnus-group-split-update} $B$,(B @code{nnmail-pre-get-new-mail-hook} $B$K(B
 $BDI2C$5$l!"FsEY$H(B @code{nnmail-split-fancy} $B$N99?7$r?4G[$9$kI,MW$O$"$j$^(B
-$B$;$s!#(B@var{catch-all} $B$r>JN,$7$J$$>l9g$O(B ($B$=$l$O%*%W%7%g%s$G(B nil $B$HF1$8(B)$B!"(B
-@code{gnus-group-split-default-catch-all-group} $B$O$=$NCM$K@_Dj$5$l$^$9!#(B
+$B$;$s!#(B@var{catch-all} $B$r>JN,$7$J$$>l9g$O(B ($B$=$l$O%*%W%7%g%s(B
+$B$G(B @code{nil} $B$HEy(B
+$B2A(B)$B!"(B@code{gnus-group-split-default-catch-all-group} $B$O$=$NCM$K@_Dj$5$l(B
+$B$^$9!#(B
 
 @vindex gnus-group-split-updated-hook
 @code{nnmail-split-fancy} $B$,(B @code{gnus-group-split-update} $B$G@_Dj$5$l$?(B
@@ -11988,6 +12215,10 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 $B4X?t$OJL$N$H$3$m$K%a%C%;!<%8$r%3%T!<$7$?$j!">C5n$9$k$^$($K2?$i$+$N>pJs$r(B
 $B<h$j=P$9$?$a$K;H$C$?$j$9$k$3$H$,$G$-$^$9!#(B
 
+@item nnfolder-nov-is-evil
+@vindex nnfolder-nov-is-evil
+$B$b$7Hs(B@code{nil}$B$J$i!"$3$N%P%C%/%(%s%I$O(B @sc{nov} $B%U%!%$%k$rL5;k$7$^$9!#(B
+
 @end table
 
 @findex nnfolder-generate-active-file
@@ -12246,7 +12477,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 @cindex Slashdot
 @cindex nnslashdot
 
-Slashdot (@file{http://slashdot.org/}) $B$O?M5$$N$"$k%K%e!<%9%5%$%H$G!"%K%e!<(B
+Slashdot (@uref{http://slashdot.org/}) $B$O?M5$$N$"$k%K%e!<%9%5%$%H$G!"%K%e!<(B
 $B%95-;v$N8e$K3hH/$J5DO@$,$J$5$l$F$$$^$9!#(B@code{nnslashdot} $B$G$OJXMx$JJ}K!(B
 $B$G$3$N2q5D<<$rFI$`$3$H$,$G$-$^$9!#(B
 
@@ -12330,7 +12561,7 @@ Slashdot (@file{http://slashdot.org/}) $B$O?M5$$N$"$k%K%e!<%9%5%$%H$G!"%K%e!<(
 @cindex nnultimate
 @cindex Ultimate Bulletin Board
 
-Ultimate Bulletin Board (@file{http://www.ultimatebb.com/}) $B$O$*$=$i$/0l(B
+Ultimate Bulletin Board (@uref{http://www.ultimatebb.com/}) $B$O$*$=$i$/0l(B
 $BHVNI$/;H$o$l$F$$$k%&%'%V7G<(HD%7%9%F%`$G$7$g$&!#$H$F$b@0A3$H$7$FNI$$3&LL(B
 $B$G!"(Bgnus $B$,%0%k!<%W$r:G?7$N>uBV$KJ]$C$F$*$/$?$a$K>pJs$rF@$k$3$H$,2DG=$G(B
 $B$9!#(B
@@ -12358,7 +12589,7 @@ http://www.tcj.com/messboard.ubbcgi/ RET}$B!#(B($B6=L#$N$"$k2q5D<<(B
 @cindex Web Archive
 
 $B%a!<%j%s%0%j%9%H$NCf$K$ONc$($P!"(B
-@file{http://www.egroups.com/} $B$d(B @file{http://www.mail-archive.com/} $B$N(B
+@uref{http://www.egroups.com/} $B$d(B @uref{http://www.mail-archive.com/} $B$N(B
 $B$h$&$K%&%'%V%5!<%P!<$K$7$+%"!<%+%$%V$,L5$$$b$N$b$"$j$^$9!#$H$F$b@0A3$H$7(B
 $B$FNI$$3&LL$G!"(Bgnus $B$,%0%k!<%W$r:G?7$N>uBV$KJ]$C$F$*$/$?$a$K>pJs$rF@$k$3(B
 $B$H$,2DG=$G$9!#(B
@@ -13143,6 +13374,23 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 $B$O%K%e!<%9%5!<%P!<$X$N@\B3$HHs>o$K;w$F$$$F!"$=$N%5!<%P!<$N%M%C%H%o!<%/%"(B
 $B%I%l%9$r;XDj$9$k$@$1$K$J$C$F$$$^$9!#(B
 
+@sc{imap} $B$K$OFs$D$NFC<A$,$"$j$^$9!#0l$D$O!"(B@sc{imap} $B$O(B POP $B$G$G$-$k$3(B
+$B$H$OA4It$G$-$k!"$=$l$f$((B POP++ $B$N$h$&$K$b8+$($k$H$$$&$3$H!#Fs$DL\$O!"(B
+@sc{imap} $B$O(B @sc{nntp} $B$,%K%e!<%9$rCyB"$9$k%W%m%H%3%k$G$"$k$h$&$K!"%a!<(B
+$B%k$rCyB"$9$k%W%m%H%3%k$G$"$k$H$$$&$3$H$G$9!#(B(@sc{imap} $B$O(B @sc{nntp} $B$h$j(B
+$BB?$/$N5!G=$rDs6!$7$^$9!#%K%e!<%9$OFI$`$@$1$G$9$,!"%a!<%k$OFI$_=q$-$,$G$-(B
+$B$^$9!#(B)
+
+@sc{imap} $B$r(B POP++ $B$N$h$&$K;H$$$?$$$H$-$O!"%a!<%k%=!<%9$K(B imap $B$rEPO?$7(B
+$B$F2<$5$$!#$3$l$K$h$C$F(B gnus $B$O(B @sc{imap} $B%5!<%P!<$+$i%a!<%k$r<h$j9~$s$G!"(B
+$B%m!<%+%k%G%#%9%/$KCyB"$7$^$9!#$3$3$G$O$=$N;H$$J}$N@bL@$O$7$^$;$s$N$G!"(B
+@xref{Mail Sources} $B$r;2>H$7$F2<$5$$!#(B
+
+@sc{imap} $B$r%a!<%k$rCyB"$9$k%W%m%H%3%k$H$7$F;H$$$?$$$H$-$O!"(B
+gnus-secondary-select-methods $B$K(B nnimap $B$rEPO?$7$F2<$5$$!#$3$l$K$h$C(B
+$B$F(B gnus $B$O(B @sc{imap} $B%5!<%P!<$KCyB"$5$l$F$$$k%a!<%k$rA`:n$9$k$h$&$K$J$j(B
+$B$^$9!#$3$l$,$3$3$G@bL@$9$k;H$$J}$G$9!#(B
+
 $B$$$/$D$+$N(B @sc{imap} $B%5!<%P!<$r(B @code{~/.gnus} $B$G@_Dj$9$k$H!"$?$V$s$3$N(B
 $B$h$&$J$b$N$K$J$k$G$7$g$&(B:
 
@@ -13244,7 +13492,7 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 @dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i(B
 $B%`(B) $B$+(B SSLeay (@samp{s_client}) $B$,I,MW$G$9!#(B
 @item
-@dfn{shell:} $B%7%'%kL?Na$r;H$C$F(B IMAP $B@\B3$r3+;O$7$^$9!#(B
+@dfn{shell:} $B%7%'%kL?Na$r;H$C$F(B @sc{imap} $B@\B3$r3+;O$7$^$9!#(B
 @item
 @dfn{network:} $B@8$N!"(BTCP/IP $B$N%M%C%H%o!<%/@\B3$G$9!#(B
 @end itemize
@@ -13256,7 +13504,7 @@ nnimap $B$O(B @samp{imtest} $B%P!<%8%g%s(B 1.5.x $B$H(B 1.6.x $B$NN>J}$r%
 $B$r4^$_$^$9!#(B
 
 @vindex imap-ssl-program
-SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @file{http://www.openssl.org/} $B$+(B
+SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @uref{http://www.openssl.org/} $B$+(B
 $B$iF~<j$G$-$^$9!#(BOpenSSL $B$O0JA0$O(B SSLeay $B$H$7$FCN$i$l$F$$$?$b$N$G!"(B
 nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x $B$K$O(B
 $B=EBg$J%P%0$,$"$k$?$a;H$($^$;$s!#0JA0$NHG!"FC$K(B SSLeay 0.8.x $B$O;H$($k$3$H(B
@@ -13265,7 +13513,7 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 
 @vindex imap-shell-program
 @vindex imap-shell-host
-IMAP $B@\B3$K(B @code{shell} $B%9%H%j!<%`$r;H$&>l9g!"JQ(B
+@sc{imap} $B@\B3$K(B @code{shell} $B%9%H%j!<%`$r;H$&>l9g!"JQ(B
 $B?t(B @code{imap-shell-program} $B$O2?$N%W%m%0%i%`$r8F$V$+$r;XDj$7$^$9!#(B
 
 @item nnimap-authenticator
@@ -13417,7 +13665,7 @@ Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 
 $B$3$l$O(B nnimap $B%a!<%j%s%0%j%9%H$+$i$NA4$F$N5-;v$r%a!<%k%\%C%/(B
 $B%9(B INBOX.nnimap $B$KF~$l!"(BSubject: $B9T$K(B MAKE MONEY $B$N$"$kA4$F$N5-;v(B
-$B$r(B INBOX.spam $B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $B$KF~$l$^$9!#(B
+$B$r(B INBOX.junk $B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $B$KF~$l$^$9!#(B
 
 $B:G=i$NJ8;zNs$O!"(Breplace-match $B$G9gCW$7$?%F%-%9%H$+$iI{I=8=$rA^F~$9$k$H$-(B
 $B$K;HMQ$5$l$k$N$HF1$8$h$&$J!"(B`\\1' $B7A<0$r4^$`$3$H$,$G$-$^$9!#Nc$($P(B:
@@ -13838,9 +14086,9 @@ PPP $B4X78(B($B$J$I(B)$B$rJD$8$^$9!#$=$&$7$F%K%e!<%9$r%*%U%i%$%s$GFI$`$3$H$
 $B@.$H4IM}$N$?$a$NFH<+$N%P%C%U%!!<$r;}$C$F$$$^$9!#(B
 
 @menu
-* Category Syntax::     $BJ,N`$H$O$I$s$J$b$N$+(B
-* The Category Buffer:: $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
-* Category Variables::  $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
+* Category Syntax::    $BJ,N`$H$O$I$s$J$b$N$+(B
+* Category Buffer::    $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
+* Category Variables:: $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
 @end menu
 
 @node Category Syntax
@@ -14102,7 +14350,7 @@ file
 @end itemize
 @end enumerate
 
-@node The Category Buffer
+@node Category Buffer
 @subsubsection $BJ,N`%P%C%U%!!<(B
 
 $BDL>o$OA4$F$NJ,N`$OJ,N`%P%C%U%!!<$+$i4IM}$7$^$9!#(B($B%0%k!<%W%P%C%U%!!<(B
@@ -14337,14 +14585,14 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 @subsection $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 
 $B%(!<%8%'%s%H$O(B nnimap $B$r4^$`(B gnus $B$N$I$s$J%P%C%/%(%s%I$G$bF0:n$7$^$9!#$7(B
-$B$+$7(B NNTP $B$H(B IMAP $B$K$O$$$/$D$+$N35G0$N0c$$$,$"$k$N$G!"$3$N9`$G$O(B gnus $B%(!<(B
-$B%8%'%s%H$r(B IMAP $B$N(B @dfn{unplugged} $B$J%b!<%I$N%/%i%$%"%s%H$H$7$F1_3j$K;H(B
-$B$($k$h$&$K$9$k$?$a$N!"$$$/$D$+$N>pJs$rDs6!$7$^$9!#(B
+$B$+$7(B @sc{nntp} $B$H(B @sc{imap} $B$K$O$$$/$D$+$N35G0$N0c$$$,$"$k$N$G!"$3$N9`$G(B
+$B$O(B gnus $B%(!<%8%'%s%H$r(B @sc{imap} $B$N(B @dfn{unplugged} $B$J%b!<%I$N%/%i%$%"%s(B
+$B%H$H$7$F1_3j$K;H$($k$h$&$K$9$k$?$a$N!"$$$/$D$+$N>pJs$rDs6!$7$^$9!#(B
 
 $B?4$KN1$a$F$*$/:G=i$N$3$H$O!"A4$F$N%U%i%0(B (read, ticked $B$J$I(B) $B$O(B nntp $B$N(B
-$B>l9g$K$*$1$k(B @code{.newsrc} $B$G$O$J$/$F(B IMAP $B%5!<%P!<$KJ];}$5$l$k$H$$$&$3(B
-$B$H$G$9!#$7$?$,$C$F!"(Bgnus $B$O(B @dfn{unplugged} $B$N$H$-$N%U%i%0$NJQ2=$r3P$($F(B
-$B$*$$$F!":F$S@\B3$7$?$H$-$K$=$l$i$N%U%i%0$rF14|$5$;$kI,MW$,$"$j$^$9!#(B
+$B>l9g$K$*$1$k(B @code{.newsrc} $B$G$O$J$/$F(B @sc{imap} $B%5!<%P!<$KJ];}$5$l$k$H(B
+$B$$$&$3$H$G$9!#$7$?$,$C$F!"(Bgnus $B$O(B @dfn{unplugged} $B$N$H$-$N%U%i%0$NJQ2=$r(B
+$B3P$($F$*$$$F!":F$S@\B3$7$?$H$-$K$=$l$i$N%U%i%0$rF14|$5$;$kI,MW$,$"$j$^$9!#(B
 
 gnus $B$O%(!<%8%'%s%H$N85$G(B nnimap $B%0%k!<%W$rFI$`$H$-!"%G%#%U%)%k%H$G%U%i(B
 $B%0$NJQ2=$K@d$($:Cm0U$7$F$$$^$9!#$"$J$?$,:F$S@\B3$7$?$H$-!"%G%#%U%)%k%H(B
@@ -14365,9 +14613,9 @@ gnus $B$O%(!<%8%'%s%H$N85$G(B nnimap $B%0%k!<%W$rFI$`$H$-!"%G%#%U%)%k%H$G%U%i
 $B%-!<$K3d$jEv$F$i$l$?(B @code{gnus-agent-synchronize-flags} $B%3%^%s%I$r;H$$(B
 $B$^$9!#(B
 
-$B$"$J$?$,!"(B@dfn{unplugged} $B$N$H$-$N(B IMAP $B%/%i%$%"%s%H$K4|BT$9$k$G$"$m$&$$(B
-$B$/$D$+$N5!G=$O!"8=:_$N%(!<%8%'%s%H$K$O@9$j9~$^$l$F$$$^$;$s!#$=$l$i$O0J2<(B
-$B$NDL$j$G$9!#(B
+$B$"$J$?$,!"(B@dfn{unplugged} $B$N$H$-$N(B @sc{imap} $B%/%i%$%"%s%H$K4|BT$9$k$G$"(B
+$B$m$&$$$/$D$+$N5!G=$O!"8=:_$N%(!<%8%'%s%H$K$O@9$j9~$^$l$F$$$^$;$s!#$=$l$i(B
+$B$O0J2<$NDL$j$G$9!#(B
 
 @itemize @bullet
 
@@ -14528,7 +14776,7 @@ Message $B$r2#<h$j$7$F!"(Boffline $B$G(B post/send $B$9$k$?$a$NHFMQ%i%$%V%i
 $B$3$N(B @code{MIEE} $B$r;H$&$H(B @code{gnus-offline} $B$rMQ$$$F(B@code{nnspool} $B$b(B
 $B%3%s%H%m!<%k$9$k;v$,$G$-$^$9(B($B$3$3$G$O=R$Y$^$;$s$,!D(B)$B!#(B($B$b$A$m(B
 $B$s(B @code{gnus-agent} + @code{MIEE} $B$H$$$&AH9g$;$b2DG=$G(B
-$B$9(B) @code{MIEE} $B$O(B @file{http://www.shiojiri.ne.jp/%7Et-ichi/lisp/miee.el} $B$+(B
+$B$9(B) @code{MIEE} $B$O(B @uref{http://www.shiojiri.ne.jp/%7Et-ichi/lisp/miee.el} $B$+(B
 $B$i<h$C$FMh$k;v$,$G$-$^$9!#(B@code{gnus-setup-for-offline} $B$G@_Dj$7$?>l9g$K(B
 $B$O!"(B@code{MIEE} $B$N@_Dj$O$$$C$5$$$7$J$/$F$b$+$^$$$^$;$s!#(B
 
@@ -15486,6 +15734,12 @@ gnus $B$K$O$3$l$i$rA4$F<+F0E*$K(B --- $B$^$k$GKbK!$G$b;H$C$?$h$&$K:n@.(B
 $B$l$^$9!#L5;k$7$?$$C18l$rDI2C$7$?$$$H$-$O!"$3$NJQ?t$G$O$J(B
 $B$/(B @code{gnus-ignored-adaptive-words} $B%j%9%H$NJ}$r;H$C$F$/$@$5$$!#(B
 
+@vindex gnus-adaptive-word-length-limit
+$BC;$$C18l$G$OE,1~@-%9%3%"$r:nF0$5$;$k$Y$-$G$O$J$$$H;W$&?M$b$$$k$G$7$g$&!#(B
+$B$b$7$=$&$J$i(B @code{gnus-adaptive-word-length-limit} $B$K@0?t$r@_Dj$9$k$3$H(B
+$B$,$G$-!"$3$N?tCM$h$jC;$$C18l$OL5;k$5$l$^$9!#$3$NJQ?t$N=i4|@_DjCM(B
+$B$O(B @code{nil} $B$G$9!#(B
+
 @vindex gnus-adaptive-word-syntax-table
 $B%9%3%"IU$1$,=*N;$7$?$H$-!"(B@code{gnus-adaptive-word-syntax-table} $B$NJ8K!(B
 $BI=$,$=$N1F6A$r<u$1$^$9!#$3$l$OI8=`$NJ8K!I=$H;w$F$$$^$9$,!"C18l$N9=@.MWAG(B
@@ -15636,7 +15890,10 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 
 @vindex message-sent-hook
 $B$3$l$iFs$D$N4X?t$O!"4pK\E*$K$O$I$A$i$b(B @code{message-sent-hook} $B$N$h$&$J(B
-$B%U%C%/$NCf$G;H$&$?$a$N$b$N$G$9!#(B
+$B%U%C%/$NCf$G;H$&$?$a$N$b$N$G$9!#Nc$($P$3$N$h$&$K(B:
+@lisp
+(add-hook 'message-sent-hook 'gnus-score-followup-thread)
+@end lisp
 
 $B$"$J$?$N<+J,$N(B @code{Message-ID} $B$r$8$C$/$j$HD/$a$F$_$k$H!"$O$8$a$NFs!"(B
 $B;0J8;z$O>o$KF1$8$G$"$k$3$H$K5$$,$D$/$G$7$g$&!#0J2<$NFs$D$O;d$N$b$N$G$9!#(B
@@ -15652,7 +15909,7 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 
 @lisp
 ("references"
- ("<x6[0-9a-z]+\\.fsf\\(_-_\\)?@@.*eyesore.no>"
+ ("<x6[0-9a-z]+\\.fsf\\(_-_\\)?@@.*eyesore\\.no>"
   1000 nil r))
 @end lisp
 
@@ -15912,7 +16169,7 @@ GNUS $B>C5n%U%!%$%k$rJT=8$9$k$?$a$NFs$D$N35N,%P%C%U%!4X?t$,$"$j$^$9!#(B
 
 $B>C5n%U%!%$%k$+$i%9%3%"%U%!%$%k$X$NJQ49%Q%C%1!<%8$O!"I8=`$G$O(Bgnus $B$K$O4^(B
 $B$^$l$^$;$s!#(B
-@file{http://www.stud.ifi.uio.no/~larsi/ding-various/gnus-kill-to-score.el} $B$+(B
+@uref{http://www.stud.ifi.uio.no/~larsi/ding-various/gnus-kill-to-score.el} $B$+(B
 $B$iF~<j$9$k$3$H$,$G$-$^$9!#(B
 
 $B$b$7$"$J$?$N>C5n%U%!%$%k$,Hs>o$KJ#;($J$b$N$G$"$l$P(B --- $B$=$l(B
@@ -15949,7 +16206,7 @@ GoupLens $B$O!"KhF|:n@.$5$l$kB?$/$NNL$N%K%e!<%95-;v$+$i<A$NNI$$5-;v$rB>$N(B
 
 GroupLens $B$r;H$&$?$a$K$O!"%m!<%+%k$N(B Better Bit Berau (BBB) $B$KI.(B
 $BL>(B (pseudonym) $B$rEPO?$7$J$1$l$P$J$j$^$;$s!#(B
-@samp{http://www.cs.umn.edu/Research/GroupLens/bbb.html} $B$,8=:_!"$A$^$?(B
+@uref{http://www.cs.umn.edu/Research/GroupLens/bbb.html} $B$,8=:_!"$A$^$?(B
 $B$KB8:_$9$kM#0l$N(B better bit $B$G$9!#(B
 
 $BEPO?$7$?8e$G!"$$$/$D$+$NJQ?t$r@_Dj$9$kI,MW$,$"$j$^$9!#(B
@@ -17288,7 +17545,7 @@ NoCeM $B%a%C%;!<%8$rH/9T$9$k?M$O$?$/$5$s$$$^$9!#$3$N%j%9%H$G$O!"C/$N8@$&$3(B
 "hweede@@snafu.de")} $B$G$9!#H`$i$O$_$s$J!"N)GI$G9b7i$J;TL1$G$9!#(B
 
 $B$3$N%j%9%H$K4^$a$i$l$kM-L>$JH?%9%Q%`2H$?$A(B
-$B$O(B @file{http://www.xs4all.nl/~rosalind/nocemreg/nocemreg.html} $B$K:\$C$F(B
+$B$O(B @uref{http://www.xs4all.nl/~rosalind/nocemreg/nocemreg.html} $B$K:\$C$F(B
 $B$$$^$9!#(B
 
 $B$3$l$iA4$F$N?M!9$N(B NoCeM $B%a%C%;!<%8$KN10U$9$kI,MW$O$"$j$^$;$s(B --- $B8@$&$3(B
@@ -17511,13 +17768,13 @@ Picon $B$H$O$J$s$G$7$g$&(B? Picons $B%&%'%V%5%$%H$+$iD>@\0zMQ$7$^$7$g$&!#(B
 @vindex gnus-picons-piconsearch-url
 $B$"$J$?$,%$%s%?!<%M%C%H$X>o;~@\B3$7$F$$$k$N$J$i$P!"(B
 @code{gnus-picons-piconsearch-url} $B$KJ8;z(B
-$BNs(B @file{http://www.cs.indiana.edu/picons/search.html} $B$r@_Dj$9$k$3$H$G!"(B
+$BNs(B @uref{http://www.cs.indiana.edu/picons/search.html} $B$r@_Dj$9$k$3$H$G!"(B
 Steve Kinzler $B$N(B picon $B8!:w%(%s%8%s$r;H$&$3$H$,$G$-$^$9!#(B
 
 @vindex gnus-picons-database
 $B$=$&$G$J$1$l$P!"H`$N%G!<%?%Y!<%9$r<j85$KJ#@=$9$kI,MW$,$"$j$^$9!#(Bpicon $B%G!<(B
 $B%?%Y!<%9$NF~<j$H%$%s%9%H!<%k$N<j=g$O!"%&%'%V%V%i%&%6!<(B
-$B$G(B @file{http://www.cs.indiana.edu/picons/ftp/index.html} $B$K9T$C$F$_$F$/(B
+$B$G(B @uref{http://www.cs.indiana.edu/picons/ftp/index.html} $B$K9T$C$F$_$F$/(B
 $B$@$5$$!#(BGnus $B$O(B picons $B$,(B @code{gnus-picons-database} $B$G<($5$l$k>l=j$K%$(B
 $B%s%9%H!<%k$7$F$"$k$b$N$H4|BT$7$^$9!#(B
 
@@ -17587,7 +17844,7 @@ picon $B%G!<%?%Y!<%9$N>l=j!#(B@file{news}, @file{domains}, @file{users} ($B$J
 @item gnus-picons-piconsearch-url
 @vindex gnus-picons-piconsearch-url
 Web $B>e$N(B picon $B8!:w%(%s%8%s$N(B URL$B!#8=:_CN$i$l$F$$$kM#0l$N%(%s%8%s(B
-$B$O(B @file{http://www.cs.indiana.edu:800/piconsearch} $B$G$9!#%M%C%H%o!<%/CY(B
+$B$O(B @uref{http://www.cs.indiana.edu:800/piconsearch} $B$G$9!#%M%C%H%o!<%/CY(B
 $B1d$r2sHr$9$k$?$a$K(B icon $B$O%P%C%/%0%i%&%s%I$G<hF@$5$l$^$9!#$b$7$3$l$,(B
 @code{nil} ($B=i4|@_DjCM(B) $B$G$"$l$P!"(B
 picon $B$O(B @code{gnus-picons-database} $B$G<($5$l$k%m!<%+%k$N%G!<%?%Y!<%9$+(B
@@ -17964,7 +18221,7 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 $B$^$?!"$"$J$?$,BU$1<T$N%M%C%H%o!<%/;TL1$G$b$"$k$J$i!"(B
 @file{gnus-junk.el} $B%Q%C%1!<%8$K$h$C$F<+F0E*$K6l>p$r$$$&J}$,NI$$$H;W$&$+(B
 $B$b$7$l$^$;$s!#$3$l(B
-$B$O(B @file{<URL:http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html>} $B$+(B
+$B$O(B @* @uref{http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html} $B$+(B
 $B$i!VL5NA$G!WMxMQ$G$-$^$9!#$[$H$s$I$N(B spam $B%a!<%k$O<+F0E*$KAw$i$l$F$$$k$N(B
 $B$G!"$A$g$C$H$@$11'Ch$N%P%i%s%9$,$H$l$k$+$b$7$l$^$;$s!#(B
 
@@ -18077,7 +18334,7 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 $BDL>o(B @samp{:} $B$r;H$C$F$$$k(B) $B$r$a$A$c$a$A$c$K$7$F$7$^$&$+$b$7$l$J$$!"$$$/(B
 $B$D$+$N(B @strong{$BK\Ev$K(B} $B;H$($J$$%0%k!<%WL>$rJa$^$($^$9!#(B
 
-IMAP $B%f!<%6$O%0%k!<%WL>$K(B @samp{/} $B$r;H$$$?$$$H;W$&$G$7$g$&$1$l$I!#(B
+@sc{imap} $B%f!<%6$O%0%k!<%WL>$K(B @samp{/} $B$r;H$$$?$$$H;W$&$G$7$g$&$1$l$I!#(B
 
 @end table
 
@@ -18155,7 +18412,7 @@ but at the common table.@*
 $B$?!#(B
 
 $B$3$NL5Ni$r9T$C$??MJ*$rD4$Y$F$_$?$$$N$J$i!"$"$J$?$N(B ($B$/$=(B!) $B%&%'%V%V%i%&(B
-$B%6!<$r(B @file{http://quimby.gnus.org/~larsi/} $B$K8~$1$k;v$,$G$-$^$9!#(B
+$B%6!<$r(B @uref{http://quimby.gnus.org/} $B$K8~$1$k;v$,$G$-$^$9!#(B
 $B$3$l$O?7$7$/$F?h$JHG$N(B gnus $B$NBh0lG[I[>l=j$G!"(BNewsrc $B$r$V$C2u$7$F?M!9$r(B
 $B7cE\$5$l$k%5%$%H$H$7$FCN$i$l$F$$$^$9!#(B
 
@@ -18180,7 +18437,6 @@ but at the common table.@*
 * Gnus Development::    Gnus $B$,3+H/$5$l$F$$$kJ}K!(B
 * Contributors::        $BBgNL$N?M!9(B
 * New Features::        Gnus $B$N?7$7$$;v$K4X$9$k<j$,$+$j(B
-* Newest Features::     $B$"$^$j$K$b?7$7$$$?$a$K$^$@=q$+$l$F$$$J$$$b$N(B
 @end menu
 
 @node Gnus Versions
@@ -18208,12 +18464,14 @@ but at the common table.@*
 $B$K(B (99 $B%j%j!<%9$H(B CVS $B%j%]%8%H%j$G$N:n6H$N8e(B) ``Gnus 5.8'' $B$H$7$F%j%j!<(B
 $B%9$5$l$^$7$?!#(B
 
+2000$BG/(B10$B7n(B26$BF|$K(B Oort Gnus $B$,3+;O$5$l$^$7$?!#(B
+
 $B$b$7@\F,<-$r;}$C$?HG$N(B Gnus -- ``(ding) Gnus'', ``September Gnus'',
-``Red Gnus'', ``Quassia Gnus'' -- $B$K=P2q$C$F$b!":.Mp$7$J$$$G$/$@$5$$!#$"(B
-$B$J$?$,62$,$C$F$$$k;v$rCN$i$l$F$O$$$1$^$;$s!#8e$m$K2<$,$j$J$5$$!#$f$C$/$j(B
-$B$H!#B>$K2?$r$7$F$b!"Av$C$F$O$$$1$^$;$s!#$=$l$,FO$+$/$J$k$^$G!"@E$+$KJb$-(B
-$B5n$j$J$5$$!#E,@Z$K%j%j!<%9$5$l$?HG$N(B Gnus $B$r8+$D$1$F!"Be$o$j$K$=$l$K4s$j(B
-$BE:$C$F2<$5$$!#(B
+``Red Gnus'', ``Quassia Gnus'', ``Pterodactyl Gnus'', ``Oort Gnus''
+-- $B$K=P2q$C$F$b!":.Mp$7$J$$$G$/$@$5$$!#$"$J$?$,62$,$C$F$$$k;v$rCN$i$l$F(B
+$B$O$$$1$^$;$s!#8e$m$K2<$,$j$J$5$$!#$f$C$/$j$H!#B>$K2?$r$7$F$b!"Av$C$F$O$$(B
+$B$1$^$;$s!#$=$l$,FO$+$/$J$k$^$G!"@E$+$KJb$-5n$j$J$5$$!#E,@Z$K%j%j!<%9$5$l(B
+$B$?HG$N(B Gnus $B$r8+$D$1$F!"Be$o$j$K$=$l$K4s$jE:$C$F2<$5$$!#(B
 
 @node Other Gnus Versions
 @subsection $BB>$N(B gnus $B$N%P!<%8%g%s(B
@@ -18424,8 +18682,8 @@ Gnus $B$OFs$D$NCJ3,$N=[4D$G3+H/$5$l$F$$$^$9!#:G=i$NCJ3,(B
 @cindex Incoming*
 @vindex mail-source-delete-incoming
 $B%"%k%U%!(B Gnusae $B$H(B $B%j%j!<%9$5$l$?(B Gnusae $B$G$OJQ?t$N=i4|CM$,0c$&$b$N$,$"(B
-$B$j$^$9!#FC$K!"(B@code{mail-source-delete-incoming} $B$O%"%k%U%!(B Gnusae $B$G(B
-$B$O(B @code{nil} $B$G!"%j%j!<%9$5$l$?(B Gnusae $B$G$O(B @code{t} $B$G$9!#$3$l$O%a!<%k(B
+$B$j$^$9!#FC$K!"(B@code{mail-source-delete-incoming} $B$O%"%k%U%!(B gnusae $B$G(B
+$B$O(B @code{nil} $B$G!"%j%j!<%9$5$l$?(B gnusae $B$G$O(B @code{t} $B$G$9!#$3$l$O%a!<%k(B
 $B$r07$C$F$$$k:]$K!"%"%k%U%!%j%j!<%9$Nsrsw$K$h$j%a!<%k$r<:$J$&$3$H$rHr$1$k(B
 $B$?$a$G$9!#(B
 
@@ -18764,9 +19022,11 @@ Lloyd Zusman.
 
 @menu
 * ding Gnus::      $B:G=i$N?7$7$$(B Gnus $B$G$"$k(B Gnus 5.0/5.1 $B$N?7$7$$;v(B
-* September Gnus:: $B8x<0$K(B GNus 5.2/5.3 $B$H$7$FCN$i$l$F$$$k$b$N(B
+* September Gnus:: $B8x<0$K(B Gnus 5.2/5.3 $B$H$7$FCN$i$l$F$$$k$b$N(B
 * Red Gnus::       3 $BHVL\$N:G>e$N$b$N(B---Gnus 5.4/5.5
 * Quassia Gnus::   2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
+* Pterodactyl Gnus::   $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$F(B
+                       $BCN$i$l$F$$$k$b$N(B
 @end menu
 
 $B$3$N%j%9%H$O!"$b$A$m$s!"(B@emph{$B$?$$$F$$$N(B} $B=EMW$J?7$7$$5!G=$K4X$9(B
@@ -19414,1295 +19674,63 @@ M******** sm*rtq**t*s $B$rE,@Z$JJ8>O$KK]0F$9$k?7$7$$L?Na$,$"$j$^$9(B---
 
 @end itemize
 
-@node Newest Features
-@subsection $B:G?7$N5!G=(B
-@cindex todo
+@node Pterodactyl Gnus
+@subsubsection Pterodactyl Gnus
 
-@dfn{todo list} $B$H$7$F$bCN$i$l$F$$$^$9!#<!$N@iG/:W$^$G$K$O3N<B$K<BAu$5$l(B
-$B$k$G$7$g$&!#(B
-
-$B62$l$F2<$5$$!#Hs>o$K62$l$F2<$5$$!#(B
-
-($B$3$N0lMw$K8=$o$l$F$$$k5!G=$OI,$:$7$b;d$,$=$l$r<B:]$K<BAu$7$h$&$H7h$a$?(B
-$B$H$$$&$o$1$G$O$"$j$^$;$s!#$=$l$O;d$,$*$b$7$m$=$&$@$J!"$H;W$C$?$H$$$&$@$1(B
-$B$G$9!#(B)
-
-($B$O$$!"$3$l$O<B:]$N!":GM%@h$+$i$=$N<!$X$N(B todo list $B$G$9!#(B)
-
+Gnus 5.8 $B$N?7$7$$5!G=(B:
+  
 @itemize @bullet
 
-@item
- I would like the zombie-page to contain an URL to the source of the
-latest version of gnus or some explanation on where to find it.
-
-@item
- A way to continue editing the latest Message composition.
-
-@item
- http://www.sonicnet.com/feature/ari3/
-
-@item
- facep is not declared.
-
-@item
- Include a section in the manual on why the number of articles
-isn't the same in the group buffer and on the SPC prompt.
-
-@item
- Interacting with rmail fcc isn't easy.
-
-@item
-@example
- Hypermail:
-<URL:http://www.falch.no/people/pepper/DSSSL-Lite/archives/>
-<URL:http://www.eit.com/software/hypermail/hypermail.html>
-<URL:http://homer.ncm.com/>
-<URL:http://www.yahoo.com/Computers_and_Internet/Internet/World_Wide_Web/HTML_Converters/>
-http://www.uwsg.indiana.edu/hypermail/linux/kernel/9610/index.html
-<URL:http://union.ncsa.uiuc.edu/HyperNews/get/www/html/converters.html>
-http://www.miranova.com/gnus-list/
-
-@end example
-
-@item
-@samp{^-- } is made into - in LaTeX.
-
-@item
- gnus-kill is much slower than it was in GNUS 4.1.3.
-
-@item
- when expunging articles on low score, the sparse nodes keep hanging on?
-@item
- starting the first time seems to hang Gnus on some systems.  Does
-NEWGROUPS answer too fast?
-@item
- nndir doesn't read gzipped files.
-@item
- FAQ doesn't have an up node?
-@item
- when moving mail from a procmail spool to the crash-box,
-the crash-box is only appropriate to one specific group.
-@item
- `t' `t' makes X-Faces disappear.
-@item
- nnmh-be-safe means that crossposted articles will
-be marked as unread.
-@item
- Orphan score entries don't show on "V t" score trace
-@item
- when clearing out data, the cache data should also be reset.
-@item
- rewrite gnus-summary-limit-children to be non-recursive
-to avoid exceeding lisp nesting on huge groups.
-@item
- expunged articles are counted when computing scores.
-@item
- implement gnus-batch-brew-soup
-@item
- ticked articles aren't easy to read in pick mode -- `n' and
-stuff just skips past them.  Read articles are the same.
-@item
- topics that contain just groups with ticked
-articles aren't displayed.
-@item
- nndoc should always allocate unique Message-IDs.
-@item
- If there are mail groups the first time you use Gnus, Gnus'll
-make the mail groups killed.
-@item
- no "no news is good news" when using topics.
-@item
- when doing crosspost marking, the cache has to be consulted
-and articles have to be removed.
-@item
- nnweb should fetch complete articles when they are split into several
-parts.
-@item
- scoring on head immediate doesn't work.
-@item
- finding short score file names takes forever.
-@item
- canceling articles in foreign groups.
-@item
- nntp-open-rlogin no longer works.
-@item
- C-u C-x C-s (Summary) switches to the group buffer.
-@item
- move nnmail-split-history out to the backends.
-@item
- nnweb doesn't work properly.
-@item
- using a virtual server name as `gnus-select-method' doesn't work?
-@item
- when killing/yanking a group from one topic to another in a slave, the
-master will yank it first to one topic and then add it to another.
-Perhaps.
-
-@item
- warn user about `=' redirection of a group in the active file?
-@item
- take over the XEmacs menubar and offer a toggle between the XEmacs
-bar and the Gnus bar.
-@item
-@example
- push active file and NOV file parsing down into C code.
-`(canonize-message-id id)'
-`(mail-parent-message-id references n)'
-`(parse-news-nov-line &optional dependency-hashtb)'
-`(parse-news-nov-region beg end &optional dependency-hashtb fullp)'
-`(parse-news-active-region beg end hashtb)'
-
-@end example
-
-@item
- nnml .overview directory with splits.
-@item
- asynchronous cache
-@item
- postponed commands.
-@item
- the selected article show have its Subject displayed in its summary line.
-@item
- when entering groups, get the real number of unread articles from
-the server?
-@item
- sort after gathering threads -- make false roots have the
-headers of the oldest orphan with a 0 article number?
-@item
- nndoc groups should inherit the score files of their parents?  Also
-inherit copy prompts and save files.
-@item
- command to start up Gnus (if not running) and enter a mail mode buffer.
-@item
- allow editing the group description from the group buffer
-for backends that support that.
-@item
-gnus-hide,show-all-topics
-@item
- groups and sub-topics should be allowed to mingle inside each topic,
-and not just list all subtopics at the end.
-@item
- a command to remove all read articles that are not needed to connect
-threads -- `gnus-summary-limit-to-sparse-unread'?
-@item
- a variable to turn off limiting/cutting of threads in the tree buffer.
-@item
- a variable to limit how many files are uudecoded.
-@item
- add zombie groups to a special "New Groups" topic.
-@item
- server mode command: close/open all connections
-@item
- put a file date in gnus-score-alist and check whether the file
-has been changed before using it.
-@item
- on exit from a digest group, go to the next article in the parent group.
-@item
- hide (sub)threads with low score.
-@item
- when expiring, remove all marks from expired articles.
-@item
- gnus-summary-limit-to-body
-@item
- a regexp alist that says what level groups are to be subscribed
-on.  Eg. -- `(("nnml:" . 1))'.
-@item
- easier interface to nnkiboze to create ephemeral groups that
-contain groups that match a regexp.
-@item
- allow newlines in <URL:> urls, but remove them before using
-the URL.
-@item
- If there is no From line, the mail backends should fudge one from the
-"From " line.
-@item
- fuzzy simplifying should strip all non-alpha-numerical info
-from subject lines.
-@item
- gnus-soup-brew-soup-with-high-scores.
-@item
- nntp-ping-before-connect
-@item
- command to check whether NOV is evil.  "list overview.fmt".
-@item
- when entering a group, Gnus should look through the score
-files very early for `local' atoms and set those local variables.
-@item
- message annotations.
-@item
- topics are always yanked before groups, and that's not good.
-@item
- (set-extent-property extent 'help-echo "String to display in minibuf")
-to display help in the minibuffer on buttons under XEmacs.
-@item
- allow group line format spec to say how many articles there
-are in the cache.
-@item
- AUTHINFO GENERIC
-@item
- `run-with-idle-timer' in gnus-demon.
-@item
- stop using invisible text properties and start using overlays instead
-@item
- C-c C-f C-e to add an Expires header.
-@item
- go from one group to the next; everything is expunged; go to the
-next group instead of going to the group buffer.
-@item
- gnus-renumber-cache -- to renumber the cache using "low" numbers.
-@item
- record topic changes in the dribble buffer.
-@item
- `nnfolder-generate-active-file' should look at the folders it
-finds and generate proper active ranges.
-@item
- nneething-look-in-files-for-article-heads variable to control
-whether nneething should sniff all files in the directories.
-@item
- gnus-fetch-article -- start Gnus, enter group, display article
-@item
- gnus-dont-move-articles-to-same-group variable when respooling.
-@item
- when messages are crossposted between several auto-expirable groups,
-articles aren't properly marked as expirable.
-@item
- nneething should allow deletion/moving.
-@item
- TAB on the last button should go to the first button.
-@item
- if the car of an element in `mail-split-methods' is a function,
-and the function returns non-nil, use that as the name of the group(s) to
-save mail in.
-@item
- command for listing all score files that have been applied.
-@item
- a command in the article buffer to return to `summary' config.
-@item
- `gnus-always-post-using-current-server' -- variable to override
-`C-c C-c' when posting.
-@item
- nnmail-group-spool-alist -- says where each group should use
-as a spool file.
-@item
- when an article is crossposted to an auto-expirable group, the article
-should be marker as expirable.
-@item
- article mode command/menu for "send region as URL to browser".
-@item
- on errors, jump to info nodes that explain the error.  For instance,
-on invalid From headers, or on error messages from the nntp server.
-@item
- when gathering threads, make the article that has no "Re: " the parent.
-Also consult Date headers.
-@item
- a token in splits to call shrink-window-if-larger-than-buffer
-@item
- `1 0 A M' to do matches on the active hashtb.
-@item
- duplicates -- command to remove Gnus-Warning header, use the read
-Message-ID, delete the "original".
-@item
- when replying to several messages at once, put the "other" message-ids
-into a See-Also header.
-@item
- support setext: URL:http://www.bsdi.com/setext/
-@item
- support ProleText: <URL:http://proletext.clari.net/prole/proletext.html>
-@item
- when browsing a foreign server, the groups that are already subscribed
-should be listed as such and not as "K".
-@item
- generate font names dynamically.
-@item
- score file mode auto-alist.
-@item
- allow nndoc to change/add/delete things from documents.  Implement
-methods for each format for adding an article to the document.
-@item
- `gnus-fetch-old-headers' `all' value to incorporate
-absolutely all headers there is.
-@item
- function like `|', but concatenate all marked articles
-and pipe them to the process.
-@item
- cache the list of killed (or active) groups in a separate file.  Update
-the file whenever we read the active file or the list
-of killed groups in the .eld file reaches a certain length.
-@item
- function for starting to edit a file to put into
-the current mail group.
-@item
- score-find-trace should display the total score of the article.
-@item
- "ghettozie" -- score on Xref header and nix it out after using it
-to avoid marking as read in other groups it has been crossposted to.
-@item
- look at procmail splitting.  The backends should create
-the groups automatically if a spool file exists for that group.
-@item
- function for backends to register themselves with Gnus.
-@item
- when replying to several process-marked articles,
-have all the From end up in Cc headers?  Variable to toggle.
-@item
- command to delete a crossposted mail article from all
-groups it has been mailed to.
-@item
- `B c' and `B m' should be crosspost aware.
-@item
- hide-pgp should also hide PGP public key blocks.
-@item
- Command in the group buffer to respool process-marked groups.
-@item
- `gnus-summary-find-matching' should accept
-pseudo-"headers" like "body", "head" and "all"
-@item
- When buttifying <URL: > things, all white space (including
-newlines) should be ignored.
-@item
- Process-marking all groups in a topic should process-mark
-groups in subtopics as well.
-@item
- Add non-native groups to the list of killed groups when killing them.
-@item
- nntp-suggest-kewl-config to probe the nntp server and suggest
-variable settings.
-@item
- add edit and forward secondary marks.
-@item
- nnml shouldn't visit its .overview files.
-@item
- allow customizing sorting within gathered threads.
-@item
- `B q' shouldn't select the current article.
-@item
- nnmbox should support a newsgroups file for descriptions.
-@item
- allow fetching mail from several pop servers.
-@item
- Be able to specify whether the saving commands save the original
-or the formatted article.
-@item
- a command to reparent with the child process-marked (cf. `T ^'.).
-@item
- I think the possibility to send a password with nntp-open-rlogin
-should be a feature in Red Gnus.
-@item
- The `Z n' command should be possible to execute from a mouse click.
-@item
- more limiting functions -- date, etc.
-@item
- be able to limit on a random header; on body; using reverse matches.
-@item
- a group parameter (`absofucking-total-expiry') that will make Gnus expire
-even unread articles.
-@item
- a command to print the article buffer as postscript.
-@item
- variable to disable password fetching when opening by nntp-open-telnet.
-@item
- manual: more example servers -- nntp with rlogin, telnet
-@item
- checking for bogus groups should clean topic alists as well.
-@item
- canceling articles in foreign groups.
-@item
- article number in folded topics isn't properly updated by
-Xref handling.
-@item
- Movement in the group buffer to the next unread group should go to the
-next closed topic with unread messages if no group can be found.
-@item
- Extensive info pages generated on the fly with help everywhere --
-in the "*Gnus edit*" buffers, for instance.
-@item
- Topic movement commands -- like thread movement.  Up, down, forward, next.
-@item
- a way to tick/mark as read Gcc'd articles.
-@item
- a way to say that all groups within a specific topic comes
-from a particular server?  Hm.
-@item
- `gnus-article-fill-if-long-lines' -- a function to fill
-the article buffer if there are any looong lines there.
-@item
- `T h' should jump to the parent topic and fold it.
-@item
- a command to create an ephemeral nndoc group out of a file,
-and then splitting it/moving it to some other group/backend.
-@item
- a group parameter for nnkiboze groups that says that
-all kibozed articles should be entered into the cache.
-@item
- It should also probably be possible to delimit what
-`gnus-jog-cache' does -- for instance, work on just some groups, or on
-some levels, and entering just articles that have a score higher than
-a certain number.
-@item
- nnfolder should append to the folder instead of re-writing
-the entire folder to disk when accepting new messages.
-@item
- allow all backends to do the proper thing with .gz files.
-@item
- a backend for reading collections of babyl files nnbabylfolder?
-@item
- a command for making the native groups into foreign groups.
-@item
- server mode command for clearing read marks from all groups
-from a server.
-@item
- when following up multiple articles, include all To, Cc, etc headers
-from all articles.
-@item
- a command for deciding what the total score of the current
-thread is.  Also a way to highlight based on this.
-@item
- command to show and edit group scores
-@item
- a gnus-tree-minimize-horizontal to minimize tree buffers
-horizontally.
-@item
- command to generate nnml overview file for one group.
-@item
- `C-u C-u a' -- prompt for many crossposted groups.
-@item
- keep track of which mail groups have received new articles (in this session).
-Be able to generate a report and perhaps do some marking in the group
-buffer.
-@item
- gnus-build-sparse-threads to a number -- build only sparse threads
-that are of that length.
-@item
- have nnmh respect mh's unseen sequence in .mh_profile.
-@item
- cache the newsgroups descriptions locally.
-@item
- asynchronous posting under nntp.
-@item
- be able to control word adaptive scoring from the score files.
-@item
- a variable to make `C-c C-c' post using the "current" select method.
-@item
- `limit-exclude-low-scored-articles'.
-@item
- if `gnus-summary-show-thread' is a number, hide threads that have
-a score lower than this number.
-@item
- split newsgroup subscription variable up into "order" and "method".
-@item
- buttonize ange-ftp file names.
-@item
- a command to make a duplicate copy of the current article
-so that each copy can be edited separately.
-@item
- nnweb should allow fetching from the local nntp server.
-@item
- record the sorting done in the summary buffer so that
-it can be repeated when limiting/regenerating the buffer.
-@item
- nnml-generate-nov-databses should generate for
-all nnml servers.
-@item
- when the user does commands in the group buffer, check
-the modification time of the .newsrc.eld file and use
-ask-user-about-supersession-threat.  Also warn when trying
-to save .newsrc.eld and it has changed.
-@item
- M-g on a topic will display all groups with 0 articles in
-the topic.
-@item
- command to remove all topic stuff.
-@item
- allow exploding incoming digests when reading incoming mail
-and splitting the resulting digests.
-@item
- nnsoup shouldn't set the `message-' variables.
-@item
- command to nix out all nnoo state information.
-@item
- nnmail-process-alist that calls functions if group names
-matches an alist -- before saving.
-@item
- use buffer-invisibility-spec everywhere for hiding text.
-@item
- variable to activate each group before entering them
-to get the (new) number of articles.  `gnus-activate-before-entering'.
-@item
- command to fetch a Message-ID from any buffer, even
-starting Gnus first if necessary.
-@item
- when posting and checking whether a group exists or not, just
-ask the nntp server instead of relying on the active hashtb.
-@item
- buttonize the output of `C-c C-a' in an apropos-like way.
-@item
- `G p' should understand process/prefix, and allow editing
-of several groups at once.
-@item
- command to create an ephemeral nnvirtual group that
-matches some regexp(s).
-@item
- nndoc should understand "Content-Type: message/rfc822" forwarded messages.
-@item
- it should be possible to score "thread" on the From header.
-@item
- hitting RET on a "gnus-uu-archive" pseudo article should unpack it.
-@item
- `B i' should display the article at once in the summary buffer.
-@item
- remove the "*" mark at once when unticking an article.
-@item
- `M-s' should highlight the matching text.
-@item
- when checking for duplicated mails, use Resent-Message-ID if present.
-@item
- killing and yanking groups in topics should be better.  If killing one copy
-of a group that exists in multiple topics, only that copy should
-be removed.  Yanking should insert the copy, and yanking topics
-should be possible to be interspersed with the other yankings.
-@item
- command for enter a group just to read the cached articles.  A way to say
-"ignore the nntp connection; just read from the cache."
-@item
- `X u' should decode base64 articles.
-@item
- a way to hide all "inner" cited text, leaving just the most
-recently cited text.
-@item
- nnvirtual should be asynchronous.
-@item
- after editing an article, gnus-original-article-buffer should
-be invalidated.
-@item
- there should probably be a way to make Gnus not connect to the
-server and just read the articles in the server
-@item
- allow a `set-default' (or something) to change the default
-value of nnoo variables.
-@item
- a command to import group infos from a .newsrc.eld file.
-@item
- groups from secondary servers have the entire select method
-listed in each group info.
-@item
- a command for just switching from the summary buffer to the group
-buffer.
-@item
- a way to specify that some incoming mail washing functions
-should only be applied to some groups.
-@item
- Message `C-f C-t' should ask the user whether to heed
-mail-copies-to: never.
-@item
- new group parameter -- `post-to-server' that says to post
-using the current server.  Also a variable to do the same.
-@item
- the slave dribble files should auto-save to the slave file names.
-@item
- a group parameter that says what articles to display on group entry, based
-on article marks.
-@item
- a way to visually distinguish slave Gnusae from masters.  (Whip instead
-of normal logo?)
-@item
- Use DJ Bernstein "From " quoting/dequoting, where applicable.
-@item
- Why is hide-citation-maybe and hide-citation different?  Also
-clear up info.
-@item
- group user-defined meta-parameters.
-
-From: John Griffith <griffith@@sfs.nphil.uni-tuebingen.de>
-@item
- I like the option for trying to retrieve the FAQ for a group and I was
-thinking it would be great if for those newsgroups that had archives
-you could also try to read the archive for that group.  Part of the
-problem is that archives are spread all over the net, unlike FAQs.
-What would be best I suppose is to find the one closest to your site.
-
-In any case, there is a list of general news group archives at @*
-ftp://ftp.neosoft.com/pub/users/claird/news.lists/newsgroup_archives.html
-
-@item
-@example
-From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
-(add-hook 'gnus-select-group-hook
-  (lambda ()
-    (gnus-group-add-parameter group
-       (cons 'gnus-group-date-last-entered (list (current-time-string))))))
-
-(defun gnus-user-format-function-d (headers)
-  "Return the date the group was last read."
-  (cond ((car (gnus-group-get-parameter gnus-tmp-group 'gnus-group-date-last-entered)))
-      (t "")))
-@end example
-
-@item
- tanken var at n.ANer du bruker `gnus-startup-file' som prefix (FOO) til Ne lete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v.ANfre en
-liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
-hatt forskjellige serveres startup-filer forskjellige steder.
-
-@item
-LMI> Well, nnbabyl could alter the group info to heed labels like
-LMI> answered and read, I guess.
-
-It could also keep them updated (the same for the Status: header of
-unix mbox files).
-
-They could be used like this:
-
-@example
-`M l <name> RET' add label <name> to current message.
-`M u <name> RET' remove label <name> from current message.
-`/ l <expr> RET' limit summary buffer according to <expr>.
-
-<expr> would be a boolean expression on the labels, e.g.
-
-`/ l bug & !fixed RET'
-@end example
-
-would show all the messages which are labeled `bug' but not labeled
-`fixed'.
-
-One could also imagine the labels being used for highlighting, or
-affect the summary line format.
-
-@item
-Sender: abraham@@dina.kvl.dk
-
-I'd like a gnus-find-file which work like find file, except that it
-would recognize things that looks like messages or folders:
-
-- If it is a directory containing numbered files, create an nndir
-summary buffer.
-
-- For other directories, create a nneething summary buffer.
-
-- For files matching "\\`From ", create a nndoc/mbox summary.
-
-- For files matching "\\`BABYL OPTIONS:", create a nndoc/baby summary.
-
-- For files matching "\\`[^ \t\n]+:", create an *Article* buffer.
-
-- For other files, just find them normally.
-
-I'd like `nneething' to use this function, so it would work on a
-directory potentially containing mboxes or babyl files.
-
-@item
-Please send a mail to bwarsaw@@cnri.reston.va.us (Barry A. Warsaw) and
-tell him what you are doing.
-
-@item
-Currently, I get prompted:
-
-decend into sci?
-- type y
-decend into sci.something ?
-- type n
-decend into ucd?
-
-The problem above is that since there is really only one subsection of
-science, shouldn't it prompt you for only descending sci.something?  If
-there was a sci.somethingelse group or section, then it should prompt
-for sci? first the sci.something? then sci.somethingelse?...
-
-@item
-Ja, det burde v.ANfre en mNete Ne si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  S.ANe kunne score-regler legges til den
-"mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
-"no.all.SCORE", osv.
-
-@item
-What i want is for Gnus to treat any sequence or combination of the following
-as a single spoiler warning and hide it all, replacing it with a "Next Page"
-button:
-
-^L's
-
-more than n blank lines
-
-more than m identical lines
-(which should be replaced with button to show them)
-
-any whitespace surrounding any of the above
-
-@item
-Well, we could allow a new value to `gnus-thread-ignore-subject' --
-`spaces', or something.  (We could even default to that.)  And then
-subjects that differ in white space only could be considered the
-"same" subject for threading purposes.
-
-@item
-Modes to preprocess the contents (e.g. jka-compr) use the second form
-"(REGEXP FUNCTION NON-NIL)" while ordinary modes (e.g. tex) use the first
-form "(REGEXP . FUNCTION)", so you could use it to distinguish between
-those two types of modes. (auto-modes-alist, insert-file-contents-literally.)
-
-@item
- Under XEmacs -- do funny article marks:
-tick - thumb tack
-killed - skull
-soup - bowl of soup
-score below - dim light bulb
-score over - bright light bulb
-
-@item
-Yes. I think the algorithm is as follows:
-
-@example
-Group-mode
-
-   show-list-of-articles-in-group
-        if (key-pressed == SPACE)
-                if (no-more-articles-in-group-to-select)
-                        if (articles-selected)
-                                start-reading-selected-articles;
-                        junk-unread-articles;
-                        next-group;
-                 else
-                        show-next-page;
-
-         else if (key-pressed = '.')
-                if (consolidated-menus)         # same as hide-thread in Gnus
-                        select-thread-under-cursor;
-                else
-                        select-article-under-cursor;
-
-Article-mode
-        if (key-pressed == SPACE)
-                if (more-pages-in-article)
-                        next-page;
-                else if (more-selected-articles-to-read)
-                        next-article;
-                else
-                        next-group;
-@end example
-
-@item
-My precise need here would have been to limit files to Incoming*.
-One could think of some `nneething-only-files' variable, but I guess
-it would have been unacceptable if one was using many unrelated such
-nneething groups.
-
-A more useful approach would be to, in response to the `G D' prompt, be
-allowed to say something like: `~/.mail/Incoming*', somewhat limiting
-the top-level directory only (in case directories would be matched by
-the wildcard expression).
-
-@item
-It would be nice if it also handled
-
-        <URL:news://sunsite.auc.dk/>
-
-which should correspond to `B nntp RET sunsite.auc.dk' in *Group*.
-
-@item
-
-  Take a look at w3-menu.el in the Emacs-W3 distribution - this works out
-really well.  Each menu is 'named' by a symbol that would be on a
-gnus-*-menus (where * would be whatever, but at least group, summary, and
-article versions) variable.
-
-  So for gnus-summary-menus, I would set to '(sort mark dispose ...)
-
-  A value of '1' would just put _all_ the menus in a single 'GNUS' menu in
-the main menubar.  This approach works really well for Emacs-W3 and VM.
-
-@item
- nndoc should take care to create unique Message-IDs for all its
-articles.
-@item
- gnus-score-followup-article only works when you have a summary buffer
-active.  Make it work when posting from the group buffer as well.
-(message-sent-hook).
-@item
- rewrite gnus-demon to use run-with-idle-timers.
-
-@item
- * Enhancements to Gnus:
-
-  Add two commands:
-
-  * gnus-servers (gnus-start-server-buffer?)--enters Gnus and goes
-    straight to the server buffer, without opening any connections to
-    servers first.
-
-  * gnus-server-read-server-newsrc--produces a buffer very similar to
-    the group buffer, but with only groups from that server listed;
-    quitting this buffer returns to the server buffer.
-
-@item
- add a command to check the integrity of an nnfolder folder --
-go through the article numbers and see that there are no duplicates,
-and stuff.
-
-@item
- `unsmileyfy-buffer' to undo smileification.
-
-@item
- a command to give all relevant info on an article, including all
-secondary marks.
-
-@item
- when doing `-request-accept-article', the backends should do
-the nnmail duplicate checking.
-
-@item
- allow `message-signature-file' to be a function to return the
-value of the signature file.
-
-@item
- In addition, I would love it if I could configure message-tab so that it
-could call `bbdb-complete-name' in other headers.  So, some sort of
-interface like
-
-(setq message-tab-alist
-      '((message-header-regexp message-expand-group)
-        ("^\\(To\\|[cC]c\\|[bB]cc\\)"  bbdb-complete-name)))
-
-then you could run the relevant function to complete the information in
-the header
-
-@item
- cache the newsgroups file locally to avoid reloading it all the time.
-
-@item
- a command to import a buffer into a group.
-
-@item
- nnweb should allow fetching by Message-ID from servers.
-
-@item
- point in the article buffer doesn't always go to the
-beginning of the buffer when selecting new articles.
-
-@item
- a command to process mark all unread articles.
-
-@item
- `gnus-gather-threads-by-references-and-subject' -- first
-do gathering by references, and then go through the dummy roots and
-do more gathering by subject.
-
-@item
- gnus-uu-mark-in-numerical-order -- process mark articles in
-article numerical order.
-
-@item
- (gnus-thread-total-score
- (gnus-id-to-thread (mail-header-id (gnus-summary-article-header))))
-bind to a key.
-
-@item
- sorting by score is wrong when using sparse threads.
-
-@item
- a command to fetch an arbitrary article -- without having to be
-in the summary buffer.
-
-@item
- a new nncvs backend.  Each group would show an article, using
-version branches as threading, checkin date as the date, etc.
-
-@item
- http://www.dejanews.com/forms/dnsetfilter_exp.html ?
-This filter allows one to construct advance queries on the Dejanews
-database such as specifying start and end dates, subject, author,
-and/or newsgroup name.
-
-@item
- new Date header scoring type -- older, newer
-
-@item
- use the summary toolbar in the article buffer.
-
-@item
- a command to fetch all articles that are less than X days old.
-
-@item
- in pick mode, `q' should save the list of selected articles in the
-group info.  The next time the group is selected, these articles
-will automatically get the process mark.
-
-@item
- Isn't it possible to (also?) allow M-^ to automatically try the
-default server if it fails on the current server?  (controlled by a
-user variable, (nil, t, 'ask)).
-
-@item
- make it possible to cancel articles using the select method for the
-current group.
-
-@item
- `gnus-summary-select-article-on-entry' or something.  It'll default
-to t and will select whatever article decided by `gnus-auto-select-first'.
-
-@item
- a new variable to control which selection commands should be unselecting.
-`first', `best', `next', `prev', `next-unread', `prev-unread' are
-candidates.
-
-@item
- be able to select groups that have no articles in them
-to be able to post in them (using the current select method).
-
-@item
- be able to post via DejaNews.
-
-@item
- `x' should retain any sortings that have been performed.
-
-@item
- allow the user to specify the precedence of the secondary marks.  Also
-allow them to be displayed separately.
-
-@item
- gnus-summary-save-in-pipe should concatenate the results from
-the processes when doing a process marked pipe.
-
-@item
- a new match type, like Followup, but which adds Thread matches on all
-articles that match a certain From header.
-
-@item
- a function that can be read from kill-emacs-query-functions to offer
-saving living summary buffers.
-
-@item
- a function for selecting a particular group which will contain
-the articles listed in a list of article numbers/id's.
-
-@item
- a battery of character translation functions to translate common
-Mac, MS (etc) characters into ISO 8859-1.
-
-@example
-(defun article-fix-m$word ()
-  "Fix M$Word smartquotes in an article."
-  (interactive)
-  (save-excursion
-    (let ((buffer-read-only nil))
-      (goto-char (point-min))
-      (while (search-forward "\221" nil t)
-        (replace-match "`" t t))
-      (goto-char (point-min))
-      (while (search-forward "\222" nil t)
-        (replace-match "'" t t))
-      (goto-char (point-min))
-      (while (search-forward "\223" nil t)
-        (replace-match "\"" t t))
-      (goto-char (point-min))
-      (while (search-forward "\224" nil t)
-        (replace-match "\"" t t)))))
-@end example
-
-@item
-@example
- (add-hook 'gnus-exit-query-functions
-'(lambda ()
-   (if (and (file-exists-p nnmail-spool-file)
-            (> (nnheader-file-size nnmail-spool-file) 0))
-       (yes-or-no-p "New mail has arrived.  Quit Gnus anyways? ")
-       (y-or-n-p "Are you sure you want to quit Gnus? "))))
-@end example
-
-@item
- allow message-default-headers to be a function.
-
-@item
- new Date score match types -- < > = (etc) that take floating point
-numbers and match on the age of the article.
-
-@item
-@example
->  > > If so, I've got one gripe: It seems that when I fire up gnus 5.2.25
->  > > under xemacs-19.14, it's creating a new frame, but is erasing the
->  > > buffer in the frame that it was called from =:-O
->
->  > Hm.  How do you start up Gnus?  From the toolbar or with
->  > `M-x gnus-other-frame'?
->
->    I normally start it up from the toolbar; at
-> least that's the way I've caught it doing the
-> deed before.
-@end example
-
-@item
- all commands that react to the process mark should push
-the current process mark set onto the stack.
-
-@item
- gnus-article-hide-pgp
-Selv ville jeg nok ha valgt .ANe slette den dersom teksten matcher
-@example
-"\\(This\s+\\)?[^ ]+ has been automatically signed by"
-@end example
-og det er maks hundre tegn mellom match-end og ----linja.  Men -det-
-er min type heuristikk og langt fra alles.
-
-@item
- `gnus-subscribe-sorted' -- insert new groups where they would have been
-sorted to if `gnus-group-sort-function' were run.
-
-@item
- gnus-(group,summary)-highlight should respect any `face' text props set
-on the lines.
-
-@item
- use run-with-idle-timer for gnus-demon instead of the
-home-brewed stuff for better reliability.
-
-@item
- add a way to select which NoCeM type to apply -- spam, troll, etc.
-
-@item
- nndraft-request-group should tally auto-save files.
-
-@item
- implement nntp-retry-on-break and nntp-command-timeout.
-
-@item
- gnus-article-highlight-limit that says when not to highlight (long)
-articles.
-
-@item
- (nnoo-set SERVER VARIABLE VALUE)
-
-@item
- nn*-spool-methods
-
-@item
- interrupitng agent fetching of articles should save articles.
-
-@item
- command to open a digest group, and copy all the articles there to the
-current group.
-
-@item
- a variable to disable article body highlights if there's more than
-X characters in the body.
-
-@item
- handle 480/381 authinfo requests separately.
-
-@item
- include the texi/dir file in the distribution.
-
-@item
- format spec to "tab" to a position.
-
-@item
- Move all prompting to the new `M-n' default style.
-
-@item
- command to display all dormant articles.
-
-@item
- gnus-auto-select-next makeover -- list of things it should do.
-
-@item
- a score match type that adds scores matching on From if From has replied
-to something someone else has said.
-
-@item
- Read Netscape discussion groups:
-snews://secnews.netscape.com/netscape.communicator.unix
-
-@item
-One command to edit the original version if an article, and one to edit
-the displayed version.
-
-@item
-@kbd{T v} -- make all process-marked articles the children of the
-current article.
-
-@item
-Switch from initial text to the new default text mechanism.
-
-@item
-How about making it possible to expire local articles?  Will it be
-possible to make various constraints on when an article can be
-expired, e.g. (read), (age > 14 days), or the more interesting (read
-& age > 14 days)?
-
-@item
-New limit command---limit to articles that have a certain string
-in the head or body.
-
-@item
-Allow breaking lengthy @sc{nntp} commands.
-
-@item
-gnus-article-highlight-limit, to disable highlighting in big articles.
-
-@item
-Editing an article should put the article to be edited
-in a special, unique buffer.
-
-@item
-A command to send a mail to the admin-address group param.
-
-@item
-A Date scoring type that will match if the article
-is less than a certain number of days old.
-
-@item
-New spec: %~(tab 56) to put point on column 56
-
-@item
-Allow Gnus Agent scoring to use normal score files.
-
-@item
-Rething the Agent active file thing.  `M-g' doesn't update the active
-file, for instance.
-
-@item
-With dummy roots, `^' and then selecing the first article
-in any other dummy thread will make gnus highlight the
-dummy root instead of the first article.
-
-@item
-Propagate all group properties (marks, article numbers, etc) up to the
-topics for displaying.
-
-@item
-`n' in the group buffer with topics should go to the next group
-with unread articles, even if that group is hidden in a topic.
-
-@item
-gnus-summary-limit-include-cached is slow when there are
-many articles in the cache, since it regenerates big parts of the
-summary buffer for each article.
-
-@item
-Implement gnus-batch-brew-soup.
-
-@item
-Group parameters and summary commands for un/subscribing to mailing
-lists.
-
-@item
-Introduce nnmail-home-directory.
-
-@item
-gnus-fetch-group and friends should exit Gnus when the user
-exits the group.
-
-@item
-The jingle is only played on the second invocation of Gnus.
-
-@item
-Bouncing articles should do MIME.
-
-@item
-Crossposted articles should "inherit" the % or @@ mark from the other
-groups it has been crossposted to, or something.  (Agent.)
-
-@item
-If point is on a group that appears multiple times in topics, and
-you press `l', point will move to the first instance of the group.
-
-@item
-A spec for the group line format to display the number of
-agent-downloaded articles in the group.
-
-@item
-Some nntp servers never respond when posting, so there should be a
-timeout for all commands.
-
-@item
-When stading on a topic line and `t'-ing, point goes to the last line.
-It should go somewhere else.
-
-@item
-I'm having trouble accessing a newsgroup with a "+" in its name with
-Gnus.  There is a new newsgroup on msnews.microsoft.com named
-"microsoft.public.multimedia.directx.html+time" that I'm trying to
-access as
-"nntp+msnews.microsoft.com:microsoft.public.multimedia.directx.html+time"
-but it gives an error that it cant access the group.
-
-Is the "+" character illegal in newsgroup names?  Is there any way in
-Gnus to work around this?  (gnus 5.6.45 - XEmacs 20.4)
-
-@item
-
-When `#F', do:
-
-@example
-Subject: Answer to your mails 01.01.1999-01.05.1999
- --text follows this line--
-Sorry I killfiled you...
-
-Under the subject "foo", you wrote on 01.01.1999:
-> bar
-Under the subject "foo1", you wrote on 01.01.1999:
-> bar 1
-@end example
-
-@item
-Allow "orphan" scores in the Agent scoring.
-
-@item
-@example
-    - Edit article's summary line.
-    - End edit
-    - Sort lines in buffer by subject
-
-    --> the old subject line appears in Summary buffer, not the one that was
-    just changed to.
-@end example
-
-@item
-Remove list identifiers from the subject in the summary when doing `^'
-and the like.
-
-@item
-Have the Agent write out articles, one by one, as it retrieves them,
-to avoid having to re-fetch them all if Emacs should crash while
-fetching.
-
-@item
-Be able to forward groups of messages as MIME digests.
-
-@item
-nnweb should include the "get whole article" article when getting articles.
-
-@item
-When I type W W c (gnus-article-hide-citation) in the summary
-buffer, the citations are revealed, but the [+] buttons don't turn
-into [-] buttons.  (If I click on one of the [+] buttons, it does
-turn into a [-] button.)
-
-@item
-Perhaps there should be a command to "attach" a buffer of comments to
-a message?  That is, `B WHATEVER', you're popped into a buffer, write
-something, end with `C-c C-c', and then the thing you've written gets
-to be the child of the message you're commenting.
-
-@item
-Handle external-body parts.
-
-@item
-When renaming a group name, nnmail-split-history does not get the group
-name renamed.
-
-@item
-Allow mail splitting on bodies when using advanced mail splitting.
+@item $B%a!<%k$r<h$j9~$`5!G=$,JQ$o$j$^$7$?!#$?$/$5$s$N>\:Y$K$D$$$F$O%^%K%e(B
+$B%"%k$r8+$F2<$5$$!#FC$K!"(Bprocmail $B$G<h$j9~$`$?$a$N$9$Y$F$NJQ?t$,L5$/$J$C(B
+$B$F$$$^$9!#(B
+
+$B$3$N$h$&$J(B procmail $B$N;H$$J}$O(B
 
 @lisp
-  (body "whatever.text")
+(setq nnmail-use-procmail t)
+(setq nnmail-spool-file 'procmail)
+(setq nnmail-procmail-directory "~/mail/incoming/")
+(setq nnmail-procmail-suffix "\\.in")
 @end lisp
 
-@item
-Be able to run `J u' from summary buffers.
+$B8=:_$O<!$N$h$&$KJQ$o$C$F$$$^$9!#(B
 
-@item
-Solve the halting problem.
+@lisp
+(setq mail-sources
+      '((directory :path "~/mail/incoming/"
+		   :suffix ".in")))
+@end lisp
 
-@c TODO
+$B$b$C$H>\$7$$>pJs$O(B info $B$N(B Select Methods -> Getting Mail -> Mail
+Sources $B$GF@$k$3$H$,$G$-$^$9!#(B
+
+@item Gnus $B$O(B MIME $B$KBP1~$7$?%j!<%@!<$K$J$j$^$7$?!#$3$l$O(B Gnus $B$NB?$/$N(B
+$BItJ,$K1F6A$7$F$$$F!"$?$/$5$s$N?7$7$$%3%^%s%I$,DI2C$5$l$F$$$^$9!#>\:Y$O%^(B
+$B%K%e%"%k$r;2>H$7$F2<$5$$!#(B($BLuCm(B: T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p(B
+$B$E$$$F$$$^$9!#(B)
+
+@item Gnus $B$O$^$?3F9q8lBP1~$K$J$j$^$7$?!#$3$3$G$OMWLs$G$-$J$$$/$i$$(B
+$B$K(B Gnus $B$NB?$/$NItJ,$K1F6A$7$F$$$F!"?7$7$$$?$/$5$s$NJQ?t$,DI2C$5$l$F$$$^(B
+$B$9!#(B($BLuCm(B: T-gnus $B$O(B SEMI $B$*$h$S(B FLIM $B$N=t5!G=$K4p$E$$$F$$$^$9!#(B)
+
+@item @code{gnus-auto-select-first} $B$,4X?t$G$"$C$F$b$h$/$J$j$^$7$?!#(B
+
+@item Summary $B%P%C%U%!$H(B NOV $B%U%!%$%k$K4^$a$kDI2C$N%X%C%@!<$r!"%f!<%6$,(B
+$B7h$a$k$3$H$,$G$-$k$h$&$K$J$j$^$7$?!#(B
+
+@item @code{gnus-article-display-hook} $B$,:o=|$5$l$^$7$?!#Be$o$j(B
+$B$K(B @code{gnus-treat-} $B$G;O$^$k$?$/$5$s$NJQ?t$,DI2C$5$l$^$7$?!#(B
+
+@item Gnus posting styles $B$,:F$S2~Au$5$l$^$7$?!#8=:_$OHyL/$K0c$&5,B'$GF0(B
+$B:n$7$^$9!#(B
+
+@item $B?7$7$$%&%'%V$K4p$E$$$?%P%C%/%(%s%I$,DI2C$5$l$^$7$?!#(B
+@code{nnslashdot}, @code{nnwarchive} $B$*$h$S(B @code{nnultimate} $B$G$9!#(B
+nnweb $B$O:F$S2~:n$5$l!">o$KJQ2=$9$k9=@.$rB3$1$^$9!#(B
+
+@item Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B IMAP $B%a!<%k$rFI$`$3$H$,$G$-$^$9!#(B
+
 @end itemize
 
 @iftex
@@ -21113,11 +20141,11 @@ Gnus $B$OH"$+$i=P$7$F$9$0$K(B @emph{$BHs>o$K(B} $B$h$/F0:n$7$^$9(B---$B2?
 
 @item
 @kbd{M-x gnus-version} $B$r;n$7$F2<$5$$!#$b$7!"(B
-@samp{T-gnus 6.14.* (based on Gnus v5.8.8; for SEMI 1.13, FLIM 1.13)} $B$N(B
-$B$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#$b$7!"(B
-@samp{NNTP 3.x} $B$d(B @samp{nntp flee} $B$N$h$&$J$b$N$,=P$F$-$?$H$-$O!"$=$3$K(B
-$B$"$k$$$/$D$+$N8E$$(B @file{.el} $B%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#$=$l$i$r>C$7(B
-$B$F2<$5$$!#(B
+@samp{T-gnus 6.15.* (based on Oort Gnus v0.*; for SEMI 1.1*, FLIM
+1.1*)} $B$N$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#(B
+$B$b$7!"(B@samp{NNTP 3.x} $B$d(B @samp{nntp flee} $B$N$h$&$J$b$N$,=P$F$-$?$H$-$O!"(B
+$B$=$3$K$"$k$$$/$D$+$N8E$$(B @file{.el} $B%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#$=$l$i(B
+$B$r>C$7$F2<$5$$!#(B
 
 @item
 FAQ $B$H(B how-to $B$rFI$`$?$a$K%X%k%W%0%k!<%W(B ($B%0%k!<%W%P%C%U%!(B
@@ -22664,3 +21692,8 @@ Gnus $B$O(B Emacs Lisp $B$K$h$C$F=q$+$l$F$$$F!"$=$l$O$?$/$5$s$NC`<!2r<a<B9T$5
 @end iftex
 
 @c End:
+% LocalWords:  Backend BNF mucho Backends backends detailmenu cindex kindex kbd
+% LocalWords:  findex Gnusae vindex dfn dfn samp nntp setq nnspool nntpserver
+% LocalWords:  nnmbox backend newusers Blllrph NEWGROUPS dingnusdingnusdingnus
+% LocalWords:  pre fab rec comp nnslashdot regex ga ga sci nnml nnbabyl nnmh
+% LocalWords:  nnfolder emph looong eld newsreaders defun init elc pxref

@@ -100,9 +100,9 @@ Some people may want to add \"unknown\" to this list."
   (when (featurep 'x)
     (let ((types (list "xbm")))
       (when (featurep 'gif)
-	(push "gif" types))
+	(setq types (cons "gif" types)))
       (when (featurep 'xpm)
-	(push "xpm" types))
+	(setq types (cons "xpm" types)))
       types))
   "*List of suffixes on picon file names to try."
   :type '(repeat string)
@@ -258,8 +258,9 @@ arguments necessary for the job.")
     (when (and (featurep 'xpm)
 	       (or (not (fboundp 'device-type)) (equal (device-type) 'x))
 	       (setq from (mail-fetch-field "from"))
-	       (setq from (downcase (or (cadr (mail-extract-address-components
-					       from))
+	       (setq from (downcase (or (cadr
+					 (funcall gnus-extract-address-components
+						  from))
 					"")))
 	       (or (setq at-idx (string-match "@" from))
 		   (setq at-idx (length from))))

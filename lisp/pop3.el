@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
@@ -162,6 +162,28 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (kill-buffer crashbuf)
     message-count))
 
+(defun pop3-get-message-count ()
+  "Return the number of messages in the maildrop."
+  (let* ((process (pop3-open-server pop3-mailhost pop3-port))
+	 message-count
+	 (pop3-password pop3-password)
+	 )
+    ;; for debugging only
+    (if pop3-debug (switch-to-buffer (process-buffer process)))
+    ;; query for password
+    (if (and pop3-password-required (not pop3-password))
+	(setq pop3-password
+	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+    (cond ((equal 'apop pop3-authentication-scheme)
+	   (pop3-apop process pop3-maildrop))
+	  ((equal 'pass pop3-authentication-scheme)
+	   (pop3-user process pop3-maildrop)
+	   (pop3-pass process))
+	  (t (error "Invalid POP3 authentication scheme.")))
+    (setq message-count (car (pop3-stat process)))
+    (pop3-quit process)
+    message-count))
+
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection.
@@ -255,8 +277,8 @@ Args are NAME BUFFER HOST SERVICE."
     )
 
 (defun pop3-read-response (process &optional return)
-  "Read the response from the server.
-Return the response string if optional second argument is non-nil."
+  "Read the response from the server PROCESS.
+Return the response string if optional second argument RETURN is non-nil."
   (let ((case-fold-search nil)
 	match-end)
     (save-excursion
@@ -303,10 +325,31 @@ Return the response string if optional second argument is non-nil."
       (forward-char)))
   (set-marker end nil))
 
+(eval-when-compile (defvar parse-time-months))
+
+;; Copied from message-make-date.
+(defun pop3-make-date (&optional now)
+  "Make a valid date header.
+If NOW, use that time instead."
+  (require 'parse-time)
+  (let* ((now (or now (current-time)))
+	 (zone (nth 8 (decode-time now)))
+	 (sign "+"))
+    (when (< zone 0)
+      (setq sign "-")
+      (setq zone (- zone)))
+    (concat
+     (format-time-string "%d" now)
+     ;; The month name of the %b spec is locale-specific.  Pfff.
+     (format " %s "
+	     (capitalize (car (rassoc (nth 4 (decode-time now))
+				      parse-time-months))))
+     (format-time-string "%Y %H:%M:%S " now)
+     ;; We do all of this because XEmacs doesn't have the %z spec.
+     (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60)))))
+
 (defun pop3-munge-message-separator (start end)
   "Check to see if a message separator exists.  If not, generate one."
-  (if (not (fboundp 'parse-time-string))
-      (autoload 'parse-time-string "parse-time"))
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
@@ -316,26 +359,44 @@ Return the response string if optional second argument is non-nil."
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (mail-fetch-field "Date"))
+		(date (split-string (or (mail-fetch-field "Date")
+					(pop3-make-date))
+				    " "))
 		(From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
-	    (setq date (format-time-string
-			"%a %b %e %T %Y"
-			(if date
-			    (condition-case nil
-				(apply 'encode-time (parse-time-string date))
-			      (error (current-time)))
-			  (current-time))))
+	    (setq date
+		  (cond ((string-match "[A-Z]" (nth 0 date))
+			 (format "%s %s %s %s %s"
+				 (nth 0 date) (nth 2 date) (nth 1 date)
+				 (nth 4 date) (nth 3 date)))
+			(t
+			 ;; this really needs to be better but I don't feel
+			 ;; like writing a date to day converter.
+			 (format "Sun %s %s %s %s"
+				 (nth 1 date) (nth 0 date)
+				 (nth 3 date) (nth 2 date)))
+			))
 	    (setq From_ (format "\nFrom %s  %s\n" from date))
 	    (while (string-match "," From_)
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
-	    (insert From_))))))
+	    (insert From_)
+	    (if (search-forward "\n\n" nil t)
+		nil
+	      (goto-char (point-max))
+	      (insert "\n"))
+	    (narrow-to-region (point) (point-max))
+	    (let ((size (- (point-max) (point-min))))
+	      (goto-char (point-min))
+	      (widen)
+	      (forward-line -1)
+	      (insert (format "Content-Length: %s\n" size)))
+	    )))))
 
 ;; UIDL support
 

@@ -1,4 +1,4 @@
-This package contains T-gnus 6.14.
+This package contains T-gnus 6.15.
 
 What is T-gnus?
 ===============
@@ -8,7 +8,7 @@ features of Gnus and gnus-mime, so there are no need to install Gnus
 to use it, and you must not use gnus-mime for SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
-them before to install it.  T-gnus 6.14 requires APEL 10.0 or later,
+them before to install it.  T-gnus 6.15 requires APEL 10.0 or later,
 FLIM (1.13.1 or later) and SEMI/WEMI (1.13.5 or later).  You can get
 these packages from:
 
@@ -31,7 +31,7 @@ How to get? (via CVS)
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_14 gnus
+	checkout -r t-gnus-6_15-quimby gnus
 
 (2) compile
 
@@ -41,15 +41,12 @@ How to get? (via CVS)
 
 (3) update
 
-    % cvs update -r t-gnus-6_14 gnus
+    % cvs update -r t-gnus-6_15-quimby gnus
 
 Major tags are following:
 
     t-gnus-6_15-quimby	Assigned to the latest version of T-gnus for
 			developing and synchronizing with Oort Gnus.
-
-    t-gnus-6_14		Assigned to the latest development version of
-			T-gnus.
 
     pgnus-ichikawa	The main trunk of T-gnus.
 
@@ -81,9 +78,9 @@ For more detailed information, please read README.branch.
 How to get? (via ftp)
 =====================
 
-  T-gnus 6.14 is available from
+  T-gnus 6.15 is available from
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/snapshots/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.15/snapshots/
 
   NOTE: These snapshots are manually created when the urge takes the
   administrator of the a-ftp site, and will usually not be tested.

@@ -32,6 +32,7 @@
 (require 'gnus)
 (require 'gnus-art)
 (require 'gnus-range)
+(require 'message)	; for message-cite-prefix-regexp
 
 ;;; Customization:
 
@@ -80,19 +81,13 @@ Set it to nil to parse all articles."
   :type '(choice (const :tag "all" nil)
 		 integer))
 
-(defcustom gnus-cite-prefix-regexp
-  "^[]>»|:}+ ]*[]>»|:}+]\\(.*>»\\)?\\|^.*>"
-  "*Regexp matching the longest possible citation prefix on a line."
-  :group 'gnus-cite
-  :type 'regexp)
-
 (defcustom gnus-cite-max-prefix 20
   "Maximum possible length for a citation prefix."
   :group 'gnus-cite
   :type 'integer)
 
 (defcustom gnus-supercite-regexp
-  (concat "^\\(" gnus-cite-prefix-regexp "\\)? *"
+  (concat "^\\(" message-cite-prefix-regexp "\\)? *"
 	  ">>>>> +\"\\([^\"\n]+\\)\" +==")
   "*Regexp matching normal Supercite attribution lines.
 The first grouping must match prefixes added by other packages."
@@ -312,7 +307,7 @@ Attribution lines are highlighted with the same face as the
 corresponding citation merged with `gnus-cite-attribution-face'.
 
 Text is considered cited if at least `gnus-cite-minimum-match-count'
-lines matches `gnus-cite-prefix-regexp' with the same prefix.
+lines matches `message-cite-prefix-regexp' with the same prefix.
 
 Lines matching `gnus-cite-attribution-suffix' and perhaps
 `gnus-cite-attribution-prefix' are considered attribution lines."
@@ -445,7 +440,9 @@ If WIDTH (the numerical prefix), use that text width when filling."
 	  (narrow-to-region (caar marks) (caadr marks))
 	  (let ((adaptive-fill-regexp
 		 (concat "^" (regexp-quote (cdar marks)) " *"))
-		(fill-prefix (cdar marks)))
+		(fill-prefix
+		 (if (string= (cdar marks) "") ""
+		   (concat (cdar marks) " "))))
 	    (fill-region (point-min) (point-max)))
 	  (set-marker (caar marks) nil)
 	  (setq marks (cdr marks)))
@@ -684,7 +681,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (goto-char (point-max))
 	       (gnus-article-search-signature)
 	       (point)))
-	(prefix-regexp (concat "^\\(" gnus-cite-prefix-regexp "\\)"))
+	(prefix-regexp (concat "^\\(" message-cite-prefix-regexp "\\)"))
 	alist entry start begin end numbers prefix guess-limit mc-flag)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)

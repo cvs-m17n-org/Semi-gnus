@@ -58,6 +58,7 @@
 (defalias 'nnheader-run-at-time 'nnheader-xmas-run-at-time)
 (defalias 'nnheader-cancel-timer 'delete-itimer)
 (defalias 'nnheader-cancel-function-timers 'ignore)
+(defalias 'nnheader-string-as-multibyte 'identity)
 (defalias 'nnheader-Y-or-n-p 'nnheader-xmas-Y-or-n-p)
 
 (provide 'nnheaderxm)

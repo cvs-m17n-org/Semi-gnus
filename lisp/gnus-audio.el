@@ -32,6 +32,7 @@
 
 (defgroup gnus-audio nil
   "Playing sound in Gnus."
+  :version "21.1"
   :group 'gnus-visual
   :group 'multimedia)
 

@@ -51,7 +51,10 @@ If you are using Cnews, you probably should set this variable to nil.")
 (defvoo nnspool-nov-directory (concat nnspool-spool-directory "over.view/")
   "Local news nov directory.")
 
-(defvoo nnspool-lib-dir "/usr/lib/news/"
+(defvoo nnspool-lib-dir 
+    (if (file-exists-p "/usr/lib/news/active")
+	"/usr/lib/news/"
+      "/var/lib/news/")
   "Where the local news library files are stored.")
 
 (defvoo nnspool-active-file (concat nnspool-lib-dir "active")
@@ -141,9 +144,8 @@ there.")
 	      (inline (nnheader-insert-head file))
 	      (goto-char beg)
 	      (if (search-forward "\n\n" nil t)
-		  (progn
-		    (forward-char -1)
-		    (insert ".\n"))
+		  (progn (forward-char -1)
+			 (insert ".\n"))
 		(goto-char (point-max))
 		(if (bolp)
 		    (insert ".\n")

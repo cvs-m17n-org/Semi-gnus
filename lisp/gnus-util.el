@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -32,7 +32,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; Fixme: this should be a gnus variable, not nnmail-.
+  (defvar nnmail-pathname-coding-system))
 (eval-when-compile (require 'static))
 
 (require 'custom)
@@ -40,6 +43,7 @@
 (require 'time-date)
 
 (eval-and-compile
+  (autoload 'message-fetch-field "message")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
   (autoload 'rmail-show-message "rmail"))
@@ -221,22 +225,17 @@
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
 
+(require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
-  (let ((newsgroup (gnus-newsgroup-savable-name newsgroup))
-	(len (length newsgroup))
-	idx)
-    ;; If this is a foreign group, we don't want to translate the
-    ;; entire name.
-    (if (setq idx (string-match ":" newsgroup))
-	(aset newsgroup idx ?/)
-      (setq idx 0))
-    ;; Replace all occurrences of `.' with `/'.
-    (while (< idx len)
-      (when (= (aref newsgroup idx) ?.)
-	(aset newsgroup idx ?/))
-      (setq idx (1+ idx)))
-    newsgroup))
+  (let* ((newsgroup (gnus-newsgroup-savable-name newsgroup))
+	 (idx (string-match ":" newsgroup)))
+    (concat
+     (if idx (substring newsgroup 0 idx))
+     (if idx "/")
+     (nnheader-replace-chars-in-string
+      (if idx (substring newsgroup (1+ idx)) newsgroup)
+      ?. ?/))))
 
 (defun gnus-newsgroup-savable-name (group)
   ;; Replace any slashes in a group name (eg. an ange-ftp nndoc group)
@@ -415,7 +414,7 @@ jabbering all the time."
   "Return a list of Message-IDs in REFERENCES."
   (let ((beg 0)
 	ids)
-    (while (string-match "<[^>]+>" references beg)
+    (while (string-match "<[^> \t]+>" references beg)
       (push (substring references (match-beginning 0) (setq beg (match-end 0)))
 	    ids))
     (nreverse ids)))
@@ -561,6 +560,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
+  (require 'nnmail)
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(pathname-coding-system nnmail-pathname-coding-system))
     (when (and directory
@@ -956,12 +956,15 @@ Entries without port tokens default to DEFAULTPORT."
       (pop list))
     (nreverse out)))
 
-(defun gnus-delete-alist (key alist)
-  "Delete all entries in ALIST that have a key eq to KEY."
-  (let (entry)
-    (while (setq entry (assq key alist))
-      (setq alist (delq entry alist)))
-    alist))
+(if (fboundp 'assq-delete-all)
+    (defalias 'gnus-delete-alist 'assq-delete-all)
+  (defun gnus-delete-alist (key alist)
+    "Delete from ALIST all elements whose car is KEY.
+Return the modified alist."
+    (let (entry)
+      (while (setq entry (assq key alist))
+        (setq alist (delq entry alist)))
+      alist)))
 
 (defmacro gnus-pull (key alist &optional assoc-p)
   "Modify ALIST to be without KEY."
@@ -1063,6 +1066,12 @@ Entries without port tokens default to DEFAULTPORT."
     (if start
 	(remove-text-properties start end properties object))
     t))
+
+(defun gnus-string-equal (x y)
+  "Like `string-equal', except it compares case-insensitively."
+  (and (= (length x) (length y))
+       (or (string-equal x y)
+	   (string-equal (downcase x) (downcase y)))))
 
 (provide 'gnus-util)
 

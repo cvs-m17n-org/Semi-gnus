@@ -1,7 +1,7 @@
 ========================================================================
 Codename:	T-gnus
-Branch Tag:	t-gnus-6_14
-Branch Status:	Public, Stable
+Branch Tag:	t-gnus-6_15-quimby
+Branch Status:	Develop, Synchronize with Oort Gnus
 Branch Goal:	Implement latest features of gnus and offline features
 		Use Gnus in Offline status.
 Branch Policy:	(not defined yet)
@@ -31,8 +31,8 @@ NEWS:
 
   See TODO.ja
 
-* T-gnus 6.14 - this is based on Pterodactyl Gnus.
+* T-gnus 6.15 - this is based on Oort Gnus.
 
-  The latest T-gnus is T-gnus 6.14.6 (Based on Gnus 5.8.8).  It requires
-  SEMI/WEMI (1.13.5 or later), FLIM (1.13.1 or later), and APEL (10.0 or
-  later).
+  The latest T-gnus is T-gnus 6.15.0 (based on Oort Gnus 0.01).  It
+  requires SEMI/WEMI (1.13.5 or later), FLIM (1.13.1 or later), and
+  APEL (10.0 or later).

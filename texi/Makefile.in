@@ -1,5 +1,5 @@
-prefix = @prefix@
 infodir = @infodir@
+prefix = @prefix@
 srcdir = @srcdir@
 subdir = texi
 top_srcdir = @top_srcdir@
@@ -10,9 +10,8 @@ TEXI2DVI=texi2dvi
 TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
 EMACS=@EMACS@
-EMACSINFO=$(EMACS) -batch -q -no-site-file
-INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
-XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
+EMACSCOMP=$(EMACS) -batch -q -no-site-file
+EMACSINFO=$(EMACSCOMP) -l $(srcdir)/infohack.el -f batch-makeinfo
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
@@ -41,18 +40,18 @@ message-ja.info: message-ja.texi
 most: texi2latex.elc latex latexps
 
 %-ja: %-ja.texi
-	cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<
+	$(EMACSINFO) $<
 
 %-ja.info: %-ja.texi
-	cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<
+	$(EMACSINFO) $< t
 
 %.info: %.texi
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
-	  cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<; \
+	  $(EMACSINFO) $< t; \
 	else \
-	  $(MAKEINFO) -o $@ $<; \
+	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf
@@ -61,7 +60,7 @@ most: texi2latex.elc latex latexps
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
-	  cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<; \
+	  $(EMACSINFO) $<; \
 	else \
 	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
@@ -72,23 +71,23 @@ pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
 
 .texi.dvi :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
-	$(TEXI2DVI) gnustmp.texi
+	$(TEXI2DVI) -I $(srcdir) gnustmp.texi
 	cp gnustmp.dvi $*.dvi
 	rm gnustmp.*
 
 .texi.pdf :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
-	$(TEXI2PDF) gnustmp.texi
+	$(TEXI2PDF) -I $(srcdir) gnustmp.texi
 	cp gnustmp.pdf $*.pdf
 	rm gnustmp.*
 
 refcard.dvi: refcard.tex gnuslogo.refcard gnusref.tex
-	$(LATEX) refcard.tex
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) refcard.tex
 
 
 refcard.pdf: refcard.tex gnuslogo.refcard gnusref.tex
-	epstopdf gnuslogo.refcard --outfile=gnuslogo.refcard.pdf
-	$(PDFLATEX) refcard.tex
+	epstopdf $(srcdir)/gnuslogo.refcard --outfile=gnuslogo.refcard.pdf
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) refcard.tex
 
 clean:
 	rm -f *.orig *.rej *.elc *~ gnus-[0-9] gnus-[0-9][0-9]
@@ -109,16 +108,16 @@ makeinfo:
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	$(EMACSINFO) -batch -l bytecomp --eval '(byte-compile-file "texi2latex.el")'
+	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
 
-latex: gnus.texi texi2latex.elc
-	$(EMACSINFO) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
+latex gnus.latexi gnus-faq.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi texi2latex.elc
+	srcdir=$(srcdir) $(EMACSCOMP) -l ./texi2latex.elc -f latexi-translate
 
-latexps:
+latexps: gnus.latexi
 	$(MAKE) texi2latex.elc
 	rm -f gnus.aux
 	egrep -v "label.*Index|chapter.*Index" gnus.latexi > gnus.tmplatexi1
-	$(LATEX) gnus.tmplatexi1
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) gnus.tmplatexi1
 	./splitindex
 	makeindex -o gnus.kind gnus.kidx
 	makeindex -o gnus.cind gnus.cidx
@@ -169,11 +168,10 @@ install: $(INFO_DEPS)
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
 	@list='$(INFO_DEPS)'; \
 	for file in $$list; do \
-	  d=$(srcdir); \
-	  for ifile in `CDPATH=: && cd $$d && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
-	    if test -f $$d/$$ifile; then \
-	      echo " $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile"; \
-	      $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile; \
+	  for ifile in `echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
+	    if test -f $$ifile; then \
+	      echo " $(INSTALL_DATA) $$ifile $(infodir)/$$ifile"; \
+	      $(INSTALL_DATA) $$ifile $(infodir)/$$ifile; \
 	    else : ; fi; \
 	  done; \
 	done

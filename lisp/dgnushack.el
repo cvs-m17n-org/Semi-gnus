@@ -55,11 +55,15 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(defvar dgnushack-w3-dir (let ((w3dir (getenv "W3DIR")))
-			   (unless (zerop (length w3dir))
-			     (file-name-as-directory w3dir))))
-(when dgnushack-w3-dir
-  (push dgnushack-w3-dir load-path))
+(let ((urldir (getenv "URLDIR")))
+  (unless (zerop (length urldir))
+    (push (file-name-as-directory urldir) load-path)))
+
+(defvar dgnushack-w3-directory (let ((w3dir (getenv "W3DIR")))
+				 (unless (zerop (length w3dir))
+				   (file-name-as-directory w3dir))))
+(when dgnushack-w3-directory
+  (push dgnushack-w3-directory load-path))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -106,8 +110,6 @@
 		(cons fn (nreverse head)))))
       (si:byte-optimize-form-code-walker form for-effect)))
   (byte-compile 'byte-optimize-form-code-walker))
-
-(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
 (condition-case nil
     (char-after)
@@ -159,6 +161,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t t)
 
+(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
+
+(require 'custom)
+
 ;; Bind functions defined by `defun-maybe'.
 (put 'defun-maybe 'byte-hunk-handler 'byte-compile-file-form-defun-maybe)
 (defun byte-compile-file-form-defun-maybe (form)
@@ -175,7 +181,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (void-variable
    ;; Bind keywords.
    (dolist (keyword '(:button-keymap :data :file :mime-handle
-				     :key-type :value-type))
+				     :key-type :value-type
+				     :ascent :foreground :help))
      (set keyword keyword))))
 
 ;; If you are using Mule 2.3 based on Emacs 19.34, you may also put the
@@ -247,7 +254,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (unless (featurep 'xemacs)
   (defalias 'Custom-make-dependencies 'ignore)
   (defalias 'update-autoloads-from-directory 'ignore))
-(autoload 'texinfo-parse-line-arg "texinfmt")
 
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
@@ -257,7 +263,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defalias 'define-mail-user-agent 'ignore)
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el")
+  (append '("dgnushack.el" "dgnuspath.el" "lpath.el")
 	  (unless (or (condition-case code
 			  (require 'w3-forms)
 			(error
@@ -266,7 +272,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
-		      (let ((lp (delete dgnushack-w3-dir
+		      (let ((lp (delete dgnushack-w3-directory
 					(copy-sequence load-path))))
 			(if (let ((load-path lp))
 			      (condition-case nil
@@ -283,7 +289,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			  nil)))
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
 	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
-	      "nnwfm.el"))
+	      "nnwfm.el" "nnrss.el"))
 	  (condition-case nil
 	      (progn (require 'bbdb) nil)
 	    (error '("gnus-bbdb.el")))
@@ -338,6 +344,10 @@ Modify to suit your needs."))
   (let ((files dgnushack-exporting-files)
 	;;(byte-compile-generate-call-tree t)
 	file elc)
+    ;; Avoid barfing (from gnus-xmas) because the etc directory is not yet
+    ;; installed.
+    (when (featurep 'xemacs)
+      (setq gnus-xmas-glyph-directory "dummy"))
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
       (when (or (not (file-exists-p
@@ -350,119 +360,161 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-
-(defun dgnushack-texi-add-suffix-and-format ()
-  (dgnushack-texi-format t))
+(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el" srcdir))
+(defvar dgnushack-cus-load-file (expand-file-name "cus-load.el" srcdir))
+(defvar dgnushack-auto-load-file (expand-file-name "auto-autoloads.el" srcdir))
 
-(defun dgnushack-texi-format (&optional addsuffix)
-  (if (not noninteractive)
-      (error "batch-texinfo-format may only be used -batch."))
-  (require 'ptexinfmt)
-  (let ((auto-save-default nil)
-	(find-file-run-dired nil)
-	coding-system-for-write
-	output-coding-system)
-    (let ((error 0)
-	  file
-	  (files ()))
-      (while command-line-args-left
-	(setq file (expand-file-name (car command-line-args-left)))
-	(cond ((not (file-exists-p file))
-	       (message ">> %s does not exist!" file)
-	       (setq error 1
-		     command-line-args-left (cdr command-line-args-left)))
-	      ((file-directory-p file)
-	       (setq command-line-args-left
-		     (nconc (directory-files file nil nil t)
-			    (cdr command-line-args-left))))
-	      (t
-	       (setq files (cons file files)
-		     command-line-args-left (cdr command-line-args-left)))))
-      (while (setq file (pop files))
-	(condition-case err
-	    (progn
-	      (if buffer-file-name (kill-buffer (current-buffer)))
-	      (find-file file)
-	      (buffer-disable-undo (current-buffer))
-	      (if (boundp 'MULE)
-		  (setq output-coding-system (symbol-value
-					      'file-coding-system))
-		(setq coding-system-for-write buffer-file-coding-system))
-	      ;; Remove ignored areas first.
-	      (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
-		(delete-region (match-beginning 0)
-			       (if (re-search-forward
-				    "^@end[\t ]+ignore[\t\r ]*$" nil t)
-				   (1+ (match-end 0))
-				 (point-max))))
-	      (goto-char (point-min))
-	      ;; formerly EMACSINFOHACK in texi/Makefile.
-	      (while (re-search-forward "@\\(end \\)?ifnottex\n*" nil t)
-		(replace-match ""))
-	      (goto-char (point-min))
-	      ;; Add suffix if it is needed.
-	      (when (and addsuffix
-			 (re-search-forward
-			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
-			 (not (string-match "\\.info$" (match-string 1))))
-		(insert ".info")
-		(goto-char (point-min)))
-	      ;; process @include before updating node
-	      ;; This might produce some problem if we use @lowersection or
-	      ;; such.
-	      (let ((input-directory default-directory)
-		    (texinfo-command-end))
-		(while (re-search-forward "^@include" nil t)
-		  (setq texinfo-command-end (point))
-		  (let ((filename (concat input-directory
-					  (texinfo-parse-line-arg))))
-		    (re-search-backward "^@include")
-		    (delete-region (point) (save-excursion
-					     (forward-line 1)
-					     (point)))
-		    (message "Reading included file: %s" filename)
-		    (save-excursion
-		      (save-restriction
-			(narrow-to-region
-			 (point)
-			 (+ (point)
-			    (car (cdr (insert-file-contents filename)))))
-			(goto-char (point-min))
-			;; Remove `@setfilename' line from included file,
-			;; if any, so @setfilename command not duplicated.
-			(if (re-search-forward "^@setfilename"
-					       (save-excursion
-						 (forward-line 100)
-						 (point))
-					       t)
-			    (progn
-			      (beginning-of-line)
-			      (delete-region (point) (save-excursion
-						       (forward-line 1)
-						       (point))))))))))
-	      (texinfo-mode)
-	      (texinfo-every-node-update)
-	      (set-buffer-modified-p nil)
-	      (message "texinfo formatting %s..." file)
-	      (texinfo-format-buffer nil)
-	      (if (buffer-modified-p)
-		  (progn (message "Saving modified %s" (buffer-file-name))
-			 (save-buffer))))
-	  (error
-	   (message ">> Error: %s" (prin1-to-string err))
-	   (message ">>  point at")
-	   (let ((s (buffer-substring (point)
-				      (min (+ (point) 100)
-					   (point-max))))
-		 (tem 0))
-	     (while (setq tem (string-match "\n+" s tem))
-	       (setq s (concat (substring s 0 (match-beginning 0))
-			       "\n>>  "
-			       (substring s (match-end 0)))
-		     tem (1+ tem)))
-	     (message ">>  %s" s))
-	   (setq error 1))))
-      (kill-emacs error))))
+(defun dgnushack-make-cus-load ()
+  (when (condition-case nil
+	    (load "cus-dep")
+	  (error nil))
+    (let ((cusload-base-file dgnushack-cus-load-file))
+      (if (fboundp 'custom-make-dependencies)
+	  (custom-make-dependencies)
+	(Custom-make-dependencies)))))
+
+(defun dgnushack-make-auto-load ()
+  (require 'autoload)
+  (let ((generated-autoload-file dgnushack-gnus-load-file)
+	(make-backup-files nil)
+	(autoload-package-name "gnus"))
+    (if (featurep 'xemacs)
+	(progn
+	  (if (file-exists-p generated-autoload-file)
+	      (delete-file generated-autoload-file))
+	  (if (file-exists-p dgnushack-auto-load-file)
+	      (delete-file dgnushack-auto-load-file)))
+      (with-temp-file generated-autoload-file
+	(insert ?\014)))
+    (if (featurep 'xemacs)
+	(let ((si:message (symbol-function 'message)))
+	  (defun message (fmt &rest args)
+	    (cond ((and (string-equal "Generating autoloads for %s..." fmt)
+			(file-exists-p (file-name-nondirectory (car args))))
+		   (funcall si:message
+			    fmt (file-name-nondirectory (car args))))
+		  ((string-equal "No autoloads found in %s" fmt))
+		  ((string-equal "Generating autoloads for %s...done" fmt))
+		  (t (apply si:message fmt args))))
+	  (unwind-protect
+	      (batch-update-autoloads)
+	    (fset 'message si:message)))
+      (batch-update-autoloads))))
+
+(defun dgnushack-make-load ()
+  (message (format "Generating %s..." dgnushack-gnus-load-file))
+  (with-temp-file dgnushack-gnus-load-file
+    (if (file-exists-p dgnushack-cus-load-file)
+	(progn
+	  (insert-file-contents dgnushack-cus-load-file)
+	  (delete-file dgnushack-cus-load-file)
+	  (goto-char (point-min))
+	  (search-forward ";;; Code:")
+	  (forward-line)
+	  (delete-region (point-min) (point))
+	  (unless (re-search-forward "\
+^[\t ]*(autoload[\t\n ]+\\('\\|(quote[\t\n ]+\\)custom-add-loads[\t\n ]"
+				     nil t)
+	    (insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))
+	  (goto-char (point-min))
+	  (insert "\
+;;; gnus-load.el --- automatically extracted custom dependencies and autoload
+;;
+;;; Code:
+")
+	  (goto-char (point-max))
+	  (if (search-backward "custom-versions-load-alist" nil t)
+	      (forward-line -1)
+	    (forward-line -1)
+	    (while (eq (char-after) ?\;)
+	      (forward-line -1))
+	    (forward-line))
+	  (delete-region (point) (point-max))
+	  (insert "\n"))
+      (insert "\
+;;; gnus-load.el --- automatically extracted autoload
+;;
+;;; Code:
+"))
+    ;; smiley-* are duplicated. Remove them all.
+    (let ((point (point)))
+      (insert-file-contents dgnushack-gnus-load-file)
+      (goto-char point)
+      (while (search-forward "smiley-" nil t)
+	(beginning-of-line)
+	(if (looking-at "(autoload ")
+	    (delete-region (point) (progn (forward-sexp) (point)))
+	  (forward-line))))
+    ;;
+    (goto-char (point-max))
+    (when (search-backward "\n(provide " nil t)
+      (forward-line -1)
+      (delete-region (point) (point-max)))
+    (insert "\
+
+\(provide 'gnus-load)
+
+;;; Local Variables:
+;;; version-control: never
+;;; no-byte-compile: t
+;;; no-update-autoloads: t
+;;; End:
+;;; gnus-load.el ends here\n"))
+  (message (format "Compiling %s..." dgnushack-gnus-load-file))
+  (byte-compile-file dgnushack-gnus-load-file))
+
+
+(defun dgnushack-compose-package ()
+  "Re-split the file gnus-load.el into custom-load.el and
+auto-autoloads.el.  It is silly, should be improved!"
+  (message "
+Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...")
+  (let ((customload (expand-file-name "custom-load.el" srcdir))
+	(autoloads (expand-file-name "auto-autoloads.el" srcdir))
+	start)
+    (with-temp-buffer
+      (insert-file-contents dgnushack-gnus-load-file)
+      (delete-file dgnushack-gnus-load-file)
+      (when (file-exists-p (concat dgnushack-gnus-load-file "c"))
+	(delete-file (concat dgnushack-gnus-load-file "c")))
+      (while (prog1
+		 (looking-at "[\t ;]")
+	       (forward-line 1)))
+      (setq start (point))
+      (insert "\
+;;; custom-load.el --- automatically extracted custom dependencies\n
+;;; Code:\n\n")
+      (goto-char (point-max))
+      (while (progn
+	       (forward-line -1)
+	       (not (looking-at "[\t ]*(custom-add-loads[\t\n ]"))))
+      (forward-list 1)
+      (forward-line 1)
+      (insert "\n;;; custom-load.el ends here\n")
+      (write-region start (point) customload)
+      (while (looking-at "[\t ]*$")
+	(forward-line 1))
+      (setq start (point))
+      (if (re-search-forward "^[\t\n ]*(if[\t\n ]+(featurep[\t\n ]" nil t)
+	  (let ((from (goto-char (match-beginning 0))))
+	    (delete-region from (progn
+				  (forward-list 1)
+				  (forward-line 1)
+				  (point))))
+	(while (looking-at "[\t ;]")
+	  (forward-line 1)))
+      (insert "(if (featurep 'gnus-autoloads) (error \"Already loaded\"))\n")
+      (goto-char (point-max))
+      (while (progn
+	       (forward-line -1)
+	       (not (looking-at "[\t ]*(provide[\t\n ]"))))
+      (insert "(provide 'gnus-autoloads)\n")
+      (write-region start (point) autoloads))
+    (byte-compile-file customload)
+    (byte-compile-file autoloads))
+  (message "\
+Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done
+\n"))
 
 
 (defconst dgnushack-info-file-regexp-en
@@ -482,42 +534,6 @@ Modify to suit your needs."))
 			   (when names "\\|"))))
     regexp)
   "Regexp matching Japanese info files.")
-
-(defun dgnushack-make-autoloads ()
-  "Make auto-autoloads.el, custom-load.el and then compile them."
-  (let ((auto-autoloads (expand-file-name "auto-autoloads.el" srcdir))
-	(custom-load (expand-file-name "custom-load.el" srcdir)))
-    (unless (and (file-exists-p auto-autoloads)
-		 (file-exists-p (concat auto-autoloads "c"))
-		 (file-newer-than-file-p (concat auto-autoloads "c")
-					 auto-autoloads)
-		 (file-exists-p custom-load)
-		 (file-exists-p (concat custom-load "c"))
-		 (file-newer-than-file-p (concat custom-load "c")
-					 custom-load))
-      (let (make-backup-files)
-	(message "Updating autoloads for directory %s..." default-directory)
-	(let ((generated-autoload-file auto-autoloads)
-	      (si:message (symbol-function 'message))
-	      noninteractive)
-	  (defun message (fmt &rest args)
-	    (cond ((and (string-equal "Generating autoloads for %s..." fmt)
-			(file-exists-p (file-name-nondirectory (car args))))
-		   (funcall si:message
-			    fmt (file-name-nondirectory (car args))))
-		  ((string-equal "No autoloads found in %s" fmt))
-		  ((string-equal "Generating autoloads for %s...done" fmt))
-		  (t (apply si:message fmt args))))
-	  (unwind-protect
-	      (update-autoloads-from-directory default-directory)
-	    (fset 'message si:message)))
-	(byte-compile-file auto-autoloads)
-	(with-temp-buffer
-	  (let ((standard-output (current-buffer)))
-	    (Custom-make-dependencies "."))
-	  (message "%s" (buffer-string)))
-	(require 'cus-load)
-	(byte-compile-file custom-load)))))
 
 (defun dgnushack-remove-extra-files-in-package ()
   "Remove extra files in the lisp directory of the XEmacs package."

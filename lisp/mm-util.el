@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for Mule and low level things
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -31,25 +31,27 @@
 (require 'mail-prsvr)
 
 (defvar mm-mime-mule-charset-alist
-  '((us-ascii ascii)
+  `((us-ascii ascii)
     (iso-8859-1 latin-iso8859-1)
     (iso-8859-2 latin-iso8859-2)
     (iso-8859-3 latin-iso8859-3)
     (iso-8859-4 latin-iso8859-4)
     (iso-8859-5 cyrillic-iso8859-5)
     ;; Non-mule (X)Emacs uses the last mule-charset for 8bit characters.
-    ;; The fake mule-charset, gnus-koi8-r, tells Gnus that the default 
+    ;; The fake mule-charset, gnus-koi8-r, tells Gnus that the default
     ;; charset is koi8-r, not iso-8859-5.
     (koi8-r cyrillic-iso8859-5 gnus-koi8-r)
     (iso-8859-6 arabic-iso8859-6)
     (iso-8859-7 greek-iso8859-7)
     (iso-8859-8 hebrew-iso8859-8)
     (iso-8859-9 latin-iso8859-9)
+    (iso-8859-14 latin-iso8859-14)
+    (iso-8859-15 latin-iso8859-15)
     (viscii vietnamese-viscii-lower)
     (iso-2022-jp latin-jisx0201 japanese-jisx0208 japanese-jisx0208-1978)
     (euc-kr korean-ksc5601)
-    (cn-gb-2312 chinese-gb2312)
-    (cn-big5 chinese-big5-1 chinese-big5-2)
+    (gb2312 chinese-gb2312)
+    (big5 chinese-big5-1 chinese-big5-2)
     (tibetan tibetan)
     (thai-tis620 thai-tis620)
     (iso-2022-7bit ethiopic arabic-1-column arabic-2-column)
@@ -72,7 +74,13 @@
 		    chinese-cns11643-3 chinese-cns11643-4
 		    chinese-cns11643-5 chinese-cns11643-6
 		    chinese-cns11643-7)
-    (utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e))
+    ,(if (or (not (fboundp 'charsetp)) ;; non-Mule case
+	     (not (fboundp 'coding-system-p))
+	     (charsetp 'unicode-a)
+	     (not (coding-system-p 'mule-utf-8)))
+	 '(utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e)
+       ;; If we have utf-8 we're in Mule 5+.
+       (delete 'ascii (coding-system-get 'mule-utf-8 'safe-charsets))))
   "Alist of MIME-charset/MULE-charsets.")
 
 (eval-and-compile
@@ -122,13 +130,15 @@
 		(aset string idx to))
 	      (setq idx (1+ idx)))
 	    string)))
-      )))
+     (string-as-unibyte . identity)
+     (multibyte-string-p . ignore)
+     )))
 
 (eval-and-compile
   (defalias 'mm-char-or-char-int-p
-    (cond 
+    (cond
      ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
-     ((fboundp 'char-valid-p) 'char-valid-p) 
+     ((fboundp 'char-valid-p) 'char-valid-p)
      (t 'identity))))
 
 (defvar mm-coding-system-list nil)
@@ -154,7 +164,7 @@
   "A mapping from invalid charset names to the real charset names.")
 
 (defvar mm-binary-coding-system
-  (cond 
+  (cond
    ((mm-coding-system-p 'binary) 'binary)
    ((mm-coding-system-p 'no-conversion) 'no-conversion)
    (t nil))
@@ -171,10 +181,10 @@
   "Text coding system for write.")
 
 (defvar mm-auto-save-coding-system
-  (cond 
+  (cond
    ((mm-coding-system-p 'emacs-mule)
     (if (memq system-type '(windows-nt ms-dos ms-windows))
-	(if (mm-coding-system-p 'emacs-mule-dos) 
+	(if (mm-coding-system-p 'emacs-mule-dos)
 	    'emacs-mule-dos mm-binary-coding-system)
       'emacs-mule))
    ((mm-coding-system-p 'escape-quoted) 'escape-quoted)
@@ -290,22 +300,23 @@ If the charset is `composition', return the actual one."
 	   (progn
 	     (setq mail-parse-mule-charset
 		   (and (boundp 'current-language-environment)
-		      (car (last 
-			    (assq 'charset 
-				  (assoc current-language-environment 
+		      (car (last
+			    (assq 'charset
+				  (assoc current-language-environment
 					 language-info-alist))))))
 	     (if (or (not mail-parse-mule-charset)
 		     (eq mail-parse-mule-charset 'ascii))
 		 (setq mail-parse-mule-charset
 		       (or (car (last (assq mail-parse-charset
 					    mm-mime-mule-charset-alist)))
+			   ;; Fixme: don't fix that!
 			   'latin-iso8859-1)))
 	     mail-parse-mule-charset)))))))
 
 (defun mm-mime-charset (charset)
   "Return the MIME charset corresponding to the MULE CHARSET."
   (if (eq charset 'unknown)
-      (error "8-bit characters are found in the message, please specify charset."))
+      (error "The message contains non-printable characters, please use attachment."))
   (if (and (fboundp 'coding-system-get) (fboundp 'get-charset-property))
       ;; This exists in Emacs 20.
       (or
@@ -338,7 +349,8 @@ If the charset is `composition', return the actual one."
     (setq charsets (mm-delete-duplicates charsets))
     (if (and (> (length charsets) 1)
 	     (fboundp 'find-coding-systems-region)
-	     (memq 'utf-8 (find-coding-systems-region b e)))
+	     (let ((cs (find-coding-systems-region b e)))
+	       (or (memq 'utf-8 cs) (memq 'mule-utf-8 cs))))
 	'(utf-8)
       charsets)))
 
@@ -430,8 +442,8 @@ Mule4 only."
 	  (let (charset)
 	    (setq charset
 		  (and (boundp 'current-language-environment)
-		       (car (last (assq 'charset 
-					(assoc current-language-environment 
+		       (car (last (assq 'charset
+					(assoc current-language-environment
 					       language-info-alist))))))
 	    (if (eq charset 'ascii) (setq charset nil))
 	    (or charset
@@ -466,7 +478,7 @@ Mule4 only."
     (nreverse out)))
 
 (defvar mm-inhibit-file-name-handlers
-  '(jka-compr-handler)
+  '(jka-compr-handler image-file-handler)
   "A list of handlers doing (un)compression (etc) thingies.")
 
 (defun mm-insert-file-contents (filename &optional visit beg end replace
@@ -484,12 +496,12 @@ If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers.
         (after-insert-file-functions nil)
 	(enable-local-eval nil)
 	(find-file-hooks nil)
-	(inhibit-file-name-operation (if inhibit 
+	(inhibit-file-name-operation (if inhibit
 					 'insert-file-contents
 				       inhibit-file-name-operation))
 	(inhibit-file-name-handlers
 	 (if inhibit
-	     (append mm-inhibit-file-name-handlers 
+	     (append mm-inhibit-file-name-handlers
 		     inhibit-file-name-handlers)
 	   inhibit-file-name-handlers)))
     (insert-file-contents filename visit beg end replace)))
@@ -502,33 +514,33 @@ saying what text to write.
 Optional fourth argument specifies the coding system to use when
 encoding the file.
 If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers."
-  (let ((coding-system-for-write 
-	 (or codesys mm-text-coding-system-for-write 
+  (let ((coding-system-for-write
+	 (or codesys mm-text-coding-system-for-write
 	     mm-text-coding-system))
-	(inhibit-file-name-operation (if inhibit 
+	(inhibit-file-name-operation (if inhibit
 					 'append-to-file
 				       inhibit-file-name-operation))
 	(inhibit-file-name-handlers
 	 (if inhibit
-	     (append mm-inhibit-file-name-handlers 
+	     (append mm-inhibit-file-name-handlers
 		     inhibit-file-name-handlers)
 	   inhibit-file-name-handlers)))
     (append-to-file start end filename)))
 
-(defun mm-write-region (start end filename &optional append visit lockname 
+(defun mm-write-region (start end filename &optional append visit lockname
 			      coding-system inhibit)
 
   "Like `write-region'.
 If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers."
-  (let ((coding-system-for-write 
-	 (or coding-system mm-text-coding-system-for-write 
+  (let ((coding-system-for-write
+	 (or coding-system mm-text-coding-system-for-write
 	     mm-text-coding-system))
-	(inhibit-file-name-operation (if inhibit 
+	(inhibit-file-name-operation (if inhibit
 					 'write-region
 				       inhibit-file-name-operation))
 	(inhibit-file-name-handlers
 	 (if inhibit
-	     (append mm-inhibit-file-name-handlers 
+	     (append mm-inhibit-file-name-handlers
 		     inhibit-file-name-handlers)
 	   inhibit-file-name-handlers)))
     (write-region start end filename append visit lockname)))

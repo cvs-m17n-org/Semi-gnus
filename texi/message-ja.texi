@@ -1,11 +1,11 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message-ja
-@settitle T-gnus 6.14 Message Manual
+@settitle T-gnus 6.15 Message Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@dircategory Editors
+@dircategory Emacs
 @direntry
 * Message-ja: (message-ja).   Mail and news composition mode that goes
                               with Gnus (Japanese).
@@ -22,7 +22,7 @@ This file documents Message, the Emacs message composition mode.
 $B$3$N%U%!%$%k$O(B Emacs $B$N%a%C%;!<%8:n@.%b!<%I$G$"$k(B Message $B$K4X$9$k@bL@J8(B
 $B=q$G$9!#(B
 
-Copyright (C) 1996,97,98,99,2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -62,14 +62,15 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.14 Message Manual
+@title T-gnus 6.15 Message Manual
 
 @author by Lars Magne Ingebrigtsen
 @translated by members of Semi-gnus mailing-list
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996,97,98,99,2000 Free Software Foundation, Inc.
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2000
+     Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -125,7 +126,7 @@ Gnus $B$NA4$F$N%a%C%;!<%8$N:n@.(B ($B%a!<%k$H%K%e!<%9$NN>J}(B) $B$O%a%C%;!<
 * Key Index::         $B%a%C%;!<%8%b!<%I%-!<$N0lMw(B
 @end menu
 
-$B$3$N%^%K%e%"%k$O(B T-gnus 6.14 Message $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e(B
+$B$3$N%^%K%e%"%k$O(B T-gnus 6.15 Message $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e(B
 $B%"%k$HF1$8HGHV9f$N(B Gnus $B$NG[I[$H6&$KG[I[$5$l$^$9!#(B
 
 @node Interface
@@ -315,6 +316,7 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 * Movement::            $B%a%C%;!<%8%P%C%U%!$rF0$-2s$k(B
 * Insertion::           $B%a%C%;!<%8%P%C%U%!$KJ*;v$rA^F~$9$k(B
 @c * MIME::                @sc{mime} considerations.
+@c * Security::            Signing and encrypting messages.
 * Various Commands::    $B$$$m$$$m$J;v(B
 * Sending::             $B<B:]$K%a%C%;!<%8$rAw$k(B
 * Mail Aliases::        $B$I$N$h$&$K$7$F%a!<%k$NJLL>$r;H$&$+(B
@@ -428,8 +430,9 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @item C-c C-y
 @kindex C-c C-y
 @findex message-yank-original
-$BJV;v$r$9$k%a%C%;!<%8$r%a%C%;!<%8%P%C%U%!$KE=$jIU$1$^(B
-$B$9(B (@code{messsage-yank-original})$B!#(B
+$B%P%C%U%!(B @code{gnus-article-copy} $B$K$"$k%a%C%;!<%8$r%a%C%;!<%8%P%C%U%!$K(B
+$BE=$jIU$1$^$9!#IaDL$O(B @code{gnus-article-copy} $B$O$"$J$?$,JVEz$7$h$&$H$7$F(B
+$B$$$k%a%C%;!<%8$G$9(B (@code{messsage-yank-original})$B!#(B
 
 @item C-c M-C-y
 @kindex C-c M-C-y
@@ -464,6 +467,10 @@ message buffer (@code{message-yank-buffer}).
 $B$3$N@55,I=8=$K9gCW$9$kA4$F$N%X%C%@!<$OE=$jIU$1$i$l$?%a%C%;!<%8$+$i<h$j=|(B
 $B$+$l$^$9!#=i4|CM$O(B @samp{.} $B$G!"$3$l$OA4$F$N%X%C%@!<$,<h$j=|$+$l$k$H8@$&(B
 $B;v$G$9!#(B
+
+@item message-cite-prefix-regexp
+@vindex message-cite-prefix-regexp
+$B$"$k9T$,<h$jF@$k:GBg$N0zMQ@\F,8l$K9gCW$9$k@55,I=8=$G$9!#(B
 
 @item message-citation-line-function
 @vindex message-citation-line-function
@@ -552,27 +559,160 @@ RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$
 $B$?$a$N8z2LE*$JJ}K!$G$9!#(B
 
 @c FIXTGNUS We should provide MIME manual.
-@c @node MIME
-@c @section MIME
-@c @cindex MML
-@c @cindex MIME
-@c @cindex multipart
-@c @cindex attachment
+@ignore
+@node MIME
+@section MIME
+@cindex MML
+@cindex MIME
+@cindex multipart
+@cindex attachment
 
-@c Message is a @sc{mime}-compliant posting agent.  The user generally
-@c doesn't have to do anything to make the @sc{mime} happen---Message will
-@c automatically add the @code{Content-Type} and
-@c @code{Content-Transfer-Encoding} headers.
+Message is a @sc{mime}-compliant posting agent.  The user generally
+doesn't have to do anything to make the @sc{mime} happen---Message will
+automatically add the @code{Content-Type} and
+@code{Content-Transfer-Encoding} headers.
 
-@c The most typical thing users want to use the multipart things in
-@c @sc{mime} for is to add ``attachments'' to mail they send out.  This can
-@c be done with the @code{C-c C-a} command, which will prompt for a file
-@c name and a @sc{mime} type.
+The most typical thing users want to use the multipart things in
+@sc{mime} for is to add ``attachments'' to mail they send out.  This can
+be done with the @code{C-c C-a} command, which will prompt for a file
+name and a @sc{mime} type.
 
-@c You can also create arbitrarily complex multiparts using the MML
-@c language (@pxref{Composing, , Composing, emacs-mime, The Emacs MIME
-@c Manual}).
+You can also create arbitrarily complex multiparts using the MML
+language (@pxref{Composing, , Composing, emacs-mime, The Emacs MIME
+Manual}).
 
+@node Security
+@section Security
+@cindex Security
+@cindex S/MIME
+@cindex PGP/MIME
+@cindex sign
+@cindex encrypt
+
+Using the MML language, Message is able to create digitally signed and
+digitally encrypted messages.  Message (or rather MML) currently support
+PGP/MIME and S/MIME.  Instructing MML to perform security operations on
+a MIME part is done using the @code{C-c C-m s} key map for signing and the
+@code{C-c C-m c} key map for encryption, as follows.
+
+@table @kbd
+
+@item C-c C-m s s
+@kindex C-c C-m s s
+@findex mml-secure-sign-smime
+
+Digitally sign current MIME part using S/MIME.
+
+@item C-c C-m s p
+@kindex C-c C-m s p
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP/MIME.
+
+@item C-c C-m c s
+@kindex C-c C-m c s
+@findex mml-secure-encrypt-smime
+
+Digitally encrypt current MIME part using S/MIME.
+
+@item C-c C-m c p
+@kindex C-c C-m c p
+@findex mml-secure-encrypt-pgpmime
+
+Digitally encrypt current MIME part using PGP/MIME.
+
+@end table
+
+These commands do not immediately sign or encrypt the message, they
+merely insert proper MML tags to instruct the MML engine to perform that
+operation when the message is actually sent.  They may perform other
+operations too, such as locating and retrieving a S/MIME certificate of
+the person you wish to send encrypted mail to.
+
+Since signing and especially encryption often is used when sensitive
+information is sent, you may want to have some way to ensure that your
+mail is actually signed or encrypted.  After invoking the above
+sign/encrypt commands, it is possible to preview the raw article by
+using @code{C-u C-m P} (@code{mml-preview}).  Then you can verify that
+your long rant about what your ex-significant other or whomever actually
+did with that funny looking person at that strange party the other
+night, actually will be sent encrypted.
+
+@emph{Note!}  Neither PGP/MIME nor S/MIME encrypt/signs RFC822 headers.
+They only operate on the MIME object.  Keep this in mind before sending
+mail with a sensitive Subject line.
+
+Actually using the security commands above is not very difficult.  At
+least not compared with making sure all involved programs talk with each
+other properly.  Thus, we now describe what external libraries or
+programs are required to make things work, and some small general hints.
+
+@subsection Using S/MIME
+
+@emph{Note!}  This section assume you have a basic familiarity with
+modern cryptography, S/MIME, various PKCS standards, OpenSSL and so on.
+
+The S/MIME support in Message (and MML) require OpenSSL.  OpenSSL
+perform the actual S/MIME sign/encrypt operations.  OpenSSL can be found
+at @code{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
+Version 0.9.5a cannot extract mail addresses from certificates, and it
+insert a spurious CR character into MIME separators so you may wish to
+avoid it if you would like to avoid being regarded as someone who send
+strange mail. (Although by sending S/MIME messages you've probably
+already lost that contest.)
+
+To be able to send encrypted mail, a personal certificate is not
+required.  Message (MML) need a certificate for the person to whom you
+wish to communicate with though.  You're asked for this when you type
+@code{C-c C-m c s}.  Currently there are two ways to retrieve this
+certificate, from a local file or from DNS.  If you chose a local file,
+it need to contain a X.509 certificate in PEM format.  If you chose DNS,
+you're asked for the domain name where the certificate is stored, the
+default is a good guess.  To my belief, Message (MML) is the first mail
+agent in the world to support retrieving S/MIME certificates from DNS,
+so you're not likely to find very many certificates out there.  At least
+there should be one, stored at the domain @code{simon.josefsson.org}.
+LDAP is a more popular method of distributing certificates, support for
+it is planned.  (Meanwhile, you can use @code{ldapsearch} from the
+command line to retrieve a certificate into a file and use it.)
+
+As for signing messages, OpenSSL can't perform signing operations
+without some kind of configuration.  Especially, you need to tell it
+where your private key and your certificate is stored.  MML uses an
+Emacs interface to OpenSSL, aptly named @code{smime.el}, and it contain
+a @code{custom} group used for this configuration.  So, try @code{M-x
+customize-group RET smime RET} and look around.
+
+Currently there is no support for talking to a CA (or RA) to create your
+own certificate.  None is planned either.  You need to do this manually
+with OpenSSL or using some other program.  I used Netscape and got a
+free S/MIME certificate from one of the big CA's on the net.  Netscape
+is able to export your private key and certificate in PKCS #12 format.
+Use OpenSSL to convert this into a plain X.509 certificate in PEM format
+as follows.
+
+@example
+$ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
+@end example
+
+The @code{key+cert.pem} file should be pointed to from the
+@code{smime-keys} variable.  You should now be able to send signed mail.
+
+@emph{Note!}  Your private key is store unencrypted in the file, so take
+care in handling it.
+
+@subsection Using PGP/MIME
+
+PGP/MIME requires an external OpenPGP implementation, such as GNU Privacy
+Guard (@code{http://www.gnupg.org/}).  It also requires an Emacs interface
+to it, such as Mailcrypt (available from
+@code{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
+Florian Weimer's @code{gpg.el}.
+
+Creating your own OpenPGP key is described in detail in the
+documentation of your OpenPGP implementation, so we refer to it.
+
+@end ignore
 @node Various Commands
 @section $B$$$m$$$m$JL?Na(B
 
@@ -777,8 +917,14 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-@code{nil} $B$G$J$1$l$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$N%X%C%@!<$r:n@.(B
-$B$7$^$9!#(B
+@code{nil} $B$G$J$1$l$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$NI,MW$J%X%C%@!<(B
+$B$r:n@.$7$^$9!#(B
+
+$BJQ?t(B @code{message-required-mail-headers} $B$H(B @code{message-required-news-headers} $B$G!"(B
+$B$I$N%X%C%@!<$,I,MW$+$r;XDj$7$^$9!#(B
+
+$B$$$/$D$+$N%X%C%@!<$O!"Aw?.$9$kA0$K>C$5$l$?$j:n$jD>$5$l$?$j$7$^$9!#$3$l$K(B
+$B$OJQ?t(B @code{message-deletable-headers} ($B8e=R(B) $B$,4X78$7$^$9!#(B
 
 @item message-from-style
 @vindex message-from-style
@@ -847,12 +993,12 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 @vindex message-required-mail-headers
 $B$3$NJQ?t$N9=J8$rCN$j$?$1$l$P!"(B@xref{News Headers} $B$r;2>H$7$F2<$5$$!#$=$l(B
 $B$N=i4|CM$O(B @code{(From Date Subject (optional . In-Reply-To) Message-ID
-Lines (optional . X-Mailer))} $B$G$9!#(B
+Lines (optional . User-Agent))} $B$G$9!#(B
 
 @item message-ignored-mail-headers
 @vindex message-ignored-mail-headers
 $B%a!<%k$r=P$9A0$K<h$j=|$+$l$k%X%C%@!<$N@55,I=8=$G$9!#=i4|CM(B
-$B$O(B @samp{^[GF]cc:\\|^Resent-Fcc:} $B$G$9!#(B
+$B$O(B @samp{^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:} $B$G$9!#(B
 
 @item message-default-mail-headers
 @vindex message-default-mail-headers
@@ -879,6 +1025,12 @@ Lines (optional . X-Mailer))} $B$G$9!#(B
 $B$N%X%C%@!<$O(B MH $B$r;H$C$F%a%C%;!<%8$rAw$C$F$$$k$H$-$K$O<h$j=|$+$l$^$9!#$"(B
 $B$J$?$N(B MH $B$,$3$l$i$N%X%C%@!<$r07$($k$N$G$"$l$P!"$=$l$r(B @code{nil} $B$K@_Dj(B
 $B$7$F2<$5$$!#(B
+
+@c @item message-send-mail-partially-limit
+@c @vindex message-send-mail-partially-limit
+@c The limitation of messages sent as message/partial.
+@c The lower bound of message size in characters, beyond which the message 
+@c should be sent in several parts. If it is nil, the size is unlimited.
 
 @end table
 
@@ -933,14 +1085,10 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 $BL>(B) $B$G$J$$$J$i(B $B$P!"(BMessage $B$O(B @code{mail-host-address} $B$r(B FQDN $B$H$7$F;H(B
 $B$$$^$9!#(B
 
-@item X-Newsreader
-@cindex X-Nesreader
+@item User-Agent
+@cindex User-Agent
 $B$3$NA*Br<+M3$J%X%C%@!<$O%m!<%+%kJQ?t(B @code{message-newsreader} $B$K$7$?$,$C(B
 $B$F:n$i$l$^$9!#(B
-
-@item X-Mailer
-$B$3$NA*Br<+M3$J%X%C%@!<$O!"4{$K(B @code{X-Nesreader} $B%X%C%@!<$,B8:_$7$F$$$k(B
-$B>l9g0J30$O!"%m!<%+%kJQ?t(B @code{message-mailer} $B$K$7$?$,$C$F:n$i$l$^$9!#(B
 
 @item In-Reply-To
 $B$3$NA*Br<+M3$J%X%C%@!<$OJVEz$7$F$$$k5-;v$N(B @code{Date} $B$H(B @code{From} $B%X%C(B
@@ -1047,7 +1195,8 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @item message-ignored-news-headers
 @vindex message-ignored-news-headers
 $BEj9F$9$kA0$K<h$j=|$+$l$k%X%C%@!<$N@55,I=8=$G$9!#=i4|CM$O(B @*
-@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:} $B$G$9!#(B
+@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:}
+$B$G$9!#(B
 
 @item message-default-news-headers
 @vindex message-default-news-headers
@@ -1142,9 +1291,8 @@ follows this line--} $B$G$9!#(B
 @lisp
 (add-hook 'message-send-hook 'my-message-add-content)
 (defun my-message-add-content ()
-  (message-add-header
-   "X-In-No-Sense: Nonsense"
-   "X-Whatever: no"))
+  (message-add-header "X-In-No-Sense: Nonsense")
+  (message-add-header "X-Whatever: no"))
 @end lisp
 
 $B$3$N4X?t$O!"%X%C%@!<$,4{$KB8:_$7$F$$$k>l9g$O%X%C%@!<$r2C$($^$;$s!#(B
@@ -1247,7 +1395,7 @@ Message $B$O$"$J$?$,%a%C%;!<%8%P%C%U%!$rMW5a$7$?$H$-$K!"B>$KL5$$M#0l$N%P%C(B
 
 @item message-max-buffers
 @vindex message-max-buffers
-$B#k$NJQ?t$O$I$N$/$i$$8E$$%a%C%;!<%8%P%C%U%!$rJ]$C$F$*$/$+$r;XDj$7$^$9!#$3(B
+$B$3$NJQ?t$O$I$N$/$i$$8E$$%a%C%;!<%8%P%C%U%!$rJ]$C$F$*$/$+$r;XDj$7$^$9!#$3(B
 $B$l$h$jB?$$%a%C%;!<%8%P%C%U%!$,$"$l$P!"0lHV8E$$%P%C%U%!$,:o=|$5$l$^$9!#=i(B
 $B4|CM$O(B10$B$G$9!#$3$NJQ?t$,(B @code{nil} $B$G$"$k$H!"8E$$%a%C%;!<%8%P%C%U%!$O:o(B
 $B=|$5$l$^$;$s!#(B

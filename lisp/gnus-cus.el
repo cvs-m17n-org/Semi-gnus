@@ -27,8 +27,10 @@
 ;;; Code:
 
 (require 'wid-edit)
+(require 'gnus)
 (require 'gnus-score)
 (require 'gnus-topic)
+(require 'gnus-art)
 
 ;;; Widgets:
 
@@ -72,36 +74,7 @@ if that value is non-nil."
 ;;; Group Customization:
 
 (defconst gnus-group-parameters
-  '((to-address (gnus-email-address :tag "To Address") "\
-This will be used when doing followups and posts.
-
-This is primarily useful in mail groups that represent closed
-mailing lists--mailing lists where it's expected that everybody that
-writes to the mailing list is subscribed to it.  Since using this
-parameter ensures that the mail only goes to the mailing list itself,
-it means that members won't receive two copies of your followups.
-
-Using `to-address' will actually work whether the group is foreign or
-not.  Let's say there's a group on the server that is called
-`fa.4ad-l'.  This is a real newsgroup, but the server has gotten the
-articles from a mail-to-news gateway.  Posting directly to this group
-is therefore impossible--you have to send mail to the mailing list
-address instead.
-
-The gnus-group-split mail splitting mechanism will behave as if this
-address was listed in gnus-group-split Addresses (see below).")
-
-    (to-list (gnus-email-address :tag "To List") "\
-This address will be used when doing a `a' in the group.
-
-It is totally ignored when doing a followup--except that if it is
-present in a news group, you'll get mail group semantics when doing
-`f'.
-
-The gnus-group-split mail splitting mechanism will behave as if this
-address was listed in gnus-group-split Addresses (see below).")
-
-    (extra-aliases (choice
+  '((extra-aliases (choice
 		    :tag "Extra Aliases"
 		    (list
 		     :tag "List"
@@ -168,22 +141,6 @@ is present and a string, this string will be inserted literally as a
 `gcc' header (this symbol takes precedence over any default `Gcc'
 rules as described later).")
 
-    (banner (choice :tag "Banner"
-		    (const signature)
-		    symbol
-		    regexp
-		    (const :tag "None" nil)) "\
-Regular expression matching banners to be removed from articles.")
-
-    (auto-expire (const :tag "Automatic Expire" t) "\
-All articles that are read will be marked as expirable.")
-
-    (total-expire (const :tag "Total Expire" t) "\
-All read articles will be put through the expiry process
-
-This happens even if they are not marked as expirable.
-Use with caution.")
-
     (expiry-wait (choice :tag  "Expire Wait"
 			 :value never
 			 (const never)
@@ -242,18 +199,6 @@ An arbitrary comment on the group.")
 Always display this group, even when there are no unread articles
 in it..")
 
-    (charset (symbol :tag "Charset") "\
-The default charset to use in the group.")
-	     
-    (ignored-charsets 
-     (choice :tag "Ignored charsets" 
-	     :value nil
-	     (repeat (symbol))) "\
-List of charsets that should be ignored.
-
-When these charsets are used in the \"charset\" parameter, the
-default charset will be used instead.")
-	     
     (highlight-words 
      (choice :tag "Highlight words"
 	     :value nil
@@ -263,7 +208,23 @@ default charset will be used instead.")
 			   (symbol :tag "Face" 
 				   gnus-emphasis-highlight-words))))
      "highlight regexps.
-See gnus-emphasis-alist."))
+See gnus-emphasis-alist.")
+
+    (posting-style
+     (choice :tag "Posting style"
+	     :value nil
+	     (repeat (list
+ 		      (choice :tag "Type"
+			      :value nil
+			      (const signature)
+ 			      (const signature-file) 
+ 			      (const organization) 
+ 			      (const address)
+ 			      (const name)
+ 			      (const body))
+		      (string :format "%v"))))
+     "post style.
+See gnus-posting-styles."))
   "Alist of valid group or topic parameters.
 
 Each entry has the form (NAME TYPE DOC), where NAME is the parameter
@@ -272,7 +233,8 @@ DOC is a documentation string for the parameter.")
 
 (defconst gnus-extra-topic-parameters
   '((subscribe (regexp :tag "Subscribe") "\
-If `gnus-subscribe-newsgroup-method' is set to
+If `gnus-subscribe-newsgroup-method' or 
+`gnus-subscribe-options-newsgroup-method' is set to
 `gnus-subscribe-topics', new groups that matches this regexp will
 automatically be subscribed to this topic")) 
   "Alist of topic parameters that are not also group parameters.
@@ -303,7 +265,8 @@ DOC is a documentation string for the parameter.")
 				:doc ,(nth 2 entry)
 				(const :format "" ,(nth 0 entry))
 				,(nth 1 entry)))
-		       (append gnus-group-parameters 
+		       (append (reverse gnus-group-parameters-more)
+			       gnus-group-parameters 
 			       (if group
 				   gnus-extra-group-parameters
 				 gnus-extra-topic-parameters)))))
@@ -678,8 +641,13 @@ eh?")))
 (defvar gnus-custom-score-alist)
 
 (defun gnus-score-customize (file)
-  "Customize score file FILE."
+  "Customize score file FILE.
+When called interactively, FILE defaults to the current score file.
+This can be changed using the `\\[gnus-score-change-score-file]' command."
   (interactive (list gnus-current-score-file))
+  (unless file
+    (error (format "No score file for %s." 
+		   (gnus-group-decoded-name gnus-newsgroup-name))))
   (let ((scores (gnus-score-load file))
 	(types (mapcar (lambda (entry)
 			 `(group :format "%v%h\n"

@@ -13,14 +13,18 @@
 
 (maybe-fbind '(babel-fetch
 	       babel-wash create-image decode-coding-string display-graphic-p
+	       display-time-event-handler
 	       find-image font-create-object gnus-mule-get-coding-system
 	       font-lock-set-defaults
 	       image-size image-type-available-p insert-image
 	       make-temp-file message-xmas-redefine
 	       mail-aliases-setup mm-copy-tree
 	       mule-write-region-no-coding-system put-image
+	       ring-elements
 	       rmail-select-summary rmail-summary-exists rmail-update-summary
 	       sc-cite-regexp set-font-family set-font-size temp-directory
+	       string-as-multibyte
+	       tool-bar-add-item tool-bar-add-item-from-menu
 	       url-view-url vcard-pretty-print
 	       url-insert-file-contents
 	       w3-coding-system-for-mime-charset w3-prepare-buffer w3-region
@@ -58,7 +62,8 @@
 		     set-buffer-multibyte set-char-table-range
 		     set-face-stipple set-frame-face-alist track-mouse
 		     url-retrieve w3-form-encode-xwfu window-at
-		     window-edges x-color-values x-popup-menu))
+		     window-edges x-color-values x-popup-menu browse-url
+		     frame-char-height frame-char-width))
       (maybe-bind '(buffer-display-table
 		    buffer-file-coding-system font-lock-defaults
 		    global-face-data gnus-article-x-face-too-ugly
@@ -91,21 +96,23 @@
 		 window-pixel-height window-pixel-width)))
 
 ;; T-gnus.
-(if (featurep 'xemacs)
-    (progn
-      (maybe-fbind '(propertize))
-      (maybe-bind '(mh-lib-progs)))
-  ;; FSFmacs
-  (maybe-fbind '(charsetp
-		 function-max-args propertize smiley-encode-buffer))
-  (if (boundp 'MULE)
-      (progn
-	(maybe-fbind '(coding-system-get
-		       file-name-extension find-coding-systems-region
-		       get-charset-property))
-	(maybe-bind '(mh-lib-progs)))))
-
-(require 'custom)
+(let ((functions-variables
+       (cond
+	((featurep 'xemacs)
+	 '((propertize xml-parse-region)))
+	((>= emacs-major-version 21)
+	 '((function-max-args smiley-encode-buffer)))
+	((boundp 'MULE)
+	 '((charsetp
+	    coding-system-get compose-mail file-name-extension
+	    find-coding-systems-region function-max-args get-charset-property
+	    propertize shell-command-to-string smiley-encode-buffer
+	    xml-parse-region)))
+	(t
+	 '((function-max-args
+	    propertize smiley-encode-buffer xml-parse-region))))))
+  (maybe-fbind (car functions-variables))
+  (maybe-bind (car (cdr functions-variables))))
 
 (defun nnkiboze-score-file (a)
   )
