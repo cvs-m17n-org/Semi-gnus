@@ -5,6 +5,7 @@
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;         Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
+;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
@@ -360,7 +361,7 @@ The provided functions are:
   :group 'message-forwarding
   :type 'boolean)
 
-(defcustom message-ignored-resent-headers "^Return-receipt"
+(defcustom message-ignored-resent-headers "^Return-Receipt"
   "*All headers that match this regexp will be deleted when resending a message."
   :group 'message-interface
   :type 'regexp)
@@ -532,6 +533,12 @@ The function `message-supersede' runs this hook."
   "*Prefix inserted on the lines of yanked messages.
 nil means use indentation."
   :type 'string
+  :group 'message-insertion)
+
+(defcustom message-yank-add-new-references t
+  "*Non-nil means new IDs will be added to \"References\" field when an
+article is yanked by the command `message-yank-original' interactively."
+  :type 'boolean
   :group 'message-insertion)
 
 (defcustom message-indentation-spaces 3
@@ -1830,14 +1837,54 @@ if `message-yank-prefix' is non-nil, insert that prefix on each line.
 This function uses `message-cite-function' to do the actual citing.
 
 Just \\[universal-argument] as argument means don't indent, insert no
-prefix, and don't delete any headers."
+prefix, and don't delete any headers.
+
+In addition, if `message-yank-add-new-references' is non-nil and this
+command is called interactively, new IDs from the yanked article will
+be added to \"References\" field."
   (interactive "P")
   (let ((modified (buffer-modified-p))
-	(buffer (message-eval-parameter message-reply-buffer)))
+	(buffer (message-eval-parameter message-reply-buffer))
+	refs references)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
-      (insert-buffer buffer)
+      (insert-buffer buffer) ; mark will be set at the end of article.
+
+      ;; Add new IDs to References field.
+      (when (and message-yank-add-new-references (interactive-p))
+	(save-excursion
+	  (save-restriction
+	    (narrow-to-region (point) (mark t))
+	    (message-narrow-to-head)
+	    (setq refs (concat (or (message-fetch-field "References") "")
+			       " "
+			       (or (message-fetch-field "Message-ID") "")))
+	    (unless (string-match "^ +$" refs)
+	      (widen)
+	      (message-narrow-to-headers)
+	      (setq references (message-fetch-field "References"))
+	      (when references
+		(setq references (split-string references)))
+	      (mapcar
+	       (lambda (ref)
+		 (or (zerop (length ref))
+		     (member ref references)
+		     (setq references (append references (list ref)))))
+	       (split-string refs))
+	      (when references
+		(goto-char (point-min))
+		(let ((case-fold-search t))
+		  (if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+		      (replace-match "")
+		    (goto-char (point-max))))
+		(mail-header-format
+		 (list (or (assq 'References message-header-format-alist)
+			   '(References . message-fill-references)))
+		 (list (cons 'References
+			     (mapconcat 'identity references " "))))
+		(backward-delete-char 1))))))
+
       (funcall message-cite-function)
       (message-exchange-point-and-mark)
       (unless (bolp)

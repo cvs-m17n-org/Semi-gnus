@@ -6,6 +6,7 @@
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;      Katsumi Yamaoka  <yamaoka@jpl.org>
+;;      Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -307,10 +308,11 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
 (defun gnus-inews-yank-articles (articles)
-  (let ((frame (when (and message-use-multi-frames
-			  (> (length articles) 1))
-		 (window-frame (get-buffer-window (current-buffer)))))
-	beg article)
+  (let* ((more-than-one (> (length articles) 1))
+	 (frame (when (and message-use-multi-frames more-than-one)
+		  (window-frame (get-buffer-window (current-buffer)))))
+	 (refs "")
+	 beg article references)
     (message-goto-body)
     (while (setq article (pop articles))
       (save-window-excursion
@@ -319,7 +321,19 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 	(gnus-summary-remove-process-mark article))
       (when frame
 	(select-frame frame))
-      (gnus-copy-article-buffer)
+
+      ;; Gathering references.
+      (when more-than-one
+	(save-current-buffer
+	  (set-buffer (gnus-copy-article-buffer))
+	  (save-restriction
+	    (message-narrow-to-head)
+	    (setq refs (concat refs
+			       (or (message-fetch-field "references") "")
+			       " "
+			       (or (message-fetch-field "message-id") "")
+			       " ")))))
+
       (let ((message-reply-buffer gnus-article-copy)
 	    (message-reply-headers gnus-current-headers))
 	(message-yank-original)
@@ -327,6 +341,31 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
       (when articles
 	(insert "\n")))
     (push-mark)
+
+    ;; Eliminate duplicated references.
+    (unless (string-match "^ *$" refs)
+      (mapcar
+       (lambda (ref)
+	 (or (zerop (length ref))
+	     (member ref references)
+	     (setq references (append references (list ref)))))
+       (split-string refs)))
+
+    ;; Replace with the gathered references.
+    (when references
+      (save-restriction
+	(message-narrow-to-headers)
+	(let ((case-fold-search t))
+	  (if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+	      (replace-match "")
+	    (goto-char (point-max))))
+	(mail-header-format
+	 (list (or (assq 'References message-header-format-alist)
+		   '(References . message-fill-references)))
+	 (list (cons 'References
+		     (mapconcat 'identity references " "))))
+	(backward-delete-char 1)))
+
     (goto-char beg)))
 
 (defun gnus-summary-cancel-article (&optional n symp)
@@ -689,7 +728,7 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
   "Digest and forwards all articles in this series to a newsgroup."
   (interactive "P")
   (gnus-summary-mail-digest n t))
- 
+
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive "sResend message(s) to: \nP")
