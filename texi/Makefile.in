@@ -1,5 +1,5 @@
-infodir = @infodir@
 prefix = @prefix@
+infodir = @infodir@
 srcdir = @srcdir@
 subdir = texi
 top_srcdir = @top_srcdir@
