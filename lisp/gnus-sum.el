@@ -4402,19 +4402,20 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (nnheader-header-value)
+		  (buffer-substring (match-end 0) (std11-field-end))
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (nnheader-header-value)
+		  (buffer-substring (match-end 0) (std11-field-end))
 		"(nobody)"))
 	    ;; Date.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\ndate: " nil t)
-		  (nnheader-header-value) ""))
+		  (buffer-substring (match-end 0) (std11-field-end))
+		""))
 	    ;; Message-ID.
 	    (progn
 	      (goto-char p)
@@ -4434,11 +4435,11 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		  (progn
 		    (setq end (point))
 		    (prog1
-			(nnheader-header-value)
+			(buffer-substring (match-end 0) (std11-field-end))
 		      (setq ref
 			    (buffer-substring
 			     (progn
-			       (end-of-line)
+                               ;; (end-of-line)
 			       (search-backward ">" end t)
 			       (1+ (point)))
 			     (progn
@@ -4448,7 +4449,9 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		;; were no references and the in-reply-to header looks
 		;; promising.
 		(if (and (search-forward "\nin-reply-to: " nil t)
-			 (setq in-reply-to (nnheader-header-value))
+			 (setq in-reply-to
+			       (buffer-substring (match-end 0)
+						 (std11-field-end)))
 			 (string-match "<[^>]+>" in-reply-to))
 		    (let (ref2)
 		      (setq ref (substring in-reply-to (match-beginning 0)
@@ -4478,10 +4481,11 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (and (search-forward "\nxref: " nil t)
-		   (nnheader-header-value)))))
+		   (buffer-substring (match-end 0) (std11-field-end))))))
 	  (goto-char p)
 	  (if (and (search-forward "\ncontent-type: " nil t)
-		   (setq ctype (nnheader-header-value)))
+		   (setq ctype
+			 (buffer-substring (match-end 0) (std11-field-end))))
 	      (mime-entity-set-content-type-internal
 	       header (mime-parse-Content-Type ctype)))
 	  (when (equal id ref)
