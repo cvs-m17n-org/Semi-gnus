@@ -1007,7 +1007,7 @@ find-file-hooks, etc.
 	(enable-local-variables nil)
 	(after-insert-file-functions nil)
 	(find-file-hooks nil))
-    (apply 'find-file-noselect-raw-text-CRLF args)))
+    (apply 'find-file-noselect-as-raw-text-CRLF args)))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."
