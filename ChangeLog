@@ -1,3 +1,27 @@
+1999-06-21  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Use `move-to-column'
+	statically to skip the prefix string under Emacs 20.2 or earlier.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Move
+	`gnus-revision-number' to the last.
+
+1999-06-21  Daiji KANEMATSU   <kanematu@sra.co.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-jump-to-other-group): Call
+	`gnus-summary-read-group' with the 3rd arg T.
+
+1999-06-21  NAKAJI Hiroyuki   <nakaji@tutrp.tut.ac.jp>
+
+	* texi/Makefile.in (clean): Remove gnus.info*, gnus-ja.info*,
+	message.info*, message-ja.info*, *.texi_ and emacs-mime.info.
+
+	* lisp/Makefile.in (distclean): Remove auto-autoload.el and
+	custom-load.el.
+
 1999-06-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
