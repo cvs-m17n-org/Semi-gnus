@@ -8355,13 +8355,13 @@ Gnus の info の節 (node) に移動します (@code{gnus-info-find-no
 @item M-s
 @kindex M-s (概略)
 @findex gnus-summary-search-article-forward
-直後にある全ての記事を正規表現で検索しま
+直後にある全ての (生の) 記事を正規表現で検索しま
 す (@code{gnus-summary-search-article-forward})。
 
 @item M-r
 @kindex M-r (概略)
 @findex gnus-summary-search-article-backward
-前にある全ての記事を正規表現で検索しま
+前にある全ての (生の) 記事を正規表現で検索しま
 す (@code{gnus-summary-search-article-backward})。
 
 @item &
