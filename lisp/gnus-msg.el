@@ -621,7 +621,11 @@ If SILENT, don't prompt the user."
 
 (defun gnus-extended-version ()
   "Stringified gnus version."
-  (concat gnus-product-name "/" gnus-version-number " (based on "
+  (concat gnus-product-name "/" gnus-version-number
+	  (if (zerop (string-to-number gnus-revision-number))
+	      ""
+	    (concat " (revision " gnus-revision-number ")"))
+	  " (based on "
 	  gnus-original-product-name " v" gnus-original-version-number ")"))
 
 (defun gnus-message-make-user-agent (&optional include-mime-info max-column)
