@@ -1,3 +1,8 @@
+2001-01-29  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-exit): Use
+	`buffer-substring-no-properties' instead of `format'.
+
 2001-01-23  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* texi/ptexinfmt.el: Support @letterpaper and @afivepaper.
