@@ -1,3 +1,7 @@
+2001-02-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* README-gnus-bbdb.{en,ja}: Update the patch for BBDB v2.2.
+
 2001-02-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/Makefile.in (.texi, %.info): Don't use makeinfo command when
