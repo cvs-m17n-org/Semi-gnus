@@ -2400,7 +2400,7 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
       (save-excursion
 	(goto-char start)
 	(while (< (point) (mark t))
-	  (if (looking-at ">")
+	  (if (or (looking-at ">") (looking-at "^$"))
 	      (insert message-yank-cited-prefix)
 	    (insert message-yank-prefix))
 	  (forward-line 1))))
