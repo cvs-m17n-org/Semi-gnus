@@ -17,6 +17,11 @@
 	* lisp/message.el (message-generate-headers): Fix regexp.
 	(cf. [semi-gnus-ja:107])
 
+1998-03-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Add setting for
+ 	`mime-raw-buffer-coding-system-alist'.
+
 1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el: Rename `mime-view-quitting-method-for-gnus' ->
