@@ -1,12 +1,12 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Gnus 5.6.4 Manual
+@settitle Semi-gnus 6.1.2 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
 @c @direntry
-@c * Gnus: (gnus).         The news reader Gnus.
+@c * Gnus: (gnus).         The news reader gnus.
 @c @end direntry
 @iftex
 @finalout
@@ -289,7 +289,7 @@ into another language, under the above conditions for modified versions.
 
 @ifinfo
 
-This file documents Gnus, the GNU Emacs newsreader.
+This file documents gnus, the GNU Emacs newsreader.
 
 Copyright (C) 1995,96 Free Software Foundation, Inc.
 
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Gnus 5.6.4 Manual
+@title Semi-gnus 6.1.2 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -343,16 +343,23 @@ into another language, under the above conditions for modified versions.
 
 
 @node Top
-@top The Gnus Newsreader
+@top The gnus Newsreader
 
 @ifinfo
 
-You can read news (and mail) from within Emacs by using Gnus.  The news
+You can read news (and mail) from within Emacs by using gnus.  The news
 can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Gnus 5.6.4.
+Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
+supports your right to read strange messages including big images or
+other various kinds of formats.  Semi-gnus also supports
+internationalization/localization and multiscript features based on MULE
+API.  So Semi-gnus does not discriminate various language communities.
+Oh, if you are a Klingon, please wait Unicode Next Generation.
+
+This manual corresponds to Semi-gnus 6.1.2.
 
 @end ifinfo
 
@@ -376,7 +383,7 @@ even read news with it!
 
 Gnus tries to empower people who read news the same way Emacs empowers
 people who edit text.  Gnus sets no limits to what the user should be
-allowed to do.  Users are encouraged to extend Gnus to make it behave
+allowed to do.  Users are encouraged to extend gnus to make it behave
 like they want it to behave.  A program should not control people;
 people should be empowered to do what they want by using (or abusing)
 the program.
@@ -400,18 +407,18 @@ the program.
 @end menu
 
 @node Starting Up
-@chapter Starting Gnus
+@chapter Starting gnus
 @cindex starting up
 
 @kindex M-x gnus
 @findex gnus
-If your system administrator has set things up properly, starting Gnus
+If your system administrator has set things up properly, starting gnus
 and reading news is extremely easy---you just type @kbd{M-x gnus} in
 your Emacs.
 
 @findex gnus-other-frame
 @kindex M-x gnus-other-frame
-If you want to start Gnus in a different frame, you can use the command
+If you want to start gnus in a different frame, you can use the command
 @kbd{M-x gnus-other-frame} instead.
 
 If things do not go smoothly at startup, you have to twiddle some
@@ -423,11 +430,11 @@ terminology section (@pxref{Terminology}).
 
 @menu
 * Finding the News::    Choosing a method for getting news.
-* The First Time::      What does Gnus do the first time you start it?
+* The First Time::      What does gnus do the first time you start it?
 * The Server is Down::  How can I read my mail then?
-* Slave Gnusae::        You can have more than one Gnus active at a time.
-* Fetching a Group::    Starting Gnus just to read a group.
-* New Groups::          What is Gnus supposed to do with new groups?
+* Slave Gnusae::        You can have more than one gnus active at a time.
+* Fetching a Group::    Starting gnus just to read a group.
+* New Groups::          What is gnus supposed to do with new groups?
 * Startup Files::       Those pesky startup files---@file{.newsrc}.
 * Auto Save::           Recovering from a crash.
 * The Active File::     Reading the active file over a slow line Takes Time.
@@ -442,11 +449,11 @@ terminology section (@pxref{Terminology}).
 
 @vindex gnus-select-method
 @c @head
-The @code{gnus-select-method} variable says where Gnus should look for
+The @code{gnus-select-method} variable says where gnus should look for
 news.  This variable should be a list where the first element says
 @dfn{how} and the second element says @dfn{where}.  This method is your
-native method.  All groups not fetched with this method are
-foreign groups.
+native method.  All groups not fetched with this method are foreign
+groups.
 
 For instance, if the @samp{news.somewhere.edu} @sc{nntp} server is where
 you want to get your daily dosage of news from, you'd say:
@@ -467,11 +474,12 @@ certainly be much faster.
 @vindex gnus-nntpserver-file
 @cindex NNTPSERVER
 @cindex @sc{nntp} server
-If this variable is not set, Gnus will take a look at the
+If this variable is not set, gnus will take a look at the
 @code{NNTPSERVER} environment variable.  If that variable isn't set,
-Gnus will see whether @code{gnus-nntpserver-file}
+gnus will see whether @code{gnus-nntpserver-file}
 (@file{/etc/nntpserver} by default) has any opinions on the matter.  If
-that fails as well, Gnus will try to use the machine running Emacs as an @sc{nntp} server.  That's a long shot, though.
+that fails as well, gnus will try to use the machine running Emacs as an
+@sc{nntp} server.  That's a long shot, though.
 
 @vindex gnus-nntp-server
 If @code{gnus-nntp-server} is set, this variable will override
@@ -479,9 +487,9 @@ If @code{gnus-nntp-server} is set, this variable will override
 @code{gnus-nntp-server} to @code{nil}, which is what it is by default.
 
 @vindex gnus-secondary-servers
-You can also make Gnus prompt you interactively for the name of an
+You can also make gnus prompt you interactively for the name of an
 @sc{nntp} server.  If you give a non-numerical prefix to @code{gnus}
-(i.e., @kbd{C-u M-x gnus}), Gnus will let you choose between the servers
+(i.e., @kbd{C-u M-x gnus}), gnus will let you choose between the servers
 in the @code{gnus-secondary-servers} list (if any).  You can also just
 type in the name of any server you feel like visiting.
 
@@ -516,23 +524,23 @@ would typically set this variable to
 @section The First Time
 @cindex first time usage
 
-If no startup files exist, Gnus will try to determine what groups should
+If no startup files exist, gnus will try to determine what groups should
 be subscribed by default.
 
 @vindex gnus-default-subscribed-newsgroups
-If the variable @code{gnus-default-subscribed-newsgroups} is set, Gnus
+If the variable @code{gnus-default-subscribed-newsgroups} is set, gnus
 will subscribe you to just those groups in that list, leaving the rest
 killed.  Your system administrator should have set this variable to
 something useful.
 
-Since she hasn't, Gnus will just subscribe you to a few arbitrarily
+Since she hasn't, gnus will just subscribe you to a few arbitrarily
 picked groups (i.e., @samp{*.newusers}).  (@dfn{Arbitrary} is defined
 here as @dfn{whatever Lars thinks you should read}.)
 
-You'll also be subscribed to the Gnus documentation group, which should
+You'll also be subscribed to the gnus documentation group, which should
 help you with most common problems.
 
-If @code{gnus-default-subscribed-newsgroups} is @code{t}, Gnus will just
+If @code{gnus-default-subscribed-newsgroups} is @code{t}, gnus will just
 use the normal functions for handling new groups, and not do anything
 special.
 
@@ -541,9 +549,9 @@ special.
 @section The Server is Down
 @cindex server errors
 
-If the default server is down, Gnus will understandably have some
+If the default server is down, gnus will understandably have some
 problems starting.  However, if you have some mail groups in addition to
-the news groups, you may want to start Gnus anyway.
+the news groups, you may want to start gnus anyway.
 
 Gnus, being the trusting sort of program, will ask whether to proceed
 without a native select method if that server can't be contacted.  This
@@ -558,7 +566,7 @@ buffer.  But, hey, that's your problem.  Blllrph!
 @c @head
 If you know that the server is definitely down, or you just want to read
 your mail without bothering with the server at all, you can use the
-@code{gnus-no-server} command to start Gnus.  That might come in handy
+@code{gnus-no-server} command to start gnus.  That might come in handy
 if you're in a hurry as well.  This command will not attempt to contact
 your primary server---instead, it will just activate all groups on level
 1 and 2.  (You should preferably keep no native groups on those two
@@ -569,27 +577,27 @@ levels.)
 @section Slave Gnusae
 @cindex slave
 
-You might want to run more than one Emacs with more than one Gnus at the
-same time.  If you are using different @file{.newsrc} files (e.g., if you
-are using the two different Gnusae to read from two different servers),
-that is no problem whatsoever.  You just do it.
+You might want to run more than one Emacs with more than one gnus at the
+same time.  If you are using different @file{.newsrc} files (e.g., if
+you are using the two different gnusae to read from two different
+servers), that is no problem whatsoever.  You just do it.
 
 The problem appears when you want to run two Gnusae that use the same
 @code{.newsrc} file.
 
-To work around that problem some, we here at the Think-Tank at the Gnus
-Towers have come up with a new concept: @dfn{Masters} and
-@dfn{slaves}.  (We have applied for a patent on this concept, and have
-taken out a copyright on those words.  If you wish to use those words in
-conjunction with each other, you have to send $1 per usage instance to
-me.  Usage of the patent (@dfn{Master/Slave Relationships In Computer
-Applications}) will be much more expensive, of course.)
+To work around that problem some, we here at the Think-Tank at the gnus
+Towers have come up with a new concept: @dfn{Masters} and @dfn{slaves}.
+(We have applied for a patent on this concept, and have taken out a
+copyright on those words.  If you wish to use those words in conjunction
+with each other, you have to send $1 per usage instance to me.  Usage of
+the patent (@dfn{Master/Slave Relationships In Computer Applications})
+will be much more expensive, of course.)
 
-Anyways, you start one Gnus up the normal way with @kbd{M-x gnus} (or
-however you do it).  Each subsequent slave Gnusae should be started with
+Anyways, you start one gnus up the normal way with @kbd{M-x gnus} (or
+however you do it).  Each subsequent slave gnusae should be started with
 @kbd{M-x gnus-slave}.  These slaves won't save normal @file{.newsrc}
 files, but instead save @dfn{slave files} that contain information only
-on what groups have been read in the slave session.  When a master Gnus
+on what groups have been read in the slave session.  When a master gnus
 starts, it will read (and delete) these slave files, incorporating all
 information from them.  (The slave files will be read in the sequence
 they were created, so the latest changes will have precedence.)
@@ -604,7 +612,7 @@ information in the normal (i.e., master) @code{.newsrc} file.
 
 @findex gnus-fetch-group
 It is sometimes convenient to be able to just say ``I want to read this
-group and I don't care whether Gnus has been started or not''.  This is
+group and I don't care whether gnus has been started or not''.  This is
 perhaps more useful for people who write code than for users, but the
 command @code{gnus-fetch-group} provides this functionality in any case.
 It takes the group name as a parameter.
@@ -622,13 +630,13 @@ also save you some time at startup.  Even if this variable is
 @code{nil}, you can always subscribe to the new groups just by pressing
 @kbd{U} in the group buffer (@pxref{Group Maintenance}).  This variable
 is @code{ask-server} by default.  If you set this variable to
-@code{always}, then Gnus will query the backends for new groups even
+@code{always}, then gnus will query the backends for new groups even
 when you do the @kbd{g} command (@pxref{Scanning New Messages}).
 
 @menu
 * Checking New Groups::      Determining what groups are new.
-* Subscription Methods::     What Gnus should do with new groups.
-* Filtering New Groups::     Making Gnus ignore certain new groups.
+* Subscription Methods::     What gnus should do with new groups.
+* Filtering New Groups::     Making gnus ignore certain new groups.
 @end menu
 
 
@@ -638,7 +646,7 @@ when you do the @kbd{g} command (@pxref{Scanning New Messages}).
 Gnus normally determines whether a group is new or not by comparing the
 list of groups from the active file(s) with the lists of subscribed and
 dead groups.  This isn't a particularly fast method.  If
-@code{gnus-check-new-newsgroups} is @code{ask-server}, Gnus will ask the
+@code{gnus-check-new-newsgroups} is @code{ask-server}, gnus will ask the
 server for new groups since the last time.  This is both faster and
 cheaper.  This also means that you can get rid of the list of killed
 groups altogether, so you may set @code{gnus-save-killed-list} to
@@ -650,15 +658,15 @@ I bet I know what you're thinking now: How do I find out whether my
 server supports @code{ask-server}?  No?  Good, because I don't have a
 fail-safe answer.  I would suggest just setting this variable to
 @code{ask-server} and see whether any new groups appear within the next
-few days.  If any do, then it works.  If none do, then it doesn't
-work.  I could write a function to make Gnus guess whether the server
-supports @code{ask-server}, but it would just be a guess.  So I won't.
-You could @code{telnet} to the server and say @code{HELP} and see
-whether it lists @samp{NEWGROUPS} among the commands it understands.  If
-it does, then it might work.  (But there are servers that lists
-@samp{NEWGROUPS} without supporting the function properly.)
+few days.  If any do, then it works.  If none do, then it doesn't work.
+I could write a function to make gnus guess whether the server supports
+@code{ask-server}, but it would just be a guess.  So I won't.  You could
+@code{telnet} to the server and say @code{HELP} and see whether it lists
+@samp{NEWGROUPS} among the commands it understands.  If it does, then it
+might work.  (But there are servers that lists @samp{NEWGROUPS} without
+supporting the function properly.)
 
-This variable can also be a list of select methods.  If so, Gnus will
+This variable can also be a list of select methods.  If so, gnus will
 issue an @code{ask-server} command to each of the select methods, and
 subscribe them (or not) using the normal methods.  This might be handy
 if you are monitoring a few servers for new groups.  A side effect is
@@ -670,7 +678,7 @@ Use the mantra ``dingnusdingnusdingnus'' to achieve permanent bliss.
 @subsection Subscription Methods
 
 @vindex gnus-subscribe-newsgroup-method
-What Gnus does when it encounters a new group is determined by the
+What gnus does when it encounters a new group is determined by the
 @code{gnus-subscribe-newsgroup-method} variable.
 
 This variable should contain a function.  This function will be called
@@ -707,9 +715,9 @@ up.  Or something like that.
 
 @item gnus-subscribe-interactively
 @vindex gnus-subscribe-interactively
-Subscribe new groups interactively.  This means that Gnus will ask
-you about @strong{all} new groups.  The groups you choose to subscribe
-to will be subscribed hierarchically.
+Subscribe new groups interactively.  This means that gnus will ask you
+about @strong{all} new groups.  The groups you choose to subscribe to
+will be subscribed hierarchically.
 
 @item gnus-subscribe-killed
 @vindex gnus-subscribe-killed
@@ -720,7 +728,7 @@ Kill all new groups.
 @vindex gnus-subscribe-hierarchical-interactive
 A closely related variable is
 @code{gnus-subscribe-hierarchical-interactive}.  (That's quite a
-mouthful.)  If this variable is non-@code{nil}, Gnus will ask you in a
+mouthful.)  If this variable is non-@code{nil}, gnus will ask you in a
 hierarchical fashion whether to subscribe to new groups or not.  Gnus
 will ask you for each sub-hierarchy whether you want to descend the
 hierarchy or not.
@@ -15688,7 +15696,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.4.
+* Quassia Gnus::       Two times two is four, or Semi-gnus 6.1.2.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16223,7 +16231,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.4:
+New features in Semi-gnus 6.1.2:
 
 @itemize @bullet
 

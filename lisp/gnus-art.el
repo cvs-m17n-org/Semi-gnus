@@ -3251,9 +3251,9 @@ forbidden in URL encoding."
 It is registered to variable `mime-view-content-header-filter-alist'."
   (eword-decode-header default-mime-charset))
 
-(defun mime-view-quitting-method-for-gnus ()
+(defun mime-preview-quitting-method-for-gnus ()
   (if (not gnus-show-mime)
-      (mime-view-kill-buffer))
+      (mime-preview-kill-buffer))
   (delete-other-windows)
   (gnus-article-show-summary)
   (if (or (not gnus-show-mime)
@@ -3261,21 +3261,37 @@ It is registered to variable `mime-view-content-header-filter-alist'."
       (gnus-summary-select-article nil t)
     ))
 
+(set-alist 'mime-raw-buffer-coding-system-alist
+	   'gnus-original-article-mode
+	   'raw-text)
+
 (set-alist 'mime-view-content-header-filter-alist
 	   'gnus-original-article-mode
-	   (function gnus-content-header-filter))
+	   #'gnus-content-header-filter)
 
 (set-alist 'mime-text-decoder-alist
 	   'gnus-original-article-mode
-	   (function mime-text-decode-buffer))
+	   #'mime-text-decode-buffer)
 
-(set-alist 'mime-view-quitting-method-alist
+(set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode
-	   (function mime-view-quitting-method-for-gnus))
+	   #'mime-preview-quitting-method-for-gnus)
 
 (set-alist 'mime-view-show-summary-method
 	   'gnus-original-article-mode
-	   (function mime-view-quitting-method-for-gnus))
+	   #'mime-preview-quitting-method-for-gnus)
+
+(defun gnus-following-method (buf)
+  (set-buffer buf)
+  (message-followup)
+  (message-yank-original)
+  (kill-buffer buf)
+  (goto-char (point-min))
+  )
+
+(set-alist 'mime-view-following-method-alist
+	   'gnus-original-article-mode
+	   #'gnus-following-method)
 
 
 ;;; @ end

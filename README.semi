@@ -11,8 +11,8 @@ Gnus to use it, and you must not use gnus-mime for SEMI.
 before to install it.
 
 
-How to get?
-===========
+How to get? (via CVS)
+=====================
 
 (0) cvs login
 
@@ -23,42 +23,44 @@ How to get?
 
 (1) checkout
 
-    Please do following in a directory to extract (ex. site-lisp):
-
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout -r semi-gnus gnus
+	checkout [-r semi-gnus] gnus
 
 (2) compile
 
-    ;; as same as Gnus
-
     % cd gnus
-
     % make EMACS=<file name of your emacs>
 
 (3) update
 
-    Please do following in your Open gnus directory:
+    % cvs update [-r semi-gnus]
 
-    % cvs update -r semi-gnus
+The ``semi-gnus'' CVS tag is assigned to the latest stable version.
 
+How to get? (via ftp)
+=====================
 
-  (semi-)daily snapshot is also available from
+  Semi-daily snapshots are also available from
 
     ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
 
-  Note that this snapshot is automatically created from our repository
-and will usually not be tested, and may not even work.
+  NOTE: These snapshots are automatically created from our repository
+if something was changed within a day, and will usually not be tested.
 
 
 How to join development
 =======================
 
-  If you write bug-reports and/or suggestions for improvement, please
-send them to the Semi-gnus mailing list:
+  If you have found a bug in Gnus proper, please do `M-x gnus-bug' and
+send a bug report to the Gnus maintainers.
+
+  If you have found a bug in Semi-gnus, or if you're not sure whether it
+is a Gnus proper, please send a bug report to the Semi-gnus mailing list:
 
     semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
     semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+
+Suggestions for Semi-gnus improvements are also welcome.
 
   Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
 the latest release of Semi-gnus, and discuss future enhancements to
