@@ -1,6 +1,6 @@
 1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/message.el (message-send-mail): Remove a misplaced
+	* lisp/message.el (message-send-mail): Remove the misplaced
 	`interactive'.
 
 	* lisp/message.el (message-yank-original): Get back to the previous
