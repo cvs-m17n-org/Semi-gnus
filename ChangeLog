@@ -1,3 +1,8 @@
+1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
+	implementation.
+
 1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/gnus-sum.el (gnus-articles-to-read): Use maximum number in
