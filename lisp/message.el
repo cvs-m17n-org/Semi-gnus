@@ -420,8 +420,9 @@ always query the user whether to use the value.  If it is the symbol
 `use', always use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 (const use)
-		 (const ask)))
+		 (const :tag "maybe" t)
+		 (const :tag "always" use)
+		 (const :tag "ask" ask)))
 
 (defcustom message-use-mail-copies-to 'ask
   "*Specifies what to do with Mail-Copies-To header.
@@ -431,8 +432,9 @@ If it is the symbol `ask', always query the user whether to use
 the value.  If it is the symbol `use', always use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 (const use)
-		 (const ask)))
+		 (const :tag "maybe" t)
+		 (const :tag "always" use)
+		 (const :tag "ask" ask)))
 
 (defcustom message-use-mail-followup-to 'ask
   "*Specifies what to do with Mail-Followup-To header.
@@ -441,19 +443,21 @@ query the user whether to use the value.  If it is t or the symbol
 `use', always use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 (const use)
-		 (const ask)))
+		 (const :tag "maybe" t)
+		 (const :tag "always" use)
+		 (const :tag "ask" ask)))
 
-(defcustom message-use-mail-reply-to t
+(defcustom message-use-mail-reply-to 'ask
   "*Specifies what to do with Mail-Reply-To/Reply-To header.
-If nil, always ignore the header.  If it is t, use its value unless
-\"Reply-To\" is marked as \"broken\".  If it is the symbol `ask',
-always query the user whether to use the value.  If it is the symbol
-`use', always use the value."
+If nil, always ignore the header.  If it is t or the symbol `use', use
+its value.  If it is the symbol `ask', always query the user whether to
+use the value.  Not that if \"Reply-To\" is marked as \"broken\", its value
+is never used."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 (const use)
-		 (const ask)))
+		 (const :tag "maybe" t)
+		 (const :tag "always" use)
+		 (const :tag "ask" ask)))
 
 ;; stuff relating to broken sendmail in MMDF
 (defcustom message-sendmail-f-is-evil nil
@@ -1141,7 +1145,7 @@ If REGEXP, HEADER is a regular expression.
 If FIRST, only remove the first instance of the header.
 Return the number of headers removed."
   (goto-char (point-min))
-  (let ((regexp (if is-regexp header (concat "^" header ":")))
+  (let ((regexp (if is-regexp header (concat "^" (regexp-quote header) ":")))
 	(number 0)
 	(case-fold-search t)
 	last)
@@ -3380,7 +3384,7 @@ Headers already prepared in the buffer are not modified."
 		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
-(defun message-reply (&optional to-address wide ignore-reply-to)
+(defun message-reply (&optional to-address wide)
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
@@ -3414,9 +3418,7 @@ Headers already prepared in the buffer are not modified."
 		  (message-fetch-field "mail-followup-to"))
 	    mrt (when message-use-mail-reply-to
 		  (or (message-fetch-field "mail-reply-to")
-		      (and (or (eq message-use-mail-reply-to 'use)
-			       (not ignore-reply-to))
-			   (message-fetch-field "reply-to"))))
+		      (message-fetch-field "reply-to")))
 	    gnus-warning (message-fetch-field "gnus-warning"))
       (when (and gnus-warning (string-match "<[^>]+>" gnus-warning))
 	(setq message-id (match-string 0 gnus-warning)))
@@ -3535,10 +3537,10 @@ that further discussion should take place only in "
      cur)))
 
 ;;;###autoload
-(defun message-wide-reply (&optional to-address ignore-reply-to)
+(defun message-wide-reply (&optional to-address)
   "Make a \"wide\" reply to the message in the current buffer."
   (interactive)
-  (message-reply to-address t ignore-reply-to))
+  (message-reply to-address t))
 
 ;;;###autoload
 (defun message-followup (&optional to-newsgroups)
