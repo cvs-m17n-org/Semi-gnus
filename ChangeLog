@@ -1,3 +1,17 @@
+1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/mmgnus.el (entity-buffer): Must move to (point-min) before
+	search boundary between header and body (to fix problem with
+	Emacs).
+
+1998-11-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmh.el (nnmh-retrieve-headers): Don't use
+	`nnheader-fold-continuation-lines'.
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Don't expect
+	unfolded (to fix problem when using gnus-cache).
+
 1998-11-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-make-in-reply-to): Quote date.
