@@ -1,3 +1,62 @@
+2003-02-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-refer-article): Use
+	gnus-replace-in-string.
+
+	* gnus-util.el (gnus-map-function): Remove unneeded let-binding.
+	(gnus-remove-duplicates): do.
+
+2003-02-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-int.el (gnus-internal-registry-spool-current-method): new variable
+	(gnus-request-scan): set
+	gnus-internal-registry-spool-current-method to gnus-command-method
+	before a request-scan operation
+
+	* gnus-registry.el (regtest-nnmail): use
+	gnus-internal-registry-spool-current-method
+
+	
+
+2003-02-07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-fetch): Typo fix.
+
+2003-02-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* nnmail.el (nnmail-spool-hook): new hook
+	(nnmail-cache-insert): call nnmail-spool-hook
+
+	* gnus-registry.el: new file with examples of using the hooks
+
+	* gnus.el (gnus-registry): added registry customization group
+	(gnus-group-prefixed-name): improve function to return full group
+	name optionally
+	(gnus-group-guess-prefixed-name): shortcut to
+	gnus-group-prefixed-name, using just the group name
+	(gnus-group-full-name): always get a group's full name
+	(gnus-group-guess-full-name): shortcut, using just the group name
+
+	* gnus-sum.el (gnus-summary-article-move-hook) 
+	(gnus-summary-article-delete-hook) 
+	(gnus-summary-article-expire-hook): new hooks
+	(gnus-summary-move-article, gnus-summary-expire-articles) 
+	(gnus-summary-delete-article): invoke the new hooks
+
+2003-02-07  Frank Weinberg  <frank@usenet-rundfahrt.de>
+
+        * gnus-art.el (gnus-article-refer-article): Strip leading "news:"
+          from message-ID
+
+2003-02-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-run-hooks): Use save-current-buffer.
+
+2003-02-07  John Paul Wallington  <jpw@gnu.org>
+
+	* mm-util.el (mm-delete-duplicates, mm-append-to-file)
+	(mm-write-region, mm-detect-coding-region): Doc fixes.
+
 2003-02-07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* mail-source.el (mail-source-fetch): Ignore errors.
