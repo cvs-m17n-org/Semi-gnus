@@ -2896,7 +2896,7 @@ gnus-registry.el will populate this if it's loaded.")
      ("international/mw32misc" define-process-argument-editing
       general-process-argument-editing-function)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
-      gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
+      gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
       gnus-summary-set-agent-mark gnus-agent-save-group-info
       gnus-agent-request-article gnus-agent-retrieve-headers)
