@@ -1,12 +1,13 @@
 1999-01-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
-	* lisp/gnus-offline.el (gnus-offline-popup-menu): New function.
-	(gnus-offline-define-menu-on-miee): Use `easy-menu-add' for adding
-	a menu under XEmacs.
-	(gnus-offline-define-menu-and-key): Don't set
-	`gnus-offline-popup-menu' to `gnus-group-mode-map' under XEmacs.
-	(gnus-offline-after-jobs-done): Don't call
-	`gnus-offline-agent-expire' if `gnus-agent-expire-all' is non-nil.
+	* lisp/gnus-offline.el (gnus-offline-setup): Don't call
+	`gnus-offline-agent-expire' when 'gnus-agent-expire-all' is
+	non-nil.
+	(gnus-offline-define-menu-on-miee): Call `easy-menu-add' under
+	XEmacs.
+	(gnus-offline-popup-menu): New function.
+	(gnus-offline-define-menu-and-key): Call it under Emacs to create
+	a popup menu in the group buffer.
 
 1999-01-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
