@@ -111,10 +111,13 @@ To join the Semi-gnus ML, send an empty e-mail to
     semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
-please send mail to cvs@cvs.m17n.org with your account name and UNIX
-/etc/passwd style crypted password.  You can get the notice of
-modifications in m17n open CVS server via the mail which also contains
-informations on the other modules.  To subscribe it, send an empty
-e-mail to
+please send mail to cvs@cvs.m17n.org with your account name and your
+public key for ssh.  cvsroot is :ext:cvs@cvs.m17n.org:/cvs/root.
+If you cannot use ssh, please send UNIX /etc/passwd style crypted
+password instead.  cvsroot is
+:pserver:<accountname>@cvs.m17n.org:/cvs/root in this case.  You can
+get the notice of modifications in m17n open CVS server via the mail
+which also contains informations on the other modules.  To subscribe
+it, send an empty e-mail to
 
     cvs-info-help@cvs.m17n.org
