@@ -30,7 +30,7 @@ of this file should be applied. If not, it might not.
 
 (require 'bbdb)
 (require 'gnus-bbdb)
-(bbdb-initialize 'sc)  ;; 'Gnus of 'gnus should be deleted.
+(bbdb-initialize 'sc)  ;; 'Gnus or 'gnus should be deleted.
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
 
  If you would like to decode the quoted encoded words forcibly, even
