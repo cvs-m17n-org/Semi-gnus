@@ -1088,18 +1088,21 @@ The original article will be yanked."
    (gnus-summary-work-articles n) t (gnus-summary-work-articles n)))
 
 (defun gnus-summary-mail-forward (&optional full-headers post)
-  "Forward the current message to another user.
+  "Forward the current message(s) to another user.
+If process marks exist, forward all marked messages;
 If FULL-HEADERS (the prefix), include full headers when forwarding."
   (interactive "P")
-  (gnus-setup-message 'forward
-    (gnus-summary-select-article)
-    (let ((charset default-mime-charset))
-      (set-buffer gnus-original-article-buffer)
-      (make-local-variable 'default-mime-charset)
-      (setq default-mime-charset charset))
-    (let ((message-included-forward-headers
-	   (if full-headers "" message-included-forward-headers)))
-      (message-forward post))))
+  (if (null (cdr (gnus-summary-work-articles nil)))
+      (gnus-setup-message 'forward
+	(gnus-summary-select-article)
+	(let ((charset default-mime-charset))
+	  (set-buffer gnus-original-article-buffer)
+	  (make-local-variable 'default-mime-charset)
+	  (setq default-mime-charset charset))
+	(let ((message-included-forward-headers
+	       (if full-headers "" message-included-forward-headers)))
+	  (message-forward post)))
+    (gnus-summary-digest-mail-forward nil post)))
 
 (defun gnus-summary-digest-mail-forward (&optional n post)
   "Digests and forwards all articles in this series.
