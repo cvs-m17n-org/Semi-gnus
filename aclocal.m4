@@ -149,10 +149,10 @@ fi
    AC_ARG_WITH(w3,[  --with-w3=DIR           Specify where to find the w3 package], [ EMACS_cv_ACCEPTABLE_W3=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` ])
    W3=${EMACS_cv_ACCEPTABLE_W3}
    AC_SUBST(W3)
-   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
-	AC_MSG_RESULT("${W3}")
-   else
+   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "x"; then
 	AC_MSG_RESULT("not found")
+   else
+	AC_MSG_RESULT("${W3}")
    fi
 ])
 

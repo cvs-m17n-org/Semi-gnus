@@ -1061,10 +1061,10 @@ fi
 
    W3=${EMACS_cv_ACCEPTABLE_W3}
    
-   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
-	echo "$ac_t"""${W3}"" 1>&6
-   else
+   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "x"; then
 	echo "$ac_t"""not found"" 1>&6
+   else
+	echo "$ac_t"""${W3}"" 1>&6
    fi
 
   if test ${EMACS_FLAVOR} = xemacs; then

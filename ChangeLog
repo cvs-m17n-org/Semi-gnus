@@ -5,8 +5,10 @@
 	* aclocal.m4 (AC_CHECK_W3): Substitute `W3' with empty string
 	instead of "no" if it is not acceptable.
 
-	* lisp/dgnushack.el: Load ~/.lpath.el just before `srcdir' is added
-	to `load-path'.
+	* lisp/dgnushack.el: Load dgnuspath.el and ~/.lpath.el just before
+	path-util is loaded.
+	(dgnushack-compile): Show `load-path'.
+	(dgnushack-w3-dir): Ignore the env var W3DIR if it is empty.
 
 	* lisp/lpath.el: Move out `load-path' modification for APEL, FLIM
 	and SEMI to dgnushack.el.

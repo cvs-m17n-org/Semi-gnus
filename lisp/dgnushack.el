@@ -52,12 +52,11 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(defvar dgnushack-w3-dir
-  (file-name-as-directory
-   (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))))
-(push dgnushack-w3-dir load-path)
-
-(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+(defvar dgnushack-w3-dir (let ((w3dir (getenv "W3DIR")))
+			   (unless (zerop (length w3dir))
+			     (file-name-as-directory w3dir))))
+(when dgnushack-w3-dir
+  (push dgnushack-w3-dir load-path))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -127,6 +126,12 @@
 	 '(char-before (point))
        form))))
 
+(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+
+(condition-case err
+    (load "~/.lpath.el" t nil t)
+  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
+
 ;; Don't load path-util until `char-after' and `char-before' have been
 ;; optimized because it requires `poe' and then modify the functions.
 (or (featurep 'path-util)
@@ -134,10 +139,6 @@
 (add-path "apel")
 (add-path "flim")
 (add-path "semi")
-
-(condition-case err
-    (load "~/.lpath.el" t nil t)
-  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
 
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t t)
@@ -247,6 +248,11 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
+
+  ;; Show `load-path'.
+  (message "load-path=(\"%s\")"
+	   (mapconcat 'identity load-path "\"\n           \""))
+
   (dolist (file dgnushack-exporting-files)
     (setq file (expand-file-name file srcdir))
     (when (and (file-exists-p (setq elc (concat file "c")))
