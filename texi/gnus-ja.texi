@@ -570,6 +570,7 @@ Summary Buffer
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
 @c * Security::                    Decrypt and Verify.
+* Mailing List::               $B%a!<%j%s%0%j%9%H%^%$%J!<%b!<%I(B
 
 Summary Buffer Format
 
@@ -2630,6 +2631,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$b$7(B @kbd{a} $B%3%^%s%I$r%a!<%k%0%k!<%W$G<B9T$7$?$H$-!"(B@code{to-list} $B%0%k!<(B
 $B%W%Q%i%a!<%?$,$J$1$l$P!"Aw?.;~$K<+F0E*$KIU2C$5$l$^$9!#(B
 
+$B$b$7$3$N%0%k!<%W%Q%i%a!<%?$,@_Dj$5$l$F$$$k$H!"35N,%P%C%U%!$KF~$C$?$H$-(B
+$B$K(B @code{gnus-mailing-list-mode} $B$,M-8z$K$J$j$^$9!#(B
+
 @code{gnus-parameter-to-list-alist} $B$b;2>H$7$F2<$5$$!#(B
 
 @item visible
@@ -2757,6 +2761,11 @@ See also @code{gnus-group-ignored-charsets-alist}.
   (name "Funky Name")
   (signature "Funky Signature"))
 @end example
+
+@item post-method
+@cindex post-method
+$B$b$7$3$l$,@_Dj$5$l$F$$$k$H!"%a%C%;!<%8$rAw?.$9$k$?$a$NA*BrJ}K!$H$7(B
+$B$F(B @code{gnus-post-method} $B$NBe$o$j$K;H$o$l$^$9!#(B
 
 @item banner
 @code{(banner . "regex")} $B$N$h$&$J9`L\$O!"5-;v$N$9$Y$F$N>l=j$G@55,I=(B
@@ -3930,6 +3939,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
 @c * Security::                    Decrypt and Verify.
+* Mailing List::               $B%a!<%j%s%0%j%9%H%^%$%J!<%b!<%I(B
 @end menu
 
 @node Summary Buffer Format
@@ -8730,6 +8740,50 @@ Option of decrypting encrypted parts.  @code{never}, no decryption;
 protocols. Otherwise, ask user.
 @end table
 @end ignore
+
+@node Mailing List
+@section $B%a!<%j%s%0%j%9%H(B
+
+Gnus $B$O(B RFC 2369 $B$G4{Dj$5$l$?3F<o$N%a!<%j%s%0%j%9%H$G;H$o$l$k%U%#!<%k%I(B
+$B$rM}2r$7$^$9!#(B
+
+@table @kbd
+
+@item C-c C-n h
+@kindex C-c C-n h (Summary)
+@findex gnus-mailing-list-help
+List-Help $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N%X%k%W$r<h$j4s$;$k$?$a(B
+$B$N%a%C%;!<%8$rAw?.$7$^$9!#(B
+
+@item C-c C-n s
+@kindex C-c C-n s (Summary)
+@findex gnus-mailing-list-subscribe
+List-Subscribe $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N9VFI$r;O$a$k$?$a(B
+$B$N%a%C%;!<%8$rAw?.$7$^$9!#(B
+
+@item C-c C-n u
+@kindex C-c C-n u (Summary)
+@findex gnus-mailing-list-unsubscribe
+List-Unsubscribe $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N9VFI$r$d$a$k$?(B
+$B$a$N%a%C%;!<%8$rAw?.$7$^$9!#(B
+
+@item C-c C-n p
+@kindex C-c C-n p (Summary)
+@findex gnus-mailing-list-post
+List-Post $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$KEj9F$7$^$9!#(B
+
+@item C-c C-n o
+@kindex C-c C-n o (Summary)
+@findex gnus-mailing-list-owner
+List-Owner $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N4IM}<T08$F$K%a%C%;!<(B
+$B%8$rAw?.$7$^$9!#(B
+
+@item C-c C-n a
+@kindex C-c C-n a (Summary)
+@findex gnus-mailing-list-owner
+List-Archive $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N%"!<%+%$%V$r1\Mw$7(B
+$B$^$9!#(B
+@end table
 
 @node Article Buffer
 @chapter $B5-;v%P%C%U%!(B
