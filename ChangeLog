@@ -1,3 +1,13 @@
+2000-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/mm-view.el (gnus-article-mime-handles): Don't bind it.
+
+	* lisp/gnus-sum.el (gnus-article-mime-handles): Restore from Gnus.
+	(gnus-article-decoded-p): Ditto.
+
+	* lisp/gnus-art.el (gnus-article-mime-handles): Don't bind it.
+	(gnus-article-decoded-p): Ditto.
+
 2000-04-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
 
 	* lisp/dgnushack.el: Add code to avoid mule-2.3@19.34 failing to

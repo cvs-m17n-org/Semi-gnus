@@ -36,9 +36,6 @@
   (autoload 'fill-flowed "flow-fill")
   (autoload 'diff-mode "diff-mode"))
 
-;; Avoid byte compile warning.
-(defvar gnus-article-mime-handles)
-
 ;;;
 ;;; Functions for displaying various formats inline
 ;;;
