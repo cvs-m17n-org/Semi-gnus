@@ -1,5 +1,13 @@
 2001-11-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/message.el (message-forbidden-properties): Defcustom; make
+	it a list; don't include `intangible', `invisible',
+	`modification-hooks' or `read-only'.
+	(message-strip-forbidden-properties): Convert the value of
+	`message-forbidden-properties' to plist.
+
+2001-11-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-group.el (gnus-group-group-map): Bind `G n' key to the
 	command `gnus-group-make-shimbun-group'.
 	(gnus-group-group-menu): Add `gnus-group-make-shimbun-group'.

@@ -1843,28 +1843,35 @@ Point is left at the beginning of the narrowed-to region."
 ;;
 ;; We use `after-change-functions' to keep special text properties
 ;; that interfer with the normal function of message mode out of the
-;; buffer. 
+;; buffer.
 
-(defconst message-forbidden-properties 
-  ;; No reason this should be clutter up customize.  We make it a
-  ;; property list (rather than a list of property symbols), to be
-  ;; directly useful for `remove-text-properties'.
-  '(field nil read-only nil intangible nil invisible nil 
-	  mouse-face nil modification-hooks nil insert-in-front-hooks nil
-	  insert-behind-hooks nil point-entered nil point-left nil) 
+(defcustom message-forbidden-properties
+  '(field insert-behind-hooks insert-in-front-hooks mouse-face
+	  point-entered point-left
+	  ;;intangible invisible modification-hooks read-only
+	  )
+  "List of text properties forbidden in message buffers.
+If you are using tamago version 4 for writing Japanese text, you should
+remove `intangible', `invisible', `modification-hooks' and `read-only'
+from the list."
   ;; Other special properties:
   ;; category, face, display: probably doesn't do any harm.
   ;; fontified: is used by font-lock.
   ;; syntax-table, local-map: I dunno.
   ;; We need to add XEmacs names to the list.
-  "Property list of with properties.forbidden in message buffers.
-The values of the properties are ignored, only the property names are used.")
+  :group 'message-various
+  :type '(repeat sexp))
 
 (defun message-strip-forbidden-properties (begin end &optional old-length)
   "Strip forbidden properties between BEGIN and END, ignoring the third arg.
 This function is intended to be called from `after-change-functions'.
 See also `message-forbidden-properties'."
-  (remove-text-properties begin end message-forbidden-properties))
+  (let ((props message-forbidden-properties)
+	plist)
+    (while props
+      (setq plist (plist-put plist (car props) nil)
+	    props (cdr props)))
+    (remove-text-properties begin end plist)))
 
 ;;;###autoload
 (define-derived-mode message-mode text-mode "Message"
