@@ -47,6 +47,7 @@
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
+(require 'gnus)
 (require 'gnus-bcklg)
 (require 'shimbun)
 (require 'message)
@@ -56,6 +57,79 @@
 (defgroup nnshimbun nil
   "Reading Web Newspapers with Gnus."
   :group 'gnus)
+
+(defvar nnshimbun-group-parameters-custom
+  '(list :format "%v"
+	 (checklist :inline t
+		    (list :inline t :format "%v"
+			  (const :format "" index-range)
+			  (choice :tag "Index range"
+				  :value all
+				  (const all)
+				  (const last)
+				  (integer :tag "days")))
+		    (list :inline t :format "%v"
+			  (const :format "" prefetch-articles)
+			  (boolean :tag "Prefetch articles"
+				   :on "on"
+				   :off "off"))
+		    (list :inline t :format "%v"
+			  (const :format "" expiry-wait)
+			  (choice :tag "Expire wait"
+				  :value never
+				  (const never)
+				  (const immediate)
+				  (number :tag "days"))))
+	 (repeat :inline t :tag "Others"
+		 (list :inline t :format "%v"
+		       (symbol :tag "Keyword")
+		       (sexp :tag "Value"))))
+  "A type definition for customizing `nnshimbun-group-parameters'.")
+
+;; The following definition provides the group parameter
+;; `nnshimbun-group-parameters', the user option
+;; `nnshimbun-group-parameters-alist' and the function
+;; `nnshimbun-find-group-parameters'.
+;;
+;; Note that the group parameter `nnshimbun-group-parameters' will
+;; have a property list like the following:
+;;
+;; '(index-range all prefetch-articles t expiry-wait 6)
+;;
+;; So the third argument of the function `gnus-group-find-parameter'
+;; should be non-nil to get the value of the group parameter.
+
+(gnus-define-group-parameter
+ nnshimbun-group-parameters
+ :function nnshimbun-find-group-parameters
+ :function-document "\
+Return a nnshimbun GROUP's group parameters."
+ :variable nnshimbun-group-parameters-alist
+ :variable-default nil
+ :variable-document "\
+Alist of nnshimbun group parameters.  Each element should be a cons of
+group name regexp and a plist which consists of a keyword and a value
+pairs like the following:
+
+'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles t expiry-wait 6)"
+ :variable-group shimbun
+ :variable-type `(repeat (cons :format "%v" (regexp :tag "Group name regexp"
+						    :value "^nnshimbun\\+")
+			       ,nnshimbun-group-parameters-custom))
+ :parameter-type nnshimbun-group-parameters-custom
+ :parameter-document "\
+Group parameters for the nnshimbun group.
+
+`Index range' specifies a range of header indices as described below:
+      all: Retrieve all header indices.
+     last: Retrieve the last header index.
+integer N: Retrieve N pages of header indices.
+
+`Prefetch articles' specifies whether to pre-fetch the unread articles
+when scanning the group.
+
+`Expire wait' is similar to the generic group parameter `expiry-wait',
+but it has a preference.")
 
 (defcustom nnshimbun-keep-unparsable-dated-articles t
   "*If non-nil, nnshimbun will never delete articles whose NOV date is unparsable."
@@ -643,7 +717,7 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 				(directory-files d)))))
 		  load-path)))
 	 (server (completing-read
-		  "Shimbun address: " 
+		  "Shimbun address: "
 		  alist nil t
 		  (or (car nnshimbun-server-history)
 		      (caar alist))
