@@ -1,3 +1,14 @@
+1999-02-24  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.4 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.4.
+
+	* Nana-TIPS.ja: Add new section message-locale-* and
+	message-mime-charset-recover-*.
+
+	* lisp/message.el (message-locale-detect): Fix, save restriction.
+
 1999-02-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.3 released.
