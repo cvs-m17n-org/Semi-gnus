@@ -6,7 +6,7 @@ top_srcdir = @top_srcdir@
 
 @SET_MAKE@
 TEXI2DVI=texi2dvi
-EMACS=emacs
+EMACS=@EMACS@
 MAKEINFO=@MAKEINFO@
 FLAGS=-batch -q -no-site-file
 INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
@@ -69,6 +69,11 @@ clean:
 	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi \
 	gnus.info* gnus-ja.info* message.info* message-ja.info* \
 	emacs-mime.info
+	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9]
+	rm -f message message-[0-9]
+	rm -f emacs-mime
+	rm -f gnus-ja gnus-ja-[0-9] gnus-ja-[0-9][0-9]
+	rm -f message-ja message-ja-[0-9]
 
 makeinfo:
 	makeinfo -o gnus gnus.texi
@@ -129,11 +134,7 @@ veryclean: clean
 	rm -f gnus.dvi gnus.ps texi2latex.elc
 
 distclean: clean
-	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9] Makefile
-	rm -f message message-[0-9]
-	rm -f emacs-mime
-	rm -f gnus-ja gnus-ja-[0-9] gnus-ja-[0-9][0-9]
-	rm -f message-ja message-ja-[0-9]
+	rm -f Makefile
 
 install:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
