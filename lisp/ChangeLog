@@ -1,5 +1,90 @@
 1997-11-27  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
 
+	* gnus-i18n.el: New file.
+
+	* nnmail.el (nnmail-file-coding-system): Use `raw-text' in
+ 	default.
+
+	* nnheader.el (nnheader-file-coding-system): Use `raw-text' in
+ 	default.
+
+	* message.el (message-encode-function): New variable.
+	(message-forward-start-separator): Modify for mime-edit.
+	(message-forward-end-separator): Modify for mime-edit.
+	(message-setup-hook): Use `(message-maybe-setup-default-charset
+ 	turn-on-mime-edit)' in default.
+	(message-header-hook): Use `(eword-encode-header)' in default.
+
+	(message-send): Use local variable `message-encoding-buffer',
+ 	`message-edit-buffer' and `message-mime-mode' as public variables;
+ 	use `message-encode-function'.
+	(message-send-mail): Use `message-encoding-buffer' to get contents
+ 	of body; abolish `message-encode-mail-hook'; use
+ 	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+ 	refer original editing buffer.
+	(message-send-news): Use `message-encoding-buffer' to get contents
+ 	of body; abolish `message-encode-news-hook'; use
+ 	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+ 	refer original editing buffer.
+	(message-check-news-syntax): Call `message-check-news-body-syntax'
+ 	in `mime-edit-buffer'.
+	(message-do-fcc): Use `message-encoding-buffer' to get contents;
+ 	run `message-header-hook'.
+	(message-cancel-news): Use `std11-extract-address-components'
+ 	instead of `mail-extract-address-components'; bind
+ 	`message-encoding-buffer' and `message-edit-buffer'.
+
+	(message-maybe-setup-default-charset): New function.
+	(message-maybe-encode): New function.
+	(message-mime-insert-article): New function.
+	Add setting for mime-view.
+
+	* gnus-sum.el: Autoload gnus-i18n.
+
+	(gnus-show-mime): `t' in default.
+	(gnus-structured-field-decoder): Use
+ 	`eword-decode-structured-field-body' in default.
+	(gnus-unstructured-field-decoder): Use
+ 	`eword-decode-unstructured-field-body' in default.
+
+	(gnus-parse-headers-hook): Use
+ 	`(gnus-set-summary-default-charset)' in default.
+
+	(gnus-summary-mode-map): Add binding for
+ 	`gnus-summary-scroll-down' and
+ 	`gnus-summary-preview-mime-message'.
+
+	(gnus-summary-preview-mime-message): New function.
+	(gnus-mime-partial-preview-function): New function.
+	Add setting for mime-view.
+
+	* gnus-msg.el (gnus-summary-cancel-article): Display
+ 	`gnus-article-buffer' instead ofb `gnus-original-article-buffer'.
+	(gnus-extended-version): Don't return version of emacsen.
+	(gnus-inews-do-gcc): Refer `message-encoding-buffer'.
+
+	* gnus-art.el (gnus-show-mime-method): Use
+ 	`gnus-article-preview-mime-message' instead of `metamail-buffer'
+ 	in default.
+	(gnus-decode-encoded-word-method): Use
+ 	`gnus-article-decode-encoded-word' instead of
+ 	`gnus-article-de-quoted-unreadable' in default.
+
+	Abolish `gnus-hack-decode-rfc1522', `gnus-decode-rfc1522',
+ 	`article-decode-rfc1522', `article-de-quoted-unreadable',
+ 	`article-mime-decode-quoted-printable-buffer' and
+ 	`article-mime-decode-quoted-printable'.
+	(gnus-article-decode-rfc1522): New implementation (use
+ 	`eword-decode-header').
+
+	(gnus-article-preview-mime-message): New function.
+	(gnus-article-decode-encoded-word): New function.
+	(gnus-content-header-filter): New function.
+	(mime-view-quitting-method-for-gnus): New function.
+	Add setting for mime-view.
+
+1997-11-27  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+
 	* message.el: Abolish `message-max-size' because it is not used.
 
 1997-11-26  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
