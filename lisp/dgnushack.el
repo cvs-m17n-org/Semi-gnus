@@ -89,11 +89,8 @@ Modify to suit your needs."))
 
 
 ;; Avoid byte-compile warnings.
-(defvar gnus-revision-number)
-(defvar gnus-version-number)
 (defvar gnus-product-name)
 (defvar configure-package-path)
-(defvar package-path)
 
 (defconst dgnushack-info-file-regexp
   (concat "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)"
@@ -141,11 +138,18 @@ Modify to suit your needs."))
       (write-file (concat "../MANIFEST." product-name)))))
 
 (defun dgnushack-install-package ()
-  (let* ((package-dir (file-name-as-directory
-		       (or (car command-line-args-left)
-			   (if (boundp 'configure-package-path)
-			       (car configure-package-path)
-			     (car package-path)))))
+  (let* ((package-dir
+	  (file-name-as-directory
+	   (or (car command-line-args-left)
+	       (car configure-package-path)
+	       (error "%s" "
+You must specify the name of the package path as follows:
+
+% make install-package PACKAGEDIR=/usr/local/lib/xemacs/xemacs-packages
+
+                        - GAME OVER -
+"
+		      ))))
 	 (info-dir (expand-file-name "info/" package-dir))
 	 (pkginfo-dir (expand-file-name "pkginfo/" package-dir))
 	 product-name lisp-dir manifest files)
@@ -194,7 +198,8 @@ Modify to suit your needs."))
     (message "Done")))
 
 (defun dgnushack-add-info-suffix-maybe ()
-  ;; This function must be invoked from texi directory.
+  ;; This function must be invoked from lisp directory.
+  (setq default-directory "../texi/")
   (let ((coding-system-for-read 'raw-text)
 	(coding-system-for-write 'raw-text)
 	(files (directory-files "." nil dgnushack-texi-file-regexp))
