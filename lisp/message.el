@@ -3914,10 +3914,12 @@ the message."
       (let ((funcs message-make-forward-subject-function)
 	    (subject (if message-wash-forwarded-subjects
 			 (message-wash-subject
-			  (or (eword-decode-unstructured-field-body
-			       (message-fetch-field "Subject")) ""))
-		       (or (eword-decode-unstructured-field-body
-			    (message-fetch-field "Subject")) ""))))
+			  (or (eword-decode-field
+                               'Subject (message-fetch-field "Subject"))
+                              ""))
+		       (or (eword-decode-field
+                            'Subject (message-fetch-field "Subject"))
+                           ""))))
 	;; Make sure funcs is a list.
 	(and funcs
 	     (not (listp funcs))

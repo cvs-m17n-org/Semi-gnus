@@ -110,10 +110,10 @@ on your system, you could say something like:
    nil
    nil nil nil
    (if subject
-       (eword-decode-and-unfold-unstructured-field subject)
+       (eword-decode-field 'Subject subject t)
      )
    (if from
-       (eword-decode-and-unfold-structured-field from)
+       (eword-decode-field 'From from t)
      )
    date id references
    chars lines xref

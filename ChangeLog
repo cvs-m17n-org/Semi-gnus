@@ -1,3 +1,10 @@
+1998-10-19  Tanaka Akira  <akr@jaist.ac.jp>
+
+        * lisp/message.el (message-make-forward-subject): Use
+        `eword-decode-field'.
+
+        * lisp/nnheader.el (make-full-mail-header): Use `eword-decode-field'.
+
 1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
