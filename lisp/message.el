@@ -4343,6 +4343,21 @@ regexp varstr."
       (setq idx (1+ idx)))
     string))
 
+(defvar message-save-buffer " *encoding")
+(defun message-save-drafts ()
+  (interactive)
+  (if (not (get-buffer message-save-buffer))
+      (get-buffer-create message-save-buffer))
+  (let ((filename buffer-file-name)
+	(buffer (current-buffer)))
+    (set-buffer message-save-buffer)
+    (erase-buffer)
+    (insert-buffer buffer)
+    (mime-edit-translate-buffer)
+    (write-region (point-min) (point-max) filename)
+    (set-buffer buffer)
+    (set-buffer-modified-p nil)))
+
 (run-hooks 'message-load-hook)
 
 (provide 'message)

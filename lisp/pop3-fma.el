@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.13
+;; Version: 1.14
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -80,7 +80,9 @@
 
 (unless (and (fboundp 'pop3-fma-encode-string)
 	     (fboundp 'pop3-fma-decode-string))
-  (require 'mel-b)
+  (condition-case nil
+      (require 'mel-b-el)
+    (error (require 'mel-b)))
   (fset 'pop3-fma-encode-string 'base64-encode-string)
   (fset 'pop3-fma-decode-string 'base64-decode-string))
 
@@ -90,7 +92,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.13")
+(defconst pop3-fma-version-number "1.14")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -102,7 +104,8 @@
 ;;  "Blood line"		; 1.10
 ;;  "Star ring"			; 1.11
 ;;  "Goodbye Game"		; 1.12
-  "Love is Gamble"		; 1.13
+;;  "Love is Gamble"		; 1.13
+  "Lonely"			; 1.14
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
