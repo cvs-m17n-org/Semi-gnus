@@ -1,5 +1,5 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -44,12 +44,15 @@
   "The default status if the server is not able to open.
 If the server is covered by Gnus agent, the possible values are
 `denied', set the server denied; `offline', set the server offline;
-`nil', ask user.  If the server is not covered by Gnus agent, set the
+nil, ask user.  If the server is not covered by Gnus agent, set the
 server denied."
   :group 'gnus-start
   :type '(choice (const :tag "Ask" nil)
 		 (const :tag "Deny server" denied)
 		 (const :tag "Unplugg Agent" offline)))
+
+(defvar gnus-internal-registry-spool-current-method nil
+  "The current method, for the registry.")
 
 ;;;
 ;;; Server Communication
@@ -487,9 +490,11 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	(gnus-inhibit-demon t)
 	(mail-source-plugged gnus-plugged))
     (if (or gnus-plugged (not (gnus-agent-method-p gnus-command-method)))
-	(funcall (gnus-get-function gnus-command-method 'request-scan)
-		 (and group (gnus-group-real-name group))
-		 (nth 1 gnus-command-method)))))
+	(progn
+	  (setq gnus-internal-registry-spool-current-method gnus-command-method)
+	  (funcall (gnus-get-function gnus-command-method 'request-scan)
+		   (and group (gnus-group-real-name group))
+		   (nth 1 gnus-command-method))))))
 
 (defsubst gnus-request-update-info (info gnus-command-method)
   "Request that GNUS-COMMAND-METHOD update INFO."

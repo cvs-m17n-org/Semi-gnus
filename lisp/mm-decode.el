@@ -1,5 +1,6 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002,
+;;        2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -110,7 +111,7 @@ The defined renderer types are:
 `links': using links;
 `lynx' : using lynx;
 `html2text' : using html2text;
-`nil'  : using external viewer."
+nil    : using external viewer."
   :type '(choice (const w3)
 		 (const w3m)
 		 (const links)
@@ -355,7 +356,6 @@ If not set, `default-directory' will be used."
 
 ;;; Internal variables.
 
-(defvar mm-dissection-list nil)
 (defvar mm-last-shell-command "")
 (defvar mm-content-id-alist nil)
 (defvar mm-postponed-undisplay-list nil)
@@ -552,16 +552,8 @@ for types in mm-keep-viewer-alive-types."
 	    (if (equal "text/plain" (car ctl))
 		(assoc 'format ctl)
 	      t))
-    (let ((res (mm-make-handle
-		(mm-copy-to-buffer) ctl cte nil cdl description nil id)))
-      (push (car res) mm-dissection-list)
-      res)))
-
-(defun mm-remove-all-parts ()
-  "Remove all MIME handles."
-  (interactive)
-  (mapcar 'mm-remove-part mm-dissection-list)
-  (setq mm-dissection-list nil))
+    (mm-make-handle
+     (mm-copy-to-buffer) ctl cte nil cdl description nil id)))
 
 (defun mm-dissect-multipart (ctl)
   (goto-char (point-min))

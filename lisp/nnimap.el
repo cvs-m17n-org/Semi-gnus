@@ -1,5 +1,6 @@
 ;;; nnimap.el --- imap backend for Gnus
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
 ;;         Jim Radford <radford@robby.caltech.edu>
@@ -1327,7 +1328,9 @@ function is generally only called when Gnus is shutting down."
 (deffoo nnimap-request-create-group (group &optional server args)
   (when (nnimap-possibly-change-server server)
     (or (imap-mailbox-status group 'uidvalidity nnimap-server-buffer)
-	(imap-mailbox-create group nnimap-server-buffer))))
+	(imap-mailbox-create group nnimap-server-buffer)
+	(nnheader-report 'nnimap "%S"
+			 (imap-error-text nnimap-server-buffer)))))
 
 (defun nnimap-time-substract (time1 time2)
   "Return TIME for TIME1 - TIME2."

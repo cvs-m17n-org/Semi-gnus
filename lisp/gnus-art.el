@@ -791,7 +791,7 @@ This is meant for people who want to view first matched part.
 For `undisplayed-alternative' (default), the first undisplayed
 part or alternative part is used.  For `undisplayed', the first
 undisplayed part is used.  For a function, the first part which
-the function return `t' is used.  For `nil', the first part is
+the function return t is used.  For nil, the first part is
 used."
   :version "21.1"
   :group 'gnus-article-mime
@@ -1163,17 +1163,6 @@ See Info node `(gnus)Customizing Articles' and Info node
   :link '(custom-manual "(gnus)X-Face")
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-display-xface 'highlight t)
-
-(defcustom gnus-treat-display-grey-xface
-  (and (not noninteractive)
-       (string-match "^0x" (shell-command-to-string "uncompface"))
-       t)
-  "Display grey X-Face headers.
-Valid values are nil, t."
-  :group 'gnus-article-treat
-  :version "21.3"
-  :type 'boolean)
-(put 'gnus-treat-display-grey-xface 'highlight t)
 
 (defcustom gnus-treat-display-smileys
   (if (or (and (featurep 'xemacs)
@@ -1928,11 +1917,7 @@ unfolded."
   "Display any Face headers in the header."
   (interactive)
   (gnus-with-article-headers
-    (let ((face nil))
-      (save-excursion
-	(when (gnus-buffer-live-p gnus-original-article-buffer)
-	  (set-buffer gnus-original-article-buffer)
-	  (setq face (message-fetch-field "face"))))
+    (let ((face (message-fetch-field "face")))
       (when face
 	(let ((png (gnus-convert-face-to-png face))
 	      image)
@@ -1959,7 +1944,7 @@ unfolded."
 	  ;; instead.
 	  (gnus-delete-images 'xface)
 	;; Display X-Faces.
-	(let (x-faces from face grey)
+	(let (x-faces from face)
 	  (save-excursion
 	    (when (and wash-face-p
 		       (progn
@@ -1973,67 +1958,39 @@ unfolded."
 	      (set-buffer gnus-original-article-buffer))
 	    (save-restriction
 	      (mail-narrow-to-head)
-	      (if gnus-treat-display-grey-xface
-		  (progn
-		    (while (gnus-article-goto-header "X-Face\\(-[0-9]+\\)?")
-		      (if (match-beginning 2)
-			  (progn
-			    (setq grey t)
-			    (push (cons (- (string-to-number (match-string 2)))
-					(mail-header-field-value))
-				  x-faces))
-			(push (cons 0 (mail-header-field-value)) x-faces)))
-		    (dolist (x-face (prog1
-					(if grey
-					    (sort x-faces 'car-less-than-car)
-					  (nreverse x-faces))
-				      (setq x-faces nil)))
-		      (push (cdr x-face) x-faces)))
-		(while (gnus-article-goto-header "X-Face")
-		  (push (mail-header-field-value) x-faces)))
+	      (while (gnus-article-goto-header "X-Face")
+		(push (mail-header-field-value) x-faces))
 	      (setq from (message-fetch-field "from"))))
-	  (if grey
-	      (let ((xpm (gnus-convert-gray-x-face-to-xpm x-faces))
-		    image)
-		(when xpm
-		  (setq image (gnus-create-image xpm 'xpm t))
-		  (gnus-article-goto-header "from")
-		  (when (bobp)
-		    (insert "From: [no `from' set]\n")
-		    (forward-char -17))
-		  (gnus-add-wash-type 'xface)
-		  (gnus-add-image 'xface image)
-		  (gnus-put-image image)))
-	    ;; Sending multiple EOFs to xv doesn't work, so we only do a
-	    ;; single external face.
-	    (when (stringp gnus-article-x-face-command)
-	      (setq x-faces (list (car x-faces))))
-	    (while (and (setq face (pop x-faces))
-			gnus-article-x-face-command
-			(or force
-			    ;; Check whether this face is censored.
-			    (not gnus-article-x-face-too-ugly)
-			    (and gnus-article-x-face-too-ugly from
-				 (not (string-match gnus-article-x-face-too-ugly
-						    from)))))
-	      ;; We display the face.
-	      (if (symbolp gnus-article-x-face-command)
-		  ;; The command is a lisp function, so we call it.
-		  (if (gnus-functionp gnus-article-x-face-command)
-		      (funcall gnus-article-x-face-command face)
-		    (error "%s is not a function" gnus-article-x-face-command))
-		;; The command is a string, so we interpret the command
-		;; as a, well, command, and fork it off.
-		(let ((process-connection-type nil))
-		  (process-kill-without-query
-		   (start-process
-		    "article-x-face" nil shell-file-name shell-command-switch
-		    gnus-article-x-face-command))
-		  (with-temp-buffer
-		    (insert face)
-		    (process-send-region "article-x-face"
-					 (point-min) (point-max)))
-		  (process-send-eof "article-x-face"))))))))))
+	  ;; Sending multiple EOFs to xv doesn't work, so we only do a
+	  ;; single external face.
+	  (when (stringp gnus-article-x-face-command)
+	    (setq x-faces (list (car x-faces))))
+	  (while (and (setq face (pop x-faces))
+		      gnus-article-x-face-command
+		      (or force
+			  ;; Check whether this face is censored.
+			  (not gnus-article-x-face-too-ugly)
+			  (and gnus-article-x-face-too-ugly from
+			       (not (string-match gnus-article-x-face-too-ugly
+						  from)))))
+	    ;; We display the face.
+	    (if (symbolp gnus-article-x-face-command)
+		;; The command is a lisp function, so we call it.
+		(if (gnus-functionp gnus-article-x-face-command)
+		    (funcall gnus-article-x-face-command face)
+		  (error "%s is not a function" gnus-article-x-face-command))
+	      ;; The command is a string, so we interpret the command
+	      ;; as a, well, command, and fork it off.
+	      (let ((process-connection-type nil))
+		(process-kill-without-query
+		 (start-process
+		  "article-x-face" nil shell-file-name shell-command-switch
+		  gnus-article-x-face-command))
+		(with-temp-buffer
+		  (insert face)
+		  (process-send-region "article-x-face"
+				       (point-min) (point-max)))
+		(process-send-eof "article-x-face")))))))))
 
 (defun article-decode-mime-words ()
   "Decode all MIME-encoded words in the article."
@@ -3090,6 +3047,7 @@ Directory to save to is default to `gnus-article-save-directory'."
       (save-restriction
 	(widen)
 	(if (and (file-readable-p filename)
+		 (file-regular-p filename)
 		 (mail-file-babyl-p filename))
 	    (rmail-output-to-rmail-file filename t)
 	  (gnus-output-to-mail filename)))))
@@ -3453,9 +3411,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 
     (gnus-run-hooks 'gnus-article-menu-hook)))
 
-;; Fixme: do something for the Emacs tool bar in Article mode a la
-;; Summary.
-
 (defun gnus-article-mode ()
   "Major mode for displaying an article.
 
@@ -3478,7 +3433,9 @@ commands:
   (make-local-variable 'minor-mode-alist)
   (use-local-map gnus-article-mode-map)
   (when (gnus-visual-p 'article-menu 'menu)
-    (gnus-article-make-menu-bar))
+    (gnus-article-make-menu-bar)
+    (when gnus-summary-tool-bar-map
+      (set (make-local-variable 'tool-bar-map) gnus-summary-tool-bar-map)))
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
   (make-local-variable 'gnus-page-broken)
@@ -3539,6 +3496,8 @@ commands:
 	  (setq gnus-article-mime-handle-alist nil)
 	  (buffer-disable-undo)
 	  (setq buffer-read-only t)
+	  ;; This list just keeps growing if we don't reset it.
+	  (setq gnus-button-marker-list nil)
 	  (unless (eq major-mode 'gnus-article-mode)
 	    (gnus-article-mode))
 	  (current-buffer))
@@ -4074,7 +4033,8 @@ If no internal viewer is available, use an external viewer."
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets
 	  (save-excursion (set-buffer gnus-summary-buffer)
-			  gnus-newsgroup-ignored-charsets)))
+			  gnus-newsgroup-ignored-charsets))
+	 buffer-read-only)
     (when handle
       (if (mm-handle-undisplayer handle)
 	  (mm-remove-part handle)
@@ -4781,7 +4741,7 @@ Argument LINES specifies lines to be scrolled down."
   (let ((point (point)))
     (search-forward ">" nil t)		;Move point to end of "<....>".
     (if (re-search-backward "\\(<[^<> \t\n]+>\\)" nil t)
-	(let ((message-id (match-string 1)))
+	(let ((message-id (gnus-replace-in-string (match-string 1) "<news:" "<" )))
 	  (goto-char point)
 	  (set-buffer gnus-summary-buffer)
 	  (gnus-summary-refer-article message-id))
@@ -5506,40 +5466,43 @@ respectivly."
 (defvar gnus-button-handle-describe-prefix "^\\(C-h\\|<?[Ff]1>?\\)")
 
 (defun gnus-button-handle-describe-function (url)
-  "Call describe-function when pushing the corresponding URL button."
+  "Call `describe-function' when pushing the corresponding URL button."
   (describe-function
    (intern
     (gnus-replace-in-string url gnus-button-handle-describe-prefix ""))))
 
 (defun gnus-button-handle-describe-variable (url)
-  "Call describe-variable when pushing the corresponding URL button."
+  "Call `describe-variable' when pushing the corresponding URL button."
   (describe-variable
    (intern
     (gnus-replace-in-string url gnus-button-handle-describe-prefix ""))))
 
-;; FIXME: Is is possible to implement this?  Else it should be removed here
-;; and in `gnus-button-alist'.
 (defun gnus-button-handle-describe-key (url)
-  "Call describe-key when pushing the corresponding URL button."
-  (error "not implemented"))
+  "Call `describe-key' when pushing the corresponding URL button."
+  (let* ((key-string
+	  (gnus-replace-in-string url gnus-button-handle-describe-prefix ""))
+	 (keys (ignore-errors (eval `(kbd ,key-string)))))
+    (if keys
+	(describe-key keys)
+      (gnus-message 3 "Invalid key sequence in button: %s" key-string))))
 
 (defun gnus-button-handle-apropos (url)
-  "Call apropos when pushing the corresponding URL button."
+  "Call `apropos' when pushing the corresponding URL button."
   (apropos (gnus-replace-in-string url gnus-button-handle-describe-prefix "")))
 
 (defun gnus-button-handle-apropos-command (url)
-  "Call apropos when pushing the corresponding URL button."
+  "Call `apropos' when pushing the corresponding URL button."
   (apropos-command
    (gnus-replace-in-string url gnus-button-handle-describe-prefix "")))
 
 (defun gnus-button-handle-apropos-variable (url)
-  "Call apropos when pushing the corresponding URL button."
+  "Call `apropos' when pushing the corresponding URL button."
   (funcall
    (if (fboundp 'apropos-variable) 'apropos-variable 'apropos)
    (gnus-replace-in-string url gnus-button-handle-describe-prefix "")))
 
 (defun gnus-button-handle-apropos-documentation (url)
-  "Call apropos when pushing the corresponding URL button."
+  "Call `apropos' when pushing the corresponding URL button."
   (funcall
    (if (fboundp 'apropos-documentation) 'apropos-documentation 'apropos)
    (gnus-replace-in-string url gnus-button-handle-describe-prefix "")))
@@ -5631,9 +5594,10 @@ positives are possible."
      0 (>= gnus-button-emacs-level 1) gnus-button-handle-describe-function 2)
     ("\\b\\(C-h\\|<?[Ff]1>?\\)[ \t\n]+v[ \t\n]+\\([^ \t\n]+\\)[ \t\n]+RET"
      0 (>= gnus-button-emacs-level 1) gnus-button-handle-describe-variable 2)
-    ("\\b\\(C-h\\|<?[Ff]1>?\\)[ \t\n]+k[ \t\n]+\\([^ \t\n]+\\)[ \t\n]+" 0
-     ;; this regexp needs to be fixed!
-     (>= gnus-button-emacs-level 9) gnus-button-handle-describe-key 2)
+    ("`\\(\\b\\(C-h\\|<?[Ff]1>?\\)[ \t\n]+k[ \t\n]+\\([^']+\\)\\)'" 1
+     ;; Unlike the other regexps we really have to require quoting
+     ;; here to determine where it ends.
+     (>= gnus-button-emacs-level 1) gnus-button-handle-describe-key 3)
     ;; This is how URLs _should_ be embedded in text...
     ("<URL: *\\([^<>]*\\)>" 1 t gnus-button-embedded-url 1)
     ;; Raw URLs.

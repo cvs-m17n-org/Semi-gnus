@@ -1,5 +1,5 @@
 ;;; sieve-manage.el --- Implementation of the managesive protocol in elisp
-;; Copyright (C) 2001 Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2003 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 
@@ -535,7 +535,13 @@ password is remembered in the buffer."
   (when (looking-at (concat
 		     "^\\(OK\\|NO\\)\\( (\\([^)]+\\))\\)?\\( \\(.*\\)\\)?"
 		     sieve-manage-server-eol))
-    (list (match-string 1) (match-string 3) (match-string 5))))
+    (let ((status (match-string 1))
+	  (resp-code (match-string 3))
+	  (response (match-string 5)))
+      (when response
+	(goto-char (match-beginning 5))
+	(setq response (sieve-manage-is-string)))
+      (list status resp-code response))))
 
 (defun sieve-manage-parse-okno ()
   (let (rsp)

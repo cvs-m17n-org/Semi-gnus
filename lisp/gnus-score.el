@@ -1,5 +1,5 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
@@ -1484,7 +1484,7 @@ EXTRA is the possible non-standard header."
 		(with-current-buffer gnus-summary-buffer
 		  (setq gnus-newsgroup-scored scored))))
 	    ;; Remove the buffer.
-	    (kill-buffer (current-buffer)))
+	    (gnus-kill-buffer (current-buffer)))
 
 	  ;; Add articles to `gnus-newsgroup-scored'.
 	  (while gnus-scores-articles
@@ -1509,7 +1509,7 @@ EXTRA is the possible non-standard header."
   "Lower the score on THREAD with SCORE-ADJUST.
 THREAD is expected to contain a list of the form `(PARENT [CHILD1
 CHILD2 ...])' where PARENT is a header array and each CHILD is a list
-of the same form as THREAD.  The empty list `nil' is valid.  For each
+of the same form as THREAD.  The empty list nil is valid.  For each
 article in the tree, the score of the corresponding entry in
 `gnus-newsgroup-scored' is adjusted by SCORE-ADJUST."
   (while thread
@@ -1916,7 +1916,7 @@ score in `gnus-newsgroup-scored' by SCORE."
       ;; with working on them as a group.  What a hassle.
       ;; Just wait 'til you see what horrors we commit against `match'...
       (if (= gnus-score-index 9)
-	  (setq this (prin1-to-string this))) ; ick.
+	  (setq this (gnus-prin1-to-string this))) ; ick.
 
       (if simplify
 	  (setq this (gnus-map-function gnus-simplify-subject-functions this)))
@@ -2633,7 +2633,7 @@ GROUP using BNews sys file syntax."
 			 (ignore-errors (string-match regexp group-trans))))
 	    (push (car sfiles) ofiles)))
 	(setq sfiles (cdr sfiles)))
-      (kill-buffer (current-buffer))
+      (gnus-kill-buffer (current-buffer))
       ;; Slight kludge here - the last score file returned should be
       ;; the local score file, whether it exists or not.  This is so
       ;; that any score commands the user enters will go to the right

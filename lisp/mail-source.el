@@ -1,5 +1,5 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -230,6 +230,11 @@ See Info node `(gnus)Mail Source Specifiers'."
 				   (group :inline t
 					  (const :format "" :value :plugged)
 					  (boolean :tag "Plugged")))))))
+
+(defcustom mail-source-ignore-errors nil
+  "*Ignore errors when querying mail sources.
+If nil, the user will be prompted when an error occurs.  If non-nil,
+the error will be ignored.")
 
 (defcustom mail-source-primary-source nil
   "*Primary source for incoming mail.
@@ -476,15 +481,16 @@ Return the number of files that were found."
 		 (condition-case err
 		     (funcall function source callback)
 		   (error
-		    (unless (yes-or-no-p
-			     (format "Mail source %s error (%s).  Continue? "
-				     (if (memq ':password source)
-					 (let ((s (copy-sequence source)))
-					   (setcar (cdr (memq ':password s)) 
-						   "********")
-					   s)
-				       source)
-				     (cadr err)))
+		    (if (and (not mail-source-ignore-errors)
+			     (yes-or-no-p
+			      (format "Mail source %s error (%s).  Continue? "
+				      (if (memq ':password source)
+					  (let ((s (copy-sequence source)))
+					    (setcar (cdr (memq ':password s)) 
+						    "********")
+					    s)
+					source)
+				      (cadr err))))
 		      (error "Cannot get new mail"))
 		    0)))))))))
 

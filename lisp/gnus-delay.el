@@ -1,6 +1,6 @@
 ;;; gnus-delay.el --- Delayed posting of articles
 
-;; Copyright (C) 2001, 2002  Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2002, 2003  Free Software Foundation, Inc.
 
 ;; Author: Kai Groﬂjohann <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 ;; Keywords: mail, news, extensions
@@ -132,7 +132,12 @@ DELAY is a string, giving the length of the time.  Possible values are:
 	  (t (error "Malformed delay `%s'" delay)))
     (message-add-header (format "%s: %s" gnus-delay-header deadline)))
   (set-buffer-modified-p t)
-  (nndraft-request-create-group gnus-delay-group)
+  ;; If group does not exist, create it.
+  (let ((group (format "nndraft:%s" gnus-delay-group)))
+    (unless (gnus-gethash group gnus-newsrc-hashtb)
+      (nndraft-request-create-group gnus-delay-group)
+      ;; Make it active.
+      (gnus-set-active group (cons 1 0))))
   (message-disassociate-draft)
   (nndraft-request-associate-buffer gnus-delay-group)
   (save-buffer 0)
