@@ -160,27 +160,21 @@
   (condition-case nil
       (base64-encode-string "" 'no-line-break)
     (error
-     (defun base64-encode-string (string &optional no-line-break)
-       "Base64-encode STRING and return the result.
+     (condition-case nil
+	 (let ((fn (mel-find-function 'mime-encode-string "base64")))
+	   (funcall fn "" 'no-line-break)
+	   (fset 'base64-encode-string (symbol-function fn)))
+       (wrong-number-of-arguments
+	(defun base64-encode-string (string &optional no-line-break)
+	  "Base64-encode STRING and return the result.
 Optional second argument NO-LINE-BREAK means do not break long lines
 into shorter lines."
-       (fmakunbound 'base64-encode-string)
-       (condition-case nil
-	   (let ((fn (mel-find-function 'mime-encode-string "base64")))
-	     (funcall fn "" 'no-line-break)
-	     (fset 'base64-encode-string (symbol-function fn)))
-	 (wrong-number-of-arguments
-	  (defun base64-encode-string (string &optional no-line-break)
-	    "Base64-encode STRING and return the result.
-Optional second argument NO-LINE-BREAK means do not break long lines
-into shorter lines."
-	    (let ((fn (mel-find-function 'mime-encode-string "base64")))
-	      (if no-line-break
-		  (mapconcat 'identity
-			     (split-string (funcall fn string) "\n")
-			     "")
+	  (let ((fn (mel-find-function 'mime-encode-string "base64")))
+	    (if no-line-break
+		(mapconcat 'identity
+			   (split-string (funcall fn string) "\n")
+			   "")
 		(funcall fn string))))))
-       (base64-encode-string string no-line-break))
      )))
 
 (autoload 'md5 "md5")
