@@ -4,7 +4,7 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3m
+;; Version: 1.3m+
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3m")
+(defconst pop3-version "1.3m+")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -59,6 +59,9 @@ values are 'apop.")
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
+
+(defvar pop3-movemail-file-coding-system 'binary
+  "Crashbox made by pop3-movemail with this coding system.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
@@ -91,7 +94,8 @@ Used for APOP authentication.")
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(append-to-file (point-min) (point-max) crashbox)
+	(let ((coding-system-for-write pop3-movemail-file-coding-system))
+	  (append-to-file (point-min) (point-max) crashbox))
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))
@@ -111,23 +115,19 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process)
-	(coding-system-for-read 'binary)   ;; because FSF Emacs 20 and
-	(coding-system-for-write 'binary)  ;; XEmacs 20/1 are st00pid 
-    )
+	(process))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
       (setq pop3-read-point (point-min))
       )
     (setq process
-	  (open-network-stream "POP" process-buffer mailhost port))
+	  (open-network-stream-as-binary "POP" process-buffer mailhost port))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
@@ -191,10 +191,12 @@ Return the response string if optional second argument is non-nil."
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)
   (if (not pop3-read-passwd)
-      (if (load "passwd" t)
+      (if (functionp 'read-passwd)
 	  (setq pop3-read-passwd 'read-passwd)
-	(autoload 'ange-ftp-read-passwd "ange-ftp")
-	(setq pop3-read-passwd 'ange-ftp-read-passwd)))
+	(if (load "passwd" t)
+	    (setq pop3-read-passwd 'read-passwd)
+	  (autoload 'ange-ftp-read-passwd "ange-ftp")
+	  (setq pop3-read-passwd 'ange-ftp-read-passwd))))
   (funcall pop3-read-passwd prompt))
 
 (defun pop3-clean-region (start end)
