@@ -1,3 +1,14 @@
+1998-11-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-make-full-mail-header): New
+	function.
+	(gnus-article-mime-edit-article-setup): Use it.
+	(gnus-article-mime-edit-exit): Use it.
+
+	(gnus-article-mime-edit-article-setup): Set `gnus-show-mime' to t.
+
+	* lisp/gnus-bbdb.el: Modify header description.
+
 1998-11-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-edit-done): Remove
@@ -6,6 +17,7 @@
 	(gnus-article-mime-edit-article-setup): Revised.
 	(gnus-article-mime-edit-article-unwind): New function.
 	(gnus-article-mime-edit-exit): New function.
+
 	(gnus-insert-mime-button): Fix typo.
 
 1998-11-04  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
