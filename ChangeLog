@@ -1,5 +1,9 @@
 2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/lpath.el: Fbind `coding-system-base' for Mule 2.
+
+2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.15.19 (quimby) revision 00.
 
 2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>

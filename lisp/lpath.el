@@ -79,10 +79,11 @@
 	 '(function-max-args smiley-encode-buffer))
 	((boundp 'MULE)
 	 '(charsetp
-	   coding-system-get coding-system-list coding-system-to-mime-charset
-	   compose-mail file-name-extension find-coding-systems-for-charsets
-	   find-coding-systems-region function-max-args get-charset-property
-	   smiley-encode-buffer smtpmail-send-it))
+	   coding-system-base coding-system-get coding-system-list
+	   coding-system-to-mime-charset compose-mail file-name-extension
+	   find-coding-systems-for-charsets find-coding-systems-region
+	   function-max-args get-charset-property smiley-encode-buffer
+	   smtpmail-send-it))
 	(t
 	 '(function-max-args smiley-encode-buffer))))
       (common-fns
