@@ -1,3 +1,7 @@
+2002-02-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* etc/gnus/gnus.xpm: Remove some garbages at the end of the file.
+
 2002-02-03  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/nnir.el (nnir-run-namazu): According to SUSv3, LC_ALL is

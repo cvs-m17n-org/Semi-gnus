@@ -1,3 +1,72 @@
+2002-02-03  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	
+	* imap.el (imap-anonymous-auth): Fix typo. 
+	From: Steinar Bang <sb@dod.no>
+
+	* gnus-cache.el (gnus-cache-braid-nov): Use set-buffer instead of
+	save-excursion.
+	(gnus-cache-braid-heads): Ditto.
+
+	* gnus-agent.el (gnus-agent-copy-nov-line): Move to the correct
+	line, because there are extra articles in the overview buffer.
+
+	* nntp.el (nntp-retrieve-groups): Check whether BUF is live.
+
+	* message.el (message-forward-rmail-make-body): Directly use
+	rmail-msg-restore-non-pruned-header to avoid calling
+	vertical-motion.
+
+2002-02-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-cache.el (gnus-summary-insert-cached-articles): 
+	(gnus-summary-limit-include-cached): gnus-newsgroup-cached is sorted.
+
+	* gnus-group.el (gnus-group-mark-article-read): Nreverse
+	gnus-newsgroups-unselected.
+
+	* gnus-agent.el (gnus-summary-set-agent-mark): Use
+	gnus-add-to-sorted-list.
+
+	* gnus-sum.el (gnus-summary-update-info): gnus-newsgroup-unreads
+	gnus-newsgroup-unselected are sorted. Use gnus-sorted-union.
+	(gnus-build-all-threads): Use gnus-add-to-sorted-list.
+	(gnus-update-read-articles): UNREAD is sorted.
+	(gnus-newsgroup-unreads, gnus-newsgroup-unselected) 
+	(gnus-newsgroup-marked, gnus-newsgroup-cached) 
+	(gnus-newsgroup-expirable, gnus-newsgroup-downloadable) 
+	(gnus-newsgroup-dormant): Require sorted.
+
+	* gnus-dired.el (gnus-dired-find-file-mailcap): Correctly handle
+	directories.
+	(gnus-dired-print): New function.
+
+	* gnus-art.el (gnus-mime-print-part): Add argument filename. Call
+	ps-despool.
+
+2002-02-02  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-dired.el (turn-on-gnus-dired-mode): Autoload.  Make defun.
+
+2002-02-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-start.el (gnus-1): Call gnus-agentize if gnus-agent is
+	t. This makes gnus-agent customizable without putting
+	gnus-agentize into .gnus.
+
+	* gnus.el (gnus-agent): Make it customizable.
+
+	* gnus-dired.el: New file.
+	From Benjamin Rutt <brutt@bloomington.in.us>
+
+	* gnus-cache.el (gnus-cache-articles-in-group): Remove from active
+	if no article.
+	(gnus-cache-possibly-remove-article): Ditto.
+	(gnus-cache-possibly-enter-article): Use gnus-add-to-sorted-list.
+
+2002-02-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-int.el (gnus-request-accept-article): Use gnus-get-function.
+
 2002-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* mm-view.el (mm-w3m-mode-dont-bind-keys): New variable.

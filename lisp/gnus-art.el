@@ -4180,9 +4180,9 @@ General format specifiers can also be used.  See
 	(setq buffer-file-name nil))
       (goto-char (point-min)))))
 
-(defun gnus-mime-print-part (&optional handle)
+(defun gnus-mime-print-part (&optional handle filename)
   "Print the MIME part under point."
-  (interactive)
+  (interactive (list nil (ps-print-preprint current-prefix-arg)))
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (contents (and handle (mm-get-part handle)))
@@ -4203,7 +4203,8 @@ General format specifiers can also be used.  See
 	      (delete-file file))
 	  (with-temp-buffer
 	    (insert contents)
-	    (gnus-print-buffer))))))
+	    (gnus-print-buffer))
+	  (ps-despool filename)))))
 
 (defun gnus-mime-inline-part (&optional handle arg)
   "Insert the MIME part under point into the current buffer."

@@ -697,7 +697,8 @@ the actual number of articles toggled is returned."
 	  (push article gnus-newsgroup-undownloaded))
       (setq gnus-newsgroup-undownloaded
 	    (delq article gnus-newsgroup-undownloaded))
-      (push article gnus-newsgroup-downloadable))
+      (setq gnus-newsgroup-downloadable
+	    (gnus-add-to-sorted-list gnus-newsgroup-downloadable article)))
     (gnus-summary-update-mark
      (if unmark gnus-undownloaded-mark gnus-downloadable-mark)
      'unread)))
@@ -1094,15 +1095,17 @@ the actual number of articles toggled is returned."
 	articles))))
 
 (defsubst gnus-agent-copy-nov-line (article)
-  (let (b e)
+  (let (art b e)
     (set-buffer gnus-agent-overview-buffer)
-    (unless (eobp)
+    (while (and (not (eobp))
+		(< (setq art (read (current-buffer))) article))
+      (forward-line 1))
+    (beginning-of-line)
+    (if (or (eobp)
+	    (not (eq article art)))
+	(set-buffer nntp-server-buffer)
       (setq b (point))
-      (if (eq article (read (current-buffer)))
-	  (setq e (progn (forward-line 1) (point)))
-	(progn
-	  (beginning-of-line)
-	  (setq e b)))
+      (setq e (progn (forward-line 1) (point)))
       (set-buffer nntp-server-buffer)
       (insert-buffer-substring gnus-agent-overview-buffer b e))))
 
