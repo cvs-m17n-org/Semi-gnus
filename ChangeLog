@@ -1,6 +1,12 @@
 1999-12-03  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
             Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/dgnushack.el (char-before): Use compiler macro instead of
+	byte-optimizer.
+	(char-after): Comment out the byte-optimization.
+
 	* imap.el (imap-base64-encode-string, imap-base64-decode-string):
 	New functions.  They are identical to the built-in codec if
 	possible, otherwise the functions defined in mel are used.
