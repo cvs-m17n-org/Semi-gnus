@@ -22973,7 +22973,7 @@ Package}.
   "Blackbox を使うときは t にする。")
 @end lisp
 
-Blackbox が入ってくるメールを検査できるのであれば、
+Blackbox が、入ってくるメールを検査できるのであれば、
 @code{spam-check-blackbox} を書いて下さい。
 
 Blackbox が spam と ham を register/unregister できるのであれば、手始め
@@ -23033,7 +23033,7 @@ Gnus のパラメータ
 を加えて下さい。それをパラメータと変数のカスタマイズの二回について行なう
 ことを確かめて下さい。
 
-Blackbox が入ってくるメールが spam かどうかを検査できるのであれば、
+Blackbox が、入ってくるメールが spam かどうかを検査できるのであれば、
 
 @lisp
 (variable-item spam-use-blackbox)
@@ -23042,8 +23042,8 @@ Blackbox が入ってくるメールが spam かどうかを検査できるのであれば、
 を @code{gnus.el} のグループパラメータ @code{spam-autodetect-methods} に
 加えて下さい。
 
-最後に、@code{spam.el} にある適切な @code{spam-install-*-backend} 関数を
-使って下さい。利用できる関数は次の通りです。
+最後に、@code{spam.el} にある、適切な @code{spam-install-*-backend} 関数
+を使って下さい。利用できる関数は次の通りです。
 
 @enumerate
 
