@@ -26078,8 +26078,7 @@ Gnus will work.
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
 like @samp{T-gnus 6.16.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
-1.1*)} you have the right files loaded.  If, on the other hand, you get
-something like @samp{NNTP 3.x} or @samp{nntp flee}, you have some old
+1.1*)} you have the right files loaded.  Otherwise you have some old
 @file{.el} files lying around.  Delete these.
 
 @item
