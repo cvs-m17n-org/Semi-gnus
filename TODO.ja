@@ -43,10 +43,6 @@ To do list.
     動する。
     その前に、 shuhei-k 枝の smtp.el との仕様を共通化する必要がある。
 
-*1998/10/02-9 In-Reply-To ヘッダー形式変更
-
-    draft-ietf-drums-msg-fmt-05.txt に従った形式に変更する。
-
 *1998/10/02-10 はじめて gnus-agent を使用したときの問題
 
     以下のような方法(起動時から unplugged にする)で、はじめて
@@ -104,21 +100,18 @@ To do list.
     よって message-mime-insert-article() でメッセージを破壊してしまう
     ようになった。
 
-*1998/10/03-2 Info (gnus/gnus-ja) の選択
-
-    semi-gnus-ja : No.1271, 1272 で出た話題
-
-    Gnusでは C-c TABでそれぞれのbufferに対応するinfoのnodeを開くことが
-    できるようになってるので日本語Infoも読めるようにする。(動的に選択
-    できるようにする。)
-    
-    [補足]
-
-    Semi-gnusの成果のひとつである日本語Infoをそのまま読めるようにした
-    い。gnus/gnus-jaは動的に選択できるようにしたい。
-
 ----------- 対策済 -----------
     
 *1998/10/02-8 User-Agent ヘッダー・フィールド採用
 
     1998/10/05 - 完了
+
+*1998/10/02-9 In-Reply-To ヘッダー形式変更
+
+    draft-ietf-drums-msg-fmt-05.txt に従った形式に変更する。
+
+    1998/11/02 - 完了
+
+*1998/10/03-2 Info (gnus/gnus-ja) の選択
+    
+    完了
