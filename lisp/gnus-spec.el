@@ -1,5 +1,5 @@
 ;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -244,14 +244,17 @@ Return a list of updated types."
 	  gnus-format-specs-compiled nil)
     (gnus-product-variable-touch 'gnus-format-specs
 				 'gnus-format-specs-compiled))
-  ;; Flush the group format spec cache if there's the grouplens stuff.
-  (let ((spec (assq 'group gnus-format-specs)))
-    (when (and (memq 'group types)
-	       (string-match " gnus-tmp-grouplens[ )]"
-			     (gnus-prin1-to-string (cdr spec))))
-      (setq gnus-format-specs (delq spec gnus-format-specs)
-	    spec (assq 'group gnus-format-specs-compiled)
-	    gnus-format-specs-compiled (delq spec gnus-format-specs-compiled))))
+  ;; Flush the group format spec cache if there's the grouplens stuff
+  ;; or it doesn't support decoded group names.
+  (when (memq 'group types)
+    (let* ((spec (assq 'group gnus-format-specs))
+	   (sspec (gnus-prin1-to-string (nth 2 spec))))
+      (when (or (string-match " gnus-tmp-grouplens[ )]" sspec)
+		(not (string-match " gnus-tmp-decoded-group[ )]" sspec)))
+	(setq gnus-format-specs (delq spec gnus-format-specs)
+	      spec (assq 'group gnus-format-specs-compiled)
+	      gnus-format-specs-compiled (delq spec
+					       gnus-format-specs-compiled)))))
 
   ;; Go through all the formats and see whether they need updating.
   (let (new-format type val unchanged updated)
