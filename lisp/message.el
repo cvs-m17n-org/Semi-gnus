@@ -4854,7 +4854,7 @@ responses here are directed to other addresses.")))
 	;; Allow the user to be asked whether or not to reply to all
 	;; recipients in a wide reply.
 	(if (and ccalist wide message-wide-reply-confirm-recipients
-		 (not (y-or-n-p "Reply to all recipients?")))
+		 (not (y-or-n-p "Reply to all recipients? ")))
 	    (setq follow-to (delq (assoc 'Cc follow-to) follow-to)))))
     follow-to))
 
@@ -5571,15 +5571,15 @@ which specify the range to operate on."
   "Alist of (RE . FUN).  Use FUN for completion on header lines matching RE.")
 
 (defun message-tab ()
-  "Expand group names in Newsgroups and Followup-To headers.
-Do a `tab-to-tab-stop' if not in those headers."
+  "Complete names according to `message-completion-alist'.
+Do an `indent-relative' if not in those headers."
   (interactive)
   (let ((alist message-completion-alist))
     (while (and alist
 		(let ((mail-abbrev-mode-regexp (caar alist)))
 		  (not (mail-abbrev-in-expansion-header-p))))
       (setq alist (cdr alist)))
-    (funcall (or (cdar alist) (default-value 'indent-line-function)))))
+    (funcall (or (cdar alist) 'indent-relative))))
 
 (defun message-expand-group ()
   "Expand the group name under point."

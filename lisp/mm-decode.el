@@ -177,8 +177,8 @@
     ("application/pgp-signature" ignore identity)
     ("application/x-pkcs7-signature" ignore identity)
     ("application/pkcs7-signature" ignore identity)
-    ("application/x-pkcs7-mime" mm-view-pkcs7 identity)
-    ("application/pkcs7-mime" mm-view-pkcs7 identity)
+    ("application/x-pkcs7-mime" ignore identity)
+    ("application/pkcs7-mime" ignore identity)
     ("multipart/alternative" ignore identity)
     ("multipart/mixed" ignore identity)
     ("multipart/related" ignore identity)
@@ -468,14 +468,17 @@ for types in mm-keep-viewer-alive-types."
 				  (car ctl))
 	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
-	   (mm-dissect-singlepart
-	    ctl
-	    (and cte (intern (downcase (mail-header-remove-whitespace
-					(mail-header-remove-comments
-					 cte)))))
-	    no-strict-mime
-	    (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
-	    description id))))
+	   (mm-possibly-verify-or-decrypt
+	    (mm-dissect-singlepart
+	     ctl
+	     (and cte (intern (downcase (mail-header-remove-whitespace
+					 (mail-header-remove-comments
+					  cte)))))
+	     no-strict-mime
+	     (and cd (ignore-errors
+		       (mail-header-parse-content-disposition cd)))
+	     description id)
+	    ctl))))
 	(when id
 	  (when (string-match " *<\\(.*\\)> *" id)
 	    (setq id (match-string 1 id)))
@@ -895,20 +898,22 @@ external if displayed external."
       (if (member (mm-handle-media-supertype handle) '("text" "message"))
 	  (with-temp-buffer
 	    (insert-buffer-substring (mm-handle-buffer handle))
-	    (mm-decode-content-transfer-encoding
-	     (mm-handle-encoding handle)
-	     (mm-handle-media-type handle))
-	    (let ((temp (current-buffer)))
-	      (set-buffer cur)
-	      (insert-buffer-substring temp)))
+	    (prog1
+		(mm-decode-content-transfer-encoding
+		 (mm-handle-encoding handle)
+		 (mm-handle-media-type handle))
+	      (let ((temp (current-buffer)))
+		(set-buffer cur)
+		(insert-buffer-substring temp))))
 	(mm-with-unibyte-buffer
 	  (insert-buffer-substring (mm-handle-buffer handle))
-	  (mm-decode-content-transfer-encoding
-	   (mm-handle-encoding handle)
-	   (mm-handle-media-type handle))
-	  (let ((temp (current-buffer)))
-	    (set-buffer cur)
-	    (insert-buffer-substring temp)))))))
+	  (prog1
+	      (mm-decode-content-transfer-encoding
+	       (mm-handle-encoding handle)
+	       (mm-handle-media-type handle))
+	    (let ((temp (current-buffer)))
+	      (set-buffer cur)
+	      (insert-buffer-substring temp))))))))
 
 (defun mm-file-name-delete-whitespace (file-name)
   "Remove all whitespace characters from FILE-NAME."
@@ -963,7 +968,8 @@ like underscores."
 
 (defun mm-save-part-to-file (handle file)
   (mm-with-unibyte-buffer
-    (mm-insert-part handle)
+    (or (mm-insert-part handle)
+	(error "Error with message"))
     (let ((coding-system-for-write 'binary)
 	  ;; Don't re-compress .gz & al.  Arguably we should make
 	  ;; `file-name-handler-alist' nil, but that would chop
@@ -1218,10 +1224,22 @@ If RECURSIVE, search recursively."
 			 (car handle))))
 
 (defun mm-possibly-verify-or-decrypt (parts ctl)
-  (let ((subtype (cadr (split-string (car ctl) "/")))
+  (let ((type (car ctl))
+	(subtype (cadr (split-string (car ctl) "/")))
 	(mm-security-handle ctl) ;; (car CTL) is the type.
 	protocol func functest)
     (cond
+     ((or (equal type "application/x-pkcs7-mime")
+	  (equal type "application/pkcs7-mime"))
+      (with-temp-buffer
+	(when (and (cond
+		    ((eq mm-decrypt-option 'never) nil)
+		    ((eq mm-decrypt-option 'always) t)
+		    ((eq mm-decrypt-option 'known) t)
+		    (t (y-or-n-p
+			(format "Decrypt (S/MIME) part? "))))
+		   (mm-view-pkcs7 parts))
+	  (setq parts (mm-dissect-buffer t)))))
      ((equal subtype "signed")
       (unless (and (setq protocol
 			 (mm-handle-multipart-ctl-parameter ctl 'protocol))

@@ -11369,6 +11369,9 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 $B$s!#(B@code{gnus-article-decode-rfc1522} $B$,$3$N%U%C%/$K2C$($k;v$,E,@Z$J4X(B
 $B?t$N0l$D$G$9!#(B
 
+@vindex nnmail-pre-get-new-mail-hook
+@vindex nnmail-post-get-new-mail-hook
+@item nnmail-pre-get-new-mail-hook
 @itemx nnmail-post-get-new-mail-hook
 $B$3$l$i$OF~$C$F$/$k%a!<%k$r07$&$H$-$K<B9T$5$l$kLr$KN)$DFs$D$N%U%C%/$G(B
 $B$9(B---@code{nnmail-pre-get-new-mail-hook} ($B$3$l$O?7$7$$%a!<%k$r07$&D>A0$K(B
@@ -11377,10 +11380,10 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 $B$7$$%a!<%k%U%!%$%k$KM?$($i$l$k=i4|%U%!%$%k%b!<%I$rJQ99$9$kNc$G$9(B:
 
 @lisp
-(add-hook 'gnus-pre-get-new-mail-hook
+(add-hook 'nnmail-pre-get-new-mail-hook
           (lambda () (set-default-file-modes 511)))
 
-(add-hook 'gnus-post-get-new-mail-hook
+(add-hook 'nnmail-post-get-new-mail-hook
           (lambda () (set-default-file-modes 551)))
 @end lisp
 
@@ -20533,6 +20536,10 @@ Gnus $B$OB?$/$NB?$/$N:F5"9=B$$GF0:n$7!"2?$i$+$N6KC<$J(B ($B$=$7$FHs>o$K$^$l(
 $B9g$O!"(BEmacs $B$N%&%#%s%I%&$r%U%!%$%k$K%3%T!<$7$F(B ($BNc$($P!"(B@kbd{xwd} $B$G(B)$B!"(B
 $B$=$l$r$I$3$+<j$NFO$/$I$3$+$K$*$$$F!"$=$N2hA|$N(B URL $B$r%P%0Js9p$K4^$a$F2<(B
 $B$5$$!#(B
+
+@cindex patches
+$B$b$7$"$J$?$,%P%0$N=$@5$d2~A1$N$?$a$N%Q%C%A$r4s9F$7$F2<$5$k$N$G$7$?$i!"$9(B
+$B$_$^$;$s$,$=$N%Q%C%A$O(B @samp{diff -u} $B$G:n$C$F2<$5$$!#(B
 
 $B$b$71g=u$,M_$7$$$@$1$G$"$l$P!"(B@samp{gnu.emacs.gnus} $B$G?R$M$k$N$,NI$$$G$7$g(B
 $B$&!#;d$O$"$^$jLr$KN)$A$^$;$s!#(B

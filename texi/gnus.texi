@@ -12029,10 +12029,10 @@ is done).  Here's and example of using these two hooks to change the
 default file modes the new mail files get:
 
 @lisp
-(add-hook 'gnus-pre-get-new-mail-hook
+(add-hook 'nnmail-pre-get-new-mail-hook
           (lambda () (set-default-file-modes 511)))
 
-(add-hook 'gnus-post-get-new-mail-hook
+(add-hook 'nnmail-post-get-new-mail-hook
           (lambda () (set-default-file-modes 551)))
 @end lisp
 
@@ -21155,6 +21155,10 @@ If the problem you're seeing is very visual, and you can't quite explain
 it, copy the Emacs window to a file (with @code{xwd}, for instance), put
 it somewhere it can be reached, and include the URL of the picture in
 the bug report.
+
+@cindex patches
+If you would like to contribute a patch to fix bugs or make
+improvements, please produce the patch using @samp{diff -u}.
 
 If you just need help, you are better off asking on
 @samp{gnu.emacs.gnus}.  I'm not very helpful.
