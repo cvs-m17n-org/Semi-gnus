@@ -10974,7 +10974,7 @@ www.my-deja.com などのウェブメールサーバーからメールを取得します。
 @code{mail-sources} をメールソース指示子のリストに設定することです
 (@pxref{Mail Source Specifiers}).
 
-この変数 (と旧式の @code{nnmail-sppl-file}) が @code{nil} であれば、メー
+この変数 (と旧式の @code{nnmail-spool-file}) が @code{nil} であれば、メー
 ルバックエンドは決して自分自身ではメールを取得しようとしません。
 
 ローカルのスプールと POP メールサーバーの両方からメールを取得したいなら、
