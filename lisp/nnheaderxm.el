@@ -53,10 +53,10 @@
 	(message "%s(Y/n) Yes" prompt)
 	t))))
 
-(fset 'nnheader-run-at-time 'nnheader-xmas-run-at-time)
-(fset 'nnheader-cancel-timer 'delete-itimer)
-(fset 'nnheader-cancel-function-timers 'ignore)
-(fset 'nnheader-Y-or-n-p 'nnheader-xmas-Y-or-n-p)
+(defalias 'nnheader-run-at-time 'nnheader-xmas-run-at-time)
+(defalias 'nnheader-cancel-timer 'delete-itimer)
+(defalias 'nnheader-cancel-function-timers 'ignore)
+(defalias 'nnheader-Y-or-n-p 'nnheader-xmas-Y-or-n-p)
 
 (provide 'nnheaderxm)
 

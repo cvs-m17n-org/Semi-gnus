@@ -1,5 +1,6 @@
 ;;; gnus-mh.el --- mh-e interface for Gnus
-;; Copyright (C) 1994,95,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -39,6 +40,9 @@
 (require 'gnus-msg)
 (require 'gnus-sum)
 
+(eval-when-compile
+  (defvar mh-lib-progs))
+
 (defun gnus-summary-save-article-folder (&optional arg)
   "Append the current article to an mh folder.
 If N is a positive number, save the N next articles.
@@ -66,8 +70,12 @@ Optional argument FOLDER specifies folder name."
 		   t))))
 	(errbuf (gnus-get-buffer-create " *Gnus rcvstore*"))
 	;; Find the rcvstore program.
-	(exec-path (if mh-lib (cons mh-lib exec-path) exec-path)))
-    (gnus-eval-in-buffer-window gnus-original-article-buffer
+	(exec-path (cond
+		    ((and (boundp 'mh-lib-progs) mh-lib-progs)
+		     (cons mh-lib-progs exec-path))
+		    (mh-lib (cons mh-lib exec-path))
+		    (t exec-path))))
+    (with-current-buffer gnus-original-article-buffer
       (save-restriction
 	(widen)
 	(unwind-protect

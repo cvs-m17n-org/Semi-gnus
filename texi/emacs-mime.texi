@@ -5,39 +5,38 @@
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@c @direntry
-@c * Emacs MIME: (emacs-mime).   The MIME de/composition library.
-@c @end direntry
+@dircategory Editors
+@direntry
+* Emacs MIME: (emacs-mime).   The MIME de/composition library.
+@end direntry
 @iftex
 @finalout
 @end iftex
 @setchapternewpage odd
 
-@ifinfo
+@ifnottex
 
 This file documents the Emacs MIME interface functionality.
 
-Copyright (C) 1998,99 Free Software Foundation, Inc.
+Copyright (C) 1998,99,2000 Free Software Foundation, Inc.
 
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover texts being ``A GNU
+Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License'' in the Emacs manual.
 
-@ignore
-Permission is granted to process this file through Tex and print the
-results, provided the printed document carries copying permission
-notice identical to this one except for the removal of this paragraph
-(this paragraph not being relevant to the printed manual).
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.''
 
-@end ignore
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-@end ifinfo
+This document is part of a collection distributed under the GNU Free
+Documentation License.  If you want to distribute this document
+separately from the collection, you can do so by adding a copy of the
+license to the document, as described in section 6 of the license.
+@end ifnottex
 
 @tex
 
@@ -48,20 +47,24 @@ into another language, under the above conditions for modified versions.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1998,99 Free Software Foundation, Inc.
+Copyright @copyright{} 1998,99,2000 Free Software Foundation, Inc.
 
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being none, with the Front-Cover texts being ``A GNU
+Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License'' in the Emacs manual.
 
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.''
 
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-
+This document is part of a collection distributed under the GNU Free
+Documentation License.  If you want to distribute this document
+separately from the collection, you can do so by adding a copy of the
+license to the document, as described in section 6 of the license.
 @end titlepage
 @page
 
@@ -703,8 +706,8 @@ image/*; gimp -8 %s
 audio/wav; wavplayer %s
 @end example
 
-This says that all image files should be displayed with @samp{xv}, and
-that realaudio files should be played by @samp{rvplayer}.
+This says that all image files should be displayed with @code{gimp}, and
+that realaudio files should be played by @code{rvplayer}.
 
 The @code{mailcap} library parses this file, and provides functions for
 matching types.
@@ -960,6 +963,7 @@ string containing the @sc{mime} message.
 * Simple MML Example::             An example MML document.
 * MML Definition::                 All valid MML elements.
 * Advanced MML Example::           Another example MML document.
+* Charset Translation::            How charsets are mapped from @sc{mule} to MIME.
 * Conversion::                     Going from @sc{mime} to MML and vice versa.
 @end menu
 
@@ -1063,6 +1067,14 @@ RFC822 date when the part was read (@code{Content-Disposition}).
 @item size
 The size (in octets) of the part (@code{Content-Disposition}).
 
+@item sign
+What technology to sign this MML part with (@code{smime} or
+@code{pgpmime})
+
+@item encrypt
+What technology to encrypt this MML part with (@code{smime} or
+@code{pgpmime})
+
 @end table
 
 Parameters for @samp{application/octet-stream}:
@@ -1091,6 +1103,24 @@ The size (in octets) of the file.  (@code{Content-Type}.)
 @item permission
 Valid values are @samp{read} and @samp{read-write}
 (@code{Content-Type}).
+
+@end table
+
+Parameters for @samp{sign=smime}:
+
+@table @samp
+
+@item keyfile
+File containing key and certificate for signer.
+
+@end table
+
+Parameters for @samp{encrypt=smime}:
+
+@table @samp
+
+@item certfile
+File containing certificate for recipient.
 
 @end table
 
@@ -1181,6 +1211,43 @@ This plain text part is an attachment.
 --=-=-=--
 @end example
 
+@node Charset Translation
+@section Charset Translation
+@cindex charsets
+
+During translation from MML to @sc{mime}, for each @sc{mime} part which
+has been composed inside Emacs, an appropriate charset has to be chosen.
+
+@vindex mail-parse-charset
+If you are running a non-@sc{mule} Emacs, this process is simple: If the
+part contains any non-ASCII (8-bit) characters, the @sc{mime} charset
+given by @code{mail-parse-charset} (a symbol) is used.  (Never set this
+variable directly, though.  If you want to change the default charset,
+please consult the documentation of the package which you use to process
+@sc{mime} messages.
+@xref{Various Message Variables, , Various Message Variables, message, 
+      Message Manual}, for example.)
+If there are only ASCII characters, the @sc{mime} charset US-ASCII is
+used, of course.
+
+@cindex MULE
+@cindex UTF-8
+@cindex Unicode
+@vindex mm-mime-mule-charset-alist
+Things are slightly more complicated when running Emacs with @sc{mule}
+support.  In this case, a list of the @sc{mule} charsets used in the
+part is obtained, and the @sc{mule} charsets are translated to @sc{mime}
+charsets by consulting the variable @code{mm-mime-mule-charset-alist}.
+If this results in a single @sc{mime} charset, this is used to encode
+the part.  But if the resulting list of @sc{mime} charsets contains more
+than one element, two things can happen: If it is possible to encode the
+part via UTF-8, this charset is used.  (For this, Emacs must support
+the @code{utf-8} coding system, and the part must consist entirely of
+characters which have Unicode counterparts.)  If UTF-8 is not available
+for some reason, the part is split into several ones, so that each one
+can be encoded with a single @sc{mime} charset.  The part can only be
+split at line boundaries, though---if more than one @sc{mime} charset is
+required to encode a single line, it is not possible to encode the part.
 
 @node Conversion
 @section Conversion
@@ -1216,7 +1283,7 @@ if not identical.
 The Emacs @sc{mime} library implements handling of various elements
 according to a (somewhat) large number of RFCs, drafts and standards
 documents.  This chapter lists the relevant ones.  They can all be
-fetched from @samp{http://www.stud.ifi.uio.no/~larsi/notes/}.
+fetched from @samp{http://quimby.gnus.org/notes/}.
 
 @table @dfn
 @item RFC822

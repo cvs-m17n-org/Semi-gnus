@@ -1,4 +1,4 @@
-このパッケージには T-gnus 6.13 が入っています。
+このパッケージには T-gnus 6.15 が入っています。
 
 T-gnus とは？
 =============
@@ -9,7 +9,7 @@ T-gnus とは？
 してはいけません。
 
   APEL, FLIM および SEMI パッケージが必要ですので、インストールする前
-にそれらをインストールしてください。T-gnus 6.13 は APEL 9.20 以上、
+にそれらをインストールしてください。T-gnus 6.15 は APEL 10.0 以上、
 FLIM (1.13.1 以上) および SEMI/WEMI (1.13.5 以上) を必要とします。それ
 らのパッケージは
 
@@ -26,15 +26,14 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 (0) cvs login (初回のみ)
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	login
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root login
 
     CVS password: [CR] # 空文字列
 
 (1) checkout
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout -r t-gnus-6_13 gnus
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
+	checkout -r t-gnus-6_15-quimby gnus
 
 (2) compile
 
@@ -44,13 +43,12 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 (3) update
 
-    % cvs update -r t-gnus-6_13 gnus
+    % cvs update -r t-gnus-6_15-quimby gnus
 
 主なタグは以下のようになっています:
 
-    t-gnus-6_12		最新の T-gnus の安定版に割り当てられます。
-
-    t-gnus-6_13		最新の T-gnus の開発版に割り当てられます。
+    t-gnus-6_15-quimby	最新の T-gnus 割り当てられ、開発と Oort Gnus
+			との同期を行ないます。
 
     pgnus-ichikawa	T-gnus の幹です。
 
@@ -83,21 +81,9 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 取得方法 (ftp)
 ==============
 
-  安定版は
+  T-gnus 6.15 は以下の場所から取得可能です。
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
-
-  から、そして開発版は
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/
-
-  から、それぞれ取得可能です。そしてほぼ毎日の snapshot が
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
-  または
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/snapshots/
-
-  から取得可能です。
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.15/snapshots/
 
   注意: これらの snapshot は a-ftp site の管理者の気が向いたときに手動
   で作成され、普通はテストされていません。
@@ -112,8 +98,8 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
   T-gnus のバグを見つけたか、Gnus のバグであるかどうかが分からないとき
   は、バグ報告を Semi-gnus メーリングリストに送ってください:
 
-    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(英語)
-    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(日本語)
+    semi-gnus-en@meadowy.org	(英語)
+    semi-gnus-ja@meadowy.org	(日本語)
 
   T-gnus の改善のための提案も歓迎されます。
 
@@ -121,18 +107,20 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
   リースを取得したり、T-gnus の将来の拡張を議論したりすることができま
   す。Semi-gnus ML に参加するためには
 
-    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(英語)
-    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(日本語)
+    semi-gnus-en-help@meadowy.org	(英語)
+    semi-gnus-ja-help@meadowy.org	(日本語)
 
   に空のメールを送ってください。
 
   加えて、開発者を必要としています。開発に参加したい場合は、
-  cvs@chamonix.jaist.ac.jp にアカウント名と UNIX の /etc/passwd の様式
-  で暗号化されたパスワードをメールを送ってください。
-  chamonix open CVS server で行なわれた変更をメールで通知してもらうこ
-  とも可能です。これには gnus 以外の module に関する情報も含まれます。
-  必要な方は
+  cvs@cvs.m17n.org にアカウント名と ssh の公開鍵を送ってください。ssh
+  経由での cvsroot は :ext:cvs@cvs.m17n.org:/cvs/root となります。どう
+  しても ssh が使えない場合、UNIX の /etc/passwd の様式で暗号化された
+  パスワードをメールを送ってください。この場合 cvsroot は
+  :pserver:<アカウント名>@cvs.m17n.org:/cvs/root となります。m17n open
+  CVS server で行なわれた変更をメールで通知してもらうことも可能です。
+  これには gnus 以外の module に関する情報も含まれます。必要な方は
 
-    cvs-info-help@chamonix.jaist.ac.jp
+    cvs-info-help@cvs.m17n.org
 
   に空のメールを送って案内に従って下さい。

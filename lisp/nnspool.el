@@ -1,5 +1,7 @@
 ;;; nnspool.el --- spool access for GNU Emacs
-;; Copyright (C) 198,998,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
+
+;; Copyright (C) 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997, 1998,
+;;	2000 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -27,6 +29,8 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (require 'nnheader)
 (require 'nntp)
 (require 'nnoo)
@@ -47,7 +51,10 @@ If you are using Cnews, you probably should set this variable to nil.")
 (defvoo nnspool-nov-directory (concat nnspool-spool-directory "over.view/")
   "Local news nov directory.")
 
-(defvoo nnspool-lib-dir "/usr/lib/news/"
+(defvoo nnspool-lib-dir 
+    (if (file-exists-p "/usr/lib/news/active")
+	"/usr/lib/news/"
+      "/var/lib/news/")
   "Where the local news library files are stored.")
 
 (defvoo nnspool-active-file (concat nnspool-lib-dir "active")
@@ -148,7 +155,7 @@ there.")
 	    (and do-message
 		 (zerop (% (incf count) 20))
 		 (nnheader-message 5 "nnspool: Receiving headers... %d%%"
-			  (/ (* count 100) number))))
+				   (/ (* count 100) number))))
 
 	  (when do-message
 	    (nnheader-message 5 "nnspool: Receiving headers...done"))
@@ -298,8 +305,8 @@ there.")
 			     (read (current-buffer)))
 			   seconds))
 		      (push (buffer-substring
-					  (match-beginning 1) (match-end 1))
-					 groups)
+			     (match-beginning 1) (match-end 1))
+			    groups)
 		      (zerop (forward-line -1))))
 	  (erase-buffer)
 	  (while groups

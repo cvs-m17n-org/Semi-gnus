@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for MIME things
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -24,6 +24,11 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'static))
+
+(eval-when-compile (require 'cl))
+(require 'mail-prsvr)
+
 (defvar mm-mime-mule-charset-alist
   '((us-ascii ascii)
     (iso-8859-1 latin-iso8859-1)
@@ -31,7 +36,10 @@
     (iso-8859-3 latin-iso8859-3)
     (iso-8859-4 latin-iso8859-4)
     (iso-8859-5 cyrillic-iso8859-5)
-    (koi8-r cyrillic-iso8859-5)
+    ;; Non-mule (X)Emacs uses the last mule-charset for 8bit characters.
+    ;; The fake mule-charset, gnus-koi8-r, tells Gnus that the default 
+    ;; charset is koi8-r, not iso-8859-5.
+    (koi8-r cyrillic-iso8859-5 gnus-koi8-r)
     (iso-8859-6 arabic-iso8859-6)
     (iso-8859-7 greek-iso8859-7)
     (iso-8859-8 hebrew-iso8859-8)
@@ -62,9 +70,9 @@
 		    chinese-cns11643-1 chinese-cns11643-2
 		    chinese-cns11643-3 chinese-cns11643-4
 		    chinese-cns11643-5 chinese-cns11643-6
-		    chinese-cns11643-7))
+		    chinese-cns11643-7)
+    (utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e))
   "Alist of MIME-charset/MULE-charsets.")
-
 
 (eval-and-compile
   (mapcar
@@ -91,7 +99,36 @@
 	  "Prompt the user for a coding system."
 	  (completing-read
 	   prompt (mapcar (lambda (s) (list (symbol-name (car s))))
-			  mm-mime-mule-charset-alist)))))))
+			  mm-mime-mule-charset-alist))))
+     (read-charset
+      . (lambda (prompt)
+	  "Return a charset."
+	  (intern
+	   (completing-read
+	    prompt
+	    (mapcar (lambda (e) (list (symbol-name (car e))))
+		    mm-mime-mule-charset-alist)
+	    nil t))))
+     (subst-char-in-string
+      . (lambda (from to string) ;; stolen (and renamed) from nnheader.el
+	  "Replace characters in STRING from FROM to TO."
+	  (let ((string (substring string 0))	;Copy string.
+		(len (length string))
+		(idx 0))
+	    ;; Replace all occurrences of FROM with TO.
+	    (while (< idx len)
+	      (when (= (aref string idx) from)
+		(aset string idx to))
+	      (setq idx (1+ idx)))
+	    string)))
+      )))
+
+(eval-and-compile
+  (defalias 'mm-char-or-char-int-p
+    (cond 
+     ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
+     ((fboundp 'char-valid-p) 'char-valid-p) 
+     (t 'identity))))
 
 (defvar mm-coding-system-list nil)
 (defun mm-get-coding-system-list ()
@@ -99,16 +136,21 @@
   (or mm-coding-system-list
       (setq mm-coding-system-list (mm-coding-system-list))))
 
-(defvar mm-charset-synonym-alist
-  '((big5 . cn-big5)
-    (gb2312 . cn-gb-2312)
-    (x-ctext . ctext))
-  "A mapping from invalid charset names to the real charset names.")
-
 (defun mm-coding-system-p (sym)
   "Return non-nil if SYM is a coding system."
   (or (and (fboundp 'coding-system-p) (coding-system-p sym))
       (memq sym (mm-get-coding-system-list))))
+
+(defvar mm-charset-synonym-alist
+  `((big5 . cn-big5)
+    (gb2312 . cn-gb-2312)
+    (cn-gb . cn-gb-2312)
+    ;; Windows-1252 is actually a superset of Latin-1.  See also
+    ;; `gnus-article-dumbquotes-map'.
+    ,(unless (mm-coding-system-p 'windows-1252) ; should be defined eventually
+       '(windows-1252 . iso-8859-1))
+    (x-ctext . ctext))
+  "A mapping from invalid charset names to the real charset names.")
 
 (defvar mm-binary-coding-system
   (cond 
@@ -143,7 +185,7 @@
 ;;; Functions:
 
 (defun mm-mule-charset-to-mime-charset (charset)
-  "Return the MIME charset corresponding to MULE CHARSET."
+  "Return the MIME charset corresponding to the given Mule CHARSET."
   (let ((alist mm-mime-mule-charset-alist)
 	out)
     (while alist
@@ -172,35 +214,49 @@ used as the line break code type of the coding system."
    ;; ascii
    ((eq charset 'us-ascii)
     'ascii)
-   ;; Check to see whether we can handle this charset.
+   ;; Check to see whether we can handle this charset.  (This depends
+   ;; on there being some coding system matching each `mime-charset'
+   ;; coding sysytem property defined, as there should be.)
    ((memq charset (mm-get-coding-system-list))
     charset)
    ;; Nope.
    (t
     nil)))
 
-(defun mm-replace-chars-in-string (string from to)
-  "Replace characters in STRING from FROM to TO."
-  (let ((string (substring string 0))	;Copy string.
-	(len (length string))
-	(idx 0))
-    ;; Replace all occurrences of FROM with TO.
-    (while (< idx len)
-      (when (= (aref string idx) from)
-	(aset string idx to))
-      (setq idx (1+ idx)))
-    string))
+(defsubst mm-replace-chars-in-string (string from to)
+  (mm-subst-char-in-string from to string))
 
 (defsubst mm-enable-multibyte ()
-  "Enable multibyte in the current buffer."
+  "Set the multibyte flag of the current buffer.
+Only do this if the default value of `enable-multibyte-characters' is
+non-nil.  This is a no-op in XEmacs."
   (when (and (fboundp 'set-buffer-multibyte)
              (boundp 'enable-multibyte-characters)
 	     (default-value 'enable-multibyte-characters))
     (set-buffer-multibyte t)))
 
 (defsubst mm-disable-multibyte ()
-  "Disable multibyte in the current buffer."
+  "Unset the multibyte flag of in the current buffer.
+This is a no-op in XEmacs."
   (when (fboundp 'set-buffer-multibyte)
+    (set-buffer-multibyte nil)))
+
+(defsubst mm-enable-multibyte-mule4 ()
+  "Enable multibyte in the current buffer.
+Only used in Emacs Mule 4."
+  (when (and (fboundp 'set-buffer-multibyte)
+             (boundp 'enable-multibyte-characters)
+	     (default-value 'enable-multibyte-characters)
+	     (fboundp 'charsetp)
+	     (not (charsetp 'eight-bit-control)))
+    (set-buffer-multibyte t)))
+
+(defsubst mm-disable-multibyte-mule4 ()
+  "Disable multibyte in the current buffer.
+Only used in Emacs Mule 4."
+  (when (and (fboundp 'set-buffer-multibyte)
+	     (fboundp 'charsetp)
+	     (not (charsetp 'eight-bit-control)))
     (set-buffer-multibyte nil)))
 
 (defun mm-preferred-coding-system (charset)
@@ -208,9 +264,44 @@ used as the line break code type of the coding system."
   (or (get-charset-property charset 'prefered-coding-system)
       (get-charset-property charset 'preferred-coding-system)))
 
+(defun mm-charset-after (&optional pos)
+  "Return charset of a character in current buffer at position POS.
+If POS is nil, it defauls to the current point.
+If POS is out of range, the value is nil.
+If the charset is `composition', return the actual one."
+  (let ((char (char-after pos)) charset)
+    (if (< (mm-char-int char) 128)
+	(setq charset 'ascii)
+      ;; charset-after is fake in some Emacsen.
+      (setq charset (and (fboundp 'char-charset) (char-charset char)))
+      (if (eq charset 'composition)
+	  (let ((p (or pos (point))))
+	    (cadr (find-charset-region p (1+ p))))
+	(if (and charset (not (memq charset '(ascii eight-bit-control
+						    eight-bit-graphic))))
+	    charset
+	  (or
+	   mail-parse-mule-charset ;; cached mule-charset
+	   (progn
+	     (setq mail-parse-mule-charset
+		   (and (boundp 'current-language-environment)
+		      (car (last 
+			    (assq 'charset 
+				  (assoc current-language-environment 
+					 language-info-alist))))))
+	     (if (or (not mail-parse-mule-charset)
+		     (eq mail-parse-mule-charset 'ascii))
+		 (setq mail-parse-mule-charset
+		       (or (car (last (assq mail-parse-charset
+					    mm-mime-mule-charset-alist)))
+			   'latin-iso8859-1)))
+	     mail-parse-mule-charset)))))))
+
 (defun mm-mime-charset (charset)
   "Return the MIME charset corresponding to the MULE CHARSET."
-  (if (fboundp 'coding-system-get)
+  (if (eq charset 'unknown)
+      (error "8-bit characters are found in the message, please specify charset."))
+  (if (and (fboundp 'coding-system-get) (fboundp 'get-charset-property))
       ;; This exists in Emacs 20.
       (or
        (and (mm-preferred-coding-system charset)
@@ -223,61 +314,104 @@ used as the line break code type of the coding system."
     ;; This is for XEmacs.
     (mm-mule-charset-to-mime-charset charset)))
 
+(defun mm-delete-duplicates (list)
+  "Simple  substitute for CL `delete-duplicates', testing with `equal'."
+  (let (result head)
+    (while list
+      (setq head (car list))
+      (setq list (delete head list))
+      (setq result (cons head result)))
+    (nreverse result)))
+
 (defun mm-find-mime-charset-region (b e)
   "Return the MIME charsets needed to encode the region between B and E."
-  (let ((charsets
-	 (mapcar 'mm-mime-charset
-		 (delq 'ascii
-		       (mm-find-charset-region b e)))))
+  (let ((charsets (mapcar 'mm-mime-charset
+			  (delq 'ascii
+				(mm-find-charset-region b e)))))
     (when (memq 'iso-2022-jp-2 charsets)
       (setq charsets (delq 'iso-2022-jp charsets)))
-    (delete-duplicates charsets)
+    (setq charsets (mm-delete-duplicates charsets))
     (if (and (> (length charsets) 1)
-	     (fboundp 'find-coding-systems-for-charsets)
-	     (memq 'utf-8 (find-coding-systems-for-charsets charsets)))
+	     (fboundp 'find-coding-systems-region)
+	     (memq 'utf-8 (find-coding-systems-region b e)))
 	'(utf-8)
       charsets)))
 
 (defsubst mm-multibyte-p ()
   "Say whether multibyte is enabled."
-  (or (string-match "XEmacs\\|Lucid" emacs-version)
-      (and (boundp 'enable-multibyte-characters)
-	   enable-multibyte-characters)))
+  (if (and (not (featurep 'xemacs))
+	   (boundp 'enable-multibyte-characters))
+      enable-multibyte-characters
+    (featurep 'mule)))
 
 (defmacro mm-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.
-See also `with-temp-file' and `with-output-to-string'."
-  (let ((temp-buffer (make-symbol "temp-buffer"))
-	(multibyte (make-symbol "multibyte")))
-    `(if (or (string-match "XEmacs\\|Lucid" emacs-version)
-	     (not (boundp 'enable-multibyte-characters)))
-	 (with-temp-buffer ,@forms)
-       (let ((,multibyte (default-value 'enable-multibyte-characters))
-	     ,temp-buffer)
-	 (unwind-protect
-	     (progn
-	       (setq-default enable-multibyte-characters nil)
-	       (setq ,temp-buffer
-		     (get-buffer-create (generate-new-buffer-name " *temp*")))
-	       (unwind-protect
-		   (with-current-buffer ,temp-buffer
-		     (let ((buffer-file-coding-system mm-binary-coding-system)
-			   (coding-system-for-read mm-binary-coding-system)
-			   (coding-system-for-write mm-binary-coding-system))
-		       ,@forms))
-		 (and (buffer-name ,temp-buffer)
-		      (kill-buffer ,temp-buffer))))
-	   (setq-default enable-multibyte-characters ,multibyte))))))
+Use unibyte mode for this."
+  `(let (default-enable-multibyte-characters)
+     (with-temp-buffer ,@forms)))
 (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
 (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
 
+(defmacro mm-with-unibyte-current-buffer (&rest forms)
+  "Evaluate FORMS with current current buffer temporarily made unibyte.
+Also bind `default-enable-multibyte-characters' to nil.
+Equivalent to `progn' in XEmacs"
+  (let ((multibyte (make-symbol "multibyte")))
+    `(if (fboundp 'set-buffer-multibyte)
+	 (let ((,multibyte enable-multibyte-characters))
+	   (unwind-protect
+	       (let (default-enable-multibyte-characters)
+		 (set-buffer-multibyte nil)
+		 ,@forms)
+	     (set-buffer-multibyte ,multibyte)))
+       (progn
+	 ,@forms))))
+(put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
+(put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
+
+(defmacro mm-with-unibyte-current-buffer-mule4 (&rest forms)
+  "Evaluate FORMS there like `progn' in current buffer.
+Mule4 only."
+  (let ((multibyte (make-symbol "multibyte")))
+    `(if (or (featurep 'xemacs)
+	     (not (fboundp 'set-buffer-multibyte))
+	     (not (fboundp 'charsetp))
+	     (charsetp 'eight-bit-control)) ;; For Emacs Mule 4 only.
+	 (progn
+	   ,@forms)
+       (let ((,multibyte (default-value 'enable-multibyte-characters)))
+	 (unwind-protect
+	     (let ((buffer-file-coding-system mm-binary-coding-system)
+		   (coding-system-for-read mm-binary-coding-system)
+		   (coding-system-for-write mm-binary-coding-system))
+	       (set-buffer-multibyte nil)
+	       (setq-default enable-multibyte-characters nil)
+	       ,@forms)
+	   (setq-default enable-multibyte-characters ,multibyte)
+	   (set-buffer-multibyte ,multibyte))))))
+(put 'mm-with-unibyte-current-buffer-mule4 'lisp-indent-function 0)
+(put 'mm-with-unibyte-current-buffer-mule4 'edebug-form-spec '(body))
+
+(defmacro mm-with-unibyte (&rest forms)
+  "Eval the FORMS with the default value of `enable-multibyte-characters' nil, ."
+  `(let (default-enable-multibyte-characters)
+     ,@forms))
+(put 'mm-with-unibyte 'lisp-indent-function 0)
+(put 'mm-with-unibyte 'edebug-form-spec '(body))
+
 (defun mm-find-charset-region (b e)
-  "Return a list of charsets in the region."
+  "Return a list of Emacs charsets in the region B to E."
   (cond
    ((and (mm-multibyte-p)
  	 (fboundp 'find-charset-region))
-    (find-charset-region b e))
-   ((not (boundp 'current-language-environment))
+    ;; Remove composition since the base charsets have been included.
+    ;; Remove eight-bit-*, treat them as ascii.
+    (let ((css (find-charset-region b e)))
+      (mapcar (lambda (cs) (setq css (delq cs css)))
+	      '(composition eight-bit-control eight-bit-graphic))
+      css))
+   (t
+    ;; We are in a unibyte buffer or XEmacs non-mule, so we futz around a bit.
     (save-excursion
       (save-restriction
 	(narrow-to-region b e)
@@ -285,41 +419,33 @@ See also `with-temp-file' and `with-output-to-string'."
 	(skip-chars-forward "\0-\177")
 	(if (eobp)
 	    '(ascii)
-	  (delq nil (list 'ascii mail-parse-charset))))))
-   (t
-    ;; We are in a unibyte buffer, so we futz around a bit.
-    (save-excursion
-      (save-restriction
-	(narrow-to-region b e)
-	(goto-char (point-min))
-	(let ((entry (assoc (capitalize current-language-environment)
-			    language-info-alist)))
-	  (skip-chars-forward "\0-\177")
-	  (if (eobp)
-	      '(ascii)
-	    (list 'ascii (car (last (assq 'charset entry)))))))))))
+	  (let (charset)
+	    (setq charset
+		  (and (boundp 'current-language-environment)
+		       (car (last (assq 'charset 
+					(assoc current-language-environment 
+					       language-info-alist))))))
+	    (if (eq charset 'ascii) (setq charset nil))
+	    (or charset
+		(setq charset
+		      (car (last (assq mail-parse-charset
+				       mm-mime-mule-charset-alist)))))
+	    (list 'ascii (or charset 'latin-iso8859-1)))))))))
 
-(defun mm-read-charset (prompt)
-  "Return a charset."
-  (intern
-   (completing-read
-    prompt
-    (mapcar (lambda (e) (list (symbol-name (car e))))
-	    mm-mime-mule-charset-alist)
-    nil t)))
-
-(defun mm-quote-arg (arg)
-  "Return a version of ARG that is safe to evaluate in a shell."
-  (let ((pos 0) new-pos accum)
-    ;; *** bug: we don't handle newline characters properly
-    (while (setq new-pos (string-match "[]*[;!'`\"$\\& \t{} |()<>]" arg pos))
-      (push (substring arg pos new-pos) accum)
-      (push "\\" accum)
-      (push (list (aref arg new-pos)) accum)
-      (setq pos (1+ new-pos)))
-    (if (= pos 0)
-        arg
-      (apply 'concat (nconc (nreverse accum) (list (substring arg pos)))))))
+(static-if (fboundp 'shell-quote-argument)
+    (defalias 'mm-quote-arg 'shell-quote-argument)
+  (defun mm-quote-arg (arg)
+    "Return a version of ARG that is safe to evaluate in a shell."
+    (let ((pos 0) new-pos accum)
+      ;; *** bug: we don't handle newline characters properly
+      (while (setq new-pos (string-match "[]*[;!'`\"$\\& \t{} |()<>]" arg pos))
+	(push (substring arg pos new-pos) accum)
+	(push "\\" accum)
+	(push (list (aref arg new-pos)) accum)
+	(setq pos (1+ new-pos)))
+      (if (= pos 0)
+	  arg
+	(apply 'concat (nconc (nreverse accum) (list (substring arg pos))))))))
 
 (defun mm-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."

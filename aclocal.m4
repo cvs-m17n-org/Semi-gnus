@@ -1,217 +1,225 @@
-dnl aclocal.m4 generated automatically by aclocal 1.3
+AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
+ [echo $ac_n "defining gnus product name... $ac_c"
+  AC_CACHE_VAL(EMACS_cv_GNUS_PRODUCT_NAME,[EMACS_cv_GNUS_PRODUCT_NAME=$1])
+  GNUS_PRODUCT_NAME=${EMACS_cv_GNUS_PRODUCT_NAME}
+  AC_MSG_RESULT(${GNUS_PRODUCT_NAME})
+  AC_SUBST(GNUS_PRODUCT_NAME)])
 
-dnl Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
-dnl This Makefile.in is free software; the Free Software Foundation
-dnl gives unlimited permission to copy and/or distribute it,
-dnl with or without modifications, as long as this notice is preserved.
+AC_DEFUN(AC_CHECK_EMACS,
+ [dnl Check for Emacsen.
 
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-dnl even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-dnl PARTICULAR PURPOSE.
+  dnl Apparently, if you run a shell window in Emacs, it sets the EMACS
+  dnl environment variable to 't'.  Lets undo the damage.
+  test x$EMACS = xt && EMACS=
 
-dnl Copyright (C) 1999 NISHIDA Keisuke <knishida@ring.aist.go.jp>
-dnl
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2, or (at your option)
-dnl any later version.
-dnl
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-dnl GNU General Public License for more details.
-dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software
-dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-dnl 02111-1307, USA.
+  dnl Ignore cache.
+  unset ac_cv_prog_EMACS; unset ac_cv_prog_XEMACS;
 
-AC_DEFUN(AM_PATH_LISPDIR,
- [dnl #
-  dnl # Check Emacs
-  dnl #
   AC_ARG_WITH(emacs,
-    [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, xemacs...]],
-    [case "${withval}" in
-       yes)	EMACS= ;;
-       no)	AC_MSG_ERROR([emacs is not available]) ;;
-       *)	EMACS=${withval} ;;
-     esac], EMACS=)
-  if test "x$EMACS" = "xt" -o "x$EMACS" = x; then
-    AC_PATH_PROGS(EMACS, emacs xemacs mule, no)
-    if test $EMACS = no; then
-      AC_MSG_ERROR(you should install Emacs first)
+   [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
+   [if test x$withval = xyes -o x$withval = x; then
+      AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)
+    else
+      AC_CHECK_PROG(EMACS, $withval, $withval, emacs)
+    fi])
+  AC_ARG_WITH(xemacs,
+   [  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]],
+   [if test x$withval = xyes -o x$withval = x; then
+      AC_CHECK_PROG(XEMACS, xemacs, xemacs, xemacs)
+    else
+      AC_CHECK_PROG(XEMACS, $withval, $withval, xemacs)
     fi
-  fi
-  dnl # 
-  dnl # Check Emacs directories
-  dnl #
-  AC_MSG_CHECKING([where emacs files are in])
-  EMACS_BASENAME="`echo x$EMACS | sed -e 's/x//' -e 's/^.*\///'`"
-  if test "x$emacsdir" = x; then
-    if test "x$prefix" = "xNONE"; then
-      prefix=$ac_default_prefix
-    fi
-    emacsdir="\$(datadir)/emacs"
-    case "$EMACS_BASENAME" in
-    emacs|emacs-*)
-      if test -d $prefix/lib/emacs; then
-	emacsdir="$prefix/lib/emacs"
-      fi
-      if test -d $prefix/share/emacs; then
-	emacsdir="$prefix/share/emacs"
-      fi
-      ;;
-    xemacs|xemacs-*)
-      if test -d $prefix/lib/xemacs; then
-	emacsdir="$prefix/lib/xemacs"
-      fi
-      if test -d $prefix/share/xemacs; then
-	emacsdir="$prefix/share/xemacs"
-      fi
-      ;;
-    mule|mule-*)
-      if test -d $prefix/lib/emacs; then
-	emacsdir="$prefix/lib/emacs"
-      fi
-      if test -d $prefix/share/emacs; then
-	emacsdir="$prefix/share/emacs"
-      fi
-      if test -d $prefix/lib/mule; then
-	emacsdir="$prefix/lib/mule"
-      fi
-      if test -d $prefix/share/mule; then
-	emacsdir="$prefix/share/mule"
-      fi
-      ;;
-    esac
-  fi
-  AC_MSG_RESULT($emacsdir)
-  AC_SUBST(emacsdir)
-  dnl # 
-  dnl # Check Emacs site-lisp directories
-  dnl #
-  AC_ARG_WITH(lispdir,
-    [  --with-lispdir=DIR      emacs lisp files go to DIR [guessed]],
-    [case "${withval}" in
-       yes)	lispdir= ;;
-       no)	AC_MSG_ERROR(lispdir is not available) ;;
-       *)	lispdir=${withval} ;;
-     esac], lispdir=)
-  AC_MSG_CHECKING([where .elc files should go])
-  if test "x$lispdir" = x; then
-    lispdir="$emacsdir/site-lisp"
-    if test -d $emacsdir/lisp; then
-      lispdir="$emacsdir/lisp"
-    fi
-    case "$EMACS_BASENAME" in
-    xemacs|xemacs-*)
-      lispdir="$lispdir/tgnus"
-      ;;
-    esac
-  fi
-  AC_MSG_RESULT($lispdir)
-  AC_SUBST(lispdir)])
+    EMACS=$XEMACS],
+   [XEMACS=xemacs
+    test x$EMACS = x &&\
+      AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)])
+  AC_SUBST(EMACS)
+  AC_SUBST(XEMACS)])
 
-# Do all the work for Automake.  This macro actually does too much --
-# some checks are only needed if your package does certain things.
-# But this isn't really a big deal.
-
-# serial 1
-
-dnl Usage:
-dnl AM_INIT_AUTOMAKE(package,version, [no-define])
-
-AC_DEFUN(AM_INIT_AUTOMAKE,
-[AC_REQUIRE([AM_PROG_INSTALL])
-PACKAGE=[$1]
-AC_SUBST(PACKAGE)
-VERSION=[$2]
-AC_SUBST(VERSION)
-dnl test to see if srcdir already configured
-if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
-  AC_MSG_ERROR([source directory already configured; run "make distclean" there first])
+AC_DEFUN(AC_EMACS_LISP, [
+elisp="$2"
+if test -z "$3"; then
+	AC_MSG_CHECKING(for $1)
 fi
-ifelse([$3],,
-AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
-AC_DEFINE_UNQUOTED(VERSION, "$VERSION"))
-AC_REQUIRE([AM_SANITY_CHECK])
-AC_REQUIRE([AC_ARG_PROGRAM])
-dnl FIXME This is truly gross.
-missing_dir=`cd $ac_aux_dir && pwd`
-AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
-AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
-AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
-AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
-AM_MISSING_PROG(MAKEINFO, makeinfo, $missing_dir)
-AC_REQUIRE([AC_PROG_MAKE_SET])])
-
-
-# serial 1
-
-AC_DEFUN(AM_PROG_INSTALL,
-[AC_REQUIRE([AC_PROG_INSTALL])
-test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
-AC_SUBST(INSTALL_SCRIPT)dnl
+AC_CACHE_VAL(EMACS_cv_SYS_$1,[
+	OUTPUT=./conftest-$$
+	echo ${EMACS}' -batch -eval '\''(let ((x '${elisp}')) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil "'${OUTPUT}'" nil 5))'\' >& AC_FD_CC 2>&1
+	eval ${EMACS}' -batch -eval '\''(let ((x '${elisp}')) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil "'${OUTPUT}'" nil 5))'\' >& AC_FD_CC 2>&1
+	retval=`cat ${OUTPUT}`
+	echo "=> ${retval}" >& AC_FD_CC 2>&1
+	rm -f ${OUTPUT}
+	EMACS_cv_SYS_$1=$retval
+])
+$1=${EMACS_cv_SYS_$1}
+if test -z "$3"; then
+	AC_MSG_RESULT($$1)
+fi
 ])
 
-#
-# Check to make sure that the build environment is sane.
-#
+AC_DEFUN(AC_CHECK_EMACS_FLAVOR,
+ [AC_MSG_CHECKING([what a flavor does $EMACS have])
 
-AC_DEFUN(AM_SANITY_CHECK,
-[AC_MSG_CHECKING([whether build environment is sane])
-# Just in case
-sleep 1
-echo timestamp > conftestfile
-# Do `set' in a subshell so we don't clobber the current shell's
-# arguments.  Must try -L first in case configure is actually a
-# symlink; some systems play weird games with the mod time of symlinks
-# (eg FreeBSD returns the mod time of the symlink's containing
-# directory).
-if (
-   set X `ls -Lt $srcdir/configure conftestfile 2> /dev/null`
-   if test "[$]*" = "X"; then
-      # -L didn't work.
-      set X `ls -t $srcdir/configure conftestfile`
-   fi
-   if test "[$]*" != "X $srcdir/configure conftestfile" \
-      && test "[$]*" != "X conftestfile $srcdir/configure"; then
+  dnl Ignore cache.
+  unset EMACS_cv_SYS_flavor;
 
-      # If neither matched, then we have a broken ls.  This can happen
-      # if, for instance, CONFIG_SHELL is bash and it inherits a
-      # broken ls alias from the environment.  This has actually
-      # happened.  Such a system could not be considered "sane".
-      AC_MSG_ERROR([ls -t appears to fail.  Make sure there is not a broken
-alias in your environment])
-   fi
+  AC_EMACS_LISP(flavor,
+    (cond ((featurep (quote xemacs)) \"XEmacs\")\
+          ((boundp (quote MULE)) \"MULE\")\
+          (t \"FSF Emacs\")),
+    "noecho")
+  case $EMACS_cv_SYS_flavor in
+  XEmacs)
+    EMACS_FLAVOR=xemacs;;
+  MULE)
+    EMACS_FLAVOR=mule;;
+  *)
+    EMACS_FLAVOR=emacs;;
+  esac
+  AC_MSG_RESULT($EMACS_cv_SYS_flavor)])
 
-   test "[$]2" = conftestfile
-   )
-then
-   # Ok.
-   :
-else
-   AC_MSG_ERROR([newly created file is older than distributed files!
-Check your system clock])
+AC_DEFUN(AC_PATH_LISPDIR, [
+  AC_CHECK_EMACS_FLAVOR
+  if test "$prefix" = "NONE"; then
+	AC_MSG_CHECKING([prefix for your Emacs])
+	AC_EMACS_LISP(prefix,(expand-file-name \"..\" invocation-directory),"noecho")
+	prefix=${EMACS_cv_SYS_prefix}
+	AC_MSG_RESULT($prefix)
+  fi
+  AC_ARG_WITH(lispdir,
+    [  --with-lispdir=DIR      Where to install lisp files
+                          (for XEmacs package, use --with-packagedir instead)],
+    lispdir=${withval})
+  AC_MSG_CHECKING([where lisp files should go])
+  if test -z "$lispdir"; then
+    dnl Set default value
+    theprefix=$prefix
+    if test "x$theprefix" = "xNONE"; then
+	theprefix=$ac_default_prefix
+    fi
+    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+    for thedir in share lib; do
+	potential=
+	if test -d ${theprefix}/${thedir}/${EMACS_FLAVOR}/site-lisp; then
+	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+	   break
+	fi
+    done
+  fi
+  if test ${EMACS_FLAVOR} = xemacs; then
+    AC_MSG_RESULT([$lispdir
+         (it will be ignored when \"make install-package[[-ja]]\" is done)])
+  else
+    AC_MSG_RESULT([$lispdir])
+  fi
+  AC_SUBST(lispdir)
+])
+
+dnl
+dnl Check whether a function exists in a library
+dnl All '_' characters in the first argument are converted to '-'
+dnl
+AC_DEFUN(AC_EMACS_CHECK_LIB, [
+if test -z "$3"; then
+	AC_MSG_CHECKING(for $2 in $1)
 fi
-rm -f conftest*
-AC_MSG_RESULT(yes)])
-
-dnl AM_MISSING_PROG(NAME, PROGRAM, DIRECTORY)
-dnl The program must properly implement --version.
-AC_DEFUN(AM_MISSING_PROG,
-[AC_MSG_CHECKING(for working $2)
-# Run test in a subshell; some versions of sh will print an error if
-# an executable is not found, even if stderr is redirected.
-# Redirect stdin to placate older versions of autoconf.  Sigh.
-if ($2 --version) < /dev/null > /dev/null 2>&1; then
-   $1=$2
-   AC_MSG_RESULT(found)
-else
-   $1="$3/missing $2"
-   AC_MSG_RESULT(missing)
+library=`echo $1 | tr _ -`
+AC_EMACS_LISP($1,(progn (fmakunbound (quote $2)) (condition-case nil (progn (require (quote $library)) (fboundp (quote $2))) (error (prog1 nil (message \"$library not found\"))))),"noecho")
+if test "${EMACS_cv_SYS_$1}" = "nil"; then
+	EMACS_cv_SYS_$1=no
 fi
-AC_SUBST($1)])
+if test "${EMACS_cv_SYS_$1}" = "t"; then
+	EMACS_cv_SYS_$1=yes
+fi
+HAVE_$1=${EMACS_cv_SYS_$1}
+AC_SUBST(HAVE_$1)
+if test -z "$3"; then
+	AC_MSG_RESULT($HAVE_$1)
+fi
+])
 
+dnl
+dnl Perform sanity checking and try to locate the W3 package
+dnl
+AC_DEFUN(AC_CHECK_W3, [
+AC_MSG_CHECKING(for acceptable W3 version)
+
+dnl Ignore cache.
+unset EMACS_cv_ACCEPTABLE_W3;
+unset EMACS_cv_SYS_w3_dir;
+unset EMACS_cv_SYS_w3_forms;
+
+AC_CACHE_VAL(EMACS_cv_ACCEPTABLE_W3,[
+AC_EMACS_CHECK_LIB(w3_forms, w3-form-encode-xwfu,"noecho")
+if test "${HAVE_w3_forms}" = "yes"; then
+	EMACS_cv_ACCEPTABLE_W3=yes
+else
+	EMACS_cv_ACCEPTABLE_W3=
+fi
+
+if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
+	AC_EMACS_LISP(w3_dir,(file-name-directory (locate-library \"w3-forms\")),"noecho")
+	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_dir
+fi
+])
+   AC_ARG_WITH(w3,[  --with-w3=DIR           Specify where to find the w3 package], [ EMACS_cv_ACCEPTABLE_W3=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` ])
+   W3=${EMACS_cv_ACCEPTABLE_W3}
+   AC_SUBST(W3)
+   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "x"; then
+	AC_MSG_RESULT(not found)
+   else
+	AC_MSG_RESULT(${W3})
+   fi
+])
+
+AC_DEFUN(AC_EXAMINE_PACKAGEDIR,
+ [dnl Examine PACKAGEDIR.
+  AC_EMACS_LISP(PACKAGEDIR,
+    (let (package-dir)\
+      (if (boundp (quote early-packages))\
+	  (let ((dirs (delq nil (append (if early-package-load-path\
+					    early-packages)\
+					(if late-package-load-path\
+					    late-packages)\
+					(if last-package-load-path\
+					    last-packages)))))\
+	    (while (and dirs (not package-dir))\
+	      (if (file-directory-p (car dirs))\
+		  (setq package-dir (car dirs)\
+			dirs (cdr dirs))))))\
+      (or package-dir \"\")),
+    "noecho")])
+
+AC_DEFUN(AC_PATH_PACKAGEDIR,
+ [dnl Check for PACKAGEDIR.
+  if test ${EMACS_FLAVOR} = xemacs; then
+    AC_MSG_CHECKING([where the XEmacs package is])
+    AC_ARG_WITH(packagedir,
+      [  --with-packagedir=DIR   package DIR for XEmacs],
+      [if test x$withval != xyes -a x$withval != x; then
+	PACKAGEDIR=$withval
+      else
+	AC_EXAMINE_PACKAGEDIR
+      fi],
+      AC_EXAMINE_PACKAGEDIR)
+    if test x$PACKAGEDIR = x; then
+      AC_MSG_RESULT(not found)
+    else
+      AC_MSG_RESULT($PACKAGEDIR)
+    fi
+  else
+    PACKAGEDIR=
+  fi
+  AC_SUBST(PACKAGEDIR)])
+
+AC_DEFUN(AC_ADD_LOAD_PATH,
+ [dnl Check for additional load path.
+  AC_ARG_WITH(addpath,
+   [  --with-addpath=PATH     search Emacs-Lisp libraries with PATH
+                          use colons to separate directory names],
+   [if test x$withval != xyes -a x$withval != x; then
+      AC_MSG_CHECKING([where to find the additional elisp libraries])
+      ADDITIONAL_LOAD_PATH=$withval
+      AC_MSG_RESULT($ADDITIONAL_LOAD_PATH)
+    fi],
+    ADDITIONAL_LOAD_PATH=)
+  AC_SUBST(ADDITIONAL_LOAD_PATH)])

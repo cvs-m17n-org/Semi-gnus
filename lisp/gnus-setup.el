@@ -1,5 +1,6 @@
 ;;; gnus-setup.el --- Initialization & Setup for Gnus 5
-;; Copyright (C) 1995, 96 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 2000 Free Software Foundation, Inc.
 
 ;; Author: Steven L. Baur <steve@miranova.com>
 ;; Keywords: news
@@ -33,52 +34,43 @@
 
 (eval-when-compile (require 'cl))
 
-(defvar running-xemacs (string-match "XEmacs\\|Lucid" emacs-version))
-
 (defvar gnus-use-installed-gnus t
   "*If non-nil Use installed version of Gnus.")
 
-(defvar gnus-use-installed-tm running-xemacs
-  "*If non-nil use installed version of tm.")
-
-(defvar gnus-use-installed-mailcrypt running-xemacs
+(defvar gnus-use-installed-mailcrypt (featurep 'xemacs)
   "*If non-nil use installed version of mailcrypt.")
 
-(defvar gnus-emacs-lisp-directory (if running-xemacs
+(defvar gnus-emacs-lisp-directory (if (featurep 'xemacs)
 				      "/usr/local/lib/xemacs/"
 				    "/usr/local/share/emacs/")
   "Directory where Emacs site lisp is located.")
 
 (defvar gnus-gnus-lisp-directory (concat gnus-emacs-lisp-directory
-					 "gnus-5.0.15/lisp/")
+					 "gnus/lisp/")
   "Directory where Gnus Emacs lisp is found.")
 
-(defvar gnus-tm-lisp-directory (concat gnus-emacs-lisp-directory
-				       "site-lisp/")
-  "Directory where TM Emacs lisp is found.")
-
 (defvar gnus-mailcrypt-lisp-directory (concat gnus-emacs-lisp-directory
-					      "site-lisp/mailcrypt-3.4/")
+					      "site-lisp/mailcrypt/")
   "Directory where Mailcrypt Emacs Lisp is found.")
 
 (defvar gnus-bbdb-lisp-directory (concat gnus-emacs-lisp-directory
-					 "site-lisp/bbdb-1.51/")
+					 "site-lisp/bbdb/")
   "Directory where Big Brother Database is found.")
 
 (defvar gnus-use-mhe nil
-  "Set this if you want to use MH-E for mail reading")
+  "Set this if you want to use MH-E for mail reading.")
 (defvar gnus-use-rmail nil
-  "Set this if you want to use RMAIL for mail reading")
+  "Set this if you want to use RMAIL for mail reading.")
 (defvar gnus-use-sendmail t
-  "Set this if you want to use SENDMAIL for mail reading")
+  "Set this if you want to use SENDMAIL for mail reading.")
 (defvar gnus-use-vm nil
-  "Set this if you want to use the VM package for mail reading")
+  "Set this if you want to use the VM package for mail reading.")
 (defvar gnus-use-sc nil
-  "Set this if you want to use Supercite")
+  "Set this if you want to use Supercite.")
 (defvar gnus-use-mailcrypt t
-  "Set this if you want to use Mailcrypt for dealing with PGP messages")
+  "Set this if you want to use Mailcrypt for dealing with PGP messages.")
 (defvar gnus-use-bbdb nil
-  "Set this if you want to use the Big Brother DataBase")
+  "Set this if you want to use the Big Brother DataBase.")
 
 (when (and (not gnus-use-installed-gnus)
 	   (null (member gnus-gnus-lisp-directory load-path)))
@@ -97,8 +89,8 @@
     (setq load-path (cons gnus-mailcrypt-lisp-directory load-path)))
   (autoload 'mc-install-write-mode "mailcrypt" nil t)
   (autoload 'mc-install-read-mode "mailcrypt" nil t)
-  (add-hook 'message-mode-hook 'mc-install-write-mode)
-  (add-hook 'gnus-summary-mode-hook 'mc-install-read-mode)
+;;;   (add-hook 'message-mode-hook 'mc-install-write-mode)
+;;;   (add-hook 'gnus-summary-mode-hook 'mc-install-read-mode)
   (when gnus-use-mhe
     (add-hook 'mh-folder-mode-hook 'mc-install-read-mode)
     (add-hook 'mh-letter-mode-hook 'mc-install-write-mode)))

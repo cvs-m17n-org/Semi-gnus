@@ -1,5 +1,5 @@
-;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system
-;; Copyright (C) 1999 Free Software Foundation, Inc.
+;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system -*- coding: iso-latin-1 -*-
+;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -29,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
 
 (require 'nnoo)
 (require 'message)
@@ -36,17 +37,11 @@
 (require 'gnus)
 (require 'nnmail)
 (require 'mm-util)
-(require 'nnweb)
 (eval-when-compile
   (ignore-errors
-    (require 'w3)
-    (require 'url)
-    (require 'w3-forms)))
+    (require 'nnweb)))
 ;; Report failure to find w3 at load time if appropriate.
-(eval '(progn
-	 (require 'w3)
-	 (require 'url)
-	 (require 'w3-forms)))
+(eval '(require 'nnweb))
 
 (nnoo-declare nnultimate)
 
@@ -62,6 +57,8 @@
 (defvoo nnultimate-groups nil)
 (defvoo nnultimate-headers nil)
 (defvoo nnultimate-articles nil)
+(defvar nnultimate-table-regexp 
+  "postings.*editpost\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio")
 
 ;;; Interface functions
 
@@ -80,6 +77,8 @@
 	   (old-total (or (nth 6 entry) 1))
 	   (furl "forumdisplay.cgi?action=topics&number=%d&DaysPrune=1000")
 	   (furls (list (concat nnultimate-address (format furl sid))))
+	   (nnultimate-table-regexp
+	    "postings.*editpost\\|forumdisplay\\|getbio")
 	   headers article subject score from date lines parent point
 	   contents tinfo fetchers map elem a href garticles topic old-max
 	   inc datel table string current-page total-contents pages
@@ -88,7 +87,8 @@
       (while (and (setq article (car articles))
 		  map)
 	(while (and map
-		    (> article (caar map)))
+		    (or (> article (caar map))
+			(< (cadar map) (caar map))))
 	  (pop map))
 	(when (setq mmap (car map))
 	  (setq farticle -1)
@@ -114,7 +114,7 @@
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer))
 	(setq nnultimate-articles nil)
-	(with-temp-buffer
+	(mm-with-unibyte-buffer
 	  (dolist (elem fetchers)
 	    (setq pages 1
 		  current-page 1
@@ -130,7 +130,8 @@
 				      "-" (number-to-string current-page)
 				      (match-string 0 href))))
 	      (goto-char (point-min))
-	      (setq contents (w3-parse-buffer (current-buffer)))
+	      (setq contents
+		    (ignore-errors (w3-parse-buffer (current-buffer))))
 	      (setq table (nnultimate-find-forum-table contents))
 	      (setq string (mapconcat 'identity (nnweb-text table) ""))
 	      (when (string-match "topic is \\([0-9]\\) pages" string)
@@ -143,7 +144,7 @@
 	    ;;(setq total-contents (nreverse total-contents))
 	    (dolist (art (cdr elem))
 	      (if (not (nth (1- (cdr art)) total-contents))
-		  ();(debug)
+		  ()			;(debug)
 		(push (list (car art)
 			    (nth (1- (cdr art)) total-contents)
 			    subject)
@@ -165,7 +166,7 @@
 	      (setq date (substring (car datel) (match-end 0))
 		    datel nil))
 	    (pop datel))
-	  (setq date (delete "" (split-string date "[- \n\t\r    ]")))
+	  (setq date (delete "" (split-string date "[- \n\t\r    ]")))
 	  (if (or (member "AM" date)
 		  (member "PM" date))
 	      (setq date (format "%s %s %s %s"
@@ -197,9 +198,10 @@
 	(setq nnultimate-headers (sort headers 'car-less-than-car))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
-	  (erase-buffer)
-	  (dolist (header nnultimate-headers)
-	    (nnheader-insert-nov (cdr header)))))
+	  (mm-with-unibyte-current-buffer
+	    (erase-buffer)
+	    (dolist (header nnultimate-headers)
+	      (nnheader-insert-nov (cdr header))))))
       'nov)))
 
 (deffoo nnultimate-request-group (group &optional server dont-check)
@@ -218,6 +220,10 @@
        "211 %d %d %d %s\n" (cadr elem) 1 (cadr elem)
        (prin1-to-string group))))))
 
+(deffoo nnultimate-request-close ()
+  (setq nnultimate-groups-alist nil
+	nnultimate-groups nil))
+
 (deffoo nnultimate-request-article (article &optional group server buffer)
   (nnultimate-possibly-change-server group server)
   (let ((contents (cdr (assq article nnultimate-articles))))
@@ -230,13 +236,14 @@
 	(goto-char (point-min))
 	(insert "Content-Type: text/html\nMIME-Version: 1.0\n")
 	(let ((header (cdr (assq article nnultimate-headers))))
-	  (nnheader-insert-header header))
+	  (mm-with-unibyte-current-buffer
+	    (nnheader-insert-header header)))
 	(nnheader-report 'nnultimate "Fetched article %s" article)
 	(cons group article)))))
 
 (deffoo nnultimate-request-list (&optional server)
   (nnultimate-possibly-change-server nil server)
-  (with-temp-buffer
+  (mm-with-unibyte-buffer
     (nnweb-insert
      (if (string-match "/$" nnultimate-address)
 	 (concat nnultimate-address "Ultimate.cgi")
@@ -299,7 +306,7 @@
 	 (furls (list (concat nnultimate-address (format furl sid))))
 	 contents forum-contents furl-fetched a subject href
 	 garticles topic tinfo old-max inc parse)
-    (with-temp-buffer
+    (mm-with-unibyte-buffer
       (while furls
 	(erase-buffer)
 	(nnweb-insert (pop furls))
@@ -328,7 +335,7 @@
       ;; the group is entered, there's 2 new articles in topic one
       ;; and 1 in topic three.  Then Gnus article number 8-9 be 5-6
       ;; in topic one and 10 will be the 2 in topic three.
-      (dolist (row (reverse forum-contents))
+      (dolist (row (nreverse forum-contents))
 	(setq row (nth 2 row))
 	(when (setq a (nnweb-parse-find 'a row))
 	  (setq subject (car (last (nnweb-text a)))
@@ -341,25 +348,26 @@
 		(setq art (1+ (string-to-number (car artlist)))))
 	      (pop artlist))
 	    (setq garticles art))
-	  (string-match "/\\([0-9]+\\).html" href)
-	  (setq topic (string-to-number (match-string 1 href)))
-	  (if (setq tinfo (assq topic topics))
-	      (progn
-		(setq old-max (cadr tinfo))
-		(setcar (cdr tinfo) garticles))
-	    (setq old-max 0)
-	    (push (list topic garticles subject href) topics)
-	    (setcar (nthcdr 4 entry) topics))
-	  (when (not (= old-max garticles))
-	    (setq inc (- garticles old-max))
-	    (setq mapping (nconc mapping
-				 (list
-				  (list
-				   old-total (1- (incf old-total inc))
-				   topic (1+ old-max)))))
-	    (incf old-max inc)
-	    (setcar (nthcdr 5 entry) mapping)
-	    (setcar (nthcdr 6 entry) old-total)))))
+	  (when garticles
+	    (string-match "/\\([0-9]+\\).html" href)
+	    (setq topic (string-to-number (match-string 1 href)))
+	    (if (setq tinfo (assq topic topics))
+		(progn
+		  (setq old-max (cadr tinfo))
+		  (setcar (cdr tinfo) garticles))
+	      (setq old-max 0)
+	      (push (list topic garticles subject href) topics)
+	      (setcar (nthcdr 4 entry) topics))
+	    (when (not (= old-max garticles))
+	      (setq inc (- garticles old-max))
+	      (setq mapping (nconc mapping
+				   (list
+				    (list
+				     old-total (1- (incf old-total inc))
+				     topic (1+ old-max)))))
+	      (incf old-max inc)
+	      (setcar (nthcdr 5 entry) mapping)
+	      (setcar (nthcdr 6 entry) old-total))))))
     (setcar (nthcdr 7 entry) current-time)
     (setcar (nthcdr 1 entry) (1- old-total))
     (nnultimate-write-groups)
@@ -372,8 +380,8 @@
     (nnultimate-open-server server))
   (unless nnultimate-groups-alist
     (nnultimate-read-groups)
-  (setq nnultimate-groups (cdr (assoc nnultimate-address
-				      nnultimate-groups-alist)))))
+    (setq nnultimate-groups (cdr (assoc nnultimate-address
+					nnultimate-groups-alist)))))
 
 (deffoo nnultimate-open-server (server &optional defs connectionless)
   (nnheader-init-server-buffer)
@@ -387,7 +395,7 @@
   (setq nnultimate-groups-alist nil)
   (let ((file (expand-file-name "groups" nnultimate-directory)))
     (when (file-exists-p file)
-      (with-temp-buffer
+      (mm-with-unibyte-buffer
 	(insert-file-contents file)
 	(goto-char (point-min))
 	(setq nnultimate-groups-alist (read (current-buffer)))))))
@@ -435,11 +443,13 @@
 		     (nth 2 parse))))
     (let ((href (cdr (assq 'href (nth 1 (nnweb-parse-find 'a parse 20)))))
 	  case-fold-search)
-      (when (and href (string-match
-		       "postings\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio"
-				    href))
+      (when (and href (string-match nnultimate-table-regexp href))
 	t))))
 
 (provide 'nnultimate)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; nnultimate.el ends here

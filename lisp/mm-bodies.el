@@ -1,5 +1,5 @@
 ;;; mm-bodies.el --- Functions for decoding MIME things
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -26,86 +26,112 @@
 
 (eval-and-compile
   (or (fboundp  'base64-decode-region)
-      (require 'base64))
-  (autoload 'binhex-decode-region "binhex"))
+      (require 'base64)))
+
+(eval-when-compile
+  (defvar mm-uu-decode-function)
+  (defvar mm-uu-binhex-decode-function))
 
 (require 'mm-util)
 (require 'rfc2047)
-(require 'qp)
-(require 'uudecode)
+(require 'mm-encode)
 
 ;; 8bit treatment gets any char except: 0x32 - 0x7f, CR, LF, TAB, BEL,
 ;; BS, vertical TAB, form feed, and ^_
-(defvar mm-8bit-char-regexp "[^\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f]")
+(defvar mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f")
 
-(defvar mm-body-charset-encoding-alist nil
+(defcustom mm-body-charset-encoding-alist
+  '((iso-2022-jp . 7bit)
+    (iso-2022-jp-2 . 7bit))
   "Alist of MIME charsets to encodings.
-Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'.")
+Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'."
+  :type '(repeat (cons (symbol :tag "charset")
+		       (choice :tag "encoding"
+			       (const 7bit)
+			       (const 8bit)
+			       (const quoted-printable)
+			       (const base64))))
+  :group 'mime)
 
-(defun mm-encode-body ()
+(defun mm-encode-body (&optional charset)
   "Encode a body.
 Should be called narrowed to the body that is to be encoded.
 If there is more than one non-ASCII MULE charset, then list of found
 MULE charsets are returned.
+If CHARSET is non-nil, it is used.
 If successful, the MIME charset is returned.
 If no encoding was done, nil is returned."
-  (if (not (featurep 'mule))
+  (if (not (mm-multibyte-p))
       ;; In the non-Mule case, we search for non-ASCII chars and
-      ;; return the value of `mm-default-charset' if any are found.
-      (save-excursion
-	(goto-char (point-min))
-	(if (re-search-forward "[^\x0-\x7f]" nil t)
-	    (or mail-parse-charset
-		(mm-read-charset "Charset used in the article: "))
-	  ;; The logic in `mml-generate-mime-1' confirms that it's OK
-	  ;; to return nil here.
-	  nil))
+      ;; return the value of `mail-parse-charset' if any are found.
+      (or charset
+	  (save-excursion
+	    (goto-char (point-min))
+	    (if (re-search-forward "[^\x0-\x7f]" nil t)
+		(or mail-parse-charset
+		    (message-options-get 'mm-encody-body-charset)
+		    (message-options-set 
+		     'mm-encody-body-charset
+		     (mm-read-charset "Charset used in the article: ")))
+	      ;; The logic in `mml-generate-mime-1' confirms that it's OK
+	      ;; to return nil here.
+	      nil)))
     (save-excursion
-      (goto-char (point-min))
-      (let ((charsets (mm-find-mime-charset-region (point-min) (point-max)))
+      (if charset
+	  (progn
+	    (mm-encode-coding-region (point-min) (point-max) charset)
 	    charset)
-	(cond
-	 ;; No encoding.
-	 ((null charsets)
-	  nil)
-	 ;; Too many charsets.
-	 ((> (length charsets) 1)
-	  charsets)
-	 ;; We encode.
-	 (t
-	  (let ((charset (car charsets))
-		start)
-	    (when (or t
-		      ;; We always decode.
-		      (not (mm-coding-system-equal
-			    charset buffer-file-coding-system)))
-	      (while (not (eobp))
-		(if (eq (char-charset (char-after)) 'ascii)
-		    (when start
-		      (save-restriction
-			(narrow-to-region start (point))
-			(mm-encode-coding-region start (point) charset)
-			(goto-char (point-max)))
-		      (setq start nil))
-		  (unless start
-		    (setq start (point))))
-		(forward-char 1))
-	      (when start
-		(mm-encode-coding-region start (point) charset)
-		(setq start nil)))
+	(goto-char (point-min))
+	(let ((charsets (mm-find-mime-charset-region (point-min) (point-max)))
+	      start)
+	  (cond
+	   ;; No encoding.
+	   ((null charsets)
+	    nil)
+	   ;; Too many charsets.
+	   ((> (length charsets) 1)
+	    charsets)
+	   ;; We encode.
+	   (t
+	    (setq charset (car charsets))
+	    (while (not (eobp))
+	      (if (eq (mm-charset-after) 'ascii)
+		  (when start
+		    (save-restriction
+		      (narrow-to-region start (point))
+		      (mm-encode-coding-region
+		       start (point) (mm-charset-to-coding-system charset))
+		      (goto-char (point-max)))
+		    (setq start nil))
+		(unless start
+		  (setq start (point))))
+	      (forward-char 1))
+	    (when start
+	      (mm-encode-coding-region start (point)
+				       (mm-charset-to-coding-system charset))
+	      (setq start nil))
 	    charset)))))))
 
-(defun mm-body-encoding (charset)
+(eval-when-compile (defvar message-posting-charset))
+
+(defun mm-body-encoding (charset &optional encoding)
   "Do Content-Transfer-Encoding and return the encoding of the current buffer."
   (let ((bits (mm-body-7-or-8)))
+    (require 'message)
     (cond
-     ((eq bits '7bit)
+     ((and (not mm-use-ultra-safe-encoding) (eq bits '7bit))
       bits)
-     ((eq charset mail-parse-charset)
+     ((and (not mm-use-ultra-safe-encoding)
+	   (or (eq t (cdr message-posting-charset))
+	       (memq charset (cdr message-posting-charset))
+	       (eq charset mail-parse-charset)))
       bits)
      (t
-      (let ((encoding (or (cdr (assq charset mm-body-charset-encoding-alist))
+      (let ((encoding (or encoding
+			  (cdr (assq charset mm-body-charset-encoding-alist))
 			  (mm-qp-or-base64))))
+	(when mm-use-ultra-safe-encoding
+	  (setq encoding (mm-safer-encoding encoding)))
 	(mm-encode-content-transfer-encoding encoding "text/plain")
 	encoding)))))
 
@@ -115,9 +141,10 @@ If no encoding was done, nil is returned."
    ((not (featurep 'mule))
     (if (save-excursion
 	  (goto-char (point-min))
-	  (re-search-forward mm-8bit-char-regexp nil t))
-	'8bit
-      '7bit))
+	  (skip-chars-forward mm-7bit-chars)
+	  (eobp))
+	'7bit
+      '8bit))
    (t
     ;; Mule version
     (if (and (null (delq 'ascii
@@ -127,7 +154,7 @@ If no encoding was done, nil is returned."
 	     ;;!!!Emacs 20.3.  Sometimes.
 	     (save-excursion
 	       (goto-char (point-min))
-	       (skip-chars-forward "\0-\177")
+	       (skip-chars-forward mm-7bit-chars)
 	       (eobp)))
 	'7bit
       '8bit))))
@@ -143,22 +170,33 @@ If no encoding was done, nil is returned."
 	   ((eq encoding 'quoted-printable)
 	    (quoted-printable-decode-region (point-min) (point-max)))
 	   ((eq encoding 'base64)
-	    (base64-decode-region (point-min)
-				  ;; Some mailers insert whitespace
-				  ;; junk at the end which
-				  ;; base64-decode-region dislikes.
-				  (save-excursion
-				    (goto-char (point-max))
-				    (skip-chars-backward "\n\t ")
-				    (delete-region (point) (point-max))
-				    (point))))
+	    (base64-decode-region
+	     (point-min)
+	     ;; Some mailers insert whitespace
+	     ;; junk at the end which
+	     ;; base64-decode-region dislikes.
+	     ;; Also remove possible junk which could
+	     ;; have been added by mailing list software.
+	     (save-excursion
+	       (goto-char (point-min))
+	       (while (re-search-forward "^[\t ]*\r?\n" nil t)
+		 (delete-region (match-beginning 0) (match-end 0)))
+	       (goto-char (point-max))
+	       (when (re-search-backward "^[A-Za-z0-9+/]+=*[\t ]*$" nil t)
+		 (forward-line)
+		 (delete-region (point) (point-max)))
+	       (point-max))))
 	   ((memq encoding '(7bit 8bit binary))
+	    ;; Do nothing.
 	    )
 	   ((null encoding)
+	    ;; Do nothing.
 	    )
 	   ((memq encoding '(x-uuencode x-uue))
+	    (require 'mm-uu)
 	    (funcall mm-uu-decode-function (point-min) (point-max)))
 	   ((eq encoding 'x-binhex)
+	    (require 'mm-uu)
 	    (funcall mm-uu-binhex-decode-function (point-min) (point-max)))
 	   ((functionp encoding)
 	    (funcall encoding (point-min) (point-max)))
@@ -178,40 +216,54 @@ If no encoding was done, nil is returned."
   "Decode the current article that has been encoded with ENCODING.
 The characters in CHARSET should then be decoded."
   (if (stringp charset)
-    (setq charset (intern (downcase charset))))
-  (if (or (not charset) (memq charset mail-parse-ignored-charsets))
+      (setq charset (intern (downcase charset))))
+  (if (or (not charset) 
+	  (eq 'gnus-all mail-parse-ignored-charsets)
+	  (memq 'gnus-all mail-parse-ignored-charsets)
+	  (memq charset mail-parse-ignored-charsets))
       (setq charset mail-parse-charset))
   (save-excursion
     (when encoding
       (mm-decode-content-transfer-encoding encoding type))
     (when (featurep 'mule)
-      (let (mule-charset)
-	(when (and charset
-		   (setq mule-charset (mm-charset-to-coding-system charset))
+      (let ((coding-system (mm-charset-to-coding-system charset)))
+	(if (and (not coding-system)
+		 (listp mail-parse-ignored-charsets)
+		 (memq 'gnus-unknown mail-parse-ignored-charsets))
+	    (setq coding-system 
+		  (mm-charset-to-coding-system mail-parse-charset)))
+	(when (and charset coding-system
 		   ;; buffer-file-coding-system
 		   ;;Article buffer is nil coding system
 		   ;;in XEmacs
 		   (mm-multibyte-p)
-		   (or (not (eq mule-charset 'ascii))
-		       (setq mule-charset mail-parse-charset))
-		   (not (eq mule-charset 'gnus-decoded)))
-	  (mm-decode-coding-region (point-min) (point-max) mule-charset))))))
+		   (or (not (eq coding-system 'ascii))
+		       (setq coding-system mail-parse-charset))
+		   (not (eq coding-system 'gnus-decoded)))
+	  (mm-decode-coding-region (point-min) (point-max) coding-system))))))
 
 (defun mm-decode-string (string charset)
   "Decode STRING with CHARSET."
-  (if (stringp charset)
+  (when (stringp charset)
     (setq charset (intern (downcase charset))))
-  (if (or (not charset) (memq charset mail-parse-ignored-charsets))
-      (setq charset mail-parse-charset))
+  (when (or (not charset) 
+	    (eq 'gnus-all mail-parse-ignored-charsets)
+	    (memq 'gnus-all mail-parse-ignored-charsets)
+	    (memq charset mail-parse-ignored-charsets))
+    (setq charset mail-parse-charset))
   (or
    (when (featurep 'mule)
-     (let (mule-charset)
-       (when (and charset
-		  (setq mule-charset (mm-charset-to-coding-system charset))
+     (let ((coding-system (mm-charset-to-coding-system charset)))
+       (if (and (not coding-system)
+		(listp mail-parse-ignored-charsets)
+		(memq 'gnus-unknown mail-parse-ignored-charsets))
+	   (setq coding-system 
+		 (mm-charset-to-coding-system mail-parse-charset)))
+       (when (and charset coding-system
 		  (mm-multibyte-p)
-		  (or (not (eq mule-charset 'ascii))
-		      (setq mule-charset mail-parse-charset)))
-	 (mm-decode-coding-string string mule-charset))))
+		  (or (not (eq coding-system 'ascii))
+		      (setq coding-system mail-parse-charset)))
+	 (mm-decode-coding-string string coding-system))))
    string))
 
 (provide 'mm-bodies)

@@ -1,30 +1,39 @@
 Emacs 19.34 をベースにした Mule 2.3 で T-gnus を作る方法。
 
-FIX loaddefs.el
-===============
+FIXING loaddefs.el
+==================
 
 残念なことにいくつかの `message' で使う変数が lisp/loaddefs.el で定義
 されていて Mule の実行ファイルに組み込まれてしまっています。これは余計
 なお世話だし、しかも悪影響があります。そこであなたはそれらの定義を
 lisp/loaddefs.el から削除して、Mule を作り直さなければなりません。
 しかし、もしあなたが Mule を作り直すことを望まないならば、.emacs ファ
-イルの先頭に以下の各行を書き込むことで代用することができます。
+イルの先頭に以下の各行を書き込むことで、Mule を作り直す代わりにするこ
+とができます。
 
-(mapcar
- (lambda (symbol)
-   (makunbound (intern (format "message-%s" symbol))))
- '(citation-line-function
-   cite-function courtesy-message default-headers default-mail-headers
-   default-news-headers deletable-headers fcc-handler-function
-   followup-to-function from-style generate-headers-first generate-new-buffers
-   ignored-bounced-headers ignored-cited-headers ignored-mail-headers
-   ignored-news-headers ignored-resent-headers ignored-supersedes-headers
-   included-forward-headers indent-citation-function interactive
-   kill-buffer-on-exit post-method reply-to-function required-mail-headers
-   required-news-headers send-mail-function send-news-function
-   signature signature-before-forwarded-message signature-file
-   signature-separator syntax-checks use-followup-to user-organization-file
-   wide-reply-to-function yank-prefix))
+(let ((symbols '(citation-line-function
+		 cite-function courtesy-message default-headers
+		 default-mail-headers default-news-headers
+		 deletable-headers fcc-handler-function
+		 followup-to-function from-style
+		 generate-headers-first generate-new-buffers
+		 ignored-bounced-headers ignored-cited-headers
+		 ignored-mail-headers ignored-news-headers
+		 ignored-resent-headers ignored-supersedes-headers
+		 included-forward-headers indent-citation-function
+		 interactive kill-buffer-on-exit post-method
+		 reply-to-function required-mail-headers
+		 required-news-headers send-mail-function
+		 send-news-function signature
+		 signature-before-forwarded-message signature-file
+		 signature-separator syntax-checks use-followup-to
+		 user-organization-file wide-reply-to-function
+		 yank-prefix))
+      symbol)
+  (while symbols
+    (setq symbol (car symbols)
+	  symbols (cdr symbol))
+    (makunbound (intern (format "message-%s" symbol)))))
 
 
 INSTALL CUSTOM, APEL, FLIM, SEMI
@@ -57,20 +66,87 @@ ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 INSTALL T-gnus
 ==============
 
-Mule 2.3 based on Emacs 19.34 で gnus を作るには二つの方法があります。
+Emacs 19.34 をベースにした Mule 2.3 で gnus を作るには三つの方法があり
+ます。
 
- 1. configure オプションの `--with-addpath=' を使って EMU, APEL および
-    CUSTOM の各パッケージがインストールされている場所を指定して下さい。
-    例えば
+1. もしあなたが EMU, APEL, FLIM および SEMI または WEMI の各パッケー
+   ジを標準の load-path の下にインストールしているとします。例えばこう。
 
-    % configure --with-emacs=mule\
-      --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
-    % make
+   EMU:  /usr/local/share/mule/19.34/site-lisp/
+   APEL: /usr/local/share/mule/site-lisp/apel/
+   FLIM: /usr/local/share/mule/site-lisp/flim/
+   SEMI: /usr/local/share/mule/site-lisp/semi/
 
- 2. `sample.lpath.el' を `~/.lpath.el' にコピーして、あなたの環境に
-    合うように書き換えて下さい。そして次のようにタイプして下さい。
+   しかも、もしあなたが古い CUSTOM を新しい CUSTOM で置き換えているか、
+   新しい CUSTOM を /usr/local/share/mule/19.34/site-lisp/ のような標
+   準の load-path の直下にインストールしているならば、あなたは何もす
+   る必要がありません。今すぐに以下のコマンドをタイプして下さい。
 
-    % configure
-    % make EMACS=mule
+   % ./configure --with-emacs=mule
+   % make install
 
-    この場合 install は手作業で行なって下さい。
+   しかし、もしあなたが新しい CUSTOM を標準の load-path の下のサブディ
+   レクトリにインストールしてあるならば、以下のように configure オプ
+   ションの `--with-addpath=' を使うか、
+
+   % ./configure --with-emacs=mule\
+     --with-addpath=/usr/local/share/mule/site-lisp/custom/
+   % make install
+
+   あるいはあなたは以下の内容を含む、CUSTOM サブディレクトリの親ディ
+   レクトリの下の subdirs.el ファイルを使うことができます。
+
+   (normal-top-level-add-to-load-path
+    '("custom/" "and the other subdirectories.../"))
+
+   そして単に
+
+   % ./configure --with-emacs=mule
+   % make install
+
+   とタイプして下さい。
+
+2. もしあなたが EMU, APEL, FLIM および SEMI または WEMI の各パッケー
+   ジを標準ではない load-path にインストールしているならば、コロンで
+   区切られた EMU, APEL および CUSTOM がインストールされているディレ
+   クトリ名と configure オプションの `--with-addpath=' を使って下さい。
+   例えば
+
+   % ./configure --with-emacs=mule\
+     --with-addpath=~/elisp/emu/:~/elisp/apel/:~/elisp/custom/
+   % make
+
+   この場合、もし FLIM, SEMI または WEMI が APEL の親ディレクトリと同
+   じディレクトリの下にインストールされているならば、それらの path を
+   追加する必要はありません。
+
+3. これは、EMU, APEL, FLIM および SEMI または WEMI の各パッケージを標
+   準ではない load-path にインストールしている場合の、別の方法です。
+   配布に含まれているファイル `sample.lpath.el' を `~/.lpath.el' にコ
+   ピーして、あなたの環境に合うように書き換えて下さい。そして次のコマ
+   ンドをタイプして下さい。
+
+   % ./configure --with-emacs=mule
+   % make install
+
+USING Emacs W3
+==============
+
+;; ところで、肝心なことなんですが、誰か Emacs 19.34 をベースにした
+;; Mule 2.3 に適合する Emacs W3 がどこにあるか知りませんか? :-p
+
+いくつかの T-gnus のモジュール (例えば nnshimbun) は Emacs W3 を必要と
+します。もしあなたがすでに Emacs W3 をインストールしてあるのならば、あ
+なたはそれらを使えるように T-gnus を作ることができます。そのためには、
+configure オプションの `--with-w3=' を使うか `~/.lpath.el' ファイルを
+編集して、Emacs W3 がインストールされている path を指定しなければなり
+ません。以下は configure オプションを使う例です。
+
+   % ./configure --with-emacs=mule\
+     --with-w3=/usr/local/share/mule/site-lisp/w3/
+   % make install
+
+もし configure が「W3... not found」と言っても気にしないで下さい。たと
+え `~/.lpath.el' ファイルで Emacs W3 の path が指定されていても、
+configure オプションの `--with-w3=' を使わないと、現在それは正常に働き
+ませんので。

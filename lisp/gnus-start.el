@@ -1,5 +1,6 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -27,6 +28,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
 (require 'gnus)
 (require 'gnus-win)
 (require 'gnus-int)
@@ -41,6 +43,12 @@
   :group 'gnus-start
   :type 'file)
 
+(defcustom gnus-product-directory
+  (nnheader-concat gnus-directory (concat "." gnus-product-name))
+  "Product depend data files directory."
+  :group 'gnus-start
+  :type '(choice directory (const nil)))
+
 (defcustom gnus-init-file (nnheader-concat gnus-home-directory ".gnus")
   "Your Gnus Emacs-Lisp startup file name.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
@@ -53,7 +61,7 @@ If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
 	       (directory-file-name installation-directory))
 	      "site-lisp/gnus-init")
     (error nil))
-  "*The site-wide Gnus Emacs-Lisp startup file name, or nil if none.
+  "The site-wide Gnus Emacs-Lisp startup file name, or nil if none.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
   :group 'gnus-start
   :type '(choice file (const nil)))
@@ -197,6 +205,7 @@ Gnus always reads its own startup file, which is called
 be readily understood by other newsreaders.  If you don't plan on
 using other newsreaders, set this variable to nil to save some time on
 entry."
+  :version "21.1"
   :group 'gnus-newsrc
   :type 'boolean)
 
@@ -226,12 +235,12 @@ not match this regexp will be removed before saving the list."
   :type 'boolean)
 
 (defcustom gnus-ignored-newsgroups
- (mapconcat 'identity
-	    '("^to\\."			; not "real" groups
-	      "^[0-9. \t]+ "		; all digits in name
-	      "^[\"][]\"[#'()]"		; bogus characters
-	      )
-	    "\\|")
+  (mapconcat 'identity
+	     '("^to\\."			; not "real" groups
+	       "^[0-9. \t]+ "		; all digits in name
+	       "^[\"][]\"[#'()]"	; bogus characters
+	       )
+	     "\\|")
   "*A regexp to match uninteresting newsgroups in the active file.
 Any lines in the active file matching this regular expression are
 removed from the newsgroup list before anything else is done to it,
@@ -591,13 +600,25 @@ the first newsgroup."
 (defvar nnoo-state-alist)
 (defvar gnus-current-select-method)
 
-(defun gnus-clear-system ()
-  "Clear all variables and buffers."
-  ;; Clear Gnus variables.
+(defun gnus-clear-quick-file-variables ()
+  "Clear all variables in quick startup files."
   (let ((variables gnus-variable-list))
+    ;; Clear Gnus variables.
     (while variables
       (set (car variables) nil)
       (setq variables (cdr variables))))
+  (let ((files gnus-product-variable-file-list))
+    (while files
+      (let ((variables (nthcdr 3 (car files))))
+	(while variables
+	  (set (car variables) nil)
+	  (setq variables (cdr variables))))
+      (setq files (cdr files)))))
+
+(defun gnus-clear-system ()
+  "Clear all variables and buffers."
+  ;; Clear gnus variables.
+  (gnus-clear-quick-file-variables)
   ;; Clear other internal variables.
   (setq gnus-list-of-killed-groups nil
 	gnus-have-read-active-file nil
@@ -621,6 +642,7 @@ the first newsgroup."
 	gnus-newsgroup-unreads nil
 	nnoo-state-alist nil
 	gnus-current-select-method nil
+	nnmail-split-history nil
 	gnus-ephemeral-servers nil)
   (gnus-shutdown 'gnus)
   ;; Kill the startup file.
@@ -678,9 +700,9 @@ prompt the user for the name of an NNTP server to use."
     (when gnus-simple-splash
       (setq gnus-simple-splash nil)
       (cond
-       (gnus-xemacs
+       ((featurep 'xemacs)
 	(gnus-xmas-splash))
-       ((and (eq window-system 'x)
+       ((and window-system
 	     (= (frame-height) (1+ (window-height))))
 	(gnus-x-splash))))
 
@@ -734,17 +756,14 @@ prompt the user for the name of an NNTP server to use."
 
 ;;;###autoload
 (defun gnus-unload ()
-  "Unload all Gnus features."
+  "Unload all Gnus features.
+\(For some value of `all' or `Gnus'.)  Currently, features whose names
+have prefixes `gnus-', `nn', `mm-' or `rfc' are unloaded.  Use
+cautiously -- unloading may cause trouble."
   (interactive)
-  (unless (boundp 'load-history)
-    (error "Sorry, `gnus-unload' is not implemented in this Emacs version"))
-  (let ((history load-history)
-	feature)
-    (while history
-      (and (string-match "^\\(gnus\\|nn\\)" (caar history))
-	   (setq feature (cdr (assq 'provide (car history))))
-	   (unload-feature feature 'force))
-      (setq history (cdr history)))))
+  (dolist (feature features)
+    (if (string-match "^\\(gnus-\\|nn\\|mm-\\|rfc\\)" (symbol-name feature))
+	(unload-feature feature 'force))))
 
 
 ;;;
@@ -962,16 +981,16 @@ for new groups, and subscribe the new groups as zombies."
   (let* ((gnus-subscribe-newsgroup-method
 	  gnus-subscribe-newsgroup-method)
 	 (check (cond
-		((or (and (= (or arg 1) 4)
-			  (not (listp gnus-check-new-newsgroups)))
-		     (null gnus-read-active-file)
-		     (eq gnus-read-active-file 'some))
-		 'ask-server)
-		((= (or arg 1) 16)
-		 (setq gnus-subscribe-newsgroup-method
-		       'gnus-subscribe-zombies)
-		 t)
-		(t gnus-check-new-newsgroups))))
+		 ((or (and (= (or arg 1) 4)
+			   (not (listp gnus-check-new-newsgroups)))
+		      (null gnus-read-active-file)
+		      (eq gnus-read-active-file 'some))
+		  'ask-server)
+		 ((= (or arg 1) 16)
+		  (setq gnus-subscribe-newsgroup-method
+			'gnus-subscribe-zombies)
+		  t)
+		 (t gnus-check-new-newsgroups))))
     (unless (gnus-check-first-time-used)
       (if (or (consp check)
 	      (eq check 'ask-server))
@@ -1106,39 +1125,40 @@ for new groups, and subscribe the new groups as zombies."
 	 hashtb))
       (when new-newsgroups
 	(gnus-subscribe-hierarchical-interactive new-newsgroups)))
-     (if (> groups 0)
-	 (gnus-message 5 "%d new newsgroup%s arrived"
-		       groups (if (> groups 1) "s have" " has"))
-       (gnus-message 5 "No new newsgroups"))
+    (if (> groups 0)
+	(gnus-message 5 "%d new newsgroup%s arrived"
+		      groups (if (> groups 1) "s have" " has"))
+      (gnus-message 5 "No new newsgroups"))
     (when got-new
       (setq gnus-newsrc-last-checked-date new-date))
     got-new))
 
 (defun gnus-check-first-time-used ()
   (catch 'ended
-    (let ((files (list gnus-current-startup-file
-		       (concat gnus-current-startup-file ".el")
-		       (concat gnus-current-startup-file ".eld")
-		       gnus-startup-file
-		       (concat gnus-startup-file ".el")
-		       (concat gnus-startup-file ".eld"))))
-      (while files
-	(when (file-exists-p (pop files))
-	  (throw 'ended nil))))
+    ;; First check if any of the following files exist.  If they do,
+    ;; it's not the first time the user has used Gnus.
+    (dolist (file (list gnus-current-startup-file
+			(concat gnus-current-startup-file ".el")
+			(concat gnus-current-startup-file ".eld")
+			gnus-startup-file
+			(concat gnus-startup-file ".el")
+			(concat gnus-startup-file ".eld")))
+      (when (file-exists-p file)
+	(throw 'ended nil)))
     (gnus-message 6 "First time user; subscribing you to default groups")
     (unless (gnus-read-active-file-p)
       (let ((gnus-read-active-file t))
 	(gnus-read-active-file)))
     (setq gnus-newsrc-last-checked-date (current-time-string))
-    (let ((groups gnus-default-subscribed-newsgroups)
+    ;; Subscribe to the default newsgroups.
+    (let ((groups (or gnus-default-subscribed-newsgroups
+		      gnus-backup-default-subscribed-newsgroups))
 	  group)
-      (if (eq groups t)
-	  nil
-	(setq groups (or groups gnus-backup-default-subscribed-newsgroups))
+      (when (eq groups t)
+	;; If t, we subscribe (or not) all groups as if they were new.
 	(mapatoms
 	 (lambda (sym)
-	   (if (null (setq group (symbol-name sym)))
-	       ()
+	   (when (setq group (symbol-name sym))
 	     (let ((do-sub (gnus-matches-options-n group)))
 	       (cond
 		((eq do-sub 'subscribe)
@@ -1149,17 +1169,16 @@ for new groups, and subscribe the new groups as zombies."
 		(t
 		 (push group gnus-killed-list))))))
 	 gnus-active-hashtb)
-	(while groups
-	  (when (gnus-active (car groups))
+	(dolist (group groups)
+	  ;; Only subscribe the default groups that are activated.
+	  (when (gnus-active group)
 	    (gnus-group-change-level
-	     (car groups) gnus-level-default-subscribed gnus-level-killed))
-	  (setq groups (cdr groups)))
+	     group gnus-level-default-subscribed gnus-level-killed)))
 	(save-excursion
 	  (set-buffer gnus-group-buffer)
 	  (gnus-group-make-help-group))
 	(when gnus-novice-user
 	  (gnus-message 7 "`A k' to list killed groups"))))))
-
 
 (defun gnus-subscribe-group (group &optional previous method)
   "Subcribe GROUP and put it after PREVIOUS."
@@ -1247,7 +1266,11 @@ for new groups, and subscribe the new groups as zombies."
 	(unless (gnus-group-foreign-p group)
 	  (if (= level gnus-level-zombie)
 	      (push group gnus-zombie-list)
-	    (push group gnus-killed-list))))
+	    (if (= oldlevel gnus-level-killed)
+		;; Remove from active hashtb.
+		(unintern group gnus-active-hashtb)
+	      ;; Don't add it into killed-list if it was killed.
+	      (push group gnus-killed-list)))))
        (t
 	;; If the list is to be entered into the newsrc assoc, and
 	;; it was killed, we have to create an entry in the newsrc
@@ -1263,14 +1286,14 @@ for new groups, and subscribe the new groups as zombies."
 	    (setq active (gnus-active group))
 	    (setq num
 		  (if active (- (1+ (cdr active)) (car active)) t))
-           ;; Shorten the select method if possible, if we need to
-           ;; store it at all (native groups).
-           (let ((method (gnus-method-simplify
-                          (or gnus-override-subscribe-method
-                              (gnus-group-method group)))))
-             (if method
-                 (setq info (list group level nil nil method))
-               (setq info (list group level nil)))))
+	    ;; Shorten the select method if possible, if we need to
+	    ;; store it at all (native groups).
+	    (let ((method (gnus-method-simplify
+			   (or gnus-override-subscribe-method
+			       (gnus-group-method group)))))
+	      (if method
+		  (setq info (list group level nil nil method))
+		(setq info (list group level nil)))))
 	  (unless previous
 	    (setq previous
 		  (let ((p gnus-newsrc-alist))
@@ -1388,8 +1411,10 @@ newsgroup."
 	   t)
 	 (condition-case ()
 	     (inline (gnus-request-group group dont-check method))
-	   ;(error nil)
-	   (quit nil))
+	   ;;(error nil)
+	   (quit
+	    (message "Quit activating %s" group)
+	    nil))
 	 (setq active (gnus-parse-active))
 	 ;; If there are no articles in the group, the GROUP
 	 ;; command may have responded with the `(0 . 0)'.  We
@@ -1502,7 +1527,7 @@ newsgroup."
 		  gnus-activate-foreign-newsgroups)
 		 (t 0))
 	   level))
-	 info group active method retrievegroups)
+	 scanned-methods info group active method retrievegroups)
     (gnus-message 5 "Checking new news...")
 
     (while newsrc
@@ -1514,6 +1539,13 @@ newsgroup."
       ;; be reached) we just set the number of unread articles in this
       ;; newsgroup to t.  This means that Gnus thinks that there are
       ;; unread articles, but it has no idea how many.
+
+      ;; To be more explicit:
+      ;; >0 for an active group with messages
+      ;; 0 for an active group with no unread messages
+      ;; nil for non-foreign groups that the user has requested not be checked
+      ;; t for unchecked foreign groups or bogus groups, or groups that can't
+      ;;   be checked, for one reason or other.
       (if (and (setq method (gnus-info-method info))
 	       (not (inline
 		      (gnus-server-equal
@@ -1521,8 +1553,8 @@ newsgroup."
 		       (setq method (gnus-server-get-method nil method)))))
 	       (not (gnus-secondary-method-p method)))
 	  ;; These groups are foreign.  Check the level.
-	  (when (<= (gnus-info-level info) foreign-level)
-	    (setq active (gnus-activate-group group 'scan))
+	  (when (and (<= (gnus-info-level info) foreign-level)
+                     (setq active (gnus-activate-group group 'scan)))
 	    ;; Let the Gnus agent save the active file.
 	    (when (and gnus-agent gnus-plugged active)
 	      (gnus-agent-save-group-info
@@ -1546,8 +1578,25 @@ newsgroup."
 		  (setcdr (assoc method retrievegroups)
 			  (cons group (cdr (assoc method retrievegroups))))
 		(push (list method group) retrievegroups))
-	  (setq active (gnus-activate-group group 'scan))
-	    (inline (gnus-close-group group))))))
+	    ;; hack: `nnmail-get-new-mail' changes the mail-source depending
+	    ;; on the group, so we must perform a scan for every group
+	    ;; if the users has any directory mail sources.
+	    ;; hack: if `nnmail-scan-directory-mail-source-once' is non-nil,
+	    ;; for it scan all spool files even when the groups are
+	    ;; not required.
+	    (if (and
+		 (or nnmail-scan-directory-mail-source-once
+		     (null (assq 'directory
+				 (or mail-sources
+				     (if (listp nnmail-spool-file)
+					 nnmail-spool-file
+				       (list nnmail-spool-file))))))
+		 (member method scanned-methods))
+		(setq active (gnus-activate-group group))
+	      (setq active (gnus-activate-group group 'scan))
+	      (push method scanned-methods))
+            (when active
+              (gnus-close-group group))))))
 
       ;; Get the number of unread articles in the group.
       (cond
@@ -1569,23 +1618,23 @@ newsgroup."
       (let* ((mg (pop retrievegroups))
 	     (method (or (car mg) gnus-select-method))
 	     (groups (cdr mg)))
-	(gnus-check-server method)
-	;; Request that the backend scan its incoming messages.
-	(when (gnus-check-backend-function 'request-scan (car method))
-	  (gnus-request-scan nil method))
-	(gnus-read-active-file-2 (mapcar (lambda (group)
-					   (gnus-group-real-name group))
-					 groups) method)
-	(dolist (group groups)
-	  (cond
-	   ((setq active (gnus-active (gnus-info-group
-				       (setq info (gnus-get-info group)))))
-	    (inline (gnus-get-unread-articles-in-group info active t)))
-	   (t
-	    ;; The group couldn't be reached, so we nix out the number of
-	    ;; unread articles and stuff.
-	    (gnus-set-active group nil)
-	    (setcar (gnus-gethash group gnus-newsrc-hashtb) t))))))
+	(when (gnus-check-server method)
+          ;; Request that the backend scan its incoming messages.
+          (when (gnus-check-backend-function 'request-scan (car method))
+            (gnus-request-scan nil method))
+          (gnus-read-active-file-2 (mapcar (lambda (group)
+                                             (gnus-group-real-name group))
+                                           groups) method)
+          (dolist (group groups)
+            (cond
+             ((setq active (gnus-active (gnus-info-group
+                                         (setq info (gnus-get-info group)))))
+              (inline (gnus-get-unread-articles-in-group info active t)))
+             (t
+              ;; The group couldn't be reached, so we nix out the number of
+              ;; unread articles and stuff.
+              (gnus-set-active group nil)
+              (setcar (gnus-gethash group gnus-newsrc-hashtb) t)))))))
 
     (gnus-message 5 "Checking new news...done")))
 
@@ -1718,7 +1767,9 @@ newsgroup."
 	      (gnus-read-active-file-1 method force)
 	    ;; We catch C-g so that we can continue past servers
 	    ;; that do not respond.
-	    (quit nil)))))))
+	    (quit
+	     (message "Quit reading the active file")
+	     nil)))))))
 
 (defun gnus-read-active-file-1 (method force)
   (let (where mesg)
@@ -1770,14 +1821,14 @@ newsgroup."
       (gnus-check-server method)
       (let ((list-type (gnus-retrieve-groups groups method)))
 	(cond ((not list-type)
-	       (gnus-error 
+	       (gnus-error
 		1.2 "Cannot read partial active file from %s server."
 		(car method)))
 	      ((eq list-type 'active)
 	       (gnus-active-to-gnus-format method gnus-active-hashtb nil t))
 	      (t
 	       (gnus-groups-to-gnus-format method gnus-active-hashtb t)))))))
-  
+
 ;; Read an active file and place the results in `gnus-active-hashtb'.
 (defun gnus-active-to-gnus-format (&optional method hashtb ignore-errors
 					     real-active)
@@ -1884,7 +1935,10 @@ newsgroup."
 		     (gnus-group-prefixed-name "" method))))
 
     ;; Let the Gnus agent save the active file.
-    (if (and gnus-agent real-active gnus-plugged (gnus-agent-method-p method))
+    (if (and gnus-agent
+	     real-active
+	     gnus-plugged
+	     (gnus-agent-method-p method))
 	(progn
 	  (gnus-agent-save-groups method)
 	  (gnus-active-to-gnus-format method hashtb nil real-active))
@@ -1924,10 +1978,7 @@ newsgroup."
   "Read startup file.
 If FORCE is non-nil, the .newsrc file is read."
   ;; Reset variables that might be defined in the .newsrc.eld file.
-  (let ((variables gnus-variable-list))
-    (while variables
-      (set (car variables) nil)
-      (setq variables (cdr variables))))
+  (gnus-clear-quick-file-variables)
   (let* ((newsrc-file gnus-current-startup-file)
 	 (quick-file (concat newsrc-file ".el")))
     (save-excursion
@@ -1956,36 +2007,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (buffer-disable-undo)
 	  (gnus-newsrc-to-gnus-format)
 	  (kill-buffer (current-buffer))
-	  (gnus-message 5 "Reading %s...done" newsrc-file)))
-
-      ;; Convert old to new.
-      (gnus-convert-old-newsrc))))
-
-(defun gnus-convert-old-newsrc ()
-  "Convert old newsrc into the new format, if needed."
-  (let ((fcv (and gnus-newsrc-file-version
-		  (gnus-continuum-version gnus-newsrc-file-version))))
-    (cond
-     ;; No .newsrc.eld file was loaded.
-     ((null fcv) nil)
-     ;; Gnus 5 .newsrc.eld was loaded.
-     ((< fcv (gnus-continuum-version "September Gnus v0.1"))
-      (gnus-convert-old-ticks)))))
-
-(defun gnus-convert-old-ticks ()
-  (let ((newsrc (cdr gnus-newsrc-alist))
-	marks info dormant ticked)
-    (while (setq info (pop newsrc))
-      (when (setq marks (gnus-info-marks info))
-	(setq dormant (cdr (assq 'dormant marks))
-	      ticked (cdr (assq 'tick marks)))
-	(when (or dormant ticked)
-	  (gnus-info-set-read
-	   info
-	   (gnus-add-to-range
-	    (gnus-info-read info)
-	    (nconc (gnus-uncompress-range dormant)
-		   (gnus-uncompress-range ticked)))))))))
+	  (gnus-message 5 "Reading %s...done" newsrc-file))))))
 
 (defun gnus-read-newsrc-el-file (file)
   (let ((ding-file (concat file "d")))
@@ -1993,16 +2015,20 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
       (when (file-exists-p ding-file)
-	(condition-case nil
-	    (with-temp-buffer
-	      (insert-file-contents-as-coding-system
-	       gnus-startup-file-coding-system ding-file)
-	      (eval-region (point-min) (point-max)))
-	  (error
-	   (ding)
-	   (unless (gnus-yes-or-no-p
-		    (format "Error in %s; continue? " ding-file))
-	     (error "Error in %s" ding-file))))
+	(with-temp-buffer
+	  (condition-case nil
+	      (progn
+		(insert-file-contents-as-coding-system
+		 gnus-startup-file-coding-system ding-file)
+		(eval-region (point-min) (point-max)))
+	    (error
+	     (ding)
+	     (or (not (or (zerop (buffer-size))
+			  (eq 'binary gnus-startup-file-coding-system)
+			  (gnus-re-read-newsrc-el-file ding-file)))
+		 (gnus-yes-or-no-p
+		  (format "Error in %s; continue? " ding-file))
+		 (error "Error in %s" ding-file)))))
 	(when gnus-newsrc-assoc
 	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
     (gnus-make-hashtable-from-newsrc-alist)
@@ -2011,7 +2037,71 @@ If FORCE is non-nil, the .newsrc file is read."
       (gnus-message 5 "Reading %s..." file)
       ;; The .el file is newer than the .eld file, so we read that one
       ;; as well.
-      (gnus-read-old-newsrc-el-file file))))
+      (gnus-read-old-newsrc-el-file file)))
+  (when (and gnus-product-directory
+	     (file-directory-p gnus-product-directory))
+    (let ((list gnus-product-variable-file-list))
+      (while list
+	(apply 'gnus-product-read-variable-file-1 (car list))
+	(setq list (cdr list))))))
+
+(defun gnus-re-read-newsrc-el-file (file)
+  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
+The backup file \".newsrc.eld_\" will be created before re-reading."
+  (message "Error in %s; retrying..." file)
+  (if (and
+       (condition-case nil
+	   (let ((backup (concat file "_")))
+	     (copy-file file backup 'ok-if-already-exists 'keep-time)
+	     (message " (The backup file %s has been created)" backup)
+	     t)
+	 (error nil))
+       (progn
+	 (insert-file-contents-as-binary file nil nil nil 'replace)
+	 (when (re-search-forward
+		"^[\t ]*([\t\n\r ]*setq[\t\n\r ]+gnus-format-specs" nil t)
+	   (delete-region (goto-char (match-beginning 0)) (forward-list 1))
+	   (decode-coding-region (point-min) (point-max)
+				 gnus-startup-file-coding-system)
+	   (condition-case nil
+	       (progn
+		 (eval-region (point-min) (point-max))
+		 t)
+	     (error nil)))))
+      (prog1
+	  nil
+	(message "Error in %s; retrying...done" file))
+    (message "Error in %s; retrying...failed" file)
+    t))
+
+(defun gnus-product-read-variable-file-1 (file checking-methods coding
+					       &rest variables)
+  (let (error gnus-product-file-version method file-ver)
+    (when (or
+	   (condition-case err
+	       (let ((coding-system-for-read coding)
+		     (input-coding-system coding))
+		 (load (expand-file-name file gnus-product-directory) t nil t)
+		 nil)
+	     (error
+	      (message "%s" err)
+	      (setq error t)))
+	   (and (assq 'emacs-version checking-methods)
+		(not (string= emacs-version
+			      (cdr (assq 'emacs-version
+					 gnus-product-file-version)))))
+	   (and (setq method (assq 'product-version checking-methods))
+		(or (not (setq file-ver
+			       (cdr (assq 'product-version
+					  gnus-product-file-version))))
+		    (< (product-version-compare file-ver (cadr method)) 0))))
+      (unless error
+	(message "\"%s\" seems to have mismatched contents, updating..."
+		 file))
+      (while variables
+	(set (car variables) nil)
+	(gnus-product-variable-touch (car variables))
+	(setq variables (cdr variables))))))
 
 ;; Parse the old-style quick startup file
 (defun gnus-read-old-newsrc-el-file (file)
@@ -2363,12 +2453,15 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
 	(gnus-dribble-delete-file)
-	(gnus-group-set-mode-line)))))
+	(gnus-group-set-mode-line))))
+  (when gnus-product-directory
+    (gnus-product-save-variable-file)))
 
 ;; Call the function above at C-x C-c.
-(defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe activate)
+(defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe
+					   activate preactivate)
   "Save .newsrc and .newsrc.eld when Emacs is killed."
-  (when (get-buffer gnus-group-buffer)
+  (when (gnus-alive-p)
     (gnus-run-hooks 'gnus-exit-gnus-hook)
     (gnus-offer-save-summaries)
     (gnus-save-newsrc-file)))
@@ -2377,6 +2470,7 @@ If FORCE is non-nil, the .newsrc file is read."
   "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
   (let ((print-quoted t)
 	(print-escape-newlines t))
+
     (insert ";; -*- emacs-lisp -*-\n")
     (insert ";; Gnus startup file.\n")
     (insert "\
@@ -2404,6 +2498,76 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (insert "(setq " (symbol-name variable) " '")
 	  (gnus-prin1 (symbol-value variable))
 	  (insert ")\n"))))))
+
+(defun gnus-product-variable-touch (&rest variables)
+  (while variables
+    (put (pop variables) 'gnus-product-variable 'dirty)))
+
+(defun gnus-product-variables-dirty-p (variables)
+  (catch 'done
+    (while variables
+      (when (eq (get (car variables) 'gnus-product-variable) 'dirty)
+	(throw 'done t))
+      (setq variables (cdr variables)))))
+
+(defun gnus-product-save-variable-file (&optional force)
+  "Save all product variables to files, when need to be saved."
+  (let ((list gnus-product-variable-file-list))
+    (gnus-make-directory gnus-product-directory)
+    (while list
+      (apply 'gnus-product-save-variable-file-1 force (car list))
+      (setq list (cdr list)))))
+
+(defun gnus-product-save-variable-file-1 (force file checking-methods coding
+						&rest variables)
+  "Save a product variable file, when need to be saved."
+  (when (or force
+	    (gnus-product-variables-dirty-p variables))
+    (let ((product (product-find 'gnus-vers)))
+      (set-buffer (gnus-get-buffer-create " *gnus-product*"))
+      (make-local-variable 'version-control)
+      (setq version-control 'never)
+      (setq file (expand-file-name file gnus-product-directory)
+	    buffer-file-name file
+	    default-directory (file-name-directory file))
+      (buffer-disable-undo)
+      (erase-buffer)
+      (gnus-message 5 "Saving %s..." file)
+      (apply 'gnus-product-quick-file-format product checking-methods coding
+	     variables)
+      (save-buffer-as-coding-system coding)
+      (kill-buffer (current-buffer))
+      (while variables
+	(put (car variables) 'gnus-product-variable nil)
+	(setq variables (cdr variables)))
+      (gnus-message
+       5 "Saving %s...done" file))))
+
+(defun gnus-product-quick-file-format (product checking-methods
+					       coding &rest variables)
+  "Insert gnus product depend variables in lisp format."
+  (let ((print-quoted t)
+	(print-escape-newlines t)
+	variable param)
+    (insert (format ";; -*- Mode: emacs-lisp; coding: %s -*-\n" coding))
+    (insert (format ";; %s startup file.\n" (product-name product)))
+    (when (setq param (cdr (assq 'product-version checking-methods)))
+      (insert "(or (>= (product-version-compare "
+	      "(product-version (product-find 'gnus-vers))\n"
+	      "\t\t\t\t '" (apply 'prin1-to-string param) ")\n"
+	      "\t0)\n"
+	      "    (error \"This file was created by later version of "
+	      "gnus.\"))\n"))
+    (insert "(setq gnus-product-file-version \n"
+	    "      '((product-version . "
+	    (prin1-to-string (product-version product)) ")\n"
+	    "\t(emacs-version . " (prin1-to-string emacs-version) ")))\n")
+    (while variables
+      (when (and (boundp (setq variable (pop variables)))
+		 (symbol-value variable))
+	  (insert "(setq " (symbol-name variable) " '")
+	  (gnus-prin1 (symbol-value variable))
+	  (insert ")\n")))))
 
 (defun gnus-strip-killed-list ()
   "Return the killed list minus the groups that match `gnus-save-killed-list'."
@@ -2490,7 +2654,8 @@ If FORCE is non-nil, the .newsrc file is read."
 	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
-      (gnus-write-buffer slave-name)
+      (gnus-write-buffer-as-coding-system
+       gnus-startup-file-coding-system slave-name)
       (when modes
 	(set-file-modes slave-name modes)))))
 
@@ -2520,7 +2685,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(while slave-files
 	  (erase-buffer)
 	  (setq file (nth 1 (car slave-files)))
-	  (insert-file-contents file)
+	  (nnheader-insert-file-contents file)
 	  (when (condition-case ()
 		    (progn
 		      (eval-buffer (current-buffer))
@@ -2613,7 +2778,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	      (let ((str (buffer-substring
 			  (point) (progn (end-of-line) (point))))
 		    (coding
-		     (and (or gnus-xemacs
+		     (and (or (featurep 'xemacs)
 			      (and (boundp 'enable-multibyte-characters)
 				   enable-multibyte-characters))
 			  (fboundp 'gnus-mule-get-coding-system)
@@ -2639,7 +2804,8 @@ If FORCE is non-nil, the .newsrc file is read."
   "Declare backend NAME with ABILITIES as a Gnus backend."
   (setq gnus-valid-select-methods
 	(nconc gnus-valid-select-methods
-	       (list (apply 'list name abilities)))))
+	       (list (apply 'list name abilities))))
+  (gnus-redefine-select-method-widget))
 
 (defun gnus-set-default-directory ()
   "Set the default directory in the current buffer to `gnus-default-directory'.

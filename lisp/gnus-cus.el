@@ -1,6 +1,6 @@
 ;;; gnus-cus.el --- customization commands for Gnus
 ;;
-;; Copyright (C) 1996,1999 Free Software Foundation, Inc.
+;; Copyright (C) 1996,1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <abraham@dina.kvl.dk>
 ;; Keywords: news
@@ -52,6 +52,21 @@ if that value is non-nil."
   (setq major-mode 'gnus-custom-mode
 	mode-name "Gnus Customize")
   (use-local-map widget-keymap)
+  ;; Emacs 21 stuff:
+  (when (and (facep 'custom-button-face)
+	     (facep 'custom-button-pressed-face))
+    (set (make-local-variable 'widget-button-face)
+	 'custom-button-face)
+    (set (make-local-variable 'widget-button-pressed-face)
+	 'custom-button-pressed-face)
+    (set (make-local-variable 'widget-mouse-face)
+	 'custom-button-pressed-face))
+  (when (and (boundp 'custom-raised-buttons)
+	     (symbol-value 'custom-raised-buttons))
+    (set (make-local-variable 'widget-push-button-prefix) "")
+    (set (make-local-variable 'widget-push-button-suffix) "")
+    (set (make-local-variable 'widget-link-prefix) "")
+    (set (make-local-variable 'widget-link-suffix) ""))
   (gnus-run-hooks 'gnus-custom-mode-hook))
 
 ;;; Group Customization:
@@ -137,26 +152,35 @@ listserv has inserted `Reply-To' headers that point back to the
 listserv itself.  This is broken behavior.  So there!")
 
     (to-group (string :tag "To Group") "\
-All posts will be send to the specified group.")
+All posts will be sent to the specified group.")
 
     (gcc-self (choice :tag  "GCC"
 		      :value t
-		      (const t)
+		      (const :tag "To current group" t)
 		      (const none)
 		      (string :format "%v" :hide-front-space t)) "\
 Specify default value for GCC header.
 
 If this symbol is present in the group parameter list and set to `t',
-new composed messages will be `Gcc''d to the current group. If it is
+new composed messages will be `Gcc''d to the current group.  If it is
 present and set to `none', no `Gcc:' header will be generated, if it
 is present and a string, this string will be inserted literally as a
 `gcc' header (this symbol takes precedence over any default `Gcc'
 rules as described later).")
 
     (banner (choice :tag "Banner"
-		    (const signature)
-		    string ) "\
-Banner to be removed from articles.")
+		    :value nil
+		    (const :tag "Remove signature" signature)
+		    (symbol :tag "Item in `gnus-article-banner-alist'" none)
+		    regexp
+		    (const :tag "None" nil)) "\
+If non-nil, specify how to remove `banners' from articles.
+
+Symbol `signature' means to remove signatures delimited by
+`gnus-signature-separator'.  Any other symbol is used to look up a
+regular expression to match the banner in `gnus-article-banner-alist'.
+A string is used as a regular expression to match the banner
+directly.")
 
     (auto-expire (const :tag "Automatic Expire" t) "\
 All articles that are read will be marked as expirable.")
@@ -176,9 +200,18 @@ Use with caution.")
 When to expire.
 
 Overrides any `nnmail-expiry-wait' and `nnmail-expiry-wait-function'
-when expiring expirable messages. The value can either be a number of
+when expiring expirable messages.  The value can either be a number of
 days (not necessarily an integer) or the symbols `never' or
 `immediate'.")
+
+    (expiry-target (choice :tag "Expiry Target"
+                           :value delete
+                           (const delete)
+                           (function :format "%v" nnmail-)
+                           string) "\
+Where expired messages end up.
+
+Overrides `nnmail-expiry-target', which see.")
 
     (score-file (file :tag "Score File") "\
 Make the specified file into the current score file.
@@ -236,8 +269,24 @@ default charset will be used instead.")
 			   (number :tag "Group for displayed part" 0)
 			   (symbol :tag "Face" 
 				   gnus-emphasis-highlight-words))))
-  "highlight regexps.
-See gnus-emphasis-alist."))
+     "highlight regexps.
+See gnus-emphasis-alist.")
+
+    (posting-style
+     (choice :tag "Posting style"
+	     :value nil
+	     (repeat (list
+ 		      (choice :tag "Type"
+			      :value nil
+			      (const signature)
+ 			      (const signature-file) 
+ 			      (const organization) 
+ 			      (const address)
+ 			      (const name)
+ 			      (const body))
+		      (string :format "%v"))))
+     "post style.
+See gnus-posting-styles."))
   "Alist of valid group or topic parameters.
 
 Each entry has the form (NAME TYPE DOC), where NAME is the parameter
@@ -255,7 +304,9 @@ Each entry has the form (NAME TYPE DOC), where NAME is the parameter
 itself (a symbol), TYPE is the parameters type (a sexp widget), and
 DOC is a documentation string for the parameter.")
 
-(defconst gnus-extra-group-parameters nil
+(defconst gnus-extra-group-parameters
+  '((uidvalidity (string :tag "IMAP uidvalidity") "\
+Server-assigned value attached to IMAP groups, used to maintain consistency."))
   "Alist of group parameters that are not also topic parameters.
 
 Each entry has the form (NAME TYPE DOC), where NAME is the parameter
@@ -293,6 +344,7 @@ DOC is a documentation string for the parameter.")
     (setq gnus-custom-group group)
     (make-local-variable 'gnus-custom-topic)
     (setq gnus-custom-topic topic)
+    (buffer-disable-undo)
     (widget-insert "Customize the ")
     (if group
 	(widget-create 'info-link
@@ -304,7 +356,7 @@ DOC is a documentation string for the parameter.")
 		     :tag  "topic parameters"
 		     "(gnus)Topic Parameters"))
     (widget-insert " for <")
-    (widget-insert (or group topic))
+    (widget-insert (gnus-group-decoded-name (or group topic)))
     (widget-insert "> and press ")
     (widget-create 'push-button
 		   :tag "done"
@@ -322,7 +374,7 @@ DOC is a documentation string for the parameter.")
 			       :tag "Parameters"
 			       :format "%t:\n%h%v"
 			       :doc "\
-These special paramerters are recognized by Gnus.
+These special parameters are recognized by Gnus.
 Check the [ ] for the parameters you want to apply to this group or
 to the groups in this topic, then edit the value to suit your taste."
 			       ,@types)
@@ -342,10 +394,10 @@ like.  If you want to hear a beep when you enter a group, you could
 put something like `(dummy-variable (ding))' in the parameters of that
 group.  `dummy-variable' will be set to the result of the `(ding)'
 form, but who cares?"
-				  (cons :format "%v" :value (nil .  nil)
-					 (symbol :tag "Variable")
-					 (sexp :tag
-					       "Value")))
+				  (list :format "%v" :value (nil nil)
+					(symbol :tag "Variable")
+					(sexp :tag
+					      "Value")))
 
 			 '(repeat :inline t
 				  :tag "Unknown entries"
@@ -363,6 +415,7 @@ form, but who cares?"
 			   :value (gnus-info-method info))))
     (use-local-map widget-keymap)
     (widget-setup)
+    (buffer-enable-undo)
     (goto-char (point-min))))
 
 (defun gnus-group-customize-done (&rest ignore)
@@ -490,9 +543,9 @@ documentation string for the parameter.")
 	 (item `(const :format "" :value ,(downcase tag)))
 	 (match '(string :tag "Match"))
 	 (score '(choice :tag "Score"
-			(const :tag "default" nil)
-			(integer :format "%v"
-				 :hide-front-space t)))
+			 (const :tag "default" nil)
+			 (integer :format "%v"
+				  :hide-front-space t)))
 	 (expire '(choice :tag "Expire"
 			  (const :tag "off" nil)
 			  (integer :format "%v"
@@ -563,9 +616,9 @@ each score entry has four elements:
 	 (item `(const :format "" :value ,(downcase tag)))
 	 (match '(integer :tag "Match"))
 	 (score '(choice :tag "Score"
-			(const :tag "default" nil)
-			(integer :format "%v"
-				 :hide-front-space t)))
+			 (const :tag "default" nil)
+			 (integer :format "%v"
+				  :hide-front-space t)))
 	 (expire '(choice :tag "Expire"
 			  (const :tag "off" nil)
 			  (integer :format "%v"
@@ -600,9 +653,9 @@ each score entry has four elements:
 	 (item `(const :format "" :value ,(downcase tag)))
 	 (match '(string :tag "Match"))
 	 (score '(choice :tag "Score"
-			(const :tag "default" nil)
-			(integer :format "%v"
-				 :hide-front-space t)))
+			 (const :tag "default" nil)
+			 (integer :format "%v"
+				  :hide-front-space t)))
 	 (expire '(choice :tag "Expire"
 			  (const :tag "off" nil)
 			  (integer :format "%v"
@@ -652,11 +705,11 @@ eh?")))
   (interactive (list gnus-current-score-file))
   (let ((scores (gnus-score-load file))
 	(types (mapcar (lambda (entry)
-		 `(group :format "%v%h\n"
-			 :doc ,(nth 2 entry)
-			 (const :format "" ,(nth 0 entry))
-			 ,(nth 1 entry)))
-	       gnus-score-parameters)))
+			 `(group :format "%v%h\n"
+				 :doc ,(nth 2 entry)
+				 (const :format "" ,(nth 0 entry))
+				 ,(nth 1 entry)))
+		       gnus-score-parameters)))
     ;; Ready.
     (kill-buffer (gnus-get-buffer-create "*Gnus Customize*"))
     (switch-to-buffer (gnus-get-buffer-create "*Gnus Customize*"))

@@ -1,5 +1,6 @@
 ;;; nndoc.el --- single file access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -27,6 +28,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
@@ -69,8 +71,8 @@ from the document.")
      (body-begin-function . nndoc-babyl-body-begin)
      (head-begin-function . nndoc-babyl-head-begin))
     (forward
-     (article-begin . "^-+ Start of forwarded message -+\n+")
-     (body-end . "^-+ End of forwarded message -+$")
+     (article-begin . "^-+ \\(Start of \\)?forwarded message.*\n+")
+     (body-end . "^-+ End \\(of \\)?forwarded message.*$")
      (prepare-body-function . nndoc-unquote-dashes))
     (rfc934
      (article-begin . "^--.*\n+")
@@ -85,6 +87,7 @@ from the document.")
      (article-transform-function . nndoc-transform-clari-briefs))
     (mime-digest
      (article-begin . "")
+     (head-begin . "^ ?\n")
      (head-end . "^ ?$")
      (body-end . "")
      (file-end . "")
@@ -122,6 +125,9 @@ from the document.")
     (rfc822-forward
      (article-begin . "^\n")
      (body-end-function . nndoc-rfc822-forward-body-end-function))
+    (outlook
+     (article-begin-function . nndoc-outlook-article-begin)
+     (body-end .  "\0"))
     (guess
      (guess . t)
      (subtype nil))
@@ -430,7 +436,8 @@ from the document.")
     t))
 
 (defun nndoc-forward-type-p ()
-  (when (and (re-search-forward "^-+ Start of forwarded message -+\n+" nil t)
+  (when (and (re-search-forward "^-+ \\(Start of \\)?forwarded message.*\n+" 
+				nil t)
 	     (not (re-search-forward "^Subject:.*digest" nil t))
 	     (not (re-search-backward "^From:" nil t 2))
 	     (not (re-search-forward "^From:" nil t 2)))
@@ -524,10 +531,11 @@ from the document.")
 	    nil t)
 	   (match-beginning 1))
       (setq boundary-id (match-string 1)
-	    b-delimiter (concat "\n--" boundary-id "[\n \t]+"))
+	    b-delimiter (concat "\n--" boundary-id "[ \t]*$"))
       (setq entry (assq 'mime-digest nndoc-type-alist))
       (setcdr entry
 	      (list
+	       (cons 'head-begin "^ ?\n")
 	       (cons 'head-end "^ ?$")
 	       (cons 'body-begin "^ ?\n")
 	       (cons 'article-begin b-delimiter)
@@ -556,10 +564,7 @@ from the document.")
 (defun nndoc-transform-lanl-gov-announce (article)
   (goto-char (point-max))
   (when (re-search-backward "^\\\\\\\\ +(\\([^ ]*\\) , *\\([^ ]*\\))" nil t)
-    (replace-match "\n\nGet it at \\1 (\\2)" t nil))
-  ;;  (when (re-search-backward "^\\\\\\\\$" nil t)
-  ;;    (replace-match "" t t))
-  )
+    (replace-match "\n\nGet it at \\1 (\\2)" t nil)))
 
 (defun nndoc-generate-lanl-gov-head (article)
   (let ((entry (cdr (assq article nndoc-dissection-alist)))
@@ -577,8 +582,7 @@ from the document.")
  	  (when (re-search-forward "^Title: \\([^\f]*\\)\nAuthors?: \\(.*\\)"
  				   nil t)
  	    (setq subject (concat (match-string 1) subject))
- 	    (setq from (concat (match-string 2) " <" e-mail ">"))))
- 	))
+ 	    (setq from (concat (match-string 2) " <" e-mail ">"))))))
     (while (and from (string-match "(\[^)\]*)" from))
       (setq from (replace-match "" t t from)))
     (insert "From: "  (or from "unknown")
@@ -587,6 +591,14 @@ from the document.")
 (defun nndoc-nsmail-type-p ()
   (when (looking-at "From - ")
     t))
+
+(defun nndoc-outlook-article-begin ()
+  (prog1 (re-search-forward "From:\\|Received:" nil t)
+    (goto-char (match-beginning 0))))
+
+(defun nndoc-outlook-type-p ()
+  ;; FIXME: Is JMF the magic of outlook mailbox? -- ShengHuo.
+  (looking-at "JMF"))
 
 (deffoo nndoc-request-accept-article (group &optional server last)
   nil)
@@ -689,7 +701,8 @@ PARENT is the message-ID of the parent summary line, or nil for none."
 	subject content-type type subtype boundary-regexp)
     ;; Gracefully handle a missing body.
     (goto-char head-begin)
-    (if (search-forward "\n\n" body-end t)
+    (if (or (and (eq (char-after) ?\n) (or (forward-char 1) t))
+	    (search-forward "\n\n" body-end t))
 	(setq head-end (1- (point))
 	      body-begin (point))
       (setq head-end body-end
@@ -771,7 +784,7 @@ PARENT is the message-ID of the parent summary line, or nil for none."
       (let ((part-counter 0)
 	    part-begin part-end eof-flag)
 	(while (string-match "\
-^\\(Lines\\|Content-\\(Type\\|Transfer-Encoding\\)\\):.*\n\\([ \t].*\n\\)*"
+^\\(Lines\\|Content-\\(Type\\|Transfer-Encoding\\|Disposition\\)\\):.*\n\\([ \t].*\n\\)*"
 			     article-insert)
 	  (setq article-insert (replace-match "" t t article-insert)))
 	(let ((case-fold-search nil))

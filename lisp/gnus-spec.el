@@ -1,5 +1,6 @@
-;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;;; gnus-spec.el --- format spec functions for Gnus  -*- coding: iso-latin-1 -*-
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -27,6 +28,8 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
+(require 'alist)
 (require 'gnus)
 
 ;;; Internal variables.
@@ -118,13 +121,18 @@
   (gnus-byte-code 'gnus-group-line-format-spec))
 
 (defvar gnus-format-specs
-  `((version . ,emacs-version)
-    (group "%M\%S\%p\%P\%5y: %(%g%)%l\n" ,gnus-group-line-format-spec)
-    (summary-dummy "*  %(:                          :%) %S\n"
-		   ,gnus-summary-dummy-line-format-spec)
-    (summary "%U\%R\%z\%I\%(%[%4L: %-20,20n%]%) %s\n"
-	     ,gnus-summary-line-format-spec))
+  `((group ("%M\%S\%p\%P\%5y: %(%g%)%l\n" ,gnus-group-line-format-spec))
+    (summary-dummy ("*  %(:                          :%) %S\n"
+		    ,gnus-summary-dummy-line-format-spec))
+    (summary ("%U\%R\%z\%I\%(%[%4L: %-20,20n%]%) %s\n"
+	      ,gnus-summary-line-format-spec)))
   "Alist of format specs.")
+
+(defvar gnus-format-specs-compiled nil
+  "Alist of compiled format specs.  Each element should be the form:
+\(TYPE (FORMAT-STRING-1 . COMPILED-FUNCTION-1)
+                 :
+       (FORMAT-STRING-n . COMPILED-FUNCTION-n)).")
 
 (defvar gnus-article-mode-line-format-spec nil)
 (defvar gnus-summary-mode-line-format-spec nil)
@@ -146,78 +154,101 @@
 	(match-string 1)))))
   (let* ((type (intern (progn (string-match "gnus-\\([-a-z]+\\)-line" var)
 			      (match-string 1 var))))
-	 (entry (assq type gnus-format-specs))
-	 value spec)
-    (when entry
-      (setq gnus-format-specs (delq entry gnus-format-specs)))
-    (set
-     (intern (format "%s-spec" var))
-     (gnus-parse-format (setq value (symbol-value (intern var)))
-			(symbol-value (intern (format "%s-alist" var)))
-			(not (string-match "mode" var))))
-    (setq spec (symbol-value (intern (format "%s-spec" var))))
-    (push (list type value spec) gnus-format-specs)
+	 (value (symbol-value (intern var)))
+	 (spec (set
+		(intern (format "%s-spec" var))
+		(gnus-parse-format
+		 value (symbol-value (intern (format "%s-alist" var)))
+		 (not (string-match "mode" var)))))
+	 (entry (assq type gnus-format-specs)))
+    (if entry
+	(let ((elem (assoc value entry)))
+	  (if elem
+	      (setcdr elem spec)
+	    (setcdr entry (cons (cons value elem) (cdr entry)))))
+      (push (list type (cons value spec)) gnus-format-specs))
+    (gnus-product-variable-touch 'gnus-format-specs)
 
     (pop-to-buffer "*Gnus Format*")
     (erase-buffer)
     (lisp-interaction-mode)
     (insert (pp-to-string spec))))
 
+(put 'gnus-search-or-regist-spec 'lisp-indent-function 1)
+(defmacro gnus-search-or-regist-spec (mspec &rest body)
+  (let ((specs (nth 0 mspec)) (type (nth 1 mspec)) (format (nth 2 mspec))
+	(spec (nth 3 mspec)) (entry (nth 4 mspec)) (elem (nth 5 mspec)))
+    `(let* ((,entry (assq ,type ,specs))
+	    (,elem (assoc ,format (cdr ,entry))))
+       (or (cdr ,elem)
+	   (when (progn ,@body)
+	     (if ,entry
+		 (if ,elem
+		     (setcdr ,elem ,spec)
+		   (setcdr ,entry (cons (cons ,format ,spec) (cdr ,entry))))
+	       (push (list ,type (cons ,format ,spec)) ,specs))
+	     (gnus-product-variable-touch (quote ,specs)))
+	   ,spec))))
+
+(defun gnus-update-format-specification-1 (type format val)
+  (set (intern (format "gnus-%s-line-format-spec" type))
+       (gnus-search-or-regist-spec (gnus-format-specs-compiled
+				    type format val entry elem)
+	 (when (and gnus-compile-user-specs val)
+	   (setq val (prog1
+			 (progn
+			   (fset 'gnus-tmp-func `(lambda () ,val))
+			   (require 'bytecomp)
+			   (let (byte-compile-warnings)
+			     (byte-compile 'gnus-tmp-func))
+			   (gnus-byte-code 'gnus-tmp-func))
+		       (when (get-buffer "*Compile-Log*")
+			 (bury-buffer "*Compile-Log*"))
+		       (when (get-buffer "*Compile-Log-Show*")
+			 (bury-buffer "*Compile-Log-Show*"))))))))
+
 (defun gnus-update-format-specifications (&optional force &rest types)
   "Update all (necessary) format specifications."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
-  (when (or force
-	    (not (equal emacs-version
-			(cdr (assq 'version gnus-format-specs))))
-	    (not (equal gnus-version
-			(cdr (assq 'gnus-version gnus-format-specs)))))
+  (when force
     (message "%s" "Force update format specs.")
-    (setq gnus-format-specs nil))
+    (setq gnus-format-specs nil
+	  gnus-format-specs-compiled nil)
+    (gnus-product-variable-touch 'gnus-format-specs
+				 'gnus-format-specs-compiled))
 
   ;; Go through all the formats and see whether they need updating.
-  (let (new-format entry type val)
-    (while (setq type (pop types))
-      ;; Jump to the proper buffer to find out the value of
-      ;; the variable, if possible.  (It may be buffer-local.)
-      (save-excursion
-	(let ((buffer (intern (format "gnus-%s-buffer" type)))
-	      val)
-	  (when (and (boundp buffer)
-		     (setq val (symbol-value buffer))
-		     (gnus-buffer-exists-p val))
-	    (set-buffer val))
-	  (setq new-format (symbol-value
-			    (intern (format "gnus-%s-line-format" type)))))
-	(setq entry (cdr (assq type gnus-format-specs)))
-	(if (and (car entry)
-		 (equal (car entry) new-format))
-	    ;; Use the old format.
-	    (set (intern (format "gnus-%s-line-format-spec" type))
-		 (cadr entry))
-	  ;; This is a new format.
-	  (setq val
-		(if (not (stringp new-format))
-		    ;; This is a function call or something.
-		    new-format
-		  ;; This is a "real" format.
-		  (gnus-parse-format
-		   new-format
-		   (symbol-value
-		    (intern (format "gnus-%s-line-format-alist" type)))
-		   (not (string-match "mode$" (symbol-name type))))))
-	  ;; Enter the new format spec into the list.
-	  (if entry
-	      (progn
-		(setcar (cdr entry) val)
-		(setcar entry new-format))
-	    (push (list type new-format val) gnus-format-specs))
-	  (set (intern (format "gnus-%s-line-format-spec" type)) val)))))
-
-  (unless (assq 'version gnus-format-specs)
-    (push (cons 'version emacs-version) gnus-format-specs))
-  (unless (assq 'gnus-version gnus-format-specs)
-    (push (cons 'gnus-version gnus-version) gnus-format-specs)))
+  (let (type val)
+    (save-excursion
+      (while (setq type (pop types))
+	;; Jump to the proper buffer to find out the value of
+	;; the variable, if possible.  (It may be buffer-local.)
+	(let* ((new-format
+		(let ((buffer (intern (format "gnus-%s-buffer" type))))
+		  (when (and (boundp buffer)
+			     (setq val (symbol-value buffer))
+			     (gnus-buffer-exists-p val))
+		    (set-buffer val))
+		  (symbol-value
+		   (intern (format "gnus-%s-line-format" type))))))
+	  (or (gnus-update-format-specification-1 type new-format nil)
+	      ;; This is a new format.
+	      (gnus-update-format-specification-1
+	       type new-format
+	       (gnus-search-or-regist-spec (gnus-format-specs
+					    type new-format val entry elem)
+		 (setq val (if (stringp new-format)
+			       ;; This is a "real" format.
+			       (gnus-parse-format
+				new-format
+				(symbol-value
+				 (intern (format "gnus-%s-line-format-alist"
+						 type)))
+				(not (string-match "mode$"
+						   (symbol-name type))))
+			     ;; This is a function call or something.
+			     new-format))))))))))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
@@ -355,7 +386,7 @@ by `gnus-xmas-redefine'."
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let ((xemacs-mule-p (and gnus-xemacs (featurep 'mule)))
+  (let ((xemacs-mule-p (and (featurep 'xemacs) (featurep 'mule)))
 	max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
@@ -531,13 +562,14 @@ If PROPS, insert the result."
   (require 'bytecomp)
   (let ((entries gnus-format-specs)
 	(byte-compile-warnings '(unresolved callargs redefine))
-	entry gnus-tmp-func)
+	entry type compiled-function)
     (save-excursion
       (gnus-message 7 "Compiling format specs...")
 
       (while entries
-	(setq entry (pop entries))
-	(if (eq (car entry) 'version)
+	(setq entry (pop entries)
+	      type (car entry))
+	(if (memq type '(version gnus-version))
 	    (setq gnus-format-specs (delq entry gnus-format-specs))
 	  (let ((form (caddr entry)))
 	    (when (and (listp form)
@@ -546,13 +578,18 @@ If PROPS, insert the result."
 		       ;; Under XEmacs, it's (funcall #<compiled-function ...>)
 		       (not (and (eq 'funcall (car form))
 				 (byte-code-function-p (cadr form)))))
-	      (fset 'gnus-tmp-func `(lambda () ,form))
+	      (defalias 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
-	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))
+	      (setq compiled-function (gnus-byte-code 'gnus-tmp-func))
+	      (set (intern (format "gnus-%s-line-format-spec" type))
+		   compiled-function)
+	      (let ((elem (cdr (assq type gnus-format-specs-compiled))))
+		(if elem
+		    (set-alist 'elem (cadr entry) compiled-function)
+		  (setq elem (list (cadr entry) compiled-function)))
+		(set-alist 'gnus-format-specs-compiled type elem))))))
 
       (push (cons 'version emacs-version) gnus-format-specs)
-      ;; Mark the .newsrc.eld file as "dirty".
-      (gnus-dribble-touch)
       (gnus-message 7 "Compiling user specs...done"))))
 
 (defun gnus-set-format (type &optional insertable)
@@ -562,7 +599,12 @@ If PROPS, insert the result."
 	(symbol-value (intern (format "gnus-%s-line-format-alist" type)))
 	insertable)))
 
+(gnus-ems-redefine)
 
 (provide 'gnus-spec)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; gnus-spec.el ends here

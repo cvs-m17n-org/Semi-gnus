@@ -1,8 +1,10 @@
 ;;; time-date.el --- Date and time handling functions
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu Umeda <umerin@mse.kyutech.ac.jp>
+;; Keywords: mail news util
+
 ;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -25,19 +27,31 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'parse-time)
 
+(autoload 'timezone-make-date-arpa-standard "timezone")
+
+;;;###autoload
 (defun date-to-time (date)
   "Convert DATE into time."
   (condition-case ()
-      (apply 'encode-time (parse-time-string date))
+      (apply 'encode-time
+	     (parse-time-string
+	      ;; `parse-time-string' isn't sufficiently general or
+	      ;; robust.  It fails to grok some of the formats that
+	      ;; timzeone does (e.g. dodgy post-2000 stuff from some
+	      ;; Elms) and either fails or returns bogus values.  Lars
+	      ;; reverted this change, but that loses non-trivially
+	      ;; often for me.  -- fx
+	      (timezone-make-date-arpa-standard date)))
     (error (error "Invalid date: %s" date))))
 
 (defun time-to-seconds (time)
   "Convert TIME to a floating point number."
   (+ (* (car time) 65536.0)
      (cadr time)
-     (/ (or (caddr time) 0) 1000000.0)))
+     (/ (or (nth 2 time) 0) 1000000.0)))
 
 (defun seconds-to-time (seconds)
   "Convert SECONDS (a floating point number) to an Emacs time structure."
@@ -117,6 +131,7 @@ The Gregorian date Sunday, December 31, 1bce is imaginary."
        (- (/ (1- year) 100))		;	- century years
        (/ (1- year) 400))))		;	+ Gregorian leap years
 
+;;;###autoload
 (defun safe-date-to-time (date)
   "Parse DATE and return a time structure.
 If DATE is malformed, a zero time will be returned."

@@ -7,8 +7,11 @@
     (setq path (file-name-as-directory
 		(expand-file-name (match-string 0 addpath)))
 	  addpath (substring addpath (match-end 0)))
-    (if (string-match "apel/" path)
-	(setq path (substring path 0 (match-beginning 0))))
+    (if (string-match "apel/$" path)
+	(progn
+	  (if (file-directory-p path)
+	      (setq paths (nconc paths (list path))))
+	  (setq path (substring path 0 (match-beginning 0)))))
     (if (file-directory-p path)
 	(setq paths (nconc paths (list path)))))
   (or (null paths)

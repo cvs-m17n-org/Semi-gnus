@@ -1,5 +1,6 @@
 ;;; gnus-salt.el --- alternate summary mode interfaces for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -26,6 +27,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus)
 (require 'gnus-sum)
 
@@ -52,7 +54,7 @@
   :group 'gnus-summary-pick)
 
 (defcustom gnus-pick-elegant-flow t
-  "If non-nil, gnus-pick-start-reading will run gnus-summary-next-group when no articles have been picked."
+  "If non-nil, `gnus-pick-start-reading' runs `gnus-summary-next-group' when no articles have been picked."
   :type 'boolean
   :group 'gnus-summary-pick)
 
@@ -119,7 +121,8 @@ It accepts the same format specs that `gnus-summary-line-format' does."
       ;; Set up the menu.
       (when (gnus-visual-p 'pick-menu 'menu)
 	(gnus-pick-make-menu-bar))
-      (gnus-add-minor-mode 'gnus-pick-mode " Pick" gnus-pick-mode-map)
+      (gnus-add-minor-mode 'gnus-pick-mode " Pick" gnus-pick-mode-map
+			   nil 'gnus-pick-mode)
       (gnus-run-hooks 'gnus-pick-mode-hook))))
 
 (defun gnus-pick-setup-message ()
@@ -161,8 +164,8 @@ If given a prefix, mark all unpicked articles as read."
       (error "No articles have been picked"))))
 
 (defun gnus-pick-goto-article (arg)
-  "Go to the article number indicated by ARG.  If ARG is an invalid
-article number, then stay on current line."
+  "Go to the article number indicated by ARG.
+If ARG is an invalid article number, then stay on current line."
   (let (pos)
     (save-excursion
       (goto-char (point-min))
@@ -173,7 +176,7 @@ article number, then stay on current line."
       (goto-char pos))))
 
 (defun gnus-pick-article (&optional arg)
-    "Pick the article on the current line.
+  "Pick the article on the current line.
 If ARG, pick the article on that line instead."
   (interactive "P")
   (when arg
@@ -181,7 +184,7 @@ If ARG, pick the article on that line instead."
   (gnus-summary-mark-as-processable 1))
 
 (defun gnus-pick-article-or-thread (&optional arg)
-  "If gnus-thread-hide-subtree is t, then pick the thread on the current line.
+  "If `gnus-thread-hide-subtree' is t, then pick the thread on the current line.
 Otherwise pick the article on the current line.
 If ARG, pick the article/thread on that line instead."
   (interactive "P")
@@ -195,7 +198,7 @@ If ARG, pick the article/thread on that line instead."
     (gnus-summary-mark-as-processable 1)))
 
 (defun gnus-pick-unmark-article-or-thread (&optional arg)
-  "If gnus-thread-hide-subtree is t, then unmark the thread on current line.
+  "If `gnus-thread-hide-subtree' is t, then unmark the thread on current line.
 Otherwise unmark the article on current line.
 If ARG, unmark thread/article on that line instead."
   (interactive "P")
@@ -243,46 +246,46 @@ This must be bound to a button-down mouse event."
     ;; (but not outside the window where the drag started).
     (let (event end end-point (end-of-range (point)))
       (track-mouse
-	(while (progn
-		 (setq event (cdr (gnus-read-event-char)))
-		 (or (mouse-movement-p event)
-		     (eq (car-safe event) 'switch-frame)))
-	  (if (eq (car-safe event) 'switch-frame)
-	      nil
-	    (setq end (event-end event)
-		  end-point (posn-point end))
+       (while (progn
+		(setq event (cdr (gnus-read-event-char)))
+		(or (mouse-movement-p event)
+		    (eq (car-safe event) 'switch-frame)))
+	 (if (eq (car-safe event) 'switch-frame)
+	     nil
+	   (setq end (event-end event)
+		 end-point (posn-point end))
 
-	    (cond
-	     ;; Are we moving within the original window?
-	     ((and (eq (posn-window end) start-window)
-		   (integer-or-marker-p end-point))
-	      ;; Go to START-POINT first, so that when we move to END-POINT,
-	      ;; if it's in the middle of intangible text,
-	      ;; point jumps in the direction away from START-POINT.
-	      (goto-char start-point)
-	      (goto-char end-point)
-	      (gnus-pick-article)
-	      ;; In case the user moved his mouse really fast, pick
-	      ;; articles on the line between this one and the last one.
-	      (let* ((this-line (1+ (count-lines 1 end-point)))
-		     (min-line (min this-line start-line))
-		     (max-line (max this-line start-line)))
-		(while (< min-line max-line)
-		  (goto-line min-line)
-		  (gnus-pick-article)
-		  (setq min-line (1+ min-line)))
-		(setq start-line this-line))
-	      (when (zerop (% click-count 3))
-		(setq end-of-range (point))))
-	     (t
-	      (let ((mouse-row (cdr (cdr (mouse-position)))))
-		(cond
-		 ((null mouse-row))
-		 ((< mouse-row top)
-		  (mouse-scroll-subr start-window (- mouse-row top)))
-		 ((>= mouse-row bottom)
-		  (mouse-scroll-subr start-window
-				     (1+ (- mouse-row bottom)))))))))))
+	   (cond
+	    ;; Are we moving within the original window?
+	    ((and (eq (posn-window end) start-window)
+		  (integer-or-marker-p end-point))
+	     ;; Go to START-POINT first, so that when we move to END-POINT,
+	     ;; if it's in the middle of intangible text,
+	     ;; point jumps in the direction away from START-POINT.
+	     (goto-char start-point)
+	     (goto-char end-point)
+	     (gnus-pick-article)
+	     ;; In case the user moved his mouse really fast, pick
+	     ;; articles on the line between this one and the last one.
+	     (let* ((this-line (1+ (count-lines 1 end-point)))
+		    (min-line (min this-line start-line))
+		    (max-line (max this-line start-line)))
+	       (while (< min-line max-line)
+		 (goto-line min-line)
+		 (gnus-pick-article)
+		 (setq min-line (1+ min-line)))
+	       (setq start-line this-line))
+	     (when (zerop (% click-count 3))
+	       (setq end-of-range (point))))
+	    (t
+	     (let ((mouse-row (cdr (cdr (mouse-position)))))
+	       (cond
+		((null mouse-row))
+		((< mouse-row top)
+		 (mouse-scroll-subr start-window (- mouse-row top)))
+		((>= mouse-row bottom)
+		 (mouse-scroll-subr start-window
+				    (1+ (- mouse-row bottom)))))))))))
       (when (consp event)
 	(let ((fun (key-binding (vector (car event)))))
 	  ;; Run the binding of the terminating up-event, if possible.
@@ -324,8 +327,8 @@ This must be bound to a button-down mouse event."
   (setq gnus-binary-mode-map (make-sparse-keymap))
 
   (gnus-define-keys
-   gnus-binary-mode-map
-   "g" gnus-binary-show-article))
+      gnus-binary-mode-map
+    "g" gnus-binary-show-article))
 
 (defun gnus-binary-make-menu-bar ()
   (unless (boundp 'gnus-binary-menu)
@@ -351,7 +354,8 @@ This must be bound to a button-down mouse event."
       ;; Set up the menu.
       (when (gnus-visual-p 'binary-menu 'menu)
 	(gnus-binary-make-menu-bar))
-      (gnus-add-minor-mode 'gnus-binary-mode " Binary" gnus-binary-mode-map)
+      (gnus-add-minor-mode 'gnus-binary-mode " Binary"
+			   gnus-binary-mode-map nil 'gnus-binary-mode)
       (gnus-run-hooks 'gnus-binary-mode-hook))))
 
 (defun gnus-binary-display-article (article &optional all-header)
@@ -442,13 +446,13 @@ Two predefined functions are available:
   (setq gnus-tree-mode-map (make-keymap))
   (suppress-keymap gnus-tree-mode-map)
   (gnus-define-keys
-   gnus-tree-mode-map
-   "\r" gnus-tree-select-article
-   gnus-mouse-2 gnus-tree-pick-article
-   "\C-?" gnus-tree-read-summary-keys
-   "h" gnus-tree-show-summary
+      gnus-tree-mode-map
+    "\r" gnus-tree-select-article
+    gnus-mouse-2 gnus-tree-pick-article
+    "\C-?" gnus-tree-read-summary-keys
+    "h" gnus-tree-show-summary
 
-   "\C-c\C-i" gnus-info-find-node)
+    "\C-c\C-i" gnus-info-find-node)
 
   (substitute-key-definition
    'undefined 'gnus-tree-read-summary-keys gnus-tree-mode-map))

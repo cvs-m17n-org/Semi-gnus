@@ -1,5 +1,6 @@
 ;;; gnus-kill.el --- kill commands for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -27,6 +28,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus)
 (require 'gnus-art)
 (require 'gnus-range)
@@ -48,7 +50,8 @@
   :type 'boolean)
 
 (defcustom gnus-winconf-kill-file nil
-  "What does this do, Lars?"
+  "What does this do, Lars?
+I don't know, Per."
   :group 'gnus-score-kill
   :type 'sexp)
 
@@ -520,7 +523,7 @@ COMMAND must be a lisp expression or a string representing a key sequence."
 	  (if (listp kill-list)
 	      ;; It is a list.
 	      (if (not (consp (cdr kill-list)))
-		  ;; It's on the form (regexp . date).
+		  ;; It's of the form (regexp . date).
 		  (if (zerop (gnus-execute field (car kill-list)
 					   command nil (not all)))
 		      (when (> (days-between date (cdr kill-list))
@@ -682,6 +685,7 @@ Usage: emacs -batch -l ~/.emacs -l gnus -f gnus-batch-score"
 		   (mapconcat 'identity command-line-args-left " "))))
 	 (gnus-expert-user t)
 	 (nnmail-spool-file nil)
+	 (mail-sources nil)
 	 (gnus-use-dribble-file nil)
 	 (gnus-batch-mode t)
 	 info group newsrc entry

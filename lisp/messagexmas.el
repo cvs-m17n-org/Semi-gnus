@@ -25,6 +25,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 
 (defvar message-xmas-dont-activate-region t
@@ -90,7 +91,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
   "Exchange point and mark, but allow for XEmacs' optional argument."
   (exchange-point-and-mark message-xmas-dont-activate-region))
 
-(fset 'message-exchange-point-and-mark 'message-xmas-exchange-point-and-mark)
+(defalias 'message-exchange-point-and-mark 
+  'message-xmas-exchange-point-and-mark)
 
 (defun message-xmas-maybe-fontify ()
   (when (featurep 'font-lock)
@@ -114,8 +116,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      (substring table (+ a 26) 255))))
 
 (when (>= emacs-major-version 20)
-  (fset 'message-make-caesar-translation-table
-	'message-xmas-make-caesar-translation-table))
+  (defalias 'message-make-caesar-translation-table
+    'message-xmas-make-caesar-translation-table))
 
 (add-hook 'message-mode-hook 'message-xmas-maybe-fontify)
 

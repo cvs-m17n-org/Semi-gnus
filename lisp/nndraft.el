@@ -1,5 +1,6 @@
 ;;; nndraft.el --- draft article access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -26,6 +27,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-start)
@@ -33,7 +35,7 @@
 (require 'nnoo)
 (eval-when-compile
   ;; This is just to shut up the byte-compiler.
-  (fset 'nndraft-request-group 'ignore))
+  (defalias 'nndraft-request-group 'ignore))
 
 (nnoo-declare nndraft
   nnmh)
@@ -109,7 +111,8 @@
 	   (newest (if (file-newer-than-file-p file auto) file auto))
 	   (nntp-server-buffer (or buffer nntp-server-buffer)))
       (when (and (file-exists-p newest)
-		 (nnmail-find-file newest))
+		 (let ((nnmail-file-coding-system nnheader-text-coding-system))
+		   (nnmail-find-file newest)))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
 	  (goto-char (point-min))
@@ -126,6 +129,7 @@
   (when (nndraft-request-article article group server (current-buffer))
     (message-remove-header "xref")
     (message-remove-header "lines")
+    (message-remove-header "date")
     t))
 
 (deffoo nndraft-request-update-info (group info &optional server)
@@ -134,8 +138,9 @@
    info
    (gnus-update-read-articles (gnus-group-prefixed-name group '(nndraft ""))
 			      (nndraft-articles) t))
-  (let (marks)
-    (when (setq marks (nth 3 info))
+  (let ((marks (nth 3 info)))
+    (when marks
+      ;; Nix out all marks except the `unsend'-able article marks.
       (setcar (nthcdr 3 info)
 	      (if (assq 'unsend marks)
 		  (list (assq 'unsend marks))
@@ -149,7 +154,7 @@
   (nndraft-possibly-change-group group)
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
-	 article file)
+	article file)
     (with-temp-buffer
       (insert-buffer-substring buf)
       (setq article (nndraft-request-accept-article
@@ -188,6 +193,12 @@
   (let ((gnus-verbose-backends nil))
     (nnoo-parent-function 'nndraft 'nnmh-request-accept-article
 			  (list group server last noinsert))))
+
+(deffoo nndraft-request-replace-article (article group buffer)
+  (nndraft-possibly-change-group group)
+  (let ((nnmail-file-coding-system nnheader-text-coding-system))
+    (nnoo-parent-function 'nndraft 'nnmh-request-replace-article
+			  (list article group buffer))))
 
 (deffoo nndraft-request-create-group (group &optional server args)
   (nndraft-possibly-change-group group)
@@ -242,8 +253,7 @@
    nnmh-close-group
    nnmh-request-list
    nnmh-request-newsgroups
-   nnmh-request-move-article
-   nnmh-request-replace-article))
+   nnmh-request-move-article))
 
 (provide 'nndraft)
 
