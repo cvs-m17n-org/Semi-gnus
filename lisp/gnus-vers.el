@@ -31,7 +31,7 @@
 
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
-    (product-define "Nana-gnus" nil '(7 1 0 22)))
+    (product-define "Nana-gnus" nil '(7 1 0 23)))
 
 (defconst gnus-product-name (product-name (product-find 'gnus-vers))
   "Product name of this version of gnus.")
