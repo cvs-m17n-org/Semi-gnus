@@ -334,12 +334,6 @@
 		      (nth 1 sform))))
 	 form)))
 
-;; Avoid byte compile warning for FSF Emacsen.
-(eval-when-compile
-  (unless (featurep 'xemacs)
-    (autoload 'gnus-tilde-pad-form "gnus-xmas")
-    ))
-
 (defun gnus-parse-simple-format (format spec-alist &optional insert)
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a

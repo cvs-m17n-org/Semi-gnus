@@ -274,7 +274,6 @@ time saver for large mailboxes.")
   (nnfolder-possibly-change-group nil server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (file-name-coding-system 'binary)
 	  (pathname-coding-system 'binary))
       (nnmail-find-file nnfolder-active-file)
       (setq nnfolder-group-alist (nnmail-get-active)))
@@ -535,8 +534,7 @@ deleted.  Point is left where the deleted region was."
   ;; Change group.
   (when (and group
 	     (not (equal group nnfolder-current-group)))
-    (let ((file-name-coding-system 'binary)
-	  (pathname-coding-system 'binary))
+    (let ((pathname-coding-system 'binary))
       (nnmail-activate 'nnfolder)
       (when (and (not (assoc group nnfolder-group-alist))
 		 (not (file-exists-p
@@ -590,13 +588,8 @@ deleted.  Point is left where the deleted region was."
     (unless (looking-at message-unix-mail-delimiter)
       (insert "From nobody " (current-time-string) "\n")
       (goto-char (point-min)))
-    (forward-line 1)
-    ;; Quote subsequent "From " lines in the header.
-    (while (looking-at message-unix-mail-delimiter)
-      (delete-region (point) (+ (point) 4))
-      (insert "X-From-Line:")
-      (forward-line 1))
     ;; Quote all "From " lines in the article.
+    (forward-line 1)
     (let (case-fold-search)
       (while (re-search-forward "^From " nil t)
 	(beginning-of-line)

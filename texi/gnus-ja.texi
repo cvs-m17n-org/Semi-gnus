@@ -6,7 +6,7 @@
 @synindex vr cp
 @synindex pg cp
 @c @direntry
-@c * Semi-gnus-ja: (gnus-ja).   The news reader Semi-gnus ($BF|K\8lHG(B).
+@c * Gnus-ja: (gnus-ja).   The news reader gnus ($BF|K\8lHG(B).
 @c @end direntry
 @iftex
 @finalout
@@ -14,8 +14,290 @@
 @setchapternewpage odd
 
 @iftex
+@iflatex
+\documentclass[twoside,a4paper,openright,11pt]{book}
+\usepackage[latin1]{inputenc}
+\usepackage{pagestyle}
+\usepackage{epsfig}
+\usepackage{bembo}
+\usepackage{pixidx}
+
+\makeindex
+\begin{document}
+
+\newcommand{\gnuschaptername}{}
+\newcommand{\gnussectionname}{}
+
+\newcommand{\gnusbackslash}{/}
+
+\newcommand{\gnusxref}[1]{See ``#1'' on page \pageref{#1}}
+\newcommand{\gnuspxref}[1]{see ``#1'' on page \pageref{#1}}
+
+\newcommand{\gnuskindex}[1]{\index{#1}}
+\newcommand{\gnusindex}[1]{\index{#1}}
+
+\newcommand{\gnustt}[1]{{\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}}
+\newcommand{\gnuscode}[1]{\gnustt{#1}}
+\newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}''}
+\newcommand{\gnuslisp}[1]{\gnustt{#1}}
+\newcommand{\gnuskbd}[1]{`\gnustt{#1}'}
+\newcommand{\gnusfile}[1]{`\gnustt{#1}'}
+\newcommand{\gnusdfn}[1]{\textit{#1}}
+\newcommand{\gnusi}[1]{\textit{#1}}
+\newcommand{\gnusstrong}[1]{\textbf{#1}}
+\newcommand{\gnusemph}[1]{\textit{#1}}
+\newcommand{\gnusvar}[1]{{\fontsize{10pt}{10}\selectfont\textsl{\textsf{#1}}}}
+\newcommand{\gnussc}[1]{\textsc{#1}}
+\newcommand{\gnustitle}[1]{{\huge\textbf{#1}}}
+\newcommand{\gnusauthor}[1]{{\large\textbf{#1}}}
+
+\newcommand{\gnusbullet}{{${\bullet}$}}
+\newcommand{\gnusdollar}{\$}
+\newcommand{\gnusampersand}{\&}
+\newcommand{\gnuspercent}{\%}
+\newcommand{\gnushash}{\#}
+\newcommand{\gnushat}{\symbol{"5E}}
+\newcommand{\gnusunderline}{\symbol{"5F}}
+\newcommand{\gnusnot}{$\neg$}
+\newcommand{\gnustilde}{\symbol{"7E}}
+\newcommand{\gnusless}{{$<$}}
+\newcommand{\gnusgreater}{{$>$}}
+\newcommand{\gnusbraceleft}{{$>$}}
+\newcommand{\gnusbraceright}{{$>$}}
+
+\newcommand{\gnushead}{\raisebox{-1cm}{\epsfig{figure=ps/gnus-head.eps,height=1cm}}}
+\newcommand{\gnusinteresting}{
+\marginpar[\mbox{}\hfill\gnushead]{\gnushead}
+}
+
+\newcommand{\gnuscleardoublepage}{\ifodd\count0\mbox{}\clearpage\thispagestyle{empty}\mbox{}\clearpage\else\clearpage\fi}
+
+\newcommand{\gnuspagechapter}[1]{
+{\mbox{}}
+}
+
+\newdimen{\gnusdimen}
+\gnusdimen 0pt
+
+\newcommand{\gnuschapter}[2]{
+\gnuscleardoublepage
+\ifdim \gnusdimen = 0pt\setcounter{page}{1}\pagestyle{gnus}\pagenumbering{arabic} \gnusdimen 1pt\fi
+\chapter{#2}
+\renewcommand{\gnussectionname}{}
+\renewcommand{\gnuschaptername}{#2}
+\thispagestyle{empty}
+\hspace*{-2cm}
+\begin{picture}(500,500)(0,0)
+\put(480,350){\makebox(0,0)[tr]{#1}}
+\put(40,300){\makebox(500,50)[bl]{{\Huge\bf{#2}}}}
+\end{picture}
+\clearpage
+}
+
+\newcommand{\gnusfigure}[3]{
+\begin{figure}
+\mbox{}\ifodd\count0\hspace*{-0.8cm}\else\hspace*{-3cm}\fi\begin{picture}(440,#2)
+#3
+\end{picture}
+\caption{#1}
+\end{figure}
+}
+
+\newcommand{\gnusicon}[1]{
+\marginpar[\mbox{}\hfill\raisebox{-1.5cm}{\epsfig{figure=tmp/#1-up.ps,height=1.5cm}}]{\raisebox{-1cm}{\epsfig{figure=tmp/#1-up.ps,height=1cm}}}
+}
+
+\newcommand{\gnuspicon}[1]{
+\margindex{\epsfig{figure=#1,width=2cm}}
+}
+
+\newcommand{\gnusxface}[2]{
+\margindex{\epsfig{figure=#1,width=1cm}\epsfig{figure=#2,width=1cm}}
+}
+
+\newcommand{\gnussmiley}[2]{
+\margindex{\makebox[2cm]{\hfill\epsfig{figure=#1,width=0.5cm}\hfill\epsfig{figure=#2,width=0.5cm}\hfill}}
+}
+
+\newcommand{\gnusitemx}[1]{\mbox{}\vspace*{-\itemsep}\vspace*{-\parsep}\item#1}
+
+\newcommand{\gnussection}[1]{
+\renewcommand{\gnussectionname}{#1}
+\section{#1}
+}
+
+\newenvironment{codelist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{kbdlist}%
+{\begin{list}{}{
+\labelwidth=0cm
+}
+}{\end{list}}
+
+\newenvironment{dfnlist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{stronglist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{samplist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{varlist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{emphlist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newlength\gnusheadtextwidth
+\setlength{\gnusheadtextwidth}{\headtextwidth}
+\addtolength{\gnusheadtextwidth}{1cm}
+
+\newpagestyle{gnuspreamble}%
+{
+{
+\ifodd\count0
+{
+\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\mbox{}}\textbf{\hfill\roman{page}}}
+}
+\else
+{
+\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\roman{page}\hfill\mbox{}}}
+}
+}
+\fi
+}
+}
+{
+\ifodd\count0
+\mbox{} \hfill
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\else
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\hfill \mbox{}
+\fi
+}
+
+\newpagestyle{gnusindex}%
+{
+{
+\ifodd\count0
+{
+\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\gnuschaptername\hfill\arabic{page}}}}
+}
+\else
+{
+\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}
+}
+\fi
+}
+}
+{
+\ifodd\count0
+\mbox{} \hfill
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\else
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\hfill \mbox{}
+\fi
+}
+
+\newpagestyle{gnus}%
+{
+{
+\ifodd\count0
+{
+\makebox[12cm]{\hspace*{3.1cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{chapter}.\arabic{section}} \textbf{\gnussectionname\hfill\arabic{page}}}}}
+}
+\else
+{
+\makebox[12cm]{\hspace*{-2.95cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}}
+}
+\fi
+}
+}
+{
+\ifodd\count0
+\mbox{} \hfill
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\else
+\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
+\hfill \mbox{}
+\fi
+}
+
+\pagenumbering{roman}
+\pagestyle{gnuspreamble}
+
+@end iflatex
 @end iftex
 
+@iftex
+@iflatex
+\begin{titlepage}
+{
+
+%\addtolength{\oddsidemargin}{-5cm}
+%\addtolength{\evensidemargin}{-5cm}
+\parindent=0cm
+\addtolength{\textheight}{2cm}
+
+\gnustitle{\gnustitlename}\\
+\rule{15cm}{1mm}\\
+\vfill
+\hspace*{0cm}\epsfig{figure=ps/gnus-big-logo.eps,height=15cm}
+\vfill
+\rule{15cm}{1mm}\\
+\gnusauthor{by Lars Magne Ingebrigtsen}
+\newpage
+}
+
+\mbox{}
+\vfill
+
+\thispagestyle{empty}
+
+Copyright \copyright{} 1995,96,97 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+$BCx:n8"I=<($H$3$N5v2DJ8$,$9$Y$F$NJ#@=$KB8:_$9$k8B$j!"$3$N@bL@=q$N$^$C$?$/(B
+$BF10l$NJ#@=$r:n$j!"G[I[$9$k$3$H$r5v2D$9$k!#(B
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+$BF10lJ#@=$N>r7o$N2<$G!"$=$l$K$h$C$FF@$i$l$?7k2L$r$3$N5v2DJ8$NI=<($HF10l$N(B
+$B>r7o$N$b$H$GG[I[$9$k8B$j!"$3$N@bL@=q$N=$@5HG$NJ#@=$r$7!"G[I[$9$k$3$H$r5v(B
+$B2D$9$k!#(B
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+$B>e5-$N=$@5HG$K4X$9$k>r7o$N2<$G!"$3$N@bL@=q$NK]Lu$NJ#@=$r:n$j!"G[I[$9$k$3(B
+$B$H$r5v2D$9$k!#(B
+
+\newpage
+\end{titlepage}
+@end iflatex
+@end iftex
 
 @ifinfo
 
@@ -122,6 +404,11 @@ Semi-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 @end ifinfo
 
 @iftex
+
+@iflatex
+\tableofcontents
+\gnuscleardoublepage
+@end iflatex
 
 Gnus $B$O(B GNU Emacs $B$N@h?JE*$G!"@bL@$N$"$k!"%+%9%?%^%$%:2DG=$G!"3HD%2DG=$J!"(B
 $B%j%"%k%?%$%`$G$J$$%K%e!<%9%j!<%@!<$G$9!#(B
@@ -613,6 +900,8 @@ gnus-group-clear-data-on-native-groups} $B$r;H$C$F!"4pK\%0%k!<%W$K4X$9$k%G!<(B
 $B$s!#(B---$B$=$l$O%U%!%$%k(B @file{.newsrc} $B$K$O$J$$$?$/$5$s$N>pJs$rJ];}$7$F$$(B
 $B$^$9!#(B 
 
+$B$A$J$_$K!"(Bgnus $B$O2?$bJQ$($F$^$;$s!#(BLars $BF1;V!"K|:P!*(B
+
 
 @vindex gnus-save-newsrc-file
 @code{gnus-save-newsrc-file} $B$r(B @code{nil} $B$K$9$k$3$H$K$h$C$F%U%!%$%k(B
@@ -783,8 +1072,8 @@ Gnus $B$,5/F0$5$l$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 @vindex gnus-started-hook
 Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 
-@item gnus-started-hook
-@vindex gnus-started-hook
+@item gnus-setup-news-hook
+@vindex gnus-setup-news-hook
 
 $B%U%!%$%k(B @file{.newsrc} $B$rFI$_9~$s$@8e$G!"%0%k!<%W%P%C%U%!$r:n@.$9$kA0$K(B
 $B<B9T$5$l$k%U%C%/$G$9!#(B
@@ -831,6 +1120,19 @@ Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 $B$G!"(Bgnus $B$,@8$-$F$$$k8B$j7h$7$F>C$5$l$k$3$H$O$"$j$^$;$s!#(B
 
 
+@iftex
+@iflatex
+\gnusfigure{The Group Buffer}{320}{
+\put(75,50){\epsfig{figure=tmp/group.ps,height=9cm}}
+\put(120,37){\makebox(0,0)[t]{Buffer name}}
+\put(120,38){\vector(1,2){10}}
+\put(40,60){\makebox(0,0)[r]{Mode line}}
+\put(40,58){\vector(1,0){30}}
+\put(200,28){\makebox(0,0)[t]{Native select method}}
+\put(200,26){\vector(-1,2){15}}
+}
+@end iflatex
+@end iftex
 
 @menu
 * Group Buffer Format::    $BI=<($5$l$F$$$k>pJs$HJQ99$NJ}K!!#(B
@@ -2288,6 +2590,14 @@ Note:
 $B%0%k!<%W$r(B Emacs $B%0%k!<%W!"%;%C%/%9%0%k!<%W$N$I$A$i$+$NI{%H%T%C%/$H$9$k$3(B
 $B$H$5$($b$G$-$^$9!=!=$"$k$$$ON>J}$K!*$9$s$4$$$G$7$g$&!*(B
 
+@iftex
+@iflatex
+\gnusfigure{Group Topics}{400}{
+\put(75,50){\epsfig{figure=tmp/group-topic.ps,height=9cm}}
+}
+@end iflatex
+@end iftex
+
 $B$3$l$,Nc$G$9!'(B
 
 @example
@@ -2955,6 +3265,15 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx(B
 @node Summary Buffer Format
 @section $B35N,%P%C%U%!$NMM<0(B
 @cindex summary buffer format
+
+@iftex
+@iflatex
+\gnusfigure{The Summary Buffer}{180}{
+\put(0,0){\epsfig{figure=tmp/summary.ps,width=7.5cm}}
+\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-article.ps,width=7.5cm}}}
+}
+@end iflatex
+@end iftex
 
 @menu
 * Summary Buffer Lines::     $B35N,%P%C%U%!$,$I$N$h$&$K8+$($k$Y$-$+$r;XDj$G$-$k!#(B
@@ -3871,7 +4190,7 @@ Prefixes})$B!#(B
 $BO@J8$rFI$s$G$$$F!"$=$l$rFI$_=*$o$kA0$KM<?)$r?)$Y$k$?$a$K2H$K5"$i$J$1$l$P(B
 $B$J$i$J$+$C$?$H$7$^$7$g$&!#$=$N$H$-$K!"5-;v$K$7$*$j$r64$`$3$H$,$G$-!"<!$K(B
 $B$=$N5-;v$K=P$/$o$7$?$H$-$K!"(Bgnus $B$O$=$N$7$*$j$N$H$3$m$X0\F0$9$k$G$7$g$&!#(B
-@xref{Setting Marks}.
+@xref{Setting Marks}
 
 @item
 @vindex gnus-replied-mark
@@ -3881,7 +4200,7 @@ Prefixes})$B!#(B
 @item
 @vindex gnus-cached-mark
 $B5-;v%-%c%C%7%e$KCy$a$i$l$F$$$k5-;v$O(B2$B7eL\$K(B @samp{*} $B$N0u$,$D$-$^$9(B
-(@code{gnus-replied-mark})$B!#(B @xref{Article Caching}.
+(@code{gnus-replied-mark})$B!#(B @xref{Article Caching}
 
 @item
 @vindex gnus-saved-mark
@@ -3936,7 +4255,7 @@ Prefixes})$B!#(B
 @kindex M t $B!J35N,!K(B
 @findex gnus-summary-tick-article-forward
 $B8=:_$N5-;v$K2D;k5-;v0u$rIU$1$^$9(B
-(@code{gnus-summary-tick-article-forward})$B!#(B @xref{Article Caching}.
+(@code{gnus-summary-tick-article-forward})$B!#(B @xref{Article Caching}
 
 @item M ?
 @itemx ?
@@ -4348,6 +4667,17 @@ Gnus $B$O=i4|@_Dj$G5-;v$r%9%l%C%I$K$7$^$9!#(B@dfn{$B%9%l%C%I$K$9$k(B} $B$H$
 $BK\Ev$N%9%l%C%I$,L5$$$H$-$O!"(Bgnus $B$O2?$+$G$C$A>e$2$r$9$kI,MW$,$"$j$^$9!#$3(B
 $B$NJQ?t$O(B gnus $B$,;H$&$Y$-$4$^$+$7$NJ}K!$r<($7$F$$$^$9!#CM$H$7$F$H$k$3$H$,$G(B
 $B$-$k#4$D$N8uJd$,$"$j$^$9!#(B
+
+@iftex
+@iflatex
+\gnusfigure{The Summary Buffer}{390}{
+\put(0,0){\epsfig{figure=tmp/summary-adopt.ps,width=7.5cm}}
+\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-empty.ps,width=7.5cm}}}
+\put(0,400){\makebox(0,0)[tl]{\epsfig{figure=tmp/summary-none.ps,width=7.5cm}}}
+\put(445,400){\makebox(0,0)[tr]{\epsfig{figure=tmp/summary-dummy.ps,width=7.5cm}}}
+}
+@end iflatex
+@end iftex
 
 @cindex adopting articles
 
@@ -6077,6 +6407,11 @@ M******** sm*rtq**t*s $B$r=hM}$7$^$9(B
 @findex gnus-article-x-face-command
 @vindex gnus-article-x-face-command
 @vindex gnus-article-x-face-too-ugly
+@iftex
+@iflatex
+\include{xface}
+@end iflatex
+@end iftex
 $B$9$Y$F$N(B X-Face $BMs$rC5$7$FI=<($7$^$9(B(@code{gnus-article-display-x-face})$B!#(B
 $B$3$NL?Na$OJQ?t(B @code{gnus-article-x-face-command} $B$K$h$C$FM?$($i$l$?4X?t$K(B
 $B$h$C$F<B9T$5$l$^$9!#$3$NJQ?t$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B9T$5(B
@@ -6094,7 +6429,7 @@ X-Face $B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $B$O(B @code{pbmplus} $B$d$=$NCg4V$N3
 @kindex W b $B!J35N,!K(B
 @findex gnus-article-add-buttons
 $B%/%j%C%/$G$-$k%\%?%s$r5-;v$K2C$($^$9(B (@code{gnus-article-add-buttons})$B!#(B
-@xref{Article Buttons}.
+@xref{Article Buttons}
 
 @item W B
 @kindex W B $B!J35N,!K(B
@@ -7475,6 +7810,11 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B8=<B$N=PMh;v$H<B:_$N?MJ*$KN`;w$7$F$$$k$+$b$7$l$^$;$s$,!"$3$l$OA4(B
 $B$F%[%s%H$N$3$H$G$9!#$2$[$2$[!#(B
 
+$B$^$"!"$=$&$$$&Lu$G!"(Bgnus $B$G$O(B @code{metamail-buffer} $B$r;H$&$N$r;_$a$?Lu$G(B
+$B$9!#$=$&$$$&Lu$G!":#$G$O>o$K(B @code{gnus-show-mime} $B$r(B @code{nil} $B0J30$K$7(B
+$B$F$*$-!"<~$j$K?M$,$$$J$$;~$r8+7W$i$C$F5-;v%P%C%U%!$K8=$o$l$k%\%?%s$r2!$7$^(B
+$B$7$g$&!#(B
+
 
 @node Customizing Articles
 @section $B5-;v$N%+%9%?%^%$%:(B
@@ -7939,7 +8279,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
-$B$O(B @var{(name . value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
+$B$O(B @var{(name value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
 @code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
@@ -9895,7 +10235,6 @@ mbox $B%U%!%$%k$r=E$$B-<h$j$GC5$9I,MW$O$"$j$^$;$s!#(B
 
 @end table
 
-
 @findex nnfolder-generate-active-file
 @kindex M-x nnfolder-generate-active-file
 @code{nnfolder} $B$GFI$_$?$$$H;W$&!"$?$/$5$s$N(B @code{nnfolder} $B$N$h$&$J%U%!(B
@@ -10973,7 +11312,7 @@ Gnus $B$r(B @code{gnus-unplugged} $B$G5/F0$7$^$9!#$3$l$O(B gnus $B%(!<%8%'
 $B%U%!!<$N2<$K0lMwI=<($5$l$F$$$k4pK\A*BrJ}K!$@$1$G$7$g$&!#(B
 
 @item
-$B%@%&%s%m!<%IJ}?K$r7hDj$7$^$9!#(B@xref{Agent Categories}.
+$B%@%&%s%m!<%IJ}?K$r7hDj$7$^$9!#(B@xref{Agent Categories}
 
 @item
 $B$($($H!D!"0J>e$G$9!#(B
@@ -11240,7 +11579,7 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 @kindex J S (Agent Group)
 @findex gnus-group-send-drafts
 $B2<=q$-%0%k!<%W$K$"$kAw?.2DG=$J%a%C%;!<%8$rA4$FAw?.$9$k(B
-(@code{gnus-group-send-session})$B!#(B @xref{Drafts}.
+(@code{gnus-group-send-session})$B!#(B @xref{Drafts}
 
 @item J a
 @kindex J a (Agent Group)
@@ -14295,6 +14634,12 @@ XEmacs $B$O3($d$=$NB>$N$b$N$rI=<($9$k$3$H$,$G$-$k$N$G!"(Bgnus $B$O$3$l(B
 @node Picons
 @subsection Picons
 
+@iftex
+@iflatex
+\include{picons}
+@end iflatex
+@end iftex
+
 $B$=$l$G!D!"$"$J$?$O$3$N%K%e!<%9%j!<%@!<$r$5$i$K$b$C$HCY$/$7$?$$$C(B
 $B$F$o$1$@$M(B! $B$3$l$O$=$&$9$k$N$K$T$C$?$j$JJ}K!$G$9!#$5$i$K$3$l$O!"(B
 $B$"$J$?$,%K%e!<%9$rFI$s$G$$$k$s$@$H$$$&$3$H$r!"$"$J$?$N8*1[$7$K8+(B
@@ -14313,6 +14658,12 @@ XEmacs $B$O3($d$=$NB>$N$b$N$rI=<($9$k$3$H$,$G$-$k$N$G!"(Bgnus $B$O$3$l(B
 @subsubsection Picon $B$N4pAC(B
 
 Picon $B$H$O$J$s$G$7$g$&(B? Picons $B%&%'%V%5%$%H$+$iD>@\0zMQ$7$^$7$g$&!#(B
+
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
 
 @quotation
 @dfn{Picon} $B$H$O!"(B``$B8D?M%"%$%3%s(B (personal icons)'' $B$NN,$G$9!#$3(B
@@ -14386,6 +14737,12 @@ picon $BI=<($rM-8z$K$9$k$K$O!"C1$K0J2<$N9T$r(B @file{~/.gnus} $B%U%!%$(B
 
 @node Hard Picons
 @subsubsection $BFq2r(B Picons
+
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
 
 Gnus $B$O!"%0%k!<%W$d5-;v$KF~$C$?$j=P$?$j$9$k$N$K=>$C$F(B picon $B$rI=(B
 $B<($9$k$3$H$,$G$-$^$9!#(BGnus $B$O(B picon $B%G!<%?%Y!<%9$N;0$D$N>O$H$I$&(B
@@ -14461,6 +14818,12 @@ X-Face $B%X%C%@!<$,$"$l$P$=$l$rI|9f2=$7I=<($7$^$9!#$3$N4X?t$O(B
 
 @node Picon Useless Configuration
 @subsubsection $BL50UL#$J(B Picon $B@_Dj(B
+
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
 
 $B0J2<$NJQ?t$O!"$5$i$K$3$l$i$r$I$&<B9T$9$k$+!"$I$3$KG[CV$9$k$+!"$=(B
 $B$NB>Lr$K$bN)$?$J$$$I$&$G$b$h$$$3$H$r@)8f$G$-$k$h$&$K$7$^$9!#(B
@@ -14540,11 +14903,24 @@ Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus
 $B8F$S=P$9I,MW$,$"$j$^$9!#(B@code{nil} $B$G$J$1$l$P%-%c%C%7%e$O(B gnus
 $B$,=*N;$9$k$?$S$K>C5n$5$l$^$9!#=i4|@_DjCM$O(B @code{t} $B$G$9!#(B
 
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
+
 @end table
 
 @node Smileys
 @subsection $B%9%^%$%j!<(B
 @cindex smileys
+
+@iftex
+@iflatex
+\gnusfig{-3cm}{0.5cm}{\epsfig{figure=tmp/BigFace.ps,height=20cm}}
+\input{smiley}
+@end iflatex
+@end iftex
 
 $B%9%^%$%j!<(B @dfn{smiley} $B$O(B gnus $B$H$OJL$N%Q%C%1!<%8$G$9$,!"%9%^%$(B
 $B%j!<$r;H$C$F$$$k%Q%C%1!<%8$O8=:_(B gnus $B$@$1$G$9$N$G!"$3$3$G@bL@$7(B
@@ -14613,6 +14989,12 @@ Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus
 
 @table @code
 
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
+
 @item gnus-use-toolbar
 @vindex gnus-use-toolbar
 @code{nil} $B$J$i$P%D!<%k%P!<$rI=<($7$J$$!#(B@code{nil} $B0J30$N>l9g$O!"(B
@@ -14663,6 +15045,12 @@ Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus
 @vindex gnus-xmas-modeline-glyph
 $BA4$F$N(B gnus $B%b!<%I9T$GI=<($5$l$k3(J8;z!#$3$l$O=i4|@_Dj$G$O$A$$$5(B
 $B$J%L!<(B (gnu) $B$NF,$G$9!#(B
+
+@iftex
+@iflatex
+\margindex{}
+@end iflatex
+@end iftex
 
 @end table
 
@@ -15599,6 +15987,12 @@ Gnus $B$N%&%#%s%I%&$H%U%l!<%`$N@_Dj$G$?$/$5$s$NJQ$J;v$r$G$-$k$h$&$K$J$j$^(B
 @node September Gnus
 @subsubsection September Gnus
 
+@iftex
+@iflatex
+\gnusfig{-28cm}{0cm}{\epsfig{figure=tmp/september.ps,height=20cm}}
+@end iflatex
+@end iftex
+
 Gnus 5.2/5.3 $B$N?7$7$$5!G=(B:
 
 @itemize @bullet
@@ -15746,6 +16140,11 @@ Washing})$B!#(B
 @item
 $B%G!<%b%s$N%W%m%;%9$G%a!<%k$r:FAv::$9$k$3$H$,$G$-$k$h$&$K$J$j$^$7$?(B 
 (@pxref{Daemons})$B!#(B
+@iftex
+@iflatex
+\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fseptember.ps,height=5cm}]{\epsfig{figure=tmp/fseptember.ps,height=5cm}}
+@end iflatex
+@end iftex
 
 @item
 Gnus $B$O%9%Q%`$r:,@d$d$7$K$9$k$?$a$K(B NoCeM $B%U%!%$%k$r;H$&;v$,$G$-$k$h$&$K(B
@@ -15843,6 +16242,12 @@ Gnus $B$OJ]B8$9$k$H$-$KF1$8$/$i$$$NB%?J$r$7$J$/$F$bNI$$$h$&$K$J$j$^$7$?(B
 @subsubsection Red Gnus
 
 Gnus 5.4/5.5 $B$N?7$7$$5!G=(B:
+
+@iftex
+@iflatex
+\gnusfig{-5.5cm}{-4cm}{\epsfig{figure=tmp/red.ps,height=20cm}}
+@end iflatex
+@end iftex
 
 @itemize @bullet
 
@@ -15962,6 +16367,11 @@ Sorting})$B!#(B
 @item
 $B%-%c%C%7%e$5$l$?5-;v$,%0%k!<%W$KF~$l$i$l$k$h$&$K$J$j$^$7$?(B 
 (@pxref{Summary Generation Commands})$B!#(B
+@iftex
+@iflatex
+\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fred.ps,width=3cm}]{\epsfig{figure=tmp/fred.ps,width=3cm}}
+@end iflatex
+@end iftex
 
 @item
 $B%9%3%"%U%!%$%k$,$b$C$H?.Mj$G$-$k=gHV$GE,MQ$G$-$k$h$&$K$J$j$^$7$?(B 
@@ -17334,6 +17744,10 @@ Solve the halting problem.
 @cindex manual
 
 $B$3$N%^%K%e%"%k$O(B TeXinfo $B%U%!%$%k$+$i:n@.$5$l!"$=$l$+$i(B @code{texi2dvi}
+@iflatex
+$B$b$7$/$O!"(BLars $B$5$s$N:n$i$l$?(B Texinfo to \LaTeX $BJQ49$rDL$j!"$=$l$+$i!"(B
+@code{latex} $B$H(B @code{dvips} 
+@end iflatex
 $B$r<B9T$7$F!"<j85$K$"$k$b$K$J$j$^$7$?!#(B
 
 $B0J2<$N=,47$,MQ$$$i$l$^$7$?(B:
@@ -17366,6 +17780,15 @@ Solve the halting problem.
 @samp{yes} $B$H(B @code{yes} $B$O(B2$B$D$N(B @emph{$BA4$/(B} $B0c$C$?$b$N$G$9(B---$B@dBP$K:.F1(B
 $B$7$J$$$G$/$@$5$$!#(B
 
+@iflatex
+@c @head
+$B$b$A$m$s!"$3$N%^%K%e%"%k$NA4$F$O=EBg$J6=L#$N$"$k$3$H$G$9$N$G!"$"$J$?$OA4(B
+$B$FFI$`$Y$-$G$9!#2?EY$b!#$7$+$7!"%^%K%e%"%k$r<P$aFI$_$7$?$$$N$G$"$l$P!"$=(B
+$B$3$N%^!<%8%s$K$"$k%L!<$NF,$r8+$k$Y$-$G$7$g$&(B---$B$=$l$O$=$3$G5DO@$5$l$F$$(B
+$B$k$N$,;D$j$N$b$N$h$j=EMW$G$"$k$H$$$&$3$H$G$9!#(B ($B0lJ}!"A4$F$,L58B$K=EMW$N(B
+$B$G$"$l$P!"$I$&$9$l$P$=$l$h$j$b$C$H=EMW$J$b$N$,$G$-$k$N$G$7$g$&!)(B $B$3$N@$(B
+$B3&$N!"IT;W5D$N(B1$B$D$G$7$g$&!"$?$V$s!#(B)
+@end iflatex
 
 @end iftex
 
@@ -19274,5 +19697,10 @@ lisp $B8l$G$9(B) $B$5$l$^$9!#$b$7JQ?t$r$9$0$KJQ99$7$?$$$N$G$"$l$P!"JD$83g8L$N
 @contents
 @bye
 
+@iftex
+@iflatex
+\end{document}
+@end iflatex
+@end iftex
 
 @c End:

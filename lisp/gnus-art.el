@@ -96,7 +96,7 @@
 
 (defcustom gnus-ignored-headers
   '("^Path:" "^Expires:" "^Date-Received:" "^References:" "^Xref:" "^Lines:"
-    "^Relay-Version:" "^Message-ID:" "^Approved:" "^Sender:" "^Received:"
+    "^Relay-Version:" "^Message-ID:" "^Approved:" "^Sender:" "^Received:" 
     "^X-UIDL:" "^MIME-Version:" "^Return-Path:" "^In-Reply-To:"
     "^Content-Type:" "^Content-Transfer-Encoding:" "^X-WebTV-Signature:"
     "^X-MimeOLE:" "^X-MSMail-Priority:" "^X-Priority:" "^X-Loop:"
@@ -106,7 +106,7 @@
     "^X-Complaints-To:" "^X-NNTP-Posting-Host:" "^X-Orig.*:"
     "^Abuse-Reports-To:" "^Cache-Post-Path:" "^X-Article-Creation-Date:"
     "^X-Poster:" "^X-Mail2News-Path:" "^X-Server-Date:" "^X-Cache:"
-    "^Originator:" "^X-Problems-To:" "^X-Auth-User:" "^X-Post-Time:"
+    "^Originator:" "^X-Problems-To:" "^X-Auth-User:" "^X-Post-Time:" 
     "^X-Admin:" "^X-UID:" "^Resent-[-A-Za-z]+:" "^X-Mailing-List:"
     "^Precedence:" "^Original-[-A-Za-z]+:" "^X-filename:" "^X-Orcpt:"
     "^Old-Received:" "^X-Pgp-Fingerprint:" "^X-Pgp-Key-Id:"
@@ -2152,23 +2152,20 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 
 (defun gnus-article-prepare-display ()
   "Make the current buffer look like a nice article."
-  (gnus-run-hooks 'gnus-tmp-internal-hook)
-  (gnus-run-hooks 'gnus-article-prepare-hook)
   (let ((method
 	 (if gnus-show-mime
 	     (progn
 	       (setq mime-message-structure gnus-current-headers)
 	       gnus-article-display-method-for-mime)
-	   gnus-article-display-method-for-traditional))
-	(inhibit-read-only t)
-	buffer-read-only)
+	   gnus-article-display-method-for-traditional)))
+    (gnus-run-hooks 'gnus-tmp-internal-hook)
+    (gnus-run-hooks 'gnus-article-prepare-hook)
     ;; Display message.
     (funcall method)
     ;; Associate this article with the current summary buffer.
     (setq gnus-article-current-summary gnus-summary-buffer)
     ;; Perform the article display hooks.
-    (gnus-run-hooks 'gnus-article-display-hook)
-    (put-text-property (point-min) (point-max) 'read-only nil)))
+    (gnus-run-hooks 'gnus-article-display-hook)))
 
 (defun gnus-article-wash-status ()
   "Return a string which display status of article washing."
@@ -2765,12 +2762,6 @@ groups."
     (setq font-lock-defaults nil)
     (font-lock-mode 0)))
 
-;; Avoid byte compile warning for FSF Emacsen.
-(eval-when-compile
-  (unless (featurep 'xemacs)
-    (autoload 'font-lock-set-defaults "font-lock")
-    ))
-
 (defun gnus-article-mime-edit-article-setup ()
   "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
 after replacing with the original article."
@@ -3325,12 +3316,17 @@ forbidden in URL encoding."
 
 (defun gnus-button-url (address)
   "Browse ADDRESS."
-  (browse-url address))
+  ;; In Emacs 20, `browse-url-browser-function' may be an alist.
+  (if (listp browse-url-browser-function)
+      (browse-url address)
+    (funcall browse-url-browser-function address)))
 
 (defun gnus-button-embedded-url (address)
   "Browse ADDRESS."
   ;; In Emacs 20, `browse-url-browser-function' may be an alist.
-  (browse-url (gnus-strip-whitespace address)))
+  (if (listp browse-url-browser-function)
+      (browse-url (gnus-strip-whitespace address))
+    (funcall browse-url-browser-function (gnus-strip-whitespace address))))
 
 ;;; Next/prev buttons in the article buffer.
 

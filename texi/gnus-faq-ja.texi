@@ -1,4 +1,5 @@
-\input texinfo                  @c -*-texinfo-*-
+@c Insert  "\input texinfo" at 1st line before texing this file alone.
+@c -*-texinfo-*-
 @c Copyright (C) 1998 Keiichi Suzuki
 @setfilename gnus-faq-ja.info
 

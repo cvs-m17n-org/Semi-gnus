@@ -104,13 +104,6 @@ Modify to suit your needs."))
 (defconst dgnushack-texi-file-regexp
   "^\\(gnus\\|message\\|gnus-ja\\|message-ja\\)\\.texi$")
 
-;; Avoid byte compile warnings for FSF Emacsen.
-(eval-when-compile
-  (unless (featurep 'xemacs)
-    (autoload 'update-autoloads-from-directory "autoload")
-    (autoload 'Custom-make-dependencies "cus-dep")
-    ))
-
 (defun dgnushack-make-package ()
   (require 'gnus)
   (let* ((product-name (downcase gnus-product-name))

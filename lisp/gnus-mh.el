@@ -39,9 +39,6 @@
 (require 'gnus-msg)
 (require 'gnus-sum)
 
-;; Avoid byte compile warning.
-(defvar mh-lib-progs)
-
 (defun gnus-summary-save-article-folder (&optional arg)
   "Append the current article to an mh folder.
 If N is a positive number, save the N next articles.
@@ -69,12 +66,7 @@ Optional argument FOLDER specifies folder name."
 		   t))))
 	(errbuf (gnus-get-buffer-create " *Gnus rcvstore*"))
 	;; Find the rcvstore program.
-	(exec-path (cond ((and (boundp 'mh-lib-progs) mh-lib-progs)
-			  (cons mh-lib-progs exec-path))
-			 ((and (boundp 'mh-lib) mh-lib)
-			  (cons mh-lib exec-path))
-			 (t
-			  exec-path))))
+	(exec-path (if mh-lib (cons mh-lib exec-path) exec-path)))
     (gnus-eval-in-buffer-window gnus-original-article-buffer
       (save-restriction
 	(widen)

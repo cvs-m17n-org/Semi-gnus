@@ -1,5 +1,5 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -122,8 +122,7 @@ the `a' symbolic prefix to the score commands will always use
 (defcustom gnus-score-interactive-default-score 1000
   "*Scoring commands will raise/lower the score with this number as the default."
   :group 'gnus-score-default
-  :type '(choice (const nil)
-		 integer))
+  :type 'integer)
 
 (defcustom gnus-score-expiry-days 7
   "*Number of days before unused score file entries are expired.

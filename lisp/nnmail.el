@@ -498,8 +498,7 @@ parameter.  It should return nil, `warn' or `delete'."
   (let ((format-alist nil)
         (after-insert-file-functions nil))
     (condition-case ()
-	(let ((file-name-coding-system 'binary)
-	      (pathname-coding-system 'binary))
+	(let ((pathname-coding-system 'binary))
 	  (insert-file-contents-as-coding-system
 	   nnmail-file-coding-system file)
 	  t)
@@ -1207,9 +1206,8 @@ Return the number of characters in the body."
       (insert (format "Xref: %s" (system-name)))
       (while group-alist
 	(insert (format " %s:%d"
-			(gnus-encode-coding-string
-			 (caar group-alist)
-			 nnmail-pathname-coding-system)
+			(gnus-encode-coding-string (caar group-alist)
+					      nnmail-pathname-coding-system)
 			(cdar group-alist)))
 	(setq group-alist (cdr group-alist)))
       (insert "\n"))))
@@ -1709,8 +1707,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((file-name-coding-system 'binary)
-	(pathname-coding-system 'binary))
+  (let ((pathname-coding-system 'binary))
     (write-region-as-coding-system
      nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
