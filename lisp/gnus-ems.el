@@ -77,7 +77,10 @@
 	    (append nnheader-file-name-translation-alist
 		    (mapcar (lambda (c) (cons c ?_))
 			    '(?: ?* ?\" ?< ?> ??))
-		    '((?+ . ?-))))))))
+		    (if (string-match "windows-nt\\|cygwin32"
+				      (symbol-name system-type))
+			nil
+		      '((?+ . ?-)))))))))
 
 (defvar gnus-tmp-unread)
 (defvar gnus-tmp-replied)
