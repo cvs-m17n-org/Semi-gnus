@@ -962,11 +962,12 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
   (save-excursion
     (set-buffer
      (find-file-noselect file))
-    (goto-char (point-max))
-    (unless (bobp)
-      (insert "\n"))
-    (insert address "\n")
-    (save-buffer)))
+    (unless (search-forward (regexp-quote address))
+      (goto-char (point-max))
+      (unless (bobp)
+	(insert "\n"))
+      (insert address "\n")
+      (save-buffer))))
 
 ;;; returns t if the sender is in the whitelist, nil or spam-split-group otherwise
 (defun spam-check-whitelist ()
@@ -1140,7 +1141,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
     (let ((temp-buffer-name (buffer-name)))
       (save-excursion
 	(goto-char (point-min))
-	(insert-string (spam-get-article-as-string article))
+	(insert (spam-get-article-as-string article))
 	(let* ((arg (if article-is-spam-p "-spam" "-good"))
 	       (status 
 		(apply 'call-process-region
