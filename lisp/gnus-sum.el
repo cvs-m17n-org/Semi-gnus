@@ -5740,6 +5740,9 @@ Given a prefix, will force an `article' buffer configuration."
 	(if gnus-summary-display-article-function
 	    (funcall gnus-summary-display-article-function article all-header)
 	  (gnus-article-prepare article all-header))
+      (with-current-buffer gnus-article-buffer
+	(set (make-local-variable 'gnus-summary-search-article-matched-data)
+	     nil))
       (gnus-run-hooks 'gnus-select-article-hook)
       (when (and gnus-current-article
 		 (not (zerop gnus-current-article)))
@@ -5787,10 +5790,7 @@ be displayed."
 		  (gnus-summary-display-article article all-headers)
 		(setq did article)
 		(when (or all-headers gnus-show-all-headers)
-		  (gnus-article-show-all-headers))
-		(with-current-buffer gnus-article-buffer
-		  (set (make-local-variable
-			'gnus-summary-search-article-matched-data) nil)))
+		  (gnus-article-show-all-headers)))
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
 	    'old))
@@ -6902,32 +6902,48 @@ If BACKWARD, search backward instead."
 
 (defvar gnus-summary-search-article-matched-data)
 (eval-when-compile
-  (defmacro gnus-summary-search-article-position-point (backward)
+  (defmacro gnus-summary-search-article-position-point (regexp backward)
     "Dehighlight the last matched text and goto the beginning position."
-    `(if gnus-summary-search-article-matched-data
-	 (let ((start (car gnus-summary-search-article-matched-data))
-	       (end (cadr gnus-summary-search-article-matched-data))
-	       (text (caddr gnus-summary-search-article-matched-data))
-	       (inhibit-read-only t)
-	       buffer-read-only)
-	   (delete-region (goto-char start) end)
-	   (insert text)
-	   (set-buffer-modified-p nil)
-	   (when ,backward
-	     (goto-char start)))
-       (goto-char (if ,backward (point-max) (point-min)))))
+    (` (if (and gnus-summary-search-article-matched-data
+		(let ((text (caddr gnus-summary-search-article-matched-data))
+		      (inhibit-read-only t)
+		      buffer-read-only)
+		  (delete-region
+		   (goto-char (car gnus-summary-search-article-matched-data))
+		   (cadr gnus-summary-search-article-matched-data))
+		  (insert text)
+		  (string-match (, regexp) text)))
+	   (if (, backward) (beginning-of-line) (end-of-line))
+	 (goto-char (if (, backward) (point-max) (point-min))))))
 
-  (defmacro gnus-summary-search-article-highlight-matched-text ()
+  (defmacro gnus-summary-search-article-highlight-matched-text (backward
+								treated)
     "Highlight matched text in the function `gnus-summary-search-article'."
-    '(let ((start (match-beginning 0))
-	   (end (match-end 0))
-	   (inhibit-read-only t)
-	   buffer-read-only)
-       (setq gnus-summary-search-article-matched-data
-	     (list start end (buffer-substring start end)))
-       (put-text-property start end 'face
-			  (or (find-face 'isearch) 'secondary-selection))
-       (set-buffer-modified-p nil)))
+    (` (let ((start (match-beginning 0))
+	     (end (match-end 0))
+	     (inhibit-read-only t)
+	     buffer-read-only)
+	 (unless treated
+	   (let (, (let ((items (mapcar 'car gnus-treatment-function-alist)))
+		     (mapcar
+		      (lambda (item) (setq items (delq item items)))
+		      '(gnus-treat-buttonize
+			gnus-treat-fill-article
+			gnus-treat-fill-long-lines
+			gnus-treat-emphasize
+			gnus-treat-highlight-headers
+			gnus-treat-highlight-citation
+			gnus-treat-highlight-signature
+			gnus-treat-overstrike
+			gnus-treat-buttonize-head
+			gnus-treat-decode-article-as-default-mime-charset))
+		     items))
+	     (gnus-article-prepare-mime-display))
+	   (goto-char (if (, backward) start end)))
+	 (setq gnus-summary-search-article-matched-data
+	       (list start end (buffer-substring start end)))
+	 (put-text-property start end 'face
+			    (or (find-face 'isearch) 'secondary-selection)))))
   )
 
 (defun gnus-summary-search-article (regexp &optional backward)
@@ -6946,19 +6962,21 @@ Optional argument BACKWARD means do search for backward.
 	(gnus-use-trees nil)		;Inhibit updating tree buffer.
 	(sum (current-buffer))
 	(found nil)
-	point)
+	point treated)
     (gnus-save-hidden-threads
-      (let* ((gnus-inhibit-treatment t)
-	     (old (gnus-summary-select-article)))
-	(set-buffer gnus-article-buffer)
-	(widen)
-	(if (eq 'old old)
-	    (progn
-	      (gnus-article-show-all-headers)
-	      (gnus-summary-search-article-position-point backward))
-	  (goto-char (if backward (point-max) (point-min)))))
-      (when backward
-	(forward-line -1))
+      (let ((gnus-inhibit-treatment t))
+	(setq treated (eq 'old (gnus-summary-select-article))))
+      (unless (and (gnus-buffer-live-p gnus-article-buffer)
+		   (window-live-p (get-buffer-window gnus-article-buffer
+						     t)))
+	(setq treated (eq 'old (gnus-summary-select-article nil t))))
+      (set-buffer gnus-article-buffer)
+      (widen)
+      (if treated
+	  (progn
+	    (gnus-article-show-all-headers)
+	    (gnus-summary-search-article-position-point regexp backward))
+	(goto-char (if backward (point-max) (point-min))))
       (while (not found)
 	(gnus-message 7 "Searching article: %d..." (cdr gnus-article-current))
 	(if (if backward
@@ -6966,13 +6984,16 @@ Optional argument BACKWARD means do search for backward.
 	      (re-search-forward regexp nil t))
 	    ;; We found the regexp.
 	    (progn
-	      (gnus-summary-search-article-highlight-matched-text)
+	      (gnus-summary-search-article-highlight-matched-text backward
+								  treated)
 	      (setq found 'found)
-	      (beginning-of-line)
+	      (forward-line
+	       (/ (- 2 (window-height
+			(get-buffer-window gnus-article-buffer t)))
+		  2))
 	      (set-window-start
 	       (get-buffer-window (current-buffer))
 	       (point))
-	      (forward-line 1)
 	      (set-buffer sum)
 	      (setq point (point)))
 	  ;; We didn't find it, so we go to the next article.
@@ -6989,6 +7010,7 @@ Optional argument BACKWARD means do search for backward.
 		(setq found nil)
 		(let ((gnus-inhibit-treatment t))
 		  (gnus-summary-select-article))
+		(setq treated nil)
 		(set-buffer gnus-article-buffer)
 		(widen)
 		(goto-char (if backward (point-max) (point-min))))))))
