@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.26 1999-01-25 07:09:51 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.27 1999-01-26 02:35:37 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -59,6 +59,27 @@
 ;;; In Gnus group buffer , type g to get all news and mail.
 ;;; Then send mail and news in spool directory.
 ;;;
+;;; Security Notice.
+;;;
+;;; You can set the variable gnus-offline-pop-password-file to save your POP
+;;; passwords. But TAKE CARE. Use it at your own risk.
+;;; If you decide to use it, then write in .emacs or .gnus-offline.el 
+;;; something like:
+;;;
+;;;  (setq gnus-offline-pop-password-file "~/.pop.passwd")
+;;;
+;;; and write in this file something like:
+;;;
+;;;  (setq pop3-fma-password
+;;;	 '(("SERVER1" "ACCOUNT1" "PASSWORD1")
+;;;	   ("SERVER2" "ACCOUNT2" "PASSWORD2")
+;;;        ............................
+;;;        ))
+;;;
+;;; If you want to encode the file with base64, try:
+;;;
+;;;    M-: (base64-encode-region (point-min) (point-max))
+;;;
 ;;; Variables.
 ;;;  gnus-offline-dialup-program-arguments
 ;;;                                   ... List of dialup program arguments.
@@ -74,6 +95,9 @@
 ;;;                                        (minutes)
 ;;;  gnus-offline-dialup-function     ... Function to diualup.
 ;;;  gnus-offline-hangup-function     ... Function to hangup.
+;;;  gnus-offline-pop-password-file   ... File to keep the POP password info.
+;;;  gnus-offline-pop-password-decoding-function
+;;;                                   ... Function to decode the password info.
 
 ;;; Code:
 
