@@ -1585,12 +1585,13 @@ This variable can be nil, gnus or gnus-ja."
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-product-variable-file-list
-  (let ((version (product-version (product-find 'gnus-vers))))
+  (let ((version (product-version (product-find 'gnus-vers)))
+	(codesys (static-if (boundp 'MULE) '*ctext* 'ctext)))
     `(("strict-cache" ((product-version ,version) (emacs-version))
        binary
        gnus-format-specs-compiled)
       ("cache" ((product-version ,version))
-       ctext
+       ,codesys
        gnus-format-specs)))
   "Gnus variables are saved in the produce depend quick startup files.")
 
