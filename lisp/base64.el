@@ -54,7 +54,7 @@
 
 ;; For non-MULE
 (if (not (fboundp 'char-int))
-    (fset 'char-int 'identity))
+    (defalias 'char-int 'identity))
 
 (defvar base64-alphabet
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
@@ -180,12 +180,12 @@ base64-encoder-program.")
 			 (setq bits 0 counter 0))
 			(t (setq bits (lsh bits 6)))))))
 	      (cond
-	       ((= (point) end)
-		(if (not (zerop counter))
-		    (error "at least %d bits missing at end of base64 encoding"
-			   (* (- 4 counter) 6)))
-		(setq done t))
-	       ((eq (char-after (point)) ?=)
+	       ((or (= (point) end)
+		    (eq (char-after (point)) ?=))
+		(if (and (= (point) end) (> counter 1))
+		    (message 
+		     "at least %d bits missing at end of base64 encoding"
+		     (* (- 4 counter) 6)))
 		(setq done t)
 		(cond ((= counter 1)
 		       (error "at least 2 bits missing at end of base64 encoding"))
@@ -297,8 +297,8 @@ base64-encoder-program.")
 	(buffer-string)
       (kill-buffer (current-buffer)))))
 
-(fset 'base64-decode-string 'base64-decode)
-(fset 'base64-encode-string 'base64-encode)
+(defalias 'base64-decode-string 'base64-decode)
+(defalias 'base64-encode-string 'base64-encode)
 
 );; (static-when nil ...
 

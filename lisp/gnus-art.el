@@ -216,7 +216,7 @@ regexp.  If it matches, the text in question is not a signature."
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
     'gnus-article-display-xface)
-   ((and (not gnus-xemacs)
+   ((and (not (featurep 'xemacs))
 	 window-system
 	 (module-installed-p 'x-face-mule))
     'x-face-mule-gnus-article-display-x-face)
@@ -631,8 +631,8 @@ displayed by the first non-nil matching CONTENT face."
     ("\223" "``")
     ("\224" "\"")
     ("\225" "*")
-    ("\226" "---")
-    ("\227" "-")
+    ("\226" "-")
+    ("\227" "--")
     ("\231" "(TM)")
     ("\233" ">")
     ("\234" "oe")
@@ -925,7 +925,7 @@ See the manual for details."
 (defcustom gnus-treat-display-xface
   (and (or (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'xbm))
-	   (and gnus-xemacs (featurep 'xface))
+	   (and (featurep 'xemacs) (featurep 'xface))
 	   (eq 'x-face-mule-gnus-article-display-x-face
 	       gnus-article-x-face-command))
        'head)
@@ -937,8 +937,11 @@ See the manual for details."
 (put 'gnus-treat-display-xface 'highlight t)
 
 (defcustom gnus-treat-display-smileys
-  (if (or (and gnus-xemacs (featurep 'xpm))
-	  (and (not gnus-xemacs)
+  (if (or (and (featurep 'xemacs)
+	       (featurep 'xpm))
+	  (and (fboundp 'image-type-available-p)
+	       (image-type-available-p 'pbm))
+	  (and (not (featurep 'xemacs))
 	       window-system
 	       (module-installed-p 'gnus-bitmap)))
       t
@@ -950,7 +953,7 @@ See the manual for details."
   :type gnus-article-treat-custom)
 (put 'gnus-treat-display-smileys 'highlight t)
 
-(defcustom gnus-treat-display-picons (if gnus-xemacs 'head nil)
+(defcustom gnus-treat-display-picons (if (featurep 'xemacs) 'head nil)
   "Display picons.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -1381,7 +1384,7 @@ if given a positive prefix, always hide."
 	  (narrow-to-region header-start header-end)
 	  (article-hide-headers)
 	  ;; Re-display X-Face image under XEmacs.
-	  (when (and gnus-xemacs
+	  (when (and (featurep 'xemacs)
 		     (gnus-functionp gnus-article-x-face-command))
 	    (let ((func (cadr (assq 'gnus-treat-display-xface
 				    gnus-treatment-function-alist)))
@@ -1695,9 +1698,11 @@ or not."
       (unless charset 
 	(setq charset gnus-newsgroup-charset))
       (when (or force
-		(and type (string-match "quoted-printable" (downcase type))))
+		(and type (let ((case-fold-search t))
+			    (string-match "quoted-printable" type))))
 	(article-goto-body)
-	(quoted-printable-decode-region (point) (point-max) charset)))))
+	(quoted-printable-decode-region
+	 (point) (point-max) (mm-charset-to-coding-system charset))))))
 
 (defun article-de-base64-unreadable (&optional force)
   "Translate a base64 article.
@@ -1720,13 +1725,14 @@ If FORCE, decode the article whether it is marked as base64 not."
       (unless charset 
 	(setq charset gnus-newsgroup-charset))
       (when (or force
-		(and type (string-match "base64" (downcase type))))
+		(and type (let ((case-fold-search t))
+			    (string-match "base64" type))))
 	(article-goto-body)
 	(save-restriction
 	  (narrow-to-region (point) (point-max))
 	  (base64-decode-region (point-min) (point-max))
-	  (if (mm-coding-system-p charset)
-	      (mm-decode-coding-region (point-min) (point-max) charset)))))))
+	  (mm-decode-coding-region
+	   (point-min) (point-max) (mm-charset-to-coding-system charset)))))))
 
 (eval-when-compile
   (require 'rfc1843))
@@ -3116,6 +3122,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (gnus-set-mode-line 'article))
 	    (article-goto-body)
 	    (set-window-point (get-buffer-window (current-buffer)) (point))
+	    (gnus-configure-windows 'article)
 	    t))))))
 
 (defun gnus-article-prepare-mime-display (&optional number)
@@ -3413,9 +3420,11 @@ value of the variable `gnus-show-mime' is non-nil."
 			     gnus-summary-show-article-charset-alist))
 		  (read-coding-system "Charset: ")))))
       (forward-line 2)
-      (mm-insert-inline handle (if charset 
-				   (mm-decode-coding-string contents charset)
-				 contents))
+      (mm-insert-inline handle
+			(if charset 
+			    (mm-decode-coding-string
+			     contents (mm-charset-to-coding-system charset))
+			  contents))
       (goto-char b))))
 
 (defun gnus-mime-externalize-part (&optional handle)
@@ -3637,8 +3646,8 @@ In no internal viewer is available, use an external viewer."
 	;; window, overlay, position.
 	(if (mm-handle-displayed-p
 	     (if overlay
-		 (with-current-buffer (overlay-buffer overlay)
-		   (widget-get (widget-at (overlay-start overlay))
+		 (with-current-buffer (gnus-overlay-buffer overlay)
+		   (widget-get (widget-at (gnus-overlay-start overlay))
 			       :mime-handle))
 	       (widget-get widget/window :mime-handle)))
 	    "hide" "show")
@@ -5099,18 +5108,14 @@ forbidden in URL encoding."
 	(message-goto-subject)))))
 
 (defun gnus-button-mailto (address)
-  ;; Mail to ADDRESS.
+  "Mail to ADDRESS."
   (set-buffer (gnus-copy-article-buffer))
-  (gnus-setup-message 'reply
-    (message-reply address)))
+  (message-reply address))
 
-(defun gnus-button-reply (address)
-  ;; Reply to ADDRESS.
-  (gnus-setup-message 'reply
-    (message-reply address)))
+(defalias 'gnus-button-reply 'message-reply)
 
 (defun gnus-button-embedded-url (address)
-  "Browse ADDRESS."
+  "Activate ADDRESS with `browse-url'."
   (browse-url (gnus-strip-whitespace address)))
 
 (defun gnus-article-smiley-display ()
@@ -5293,11 +5298,13 @@ For example:
 			     'mime-view-entity entity))))))
 
 ;; Dynamic variables.
-(defvar part-number)
-(defvar total-parts)
-(defvar type)
-(defvar condition)
-(defvar length)
+(eval-when-compile
+  (defvar part-number)
+  (defvar total-parts)
+  (defvar type)
+  (defvar condition)
+  (defvar length))
+
 (defun gnus-treat-predicate (val)
   (cond
    ((null val)

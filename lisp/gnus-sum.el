@@ -49,6 +49,7 @@
   (autoload 'pgg-verify-region "pgg" nil t))
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
+(autoload 'gnus-cache-write-active "gnus-cache")
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
 (defcustom gnus-kill-summary-on-exit t

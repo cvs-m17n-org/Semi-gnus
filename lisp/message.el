@@ -1255,8 +1255,16 @@ should be sent in several parts. If it is nil, the size is unlimited."
   :type '(choice (const :tag "unlimited" nil)
 		 (integer 1000000)))
 
+(defcustom message-alternative-emails nil
+  "A regexp to match the alternative email addresses.
+The first matched address (not primary one) is used in the From field."
+  :group 'message-headers
+  :type '(choice (const :tag "Always use primary" nil)
+		 regexp))
+
 ;;; Internal variables.
 
+(defvar message-sending-message "Sending...")
 (defvar message-buffer-list nil)
 (defvar message-this-is-news nil)
 (defvar message-this-is-mail nil)
@@ -2651,7 +2659,7 @@ It should typically alter the sending method in some way or other."
       (put-text-property (point-min) (point-max) 'read-only nil))
     (run-hooks 'message-send-hook)
     (message-fix-before-sending)
-    (message "Sending...")
+    (message message-sending-message)
     (let ((message-encoding-buffer
 	   (message-generate-new-buffer-clone-locals " message encoding"))
 	  (message-edit-buffer (current-buffer))
@@ -4364,6 +4372,8 @@ than 988 characters long, and if they are not, trim them until they are."
   (message-insert-signature)
   (save-restriction
     (message-narrow-to-headers)
+    (if message-alternative-emails
+	(message-use-alternative-email-as-from))
     (run-hooks 'message-header-setup-hook))
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil)
@@ -5449,6 +5459,24 @@ regexp varstr."
 	(read-from-minibuffer prompt))
     (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook))
       (read-string prompt))))
+
+(defun message-use-alternative-email-as-from ()
+  (require 'mail-utils)
+  (let* ((fields '("To" "Cc")) 
+	 (emails
+	  (split-string
+	   (mail-strip-quoted-names
+	    (mapconcat 'message-fetch-reply-field fields ","))
+	   "[ \f\t\n\r\v,]+"))
+	 email)
+    (while emails
+      (if (string-match message-alternative-emails (car emails))
+	  (setq email (car emails)
+		emails nil))
+      (pop emails))
+    (unless (or (not email) (equal email user-mail-address))
+      (goto-char (point-max))
+      (insert "From: " email "\n"))))
 
 (defun message-save-drafts ()
   "Postponing the message."

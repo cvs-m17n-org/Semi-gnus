@@ -1,3 +1,11 @@
+2000-10-07 16:50:14  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in: Use install-info.
+
+2000-10-06 14:38:27  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Message Headers): Add.
+
 2000-10-04 09:23:49  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Article Hiding): Add.

@@ -29,12 +29,10 @@
 ;;; Code:
 
 ;; Set coding priority of Shift-JIS to the bottom.
-(defvar *predefined-category*)
-(defvar coding-category-list)
 (if (featurep 'xemacs)
-    (fset 'set-coding-priority 'ignore)
-  (fset 'coding-priority-list 'ignore)
-  (fset 'set-coding-priority-list 'ignore))
+    (defalias 'set-coding-priority 'ignore)
+  (defalias 'coding-priority-list 'ignore)
+  (defalias 'set-coding-priority-list 'ignore))
 (cond ((and (featurep 'xemacs) (featurep 'mule))
        (if (memq 'shift-jis (coding-priority-list))
 	   (set-coding-priority-list
@@ -48,7 +46,7 @@
 			  (copy-sequence coding-category-list))
 		    '(coding-category-sjis))))))
 
-(fset 'facep 'ignore)
+(defalias 'facep 'ignore)
 
 (require 'cl)
 
@@ -81,8 +79,8 @@
 (unless (fboundp 'si:byte-optimize-form-code-walker)
   (byte-optimize-form nil);; Load `byte-opt' or `byte-optimize'.
   (setq max-specpdl-size 3000)
-  (fset 'si:byte-optimize-form-code-walker
-	(symbol-function 'byte-optimize-form-code-walker))
+  (defalias 'si:byte-optimize-form-code-walker
+    (symbol-function 'byte-optimize-form-code-walker))
   (defun byte-optimize-form-code-walker (form for-effect)
     (if (and for-effect (memq (car-safe form) '(and or)))
 	;; Fix bug in and/or forms.
@@ -118,8 +116,7 @@
    (defun byte-optimize-char-after (form)
      (if (null (cdr form))
 	 '(char-after (point))
-       form))
-   ))
+       form))))
 
 (condition-case nil
     (char-before)
@@ -129,8 +126,7 @@
    (defun byte-optimize-char-before (form)
      (if (null (cdr form))
 	 '(char-before (point))
-       form))
-   ))
+       form))))
 
 (push srcdir load-path)
 
@@ -163,8 +159,8 @@
     :symbol-for-testing-whether-colon-keyword-is-available-or-not
   (void-variable
    ;; Bind keywords.
-   (mapcar (lambda (keyword) (set keyword keyword))
-	   '(:button-keymap :data :file :mime-handle))))
+   (dolist (keyword '(:button-keymap :data :file :mime-handle))
+     (set keyword keyword))))
 
 ;; Unknown variables and functions.
 (unless (boundp 'buffer-file-coding-system)
@@ -203,48 +199,46 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (directory-files srcdir nil "^[^=].*\\.el$"))
-	;;(byte-compile-generate-call-tree t)
-	file elc)
-    (mapcar
-     (lambda (el) (setq files (delete el files)))
-     (append
-      dgnushack-tool-files
-      (condition-case nil
-	  (progn (require 'w3-forms) nil)
-	(error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-		 "nnslashdot.el" "nnwarchive.el" "webmail.el")))
-      (condition-case nil
-	  (progn (require 'bbdb) nil)
-	(error '("gnus-bbdb.el")))
-      (unless (featurep 'xemacs)
-	'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-	  "nnheaderxm.el" "smiley.el"))
-      (when (or (featurep 'xemacs) (<= emacs-major-version 20))
-	'("smiley-ems.el"))
-      (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-	'("md5.el"))))
-    (while (setq file (pop files))
+  (let ((files (directory-files srcdir nil "^[^=].*\\.el$")))
+    (dolist (file
+	     (append
+	      dgnushack-tool-files
+	      (condition-case nil
+		  (progn (require 'w3-forms) nil)
+		(error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
+			 "nnslashdot.el" "nnwarchive.el" "webmail.el")))
+	      (condition-case nil
+		  (progn (require 'bbdb) nil)
+		(error '("gnus-bbdb.el")))
+	      (unless (featurep 'xemacs)
+		'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
+		  "nnheaderxm.el" "smiley.el"))
+	      (when (or (featurep 'xemacs) (<= emacs-major-version 20))
+		'("smiley-ems.el"))
+	      (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
+		'("md5.el"))))
+      (setq files (delete file files)))
+
+    (dolist (file files)
       (setq file (expand-file-name file srcdir))
-      (when (or (not (file-exists-p (setq elc (concat file "c"))))
-		(file-newer-than-file-p file elc))
-	(ignore-errors
-	  (byte-compile-file file))))))
+      (when (and (file-exists-p (setq elc (concat file "c")))
+		 (file-newer-than-file-p file elc))
+	(delete-file elc)))
+
+    (let (;;(byte-compile-generate-call-tree t)
+	  file elc)
+      (while (setq file (pop files))
+	(setq file (expand-file-name file srcdir))
+	(when (or (not (file-exists-p (setq elc (concat file "c"))))
+		  (file-newer-than-file-p file elc))
+	  (ignore-errors
+	    (byte-compile-file file)))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
 
-;; Avoid byte-compile warnings.
-(defvar gnus-product-name)
-(defvar early-package-load-path)
-(defvar early-packages)
-(defvar last-package-load-path)
-(defvar last-packages)
-(defvar late-package-load-path)
-(defvar late-packages)
-
 (defconst dgnushack-info-file-regexp
   (concat "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)"
 	  "\\.info\\(-[0-9]+\\)?$"))
@@ -253,11 +247,7 @@ Modify to suit your needs."))
   "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)\\.texi$")
 
 (defun dgnushack-make-package ()
-  (require 'gnus)
-  (let* ((product-name (downcase gnus-product-name))
-	 (lisp-dir (concat "lisp/" product-name "/"))
-	 make-backup-files)
-
+  (let (make-backup-files)
     (message "Updating autoloads for directory %s..." default-directory)
     (let ((generated-autoload-file "auto-autoloads.el")
 	  noninteractive
@@ -281,89 +271,90 @@ Modify to suit your needs."))
     (require 'cus-load)
     (byte-compile-file "custom-load.el")
 
-    (message "Generating MANIFEST.%s for the package..." product-name)
-    (with-temp-buffer
-      (insert "pkginfo/MANIFEST." product-name "\n")
-      (mapcar
-       (lambda (file)
-	 (unless (member file dgnushack-unexported-files)
-	   (insert lisp-dir file "\n")))
-       (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
-      (mapcar
-       (lambda (file) (insert "info/" file "\n"))
-       (sort (directory-files "../texi/" nil dgnushack-info-file-regexp)
-	     'string-lessp))
-      (write-file (concat "../MANIFEST." product-name)))))
+    (require 'gnus)
+    (let ((product-name (downcase gnus-product-name)))
+      (message "Generating MANIFEST.%s for the package..." product-name)
+      (with-temp-buffer
+	(insert "pkginfo/MANIFEST." product-name "\n")
+	(let ((lisp-dir (concat "lisp/" product-name "/"))
+	      (files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+	      file)
+	  (while (setq file (pop files))
+	    (unless (member file dgnushack-unexported-files)
+	      (insert lisp-dir file "\n")))
+	  (setq files (sort (directory-files "../texi/" nil
+					     dgnushack-info-file-regexp)
+			    'string-lessp))
+	  (while (setq file (pop files))
+	    (insert lisp-dir file "\n")))
+	(write-file (concat "../MANIFEST." product-name))))))
 
 (defun dgnushack-install-package ()
   (let ((package-dir (car command-line-args-left))
-	dirs info-dir pkginfo-dir product-name lisp-dir manifest files)
+	(product-name (progn (require 'gnus) (downcase gnus-product-name))))
+
+    ;; Examine PACKAGEDIR.
     (unless package-dir
-      (when (boundp 'early-packages)
-	(setq dirs (delq nil (append (when early-package-load-path
-				       early-packages)
-				     (when late-package-load-path
-				       late-packages)
-				     (when last-package-load-path
-				       last-packages))))
-	(while (and dirs (not package-dir))
-	  (when (file-exists-p (car dirs))
-	    (setq package-dir (car dirs)
-		  dirs (cdr dirs))))))
+      (let (dirs)
+	(when (boundp 'early-packages)
+	  (setq dirs (delq nil (append (when early-package-load-path
+					 early-packages)
+				       (when late-package-load-path
+					 late-packages)
+				       (when last-package-load-path
+					 last-packages))))
+	  (while (and dirs (not package-dir))
+	    (when (file-directory-p (car dirs))
+	      (setq package-dir (car dirs)
+		    dirs (cdr dirs)))))))
     (unless package-dir
       (error "%s" "
 You must specify the name of the package path as follows:
 
-% make install-package PACKAGEDIR=/usr/local/lib/xemacs/xemacs-packages
-"
-	     ))
-    (setq info-dir (expand-file-name "info/" package-dir)
-	  pkginfo-dir (expand-file-name "pkginfo/" package-dir))
-    (require 'gnus)
-    (setq product-name (downcase gnus-product-name)
-	  lisp-dir (expand-file-name (concat "lisp/" product-name "/")
-				     package-dir)
-	  manifest (concat "MANIFEST." product-name))
+% make install-package PACKAGEDIR=/usr/local/lib/xemacs/xemacs-packages/"))
 
-    (unless (file-directory-p lisp-dir)
-      (make-directory lisp-dir t))
-    (unless (file-directory-p info-dir)
-      (make-directory info-dir))
-    (unless (file-directory-p pkginfo-dir)
-      (make-directory pkginfo-dir))
+    ;; Install lisp files.
+    (let ((lisp-dir (expand-file-name (concat "lisp/" product-name "/")
+				      package-dir))
+	  (files (sort (directory-files "." nil "\\.elc?$") 'string-lessp)))
+      (unless (file-directory-p lisp-dir)
+	(make-directory lisp-dir t))
+      (dolist (file dgnushack-unexported-files)
+	(setq files (delete file files)))
+      ;; Remove extra files.
+      (dolist (file (directory-files lisp-dir nil nil nil t))
+	(unless (or (member file files)
+		    (not (string-match "\\.elc?$" file)))
+	  (setq file (expand-file-name file lisp-dir))
+	  (message "Removing %s..." file)
+	  (condition-case nil
+	      (delete-file file)
+	    (error nil))))
+      (while (setq file (pop files))
+	(message "Copying %s to %s..." file lisp-dir)
+	(copy-file file (expand-file-name file lisp-dir) t t)))
 
-    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
-    (mapcar (lambda (el) (setq files (delete el files)))
-	    dgnushack-unexported-files)
-    (mapcar
-     (lambda (file)
-       (unless (or (member file files)
-		   (not (string-match "\\.elc?$" file)))
-	 (setq file (expand-file-name file lisp-dir))
-	 (message "Removing %s..." file)
-	 (condition-case nil
-	     (delete-file file)
-	   (error nil))))
-     (directory-files lisp-dir nil nil nil t))
-    (mapcar
-     (lambda (file)
-       (message "Copying %s to %s..." file lisp-dir)
-       (copy-file file (expand-file-name file lisp-dir) t t))
-     files)
+    ;; Install info files.
+    (let ((files (sort (directory-files "../texi/" nil
+					dgnushack-info-file-regexp)
+		       'string-lessp))
+	  (info-dir (expand-file-name "info/" package-dir)))
+      (unless (file-directory-p info-dir)
+	(make-directory info-dir))
+      (while (setq file (pop files))
+	(message "Copying ../texi/%s to %s..." file info-dir)
+	(copy-file (expand-file-name file "../texi/")
+		   (expand-file-name file info-dir)
+		   t t)))
 
-    (mapcar
-     (lambda (file)
-       (message "Copying ../texi/%s to %s..." file info-dir)
-       (copy-file (expand-file-name file "../texi/")
-		  (expand-file-name file info-dir)
-		  t t))
-     (sort (directory-files "../texi/" nil dgnushack-info-file-regexp)
-	   'string-lessp))
-
-    (message "Copying ../%s to %s..." manifest pkginfo-dir)
-    (copy-file (expand-file-name manifest "../")
-	       (expand-file-name manifest pkginfo-dir) t t)
-
+    ;; Install pkginfo.
+    (let ((manifest (concat "MANIFEST." product-name))
+	  (pkginfo-dir (expand-file-name "pkginfo/" package-dir)))
+      (unless (file-directory-p pkginfo-dir)
+	(make-directory pkginfo-dir))
+      (message "Copying ../%s to %s..." manifest pkginfo-dir)
+      (copy-file (expand-file-name manifest "../")
+		 (expand-file-name manifest pkginfo-dir) t t))
     (message "Done")))
 
 (defun dgnushack-texi-add-suffix-and-format ()
@@ -393,9 +384,7 @@ You must specify the name of the package path as follows:
 	      (t
 	       (setq files (cons file files)
 		     command-line-args-left (cdr command-line-args-left)))))
-      (while files
-	(setq file (car files)
-	      files (cdr files))
+      (while (setq file (pop files))
 	(condition-case err
 	    (progn
 	      (if buffer-file-name (kill-buffer (current-buffer)))

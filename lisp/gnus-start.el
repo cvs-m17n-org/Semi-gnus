@@ -699,7 +699,7 @@ prompt the user for the name of an NNTP server to use."
     (when gnus-simple-splash
       (setq gnus-simple-splash nil)
       (cond
-       (gnus-xemacs
+       ((featurep 'xemacs)
 	(gnus-xmas-splash))
        ((and (eq window-system 'x)
 	     (= (frame-height) (1+ (window-height))))
@@ -2767,7 +2767,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	      (let ((str (buffer-substring
 			  (point) (progn (end-of-line) (point))))
 		    (coding
-		     (and (or gnus-xemacs
+		     (and (or (featurep 'xemacs)
 			      (and (boundp 'enable-multibyte-characters)
 				   enable-multibyte-characters))
 			  (fboundp 'gnus-mule-get-coding-system)

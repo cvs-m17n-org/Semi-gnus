@@ -350,8 +350,12 @@ and `altavista'.")
       (setq url-current-callback-data data
 	    url-be-asynchronous t
 	    url-current-callback-func callback)
-      (url-retrieve url))
+      (url-retrieve url nil))
     (setq-default url-be-asynchronous old-asynch)))
+
+(if (fboundp 'url-retrieve-synchronously)
+    (defun nnweb-url-retrieve-asynch (url callback &rest data)
+      (url-retrieve url callback data)))
 
 ;;;
 ;;; DejaNews functions.

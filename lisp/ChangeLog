@@ -1,3 +1,186 @@
+2000-10-10 00:00:28  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-init): Use mm-disable-multibyte-mule4.
+
+2000-10-09 22:50:05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* base64.el (base64-decode-region): Just give a message if the end
+	is not sane.
+
+2000-10-09 20:09:11  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode-message-header): Move fold into
+	encode-region.
+	(rfc2047-dissect-region): Rewrite.
+	(rfc2047-encode-region): Rewrite.
+	(rfc2047-fold-region): Fold any line longer than 76.
+	(rfc2047-unfold-region): New function.
+	(rfc2047-decode-region): Use it.
+	(rfc2047-q-encode-region): Don't break at bob.
+
+2000-10-09 17:12:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-open-connection): Kill process buffer when quit.
+	(nntp-connection-timeout): Add a note. SIGALRM is ignored in both
+	FSF Emacs 20 and XEmacs 21.
+	* gnus-agent.el (gnus-agent-fetch-session): Catch quit.
+
+2000-10-09  Dave Love  <fx@gnu.org>
+
+	* gnus-audio.el: Don't require cl.
+	(gnus-audio): New custom group.
+	(gnus-audio-inline-sound): Change to work with Emacs.
+	(gnus-audio-directory, gnus-audio-directory) 
+	(gnus-audio-au-player):  Customize.
+	(gnus-audio-play): Try external player if play-sound-file fails.
+	Use file-name-extension, not string-match.
+
+	* gnus-art.el (article-de-quoted-unreadable)
+	(article-de-base64-unreadable): Fold search case rather than
+	downcasing string.  Apply mm-charset-to-coding-system to arg of
+	quoted-printable-decode-region.
+	(gnus-article-dumbquotes-map): Fix dashes.
+	(gnus-button-mailto, gnus-button-embedded-url): Doc fix.
+	(gnus-button-reply): Just alias it.
+
+2000-10-09  Stefan Monnier  <monnier@cs.yale.edu>
+
+	* mm-encode.el: Require CL.  At least, for `incf'.
+
+	* nnfolder.el (nnfolder-ignore-active-file): Typos.
+
+	* gnus-mh.el (gnus-summary-save-in-folder): Obey mh-lib-progs.
+
+	* gnus-kill.el (gnus-kill): Typo.
+
+2000-10-09  Gerd Moellmann  <gerd@gnu.org>
+
+	* smiley-ems.el (smiley-update-cache):  Use `:ascent center'.
+
+2000-10-09  Simon Josefsson  <simon@josefsson.org>
+
+	* nnimap.el (nnimap-group-overview-filename): Create directory for
+	newfile (when use long filenames is nil).  Copy+delete file if
+	rename didn't work.
+	(nnimap-group-overview-filename): `rename-file' and `copy-file'
+	doesn't return anything useful, use ignore-errors instead.
+
+2000-10-08 13:05:11  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el (dgnushack-compile): Delete old elc files first.
+
+2000-10-08 10:59:13  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ems.el (gnus-kill-all-overlays): Move here.
+	* gnus-util.el (gnus-kill-all-overlays): Move out.
+	* gnus-sum.el (gnus-cache-write-active): Auto load.
+	* lpath.el: Shut up.
+	* nnweb.el (nnweb-url-retrieve-asynch): url-retrieve is 
+	asynchronous in Exp version.
+
+2000-10-08 08:57:13  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el, gnus-ems.el, gnus-start.el: Remove gnus-xemacs.
+	* gnus-ems.el: Autoload smiley.
+	* gnus-art.el (gnus-treat-display-smileys): Default value in Emacs 21.
+
+2000-10-08 08:45:48  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-display-article): Enable multibyte.
+	(gnus-summary-select-article): Don't enable multibyte here.
+	(gnus-summary-goto-article): Ditto.
+
+2000-10-08 Christoph Conrad <christoph.conrad@gmx.de>
+
+	* gnus-draft.el (gnus-draft-send-message): Typo.
+
+2000-10-08  Simon Josefsson  <simon@josefsson.org>
+
+	* nnimap.el (nnimap-verify-uidvalidity): Delete overview file when
+	uid validity changes.
+	(nnimap-group-overview-filename): Store uidvalidity in filenames.
+	Rename old files into new format.
+
+2000-10-07 15:49:39  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-enable-multibyte-mule4): New.
+	(mm-disable-multibyte-mule4): New.
+	* gnus-sum.el (gnus-summary-mode): Use it.
+	(gnus-summary-select-article): Ditto.
+	(gnus-summary-goto-article): Use enable multibyte.
+	* rfc2047.el (rfc2047-decode): Use unibyte.
+
+2000-10-07 15:42:59  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-logic.el (gnus-advanced-string): Use "" if nil.
+
+2000-10-07 10:31:05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-q-encode-region): Better calculation of
+	break point.
+	(rfc2047-fold-region): Don't break the first non-LWSP characters.
+
+2000-10-07 09:18:53  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-agent-fetching): New variable.
+	* gnus-agent.el (gnus-agent-with-fetch): Bind it.
+	* gnus-score.el (gnus-score-body): Don't score body when
+	agent-fetching.
+	(gnus-score-followup): Don't score followup either. 
+
+2000-10-07 08:19:17  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el: Define dynamic variables in eval-when-compile.
+	* message.el (message-sending-message): New variable.
+	(message-send): Use it.
+	* gnus-draft.el (gnus-draft-send-message): Ditto.
+	(gnus-group-send-drafts): Ditto.
+
+2000-10-06  Dave Love  <fx@gnu.org>
+
+	* gnus-audio.el: Don't require cl.
+	(gnus-audio): New custom group.
+	(gnus-audio-inline-sound): Change to work with Emacs.
+	(gnus-audio-directory, gnus-audio-directory) 
+	(gnus-audio-au-player):  Customize.
+	(gnus-audio-play): Try external player if play-sound-file fails.
+	Use file-name-extension, not string-match.
+
+2000-10-06 17:38:03  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-prepare): Configure it again.
+
+2000-10-06 15:11:07  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-default-charset): Default value for non-Mule
+	Emacsen.
+
+2000-10-06 14:28:50  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-alternative-emails): New.
+	(message-use-alternative-email-as-from): New.
+	(message-setup): Use them.
+
+2000-10-06 13:46:47  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* base64.el, dgnushack.el, gnus-spec.el, messagexmas.el
+	* gnus-xmas.el, nnheaderxm.el, nndraft.el: Use defalias.
+
+	* gnus-xmas.el (gnus-xmas-define): Defalias gnus-overlay-buffer,
+	gnus-overlay-start.
+	* gnus.el: Ditto.
+	* gnus-art.el (gnus-insert-mime-button): Use them.
+
+2000-10-06 10:01:08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-with-unibyte-current-buffer): Don't set unibyte
+	if eight-bit-control is a charset, e.g. Mule 5.0 in Emacs 21.
+
+2000-10-06 09:38:54  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* qp.el (quoted-printable-encode-region): Use
+	mm-with-unibyte-current-buffer within narrowed region.
+
 2000-10-06 08:56:33  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* webmail.el (webmail-type-definition): Fix my-deja open url.
@@ -300,7 +483,6 @@
 	(mm-inline-message): Test for `remove-specifier'; don't use
 	condition-case.
 
->>>>>>> 5.672
 2000-09-24  Simon Josefsson  <simon@josefsson.org>
 
 	* nnimap.el (nnimap-request-accept-article): Remove From[^:] lines.

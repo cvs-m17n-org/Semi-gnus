@@ -277,17 +277,17 @@ Copyright \copyright{} 1995,96,97,98,99,2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with the
-Invariant Sections being none, with the Front-Cover texts being ``A GNU
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover texts being ``A GNU
 Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
 license is included in the section entitled ``GNU Free Documentation
-License''.
+License'' in the Emacs manual.
 
 この文書を、フリーソフトウェア財団発行の GNU フリー文書利用許諾契約書
 第 1.1 版またはそれ以降の版が定める条件の下で複製、配布、あるいは変更す
 ることを許可する。変更不可部分は指定しない。「A GNU Manual」は表表紙テ
 キスト、以下の (a) は裏表紙テキストである。この利用許諾契約書の複写は
-「GNU フリー文書利用許諾契約書」という章に含まれている。
+「Emacs manual」の「GNU フリー文書利用許諾契約書」という章に含まれている。
 
 (a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
 this GNU Manual, like GNU software.  Copies published by the Free
@@ -297,6 +297,16 @@ Software Foundation raise funds for GNU development.''
 のように複製したり変更する自由がある。複製はフリーソフトウェア財団によっ
 て出版された。(フリーソフトウェア財団は) GNU の開発のために必要な資金を
 集めている。」
+
+This document is part of a collection distributed under the GNU Free
+Documentation License.  If you want to distribute this document
+separately from the collection, you can do so by adding a copy of the
+license to the document, as described in section 6 of the license.
+
+この文書は「GNU フリー文書利用許諾契約書」に基づいて配布された収集著作物
+の一部です。もしあなたがこの文書を収集著作物から分離して配布したいときは、
+契約書の第 6 項に記述されているように、文書に契約書の複写を付加すること
+によって、行なうことができます。
 \newpage
 \end{titlepage}
 @end iflatex
@@ -312,17 +322,17 @@ Copyright (C) 1995,96,97,98,99,2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with the
-Invariant Sections being none, with the Front-Cover texts being ``A GNU
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover texts being ``A GNU
 Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
 license is included in the section entitled ``GNU Free Documentation
-License''.
+License'' in the Emacs manual.
 
 この文書を、フリーソフトウェア財団発行の GNU フリー文書利用許諾契約書
 第 1.1 版またはそれ以降の版が定める条件の下で複製、配布、あるいは変更す
 ることを許可する。変更不可部分は指定しない。「A GNU Manual」は表表紙テ
 キスト、以下の (a) は裏表紙テキストである。この利用許諾契約書の複写は
-「GNU フリー文書利用許諾契約書」という章に含まれている。
+「Emacs manual」の「GNU フリー文書利用許諾契約書」という章に含まれている。
 
 (a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
 this GNU Manual, like GNU software.  Copies published by the Free
@@ -332,6 +342,16 @@ Software Foundation raise funds for GNU development.''
 のように複製したり変更する自由がある。複製はフリーソフトウェア財団によっ
 て出版された。(フリーソフトウェア財団は) GNU の開発のために必要な資金を
 集めている。」
+
+This document is part of a collection distributed under the GNU Free
+Documentation License.  If you want to distribute this document
+separately from the collection, you can do so by adding a copy of the
+license to the document, as described in section 6 of the license.
+
+この文書は「GNU フリー文書利用許諾契約書」に基づいて配布された収集著作物
+の一部です。もしあなたがこの文書を収集著作物から分離して配布したいときは、
+契約書の第 6 項に記述されているように、文書に契約書の複写を付加すること
+によって、行なうことができます。
 @end ifnottex
 
 @tex
@@ -346,27 +366,38 @@ Software Foundation raise funds for GNU development.''
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1995,96,97,98,99,2000 Free Software Foundation, Inc.
 
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover texts being ``A GNU
+Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License'' in the Emacs manual.
 
-著作権表示とこの許可文がすべての複製に存在する限り、この説明書のまったく
-同一の複製を作り、配布することを許可する。
+この文書を、フリーソフトウェア財団発行の GNU フリー文書利用許諾契約書
+第 1.1 版またはそれ以降の版が定める条件の下で複製、配布、あるいは変更す
+ることを許可する。変更不可部分は指定しない。「A GNU Manual」は表表紙テ
+キスト、以下の (a) は裏表紙テキストである。この利用許諾契約書の複写は
+「Emacs manual」の「GNU フリー文書利用許諾契約書」という章に含まれている。
 
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.''
 
-同一複製の条件の下で、それによって得られた結果をこの許可文の表示と同一の
-条件のもとで配布する限り、この説明書の修正版の複製をし、配布することを許
-可する。
+(a) FSF の裏表紙テキスト:「あなたにはこの GNU Manual を GNU ソフトウェア
+のように複製したり変更する自由がある。複製はフリーソフトウェア財団によっ
+て出版された。(フリーソフトウェア財団は) GNU の開発のために必要な資金を
+集めている。」
 
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
+This document is part of a collection distributed under the GNU Free
+Documentation License.  If you want to distribute this document
+separately from the collection, you can do so by adding a copy of the
+license to the document, as described in section 6 of the license.
 
-上記の修正版に関する条件の下で、この説明書の翻訳の複製を作り、配布するこ
-とを許可する。
+この文書は「GNU フリー文書利用許諾契約書」に基づいて配布された収集著作物
+の一部です。もしあなたがこの文書を収集著作物から分離して配布したいときは、
+契約書の第 6 項に記述されているように、文書に契約書の複写を付加すること
+によって、行なうことができます。
 
 @end titlepage
 @page
@@ -773,6 +804,7 @@ Scoring
 * Reverse Scoring::        古いものの子であるという問題は問題ではない
 * Global Score Files::     地をつかみ、耳を切り裂くスコアファイル
 * Kill Files::             それらはまだここにありますが、無視する事ができる
+* Converting Kill Files::  消去ファイルをスコアファイルに変換する
 * GroupLens::              どれを読むのが好きかの予言を得る
 * Advanced Scoring::       スコアの法則を作るために論理表現を使う
 * Score Decays::           スコアを枯れていかせるのは役に立つ事もある
@@ -14470,6 +14502,7 @@ Gnus は概略バッファを作成する前に、現在のグループに適用されるどん
 * Reverse Scoring::        古いものの子であるという問題は問題ではない
 * Global Score Files::     地をつかみ、耳を切り裂くスコアファイル
 * Kill Files::             それらはまだここにありますが、無視する事ができる
+* Converting Kill Files::  消去ファイルをスコアファイルに変換する
 * GroupLens::              どれを読むのが好きかの予言を得る
 * Advanced Scoring::       スコアの法則を作るために論理表現を使う
 * Score Decays::           スコアを枯れていかせるのは役に立つ事もある
@@ -15738,8 +15771,6 @@ GNUS 消去ファイルを編集するための二つの概略バッファ関数があります。
 
 @end table
 
-@c The URL below is invalid and the code isn't on gnus.org.
-@ignore
 @node Converting Kill Files
 @section 消去ファイルの変換
 @cindex kill files
@@ -15759,7 +15790,6 @@ GNUS 消去ファイルを編集するための二つの概略バッファ関数があります。
 に @code{gnus-kill} 形式以外のものがたくさん含まれていれば、それらを手で
 変換しなければなりません。あるいは単にそれらを、そのままにしておいてくだ
 さい。Gnus は以前同様にそれらを使ってくれるでしょう。
-@end ignore
 
 @node GroupLens
 @section GroupLens
