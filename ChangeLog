@@ -1,3 +1,16 @@
+1999-03-01  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.7.
+
+	* Nana-TIPS.ja:  New section `nnheader-file-coding-system' and
+	`nnspool-file-coding-system'.
+
+	* lisp/nnspool.el (nnspool-file-coding-system): Abolished.
+	(nnspool-retrieve-headers): Don't use
+	`nnheader-file-coding-system'.
+	(nnspool-retrieve-headers-with-nov): Ditto.
+	(nnspool-find-file): Ditto.
+
 1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-locale-detect): Fix, when no locale
