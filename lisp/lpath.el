@@ -5,7 +5,7 @@
 (or (featurep 'path-util)
     (load "apel/path-util"))
 (add-path "apel")
-(add-path "mel")
+(add-path "flim")
 (add-path "semi")
 
 (defun maybe-fbind (args)
