@@ -22182,38 +22182,37 @@ spam-stat.el $B$O(B (Lisp $B$@$1$N(B) spam $BFbIt%G!<%?%Y!<%9$rDs6!$7$^$9$,
 Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
 $B$N(B @code{spam-use-stat} $BJQ?t$,Ds6!$5$l$^$9!#(B
 
-@c TRANSLATEME
 @node SpamOracle
-@subsubsection Using SpamOracle with Gnus
+@subsubsection Gnus $B$G(B SpamOracle $B$r;H$&$K$O(B
 @cindex spam filtering
 @cindex SpamOracle
 @cindex spam
 
-An easy way to filter out spam is to use SpamOracle.  SpamOracle is an
-statistical mail filtering tool written by Xavier Leroy and needs to be
-installed separately.
+$B5$7Z$K(B spam $B$r_I2a$9$k0l$D$N$d$jJ}$O(B SpamOracle $B$r;H$&$3$H$G$9!#E}7WE*$K(B
+$B%a!<%k$r_I2a$9$k$?$a$NF;6q$G$"$k(B SpamOracle $B$O!"(BXavier Leroy $B$K$h$C$F=q(B
+$B$+$l$^$7$?!#$3$l$OJL$K%$%s%9%H!<%k$9$kI,MW$,$"$j$^$9!#(B
 
-There are several ways to use SpamOracle with Gnus.  In all cases, your
-mail is piped through SpamOracle in its @emph{mark} mode.  SpamOracle will
-then enter an @samp{X-Spam} header indicating whether it regards the
-mail as a spam mail or not.
+Gnus $B$G(B SpamOracle $B$r;H$&$K$O!"$$$/$D$+$N$d$jJ}$,$"$j$^$9!#$9$Y$F$N>l9g(B
+$B$K!"%a!<%k$O(B @emph{mark} $B%b!<%I$GF0:n$7$F$$$k(B SpamOracle $B$K%Q%$%W$5$l$^(B
+$B$9!#$9$k$H(B SpamOracle $B$O!"$=$N%a!<%k$r(B spam $B$@$H8+$J$7$?$+$I$&$+$r<((B
+$B$9(B @samp{X-Spam} $B%X%C%@!<$r5-F~$7$^$9!#(B
 
-One possibility is to run SpamOracle as a @code{:prescript} from the
-@xref{Mail Source Specifiers}, (@pxref{SpamAssassin}).  This method has
-the advantage that the user can see the @emph{X-Spam} headers.
+$B<B8=2DG=$J0l$D$O!"(BSpamOracle $B$r(B @code{:prescript} $B$H$7$F(B @xref{Mail
+Source Specifiers} $B$+$i(B $BAv$i$;$k$3$H$G$9!#$3$NJ}K!$K$O!"%f!<%6(B
+$B$,(B @emph{X-Spam} $B%X%C%@!<$r8+$k$3$H$,$G$-$k$H$$$&MxE@$,$"$j$^$9!#(B
 
-The easiest method is to make @code{spam.el} (@pxref{Filtering Spam
-Using The Spam ELisp Package}) call SpamOracle.
+$B$b$C$H$b<j7Z$JJ}K!$O!"(B@file{spam.el} (@pxref{Filtering Spam Using The
+Spam ELisp Package}) $B$,(B SpamOracle $B$r8F$V$h$&$K$9$k$3$H$G$9!#(B
 
 @vindex spam-use-spamoracle
-To enable SpamOracle usage by @code{spam.el}, set the variable
-@code{spam-use-spamoracle} to @code{t} and configure the
-@code{nnmail-split-fancy} or @code{nnimap-split-fancy} as described in
-the section @xref{Filtering Spam Using The Spam ELisp Package}.  In
-this example the @samp{INBOX} of an nnimap server is filtered using
-SpamOracle.  Mails recognized as spam mails will be moved to
-@code{spam-split-group}, @samp{Junk} in this case.  Ham messages stay
-in @samp{INBOX}:
+@file{spam.el} $B$,(B SpamOracle $B$r;H$($k$h$&$K$9$k$K$O!"JQ(B
+$B?t(B @code{spam-use-spamoracle} $B$r(B @code{t} $B$K$7$F!"(B@xref{Filtering Spam
+Using The Spam ELisp Package} $B$N9`$G=R$Y$i$l$F$$$k$h$&(B
+$B$K(B @code{nnmail-split-fancy} $B$+(B @code{nnimap-split-fancy} $B$r@_Dj$7$F2<$5(B
+$B$$!#$3$NNc$G$O(B @code{nnimap} $B%5!<%P!<$N(B @samp{INBOX} $B$,(B SpamOracle $B$K$h$C(B
+$B$F_I2a$5$l$^$9!#(BSpam $B$@$H8+$J$5$l$?%a!<%k$O(B @code{spam-split-group}$B!"$3(B
+$B$N>l9g$O(B @samp{Junk} $B$K0\F0$5$;$i$l$^$9!#(BHam $B$J%a%C%;!<%8(B
+$B$O(B @samp{INBOX} $B$K;D$j$^$9(B:
 
 @example
 (setq spam-use-spamoracle t
@@ -22224,67 +22223,68 @@ in @samp{INBOX}:
 @end example
 
 @defvar spam-use-spamoracle
-Set to @code{t} if you want Gnus to enable spam filtering using
-SpamOracle.
+Gnus $B$K(B SpamOracle $B$r;H$C$F(B spam $B$N_I2a$r$5$;$?$$>l9g$K(B @code{t} $B$K$7$F(B
+$B2<$5$$!#(B
 @end defvar
 
 @defvar spam-spamoracle-binary
-Gnus uses the SpamOracle binary called @file{spamoracle} found in the
-user's PATH.  Using the variable @code{spam-spamoracle-binary}, this
-can be customized.
+Gnus $B$O%f!<%6$N(B PATH $B$G8+$D$+$C$?(B @file{spamoracle} $B$H$$$&(B SpamOracle $B$N(B
+$B%P%$%J%j$r;H$$$^$9!#$3$l$K$O%+%9%?%^%$%:2DG=$JJQ(B
+$B?t(B @code{spam-spamoracle-binary} $B$r;H$$$^$9!#(B
 @end defvar
 
 @defvar spam-spamoracle-database
-By default, SpamOracle uses the file @file{~/.spamoracle.db} as a database to
-store its analyses.  This is controlled by the variable
-@code{spam-spamoracle-database} which defaults to @code{nil}.  That means
-the default SpamOracle database will be used.  In case you want your
-database to live somewhere special, set
-@code{spam-spamoracle-database} to this path.
+SpamOracle $B$O$=$N2r@O7k2L$r%G!<%?%Y!<%9$H$7$F3JG<$9$k$?$a$K!"%G%#%U%)%k(B
+$B%H$G(B @file{~/.spamoracle.db} $B%U%!%$%k$r;H$$$^$9!#$3$l$OJQ(B
+$B?t(B @code{spam-spamoracle-database} $B$G@)8f$5$l!"%G%#%U%)%k%H(B
+$B$O(B @code{nil} $B$G$9!#$=$l$O!"%G%#%U%)%k%H$N(B SpamOracle $B%G!<%?%Y!<%9$,;H$o(B
+$B$l$k$3$H$r0UL#$7$^$9!#%G!<%?%Y!<%9$,$I$3$+FCJL$J>l=j$K$"$k>l9g$O!"(B
+@code{spam-spamoracle-database} $B$r$=$N%Q%9$K@_Dj$7$F2<$5$$!#(B
 @end defvar
 
-SpamOracle employs a statistical algorithm to determine whether a
-message is spam or ham.  In order to get good results, meaning few
-false hits or misses, SpamOracle needs training.  SpamOracle learns the
-characteristics of your spam mails.  Using the @emph{add} mode
-(training mode) one has to feed good (ham) and spam mails to
-SpamOracle.  This can be done by pressing @kbd{|} in the Summary buffer
-and pipe the mail to a SpamOracle process or using @code{spam.el}'s
-spam- and ham-processors, which is much more convenient.  For a
-detailed description of spam- and ham-processors, see @xref{Filtering Spam Using The Spam ELisp Package}.
+SpamOracle $B$O%a%C%;!<%8$,(B spam $B$+(B ham $B$+$r8+6K$a$k$?$a$KE}7WE*$J<jK!$r;H(B
+$B$$$^$9!#4V0c$$$d8+F($7$N>/$J$$NI$$7k2L$rF@$k$?$a$K!"(BSpamOracle $B$O71N}$r(B
+$BI,MW$H$7$^$9!#(BSpamOracle $B$O(B spam $B%a!<%k$NFCD'$r3X$S$^$9!#(B@emph{add} $B%b!<(B
+$B%I(B ($B71N}%b!<%I(B) $B$r;H$C$F!"NI$$%a!<%k(B (ham) $B$H(B spam $B$r(B SpamOracle $B$KM?$((B
+$B$J$1$l$P$J$j$^$;$s!#$3$l$O!"35N,%P%C%U%!$G(B @kbd{|} $B$r2!$9$3$H$K$h$C$F%a!<(B
+$B%k$r(B SpamOracle $B$N%W%m%;%9$K%Q%$%W$9$k$+!"$^$?(B
+$B$O(B @file{spam.el} $B$N(B spam $B$*$h$S(B ham $B%W%m%;%C%5!<$r;H$&$3$H$K$h$C$F9T$J(B
+$B$&$3$H$,$G$-$^$9!#(B@xref{Filtering Spam Using The Spam ELisp Package} $B$r(B
+$B;2>H$7$F2<$5$$!#(B
 
 @defvar gnus-group-spam-exit-processor-spamoracle
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameter or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is added
-to a group's @code{spam-process} parameter, spam-marked articles will be
-sent to SpamOracle as spam samples.
+$B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
+$B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
+$B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
+$B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bspam $B0u$,IU$$(B
+$B$?5-;v$,(B spam $B$N%5%s%W%k$H$7$F(B SpamOracle $B$KAw$i$l$^$9!#(B
 @end defvar
 
 @defvar gnus-group-ham-exit-processor-spamoracle
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameter or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is added
-to a grup's @code{spam-process} parameter, the ham-marked articles in
-@emph{ham} groups will be sent to the SpamOracle as samples of ham
-messages.  Note that this ham processor has no effect in @emph{spam} or
-@emph{unclassified} groups.
+$B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
+$B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
+$B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
+$B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(B@emph{ham} $B%0(B
+$B%k!<%W$K$"$k(B ham $B0u$,IU$$$?5-;v$,(B ham $B$N5-;v$N%5%s%W%k$H$7(B
+$B$F(B SpamOracle $B$KAw$i$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<(B
+$B$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7(B
+$B$F2<$5$$!#(B
 @end defvar
 
-@emph{Example:} These are the Group Parameters of an group that has been
-classified as a ham group, meaning that it should only contain ham
-messages.
+@emph{$BNc(B:} $B$3$l$i$O(B ham $B%0%k!<%W$H$7$FJ,N`$5$l$?!"$D$^$j(B ham $B$N5-;v$7$+(B
+$B$J$$%0%k!<%W$N%0%k!<%W%Q%i%a!<%?$G$9!#(B
 @example
  ((spam-contents gnus-group-spam-classification-ham)
   (spam-process
    (gnus-group-spam-exit-processor-spamoracle)))
 @end example
-For this group the `gnus-group-spam-exit-processor-spamoracle' is
-installed.  If the group contains spam message (e.g. because SpamOracle
-has not had enough sample messages yet) and the user marks some
-messages as spam messages, these messages will be processed by
-@code{gnus-group-spam-exit-processor-spamoracle}.  This processor sends
-the messages to SpamOracle as new samples for spam.
+$B$3$N%0%k!<%W$G$O(B @code{gnus-group-spam-exit-processor-spamoracle} $B$,;E;v(B
+$B$r$7$^$9!#$3$N%0%k!<%W$K(B spam $B5-;v$,$"$C$F(B (SpamOracle $B$,==J,$J%5%s%W%k(B
+$B$r?)$Y$5$;$F$b$i$C$F$$$J$1$l$P!"$=$&$J$j$^$9$M(B)$B!"$+$D%f!<%6$,$$$/$D$+$N(B
+$B5-;v$K(B spam $B$N0u$rIU$1$?$J$i$P!"$=$l$i$N5-;v(B
+$B$O(B @code{gnus-group-spam-exit-processor-spamoracle} $B$K$h$C$F=hM}$5$l$^$9!#(B
+$B$3$N%W%m%;%C%5!<$O!"?7$7$$(B spam $B$N%5%s%W%k$H$7$F(B SpamOracle $B$K5-;v$rAw$j(B
+$B$^$9!#(B
 
 @node Extending the spam elisp package
 @subsubsection Spam elisp $B%Q%C%1!<%8$N3HD%(B
