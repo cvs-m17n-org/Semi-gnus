@@ -9560,12 +9560,14 @@ treated as multipart/mixed."
 		       (setq edge (* edge direction))
 		     (setq edge -1))
 		   (or (plusp edge)
-		       (progn
+		       (let ((buffer-read-only nil)
+			     (inhibit-read-only t))
 			 (put-text-property (point-min) (point-max)
 					    'gnus-wheel-edge direction)
 			 nil))
 		   (or (> edge gnus-wheel-edge-resistance)
-		       (progn
+		       (let ((buffer-read-only nil)
+			     (inhibit-read-only t))
 			 (put-text-property (point-min) (point-max)
 					    'gnus-wheel-edge
 					    (* (1+ edge) direction))
