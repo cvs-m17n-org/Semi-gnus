@@ -1469,11 +1469,11 @@ Lines (optional . User-Agent))} です。
 @findex smtpmail-send-it
 @findex feedmail-send-it
 現在のバッファをメールとして送るために使われる関数です。初期値
-は @code{message-send-mail-with-sendmail} です。他
-に @code{message-send-mail-with-mh},
+は @code{message-send-mail-with-sendmail}、またはシステムによって
+は @code{smtpmail-send-it} です。他に @code{message-send-mail-with-mh},
 @code{message-send-mail-with-qmail}, @code{message-send-mail-with-smtp},
-@code{message-smtpmail-send-it}, @code{smtpmail-send-it} およ
-び @code{feedmail-send-it} が使えます。
+@code{message-smtpmail-send-it} および @code{feedmail-send-it} が使えま
+す。
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
