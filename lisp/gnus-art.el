@@ -4900,7 +4900,7 @@ If no internal viewer is available, use an external viewer."
 (defcustom gnus-mime-display-multipart-as-mixed nil
   "Display \"multipart\" parts as  \"multipart/mixed\".
 
-If `t', it overrides `nil' values of
+If t, it overrides nil values of
 `gnus-mime-display-multipart-alternative-as-mixed' and
 `gnus-mime-display-multipart-related-as-mixed'."
   :group 'gnus-article-mime
@@ -4916,7 +4916,7 @@ If `t', it overrides `nil' values of
 
 If displaying \"text/html\" is discouraged \(see
 `mm-discouraged-alternatives'\) images or other material inside a
-\"multipart/related\" part might be overlooked when this variable is `nil'."
+\"multipart/related\" part might be overlooked when this variable is nil."
   :group 'gnus-article-mime
   :type 'boolean)
 
@@ -6258,7 +6258,7 @@ must return `mid', `mail', `invalid' or `ask'."
   "An alist of \(RATE . REGEXP\) pairs for `gnus-button-mid-or-mail-heuristic'.
 
 A negative RATE indicates a message IDs, whereas a positive indicates a mail
-address.  The REGEXP is processed with `case-fold-search' set to `nil'."
+address.  The REGEXP is processed with `case-fold-search' set to nil."
   :group 'gnus-article-buttons
   :type '(repeat (cons (number :tag "Rate")
 		       (regexp :tag "Regexp"))))
