@@ -2834,7 +2834,7 @@ to find out how to use this."
 	   (encoding (or encoding-string
 			 message-default-encoding)))
       (message "%s %s" encoding-string encoding)
-      (if (not (string-match "^7bit" encoding))
+      (if (string-match "^8bit" encoding)
 	  t
 	(widen)
 	(set-buffer (get-buffer-create " message syntax"))
