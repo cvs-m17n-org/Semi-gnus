@@ -1,6 +1,6 @@
 ;;; nnheaderxm.el --- making Gnus backends work under XEmacs
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003
 ;;      Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -29,11 +29,38 @@
 ;;; Code:
 
 (defun nnheader-xmas-run-at-time (time repeat function &rest args)
-  (start-itimer
-   "nnheader-run-at-time"
-   `(lambda ()
-      (,function ,@args))
-   time repeat))
+  "Emulating function run as `run-at-time' in the right way.
+TIME should be nil meaning now or a number of seconds from now.
+Return an itimer object which can be used in either `delete-itimer'
+or `cancel-timer'."
+  (let ((itimers (list nil)))
+    (setcar
+     itimers
+     (apply #'start-itimer "nnheader-run-at-time"
+	    (lambda (itimers repeat function &rest args)
+	      (let ((itimer (car itimers)))
+		(if repeat
+		    (progn
+		      (set-itimer-function
+		       itimer
+		       (lambda (itimer repeat function &rest args)
+			 (set-itimer-restart itimer repeat)
+			 (set-itimer-function itimer function)
+			 (set-itimer-function-arguments itimer args)
+			 (apply function args)))
+		      (set-itimer-function-arguments
+		       itimer
+		       (append (list itimer repeat function) args)))
+		  (set-itimer-function
+		   itimer
+		   (lambda (itimer function &rest args)
+		     (delete-itimer itimer)
+		     (apply function args)))
+		  (set-itimer-function-arguments
+		   itimer
+		   (append (list itimer function) args)))))
+	    1e-9 (if time (max time 1e-9) 1e-9)
+	    nil t itimers repeat function args))))
 
 (defun nnheader-xmas-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
