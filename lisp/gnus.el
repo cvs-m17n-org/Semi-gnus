@@ -3117,11 +3117,9 @@ Return nil if not defined."
 
 (defun gnus-shutdown (symbol)
   "Shut down everything that waits for SYMBOL."
-  (let ((alist gnus-shutdown-alist)
-	entry)
-    (while (setq entry (pop alist))
-      (when (memq symbol (cdr entry))
-	(funcall (car entry))))))
+  (dolist (entry gnus-shutdown-alist)
+    (when (memq symbol (cdr entry))
+      (funcall (car entry)))))
 
 
 ;;;
