@@ -353,6 +353,7 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 
     ;; Replace with the gathered references.
     (when references
+      (push-mark beg)
       (save-restriction
 	(message-narrow-to-headers)
 	(let ((case-fold-search t))
@@ -364,7 +365,9 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 		   '(References . message-fill-references)))
 	 (list (cons 'References
 		     (mapconcat 'identity references " "))))
-	(backward-delete-char 1)))
+	(backward-delete-char 1))
+      (setq beg (mark t))
+      (pop-mark))
 
     (goto-char beg)))
 
