@@ -177,21 +177,25 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 ;; included in the standard `load-path' or added by the configure
 ;; option "--with-addpath=".
 (let ((path (or (locate-library "path-util")
-		(locate-library "apel/path-util"))));; backward compat.
+		(locate-library "apel/path-util")));; backward compat.
+      parent lpath)
   (if path
       (progn
 	(when (string-match "/$" (setq path (file-name-directory path)))
 	  (setq path (substring path 0 (match-beginning 0))))
 	;; path == "/var/home/john/lisp/apel-VERSION"
-	(unless (or (member path load-path)
-		    (member (file-name-as-directory path) load-path))
-	  (push path load-path))
-	(when (string-match "/$" (setq path (file-name-directory path)))
-	  (setq path (substring path 0 (match-beginning 0))))
-	;; path == "/var/home/john/lisp"
-	(unless (or (member path load-path)
-		    (member (file-name-as-directory path) load-path))
-	  (push path (cdr load-path)))
+	(when (string-match "/$" (setq parent (file-name-directory path)))
+	  (setq parent (substring path 0 (match-beginning 0))))
+	;; parent == "/var/home/john/lisp"
+	(if (setq lpath (or (member path load-path)
+			    (member (file-name-as-directory path) load-path)))
+	    (unless (or (member parent load-path)
+			(member (file-name-as-directory parent) load-path))
+	      (push parent (cdr lpath)))
+	  (push path load-path)
+	  (unless (or (member parent load-path)
+		      (member (file-name-as-directory parent) load-path))
+	    (push parent (cdr load-path))))
 	(require 'path-util))
     (error "
 APEL modules are not found in %s.
