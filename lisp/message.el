@@ -165,17 +165,6 @@ Otherwise, most addresses look like `angles', but they look like
 		 (const default))
   :group 'message-headers)
 
-(defcustom message-references-generator
-  (if (fboundp 'std11-fill-msg-id-list-string)
-      (function message-generate-filled-references)
-    (function message-generate-folded-references))
-  "*Function to generate \"References\" field."
-  :type '(radio (function-item message-generate-filled-references)
-		(function-item message-generate-folded-references)
-		(function-item message-generate-unfolded-references)
-		(function :tag "Other"))
-  :group 'message-headers)
-
 (defcustom message-syntax-checks nil
   ;; Guess this one shouldn't be easy to customize...
   "*Controls what syntax checks should not be performed on outgoing posts.
@@ -926,7 +915,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    (References . message-fill-header)
+    (References . message-fill-references)
     (X-Mailer)
     (X-Newsreader))
   "Alist used for formatting headers.")
@@ -2959,44 +2948,6 @@ give as trustworthy answer as possible."
   (or mail-host-address
       (message-make-fqdn)))
 
-(defun message-generate-filled-references (references message-id)
-  "Return filled References field from REFERENCES and MESSAGE-ID."
-  (std11-fill-msg-id-list-string (concat references message-id)))
-
-(defun message-generate-folded-references (references message-id)
-  "Return folded References field from REFERENCES and MESSAGE-ID."
-  (if references
-      (let (quote)
-	(setq references
-	      (mapconcat (function
-			  (lambda (char)
-			    (cond ((eq char ?\\)
-				   (setq quote t)
-				   "\\")
-				  ((memq char '(?\  ?\t))
-				   (prog1
-				       (if quote
-					   (char-to-string char)
-					 (concat "\n" (char-to-string char)))
-				     (setq quote nil)))
-				  (t
-				   (setq quote nil)
-				   (char-to-string char)
-				   ))))
-			 references ""))
-	(if message-id
-	    (concat references "\n " message-id)
-	  references))
-    message-id))
-
-(defun message-generate-unfolded-references (references message-id)
-  "Return folded References field from REFERENCES and MESSAGE-ID."
-  (if references
-      (if message-id
-	  (concat references " " message-id)
-	references)
-    message-id))
-
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
@@ -3173,6 +3124,16 @@ Headers already prepared in the buffer are not modified."
     (goto-char (point-max))
     (widen)
     (forward-line 1)))
+
+(defun message-fill-references (header value)
+  (let ((begin (point))
+	(fill-column 990)
+	(fill-prefix "\t"))
+    (insert (capitalize (symbol-name header))
+	    ": "
+	    (std11-fill-msg-id-list-string
+	     (if (consp value) (car value) value))
+	    "\n")))
 
 (defun message-fill-header (header value)
   (let ((begin (point))
@@ -3478,9 +3439,9 @@ Headers already prepared in the buffer are not modified."
      `((Subject . ,subject)
        ,@follow-to
        ,@(if (or references message-id)
-	     `((References . ,(funcall message-references-generator
-				       references message-id))))
-       )
+	     `((References . ,(concat (or references "") (and references " ")
+				      (or message-id ""))))
+	   nil))
      cur)))
 
 ;;;###autoload
@@ -3586,8 +3547,8 @@ responses here are directed to other newsgroups."))
 	   `((Newsgroups . ,newsgroups))))
        ,@(and distribution (list (cons 'Distribution distribution)))
        ,@(if (or references message-id)
-	     `((References . ,(funcall message-references-generator
-				       references message-id))))
+	     `((References . ,(concat (or references "") (and references " ")
+				      (or message-id "")))))
        ,@(when (and mct
 		    (not (equal (downcase mct) "never")))
 	   (list (cons 'Cc (if (equal (downcase mct) "always")
