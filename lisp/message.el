@@ -6750,16 +6750,29 @@ Optional NEWS will use news to forward instead of mail."
   (insert
    "\n-------------------- Start of forwarded message --------------------\n")
   (let ((b (point)) e)
-    (save-restriction
-      (narrow-to-region (point) (point))
-      (mml-insert-buffer forward-buffer)
-      (goto-char (point-min))
-      (when (looking-at "From ")
-	(replace-match "X-From-Line: "))
-      (goto-char (point-max)))
+    (insert
+     (with-temp-buffer
+       (mm-disable-multibyte)
+       (insert
+	(with-current-buffer forward-buffer
+	  (mm-with-unibyte-current-buffer (buffer-string))))
+       (mm-enable-multibyte)
+       (mime-to-mml)
+       (goto-char (point-min))
+       (when (looking-at "From ")
+	 (replace-match "X-From-Line: "))
+       (buffer-string)))
     (setq e (point))
     (insert
-     "\n-------------------- End of forwarded message --------------------\n")))
+     "\n-------------------- End of forwarded message --------------------\n")
+    (when (and (not current-prefix-arg)
+	       message-forward-ignored-headers)
+      (save-restriction
+	(narrow-to-region b e)
+	(goto-char b)
+	(narrow-to-region (point)
+			  (or (search-forward "\n\n" nil t) (point)))
+	(message-remove-header message-forward-ignored-headers t)))))
 
 (defun message-forward-make-body-mime (forward-buffer)
   (insert "\n\n<#part type=message/rfc822 disposition=inline raw=t>\n")
