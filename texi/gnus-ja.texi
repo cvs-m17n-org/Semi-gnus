@@ -8146,28 +8146,27 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 $B2u$l$?(B Outlook (Express) $B$N5-;v$r(B deuglify $B$7$^(B
 $B$9(B (@code{gnus-article-outlook-deuglify-article})$B!#(B
 
-@c TRANSLATEME!
 @item W Y u
 @kindex W Y u ($B35N,(B)
 @findex gnus-outlook-unwrap-lines
-Unwrap lines that appear to be wrapped citation lines.  You can control
-what lines will be unwrapped by frobbing
-@code{gnus-outlook-deuglify-unwrap-min} and
-@code{gnus-outlook-deuglify-unwrap-max}, indicating the miminum and
-maximum length of an unwrapped citation line.
-(@code{gnus-outlook-deuglify-article}).
+$B@^$jJV$5$l$?0zMQ9T$N$h$&$K8+$($k9T$N@^$jJV$7$r2r$-$^$9!#@^$jJV$7$,2r$+$l(B
+$B$?9T$N:G>.$*$h$S:GBg$ND9$5$rI=(B
+$B$9(B @code{gnus-outlook-deuglify-unwrap-min} $B$*$h(B
+$B$S(B @code{gnus-outlook-deuglify-unwrap-max} $B$rD4@0$9$k$3$H$K$h$C$F!"$I$N(B
+$B9T$N@^$jJV$7$,2r$+$l$k$+$r@)8f$9$k$3$H$,$G$-$^$9!#(B
+(@code{gnus-outlook-deuglify-article})$B!#(B
 
 @item W Y a
 @kindex W Y a ($B35N,(B)
 @findex gnus-outlook-repair-attribution
-Repair a broken attribution line
-(@code{gnus-outlook-repair-attribution}).
+$B2u$l$?B0@-9T$r=$I|$7$^$9!#(B
+(@code{gnus-outlook-repair-attribution})$B!#(B
 
 @item W Y c
 @kindex W Y c ($B35N,(B)
 @findex gnus-outlook-rearrange-citation
-Repair broken citations by rearranging the text.
-(@code{gnus-outlook-rearrange-citation}).
+$B2u$l$?0zMQ$r!"%F%-%9%H$rJB$YD>$9$3$H$K$h$C$F=$I|$7$^$9!#(B
+(@code{gnus-outlook-rearrange-citation})$B!#(B
 
 @item W w
 @kindex W w ($B35N,(B)
@@ -16937,9 +16936,8 @@ Gnus $B%(!<%8%'%s%H$K5-;v$r<hF@$5$;$k$N$O(B ($B$=$7$F$"$J$?$N=q$$$?2?$+$N%a%C
 $B%;!<%8$rEj9F$9$k$N$O(B)$B!"0lC6J*;v$r@5$7$/@_Dj$7$F$7$^$($PHs>o$K4JC1$G$9!#(B
 $B0J2<$N%7%'%k%9%/%j%W%H$OI,MW$J$3$H$rA4$F$d$C$F$/$l$k$G$7$g$&!#(B
 
-@c TRANSLATEME!
-You can run a complete batch command from the command line with the
-following incantation:
+$B0J2<$N<vJ8$r%3%^%s%I%i%$%s$G;H$&$3$H$K$h$C$F!"40A4$J%P%C%A%3%^%s%I$rAv$i(B
+$B$;$k$3$H$,$G$-$^$9(B:
 
 @example
 #!/bin/sh

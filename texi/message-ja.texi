@@ -263,23 +263,22 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 @code{message-cancel-message} の値が取り消し記事の本文に挿入されます。ディ
 フォルトは @samp{I am canceling my own article.} です。
 
-@c TRANSLATEME!
 @cindex Cancel Locks
 @vindex message-insert-canlock
 @cindex canlock
-When Message posts news messages, it inserts @code{Cancel-Lock}
-headers by default.  This is a cryptographic header that ensures that
-only you can cancel your own messages, which is nice.  The downside
-is that if you lose your @file{.emacs} file (which is where Gnus
-stores the secret cancel lock password (which is generated
-automatically the first time you use this feature)), you won't be
-able to cancel your message.
+Message がニュース記事をポストするとき、ディフォルト
+で @code{Cancel-Lock} ヘッダーを挿入します。これは暗号化されたヘッダーで、
+あなた自身が書いたメーッセージをあなただけが取り消すことができることを保
+証する、すぐれものです。欠点は、@file{.emacs} ファイル (gnus が秘密
+の cancel lock パスワード (最初のこの機能を使うときに自動的に生成され
+る) を格納する場所) をなくしてしまうと、メッセージを取り消すことができな
+いであろうことです。
 
-Whether to insert the header or not is controlled by the
-@code{message-insert-canlock} variable.
+そのヘッダーを挿入するかどうかは、@code{message-insert-canlock} 変数によっ
+て制御されます。
 
-Not many news servers respect the @code{Cancel-Lock} header yet, but
-this is expected to change in the future.
+まだ多くのニュースサーバーが @code{Cancel-Lock} ヘッダーを重要視していま
+せんが、将来は変わることが期待されます。
 
 @node Superseding
 @section 代替
