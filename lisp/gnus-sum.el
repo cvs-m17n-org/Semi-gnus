@@ -45,6 +45,9 @@
   (defvar gnus-decode-encoded-word-function)
   )
 
+(eval-and-compile
+  (autoload 'gnus-cache-articles-in-group "gnus-cache"))
+
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
@@ -3978,8 +3981,10 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       (gnus-adjust-marked-articles info))
 
     ;; Kludge to avoid having cached articles nixed out in virtual groups.
-    (when (gnus-virtual-group-p group)
-      (setq cached gnus-newsgroup-cached))
+    (setq cached
+	  (if (gnus-virtual-group-p group)
+	      gnus-newsgroup-cached
+	    (gnus-cache-articles-in-group group)))
 
     (setq gnus-newsgroup-unreads
 	  (gnus-set-difference
@@ -4020,10 +4025,6 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		  gnus-fetch-old-headers)))
       (gnus-message 5 "Fetching headers for %s...done" gnus-newsgroup-name)
 
-      ;; Kludge to avoid having cached articles nixed out in virtual groups.
-      (when cached
-	(setq gnus-newsgroup-cached cached))
-
       ;; Suppress duplicates?
       (when gnus-suppress-duplicates
 	(gnus-dup-suppress-articles))
@@ -4040,6 +4041,11 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Removed marked articles that do not exist.
       (gnus-update-missing-marks
        (gnus-sorted-complement fetched-articles articles))
+
+      ;; Kludge to avoid having cached articles nixed out in virtual groups.
+      (when cached
+	(setq gnus-newsgroup-cached cached))
+
       ;; We might want to build some more threads first.
       (when (and gnus-fetch-old-headers
 		 (eq gnus-headers-retrieved-by 'nov))
