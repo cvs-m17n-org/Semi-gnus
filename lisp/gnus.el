@@ -250,7 +250,7 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Quassia Gnus v0.23)" gnus-version-number)
+  (format "Semi-gnus %s (based on Quassia Gnus v0.25)" gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1529,6 +1529,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("pp" pp pp-to-string pp-eval-expression)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
+     ("browse-url" browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
      ("nnmail" nnmail-split-fancy nnmail-article-group nnmail-date-to-time)
