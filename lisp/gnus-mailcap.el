@@ -210,7 +210,7 @@
       (viewer . tar-mode)
       (type . "archive/tar")
       (test . (fboundp 'tar-mode)))))
-     "*The mailcap structure is an assoc list of assoc lists.
+     "The mailcap structure is an assoc list of assoc lists.
 1st assoc list is keyed on the major content-type
 2nd assoc list is keyed on the minor content-type (which can be a regexp)
 
@@ -412,7 +412,7 @@ If FORCE, re-parse even if already parsed."
 	(downcase-region name-pos (point))
 	(setq name (buffer-substring name-pos (point)))
 	(skip-chars-forward " \t\n")
-	(if (not (eq (or (char-after (point)) 0) ?=)) ; There is no value
+	(if (not (eq (char-after (point)) ?=)) ; There is no value
 	    (setq value nil)
 	  (skip-chars-forward " \t\n=")
 	  (setq val-pos (point))
@@ -426,7 +426,7 @@ If FORCE, re-parse even if already parsed."
 		  (error (goto-char (point-max)))))
 	    (while (not done)
 	      (skip-chars-forward "^;")
-	      (if (eq (or (char-after (1- (point))) 0) ?\\ )
+	      (if (eq (char-after (1- (point))) ?\\ )
 		  (progn
 		    (subst-char-in-region (1- (point)) (point) ?\\ ? )
 		    (skip-chars-forward ";"))
@@ -749,14 +749,13 @@ this type is returned."
     (".wav"      . "audio/x-wav")
     (".wrl"      . "x-world/x-vrml")
     (".xbm"      . "image/xbm")
-    (".xpm"      . "image/x-pixmap")
+    (".xpm"      . "image/xpm")
     (".xwd"      . "image/windowdump")
     (".zip"      . "application/zip")
     (".ai"       . "application/postscript")
     (".jpe"      . "image/jpeg")
     (".jpeg"     . "image/jpeg"))
-  "*An assoc list of file extensions and the MIME content-types they
-correspond to.")
+  "An assoc list of file extensions and corresponding MIME content-types.")
 
 (defun mailcap-parse-mimetypes (&optional path)
   ;; Parse out all the mimetypes specified in a unix-style path string PATH
