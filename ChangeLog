@@ -1,3 +1,8 @@
+2002-04-23  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Work around the
+	incompatibility with BBDB 2.3x.
+
 2002-04-22  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/message.el (message-make-user-agent): Remove product tokens
