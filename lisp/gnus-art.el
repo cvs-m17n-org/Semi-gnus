@@ -38,8 +38,9 @@
 (require 'alist)
 (require 'mime-view)
 
-;; Avoid byte-compile warnings.
 (eval-when-compile
+  (require 'static)
+  ;; Avoid byte-compile warnings.
   (defvar gnus-article-decoded-p)
   (defvar gnus-article-mime-handles)
   (require 'mm-bodies)
@@ -1288,7 +1289,7 @@ if given a positive prefix, always hide."
 	  (narrow-to-region header-start header-end)
 	  (article-hide-headers)
 	  ;; Re-display X-Face image under XEmacs.
-	  (when (and (featurep 'xemacs)
+	  (when (and gnus-xemacs
 		     (gnus-functionp gnus-article-x-face-command))
 	    (let ((func (cadr (assq 'gnus-treat-display-xface
 				    gnus-treatment-function-alist)))
@@ -2993,7 +2994,7 @@ value of the variable `gnus-show-mime' is non-nil."
   "Decode and show X-Face with the function
 `x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
 narrowed to just the headers of the article."
-  (when (featurep 'xemacs)
+  (when gnus-xemacs
     (error "`%s' won't work under XEmacs."
 	   'gnus-article-display-x-face-with-x-face-mule))
   (when window-system
@@ -3777,7 +3778,7 @@ Argument LINES specifies lines to be scrolled down."
   (gnus-article-check-buffer)
   (let ((nosaves
          '("q" "Q"  "c" "r" "R" "\C-c\C-f" "m"  "a" "f" "F"
-           "Zc" "ZC" "ZE" "ZQ" "ZZ" "Zn" "ZR" "ZG" "ZN" "ZP"
+           "Zc" "ZC" "ZE" "ZJ" "ZQ" "ZZ" "Zn" "ZR" "ZG" "ZN" "ZP"
            "=" "^" "\M-^" "|"))
         (nosave-but-article
          '("A\r"))
@@ -3790,7 +3791,9 @@ Argument LINES specifies lines to be scrolled down."
       (set-buffer gnus-article-current-summary)
       (let (gnus-pick-mode)
         (push (or key last-command-event) unread-command-events)
-        (setq keys (read-key-sequence nil))))
+	(setq keys (static-if (featurep 'xemacs)
+		       (events-to-keys (read-key-sequence nil))
+		     (read-key-sequence nil)))))
     (message "")
 
     (if (or (member keys nosaves)
