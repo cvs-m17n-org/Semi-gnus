@@ -213,7 +213,7 @@ included.  Organization, Lines and X-Mailer are optional."
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\||X-Trace:\\|X-Complaints-To:\\|Return-Path:\\|^Supersedes:"
+(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|X-Trace:\\|X-Complaints-To:\\|Return-Path:\\|^Supersedes:"
   "*Header lines matching this regexp will be deleted before posting.
 It's best to delete old Path and Date headers before posting to avoid
 any confusion."
@@ -2471,31 +2471,32 @@ to find out how to use this."
   ;; Remove empty lines in the header.
   (save-restriction
     (message-narrow-to-headers)
+    ;; Remove blank lines.
     (while (re-search-forward "^[ \t]*\n" nil t)
-      (replace-match "" t t)))
+      (replace-match "" t t))
 
-  ;; Correct Newsgroups and Followup-To headers: change sequence of
-  ;; spaces to comma and eliminate spaces around commas.  Eliminate
-  ;; embedded line breaks.
-  (goto-char (point-min))
-  (while (re-search-forward "^\\(Newsgroups\\|Followup-To\\): +" nil t)
-    (save-restriction
-      (narrow-to-region
-       (point)
-       (if (re-search-forward "^[^ \t]" nil t)
-	   (match-beginning 0)
-	 (forward-line 1)
-	 (point)))
-      (goto-char (point-min))
-      (while (re-search-forward "\n[ \t]+" nil t)
-	(replace-match " " t t))	;No line breaks (too confusing)
-      (goto-char (point-min))
-      (while (re-search-forward "[ \t\n]*,[ \t\n]*\\|[ \t]+" nil t)
-	(replace-match "," t t))
-      (goto-char (point-min))
-      ;; Remove trailing commas.
-      (when (re-search-forward ",+$" nil t)
-	(replace-match "" t t)))))
+    ;; Correct Newsgroups and Followup-To headers:  Change sequence of
+    ;; spaces to comma and eliminate spaces around commas.  Eliminate
+    ;; embedded line breaks.
+    (goto-char (point-min))
+    (while (re-search-forward "^\\(Newsgroups\\|Followup-To\\): +" nil t)
+      (save-restriction
+	(narrow-to-region
+	 (point)
+	 (if (re-search-forward "^[^ \t]" nil t)
+	     (match-beginning 0)
+	   (forward-line 1)
+	   (point)))
+	(goto-char (point-min))
+	(while (re-search-forward "\n[ \t]+" nil t)
+	  (replace-match " " t t))	;No line breaks (too confusing)
+	(goto-char (point-min))
+	(while (re-search-forward "[ \t\n]*,[ \t\n]*\\|[ \t]+" nil t)
+	  (replace-match "," t t))
+	(goto-char (point-min))
+	;; Remove trailing commas.
+	(when (re-search-forward ",+$" nil t)
+	  (replace-match "" t t))))))
 
 (defun message-make-date ()
   "Make a valid data header."
