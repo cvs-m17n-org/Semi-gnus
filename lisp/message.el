@@ -478,7 +478,7 @@ query the user whether to use the value.  If it is t or the symbol
   "*Specifies what to do with Mail-Reply-To/Reply-To header.
 If nil, always ignore the header.  If it is t or the symbol `use', use
 its value.  If it is the symbol `ask', always query the user whether to
-use the value.  Not that if \"Reply-To\" is marked as \"broken\", its value
+use the value.  Note that if \"Reply-To\" is marked as \"broken\", its value
 is never used."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
@@ -2933,10 +2933,9 @@ to find out how to use this."
       (when mid
 	(concat mid
 		(when from
-		  (let ((stop-pos 
-			 (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
+		  (let ((pair (std11-extract-address-components from)))
 		    (concat "\n ("
-			    (if stop-pos (substring from 0 stop-pos) from)
+			    (or (car pair) (cadr pair))
 			    "'s message of " 
 			    (if (or (not date) (string= date ""))
 				"(unknown date)" date)
