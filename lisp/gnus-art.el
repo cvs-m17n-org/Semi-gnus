@@ -594,9 +594,9 @@ displayed by the first non-nil matching CONTENT face."
     ("\221" "`")
     ("\222" "'")
     ("\223" "``")
-    ("\224" "''")
+    ("\224" "\"")
     ("\225" "*")
-    ("\226" "-")
+    ("\226" "---")
     ("\227" "-")
     ("\231" "(TM)")
     ("\233" ">")
@@ -3114,7 +3114,7 @@ Type any key: "
     (mm-pipe-part data)))
 
 (defun gnus-mime-view-part ()
-  "Interactively choose a view method for the MIME part under point."
+  "Interactively choose a viewing method for the MIME part under point."
   (interactive)
   (gnus-article-check-buffer)
   (let ((data (get-text-property (point) 'gnus-data)))
@@ -3164,7 +3164,7 @@ Type any key: "
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (mm-user-display-methods nil)
-	 (mm-all-images-fit t)
+	 (mm-inline-large-images nil)
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets 
 	  (save-excursion (set-buffer gnus-summary-buffer)
@@ -3179,7 +3179,7 @@ Type any key: "
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (mm-user-display-methods '((".*" . inline)))
-	 (mm-all-images-fit t)
+	 (mm-inline-large-images t)
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets 
 	  (save-excursion (set-buffer gnus-summary-buffer)
@@ -3445,9 +3445,9 @@ Type any key: "
 		       (or (not (mm-handle-disposition handle))
 			   (equal (car (mm-handle-disposition handle))
 				  "inline")
-			   (mm-attachment-override-p type)))
-		 (mm-automatic-display-p type)
-		 (or (mm-inlined-p type)
+			   (mm-attachment-override-p handle)))
+		 (mm-automatic-display-p handle)
+		 (or (mm-inlined-p handle)
 		     (mm-automatic-external-display-p type)))
 	    (setq display t)
 	  (when (equal (car (split-string type "/"))
