@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.016"
+(defconst gnus-version-number "6.10.017"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.24"
+(defconst gnus-original-version-number "0.25"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -280,8 +280,6 @@ be set in `.emacs' instead."
   :group 'gnus-start
   :type 'boolean)
 
-;;; Kludges to help the transition from the old `custom.el'.
-
 (unless (featurep 'gnus-xmas)
   (defalias 'gnus-make-overlay 'make-overlay)
   (defalias 'gnus-delete-overlay 'delete-overlay)
@@ -301,7 +299,8 @@ be set in `.emacs' instead."
   (defalias 'gnus-characterp 'numberp)
   (defalias 'gnus-deactivate-mark 'deactivate-mark)
   (defalias 'gnus-window-edges 'window-edges)
-  (defalias 'gnus-key-press-event-p 'numberp))
+  (defalias 'gnus-key-press-event-p 'numberp)
+  (defalias 'gnus-annotation-in-region-p 'ignore))
 
 ;; We define these group faces here to avoid the display
 ;; update forced when creating new faces.

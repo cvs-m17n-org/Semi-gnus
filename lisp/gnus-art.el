@@ -376,11 +376,6 @@ be used as possible file names."
 			 (cons :value ("" "") regexp (repeat string))
 			 (sexp :value nil))))
 
-(defcustom gnus-strict-mime t
-  "*If nil, MIME-decode even if there is no MIME-Version header."
-  :group 'gnus-article-mime
-  :type 'boolean)
-
 (defcustom gnus-article-display-method-for-mime
   'gnus-article-display-mime-message
   "Function to display a MIME message.
@@ -557,7 +552,9 @@ displayed by the first non-nil matching CONTENT face."
 			       (face :value default)))))
 
 (defcustom gnus-article-decode-hook nil
-  "*Hook run to decode charsets in articles.")
+  "*Hook run to decode charsets in articles."
+  :group 'gnus-article-headers
+  :type 'hook)
 
 ;;; Internal variables
 
@@ -904,7 +901,9 @@ characters to translate to."
        (point)
        (progn
 	 (while (and (not (bobp))
-		     (looking-at "^[ \t]*$"))
+		     (looking-at "^[ \t]*$")
+		     (not (gnus-annotation-in-region-p
+			   (point) (gnus-point-at-eol))))
 	   (forward-line -1))
 	 (forward-line 1)
 	 (point))))))
@@ -1071,7 +1070,9 @@ always hide."
       (goto-char (point-min))
       (search-forward "\n\n" nil t)
       (while (re-search-forward "\n\n\n+" nil t)
-	(replace-match "\n\n" t t)))))
+	(unless (gnus-annotation-in-region-p
+		 (match-beginning 0) (match-end 0))
+	  (replace-match "\n\n" t t))))))
 
 (defun article-strip-leading-space ()
   "Remove all white space from the beginning of the lines in the article."
@@ -2084,10 +2085,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		     (if gnus-show-mime
 			 (progn
 			   (mime-parse-buffer)
-			   (if (or (not gnus-strict-mime)
-				   (mime-fetch-field "MIME-Version"))
-			       gnus-article-display-method-for-mime
-			     gnus-article-display-method-for-encoded-word))
+			   gnus-article-display-method-for-mime)
 		       gnus-article-display-method-for-traditional)))
 		;; Hooks for getting information from the article.
 		;; This hook must be called before being narrowed.

@@ -39,7 +39,6 @@
 		     url-view-url w3-prepare-buffer
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
-		     mule-write-region-no-coding-system
 		     find-charset-region base64-decode-string
 		     find-coding-systems-region get-charset-property
 		     coding-system-get))
@@ -69,8 +68,7 @@
 		 pp-to-string color-name 
 		 gnus-mule-get-coding-system decode-coding-string
 		 mail-aliases-setup
-		 url-view-url w3-prepare-buffer
-		 mule-write-region-no-coding-system char-int)))
+		 url-view-url w3-prepare-buffer char-int)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

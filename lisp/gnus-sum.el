@@ -335,7 +335,7 @@ variable."
 (defcustom gnus-show-mime t
   "*If non-nil, do mime processing of articles.
 The articles will simply be fed to the function given by
-`gnus-show-mime-method'."
+`gnus-article-display-method-for-mime'."
   :group 'gnus-article-mime
   :type 'boolean)
 
