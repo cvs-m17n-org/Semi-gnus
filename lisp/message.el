@@ -3695,7 +3695,7 @@ Otherwise, generate and save a value for `canlock-password' first."
     (backward-char 1)
     (run-hooks 'message-send-news-hook)
     (gnus-open-server method)
-    (message "Sending news with %s..." (gnus-server-string method))
+    (message "Sending news via %s..." (gnus-server-string method))
     (gnus-request-post method)
     ))
 

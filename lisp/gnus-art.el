@@ -1305,15 +1305,8 @@ It is a string, such as \"PGP\". If nil, ask user."
   :type 'string
   :group 'mime-security)
 
-(defcustom gnus-article-wash-function
-  (cond ((locate-library "w3")
-	 'gnus-article-wash-html-with-w3)
-	((locate-library "w3m")
-	 'gnus-article-wash-html-with-w3m))
-  "Function used for converting HTML into text."
-  :type '(radio (function-item gnus-article-wash-html-with-w3)
-		(function-item gnus-article-wash-html-with-w3m))
-  :group 'gnus-article)
+(defvar gnus-article-wash-function nil
+  "Function used for converting HTML into text.")
 
 ;;; Internal variables
 
@@ -2314,7 +2307,15 @@ If READ-CHARSET, ask for a coding system."
       (save-window-excursion
 	(save-restriction
 	  (narrow-to-region (point) (point-max))
-	  (funcall gnus-article-wash-function))))))
+	  (let* ((func (or gnus-article-wash-function mm-text-html-renderer))
+		 (entry (assq func mm-text-html-washer-alist)))
+	    (if entry
+		(setq func (cdr entry)))
+	    (cond
+	     ((gnus-functionp func)
+	      (funcall func))
+	     (t
+	      (apply (car func) (cdr func))))))))))
 
 (defun gnus-article-wash-html-with-w3 ()
   "Wash the current buffer with w3."
@@ -5456,16 +5457,66 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 
 ;; Should we be using derived.el for this?
 (unless gnus-article-edit-mode-map
-  (setq gnus-article-edit-mode-map (make-sparse-keymap))
+  (setq gnus-article-edit-mode-map (make-keymap))
   (set-keymap-parent gnus-article-edit-mode-map text-mode-map)
 
   (gnus-define-keys gnus-article-edit-mode-map
+    "\C-c?"    describe-mode
     "\C-c\C-c" gnus-article-edit-done
-    "\C-c\C-k" gnus-article-edit-exit)
+    "\C-c\C-k" gnus-article-edit-exit
+    "\C-c\C-f\C-t" message-goto-to
+    "\C-c\C-f\C-o" message-goto-from
+    "\C-c\C-f\C-b" message-goto-bcc
+    ;;"\C-c\C-f\C-w" message-goto-fcc
+    "\C-c\C-f\C-c" message-goto-cc
+    "\C-c\C-f\C-s" message-goto-subject
+    "\C-c\C-f\C-r" message-goto-reply-to
+    "\C-c\C-f\C-n" message-goto-newsgroups
+    "\C-c\C-f\C-d" message-goto-distribution
+    "\C-c\C-f\C-f" message-goto-followup-to
+    "\C-c\C-f\C-m" message-goto-mail-followup-to
+    "\C-c\C-f\C-k" message-goto-keywords
+    "\C-c\C-f\C-u" message-goto-summary
+    "\C-c\C-f\C-i" message-insert-or-toggle-importance
+    "\C-c\C-f\C-a" message-gen-unsubscribed-mft
+    "\C-c\C-b" message-goto-body
+    "\C-c\C-i" message-goto-signature
+
+    "\C-c\C-t" message-insert-to
+    "\C-c\C-n" message-insert-newsgroups
+    "\C-c\C-o" message-sort-headers
+    "\C-c\C-e" message-elide-region
+    "\C-c\C-v" message-delete-not-region
+    "\C-c\C-z" message-kill-to-signature
+    "\M-\r" message-newline-and-reformat
+    "\C-c\C-a" mml-attach-file
+    "\C-a" message-beginning-of-line
+    "\t" message-tab
+    "\M-;" comment-region)
 
   (gnus-define-keys (gnus-article-edit-wash-map
 		     "\C-c\C-w" gnus-article-edit-mode-map)
     "f" gnus-article-edit-full-stops))
+
+(easy-menu-define
+  gnus-article-edit-mode-field-menu gnus-article-edit-mode-map ""
+  '("Field"
+    ["Fetch To" message-insert-to t]
+    ["Fetch Newsgroups" message-insert-newsgroups t]
+    "----"
+    ["To" message-goto-to t]
+    ["From" message-goto-from t]
+    ["Subject" message-goto-subject t]
+    ["Cc" message-goto-cc t]
+    ["Reply-To" message-goto-reply-to t]
+    ["Summary" message-goto-summary t]
+    ["Keywords" message-goto-keywords t]
+    ["Newsgroups" message-goto-newsgroups t]
+    ["Followup-To" message-goto-followup-to t]
+    ["Mail-Followup-To" message-goto-mail-followup-to t]
+    ["Distribution" message-goto-distribution t]
+    ["Body" message-goto-body t]
+    ["Signature" message-goto-signature t]))
 
 (define-derived-mode gnus-article-edit-mode text-mode "Article Edit"
   "Major mode for editing articles.
@@ -5476,6 +5527,9 @@ This is an extended text-mode.
   (make-local-variable 'gnus-prev-winconf)
   (set (make-local-variable 'font-lock-defaults)
        '(message-font-lock-keywords t))
+  (set (make-local-variable 'mail-header-separator) "")
+  (easy-menu-add message-mode-field-menu message-mode-map)
+  (mml-mode)
   (setq buffer-read-only nil)
   (buffer-enable-undo)
   (widen))
@@ -5517,39 +5571,30 @@ groups."
   (interactive "P")
   (let ((func gnus-article-edit-done-function)
 	(buf (current-buffer))
-	(start (window-start)))
+	(start (window-start))
+	(p (point))
+	(winconf gnus-prev-winconf))
     (remove-hook 'gnus-article-mode-hook
 		 'gnus-article-mime-edit-article-unwind)
-    ;; We remove all text props from the article buffer.
-    (let ((content
-	   (buffer-substring-no-properties (point-min) (point-max)))
-	  (p (point)))
-      (erase-buffer)
-      (insert content)
-      (let ((winconf gnus-prev-winconf))
-	(gnus-article-mode)
-	(set-window-configuration winconf)
-	;; Tippy-toe some to make sure that point remains where it was.
-	(save-current-buffer
-	  (set-buffer buf)
-	  (set-window-start (get-buffer-window (current-buffer)) start)
-	  (goto-char p))))
+    (funcall func arg)
+    (set-buffer buf)
+    ;; The cache and backlog have to be flushed somewhat.
+    (when gnus-keep-backlog
+      (gnus-backlog-remove-article
+       (car gnus-article-current) (cdr gnus-article-current)))
+    ;; Flush original article as well.
     (save-excursion
-      (set-buffer buf)
-      (let ((buffer-read-only nil))
-	(funcall func arg))
-      ;; The cache and backlog have to be flushed somewhat.
-      (when gnus-keep-backlog
-	(gnus-backlog-remove-article
-	 (car gnus-article-current) (cdr gnus-article-current)))
-      ;; Flush original article as well.
-      (save-excursion
-	(when (get-buffer gnus-original-article-buffer)
-	  (set-buffer gnus-original-article-buffer)
-	  (setq gnus-original-article nil)))
-      (when gnus-use-cache
-	(gnus-cache-update-article
-	 (car gnus-article-current) (cdr gnus-article-current))))
+      (when (get-buffer gnus-original-article-buffer)
+	(set-buffer gnus-original-article-buffer)
+	(setq gnus-original-article nil)))
+    (when gnus-use-cache
+      (gnus-cache-update-article
+       (car gnus-article-current) (cdr gnus-article-current)))
+    ;; We remove all text props from the article buffer.
+    (kill-all-local-variables)
+    (gnus-set-text-properties (point-min) (point-max) nil)
+    (gnus-article-mode)
+    (set-window-configuration winconf)
     (set-buffer buf)
     (set-window-start (get-buffer-window buf) start)
     (set-window-point (get-buffer-window buf) (point))))

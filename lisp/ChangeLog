@@ -1,3 +1,67 @@
+2002-02-17  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	Some ideas is inspired by code from Hrvoje Niksic
+	<hniksic@arsdigita.com>
+	
+	* gnus-art.el (gnus-article-wash-function): Set the default to
+	nil, so that we use mm-text-html-renderer instead.
+	(article-wash-html): Use mm-text-html-renderer.
+
+	* mm-decode.el (mm-inline-media-tests): Use mm-inline-text-*.
+	(mm-text-html-renderer): New variable.
+	(mm-inline-text-html-renderer): Set the default to nil, so that we
+	use mm-text-html-renderer instead.
+	
+	* mm-view.el (mm-inline-text-html): New function.
+	(mm-text-html-renderer-alist): New variable.
+	(mm-inline-text-vcard): New function.
+	(mm-inline-text): Split.
+	(mm-links-remove-leading-blank): New function.
+	(mm-inline-render-with-file): New function.
+	(mm-inline-render-with-stdin): New function.
+	(mm-inline-render-with-function): New function.
+	(mm-text-html-washer-alist): New variable.
+	(mm-inline-wash-with-file): New function.
+	(mm-inline-wash-with-stdin): New function.
+
+2002-02-17  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	
+	* message-utils.el: Fix installation doc.
+	From: Reiner Steib <4uce.02.r.steib@gmx.net>
+
+2002-02-16  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-discouraged-post-methods): New variable.
+	(gnus-post-method): Use it.
+	(gnus-summary-cancel-article): Find the correct post-method.
+
+	* gnus-soup.el (gnus-soup-send-packet): Via ... using ...
+	* message.el (message-send-news): Ditto.
+	Suggested by Lloyd Zusman <ljz@asfast.com> and IPmonger
+	<ipmonger@delamancha.org>
+
+	* gnus.el (gnus-select-method): Fix doc.
+	(gnus-server-string): Use 'using nntp'.
+
+	* gnus-agent.el (gnus-slave-unplugged): New command.
+	From: Felix Natter <fnatter@gmx.net>
+
+2002-02-15  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-edit-done): Kill-all-local-variables.
+	Call edit-done-function first, then change the window
+	configuration.
+	(gnus-article-edit-mode-map): Add message key bindings. Add menu.
+	(gnus-article-edit-mode): mml-mode.
+
+	* gnus-util.el (gnus-byte-compile): Work around a bug in XEmacs
+	21.4. Suggested by Russ Allbery <rra@stanford.edu> .
+
+	* message-utils.el: Adopt the file.
+
+	* message-utils.el: New file.
+	From Holger Schauer <Holger.Schauer@gmx.de>
+
 2002-02-14  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-sum.el (gnus-summary-move-article): Select-article only

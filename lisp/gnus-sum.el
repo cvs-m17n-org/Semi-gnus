@@ -310,13 +310,13 @@ higest-scored article), `unseen' (place point on the subject line of
 the first unseen article), 'unseen-or-unread' (place point on the subject
 line of the first unseen article or, if all article have been seen, on the
 subject line of the first unread article), or a function to be called to
-place point on some subject line.."
+place point on some subject line."
   :group 'gnus-group-select
   :type '(choice (const best)
 		 (const unread)
 		 (const first)
 		 (const unseen)
-	         (const unseen-or-unread)))
+		 (const unseen-or-unread)))
 
 (defcustom gnus-dont-select-after-jump-to-other-group nil
   "If non-nil, don't select the first unread article after entering the
