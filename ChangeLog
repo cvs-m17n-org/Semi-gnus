@@ -1,3 +1,9 @@
+2003-07-01  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: @verb, @tie, @/ support.
+	(ptexinfmt-broken-facility): Abolish NO-NOTICE argument.
+	Use `ptexinfmt-disable-broken-notice-flag' instead.
+
 2003-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el (infohack-texi-format): Include other files
