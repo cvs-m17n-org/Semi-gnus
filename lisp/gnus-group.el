@@ -153,6 +153,7 @@ with some simple extensions.
 %y    Number of unread, unticked articles (integer)
 %G    Group name (string)
 %g    Qualified group name (string)
+%c    Short (collapsed) group name.  See `gnus-group-uncollapsed-levels'.
 %D    Group description (string)
 %s    Select method (string)
 %o    Moderated group (char, \"m\")
@@ -200,12 +201,6 @@ with some simple extensions:
 %:   \":\" if %S isn't \"\"."
   :group 'gnus-group-visual
   :type 'string)
-
-(defcustom gnus-group-mode-hook nil
-  "Hook for Gnus group mode."
-  :group 'gnus-group-various
-  :options '(gnus-topic-mode)
-  :type 'hook)
 
 ;; Extracted from gnus-xmas-redefine in order to preserve user settings
 (when (featurep 'xemacs)

@@ -1,3 +1,34 @@
+2001-09-15  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-group.el (gnus-group-line-format): Document %c.
+
+	* nnml.el (nnml-parse-head): Handle CRLF files.
+	(nnml-generate-nov-file): Ditto.
+	(nnml-retrieve-headers): Ditto.
+
+2001-09-15  Michael Welsh Duggan <md5i@cs.cmu.edu>
+
+	* gnus-spec.el (gnus-parse-format): Don't treat %c as %C.
+
+2001-09-13  Martin Kretzschmar  <Martin.Kretzschmar@inf.tu-dresden.de>
+
+	* gnus-spec.el (gnus-correct-substring): Still stopped one
+	character before we wanted (never included last character).
+	(gnus-tilde-max-form, gnus-tilde-cut-form) Made readable again,
+	add missing "," (once per function)
+	
+2001-09-14  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-start.el (gnus-group-mode-hook): Moved from gnus-group
+	(otherwise e.g. gnus-agentize in .gnus overrides the customized
+	default before gnus-group is loaded and the variable set.)
+
+	* nnimap.el (nnimap-request-set-mark): Do not store bookmark,
+	killed or unsent marks.
+
+	* gnus-draft.el (gnus-draft-setup): Don't set mark when there
+	isn't an article to set it on (e.g. when you `a' in a group).
+
 2001-09-12  Pavel Jan,Bm(Bk  <Pavel@Janik.cz>
 
 	* mm-util.el (mm-charset-synonym-alist): add windows-1250 so we

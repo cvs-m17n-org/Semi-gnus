@@ -1,3 +1,8 @@
+2001-09-17  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/insert-address-regexp):
+	`regexp-quote' for each addresses.
+
 2001-09-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* gnus-ja.texi (Drafts): Fix typo.

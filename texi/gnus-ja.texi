@@ -12688,6 +12688,11 @@ rmail box のためのアクティブファイルの名前。既定値
 @vindex nnfolder-nov-file-suffix
 @sc{nov} ファイルの拡張子です。ディフォルトは @file{.nov} です。
 
+@item nnfolder-nov-directory
+@vindex nnfolder-nov-directory
+@sc{nov} ファイルが格納されるディレクトリです。nil だった
+ら @code{nnfolder-directory} が使われます。
+
 @item nnfolder-marks-is-evil
 @vindex nnfolder-marks-is-evil
 非@code{nil} であると、このバックエンドはいかなる @sc{印} ファイルをも
@@ -12696,6 +12701,11 @@ rmail box のためのアクティブファイルの名前。既定値
 @item nnfolder-marks-file-suffix
 @vindex nnfolder-marks-file-suffix
 @sc{印} ファイルの拡張子です。ディフォルトは @file{.mrk} です。
+
+@item nnfolder-marks-directory
+@vindex nnfolder-marks-directory
+@sc{印} ファイルが格納されるディレクトリです。nil だった
+ら @code{nnfolder-directory} が使われます。
 @end table
 
 @findex nnfolder-generate-active-file

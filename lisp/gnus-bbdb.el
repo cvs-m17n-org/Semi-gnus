@@ -196,10 +196,10 @@ BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
 	 (unless (eq (point) (point-min))
 	   (insert "\\|"))
 	 (let ((addr (nth 1 address)))
-	   (insert (std11-addr-to-string
-		    (if (eq (car addr) 'phrase-route-addr)
-			(nth 2 addr)
-		      (cdr addr))))))))
+	   (insert (regexp-quote (std11-addr-to-string
+				  (if (eq (car addr) 'phrase-route-addr)
+				      (nth 2 addr)
+				    (cdr addr)))))))))
 
 (defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
   (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
