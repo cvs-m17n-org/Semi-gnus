@@ -27,6 +27,25 @@
 
 ;;; Code:
 
+;; Set coding priority of Shift-JIS to the bottom.
+(defvar *predefined-category*)
+(defvar coding-category-list)
+(if (featurep 'xemacs)
+    (fset 'set-coding-priority 'ignore)
+  (fset 'coding-priority-list 'ignore)
+  (fset 'set-coding-priority-list 'ignore))
+(cond ((and (featurep 'xemacs) (featurep 'mule))
+       (if (memq 'shift-jis (coding-priority-list))
+	   (set-coding-priority-list
+	    (nconc (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
+      ((boundp 'MULE)
+       (put '*coding-category-sjis* 'priority (length *predefined-category*)))
+      ((featurep 'mule)
+       (if (memq 'coding-category-sjis coding-category-list)
+	   (set-coding-priority
+	    (nconc (delq 'coding-category-sjis coding-category-list)
+		   '(coding-category-sjis))))))
+
 (fset 'facep 'ignore)
 
 (require 'cl)
@@ -183,8 +202,18 @@ Modify to suit your needs."))
 
     (message "Updating autoloads for directory %s..." default-directory)
     (let ((generated-autoload-file "auto-autoloads.el")
-	  noninteractive)
-      (update-autoloads-from-directory default-directory))
+	  noninteractive
+	  (omsg (symbol-function 'message)))
+      (defun message (fmt &rest args)
+	(cond ((and (string-equal "Generating autoloads for %s..." fmt)
+		    (file-exists-p (file-name-nondirectory (car args))))
+	       (funcall omsg fmt (file-name-nondirectory (car args))))
+	      ((string-equal "No autoloads found in %s" fmt))
+	      ((string-equal "Generating autoloads for %s...done" fmt))
+	      (t (apply omsg fmt args))))
+      (unwind-protect
+	  (update-autoloads-from-directory default-directory)
+	(fset 'message omsg)))
     (byte-compile-file "auto-autoloads.el")
 
     (with-temp-buffer
