@@ -1,3 +1,38 @@
+1999-03-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.8 released.
+
+	* lisp/nnml.el (nnml-request-list): Use
+	`nnmail-find-active-file'.
+
+	* lisp/nnmail.el (nnmail-file-coding-system): Abolished.
+	(nnmail-file-coding-system-for-write): New variable.
+	(nnmail-file-coding-system-for-read): Ditto.
+	(nnmail-active-file-coding-system): Abolished.
+	(nnmail-active-coding-system-for-read): New variable.
+	(nnmail-active-coding-system-for-write): Ditto.
+	(nnmail-find-active-file): New function.
+
+	* lisp/nnheader.el (nnheader-message-coding-system-for-read): New
+	variable.
+	(nnheader-message-coding-system-for-write): Ditto.
+
+	* lisp/nnfolder.el, lisp/nnmail.el, lisp/nnmh.el, lisp/nnml.el:
+	Use `nnheader-pathname-coding-system'.
+
+	* lisp/nnfolder.el (nnfolder-request-list): Use
+	`nnmail-find-active-file'.
+
+	* lisp/message.el: Use `nnheader-message-coding-system-for-write'.
+
+1999-03-03  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.8.
+
+	* lisp/message.el (message-after-save-hook): New function.
+	(message-mime-setup): Set buffer file coding system. Make local
+	hook `after-save-hook'.
+
 1999-03-01  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.7 released.
