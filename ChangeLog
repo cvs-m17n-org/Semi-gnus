@@ -1,6 +1,56 @@
-1999-02-08  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+1999-02-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.3 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.3.
+
+	* lisp/message.el (message-mime-charset-detect-method): Abolished.
+	(message-mime-charset-specify-method): Ditto.
+	(message-mime-charset-detect-args): Ditto.
+	(message-maybe-encode-with-specified-charset): Ditto.
+	(message-mime-charset-detect-by-ask): Ditto.
+	(message-mime-charset-specify-none): Ditto.
+	(message-mime-charset-recover-function): New variable.
+	(message-mime-charset-recover-args): Ditto.
+	(message-charsets-mime-charset-alist): Ditto.
+	(message-locale-default): Ditto.
+	(message-locale-detect-for-mail): Ditto.
+	(message-locale-detect-for-news): Ditto.
+	(message-locale-newsgroup-alist): Ditto.
+	(message-locale-mail-address-alist): Ditto.
+	(message-mime-charset-recover-ask-function): Ditto.
+	(message-locale-mime-charsets-alist): Ditto.
+	(message-maybe-encode): New implementation.
+	(message-locale-detect): New function.
+	(message-locale-detect-with-newsgroup-alist): Ditto.
+	(message-locale-detect-with-mail-address-alist): Ditto.
+	(message-mime-charset-recover-by-ask): Ditto.
+	(message-mime-charset-recover-ask-y-or-n): Ditto.
+	(message-mime-charset-recover-ask-charset): Ditto.
+	(message-mime-charset-setup): Ditto.
+
+1999-02-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.2 released.
+
+1999-02-12  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-maybe-encode-with-specified-charset):
+	Renamed to `message-maybe-encode'.
+	(message-mime-charset-detect-by-ask): Pop up encoding region when
+	ask charset to user.
+	(message-mime-charset-detect-method): Change default value to nil.
+	(message-mime-charset-specify-method): Ditto.
+	(message-mime-charset-detect-ask-metod): New variable.
+	(message-mime-charset-detect-by-ask): Use
+	`message-mime-charset-ask-metod'.
+	(message-mime-charset-detect-ask-y-or-n): New function.
+	(message-mime-charset-detect-ask-charset): New function.
+	(message-mime-charset-alias-alist): New variable.
+	(message-mime-charset-newsgroup-alist): Ditto.
+	(message-mime-charset-mail-address-alist): Ditto.
+
+1999-02-08  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.2.
 
