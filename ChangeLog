@@ -1,3 +1,39 @@
+1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* GNUS-NEWS: Sync up with Pterodactyl Gnus v0.99.
+
+	* lisp/{rfc2047.el,rfc1843.el,nnweb.el,nnvirtual.el,nntp.el,
+	nnmh.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,nndraft.el,
+	nndoc.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,mm-encode.el,
+	mm-decode.el,mm-bodies.el,message.el,mail-source.el,lpath.el,
+	gnus-xmas.el,gnus-uu.el,gnus-util.el,gnus-topic.el,gnus-sum.el,
+	gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,gnus-salt.el,
+	gnus-picon.el,gnus-msg.el,gnus-mailcap.el,gnus-int.el,
+	gnus-group.el,gnus-ems.el,gnus-cus.el,gnus-cache.el,gnus-async.el,
+	gnus-art.el,gnus-agent.el,dgnushack.el,base64.el,Makefile.in,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.99.
+
+	* lisp/{webmail.el,nnwarchive.el,nnultimate.el,nnslashdot.el}: New
+	files.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
+	emacs-mime.texi,Makefile.in,ChangeLog}: Sync up with Pterodactyl
+	Gnus v0.99.
+
+1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-select-method): Undo (`if' -> `when').
+	* lisp/gnus-picon.el (gnus-picons-file-suffixes): Ditto.
+	* lisp/gnus-start.el (save-buffers-kill-emacs): Ditto.
+	(gnus-after-getting-new-news-hook): Ditto.
+
+	* lisp/gnus-group.el (gnus-useful-groups): Undo (`or' -> `unless').
+
 1999-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
