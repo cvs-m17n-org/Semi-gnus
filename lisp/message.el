@@ -2802,6 +2802,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (insert header)
 	      (message-remove-header "Mime-Version")
 	      (message-remove-header "Content-Type")
+	      (message-remove-header "Content-Transfer-Encoding")
 	      (message-remove-header "Message-ID")
 	      (message-remove-header "Lines")
 	      (goto-char (point-max))
