@@ -101,7 +101,7 @@ gnus-load.elc:
 
 clean:
 	rm -f *.orig *.rej *.elc *~ \
-		auto-autoloads.el custom-load.el gnus-load.el
+		auto-autoloads.el custom-load.el gnus-load.el dgnuskwds.el
 
 distclean: clean
 	rm -f Makefile dgnuspath.el

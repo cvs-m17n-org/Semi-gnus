@@ -893,15 +893,15 @@ For example:
 
 (defvar gnus-group-parameters-more nil)
 
-(condition-case nil
-    :symbol-for-testing-whether-colon-keyword-is-available-or-not
-  (void-variable
-   ;; Bind keywords.
-   (dolist (keyword '(:parameter-type
-		      :parameter-document :function :function-document
-		      :variable :variable-document :variable-group
-		      :variable-type :variable-default))
-     (set keyword keyword))))
+(defvar gnus-colon-keywords
+  (eval-when-compile
+    (when (boundp 'dgnushack-colon-keywords)
+      (symbol-value 'dgnushack-colon-keywords)))
+  "List of the colon keywords should be bound at run-time.  This variable
+defaults to a proper value only if this file is byte-compiled by make.")
+
+(dolist (keyword gnus-colon-keywords)
+  (set keyword keyword))
 
 (defmacro gnus-define-group-parameter (param &rest rest)
   "Define a group parameter PARAM.
