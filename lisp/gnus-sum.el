@@ -8953,14 +8953,14 @@ save those articles instead."
   (gnus-summary-preview-mime-message (gnus-summary-article-number))
   )
 
-(autoload 'mime-method-to-combine-message/partial-pieces
+(autoload 'mime-combine-message/partial-pieces-automatically
   "mime-partial"
   "Internal method to combine message/partial messages automatically.")
 
 (mime-add-condition
  'action '((type . message)(subtype . partial)
-	   (method . mime-method-to-combine-message/partial-pieces)
 	   (major-mode . gnus-original-article-mode)
+	   (method . mime-combine-message/partial-pieces-automatically)
 	   (summary-buffer-exp . gnus-summary-buffer)
 	   ))
 
