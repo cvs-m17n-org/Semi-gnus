@@ -1,3 +1,15 @@
+2000-02-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 7.1.0.6 (This is alpha status.)
+	See announcement of 7.1.0.3.
+
+	Maybe use `gnus-agent'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.6.
+
+	* lisp/nnmh.el (nnmh-request-accept-article): Do not add dummy
+	Message-Id to message which accept to `queue' to `draft' group.
+
 2000-02-08  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.5 (This is alpha status.)
