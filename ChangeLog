@@ -1,3 +1,7 @@
+2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Don't Fbind `xml-node-children'.
+
 2001-06-11  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Fix
