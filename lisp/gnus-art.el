@@ -4627,6 +4627,34 @@ For example:
    (t
     (error "%S is not a valid value" val))))
 
+;;; @ for mime-view
+;;;
+
+(defun gnus-article-header-presentation-method (entity situation)
+  (mime-insert-header entity))
+
+(set-alist 'mime-header-presentation-method-alist
+	   'gnus-article-mode
+	   #'gnus-article-header-presentation-method)
+
+(defun gnus-mime-preview-quitting-method ()
+  (gnus-article-show-summary))
+
+(set-alist 'mime-preview-quitting-method-alist
+	   'gnus-article-mode #'gnus-mime-preview-quitting-method)
+
+(defun gnus-following-method (buf)
+  (set-buffer buf)
+  (if (gnus-group-find-parameter gnus-newsgroup-name 'newsgroup)
+      (message-followup)
+    (message-wide-reply))
+  (message-yank-original)
+  (kill-buffer buf)
+  (goto-char (point-min)))
+
+(set-alist 'mime-preview-following-method-alist
+	   'gnus-article-mode #'gnus-following-method)
+
 (gnus-ems-redefine)
 
 (provide 'gnus-art)
