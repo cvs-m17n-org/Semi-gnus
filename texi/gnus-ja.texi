@@ -706,6 +706,7 @@ Composing Messages
 
 * Mail::                        $B%a!<%k$HJVEz(B
 * Posting Server::              $B$I$N%5!<%P!<$rDL$7$F%K%e!<%9$rEj9F$^$?$O%a!<%k$rAw?.$9$k$Y$-$+(B?
+* POP before SMTP::             $B%a!<%k$rFI$^$J$$$H%a!<%k$rAw?.$G$-$J$$(B
 * Mail and Post::               $BF1;~$K%a!<%k$r=P$7JVEz$9$k(B
 * Archived Messages::           $BAw$C$?%a%C%;!<%8$r(B gnus $B$,Cy$a$F$*$/$H$3$m(B
 * Posting Styles::              $B$"$J$?$,C/$G$"$k$+$r;XDj$9$k$h$j4JC1$JJ}K!(B
@@ -10642,6 +10643,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @menu
 * Mail::                        $B%a!<%k$HJVEz(B
 * Posting Server::              $B$I$N%5!<%P!<$rDL$7$F%K%e!<%9$rEj9F$^$?$O%a!<%k$rAw?.$9$k$Y$-$+(B?
+* POP before SMTP::             $B%a!<%k$rFI$^$J$$$H%a!<%k$rAw?.$G$-$J$$(B
 * Mail and Post::               $BF1;~$K%a!<%k$r=P$7JVEz$9$k(B
 * Archived Messages::           $BAw$C$?%a%C%;!<%8$r(B gnus $B$,Cy$a$F$*$/$H$3$m(B
 * Posting Styles::              $B$"$J$?$,C/$G$"$k$+$r;XDj$9$k$h$j4JC1$JJ}K!(B
@@ -10748,12 +10750,38 @@ gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 
 $B$3$l$H;w$?$b$N$K(B @code{message-smtpmail-send-it} $B$,$"$j$^$9!#(B
 ISP $B$,(B @acronym{POP}-before-@acronym{SMTP} $B$NG'>Z$rMW5a$7$F$$$k>l9g$KM-(B
-$BMQ$G$9!#4X?t(B @code{mail-source-touch-pop} $B$N@bL@J8$r8+$F$/$@$5$$!#(B
+$BMQ$G$9!#(B@xref{POP before SMTP}.
 
 $BB>$N2DG=$J(B @code{message-send-mail-function} $B$NA*Br;h(B
 $B$O(B @code{message-send-mail-with-mh},
 @code{message-send-mail-with-qmail} $B$*$h$S(B @code{feedmail-send-it} $B$r4^(B
 $B$_$^$9!#(B
+
+@node POP before SMTP
+@section POP before SMTP
+@cindex pop before smtp
+@findex message-smtpmail-send-it
+@findex mail-source-touch-pop
+
+$B$"$J$?$N(B @acronym{ISP} $B$O(B @acronym{POP}-before-@acronym{SMTP} $BG'>Z$rMW5a(B
+$B$7$^$9$+(B? $B$=$l$O!"%a!<%k$rAw?.$9$kA0$N0lDj;~4V0JFb$K(B @acronym{POP} $B%a!<(B
+$B%k%5!<%P!<$K@\B3$7$J$1$l$P$J$i$J$$$+$I$&$+$G$9!#$b$7$=$&$J$i$P!"JXMx$J<j(B
+$B$,$"$j$^$9!#$=$l$K$O(B @file{~/.gnus.el} $B%U%!%$%k$K0J2<$N9T$rF~$l$F2<$5$$(B:
+
+@lisp
+(setq message-send-mail-function 'message-smtpmail-send-it)
+(add-hook 'message-send-mail-hook 'mail-source-touch-pop)
+@end lisp
+
+@noindent
+$B$3$l$O!"%a!<%k$rAw?.$9$k$H$-$O$$$D$G$b(B gnus $B$KA0$b$C$F(B @acronym{POP} $B%a!<(B
+$B%k%5!<%P!<$K@\B3$5$;$k$3$H$r0UL#$7$^$9!#4X(B
+$B?t(B @code{mail-source-touch-pop} $B$O!"%a!<%k$rAw?.$9$kD>A0$K!"%a!<%k$r<hF@(B
+$B$;$:$K(B @code{mail-sources} $B$NCM$K=>$C$F(B @acronym{POP} $BG'>Z$@$1$r9T$J$$$^(B
+$B$9!#(B@code{smtpmail-send-it} $B$G$O$J$/$F!"(B@code{message-send-mail-hook} $B$r(B
+$B<B9T$9$k(B @code{message-smtpmail-send-it} $B$r;H$o$J$1$l$P$J$i$J$$$3$H$H!"(B
+@acronym{POP} $B@\B3$N$?$a$K(B @code{mail-sources} $B$NCM$r@5$7$/@_Dj$7$J$1$l(B
+$B$P$J$i$J$$(B (@pxref{Mail Sources}) $B$3$H$KCm0U$7$F2<$5$$!#(B
 
 @node Mail and Post
 @section $B%a!<%k$HEj9F(B
