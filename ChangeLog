@@ -1,6 +1,10 @@
 2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-art.el (mime-button-mother-dispatcher): Bind.
+	* lisp/gnus-ml.el: Bind some undeclared variables.
+
+	* lisp/gnus-art.el (gnus-article-add-button): Add widget button.
+	(gnus-article-display-mime-message): Don't set
+	`mime-button-mother-dispatcher'.
 
 	* lisp/message.el: Require `reporter' for the function
 	`define-mail-user-agent' when Mule 2.3 is running.

@@ -2891,8 +2891,6 @@ commands:
 ;;; @@ article filters
 ;;;
 
-(defvar mime-button-mother-dispatcher)
-
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.
@@ -2908,12 +2906,7 @@ commands:
     (mime-display-message mime-message-structure
 			  gnus-article-buffer nil gnus-article-mode-map)
     (when all-headers
-      (gnus-article-hide-headers nil -1))
-    )
-  ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
-  (make-local-variable 'mime-button-mother-dispatcher)
-  (setq mime-button-mother-dispatcher
-	(function gnus-article-push-button))
+      (gnus-article-hide-headers nil -1)))
   (run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-display-traditional-message ()
@@ -4864,7 +4857,9 @@ specified by `gnus-button-alist'."
    (nconc (and gnus-article-mouse-face
 	       (list gnus-mouse-face-prop gnus-article-mouse-face))
 	  (list 'gnus-callback fun)
-	  (and data (list 'gnus-data data)))))
+	  (and data (list 'gnus-data data))))
+  (widget-convert-button 'link from to :action 'gnus-widget-press-button
+			 :button-keymap gnus-widget-button-keymap))
 
 ;;; Internal functions:
 

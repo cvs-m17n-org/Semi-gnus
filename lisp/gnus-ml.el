@@ -28,6 +28,14 @@
 (require 'gnus)
 (eval-when-compile (require 'cl))
 
+(defvar group)
+(defvar list-help)
+(defvar list-subscribe)
+(defvar list-unsubscribe)
+(defvar list-post)
+(defvar list-owner)
+(defvar list-archive)
+
 ;;; Mailing list minor mode
 
 (defvar gnus-mailing-list-mode nil
