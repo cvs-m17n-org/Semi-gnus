@@ -1,3 +1,14 @@
+2001-06-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-use-entire-index): Removed.
+	(nnshimbun-index-range): New variable.
+	(nnshimbun-close-server): Check status strictly to close server
+	safely.
+	(nnshimbun-generate-nov-database): Refer the group paramter
+	`nnshimbun-index-range' as the second parameter of
+	`shimbun-headers'.
+	(shimbun-mua-use-entire-index): Removed.
+
 2001-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-expire-nov-databases): Removed.

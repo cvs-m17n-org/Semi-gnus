@@ -73,8 +73,8 @@
 (defvoo nnshimbun-pre-fetch-article nil
   "*Non nil means that nnshimbun fetch unread articles when scanning groups.")
 
-(defvoo nnshimbun-use-entire-index t
-  "*Nil means that nnshimbun check the last index of articles.")
+(defvoo nnshimbun-index-range nil
+  "*Range of indecis to detect new pages.")
 
 ;; set by nnshimbun-possibly-change-group
 (defvoo nnshimbun-buffer nil)
@@ -155,10 +155,11 @@
       t)))))
 
 (deffoo nnshimbun-close-server (&optional server)
-  (shimbun-close nnshimbun-shimbun)
-  (and (nnshimbun-server-opened server)
-       (gnus-buffer-live-p nnshimbun-buffer)
-       (kill-buffer nnshimbun-buffer))
+  (when (nnshimbun-server-opened server)
+    (when nnshimbun-shimbun
+      (shimbun-close nnshimbun-shimbun))
+    (when (gnus-buffer-live-p nnshimbun-buffer)
+      (kill-buffer nnshimbun-buffer)))
   (nnshimbun-backlog (gnus-backlog-shutdown))
   (nnshimbun-save-nov)
   (nnoo-close-server 'nnshimbun server)
@@ -408,7 +409,14 @@ also be nil."
     (goto-char (point-max))
     (forward-line -1)
     (let ((i (or (ignore-errors (read (current-buffer))) 0)))
-      (dolist (header (shimbun-headers nnshimbun-shimbun))
+      (dolist (header (shimbun-headers
+		       nnshimbun-shimbun
+		       (or (gnus-group-find-parameter
+			    (concat "nnshimbun+"
+				    (nnoo-current-server 'nnshimbun)
+				    ":" group)
+			    'nnshimbun-index-range)
+			   nnshimbun-index-range)))
 	(unless (nnshimbun-search-id group (shimbun-header-id header))
 	  (goto-char (point-max))
 	  (nnshimbun-insert-nov (setq i (1+ i)) header)
@@ -604,9 +612,6 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
   (nnshimbun-search-id
    (shimbun-current-group-internal (shimbun-mua-shimbun-internal mua))
    id))
-
-(luna-define-method shimbun-mua-use-entire-index ((mua shimbun-gnus-mua))
-  nnshimbun-use-entire-index)
 
 
 (provide 'nnshimbun)
