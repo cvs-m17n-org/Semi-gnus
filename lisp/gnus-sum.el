@@ -1280,7 +1280,7 @@ increase the score of each group you read."
     "a" gnus-summary-post-news
     "x" gnus-summary-limit-to-unread
     "s" gnus-summary-isearch-article
-    "t" gnus-summary-toggle-header
+    "t" gnus-article-hide-headers
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
     "v" gnus-summary-preview-mime-message

@@ -976,7 +976,10 @@ always hide."
   (current-buffer)
   (if (gnus-article-check-hidden-text 'headers arg)
       ;; Show boring headers as well.
-      (gnus-article-show-hidden-text 'boring-headers)
+      (progn
+	(gnus-article-show-hidden-text 'boring-headers)
+	(when (eq 1 (point-min))
+	  (set-window-start (get-buffer-window (current-buffer)) 1)))
     ;; This function might be inhibited.
     (unless gnus-inhibit-hiding
       (save-excursion
