@@ -72,7 +72,7 @@ most: texi2latex.elc latex latexps
 	  $(EMACSINFO) $<; \
 	else \
 	  echo "LC_ALL=C" \
-	    $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<"; \
+	    "$(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<"; \
 	  LC_ALL=C $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
 	fi
 
