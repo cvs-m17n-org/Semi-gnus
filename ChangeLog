@@ -1,8 +1,8 @@
 1998-11-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.038.
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.039.
 
-	* Sync up with Pterodactyl Gnus 0.52.
+	* Sync up with Pterodactyl Gnus 0.53.
 
 	* lisp/pop3-fma.el (pop3-fma-init-message-hook): Change
 	message-send-hook to mime-edit-translate-hook - enbug.
