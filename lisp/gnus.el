@@ -1816,6 +1816,19 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-async" gnus-async-request-fetched-article gnus-async-prefetch-next
       gnus-async-prefetch-article gnus-async-prefetch-remove-group
       gnus-async-halt-prefetch)
+     ("gnus-offline"
+      gnus-offline-setup)
+     ("gnus-offline" :interactive t
+      gnus-offline-toggle-plugged
+      gnus-offline-set-unplugged-state
+      gnus-offline-toggle-auto-hangup
+      gnus-offline-toggle-on/off-send-mail
+      gnus-offline-toggle-articles-to-fetch
+      gnus-offline-toggle-movemail-program
+      gnus-offline-set-interval-time
+      gnus-offline-agent-expire)
+     ("pop3-fma" :interactive t
+      pop3-fma-set-pop3-password)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
