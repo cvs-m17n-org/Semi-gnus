@@ -1,3 +1,7 @@
+2001-09-27  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* texi/gnus-ja.texi (Article Hiding): Fix typo.
+
 2001-09-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: If W3DIR is identical to URLDIR, don't add it
@@ -10,7 +14,7 @@
 
 2001-09-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
-	* gnus-ja.texi (Drafts): Fix typo.
+	* texi/gnus-ja.texi (Drafts): Fix typo.
 
 2001-09-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
