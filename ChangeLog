@@ -1,3 +1,8 @@
+1999-09-30   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* nnfolder.el (nnfolder-possibly-change-group): Don't create an
+	active entry for the group even if it doesn't exist.
+
 1999-09-28   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* gnus-art.el (gnus-article-mime-part-status): Use `mime-entity-children'.
