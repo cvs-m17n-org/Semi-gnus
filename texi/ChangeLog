@@ -1,3 +1,16 @@
+2003-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Maildir): Filled.
+	(Key Index): Untabified.
+
+2003-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Clarification.
+
+2003-12-29  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Agent Variables): Add.
+
 2003-12-23  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* gnus.texi (Oort Gnus): Mention change of `e' in draft groups.

@@ -193,6 +193,13 @@ When found, offer to remove them."
   :type 'boolean
   :group 'gnus-agent)
 
+(defcustom gnus-agent-auto-agentize-methods '(nntp nnimap)
+  "Initially, all servers from these methods are agentized.
+The user may remove or add servers using the Server buffer.
+See Info node `(gnus)Server Buffer'."
+  :type '(repeat symbol)
+  :group 'gnus-agent)
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -220,11 +227,6 @@ NOTES:
 (defvar gnus-agent-file-coding-system 'raw-text)
 (defvar gnus-agent-file-loading-cache nil)
 (defvar gnus-agent-file-header-cache nil)
-
-(defvar gnus-agent-auto-agentize-methods '(nntp nnimap)
-  "Initially, all servers from these methods are agentized.
-The user may remove or add servers using the Server buffer.  See Info
-node `(gnus)Server Buffer'.")
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -618,19 +620,24 @@ minor mode in all Gnus buffers."
   (unless gnus-agent-send-mail-function
     (setq gnus-agent-send-mail-function
 	  (or message-send-mail-real-function
-              message-send-mail-function)
+	      message-send-mail-function)
 	  message-send-mail-real-function 'gnus-agent-send-mail))
 
-  (unless gnus-agent-covered-methods
+  ;; If the servers file doesn't exist, auto-agentize some servers and
+  ;; save the servers file so this auto-agentizing isn't invoked
+  ;; again.
+  (unless (file-exists-p (nnheader-concat gnus-agent-directory "lib/servers"))
+    (gnus-message 3 "First time agent user, agentizing remote groups...")
     (mapc
      (lambda (server-or-method)
        (let ((method (gnus-server-to-method server-or-method)))
-         (when (memq (car method)
-                     gnus-agent-auto-agentize-methods)
-           (push (gnus-method-to-server method)
-                 gnus-agent-covered-methods)
-           (setq gnus-agent-method-p-cache nil))))
-     (cons gnus-select-method gnus-secondary-select-methods))))
+	 (when (memq (car method)
+		     gnus-agent-auto-agentize-methods)
+	   (push (gnus-method-to-server method)
+		 gnus-agent-covered-methods)
+	   (setq gnus-agent-method-p-cache nil))))
+     (cons gnus-select-method gnus-secondary-select-methods))
+    (gnus-agent-write-servers)))
 
 (defun gnus-agent-queue-setup (&optional group-name)
   "Make sure the queue group exists.

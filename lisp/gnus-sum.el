@@ -2185,20 +2185,20 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 		gnus-article-outlook-deuglify-article t])
 	      )
 	     ("Output"
-	      ["Save in default format" gnus-summary-save-article
+	      ["Save in default format..." gnus-summary-save-article
 	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article using default method"))]
-	      ["Save in file" gnus-summary-save-article-file
+	      ["Save in file..." gnus-summary-save-article-file
 	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article in file"))]
-	      ["Save in Unix mail format" gnus-summary-save-article-mail t]
-	      ["Save in MH folder" gnus-summary-save-article-folder t]
-	      ["Save in VM folder" gnus-summary-save-article-vm t]
-	      ["Save in RMAIL mbox" gnus-summary-save-article-rmail t]
-	      ["Save body in file" gnus-summary-save-article-body-file t]
-	      ["Pipe through a filter" gnus-summary-pipe-output t]
+	      ["Save in Unix mail format..." gnus-summary-save-article-mail t]
+	      ["Save in MH folder..." gnus-summary-save-article-folder t]
+	      ["Save in VM folder..." gnus-summary-save-article-vm t]
+	      ["Save in RMAIL mbox..." gnus-summary-save-article-rmail t]
+	      ["Save body in file..." gnus-summary-save-article-body-file t]
+	      ["Pipe through a filter..." gnus-summary-pipe-output t]
 	      ["Add to SOUP packet" gnus-soup-add-article t]
-	      ["Print with Muttprint" gnus-summary-muttprint t]
+	      ["Print with Muttprint..." gnus-summary-muttprint t]
 	      ["Print" gnus-summary-print-article t])
 	     ("Backend"
 	      ["Respool article..." gnus-summary-respool-article t]

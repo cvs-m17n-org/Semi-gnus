@@ -1,3 +1,7 @@
+2003-12-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.16.3 revision 00.
+
 2003-12-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Autoload `open-ssl-stream' when compiling.
