@@ -1,3 +1,11 @@
+2003-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.14 revision 00.
+
+2003-01-24  Jesper Harder  <harder@ifa.au.dk>
+
+	* etc/gnus-tut.txt: Update.
+
 2003-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el (infohack-texi-format): Withdraw the change of

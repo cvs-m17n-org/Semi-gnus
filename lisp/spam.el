@@ -102,6 +102,12 @@ The regular expression is matched against the address."
   :type 'boolean
   :group 'spam)
 
+(defcustom spam-use-regex-headers nil
+  "Whether a header regular expression match should be used by spam-split.
+Also see the variable `spam-spam-regex-headers' and `spam-ham-regex-headers'."
+  :type 'boolean
+  :group 'spam)
+
 (defcustom spam-use-bogofilter-headers nil
   "Whether bogofilter headers should be used by spam-split.
 Enable this if you pre-process messages with Bogofilter BEFORE Gnus sees them."
@@ -174,6 +180,16 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
   :type 'face
   :group 'spam)
 
+(defcustom spam-regex-headers-spam '("^X-Spam-Flag: YES")
+  "Regular expression for positive header spam matches"
+  :type '(repeat (regexp :tag "Regular expression to match spam header"))
+  :group 'spam)
+
+(defcustom spam-regex-headers-ham '("^X-Spam-Flag: NO")
+  "Regular expression for positive header ham matches"
+  :type '(repeat (regexp :tag "Regular expression to match ham header"))
+  :group 'spam)
+
 (defgroup spam-ifile nil
   "Spam ifile configuration."
   :group 'spam)
@@ -193,6 +209,13 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
 (defcustom spam-ifile-spam-category "spam"
   "Name of the spam ifile category."  
   :type 'string
+  :group 'spam-ifile)
+
+(defcustom spam-ifile-ham-category nil
+  "Name of the ham ifile category.  If nil, the current group name will
+be used."
+  :type '(choice (string :tag "Use a fixed category")
+                (const :tag "Use the current group name"))
   :group 'spam-ifile)
 
 (defcustom spam-ifile-all-categories nil
@@ -272,7 +295,7 @@ your main source of newsgroup names."
   (spam-group-processor-p group 'gnus-group-ham-exit-processor-ifile))
 
 (defun spam-group-ham-processor-bogofilter-p (group)
-  (spam-group-processor-p group 'gnus-group-ham-exit-processor-ifile))
+  (spam-group-processor-p group 'gnus-group-ham-exit-processor-bogofilter))
 
 (defun spam-group-spam-processor-stat-p (group)
   (spam-group-processor-p group 'gnus-group-spam-exit-processor-stat))
@@ -295,24 +318,30 @@ your main source of newsgroup names."
 
 (defun spam-summary-prepare-exit ()
   ;; The spam processors are invoked for any group, spam or ham or neither
+  (gnus-message 6 "Exiting summary buffer and applying spam rules")
   (when (and spam-bogofilter-path
 	     (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name))
+    (gnus-message 5 "Registering spam with bogofilter")
     (spam-bogofilter-register-spam-routine))
   
   (when (and spam-ifile-path
 	     (spam-group-spam-processor-ifile-p gnus-newsgroup-name))
+    (gnus-message 5 "Registering spam with ifile")
     (spam-ifile-register-spam-routine))
   
   (when (spam-group-spam-processor-stat-p gnus-newsgroup-name)
+    (gnus-message 5 "Registering spam with spam-stat")
     (spam-stat-register-spam-routine))
 
   (when (spam-group-spam-processor-blacklist-p gnus-newsgroup-name)
+    (gnus-message 5 "Registering spam with the blacklist")
     (spam-blacklist-register-routine))
 
   (if spam-move-spam-nonspam-groups-only      
       (when (not (spam-group-spam-contents-p gnus-newsgroup-name))
 	(spam-mark-spam-as-expired-and-move-routine
 	 (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+    (gnus-message 5 "Marking spam as expired and moving it")
     (spam-mark-spam-as-expired-and-move-routine 
      (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
 
@@ -322,18 +351,24 @@ your main source of newsgroup names."
 
   (when (spam-group-ham-contents-p gnus-newsgroup-name)
     (when (spam-group-ham-processor-whitelist-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering ham with the whitelist")
       (spam-whitelist-register-routine))
     (when (spam-group-ham-processor-ifile-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering ham with ifile")
       (spam-ifile-register-ham-routine))
     (when (spam-group-ham-processor-bogofilter-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering ham with Bogofilter")
       (spam-bogofilter-register-ham-routine))
     (when (spam-group-ham-processor-stat-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering ham with spam-stat")
       (spam-stat-register-ham-routine))
     (when (spam-group-ham-processor-BBDB-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering ham with the BBDB")
       (spam-BBDB-register-routine)))
 
   ;; now move all ham articles out of spam groups
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
+    (gnus-message 5 "Moving ham messages from spam group")
     (spam-ham-move-routine
      (gnus-parameter-ham-process-destination gnus-newsgroup-name))))
 
@@ -343,6 +378,7 @@ your main source of newsgroup names."
   ;; check the global list of group names spam-junk-mailgroups and the
   ;; group parameters
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
+    (gnus-message 5 "Marking unread articles as spam")
     (let ((articles gnus-newsgroup-articles)
 	  article)
       (while articles
@@ -454,6 +490,7 @@ your main source of newsgroup names."
 
 (defvar spam-list-of-checks
   '((spam-use-blacklist  		. 	spam-check-blacklist)
+    (spam-use-regex-headers  		. 	spam-check-regex-headers)
     (spam-use-whitelist  		. 	spam-check-whitelist)
     (spam-use-BBDB	 		. 	spam-check-BBDB)
     (spam-use-ifile	 		. 	spam-check-ifile)
@@ -489,10 +526,31 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
     (while (and list-of-checks (not decision))
       (let ((pair (pop list-of-checks)))
 	(when (symbol-value (car pair))
+	  (gnus-message 5 "spam-split: calling the %s function" (symbol-name (cdr pair)))
 	  (setq decision (funcall (cdr pair))))))
     (if (eq decision t)
 	nil
       decision)))
+
+;;;; Regex headers
+
+(defun spam-check-regex-headers ()
+  (let (ret found)
+    (dolist (h-regex spam-regex-headers-ham)
+      (unless found
+	(goto-char (point-min))
+	(when (re-search-forward h-regex nil t)
+	  (message "Ham regex header search positive.")
+	  (setq found t))))
+    (dolist (s-regex spam-regex-headers-spam)
+      (unless found
+	(goto-char (point-min))
+	(when (re-search-forward s-regex nil t)
+	  (message "Spam regex header search positive." (match-string 1))
+	  (setq found t)
+	  (setq ret spam-split-group))))
+    ret))
+
 
 ;;;; Blackholes.
 
@@ -504,9 +562,10 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
       (with-temp-buffer
 	(insert headers)
 	(goto-char (point-min))
+	(gnus-message 5 "Checking headers for relay addresses")
 	(while (re-search-forward
 		"\\[\\([0-9]+.[0-9]+.[0-9]+.[0-9]+\\)\\]" nil t)
-	  (message "Blackhole search found host IP %s." (match-string 1))
+	  (gnus-message 9 "Blackhole search found host IP %s." (match-string 1))
 	  (push (mapconcat 'identity
 			   (nreverse (split-string (match-string 1) "\\."))
 			   ".")
@@ -517,11 +576,12 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	    (if spam-use-dig
 		(let ((query-result (query-dig query-string)))
 		  (when query-result
-		    (message "spam: positive blackhole check '%s'" query-result)
+		    (gnus-message 5 "(DIG): positive blackhole check '%s'" query-result)
 		    (push (list ip server query-result)
 			  matches)))
 	      ;; else, if not using dig.el
 	      (when (query-dns query-string)
+		(gnus-message 5 "positive blackhole check")
 		(push (list ip server (query-dns query-string 'TXT))
 		      matches)))))))
     (when matches
@@ -545,7 +605,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
       (let* ((parsed-address (gnus-extract-address-components from))
 	     (name (or (car parsed-address) "Ham Sender"))
 	     (net-address (car (cdr parsed-address))))
-	(message "Adding address %s to BBDB" from)
+	(gnus-message 5 "Adding address %s to BBDB" from)
 	(when (and net-address
 		   (not (bbdb-search-simple nil net-address)))
 	  (bbdb-create-internal name nil net-address nil nil 
@@ -641,7 +701,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
    nil
    (lambda (article)
      (spam-ifile-register-with-ifile 
-      (spam-get-article-as-string article) nil))))
+      (spam-get-article-as-string article) spam-ifile-ham-category))))
 
 
 ;;;; spam-stat

@@ -859,6 +859,7 @@ Gnus Unplugged
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
+* Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
 * Agent and IMAP::              $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 * Outgoing Messages::           $BEj9F!"%a!<%k$r=P$9$H$-$K$J$K$,5/$3$k$N$+(B?
 * Agent Variables::             $B%+%9%?%^%$%:$O3Z$7(B
@@ -876,9 +877,9 @@ Agent Categories
 
 Agent Commands
 
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        $B%0%k!<%W$N@_Dj$H$=$l$i$NFbMF$N<hF@(B
+* Summary Agent Commands::      $B<jF0$GA*Br$7$?5-;v$r<hF@$9$k(B
+* Server Agent Commands::       $B%(!<%8%'%s%H$G%5%]!<%H$5$l$k%5!<%P!<$NA*Br(B
 
 Scoring
 
@@ -968,19 +969,7 @@ Image Enhancements
 * Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<((B
                                 $B$9$kJ}K!(B
 * X-Face::                      $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
-* Toolbar::                     $B%/%j%C%/1n(B
 * XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
-
-Picons
-
-* Picon Basics::                picon $B$H$O2?$G!"$I$&$d$C$F<j$KF~$l$k$N$+(B
-* Picon Requirements::          XEmacs $B$r;H$C$F$J$1$l$P$3$3$+$i$OFI$^$J(B
-                                $B$$$G(B
-* Easy Picons::                 picon $B$NI=<((B --- $B3Z$JJ}K!(B
-* Hard Picons::                 $BK\Mh$9$Y$-$3$H!#2?$+$r3X$V$3$H$,$G$-$k$@(B
-                                $B$m$&(B
-* Picon Useless Configuration::  $B$=$NB>$N$V$C2u$7$?$j$R$M$C$?$j$$$8$C$?(B
-                                $B$jM7$s$@$j$9$kJQ?t(B
 
 Thwarting Email Spam
 
@@ -5038,10 +5027,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @item gnus-select-article-hook
 @vindex gnus-select-article-hook
 $B$3$N%U%C%/$O5-;v$,A*Br$5$l$?$H$-$K>o$K8F$P$l$^$9!#=i4|@_Dj$G$O!"A*Br$5$l(B
-$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#%(!<%8%'%s%H$,(B
-$B$9$Y$F$N4{FI$N5-;v$r%;!<%V$9$k$h$&$K$5$;$?$$>l9g$O!"$3$N%U%C%/(B
-$B$K(B @code{gnus-agent-fetch-selected-article} $B$rDI2C$9$k$3$H$G!"$=$l$r$9$k(B
-$B$O$:$G$9!#(B
+$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#$"$J$?$,FI$s$@(B
+$B$=$l$>$l$N5-;v$r%(!<%8%'%s%H$K%;!<%V$5$;$?$$>l9g$O!"$3$N%U%C%/(B
+$B$K(B @code{gnus-agent-fetch-selected-article} $B$rDI2C$9$k$3$H$G!"$=$l$r9T$J(B
+$B$&$G$7$g$&!#(B
 
 @item gnus-mark-article-hook
 @vindex gnus-mark-article-hook
@@ -5739,12 +5728,20 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$9(B (@code{gnus-unseen-mark})$B!#(B@code{gnus-recent-mark} $B$H8+Hf$Y$F2<$5$$!#(B
 
 @item
+@vindex gnus-downloaded-mark
+gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$r;H$C$F$$$k$H$-!"5-;v(B
+$B$O(B unplugged ($B%*%U%i%$%s(B) $B$G8+$k$?$a$K%@%&%s%m!<%I$5$l$F$$$k$+$b$7$l$^$;(B
+$B$s!#(B@samp{%O} $B$N;EMM$r;H$C$F$$$k$H!"$=$l$i$N5-;v$K$O$=$N;EMM(B
+$B$K(B @samp{+} $B$N0u$,IU$-$^$9!#(B($BJQ?t(B @code{gnus-downloaded-mark} $B$G$I$NJ8;z(B
+$B$r;H$&$+$r@)8f$7$^$9!#(B)
+
+@item
 @vindex gnus-undownloaded-mark
 gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$r;H$C$F$$$k$H$-!"$$$/$D$+$N5-;v(B
-$B$O%@%&%s%m!<%I$5$l$F$$$J$$$+$b$7$l$^$;$s!#%*%U%i%$%s(B (unplugged) $B$N>uBV(B
-$B$G$O$=$N$h$&$J5-;v$r8+$k$3$H$,$G$-$^$;$s!#$=$l$i$N5-;v$K$O:G=i$N7e(B
-$B$K(B @samp{@@} $B$N0u$,IU$-$^$9!#(B($BJQ?t(B @code{gnus-undownloaded-mark} $B$G$I$N(B
-$BJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
+$B$O%@%&%s%m!<%I$5$l$F$$$J$$$+$b$7$l$^$;$s!#(BUnplugged ($B%*%U%i%$%s(B) $B$N>uBV(B
+$B$G$O$=$N$h$&$J5-;v$r8+$k$3$H$,$G$-$^$;$s!#(B@samp{%O} $B$N;EMM$r;H$C$F$$$k$H!"(B
+$B$=$l$i$N5-;v$K$O$=$N;EMM$K(B @samp{-} $B$N0u$,IU$-$^$9!#(B($BJQ(B
+$B?t(B @code{gnus-undownloaded-mark} $B$G$I$NJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
 
 @item
 @vindex gnus-downloadable-mark
@@ -5963,13 +5960,10 @@ gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&%s
 @itemx #
 @kindex # ($B35N,(B)
 @kindex M P p ($B35N,(B)
-@findex gnus-pick-unmark-article-or-thread
-$B%9%l%C%I$+5-;v$rL$A*Br$K$7$^(B
-$B$9(B (@code{gnus-pick-unmark-article-or-thread})$B!#JQ(B
-$B?t(B @code{gnus-thread-hide-subtree} $B$,(B true $B$G$"$l$P!"$3$N%-!<$O%9%l%C%I(B
-$B$N:G=i$N5-;v$G;H$o$l$?$H$-$O%9%l%C%I$rL$A*Br$K$7$^$9!#$=$&$G$J$$>l9g$O!"(B
-$B$=$N5-;v$@$1$rL$A*Br$K$7$^$9!#$=$N9T$N%9%l%C%I$+5-;v$rL$A*Br$K$9$k$?$a$K(B
-$B$3$N%-!<$K?tCM@\F,0z?t$rM?$($k;v$,$G$-$^$9!#(B
+@findex gnus-summary-mark-as-processable
+$B8=:_$N5-;v$K%W%m%;%90u$rIU$1$^(B
+$B$9(B (@code{gnus-summary-mark-as-processable})$B!#(B
+@findex gnus-summary-unmark-as-processable
 
 @item M P u
 @itemx M-#
@@ -7955,29 +7949,6 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 $BI=Bj$+$i:o=|$5$l$k$Y$-I8<1$N%j%9%H$K9gCW$9$k@55,I=8=$G$9!#$3$l$O@55,I=8=(B
 $B$N%j%9%H$G$"$k$3$H$b$G$-$^$9!#(B
 @end table
-
-@item W W p
-@kindex W W p ($B35N,(B)
-@findex gnus-article-hide-pgp
-@vindex gnus-article-hide-pgp-hook
-@sc{pgp} $B=pL>$r1#$7$^$9(B (@code{gnus-article-hide-pgp})$B!#(B@sc{pgp} $B=pL>$,(B
-$B1#$5$l$?8e$K%U%C%/(B @code{gnus-article-hide-pgp-hook} $B$,<B9T$5$l$^$9!#(B
-$BNc$($P!"=pL>$r;}$D5-;v$r<+F0E*$KG'>Z$9$k$K$O(B:
-
-@lisp
-;;; Hide pgp cruft if any.
-
-(setq gnus-treat-strip-pgp t)
-
-;;; After hiding pgp, verify the message;
-;;; only happens if pgp signature is found.
-
-(add-hook 'gnus-article-hide-pgp-hook
-          (lambda ()
-            (save-excursion
-              (set-buffer gnus-original-article-buffer)
-              (mc-verify))))
-@end lisp
 
 @item W W P
 @kindex W W P ($B35N,(B)
@@ -10145,7 +10116,6 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-strip-leading-blank-lines (t, integer)
 @item gnus-treat-strip-multiple-blank-lines (t, integer)
 @item gnus-treat-strip-pem (t, last, integer)
-@item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-unsplit-urls (t, integer)
 @item gnus-treat-wash-html (t, integer)
@@ -10967,6 +10937,9 @@ format or @sc{pgp/mime} or @sc{s/mime}.  For decoding such messages,
 see the @code{mm-verify-option} and @code{mm-decrypt-option} options
 (@pxref{Security}).
 
+@vindex gnus-message-replysign
+@vindex gnus-message-replyencrypt
+@vindex gnus-message-replysignencrypted
 Often, you would like to sign replies to people who send you signed
 messages.  Even more often, you might want to encrypt messages which
 are in reply to encrypted messages.  Gnus offers
@@ -11680,6 +11653,13 @@ default force yes
 
 $B$9$Y$F$N%5!<%P!<$,?d>)(B ID $B$r%5%]!<%H$7$F$$$k$o$1$G$O$J$$$3$H$KCm0U$7$F2<(B
 $B$5$$!#$3$l$ONc$($P(B INN 2.3.0 $B0J>e$GF0:n$7$^$9!#(B
+
+@item nntp-read-timeout
+@vindex nntp-read-timeout
+Nntp $B$,=PNO$,=*N;$7$?$3$H$r3NG'$9$k$?$a$KBT$D$Y$-;~4V$G$9!#CM$rC;$/$9$l(B
+$B$PH?1~$,B.$/$J$j$^$9$,(B CPU $B$r?)$$$^$9!#%G%#%U%)%k%H$O(B 0.1 $BIC$G$9!#%5!<%P!<(B
+$B$KCY$$2s@~$G@\B3$7$F$$$k>l9g$O(B ($B$=$7$F(B Emacs $B$,(B CPU $B%Q%o!<$r?)$&$N$rK>$^(B
+$B$J$1$l$P(B)$B!"$3$l$rNc$($P(B 1 $B$K$7$F$b9=$$$^$;$s!#(B
 
 @item nntp-list-options
 @vindex nntp-list-options
@@ -14748,6 +14728,11 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
                 (nnimap-stream ssl))))
 @end lisp
 
+$B?7$7$$%5!<%P!<$rDj5A$7$?8e$G!"(B@kbd{U} $B$N$h$&$J(B gnus $B$NDL>o$N%3%^%s%I$r%0(B
+$B%k!<%W%P%C%U%!$G;H$&(B (@pxref{Subscription Commands}) $B$+!"$^$?$O%5!<%P!<(B
+$B%P%C%U%!(B (@pxref{Server Buffer}) $B$r2p$7$F!"$=$N%5!<%P!<$N%0%k!<%W$r9VFI(B
+$B$9$k$3$H$,$G$-$^$9!#(B
+
 $B0J2<$NJQ?t$O2>A[(B @code{nnimap} $B%5!<%P!<$r:n@.$9$k$?$a$K;H$&$3$H$,$G$-$^(B
 $B$9!#(B
 
@@ -15142,21 +15127,21 @@ Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-fancy}.
 @subsection IMAP $B$G$N4|8B@Z$l>C5n(B
 @cindex expiring imap mail
 
-@sc{nnimap} $B$O40A4$J(B @sc{nnmail} $BM3Mh$N%P%C%/%(%s%I$G$O$"$j$^$;$s$,!"$?(B
-$B$$$F$$$N4|8B@Z$l>C5n(B (@pxref{Expiring Mail}) $B$NI8=`5!G=$r%5%]!<%H$7$^$9!#(B
-IMAP $B$NJ,3d(B (@pxref{Splitting in IMAP}) $B$G$O(B @sc{nnmail} $B$NJQ?t$rJ#@=$7(B
-$B$J$$(B ($BNc$($P(B @var{nnimap-expiry-wait} $B$r@8@.$7$J$$(B) $BE@$,0c$&$N$G$9$,!"(B
-@sc{nnmail} $B$NJQ?t$rN.MQ$7$^$9!#0J2<$O(B @sc{nnimap} $B$N4|8B@Z$l>C5n=hM}$G(B
-$B;H$o$l$kJQ?t$G$9!#(B
+@code{nnimap} $B$O40A4$J(B @code{nnmail} $BM3Mh$N%P%C%/%(%s%I$G$O$"$j$^$;$s$,!"(B
+$B$?$$$F$$$N4|8B@Z$l>C5n(B (@pxref{Expiring Mail}) $B$NI8=`5!G=$r%5%]!<%H$7$^(B
+$B$9!#(BIMAP $B$NJ,3d(B (@pxref{Splitting in IMAP}) $B$G$O(B @code{nnmail} $B$NJQ?t$r(B
+$BJ#@=$7$J$$(B ($BNc$($P(B @var{nnimap-expiry-wait} $B$r@8@.$7$J$$(B) $BE@$,0c$&$N$G$9(B
+$B$,!"(B@code{nnmail} $B$NJQ?t$rN.MQ$7$^$9!#0J2<$O(B @code{nnimap} $B$N4|8B@Z$l>C(B
+$B5n=hM}$G;H$o$l$kJQ?t$G$9!#(B
 
 $B4|8B@Z$l>C5n$N0u$,$I$N$h$&$KE,@Z$K(B @sc{imap} $B%5!<%P!<$K5-O?$5$l$k$+$K$D(B
-$B$$$F$b$3$3$G8@5Z$7$F$*$-$^$7$g$&!#4|8B@Z$l>C5n$N0u$O(B @sc{imap} $B%/%i%$%"(B
-$B%s%HFCM-$N0u$G$"$k(B @code{gnus-expire} $B$KJQ49$5$l!"%a%C%;!<%8$K5-O?$5$l$^(B
-$B$9!#$3$l$O!"B>$N%/%i%$%"%s%H$O%a%C%;!<%8$N%/%i%$%"%s%HFCM-$N%U%i%0$r8+$k(B
-$B$+$b$7$l$J$$$N$KBP$7$F!"(BGnus $B$O$?$V$s(B @code{gnus-expire} $B$N0u$rE,@Z$K07(B
-$B$$M}2r$9$k$@$1$G$"$k$3$H$r0UL#$7$^$9!#$^$?$3$l$O%5!<%P!<$,!"%/%i%$%"%s%H(B
-$BFCM-$N%U%i%0$N%a%C%;!<%8$X$N915WE*$JJ]B8$r%5%]!<%H$7$J$1$l$P$J$i$J$$$3$H(B
-$B$b0UL#$7$^$9!#9,$$$K!"$?$$$F$$$O%5%]!<%H$7$^$9!#(B
+$B$$$F$b$3$3$G8@5Z$7$F$*$-$^$7$g$&!#4|8B@Z$l>C5n$N0u$O(B @code{imap} $B%/%i%$(B
+$B%"%s%HFCM-$N0u$G$"$k(B @code{gnus-expire} $B$KJQ49$5$l!"%a%C%;!<%8$K5-O?$5$l(B
+$B$^$9!#$3$l$O!"B>$N%/%i%$%"%s%H$O%a%C%;!<%8$N%/%i%$%"%s%HFCM-$N%U%i%0$r8+(B
+$B$k$+$b$7$l$J$$$N$KBP$7$F!"(BGnus $B$O$?$V$s(B @code{gnus-expire} $B$N0u$rE,@Z$K(B
+$B07$$M}2r$9$k$@$1$G$"$k$3$H$r0UL#$7$^$9!#$^$?$3$l$O%5!<%P!<$,!"%/%i%$%"%s(B
+$B%HFCM-$N%U%i%0$N%a%C%;!<%8$X$N915WE*$JJ]B8$r%5%]!<%H$7$J$1$l$P$J$i$J$$$3(B
+$B$H$b0UL#$7$^$9!#9,$$$K!"$?$$$F$$$O%5%]!<%H$7$^$9!#(B
 
 @table @code
 @item nnmail-expiry-wait
@@ -15167,10 +15152,10 @@ IMAP $B$NJ,3d(B (@pxref{Splitting in IMAP}) $B$G$O(B @sc{nnmail} $B$NJQ?t$r
 
 @item nnmail-expiry-target
 
-$B$3$NJQ?t$O%5%]!<%H$5$l$F$$$F!"FbItE*$K$O$3$l$r07$&(B @sc{nnmail} $B4X?t$r8F(B
-$B$V$3$H$K$h$C$F<BAu$5$l$F$$$^$9!#$b$79T$-@h$,F1$8%5!<%P!<$N(B IMAP $B%0%k!<%W(B
-$B$@$C$?$i!"5-;v$ODI2C$5$l$kBe$o$j$K%3%T!<$5$l$k(B ($B%"%C%W%m!<%I$7D>$5$l(B
-$B$k(B) $B$H$$$&:GE,2=$b4^$_$^$9!#(B
+$B$3$NJQ?t$O%5%]!<%H$5$l$F$$$F!"FbItE*$K$O$3$l$r07$&(B @code{nnmail} $B4X?t$r(B
+$B8F$V$3$H$K$h$C$F<BAu$5$l$F$$$^$9!#$b$79T$-@h$,F1$8%5!<%P!<$N(B IMAP $B%0%k!<(B
+$B%W$@$C$?$i!"5-;v$ODI2C$5$l$kBe$o$j$K%3%T!<$5$l$k(B ($B%"%C%W%m!<%I$7D>$5$l$k(B)
+$B$H$$$&:GE,2=$b4^$_$^$9!#(B
 @end table
 
 @node Editing IMAP ACLs
@@ -16127,8 +16112,8 @@ Namazu $B$r;H$C$F!"%a!<%k$N;3$+$i$"$J$?$N9%$-$J%-!<%o!<%I$r4^$`5-;v$r8+(B
 $B:G=i$KHa$7$$$*CN$i$;$,$R$H$D!#(B@file{gnus-namazu.el} $B$O!"8=;~E@$G$O!"(B
 @code{nnml} $B%P%C%/%(%s%I$"$k$$$O(B @code{nnmh} $B%P%C%/%(%s%I$K$h$C$FJ]B8(B
 $B$5$l$F$$$k5-;v$H!"(B@code{gnus-cache-enter-article} $B$K$h$C$F1JB32=$5$l$?(B
-$B5-;v$7$+!"<h$j07$&$3$H$,$G$-$^$;$s!#(B@code{nnimap} $B%P%C%/%(%s%I$d(B 
-@code{nnmbox} $B%P%C%/%(%s%I$r;H$C$F$$$k?M$O!"$4$a$s$J$5$$!#(B
+$B5-;v$7$+!"<h$j07$&$3$H$,$G$-$^$;$s!#(B@code{nnimap} $B%P%C%/%(%s%I(B
+$B$d(B @code{nnmbox} $B%P%C%/%(%s%I$r;H$C$F$$$k?M$O!"$4$a$s$J$5$$!#(B
 
 $B$=$l$G$O5$$r<h$jD>$7$F!"$^$:!"(BNamazu $B$r;H$($k$h$&$K$7$^$7$g$&!#>\$7$$(B
 $B$3$H$O!"<!$N%Z!<%8$GCN$k$3$H$,$G$-$^$9!#(B
@@ -16239,6 +16224,7 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
+* Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
 * Agent and IMAP::              $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 * Outgoing Messages::           $BEj9F!"%a!<%k$r=P$9$H$-$K$J$K$,5/$3$k$N$+(B?
 * Agent Variables::             $B%+%9%?%^%$%:$O3Z$7(B
@@ -16706,9 +16692,9 @@ file
 $B$GF0:n$7!"(Bgnus $B%(!<%8%'%s%H$N@Z$jN%$7(B/$B:9$79~$_>uBV$r@Z$jBX$($^$9!#(B
 
 @menu
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        $B%0%k!<%W$N@_Dj$H$=$l$i$NFbMF$N<hF@(B
+* Summary Agent Commands::      $B<jF0$GA*Br$7$?5-;v$r<hF@$9$k(B
+* Server Agent Commands::       $B%(!<%8%'%s%H$G%5%]!<%H$5$l$k%5!<%P!<$NA*Br(B
 @end menu
 
 @node Group Agent Commands
@@ -16782,13 +16768,26 @@ file
 @item J c
 @kindex J c ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-catchup
-$B%@%&%s%m!<%I0u$NL5$$5-;v$rA4$F4{FI$K$9$k(B (@code{gnus-agent-catchup})$B!#(B
+$B%-%c%C%7%e$5$l$F$$$J$$!"%@%&%s%m!<%I$5$l$F$$$J$$!"$^$?$O%@%&%s%m!<%I$G$-(B
+$B$J$$$9$Y$F$N5-;v$r4{FI$K$9$k(B (@code{gnus-agent-catchup})$B!#(B
+
+@item J S
+@kindex J S ($B%(!<%8%'%s%H(B $B35N,(B)
+@findex gnus-agent-fetch-group
+$B$3$N%0%k!<%W$N$9$Y$F$NK>$^$7$$5-;v(B (@pxref{Agent Categories} $B;2>H(B) $B$r%@(B
+$B%&%s%m!<%I$9$k!#(B(@code{gnus-agent-fetch-group})$B!#(B
+
+@item J s
+@kindex J s ($B%(!<%8%'%s%H(B $B35N,(B)
+@findex gnus-agent-fetch-series
+$B$3$N%0%k!<%W$N$9$Y$F$N%W%m%;%90u$,IU$$$?5-;v$r%@%&%s%m!<%I$9$k!#(B
+(@code{gnus-agent-fetch-series})$B!#(B
 
 @item J u
 @kindex J u ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-summary-fetch-group
-$B8=:_$N%0%k!<%W$N%@%&%s%m!<%I2DG=$J5-;v$r!"$9$Y$F%@%&%s%m!<%I$7$^(B
-$B$9(B (@code{gnus-agent-summary-fetch-group})$B!#(B
+$B8=:_$N%0%k!<%W$N%@%&%s%m!<%I2DG=$J5-;v$r!"$9$Y$F%@%&%s%m!<%I$9(B
+$B$k(B (@code{gnus-agent-summary-fetch-group})$B!#(B
 @end table
 
 @node Server Agent Commands
@@ -16840,6 +16839,10 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 $BE*$G$b$J$/!"0lC6;O$a$F$7$^$C$?$i(B (@kbd{C-g} $B$d$=$NB>$G(B) $BCfCG$9$k$3$H$b$"(B
 $B$^$jNI$$$3$H$G$O$"$j$^$;$s!#(B
 
+$BNc$($P(B @code{gnus-request-expire-articles} $B$N$h$&$JB>$N4X?t$O!"%(!<%8%'(B
+$B%s%H$r%0%k!<%W$KF14|$5$;$k$?$a$K(B @code{gnus-agent-expire} $B$r<B9T$9$k$+$b(B
+$B$7$l$J$$$3$H$KCm0U$7$F2<$5$$!#(B
+
 @code{gnus-agent-expire-days} $B$O@55,I=8=(B/$BF|?t$N%Z%"$N%j%9%H$G$"$C$F$b9=(B
 $B$$$^$;$s!#@55,I=8=$O%0%k!<%WL>$K%^%C%A$7!"0[$J$k%0%k!<%W$G0[$J$k4|8B@Z$l(B
 $B>C5n$r9T$J$&$3$H$r2DG=$K$7$^$9!#(B
@@ -16852,7 +16855,8 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 @end lisp
 
 $B$b$7%j%9%H$N7A<0$r;H$&>l9g$O!":G8e$NMWAG$O%G%#%U%)%k%H$N%a%=%C%I!"$9$J$o(B
-$B$A$9$Y$F$N%0%k!<%W$K%^%C%A$9$k$b$N$K$7$J$1$l$P$J$j$^$;$s!#(B
+$B$A$9$Y$F$N%0%k!<%W$K%^%C%A$9$k$b$N$K$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$K4X$7(B
+$B$F!"$5$i$K$=$l$O%0%k!<%WL>$N@hF,$+$i%^%C%A$7$J$1$l$P$J$j$^$;$s!#(B
 
 @vindex gnus-agent-expire-all
 @code{gnus-agent-expire-all} $B$,(B @code{nil} $B$G$J$1$l$P!"$3$NL?Na$OA4$F$N(B
@@ -16860,11 +16864,44 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 $B=i4|@_DjCM(B) $B$G$"$l$P!"4{FI5-;v$N$_$,>C5n$NBP>]$H$J$j!"L$FI!"2D;k!"J]N15-(B
 $B;v$O$5$i$KL54|8B$KJ];}$7$^$9!#(B
 
-@findex gnus-agent-regenerate
 $B4|8B@Z$l>C5n$5$l$F$$$k$O$:$J$N$K;D$C$F$$$k5-;v$r8+$D$1$?$J$i$P!"$?$V$s$$(B
 $B$/$D$+$N(B gnus $B%(!<%8%'%s%H%U%!%$%k$,2u$l$F$$$^$9!#(B
 @code{gnus-agent-regenerate} $B$O!"5/$3$j$&$kLdBj$r=$I|$9$k$?$a$NFCJL$J%3(B
 $B%^%s%I$G$9!#(B
+
+@node Agent Regeneration
+@subsection $B%(!<%8%'%s%H$r:n$jD>$9(B
+
+@cindex Agent Regeneration
+@cindex Gnus Agent Regeneration
+@cindex regeneration
+
+@code{nnagent} $B$K$h$C$F;H$o$l$k%m!<%+%k$N%G!<%?9=B$$O!"$"$kNc30E*$J>r7o(B
+$B$K$h$C$F$*$+$7$/$J$C$F$7$^$&$+$b$7$l$^$;$s!#$3$l$,5/$3$k$H!"(B
+@code{nnagent} $B$N5!G=@-$,2<$,$k$+$b$7$l$J$$$7!"<:GT$7$5$($9$k$+$b$7$l$^(B
+$B$;$s!#$3$NLdBj$N2r7h:v$O!"FbIt$NL7=b$r$9$Y$F:o=|$9$k$3$H$K$h$C$F!"%m!<%+(B
+$B%k$N%G!<%?9=B$$r=$I|$9$k$3$H$G$9!#(B
+
+$BNc$($P!"5-;v$r%(!<%8%'%s%H$K%@%&%s%m!<%I$7$F$$$k4V$K%5!<%P!<$X$N@\B3$,@Z(B
+$B$l$F$7$^$&>l9g!"%m!<%+%k$N%G!<%?9=B$$O@\B3$,@Z$l$kA0$K%@%&%s%m!<%I$5$l$?(B
+$B5-;v$N$3$H$rCN$j$^$;$s!#(B@code{gnus-agent-regenerate} $B$^$?(B
+$B$O(B @code{gnus-agent-regenerate-group} $B$r<B9T$9$k$H!"$=$N$h$&$J5-;v$rFs2s(B
+$B%@%&%s%m!<%I$7$J$/$F$b:Q$`$h$&$K%G!<%?9=B$$r99?7$7$^$9!#(B
+
+@findex gnus-agent-regenerate
+@kindex M-x gnus-agent-regenerate
+$B%3%^%s%I(B @code{gnus-agent-regenerate} $B$O!"$9$Y$F$N%(!<%8%'%s%H2=$5$l$?%0(B
+$B%k!<%W$G(B @code{gnus-agent-regenerate-group} $B$r<B9T$7$^$9!#$I$N%P%C%U%!>e(B
+$B$G$b(B @code{gnus-agent-regenerate} $B$r<B9T$9$k$3$H$,$G$-$^$9$,!":G=i$K$9$Y(B
+$B$F$N35N,%P%C%U%!$rJD$8$k$3$H$r6/$/4+$a$^$9!#(B
+
+@findex gnus-agent-regenerate-group
+@kindex M-x gnus-agent-regenerate-group
+$B%3%^%s%I(B @code{gnus-agent-regenerate-group} $B$O!"%m!<%+%k$N(B NOV ($B%X%C(B
+$B%@!<(B) $B%G!<%?%Y!<%9$r=$I|$9$k$?$a$K!"8D!9$N5-;v$N%m!<%+%k$J%3%T!<$r;H$$$^(B
+$B$9!#$=$N8e$=$l$O!"$I$N5-;v$,%m!<%+%k$K3JG<$5$l$k$+$rN"IU$1$k$?$a$NFbIt%G!<(B
+$B%?9=B$$r99?7$7$^$9!#0z?t$rM?$($k$H!"%(!<%8%'%s%H$NCf$N5-;v$KL$FI$N0u$rIU(B
+$B$1$^$9!#(B
 
 @node Agent and IMAP
 @subsection $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
@@ -16972,6 +17009,31 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B @sc{nov} $B$H5-;v$r;H$&$+$I$&$+$r@
 $B$,%G%#%U%)%k%H$G$9$,!"%(!<%8%'%s%H$O:F@\B3$9$k$H$-$K%*%U%i%$%s>uBV$N%5!<(B
 $B%P!<$r%*%s%i%$%s>uBV$K$9$k$+$I$&$+$r?R$M$^$9!#$=$l0J30$NCM$@$C$?$i!"%*%U(B
 $B%i%$%s>uBV$N%5!<%P!<$O<+F0E*$K%*%s%i%$%s>uBV$K$J$j$^$9!#(B
+
+@item gnus-agent-mark-unread-after-downloaded
+@vindex gnus-agent-mark-unread-after-downloaded
+@code{gnus-agent-mark-unread-after-downloaded} $B$,(B $BHs(B-@code{nil} $B$@$C$?$i!"(B
+$B%@%&%s%m!<%I$7$?8e$G5-;v$KL$FI$N0u$rIU$1$^$9!#%G%#%U%)%k%H$O(B @code{t} $B$G(B
+$B$9!#(B
+
+@item gnus-agent-consider-all-articles
+@vindex gnus-agent-consider-all-articles
+@code{gnus-agent-consider-all-articles} $B$,(B $BHs(B-@code{nil} $B$@$C$?$i!"%(!<(B
+$B%8%'%s%H$O$9$Y$F$N8+Ev$?$i$J$$%X%C%@!<$r<hF@$7$^$9!#(B@code{nil} $B$@$C$?$i(B
+$B?7$7$$%X%C%@!<$@$1$r<hF@$7$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item gnus-agent-max-fetch-size
+@vindex gnus-agent-max-fetch-size
+$B%(!<%8%'%s%H$O!"<hF@$7$?5-;v$r8D!9$N%U%!%$%k$KF~$l$k$?$a$N2r@O$r9T$J$&A0(B
+$B$K!"$=$l$i$r0l;~E*$J%P%C%U%!!<$X<h$j9~$_$^$9!#:GBg$N%P%C%U%!%5%$%:$rD62a(B
+$B$7$J$$$h$&$K$9$k$?$a$K!"5-;v$,$9$Y$F<hF@$5$l$k$^$G!"%(!<%8%'%s%H$O<hF@$H(B
+$B2r@O$r8r8_$K9T$J$$$^$9!#(B@code{gnus-agent-max-fetch-size} $B$O!"7+$jJV$7$,(B
+$B$I$l$/$i$$IQHK$K5/$-$k$+$r@)8f$9$k$?$a$N!"%5%$%:$N8B3&$r5,Dj$7$^$9!#Bg$-(B
+$B$JCM$O@-G=$r2~A1$7$^$9!#>.$5$JCM$O!"K|$,0l<hF@$7$F$$$k4V$K@\B3$,@Z$l$?>l(B
+$B9g$K!"CY$l;~4V$r:G>.$K$7$^$9(B ($B%0%k!<%W$N>uBV$r99?7$9$k$?$a(B
+$B$K(B @code{gnus-agent-regenerate-group} $B$r<B9T$9$kI,MW$,$"$k$+$b$7$l$^$;(B
+$B$s!#$G$b!"@\B3$,@Z$l$kA0$K2r@O$5$l$?$9$Y$F$N5-;v$O!"(Bunplugged $B$N4|4V$KMx(B
+$BMQ$9$k$3$H$,$G$-$k$G$7$g$&!#(B)$B!#(B
 
 @item gnus-server-unopen-status
 @vindex gnus-server-unopen-status
@@ -17152,8 +17214,8 @@ Gnus Agent $B$O$h$/$"$kB>$N%*%U%i%$%s%K%e!<%9%j!<%@!<$N$h$&$K$OF0:n$7$^$;(B
 @end table
 
 $BMWLs$9$k$H!"(Bgnus $B$,@Z$jN%$5$l$F$$$k$H$-$O%m!<%+%k$KJ]B8$5$l$?5-;v$r8+$k(B
-$B$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O(B ISP $B$HOC$9$@$1$G!"$+$D%m!<%+%k$K;}$C$F$$(B
-$B$k5-;v$r;H$$$^$9!#(B
+$B$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O(B ISP $B$HOC$7!"$+$D%m!<%+%k$K;}$C$F$$$k5-;v(B
+$B$b;H$&$+$b$7$l$^$;$s!#(B
 
 @node Scoring
 @chapter $B%9%3%"(B
@@ -20199,7 +20261,6 @@ gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 * Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<((B
                                 $B$9$kJ}K!(B
 * X-Face::                      $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
-* Toolbar::                     $B%/%j%C%/1n(B
 * XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
 @end menu
 
@@ -20216,20 +20277,6 @@ gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 $B$M(B! $B$3$l$O$=$&$9$k$N$K$T$C$?$j$JJ}K!$G$9!#$5$i$K$3$l$O!"$"$J$?$,%K%e!<%9(B
 $B$rFI$s$G$$$k$s$@$H$$$&$3$H$r!"$"$J$?$N8*1[$7$K8+$D$a$F$$$k?M$K0u>]$E$1$k(B
 $B$?$a$NAG@2$i$7$$J}K!$G$b$"$j$^$9!#(B
-
-@menu
-* Picon Basics::                picon $B$H$O2?$G!"$I$&$d$C$F<j$KF~$l$k$N$+(B
-* Picon Requirements::          XEmacs $B$r;H$C$F$J$1$l$P$3$3$+$i$OFI$^$J(B
-                                $B$$$G(B
-* Easy Picons::                 picon $B$NI=<((B --- $B3Z$JJ}K!(B
-* Hard Picons::                 $BK\Mh$9$Y$-$3$H!#2?$+$r3X$V$3$H$,$G$-$k$@(B
-                                $B$m$&(B
-* Picon Useless Configuration::  $B$=$NB>$N$V$C2u$7$?$j$R$M$C$?$j$$$8$C$?(B
-                                $B$jM7$s$@$j$9$kJQ?t(B
-@end menu
-
-@node Picon Basics
-@subsubsection Picon $B$N4pAC(B
 
 Picon $B$H$O$J$s$G$7$g$&(B? Picons $B%&%'%V%5%$%H$+$iD>@\0zMQ$7$^$7$g$&!#(B
 
@@ -20249,223 +20296,51 @@ Picon $B$H$O$J$s$G$7$g$&(B? Picons $B%&%'%V%5%$%H$+$iD>@\0zMQ$7$^$7$g$&!#(B
 $B$$$^$;$s!#(B
 @end quotation
 
-@vindex gnus-picons-piconsearch-url
-$B$"$J$?$,%$%s%?!<%M%C%H$X>o;~@\B3$7$F$$$k$N$J$i$P!"(B
-@code{gnus-picons-piconsearch-url} $B$KJ8;z(B
-$BNs(B @uref{http://www.cs.indiana.edu/picons/search.html} $B$r@_Dj$9$k$3$H$G!"(B
-Steve Kinzler $B$N(B picon $B8!:w%(%s%8%s$r;H$&$3$H$,$G$-$^$9!#(B
+@vindex gnus-picon-databases
+Picon $B%G!<%?%Y!<%9$NF~<j$H%$%s%9%H!<%k$N<j=g$K$D$$$F$O!"%&%'%V%V%i%&%6!<(B
+$B$G(B @uref{http://www.cs.indiana.edu/picons/ftp/index.html} $B$rK,$M$F$_$F2<(B
+$B$5$$!#(B
 
-@vindex gnus-picons-database
-$B$=$&$G$J$1$l$P!"H`$N%G!<%?%Y!<%9$r<j85$KJ#@=$9$kI,MW$,$"$j$^$9!#(Bpicon $B%G!<(B
-$B%?%Y!<%9$NF~<j$H%$%s%9%H!<%k$N<j=g$O!"%&%'%V%V%i%&%6!<(B
-$B$G(B @uref{http://www.cs.indiana.edu/picons/ftp/index.html} $B$K9T$C$F$_$F$/(B
-$B$@$5$$!#(BGnus $B$O(B picons $B$,(B @code{gnus-picons-database} $B$G<($5$l$k>l=j$K%$(B
-$B%s%9%H!<%k$7$F$"$k$b$N$H4|BT$7$^$9!#(B
-
-$B$b$7$"$J$?$,(B Debian GNU/Linux $B$r;H$C$F$$$k$N$J$i!"(B@samp{apt-get install
+$B$b$7(B Debian GNU/Linux $B$r;H$C$F$$$k$N$J$i!"(B@samp{apt-get install
 picons.*} $B$H8@$($P(B gnus $B$,8+$D$1$k$3$H$,$G$-$k(B picon $B$,%$%s%9%H!<%k$5$l(B
 $B$^$9!#(B
 
-@node Picon Requirements
-@subsubsection Picon $B$NF0:n>r7o(B
+Picon $B$NI=<($,$G$-$k$h$&$K$9$k$?$a$K$O!"(Bpicon $B%G!<%?%Y!<%9$,$"$k%G%#%l%/(B
+$B%H%j$,!"$?$@C1$K(B @code{gnus-picon-databases} $B$K@_Dj$5$l$F$$$k$h$&$K$7$F(B
+$B2<$5$$!#(B
 
-Gnus $B$K(B picon $B$rI=<($5$;$k$K$O(B @code{x} $B%5%]!<%HIU$-$G(B XEmacs $B$r%3%s%Q%$(B
-$B%k$7$F$$$J$/$F$O$J$j$^$;$s!#Gr9u$h$j$b$b$C$H4qNo$J?'IU$-$N(B picon $B$rI=<((B
-$B$9$k$?$a$K$O!"(B@code{xpm} $B$+(B @code{gif} $B$N$I$A$i$+$,;H$($k$h$&$K%3%s%Q%$(B
-$B%k$5$l$?(B XEmacs $B$G$"$kI,MW$b$"$j$^$9!#(B
-
-@vindex gnus-picons-convert-x-face
-@code{X-Face} $B%X%C%@!<$N4i$rI=<($7$?$$$N$J$i!"(BXEmacs $B$r(B @code{xface} $B%5(B
-$B%]!<%HIU$-$G%3%s%Q%$%k$7$J$1$l$P$J$j$^$;$s!#$=$&$G$J$1$l$P!"(B
-@code{netpbm} $B%f!<%F%#%j%F%#$r%$%s%9%H!<%k$7$F$*$/$+!"$"$k$$$OB>$N2?$+$r(B
-$B;H$&$h$&$K(B @code{gnus-picons-convert-x-face} $BJQ?t$r$$$8$/$C$F$/$@$5$$!#(B
-($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
-
-@node Easy Picons
-@subsubsection $B3Z!9(B Picons
-
-picon $BI=<($rM-8z$K$9$k$K$O!"C1$K0J2<$N9T$r(B @file{~/.gnus} $B%U%!%$%k$KF~$l(B
-$B$F!"(Bgnus $B$r5/F0$7$F$/$@$5$$!#(B
-
-@lisp
-(setq gnus-use-picons t)
-(setq gnus-treat-display-picons t)
-@end lisp
-
-@code{gnus-picons-database} $B$,(B picon $B%G!<%?%Y!<%9$,4^$^$l$F$$$k%G%#%l%/(B
-$B%H%j$r;X$7$F$$$k$3$H$r3NG'$7$F$/$@$5$$!#(B
-
-$B$=$NBe$o$j$K(B Web $B>e$N(B picon $B8!:w%(%s%8%s$r;H$$$?$1$l$P!"$3$l$rDI2C$7$^$9!#(B
-
-@lisp
-(setq gnus-picons-piconsearch-url
-      "http://www.cs.indiana.edu:800/piconsearch")
-@end lisp
-
-@node Hard Picons
-@subsubsection $BFq2r(B Picons
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-Gnus $B$O!"%0%k!<%W$d5-;v$KF~$C$?$j=P$?$j$9$k$N$K=>$C$F(B picon $B$rI=<($9$k$3(B
-$B$H$,$G$-$^$9!#(BGnus $B$O(B picon $B%G!<%?%Y!<%9$N;0$D$N>O$H$I$&Aj8_:nMQ$9$l$P$h(B
-$B$$$+$rCN$C$F$$$^$9!#$9$J$o$A!"(Bgnus $B$O%K%e!<%9%0%k!<%W$N3(!"Cx<T$N4i$N3(!"(B
-$BCx<T$N%I%a%$%s$N(B picon $B$rI=<($9$k$3$H$,$G$-$^$9!#$3$N5!G=$rM-8z$K$9$k$K(B
-$B$O!"(Bpicon $B$r$I$3$+$i;}$C$F$/$k$+!"$=$7$F$I$3$KI=<($9$k$+$rA*Br$9$kI,MW$,(B
-$B$"$j$^$9!#(B
+$B$b$N$4$H$N=j:_$r4IM}$9$k$?$a$K!"0J2<$NJQ?t$r@_$1$F$$$^$9!#(B
 
 @table @code
 @item gnus-picons-database
 @vindex gnus-picons-database
-picon $B%G!<%?%Y!<%9$N>l=j!#(B@file{news}, @file{domains}, @file{users} ($B$J(B
-$B$I$J$I(B) $B$N%5%V%G%#%l%/%H%j!<$,4^$^$l$F$$$k%G%#%l%/%H%j!<$r;X$7$F$$$J$1$l(B
-$B$P$J$j$^$;$s!#$3$l$O(B @code{gnus-picons-piconsearch-url} $B$,(B @code{nil} $B$G(B
-$B$"$k$H$-$N$_;HMQ$5$l$^$9!#=i4|@_DjCM$O(B @file{/usr/local/faces/} $B$G$9!#(B
+Picon $B%G!<%?%Y!<%9$N>l=j$G$9!#$3$l$O(B @file{news}, @file{domains},
+@file{users} ($B$J$I$J$I(B) $B$N%5%V%G%#%l%/%H%j!<$,4^$^$l$F$$$k%G%#%l%/%H%j!<(B
+$B$N%j%9%H$G$9!#(B@code{("/usr/lib/picon" "/usr/local/faces")} $B$,%G%#%U%)%k(B
+$B%H$G$9!#(B
 
-@item gnus-picons-piconsearch-url
-@vindex gnus-picons-piconsearch-url
-Web $B>e$N(B picon $B8!:w%(%s%8%s$N(B URL$B!#8=:_CN$i$l$F$$$kM#0l$N%(%s%8%s(B
-$B$O(B @uref{http://www.cs.indiana.edu:800/piconsearch} $B$G$9!#%M%C%H%o!<%/CY(B
-$B1d$r2sHr$9$k$?$a$K(B icon $B$O%P%C%/%0%i%&%s%I$G<hF@$5$l$^$9!#$b$7$3$l$,(B
-@code{nil} ($B=i4|@_DjCM(B) $B$G$"$l$P!"(B
-picon $B$O(B @code{gnus-picons-database} $B$G<($5$l$k%m!<%+%k$N%G!<%?%Y!<%9$+(B
-$B$i<hF@$5$l$^$9!#(B
-
-@item gnus-picons-display-where
-@vindex gnus-picons-display-where
-picon $B2hA|$,I=<($5$l$k>l=j!#$3$l$O=i4|@_Dj$G$O(B @code{picons} $B$G$9(B ($B$3$l(B
-$B$O=i4|@_Dj$G(B @samp{*Picons*} $B%P%C%U%!$K0LCV$7$^$9(B)$B!#B>$NM-8z$J>l=j$H$7$F(B
-$B$O(B @code{article}, @code{summary} $B$"$k$$$O(B @samp{*scratch*} $B$@$m$&$HCN$C(B
-$B$?$3$H$G$O$"$j$^$;$s!#$?$@$=$N%P%C%U%!$rI8=`$N(B gnus $BAkG[CV=h(B
-$BM}(B --- @pxref{Window Layout} $B$K$h$C$F8+$($k$h$&$K$7$F$*$/$3$H$r3NG'$7$F(B
-$B$/$@$5$$!#(B
-
-@item gnus-picons-group-excluded-groups
-@vindex gnus-picons-group-excluded-groups
-$B$3$N@55,I=8=$K%^%C%A$9$k%0%k!<%W$G$O$=$N%0%k!<%W%"%$%3%s$rI=<($5$;$^$;$s!#(B
-@end table
-
-$BCm0U(B: $B$b$7(B @code{gnus-use-picons} $B$r(B @code{t} $B$K@_Dj$9$k$H!"AkG[CV(B
-$B$K(B @code{picons} $B%P%C%U%!$r4^$a$k$h$&$K@_Dj$5$l$^$9!#(B
-
-$B$5$F!"$3$l$i$r7hDj$7$?8e$K$O!"$3$l$i$N3($,@5$7$$;~$KI=<($5$l$k$h$&$K!"0J(B
-$B2<$N4X?t$rE,@Z$J%U%C%/$KDI2C$9$kI,MW$,$"$j$^$9!#(B
-
-@vindex gnus-picons-display-where
-
-@table @code
-@item gnus-article-display-picons
-@findex gnus-article-display-picons
-$BCx<T$HCx<T$N%I%a%$%s$N(B picon $B$rC5$7!"(B@code{gnus-picons-display-where} $B%P%C(B
-$B%U%!$KI=<($7$^$9!#(B
-
-@item gnus-picons-article-display-x-face
-@findex gnus-picons-article-display-x-face
-X-Face $B%X%C%@!<$,$"$l$P$=$l$rI|9f2=$7I=<($7$^$9!#(B($BCm(B: $BJQ?t(B/$B4X?tL>$K(B
-$B$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
-@end table
-
-@node Picon Useless Configuration
-@subsubsection $BL50UL#$J(B Picon $B@_Dj(B
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-$B0J2<$NJQ?t$O!"$5$i$K$3$l$i$r$I$&<B9T$9$k$+!"$I$3$KG[CV$9$k$+!"$=$NB>Lr$K(B
-$B$bN)$?$J$$$I$&$G$b$h$$$3$H$r@)8f$G$-$k$h$&$K$7$^$9!#(B
-
-@table @code
-@item gnus-picons-news-directories
-@vindex gnus-picons-news-directories
-@code{gnus-picons-database} $B$+$i%K%e!<%9%0%k!<%W%U%'%$%9$rC5$9$?$a$N%5%V(B
-$B%G%#%l%/%H%j!<$N%j%9%H!#(B@code{("news")} $B$,=i4|@_DjCM$G$9!#(B
+@item gnus-picon-news-directories
+@vindex gnus-picon-news-directories
+@code{gnus-picons-database} $B$+$i%K%e!<%9%0%k!<%WMQ$N%U%'!<%9$rC5$9$?$a$N(B
+$B%5%V%G%#%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("news")} $B$G$9!#(B
 
 @item gnus-picons-user-directories
 @vindex gnus-picons-user-directories
-@code{gnus-picons-database} $B$+$iMxMQ<T%U%'%$%9$rC5$9$?$a$N%5%V%G%#%l%/%H(B
-$B%j!<$N%j%9%H!#(B@code{("local" "users" "usenix" "misc")} $B$,=i4|@_DjCM$G$9!#(B
+@code{gnus-picons-database} $B$+$i%f!<%6$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#%l%/(B
+$B%H%j!<$N%j%9%H$G$9!#(B@code{("local" "users" "usenix" "misc")} $B$,%G%#%U%)(B
+$B%k%H$G$9!#(B
 
 @item gnus-picons-domain-directories
 @vindex gnus-picons-domain-directories
-@code{gnus-picons-database} $B$+$i%I%a%$%sL>%U%'%$%9$rC5$9$?$a$N%5%V%G%#%l(B
-$B%/%H%j!<$N%j%9%H!#=i4|@_DjCM$O(B @code{("domains")} $B$G$9!#$3$N%j%9%H(B
-$B$K(B @samp{"unknown"} $B$rDI2C$7$F$*$-$?$/$J$k?M$b$$$k$G$7$g$&!#(B
+@code{gnus-picons-database} $B$+$i%I%a%$%sL>$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#(B
+$B%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("domains")} $B$G$9!#$3$N%j%9(B
+$B%H$K(B @samp{"unknown"} $B$rDI2C$7$F$*$-$?$/$J$k?M$b$$$k$G$7$g$&!#(B
 
-@item gnus-picons-convert-x-face
-@vindex gnus-picons-convert-x-face
-$B$b$7(B XEmacs $B$K(B @code{xface} $B%5%]!<%H$,AH$_9~$^$l$F$$$J$1$l$P!"$3$NL?Na$,(B
-@code{X-Face} $B%X%C%@!<$r(B X $B%S%C%H%^%C%W(B (@code{xbm}) $B$KJQ49$9$k$N$K;HMQ(B
-$B$5$l$^$9!#=i4|@_DjCM(B
-$B$O(B @code{(format "@{ echo '/* Width=48, Height=48 */'; uncompface; @} | icontopbm | pbmtoxbm > %s" gnus-picons-x-face-file-name)} $B$G(B
-$B$9!#(B($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^(B
-$B$9!#(B)
-
-@item gnus-picons-x-face-file-name
-@vindex gnus-picons-x-face-file-name
-@code{X-Face} $B%S%C%H%^%C%W$r3JG<$7$F$*$/0l;~%U%!%$%k$NL>A0!#=i4|@_DjCM(B
-$B$O(B @code{(format "/tmp/picon-xface.%s.xbm" (user-login-name))}$B!#(B($BCm(B: $BJQ(B
-$B?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
-
-@item gnus-picons-has-modeline-p
-@vindex gnus-picons-has-modeline-p
-@code{gnus-picons-display-where} $B$r(B @code{picons} $B$K@_Dj$7$F$7$^$&$H!"(B
-XEmacs $B$N%U%l!<%`$O$a$A$c$a$A$c$K$J$C$F$7$^$&$G$7$g$&!#$3$l$rB?>/$J$j$H(B
-$B$b7Z8:$9$k$K$O!"(B@code{gnus-picons-has-modeline-p} $B$r(B @code{nil} $B$K@_Dj$7(B
-$B$F$/$@$5$$!#$3$l$O(B picon $B%P%C%U%!$+$i%b!<%I9T$r<h$j=|$-$^$9!#$3$l$O(B
-@code{gnus-picons-display-where} $B$,(B @code{picons} $B$N$H$-$N$_0UL#$,$"$j$^(B
-$B$9!#(B
-
-@item gnus-picons-refresh-before-display
-@vindex gnus-picons-refresh-before-display
-@code{nil} $B0J30$G$"$l$P!"(Bpicon $B$r7W;;$9$kA0$K5-;v%P%C%U%!$rI=<(!#=i4|@_(B
-$BDjCM$O(B @code{nil} $B$G$9!#(B
-
-@item gnus-picons-display-as-address
-@vindex gnus-picons-display-as-address
-@code{t} $B$G$"$l$P3($H0l=o$KJ8;z$GEE;R%a!<%k%"%I%l%9$rI=<(!#=i4|@_DjCM(B
-$B$O(B @code{t} $B$G$9!#(B
-
-@item gnus-picons-file-suffixes
-@vindex gnus-picons-file-suffixes
-picon $B%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N=g=x%j%9%H!#=i4|@_DjCM(B
-$B$O(B @code{("xpm" "gif" "xbm")} $B$+$i(B XEmacs $B$KAH$_9~$^$l$F$$$J$$$b$N$r0z$$(B
-$B$?$b$N$G$9!#(B
-
-@item gnus-picons-setup-hook
-@vindex gnus-picons-setup-hook
-picon $B$,$b$7I=<($5$l$F$$$l$P!"(Bpicon $B%P%C%U%!$G<B9T$5$l$k%U%C%/$G$9!#(B
-
-@item gnus-picons-display-article-move-p
-@vindex gnus-picons-display-article-move-p
-picon $B$rI=<($7$F$$$k$H$-$K%+!<%=%k0LCV$r:G=i$N6u9T$^$GF0$+$9$+$I$&$+$r;X(B
-$BDj!#$3$l$O(B @code{gnus-picons-display-where} $B$NCM$,(B @code{article} $B$G$"$k(B
-$B$H$-$N$_8z2L$,$"$j$^$9!#(B
-
-@code{nil} $B$G$"$l$P!"(Bpicon $B$r(B @code{From} $B$H(B @code{Newsgroup} $B$N4V$KI=<((B
-$B$7$^$9!#$3$l$,=i4|@_Dj$G$9!#(B
-
-@item gnus-picons-clear-cache-on-shutdown
-@vindex gnus-picons-clear-cache-on-shutdown
-Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus $B$O<B9TCf(B
-$B$K8+$D$1$?(B picon $B$rA4$F%-%c%C%7%e$7$^$9!#$3$l$O8!:w=hM}$N;~4V$rB?>/@aLs(B
-$B$G$-$^$9$,!"%a%b%j$r$$$/$i$+?)$$$^$9!#$b$7$3$NJQ?t$r(B @code{nil} $B$K@_Dj$9(B
-$B$l$P!"(Bgnus $B$O$=$N%-%c%C%7%e$r7h$7$F>C$7$^$;$s!#$=$l$r>C$75n$k$K$O<j(B
-$B$G(B @code{gnus-picons-clear-cache} $B$r8F$S=P$9I,MW$,$"$j$^$9!#(B
-@code{nil} $B$G$J$1$l$P%-%c%C%7%e$O(B gnus $B$,=*N;$9$k$?$S$K>C5n$5$l$^$9!#=i(B
-$B4|@_DjCM$O(B @code{t} $B$G$9!#(B
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
+@item gnus-picon-file-types
+@vindex gnus-picon-file-types
+Picon $B$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N=gHV%j%9%H$G$9!#%G%#%U%)%k%H$O!"(B
+@code{("xpm" "gif" "xbm")} $B$+$i(B Emacs $B$KAH$_9~$^$l$F$$$J$$$b$N$r=|30$7$?(B
+$B$b$N$G$9!#(B
 @end table
 
 @node Smileys
@@ -20489,52 +20364,27 @@ Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus $B$O
 (setq gnus-treat-display-smileys t)
 @end lisp
 
-$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{:-=}, @samp{:-(} $B$J$I(B
+$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{8-)}, @samp{:-(} $B$J$I(B
 $B$H$$$C$?$b$N(B --- $B$r3($KBP1~$5$;!"J8;z$N4i%^!<%/$NBe$o$j$K$=$N3($rI=<($7(B
 $B$^$9!#$3$NJQ49$OJ8;z$K%^%C%A$9$k@55,I=8=$H$=$l$N%U%!%$%kL>$X$NBP1~$N%j%9(B
 $B%H$G@)8f$5$l$^$9!#(B
 
-@vindex smiley-nosey-regexp-alist
-@vindex smiley-deformed-regexp-alist
-$B%9%^%$%j!<$O=i4|@_Dj$G$OFs$D$NJQ49O"A[%j%9%H$NNc$rDs6!$7$F$$$^$9!#(B
-@code{smiley-deformed-regexp-alist} (@samp{:)}, @samp{:(} $B$J$I$K%^%C%A(B
-$B$9$k(B) $B$H!"(B@code{smiley-nosey-regexp-alist} (@samp{:-)}, @samp{:-(} $B$J$I(B
-$B$K%^%C%A$9$k(B) $B$G$9!#(B
+@vindex smiley-regexp-alist
+$B;H$o$l$kO"A[%j%9%H$O!"JQ?t(B @code{smiley-regexp-alist} $B$G@_Dj$7$^$9!#3FMW(B
+$BAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$($?$$(B
+$B%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$%k$N(B
+$BL>A0$G$9!#(B
 
-$B;HMQ$5$l$kO"A[%j%9%H$O(B @code{smiley-regexp-alist} $BJQ?t$G;XDj$5$l$^$9!#$3(B
-$B$N=i4|@_DjCM$O(B @code{smiley-deformed-regexp-alist} $B$G$9!#(B
-
-$B3FMWAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$((B
-$B$?$$%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$(B
-$B%k$NL>A0$G$9!#(B
-
-$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j!"$"$k$$$O$I$N?'$r;H(B
-$B$&$+$H!"$=$NB>$N$b$N$r%+%9%?%^%$%:$7$^$9!#(B
+$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j$r%+%9%?%^%$%:$7$^$9(B:
 
 @table @code
 @item smiley-data-directory
 @vindex smiley-data-directory
 $B%9%^%$%j!<$,4i%U%!%$%k$rC5$9>l=j!#(B
 
-@item smiley-flesh-color
-@vindex smiley-flesh-color
-$BH)$N?'!#=i4|@_DjCM$O!"?M<o:9JLE*$@$1$I(B @samp{yellow} $B$G$9!#(B
-
-@item smiley-features-color
-@vindex smiley-features-color
-$B%U%'%$%9$N5!G=$N?'!#=i4|@_DjCM$O(B @samp{black} $B$G$9!#(B
-
-@item smiley-tongue-color
-@vindex smiley-tongue-color
-$B@e$N?'!#=i4|@_DjCM$O(B @samp{red} $B$G$9!#(B
-
-@item smiley-circle-color
-@vindex smiley-circle-color
-$B4i$N<~$j$N4]$N?'!#=i4|@_DjCM$O(B @samp{black} $B$G$9!#(B
-
-@item smiley-mouse-face
-@vindex smiley-mouse-face
-$B%^%&%9$G6/D4I=<($7$?$H$-$N4i!#(B
+@item gnus-smiley-file-types
+@vindex gnus-smiley-file-types
+$B%9%^%$%j!<$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N%j%9%H$G$9!#(B
 @end table
 
 @node X-Face
@@ -20622,35 +20472,6 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
                                  "~/My-face.gif"))))))
 @end lisp
 
-@node Toolbar
-@subsection $B%D!<%k%P!<(B
-
-@table @code
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-@item gnus-use-toolbar
-@vindex gnus-use-toolbar
-@code{nil} $B$J$i$P%D!<%k%P!<$rI=<($7$J$$!#(B@code{nil} $B0J30$N>l9g$O!"(B
-@code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar}, @code{right-toolbar}, @code{left-toolbar} $B$N(B
-$B$I$l$+$G$J$/$F$O$J$j$^$;$s!#(B
-
-@item gnus-group-toolbar
-@vindex gnus-group-toolbar
-$B%0%k!<%W%P%C%U%!Fb$N%D!<%k%P!<!#(B
-
-@item gnus-summary-toolbar
-@vindex gnus-summary-toolbar
-$B35N,%P%C%U%!Fb$N%D!<%k%P!<!#(B
-
-@item gnus-summary-mail-toolbar
-@vindex gnus-summary-mail-toolbar
-$B%a!<%k%0%k!<%W$N35N,%P%C%U%!Fb$N%D!<%k%P!<!#(B
-@end table
-
 @node XVarious
 @subsection $B$5$^$6$^$J(B XEmacs $BJQ?t(B
 
@@ -20669,20 +20490,43 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 @item gnus-xmas-logo-color-style
 @vindex gnus-xmas-logo-color-style
 $B$3$l$OA05-$NO"A[%j%9%H$G?'$r8!:w$9$k$N$K;H$o$l$k%-!<$G$9!#M-8z$JCM$K(B
-$B$O(B @code{flame}, @code{pine}, @code{moss}, @code{irish}, @code{sky}, @code{tin}, @code{velvet}, @code{grape}, @code{labia}, @code{berry}, @code{neutral}, @code{september} $B$,(B
-$B$"$j$^$9!#(B
+$B$O(B @code{flame}, @code{pine}, @code{moss}, @code{irish}, @code{sky},
+@code{tin}, @code{velvet}, @code{grape}, @code{labia}, @code{berry},
+@code{neutral}, @code{september} $B$,$"$j$^$9!#(B
 
 @item gnus-xmas-modeline-glyph
 @vindex gnus-xmas-modeline-glyph
 $BA4$F$N(B gnus $B%b!<%I9T$GI=<($5$l$k3(J8;z!#$3$l$O=i4|@_Dj$G$O$A$$$5$J(B
 $B%L!<(B (gnu) $B$NF,$G$9!#(B
+@end table
+
+@subsubsection $B%D!<%k%P!<(B
+
+@table @code
+@item gnus-use-toolbar
+@vindex gnus-use-toolbar
+@code{nil} $B$J$i$P%D!<%k%P!<$rI=<($7$^$;$s!#(B@code{nil} $B0J30$N>l9g$O!"(B
+@code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar},
+@code{right-toolbar}, @code{left-toolbar} $B$N$I$l$+$G$J$/$F$O$J$j$^$;$s!#(B
+
+@item gnus-group-toolbar
+@vindex gnus-group-toolbar
+$B%0%k!<%W%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+
+@item gnus-summary-toolbar
+@vindex gnus-summary-toolbar
+$B35N,%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+
+@item gnus-summary-mail-toolbar
+@vindex gnus-summary-mail-toolbar
+$B%a!<%k%0%k!<%W$N35N,%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+@end table
 
 @iftex
 @iflatex
 \margindex{}
 @end iflatex
 @end iftex
-@end table
 
 @node Fuzzy Matching
 @section $B%U%!%8!<$J0lCW(B
@@ -21201,6 +21045,7 @@ spam-check-bogofilter$B!"(Bspam-check-ifile $B$^$?$O(B spam-check-stat ($B$
 * Blacklists and Whitelists::   
 * BBDB Whitelists::             
 * Blackholes::                  
+* Regular Expressions Header Matching::  
 * Bogofilter::                  
 * ifile spam filtering::        
 * spam-stat spam filtering::    
@@ -21334,6 +21179,40 @@ spam-check-bogofilter$B!"(Bspam-check-ifile $B$^$?$O(B spam-check-stat ($B$
 
 $B%V%i%C%/%[!<%k!&%A%'%C%/$OF~$C$FMh$k%a!<%k$KBP$7$F$@$19T$J$o$l$^$9!#%V%i%C(B
 $B%/%[!<%k$K(B spam $B$^$?$O(B ham $B%W%m%;%C%5!<$O$"$j$^$;$s!#(B
+
+@node Regular Expressions Header Matching
+@subsubsection $B@55,I=8=$K$h$k%X%C%@!<$N9gCW8!::(B
+@cindex spam filtering
+@cindex regular expressions header matching, spam filtering
+@cindex spam
+
+@defvar spam-use-regex-headers
+
+$B$3$N%*%W%7%g%s$O%G%#%U%)%k%H$GL58z$K$J$C$F$$$^$9!#$3$N%*%W%7%g%s$r%;%C%H(B
+$B$9$k$H!"(Bgnus $B$K@55,I=8=$N%j%9%H$H%a%C%;!<%8%X%C%@!<$r>H9g$5$;$k$3$H$,$G(B
+$B$-$^$9!#JQ?t(B @code{spam-regex-headers-spam} $B$*$h(B
+$B$S(B @code{spam-regex-headers-ham} $B$,@55,I=8=$N%j%9%H$r;}$A$^$9!#%a%C%;!<(B
+$B%8$,(B spam $B$^$?$O(B ham $B$+$I$&$+$r7h$a$k$?$a$K!"(BGnus $B$O%a%C%;!<%8%X%C%@!<$N(B
+$B$=$l$>$l$r8!::$7$^$9!#(B
+
+@end defvar
+
+@defvar spam-regex-headers-spam
+
+$B%a%C%;!<%8%X%C%@!<$NCf$G0lCW$7$?;~$K!"$=$l$,L@$i$+$K(B spam $B$G$"$k$3$H$r8+(B
+$BJ,$1$k$?$a$N@55,I=8=$N%j%9%H$G$9!#(B
+
+@end defvar
+
+@defvar spam-regex-headers-ham
+
+$B%a%C%;!<%8%X%C%@!<$NCf$G0lCW$7$?;~$K!"$=$l$,L@$i$+$K(B ham $B$G$"$k$3$H$r8+(B
+$BJ,$1$k$?$a$N@55,I=8=$N%j%9%H$G$9!#(B
+
+@end defvar
+
+$B@55,I=8=$K$h$k%X%C%@!<$N8!::$O!"F~$C$F$-$?%a!<%k$KBP$7$F$@$19T$J$o$l$^$9!#(B
+$B@55,I=8=$N$?$a$KFCM-$J(B spam $B$^$?$O(B ham $B%W%m%;%C%5!<$O$"$j$^$;$s!#(B
 
 @node Bogofilter
 @subsubsection Bogofilter

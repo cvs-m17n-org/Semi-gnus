@@ -237,6 +237,10 @@ NOTE: This variable is never seen to work in Emacs 20 and XEmacs 21.")
   "*Hook run just before posting an article.  It is supposed to be used
 to insert Cancel-Lock headers.")
 
+(defvoo nntp-read-timeout 0.1
+  "How long nntp should wait between checking for the end of output.
+Shorter values mean quicker response, but is more CPU intensive.")
+
 ;;; Internal variables.
 
 (defvar nntp-record-commands nil
@@ -611,17 +615,15 @@ command whose response triggered the error."
 					      nntp-server-buffer))
 				    (buffer  (and process
 						  (process-buffer process))))
-					; when I an able to identify
-					; the connection to the server
-					; AND I've received NO reponse
-					; for nntp-connection-timeout
-					; seconds.
+				;; When I an able to identify the
+				;; connection to the server AND I've
+				;; received NO reponse for
+				;; nntp-connection-timeout seconds.
 				(when (and buffer (eq 0 (buffer-size buffer)))
-					; Close the connection.	 Take
-					; no other action as the
-					; accept input code will
-					; handle the closed
-					; connection.
+				  ;; Close the connection.  Take no
+				  ;; other action as the accept input
+				  ;; code will handle the closed
+				  ;; connection.
 				  (nntp-kill-buffer buffer))))))))
 		(unwind-protect
 		    (setq nntp-with-open-group-internal
@@ -629,8 +631,7 @@ command whose response triggered the error."
 			      (progn ,@forms)
 			    (quit
 			     (nntp-close-server)
-                             (signal 'quit nil)))
-                          )
+                             (signal 'quit nil))))
 		  (when timer
 		    (nnheader-cancel-timer timer)))
 		nil))
@@ -764,7 +765,8 @@ command whose response triggered the error."
                            (set-buffer buf)
                            (goto-char (point-max))
                            (if (not nntp-server-list-active-group)
-                               (not (re-search-backward "\r?\n" (- (point) 3) t))
+                               (not (re-search-backward "\r?\n"
+							(- (point) 3) t))
                              (not (re-search-backward "^\\.\r?\n"
                                                       (- (point) 4) t)))))
                (nntp-accept-response)))
@@ -1335,7 +1337,7 @@ password contained in '~/.nntp-authinfo'."
     (nnheader-report 'nntp message)
     message))
 
-(defun nntp-accept-process-output (process &optional timeout)
+(defun nntp-accept-process-output (process)
   "Wait for output from PROCESS and message some dots."
   (save-excursion
     (set-buffer (or (nntp-find-connection-buffer nntp-server-buffer)
@@ -1345,15 +1347,18 @@ password contained in '~/.nntp-authinfo'."
       (unless (< len 10)
 	(setq nntp-have-messaged t)
 	(nnheader-message 7 "nntp read: %dk" len)))
-    (if timeout
-	(accept-process-output process timeout)
-      (accept-process-output process 0 100))
+    (accept-process-output
+     process
+     (truncate nntp-read-timeout)
+     (truncate (* (- nntp-read-timeout
+		     (truncate nntp-read-timeout))
+		  1000)))
     ;; accept-process-output may update status of process to indicate
     ;; that the server has closed the connection.  This MUST be
     ;; handled here as the buffer restored by the save-excursion may
     ;; be the process's former output buffer (i.e. now killed)
     (or (and process 
-            (memq (process-status process) '(open run)))
+	     (memq (process-status process) '(open run)))
         (nntp-report "Server closed connection"))))
 
 (defun nntp-accept-response ()
@@ -1503,12 +1508,13 @@ password contained in '~/.nntp-authinfo'."
 		     (while (re-search-forward "^[0-9][0-9][0-9] .*\n" nil t)
 		       (incf received))
 		     (setq last-point (point))
-		     (or (< received count) ;; I haven't started reading the final response
+		     (or (< received count)
+			 ;; I haven't started reading the final response
                          (progn
                            (goto-char (point-max))
                            (forward-line -1)
-                           (not (looking-at "^\\.\r?\n"))) ;; I haven't read the end of the final response
-                         ))
+                           (not (looking-at "^\\.\r?\n")))))
+	      ;; I haven't read the end of the final response
 	      (nntp-accept-response)
 	      (set-buffer process-buffer))))
 
@@ -1526,8 +1532,9 @@ password contained in '~/.nntp-authinfo'."
         (when (<= count 1)
           (goto-char (point-min))
           (when (re-search-forward "^[0-9][0-9][0-9] .*\n\\([0-9]+\\)" nil t)
-            (let ((low-limit (string-to-int (buffer-substring (match-beginning 1) 
-                                                              (match-end 1)))))
+            (let ((low-limit (string-to-int
+			      (buffer-substring (match-beginning 1) 
+						(match-end 1)))))
               (while (and articles (<= (car articles) low-limit))
                 (setq articles (cdr articles))))))
         (set-buffer buf))

@@ -4,7 +4,7 @@ What is T-gnus?
 ===============
 
   T-gnus is an improvement of Gnus with SEMI's MIME feature. T-gnus
-6.15 is based on Oort Gnus v0.13. SEMI may stand for "SEMI is Emacs
+6.15 is based on Oort Gnus v0.14. SEMI may stand for "SEMI is Emacs
 MIME Interface" and is developped to provide an easy interfaces for
 users to handle MIME message structures. For further information,
 refer to REASME.en of SEMI.
