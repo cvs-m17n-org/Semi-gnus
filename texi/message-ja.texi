@@ -488,7 +488,7 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 能があります。もしあなたが度を越して引用行を変更してしまうと、それを読む
 人たちも彼らの gnus を対応させなければならなくなるでしょう。変
 数 @code{gnus-cite-attribution-suffix} を参照して下さい。詳細
-は @xref{記事のハイライト, , Article Highlighting, gnus} にあります。
+は @xref{Article Highlighting, , 記事のハイライト, gnus-ja}, にあります。
 
 @item message-yank-prefix
 @vindex message-yank-prefix

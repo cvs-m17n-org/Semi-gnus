@@ -1,5 +1,8 @@
 2001-07-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* texi/message-ja.texi (message-citation-line-function): Add a
+	comma just after the `@xref' form.
+
 	* lisp/nnheader.el (nnheader-header-value): Ignore leading
 	whitespaces.
 
