@@ -951,8 +951,7 @@ See Info node `(gnus)Customizing Articles' for details."
 
 (defcustom gnus-treat-emphasize
   (and (or window-system
-	   (featurep 'xemacs)
-	   (>= (string-to-number emacs-version) 21))
+	   (featurep 'xemacs))
        50000)
   "Emphasize text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -4275,9 +4274,6 @@ General format specifiers can also be used.  See Info node
 
 (defvar gnus-mime-button-map
   (let ((map (make-sparse-keymap)))
-    (unless (>= (string-to-number emacs-version) 21)
-      ;; XEmacs doesn't care.
-      (set-keymap-parent map gnus-article-mode-map))
     (define-key map gnus-mouse-2 'gnus-article-push-button)
     (define-key map gnus-down-mouse-3 'gnus-mime-button-menu)
     (dolist (c gnus-mime-button-commands)
@@ -6238,7 +6234,7 @@ The function must take one argument, the string naming the URL."
 
 (defcustom gnus-button-ctan-directory-regexp
   (concat
-   "\\("; Cannot use `\(?: ... \)' (compatibility with Emacs 20).
+   "\\(?:"
    "biblio\\|digests\\|dviware\\|fonts\\|graphics\\|help\\|"
    "indexing\\|info\\|language\\|macros\\|support\\|systems\\|"
    "tds\\|tools\\|usergrps\\|web\\|nonfree\\|obsolete"
@@ -7222,11 +7218,14 @@ specified by `gnus-button-alist'."
 
 (defvar gnus-prev-page-map
   (let ((map (make-sparse-keymap)))
-    (unless (>= emacs-major-version 21)
-      ;; XEmacs doesn't care.
-      (set-keymap-parent map gnus-article-mode-map))
     (define-key map gnus-mouse-2 'gnus-button-prev-page)
     (define-key map "\r" 'gnus-button-prev-page)
+    map))
+
+(defvar gnus-next-page-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map gnus-mouse-2 'gnus-button-next-page)
+    (define-key map "\r" 'gnus-button-next-page)
     map))
 
 (defun gnus-insert-prev-page-button ()
@@ -7247,15 +7246,6 @@ specified by `gnus-button-alist'."
 	       (point))
      :action 'gnus-button-prev-page
      :button-keymap gnus-prev-page-map)))
-
-(defvar gnus-next-page-map
-  (let ((map (make-sparse-keymap)))
-    (unless (>= emacs-major-version 21)
-      ;; XEmacs doesn't care.
-      (set-keymap-parent map gnus-article-mode-map))
-    (define-key map gnus-mouse-2 'gnus-button-next-page)
-    (define-key map "\r" 'gnus-button-next-page)
-    map))
 
 (defun gnus-button-next-page (&optional args more-args)
   "Go to the next page."
@@ -7533,8 +7523,6 @@ For example:
 
 (defvar gnus-mime-security-button-map
   (let ((map (make-sparse-keymap)))
-    (unless (>= (string-to-number emacs-version) 21)
-      (set-keymap-parent map gnus-article-mode-map))
     (define-key map gnus-mouse-2 'gnus-article-push-button)
     (define-key map "\r" 'gnus-article-press-button)
     map))
