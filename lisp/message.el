@@ -2339,8 +2339,6 @@ to find out how to use this."
 	 nil)
 	(t t))))))
 
-(defconst message-max-size 60000)
-
 (defun message-check-news-body-syntax ()
   (and
    ;; Check for long lines.
