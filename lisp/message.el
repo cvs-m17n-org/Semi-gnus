@@ -2206,29 +2206,39 @@ It should typically alter the sending method in some way or other."
 	      (message-mime-mode mime-edit-mode-flag)
 	      (alist message-send-method-alist)
 	      (success t)
-	      elem sent)
-	  (unwind-protect
-	      (if (save-excursion
-		    (set-buffer message-encoding-buffer)
-		    (erase-buffer)
-		    (insert-buffer message-edit-buffer)
-		    (funcall message-encode-function)
-		    (message-fix-before-sending)
-		    (while (and success
-				(setq elem (pop alist)))
-		      (and (funcall (cadr elem))
-			   (and (or (not (memq (car elem)
-					       message-sent-message-via))
-				    (y-or-n-p
-				     (format
-				      "Already sent message via %s; resend? "
-				      (car elem))))
-				(setq success (funcall (caddr elem) arg)))
-			   (setq sent t)))
-		    (not (and success sent)))
-		  (throw 'message-sending-cancel t)
+	      elem sent header-encoded)
+	  (save-excursion
+	    (set-buffer message-encoding-buffer)
+	    (erase-buffer)
+	    (insert-buffer message-edit-buffer)
+	    (funcall message-encode-function)
+	    (message-fix-before-sending)
+	    (while (and success
+			(setq elem (pop alist)))
+	      (when (or (not (funcall (cadr elem)))
+			(and (or (not (memq (car elem)
+					    message-sent-message-via))
+				 (y-or-n-p
+				  (format
+				   "Already sent message via %s; resend? "
+				   (car elem))))
+			     (setq success (funcall (caddr elem) arg))
+			     (setq header-encoded t)))
+		(setq sent t))))
+	  (unless (or sent (not success))
+	    (error "No methods specified to send by"))
+	  (unless header-encoded
+	    (save-excursion
+	      (set-buffer message-encoding-buffer)
+	      (run-hooks 'message-header-hook)
+	      (when (functionp message-header-encode-function)
+		(funcall message-header-encode-function))
+	      (run-hooks 'message-header-encoded-hook)))
+	  (prog1
+	      (when (and success sent)
 		(message-do-fcc)
-		(run-hooks 'message-sent-hook)
+		(save-excursion
+		  (run-hooks 'message-sent-hook))
 		(message "Sending...done")
 		;; Mark the buffer as unmodified and delete auto-save.
 		(set-buffer-modified-p nil)
@@ -2237,6 +2247,7 @@ It should typically alter the sending method in some way or other."
 		;; Delete other mail buffers and stuff.
 		(message-do-send-housekeeping)
 		(message-do-actions message-send-actions)
+		;; Return success.
 		nil)
 	    (kill-buffer message-encoding-buffer))))
       (progn
