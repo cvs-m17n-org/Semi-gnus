@@ -109,8 +109,7 @@
   (void-variable
    ;; Bind keywords.
    (mapcar (lambda (keyword) (set keyword keyword))
-	   '(:button-keymap
-	     :data :file :mime-handle :path :predicate :user))))
+	   '(:button-keymap :data :file :mime-handle))))
 
 ;; Unknown variables and functions.
 (unless (boundp 'buffer-file-coding-system)
