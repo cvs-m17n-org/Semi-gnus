@@ -1,3 +1,8 @@
+2003-02-13  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* GNUS-NEWS: Add user visible changes from Michael Shields from
+	the past couple of days.  Actual text from Michael.
+
 2003-02-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.16 (quimby) revision 00.
