@@ -1,3 +1,11 @@
+1999-05-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-art.el (article-date-ut): Keep the original X-Sent
+	field, fix the position of the converted date to be displayed,
+	etc.
+
 1999-05-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
