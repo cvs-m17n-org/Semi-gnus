@@ -271,8 +271,8 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 ニュースを使います。
 
 @table @code
-@item message-ignored-forward-headers
-@vindex message-ignored-forward-headers
+@item message-forward-ignored-headers
+@vindex message-forward-ignored-headers
 この正規表現に合致するすべてのヘッダーが、転送されるメッセージから削除さ
 れます。
 
