@@ -1248,6 +1248,21 @@ Point is left at the beginning of the narrowed-to region."
      (point-max)))
   (goto-char (point-min)))
 
+(defun message-narrow-to-headers-or-head ()
+  "Narrow the buffer to the head of the message."
+  (widen)
+  (narrow-to-region
+   (goto-char (point-min))
+   (cond
+    ((re-search-forward
+      (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+     (match-beginning 0))
+    ((search-forward "\n\n" nil t)
+     (1- (point)))
+    (t
+     (point-max))))
+  (goto-char (point-min)))
+
 (defun message-news-p ()
   "Say whether the current buffer contains a news message."
   (and (not message-this-is-mail)
@@ -2757,7 +2772,6 @@ to find out how to use this."
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (insert-buffer-substring message-encoding-buffer)
       (save-restriction
@@ -2836,6 +2850,8 @@ If NOW, use that time instead."
   (let* ((now (or now (current-time)))
 	 (zone (nth 8 (decode-time now)))
 	 (sign "+"))
+    (when (< zone 0)
+      (setq sign ""))
     ;; We do all of this because XEmacs doesn't have the %z spec.
     (concat (format-time-string "%d %b %Y %H:%M:%S " (or now (current-time)))
 	    (format "%s%02d%02d"
@@ -3951,7 +3967,6 @@ that further discussion should take place only in "
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
-	(buffer-disable-undo (current-buffer))
 	(erase-buffer)
 	(insert "Newsgroups: " newsgroups "\n"
 		"From: " (message-make-from) "\n"
@@ -4146,7 +4161,6 @@ Optional NEWS will use news to forward instead of mail."
 	  beg)
       ;; We first set up a normal mail buffer.
       (set-buffer (get-buffer-create " *message resend*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       ;; avoid to turn-on-mime-edit
       (let (message-setup-hook)

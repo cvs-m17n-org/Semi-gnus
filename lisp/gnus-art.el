@@ -958,8 +958,8 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-(defun gnus-article-decode-rfc1522 ()
-  "Decode MIME encoded-words in header fields."
+(defun article-decode-encoded-words ()
+  "Remove encoded-word encoding from headers."
   (let (buffer-read-only)
     (let ((charset (save-excursion
 		     (set-buffer gnus-summary-buffer)
@@ -1065,7 +1065,9 @@ always hide."
       (goto-char (point-min))
       (search-forward "\n\n" nil t)
       (while (re-search-forward "^[ \t]+$" nil t)
-	(replace-match "" nil t))
+	(unless (gnus-annotation-in-region-p
+		 (match-beginning 0) (match-end 0))
+	  (replace-match "" nil t)))
       ;; Then replace multiple empty lines with a single empty line.
       (goto-char (point-min))
       (search-forward "\n\n" nil t)
@@ -2516,10 +2518,10 @@ If given a prefix, show the hidden text instead."
 	  (let (buffer-read-only)
 	    (erase-buffer)
 	    (insert-buffer-substring gnus-article-buffer))
-	  (setq gnus-original-article (cons group article))))
+	  (setq gnus-original-article (cons group article)))
 
-      ;; Decode charsets.
-      (run-hooks 'gnus-article-decode-hook)
+	;; Decode charsets.
+	(run-hooks 'gnus-article-decode-hook))
       
       ;; Update sparse articles.
       (when (and do-update-line

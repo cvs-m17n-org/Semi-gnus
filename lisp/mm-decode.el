@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'drums)
+(require 'mail-parse)
 (require 'mailcap)
 (require 'mm-bodies)
 
@@ -51,7 +51,10 @@
     ("text/.*" . inline)))
 
 (defvar mm-user-automatic-display
-  '("text/plain" "image/gif"))
+  '("text/plain" "text/html" "image/gif"))
+
+(defvar mm-alternative-precedence '("text/plain" "text/html")
+  "List that describes the precedence of alternative parts.")
 
 (defvar mm-tmp-directory "/tmp/"
   "Where mm will store its temporary files.")
@@ -60,33 +63,66 @@
 
 (defvar mm-dissection-list nil)
 (defvar mm-last-shell-command "")
+(defvar mm-content-id-alist nil)
+
+;;; Convenience macros.
+
+(defmacro mm-handle-buffer (handle)
+  `(nth 0 ,handle))
+(defmacro mm-handle-type (handle)
+  `(nth 1 ,handle))
+(defmacro mm-handle-encoding (handle)
+  `(nth 2 ,handle))
+(defmacro mm-handle-undisplayer (handle)
+  `(nth 3 ,handle))
+(defmacro mm-handle-set-undisplayer (handle function)
+  `(setcar (nthcdr 3 ,handle) ,function))
+(defmacro mm-handle-disposition (handle)
+  `(nth 4 ,handle))
+(defmacro mm-handle-description (handle)
+  `(nth 5 ,handle))
+
+;;; The functions.
 
 (defun mm-dissect-buffer (&optional no-strict-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
-    (let (ct ctl type subtype cte)
+    (let (ct ctl type subtype cte cd description id result)
       (save-restriction
-	(drums-narrow-to-header)
+	(mail-narrow-to-head)
 	(when (and (or no-strict-mime
 		       (mail-fetch-field "mime-version"))
 		   (setq ct (mail-fetch-field "content-type")))
-	  (setq ctl (drums-parse-content-type ct))
-	  (setq cte (mail-fetch-field "content-transfer-encoding"))))
+	  (setq ctl (mail-header-parse-content-type ct)
+		cte (mail-fetch-field "content-transfer-encoding")
+		cd (mail-fetch-field "content-disposition")
+		description (mail-fetch-field "content-description")
+		id (mail-fetch-field "content-id"))))
       (when ctl
 	(setq type (split-string (car ctl) "/"))
 	(setq subtype (cadr type)
 	      type (pop type))
-	(cond
-	 ((equal type "multipart")
-	  (mm-dissect-multipart ctl))
-	 (t
-	  (mm-dissect-singlepart ctl (and cte (intern cte))
-				 no-strict-mime)))))))
+	(setq
+	 result
+	 (cond
+	  ((equal type "multipart")
+	   (mm-dissect-multipart ctl))
+	  (t
+	   (mm-dissect-singlepart
+	    ctl
+	    (and cte (intern (downcase (mail-header-remove-whitespace
+					(mail-header-remove-comments
+					 cte)))))
+	    no-strict-mime
+	    (and cd (mail-header-parse-content-disposition cd))))))
+	(when id
+	  (push (cons id result) mm-content-id-alist))
+	result))))
 
-(defun mm-dissect-singlepart (ctl cte &optional force)
+(defun mm-dissect-singlepart (ctl cte &optional force cdl description)
   (when (or force
 	    (not (equal "text/plain" (car ctl))))
-    (let ((res (list (list (mm-copy-to-buffer) ctl cte nil))))
+    (let ((res (list (list (mm-copy-to-buffer) ctl cte nil cdl description))))
       (push (car res) mm-dissection-list)
       res)))
 
@@ -98,7 +134,7 @@
 
 (defun mm-dissect-multipart (ctl)
   (goto-char (point-min))
-  (let ((boundary (concat "\n--" (drums-content-type-get ctl 'boundary)))
+  (let ((boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
 	start parts end)
     (while (search-forward boundary nil t)
       (forward-line -1)
@@ -127,28 +163,29 @@
   "Display the MIME part represented by HANDLE."
   (save-excursion
     (mailcap-parse-mailcaps)
-    (if (nth 3 handle)
+    (if (mm-handle-undisplayer handle)
 	(mm-remove-part handle)
-      (let* ((type (caadr handle))
+      (let* ((type (car (mm-handle-type handle)))
 	     (method (mailcap-mime-info type))
 	     (user-method (mm-user-method type)))
 	(if (eq user-method 'inline)
 	    (progn
 	      (forward-line 1)
 	      (mm-display-inline handle))
-	  (mm-display-external handle (or user-method method)))))))
+	  (mm-display-external
+	   handle (or user-method method 'mailcap-save-binary-file)))))))
 
 (defun mm-display-external (handle method)
   "Display HANDLE using METHOD."
   (mm-with-unibyte-buffer
-    (insert-buffer-substring (car handle))
-    (mm-decode-content-transfer-encoding (nth 2 handle))
+    (insert-buffer-substring (mm-handle-buffer handle))
+    (mm-decode-content-transfer-encoding (mm-handle-encoding handle))
     (if (functionp method)
 	(let ((cur (current-buffer)))
 	  (switch-to-buffer (generate-new-buffer "*mm*"))
 	  (insert-buffer-substring cur)
 	  (funcall method)
-	  (setcar (nthcdr 3 handle) (current-buffer)))
+	  (mm-handle-set-undisplayer handle (current-buffer)))
       (let* ((file (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
 	     process)
 	(write-region (point-min) (point-max)
@@ -156,35 +193,37 @@
 	(setq process
 	      (start-process "*display*" nil shell-file-name
 			     "-c" (format method file)))
-	(setcar (nthcdr 3 handle) (cons file process))
+	(mm-handle-set-undisplayer handle (cons file process))
 	(message "Displaying %s..." (format method file))))))
 
 (defun mm-remove-part (handle)
   "Remove the displayed MIME part represented by HANDLE."
-  (let ((object (nth 3 handle)))
-    (cond
-     ;; Internally displayed part.
-     ((mm-annotationp object)
-      (delete-annotation object))
-     ((or (functionp object)
-	  (and (listp object)
-	       (eq (car object) 'lambda)))
-      (funcall object))
-     ;; Externally displayed part.
-     ((consp object)
-      (condition-case ()
-	  (delete-file (car object))
-	(error nil))
-      (condition-case ()
-	  (kill-process (cdr object))
-	(error nil)))
-     ((bufferp object)
-      (when (buffer-live-p object)
-	(kill-buffer object))))
-    (setcar (nthcdr 3 handle) nil)))
+  (let ((object (mm-handle-undisplayer handle)))
+    (condition-case ()
+	(cond
+	 ;; Internally displayed part.
+	 ((mm-annotationp object)
+	  (delete-annotation object))
+	 ((or (functionp object)
+	      (and (listp object)
+		   (eq (car object) 'lambda)))
+	  (funcall object))
+	 ;; Externally displayed part.
+	 ((consp object)
+	  (condition-case ()
+	      (delete-file (car object))
+	    (error nil))
+	  (condition-case ()
+	      (kill-process (cdr object))
+	    (error nil)))
+	 ((bufferp object)
+	  (when (buffer-live-p object)
+	    (kill-buffer object))))
+      (error nil))
+    (mm-handle-set-undisplayer handle nil)))
 
 (defun mm-display-inline (handle)
-  (let* ((type (caadr handle))
+  (let* ((type (car (mm-handle-type handle)))
 	 (function (cadr (assoc type mm-inline-media-tests))))
     (funcall function handle)))
 	 
@@ -230,8 +269,8 @@ This overrides entries in the mailcap file."
 (defun mm-destroy-part (handle)
   "Destroy the data structures connected to HANDLE."
   (mm-remove-part handle)
-  (when (buffer-live-p (car handle))
-    (kill-buffer (car handle))))
+  (when (buffer-live-p (mm-handle-buffer handle))
+    (kill-buffer (mm-handle-buffer handle))))
 
 (defun mm-quote-arg (arg)
   "Return a version of ARG that is safe to evaluate in a shell."
@@ -247,84 +286,77 @@ This overrides entries in the mailcap file."
       (apply 'concat (nconc (nreverse accum) (list (substring arg pos)))))))
 
 ;;;
-;;; Functions for displaying various formats inline
-;;;
-
-(defun mm-inline-image (handle)
-  (let ((type (cadr (split-string (caadr handle) "/")))
-	image)
-    (mm-with-unibyte-buffer
-      (insert-buffer-substring (car handle))
-      (mm-decode-content-transfer-encoding (nth 2 handle))
-      (setq image (make-image-specifier
-		   (vector (intern type) :data (buffer-string)))))
-    (let ((annot (make-annotation image nil 'text)))
-      (set-extent-property annot 'mm t)
-      (set-extent-property annot 'duplicable t)
-      (setcar (nthcdr 3 handle) annot))))
-
-(defun mm-inline-text (handle)
-  (let ((type (cadr (split-string (caadr handle) "/")))
-	text buffer-read-only)
-    (mm-with-unibyte-buffer
-      (insert-buffer-substring (car handle))
-      (mm-decode-content-transfer-encoding (nth 2 handle))
-      (setq text (buffer-string)))
-    (cond
-     ((equal type "plain")
-      (let ((b (point)))
-	(insert text)
-	(save-restriction
-	  (narrow-to-region b (point))
-	  (let ((charset (drums-content-type-get (nth 1 handle) 'charset)))
-	    (when charset
-	      (mm-decode-body charset nil)))
-	  (setcar
-	   (nthcdr 3 handle)
-	   `(lambda ()
-	      (let (buffer-read-only)
-		(delete-region ,(set-marker (make-marker) (point-min))
-			       ,(set-marker (make-marker) (point-max)))))))))
-     )))
-
-(defun mm-inline-audio (handle)
-  (message "Not implemented"))
-
-;;;
 ;;; Functions for outputting parts
 ;;;
 
+(defun mm-get-part (handle)
+  "Return the contents of HANDLE as a string."
+  (mm-with-unibyte-buffer
+    (insert-buffer-substring (mm-handle-buffer handle))
+    (mm-decode-content-transfer-encoding (mm-handle-encoding handle))
+    (buffer-string)))
+
 (defun mm-save-part (handle)
   "Write HANDLE to a file."
-  (let* ((name (drums-content-type-get (cadr handle) 'name))
-	 (file (read-file-name "Save MIME part to: "
-			       (expand-file-name
-				(or name "") default-directory))))
+  (let* ((name (mail-content-type-get (mm-handle-type handle) 'name))
+	 (filename (mail-content-type-get
+		    (mm-handle-disposition handle) 'filename))
+	 file)
+    (when filename
+      (setq filename (file-name-nondirectory filename)))
+    (setq file
+	  (read-file-name "Save MIME part to: "
+			  (expand-file-name
+			   (or filename name "") default-directory)))
     (mm-with-unibyte-buffer
-      (insert-buffer-substring (car handle))
-      (mm-decode-content-transfer-encoding (nth 2 handle))
+      (insert-buffer-substring (mm-handle-buffer handle))
+      (mm-decode-content-transfer-encoding (mm-handle-encoding handle))
       (when (or (not (file-exists-p file))
-		(yes-or-no-p (format "File %s already exists; overwrite? ")))
+		(yes-or-no-p (format "File %s already exists; overwrite? "
+				     file)))
 	(write-region (point-min) (point-max) file)))))
 
 (defun mm-pipe-part (handle)
   "Pipe HANDLE to a process."
-  (let* ((name (drums-content-type-get (cadr handle) 'name))
+  (let* ((name (mail-content-type-get (car (mm-handle-type handle)) 'name))
 	 (command
 	  (read-string "Shell command on MIME part: " mm-last-shell-command)))
     (mm-with-unibyte-buffer
-      (insert-buffer-substring (car handle))
-      (mm-decode-content-transfer-encoding (nth 2 handle))
+      (insert-buffer-substring (mm-handle-buffer handle))
+      (mm-decode-content-transfer-encoding (mm-handle-encoding handle))
       (shell-command-on-region (point-min) (point-max) command nil))))
 
 (defun mm-interactively-view-part (handle)
   "Display HANDLE using METHOD."
-  (let* ((type (caadr handle))
+  (let* ((type (car (mm-handle-type handle)))
 	 (methods
 	  (mapcar (lambda (i) (list (cdr (assoc "viewer" i))))
 		  (mailcap-mime-info type 'all)))
 	 (method (completing-read "Viewer: " methods)))
     (mm-display-external (copy-sequence handle) method)))
+
+(defun mm-preferred-alternative (handles &optional preferred)
+  "Say which of HANDLES are preferred."
+  (let ((prec (if preferred (list preferred) mm-alternative-precedence))
+	p h result type)
+    (while (setq p (pop prec))
+      (setq h handles)
+      (while h
+	(setq type (car (mm-handle-type (car h))))
+	(when (and (equal p type)
+		   (mm-automatic-display-p type)
+		   (or (not (mm-handle-disposition (car h)))
+		       (equal (car (mm-handle-disposition (car h)))
+			      "inline")))
+	  (setq result (car h)
+		h nil
+		prec nil))
+	(pop h)))
+    result))
+
+(defun mm-get-content-id (id)
+  "Return the handle(s) referred to by ID."
+  (cdr (assoc id mm-content-id-alist)))
 
 (provide 'mm-decode)
 

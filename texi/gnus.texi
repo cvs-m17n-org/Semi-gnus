@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.018 Manual
+@settitle Semi-gnus 6.10.019 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -270,7 +270,7 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995,96,97 Free Software Foundation, Inc.
+Copyright \copyright{} 1995,96,97,98 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.018 Manual
+@title Semi-gnus 6.10.019 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.018.
+This manual corresponds to Semi-gnus 6.10.019.
 
 @end ifinfo
 
@@ -8073,6 +8073,12 @@ If non-@code{nil}, use the same article buffer for all the groups.
 (This is the default.)  If @code{nil}, each group will have its own
 article buffer.
 
+@vindex gnus-article-decode-hook
+@item gnus-article-decode-hook
+@cindex MIME
+Hook used to decode @sc{mime} articles.  The default value is
+@code{(article-decode-charset article-decode-encoded-words)}
+
 @vindex gnus-article-prepare-hook
 @item gnus-article-prepare-hook
 This hook is called right after the article has been inserted into the
@@ -9628,14 +9634,16 @@ used for, well, anything, really.
 
 @vindex nnmail-split-hook
 @item nnmail-split-hook
-@findex article-decode-rfc1522
+@findex article-decode-encoded-words
 @findex RFC1522 decoding
+@findex RFC2047 decoding
 Hook run in the buffer where the mail headers of each message is kept
 just before the splitting based on these headers is done.  The hook is
 free to modify the buffer contents in any way it sees fit---the buffer
 is discarded after the splitting has been done, and no changes performed
-in the buffer will show up in any files.  @code{gnus-article-decode-rfc1522}
-is one likely function to add to this hook.
+in the buffer will show up in any files.
+@code{gnus-article-decode-encoded-words} is one likely function to add
+to this hook.
 
 @vindex nnmail-pre-get-new-mail-hook
 @vindex nnmail-post-get-new-mail-hook

@@ -6994,7 +6994,7 @@ and `request-accept' functions."
 	   (set-buffer copy-buf)
 	   (when (gnus-request-article-this-buffer article gnus-newsgroup-name)
 	     (gnus-request-accept-article
-	      to-newsgroup select-method (not articles)))))
+	      to-newsgroup select-method (not articles) t))))
 	;; Crosspost the article.
 	((eq action 'crosspost)
 	 (let ((xref (message-tokenize-header
@@ -7202,7 +7202,6 @@ latter case, they will be copied into the relevant groups."
 	(error "Can't read %s" file))
     (save-excursion
       (set-buffer (gnus-get-buffer-create " *import file*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (nnheader-insert-file-contents file)
       (goto-char (point-min))
