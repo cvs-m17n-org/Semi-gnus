@@ -1,3 +1,11 @@
+2001-07-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (clever): Change the quoting style for the
+	elisp form to check for XEmacs-p.
+
+	* lisp/dgnushack.el: Require `path-util' first, and then search
+	for the path if it is not found.
+
 2001-07-05  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.

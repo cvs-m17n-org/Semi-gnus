@@ -32,10 +32,10 @@ warn: clean-some gnus-load.elc
 clever some: gnus-load.elc
 	@if test -f $(srcdir)/gnus.elc; then \
 	  echo \
-	    "checking for whether the all elc files should be recompiled..."; \
+	    "checking whether the all elc files should be recompiled..."; \
 	  RM_ELC=nil; \
 	  if test `$(EMACS) -batch -q -no-site-file \
-		-eval "(princ (format \"%s\" (featurep (quote xemacs))))" \
+		-eval '(prin1 (featurep (quote xemacs)))' \
 		2>/dev/null` = t; then \
 	    test ! -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
 	  else \
