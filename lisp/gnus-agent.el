@@ -179,9 +179,12 @@ enable expiration per categories, topics, and groups."
                 (const :format "Disable " DISABLE)))
 
 (defcustom gnus-agent-expire-unagentized-dirs t
-"Have gnus-agent-expire scan the directories under
-\(gnus-agent-directory) for groups that are no longer agentized.  When
-found, offer to remove them.")
+  "*Whether expiration should expire in unagentized directories.
+Have gnus-agent-expire scan the directories under
+\(gnus-agent-directory) for groups that are no longer agentized.
+When found, offer to remove them."
+  :type 'boolean
+  :group 'gnus-agent)
 
 ;;; Internal variables
 
@@ -1227,7 +1230,7 @@ This can be added to `gnus-select-article-hook' or
 
 (defun gnus-agent-covered-methods ()
   "Return the subset of methods that are covered by the agent."
-  (mapcar #'gnus-server-to-method gnus-agent-covered-methods))
+  (delq nil (mapcar #'gnus-server-to-method gnus-agent-covered-methods)))
 
 ;;; History functions
 
@@ -2744,7 +2747,8 @@ line." (point) nov-file)))
           (while dlist
             (let ((new-completed (truncate (* 100.0
                                               (/ (setq cnt (1+ cnt))
-                                                 len)))))
+                                                 len))))
+		  message-log-max)
               (when (> new-completed completed)
                 (setq completed new-completed)
                 (gnus-message 7 "%3d%% completed..."  completed)))
@@ -2758,16 +2762,16 @@ line." (point) nov-file)))
                ;; Kept articles are unread, marked, or special.
                (keep
                 (gnus-agent-message 10
-                                    "gnus-agent-expire: Article %d: Kept %s article%s."
-                                    article-number keep (if fetch-date " and file" ""))
+                                    "gnus-agent-expire: %s:%d: Kept %s article%s."
+                                    group article-number keep (if fetch-date " and file" ""))
                 (when fetch-date
                   (unless (file-exists-p
                            (concat dir (number-to-string
                                         article-number)))
                     (setf (nth 1 entry) nil)
                     (gnus-agent-message 3 "gnus-agent-expire cleared \
-download flag on article %d as the cached article file is missing."
-                                        (caar dlist)))
+download flag on %s:%d as the cached article file is missing."
+                                        group (caar dlist)))
                   (unless marker
                     (gnus-message 1 "gnus-agent-expire detected a \
 missing NOV entry.  Run gnus-agent-regenerate-group to restore it.")))
@@ -2835,13 +2839,14 @@ missing NOV entry.  Run gnus-agent-regenerate-group to restore it.")))
                     (push (format "Removed %s article number from \
 article alist" type) actions))
 
-                  (gnus-agent-message 8 "gnus-agent-expire: Article %d: %s"
-                                      article-number
-                                      (mapconcat 'identity actions ", "))))
+		  (when actions
+		    (gnus-agent-message 8 "gnus-agent-expire: %s:%d: %s"
+					group article-number
+					(mapconcat 'identity actions ", ")))))
                (t
                 (gnus-agent-message
-                 10 "gnus-agent-expire: Article %d: Article kept as \
-expiration tests failed." article-number)
+                 10 "gnus-agent-expire: %s:%d: Article kept as \
+expiration tests failed." group article-number)
                 (gnus-agent-append-to-list
                  tail-alist (cons article-number fetch-date)))
                )
