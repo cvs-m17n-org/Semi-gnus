@@ -1,3 +1,9 @@
+1999-01-11  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/message.el (message-draft-coding-system): Don't Call
+	`coding-system-p'. Find its default value using
+	`find-coding-system' instead.
+
 1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-munge-message-separator): Use
