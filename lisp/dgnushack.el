@@ -176,14 +176,155 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		  byte-compile-function-environment)))
   form)
 
+(when (boundp 'MULE)
+  (let (current-load-list)
+    ;; Make the function to be silent at compile-time.
+    (defun locate-library (library &optional nosuffix)
+      "Show the full path name of Emacs library LIBRARY.
+This command searches the directories in `load-path' like `M-x load-library'
+to find the file that `M-x load-library RET LIBRARY RET' would load.
+Optional second arg NOSUFFIX non-nil means don't add suffixes `.elc' or `.el'
+to the specified name LIBRARY (a la calling `load' instead of `load-library')."
+      (interactive "sLocate library: ")
+      (catch 'answer
+	(mapcar
+	 '(lambda (dir)
+	    (mapcar
+	     '(lambda (suf)
+		(let ((try (expand-file-name (concat library suf) dir)))
+		  (and (file-readable-p try)
+		       (null (file-directory-p try))
+		       (progn
+			 (or noninteractive
+			     (message "Library is file %s" try))
+			 (throw 'answer try)))))
+	     (if nosuffix '("") '(".elc" ".el" ""))))
+	 load-path)
+	(or noninteractive
+	    (message "No library %s in search path" library))
+	nil))
+    (byte-compile 'locate-library)))
+
 (condition-case nil
     :symbol-for-testing-whether-colon-keyword-is-available-or-not
   (void-variable
-   ;; Bind keywords.
-   (dolist (keyword '(:button-keymap :data :file :mime-handle
-				     :key-type :value-type
-				     :ascent :foreground :help))
-     (set keyword keyword))))
+   (defun dgnushack-bind-colon-keywords ()
+     "Bind all the colon keywords for old Emacsen."
+     (let ((cache (expand-file-name "dgnuskwds.el" srcdir))
+	   (makefile (expand-file-name "Makefile" srcdir))
+	   (buffer (get-buffer-create " *colon keywords*"))
+	   keywords ignores files file dirs dir form elem make-backup-files)
+       (save-excursion
+	 (set-buffer buffer)
+	 (let (buffer-file-format
+	       format-alist
+	       insert-file-contents-post-hook
+	       insert-file-contents-pre-hook
+	       jam-zcat-filename-list
+	       jka-compr-compression-info-list)
+	   (if (and (file-exists-p cache)
+		    (file-exists-p makefile)
+		    (file-newer-than-file-p cache makefile))
+	       (progn
+		 (insert-file-contents cache nil nil nil t)
+		 (setq keywords (read buffer)))
+	     (setq
+	      ignores
+	      '(:symbol-for-testing-whether-colon-keyword-is-available-or-not
+		;; The following keywords will be bound by CUSTOM.
+		:get :group :initialize :link :load :options :prefix
+		:require :set :tag :type)
+	      files (list (locate-library "semi-def")
+			  (locate-library "mailcap")
+			  (locate-library "mime-def")
+			  (locate-library "path-util")
+			  (locate-library "poem"))
+	      dirs (list (file-name-as-directory (expand-file-name srcdir))))
+	     (while files
+	       (when (setq file (pop files))
+		 (setq dir (file-name-directory file))
+		 (unless (member dir dirs)
+		   (push dir dirs))))
+	     (message "Searching for all the colon keywords in:")
+	     (while dirs
+	       (setq dir (pop dirs))
+	       (message " %s..." dir)
+	       (setq files (directory-files dir t
+					    "\\.el\\(\\.gz\\|\\.bz2\\)?$"))
+	       (while files
+		 (setq file (pop files))
+		 (if (string-match "\\(\\.gz$\\)\\|\\.bz2$" file)
+		     (let ((temp (expand-file-name "dgnustemp.el" srcdir)))
+		       (when
+			   (let* ((binary (if (boundp 'MULE)
+					      '*noconv*
+					    'binary))
+				  (coding-system-for-read binary)
+				  (coding-system-for-write binary)
+				  (input-coding-system binary)
+				  (output-coding-system binary)
+				  (default-process-coding-system
+				    (cons binary binary))
+				  call-process-hook)
+			     (insert-file-contents file nil nil nil t)
+			     (when
+				 (condition-case code
+				     (progn
+				       (if (match-beginning 1)
+					   (call-process-region
+					    (point-min) (point-max)
+					    "gzip" t buffer nil "-cd")
+					 (call-process-region
+					  (point-min) (point-max)
+					  "bzip2" t buffer nil "-d"))
+				       t)
+				   (error
+				    (erase-buffer)
+				    (message "In file %s: %s" file code)
+				    nil))
+			       (write-region (point-min) (point-max) temp
+					     nil 'silent)
+			       t))
+			 (unwind-protect
+			     (insert-file-contents temp nil nil nil t)
+			   (delete-file temp))))
+		   (insert-file-contents file nil nil nil t))
+		 (while (setq form (condition-case nil
+				       (read buffer)
+				     (error nil)))
+		   (while form
+		     (setq elem (pop form))
+		     (unless (memq (car-safe elem)
+				   '(\` backquote defcustom define-widget
+				     quote widget-convert-button
+				     widget-create widget-put))
+		       (while (consp elem)
+			 (push (car elem) form)
+			 (setq elem (cdr elem)))
+		       (when (and elem
+				  (symbolp elem)
+				  (not (eq ': elem))
+				  (eq ?: (aref (symbol-name elem) 0))
+				  (not (memq elem ignores))
+				  (not (memq elem keywords)))
+			 (push elem keywords)))))))
+	     (setq keywords (sort keywords
+				  (lambda (a b)
+				    (string-lessp (symbol-name a)
+						  (symbol-name b)))))
+	     (erase-buffer)
+	     (insert (format "%s" keywords))
+	     (write-region (point-min) (point) cache nil 'silent)
+	     (message
+	      "The following colon keywords will be bound at run-time:\n %s"
+	      keywords))))
+       (kill-buffer buffer)
+       (defconst dgnushack-colon-keywords keywords)
+       (while keywords
+	 (set (car keywords) (car keywords))
+	 (setq keywords (cdr keywords)))))
+   (byte-compile 'dgnushack-bind-colon-keywords)
+   (dgnushack-bind-colon-keywords)))
 
 ;; If you are using Mule 2.3 based on Emacs 19.34, you may also put the
 ;; following lines in your .emacs file, before gnus related modules are
@@ -263,7 +404,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defalias 'define-mail-user-agent 'ignore)
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "lpath.el")
+  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
 	  (unless (or (condition-case code
 			  (require 'w3-forms)
 			(error

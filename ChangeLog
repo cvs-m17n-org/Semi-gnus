@@ -1,3 +1,18 @@
+2001-05-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/nnmail.el: Don't bind the colon keywords here.
+	* lisp/gnus.el (gnus-colon-keywords): New variable which will
+	default to the value of `dgnushack-colon-keywords'; bind them.
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	dgnuskwds.el.
+	(dgnushack-colon-keywords): New constant which will have the colon
+	keywords shuld be bound at run-time for old Emacsen; cache them in
+	the file dgnuskwds.el and bind them.
+	(locate-library): Make the function to be silent for Mule.
+	* lisp/Makefile.in (clean): Remove dgnuskwds.el.
+
 2001-05-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-maybe-encode): Don't use
