@@ -8561,6 +8561,10 @@ forward."
 	  (message-caesar-buffer-body arg)
 	  (set-window-start (get-buffer-window (current-buffer)) start))))))
 
+(autoload 'unmorse-region "morse"
+  "Convert morse coded text in region to ordinary ASCII text."
+  t)
+
 (defun gnus-summary-morse-message (&optional arg)
   "Morse decode the current article."
   (interactive "P")
@@ -8577,8 +8581,7 @@ forward."
 	    (while (re-search-forward "·" end t)
 	      (replace-match "."))
 	    (unmorse-region start end)
-	    (set-window-start (get-buffer-window (current-buffer)) 
-			      start)))))))
+	    (set-window-start (get-buffer-window (current-buffer)) start)))))))
 
 (defun gnus-summary-stop-page-breaking ()
   "Stop page breaking in the current article."
