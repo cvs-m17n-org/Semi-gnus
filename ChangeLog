@@ -1,5 +1,13 @@
 1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/dgnushack.el (dgnushack-compile): Do not compile
+	`webmail.el'. (temporarily)
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Fix timing of
+	`save-restriction'.
+
+1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 7.1.0.0 (This is very alpha status.)
 	I tested only `nntp',`nnml (with pop3)' backend and `Message'
 	mode.
