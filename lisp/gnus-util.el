@@ -1,8 +1,8 @@
-;;; gnus-util.el --- utility functions for Gnus
+;;; gnus-util.el --- utility functions for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -721,7 +721,8 @@ with potentially long computations."
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
   (let ((artbuf (current-buffer))
-	(tmpbuf (get-buffer-create " *Gnus-output*")))
+	(tmpbuf (get-buffer-create " *Gnus-output*"))
+	(coding-system-for-write 'binary))
     (save-excursion
       (or (get-file-buffer filename)
 	  (file-exists-p filename)
