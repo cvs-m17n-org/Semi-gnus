@@ -1,6 +1,11 @@
 1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
 
-	*  (Repository): New branch Nana7 from gnus-5.8.2.
+	* Nana-gnus: Version 7.1.0.0 (This is very alpha status.)
+	I tested only `nntp',`nnml (with pop3)' backend and `Message'
+	mode.
+
+	The test of implement that based on `luna' and the other FLIM
+	functions. But could not use MIME-View currently.
 
 	* lisp/score-mode.el (score-mode-coding-system): Do not specify
 	the coding system for score file in default.
@@ -136,9 +141,4 @@
 	* lisp/dgnushack.el (dgnushack-compile): When BBDB is not
 	installed, do not compile `gnus-bbdb.el' and `mess-bbdb.el'.
 
-	* Nana-gnus: Version 7.1.0.0 (This is very alpha status.)
-	I tested only `nntp',`nnml (with pop3)' backend and `Message'
-	mode.
-
-	The test of implement that based on `luna' and the other FLIM
-	functions. But could not use MIME-View currently.
+	*  (Repository): New branch Nana7 from gnus-5.8.2.
