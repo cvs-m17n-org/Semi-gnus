@@ -142,7 +142,6 @@
 (require 'base64)
 
 (eval-and-compile
-  (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
   (autoload 'rfc2104-hash "rfc2104")
@@ -589,24 +588,21 @@ If ARGS, PROMPT is used as an argument to `format'."
   (let ((cmds (if (listp imap-ssl-program) imap-ssl-program
 		(list imap-ssl-program)))
 	cmd done)
-    (condition-case ()
-	(require 'ssl)
-      (error))
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening SSL connection with `%s'..." cmd)
-      (let* ((port (or port imap-default-ssl-port))
-	     (ssl-program-name shell-file-name)
-	     (ssl-program-arguments
-	      (list shell-command-switch
-		    (format-spec cmd (format-spec-make
-				      ?s server
-				      ?p (number-to-string port)))))
-	     process)
-	(when (setq process
-		    (condition-case nil
-			(as-binary-process
-			 (open-ssl-stream name buffer server port))
-		      (error nil)))
+      (let ((port (or port imap-default-ssl-port))
+	    (process-connection-type nil)
+	    process)
+	(when (prog1
+		  (setq process (as-binary-process
+				 (start-process
+				  name buffer shell-file-name
+				  shell-command-switch
+				  (format-spec cmd
+					       (format-spec-make
+						?s server
+						?p (number-to-string port))))))
+		(process-kill-without-query process))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
 	    (while (and (memq (process-status process) '(open run))
