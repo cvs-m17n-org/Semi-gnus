@@ -810,6 +810,77 @@ be set in `.emacs' instead."
 (require 'gnus-util)
 (require 'nnheader)
 
+(defmacro gnus-define-group-parameter (param &rest rest)
+  "Define a group parameter PARAM.
+REST is a plist of following:
+:type               One of `bool', `list' or `nil'.
+:function           The name of the function.
+:function-document  The documentation of the function.
+:parameter-type     The type for customizing the parameter.
+:parameter-document The documentation for the parameter.
+:variable           The name of the variable.
+:variable-document  The documentation for the variable.
+:variable-group     The group for customizing the variable.
+:variable-type      The type for customizing the variable.
+:variable-default   The default value of the variable."
+  (let* ((type (plist-get rest :type))
+	 (parameter-type (plist-get rest :parameter-type))
+	 (parameter-document (plist-get rest :parameter-document))
+	 (function (or (plist-get rest :function)
+		       (intern (format "gnus-parameter-%s" param))))
+	 (function-document (or (plist-get rest :function-document) ""))
+	 (variable (or (plist-get rest :variable)
+		       (intern (format "gnus-parameter-%s-alist" param))))
+	 (variable-document (or (plist-get rest :variable-document) ""))
+	 (variable-group (plist-get rest :variable-group))
+	 (variable-type (or (plist-get rest :variable-type)
+			    `(quote (repeat
+				     (list (regexp :tag "Group")
+					   ,(car (cdr parameter-type)))))))
+	 (variable-default (plist-get rest :variable-default)))
+    (list
+     'progn
+     `(defcustom ,variable ,variable-default
+	,variable-document
+	:group 'gnus-group-parameter
+	:group ',variable-group
+	:type ,variable-type)
+     (if (eq type 'bool)
+	 `(defun ,function (name)
+	    ,function-document
+	    (let ((params (gnus-group-find-parameter name))
+		  val)
+	      (cond
+	       ((memq ',param params)
+		t)
+	       ((setq val (assq ',param params))
+		(cdr val))
+	       ((stringp ,variable)
+		(string-match ,variable name))
+	       (,variable
+		(let ((alist ,variable)
+		      elem value)
+		  (while (setq elem (pop alist))
+		    (when (and name
+			       (string-match (car elem) name))
+		      (setq alist nil
+			    value (cdr elem))))
+		  (if (consp value) (car value) value))))))
+       `(defun ,function (name)
+	  ,function-document
+	  (and name
+	       (or (gnus-group-find-parameter name ',param ,(and type t))
+		   (let ((alist ,variable)
+			 elem value)
+		     (while (setq elem (pop alist))
+		       (when (and name
+				  (string-match (car elem) name))
+			 (setq alist nil
+			       value (cdr elem))))
+		     ,(if type
+			  'value
+			'(if (consp value) (car value) value))))))))))
+
 (defcustom gnus-home-directory "~/"
   "Directory variable that specifies the \"home\" directory.
 All other Gnus path variables are initialized from this variable."
@@ -1819,7 +1890,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-mlspl" gnus-group-split gnus-group-split-fancy)
      ("gnus-mlspl" :interactive t gnus-group-split-setup
       gnus-group-split-update)
-     ("gnus-namazu" :interactive t gnus-namazu-search))))
+     ("gnus-namazu" :interactive t gnus-namazu-search)
+     ("nnshimbun" :interactive t gnus-group-make-shimbun-group))))
 
 ;;; gnus-sum.el thingies
 
