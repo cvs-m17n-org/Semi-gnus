@@ -3,7 +3,7 @@
 	* lisp/nnmail.el (nnmail-read-passwd): Use `read-passwd' if it
 	exists as a function.
 
-	* lisp/pop3.el (nnmail-read-passwd): Likewise.
+	* lisp/pop3.el (pop3-read-passwd): Likewise.
 
 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
