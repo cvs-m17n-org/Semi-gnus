@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 
-;; Copyright (C) 1998 Tatsuya Ichikawa
+;; Copyright (C) 1998, 2001 Tatsuya Ichikawa
 
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;	Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>
@@ -34,7 +34,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'read-passwd)
 
@@ -526,17 +525,13 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			(format "<%d of %d> %s" j n
 				(gnus-ofsetup-gettext 'setup-21)))))
 	  ;; Now set a mail source specifier.
-	  (setq source `(,type))
-	  (mapc
-	   #'(lambda (sym)
-	       (when (symbol-value sym)
-		 (setq source
-		       (nconc source
-			      (list
-			       (make-symbol
-				(format ":%s" sym))
-			       (symbol-value sym))))))
-	   '(path user server authentication stream program))
+	  (setq source (list type))
+	  (let (value)
+	    (dolist (symbol '(path user server authentication stream program))
+	      (when (setq value (symbol-value symbol))
+		(setq source (nconc source
+				    (list (make-symbol (format ":%s" symbol))
+					  value))))))
 	  (setq mail-source (nconc mail-source (list source))))
 	(setq i (1- i)))
       (setq save-passwd
@@ -715,24 +710,23 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			  t)))
     (if (null params)
 	(gnus-message 4 (gnus-ofsetup-gettext 'customize-done-1))
-      (mapc #'(lambda (el)
-		(let ((sym (car el))
-		      (val (cdr el)))
-		  (set sym val)
-		  (cond ((eq sym 'news-method)
-			 (if (eq val 'nnspool)
-			     (setq use-miee t)))
-			((eq sym 'drafts-queue-type)
-			 (setq use-miee
-			       (if (eq val 'miee) t nil)))
-			((eq sym 'save-passwd)
-			 (if val
-			     (add-to-list 'gnus-variable-list
-					  'mail-source-password-cache)
-			   (setq gnus-variable-list
-				 (delq 'mail-source-password-cache
-				       gnus-variable-list)))))))
-	    params)
+      (let (symbol value)
+	(dolist (elem params)
+	  (setq symbol (car elem)
+		value (cdr elem))
+	  (set symbol value)
+	  (cond ((eq symbol 'news-method)
+		 (if (eq value 'nnspool)
+		     (setq use-miee t)))
+		((eq symbol 'drafts-queue-type)
+		 (setq use-miee (eq value 'miee)))
+		((eq symbol 'save-passwd)
+		 (if value
+		     (add-to-list 'gnus-variable-list
+				  'mail-source-password-cache)
+		   (setq gnus-variable-list
+			 (delq 'mail-source-password-cache
+			       gnus-variable-list)))))))
       (if (and (eq news-method 'nnspool)
 	       (not (eq drafts-queue-type 'miee)))
 	  (error (gnus-ofsetup-gettext 'customize-done-2)))

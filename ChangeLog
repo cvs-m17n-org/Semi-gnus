@@ -1,5 +1,30 @@
 2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnwfm.el: Require `gnus-clfns' when compiling.
+	* lisp/nnshimbun.el: Ditto.
+	* lisp/nnfolder.el: Ditto.
+	* lisp/mm-util.el: Ditto.
+	* lisp/gnus-vers.el: Ditto.
+	* lisp/gnus-sum.el: Ditto.
+	* lisp/gnus-score.el: Ditto.
+	* lisp/gnus-nocem.el: Ditto.
+
+	* lisp/gnus-ofsetup.el: Don't require `gnus-clfns'.
+	(gnus-ofsetup-customize-done): Use `dolist' instead of `mapc'.
+	(gnus-setup-for-offline): Ditto.
+
+	* lisp/gnus-offline.el: Don't use `mapc' for binding some vars;
+	don't require `gnus-clfns'.
+
+	* lisp/gnus-clfns.el (subseq, merge, coerce, butlast): New compiler
+	macros.
+	(mapc): Remove.
+
+	* lisp/gnus-art.el: Use `dolist' instead of `mapcar' for defining
+	`gnus-article-read-summary-keys'.
+
+2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Leave
 	the forwarded parts undecoded.
 	(gnus-article-decode-article-as-default-mime-charset): Set the
