@@ -1,3 +1,15 @@
+2001-10-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Don't expose
+	invisible MIME parts; don't use `message-find-invisible-regions'.
+	(message-find-invisible-regions): Remove.
+	(invisible-region): Advise the function to add the text property
+	`mime-edit-invisible'.
+	(message-invisible-region): Remove.
+	(message-save-drafts): Copy all the text properties from the
+	editing buffer to the encoding buffer.
+	(message-send): Ditto.
+
 2001-10-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nndoc.el (nndoc-oe-dbx-type-p): Use `string-as-multibyte'
