@@ -1,4 +1,4 @@
-;;; gnus-draft.el --- draft message support for Gnus
+;;; gnus-draft.el --- draft message support for Semi-gnus
 ;; Copyright (C) 1997 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -113,7 +113,8 @@
 (defun gnus-draft-send (article &optional group)
   "Send message ARTICLE."
   (gnus-draft-setup article (or group "nndraft:queue"))
-  (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me))
+  (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me)
+	message-send-hook)
     (message-send-and-exit)))
 
 (defun gnus-draft-send-all-messages ()
@@ -158,7 +159,6 @@
     (let ((article narticle))
       (message-mail)
       (erase-buffer)
-      (message "%s %s" group article)
       (if (not (gnus-request-restore-buffer article group))
 	  (error "Couldn't restore the article")
 	;; Insert the separator.
