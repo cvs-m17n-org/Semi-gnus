@@ -2,6 +2,11 @@
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
 
+	* lisp/gnus-sum.el: Don't autoload gnus-set-summary-default-charset.
+	(gnus-summary-inherit-default-charset): New function.
+	(gnus-parse-headers-hook): Use it.
+	(gnus-summary-setup-default-charset): Set default-mime-charset here.
+	
 	* lisp/gnus-delay.el (gnus-delay-article): Undo the last change.
 
 	* lisp/gnus-draft.el: Revert to the original implementation.
@@ -9,9 +14,6 @@
 	gnus-draft-setup; call save-buffer instead of message-save-drafts.
 	(gnus-draft-setup): Rename from gnus-draft-setup-for-editing.
 	(gnus-draft-setup-for-sending): Abolish.
-
-	* lisp/gnus-i18n.el (gnus-newsgroup-default-charset-alist): Don't
-	decode headers of articles stored in nndraft:drafts.
 
 	* lisp/nnheader.el (nnheader-auto-save-coding-system): New variable.
 
