@@ -261,13 +261,13 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-product-name "T-gnus"
+(defconst gnus-product-name "ET-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.064"
+(defconst gnus-version-number "6.11.00"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "16"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.84"
@@ -279,7 +279,7 @@ is restarted, and sometimes reloaded."
   "Product name of the original version of Gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on %s v%s ; for SEMI 1.12/1.13, FLIM 1.12)"
+  (format "%s %s (based on %s v%s ; for SEMI 1.13, FLIM 1.13)"
 	  gnus-product-name gnus-version-number
 	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")

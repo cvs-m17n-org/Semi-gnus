@@ -96,12 +96,12 @@ That's all. Restart Gnus and try typing "g" in the *Group* buffer.
 ***Note***
 
 Most versions of Semi-gnus have pop3-fma.el to operate multiple POP
-accounts. T-gnus 6.10.56 or later does not because it can handle
+accounts. T-gnus 6.10.056 or later does not because it can handle
 multiple POP accounts itself.
 
 <<<<<ATTENTION!!>>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
-updating to T-gnus 6.10.56 or later, remove the setting for
+T-gnus 6.10.056 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.056 or later, remove the setting for
 pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
 [Semi-gnus with pop3-fma.el]
@@ -115,7 +115,7 @@ o pop3-fma-spool-file-alist
 o pop3-fma-movemail-type 
       use movemail.exe ('exe) or pop3.el('lisp) 
 
-[T-gnus 6.10.56 or later]
+[T-gnus 6.10.056 or later]
 
 o gnus-offline-mail-source 
 	'(
@@ -232,8 +232,8 @@ o M-x gnus-offline-agent-expire
 ===========================================
 
 <<<<<ATTENTION!!>>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
-updating to T-gnus 6.10.56 or later, remove the setting for
+T-gnus 6.10.056 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.056 or later, remove the setting for
 pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
 Under Semi-gnus with pop3-fma.el, you must enter the password for the
@@ -259,7 +259,7 @@ password will be saved in ~/.newsrc.eld. (*)
               (setq pop3-fma-save-password-information t)
               (add-to-list 'gnus-variable-list 'pop3-fma-password)))
 
-           [T-gnus 6.10.56 or later]
+           [T-gnus 6.10.056 or later]
 
             (add-hook 'gnus-setup-news-hook 
              (lambda ()
@@ -281,5 +281,5 @@ For Semi-gnus with pop3-fma.el, add the following code in
 In this way, once you enter the password at the startup of Gnus, it
 will be kept as a variable `pop3-fma-password' until you quit Gnus.
 
-Under T-gnus 6.10.56 or later, the password will be kept as a variable
+Under T-gnus 6.10.056 or later, the password will be kept as a variable
 `mail-source-password-cache' by default.

@@ -2881,6 +2881,14 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (funcall (if gnus-show-mime
 		 (progn
 		   (setq mime-message-structure gnus-current-headers)
+		   (mime-buffer-entity-set-buffer-internal
+		    mime-message-structure
+		    gnus-original-article-buffer)
+		   (mime-entity-set-representation-type-internal
+		    mime-message-structure 'mime-buffer-entity)
+		   (luna-send mime-message-structure
+			      'initialize-instance
+			      mime-message-structure)
 		   gnus-article-display-method-for-mime)
 	       gnus-article-display-method-for-traditional)))
   ;; Associate this article with the current summary buffer.

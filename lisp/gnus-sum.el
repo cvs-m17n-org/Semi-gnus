@@ -5126,22 +5126,24 @@ With arg, turn line truncation on iff arg is positive."
   (redraw-display))
 
 (defun gnus-summary-reselect-current-group (&optional all rescan)
-  "Exit and then reselect the current newsgroup.
+  "Rescan the current newsgroup, exit and then reselect it.
 The prefix argument ALL means to select all articles."
   (interactive "P")
   (when (gnus-ephemeral-group-p gnus-newsgroup-name)
     (error "Ephemeral groups can't be reselected"))
   (let ((current-subject (gnus-summary-article-number))
 	(group gnus-newsgroup-name))
+    (save-excursion
+      (set-buffer gnus-group-buffer)
+      ;; We have to adjust the point of group mode buffer because
+      ;; point was moved to the next unread newsgroup by exiting.
+      (gnus-summary-jump-to-group group)
+      (when rescan
+	(save-excursion
+	  (gnus-group-get-new-news-this-group 1))))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
-    ;; We have to adjust the point of group mode buffer because
-    ;; point was moved to the next unread newsgroup by exiting.
-    (gnus-summary-jump-to-group group)
-    (when rescan
-      (save-excursion
-	(gnus-group-get-new-news-this-group 1)))
-    (gnus-group-read-group all t)
+    (gnus-group-read-group all t group)
     (gnus-summary-goto-subject current-subject nil t)))
 
 (defun gnus-summary-rescan-group (&optional all)
