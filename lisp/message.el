@@ -1204,11 +1204,14 @@ Return the number of headers removed."
 	     ;; There might be a continuation header, so we have to search
 	     ;; until we find a new non-continuation line.
 	     (progn
-	       (while (and (zerop (forward-line 1))
-			   (memq (char-after) '(?\t ?\ ))))
-	       (point))))
-	(while (and (zerop (forward-line 1))
-		    (memq (char-after) '(?\t ?\ ))))))
+	       (forward-line 1)
+	       (if (re-search-forward "^[^ \t]" nil t)
+		   (goto-char (match-beginning 0))
+		 (point-max)))))
+	(forward-line 1)
+	(if (re-search-forward "^[^ \t]" nil t)
+	    (goto-char (match-beginning 0))
+	  (point-max))))
     number))
 
 (defun message-narrow-to-headers ()
@@ -1255,9 +1258,11 @@ Return the number of headers removed."
 
 (defun message-next-header ()
   "Go to the beginning of the next header."
-  (while (and (zerop (forward-line 1))
-	      (memq (char-after) '(?\t ?\ ))))
-  (not (eobp)))
+  (beginning-of-line)
+  (or (eobp) (forward-char 1))
+  (not (if (re-search-forward "^[^ \t]" nil t)
+	   (beginning-of-line)
+	 (goto-char (point-max)))))
 
 (defun message-sort-headers-1 ()
   "Sort the buffer as headers using `message-rank' text props."
@@ -2307,7 +2312,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
-	    (or (bolp)
+	    (or (eq (char-before) ?\n)
 		(insert ?\n))
 	    (when (and news
 		       (or (message-fetch-field "cc")
@@ -2337,7 +2342,7 @@ This sub function is for exclusive use of `message-send-mail'."
       (re-search-forward
        (concat "^" (regexp-quote mail-header-separator) "\n"))
       (replace-match "\n")
-      (forward-char -1)
+      (backward-char 1)
       (setq delimline (point-marker))
       (run-hooks 'message-send-mail-hook)
       ;; Insert an extra newline if we need it to work around
@@ -2464,7 +2469,7 @@ to find out how to use this."
     (re-search-forward
      (concat "^" (regexp-quote mail-header-separator) "\n"))
     (replace-match "\n")
-    (forward-char -1)
+    (backward-char 1)
     (run-hooks 'message-send-mail-hook)
     (if recipients
 	(let ((result (smtp-via-smtp user-mail-address
@@ -2543,7 +2548,7 @@ This sub function is for exclusive use of `message-send-news'."
 	      (message-remove-header message-ignored-news-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
-	    (or (bolp)
+	    (or (eq (char-before) ?\n)
 		(insert ?\n))
 	    (setq result (message-maybe-split-and-send-news method)))
 	(kill-buffer tembuf))
@@ -2563,7 +2568,7 @@ This sub function is for exclusive use of `message-send-news'."
     (re-search-forward
      (concat "^" (regexp-quote mail-header-separator) "\n"))
     (replace-match "\n")
-    (forward-char -1)
+    (backward-char 1)
     (run-hooks 'message-send-news-hook)
     ;;(require (car method))
     ;;(funcall (intern (format "%s-open-server" (car method)))
@@ -3083,7 +3088,7 @@ This sub function is for exclusive use of `message-send-news'."
       (while (re-search-forward "[\t\n]+" nil t)
 	(replace-match "" t t))
       (unless (zerop (buffer-size))
-	(buffer-substring (point-min) (point-max))))))
+	(buffer-string)))))
 
 (defun message-make-lines ()
   "Count the number of lines and return numeric string."
@@ -3201,7 +3206,7 @@ This sub function is for exclusive use of `message-send-news'."
 	    (replace-match "\\1(\\3)" t)
 	    (goto-char fullname-start)))
 	(insert ")")))
-      (buffer-substring (point-min) (point-max)))))
+      (buffer-string))))
 
 (defun message-make-sender ()
   "Return the \"real\" user address.
@@ -3787,8 +3792,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	      (while (re-search-forward "[ \t]+" nil t)
 		(replace-match " " t t))
 	      ;; Remove addresses that match `rmail-dont-reply-to-names'.
-	      (insert (prog1 (rmail-dont-reply-to (buffer-substring
-						   (point-min) (point-max)))
+	      (insert (prog1 (rmail-dont-reply-to (buffer-string))
 			(erase-buffer)))
 	      (goto-char (point-min))
 	      ;; Perhaps Mail-Copies-To: never removed the only address?
@@ -3798,8 +3802,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 		    (mapcar
 		     (lambda (addr)
 		       (cons (mail-strip-quoted-names addr) addr))
-		     (message-tokenize-header (buffer-substring
-					       (point-min) (point-max)))))
+		     (message-tokenize-header (buffer-string))))
 	      (let ((s ccalist))
 		(while s
 		  (setq ccalist (delq (assoc (car (pop s)) s) ccalist))))
@@ -4090,7 +4093,7 @@ header line with the old Message-ID."
     (while (re-search-backward "[ \t]+$" nil t)
       (replace-match ""))
 
-    (buffer-substring (point-min) (point-max))))
+    (buffer-string)))
     
 ;;; Forwarding messages.
 

@@ -514,9 +514,7 @@ none, and whose CDR is the corresponding element of DOMAINS."
 					nil 'quiet)
 			  (prog1 (make-glyph (vector 'xbm :file fname))
 			    (delete-file fname))))
-	(t (make-glyph
-	    (vector type :data
-		    (buffer-substring (point-min) (point-max)))))))
+	(t (make-glyph (vector type :data (buffer-string))))))
 
 ;;; Parsing of piconsearch result page.
 

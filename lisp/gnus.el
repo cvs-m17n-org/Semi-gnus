@@ -794,7 +794,7 @@ used to 899, you would say something along these lines:
 	     (set-buffer (gnus-get-buffer-create " *gnus nntp*"))
 	     (buffer-disable-undo (current-buffer))
 	     (insert-file-contents gnus-nntpserver-file)
-	     (let ((name (buffer-substring (point-min) (point-max))))
+	     (let ((name (buffer-string)))
 	       (prog1
 		   (if (string-match "^[ \t\n]*$" name)
 		       nil

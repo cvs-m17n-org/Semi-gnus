@@ -906,7 +906,7 @@ password contained in '~/.nntp-authinfo'."
 (defun nntp-read-server-type ()
   "Find out what the name of the server we have connected to is."
   ;; Wait for the status string to arrive.
-  (setq nntp-server-type (buffer-substring (point-min) (point-max)))
+  (setq nntp-server-type (buffer-string))
   (let ((alist nntp-server-action-alist)
 	(case-fold-search t)
 	entry)
@@ -956,7 +956,7 @@ password contained in '~/.nntp-authinfo'."
 
 (defun nntp-snarf-error-message ()
   "Save the error message in the current buffer."
-  (let ((message (buffer-substring (point-min) (point-max))))
+  (let ((message (buffer-string)))
     (while (string-match "[\r\n]+" message)
       (setq message (replace-match " " t t message)))
     (nnheader-report 'nntp message)
