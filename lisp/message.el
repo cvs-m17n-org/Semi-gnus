@@ -977,10 +977,152 @@ Defaults to `text-mode-abbrev-table'.")
   "Face used for displaying MML."
   :group 'message-faces)
 
-(defvar message-font-lock-keywords
-  (let* ((cite-prefix "A-Za-z")
-	 (cite-suffix (concat cite-prefix "0-9_.@-"))
-	 (content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)"))
+(defvar message-font-lock-fence-open-regexp "[+|]"
+  "*Regexp that matches fence open string.")
+
+(defvar message-font-lock-fence-close-regexp "|"
+  "*Regexp that matches fence close string.")
+
+(defvar message-font-lock-fence-open-position nil
+  "*Cons of SYMBOL of a function or a variable and a number of OFFSET that
+indicate the fence open position.  If it is non-nil,
+`message-font-lock-fence-open-regexp' is not used for searching for the
+fence open position.  If SYMBOL is a function, it is called with one argument
+last cursor position and should return the fence open position as a number
+or a marker.  If SYMBOL is a variable symbol, the value is examined with
+`symbol-value'.  OFFSET is added to the position to compensate the value.
+For example, the following combinations of variable symbol and offset value
+can be used:
+
+Egg v3: '(egg:*region-start* . -1)
+Canna:  '(canna:*region-start* . 0)
+")
+
+(defvar message-font-lock-fence-close-position nil
+  "*Cons of SYMBOL of a function or a variable and a number of OFFSET that
+indicate the fence close position.  If it is non-nil,
+`message-font-lock-fence-close-regexp' is not used for searching for the
+fence close position.  If SYMBOL is a function, it is called with one argument
+last cursor position and should return the fence close position as a number
+or a marker.  If SYMBOL is a variable symbol, the value is examined with
+`symbol-value'.  OFFSET is added to the position to compensate the value.
+For example, the following combinations of variable symbol and offset value
+can be used:
+
+Egg v3: '(egg:*region-end* . 0)
+Canna:  '(canna:*region-end* . 0)
+")
+
+(defvar message-font-lock-cited-text-regexp
+  "^[\t ]*\\([^\000- :>|}\177]*\\)[:>|}].*"
+  "*Regexp that matches cited text.  It should have a grouping for the
+citation prefix which is ended at the beginning of citation mark string.")
+
+(defvar message-font-lock-citation-name-max-column 10
+  "*Maximun number of column for citation name for fontifying.")
+
+(defvar message-font-lock-last-position nil
+  "Internal buffer local variable to save the last cursor position
+before fontifying.")
+
+(eval-after-load "font-lock"
+  '(defadvice font-lock-after-change-function
+     (before message-font-lock-save-last-position activate compile)
+     "Save last cursor position before fontifying."
+     (if (eq 'message-mode major-mode)
+	 (setq message-font-lock-last-position (point)))))
+
+(defun message-font-lock-cited-text-matcher (limit)
+  "Search for a cited text containing `message-font-lock-cited-text-regexp'
+forward.  Argument LIMIT bounds the search.  If a cited text is found, it
+returns t and sets match data 1 and 2, otherwise it returns nil.  Normally,
+match data 2 has zero length, but if the FENCE (for input method) is detected
+in matched text, result is divided into match data 1 and 2 across the FENCE.
+See also the documentations for the following variables:
+ `message-font-lock-fence-open-regexp'
+ `message-font-lock-fence-close-regexp'
+ `message-font-lock-fence-open-position'
+ `message-font-lock-fence-close-position'
+"
+  (prog1
+      (when (re-search-forward message-font-lock-cited-text-regexp limit t)
+	(let* ((start0 (match-beginning 0))
+	       (end0 (match-end 0))
+	       (cite-mark (match-end 1))
+	       (should-fontify
+		(progn
+		  (goto-char cite-mark)
+		  (<= (current-column)
+		      message-font-lock-citation-name-max-column)))
+	       end1 start2)
+	  (and
+	   should-fontify
+	   message-font-lock-last-position
+	   (>= message-font-lock-last-position start0)
+	   (<= message-font-lock-last-position end0)
+	   (cond
+	    (message-font-lock-fence-open-position
+	     (let* ((symbol (car message-font-lock-fence-open-position))
+		    (open
+		     (cond ((functionp symbol)
+			    (funcall symbol message-font-lock-last-position))
+			   ((and (symbolp symbol)
+				 (boundp symbol))
+			    (symbol-value symbol)))))
+	       (when (markerp open)
+		 (setq open (marker-position open)))
+	       (and (numberp open)
+		    (setq open
+			  (+ open
+			     (cdr message-font-lock-fence-open-position)))
+		    (>= message-font-lock-last-position open)
+		    (goto-char open)
+		    (or (not message-font-lock-fence-open-regexp)
+			(looking-at message-font-lock-fence-open-regexp))
+		    (setq end1 open))))
+	    (message-font-lock-fence-open-regexp
+	     (goto-char message-font-lock-last-position)
+	     (when (re-search-backward
+		    message-font-lock-fence-open-regexp start0 t)
+	       (setq end1 (match-beginning 0)))))
+	   (setq should-fontify
+		 (and message-font-lock-fence-open-position
+		      (not (eq cite-mark end1))))
+	   (cond
+	    (message-font-lock-fence-close-position
+	     (let* ((symbol (car message-font-lock-fence-close-position))
+		    (close
+		     (cond ((functionp symbol)
+			    (funcall symbol message-font-lock-last-position))
+			   ((and (symbolp symbol)
+				 (boundp symbol))
+			    (symbol-value symbol)))))
+	       (when (markerp close)
+		 (setq close (marker-position close)))
+	       (and (numberp close)
+		    (setq close
+			  (+ close
+			     (cdr message-font-lock-fence-close-position)))
+		    (<= message-font-lock-last-position close)
+		    (setq start2 close))))
+	    (message-font-lock-fence-close-regexp
+	     (goto-char message-font-lock-last-position)
+	     (when (looking-at message-font-lock-fence-close-regexp)
+	       (setq start2 (match-end 0)))))
+	   (setq should-fontify
+		 (and (not (and (not message-font-lock-fence-open-position)
+				(eq cite-mark end1)))
+		      (not (eq cite-mark start2)))))
+	  (goto-char end0)
+	  (when should-fontify
+	    (if start2
+		(store-match-data (list start0 end0 start0 end1 start2 end0))
+	      (store-match-data (list start0 end0 start0 end0 end0 end0)))
+	    t)))
+    (setq message-font-lock-last-position nil)))
+
+(defvar message-font-lock-keywords-1
+  (let ((content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)"))
     `((,(concat "^\\([Tt]o:\\)" content)
        (1 'message-header-name-face)
        (2 'message-header-to-face nil t))
@@ -1006,18 +1148,27 @@ Defaults to `text-mode-abbrev-table'.")
 		 (not (equal mail-header-separator "")))
 	    `((,(concat "^\\(" (regexp-quote mail-header-separator) "\\)$")
 	       1 'message-separator-face))
-	  nil)
-      (,(concat "^[ \t]*"
-		"\\([" cite-prefix "]+[" cite-suffix "]*\\)?"
-		"[:>|}].*")
-       (0 'message-cited-text-face))
-      ("<#/?\\(multipart\\|part\\|external\\).*>"
-       (0 'message-mml-face))))
+	  nil))))
+
+(defvar message-font-lock-keywords-2
+  (append message-font-lock-keywords-1
+	  '((message-font-lock-cited-text-matcher
+	     (1 'message-cited-text-face)
+	     (2 'message-cited-text-face))
+	    ("<#/?\\(multipart\\|part\\|external\\).*>"
+	     (0 'message-mml-face)))))
+
+(defvar message-font-lock-keywords message-font-lock-keywords-2
   "Additional expressions to highlight in Message mode.")
 
 ;; XEmacs does it like this.  For Emacs, we have to set the
 ;; `font-lock-defaults' buffer-local variable.
-(put 'message-mode 'font-lock-defaults '(message-font-lock-keywords t))
+(put 'message-mode 'font-lock-defaults
+     '((message-font-lock-keywords
+	message-font-lock-keywords-1
+	message-font-lock-keywords-2)
+       nil nil nil nil
+       (font-lock-mark-block-function . mark-paragraph)))
 
 (defvar message-face-alist
   '((bold . bold-region)
@@ -1664,10 +1815,16 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (message-set-auto-save-file-name)
   (unless (string-match "XEmacs" emacs-version)
     (set (make-local-variable 'font-lock-defaults)
-	 '(message-font-lock-keywords t)))
+	 '((message-font-lock-keywords
+	    message-font-lock-keywords-1
+	    message-font-lock-keywords-2)
+	   nil nil nil nil
+	   (font-lock-mark-block-function . mark-paragraph))))
+  (set (make-local-variable 'message-font-lock-last-position) nil)
   (make-local-variable 'adaptive-fill-regexp)
   (setq adaptive-fill-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|" adaptive-fill-regexp))
+	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
+		adaptive-fill-regexp))
   (unless (boundp 'adaptive-fill-first-line-regexp)
     (setq adaptive-fill-first-line-regexp nil))
   (make-local-variable 'adaptive-fill-first-line-regexp)
