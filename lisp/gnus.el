@@ -36,6 +36,7 @@
 (eval-when-compile (require 'static))
 
 (require 'wid-edit)
+(require 'nnheader)
 
 (require 'gnus-vers)
 

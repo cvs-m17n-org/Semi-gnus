@@ -1324,6 +1324,14 @@ See Info node `(gnus)Customizing Articles' for details."
   :link '(custom-manual "(gnus)Customizing Articles")
   :type gnus-article-treat-custom)
 
+(defcustom gnus-treat-wash-html nil
+  "Format as HTML.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' for details."
+  :group 'gnus-article-treat
+  :link '(custom-manual "(gnus)Customizing Articles")
+  :type gnus-article-treat-custom)
+
 (defcustom gnus-treat-fill-long-lines nil
   "Fill long lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -1451,6 +1459,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
     (gnus-treat-display-smileys gnus-treat-smiley)
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
+    (gnus-treat-wash-html gnus-article-wash-html)
     (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-hide-citation gnus-article-hide-citation)
     (gnus-treat-hide-citation-maybe gnus-article-hide-citation-maybe)
@@ -2301,24 +2310,24 @@ If READ-CHARSET, ask for a coding system."
 
 
 (defun article-wash-html (&optional read-charset)
-  "Format an html article.
+  "Format an HTML article.
 If READ-CHARSET, ask for a coding system."
   (interactive "P")
   (save-excursion
     (let ((buffer-read-only nil)
 	  charset)
-      (if (gnus-buffer-live-p gnus-original-article-buffer)
-	  (with-current-buffer gnus-original-article-buffer
-	    (let* ((ct (gnus-fetch-field "content-type"))
-		   (ctl (and ct
-			     (ignore-errors
-			       (mail-header-parse-content-type ct)))))
-	      (setq charset (and ctl
-				 (mail-content-type-get ctl 'charset)))
-	      (if (stringp charset)
-		  (setq charset (intern (downcase charset)))))))
-      (if read-charset
-	  (setq charset (mm-read-coding-system "Charset: " charset)))
+      (when (gnus-buffer-live-p gnus-original-article-buffer)
+	(with-current-buffer gnus-original-article-buffer
+	  (let* ((ct (gnus-fetch-field "content-type"))
+		 (ctl (and ct
+			   (ignore-errors
+			     (mail-header-parse-content-type ct)))))
+	    (setq charset (and ctl
+			       (mail-content-type-get ctl 'charset)))
+	    (when (stringp charset)
+	      (setq charset (intern (downcase charset)))))))
+      (when read-charset
+	(setq charset (mm-read-coding-system "Charset: " charset)))
       (unless charset
 	(setq charset gnus-newsgroup-charset))
       (article-goto-body)
@@ -2327,8 +2336,8 @@ If READ-CHARSET, ask for a coding system."
 	  (narrow-to-region (point) (point-max))
 	  (let* ((func (or gnus-article-wash-function mm-text-html-renderer))
 		 (entry (assq func mm-text-html-washer-alist)))
-	    (if entry
-		(setq func (cdr entry)))
+	    (when entry
+	      (setq func (cdr entry)))
 	    (cond
 	     ((gnus-functionp func)
 	      (funcall func))
@@ -5846,8 +5855,8 @@ after replacing with the original article."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?[-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,[:word:]]+[-a-zA-Z0-9_=#$@~`%&*+|\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~`%&*+|\\/:;.,[:word:]]+[-a-z0-9_=#$@~`%&*+|\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -5899,7 +5908,7 @@ The function must take one argument, the string naming the URL."
 		 (regexp :tag "Other")))
 
 (defcustom gnus-button-mid-or-mail-regexp
-  (concat "\\b\\(<?[a-zA-Z0-9][^<>\")!;:,{}\n\t ]*@"
+  (concat "\\b\\(<?[a-z0-9][^<>\")!;:,{}\n\t ]*@"
 	  gnus-button-valid-fqdn-regexp
 	  ">?\\)\\b")
   "Regular expression that matches a message ID or a mail address."
@@ -6063,7 +6072,7 @@ positives are possible."
     ("\\bin\\( +article\\| +message\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)" 2
      t gnus-button-message-id 3)
     ("\\(<URL: *\\)mailto: *\\([^> \n\t]+\\)>" 0 t gnus-url-mailto 2)
-    ("mailto:\\([-a-zA-Z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
+    ("mailto:\\([-a-z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
     ("\\bmailto:\\([^ \n\t]+\\)" 0 t gnus-url-mailto 1)
     ;; CTAN
     ("\\bCTAN:[ \t\n]*\\([^>)!;:,\n\t ]*\\)" 0 (>= gnus-button-tex-level 1)
@@ -6102,12 +6111,12 @@ positives are possible."
      (and (>= gnus-button-man-level 1) (< gnus-button-man-level 3))
      gnus-button-handle-man 1)
     ;; more man pages: resolv.conf(5), iso_8859-1(7), xterm(1x)
-    ("\\b\\([a-zA-Z][-_.a-zA-Z0-9]+\\)([1-9])\\W" 0
+    ("\\b\\([a-z][-_.a-z0-9]+\\)([1-9])\\W" 0
      (and (>= gnus-button-man-level 3) (< gnus-button-man-level 5))
      gnus-button-handle-man 1)
     ;; even more: Apache::PerlRun(3pm), PDL::IO::FastRaw(3pm),
     ;; SoWWWAnchor(3iv), XSelectInput(3X11)
-    ("\\b\\([a-zA-Z][-_.:a-zA-Z0-9]+\\)([1-9][X1a-z]*)\\W" 0
+    ("\\b\\([a-z][-_.:a-z0-9]+\\)([1-9][X1a-z]*)\\W" 0
      (>= gnus-button-man-level 5) gnus-button-handle-man 1)
     ;; MID or mail: To avoid too many false positives we don't try to catch
     ;; all kind of allowed MIDs or mail addresses.  Domain part must contain
@@ -6119,8 +6128,8 @@ positives are possible."
   "*Alist of regexps matching buttons in article bodies.
 
 Each entry has the form (REGEXP BUTTON FORM CALLBACK PAR...), where
-REGEXP: is the string matching text around the button (can also be lisp
-expression evaluating to a string),
+REGEXP: is the string (case insensitive) matching text around the button (can
+also be lisp expression evaluating to a string),
 BUTTON: is the number of the regexp grouping actually matching the button,
 FORM: is a lisp expression which must eval to true for the button to
 be added,
@@ -6147,7 +6156,7 @@ variable it the real callback function."
     ("^X-[Uu][Rr][Ll]:" gnus-button-url-regexp 0 t browse-url 0)
     ("^Subject:" gnus-button-url-regexp 0 t browse-url 0)
     ("^[^:]+:" gnus-button-url-regexp 0 t browse-url 0)
-    ("^[^:]+:" "\\bmailto:\\([-a-zA-Z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
+    ("^[^:]+:" "\\bmailto:\\([-a-z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
     ("^[^:]+:" "\\(<\\(url: \\)?news:\\([^>\n ]*\\)>\\)" 1 t
      gnus-button-message-id 3))
   "*Alist of headers and regexps to match buttons in article heads.
@@ -6768,11 +6777,11 @@ For example:
 	val elem buttonized)
     (gnus-run-hooks 'gnus-part-display-hook)
     (unless gnus-inhibit-treatment
-      (while (setq elem (pop alist))
+      (dolist (elem alist)
 	(setq val
 	      (save-excursion
-		(if (gnus-buffer-live-p gnus-summary-buffer)
-		    (set-buffer gnus-summary-buffer))
+		(when (gnus-buffer-live-p gnus-summary-buffer)
+		  (set-buffer gnus-summary-buffer))
 		(symbol-value (car elem))))
 	(when (and (or (consp val)
 		       treated-type)
@@ -6806,6 +6815,8 @@ For example:
   (cond
    ((null val)
     nil)
+   (condition
+    (eq condition val))
    ((and (listp val)
 	 (stringp (car val)))
     (apply 'gnus-or (mapcar `(lambda (s)
@@ -6826,8 +6837,6 @@ For example:
 	(error "%S is not a valid predicate" pred)))))
    ((eq val 'mime)
     gnus-show-mime)
-   (condition
-    (eq condition val))
    ((eq val t)
     t)
    ((eq val 'head)

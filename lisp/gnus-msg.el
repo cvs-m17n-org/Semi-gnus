@@ -180,7 +180,7 @@ See Info node `(gnus)Posting Styles'."
   "Should local-file attachments be included as external parts in Gcc copies?
 If it is `all', attach files as external parts;
 if a regexp and matches the Gcc group name, attach files as external parts;
-If nil, attach files as normal parts."
+if nil, attach files as normal parts."
   :version "21.1"
   :group 'gnus-message
   :type '(choice (const nil :tag "None")
@@ -385,6 +385,11 @@ Thank you for your help in stamping out bugs.
 
 ;;; Internal functions.
 
+(defun gnus-inews-make-draft ()
+  `(lambda ()
+     (gnus-inews-make-draft-meta-information
+      ,gnus-newsgroup-name ,gnus-article-reply)))
+
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
   (let ((winconf (make-symbol "gnus-setup-message-winconf"))
@@ -420,10 +425,9 @@ Thank you for your help in stamping out bugs.
 		  message-required-headers)
        (when (and ,group
 		  (not (string= ,group "")))
-	 (push '(,(intern gnus-draft-meta-information-header)
-		 . (lambda ()
-		     (gnus-inews-make-draft-meta-information
-		      ,gnus-newsgroup-name ,gnus-article-reply)))
+	 (push (cons
+		(intern gnus-draft-meta-information-header)
+		(gnus-inews-make-draft))
 	       message-required-headers))
        (unwind-protect
 	   (progn
@@ -1290,20 +1294,22 @@ If FULL-HEADERS (the prefix), include full headers when forwarding.
 Note that this function definition for T-gnus is totally different
 from the original Gnus."
   (interactive "P")
-  (if (null (cdr (gnus-summary-work-articles nil)))
-      (let* ((gnus-article-reply (gnus-summary-article-number))
-	     (gnus-article-yanked-articles (list (list gnus-article-reply)))
-	     charset
-	     (message-included-forward-headers
-	      (if full-headers "" message-included-forward-headers)))
-	(gnus-setup-message 'forward
-	  (gnus-summary-select-article)
-	  (setq charset default-mime-charset)
-	  (set-buffer gnus-original-article-buffer)
-	  (make-local-variable 'default-mime-charset)
-	  (setq default-mime-charset charset)
-	  (message-forward post)))
-    (gnus-summary-digest-mail-forward nil post)))
+  (if (cdr (gnus-summary-work-articles nil))
+      ;; Process marks are given.
+      (gnus-summary-digest-mail-forward nil post)
+    ;; No process marks.
+    (let* ((gnus-article-reply (gnus-summary-article-number))
+	   (gnus-article-yanked-articles (list (list gnus-article-reply)))
+	   charset
+	   (message-included-forward-headers
+	    (if full-headers "" message-included-forward-headers)))
+      (gnus-setup-message 'forward
+	(gnus-summary-select-article)
+	(setq charset default-mime-charset)
+	(set-buffer gnus-original-article-buffer)
+	(make-local-variable 'default-mime-charset)
+	(setq default-mime-charset charset)
+	(message-forward post)))))
 
 (defun gnus-summary-digest-mail-forward (&optional n post)
   "Digests and forwards all articles in this series.
@@ -1822,7 +1828,7 @@ this is a reply."
 		    group))))
 	(when gcc
 	  (insert "Gcc: "
-		  (if (stringp gcc) 
+		  (if (stringp gcc)
 		      (if (string-match " " gcc)
 			  (concat "\"" gcc "\"")
 			gcc)
@@ -1978,7 +1984,7 @@ this is a reply."
       (setq results (delq name (delq address results)))
       ;; make-local-hook is not obsolete in Emacs 20 or XEmacs.
       (make-local-hook 'message-setup-hook)
-      (setq results (sort results (lambda (x y) 
+      (setq results (sort results (lambda (x y)
 				    (string-lessp (car x) (car y)))))
       (dolist (result results)
 	(add-hook 'message-setup-hook

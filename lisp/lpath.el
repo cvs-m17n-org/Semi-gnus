@@ -16,9 +16,9 @@
 	       put-image replace-regexp-in-string rmail-msg-is-pruned
 	       rmail-msg-restore-non-pruned-header sort-coding-systems
 	       tool-bar-add-item tool-bar-add-item-from-menu
-	       tool-bar-local-item-from-menu vcard-pretty-print
-	       w32-focus-frame w3m-charset-to-coding-system
-	       x-focus-frame))
+	       tool-bar-local-item-from-menu url-http-file-exists-p
+	       vcard-pretty-print w32-focus-frame
+	       w3m-charset-to-coding-system x-focus-frame))
 (maybe-bind '(filladapt-mode
 	      mc-pgp-always-sign rmail-enable-mime-composing
 	      rmail-insert-mime-forwarded-message-function
@@ -40,7 +40,7 @@
 		     mouse-minibuffer-check mouse-movement-p mouse-scroll-subr
 		     overlay-lists pgg-parse-crc24-string posn-point
 		     posn-window read-event set-buffer-multibyte track-mouse
-		     window-edges))
+		     window-edges w3m-region))
       (maybe-bind '(adaptive-fill-first-line-regexp
 		    buffer-display-table buffer-file-coding-system
 		    current-language-environment

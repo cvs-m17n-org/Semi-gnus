@@ -3582,13 +3582,22 @@ If given a prefix argument, prompt for a group."
   (unless group
     (error "No group name given"))
   (require 'mm-url)
+  (condition-case nil (require 'url-http) (error nil))
   (let ((name (mm-url-form-encode-xwfu (gnus-group-real-name group)))
 	url hierarchy)
     (when (string-match "\\(^[^\\.]+\\)\\..*" name)
       (setq hierarchy (match-string 1 name))
-      (if (setq url (cdr (assoc hierarchy gnus-group-charter-alist)))
+      (if (and (setq url (cdr (assoc hierarchy gnus-group-charter-alist)))
+	       (if (fboundp 'url-http-file-exists-p)
+		   (url-http-file-exists-p (eval url))
+		 t))
 	  (browse-url (eval url))
-	(gnus-group-fetch-control group)))))
+	(setq url (concat "http://" hierarchy
+			  ".news-admin.org/charters/" name))
+	(if (and (fboundp 'url-http-file-exists-p) 
+		 (url-http-file-exists-p url))
+	    (browse-url url)
+	  (gnus-group-fetch-control group))))))
 
 (defun gnus-group-fetch-control (group)
   "Fetch the archived control messages for the current group.
@@ -4168,8 +4177,7 @@ This command may read the active file."
 	      (setq gnus-newsgroup-unselected
 		    (nreverse gnus-newsgroup-unselected)))))
       (gnus-activate-group group)
-      (gnus-group-make-articles-read group
-				     (list article))
+      (gnus-group-make-articles-read group (list article))
       (when (gnus-group-auto-expirable-p group)
 	(gnus-add-marked-articles
 	 group 'expire (list article))))))

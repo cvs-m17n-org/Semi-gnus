@@ -1,4 +1,99 @@
+2003-01-03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-setup-message): Get the evaliation order
+	right. 
+	(gnus-inews-make-draft): New function.
+	(gnus-setup-message): Use it.
+
+	* message.el (message-required-headers): Add From.
+
+2003-01-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+	Trivial patch from Norbert Koch <nk@viteno.net>.
+
+	* gnus-msg.el (gnus-gcc-externalize-attachments): Fix typo.
+
 2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-generate-headers): Let header formatters do
+	their work.
+
+2003-01-02  Raymond Scholz  <ray-2003@zonix.de>
+
+	* deuglify.el (gnus-article-outlook-deuglify-article):
+	Rehighlight, reapply treatments and call
+	`gnus-article-prepare-hook'.  Suggested by Niels Olof Bouvin.
+	(gnus-outlook-repair-attribution-block): Recognize cited
+	attributions.  Suggested by Niklas Morberg.
+
+2003-01-02  Pete Kazmier  <pete@kazmier.com>
+
+	* gnus-art.el (gnus-treat-predicate): Check condition first.
+
+2003-01-02  Jesper Harder  <harder@ifa.au.dk>
+
+	* lpath.el: Add url-http-file-exists-p.
+
+	* gnus-group.el (gnus-group-fetch-charter): Use
+	http://TLH.news-admin.org/charters/GROUPNAME as a fallback.
+
+2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-draft-headers): Also generate From to get a
+	nicer draft buffer summary.
+
+	* gnus-xmas.el (gnus-xmas-read-event-char): Take an optional
+	parameter.
+
+	* gnus-art.el (article-wash-html): Clean up.
+	(article-wash-html): Typo fix.
+
+	* gnus-msg.el (gnus-summary-mail-forward): Clean up.
+	(gnus-summary-mail-forward): To many lists of lists.
+
+	* gnus-art.el (article-wash-html): Clean up.
+
+2003-01-02  pete-temp  <pete-temp-12-29-2002@kazmier.com>
+
+	* gnus-art.el (gnus-treat-wash-html): New variable.
+
+2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-check-news-header-syntax): Allow posting.
+	(message-check-news-header-syntax): Fix logic for sure, this
+	time.
+
+2003-01-02  Matthieu Moy  <Matthieu.Moy@imag.fr>
+
+	* message.el (message-check-news-header-syntax): Check syntax of
+	continuation headers.
+
+2003-01-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-url-regexp,
+	(gnus-button-mid-or-mail-regexp, gnus-button-alist,
+	(gnus-header-button-alist): Regexps are case insensitive here.
+
+2003-01-02  Simon Josefsson  <jas@extundo.com>
+
+	* dig.el (query-dig): Doc fix.
+
+2003-01-02  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-agent.el (gnus-agent-fetch-selected-article): Update whole
+	summary buffer line, not just the download mark.
+
+2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-goto-subjects): New function.
+	(gnus-summary-insert-dormant-articles): New command and
+	keystroke.
+
+	* gnus-cache.el (gnus-summary-insert-cached-articles): Use new
+	function for mass insertion of subjects.
+
+	* nndraft.el (nndraft-generate-headers): Don't move point.
+
+	* gnus.el (nnheader): Require nnheader.
 
 	* nndraft.el (nndraft-request-associate-buffer): Use
 	make-local-variable.
@@ -11,17 +106,17 @@
 2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.el (gnus-group-parameter-value): Take an extra param.
-	(gnus-group-fast-parameter): Let group param results be nil. 
+	(gnus-group-fast-parameter): Let group param results be nil.
 
 	* gnus-art.el (gnus-article-forward-header): New function.
-	(article-date-ut): Use it to remove continuation date headers. 
+	(article-date-ut): Use it to remove continuation date headers.
 
 	* gnus-sum.el (gnus-summary-walk-group-buffer): Supply prompt to
-	read-event. 
+	read-event.
 	(gnus-summary-remove-bookmark): Clean up.
 	(gnus-summary-set-bookmark): Clean up.
 
-	* gnus-util.el (gnus-read-event-char): Take an optional prompt. 
+	* gnus-util.el (gnus-read-event-char): Take an optional prompt.
 
 	* gnus.el (gnus-group-startup-message): Bind data-directory to
 	the Gnus etc directory.
@@ -104,7 +199,7 @@
 	* gnus-sum.el (gnus-summary-display-while-building): New
 	variable.
 
-2002-01-01  Raymond Scholz  <ray-2003@zonix.de>
+2003-01-01  Raymond Scholz  <ray-2003@zonix.de>
 
 	* deuglify.el (gnus-outlook-rearrange-article): Kill overlays
 	before rearranging the article.

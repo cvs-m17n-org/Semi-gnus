@@ -341,11 +341,12 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
 `new-text', `quoting-style', `redirected-followup', `signature',
 `approved', `sender', `empty', `empty-headers', `message-id', `from',
 `subject', `shorten-followup-to', `existing-newsgroups',
-`buffer-file-name', `unchanged', `newsgroups', `reply-to'."
+`buffer-file-name', `unchanged', `newsgroups', `reply-to',
+'continuation-headers'."
   :group 'message-news
   :type '(repeat sexp))			; Fixme: improve this
 
-(defcustom message-required-headers '((optional . References))
+(defcustom message-required-headers '((optional . References) From)
   "*Headers to be generated or promted for when sending a message.
 Also see `message-required-news-headers' and
 1message-required-mail-headers'."
@@ -353,7 +354,7 @@ Also see `message-required-news-headers' and
   :group 'message-headers
   :type '(repeat sexp))
 
-(defcustom message-draft-headers '(References)
+(defcustom message-draft-headers '(References From)
   "*Headers to be generated when saving a draft message."
   :group 'message-news
   :group 'message-headers
@@ -4447,6 +4448,18 @@ Otherwise, generate and save a value for `canlock-password' first."
 	   (if (= (length errors) 1) "this" "these")
 	   (if (= (length errors) 1) "" "s")
 	   (mapconcat 'identity errors ", ")))))))
+   ;; Check continuation headers.
+   (message-check 'continuation-headers
+     (goto-char (point-min))
+     (let ((do-posting t))
+       (while (re-search-forward "^[^ \t\n][^:\n]*$" nil t)
+	 (if (y-or-n-p "Fix continuation lines? ")
+	     (progn
+	       (goto-char (match-beginning 0))
+	       (insert " "))
+	   (unless (y-or-n-p "Send anyway? ")
+	     (setq do-posting nil))))
+       do-posting))
    ;; Check the Newsgroups & Followup-To headers for syntax errors.
    (message-check 'valid-newsgroups
      (let ((case-fold-search t)
@@ -5241,13 +5254,18 @@ Headers already prepared in the buffer are not modified."
 		  (progn
 		    ;; This header didn't exist, so we insert it.
 		    (goto-char (point-max))
-		    (insert (if (stringp header) header (symbol-name header))
-			    ": " value)
-		    ;; We check whether the value was ended by a
-		    ;; newline.  If now, we insert one.
-		    (unless (bolp)
-		      (insert "\n"))
-		    (forward-line -1))
+		    (let ((formatter
+			   (cdr (assq header message-header-format-alist))))
+		      (if formatter
+			  (funcall formatter header value)
+			(insert (if (stringp header)
+				    header (symbol-name header))
+				": " value))
+		      ;; We check whether the value was ended by a
+		      ;; newline.  If now, we insert one.
+		      (unless (bolp)
+			(insert "\n"))
+		      (forward-line -1)))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
 		(delete-region (point) (gnus-point-at-eol))
