@@ -1,3 +1,34 @@
+2001-09-17  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.26 (This is alpha status.)
+	Set unibyte mode to `gnus-article-buffer' while parsing article.
+	Adopt RFC2822 for `References' and `In-Reply-To' field.
+	Fix a bug.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.26.
+
+	* lisp/mm-decode.el (mm-copy-to-buffer): Disable multibyte in
+	` *mm*' buffer.
+
+	* lisp/message.el: Adopt RFC2822 for `References' and
+	`In-Reply-To' field.
+	(message-yank-add-new-references): Change initial value to nil
+	instead of t.
+	(message-header-format-alist): Format `In-Reply-To' field as same
+	as `References' field.
+	(message-yank-original): Add message id to `In-Reply-To' field
+	instead of `References'.
+	(message-replace-reference): New function.
+	(message-make-in-reply-to): Return only `Message-Id'.
+	(message-reply): Insert `In-Reply-To' field.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/insert-address-regexp):
+	`regexp-quote' for each addresses.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Disable multibyte in
+	`*Article*' buffer while parsing article.
+	(gnus-display-mime): Ditto.
+
 2001-07-25  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/mm-decode.el (mm-dissect-buffer): Could not handle
