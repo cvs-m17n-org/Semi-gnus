@@ -8313,9 +8313,10 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 @item W A
 @kindex W A ($B35N,(B)
 @findex gnus-article-treat-ansi-sequences
-ANSI SGR $B%7!<%1%s%9$r(B overlay $B$^$?$O(B extent $B$KJQ49$7$^(B
-$B$9(B (@code{gnus-article-treat-ansi-sequences})$B!#(BANSI $B%7!<%1%s%9$OCf9q8l$N(B
-$B%K%e!<%9%0%k!<%W$G6/D4I=<($K;H$o$l$F$$$^$9!#(B
+@cindex @acronym{ANSI} control sequences
+@acronym{ANSI} SGR $B%7!<%1%s%9$r(B overlay $B$^$?$O(B extent $B$KJQ49$7$^(B
+$B$9(B (@code{gnus-article-treat-ansi-sequences})$B!#(B@acronym{ANSI} $B%7!<%1%s%9(B
+$B$OCf9q8l$N%K%e!<%9%0%k!<%W$G6/D4I=<($K;H$o$l$F$$$^$9!#(B
 
 @item W u
 @kindex W u ($B35N,(B)
@@ -10088,7 +10089,7 @@ List-Owner $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N4IM}<T08$F$K%a%C%;!<(B
 
 @item C-c C-n a
 @kindex C-c C-n a ($B35N,(B)
-@findex gnus-mailing-list-owner
+@findex gnus-mailing-list-archive
 List-Archive $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N%"!<%+%$%V$r1\Mw$7(B
 $B$^$9!#(B
 @end table
@@ -10424,6 +10425,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 @item gnus-treat-play-sounds
 @item gnus-treat-translate
+@item gnus-treat-ansi-sequences (t)
 @item gnus-treat-x-pgp-sig (head)
 
 @item gnus-treat-unfold-headers (head)
@@ -21686,6 +21688,8 @@ Spam $B$N$?$a$K?7Ce%a!<%k$r8!::$9$k$H$-!"$*$h$S%0%k!<%W$rH4$1$k$H$-$G$9!#(B
 $B$7$F$$$^$9!#(B@xref{Spam ELisp Package Filtering of Incoming Mail} $B$r;2>H(B
 $B$7$F2<$5$$!#(B
 
+@vindex gnus-spam-autodetect
+@vindex gnus-spam-autodetect-methods
 @code{nntp} $B$N$h$&$J%P%C%/%(%s%I$K$O?7Ce%a!<%k$N%9%W!<%k$,L5$$$N$G!"Be$o(B
 $B$j$N5!9=$r;H$o$J$1$l$P$J$j$^$;$s!#$3$l$O!"%5!<%P!<$,?7Ce%a!<%k$NJ,3d$rC4(B
 $BEv$7$F$$$F!"(BGnus $B$,$5$i$K$^$?J,3d$r9T$J$o$J$$%P%C%/%(%s%I$G$b!"(B($BBe$o$j$N(B
