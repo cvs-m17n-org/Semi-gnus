@@ -45,6 +45,8 @@
   "*POP3 mailhost.")
 (defvar pop3-port 110
   "*POP3 port.")
+(defvar pop3-connection-type nil
+  "*POP3 connection type.")
 
 (defvar pop3-password-required t
   "*Non-nil if a password is required when connecting to POP server.")
@@ -62,6 +64,13 @@ Used for APOP authentication.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
+
+(eval-and-compile
+  (autoload 'open-ssl-stream "ssl"))
+
+(defvar pop3-ssl-program-arguments
+  '("-quiet")
+  "Arguments to be passed to the program `pop3-ssl-program-name'.")
 
 (defun pop3-movemail (&optional crashbox)
   "Transfer contents of a maildrop to the specified CRASHBOX."
@@ -119,12 +128,39 @@ Returns the process associated with the connection."
       (setq pop3-read-point (point-min))
       )
     (setq process
-	  (open-network-stream-as-binary "POP" process-buffer mailhost port))
+	  (cond ((eq pop3-connection-type 'ssl)
+		 (pop3-open-ssl-stream "POP" process-buffer mailhost port))
+		(t
+		 (open-network-stream-as-binary "POP" process-buffer mailhost port))))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
     process))
+
+(defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
+  (let* ((ssl-program-arguments 
+	  (` ((,@ pop3-ssl-program-arguments) (, extra-arg) 
+	      "-connect" (, (format "%s:%d" host service)))))
+         (process (open-ssl-stream name buffer host service)))
+    (when process
+      (with-current-buffer buffer
+	(goto-char (point-min))
+	(while (and (memq (process-status process) '(open run))
+                    (goto-char (point-max))
+                    (forward-line -1)
+                    (not (looking-at "+OK")))
+          (accept-process-output process 1)
+          (sit-for 1))
+	(delete-region (point-min) (point)))
+      (and process (memq (process-status process) '(open run))
+	   process))))
+
+(defun pop3-open-ssl-stream (name buffer host service)
+  "Open a SSL connection for a service to a host."
+  (as-binary-process
+   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 
 ;; Support functions
 

@@ -1,3 +1,19 @@
+1999-05-17   Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
+	     Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/mail-source.el (mail-source-keyword-map): New keyword
+	:connection for pop. It is introduced to enable SSL connection.
+	(mail-source-fetch-pop): Use it to bind `pop3-connection-type'.
+
+	* lisp/pop3.el : Add an autoload for `open-ssl-stream' defined in
+	`ssl'.
+	(pop3-connection-type, pop3-ssl-program-arguments): New variables.
+	(pop3-open-ssl-stream-1, pop3-open-ssl-stream): New functions.
+	(pop3-open-server): Call the latter when `pop3-connection-type' is
+	ssl.
+
 1999-05-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
