@@ -1,5 +1,12 @@
 1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus-art.el (gnus-article-wash-status): Sync up with
+	Pterodactyl Gnus v0.98.
+
+1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnimap.el (nnimap-request-newgroups): Don't use `member-if'.
 
 	* lisp/gnus.el (gnus-select-method): Use `if' instead of `when'.
