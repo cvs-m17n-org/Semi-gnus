@@ -1,8 +1,61 @@
+1998-12-10  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-movemail): Use `write-region-as-binary'
+	instead of `append-to-file'.
+	(pop3-movemail-file-coding-system): Abolished.
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-specified-coding-system' instead of
+	`find-file-noselect'.
+
+	* lisp/gnus-score.el (gnus-score-load-score-alist): Use
+	`insert-file-contents-as-specified-coding-system' instead of
+	`insert-file-contents'.
+	* lisp/nnmail.el (nnmail-find-file): Ditto.
+	* lisp/nnheader.el (nnheader-insert-file-contents): Ditto.
+
+	* lisp/message.el (message-send-mail-with-qmail): Enclose
+	`call-process-region' with `as-binary-process'.
+	(message-send-mail-with-sendmail): Ditto.
+	(message-send-coding-system): Abolished.
+
+	* lisp/score-mode.el (gnus-score-edit-exit): Emulate
+	`save-buffer' with `write-region-as-specified-coding-system'.
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Ditto.
+
+	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Emulate `load'
+	with `insert-file-contents-as-specified-coding-system' and
+	`eval-region'.
+
+	* lisp/gnus-score.el (gnus-score-save): Use
+	`gnus-write-buffer-as-specified-coding-system' instead of
+	`gnus-write-buffer'.
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Ditto.
+	(gnus-cache-save-buffers): Ditto.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Use
+	`write-region-as-binary' instead of `append-to-file'.
+	(gnus-output-to-mail): Use `gnus-write-buffer-as-binary' instead
+	of `gnus-write-buffer'.
+	(gnus-write-buffer-as-specified-coding-system): New function.
+	(gnus-write-buffer-as-binary): New function.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-specified-coding-system' instead of
+	`write-region'.
+	* lisp/gnus-agent.el (gnus-agent-expire): Ditto.
+	(gnus-agent-fetch-headers): Ditto.
+	(gnus-agent-flush-cache): Ditto.
+	(gnus-agent-fetch-articles): Ditto.
+	(gnus-agent-save-history): Ditto.
+	(gnus-agent-save-groups): Ditto.
+	(gnus-agent-save-active): Ditto.
+
 1998-12-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-	
+
 	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Create menu
 	using 'easymenu'.
-	
+
 1998-12-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Don't call
