@@ -8,7 +8,7 @@
 
 @copying
 Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003, 2004
+2002, 2003, 2004, 2005
 Free Software Foundation, Inc.
 
 @quotation
@@ -8150,6 +8150,14 @@ gnus が記事を表示する既定のやり方を変えたいとき
 @kindex W m (概略)
 @findex gnus-summary-morse-message
 記事バッファをモールス復号します (@code{gnus-summary-morse-message})。
+
+@item W i
+@kindex W i (概略)
+@findex gnus-summary-idna-message
+現在の記事にある IDNA エンコードされたドメイン名をデコードします。
+IDNA エンコードされたドメイン名は @samp{xn--bar} のように見えます。これ
+を実行した後で文字列がデコードされないままだったら、おそらくそれは不正
+な IDNA 文字列でしょう (@samp{xn--bar} は不正です)。
 
 @item W t
 @item t
