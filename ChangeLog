@@ -1,3 +1,16 @@
+1999-08-06  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.4b3.
+
+	* README-offline.ja: Match with Nana-gnus.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-setting-file): Change to
+	"~/.nana-gnus-offline.el".
+	(gnus-ofsetup-read-from-minibuffer): New function.
+	(gnus-ofsetup-completing-read-symbol): Ditto.
+	(gnus-ofsetup-read-pop-account): Ditto.
+	(gnus-setup-for-offline): Refine.
+
 1999-08-05  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-version-number): Change to 6.13.4b2.
