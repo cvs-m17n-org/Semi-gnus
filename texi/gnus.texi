@@ -7817,9 +7817,9 @@ of the characters, and it also makes it possible to embed pictures and
 other naughty stuff in innocent-looking articles.
 
 @vindex gnus-show-mime
-@vindex gnus-show-mime-method
+@vindex gnus-article-display-method-for-mime
 @vindex gnus-strict-mime
-@findex metamail-buffer
+@findex gnus-article-display-mime-message
 Gnus handles @sc{mime} by pushing the articles through
 @code{gnus-article-display-method-for-mime}, which is
 @code{gnus-article-display-mime-message} by default.  This function
