@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "12"
+(defconst gnus-revision-number "13"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -1715,7 +1715,7 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-current-score-file-nondirectory gnus-score-adaptive
       gnus-score-find-trace gnus-score-file-name)
      ("gnus-cus" :interactive t gnus-custom-mode gnus-group-customize
-       gnus-score-customize)
+      gnus-score-customize)
      ("gnus-topic" :interactive t gnus-topic-mode)
      ("gnus-topic" gnus-topic-remove-group gnus-topic-set-parameters)
      ("gnus-salt" :interactive t gnus-pick-mode gnus-binary-mode)
@@ -1760,8 +1760,7 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-offer-save-summaries gnus-make-thread-indent-array
       gnus-summary-exit gnus-update-read-articles gnus-summary-last-subject
       gnus-summary-skip-intangible gnus-summary-article-number
-      gnus-data-header gnus-data-find
-      gnus-summary-jump-to-other-group)
+      gnus-data-header gnus-data-find gnus-summary-jump-to-other-group)
      ("gnus-group" gnus-group-insert-group-line gnus-group-quit
       gnus-group-list-groups gnus-group-first-unread-group
       gnus-group-set-mode-line gnus-group-set-info gnus-group-save-newsrc
@@ -1829,9 +1828,12 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts)
      ("gnus-mlspl" gnus-group-split gnus-group-split-fancy)
      ("gnus-mlspl" :interactive t gnus-group-split-setup
-      gnus-group-split-update)
-     ("smiley-mule" smiley-buffer)
-     ("x-face-mule" x-face-mule-gnus-article-display-x-face))))
+      gnus-group-split-update))))
+
+(eval-and-compile
+  (unless (featurep 'xemacs)
+    (autoload 'gnus-smiley-display "smiley-mule")
+    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
 
 ;;; gnus-sum.el thingies
 
