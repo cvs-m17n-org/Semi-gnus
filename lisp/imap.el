@@ -1,5 +1,5 @@
 ;;; imap.el --- imap library
-;; Copyright (C) 1998, 1999, 2000, 2001
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
@@ -601,7 +601,9 @@ If ARGS, PROMPT is used as an argument to `format'."
   (let ((cmds (if (listp imap-ssl-program) imap-ssl-program
 		(list imap-ssl-program)))
 	cmd done)
-    (ignore-errors (require 'ssl))
+    (condition-case ()
+	(require 'ssl)
+      (error))
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening SSL connection with `%s'..." cmd)
       (let* ((port (or port imap-default-ssl-port))
@@ -614,8 +616,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 				      ?s server
 				      ?p (number-to-string port)))))
 	     process)
-	(when (setq process (ignore-errors (open-ssl-stream
-					    name buffer server port)))
+	(when (setq process (condition-case ()
+				(open-ssl-stream name buffer server port)
+			      (error)))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
 	    (while (and (memq (process-status process) '(open run))
@@ -710,12 +713,7 @@ If ARGS, PROMPT is used as an argument to `format'."
       nil)))
 
 (defun imap-starttls-p (buffer)
-  (and (imap-capability 'STARTTLS buffer)
-       (condition-case ()
-	   (progn
-	     (require 'starttls)
-	     (call-process "starttls"))
-	 (error nil))))
+  (imap-capability 'STARTTLS buffer))
 
 (defun imap-starttls-open (name buffer server port)
   (let* ((port (or port imap-default-port))
@@ -768,12 +766,15 @@ Returns t if login was successful, nil otherwise."
       (while (or (not user) (not passwd))
 	(setq user (or imap-username
 		       (read-from-minibuffer
-			(concat "IMAP username for " imap-server ": ")
+			(concat "IMAP username for " imap-server 
+				" (using stream `" (symbol-name imap-stream)
+				"'): ")
 			(or user imap-default-user))))
 	(setq passwd (or imap-password
 			 (imap-read-passwd
 			  (concat "IMAP password for " user "@"
-				  imap-server ": "))))
+				  imap-server " (using authenticator `"
+				  (symbol-name imap-auth) "'): "))))
 	(when (and user passwd)
 	  (if (funcall loginfunc user passwd)
 	      (progn
@@ -795,13 +796,7 @@ Returns t if login was successful, nil otherwise."
 
 (defun imap-gssapi-auth-p (buffer)
   (and (imap-capability 'AUTH=GSSAPI buffer)
-       (catch 'imtest-found
-	 (let (prg (prgs imap-gssapi-program))
-	   (while (setq prg (pop prgs))
-	     (condition-case ()
-		 (and (call-process (substring prg 0 (string-match " " prg)))
-		      (throw 'imtest-found t))
-	       (error nil)))))))
+       (eq imap-stream 'gssapi)))
 
 (defun imap-gssapi-auth (buffer)
   (message "imap: Authenticating using GSSAPI...%s"
@@ -810,13 +805,7 @@ Returns t if login was successful, nil otherwise."
 
 (defun imap-kerberos4-auth-p (buffer)
   (and (imap-capability 'AUTH=KERBEROS_V4 buffer)
-       (catch 'imtest-found
-	 (let (prg (prgs imap-kerberos4-program))
-	   (while (setq prg (pop prgs))
-	     (condition-case ()
-		 (and (call-process (substring prg 0 (string-match " " prg)))
-		      (throw 'imtest-found t))
-	       (error nil)))))))
+       (eq imap-stream 'kerberos4)))
 
 (defun imap-kerberos4-auth (buffer)
   (message "imap: Authenticating using Kerberos 4...%s"
@@ -949,46 +938,53 @@ necessery.  If nil, the buffer name is generated."
     (setq imap-auth (or auth imap-auth))
     (setq imap-stream (or stream imap-stream))
     (message "imap: Connecting to %s..." imap-server)
-    (if (let ((imap-stream (or imap-stream imap-default-stream)))
-	  (imap-open-1 buffer))
-	;; Choose stream.
-	(let (stream-changed)
-	  (message "imap: Connecting to %s...done" imap-server)
-	  (when (null imap-stream)
-	    (let ((streams imap-streams))
-	      (while (setq stream (pop streams))
-		(if (funcall (nth 1 (assq stream imap-stream-alist)) buffer)
-		    (setq stream-changed (not (eq (or imap-stream
-						      imap-default-stream)
-						  stream))
-			  imap-stream stream
-			  streams nil)))
-	      (unless imap-stream
-		(error "Couldn't figure out a stream for server"))))
-	  (when stream-changed
-	    (message "imap: Reconnecting with stream `%s'..." imap-stream)
-	    (imap-close buffer)
-	    (if (imap-open-1 buffer)
-		(message "imap: Reconnecting with stream `%s'...done"
-			 imap-stream)
-	      (message "imap: Reconnecting with stream `%s'...failed"
-		       imap-stream))
-	    (setq imap-capability nil))
-	  (if (imap-opened buffer)
-	      ;; Choose authenticator
-	      (when (and (null imap-auth) (not (eq imap-state 'auth)))
-		(let ((auths imap-authenticators))
-		  (while (setq auth (pop auths))
-		    (if (funcall (nth 1 (assq auth imap-authenticator-alist))
-				 buffer)
-			(setq imap-auth auth
-			      auths nil)))
-		  (unless imap-auth
-		    (error "Couldn't figure out authenticator for server"))))))
-      (message "imap: Connecting to %s...failed" imap-server))
-    (when (imap-opened buffer)
-      (setq imap-mailbox-data (make-vector imap-mailbox-prime 0))
-      buffer)))
+    (if (null (let ((imap-stream (or imap-stream imap-default-stream)))
+		(imap-open-1 buffer)))
+	(progn
+	  (message "imap: Connecting to %s...failed" imap-server)
+	  nil)
+      (when (null imap-stream)
+	;; Need to choose stream.
+	(let ((streams imap-streams))
+	  (while (setq stream (pop streams))
+	    ;; OK to use this stream?
+	    (when (funcall (nth 1 (assq stream imap-stream-alist)) buffer)
+	      ;; Stream changed?
+	      (if (not (eq imap-default-stream stream))
+		  (with-current-buffer (get-buffer-create
+					(generate-new-buffer-name " *temp*"))
+		    (mapcar 'make-local-variable imap-local-variables)
+		    (imap-disable-multibyte)
+		    (buffer-disable-undo)
+		    (setq imap-server (or server imap-server))
+		    (setq imap-port imap-port)
+		    (setq imap-auth imap-auth)
+		    (message "imap: Reconnecting with stream `%s'..." stream)
+		    (if (null (let ((imap-stream stream))
+				(imap-open-1 (current-buffer))))
+			(progn
+			  (kill-buffer (current-buffer))
+			  (message 
+			   "imap: Reconnecting with stream `%s'...failed" 
+			   stream))
+		      ;; We're done, kill the first connection
+		      (imap-close buffer)
+		      (kill-buffer buffer)
+		      (rename-buffer buffer)
+		      (message "imap: Reconnecting with stream `%s'...done"
+			       stream)
+		      (setq imap-stream stream)
+		      (setq imap-capability nil)
+		      (setq streams nil)))
+		;; We're done
+		(message "imap: Connecting to %s...done" imap-server)
+		(setq imap-stream stream)
+		(setq imap-capability nil)
+		(setq streams nil))))))
+      (when (imap-opened buffer)
+	(setq imap-mailbox-data (make-vector imap-mailbox-prime 0)))
+      (when imap-stream 
+	buffer))))
 
 (defun imap-opened (&optional buffer)
   "Return non-nil if connection to imap server in BUFFER is open.
@@ -1015,15 +1011,36 @@ password is remembered in the buffer."
       (make-local-variable 'imap-password)
       (if user (setq imap-username user))
       (if passwd (setq imap-password passwd))
-      (if (funcall (nth 2 (assq imap-auth imap-authenticator-alist)) buffer)
-	  (setq imap-state 'auth)))))
+      (if imap-auth
+	  (and (funcall (nth 2 (assq imap-auth 
+				     imap-authenticator-alist)) buffer)
+	       (setq imap-state 'auth))
+	;; Choose authenticator.
+	(let ((auths imap-authenticators)
+	      auth)
+	  (while (setq auth (pop auths))
+	    ;; OK to use authenticator?
+	    (when (funcall (nth 1 (assq auth imap-authenticator-alist)) buffer)
+	      (message "imap: Authenticating to `%s' using `%s'..."
+		       imap-server auth)
+	      (setq imap-auth auth)
+	      (if (funcall (nth 2 (assq auth imap-authenticator-alist)) buffer)
+		  (progn
+		    (message "imap: Authenticating to `%s' using `%s'...done"
+			     imap-server auth)
+		    (setq auths nil))
+		(message "imap: Authenticating to `%s' using `%s'...failed"
+			 imap-server auth)))))
+	imap-state))))
 
 (defun imap-close (&optional buffer)
   "Close connection to server in BUFFER.
 If BUFFER is nil, the current buffer is used."
   (with-current-buffer (or buffer (current-buffer))
     (when (imap-opened)
-      (imap-send-command-wait "LOGOUT"))
+      (condition-case nil
+	  (imap-send-command-wait "LOGOUT")
+	(quit nil)))
     (when (and imap-process
 	       (memq (process-status imap-process) '(open run)))
       (delete-process imap-process))
@@ -2205,7 +2222,9 @@ Return nil if no complete line has arrived."
 	(let ((token (read (current-buffer))))
 	  (imap-forward)
 	  (cond ((eq token 'UID)
-		 (setq uid (ignore-errors (read (current-buffer)))))
+		 (setq uid (condition-case ()
+			       (read (current-buffer))
+			     (error))))
 		((eq token 'FLAGS)
 		 (setq flags (imap-parse-flag-list))
 		 (if (not flags)

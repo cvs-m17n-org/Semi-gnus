@@ -1,5 +1,5 @@
 ;;; mml.el --- A package for parsing and validating MML documents
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -35,6 +35,7 @@
   (autoload 'gnus-setup-posting-charset "gnus-msg")
   (autoload 'gnus-add-minor-mode "gnus-ems")
   (autoload 'message-fetch-field "message")
+  (autoload 'fill-flowed-encode "flow-fill")
   (autoload 'message-posting-charset "message"))
 
 (defcustom mml-content-type-parameters
@@ -63,6 +64,16 @@ the MML handle.")
 NAME is a string containing the name of the TWEAK parameter in the MML
 handle.  FUNCTION is a Lisp function which is called with the MML
 handle to tweak the part.")
+
+(defvar mml-tweak-sexp-alist 
+  '((mml-externalize-attachments . mml-tweak-externalize-attachments))
+  "A list of (SEXP . FUNCTION) for tweaking MML parts.
+SEXP is a s-expression. If the evaluation of SEXP is non-nil, FUNCTION
+is called.  FUNCTION is a Lisp function which is called with the MML
+handle to tweak the part.")
+
+(defvar mml-externalize-attachments nil
+  "*If non-nil, local-file attachments are generated as external parts.")
 
 (defvar mml-generate-multipart-alist nil
   "*Alist of multipart generation functions.
@@ -276,6 +287,15 @@ A message part needs to be split into %d charset parts.  Really send? "
     (setq contents (append (list (cons 'tag-location orig-point)) contents))
     (cons (intern name) (nreverse contents))))
 
+(defun mml-buffer-substring-no-properties-except-hard-newlines (start end)
+  (let ((str (buffer-substring-no-properties start end))
+	(bufstart start) tmp)
+    (while (setq tmp (text-property-any start end 'hard 't))
+      (set-text-properties (- tmp bufstart) (- tmp bufstart -1)
+			   '(hard t) str)
+      (setq start (1+ tmp)))
+    str))
+
 (defun mml-read-part (&optional mml)
   "Return the buffer up till the next part, multipart or closing part or multipart.
 If MML is non-nil, return the buffer up till the correspondent mml tag."
@@ -289,19 +309,22 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	    (if (re-search-forward "<#\\(/\\)?mml." nil t)
 		(setq count (+ count (if (match-beginning 1) -1 1)))
 	      (goto-char (point-max))))
-	  (buffer-substring-no-properties beg (if (> count 0)
-						  (point)
-						(match-beginning 0))))
+	  (mml-buffer-substring-no-properties-except-hard-newlines
+	   beg (if (> count 0)
+		   (point)
+		 (match-beginning 0))))
       (if (re-search-forward
 	   "<#\\(/\\)?\\(multipart\\|part\\|external\\|mml\\)." nil t)
 	  (prog1
-	      (buffer-substring-no-properties beg (match-beginning 0))
+	      (mml-buffer-substring-no-properties-except-hard-newlines
+	       beg (match-beginning 0))
 	    (if (or (not (match-beginning 1))
 		    (equal (match-string 2) "multipart"))
 		(goto-char (match-beginning 0))
 	      (when (looking-at "[ \t]*\n")
 		(forward-line 1))))
-	(buffer-substring-no-properties beg (goto-char (point-max)))))))
+	(mml-buffer-substring-no-properties-except-hard-newlines
+	 beg (goto-char (point-max)))))))
 
 (defvar mml-boundary nil)
 (defvar mml-base-boundary "-=-=")
@@ -330,7 +353,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
       (cond
        ((or (eq (car cont) 'part) (eq (car cont) 'mml))
 	(let ((raw (cdr (assq 'raw cont)))
-	      coded encoding charset filename type)
+	      coded encoding charset filename type flowed)
 	  (setq type (or (cdr (assq 'type cont)) "text/plain"))
 	  (if (and (not raw)
 		   (member (car (split-string type "/")) '("text" "message")))
@@ -377,8 +400,24 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		    (setq charset (mm-encode-body charset))
 		    (setq encoding (mm-body-encoding
 				    charset (cdr (assq 'encoding cont))))))
+		  ;; Only perform format=flowed filling on text/plain
+		  ;; parts where there either isn't a format parameter
+		  ;; in the mml tag or it says "flowed" and there
+		  ;; actually are hard newlines in the text.
+		  (let (use-hard-newlines)
+		    (when (and (string= type "text/plain")
+			       (or (null (assq 'format cont))
+				   (string= (assq 'format cont) "flowed"))
+			       (setq use-hard-newlines
+				     (text-property-any
+				      (point-min) (point-max) 'hard 't)))
+		      (fill-flowed-encode)
+		      ;; Indicate that `mml-insert-mime-headers' should
+		      ;; insert a "; format=flowed" string unless the
+		      ;; user has already specified it.
+		      (setq flowed (null (assq 'format cont)))))
 		  (setq coded (buffer-string)))
-		(mml-insert-mime-headers cont type charset encoding)
+		(mml-insert-mime-headers cont type charset encoding flowed)
 		(insert "\n")
 		(insert coded))
 	    (mm-with-unibyte-buffer
@@ -393,7 +432,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		(insert (cdr (assq 'contents cont)))))
 	      (setq encoding (mm-encode-buffer type)
 		    coded (mm-string-as-multibyte (buffer-string))))
-	    (mml-insert-mime-headers cont type charset encoding)
+	    (mml-insert-mime-headers cont type charset encoding nil)
 	    (insert "\n")
 	    (mm-with-unibyte-current-buffer
 	      (insert coded)))))
@@ -462,7 +501,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	  (if (setq sender (cdr (assq 'sender cont)))
 	      (message-options-set 'message-sender sender))
 	  (if (setq recipients (cdr (assq 'recipients cont)))
-	      (message-options-set 'message-sender recipients))
+	      (message-options-set 'message-recipients recipients))
 	  (funcall (nth 1 item) cont)))
       (let ((item (assoc (cdr (assq 'encrypt cont)) mml-encrypt-alist))
 	    sender recipients)
@@ -470,7 +509,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	  (if (setq sender (cdr (assq 'sender cont)))
 	      (message-options-set 'message-sender sender))
 	  (if (setq recipients (cdr (assq 'recipients cont)))
-	      (message-options-set 'message-sender recipients))
+	      (message-options-set 'message-recipients recipients))
 	  (funcall (nth 1 item) cont))))))
 
 (defun mml-compute-boundary (cont)
@@ -513,13 +552,14 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	    "")
 	  mml-base-boundary))
 
-(defun mml-insert-mime-headers (cont type charset encoding)
+(defun mml-insert-mime-headers (cont type charset encoding flowed)
   (let (parameters disposition description)
     (setq parameters
 	  (mml-parameter-string
 	   cont mml-content-type-parameters))
     (when (or charset
 	      parameters
+	      flowed
 	      (not (equal type mml-generate-default-type)))
       (when (consp charset)
 	(error
@@ -528,6 +568,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
       (when charset
 	(insert "; " (mail-header-encode-parameter
 		      "charset" (symbol-name charset))))
+      (when flowed
+	(insert "; format=flowed"))
       (when parameters
 	(mml-insert-parameter-string
 	 cont mml-content-type-parameters))
@@ -626,6 +668,9 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
   (message-encode-message-body)
   (save-restriction
     (message-narrow-to-headers-or-head)
+    ;; Skip past any From_ headers.
+    (while (looking-at "From ")
+      (forward-line 1))
     (let ((mail-parse-charset message-default-charset))
       (mail-encode-encoded-word-buffer))))
 
@@ -928,7 +973,8 @@ If RAW, don't highlight the article."
 	    (erase-buffer)
 	    (mm-disable-multibyte)
 	    (insert s)))
-      (let ((gnus-newsgroup-charset (car message-posting-charset)))
+      (let ((gnus-newsgroup-charset (car message-posting-charset))
+	    gnus-article-prepare-hook gnus-original-article-buffer)
 	(run-hooks 'gnus-article-decode-hook)
 	(let ((gnus-newsgroup-name "dummy"))
 	  (gnus-article-prepare-display))))
@@ -962,7 +1008,23 @@ If RAW, don't highlight the article."
 	    (setq alist (cdr alist)))))))
     (if func
 	(funcall func cont)
-      cont)))
+      cont)
+    (let ((alist mml-tweak-sexp-alist))
+      (while alist
+	(if (eval (caar alist))
+	    (funcall (cdar alist) cont))
+	(setq alist (cdr alist)))))
+  cont)
+
+(defun mml-tweak-externalize-attachments (cont)
+  "Tweak attached files as external parts."
+  (let (filename-cons)
+    (when (and (eq (car cont) 'part) 
+	       (not (cdr (assq 'buffer cont)))
+	       (and (setq filename-cons (assq 'filename cont))
+		    (not (equal (cdr (assq 'nofile cont)) "yes"))))
+      (setcar cont 'external)
+      (setcar filename-cons 'name))))
 
 (provide 'mml)
 

@@ -1,6 +1,6 @@
 ;;; nneething.el --- arbitrary file access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -126,11 +126,23 @@ included.")
 	 (file-exists-p file)		; The file exists.
 	 (not (file-directory-p file))	; It's not a dir.
 	 (save-excursion
-	   (nnmail-find-file file)  ; Insert the file in the nntp buf.
+	   (let ((nnmail-file-coding-system 'binary))
+	     (nnmail-find-file file))	; Insert the file in the nntp buf.
 	   (unless (nnheader-article-p)	; Either it's a real article...
-	     (goto-char (point-min))
-	     (nneething-make-head
-	      file (current-buffer))	; ... or we fake some headers.
+	     (let ((type
+		    (unless (file-directory-p file)
+		      (or (cdr (assoc (concat "." (file-name-extension file))
+				      mailcap-mime-extensions))
+			  "text/plain")))
+		   (charset
+		    (mm-detect-mime-charset-region (point-min) (point-max)))
+		   (encoding))
+	       (unless (string-match "\\`text/" type)
+		 (base64-encode-region (point-min) (point-max))
+		 (setq encoding "base64"))
+	       (goto-char (point-min))
+	       (nneething-make-head file (current-buffer)
+				    nil type charset encoding))
 	     (insert "\n"))
 	   t))))
 
@@ -272,13 +284,44 @@ included.")
     (insert-buffer-substring nneething-work-buffer)
     (goto-char (point-max))))
 
-(defun nneething-make-head (file &optional buffer extra-msg)
+(defun nneething-encode-file-name (file &optional coding-system)
+  "Encode the name of the FILE in CODING-SYSTEM."
+  (let ((pos 0) buf)
+    (setq file (mm-encode-coding-string
+		file (or coding-system nnmail-pathname-coding-system)))
+    (while (string-match "[^-a-zA-Z_:/.]" file pos)
+      (setq buf (cons (format "%%%02x" (aref file (match-beginning 0)))
+		      (cons (substring file pos (match-beginning 0)) buf))
+	    pos (match-end 0)))
+    (apply (function concat)
+	   (nreverse (cons (substring file pos) buf)))))
+
+(defun nneething-decode-file-name (file &optional coding-system)
+  "Decode the name of the FILE is encoded in CODING-SYSTEM."
+  (let ((pos 0) buf)
+    (while (string-match "%\\([0-9a-fA-F][0-9a-fA-F]\\)" file pos)
+      (setq buf (cons (string (string-to-number (match-string 1 file) 16))
+		      (cons (substring file pos (match-beginning 0)) buf))
+	    pos (match-end 0)))
+    (decode-coding-string
+     (apply (function concat)
+	    (nreverse (cons (substring file pos) buf)))
+     (or coding-system nnmail-pathname-coding-system))))
+
+(defun nneething-get-file-name (id)
+  "Extract the file name from the message ID string."
+  (when (string-match "\\`<nneething\\-[0-9]+\\-\\([^@]+\\)@.*>\\'" id)
+    (nneething-decode-file-name (match-string 1 id))))
+
+(defun nneething-make-head (file &optional buffer extra-msg
+				 mime-type mime-charset mime-encoding)
   "Create a head by looking at the file attributes of FILE."
   (let ((atts (file-attributes file)))
     (insert
      "Subject: " (file-name-nondirectory file) (or extra-msg "") "\n"
      "Message-ID: <nneething-"
      (int-to-string (incf nneething-message-id-number))
+     "-" (nneething-encode-file-name file)
      "@" (system-name) ">\n"
      (if (equal '(0 0) (nth 5 atts)) ""
        (concat "Date: " (current-time-string (nth 5 atts)) "\n"))
@@ -297,6 +340,19 @@ included.")
 	   (concat "Lines: " (int-to-string
 			      (count-lines (point-min) (point-max)))
 		   "\n"))
+       "")
+     (if mime-type
+	 (concat "Content-Type: " mime-type
+		 (if mime-charset
+		     (concat "; charset="
+			     (if (stringp mime-charset)
+				 mime-charset
+			       (symbol-name mime-charset)))
+		   "")
+		 (if mime-encoding
+		     (concat "\nContent-Transfer-Encoding: " mime-encoding)
+		   "")
+		 "\nMIME-Version: 1.0\n")
        ""))))
 
 (defun nneething-from-line (uid &optional file)

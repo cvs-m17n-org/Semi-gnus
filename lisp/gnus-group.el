@@ -178,9 +178,6 @@ with some simple extensions.
       will be inserted into the buffer just like information from any other
       group specifier.
 
-Text between %( and %) will be highlighted with `gnus-mouse-face' when
-the mouse point move inside the area.  There can only be one such area.
-
 Note that this format specification is not always respected.  For
 reasons of efficiency, when listing killed groups, this specification
 is ignored altogether.	If the spec is changed considerably, your
@@ -191,7 +188,11 @@ If you use %o or %O, reading the active file will be slower and quite
 a bit of extra memory will be used.  %D will also worsen performance.
 Also note that if you change the format specification to include any
 of these specs, you must probably re-start Gnus to see them go into
-effect."
+effect.
+
+General format specifiers can also be used.  
+See (gnus)Formatting Variables."
+  :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-group-visual
   :type 'string)
 
@@ -412,7 +413,7 @@ For example:
 
 (defcustom gnus-group-name-charset-group-alist
   (if (or (and (fboundp 'find-coding-system) (find-coding-system 'utf-8))
-         (and (fboundp 'coding-system-p) (coding-system-p 'utf-8)))
+	  (and (fboundp 'coding-system-p) (coding-system-p 'utf-8)))
       '((".*" . utf-8))
     nil)
   "Alist of group regexp and the charset for group names.
@@ -1868,13 +1869,15 @@ Returns whether the fetching was successful or not."
 ;; if selection was successful.
 (defun gnus-group-read-ephemeral-group (group method &optional activate
 					      quit-config request-only
-					      select-articles)
+					      select-articles
+					      parameters)
   "Read GROUP from METHOD as an ephemeral group.
 If ACTIVATE, request the group first.
 If QUIT-CONFIG, use that window configuration when exiting from the
 ephemeral group.
 If REQUEST-ONLY, don't actually read the group; just request it.
 If SELECT-ARTICLES, only select those articles.
+If PARAMETERS, use those as the group parameters.
 
 Return the name of the group if selection was successful."
   ;; Transform the select method into a unique server.
@@ -1891,10 +1894,13 @@ Return the name of the group if selection was successful."
      group
      `(-1 nil (,group
 	       ,gnus-level-default-subscribed nil nil ,method
-	       ((quit-config .
-			     ,(if quit-config quit-config
-				(cons gnus-summary-buffer
-				      gnus-current-window-configuration))))))
+	       ,(cons
+		 (if quit-config 
+		     (cons 'quit-config quit-config)
+		   (cons 'quit-config
+			 (cons gnus-summary-buffer
+			       gnus-current-window-configuration)))
+		 parameters)))
      gnus-newsrc-hashtb)
     (push method gnus-ephemeral-servers)
     (set-buffer gnus-group-buffer)
@@ -3686,7 +3692,11 @@ The hook gnus-suspend-gnus-hook is called before actually suspending."
   ;; Kill Gnus buffers except for group mode buffer.
   (let ((group-buf (get-buffer gnus-group-buffer)))
     (mapcar (lambda (buf)
-	      (unless (member buf (list group-buf gnus-dribble-buffer))
+	      (unless (or (member buf (list group-buf gnus-dribble-buffer))
+                          (progn
+			    (save-excursion
+                              (set-buffer buf)
+                              (eq major-mode 'message-mode))))
 		(gnus-kill-buffer buf)))
 	    (gnus-buffers))
     (gnus-kill-gnus-frames)
@@ -4006,22 +4016,28 @@ This command may read the active file."
 
 (defun gnus-group-mark-article-read (group article)
   "Mark ARTICLE read."
-  (gnus-activate-group group)
   (let ((buffer (gnus-summary-buffer-name group))
-	(mark gnus-read-mark))
-    (unless
-	(and
-	 (get-buffer buffer)
-	 (with-current-buffer buffer
-	   (when gnus-newsgroup-prepared
-	     (when (and gnus-newsgroup-auto-expire
-			(memq mark gnus-auto-expirable-marks))
-	       (setq mark gnus-expirable-mark))
-	     (setq mark (gnus-request-update-mark
-			 group article mark))
-	     (gnus-mark-article-as-read article mark)
-	     (setq gnus-newsgroup-active (gnus-active group))
-	     t)))
+	(mark gnus-read-mark)
+	active n)
+    (if (get-buffer buffer)
+	(with-current-buffer buffer 
+	  (setq active gnus-newsgroup-active)
+	  (gnus-activate-group group)
+	  (when gnus-newsgroup-prepared
+	    (when (and gnus-newsgroup-auto-expire
+		       (memq mark gnus-auto-expirable-marks))
+	      (setq mark gnus-expirable-mark))
+	    (setq mark (gnus-request-update-mark
+			group article mark))
+	    (gnus-mark-article-as-read article mark)
+	    (setq gnus-newsgroup-active (gnus-active group))
+	    (when active
+	      (setq n (1+ (cdr active)))
+	      (while (<= n (cdr gnus-newsgroup-active))
+		(unless (eq n article)
+		  (push n gnus-newsgroup-unselected))
+		(setq n (1+ n))))))
+      (gnus-activate-group group)
       (gnus-group-make-articles-read group
 				     (list article))
       (when (gnus-group-auto-expirable-p group)

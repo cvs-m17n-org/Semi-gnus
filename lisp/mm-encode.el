@@ -1,5 +1,5 @@
 ;;; mm-encode.el --- Functions for encoding MIME things
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -35,6 +35,7 @@
     ("text/.*" qp-or-base64)
     ("message/rfc822" 8bit)
     ("application/emacs-lisp" 8bit)
+    ("application/x-emacs-lisp" 8bit)
     ("application/x-patch" 8bit)
     (".*" base64))
   "Alist of regexps that match MIME types and their encodings.

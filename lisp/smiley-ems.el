@@ -1,6 +1,6 @@
 ;;; smiley-ems.el --- displaying smiley faces
 
-;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Dave Love <fx@gnu.org>
 ;; Keywords: news mail multimedia
@@ -37,6 +37,7 @@
 
 (eval-when-compile (require 'cl))
 (require 'nnheader)
+(require 'gnus-art)
 
 (defgroup smiley nil
   "Turn :-)'s into real images."
@@ -102,10 +103,6 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
 	    (push (list (car elt) (cadr elt) image)
 		  smiley-cached-regexp-alist)))))))
 
-(defvar smiley-active nil
-  "Non-nil means smilies in the buffer will be displayed.")
-(make-variable-buffer-local 'smiley-active)
-
 (defvar smiley-mouse-map
   (let ((map (make-sparse-keymap)))
     (define-key map [down-mouse-2] 'ignore) ; override widget
@@ -126,7 +123,6 @@ A list of images is returned."
 	    (overlays-in start end))
     (unless smiley-cached-regexp-alist
       (smiley-update-cache))
-    (setq smiley-active t)
     (save-excursion
       (let ((beg (or start (point-min)))
 	    group overlay image images)
@@ -137,6 +133,8 @@ A list of images is returned."
 	  (while (re-search-forward (car entry) end t)
 	    (when image
 	      (push image images)
+	      (gnus-add-wash-type 'smiley)
+	      (gnus-add-image 'smiley image)
 	      (add-text-properties
 	       (match-beginning group) (match-end group)
 	       `(display ,image
@@ -147,12 +145,15 @@ A list of images is returned."
 	images))))
 
 (defun smiley-toggle-buffer (&optional arg)
-  "Toggle displaying smiley faces.
+  "Toggle displaying smiley faces in article buffer.
 With arg, turn displaying on if and only if arg is positive."
   (interactive "P")
-  (if (numberp arg)
-      (setq smiley-active (> arg 0))
-    (setq smiley-active (not smiley-active))))
+  (gnus-with-article-buffer
+    (if (if (numberp arg) 
+	    (> arg 0)
+	  (not (memq 'smiley gnus-article-wash-types)))
+	(smiley-region (point-min) (point-max))
+      (gnus-delete-images 'smiley))))
 
 (defun smiley-mouse-toggle-buffer (event)
   "Toggle displaying smiley faces.
@@ -162,25 +163,6 @@ With arg, turn displaying on if and only if arg is positive."
     (save-window-excursion
       (mouse-set-point event)
       (smiley-toggle-buffer))))
-
-(eval-when-compile (defvar gnus-article-buffer))
-
-(defun gnus-smiley-display (&optional arg)
-  "Display textual emoticaons (\"smilies\") as small graphical icons.
-With arg, turn displaying on if and only if arg is positive."
-  (interactive "P")
-  (gnus-with-article-buffer
-    (if (memq 'smiley gnus-article-wash-types)
-	(gnus-delete-images 'smiley)
-      (article-goto-body)
-      (let ((images (smiley-region (point) (point-max))))
-	(when images
-	  (gnus-add-wash-type 'smiley)
-	  (dolist (image images)
-	    (gnus-add-image 'smiley image))))
-      (when (and (numberp arg)
-		 (<= arg 0))
-	(smiley-toggle-buffer arg)))))
 
 (provide 'smiley)
 

@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -132,10 +132,26 @@ See Info node `(gnus)Posting Styles'."
 					(variable)
 					(sexp)))))))
 
-(defcustom gnus-inews-mark-gcc-as-read nil
+(defcustom gnus-gcc-mark-as-read nil
   "If non-nil, automatically mark Gcc articles as read."
   :group 'gnus-message
   :type 'boolean)
+
+(defvar gnus-inews-mark-gcc-as-read nil
+  "Obsolete variable. Use `gnus-gcc-mark-as-read' instead.")
+
+(make-obsolete-variable 'gnus-inews-mark-gcc-as-read 
+			'gnus-gcc-mark-as-read)
+
+(defcustom gnus-gcc-externalize-attachments nil
+  "Should local-file attachments be included as external parts in Gcc copies?
+If it is `all', attach files as external parts;
+if a regexp and matches the Gcc group name, attach files as external parts;
+If nil, attach files as normal parts."
+  :group 'gnus-message
+  :type '(choice (const nil :tag "None")
+		 (const all :tag "Any")
+		 (string :tag "Regexp")))
 
 (defcustom gnus-group-posting-charset-alist
   '(("^\\(no\\|fr\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
@@ -228,7 +244,7 @@ Thank you for your help in stamping out bugs.
   "w" gnus-summary-wide-reply
   "W" gnus-summary-wide-reply-with-original
   "v" gnus-summary-very-wide-reply
-  "W" gnus-summary-very-wide-reply-with-original
+  "V" gnus-summary-very-wide-reply-with-original
   "n" gnus-summary-followup-to-mail
   "N" gnus-summary-followup-to-mail-with-original
   "m" gnus-summary-mail-other-window
@@ -550,12 +566,19 @@ a news."
 
 (defun gnus-summary-followup (yank &optional force-news)
   "Compose a followup to an article.
-If prefix argument YANK is non-nil, original article is yanked automatically."
+If prefix argument YANK is non-nil, the original article is yanked
+automatically.
+YANK is a list of elements, where the car of each element is the
+article number, and the two following numbers is the region to be
+yanked."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
   (when yank
-    (gnus-summary-goto-subject (car yank)))
+    (gnus-summary-goto-subject
+     (if (listp (car yank))
+	 (caar yank)
+       (car yank))))
   (save-window-excursion
     (gnus-summary-select-article))
   (let ((headers (gnus-summary-article-header (gnus-summary-article-number)))
@@ -583,18 +606,21 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
 (defun gnus-inews-yank-articles (articles)
-  (let (beg article)
+  (let (beg article yank-string)
     (message-goto-body)
     (while (setq article (pop articles))
+      (when (listp article)
+	(setq yank-string (nth 1 article)
+	      article (nth 0 article)))
       (save-window-excursion
 	(set-buffer gnus-summary-buffer)
 	(gnus-summary-select-article nil nil nil article)
 	(gnus-summary-remove-process-mark article))
-      (gnus-copy-article-buffer)
+      (gnus-copy-article-buffer nil yank-string)
       (let ((message-reply-buffer gnus-article-copy)
 	    (message-reply-headers
+	     ;; The headers are decoded.
 	     (with-current-buffer gnus-article-copy
-	       ;; The headers are decoded.
 	       (nnheader-parse-head t))))
 	(message-yank-original)
 	(setq beg (or beg (mark t))))
@@ -644,7 +670,7 @@ header line with the old Message-ID."
 
 
 
-(defun gnus-copy-article-buffer (&optional article-buffer)
+(defun gnus-copy-article-buffer (&optional article-buffer yank-string)
   ;; make a copy of the article buffer with all text properties removed
   ;; this copy is in the buffer gnus-article-copy.
   ;; if ARTICLE-BUFFER is nil, gnus-article-buffer is used
@@ -671,6 +697,10 @@ header line with the old Message-ID."
 	    (widen)
 	    (copy-to-buffer gnus-article-copy (point-min) (point-max))
 	    (set-buffer gnus-article-copy)
+	    (when yank-string
+	      (message-goto-body)
+	      (delete-region (point) (point-max))
+	      (insert yank-string))
 	    (gnus-article-delete-text-of-type 'annotation)
 	    (gnus-remove-text-with-property 'gnus-prev)
 	    (gnus-remove-text-with-property 'gnus-next)
@@ -683,8 +713,8 @@ header line with the old Message-ID."
 	    (goto-char (point-min))
 	    (while (looking-at message-unix-mail-delimiter)
 	      (forward-line 1))
-	    (setq beg (point))
-	    (setq end (or (message-goto-body) beg))
+	    (setq beg (point)
+		  end (or (message-goto-body) beg))
 	    ;; Delete the headers from the displayed articles.
 	    (set-buffer gnus-article-copy)
 	    (delete-region (goto-char (point-min))
@@ -892,11 +922,15 @@ If VERY-WIDE, make a very wide reply."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
-  ;; Stripping headers should be specified with mail-yank-ignored-headers.
-  (when yank
-    (gnus-summary-goto-subject (car yank)))
-  (let ((gnus-article-reply (or yank (gnus-summary-article-number)))
-	(headers ""))
+  (let* ((article
+	  (if (listp (car yank))
+	      (caar yank)
+	    (car yank)))
+	 (gnus-article-reply (or article (gnus-summary-article-number)))
+	 (headers ""))
+    ;; Stripping headers should be specified with mail-yank-ignored-headers.
+    (when yank
+      (gnus-summary-goto-subject article))
     (gnus-setup-message (if yank 'reply-yank 'reply)
       (if (not very-wide)
 	  (gnus-summary-select-article)
@@ -1020,7 +1054,14 @@ For the `inline' alternatives, also see the variable
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive
-   (list (message-read-from-minibuffer "Resend message(s) to: ")
+   (list (message-read-from-minibuffer 
+	  "Resend message(s) to: "
+	  (when (gnus-buffer-live-p gnus-original-article-buffer)
+	    ;; If some other article is currently selected, the
+	    ;; initial-contents is wrong. Whatever, it is just the
+	    ;; initial-contents.
+	    (with-current-buffer gnus-original-article-buffer
+	      (nnmail-fetch-field "to"))))
 	 current-prefix-arg))
   (let ((articles (gnus-summary-work-articles n))
 	article)
@@ -1207,7 +1248,7 @@ If YANK is non-nil, include the original article."
 	(erase-buffer)
 	(gnus-debug)
 	(setq text (buffer-string)))
-      (insert "<#part type=application/x-emacs-lisp disposition=inline description=\"User settings\">\n" text "\n<#/part>"))
+      (insert "<#part type=application/emacs-lisp disposition=inline description=\"User settings\">\n" text "\n<#/part>"))
     (goto-char (point-min))
     (search-forward "Subject: " nil t)
     (message "")))
@@ -1335,7 +1376,8 @@ this is a reply."
       (message-narrow-to-headers)
       (let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	    (cur (current-buffer))
-	    groups group method group-art)
+	    groups group method group-art
+	    mml-externalize-attachments)
 	(when gcc
 	  (message-remove-header "gcc")
 	  (widen)
@@ -1349,6 +1391,10 @@ this is a reply."
 					      (car method))))
 	    (unless (gnus-request-group group nil method)
 	      (gnus-request-create-group group method))
+	    (setq mml-externalize-attachments
+		  (if (stringp gnus-gcc-externalize-attachments)
+		      (string-match gnus-gcc-externalize-attachments group)
+		    gnus-gcc-externalize-attachments))
 	    (save-excursion
 	      (nnheader-set-temp-buffer " *acc*")
 	      (insert-buffer-substring cur)
@@ -1391,7 +1437,9 @@ this is a reply."
 		(gnus-message 1 "Couldn't store article in group %s: %s"
 			      group (gnus-status-message method))
 		(sit-for 2))
-	      (when (and group-art gnus-inews-mark-gcc-as-read)
+	      (when (and group-art 
+			 (or gnus-gcc-mark-as-read
+			     gnus-inews-mark-gcc-as-read))
 		(gnus-group-mark-article-read group (cdr group-art)))
 	      (kill-buffer (current-buffer)))))))))
 

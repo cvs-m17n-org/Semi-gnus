@@ -1,6 +1,6 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -555,6 +555,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     [gnus-group-unsubscribe gnus-group-unsubscribe t "Unsubscribe group"]
     [gnus-group-subscribe gnus-group-subscribe t "Subscribe group"]
     [gnus-group-kill-group gnus-group-kill-group t "Kill group"]
+    [gnus-summary-mail-save
+     gnus-group-save-newsrc t "Save .newsrc files"] ; borrowed icon.
     [gnus-group-exit gnus-group-exit t "Exit Gnus"])
   "The group buffer toolbar.")
 
@@ -612,6 +614,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      gnus-summary-save-article-file t "Save article in file"]
     [gnus-summary-save-article
      gnus-summary-save-article t "Save article"]
+    [gnus-summary-cancel-article ; usenet : cancellation :: mail : deletion.
+     gnus-summary-delete-article t "Delete message"]
     [gnus-summary-catchup
      gnus-summary-catchup t "Catchup"]
     [gnus-summary-catchup-and-exit
@@ -644,41 +648,6 @@ XEmacs compatibility workaround."
   (apply
    'call-process-region (point-min) (point-max) command t '(t nil) nil
    args))
-
-(defface gnus-x-face '((t (:foreground "black" :background "white")))
-  "Face to show X face"
-  :group 'gnus-xmas)
-
-(defun gnus-xmas-article-display-xface (data)
-  "Display the XFace in DATA."
-  (save-excursion
-    (let ((xface-glyph
-	   (cond
-	    ((featurep 'xface)
-	     (make-glyph (vector 'xface :data
-				 (concat "X-Face: " data))))
-	    ((featurep 'xpm)
-	     (let ((cur (current-buffer)))
-	       (save-excursion
-		 (gnus-set-work-buffer)
-		 (insert data)
-		 (let ((coding-system-for-read 'binary)
-		       (coding-system-for-write 'binary))
-		   (gnus-xmas-call-region "uncompface")
-		   (goto-char (point-min))
-		   (insert "/* Width=48, Height=48 */\n")
-		   (gnus-xmas-call-region "icontopbm")
-		   (gnus-xmas-call-region "ppmtoxpm")
-		   (make-glyph
-		    (vector 'xpm :data (buffer-string)))))))
-	    (t
-	     (make-glyph [nothing])))))
-      ;;(set-glyph-face xface-glyph 'gnus-x-face)
-
-      (gnus-article-goto-header "from")
-      (gnus-put-image xface-glyph " ")
-      (gnus-add-wash-type 'xface)
-      (gnus-add-image 'xface xface-glyph))))
 
 (defvar gnus-xmas-modeline-left-extent
   (let ((ext (copy-extent modeline-buffer-id-left-extent)))
@@ -820,27 +789,66 @@ XEmacs compatibility workaround."
 		      gnus-mailing-list-menu))
 
 (defun gnus-xmas-image-type-available-p (type)
+  (when (eq type 'pbm)
+    (setq type 'xbm))
   (featurep type))
 
-(defun gnus-xmas-create-image (file)
-  (with-temp-buffer
-    (insert-file-contents file)
-    (mm-create-image-xemacs (car (last (split-string file "[.]"))))))
+(defun gnus-xmas-create-image (file &optional type data-p &rest props)
+  (let ((type (if type
+		  (symbol-name type)
+		(car (last (split-string file "[.]")))))
+	(face (plist-get props :face))
+	glyph)
+    (when (equal type "pbm")
+      (with-temp-buffer
+	(if data-p
+	    (insert file)
+	  (insert-file-contents file))
+	(shell-command-on-region (point-min) (point-max)
+				 "ppmtoxpm 2>/dev/null" t)
+	(setq file (buffer-string)
+	      type "xpm"
+	      data-p t)))
+    (setq glyph
+	  (if (equal type "xbm")
+	      (make-glyph (list (cons 'x file)))
+	    (with-temp-buffer
+	      (if data-p
+		  (insert file)
+		(insert-file-contents file))
+	      (make-glyph
+	       (vector 
+		(or (intern type)
+		    (mm-image-type-from-buffer))
+		:data (buffer-string))))))
+    (when face
+      (set-glyph-face glyph face))
+    glyph))
 
 (defun gnus-xmas-put-image (glyph &optional string)
+  "Insert STRING, but display GLYPH.
+Warning: Don't insert text immediately after the image."
   (let ((begin (point))
 	extent)
-    (insert string)
+    (if (and (bobp) (not string))
+	(setq string " "))
+    (if string 
+	(insert string)
+      (setq begin (1- begin)))
     (setq extent (make-extent begin (point)))
     (set-extent-property extent 'gnus-image t)
     (set-extent-property extent 'duplicable t)
-    (set-extent-property extent 'begin-glyph glyph)))
+    (if string
+	(set-extent-property extent 'invisible t))
+    (set-extent-property extent 'end-glyph glyph))
+  glyph)
 
 (defun gnus-xmas-remove-image (image)
   (map-extents
    (lambda (ext unused)
-     (when (equal (extent-begin-glyph ext) image)
-       (set-extent-property ext 'begin-glyph nil))
+     (when (equal (extent-end-glyph ext) image)
+       (set-extent-property ext 'invisible nil)
+       (set-extent-property ext 'end-glyph nil))
      nil)
    nil nil nil nil nil 'gnus-image))
 

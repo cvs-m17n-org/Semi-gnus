@@ -1,5 +1,5 @@
 ;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -30,7 +30,7 @@
 
 (require 'gnus)
 
-(defcustom gnus-use-correct-string-widths t
+(defcustom gnus-use-correct-string-widths (featurep 'xemacs)
   "*If non-nil, use correct functions for dealing with wide characters."
   :group 'gnus-format
   :type 'boolean)
@@ -74,6 +74,8 @@
 (defvar gnus-tmp-article-number)
 (defvar gnus-mouse-face)
 (defvar gnus-mouse-face-prop)
+(defvar gnus-tmp-header)
+(defvar gnus-tmp-from)
 
 (defun gnus-summary-line-format-spec ()
   (insert gnus-tmp-unread gnus-tmp-replied
@@ -82,13 +84,15 @@
    (point)
    (progn
      (insert
-      gnus-tmp-opening-bracket
-      (format "%4d: %-20s"
-	      gnus-tmp-lines
-	      (if (> (length gnus-tmp-name) 20)
-		  (substring gnus-tmp-name 0 20)
-		gnus-tmp-name))
-      gnus-tmp-closing-bracket)
+      (format "%c%4s: %-23s%c" gnus-tmp-opening-bracket gnus-tmp-lines
+	      (let ((val
+		     (inline
+		       (gnus-summary-from-or-to-or-newsgroups
+			gnus-tmp-header gnus-tmp-from))))
+		(if (> (length val) 23)
+		    (substring val 0 23)
+		  val))
+	      gnus-tmp-closing-bracket))
      (point))
    gnus-mouse-face-prop gnus-mouse-face)
   (insert " " gnus-tmp-subject-or-nil "\n"))
@@ -129,9 +133,11 @@
     (group "%M\%S\%p\%P\%5y: %(%g%)%l\n" ,gnus-group-line-format-spec)
     (summary-dummy "*  %(:                          :%) %S\n"
 		   ,gnus-summary-dummy-line-format-spec)
-    (summary "%U\%R\%z\%I\%(%[%4L: %-23,23n%]%) %s\n"
+    (summary "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n"
 	     ,gnus-summary-line-format-spec))
   "Alist of format specs.")
+
+(defvar gnus-default-format-specs gnus-format-specs)
 
 (defvar gnus-article-mode-line-format-spec nil)
 (defvar gnus-summary-mode-line-format-spec nil)
@@ -175,8 +181,9 @@
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
   (when (or force
+	    (not gnus-newsrc-file-version)
 	    (not (equal (gnus-continuum-version)
-			(cdr (assq 'gnus-version gnus-format-specs))))
+			(gnus-continuum-version gnus-newsrc-file-version)))
 	    (not (equal emacs-version
 			(cdr (assq 'version gnus-format-specs)))))
     (setq gnus-format-specs nil))
@@ -257,12 +264,20 @@
 (defun gnus-spec-tab (column)
   (if (> column 0)
       `(insert (make-string (max (- ,column (current-column)) 0) ? ))
-    `(progn
-       (if (> (current-column) ,(abs column))
-	   (delete-region (point)
-			  (- (point) (- (current-column) ,(abs column))))
-	 (insert (make-string (max (- ,(abs column) (current-column)) 0)
-			      ? ))))))
+    (let ((column (abs column)))
+      (if gnus-use-correct-string-widths
+	  `(progn
+	     (if (> (current-column) ,column)
+		 (while (progn
+			  (delete-backward-char 1)
+			  (> (current-column) ,column))))
+	     (insert (make-string (max (- ,column (current-column)) 0) ? )))
+	`(progn
+	   (if (> (current-column) ,column)
+	       (delete-region (point)
+			      (- (point) (- (current-column) ,column)))
+	     (insert (make-string (max (- ,column (current-column)) 0)
+				  ? ))))))))
 
 (defun gnus-correct-length (string)
   "Return the correct width of STRING."
@@ -292,15 +307,29 @@
     (setq wend seek)
     (substring string wstart (1- wend))))
 
+(defun gnus-string-width-function ()
+  (cond
+   (gnus-use-correct-string-widths
+    'gnus-correct-length)
+   ((fboundp 'string-width)
+    'string-width)
+   (t
+    'length)))
+
+(defun gnus-substring-function ()
+  (cond
+   (gnus-use-correct-string-widths
+    'gnus-correct-substring)
+   ((fboundp 'string-width)
+    'gnus-correct-substring)
+   (t
+    'substring)))
+
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
   (let ((max (abs max-width))
-	(length-fun (if gnus-use-correct-string-widths
-		      'gnus-correct-length
-		    'length))
-	(substring-fun (if gnus-use-correct-string-widths
-		       'gnus-correct-substring
-		     'substring)))
+	(length-fun (gnus-string-width-function))
+	(substring-fun (gnus-substring-function)))
     (if (symbolp el)
 	`(if (> (,length-fun ,el) ,max)
 	     ,(if (< max-width 0)
@@ -317,12 +346,8 @@
 (defun gnus-tilde-cut-form (el cut-width)
   "Return a form that cuts CUT-WIDTH off of EL."
   (let ((cut (abs cut-width))
-	(length-fun (if gnus-use-correct-string-widths
-		      'gnus-correct-length
-		    'length))
-	(substring-fun (if gnus-use-correct-string-widths
-		       'gnus-correct-substring
-		     'substring)))
+	(length-fun (gnus-string-width-function))
+	(substring-fun (gnus-substring-function)))
     (if (symbolp el)
 	`(if (> (,length-fun ,el) ,cut)
 	     ,(if (< cut-width 0)
@@ -345,26 +370,31 @@
        (if (equal val ,ignore-value)
 	   "" val))))
 
-(defun gnus-correct-pad-form (el pad-width)
+(defun gnus-pad-form (el pad-width)
   "Return a form that pads EL to PAD-WIDTH accounting for multi-column
 characters correctly. This is because `format' may pad to columns or to
 characters when given a pad value."
   (let ((pad (abs pad-width))
 	(side (< 0 pad-width)))
     (if (symbolp el)
-	`(let ((need (- ,pad (gnus-correct-length ,el))))
+	`(let ((need (- ,pad (,(if gnus-use-correct-string-widths
+				   'gnus-correct-length
+				 'length)
+			      ,el))))
 	   (if (> need 0)
 	       (concat ,(when side '(make-string need ?\ ))
 		       ,el
 		       ,(when (not side) '(make-string need ?\ )))
 	     ,el))
       `(let* ((val (eval ,el))
-	      (need (- ,pad (gnus-correct-length ,el))))
+	      (need (- ,pad (,(if gnus-use-correct-string-widths
+				  'gnus-correct-length
+				'length) val))))
 	 (if (> need 0)
 	     (concat ,(when side '(make-string need ?\ ))
-		     ,el
+		     val
 		     ,(when (not side) '(make-string need ?\ )))
-	   ,el)))))
+	   val)))))
 
 (defun gnus-parse-format (format spec-alist &optional insert)
   ;; This function parses the FORMAT string with the help of the
@@ -375,9 +405,9 @@ characters when given a pad value."
   ;; them will have the balloon-help text property.
   (let ((case-fold-search nil))
     (if (string-match
-       "\\`\\(.*\\)%[0-9]?[{(«]\\(.*\\)%[0-9]?[»})]\\(.*\n?\\)\\'"
-       format)
-      (gnus-parse-complex-format format spec-alist)
+	 "\\`\\(.*\\)%[0-9]?[{(«]\\(.*\\)%[0-9]?[»})]\\(.*\n?\\)\\'\\|%[-0-9]*="
+	 format)
+	(gnus-parse-complex-format format spec-alist)
       ;; This is a simple format.
       (gnus-parse-simple-format format spec-alist insert))))
 
@@ -572,7 +602,7 @@ characters when given a pad value."
 		  (when max-width
 		    (setq el (gnus-tilde-max-form el max-width)))
 		  (when pad-width
-		    (setq el (gnus-correct-pad-form el pad-width)))
+		    (setq el (gnus-pad-form el pad-width)))
 		  (push el flist)))
 	    (insert elem-type)
 	    (push (car elem) flist))))

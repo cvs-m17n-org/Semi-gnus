@@ -1,6 +1,135 @@
+2002-01-20  Patric Mueller  <bhaak@gmx.net>
+
+	* gnus.texi (Group Timestamp): Typo fix.
+
+2002-01-19  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Selecting a Group): Addition.
+
+2002-01-19  Lars Magne Ingebrigtsen  <karra@cs.utah.edu>
+
+	* gnus.texi (Mail Spool): Note that the .marks files can be
+	removed. 
+
+2002-01-17  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus.texi (Choosing a Mail Back End): mention nnmaildir.
+	(Comparing Mail Backends): briefly describe nnmaildir.
+
+2002-01-17  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Agent Commands): Use gnus-agent-batch instead of
+	gnus-agent-batch-fetch.
+
+2002-01-15 Tue  Jari Aalto  <jari.aalto@poboxes.com>
+
+	* gnus.texi (Really Various Summary Commands): Added commands how
+	to create nnvirtual group and and how to modify the nnvirtual
+	regexp
+
+2002-01-12  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Agent Caveats): Add agent cache.
+	(Agent Variables): Addition.
+
+2002-01-12  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Fix typo.
+
+	* emacs-mime.texi (Flowed text, Standards): Add.
+
+2002-01-11  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Mailing Lists): Addition.
+	* gnus.texi (Group Parameters): Addition. 
+	From Sriram Karra <karra@cs.utah.edu>.
+
+2002-01-10  Colin Marquardt  <c.marquardt@alcatel.de>
+
+	* gnus.texi (Changing Servers): Addition.
+
+2002-01-06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Archived Messages): Rename
+	gnus-inews-mark-gcc-as-read to gnus-gcc-mark-as-read.
+
+	* Makefile.in (clean): Clean thumb*.
+
+2002-01-05  Harry Putnam  <reader@newsguy.com>
+
+	* gnus.texi (Score Variables): Clarify.
+
+2002-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Agent Expiry): Addition.
+	(Sorting the Summary Buffer): Addition.
+
+2002-01-05  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Add MIME and Disposition Notifications.
+
+	* message.texi (Header Commands): Fix.  Add m-goto-from.
+	(Insertion): Add m-i-disposition-notification-to.
+
+2002-01-05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (.latexi.pdf-x): Use thumbpdf.
+
+	* gnus.texi (Advanced Formatting): Double @'s. Use thumbpdf.
+	colorlinks=true.
+
+2002-01-05  Norman Walsh  <ndw@nwalsh.com>
+
+	* gnus-faq.texi: Fix typo.
+
+2002-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Sorting the Summary Buffer): Addition.
+
+2002-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Virtual Groups): Addition.
+
+2002-01-03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Keymap): Addition.
+	(Summary Mail Commands): Fix.
+
+2002-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Timestamp): Addition.  Example from Andras
+	BALI. 
+	(X-Face): Addition.
+	(Advanced Formatting): Add example.
+
+2002-01-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Add and fix.
+
+	* message.texi (Security): Mention gpg-temp-directory.
+
+	* gnus.texi (Article Washing): Link to Security section.
+	(Security): Fix.
+	(Signing and Encrypting): Renamed from Using GPG.
+	(IMAP): Fixes.
+
+2002-01-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Customizing Articles): Add crossreference links.  Add
+	gnus-body-boundary-delimiter.
+
 2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Choosing Commands): Addition.
+	(Article Display): Update.
+	(Article Display): Addition.
+	(Article Header): New.
+	(Slow Terminal Connection): Addition.
+	(Predicate Specifiers): New.
+	(To From Newsgroups): Addition.
+	(Topic Commands): Addition.
+	Update the menus.
+	Fix some references b0rked up by the menu fixing.
 
 2001-12-31  Rui Zhu  <sprache@iname.com>
 

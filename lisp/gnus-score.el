@@ -1,5 +1,5 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
@@ -643,7 +643,7 @@ used as score."
 	  (and gnus-extra-headers
 	       (equal (nth 1 entry) "extra")
 	       (intern			; need symbol
-		(gnus-completing-read
+		(gnus-completing-read-with-default
 		 (symbol-name (car gnus-extra-headers))	; default response
 		 "Score extra header:"	; prompt
 		 (mapcar (lambda (x)	; completion list
@@ -1208,7 +1208,6 @@ EXTRA is the possible non-standard header."
 		   (setq gnus-newsgroup-adaptive t)
 		   adapt)
 		  (t
-		   ;;(setq gnus-newsgroup-adaptive gnus-use-adaptive-scoring)
 		   gnus-default-adaptive-score-alist)))
       (setq gnus-thread-expunge-below
 	    (or thread-mark-and-expunge gnus-thread-expunge-below))

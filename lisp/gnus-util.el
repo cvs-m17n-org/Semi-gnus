@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -221,17 +221,6 @@
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
 
-(defun gnus-text-with-property (prop)
-  "Return a list of all points where the text has PROP."
-  (let ((points nil)
-	(point (point-min)))
-    (save-excursion
-      (while (< point (point-max))
-	(when (get-text-property point prop)
-	  (push point points))
-	(incf point)))
-    (nreverse points)))
-
 (require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
@@ -305,7 +294,7 @@
 	  (define-key keymap key (pop plist))
 	(pop plist)))))
 
-(defun gnus-completing-read (default prompt &rest args)
+(defun gnus-completing-read-with-default (default prompt &rest args)
   ;; Like `completing-read', except that DEFAULT is the default argument.
   (let* ((prompt (if default
 		     (concat prompt " (default " default ") ")
@@ -354,7 +343,8 @@
     (604800 . "%a %k:%M")                   ;;that's one week
     ((gnus-seconds-month) . "%a %d")
     ((gnus-seconds-year) . "%b %d")
-    (t . "%b %m '%y"))                      ;;this one is used when no other does match
+    (t . "%b %d '%y"))                      ;;this one is used when no
+					    ;;other does match
   "Alist of time in seconds and format specification used to display dates not older.
 The first element must be a number or a function returning a
 number. The second element is a format-specification as described in
@@ -487,11 +477,15 @@ jabbering all the time."
 (defsubst gnus-parent-id (references &optional n)
   "Return the last Message-ID in REFERENCES.
 If N, return the Nth ancestor instead."
-  (when references
-    (let ((ids (inline (gnus-split-references references))))
-      (while (nthcdr (or n 1) ids)
-	(setq ids (cdr ids)))
-      (car ids))))
+  (when (and references
+	     (not (zerop (length references))))
+    (if n
+	(let ((ids (inline (gnus-split-references references))))
+	  (while (nthcdr n ids)
+	    (setq ids (cdr ids)))
+	  (car ids))
+      (when (string-match "<[^> \t]+>\\'" references)
+	(match-string 0 references)))))
 
 (defun gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
@@ -685,9 +679,10 @@ Bind `print-quoted' and `print-readably' to t while printing."
       (when (get-text-property b 'gnus-face)
 	(setq b (next-single-property-change b 'gnus-face nil end)))
       (when (/= b end)
-	(gnus-put-text-property
-	 b (setq b (next-single-property-change b 'gnus-face nil end))
-	 prop val)))))
+	(inline
+	  (gnus-put-text-property
+	   b (setq b (next-single-property-change b 'gnus-face nil end))
+	   prop val))))))
 
 ;;; Protected and atomic operations.  dmoore@ucsd.edu 21.11.1996
 ;;; The primary idea here is to try to protect internal datastructures
@@ -1216,6 +1211,48 @@ forbidden in URL encoding."
 	      str (substring str (match-end 0)))))
     (setq tmp (concat tmp str))
     tmp))
+
+(defun gnus-make-predicate (spec)
+  "Transform SPEC into a function that can be called.
+SPEC is a predicate specifier that contains stuff like `or', `and',
+`not', lists and functions.  The functions all take one parameter."
+  `(lambda (elem) ,(gnus-make-predicate-1 spec)))
+  
+(defun gnus-make-predicate-1 (spec)
+  (cond
+   ((symbolp spec)
+    `(,spec elem))
+   ((listp spec)
+    (if (memq (car spec) '(or and not))
+	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
+      (error "Invalid predicate specifier: %s" spec)))))
+
+(defun gnus-local-map-property (map)
+  "Return a list suitable for a text property list specifying keymap MAP."
+  (cond
+   ((featurep 'xemacs)
+    (list 'keymap map))
+   ((>= emacs-major-version 21)
+    (list 'keymap map))
+   (t
+    (list 'local-map map))))
+
+(defun gnus-completing-read (prompt table &optional predicate require-match
+				    history inherit-input-method)
+  (when (and history
+	     (not (boundp history)))
+    (set history nil))
+  (completing-read
+   (if (symbol-value history)
+       (concat prompt " (" (car (symbol-value history)) "): ")
+     (concat prompt ": "))
+   table
+   predicate
+   require-match
+   nil
+   history
+   (car (symbol-value history))
+   inherit-input-method))
 
 (provide 'gnus-util)
 
