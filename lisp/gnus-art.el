@@ -2176,6 +2176,9 @@ unfolded."
 	 (forward-line 1)
 	 (point))))))
 
+(eval-when-compile
+  (defvar gnus-face-properties-alist))
+
 (defun article-display-face ()
   "Display any Face headers in the header."
   (interactive)
@@ -2204,7 +2207,9 @@ unfolded."
 	    (let ((png (gnus-convert-face-to-png face))
 		  image)
 	      (when png
-		(setq image (gnus-create-image png 'png t))
+		(setq image
+		      (apply 'gnus-create-image png 'png t
+			     (cdr (assq 'png gnus-face-properties-alist))))
 		(gnus-article-goto-header "from")
 		(when (bobp)
 		  (insert "From: [no `from' set]\n")
