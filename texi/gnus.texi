@@ -7339,12 +7339,18 @@ If this variable is a string, this string will be executed in a
 sub-shell.  If it is a function, this function will be called with the
 face as the argument.  If the @code{gnus-article-x-face-too-ugly} (which
 is a regexp) matches the @code{From} header, the face will not be shown.
-The default action under Emacs is to fork off an @code{xv} to view the
-face; under XEmacs the default action is to display the face before the
+The default action under Emacs is to fork off the @code{display}
+program@footnote{@code{display} is from the ImageMagick package.  For the
+@code{uncompface} and @code{icontopbm} programs look for a package
+like `compface' or `faces-xface' on a GNU/Linux system.}
+to view the face.  Under XEmacs or Emacs 21+ with suitable image
+support, the default action is to display the face before the
 @code{From} header.  (It's nicer if XEmacs has been compiled with X-Face
 support---that will make display somewhat faster.  If there's no native
 X-Face support, Gnus will try to convert the @code{X-Face} header using
-external programs from the @code{pbmplus} package and friends.)  If you
+external programs from the @code{pbmplus} package and
+friends.@footnote{On a GNU/Linux system look for packages with names
+like @code{netpbm} or @code{libgr-progs}.})  If you
 want to have this function in the display hook, it should probably come
 last.
 
@@ -9683,8 +9689,9 @@ attribute name can be one of @code{signature}, @code{signature-file},
 @code{organization}, @code{address}, @code{name} or @code{body}.  The
 attribute name can also be a string.  In that case, this will be used as
 a header name, and the value will be inserted in the headers of the
-article.  If the attribute name is @code{eval}, the form is evaluated,
-and the result is thrown away.
+article; if the value is @code{nil}, the header name will be removed.
+If the attribute name is @code{eval}, the form is evaluated, and the
+result is thrown away.
 
 The attribute value can be a string (used verbatim), a function with
 zero arguments (the return value will be used), a variable (its value
@@ -11176,11 +11183,14 @@ An example @sc{imap} mail source:
 @end lisp
 
 @item webmail
-Get mail from a webmail server, such as www.hotmail.com, 
-mail.yahoo.com, www.netaddress.com and www.my-deja.com. 
+Get mail from a webmail server, such as www.hotmail.com,
+webmail.netscape.com, www.netaddress.com, www.my-deja.com.
 
-NOTE: Webmail largely depends on w3 (url) package, whose version of "WWW
-4.0pre.46 1999/10/01" or previous ones may not work.
+NOTE: Now mail.yahoo.com provides POP3 service, so @sc{pop} mail source
+is suggested.
+
+NOTE: Webmail largely depends cookies. A "one-line-cookie" patch is
+required for url "4.0pre.46".
 
 WARNING: Mails may lost.  NO WARRANTY.
 
@@ -11189,7 +11199,7 @@ Keywords:
 @table @code
 @item :subtype
 The type of the webmail server.  The default is @code{hotmail}.  The
-alternatives are @code{yahoo}, @code{netaddress}, @code{my-deja}.
+alternatives are @code{netscape}, @code{netaddress}, @code{my-deja}.
 
 @item :user
 The user name to give to the webmail server.  The default is the login
@@ -11208,7 +11218,7 @@ folder after finishing the fetch.
 An example webmail source:
 
 @lisp
-(webmail :subtype 'yahoo :user "user-name" :password "secret")
+(webmail :subtype 'hotmail :user "user-name" :password "secret")
 @end lisp
 @end table
 

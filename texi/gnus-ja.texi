@@ -7264,14 +7264,18 @@ DOS $(B$N9TKv$N@$OC$r$7$^$9(B)$(B!"$=$7$F$=$l$+$i;D$j$N(B CR $(B$r(B LF $
 $(B$3$NL?Na$OJQ?t(B @code{gnus-article-x-face-command} $(B$K$h$C$FM?$($i$l$?4X?t$K(B
 $(B$h$C$F<B9T$5$l$^$9!#$3$NJQ?t$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B9T$5(B
 $(B$l$^$9!#4X?t$J$i$P!"$3$N4X?t$,4i$r0z?t$H$7$F8F$P$l$^$9!#$b$7(B
-@code{gnus-article-x-face-too-ugly}$(B!J$3$l$O@55,I=8=$G$9!K$,(B @code{From} $(BMs(B
-$(B$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(BEmacs $(B$G$N%G%#%U%)%k%H$NF0:n$O(B
-@code{xv} $(B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(BXEmacs $(B$G$N%G%#%U%)%k%H$NF0:n$O(B
-@code{From} $(BMs$NA0$K4i$rI=<($7$^$9!#!J(BXEmacs $(B$,(B X-Face $(B5!G=IU$-$G%3%s%Q%$(B
-$(B%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l$OI=<($r>/$7Aa$/$7$^$9!#$b$7:,K\E*(B
-X-Face $(B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $(B$O(B @code{pbmplus} $(B$d$=$NCg4V$N30It%W%m%0(B
-$(B%i%`$r;H$C$F(B @code{X-Face} $(BMs$rJQ49$7$h$&$H;n$_$^$9!#!K$3$N4X?t$rI=<(%U%C(B
-$(B%/$KF~$l$?$$$N$G$"$l$P!"$*$=$i$/$=$l$":G8e$K$J$k$Y$-$G$7$g$&!#(B
+ @code{gnus-article-x-face-too-ugly}$(B!J$3$l$O@55,I=8=$G$9!K$,(B @code{From}
+ $(BMs$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(BEmacs $(B$G$N%G%#%U%)%k%H$NF0:n$O(B
+ @code{display} $(B%W%m%0%i%`(B @footnote{@code{display} $(B$O(B ImageMagick $(B%Q%C(B
+$(B%1!<%8$K4^$^$l$F$$$^$9!#(B@code{uncompface} $(B$H(B @code{icontopbm} $(B$NN>%W%m%0(B
+$(B%i%`$K$D$$$F$O!"(B`compface' $(B$d(B GNU/Linux $(B%7%9%F%`$K$*$1$k(B `faces-xface'
+ $(B$N$h$&$J%Q%C%1!<%8$rC5$7$F2<$5$$!#(B} $(B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(B
+XEmacs $(B$G$N%G%#%U%)%k%H$NF0:n$O(B @code{From} $(BMs$NA0$K4i$rI=<($7$^$9!#(B
+$(B!J(BXEmacs $(B$,(B X-Face $(B5!G=IU$-$G%3%s%Q%$%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l(B
+$(B$OI=<($r>/$7Aa$/$7$^$9!#$b$7:,K\E*(B X-Face $(B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $(B$O(B
+ @code{pbmplus} $(B$d$=$NCg4V$N30It%W%m%0%i%`$r;H$C$F(B @code{X-Face} $(BMs$rJQ(B
+$(B49$7$h$&$H;n$_$^$9!#!K$3$N4X?t$rI=<(%U%C%/$KF~$l$?$$$N$G$"$l$P!"$*$=$i$/(B
+$(B$=$l$O:G8e$K$J$k$Y$-$G$7$g$&!#(B
 
 @item W b
 @kindex W b $(B!J35N,!K(B
@@ -9322,8 +9326,9 @@ Gnus $(B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<
 $(B$O!"(B@code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $(B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $(B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
-$(B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7B0@-L>$,(B @code{eval} $(B$@$C$?$i(B
-$(B$=$NMM<0$,I>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B
+$(B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7B0@-L>$,(B @code{nil} $(B$@$C$?$i$=(B
+$(B$N%X%C%@!<L>$O:o=|$5$l$^$9!#$b$7B0@-L>$,(B @code{eval} $(B$@$C$?$i$=$NMM<0$,(B
+$(BI>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B
 
 $(BB0@-CM$OJ8;zNs(B ($(B$=$N$^$^;H$o$l$^$9(B)$(B!"0z?t$NL5$$4X?t(B ($(BJV$jCM$,;H$o$l$^$9(B)$(B!"(B
 $(BJQ?t(B ($(B$=$NCM$,;H$o$l$^$9(B) $(B$^$?$O%j%9%H(B ($(B$=$l$O(B @code{$(BI>2A(B} $(B$5$l$F!"JV$j(B
@@ -10759,12 +10764,14 @@ IMAP $(B%a!<%k%=!<%9$NNc(B:
 @end lisp
 
 @item webmail
-www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
-$(B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
+www.hotmail.com, webmail.netscape.com, www.netaddress.com,
+www.my-deja.com $(B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 
-$(BCm(B: $(B%&%'%V%a!<%k$O(B w3 (url) $(B%Q%C%1!<%8$N%P!<%8%g%s(B "WWW 4.0pre.46
-1999/10/01" $(B$KBg$-$/0MB8$7$^$9!#$=$l0JA0$N$b$N$O$*$=$i$/F0:n$7$J$$$G$7$g(B
-$(B$&!#(B
+$(BCm(B: $(B8=:_(B mail.yahoo.com $(B$O(B POP3 $(B%5!<%S%9$rDs6!$7$F$$$^$9$N$G!"(B@sc{pop}
+$(B%a!<%k%=!<%9$r;H$&$N$,NI$$$N$G$O$J$$$G$7$g$&$+!#(B
+
+$(BCm(B: $(B%&%'%V%a!<%k$O%/%C%-!<$KBg$-$/0MB8$7$^$9!#(Burl "4.0pre.46" $(B$r;H$&>l9g(B
+$(B$O(B "one-line-cookie" $(B%Q%C%A$rEv$F$kI,MW$,$"$j$^$9!#(B
 
 $(B7Y9p(B: $(B%a!<%k$,<:$o$l$k$+$b$7$l$^$;$s!#L5J]>Z$G$9!#(B
 
@@ -10773,7 +10780,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 @table @code
 @item :subtype
 $(B%&%'%V%a!<%k%5!<%P!<$N7?$G$9!#=i4|CM$O(B @code{hotmail} $(B$G$9!#B>$N8uJd$O(B
-@code{yahoo}, @code{netaddress}, @code{my-deja} $(B$G$9!#(B
+@code{netscape}, @code{netaddress}, @code{my-deja} $(B$G$9!#(B
 
 @item :user
 $(B%&%'%V%a!<%k%5!<%P!<$NMxMQ<TL>$G$9!#=i4|CM$O%m%0%$%sL>$G$9!#(B
@@ -10791,7 +10798,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 $(B%&%'%V%a!<%k$N%=!<%9$NNc$G$9(B:
 
 @lisp
-(webmail :subtype 'yahoo :user "user-name" :password "secret")
+(webmail :subtype 'hotmail :user "user-name" :password "secret")
 @end lisp
 @end table
 

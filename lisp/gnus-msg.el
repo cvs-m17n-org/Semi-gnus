@@ -108,6 +108,7 @@ the second with the current group name.")
 
 (defcustom gnus-group-posting-charset-alist
   '(("^\\(no\\|fr\\|dk\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\|dk\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+    ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
     (message-this-is-mail nil nil)
     (message-this-is-news nil t))
   "Alist of regexps and permitted unencoded charsets for posting.
@@ -1355,8 +1356,10 @@ this is a reply."
 		      `(lambda ()
 			 (save-excursion
 			   (message-remove-header ,header)
-			   (message-goto-eoh)
-			   (insert ,header ": " ,(cdr result) "\n"))))))))
+			   (let ((value ,(cdr result)))
+			     (when value
+			       (message-goto-eoh)
+			       (insert ,header ": " value "\n"))))))))))
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
