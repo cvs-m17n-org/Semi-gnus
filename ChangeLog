@@ -1,3 +1,17 @@
+2000-02-22  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.8 (This is alpha status.)
+	I tested `nnvirtual'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.8.
+
+* 2000-02-21  Yoshiki Hayashi  <yoshiki@xemacs.org>
+
+	* nnvirtual.el (nnvirtual-request-article):
+	Bind gnus-override-method to nil.
+	(nnvirtual-request-update-mark): Don't update mark when
+	article is not there.
+
 2000-02-14  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.7 (This is alpha status.)
