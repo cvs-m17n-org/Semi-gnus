@@ -1,3 +1,20 @@
+1998-10-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.1.
+
+1998-10-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-make-forward-subject): Use
+	`nnheader-decode-subject' instead of
+	`eword-decode-unstructured-field-body'.
+
+	* lisp/nnheader.el (nnheader-decode-subject): New alias.
+	(nnheader-decode-from): New alias.
+	(make-full-mail-header): Use `nnheader-decode-subject' and
+	`nnheader-decode-from' instead of
+	`eword-decode-and-unfold-unstructured-field' and
+	`eword-decode-and-unfold-structured-field'.
+
 1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.7.
@@ -390,15 +407,6 @@
 1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Update.
-
-1998-08-14  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus-start.el (gnus-save-newsrc-file): Bind
-	`coding-system-for-write' by `gnus-startup-file-coding-system'
-	while saving the quick newsrc file.
-
-	* lisp/gnus-start.el (gnus-startup-file-coding-system): Change
-	default value to `ctext'.
 
 1998-08-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
