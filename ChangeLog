@@ -1,3 +1,9 @@
+2000-10-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-format-direntry): Fixed broken
+	direntry generate probrem.
+	(Advised by Tetsuo Tsukamoto <czkmt@remus.dti.ne.jp>)
+
 2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-insert-line): Work with quoted
