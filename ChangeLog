@@ -13,7 +13,7 @@
 	* lisp/nntp.el (nntp-list-options, nntp-options-subscribe,
 	nntp-options-not-subscribe): New server variables.
 	(nntp-request-list): Use them.
-	* text/gnus.texi, texi/gnus-ja.texi: Update for them.
+	* texi/gnus.texi, texi/gnus-ja.texi: Update for them.
 
 2000-08-23  Katsumi Yamaoka <yamaoka@jpl.org>
 
