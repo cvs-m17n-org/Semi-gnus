@@ -85,9 +85,9 @@
 		  (article 1.0)))
       (t
        '(vertical 1.0
-		 (summary 0.25 point)
-		 (if gnus-carpal '(summary-carpal 4))
-		 (article 1.0)))))
+		  (summary 0.25 point)
+		  (if gnus-carpal '(summary-carpal 4))
+		  (article 1.0)))))
     (server
      (vertical 1.0
 	       (server 1.0 point)
@@ -286,7 +286,7 @@ See the Gnus manual for an explanation of the syntax used.")
 (defun gnus-configure-frame (split &optional window)
   "Split WINDOW according to SPLIT."
   (unless window
-    (setq window (get-buffer-window (current-buffer))))
+    (setq window (or (get-buffer-window (current-buffer)) (selected-window))))
   (select-window window)
   ;; This might be an old-stylee buffer config.
   (when (vectorp split)
@@ -319,8 +319,10 @@ See the Gnus manual for an explanation of the syntax used.")
 			  (t (cdr (assq type gnus-window-to-buffer))))))
 	(unless buffer
 	  (error "Invalid buffer type: %s" type))
-	(switch-to-buffer (gnus-get-buffer-create
-			   (gnus-window-to-buffer-helper buffer)))
+	(let ((buf (gnus-get-buffer-create
+ 		    (gnus-window-to-buffer-helper buffer))))
+ 	  (if (eq buf (window-buffer (selected-window))) (set-buffer buf)
+ 	    (switch-to-buffer buf)))
 	(when (memq 'frame-focus split)
 	  (setq gnus-window-frame-focus window))
 	;; We return the window if it has the `point' spec.
@@ -421,7 +423,7 @@ See the Gnus manual for an explanation of the syntax used.")
       (setq gnus-frame-split-p nil)
 
       (unless split
-	(error "No such setting: %s" setting))
+	(error "No such setting in `gnus-buffer-configuration': %s" setting))
 
       (if (and (setq all-visible (gnus-all-windows-visible-p split))
 	       (not force))
@@ -444,12 +446,12 @@ See the Gnus manual for an explanation of the syntax used.")
 		    (gnus-delete-windows-in-gnusey-frames))
 		;; Just remove some windows.
 		(gnus-remove-some-windows)
-		(switch-to-buffer nntp-server-buffer))
+	      (set-buffer nntp-server-buffer))
 	    (select-frame frame)))
 
-	(switch-to-buffer nntp-server-buffer)
 	(let (gnus-window-frame-focus)
-	  (gnus-configure-frame split (get-buffer-window (current-buffer)))
+	(set-buffer nntp-server-buffer)
+	(gnus-configure-frame split)
 	  (when gnus-window-frame-focus
 	    (select-frame (window-frame gnus-window-frame-focus))))))))
 
@@ -506,7 +508,7 @@ should have point."
 	(if (and (setq buf (get-buffer (gnus-window-to-buffer-helper buffer)))
 		 (setq win (get-buffer-window buf t)))
 	    (if (memq 'point split)
-	      (setq all-visible win))
+		(setq all-visible win))
 	  (setq all-visible nil)))
        (t
 	(when (eq type 'frame)

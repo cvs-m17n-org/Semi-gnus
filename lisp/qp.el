@@ -59,21 +59,25 @@
 	(message "Malformed MIME quoted-printable message"))))))
 
 (defun quoted-printable-decode-string (string)
- "Decode the quoted-printable-encoded STRING and return the results."
- (with-temp-buffer
-   (insert string)
-   (quoted-printable-decode-region (point-min) (point-max))
-   (buffer-string)))
+  "Decode the quoted-printable-encoded STRING and return the results."
+  (with-temp-buffer
+    (insert string)
+    (quoted-printable-decode-region (point-min) (point-max))
+    (buffer-string)))
 
 (defun quoted-printable-encode-region (from to &optional fold class)
   "QP-encode the region between FROM and TO.
-If FOLD, fold long lines.  If CLASS, translate the characters
-matched by that regexp."
+
+If FOLD fold long lines.  If CLASS, translate the characters 
+matched by that regexp.
+
+If `mm-use-ultra-safe-encoding' is set, fold unconditionally and
+encode lines starting with \"From\"."
   (interactive "r")
   (save-excursion
     (save-restriction
       (narrow-to-region from to)
-;;      (mm-encode-body)
+      ;;      (mm-encode-body)
       ;; Encode all the non-ascii and control characters.
       (goto-char (point-min))
       (while (and (skip-chars-forward
@@ -92,14 +96,20 @@ matched by that regexp."
 	   (prog1
 	       (upcase (format "=%02x" (char-after)))
 	     (delete-char 1)))))
-      (when fold
+      (when (or fold mm-use-ultra-safe-encoding)
 	;; Fold long lines.
 	(goto-char (point-min))
 	(while (not (eobp))
+	  ;; In ultra-safe mode, encode "From " at the beginning of a
+	  ;; line.
+	  (when mm-use-ultra-safe-encoding
+	    (beginning-of-line)
+	    (when (looking-at "From ")
+	      (replace-match "From=20" nil t)))
 	  (end-of-line)
 	  (while (> (current-column) 72)
 	    (beginning-of-line)
-	    (forward-char 71) ;; 71 char plus an "="
+	    (forward-char 71);; 71 char plus an "="
 	    (search-backward "=" (- (point) 2) t)
 	    (insert "=\n")
 	    (end-of-line))
@@ -107,11 +117,11 @@ matched by that regexp."
 	    (forward-line)))))))
 
 (defun quoted-printable-encode-string (string)
- "QP-encode STRING and return the results."
- (mm-with-unibyte-buffer
-   (insert string)
-   (quoted-printable-encode-region (point-min) (point-max))
-   (buffer-string)))
+  "QP-encode STRING and return the results."
+  (mm-with-unibyte-buffer
+    (insert string)
+    (quoted-printable-encode-region (point-min) (point-max))
+    (buffer-string)))
 
 (provide 'qp)
 

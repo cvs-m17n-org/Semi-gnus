@@ -331,7 +331,7 @@ variable."
     ((= unread 0) .
      gnus-group-mail-low-empty-face)
     (t .
-     gnus-group-mail-low-face))
+       gnus-group-mail-low-face))
   "*Controls the highlighting of group buffer lines.
 
 Below is a list of `Form'/`Face' pairs.  When deciding how a a
@@ -925,7 +925,7 @@ If REGEXP, only list groups matching REGEXP."
 	      params (gnus-info-params info)
 	      newsrc (cdr newsrc)
 	      unread (car (gnus-gethash group gnus-newsrc-hashtb)))
-	(and unread			; This group might be bogus
+	(and unread			; This group might be unchecked
 	     (or (not regexp)
 		 (string-match regexp group))
 	     (<= (setq clevel (gnus-info-level info)) level)
@@ -1849,8 +1849,20 @@ ADDRESS."
       (gnus-request-create-group nname nil args))
     t))
 
-(defun gnus-group-delete-group (group &optional force)
-  "Delete the current group.  Only meaningful with mail groups.
+(defun gnus-group-delete-groups (&optional arg)
+  "Delete the current group.  Only meaningful with editable groups."
+  (interactive "P")
+  (let ((n (length (gnus-group-process-prefix arg))))
+    (when (gnus-yes-or-no-p
+	   (if (= n 1)
+	       "Delete this 1 group? "
+	     (format "Delete these %d groups? " n)))
+      (gnus-group-iterate arg
+	(lambda (group)
+	  (gnus-group-delete-group group nil t))))))
+
+(defun gnus-group-delete-group (group &optional force no-prompt)
+  "Delete the current group.  Only meaningful with editable groups.
 If FORCE (the prefix) is non-nil, all the articles in the group will
 be deleted.  This is \"deleted\" as in \"removed forever from the face
 of the Earth\".	 There is no undo.  The user will be prompted before
@@ -1863,10 +1875,11 @@ doing the deletion."
   (unless (gnus-check-backend-function 'request-delete-group group)
     (error "This backend does not support group deletion"))
   (prog1
-      (if (not (gnus-yes-or-no-p
-		(format
-		 "Do you really want to delete %s%s? "
-		 group (if force " and all its contents" ""))))
+      (if (and (not no-prompt)
+	       (not (gnus-yes-or-no-p
+		     (format
+		      "Do you really want to delete %s%s? "
+		      group (if force " and all its contents" "")))))
 	  ()				; Whew!
 	(gnus-message 6 "Deleting group %s..." group)
 	(if (not (gnus-request-delete-group group force))
@@ -2286,12 +2299,12 @@ score file entries for articles to include in the group."
 
    An access control list is a list of (identifier . rights) elements.
 
-   The identifier string specifies the corresponding user. The
+   The identifier string specifies the corresponding user.  The
    identifier \"anyone\" is reserved to refer to the universal identity.
 
    Rights is a string listing a (possibly empty) set of alphanumeric
    characters, each character listing a set of operations which is being
-   controlled. Letters are reserved for ``standard'' rights, listed
+   controlled.  Letters are reserved for ``standard'' rights, listed
    below.  Digits are reserved for implementation or site defined rights.
 
    l - lookup (mailbox is visible to LIST/LSUB commands)
@@ -2563,8 +2576,7 @@ up is returned."
 	  (when (eq 'nnvirtual (car method))
 	    (nnvirtual-catchup-group
 	     (gnus-group-real-name group) (nth 1 method) all)))
-	(if (>= (gnus-info-level (gnus-get-info group))
-		gnus-level-zombie)
+	(if (>= (gnus-group-level group) gnus-level-zombie)
 	    (gnus-message 2 "Dead groups can't be caught up")
 	  (if (prog1
 		  (gnus-group-goto-group group)
@@ -2963,7 +2975,7 @@ entail asking the server for the groups."
   ;; First we make sure that we have really read the active file.
   (unless (gnus-read-active-file-p)
     (let ((gnus-read-active-file t)
-	  (gnus-agent nil)) ; Trick the agent into ignoring the active file.
+	  (gnus-agent nil))		; Trick the agent into ignoring the active file.
       (gnus-read-active-file)))
   ;; Find all groups and sort them.
   (let ((groups
@@ -3048,7 +3060,12 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	 (ret (if (numberp n) (- n (length groups)) 0))
 	 (beg (unless n
 		(point)))
-	 group method)
+	 group method
+	 (gnus-inhibit-demon t)
+	 ;; Binding this variable will inhibit multiple fetchings
+	 ;; of the same mail source.
+	 (nnmail-fetched-sources (list t)))
+    (gnus-run-hooks 'gnus-get-new-news-hook)
     (while (setq group (pop groups))
       (gnus-group-remove-mark group)
       ;; Bypass any previous denials from the server.
@@ -3455,19 +3472,19 @@ and the second element is the address."
     (or (not info)
 	(and (not (setq marked (nthcdr 3 info)))
 	     (or (null articles)
-                (setcdr (nthcdr 2 info)
-                        (list (list (cons type (gnus-compress-sequence
-                                                articles t)))))))
+		 (setcdr (nthcdr 2 info)
+			 (list (list (cons type (gnus-compress-sequence
+						 articles t)))))))
 	(and (not (setq m (assq type (car marked))))
 	     (or (null articles)
-                (setcar marked
-                        (cons (cons type (gnus-compress-sequence articles t) )
-                              (car marked)))))
+		 (setcar marked
+			 (cons (cons type (gnus-compress-sequence articles t) )
+			       (car marked)))))
 	(if force
 	    (if (null articles)
-               (setcar (nthcdr 3 info)
-                       (gnus-delete-alist type (car marked)))
-             (setcdr m (gnus-compress-sequence articles t)))
+		(setcar (nthcdr 3 info)
+			(gnus-delete-alist type (car marked)))
+	      (setcdr m (gnus-compress-sequence articles t)))
 	  (setcdr m (gnus-compress-sequence
 		     (sort (nconc (gnus-uncompress-range (cdr m))
 				  (copy-sequence articles)) '<) t))))))
@@ -3492,7 +3509,7 @@ or `gnus-group-catchup-group-hook'."
 (defun gnus-group-timestamp-delta (group)
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."
   (let* ((time (or (gnus-group-timestamp group)
-		  (list 0 0)))
+		   (list 0 0)))
          (delta (subtract-time (current-time) time)))
     (+ (* (nth 0 delta) 65536.0)
        (nth 1 delta))))

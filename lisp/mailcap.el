@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (require 'cl))
+(eval-when-compile (require 'cl))
 (require 'mail-parse)
+(require 'mm-util)
 
 (defvar mailcap-parse-args-syntax-table
   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
@@ -119,12 +119,6 @@
      ("x-mpeg"
       (viewer . "maplay %s")
       (type   . "audio/x-mpeg"))
-     (".*"
-      (viewer . mailcap-save-binary-file)
-      (non-viewer . t)
-      (test   . (or (featurep 'nas-sound)
-		      (featurep 'native-sound)))
-      (type   . "audio/*"))
      (".*"
       (viewer . "showaudio")
       (type   . "audio/*")))
@@ -219,7 +213,7 @@
       (viewer . tar-mode)
       (type . "archive/tar")
       (test . (fboundp 'tar-mode)))))
-     "The mailcap structure is an assoc list of assoc lists.
+  "The mailcap structure is an assoc list of assoc lists.
 1st assoc list is keyed on the major content-type
 2nd assoc list is keyed on the minor content-type (which can be a regexp)
 
@@ -261,7 +255,7 @@ not.")
 ;;;
 
 (defun mailcap-generate-unique-filename (&optional fmt)
-  "Generate a unique filename in mailcap-temporary-directory"
+  "Generate a unique filename in mailcap-temporary-directory."
   (if (not fmt)
       (let ((base (format "mailcap-tmp.%d" (user-real-uid)))
 	    (fname "")
@@ -293,7 +287,7 @@ not.")
     (kill-buffer (current-buffer))))
 
 (defun mailcap-maybe-eval ()
-  "Maybe evaluate a buffer of emacs lisp code"
+  "Maybe evaluate a buffer of emacs lisp code."
   (if (yes-or-no-p "This is emacs-lisp code, evaluate it? ")
       (eval-buffer (current-buffer))
     (emacs-lisp-mode)))
@@ -336,8 +330,8 @@ If FORCE, re-parse even if already parsed."
 	  fname)
       (while fnames
 	(setq fname (car fnames))
-       (if (and (file-exists-p fname) (file-readable-p fname)
-                (file-regular-p fname))
+	(if (and (file-exists-p fname) (file-readable-p fname)
+		 (file-regular-p fname))
 	    (mailcap-parse-mailcap (car fnames)))
 	(setq fnames (cdr fnames))))
     (setq mailcap-parsed-p t)))
@@ -601,7 +595,7 @@ If FORCE, re-parse even if already parsed."
 	 ((or (null cur-minor)		; New minor area, or
 	      (assq 'test info))	; Has a test, insert at beginning
 	  (setcdr old-major (cons (cons minor info) (cdr old-major))))
-	 ((and (not (assq 'test info)) ; No test info, replace completely
+	 ((and (not (assq 'test info))	; No test info, replace completely
 	       (not (assq 'test cur-minor)))
 	  (setcdr cur-minor info))
 	 (t
@@ -694,7 +688,7 @@ this type is returned."
 	passed)
        (t
 	;; MUST make a copy *sigh*, else we modify mailcap-mime-data
-	(setq viewer (copy-tree viewer))
+	(setq viewer (copy-sequence viewer))
 	(let ((view (assq 'viewer viewer))
 	      (test (assq 'test viewer)))
 	  (if view (setcdr view (mailcap-unescape-mime-test (cdr view) info)))
@@ -888,7 +882,7 @@ The path of COMMAND will be returned iff COMMAND is a command."
 
 (defun mailcap-mime-types ()
   "Return a list of MIME media types."
-  (delete-duplicates (mapcar 'cdr mailcap-mime-extensions)))
+  (mm-delete-duplicates (mapcar 'cdr mailcap-mime-extensions)))
 
 (provide 'mailcap)
 

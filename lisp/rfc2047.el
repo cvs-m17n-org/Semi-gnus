@@ -133,13 +133,13 @@ Should be called narrowed to the head of the message."
 	(encode-coding-region (point-min) (point-max)
 			      mail-parse-charset)))))
 
-(defun rfc2047-encodable-p ()
-  "Say whether the current (narrowed) buffer contains characters that need encoding."
+(defun rfc2047-encodable-p (&optional header)
+  "Say whether the current (narrowed) buffer contains characters that need encoding in headers."
   (let ((charsets
 	 (mapcar
 	  'mm-mime-charset
 	  (mm-find-charset-region (point-min) (point-max))))
-	(cs (list 'us-ascii mail-parse-charset))
+	(cs (list 'us-ascii (car message-posting-charset)))
 	found)
     (while charsets
       (unless (memq (pop charsets) cs)
@@ -148,18 +148,58 @@ Should be called narrowed to the head of the message."
 
 (defun rfc2047-dissect-region (b e)
   "Dissect the region between B and E into words."
-  (let (words)
+  (let ((all-specials (concat ietf-drums-tspecials " \t\n\r"))
+	(special-list (mapcar 'identity ietf-drums-tspecials))
+	(blank-list '(?  ?\t ?\n ?\r))
+	words current cs state mail-parse-mule-charset)
     (save-restriction
       (narrow-to-region b e)
       (goto-char (point-min))
-      (while (re-search-forward
-	      (concat "[^" ietf-drums-tspecials " \t\n]+") nil t)
-	(push
-	 (list (match-beginning 0) (match-end 0)
-	       (car (delq 'ascii (mm-find-charset-region
-				  (match-beginning 0) (match-end 0)))))
-	 words))
-      words)))
+      (skip-chars-forward all-specials)
+      (setq b (point))
+      (while (not (eobp))
+	(cond
+	 ((not state)
+	  (if (memq (char-after) blank-list)
+	      (setq state 'blank)
+	    (setq state 'word)
+	    (if (not (eq (setq cs (mm-charset-after)) 'ascii))
+		(setq current cs)))
+	  (setq b (point)))
+	 ((eq state 'blank)
+	  (cond 
+	   ((memq (char-after) special-list)
+	    (setq state nil))
+	   ((memq (char-after) blank-list))
+	   (t
+	    (setq state 'word)
+	    (if (not (eq (setq cs (mm-charset-after)) 'ascii))
+		(setq current cs)))))
+	 ((eq state 'word)
+	  (cond 
+	   ((memq (char-after) special-list)
+	    (setq state nil)
+	    (push (list b (point) current) words)
+	    (setq current nil))
+	   ((memq (char-after) blank-list)
+	    (setq state 'blank)
+	    (push (list b (point) current) words)
+	    (setq current nil)
+	    (setq b (point)))
+	   ((or (eq (setq cs (mm-charset-after)) 'ascii)
+		(if current
+		    (eq current cs)
+		  (setq current cs))))
+	   (t
+	    (push (list b (point) current) words)
+	    (setq current cs)
+	    (setq b (point))))))
+	(if state
+	    (forward-char)
+	  (skip-chars-forward all-specials)))
+      (if (eq state 'word)
+	  (push (list b (point) current) words)))
+    words))
 
 (defun rfc2047-encode-region (b e)
   "Encode all encodable words in REGION."
@@ -231,8 +271,8 @@ Should be called narrowed to the head of the message."
 	 ((and (looking-at "\\?=")
 	       (> (- (point) (save-excursion (beginning-of-line) (point))) 76))
 	  (goto-char break)
-	  (insert "\n ")
-	  (forward-line 1)))
+	  (setq break nil)
+	  (insert "\n ")))
 	(unless (eobp)
 	  (forward-char 1))))))
 
@@ -337,7 +377,7 @@ Return WORD if not."
 Valid ENCODINGs are \"B\" and \"Q\".
 If your Emacs implementation can't decode CHARSET, it returns nil."
   (if (stringp charset)
-    (setq charset (intern (downcase charset))))
+      (setq charset (intern (downcase charset))))
   (if (or (not charset) 
 	  (eq 'gnus-all mail-parse-ignored-charsets)
 	  (memq 'gnus-all mail-parse-ignored-charsets)
@@ -347,7 +387,7 @@ If your Emacs implementation can't decode CHARSET, it returns nil."
     (if (and (not cs) charset 
 	     (listp mail-parse-ignored-charsets)
 	     (memq 'gnus-unknown mail-parse-ignored-charsets))
-      (setq cs (mm-charset-to-coding-system mail-parse-charset)))
+	(setq cs (mm-charset-to-coding-system mail-parse-charset)))
     (when cs
       (when (and (eq cs 'ascii)
 		 mail-parse-charset)

@@ -260,7 +260,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.8.2"
+(defconst gnus-version-number "5.8.3"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Gnus v%s" gnus-version-number)
@@ -866,19 +866,21 @@ used to 899, you would say something along these lines:
 		 (kill-buffer (current-buffer))))))))
 
 (defcustom gnus-select-method
-  (ignore-errors
-    (nconc
-     (list 'nntp (or (ignore-errors
-		       (gnus-getenv-nntpserver))
-		     (when (and gnus-default-nntp-server
-				(not (string= gnus-default-nntp-server "")))
-		       gnus-default-nntp-server)
-		     "news"))
-     (if (or (null gnus-nntp-service)
-	     (equal gnus-nntp-service "nntp"))
-	 nil
-       (list gnus-nntp-service))))
-  "*Default method for selecting a newsgroup.
+  (condition-case nil
+      (nconc
+       (list 'nntp (or (condition-case nil
+			   (gnus-getenv-nntpserver)
+			 (error nil))
+		       (when (and gnus-default-nntp-server
+				  (not (string= gnus-default-nntp-server "")))
+			 gnus-default-nntp-server)
+		       "news"))
+       (if (or (null gnus-nntp-service)
+	       (equal gnus-nntp-service "nntp"))
+	   nil
+	 (list gnus-nntp-service)))
+    (error nil))
+  "Default method for selecting a newsgroup.
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.
 
@@ -966,8 +968,8 @@ If, for instance, you want to read your mail with the nnml backend,
 you could set this variable:
 
 \(setq gnus-secondary-select-methods '((nnml \"\")))"
-:group 'gnus-server
-:type '(repeat gnus-select-method))
+  :group 'gnus-server
+  :type '(repeat gnus-select-method))
 
 (defvar gnus-backup-default-subscribed-newsgroups
   '("news.announce.newusers" "news.groups.questions" "gnu.emacs.gnus")
@@ -1282,10 +1284,11 @@ this variable.	I think."
 				    (intern (car entry))))
 			    gnus-valid-select-methods))
 	  (string :tag "Address")
-	  (editable-list  :inline t
-			  (list :format "%v"
-				variable
-				(sexp :tag "Value")))))
+	  (repeat :tag "Options"
+		  :inline t
+		  (list :format "%v"
+			variable
+			(sexp :tag "Value")))))
 
 (defcustom gnus-updated-mode-lines '(group article summary tree)
   "List of buffers that should update their mode lines.
@@ -1552,11 +1555,11 @@ If nil, no default charset is assumed when posting."
 
 (defvar gnus-variable-list
   '(gnus-newsrc-options gnus-newsrc-options-n
-    gnus-newsrc-last-checked-date
-    gnus-newsrc-alist gnus-server-alist
-    gnus-killed-list gnus-zombie-list
-    gnus-topic-topology gnus-topic-alist
-    gnus-format-specs)
+			gnus-newsrc-last-checked-date
+			gnus-newsrc-alist gnus-server-alist
+			gnus-killed-list gnus-zombie-list
+			gnus-topic-topology gnus-topic-alist
+			gnus-format-specs)
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-newsrc-alist nil
@@ -1668,20 +1671,20 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-cache-retrieve-headers gnus-cache-possibly-alter-active
       gnus-cache-enter-remove-article gnus-cached-article-p
       gnus-cache-open gnus-cache-close gnus-cache-update-article)
-      ("gnus-cache" :interactive t gnus-jog-cache gnus-cache-enter-article
-       gnus-cache-remove-article gnus-summary-insert-cached-articles)
-      ("gnus-score" :interactive t
-       gnus-summary-increase-score gnus-summary-set-score
-       gnus-summary-raise-thread gnus-summary-raise-same-subject
-       gnus-summary-raise-score gnus-summary-raise-same-subject-and-select
-       gnus-summary-lower-thread gnus-summary-lower-same-subject
-       gnus-summary-lower-score gnus-summary-lower-same-subject-and-select
-       gnus-summary-current-score gnus-score-default
-       gnus-score-flush-cache gnus-score-close
-       gnus-possibly-score-headers gnus-score-followup-article
-       gnus-score-followup-thread)
-      ("gnus-score"
-       (gnus-summary-score-map keymap) gnus-score-save gnus-score-headers
+     ("gnus-cache" :interactive t gnus-jog-cache gnus-cache-enter-article
+      gnus-cache-remove-article gnus-summary-insert-cached-articles)
+     ("gnus-score" :interactive t
+      gnus-summary-increase-score gnus-summary-set-score
+      gnus-summary-raise-thread gnus-summary-raise-same-subject
+      gnus-summary-raise-score gnus-summary-raise-same-subject-and-select
+      gnus-summary-lower-thread gnus-summary-lower-same-subject
+      gnus-summary-lower-score gnus-summary-lower-same-subject-and-select
+      gnus-summary-current-score gnus-score-delta-default
+      gnus-score-flush-cache gnus-score-close
+      gnus-possibly-score-headers gnus-score-followup-article
+      gnus-score-followup-thread)
+     ("gnus-score"
+      (gnus-summary-score-map keymap) gnus-score-save gnus-score-headers
       gnus-current-score-file-nondirectory gnus-score-adaptive
       gnus-score-find-trace gnus-score-file-name)
      ("gnus-cus" :interactive t gnus-group-customize gnus-score-customize)
@@ -1750,6 +1753,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-treat-overstrike 
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-decode-HZ
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
@@ -2471,9 +2475,9 @@ You should probably use `gnus-find-method-for-group' instead."
   (let ((methods gnus-secondary-select-methods)
 	(gmethod (gnus-server-get-method nil method)))
     (while (and methods
-               (not (gnus-method-equal
-                     (gnus-server-get-method nil (car methods))
-                     gmethod)))
+		(not (gnus-method-equal
+		      (gnus-server-get-method nil (car methods))
+		      gmethod)))
       (setq methods (cdr methods)))
     methods))
 
@@ -2706,7 +2710,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
   (let ((opened gnus-opened-servers))
     (while (and method opened)
       (when (and (equal (cadr method) (cadaar opened))
-                (equal (car method) (caaar opened))
+		 (equal (car method) (caaar opened))
 		 (not (equal method (caar opened))))
 	(setq method nil))
       (pop opened))
@@ -2743,7 +2747,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
   (or gnus-override-method
       (and (not group)
 	   gnus-select-method)
-      (and (not (gnus-group-entry group)) ;; a new group
+      (and (not (gnus-group-entry group));; a new group
 	   (gnus-group-name-to-method group))
       (let ((info (or info (gnus-get-info group)))
 	    method)

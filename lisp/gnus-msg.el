@@ -44,8 +44,8 @@ This method will not be used in mail groups and the like, only in
 \"real\" newsgroups.
 
 If not nil nor `native', the value must be a valid method as discussed
-in the documentation of `gnus-select-method'. It can also be a list of
-methods. If that is the case, the user will be queried for what select
+in the documentation of `gnus-select-method'.  It can also be a list of
+methods.  If that is the case, the user will be queried for what select
 method to use when posting."
   :group 'gnus-group-foreign
   :type `(choice (const nil)
@@ -101,14 +101,34 @@ the second with the current group name.")
   "*Alist of styles to use when posting.")
 
 (defcustom gnus-group-posting-charset-alist
-  '(("^no\\." iso-8859-1)
-    (message-this-is-mail nil)
-    ("^de\\." nil)
-    (".*" iso-8859-1)
-    (message-this-is-news iso-8859-1))
-  "Alist of regexps (to match group names) and default charsets to be unencoded when posting."
-  :type '(repeat (list (regexp :tag "Group")
-		       (symbol :tag "Charset")))
+  '(("^\\(no\\|fr\\|dk\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\|dk\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+    (message-this-is-mail nil nil)
+    (message-this-is-news nil t))
+  "Alist of regexps and permitted unencoded charsets for posting.
+Each element of the alist has the form (TEST HEADER BODY-LIST), where
+TEST is either a regular expression matching the newsgroup header or a
+variable to query,
+HEADER is the charset which may be left unencoded in the header (nil
+means encode all charsets),
+BODY-LIST is a list of charsets which may be encoded using 8bit
+content-transfer encoding in the body, or one of the special values
+nil (always encode using quoted-printable) or t (always use 8bit).
+
+Note that any value other tha nil for HEADER infringes some RFCs, so
+use this option with care."
+  :type '(repeat (list :tag "Permitted unencoded charsets"
+		  (choice :tag "Where"
+		   (regexp :tag "Group")
+		   (const :tag "Mail message" :value message-this-is-mail)
+		   (const :tag "News article" :value message-this-is-news))
+		  (choice :tag "Header"
+		   (const :tag "None" nil)
+		   (symbol :tag "Charset"))
+		  (choice :tag "Body"
+			  (const :tag "Any" :value t)
+			  (const :tag "None" :value nil)
+			  (repeat :tag "Charsets"
+				  (symbol :tag "Charset")))))
   :group 'gnus-charset)
 
 ;;; Internal variables.
@@ -206,8 +226,6 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,group ,article))
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
-	 (set (make-local-variable 'message-posting-charset)
-	      (gnus-setup-posting-charset ,group))
 	 (gnus-run-hooks 'gnus-message-setup-hook))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
@@ -226,7 +244,7 @@ Thank you for your help in stamping out bugs.
 			 (funcall (car elem) group))
 		    (and (symbolp (car elem))
 			 (symbol-value (car elem))))
-	    (throw 'found (cadr elem))))))))
+	    (throw 'found (cons (cadr elem) (caddr elem)))))))))
 
 (defun gnus-inews-add-send-actions (winconf buffer article)
   (make-local-hook 'message-sent-hook)
@@ -504,7 +522,7 @@ If SILENT, don't prompt the user."
      ;; the default method.
      ((null group-method)
       (or (and (null (eq gnus-post-method 'active)) gnus-post-method)
-	       gnus-select-method message-post-method))
+	  gnus-select-method message-post-method))
      ;; We want the inverse of the default
      ((and arg (not (eq arg 0)))
       (if (eq gnus-post-method 'active)

@@ -41,11 +41,11 @@
   "Spool directory for the nnml mail backend.")
 
 (defvoo nnml-active-file
-  (concat (file-name-as-directory nnml-directory) "active")
+    (concat (file-name-as-directory nnml-directory) "active")
   "Mail active file.")
 
 (defvoo nnml-newsgroups-file
-  (concat (file-name-as-directory nnml-directory) "newsgroups")
+    (concat (file-name-as-directory nnml-directory) "newsgroups")
   "Mail newsgroups description file.")
 
 (defvoo nnml-get-new-mail t
@@ -304,7 +304,7 @@ all.  This may very well take some time.")
     (nconc rest articles)))
 
 (deffoo nnml-request-move-article
-  (article group server accept-form &optional last)
+    (article group server accept-form &optional last)
   (let ((buf (get-buffer-create " *nnml move*"))
 	result)
     (nnml-possibly-change-directory group server)
@@ -312,12 +312,15 @@ all.  This may very well take some time.")
     (and
      (nnml-deletable-article-p group article)
      (nnml-request-article article group server)
-     (save-excursion
-       (set-buffer buf)
-       (insert-buffer-substring nntp-server-buffer)
-       (setq result (eval accept-form))
-       (kill-buffer (current-buffer))
-       result)
+     (let (nnml-current-directory 
+	   nnml-current-group 
+	   nnml-article-file-alist)
+       (save-excursion
+	 (set-buffer buf)
+	 (insert-buffer-substring nntp-server-buffer)
+	 (setq result (eval accept-form))
+	 (kill-buffer (current-buffer))
+	 result))
      (progn
        (nnml-possibly-change-directory group server)
        (condition-case ()

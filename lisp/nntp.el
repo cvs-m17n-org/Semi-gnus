@@ -48,10 +48,10 @@ server spawn an nnrpd server.")
 It is called with no parameters.")
 
 (defvoo nntp-server-action-alist
-  '(("nntpd 1\\.5\\.11t"
-     (remove-hook 'nntp-server-opened-hook 'nntp-send-mode-reader))
-    ("NNRP server Netscape"
-     (setq nntp-server-list-active-group nil)))
+    '(("nntpd 1\\.5\\.11t"
+       (remove-hook 'nntp-server-opened-hook 'nntp-send-mode-reader))
+      ("NNRP server Netscape"
+       (setq nntp-server-list-active-group nil)))
   "Alist of regexps to match on server types and actions to be taken.
 For instance, if you want Gnus to beep every time you connect
 to innd, you could say something like:
@@ -436,36 +436,36 @@ noticing asynchronous data.")
 	    (nntp-inhibit-erase t)
 	    article)
 	;; Send HEAD commands.
-      (while (setq article (pop articles))
-	(nntp-send-command
-	 nil
-	 "HEAD" (if (numberp article)
-		    (int-to-string article)
-		  ;; `articles' is either a list of article numbers
-		  ;; or a list of article IDs.
-		  article))
-	(incf count)
-	;; Every 400 requests we have to read the stream in
-	;; order to avoid deadlocks.
-	(when (or (null articles)	;All requests have been sent.
-		  (zerop (% count nntp-maximum-request)))
-	  (nntp-accept-response)
-	  (while (progn
-		   (set-buffer buf)
-		   (goto-char last-point)
-		   ;; Count replies.
-		   (while (nntp-next-result-arrived-p)
-		     (setq last-point (point))
-		     (incf received))
-		   (< received count))
-	    ;; If number of headers is greater than 100, give
-	    ;;  informative messages.
-	    (and (numberp nntp-large-newsgroup)
-		 (> number nntp-large-newsgroup)
-		 (zerop (% received 20))
-		 (nnheader-message 6 "NNTP: Receiving headers... %d%%"
-				   (/ (* received 100) number)))
-	    (nntp-accept-response))))
+	(while (setq article (pop articles))
+	  (nntp-send-command
+	   nil
+	   "HEAD" (if (numberp article)
+		      (int-to-string article)
+		    ;; `articles' is either a list of article numbers
+		    ;; or a list of article IDs.
+		    article))
+	  (incf count)
+	  ;; Every 400 requests we have to read the stream in
+	  ;; order to avoid deadlocks.
+	  (when (or (null articles)	;All requests have been sent.
+		    (zerop (% count nntp-maximum-request)))
+	    (nntp-accept-response)
+	    (while (progn
+		     (set-buffer buf)
+		     (goto-char last-point)
+		     ;; Count replies.
+		     (while (nntp-next-result-arrived-p)
+		       (setq last-point (point))
+		       (incf received))
+		     (< received count))
+	      ;; If number of headers is greater than 100, give
+	      ;;  informative messages.
+	      (and (numberp nntp-large-newsgroup)
+		   (> number nntp-large-newsgroup)
+		   (zerop (% received 20))
+		   (nnheader-message 6 "NNTP: Receiving headers... %d%%"
+				     (/ (* received 100) number)))
+	      (nntp-accept-response))))
 	(and (numberp nntp-large-newsgroup)
 	     (> number nntp-large-newsgroup)
 	     (nnheader-message 6 "NNTP: Receiving headers...done"))
@@ -482,7 +482,7 @@ noticing asynchronous data.")
   (nntp-possibly-change-group nil server)
   (when (nntp-find-connection-buffer nntp-server-buffer)
     (save-excursion
-      ;; Erase nntp-sever-buffer before nntp-inhibit-erase.
+      ;; Erase nntp-server-buffer before nntp-inhibit-erase.
       (set-buffer nntp-server-buffer)
       (erase-buffer)
       (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
@@ -787,13 +787,13 @@ If SEND-IF-FORCE, only send authinfo to the server if the
       (unless (member user '(nil ""))
 	(nntp-send-command "^3.*\r?\n" "AUTHINFO USER" user)
 	(when t				;???Should check if AUTHINFO succeeded
-      (nntp-send-command
-       "^2.*\r?\n" "AUTHINFO PASS"
-       (or passwd
-	   nntp-authinfo-password
-	   (setq nntp-authinfo-password
+	  (nntp-send-command
+	   "^2.*\r?\n" "AUTHINFO PASS"
+	   (or passwd
+	       nntp-authinfo-password
+	       (setq nntp-authinfo-password
 		     (mail-source-read-passwd (format "NNTP (%s@%s) password: "
-						 user nntp-address))))))))))
+						      user nntp-address))))))))))
 
 (defun nntp-send-nosy-authinfo ()
   "Send the AUTHINFO to the nntp server."
@@ -803,7 +803,7 @@ If SEND-IF-FORCE, only send authinfo to the server if the
       (when t				;???Should check if AUTHINFO succeeded
 	(nntp-send-command "^2.*\r?\n" "AUTHINFO PASS"
 			   (mail-source-read-passwd "NNTP (%s@%s) password: "
-					       user nntp-address))))))
+						    user nntp-address))))))
 
 (defun nntp-send-authinfo-from-file ()
   "Send the AUTHINFO to the nntp server.
@@ -1111,7 +1111,7 @@ password contained in '~/.nntp-authinfo'."
      (car (last articles)) 'wait)
 
     (goto-char (point-min))
-    (when (looking-at "[1-5][0-9][0-9] ")
+    (when (looking-at "[1-5][0-9][0-9] .*\n")
       (delete-region (point) (progn (forward-line 1) (point))))
     (while (search-forward "\r" nil t)
       (replace-match "" t t))
@@ -1158,16 +1158,16 @@ password contained in '~/.nntp-authinfo'."
 		    (zerop (% count nntp-maximum-request)))
 
 	    (nntp-accept-response)
-	    ;; On some Emacs versions the preceding function has
-	    ;; a tendency to change the buffer.  Perhaps.  It's
-	    ;; quite difficult to reproduce, because it only
-	    ;; seems to happen once in a blue moon.
+	    ;; On some Emacs versions the preceding function has a
+	    ;; tendency to change the buffer.  Perhaps.  It's quite
+	    ;; difficult to reproduce, because it only seems to happen
+	    ;; once in a blue moon.
 	    (set-buffer process-buffer)
 	    (while (progn
 		     (goto-char (or last-point (point-min)))
 		     ;; Count replies.
-		     (while (re-search-forward "^[0-9][0-9][0-9] " nil t)
-		       (setq received (1+ received)))
+		     (while (re-search-forward "^[0-9][0-9][0-9] .*\n" nil t)
+		       (incf received))
 		     (setq last-point (point))
 		     (< received count))
 	      (nntp-accept-response)
@@ -1179,7 +1179,10 @@ password contained in '~/.nntp-authinfo'."
 	  (set-buffer process-buffer)
 	  ;; Wait for the reply from the final command.
 	  (goto-char (point-max))
-	  (re-search-backward "^[0-9][0-9][0-9] " nil t)
+	  (while (not (re-search-backward "^[0-9][0-9][0-9] " nil t))
+	    (nntp-accept-response)
+	    (set-buffer process-buffer)
+	    (goto-char (point-max)))
 	  (when (looking-at "^[23]")
 	    (while (progn
 		     (goto-char (point-max))

@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'mail-prsvr)
+
 (defvar mm-mime-mule-charset-alist
   '((us-ascii ascii)
     (iso-8859-1 latin-iso8859-1)
@@ -64,7 +66,6 @@
 		    chinese-cns11643-5 chinese-cns11643-6
 		    chinese-cns11643-7))
   "Alist of MIME-charset/MULE-charsets.")
-
 
 (eval-and-compile
   (mapcar
@@ -208,6 +209,36 @@ used as the line break code type of the coding system."
   (or (get-charset-property charset 'prefered-coding-system)
       (get-charset-property charset 'preferred-coding-system)))
 
+(defun mm-charset-after (&optional pos)
+  "Return charset of a character in current buffer at position POS.
+If POS is nil, it defauls to the current point.
+If POS is out of range, the value is nil.
+If the charset is `composition', return the actual one."
+  (let ((charset (cond 
+		  ((fboundp 'charset-after)
+		   (charset-after pos))
+		  ((fboundp 'char-charset)
+		   (char-charset (char-after pos)))
+		  ((< (mm-char-int (char-after pos)) 128)
+		   'ascii)
+		  (mail-parse-mule-charset ;; cached mule-charset
+		   mail-parse-mule-charset)
+		  ((boundp 'current-language-environment)
+		   (let ((entry (assoc current-language-environment 
+				       language-info-alist)))
+		     (setq mail-parse-mule-charset
+			   (or (car (last (assq 'charset entry)))
+			       'latin-iso8859-1))))
+		  (t                       ;; figure out the charset
+		   (setq mail-parse-mule-charset
+			 (or (car (last (assq mail-parse-charset
+					      mm-mime-mule-charset-alist)))
+			     'latin-iso8859-1))))))
+    (if (eq charset 'composition)
+	(let ((p (or pos (point))))
+	  (cadr (find-charset-region p (1+ p))))
+      charset)))
+
 (defun mm-mime-charset (charset)
   "Return the MIME charset corresponding to the MULE CHARSET."
   (if (fboundp 'coding-system-get)
@@ -223,18 +254,26 @@ used as the line break code type of the coding system."
     ;; This is for XEmacs.
     (mm-mule-charset-to-mime-charset charset)))
 
+(defun mm-delete-duplicates (list)
+  "Simple  substitute for CL `delete-duplicates', testing with `equal'."
+  (let (result head)
+    (while list
+      (setq head (car list))
+      (setq list (delete head list))
+      (setq result (cons head result)))
+    (nreverse result)))
+
 (defun mm-find-mime-charset-region (b e)
   "Return the MIME charsets needed to encode the region between B and E."
-  (let ((charsets
-	 (mapcar 'mm-mime-charset
-		 (delq 'ascii
-		       (mm-find-charset-region b e)))))
+  (let ((charsets (mapcar 'mm-mime-charset
+			  (delq 'ascii
+				(mm-find-charset-region b e)))))
     (when (memq 'iso-2022-jp-2 charsets)
       (setq charsets (delq 'iso-2022-jp charsets)))
-    (delete-duplicates charsets)
+    (setq charsets (mm-delete-duplicates charsets))
     (if (and (> (length charsets) 1)
-	     (fboundp 'find-coding-systems-for-charsets)
-	     (memq 'utf-8 (find-coding-systems-for-charsets charsets)))
+	     (fboundp 'find-coding-systems-region)
+	     (memq 'utf-8 (find-coding-systems-region b e)))
 	'(utf-8)
       charsets)))
 
@@ -289,12 +328,28 @@ See also `with-temp-file' and `with-output-to-string'."
 (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
 (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
 
+(defmacro mm-with-unibyte (&rest forms)
+  "Set default `enable-multibyte-characters' to `nil', eval the FORMS."
+  (let ((multibyte (make-symbol "multibyte")))
+    `(if (or (string-match "XEmacs\\|Lucid" emacs-version)
+	     (not (boundp 'enable-multibyte-characters)))
+	 (progn ,@forms)
+       (let ((,multibyte (default-value 'enable-multibyte-characters)))
+	 (unwind-protect
+	     (progn
+	       (setq-default enable-multibyte-characters nil)
+	       ,@forms)
+	   (setq-default enable-multibyte-characters ,multibyte))))))
+(put 'mm-with-unibyte 'lisp-indent-function 0)
+(put 'mm-with-unibyte 'edebug-form-spec '(body))
+
 (defun mm-find-charset-region (b e)
   "Return a list of charsets in the region."
   (cond
    ((and (mm-multibyte-p)
  	 (fboundp 'find-charset-region))
-    (find-charset-region b e))
+    ;; Remove composition since the base charsets have been included.
+    (delq 'composition (find-charset-region b e)))
    ((not (boundp 'current-language-environment))
     (save-excursion
       (save-restriction
@@ -303,19 +358,24 @@ See also `with-temp-file' and `with-output-to-string'."
 	(skip-chars-forward "\0-\177")
 	(if (eobp)
 	    '(ascii)
-	  (delq nil (list 'ascii mail-parse-charset))))))
+	  (delq nil (list 'ascii 
+			  (or (car (last (assq mail-parse-charset
+					       mm-mime-mule-charset-alist)))
+			      'latin-iso8859-1)))))))
    (t
     ;; We are in a unibyte buffer, so we futz around a bit.
     (save-excursion
       (save-restriction
 	(narrow-to-region b e)
 	(goto-char (point-min))
-	(let ((entry (assoc (capitalize current-language-environment)
+	(let ((entry (assoc current-language-environment 
 			    language-info-alist)))
 	  (skip-chars-forward "\0-\177")
 	  (if (eobp)
 	      '(ascii)
-	    (list 'ascii (car (last (assq 'charset entry)))))))))))
+	    (delq nil (list 'ascii 
+			    (or (car (last (assq 'charset entry)))
+				'latin-iso8859-1))))))))))
 
 (defun mm-read-charset (prompt)
   "Return a charset."

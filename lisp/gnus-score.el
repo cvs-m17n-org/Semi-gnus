@@ -221,14 +221,14 @@ This variable allows the same syntax as `gnus-home-score-file'."
     (gnus-catchup-mark (subject -10))
     (gnus-killed-mark (from -1) (subject -20))
     (gnus-del-mark (from -2) (subject -15)))
-"*Alist of marks and scores."
-:group 'gnus-score-adapt
-:type '(repeat (cons (symbol :tag "Mark")
-		     (repeat (list (choice :tag "Header"
-					   (const from)
-					   (const subject)
-					   (symbol :tag "other"))
-				   (integer :tag "Score"))))))
+  "*Alist of marks and scores."
+  :group 'gnus-score-adapt
+  :type '(repeat (cons (symbol :tag "Mark")
+		       (repeat (list (choice :tag "Header"
+					     (const from)
+					     (const subject)
+					     (symbol :tag "other"))
+				     (integer :tag "Score"))))))
 
 (defcustom gnus-ignored-adaptive-words nil
   "List of words to be ignored when doing adaptive word scoring."
@@ -259,10 +259,10 @@ This variable allows the same syntax as `gnus-home-score-file'."
     (,gnus-catchup-mark . -10)
     (,gnus-killed-mark . -20)
     (,gnus-del-mark . -15))
-"*Alist of marks and scores."
-:group 'gnus-score-adapt
-:type '(repeat (cons (character :tag "Mark")
-		     (integer :tag "Score"))))
+  "*Alist of marks and scores."
+  :group 'gnus-score-adapt
+  :type '(repeat (cons (character :tag "Mark")
+		       (integer :tag "Score"))))
 
 (defcustom gnus-adaptive-word-minimum nil
   "If a number, this is the minimum score value that can be assigned to a word."
@@ -480,7 +480,7 @@ The user will be prompted for header to score on, match type,
 permanence, and the string to be used.  The numerical prefix will be
 used as score."
   (interactive (gnus-interactive "P\ny"))
-  (gnus-summary-increase-score (- (gnus-score-default score)) symp))
+  (gnus-summary-increase-score (- (gnus-score-delta-default score)) symp))
 
 (defun gnus-score-kill-help-buffer ()
   (when (get-buffer "*Score Help*")
@@ -494,7 +494,7 @@ The user will be prompted for header to score on, match type,
 permanence, and the string to be used.  The numerical prefix will be
 used as score."
   (interactive (gnus-interactive "P\ny"))
-  (let* ((nscore (gnus-score-default score))
+  (let* ((nscore (gnus-score-delta-default score))
 	 (prefix (if (< nscore 0) ?L ?I))
 	 (increase (> nscore 0))
 	 (char-to-header
@@ -617,7 +617,7 @@ used as score."
 	    ;; Deal with der(r)ided superannuated paradigms.
 	    (when (and (eq (1+ prefix) 77)
 		       (eq (+ hchar 12) 109)
-		       (eq tchar 114)
+		       (eq (1- tchar) 113)
 		       (eq (- pchar 4) 111))
 	      (error "You rang?"))
 	    (if mimic
@@ -730,7 +730,7 @@ used as score."
     (pop-to-buffer "*Score Help*")
     (let ((window-min-height 1))
       (shrink-window-if-larger-than-buffer))
-    (select-window (get-buffer-window gnus-summary-buffer))))
+    (select-window (get-buffer-window gnus-summary-buffer t))))
 
 (defun gnus-summary-header (header &optional no-err extra)
   ;; Return HEADER for current articles, or error.
@@ -785,7 +785,7 @@ If optional argument `EXTRA' is non-nil, it's a non-standard overview header."
 	 (setq match (if match (gnus-simplify-subject-re match) "")))
 	((eq type 'f)
 	 (setq match (gnus-simplify-subject-fuzzy match))))
-  (let ((score (gnus-score-default score))
+  (let ((score (gnus-score-delta-default score))
 	(header (format "%s" (downcase header)))
 	new)
     (when prompt
@@ -968,7 +968,7 @@ EXTRA is the possible non-standard header."
 (defun gnus-score-followup-article (&optional score)
   "Add SCORE to all followups to the article in the current buffer."
   (interactive "P")
-  (setq score (gnus-score-default score))
+  (setq score (gnus-score-delta-default score))
   (when (gnus-buffer-live-p gnus-summary-buffer)
     (save-excursion
       (save-restriction
@@ -983,7 +983,7 @@ EXTRA is the possible non-standard header."
 (defun gnus-score-followup-thread (&optional score)
   "Add SCORE to all later articles in the thread the current buffer is part of."
   (interactive "P")
-  (setq score (gnus-score-default score))
+  (setq score (gnus-score-delta-default score))
   (when (gnus-buffer-live-p gnus-summary-buffer)
     (save-excursion
       (save-restriction
@@ -1028,7 +1028,7 @@ EXTRA is the possible non-standard header."
     (let ((buffer-read-only nil))
       ;; Set score.
       (gnus-summary-update-mark
-       (if (= n (or gnus-summary-default-score 0)) ? ;Whitespace
+       (if (= n (or gnus-summary-default-score 0)) ?  ;Whitespace
 	 (if (< n (or gnus-summary-default-score 0))
 	     gnus-score-below-mark gnus-score-over-mark))
        'score))
@@ -1483,79 +1483,50 @@ EXTRA is the possible non-standard header."
 
 	  (gnus-message 5 "Scoring...done"))))))
 
+(defun gnus-score-lower-thread (thread score-adjust)
+  "Lower the socre on THREAD with SCORE-ADJUST.
+THREAD is expected to contain a list of the form `(PARENT [CHILD1
+CHILD2 ...])' where PARENT is a header array and each CHILD is a list
+of the same form as THREAD.  The empty list `nil' is valid.  For each
+article in the tree, the score of the corresponding entry in
+GNUS-NEWSGROUP-SCORED is adjusted by SCORE-ADJUST."
+  (while thread
+    (let ((head (car thread)))
+      (if (listp head)
+	  ;; handle a child and its descendants
+	  (gnus-score-lower-thread head score-adjust)
+	;; handle the parent
+	(let* ((article (mail-header-number head))
+	       (score (assq article gnus-newsgroup-scored)))
+	  (if score (setcdr score (+ (cdr score) score-adjust))
+	    (push (cons article score-adjust) gnus-newsgroup-scored)))))
+    (setq thread (cdr thread))))
 
-(defun gnus-get-new-thread-ids (articles)
-  (let ((index (nth 1 (assoc "message-id" gnus-header-index)))
-        (refind gnus-score-index)
-        id-list art this tref)
-    (while articles
-      (setq art (car articles)
-            this (aref (car art) index)
-            tref (aref (car art) refind)
-            articles (cdr articles))
-      (when (string-equal tref "")	;no references line
-	(push this id-list)))
-    id-list))
-
-;; Orphan functions written by plm@atcmp.nl (Peter Mutsaers).
 (defun gnus-score-orphans (score)
-  (let ((new-thread-ids (gnus-get-new-thread-ids gnus-scores-articles))
-        alike articles art arts this last this-id)
-
-    (setq gnus-scores-articles (sort gnus-scores-articles 'gnus-score-string<)
-	  articles gnus-scores-articles)
-
-    ;;more or less the same as in gnus-score-string
-    (erase-buffer)
-    (while articles
-      (setq art (car articles)
-            this (aref (car art) gnus-score-index)
-            articles (cdr articles))
-      ;;completely skip if this is empty (not a child, so not an orphan)
-      (when (not (string= this ""))
-	(if (equal last this)
-	    ;; O(N*H) cons-cells used here, where H is the number of
-	    ;; headers.
-	    (push art alike)
-	  (when last
-	    ;; Insert the line, with a text property on the
-	    ;; terminating newline referring to the articles with
-	    ;; this line.
-	    (insert last ?\n)
-	    (put-text-property (1- (point)) (point) 'articles alike))
-	  (setq alike (list art)
-		last this))))
-    (when last				; Bwadr, duplicate code.
-      (insert last ?\n)
-      (put-text-property (1- (point)) (point) 'articles alike))
-
-    ;; PLM: now delete those lines that contain an entry from new-thread-ids
-    (while new-thread-ids
-      (setq this-id (car new-thread-ids)
-            new-thread-ids (cdr new-thread-ids))
-      (goto-char (point-min))
-      (while (search-forward this-id nil t)
-        ;; found a match.  remove this line
-	(beginning-of-line)
-	(kill-line 1)))
-
-    ;; now for each line: update its articles with score by moving to
-    ;; every end-of-line in the buffer and read the articles property
-    (goto-char (point-min))
-    (while (eq 0 (progn
-                   (end-of-line)
-                   (setq arts (get-text-property (point) 'articles))
-                   (while arts
-                     (setq art (car arts)
-                           arts (cdr arts))
-                     (setcdr art (+ score (cdr art))))
-                   (forward-line))))))
-
+  "Score orphans.
+A root is an article with no references.  An orphan is an article
+which has references, but is not connected via its references to a
+root article.  This function finds all the orphans, and adjusts their
+score in GNUS-NEWSGROUP-SCORED by SCORE."
+  (let ((threads (gnus-make-threads)))
+    ;; gnus-make-threads produces a list, where each entry is a "thread"
+    ;; as described in the gnus-score-lower-thread docs.  This function
+    ;; will be called again (after limiting has been done) if the display
+    ;; is threaded.  It would be nice to somehow save this info and use
+    ;; it later.
+    (while threads
+      (let* ((thread (car threads))
+	     (id (aref (car thread) gnus-score-index)))
+	;; If the parent of the thread is not a root, lower the score of
+	;; it and its descendants.  Note that some roots seem to satisfy
+	;; (eq id nil) and some (eq id "");  not sure why.
+	(if (and id (not (string= id "")))
+	    (gnus-score-lower-thread thread score)))
+      (setq threads (cdr threads)))))
 
 (defun gnus-score-integer (scores header now expire &optional trace)
   (let ((gnus-score-index (nth 1 (assoc header gnus-header-index)))
 	entries alist)
-
     ;; Find matches.
     (while scores
       (setq alist (car scores)
@@ -1604,7 +1575,6 @@ EXTRA is the possible non-standard header."
 (defun gnus-score-date (scores header now expire &optional trace)
   (let ((gnus-score-index (nth 1 (assoc header gnus-header-index)))
 	entries alist match match-func article)
-
     ;; Find matches.
     (while scores
       (setq alist (car scores)
@@ -1691,8 +1661,8 @@ EXTRA is the possible non-standard header."
 	  (while articles
 	    (setq article (mail-header-number (caar articles)))
 	    (gnus-message 7 "Scoring article %s of %s..." article last)
+	    (widen)
 	    (when (funcall request-func article gnus-newsgroup-name)
-	      (widen)
 	      (goto-char (point-min))
 	      ;; If just parts of the article is to be searched, but the
 	      ;; backend didn't support partial fetching, we just narrow
@@ -1912,7 +1882,7 @@ EXTRA is the possible non-standard header."
       ;; with working on them as a group.  What a hassle.
       ;; Just wait 'til you see what horrors we commit against `match'...
       (if (= gnus-score-index 9)
-	  (setq this (prin1-to-string this)))	; ick.
+	  (setq this (prin1-to-string this))) ; ick.
 
       (if simplify
 	  (setq this (gnus-map-function gnus-simplify-subject-functions this)))
@@ -1965,7 +1935,7 @@ EXTRA is the possible non-standard header."
 	  (when extra
 	    (setq match (concat "[ (](" extra " \\. \"[^)]*"
 				match "[^(]*\")[ )]")
-		  search-func 're-search-forward))	; XXX danger?!?
+		  search-func 're-search-forward)) ; XXX danger?!?
 
 	  (cond
 	   ;; Fuzzy matches.  We save these for later.
@@ -2093,6 +2063,7 @@ EXTRA is the possible non-standard header."
 	      (cond
 	       ;; Permanent.
 	       ((null date)
+		;; Do nothing.
 		)
 	       ;; Match, update date.
 	       ((and found gnus-update-score-entry-dates)
@@ -2131,6 +2102,7 @@ EXTRA is the possible non-standard header."
 		(cond
 		 ;; Permanent.
 		 ((null date)
+		  ;; Do nothing.
 		  )
 		 ;; Match, update date.
 		 ((and found gnus-update-score-entry-dates)
@@ -2437,14 +2409,14 @@ EXTRA is the possible non-standard header."
       (gnus-summary-raise-score score))
     (gnus-summary-next-subject 1 t)))
 
-(defun gnus-score-default (level)
+(defun gnus-score-delta-default (level)
   (if level (prefix-numeric-value level)
     gnus-score-interactive-default-score))
 
 (defun gnus-summary-raise-thread (&optional score)
   "Raise the score of the articles in the current thread with SCORE."
   (interactive "P")
-  (setq score (gnus-score-default score))
+  (setq score (gnus-score-delta-default score))
   (let (e)
     (save-excursion
       (let ((articles (gnus-summary-articles-in-thread)))
@@ -2473,7 +2445,7 @@ EXTRA is the possible non-standard header."
 (defun gnus-summary-lower-thread (&optional score)
   "Lower score of articles in the current thread with SCORE."
   (interactive "P")
-  (gnus-summary-raise-thread (- (1- (gnus-score-default score)))))
+  (gnus-summary-raise-thread (- (1- (gnus-score-delta-default score)))))
 
 ;;; Finding score files.
 
@@ -2966,8 +2938,7 @@ See `(Gnus)Scoring Tips' for examples of good regular expressions."
        (cond
 	(bad (cons 'bad bad))
 	(new (cons 'new new))
-	;; or nil
-	)))))
+	(t nil))))))
 
 (provide 'gnus-score)
 

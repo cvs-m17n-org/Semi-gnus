@@ -387,17 +387,17 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   "P" gnus-uu-decode-postscript-and-save)
 
 (gnus-define-keys
- (gnus-uu-extract-view-map "v" gnus-uu-extract-map)
- "u" gnus-uu-decode-uu-view
- "U" gnus-uu-decode-uu-and-save-view
- "s" gnus-uu-decode-unshar-view
- "S" gnus-uu-decode-unshar-and-save-view
- "o" gnus-uu-decode-save-view
- "O" gnus-uu-decode-save-view
- "b" gnus-uu-decode-binhex-view
- "B" gnus-uu-decode-binhex-view
- "p" gnus-uu-decode-postscript-view
- "P" gnus-uu-decode-postscript-and-save-view)
+    (gnus-uu-extract-view-map "v" gnus-uu-extract-map)
+  "u" gnus-uu-decode-uu-view
+  "U" gnus-uu-decode-uu-and-save-view
+  "s" gnus-uu-decode-unshar-view
+  "S" gnus-uu-decode-unshar-and-save-view
+  "o" gnus-uu-decode-save-view
+  "O" gnus-uu-decode-save-view
+  "b" gnus-uu-decode-binhex-view
+  "B" gnus-uu-decode-binhex-view
+  "p" gnus-uu-decode-postscript-view
+  "P" gnus-uu-decode-postscript-and-save-view)
 
 
 ;; Commands.
@@ -568,8 +568,10 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 ;; Process marking.
 
 (defun gnus-uu-mark-by-regexp (regexp &optional unmark)
-  "Ask for a regular expression and set the process mark on all articles that match."
-  (interactive (list (read-from-minibuffer "Mark (regexp): ")))
+  "Set the process mark on articles whose subjects match REGEXP.
+When called interactively, prompt for REGEXP.
+Optional UNMARK non-nil means unmark instead of mark."
+  (interactive "sMark (regexp): \nP")
   (let ((articles (gnus-uu-find-articles-matching regexp)))
     (while articles
       (if unmark
@@ -578,9 +580,10 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
     (message ""))
   (gnus-summary-position-point))
 
-(defun gnus-uu-unmark-by-regexp (regexp &optional unmark)
-  "Ask for a regular expression and remove the process mark on all articles that match."
-  (interactive (list (read-from-minibuffer "Mark (regexp): ")))
+(defun gnus-uu-unmark-by-regexp (regexp)
+  "Remove the process mark from articles whose subjects match REGEXP.
+When called interactively, prompt for REGEXP."
+  (interactive "sUnmark (regexp): ")
   (gnus-uu-mark-by-regexp regexp t))
 
 (defun gnus-uu-mark-series ()
@@ -657,7 +660,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-over (&optional score)
   "Mark all articles with a score over SCORE (the prefix)."
   (interactive "P")
-  (let ((score (gnus-score-default score))
+  (let ((score (or score gnus-summary-default-score 0))
 	(data gnus-newsgroup-data))
     (save-excursion
       (while data

@@ -159,7 +159,7 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
                               thenMin
                               thenHour
                               ;; If THEN is earlier than NOW, make it
-                              ;; same time tomorrow. Doc for encode-time
+                              ;; same time tomorrow.  Doc for encode-time
                               ;; says that this is OK.
                               (+ (elt nowParts 3)
                                  (if (or (< thenHour (elt nowParts 2))
@@ -258,7 +258,7 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
   "Add daemonic nntp server disconnection to Gnus.
 If no commands have gone out via nntp during the last five
 minutes, the connection is closed."
-  (gnus-demon-add-handler 'gnus-demon-close-connections 5 nil))
+  (gnus-demon-add-handler 'gnus-demon-nntp-close-connections 5 nil))
 
 (defun gnus-demon-nntp-close-connection ()
   (save-window-excursion

@@ -48,7 +48,10 @@
   "*Hook run narrowed to an article before saving.")
 
 (defvoo nnmh-be-safe nil
-  "*If non-nil, nnmh will check all articles to make sure whether they are new or not.")
+  "*If non-nil, nnmh will check all articles to make sure whether they are new or not.
+Go through the .nnmh-articles file and compare with the actual
+articles in this folder.  The articles that are \"new\" will be marked
+as unread by Gnus.")
 
 
 
@@ -60,6 +63,9 @@
 
 (defvoo nnmh-status-string "")
 (defvoo nnmh-group-alist nil)
+;; Don't even think about setting this variable.  It does not exist.
+;; Forget about it.  Uh-huh.  Nope.  Nobody here.  It's only bound
+;; dynamically by certain functions in nndraft.
 (defvar nnmh-allow-delete-final nil)
 
 
@@ -105,7 +111,7 @@
 	  (and large
 	       (zerop (% count 20))
 	       (nnheader-message 5 "nnmh: Receiving headers... %d%%"
-			(/ (* count 100) number))))
+				 (/ (* count 100) number))))
 
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
@@ -171,19 +177,19 @@
 	       (mapcar (lambda (name) (string-to-int name))
 		       (directory-files pathname nil "^[0-9]+$" t))
 	       '<))
-	  (cond
-	   (dir
-	    (setq nnmh-group-alist
-		  (delq (assoc group nnmh-group-alist) nnmh-group-alist))
-	    (push (list group (cons (car dir) (car (last dir))))
-		  nnmh-group-alist)
-	    (nnheader-report 'nnmh "Selected group %s" group)
-	    (nnheader-insert
-	     "211 %d %d %d %s\n" (length dir) (car dir)
-	     (car (last dir)) group))
-	   (t
-	    (nnheader-report 'nnmh "Empty group %s" group)
-	    (nnheader-insert (format "211 0 1 0 %s\n" group))))))))))
+	(cond
+	 (dir
+	  (setq nnmh-group-alist
+		(delq (assoc group nnmh-group-alist) nnmh-group-alist))
+	  (push (list group (cons (car dir) (car (last dir))))
+		nnmh-group-alist)
+	  (nnheader-report 'nnmh "Selected group %s" group)
+	  (nnheader-insert
+	   "211 %d %d %d %s\n" (length dir) (car dir)
+	   (car (last dir)) group))
+	 (t
+	  (nnheader-report 'nnmh "Empty group %s" group)
+	  (nnheader-insert (format "211 0 1 0 %s\n" group))))))))))
 
 (deffoo nnmh-request-scan (&optional group server)
   (nnmail-get-new-mail 'nnmh nil nnmh-directory group))
@@ -274,7 +280,7 @@
   t)
 
 (deffoo nnmh-request-move-article
-  (article group server accept-form &optional last)
+    (article group server accept-form &optional last)
   (let ((buf (get-buffer-create " *nnmh move*"))
 	result)
     (and
