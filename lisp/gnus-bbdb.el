@@ -63,7 +63,7 @@ the user confirms the creation."
 			    (progn (goto-char (point-min))
 				   (or (search-forward "\n\n" nil t)
 				       (error "message unexists"))
-				   (- (point) 2)))
+				   (- (point) 1)))
 	  (when (setq from (mail-fetch-field "from"))
 	    (setq from (gnus-bbdb/extract-address-components
 			(gnus-bbdb/decode-field-body from 'From))))
@@ -103,6 +103,31 @@ of the BBDB record corresponding to the sender of this message."
 	(bbdb-record-edit-property record nil t)
       (bbdb-record-edit-notes record t))))
 
+(defun gnus-bbdb/ignore-sender (func &optional arglist)
+  (let* (from
+	 (bbdb-user-mail-names
+	  (save-excursion
+	    (set-buffer gnus-original-article-buffer)
+	    (save-restriction
+	      (widen)
+	      (narrow-to-region (point-min)
+				(progn (goto-char (point-min))
+				       (or (search-forward "\n\n" nil t)
+					   (error "message unexists"))
+				       (- (point) 1)))
+	      (when (setq from (mail-fetch-field "from"))
+		(regexp-quote
+		 (car (cdr (gnus-bbdb/extract-address-components
+			    (gnus-bbdb/decode-field-body from 'From))))))))))
+    (apply func arglist)))
+
+;;;###autoload
+(defun gnus-bbdb/edit-notes-to (&optional arg)
+  "Edit the notes field or (with a prefix arg) a user-defined field
+of the BBDB record corresponding to the primary recipient of this message."
+  (interactive "P")
+  (gnus-bbdb/ignore-sender 'gnus-bbdb/edit-notes (list arg)))
+
 ;;;###autoload
 (defun gnus-bbdb/show-sender ()
   "Display the contents of the BBDB for the sender of this message.
@@ -113,6 +138,12 @@ This buffer will be in bbdb-mode, with associated keybindings."
 	(bbdb-display-records (list record))
 	(error "unperson"))))
 
+;;;###autoload
+(defun gnus-bbdb/show-to ()
+  "Display the contents of the BBDB for the primary recipient of this message.
+This buffer will be in bbdb-mode, with associated keybindings."
+  (interactive)
+  (gnus-bbdb/ignore-sender 'gnus-bbdb/show-sender))
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
   "Make the *BBDB* buffer be displayed along with the GNUS windows,
@@ -616,6 +647,8 @@ beginning of the message headers."
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)
+  (define-key gnus-summary-mode-map "[" 'gnus-bbdb/show-to)
+  (define-key gnus-summary-mode-map "]" 'gnus-bbdb/edit-notes-to)
 
   ;; Set up user field for use in gnus-summary-line-format
   (let ((get-author-user-fun (intern
