@@ -1,3 +1,56 @@
+1999-12-26  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.2 (This is very alpha status.)
+	See announcement of 7.1.0.0.
+
+	You can use both MIME-View mode and Gnus native viewer from this
+	version.   If you would like to use MIME-View mode, set
+	`gnus-mime-display-part-with-mime-view' to
+	`gnus-mime-display-part-function' by default.  Otherwise, set
+	`gnus-mime-display-part-with-Gnus'.
+
+	* lisp/mmgnus.el (TopLevel): Require `mime' and `eword-deocode'
+	instead of `mmbuffer'.
+	(mmgnus-entity): Rename from `mime-gnus-handle-entity' and use
+	`mime-entity' as parent class.  Add slot `body' and `header'.
+	(mmgnus-visible-field-p): New function. (copy from
+	`mime-visible-field-p' in FLIM's mmbuffer.el)
+	(mmgnus-insert-header-from-string): New function.
+	(mime-insert-header): Define new method.
+	(mime-entity-content): Likewise.
+	(mime-gnus-entity): Use `mmgnus-entity' as parent class.
+
+	* lisp/mm-view.el (mm-inline-message): Set parent to the child.
+
+	* lisp/mm-decode.el: Rename `mime-gnus-handle-*' to `mmgnus-*'.
+	(mm-handle-body): Rename from `mm-handle-buffer'.
+	(mm-handle-set-body): Rename from `mm-handle-set-buffer'.
+	(mm-make-handle): New argument `parent' and `header'.  If encoding
+	is `nil', do not convert to string.
+	(mm-dissect-buffer-header): Rename argument `parent' to
+	`handle'.  Set raw header string to header slot of `mmgnus-entity'.
+	(mm-dissect-buffer): Rename argument `parent' to `handle'.  When
+	use `MIME-View' mode as viewer, parse `message/*' part.
+	(mm-dissect-singlepart): Use `mm-handle-set-body' and
+	`mm-handle-body'.
+	(mm-dissect-message): New function.
+	(mm-dissect-multipart): Rename argument `parent' to `handle'.
+	(mm-dissect-multipart): Set node ID for each parts.
+	(mm-destroy-part): Use `mm-handle-body' and `mm-handle-set-body'.
+	(mm-insert-part): Likewise.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.2.
+
+	* lisp/gnus-art.el (gnus-insert-mime-button): Rename
+	`mm-handle-buffer' to `mm-handle-body'.
+	(gnus-article-decode-hook): Do not decode message header.
+	(gnus-mime-display-part-function): New variable
+	`gnus-mime-display-part-function'.
+	(gnus-display-mime): Use `gnus-mime-display-part-function'.
+	(gnus-mime-display-part-with-mime-view): New function for
+	`gnus-mime-display-part-function'.
+	(gnus-mime-display-part-with-Gnus): Likewise.
+
 1999-12-25  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/mm-decode.el (mm-dissect-buffer-header): Correspondence
@@ -11,6 +64,9 @@
 	body by handle.
 
 1999-12-24  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.1 (This is very alpha status.)
+	See announcement of 7.1.0.0.
 
 	* lisp/nnheader.el (make-full-mail-header): If field decoder does
 	not found, then do not decode field body.
@@ -39,9 +95,6 @@
 	`mail-decode-encoded-word-region'.
 	(article-decode-encoded-words): Bind `default-mime-charset'
 	instead of `mail-parse-charset'.
-
-	* Nana-gnus: Version 7.1.0.1 (This is very alpha status.)
-	See announcement of 7.1.0.0.
 
 	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.1.
 
