@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(eval-and-compile
+(eval-when-compile
   (require 'cl))
 (require 'mail-parse)
 
