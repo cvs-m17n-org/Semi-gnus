@@ -1,3 +1,7 @@
+1998-11-11  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* README.semi.ja, README.branch.ja: New file.
+
 1998-11-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: bug fix.
