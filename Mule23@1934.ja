@@ -138,7 +138,7 @@ USING Emacs-W3M (and Emacs W3)
 ンド W3M へのインターフェースを行なうプログラムで、詳細情報については
 以下のページを訪ねてみて下さい。
 
-   http://namazu.org/~tsuchiya/emacs-w3m/
+   http://emacs-w3m.namazu.org/
    http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 Emacs-W3M と nnshimbun が使えるように T-gnus を作るには、Emacs-W3M が

@@ -23,7 +23,7 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
   加えて、`nnshimbun' を使いたい場合には、Emacs-W3M パッケージと外部
 コマンドの W3M が必要です。詳しいことは以下のページをご覧下さい。
 
-http://namazu.org/~tsuchiya/emacs-w3m/
+http://emacs-w3m.namazu.org/
 http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 

@@ -636,7 +636,7 @@ Article Treatment
 * Article Buttons::      URL $B$d(B Message-ID $B$d(B $B%"%I%l%9$J$I$r%/%j%C%/$9$k(B
 * Article Date::         $B$0$:$0$:8@$&$J!"@$3&;~$@(B!
 * Article Signature::    $B=pL>$C$F2?(B?
-* Article Miscellanina:: $BB>$N$$$m$$$m$J$b$N(B
+* Article Miscellania:: $BB>$N$$$m$$$m$J$b$N(B
 
 Alternative Approaches
 
@@ -6878,7 +6878,7 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 * Article Buttons::      URL $B$d(B Message-ID $B$d(B $B%"%I%l%9$J$I$r%/%j%C%/$9$k(B
 * Article Date::         $B$0$:$0$:8@$&$J!"@$3&;~$@(B!
 * Article Signature::    $B=pL>$C$F2?(B?
-* Article Miscellanina:: $BB>$N$$$m$$$m$J$b$N(B
+* Article Miscellania:: $BB>$N$$$m$$$m$J$b$N(B
 @end menu
 
 @node Article Highlighting
@@ -12653,7 +12653,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
 $B$F$*$$$F$/$@$5$$!#>\$7$$$3$H$O0J2<$N%Z!<%8$GCN$k$3$H$,$G$-$^$9!#(B
 
 @example
-  @uref{http://namazu.org/~tsuchiya/emacs-w3m/}
+  @uref{http://emacs-w3m.namazu.org/}
   @uref{http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/}
 @end example
 

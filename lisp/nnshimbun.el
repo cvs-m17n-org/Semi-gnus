@@ -31,7 +31,7 @@
 ;; This module requires the Emacs-W3M and the external command W3M.
 ;; Visit the following pages for more information.
 ;;
-;;	http://namazu.org/~tsuchiya/emacs-w3m/
+;;	http://emacs-w3m.namazu.org/
 ;;	http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 ;; If you would like to use this module in Gnus (not T-gnus), put this
