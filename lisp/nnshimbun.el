@@ -573,14 +573,15 @@
 			(re-search-forward
 			 "^\\[\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\)\\]"
 			 nil t))
-	      (let ((date (decode-time (current-time))))
+	      (let ((month (string-to-number (match-string 1)))
+		    (date (decode-time (current-time))))
 		(mail-header-set-date
 		 (nth i headers)
 		 (nnshimbun-make-date-string
 		  (if (and (eq 12 month) (eq 1 (nth 4 date)))
 		      (1- (nth 5 date))
 		    (nth 5 date))
-		  (string-to-number (match-string 1))
+		  month
 		  (string-to-number (match-string 2))
 		  (match-string 3))))
 	      (setq i (1+ i))))
