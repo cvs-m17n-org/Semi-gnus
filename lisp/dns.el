@@ -281,8 +281,8 @@ If TCP-P, the first two bytes of the package with be the length field."
       (setq dns-servers (nreverse dns-servers)))))
 
 ;;; Interface functions.
-(when (featurep 'xemacs)
-  (eval-when-compile (require 'gnus-xmas)))
+
+(autoload 'gnus-xmacs-open-network-stream "gnus-xmas" nil nil 'macro)
 
 (defmacro dns-make-network-process (server)
   (if (featurep 'xemacs)
