@@ -1,7 +1,6 @@
 1998-10-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/gnus.el: Add autoload setting for `gnus-offline' and
-	`pop3-fma'.
+	* lisp/gnus.el: Add autoload setting for `pop3-fma'.
 
 1998-10-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
