@@ -733,47 +733,89 @@ If SILENT, don't prompt the user."
      (t gnus-select-method))))
 
 
+(defun gnus-message-make-user-agent (&optional include-mime-info max-column
+						 newline-product)
+  "Return a user-agent info.  If INCLUDE-MIME-INFO is non-nil and the
+variable `mime-edit-user-agent-value' is bound, the value will be
+included in the return value.  If MAX-COLUMN is specified, the return
+value will be folded up as it were filled.  NEWLINE-PRODUCT specifies
+whether a newline should be inserted in front of each product-token.
+If the value is t or `hard', it works strictly.  Otherwise, if it is
+non-nil (e.g. `soft'), it works semi-strictly.
 
-(defun gnus-message-make-user-agent (&optional include-mime-info max-column)
-  "Return user-agent info.
-INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable
-  `mime-edit-user-agent-value' exists, the return value will include it.
-MAX-COLUMN the optional second argument if it is specified, the return value
-  will be folded up in the proper way."
+Here is an example of how to use this function:
+
+\(add-hook 'gnus-message-setup-hook
+	  (lambda nil
+	    (setq message-user-agent nil)
+	    (save-excursion
+	      (save-restriction
+		(message-narrow-to-headers)
+		(goto-char (point-max))
+		(insert \"User-Agent: \"
+			(gnus-message-make-user-agent t 76 'soft)
+			\"\\n\")))))
+"
   (let ((user-agent (if (and include-mime-info
 			     (boundp 'mime-edit-user-agent-value))
 			(concat (gnus-extended-version)
 				" "
 				mime-edit-user-agent-value)
 		      (gnus-extended-version))))
-    (if max-column
-	(let (boundary)
-	  (unless (natnump max-column) (setq max-column 76))
-	  (with-temp-buffer
-	    (insert "            " user-agent)
-	    (goto-char 13)
-	    (while (re-search-forward "[\n\t ]+" nil t)
-	      (replace-match " "))
-	    (goto-char 13)
-	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
-	      (while (eq ?\( (char-after (point)))
-		(forward-list)
-		(skip-chars-forward " "))
-	      (skip-chars-backward " ")
-	      (if (> (current-column) max-column)
-		  (progn
-		    (if (or (not boundary) (eq ?\n (char-after boundary)))
-			(progn
-			  (setq boundary (point))
-			  (unless (eobp)
-			    (delete-char 1)
-			    (insert "\n ")))
-		      (goto-char boundary)
-		      (delete-char 1)
-		      (insert "\n ")))
-		(setq boundary (point))))
-	    (buffer-substring 13 (point-max))))
-      user-agent)))
+    (when max-column
+      (unless (natnump max-column)
+	(setq max-column 76))
+      (with-temp-buffer
+	(set-buffer-multibyte t)
+	(insert (mapconcat 'identity (split-string user-agent) " "))
+	(goto-char (point-min))
+	(let ((bol t)
+	      start agent agents width element swidth)
+	  (while (re-search-forward "\\([^ ]+\\) ?" nil t)
+	    (setq start (match-beginning 0))
+	    (if (eq (char-after start) ?\()
+		(progn
+		  (goto-char start)
+		  (forward-list)
+		  (push (buffer-substring start (point)) agent))
+	      (when agent
+		(push (nreverse agent) agents))
+	      (setq agent (list (match-string 1)))))
+	  (when agent
+	    (push (nreverse agent) agents))
+	  (setq agents (nreverse agents))
+	  (if (> (+ 12 (string-width (caar agents))) max-column)
+	      (setq user-agent "\n"
+		    width 0)
+	    (setq user-agent ""
+		  width 11))
+	  (while agents
+	    (setq agent (car agents)
+		  agents (cdr agents))
+	    (when (and (not bol)
+		       (or (memq newline-product '(t hard))
+			   (and newline-product
+				(> (+ width 1
+				      (string-width (mapconcat 'identity
+							       agent " ")))
+				   max-column))))
+	      (setq user-agent (concat user-agent "\n")
+		    width 0
+		    bol t))
+	    (while agent
+	      (setq element (car agent)
+		    swidth (string-width element)
+		    agent (cdr agent))
+	      (if bol
+		  (setq user-agent (concat user-agent " " element)
+			width (+ width 1 swidth)
+			bol nil)
+		(if (> (+ width 1 swidth) max-column)
+		    (setq user-agent (concat user-agent "\n " element)
+			  width (1+ swidth))
+		  (setq user-agent (concat user-agent " " element)
+			width (+ width 1 swidth)))))))))
+    user-agent))
 
 
 ;;;
