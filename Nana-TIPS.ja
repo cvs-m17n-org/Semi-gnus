@@ -212,4 +212,14 @@ message-mime-charset-recover-ask-charset ()
 ユーザーに使用する charset を指定することを促します。その際の default
 値は自動判定した結果になります。
 
+---
+nnheader-file-coding-system
+nnspool-file-coding-system
+
+メッセージは network 表現(デコードされていない状態)のまま保存されるべ
+きという考えから廃止しました。
+
+[TIPS] gnspool を使用されている方は保存形式を JIS にしてください。
+;; この場合は変換は行われないようです。
+
 ;; Nana-TIPS.ja ends here.
