@@ -44,7 +44,15 @@
 (eval-when-compile
   (require 'cl))
 
-(require 'sha1-el)
+(eval-and-compile
+  (require 'sha1-el)
+  (condition-case nil
+      (sha1 "" nil nil 'binary)
+    (wrong-number-of-arguments
+     (let ((mel (locate-library "mel")))
+       (when mel
+	 (load (expand-file-name "sha1-el" (file-name-directory mel))
+	       nil t))))))
 
 (autoload 'mail-fetch-field "mail-utils")
 (defvar mail-header-separator)
