@@ -2052,8 +2052,13 @@ be added to \"References\" field."
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region (point) (mark t))
-	    (message-narrow-to-head)
-	    (setq refs (concat (or (message-fetch-field "References") "")
+	    (std11-narrow-to-header)
+	    (unless (setq refs (message-fetch-field "References"))
+	      (if (and (setq refs (message-fetch-field "In-Reply-To"))
+		       (string-match "<[^>]+>" refs))
+		  (setq refs (match-string 0 refs))
+		(setq refs nil)))
+	    (setq refs (concat (or refs "")
 			       " "
 			       (or (message-fetch-field "Message-ID") "")))
 	    (unless (string-match "^ +$" refs)
@@ -3920,7 +3925,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	from subject date to cc
 	references message-id follow-to
 	(inhibit-point-motion-hooks t)
-	mct never-mct mft mrt gnus-warning)
+	mct never-mct mft mrt gnus-warning in-reply-to)
     (save-restriction
       (message-narrow-to-head)
       ;; Allow customizations to have their say.
@@ -3951,6 +3956,12 @@ OTHER-HEADERS is an alist of header/value pairs."
 	    gnus-warning (message-fetch-field "gnus-warning"))
       (when (and gnus-warning (string-match "<[^>]+>" gnus-warning))
 	(setq message-id (match-string 0 gnus-warning)))
+      ;; Get the references from "In-Reply-To" field if there were
+      ;; no references and "In-Reply-To" field looks promising.
+      (unless references
+	(when (and (setq in-reply-to (message-fetch-field "in-reply-to"))
+		   (string-match "<[^>]+>" in-reply-to))
+	  (setq references (match-string 0 in-reply-to))))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
       (setq subject (message-make-followup-subject subject))
