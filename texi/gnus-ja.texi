@@ -10012,7 +10012,7 @@ POP サーバーからメールを取得するために使う関数です。その関数は一つのパラ
      :user "user-name" :password "secret")
 @end lisp
 
-Use @samp{movemail} to move the mail:
+メールの移動に @samp{movemail} を使います:
 
 @lisp
 (pop :program "movemail po:%u %t %p")
