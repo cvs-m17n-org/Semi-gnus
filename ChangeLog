@@ -3,6 +3,7 @@
 	* aclocal.m4: install .el files to site-lisp/gnus instead of
 	site-lisp.
 	* configure: Ditto.
+	* Makefile.in: add new rule `all-ja'.
 	
 1999-02-15  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
