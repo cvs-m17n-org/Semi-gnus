@@ -1,6 +1,5 @@
 ;;; hashcash.el --- Add hashcash payments to email
 
-;; $Revision: 1.1.2.4 $
 ;; Copyright (C) 1997,2001 Paul E. Foley
 
 ;; Maintainer: Paul Foley <mycroft@actrix.gen.nz>
@@ -35,8 +34,12 @@ ADDR is the email address of the intended recipient and AMOUNT is
 the value of hashcash payment to be made to that user.  STRING, if
 present, is the string to be hashed; if not present ADDR will be used.")
 
-(defcustom hashcash "hashcash"
+(defcustom hashcash "/usr/local/bin/hashcash"
   "*The path to the hashcash binary.")
+
+(defcustom hashcash-in-news nil
+  "*Specifies whether or not hashcash payments should be made to newsgroups."
+  :type 'boolean)
 
 (require 'mail-utils)
 
@@ -103,13 +106,13 @@ Prefix arg sets default payment temporarily."
 	(narrow-to-region (point-min) (point))
 	(let ((to (hashcash-strip-quoted-names (mail-fetch-field "To" nil t)))
 	      (cc (hashcash-strip-quoted-names (mail-fetch-field "Cc" nil t)))
-	      (ng (hashcash-strip-quoted-names
-		   (mail-fetch-field "Newsgroups" nil t))))
+	      (ng (hashcash-strip-quoted-names (mail-fetch-field "Newsgroups"
+								 nil t))))
 	  (when to
 	    (setq addrlist (split-string to ",[ \t\n]*")))
 	  (when cc
 	    (setq addrlist (nconc addrlist (split-string cc ",[ \t\n]*"))))
-	  (when ng
+	  (when (and hashcash-in-news ng)
 	    (setq addrlist (nconc addrlist (split-string ng ",[ \t\n]*")))))
 	(while addrlist
 	  (hashcash-insert-payment (pop addrlist))))))
