@@ -1,5 +1,7 @@
 1999-08-02  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/nnmail.el (nnmail-get-new-mail): Fix typo.
+
 	* Nana-TIPS.ja: New sections `pop3-fma.el', `nnmail.el' and
 	`pop3.el'.
 
