@@ -5260,6 +5260,11 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 		 (numberp article)
 		 (gnus-cache-request-article article group))
 	    'article)
+	   ;; Check the agent cache.
+	   ((and gnus-agent gnus-agent-cache gnus-plugged
+		 (numberp article)
+		 (gnus-agent-request-article article group))
+	    'article)
 	   ;; Get the article and put into the article buffer.
 	   ((or (stringp article)
 		(numberp article))

@@ -3313,7 +3313,9 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 		 gnus-auto-select-first)
 	    (progn
 	      (gnus-configure-windows 'summary)
-	      (gnus-summary-goto-article (gnus-summary-article-number)))
+	      (let ((art (gnus-summary-article-number)))
+		(unless (memq art gnus-newsgroup-undownloaded)
+		  (gnus-summary-goto-article art))))
 	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
 	  (gnus-configure-windows 'summary 'force)
