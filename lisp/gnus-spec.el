@@ -1,5 +1,5 @@
 ;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -189,7 +189,7 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
     (pop-to-buffer "*Gnus Format*")
     (erase-buffer)
     (lisp-interaction-mode)
-    (insert (pp-to-string spec))))
+    (insert (gnus-pp-to-string spec))))
 
 (put 'gnus-search-or-regist-spec 'lisp-indent-function 1)
 (defmacro gnus-search-or-regist-spec (mspec &rest body)
