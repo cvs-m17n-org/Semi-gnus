@@ -2316,10 +2316,11 @@ If FORCE is non-nil, the .newsrc file is read."
 ;; Call the function above at C-x C-c.
 (defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe activate)
   "Save .newsrc and .newsrc.eld when Emacs is killed."
-  (when (get-buffer gnus-group-buffer)
-    (gnus-run-hooks 'gnus-exit-gnus-hook)
-    (gnus-offer-save-summaries)
-    (gnus-save-newsrc-file)))
+  (if (get-buffer gnus-group-buffer)
+      (progn
+	(gnus-run-hooks 'gnus-exit-gnus-hook)
+	(gnus-offer-save-summaries)
+	(gnus-save-newsrc-file))))
 
 (defun gnus-gnus-to-quick-newsrc-format ()
   "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
