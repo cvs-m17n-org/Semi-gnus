@@ -1,3 +1,8 @@
+2004-07-29  KOSEKI Yoshinori  <kose@meadowy.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/make-directory-table): Fix normalization
+	of dir (remove drive letter).
+
 2004-07-20  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* texi/ptexinfmt.el: Support @s.

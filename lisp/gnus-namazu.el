@@ -371,7 +371,8 @@ This means that the group \"nnimap+server:INBOX.group\" is placed in
 	       (setq dir (nnmail-group-pathname
 			  (substring group (match-end 0))
 			  "/"))
-	       (push (cons (concat (cdr pair) (substring dir 1)) group)
+	       (push (cons (concat (cdr pair) 
+		   (substring dir (+ 1 (string-match "/" dir)))) group)
 		     alist)))))
        gnus-newsrc-hashtb)
       (dolist (pair (nconc agent cache alist))
