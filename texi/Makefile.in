@@ -142,9 +142,9 @@ makeinfo:
 texi2latex.elc: texi2latex.el
 	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
 
-latex: gnus.latexi gnus-faq.latexi message.latexi emacs-mime.latexi sieve.latexi
+latex: gnus.latexi gnus-faq.latexi message.latexi emacs-mime.latexi sieve.latexi gnus-news.latexi
 
-gnus.latexi gnus-faq.latexi message.latexi emacs-mime.latexi sieve.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi $(srcdir)/message.texi $(srcdir)/emacs-mime.texi $(srcdir)/sieve.texi texi2latex.elc
+gnus.latexi gnus-faq.latexi message.latexi emacs-mime.latexi sieve.latexi gnus-news.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi $(srcdir)/message.texi $(srcdir)/emacs-mime.texi $(srcdir)/sieve.texi $(srcdir)/gnus-news.texi texi2latex.elc
 	srcdir=$(srcdir) $(EMACSCOMP) -l ./texi2latex.elc -f latexi-translate
 
 .latexi.dvi-x:
