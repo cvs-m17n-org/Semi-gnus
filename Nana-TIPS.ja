@@ -11,6 +11,12 @@ SEMI は 1.13 以上のもの   (1.13 系列の最新のものを推奨します。
 が必要です。
 ====================================================================
 
+* Cancel sending message from hooks.
+
+`mesage-send-hook' に設定された関数内で、
+(throw 'message-sending-cancel t) 
+とすることによって、メッセージの送信を取りやめることができます。
+
 * Fuzzy matching
 
 gnus-simplify-buffer-fuzzy
