@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.17 1998-12-11 15:43:46 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.18 1998-12-13 01:12:16 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -719,7 +719,7 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-define-menu-and-key ()
   "*Set key and menu."
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-miee)
+      (gnus-offline-define-menu-on-miee)
     (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-agent))
   (add-hook 'gnus-group-mode-hook
 	    '(lambda ()
@@ -751,7 +751,7 @@ If value is nil , dialup line is disconnected status.")
   (easy-menu-change
    nil
    "Miee"
-   '(nil
+   '(
      ["Post news in spool" news-spool-post t]
      ["Send mails in spool" mail-spool-send t]
      "----"

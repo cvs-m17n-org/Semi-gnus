@@ -1,3 +1,9 @@
+1998-12-14  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
+	fix.
+	(gnus-offline-set-offline-sendmail-function): Bug fix.
+	
 1998-12-12  Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix.
