@@ -1370,8 +1370,9 @@ The following commands are available:
 	  (insert-file-contents-as-coding-system
 	   gnus-agent-file-coding-system (gnus-agent-lib-file "active"))
 	  (gnus-active-to-gnus-format
-	   nil (setq orig (gnus-make-hashtable
-			   (count-lines (point-min) (point-max))))))
+	   gnus-command-method
+	   (setq orig (gnus-make-hashtable
+		       (count-lines (point-min) (point-max))))))
 	(let ((expiry-hashtb (gnus-make-hashtable 1023)))
 	(gnus-agent-open-history)
 	(set-buffer

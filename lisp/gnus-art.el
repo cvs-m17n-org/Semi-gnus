@@ -842,13 +842,6 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-strip-blank-lines nil
-  "Strip all blank lines.
-Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
-  :group 'gnus-article-treat
-  :type gnus-article-treat-custom)
-
 (defcustom gnus-treat-overstrike t
   "Treat overstrike highlighting.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -959,7 +952,6 @@ See the manual for details."
      gnus-article-strip-leading-blank-lines)
     (gnus-treat-strip-multiple-blank-lines
      gnus-article-strip-multiple-blank-lines)
-    (gnus-treat-strip-blank-lines gnus-article-strip-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
     (gnus-treat-display-smileys gnus-smiley-display)
@@ -3247,7 +3239,7 @@ value of the variable `gnus-show-mime' is non-nil."
 		      (gnus-treat-article
 		       nil id
 		       (1- (length gnus-article-mime-handles))
-		       (car (mm-handle-type handle))))))
+		       (mm-handle-media-type handle)))))
 	      (select-window window))))
       (goto-char point)
       (delete-region (gnus-point-at-bol) (progn (forward-line 1) (point)))
@@ -3268,7 +3260,7 @@ value of the variable `gnus-show-mime' is non-nil."
 	     (mail-content-type-get (mm-handle-disposition handle)
 				    'filename)
 	     ""))
-	(gnus-tmp-type (car (mm-handle-type handle)))
+	(gnus-tmp-type (mm-handle-media-type handle))
 	(gnus-tmp-description
 	 (mail-decode-encoded-word-string (or (mm-handle-description handle)
 					      "")))
@@ -3403,7 +3395,7 @@ value of the variable `gnus-show-mime' is non-nil."
   (mapcar 'gnus-mime-display-part handles))
 
 (defun gnus-mime-display-single (handle)
-  (let ((type (car (mm-handle-type handle)))
+  (let ((type (mm-handle-media-type handle))
 	(ignored gnus-ignored-mime-types)
 	(not-attachment t)
 	(move nil)
@@ -3422,8 +3414,7 @@ value of the variable `gnus-show-mime' is non-nil."
 		 (or (mm-inlined-p handle)
 		     (mm-automatic-external-display-p type)))
 	    (setq display t)
-	  (when (equal (car (split-string type "/"))
-		       "text")
+	  (when (equal (mm-handle-media-supertype handle) "text")
 	    (setq text t)))
 	(let ((id (1+ (length gnus-article-mime-handle-alist))))
 	  (push (cons id handle) gnus-article-mime-handle-alist)
@@ -3459,7 +3450,7 @@ value of the variable `gnus-show-mime' is non-nil."
 	      (gnus-treat-article
 	       nil (length gnus-article-mime-handle-alist)
 	       (1- (length gnus-article-mime-handles))
-	       (car (mm-handle-type handle))))))))))
+	       (mm-handle-media-type handle)))))))))
 
 (defun gnus-unbuttonized-mime-type-p (type)
   "Say whether TYPE is to be unbuttonized."
@@ -3526,9 +3517,7 @@ value of the variable `gnus-show-mime' is non-nil."
 	     (progn
 	       (insert (format "(%c) %-18s"
 			       (if (equal handle preferred) ?* ? )
-			       (if (stringp (car handle))
-				   (car handle)
-				 (car (mm-handle-type handle)))))
+			       (mm-handle-media-type handle)))
 	       (point))
 	     `(gnus-callback
 	       (lambda (handles)
@@ -3555,7 +3544,15 @@ value of the variable `gnus-show-mime' is non-nil."
 		  (mail-parse-ignored-charsets 
 		   (save-excursion (set-buffer gnus-summary-buffer)
 				   gnus-newsgroup-ignored-charsets)))
-	      (mm-display-part preferred)))
+	      (mm-display-part preferred)
+	      ;; Do highlighting.
+	      (save-excursion
+		(save-restriction
+		  (narrow-to-region (car begend) (point-max))
+		  (gnus-treat-article
+		   nil (length gnus-article-mime-handle-alist)
+		   (1- (length gnus-article-mime-handles))
+		   (mm-handle-media-type handle))))))
 	  (goto-char (point-max))
 	  (setcdr begend (point-marker)))))
     (when ibegend
@@ -4070,8 +4067,6 @@ groups."
     (set-buffer gnus-article-buffer)
     (gnus-article-edit-mode)
     (funcall start-func)
-    ;;(gnus-article-delete-text-of-type 'annotation)
-    ;;(gnus-set-text-properties (point-min) (point-max) nil)
     (gnus-configure-windows 'edit-article)
     (setq gnus-article-edit-done-function exit-func)
     (setq gnus-prev-winconf winconf)
