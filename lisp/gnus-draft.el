@@ -184,7 +184,10 @@
 ;;; Utility functions
 
 (defcustom gnus-draft-decoding-function
-  #'mime-edit-decode-buffer
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (mime-decode-header-in-buffer)))
   "*Function called to decode the message from network representation."
   :group 'gnus-agent
   :type 'function)
