@@ -1,3 +1,15 @@
+1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.5 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.5.
+
+	* lisp/nnheader.el (nnheader-file-coding-system): Abolished.
+	(nnheader-insert-file-contents): Use
+	`insert-file-contents-as-raw-text-CRLF'.
+	(nnheader-find-file-noselect): Use
+	`find-file-noselect-raw-text-CRLF'.
+
 1999-02-24  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.4 released.
