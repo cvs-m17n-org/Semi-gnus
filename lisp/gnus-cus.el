@@ -267,6 +267,13 @@ DOC is a documentation string for the parameter.")
 (defvar gnus-custom-group)
 (defvar gnus-custom-topic)
 
+(defvar gnus-user-group-parameters nil
+  "Alist of group parameters that are defined by user.
+
+Each entry has the form (NAME TYPE DOC), where NAME is the parameter
+itself (a symbol), TYPE is the parameters type (a sexp widget), and
+DOC is a documentation string for the parameter.")
+
 (defun gnus-group-customize (group &optional topic)
   "Edit the group or topic on the current line."
   (interactive (list (gnus-group-group-name) (gnus-group-topic-name)))
@@ -279,7 +286,8 @@ DOC is a documentation string for the parameter.")
 		       (append gnus-group-parameters 
 			       (if group
 				   gnus-extra-group-parameters
-				 gnus-extra-topic-parameters)))))
+				 gnus-extra-topic-parameters)
+			       gnus-user-group-parameters))))
     (unless (or group topic)
       (error "No group on current line"))
     (when (and group topic)
