@@ -1,5 +1,7 @@
 1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el: (gnus-version-number): Update to 6.9.2.
+
 	* lisp/nnheader.el (nnheader-find-file-noselect): Call
 	`find-file-noselect-as-coding-system' with CODING-SYSTEM as the
 	1st arg.
