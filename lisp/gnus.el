@@ -246,7 +246,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.2.1"
+(defconst gnus-version-number "6.2.2"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -1677,7 +1677,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
-      gnus-summary-set-agent-mark)
+      gnus-summary-set-agent-mark gnus-agent-save-group-info)
      ("gnus-agent" :interactive t
       gnus-unplugged gnus-agentize gnus-agent-batch)
      ("gnus-vm" :interactive t gnus-summary-save-in-vm
