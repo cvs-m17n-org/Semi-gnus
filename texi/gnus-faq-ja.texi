@@ -131,13 +131,13 @@ SEMI, FLIM, APEL は、anonymous ftp で以下の場所から取得します。
 
 @table @var
 @item SEMI
-@file{ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.12/}
+@file{ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.12/}
 
 @item FLIM
-@file{ftp://ftp.etl.go.jp/pub/mule/flim/flim-1.12/flim-1.12.7.tar.gz}
+@file{ftp://ftp.m17n.org/pub/mule/flim/flim-1.12/flim-1.12.7.tar.gz}
 
 @item APEL
-@file{ftp://ftp.etl.go.jp/pub/mule/apel/}
+@file{ftp://ftp.m17n.org/pub/mule/apel/}
 
 @end table
 
