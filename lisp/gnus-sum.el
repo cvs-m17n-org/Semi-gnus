@@ -4065,15 +4065,20 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	    (condition-case ()
 		(cond
 		 ((and (or (<= scored marked) (= scored number))
-		       (numberp gnus-large-newsgroup)
+		       (natnump gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let ((input
-			 (read-string
-			  (format
-			   "How many articles from %s (default %d): "
-			   (gnus-limit-string gnus-newsgroup-name 35)
-			   number))))
-		    (if (string-match "^[ \t]*$" input) number input)))
+		  (let* ((minibuffer-setup-hook (append
+						 minibuffer-setup-hook
+						 '(beginning-of-line)))
+			 (input (read-string
+				 (format
+				  "How many articles from %s (max %d): "
+				  (gnus-limit-string gnus-newsgroup-name 35)
+				  number)
+				 (number-to-string gnus-large-newsgroup))))
+		    (if (string-match "^[ \t]*$" input)
+			gnus-large-newsgroup
+		      input)))
 		 ((and (> scored marked) (< scored number)
 		       (> (- scored number) 20))
 		  (let ((input
@@ -9137,6 +9142,97 @@ save those articles instead."
 	   (summary-buffer-exp . gnus-summary-buffer)
 	   (request-partial-message-method . gnus-request-partial-message)
 	   ))
+
+
+;;; @ for message/rfc822
+;;;
+
+(defun gnus-mime-extract-message/rfc822 (entity situation)
+  (with-current-buffer (mime-entity-buffer entity)
+    (save-restriction
+      (narrow-to-region (mime-entity-body-start entity)
+			(mime-entity-body-end entity))
+      (let* ((group (or (cdr (assq 'group situation))
+			(completing-read "Group: "
+					 gnus-active-hashtb
+					 nil
+					 (gnus-read-active-file-p)
+					 gnus-newsgroup-name)))
+	     cur
+	     (article (gnus-request-accept-article group))
+	     (num (or (cdr (assq 'number situation))
+		      0)))
+	(when (and (consp article)
+		   (numberp (setq article (cdr article))))
+	  (incf num)
+	  (with-current-buffer gnus-summary-buffer
+	    (setq cur gnus-current-article)
+	    (forward-line num)
+	    (let (gnus-show-threads)
+	      (gnus-summary-goto-subject article t)
+	      )
+	    (gnus-summary-clear-mark-forward 1)
+	    )
+	  (if (boundp 'mime-acting-situation-to-override)
+	      (progn
+		(set-alist 'mime-acting-situation-to-override
+			   'group
+			   group)
+		(set-alist 'mime-acting-situation-to-override
+			   'after-method
+			   `(progn
+			      (save-current-buffer
+				(set-buffer gnus-group-buffer)
+				(gnus-activate-group ,group)
+				)
+			      (gnus-summary-goto-article ,cur
+							 gnus-show-all-headers)
+			      ))
+		(set-alist 'mime-acting-situation-to-override
+			   'number num)
+		)
+	    (save-current-buffer
+	      (set-buffer gnus-group-buffer)
+	      (gnus-activate-group group)
+	      (set-buffer gnus-summary-buffer)
+	      (gnus-summary-goto-article cur gnus-show-all-headers)
+	      )
+	    ))))))
+
+(mime-add-condition
+ 'action '((type . message)(subtype . rfc822)
+	   (major-mode . gnus-original-article-mode)
+	   (method . gnus-mime-extract-message/rfc822)
+	   (mode . "extract")
+	   ))
+
+(mime-add-condition
+ 'action '((type . message)(subtype . news)
+	   (major-mode . gnus-original-article-mode)
+	   (method . gnus-mime-extract-message/rfc822)
+	   (mode . "extract")
+	   ))
+
+(defun gnus-mime-extract-multipart (entity situation)
+  (let ((children (mime-entity-children entity))
+	mime-acting-situation-to-override
+	f)
+    (while children
+      (mime-play-entity (car children)
+			(cons (assq 'mode situation)
+			      mime-acting-situation-to-override))
+      (setq children (cdr children)))
+    (if (setq f (cdr (assq 'after-method
+			   mime-acting-situation-to-override)))
+	(eval f)
+      )))  
+
+(mime-add-condition
+ 'action '((type . multipart)
+	   (method . gnus-mime-extract-multipart)
+	   (mode . "extract")
+	   )
+ 'with-default)
 
 
 ;;; @ end
