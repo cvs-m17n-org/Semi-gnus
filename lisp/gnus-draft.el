@@ -159,18 +159,24 @@
 	(message-remove-header gnus-agent-meta-information-header)))
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (if (eq type 'mail)
-	(progn
-	  (require 'smtp)
-	  (let ((recipients (smtp-deduce-address-list
-			     (current-buffer)
-			     (goto-char (point-min)) (search-forward "\n\n"))))
-	    (if (not (null recipients))
-		(if (not (smtp-via-smtp user-mail-address recipients (current-buffer)))
-		    (error "Sending failed: SMTP protocol error")))))
-      (gnus-open-server method)
-      (gnus-request-post method)))
-  (kill-buffer gnus-draft-send-draft-buffer))
+    (gnus-draft-send-draft type method)))
+;;
+(defun gnus-draft-send-draft (type method)
+  (if (eq type 'mail)
+      (progn
+	;; Send draft via SMTP.
+	(require 'smtp)
+	(let ((recipients (smtp-deduce-address-list
+			   (current-buffer)
+			   (goto-char (point-min)) (search-forward "\n\n"))))
+	  (if (not (null recipients))
+	      (if (not (smtp-via-smtp user-mail-address recipients (current-buffer)))
+		  (error "Sending failed: SMTP protocol error")))))
+    ;; Send draft via NNTP.
+    (gnus-open-server method)
+    (gnus-request-post method))
+  (if (get-buffer gnus-draft-send-draft-buffer)
+      (kill-buffer gnus-draft-send-draft-buffer)))
 ;; For draft TEST
 
 (defun gnus-draft-send-all-messages ()
@@ -232,7 +238,8 @@
 (progn
 (defun gnus-draft-setup (narticle group)
   (let ((article narticle))
-    (get-buffer-create gnus-draft-send-draft-buffer)
+    (if (not (get-buffer gnus-draft-send-draft-buffer))
+	(get-buffer-create gnus-draft-send-draft-buffer))
     (set-buffer gnus-draft-send-draft-buffer)
     (erase-buffer)
     (if (not (gnus-request-restore-buffer article group))
