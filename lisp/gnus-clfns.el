@@ -213,8 +213,8 @@ Emacs will not be reported."
 		     current-prefix-arg))
   (unless (interactive-p)
     (error "You should invoke `M-x find-cl-run-time-functions' interactively"))
-  (let (files clfns working giveup file lines forms fns pt form fn buffer
-	      buffer-file-format format-alist
+  (let (files clfns working file lines forms fns pt form fn buffer
+	      window height buffer-file-format format-alist
 	      insert-file-contents-post-hook insert-file-contents-pre-hook)
     (cond ((file-directory-p file-or-directory)
 	   (prog1
@@ -242,8 +242,7 @@ Emacs will not be reported."
 	  (let (emacs-lisp-mode-hook)
 	    (emacs-lisp-mode))
 	  (while files
-	    (setq giveup nil
-		  file (pop files)
+	    (setq file (pop files)
 		  lines (list nil 1))
 	    (message "Searching for CL run-time functions in: %s..."
 		     (file-name-nondirectory file))
@@ -312,17 +311,18 @@ Emacs will not be reported."
 						   form))
 					    forms))))
 		  (goto-char (point-max))
-		  (setq giveup t
-			lines (list (cadr lines)
+		  (setq lines (list (cadr lines)
 				    (count-lines (point-min) (point)))
 			fns '("Couldn't parse, check this file manually."))))
-	      (when (or fns giveup)
+	      (when fns
 		(if buffer
 		    (set-buffer buffer)
 		  (display-buffer
 		   (setq buffer (get-buffer-create
 				 (concat "*CL run-time functions in: "
 					 file-or-directory "*"))))
+		  (setq window (get-buffer-window buffer t)
+			height (window-height window))
 		  (set-buffer buffer)
 		  (erase-buffer))
 		(when file
@@ -338,6 +338,9 @@ Emacs will not be reported."
 		  (insert "\n              ")
 		  (end-of-line))
 		(insert "\n")
+		(when (zerop (forward-line (- 0 height -2)))
+		  (set-window-start window (point)))
+		(goto-char (point-max))
 		(sit-for 0)
 		(set-buffer working))))
 	  (kill-buffer working)
