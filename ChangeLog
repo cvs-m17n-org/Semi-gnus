@@ -1,3 +1,19 @@
+1999-05-28  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-header-encode-function): Call
+	`eword-encode-header' with optional argument code-conversion.
+
+	* Nana-TIPS.ja: Add description of variable
+	`message-encode-function'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.17.
+
+1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/dgnushack.el: Add `byte-optimizer' to `buffer-string',
+	`backward-char' and `char-before'.
+	;; Thanks for Shuhei KOBAYASHI's suggestion.
+
 1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.16 released.
