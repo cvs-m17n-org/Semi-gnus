@@ -820,3 +820,51 @@ options -n !alt.all !rec.all sci.all
 @code{gnus-subscribe-options-newsgroup-method} を使って購読されます。
 
 
+@node Changing Servers
+@section Changing Servers
+@cindex changing servers
+
+ときどき、ある @sc{nntp} サーバーから別のサーバーへ移動しなければならな
+いことがあります。このようなことはめったにおきませんが、おそらくあなたが
+仕事を変えたり、使っているサーバーがとても不安定で、別のものに乗り換えた
+いというときに必要になるでしょう。
+
+サーバーを変更するのはとても簡単ですよね?
+@code{gnus-select-method} を新しいサーバーを指し示すように変更すればいい
+だけですね?
+
+@emph{違います!}
+
+記事の番号は違った @sc{nntp} サーバーでも (どうにかして) 同じにしてある、
+ということはありません。そして、 guns がどの記事を読んだかを記録する唯一
+の方法は、記事番号を記録することです。ですから、
+@code{gnus-select-method} を変更したときは、ファイル @file{.newsrc} は意
+味がなくなります。
+
+Gnusはファイル @file{.newsrc} をあるサーバー用から別のサーバー用に変換す
+る関数を2、3用意しています。それらには一つ共通点があります---実行にながーー
+い時間がかかることです。おそらく、どうしても必要になったとき以外にこの関
+数を使おうとは思わないでしょう。
+
+@kindex M-x gnus-change-server
+@findex gnus-change-server
+もし両方のサーバーに接続できるなら、gnusはあなたが読んだ記事全てに対して
+ヘッダー群 (headers) を要求して、@code{Message-ID} を比較し、読んだ記事
+と記事の印を新しく記録します。コマンド @kbd{M-x gnus-change-server} はこ
+れをすべての基本グループに対して行います。そのコマンドは移動先の方法の入
+力を促します。
+
+@kindex M-x gnus-group-move-group-to-server
+@findex gnus-group-move-group-to-server
+個々のグループをコマンド @kbd{M-x gnus-group-move-group-to-server} で移
+動することもできます。これはあるサーバーから別のサーバーへ一つの (外の) 
+グループを移動したいときに役に立ちます。
+
+@kindex M-x gnus-group-clear-data-on-native-groups
+@findex gnus-group-clear-data-on-native-groups
+古いサーバーと新しいサーバーの両方に接続することができないとき、印と読ん
+だ範囲はすべて意味が無くなります。そのようなときは、コマンド @kbd{M-x
+gnus-group-clear-data-on-native-groups} を使って、基本グループに関するデー
+タをすべて消去することができます。このコマンドは注意して使ってください。 
+
+
