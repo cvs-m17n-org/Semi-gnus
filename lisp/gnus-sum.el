@@ -5192,17 +5192,12 @@ The state which existed when entering the ephemeral is reset."
 (defun gnus-summary-preview-mime-message (arg)
   "MIME decode and play this message."
   (interactive "P")
-  (let ((gnus-break-pages nil))
-    (gnus-summary-select-article t t)
-    )
-  (pop-to-buffer gnus-original-article-buffer t)
-  (let (buffer-read-only)
-    (if (text-property-any (point-min) (point-max) 'invisible t)
-	(remove-text-properties (point-min) (point-max)
-				gnus-hidden-properties)
-      ))
-  (mime-view-mode nil nil nil gnus-original-article-buffer
-		  gnus-article-buffer)
+  (or gnus-show-mime
+      (let ((gnus-break-pages nil)
+	    (gnus-show-mime t))
+	(gnus-summary-select-article t t)
+	))
+  (select-window (get-buffer-window gnus-article-buffer))
   )
 
 (defun gnus-summary-scroll-down ()
