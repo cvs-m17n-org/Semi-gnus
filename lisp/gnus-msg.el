@@ -727,7 +727,7 @@ If SILENT, don't prompt the user."
       (or (and (listp gnus-post-method)	;If not current/native/nil
 	       (not (listp (car gnus-post-method))) ; and not a list of methods
 	       gnus-post-method)	;then use it.
-	  gnus-select-method 
+	  gnus-select-method
 	  message-post-method))
      ;; We want the inverse of the default
      ((and arg (not (eq arg 0)))
@@ -1611,7 +1611,8 @@ this is a reply."
       (setq name (assq 'name results)
 	    address (assq 'address results))
       (setq results (delq name (delq address results)))
-      (make-local-variable 'message-setup-hook)
+      ;; make-local-hook is not obsolete in Emacs 20 or XEmacs.
+      (make-local-hook 'message-setup-hook)
       (dolist (result results)
 	(add-hook 'message-setup-hook
 		  (cond
@@ -1643,7 +1644,8 @@ this is a reply."
 			   (let ((value ,(cdr result)))
 			     (when value
 			       (message-goto-eoh)
-			       (insert ,header ": " value "\n"))))))))))
+			       (insert ,header ": " value "\n"))))))))
+		  nil 'local))
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
@@ -1655,7 +1657,8 @@ this is a reply."
 		       (save-excursion
 			 (message-remove-header "From")
 			 (message-goto-eoh)
-			 (insert "From: " (message-make-from) "\n")))))))))
+			 (insert "From: " (message-make-from) "\n"))))
+		  nil 'local)))))
 
 
 ;;; @ for MIME Edit mode
