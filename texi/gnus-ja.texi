@@ -16683,7 +16683,8 @@ gnus-namazu-update-all-indices} とする必要があるかもしれません。
 に任せるようにすることは理にかなっています。
 
 Gnus を ``オフライン'' のニュースリーダーとして仕立てるのは極めて簡単で
-す。実際、あなたは何も設定する必要が無いのです。
+す。実際、エージェントは今やディフォルトで有効になっている (@pxref{Agent
+Variables, gnus-agent}) ので、あなたは何も設定する必要が無いのです。
 
 もちろん、これをオフラインニュースリーダーとして使うには、いくつか新しい
 命令を覚えなくてはなりません。
@@ -17641,6 +17642,17 @@ Variables} 参照)。
 @subsection エージェント変数
 
 @table @code
+@item gnus-agent
+@vindex gnus-agent
+エージェントが有効になっているかどうか。ディフォルトは @code{t} です。
+最初に有効にされると、いくつかのバックエンドをエージェント化するために、
+エージェントは @code{gnus-agent-auto-agentize-methods} を使います。サー
+バーバッファでエージェントのコマンドを使うことによって、どのバックエン
+ドをエージェント化するかを変更することができます。
+
+サーバーバッファに入るには、グループバッファ
+で @kbd{^} (@code{gnus-group-enter-server-mode}) を使って下さい。
+
 @item gnus-agent-directory
 @vindex gnus-agent-directory
 Gnus エージェントがファイルを格納する場所。初期設定値

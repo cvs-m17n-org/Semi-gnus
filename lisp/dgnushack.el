@@ -56,6 +56,7 @@
   (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
+(defvar loaddir (and load-file-name (file-name-directory load-file-name)))
 
 (defvar dgnushack-w3-directory (let ((w3dir (getenv "W3DIR")))
 				 (unless (zerop (length w3dir))
@@ -267,7 +268,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	 (set-syntax-table stab)))))
 
 (push srcdir load-path)
-(load (expand-file-name "lpath.el" srcdir) nil t t)
+(push loaddir load-path)
+(load (expand-file-name "lpath.el" loaddir) nil t)
 
 (require 'custom)
 
