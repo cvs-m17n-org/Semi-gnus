@@ -195,11 +195,12 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (delete "dgnuspath.el"
-		       (directory-files srcdir nil "^[^=].*\\.el$")))
+  (let ((files (directory-files srcdir nil "^[^=].*\\.el$"))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
+    (dolist (file '("dgnushack.el" "dgnuspath.el" "lpath.el"))
+      (setq files (delete file files)))
     (condition-case ()
 	(require 'w3-forms)
       (error

@@ -1641,16 +1641,6 @@ The following commands are available:
   (gnus-group-send-drafts)
   (gnus-agent-fetch-session))
 
-;;;
-;;; Advice
-;;;
-
-(defadvice gnus-group-get-new-news (after gnus-agent-advice
-					  activate preactivate)
-  "Update modeline."
-  (unless (interactive-p)
-    (gnus-agent-toggle-plugged gnus-plugged)))
-
 (provide 'gnus-agent)
 
 ;;; gnus-agent.el ends here

@@ -4861,7 +4861,9 @@ specified by `gnus-button-alist'."
 	  (list 'gnus-callback fun)
 	  (and data (list 'gnus-data data))))
   (widget-convert-button 'link from to :action 'gnus-widget-press-button
-			 :button-keymap gnus-widget-button-keymap))
+			 ;; Quote `:button-keymap' for Mule 2.3
+			 ;; but it won't work.
+			 ':button-keymap gnus-widget-button-keymap))
 
 ;;; Internal functions:
 

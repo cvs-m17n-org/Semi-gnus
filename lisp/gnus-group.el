@@ -3218,7 +3218,10 @@ re-scanning.  If ARG is non-nil and not a number, this will force
 	(gnus-get-unread-articles arg)))
     (gnus-run-hooks 'gnus-after-getting-new-news-hook)
     (gnus-group-list-groups (and (numberp arg)
-				 (max (car gnus-group-list-mode) arg)))))
+				 (max (car gnus-group-list-mode) arg))))
+  ;; Update modeline.
+  (when (and gnus-agent (not (interactive-p)))
+    (gnus-agent-toggle-plugged gnus-plugged)))
 
 (defun gnus-group-get-new-news-this-group (&optional n dont-scan)
   "Check for newly arrived news in the current group (and the N-1 next groups).

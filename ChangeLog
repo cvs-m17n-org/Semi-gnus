@@ -1,3 +1,19 @@
+2000-10-03  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-get-new-news): Update modeline
+	using `gnus-agent-toggle-plugged' if agent is activated.
+	* lisp/gnus-agent.el (gnus-group-get-new-news): Don't advise it,
+	merge it into gnus-group.el instead.
+
+	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Use `ding'
+	with `play-sound-file' for XEmacs statically.
+
+	* lisp/gnus-art.el (gnus-article-add-button): Quote
+	`:button-keymap' for Mule 2.3 but it won't work.
+
+	* lisp/dgnushack.el: (dgnushack-compile): Don't conpile
+	dgnushack.el nor lpath.el.
+
 2000-09-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-ignored-supersedes-headers): Synch with
