@@ -2165,8 +2165,8 @@ this is a reply."
 	(setq v (with-temp-buffer
 		  (insert-file-contents v)
 		  (goto-char (point-max))
-		  (while (bolp)
-		    (delete-char -1))
+		  (skip-chars-backward "\n")
+		  (delete-region (+ (point) (if (bolp) 0 1)) (point-max))
 		  (buffer-string))))
       (if (eq element 'import)
 	  (progn
