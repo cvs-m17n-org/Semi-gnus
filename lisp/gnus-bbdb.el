@@ -3,7 +3,7 @@
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
 ;; Copyright (C) 1997,1998 MORIOKA Tomohiko
-;; Copyright (C) 1998 Keiichi Suzuki <keiichi@nanap.org>
+;; Copyright (C) 1998,1999 Keiichi Suzuki <keiichi@nanap.org>
 
 ;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
@@ -29,9 +29,11 @@
 ;;; Code:
 
 (require 'bbdb)
+(require 'bbdb-com)
 (require 'gnus)
 (require 'std11)
 (eval-when-compile
+  (defvar bbdb-pop-up-elided-display)	; default unbound.
   (require 'gnus-win))
 
 (defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
@@ -53,8 +55,8 @@ the user confirms the creation."
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
     (save-excursion
       (let (from)
+	(set-buffer gnus-original-article-buffer)
 	(save-restriction
-	  (set-buffer gnus-original-article-buffer)
 	  (widen)
 	  (narrow-to-region (point-min)
 			    (progn (goto-char (point-min))
@@ -78,7 +80,7 @@ the user confirms the creation."
 					(or (bbdb-invoke-hook-for-value
 					     bbdb/news-auto-create-p)
 					    offer-to-create)
-					offer-to-create)))))))
+					offer-to-create)))))) )
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
@@ -110,8 +112,6 @@ This buffer will be in bbdb-mode, with associated keybindings."
 	(bbdb-display-records (list record))
 	(error "unperson"))))
 
-;; Avoid byte-compile warning.
-(defvar bbdb-pop-up-elided-display)
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
   "Make the *BBDB* buffer be displayed along with the GNUS windows,
@@ -145,6 +145,74 @@ displaying the record corresponding to the sender of the current message."
 		   ))))
       (set-buffer b)
       record)))
+
+;;;###autoload
+(defun gnus-bbdb/split-mail (header-field bbdb-field
+					  &optional regexp group)
+  "Mail split method for `nnmail-split-fancy'.
+HEADER-FIELED is a regexp or list of regexps as mail header field name
+for gathering mail addresses.  If HEADER-FIELED is a string, then it's
+used for just matching pattern.  If HEADER-FIELED is a list of strings,
+then these strings have priorities in the order.
+
+BBDB-FIELD is field name of BBDB.
+Optional argument REGEXP is regexp string for matching BBDB-FIELD value.
+If REGEXP is nil or not specified, then all BBDB-FIELD value is matched.
+
+If GROUP is nil or not specified, then BBDB-FIELD value is returned as
+group name.  If GROUP is a symbol `&', then list of all matcing group's
+BBDB-FEILD values is returned.  Otherwise, GROUP is returned."
+  (if (listp header-field)
+      (if (eq group '&)
+	  (gnus-bbdb/split-mail (mapconcat 'identity header-field "\\|")
+				bbdb-field regexp group)
+	(let (rest)
+	  (while (and header-field
+		      (null (setq rest (gnus-bbdb/split-mail
+					(car header-field) bbdb-field
+					regexp group))))
+	    (setq header-field (cdr header-field)))
+	  rest))
+    (let ((pat (concat "^\\(" header-field "\\):[ \t]"))
+	  header-values)
+      (goto-char (point-min))
+      (while (re-search-forward pat nil t)
+	(setq header-values (cons (buffer-substring (point)
+						(std11-field-end))
+				  header-values)))
+      (let ((address-regexp
+	     (mapconcat
+	      (lambda (lal)
+		(regexp-quote (std11-address-string lal)))
+	      (apply 'nconc
+		     (mapcar #'std11-parse-addresses-string
+			     header-values))
+	      "\\|")))
+	(unless (zerop (length address-regexp))
+	  (gnus-bbdb/split-mail-1 address-regexp bbdb-field regexp group))))))
+
+(defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
+  (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
+	prop rest)
+    (or regexp (setq regexp ""))
+    (catch 'done
+      (cond
+       ((eq group '&)
+	(while records
+	  (when (and (setq prop (bbdb-record-getprop (car records) bbdb-field))
+		     (string-match regexp prop)
+		     (not (member prop rest)))
+	    (setq rest (cons prop rest)))
+	  (setq records (cdr records)))
+	(throw 'done (when rest (cons '& rest))))
+       (t
+	(while records
+	  (when (or (null bbdb-field) 
+		    (and (setq prop (bbdb-record-getprop (car records)
+							 bbdb-field))
+			 (string-match regexp prop)))
+	    (throw 'done (or group prop)))
+	  (setq records (cdr records))))))))
 
 ;;
 ;; Announcing BBDB entries in the summary buffer
