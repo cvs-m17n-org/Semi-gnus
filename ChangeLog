@@ -1,5 +1,11 @@
 1998-09-10  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-spec.el (gnus-tilde-pad-form): Use old macro form.
+
+	* lisp/gnus-art.el (article-decode-mime-words): Abolished.
+
+1998-09-10  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.016.
 
 	* Sync up with Pterodactyl Gnus 0.24.

@@ -245,9 +245,8 @@
 (defun gnus-tilde-pad-form (el pad-width)
   "Dummy function except for XEmacs-mule. It will be redefined
 by `gnus-xmas-redefine'."
-  (if (symbolp el)
-      `(eval ,el)
-    `,el))
+  (let ((val (if (symbolp el) (eval el) el)))
+    (` (, val))))
 
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
