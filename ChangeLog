@@ -1,3 +1,13 @@
+2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.19 (This is alpha status.)
+	`gnus-bbdb/split-mail' supports group address.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.19.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): Support group address.
+	(gnus-bbdb/insert-address-regexp): New function.
+
 2000-04-27  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.18 (This is alpha status.)
