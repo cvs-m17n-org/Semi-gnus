@@ -869,7 +869,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	  from to overlay)
       (goto-line number)
       (unless (eobp)			; Sometimes things become confused.
-	(goto-char (+ (point) (length prefix)))
+	(forward-char (length prefix))
 	(skip-chars-forward " \t")
 	(setq from (point))
 	(end-of-line 1)
