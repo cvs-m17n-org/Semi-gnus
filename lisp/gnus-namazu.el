@@ -36,17 +36,15 @@
 
 ;;; Install:
 
-;; (1) Make index of articles with Namzu before using this module.
+;; Make index of articles with Namzu before using this module.
 ;;
 ;;	 % mkdir ~/News/namazu
-;;	 % cd ~/News/namazu
-;;       % mknmz -a -c -h ~/Mail
+;;       % mknmz -a -h -O ~/News/namazu ~/Mail
 ;;
-;; (2) Furthermore, put these expressions to your ~/.emacs, to set the
-;;     path of the index files to `gnus-namazu-index-directory' and to
-;;     initialize this module.
+;; (2) Furthermore, put these expressions to your ~/.gnus, to set the
+;;     path of the index files to `gnus-namazu-index-directory'.
 ;;
-;;       (setq gnus-namazu-index-directory (expand-file-name "~/Namazu"))
+;;       (setq gnus-namazu-index-directory (expand-file-name "~/News/namazu"))
 
 ;; If you would like to use this module in Gnus (not T-gnus), put this
 ;; file into the lisp/ directory in the Gnus source tree and run `make

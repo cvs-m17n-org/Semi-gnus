@@ -14607,6 +14607,7 @@ Gnus $B$O!"A4$F$N%0%k!<%W$N<oN`$r:.9g$7$F!"Bg$-$J%0%k!<%W$K7k9g$9$k$3$H$,(B
 @menu
 * Virtual Groups::              $B$?$/$5$s$N%0%k!<%W$N5-;v$r7k9g$9$k(B
 * Kibozed Groups::              $B%K%e!<%9%9%W!<%k$NCf$+$i$N5-;v$r8!:w$9$k(B
+* Namazu Groups::               Namazu $B$r;H$C$F%a!<%k$N;3$+$i5-;v$r<h$j=P$9(B
 @end menu
 
 @node Virtual Groups
@@ -14738,6 +14739,82 @@ Gnus $B$O$=$N(B @code{nnkiboze} $B%0%k!<%W$N0lIt$H$J$k$Y$-5-;v$,$"$k$+$I$&$+$
 
 @code{nnkiboze} $B%0%k!<%WFb$N4{FI$H$J$C$?5-;v$O!"$=$N5-;v$N(B @sc{nov} $B9T(B
 $B$,(B @sc{nov} $B%U%!%$%k$+$i:o=|$5$l$^$9!#(B
+
+@node Namazu Groups
+@subsection Namazu $B$r;H$C$F%a!<%k$N;3$+$i5-;v$r<h$j=P$9(B
+@cindex namazu
+
+$B%a!<%k$OF|!9Cy$^$C$F$$$/$P$+$j$G$9!#N.NL$NB?$$%a!<%j%s%0%j%9%H$r9XFI$7(B
+$B$F$$$k>l9g$K$O!"FC$K!#$G$b!"BgDq$N>l9g!"2ACM$"$k5-;v$O$4$/>/?t$G!"$=$N(B
+$B5-;v$rBgNL$N5-;v$N;3$+$i8+$D$1=P$9$N$O!"$H$F$b:$Fq$J$3$H$G$9!#(B
+
+$B$3$&$$$C$?$3$H$3$=!"%3%s%T%e!<%?$,$7$F$/$l$k$Y$-;E;v$G$9$h$M!#(BGnus $B$O!"(B
+Namazu $B$r;H$C$F!"%a!<%k$N;3$+$i$"$J$?$N9%$-$J%-!<%o!<%I$r4^$`5-;v$r8+(B
+$B$D$1=P$9J}K!$rDs6!$7$^$9!#(B
+
+$B:G=i$KHa$7$$$*CN$i$;$,$R$H$D!#(B@file{gnus-namazu.el} $B$O!"8=;~E@$G$O!"(B
+@code{nnml} $B%P%C%/%(%s%I$"$k$$$O(B @code{nnmh} $B%P%C%/%(%s%I$K$h$C$FJ]B8(B
+$B$5$l$F$$$k5-;v$7$+!"<h$j07$&$3$H$,$G$-$^$;$s!#(B@code{nnimap} $B%P%C%/%(%s(B
+$B%I$d(B @code{nnmbox} $B%P%C%/%(%s%I$r;H$C$F$$$k?M$O!"$4$a$s$J$5$$!#(B
+
+$B$=$l$G$O5$$r<h$jD>$7$F!"$^$:!"(BNamazu $B$r;H$($k$h$&$K$7$^$7$g$&!#>\$7$$(B
+$B$3$H$O!"<!$N%Z!<%8$GCN$k$3$H$,$G$-$^$9!#(B
+
+@example
+  @uref{http://namazu.org/}
+@end example
+
+$B<!$K!"$"$J$?$NHkB"$N%a!<%k$N;3$N:w0z$r:n$j$^$9!#$=$N$?$a$K$O!"0J2<$N(B2
+$B$D$N%3%^%s%I$r<B9T$9$kI,MW$,$"$k$G$7$g$&!#(B
+
+@example
+  % mkdir ~/News/namazu
+  % mknmz -a -h -O ~/News/namazu ~/Mail
+@end example
+
+$B$3$N%3%^%s%I$O!"(B(1) @file{~/News/namazu/} $B$H$$$&%G%#%l%/%H%j$r:n@.$9$k!"(B
+(2) $B$=$N%G%#%l%/%H%j$K(B @file{~/Mail/} $B0J2<$KJ]B8$5$l$F$$$k%a!<%k$N:w0z(B
+$B$r:n@.$9$k!"$H$$$&0UL#$G$9!#(B
+
+$B$5$"!"$3$l$G=`Hw$,$G$-$^$7$?!#(B
+
+@kindex C-c C-n (Group)
+@kindex C-c C-n (Summary)
+@findex gnus-namazu-search
+$B%0%k!<%W%P%C%U%!$G(B@kbd{C-c C-n}$B$HF~NO$9$k$H!"8!:w<0$r?R$M$i$l$^$9$+$i!"(B
+$BE,Ev$JC18l$rF~NO$7$F$/$@$5$$!#Nc$($P(B:
+
+@example
+  @kbd{C-c C-n gnus namazu RET}
+@end example
+
+$B$3$&$9$k$H!"(Bgnus $B$H(B namazu $B$NAPJ}$N%-!<%o!<%I$rF1;~$K4^$`%a!<%k$rA4$F(B
+$BC5$7=P$7!"$=$l$i$N%a!<%k$+$i$J$k2>A[%0%k!<%W$r:n@.$7$^$9(B@xref{Virtual
+Groups}$B!#(B
+
+@kbd{C-c C-n}$B$K$h$C$F8F$S=P$5$l$kL?Na(B @code{gnus-namazu-search} $B$O!"(B
+gnus $B$NDL>o$N?t;z@\F,<-$d!"%W%m%;%9@\F,<-$rM}2r$7$^$9!#$G$9$+$i!"$"$J(B
+$B$?$,!"$"$k%0%k!<%W$@$1$rBP>]$H$7$F8!:w$r<B9T$7$?$$$J$i$P!"$=$N%0%k!<%W(B
+$B$N9T$K0\F0$7$F!"<!$N$h$&$K8!:w$9$k$3$H$,$G$-$^$9!#(B
+
+@example
+  @kbd{M-1 C-c C-n namazu RET}
+@end example
+
+$B$^$?!"35N,%P%C%U%!$+$i!"$$$-$J$j8!:w$9$k$3$H$b$G$-$^$9!#$3$N>l9g!"8!:w(B
+$BBP>]$O!"<+F0E*$K$=$N%0%k!<%W$K8BDj$5$l$^$9!#Nc$($P!"$"$J$?$,$"$k%0%k!<(B
+$B%W$r1\MwCf$K!"$=$N%0%k!<%W$K$*$1$k<+J,$N2a5n$r?6$jJV$j$?$/$J$C$?$i!"<!(B
+$B$N$h$&$K$9$l$PNI$$$N$G$9!#(B
+
+@example
+  @kbd{C-c C-n +from:"Your E-Mail Address" RET}
+@end example
+
+$B:G8e$K!"(BNamazu $B$r$h$/J,$+$C$F$$$k?M$K$O!"ITMW$JCm0U$r0l$D!#(BNamazu $B$O!"(B
+$B;vA0$K:n@.$5$l$?:w0z$rMQ$$$F8!:w$r9T$$!":w0z$K$N$C$F$$$J$$%U%!%$%k$K$O(B
+$BL\$b$/$l$^$;$s!#$@$+$i!"Dj4|E*$K(B @code{mknmz} $B$r8F$S=P$7$F!"?7$?$J%a!<(B
+$B%k$N:w0z$rDI2C$7$J$$$H!"?7$7$$%a!<%k$O$$$D$^$G$?$C$F$b8!:w$5$l$J$$$3$H(B
+$B$K$J$j$^$9$+$i!"$"$7$+$i$:!#(B
 
 @node Gnus Unplugged
 @section Gnus $B$N@Z$jN%$7(B
