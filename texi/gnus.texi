@@ -8017,14 +8017,14 @@ where you can edit the article all you like, before you send the article
 by pressing @kbd{C-c C-c}.  @xref{Top, , Top, message, The Message
 Manual}.  If you are in a foreign news group, and you wish to post the
 article using the foreign server, you can give a prefix to @kbd{C-c C-c}
-to make Gnus try to post using the foreign server.
+to make gnus try to post using the foreign server.
 
 @menu
 * Mail::                 Mailing and replying.
 * Post::                 Posting and following up.
 * Posting Server::       What server should you post via?
 * Mail and Post::        Mailing and posting at the same time.
-* Archived Messages::    Where Gnus stores the messages you've sent.
+* Archived Messages::    Where gnus stores the messages you've sent.
 * Drafts::               Postponing messages and rejected messages.
 * Rejected Articles::    What happens if the server doesn't like your article?
 @end menu
@@ -8066,7 +8066,7 @@ user whether to re-send the mail.  (This is primarily useful when
 dealing with @sc{soup} packets and the like where one is apt to send the
 same packet multiple times.)  This variable says what the name of this
 history file is.  It is @file{~/News/Sent-Message-IDs} by default.  Set
-this variable to @code{nil} if you don't want Gnus to keep a history
+this variable to @code{nil} if you don't want gnus to keep a history
 file.
 
 @item gnus-sent-message-ids-length
@@ -8087,7 +8087,7 @@ Thank you for asking.  I hate you.
 
 @vindex gnus-post-method
 
-It can be quite complicated.  Normally, Gnus will use the same native
+It can be quite complicated.  Normally, gnus will use the same native
 server.  However.  If your native server doesn't allow posting, just
 reading, you probably want to use some other server to post your
 (extremely intelligent and fabulously interesting) articles.  You can
@@ -8103,10 +8103,10 @@ can use a non-zero prefix to the @kbd{C-c C-c} command to force using
 the ``current'' server for posting.
 
 If you give a zero prefix (i.e., @kbd{C-u 0 C-c C-c}) to that command,
-Gnus will prompt you for what method to use for posting.
+gnus will prompt you for what method to use for posting.
 
 You can also set @code{gnus-post-method} to a list of select methods.
-If that's the case, Gnus will always prompt you for what method to use
+If that's the case, gnus will always prompt you for what method to use
 for posting.
 
 Finally, if you want to always post using the same select method as
@@ -8161,7 +8161,7 @@ store the messages.  If you want to disable this completely, the
 is the default.
 
 @vindex gnus-message-archive-method
-@code{gnus-message-archive-method} says what virtual server Gnus is to
+@code{gnus-message-archive-method} says what virtual server gnus is to
 use to store sent messages.  The default is:
 
 @lisp
@@ -8250,7 +8250,7 @@ Now, when you send a message off, it will be stored in the appropriate
 group.  (If you want to disable storing for just one particular message,
 you can just remove the @code{Gcc} header that has been inserted.)  The
 archive group will appear in the group buffer the next time you start
-Gnus, or the next time you press @kbd{F} in the group buffer.  You can
+gnus, or the next time you press @kbd{F} in the group buffer.  You can
 enter it and read the articles in it just like you'd read any other
 group.  If the group gets really big and annoying, you can simply rename
 if (using @kbd{G r} in the group buffer) to something
@@ -8369,7 +8369,7 @@ the message you are writing so that you can continue editing it some
 other day, and send it when you feel its finished.
 
 Well, don't worry about it.  Whenever you start composing a message of
-some sort using the Gnus mail and post commands, the buffer you get will
+some sort using the gnus mail and post commands, the buffer you get will
 automatically associate to an article in a special @dfn{draft} group.
 If you save the buffer the normal way (@kbd{C-x C-s}, for instance), the
 article will be saved there.  (Auto-save files also go to the draft
@@ -8439,10 +8439,10 @@ doesn't like your face.  Perhaps it just feels miserable.  Perhaps
 @emph{there be demons}.  Perhaps you have included too much cited text.
 Perhaps the disk is full.  Perhaps the server is down.
 
-These situations are, of course, totally beyond the control of Gnus.
+These situations are, of course, totally beyond the control of gnus.
 (Gnus, of course, loves the way you look, always feels great, has angels
 fluttering around inside of it, doesn't care about how much cited text
-you include, never runs full and never goes down.)  So Gnus saves these
+you include, never runs full and never goes down.)  So gnus saves these
 articles until some later time when the server feels better.
 
 The rejected articles will automatically be put in a special draft group
