@@ -3224,6 +3224,7 @@ used to distinguish whether the invisible text is a MIME part or not."
 	       "Illegible text found. Continue posting? "
 	       '((?d "Remove and continue posting")
 		 (?r "Replace with dots and continue posting")
+		 (?i "Ignore and continue posting")
 		 (?e "Continue editing"))))
 	(if (eq choice ?e)
 	  (error "Illegible text found"))
@@ -3236,9 +3237,11 @@ used to distinguish whether the invisible text is a MIME part or not."
 			   (memq (char-charset char)
 				 '(eight-bit-control eight-bit-graphic
 						     control-1)))))
-	    (delete-char 1)
-	    (if (eq choice ?r)
-		(insert ".")))
+	    (if (eq choice ?i)
+		(remove-text-properties (point) (1+ (point)) '(highlight t))
+	      (delete-char 1)
+	      (if (eq choice ?r)
+		  (insert "."))))
 	  (forward-char)
 	  (skip-chars-forward mm-7bit-chars))))))
 
