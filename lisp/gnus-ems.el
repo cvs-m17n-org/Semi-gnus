@@ -1,4 +1,4 @@
-;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
+;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
