@@ -1978,6 +1978,17 @@ be added to \"References\" field.
     (save-window-excursion
       (message-yank-original))))
 
+(defun message-buffers ()
+  "Return a list of active message buffers."
+  (let (buffers)
+    (save-excursion
+      (dolist (buffer (buffer-list t))
+	(set-buffer buffer)
+	(when (and (eq major-mode 'message-mode)
+		   (null message-sent-message-via))
+	  (push (buffer-name buffer) buffers))))
+    (nreverse buffers)))
+
 (defun message-cite-original-without-signature ()
   "Cite function in the standard Message manner."
   (let ((start (point))
