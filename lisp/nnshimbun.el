@@ -57,13 +57,6 @@
   "Reading Web Newspapers with Gnus."
   :group 'gnus)
 
-(defcustom nnshimbun-keep-last-article t
-  "*If non-nil, nnshimbun will never delete a group's last article.
-It can be marked expirable, so it will be deleted when it is no
-longer last."
-  :group 'nnshimbun
-  :type 'boolean)
-
 (defcustom nnshimbun-keep-unparsable-dated-articles t
   "*If non-nil, nnshimbun will never delete articles whose NOV date is unparsable."
   :group 'nnshimbun
@@ -543,8 +536,7 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	      (setq article (pop expirable))
 	      (when (and (nnheader-find-nov-line article)
 			 (setq end (line-end-position))
-			 (not (and nnshimbun-keep-last-article
-				   (= (point-max) (1+ end)))))
+			 (not (= (point-max) (1+ end))))
 		(setq time (and (search-forward "\t" end t)
 				(search-forward "\t" end t)
 				(search-forward "\t" end t)

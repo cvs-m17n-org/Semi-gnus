@@ -1,5 +1,10 @@
 2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Don't
+	refer to the variable `nnshimbun-keep-last-article', we should
+	keep the last article anyway.
+	(nnshimbun-keep-last-article): Abolished.
+
 	* lisp/gnus.el: Autoload "nnshimbun" for the command `gnus-group-
 	make-shimbun-group'.
 
