@@ -1,8 +1,27 @@
+1998-04-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.1.3.
+
+1998-04-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-following-method): New function; set up
+ 	for 'mime-view-following-method-alist.
+
+1998-04-18  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi: Add and modify description for Semi-gnus.
+
+1998-04-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi: "Gnus 5.6.4" -> "Semi-gnus 6.1.2".
+	(Top): "Gnus" -> "gnus".
+	(Starting Up): "Gnus" -> "gnus".
+
 1998-04-10  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/ChangeLog, lisp/gnus-agent.el: Sync up with Gnus 5.6.4.
 
-1998-04-08  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+1998-04-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.1.2.
 	(gnus-version): Include corresponding SEMI version.
