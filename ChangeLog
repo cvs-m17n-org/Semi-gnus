@@ -1,3 +1,15 @@
+1998-07-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-product-name): Change to "Shoe-gnus".
+	(gnus-version-number): Update to 6.8.2.
+
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-product-name): New constant.
+	(gnus-version): Use it for initialization.
+
+	* lisp/gnus-msg.el (gnus-extended-version): New implementation.
+
 1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* Sync up with Semi-gnus 6.8.1.
