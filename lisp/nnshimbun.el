@@ -1,9 +1,12 @@
-;;; -*- mode: Emacs-Lisp; coding: junet -*-
+;;; nnshimbun.el --- interfacing with web newspapers
 
-;;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-;;; Keywords: news
+;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
-;;; Copyright:
+;; Authors: TSUCHIYA Masatoshi <tsuchiya@namazu.org>,
+;;          Akihiro Arisawa    <ari@atesoft.advantest.co.jp>,
+;;          Katsumi Yamaoka    <yamaoka@jpl.org>,
+;;          Yuuichi Teranishi  <teranisi@gohome.org>
+;; Keywords: news
 
 ;; This file is a part of Semi-Gnus.
 
@@ -24,98 +27,142 @@
 
 ;;; Commentary:
 
-;; Gnus backend to read newspapers on WEB.
+;; Gnus (or gnus) backend to read newspapers on the World Wide Web.
+;; This module requires the Emacs-W3M and the external command W3M.
+;; Visit the following pages for more information.
+;;
+;;	http://emacs-w3m.namazu.org/
+;;	http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
+
+;; If you would like to use this module in Gnus (not T-gnus), put this
+;; file into the lisp/ directory in the Gnus source tree and run `make
+;; install'.  And then, put the following expression into your ~/.gnus.
+;;
+;; (autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
 
 
-;;; Defintinos:
-
-(gnus-declare-backend "nnshimbun" 'address)
+;;; Definitions:
 
 (eval-when-compile (require 'cl))
-
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
+(require 'gnus)
 (require 'gnus-bcklg)
-(eval-when-compile
-  (ignore-errors
-    (require 'nnweb)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(require 'nnweb))
+(require 'shimbun)
+(require 'message)
 
 
+;; Customize variables
+(defgroup nnshimbun nil
+  "Reading Web Newspapers with Gnus."
+  :group 'gnus)
+
+(defvar nnshimbun-group-parameters-custom
+  '(list :format "%v"
+	 (checklist :inline t
+		    (list :inline t :format "%v"
+			  (const :format "" index-range)
+			  (choice :tag "Index range"
+				  :value all
+				  (const all)
+				  (const last)
+				  (integer :tag "days")))
+		    (list :inline t :format "%v"
+			  (const :format "" prefetch-articles)
+			  (choice :tag "Prefetch articles"
+				  :value off
+				  (const on)
+				  (const off)))
+		    (list :inline t :format "%v"
+			  (const :format "" encapsulate-images)
+			  (choice :tag "Encapsulate article"
+				  :value on
+				  (const on)
+				  (const off)))
+		    (list :inline t :format "%v"
+			  (const :format "" expiry-wait)
+			  (choice :tag "Expire wait"
+				  :value never
+				  (const never)
+				  (const immediate)
+				  (number :tag "days"))))
+	 (repeat :inline t :tag "Others"
+		 (list :inline t :format "%v"
+		       (symbol :tag "Keyword")
+		       (sexp :tag "Value"))))
+  "A type definition for customizing the nnshimbun group parameters.")
+
+;; The following definition provides the group parameter
+;; `nnshimbun-group-parameters', the user option
+;; `nnshimbun-group-parameters-alist' and the function
+;; `nnshimbun-find-group-parameters'.
+;; The group parameter `nnshimbun-group-parameters' will have a
+;; property list like the following:
+;;
+;; '(index-range all prefetch-articles off encapsulate-images on
+;;               expiry-wait 6)
+
+(gnus-define-group-parameter
+ nnshimbun-group-parameters
+ :type list
+ :function nnshimbun-find-group-parameters
+ :function-document "\
+Return a nnshimbun GROUP's group parameters."
+ :variable nnshimbun-group-parameters-alist
+ :variable-default nil
+ :variable-document "\
+Alist of nnshimbun group parameters.  Each element should be a cons of
+a group name regexp and a plist which consists of a keyword and a value
+pairs like the following:
+
+'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles off
+  encapsulate-images on expiry-wait 6)
+
+`index-range' specifies a range of header indices as described below:
+      all: Retrieve all header indices.
+     last: Retrieve the last header index.
+integer N: Retrieve N pages of header indices.
+
+`prefetch-articles' specifies whether to pre-fetch the unread articles
+when scanning the group.
+
+`encapsulate-images' specifies whether inline images in the shimbun
+article are encapsulated.
+
+`expiry-wait' is similar to the generic group parameter `expiry-wait',
+but it has a preference."
+ :variable-group nnshimbun
+ :variable-type `(repeat (cons :format "%v" (regexp :tag "Group name regexp"
+						    :value "^nnshimbun\\+")
+			       ,nnshimbun-group-parameters-custom))
+ :parameter-type nnshimbun-group-parameters-custom
+ :parameter-document "\
+Group parameters for the nnshimbun group.
+
+`Index range' specifies a range of header indices as described below:
+      all: Retrieve all header indices.
+     last: Retrieve the last header index.
+integer N: Retrieve N pages of header indices.
+
+`Prefetch articles' specifies whether to pre-fetch the unread articles
+when scanning the group.
+
+`Encapsulate article' specifies whether inline images in the shimbun
+article are encapsulated.
+
+`Expire wait' is similar to the generic group parameter `expiry-wait',
+but it has a preference.")
+
+(defcustom nnshimbun-keep-unparsable-dated-articles t
+  "*If non-nil, nnshimbun will never delete articles whose NOV date is unparsable."
+  :group 'nnshimbun
+  :type 'boolean)
+
+
+;; Define backend
+(gnus-declare-backend "nnshimbun" 'address)
 (nnoo-declare nnshimbun)
-
-(defvar nnshimbun-check-interval 300)
-
-(defvar nnshimbun-type-definition
-  `(("asahi"
-     (url . "http://spin.asahi.com/")
-     (groups "national" "business" "politics" "international" "sports" "personal" "feneral")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
-     (generate-nov   . nnshimbun-generate-nov-for-each-group)
-     (get-headers    . nnshimbun-asahi-get-headers)
-     (index-url      . (format "%sp%s.html" nnshimbun-url nnshimbun-current-group))
-     (from-address   . "webmaster@www.asahi.com")
-     (make-contents  . nnshimbun-make-text-or-html-contents)
-     (contents-start . "\n<!-- Start of kiji -->\n")
-     (contents-end   . "\n<!-- End of kiji -->\n"))
-    ("sponichi"
-     (url . "http://www.sponichi.co.jp/")
-     (groups "baseball" "soccer" "usa" "others" "society" "entertainment" "horseracing")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
-     (generate-nov   . nnshimbun-generate-nov-for-each-group)
-     (get-headers    . nnshimbun-sponichi-get-headers)
-     (index-url      . (format "%s%s/index.html" nnshimbun-url nnshimbun-current-group))
-     (from-address   . "webmaster@www.sponichi.co.jp")
-     (make-contents  . nnshimbun-make-text-or-html-contents)
-     (contents-start . "\n<span class=\"text\">　")
-     (contents-end   . "\n"))
-    ("cnet"
-     (url . "http://cnet.sphere.ne.jp/")
-     (groups "comp")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
-     (generate-nov   . nnshimbun-generate-nov-for-each-group)
-     (get-headers    . nnshimbun-cnet-get-headers)
-     (index-url      . (format "%s/News/Oneweek/" nnshimbun-url))
-     (from-address   . "cnet@sphere.ad.jp")
-     (make-contents  . nnshimbun-make-html-contents)
-     (contents-start . "\n<!--KIJI-->\n")
-     (contents-end   . "\n<!--/KIJI-->\n"))
-    ("wired"
-     (url . "http://www.hotwired.co.jp/")
-     (groups "business" "culture" "technology")
-     (coding-system  . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
-     (generate-nov   . nnshimbun-generate-nov-for-all-groups)
-     (get-headers    . nnshimbun-wired-get-all-headers)
-     (index-url)
-     (from-address   . "webmaster@www.hotwired.co.jp")
-     (make-contents  . nnshimbun-make-html-contents)
-     (contents-start . "\n<!-- START_OF_BODY -->\n")
-     (contents-end   . "\n<!-- END_OF_BODY -->\n"))
-    ("yomiuri"
-     (url . "http://www.yomiuri.co.jp/")
-     (groups "shakai" "sports" "seiji" "keizai" "kokusai" "fuho")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
-     (generate-nov   . nnshimbun-generate-nov-for-all-groups)
-     (get-headers    . nnshimbun-yomiuri-get-all-headers)
-     (index-url      . (concat nnshimbun-url "main.htm"))
-     (from-address   . "webmaster@www.yomiuri.co.jp")
-     (make-contents  . nnshimbun-make-text-or-html-contents)
-     (contents-start . "\n<!--  honbun start  -->\n")
-     (contents-end   . "\n<!--  honbun end  -->\n"))
-    ("zdnet"
-     (url . "http://zdseek.pub.softbank.co.jp/news/")
-     (groups "comp")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
-     (generate-nov   . nnshimbun-generate-nov-for-each-group)
-     (get-headers    . nnshimbun-zdnet-get-headers)
-     (index-url      . nnshimbun-url)
-     (from-address   . "zdnn@softbank.co.jp")
-     (make-contents  . nnshimbun-make-html-contents)
-     (contents-start . "<!--BODY-->")
-     (contents-end   . "<!--BODYEND-->"))
-    ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
   "Where nnshimbun will save its files.")
@@ -125,25 +172,30 @@
 
 (defvoo nnshimbun-nov-file-name ".overview")
 
-(defvoo nnshimbun-pre-fetch-article nil
-  "*Non nil means that nnshimbun fetch unread articles when scanning groups.")
+(defvoo nnshimbun-pre-fetch-article 'off
+  "*If it is neither `off' nor nil, nnshimbun fetch unread articles when
+scanning groups.  Note that this variable has just a default value for
+all the nnshimbun groups.  You can specify the nnshimbun group
+parameter `prefecth-articles' for each nnshimbun group.")
 
-;; set by nnshimbun-possibly-change-server
+(defvoo nnshimbun-encapsulate-images shimbun-encapsulate-images
+  "*If it is neither `off' nor nil, inline images will be encapsulated in
+the articles.  Note that this variable has just a default value for
+all the nnshimbun groups.  You can specify the nnshimbun group
+parameter `encapsulate-images' for each nnshimbun group.")
+
+(defvoo nnshimbun-index-range nil
+  "*Range of indices to detect new pages.  Note that this variable has
+just a default value for all the nnshimbun groups.  You can specify
+the nnshimbun group parameter `index-range' for each nnshimbun group.")
+
+;; set by nnshimbun-possibly-change-group
 (defvoo nnshimbun-buffer nil)
 (defvoo nnshimbun-current-directory nil)
 (defvoo nnshimbun-current-group nil)
 
 ;; set by nnshimbun-open-server
-(defvoo nnshimbun-url nil)
-(defvoo nnshimbun-coding-system nil)
-(defvoo nnshimbun-groups nil)
-(defvoo nnshimbun-generate-nov nil)
-(defvoo nnshimbun-get-headers nil)
-(defvoo nnshimbun-index-url nil)
-(defvoo nnshimbun-from-address nil)
-(defvoo nnshimbun-make-contents nil)
-(defvoo nnshimbun-contents-start nil)
-(defvoo nnshimbun-contents-end nil)
+(defvoo nnshimbun-shimbun nil)
 (defvoo nnshimbun-server-directory nil)
 
 (defvoo nnshimbun-status-string "")
@@ -155,12 +207,11 @@
 (defvoo nnshimbun-backlog-articles nil)
 (defvoo nnshimbun-backlog-hashtb nil)
 
-
-
 ;;; backlog
 (defmacro nnshimbun-backlog (&rest form)
   `(let ((gnus-keep-backlog nnshimbun-keep-backlog)
-	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*" (nnoo-current-server 'nnshimbun)))
+	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*"
+				      (nnoo-current-server 'nnshimbun)))
 	 (gnus-backlog-articles nnshimbun-backlog-articles)
 	 (gnus-backlog-hashtb nnshimbun-backlog-hashtb))
      (unwind-protect
@@ -171,16 +222,56 @@
 (put 'nnshimbun-backlog 'edebug-form-spec '(form body))
 
 
+;;; Group parameter
+(defmacro nnshimbun-find-parameter (group symbol &optional full-name-p)
+  "Return the value of a nnshimbun group parameter for GROUP which is
+associated with SYMBOL.  If FULL-NAME-P is non-nil, it treats that
+GROUP has a full name."
+  (let ((name (if full-name-p
+		  group
+		`(concat "nnshimbun+" (nnoo-current-server 'nnshimbun)
+			 ":" ,group))))
+    (cond ((eq 'index-range (eval symbol))
+	   `(or (plist-get (nnshimbun-find-group-parameters ,name)
+			   'index-range)
+		nnshimbun-index-range))
+	  ((eq 'prefetch-articles (eval symbol))
+	   `(let ((val (or (plist-get (nnshimbun-find-group-parameters ,name)
+				      'prefetch-articles)
+			   nnshimbun-pre-fetch-article)))
+	      (if (eq 'off val)
+		  nil
+		val)))
+	  ((eq 'encapsulate-images (eval symbol))
+	   `(let ((val (or (plist-get (nnshimbun-find-group-parameters ,name)
+				      'encapsulate-images)
+			   nnshimbun-encapsulate-images)))
+	      (if (eq 'off val)
+		  nil
+		val)))
+	  ((eq 'expiry-wait (eval symbol))
+	   (if full-name-p
+	       `(or (plist-get (nnshimbun-find-group-parameters ,group)
+			       'expiry-wait)
+		    (gnus-group-find-parameter ,group 'expiry-wait))
+	     `(let ((name ,name))
+		(or (plist-get (nnshimbun-find-group-parameters name)
+			       'expiry-wait)
+		    (gnus-group-find-parameter name 'expiry-wait)))))
+	  (t
+	   `(plist-get (nnshimbun-find-group-parameters ,name) ,symbol)))))
+
 
 ;;; Interface Functions
 (nnoo-define-basics nnshimbun)
 
 (deffoo nnshimbun-open-server (server &optional defs)
-  ;; Set default values.
-  (dolist (default (cdr (assoc server nnshimbun-type-definition)))
-    (let ((symbol (intern (concat "nnshimbun-" (symbol-name (car default))))))
-      (unless (assq symbol defs)
-	(push (list symbol (cdr default)) defs))))
+  (push (list 'nnshimbun-shimbun
+	      (condition-case err
+		  (shimbun-open server (luna-make-entity 'shimbun-gnus-mua))
+		(error (nnheader-report 'nnshimbun "%s" (error-message-string
+							 err)))))
+	defs)
   ;; Set directory for server working files.
   (push (list 'nnshimbun-server-directory
 	      (file-name-as-directory
@@ -194,7 +285,8 @@
   (cond
    ((not (file-exists-p nnshimbun-directory))
     (nnshimbun-close-server)
-    (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-directory))
+    (nnheader-report 'nnshimbun "Couldn't create directory: %s"
+		     nnshimbun-directory))
    ((not (file-directory-p (file-truename nnshimbun-directory)))
     (nnshimbun-close-server)
     (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-directory))
@@ -204,101 +296,116 @@
     (cond
      ((not (file-exists-p nnshimbun-server-directory))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Couldn't create directory: %s"
+		       nnshimbun-server-directory))
      ((not (file-directory-p (file-truename nnshimbun-server-directory)))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Not a directory: %s"
+		       nnshimbun-server-directory))
      (t
       (nnheader-report 'nnshimbun "Opened server %s using directory %s"
 		       server nnshimbun-server-directory)
       t)))))
 
 (deffoo nnshimbun-close-server (&optional server)
-  (and (nnshimbun-server-opened server)
-       (gnus-buffer-live-p nnshimbun-buffer)
-       (kill-buffer nnshimbun-buffer))
+  (when (nnshimbun-server-opened server)
+    (when nnshimbun-shimbun
+      (shimbun-close nnshimbun-shimbun))
+    (when (gnus-buffer-live-p nnshimbun-buffer)
+      (kill-buffer nnshimbun-buffer)))
   (nnshimbun-backlog (gnus-backlog-shutdown))
   (nnshimbun-save-nov)
   (nnoo-close-server 'nnshimbun server)
   t)
 
-(defun nnshimbun-retrieve-url (url &optional no-cache)
-  "Rertrieve URL contents and insert to current buffer."
-  (let ((coding-system-for-read 'binary)
-	(coding-system-for-write 'binary))
-    ;; XXX: Ad hok.
-    (when (or no-cache
-	      (not (file-exists-p
-		    (url-cache-create-filename url))))
-      (set-buffer-multibyte nil))
-    ;; Following code is imported from `url-insert-file-contents'.
-    (save-excursion
-      (let ((old-asynch (default-value 'url-be-asynchronous))
-	    (old-caching (default-value 'url-automatic-caching))
-	    (old-mode (default-value 'url-standalone-mode)))
-	(unwind-protect
-	    (progn
-	      (setq-default url-be-asynchronous nil)
-	      (when no-cache
-		(setq-default url-automatic-caching nil)
-		(setq-default url-standalone-mode nil))
-	      (let ((buf (current-buffer))
-		    (url-working-buffer (cdr (url-retrieve url no-cache))))
-		(set-buffer url-working-buffer)
-		(url-uncompress)
-		(set-buffer buf)
-		(insert-buffer url-working-buffer)
-		(save-excursion
-		  (set-buffer url-working-buffer)
-		  (set-buffer-modified-p nil))
-		(kill-buffer url-working-buffer)))
-	  (setq-default url-be-asynchronous old-asynch)
-	  (setq-default url-automatic-caching old-caching)
-	  (setq-default url-standalone-mode old-mode))))
-    ;; Modify buffer coding system.
-    (decode-coding-region (point-min) (point-max) nnshimbun-coding-system)
-    (set-buffer-multibyte t)))
+(eval-and-compile
+  (let ((Gnus-p
+	 (eval-when-compile
+	   (let ((gnus (locate-library "gnus")))
+	     (and gnus
+		  ;; Gnus has mailcap.el in the same directory of gnus.el.
+		  (file-exists-p (expand-file-name
+				  "mailcap.el"
+				  (file-name-directory gnus))))))))
+    (if Gnus-p
+	(progn
+	  (defmacro nnshimbun-mail-header-subject (header)
+	    `(mail-header-subject ,header))
+	  (defmacro nnshimbun-mail-header-from (header)
+	    `(mail-header-from ,header)))
+      (defmacro nnshimbun-mail-header-subject (header)
+	`(mime-entity-fetch-field ,header 'Subject))
+      (defmacro nnshimbun-mail-header-from (header)
+	`(mime-entity-fetch-field ,header 'From)))))
 
-(deffoo nnshimbun-request-article (article &optional group server to-buffer)
-  (when (nnshimbun-possibly-change-group group server)
-    (if (stringp article)
-	(setq article (nnshimbun-search-id group article)))
-    (if (integerp article)
-	(nnshimbun-request-article-1 article group server to-buffer)
-      (nnheader-report 'nnml "Couldn't retrieve article: %s" (prin1-to-string article))
-      nil)))
+(defun nnshimbun-make-shimbun-header (header)
+  (shimbun-make-header
+   (mail-header-number header)
+   (nnshimbun-mail-header-subject header)
+   (nnshimbun-mail-header-from header)
+   (mail-header-date header)
+   (or (cdr (assq 'X-Nnshimbun-Id (mail-header-extra header)))
+       (mail-header-id header))
+   (mail-header-references header)
+   (mail-header-chars header)
+   (mail-header-lines header)
+   (let ((xref (mail-header-xref header)))
+     (if (and xref (string-match "^Xref: " xref))
+	 (substring xref 6)
+       xref))))
+
+(eval-when-compile
+  (require 'gnus-sum));; For the macro `gnus-summary-article-header'.
 
 (defun nnshimbun-request-article-1 (article &optional group server to-buffer)
   (if (nnshimbun-backlog
 	(gnus-backlog-request-article
 	 group article (or to-buffer nntp-server-buffer)))
       (cons group article)
-    (let (header contents)
-      (when (setq header (save-excursion
-			   (set-buffer (nnshimbun-open-nov group))
-			   (and (nnheader-find-nov-line article)
-				(nnheader-parse-nov))))
-	(let ((xref (substring (mail-header-xref header) 6)))
-	  (save-excursion
-	    (set-buffer nnshimbun-buffer)
-	    (erase-buffer)
-	    (nnshimbun-retrieve-url xref)
-	    (nnheader-message 6 "nnshimbun: Make contents...")
-	    (goto-char (point-min))
-	    (setq contents (funcall nnshimbun-make-contents header))
-	    (nnheader-message 6 "nnshimbun: Make contents...done"))))
-      (when contents
-	(save-excursion
-	  (set-buffer (or to-buffer nntp-server-buffer))
-	  (erase-buffer)
-	  (insert contents)
-	  (nnshimbun-backlog
-	    (gnus-backlog-enter-article group article (current-buffer)))
-	  (nnheader-report 'nnshimbun "Article %s retrieved" (mail-header-id header))
-	  (cons group (mail-header-number header)))))))
+    (let* ((header (with-current-buffer (nnshimbun-open-nov group)
+		     (and (nnheader-find-nov-line article)
+			  (nnshimbun-make-shimbun-header
+			   (nnheader-parse-nov)))))
+	   (original-id (shimbun-header-id header)))
+      (when header
+	(with-current-buffer (or to-buffer nntp-server-buffer)
+	  (delete-region (point-min) (point-max))
+	  (let ((shimbun-encapsulate-images
+		 (nnshimbun-find-parameter group 'encapsulate-images)))
+	    (shimbun-article nnshimbun-shimbun header))
+	  (when (> (buffer-size) 0)
+	    ;; Kludge! replace a date string in `gnus-newsgroup-data'
+	    ;; based on the newly retrieved article.
+	    (let ((x (gnus-summary-article-header article)))
+	      (when x
+		(mail-header-set-date x (shimbun-header-date header))))
+	    (nnshimbun-replace-nov-entry group article header original-id)
+	    (nnshimbun-backlog
+	      (gnus-backlog-enter-article group article (current-buffer)))
+	    (nnheader-report 'nnshimbun "Article %s retrieved"
+			     (shimbun-header-id header))
+	    (cons group article)))))))
+
+(deffoo nnshimbun-request-article (article &optional group server to-buffer)
+  (when (nnshimbun-possibly-change-group group server)
+    (when (stringp article)
+      (let ((num (when (or group (setq group nnshimbun-current-group))
+		   (nnshimbun-search-id group article))))
+	(unless num
+	  (let ((groups (shimbun-groups (shimbun-open server))))
+	    (while (and (not num) groups)
+	      (setq group (pop groups)
+		    num (nnshimbun-search-id group article)))))
+	(setq article num)))
+    (if (integerp article)
+	(nnshimbun-request-article-1 article group server to-buffer)
+      (nnheader-report 'nnshimbun "Couldn't retrieve article: %s"
+		       (prin1-to-string article))
+      nil)))
 
 (deffoo nnshimbun-request-group (group &optional server dont-check)
-  (let ((pathname-coding-system 'binary))
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system))
     (cond
      ((not (nnshimbun-possibly-change-group group server))
       (nnheader-report 'nnshimbun "Invalid group (no such directory)"))
@@ -306,21 +413,21 @@
       (nnheader-report 'nnshimbun "Directory %s does not exist"
 		       nnshimbun-current-directory))
      ((not (file-directory-p nnshimbun-current-directory))
-      (nnheader-report 'nnshimbun "%s is not a directory" nnshimbun-current-directory))
+      (nnheader-report 'nnshimbun "%s is not a directory"
+		       nnshimbun-current-directory))
      (dont-check
       (nnheader-report 'nnshimbun "Group %s selected" group)
       t)
      (t
       (let (beg end lines)
-	(save-excursion
-	  (set-buffer (nnshimbun-open-nov group))
+	(with-current-buffer (nnshimbun-open-nov group)
 	  (goto-char (point-min))
 	  (setq beg (ignore-errors (read (current-buffer))))
 	  (goto-char (point-max))
 	  (forward-line -1)
 	  (setq end (ignore-errors (read (current-buffer)))
 		lines (count-lines (point-min) (point-max))))
-	(nnheader-report 'nnshimbunw "Selected group %s" group)
+	(nnheader-report 'nnshimbun "Selected group %s" group)
 	(nnheader-insert "211 %d %d %d %s\n"
 			 lines (or beg 0) (or end 0) group))))))
 
@@ -329,17 +436,16 @@
   (nnshimbun-generate-nov-database group))
 
 (deffoo nnshimbun-close-group (group &optional server)
+  (nnshimbun-write-nov group)
   t)
 
 (deffoo nnshimbun-request-list (&optional server)
-  (save-excursion
-    (set-buffer nntp-server-buffer)
-    (erase-buffer)
-    (dolist (group nnshimbun-groups)
+  (with-current-buffer nntp-server-buffer
+    (delete-region (point-min) (point-max))
+    (dolist (group (shimbun-groups nnshimbun-shimbun))
       (when (nnshimbun-possibly-change-group group server)
 	(let (beg end)
-	  (save-excursion
-	    (set-buffer (nnshimbun-open-nov group))
+	  (with-current-buffer (nnshimbun-open-nov group)
 	    (goto-char (point-min))
 	    (setq beg (ignore-errors (read (current-buffer))))
 	    (goto-char (point-max))
@@ -348,46 +454,25 @@
 	  (insert (format "%s %d %d n\n" group (or end 0) (or beg 0)))))))
   t) ; return value
 
-(eval-and-compile
-  (if (fboundp 'mime-entity-fetch-field)
-      ;; For Semi-Gnus.
-      (defun nnshimbun-insert-header (header)
-	(insert "Subject: " (or (mime-entity-fetch-field header 'Subject) "(none)") "\n"
-		"From: " (or (mime-entity-fetch-field header 'From) "(nobody)") "\n"
-		"Date: " (or (mail-header-date header) "") "\n"
-		"Message-ID: " (or (mail-header-id header) (nnmail-message-id)) "\n"
-		"References: " (or (mail-header-references header) "") "\n"
-		"Lines: ")
-	(princ (or (mail-header-lines header) 0) (current-buffer))
-	(insert "\n")
-	(if (mail-header-xref header)
-	    (insert (mail-header-xref header) "\n")))
-    ;; For pure Gnus.
-    (defun nnshimbun-insert-header (header)
-      (nnheader-insert-header header)
-      (delete-char -1)
-      (if (mail-header-xref header)
-	  (insert (mail-header-xref header) "\n")))))
-
 (deffoo nnshimbun-retrieve-headers (articles &optional group server fetch-old)
   (when (nnshimbun-possibly-change-group group server)
     (if (nnshimbun-retrieve-headers-with-nov articles fetch-old)
 	'nov
-      (save-excursion
-	(set-buffer nntp-server-buffer)
-	(erase-buffer)
+      (with-current-buffer nntp-server-buffer
+	(delete-region (point-min) (point-max))
 	(let (header)
 	  (dolist (art articles)
 	    (if (stringp art)
 		(setq art (nnshimbun-search-id group art)))
 	    (if (integerp art)
 		(when (setq header
-			    (save-excursion
-			      (set-buffer (nnshimbun-open-nov group))
+			    (with-current-buffer (nnshimbun-open-nov group)
 			      (and (nnheader-find-nov-line art)
 				   (nnheader-parse-nov))))
 		  (insert (format "220 %d Article retrieved.\n" art))
-		  (nnshimbun-insert-header header)
+		  (shimbun-header-insert
+		   nnshimbun-shimbun
+		   (nnshimbun-make-shimbun-header header))
 		  (insert ".\n")
 		  (delete-region (point) (point-max))))))
 	'header))))
@@ -395,7 +480,8 @@
 (defun nnshimbun-retrieve-headers-with-nov (articles &optional fetch-old)
   (if (or gnus-nov-is-evil nnshimbun-nov-is-evil)
       nil
-    (let ((nov (expand-file-name nnshimbun-nov-file-name nnshimbun-current-directory)))
+    (let ((nov (expand-file-name nnshimbun-nov-file-name
+				 nnshimbun-current-directory)))
       (when (file-exists-p nov)
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
@@ -406,82 +492,132 @@
 	    (nnheader-nov-delete-outside-range
 	     (if fetch-old (max 1 (- (car articles) fetch-old))
 	       (car articles))
-	     (car (last articles)))
+	     (nth (1- (length articles)) articles))
 	    t))))))
 
 
 
 ;;; Nov Database Operations
 
+(defvar nnshimbun-tmp-string nil
+  "Internal variable used to just a rest for a temporary string.  The
+macro `nnshimbun-string-or' uses it exclusively.")
+
+(defmacro nnshimbun-string-or (&rest strings)
+  "Return the first element of STRINGS that is a non-blank string.  It
+should run fast, especially if two strings are given.  Each string can
+also be nil."
+  (cond ((null strings)
+	 nil)
+	((= 1 (length strings))
+	 ;; Return irregularly nil if one blank string is given.
+	 `(unless (zerop (length (setq nnshimbun-tmp-string ,(car strings))))
+	    nnshimbun-tmp-string))
+	((= 2 (length strings))
+	 ;; Return the second string when the first string is blank.
+	 `(if (zerop (length (setq nnshimbun-tmp-string ,(car strings))))
+	      ,(cadr strings)
+	    nnshimbun-tmp-string))
+	(t
+	 `(let ((strings (list ,@strings)))
+	    (while strings
+	      (setq strings (if (zerop (length (setq nnshimbun-tmp-string
+						     (car strings))))
+				(cdr strings))))
+	    nnshimbun-tmp-string))))
+
+(defsubst nnshimbun-insert-nov (number header &optional id)
+  (insert "\n")
+  (backward-char 1)
+  (let ((header-id (nnshimbun-string-or (shimbun-header-id header)))
+	;; Force `princ' to work in the current buffer.
+	(standard-output (current-buffer))
+	(xref (nnshimbun-string-or (shimbun-header-xref header)))
+	(start (point)))
+    (and (stringp id)
+	 header-id
+	 (string-equal id header-id)
+	 (setq id nil))
+    (princ number)
+    (insert
+     "\t"
+     (nnshimbun-string-or (shimbun-header-subject header) "(none)") "\t"
+     (nnshimbun-string-or (shimbun-header-from header) "(nobody)") "\t"
+     (nnshimbun-string-or (shimbun-header-date header) (message-make-date))
+     "\t"
+     (or header-id (nnmail-message-id)) "\t"
+     (or (shimbun-header-references header) "") "\t")
+    (princ (or (shimbun-header-chars header) 0))
+    (insert "\t")
+    (princ (or (shimbun-header-lines header) 0))
+    (insert "\t")
+    (if xref
+	(progn
+	  (insert "Xref: " xref "\t")
+	  (when id
+	    (insert "X-Nnshimbun-Id: " id "\t")))
+      (when id
+	(insert "\tX-Nnshimbun-Id: " id "\t")))
+    ;; Replace newlines with spaces in the current NOV line.
+    (while (progn
+	     (forward-line 0)
+	     (> (point) start))
+      (backward-delete-char 1)
+      (insert " "))
+    (forward-line 1)))
+
 (defun nnshimbun-generate-nov-database (group)
-  (prog1 (funcall nnshimbun-generate-nov group)
-    (save-excursion
-      (set-buffer (nnshimbun-open-nov group))
-      (when (buffer-modified-p)
-	(nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-			     nil 'nomesg)))))
-
-(defun nnshimbun-generate-nov-for-each-group (group)
   (nnshimbun-possibly-change-group group)
-  (save-excursion
-    (set-buffer (nnshimbun-open-nov group))
-    (let (i)
-      (goto-char (point-max))
-      (forward-line -1)
-      (setq i (or (ignore-errors (read (current-buffer))) 0))
-      (goto-char (point-max))
-      (dolist (header (save-excursion
-			(set-buffer nnshimbun-buffer)
-			(erase-buffer)
-			(nnshimbun-retrieve-url (eval nnshimbun-index-url) t)
-			(goto-char (point-min))
-			(funcall nnshimbun-get-headers)))
-	(unless (nnshimbun-search-id group (mail-header-id header))
-	  (mail-header-set-number header (setq i (1+ i)))
-	  (nnheader-insert-nov header)
-	  (if nnshimbun-pre-fetch-article
-	      (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))))
+  (with-current-buffer (nnshimbun-open-nov group)
+    (goto-char (point-max))
+    (forward-line -1)
+    (let* ((i (or (ignore-errors (read (current-buffer))) 0))
+	   (name (concat "nnshimbun+" (nnoo-current-server 'nnshimbun)
+			 ":" group))
+	   (pre-fetch (nnshimbun-find-parameter name 'prefetch-articles t)))
+      (dolist (header
+	       (shimbun-headers
+		nnshimbun-shimbun
+		(nnshimbun-find-parameter name 'index-range t)))
+	(unless (nnshimbun-search-id group (shimbun-header-id header))
+	  (goto-char (point-max))
+	  (nnshimbun-insert-nov (setq i (1+ i)) header)
+	  (when pre-fetch
+	    (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))
+    (nnshimbun-write-nov group)))
 
-(defun nnshimbun-generate-nov-for-all-groups (&rest args)
-  (unless (and nnshimbun-nov-last-check
-	       (< (nnshimbun-lapse-seconds nnshimbun-nov-last-check)
-		  nnshimbun-check-interval))
-    (save-excursion
-      (dolist (list (funcall nnshimbun-get-headers))
-	(let ((group (car list)))
-	  (nnshimbun-possibly-change-group group)
-	  (when (cdr list)
-	    (set-buffer (nnshimbun-open-nov group))
-	    (let (i)
-	      (goto-char (point-max))
-	      (forward-line -1)
-	      (setq i (or (ignore-errors (read (current-buffer))) 0))
-	      (goto-char (point-max))
-	      (dolist (header (cdr list))
-		(unless (nnshimbun-search-id group (mail-header-id header))
-		  (mail-header-set-number header (setq i (1+ i)))
-		  (nnheader-insert-nov header)
-		  (if nnshimbun-pre-fetch-article
-		      (nnshimbun-request-article-1 i group nil nnshimbun-buffer))))))))
-      (nnshimbun-save-nov)
-      (setq nnshimbun-nov-last-check (current-time)))))
+(defun nnshimbun-replace-nov-entry (group article header &optional id)
+  (with-current-buffer (nnshimbun-open-nov group)
+    (when (nnheader-find-nov-line article)
+      (delete-region (point) (progn (forward-line 1) (point)))
+      (nnshimbun-insert-nov article header id))))
 
-(defun nnshimbun-search-id (group id)
-  (save-excursion
-    (set-buffer (nnshimbun-open-nov group))
+(defun nnshimbun-search-id (group id &optional nov)
+  (with-current-buffer (nnshimbun-open-nov group)
     (goto-char (point-min))
-    (let (number found)
+    (let (found)
       (while (and (not found)
 		  (search-forward id nil t)) ; We find the ID.
 	;; And the id is in the fourth field.
 	(if (not (and (search-backward "\t" nil t 4)
 		      (not (search-backward "\t" (gnus-point-at-bol) t))))
 	    (forward-line 1)
-	  (beginning-of-line)
-	  (setq found t)
+	  (forward-line 0)
+	  (setq found t)))
+      (unless found
+	(goto-char (point-min))
+	(setq id (concat "X-Nnshimbun-Id: " id))
+	(while (and (not found)
+		    (search-forward id nil t))
+	  (if (not (search-backward "\t" (gnus-point-at-bol) t 8))
+	      (forward-line 1)
+	    (forward-line 0)
+	    (setq found t))))
+      (when found
+	(if nov
+	    (nnheader-parse-nov)
 	  ;; We return the article number.
-	  (setq number (ignore-errors (read (current-buffer))))))
-      number)))
+	  (ignore-errors (read (current-buffer))))))))
 
 (defun nnshimbun-open-nov (group)
   (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
@@ -503,21 +639,97 @@
       (push (cons group buffer) nnshimbun-nov-buffer-alist)
       buffer)))
 
+(defun nnshimbun-write-nov (group)
+  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
+    (when (buffer-live-p buffer)
+      (save-excursion
+	(set-buffer buffer)
+	(and (> (buffer-size) 0)
+	     (buffer-modified-p)
+	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+				  nil 'nomesg))))))
+
 (defun nnshimbun-save-nov ()
   (save-excursion
     (while nnshimbun-nov-buffer-alist
       (when (buffer-name (cdar nnshimbun-nov-buffer-alist))
 	(set-buffer (cdar nnshimbun-nov-buffer-alist))
-	(when (buffer-modified-p)
-	  (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-			       nil 'nomesg))
-	(set-buffer-modified-p nil)
+	(and (> (buffer-size) 0)
+	     (buffer-modified-p)
+	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+				  nil 'nomesg))
 	(kill-buffer (current-buffer)))
       (setq nnshimbun-nov-buffer-alist (cdr nnshimbun-nov-buffer-alist)))))
+
+(deffoo nnshimbun-request-expire-articles (articles group
+						    &optional server force)
+  "Do expiration for the specified ARTICLES in the nnshimbun GROUP.
+Notice that nnshimbun does not actually delete any articles, it just
+delete the corresponding entries in the NOV database locally.  The
+expiration will be performed only when the current SERVER is specified
+and the NOV is open.  The optional fourth argument FORCE is ignored."
+  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
+    (if (and server
+	     ;; Don't use 'string-equal' in the following.
+	     (equal server (nnoo-current-server 'nnshimbun))
+	     (buffer-live-p buffer))
+	(let* ((expirable (copy-sequence articles))
+	       (name (concat "nnshimbun+" server ":" group))
+	       ;; If the group's parameter `expiry-wait' is non-nil,
+	       ;; the value of the option `nnmail-expiry-wait' will be
+	       ;; bound to that value, and the value of the option
+	       ;; `nnmail-expiry-wait-function' will be bound to nil.
+	       ;; See the source code of `gnus-summary-expire-articles'
+	       ;; how does it work.  If the group's parameter is not
+	       ;; specified by user, the shimbun's default value will
+	       ;; be used.
+	       (expiry-wait
+		(or (nnshimbun-find-parameter name 'expiry-wait t)
+		    (shimbun-article-expiration-days nnshimbun-shimbun)))
+	       (nnmail-expiry-wait (or expiry-wait nnmail-expiry-wait))
+	       (nnmail-expiry-wait-function (if expiry-wait
+						nil
+					      nnmail-expiry-wait-function))
+	       article end time)
+	  (save-excursion
+	    (set-buffer buffer)
+	    (while expirable
+	      (setq article (pop expirable))
+	      (when (and (nnheader-find-nov-line article)
+			 (setq end (line-end-position))
+			 (not (= (point-max) (1+ end))))
+		(setq time (and (search-forward "\t" end t)
+				(search-forward "\t" end t)
+				(search-forward "\t" end t)
+				(parse-time-string
+				 (buffer-substring
+				  (point)
+				  (if (search-forward "\t" end t)
+				      (1- (point))
+				    end)))))
+		(when (cond ((setq time (condition-case nil
+					    (apply 'encode-time time)
+					  (error nil)))
+			     (nnmail-expired-article-p name time nil))
+			    (t
+			     ;; Inhibit expiration if there's no parsable
+			     ;; date and the following option is non-nil.
+			     (not nnshimbun-keep-unparsable-dated-articles)))
+		  (beginning-of-line)
+		  (delete-region (point) (1+ end))
+		  (setq articles (delq article articles)))))
+	    (when (buffer-modified-p)
+	      (nnmail-write-region 1 (point-max)
+				   nnshimbun-nov-buffer-file-name
+				   nil 'nomesg)
+	      (set-buffer-modified-p nil))
+	    articles))
+      t)))
 
 
 
 ;;; Server Initialize
+
 (defun nnshimbun-possibly-change-group (group &optional server)
   (when server
     (unless (nnshimbun-server-opened server)
@@ -529,8 +741,12 @@
 	     (format " *nnshimbun %s*" (nnoo-current-server 'nnshimbun))))))
   (if (not group)
       t
+    (condition-case err
+	(shimbun-open-group nnshimbun-shimbun group)
+      (error (nnheader-report 'nnshimbun "%s" (error-message-string err))))
     (let ((pathname (nnmail-group-pathname group nnshimbun-server-directory))
-	  (pathname-coding-system 'binary))
+	  (file-name-coding-system nnmail-pathname-coding-system)
+	  (pathname-coding-system nnmail-pathname-coding-system))
       (unless (equal pathname nnshimbun-current-directory)
 	(setq nnshimbun-current-directory pathname
 	      nnshimbun-current-group group))
@@ -538,422 +754,63 @@
 	(ignore-errors (make-directory nnshimbun-current-directory t)))
       (cond
        ((not (file-exists-p nnshimbun-current-directory))
-	(nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Couldn't create directory: %s"
+			 nnshimbun-current-directory))
        ((not (file-directory-p (file-truename nnshimbun-current-directory)))
-	(nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Not a directory: %s"
+			 nnshimbun-current-directory))
        (t t)))))
 
 
 
-;;; Misc Functions
+;;; shimbun-gnus-mua
+(luna-define-class shimbun-gnus-mua (shimbun-mua) ())
 
-(eval-and-compile
-  (if (fboundp 'eword-encode-string)
-      ;; For Semi-Gnus.
-      (defun nnshimbun-mime-encode-string (string)
-	(if (zerop (length string))
-	    ""
-	  (mapconcat
-	   #'identity
-	   (split-string (eword-encode-string (nnweb-decode-entities-string string)) "\n")
-	   "")))
-    ;; For pure Gnus.
-    (defun nnshimbun-mime-encode-string (string)
-      (mapconcat
-       #'identity
-       (split-string
-	(with-temp-buffer
-	  (insert (nnweb-decode-entities-string string))
-	  (rfc2047-encode-region (point-min) (point-max))
-	  (buffer-substring (point-min) (point-max)))
-	"\n")
-       ""))))
-
-(defun nnshimbun-lapse-seconds (time)
-  (let ((now (current-time)))
-    (+ (* (- (car now) (car time)) 65536)
-       (- (nth 1 now) (nth 1 time)))))
-
-(defun nnshimbun-make-date-string (year month day &optional time)
-  (format "%02d %s %04d %s +0900"
-	  day
-	  (aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
-		     "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
-		month)
-	  year
-	  (or time "00:00")))
-
-(if (fboundp 'regexp-opt)
-    (defalias 'nnshimbun-regexp-opt 'regexp-opt)
-  (defun nnshimbun-regexp-opt (strings &optional paren)
-    "Return a regexp to match a string in STRINGS.
-Each string should be unique in STRINGS and should not contain any regexps,
-quoted or not.  If optional PAREN is non-nil, ensure that the returned regexp
-is enclosed by at least one regexp grouping construct."
-    (let ((open-paren (if paren "\\(" "")) (close-paren (if paren "\\)" "")))
-      (concat open-paren (mapconcat 'regexp-quote strings "\\|") close-paren))))
-
-
-;; Fast fill-region function
-
-(defvar nnshimbun-fill-column (min 80 (- (frame-width) 4)))
-
-(defconst nnshimbun-kinsoku-bol-list
-  (funcall
-   (if (fboundp 'string-to-char-list)
-       'string-to-char-list
-     'string-to-list) "\
-!)-_~}]:;',.?、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃仝々〆〇ー―‐／＼〜\
-‖｜…‥’”）〕］｝〉》」』】°′″℃ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ"))
-
-(defconst nnshimbun-kinsoku-eol-list
-  (funcall
-   (if (fboundp 'string-to-char-list)
-       'string-to-char-list
-     'string-to-list)
-   "({[`‘“（〔［｛〈《「『【°′″§"))
-
-(defun nnshimbun-fill-line ()
-  (forward-line 0)
-  (let ((top (point)) chr)
-    (while (if (>= (move-to-column nnshimbun-fill-column)
-		   nnshimbun-fill-column)
-	       (not (progn
-		      (if (memq (preceding-char) nnshimbun-kinsoku-eol-list)
-			  (progn
-			    (backward-char)
-			    (while (memq (preceding-char) nnshimbun-kinsoku-eol-list)
-			      (backward-char))
-			    (insert "\n"))
-			(while (memq (setq chr (following-char)) nnshimbun-kinsoku-bol-list)
-			  (forward-char))
-			(if (looking-at "\\s-+")
-			    (or (eolp) (delete-region (point) (match-end 0)))
-			  (or (> (char-width chr) 1)
-			      (re-search-backward "\\<" top t)
-			      (end-of-line)))
-			(or (eolp) (insert "\n"))))))
-      (setq top (point))))
-  (forward-line 1)
-  (not (eobp)))
-
-(defsubst nnshimbun-shallow-rendering ()
-  (goto-char (point-min))
-  (while (search-forward "<p>" nil t)
-    (insert "\n\n"))
-  (goto-char (point-min))
-  (while (search-forward "<br>" nil t)
-    (insert "\n"))
-  (nnweb-remove-markup)
-  (nnweb-decode-entities)
-  (goto-char (point-min))
-  (while (nnshimbun-fill-line))
-  (goto-char (point-min))
-  (when (skip-chars-forward "\n")
-    (delete-region (point-min) (point)))
-  (while (search-forward "\n\n" nil t)
-    (let ((p (point)))
-      (when (skip-chars-forward "\n")
-	(delete-region p (point)))))
-  (goto-char (point-max))
-  (when (skip-chars-backward "\n")
-    (delete-region (point) (point-max)))
-  (insert "\n"))
-
-(defun nnshimbun-make-text-or-html-contents (header)
-  (let ((case-fold-search t) (html t) (start))
-    (when (and (search-forward nnshimbun-contents-start nil t)
-	       (setq start (point))
-	       (search-forward nnshimbun-contents-end nil t))
-      (delete-region (point-min) start)
-      (delete-region (- (point) (length nnshimbun-contents-end)) (point-max))
-      (nnshimbun-shallow-rendering)
-      (setq html nil))
-    (goto-char (point-min))
-    (nnshimbun-insert-header header)
-    (insert "Content-Type: " (if html "text/html" "text/plain")
-	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
-    (encode-coding-string (buffer-string)
-			  (mime-charset-to-coding-system "ISO-2022-JP"))))
-
-(defun nnshimbun-make-html-contents (header)
-  (let (start)
-    (when (and (search-forward nnshimbun-contents-start nil t)
-	       (setq start (point))
-	       (search-forward nnshimbun-contents-end nil t))
-      (delete-region (point-min) start)
-      (delete-region (- (point) (length nnshimbun-contents-end)) (point-max)))
-    (goto-char (point-min))
-    (nnshimbun-insert-header header)
-    (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
-    (encode-coding-string (buffer-string)
-			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+(luna-define-method shimbun-mua-search-id ((mua shimbun-gnus-mua) id)
+  (nnshimbun-search-id
+   (shimbun-current-group-internal (shimbun-mua-shimbun-internal mua))
+   id))
 
 
 
-;;; www.asahi.com
+;;; Command to create nnshimbun group
 
-(defun nnshimbun-asahi-get-headers ()
-  (when (search-forward "\n<!-- Start of past -->\n" nil t)
-    (delete-region (point-min) (point))
-    (when (search-forward "\n<!-- End of past -->\n" nil t)
-      (forward-line -1)
-      (delete-region (point) (point-max))
-      (goto-char (point-min))
-      (let (headers)
-	(while (re-search-forward
-		"^■<a href=\"\\(\\([0-9][0-9][0-9][0-9]\\)/past/\\([A-z]*[0-9]*\\)\\.html\\)\"> *"
-		nil t)
-	  (let ((id (format "<%s%s%%%s>"
-			    (match-string 2)
-			    (match-string 3)
-			    nnshimbun-current-group))
-		(url (match-string 1)))
-	    (push (make-full-mail-header
-		   0
-		   (nnshimbun-mime-encode-string
-		    (mapconcat 'identity
-			       (split-string
-				(buffer-substring
-				 (match-end 0)
-				 (progn (search-forward "<br>" nil t) (point)))
-				"<[^>]+>")
-			       ""))
-		   nnshimbun-from-address
-		   "" id "" 0 0 (concat nnshimbun-url url))
-		  headers)))
-	(setq headers (nreverse headers))
-	(let ((i 0))
-	  (while (and (nth i headers)
-		      (re-search-forward
-		       "^\\[\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\)\\]"
-		       nil t))
-	    (let ((month (string-to-number (match-string 1)))
-		  (date (decode-time (current-time))))
-	      (mail-header-set-date
-	       (nth i headers)
-	       (nnshimbun-make-date-string
-		(if (and (eq 12 month) (eq 1 (nth 4 date)))
-		    (1- (nth 5 date))
-		  (nth 5 date))
-		month
-		(string-to-number (match-string 2))
-		(match-string 3))))
-	    (setq i (1+ i))))
-	(nreverse headers)))))
+(defvar nnshimbun-server-history nil)
 
-
-
-;;; www.sponichi.co.jp
-
-(defun nnshimbun-sponichi-get-headers ()
-  (when (search-forward "ニュースインデックス" nil t)
-    (delete-region (point-min) (point))
-    (when (search-forward "アドタグ" nil t)
-      (forward-line 2)
-      (delete-region (point) (point-max))
-      (goto-char (point-min))
-      (let ((case-fold-search t) headers)
-	(while (re-search-forward
-		"^<a href=\"/\\(\\([A-z]*\\)/kiji/\\([0-9][0-9][0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)\\.html\\)\">"
-		nil t)
-	  (let ((url (match-string 1))
-		(id (format "<%s%s%s%s%%%s>"
-			    (match-string 3)
-			    (match-string 4)
-			    (match-string 5)
-			    (match-string 6)
-			    nnshimbun-current-group))
-		(date (nnshimbun-make-date-string
-		       (string-to-number (match-string 3))
-		       (string-to-number (match-string 4))
-		       (string-to-number (match-string 5)))))
-	    (push (make-full-mail-header
-		   0
-		   (nnshimbun-mime-encode-string
-		    (mapconcat 'identity
-			       (split-string
-				(buffer-substring
-				 (match-end 0)
-				 (progn (search-forward "<br>" nil t) (point)))
-				"<[^>]+>")
-			       ""))
-		   nnshimbun-from-address
-		   date id "" 0 0 (concat nnshimbun-url url))
-		  headers)))
-	headers))))
-
-
-
-;;; CNET Japan
-
-(defun nnshimbun-cnet-get-headers ()
-  (let ((case-fold-search t) headers)
-    (while (search-forward "\n<!--*****見出し*****-->\n" nil t)
-      (let ((subject (buffer-substring (point) (gnus-point-at-eol)))
-	    (point (point)))
-	(forward-line -2)
-	(when (looking-at "<a href=\"/\\(News/\\([0-9][0-9][0-9][0-9]\\)/Item/\\([0-9][0-9]\\([0-9][0-9]\\)\\([0-9][0-9]\\)-[0-9]+\\).html\\)\">")
-	  (let ((url (match-string 1))
-		(id  (format "<%s%s%%%s>"
-			     (match-string 2)
-			     (match-string 3)
-			     nnshimbun-current-group))
-		(date (nnshimbun-make-date-string
-		       (string-to-number (match-string 2))
-		       (string-to-number (match-string 4))
-		       (string-to-number (match-string 5)))))
-	    (push (make-full-mail-header
-		   0
-		   (nnshimbun-mime-encode-string subject)
-		   nnshimbun-from-address
-		   date id "" 0 0 (concat nnshimbun-url url))
-		  headers)))
-	(goto-char point)))
-    headers))
-
-
-
-;;; Wired
-
-(defun nnshimbun-wired-get-all-headers ()
-  (save-excursion
-    (set-buffer nnshimbun-buffer)
-    (let ((group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups))
-	  (case-fold-search t)
-	  (regexp (format
-		   "<a href=\"\\(%s\\|/\\)\\(news/news/\\(%s\\)/story/\\(\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)[0-9]+\\)\\.html\\)\"><b>"
-		   (regexp-quote nnshimbun-url)
-		   (nnshimbun-regexp-opt nnshimbun-groups))))
-      (dolist (xover (list (concat nnshimbun-url "news/news/index.html")
-			   (concat nnshimbun-url "news/news/last_seven.html")))
-	(erase-buffer)
-	(nnshimbun-retrieve-url xover t)
-	(goto-char (point-min))
-	(while (re-search-forward regexp nil t)
-	  (let* ((url   (concat nnshimbun-url (match-string 2)))
-		 (group (downcase (match-string 3)))
-		 (id    (format "<%s%%%s>" (match-string 4) group))
-		 (date  (nnshimbun-make-date-string
-			 (string-to-number (match-string 5))
-			 (string-to-number (match-string 6))
-			 (string-to-number (match-string 7))))
-		 (header (make-full-mail-header
-			  0
-			  (nnshimbun-mime-encode-string
-			   (mapconcat 'identity
-				      (split-string
-				       (buffer-substring
-					(match-end 0)
-					(progn (search-forward "</b>" nil t) (point)))
-				       "<[^>]+>")
-				      ""))
-			  nnshimbun-from-address
-			  date id "" 0 0 url))
-		 (x (assoc group group-header-alist)))
-	    (setcdr x (cons header (cdr x))))))
-      group-header-alist)))
-
-
-
-;;; www.yomiuri.co.jp
-
-(defun nnshimbun-yomiuri-get-all-headers ()
-  (save-excursion
-    (set-buffer nnshimbun-buffer)
-    (erase-buffer)
-    (nnshimbun-retrieve-url (eval nnshimbun-index-url) t)
-    (let ((case-fold-search t)
-	  (group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups)))
-      (dolist (group nnshimbun-groups)
-	(let (start)
-	  (goto-char (point-min))
-	  (when (and (search-forward (format "\n<!-- /news/%s=start -->\n" group) nil t)
-		     (setq start (point))
-		     (search-forward (format "\n<!-- /news/%s=end -->\n" group) nil t))
-	    (forward-line -1)
-	    (save-restriction
-	      (narrow-to-region start (point))
-	      (goto-char start)
-	      (while (re-search-forward
-		      "<a href=\"/\\([0-9]+\\)/\\(\\(\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)[A-z0-9]+\\)\\.htm\\)\"[^>]*>"
-		      nil t)
-		(let ((url   (concat (match-string 1) "a/" (match-string 2)))
-		      (id    (format "<%s%s%%%s>"
-				     (match-string 1)
-				     (match-string 3)
-				     group))
-		      (year  (string-to-number (match-string 4)))
-		      (month (string-to-number (match-string 5)))
-		      (day   (string-to-number (match-string 6)))
-		      (subject (mapconcat
-				'identity
-				(split-string
-				 (buffer-substring
-				  (match-end 0)
-				  (progn (search-forward "<br>" nil t) (point)))
-				 "<[^>]+>")
-				""))
-		      date x)
-		  (when (string-match "^◆" subject)
-		    (setq subject (substring subject (match-end 0))))
-		  (if (string-match "(\\([0-9][0-9]:[0-9][0-9]\\))$" subject)
-		      (setq date (nnshimbun-make-date-string
-				  year month day (match-string 1 subject))
-			    subject (substring subject 0 (match-beginning 0)))
-		    (setq date (nnshimbun-make-date-string year month day)))
-		  (setcdr (setq x (assoc group group-header-alist))
-			  (cons (make-full-mail-header
-				 0
-				 (nnshimbun-mime-encode-string subject)
-				 nnshimbun-from-address
-				 date id "" 0 0 (concat nnshimbun-url url))
-				(cdr x)))))))))
-      group-header-alist)))
-
-
-
-;;; Zdnet Japan
-
-(defun nnshimbun-zdnet-get-headers ()
-  (let ((case-fold-search t) headers)
-    (goto-char (point-min))
-    (let (start)
-      (while (and (search-forward "<!--" nil t)
-		  (setq start (- (point) 4))
-		  (search-forward "-->" nil t))
-	(delete-region start (point))))
-    (goto-char (point-min))
-    (while (re-search-forward
-	    "<a href=\"\\(\\([0-9][0-9]\\)\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([^\\.]+\\).html\\)\"><font size=\"4\"><strong>"
-	    nil t)
-      (let ((year  (+ 2000 (string-to-number (match-string 2))))
-	    (month (string-to-number (match-string 3)))
-	    (day   (string-to-number (match-string 4)))
-	    (id    (format "<%s%s%s%s%%%s>"
-			   (match-string 2)
-			   (match-string 3)
-			   (match-string 4)
-			   (match-string 5)
-			   nnshimbun-current-group))
-	    (url (match-string 1)))
-	(push (make-full-mail-header
-	       0
-	       (nnshimbun-mime-encode-string
-		(mapconcat 'identity
-			   (split-string
-			    (buffer-substring
-			     (match-end 0)
-			     (progn (search-forward "</a>" nil t) (point)))
-			    "<[^>]+>")
-			   ""))
-	       nnshimbun-from-address
-	       (nnshimbun-make-date-string year month day)
-	       id  "" 0 0 (concat nnshimbun-url url))
-	      headers)))
-    (nreverse headers)))
-
+;;;###autoload
+(defun gnus-group-make-shimbun-group ()
+  "Create a nnshimbun group."
+  (interactive)
+  (let* ((minibuffer-setup-hook
+	  (append minibuffer-setup-hook '(beginning-of-line)))
+	 (alist
+	  (apply 'nconc
+		 (mapcar
+		  (lambda (d)
+		    (and (stringp d)
+			 (file-directory-p d)
+			 (delq nil
+			       (mapcar
+				(lambda (f)
+				  (and (string-match "^sb-\\(.*\\)\\.el$" f)
+				       (list (match-string 1 f))))
+				(directory-files d)))))
+		  load-path)))
+	 (server (completing-read
+		  "Shimbun address: "
+		  alist nil t
+		  (or (car nnshimbun-server-history)
+		      (caar alist))
+		  'nnshimbun-server-history))
+	 (groups)
+	 (nnshimbun-pre-fetch-article))
+    (if (setq groups (shimbun-groups (shimbun-open server)))
+	(gnus-group-make-group
+	 (completing-read "Group name: " (mapcar 'list groups) nil t nil)
+	 (list 'nnshimbun server))
+      (error "%s" "Can't find group"))))
 
 
 (provide 'nnshimbun)
-;;; nnshimbun.el ends here.
+
+;;; nnshimbun.el ends here
