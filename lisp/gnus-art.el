@@ -1303,8 +1303,7 @@ Initialized from `text-mode-syntax-table.")
   (unless gnus-inhibit-hiding
     (save-excursion
       (save-restriction
-	(let ((buffer-read-only nil)
-	      (inhibit-read-only t)
+	(let ((inhibit-read-only t)
 	      (case-fold-search t)
 	      (max (1+ (length gnus-sorted-header-list)))
 	      (ignored (when (not gnus-visible-headers)
@@ -1494,8 +1493,7 @@ if given a positive prefix, always hide."
 	(header-end (point-min))
 	header-start field-end field-start
 	(inhibit-point-motion-hooks t)
-	(inhibit-read-only t)
-	buffer-read-only)
+	(inhibit-read-only t))
     (save-restriction
       (widen)
       (while (and (setq header-start
@@ -3361,7 +3359,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	   result)
       (save-excursion
 	(gnus-article-setup-buffer)
-	(set-buffer gnus-original-article-buffer)
+	(set-buffer gnus-article-buffer)
 	;; Deactivate active regions.
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
@@ -3523,8 +3521,22 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 ;;;###autoload
 (defun gnus-article-prepare-display ()
   "Make the current buffer look like a nice article."
-  (setq gnus-article-wash-types nil)
-  (gnus-run-hooks 'gnus-tmp-internal-hook)
+  (let ((gnus-article-buffer (current-buffer))
+	buffer-read-only)
+    (unless (eq major-mode 'gnus-article-mode)
+      (gnus-article-mode))
+    (setq buffer-read-only nil
+	  gnus-button-marker-list nil
+	  gnus-article-wash-types nil)
+    (save-restriction
+      (widen)
+      (static-if (featurep 'xemacs)
+	  (map-extents (lambda (extent maparg) (delete-extent extent)))
+	(let ((lists (overlay-lists)))
+	  (dolist (overlay (nconc (car lists) (cdr lists)))
+	    (delete-overlay overlay)))))
+    (gnus-run-hooks 'gnus-tmp-internal-hook))
+  (set-buffer gnus-original-article-buffer)
   ;; Display message.
   (setq mime-message-structure gnus-current-headers)
   (mime-buffer-entity-set-buffer-internal mime-message-structure
@@ -3537,11 +3549,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (let (mime-display-header-hook mime-display-text/plain-hook)
 	(funcall gnus-article-display-method-for-mime))
     (funcall gnus-article-display-method-for-traditional))
-  ;; Associate this article with the current summary buffer.
-  (setq gnus-article-current-summary gnus-summary-buffer)
   ;; Call the treatment functions.
-  (let ((inhibit-read-only t)
-	buffer-read-only)
+  (let ((inhibit-read-only t))
     (save-restriction
       (widen)
       (if gnus-show-mime
@@ -5082,10 +5091,13 @@ after replacing with the original article."
 		    nil t)
 	       (replace-match "")))
 	   (apply ,gnus-article-edit-done-function args)
-	   (set-buffer (get-buffer-create gnus-original-article-buffer))
-	   (erase-buffer)
-	   (insert-buffer gnus-article-buffer)
+	   (insert
+	    (prog1
+		(buffer-substring-no-properties (point-min) (point-max))
+	      (set-buffer (get-buffer-create gnus-original-article-buffer))
+	      (erase-buffer)))
 	   (setq gnus-current-headers (gnus-article-make-full-mail-header))
+	   (set-buffer gnus-article-buffer)
 	   (gnus-article-prepare-display)))
   (substitute-key-definition 'gnus-article-edit-done
 			     'gnus-article-mime-edit-done
@@ -5148,6 +5160,7 @@ after replacing with the original article."
 		(set-buffer (get-buffer-create gnus-original-article-buffer))
 		(erase-buffer)))
       (setq gnus-current-headers (gnus-article-make-full-mail-header))
+      (set-buffer gnus-article-buffer)
       (gnus-article-prepare-display)
       (set-window-configuration winconf))))
 

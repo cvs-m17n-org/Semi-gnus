@@ -1,3 +1,21 @@
+2001-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-exit): Set buffer to
+	`gnus-article-buffer' just before `gnus-article-prepare-display' is
+	called.
+	(gnus-article-mime-edit-article-setup): Ditto.
+	(gnus-article-prepare-display): Don't bind `buffer-read-only'
+	because of `inhibit-read-only'; don't set the value of
+	`gnus-article-current-summary' here; delete all extents or overlays
+	and clear the value of `gnus-button-marker-list' in advance; make
+	it to run in `gnus-article-buffer'.
+	(gnus-article-prepare): Make it to run in `gnus-article-buffer'.
+	(article-toggle-headers): Don't bind `buffer-read-only' because of
+	`inhibit-read-only'.
+	(article-hide-headers): Ditto.
+
 2001-04-16  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.3 revision 00.
