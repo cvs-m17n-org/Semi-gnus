@@ -1,5 +1,14 @@
 1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-and-key): Fix a
+	bug -- do add-hook.
+	(gnus-offline-popup): Examine whether `easy-menu-create-menu' is
+	defined. If not, call `easy-menu-create-keymaps'.
+
+1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
 
 	* lisp/gnus-offline.el (TopLevel): Use `static-if', requiring
