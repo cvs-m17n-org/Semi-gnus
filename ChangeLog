@@ -1,5 +1,16 @@
 1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/message.el (message-send-mail): Remove a misplaced
+	`interactive'.
+
+	* lisp/message.el (message-yank-original): Get back to the previous
+	state.
+	(message-fetch-reply-field): Ditto.
+	(message-setup): Ditto.
+	* lisp/gnus-msg.el (gnus-setup-message): Ditto.
+
+1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-draft.el: Remove some useless comments.
 
 	* lisp/gnus-draft.el (gnus-draft-send-draft): Abolished.
