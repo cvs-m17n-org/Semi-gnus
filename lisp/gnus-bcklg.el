@@ -42,7 +42,7 @@
   (or (get-buffer gnus-backlog-buffer)
       (save-excursion
 	(set-buffer (gnus-get-buffer-create gnus-backlog-buffer))
-	(buffer-disable-undo)
+	(buffer-disable-undo (current-buffer))
 	(setq buffer-read-only t)
 	(get-buffer gnus-backlog-buffer))))
 

@@ -249,8 +249,9 @@ all.  This may very well take some time.")
 (deffoo nnml-request-list (&optional server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (pathname-coding-system 'binary)) 
-      (nnmail-find-file nnml-active-file))
+	  (pathname-coding-system 'binary)) ; for XEmacs/mule
+      (nnmail-find-file nnml-active-file)
+      )
     (setq nnml-group-alist (nnmail-get-active))
     t))
 
@@ -468,7 +469,7 @@ all.  This may very well take some time.")
      ((not (file-exists-p file))
       (nnheader-report 'nnml "File %s does not exist" file))
      (t
-      (with-temp-file file
+      (nnheader-temp-write file
 	(nnheader-insert-file-contents file)
 	(nnmail-replace-status name value))
       t))))
@@ -502,6 +503,7 @@ all.  This may very well take some time.")
 (defun nnml-find-group-number (id)
   (save-excursion
     (set-buffer (get-buffer-create " *nnml id*"))
+    (buffer-disable-undo (current-buffer))
     (let ((alist nnml-group-alist)
 	  number)
       ;; We want to look through all .overview files, but we want to
@@ -771,7 +773,7 @@ all.  This may very well take some time.")
     (save-excursion
       ;; Init the nov buffer.
       (set-buffer nov-buffer)
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (set-buffer nntp-server-buffer)
       ;; Delete the old NOV file.

@@ -70,6 +70,7 @@
   (autoload 'cancel-timer "timer")
   (autoload 'telnet "telnet" nil t)
   (autoload 'telnet-send-input "telnet" nil t)
+  (autoload 'timezone-parse-date "timezone")
   (autoload 'gnus-declare-backend "gnus-start"))
 
 ;; Declare nndb as derived from nntp
@@ -180,7 +181,8 @@ article was posted to nndb")
 		   msg))
 	(if (nnmail-expired-article-p
 	     group
-	     (date-to-time (substring msg (match-beginning 1) (match-end 1)))
+	     (gnus-encode-date
+	      (substring msg (match-beginning 1) (match-end 1)))
 	     force)
 	    (progn
 	      (setq delete-list (concat delete-list " " (int-to-string art)))

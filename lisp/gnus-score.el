@@ -672,7 +672,7 @@ used as score."
   (setq gnus-score-help-winconf (current-window-configuration))
   (save-excursion
     (set-buffer (gnus-get-buffer-create "*Score Help*"))
-    (buffer-disable-undo)
+    (buffer-disable-undo (current-buffer))
     (delete-windows-on (current-buffer))
     (erase-buffer)
     (insert string ":\n\n")
@@ -743,7 +743,6 @@ used as score."
 
 (defun gnus-summary-score-entry (header match type score date
 					&optional prompt silent)
-  (interactive)
   "Enter score file entry.
 HEADER is the header being scored.
 MATCH is the string we are looking for.
@@ -795,9 +794,9 @@ If optional argument `SILENT' is nil, show effect of score entry."
 	       (type
 		(list match score
 		      (and date (if (numberp date) date
-				  (date-to-day date)))
+				  (gnus-day-number date)))
 		      type))
-	       (date (list match score (date-to-day date)))
+	       (date (list match score (gnus-day-number date)))
 	       (score (list match score))
 	       (t (list match))))
 	;; We see whether we can collapse some score entries.
@@ -1122,7 +1121,7 @@ SCORE is the score to add."
 		 (or (not decay)
 		     (gnus-decay-scores alist decay)))
 	(gnus-score-set 'touched '(t) alist)
-	(gnus-score-set 'decay (list (time-to-days (current-time))) alist))
+	(gnus-score-set 'decay (list (gnus-time-to-day (current-time))) alist))
       ;; We do not respect eval and files atoms from global score
       ;; files.
       (when (and files (not global))
@@ -1203,9 +1202,9 @@ SCORE is the score to add."
 	;; Couldn't read file.
 	(setq gnus-score-alist nil)
       ;; Read file.
-      (with-temp-buffer
-	(let ((coding-system-for-write score-mode-coding-system))
-	  (insert-file-contents file))
+      (save-excursion
+	(gnus-set-work-buffer)
+	(insert-file-contents file)
 	(goto-char (point-min))
 	;; Only do the loading if the score file isn't empty.
 	(when (save-excursion (re-search-forward "[()0-9a-zA-Z]" nil t))
@@ -1291,7 +1290,7 @@ SCORE is the score to add."
 	      (setcar scor
 		      (list (caar scor) (nth 2 (car scor))
 			    (and (nth 3 (car scor))
-				 (date-to-day (nth 3 (car scor))))
+				 (gnus-day-number (nth 3 (car scor))))
 			    (if (nth 1 (car scor)) 'r 's)))
 	      (setq scor (cdr scor))))
 	(push (if (not (listp (cdr entry)))
@@ -1338,8 +1337,7 @@ SCORE is the score to add."
 	      (delete-file file)
 	    ;; There are scores, so we write the file.
 	    (when (file-writable-p file)
-	      (let ((coding-system-for-write score-mode-coding-system))
-		(gnus-write-buffer file))
+	      (gnus-write-buffer file)
 	      (when gnus-score-after-write-file-function
 		(funcall gnus-score-after-write-file-function file)))))
 	(and gnus-score-uncacheable-files
@@ -1387,7 +1385,7 @@ SCORE is the score to add."
       (when (and gnus-summary-default-score
 		 scores)
 	(let* ((entries gnus-header-index)
-	       (now (date-to-day (current-time-string)))
+	       (now (gnus-day-number (current-time-string)))
 	       (expire (and gnus-score-expiry-days
 			    (- now gnus-score-expiry-days)))
 	       (headers gnus-newsgroup-headers)
@@ -1406,7 +1404,7 @@ SCORE is the score to add."
 
 	  (save-excursion
 	    (set-buffer (gnus-get-buffer-create "*Headers*"))
-	    (buffer-disable-undo)
+	    (buffer-disable-undo (current-buffer))
 	    (when (gnus-buffer-live-p gnus-summary-buffer)
 	      (message-clone-locals gnus-summary-buffer))
 
@@ -2211,9 +2209,9 @@ SCORE is the score to add."
     ;; Perform adaptive word scoring.
     (when (and (listp gnus-newsgroup-adaptive)
 	       (memq 'word gnus-newsgroup-adaptive))
-      (with-temp-buffer
+      (nnheader-temp-write nil
 	(let* ((hashtb (gnus-make-hashtable 1000))
-	       (date (date-to-day (current-time-string)))
+	       (date (gnus-day-number (current-time-string)))
 	       (data gnus-newsgroup-data)
 	       (syntab (syntax-table))
 	       word d score val)
@@ -2507,7 +2505,7 @@ GROUP using BNews sys file syntax."
 	 ofiles not-match regexp)
     (save-excursion
       (set-buffer (gnus-get-buffer-create "*gnus score files*"))
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       ;; Go through all score file names and create regexp with them
       ;; as the source.
       (while sfiles
@@ -2627,7 +2625,7 @@ Destroys the current buffer."
 
 (defun gnus-sort-score-files (files)
   "Sort FILES so that the most general files come first."
-  (with-temp-buffer
+  (nnheader-temp-write nil
     (let ((alist
 	   (mapcar
 	    (lambda (file)
@@ -2839,7 +2837,7 @@ If ADAPT, return the home adaptive file instead."
 
 (defun gnus-decay-scores (alist day)
   "Decay non-permanent scores in ALIST."
-  (let ((times (- (time-to-days (current-time)) day))
+  (let ((times (- (gnus-time-to-day (current-time)) day))
 	kill entry updated score n)
     (unless (zerop times)		;Done decays today already?
       (while (setq entry (pop alist))

@@ -68,6 +68,8 @@ If this variable is nil, no files will be excluded.")
 
 
 
+(autoload 'gnus-encode-coding-string "gnus-ems")
+
 ;;; Interface functions.
 
 (nnoo-define-basics nneething)
@@ -241,7 +243,7 @@ If this variable is nil, no files will be excluded.")
 	(setq files (cdr files)))
       (when (and touched
 		 (not nneething-read-only))
-	(with-temp-file map-file
+	(nnheader-temp-write map-file
 	  (insert "(setq nneething-map '")
 	  (gnus-prin1 nneething-map)
 	  (insert ")\n(setq nneething-active '")
@@ -314,7 +316,7 @@ If this variable is nil, no files will be excluded.")
   (save-excursion
     (set-buffer (get-buffer-create nneething-work-buffer))
     (setq case-fold-search nil)
-    (buffer-disable-undo)
+    (buffer-disable-undo (current-buffer))
     (erase-buffer)
     (cond
      ((not (file-exists-p file))

@@ -785,7 +785,7 @@ prompt the user for the name of an NNTP server to use."
       (erase-buffer)
       (setq buffer-file-name dribble-file)
       (auto-save-mode t)
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (bury-buffer (current-buffer))
       (set-buffer-modified-p nil)
       (let ((auto (make-auto-save-file-name))
@@ -1877,7 +1877,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(save-excursion
 	  (gnus-message 5 "Reading %s..." newsrc-file)
 	  (set-buffer (nnheader-find-file-noselect newsrc-file))
-	  (buffer-disable-undo)
+	  (buffer-disable-undo (current-buffer))
 	  (gnus-newsrc-to-gnus-format)
 	  (kill-buffer (current-buffer))
 	  (gnus-message 5 "Reading %s...done" newsrc-file)))
@@ -2274,7 +2274,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (setq buffer-file-name
 		(concat gnus-current-startup-file ".eld"))
 	  (setq default-directory (file-name-directory buffer-file-name))
-	  (buffer-disable-undo)
+	  (buffer-disable-undo (current-buffer))
 	  (erase-buffer)
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
@@ -2338,7 +2338,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  info ranges range method)
       (setq buffer-file-name gnus-current-startup-file)
       (setq default-directory (file-name-directory buffer-file-name))
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       ;; Write options.
       (when gnus-newsrc-options
@@ -2424,6 +2424,7 @@ If FORCE is non-nil, the .newsrc file is read."
       (gnus-message 7 "Reading slave newsrcs...")
       (save-excursion
 	(set-buffer (gnus-get-buffer-create " *gnus slave*"))
+	(buffer-disable-undo (current-buffer))
 	(setq slave-files
 	      (sort (mapcar (lambda (file)
 			      (list (nth 5 (file-attributes file)) file))
@@ -2529,8 +2530,8 @@ If FORCE is non-nil, the .newsrc file is read."
 			  enable-multibyte-characters
 			  (fboundp 'gnus-mule-get-coding-system)
 			  (gnus-mule-get-coding-system (symbol-name group)))))
-		(when coding
-		  (setq str (mm-decode-coding-string str (car coding))))
+		(if coding
+		    (setq str (gnus-decode-coding-string str (car coding))))
 		(set group str)))
 	    (forward-line 1))))
       (gnus-message 5 "Reading descriptions file...done")

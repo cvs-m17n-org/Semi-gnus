@@ -32,7 +32,6 @@
 (require 'gnus-art)
 (require 'message)
 (require 'gnus-msg)
-(require 'mm-decode)
 
 (defgroup gnus-extract nil
   "Extracting encoded files."
@@ -1025,7 +1024,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   ;; finally just replaces the next to last number with "[0-9]+".
   (save-excursion
     (set-buffer (gnus-get-buffer-create gnus-uu-output-buffer-name))
-    (buffer-disable-undo)
+    (buffer-disable-undo (current-buffer))
     (erase-buffer)
     (insert (regexp-quote string))
 
@@ -1125,7 +1124,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	string)
     (save-excursion
       (set-buffer (gnus-get-buffer-create gnus-uu-output-buffer-name))
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (while string-list
 	(erase-buffer)
 	(insert (caar string-list))
@@ -1695,11 +1694,23 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
     (when (setq buf (get-buffer gnus-uu-output-buffer-name))
       (kill-buffer buf))))
 
+(defun gnus-quote-arg-for-sh-or-csh (arg)
+  (let ((pos 0) new-pos accum)
+    ;; *** bug: we don't handle newline characters properly
+    (while (setq new-pos (string-match "[!`\"$\\& \t{}]" arg pos))
+      (push (substring arg pos new-pos) accum)
+      (push "\\" accum)
+      (push (list (aref arg new-pos)) accum)
+      (setq pos (1+ new-pos)))
+    (if (= pos 0)
+        arg
+      (apply 'concat (nconc (nreverse accum) (list (substring arg pos)))))))
+
 ;; Inputs an action and a filename and returns a full command, making sure
 ;; that the filename will be treated as a single argument when the shell
 ;; executes the command.
 (defun gnus-uu-command (action file)
-  (let ((quoted-file (mm-quote-arg file)))
+  (let ((quoted-file (gnus-quote-arg-for-sh-or-csh file)))
     (if (string-match "%s" action)
 	(format action quoted-file)
       (concat action " " quoted-file))))

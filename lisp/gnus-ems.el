@@ -34,7 +34,6 @@
 
 (defvar gnus-mouse-2 [mouse-2])
 (defvar gnus-down-mouse-2 [down-mouse-2])
-(defvar gnus-widget-button-keymap nil)
 (defvar gnus-mode-line-modified
   (if (or gnus-xemacs
 	  (< emacs-major-version 20))
@@ -45,6 +44,9 @@
   (autoload 'gnus-xmas-define "gnus-xmas")
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
+
+(or (fboundp 'mail-file-babyl-p)
+    (fset 'mail-file-babyl-p 'rmail-file-p))
 
 ;;; Mule functions.
 
@@ -76,6 +78,12 @@
 	   (truncate-string valstr (, max-width))
 	 valstr))))
 
+(defun gnus-encode-coding-string (string system)
+  string)
+
+(defun gnus-decode-coding-string (string system)
+  string)
+
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
       nil
@@ -86,6 +94,20 @@
   (cond
    ((string-match "XEmacs\\|Lucid" emacs-version)
     (gnus-xmas-define))
+
+   ((or (not (boundp 'emacs-minor-version))
+	(and (< emacs-major-version 20)
+	     (< emacs-minor-version 30)))
+    ;; Remove the `intangible' prop.
+    (let ((props (and (boundp 'gnus-hidden-properties)
+		      gnus-hidden-properties)))
+      (while (and props (not (eq (car (cdr props)) 'intangible)))
+	(setq props (cdr props)))
+      (when props
+	(setcdr props (cdr (cdr (cdr props))))))
+    (unless (fboundp 'buffer-substring-no-properties)
+      (defun buffer-substring-no-properties (beg end)
+	(format "%s" (buffer-substring beg end)))))
 
    ((boundp 'MULE)
     (provide 'gnusutil))))
@@ -151,11 +173,15 @@
     ;; `emacs-version'. In this case, implementation for XEmacs/mule
     ;; may be able to share between XEmacs and XEmacs/mule.
 
+    (defalias 'gnus-truncate-string 'truncate-string)
+
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
     (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
     (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
     (fset 'gnus-summary-set-display-table (lambda ()))
+    (fset 'gnus-encode-coding-string 'encode-coding-string)
+    (fset 'gnus-decode-coding-string 'decode-coding-string)
     
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
@@ -208,7 +234,7 @@
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file (concat dir "x-splash"))))
-	  (with-temp-buffer
+	  (nnheader-temp-write nil
 	    (insert-file-contents file)
 	    (goto-char (point-min))
 	    (ignore-errors
@@ -219,7 +245,7 @@
 	    (make-face 'gnus-splash))
 	  (setq height (/ (car pixmap) (frame-char-height))
 		width (/ (cadr pixmap) (frame-char-width)))
-	  (set-face-foreground 'gnus-splash "Brown")
+	  (set-face-foreground 'gnus-splash "ForestGreen")
 	  (set-face-stipple 'gnus-splash pixmap)
 	  (insert-char ?\n (* (/ (window-height) 2 height) height))
 	  (setq i height)
@@ -232,6 +258,16 @@
 	    (decf i))
 	  (goto-char (point-min))
 	  (sit-for 0))))))
+
+(if (fboundp 'split-string)
+    (fset 'gnus-split-string 'split-string)
+  (defun gnus-split-string (string pattern)
+    "Return a list of substrings of STRING which are separated by PATTERN."
+    (let (parts (start 0))
+      (while (string-match pattern string start)
+	(setq parts (cons (substring string start (match-beginning 0)) parts)
+	      start (match-end 0)))
+      (nreverse (cons (substring string start) parts)))))
 
 (provide 'gnus-ems)
 

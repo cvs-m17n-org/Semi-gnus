@@ -159,11 +159,7 @@ An arbitrary comment on the group.")
 
     (visible (const :tag "Permanently visible" t) "\
 Always display this group, even when there are no unread articles
-in it..")
-
-    (charset (string :tag "Charset") "\
-The default charset to use in the group.") 
-)
+in it.."))
   "Alist of valid group parameters.
 
 Each entry has the form (NAME TYPE DOC), where NAME is the parameter
@@ -236,7 +232,7 @@ like.  If you want to hear a beep when you enter a group, you could
 put something like `(dummy-variable (ding))' in the parameters of that
 group.  `dummy-variable' will be set to the result of the `(ding)'
 form, but who cares?"
-				  (cons :format "%v" :value (nil .  nil)
+				  (group :value (nil nil)
 					 (symbol :tag "Variable")
 					 (sexp :tag
 					       "Value")))

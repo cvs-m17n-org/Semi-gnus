@@ -228,20 +228,11 @@ Thank you for your help in stamping out bugs.
 
 ;;; Post news commands of Gnus group mode and summary mode
 
-(defun gnus-group-mail (&optional arg)
-  "Start composing a mail.
-If ARG, use the group under the point to find a posting style.
-If ARG is 1, prompt for a group name to find the posting style."
-  (interactive "P")
-  (let ((gnus-newsgroup-name
-	 (if arg
-	     (if (= 1 (prefix-numeric-value arg))
-		 (completing-read "Use posting style of group: "
-				  gnus-active-hashtb nil
-				  (gnus-read-active-file-p))
-	       (gnus-group-group-name))
-	   "")))
-    (gnus-setup-message 'message (message-mail))))
+(defun gnus-group-mail ()
+  "Start composing a mail."
+  (interactive)
+  (gnus-setup-message 'message
+    (message-mail)))
 
 (defun gnus-group-post-news (&optional arg)
   "Start composing a news message.
@@ -362,9 +353,7 @@ header line with the old Message-ID."
   ;; if ARTICLE-BUFFER is nil, gnus-article-buffer is used
   ;; this buffer should be passed to all mail/news reply/post routines.
   (setq gnus-article-copy (gnus-get-buffer-create " *gnus article copy*"))
-  (save-excursion
-    (set-buffer gnus-article-copy)
-    (mm-enable-multibyte))
+  (buffer-disable-undo gnus-article-copy)
   (let ((article-buffer (or article-buffer gnus-article-buffer))
 	end beg)
     (if (not (and (get-buffer article-buffer)
@@ -398,7 +387,7 @@ header line with the old Message-ID."
 			 (or (search-forward "\n\n" nil t) (point)))
 	  ;; Insert the original article headers.
 	  (insert-buffer-substring gnus-original-article-buffer beg end)
-	  (article-decode-encoded-words)))
+	  (gnus-article-decode-rfc1522)))
       gnus-article-copy)))
 
 (defun gnus-post-news (post &optional group header article-buffer yank subject
@@ -494,16 +483,14 @@ If SILENT, don't prompt the user."
 		   (list gnus-post-method)))
 	       gnus-secondary-select-methods
 	       (mapcar 'cdr gnus-server-alist)
-	       (mapcar 'car gnus-opened-servers)
 	       (list gnus-select-method)
 	       (list group-method)))
 	     method-alist post-methods method)
 	;; Weed out all mail methods.
 	(while methods
 	  (setq method (gnus-server-get-method "" (pop methods)))
-	  (when (and (or (gnus-method-option-p method 'post)
-			 (gnus-method-option-p method 'post-mail))
-		     (not (member method post-methods)))
+	  (when (or (gnus-method-option-p method 'post)
+		    (gnus-method-option-p method 'post-mail))
 	    (push method post-methods)))
 	;; Create a name-method alist.
 	(setq method-alist
@@ -527,7 +514,7 @@ If SILENT, don't prompt the user."
      ((and (eq gnus-post-method 'current)
 	   (not (eq (car group-method) 'nndraft))
 	   (not arg))
-      group-method)
+      group-method) 
      ((and gnus-post-method
 	   (not (eq gnus-post-method 'current)))
       gnus-post-method)
@@ -536,31 +523,68 @@ If SILENT, don't prompt the user."
 
 
 
-;; Dummies to avoid byte-compile warning.
+;; Dummy to avoid byte-compile warning.
 (defvar nnspool-rejected-article-hook)
 (defvar xemacs-codename)
 
+;;; Since the X-Newsreader/X-Mailer are ``vanity'' headers, they might
+;;; as well include the Emacs version as well.
+;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
   "Stringified Gnus version and Emacs version."
   (interactive)
   (concat
-   "Gnus/" (prin1-to-string (gnus-continuum-version gnus-version) t)
-   " (" gnus-version ")"
-   " "
+   gnus-version
+   "/"
    (cond
     ((string-match "^\\([0-9]+\\.[0-9]+\\)\\.[.0-9]+$" emacs-version)
-     (concat "Emacs/" (match-string 1 emacs-version)))
+     (concat "Emacs " (substring emacs-version
+				 (match-beginning 1)
+				 (match-end 1))))
     ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
 		   emacs-version)
-     (concat (match-string 1 emacs-version)
-	     (format "/%d.%d" emacs-major-version emacs-minor-version)
+     (concat (substring emacs-version
+			(match-beginning 1)
+			(match-end 1))
+	     (format " %d.%d" emacs-major-version emacs-minor-version)
 	     (if (match-beginning 3)
-		 (match-string 3 emacs-version)
+		 (substring emacs-version
+			    (match-beginning 3)
+			    (match-end 3))
 	       "")
 	     (if (boundp 'xemacs-codename)
-		 (concat " (" xemacs-codename ")")
-	       "")))
+		 (concat " - \"" xemacs-codename "\""))))
     (t emacs-version))))
+
+;; Written by "Mr. Per Persson" <pp@gnu.ai.mit.edu>.
+(defun gnus-inews-insert-mime-headers ()
+  "Insert MIME headers.
+Assumes ISO-Latin-1 is used iff 8-bit characters are present."
+  (goto-char (point-min))
+  (let ((mail-header-separator
+	 (progn
+	   (goto-char (point-min))
+	   (if (and (search-forward (concat "\n" mail-header-separator "\n")
+				    nil t)
+		    (not (search-backward "\n\n" nil t)))
+	       mail-header-separator
+	     ""))))
+    (or (mail-position-on-field "Mime-Version")
+	(insert "1.0")
+	(cond ((save-restriction
+		 (widen)
+		 (goto-char (point-min))
+		 (re-search-forward "[^\000-\177]" nil t))
+	       (or (mail-position-on-field "Content-Type")
+		   (insert "text/plain; charset=ISO-8859-1"))
+	       (or (mail-position-on-field "Content-Transfer-Encoding")
+		   (insert "8bit")))
+	      (t (or (mail-position-on-field "Content-Type")
+		     (insert "text/plain; charset=US-ASCII"))
+		 (or (mail-position-on-field "Content-Transfer-Encoding")
+		     (insert "7bit")))))))
+
+(custom-add-option 'message-header-hook 'gnus-inews-insert-mime-headers)
 
 
 ;;;
@@ -668,8 +692,7 @@ The current group name will be inserted at \"%s\".")
 	(gnus-summary-select-article)
 	(set-buffer gnus-original-article-buffer)
 	(if (and (<= (length (message-tokenize-header
-			      (setq newsgroups
-				    (mail-fetch-field "newsgroups"))
+			      (setq newsgroups (mail-fetch-field "newsgroups"))
 			      ", "))
 		     1)
 		 (or (not (setq followup-to (mail-fetch-field "followup-to")))
@@ -832,6 +855,7 @@ The source file has to be in the Emacs load path."
     ;; Go through all the files looking for non-default values for variables.
     (save-excursion
       (set-buffer (gnus-get-buffer-create " *gnus bug info*"))
+      (buffer-disable-undo (current-buffer))
       (while files
 	(erase-buffer)
 	(when (and (setq file (locate-library (pop files)))
@@ -943,7 +967,7 @@ this is a reply."
 		       (concat "^" (regexp-quote mail-header-separator) "$")
 		       nil t)
 		  (replace-match "" t t ))
-		(unless (gnus-request-accept-article group method t t)
+		(unless (gnus-request-accept-article group method t)
 		  (gnus-message 1 "Couldn't store article in group %s: %s"
 				group (gnus-status-message method))
 		  (sit-for 2))
@@ -974,7 +998,7 @@ this is a reply."
 	  (and gnus-newsgroup-name
 	       (gnus-group-find-parameter
 		gnus-newsgroup-name 'gcc-self)))
-	 result
+	 result 
 	 (groups
 	  (cond
 	   ((null gnus-message-archive-method)
@@ -1078,7 +1102,7 @@ this is a reply."
 	    (if (and (not (stringp (car attribute)))
 		     (not (eq 'body (car attribute)))
 		     (not (setq variable
-				(cdr (assq (car attribute)
+				(cdr (assq (car attribute) 
 					   gnus-posting-style-alist)))))
 		(message "Couldn't find attribute %s" (car attribute))
 	      ;; We get the value.

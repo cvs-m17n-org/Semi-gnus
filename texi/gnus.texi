@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Pterodactyl Gnus 0.33 Manual
+@settitle Gnus 5.6.44 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -270,7 +270,7 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995,96,97,98 Free Software Foundation, Inc.
+Copyright \copyright{} 1995,96,97 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Pterodactyl Gnus 0.33 Manual
+@title Gnus 5.6.44 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -354,7 +354,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Pterodactyl Gnus 0.33.
+This manual corresponds to Gnus 5.6.44.
 
 @end ifinfo
 
@@ -2120,11 +2120,6 @@ are arbitrary comments on the group.  They are currently ignored by
 Gnus, but provide a place for you to store information on particular
 groups.
 
-@item charset
-Elements that look like @code{(charset . iso-8859-1)} will make
-@code{iso-8859-1} the default charset; that is, the charset that will be 
-used for all articles that do not specify a charset.
-
 @item @var{(variable form)}
 You can use the group parameters to set variables local to the group you
 are entering.  If you want to turn threading off in @samp{news.answers},
@@ -2340,11 +2335,7 @@ Sort the group buffer alphabetically by backend name
 
 @end table
 
-All the commands below obeys the process/prefix convention
-(@pxref{Process/Prefix}).
-
-When given a symbolic prefix (@pxref{Symbolic Prefixes}), all these
-commands will sort in reverse order.  
+When given a prefix, all these commands will sort in reverse order.
 
 You can also sort a subset of the groups:
 
@@ -2352,38 +2343,38 @@ You can also sort a subset of the groups:
 @item G P a
 @kindex G P a (Group)
 @findex gnus-group-sort-selected-groups-by-alphabet
-Sort the groups alphabetically by group name
-(@code{gnus-group-sort-selected-groups-by-alphabet}).
+Sort the process/prefixed groups in the group buffer alphabetically by
+group name (@code{gnus-group-sort-selected-groups-by-alphabet}).
 
 @item G P u
 @kindex G P u (Group)
 @findex gnus-group-sort-selected-groups-by-unread
-Sort the groups by the number of unread articles
-(@code{gnus-group-sort-selected-groups-by-unread}).
+Sort the process/prefixed groups in the group buffer by the number of
+unread articles (@code{gnus-group-sort-selected-groups-by-unread}).
 
 @item G P l
 @kindex G P l (Group)
 @findex gnus-group-sort-selected-groups-by-level
-Sort the groups by group level
+Sort the process/prefixed groups in the group buffer by group level
 (@code{gnus-group-sort-selected-groups-by-level}).
 
 @item G P v
 @kindex G P v (Group)
 @findex gnus-group-sort-selected-groups-by-score
-Sort the groups by group score
+Sort the process/prefixed groups in the group buffer by group score
 (@code{gnus-group-sort-selected-groups-by-score}).  @xref{Group Score}.
 
 @item G P r
 @kindex G P r (Group)
 @findex gnus-group-sort-selected-groups-by-rank
-Sort the groups by group rank
+Sort the process/prefixed groups in the group buffer by group rank
 (@code{gnus-group-sort-selected-groups-by-rank}).  @xref{Group Score}.
 
 @item G P m
 @kindex G P m (Group)
 @findex gnus-group-sort-selected-groups-by-method
-Sort the groups alphabetically by backend name
-(@code{gnus-group-sort-selected-groups-by-method}).
+Sort the process/prefixed groups in the group buffer alphabetically by
+backend name (@code{gnus-group-sort-selected-groups-by-method}).
 
 @end table
 
@@ -3202,7 +3193,6 @@ You can have as many summary buffers open as you wish.
 * Saving Articles::             Ways of customizing article saving.
 * Decoding Articles::           Gnus can treat series of (uu)encoded articles.
 * Article Treatment::           The article buffer can be mangled at will.
-* MIME Commands::               Doing MIMEy things with the articles.
 * Article Commands::            Doing various things with the article buffer.
 * Summary Sorting::             Sorting the summary buffer in various ways.
 * Finding the Parent::          No child support? Get the parent.
@@ -4924,7 +4914,10 @@ The default is 4.
 
 @item gnus-parse-headers-hook
 @vindex gnus-parse-headers-hook
-Hook run before parsing any headers.
+Hook run before parsing any headers.  The default value is
+@code{(gnus-decode-rfc1522)}, which means that QPized headers will be
+slightly decoded in a hackish way.  This is likely to change in the
+future when Gnus becomes @sc{MIME}ified.
 
 @item gnus-alter-header-function
 @vindex gnus-alter-header-function
@@ -5501,7 +5494,7 @@ files.
 
 @vindex gnus-default-article-saver
 You can customize the @code{gnus-default-article-saver} variable to make
-Gnus do what you want it to.  You can use any of the six ready-made
+Gnus do what you want it to.  You can use any of the four ready-made
 functions below, or you can create your own.
 
 @table @code
@@ -6296,22 +6289,7 @@ Signature}.
 @vindex gnus-article-hide-pgp-hook
 Hide @sc{pgp} signatures (@code{gnus-article-hide-pgp}).  The
 @code{gnus-article-hide-pgp-hook} hook will be run after a @sc{pgp}
-signature has been hidden.  For example, to automatically verify
-articles that have signatures in them do:
-@lisp
-;;; Hide pgp cruft if any.
-
-(add-hook 'gnus-article-display-hook 'gnus-article-hide-pgp)
-
-;;; After hiding pgp, verify the message;
-;;; only happens if pgp signature is found.
-
-(add-hook 'gnus-article-hide-pgp-hook
-          (lambda ()
-            (save-excursion
-              (set-buffer gnus-original-article-buffer)
-              (mc-verify))))
-@end lisp
+signature has been hidden.
 
 @item W W P
 @kindex W W P (Summary)
@@ -6779,31 +6757,6 @@ This means that if there are more than 200 lines after the signature
 separator, or the text after the signature separator is matched by
 the regular expression @samp{^---*Forwarded article}, then it isn't a
 signature after all.
-
-
-@node MIME Commands
-@section MIME Commands
-@cindex MIME decoding
-
-@table @kbd
-@item W M w
-@kindex W M w (Summary)
-Decode RFC2047-encoded words in the article headers
-(@code{gnus-article-decode-mime-words}).
-
-@item W M c
-@kindex W M c (Summary)
-Decode encoded article bodies as well as charsets
-(@code{gnus-article-decode-charset}).
-
-This command looks in the @code{Content-Type} header to determine the
-charset.  If there is no such header in the article, you can give it a
-prefix, which will prompt for the charset to decode as.  In regional
-groups where people post using some common encoding (but do not include
-MIME headers), you can set the @code{charset} group/topic parameter to
-the required charset (@pxref{Group Parameters}).
-
-@end table
 
 
 @node Article Commands
@@ -7369,11 +7322,6 @@ It is called after the summary buffer has been generated.  You might use
 it to, for instance, highlight lines or modify the look of the buffer in
 some other ungodly manner.  I don't care.
 
-@vindex gnus-summary-prepared-hook
-@item gnus-summary-prepared-hook
-A hook called as the very last thing after the summary buffer has been
-generated.
-
 @vindex gnus-summary-ignore-duplicates
 @item gnus-summary-ignore-duplicates
 When Gnus discovers two articles that have the same @code{Message-ID},
@@ -7929,57 +7877,40 @@ while all newsreaders die of fear.
 of the characters, and it also makes it possible to embed pictures and
 other naughty stuff in innocent-looking articles.
 
-@vindex gnus-display-mime-function
-@findex gnus-display-mime
-Gnus pushes @sc{mime} articles through @code{gnus-display-mime-function} 
-to display the @sc{mime} parts.  This is @code{gnus-display-mime} by
-default, which creates a bundle of clickable buttons that can be used to 
-display, save and manipulate the @sc{mime} objects.  
+@vindex gnus-show-mime
+@vindex gnus-show-mime-method
+@vindex gnus-strict-mime
+@findex metamail-buffer
+Gnus handles @sc{mime} by pushing the articles through
+@code{gnus-show-mime-method}, which is @code{metamail-buffer} by
+default.  This function calls the external @code{metamail} program to
+actually do the work.  One common problem with this program is that is
+thinks that it can't display 8-bit things in the Emacs buffer.  To tell
+it the truth, put something like the following in your
+@file{.bash_profile} file.  (You do use @code{bash}, don't you?)
 
-The following commands are available when you have placed point over a
-@sc{mime} button:
+@example
+export MM_CHARSET="iso-8859-1"
+@end example
 
-@table @kbd
-@findex gnus-article-press-button
-@item RET (Article)
-@itemx BUTTON-2 (Article)
-Toggle displaying of the @sc{mime} object
-(@code{gnus-article-press-button}).
+For more information on @code{metamail}, see its manual page.
 
-@findex gnus-mime-view-part
-@item M-RET (Article)
-@itemx v (Article)
-Prompt for a method, and then view the @sc{mime} object using this
-method (@code{gnus-mime-view-part}).
+Set @code{gnus-show-mime} to @code{t} if you want to use
+@sc{mime} all the time.  However, if @code{gnus-strict-mime} is
+non-@code{nil}, the @sc{mime} method will only be used if there are
+@sc{mime} headers in the article.  If you have @code{gnus-show-mime}
+set, then you'll see some unfortunate display glitches in the article
+buffer.  These can't be avoided.
 
-@findex gnus-mime-save-part
-@item o (Article)
-Prompt for a file name, and then save the @sc{mime} object
-(@code{gnus-mime-save-part}).
-
-@findex gnus-mime-copy-part
-@item c (Article)
-Copy the @sc{mime} object to a fresh buffer and display this buffer
-(@code{gnus-mime-copy-part}).
-
-@findex gnus-mime-pipe-part
-@item | (Article)
-Output the @sc{mime} object to a process (@code{gnus-mime-pipe-part}).
-@end table
-
-Gnus will display some @sc{mime} objects automatically.  The way Gnus
-determines which parts to do this with is described in the Emacs MIME
-manual.  
-
-It might be best to just use the toggling functions from the article
-buffer to avoid getting nasty surprises.  (For instance, you enter the
+It might be best to just use the toggling functions from the summary
+buffer to avoid getting nasty surprises. (For instance, you enter the
 group @samp{alt.sing-a-long} and, before you know it, @sc{mime} has
 decoded the sound file in the article and some horrible sing-a-long song
-comes screaming out your speakers, and you can't find the volume button,
-because there isn't one, and people are starting to look at you, and you
-try to stop the program, but you can't, and you can't find the program
-to control the volume, and everybody else in the room suddenly decides
-to look at you disdainfully, and you'll feel rather stupid.)
+comes screaming out your speakers, and you can't find the volume
+button, because there isn't one, and people are starting to look at you,
+and you try to stop the program, but you can't, and you can't find the
+program to control the volume, and everybody else in the room suddenly
+decides to look at you disdainfully, and you'll feel rather stupid.)
 
 Any similarity to real events and people is purely coincidental.  Ahem.
 
@@ -8085,12 +8016,6 @@ Go to the previous button, if any (@code{gnus-article-prev-button}).
 If non-@code{nil}, use the same article buffer for all the groups.
 (This is the default.)  If @code{nil}, each group will have its own
 article buffer.
-
-@vindex gnus-article-decode-hook
-@item gnus-article-decode-hook
-@cindex MIME
-Hook used to decode @sc{mime} articles.  The default value is
-@code{(article-decode-charset article-decode-encoded-words)}
 
 @vindex gnus-article-prepare-hook
 @item gnus-article-prepare-hook
@@ -9647,16 +9572,14 @@ used for, well, anything, really.
 
 @vindex nnmail-split-hook
 @item nnmail-split-hook
-@findex article-decode-encoded-words
+@findex article-decode-rfc1522
 @findex RFC1522 decoding
-@findex RFC2047 decoding
 Hook run in the buffer where the mail headers of each message is kept
 just before the splitting based on these headers is done.  The hook is
 free to modify the buffer contents in any way it sees fit---the buffer
 is discarded after the splitting has been done, and no changes performed
-in the buffer will show up in any files.
-@code{gnus-article-decode-encoded-words} is one likely function to add
-to this hook.
+in the buffer will show up in any files.  @code{gnus-article-decode-rfc1522}
+is one likely function to add to this hook.
 
 @vindex nnmail-pre-get-new-mail-hook
 @vindex nnmail-post-get-new-mail-hook
@@ -10495,12 +10418,6 @@ your @file{.emacs} file:
 
 (add-hook 'nnfolder-save-buffer-hook 'turn-off-backup)
 @end lisp
-
-@item nnfolder-delete-mail-hook
-@vindex nnfolder-delete-mail-hook
-Hook run in a buffer narrowed to the message that is to be deleted.
-This function can be used to copy the message to somewhere else, or to
-extract some information from it before removing it.  
 
 @end table
 
@@ -11589,21 +11506,11 @@ are eligible for downloading; and
 @item
 a score rule which (generally) gives you a finer granularity when
 deciding what articles to download.  (Note that this @dfn{download
-score} is not necessarily related to normal scores.)
+score} is wholly unrelated to normal scores.)
 @end enumerate
 
-A predicate in its simplest form can be a single predicate such as
-@code{true} or @code{false}. These two will download every available
-article or nothing respectively. In the case of these two special
-predicates an additional score rule is superfluous.
-
-Predicates of @code{high} or @code{low} download articles in respect of
-their scores in relationship to @code{gnus-agent-high-score} and
-@code{gnus-agent-low-score} as descibed below.
-
-To gain even finer control of what is to be regarded eligible for
-download a predicate can consist of a number of predicates with logical
-operators sprinkled in between.
+A predicate consists of predicates with logical operators sprinkled in
+between.
 
 Perhaps some examples are in order.
 
@@ -11671,186 +11578,14 @@ to know:  The functions are called with no parameters, but the
 @code{gnus-headers} and @code{gnus-score} dynamic variables are bound to
 useful values.
 
-For example, you could decide that you don't want to download articles
-that were posted more than a certain number of days ago (e.g. posted
-more than @code{gnus-agent-expire-days} ago) you might write a function
-something along the lines of the following:
-
-@lisp
-(defun my-article-old-p ()
-  "Say whether an article is old."
-  (< (time-to-day (date-to-time (mail-header-date gnus-headers)))
-     (- (time-to-day (current-time)) gnus-agent-expire-days)))
-@end lisp
-
-with the predicate then defined as:
-
-@lisp
-(not my-article-old-p)
-@end lisp
-
-or you could append your predicate to the predefined
-@code{gnus-category-predicate-alist} in your @file{~/.gnus.el} or
-wherever.  (Note: this would have to be at a point *after*
-@code{gnus-agent} has been loaded via @code{(gnus-agentize)})   
-
-@lisp
-(defvar  gnus-category-predicate-alist
-  (append gnus-category-predicate-alist
-	 '((old . my-article-old-p))))
-@end lisp
-
-and simply specify your predicate as:
-
-@lisp
-(not old)
-@end lisp
-
-If/when using something like the above, be aware that there are many
-misconfigured systems/mailers out there and so an article's date is not
-always a reliable indication of when it was posted. Hell, some people
-just don't give a damm.
-
-
-The above predicates apply to *all* the groups which belong to the
-category. However, if you wish to have a specific predicate for an
-individual group within a category, or you're just too lazy to set up a
-new category, you can enter a group's individual predicate in it's group 
-parameters like so:
-
-@lisp
-(agent-predicate . short)
-@end lisp
-
-This is the group parameter equivalent of the agent category
-default. Note that when specifying a single word predicate like this,
-the @code{agent-predicate} specification must be in dotted pair
-notation.
-
-The equivalent of the longer example from above would be:
-
-@lisp
-(agent-predicate or high (and (not low) (not long)))
-@end lisp
-
-The outer parenthesis required in the category specification are not
-entered here as, not being in dotted pair notation, the value of the
-predicate is assumed to be a list. 
- 
-
 Now, the syntax of the download score is the same as the syntax of
 normal score files, except that all elements that require actually
 seeing the article itself are verboten.  This means that only the
-following headers can be scored on: @code{Subject}, @code{From},
-@code{Date}, @code{Message-ID}, @code{References}, @code{Chars},
-@code{Lines}, and @code{Xref}.
+following headers can be scored on: @code{From}, @code{Subject},
+@code{Date}, @code{Xref}, @code{Lines}, @code{Chars}, @code{Message-ID},
+and @code{References}.
 
-As with predicates, the specification of the @code{download score rule}
-to use in respect of a group can be in either the category definition if
-it's to be applicable to all groups in therein, or a group's parameters
-if it's to be specific to that group.
 
-In both of these places the @code{download score rule} can take one of
-three forms:
-
-@table @code
-@enumerate
-@item 
-Score rule
-
-This has the same syntax as a normal gnus score file except only a
-subset of scoring keywords are available as mentioned above.
-
-example:
-
-@itemize @bullet
-@item 
-Category specification
-
-@lisp
-(("from"        
-       ("Lars Ingebrigtsen" 1000000 nil s))
-("lines"
-       (500 -100 nil <)))
-@end lisp
-
-@item 
-Group Parameter specification
-
-@lisp
-(agent-score ("from"        
-                   ("Lars Ingebrigtsen" 1000000 nil s))
-             ("lines"
-                   (500 -100 nil <)))
-@end lisp
-
-Again, note the omission of the outermost parenthesis here.
-@end itemize
-
-@item 
-Agent score file
-
-These score files must *only* contain the permitted scoring keywords
-stated above.
-
-example:
-
-@itemize @bullet
-@item 
-Category specification
-
-@lisp
-("~/News/agent.SCORE")
-@end lisp
-
-or perhaps
-
-@lisp
-("~/News/agent.SCORE" "~/News/agent.group.SCORE")
-@end lisp
-
-@item 
-Group Parameter specification
-
-@lisp
-(agent-score "~/News/agent.SCORE")
-@end lisp
-
-Additional score files can be specified as above. Need I say anything
-about parenthesis.
-@end itemize
-
-@item 
-Use @code{normal} score files
-
-If you dont want to maintain two sets of scoring rules for a group, and
-your desired @code{downloading} criteria for a group are the same as your
-@code{reading} criteria then you can tell the agent to refer to your
-@code{normal} score files when deciding what to download.
-
-These directives in either the category definition or a group's
-parameters will cause the agent to read in all the applicable score
-files for a group, *filtering out* those those sections that do not
-relate to one of the permitted subset of scoring keywords.
-
-@itemize @bullet
-@item 
-Category Specification
-
-@lisp
-file
-@end lisp
-
-@item 
-Group Parameter specification
-
-@lisp
-(agent-score . file)
-@end lisp
-@end itemize
-@end enumerate
-@end table
- 
 @node The Category Buffer
 @subsubsection The Category Buffer
 
@@ -12062,16 +11797,16 @@ Agent (@code{gnus-agent-remove-server}).
 @node Agent Expiry
 @subsection Agent Expiry
 
-@vindex gnus-agent-expire-days
-@findex gnus-agent-expire
-@kindex M-x gnus-agent-expire
+@vindex gnus-agent-expiry-days
+@findex gnus-agent-expiry
+@kindex M-x gnus-agent-expiry
 @cindex Agent expiry
 @cindex Gnus Agent expiry
 @cindex expiry
 
 @code{nnagent} doesn't handle expiry.  Instead, there's a special
-@code{gnus-agent-expire} command that will expire all read articles that
-are older than @code{gnus-agent-expire-days} days.  It can be run
+@code{gnus-agent-expiry} command that will expire all read articles that
+are older than @code{gnus-agent-expiry-days} days.  It can be run
 whenever you feel that you're running out of space.  It's not
 particularly fast or efficient, and it's not a particularly good idea to
 interrupt it (with @kbd{C-g} or anything else) once you've started it.
@@ -12489,7 +12224,7 @@ You can do scoring from the command line by saying something like:
 @findex gnus-batch-score
 @cindex batch scoring
 @example
-$ emacs -batch -l ~/.emacs -l ~/.gnus.el -f gnus-batch-score
+$ emacs -batch -l ~/.emacs -l gnus -f gnus-batch-score
 @end example
 
 
@@ -13099,12 +12834,6 @@ it considers numbers to be non-word-constituent characters.
 If @code{gnus-adaptive-word-minimum} is set to a number, the adaptive
 word scoring process will never bring down the score of an article to
 below this number.  The default is @code{nil}.
-
-@vindex gnus-adaptive-word-no-group-words
-If @code{gnus-adaptive-word-no-group-words} is set to @code{t}, gnus
-won't adaptively word score any of the words in the group name.  Useful
-for groups like @samp{comp.editors.emacs}, where most of the subject
-lines contain the word @samp{emacs}.
 
 After using this scheme for a while, it might be nice to write a
 @code{gnus-psychoanalyze-user} command to go through the rules and see
@@ -14305,9 +14034,6 @@ If @code{gnus-use-full-window} non-@code{nil}, Gnus will delete all
 other windows and occupy the entire Emacs screen by itself.  It is
 @code{t} by default.
 
-Setting this variable to @code{nil} kinda works, but there are
-glitches.  Use at your own peril.
-
 @vindex gnus-buffer-configuration
 @code{gnus-buffer-configuration} describes how much space each Gnus
 buffer should be given.  Here's an excerpt of this variable:
@@ -14626,8 +14352,7 @@ Do highlights in the group buffer.
 @item summary-highlight
 Do highlights in the summary buffer.
 @item article-highlight
-Do highlights according to @code{gnus-article-display-hook} in the
-article buffer.
+Do highlights in the article buffer.
 @item highlight
 Turn on highlighting in all buffers.
 @item group-menu
@@ -15929,8 +15654,8 @@ We do have some breaches to this one.
 @table @emph
 
 @item MIME
-Gnus does not yet fully handle MIME, and this standard-to-be seems to
-think that MIME is the bees' knees, so we have major breakage here.
+Gnus does no MIME handling, and this standard-to-be seems to think that
+MIME is the bees' knees, so we have major breakage here.
 
 @item X-Newsreader
 This is considered to be a ``vanity header'', while I consider it to be
@@ -15939,13 +15664,6 @@ coming from @code{tin} and @code{Netscape} I know not to use either of
 those for posting articles.  I would not have known that if it wasn't
 for the @code{X-Newsreader} header.
 @end table
-
-@item USEFOR
-@cindex USEFOR
-USEFOR is an IETF working group writing a successor to RFC 1036, based
-on Son-of-RFC 1036.  They have produced a number of drafts proposing
-various changes to the format of news articles.  The Gnus towers will
-look into implementing the changes when the draft is accepted as an RFC.
 
 @end table
 
@@ -15966,10 +15684,13 @@ Gnus should work on :
 @itemize @bullet
 
 @item
-Emacs 20.2 and up.
+Emacs 19.32 and up.
 
 @item
-XEmacs 20.4 and up.
+XEmacs 19.14 and up.
+
+@item
+Mule versions based on Emacs 19.32 and up.
 
 @end itemize
 
@@ -16131,7 +15852,6 @@ Luc Van Eycken,
 Sam Falkner,
 Nelson Jose dos Santos Ferreira,
 Sigbjorn Finne,
-Paul Fisher,
 Decklin Foster,
 Gary D. Foster,
 Paul Franklin,
@@ -16216,7 +15936,6 @@ Jason Rumney,
 Wolfgang Rupprecht,
 Jay Sachs,
 Dewey M. Sasser,
-Conrad Sauerwald,
 Loren Schall,
 Dan Schmidt,
 Ralph Schleicher,
@@ -18138,16 +17857,6 @@ Introduce nnmail-home-directory.
 @item
 gnus-fetch-group and friends should exit Gnus when the user
 exits the group.
-
-@item
-The jingle is only played on the second invocation of Gnus.
-
-@item
-gnus-ignored-mime-types to avoid seeing buttons for Vcards and the
-like.
-
-@item
-Bouncing articles should do MIME.
 
 @item
 Solve the halting problem.

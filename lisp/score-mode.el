@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'easymenu)
+(require 'timezone)
 (eval-when-compile (require 'cl))
 
 (defvar gnus-score-mode-hook nil
@@ -49,8 +50,6 @@
     (modify-syntax-entry ?| "w" table)
     table)
   "Syntax table used in score-mode buffers.")
-
-(defvar score-mode-coding-system 'binary)
 
 ;;;###autoload
 (defun gnus-score-mode ()
@@ -82,7 +81,7 @@ This mode is an extended emacs-lisp mode.
 (defun gnus-score-edit-insert-date ()
   "Insert date in numerical format."
   (interactive)
-  (princ (time-to-days (current-time)) (current-buffer)))
+  (princ (gnus-score-day-number (current-time)) (current-buffer)))
 
 (defun gnus-score-pretty-print ()
   "Format the current score file."
@@ -99,14 +98,18 @@ This mode is an extended emacs-lisp mode.
   (interactive)
   (unless (file-exists-p (file-name-directory (buffer-file-name)))
     (make-directory (file-name-directory (buffer-file-name)) t))
-  (let ((coding-system-for-write score-mode-coding-system))
-    (save-buffer))
+  (save-buffer)
   (bury-buffer (current-buffer))
   (let ((buf (current-buffer)))
     (when gnus-score-edit-exit-function
       (funcall gnus-score-edit-exit-function))
     (when (eq buf (current-buffer))
       (switch-to-buffer (other-buffer (current-buffer))))))
+
+(defun gnus-score-day-number (time)
+  (let ((dat (decode-time time)))
+    (timezone-absolute-from-gregorian
+     (nth 4 dat) (nth 3 dat) (nth 5 dat))))
 
 (provide 'score-mode)
 

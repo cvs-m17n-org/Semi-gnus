@@ -80,6 +80,7 @@
     (let* ((buf (get-buffer-create " *draft headers*"))
 	   article)
       (set-buffer buf)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       ;; We don't support fetching by Message-ID.
       (if (stringp (car articles))
@@ -153,7 +154,7 @@
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
 	 article file)
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert-buffer buf)
       (setq article (nndraft-request-accept-article
 		     group (nnoo-current-server 'nndraft) t 'noinsert))

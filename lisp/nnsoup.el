@@ -376,7 +376,7 @@ backend for the messages.")
 	     (or force
 		 nnsoup-group-alist-touched))
     (setq nnsoup-group-alist-touched nil)
-    (with-temp-file nnsoup-active-file
+    (nnheader-temp-write nnsoup-active-file
       (gnus-prin1 `(setq nnsoup-group-alist ',nnsoup-group-alist))
       (insert "\n")
       (gnus-prin1 `(setq nnsoup-current-prefix ,nnsoup-current-prefix))
@@ -530,7 +530,7 @@ backend for the messages.")
 	(when (file-exists-p (concat nnsoup-directory file))
 	  (save-excursion		; Load the file.
 	    (set-buffer (get-buffer-create buffer-name))
-	    (buffer-disable-undo)
+	    (buffer-disable-undo (current-buffer))
 	    (push (cons nnsoup-current-group (current-buffer)) nnsoup-buffers)
 	    (nnheader-insert-file-contents (concat nnsoup-directory file))
 	    (current-buffer))))))
@@ -752,6 +752,7 @@ backend for the messages.")
 				 (string-to-int (match-string 1 f2)))))))
 	active group lines ident elem min)
     (set-buffer (get-buffer-create " *nnsoup work*"))
+    (buffer-disable-undo (current-buffer))
     (while files
       (nnheader-message 5 "Doing %s..." (car files))
       (erase-buffer)

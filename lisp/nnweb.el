@@ -34,17 +34,11 @@
 (require 'message)
 (require 'gnus-util)
 (require 'gnus)
+(require 'w3)
+(require 'url)
 (require 'nnmail)
-(eval-when-compile
-  (ignore-errors
-    (require 'w3)
-    (require 'url)
-    (require 'w3-forms)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(progn
-	 (require 'w3)
-	 (require 'url)
-	 (require 'w3-forms)))
+(ignore-errors
+  (require 'w3-forms))
 
 (nnoo-declare nnweb)
 
@@ -225,7 +219,7 @@ and `altavista'.")
 (defun nnweb-read-overview (group)
   "Read the overview of GROUP and build the map."
   (when (file-exists-p (nnweb-overview-file group))
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (nnheader-insert-file-contents (nnweb-overview-file group))
       (goto-char (point-min))
       (let (header)
@@ -239,7 +233,7 @@ and `altavista'.")
 
 (defun nnweb-write-overview (group)
   "Write the overview file for GROUP."
-  (with-temp-file (nnweb-overview-file group)
+  (nnheader-temp-write (nnweb-overview-file group)
     (let ((articles nnweb-articles))
       (while articles
 	(nnheader-insert-nov (cadr (pop articles)))))))
@@ -260,7 +254,7 @@ and `altavista'.")
 
 (defun nnweb-write-active ()
   "Save the active file."
-  (with-temp-file (nnheader-concat nnweb-directory "active")
+  (nnheader-temp-write (nnheader-concat nnweb-directory "active")
     (prin1 `(setq nnweb-group-alist ',nnweb-group-alist) (current-buffer))))
 
 (defun nnweb-read-active ()
