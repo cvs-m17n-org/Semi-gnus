@@ -1,3 +1,30 @@
+2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Clean up codes.
+	(nnshimbun-buffer, nnshimbun-current-directory)
+	(nnshimbun-current-group, nnshimbun-server-directory): Removed.
+	(nnshimbun-current-server, nnshimbun-server-directory)
+	(nnshimbun-current-group, nnshimbun-current-directory): New macros.
+	(nnshimbun-backlog, nnshimbun-find-parameter): Use
+	`nnshimbun-current-server'.
+	(nnshimbun-possibly-change-group, nnshimbun-open-server):
+	Reimplemented.
+	(nnshimbun-close-server): Do not kill `nnshimbun-buffer'.
+	(nnshimbun-request-article-1, nnshimbun-request-list): Use
+	`erase-buffer' instead of `delete-region'.
+	(nnshimbun-request-article): Use `nnshimbun-current-group'.
+	(nnshimbun-request-group): Remove redundant checks.
+	(nnshimbun-request-scan): Check arguments strictly.
+	(nnshimbun-retrieve-headers, nnshimbun-retrieve-headers-with-nov):
+	Reimplemented.
+	(nnshimbun-generate-nov-database, nnshimbun-search-id)
+	(nnshimbun-write-nov, nnshimbun-request-expire-articles):
+	Simplified.
+	(nnshimbun-nov-buffer-name, nnshimbun-nov-file-name): Make the
+	first argument optional.
+	(nnshimbun-open-nov): Bind variables to set coding systems for
+	path names.
+
 2002-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
