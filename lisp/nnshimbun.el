@@ -158,12 +158,6 @@
   (nnoo-close-server 'nnshimbun server)
   t)
 
-(defsubst nnshimbun-header-xref (x)
-  (if (and (setq x (mail-header-xref x))
-	   (string-match "^Xref: " x))
-      (substring x 6)
-    x))
-
 (eval-and-compile
   (let ((Gnus-p
 	 (eval-when-compile
@@ -195,53 +189,32 @@
    (mail-header-references header)
    (mail-header-chars header)
    (mail-header-lines header)
-   (nnshimbun-header-xref header)))
-
-(defsubst nnshimbun-check-header (group header)
-  (let (flag)
-    ;; Check message-id.
-    (let ((id (std11-field-body "message-id")))
-      (when (and id (not (string= id (mail-header-id header))))
-	(let ((extra (mail-header-extra header)))
-	  (unless (assq 'X-Nnshimbun-Id extra)
-	    (push (cons 'X-Nnshimbun-Id (mail-header-id header)) extra)
-	    (mail-header-set-extra header extra)))
-	(mail-header-set-id header id)
-	(setq flag t)))
-    ;; Check references.
-    (when (string= "" (mail-header-references header))
-      (let ((refs (std11-field-body "references")))
-	(when refs
-	  (mail-header-set-references header (std11-unfold-string refs))))
-      (setq flag t))
-    (when flag
-      ;; Replace header.
-      (with-current-buffer (nnshimbun-open-nov group)
-	(when (nnheader-find-nov-line (mail-header-number header))
-	  (mail-header-set-xref header (nnshimbun-header-xref header))
-	  (delete-region (point) (progn (forward-line 1) (point)))
-	  (nnheader-insert-nov header))))))
+   (let ((xref (mail-header-xref header)))
+     (if (and xref (string-match "^Xref: " xref))
+	 (substring xref 6)
+       xref))))
 
 (defun nnshimbun-request-article-1 (article &optional group server to-buffer)
   (if (nnshimbun-backlog
 	(gnus-backlog-request-article
 	 group article (or to-buffer nntp-server-buffer)))
       (cons group article)
-    (let ((header (with-current-buffer (nnshimbun-open-nov group)
-		    (and (nnheader-find-nov-line article)
-			 (nnheader-parse-nov)))))
+    (let* ((header (with-current-buffer (nnshimbun-open-nov group)
+		     (and (nnheader-find-nov-line article)
+			  (nnshimbun-make-shimbun-header
+			   (nnheader-parse-nov)))))
+	   (original-id (shimbun-header-id header)))
       (when header
 	(with-current-buffer (or to-buffer nntp-server-buffer)
 	  (delete-region (point-min) (point-max))
-	  (shimbun-article nnshimbun-shimbun
-			   (nnshimbun-make-shimbun-header header))
+	  (shimbun-article nnshimbun-shimbun header)
 	  (when (> (buffer-size) 0)
-	    (nnshimbun-check-header group header)
+	    (nnshimbun-replace-nov-entry group article header original-id)
 	    (nnshimbun-backlog
 	      (gnus-backlog-enter-article group article (current-buffer)))
 	    (nnheader-report 'nnshimbun "Article %s retrieved"
-			     (mail-header-id header))
-	    (cons group (mail-header-number header))))))))
+			     (shimbun-header-id header))
+	    (cons group article)))))))
 
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)
@@ -269,8 +242,7 @@
       t)
      (t
       (let (beg end lines)
-	(save-excursion
-	  (set-buffer (nnshimbun-open-nov group))
+	(with-current-buffer (nnshimbun-open-nov group)
 	  (goto-char (point-min))
 	  (setq beg (ignore-errors (read (current-buffer))))
 	  (goto-char (point-max))
@@ -348,29 +320,54 @@
 
 ;;; Nov Database Operations
 
+(defsubst nnshimbun-insert-nov (number header &optional id)
+  (unless (and (stringp id)
+	       (not (string= id (shimbun-header-id header))))
+    (setq id nil))
+  (princ number (current-buffer))
+  (let ((p (point)))
+    (insert
+     "\t"
+     (or (shimbun-header-subject header) "(none)") "\t"
+     (or (shimbun-header-from header) "(nobody)") "\t"
+     (or (shimbun-header-date header) "") "\t"
+     (or (shimbun-header-id header) (nnmail-message-id)) "\t"
+     (or (shimbun-header-references header) "") "\t")
+    (princ (or (shimbun-header-chars header) 0) (current-buffer))
+    (insert "\t")
+    (princ (or (shimbun-header-lines header) 0) (current-buffer))
+    (insert "\t")
+    (when (shimbun-header-xref header)
+      (insert "Xref: " (shimbun-header-xref header)))
+    (when (or (shimbun-header-xref header) id)
+      (insert "\t"))
+    (when id
+      (insert "X-Nnshimbun-Id: " id "\t"))
+    (insert "\n")
+    (backward-char 1)
+    (while (search-backward "\n" p t)
+      (delete-char 1))
+    (forward-line 1)))
+
 (defun nnshimbun-generate-nov-database (group)
   (nnshimbun-possibly-change-group group)
-  (let (i)
   (with-current-buffer (nnshimbun-open-nov group)
     (goto-char (point-max))
     (forward-line -1)
-    (setq i (or (ignore-errors (read (current-buffer))) 0))
-    (dolist (header (shimbun-headers nnshimbun-shimbun))
-      (unless (nnshimbun-search-id group (shimbun-header-id header))
-	(goto-char (point-max))
-	(nnheader-insert-nov
-	 (make-full-mail-header (setq i (1+ i))
-				(shimbun-header-subject header)
-				(shimbun-header-from header)
-				(shimbun-header-date header)
-				(shimbun-header-id header)
-				(shimbun-header-references header)
-				(shimbun-header-chars header)
-				(shimbun-header-lines header)
-				(shimbun-header-xref header)))
-	(if nnshimbun-pre-fetch-article
+    (let ((i (or (ignore-errors (read (current-buffer))) 0)))
+      (dolist (header (shimbun-headers nnshimbun-shimbun))
+	(unless (nnshimbun-search-id group (shimbun-header-id header))
+	  (goto-char (point-max))
+	  (nnshimbun-insert-nov (setq i (1+ i)) header)
+	  (when nnshimbun-pre-fetch-article
 	    (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))
   (nnshimbun-write-nov group)))
+
+(defun nnshimbun-replace-nov-entry (group article header &optional id)
+  (with-current-buffer (nnshimbun-open-nov group)
+    (when (nnheader-find-nov-line article)
+      (delete-region (point) (progn (forward-line 1) (point)))
+      (nnshimbun-insert-nov article header id))))
 
 (defun nnshimbun-search-id (group id &optional nov)
   (with-current-buffer (nnshimbun-open-nov group)

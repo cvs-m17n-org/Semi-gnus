@@ -1,3 +1,17 @@
+2001-05-31  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-header-xref): Removed.
+	(nnshimbun-check-header): Removed.
+	(nnshimbun-make-shimbun-header): Don't call
+	`nnshimbun-header-xref'.
+	(nnshimbun-request-group): Simplified.
+	(nnshimbun-request-article-1): Call `nnshimbun-replace-nov-entry'
+	instead of `nnshimbun-check-header'.
+	(nnshimbun-insert-nov): New function.
+	(nnshimbun-generate-nov-database): Call `nnshimbun-insert-nov'
+	instead of `nnheader-insert-nov'.
+	(nnshimbun-replace-nov-entry): New function.
+
 2001-05-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): Add a parser for
