@@ -64,9 +64,9 @@ the user confirms the creation."
 	  (when (setq from (mail-fetch-field "from"))
 	    (setq from (gnus-bbdb/extract-address-components
 			(gnus-bbdb/decode-field-body from 'From))))
-	  (when (or (null from)
-		    (string-match (bbdb-user-mail-names)
-				  (car (cdr from))))
+	  (when (and (car (cdr from))
+		     (string-match (bbdb-user-mail-names)
+				   (car (cdr from))))
 	    ;; if logged-in user sent this, use recipients.
 	    (let ((to (mail-fetch-field "to")))
 	      (when to
@@ -483,7 +483,8 @@ beginning of the message headers."
             methods (cdr methods)))
     (if (string= address "") (setq address nil))
     (if (string= phrase "") (setq phrase nil))
-    (list phrase address)
+    (when (or phrase address)
+      (list phrase address))
     ))
 
 ;;; @ full-name canonicalization methods
