@@ -415,7 +415,7 @@ For example:
 (defcustom gnus-group-name-charset-group-alist
   (if (or (and (fboundp 'find-coding-system) (find-coding-system 'utf-8))
 	  (and (fboundp 'coding-system-p) (coding-system-p 'utf-8)))
-      '((".*" . utf-8))
+      '(("[^\000-\177]" . utf-8))
     nil)
   "Alist of group regexp and the charset for group names.
 
@@ -1065,20 +1065,14 @@ The following commands are available:
 (defun gnus-group-completing-read-group-name
   (prompt table &optional predicate require-match initial-contents history)
   (if (vectorp table)
-      (let ((decoded-table (make-vector (length table) 0)))
-	(mapatoms
-	 (lambda (atom)
-	   (set (intern (gnus-group-decoded-name (symbol-name atom))
-			decoded-table)
-		(symbol-value atom)))
-	 table)
-	(setq table decoded-table))
-    (setq table (mapcar
-		 (lambda (entry)
-		   (cons (gnus-group-decoded-name
-			  (car entry))
-			 (cdr entry)))
-		 table)))
+      (dolist (group (prog1
+			 (delq 0 (append table nil))
+		       (setq table nil)))
+	(push (list (gnus-group-decoded-name (symbol-name group))) table))
+    (dolist (entry (prog1
+		       table
+		     (setq table nil)))
+      (push (list (gnus-group-decoded-name (car entry))) table)))
   (gnus-group-encoded-name
    (completing-read
     prompt table predicate
