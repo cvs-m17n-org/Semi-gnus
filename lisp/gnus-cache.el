@@ -1,7 +1,8 @@
-;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
+;;; gnus-cache.el --- cache interface for Chaos
+;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
