@@ -20863,7 +20863,8 @@ gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 @vindex uncompface-use-external-threshold
 $B%[%9%H%^%7%s$,CY$$$+$I$&$+$r8!::$9$k$?$a$NIC?t$G$9!#(BELisp $B$G=q$+$l$?Fb(B
 $BIt(B @code{uncompface} $B%W%m%0%i%`$r;H$C$F(B @code{X-Face} $B$r%G%3!<%I$9$k$N$K(B
-$B$+$+$k;~4V$,$3$NCM$h$jBg$-$$>l9g$O!"30It%G%3!<%@$N;HMQ$KJQ99$5$l$^$9!#(B
+$B$+$+$k;~4V$,$3$NCM$h$jBg$-$$>l9g$O!"30It%G%3!<%@$N;HMQ$KJQ99$5$l$^$9!#%G%#(B
+$B%U%)%k%H$O(B 0.1 $BIC$G$9!#(B
 @end table
 
 $BFbIt%G%3!<%@$,L58z$K$5$l$k>l9g!"$"$k$$$O(B XEmacs $B$r;H$C$F$$$k>l9g$O!"(B
@@ -20893,6 +20894,41 @@ GNU/Linux $B%7%9%F%`$G$O(B @code{netpbm}$B!"(B@code{libgr-progs} $B$^$?(B
 $B$O(B @code{compface} $B$N$h$&$JL>A0$N%Q%C%1!<%8$rC5$7$F2<$5$$!#(B}$B!#(B)
 
 ($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
+
+$B%U%'!<%9$HJQ?t(B:
+
+@table @code
+@item gnus-x-face
+@vindex gnus-x-face
+X-Face $B$rI=<($9$k$?$a$N%U%'!<%9!#$3$N%U%'!<%9$N?'$,I=<($5$l$k(B X-Face $B$N(B
+$BA07J?'$HGX7J?'$H$7$F;H$o$l$^$9!#%G%#%U%)%k%H$N?'$OGr$H9u$G$9!#(B
+
+@item gnus-face-properties-alist
+@vindex gnus-face-properties-alist
+Face (@pxref{Face}) $B$H(B X-Face $B2hA|$KE,MQ$5$l$k!"2hA|$N7A<0$H%W%m%Q%F%#$N(B
+$BO"A[%j%9%H$G$9!#%G%#%U%)%k%HCM$O(B Emacs $BMQ$N(B @code{((pbm . (:face
+gnus-x-face)) (png . nil))} $B$^$?$O(B XEmacs $BMQ$N(B @code{((xface . (:face
+gnus-x-face)))} $B$G$9!#Nc$r5s$2$^$7$g$&(B:
+
+@lisp
+;; From $B%X%C%@!<$K$*$1$k(B Face $B$H(B X-Face $B$N9b$5$r;XDj$7$^$9!#(B
+(setq gnus-face-properties-alist
+      '((pbm . (:face gnus-x-face :ascent 80))
+        (png . (:ascent 80))))
+
+;; Face $B$H(B X-Face $B$r1z$s$@%\%?%s$N$h$&$KI=<($7$^$9!#(B
+(setq gnus-face-properties-alist
+      '((pbm . (:face gnus-x-face :relief -2))
+        (png . (:relief -2))))
+@end lisp
+
+$B$$$m$$$m$J2hA|$N7A<0$GMxMQ2DG=$J%W%m%Q%F%#$K$D$$$F$O(B @pxref{Image
+Descriptors, ,Image Descriptors, elisp, The Emacs Lisp Reference
+Manual} $B$r;2>H$7$F2<$5$$!#:#$N$H$3$m(B Emacs $B$G$O(B @code{pbm} $B$,(B X-Face $B2h(B
+$BA|$K;H$o$l!"(B @code{png} $B$,(B Face $B2hA|$K;H$o$l$^$9!#(BXEmacs $B$G$O!"$=$l(B
+$B$,(B @samp{libcompface} $B%i%$%V%i%j$H$H$b$K9=C[$5$l$F$$$l$P!"(B
+@code{xface} $B2hA|7A<0$K(B @code{:face} $B%W%m%Q%F%#$@$1$,8z2L$r5Z$\$7$^$9!#(B
+@end table
 
 gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX(B
 $BMx$J4X?t$HJQ?t$r>/$7$P$+$jDs6!$7$^$9!#(B
@@ -20950,6 +20986,9 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 @code{Face} $B%X%C%@!<$NFbMF$O!"(Bbase64 $B$G%(%s%3!<%I$5$l$?(B PNG $B$N2hA|$G$J$1(B
 $B$l$P$J$j$^$;$s!#@53N$J;EMM$K$D$$$F!"(B
 @uref{http://quimby.gnus.org/circus/face/} $B$r;2>H$7$F2<$5$$!#(B
+
+$BJQ?t(B @code{gnus-face-properties-alist} $B$OI=<($5$l$k(B Face $B2hA|$N304Q$K1F(B
+$B6A$7$^$9!#(B@xref{X-Face}.
 
 $BAw?.$9$k%a%C%;!<%8$K4JC1$K(B Face $B%X%C%@!<$rA^F~$G$-$k$h$&$K$9$k$?$a$K!"(B
 Gnus $B$O(B 2$B!A(B3 $B$N4X?t$HJQ?t$rDs6!$7$^$9!#(B
