@@ -1648,8 +1648,7 @@ Use with caution.")
    ("\\(^\\|:\\)han\\>" euc-kr)
    ("\\(^\\|:\\)alt.chinese.text.big5\\>" chinese-big5)
    ("\\(^\\|:\\)soc.culture.vietnamese\\>" vietnamese-viqr)
-   ("\\(^\\|:\\)\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
-   (".*" iso-8859-1))
+   ("\\(^\\|:\\)\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1))
  :variable-document
  "Alist of regexps (to match group names) and default charsets to be used when reading."
  :variable-group gnus-charset
@@ -1809,7 +1808,7 @@ face."
   :group 'gnus-agent
   :type 'boolean)
 
-(defcustom gnus-default-charset 'iso-8859-1
+(defcustom gnus-default-charset (mm-guess-mime-charset)
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
 gnus-group-charset-alist variable and is only used on groups not
@@ -2191,6 +2190,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-display-x-face
       gnus-article-decode-HZ
       gnus-article-wash-html
+      gnus-article-unsplit-urls
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local

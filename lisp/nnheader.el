@@ -158,13 +158,75 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters mc-flag)
+  `(let (default-enable-multibyte-characters default-mc-flag)
      (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
   (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
-  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer))
+  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
+
+  ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
+  (defmacro nnheader-with-unibyte-current-buffer (&rest forms)
+    "Evaluate FORMS with current current buffer temporarily made unibyte.
+Also bind `default-enable-multibyte-characters' to nil.
+Equivalent to `progn' in XEmacs"
+    (let ((multibyte (make-symbol "multibyte"))
+	  (buffer (make-symbol "buffer")))
+      (cond ((featurep 'xemacs)
+	     `(let (default-enable-multibyte-characters)
+		,@forms))
+	    ((boundp 'MULE)
+	     `(let ((,multibyte mc-flag)
+		    (,buffer (current-buffer)))
+		(unwind-protect
+		    (let (default-enable-multibyte-characters default-mc-flag)
+		      (setq mc-flag nil)
+		      ,@forms)
+		  (set-buffer ,buffer)
+		  (setq mc-flag ,multibyte))))
+	    (t
+	     `(let ((,multibyte enable-multibyte-characters)
+		    (,buffer (current-buffer)))
+		(unwind-protect
+		    (let (default-enable-multibyte-characters)
+		      (set-buffer-multibyte nil)
+		      ,@forms)
+		  (set-buffer ,buffer)
+		  (set-buffer-multibyte ,multibyte)))))))
+  (put 'nnheader-with-unibyte-current-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte-current-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
+  (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte-current-buffer
+    'nnheader-with-unibyte-current-buffer)
+
+  ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
+  (defun nnheader-guess-mime-charset ()
+  "Guess the default MIME charset from the language environment."
+  (let ((language-info
+	 (and (boundp 'current-language-environment)
+	      (assoc current-language-environment
+		     language-info-alist)))
+	item)
+    (cond
+     ((null language-info)
+      'iso-8859-1)
+     ((setq item
+	    (cadr
+	     (or (assq 'coding-priority language-info)
+		 (assq 'coding-system language-info))))
+      (if (fboundp 'coding-system-get)
+	  (or (coding-system-get item 'mime-charset)
+	      item)
+	item))
+     ((setq item (car (last (assq 'charset language-info))))
+      (if (eq item 'ascii)
+	  'iso-8859-1
+	 (charsets-to-mime-charset (list item))))
+     (t
+      'iso-8859-1))))
+  (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
@@ -1459,6 +1521,13 @@ find-file-hooks, etc.
 	  nil)
       (message "%s(Y/n) Yes" prompt)
       t)))
+
+(defun-maybe shell-command-to-string (command)
+  "Execute shell command COMMAND and return its output as a string."
+  (with-output-to-string
+    (with-current-buffer
+	standard-output
+      (call-process shell-file-name nil t nil shell-command-switch command))))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

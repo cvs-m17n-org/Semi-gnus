@@ -908,6 +908,13 @@ See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
+(defcustom gnus-treat-unsplit-urls nil
+  "Remove newlines from within URLs.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' for details."
+  :group 'gnus-article-treat
+  :type gnus-article-treat-custom)
+
 (defcustom gnus-treat-leading-whitespace nil
   "Remove leading whitespace in headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -1155,6 +1162,16 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
   "Internal variable used to say whether `smiley-mule' is loaded (whether
 smiley functions are not overridden by `smiley').")
 
+(defcustom gnus-treat-display-grey-xface
+  (and (string-match "^0x" (shell-command-to-string "uncompface"))
+       t)
+  "Display grey X-Face headers.
+Valid values are nil, t."
+  :group 'gnus-article-treat
+  :version "21.3"
+  :type 'boolean)
+(put 'gnus-treat-display-grey-xface 'highlight t)
+
 (defcustom gnus-treat-display-smileys
   (if (or (and (featurep 'xemacs)
 	       (featurep 'xpm))
@@ -1315,6 +1332,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-fill-article gnus-article-fill-cited-article)
     (gnus-treat-fill-long-lines gnus-article-fill-long-lines)
     (gnus-treat-strip-cr gnus-article-remove-cr)
+    (gnus-treat-unsplit-urls gnus-article-unsplit-urls)
     (gnus-treat-date-ut gnus-article-date-ut)
     (gnus-treat-date-local gnus-article-date-local)
     (gnus-treat-date-english gnus-article-date-english)
@@ -2039,10 +2057,14 @@ unfolded."
 	      (set-buffer gnus-original-article-buffer))
 	    (save-restriction
 	      (mail-narrow-to-head)
-	      (while (gnus-article-goto-header "x-face\\(-[0-9]+\\)?")
-		(when (match-beginning 2)
-		  (setq grey t))
-		(push (mail-header-field-value) x-faces))
+	      (let ((regexp
+		     (if gnus-treat-display-grey-xface
+			 "x-face\\(-[0-9]+\\)?"
+		       "x-face")))
+		(while (gnus-article-goto-header regexp)
+		  (when (match-beginning 2)
+		    (setq grey t))
+		  (push (mail-header-field-value) x-faces)))
 	      (setq from (message-fetch-field "from"))))
 	  (if grey
 	      (let ((xpm (gnus-convert-gray-x-face-to-xpm x-faces))
@@ -2251,6 +2273,16 @@ If READ-CHARSET, ask for a coding system."
   (save-excursion
     (let ((buffer-read-only nil))
       (rfc1843-decode-region (point-min) (point-max)))))
+
+(defun article-unsplit-urls ()
+  "Remove the newlines that some other mailers insert into URLs."
+  (interactive)
+  (save-excursion
+    (let ((buffer-read-only nil))
+      (goto-char (point-min))
+      (while (re-search-forward
+	      "^\\(\\(https?\\|ftp\\)://\\S-+\\)\n\\(\\S-+\\)" nil t)
+	(replace-match "\\1\\3" t)))))
 
 (defun article-wash-html (&optional read-charset)
   "Format an html article.
@@ -3422,6 +3454,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-de-base64-unreadable
      article-decode-HZ
      article-wash-html
+     article-unsplit-urls
      article-hide-list-identifiers
      article-hide-pgp
      article-strip-banner
@@ -3527,6 +3560,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Remove carriage return" gnus-article-remove-cr t]
        ["Remove leading whitespace" gnus-article-remove-leading-whitespace t]
        ["Treat html" gnus-article-wash-html t]
+       ["Remove newlines from within URLs" gnus-article-unsplit-urls t]
        ["Decode HZ" gnus-article-decode-HZ t]))
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency

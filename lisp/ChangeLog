@@ -1,3 +1,39 @@
+2002-02-09  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-soup.el (gnus-soup-send-packet): Send news and mail
+	directly instead of calling message-send-mail.
+
+	* gnus-start.el (gnus-read-descriptions-file): Use
+	gnus-default-charset.
+
+	* mm-util.el (mm-guess-mime-charset): New function.
+
+	* gnus.el (gnus-default-charset): Use it.
+	(gnus-group-charset-alist): Remove .*, Let gnus-default-charset be
+	the default.
+
+2002-02-08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-treat-display-grey-xface): New variable.
+	(article-display-x-face): Use it.  Disable grey xface, if
+	uncompface is not found.
+
+	* message.el (message-mode): Don't enable multibyte on an indirect
+	buffer.
+
+	* nnrss.el (nnrss-content-function): New variable.
+	(nnrss-request-article): Use it.
+
+2002-02-08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	
+	* gnus.el: Add article-unsplit-urls.
+	* gnus-sum.el: Ditto.
+	* gnus-art.el (gnus-treat-strip-cr): New variable.
+	(gnus-treatment-function-alist): Use it.
+	(article-unsplit-urls): New function.
+	(gnus-article-make-menu-bar): Use it.
+	From: Michael Cook <michael.cook@cisco.com>
+
 2002-02-08  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-agent.el (gnus-agent-braid-nov): Find the first article to

@@ -1,3 +1,18 @@
+2002-02-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/mm-view.el: Require `gnus-mailcap' rather than `mailcap'.
+
+	* lisp/nnheader.el (mm-with-unibyte-buffer): Bind `default-mc-flag'
+	instead of `mc-flag'.
+	(nnheader-with-unibyte-current-buffer): New macro.
+	(mm-with-unibyte-current-buffer): Alias to
+	`nnheader-with-unibyte-current-buffer'.
+	(nnheader-guess-mime-charset): New macro.
+	(mm-guess-mime-charset): Alias to `nnheader-guess-mime-charset'.
+	(shell-command-to-string): New function for old Emacsen.
+
+	* lisp/lpath.el: Don't fbind `shell-command-to-string'.
+
 2002-02-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/group-alist): Abolished.

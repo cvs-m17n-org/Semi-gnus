@@ -2999,6 +2999,15 @@ Sieve}$B!#(B
 @code{gnus-show-threads} $B$O!"$=$N35N,%P%C%U%!$NCf$N%m!<%+%kJQ?t$K$J$j!"(B
 form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 
+@vindex gnus-list-identifiers
+$B$3$N5!G=$NMQES$N0l$D$O!"5-;v$NBjL>Ms$+$i%a!<%j%s%0%j%9%H$NI8<1%?%0$r$O$.(B
+$B<h$k$3$H$G$9!#$b$7%K%e!<%9%0%k!<(B
+$B%W(B @samp{nntp+news.gnus.org:gmane.text.docbook.apps} $B$,!"$9$Y$F$N5-;v$N(B
+$BBjL>$K(B @samp{DOC-BOOK-APPS:} $B$H$$$&%?%0$r;}$C$F$$$k$J$i$P!"$=$N%0%k!<%W(B
+$B$N%0%k!<%W%Q%i%a!<%?$K(B @code{(gnus-list-identifiers "DOCBOOK-APPS:")} $B$r(B
+$BF~$l$k$3$H$K$h$C$F!"$=$N%0%k!<%W$N35N,%P%C%U%!$KI=<($5$l$k5-;v$NBjL>$+$i(B
+$B%?%0$r$O$.<h$k$3$H$,$G$-$^$9!#(B
+
 $B$3$l$O$b$7I,MW$G$"$l$P!"%0%k!<%WKh$N%U%C%/4X?t$H$7$F$b;HMQ$G$-$^$9!#$b$7(B
 $B$"$k%0%k!<%W$KF~$C$?$H$-$K%S!<%W2;$rLD$i$7$?$1$l$P!"$=$N%0%k!<%W$N%Q%i%a!<(B
 $B%?$K(B @code{(dummy-variable (ding))} $B$_$?$$$J$b$N$r=q$$$F$*$/$3$H$b$G$-$^(B
@@ -7981,6 +7990,14 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 $B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $B$N(B
 $B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
 
+@item W u
+@kindex W u (Summary)
+@findex gnus-article-unsplit-urls
+URL $B$K4^$^$l$k2~9T$r:o=|$7$^$9!#$$$/$D$+$N%a%$%i!<$O!"9T$rC;$/$9$k$?$a$K(B
+$B=P$F$$$/%a!<%k$K2~9T$rA^F~$7$^$9$,!"$3$l$OD9$$(B URL $B$rJ#?t$N9T$KJ,3d$7$F(B
+$B$7$^$$$^$9!#2~9T$r:o=|$9$k$3$H$K$h$C$F!"$=$l$i$N(B URL $B$rI|5l$5$;$^(B
+$B$9(B (@code{gnus-article-unsplit-urls})$B!#(B
+
 @item W h
 @kindex W h ($B35N,(B)
 @findex gnus-article-wash-html
@@ -9771,6 +9788,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-strip-pem (t, last, integer)
 @item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
+@item gnus-treat-unsplit-urls (t, integer)
 
 @xref{Article Washing}.
 

@@ -2874,7 +2874,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 		     (name (symbol-name group))
 		     (charset
 		      (or (gnus-group-name-charset method name)
-			  (gnus-parameter-charset name))))
+			  (gnus-parameter-charset name)
+			  gnus-default-charset)))
 		(when (and str charset (featurep 'mule))
 		  (setq str (decode-coding-string str charset)))
 		(set group str)))

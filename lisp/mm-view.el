@@ -25,7 +25,7 @@
 
 (eval-when-compile (require 'cl))
 (require 'mail-parse)
-(require 'mailcap)
+(require 'gnus-mailcap)
 (require 'mm-bodies)
 (require 'mm-decode)
 

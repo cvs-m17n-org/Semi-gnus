@@ -2908,6 +2908,16 @@ that group.  @code{gnus-show-threads} will be made into a local variable
 in the summary buffer you enter, and the form @code{nil} will be
 @code{eval}ed there.
 
+@vindex gnus-list-identifiers
+A use for this feature, is to remove a mailing list identifier tag in
+the subject fields of articles.   E.g. if the news group
+@samp{nntp+news.gnus.org:gmane.text.docbook.apps} has the tag
+@samp{DOC-BOOK-APPS:} in the subject of all articles, this tag can be
+removed from the article subjects in the summary buffer for the group by
+putting @code{(gnus-list-identifiers "DOCBOOK-APPS:")} into the group
+parameters for the group.
+
+
 This can also be used as a group-specific hook function, if you'd like.
 If you want to hear a beep when you enter a group, you could put
 something like @code{(dummy-variable (ding))} in the parameters of that
@@ -8117,6 +8127,14 @@ Treat HZ or HZP (@code{gnus-article-decode-HZ}).  HZ (or HZP) is one
 common encoding employed when sending Chinese articles.  It typically
 makes strings look like @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}}.
 
+@item W u
+@kindex W u (Summary)
+@findex gnus-article-unsplit-urls
+Remove newlines from within URLs.  Some mailers insert newlines into
+outgoing email messages to keep lines short.  This reformatting can
+split long URLs onto multiple lines.  Repair those URLs by removing
+the newlines (@code{gnus-article-unsplit-urls}).
+
 @item W h
 @kindex W h (Summary)
 @findex gnus-article-wash-html
@@ -10259,6 +10277,7 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-strip-pem (t, last, integer)
 @item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
+@item gnus-treat-unsplit-urls (t, integer)
 
 @xref{Article Washing}.
 

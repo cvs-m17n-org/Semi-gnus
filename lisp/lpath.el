@@ -130,8 +130,7 @@
 	 '((coding-system-get
 	    coding-system-to-mime-charset compose-mail file-name-extension
 	    find-coding-systems-for-charsets find-coding-systems-region
-	    function-max-args get-charset-property shell-command-to-string
-	    smiley-encode-buffer)))
+	    function-max-args get-charset-property smiley-encode-buffer)))
 	(t
 	 '((function-max-args smiley-encode-buffer))))))
   (maybe-fbind (car functions-variables))
