@@ -1,8 +1,9 @@
 ;;; nnml.el --- mail spool access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;; Author: Simon Josefsson <simon@josefsson.org> (adding MARKS)
+;;      Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
@@ -34,6 +35,7 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'gnus-clfns))
 
+(require 'gnus)
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
@@ -63,13 +65,24 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 This variable is a virtual server slot.  See the Gnus manual for details.")
 
 (defvoo nnml-nov-is-evil nil
-  "If non-nil, Gnus will never generate and use nov databases for mail groups.
+  "If non-nil, Gnus will never generate and use nov databases for mail spools.
 Using nov databases will speed up header fetching considerably.
 This variable shouldn't be flipped much.  If you have, for some reason,
 set this to t, and want to set it to nil again, you should always run
 the `nnml-generate-nov-databases' command.  The function will go
 through all nnml directories and generate nov databases for them
 all.  This may very well take some time.
+
+This variable is a virtual server slot.  See the Gnus manual for details.")
+
+(defvoo nnml-marks-is-evil nil
+  "If non-nil, Gnus will never generate and use marks file for mail spools.
+Using marks files makes it possible to backup and restore mail groups
+separately from `.newsrc.eld'.  If you have, for some reason, set this
+to t, and want to set it to nil again, you should always remove the
+corresponding marks file (usually named `.marks' in the nnml group
+directory, but see `nnml-marks-file-name') for the group.  Then the
+marks file will be regenerated properly by Gnus.
 
 This variable is a virtual server slot.  See the Gnus manual for details.")
 
@@ -90,6 +103,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
   "nnml version.")
 
 (defvoo nnml-nov-file-name ".overview")
+(defvoo nnml-marks-file-name ".marks")
 
 (defvoo nnml-current-directory nil)
 (defvoo nnml-current-group nil)
@@ -107,6 +121,8 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 check twice.")
 
 (defvoo nnml-file-coding-system nnmail-file-coding-system)
+
+(defvoo nnml-marks nil)
 
 
 
@@ -865,10 +881,6 @@ check twice.")
     (setq nnml-article-file-alist
 	  (nnheader-article-to-file-alist nnml-current-directory))))
 
-(defvoo nnml-marks-file-name ".marks")
-(defvoo nnml-marks-is-evil nil)
-(defvoo nnml-marks nil)
-
 (deffoo nnml-request-set-mark (group actions &optional server)
   (nnml-possibly-change-directory group server)
   (unless nnml-marks-is-evil
@@ -915,11 +927,16 @@ check twice.")
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(file (expand-file-name nnml-marks-file-name
 				(nnmail-group-pathname group nnml-directory))))
-    (nnml-possibly-create-directory group)
-    (with-temp-file file
-      (erase-buffer)
-      (princ nnml-marks (current-buffer))
-      (insert "\n"))))
+    (condition-case err
+	(progn
+	  (nnml-possibly-create-directory group)
+	  (with-temp-file file
+	    (erase-buffer)
+	    (princ nnml-marks (current-buffer))
+	    (insert "\n")))
+      (error (or (gnus-yes-or-no-p
+		  (format "Could not write to %s (%s).  Continue? " file err))
+		 (error "Cannot write to %s (%s)" err))))))
 
 (defun nnml-open-marks (group server)
   (let ((file (expand-file-name 
@@ -939,7 +956,7 @@ check twice.")
 		   (gnus-group-prefixed-name
 		    group
 		    (gnus-server-to-method (format "nnml:%s" server))))))
-	(nnheader-message 6 "Boostrapping nnml marks...")
+	(nnheader-message 6 "Bootstrapping nnml marks...")
 	(setq nnml-marks (gnus-info-marks info))
 	(push (cons 'read (gnus-info-read info)) nnml-marks)
 	(nnml-save-marks group server)))))

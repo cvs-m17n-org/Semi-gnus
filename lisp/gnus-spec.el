@@ -309,7 +309,7 @@ by `gnus-xmas-redefine'."
     (mapcar (lambda (char) (incf length (gnus-char-width char))) string)
     length))
 
-(defun gnus-correct-substring (string start end)
+(defun gnus-correct-substring (string start &optional end)
   (let ((wstart 0)
 	(wend 0)
 	(seek 0)
@@ -323,7 +323,8 @@ by `gnus-xmas-redefine'."
 	  wstart seek)
     ;; Find the end position.
     (while (and (< seek length)
-		(<= wend end))
+		(or (not end)
+		    (<= wend end)))
       (incf wend (gnus-char-width (aref string seek)))
       (incf seek))
     (setq wend seek)
@@ -670,7 +671,7 @@ If PROPS, insert the result."
       (while entries
 	(setq entry (pop entries)
 	      type (car entry))
-	(if (memq type '(version gnus-version))
+	(if (memq type '(gnus-version version))
 	    (setq gnus-format-specs (delq entry gnus-format-specs))
 	  (let ((form (caddr entry)))
 	    (when (and (listp form)

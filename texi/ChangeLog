@@ -1,3 +1,29 @@
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Spool): Add marks.
+	(MH Spool): Doesn't use marks file.
+	(Mail Folders): Add marks.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+	From Henrik Enberg <henrik@enberg.org>
+
+	* gnus.texi (Group Parameters): Fix.
+
+2001-08-24 16:03:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Fix.
+
+2001-08-24  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (latexps): Make tmps.
+
+2001-08-24  Simon Josefsson  <jas@extundo.com>
+	From Jesper Harder <harder@ifa.au.dk>
+
+	* Makefile.in (latexps): Escape {.
+
+	* splitindex: Ditto.
+
 2001-08-23 19:22:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Group Parameters): Fix.

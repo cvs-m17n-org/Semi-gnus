@@ -362,7 +362,7 @@ standard error."
   '(gpg-2comp . ("--batch" "--passphrase-fd=0" "--output=-"
 		 armor textmode  "--clearsign"
 		 sign-with-key))
-  "Command to create a create a \"clearsign\" text file.  
+  "Command to create a \"clearsign\" text file.  
 The invoked program has to read the passphrase from standard input,
 followed by the message to sign.  It should write the ASCII-amored
 signed text message to standard output, and diagnostic messages to
@@ -375,7 +375,7 @@ standard error."
   '(gpg-2comp . ("--batch" "--passphrase-fd=0" "--output=-"
 		 armor textmode "--detach-sign" 
 		 sign-with-key))
-  "Command to create a create a detached signature. 
+  "Command to create a detached signature. 
 The invoked program has to read the passphrase from standard input,
 followed by the message to sign.  It should write the ASCII-amored
 detached signature to standard output, and diagnostic messages to

@@ -1,3 +1,74 @@
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	* nnfolder.el (nnfolder-save-marks): Don't create directory named
+	after group in ~/.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+	From Andreas Jaeger  <aj@suse.de>
+
+	* nnfolder.el (nnfolder-open-marks): Fix typo.
+	* nnml.el (nnml-open-marks): Likewise.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	Make nnfolder groups self-contained as far as marks are concerned.
+
+	* nnfolder.el (nnfolder-marks-directory, nnfolder-marks-is-evil)
+	(nnfolder-marks, nnfolder-marks-file-suffix): New variables.
+	(nnfolder-open-server): Make marks directory.
+	(nnfolder-request-delete-group): Delete marks file.
+	(nnfolder-request-delete-group): Check of nov/marks file exist
+	before deleting.
+	(nnfolder-request-rename-group): Rename marks file.
+	(nnfolder-request-rename-group): Only rename nov/mark if they exists.
+	(nnfolder-request-set-mark, nnfolder-request-update-info)
+	(nnfolder-group-marks-pathname, nnfolder-save-marks)
+	(nnfolder-open-marks): New functions.
+	(top-level): Require gnus.
+
+2001-08-25 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnweb.el (nnweb-type-definition): Use google raw file.
+	(nnweb-google-parse-1): Ditto.
+	(nnweb-google-identity): Ditto.
+	(nnweb-reference-wash-article): Move nnweb-decode-entities here.
+	(nnweb-altavista-wash-article): Ditto.
+	(nnweb-request-article): Remove nnweb-decode-entities.
+
+	* nnml.el: Require 'gnus.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	* nnml.el (nnml-marks-is-evil): Add doc.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	* nnml.el (nnml-save-marks): Wrap saving marks in a
+	condition-case, to allow user to start Gnus if saving marks failed
+	for some reason.
+
+2001-08-24 16:05:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-spec.el (gnus-compile): Don't compile gnus-version. 
+
+	* gnus-group.el (gnus-update-group-mark-positions): Bind
+	gnus-group-update-hook to nil.
+
+2001-08-24 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-generate-mime-1): Force as multibyte string.
+
+2001-08-24 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-insert-line) 
+	(gnus-summary-prepare-threads): gnus-tmp-lines should be a string.
+	From Martin Kretzschmar <Martin.Kretzschmar@inf.tu-dresden.de>
+
+	* gnus-spec.el (gnus-correct-substring): Take optional END.
+
+	* nnrss.el (nnrss-request-article): Remove \n.
+	(nnrss-retrieve-headers): Lines number is -1.
+
 2001-08-24  Simon Josefsson  <jas@extundo.com>
 
 	* gnus-group.el (gnus-info-clear-data): Call

@@ -2820,8 +2820,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$$$/$D$+Nc$r5s$2$^$9(B:
 
 @table @code
-@item [unread]
-$BL$FI$N5-;v$@$1$rI=<($7$^$9!#(B
+@item [read]
+$B4{FI$N5-;v$@$1$rI=<($7$^$9!#(B
 
 @item [not expire]
 $B4|8B@Z$l>C5n2DG=$J5-;v0J30$N$9$Y$F$rI=<($7$^$9!#(B
@@ -10767,7 +10767,7 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 
 @item nntp-via-envuser
 @vindex nntp-via-envuser
-$B$b$7Hs(B-@code{nil}$B$J$i!"Cf4V$N(B @code{telnet} $B$N%;%C%7%g%s(B ($B%/%i%$%"%s%H$H(B
+$B$b$7Hs(B@code{nil}$B$J$i!"Cf4V$N(B @code{telnet} $B$N%;%C%7%g%s(B ($B%/%i%$%"%s%H$H(B
 $B%5!<%P!<$NN>J}(B) $B$G(B @code{ENVIRON} $B%*%W%7%g%s$r%5%]!<%H$7!"%m%0%$%sL>$NF~(B
 $BNO$rMW5a$7$^$;$s!#$3$l$ONc$($P(B Solaris $B$N(B @code{telnet} $B$GF0:n$7$^$9!#(B
 
@@ -12458,6 +12458,17 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 $B$N(B @sc{nov} $B%G!<%?%Y!<%9$b:n@.$7$J$1$l$P$J$j$^$;$s!#$3$l$N$?$a$K!"%a!<%k(B
 $B$rFI$`;v$K4X$7$F$O:GB.$N%P%C%/%(%s%I$K$J$j$^$9!#(B
 
+@cindex self contained nnml servers
+$B0u%U%!%$%k(B ($BLuCm(B: marks file) $B$,;H$o$l$k$H(B ($B$=$l$,%G%#%U%)%k%H$G$9$,(B)$B!"(B
+@code{nnml} $B%5!<%P!<$O(B @code{tar} $B$J$I$r;H$C$F%P%C%/%"%C%W$7$?$j!"8e$G$"(B
+$B$J$?$,IU$1$?0u$,$9$Y$FJ]$?$l$?>uBV$G(B gnus $B$KLa$9(B ($BK\Mh$N(B @code{nnml} $B%5!<(B
+$B%P!<$K$h$C$FDI2C$9$k(B) $B$3$H$,$G$-$kFC<A$r;}$D$h$&$K$J$j$^$9!#%0%k!<%W$N0u(B
+$B$O$=$l$>$l$N(B @code{nnml} $B%0%k!<%W$N%G%#%l%/%H%jFb$N!"DL(B
+$B>o(B @code{.marks} $B%U%!%$%k(B (@code{nnml-marks-file-name} $B$r;2>H(B) $B$K3JG<$5(B
+$B$l$^$9!#$^$?!"8D!9$N(B @code{nnml} $B%0%k!<%W$K$D$$$F$b%P%C%/%"%C%W$9$k$3$H(B
+$B$,2DG=$G!"(B($B%P%C%/%"%C%W$r(B nnml $B%G%#%l%/%$%H%j$KLa$7$?8e$G(B) @kbd{G m} $B%-!<(B
+$B$r;H$C$F$=$N%0%k!<%W$r85$KLa$7$^$9!#(B
+
 $B;v<B>e$N%5!<%P!<$N@_Dj(B:
 
 @table @code
@@ -12493,6 +12504,15 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 @item nnml-prepare-save-mail-hook
 @vindex nnml-prepare-save-mail-hook
 $BJ]B8$9$kA0$K5-;v$KHO0O$r69$a$F<B9T$9$k%U%C%/$G$9!#(B
+
+@item nnml-marks-is-evil
+@vindex nnml-marks-is-evil
+$BHs(B@code{nil} $B$G$"$k$H!"$3$N%P%C%/%(%s%I$O$$$+$J$k(B @sc{$B0u(B} $B%U%!%$%k$bL5;k(B
+$B$7$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item nnml-marks-file-name
+@vindex nnml-marks-file-name
+@sc{$B0u(B} $B%U%!%$%k$NL>A0$G$9!#%G%#%U%)%k%H$O(B @file{.marks} $B$G$9!#(B
 @end table
 
 @findex nnml-generate-nov-databases
@@ -12509,7 +12529,7 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 @cindex mh-e mail spool
 
 @code{nnmh} $B$O!"(B@sc{nov} $B%G!<%?%Y!<%9$r:n$i$J$$$3$H$H%"%/%F%#%V%U%!%$%k(B
-$B$rJ];}$7$J$$;v$r=|$$$F!"(B@code{nnml} $B$H;w$F$$$^$9!#$=$N$3$H(B
+$B$d0u%U%!%$%k$rJ];}$7$J$$;v$r=|$$$F!"(B@code{nnml} $B$H;w$F$$$^$9!#$=$N$3$H(B
 $B$O(B @code{nnmh} $B$r(B @code{nnml} $B$h$j(B @emph{$B$+$J$j(B} $BCY$$%P%C%/%(%s%I$K$7$F(B
 $B$$$^$9$,!"$=$l$O(B procmail $B$N%9%/%j%W%H$r=q$/$?$a$K$:$C$H$d$j$d$9$/$J$C$F(B
 $B$b$$$^$9!#(B
@@ -12547,6 +12567,17 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 $B%/%(%s%I$G$9!#$=$l$>$l$N%U%!%$%k$OI8=`$N(B Un*x mbox $BMM<0$G$9!#(B
 @code{nnfolder} $B$O5-;vHV9f$HE~CeF|$r5-O?$7$F$*$/$?$a$NDI2C$N%X%C%@!<$r2C(B
 $B$($^$9!#(B
+
+@cindex self contained nnfolder servers
+$B0u%U%!%$%k(B ($BLuCm(B: marks file) $B$,;H$o$l$k$H(B ($B$=$l$,%G%#%U%)%k%H$G$9$,(B)$B!"(B
+@code{nnfolder} $B%5!<%P!<$O(B @code{tar} $B$J$I$r;H$C$F%P%C%/%"%C%W$7$?$j!"8e(B
+$B$G$"$J$?$,IU$1$?0u$,$9$Y$FJ]$?$l$?>uBV$G(B gnus $B$KLa$9(B ($BK\Mh(B
+$B$N(B @code{nnfolder} $B%5!<%P!<$K$h$C$FDI2C$9$k(B) $B$3$H$,$G$-$kFC<A$r;}$D$h$&(B
+$B$K$J$j$^$9!#%0%k!<%W$N0u$O(B @code{nnfolder} $B%G%#%l%/%H%jFb$N!"(Bmbox $B%U%!%$(B
+$B%k$KDL>o(B @code{.mrk} (@code{nnfolder-marks-file-name} $B$r;2>H(B) $B$,IU2C$5$l(B
+$B$?L>A0$N%U%!%$%k$K3JG<$5$l$^$9!#$^$?!"8D!9$N(B @code{nnfolder} $B%0%k!<%W$K(B
+$B$D$$$F$b%P%C%/%"%C%W$9$k$3$H$,2DG=$G!"(B($B%P%C%/%"%C%W$r(B nnfolder $B%G%#%l%/(B
+$B%$%H%j$KLa$7$?8e$G(B) @kbd{G m} $B%-!<$r;H$C$F$=$N%0%k!<%W$r85$KLa$7$^$9!#(B
 
 $B;v<B>e$N%5!<%P!<$N@_Dj(B:
 
@@ -12596,6 +12627,19 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 @vindex nnfolder-nov-is-evil
 $B$b$7Hs(B@code{nil}$B$J$i!"$3$N%P%C%/%(%s%I$O(B @sc{nov} $B%U%!%$%k$rL5;k$7$^$9!#(B
 $B4{DjCM$O(B @code{nil} $B$G$9!#(B
+
+@item nnfolder-nov-file-suffix
+@vindex nnfolder-nov-file-suffix
+@sc{nov} $B%U%!%$%k$N3HD%;R$G$9!#%G%#%U%)%k%H$O(B @file{.nov} $B$G$9!#(B
+
+@item nnfolder-marks-is-evil
+@vindex nnfolder-marks-is-evil
+$BHs(B@code{nil} $B$G$"$k$H!"$3$N%P%C%/%(%s%I$O$$$+$J$k(B @sc{$B0u(B} $B%U%!%$%k$r$b(B
+$BL5;k$7$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item nnfolder-marks-file-suffix
+@vindex nnfolder-marks-file-suffix
+@sc{$B0u(B} $B%U%!%$%k$N3HD%;R$G$9!#%G%#%U%)%k%H$O(B @file{.mrk} $B$G$9!#(B
 @end table
 
 @findex nnfolder-generate-active-file
@@ -14226,7 +14270,7 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 @item nnimap-importantize-dormant
 @vindex nnimap-importantize-dormant
 
-$BHs(B-nil $B$@$C$?$i!"B>$N(B IMAP $B%/%i%$%"%s%H$N$?$a$KJ]N15-;v$r0uIU$-$H$7$F$b(B
+$BHs(B nil $B$@$C$?$i!"B>$N(B IMAP $B%/%i%$%"%s%H$N$?$a$KJ]N15-;v$r0uIU$-$H$7$F$b(B
 $B0u$rIU$1$^$9!#(Bgnus $B$NFbIt$G$O!"J]N15-;v$O85!9$9$G$K0uIU$-$H$7$F$N$_0u$,(B
 $BIU$1$i$l$F$$$^$9!#$3$l$O!"B>$N(B IMAP $B%/%i%$%"%s%H$K$*$1$kJ]N15-;v$r!"$"$?(B
 $B$+$b0uIU$-$N$h$&$K$-$oN)$?$;$^$9!#(B($BJL$N8@$$J}$r$9$k$H!"(Bgnus $B$OFs$D$N0u$r(B

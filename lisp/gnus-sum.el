@@ -2979,8 +2979,9 @@ buffer that was in action when the last article was fetched."
       (setq gnus-tmp-name gnus-tmp-from))
     (unless (numberp gnus-tmp-lines)
       (setq gnus-tmp-lines -1))
-    (when (= gnus-tmp-lines -1)
-      (setq gnus-tmp-lines "?"))
+    (if (= gnus-tmp-lines -1)
+	(setq gnus-tmp-lines "?")
+      (setq gnus-tmp-lines (number-to-string gnus-tmp-lines)))
     (gnus-put-text-property-excluding-characters-with-faces
      (point)
      (progn (eval gnus-summary-line-format-spec) (point))
@@ -4411,8 +4412,9 @@ or a straight list of headers."
 	      (setq gnus-tmp-name gnus-tmp-from))
 	    (unless (numberp gnus-tmp-lines)
 	      (setq gnus-tmp-lines -1))
-	    (when (= gnus-tmp-lines -1)
-	      (setq gnus-tmp-lines "?"))
+	    (if (= gnus-tmp-lines -1)
+		(setq gnus-tmp-lines "?")
+	      (setq gnus-tmp-lines (number-to-string gnus-tmp-lines)))
 	    (gnus-put-text-property
 	     (point)
 	     (progn (eval gnus-summary-line-format-spec) (point))
