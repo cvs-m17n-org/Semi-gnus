@@ -1,3 +1,19 @@
+2002-07-19  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.32 (This is alpha status.)
+	If set `nnml' to `gnus-select-method', could not read mail when
+	unplugged.  Fixed.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.32.
+
+	* lisp/nntp.el (nntp): Make to be covered by gnus-agent.
+
+	* lisp/nnimap.el (nnimap): Ditto.
+
+	* lisp/gnus-agent.el (gnus-agentize): Use
+	`gnus-agent-covered-methods'.
+	(gnus-agent-covered-methods): New function.
+
 2002-07-03  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.31 (This is alpha status.)
