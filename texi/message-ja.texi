@@ -1432,6 +1432,7 @@ qmail-inject プログラムに渡す引数です。これは文字列のリストで、それぞれ
 
 @c @item message-send-mail-partially-limit
 @c @vindex message-send-mail-partially-limit
+@c @cindex split large message
 @c The limitation of messages sent as message/partial.
 @c The lower bound of message size in characters, beyond which the message
 @c should be sent in several parts. If it is nil, the size is unlimited.
