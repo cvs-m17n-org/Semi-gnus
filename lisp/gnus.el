@@ -43,6 +43,11 @@
   :group 'news
   :group 'mail)
 
+(defgroup gnus-charset nil
+  "Group character set issues."
+  :link '(custom-manual "(gnus)Charsets")
+  :group 'gnus)
+
 (defgroup gnus-cache nil
   "Cache interface."
   :group 'gnus)
@@ -259,10 +264,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.053"
+(defconst gnus-version-number "6.10.054"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.70"
+(defconst gnus-original-version-number "0.71"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1483,6 +1488,23 @@ want."
 (defvar gnus-plugged t
   "Whether Gnus is plugged or not.")
 
+(defcustom gnus-default-charset 'iso-8859-1
+  "Default charset assumed to be used when viewing non-ASCII characters.
+This variable is overridden on a group-to-group basis by the
+gnus-group-charset-alist variable and is only used on groups not
+covered by that variable."
+  :type 'symbol
+  :group 'gnus-charset)
+
+(defcustom gnus-default-posting-charset nil
+  "Default charset assumed to be used when posting non-ASCII characters.
+This variable is overridden on a group-to-group basis by the
+gnus-group-posting-charset-alist variable and is only used on groups not
+covered by that variable.
+If nil, no default charset is assumed when posting."
+  :type 'symbol
+  :group 'gnus-charset)
+
 
 ;;; Internal variables
 
@@ -1785,7 +1807,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-next-page gnus-article-prev-page
       gnus-request-article-this-buffer gnus-article-mode
       gnus-article-setup-buffer gnus-narrow-to-page
-      gnus-article-delete-invisible-text)
+      gnus-article-delete-invisible-text gnus-treat-article)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap

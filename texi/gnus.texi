@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.053 Manual
+@settitle Semi-gnus 6.10.054 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.053 Manual
+@title Semi-gnus 6.10.054 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.053.
+This manual corresponds to Semi-gnus 6.10.054.
 
 @end ifinfo
 
@@ -18458,6 +18458,10 @@ Fetch by Message-ID from dejanews.
 @item
 A spec for the group line format to display the number of
 agent-downloaded articles in the group.
+
+@item
+Some nntp servers never respond when posting, so there should be a
+timeout for all commands.
 
 @item
 Solve the halting problem.
