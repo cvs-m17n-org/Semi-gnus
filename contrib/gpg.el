@@ -141,12 +141,19 @@
 
 ;;; Customization: Widgets:
 
-(define-widget 'gpg-command-alist 'alist
-  "An association list for GnuPG command names."
-  :key-type '(symbol :tag   "Abbreviation")
-  :value-type '(string :tag "Program name")
-  :convert-widget 'widget-alist-convert-widget
-  :tag "Alist")
+(if (get 'alist 'widget-type)
+    (define-widget 'gpg-command-alist 'alist
+      "An association list for GnuPG command names."
+      :key-type '(symbol :tag   "Abbreviation")
+      :value-type '(string :tag "Program name")
+      :convert-widget 'widget-alist-convert-widget
+      :tag "Alist")
+    (define-widget 'gpg-command-alist 'repeat
+      "An association list for GnuPG command names."
+      :args '((cons :format "%v"
+		    (symbol :tag   "Abbreviation")
+		    (string :tag "Program name")))
+      :tag "Alist"))
 
 (define-widget 'gpg-command-program 'choice
   "Widget for entering the name of a program (mostly the GnuPG binary)."
@@ -614,7 +621,8 @@ adjust according to `gpg-command-passphrase-env'."
       ;; make-temp-name doesn't create the file, and an ordinary
       ;; write-file operation is prone to nasty symlink attacks if the
       ;; temporary file resides in a world-writable directory.
-      (unless (eq (file-modes gpg-temp-directory) 448) ; mode 0700
+      (unless (or (memq system-type '(windows-nt cygwin32 win32 w32 mswindows))
+		  (eq (file-modes gpg-temp-directory) 448)) ; mode 0700
 	(error "Directory for temporary files must have mode 0700."))
       (setq name (make-temp-name name))
       (let ((mode (default-file-modes)))

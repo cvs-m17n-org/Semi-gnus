@@ -238,6 +238,7 @@ Only used in Emacs Mule 4."
   (when (and (fboundp 'set-buffer-multibyte)
              (boundp 'enable-multibyte-characters)
 	     (default-value 'enable-multibyte-characters)
+	     (fboundp 'charsetp)
 	     (not (charsetp 'eight-bit-control)))
     (set-buffer-multibyte t)))
 
@@ -245,6 +246,7 @@ Only used in Emacs Mule 4."
   "Disable multibyte in the current buffer.
 Only used in Emacs Mule 4."
   (when (and (fboundp 'set-buffer-multibyte)
+	     (fboundp 'charsetp)
 	     (not (charsetp 'eight-bit-control)))
     (set-buffer-multibyte nil)))
 
@@ -386,6 +388,7 @@ Mule4 only."
   (let ((multibyte (make-symbol "multibyte")))
     `(if (or (featurep 'xemacs)
 	     (not (fboundp 'set-buffer-multibyte))
+	     (not (fboundp 'charsetp))
 	     (charsetp 'eight-bit-control)) ;; For Emacs Mule 4 only.
 	 (progn
 	   ,@forms)
