@@ -1490,14 +1490,24 @@ want."
  semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
   "The mail address of the Semi-gnus developers.")
 
+(defcustom gnus-info-filename nil
+  "*Controls language of gnus Info.
+If nil and current-language-environment is Japanese, go to gnus-ja.
+Otherwise go to corresponding Info.
+This variable can be nil, gnus or gnus-ja."
+  :group 'gnus-start
+  :type '(choice (const nil)
+		 (const :tag "English" gnus)
+		 (const :tag "Japanese" gnus-ja)))
+
 (defvar gnus-info-nodes
-  '((gnus-group-mode "(gnus)The Group Buffer")
-    (gnus-summary-mode "(gnus)The Summary Buffer")
-    (gnus-article-mode "(gnus)The Article Buffer")
-    (mime/viewer-mode "(gnus)The Article Buffer")
-    (gnus-server-mode "(gnus)The Server Buffer")
-    (gnus-browse-mode "(gnus)Browse Foreign Server")
-    (gnus-tree-mode "(gnus)Tree Display"))
+  '((gnus-group-mode "The Group Buffer")
+    (gnus-summary-mode "The Summary Buffer")
+    (gnus-article-mode "The Article Buffer")
+    (mime/viewer-mode "The Article Buffer")
+    (gnus-server-mode "The Server Buffer")
+    (gnus-browse-mode "Browse Foreign Server")
+    (gnus-tree-mode "Tree Display"))
   "Alist of major modes and related Info nodes.")
 
 (defvar gnus-group-buffer "*Group*")
@@ -2029,7 +2039,11 @@ If ARG, insert string at point."
   (interactive)
   ;; Enlarge info window if needed.
   (let (gnus-info-buffer)
-    (Info-goto-node (cadr (assq major-mode gnus-info-nodes)))
+    (Info-goto-node (format "(%s)%s" 
+			    (or gnus-info-filename
+				(get-language-info current-language-environment 'gnus-info)
+				"gnus")
+			    (cadr (assq major-mode gnus-info-nodes))))
     (setq gnus-info-buffer (current-buffer))
     (gnus-configure-windows 'info)))
 

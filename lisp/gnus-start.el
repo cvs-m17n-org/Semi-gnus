@@ -711,6 +711,8 @@ prompt the user for the name of an NNTP server to use."
 	  (gnus-group-first-unread-group)
 	  (gnus-configure-windows 'group)
 	  (gnus-group-set-mode-line)
+	  ;; For reading Info.
+	  (set-language-info "Japanese" 'gnus-info "gnus-ja")
 	  (gnus-run-hooks 'gnus-started-hook))))))
 
 (defun gnus-start-draft-setup ()
