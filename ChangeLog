@@ -1,3 +1,8 @@
+2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02 (synch
+	with the released version of Oort Gnus v0.05).
+
 2002-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Advise `byte-compile-inline-expand' for Mule

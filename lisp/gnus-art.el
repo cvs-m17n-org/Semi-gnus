@@ -4804,7 +4804,7 @@ is the string to use when it is inactive.")
 
 (defun gnus-add-wash-type (type)
   "Add a washing of TYPE to the current status."
-  (push type gnus-article-wash-types))
+  (add-to-list 'gnus-article-wash-types type))
 
 (defun gnus-delete-wash-type (type)
   "Add a washing of TYPE to the current status."
@@ -5189,6 +5189,9 @@ If given a prefix, show the hidden text instead."
     (gnus-check-server (gnus-find-method-for-group gnus-newsgroup-name))
     (gnus-request-group gnus-newsgroup-name t)))
 
+(eval-when-compile
+  (autoload 'nneething-get-file-name "nneething"))
+
 (defun gnus-request-article-this-buffer (article group)
   "Get an article and insert it into this buffer.
 T-gnus change: Insert an article into `gnus-original-article-buffer'."
@@ -5240,12 +5243,10 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 			       gnus-newsgroup-name)))
 		  (when (and (eq (car method) 'nneething)
 			     (vectorp header))
-		    (let ((dir (expand-file-name
-				(mail-header-subject header)
-				(file-name-as-directory
-				 (or (cadr (assq 'nneething-address method))
-				     (nth 1 method))))))
-		      (when (file-directory-p dir)
+		    (let ((dir (nneething-get-file-name
+				(mail-header-id header))))
+		      (when (and (stringp dir)
+				 (file-directory-p dir))
 			(setq article 'nneething)
 			(gnus-group-enter-directory dir))))))))
 	  (setq gnus-original-article (cons group article))
@@ -6110,7 +6111,7 @@ specified by `gnus-button-alist'."
       (if (not (string-match "=" cur))
 	  nil				; Grace
 	(setq key (gnus-url-unhex-string (substring cur 0 (match-beginning 0)))
-	      val (gnus-url-unhex-string (substring cur (match-end 0) nil)))
+	      val (gnus-url-unhex-string (substring cur (match-end 0) nil) t))
 	(if downcase
 	    (setq key (downcase key)))
 	(setq cur (assoc key retval))

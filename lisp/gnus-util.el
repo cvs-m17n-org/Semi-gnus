@@ -320,7 +320,7 @@
 	  (define-key keymap key (pop plist))
 	(pop plist)))))
 
-(defun gnus-completing-read (default prompt &rest args)
+(defun gnus-completing-read-with-default (default prompt &rest args)
   ;; Like `completing-read', except that DEFAULT is the default argument.
   (let* ((prompt (if default
 		     (concat prompt " (default " default ") ")
@@ -505,10 +505,13 @@ jabbering all the time."
 If N, return the Nth ancestor instead."
   (when (and references
 	     (not (zerop (length references))))
-    (let ((ids (inline (gnus-split-references references))))
-      (while (nthcdr (or n 1) ids)
-	(setq ids (cdr ids)))
-      (car ids))))
+    (if n
+	(let ((ids (inline (gnus-split-references references))))
+	  (while (nthcdr n ids)
+	    (setq ids (cdr ids)))
+	  (car ids))
+      (when (string-match "<[^> \t]+>\\'" references)
+	(match-string 0 references)))))
 
 (defun gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
@@ -1280,6 +1283,22 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
     (list 'keymap map))
    (t
     (list 'local-map map))))
+
+(defun gnus-completing-read (prompt table &optional predicate require-match
+				    history)
+  (when (and history
+	     (not (boundp history)))
+    (set history nil))
+  (completing-read
+   (if (symbol-value history)
+       (concat prompt " (" (car (symbol-value history)) "): ")
+     (concat prompt ": "))
+   table
+   predicate
+   require-match
+   nil
+   history
+   (car (symbol-value history))))
 
 (provide 'gnus-util)
 

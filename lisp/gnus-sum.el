@@ -307,13 +307,16 @@ This variable can either be the symbols `first' (place point on the
 first subject), `unread' (place point on the subject line of the first
 unread article), `best' (place point on the subject line of the
 higest-scored article), `unseen' (place point on the subject line of
-the first unseen article), or a function to be called to place point on
-some subject line.."
+the first unseen article), 'unseen-or-unread' (place point on the subject
+line of the first unseen article or, if all article have been seen, on the
+subject line of the first unread article), or a function to be called to
+place point on some subject line.."
   :group 'gnus-group-select
   :type '(choice (const best)
 		 (const unread)
 		 (const first)
-		 (const unseen)))
+		 (const unseen)
+	         (const unseen-or-unread)))
 
 (defcustom gnus-dont-select-after-jump-to-other-group nil
   "If non-nil, don't select the first unread article after entering the
@@ -3350,6 +3353,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
     (gnus-summary-first-unread-subject))
    ((eq gnus-auto-select-subject 'unseen)
     (gnus-summary-first-unseen-subject))
+   ((eq gnus-auto-select-subject 'unseen-or-unread)
+    (gnus-summary-first-unseen-or-unread-subject))
    ((eq gnus-auto-select-subject 'first)
     ;; Do nothing.
     )
@@ -5010,8 +5015,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
        ((eq mark-type 'range)
 	(cond
 	 ((eq mark 'seen)
-	  ;; T-gnus change: Fix the record for `seen' if it looks like
-	  ;; (seen NUM1 . NUM2).  It should be (seen (NUM1 . NUM2)).
+	  ;; Fix the record for `seen' if it looks like (seen NUM1 . NUM2).
+	  ;; It should be (seen (NUM1 . NUM2)).
 	  (when (numberp (cddr marks))
 	    (setcdr marks (list (cdr marks))))
 	  (setq articles (cdr marks))
@@ -6486,6 +6491,8 @@ If optional argument UNREAD is non-nil, only unread article is selected."
   "Go the subject line of ARTICLE.
 If FORCE, also allow jumping to articles not currently shown."
   (interactive "nArticle number: ")
+  (unless (numberp article)
+    (error "Article %s is not a number" article))
   (let ((b (point))
 	(data (gnus-data-find article)))
     ;; We read in the article if we have to.
@@ -6887,6 +6894,19 @@ Return nil if there are no unseen articles."
 	(gnus-summary-first-subject t t t))
     (gnus-summary-position-point)))
 
+(defun gnus-summary-first-unseen-or-unread-subject ()
+  "Place the point on the subject line of the first unseen article.
+Return nil if there are no unseen articles."
+  (interactive)
+  (prog1
+      (unless (when (gnus-summary-first-subject t t t)
+		(gnus-summary-show-thread)
+		(gnus-summary-first-subject t t t))
+	(when (gnus-summary-first-subject t)
+	  (gnus-summary-show-thread)
+	  (gnus-summary-first-subject t)))
+    (gnus-summary-position-point)))
+
 (defun gnus-summary-first-article ()
   "Select the first article.
 Return nil if there are no articles."
@@ -7098,7 +7118,7 @@ articles that are younger than AGE days."
   (interactive
    (let ((header
 	  (intern
-	   (gnus-completing-read
+	   (gnus-completing-read-with-default
 	    (symbol-name (car gnus-extra-headers))
 	    (if current-prefix-arg
 		"Exclude extra header:"
@@ -8613,7 +8633,7 @@ latter case, they will be copied into the relevant groups."
 				  (car (gnus-find-method-for-group
 					gnus-newsgroup-name)))))
 		(method
-		 (gnus-completing-read
+		 (gnus-completing-read-with-default
 		  methname "What backend do you want to use when respooling?"
 		  methods nil t nil 'gnus-mail-method-history))
 		ms)
@@ -10318,23 +10338,26 @@ save those articles instead."
 	 (to-newsgroup
 	  (cond
 	   ((null split-name)
-	    (gnus-completing-read default prom
-				  gnus-active-hashtb
-				  'gnus-valid-move-group-p
-				  nil prefix
-				  'gnus-group-history))
+	    (gnus-completing-read-with-default
+	     default prom
+	     gnus-active-hashtb
+	     'gnus-valid-move-group-p
+	     nil prefix
+	     'gnus-group-history))
 	   ((= 1 (length split-name))
-	    (gnus-completing-read (car split-name) prom
-				  gnus-active-hashtb
-				  'gnus-valid-move-group-p
-				  nil nil
-				  'gnus-group-history))
+	    (gnus-completing-read-with-default
+	     (car split-name) prom
+	     gnus-active-hashtb
+	     'gnus-valid-move-group-p
+	     nil nil
+	     'gnus-group-history))
 	   (t
-	    (gnus-completing-read nil prom
-				  (mapcar (lambda (el) (list el))
-					  (nreverse split-name))
-				  nil nil nil
-				  'gnus-group-history))))
+	    (gnus-completing-read-with-default
+	     nil prom
+	     (mapcar (lambda (el) (list el))
+		     (nreverse split-name))
+	     nil nil nil
+	     'gnus-group-history))))
 	 (to-method (gnus-server-to-method (gnus-group-method to-newsgroup))))
     (when to-newsgroup
       (if (or (string= to-newsgroup "")

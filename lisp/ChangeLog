@@ -1,3 +1,124 @@
+2002-01-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-util.el (gnus-completing-read): Remove
+	inherit-input-method.
+
+2002-01-20 05:33:30 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.05 is released.
+
+2002-01-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnkiboze.el (nnkiboze-generate-group): Make sure the directory
+	exists. 
+
+	* gnus-spec.el (gnus-string-width-function): New function.
+	(gnus-tilde-cut-form): Use it.
+	(gnus-tilde-max-form): Ditto.
+	(gnus-use-correct-string-widths): Default to (featurep 'xemacs). 
+	(gnus-substring-function): Use it.
+	(gnus-tilde-cut-form): Ditto.
+	(gnus-substring-function): New function.
+
+	* message.el (message-check-news-header-syntax): New message.
+
+	* gnus.el (gnus-slave-no-server): Doc fix.
+
+	* gnus-spec.el (gnus-use-correct-string-widths): Default to t.
+
+2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-sum.el (gnus-adjust-marked-articles): Fix the record for
+	`seen' if it looks like (seen NUM1 . NUM2).  It should be
+	(seen (NUM1 . NUM2)).
+
+2002-01-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-topic.el (gnus-topic-catchup-articles): Update article
+	number in closed topics.
+
+2002-01-19  Daniel Pittman  <daniel@rimspace.net>
+
+	* gnus-sum.el (gnus-summary-first-unseen-or-unread-subject): New
+	functions. 
+
+2002-01-19  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-group-find-parameter): Clean up.	
+
+	* gnus-sum.el (gnus-summary-goto-subject): Error on non-numerical
+	articles. 
+
+	* gnus-util.el (gnus-completing-read-with-default): Renamed.
+
+	* nnmail.el (nnmail-article-group): Clean up.
+
+2002-01-19  Paul Stodghill  <stodghil@cs.cornell.edu>
+
+	* gnus-agent.el (gnus-category-name): Intern the category name. 
+
+2002-01-19  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-topic.el (gnus-topic-move-group): Use gnus-topic-history.
+
+	* gnus-util.el (gnus-completing-read): New function.
+
+2002-01-19  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-add-wash-type): Use add-to-list.
+
+	* smiley-ems.el (smiley-region): Register smiley.
+	(smiley-toggle-buffer): Rewrite the function.
+	(smiley-active): Removed.
+
+2002-01-19  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-util.el (gnus-parent-id): Optimize null n case.  From
+	Jesper Harder <harder@ifa.au.dk>.
+
+2002-01-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-art.el (gnus-request-article-this-buffer): Call
+	`nneething-get-file-name' to extract the file name from the
+	message id.
+
+	* nneething.el (nneething-encode-file-name): New function.
+	(nneething-decode-file-name): Ditto.
+	(nneething-get-file-name): Ditto.
+	(nneething-make-head): Encode the file name and encapsulate it
+	into the field of the message id.
+
+2002-01-18  Simon Josefsson  <jas@extundo.com>
+
+	* nnml.el (nnml-request-update-info): Don't erase flags that isn't
+	stored in .marks.
+
+	* nnfolder.el (nnfolder-request-update-info): Ditto.
+
+2002-01-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-url-parse-query-string): Allow new line in value.
+
+2002-01-18  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-starttls-p): Don't check for binary.
+	(imap-gssapi-auth-p): Ditto.
+	(imap-kerberos4-auth-p): Ditto.
+	(imap-open): Change logic.  Iterate through all possible streams,
+	instead of bailing out after first failure.  Move authenticator
+	decision to `imap-authenticate'.
+	(imap-authenticate): Change logic, now finds the authenticator to
+	use, was previously in `imap-open'.
+	(imap-open): Return nil on failure.
+	(imap-open): Setup temp buffer correctly.
+	(imap-open): Return buffer only on success.
+	(imap-interactive-login, imap-interactive-login): Tell the user
+	which stream/authenticator is used for the queried
+	username/password.
+	(imap-open, imap-authenticate): Set variables.
+	(imap-gssapi-auth-p, imap-kerberos4-auth-p): Fix typo.
+	(imap-open): Don't assume how `with-temp-buffer' is implemented.
+
 2002-01-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus-fun.el (gnus-grab-cam-x-face): New function.
@@ -4571,7 +4692,7 @@
 2001-06-03  Dale Hagglund  <rdh@best.com>
 
 	* gnus-mlspl.el (gnus-group-split-fancy): Fix generation of split
-       restrict clauses.
+	restrict clauses.
 
 2001-06-07 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 

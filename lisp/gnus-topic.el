@@ -1194,10 +1194,13 @@ Also see `gnus-group-catchup'."
   (if (not topic)
       (call-interactively 'gnus-group-catchup-current)
     (save-excursion
-      (let ((gnus-group-marked
+      (let* ((groups
 	     (mapcar (lambda (entry) (car (nth 2 entry)))
-		     (gnus-topic-find-groups topic gnus-level-killed t))))
-	(gnus-group-catchup-current)))))
+		     (gnus-topic-find-groups topic gnus-level-killed t)))
+	     (buffer-read-only nil)
+	     (gnus-group-marked groups))
+	(gnus-group-catchup-current)
+	(mapcar 'gnus-topic-update-topics-containing-group groups)))))
 
 (defun gnus-topic-read-group (&optional all no-article group)
   "Read news in this newsgroup.
@@ -1255,7 +1258,8 @@ When used interactively, PARENT will be the topic under point."
 If COPYP, copy the groups instead."
   (interactive
    (list current-prefix-arg
-	 (completing-read "Move to topic: " gnus-topic-alist nil t)))
+	 (gnus-completing-read "Move to topic" gnus-topic-alist nil t
+			       'gnus-topic-history)))
   (let ((use-marked (and (not n) (not (gnus-region-active-p))
 			 gnus-group-marked t))
 	(groups (gnus-group-process-prefix n))

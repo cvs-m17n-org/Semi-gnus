@@ -2216,6 +2216,10 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 @item unseen
 $B$^$@FI$^$l$?$3$H$,L5$$:G=i$N5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
 
+@item unseen-or-unread
+$B$^$@FI$^$l$?$3$H$,L5$$:G=i$N5-;v$,$"$l$P!"$=$N5-;v$NI=Bj$N9T$K%]%$%s%H$r(B
+$B0\F0$5$;!"L5$+$C$?$i:G=i$NL$FI5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
+
 @item best
 $B%9%3%"$,:G$b9b$$L$FI5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
 @end table
@@ -4180,10 +4184,12 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 
 @lisp
 (setq gnus-group-line-format
-      "%M\%S\%p\%P\%5y: %(%-40,40g%) %Ud\n")
+      "%M\%S\%p\%P\%5y: %(%-40,40g%) %ud\n")
 (defun gnus-user-format-function-d (headers)
   (let ((time (gnus-group-timestamp gnus-tmp-group)))
-    (format-time-string "%b %d  %H:%M" time)))
+    (if time
+        (format-time-string "%b %d  %H:%M" time)
+      "")))
 @end lisp
 
 @node File Commands
@@ -12920,9 +12926,12 @@ Gnus $B$O%a!<%k%0%k!<%W$rF0:n$9$k$h$&$K$9$k$H%a!<%k%9%W!<%k$rFI$_9~$_$^$9!#(B
 $B%a!<%k%U%!%$%k$O$^$:$"$J$?$N%[!<%`%G%#%l%/%H%j!<$KJ#<L$5$l$^$9!#$=$N8e$K(B
 $B2?$,5/$3$k$+$O%a!<%k$r$I$NMM<0$GN/$a$?$$$+$K$h$C$FJQ$o$j$^$9!#(B
 
-$BI8=`$N(B gnus $B$G$O8^$D$N0c$C$?%a!<%k%P%C%/%(%s%I$,$"$j!"8DJL$K$5$i$J$k%P%C(B
-$B%/%(%s%I$r;HMQ2DG=$G$9!#$[$H$s$I$N?M$,;H$&%a!<%k%P%C%/%(%s%I$O(B ($B$H$$$&$N(B
-$B$O:GB.$G=@Fp$@$+$i(B) @code{nnml} $B$G$9(B (@pxref{Mail Spool})$B!#(B
+$BI8=`$N(B gnus $B$G$OO;$D$N0c$C$?%a!<%k%P%C%/%(%s%I$,$"$j!"8DJL$K$5$i$J$k%P%C(B
+$B%/%(%s%I$r;HMQ2DG=$G$9!#$[$H$s$I$N?M$,;H$&%a!<%k%P%C%/%(%s%I$O(B ($B$=$l$,$?(B
+$B$V$s:GB.$@$+$i(B) @code{nnml} $B$G$9(B (@pxref{Mail Spool})$B!#$"$J$?$O0J2<$K8^(B
+$B$D$N%P%C%/%(%s%I$7$+$J$$$3$H$K5$$,IU$/$G$7$g$&(B; @code{nnmaildir} $B$NJ88%(B
+$B$O$^$@$3$N%^%K%e%"%k$K40A4$KJTF~$5$l$F$$$J$$$N$G$9!#$=$l$^$G(B
+$B$O(B @uref{http://multivac.cwru.edu./nnmaildir/} $B$G8+$D$1$k$3$H$,$G$-$^$9!#(B
 
 @menu
 * Unix Mail Box::               ($B$H$F$b(B) $BI8=`E*$J(B Un*x mbox $B$r;H$&(B
@@ -13035,6 +13044,10 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
 $B$l$^$9!#$^$?!"8D!9$N(B @code{nnml} $B%0%k!<%W$K$D$$$F$b%P%C%/%"%C%W$9$k$3$H(B
 $B$,2DG=$G!"(B($B%P%C%/%"%C%W$r(B nnml $B%G%#%l%/%$%H%j$KLa$7$?8e$G(B) @kbd{G m} $B%-!<(B
 $B$r;H$C$F$=$N%0%k!<%W$r85$KLa$7$^$9!#(B
+
+$B$b$72?$i$+$NM}M3$K$h$C$F(B @file{.marks} $B%U%!%$%k$,$*$+$7$/$J$C$F$$$k$H;W$C(B
+$B$?$H$-$O!"C1$K$=$l$iA4It$r>C$7$F$7$^$&$3$H$,$G$-$^$9!#(Bgnus $B$O<!2s5/F0$9(B
+$B$k$H$-$K!"$=$l$i$r@5$7$/:F:n@.$9$k$G$7$g$&!#(B
 
 $B;v<B>e$N%5!<%P!<$N@_Dj(B:
 
@@ -13335,6 +13348,63 @@ Rand MH $B%a!<%k1\Mw%7%9%F%`$O(B UNIX $B%7%9%F%`$K$+$J$jD9$$4VB8:_$7$F$$$^$9!
 @code{nnfolder} $B$O:GA1$NA*Br$G$O$"$j$^$;$s$,!"$=$l$J$j$NNL$N%a!<%k$7$+<u(B
 $B$1<h$i$J$$$J$i!"$*$=$i$/(B @code{nnfolder} $B$OA4$F$NCf$G0lHVE,$7$?%P%C%/%((B
 $B%s%I$G$7$g$&!#(B
+
+@c TRANSLATE_ME
+@item nnmaildir
+
+@code{nnmaildir} is largely similar to @code{nnml}, with some notable
+differences.  Each message is stored in a separate file, but the
+filename is unrelated to the article number in Gnus.  @code{nnmaildir}
+also stores the equivalent of @code{nnml}'s overview files in one file
+per article, so it uses about twice as many inodes as @code{nnml}.  (Use
+@code{df -i} to see how plentiful your inode supply is.)  If this slows
+you down or takes up very much space, consider switching to ReiserFS
+(@uref{http://www.namesys.com/}) or another non-block-structured
+filesystem.
+
+Since maildirs don't require locking for delivery, the maildirs you use
+as groups can also be the maildirs your mail is directly delivered to.
+This means you can skip Gnus's mail splitting if your mail is already
+organized into different mailboxes during delivery.  A @code{directory}
+entry in @code{mail-sources} would have a similar effect, but would
+require one set of mailboxes for spooling deliveries (in mbox format,
+thus damaging message bodies), and another set to be used as groups (in
+whatever format you like).  A maildir has a built-in spool, in the
+@code{new/} subdirectory.  Beware that currently, mail moved from
+@code{new/} to @code{cur/} instead of via mail splitting will undergo
+treatment such as duplicate checking.
+
+An article will not necessarily keep the same number across Gnus
+sessions; articles are renumbered starting from 1 for each Gnus session
+(more precisely, each time you open the @code{nnmaildir} server).  This
+way, you don't get gaps in your article number ranges, and when entering
+large groups, Gnus is likely to give a more accurate article count.  The
+price is that @code{nnmaildir} doesn't work with the cache or agent.
+This will probably be changed in the future.
+
+@code{nnmaildir} stores article marks for a given group in the
+corresponding maildir, in a way designed so that it's easy to manipulate
+them from outside Gnus.  You can tar up a maildir, unpack it somewhere
+else, and still have your marks.  @code{nnml} also stores marks, but
+it's not as easy to work with them from outside Gnus as with
+@code{nnmaildir}.
+
+For configuring expiry and other things, @code{nnmaildir} uses group
+parameters slightly different from those of other mail backends.
+
+@code{nnmaildir} uses a significant amount of memory to speed things up.
+(It keeps in memory some of the things that @code{nnml} stores in files
+and that @code{nnmh} repeatedly parses out of message files.)  If this
+is a problem for you, you can set the @code{nov-cache-size} group
+parameter to somthing small (0 would probably not work, but 1 probably
+would) to make it use less memory.
+
+Startup and shutdown are likely to be slower with @code{nnmaildir} than
+with other backends.  Everything in between is likely to be faster,
+depending in part on your filesystem.
+
+@code{nnmaildir} does not use @code{nnoo}, so you cannot use @code{nnoo}
+to write an @code{nnmaildir}-derived backend.
 @end table
 
 @node Browsing the Web
