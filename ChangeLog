@@ -1,3 +1,20 @@
+1999-07-20   Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-prepare-for-miee,
+	gnus-ofsetup-write-setting-file): New functions.
+	(gnus-setup-for-offline): Use them.
+	(gnus-ofsetup-parameters, gnus-ofsetup-customize,
+	gnus-ofsetup-customize-done): New functions for customization
+	support.
+
+	* lisp/gnus-offline.el (gnus-offline-version-number): Update to
+	2.20.
+	(gnus-offline-define-menu-on-miee,
+	gnus-offline-define-menu-on-agent): Add a menu item which calls
+	`gnus-ofsetup-customize'.
+
 1999-07-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.08.

@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.35 1999-03-22 21:46:30 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.35.2.1 1999-07-20 15:01:17 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -100,13 +100,14 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.10b1")
+(defconst gnus-offline-version-number "2.20")
 (defconst gnus-offline-codename
 ;;  "Beta5"			; Beta
 ;;  "This is the time"		; 2.00
 ;;  "A matter of trust"
 ;;  "Modern Woman"
-  "Ahhhhhhh!!"			; 2.10b1
+;;  "Ahhhhhhh!!"		; 2.10b1
+  "Cup of life"                 ; 2.20
 ;;  "Code of silence"
   )
 
@@ -795,7 +796,9 @@ If value is nil , dialup line is disconnected status.")
 	  ["取得済記事を消す" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
 	  ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
 	  "----"
-	  ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
+	  ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected]
+	  "----"
+	  ["プロパティ..." gnus-ofsetup-customize t])
 	 ))
     (easy-menu-change
      nil
@@ -818,6 +821,8 @@ If value is nil , dialup line is disconnected status.")
 	["Set interval time" gnus-offline-set-interval-time t]
 	"----"
 	["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
+	"----"
+	["Customize options..." gnus-ofsetup-customize t]
 	))))))
   (and (featurep 'xemacs)
        (easy-menu-add menu))))
@@ -841,7 +846,9 @@ If value is nil , dialup line is disconnected status.")
 	 ["取得済記事を消す" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
 	 ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
 	 "----"
-	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
+	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected]
+	 "----"
+	 ["プロパティ..." gnus-ofsetup-customize t])
      '("Offline"
        ["Toggle movemail program" gnus-offline-toggle-movemail-program
 	(not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
@@ -852,7 +859,9 @@ If value is nil , dialup line is disconnected status.")
        ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
        ["Set interval time" gnus-offline-set-interval-time t]
        "----"
-       ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected])))
+       ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
+       "----"
+       ["Customize options..." gnus-ofsetup-customize t])))
   (and (featurep 'xemacs)
        (easy-menu-add gnus-offline-menu-on-agent)))
 ;;
