@@ -13029,6 +13029,13 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 $B@\B3$r;n$_$k%5!<%P!<$N%]!<%H$G$9!#=i4|CM$G$O!"%]!<%H(B 143 $B$+!"(BSSL $B$G(B
 $B$O(B 993 $B$G$9!#(B
 
+$B$3$l$O@0?t$G$J$1$l$P$J$j$^$;$s!#0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
+
+@lisp
+(nnimap "mail.server.com"
+        (nnimap-server-port 4711))
+@end lisp
+
 @item nnimap-list-pattern
 @vindex nnimap-list-pattern
 $B;HMQ2DG=$J%a!<%k%\%C%/%9$r@)8B$9$k$?$a$NJ8;zNs$+%j%9%H$G$9!#$3$l$O!"%5!<(B
@@ -13041,10 +13048,12 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 $B$N(B REFERENCE $B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<(B
 $B$G$O!"%a!<%k%\%C%/%9$HO"7k$5$l$?%G%#%l%/%H%j!<$G$9!#(B
 
-$BNc$($P(B:
+$B0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
 
 @lisp
-("INBOX" "Mail/*" "alt.sex.*" ("~friend/Mail/" . "list/*"))
+(nnimap "mail.server.com"
+        (nnimap-list-pattern ("INBOX" "Mail/*" "alt.sex.*" 
+                               ("~friend/Mail/" . "list/*"))))
 @end lisp
 
 @item nnimap-stream
@@ -13053,6 +13062,16 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 $B$O(B nnimap $B$O(B SSL $B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
 (SSL $B$O(B STARTTLS $B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F08!=P$G$-$^$9$,!"$^$@(B
 $B9-HO0O$KG[Hw$5$l$F$$$^$;$s!#(B)
+
+$B0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
+
+@lisp
+(nnimap "mail.server.com"
+        (nnimap-stream ssl))
+@end lisp
+
+@code{nnimap-stream} $B$NCM$O%7%s%\%k$G$J$1$l$P$J$i$J$$$3$H$KCm0U$7$F2<$5(B
+$B$$(B!
 
 @itemize @bullet
 @item
@@ -13097,6 +13116,16 @@ IMAP $B@\B3$K(B @code{shell} $B%9%H%j!<%`$r;H$&>l9g!"JQ(B
 
 $B%5!<%P!<$K@\B3$9$k$?$a$K;H$o$l$kG'>Z$G$9!#=i4|@_Dj$G$O!"(Bnnimap $B$O%5!<%P!<(B
 $B$,;HMQ2DG=$J0lHV0BA4$JG'>Z$r;HMQ$7$^$9!#(B
+
+$B0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
+
+@lisp
+(nnimap "mail.server.com"
+        (nnimap-authenticator anonymous))
+@end lisp
+
+@code{nnimap-authenticator} $B$NCM$O%7%s%\%k$G$J$1$l$P$J$i$J$$$3$H$KCm0U$7(B
+$B$F2<$5$$(B!
 
 @itemize @bullet
 @item
