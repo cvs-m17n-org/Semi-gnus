@@ -566,7 +566,8 @@ displayed by the first non-nil matching CONTENT face."
   :group 'gnus-article-mime
   :type 'function)
 
-(defvar gnus-decode-header-function 'mail-decode-encoded-word-region
+(defvar gnus-decode-header-function 'mime-decode-header-in-region
+					;'mail-decode-encoded-word-region
   "Function used to decode headers.")
 
 (defvar gnus-article-dumbquotes-map
@@ -1439,14 +1440,13 @@ If PROMPT (the prefix), prompt for a coding system to use."
                                (error))
 			      gnus-newsgroup-ignored-charsets))
 	     buffer-read-only)
-	(if (and ctl (not (string-match "/" (car ctl)))) 
-	    (setq ctl nil))
 	(goto-char (point-max))
 	(widen)
 	(forward-line 1)
 	(narrow-to-region (point) (point-max))
 	(when (and (or (not ctl)
-		       (equal (car ctl) "text/plain")))
+		       (and (eq (mime-content-type-primary-type ctl) 'text)
+			    (eq (mime-content-type-subtype ctl) 'plain))))
 	  (mm-decode-body
 	   charset (and cte (intern (downcase
 				     (gnus-strip-whitespace cte))))
@@ -2698,7 +2698,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      (gnus-article-prepare-display)
+	      (gnus-article-prepare-display 
+	       (set (make-local-variable 'mime-message-structure)
+		    (or header gnus-current-headers)))
 	      ;; Do page break.
 	      (goto-char (point-min))
 	      (setq gnus-page-broken
@@ -2714,7 +2716,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    t))))))
 
 ;;;###autoload
-(defun gnus-article-prepare-display ()
+(defun gnus-article-prepare-display (&optional parent)
   "Make the current buffer look like a nice article."
   ;; Hooks for getting information from the article.
   ;; This hook must be called before being narrowed.
@@ -2726,7 +2728,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  gnus-article-wash-types nil)
     (gnus-run-hooks 'gnus-tmp-internal-hook)
     (when gnus-display-mime-function
-      (funcall gnus-display-mime-function))
+      (funcall gnus-display-mime-function parent))
     (gnus-run-hooks 'gnus-article-prepare-hook)))
 
 ;;;
@@ -2832,7 +2834,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 (defun gnus-mime-view-part-as-type ()
   "Choose a MIME media type, and view the part as such."
   (interactive
-   (list (completing-read "View as MIME type: " mailcap-mime-types)))
+   (list (completing-read "View as MIME type: " mm-mailcap-mime-types)))
   (gnus-article-check-buffer)
   (let ((handle (get-text-property (point) 'gnus-data)))
     (gnus-mm-display-part handle)))
@@ -3088,7 +3090,7 @@ In no internal viewer is available, use an external viewer."
 
 (defvar gnus-displaying-mime nil)
 
-(defun gnus-display-mime (&optional ihandles)
+(defun gnus-display-mime (parent &optional ihandles)
   "Display the MIME parts."
   (save-excursion
     (save-selected-window
@@ -3099,7 +3101,7 @@ In no internal viewer is available, use an external viewer."
 	  ;; We have to do this since selecting the window
 	  ;; may change the point.  So we set the window point.
 	  (set-window-point window point)))
-      (let* ((handles (or ihandles (mm-dissect-buffer) (mm-uu-dissect)))
+      (let* ((handles (or ihandles (mm-dissect-buffer parent) (mm-uu-dissect)))
 	     buffer-read-only handle name type b e display)
 	(when (and (not ihandles)
 		   (not gnus-displaying-mime))
@@ -3112,8 +3114,7 @@ In no internal viewer is available, use an external viewer."
 	  (when gnus-article-mime-part-function
 	    (gnus-mime-part-function handles)))
 	(if (and handles
-		 (or (not (stringp (car handles)))
-		     (cdr handles)))
+		 (mm-handle-child handles))
 	    (progn
 	      (when (and (not ihandles)
 			 (not gnus-displaying-mime))
@@ -3138,29 +3139,30 @@ In no internal viewer is available, use an external viewer."
 (defvar gnus-mime-display-multipart-as-mixed nil)
 
 (defun gnus-mime-display-part (handle)
-  (cond
-   ;; Single part.
-   ((not (stringp (car handle)))
-    (gnus-mime-display-single handle))
-   ;; User-defined multipart
-   ((cdr (assoc (car handle) gnus-mime-multipart-functions))
-    (funcall (cdr (assoc (car handle) gnus-mime-multipart-functions))
-	     handle))
-   ;; multipart/alternative
-   ((and (equal (car handle) "multipart/alternative")
-	 (not gnus-mime-display-multipart-as-mixed))
-    (let ((id (1+ (length gnus-article-mime-handle-alist))))
-      (push (cons id handle) gnus-article-mime-handle-alist)
-      (gnus-mime-display-alternative (cdr handle) nil nil id)))
-   ;; multipart/related
-   ((and (equal (car handle) "multipart/related")
-	 (not gnus-mime-display-multipart-as-mixed))
-    ;;;!!!We should find the start part, but we just default
-    ;;;!!!to the first part.
-    (gnus-mime-display-part (cadr handle)))
-   ;; Other multiparts are handled like multipart/mixed.
-   (t
-    (gnus-mime-display-mixed (cdr handle)))))
+  (if (not (mm-handle-child handle))
+      ;; Single part.
+      (gnus-mime-display-single handle)
+    (let ((type (mm-handle-media-type handle)))
+      (cond
+       ;; User-defined multipart
+       ((cdr (assoc type  gnus-mime-multipart-functions))
+	(funcall (cdr (assoc (car handle) gnus-mime-multipart-functions))
+		 handle))
+       ;; multipart/alternative
+       ((and (equal type "multipart/alternative")
+	     (not gnus-mime-display-multipart-as-mixed))
+	(let ((id (1+ (length gnus-article-mime-handle-alist))))
+	  (push (cons id handle) gnus-article-mime-handle-alist)
+	  (gnus-mime-display-alternative (mm-handle-child handle) nil nil id)))
+       ;; multipart/related
+       ((and (equal type "multipart/related")
+	     (not gnus-mime-display-multipart-as-mixed))
+        ;;;!!!We should find the start part, but we just default
+        ;;;!!!to the first part.
+	(gnus-mime-display-part (car (mm-handle-child handle))))
+       ;; Other multiparts are handled like multipart/mixed.
+       (t
+	(gnus-mime-display-mixed (mm-handle-child handle)))))))
 
 (defun gnus-mime-part-function (handles)
   (if (stringp (car handles))
@@ -3184,8 +3186,8 @@ In no internal viewer is available, use an external viewer."
 	(if (and (setq not-attachment
 		       (and (not (mm-inline-override-p handle))
 			    (or (not (mm-handle-disposition handle))
-				(equal (car (mm-handle-disposition handle))
-				       "inline")
+				(eq (mm-handle-disposition-type handle)
+				    'inline)
 				(mm-attachment-override-p handle))))
 		 (mm-automatic-display-p handle)
 		 (or (mm-inlined-p handle)
@@ -3319,7 +3321,7 @@ In no internal viewer is available, use an external viewer."
 	    (insert "  "))
 	  (insert "\n\n"))
 	(when preferred
-	  (if (stringp (car preferred))
+	  (if (mm-handle-child preferred)
 	      (gnus-display-mime preferred)
 	    (let ((mail-parse-charset gnus-newsgroup-charset)
 		  (mail-parse-ignored-charsets 
@@ -3333,7 +3335,7 @@ In no internal viewer is available, use an external viewer."
 		  (gnus-treat-article
 		   nil (length gnus-article-mime-handle-alist)
 		   (1- (length gnus-article-mime-handles))
-		   (mm-handle-media-type handle))))))
+		   (mm-handle-media-type preferred))))))
 	  (goto-char (point-max))
 	  (setcdr begend (point-marker)))))
     (when ibegend
