@@ -1,5 +1,17 @@
 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.6.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Use
+	`save-buffer-as-coding-system' instead of
+	`write-region-as-coding-system'.
+	(save-buffer-as-coding-system): New function defined with
+	`defun-maybe'. NOTE: It should be deleted in the future.
+
+	* lisp/gnus-sum.el (TopLevel): Require `mime-play' when compile.
+
+1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
 	implementation.
 
