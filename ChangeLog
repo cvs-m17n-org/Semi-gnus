@@ -1,3 +1,12 @@
+1999-12-01   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-category-edit-predicate): Expand `setf'
+	appears in the backquoted form.
+	(gnus-category-edit-score): Ditto.
+
+	* lisp/gnus-sum.el (gnus-data-set-header): Expand `setf'
+	appears in the backquoted form.
+
 1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
