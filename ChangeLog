@@ -1,3 +1,8 @@
+2003-06-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Don't check for
+	`illegible text' messages (see the comment).
+
 2003-05-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
