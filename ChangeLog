@@ -1,3 +1,9 @@
+1998-08-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.10.
+
+	* Sync up with Gnus 5.6.33.
+	
 1998-08-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el: Generate New frame when write new message.
