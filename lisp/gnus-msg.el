@@ -248,7 +248,7 @@ See also the `mml-default-encrypt-method' variable."
 
 (defcustom gnus-message-replysignencrypted
   t
-  "Setting this causes automatically encryped messages to also be signed."
+  "Setting this causes automatically encrypted messages to also be signed."
   :group 'gnus-message
   :type 'boolean)
 
@@ -535,7 +535,9 @@ Gcc: header for archiving purposes."
       (set-window-configuration ,winconf))
    'exit 'postpone 'kill)
   (let ((to-be-marked (cond
-		       (yanked yanked)
+		       (yanked
+			(mapcar
+			 (lambda (x) (if (listp x) (car x) x)) yanked))
 		       (article (if (listp article) article (list article)))
 		       (t nil))))
     (message-add-action
@@ -587,7 +589,7 @@ If ARG is 1, prompt for group name to post to.
 
 This function prepares a news even when using mail groups.  This is useful
 for posting messages to mail groups without actually sending them over the
-network.  The corresponding backend must have a 'request-post method."
+network.  The corresponding back end must have a 'request-post method."
   (interactive "P")
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
@@ -666,7 +668,7 @@ If ARG, don't do that.  If ARG is 1, prompt for group name to post to.
 
 This function prepares a news even when using mail groups.  This is useful
 for posting messages to mail groups without actually sending them over the
-network.  The corresponding backend must have a 'request-post method."
+network.  The corresponding back end must have a 'request-post method."
   (interactive "P")
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
@@ -720,8 +722,7 @@ a news."
 If prefix argument YANK is non-nil, the original article is yanked
 automatically.
 YANK is a list of elements, where the car of each element is the
-article number, and the two following numbers is the region to be
-yanked."
+article number, and the cdr is the string to be yanked."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
@@ -1038,52 +1039,16 @@ If SILENT, don't prompt the user."
 
 
 
-;; Dummies to avoid byte-compile warning.
-(eval-when-compile
-  (defvar nnspool-rejected-article-hook)
-  (defvar xemacs-codename))
-
 (defun gnus-extended-version ()
   "Stringified Gnus version and Emacs version.
 See the variable `gnus-user-agent'."
   (interactive)
-  (let* ((gnus-v
+  (let* ((float-output-format nil)
+	 (gnus-v
 	  (concat "Gnus/"
 		  (prin1-to-string (gnus-continuum-version gnus-version) t)
 		  " (" gnus-version ")"))
-	 (system-v
-	  (cond
-	   ((eq gnus-user-agent 'emacs-gnus-config)
-	    system-configuration)
-	   ((eq gnus-user-agent 'emacs-gnus-type)
-	    (symbol-name system-type))
-	   (t nil)))
-	 (emacs-v
-	  (cond
-	   ((eq gnus-user-agent 'gnus)
-	    nil)
-	   ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
-	    (concat "Emacs/" (match-string 1 emacs-version)
-		    (if system-v
-			(concat " (" system-v ")")
-		      "")))
-	   ((string-match
-	     "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-	     emacs-version)
-	    (concat
-	     (match-string 1 emacs-version)
-	     (format "/%d.%d" emacs-major-version emacs-minor-version)
-	     (if (match-beginning 3)
-		 (match-string 3 emacs-version)
-	       "")
-	     (if (boundp 'xemacs-codename)
-		 (concat
-		  " (" xemacs-codename
-		  (if system-v
-		      (concat ", " system-v ")")
-		    ")"))
-	       "")))
-	   (t emacs-version))))
+	 (emacs-v (gnus-emacs-version)))
     (if (stringp gnus-user-agent)
 	gnus-user-agent
       (concat gnus-v
@@ -1108,7 +1073,7 @@ If VERY-WIDE, make a very wide reply."
 	      (gnus-summary-work-articles 1))))
   ;; Allow user to require confirmation before replying by mail to the
   ;; author of a news article (or mail message).
-  (when (or 
+  (when (or
 	    (not (or (gnus-news-group-p gnus-newsgroup-name)
 		     gnus-confirm-treat-mail-like-news))
 	    (not (cond ((stringp gnus-confirm-mail-reply-to-news)
@@ -1312,7 +1277,6 @@ composing a new message."
 	;; Get a normal message buffer.
 	(message-pop-to-buffer (message-buffer-name "Resend" to))
 	(insert-buffer-substring cur)
-	(mime-to-mml)
 	(message-narrow-to-head-1)
 	;; Gnus will generate a new one when sending.
 	(message-remove-header "Message-ID")
@@ -1321,8 +1285,8 @@ composing a new message."
 	(goto-char (point-max))
 	(insert mail-header-separator)
 	(goto-char (point-min))
-	(re-search-forward "^To:\\|^Newsgroups:" nil 'move)
-	(forward-char 1)
+	(when (re-search-forward "^To:\\|^Newsgroups:" nil 'move)
+	  (forward-char 1))
 	(widen)))))
 
 (defun gnus-summary-post-forward (&optional arg)
@@ -1418,7 +1382,7 @@ The current group name will be inserted at \"%s\".")
       ;; This mail group doesn't have a `to-list', so we add one
       ;; here.  Magic!
       (when (gnus-y-or-n-p
-	     (format "Do you want to add this as `to-list': %s " to-address))
+	     (format "Do you want to add this as `to-list': %s? " to-address))
 	(gnus-group-add-parameter group (cons 'to-list to-address))))))
 
 (defun gnus-put-message ()
@@ -1518,8 +1482,7 @@ If YANK is non-nil, include the original article."
    (list (completing-read "Buffer: " (mapcar 'list (message-buffers)) nil t)
 	 current-prefix-arg))
   (gnus-summary-iterate n
-    (let ((gnus-display-mime-function nil)
-	  (gnus-inhibit-treatment t))
+    (let ((gnus-inhibit-treatment t))
       (gnus-summary-select-article))
     (save-excursion
       (set-buffer buffer)
@@ -1586,7 +1549,7 @@ The source file has to be in the Emacs load path."
 
 (defun gnus-summary-resend-bounced-mail (&optional fetch)
   "Re-mail the current message.
-This only makes sense if the current message is a bounce message than
+This only makes sense if the current message is a bounce message that
 contains some mail you have written which has been bounced back to
 you.
 If FETCH, try to fetch the article that this is a reply to, if indeed
@@ -1784,9 +1747,14 @@ this is a reply."
 		     (if (string-match " " gcc-self-val)
 			 (concat "\"" gcc-self-val "\"")
 		       gcc-self-val)
-		   (if (string-match " " group)
-		       (concat "\"" group "\"")
-		     group)))
+		   ;; In nndoc groups, we use the parent group name
+		   ;; instead of the current group.
+		   (let ((group (or (gnus-group-find-parameter
+				     gnus-newsgroup-name 'parent-group)
+				    group)))
+		     (if (string-match " " group)
+			 (concat "\"" group "\"")
+		       group))))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
 		  (gnus-delete-line)))
@@ -1820,7 +1788,7 @@ this is a reply."
   (unless gnus-inhibit-posting-styles
     (let ((group (or group-name gnus-newsgroup-name ""))
 	  (styles gnus-posting-styles)
-	  style match variable attribute value v results
+	  style match attribute value v results
 	  filep name address element)
       ;; If the group has a posting-style parameter, add it at the end with a
       ;; regexp matching everything, to be sure it takes precedence over all
@@ -1868,7 +1836,6 @@ this is a reply."
 	  ;; We have a match, so we set the variables.
 	  (dolist (attribute style)
 	    (setq element (pop attribute)
-		  variable nil
 		  filep nil)
 	    (setq value
 		  (cond

@@ -3,7 +3,7 @@
 ;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;      Free Software Foundation, Inc.
 
-;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news xpm annotation glyph faces
 
 ;; This file is part of GNU Emacs.
@@ -35,7 +35,9 @@
 ;;          domain/dom/subdomain/unknown/face.gif
 ;; Groups:  comp.lang.lisp
 ;;          news/comp/lang/lisp/unknown/face.gif
-
+;;
+;; Original implementation by Wes Hardaker <hardaker@ece.ucdavis.edu>.
+;;
 ;;; Code:
 
 (require 'gnus)
@@ -139,7 +141,7 @@ GLYPH can be either a glyph or a string."
       (insert glyph)
     (gnus-add-wash-type category)
     (gnus-add-image category (car glyph))
-    (gnus-put-image (car glyph) (cdr glyph))))
+    (gnus-put-image (car glyph) (cdr glyph) category)))
 
 (defun gnus-picon-create-glyph (file)
   (or (cdr (assoc file gnus-picon-glyph-alist))
@@ -154,8 +156,11 @@ GLYPH can be either a glyph or a string."
 	   (mail-header-parse-addresses
 	    ;; mail-header-parse-addresses does not work (reliably) on
 	    ;; decoded headers.
-	    (mail-encode-encoded-word-string
-	     (or (mail-fetch-field header) ""))))
+	    (or
+	     (ignore-errors
+	       (mail-encode-encoded-word-string
+		(or (mail-fetch-field header) "")))
+	     (mail-fetch-field header))))
 	  spec file point cache)
       (dolist (address addresses)
 	(setq address (car address))
@@ -231,37 +236,46 @@ GLYPH can be either a glyph or a string."
 
 ;;; Commands:
 
+;; #### NOTE: the test for buffer-read-only is the same as in
+;; article-display-[x-]face. See the comment up there.
+
 ;;;###autoload
 (defun gnus-treat-from-picon ()
   "Display picons in the From header.
 If picons are already displayed, remove them."
   (interactive)
-  (gnus-with-article-buffer
-    (if (memq 'from-picon gnus-article-wash-types)
-	(gnus-delete-images 'from-picon)
-      (gnus-picon-transform-address "from" 'from-picon))))
+  (let ((wash-picon-p buffer-read-only))
+    (gnus-with-article-buffer
+      (if (and wash-picon-p (memq 'from-picon gnus-article-wash-types))
+	  (gnus-delete-images 'from-picon)
+	(gnus-picon-transform-address "from" 'from-picon)))
+    ))
 
 ;;;###autoload
 (defun gnus-treat-mail-picon ()
   "Display picons in the Cc and To headers.
 If picons are already displayed, remove them."
   (interactive)
-  (gnus-with-article-buffer
-    (if (memq 'mail-picon gnus-article-wash-types)
-	(gnus-delete-images 'mail-picon)
-      (gnus-picon-transform-address "cc" 'mail-picon)
-      (gnus-picon-transform-address "to" 'mail-picon))))
+  (let ((wash-picon-p buffer-read-only))
+    (gnus-with-article-buffer
+      (if (and wash-picon-p (memq 'mail-picon gnus-article-wash-types))
+	  (gnus-delete-images 'mail-picon)
+	(gnus-picon-transform-address "cc" 'mail-picon)
+	(gnus-picon-transform-address "to" 'mail-picon)))
+    ))
 
 ;;;###autoload
 (defun gnus-treat-newsgroups-picon ()
   "Display picons in the Newsgroups and Followup-To headers.
 If picons are already displayed, remove them."
   (interactive)
-  (gnus-with-article-buffer
-    (if (memq 'newsgroups-picon gnus-article-wash-types)
-	(gnus-delete-images 'newsgroups-picon)
-      (gnus-picon-transform-newsgroups "newsgroups")
-      (gnus-picon-transform-newsgroups "followup-to"))))
+  (let ((wash-picon-p buffer-read-only))
+    (gnus-with-article-buffer
+      (if (and wash-picon-p (memq 'newsgroups-picon gnus-article-wash-types))
+	  (gnus-delete-images 'newsgroups-picon)
+	(gnus-picon-transform-newsgroups "newsgroups")
+	(gnus-picon-transform-newsgroups "followup-to")))
+    ))
 
 (provide 'gnus-picon)
 

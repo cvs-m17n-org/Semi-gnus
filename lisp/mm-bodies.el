@@ -109,7 +109,7 @@ If no encoding was done, nil is returned."
 	   ))))))
 
 (defun mm-long-lines-p (length)
-  "Say whether any of the lines in the buffer is longer than LINES."
+  "Say whether any of the lines in the buffer is longer than LENGTH."
   (save-excursion
     (goto-char (point-min))
     (end-of-line)
@@ -130,8 +130,9 @@ If no encoding was done, nil is returned."
 	(longp (mm-long-lines-p 1000)))
     (require 'message)
     (cond
-     ((and (not mm-use-ultra-safe-encoding)
-	   (not longp)
+     ((and (not longp)
+	   (not (and mm-use-ultra-safe-encoding
+		     (save-excursion (re-search-forward "^From " nil t))))
 	   (eq bits '7bit))
       bits)
      ((and (not mm-use-ultra-safe-encoding)

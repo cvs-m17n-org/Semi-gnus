@@ -424,7 +424,7 @@ ARTICLE is the article number of the current headline.")
 					(nnrss-translate-file-chars
 					 (concat group ".xml"))
 					nnrss-directory))))
-	(nnrss-fetch file t)
+	(setq xml (nnrss-fetch file t))
       (setq url (or (nth 2 (assoc group nnrss-server-data))
 		    (second (assoc group nnrss-group-alist))))
       (unless url
@@ -457,7 +457,8 @@ ARTICLE is the article number of the current headline.")
 	(setq extra (or (nnrss-node-text content-ns 'encoded item)
 			(nnrss-node-text rss-ns 'description item)))
 	(setq author (or (nnrss-node-text rss-ns 'author item)
-			 (nnrss-node-text dc-ns 'creator item)))
+			 (nnrss-node-text dc-ns 'creator item)
+			 (nnrss-node-text dc-ns 'contributor item)))
 	(setq date (or (nnrss-node-text dc-ns 'date item)
 		       (nnrss-node-text rss-ns 'pubDate item)
 		       (message-make-date)))
@@ -685,7 +686,9 @@ whether they are `offsite' or `onsite'."
 (defun nnrss-find-rss-via-syndic8 (url)
   "query syndic8 for the rss feeds it has for the url."
   (if (not (locate-library "xml-rpc"))
-      (message "XML-RPC is not available... not checking Syndic8.")
+      (progn
+	(message "XML-RPC is not available... not checking Syndic8.")
+	nil)
     (require 'xml-rpc)
     (let ((feedid (xml-rpc-method-call
 		   "http://www.syndic8.com/xmlrpc.php"

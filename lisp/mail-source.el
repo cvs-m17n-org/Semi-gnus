@@ -344,7 +344,7 @@ Common keywords should be listed here.")
        (:authentication password))
       (maildir
        (:path (or (getenv "MAILDIR") "~/Maildir/"))
-       (:subdirs ("new" "cur"))
+       (:subdirs ("cur" "new"))
        (:function))
       (imap
        (:server (getenv "MAILHOST"))
@@ -357,6 +357,9 @@ Common keywords should be listed here.")
        (:mailbox "INBOX")
        (:predicate "UNSEEN UNDELETED")
        (:fetchflag "\\Deleted")
+       (:prescript)
+       (:prescript-delay)
+       (:postscript)
        (:dontexpunge))
       (webmail
        (:subtype hotmail)
@@ -608,7 +611,8 @@ Pass INFO on to CALLBACK."
 		(set-file-modes to mail-source-default-file-modes))
 	      (if (and (or (not (buffer-modified-p errors))
 			   (zerop (buffer-size errors)))
-		       (zerop result))
+		       (and (numberp result)
+			    (zerop result)))
 		  ;; No output => movemail won.
 		  t
 		(set-buffer errors)
@@ -644,8 +648,8 @@ Pass INFO on to CALLBACK."
       (delete-file from)))
 
 (defun mail-source-fetch-with-program (program)
-  (zerop (call-process shell-file-name nil nil nil
-		       shell-command-switch program)))
+  (eq 0 (call-process shell-file-name nil nil nil
+		      shell-command-switch program)))
 
 (defun mail-source-run-script (script spec &optional delay)
   (when script
@@ -965,14 +969,17 @@ This only works when `display-time' is enabled."
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."
   (mail-source-bind (imap source)
-    (let* ((from (format "%s:%s:%s" server user port))
-	   (found 0)
-	   (buffer-name " *imap source*")
-	   (buf (get-buffer-create (generate-new-buffer-name buffer-name)))
-	   (mail-source-string (format "imap:%s:%s" server mailbox))
-	   (imap-shell-program (or (list program) imap-shell-program))
-	   remove)
-      (if (and (imap-open server port stream authentication buffer-name)
+    (mail-source-run-script
+     prescript (format-spec-make ?p password ?t mail-source-crash-box
+				 ?s server ?P port ?u user)
+     prescript-delay)
+    (let ((from (format "%s:%s:%s" server user port))
+	  (found 0)
+	  (buf (generate-new-buffer " *imap source*"))
+	  (mail-source-string (format "imap:%s:%s" server mailbox))
+	  (imap-shell-program (or (list program) imap-shell-program))
+	  remove)
+      (if (and (imap-open server port stream authentication buf)
 	       (imap-authenticate
 		user (or (cdr (assoc from mail-source-password-cache))
 			 password) buf)
@@ -985,8 +992,8 @@ This only works when `display-time' is enabled."
 	      (mm-disable-multibyte)
 	      ;; remember password
 	      (with-current-buffer buf
-		(when (or imap-password
-			  (assoc from mail-source-password-cache))
+		(when (and imap-password
+			   (not (assoc from mail-source-password-cache)))
 		  (push (cons from imap-password) mail-source-password-cache)))
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
@@ -1005,6 +1012,7 @@ This only works when `display-time' is enabled."
 	      (nnheader-ms-strip-cr))
 	    (incf found (mail-source-callback callback server))
 	    (when (and remove fetchflag)
+	      (setq remove (nreverse remove))
 	      (imap-message-flags-add
 	       (imap-range-to-message-set (gnus-compress-sequence remove))
 	       fetchflag nil buf))
@@ -1018,8 +1026,12 @@ This only works when `display-time' is enabled."
 	(setq mail-source-password-cache
 	      (delq (assoc from mail-source-password-cache)
 		    mail-source-password-cache))
-	(error (imap-error-text buf)))
+	(error "IMAP error: %s" (imap-error-text buf)))
       (kill-buffer buf)
+      (mail-source-run-script
+       postscript
+       (format-spec-make ?p password ?t mail-source-crash-box
+			 ?s server ?P port ?u user))
       found)))
 
 (eval-and-compile

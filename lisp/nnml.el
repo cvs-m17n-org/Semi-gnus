@@ -369,7 +369,10 @@ marks file will be regenerated properly by Gnus.")
   (nnmail-check-syntax)
   (let (result)
     (when nnmail-cache-accepted-message-ids
-      (nnmail-cache-insert (nnmail-fetch-field "message-id") group))
+      (nnmail-cache-insert (nnmail-fetch-field "message-id") 
+			   group
+			   (nnmail-fetch-field "subject")
+			   (nnmail-fetch-field "from")))
     (if (stringp group)
 	(and
 	 (nnmail-activate 'nnml)
@@ -886,7 +889,8 @@ Use the nov database for that directory if available."
 (defun nnml-current-group-article-to-file-alist ()
   "Return an alist of article/file pairs in the current group.
 Use the nov database for the current group if available."
-  (if (or gnus-nov-is-evil
+  (if (or nnml-use-compressed-files
+	  gnus-nov-is-evil
 	  nnml-nov-is-evil
 	  (not (file-exists-p
 		(expand-file-name nnml-nov-file-name

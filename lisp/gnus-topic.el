@@ -435,6 +435,8 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
 	 (and gnus-group-listed-groups
 	      (copy-sequence gnus-group-listed-groups))))
 
+    (gnus-update-format-specifications nil 'topic)
+    
     (when (or (not gnus-topic-alist)
 	      (not gnus-topology-checked-p))
       (gnus-topic-check-topology))
@@ -752,7 +754,7 @@ articles in the topic and its subtopics."
 		    (not (gnus-topic-goto-topic (caaar tp))))
 	  (pop tp))
 	(if tp
-	    (forward-line 1)
+	    (gnus-topic-forward-topic 1)
 	  (gnus-topic-goto-missing-topic (caadr top)))))
     nil))
 
@@ -927,8 +929,8 @@ articles in the topic and its subtopics."
 		       ? ))
 		     (yanked (list group))
 		     alist talist end)
-		;; Then we enter the yanked groups into the topics they belong
-		;; to.
+		;; Then we enter the yanked groups into the topics
+		;; they belong to.
 		(when (setq alist (assoc (save-excursion
 					   (forward-line -1)
 					   (or

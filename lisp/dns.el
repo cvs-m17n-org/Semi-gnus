@@ -281,8 +281,9 @@ If TCP-P, the first two bytes of the package with be the length field."
       (setq dns-servers (nreverse dns-servers)))))
 
 ;;; Interface functions.
-
-(autoload 'gnus-xmacs-open-network-stream "gnus-xmas" nil nil 'macro)
+(eval-when-compile
+  (when (featurep 'xemacs)
+    (require 'gnus-xmas)))
 
 (defmacro dns-make-network-process (server)
   (if (featurep 'xemacs)
@@ -311,45 +312,46 @@ If TCP-P, the first two bytes of the package with be the length field."
 If FULLP, return the entire record returned."
   (setq type (or type 'A))
   (unless dns-servers
-    (dns-parse-resolv-conf)
-    (unless dns-servers
-      (error "No DNS server configuration found")))
-  (mm-with-unibyte-buffer
-    (let ((process (condition-case ()
-		       (dns-make-network-process (car dns-servers))
-		     (error
-		      (message "dns: Got an error while trying to talk to %s"
-			       (car dns-servers))
-		      nil)))
-	  (tcp-p (and (not (fboundp 'make-network-process))
-		      (not (featurep 'xemacs))))
-	  (step 100)
-	  (times (* dns-timeout 1000))
-	  (id (random 65000)))
-      (when process
-	(process-send-string
-	 process
-	 (dns-write `((id ,id)
-		      (opcode query)
-		      (queries ((,name (type ,type))))
-		      (recursion-desired-p t))
-		    tcp-p))
-	(while (and (zerop (buffer-size))
-		    (> times 0))
-	  (accept-process-output process 0 step)
-	  (decf times step))
-	(ignore-errors
-	  (delete-process process))
-	(when tcp-p
-	  (goto-char (point-min))
-	  (delete-region (point) (+ (point) 2)))
-	(unless (zerop (buffer-size))
-	  (let ((result (dns-read (buffer-string))))
-	    (if fullp
-		result
-	      (let ((answer (car (dns-get 'answers result))))
-		(when (eq type (dns-get 'type answer))
-		  (dns-get 'data answer))))))))))
+    (dns-parse-resolv-conf))
+
+  (if (not dns-servers)
+      (message "No DNS server configuration found")
+    (mm-with-unibyte-buffer
+      (let ((process (condition-case ()
+			 (dns-make-network-process (car dns-servers))
+		       (error
+			(message "dns: Got an error while trying to talk to %s"
+				 (car dns-servers))
+			nil)))
+	    (tcp-p (and (not (fboundp 'make-network-process))
+			(not (featurep 'xemacs))))
+	    (step 100)
+	    (times (* dns-timeout 1000))
+	    (id (random 65000)))
+	(when process
+	  (process-send-string
+	   process
+	   (dns-write `((id ,id)
+			(opcode query)
+			(queries ((,name (type ,type))))
+			(recursion-desired-p t))
+		      tcp-p))
+	  (while (and (zerop (buffer-size))
+		      (> times 0))
+	    (accept-process-output process 0 step)
+	    (decf times step))
+	  (ignore-errors
+	    (delete-process process))
+	  (when tcp-p
+	    (goto-char (point-min))
+	    (delete-region (point) (+ (point) 2)))
+	  (unless (zerop (buffer-size))
+	    (let ((result (dns-read (buffer-string))))
+	      (if fullp
+		  result
+		(let ((answer (car (dns-get 'answers result))))
+		  (when (eq type (dns-get 'type answer))
+		    (dns-get 'data answer)))))))))))
 
 (provide 'dns)
 

@@ -138,7 +138,7 @@
 ;; It's harmless, though, so the main purpose of this alias is to shut
 ;; up the byte compiler.
 (defalias 'gnus-make-local-hook
-  (if (eq (get 'make-local-hook 'byte-compile) 
+  (if (eq (get 'make-local-hook 'byte-compile)
 	  'byte-compile-obsolete)
       'ignore				; Emacs
     'make-local-hook))			; XEmacs
@@ -170,6 +170,11 @@
       (cons 'progn (cddr fval)))))
 
 (defun gnus-extract-address-components (from)
+  "Extract address components from a From header.
+Given an RFC-822 address FROM, extract full name and canonical address.
+Returns a list of the form (FULL-NAME CANONICAL-ADDRESS).  Much more simple
+solution than `mail-extract-address-components', which works much better, but
+is slower."
   (let (name address)
     ;; First find the address - the thing with the @ in it.  This may
     ;; not be accurate in mail addresses, but does the trick most of
@@ -337,18 +342,18 @@
 ;; the full date if it's older)
 
 (defun gnus-seconds-today ()
-  "Returns the number of seconds passed today"
+  "Return the number of seconds passed today."
   (let ((now (decode-time (current-time))))
     (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600))))
 
 (defun gnus-seconds-month ()
-  "Returns the number of seconds passed this month"
+  "Return the number of seconds passed this month."
   (let ((now (decode-time (current-time))))
     (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
        (* (- (car (nthcdr 3 now)) 1) 3600 24))))
 
 (defun gnus-seconds-year ()
-  "Returns the number of seconds passed this year"
+  "Return the number of seconds passed this year."
   (let ((now (decode-time (current-time)))
 	(days (format-time-string "%j" (current-time))))
     (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
@@ -379,7 +384,7 @@ seconds passed since the start of today, of this month, of this year,
 respectively.")
 
 (defun gnus-user-date (messy-date)
-  "Format the messy-date acording to gnus-user-date-format-alist.
+  "Format the messy-date according to gnus-user-date-format-alist.
 Returns \"  ?  \" if there's bad input or if an other error occurs.
 Input should look like this: \"Sun, 14 Oct 2001 13:34:39 +0200\"."
   (condition-case ()
@@ -579,7 +584,7 @@ If N, return the Nth ancestor instead."
        gname)))
 
 (defun gnus-make-sort-function (funs)
-  "Return a composite sort condition based on the functions in FUNC."
+  "Return a composite sort condition based on the functions in FUNS."
   (cond
    ;; Just a simple function.
    ((functionp funs) funs)
@@ -596,7 +601,7 @@ If N, return the Nth ancestor instead."
     (car funs))))
 
 (defun gnus-make-sort-function-1 (funs)
-  "Return a composite sort condition based on the functions in FUNC."
+  "Return a composite sort condition based on the functions in FUNS."
   (let ((function (car funs))
 	(first 't1)
 	(last 't2))
@@ -798,6 +803,23 @@ with potentially long computations."
 ;;; Functions for saving to babyl/mail files.
 
 (eval-when-compile
+  (condition-case nil
+      (progn
+	(require 'rmail)
+	(autoload 'rmail-update-summary "rmailsum"))
+    (error
+     (define-compiler-macro rmail-select-summary (&rest body)
+       ;; Rmail of the XEmacs version is supplied by the package, and
+       ;; requires tm and apel packages.  However, there may be those
+       ;; who haven't installed those packages.  This macro helps such
+       ;; people even if they install those packages later.
+       `(eval '(rmail-select-summary ,@body)))
+     ;; If there's rmail but there's no tm (or there's apel of the
+     ;; mainstream, not the XEmacs version), loading rmail of the XEmacs
+     ;; version fails halfway, however it provides the rmail-select-summary
+     ;; macro which uses the following functions:
+     (autoload 'rmail-summary-displayed "rmail")
+     (autoload 'rmail-maybe-display-summary "rmail")))
   (defvar rmail-default-rmail-file)
   (defvar mm-text-coding-system))
 
@@ -926,7 +948,7 @@ with potentially long computations."
     (insert "\^_")))
 
 (defun gnus-map-function (funs arg)
-  "Applies the result of the first function in FUNS to the second, and so on.
+  "Apply the result of the first function in FUNS to the second, and so on.
 ARG is passed to the first function."
   (while funs
     (setq arg (funcall (pop funs) arg)))
@@ -983,7 +1005,7 @@ Return the modified alist."
     `(setq ,alist (delq (,fun ,key ,alist) ,alist))))
 
 (defun gnus-globalify-regexp (re)
-  "Returns a regexp that matches a whole line, iff RE matches a part of it."
+  "Return a regexp that matches a whole line, iff RE matches a part of it."
   (concat (unless (string-match "^\\^" re) "^.*")
 	  re
 	  (unless (string-match "\\$$" re) ".*$")))
@@ -1182,7 +1204,6 @@ If you find some problem with the directory separator character, try
 If optional second argument ALLOW-NEWLINES is non-nil, then allow the
 decoding of carriage returns and line feeds in the string, which is normally
 forbidden in URL encoding."
-  (setq str (or (mm-subst-char-in-string ?+ ?  str) "")) ; why `or'?
   (let ((tmp "")
 	(case-fold-search t))
     (while (string-match "%[0-9a-f][0-9a-f]" str)
@@ -1227,8 +1248,8 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
    (t
     (list 'local-map map))))
 
-(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate 
-					      require-match initial-contents 
+(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate
+					      require-match initial-contents
 					      history default)
   "Like `completing-read', allowing for non-existent 7th arg in older XEmacsen."
   `(completing-read ,prompt ,table ,predicate ,require-match
@@ -1427,6 +1448,43 @@ predicate on the elements."
 	    (push (pop list2) res)
 	  (push (pop list1) res)))
       (nconc (nreverse res) list1 list2))))
+
+(eval-when-compile
+  (defvar xemacs-codename))
+
+(defun gnus-emacs-version ()
+  (let ((system-v
+	 (cond
+	  ((eq gnus-user-agent 'emacs-gnus-config)
+	   system-configuration)
+	  ((eq gnus-user-agent 'emacs-gnus-type)
+	   (symbol-name system-type))
+	  (t nil))))
+    (cond
+     ((eq gnus-user-agent 'gnus)
+      nil)
+     ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
+      (concat "Emacs/" (match-string 1 emacs-version)
+	      (if system-v
+		  (concat " (" system-v ")")
+		"")))
+     ((string-match
+       "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
+       emacs-version)
+      (concat
+       (match-string 1 emacs-version)
+       (format "/%d.%d" emacs-major-version emacs-minor-version)
+       (if (match-beginning 3)
+	   (match-string 3 emacs-version)
+	 "")
+       (if (boundp 'xemacs-codename)
+	   (concat
+	    " (" xemacs-codename
+	    (if system-v
+		(concat ", " system-v ")")
+	      ")"))
+	 "")))
+     (t emacs-version))))
 
 (provide 'gnus-util)
 

@@ -27,6 +27,14 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (autoload 'gnus-active "gnus" nil nil 'macro)
+  (autoload 'gnus-group-entry "gnus" nil nil 'macro)
+  (autoload 'gnus-info-level "gnus" nil nil 'macro)
+  (autoload 'gnus-info-marks "gnus" nil nil 'macro)
+  (autoload 'gnus-info-method "gnus" nil nil 'macro)
+  (autoload 'gnus-info-score "gnus" nil nil 'macro))
+
 (require 'text-props)
 (defvar menu-bar-mode (featurep 'menubar))
 (require 'messagexmas)
@@ -812,7 +820,7 @@ XEmacs compatibility workaround."
       (with-temp-buffer
 	(if data-p
 	    (insert file)
-	  (insert-file-contents file))
+	  (insert-file-contents-literally file))
 	(shell-command-on-region (point-min) (point-max)
 				 "ppmtoxpm 2>/dev/null" t)
 	(setq file (buffer-string)
@@ -824,7 +832,7 @@ XEmacs compatibility workaround."
 	    (with-temp-buffer
 	      (if data-p
 		  (insert file)
-		(insert-file-contents file))
+		(insert-file-contents-literally file))
 	      (make-glyph
 	       (vector
 		(or (intern type)
@@ -834,7 +842,7 @@ XEmacs compatibility workaround."
       (set-glyph-face glyph face))
     glyph))
 
-(defun gnus-xmas-put-image (glyph &optional string)
+(defun gnus-xmas-put-image (glyph &optional string category)
   "Insert STRING, but display GLYPH.
 Warning: Don't insert text immediately after the image."
   (let ((begin (point))
@@ -845,21 +853,21 @@ Warning: Don't insert text immediately after the image."
 	(insert string)
       (setq begin (1- begin)))
     (setq extent (make-extent begin (point)))
-    (set-extent-property extent 'gnus-image t)
+    (set-extent-property extent 'gnus-image category)
     (set-extent-property extent 'duplicable t)
     (if string
 	(set-extent-property extent 'invisible t))
     (set-extent-property extent 'end-glyph glyph))
   glyph)
 
-(defun gnus-xmas-remove-image (image)
+(defun gnus-xmas-remove-image (image &optional category)
   (map-extents
    (lambda (ext unused)
      (when (equal (extent-end-glyph ext) image)
        (set-extent-property ext 'invisible nil)
        (set-extent-property ext 'end-glyph nil))
      nil)
-   nil nil nil nil nil 'gnus-image))
+   nil nil nil nil nil 'gnus-image category))
 
 (defun gnus-xmas-completing-read (prompt table &optional
 					 predicate require-match history)

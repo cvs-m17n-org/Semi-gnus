@@ -74,10 +74,10 @@ Integer values will in effect be rounded up to the nearest multiple of
 (defvar nnheader-read-timeout
   (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
 		    (symbol-name system-type))
-      1.0
+      1.0				; why?
     0.1)
   "How long nntp should wait between checking for the end of output.
-Shorter values mean quicker response, but is more CPU intensive.")
+Shorter values mean quicker response, but are more CPU intensive.")
 
 (defvar nnheader-file-name-translation-alist
   (let ((case-fold-search t))
@@ -856,11 +856,6 @@ without formatting."
 	 ((numberp file) (int-to-string file))
 	 (t file))))
 
-(defun nnheader-functionp (form)
-  "Return non-nil if FORM is funcallable."
-  (or (and (symbolp form) (fboundp form))
-      (and (listp form) (eq (car form) 'lambda))))
-
 (defun nnheader-concat (dir &rest files)
   "Concat DIR as directory to FILES."
   (apply 'concat (file-name-as-directory dir) files))
@@ -874,13 +869,15 @@ without formatting."
   "Return the file size of FILE or 0."
   (or (nth 7 (file-attributes file)) 0))
 
-(defun nnheader-find-etc-directory (package &optional file)
+(defun nnheader-find-etc-directory (package &optional file first)
   "Go through `load-path' and find the \"../etc/PACKAGE\" directory.
 This function will look in the parent directory of each `load-path'
 entry, and look for the \"etc\" directory there.
-If FILE, find the \".../etc/PACKAGE\" file instead."
+If FILE, find the \".../etc/PACKAGE\" file instead.
+If FIRST is non-nil, return the directory or the file found at the
+first.  Otherwise, find the newest one, though it may take a time."
   (let ((path load-path)
-	dir result)
+	dir results)
     ;; We try to find the dir by looking at the load path,
     ;; stripping away the last component and adding "etc/".
     (while path
@@ -892,10 +889,14 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
 			   "etc/" package
 			   (if file "" "/"))))
 	       (or file (file-directory-p dir)))
-	  (setq result dir
-		path nil)
+	  (progn
+	    (or (member dir results)
+		(push dir results))
+	    (setq path (if first nil (cdr path))))
 	(setq path (cdr path))))
-    result))
+    (if (or first (not (cdr results)))
+	(car results)
+      (car (sort results 'file-newer-than-file-p)))))
 
 (eval-when-compile
   (defvar ange-ftp-path-format)

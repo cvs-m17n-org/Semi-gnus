@@ -20,6 +20,7 @@ Then you have to tell Emacs where Gnus is. You might put something
 like
 
    (setq load-path (cons (expand-file-name "~/gnus-5.6.53/lisp") load-path))
+   (require 'gnus-load)
 
 in your .emacs file, or wherever you keep such things.  
 

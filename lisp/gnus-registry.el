@@ -24,6 +24,34 @@
 
 ;;; Commentary:
 
+;; This is the gnus-registry.el package, works with other backends
+;; besides nnmail.  The major issue is that it doesn't go across
+;; backends, so for instance if an article is in nnml:sys and you see
+;; a reference to it in nnimap splitting, the article will end up in
+;; nnimap:sys
+
+;; gnus-registry.el intercepts article respooling, moving, deleting,
+;; and copying for all backends.  If it doesn't work correctly for
+;; you, submit a bug report and I'll be glad to fix it.  It needs
+;; documentation in the manual (also on my to-do list).
+
+;; Put this in your startup file (~/.gnus.el for instance)
+
+;; (setq gnus-registry-max-entries 2500
+;;       gnus-registry-use-long-group-names t)
+
+;; (gnus-registry-initialize)
+
+;; Then use this in your fancy-split:
+
+;; (: gnus-registry-split-fancy-with-parent)
+
+;; TODO:
+
+;; - get the correct group on spool actions
+
+;; - articles that are spooled to a different backend should be handled
+
 ;;; Code:
 
 (eval-when-compile (require 'cl))
@@ -32,6 +60,9 @@
 (require 'gnus-int)
 (require 'gnus-sum)
 (require 'nnmail)
+
+(defvar gnus-registry-dirty t
+ "Boolean set to t when the registry is modified")
 
 (defgroup gnus-registry nil
   "The Gnus registry."
@@ -51,10 +82,52 @@ The group names are matched, they don't have to be fully qualified."
   :group 'gnus-registry
   :type 'boolean)
 
+(defcustom gnus-registry-clean-empty t
+  "Whether the empty registry entries should be deleted.
+Registry entries are considered empty when they have no groups."
+  :group 'gnus-registry
+  :type 'boolean)
+
+(defcustom gnus-registry-use-long-group-names nil
+  "Whether the registry should use long group names (BUGGY)."
+  :group 'gnus-registry
+  :type 'boolean)
+
+(defcustom gnus-registry-track-extra nil
+  "Whether the registry should track extra data about a message.
+The Subject and Sender (From:) headers are currently tracked this
+way."
+  :group 'gnus-registry
+  :type      
+  '(set :tag "Tracking choices"
+    (const :tag "Track by subject (Subject: header)" subject)
+    (const :tag "Track by sender (From: header)"  sender)))
+
+(defcustom gnus-registry-entry-caching t
+  "Whether the registry should cache extra information."
+  :group 'gnus-registry
+  :type 'boolean)
+
+(defcustom gnus-registry-minimum-subject-length 5
+  "The minimum length of a subject before it's considered trackable."
+  :group 'gnus-registry
+  :type 'integer)
+
+(defcustom gnus-registry-trim-articles-without-groups t
+  "Whether the registry should clean out message IDs without groups."
+  :group 'gnus-registry
+  :type 'boolean)
+
 (defcustom gnus-registry-cache-file "~/.gnus.registry.eld"
   "File where the Gnus registry will be stored."
   :group 'gnus-registry
   :type 'file)
+
+(defcustom gnus-registry-max-entries nil
+  "Maximum number of entries in the registry, nil for unlimited."
+  :group 'gnus-registry
+  :type '(radio (const :format "Unlimited " nil)
+		(integer :format "Maximum number: %v\n" :size 0)))
 
 ;; Function(s) missing in Emacs 20
 (when (memq nil (mapcar 'fboundp '(puthash)))
@@ -62,6 +135,12 @@ The group names are matched, they don't have to be fully qualified."
   (unless (fboundp 'puthash)
     ;; alias puthash is missing from Emacs 20 cl-extra.el
     (defalias 'puthash 'cl-puthash)))
+
+(defun gnus-registry-track-subject-p ()
+  (memq 'subject gnus-registry-track-extra))
+
+(defun gnus-registry-track-sender-p ()
+  (memq 'sender gnus-registry-track-extra))
 
 (defun gnus-registry-cache-read ()
   "Read the registry cache file."
@@ -77,7 +156,6 @@ The group names are matched, they don't have to be fully qualified."
   (interactive)
   (let ((file gnus-registry-cache-file))
     (save-excursion
-      ;; Save .newsrc.eld.
       (set-buffer (gnus-get-buffer-create " *Gnus-registry-cache*"))
       (make-local-variable 'version-control)
     (setq version-control gnus-backup-startup-file)
@@ -138,7 +216,7 @@ The group names are matched, they don't have to be fully qualified."
 ;; Idea from Dan Christensen <jdc@chow.mat.jhu.edu>
 ;; Save the gnus-registry file with extra line breaks.
 (defun gnus-registry-cache-whitespace (filename)
-  (gnus-message 4 "Adding whitespace to %s" filename)
+  (gnus-message 5 "Adding whitespace to %s" filename)
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward "^(\\|(\\\"" nil t)
@@ -147,13 +225,66 @@ The group names are matched, they don't have to be fully qualified."
     (while (re-search-forward " $" nil t)
       (replace-match "" t t))))
 
-(defun gnus-registry-save ()
-  (setq gnus-registry-alist (hashtable-to-alist gnus-registry-hashtb))
-  (gnus-registry-cache-save))
+(defun gnus-registry-save (&optional force)
+  (when (or gnus-registry-dirty force)
+    (let ((caching gnus-registry-entry-caching))
+      ;; turn off entry caching, so mtime doesn't get recorded
+      (setq gnus-registry-entry-caching nil)
+      ;; remove entry caches
+      (maphash
+       (lambda (key value)
+	 (if (hash-table-p value)
+	     (remhash key gnus-registry-hashtb)))
+       gnus-registry-hashtb)
+      ;; remove empty entries
+      (when gnus-registry-clean-empty 
+	(gnus-registry-clean-empty-function))
+      ;; now trim the registry appropriately
+      (setq gnus-registry-alist (gnus-registry-trim 
+				 (hashtable-to-alist gnus-registry-hashtb)))
+      ;; really save
+      (gnus-registry-cache-save)
+      (setq gnus-registry-entry-caching caching)
+      (setq gnus-registry-dirty nil))))
+
+(defun gnus-registry-clean-empty-function ()
+  "Remove all empty entries from the registry.  Returns count thereof."
+  (let ((count 0))
+    (maphash
+     (lambda (key value)
+       (unless (gnus-registry-fetch-group key)
+	 (incf count)
+	 (remhash key gnus-registry-hashtb)))
+     gnus-registry-hashtb)
+    count))
 
 (defun gnus-registry-read ()
   (gnus-registry-cache-read)
-  (setq gnus-registry-hashtb (alist-to-hashtable gnus-registry-alist)))
+  (setq gnus-registry-hashtb (alist-to-hashtable gnus-registry-alist))
+  (setq gnus-registry-dirty nil))
+
+(defun gnus-registry-trim (alist)
+  "Trim alist to size, using gnus-registry-max-entries."
+  (if (null gnus-registry-max-entries)
+      alist				; just return the alist
+    ;; else, when given max-entries, trim the alist
+    (let ((timehash (make-hash-table 			    
+		     :size 4096
+		     :test 'equal)))
+      (maphash
+       (lambda (key value)
+	 (puthash key (gnus-registry-fetch-extra key 'mtime) timehash))
+       gnus-registry-hashtb)
+
+      ;; we use the return value of this setq, which is the trimmed alist
+      (setq alist
+	    (nthcdr
+	     (- (length alist) gnus-registry-max-entries)
+	     (sort alist 
+		   (lambda (a b)
+		     (time-less-p 
+		      (cdr (gethash (car a) timehash))
+		      (cdr (gethash (car b) timehash))))))))))
 
 (defun alist-to-hashtable (alist)
   "Build a hashtable from the values in ALIST."
@@ -175,12 +306,15 @@ The group names are matched, they don't have to be fully qualified."
      hash)
     list))
 
-(defun gnus-register-action (action data-header from &optional to method)
+(defun gnus-registry-action (action data-header from &optional to method)
   (let* ((id (mail-header-id data-header))
-	(from (gnus-group-guess-full-name from))
-	(to (if to (gnus-group-guess-full-name to) nil))
-	(to-name (if to to "the Bit Bucket"))
-	(old-entry (gethash id gnus-registry-hashtb)))
+	 (subject (gnus-registry-simplify-subject 
+		   (mail-header-subject data-header)))
+	 (sender (mail-header-from data-header))
+	 (from (gnus-group-guess-full-name-from-command-method from))
+	 (to (if to (gnus-group-guess-full-name-from-command-method to) nil))
+	 (to-name (if to to "the Bit Bucket"))
+	 (old-entry (gethash id gnus-registry-hashtb)))
     (gnus-message 5 "Registry: article %s %s from %s to %s"
 		  id
 		  (if method "respooling" "going")
@@ -191,21 +325,18 @@ The group names are matched, they don't have to be fully qualified."
     (gnus-registry-delete-group id from)
 
     (when (equal 'copy action) 
-      (gnus-registry-add-group id from)) ; undo the delete
+      (gnus-registry-add-group id from subject sender)) ; undo the delete
 
-    (gnus-registry-add-group id to)))
+    (gnus-registry-add-group id to subject sender)))
 
-(defun gnus-register-spool-action (id group)
-  ;; do not process the draft IDs
-;  (unless (string-match "totally-fudged-out-message-id" id)
-;    (let ((group (gnus-group-guess-full-name group)))
-  (when (string-match "\r$" id)
-    (setq id (substring id 0 -1)))
-  (gnus-message 5 "Registry: article %s spooled to %s"
-		id
-		group)
-  (gnus-registry-add-group id group))
-;)
+(defun gnus-registry-spool-action (id group &optional subject sender)
+  (let ((group (gnus-group-guess-full-name-from-command-method group)))
+    (when (and (stringp id) (string-match "\r$" id))
+      (setq id (substring id 0 -1)))
+    (gnus-message 5 "Registry: article %s spooled to %s"
+		  id
+		  group)
+    (gnus-registry-add-group id group subject sender)))
 
 ;; Function for nn{mail|imap}-split-fancy: look up all references in
 ;; the cache and if a match is found, return that group.
@@ -227,23 +358,101 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	     nnmail-split-fancy-with-parent-ignore-groups
 	   (list nnmail-split-fancy-with-parent-ignore-groups)))
 	references res)
-    (when refstr
-      (setq references (nreverse (gnus-split-references refstr)))
-      (mapcar (lambda (x)
-		(setq res (or (gnus-registry-fetch-group x) res))
-		(when (or (gnus-registry-grep-in-list 
-			   res
-			   gnus-registry-unfollowed-groups)
-			  (gnus-registry-grep-in-list 
-			   res 
-			   nnmail-split-fancy-with-parent-ignore-groups))
-		  (setq res nil)))
-	      references)
-      (gnus-message 
-       5 
-       "gnus-registry-split-fancy-with-parent traced %s to group %s"
-       refstr (if res res "nil"))
-      res)))
+    (if refstr
+	(progn
+	  (setq references (nreverse (gnus-split-references refstr)))
+	  (mapcar (lambda (x)
+		    (setq res (or (gnus-registry-fetch-group x) res))
+		    (when (or (gnus-registry-grep-in-list
+			       res
+			       gnus-registry-unfollowed-groups)
+			      (gnus-registry-grep-in-list 
+			       res
+			       nnmail-split-fancy-with-parent-ignore-groups))
+		      (setq res nil)))
+		  references))
+
+      ;; else: there were no references, now try the extra tracking
+      (let ((sender (message-fetch-field "from"))
+	    (subject (gnus-registry-simplify-subject
+		      (message-fetch-field "subject")))
+	    (single-match t))
+	(when (and single-match
+		   (gnus-registry-track-sender-p)
+		   sender)
+	  (maphash
+	   (lambda (key value)
+	     (let ((this-sender (cdr 
+				 (gnus-registry-fetch-extra key 'sender))))
+	       (when (and single-match
+			  this-sender
+			  (equal sender this-sender))
+		 ;; too many matches, bail
+		 (unless (equal res (gnus-registry-fetch-group key))
+		   (setq single-match nil))
+		 (setq res (gnus-registry-fetch-group key))
+		 (gnus-message
+		  ;; raise level of messaging if gnus-registry-track-extra
+		  (if gnus-registry-track-extra 5 9)
+		  "%s (extra tracking) traced sender %s to group %s"
+		  "gnus-registry-split-fancy-with-parent"
+		  sender
+		  (if res res "nil")))))
+	   gnus-registry-hashtb))
+	(when (and single-match
+		   (gnus-registry-track-subject-p)
+		   subject
+		   (< gnus-registry-minimum-subject-length (length subject)))
+	  (maphash
+	   (lambda (key value)
+	     (let ((this-subject (cdr 
+				  (gnus-registry-fetch-extra key 'subject))))
+	       (when (and single-match
+			  this-subject
+			  (equal subject this-subject))
+		 ;; too many matches, bail
+		 (unless (equal res (gnus-registry-fetch-group key))
+		   (setq single-match nil))
+		 (setq res (gnus-registry-fetch-group key))
+		 (gnus-message
+		  ;; raise level of messaging if gnus-registry-track-extra
+		  (if gnus-registry-track-extra 5 9)
+		  "%s (extra tracking) traced subject %s to group %s"
+		  "gnus-registry-split-fancy-with-parent"
+		  subject
+		  (if res res "nil")))))
+	   gnus-registry-hashtb))
+	(unless single-match
+	  (gnus-message
+	   5
+	   "gnus-registry-split-fancy-with-parent: too many extra matches for %s"
+	   refstr)
+	  (setq res nil))))
+    (gnus-message
+     5 
+     "gnus-registry-split-fancy-with-parent traced %s to group %s"
+     refstr (if res res "nil"))
+
+    (when (and res gnus-registry-use-long-group-names)
+      (let ((m1 (gnus-find-method-for-group res))
+	    (m2 (or gnus-command-method 
+		    (gnus-find-method-for-group gnus-newsgroup-name)))
+	    (short-res (gnus-group-short-name res)))
+      (if (gnus-methods-equal-p m1 m2)
+	  (progn
+	    (gnus-message
+	     9 
+	     "gnus-registry-split-fancy-with-parent stripped group %s to %s"
+	     res
+	     short-res)
+	    (setq res short-res))
+	;; else...
+	(gnus-message
+	 5 
+	 "gnus-registry-split-fancy-with-parent ignored foreign group %s"
+	 res)
+	(setq res nil))))
+    res))
 
 (defun gnus-registry-register-message-ids ()
   "Register the Message-ID of every article in the group"
@@ -253,14 +462,39 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(unless (gnus-registry-fetch-group id)
 	  (gnus-message 9 "Registry: Registering article %d with group %s" 
 			article gnus-newsgroup-name)
-	  (gnus-registry-add-group (gnus-registry-fetch-message-id-fast article)
-				   gnus-newsgroup-name))))))
+	  (gnus-registry-add-group 
+	   (gnus-registry-fetch-message-id-fast article)
+	   gnus-newsgroup-name
+	   (gnus-registry-fetch-simplified-message-subject-fast article)
+	   (gnus-registry-fetch-sender-fast article)))))))
 
 (defun gnus-registry-fetch-message-id-fast (article)
   "Fetch the Message-ID quickly, using the internal gnus-data-list function"
   (if (and (numberp article)
 	   (assoc article (gnus-data-list nil)))
       (mail-header-id (gnus-data-header (assoc article (gnus-data-list nil))))
+    nil))
+
+(defun gnus-registry-simplify-subject (subject)
+  (if (stringp subject)
+      (gnus-simplify-subject subject)
+    nil))
+
+(defun gnus-registry-fetch-simplified-message-subject-fast (article)
+  "Fetch the Subject quickly, using the internal gnus-data-list function"
+  (if (and (numberp article)
+	   (assoc article (gnus-data-list nil)))
+      (gnus-registry-simplify-subject
+       (mail-header-subject (gnus-data-header
+			     (assoc article (gnus-data-list nil)))))
+    nil))
+
+(defun gnus-registry-fetch-sender-fast (article)
+  "Fetch the Sender quickly, using the internal gnus-data-list function"
+  (if (and (numberp article)
+	   (assoc article (gnus-data-list nil)))
+      (mail-header-from (gnus-data-header
+			 (assoc article (gnus-data-list nil))))
     nil))
 
 (defun gnus-registry-grep-in-list (word list)
@@ -275,15 +509,40 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 (defun gnus-registry-fetch-extra (id &optional entry)
   "Get the extra data of a message, based on the message ID.
 Returns the first place where the trail finds a nonstring."
-  (let ((trail (gethash id gnus-registry-hashtb)))
-    (dolist (crumb trail)
-      (unless (stringp crumb)
-	(return (gnus-registry-fetch-extra-entry crumb entry))))))
+  (let ((entry-cache (gethash entry gnus-registry-hashtb)))
+    (if (and entry
+	     (hash-table-p entry-cache)
+	     (gethash id entry-cache))
+	(gethash id entry-cache)
+      ;; else, if there is no caching possible...
+      (let ((trail (gethash id gnus-registry-hashtb)))
+	(when (listp trail)
+	  (dolist (crumb trail)
+	    (unless (stringp crumb)
+	      (return (gnus-registry-fetch-extra-entry crumb entry id)))))))))
 
-(defun gnus-registry-fetch-extra-entry (alist &optional entry)
-  "Get the extra data of a message, or a specific entry in it."
-  (if entry
-      (assq entry alist)
+(defun gnus-registry-fetch-extra-entry (alist &optional entry id)
+  "Get the extra data of a message, or a specific entry in it.
+Update the entry cache if needed."
+  (if (and entry id)
+      (let ((entry-cache (gethash entry gnus-registry-hashtb))
+	    entree)
+	(when gnus-registry-entry-caching
+	  ;; create the hash table
+	  (unless (hash-table-p entry-cache)
+	    (setq entry-cache (make-hash-table
+			       :size 4096
+			       :test 'equal))
+	    (puthash entry entry-cache gnus-registry-hashtb))
+
+	  ;; get the entree from the hash table or from the alist
+	  (setq entree (gethash id entry-cache)))
+	
+	(unless entree
+	  (setq entree (assq entry alist))
+	  (when gnus-registry-entry-caching
+	    (puthash id entree entry-cache)))
+	entree)
     alist))
 
 (defun gnus-registry-store-extra (id extra)
@@ -292,9 +551,17 @@ The message must have at least one group name."
   (when (gnus-registry-group-count id)
     ;; we now know the trail has at least 1 group name, so it's not empty
     (let ((trail (gethash id gnus-registry-hashtb))
-	  (old-extra (gnus-registry-fetch-extra id)))
+	  (old-extra (gnus-registry-fetch-extra id))
+	  entry-cache)
+      (dolist (crumb trail)
+	(unless (stringp crumb)
+	  (dolist (entry crumb)
+	    (setq entry-cache (gethash (car entry) gnus-registry-hashtb))
+	  (when entry-cache
+	    (remhash id entry-cache))))
       (puthash id (cons extra (delete old-extra trail))
-	       gnus-registry-hashtb))))
+	       gnus-registry-hashtb)
+      (setq gnus-registry-dirty t)))))
 
 (defun gnus-registry-store-extra-entry (id key value)
   "Put a specific entry in the extras field of the registry entry for id."
@@ -311,7 +578,9 @@ Returns the first place where the trail finds a group name."
     (let ((trail (gethash id gnus-registry-hashtb)))
       (dolist (crumb trail)
 	(when (stringp crumb)
-	  (return crumb))))))
+	  (return (if gnus-registry-use-long-group-names 
+		       crumb 
+		     (gnus-group-short-name crumb))))))))
 
 (defun gnus-registry-group-count (id)
   "Get the number of groups of a message, based on the message ID."
@@ -331,47 +600,100 @@ Returns the first place where the trail finds a group name."
 		      nil)
 		 gnus-registry-hashtb))
       ;; now, clear the entry if there are no more groups
-      (unless (gnus-registry-group-count id)
-	(remhash id gnus-registry-hashtb))
+      (when gnus-registry-trim-articles-without-groups
+	(unless (gnus-registry-group-count id)
+	  (gnus-registry-delete-id id)))
       (gnus-registry-store-extra-entry id 'mtime (current-time)))))
 
-(defun gnus-registry-add-group (id group &rest extra)
+(defun gnus-registry-delete-id (id)
+  "Delete a message ID from the registry."
+  (when (stringp id)
+    (remhash id gnus-registry-hashtb)
+    (maphash
+     (lambda (key value)
+       (when (hash-table-p value)
+	 (remhash id value)))
+     gnus-registry-hashtb)))
+
+(defun gnus-registry-add-group (id group &optional subject sender)
   "Add a group for a message, based on the message ID."
-  ;; make sure there are no duplicate entries
   (when group
     (when (and id
 	       (not (string-match "totally-fudged-out-message-id" id)))
-      (let ((group (gnus-group-short-name group)))
-	(gnus-registry-delete-group id group)	
+      (let ((full-group group)
+	    (group (if gnus-registry-use-long-group-names 
+		       group 
+		     (gnus-group-short-name group))))
+	(gnus-registry-delete-group id group)
+
+	(unless gnus-registry-use-long-group-names ;; unnecessary in this case
+	  (gnus-registry-delete-group id full-group))
+
 	(let ((trail (gethash id gnus-registry-hashtb)))
 	  (puthash id (if trail
 			  (cons group trail)
 			(list group))
 		   gnus-registry-hashtb)
-	  (when extra (gnus-registry-store-extra id extra))
+
+	  (when (and (gnus-registry-track-subject-p)
+		     subject)
+	    (gnus-registry-store-extra-entry
+	     id 
+	     'subject 
+	     (gnus-registry-simplify-subject subject)))
+	  (when (and (gnus-registry-track-sender-p)
+		     sender)
+	    (gnus-registry-store-extra-entry
+	     id 
+	     'sender
+	     sender))
+	  
 	  (gnus-registry-store-extra-entry id 'mtime (current-time)))))))
 
 (defun gnus-registry-clear ()
   "Clear the Gnus registry."
   (interactive)
   (setq gnus-registry-alist nil)
-  (setq gnus-registry-hashtb (alist-to-hashtable gnus-registry-alist)))
+  (setq gnus-registry-hashtb (alist-to-hashtable gnus-registry-alist))
+  (setq gnus-registry-dirty t))
 
+;;;###autoload
+(defun gnus-registry-initialize ()
+  (interactive)
+  (setq gnus-registry-install t)
+  (gnus-registry-install-hooks)
+  (gnus-registry-read))
+
+;;;###autoload
 (defun gnus-registry-install-hooks ()
   "Install the registry hooks."
   (interactive)
-  (add-hook 'gnus-summary-article-move-hook 'gnus-register-action) 
-  (add-hook 'gnus-summary-article-delete-hook 'gnus-register-action)
-  (add-hook 'gnus-summary-article-expire-hook 'gnus-register-action)
-  (add-hook 'nnmail-spool-hook 'gnus-register-spool-action)
+  (add-hook 'gnus-summary-article-move-hook 'gnus-registry-action) 
+  (add-hook 'gnus-summary-article-delete-hook 'gnus-registry-action)
+  (add-hook 'gnus-summary-article-expire-hook 'gnus-registry-action)
+  (add-hook 'nnmail-spool-hook 'gnus-registry-spool-action)
   
   (add-hook 'gnus-save-newsrc-hook 'gnus-registry-save)
   (add-hook 'gnus-read-newsrc-el-hook 'gnus-registry-read)
 
   (add-hook 'gnus-summary-prepare-hook 'gnus-registry-register-message-ids))
 
+(defun gnus-registry-unload-hook ()
+  "Uninstall the registry hooks."
+  (interactive)
+  (remove-hook 'gnus-summary-article-move-hook 'gnus-registry-action) 
+  (remove-hook 'gnus-summary-article-delete-hook 'gnus-registry-action)
+  (remove-hook 'gnus-summary-article-expire-hook 'gnus-registry-action)
+  (remove-hook 'nnmail-spool-hook 'gnus-registry-spool-action)
+  
+  (remove-hook 'gnus-save-newsrc-hook 'gnus-registry-save)
+  (remove-hook 'gnus-read-newsrc-el-hook 'gnus-registry-read)
+
+  (remove-hook 'gnus-summary-prepare-hook 'gnus-registry-register-message-ids))
+
 (when gnus-registry-install
-  (gnus-registry-install-hooks))
+  (gnus-registry-install-hooks)
+  (gnus-registry-read))
 
 ;; TODO: a lot of things
 

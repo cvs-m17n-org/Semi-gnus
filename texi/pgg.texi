@@ -81,7 +81,7 @@ This document assumes that you have already obtained and installed them
 and that you are familiar with its basic functions.
 
 By default, PGG uses GnuPG, but Pretty Good Privacy version 2 or version
-5 are also supported.  If you are new to such a system, I recomend that
+5 are also supported.  If you are new to such a system, I recommend that
 you should look over the GNU Privacy Handbook (GPH) which is available
 at @uref{http://www.gnupg.org/gph/}.
 
@@ -188,10 +188,10 @@ considerably.  For example, if you are using GnuPG, you know you can
 select cipher algorithm from 3DES, CAST5, BLOWFISH, and so on, but on
 the other hand the version 2 of PGP only supports IDEA.
 
-By default, if the variable @var{pgg-scheme} is not set, PGG searches the
+By default, if the variable @code{pgg-scheme} is not set, PGG searches the
 registered scheme for an implementation of the requested service
 associated with the named algorithm.  If there are no match, PGG uses
-@var{pgg-default-scheme}.  In other words, there are two options to
+@code{pgg-default-scheme}.  In other words, there are two options to
 control which command is used to process the incoming PGP armors.  One
 is for encrypting and signing, the other is for decrypting and
 verifying.
@@ -210,7 +210,7 @@ The value can be @code{gpg}, @code{pgp}, and @code{pgp5}.
 @section Caching passphrase
 
 PGG provides a simple passphrase caching mechanism.  If you want to
-arrange the interaction, set the variable @var{pgg-read-passphrase}.
+arrange the interaction, set the variable @code{pgg-read-passphrase}.
 
 @defvar pgg-cache-passphrase
 If non-@code{nil}, store passphrases.  The default value of this
@@ -260,7 +260,7 @@ interchangeably with "scheme" in this document).  This term refers to a
 singleton object wrapped with the luna object system.
 
 Since PGG was designed for accessing and developing PGP functionality,
-the architecture had to be designed not just for interoperablity but
+the architecture had to be designed not just for interoperability but
 also for extensiblity.  In this chapter we explore the architecture
 while finding out how to write the PGG backend.
 
@@ -278,7 +278,7 @@ It had better guarantee to keep only one instance of a scheme.
 
 The following code is snipped out of @file{pgg-gpg.el}.  Once an
 instance of @code{pgg-gpg} scheme is initialized, it's stored to the
-variable @var{pgg-scheme-gpg-instance} and will be reused from now on.
+variable @code{pgg-scheme-gpg-instance} and will be reused from now on.
 
 @lisp
 (defvar pgg-scheme-gpg-instance nil)
@@ -328,7 +328,7 @@ create a detached signature.  If signing is successful, it returns
 Verify the current region between @var{start} and @var{end}.  If the
 optional third argument @var{signature} is non-@code{nil}, it is treated
 as the detached signature of the current region.  If the signature is
-successflly verified, it returns @code{t}, otherwise @code{nil}.
+successfully verified, it returns @code{t}, otherwise @code{nil}.
 @end deffn
 
 @deffn Method pgg-scheme-insert-key scheme

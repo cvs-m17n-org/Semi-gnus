@@ -42,13 +42,6 @@
     (require 'w3)
     (require 'url)))
 
-;; Fixme: Avoid this and use mm-make-temp-file (especially for
-;; something sensitive like pgp).
-(defvar pgg-temporary-file-directory
-  (cond ((fboundp 'temp-directory) (temp-directory))
-	((boundp 'temporary-file-directory) temporary-file-directory)
-	("/tmp/")))
-
 ;;; @ utility functions
 ;;;
 
@@ -103,13 +96,91 @@
 	   (symbol-value (intern-soft key pgg-passphrase-cache)))
       (read-passwd prompt)))
 
+(eval-when-compile
+  (defvar itimer-process)
+  (defvar itimer-timer)
+  (autoload 'delete-itimer "itimer")
+  (autoload 'itimer-driver-start "itimer")
+  (autoload 'itimer-value "itimer")
+  (autoload 'set-itimer-function "itimer")
+  (autoload 'set-itimer-function-arguments "itimer")
+  (autoload 'set-itimer-restart "itimer")
+  (autoload 'start-itimer "itimer"))
+
+(eval-and-compile
+  (defalias
+    'pgg-run-at-time
+    (if (featurep 'xemacs)
+	(if (condition-case nil
+		(progn
+		  (unless (or itimer-process itimer-timer)
+		    (itimer-driver-start))
+		  ;; Check whether there is a bug to which the difference of
+		  ;; the present time and the time when the itimer driver was
+		  ;; woken up is subtracted from the initial itimer value.
+		  (let* ((inhibit-quit t)
+			 (ctime (current-time))
+			 (itimer-timer-last-wakeup
+			  (prog1
+			      ctime
+			    (setcar ctime (1- (car ctime)))))
+			 (itimer-list nil)
+			 (itimer (start-itimer "pgg-run-at-time" 'ignore 5)))
+		    (sleep-for 0.1) ;; Accept the timeout interrupt.
+		    (prog1
+			(> (itimer-value itimer) 0)
+		      (delete-itimer itimer))))
+	      (error nil))
+	    (lambda (time repeat function &rest args)
+	      "Emulating function run as `run-at-time'.
+TIME should be nil meaning now, or a number of seconds from now.
+Return an itimer object which can be used in either `delete-itimer'
+or `cancel-timer'."
+	      (apply #'start-itimer "pgg-run-at-time"
+		     function (if time (max time 1e-9) 1e-9)
+		     repeat nil t args))
+	  (lambda (time repeat function &rest args)
+	    "Emulating function run as `run-at-time' in the right way.
+TIME should be nil meaning now, or a number of seconds from now.
+Return an itimer object which can be used in either `delete-itimer'
+or `cancel-timer'."
+	    (let ((itimers (list nil)))
+	      (setcar
+	       itimers
+	       (apply #'start-itimer "pgg-run-at-time"
+		      (lambda (itimers repeat function &rest args)
+			(let ((itimer (car itimers)))
+			  (if repeat
+			      (progn
+				(set-itimer-function
+				 itimer
+				 (lambda (itimer repeat function &rest args)
+				   (set-itimer-restart itimer repeat)
+				   (set-itimer-function itimer function)
+				   (set-itimer-function-arguments itimer args)
+				   (apply function args)))
+				(set-itimer-function-arguments
+				 itimer
+				 (append (list itimer repeat function) args)))
+			    (set-itimer-function
+			     itimer
+			     (lambda (itimer function &rest args)
+			       (delete-itimer itimer)
+			       (apply function args)))
+			    (set-itimer-function-arguments
+			     itimer
+			     (append (list itimer function) args)))))
+		      1e-9 (if time (max time 1e-9) 1e-9)
+		      nil t itimers repeat function args)))))
+      'run-at-time)))
+
 (defun pgg-add-passphrase-cache (key passphrase)
   (setq key (pgg-truncate-key-identifier key))
   (set (intern key pgg-passphrase-cache)
        passphrase)
-  (run-at-time pgg-passphrase-cache-expiry nil
-	       #'pgg-remove-passphrase-cache
-	       key))
+  (pgg-run-at-time pgg-passphrase-cache-expiry nil
+		   #'pgg-remove-passphrase-cache
+		   key))
 
 (defun pgg-remove-passphrase-cache (key)
   (let ((passphrase (symbol-value (intern-soft key pgg-passphrase-cache))))
@@ -149,6 +220,19 @@
   `(with-current-buffer pgg-output-buffer
      (if (zerop (buffer-size)) nil ,@body t)))
 
+(defalias 'pgg-make-temp-file
+  (if (fboundp 'make-temp-file)
+      'make-temp-file
+    (lambda (prefix &optional dir-flag)
+      (let ((file (expand-file-name
+		   (make-temp-name prefix)
+		   (if (fboundp 'temp-directory)
+		       (temp-directory)
+		     temporary-file-directory))))
+	(if dir-flag
+	    (make-directory file))
+	file))))
+
 ;;; @ interface functions
 ;;;
 
@@ -186,15 +270,6 @@ the region."
   "Decrypt the current region between START and END."
   (interactive "r")
   (let* ((buf (current-buffer))
-	 (packet (cdr (assq 1 (with-temp-buffer
-				(insert-buffer-substring buf)
-				(pgg-decode-armor-region
-				 (point-min) (point-max))))))
-	 (key (cdr (assq 'key-identifier packet)))
-	 (pgg-default-user-id 
-	  (if key
-	      (concat "0x" (pgg-truncate-key-identifier key))
-	    pgg-default-user-id))
 	 (status
 	  (pgg-save-coding-system start end
 	    (pgg-invoke "decrypt-region" (or pgg-scheme pgg-default-scheme)

@@ -70,6 +70,8 @@
 (require 'gnus-start)
 (require 'gnus-int)
 
+(eval-when-compile (require 'cl))
+
 (nnoo-declare nnimap)
 
 (defconst nnimap-version "nnimap 1.0")
@@ -718,9 +720,11 @@ If EXAMINE is non-nil the group is selected read-only."
 	   (port (if nnimap-server-port
 		     (int-to-string nnimap-server-port)
 		   "imap"))
-	   (alist (gnus-netrc-machine list (or nnimap-server-address
-					       nnimap-address server)
-				      port "imap"))
+	   (alist (or (gnus-netrc-machine list server port "imap")
+		      (gnus-netrc-machine list
+					  (or nnimap-server-address
+					      nnimap-address)
+					  port "imap")))
 	   (user (gnus-netrc-get alist "login"))
 	   (passwd (gnus-netrc-get alist "password")))
       (if (imap-authenticate user passwd nnimap-server-buffer)
@@ -1271,7 +1275,7 @@ function is generally only called when Gnus is shutting down."
 			    nnimap-split-download-body-default
 			  nnimap-split-download-body)
 			(and (nnimap-request-article article)
-			     (mail-narrow-to-head))
+			     (with-current-buffer nntp-server-buffer (mail-narrow-to-head)))
 		      (nnimap-request-head article))
 		;; copy article to right group(s)
 		(setq removeorig nil)
@@ -1290,7 +1294,9 @@ function is generally only called when Gnus is shutting down."
 			     (let (msgid)
 			       (and (setq msgid
 					  (nnmail-fetch-field "message-id"))
-				    (nnmail-cache-insert msgid to-group)))))
+				    (nnmail-cache-insert msgid 
+							 to-group
+							 (nnmail-fetch-field "subject"))))))
 			 ;; Add the group-art list to the history list.
 			 (push (list (cons to-group 0)) nnmail-split-history))
 			(t
@@ -1324,7 +1330,7 @@ function is generally only called when Gnus is shutting down."
       (nnimap-before-find-minmax-bugworkaround)
       (dolist (pattern (nnimap-pattern-to-list-arguments
 			nnimap-list-pattern))
-	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil
+	(dolist (mbx (imap-mailbox-lsub (cdr pattern) (car pattern) nil
 					nnimap-server-buffer))
 	  (or (catch 'found
 		(dolist (mailbox (imap-mailbox-get 'list-flags mbx
@@ -1467,7 +1473,8 @@ function is generally only called when Gnus is shutting down."
 		      (replace-match "\r\n"))
 		    (when nnmail-cache-accepted-message-ids
 		      (nnmail-cache-insert (nnmail-fetch-field "message-id")
-					   group)))
+					   group
+					   (nnmail-fetch-field "subject"))))
 		  (when (and last nnmail-cache-accepted-message-ids)
 		    (nnmail-cache-close))
 		  ;; this 'or' is for Cyrus server bug

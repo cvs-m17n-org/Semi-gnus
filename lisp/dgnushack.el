@@ -50,18 +50,6 @@
 
 ;; Define compiler macros for the functions provided by cl in old Emacsen.
 (unless (featurep 'xemacs)
-  (define-compiler-macro assq-delete-all (&whole form key alist)
-    (if (>= emacs-major-version 21)
-	form
-      `(let* ((key ,key)
-	      (alist ,alist)
-	      (tail alist))
-	 (while tail
-	   (if (and (consp (car tail)) (eq (car (car tail)) key))
-	       (setq alist (delq (car tail) alist)))
-	   (setq tail (cdr tail)))
-	 alist)))
-
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (>= emacs-major-version 21)
 	form
@@ -90,7 +78,24 @@
   (define-compiler-macro remove (&whole form item seq)
     (if (>= emacs-major-version 21)
 	form
-      `(delete ,item (copy-sequence ,seq)))))
+      `(delete ,item (copy-sequence ,seq))))
+
+  (define-compiler-macro mapc (&whole form fn seq &rest rest)
+    (if (>= emacs-major-version 21)
+	form
+      (if rest
+	  `(let* ((fn ,fn)
+		  (seq ,seq)
+		  (args (list seq ,@rest))
+		  (m (apply (function min) (mapcar (function length) args)))
+		  (n 0))
+	     (while (< n m)
+	       (apply fn (mapcar (function (lambda (arg) (nth n arg))) args))
+	       (setq n (1+ n)))
+	     seq)
+	`(let ((seq ,seq))
+	   (mapcar ,fn seq)
+	   seq)))))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -119,6 +124,43 @@
 ;  "byte-optimize-handler for the `inline' special-form."
 ;  (cons 'progn (cdr form)))
 ;(defalias 'byte-compile-file-form-defsubst 'byte-compile-file-form-defun)
+
+(when (and (not (featurep 'xemacs))
+	   (= emacs-major-version 21)
+	   (= emacs-minor-version 3)
+	   (condition-case code
+	       (let ((byte-compile-error-on-warn t))
+		 (byte-optimize-form (quote (pop x)) t)
+		 nil)
+	     (error (string-match "called for effect"
+				  (error-message-string code)))))
+  (defadvice byte-optimize-form-code-walker (around silence-warn-for-pop
+						    (form for-effect)
+						    activate)
+    "Silence the warning \"...called for effect\" for the `pop' form.
+It is effective only when the `pop' macro is defined by cl.el rather
+than subr.el."
+    (let (tmp)
+      (if (and (eq (car-safe form) 'car)
+	       for-effect
+	       (setq tmp (get 'car 'side-effect-free))
+	       (not byte-compile-delete-errors)
+	       (not (eq tmp 'error-free))
+	       (eq (car-safe (cadr form)) 'prog1)
+	       (let ((var (cadr (cadr form)))
+		     (last (nth 2 (cadr form))))
+		 (and (symbolp var)
+		      (null (nthcdr 3 (cadr form)))
+		      (eq (car-safe last) 'setq)
+		      (eq (cadr last) var)
+		      (eq (car-safe (nth 2 last)) 'cdr)
+		      (eq (cadr (nth 2 last)) var))))
+	  (progn
+	    (put 'car 'side-effect-free 'error-free)
+	    (unwind-protect
+		ad-do-it
+	      (put 'car 'side-effect-free tmp)))
+	ad-do-it))))
 
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t)
@@ -202,6 +244,9 @@ dgnushack-compile."
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
+  (when (and (not (featurep 'xemacs))
+	     (< emacs-major-version 21))
+    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
@@ -265,15 +310,25 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el"))
-(defvar	dgnushack-cus-load-file (expand-file-name "cus-load.el"))
+(defvar dgnushack-gnus-load-file
+  (if (featurep 'xemacs)
+      (expand-file-name "auto-autoloads.el")
+    (expand-file-name "gnus-load.el")))
+
+(defvar	dgnushack-cus-load-file 
+  (if (featurep 'xemacs)
+      (expand-file-name "custom-load.el")
+    (expand-file-name "cus-load.el")))
 
 (defun dgnushack-make-cus-load ()
   (load "cus-dep")
   (let ((cusload-base-file dgnushack-cus-load-file))
     (if (fboundp 'custom-make-dependencies)
 	(custom-make-dependencies)
-      (Custom-make-dependencies))))
+      (Custom-make-dependencies))
+    (when (featurep 'xemacs)
+      (message "Compiling %s..." dgnushack-cus-load-file)
+      (byte-compile-file dgnushack-cus-load-file))))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)
@@ -302,43 +357,44 @@ Modify to suit your needs."))
     (batch-update-autoloads)))
 
 (defun dgnushack-make-load ()
-  (message "Generating %s..." dgnushack-gnus-load-file)
-  (with-temp-file dgnushack-gnus-load-file
-    (insert-file-contents dgnushack-cus-load-file)
-    (delete-file dgnushack-cus-load-file)
-    (goto-char (point-min))
-    (search-forward ";;; Code:")
-    (forward-line)
-    (delete-region (point-min) (point))
-    (insert "\
+  (unless (featurep 'xemacs)
+    (message "Generating %s..." dgnushack-gnus-load-file)
+    (with-temp-file dgnushack-gnus-load-file
+      (insert-file-contents dgnushack-cus-load-file)
+      (delete-file dgnushack-cus-load-file)
+      (goto-char (point-min))
+      (search-forward ";;; Code:")
+      (forward-line)
+      (delete-region (point-min) (point))
+      (insert "\
 ;;; gnus-load.el --- automatically extracted custom dependencies and autoload
 ;;
 ;;; Code:
 ")
-    (goto-char (point-max))
-    (if (search-backward "custom-versions-load-alist" nil t)
+      (goto-char (point-max))
+      (if (search-backward "custom-versions-load-alist" nil t)
+	  (forward-line -1)
 	(forward-line -1)
-      (forward-line -1)
-      (while (eq (char-after) ?\;)
-	(forward-line -1))
-      (forward-line))
-    (delete-region (point) (point-max))
-    (insert "\n")
-    ;; smiley-* are duplicated. Remove them all.
-    (let ((point (point)))
-      (insert-file-contents dgnushack-gnus-load-file)
-      (goto-char point)
-      (while (search-forward "smiley-" nil t)
-	(beginning-of-line)
-	(if (looking-at "(autoload ")
-	    (delete-region (point) (progn (forward-sexp) (point)))
-	  (forward-line))))
-    ;;
-    (goto-char (point-max))
-    (when (search-backward "\n(provide " nil t)
-      (forward-line -1)
-      (delete-region (point) (point-max)))
-    (insert "\
+	(while (eq (char-after) ?\;)
+	  (forward-line -1))
+	(forward-line))
+      (delete-region (point) (point-max))
+      (insert "\n")
+      ;; smiley-* are duplicated. Remove them all.
+      (let ((point (point)))
+	(insert-file-contents dgnushack-gnus-load-file)
+	(goto-char point)
+	(while (search-forward "smiley-" nil t)
+	  (beginning-of-line)
+	  (if (looking-at "(autoload ")
+	      (delete-region (point) (progn (forward-sexp) (point)))
+	    (forward-line))))
+      ;;
+      (goto-char (point-max))
+      (when (search-backward "\n(provide " nil t)
+	(forward-line -1)
+	(delete-region (point) (point-max)))
+      (insert "\
 
 \(provide 'gnus-load)
 
@@ -349,18 +405,22 @@ Modify to suit your needs."))
 ;;; End:
 ;;; gnus-load.el ends here
 ")
-    ;; Workaround the bug in some version of XEmacs.
-    (when (featurep 'xemacs)
-      (condition-case nil
-	  (require 'cus-load)
-	(error nil))
-      (goto-char (point-min))
-      (when (and (fboundp 'custom-add-loads)
-		 (not (search-forward "\n(autoload 'custom-add-loads " nil t)))
-	(search-forward "\n;;; Code:" nil t)
-	(forward-line 1)
-	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
+      ))
   (message "Compiling %s..." dgnushack-gnus-load-file)
-  (byte-compile-file dgnushack-gnus-load-file))
+  (byte-compile-file dgnushack-gnus-load-file)
+  (when (featurep 'xemacs)
+    (message "Creating dummy gnus-load.el...")
+    (with-temp-file (expand-file-name "gnus-load.el")
+      (insert "\
+
+\(provide 'gnus-load)
+
+;;; Local Variables:
+;;; version-control: never
+;;; no-byte-compile: t
+;;; no-update-autoloads: t
+;;; End:
+;;; gnus-load.el ends here"))))
+
 
 ;;; dgnushack.el ends here

@@ -356,12 +356,76 @@ discarded after running the split process."
   :type 'hook)
 
 (defcustom nnmail-large-newsgroup 50
-  "*The number of the articles which indicates a large newsgroup or nil.
-If the number of the articles is greater than the value, verbose
+  "*The number of articles which indicates a large newsgroup or nil.
+If the number of articles is greater than the value, verbose
 messages will be shown to indicate the current status."
   :group 'nnmail-various
   :type '(choice (const :tag "infinite" nil)
                  (number :tag "count")))
+
+(define-widget 'nnmail-lazy 'default
+  "Base widget for recursive datastructures.
+
+This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
+  :format "%{%t%}: %v"
+  :convert-widget 'widget-value-convert-widget
+  :value-create (lambda (widget)
+                  (let ((value (widget-get widget :value))
+                        (type (widget-get widget :type)))
+                    (widget-put widget :children 
+                                (list (widget-create-child-value 
+                                       widget (widget-convert type) value)))))
+  :value-delete 'widget-children-value-delete
+  :value-get (lambda (widget)
+               (widget-value (car (widget-get widget :children))))
+  :value-inline (lambda (widget)
+                  (widget-apply (car (widget-get widget :children))
+                                :value-inline))
+  :default-get (lambda (widget)
+                 (widget-default-get
+                  (widget-convert (widget-get widget :type))))
+  :match (lambda (widget value)
+           (widget-apply (widget-convert (widget-get widget :type))
+                         :match value))
+  :validate (lambda (widget)
+              (widget-apply (car (widget-get widget :children)) :validate)))
+
+(define-widget 'nnmail-split-fancy 'nnmail-lazy
+  "Widget for customizing splits in the variable of the same name."
+  :tag "Split"
+  :type '(menu-choice :value (any ".*value.*" "misc")
+                      :tag "Type"
+                      (string :tag "Destination")
+                      (list :tag "Use first match (|)" :value (|)
+                            (const :format "" |)
+                            (editable-list :inline t nnmail-split-fancy))
+                      (list :tag "Use all matches (&)" :value (&)
+                            (const :format "" &)
+                            (editable-list :inline t nnmail-split-fancy))
+                      (list :tag "Function with fixed arguments (:)"
+                            :value (: nil)
+                            (const :format "" :value :)
+                            function 
+                            (editable-list :inline t (sexp :tag "Arg"))
+                            )
+                      (list :tag "Function with split arguments (!)"
+                            :value (! nil)
+                            (const :format "" !)
+                            function
+                            (editable-list :inline t nnmail-split-fancy))
+                      (list :tag "Field match" 
+                            (choice :tag "Field" 
+                                    regexp symbol)
+                            (choice :tag "Match"
+                                    regexp 
+                                    (symbol :value mail))
+                            (repeat :inline t
+                                    :tag "Restrictions"
+                                    (group :inline t
+                                           (const :format "" -)
+                                           regexp))
+                            nnmail-split-fancy)
+                      (const :tag "Junk (delete mail)" junk)))
 
 (defcustom nnmail-split-fancy "mail.misc"
   "Incoming mail can be split according to this fancy variable.
@@ -438,8 +502,7 @@ Example:
 	  ;; Unmatched mail goes to the catch all group.
 	  \"misc.misc\"))"
   :group 'nnmail-split
-  ;; Sigh!
-  :type 'sexp)
+  :type 'nnmail-split-fancy)
 
 (defcustom nnmail-split-abbrev-alist
   '((any . "from\\|to\\|cc\\|sender\\|apparently-to\\|resent-from\\|resent-to\\|resent-cc")
@@ -503,6 +566,15 @@ parameter.  It should return nil, `warn' or `delete'."
   :group 'nnmail
   :type 'boolean)
 
+(defcustom nnmail-split-fancy-match-partial-words nil
+  "Whether to match partial words when fancy splitting.
+Normally, regexes given in `nnmail-split-fancy' are implicitly surrounded
+by \"\\=\\<...\\>\".  If this variable is true, they are not implicitly\
+ surrounded
+by anything."
+  :group 'nnmail
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar nnmail-article-buffer " *nnmail incoming*"
@@ -511,24 +583,18 @@ parameter.  It should return nil, `warn' or `delete'."
 (defvar nnmail-split-history nil
   "List of group/article elements that say where the previous split put messages.")
 
-(defvar nnmail-split-fancy-syntax-table nil
+(defvar nnmail-split-fancy-syntax-table
+  (let ((table (make-syntax-table)))
+    ;; support the %-hack
+    (modify-syntax-entry ?\% "." table)
+    table)
   "Syntax table used by `nnmail-split-fancy'.")
-(unless (syntax-table-p nnmail-split-fancy-syntax-table)
-  (setq nnmail-split-fancy-syntax-table
-	(copy-syntax-table (standard-syntax-table)))
-  ;; support the %-hack
-  (modify-syntax-entry ?\% "." nnmail-split-fancy-syntax-table))
 
 (defvar nnmail-prepare-save-mail-hook nil
   "Hook called before saving mail.")
 
 (defvar nnmail-split-tracing nil)
 (defvar nnmail-split-trace nil)
-
-
-
-(defconst nnmail-version "nnmail 1.0"
-  "nnmail version.")
 
 
 
@@ -1102,7 +1168,10 @@ FUNC will be called with the group name to determine the article number."
 	      (unless group-art
 		(setq group-art
 		      (list (cons (car method)
-				  (funcall func (car method)))))))))
+				  (funcall func (car method))))))))
+	  ;; Fall back on "bogus" if all else fails.
+	  (unless group-art
+	    (setq group-art (list (cons "bogus" (funcall func "bogus"))))))
 	;; Produce a trace if non-empty.
 	(when (and trace nnmail-split-trace)
 	  (let ((restore (current-buffer)))
@@ -1342,8 +1411,9 @@ See the documentation for the variable `nnmail-split-fancy' for details."
      (t
       (let* ((field (nth 0 split))
 	     (value (nth 1 split))
-	     partial-front regexp
-	     partial-rear  regexp)
+	     partial-front
+	     partial-rear
+	     regexp)
 	(if (symbolp value)
 	    (setq value (cdr (assq value nnmail-split-abbrev-alist))))
 	(if (and (>= (length value) 2)
@@ -1355,6 +1425,9 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 		 (string= ".*" (substring value -2)))
 	    (setq value (substring value 0 -2)
 		  partial-rear ""))
+	(when nnmail-split-fancy-match-partial-words
+	  (setq partial-front ""
+		partial-rear ""))
 	(setq regexp (concat "^\\(\\("
 			     (if (symbolp field)
 				 (cdr (assq field nnmail-split-abbrev-alist))
@@ -1485,31 +1558,34 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 (defvar group)
 (defvar group-art-list)
 (defvar group-art)
-(defun nnmail-cache-insert (id grp)
-  (run-hook-with-args 'nnmail-spool-hook 
-		      id grp)
-  (when nnmail-treat-duplicates
-    ;; Store some information about the group this message is written
-    ;; to.  This is passed in as the grp argument -- all locations this
-    ;; has been called from have been checked and the group is available.
-    ;; The only ambiguous case is nnmail-check-duplication which will only
-    ;; pass the first (of possibly >1) group which matches. -Josh
-    (unless (gnus-buffer-live-p nnmail-cache-buffer)
-      (nnmail-cache-open))
-    (save-excursion
-      (set-buffer nnmail-cache-buffer)
-      (goto-char (point-max))
-      (if (and grp (not (string= "" grp))
-	       (gnus-methods-equal-p gnus-command-method
-				     (nnmail-cache-primary-mail-backend)))
-	  (let ((regexp (if (consp nnmail-cache-ignore-groups)
-			    (mapconcat 'identity nnmail-cache-ignore-groups
-				       "\\|")
-			  nnmail-cache-ignore-groups)))
-	    (unless (and regexp (string-match regexp grp))
-	      (insert id "\t" grp "\n")))
-	(insert id "\n")))))
-
+(defun nnmail-cache-insert (id grp &optional subject sender)
+  (when (stringp id)
+    ;; this will handle cases like `B r' where the group is nil
+    (let ((grp (or grp gnus-newsgroup-name "UNKNOWN")))
+      (run-hook-with-args 'nnmail-spool-hook 
+			  id grp subject sender))
+    (when nnmail-treat-duplicates
+      ;; Store some information about the group this message is written
+      ;; to.  This is passed in as the grp argument -- all locations this
+      ;; has been called from have been checked and the group is available.
+      ;; The only ambiguous case is nnmail-check-duplication which will only
+      ;; pass the first (of possibly >1) group which matches. -Josh
+      (unless (gnus-buffer-live-p nnmail-cache-buffer)
+	(nnmail-cache-open))
+      (save-excursion
+	(set-buffer nnmail-cache-buffer)
+	(goto-char (point-max))
+	(if (and grp (not (string= "" grp))
+		 (gnus-methods-equal-p gnus-command-method
+				       (nnmail-cache-primary-mail-backend)))
+	    (let ((regexp (if (consp nnmail-cache-ignore-groups)
+			      (mapconcat 'identity nnmail-cache-ignore-groups
+					 "\\|")
+			    nnmail-cache-ignore-groups)))
+	      (unless (and regexp (string-match regexp grp))
+		(insert id "\t" grp "\n")))
+	  (insert id "\n"))))))
+  
 (defun nnmail-cache-primary-mail-backend ()
   (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
 	(be nil)
@@ -1596,7 +1672,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		   (cond
 		    ((memq nnmail-treat-duplicates '(warn delete))
 		     nnmail-treat-duplicates)
-		    ((nnheader-functionp nnmail-treat-duplicates)
+		    ((functionp nnmail-treat-duplicates)
 		     (funcall nnmail-treat-duplicates message-id))
 		    (t
 		     nnmail-treat-duplicates))))
@@ -1762,7 +1838,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (let (nnmail-cache-accepted-message-ids)
     ;; Don't enter Message-IDs into cache.
     ;; Let users hack it in TARGET function.
-    (when (nnheader-functionp target)
+    (when (functionp target)
       (setq target (funcall target group)))
     (unless (eq target 'delete)
       (when (or (gnus-request-group target)

@@ -1,6 +1,6 @@
 ;;; flow-fill.el --- interprete RFC2646 "flowed" text
 
-;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
 ;; Keywords: mail
@@ -47,6 +47,7 @@
 ;; 2000-10-23  don't flow "-- " lines, make "quote-depth wins" rule
 ;;             work when first line is at level 0.
 ;; 2002-01-12  probably incomplete encoding support
+;; 2003-12-08  started working on test harness.
 
 ;;; Code:
 
@@ -54,7 +55,7 @@
 
 (defcustom fill-flowed-display-column 'fill-column
   "Column beyond which format=flowed lines are wrapped, when displayed.
-This can be a lisp expression or an integer."
+This can be a Lisp expression or an integer."
   :type '(choice (const :tag "Standard `fill-column'" fill-column)
 		 (const :tag "Fit Window" (- (window-width) 5))
 		 (sexp)
@@ -62,7 +63,7 @@ This can be a lisp expression or an integer."
 
 (defcustom fill-flowed-encode-column 66
   "Column beyond which format=flowed lines are wrapped, in outgoing messages.
-This can be a lisp expression or an integer.
+This can be a Lisp expression or an integer.
 RFC 2646 suggests 66 characters for readability."
   :type '(choice (const :tag "Standard fill-column" fill-column)
 		 (const :tag "RFC 2646 default (66)" 66)
@@ -80,6 +81,7 @@ RFC 2646 suggests 66 characters for readability."
 	    'point-at-eol
 	  'line-end-position)))
 
+;;;###autoload
 (defun fill-flowed-encode (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
     ;; No point in doing this unless hard newlines is used.
@@ -101,6 +103,7 @@ RFC 2646 suggests 66 characters for readability."
 	  (goto-char (setq start (1+ end)))))
       t)))
 
+;;;###autoload
 (defun fill-flowed (&optional buffer)
   (save-excursion
     (set-buffer (or (current-buffer) buffer))
@@ -127,7 +130,7 @@ RFC 2646 suggests 66 characters for readability."
 		      (save-excursion
 			(unless (eobp)
 			  (forward-char 1)
-			  (looking-at (format "^\\(%s\\)\\([^>]\\)"
+			  (looking-at (format "^\\(%s\\)\\([^>\n\r]\\)"
 					      (or quote " ?"))))))
 	    (save-excursion
 	      (replace-match (if (string= (match-string 2) " ")
@@ -146,6 +149,71 @@ RFC 2646 suggests 66 characters for readability."
 	      (error
 	       (forward-line 1)
 	       nil))))))))
+
+;; Test vectors.
+
+(eval-when-compile
+  (defvar show-trailing-whitespace))
+
+(defvar fill-flowed-encode-tests
+  '(
+    ;; The syntax of each list element is:
+    ;; (INPUT . EXPECTED-OUTPUT)
+    ("> Thou villainous ill-breeding spongy dizzy-eyed 
+> reeky elf-skinned pigeon-egg! 
+>> Thou artless swag-bellied milk-livered 
+>> dismal-dreaming idle-headed scut!
+>>> Thou errant folly-fallen spleeny reeling-ripe 
+>>> unmuzzled ratsbane!
+>>>> Henceforth, the coding style is to be strictly 
+>>>> enforced, including the use of only upper case.
+>>>>> I've noticed a lack of adherence to the coding 
+>>>>> styles, of late.
+>>>>>> Any complaints?
+" . "> Thou villainous ill-breeding spongy dizzy-eyed reeky elf-skinned
+> pigeon-egg! 
+>> Thou artless swag-bellied milk-livered dismal-dreaming idle-headed
+>> scut!
+>>> Thou errant folly-fallen spleeny reeling-ripe unmuzzled ratsbane!
+>>>> Henceforth, the coding style is to be strictly enforced,
+>>>> including the use of only upper case.
+>>>>> I've noticed a lack of adherence to the coding styles, of late.
+>>>>>> Any complaints?
+")
+;    ("
+;> foo
+;> 
+;> 
+;> bar
+;" . "
+;> foo bar
+;")
+    ))
+
+(defun fill-flowed-test ()
+  (interactive "")
+  (switch-to-buffer (get-buffer-create "*Format=Flowed test output*"))
+  (erase-buffer)
+  (setq show-trailing-whitespace t)
+  (dolist (test fill-flowed-encode-tests)
+    (let (start output)
+      (insert "***** BEGIN TEST INPUT *****\n")
+      (insert (car test))
+      (insert "***** END TEST INPUT *****\n\n")
+      (insert "***** BEGIN TEST OUTPUT *****\n")
+      (setq start (point))
+      (insert (car test))
+      (save-restriction
+	(narrow-to-region start (point))
+	(fill-flowed))
+      (setq output (buffer-substring start (point-max)))
+      (insert "***** END TEST OUTPUT *****\n")
+      (unless (string= output (cdr test))
+	(insert "\n***** BEGIN TEST EXPECTED OUTPUT *****\n")
+	(insert (cdr test))
+	(insert "***** END TEST EXPECTED OUTPUT *****\n"))
+      (insert "\n\n")))
+  (goto-char (point-max)))
 
 (provide 'flow-fill)
 

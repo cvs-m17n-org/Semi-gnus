@@ -204,8 +204,7 @@ Which articles to display on entering the group.
 An arbitrary comment on the group.")
 
     (visible (const :tag "Permanently visible" t) "\
-Always display this group, even when there are no unread articles
-in it..")
+Always display this group, even when there are no unread articles in it.")
 
     (highlight-words
      (choice :tag "Highlight words"
@@ -888,6 +887,17 @@ articles in the thread.
 
 (eval-when-compile
   (defvar category-fields nil)
+  (defvar gnus-agent-cat-name)
+  (defvar gnus-agent-cat-score-file)
+  (defvar gnus-agent-cat-length-when-short)
+  (defvar gnus-agent-cat-length-when-long)
+  (defvar gnus-agent-cat-low-score)
+  (defvar gnus-agent-cat-high-score)
+  (defvar gnus-agent-cat-enable-expiration)
+  (defvar gnus-agent-cat-days-until-old)
+  (defvar gnus-agent-cat-predicate)
+  (defvar gnus-agent-cat-groups)
+  (defvar gnus-agent-cat-disable-undownloaded-faces)
 )
 
 (defun gnus-trim-whitespace (s)
@@ -1034,6 +1044,10 @@ articles in the thread.
 
       (gnus-agent-cat-prepare-category-field agent-enable-expiration)
       (gnus-agent-cat-prepare-category-field agent-days-until-old)
+
+      (widget-insert "\nVisual Settings ")
+
+      (gnus-agent-cat-prepare-category-field agent-disable-undownloaded-faces)
 
       (use-local-map widget-keymap)
       (widget-setup)

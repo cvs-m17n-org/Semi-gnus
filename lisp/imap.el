@@ -125,6 +125,7 @@
 ;; o Don't use `read' at all (important places already fixed)
 ;; o Accept list of articles instead of message set string in most
 ;;   imap-message-* functions.
+;; o Send strings as literal if they contain, e.g., ".
 ;;
 ;; Revision history:
 ;;
@@ -220,7 +221,13 @@ until a successful connection is made."
   :type '(repeat string))
 
 (defcustom imap-process-connection-type nil
-  "*Value for `process-connection-type' to use for Kerberos4 and GSSAPI."
+  "*Value for `process-connection-type' to use for Kerberos4, GSSAPI and SSL.
+The `process-connection-type' variable control type of device
+used to communicate with subprocesses.  Values are nil to use a
+pipe, or t or `pty' to use a pty.  The value has no effect if the
+system has no ptys or if all ptys are busy: then a pipe is used
+in any case.  The value takes effect when a IMAP server is
+opened, changing it after that has no effect.."
   :group 'imap
   :type 'boolean)
 
@@ -498,6 +505,13 @@ sure of changing the value of `foo'."
 	    (while (and (memq (process-status process) '(open run))
 			(set-buffer buffer) ;; XXX "blue moon" nntp.el bug
 			(goto-char (point-min))
+			;; Athena IMTEST can output SSL verify errors
+			(or (while (looking-at "^verify error:num=")
+			      (forward-line))
+			    t)
+			(or (while (looking-at "^TLS connection established")
+			      (forward-line))
+			    t)
 			;; cyrus 1.6.x (13? < x <= 22) queries capabilities
 			(or (while (looking-at "^C:")
 			      (forward-line))
@@ -752,13 +766,22 @@ sure of changing the value of `foo'."
 	 (coding-system-for-read imap-coding-system-for-read)
 	 (coding-system-for-write imap-coding-system-for-write)
 	 (process (starttls-open-stream name buffer server port))
-	 done)
+	 done tls-info)
     (message "imap: Connecting with STARTTLS...")
     (when process
       (while (and (memq (process-status process) '(open run))
 		  (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
-		  (goto-char (point-min))
+		  (goto-char (point-max))
+		  (forward-line -1)
 		  (not (imap-parse-greeting)))
+	(accept-process-output process 1)
+	(sit-for 1))
+      (imap-send-command "STARTTLS")
+      (while (and (memq (process-status process) '(open run))
+		  (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
+		  (goto-char (point-max))
+		  (forward-line -1)
+		  (not (re-search-forward "[0-9]+ OK.*\r?\n" nil t)))
 	(accept-process-output process 1)
 	(sit-for 1))
       (and imap-log
@@ -766,22 +789,13 @@ sure of changing the value of `foo'."
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))
-      (let ((imap-process process))
-	(unwind-protect
-	    (progn
-	      (set-process-filter imap-process 'imap-arrival-filter)
-	      (when (and (eq imap-stream 'starttls)
-			 (imap-ok-p (imap-send-command-wait "STARTTLS")))
-		(starttls-negotiate imap-process)))
-	  (set-process-filter imap-process nil)))
-      (when (memq (process-status process) '(open run))
+      (when (and (setq tls-info (starttls-negotiate process))
+		 (memq (process-status process) '(open run)))
 	(setq done process)))
-    (if done
-	(progn
-	  (message "imap: Connecting with STARTTLS...done")
-	  done)
-      (message "imap: Connecting with STARTTLS...failed")
-      nil)))
+    (if (stringp tls-info)
+	(message "imap: STARTTLS info: %s" tls-info))
+    (message "imap: Connecting with STARTTLS...%s" (if done "done" "failed"))
+    done))
 
 ;; Server functions; authenticator stuff:
 
@@ -817,6 +831,7 @@ Returns t if login was successful, nil otherwise."
 		    (setq imap-password passwd)))
 	    (message "Login failed...")
 	    (setq passwd nil)
+	    (setq imap-password nil)
 	    (sit-for 1))))
       ;;	(quit (with-current-buffer buffer
       ;;		(setq user nil
@@ -827,8 +842,7 @@ Returns t if login was successful, nil otherwise."
       ret)))
 
 (defun imap-gssapi-auth-p (buffer)
-  (and (imap-capability 'AUTH=GSSAPI buffer)
-       (eq imap-stream 'gssapi)))
+  (eq imap-stream 'gssapi))
 
 (defun imap-gssapi-auth (buffer)
   (message "imap: Authenticating using GSSAPI...%s"
@@ -1340,10 +1354,11 @@ returned, if ITEMS is a symbol only its value is returned."
 	   (imap-send-command-wait (list "STATUS \""
 					 (imap-utf7-encode mailbox)
 					 "\" "
-					 (format "%s"
-						 (if (listp items)
-						     items
-						   (list items))))))
+					 (upcase
+					  (format "%s"
+						  (if (listp items)
+						      items
+						    (list items)))))))
       (if (listp items)
 	  (mapcar (lambda (item)
 		    (imap-mailbox-get item mailbox))
@@ -1754,6 +1769,13 @@ on failure."
 				 (truncate (* (- imap-read-timeout
 						 (truncate imap-read-timeout))
 					      1000)))))
+      ;; A process can die _before_ we have processed everything it
+      ;; has to say.  Moreover, this can happen in between the call to
+      ;; accept-process-output and the call to process-status in an
+      ;; iteration of the loop above.
+      (when (and (null imap-continuation)
+		 (< imap-reached-tag tag))
+	(accept-process-output imap-process 0 0))
       (when imap-have-messaged
 	(message ""))
       (and (memq (process-status imap-process) '(open run))
@@ -1780,34 +1802,37 @@ Return nil if no complete line has arrived."
 
 (defun imap-arrival-filter (proc string)
   "IMAP process filter."
-  (with-current-buffer (process-buffer proc)
-    (goto-char (point-max))
-    (insert string)
-    (and imap-log
-	 (with-current-buffer (get-buffer-create imap-log-buffer)
-	   (imap-disable-multibyte)
-	   (buffer-disable-undo)
-	   (goto-char (point-max))
-	   (insert string)))
-    (let (end)
-      (goto-char (point-min))
-      (while (setq end (imap-find-next-line))
-	(save-restriction
-	  (narrow-to-region (point-min) end)
-	  (delete-backward-char (length imap-server-eol))
-	  (goto-char (point-min))
-	  (unwind-protect
-	      (cond ((eq imap-state 'initial)
-		     (imap-parse-greeting))
-		    ((or (eq imap-state 'auth)
-			 (eq imap-state 'nonauth)
-			 (eq imap-state 'selected)
-			 (eq imap-state 'examine))
-		     (imap-parse-response))
-		    (t
-		     (message "Unknown state %s in arrival filter"
-			      imap-state)))
-	    (delete-region (point-min) (point-max))))))))
+  ;; Sometimes, we are called even though the process has died.
+  ;; Better abstain from doing stuff in that case.
+  (when (buffer-name (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (goto-char (point-max))
+      (insert string)
+      (and imap-log
+	   (with-current-buffer (get-buffer-create imap-log-buffer)
+	     (imap-disable-multibyte)
+	     (buffer-disable-undo)
+	     (goto-char (point-max))
+	     (insert string)))
+      (let (end)
+	(goto-char (point-min))
+	(while (setq end (imap-find-next-line))
+	  (save-restriction
+	    (narrow-to-region (point-min) end)
+	    (delete-backward-char (length imap-server-eol))
+	    (goto-char (point-min))
+	    (unwind-protect
+		(cond ((eq imap-state 'initial)
+		       (imap-parse-greeting))
+		      ((or (eq imap-state 'auth)
+			   (eq imap-state 'nonauth)
+			   (eq imap-state 'selected)
+			   (eq imap-state 'examine))
+		       (imap-parse-response))
+		      (t
+		       (message "Unknown state %s in arrival filter"
+				imap-state)))
+	      (delete-region (point-min) (point-max)))))))))
 
 
 ;; Imap parser.

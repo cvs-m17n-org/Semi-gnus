@@ -25,13 +25,15 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'pgg))
+(eval-when-compile
+  (require 'cl)				; for gpg macros
+  (require 'pgg))
 
 (defgroup pgg-gpg ()
   "GnuPG interface"
   :group 'pgg)
 
-(defcustom pgg-gpg-program "gpg" 
+(defcustom pgg-gpg-program "gpg"
   "The GnuPG executable."
   :group 'pgg-gpg
   :type 'string)
@@ -39,20 +41,23 @@
 (defcustom pgg-gpg-extra-args nil
   "Extra arguments for every GnuPG invocation."
   :group 'pgg-gpg
-  :type '(choice
-	  (const :tag "None" nil)
-	  (string :tag "Arguments")))
+  :type '(repeat (string :tag "Argument")))
+
+(defcustom pgg-gpg-recipient-argument "--recipient"
+  "GnuPG option to specify recipient."
+  :group 'pgg-gpg
+  :type '(choice (const :tag "New `--recipient' option" "--recipient")
+		 (const :tag "Old `--remote-user' option" "--remote-user")))
 
 (defvar pgg-gpg-user-id nil
   "GnuPG ID of your default identity.")
 
 (defun pgg-gpg-process-region (start end passphrase program args)
-  (let* ((output-file-name
-	  (expand-file-name (make-temp-name "pgg-output") 
-			    pgg-temporary-file-directory))
+  (let* ((output-file-name (pgg-make-temp-file "pgg-output"))
 	 (args
 	  `("--status-fd" "2"
 	    ,@(if passphrase '("--passphrase-fd" "0"))
+	    "--yes" ; overwrite
 	    "--output" ,output-file-name
 	    ,@pgg-gpg-extra-args ,@args))
 	 (output-buffer pgg-output-buffer)
@@ -66,15 +71,16 @@
     (unwind-protect
 	(progn
 	  (set-default-file-modes 448)
-          (let* ((coding-system-for-write 'binary)
-                 (input (buffer-substring-no-properties start end)))
-            (with-temp-buffer
-              (when passphrase
-                (insert passphrase "\n"))
-              (insert input)
-              (setq exit-status
-                    (apply #'call-process-region (point-min) (point-max) program
-                           nil errors-buffer nil args))))
+	  (let ((coding-system-for-write 'binary)
+		(input (buffer-substring-no-properties start end))
+		(default-enable-multibyte-characters nil))
+	    (with-temp-buffer
+	      (when passphrase
+		(insert passphrase "\n"))
+	      (insert input)
+	      (setq exit-status
+		    (apply #'call-process-region (point-min) (point-max) program
+			   nil errors-buffer nil args))))
 	  (with-current-buffer (get-buffer-create output-buffer)
 	    (buffer-disable-undo)
 	    (erase-buffer)
@@ -84,23 +90,44 @@
 	    (set-buffer errors-buffer)
 	    (if (not (equal exit-status 0))
 		(insert (format "\n%s exited abnormally: '%s'\n"
-                                program exit-status)))))
+				program exit-status)))))
       (if (file-exists-p output-file-name)
 	  (delete-file output-file-name))
       (set-default-file-modes orig-mode))))
 
-(defun pgg-gpg-possibly-cache-passphrase (passphrase)
+(defun pgg-gpg-possibly-cache-passphrase (passphrase &optional key)
   (if (and pgg-cache-passphrase
 	   (progn
 	     (goto-char (point-min))
 	     (re-search-forward "^\\[GNUPG:] GOOD_PASSPHRASE\\>" nil t)))
       (pgg-add-passphrase-cache
-       (progn
-	 (goto-char (point-min))
-	 (if (re-search-forward
-	      "^\\[GNUPG:] NEED_PASSPHRASE \\w+ ?\\w*" nil t)
-	     (substring (match-string 0) -8)))
+       (or key
+	   (progn
+	     (goto-char (point-min))
+	     (if (re-search-forward
+		  "^\\[GNUPG:] NEED_PASSPHRASE \\w+ ?\\w*" nil t)
+		 (substring (match-string 0) -8))))
        passphrase)))
+
+(defvar pgg-gpg-all-secret-keys 'unknown)
+
+(defun pgg-gpg-lookup-all-secret-keys ()
+  "Return all secret keys present in secret key ring."
+  (when (eq pgg-gpg-all-secret-keys 'unknown)
+    (setq pgg-gpg-all-secret-keys '())
+    (let ((args (list "--with-colons" "--no-greeting" "--batch"
+		      "--list-secret-keys")))
+      (with-temp-buffer
+	(apply #'call-process pgg-gpg-program nil t nil args)
+	(goto-char (point-min))
+	(while (re-search-forward "^\\(sec\\|pub\\):"  nil t)
+	  (push (substring
+		 (nth 3 (split-string
+			 (buffer-substring (match-end 0)
+					   (progn (end-of-line) (point)))
+			 ":")) 8)
+		pgg-gpg-all-secret-keys)))))
+  pgg-gpg-all-secret-keys)
 
 (defun pgg-gpg-lookup-key (string &optional type)
   "Search keys associated with STRING."
@@ -125,7 +152,7 @@ If optional argument SIGN is non-nil, do a combined sign and encrypt."
 	  (when sign
 	    (pgg-read-passphrase
 	     (format "GnuPG passphrase for %s: " pgg-gpg-user-id)
-	     (pgg-gpg-lookup-key pgg-gpg-user-id 'encrypt))))
+	     pgg-gpg-user-id)))
 	 (args
 	  (append
 	   (list "--batch" "--armor" "--always-trust" "--encrypt")
@@ -133,7 +160,7 @@ If optional argument SIGN is non-nil, do a combined sign and encrypt."
 	   (if recipients
 	       (apply #'nconc
 		      (mapcar (lambda (rcpt)
-				(list "--remote-user" rcpt))
+				(list pgg-gpg-recipient-argument rcpt))
 			      (append recipients
 				      (if pgg-encrypt-for-me
 					  (list pgg-gpg-user-id)))))))))
@@ -141,22 +168,39 @@ If optional argument SIGN is non-nil, do a combined sign and encrypt."
       (pgg-gpg-process-region start end passphrase pgg-gpg-program args))
     (when sign
       (with-current-buffer pgg-errors-buffer
+	;; Possibly cache passphrase under, e.g. "jas", for future sign.
+	(pgg-gpg-possibly-cache-passphrase passphrase pgg-gpg-user-id)
+	;; Possibly cache passphrase under, e.g. B565716F, for future decrypt.
 	(pgg-gpg-possibly-cache-passphrase passphrase)))
     (pgg-process-when-success)))
 
 (defun pgg-gpg-decrypt-region (start end)
   "Decrypt the current region between START and END."
-  (let* ((pgg-gpg-user-id (or pgg-gpg-user-id pgg-default-user-id))
+  (let* ((current-buffer (current-buffer))
+	 (message-keys (with-temp-buffer
+			 (insert-buffer-substring current-buffer)
+			 (pgg-decode-armor-region (point-min) (point-max))))
+	 (secret-keys (pgg-gpg-lookup-all-secret-keys))
+	 (key (pgg-gpg-select-matching-key message-keys secret-keys))
+	 (pgg-gpg-user-id (or key pgg-gpg-user-id pgg-default-user-id))
 	 (passphrase
 	  (pgg-read-passphrase
 	   (format "GnuPG passphrase for %s: " pgg-gpg-user-id)
-	   (pgg-gpg-lookup-key pgg-gpg-user-id 'encrypt)))
+	   pgg-gpg-user-id))
 	 (args '("--batch" "--decrypt")))
     (pgg-gpg-process-region start end passphrase pgg-gpg-program args)
     (with-current-buffer pgg-errors-buffer
-      (pgg-gpg-possibly-cache-passphrase passphrase)
+      (pgg-gpg-possibly-cache-passphrase passphrase pgg-gpg-user-id)
       (goto-char (point-min))
       (re-search-forward "^\\[GNUPG:] DECRYPTION_OKAY\\>" nil t))))
+
+(defun pgg-gpg-select-matching-key (message-keys secret-keys)
+  "Choose a key from MESSAGE-KEYS that matches one of the keys in SECRET-KEYS."
+  (loop for message-key in message-keys
+	for message-key-id = (and (equal (car message-key) 1)
+				  (cdr (assq 'key-identifier message-key)))
+	for key = (and message-key-id (pgg-lookup-key message-key-id 'encrypt))
+	when (and key (member key secret-keys)) return key))
 
 (defun pgg-gpg-sign-region (start end &optional cleartext)
   "Make detached signature from text between START and END."
@@ -164,7 +208,7 @@ If optional argument SIGN is non-nil, do a combined sign and encrypt."
 	 (passphrase
 	  (pgg-read-passphrase
 	   (format "GnuPG passphrase for %s: " pgg-gpg-user-id)
-	   (pgg-gpg-lookup-key pgg-gpg-user-id 'sign)))
+	   pgg-gpg-user-id))
 	 (args
 	  (list (if cleartext "--clearsign" "--detach-sign")
 		"--armor" "--batch" "--verbose"
@@ -174,6 +218,9 @@ If optional argument SIGN is non-nil, do a combined sign and encrypt."
     (pgg-as-lbt start end 'CRLF
       (pgg-gpg-process-region start end passphrase pgg-gpg-program args))
     (with-current-buffer pgg-errors-buffer
+      ;; Possibly cache passphrase under, e.g. "jas", for future sign.
+      (pgg-gpg-possibly-cache-passphrase passphrase pgg-gpg-user-id)
+      ;; Possibly cache passphrase under, e.g. B565716F, for future decrypt.
       (pgg-gpg-possibly-cache-passphrase passphrase))
     (pgg-process-when-success)))
 
