@@ -145,6 +145,7 @@
 	 (string-to-int (file-name-nondirectory file)))))
 
 (deffoo nnmh-request-group (group &optional server dont-check)
+  (nnmh-possibly-change-directory group server)
   (let ((pathname (nnmail-group-pathname group nnmh-directory))
 	(pathname-coding-system 'binary)
 	dir)
@@ -205,8 +206,8 @@
       (when (and (not (member (file-name-nondirectory rdir) '("." "..")))
 		 (file-directory-p rdir)
 		 (file-readable-p rdir)
-		 (equal (file-truename rdir)
-			(file-truename dir)))
+		 (not (string= (file-truename rdir)
+			       (file-truename dir))))
 	(nnmh-request-list-1 rdir))))
   ;; For each directory, generate an active file line.
   (unless (string= (expand-file-name nnmh-toplev) dir)
