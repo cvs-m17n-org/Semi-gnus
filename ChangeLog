@@ -1,5 +1,8 @@
 2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* lisp/gnus-group.el (toplevel): Removed autoload code for
+	"nnshimbun".
+
 	* texi/gnus-ja.texi (Web Newspaper): Add documents about
 	`nnshimbun-index-range'.
 

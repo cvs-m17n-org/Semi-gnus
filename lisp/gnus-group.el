@@ -2426,9 +2426,6 @@ If SOLID (the prefix), create a solid group."
 		       (nnwarchive-login ,login))))
     (gnus-group-make-group group method)))
 
-(autoload 'gnus-group-make-shimbun-group
-  "nnshimbun" "Create a nnshimbun group." t)
-
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.
 Given a prefix, create a full group."
