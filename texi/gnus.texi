@@ -7817,14 +7817,15 @@ of the characters, and it also makes it possible to embed pictures and
 other naughty stuff in innocent-looking articles.
 
 @vindex gnus-show-mime
-@vindex gnus-show-mime-method
+@vindex gnus-article-display-method-for-mime
 @vindex gnus-strict-mime
-@findex metamail-buffer
+@findex gnus-article-display-mime-message
 Gnus handles @sc{mime} by pushing the articles through
-@code{gnus-show-mime-method}, which is @code{gnus-show-mime-method} by
-default.  This function calls the SEMI MIME-View program to actually do
-the work.  For more information on SEMI MIME-View, see its manual page
-(however it is not existed yet, sorry).
+@code{gnus-article-display-method-for-mime}, which is
+@code{gnus-article-display-mime-message} by default.  This function
+calls the SEMI MIME-View program to actually do the work.  For more
+information on SEMI MIME-View, see its manual page (however it is not
+existed yet, sorry).
 
 Set @code{gnus-show-mime} to @code{t} if you want to use
 @sc{mime} all the time.  However, if @code{gnus-strict-mime} is
