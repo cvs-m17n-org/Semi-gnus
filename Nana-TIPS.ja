@@ -80,6 +80,10 @@ message-mail-follow-up-address-checker (Default: nil)
 現在サポートしているものは、 MIME charset を制限する機能のみですが、将
 来は MIME サポートのレベルも制御できるようにしたいと思っています。
 
+初期値として、この機能が有効になるよう、 message-encode-function に
+message-locale-maybe-encode が設定されていますが、使用しない場合には 
+message-maybe-encode を設定するようにしてください。
+
 定義済の locale には次のものがあります。
 
 nil     : 特に制限をしません。
