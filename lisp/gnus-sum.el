@@ -11009,10 +11009,6 @@ If REVERSE, save parts that do not match TYPE."
                     list (cdr list)))
             (gnus-byte-compile (list 'lambda nil cond))))))
 
-(eval-when-compile
-(defvar gnus-summary-highlight-line-downloaded-alist nil)
-  (defvar gnus-summary-highlight-line-downloaded-cached nil))
-
 (defun gnus-summary-highlight-line ()
   "Highlight current line according to `gnus-summary-highlight'."
   (let*
