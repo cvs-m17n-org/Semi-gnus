@@ -54,7 +54,7 @@
 (autoload 'gnus-mailing-list-insinuate "gnus-ml" nil t)
 (autoload 'turn-on-gnus-mailing-list-mode "gnus-ml" nil t)
 (autoload 'mm-uu-dissect "mm-uu")
-(autoload 'gnus-article-outlook-deuglify-article "deuglify" 
+(autoload 'gnus-article-outlook-deuglify-article "deuglify"
   "Deuglify broken Outlook (Express) articles and redisplay."
   t)
 
@@ -8984,10 +8984,6 @@ delete these instead."
       ;; Delete the articles.
       (setq not-deleted (gnus-request-expire-articles
 			 articles gnus-newsgroup-name 'force))
-      (when (and gnus-agent gnus-agent-cache
-		 (gnus-sorted-difference articles not-deleted))
-	(gnus-agent-expire (gnus-sorted-difference articles not-deleted)
-			   gnus-newsgroup-name 'force))
       (while articles
 	(gnus-summary-remove-process-mark (car articles))
 	;; The backend might not have been able to delete the article
@@ -11353,7 +11349,7 @@ If ALL is a number, fetch this number of articles."
 	  (if (and (numberp gnus-large-newsgroup)
 		   (> len gnus-large-newsgroup))
 	      (let* ((cursor-in-echo-area nil)
-		     (initial (gnus-parameter-large-newsgroup-initial 
+		     (initial (gnus-parameter-large-newsgroup-initial
 			       gnus-newsgroup-name))
 		     (input
 		      (read-string

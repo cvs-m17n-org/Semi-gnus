@@ -1,3 +1,13 @@
+2002-06-09  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-summary-delete-article): Don't agent expire here.
+
+	* gnus-int.el (gnus-request-expire-articles): Do it here instead.
+
+2002-06-08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* flow-fill.el (fill-flowed): Ignore errors.
+
 2002-06-06  Simon Josefsson  <jas@extundo.com>
 
 	* message.el (message-send-mail-with-sendmail): Improve error message.
