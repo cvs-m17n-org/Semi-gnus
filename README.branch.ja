@@ -21,13 +21,22 @@ qGnus 0.??  ------> Semi-gnus 6.0.0
        :               +-------->---------------+
        :                        :               :
        :                        :               V
-       :                        :            6.10.072 ----> t-gnus-6_12
-       :        akr      <--  6.2.3             :     \     (for FLIM 1.12)
-       :        shuhei-k <--  6.3.1                    \
-Gnus 5.6.11 ------>           6.3.3                     --> t-gnus-6_14
-       :                      6.4.0 (for SEMI 1.5)          (for FLIM 1.13)
-       :                     (6.4.?)------> for SEMI 1.5
-       :                        |    \
+       :                        :            6.10.072 -----> t-gnus-6_12
+       :                        :               :     \      (for FLIM 1.12,
+       :                        :               :      \      stable)
+       :                        :               :       \
+       :                        :               :        --> t-gnus-6_13
+       :                        :               :            (for FLIM 1.13,
+       :                        :               :             develop)
+       :                        :               :               :
+       :                        :         t-gnus-6_10-last-  t-gnus-6_13-last-
+       :                        :               | feedback      |
+       :        akr      <--  6.2.3             +<------------- +
+       :        shuhei-k <--  6.3.1             :               |
+Gnus 5.6.11 ------>           6.3.3                          t-gnus-6_14
+       :                      6.4.0 (for SEMI 1.5)           (for FLIM 1.13,
+       :                      (6.4.?)------> for SEMI 1.5     develop)
+       :                        |    \                          :
        :                        |     \
 (元の Gnus との Sync は何度     |      ---> for SEMI 1.6
  もなされていますが、ここに  (6.4.?)------> 6.5 (for SEMI 1.7)
