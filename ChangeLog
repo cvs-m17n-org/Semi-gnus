@@ -1,3 +1,7 @@
+2000-05-25  Tanaka Akira      <akr@m17n.org>
+
+        * README.semi, README.semi.ja: Update for CVS via SSH.
+
 2000-05-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/gnus-ja.texi: Change coding-system to `iso-2022-7bit-ss2'.
