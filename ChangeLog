@@ -1,3 +1,18 @@
+1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Modify so that
+	the title of a popup menu is displayed under Emacs 19.34.
+	(gnus-offline-define-menu-and-key): Rewrite the function to change
+	the behavior of "Get new news" button, under XEmacs.
+
+	* lisp/gnus-ofsetup.el: Modify for Semi-gnus 6.10.xx so that
+	`pop3-fma-password' can be saved in .newsrc.eld.
+
+	* README-offline.en: Update.
+	* README-offline.ja: Ditto.
+
 1999-03-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el  (gnus-revision-number): Increment to 02.
