@@ -1,5 +1,19 @@
 1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version): Modify for Chao 1.10.
+
+	* lisp/gnus-score.el (gnus-header-index): Modify to use
+	mime-entity structure as gnus-header structure.
+
+	* lisp/nnheader.el: Use `mime-entity' as gnus-header structure.
+	(mail-header-number): Use `mime-entity-location-internal'.
+	(mail-header-set-number): Use `mime-entity-set-location-internal'.
+	- Change other `mail-header-*' and `mail-header-set-*' to alias of
+	  reference and set functions for mime-entity-internal.
+	(make-full-mail-header): Use `make-mime-entity-internal'.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/message.el (message-reply): Use `make-full-mail-header'.
 	(message-followup): Likewise.
 
