@@ -12288,6 +12288,7 @@ Gnus を使って新しいメールを読む事は非常に簡単です。あなたのメールバック
 @subsection メールの分割
 @cindex splitting mail
 @cindex mail splitting
+@cindex mail filtering (splitting)
 
 @vindex nnmail-split-methods
 変数 @code{nnmail-split-methods} は入ってくるメールをどのようにグループ
@@ -25084,6 +25085,13 @@ Gnus がグループに入ると、グループの全ての未読記事のヘッダーをバックエン
 @cindex digest
 複数のメッセージを一つのファイルに集めたものです。もっとも普通の集配様式
 は RFC1153 で指定されています。
+
+@item 分割 (splitting)
+@cindex splitting, terminolgy
+@cindex mail sorting
+@cindex mail filtering (splitting)
+ある規則によってメールを分類する行為です。ときどき間違ってメールの濾
+過 (mail filtering) と呼ばれます。
 @end table
 
 @page

@@ -3787,8 +3787,10 @@ used to distinguish whether the invisible text is a MIME part or not."
       (dolist (point points)
 	(add-text-properties point (1+ point)
 			     '(invisible nil intangible nil)))))
-  ;; Make invisible text visible except for the mime parts which may
-  ;; be inserted by the MIME-Edit.
+  ;; Make invisible text visible except for mime parts which may be
+  ;; inserted by the MIME-Edit.
+  ;; It doesn't seem as if this is useful, since the invisible property
+  ;; is clobbered by an after-change hook anyhow.
   (message-check 'invisible-text
     ;; FIXME T-gnus: It should also detect invisible overlays.
     (let (from
@@ -6450,7 +6452,11 @@ that further discussion should take place only in "
        ,@(and distribution (list (cons 'Distribution distribution))))
      cur)))
 
-;;;###autoload
+(eval-when-compile
+  ;; Must be dynamically bound for message-is-yours-p.
+  (defvar sender)
+  (defvar from))
+
 (defun message-is-yours-p ()
   "Non-nil means current article is yours.
 If you have added 'cancel-messages to 'message-shoot-gnksa-feet', all articles
