@@ -1,3 +1,19 @@
+2001-01-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus.el: Don't autoload "smiley" for `smiley-toggle-buffer';
+	don't autoload "gnus-bitmap" or "x-face-mule" when Emacs 21 is
+	running.
+
+	* lisp/gnus-art.el (TopLevel): Autoload "gnus-bitmap" for
+	`smiley-toggle-buffer' when compiling.
+	(gnus-treatment-function-alist): Use `gnus-smiley-display' for
+	`gnus-treat-display-smileys' by default when XEmacs is running.
+	(gnus-treat-display-smileys): Check for `smiley-mule' instead of
+	`gnus-bitmap'.
+	(gnus-article-x-face-command): Don't check for xbm for x-face-e21.
+
 2000-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (TopLevel): Defalias `coding-system-category'

@@ -208,15 +208,16 @@ regexp.  If it matches, the text in question is not a signature."
   :type 'sexp
   :group 'gnus-article-hiding)
 
+;; Fixme: This isn't the right thing for mixed graphical and and
+;; non-graphical frames in a session.
 (defcustom gnus-article-x-face-command
   (cond
-   ;; Fixme: This isn't the right thing for mixed graphical and and
-   ;; non-graphical frames in a session.
+   ((and (fboundp 'image-type-available-p)
+	 (module-installed-p 'x-face-e21))
+    'x-face-decode-message-header)
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
-    (if (module-installed-p 'x-face-e21)
-	'x-face-decode-message-header
-      'gnus-article-display-xface))
+    'gnus-article-display-xface)
    ((and (not gnus-xemacs)
 	 window-system
 	 (module-installed-p 'x-face-mule))
@@ -925,7 +926,7 @@ See the manual for details."
   (if (or (and gnus-xemacs (featurep 'xpm))
 	  (and (not gnus-xemacs)
 	       window-system
-	       (module-installed-p 'gnus-bitmap)))
+	       (module-installed-p 'smiley-mule)))
       t
     nil)
   "Display smileys.
@@ -989,7 +990,7 @@ See the manual for details."
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
-  '((gnus-treat-decode-article-as-default-mime-charset
+  `((gnus-treat-decode-article-as-default-mime-charset
      gnus-article-decode-article-as-default-mime-charset)
     (gnus-treat-strip-banner gnus-article-strip-banner)
     (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
@@ -1023,7 +1024,9 @@ See the manual for details."
      gnus-article-strip-multiple-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
-    (gnus-treat-display-smileys gnus-article-smiley-display)
+    (gnus-treat-display-smileys ,(if (featurep 'xemacs)
+				     'gnus-smiley-display
+				   'gnus-article-smiley-display))
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)))
@@ -5037,6 +5040,9 @@ forbidden in URL encoding."
   "Browse ADDRESS."
   (browse-url (gnus-strip-whitespace address)))
 
+(eval-when-compile
+  ;; Silence the byte-compiler.
+  (autoload 'smiley-toggle-buffer "gnus-bitmap"))
 (defun gnus-article-smiley-display ()
   "Display \"smileys\" as small graphical icons."
   (smiley-toggle-buffer 1 (current-buffer) (point-min) (point-max)))

@@ -1806,7 +1806,6 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
      ("smiley" :interactive t gnus-smiley-display)
-     ("smiley" smiley-toggle-buffer)
      ("gnus-win" gnus-configure-windows gnus-add-configuration)
      ("gnus-sum" gnus-summary-insert-line gnus-summary-read-group
       gnus-list-of-unread-articles gnus-list-of-read-articles
@@ -1887,11 +1886,31 @@ use the article treating faculties instead.  Is is described in Info node
 
 (eval-and-compile
   (unless (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
-    (autoload 'smiley-toggle-buffer "gnus-bitmap")
-    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")
-    (when (>= emacs-major-version 21)
-      (autoload 'x-face-decode-message-header "x-face-e21"))))
+    (if (and (fboundp 'image-type-available-p)
+	     (module-installed-p 'x-face-e21))
+	(progn
+	  ;; Don't load gnus-bitmap, it will destroy x-face-e21 thingies.
+	  (autoload 'smiley-toggle-buffer "smiley-mule")
+	  (defun gnus-smiley-display (&optional arg)
+	    "Display \"smileys\" as small graphical icons.
+With arg, turn displaying on if and only if arg is positive."
+	    (interactive "P")
+	    (if window-system
+		(save-excursion
+		  (set-buffer gnus-article-buffer)
+		  (save-restriction
+		    (widen)
+		    (article-goto-body)
+		    (narrow-to-region (point) (point-max))
+		    (let ((inhibit-read-only t)
+			  buffer-read-only)
+		      (smiley-toggle-buffer arg))))
+	      (when (interactive-p)
+		(message "You're not under window system."))))
+	  (autoload 'x-face-decode-message-header "x-face-e21"))
+      (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
+      (autoload 'smiley-toggle-buffer "gnus-bitmap")
+      (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule"))))
 
 ;;; gnus-sum.el thingies
 
