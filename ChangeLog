@@ -1,5 +1,10 @@
 2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (gnus-article-prepare-display): Setup MIME
+	entity even if `gnus-show-mime' is nil.
+
+2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/dgnushack.el: Load gnus-clfns.el after `load-path' is
 	adjusted.
 

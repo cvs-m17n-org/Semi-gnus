@@ -3526,20 +3526,17 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (setq gnus-article-wash-types nil)
   (gnus-run-hooks 'gnus-tmp-internal-hook)
   ;; Display message.
-  (let (mime-display-header-hook mime-display-text/plain-hook)
-    (funcall (if gnus-show-mime
-		 (progn
-		   (setq mime-message-structure gnus-current-headers)
-		   (mime-buffer-entity-set-buffer-internal
-		    mime-message-structure
-		    gnus-original-article-buffer)
-		   (mime-entity-set-representation-type-internal
-		    mime-message-structure 'mime-buffer-entity)
-		   (luna-send mime-message-structure
-			      'initialize-instance
-			      mime-message-structure)
-		   gnus-article-display-method-for-mime)
-	       gnus-article-display-method-for-traditional)))
+  (setq mime-message-structure gnus-current-headers)
+  (mime-buffer-entity-set-buffer-internal mime-message-structure
+					  gnus-original-article-buffer)
+  (mime-entity-set-representation-type-internal mime-message-structure
+						'mime-buffer-entity)
+  (luna-send mime-message-structure 'initialize-instance
+	     mime-message-structure)
+  (if gnus-show-mime
+      (let (mime-display-header-hook mime-display-text/plain-hook)
+	(funcall gnus-article-display-method-for-mime))
+    (funcall gnus-article-display-method-for-traditional))
   ;; Associate this article with the current summary buffer.
   (setq gnus-article-current-summary gnus-summary-buffer)
   ;; Call the treatment functions.
