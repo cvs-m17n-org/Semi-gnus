@@ -1,3 +1,8 @@
+1998-07-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix.
+
 1998-07-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Add "The End".
