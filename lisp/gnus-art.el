@@ -1061,6 +1061,7 @@ Initialized from `text-mode-syntax-table.")
     (save-excursion
       (save-restriction
 	(let ((buffer-read-only nil)
+	      (inhibit-read-only t)
 	      (case-fold-search t)
 	      (max (1+ (length gnus-sorted-header-list)))
 	      (ignored (when (not gnus-visible-headers)
@@ -2588,7 +2589,8 @@ commands:
 (defun gnus-article-display-traditional-message ()
   "Article display method for traditional message."
   (set-buffer gnus-article-buffer)
-  (let (buffer-read-only)
+  (let ((inhibit-read-only t)
+	buffer-read-only)
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)))
 
@@ -2755,6 +2757,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	 (number (or number 0))
 	 content-type treat-type)
     (while (and (not (eobp))
+		entity
 		(progn (mime-preview-move-to-next)
 		       (> (point) start)))
       (if entity
