@@ -147,6 +147,8 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
+(defvar mm-emacs-mule t "True in Emacs with Mule.")
+
 (unless (featurep 'mm-util)
   ;; Should keep track of `mm-image-load-path' in mm-util.el.
   (defun nnheader-image-load-path (&optional package)
@@ -170,6 +172,9 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
       'ignore))
   (defalias 'mm-encode-coding-string 'encode-coding-string)
   (defalias 'mm-decode-coding-string 'decode-coding-string)
+  (defalias 'mm-encode-coding-region 'encode-coding-region)
+  (defalias 'mm-decode-coding-region 'decode-coding-region)
+  (defalias 'mm-set-buffer-file-coding-system 'set-buffer-file-coding-system)
 
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
@@ -198,6 +203,18 @@ Use unibyte mode for this."
   (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
   (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
+
+  ;; Should keep track of `mm-with-multibyte-buffer' in mm-util.el.
+  (defmacro nnheader-with-multibyte-buffer (&rest forms)
+    "Create a temporary buffer, and evaluate FORMS there like `progn'.
+Use multibyte mode for this."
+    `(let ((default-enable-multibyte-characters t))
+       (with-temp-buffer ,@forms)))
+  (put 'nnheader-with-multibyte-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-multibyte-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-multibyte-buffer 'lisp-indent-function 0)
+  (put 'mm-with-multibyte-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-multibyte-buffer 'nnheader-with-multibyte-buffer)
 
   ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-current-buffer (&rest forms)

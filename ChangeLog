@@ -1,3 +1,11 @@
+2004-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mm-emacs-mule): New variable.
+	(mm-encode-coding-region): New function.
+	(mm-decode-coding-region): New function.
+	(mm-set-buffer-file-coding-system): New function.
+	(mm-with-multibyte-buffer): New macro.
+
 2004-12-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-dont-compile-files): Exclude mm-url.el.
