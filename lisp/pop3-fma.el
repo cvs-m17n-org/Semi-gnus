@@ -80,11 +80,11 @@
 
 (unless (and (fboundp 'pop3-fma-encode-string)
 	     (fboundp 'pop3-fma-decode-string))
-  (condition-case nil
-      (require 'mel-b-el)
-    (error (require 'mel-b)))
-  (fset 'pop3-fma-encode-string 'base64-encode-string)
-  (fset 'pop3-fma-decode-string 'base64-decode-string))
+  (require 'mel)
+  (fset 'pop3-fma-encode-string
+	(mel-find-function 'mime-encode-string "base64"))
+  (fset 'pop3-fma-decode-string
+	(mel-find-function 'mime-decode-string "base64")))
 
 (defgroup pop3-fma nil
   "Multile POP3 account utility for Gnus."
