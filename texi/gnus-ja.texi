@@ -3608,8 +3608,29 @@ Gnus
 $(B$3$N@55,I=8=$K%^%C%A$9$k%0%k!<%W$O!"$=$l$,6u$G$"$k$+$I$&$+$K4X$o(B
 $(B$i$:!">o$K%0%k!<%W%P%C%U%!$KI=<($5$l$^$9!#(B
 
-@end table
+@item gnus-group-name-charset-method-alist
+@vindex gnus-group-name-charset-method-alist
+$(B%0%k!<%WL>MQ$NA*BrJ}K!$HJ8;z=89g$NO"A[%j%9%H$G$9!#$3$l$O1Q;z$G$O$J$$%0%k!<(B
+$(B%WL>$rI=<($9$k$?$a$K;H$$$^$9!#(B
 
+$(BNc(B:
+@lisp
+(setq gnus-group-name-charset-method-alist
+    '(((nntp "news.com.cn") . cn-gb-2312)))
+@end lisp
+
+@item gnus-group-name-charset-group-alist
+@vindex gnus-group-name-charset-group-alist
+$(B%0%k!<%WL>MQ$N%0%k!<%WL>$N@55,I=8=$HJ8;z=89g$NO"A[%j%9%H$G$9!#$3$l$O1Q;z(B
+$(B$G$O$J$$%0%k!<%WL>$rI=<($9$k$?$a$K;H$$$^$9!#(B
+
+$(BNc(B:
+@lisp
+(setq gnus-group-name-charset-group-alist
+    '(("\\.com\\.cn:" . cn-gb-2312)))
+@end lisp
+
+@end table
 
 @node Scanning New Messages
 @subsection $(B?7Ce%a%C%;!<%8$rC5$9(B
@@ -7250,6 +7271,31 @@ CRLF $(B$NAH(B ($(B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $(B$r(B LF $(B$KJQ49
 DOS $(B$N9TKv$N@$OC$r$7$^$9(B)$(B!"$=$7$F$=$l$+$i;D$j$N(B CR $(B$r(B LF $(B$KJQ49$7$^$9(B
 ($(B$3$l$O(B MAC $(B$N9TKv$N@$OC$r$7$^$9(B) (@code{gnus-article-remove-cr})$(B!#(B
 
+@c @item W 6
+@c @kindex W 6 (Summary)
+@c @findex gnus-article-de-base64-unreadable
+@c Treat base64 (@code{gnus-article-de-base64-unreadable}).
+@c Base64 is one common @sc{mime} encoding employed when sending non-ASCII
+@c (i. e., 8-bit) articles.  Note that the this is usually done
+@c automatically by Gnus if the message in question has a
+@c @code{Content-Transfer-Encoding} header that says that this encoding has
+@c been done.
+
+@item W Z
+@kindex W Z (Summary)
+@findex gnus-article-decode-HZ
+HZ $(B$^$?$O(B HZP $(B$r=hM}$7$^$9!#(BHZ ($(B$^$?$O(B HZP) $(B$OCf9q8l$N5-;v$rEAAw$9$k$H$-(B
+$(B$K;H$o$l$k0lHLE*$JId9g$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $(B$N(B
+$(B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
+
+@c @item W h
+@c @kindex W h (Summary)
+@c @findex gnus-article-wash-html
+@c Treat HTML (@code{gnus-article-wash-html}).  
+@c Note that the this is usually done automatically by Gnus if the message
+@c in question has a @code{Content-Type} header that says that this type
+@c has been done.
+
 @item W f
 @kindex W f $(B!J35N,!K(B
 @cindex x-face
@@ -9043,6 +9089,12 @@ Superseding} $(B$r;2>H$7$F$/$@$5$$!#(B
 @code{nil} $(B$G$J$1$l$P!"(B@kbd{a} $(B$r$7$?$H$-$K!"(B@code{to-list} $(B%0%k!<%W%Q%i(B
 $(B%a!<%?$r$=$l$N$J$$%a!<%k%0%k!<%W$KIU$12C$($^$9!#(B
 
+@c @item message-send-mail-partially-limit
+@c @vindex message-send-mail-partially-limit
+@c The limitation of messages sent as message/partial.
+@c The lower bound of message size in characters, beyond which the message 
+@c should be sent in several parts. If it is nil, the size is unlimited.
+
 @end table
 
 
@@ -10549,7 +10601,8 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 @item directory
 $(B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL$O(B
 procmail $(B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ$5(B
-$(B$l$^$9!#(B
+$(B$l$^$9!#(B@code{nnmail-scan-directory-mail-source-once} $(B$r(B @code{nil} $(B0J30(B
+$(B$K$9$k$H!"(Bgnus $(B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#(B
 
 $(B%-!<%o!<%I(B:
 
