@@ -1,5 +1,6 @@
 2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* aclocal.m4 (AC_CHECK_EMACS_FLAVOR): Don't check for Mule 2.
 	* sample.lpath.el: Remove.
 	* contrib/cus-dep.el: Remove.
 	* contrib/gnus-idna.el: Remove.

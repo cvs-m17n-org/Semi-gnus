@@ -1598,9 +1598,9 @@ echo $ECHO_N "checking what a flavor does $EMACS have... $ECHO_C" >&6
     unset EMACS_cv_SYS_flavor;
 
 
-elisp="(cond ((featurep (quote xemacs)) \"XEmacs\")\
-          ((boundp (quote MULE)) \"MULE\")\
-          (t \"FSF Emacs\"))"
+elisp="(if (featurep (quote xemacs))\
+        \"XEmacs\"\
+      \"Emacs\")"
 if test -z ""noecho""; then
 	echo "$as_me:$LINENO: checking for flavor" >&5
 echo $ECHO_N "checking for flavor... $ECHO_C" >&6
@@ -1625,14 +1625,11 @@ if test -z ""noecho""; then
 echo "${ECHO_T}$flavor" >&6
 fi
 
-  case $EMACS_cv_SYS_flavor in
-  XEmacs)
-    EMACS_FLAVOR=xemacs;;
-  MULE)
-    EMACS_FLAVOR=mule;;
-  *)
-    EMACS_FLAVOR=emacs;;
-  esac
+  if test $EMACS_cv_SYS_flavor = XEmacs; then
+    EMACS_FLAVOR=xemacs
+  else
+    EMACS_FLAVOR=emacs
+  fi
   echo "$as_me:$LINENO: result: $EMACS_cv_SYS_flavor" >&5
 echo "${ECHO_T}$EMACS_cv_SYS_flavor" >&6
   if test "$prefix" = NONE; then
