@@ -1,3 +1,12 @@
+1998-07-06  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Various".
+
+1998-07-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Various".
+	* texi/gnus-ja.texi: Sync up with Gnus 5.6.22
+
 1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-header-format-alist): Repair to use
