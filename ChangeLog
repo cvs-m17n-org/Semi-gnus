@@ -1,5 +1,16 @@
 1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Use
+	`mime-display-message' instead of `mime-view-buffer'.
+	(gnus-article-display-traditional-message): Set
+	`gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Modify for
+	`gnus-article-display-traditional-message'.
+	(gnus-article-prepare): Use `mime-parse-buffer' and
+	`mime-entity-fetch-field'; don't set gnus-article-buffer.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus-sum.el (gnus-summary-move-article): Use
 	`gnus-request-original-article' instead of
 	`gnus-request-article-this-buffer'.
