@@ -38,10 +38,14 @@ xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all
 
 xinfo:
+	cd texi && $(MAKE) EMACS="$(XEMACS)" add-info-suffix
 	cd texi && $(MAKE) EMACS="$(XEMACS)" all
+	cd texi && $(MAKE) remove-info-suffix
 
 xinfo-ja:
-	cd texi && $(MAKE) EMACS=$(XEMACS) MAKEINFO=no ja
+	cd texi && $(MAKE) EMACS="$(XEMACS)" add-info-suffix
+	cd texi && $(MAKE) EMACS="$(XEMACS)" MAKEINFO=no ja
+	cd texi && $(MAKE) remove-info-suffix
 
 # Rule for Lars and nobody else.
 some:
