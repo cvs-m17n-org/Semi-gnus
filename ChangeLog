@@ -1,3 +1,11 @@
+2001-01-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treatment-function-alist): Use backquote.
+
+2001-01-13  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
+
+	* Makefile.in (install-package-lisp): Specify EMACS=$(XEMACS).
+
 2001-01-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.6.
