@@ -2737,7 +2737,8 @@ It should typically alter the sending method in some way or other."
 	  ;; Inherit the invisible property of texts to make MIME-Edit
 	  ;; find the MIME part boundaries.
 	  (dolist (region message-invisibles)
-	    (put-text-property (car region) (cdr region) 'invisible t)))
+	    (add-text-properties (car region) (cdr region)
+				 '(invisible t mime-edit-invisible t))))
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
@@ -2808,18 +2809,36 @@ It should typically alter the sending method in some way or other."
   '(defalias 'invisible-region 'message-invisible-region))
 
 (defun message-find-invisible-regions ()
-  "Find invisible texts with the property `message-invisible' and
-return a list of points."
-  (let (from
-	(to (point-min))
-	regions)
-    (while (setq from (text-property-any to (point-max)
-					 'message-invisible t))
-      (setq to (or (text-property-not-all from (point-max)
-					  'message-invisible t)
-		   (point-max)))
-      (push (cons from to) regions))
-    regions))
+  "Find invisible texts with the property `message-invisible' or
+`mime-edit-invisible' and return a list of points."
+  (let* (emiko
+	 (from (or (setq emiko (text-property-any (point-min) (point-max)
+						  'mime-edit-invisible t))
+		   (text-property-any (point-min) (point-max)
+				      'message-invisible t)))
+	 (to (or (if emiko
+		     (text-property-not-all from (point-max)
+					    'mime-edit-invisible t)
+		   (text-property-not-all from (point-max)
+					  'message-invisible t))
+		 (point-max)))
+	 regions)
+    (when from
+      (push (cons from to) regions)
+      (if emiko
+	  (while (setq from (text-property-any to (point-max)
+					       'mime-edit-invisible t))
+	    (setq to (or (text-property-not-all from (point-max)
+						'mime-edit-invisible t)
+			 (point-max)))
+	    (push (cons from to) regions))
+	(while (setq from (text-property-any to (point-max)
+					     'message-invisible t))
+	  (setq to (or (text-property-not-all from (point-max)
+					      'message-invisible t)
+		       (point-max)))
+	  (push (cons from to) regions)))
+      regions)))
 
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
@@ -2828,8 +2847,9 @@ return a list of points."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  ;; Expose all invisible text with the property `message-invisible'.
-  ;; We should believe that the things might be created by MIME-Edit.
+  ;; Expose all invisible text with the property `message-invisible'
+  ;; or `mime-edit-invisible'.  We should believe that the things
+  ;; might be created by MIME-Edit.
   (let ((message-invisibles (message-find-invisible-regions)))
     (dolist (region message-invisibles)
       (put-text-property (car region) (cdr region) 'invisible nil))
@@ -2840,8 +2860,9 @@ return a list of points."
 	(unless (yes-or-no-p
 		 "Invisible text found and made visible; continue posting? ")
 	  (error "Invisible text found and made visible"))))
-    ;; Hide again all text with the property `message-invisible'.
-    ;; It is needed to make MIME-Edit find the MIME part boundaries.
+    ;; Hide again all text with the property `message-invisible' or
+    ;; `mime-edit-invisible'.  It is needed to make MIME-Edit find the
+    ;; MIME part boundaries.
     (dolist (region message-invisibles)
       (put-text-property (car region) (cdr region) 'invisible t))))
 
@@ -5759,7 +5780,8 @@ regexp varstr."
       ;; Inherit the invisible property of texts to make MIME-Edit
       ;; find the MIME part boundaries.
       (dolist (region message-invisibles)
-	(put-text-property (car region) (cdr region) 'invisible t))
+	(add-text-properties (car region) (cdr region)
+			     '(invisible t mime-edit-invisible t)))
       (setq message-reply-headers reply-headers)
       (message-generate-headers '((optional . In-Reply-To)))
       (mime-edit-translate-buffer))
