@@ -3009,6 +3009,13 @@ if address \"sender\" \"sieve-admin@@extundo.com\" @{
 Sieve 言語は RFC 3028 で述べられていま
 す (@pxref{Top, Emacs Sieve, Top, sieve, Emacs Sieve})。
 
+@item (agent parameters)
+エージェントを使うようにしてあると、個々のグループでエージェントの振る舞
+いを制御するどのパラメータも設定することができます。エージェントパラメー
+タについては @ref{Category Syntax} を参照して下さい。たいていのユーザは、
+設定に要する苦労を最小限にするために、エージェントカテゴリーかグループト
+ピックのどちらかでエージェントパラメータを設定することを選ぶでしょう。
+
 @item (@var{variable} @var{form})
 グループに入るときに、そのグループローカルの変数を設定するグループパラメー
 タを使用することができます。@samp{news.answers} においてスレッド表示を行
@@ -3935,7 +3942,10 @@ Gnus
 
 トピック内の全てのグループはグループパラメータを、その親 (と先祖) のトピッ
 クパラメータから継承します。グループパラメータとして正しいものは全て、ト
-ピックパラメータとしても正しいものです(@pxref{Group Parameters})。
+ピックパラメータとしても正しいものです(@pxref{Group Parameters})。エージェ
+ントを使うようにしてあると、すべてのエージェントパラメータ (@ref{Category
+Syntax} の Agent Parameters を参照 (訳注: 必要なら Index を使って)) は有
+効なトピックパラメータでもあります。
 
 さらに、以下のパラメータはトピックパラメータとしてのみ有効です:
 
@@ -16808,12 +16818,13 @@ Commands}) か、またはエージェントに扱って欲しくないのに自動的に追加され
 変数を上書きする多くの任意なパラメータから成ります。エージェントパラメー
 タの完全なリストを以下に示します。
 
+@cindex Agent Parameters
 @table @code
 @item gnus-agent-cat-name
-The name of the category.
+分類の名前。
 
 @item gnus-agent-cat-groups
-The list of groups that are in this category.
+この分類にあるグループのリスト。
 
 @item gnus-agent-cat-predicate
 (通常) どの記事をダウンロードするのが適当かという大まかな輪郭を与える述
@@ -16845,6 +16856,12 @@ The list of groups that are in this category.
 
 @item gnus-agent-cat-length-when-long
 @code{gnus-agent-long-article} を上書きする整数。
+
+@item gnus-agent-cat-disable-undownloaded-faces
+ダウンロードされていない記事を gnus-summary-*-undownloaded-face を使って
+概略バッファにすべき @emph{ではない} ことを示すシンボル。値
+が @code{nil} だと、他のシンボルがそれらを抑制していても、ダウンロードさ
+れていない記事用のフェースを使えるようになります。
 @end table
 
 いったん分類が作られたら、分類の名前を変えることはできません。
