@@ -2,6 +2,11 @@
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
+	* lisp/gnus-sum.el (gnus-nov-parse-line): Use
+	`nnheader-nov-read-message-id' instead of `nnheader-nov-field' or
+	`nnheader-generate-fake-message-id'; use `(eobp)' instead of
+	`(eq (char-after) ?\n)'.
+
 1999-02-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.058.
@@ -11,10 +16,6 @@
 	design.
 	* lisp/gnus-msg.el (gnus-summary-mail-forward): Ditto.
 
- 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use
- 	`nnheader-nov-read-message-id' instead of `nnheader-nov-field' or
- 	`nnheader-generate-fake-message-id'.
- 
 	* lisp/mail-source.el (mail-source-fetch-pop): Ignore program and
 	authentication scheme..
 
