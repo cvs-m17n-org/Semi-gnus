@@ -1,3 +1,249 @@
+2001-08-20 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-start.el (gnus-activate-group): If dont-check, don't update
+	active.
+
+2001-08-20 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-retrieve-headers-1): Replace
+	nnslashdot-*-retrieve-headers.
+	(nnslashdot-request-article): Fix for slashcode 2.2.
+	(nnslashdot-make-tuple): New.
+	(nnslashdot-read-groups): Use it.
+
+2001-08-20 01:34:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-expand-group-parameters): Don't alter the variable
+	list. 
+
+	* gnus-sum.el (gnus-summary-move-article): Don't select article. 
+
+2001-08-20  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-msg.el (gnus-inews-do-gcc): If archive server can't be
+	opened, error instead of continuing (and exploding later).
+
+2001-08-20 01:34:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-expand-group-parameters): Return the parameter
+	list. 
+
+	* gnus-sum.el (gnus-summary-show-article): Doc fix.
+	(gnus-summary-show-article): Guess at charset if required.
+
+	* gnus-spec.el (gnus-correct-substring): Stopped one character
+	before we wanted.
+
+2001-08-19  Pavel Jan,Bm(Bk  <Pavel@Janik.cz>
+
+	* earcon.el (earcon-auto-play): Remove unused option.
+
+2001-08-19 16:14:41  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-score.el (gnus-score-headers): Move the "Scoring..."
+	message down in levels, since it happens very fast.
+
+	* smiley-ems.el (smiley-update-cache): Respect the symbol version
+	of smiley-regexp-alist.
+
+	* mm-view.el (mm-inline-text): Ignore vcard errors.
+
+	* gnus-art.el (gnus-ignored-headers): Added more junk headers. 
+
+	* gnus-score.el (gnus-all-score-files): Use append instead of
+	nconc. 
+
+	* gnus.el (gnus-splash-face): Doc fix.
+
+	* mm-decode.el (mm-mailcap-command): Use
+	mm-path-name-rewrite-functions. 
+	(mm-path-name-rewrite-functions): New variable.
+
+	* gnus-spec.el (gnus-parse-complex-format): React to ?=.
+	(gnus-complex-form-to-spec): Insert tab.
+	(gnus-spec-tab): New function.
+
+	* gnus-sum.el (gnus-select-newsgroup): Set the marks before
+	entering the group.
+
+	* gnus-spec.el (gnus-complex-form-to-spec): Insert Lisp to match
+	the positional spec.
+	(gnus-parse-complex-format): React to %C.
+
+	* gnus-ems.el (gnus-char-width): Moved here.
+
+	* gnus-sum.el (gnus-select-newsgroup): Set
+	gnus-newsgroup-articles. 
+	(gnus-unseen-mark): New variable.
+	(gnus-newsgroup-unseen): Ditto.
+	(gnus-newsgroup-seen): Ditto.
+	(gnus-adjust-marked-articles): Use them.
+	(gnus-update-marks): Use them.
+	(gnus-summary-update-secondary-mark): Display.
+	(gnus-summary-prepare-threads): Display.
+
+	* gnus-msg.el (gnus-inews-group-method): Use and return the
+	method, not the server.
+
+2001-08-19  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-srvr.el (gnus-server-agent-face): New.
+	(gnus-server-agent-face): New.
+	(gnus-server-mode): Turn on font-lock-mode.
+
+	* gnus.el (gnus-server-visual): Add defgroup.
+
+2001-08-19  Simon Josefsson  <jas@extundo.com>
+	From Joe Casadonte <jcasadonte@northbound-train.com>
+
+	* gnus-srvr.el (gnus-server-opened-face, gnus-server-closed-face,
+	gnus-server-denied-face): New.
+	(gnus-server-opened-face, gnus-server-closed-face,
+	gnus-server-denied-face): New.
+	(gnus-server-font-lock-keywords): Add.
+
+2001-08-19  Simon Josefsson  <jas@extundo.com>
+
+	* nnml.el (nnml-request-set-mark): Return nil.
+	(nnml-save-marks): Use nnml-possibly-create-directory.
+	(nnml-open-marks): Only work in temp buffer when inserting/reading
+	.marks file.
+
+2001-08-18 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-expand-group-parameters): Fix.
+
+	* gnus-spec.el (gnus-char-width): New.
+	(gnus-correct-substring, gnus-correct-length): Use it.
+
+	* message.el (message-required-mail-headers): Fix doc.
+
+2001-08-18 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-group-make-articles-read): gnus-request-set-mark.
+
+	* mm-decode.el (mm-save-part-to-file): Insert the handle.
+
+2001-08-18 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-threaded-retrieve-headers):
+	slashdot 2.2 (not fully fixed yet).
+	(nnslashdot-request-article): Ditto.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-util.el (gnus-remassoc, gnus-update-alist-soft): Moved from
+	nnimap.
+
+	* nnimap.el (nnimap-remassoc, nnimap-update-alist-soft): Moved to
+	gnus-util.
+	(nnimap-request-update-info-internal): Use new functions.
+
+	* nnml.el (nnml-request-set-mark, nnml-request-update-info): Use
+	new functions.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	Make nnml groups self-contained as far as marks are concerned.
+
+	* nnml.el (nnml-request-delete-group): Delete marks file.
+	(nnml-request-rename-group): Move marks file.
+	(nnml-marks-file-name, nnml-marks-is-evil, nnml-marks): New server
+	variables.
+	(nnml-request-set-mark, nnml-request-update-info): New server
+	functions.
+	(nnml-save-marks, nnml-open-marks): New functions.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-summary-move-article): Use `add' instead of
+	`set' when setting marks.
+
+2001-08-17 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-info-find-node): Take an argument.
+
+	* gnus-art.el (gnus-button-handle-info): New.
+	(gnus-url-unhex-string): Replace "+" with " ".
+
+2001-08-17 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-check-news-header-syntax): Check bad From.
+
+2001-08-18 00:14:45  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-spec.el (gnus-correct-length): New function.
+	(gnus-correct-substring): New function.
+	(gnus-tilde-max-form): Use it.
+
+2001-08-17  Nevin Kapur  <nevin@jhu.edu>
+
+	* nnmh.el: Docstring changes as below.
+
+	* nnml.el: Docstring changes as below.
+
+	* nnbabyl.el: Docstring changes as below.
+
+	* nnmbox.el: Docstring changes as below.
+
+	* nnfolder.el: Added docstrings identifying each virtual server
+	parameter.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	* mml.el (mml-menu): Collapse Attach, Insert and Security submenu.
+
+2001-08-17  Bj,Av(Brn Torkelsson  <torkel@acc.kth.se>
+
+	* message.el: rename "Abort Message" to "Postpone Message".
+	Remove "Attach file as MIME" from Message menu, it's already in
+	the MIME menu.
+
+2001-08-17 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* smime.el (smime-point-at-eol): eval-and-compile.
+	(smime-make-temp-file): New.
+	(smime-sign-region, smime-encrypt-region, smime-decrypt-region):
+	Use it.
+
+2001-08-17 10:41:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-fetch-group): Go online if offline. 
+	(gnus-agent-summary-fetch-group): New command and keystroke.
+
+	* gnus-art.el (gnus-insert-mime-button): Tiny clean-up.
+	(gnus-mime-display-security): Make it respect
+	gnus-unbuttonized-mime-type-p. 
+
+	* gnus-sum.el (gnus-articles-to-read): Comments.
+	(gnus-article-marked-p): New function.
+	(gnus-summary-display-make-predicate): New function.
+	(gnus-select-newsgroup): Use them.
+
+	* mm-decode.el (mm-save-part-to-file): Made it not error.
+
+2001-08-17  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-wait-for-tag): If process-status isn't open or
+	run, return nil instead of sit-for looping.
+
+2001-08-17 10:41:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lpath.el (featurep): fbind xml-parse-region.
+
+	* gnus.el (gnus-message-archive-method): Default to "archive".
+	(gnus-message-archive-method): Doc fix.
+	(gnus-parameters-get-parameter): Cleaned up.
+	(gnus-expand-group-parameter): New function.
+
+	* gnus-start.el (gnus-setup-news): Push the archive server only
+	the server list.
+
+	* mml.el (mml-menu): Changed name to "Attachments".
+
+	* mm-decode.el (mm-destroy-postponed-undisplay-list): Only message
+	when there is something to detroy.
+
 2001-05-21 17:11:46  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus-srvr.el (gnus-server-browse-in-group-buffer): Default to

@@ -43,6 +43,11 @@
   :group 'news
   :group 'mail)
 
+(defgroup gnus-format nil
+  "Dealing with formatting issues."
+  :group 'news
+  :group 'mail)
+
 (defgroup gnus-charset nil
   "Group character set issues."
   :link '(custom-manual "(gnus)Charsets")
@@ -237,6 +242,11 @@
 (defgroup gnus-server nil
   "Options related to newsservers and other servers used by Gnus."
   :group 'gnus)
+
+(defgroup gnus-server-visual nil
+  "Highlighting and menus in the server buffer."
+  :group 'gnus-visual
+  :group 'gnus-server)
 
 (defgroup gnus-message '((message custom-group))
   "Composing replies and followups in Gnus."
@@ -747,7 +757,7 @@ be set in `.emacs' instead."
      (:foreground "Brown"))
     (t
      ()))
-  "Face of the splash screen.")
+  "Face for the splash screen.")
 
 (defun gnus-splash ()
   (save-excursion
@@ -1085,23 +1095,9 @@ see the manual for details."
   :group 'gnus-server
   :type 'gnus-select-method)
 
-(defcustom gnus-message-archive-method
-  (progn
-    ;; Don't require it at top level to avoid circularity.
-    (require 'message)
-    `(nnfolder
-      "archive"
-      (nnfolder-directory ,(nnheader-concat message-directory "archive"))
-      (nnfolder-active-file
-       ,(nnheader-concat message-directory "archive/active"))
-      (nnfolder-get-new-mail nil)
-      (nnfolder-inhibit-expiry t)))
+(defcustom gnus-message-archive-method "archive"
   "*Method used for archiving messages you've sent.
-This should be a mail method.
-
-It's probably not very effective to change this variable once you've
-run Gnus once.  After doing that, you must edit this server from the
-server buffer."
+This should be a mail method."
   :group 'gnus-server
   :group 'gnus-message
   :type 'gnus-select-method)
@@ -1829,7 +1825,7 @@ covered by that variable."
     (scored . score) (saved . save)
     (cached . cache) (downloadable . download)
     (unsendable . unsend) (forwarded . forward)
-    (recent . recent)))
+    (recent . recent) (seen . seen)))
 
 (defvar gnus-headers-retrieved-by nil)
 (defvar gnus-article-reply nil)
@@ -2412,7 +2408,7 @@ STRINGS will be evaluated in normal `or' order."
 	(setq strings nil)))
     string))
 
-(defun gnus-info-find-node ()
+(defun gnus-info-find-node (&optional nodename)
   "Find Info documentation of Gnus."
   (interactive)
   ;; Enlarge info window if needed.
@@ -2422,7 +2418,8 @@ STRINGS will be evaluated in normal `or' order."
 	     (or gnus-info-filename
 		 (get-language-info current-language-environment 'gnus-info)
 		 "gnus")
-	     (or (cadr (assq major-mode gnus-info-nodes))
+	     (or nodename
+		 (cadr (assq major-mode gnus-info-nodes))
 		 (and (eq (current-buffer) (get-buffer gnus-article-buffer))
 		      (cadr (assq 'gnus-article-mode gnus-info-nodes))))))
     (setq gnus-info-buffer (current-buffer))
@@ -2842,15 +2839,31 @@ You should probably use `gnus-find-method-for-group' instead."
 
 (defun gnus-parameters-get-parameter (group)
   "Return the group parameters for GROUP from `gnus-parameters'."
-  (let ((alist gnus-parameters)
-	params-list)
-    (while alist
-      (when (string-match (caar alist) group)
+  (let (params-list)
+    (dolist (elem gnus-parameters)
+      (when (string-match (car elem) group)
 	(setq params-list
-	      (nconc (copy-sequence (cdar alist))
-		     params-list)))
-      (pop alist))
+	      (nconc (gnus-expand-group-parameters
+		      (car elem) (cdr elem) group)
+		     params-list))))
     params-list))
+
+(defun gnus-expand-group-parameters (match parameters group)
+  "Go through PARAMETERS and expand them according to the match data."
+  (let (new)
+    (dolist (elem parameters)
+      (if (and (stringp (cdr elem))
+	       (string-match "\\\\" (cdr elem)))
+	  (push (cons (car elem)
+		      (with-temp-buffer
+			(insert group)
+			(goto-char (point-min))
+			(while (re-search-forward match nil t)
+			  (replace-match (cdr elem)))
+			(buffer-string)))
+		new)
+	(push elem new)))
+    new))
 
 (defun gnus-group-find-parameter (group &optional symbol allow-list)
   "Return the group parameters for GROUP.

@@ -144,7 +144,10 @@
     "^X-Received:" "^Content-length:" "X-precedence:"
     "^X-Authenticated-User:" "^X-Comment" "^X-Report:" "^X-Abuse-Info:"
     "^X-HTTP-Proxy:" "^X-Mydeja-Info:" "^X-Copyright" "^X-No-Markup:"
-    "^X-Abuse-Info:")
+    "^X-Abuse-Info:" "^X-From_:" "^X-Accept-Language:" "^Errors-To:"
+    "^X-BeenThere:" "^X-Mailman-Version:" "^List-Help:" "^List-Post:"
+    "^List-Subscribe:" "^List-Id:" "^List-Unsubscribe:" "^List-Archive:"
+     "^X-Content-length:" "^X-Posting-Agent:" "^Original-Received:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -4073,12 +4076,9 @@ If no internal viewer is available, use an external viewer."
 
 (defun gnus-insert-mime-button (handle gnus-tmp-id &optional displayed)
   (let ((gnus-tmp-name
-	 (or (mail-content-type-get (mm-handle-type handle)
-				    'name)
-	     (mail-content-type-get (mm-handle-disposition handle)
-				    'filename)
-	     (mail-content-type-get (mm-handle-type handle)
-				    'url)
+	 (or (mail-content-type-get (mm-handle-type handle) 'name)
+	     (mail-content-type-get (mm-handle-disposition handle) 'filename)
+	     (mail-content-type-get (mm-handle-type handle) 'url)
 	     ""))
 	(gnus-tmp-type (mm-handle-media-type handle))
 	(gnus-tmp-description
@@ -4096,8 +4096,8 @@ If no internal viewer is available, use an external viewer."
     (setq gnus-tmp-type-long (concat gnus-tmp-type
 				     (and (not (equal gnus-tmp-name ""))
 					  (concat "; " gnus-tmp-name))))
-    (or (equal gnus-tmp-description "")
-	(setq gnus-tmp-type-long (concat " --- " gnus-tmp-type-long)))
+    (unless (equal gnus-tmp-description "")
+      (setq gnus-tmp-type-long (concat " --- " gnus-tmp-type-long)))
     (unless (bolp)
       (insert "\n"))
     (setq b (point))
@@ -5185,7 +5185,7 @@ after replacing with the original article."
 
 ;;; Internal Variables:
 
-(defcustom gnus-button-url-regexp "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\)\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)"
+(defcustom gnus-button-url-regexp "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)"
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -5204,6 +5204,9 @@ after replacing with the original article."
     ("\\(<URL: *\\)mailto: *\\([^> \n\t]+\\)>" 0 t gnus-url-mailto 2)
     ("mailto:\\([-a-zA-Z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
     ("\\bmailto:\\([^ \n\t]+\\)" 0 t gnus-url-mailto 1)
+    ;; This is info
+    ("\\binfo:\\(//\\)?\\([^'\">\n\t ]+\\)" 0 t
+     gnus-button-handle-info 2)
     ;; This is how URLs _should_ be embedded in text...
     ("<URL: *\\([^<>]*\\)>" 0 t gnus-button-embedded-url 1)
     ;; Raw URLs.
@@ -5619,6 +5622,18 @@ specified by `gnus-button-alist'."
      (group
       (gnus-button-fetch-group url)))))
 
+(defun gnus-button-handle-info (url)
+  "Fetch an info URL."
+  (if (string-match 
+       "^\\([^:/]+\\)?/\\(.*\\)"
+       url)
+      (gnus-info-find-node
+       (concat "(" (or (gnus-url-unhex-string (match-string 1 url))
+		       "Gnus") 
+	       ")" 
+	       (gnus-url-unhex-string (match-string 2 url))))
+    (error "Can't parse %s" url)))
+
 (defun gnus-button-message-id (message-id)
   "Fetch MESSAGE-ID."
   (save-excursion
@@ -5675,7 +5690,7 @@ specified by `gnus-button-alist'."
 If optional second argument ALLOW-NEWLINES is non-nil, then allow the
 decoding of carriage returns and line feeds in the string, which is normally
 forbidden in URL encoding."
-  (setq str (or str ""))
+  (setq str (or (nnheader-replace-chars-in-string str ?+ ? ) ""))
   (let ((tmp "")
 	(case-fold-search t))
     (while (string-match "%[0-9a-f][0-9a-f]" str)
@@ -6175,13 +6190,15 @@ For example:
 (defun gnus-mime-display-security (handle)
   (save-restriction
     (narrow-to-region (point) (point))
-    (gnus-insert-mime-security-button handle)
+    (unless (gnus-unbuttonized-mime-type-p (car handle))
+      (gnus-insert-mime-security-button handle))
     (gnus-mime-display-mixed (cdr handle))
     (unless (bolp)
       (insert "\n"))
-    (let ((gnus-mime-security-button-line-format
-	   gnus-mime-security-button-end-line-format))
-      (gnus-insert-mime-security-button handle))
+    (unless (gnus-unbuttonized-mime-type-p (car handle))
+      (let ((gnus-mime-security-button-line-format
+	     gnus-mime-security-button-end-line-format))
+	(gnus-insert-mime-security-button handle)))
     (mm-set-handle-multipart-parameter
      handle 'gnus-region
      (cons (set-marker (make-marker) (point-min))

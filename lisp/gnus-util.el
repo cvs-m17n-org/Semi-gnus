@@ -214,7 +214,10 @@
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (search-forward ":" (gnus-point-at-eol) t))
+  (let ((eol (gnus-point-at-eol)))
+    (goto-char (or (text-property-any (point) eol 'gnus-position t)
+		   (search-forward ":" eol t)
+		   (point)))))
 
 (defun gnus-remove-text-with-property (prop)
   "Delete all text in the current buffer with text property PROP."
@@ -1093,6 +1096,23 @@ Return the modified alist."
 	(defalias 'gnus-byte-compile 'byte-compile)
 	(byte-compile form))
     form))
+
+(defun gnus-remassoc (key alist)
+  "Delete by side effect any elements of LIST whose car is `equal' to KEY.
+The modified LIST is returned.  If the first member
+of LIST has a car that is `equal' to KEY, there is no way to remove it
+by side effect; therefore, write `(setq foo (remassoc key foo))' to be
+sure of changing the value of `foo'."
+  (when alist
+    (if (equal key (caar alist))
+	(cdr alist)
+      (setcdr alist (gnus-remassoc key (cdr alist)))
+      alist)))
+
+(defun gnus-update-alist-soft (key value alist)
+  (if value
+      (cons (cons key value) (gnus-remassoc key alist))
+    (gnus-remassoc key alist)))
 
 (provide 'gnus-util)
 

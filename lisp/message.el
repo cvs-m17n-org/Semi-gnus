@@ -53,6 +53,8 @@
   (require 'mail-parse)
   (require 'mml))
 
+(require 'rfc822)
+
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
   "Mail and news message composing."
@@ -221,7 +223,7 @@ header, remove it from this list."
   '(From Subject Date (optional . In-Reply-To) Message-ID Lines
 	 (optional . User-Agent))
   "*Headers to be generated or prompted for when mailing a message.
-RFC822 required that From, Date, To, Subject and Message-ID be
+It is recommended that From, Date, To, Subject and Message-ID be
 included.  Organization, Lines and User-Agent are optional."
   :group 'message-mail
   :group 'message-headers
@@ -1754,7 +1756,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Send Message" message-send-and-exit
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Send this message"))]
-   ["Abort Message" message-dont-send
+   ["Postpone Message" message-dont-send
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "File this draft message and exit"))]
    ["Kill Message" message-kill-buffer
@@ -3583,6 +3585,14 @@ This sub function is for exclusive use of `message-send-news'."
 	     (string-match "(.*).*(.*)" from)) ;(lars) (lars)
 	 (message
 	  "Denied posting -- the From looks strange: \"%s\"." from)
+	 nil)
+	((let ((addresses (rfc822-addresses from)))
+	   (while (and addresses
+		       (not (eq (string-to-char (car addresses)) ?\()))
+	     (setq addresses (cdr addresses)))
+	   addresses)
+	 (message
+	  "Denied posting -- bad From address: \"%s\"." from)
 	 nil)
 	(t t))))
    ;; Check the Reply-To header.

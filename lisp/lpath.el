@@ -73,7 +73,8 @@
 		     set-face-stipple set-frame-face-alist track-mouse
 		     url-retrieve w3-form-encode-xwfu window-at
 		     window-edges x-color-values x-popup-menu browse-url
-		     frame-char-height frame-char-width))
+		     frame-char-height frame-char-width
+		     xml-parse-region))
       (maybe-bind '(buffer-display-table
 		    buffer-file-coding-system font-lock-defaults
 		    global-face-data gnus-article-x-face-too-ugly
@@ -103,22 +104,23 @@
 		 set-face-doc-string set-glyph-image set-glyph-property
 		 specifier-instance url-generic-parse-url
 		 valid-image-instantiator-format-p w3-do-setup
-		 window-pixel-height window-pixel-width)))
+		 window-pixel-height window-pixel-width
+		 xml-parse-region)))
 
 ;; T-gnus.
 (let ((functions-variables
        (cond
 	((featurep 'xemacs)
-	 '((xml-parse-region)))
+	 nil)
 	((>= emacs-major-version 21)
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
 	 '((coding-system-get
 	    compose-mail file-name-extension find-coding-systems-region
 	    function-max-args get-charset-property shell-command-to-string
-	    smiley-encode-buffer xml-parse-region)))
+	    smiley-encode-buffer)))
 	(t
-	 '((function-max-args smiley-encode-buffer xml-parse-region))))))
+	 '((function-max-args smiley-encode-buffer))))))
   (maybe-fbind (car functions-variables))
   (maybe-bind (car (cdr functions-variables))))
 

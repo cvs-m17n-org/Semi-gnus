@@ -462,7 +462,7 @@ this variable specifies group names."
   :group 'gnus-summary-marks
   :type 'character)
 
-(defcustom gnus-forwarded-mark ?O
+(defcustom gnus-forwarded-mark ?F
   "*Mark used for articles that have been forwarded."
   :group 'gnus-summary-marks
   :type 'character)
@@ -478,7 +478,12 @@ this variable specifies group names."
   :type 'character)
 
 (defcustom gnus-saved-mark ?S
-  "*Mark used for articles that have been saved to."
+  "*Mark used for articles that have been saved."
+  :group 'gnus-summary-marks
+  :type 'character)
+
+(defcustom gnus-unseen-mark ?.
+  "*Mark used for articles that haven't been seen."
   :group 'gnus-summary-marks
   :type 'character)
 
@@ -1043,6 +1048,7 @@ that were fetched.  Say, for nnultimate groups."
 
 ;;; Internal variables
 
+(defvar gnus-summary-display-cache nil)
 (defvar gnus-article-mime-handles nil)
 (defvar gnus-article-decoded-p nil)
 (defvar gnus-article-charset nil)
@@ -1075,6 +1081,7 @@ that were fetched.  Say, for nnultimate groups."
 (defvar gnus-current-move-group nil)
 (defvar gnus-current-copy-group nil)
 (defvar gnus-current-crosspost-group nil)
+(defvar gnus-newsgroup-display nil)
 
 (defvar gnus-newsgroup-dependencies nil)
 (defvar gnus-newsgroup-adaptive nil)
@@ -1230,6 +1237,15 @@ end position and text.")
 (defvar gnus-newsgroup-dormant nil
   "List of dormant articles in the current newsgroup.")
 
+(defvar gnus-newsgroup-unseen nil
+  "List of unseen articles in the current newsgroup.")
+
+(defvar gnus-newsgroup-seen nil
+  "Range of seen articles in the current newsgroup.")
+
+(defvar gnus-newsgroup-articles nil
+  "List of articles in the current newsgroup.")
+
 (defvar gnus-newsgroup-scored nil
   "List of scored articles in the current newsgroup.")
 
@@ -1274,7 +1290,8 @@ end position and text.")
     gnus-newsgroup-expirable
     gnus-newsgroup-processable gnus-newsgroup-killed
     gnus-newsgroup-downloadable gnus-newsgroup-undownloaded
-    gnus-newsgroup-unsendable
+    gnus-newsgroup-unsendable gnus-newsgroup-unseen
+    gnus-newsgroup-seen gnus-newsgroup-articles
     gnus-newsgroup-bookmarks gnus-newsgroup-dormant
     gnus-newsgroup-headers gnus-newsgroup-threads
     gnus-newsgroup-prepared gnus-summary-highlight-line-function
@@ -1296,7 +1313,7 @@ end position and text.")
     gnus-cache-removable-articles gnus-newsgroup-cached
     gnus-newsgroup-data gnus-newsgroup-data-reverse
     gnus-newsgroup-limit gnus-newsgroup-limits
-    gnus-newsgroup-charset
+    gnus-newsgroup-charset gnus-newsgroup-display
     gnus-newsgroup-incorporated)
   "Variables that are buffer-local to the summary buffers.")
 
@@ -4356,6 +4373,8 @@ or a straight list of headers."
 		    gnus-saved-mark)
 		   ((memq number gnus-newsgroup-recent)
 		    gnus-recent-mark)
+		   ((memq number gnus-newsgroup-unseen)
+		    gnus-unseen-mark)
 		   (t gnus-no-mark))
 	     gnus-tmp-from (mail-header-from gnus-tmp-header)
 	     gnus-tmp-name
@@ -4529,14 +4548,22 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       (error "Couldn't request group %s: %s"
 	     group (gnus-status-message group)))
 
-    (setq gnus-newsgroup-name group)
-    (setq gnus-newsgroup-unselected nil)
-    (setq gnus-newsgroup-unreads (gnus-list-of-unread-articles group))
-    (gnus-summary-setup-default-charset)
+    (setq gnus-newsgroup-name group
+	  gnus-newsgroup-unselected nil
+	  gnus-newsgroup-unreads (gnus-list-of-unread-articles group))
 
-    ;; Adjust and set lists of article marks.
-    (when info
-      (gnus-adjust-marked-articles info))
+    (setq gnus-newsgroup-display (gnus-group-find-parameter group 'display))
+    (setq gnus-newsgroup-display
+	  (cond
+	   ((eq gnus-newsgroup-display 'all)
+	    (setq gnus-newsgroup-display 'identity))
+	   ((arrayp gnus-newsgroup-display)
+	    (gnus-summary-display-make-predicate
+	     (mapcar 'identity gnus-newsgroup-display)))
+	   (t
+	    nil)))
+
+    (gnus-summary-setup-default-charset)
 
     ;; Kludge to avoid having cached articles nixed out in virtual groups.
     (when (gnus-virtual-group-p group)
@@ -4551,6 +4578,10 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 
     (gnus-update-read-articles group gnus-newsgroup-unreads)
 
+    ;; Adjust and set lists of article marks.
+    (when info
+      (gnus-adjust-marked-articles info))
+    
     (if (setq articles select-articles)
 	(setq gnus-newsgroup-unselected
 	      (gnus-sorted-intersection
@@ -4582,12 +4613,22 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Set the initial limit.
       (setq gnus-newsgroup-limit (copy-sequence articles))
       ;; Remove canceled articles from the list of unread articles.
+      (setq fetched-articles
+	    (mapcar (lambda (headers) (mail-header-number headers))
+		    gnus-newsgroup-headers))
+      (setq gnus-newsgroup-articles fetched-articles)
       (setq gnus-newsgroup-unreads
 	    (gnus-set-sorted-intersection
-	     gnus-newsgroup-unreads
-	     (setq fetched-articles
-		   (mapcar (lambda (headers) (mail-header-number headers))
-			   gnus-newsgroup-headers))))
+	     gnus-newsgroup-unreads fetched-articles))
+
+      (let ((marks (assq 'seen (gnus-info-marks info))))
+	;; The `seen' marks are treated specially.
+	(when (setq gnus-newsgroup-seen (cdr marks))
+	  (dolist (article gnus-newsgroup-articles)
+	    (unless (gnus-member-of-range
+		     article gnus-newsgroup-seen)
+	      (push article gnus-newsgroup-unseen)))))
+
       ;; Removed marked articles that do not exist.
       (gnus-update-missing-marks
        (gnus-sorted-complement fetched-articles articles))
@@ -4619,6 +4660,58 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; GROUP is successfully selected.
       (or gnus-newsgroup-headers t)))))
 
+(defun gnus-summary-display-make-predicate (display)
+  (require 'gnus-agent)
+  (when (= (length display) 1)
+    (setq display (car display)))
+  (unless gnus-summary-display-cache
+    (dolist (elem gnus-article-mark-lists)
+	(push (cons (cdr elem)
+		    (gnus-byte-compile
+		     `(lambda () (gnus-article-marked-p ',(cdr elem)))))
+	      gnus-summary-display-cache)))
+  (let ((gnus-category-predicate-alist gnus-summary-display-cache))
+    (gnus-get-predicate display)))
+
+;; Uses the dynamically bound `number' variable.
+(defvar number)
+(defun gnus-article-marked-p (type &optional article)
+  (let ((article (or article number)))
+    (cond
+     ((eq type 'tick)
+      (memq article gnus-newsgroup-marked))
+     ((eq type 'unsend)
+      (memq article gnus-newsgroup-unsendable))
+     ((eq type 'undownload)
+      (memq article gnus-newsgroup-undownloaded))
+     ((eq type 'download)
+      (memq article gnus-newsgroup-downloadable))
+     ((eq type 'unread)
+      (memq article gnus-newsgroup-unreads))
+     ((eq type 'read)
+      (memq article gnus-newsgroup-reads))
+     ((eq type 'dormant)
+      (memq article gnus-newsgroup-dormant) )
+     ((eq type 'expire)
+      (memq article gnus-newsgroup-expirable))
+     ((eq type 'reply)
+      (memq article gnus-newsgroup-replied))
+     ((eq type 'killed)
+      (memq article gnus-newsgroup-killed))
+     ((eq type 'bookmark)
+      (assq article gnus-newsgroup-bookmarks))
+     ((eq type 'score)
+      (assq article gnus-newsgroup-scored))
+     ((eq type 'save)
+      (memq article gnus-newsgroup-saved))
+     ((eq type 'cache)
+      (memq article gnus-newsgroup-cached))
+     ((eq type 'forward)
+      (memq article gnus-newsgroup-forwarded))
+     ((eq type 'recent)
+      (memq article gnus-newsgroup-recent))
+     (t t))))
+
 (defun gnus-articles-to-read (group &optional read-all)
   "Find out what articles the user wants to read."
   (let* ((articles
@@ -4627,11 +4720,15 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	  (if (or read-all
 		  (and (zerop (length gnus-newsgroup-marked))
 		       (zerop (length gnus-newsgroup-unreads)))
-		  (eq (gnus-group-find-parameter group 'display)
-		      'all))
+		  gnus-newsgroup-display)
+	      ;; We want to select the headers for all the articles in
+	      ;; the group, so we select either all the active
+	      ;; articles in the group, or (if that's nil), the
+	      ;; articles in the cache.
 	      (or
 	       (gnus-uncompress-range (gnus-active group))
 	       (gnus-cache-articles-in-group group))
+	    ;; Select only the "normal" subset of articles.
 	    (sort (append gnus-newsgroup-dormant gnus-newsgroup-marked
 			  (copy-sequence gnus-newsgroup-unreads))
 		  '<)))
@@ -4734,34 +4831,38 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	 (uncompressed '(score bookmark killed))
 	 marks var articles article mark)
 
-    (while marked-lists
-      (setq marks (pop marked-lists))
-      (set (setq var (intern (format "gnus-newsgroup-%s"
-				     (car (rassq (setq mark (car marks))
-						 types)))))
-	   (if (memq (car marks) uncompressed) (cdr marks)
-	     (gnus-uncompress-range (cdr marks))))
+    (dolist (marks marked-lists)
+      (setq mark (car marks))
+      (unless (eq mark 'seen)
+	;; Do the rest of the marks.
+	(set (setq var (intern (format "gnus-newsgroup-%s"
+				       (car (rassq mark types)))))
+	     (cond
+	      ((memq mark uncompressed)
+	       (cdr marks))
+	      (t
+	       (gnus-uncompress-range (cdr marks)))))
 
-      (setq articles (symbol-value var))
+	(setq articles (symbol-value var))
 
-      ;; All articles have to be subsets of the active articles.
-      (cond
-       ;; Adjust "simple" lists.
-       ((memq mark '(tick dormant expire reply save))
-	(while articles
-	  (when (or (< (setq article (pop articles)) min) (> article max))
-	    (set var (delq article (symbol-value var))))))
-       ;; Adjust assocs.
-       ((memq mark uncompressed)
-	(when (not (listp (cdr (symbol-value var))))
-	  (set var (list (symbol-value var))))
-	(when (not (listp (cdr articles)))
-	  (setq articles (list articles)))
-	(while articles
-	  (when (or (not (consp (setq article (pop articles))))
-		    (< (car article) min)
-		    (> (car article) max))
-	    (set var (delq article (symbol-value var))))))))))
+	;; All articles have to be subsets of the active articles.
+	(cond
+	 ;; Adjust "simple" lists.
+	 ((memq mark '(tick dormant expire reply save))
+	  (while articles
+	    (when (or (< (setq article (pop articles)) min) (> article max))
+	      (set var (delq article (symbol-value var))))))
+	 ;; Adjust assocs.
+	 ((memq mark uncompressed)
+	  (when (not (listp (cdr (symbol-value var))))
+	    (set var (list (symbol-value var))))
+	  (when (not (listp (cdr articles)))
+	    (setq articles (list articles)))
+	  (while articles
+	    (when (or (not (consp (setq article (pop articles))))
+		      (< (car article) min)
+		      (> (car article) max))
+	      (set var (delq article (symbol-value var)))))))))))
 
 (defun gnus-update-missing-marks (missing)
   "Go through the list of MISSING articles and remove them from the mark lists."
@@ -4782,15 +4883,14 @@ If SELECT-ARTICLES, only select those articles from GROUP."
   "Enter the various lists of marked articles into the newsgroup info list."
   (let ((types gnus-article-mark-lists)
 	(info (gnus-get-info gnus-newsgroup-name))
-	(uncompressed '(score bookmark killed))
+	(uncompressed '(score bookmark killed seen))
 	type list newmarked symbol delta-marks)
     (when info
       ;; Add all marks lists to the list of marks lists.
       (while (setq type (pop types))
 	(setq list (symbol-value
 		    (setq symbol
-			  (intern (format "gnus-newsgroup-%s"
-					  (car type))))))
+			  (intern (format "gnus-newsgroup-%s" (car type))))))
 
 	(when list
 	  ;; Get rid of the entries of the articles that have the
@@ -4808,6 +4908,12 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		  (setq prev arts))
 		(setq arts (cdr arts)))
 	      (setq list (cdr all)))))
+
+	(when (eq (cdr type) 'seen)
+	  (setq list 
+		(if list
+		    (gnus-add-to-range list gnus-newsgroup-unseen)
+		  (gnus-compress-sequence gnus-newsgroup-articles))))
 
 	(unless (memq (cdr type) uncompressed)
 	  (setq list (gnus-compress-sequence (set symbol (sort list '<)) t)))
@@ -5036,6 +5142,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	     (gnus-group-update-group ,group t))))
       ;; Add the read articles to the range.
       (gnus-info-set-read info range)
+      (gnus-request-set-mark group (list (list range 'add '(read))))
       ;; Then we have to re-compute how many unread
       ;; articles there are in this group.
       (when active
@@ -7057,6 +7164,7 @@ fetch-old-headers verbiage, and so on."
   ;; Most groups have nothing to remove.
   (if (or gnus-inhibit-limiting
 	  (and (null gnus-newsgroup-dormant)
+	       (eq gnus-newsgroup-display 'identity)
 	       (not (eq gnus-fetch-old-headers 'some))
 	       (not (numberp gnus-fetch-old-headers))
 	       (not (eq gnus-fetch-old-headers 'invisible))
@@ -7145,6 +7253,9 @@ fetch-old-headers verbiage, and so on."
 		  (push (cons number gnus-low-score-mark)
 			gnus-newsgroup-reads)))
 	      t)
+	    ;; Do the `display' group parameter.
+	    (and gnus-newsgroup-display
+		 (not (funcall gnus-newsgroup-display)))
 	    ;; Check NoCeM things.
 	    (if (and gnus-use-nocem
 		     (gnus-nocem-unwanted-article-p
@@ -7814,15 +7925,20 @@ to save in."
   "Force re-fetching of the current article.
 If ARG (the prefix) is a number, show the article with the charset
 defined in `gnus-summary-show-article-charset-alist', or the charset
-inputed.
+input.
 If ARG (the prefix) is non-nil and not a number, show the raw article
 without any article massaging functions being run."
   (interactive "P")
   (cond
    ((numberp arg)
+    (gnus-summary-show-article t)
     (let ((gnus-newsgroup-charset
 	   (or (cdr (assq arg gnus-summary-show-article-charset-alist))
-	       (mm-read-coding-system "Charset: ")))
+	       (mm-read-coding-system
+		"View as charset: "
+		(save-excursion
+		  (set-buffer gnus-article-buffer)
+		  (detect-coding-region (point) (point-max) t)))))
 	  (gnus-newsgroup-ignored-charsets 'gnus-all))
       (gnus-summary-select-article nil 'force)
       (let ((deps gnus-newsgroup-dependencies)
@@ -7844,9 +7960,8 @@ without any article massaging functions being run."
 	 header)
 	(gnus-summary-update-article-line
 	 (cdr gnus-article-current) header)
-	(if (gnus-summary-goto-subject (cdr gnus-article-current) nil t)
-	    (gnus-summary-update-secondary-mark
-	     (cdr gnus-article-current))))))
+	(when (gnus-summary-goto-subject (cdr gnus-article-current) nil t)
+	  (gnus-summary-update-secondary-mark (cdr gnus-article-current))))))
    ((not arg)
     ;; Select the article the normal way.
     (gnus-summary-select-article nil 'force))
@@ -7983,10 +8098,6 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
   (interactive "P")
   (unless action
     (setq action 'move))
-  ;; Disable marking as read.
-  (let (gnus-mark-article-hook)
-    (save-window-excursion
-      (gnus-summary-select-article)))
   ;; Check whether the source group supports the required functions.
   (cond ((and (eq action 'move)
 	      (not (gnus-check-backend-function
@@ -8164,7 +8275,7 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 		  (setq marks (cdr marks)))
 
 		(gnus-request-set-mark to-group (list (list (list to-article)
-							    'set
+							    'add
 							    to-marks))))
 
 	      (gnus-dribble-enter
@@ -8983,6 +9094,8 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	  gnus-saved-mark)
 	 ((memq article gnus-newsgroup-recent)
 	  gnus-recent-mark)
+	 ((memq article gnus-newsgroup-unseen)
+	  gnus-unseen-mark)
 	 (t gnus-no-mark))
    'replied)
   (when (gnus-visual-p 'summary-highlight 'highlight)

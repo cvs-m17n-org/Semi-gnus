@@ -1,3 +1,43 @@
+2001-08-20  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Delayed Articles): New section.  Documents
+	gnus-delay.el.
+	(Fancy Mail Splitting): Say that nnmail-cache-accepted-message-ids
+	must be non-nil for splitting with parents to work.
+
+2001-08-19 17:31:15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Other Marks): Addition.
+	(Positioning Point): New.
+	(Tabulation): New.
+
+2001-08-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Getting Started Reading Mail): Use (nnml "") rather
+	than (nnml "private") as the example server specification.  This
+	way, the example group names a few paragraphs further down are
+	correct, and I expect that most people are going to use the empty
+	string as name, anyway.  Please holler if that is wrong.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Optional Backend Functions): Remove `set'
+	request-set-mark action.
+
+2001-08-18 00:40:10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Wide Characters): New section.
+
+2001-08-17  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi: Replace 20,20 with 23,23 for
+	gnus-summary-line-format.
+
+2001-08-17 14:24:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Document regexp substitution. 
+	(Group Parameters): Addition.
+
 2001-08-11 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	From Nevin Kapur <nevin@jhu.edu>
 

@@ -923,10 +923,17 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
 
     ;; Make sure the archive server is available to all and sundry.
     (when gnus-message-archive-method
-      (setq gnus-server-alist (delq (assoc "archive" gnus-server-alist)
-				    gnus-server-alist))
-      (push (cons "archive" gnus-message-archive-method)
-	    gnus-server-alist))
+      (unless (assoc "archive" gnus-server-alist)
+	(push `("archive"
+		(nnfolder
+		 "archive"
+		 (nnfolder-directory
+		  ,(nnheader-concat message-directory "archive"))
+		 (nnfolder-active-file
+		  ,(nnheader-concat message-directory "archive/active"))
+		 (nnfolder-get-new-mail nil)
+		 (nnfolder-inhibit-expiry t)))
+	      gnus-server-alist)))
 
     ;; If we don't read the complete active file, we fill in the
     ;; hashtb here.
@@ -1465,18 +1472,19 @@ newsgroup."
 	   (quit
 	    (message "Quit activating %s" group)
 	    nil))
-	 (setq active (gnus-parse-active))
-	 ;; If there are no articles in the group, the GROUP
-	 ;; command may have responded with the `(0 . 0)'.  We
-	 ;; ignore this if we already have an active entry
-	 ;; for the group.
-	 (if (and (zerop (car active))
-		  (zerop (cdr active))
-		  (gnus-active group))
-	     (gnus-active group)
-	   (gnus-set-active group active)
-	   ;; Return the new active info.
-	   active))))
+	 (unless dont-check
+	   (setq active (gnus-parse-active))
+	   ;; If there are no articles in the group, the GROUP
+	   ;; command may have responded with the `(0 . 0)'.  We
+	   ;; ignore this if we already have an active entry
+	   ;; for the group.
+	   (if (and (zerop (car active))
+		    (zerop (cdr active))
+		    (gnus-active group))
+	       (gnus-active group)
+	     (gnus-set-active group active)
+	     ;; Return the new active info.
+	     active)))))
 
 (defun gnus-get-unread-articles-in-group (info active &optional update)
   (when active

@@ -32,6 +32,11 @@
 (require 'alist)
 (require 'gnus)
 
+(defcustom gnus-use-correct-string-widths t
+  "*If non-nil, use correct functions for dealing with wide characters."
+  :group 'gnus-format
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar gnus-summary-mark-positions nil)
@@ -138,7 +143,7 @@
 (defvar gnus-summary-mode-line-format-spec nil)
 (defvar gnus-group-mode-line-format-spec nil)
 
-;;; Phew.  All that gruft is over, fortunately.
+;;; Phew.  All that gruft is over with, fortunately.
 
 ;;;###autoload
 (defun gnus-update-format (var)
@@ -288,36 +293,112 @@ by `gnus-xmas-redefine'."
     'balloon-help
     ,(intern (format "gnus-balloon-face-%d" type))))
 
+(defun gnus-spec-tab (column)
+  (if (> column 0)
+      `(insert (make-string (max (- ,column (current-column)) 0) ? ))
+    `(progn
+       (if (> (current-column) ,(abs column))
+	   (delete-region (point)
+			  (- (point) (- (current-column) ,(abs column))))
+	 (insert (make-string (max (- ,(abs column) (current-column)) 0)
+			      ? ))))))
+
+(defun gnus-correct-length (string)
+  "Return the correct width of STRING."
+  (let ((length 0))
+    (mapcar (lambda (char) (incf length (gnus-char-width char))) string)
+    length))
+
+(defun gnus-correct-substring (string start end)
+  (let ((wstart 0)
+	(wend 0)
+	(seek 0)
+	(length (length string)))
+    ;; Find the start position.
+    (while (and (< seek length)
+		(< wstart start))
+      (incf wstart (gnus-char-width (aref string seek)))
+      (incf seek))
+    (setq wend wstart
+	  wstart seek)
+    ;; Find the end position.
+    (while (and (< seek length)
+		(<= wend end))
+      (incf wend (gnus-char-width (aref string seek)))
+      (incf seek))
+    (setq wend seek)
+    (substring string wstart (1- wend))))
+
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
   (let ((max (abs max-width)))
     (if (symbolp el)
-	`(if (> (length ,el) ,max)
+	`(if (> (,(if gnus-use-correct-string-widths
+		      'gnus-correct-length
+		    'length) ,el)
+		,max)
 	     ,(if (< max-width 0)
-		  `(substring ,el (- (length el) ,max))
-		`(substring ,el 0 ,max))
+		  `(,(if gnus-use-correct-string-widths
+			 'gnus-correct-substring
+		       'substring)
+		    ,el (- (,(if gnus-use-correct-string-widths
+				 'gnus-correct-length
+			       'length)
+			    el) ,max))
+		`(,(if gnus-use-correct-string-widths
+		       'gnus-correct-substring
+		     'substring)
+		  ,el 0 ,max))
 	   ,el)
       `(let ((val (eval ,el)))
-	 (if (> (length val) ,max)
+	 (if (> (,(if gnus-use-correct-string-widths
+		      'gnus-correct-length
+		    'length) val) ,max)
 	     ,(if (< max-width 0)
-		  `(substring val (- (length val) ,max))
-		`(substring val 0 ,max))
+		  `(,(if gnus-use-correct-string-widths
+			 'gnus-correct-substring
+		       'substring)
+		    val (- (,(if gnus-use-correct-string-widths
+				 'gnus-correct-length
+			       'length) val) ,max))
+		`(,(if gnus-use-correct-string-widths
+		       'gnus-correct-substring
+		     'substring)
+		  val 0 ,max))
 	   val)))))
 
 (defun gnus-tilde-cut-form (el cut-width)
   "Return a form that cuts CUT-WIDTH off of EL."
   (let ((cut (abs cut-width)))
     (if (symbolp el)
-	`(if (> (length ,el) ,cut)
+	`(if (> (,(if gnus-use-correct-string-widths
+		      'gnus-correct-length
+		    'length) ,el) ,cut)
 	     ,(if (< cut-width 0)
-		  `(substring ,el 0 (- (length el) ,cut))
-		`(substring ,el ,cut))
+		  `(,(if gnus-use-correct-string-widths
+			 'gnus-correct-substring
+		       'substring) ,el 0
+		       (- (,(if gnus-use-correct-string-widths
+				'gnus-correct-length
+			      'length) el) ,cut))
+		`(,(if gnus-use-correct-string-widths
+		       'gnus-correct-substring
+		     'substring) ,el ,cut))
 	   ,el)
       `(let ((val (eval ,el)))
-	 (if (> (length val) ,cut)
+	 (if (> (,(if gnus-use-correct-string-widths
+		      'gnus-correct-length
+		    'length) val) ,cut)
 	     ,(if (< cut-width 0)
-		  `(substring val 0 (- (length val) ,cut))
-		`(substring val ,cut))
+		  `(,(if gnus-use-correct-string-widths
+			 'gnus-correct-substring
+		       'substring) val 0
+		       (- (,(if gnus-use-correct-string-widths
+				'gnus-correct-length
+			      'length) val) ,cut))
+		`(,(if gnus-use-correct-string-widths
+		       'gnus-correct-substring
+		     'substring) val ,cut))
 	   val)))))
 
 (defun gnus-tilde-ignore-form (el ignore-value)
@@ -352,6 +433,7 @@ by `gnus-xmas-redefine'."
       (replace-match "\\\"" nil t))
     (goto-char (point-min))
     (insert "(\"")
+    ;; Convert all font specs into font spec lists.
     (while (re-search-forward "%\\([0-9]+\\)?\\([«»{}()]\\)" nil t)
       (let ((number (if (match-beginning 1)
 			(match-string 1) "0"))
@@ -363,10 +445,20 @@ by `gnus-xmas-redefine'."
 				   (cond ((= delim ?\() "mouse")
 					 ((= delim ?\{) "face")
 					 (t "balloon"))
-				   " " number " \""))
+				   " " number " \"")
+			   t t)
 	  (replace-match "\")\""))))
     (goto-char (point-max))
     (insert "\")")
+    ;; Convert point position commands.
+    (goto-char (point-min))
+    (while (re-search-forward "%\\([-0-9]+\\)?C" nil t)
+      (replace-match "\"(point)\"" t t))
+    ;; Convert TAB commands.
+    (goto-char (point-min))
+    (while (re-search-forward "%\\([-0-9]+\\)=" nil t)
+      (replace-match (format "\"(tab %s)\"" (match-string 1)) t t))
+    ;; Convert the buffer into the spec.
     (goto-char (point-min))
     (let ((form (read (current-buffer))))
       (cons 'progn (gnus-complex-form-to-spec form spec-alist)))))
@@ -375,11 +467,17 @@ by `gnus-xmas-redefine'."
   (delq nil
 	(mapcar
 	 (lambda (sform)
-	   (if (stringp sform)
-	       (gnus-parse-simple-format sform spec-alist t)
+	   (cond
+	    ((stringp sform)
+	     (gnus-parse-simple-format sform spec-alist t))
+	    ((eq (car sform) 'point)
+	     `(gnus-put-text-property (1- (point)) (point) 'gnus-position t))
+	    ((eq (car sform) 'tab)
+	     (gnus-spec-tab (cadr sform)))
+	    (t
 	     (funcall (intern (format "gnus-%s-face-function" (car sform)))
 		      (gnus-complex-form-to-spec (cddr sform) spec-alist)
-		      (nth 1 sform))))
+		      (nth 1 sform)))))
 	 form)))
 
 (defun gnus-parse-simple-format (format spec-alist &optional insert)
