@@ -85,12 +85,6 @@
 	 (set symbol nil))
      symbol))
 
-;; Avoid byte-compile warning.
-;; In Mule, this function will be redefined to `truncate-string',
-;; which takes 3 or 4 args.
-(defun gnus-truncate-string (str width &rest ignore)
-  (substring str 0 width))
-
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
 ;; to limit the length of a string.  This function is necessary since
 ;; `(substr "abc" 0 30)' pukes with "Args out of range".
