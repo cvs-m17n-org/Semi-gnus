@@ -1598,6 +1598,8 @@ find-file-hooks, etc.
             (nnheader-insert-file-contents file)))))))
 
 (defun nnheader-find-file-noselect (&rest args)
+  "Open a file with some variables bound.
+See `find-file-noselect' for the arguments."
   (let ((format-alist nil)
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
