@@ -2659,6 +2659,8 @@ display only a single character."
 	(make-local-variable 'gnus-article-current)
 	(make-local-variable 'gnus-original-article-buffer))
       (setq gnus-newsgroup-name group)
+      ;; Set any local variables in the group parameters.
+      (gnus-summary-set-local-parameters gnus-newsgroup-name)
       t)))
 
 (defun gnus-set-global-variables ()
@@ -3053,8 +3055,6 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	     (gnus-active gnus-newsgroup-name)))
       ;; You can change the summary buffer in some way with this hook.
       (gnus-run-hooks 'gnus-select-group-hook)
-      ;; Set any local variables in the group parameters.
-      (gnus-summary-set-local-parameters gnus-newsgroup-name)
       (gnus-update-format-specifications
        nil 'summary 'summary-mode 'summary-dummy)
       (gnus-update-summary-mark-positions)
@@ -7576,6 +7576,12 @@ to save in."
 	      (copy-to-buffer buffer (point-min) (point-max))
 	      (set-buffer buffer)
 	      (gnus-article-delete-invisible-text)
+	      (when (gnus-visual-p 'article-highlight 'highlight)
+		;; Copy-to-buffer doesn't copy overlay.  So redo
+		;; highlight.
+		(let ((gnus-article-buffer buffer))
+		  (gnus-article-highlight-citation t)
+		  (gnus-article-highlight-signature)))
 	      (let ((ps-left-header
 		     (list
 		      (concat "("
