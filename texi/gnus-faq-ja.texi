@@ -146,20 +146,19 @@ T-gnus が公式に対応している Emacs のバージョンは次の通りです。
 
 @itemize @bullet
 @item
-GNU Emacs
-
-バージョン 19.34 以上の Mule 機能付き
+Emacs 19.34 とそれ以上の Mule 機能付き。
 
 @item
-XEmacs
-
-バージョン 21.1.1 以上の Mule 機能付き
+XEmacs 21.1.1 以上の Mule 機能付き
 
 @item
-Meadow
+Meadow 1.00 以上。(Mule for Windows では動きません。)
 
-バージョン 1.00 以上。(Mule for Windows では動きません。)
 @end itemize
+
+とは言うものの、T-gnus はバージョン 21.1.1 未満の XEmacs, 例えば 20.4 で
+も使えるかもしれません。詳しいことは T-gnus の配布に含まれている README
+ ファイルを読んで下さい。
 
 @item
 Q1.4: T-gnus を GNU Emacs と XEmacs の両方で動かすことはできますか?

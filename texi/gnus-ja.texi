@@ -18133,19 +18133,21 @@ Gnus $(B$O0J2<$N$b$N$GF0:n$7$^$9(B:
 @itemize @bullet
 
 @item
-Emacs 19.32 $(B$H$=$l0J9_!#(B
+Emacs 19.34 $(B$H$=$l0J>e$N(B Mule $(B5!G=IU$-!#(B
 
 @item
-XEmacs 19.14 $(B$H$=$l0J9_!#(B
+XEmacs 21.1.1 $(B0J>e$N(B Mule $(B5!G=IU$-(B
 
 @item
-Emacs 19.32 $(B$H$=$l0J9_$K4p$E$$$?(B Mule$(B!#(B
+Meadow 1.00 $(B0J>e!#(B(Mule for Windows $(B$G$OF0$-$^$;$s!#(B)
 
 @end itemize
 
 $(B$3$N(B Gnus $(B$NHG$O$3$l$h$j8E$$$I$s$J(B Emacsen $(B$G$b40A4$KF0:n$7$J$$$G$7$g$&!#(B
 $(B>/$J$/$H$b!"?.Mj$G$-$kF0:n$O$7$J$$$G$7$g$&!#8E$$HG$N(B gnus $(B$O8E$$(B Emacs
-$(B$NHG$G$bF0:n$9$k$G$7$g$&!#(B
+$(B$NHG$G$bF0:n$9$k$G$7$g$&!#$H$O8@$&$b$N$N!"(BT-gnus $(B$O%P!<%8%g%s(B 21.1.1 $(BL$(B
+$(BK~$N(B XEmacs, $(BNc$($P(B 20.4 $(B$G$b;H$($k$+$b$7$l$^$;$s!#>\$7$$$3$H$O(B T-gnus
+ $(B$NG[I[$K4^$^$l$F$$$k(B README $(B%U%!%$%k$rFI$s$G2<$5$$!#(B
 
 $(B$$$m$$$m$J%W%i%C%H%U%)!<%`$N(B Gnus $(B$N4V$K$O$$$/$D$+$NGyA3$H$7$?0c$$$,$"$j(B
 $(B$^$9(B---XEmacs $(B$O$b$C$H2hA|5!G=(B ($(B%m%4$H%D!<%k%P!<(B) $(B$rFCD'$K$7$F$$$^$9(B--$(B$7(B

@@ -18486,7 +18486,9 @@ XEmacs 21.1.1 and up.
 
 This Gnus version will absolutely not work on any Emacsen older than
 that.  Not reliably, at least.  Older versions of Gnus may work on older
-Emacs versions.
+Emacs versions.  However, T-gnus does support ``Mule 2.3 based on Emacs
+19.34'' and possibly the versions of XEmacs prior to 21.1.1, e.g. 20.4.
+See the file ``README'' in the T-gnus distribution for more details.
 
 There are some vague differences between Gnus on the various
 platforms---XEmacs features more graphics (a logo and a toolbar)---but

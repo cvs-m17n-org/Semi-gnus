@@ -1,3 +1,11 @@
+2000-04-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/gnus.texi, texi/gnus-ja.texi, texi/gnus-faq-ja.texi, README:
+	You might be able to use T-gnus with the versions of XEmacs prior
+	to 21.1.1.
+
+	* contrib/timer.el: New file. Imported from fsf-compat-1.07-pkg.
+
 2000-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/mm-view.el (gnus-article-mime-handles): Don't bind it.
