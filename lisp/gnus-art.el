@@ -5392,6 +5392,7 @@ Argument LINES specifies lines to be scrolled up."
 	      (save-excursion
 		(save-restriction
 		  (widen)
+		  (forward-line)
 		  (eobp)))) ;Real end-of-buffer?
 	  (progn
 	    (when gnus-article-over-scroll
