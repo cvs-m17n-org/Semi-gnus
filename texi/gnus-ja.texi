@@ -10283,7 +10283,8 @@ Superseding} を参照してください。
 @item gnus-uu-digest-headers
 @vindex gnus-uu-digest-headers
 要約メッセージ (digested message) に含まれるヘッダーに合致する正規表現の
-リストです。ヘッダーは合致した順に取り込まれます。
+リストです。ヘッダーは合致した順に取り込まれます。@code{nil} だったら、
+すべてのヘッダーを含みます。
 
 @item gnus-add-to-list
 @vindex gnus-add-to-list

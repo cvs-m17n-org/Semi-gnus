@@ -223,8 +223,7 @@ node `(gnus)Server Buffer'.")
 (gnus-add-shutdown 'gnus-close-agent 'gnus)
 
 (defun gnus-close-agent ()
-  (setq gnus-agent-covered-methods nil
-	gnus-category-predicate-cache nil
+  (setq gnus-category-predicate-cache nil
 	gnus-category-group-cache nil
 	gnus-agent-spam-hashtb nil)
   (gnus-kill-buffer gnus-agent-overview-buffer))
@@ -1104,21 +1103,19 @@ and that there are no duplicates."
 		    (cur (condition-case nil
 			     (read (current-buffer))
 			   (error nil))))
-		(cond ((or (not (integerp cur))
-			   (not (eq (char-after) ?\t)))
-		       (gnus-message 1
-				     "Overview buffer contains garbage '%s'." (buffer-substring p (progn (end-of-line) (point))))
-		       (debug nil "Overview buffer contains line that does not begin with a tab-delimited integer."))
+		(cond
+		 ((or (not (integerp cur))
+		      (not (eq (char-after) ?\t)))
+		  (gnus-message 1
+				"Overview buffer contains garbage '%s'." (buffer-substring p (progn (end-of-line) (point)))))
 		 ((= cur prev-num)
-		       (gnus-message 1
-				     "Duplicate overview line for %d" cur)
-		       (debug nil (format "Duplicate overview line for %d" cur))
+		  (gnus-message 1
+				"Duplicate overview line for %d" cur)
 		  (delete-region (point) (progn (forward-line 1) (point))))
 		 ((< cur prev-num)
-		       (gnus-message 1 "Overview buffer not sorted!")
-		       (debug nil "Overview buffer not sorted!"))
-		      (t
-		       (setq prev-num cur)))
+		  (gnus-message 1 "Overview buffer not sorted!"))
+		 (t
+		  (setq prev-num cur)))
 		(forward-line 1)))))))))
 
 (defun gnus-agent-flush-cache ()
