@@ -36,7 +36,6 @@
     ("\\(^\\|:\\)hk\\(star\\)?\\."		. cn-big5)
     ("\\(^\\|:\\)tw\\."				. cn-big5)
     ("\\(^\\|:\\)alt\\.chinese"			. hz-gb-2312)
-    ("\\`nndraft:\\(drafts\\|delayed\\)\\'"	. nil)
     )
   "Alist of newsgroup patterns vs. corresponding default MIME charset.
 Each element looks like (REGEXP . SYMBOL).  REGEXP is pattern for
@@ -63,7 +62,7 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
 It is specified by variable `gnus-newsgroup-default-charset-alist'
 \(cf. function `gnus-set-newsgroup-default-charset')."
   (if (buffer-live-p gnus-summary-buffer)
-      (let ((regexp-to-charset
+      (let ((charset
 	     (catch 'found
 	       (let ((group
 		      (save-excursion
@@ -73,18 +72,18 @@ It is specified by variable `gnus-newsgroup-default-charset-alist'
 		 (while alist
 		   (let ((pair (car alist)))
 		     (if (string-match (car pair) group)
-			 (throw 'found pair)
+			 (throw 'found (cdr pair))
 		       ))
 		   (setq alist (cdr alist)))
 		 ))))
-	(if regexp-to-charset
+	(if charset
 	    (progn
 	      (save-excursion
 		(set-buffer gnus-summary-buffer)
 		(make-local-variable 'default-mime-charset)
-		(setq default-mime-charset (cdr regexp-to-charset)))
+		(setq default-mime-charset charset))
 	      (make-local-variable 'default-mime-charset)
-	      (setq default-mime-charset (cdr regexp-to-charset)))
+	      (setq default-mime-charset charset))
 	  (kill-local-variable 'default-mime-charset)))))
 
 
