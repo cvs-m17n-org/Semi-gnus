@@ -1,5 +1,13 @@
 1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.0.
+	(gnus-version): Modify for SEMI 1.4.
+
+	* lisp/gnus-sum.el: Use 'mime-add-condition to set up
+ 	acting-condition.
+
+1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/lpath.el: Must add "flim" instead of "mel" to load-path.
 
 1998-05-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
