@@ -1,3 +1,13 @@
+1999-10-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.13.8 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.9.
+
+	* lisp/gnus-msg.el (gnus-bug): Do not send bug report to
+	`bugs@gnus.org'.
+
+
 1999-09-21  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.13.8 released.
