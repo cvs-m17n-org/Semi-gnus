@@ -42,7 +42,8 @@ Gnus 5.6.24 ------>             |             6.8.1
 The Vendor Branch
 
     Original version of Gnus.
-    Each version has a tag of the form "qgnus-0_XY" or "gnus-5_X_Y".
+    Each version has a tag of the form "qgnus-0_XY" or "gnus-5_X_Y" or
+    "pgnus-0_XY".
 
     The branch tag for the vendor branch is "larsi".
 
