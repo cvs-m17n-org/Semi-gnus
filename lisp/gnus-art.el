@@ -2413,6 +2413,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (unwind-protect
 		(progn
 		  (select-window (get-buffer-window (current-buffer) t))
+		  (goto-char point)
+		  (forward-line)
 		  (mm-display-part handle))
 	      (select-window window))))
       (goto-char point))))
@@ -2441,6 +2443,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (if gnus-tmp-description
 	      (concat " (" gnus-tmp-description ")")
 	    ""))
+    (unless (bolp)
+      (insert "\n"))
     (setq b (point))
     (gnus-eval-format
      gnus-mime-button-line-format gnus-mime-button-line-format-alist
