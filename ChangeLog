@@ -1,3 +1,24 @@
+1999-07-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header): Add
+	`extra' as a luna-class.
+	(make-full-mail-header): Ditto.
+	(nnheader-decode-field-body): Redefine as a regular function.
+	(mail-header-set-extra): Alias to
+	`mime-gnus-entity-set-extra-internal'.
+	(mail-header-extra): Alias to `mime-gnus-entity-extra-internal'.
+
+	* lisp/mmgnus.el (TopLevel): Add definition of `extra' as a
+	luna-class.
+
+	* lisp/gnus-sum.el (gnus-summary-from-or-to-or-newsgroups): Bind
+	the value of `default-mime-charset' to its local value in
+	`gnus-summary-buffer'; don't bind `mail-parse-charset' and
+	`mail-parse-ignored-charsets'.
+	(gnus-decode-encoded-word-function): New variable.
+
 1999-07-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.07.
