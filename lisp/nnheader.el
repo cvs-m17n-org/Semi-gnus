@@ -36,7 +36,7 @@
 
 ;; Requiring `gnus-util' at compile time creates a circular
 ;; dependency between nnheader.el and gnus-util.el.
-;(eval-when-compile (require 'gnus-util))
+;;(eval-when-compile (require 'gnus-util))
 
 (require 'mail-utils)
 
@@ -120,6 +120,14 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
    (t nil))
   "Coding system of auto save file.")
 
+(defvar nnheader-directory-separator-character 
+  (let ((case-fold-search t))
+    (cond
+     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin"
+		    (symbol-name system-type))
+      ?\\)
+     (t ?/))))
+  
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
@@ -1397,7 +1405,7 @@ without formatting."
 		     (expand-file-name
 		      (file-name-as-directory top))))
        (error "")))
-   ?/ ?.))
+   nnheader-directory-separator-character ?.))
 
 (defun nnheader-message (level &rest args)
   "Message if the Gnus backends are talkative."

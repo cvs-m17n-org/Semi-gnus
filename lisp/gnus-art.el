@@ -3730,6 +3730,8 @@ commands:
 	  (set (make-local-variable 'gnus-article-edit-mode) nil)
 	  (buffer-disable-undo)
 	  (setq buffer-read-only t)
+	  ;; This list just keeps growing if we don't reset it.
+	  (setq gnus-button-marker-list nil)
 	  (unless (eq major-mode 'gnus-article-mode)
 	    (gnus-article-mode))
 	  (current-buffer))
