@@ -52,10 +52,12 @@
   "Pop to BUFFER, evaluate FORMS, and then return to the original window."
   (let ((tempvar (make-symbol "GnusStartBufferWindow"))
         (w (make-symbol "w"))
-        (buf (make-symbol "buf")))
+        (buf (make-symbol "buf"))
+	(frame (make-symbol "frame")))
     `(let* ((,tempvar (selected-window))
             (,buf ,buffer)
-            (,w (get-buffer-window ,buf 'visible)))
+            (,w (get-buffer-window ,buf 'visible))
+	    ,frame)
        (unwind-protect
            (progn
              (if ,w
@@ -64,7 +66,9 @@
                    (set-buffer (window-buffer ,w)))
                (pop-to-buffer ,buf))
              ,@forms)
-         (select-window ,tempvar)))))
+	 (setq ,frame (selected-frame))
+         (select-window ,tempvar)
+	 (select-frame ,frame)))))
 
 (put 'gnus-eval-in-buffer-window 'lisp-indent-function 1)
 (put 'gnus-eval-in-buffer-window 'edebug-form-spec '(form body))
