@@ -40,16 +40,19 @@ clever some:
 	    test -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
 	  fi; \
 	  if test $$RM_ELC = t; then \
-	    echo " => yes; rm -f *.elc auto-autoloads.el custom-load.el"; \
+	    echo " => maybe yes;" \
+		"rm -f *.elc auto-autoloads.el custom-load.el"; \
 	    rm -f *.elc auto-autoloads.el custom-load.el; \
 	  else \
-	    echo " => unnecessary"; \
+	    echo " => maybe unnecessary"; \
 	  fi; \
 	fi
 	W3DIR=$(W3DIR) lispdir=$(lispdir) \
 		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
-install: clever
+install: clever install-without-compiling
+
+install-without-compiling:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	@for p in `$(EXPORTING_FILES)`; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
