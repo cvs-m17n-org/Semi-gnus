@@ -675,11 +675,11 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	       ;; how does it work.  If the group's parameter is not
 	       ;; specified by user, the shimbun's default value will
 	       ;; be used.
-	       (nnmail-expiry-wait
+	       (expiry-wait
 		(or (nnshimbun-find-parameter name 'expiry-wait t)
-		    (shimbun-article-expiration-days nnshimbun-shimbun)
-		    nnmail-expiry-wait))
-	       (nnmail-expiry-wait-function (if nnmail-expiry-wait
+		    (shimbun-article-expiration-days nnshimbun-shimbun)))
+	       (nnmail-expiry-wait (or expiry-wait nnmail-expiry-wait))
+	       (nnmail-expiry-wait-function (if expiry-wait
 						nil
 					      nnmail-expiry-wait-function))
 	       article end time)
