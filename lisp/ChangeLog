@@ -1,5 +1,18 @@
 1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* nnmail.el, message.el: Sync with Quassia Gnus v0.22.
+
+	* gnus.el: Delete autoload setting for `metamail-buffer'.
+
+	* gnus.el, gnus-sum.el: Sync with Quassia Gnus v0.22.
+
+	* gnus-msg.el: Abolish function `gnus-inews-insert-mime-headers'.
+
+	* gnus-msg.el, gnus-draft.el, gnus-art.el: Sync with Quassia Gnus
+	v0.22.
+
+1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* ChangeLog: sync with Quassia Gnus v0.22.
 
 	* smtpmail.el (smtpmail-coding-system): New variable; abolish
