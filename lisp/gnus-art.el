@@ -898,6 +898,14 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
+(defcustom gnus-treat-decode-message-body-as-default-mime-charset nil
+  "Decode the message body as `default-mime-charset'.
+Recommended values are nil or `nomime'.
+See the manual for details."
+  :group 'gnus-article-treat
+  :type '(choice (const :tag "Off" nil)
+		 (const :tag "On" nomime)))
+
 ;;; Internal variables
 
 (defvar article-goto-body-goes-to-point-min-p nil)
@@ -940,7 +948,9 @@ See the manual for details."
     (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-display-smileys gnus-smiley-display)
     (gnus-treat-display-picons gnus-article-display-picons)
-    (gnus-treat-play-sounds gnus-earcon-display)))
+    (gnus-treat-play-sounds gnus-earcon-display)
+    (gnus-treat-decode-message-body-as-default-mime-charset
+     gnus-article-decode-message-body-as-default-mime-charset)))
 
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
@@ -1805,13 +1815,13 @@ should replace the \"Date:\" one, or should be added below it."
 		  eface (get-text-property (1- (gnus-point-at-eol))
 					   'face)))
 	  (let ((buffer-read-only nil))
-	    (goto-char (point-min))
 	    ;; Delete any old X-Sent headers.
-	    (while (re-search-forward "^X-Sent:[ \t]" nil t)
-	      (when (get-text-property (point) 'article-date-lapsed)
-		(setq date-pos (set-marker (make-marker) (match-beginning 0)))
-		(delete-region (match-beginning 0)
-			       (progn (forward-line 1) (point)))))
+	    (when (setq date-pos
+			(next-single-property-change (point-min)
+						     'article-date-lapsed))
+	      (goto-char (setq date-pos (set-marker (make-marker) date-pos)))
+	      (delete-region (match-beginning 0)
+			     (progn (forward-line 1) (point))))
 	    (goto-char (point-min))
 	    ;; Delete any old Date headers.
 	    (while (re-search-forward "^Date:[ \t]" nil t)
@@ -2722,23 +2732,104 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (gnus-configure-windows 'article)
 	    t))))))
 
+(defun gnus-article-prepare-mime-display (&optional number)
+  (goto-char (point-min))
+  (when (re-search-forward "^[^\t ]+:" nil t)
+    (goto-char (match-beginning 0)))
+  (save-restriction
+    (narrow-to-region (point)
+		      (if (search-forward "\n\n" nil t)
+			  (point)
+			(point-max)))
+    (gnus-treat-article 'head)
+    (goto-char (point-max)))
+  (let* ((start (point))
+	 (root-entity (unless number
+			(get-text-property (point-min) 'mime-view-entity)))
+	 (entity (if (and root-entity
+			  (eq 'multipart
+			      (mime-content-type-primary-type
+			       (mime-entity-content-type root-entity))))
+		     (get-text-property start 'mime-view-entity)
+		   root-entity))
+	 (number (or number 0))
+	 content-type treat-type)
+    (while (and (not (eobp))
+		(progn (mime-preview-move-to-next)
+		       (> (point) start)))
+      (if entity
+	  (progn
+	    (setq content-type (mime-entity-content-type entity)
+		  treat-type (format "%s/%s"
+				     (mime-content-type-primary-type
+				      content-type)
+				     (mime-content-type-subtype
+				      content-type)))
+	    (if (string-equal treat-type "message/rfc822")
+		(save-restriction
+		  (narrow-to-region start (point-max))
+		  (gnus-article-prepare-mime-display number)
+		  (goto-char (point-max)))
+	      (save-restriction
+		(narrow-to-region start (point))
+		(setq start (point)
+		      entity (get-text-property start 'mime-view-entity))
+		(gnus-treat-article nil (incf number) nil treat-type))))
+	(setq start (point)
+	      entity (get-text-property start 'mime-view-entity))))
+    (unless (eobp)
+      (save-restriction
+	(narrow-to-region (point) (point-max))
+	(if entity
+	    (progn
+	      (setq content-type (mime-entity-content-type entity)
+		    treat-type (format "%s/%s"
+				       (mime-content-type-primary-type
+					content-type)
+				       (mime-content-type-subtype
+					content-type)))
+	      (if (string-equal treat-type "message/rfc822")
+		  (gnus-article-prepare-mime-display number)
+		(incf number)
+		(gnus-treat-article 'last number number treat-type)))
+	  (gnus-treat-article t))))))
+
 ;;;###autoload
 (defun gnus-article-prepare-display ()
   "Make the current buffer look like a nice article."
-  (let ((method
-	 (if gnus-show-mime
-	     (progn
-	       (setq mime-message-structure gnus-current-headers)
-	       gnus-article-display-method-for-mime)
-	   gnus-article-display-method-for-traditional)))
-    (gnus-run-hooks 'gnus-tmp-internal-hook)
-    (gnus-run-hooks 'gnus-article-prepare-hook)
-    ;; Display message.
-    (funcall method)
-    ;; Associate this article with the current summary buffer.
-    (setq gnus-article-current-summary gnus-summary-buffer)
-    ;; Perform the article display hooks.
-    (gnus-run-hooks 'gnus-article-display-hook)))
+  (gnus-run-hooks 'gnus-tmp-internal-hook)
+  (gnus-run-hooks 'gnus-article-prepare-hook)
+  ;; Display message.
+  (let (mime-display-header-hook)
+    (funcall (if gnus-show-mime
+		 (progn
+		   (setq mime-message-structure gnus-current-headers)
+		   gnus-article-display-method-for-mime)
+	       gnus-article-display-method-for-traditional)))
+  ;; Associate this article with the current summary buffer.
+  (setq gnus-article-current-summary gnus-summary-buffer)
+  ;; Call the treatment functions.
+  (save-restriction
+    (widen)
+    (if gnus-show-mime
+	(let (mime-preview-over-to-next-method-alist)
+	  (gnus-article-prepare-mime-display))
+      (std11-narrow-to-header)
+      (gnus-treat-article 'head)
+      (goto-char (point-max))
+      (widen)
+      (narrow-to-region (point) (point-max))
+      (gnus-treat-article t)))
+  ;; Perform the article display hooks.  Incidentally, this hook is
+  ;; an obsolete variable by now.
+  (gnus-run-hooks 'gnus-article-display-hook))
+
+(defun gnus-article-decode-message-body-as-default-mime-charset ()
+  "Decode the message body as `default-mime-charset'."
+  (let (buffer-read-only)
+    (decode-mime-charset-region (point) (point-max)
+				(with-current-buffer gnus-summary-buffer
+				  default-mime-charset))))
 
 ;;;
 ;;; Gnus MIME viewing functions
@@ -4605,10 +4696,27 @@ For example:
 (defvar length)
 (defun gnus-treat-predicate (val)
   (cond
-   (condition
-    (eq condition val))
+   ((eq val 'mime)
+    (and gnus-show-mime t))
+   ((eq val 'nomime)
+    (not gnus-show-mime))
    ((null val)
     nil)
+   ((listp val)
+    (let ((pred (pop val)))
+      (cond
+       ((eq pred 'or)
+	(apply 'gnus-or (mapcar 'gnus-treat-predicate val)))
+       ((eq pred 'and)
+	(apply 'gnus-and (mapcar 'gnus-treat-predicate val)))
+       ((eq pred 'not)
+	(not (gnus-treat-predicate val)))
+       ((eq pred 'typep)
+	(equal (cadr val) type))
+       (t
+	(gnus-treat-predicate pred)))))
+   (condition
+    (eq condition val))
    ((eq val t)
     t)
    ((eq val 'head)
@@ -4617,19 +4725,6 @@ For example:
     (eq part-number total-parts))
    ((numberp val)
     (< length val))
-   ((listp val)
-    (let ((pred (pop val)))
-      (cond
-       ((eq pred 'or)
-	(apply 'gnus-or (mapcar 'gnus-treat-predicate val)))
-       ((eq pred 'and)
-	(apply 'gnus-and (mapcar 'gnus-tread-predicate val)))
-       ((eq pred 'not)
-	(not (gnus-treat-predicate val)))
-       ((eq pred 'typep)
-	(equal (cadr val) type))
-       (t
-	(error "%S is not a valid predicate" pred)))))
    (t
     (error "%S is not a valid value" val))))
 
