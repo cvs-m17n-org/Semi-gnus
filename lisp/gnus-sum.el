@@ -1,4 +1,4 @@
-;;; gnus-sum.el --- summary mode commands for Open gnus
+;;; gnus-sum.el --- summary mode commands for Semi-gnus
 ;; Copyright (C) 1996,97 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -337,9 +337,9 @@ The articles will simply be fed to the function given by
   "*Variable used to suggest where articles are to be moved to.
 It uses the same syntax as the `gnus-split-methods' variable."
   :group 'gnus-summary-mail
-  :type '(repeat (choice (list function)
-			 (cons regexp (repeat string))
-			 sexp)))
+  :type '(repeat (choice (list :value (fun) function)
+			 (cons :value ("" "") regexp (repeat string))
+			 (sexp :value nil))))
 
 (defcustom gnus-unread-mark ? 
   "*Mark used for unread articles."
@@ -744,7 +744,8 @@ automatically when it is selected."
      . gnus-summary-high-unread-face)
     ((and (< score default) (= mark gnus-unread-mark))
      . gnus-summary-low-unread-face)
-    ((and (= mark gnus-unread-mark))
+    ((memq mark (list gnus-unread-mark gnus-downloadable-mark
+		      gnus-undownloaded-mark))
      . gnus-summary-normal-unread-face)
     ((> score default)
      . gnus-summary-high-read-face)
@@ -2731,8 +2732,8 @@ If NO-DISPLAY, don't generate a summary buffer."
 	  ;; article in the group.
 	  (goto-char (point-min))
 	  (gnus-summary-position-point)
-	  (gnus-set-mode-line 'summary)
-	  (gnus-configure-windows 'summary 'force))	
+	  (gnus-configure-windows 'summary 'force)
+	  (gnus-set-mode-line 'summary))	
 	(when (get-buffer-window gnus-group-buffer t)
 	  ;; Gotta use windows, because recenter does weird stuff if
 	  ;; the current buffer ain't the displayed window.
@@ -6714,25 +6715,41 @@ article.  If BACKWARD (the prefix) is non-nil, search backward instead."
     (when gnus-page-broken
       (gnus-narrow-to-page))))
 
-(defun gnus-summary-print-article (&optional filename)
-  "Generate and print a PostScript image of the article buffer.
+(defun gnus-summary-print-article (&optional filename n)
+  "Generate and print a PostScript image of the N next (mail) articles.
 
-If the optional argument FILENAME is nil, send the image to the printer.
-If FILENAME is a string, save the PostScript image in a file with that
-name.  If FILENAME is a number, prompt the user for the name of the file
+If N is negative, print the N previous articles.  If N is nil and articles
+have been marked with the process mark, print these instead.
+
+If the optional second argument FILENAME is nil, send the image to the
+printer.  If FILENAME is a string, save the PostScript image in a file with
+that name.  If FILENAME is a number, prompt the user for the name of the file
 to save in."
-  (interactive (list (ps-print-preprint current-prefix-arg)))
-  (gnus-summary-select-article)
-  (gnus-eval-in-buffer-window gnus-article-buffer
-    (let ((buffer (generate-new-buffer " *print*")))
-      (unwind-protect
-	  (progn
-	    (copy-to-buffer buffer (point-min) (point-max))
-	    (set-buffer buffer)
-	    (gnus-article-delete-invisible-text)
-	    (run-hooks 'gnus-ps-print-hook)
-	    (ps-print-buffer-with-faces filename))
-	(kill-buffer buffer)))))
+  (interactive (list (ps-print-preprint current-prefix-arg)
+		     current-prefix-arg))
+  (dolist (nbr (gnus-summary-work-articles n))
+    (gnus-summary-select-article 'all nil 'pseudo nbr)
+    (gnus-eval-in-buffer-window gnus-article-buffer
+      (let ((buffer (generate-new-buffer " *print*")))
+	(unwind-protect
+	    (progn
+	      (copy-to-buffer buffer (point-min) (point-max))
+	      (set-buffer buffer)
+	      (gnus-article-delete-invisible-text)
+	      (let ((ps-left-header
+		     (list 
+		      (concat "("
+			      (mail-header-subject gnus-current-headers) ")")
+		      (concat "("
+			      (mail-header-from gnus-current-headers) ")")))
+		    (ps-right-header 
+		     (list 
+		      "/pagenumberstring load" 
+		      (concat "("
+			      (mail-header-date gnus-current-headers) ")"))))
+		(run-hooks 'gnus-ps-print-hook)
+		(ps-print-buffer-with-faces filename)))
+	  (kill-buffer buffer))))))
 
 (defun gnus-summary-show-article (&optional arg)
   "Force re-fetching of the current article.
@@ -7970,7 +7987,7 @@ The number of articles marked as read is returned."
 		(when all
 		  (setq gnus-newsgroup-marked nil
 			gnus-newsgroup-dormant nil))
-		(setq gnus-newsgroup-unreads nil))
+		(setq gnus-newsgroup-unreads gnus-newsgroup-downloadable))
 	    ;; We actually mark all articles as canceled, which we
 	    ;; have to do when using auto-expiry or adaptive scoring.
 	    (gnus-summary-show-all-threads)
