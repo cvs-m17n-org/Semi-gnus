@@ -1,3 +1,14 @@
+2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 10.
+
+	* lisp/gnus-picon.el: Require `mail-parse'.
+
+	* lisp/gnus-fun.el: Autoload "compface" for `uncompface'.
+
+	* lisp/sha1-el.el (sha1-use-external): Replace `executable-find'
+	with `exec-installed-p'.
+
 2002-01-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el: Update comments.

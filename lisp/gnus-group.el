@@ -1,5 +1,5 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -141,7 +141,7 @@ list."
 			 (function-item gnus-group-sort-by-rank)
 			 (function :tag "other" nil))))
 
-(defcustom gnus-group-line-format "%M\%S\%p\%P\%5y: %(%g%)%l\n"
+(defcustom gnus-group-line-format "%M\%S\%p\%P\%5y: %(%g%)%l %O\n"
   "*Format of group lines.
 It works along the same lines as a normal formatting string,
 with some simple extensions.
@@ -886,9 +886,9 @@ simple manner.")
 	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Get newly arrived articles"))
 	]
-       ["Send delayed articles" gnus-delay-send-drafts
+       ["Send queued messages" gnus-delay-send-queue
 	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Send all articles that are scheduled to be sent now"))
+	    '(:help "Send all messages that are scheduled to be sent now"))
 	]
        ["Activate all groups" gnus-activate-all-groups t]
        ["Restart Gnus" gnus-group-restart t]

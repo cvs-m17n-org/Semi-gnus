@@ -38,8 +38,6 @@
 (require 'gnus-int)
 (require 'gnus-undo)
 (require 'gnus-util)
-;; Recursive :-(.
-;; (require 'gnus-art)
 (require 'nnoo)
 (require 'mime-view)
 
@@ -291,25 +289,30 @@ equal will be included."
   :type 'boolean)
 
 (defcustom gnus-auto-select-first t
-  "*If nil, don't select the first unread article when entering a group.
-If this variable is `best', select the highest-scored unread article
-in the group.  If t, select the first unread article.
+  "*If non-nil, select the article under point.
+Which article this is is controlled by the `gnus-auto-select-subject'
+variable.
 
-This variable can also be a function to place point on a likely
-subject line.  Useful values include `gnus-summary-first-unread-subject',
-`gnus-summary-first-unread-article' and
-`gnus-summary-best-unread-article'.
-
-If you want to prevent automatic selection of the first unread article
-in some newsgroups, set the variable to nil in
-`gnus-select-group-hook'."
+If you want to prevent automatic selection of articles in some
+newsgroups, set the variable to nil in `gnus-select-group-hook'."
   :group 'gnus-group-select
   :type '(choice (const :tag "none" nil)
-		 (const best)
-		 (sexp :menu-tag "first" t)
-		 (function-item gnus-summary-first-unread-subject)
-		 (function-item gnus-summary-first-unread-article)
-		 (function-item gnus-summary-best-unread-article)))
+		 (sexp :menu-tag "first" t)))
+
+(defcustom gnus-auto-select-subject 'unread
+  "*Says what subject to place under point when entering a group.
+
+This variable can either be the symbols `first' (place point on the
+first subject), `unread' (place point on the subject line of the first
+unread article), `best' (place point on the subject line of the
+higest-scored article), `unseen' (place point on the subject line of
+the first unseen article), or a function to be called to place point on
+some subject line.."
+  :group 'gnus-group-select
+  :type '(choice (const best)
+		 (const unread)
+		 (const first)
+		 (const unseen)))
 
 (defcustom gnus-dont-select-after-jump-to-other-group nil
   "If non-nil, don't select the first unread article after entering the
@@ -1739,6 +1742,8 @@ increase the score of each group you read."
     "r" gnus-summary-caesar-message
     "t" gnus-article-toggle-headers
     "g" gnus-summary-toggle-smiley
+    "u" gnus-article-treat-unfold-headers
+    "n" gnus-article-treat-fold-newsgroups
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
@@ -1763,6 +1768,13 @@ increase the score of each group you read."
     "h" gnus-article-highlight-headers
     "c" gnus-article-highlight-citation
     "s" gnus-article-highlight-signature)
+
+  (gnus-define-keys (gnus-summary-wash-display-map "D" gnus-summary-wash-map)
+    "x" gnus-article-display-x-face
+    "s" gnus-summary-toggle-smiley
+    "f" gnus-treat-from-picon
+    "m" gnus-treat-mail-picon
+    "n" gnus-treat-newsgroups-picon)
 
   (gnus-define-keys (gnus-summary-wash-time-map "T" gnus-summary-wash-map)
     "z" gnus-article-date-ut
@@ -1892,6 +1904,12 @@ increase the score of each group you read."
 	      ["Original" gnus-article-date-original t]
 	      ["Lapsed" gnus-article-date-lapsed t]
 	      ["User-defined" gnus-article-date-user t])
+	     ("Display"
+	      ["Toggle smiley" gnus-summary-toggle-smiley t]
+	      ["Show X-Face" gnus-article-display-x-face t]
+	      ["Show picons in From" gnus-treat-from-picon t]
+	      ["Show picons in mail headers" gnus-treat-mail-picon t]
+	      ["Show picons in news headers" gnus-treat-newsgroups-picon t])
 	     ("Washing"
 	      ("Remove Blanks"
 	       ["Leading" gnus-article-strip-leading-blank-lines t]
@@ -1910,7 +1928,6 @@ increase the score of each group you read."
 	      ["Fill long lines" gnus-article-fill-long-lines t]
 	      ["Capitalize sentences" gnus-article-capitalize-sentences t]
 	      ["CR" gnus-article-remove-cr t]
-	      ["Show X-Face" gnus-article-display-x-face t]
 	      ["Rot 13" gnus-summary-caesar-message
 	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "\"Caesar rotate\" article by 13"))]
@@ -1921,7 +1938,8 @@ increase the score of each group you read."
 	      ["Toggle MIME" gnus-summary-toggle-mime t]
 	      ["Verbose header" gnus-summary-verbose-headers t]
 	      ["Toggle header" gnus-summary-toggle-header t]
-	      ["Toggle smiley" gnus-summary-toggle-smiley t]
+	      ["Unfold headers" gnus-article-treat-unfold-headers t]
+	      ["Fold newsgroups" gnus-article-treat-fold-newsgroups t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
 	      ["HZ" gnus-article-decode-HZ t])
 	     ("Output"
@@ -2094,7 +2112,7 @@ increase the score of each group you read."
 	["Set expirable mark" gnus-summary-mark-as-expirable t]
 	["Set bookmark" gnus-summary-set-bookmark t]
 	["Remove bookmark" gnus-summary-remove-bookmark t])
-       ("Mark Limit"
+       ("Limit to"
 	["Marks..." gnus-summary-limit-to-marks t]
 	["Subject..." gnus-summary-limit-to-subject t]
 	["Author..." gnus-summary-limit-to-author t]
@@ -2692,9 +2710,6 @@ marks of articles."
 
 ;; Saving hidden threads.
 
-(put 'gnus-save-hidden-threads 'lisp-indent-function 0)
-(put 'gnus-save-hidden-threads 'edebug-form-spec '(body))
-
 (defmacro gnus-save-hidden-threads (&rest forms)
   "Save hidden threads, eval FORMS, and restore the hidden threads."
   (let ((config (make-symbol "config")))
@@ -2703,6 +2718,8 @@ marks of articles."
 	   (save-excursion
 	     ,@forms)
 	 (gnus-restore-hidden-threads-configuration ,config)))))
+(put 'gnus-save-hidden-threads 'lisp-indent-function 0)
+(put 'gnus-save-hidden-threads 'edebug-form-spec '(body))
 
 (defun gnus-data-compute-positions ()
   "Compute the positions of all articles."
@@ -3275,6 +3292,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	     (gnus-summary-hide-all-threads))
 	(when kill-buffer
 	  (gnus-kill-or-deaden-summary kill-buffer))
+	(gnus-summary-auto-select-subject)
 	;; Show first unread article if requested.
 	(if (and (not no-article)
 		 (not no-display)
@@ -3282,16 +3300,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 		 gnus-auto-select-first)
 	    (progn
 	      (gnus-configure-windows 'summary)
-	      (cond
-	       ((eq gnus-auto-select-first 'best)
-		(gnus-summary-best-unread-article))
-	       ((eq gnus-auto-select-first t)
-		(gnus-summary-first-unread-article))
-	       ((gnus-functionp gnus-auto-select-first)
-		(funcall gnus-auto-select-first))))
-	  ;; Don't select any articles, just move point to the first
-	  ;; article in the group.
-	  (goto-char (point-min))
+	      (gnus-summary-goto-article (gnus-summary-article-number)))
+	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
 	  (gnus-configure-windows 'summary 'force)
 	  (gnus-set-mode-line 'summary))
@@ -3307,6 +3317,22 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	(setq gnus-newsgroup-prepared t)
 	(gnus-run-hooks 'gnus-summary-prepared-hook)
 	t)))))
+
+(defun gnus-summary-auto-select-subject ()
+  "Select the subject line on initial group entry."
+  (goto-char (point-min))
+  (cond
+   ((eq gnus-auto-select-subject 'best)
+    (gnus-summary-best-unread-subject))
+   ((eq gnus-auto-select-subject 'unread)
+    (gnus-summary-first-unread-subject))
+   ((eq gnus-auto-select-subject 'unseen)
+    (gnus-summary-first-unseen-subject))
+   ((eq gnus-auto-select-subject 'first)
+    ;; Do nothing.
+    )
+   ((gnus-functionp gnus-auto-select-subject)
+    (funcall gnus-auto-select-subject))))
 
 (defun gnus-summary-prepare ()
   "Generate the summary buffer."
@@ -4677,14 +4703,13 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	    (gnus-set-sorted-intersection
 	     gnus-newsgroup-unreads fetched-articles))
 
-      (let ((marks (assq 'seen (gnus-info-marks info))))
-	;; The `seen' marks are treated specially.
-	(if (setq gnus-newsgroup-seen (cdr marks))
-	    (dolist (article gnus-newsgroup-articles)
-	      (unless (gnus-member-of-range article gnus-newsgroup-seen)
-		(setq gnus-newsgroup-unseen
-		      (append gnus-newsgroup-unseen (list article)))))
-	  (setq gnus-newsgroup-unseen gnus-newsgroup-articles)))
+      ;; The `seen' marks are treated specially.
+      (if (not gnus-newsgroup-seen)
+	  (setq gnus-newsgroup-unseen gnus-newsgroup-articles)
+	(dolist (article gnus-newsgroup-articles)
+	  (unless (gnus-member-of-range article gnus-newsgroup-seen)
+	    (push article gnus-newsgroup-unseen)))
+	(setq gnus-newsgroup-unseen (nreverse gnus-newsgroup-unseen)))
 
       ;; Removed marked articles that do not exist.
       (gnus-update-missing-marks
@@ -4927,9 +4952,18 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		    (< (car article) min)
 		    (> (car article) max))
 	    (set var (delq article (symbol-value var))))))
+       ;; Adjust ranges (sloppily).
        ((eq mark-type 'range)
 	(cond
-	 ((eq mark 'seen))))))))
+	 ((eq mark 'seen)
+	  (setq articles (cdr marks))
+	  (while (and articles
+		      (or (and (consp (car articles))
+			       (> min (cdar articles)))
+			  (and (numberp (car articles))
+			       (> min (car articles)))))
+	    (pop articles))
+	  (set var articles))))))))
 
 (defun gnus-update-missing-marks (missing)
   "Go through the list of MISSING articles and remove them from the mark lists."
@@ -4976,11 +5010,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	      (setq list (cdr all)))))
 
 	(when (eq (cdr type) 'seen)
-	  (setq list
-		(if list
-		    (gnus-range-add (gnus-uncompress-sequence list) 
-				    gnus-newsgroup-unseen)
-		  (gnus-compress-sequence gnus-newsgroup-articles))))
+	  (setq list (gnus-range-add list gnus-newsgroup-unseen)))
 
 	(when (eq (gnus-article-mark-to-type (cdr type)) 'list)
 	  (setq list (gnus-compress-sequence (set symbol (sort list '<)) t)))
@@ -6313,7 +6343,7 @@ If prefix argument NO-ARTICLE is non-nil, no article is selected initially."
 
 ;; Walking around summary lines.
 
-(defun gnus-summary-first-subject (&optional unread undownloaded)
+(defun gnus-summary-first-subject (&optional unread undownloaded unseen)
   "Go to the first unread subject.
 If UNREAD is non-nil, go to the first unread article.
 Returns the article selected or nil if there are no unread articles."
@@ -6339,6 +6369,8 @@ Returns the article selected or nil if there are no unread articles."
 		      (and (not (and undownloaded
 				     (eq gnus-undownloaded-mark
 					 (gnus-data-mark (car data)))))
+			   (not (and unseen
+				     (memq (car data) gnus-newsgroup-unseen)))
 			   (not (gnus-data-unread-p (car data)))))
 	    (setq data (cdr data)))
 	  (when data
@@ -6778,6 +6810,16 @@ Return nil if there are no unread articles."
 	(gnus-summary-first-subject t))
     (gnus-summary-position-point)))
 
+(defun gnus-summary-first-unseen-subject ()
+  "Place the point on the subject line of the first unseen article.
+Return nil if there are no unseen articles."
+  (interactive)
+  (prog1
+      (when (gnus-summary-first-subject t t t)
+	(gnus-summary-show-thread)
+	(gnus-summary-first-subject t t t))
+    (gnus-summary-position-point)))
+
 (defun gnus-summary-first-article ()
   "Select the first article.
 Return nil if there are no articles."
@@ -6789,8 +6831,20 @@ Return nil if there are no articles."
 	(gnus-summary-display-article (gnus-summary-article-number)))
     (gnus-summary-position-point)))
 
-(defun gnus-summary-best-unread-article ()
-  "Select the unread article with the highest score."
+(defun gnus-summary-best-unread-article (&optional arg)
+  "Select the unread article with the highest score.
+If given a prefix argument, select the next unread article that has a
+score higher than the default score."
+  (interactive "P")
+  (let ((article (if arg
+		     (gnus-summary-better-unread-subject)
+		   (gnus-summary-best-unread-subject))))
+    (if article
+	(gnus-summary-goto-article article)
+      (error "No unread articles"))))
+
+(defun gnus-summary-best-unread-subject ()
+  "Select the unread subject with the highest score."
   (interactive)
   (let ((best -1000000)
 	(data gnus-newsgroup-data)
@@ -6803,11 +6857,25 @@ Return nil if there are no articles."
 	   (setq best score
 		 article (gnus-data-number (car data))))
       (setq data (cdr data)))
-    (prog1
-	(if article
-	    (gnus-summary-goto-article article)
-	  (error "No unread articles"))
-      (gnus-summary-position-point))))
+    (when article
+      (gnus-summary-goto-subject article))
+    (gnus-summary-position-point)
+    article))
+
+(defun gnus-summary-better-unread-subject ()
+  "Select the first unread subject that has a score over the default score."
+  (interactive)
+  (let ((data gnus-newsgroup-data)
+	article score)
+    (while (and (setq article (gnus-data-number (car data)))
+		(or (gnus-data-read-p (car data))
+		    (not (> (gnus-summary-article-score article)
+			    gnus-summary-default-score))))
+      (setq data (cdr data)))
+    (when article
+      (gnus-summary-goto-subject article))
+    (gnus-summary-position-point)
+    article))
 
 (defun gnus-summary-last-subject ()
   "Go to the last displayed subject line in the group."
@@ -6930,7 +6998,12 @@ articles that are younger than AGE days."
        (when (> (length days) 0)
 	 (setq days (read days)))
        (if (numberp days)
-	   (setq days-got t)
+	   (progn 
+	     (setq days-got t)
+	     (if (< days 0)
+		 (progn 
+		   (setq younger (not younger))
+		   (setq days (* days -1)))))
 	 (message "Please enter a number.")
 	 (sleep-for 1)))
      (list days younger)))
@@ -7988,41 +8061,44 @@ to save in."
   (dolist (article (gnus-summary-work-articles n))
     (gnus-summary-select-article nil nil 'pseudo article)
     (gnus-eval-in-buffer-window gnus-article-buffer
-      (let ((buffer (generate-new-buffer " *print*")))
-	(unwind-protect
-	    (progn
-	      (copy-to-buffer buffer (point-min) (point-max))
-	      (set-buffer buffer)
-	      (gnus-article-delete-invisible-text)
-	      (when (gnus-visual-p 'article-highlight 'highlight)
-		;; Copy-to-buffer doesn't copy overlay.  So redo
-		;; highlight.
-		(let ((gnus-article-buffer buffer))
-		  (gnus-article-highlight-citation t)
-		  (gnus-article-highlight-signature)))
-	      (let ((ps-left-header
-		     (list
-		      (concat "("
-			      (gnus-summary-print-truncate-and-quote
-			       (mail-header-subject gnus-current-headers)
-			       66) ")")
-		      (concat "("
-			      (gnus-summary-print-truncate-and-quote
-			       (mail-header-from gnus-current-headers)
-			       45) ")")))
-		    (ps-right-header
-		     (list
-		      "/pagenumberstring load"
-		      (concat "("
-			      (mail-header-date gnus-current-headers) ")"))))
-		(gnus-run-hooks 'gnus-ps-print-hook)
-		(save-excursion
-		  (if window-system
-		      (ps-spool-buffer-with-faces)
-		    (ps-spool-buffer)))))
-	  (kill-buffer buffer))))
+      (gnus-print-buffer))
     (gnus-summary-remove-process-mark article))
   (ps-despool filename))
+
+(defun gnus-print-buffer ()
+  (let ((buffer (generate-new-buffer " *print*")))
+    (unwind-protect
+	(progn
+	  (copy-to-buffer buffer (point-min) (point-max))
+	  (set-buffer buffer)
+	  (gnus-article-delete-invisible-text)
+	  (when (gnus-visual-p 'article-highlight 'highlight)
+	    ;; Copy-to-buffer doesn't copy overlay.  So redo
+	    ;; highlight.
+	    (let ((gnus-article-buffer buffer))
+	      (gnus-article-highlight-citation t)
+	      (gnus-article-highlight-signature)))
+	  (let ((ps-left-header
+		 (list
+		  (concat "("
+			  (gnus-summary-print-truncate-and-quote
+			   (mail-header-subject gnus-current-headers)
+			   66) ")")
+		  (concat "("
+			  (gnus-summary-print-truncate-and-quote
+			   (mail-header-from gnus-current-headers)
+			   45) ")")))
+		(ps-right-header
+		 (list
+		  "/pagenumberstring load"
+		  (concat "("
+			  (mail-header-date gnus-current-headers) ")"))))
+	    (gnus-run-hooks 'gnus-ps-print-hook)
+	    (save-excursion
+	      (if window-system
+		  (ps-spool-buffer-with-faces)
+		(ps-spool-buffer)))))
+      (kill-buffer buffer))))
 
 (defun gnus-summary-show-article (&optional arg)
   "Force redisplaying of the current article.
@@ -8144,8 +8220,7 @@ If ARG is a negative number, hide the unwanted header lines."
 	  (if  hidden
 	      (let ((gnus-treat-hide-headers nil)
 		    (gnus-treat-hide-boring-headers nil))
-		(setq gnus-article-wash-types
-		      (delq 'headers gnus-article-wash-types))
+		(gnus-delete-wash-type 'headers)
 		(gnus-treat-article 'head))
 	    (gnus-treat-article 'head)))
 	(gnus-set-mode-line 'article)))))
@@ -8236,6 +8311,11 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	art-group to-method new-xref article to-groups)
     (unless (assq action names)
       (error "Unknown action %s" action))
+    ;; We have to select an article to give
+    ;; `gnus-read-move-group-name' an opportunity to suggest an
+    ;; appropriate default.
+    (unless (gnus-buffer-live-p gnus-original-article-buffer)
+      (gnus-summary-select-article nil nil nil (car articles)))
     ;; Read the newsgroup name.
     (when (and (not to-newsgroup)
 	       (not select-method))

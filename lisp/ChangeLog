@@ -1,3 +1,352 @@
+2002-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-xmas.el (gnus-xmas-create-image): Convert pbm to xbm.
+	(gnus-xmas-create-image): Take pbm files.
+
+2002-01-03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-xmas.el (gnus-xmas-create-image): Take optional
+	parameters.
+	(gnus-xmas-put-image): Allow non-strings to be passed.
+
+	* gnus-ems.el (gnus-create-image): Take optional parameters.
+
+2002-01-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	Display picons in XEmacs without showing text.
+
+	* gnus-xmas.el (gnus-xmas-create-image): Don't use
+	mm-create-image-xemacs to create xbm glyph, because it deletes
+	temporary files.
+	(gnus-xmas-put-image): Use end-glyph. Make text invisible.
+	(gnus-xmas-remove-image): Make text visible, remove glyph.
+
+2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-delay.el (gnus-delay-send-queue): Renamed.
+
+	* gnus-art.el (gnus-ignored-headers): More headers,
+
+	* ietf-drums.el (ietf-drums-parse-addresses): Use `error' instead
+	of `scan-error', since XEmacs doesn't seem to support that. 
+
+2001-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-best-unread-article): Take a prefix
+	arg. 
+	(gnus-summary-best-unread-subject): Ditto.
+	(gnus-summary-best-unread-subject): No, don't.
+	(gnus-summary-better-unread-subject): New command.
+
+	* gnus-xmas.el (gnus-xmas-put-image): Insert the string itself. 
+
+	* lpath.el ((featurep 'xemacs)): fbind url function.
+
+	* gnus-xmas.el (gnus-xmas-article-display-xface): Use data, not
+	buffer. 
+	(gnus-xmas-remove-image): Implementation that does something. 
+	(gnus-xmas-article-display-xface): Mark images properly.
+
+	* gnus-art.el (gnus-mime-print-part): Use mm-temp-directory. 
+
+2001-12-31  Florian Weimer  <fw@deneb.enyo.de>
+
+	* gnus.el (gnus): Warn if trying to run Gnus un-byte-compiled. 
+
+2001-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-line-format): Added %O to the default
+	value.
+
+	* gnus-util.el (gnus-text-with-property): The smallest point is
+	point-min. 
+
+	* smiley-ems.el (smiley-region): Return images.
+	(gnus-smiley-display): Allow toggling.
+	(smiley-region): Use text properties, not overlays.
+
+	* gnus-xmas.el (gnus-xmas-remove-image): New function, not
+	implemented yet.
+
+	* smiley-ems.el (smiley-update-cache): Check for valid types.
+
+	* gnus-art.el (gnus-with-article-buffer): New macro.
+
+	* gnus-picon.el (gnus-picon-transform-newsgroups): Keep the
+	strings as well as the glyphs.
+	(gnus-picon-transform-address): Ditto.
+	(gnus-picon-insert-glyph): Ditto.
+	(gnus-picon-transform-newsgroups): Toggle.
+	(gnus-picon-transform-address): Toggle.
+
+	* gnus-ems.el (gnus-remove-image): New function.
+	(gnus-put-image): Take an optional string.
+
+	* gnus-util.el (gnus-text-with-property): New function.
+
+	* gnus-art.el (gnus-delete-images): New function.
+
+	* gnus-ems.el (gnus-article-display-xface): Mark and store image. 
+
+	* gnus-art.el (gnus-article-wash-status-entry): Renamed.
+	(gnus-article-wash-status): Use it.
+	(gnus-signature-toggle): Clean up.
+	(gnus-add-wash-status): New function.
+	(gnus-delete-wash-status): New function.
+	(gnus-article-hide-text-type): Use them throughout.
+	(gnus-add-image): New function.
+
+	* gnus-ems.el (gnus-article-display-xface): Use new interface.
+
+	* gnus-xmas.el (gnus-xmas-article-display-xface): Use new
+	interface. 
+
+	* gnus-art.el (article-display-x-face): Cleaned up.
+
+	* rfc2047.el (rfc2047-field-value): New function.
+
+	* mail-parse.el (mail-header-field-value): New alias.
+
+	* gnus-art.el (gnus-mime-print-part): Fix typos.
+
+	* smiley-ems.el (gnus-smiley-file-types): New variable.
+	(smiley-update-cache): Use it.
+	(smiley-regexp-alist): Suffix-less smiley names.
+	(smiley-regexp-alist): Added more smileys.
+
+	* gnus-sum.el (gnus-print-buffer): Made into own function.
+	(gnus-summary-print-article): Use it.
+
+	* mailcap.el (mailcap-mime-info): Actually return the bit that we
+	looked for when REQUEST is a string.
+
+	* gnus-art.el (gnus-mime-button-commands): Add printing
+	keystroke. 
+	(gnus-mime-copy-part): Doc fix.
+	(gnus-mime-print-part): New command.
+
+2001-12-31  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-parse-fetch): Notice empty flags responses.  From
+	Nic Ferrier <nferrier@tf1.tapsellferrier.co.uk>.
+
+2001-12-30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-picon.el (gnus-treat-from-picon): Autoload.
+	(picon): Fix doc.
+
+	* gnus-win.el (gnus-window-to-buffer): gnus-picon-buffer-name no
+	longer exists. Remove those codes.
+	* gnus.el (gnus-use-picons): Ditto.
+
+2001-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-treat-fold-newsgroups): Don't
+	infloop. 
+
+	* gnus-sum.el (t): New `W D' map.
+
+	* gnus-art.el (gnus-treat-fold-newsgroups): New variable.
+	(gnus-article-treat-body-boundary): Clean up.
+	(gnus-body-boundary-face): Removed.
+	(gnus-article-goto-header): Moved here.
+	(gnus-article-goto-header): Allow better regexps.
+	(gnus-article-treat-fold-newsgroups): New command.
+
+	* gnus-sum.el (gnus-summary-move-article): We have to select an
+	article to give `gnus-read-move-group-name' an opportunity to
+	suggest an appropriate default.
+
+	* rfc2047.el (rfc2047-fold-line): New function.
+	(rfc2047-unfold-line): Ditto.
+	(rfc2047-fold-region): Don't fold just after the header name. 
+
+	* mail-parse.el (mail-header-fold-line): New alias.
+	(mail-header-unfold-line): Ditto.
+
+	* gnus-art.el (gnus-body-boundary-face): Renamed.
+	(gnus-article-treat-body-boundary): Use it.
+	(gnus-article-treat-body-boundary): Use an invisible header and a
+	line of underline characters.
+
+2001-12-30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* ietf-drums.el (ietf-drums-parse-addresses): Recover from errors.
+
+	* gnus-picon.el (gnus-picon-transform-address): Skip bad addresses.
+	(gnus-picon-split-address): New function.
+	(gnus-picon-find-face): Use it.
+	(gnus-picon-transform-address): Use it. Set first to t for each
+	address.
+
+	* gnus-art.el (gnus-with-article-headers): Move to here. Define
+	the macro then use it.
+	(gnus-treatment-function-alist): Treat picons earlier.
+
+2001-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-body-separator-face): New variable.
+	(gnus-article-treat-body-boundary): Use a blank, colored line. 
+
+	* gnus-picon.el (gnus-picon-find-face): Look into misc/MISC as
+	well. 
+
+	* gnus-art.el (gnus-treat-body-boundary): New variable.
+	(gnus-article-treat-unfold-headers): Use helper macro.
+	(gnus-article-treat-body-boundary): New command.
+
+	* gnus.el (gnus-logo-color-style): Change the default color. 
+	(gnus-splash-face): Gray, gray.
+
+	* gnus-xmas.el (gnus-xmas-group-startup-message): Use general
+	colors.
+
+	* gnus.el (gnus-logo-color-alist): Moved here and renamed.
+	(gnus-logo-color-style): Ditto.
+	(gnus-logo-colors): Ditto.
+
+	* gnus-picon.el (gnus-picon-create-glyph): Cache glyphs.
+
+	* gnus-art.el (gnus-treat-newsgroups-picon): New variable. 
+
+	* gnus-picon.el (gnus-treat-newsgroups-picon): New function.
+	(gnus-picon-transform-newsgroups): New function.
+
+	* ietf-drums.el (ietf-drums-parse-addresses): Accept a nil
+	string. 
+
+	* gnus-picon.el (gnus-treat-mail-picon): Renamed.
+
+	* gnus-art.el (gnus-treat-cc-picon): New variable.
+	(gnus-treat-mail-picon): Renamed.
+
+	* gnus-picon.el: New implementation.
+	(gnus-picon-find-face): Renamed.
+	(gnus-treat-from-picon): Use it.
+	(gnus-picon-transform-address): Renamed.
+	(gnus-treat-from-picon): Use it.
+	(gnus-picon-create-glyph): Renamed.
+	(gnus-picon-transform-address): Use it.
+	(gnus-treat-cc-picon): New command.
+
+	* mm-decode.el (mm-create-image-xemacs): Separated out into
+	function.  
+	(mm-get-image): Use it.
+
+	* gnus-art.el (gnus-treat-display-picons): Simplify.
+	(gnus-treat-from-picon): Renamed.
+
+	* gnus-ems.el (gnus-create-image): New function.
+	(gnus-put-image): New function.
+
+	* gnus-art.el (gnus-article-treat-unfold-headers): Doc fix.
+	(gnus-with-article-headers): New macro.
+	(gnus-article-goto-header): New function.
+
+	* gnus-xmas.el (gnus-image-type-available-p): New function.
+
+	* gnus-ems.el (gnus-image-type-available-p): New function.
+
+2001-12-30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-check-group): Find the correct tag, because
+	xml.el is changed.
+
+2001-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-treat-unfold-headers): Only fold when
+	lines are shorter than the window width.
+	(gnus-ignored-headers): More headers.
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-treat-unfold-lines): New variable.
+	(gnus-treat-unfold-headers): Remamed.
+	(gnus-article-treat-unfold-headers): New command and keystroke. 
+
+	* rfc2047.el (rfc2047-encode-message-header): Clean up.
+
+	* gnus-int.el (gnus-open-server): Mark quit-ed server as denied. 
+
+2001-12-29  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* sha1-el.el (sha1-use-external): New variable.
+	(sha1-region): Use it.
+	(sha1-string): Ditto.
+
+	* dgnushack.el (dgnushack-compile): Compile gnus-picon for Emacs.
+	* gnus-picon.el: Less warnings when compile.
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-picon.el (gnus-picons-news-directories): Removed obsolete
+	alias. 
+	(gnus-picons-database): Default to list.
+	(gnus-picons-lookup-internal): Use it.
+
+	* nnmail.el (nnmail-article-group): Default nnmail-split-methods
+	to "bogus".
+
+	* gnus-win.el (gnus-configure-windows-hook): New hook.
+
+2001-12-29  Sascha L,A|(Bdecke  <sascha@meta-x.de>
+
+	* gnus-win.el (gnus-configure-windows): Minimize tree buffer. 
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-update-marks): Don't uncompress the seen
+	lists. 
+	(gnus-select-newsgroup): Don't append; push.
+	(gnus-adjust-marked-articles): Remove obsolete ranges from
+	`seen'. 
+	(gnus-update-marks): Clean up.
+	(gnus-select-newsgroup): Don't stomp gnus-newsgroup-seen.
+
+2001-12-29  Frank Schmitt  <usereplyto@Frank-Schmitt.net>
+
+	* gnus-sum.el (gnus-summary-limit-to-age): Allow negative days. 
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-auto-select-subject): New variable.
+	(gnus-summary-best-unread-subject): New function.
+	(gnus-summary-best-unread-article): Use it.
+	(gnus-summary-first-unseen-subject): New function and command. 
+
+	* gnus-art.el (gnus-treatment-function-alist): Emphasize after
+	other treatments.
+
+	* gnus-util.el (gnus-put-overlay-excluding-newlines): New
+	function. 
+
+	* gnus-art.el (gnus-article-show-hidden-text): Remove the type
+	from the list of hidden types. 
+
+	* mm-view.el (mm-inline-text): Ditto.
+	(mm-inline-text): Ditto.
+	(mm-w3-prepare-buffer): Ditto.
+
+	* gnus-art.el (article-wash-html): Inhibit more remote fetching. 
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-ignored-headers): Added more headers. 
+
+2001-12-29  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-srvr.el (gnus-browse-foreign-server): Compute the prefix
+	once. 
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-srvr.el (gnus-server-browse-in-group-buffer): Doc fix. 
+
+2001-12-28  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-srvr.el (gnus-browse-foreign-server): Fix typo.  From
+	Jesper Harder <harder@ifa.au.dk>.
+
 2001-12-27  Simon Josefsson  <jas@extundo.com>
 
 	* gnus-sum.el (gnus-select-newsgroup): Make

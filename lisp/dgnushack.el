@@ -480,8 +480,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	     (message "No bbdb: %s %s (ignored)" code (locate-library "bbdb"))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-	      "nnheaderxm.el" "smiley.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el" "smiley.el"))
 	  (when (or (featurep 'xemacs) (<= emacs-major-version 20))
 	    '("smiley-ems.el"))
 	  (when (and (fboundp 'base64-decode-string)

@@ -913,6 +913,9 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 
 @item message-subject-re-regexp
 @vindex message-subject-re-regexp
+@cindex Aw:
+@cindex Sv:
+@cindex Re:
 メッセージへの応答は @samp{Re: } で始まります。これは英語
 の ``response'' の略では @emph{ありません} が、ラテン語で、``それに応答
 して'' (in response to) と言う意味です。いくつかの無学の馬鹿はこの事実を
@@ -922,6 +925,13 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 悪な道具を使った利用者を扱わなければならないかもしれませんので、そのよう
 な場合はこの変数をこれらの接頭語に合うような正規表現に設定するでしょう。
 私自身は、そのような規格に従わないメールはただ捨て去っているだけです。
+
+これは、返事をするときにこれらのヘッダーを処理する値の例です:
+
+@lisp
+(setq message-subject-re-regexp
+     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\))
+@end lisp
 
 @item message-alternative-emails
 @vindex message-alternative-emails

@@ -2990,7 +2990,8 @@ It should typically alter the sending method in some way or other."
 		       (setq success (funcall (caddr elem) arg)))
 	      (setq sent t)))))
       (unless
-	  (or sent (not success)
+	  (or sent
+	      (not success)
 	      (let ((fcc (message-fetch-field "Fcc"))
 		    (gcc (message-fetch-field "Gcc")))
 		(when (or fcc gcc)

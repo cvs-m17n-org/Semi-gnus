@@ -240,7 +240,20 @@ at the beginning of the narrowed buffer.
 
 @item mail-header-narrow-to-field
 @findex mail-header-narrow-to-field
-Narrow the buffer to the header under point.
+Narrow the buffer to the header under point.  Understands continuation
+headers. 
+
+@item mail-header-fold-field
+@findex mail-header-fold-field
+Fold the header under point.
+
+@item mail-header-unfold-field
+@findex mail-header-unfold-field
+Unfold the header under point.
+
+@item mail-header-field-value
+@findex mail-header-field-value
+Return the value of the field under point.
 
 @item mail-encode-encoded-word-region
 @findex mail-encode-encoded-word-region
@@ -1021,10 +1034,13 @@ last possible part of a message, as that is supposed to be the richest.
 However, users may prefer other types instead, and this list says what
 types are most unwanted.  If, for instance, @samp{text/html} parts are
 very unwanted, and @samp{text/richtech} parts are somewhat unwanted,
-then the value of this variable should be set to:
+you could say something like:
 
 @lisp
-("text/html" "text/richtext")
+(setq mm-discouraged-alternatives
+      '("text/html" "text/richtext")
+      mm-automatic-display
+      (remove "text/html" mm-automatic-display))
 @end lisp
 
 @item mm-inline-large-images-p
@@ -1037,7 +1053,7 @@ library will display it externally (e.g. with @samp{ImageMagick} or
 makes the library display all inline images as inline, regardless of
 their size.
 
-@item mm-inline-override-p
+@item mm-inline-override-type
 @code{mm-inlined-types} may include regular expressions, for example to
 specify that all @samp{text/.*} parts be displayed inline.  If a user
 prefers to have a type that matches such a regular expression be treated

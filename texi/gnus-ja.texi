@@ -927,8 +927,7 @@ Various
 * NoCeM::                       Spam $B$dB>$NB@$j$d$9$$?);v$rHr$1$kJ}K!(B
 * Undo::                        $B$$$/$D$+$NF0:n$O85$KLa$9;v$,$G$-$k(B
 * Moderation::                  $B$"$J$?$,%b%G%l!<%?!<$@$C$?$i$I$&$9$k$+(B
-* XEmacs Enhancements::         XEmacs $B$G$O$b$C$H3($d$=$NB>$N$b$N$,B8:_(B
-                                $B$9$k(B
+* Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
@@ -2187,40 +2186,32 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @vindex gnus-select-group-hook
 @vindex gnus-auto-select-first
-@code{gnus-auto-select-first} $B$O!"(B@kbd{SPACE} $B%3%^%s%I$G%0%k!<%W$KF~$C$?(B
-$B$H$-$K!"<+F0E*$K5-;v$rA*Br$9$k$+$I$&$+$r@)8f$7$^$9!#(B
+$B$b$7(B @code{gnus-auto-select-first} $B$,Hs(B-@code{nil} $B$@$C$?$i!"(B
+@kbd{SPACE} $B%3%^%s%I$G%0%k!<%W$KF~$C$?$H$-$K<+F0E*$K5-;v$rA*Br$7$^$9!#$I(B
+$B$N5-;v$,A*Br$5$l$k$+$O!"JQ?t(B @code{gnus-auto-select-subject} $B$G@)8f$5$l(B
+$B$^$9!#$3$NJQ?t$K@_Dj$G$-$kM-8z$JCM$O(B:
 
 @table @code
-@item nil
-$B%0%k!<%W$KF~$C$?$H$-$K$I$N5-;v$bA*Br$7$J$$!#$?$@35N,%P%C%U%!$rI=<($9$k$@(B
-$B$1!#(B
+@item unread
+$B:G=i$NL$FI5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
 
-@item t
-$B%0%k!<%W$KF~$C$?$H$-$K!":G=i$NL$FI5-;v$rA*Br$9$k!#(B
+@item first
+$B:G=i$N5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
+
+@item unseen
+$B$^$@FI$^$l$?$3$H$,L5$$:G=i$N5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
 
 @item best
-$B%0%k!<%W$KF~$C$?$H$-$K!"$=$N%0%k!<%W$G:G$b9b$$%9%3%"$N5-;v$rA*Br$9$k!#(B
+$B%9%3%"$,:G$b9b$$L$FI5-;v$NI=Bj$N9T$K%]%$%s%H$r0\F0$5$;$^$9!#(B
 @end table
 
-$B$3$NJQ?t$O4X?t$G$"$k$3$H$b$G$-$^$9!#$=$N>l9g$O!"$=$N4X?t$OI=Bj$N9T$K%]%$(B
-$B%s%H$r0\F0$5$;$k$+!"$$$/$D$+$N5-;v$rA*Br$9$k$+$NN>J}$+!"8e<T$r$9$k$?$a$K(B
-$B8F$P$l$^$9!#JXMx$J4X?t$O(B:
-
-@table @code
-@item gnus-summary-first-unread-subject
-$B:G=i$NL$FI5-;v$NI=Bj9T$K%]%$%s%H$rCV$-$^$9$,!"5-;v$rA*Br$7$^$;$s!#(B
-
-@item gnus-summary-first-unread-article
-$B:G=i$NL$FI5-;v$rA*Br$7$^$9!#(B
-
-@item gnus-summary-best-unraed-article
-$B:G9b%9%3%"$NL$FI5-;v$rA*Br$7$^$9!#(B
-@end table
+$B$3$NJQ?t$O4X?t$G$"$k$3$H$b$G$-$^$9!#$=$N>l9g!"$=$N4X?t$OI=Bj$N9T$K%]%$%s(B
+$B%H$r0\F0$5$;$k$?$a$K8F$P$l$^$9!#(B
 
 $B$b$7$"$k%0%k!<%W$G<+F05-;vA*Br$r$d$a$?$$$N$G$"$l$P(B ($BNc$($P$G$C$+$$5-;v$N(B
-$B$"$k%P%$%J%j%0%k!<%W$G$O!"$H$+(B)$B!"%0%k!<%W$,A*Br$5$l$?$H$-$K8F$S=P$5$l$k(B
-@code{gnus-select-group-hook} $B$NCf$G$3$NJQ?t$r(B @code{nil} $B$K@_Dj$9$k$3$H(B
-$B$,$G$-$^$9!#(B
+$B$"$k%P%$%J%j%0%k!<%W$G$O!"$H$+(B)$B!"%0%k!<%W$,A*Br$5$l$?$H$-$K8F$S=P$5$l(B
+$B$k(B @code{gnus-select-group-hook} $B$NCf$GJQ(B
+$B?t(B @code{gnus-auto-select-first} $B$r(B @code{nil} $B$K@_Dj$9$k$3$H$,$G$-$^$9!#(B
 
 @node Subscription Commands
 @section $B9XFI@)8f%3%^%s%I(B
@@ -4777,7 +4768,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @kindex G b ($B35N,(B)
 @kindex , ($B35N,(B)
 @findex gnus-summary-best-unread-article
-$B:G9b%9%3%"$N5-;v$K0\F0$7$^$9(B (@code{gnus-summary-best-unread-article})$B!#(B
+$B:G9b%9%3%"$NL$FI5-;v$K0\F0$7$^(B
+$B$9(B (@code{gnus-summary-best-unread-article})$B!#$b$7@\F,0z?t$,M?$($i$l$?$J(B
+$B$i$P!"%G%#%U%)%k%H$N%9%3%"$h$jBg$-$$%9%3%"$r;}$D:G=i$NL$FI5-;v$K0\F0$7$^(B
+$B$9!#(B
 
 @item G l
 @itemx l
@@ -5298,22 +5292,22 @@ Gnus $B$O!"<h$j>C$9$H$-$K!X8=:_!Y$NA*BrJ}K!$r;H$$$^$9!#I8=`$NEj9FJ}K!$r;H(B
 
 $B$"$J$?$,?7Ce%K%e!<%9$r<hF@$7$h$&$H$9$k$H$-$O$$$D$b!"(Bgnus $B$OAw?.$9$k4|8B(B
 $B$KC#$7$?5-;v$r$=$N%0%k!<%W$GC5$7$F!"$=$l$i$rAw?.$7$^$9!#$3$l$K$O4X(B
-$B?t(B @code{gnus-delay-send-drafts} $B$,;H$o$l$^$9!#%G%#%U%)%k%H$G$O$3$N4X?t(B
+$B?t(B @code{gnus-delay-send-queue} $B$,;H$o$l$^$9!#%G%#%U%)%k%H$G$O$3$N4X?t(B
 $B$O(B @code{gnus-get-new-news-hook} $B$KDI2C$5$l$^$9$,!"$b$A$m$s$"$J$?$O$3$l(B
 $B$rJQ99$9$k$3$H$,$G$-$^$9!#$*$=$i$/$"$J$?$O!"%I%i%U%H$NAw?.$K%G!<%b%s$r;H(B
 $B$$$?$$$H;W$&$N$G$O$J$$$G$7$g$&$+(B? $B$=$l$K$O!"%G!<%b%s$K4X(B
-$B?t(B @code{gnus-delay-send-drafts} $B$r<B9T$;$h!"$H8@$&$@$1$GNI$$$N$G$9!#(B
+$B?t(B @code{gnus-delay-send-queue} $B$r<B9T$;$h!"$H8@$&$@$1$GNI$$$N$G$9!#(B
 
 @table @code
 @item gnus-delay-initialize
 @findex gnus-delay-initialize
 $B%G%#%U%)%k%H$G$O!"$3$N4X?t$O(B Message $B%b!<%I$K$*$1$k(B @kbd{C-c C-j} $B%-!<$N(B
 $B%P%$%s%I$H!"(B
-@code{gnus-delay-send-drafts} $B$N(B @code{gnus-get-new-news-hook} $B$X$NDI2C(B
-$B$r9T$J$$$^$9!#$G$9$,!"$3$l$O(B @code{no-keymap} $B$H(B @code{no-check} $B$NFs$D(B
-$B$N%*%W%7%g%s0z?t$r<u$1IU$1$^$9!#$b$7(B @code{no-keymap} $B$,Hs(Bnil $B$@$C$?(B
+@code{gnus-delay-send-queue} $B$N(B @code{gnus-get-new-news-hook} $B$X$NDI2C$r(B
+$B9T$J$$$^$9!#$G$9$,!"$3$l$O(B @code{no-keymap} $B$H(B @code{no-check} $B$NFs$D$N(B
+$B%*%W%7%g%s0z?t$r<u$1IU$1$^$9!#$b$7(B @code{no-keymap} $B$,Hs(Bnil $B$@$C$?(B
 $B$i(B @kbd{C-c C-j} $B%-!<$N%P%$%s%I$r9T$J$$$^$;$s!#$b$7(B @code{no-check} $B$,Hs(B
-nill $B$@$C$?$i(B @code{gnus-get-new-news-hook} $B$OJQ99$5$l$^$;$s!#(B
+nil $B$@$C$?$i(B @code{gnus-get-new-news-hook} $B$OJQ99$5$l$^$;$s!#(B
 
 $BNc$($P(B @code{(gnus-delay-initialize nil t)} $B$O!"%-!<%^%C%W$OJQ99$9$k(B
 $B$,(B @code{gnus-get-new-news-hook} $B$OJQ99$7$J$$$3$H$r0UL#$7$^$9!#$"$J$?$O(B
@@ -7439,6 +7433,7 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 * Article Buttons::             URL $B$d(B Message-ID $B$d(B $B%"%I%l%9$J$I$r%/%j%C(B
                                 $B%/$9$k(B
 * Article Date::                $B$0$:$0$:8@$&$J!"@$3&;~$@(B!
+* Article Display::             X-Face, Picons, Smileys $B$rI=<($9$k(B
 * Article Signature::           $B=pL>$C$F2?(B?
 * Article Miscellania::         $BB>$N$$$m$$$m$J$b$N(B
 @end menu
@@ -7912,38 +7907,6 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 @c has been done.
 @c If a prefix is given, a charset will be asked for.
 
-@item W f
-@kindex W f ($B35N,(B)
-@cindex x-face
-@findex gnus-article-display-x-face
-@findex gnus-article-x-face-command
-@vindex gnus-article-x-face-command
-@vindex gnus-article-x-face-too-ugly
-@iftex
-@iflatex
-\include{xface}
-@end iflatex
-@end iftex
-@c @anchor{X-Face}
-$B$9$Y$F$N(B X-Face $BMs$rC5$7$FI=<($7$^$9(B(@code{gnus-article-display-x-face})$B!#(B
-$B$3$NL?Na$OJQ?t(B @code{gnus-article-x-face-command} $B$K$h$C$FM?$($i$l$?4X?t(B
-$B$K$h$C$F<B9T$5$l$^$9!#$3$NJQ?t$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B(B
-$B9T$5$l$^$9!#4X?t$J$i$P!"$3$N4X?t$,4i$r0z?t$H$7$F8F$P$l$^$9!#$b(B
-$B$7(B @code{gnus-article-x-face-too-ugly} ($B$3$l$O@55,I=8=$G(B
-$B$9(B) $B$,(B @code{From} $BMs$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(BEmacs $B$G$N%G%#%U%)(B
-$B%k%H$NF0:n$O(B @code{display} $B%W%m%0%i(B
-$B%`(B @footnote{@code{display} $B$O(B ImageMagick $B%Q%C%1!<%8$K4^$^$l$F$$$^$9!#(B
-@code{uncompface} $B$H(B @code{icontopbm} $B$NN>%W%m%0%i%`$K$D$$$F$O!"(B
-`compface' $B$d(B GNU/Linux $B%7%9%F%`$K$*$1$k(B `faces-xface' $B$N$h$&$J%Q%C%1!<(B
-$B%8$rC5$7$F2<$5$$!#(B} $B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(BXEmacs $B$G$N%G%#%U%)%k(B
-$B%H$NF0:n$O(B @code{From} $BMs$NA0$K4i$rI=<($7$^$9!#(B(XEmacs $B$,(B X-Face $B5!G=IU(B
-$B$-$G%3%s%Q%$%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l$OI=<($r>/$7Aa$/$7$^$9!#$b(B
-$B$7:,K\E*(B X-Face $B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $B$O(B @code{pbmplus} $B$d$=$NCg4V(B
-$B$N30It%W%m%0%i%`$r;H$C$F(B @code{X-Face} $BMs$rJQ49$7$h$&$H;n$_$^$9!#(B) $B$3$N(B
-$B4X?t$rI=<(%U%C%/$KF~$l$?$$$N$G$"$l$P!"$*$=$i$/$=$l$O:G8e$K$J$k$Y$-$G$7$g(B
-$B$&!#(B($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^(B
-$B$9!#(B)
-
 @item W b
 @kindex W b ($B35N,(B)
 @findex gnus-article-add-buttons
@@ -7973,6 +7936,18 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 @c @findex gnus-summary-force-verify-and-decrypt
 @c Verify a signed (PGP, PGP/MIME or S/MIME) message
 @c (@code{gnus-summary-force-verify-and-decrypt}).
+
+@item W u
+@kindex W u ($B35N,(B)
+@findex gnus-article-treat-unfold-headers
+$B@^$jJV$5$l$?%X%C%@!<9T$r0l9T$K$7$^(B
+$B$9(B (@code{gnus-article-treat-unfold-headers})$B!#(B
+
+@item W n
+@kindex W n ($B35N,(B)
+@findex gnus-article-treat-fold-newsgroups
+@code{Newsgroups} $B$H(B @code{Followup-To} $B%X%C%@!<$r@^$jJV$7$^(B
+$B$9(B (@code{gnus-article-treat-fold-newsgroups})$B!#(B
 
 @item W W H
 @kindex W W H ($B35N,(B)
@@ -8186,6 +8161,58 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 
 $B<+F0E*$K9%$`=q<0$GF|IU$rI=<($9$kJ}K!$O(B @xref{Customizing Articles} $B$r;2(B
 $B>H$7$F2<$5$$!#(B
+
+@node Article Display
+@subsection Article Display
+@cindex picons
+@cindex x-face
+@cindex smileys
+
+$B$3$l$i$N%3%^%s%I$O!"$$$m$s$J<h$k$KB-$i$J$$%.%_%C%/(B (gimmicks) $B$NI=<($r!"(B
+$B$=$l$i$r%5%]!<%H$7$F$$$k(B Emacs $B$N5-;v%P%C%U%!$KDI2C$7$^$9!#(B
+
+@code{X-Face} $B%X%C%@!<$O>.$5$JGr9u2hA|$G!"%a%C%;!<%8%X%C%@!<$+$i6!5k$5$l(B
+$B$^$9(B (@pxref{X-Face})$B!#(B
+
+$B0lJ}(B Picon $B$O$"$J$?<+?H$N%7%9%F%`$K0MB8$7!"(Bgnus $B$O%X%C%@!<$K%^%C%A$9$k$"(B
+$B$J$?$N;}$AJ*$rC5$7$F$_$^$9(B (@pxref{Picons})$B!#(B
+
+$B%9%^%$%j!<$O!"?M!9$,%a%C%;!<%8$K;6$i$+$7$?$,$k>.$5$J(B @samp{:-)} $B%7%s%\%k(B
+$B$G$9!#(B
+
+$B$3$l$i$9$Y$F$N5!G=$O%H%0%k$G$9!#$b$7$9$G$K$=$l$i$,B8:_$7$F$$$?$J$i$P!"$=(B
+$B$l$i$O:o=|$5$l$^$9!#(B
+
+@table @kbd
+@item W D x
+@kindex W D x ($B35N,(B)
+@findex gnus-article-display-x-face
+@code{X-Face} $B$r(B @code{From} $B%X%C%@!<$KI=<($7$^(B
+$B$9(B (@code{gnus-article-display-x-face})$B!#(B
+
+@item W D s
+@kindex W D s ($B35N,(B)
+@findex gnus-article-toggle-smiley
+$B%9%^%$%j!<$NI=<($r%H%0%k$7$^$9(B (@code{gnus-article-toggle-smiley})$B!#(B
+
+@item W D f
+@kindex W D f ($B35N,(B)
+@findex gnus-treat-from-picon
+@code{From} $B%X%C%@!<$r(B Picon $B2=$7$^$9(B (@code{gnus-treat-from-picon})$B!#(B
+
+@item W D m
+@kindex W D m ($B35N,(B)
+@findex gnus-treat-mail-picon
+$B$9$Y$F$N%a!<%k%X%C%@!<(B ($B$9$J$o$A(B @code{Cc}$B!"(B@code{To}) $B$r(B Picon $B2=$7$^(B
+$B$9(B (@code{gnus-treat-mail-picon})$B!#(B
+
+@item W D n
+@kindex W D n ($B35N,(B)
+@findex gnus-treat-newsgroups-picon
+$B$9$Y$F$N%K%e!<%9%X%C%@!<(B ($B$9$J$o(B
+$B$A(B @code{Newsgroups} $B$H(B @code{Followup-To}) $B$r(B Picon $B2=$7$^(B
+$B$9(B (@code{gnus-treat-from-picon})$B!#(B
+@end table
 
 @node Article Signature
 @subsection $B5-;v$N=pL>(B
@@ -8614,6 +8641,13 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 $B$F!"LZ%P%C%U%!$,$=$N$&$A$N0l$D$G$"$k>l9g!"LZ%&%#%s%I%&$r:G>.2=$9$k$3$H$O(B
 $B$=$NNY$KI=<($5$l$F$$$k$9$Y$F$N%&%#%s%I%&$NBg$-$5$rJQ99$9$k;v$KCm0U$7$F$/(B
 $B$@$5$$!#(B
+
+$B0J2<$N%U%C%/$rDI2C$7$F!"$$$D$G$bLZ%&%#%s%I%&$r:G>.2=$7$F$bNI$$$G$7$g$&!#(B
+
+@lisp
+(add-hook 'gnus-configure-windows-hook
+          'gnus-tree-perhaps-minimize)
+@end lisp
 
 @item gnus-generate-tree-function
 @vindex gnus-generate-tree-function
@@ -9644,6 +9678,12 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-translate
 @item gnus-treat-x-pgp-sig (head)
+@item gnus-treat-from-picon (head)
+@item gnus-treat-mail-picon (head)
+@item gnus-treat-newsgroups-picon (head)
+@item gnus-treat-unfold-headers (head)
+@item gnus-treat-fold-newsgroups (head)
+@item gnus-treat-body-boundary (head)
 @item gnus-treat-decode-article-as-default-mime-charset
 @end table
 
@@ -15700,9 +15740,9 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 
 @item J S
 @kindex J S ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
-@findex gnus-group-send-drafts
-$B2<=q$-%0%k!<%W$K$"$kAw?.2DG=$J%a%C%;!<%8$rA4$FAw?.$9(B
-$B$k(B (@code{gnus-group-send-drafts})$B!#(B@xref{Drafts}.
+@findex gnus-group-send-queue
+$B2<=q$-(B (queue) $B%0%k!<%W$K$"$kAw?.2DG=$J%a%C%;!<%8$rA4$FAw?.$9(B
+$B$k(B (@code{gnus-group-send-queue})$B!#(B@xref{Drafts}$B!#(B
 
 @item J a
 @kindex J a ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
@@ -17846,8 +17886,7 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * NoCeM::                       Spam $B$dB>$NB@$j$d$9$$?);v$rHr$1$kJ}K!(B
 * Undo::                        $B$$$/$D$+$NF0:n$O85$KLa$9;v$,$G$-$k(B
 * Moderation::                  $B$"$J$?$,%b%G%l!<%?!<$@$C$?$i$I$&$9$k$+(B
-* XEmacs Enhancements::         XEmacs $B$G$O$b$C$H3($d$=$NB>$N$b$N$,B8:_(B
-                                $B$9$k(B
+* Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
@@ -19019,19 +19058,18 @@ Gnus $B$O!"MxMQ<T$,2?$r$9$k$+$r21$($F$*$-!"$=$NMxMQ<T$NF0:n$N5U$r9T$J$&F0(B
       "^nnml:rec.zoofle$\\|^rec.zoofle$")
 @end lisp
 
-@node XEmacs Enhancements
-@section XEmacs $B3HD%(B
-@cindex XEmacs
+@node Image Enhancements
+@section $B2hA|$N3HD%(B
 
-XEmacs $B$O3($d$=$NB>$N$b$N$rI=<($9$k$3$H$,$G$-$k$N$G!"(Bgnus $B$O$3$l$rMxMQ$9(B
-$B$k$3$H$K$7$^$9!#(B
+XEmacs$B!"$=$l$K(B Emacs 21 $B$O3($d$=$NB>$N$b$N$rI=<($9$k$3$H$,$G$-$k$N$G!"(B
+gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 
 @menu
-* Picons::                      $B$"$J$?$,FI$s$G$$$k$b$N$N3($rI=<($9$kJ}K!(B
-* Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<((B
-                                $B$9$kJ}K!(B
-* Toolbar::                     $B%/%j%C%/1n(B
-* XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
+* Picons::     $B$"$J$?$,FI$s$G$$$k$b$N$N3($rI=<($9$kJ}K!(B
+* Smileys::    $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<($9$kJ}K!(B
+* X-Face::     $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
+* Toolbar::    $B%/%j%C%/1n(B
+* XVarious::   $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
 @end menu
 
 @node Picons
@@ -19092,6 +19130,10 @@ Steve Kinzler $B$N(B picon $B8!:w%(%s%8%s$r;H$&$3$H$,$G$-$^$9!#(B
 $B$G(B @uref{http://www.cs.indiana.edu/picons/ftp/index.html} $B$K9T$C$F$_$F$/(B
 $B$@$5$$!#(BGnus $B$O(B picons $B$,(B @code{gnus-picons-database} $B$G<($5$l$k>l=j$K%$(B
 $B%s%9%H!<%k$7$F$"$k$b$N$H4|BT$7$^$9!#(B
+
+$B$b$7$"$J$?$,(B Debian GNU/Linux $B$r;H$C$F$$$k$N$J$i!"(B@samp{apt-get install
+picons.*} $B$H8@$($P(B gnus $B$,8+$D$1$k$3$H$,$G$-$k(B picon $B$,%$%s%9%H!<%k$5$l(B
+$B$^$9!#(B
 
 @node Picon Requirements
 @subsubsection Picon $B$NF0:n>r7o(B
@@ -19363,6 +19405,53 @@ Gnus $B$r=*N;$9$k$H$-$K(B picon $B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus $B$O
 @vindex smiley-mouse-face
 $B%^%&%9$G6/D4I=<($7$?$H$-$N4i!#(B
 @end table
+
+@node X-Face
+@subsection X-Face
+@cindex x-face
+
+@code{X-Face} $B%X%C%@!<$O!"%a%C%;!<%8$NCx<T$rI=$o$9$3$H$K$J$C$F$$$k(B 48$B!_(B
+48 $B2hAG$NGr9u$N3($rIA$-$^$9!#$3$l$O?J2=$7B3$1$k$"$^$?$N%a!<%k$H%K%e!<%9(B
+$B%j!<%@!<$K$h$C$F%5%]!<%H$5$l$k$G$7$g$&!#(B
+
+@cindex x-face
+@findex gnus-article-display-x-face
+@findex gnus-article-x-face-command
+@vindex gnus-article-x-face-command
+@vindex gnus-article-x-face-too-ugly
+@iftex
+@iflatex
+\include{xface}
+@end iflatex
+@end iftex
+@c @anchor{X-Face}
+
+@code{X-Face} $B%X%C%@!<$NI|9f$K$O!"(BEmacs $B$,(B @samp{compface} $B$r%5%]!<(B
+$B%H(B (XEmacs $B$N$[$H$s$I$,%5%]!<%H(B) $B$7$F$$$k$+!"$"$J$?$N%7%9%F%`(B
+$B$K(B @samp{compface} $B$,%$%s%9%H!<%k$5$l$F$$$kI,MW$,$"$j$^$9!#$b$7$I$A$i$+(B
+$B$,??$J$i$P!"(Bgnus $B$O%G%#%U%)%k%H$G(B @code{X-Face} $B%X%C%@!<$rI=<($7$^$9!#(B
+
+$B$3$l$r@)8f$9$k$N$OJQ?t(B @code{gnus-article-x-face-command} $B$G$9!#$3$NJQ?t(B
+$B$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B9T$5$l$^$9!#4X?t$J$i$P!"$3$N4X(B
+$B?t$,4i$r0z?t$H$7$F8F$P$l$^$9!#$b(B
+$B$7(B @code{gnus-article-x-face-too-ugly} ($B$3$l$O@55,I=8=$G(B
+$B$9(B) $B$,(B @code{From} $BMs$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(B
+
+Emacs 20 $B$G$N%G%#%U%)%k%H$NF0:n$O(B @code{display} $B%W%m%0%i(B
+$B%`(B @footnote{@code{display} $B$O(B ImageMagick $B%Q%C%1!<%8$K4^$^$l$F$$$^$9!#(B
+@code{uncompface} $B$H(B @code{icontopbm} $B$NN>%W%m%0%i%`$K$D$$$F$O!"(B
+`compface' $B$d(B GNU/Linux $B%7%9%F%`$K$*$1$k(B `faces-xface' $B$N$h$&$J%Q%C%1!<(B
+$B%8$rC5$7$F2<$5$$!#(B} $B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(B
+
+XEmacs $B$+@E;_2h$r%5%]!<%H$7$F$$$k(B Emacs 21+ $B$G$N%G%#%U%)%k%H$NF0:n(B
+$B$O(B @code{From} $BMs$NA0$K4i$rI=<($9$k$3$H$G$9!#(B(XEmacs $B$,(B X-Face $B5!G=IU$-(B
+$B$G%3%s%Q%$%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l$OI=<($r>/$7Aa$/$7$^$9!#$b$7(B
+$B:,K\E*(B X-Face $B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $B$O(B @code{pbmplus} $B$d$=$NCg4V$N(B
+$B30It%W%m%0%i%`$r;H$C$F(B @code{X-Face} $BMs$rJQ49$7$h$&$H;n$_$^$9(B @footnote{
+GNU/Linux $B%7%9%F%`$G$O(B @code{netpbm}$B!"(B@code{libgr-progs} $B$^$?(B
+$B$O(B @code{compface} $B$N$h$&$JL>A0$N%Q%C%1!<%8$rC5$7$F2<$5$$!#(B}$B!#(B)
+
+($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
 
 @node Toolbar
 @subsection $B%D!<%k%P!<(B
@@ -19698,6 +19787,7 @@ but at the common table.@*
 @chapter $BIUO?(B
 
 @menu
+* XEmacs::                      XEmacs $B$G%$%s%9%H!<%k$9$k$?$a$NMW7o(B
 * History::                     $B$I$&$d$C$F(B gnus $B$,:#F|$N$h$&$K$J$C$?$+(B
 * On Writing Manuals::          $B$J$<$3$l$,=i?4<TMQ$N0FFb$G$J$$$+(B
 * Terminology::                 $B2f!9$OK\Ev$KFq$7$$!"8l$N$h$&$J8l$r;H$&(B
@@ -19708,6 +19798,17 @@ but at the common table.@*
 * Emacs for Heathens::          Emacs $B$NMQ8l$N<jC;$JF3F~(B
 * Frequently Asked Questions::
 @end menu
+
+@node XEmacs
+@section XEmacs
+@cindex XEmacs
+@cindex Installing under XEmacs
+
+XEmacs $B$O%Q%C%1!<%8$N=/=8$H$7$FG[I[$5$l$F$$$^$9!#(Bgnus $B$N(B XEmacs $B%Q%C%1!<(B
+$B%8$,I,MW$H$9$k$b$N$O2?$G$"$l!"$"$J$?$O%$%s%9%H!<%k$9$Y$-$G$9!#:#$N$H$3$m(B
+$BI,MW$J$N$O(B @samp{gnus}$B!"(B@samp{w3}$B!"(B@samp{mh-e}$B!"(B@samp{mailcrypt}$B!"(B
+@samp{rmail}$B!"(B@samp{eterm}$B!"(B@samp{mail-lib}$B!"(B@samp{xemacs-base} $B$*$h$S(B
+@samp{fsf-compat} $B$G$9!#(B
 
 @node History
 @section $BNr;K(B

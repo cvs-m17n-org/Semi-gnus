@@ -787,7 +787,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(message "%s" (gnus-offline-gettext 'empting-spool-4)))
     ;; Send queued message by gnus-agent
     (message "%s" (gnus-offline-gettext 'empting-spool-5))
-    (gnus-group-send-drafts)
+    (gnus-group-send-queue)
     (message "%s" (gnus-offline-gettext 'empting-spool-6)))
   ;;
   (run-hooks 'gnus-offline-after-empting-spool-hook))

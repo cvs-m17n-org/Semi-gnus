@@ -812,7 +812,7 @@ Various
 * NoCeM::                       How to avoid spam and other fatty foods.
 * Undo::                        Some actions can be undone.
 * Moderation::                  What to do if you're a moderator.
-* XEmacs Enhancements::         There are more pictures and stuff under XEmacs.
+* Image Enhancements::          There are more pictures and stuff under XEmacs.
 * Fuzzy Matching::              What's the big fuzz?
 * Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
 * Various Various::             Things that are really various.
@@ -2072,44 +2072,35 @@ be fetched.
 
 @vindex gnus-select-group-hook
 @vindex gnus-auto-select-first
-@code{gnus-auto-select-first} control whether any articles are selected
+If @code{gnus-auto-select-first} is non-@code{nil}, select an article
 automatically when entering a group with the @kbd{SPACE} command.
+Which article this is is controlled by the
+@code{gnus-auto-select-subject} variable.  Valid values for this
+variable is:
 
 @table @code
 
-@item nil
-Don't select any articles when entering the group.  Just display the
-full summary buffer.
+@item unread
+Place point on the subject line of the first unread article.
 
-@item t
-Select the first unread article when entering the group.
+@item first
+Place point on the subject line of the first article.
+
+@item unseen
+Place point on the subject line of the first unseen article.
 
 @item best
-Select the highest scored article in the group when entering the
-group.
+Place point on the subject line of the highest-scored unread article.
 
 @end table
 
-This variable can also be a function.  In that case, that function will
-be called to place point on a subject line, and/or select some article.
-Useful functions include:
-
-@table @code
-@item gnus-summary-first-unread-subject
-Place point on the subject line of the first unread article, but
-don't select the article.
-
-@item gnus-summary-first-unread-article
-Select the first unread article.
-
-@item gnus-summary-best-unread-article
-Select the highest-scored unread article.
-@end table
-
+This variable can also be a function.  In that case, that function
+will be called to place point on a subject line.  
 
 If you want to prevent automatic selection in some group (say, in a
-binary group with Huge articles) you can set this variable to @code{nil}
-in @code{gnus-select-group-hook}, which is called when a group is
+binary group with Huge articles) you can set the
+@code{gnus-auto-select-first} variable to @code{nil} in
+@code{gnus-select-group-hook}, which is called when a group is
 selected.
 
 
@@ -3880,7 +3871,7 @@ for group to post to.  @xref{Composing Messages}.
 This function actually prepares a news even when using mail groups.
 This is useful for "posting" messages to mail groups without actually
 sending them over the network: they're just saved directly to the group
-in question.  The corresponding backend must have a request-post method
+in question.  The corresponding back end must have a request-post method
 for this to work though.
 
 @end table
@@ -4753,8 +4744,9 @@ Go to the first unread article
 @kindex G b (Summary)
 @kindex , (Summary)
 @findex gnus-summary-best-unread-article
-Go to the article with the highest score
-(@code{gnus-summary-best-unread-article}).
+Go to the unread article with the highest score
+(@code{gnus-summary-best-unread-article}).  If given a prefix argument,
+go to the first unread article that has a score over the default score.
 
 @item G l
 @itemx l
@@ -5002,7 +4994,7 @@ prefix is 1, prompt for a group to post to.
 This function actually prepares a news even when using mail groups.
 This is useful for "posting" messages to mail groups without actually
 sending them over the network: they're just saved directly to the group
-in question.  The corresponding backend must have a request-post method
+in question.  The corresponding back end must have a request-post method
 for this to work though.
 
 @item S D b
@@ -5290,17 +5282,17 @@ calculates the deadline of the message and stores it in the
 @code{nndraft:delayed} group.
 
 And whenever you get new news, Gnus looks through the group for articles
-which are due and sends them.  It uses the @code{gnus-delay-send-drafts}
+which are due and sends them.  It uses the @code{gnus-delay-send-queue}
 function for this.  By default, this function is added to the hook
 @code{gnus-get-new-news-hook}.  But of course, you can change this.
 Maybe you want to use the demon to send drafts?  Just tell the demon to
-execute the @code{gnus-delay-send-drafts} function.
+execute the @code{gnus-delay-send-queue} function.
 
 @table @code
 @item gnus-delay-initialize
 @findex gnus-delay-initialize
 By default, this function installs the @kbd{C-c C-j} key binding in
-Message mode and @code{gnus-delay-send-drafts} in
+Message mode and @code{gnus-delay-send-queue} in
 @code{gnus-get-new-news-hook}.  But it accepts two optional arguments,
 @code{no-keymap} and @code{no-check}.  If @code{no-keymap} is non-nil,
 the @kbd{C-c C-j} binding is not intalled.  If @code{no-check} is
@@ -7553,14 +7545,15 @@ writing, so there are tons of functions and variables to make reading
 these articles easier.
 
 @menu
-* Article Highlighting::        You want to make the article look like fruit salad.
-* Article Fontisizing::         Making emphasized text look nice.
-* Article Hiding::              You also want to make certain info go away.
-* Article Washing::             Lots of way-neat functions to make life better.
-* Article Buttons::             Click on URLs, Message-IDs, addresses and the like.
-* Article Date::                Grumble, UT!
-* Article Signature::           What is a signature?
-* Article Miscellania::         Various other stuff.
+* Article Highlighting::    You want to make the article look like fruit salad.
+* Article Fontisizing::     Making emphasized text look nice.
+* Article Hiding::          You also want to make certain info go away.
+* Article Washing::         Lots of way-neat functions to make life better.
+* Article Buttons::         Click on URLs, Message-IDs, addresses and the like.
+* Article Date::            Grumble, UT!
+* Article Display::         Display various stuff---X-Face, Picons, Smileys
+* Article Signature::       What is a signature?
+* Article Miscellania::     Various other stuff.
 @end menu
 
 
@@ -8049,41 +8042,6 @@ in question has a @code{Content-Type} header that says that this type
 has been done.
 If a prefix is given, a charset will be asked for.
 
-@item W f
-@kindex W f (Summary)
-@cindex x-face
-@findex gnus-article-display-x-face
-@findex gnus-article-x-face-command
-@vindex gnus-article-x-face-command
-@vindex gnus-article-x-face-too-ugly
-@iftex
-@iflatex
-\include{xface}
-@end iflatex
-@end iftex
-@c @anchor{X-Face}
-Look for and display any X-Face headers
-(@code{gnus-article-display-x-face}).  The command executed by this
-function is given by the @code{gnus-article-x-face-command} variable.
-If this variable is a string, this string will be executed in a
-sub-shell.  If it is a function, this function will be called with the
-face as the argument.  If the @code{gnus-article-x-face-too-ugly} (which
-is a regexp) matches the @code{From} header, the face will not be shown.
-The default action under Emacs is to fork off the @code{display}
-program@footnote{@code{display} is from the ImageMagick package.  For
-the @code{uncompface} and @code{icontopbm} programs look for a package
-like `compface' or `faces-xface' on a GNU/Linux system.}  to view the
-face.  Under XEmacs or Emacs 21+ with suitable image support, the
-default action is to display the face before the @code{From} header.
-(It's nicer if XEmacs has been compiled with X-Face support---that will
-make display somewhat faster.  If there's no native X-Face support, Gnus
-will try to convert the @code{X-Face} header using external programs
-from the @code{pbmplus} package and friends.@footnote{On a GNU/Linux
-system look for packages with names like @code{netpbm} or
-@code{libgr-progs}.})  If you want to have this function in the display
-hook, it should probably come last.
-(NOTE: @code{x-face} is used in the variable/function names, not @code{xface}).
-
 @item W b
 @kindex W b (Summary)
 @findex gnus-article-add-buttons
@@ -8111,6 +8069,17 @@ message.@footnote{PGP keys for many hierarchies are available at
 @findex gnus-summary-force-verify-and-decrypt
 Verify a signed (PGP, PGP/MIME or S/MIME) message
 (@code{gnus-summary-force-verify-and-decrypt}).
+
+@item W u
+@kindex W u (Summary)
+@findex gnus-article-treat-unfold-headers
+Unfold folded header lines (@code{gnus-article-treat-unfold-headers}).
+
+@item W n
+@kindex W n (Summary)
+@findex gnus-article-treat-fold-newsgroups
+Fold the @code{Newsgroups} and @code{Followup-To} headers
+(@code{gnus-article-treat-fold-newsgroups}).
 
 @item W W H
 @kindex W W H (Summary)
@@ -8338,6 +8307,61 @@ that the article was posted in 1854.  Although something like that is
 
 @xref{Customizing Articles}, for how to display the date in your
 preferred format automatically.
+
+
+@node Article Display
+@subsection Article Display
+@cindex picons
+@cindex x-face
+@cindex smileys
+
+These commands add various frivolous display gimmics to the article
+buffer in Emacs versions that support them.
+
+@code{X-Face} headers are small black-and-white images supplied by the
+message headers (@pxref{X-Face}).
+
+Picons, on the other hand, reside on your own system, and Gnus will
+try to match the headers to what you have (@pxref{Picons}).
+
+Smileys are those little @samp{:-)} symbols that people like to litter
+their messages with (@pxref{Smileys}).
+
+All these functions are toggles--if the elements already exist,
+they'll be removed.
+
+@table @kbd
+@item W D x
+@kindex W D x (Summary)
+@findex gnus-article-display-x-face
+Display an @code{X-Face} in the @code{From} header.
+(@code{gnus-article-display-x-face}).
+
+@item W D s
+@kindex W D s (Summary)
+@findex gnus-article-toggle-smiley
+Toggle whether to display smileys
+(@code{gnus-article-toggle-smiley}).
+
+@item W D f
+@kindex W D f (Summary)
+@findex gnus-treat-from-picon
+Piconify the @code{From} header (@code{gnus-treat-from-picon}).
+
+@item W D m
+@kindex W D m (Summary)
+@findex gnus-treat-mail-picon
+Piconify all mail headers (i. e., @code{Cc}, @code{To})
+(@code{gnus-treat-mail-picon}).
+
+@item W D n
+@kindex W D n (Summary)
+@findex gnus-treat-newsgroups-picon
+Piconify all news headers (i. e., @code{Newsgroups} and
+@code{Followup-To}) (@code{gnus-treat-from-picon}).
+
+@end table
+
 
 
 @node Article Signature
@@ -9066,6 +9090,14 @@ higher than that number.  The default is @code{t}.  Note that if you
 have several windows displayed side-by-side in a frame and the tree
 buffer is one of these, minimizing the tree window will also resize all
 other windows displayed next to it.
+
+You may also wish to add the following hook to keep the window minimized
+at all times:
+
+@lisp
+(add-hook 'gnus-configure-windows-hook
+          'gnus-tree-perhaps-minimize)
+@end lisp
 
 @item gnus-generate-tree-function
 @vindex gnus-generate-tree-function
@@ -10131,6 +10163,12 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-translate
 @item gnus-treat-x-pgp-sig (head)
+@item gnus-treat-from-picon (head)
+@item gnus-treat-mail-picon (head)
+@item gnus-treat-newsgroups-picon (head)
+@item gnus-treat-unfold-headers (head)
+@item gnus-treat-fold-newsgroups (head)
+@item gnus-treat-body-boundary (head)
 @item gnus-treat-decode-article-as-default-mime-charset
 @end table
 
@@ -13073,17 +13111,17 @@ change the expiry period (@pxref{Group Parameters}).
 
 @vindex nnmail-expiry-target
 The normal action taken when expiring articles is to delete them.
-However, in some circumstances it might make more sense to move them to
-other groups instead of deleting them.  The variable @code{nnmail-expiry-target}
-(and the @code{expiry-target} group parameter) controls this.  The
-variable supplies a default value for all groups, which can be
-overridden for specific groups by the group parameter.
-default value is @code{delete}, but this can also be a string (which
-should be the name of the group the message should be moved to), or a
-function (which will be called in a buffer narrowed to the message in
-question, and with the name of the group being moved from as its
-parameter) which should return a target -- either a group name or
-@code{delete}.
+However, in some circumstances it might make more sense to move them
+to other groups instead of deleting them.  The variable
+@code{nnmail-expiry-target} (and the @code{expiry-target} group
+parameter) controls this.  The variable supplies a default value for
+all groups, which can be overridden for specific groups by the group
+parameter.  default value is @code{delete}, but this can also be a
+string (which should be the name of the group the message should be
+moved to), or a function (which will be called in a buffer narrowed to
+the message in question, and with the name of the group being moved
+from as its parameter) which should return a target -- either a group
+name or @code{delete}.
 
 Here's an example for specifying a group name:
 @lisp
@@ -16066,9 +16104,9 @@ Fetch all eligible articles in all groups
 
 @item J S
 @kindex J S (Agent Group)
-@findex gnus-group-send-drafts
-Send all sendable messages in the draft group
-(@code{gnus-group-send-drafts}).  @xref{Drafts}.
+@findex gnus-group-send-queue
+Send all sendable messages in the queue group
+(@code{gnus-group-send-queue}).  @xref{Drafts}.
 
 @item J a
 @kindex J a (Agent Group)
@@ -18194,24 +18232,24 @@ four days, Gnus will decay the scores four times, for instance.
 @chapter Various
 
 @menu
-* Process/Prefix::              A convention used by many treatment commands.
-* Interactive::                 Making Gnus ask you many questions.
-* Symbolic Prefixes::           How to supply some Gnus functions with options.
-* Formatting Variables::        You can specify what buffers should look like.
-* Window Layout::               Configuring the Gnus buffer windows.
-* Faces and Fonts::             How to change how faces look.
-* Compilation::                 How to speed Gnus up.
-* Mode Lines::                  Displaying information in the mode lines.
-* Highlighting and Menus::      Making buffers look all nice and cozy.
-* Buttons::                     Get tendinitis in ten easy steps!
-* Daemons::                     Gnus can do things behind your back.
-* NoCeM::                       How to avoid spam and other fatty foods.
-* Undo::                        Some actions can be undone.
-* Moderation::                  What to do if you're a moderator.
-* XEmacs Enhancements::         There are more pictures and stuff under XEmacs.
-* Fuzzy Matching::              What's the big fuzz?
-* Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
-* Various Various::             Things that are really various.
+* Process/Prefix::          A convention used by many treatment commands.
+* Interactive::             Making Gnus ask you many questions.
+* Symbolic Prefixes::       How to supply some Gnus functions with options.
+* Formatting Variables::    You can specify what buffers should look like.
+* Window Layout::           Configuring the Gnus buffer windows.
+* Faces and Fonts::         How to change how faces look.
+* Compilation::             How to speed Gnus up.
+* Mode Lines::              Displaying information in the mode lines.
+* Highlighting and Menus::  Making buffers look all nice and cozy.
+* Buttons::                 Get tendinitis in ten easy steps!
+* Daemons::                 Gnus can do things behind your back.
+* NoCeM::                   How to avoid spam and other fatty foods.
+* Undo::                    Some actions can be undone.
+* Moderation::              What to do if you're a moderator.
+* Image Enhancements::      Modern versions of Emacs/XEmacs can display images.
+* Fuzzy Matching::          What's the big fuzz?
+* Thwarting Email Spam::    A how-to on avoiding unsolicited commercial email.
+* Various Various::         Things that are really various.
 @end menu
 
 
@@ -19442,18 +19480,18 @@ To use moderation mode in these two groups, say:
 @end lisp
 
 
-@node XEmacs Enhancements
-@section XEmacs Enhancements
-@cindex XEmacs
+@node Image Enhancements
+@section Image Enhancements
 
-XEmacs is able to display pictures and stuff, so Gnus has taken
-advantage of that.
+XEmacs, as well as Emacs 21, is able to display pictures and stuff, so
+Gnus has taken advantage of that.
 
 @menu
-* Picons::                      How to display pictures of what your reading.
-* Smileys::                     Show all those happy faces the way they were meant to be shown.
-* Toolbar::                     Click'n'drool.
-* XVarious::                    Other XEmacsy Gnusey variables.
+* Picons::     How to display pictures of what you're reading.
+* Smileys::    Show all those happy faces the way they were meant to be shown.
+* X-Face::     Display a funky, teensy black-and-white image.
+* Toolbar::    Click'n'drool.
+* XVarious::   Other XEmacsy Gnusey variables.
 @end menu
 
 
@@ -19512,6 +19550,9 @@ obtaining and installing the picons databases, point your Web browser at @*
 @uref{http://www.cs.indiana.edu/picons/ftp/index.html}.  Gnus expects
 picons to be installed into a location pointed to by
 @code{gnus-picons-database}.
+
+If you are using Debian GNU/Linux, saying @samp{apt-get install
+picons.*} will install the picons where Gnus can find them.
 
 
 @node Picon Requirements
@@ -19792,6 +19833,57 @@ Color of the circle around the face.  The default is @samp{black}.
 Face used for mouse highlighting over the smiley face.
 
 @end table
+
+
+@node X-Face
+@subsection X-Face
+@cindex x-face
+
+@code{X-Face} headers describe a 48x48 pixel black-and-white image
+that's supposed to represent the author of the message.  It seems to
+be supported by an ever-growing number of mail and news readers.
+
+@cindex x-face
+@findex gnus-article-display-x-face
+@findex gnus-article-x-face-command
+@vindex gnus-article-x-face-command
+@vindex gnus-article-x-face-too-ugly
+@iftex
+@iflatex
+\include{xface}
+@end iflatex
+@end iftex
+@c @anchor{X-Face}
+
+Decoding an @code{X-Face} header either requires an Emacs that has
+@samp{compface} support (which most XEmacs versions has), or that you
+have @samp{compface} installed on your system.  If either is true,
+Gnus will default to displaying @code{X-Face} headers.
+
+The variable that controls this is the
+@code{gnus-article-x-face-command} variable.  If this variable is a
+string, this string will be executed in a sub-shell.  If it is a
+function, this function will be called with the face as the argument.
+If the @code{gnus-article-x-face-too-ugly} (which is a regexp) matches
+the @code{From} header, the face will not be shown.
+
+The default action under Emacs 20 is to fork off the @code{display}
+program@footnote{@code{display} is from the ImageMagick package.  For
+the @code{uncompface} and @code{icontopbm} programs look for a package
+like @code{compface} or @code{faces-xface} on a GNU/Linux system.}  to
+view the face.
+
+Under XEmacs or Emacs 21+ with suitable image support, the default
+action is to display the face before the @code{From} header.  (It's
+nicer if XEmacs has been compiled with @code{X-Face} support---that
+will make display somewhat faster.  If there's no native @code{X-Face}
+support, Gnus will try to convert the @code{X-Face} header using
+external programs from the @code{pbmplus} package and
+friends.@footnote{On a GNU/Linux system look for packages with names
+like @code{netpbm}, @code{libgr-progs} and @code{compface}.})
+
+(NOTE: @code{x-face} is used in the variable/function names, not
+@code{xface}).
 
 
 @node Toolbar
@@ -20115,6 +20207,7 @@ but at the common table.@*
 @chapter Appendices
 
 @menu
+* XEmacs::                      Requirements for installing under XEmacs.
 * History::                     How Gnus got where it is today.
 * On Writing Manuals::          Why this is not a beginner's guide.
 * Terminology::                 We use really difficult, like, words here.
@@ -20124,6 +20217,18 @@ but at the common table.@*
 * Emacs for Heathens::          A short introduction to Emacsian terms.
 * Frequently Asked Questions::
 @end menu
+
+
+@node XEmacs
+@section XEmacs
+@cindex XEmacs
+@cindex Installing under XEmacs
+
+XEmacs is distributed as a collection of packages.  You should install
+whatever packages the Gnus XEmacs package requires.  The current
+requirements are @samp{gnus}, @samp{w3}, @samp{mh-e},
+@samp{mailcrypt}, @samp{rmail}, @samp{eterm}, @samp{mail-lib},
+@samp{xemacs-base}, and @samp{fsf-compat}.
 
 
 @node History

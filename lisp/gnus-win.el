@@ -76,17 +76,6 @@ used to display Gnus windows."
 	       (if gnus-carpal '(summary-carpal 4))))
     (article
      (cond
-      ((and gnus-use-picons
-	    (eq gnus-picons-display-where 'picons))
-       '(frame 1.0
-	       (vertical 1.0
-			 (summary 0.25 point)
-			 (if gnus-carpal '(summary-carpal 4))
-			 (article 1.0))
-	       (vertical ((height . 5) (width . 15)
-			  (user-position . t)
-			  (left . -1) (top . 1))
-			 (picons 1.0))))
       (gnus-use-trees
        '(vertical 1.0
 		  (summary 0.25 point)
@@ -198,7 +187,6 @@ See the Gnus manual for an explanation of the syntax used.")
     (mail . gnus-message-buffer)
     (post-news . gnus-message-buffer)
     (faq . gnus-faq-buffer)
-    (picons . gnus-picons-buffer-name)
     (tree . gnus-tree-buffer)
     (score-trace . "*Score Trace*")
     (split-trace . "*Split Trace*")
@@ -207,6 +195,11 @@ See the Gnus manual for an explanation of the syntax used.")
     (article-copy . gnus-article-copy)
     (draft . gnus-draft-buffer))
   "Mapping from short symbols to buffer names or buffer variables.")
+
+(defcustom gnus-configure-windows-hook nil
+  "*A hook called when configuring windows."
+  :group 'gnus-windowns
+  :type 'hook)
 
 ;;; Internal variables.
 
@@ -458,7 +451,7 @@ See the Gnus manual for an explanation of the syntax used.")
 		      ;; This is not a `frame' split, so we ignore the
 		      ;; other frames.
 		      (delete-other-windows)
-		    ;; This is a `frame' split, so we delete all windows
+		  ;; This is a `frame' split, so we delete all windows
 		    ;; on all frames.
 		    (gnus-delete-windows-in-gnusey-frames))
 		;; Just remove some windows.
@@ -473,6 +466,7 @@ See the Gnus manual for an explanation of the syntax used.")
 	      (switch-to-buffer nntp-server-buffer)
 	    (set-buffer nntp-server-buffer))
 	  (gnus-configure-frame split)
+	  (run-hooks 'gnus-configure-windows-hook)
 	  (when gnus-window-frame-focus
 	    (select-frame (window-frame gnus-window-frame-focus))))))))
 

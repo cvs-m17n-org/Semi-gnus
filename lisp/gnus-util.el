@@ -247,6 +247,17 @@
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
 
+(defun gnus-text-with-property (prop)
+  "Return a list of all points where the text has PROP."
+  (let ((points nil)
+	(point (point-min)))
+    (save-excursion
+      (while (< point (point-max))
+	(when (get-text-property point prop)
+	  (push point points))
+	(incf point)))
+    (nreverse points)))
+
 (require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
@@ -694,6 +705,19 @@ Bind `print-quoted' and `print-readably' to t while printing."
 	  (gnus-put-text-property beg (match-beginning 0) prop val)
 	  (setq beg (point)))
 	(gnus-put-text-property beg (point) prop val)))))
+
+(defsubst gnus-put-overlay-excluding-newlines (beg end prop val)
+  "The same as `put-text-property', but don't put this prop on any newlines in the region."
+  (save-match-data
+    (save-excursion
+      (save-restriction
+	(goto-char beg)
+	(while (re-search-forward gnus-emphasize-whitespace-regexp end 'move)
+	  (gnus-overlay-put
+	   (gnus-make-overlay beg (match-beginning 0))
+	   prop val)
+	  (setq beg (point)))
+	(gnus-overlay-put (gnus-make-overlay beg (point)) prop val)))))
 
 (defun gnus-put-text-property-excluding-characters-with-faces (beg end
 								   prop val)

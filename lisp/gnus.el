@@ -1,6 +1,6 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 2001,
-;;        1997, 1998, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 
+;;        1997, 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -751,10 +751,10 @@ be set in `.emacs' instead."
 (defface gnus-splash-face
   '((((class color)
       (background dark))
-     (:foreground "Brown"))
+     (:foreground "#888888"))
     (((class color)
       (background light))
-     (:foreground "Brown"))
+     (:foreground "#888888"))
     (t
      ()))
   "Face for the splash screen.")
@@ -785,6 +785,38 @@ be set in `.emacs' instead."
 
 (defvar gnus-simple-splash nil)
 
+;;(format "%02x%02x%02x" 114 66 20) "724214"
+
+(defvar gnus-logo-color-alist
+  '((flame "#cc3300" "#ff2200")
+    (pine "#c0cc93" "#f8ffb8")
+    (moss "#a1cc93" "#d2ffb8")
+    (irish "#04cc90" "#05ff97")
+    (sky "#049acc" "#05deff")
+    (tin "#6886cc" "#82b6ff")
+    (velvet "#7c68cc" "#8c82ff")
+    (grape "#b264cc" "#cf7df")
+    (labia "#cc64c2" "#fd7dff")
+    (berry "#cc6485" "#ff7db5")
+    (dino "#724214" "#1e3f03")
+    (oort "#cccccc" "#888888")
+    (neutral "#b4b4b4" "#878787")
+    (september "#bf9900" "#ffcc00"))
+  "Color alist used for the Gnus logo.")
+
+(defcustom gnus-logo-color-style 'oort
+  "*Color styles used for the Gnus logo."
+  :type '(choice (const flame) (const pine) (const moss)
+		 (const irish) (const sky) (const tin)
+		 (const velvet) (const grape) (const labia)
+		 (const berry) (const neutral) (const september)
+		 (const dino))
+  :group 'gnus-xmas)
+
+(defvar gnus-logo-colors
+  (cdr (assq gnus-logo-color-style gnus-logo-color-alist))
+  "Colors used for the Gnus logo.")
+
 (defun gnus-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
@@ -796,9 +828,10 @@ be set in `.emacs' instead."
 		(fg (face-foreground 'gnus-splash-face))
 		(image (find-image
 			`((:type xpm :file "gnus.xpm"
-				 :color-symbols (("thing" . "#724214")
-						 ("shadow" . "#1e3f03")
-						 ("background" . ,bg)))
+				 :color-symbols
+				 (("thing" . ,(car gnus-logo-colors))
+				  ("shadow" . ,(cadr gnus-logo-colors))
+				  ("background" . ,bg)))
 			  (:type pbm :file "gnus.pbm"
 				 ;; Account for the pbm's blackground.
 				 :background ,bg :foreground ,fg)
@@ -1351,11 +1384,6 @@ articles.  This is not a good idea."
 
 (defcustom gnus-use-scoring t
   "*If non-nil, enable scoring."
-  :group 'gnus-meta
-  :type 'boolean)
-
-(defcustom gnus-use-picons nil
-  "*If non-nil, display picons in a frame of their own."
   :group 'gnus-meta
   :type 'boolean)
 
@@ -2089,9 +2117,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-summary-followup-to-mail-with-original gnus-bug
       gnus-summary-wide-reply-with-original gnus-summary-post-forward
       gnus-summary-digest-mail-forward gnus-summary-digest-post-forward)
-     ("gnus-picon" :interactive t gnus-article-display-picons
-      gnus-group-display-picons)
-     ("gnus-picon" gnus-picons-buffer-name)
+     ("gnus-picon" :interactive t gnus-treat-from-picon)
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
      ("smiley" :interactive t gnus-smiley-display)
@@ -2168,7 +2194,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-unplugged gnus-agentize gnus-agent-batch)
      ("gnus-vm" :interactive t gnus-summary-save-in-vm
       gnus-summary-save-article-vm)
-     ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts)
+     ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-queue)
      ("gnus-mlspl" gnus-group-split gnus-group-split-fancy)
      ("gnus-mlspl" :interactive t gnus-group-split-setup
       gnus-group-split-update))))
@@ -3360,6 +3386,9 @@ If ARG is non-nil and a positive number, Gnus will use that as the
 startup level.	If ARG is non-nil and not a positive number, Gnus will
 prompt the user for the name of an NNTP server to use."
   (interactive "P")
+  (unless (byte-code-function-p (symbol-function 'gnus))
+    (message "You should byte-compile Gnus")
+    (sit-for 2))
   (gnus-1 arg dont-connect slave))
 
 ;; Allow redefinition of Gnus functions.

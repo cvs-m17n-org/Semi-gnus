@@ -1,5 +1,5 @@
 ;;; gnus-draft.el --- draft message support for Semi-gnus
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -183,7 +183,7 @@
   (gnus-uu-mark-buffer)
   (gnus-draft-send-message))
 
-(defun gnus-group-send-drafts ()
+(defun gnus-group-send-queue ()
   "Send all sendable articles from the queue group."
   (interactive)
   (gnus-activate-group "nndraft:queue")

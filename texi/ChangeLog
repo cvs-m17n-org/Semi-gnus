@@ -1,3 +1,35 @@
+2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Choosing Commands): Addition.
+
+2001-12-31  Rui Zhu  <sprache@iname.com>
+
+	* emacs-mime.texi (Customization): Typo fix.
+
+2001-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Display): Addition.
+
+	* emacs-mime.texi (Interface Functions): Addition.
+
+	* gnus.texi (Using MIME): Addition.
+
+2001-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (X-Face): Made into own node.
+	(Article Display): New.
+
+	* emacs-mime.texi (Interface Functions): Addition.
+
+	* message.texi (Message Headers): Addition.
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* emacs-mime.texi (Customization): Added example.
+
+	* gnus.texi (Selecting a Group): Addition.
+	(Tree Display): Addition.
+
 2001-12-26  Florian Weimer  <fw@deneb.enyo.de>
 
 	* gnus.texi (Using GPG): Remove obsolete reference to gpg-2comp.

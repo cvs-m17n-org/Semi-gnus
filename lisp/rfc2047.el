@@ -116,6 +116,14 @@ Valid encodings are nil, `Q' and `B'.")
        (point-max))))
   (goto-char (point-min)))
 
+(defun rfc2047-field-value ()
+  "Return the value of the field at point."
+  (save-excursion
+    (save-restriction
+      (rfc2047-narrow-to-field)
+      (re-search-forward ":[ \t\n]*" nil t)
+      (buffer-substring (point) (point-max)))))
+
 (defun rfc2047-encode-message-header ()
   "Encode the message header according to `rfc2047-header-encoding-alist'.
 Should be called narrowed to the head of the message."
@@ -136,14 +144,17 @@ Should be called narrowed to the head of the message."
 		      ;; Is message-posting-charset a coding system?
 		      (mm-encode-coding-region
 		       (point-min) (point-max)
-		       (car message-posting-charset)))
+		       (car message-posting-charset))
+		    nil)
 		;; No encoding necessary, but folding is nice
-		(rfc2047-fold-region (save-excursion
-				       (goto-char (point-min))
-				       (skip-chars-forward "^:")
-				       (and (looking-at ": ")
-					    (forward-char 2))
-				       (point)) (point-max)))
+		(rfc2047-fold-region
+		 (save-excursion
+		   (goto-char (point-min))
+		   (skip-chars-forward "^:")
+		   (when (looking-at ": ")
+		     (forward-char 2))
+		   (point))
+		 (point-max)))
 	    ;; We found something that may perhaps be encoded.
 	    (setq method nil
 		  alist rfc2047-header-encoding-alist)
@@ -335,6 +346,13 @@ The buffer may be narrowed."
 	(insert "?=")
 	(forward-line 1)))))
 
+(defun rfc2047-fold-field ()
+  "Fold the current line."
+  (save-excursion
+    (save-restriction
+      (rfc2047-narrow-to-field)
+      (rfc2047-fold-region (point-min) (point-max)))))
+
 (defun rfc2047-fold-region (b e)
   "Fold long lines in region B to E."
   (save-restriction
@@ -342,11 +360,13 @@ The buffer may be narrowed."
     (goto-char (point-min))
     (let ((break nil)
 	  (qword-break nil)
+	  (first t)
 	  (bol (save-restriction
 		 (widen)
 		 (gnus-point-at-bol))))
       (while (not (eobp))
-	(when (and (or break qword-break) (> (- (point) bol) 76))
+	(when (and (or break qword-break)
+		   (> (- (point) bol) 76))
 	  (goto-char (or break qword-break))
 	  (setq break nil
 		qword-break nil)
@@ -356,7 +376,8 @@ The buffer may be narrowed."
 	  (setq bol (1- (point)))
 	  ;; Don't break before the first non-LWSP characters.
 	  (skip-chars-forward " \t")
-	  (unless (eobp) (forward-char 1)))
+	  (unless (eobp)
+	    (forward-char 1)))
 	(cond
 	 ((eq (char-after) ?\n)
 	  (forward-char 1)
@@ -370,7 +391,10 @@ The buffer may be narrowed."
 	  (forward-char 1))
 	 ((memq (char-after) '(?  ?\t))
 	  (skip-chars-forward " \t")
-	  (setq break (1- (point))))
+	  (if first
+	      ;; Don't break just after the header name.
+	      (setq first nil)
+	    (setq break (1- (point)))))
 	 ((not break)
 	  (if (not (looking-at "=\\?[^=]"))
 	      (if (eq (char-after) ?=)
@@ -380,7 +404,8 @@ The buffer may be narrowed."
 	    (skip-chars-forward "^ \t\n\r")))
 	 (t
 	  (skip-chars-forward "^ \t\n\r"))))
-      (when (and (or break qword-break) (> (- (point) bol) 76))
+      (when (and (or break qword-break)
+		 (> (- (point) bol) 76))
 	(goto-char (or break qword-break))
 	(setq break nil
 	      qword-break nil)
@@ -390,7 +415,15 @@ The buffer may be narrowed."
 	(setq bol (1- (point)))
 	;; Don't break before the first non-LWSP characters.
 	(skip-chars-forward " \t")
-	(unless (eobp) (forward-char 1))))))
+	(unless (eobp)
+	  (forward-char 1))))))
+
+(defun rfc2047-unfold-field ()
+  "Fold the current line."
+  (save-excursion
+    (save-restriction
+      (rfc2047-narrow-to-field)
+      (rfc2047-unfold-region (point-min) (point-max)))))
 
 (defun rfc2047-unfold-region (b e)
   "Unfold lines in region B to E."
