@@ -29,7 +29,7 @@
 (require 'gnus-cache)
 (require 'nnvirtual)
 (require 'gnus-sum)
-(eval-when-compile (require 'gnus-score))
+(eval-when-compile (require 'gnus-score) (require 'gnus-group))
 
 (defcustom gnus-agent-directory (nnheader-concat gnus-directory "agent/")
   "Where the Gnus agent will store its files."
@@ -319,10 +319,6 @@ fetched will be limited to it. If not a positive integer, never consider it."
   (interactive)
   (setq gnus-plugged t)
   (gnus))
-
-(defadvice gnus (after gnus-agent-advice activate preactivate)
-  "Update modeline."
-  (gnus-agent-toggle-plugged gnus-plugged))
 
 ;;;###autoload
 (defun gnus-agentize ()
@@ -1600,6 +1596,16 @@ The following commands are available:
     (gnus))
   (gnus-group-send-drafts)
   (gnus-agent-fetch-session))
+
+;;;
+;;; Advice
+;;;
+
+(defadvice gnus-group-get-new-news (after gnus-agent-advice
+					  activate preactivate)
+  "Update modeline."
+  (unless (interactive-p)
+    (gnus-agent-toggle-plugged gnus-plugged)))
 
 (provide 'gnus-agent)
 
