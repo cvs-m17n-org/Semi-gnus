@@ -1,3 +1,8 @@
+2001-12-10  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Code cleanup.  Fix a bug with "/copy".  From Frank
+	Schmitt <ich@Frank-Schmitt.net>.
+
 2001-12-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu-summary-buffer-name): Changed
