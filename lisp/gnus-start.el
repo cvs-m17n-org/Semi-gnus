@@ -386,9 +386,6 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system 'binary
-  "*Coding system for startup file.")
-
 ;;; Internal variables
 
 (defvar gnus-newsrc-file-version nil)
@@ -427,9 +424,7 @@ Can be used to turn version control on or off."
 		   (file-exists-p (concat file ".el"))
 		   (file-exists-p (concat file ".elc")))
 	       (condition-case var
-		   (let ((coding-system-for-read
-			  gnus-startup-file-coding-system))
-		     (load file nil t))
+		   (load file nil t)
 		 (error
 		  (error "Error in %s: %s" file var)))))))))
 
@@ -721,7 +716,6 @@ prompt the user for the name of an NNTP server to use."
   (unless (gnus-gethash "nndraft:drafts" gnus-newsrc-hashtb)
     (let ((gnus-level-default-subscribed 1))
       (gnus-subscribe-group "nndraft:drafts" nil '(nndraft "")))
-    (gnus-group-set-parameter "nndraft:drafts" 'charset "nil")
     (gnus-group-set-parameter
      "nndraft:drafts" 'gnus-dummy '((gnus-draft-mode)))))
 
@@ -786,7 +780,7 @@ prompt the user for the name of an NNTP server to use."
       (erase-buffer)
       (setq buffer-file-name dribble-file)
       (auto-save-mode t)
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (bury-buffer (current-buffer))
       (set-buffer-modified-p nil)
       (let ((auto (make-auto-save-file-name))
@@ -1104,16 +1098,11 @@ for new groups, and subscribe the new groups as zombies."
     got-new))
 
 (defun gnus-check-first-time-used ()
-  (catch 'ended
-    (let ((files (list gnus-current-startup-file
-		       (concat gnus-current-startup-file ".el")
-		       (concat gnus-current-startup-file ".eld")
-		       gnus-startup-file
-		       (concat gnus-startup-file ".el")
-		       (concat gnus-startup-file ".eld"))))
-      (while files
-	(when (file-exists-p (pop files))
-	  (throw 'ended nil))))
+  (if (or (> (length gnus-newsrc-alist) 1)
+	  (file-exists-p gnus-startup-file)
+	  (file-exists-p (concat gnus-startup-file ".el"))
+	  (file-exists-p (concat gnus-startup-file ".eld")))
+      nil
     (gnus-message 6 "First time user; subscribing you to default groups")
     (unless (gnus-read-active-file-p)
       (let ((gnus-read-active-file t))
@@ -1249,14 +1238,14 @@ for new groups, and subscribe the new groups as zombies."
 	    (setq active (gnus-active group))
 	    (setq num
 		  (if active (- (1+ (cdr active)) (car active)) t))
-           ;; Shorten the select method if possible, if we need to
-           ;; store it at all (native groups).
-           (let ((method (gnus-method-simplify 
-                          (or gnus-override-subscribe-method
-                              (gnus-group-method group)))))
-             (if method
-                 (setq info (list group level nil nil method))
-               (setq info (list group level nil)))))
+	    ;; Check whether the group is foreign.  If so, the
+	    ;; foreign select method has to be entered into the
+	    ;; info.
+	    (let ((method (or gnus-override-subscribe-method
+			      (gnus-group-method group))))
+	      (if (eq method gnus-select-method)
+		  (setq info (list group level nil))
+		(setq info (list group level nil nil method)))))
 	  (unless previous
 	    (setq previous
 		  (let ((p gnus-newsrc-alist))
@@ -1711,6 +1700,7 @@ newsgroup."
 		(gnus-message 5 "%sdone" mesg))))))
 	(setq methods (cdr methods))))))
 
+
 (defun gnus-ignored-newsgroups-has-to-p ()
   "Non-nil iff gnus-ignored-newsgroups includes \"^to\\\\.\" as an element."
   ;; note this regexp is the same as:
@@ -1777,13 +1767,13 @@ newsgroup."
 		       (progn
 			 (skip-chars-forward " \t")
 			 (not
-			  (or (eq (char-after) ?=)
-			      (eq (char-after) ?x)
-			      (eq (char-after) ?j)))))
+			  (or (= (following-char) ?=)
+			      (= (following-char) ?x)
+			      (= (following-char) ?j)))))
 		  (progn
 		    (set group (cons min max))
 		    ;; if group is moderated, stick in moderation table
-		    (when (eq (char-after) ?m)
+		    (when (= (following-char) ?m)
 		      (unless gnus-moderated-hashtb
 			(setq gnus-moderated-hashtb (gnus-make-hashtable)))
 		      (gnus-sethash (symbol-name group) t
@@ -1841,7 +1831,7 @@ newsgroup."
       (let (min max group)
 	(while (not (eobp))
 	  (condition-case ()
-	      (when (eq (char-after) ?2)
+	      (when (= (following-char) ?2)
 		(read cur) (read cur)
 		(setq min (read cur)
 		      max (read cur))
@@ -1882,7 +1872,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(save-excursion
 	  (gnus-message 5 "Reading %s..." newsrc-file)
 	  (set-buffer (nnheader-find-file-noselect newsrc-file))
-	  (buffer-disable-undo)
+	  (buffer-disable-undo (current-buffer))
 	  (gnus-newsrc-to-gnus-format)
 	  (kill-buffer (current-buffer))
 	  (gnus-message 5 "Reading %s...done" newsrc-file)))
@@ -1922,8 +1912,7 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
       (condition-case nil
-	  (let ((coding-system-for-read gnus-startup-file-coding-system))
-	    (load ding-file t t t))
+	  (load ding-file t t t)
 	(error
 	 (ding)
 	 (unless (gnus-yes-or-no-p
@@ -2058,7 +2047,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(unless (boundp symbol)
 	  (set symbol nil))
 	;; It was a group name.
-	(setq subscribed (eq (char-after) ?:)
+	(setq subscribed (= (following-char) ?:)
 	      group (symbol-name symbol)
 	      reads nil)
 	(if (eolp)
@@ -2082,7 +2071,7 @@ If FORCE is non-nil, the .newsrc file is read."
 			   (read buf)))
 	      (widen)
 	      ;; If the next character is a dash, then this is a range.
-	      (if (eq (char-after) ?-)
+	      (if (= (following-char) ?-)
 		  (progn
 		    ;; We read the upper bound of the range.
 		    (forward-char 1)
@@ -2104,8 +2093,8 @@ If FORCE is non-nil, the .newsrc file is read."
 		(push num1 reads))
 	      ;; If the next char in ?\n, then we have reached the end
 	      ;; of the line and return nil.
-	      (not (eq (char-after) ?\n)))
-	     ((eq (char-after) ?\n)
+	      (/= (following-char) ?\n))
+	     ((= (following-char) ?\n)
 	      ;; End of line, so we end.
 	      nil)
 	     (t
@@ -2231,7 +2220,7 @@ If FORCE is non-nil, the .newsrc file is read."
 		  (gnus-point-at-eol)))
 	;; Search for all "words"...
 	(while (re-search-forward "[^ \t,\n]+" eol t)
-	  (if (eq (char-after (match-beginning 0)) ?!)
+	  (if (= (char-after (match-beginning 0)) ?!)
 	      ;; If the word begins with a bang (!), this is a "not"
 	      ;; spec.  We put this spec (minus the bang) and the
 	      ;; symbol `ignore' into the list.
@@ -2279,13 +2268,12 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (setq buffer-file-name
 		(concat gnus-current-startup-file ".eld"))
 	  (setq default-directory (file-name-directory buffer-file-name))
-	  (buffer-disable-undo)
+	  (buffer-disable-undo (current-buffer))
 	  (erase-buffer)
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (let ((coding-system-for-write gnus-startup-file-coding-system))
-	    (save-buffer))
+	  (save-buffer)
 	  (kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
@@ -2343,7 +2331,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  info ranges range method)
       (setq buffer-file-name gnus-current-startup-file)
       (setq default-directory (file-name-directory buffer-file-name))
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       ;; Write options.
       (when gnus-newsrc-options
@@ -2429,6 +2417,7 @@ If FORCE is non-nil, the .newsrc file is read."
       (gnus-message 7 "Reading slave newsrcs...")
       (save-excursion
 	(set-buffer (gnus-get-buffer-create " *gnus slave*"))
+	(buffer-disable-undo (current-buffer))
 	(setq slave-files
 	      (sort (mapcar (lambda (file)
 			      (list (nth 5 (file-attributes file)) file))
@@ -2534,8 +2523,8 @@ If FORCE is non-nil, the .newsrc file is read."
 			  enable-multibyte-characters
 			  (fboundp 'gnus-mule-get-coding-system)
 			  (gnus-mule-get-coding-system (symbol-name group)))))
-		(when coding
-		  (setq str (mm-decode-coding-string str (car coding))))
+		(if coding
+		    (setq str (gnus-decode-coding-string str (car coding))))
 		(set group str)))
 	    (forward-line 1))))
       (gnus-message 5 "Reading descriptions file...done")

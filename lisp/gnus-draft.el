@@ -1,8 +1,10 @@
-;;; gnus-draft.el --- draft message support for Gnus
+;;; gnus-draft.el --- draft message support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;; Keywords: mail, news, MIME, offline
 
 ;; This file is part of GNU Emacs.
 
@@ -94,11 +96,9 @@
   (interactive)
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup article gnus-newsgroup-name)
+    (gnus-draft-setup-for-editing article gnus-newsgroup-name)
     (set-buffer-modified-p t)
     (save-buffer)
-    (let ((gnus-verbose-backends nil))
-      (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
      `((lambda ()
 	 (when (gnus-buffer-exists-p ,gnus-summary-buffer)
@@ -115,14 +115,13 @@
     (while (setq article (pop articles))
       (gnus-summary-remove-process-mark article)
       (unless (memq article gnus-newsgroup-unsendable)
-	(gnus-draft-send article gnus-newsgroup-name t)
+	(gnus-draft-send article gnus-newsgroup-name)
 	(gnus-summary-mark-article article gnus-canceled-mark)))))
 
-(defun gnus-draft-send (article &optional group interactive)
+(defun gnus-draft-send (article &optional group)
   "Send message ARTICLE."
-  (gnus-draft-setup article (or group "nndraft:queue"))
-  (let ((message-syntax-checks (if interactive nil
-				 'dont-check-for-anything-just-trust-me))
+  (gnus-draft-setup-for-sending article (or group "nndraft:queue"))
+  (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me)
 	message-send-hook type method)
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
@@ -136,16 +135,25 @@
 	(message-remove-header gnus-agent-meta-information-header)))
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (when (and (or (null method)
-		   (gnus-server-opened method)
-		   (gnus-open-server method))
-	       (if type
-		   (let ((message-this-is-news (eq type 'news))
-			 (message-this-is-mail (eq type 'mail))
-			 (gnus-post-method method)
-			 (message-post-method method))
-		     (message-send-and-exit))
-		 (message-send-and-exit)))
+    (when (let ((mail-header-separator ""))
+	    (cond ((eq type 'news)
+		   (mime-edit-maybe-split-and-send
+		    (function
+		     (lambda ()
+		       (interactive)
+		       (funcall message-send-news-function method)
+		       )))
+		   (funcall message-send-news-function method)
+		   )
+		  ((eq type 'mail)
+		   (mime-edit-maybe-split-and-send
+		    (function
+		     (lambda ()
+		       (interactive)
+		       (funcall message-send-mail-function)
+		       )))
+		   (funcall message-send-mail-function)
+		   t)))
       (let ((gnus-verbose-backends nil))
 	(gnus-request-expire-articles
 	 (list article) (or group "nndraft:queue") t)))))
@@ -173,13 +181,19 @@
 
 ;;; Utility functions
 
+(defcustom gnus-draft-decoding-function
+  #'mime-edit-decode-message-in-buffer
+  "*Function called to decode the message from network representation."
+  :group 'gnus-agent
+  :type 'function)
+
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!This is because `gnus-setup-message' uses uninterned symbols.
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
 (progn
-(defun gnus-draft-setup (narticle group)
+(defun gnus-draft-setup-for-editing (narticle group)
   (gnus-setup-message 'forward
     (let ((article narticle))
       (message-mail)
@@ -187,12 +201,26 @@
       (if (not (gnus-request-restore-buffer article group))
 	  (error "Couldn't restore the article")
 	;; Insert the separator.
+	(funcall gnus-draft-decoding-function)
 	(goto-char (point-min))
 	(search-forward "\n\n")
 	(forward-char -1)
 	(insert mail-header-separator)
 	(forward-line 1)
 	(message-set-auto-save-file-name))))))
+;;
+(defvar gnus-draft-send-draft-buffer " *send draft*")
+(progn
+(defun gnus-draft-setup-for-sending (narticle group)
+  (let ((article narticle))
+    (if (not (get-buffer gnus-draft-send-draft-buffer))
+	(get-buffer-create gnus-draft-send-draft-buffer))
+    (set-buffer gnus-draft-send-draft-buffer)
+    (erase-buffer)
+    (if (not (gnus-request-restore-buffer article group))
+	(error "Couldn't restore the article")
+      ))))
+;; For draft TEST
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."
