@@ -698,7 +698,13 @@ Modify to suit your needs."))
 (defun dgnushack-make-cus-load ()
   (when (condition-case nil
 	    (load "cus-dep")
-	  (error nil))
+	  (error
+	   (when (boundp 'MULE)
+	     (if (file-exists-p "../contrib/cus-dep.el")
+		 ;; Use cus-dep.el of the version of Emacs 20.7.
+		 (load-file "../contrib/cus-dep.el")
+	       (error "\
+You need contrib/cus-dep.el to build T-gnus with Mule 2.3@19.34; exiting.")))))
     (let ((cusload-base-file dgnushack-cus-load-file))
       (if (fboundp 'custom-make-dependencies)
 	  (custom-make-dependencies)

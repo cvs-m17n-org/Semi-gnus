@@ -65,6 +65,10 @@ By the way, the latest CUSTOM package for Emacs v19 is available from:
 
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 
+However, since the `custom-make-dependencies' function does not exist
+in this version of CUSTOM, we will use the contrib/cus-dep.el which is
+imported from Emacs 20.7 when building T-gnus.
+
 
 INSTALL regexp-opt.el
 =====================

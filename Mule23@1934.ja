@@ -63,9 +63,13 @@ ftp://ftp.jpl.org/pub/m17n/clime-1_14-************.tar.gz
  	    (let* ((frames (frame-list))
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 
-なお Emacs v19 用の最新の CUSTOM は以下のものを入手することができます。
+なお、Emacs v19 用の最新の CUSTOM は以下のものを入手することができます。
 
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
+
+ただし、この版の CUSTOM には `custom-make-dependencies' 関数が無いので、
+T-gnus の生成時に Emacs 20.7 から移入した contrib/cus-dep.el を使いま
+す。
 
 
 INSTALL regexp-opt.el

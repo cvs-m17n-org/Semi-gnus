@@ -1,3 +1,10 @@
+2003-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-make-cus-load): Use
+	contrib/cus-dep.el to build T-gnus with Mule 2.
+
+	* contrib/cus-dep.el: Imported from Emacs 20.7 for Mule 2.
+
 2003-11-03  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
 
 	* lisp/message.el (message-forward-subject-name-subject): Fixed.
