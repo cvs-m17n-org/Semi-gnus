@@ -37,9 +37,6 @@
 (require 'alist)
 (require 'mime-view)
 
-(or (string< "1" eword-decode-version)
-    (error "Please install latest SEMI."))
-
 (defgroup gnus-article nil
   "Article display."
   :link '(custom-manual "(gnus)The Article Buffer")
