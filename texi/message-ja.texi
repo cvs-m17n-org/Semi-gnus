@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message-ja
-@settitle Message 5.6.22 Manual
+@settitle Message 5.6.33 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -431,8 +431,9 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 @item C-c C-y
 @kindex C-c C-y
 @findex message-yank-original
-返答するメッセージをメッセージバッファに貼り付けます 
-(@code{messsage-yank-original})。
+バッファ @code{gnus-article-copy} にあるメッセージをメッセージバッファに
+貼り付けます。普通は @code{gnus-article-copy} はあなたが返答しようとして
+いるメッセージです (@code{messsage-yank-original})。
 
 @item C-c C-q
 @kindex C-c C-q
@@ -1137,6 +1138,18 @@ Message はあなたがメッセージバッファを要求したときに、他に無い唯一のバッ
 す。もしこれが関数なら、その関数を3つの引数と共に呼びます: 型、送り先ア
 ドレス、グループ名 です。 (これらのどれでも @code{nil} であるかもしれま
 せん。) 関数は新しいバッファ名を返すべきです。
+
+@item message-use-multi-frames
+@vindex message-use-multi-frames
+@code{nil} でなければ、新しいフレームを作成します。初期値は @code{nil} 
+です。
+
+@item message-delete-frame-on-exit
+@vindex messgae-delete-frame-on-exit
+変数 @code{message-delete-frame-on-exit} はメッセージを送信したときと、
+バッファを切ったときにフレームを消去するかを決定します。@code{nil} であ
+れば、(これが初期設定ですが) フレームを消去しません。@code{ask} であれば、
+消去するかどうかを利用者に尋ねます。@code{t} であれば、常に消去します。
 
 @item message-max-buffers
 @vindex message-max-buffers

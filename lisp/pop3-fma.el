@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.00
+;; Version: 1.10
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -41,11 +41,17 @@
 ;;  (require 'pop3-fma)
 ;;  (setq pop3-fma-spool-file-alist
 ;;        '(
-;;  	    "po:username0@mailhost0.your.domain0"
-;;	    "po:username1@mailhost1.your.domain1"
+;;  	    ("po:username0@mailhost0.your.domain0" pass)
+;;	    ("po:username1@mailhost1.your.domain1" apop)
 ;;                         :
 ;;                         :
 ;;	   ))
+;;
+;;	pass means normal authentication USER/PASS.
+;;	apop means authentication using APOP.
+;;
+;; When using apop , Please set pop3-fma-movemail-type 'lisp.
+;; movemail.exe does not work on APOP protocol.
 ;;
 ;; Variables
 ;;
@@ -84,7 +90,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.00")
+(defconst pop3-fma-version-number "1.10")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -92,8 +98,8 @@
 ;;  "Rock'n Roll city"		; 0.13
 ;;  "Money"			; 0.20
 ;;  "Still 19"       		; 0.21
-  "J boy"          		; 1.00
-;;  "Blood line"		; 0.xx
+;;  "J boy"          		; 1.00
+  "Blood line"			; 1.10
 ;;  "Star ring"			; 0.xx
 ;;  "Goodbye Game"		; 0.xx
   )
@@ -105,9 +111,10 @@
   "*Spool file to get mail using pop3 protocol.
 You should specify this variable like
  '(
-   \"po:user1@mailhost1\"
-   \"po:user2@mailhost2\"
-  )"
+   (\"po:user1@mailhost1\" type)
+   (\"po:user2@mailhost2\" type)
+  )
+Type must be pass or apop."
   :group 'pop3-fma
   :type 'alist)
 
@@ -134,7 +141,7 @@ Lisp means `nnmail-movemail-program' is lisp function.
 (defvar pop3-fma-password nil
   "*POP3 password , user , mailhost information for Gnus.")
 
-(defvar pop3-fma-movemail-program "movemail"
+(defvar pop3-fma-movemail-program "movemail.exe"
   "*External program name your movemail.
 Please do not set this valiable non-nil if you do not use Meadow.")
 
@@ -167,30 +174,35 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 	       (substring inbox (match-end (string-match "^po:" inbox))
 			  (- (match-end (string-match "^.*@" inbox)) 1)))
 	      (pop3-mailhost
-	       (substring inbox (match-end (string-match "^.*@" inbox)))))
-	  (let ((pop3-password
-		 (pop3-fma-read-passwd pop3-mailhost)))
-	    (message "Checking new mail user %s at %s..." pop3-maildrop pop3-mailhost)
-	    (if (and (eq system-type 'windows-nt)
-		     (eq pop3-fma-movemail-type 'exe))
-		(progn
-		  (setenv "MAILHOST" pop3-mailhost)
-		  (if (and (not (memq pop3-password pop3-fma-movemail-arguments))
-			   (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
-		      (progn
-			(setq pop3-fma-movemail-arguments nil)
-			(setq pop3-fma-movemail-arguments
-			      (append pop3-fma-movemail-options
-				      (list
-				       (concat "po:" pop3-maildrop)
-				       crashbox
-				       pop3-password)))))
-		  (apply 'call-process (concat
-					exec-directory
-					pop3-fma-movemail-program)
-			 nil nil nil
-			 pop3-fma-movemail-arguments))
-	      (pop3-movemail crashbox)))))
+	       (substring inbox (match-end (string-match "^.*@" inbox))))
+	      (pop3-password
+	       (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox)))))
+	      (pop3-authentication-scheme
+	       (nth 1 (assoc inbox pop3-fma-spool-file-alist)))
+	      (pop3-fma-movemail-type (pop3-fma-get-movemail-type inbox)))
+	  (if (eq pop3-authentication-scheme 'pass)
+	      (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)
+	    (message "Checking new mail user %s at %s using APOP ..." pop3-maildrop pop3-mailhost))
+	  (if (and (eq system-type 'windows-nt)
+		   (eq pop3-fma-movemail-type 'exe))
+	      (progn
+		(setenv "MAILHOST" pop3-mailhost)
+		(if (and (not (memq pop3-password pop3-fma-movemail-arguments))
+			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
+		    (progn
+		      (setq pop3-fma-movemail-arguments nil)
+		      (setq pop3-fma-movemail-arguments
+			    (append pop3-fma-movemail-options
+				    (list
+				     (concat "po:" pop3-maildrop)
+				     crashbox
+				     pop3-password)))))
+		(apply 'call-process (concat
+				      exec-directory
+				      pop3-fma-movemail-program)
+		       nil nil nil
+		       pop3-fma-movemail-arguments))
+	    (pop3-movemail crashbox))))
     (message "Checking new mail at %s ... " inbox)
     (call-process (concat exec-directory pop3-fma-movemail-program)
 		  nil
@@ -231,17 +243,20 @@ Please do not set this valiable non-nil if you do not use Meadow.")
   (mapcar
    (lambda (x)
      (let ((pop3-maildrop
-	    (substring x (match-end (string-match "^po:" x))
-		       (- (match-end (string-match "^.*@" x)) 1)))
+	    (substring (car x) (match-end (string-match "^po:" (car x)))
+		       (- (match-end (string-match "^.*@" (car x))) 1)))
 	   (pop3-mailhost
-	    (substring x (match-end (string-match "^.*@" x)))))
+	    (substring (car x) (match-end (string-match "^.*@" (car x))))))
        (call-interactively 'pop3-fma-store-password)))
    pop3-fma-spool-file-alist)
   (setq nnmail-movemail-program 'pop3-fma-movemail)
 ;;  (setq nnmail-spool-file pop3-fma-spool-file-alist))
   (setq nnmail-spool-file (append
 			   pop3-fma-local-spool-file-alist
-			   pop3-fma-spool-file-alist)))
+			   (mapcar
+			    (lambda (spool)
+			      (car spool))
+			    pop3-fma-spool-file-alist))))
 ;;
 (defun pop3-fma-read-noecho (prompt &optional stars)
   "Read a single line of text from user without echoing, and return it.
@@ -288,7 +303,6 @@ Argument PROMPT ."
   
 ;;
 ;; Add your custom header.
-;;
 (defun pop3-fma-add-custom-header (header string)
   (let ((delimline
 	 (progn (goto-char (point-min))
@@ -305,6 +319,12 @@ Argument PROMPT ."
 	  (setq str (concat hdr string))
 	  (setq hdr (concat str "\n"))
 	  (insert-string hdr)))))
+;;
+;;
+(defun pop3-fma-get-movemail-type (inbox)
+  (if (eq (nth 1 (assoc inbox pop3-fma-spool-file-alist)) 'apop)
+      lisp
+    pop3-fma-movemail-type))
 ;;
 (provide 'pop3-fma)
 ;;
