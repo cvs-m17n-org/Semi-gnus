@@ -4,7 +4,7 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3g
+;; Version: 1.3j
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3g")
+(defconst pop3-version "1.3j")
 
 (defvar pop3-maildrop (or user-login-name (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -72,9 +72,15 @@ Used for APOP authentication.")
   (let* ((process (pop3-open-server pop3-mailhost pop3-port))
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
-	 message-count)
+	 message-count
+	 (pop3-password pop3-password)
+	 )
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
+    ;; query for password
+    (if (and pop3-password-required (not pop3-password))
+	(setq pop3-password
+	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
     (cond ((equal 'apop pop3-authentication-scheme)
 	   (pop3-apop process pop3-maildrop))
 	  ((equal 'pass pop3-authentication-scheme)
@@ -112,10 +118,11 @@ Returns the process associated with the connection."
 	(process))
     (save-excursion
       (set-buffer process-buffer)
-      (erase-buffer))
+      (erase-buffer)
+      (setq pop3-read-point (point-min))
+      )
     (setq process
 	  (open-network-stream "POP" process-buffer mailhost port))
-    (setq pop3-read-point (point-min))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
@@ -255,45 +262,19 @@ Return the response string if optional second argument is non-nil."
 
 (defun pop3-pass (process)
   "Send authentication information to the server."
-  (let ((pass pop3-password))
-    (if (and pop3-password-required (not pass))
-	(setq pass
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
-    (if pass
-	(progn
-	  (pop3-send-command process (format "PASS %s" pass))
-	  (let ((response (pop3-read-response process t)))
-	    (if (not (and response (string-match "+OK" response)))
-		(pop3-quit process)))))
-    ))
-
-(defvar pop3-md5-program "md5"
-  "*Program to encode its input in MD5.")
-
-(defun pop3-md5 (string)
-  (nnheader-temp-write nil
-    (insert string)
-    (call-process-region (point-min) (point-max)
-			 (or shell-file-name "/bin/sh")
-			 t (current-buffer) nil
-			 "-c" pop3-md5-program)
-    ;; The meaningful output is the first 32 characters.
-    ;; Don't return the newline that follows them!
-    (buffer-substring (point-min) (+ (point-min) 32))))
+  (pop3-send-command process (format "PASS %s" pop3-password))
+  (let ((response (pop3-read-response process t)))
+    (if (not (and response (string-match "+OK" response)))
+	(pop3-quit process))))
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
-  (let ((pass pop3-password))
-    (if (and pop3-password-required (not pass))
-	(setq pass
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
-    (if pass
-	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
-	  (pop3-send-command process (format "APOP %s %s" user hash))
-	  (let ((response (pop3-read-response process t)))
-	    (if (not (and response (string-match "+OK" response)))
-		(pop3-quit process)))))
-    ))
+  (if (not (fboundp 'md5)) (autoload 'md5 "md5"))
+  (let ((hash (md5 (concat pop3-timestamp pop3-password))))
+    (pop3-send-command process (format "APOP %s %s" user hash))
+    (let ((response (pop3-read-response process t)))
+      (if (not (and response (string-match "+OK" response)))
+	  (pop3-quit process)))))
 
 ;; TRANSACTION STATE
 
@@ -318,13 +299,15 @@ This function currently does nothing.")
       (set-buffer (process-buffer process))
       (while (not (re-search-forward "^\\.\r\n" nil t))
 	(accept-process-output process 3)
-	;; bill@att.com ... to save wear and tear on the heap
-	(if (> (buffer-size)  20000) (sleep-for 1))
-	(if (> (buffer-size)  50000) (sleep-for 1))
-	(if (> (buffer-size) 100000) (sleep-for 1))
-	(if (> (buffer-size) 200000) (sleep-for 1))
-	(if (> (buffer-size) 500000) (sleep-for 1))
-	;; bill@att.com
+;	;; bill@att.com ... to save wear and tear on the heap
+;	(if (> (buffer-size)  20000) (sleep-for 1))
+;	(if (> (buffer-size)  50000) (sleep-for 1))
+;	(if (> (buffer-size) 100000) (sleep-for 1))
+;	(if (> (buffer-size) 200000) (sleep-for 1))
+;	(if (> (buffer-size) 500000) (sleep-for 1))
+;	;; bill@att.com
+	;; condensed into:
+	(if (> (buffer-size) 20000) (sleep-for (/ (buffer-size) 20000)))
 	(goto-char start))
       (setq pop3-read-point (point-marker))
 ;; this code does not seem to work for some POP servers...
