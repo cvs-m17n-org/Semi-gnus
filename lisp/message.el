@@ -2595,7 +2595,18 @@ be added to \"References\" field.
 	 (when message-indent-citation-function
 	   (if (listp message-indent-citation-function)
 	       message-indent-citation-function
-	     (list message-indent-citation-function)))))
+	     (list message-indent-citation-function))))
+	(message-reply-headers (or message-reply-headers
+				   (make-mail-header))))
+    (mail-header-set-from message-reply-headers
+			  (save-restriction
+			    (narrow-to-region
+			     (point)
+			     (if (search-forward "\n\n" nil t)
+				 (1- (point))
+			       (point-max)))
+			    (or (message-fetch-field "from")
+				"unknown sender")))
     ;; Allow undoing.
     (undo-boundary)
     (goto-char end)
