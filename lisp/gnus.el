@@ -268,11 +268,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.4"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "00"
+(defconst gnus-revision-number "01"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.99"
-    "Version number for this version of Gnus.")
+  "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
 
