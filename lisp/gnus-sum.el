@@ -7419,8 +7419,7 @@ groups."
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
 		     (cdr gnus-article-current) (car gnus-article-current)
-		     (current-buffer)
-		     (not gnus-article-decoded-p))))
+		     (current-buffer))))
 	  (error "Couldn't replace article")
 	;; Update the summary buffer.
 	(if (and references

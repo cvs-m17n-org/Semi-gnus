@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.3 $
+;; $Revision: 1.1.2.4 $
 ;; Keywords: news HZ 
 ;; Time-stamp: <Tue Oct  6 23:48:49 EDT 1998 zsh>
   

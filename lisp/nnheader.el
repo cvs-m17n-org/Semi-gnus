@@ -109,7 +109,7 @@ on your system, you could say something like:
 
 ;;(defmacro mail-header-set-extra (entity extra)
 ;;  "Set the extra headers in ENTITY to EXTRA."
-;;  `(aset ,entity 23 ,extra))
+;;  `(aset ,entity 23 ',extra))
 (defalias 'mail-header-set-extra 'ignore)
 
 (defsubst make-full-mail-header
