@@ -1412,6 +1412,7 @@ increase the score of each group you read."
     "c" gnus-summary-catchup-and-exit
     "C" gnus-summary-catchup-all-and-exit
     "E" gnus-summary-exit-no-update
+    "J" gnus-summary-jump-to-other-group
     "Q" gnus-summary-exit
     "Z" gnus-summary-exit
     "n" gnus-summary-catchup-and-goto-next-group
@@ -2647,6 +2648,7 @@ the thread are to be displayed."
 	     (make-local-variable (car elem))
 	     (set (car elem) (eval (nth 1 elem))))))))
 
+(defalias 'gnus-summary-jump-to-other-group 'gnus-summary-read-group)
 (defun gnus-summary-read-group (group &optional show-all no-article
 				      kill-buffer no-display backward
 				      select-articles)
@@ -2654,27 +2656,44 @@ the thread are to be displayed."
 If SHOW-ALL is non-nil, already read articles are also listed.
 If NO-ARTICLE is non-nil, no article is selected initially.
 If NO-DISPLAY, don't generate a summary buffer."
-  (let (result)
-    (while (and group
-		(null (setq result
-			    (let ((gnus-auto-select-next nil))
-			      (or (gnus-summary-read-group-1
-				   group show-all no-article
-				   kill-buffer no-display
-				   select-articles)
-				  (setq show-all nil
-					select-articles nil)))))
-		(eq gnus-auto-select-next 'quietly))
-      (set-buffer gnus-group-buffer)
-      ;; The entry function called above goes to the next
-      ;; group automatically, so we go two groups back
-      ;; if we are searching for the previous group.
-      (when backward
-	(gnus-group-prev-unread-group 2))
-      (if (not (equal group (gnus-group-group-name)))
-	  (setq group (gnus-group-group-name))
-	(setq group nil)))
-    result))
+  (interactive
+   (if (eq gnus-summary-buffer (current-buffer))
+       (list (completing-read
+	      "Group: " gnus-active-hashtb nil t
+	      (when (and gnus-newsgroup-name
+			 (string-match "[.:][^.:]+$" gnus-newsgroup-name))
+		(substring gnus-newsgroup-name 0 (1+ (match-beginning 0))))
+	      'gnus-group-history)
+	     current-prefix-arg)
+     (error "%s must be invoked from a gnus summary buffer." this-command)))
+  (unless (and (interactive-p)
+	       (or (zerop (length group))
+		   (and gnus-newsgroup-name
+			(string-equal gnus-newsgroup-name group))
+		   (progn
+		     (gnus-summary-exit)
+		     nil)))
+    (let (result)
+      (while (and group
+		  (null (setq result
+			      (let ((gnus-auto-select-next nil))
+				(or (gnus-summary-read-group-1
+				     group show-all no-article
+				     kill-buffer no-display
+				     select-articles)
+				    (setq show-all nil
+					  select-articles nil)))))
+		  (eq gnus-auto-select-next 'quietly))
+	(set-buffer gnus-group-buffer)
+	;; The entry function called above goes to the next
+	;; group automatically, so we go two groups back
+	;; if we are searching for the previous group.
+	(when backward
+	  (gnus-group-prev-unread-group 2))
+	(if (not (equal group (gnus-group-group-name)))
+	    (setq group (gnus-group-group-name))
+	  (setq group nil)))
+      result)))
 
 (defun gnus-summary-read-group-1 (group show-all no-article
 					kill-buffer no-display
