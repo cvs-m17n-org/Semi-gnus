@@ -1,3 +1,11 @@
+1999-06-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 17.
+
+	* lisp/gnus-art.el (gnus-article-display-x-face-with-x-face-mule):
+	Warn if it is used with X-Face 0.25 or later.  Note that it should
+	be abolished in the future.
+
 1999-06-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 16.
