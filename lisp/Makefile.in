@@ -73,9 +73,6 @@ install-package-manifest:
 	$(EMACS_COMP) -f dgnushack-install-package-manifest \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
-compose-package: gnus-load.el
-	$(EMACS_COMP) -f dgnushack-compose-package
-
 remove-extra-files-in-package:
 	$(EMACS_COMP) -f dgnushack-remove-extra-files-in-package \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)

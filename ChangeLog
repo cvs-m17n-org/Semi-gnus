@@ -1,3 +1,21 @@
+2003-10-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (install-package): Don't call `compose-package'.
+	(install-package-ja): Ditto.
+	(package): Ditto.
+	(package-ja): Ditto.
+	(compose-package): Abolish.
+
+	* lisp/Makefile.in (compose-package): Abolish.
+
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	gnus-load.el when using XEmacs.
+	(dgnushack-dont-compile-files): Add gnus-load.el.
+	(dgnushack-auto-load-file): Abolish.
+	(dgnushack-make-auto-load): Don't delete the file specified by
+	`dgnushack-auto-load-file'.
+	(dgnushack-compose-package): Abolish.
+
 2003-08-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-treat-display-x-face): Use `set-default'
