@@ -784,7 +784,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
   "Regexp that matches numerical full file paths.")
 
 (defsubst nnheader-file-to-number (file)
-  "Take a file name and return the article number."
+  "Take a FILE name and return the article number."
   (if (string= nnheader-numerical-short-files "^[0-9]+$")
       (string-to-int file)
     (string-match nnheader-numerical-short-files file)
@@ -802,7 +802,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
       second)))
 
 (defun nnheader-directory-articles (dir)
-  "Return a list of all article files in a directory."
+  "Return a list of all article files in directory DIR."
   (mapcar 'nnheader-file-to-number
 	  (nnheader-directory-files-safe
 	   dir nil nnheader-numerical-short-files t)))
@@ -829,7 +829,7 @@ If FULL, translate everything."
 	  ;; Do complete translation.
 	  (setq leaf (copy-sequence file)
 		path ""
-		i (if (and (< 1 (length leaf)) (eq ?: (aref leaf 1))) 
+		i (if (and (< 1 (length leaf)) (eq ?: (aref leaf 1)))
 		      2 0))
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
@@ -876,17 +876,20 @@ without formatting."
       (apply 'insert format args))
     t))
 
-(defun nnheader-replace-chars-in-string (string from to)
-  "Replace characters in STRING from FROM to TO."
-  (let ((string (substring string 0))	;Copy string.
-	(len (length string))
-	(idx 0))
-    ;; Replace all occurrences of FROM with TO.
-    (while (< idx len)
-      (when (= (aref string idx) from)
-	(aset string idx to))
-      (setq idx (1+ idx)))
-    string))
+(if (fboundp 'subst-char-in-string)
+    (defsubst nnheader-replace-chars-in-string (string from to)
+      (subst-char-in-string from to string))
+  (defun nnheader-replace-chars-in-string (string from to)
+    "Replace characters in STRING from FROM to TO."
+    (let ((string (substring string 0))	;Copy string.
+	  (len (length string))
+	  (idx 0))
+      ;; Replace all occurrences of FROM with TO.
+      (while (< idx len)
+	(when (= (aref string idx) from)
+	  (aset string idx to))
+	(setq idx (1+ idx)))
+      string)))
 
 (defun nnheader-replace-duplicate-chars-in-string (string from to)
   "Replace characters in STRING from FROM to TO."
@@ -954,7 +957,7 @@ without formatting."
       (and (listp form) (eq (car form) 'lambda))))
 
 (defun nnheader-concat (dir &rest files)
-  "Concat DIR as directory to FILE."
+  "Concat DIR as directory to FILES."
   (apply 'concat (file-name-as-directory dir) files))
 
 (defun nnheader-ms-strip-cr ()
@@ -1081,11 +1084,11 @@ find-file-hooks, etc.
      (set-buffer cur)))
 
 (defun nnheader-replace-string (from to)
-  "Do a fast replacement of FROM to TO from point to point-max."
+  "Do a fast replacement of FROM to TO from point to `point-max'."
   (nnheader-skeleton-replace from to))
 
 (defun nnheader-replace-regexp (from to)
-  "Do a fast regexp replacement of FROM to TO from point to point-max."
+  "Do a fast regexp replacement of FROM to TO from point to `point-max'."
   (nnheader-skeleton-replace from to t))
 
 (defun nnheader-strip-cr ()
