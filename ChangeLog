@@ -1,3 +1,8 @@
+1998-09-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/nnmh.el (nnmh-request-accept-article): Insert `Message-ID'
+	only if `group' name is neither "queue" nor "draft".
+
 1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* texi/gnus-ja.texi: Sync up with Semi-gnus 6.8.19.
