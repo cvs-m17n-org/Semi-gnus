@@ -36,6 +36,7 @@
 (eval-when-compile
   (require 'cl)
   (autoload 'vm-mode "vm")
+  (autoload 'vm-read-file-name "vm")
   (autoload 'vm-save-message "vm"))
 
 (when (not (featurep 'vm))
@@ -89,7 +90,7 @@ save those articles instead."
      (list
       prefix-arg
       (unless (zerop articles)
-	(read-file-name
+	(vm-read-file-name
 	 (format
 	  "Save %s in VM folder: "
 	  (cond ((eq 1 articles)
@@ -132,9 +133,9 @@ save those articles instead."
   (interactive
    (let (default-folder)
      (setq default-folder (or (car vm-folder-history) vm-primary-inbox))
-     (list (read-file-name "Save this article in VM folder: "
-			   (if default-folder "" vm-folder-directory)
-			   nil nil default-folder 'vm-folder-history))))
+     (list (vm-read-file-name "Save this article in VM folder: "
+			      (if default-folder "" vm-folder-directory)
+			      nil nil default-folder 'vm-folder-history))))
   (unless (interactive-p)
     (setq folder (or folder gnus-summary-save-article-vm-folder)))
   (unless folder
