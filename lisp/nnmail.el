@@ -177,13 +177,22 @@ Eg.:
   "*Where the mail backends will look for incoming mail.
 This variable is \"/usr/spool/mail/$user\" by default.
 If this variable is nil, no mail backends will read incoming mail.
-If this variable is a list, all files mentioned in this list will be
-used as incoming mailboxes.
 If this variable is a directory (i. e., it's name ends with a \"/\"),
-treat all files in that directory as incoming spool files."
+treat all files in that directory as incoming spool files.
+If this valiable is a POP3 account (\"po:ACCOUNT\": use 
+\`nnmail-default-mail-host\' as POP3 server host.
+\"po:ACCOUNT@HOST.DOMAIN\": use \`HOST.DOMAIN\' as POP3 server host.
+If this variable is a list, all files mentioned in this list will be
+used as incoming mailboxes."
   :group 'nnmail-files
   :type '(choice (file :tag "File")
 		 (repeat :tag "Files" file)))
+
+(defcustom nnmail-default-mail-host (getenv "MAILHOST")
+  "*Default mail POP server address.
+This variable gets from environment variable \"MAILHOST\" by default."
+  :group 'nnmail-files
+  :type 'string)
 
 (defcustom nnmail-crash-box "~/.gnus-crash-box"
   "File where Gnus will store mail while processing it."
@@ -452,7 +461,8 @@ parameter.  It should return nil, `warn' or `delete'."
 (defvar nnmail-current-spool nil)
 
 (defvar nnmail-pop-password nil
-  "*Password to use when reading mail from a POP server, if required.")
+  "*Password to use when reading mail from a POP server, if required.
+If this variable is `t', do not use password cache.")
 
 (defvar nnmail-split-fancy-syntax-table nil
   "Syntax table used by `nnmail-split-fancy'.")
@@ -469,6 +479,7 @@ parameter.  It should return nil, `warn' or `delete'."
   "List of inboxes that have been moved.")
 
 (defvar nnmail-internal-password nil)
+(defvar nnmail-internal-password-cache nil)
 
 (defvar nnmail-split-tracing nil)
 (defvar nnmail-split-trace nil)
@@ -479,6 +490,25 @@ parameter.  It should return nil, `warn' or `delete'."
   "nnmail version.")
 
 
+
+(defun nnmail-parse-spool-file-name (inbox)
+  (let (cooked-inbox mail-host)
+    (if (string-match "^po:\\([^@]*\\)\\(@\\(.*$\\)\\|$\\)" inbox)
+	(setq cooked-inbox (match-string 1 inbox)
+	      mail-host (match-string 3 inbox))
+      (setq cooked-inbox inbox))
+    (cons cooked-inbox
+	  (or (and mail-host
+		   (not (string-equal mail-host ""))
+		   mail-host)
+	      (or nnmail-default-mail-host
+		  (setq nnmail-default-mail-host (getenv "MAILHOST")))))))
+
+(defmacro nnmail-spool-maildrop (inbox-info)
+  `(car ,inbox-info))
+
+(defmacro nnmail-spool-mailhost (inbox-info)
+  `(cdr ,inbox-info))
 
 (defun nnmail-request-post (&optional server)
   (mail-send-and-exit nil))
@@ -563,6 +593,23 @@ parameter.  It should return nil, `warn' or `delete'."
     (list (- (+ (car current) (if rest -1 0)) (car time))
 	  (- (+ (or rest 0) (nth 1 current)) (nth 1 time)))))
 
+(defun nnmail-get-password (inbox)
+  (let (password)
+    (unless (eq nnmail-internal-password-cache t)
+      (when (stringp nnmail-internal-password-cache)
+	(setq nnmail-internal-password-cache
+	      (cons nil nnmail-internal-password-cache)))
+      (setq password (cdr (or (assoc inbox nnmail-internal-password-cache)
+			      (assq nil nnmail-internal-password-cache)))))
+    (or password
+	(and nnmail-pop-password-required
+	     (nnmail-read-passwd (format "Password for %s: " inbox))))))
+
+(defun nnmail-set-password (inbox password)
+  (unless (eq nnmail-internal-password-cache t)
+    (set-modified-alist 'nnmail-internal-password-cache
+			(list (cons inbox password)))))
+
 ;; Function rewritten from rmail.el.
 (defun nnmail-move-inbox (inbox)
   "Move INBOX to `nnmail-crash-box'."
@@ -589,15 +636,11 @@ parameter.  It should return nil, `warn' or `delete'."
 	(if popmail
 	    (progn
 	      (when (and nnmail-pop-password
-			 (not nnmail-internal-password))
-		(setq nnmail-internal-password nnmail-pop-password))
-	      (when (and nnmail-pop-password-required
-			 (not nnmail-internal-password))
-		(setq nnmail-internal-password
-		      (nnmail-read-passwd
-		       (format "Password for %s: "
-			       (substring inbox (+ popmail 3))))))
-	      (nnheader-message 5 "Getting mail from the post office..."))
+			 (not nnmail-internal-password-cache))
+		(setq nnmail-internal-password-cache nnmail-pop-password))
+	      (setq nnmail-internal-password (nnmail-get-password inbox))
+	      (nnheader-message 5 "Getting mail from the post office %s..."
+				inbox))
 	  (when (or (and (file-exists-p tofile)
 			 (/= 0 (nnheader-file-size tofile)))
 		    (and (file-exists-p inbox)
@@ -631,7 +674,9 @@ parameter.  It should return nil, `warn' or `delete'."
 			 (set-buffer errors)
 			 (insert (prin1-to-string err))
 			 (setq result 255))))
-		  (let ((default-directory "/"))
+		  (let ((default-directory "/")
+			(inbox-info (nnmail-parse-spool-file-name inbox)))
+		    (setenv (nnmail-spool-mailhost inbox-info))
 		    (setq result
 			  (apply
 			   'call-process
@@ -639,7 +684,8 @@ parameter.  It should return nil, `warn' or `delete'."
 			    (list
 			     (expand-file-name
 			      nnmail-movemail-program exec-directory)
-			     nil errors nil inbox tofile)
+			     nil errors nil 
+			     (nnmail-spool-maildrop inbox-info) tofile)
 			    (when nnmail-internal-password
 			      (list nnmail-internal-password)))))))
 		(push inbox nnmail-moved-inboxes)
@@ -675,7 +721,9 @@ parameter.  It should return nil, `warn' or `delete'."
 			     (format "movemail: %s (%d return).  Continue? "
 				     (buffer-string) result))
 		      (error "%s" (buffer-string)))
-		    (setq tofile nil)))))))
+		    (setq tofile nil)))
+		))))
+	(nnmail-set-password inbox nnmail-internal-password)
 	(nnheader-message 5 "Getting mail from %s...done" inbox)
 	(and errors
 	     (buffer-name errors)
@@ -1806,8 +1854,10 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun nnmail-pop3-movemail (inbox crashbox)
   "Function to move mail from INBOX on a pop3 server to file CRASHBOX."
-  (let ((pop3-maildrop
-         (substring inbox (match-end (string-match "^po:" inbox)))))
+  (let* ((inbox-info (nnmail-parse-spool-file-name inbox))
+	 (pop3-maildrop (nnmail-spool-maildrop inbox-info))
+	 (pop3-mailhost (nnmail-spool-mailhost inbox-info))
+	 (pop3-password nnmail-internal-password))
     (pop3-movemail crashbox)))
 
 (defun nnmail-within-headers-p ()
