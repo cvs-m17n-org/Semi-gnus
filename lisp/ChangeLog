@@ -1,3 +1,52 @@
+2003-03-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-cache.el (gnus-cache-braid-nov): Test if a line looks like
+	a NOV.
+
+2003-03-20  Simon Josefsson  <jas@extundo.com>
+
+	* message.el (message-use-idna): Disable if UTF-8 unavailable.
+	(message-idna-to-ascii-rhs): Use it.
+
+	* gnus-art.el (gnus-use-idna): Disable if UTF-8 unavailable.
+
+2003-03-19  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-group-ham-mark-p, spam-group-spam-mark-p) 
+	(spam-group-ham-marks, spam-group-spam-marks): new functions
+	(spam-spam-marks, spam-ham-marks): removed in favor of the
+	spam-marks and ham-marks parameters
+	(spam-generic-register-routine, spam-ham-move-routine): use the
+	new spam-group-{spam,ham}-mark-p functions
+
+	* gnus.el (spam-marks, ham-marks): new group parameters with
+	default values same as the old spam-spam-marks and spam-ham-marks
+
+2003-03-19  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-art.el (gnus-article-decode-hook): Add IDNA.
+	(gnus-use-idna): New variable.
+	(article-decode-idna-rhs): New function.
+
+	* message.el (message-use-idna): New variable.
+	(message-mode-field-menu): Add entry for IDNA.
+	(message-idna-inside-rhs-p, message-idna-to-ascii-rhs-1)
+	(message-idna-to-ascii-rhs): New function.
+	(message-generate-headers): Invoke IDNA code.
+
+2003-03-19  Paul Jarc  <prj@po.cwru.edu>
+
+	* nnmaildir.el (nnmaildir--system-name): New function.
+	(nnmaildir-request-accept-article): Use it.
+
+2003-03-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-util.el (gnus-byte-compile): Make it work silently as the
+	gnus-compile function does.
+
+	* gnus-sum.el (gnus-summary-highlight-line-0): Revoke the last
+	bogus change.
+
 2003-03-19  Jesper Harder  <harder@ifa.au.dk>
 
 	* mm-util.el (mm-mule-charset-to-mime-charset): Test if

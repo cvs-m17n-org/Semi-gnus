@@ -1,3 +1,10 @@
+2003-03-19  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Misc Article): Add.
+	(Agent Basics): Fix makeinfo warnings.
+
+	* message.texi (IDNA): New.
+
 2003-03-18  Kevin Greiner <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Gnus Unplugged): Refer to new agent Group/Topic
