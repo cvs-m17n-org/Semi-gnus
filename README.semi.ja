@@ -114,11 +114,13 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
   に空のメールを送ってください。
 
   加えて、開発者を必要としています。開発に参加したい場合は、
-  cvs@cvs.m17n.org にアカウント名と UNIX の /etc/passwd の様式で暗号化
-  されたパスワードをメールを送ってください。
-  m17n open CVS server で行なわれた変更をメールで通知してもらうことも
-  可能です。これには gnus 以外の module に関する情報も含まれます。
-  必要な方は
+  cvs@cvs.m17n.org にアカウント名と ssh の公開鍵を送ってください。ssh
+  経由での cvsroot は :ext:cvs@cvs.m17n.org:/cvs/root となります。どう
+  しても ssh が使えない場合、UNIX の /etc/passwd の様式で暗号化された
+  パスワードをメールを送ってください。この場合 cvsroot は
+  :pserver:<アカウント名>@cvs.m17n.org:/cvs/root となります。m17n open
+  CVS server で行なわれた変更をメールで通知してもらうことも可能です。
+  これには gnus 以外の module に関する情報も含まれます。必要な方は
 
     cvs-info-help@cvs.m17n.org
 
