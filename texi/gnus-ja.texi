@@ -12174,7 +12174,7 @@ Ultimate $(B%&%'%V%5%$%H$K$O$?$/$5$s5s$2$i$l$F$$$^$9!#(B) $(B$=$l$+$i%5!<%P!<
 $(B?7$N>uBV$KJ]$C$F$*$/$?$a$K>pJs$rF@$k$3$H$,2DG=$G$9!#(B
 
 @code{nnwarchive} $(B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
-$(B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{M-x gnus-group-make-nnwarchive-group RET
+$(B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{M-x gnus-group-make-warchive-group RET
 an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$(B!#(B
 (@sc{an_egroup} $(B$r9XFI$7$F$$$k%a!<%j%s%0%j%9%H$K!"(B
 @sc{your@@emailaddress} $(B$rEE;R%a!<%k%"%I%l%9$KCV$-49$($F$/$@$5$$!#(B)
