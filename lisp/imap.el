@@ -150,6 +150,7 @@
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec")
+  (autoload 'open-tls-stream "tls")
   ;; Avoid use gnus-point-at-eol so we're independent of Gnus.  These
   ;; days we have point-at-eol anyhow.
   (if (fboundp 'point-at-eol)
@@ -177,7 +178,12 @@ the list is tried until a successful connection is made."
   :group 'imap
   :type '(repeat string))
 
-(defcustom imap-gssapi-program '("imtest -m gssapi -u %l -p %p %s")
+(defcustom imap-gssapi-program (list
+				(concat "gsasl --client --connect %s:%p "
+					"--imap --application-data "
+					"--mechanism GSSAPI "
+					"--authentication-id %l")
+				"imtest -m gssapi -u %l -p %p %s")
   "List of strings containing commands for GSSAPI (krb5) authentication.
 %s is replaced with server hostname, %p with port to connect to, and
 %l with the value of `imap-default-user'.  The program should accept
@@ -245,17 +251,28 @@ encoded mailboxes which doesn't translate into ISO-8859-1."
   :group 'imap
   :type 'string)
 
+(defcustom imap-read-timeout (if (string-match
+				  "windows-nt\\|os/2\\|emx\\|cygwin"
+				  (symbol-name system-type))
+				 1.0
+			       0.1)
+  "*How long to wait between checking for the end of output.
+Shorter values mean quicker response, but is more CPU intensive."
+  :type 'number
+  :group 'imap)
+
 ;; Various variables.
 
 (defvar imap-fetch-data-hook nil
   "Hooks called after receiving each FETCH response.")
 
-(defvar imap-streams '(gssapi kerberos4 starttls ssl network shell)
+(defvar imap-streams '(gssapi kerberos4 starttls tls ssl network shell)
   "Priority of streams to consider when opening connection to server.")
 
 (defvar imap-stream-alist
   '((gssapi    imap-gssapi-stream-p    imap-gssapi-open)
     (kerberos4 imap-kerberos4-stream-p imap-kerberos4-open)
+    (tls       imap-tls-p              imap-tls-open)
     (ssl       imap-ssl-p              imap-ssl-open)
     (network   imap-network-p          imap-network-open)
     (shell     imap-shell-p            imap-shell-open)
@@ -298,6 +315,7 @@ for doing the actual authentication.")
 
 (defconst imap-default-port 143)
 (defconst imap-default-ssl-port 993)
+(defconst imap-default-tls-port 993)
 (defconst imap-default-stream 'network)
 (defconst imap-local-variables '(imap-server
 				 imap-port
@@ -544,7 +562,10 @@ sure of changing the value of `foo'."
 			(not (and (imap-parse-greeting)
 				  ;; success in imtest 1.6:
 				  (re-search-forward
-				   "^\\(Authenticat.*\\)" nil t)
+				   (concat "^\\(\\(Authenticat.*\\)\\|\\("
+					   "Client authentication "
+					   "finished.*\\)\\)")
+				   nil t)
 				  (setq response (match-string 1)))))
 	      (accept-process-output process 1)
 	      (sit-for 1))
@@ -610,6 +631,29 @@ sure of changing the value of `foo'."
 	  done)
       (message "imap: Opening SSL connection with `%s'...failed" cmd)
       nil)))
+
+(defun imap-tls-p (buffer)
+  nil)
+
+(defun imap-tls-open (name buffer server port)
+  (let* ((port (or port imap-default-tls-port))
+	 (process (open-tls-stream name buffer server port)))
+    (when process
+      (while (and (memq (process-status process) '(open run))
+		  (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
+		  (goto-char (point-max))
+		  (forward-line -1)
+		  (not (imap-parse-greeting)))
+	(accept-process-output process 1)
+	(sit-for 1))
+      (and imap-log
+	   (with-current-buffer (get-buffer-create imap-log-buffer)
+	     (set-buffer-multibyte nil)
+	     (buffer-disable-undo)
+	     (goto-char (point-max))
+	     (insert-buffer-substring buffer)))
+      (when (memq (process-status process) '(open run))
+	process))))
 
 (defun imap-network-p (buffer)
   t)
@@ -1680,7 +1724,11 @@ on failure."
 	  (unless (< len 10)
 	    (setq imap-have-messaged t)
 	    (message "imap read: %dk" len))
-	  (accept-process-output imap-process 1)))
+	  (accept-process-output imap-process
+				 (truncate imap-read-timeout)
+				 (truncate (* (- imap-read-timeout
+						 (truncate imap-read-timeout))
+					      1000)))))
       (when imap-have-messaged
 	(message ""))
       (and (memq (process-status imap-process) '(open run))

@@ -8,6 +8,38 @@ For older news, see Gnus info node "New Features".
 
 * Changes in Oort Gnus
 
+** TLS wrapper shipped with Gnus
+
+TLS/SSL is now supported in IMAP and NNTP via tls.el and GNUTLS.  The
+old TLS/SSL support via (external third party) ssl.el and OpenSSL
+still works.
+
+** New make.bat for compiling and installing Gnus under MS Windows
+
+Use make.bat if you want to install Gnus under MS Windows, the first
+argument to the batch-program should be the directory where xemacs.exe
+respectively emacs.exe is located, iff you want to install Gnus after
+compiling it, give make.bat /copy as the second parameter.
+
+Make.bat has been rewritten from scratch, it now features automatic
+recognition of XEmacs and GNU Emacs, generates gnus-load.el, checks if
+errors occur while compilation and generation of info files and reports
+them at the end of the build process. It now uses makeinfo if it is
+available and falls back to infohack.el otherwise. Make.bat should now
+install all files which are necessary to run Gnus and be generally a
+complete replacement for the "configure; make; make install" cycle used
+under Unix systems.
+
+The new make.bat makes make-x.bat superfluous, so it has been removed.
+
+** Support for non-ASCII domain names
+
+Message supports non-ASCII domain names in From:, To: and Cc: and will
+query you whether to perform encoding when you try to send a message.
+The variable `message-use-idna' controls this.  Gnus will also decode
+non-ASCII domain names in From:, To: and Cc: when you view a message.
+The variable `gnus-use-idna' controls this.
+
 ** Better handling of Microsoft citation styles
 
 Gnus now tries to recognize the mangled header block that some Microsoft
@@ -269,7 +301,7 @@ function filters out other articles.
 
 ** Group names are treated as UTF-8 by default.
 
-This is supposedly what USEFOR wants to migrate to.  See
+This is supposedly what USEFOR wanted to migrate to.  See
 `gnus-group-name-charset-group-alist' and
 `gnus-group-name-charset-method-alist' for customization.
 

@@ -2732,8 +2732,9 @@ If this parameter is set to @code{t}, Gnus will consider the
 to-address and to-list parameters for this group as addresses of
 mailing lists you are subscribed to.  Giving Gnus this information is
 (only) a first step in getting it to generate correct Mail-Followup-To
-headers for your posts to these lists.  Look here @pxref{(message)Mailing
-Lists} for a complete treatment of available MFT support.
+headers for your posts to these lists.  Look here @pxref{Mailing
+Lists, , Mailing Lists, message, The Message Manual} for a complete
+treatment of available MFT support.
 
 See also @code{gnus-find-subscribed-addresses}, the function that
 directly uses this group parameter.
@@ -3438,12 +3439,6 @@ The dribble file will be saved, though (@pxref{Auto Save}).
 @code{gnus-exit-gnus-hook} is called when you quit gnus, while
 @code{gnus-after-exiting-gnus-hook} is called as the final item when
 exiting gnus.
-
-@findex gnus-unload
-@cindex unloading
-If you wish to completely unload gnus and all its adherents, you can use
-the @code{gnus-unload} command.  This command is also very handy when
-trying to customize meta-variables.
 
 Note:
 
@@ -4164,8 +4159,8 @@ Gnus will open the control messages in a browser using
 and displayed in an ephemeral group.
 
 Note that the control messages are compressed.  To use this command
-you need to turn on @code{auto-compression-mode}
-(@pxref{(emacs)Compressed Files}).
+you need to turn on @code{auto-compression-mode} (@pxref{Compressed
+Files, ,Compressed Files, emacs, The Emacs Manual}).
 
 @item H d
 @itemx C-c C-d
@@ -8456,10 +8451,11 @@ If a prefix is given, a charset will be asked for.
 
 @vindex gnus-article-wash-function
 The default is to use the function specified by
-@code{mm-text-html-renderer} (@pxref{(emacs-mime)Display
-Customization}) to convert the @sc{html}, but this is controlled by
-the @code{gnus-article-wash-function} variable.  Pre-defined functions
-you can use include:
+@code{mm-text-html-renderer} (@pxref{Display Customization, ,Display
+Customization, emacs-mime, The Emacs MIME Manual}) to convert the
+@sc{html}, but this is controlled by the
+@code{gnus-article-wash-function} variable.  Pre-defined functions you
+can use include:
 
 @table @code
 @item w3
@@ -10941,6 +10937,17 @@ paging will not be done.
 @vindex gnus-page-delimiter
 This is the delimiter mentioned above.  By default, it is @samp{^L}
 (formfeed).
+
+@cindex IDNA
+@cindex internationalized domain names
+@vindex gnus-use-idna
+@item gnus-use-idna
+This variable controls whether Gnus performs IDNA decoding of
+internationalized domain names inside @sc{From:}, @sc{To:} and
+@sc{Cc:} headers.  This requires GNU Libidn
+(@url{http://www.gnu.org/software/libidn/}, and this variable is only
+enabled if you have installed it.
+
 @end table
 
 
@@ -11477,7 +11484,13 @@ read---all articles in the group are permanently unread.
 
 If the group doesn't exist, it will be created and you'll be subscribed
 to it.  The only way to make it disappear from the Group buffer is to
-unsubscribe it.
+unsubscribe it.  The special properties of the draft group comes from
+a group property (@pxref{Group Parameters}), and if lost the group
+behaves like any other group.  This means the commands below will not
+be available.  To restore the special properties of the group, the
+simplest way is to kill the group, using @kbd{C-k}, and restart
+Gnus.  The group is automatically created again with the
+correct parameters.  The content of the group is not lost.
 
 @c @findex gnus-dissociate-buffer-from-draft
 @c @kindex C-c M-d (Mail)
@@ -12368,6 +12381,23 @@ functions is also affected by commonly understood variables
 This is the default, and simply connects to some port or other on the
 remote system.
 
+@findex nntp-open-tls-stream
+@item nntp-open-tls-stream
+Opens a connection to a server over a @dfn{secure} channel.  To use
+this you must have GNUTLS installed (see
+@uref{http://www.gnu.org/software/gnutls/}).  You then define a server
+as follows:
+
+@lisp
+;; "nntps" is port 563 and is predefined in our /etc/services
+;; however, gnutls-cli -p doesn't like named ports.
+;;
+(nntp "snews.bar.com"
+      (nntp-open-connection-function nntp-open-tls-stream)
+      (nntp-port-number )
+      (nntp-address "snews.bar.com"))
+@end lisp
+
 @findex nntp-open-ssl-stream
 @item nntp-open-ssl-stream
 Opens a connection to a server over a @dfn{secure} channel.  To use this
@@ -12376,10 +12406,8 @@ installed (@uref{ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL}.  You then
 define a server as follows:
 
 @lisp
-;; Type `C-c C-c' after you've finished editing.
-;;
 ;; "snews" is port 563 and is predefined in our /etc/services
-;; however, openssl s_client -port doesn't like named ports
+;; however, openssl s_client -port doesn't like named ports.
 ;;
 (nntp "snews.bar.com"
       (nntp-open-connection-function nntp-open-ssl-stream)
@@ -12509,10 +12537,10 @@ affected.
 
 @item nntp-pre-command
 @vindex nntp-pre-command
-A command wrapper to use when connecting through a non native connection
-function (all except @code{nntp-open-network-stream} and
-@code{nntp-open-ssl-stream}.  This is where you would put a @samp{SOCKS}
-wrapper for instance.
+A command wrapper to use when connecting through a non native
+connection function (all except @code{nntp-open-network-stream},
+@code{nntp-open-tls-stream}, and @code{nntp-open-ssl-stream}.  This is
+where you would put a @samp{SOCKS} wrapper for instance.
 
 @item nntp-address
 @vindex nntp-address
@@ -12520,10 +12548,11 @@ The address of the @sc{nntp} server.
 
 @item nntp-port-number
 @vindex nntp-port-number
-Port number to connect to the @sc{nntp} server.  The default is @samp{nntp}.
-If you use @sc{nntp} over @sc{ssl}, you may want to use integer ports rather
-than named ports (i.e, use @samp{563} instead of @samp{snews}), because
-external SSL tools may not work with named ports.
+Port number to connect to the @sc{nntp} server.  The default is
+@samp{nntp}.  If you use @sc{nntp} over @sc{tls}/@sc{ssl}, you may
+want to use integer ports rather than named ports (i.e, use @samp{563}
+instead of @samp{snews} or @samp{nntps}), because external TLS/SSL
+tools may not work with named ports.
 
 @item nntp-end-of-line
 @vindex nntp-end-of-line
@@ -13161,7 +13190,7 @@ some reason or other, Gnus let you treat it similar to a POP server
 and fetches articles from a given @sc{imap} mailbox.  @xref{IMAP}, for
 more information.
 
-Note that for the Kerberos, GSSAPI, SSL/TLS and STARTTLS support you
+Note that for the Kerberos, GSSAPI, TLS/SSL and STARTTLS support you
 may need external programs and libraries, @xref{IMAP}.
 
 Keywords:
@@ -13173,7 +13202,7 @@ The name of the @sc{imap} server.  The default is taken from the
 
 @item :port
 The port number of the @sc{imap} server.  The default is @samp{143}, or
-@samp{993} for SSL/TLS connections.
+@samp{993} for TLS/SSL connections.
 
 @item :user
 The user name to give to the @sc{imap} server.  The default is the login
@@ -13186,8 +13215,8 @@ prompted.
 @item :stream
 What stream to use for connecting to the server, this is one of the
 symbols in @code{imap-stream-alist}.  Right now, this means
-@samp{gssapi}, @samp{kerberos4}, @samp{starttls}, @samp{ssl},
-@samp{shell} or the default @samp{network}.
+@samp{gssapi}, @samp{kerberos4}, @samp{starttls}, @samp{tls},
+@samp{ssl}, @samp{shell} or the default @samp{network}.
 
 @item :authentication
 Which authenticator to use for authenticating to the server, this is
@@ -14533,18 +14562,14 @@ Virtual server settings:
 @item directory
 For each of your nnmaildir servers (it's very unlikely that you'd need
 more than one), you need to create a directory and populate it with
-symlinks to maildirs (and nothing else; do not choose a directory
-already used for other purposes).  You could also put maildirs
-themselves (instead of symlinks to them) directly in the server
-directory, but that would break @code{nnmaildir-request-delete-group},
-so you wouldn't be able to delete those groups from within Gnus.  (You
-could still delete them from your shell with @code{rm -r foo}.)  Each
-maildir will be represented in Gnus as a newsgroup on that server; the
-filename of the symlink will be the name of the group.  Any filenames
-in the directory starting with `.' are ignored.  The directory is
-scanned when you first start Gnus, and each time you type @kbd{g} in
-the group buffer; if any maildirs have been removed or added,
-nnmaildir notices at these times.
+maildirs or symlinks to maildirs (and nothing else; do not choose a
+directory already used for other purposes).  Each maildir will be
+represented in Gnus as a newsgroup on that server; the filename of the
+symlink will be the name of the group.  Any filenames in the directory
+starting with `.' are ignored.  The directory is scanned when you
+first start Gnus, and each time you type @kbd{g} in the group buffer;
+if any maildirs have been removed or added, nnmaildir notices at these
+times.
 
 The value of the @code{directory} parameter should be a Lisp form
 which is processed by @code{eval} and @code{expand-file-name} to get
@@ -14552,23 +14577,38 @@ the path of the directory for this server.  The form is @code{eval}ed
 only when the server is opened; the resulting string is used until the
 server is closed.  (If you don't know about forms and @code{eval},
 don't worry - a simple string will work.)  This parameter is not
-optional; you must specify it.  I don't recommend using @file{~/Mail}
-or a subdirectory of it; several other parts of Gnus use that
-directory by default for various things, and may get confused if
-nnmaildir uses it too.  @file{~/.nnmaildir} is a typical value.
+optional; you must specify it.  I don't recommend using
+@code{"~/Mail"} or a subdirectory of it; several other parts of Gnus
+use that directory by default for various things, and may get confused
+if nnmaildir uses it too.  @code{"~/.nnmaildir"} is a typical value.
 
-@item create-directory
+@item target-prefix
 This should be a Lisp form which is processed by @code{eval} and
-@code{expand-file-name} to get the name of the directory where new
-maildirs are created.  The form is @code{eval}ed only when the server
-is opened; the resulting string is used until the server is closed.
-This parameter is optional, but if you do not supply it, you cannot
-create new groups from within Gnus.  (You could still create them from
-your shell with @code{mkdir -m 0700 foo foo/tmp foo/new foo/cur}.)  A
-relative path is interpreted as relative to the @code{directory} path.
-@code{create-directory} and @code{directory} must be different;
-otherwise, group creation and deletion will break.  (If you don't need
-those features, you can omit @code{create-directory} entirely.)
+@code{expand-file-name}.  The form is @code{eval}ed only when the
+server is opened; the resulting string is used until the server is
+closed.
+
+When you create a group on an nnmaildir server, the maildir is created
+with @code{target-prefix} prepended to its name, and a symlink
+pointing to that maildir is created, named with the plain group name.
+So if @code{directory} is @code{"~/.nnmaildir"} and
+@code{target-prefix} is @code{"../maildirs/"}, then when you create
+the group @code{foo}, nnmaildir will create
+@file{~/.nnmaildir/../maildirs/foo} as a maildir, and will create
+@file{~/.nnmaildir/foo} as a symlink pointing to
+@file{../maildirs/foo}.
+
+You can set @code{target-prefix} to a string without any slashes to
+create both maildirs and symlinks in the same @code{directory}; in
+this case, any maildirs found in @code{directory} whose names start
+with @code{target-prefix} will not be listed as groups (but the
+symlinks pointing to them will be).
+
+As a special case, if @code{target-prefix} is @code{""} (the default),
+then when you create a group, the maildir will be created in
+@code{directory} without a corresponding symlink.  Beware that you
+cannot use @code{gnus-group-delete-group} on such groups without the
+@code{force} argument.
 
 @item directory-files
 This should be a function with the same interface as
@@ -14637,8 +14677,15 @@ the name of the same group that the parameter belongs to, then
 articles will be moved to the specified group during expiry before
 being deleted.  @emph{If this is set to an nnmaildir group, the
 article will be just as old in the destination group as it was in the
-source group.} So be careful with @code{expire-age} in the destination
-group.
+source group.}  So be careful with @code{expire-age} in the
+destination group.  If this is set to the name of the same group that
+the parameter belongs to, then the article is not expired at all.  If
+you use the vector form, the first element is evaluated once for each
+article.  So that form can refer to
+@code{nnmaildir-article-file-name}, etc., to decide where to put the
+article.  @emph{If this parameter is not set, nnmaildir does not fall
+back to the @code{expiry-target} group parameter or the
+@code{nnmail-expiry-target} variable.}
 
 @item read-only
 If this is set to @code{t}, nnmaildir will treat the articles in this
@@ -14658,6 +14705,11 @@ A function with the same interface as @code{directory-files}.  It is
 used to scan the directories in the maildir corresponding to this
 group to find articles.  The default is the function specified by the
 server's @code{directory-files} parameter.
+
+@item distrust-Lines:
+If non-@code{nil}, nnmaildir will always count the lines of an
+article, rather than use the @code{Lines:} header field.  If
+@code{nil}, the header field will be used if present.
 
 @item always-marks
 A list of mark symbols, such as
@@ -14962,6 +15014,10 @@ friendly mail back end all over.
 
 @item nnmaildir
 
+For configuring expiry and other things, @code{nnmaildir} uses
+incompatible group parameters, slightly different from those of other
+mail back ends.
+
 @code{nnmaildir} is largely similar to @code{nnml}, with some notable
 differences.  Each message is stored in a separate file, but the
 filename is unrelated to the article number in Gnus.  @code{nnmaildir}
@@ -14981,16 +15037,8 @@ require one set of mailboxes for spooling deliveries (in mbox format,
 thus damaging message bodies), and another set to be used as groups (in
 whatever format you like).  A maildir has a built-in spool, in the
 @code{new/} subdirectory.  Beware that currently, mail moved from
-@code{new/} to @code{cur/} instead of via mail splitting will undergo
-treatment such as duplicate checking.
-
-An article will not necessarily keep the same number across Gnus
-sessions; articles are renumbered starting from 1 for each Gnus session
-(more precisely, each time you open the @code{nnmaildir} server).  This
-way, you don't get gaps in your article number ranges, and when entering
-large groups, Gnus is likely to give a more accurate article count.  The
-price is that @code{nnmaildir} doesn't work with the cache or agent.
-This will probably be changed in the future.
+@code{new/} to @code{cur/} instead of via mail splitting will not
+undergo treatment such as duplicate checking.
 
 @code{nnmaildir} stores article marks for a given group in the
 corresponding maildir, in a way designed so that it's easy to manipulate
@@ -14999,19 +15047,17 @@ else, and still have your marks.  @code{nnml} also stores marks, but
 it's not as easy to work with them from outside Gnus as with
 @code{nnmaildir}.
 
-For configuring expiry and other things, @code{nnmaildir} uses group
-parameters slightly different from those of other mail back ends.
-
 @code{nnmaildir} uses a significant amount of memory to speed things up.
 (It keeps in memory some of the things that @code{nnml} stores in files
 and that @code{nnmh} repeatedly parses out of message files.)  If this
 is a problem for you, you can set the @code{nov-cache-size} group
 parameter to something small (0 would probably not work, but 1 probably
-would) to make it use less memory.
+would) to make it use less memory.  This caching will probably be
+removed in the future.
 
-Startup and shutdown are likely to be slower with @code{nnmaildir} than
-with other back ends.  Everything in between is likely to be faster,
-depending in part on your file system.
+Startup is likely to be slower with @code{nnmaildir} than with other
+back ends.  Everything else is likely to be faster, depending in part
+on your file system.
 
 @code{nnmaildir} does not use @code{nnoo}, so you cannot use @code{nnoo}
 to write an @code{nnmaildir}-derived back end.
@@ -15466,7 +15512,7 @@ manipulate mails stored on the @sc{imap} server.  This is the kind of
 usage explained in this section.
 
 A server configuration in @file{~/.gnus} with a few @sc{imap} servers
-might look something like the following. (Note that for SSL/TLS, you
+might look something like the following. (Note that for TLS/SSL, you
 need external programs and libraries, see below.)
 
 @lisp
@@ -15511,7 +15557,7 @@ server name if not specified.
 
 @item nnimap-server-port
 @vindex nnimap-server-port
-Port on server to contact.  Defaults to port 143, or 993 for SSL.
+Port on server to contact.  Defaults to port 143, or 993 for TLS/SSL.
 
 Note that this should be an integer, example server specification:
 
@@ -15545,7 +15591,7 @@ Example server specification:
 @vindex nnimap-stream
 The type of stream used to connect to your server.  By default, nnimap
 will detect and automatically use all of the below, with the exception
-of SSL/TLS. (@sc{imap} over SSL/TLS is being replaced by STARTTLS, which
+of TLS/SSL. (@sc{imap} over TLS/SSL is being replaced by STARTTLS, which
 can be automatically detected, but it's not widely deployed yet.)
 
 Example server specification:
@@ -15560,13 +15606,16 @@ Please note that the value of @code{nnimap-stream} is a symbol!
 @itemize @bullet
 @item
 @dfn{gssapi:} Connect with GSSAPI (usually Kerberos 5). Requires the
-@samp{imtest} program.
+@samp{gsasl} or @samp{imtest} program.
 @item
 @dfn{kerberos4:} Connect with Kerberos 4. Requires the @samp{imtest} program.
 @item
 @dfn{starttls:} Connect via the STARTTLS extension (similar to
-SSL).  Requires the external library @samp{starttls.el} and program
+TLS/SSL).  Requires the external library @samp{starttls.el} and program
 @samp{starttls}.
+@item
+@dfn{tls:} Connect through TLS.  Requires GNUTLS (the program
+@samp{gnutls-cli}).
 @item
 @dfn{ssl:} Connect through SSL.  Requires OpenSSL (the program
 @samp{openssl}) or SSLeay (@samp{s_client}).
@@ -15586,6 +15635,19 @@ restrictions on @sc{imap} commands, which might make Gnus seem to hang
 indefinitely if you have many articles in a mailbox.  The variable
 @code{imap-kerberos4-program} contain parameters to pass to the imtest
 program.
+
+For TLS connection, the @code{gnutls-cli} program from GNUTLS is
+needed.  It is available from
+@uref{http://www.gnu.org/software/gnutls/}.
+
+@vindex imap-gssapi-program
+This parameter specifies a list of command lines that invoke a GSSAPI
+authenticated IMAP stream in a subshell.  They are tried sequentially
+until a connection is made, or the list has been exhausted.  By
+default, @samp{gsasl} from GNU SASL, available from
+@uref{http://www.gnu.org/software/gsasl/}, and the @samp{imtest}
+program from Cyrus IMAPD (see @code{imap-kerberos4-program}), are
+tried.
 
 @vindex imap-ssl-program
 For SSL connections, the OpenSSL program is available from
@@ -15619,7 +15681,7 @@ Please note that the value of @code{nnimap-authenticator} is a symbol!
 @itemize @bullet
 @item
 @dfn{gssapi:} GSSAPI (usually kerberos 5) authentication. Requires
-external program @code{imtest}.
+external program @code{gsasl} or @code{imtest}.
 @item
 @dfn{kerberos4:} Kerberos 4 authentication. Requires external program
 @code{imtest}.
@@ -17000,7 +17062,19 @@ all @code{nntp} and @code{nnimap} groups in @code{gnus-select-method} and
 @code{gnus-secondary-select-methods} are agentized.
 
 @item
-Decide on download policy.  @xref{Agent Categories}.
+
+Decide on download policy.  It's fairly simple once you decide whether
+you are going to use agent categories, topic parameters, and/or group
+parameters to implement your policy.  If you're new to gnus, it
+is probably best to start with a category @xref{Agent Categories}.
+
+Both topic parameters (@pxref{Topic Parameters}) and agent categories
+(@pxref{Agent Categories}) provide for setting a policy that applies
+to multiple groups.  Which you use is entirely up to you.  Topic
+parameters do override categories so, if you mix the two, you'll have
+to take that into account.  If you have a few groups that deviate from
+your policy, you can use grou parameters (@pxref{Group Parameters}) to
+configure them.
 
 @item
 Uhm@dots{} that's it.
@@ -17018,11 +17092,26 @@ to be somewhat more conservative in choosing what to download, and then
 mark the articles for downloading manually if it should turn out that
 you're interested in the articles anyway.
 
-The main way to control what is to be downloaded is to create a
-@dfn{category} and then assign some (or all) groups to this category.
-Groups that do not belong in any other category belong to the
-@code{default} category.  Gnus has its own buffer for creating and
-managing categories.
+One of the more effective methods for controlling what is to be
+downloaded is to create a @dfn{category} and then assign some (or all)
+groups to this category.  Groups that do not belong in any other
+category belong to the @code{default} category.  Gnus has its own
+buffer for creating and managing categories.
+
+If you prefer, you can also use group parameters (@pxref{Group
+Parameters}) and topic parameters (@pxref{Topic Parameters}) for an
+alternative approach to controlling the agent.  The only real
+difference is that categories are specific to the agent (so there is
+less to learn) while group and topic parameters include the kitchen
+sink.
+
+Since you can set agent parameters in several different places we have
+a rule to decide which source to believe.  This rule specifies that
+the parameter sources are checked in the following order: group
+parameters, topic parameters, agent category, and finally customizable
+variables. So you can mix all of these sources to produce a wide range
+of behavior, just don't blame me if you don't remember where you put
+your settings.
 
 @menu
 * Category Syntax::             What a category looks like.
@@ -17034,18 +17123,58 @@ managing categories.
 @node Category Syntax
 @subsubsection Category Syntax
 
-A category consists of two things.
+A category consists of a name, the list of groups belonging to the
+category, and a number of optional parameters that override the
+customizable variables.  The complete list of agent parameters are
+listed below.
 
-@enumerate
-@item
+@table @code
+@item gnus-agent-cat-name
+The name of the category.
+
+@item gnus-agent-cat-groups
+The list of groups that are in this category.
+
+@item gnus-agent-cat-predicate
 A predicate which (generally) gives a rough outline of which articles
 are eligible for downloading; and
 
-@item
+@item gnus-agent-cat-score-file
 a score rule which (generally) gives you a finer granularity when
 deciding what articles to download.  (Note that this @dfn{download
 score} is not necessarily related to normal scores.)
-@end enumerate
+
+@item gnus-agent-cat-enable-expiration
+a boolean indicating whether the agent should expire old articles in
+this group.  Most groups should be expired to conserve disk space.  In
+fact, its probably safe to say that the gnus.* hierarchy contains the
+only groups that should not be expired.
+
+@item gnus-agent-cat-days-until-old
+an integer indicating the number of days that the agent should wait
+before deciding that a read article is safe to expire.
+
+@item gnus-agent-cat-low-score
+an integer that overrides the value of @code{gnus-agent-low-score}.
+
+@item gnus-agent-cat-high-score
+an integer that overrides the value of @code{gnus-agent-high-score}.
+
+@item gnus-agent-cat-length-when-short
+an integer that overrides the value of
+@code{gnus-agent-short-article}.
+
+@item gnus-agent-cat-length-when-long
+an integer that overrides the value of @code{gnus-agent-long-article}.
+@end table
+
+The name of a category can not be changed once the category has been
+created.
+
+Each category maintains a list of groups that are exclusive members of
+that category.  The exclusivity rule is automatically enforced, add a
+group to a new category and it is automatically removed from its old
+category.
 
 A predicate in its simplest form can be a single predicate such as
 @code{true} or @code{false}.  These two will download every available
@@ -17091,6 +17220,14 @@ The available logical operators are @code{or}, @code{and} and
 
 The following predicates are pre-defined, but if none of these fit what
 you want to do, you can write your own.
+
+When evaluating each of these predicates, the named constant will be
+bound to the value determined by calling
+@code{gnus-agent-find-parameter} on the appropriate parameter.  For
+example, gnus-agent-short-article will be bound to
+@code{(gnus-agent-find-parameter group 'agent-short-article)}.  This
+means that you can specify a predicate in your category then tune that
+predicate to individual groups.
 
 @table @code
 @item short
@@ -17176,7 +17313,7 @@ parameters like so:
 (agent-predicate . short)
 @end lisp
 
-This is the group parameter equivalent of the agent category default.
+This is the group/topic parameter equivalent of the agent category default.
 Note that when specifying a single word predicate like this, the
 @code{agent-predicate} specification must be in dotted pair notation.
 
@@ -17227,7 +17364,7 @@ Category specification
 @end lisp
 
 @item
-Group Parameter specification
+Group/Topic Parameter specification
 
 @lisp
 (agent-score ("from"
@@ -17317,6 +17454,12 @@ The following commands are available in this buffer:
 @findex gnus-category-exit
 Return to the group buffer (@code{gnus-category-exit}).
 
+@item e
+@kindex e (Category)
+@findex gnus-category-customize-category
+Use a customization buffer to set all of the selected category's
+parameters at one time (@code{gnus-category-customize-category}).
+
 @item k
 @kindex k (Category)
 @findex gnus-category-kill
@@ -17399,6 +17542,25 @@ Articles that have a score lower than this have a low score.  Default
 @vindex gnus-agent-high-score
 Articles that have a score higher than this have a high score.  Default
 0.
+
+@item gnus-agent-expire-days
+@vindex gnus-agent-expire-days
+The number of days that a @samp{read} article must stay in the agent's
+local disk before becoming eligible for expiration (While the name is
+the same, this doesn't mean expiring the article on the server.  It
+just means deleting the local copy of the article).  What is also
+important to understand is that the counter starts with the time the
+article was written to the local disk and not the time the article was
+read.
+Default 7.
+
+@item gnus-agent-enable-expiration
+@vindex gnus-agent-enable-expiration
+Determines whether articles in a group are, by default, expired or
+retained indefinitely.  The default is @code{ENABLE} which means that
+you'll have to disable expiration when desired.  On the other hand,
+you could set this to @code{DISABLE}.  In that case, you would then
+have to enable expiration in selected groups.
 
 @end table
 
@@ -17553,8 +17715,11 @@ consume lots of disk space), but if you have already downloaded an
 article into the Agent, Gnus will not download the article from the
 server again but use the locally stored copy instead.
 
-This behaviour can be controlled by @code{gnus-agent-cache}
-(@pxref{Agent Variables}).
+If you so desire, you can configure the agent (see @code{gnus-agent-cache}
+@pxref{Agent Variables}) to always download headers and articles while
+plugged.  Gnus will almost certainly be slower, but it will be kept
+synchronized with the server.  That last point probably won't make any
+sense if you are using a nntp or nnimap backend.
 
 @node Agent Expiry
 @subsection Agent Expiry
@@ -17562,45 +17727,39 @@ This behaviour can be controlled by @code{gnus-agent-cache}
 @vindex gnus-agent-expire-days
 @findex gnus-agent-expire
 @kindex M-x gnus-agent-expire
+@kindex M-x gnus-agent-expire-group
+@findex gnus-agent-expire-group
 @cindex Agent expiry
 @cindex Gnus Agent expiry
 @cindex expiry
 
-@code{nnagent} doesn't handle expiry.  Instead, there's a special
-@code{gnus-agent-expire} command that will expire all read articles that
-are older than @code{gnus-agent-expire-days} days.  It can be run
-whenever you feel that you're running out of space.  It's not
-particularly fast or efficient, and it's not a particularly good idea to
-interrupt it (with @kbd{C-g} or anything else) once you've started it.
+The Agent backend, @code{nnagent}, doesn't handle expiry. Well, at
+least it doesn't handle it like other backends.  Instead, there are
+special @code{gnus-agent-expire} and @code{gnus-agent-expire-group}
+commands that will expire all read articles that are older than
+@code{gnus-agent-expire-days} days.  They can be run whenever you feel
+that you're running out of space.  Neither are particularly fast or
+efficient, and it's not a particularly good idea to interrupt them (with
+@kbd{C-g} or anything else) once you've started one of them.
 
 Note that other functions, e.g. @code{gnus-request-expire-articles},
 might run @code{gnus-agent-expire} for you to keep the agent 
 synchronized with the group.
 
-@code{gnus-agent-expire-days} can also be a list of regexp/day pairs.
-The regexps will be matched against group names to allow differing
-expiry in different groups.
-
-@lisp
-(setq gnus-agent-expire-days
-      '(("alt\\." 7)
-        (".*binary" 1)
-        ("." 21)))
-@end lisp
-
-If you use the list form, the last element must always be the default
-method---it must always match all groups. Also, for a regexp to match,
-it must match from the beginning of the group's name.
+The agent parameter @code{agent-enable-expiration} may be used to
+prevent expiration in selected groups.
 
 @vindex gnus-agent-expire-all
-If @code{gnus-agent-expire-all} is non-@code{nil}, this command will
-expire all articles---unread, read, ticked and dormant.  If @code{nil}
-(which is the default), only read articles are eligible for expiry, and
-unread, ticked and dormant articles will be kept indefinitely.
+If @code{gnus-agent-expire-all} is non-@code{nil}, the agent
+expiration commands will expire all articles---unread, read, ticked
+and dormant.  If @code{nil} (which is the default), only read articles
+are eligible for expiry, and unread, ticked and dormant articles will
+be kept indefinitely.
 
 If you find that some articles eligible for expiry are never expired,
-perhaps some Gnus Agent files are corrupted.  There's a special
-@code{gnus-agent-regenerate} command to fix possible problems.
+perhaps some Gnus Agent files are corrupted.  There's are special
+commands, @code{gnus-agent-regenerate} and
+@code{gnus-agent-regenerate-group}, to fix possible problems.
 
 @node Agent Regeneration
 @subsection Agent Regeneration
@@ -17617,8 +17776,8 @@ internal inconsistencies.
 
 For example, if your connection to your server is lost while
 downloaded articles into the agent, the local data structures will not
-know about articles downloaded prior to the connection failure.
-Running @code{gnus-agent-regenerate} or
+know about articles successfully downloaded prior to the connection
+failure.  Running @code{gnus-agent-regenerate} or
 @code{gnus-agent-regenerate-group} will update the data structures
 such that you don't need to download these articles a second time.
 
@@ -17730,7 +17889,7 @@ Hook run when disconnecting from the network.
 
 @item gnus-agent-fetched-hook
 @vindex gnus-agent-fetched-hook
-Hook run when after finishing fetching articles.
+Hook run when finished fetching articles.
 
 @item gnus-agent-cache
 @vindex gnus-agent-cache
@@ -17750,7 +17909,9 @@ online status.
 @item gnus-agent-mark-unread-after-downloaded
 @vindex gnus-agent-mark-unread-after-downloaded
 If @code{gnus-agent-mark-unread-after-downloaded} is non-@code{nil},
-mark articles as unread after downloading.  The default is t.
+mark articles as unread after downloading.  This is usually a safe
+thing to do as the newly downloaded article has obviously not been
+read.  The default is t.
 
 @item gnus-agent-consider-all-articles
 @vindex gnus-agent-consider-all-articles
@@ -17769,7 +17930,8 @@ performance.  A small value minimizes the time lost should the
 connection be lost while fetching (You may need to run
 @code{gnus-agent-regenerate-group} to update the group's state.
 However, all articles parsed prior to loosing the connection will be
-available while unplugged).
+available while unplugged).  The default is 10M so it is unusual to
+see any cycling.
 
 @item gnus-server-unopen-status
 @vindex gnus-server-unopen-status
@@ -17780,6 +17942,19 @@ whether to deny the server or whether to unplug the agent.  If the
 Agent is disabled, Gnus always simply deny the server.  Other choices
 for this variable include @code{denied} and @code{offline} the latter
 is only valid if the Agent is used.
+
+@item gnus-auto-goto-ignores
+@vindex gnus-auto-goto-ignores
+Another variable that isn't a Agent variable, yet so closely related
+that most will look for it here, this variable tells the summary
+buffer how to maneuver around undownloaded (only headers stored in the
+agent) and unfetched (neither article nor headers stored) articles.
+
+The legal values are @code{nil} (maneuver to any article),
+@code{undownloaded} (maneuvering while unplugged ignores articles that
+have not been fetched), @code{always-undownloaded} (maneuvering always
+ignores articles that have not been fetched), @code{unfetched}
+(maneuvering ignores articles whose headers have not been fetched).
 
 @end table
 
@@ -17861,7 +18036,8 @@ may ask:
 @code{gnus-agent-fetch-selected-article} to
 @code{gnus-select-article-hook}.
 
-@item If I read an article while plugged, and the article already exists in the Agent, will it get downloaded once more?
+@item If I read an article while plugged, and the article already exists in 
+the Agent, will it get downloaded once more?
 
 @strong{No}, unless @code{gnus-agent-cache} is @code{nil}.
 
@@ -18746,7 +18922,7 @@ Each article can have only one mark, so just a single of these rules
 will be applied to each article.
 
 To take @code{gnus-del-mark} as an example---this alist says that all
-articles that have that mark (i.e., are marked with @samp{D}) will have a
+articles that have that mark (i.e., are marked with @samp{e}) will have a
 score entry added to lower based on the @code{From} header by -4, and
 lowered by @code{Subject} by -1.  Change this to fit your prejudices.
 
@@ -20089,15 +20265,17 @@ and so on.  Create as many faces as you wish.  The same goes for the
 @samp{hello} mouse-highlighted with @code{gnus-mouse-face-3}.
 
 Text inside the @samp{%<<} and @samp{%>>} specifiers will get the
-special @code{balloon-help} property set to @code{gnus-balloon-face-0}.
-If you say @samp{%1<<}, you'll get @code{gnus-balloon-face-1} and so on.
-The @code{gnus-balloon-face-*} variables should be either strings or
-symbols naming functions that return a string.  When the mouse passes
-over text with this property set, a balloon window will appear and
-display the string.  Please refer to @ref{(emacs)Help Echo} (in GNU
-Emacs) or the doc string of @code{balloon-help-mode} (in XEmacs) for
-more information on this.  (For technical reasons, the guillemets have
-been approximated as @samp{<<} and @samp{>>} in this paragraph.)
+special @code{balloon-help} property set to
+@code{gnus-balloon-face-0}.  If you say @samp{%1<<}, you'll get
+@code{gnus-balloon-face-1} and so on.  The @code{gnus-balloon-face-*}
+variables should be either strings or symbols naming functions that
+return a string.  When the mouse passes over text with this property
+set, a balloon window will appear and display the string.  Please
+refer to @ref{Tooltips, ,Tooltips, emacs, The Emacs Manual},
+(in GNU Emacs) or the doc string of @code{balloon-help-mode} (in
+XEmacs) for more information on this.  (For technical reasons, the
+guillemets have been approximated as @samp{<<} and @samp{>>} in this
+paragraph.)
 
 Here's an alternative recipe for the group buffer:
 
@@ -24645,7 +24823,7 @@ evaluate expressions using @kbd{M-:} or inspect variables using
 @cindex slow
 Sometimes, a problem do not directly generate a elisp error but
 manifests itself by causing Gnus to be very slow.  In these cases, you
-can use @kbd{M-x toggle-debug-on-quit} and press @kbd{C-j} when things are
+can use @kbd{M-x toggle-debug-on-quit} and press @kbd{C-g} when things are
 slow, and then try to analyze the backtrace (repeating the procedure
 helps isolating the real problem areas).  A fancier approach is to use
 the elisp profiler, ELP.  The profiler is (or should be) fully

@@ -1,3 +1,7 @@
+2003-03-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.17 revision 00.
+
 2003-03-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-x-face-command): Don't examine
@@ -11,6 +15,31 @@
 
 	* lisp/message.el (message-yank-original): Check not only the
 	References field but the `message-reply-headers' variable.
+
+	* lisp/imap.el (imap-tls-open): Don't bind coding-systems; use
+	`set-buffer-multibyte' instead of `imap-disable-multibyte'.
+
+	* lisp/tls.el: Require `pces'.
+	(open-tls-stream): Use `as-binary-process'.
+
+2003-03-23  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add IDNA.  Add TLS.  Fix USEFOR reference.
+
+2003-03-22  Frank Schmitt  <ich@frank-schmitt.net>
+
+	* make.bat: Redone from scratch; supports both Emacs and XEmacs
+	now; correctly generate gnus-load.el; check for errors; use
+	makeinfo if available, infohack.el if it isn't; be less verbose
+	when copying files; copy files from etc/gnus and etc/smilies, too
+
+2003-03-22  Frank Schmitt  <ich@frank-schmitt.net>
+
+	* make-x.bat: Removed, make.bat does its job now.
+
+2003-03-22  Frank Schmitt  <ich@frank-schmitt.net>
+
+	* etc/gnus-tut.txt: Include Gnus FAQ from http://my.gnus.org.
 
 2003-03-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
