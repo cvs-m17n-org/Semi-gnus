@@ -3010,6 +3010,9 @@ groups."
 after replacing with the original article."
   (setq gnus-article-edit-done-function
 	`(lambda (&rest args)
+	   (when (featurep 'font-lock)
+	     (setq font-lock-defaults nil)
+	     (turn-off-font-lock))
 	   (mime-edit-exit)
 	   (let (case-fold-search)
 	     (goto-char (point-min))
