@@ -36,7 +36,6 @@
 ;;(setq smtpmail-local-domain "YOUR DOMAIN NAME")
 ;;(setq smtpmail-debug-info t)
 ;;(load-library "smtpmail")
-;;(setq smtpmail-code-conv-from nil)
 ;;(setq user-full-name "YOUR NAME HERE")
 
 ;; To queue mail, set smtpmail-queue-mail to t and use 
@@ -82,9 +81,9 @@ don't define this value."
   :type 'boolean
   :group 'smtpmail)
 
-(defcustom smtpmail-code-conv-from nil ;; *junet*
-  "*smtpmail code convert from this code to *internal*..for tiny-mime.."
-  :type 'boolean
+(defcustom smtpmail-coding-system 'binary
+  "*Coding-system for SMTP output."
+  :type 'coding-system
   :group 'smtpmail)
 
 (defcustom smtpmail-queue-mail nil 
@@ -328,7 +327,8 @@ This is relative to `smtpmail-queue-dir'.")
 	response-code
 	greeting
 	process-buffer
-	(supported-extensions '()))
+	(supported-extensions '())
+	(coding-system-for-write smtpmail-coding-system))
     (unwind-protect
 	(catch 'done
 	  ;; get or create the trace buffer
@@ -583,9 +583,6 @@ This is relative to `smtpmail-queue-dir'.")
 (defun smtpmail-send-data-1 (process data)
   (goto-char (point-max))
 
-  (if (not (null smtpmail-code-conv-from))
-      (setq data (code-convert-string data smtpmail-code-conv-from *internal*)))
-	
   (if smtpmail-debug-info
       (insert data "\r\n"))
 
