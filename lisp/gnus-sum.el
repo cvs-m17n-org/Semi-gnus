@@ -5349,16 +5349,13 @@ The state which existed when entering the ephemeral is reset."
       (gnus-summary-recenter)
       (gnus-summary-position-point))))
 
-(defun gnus-summary-preview-mime-message (arg)
+(defun gnus-summary-preview-mime-message ()
   "MIME decode and play this message."
-  (interactive "P")
-  (or gnus-show-mime
-      (let ((gnus-break-pages nil)
-	    (gnus-show-mime t))
-	(gnus-summary-select-article t t)
-	))
-  (select-window (get-buffer-window gnus-article-buffer))
-  )
+  (interactive)
+  (let ((gnus-break-pages nil)
+	(gnus-show-mime t))
+    (gnus-summary-select-article gnus-show-all-headers t))
+  (select-window (get-buffer-window gnus-article-buffer)))
 
 ;;; Dead summaries.
 
@@ -7017,7 +7014,8 @@ If ARG is a negative number, hide the unwanted header lines."
 If ARG is a positive number, turn MIME processing on."
   (interactive "P")
   (setq gnus-show-mime
-	(if (null arg) (not gnus-show-mime)
+	(if (null arg)
+	    (not gnus-show-mime)
 	  (> (prefix-numeric-value arg) 0)))
   (gnus-summary-select-article t 'force))
 
