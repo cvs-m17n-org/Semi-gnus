@@ -909,12 +909,12 @@ gnus $(B$,$I$N5-;v$rFI$s$@$H$_$J$9$+$K1F6A$7$^$9!#(B
 $(B:#$d!"$"$J$?$O%U%!%$%k(B @file{.newsrc} $(B$K$D$$$F$9$Y$FCN$C$F$$$^$9!#$9$Y$F(B
 $(B$N9XFI>pJs$OEAE}E*$K$3$N%U%!%$%k$KC_@Q$5$l$^$9!#(B
 
-@sc{GNUS} $(B$G$OJ*;v$,>/!9J#;($K$J$C$F$$$^$9!#%U%!%$%k(B @file{.newsrc} $(B$r:G(B
+@sc{gnus} $(B$G$OJ*;v$,>/!9J#;($K$J$C$F$$$^$9!#%U%!%$%k(B @file{.newsrc} $(B$r:G(B
 $(B?7$N$b$N$K$9$k$@$1$G$O$J$/!"%U%!%$%k(B @file{.newsrc} $(B$K$O9g$o$J$$>pJs$rJ](B
 $(BB8$7$F$*$/$?$a$K(B @file{.newsrc.el} $(B$H8F$P$l$k%U%!%$%k$r;H$$$^$9!#(B ($(B<B:](B
 $(B$O!"%U%!%$%k(B @file{.newsrc} $(B$NA4$F$N>pJs$rJ#@=$7$FJ];}$7$F$$$^$9!#(B)
 @sc{gnus}$(B$O$3$l$i$NCf$G0lHV:G8e$KJ]B8$5$l$?$b$N$r;H$$$^$9!#$3$l$r$9$k$3(B
-$(B$H$K$h$j!"(B@sc{GNUS} $(B$HB>$N%K%e!<%9%j!<%@!<$r@Z$jBX$($F;H$&$3$H$,$G$-$^$9!#(B
+$(B$H$K$h$j!"(B@sc{gnus} $(B$HB>$N%K%e!<%9%j!<%@!<$r@Z$jBX$($F;H$&$3$H$,$G$-$^$9!#(B
 
 $(B$3$l$O$A$g$C$H$P$+$JJ}K!$J$N$G!"(Bgnus $(B$O$b$C$HNI$$J}K!$rJT$_=P$7$^$7$?!#(B
 @file{.newsrc} $(B$H(B @file{.newsrc.el} $(B%U%!%$%k$K2C$($F!"(Bgnus $(B$O(B
@@ -5984,7 +5984,7 @@ Gnus $(B$O0J2<$N4JC1$J5,B'$KB'$C$F$I$N5-;v$,72$KB0$9$k$N$+$r?dB,$7$^$9!'(B $(
 $(B$7$FJ]B8$7$?$$$N$G$"$l$P!"IaDL$O(B @kbd{M P a} (@code{gnus-uu-mark-all})
 $(B$H$7!"$=$l$+$i(B @kbd{X U} (@code{gnus-uu-decode-uu-and-save}) $(B$H$7$^$9!#(B
 
-$(B$3$NA4$F$O!"GrF|$N2<$KL@Gr$K%-!<$rBG$C$F$$$?(B @sc{GNUS 4.1} $(B$N$H$-$H$O(B
+$(B$3$NA4$F$O!"GrF|$N2<$KL@Gr$K%-!<$rBG$C$F$$$?(B @sc{gnus 4.1} $(B$N$H$-$H$O(B
 @code{gnus-uu} $(B$NF0:n$,A4$/0c$C$F$$$^$9!#$3$NHG$N(B @code{gnus-uu} $(B$OIaDL(B
 $(B$O2?$+$NJ}K!(B (@pxref{Setting Process Marks}) $(B$G5-;v$K0u$rIU$1$F!"$=$l$+(B
 $(B$i(B @kbd{X u} $(B$r2!$9;v$rA0Ds$H$7$F$$$^$9!#(B

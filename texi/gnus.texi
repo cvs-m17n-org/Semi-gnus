@@ -866,11 +866,11 @@ affect which articles Gnus thinks are read.
 Now, you all know about the @file{.newsrc} file.  All subscription
 information is traditionally stored in this file.
 
-Things got a bit more complicated with @sc{GNUS}.  In addition to
+Things got a bit more complicated with @sc{gnus}.  In addition to
 keeping the @file{.newsrc} file updated, it also used a file called
 @file{.newsrc.el} for storing all the information that didn't fit into
 the @file{.newsrc} file.  (Actually, it also duplicated everything in
-the @file{.newsrc} file.)  @sc{GNUS} would read whichever one of these
+the @file{.newsrc} file.)  @sc{gnus} would read whichever one of these
 files was the most recently saved, which enabled people to swap between
 @sc{gnus} and other newsreaders.
 
@@ -6040,7 +6040,7 @@ entire newsgroup, you'd typically do @kbd{M P a}
 (@code{gnus-uu-decode-uu-and-save}).
 
 All this is very much different from how @code{gnus-uu} worked with
-@sc{GNUS 4.1}, where you had explicit keystrokes for everything under
+@sc{gnus 4.1}, where you had explicit keystrokes for everything under
 the sun.  This version of @code{gnus-uu} generally assumes that you mark
 articles in some way (@pxref{Setting Process Marks}) and then press
 @kbd{X u}.
@@ -8380,7 +8380,7 @@ tell gnus otherwise.
 
 @menu
 * Hiding Headers::        Deciding what headers should be displayed.
-* Using MIME::            Pushing to mime articles as @sc{mime} messages.
+* Using MIME::            Pushing articles through @sc{mime} before reading them.
 * Customizing Articles::  Tailoring the look of the articles.
 * Article Keymap::        Keystrokes available in the article buffer.
 * Misc Article::          Other stuff.
@@ -19424,7 +19424,7 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til  lete
+ tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til å lete
 opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den være en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
@@ -19498,8 +19498,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde være en måte  si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  S kunne score-regler legges til den
+Ja, det burde være en måte å si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  Så kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -19829,7 +19829,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt  slette den dersom teksten matcher
+Selv ville jeg nok ha valgt å slette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
