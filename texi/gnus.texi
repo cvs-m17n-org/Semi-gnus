@@ -6476,8 +6476,8 @@ headers, PGP, cited text and the signature.
 
 @item W W h
 @kindex W W h (Summary)
-@findex gnus-article-hide-headers
-Hide headers (@code{gnus-article-hide-headers}).  @xref{Hiding
+@findex gnus-article-toggle-headers
+Toggle hiding of headers (@code{gnus-article-toggle-headers}).  @xref{Hiding
 Headers}.
 
 @item W W b

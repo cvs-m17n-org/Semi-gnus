@@ -6221,8 +6221,8 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 
 @item W W h
 @kindex W W h $B!J35N,!K(B
-@findex gnus-article-hide-headers
-$B%X%C%@!<$r1#$7$^$9(B (@code{gnus-article-hide-headers})$B!#(B @xref{Hiding
+@findex gnus-article-toggle-headers
+$B%X%C%@!<$r1#$7$^$9(B (@code{gnus-article-toggle-headers})$B!#(B @xref{Hiding
 Headers}.
 
 @item W W b
