@@ -7718,14 +7718,14 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9!J$3$l$O%G%#%U%)%k%H$G9T$o$l$^
 $B3J9%$N5-;v$GKd$a9~$`$3$H$5$(2DG=$K$7$^$9!#(B
 
 @vindex gnus-show-mime
-@vindex gnus-show-mime-method
+@vindex gnus-article-display-method-for-mime
 @vindex gnus-strict-mime
-@findex metamail-buffer
-Gnus $B$O(B @code{gnus-show-mime-method} $B$K5-;v$r2!$7IU$1$k$3$H$G(B @sc{mime} $B$r(B
-$B07$$$^$9!#$3$l$O%G%#%U%)%k%H$G$O(B @code{gnus-show-mime-method} $B$G$9!#$3$N4X(B
-$B?t$O(B SEMI MIME-View $B%W%m%0%i%`$r8F$S=P$7$F<B:]$N=hM}$r9T$$$^$9!#(BSEMI
-MIME-View $B$K4X$9$k>\$7$$>pJs$O!"%^%K%e%"%k$r;2>H$7$F$/$@$5$$!J$^$@$J$$$1$I(B
-(;_;)$B!K!#(B
+@findex gnus-article-display-mime-message
+Gnus $B$O(B @code{gnus-article-display-method-for-mime} $B$K5-;v$r2!$7IU$1$k$3(B
+$B$H$G(B @sc{mime} $B$r07$$$^$9!#$3$N=i4|CM$O(B
+@code{gnus-article-display-mime-message} $B$G$9!#$3$N4X?t$O(B SEMI MIME-View 
+$B%W%m%0%i%`$r8F$S=P$7$F<B:]$N=hM}$r9T$$$^$9!#(BSEMI MIME-View $B$K4X$9$k>\$7(B
+$B$$>pJs$O!"%^%K%e%"%k$r;2>H$7$F$/$@$5$$!J$^$@$J$$$1$I(B(;_;)$B!K!#(B
 
 @sc{mime} $B$r>o$K;HMQ$7$?$1$l$P!"(B@code{gnus-show-mime} $B$r(B 
 @code{t} $B$K@_Dj$7$F$/$@$5$$!#$7$+$7!"(B@code{gnus-strict-mime} $B$,(B 

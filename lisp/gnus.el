@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.6.0"
+(defconst gnus-version-number "6.7.7"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.11; for SEMI 1.8)"
+  (format "Semi-gnus %s (based on Gnus 5.6.21; for SEMI 1.8)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -2462,7 +2462,7 @@ also examines the topic parameters."
 	(when params
 	  (setq params (delq name params))
 	  (while (assq name params)
-	    (setq params (delq (assq name params) params)))
+	    (gnus-pull name params))
 	  (gnus-info-set-params info params))))))
 
 (defun gnus-group-add-score (group &optional score)
@@ -2477,7 +2477,10 @@ If SCORE is nil, add 1 to the score of GROUP."
   "Collapse GROUP name LEVELS.
 Select methods are stripped and any remote host name is stripped down to
 just the host name."
-  (let* ((name "") (foreign "") (depth -1) (skip 1)
+  (let* ((name "")
+	 (foreign "")
+	 (depth 0)
+	 (skip 1)
 	 (levels (or levels
 		     (progn
 		       (while (string-match "\\." group skip)

@@ -414,6 +414,7 @@ header line with the old Message-ID."
 	    (if post
 		(message-news (or to-group group))
 	      (set-buffer gnus-article-copy)
+	      (gnus-msg-treat-broken-reply-to)
 	      (message-followup (if (or newsgroup-p force-news) nil to-group)))
 	  ;; The is mail.
 	  (if post
@@ -427,11 +428,18 @@ header line with the old Message-ID."
 		  (push (list 'gnus-inews-add-to-address pgroup)
 			message-send-actions)))
 	    (set-buffer gnus-article-copy)
-	    (message-wide-reply to-address
-				(gnus-group-find-parameter
-				 gnus-newsgroup-name 'broken-reply-to))))
+	    (gnus-msg-treat-broken-reply-to)
+	    (message-wide-reply to-address)))
 	(when yank
 	  (gnus-inews-yank-articles yank))))))
+
+(defun gnus-msg-treat-broken-reply-to ()
+  "Remove the Reply-to header iff broken-reply-to."
+  (when (gnus-group-find-parameter
+	 gnus-newsgroup-name 'broken-reply-to)
+    (save-restriction
+      (message-narrow-to-head)
+      (message-remove-header "reply-to"))))
 
 (defun gnus-post-method (arg group &optional silent)
   "Return the posting method based on GROUP and ARG.
@@ -462,6 +470,7 @@ If SILENT, don't prompt the user."
 		     gnus-post-method
 		   (list gnus-post-method)))
 	       gnus-secondary-select-methods
+	       (mapcar 'cdr gnus-server-alist)
 	       (list gnus-select-method)
 	       (list group-method)))
 	     method-alist post-methods method)
@@ -508,7 +517,7 @@ If SILENT, don't prompt the user."
 ;;; as well include the Emacs version as well.
 ;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified Gnus version."
+  "Stringified gnus version."
   (interactive)
   gnus-version)
 
@@ -533,8 +542,8 @@ automatically."
     (gnus-setup-message (if yank 'reply-yank 'reply)
       (gnus-summary-select-article)
       (set-buffer (gnus-copy-article-buffer))
-      (message-reply nil wide (gnus-group-find-parameter
-			       gnus-newsgroup-name 'broken-reply-to))
+      (gnus-msg-treat-broken-reply-to)
+      (message-reply nil wide)
       (when yank
 	(gnus-inews-yank-articles yank)))))
 

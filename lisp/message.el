@@ -251,7 +251,7 @@ nil means let mailer mail back a message to report errors."
   :type 'boolean)
 
 (defcustom message-generate-new-buffers t
-  "*Non-nil means that a new message buffer will be created whenever `mail-setup' is called.
+  "*Non-nil means that a new message buffer will be created whenever `message-setup' is called.
 If this is a function, call that function with three parameters:  The type,
 the to address and the group name.  (Any of these may be nil.)  The function
 should return the new buffer name."
@@ -927,7 +927,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    (References . message-fill-references)
+    (References . message-shorten-references)
     (X-Mailer)
     (X-Newsreader))
   "Alist used for formatting headers.")
@@ -1062,7 +1062,7 @@ If REGEXP, HEADER is a regular expression.
 If FIRST, only remove the first instance of the header.
 Return the number of headers removed."
   (goto-char (point-min))
-  (let ((regexp (if is-regexp header (concat "^" header ":")))
+  (let ((regexp (if is-regexp header (concat "^" (regexp-quote header) ":")))
 	(number 0)
 	(case-fold-search t)
 	last)
@@ -1241,7 +1241,8 @@ Return the number of headers removed."
    ["Spellcheck" ispell-message t]
    "----"
    ["Send Message" message-send-and-exit t]
-   ["Abort Message" message-dont-send t]))
+   ["Abort Message" message-dont-send t]
+   ["Kill Message" message-kill-buffer t]))
 
 (easy-menu-define
  message-mode-field-menu message-mode-map ""
@@ -1314,19 +1315,18 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
 	facemenu-remove-face-function t)
   (make-local-variable 'paragraph-separate)
   (make-local-variable 'paragraph-start)
+  ;; `-- ' precedes the signature.  `-----' appears at the start of the
+  ;; lines that delimit forwarded messages.
+  ;; Lines containing just >= 3 dashes, perhaps after whitespace,
+  ;; are also sometimes used and should be separators.
   (setq paragraph-start
 	(concat (regexp-quote mail-header-separator)
-		"$\\|[ \t]*[-_][-_][-_]+$\\|"
-		"-- $\\|"
+		"$\\|[ \t]*[a-z0-9A-Z]*>+[ \t]*$\\|[ \t]*$\\|"
+		"-- $\\|---+$\\|"
+		page-delimiter
 		;;!!! Uhm... shurely this can't be right?
-		"[> " (regexp-quote message-yank-prefix) "]+$\\|"
-		paragraph-start))
-  (setq paragraph-separate
-	(concat (regexp-quote mail-header-separator)
-		"$\\|[ \t]*[-_][-_][-_]+$\\|"
-		"-- $\\|"
-		"[> " (regexp-quote message-yank-prefix) "]+$\\|"
-		paragraph-separate))
+		"[> " (regexp-quote message-yank-prefix) "]+$"))
+  (setq paragraph-separate paragraph-start)
   (make-local-variable 'message-reply-headers)
   (setq message-reply-headers nil)
   (make-local-variable 'message-newsreader)
@@ -1346,7 +1346,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (when (eq message-mail-alias-type 'abbrev)
     (if (fboundp 'mail-abbrevs-setup)
 	(mail-abbrevs-setup)
-      (funcall (intern "mail-aliases-setup"))))
+      (mail-aliases-setup)))
   (message-set-auto-save-file-name)
   (unless (string-match "XEmacs" emacs-version)
     (set (make-local-variable 'font-lock-defaults)
@@ -1732,7 +1732,7 @@ prefix, and don't delete any headers."
       (unless (bolp)
 	(insert ?\n))
       (unless modified
-	(setq message-checksum (cons (message-checksum) (buffer-size)))))))
+	(setq message-checksum (message-checksum))))))
 
 (defun message-cite-original-without-signature ()
   "Cite function in the standard Message manner."
@@ -2614,8 +2614,7 @@ to find out how to use this."
    (message-check 'new-text
      (or
       (not message-checksum)
-      (not (and (eq (message-checksum) (car message-checksum))
-		(eq (buffer-size) (cdr message-checksum))))
+      (not (eq (message-checksum) message-checksum))
       (y-or-n-p
        "It looks like no new text has been added.  Really post? ")))
    ;; Check the length of the signature.
@@ -3183,6 +3182,24 @@ Headers already prepared in the buffer are not modified."
 	(replace-match " " t t))
       (goto-char (point-max)))))
 
+(defun message-shorten-references (header references)
+  "Limit REFERENCES to be shorter than 988 characters."
+  (let ((max 988)
+	(cut 4)
+	refs)
+    (nnheader-temp-write nil
+      (insert references)
+      (goto-char (point-min))
+      (while (re-search-forward "<[^>]+>" nil t)
+	(push (match-string 0) refs))
+      (setq refs (nreverse refs))
+      (while (> (length (mapconcat 'identity refs " ")) max)
+	(when (< (length refs) (1+ cut))
+	  (decf cut))
+	(setcdr (nthcdr cut refs) (cddr (nthcdr cut refs)))))
+    (insert (capitalize (symbol-name header)) ": "
+	    (mapconcat 'identity refs " ") "\n")))
+
 (defun message-position-point ()
   "Move point to where the user probably wants to find it."
   (message-narrow-to-headers)
@@ -3370,7 +3387,7 @@ Headers already prepared in the buffer are not modified."
 		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
-(defun message-reply (&optional to-address wide ignore-reply-to)
+(defun message-reply (&optional to-address wide)
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
@@ -3397,7 +3414,7 @@ Headers already prepared in the buffer are not modified."
 	    to (message-fetch-field "to")
 	    cc (message-fetch-field "cc")
 	    mct (message-fetch-field "mail-copies-to")
-	    reply-to (unless ignore-reply-to (message-fetch-field "reply-to"))
+	    reply-to (message-fetch-field "reply-to")
 	    references (message-fetch-field "references")
 	    message-id (message-fetch-field "message-id" t))
       ;; Remove any (buggy) Re:'s that are present and make a
@@ -3477,10 +3494,10 @@ Headers already prepared in the buffer are not modified."
      cur)))
 
 ;;;###autoload
-(defun message-wide-reply (&optional to-address ignore-reply-to)
+(defun message-wide-reply (&optional to-address)
   "Make a \"wide\" reply to the message in the current buffer."
   (interactive)
-  (message-reply to-address t ignore-reply-to))
+  (message-reply to-address t))
 
 ;;;###autoload
 (defun message-followup (&optional to-newsgroups)
@@ -3847,7 +3864,8 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "mail" to)))
-  (message-setup `((To . ,(or to "")) (Subject . ,(or subject "")))))
+  (let ((message-this-is-mail t))
+    (message-setup `((To . ,(or to "")) (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-mail-other-frame (&optional to subject)
@@ -3859,7 +3877,8 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "mail" to)))
-  (message-setup `((To . ,(or to "")) (Subject . ,(or subject "")))))
+  (let ((message-this-is-mail t))
+    (message-setup `((To . ,(or to "")) (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-news-other-window (&optional newsgroups subject)
@@ -3871,8 +3890,9 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
-  (message-setup `((Newsgroups . ,(or newsgroups ""))
-		   (Subject . ,(or subject "")))))
+  (let ((message-this-is-news t))
+    (message-setup `((Newsgroups . ,(or newsgroups ""))
+		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-news-other-frame (&optional newsgroups subject)
@@ -3884,8 +3904,9 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
-  (message-setup `((Newsgroups . ,(or newsgroups ""))
-		   (Subject . ,(or subject "")))))
+  (let ((message-this-is-news t))
+    (message-setup `((Newsgroups . ,(or newsgroups ""))
+		     (Subject . ,(or subject ""))))))
 
 ;;; underline.el
 

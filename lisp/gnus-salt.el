@@ -77,18 +77,18 @@ It accepts the same format specs that `gnus-summary-line-format' does."
     "." gnus-pick-article
     gnus-down-mouse-2 gnus-pick-mouse-pick-region
     "\r" gnus-pick-start-reading
-    ;; "t" gnus-uu-mark-thread
-    ;; "T" gnus-uu-unmark-thread
-    ;; "U" gnus-summary-unmark-all-processable
-    ;; "v" gnus-uu-mark-over
-    ;; "r" gnus-uu-mark-region
-    ;; "R" gnus-uu-unmark-region
-    ;; "e" gnus-uu-mark-by-regexp
-    ;; "E" gnus-uu-mark-by-regexp
-    ;; "b" gnus-uu-mark-buffer
-    ;; "B" gnus-uu-unmark-buffer
-    ;;gnus-mouse-2 gnus-pick-mouse-pick
-    ;; "X" gnus-pick-start-reading
+    "t" gnus-uu-mark-thread
+    "T" gnus-uu-unmark-thread
+    "U" gnus-summary-unmark-all-processable
+    "v" gnus-uu-mark-over
+    "r" gnus-uu-mark-region
+    "R" gnus-uu-unmark-region
+    "e" gnus-uu-mark-by-regexp
+    "E" gnus-uu-mark-by-regexp
+    "b" gnus-uu-mark-buffer
+    "B" gnus-uu-unmark-buffer
+    gnus-mouse-2 gnus-pick-mouse-pick
+    "X" gnus-pick-start-reading
     ))
 
 (defun gnus-pick-make-menu-bar ()
@@ -638,7 +638,7 @@ Two predefined functions are available:
 		    (not (eval (caar list))))
 	  (setq list (cdr list)))))
     (unless (eq (setq face (cdar list)) (get-text-property beg 'face))
-      (gnus-put-text-property
+      (gnus-put-text-property-excluding-characters-with-faces
        beg end 'face
        (if (boundp face) (symbol-value face) face)))))
 

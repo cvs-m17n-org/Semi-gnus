@@ -62,7 +62,8 @@ parameter -- the gateway address.")
 	(insert mail-header-separator "\n")
 	(widen)
 	(let (message-required-mail-headers)
-	  (funcall message-send-mail-function))))))
+	  (funcall message-send-mail-function))
+	t))))
 
 ;;; Internal functions
 
@@ -74,6 +75,13 @@ parameter -- the gateway address.")
     (goto-char (point-min))
     (insert "To: " (nnheader-replace-chars-in-string newsgroups ?. ?-)
 	    "@" gateway "\n")))
+
+(defun nngateway-mail2news-header-transformation (gateway)
+  "Transform the headers for sending to a mail2news gateway."
+  (message-remove-header "to")
+  (message-remove-header "cc")
+  (goto-char (point-min))
+  (insert "To: " gateway "\n"))
 
 (nnoo-define-skeleton nngateway)
 
