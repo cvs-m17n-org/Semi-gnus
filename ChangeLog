@@ -1,3 +1,12 @@
+2003-06-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-check-news-header-syntax): Replace
+	`mail-extract-address-components' with
+	`std11-extract-address-components'.
+	(message-sendmail-envelope-from): Ditto.
+	(message-buffer-name): Ditto.
+	(message-do-send-housekeeping): Ditto.
+
 2003-06-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/message.el (message-yank-original): When

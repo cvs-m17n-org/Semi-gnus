@@ -4684,7 +4684,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 	 nil)
 	((or (not (string-match
 		   "@[^\\.]*\\."
-		   (setq ad (nth 1 (mail-extract-address-components
+		   (setq ad (nth 1 (std11-extract-address-components
 				    from))))) ;larsi@ifi
 	     (string-match "\\.\\." ad) ;larsi@ifi..uio
 	     (string-match "@\\." ad)	;larsi@.ifi.uio
@@ -4717,7 +4717,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 		  reply-to)))
 	((or (not (string-match
 		   "@[^\\.]*\\."
-		   (setq ad (nth 1 (mail-extract-address-components
+		   (setq ad (nth 1 (std11-extract-address-components
 				    reply-to))))) ;larsi@ifi
 	     (string-match "\\.\\." ad) ;larsi@ifi..uio
 	     (string-match "@\\." ad)	;larsi@.ifi.uio
@@ -5210,7 +5210,7 @@ give as trustworthy answer as possible."
 (defun message-sendmail-envelope-from ()
   "Return the envelope from."
   (cond ((eq message-sendmail-envelope-from 'header)
-	 (nth 1 (mail-extract-address-components
+	 (nth 1 (std11-extract-address-components
 		 (message-fetch-field "from"))))
 	((stringp message-sendmail-envelope-from)
 	 message-sendmail-envelope-from)
@@ -5780,7 +5780,7 @@ beginning of line."
      (concat "*unsent " type
 	     (if to
 		 (concat " to "
-			 (or (car (mail-extract-address-components to))
+			 (or (car (std11-extract-address-components to))
 			     to) "")
 	       "")
 	     (if (and group (not (string= group ""))) (concat " on " group) "")
@@ -5853,7 +5853,7 @@ beginning of line."
 	  (setq name
 		(cond
 		 (to (concat "*sent mail to "
-			     (or (car (mail-extract-address-components to))
+			     (or (car (std11-extract-address-components to))
 				 to) "*"))
 		 ((and group (not (string= group "")))
 		  (concat "*sent posting on " group "*"))
@@ -6451,19 +6451,62 @@ that further discussion should take place only in "
      cur)))
 
 ;;;###autoload
+(defun message-is-yours-p ()
+  "Non-nil means current article is yours.
+If you have added 'cancel-messages to 'message-shoot-gnksa-feet', all articles
+are yours except those that have Cancel-Lock header not belonging to you.
+Instead of shooting GNKSA feet, you should modify 'message-alternative-emails'
+regexp to match all of yours addresses."
+  ;; Canlock-logic as suggested by Per Abrahamsen
+  ;; <abraham@dina.kvl.dk>
+  ;;
+  ;; IF article has cancel-lock THEN
+  ;;   IF we can verify it THEN
+  ;;     issue cancel
+  ;;   ELSE
+  ;;     error: cancellock: article is not yours
+  ;; ELSE
+  ;;   Use old rules, comparing sender...
+  (save-excursion
+    (save-restriction
+      (message-narrow-to-head-1)
+      (if (message-fetch-field "Cancel-Lock")
+	  (if (null (canlock-verify))
+	      t
+	    (error "Failed to verify Cancel-lock: This article is not yours"))
+	(let (sender from)
+	  (or
+	   (message-gnksa-enable-p 'cancel-messages)
+	   (and (setq sender (message-fetch-field "sender"))
+		(string-equal (downcase sender)
+			      (downcase (message-make-sender))))
+	   ;; Email address in From field equals to our address
+	   (and (setq from (message-fetch-field "from"))
+		(string-equal
+		 (downcase (cadr (std11-extract-address-components from)))
+		 (downcase (cadr (std11-extract-address-components
+				  (message-make-from))))))
+	   ;; Email address in From field matches
+	   ;; 'message-alternative-emails' regexp
+	   (and from
+		message-alternative-emails
+		(string-match
+		 message-alternative-emails
+		 (cadr (std11-extract-address-components from))))))))))
+
+;;;###autoload
 (defun message-cancel-news (&optional arg)
   "Cancel an article you posted.
 If ARG, allow editing of the cancellation message."
   (interactive "P")
   (unless (message-news-p)
     (error "This is not a news article; canceling is impossible"))
-  (let (from newsgroups message-id distribution buf sender)
+  (let (from newsgroups message-id distribution buf)
     (save-excursion
       ;; Get header info from original article.
       (save-restriction
 	(message-narrow-to-head-1)
 	(setq from (message-fetch-field "from")
-	      sender (message-fetch-field "sender")
 	      newsgroups (message-fetch-field "newsgroups")
 	      message-id (message-fetch-field "message-id" t)
 	      distribution (message-fetch-field "distribution")))
@@ -6506,9 +6549,7 @@ If ARG, allow editing of the cancellation message."
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((cur (current-buffer))
-	(sender (message-fetch-field "sender"))
-	(from (message-fetch-field "from")))
+  (let ((cur (current-buffer)))
     ;; Check whether the user owns the article that is to be superseded.
     (unless (message-is-yours-p)
       (error "This article is not yours"))
@@ -7129,46 +7170,6 @@ regexp varstr."
 	   (set (make-local-variable (car local))
 		(cdr local)))))
      locals)))
-
-;;;###autoload
-(defun message-is-yours-p ()
-  "Non-nil means current article is yours.
-If you have added 'cancel-messages to 'message-shoot-gnksa-feet', all articles
-are yours except those that have Cancel-Lock header not belonging to you.
-Instead of shooting GNKSA feet, you should modify 'message-alternative-emails'
-regexp to match all of yours addresses."
-  ;; Canlock-logic as suggested by Per Abrahamsen
-  ;; <abraham@dina.kvl.dk>
-  ;;
-  ;; IF article has cancel-lock THEN
-  ;;   IF we can verify it THEN
-  ;;     issue cancel
-  ;;   ELSE
-  ;;     error: cancellock: article is not yours
-  ;; ELSE
-  ;;   Use old rules, comparing sender...
-  (if (message-fetch-field "Cancel-Lock")
-      (if (null (canlock-verify))
-	  t
-	(error "Failed to verify Cancel-lock: This article is not yours"))
-    (or
-     (message-gnksa-enable-p 'cancel-messages)
-     (and sender
-	  (string-equal
-	   (downcase sender)
-	   (downcase (message-make-sender))))
-     ;; Email address in From field equals to our address
-     (string-equal
-      (downcase (cadr (std11-extract-address-components from)))
-      (downcase (cadr (std11-extract-address-components
-		       (message-make-from)))))
-     ;; Email address in From field matches
-     ;; 'message-alternative-emails' regexp
-     (and message-alternative-emails
-	  (string-match
-	   message-alternative-emails
-	   (cadr (std11-extract-address-components from)))))))
-
 
 ;;; @ for MIME Edit mode
 ;;;
