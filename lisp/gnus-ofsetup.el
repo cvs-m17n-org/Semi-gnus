@@ -61,7 +61,7 @@
       (let ((auth (gnus-ofsetup-completing-read-symbol 
 		   "Authentification Method"
 		   'pass 'apop)))
-	(list (concat server "@" account) :auth-scheme auth)))))
+	(list (concat account "@" server) :auth-scheme auth)))))
 
 (defun gnus-setup-for-offline ()
   "*Set up Gnus for offline environment."
@@ -152,8 +152,15 @@
 	  (while (setq spool (gnus-ofsetup-read-pop-account server))
 	    (setq spool-file (cons spool spool-file)))))
 
-      (setq save-passwd
-	    (y-or-n-p "Do you save password information to newsrc file? "))
+      (while (not save-passwd)
+	(setq save-passwd
+	      (gnus-ofsetup-completing-read-symbol
+	       "How long do you save password"
+	       'never 'exit-emacs 'permanence))
+	(if (and (eq save-passwd 'permanence)
+		 (not (y-or-n-p
+		       "Your password will be saved to newsrc file. OK? ")))
+	    (setq save-passwd nil)))
 	
       ;; Write to setting file.
       (save-excursion
@@ -235,10 +242,17 @@
 		  (prin1-to-string movemail-program-apop-option) ")\n"))
 	(insert "(setq gnus-offline-mail-source '"
 		(prin1-to-string spool-file) ")\n")
-	(when save-passwd
-	  (insert "(add-hook 'gnus-setup-news-hook 
-    (lambda ()
-        (add-to-list 'gnus-variable-list 'nnmail-internal-password-cache)))\n"))
+	(insert
+	 (cond
+	  ((eq save-passwd 'never)
+	   "(setq nnmail-pop-password-required nil)\n")
+	  ((eq save-passwd 'exit-emacs)
+	   "(setq nnmail-pop-password-required t)\n")
+	  ((eq save-passwd 'permanence)
+	   "(setq nnmail-pop-password-required t)
+(add-hook 'gnus-setup-news-hook 
+	  (lambda ()
+	    (add-to-list 'gnus-variable-list 'nnmail-internal-password-cache)))\n")))
 	(write-region (point-min) (point-max) gnus-offline-setting-file))
       (kill-buffer "* Setting")))
   (load gnus-offline-setting-file))
