@@ -1,3 +1,11 @@
+1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (save-buffers-kill-emacs): Don't use the macro
+	`when' in the body of `defadvice'.  Use `if' instead.
+
+	* lisp/dgnushack.el (last, mapc): New compiler macros for emulating
+	cl functions.
+
 1999-11-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-after-getting-new-news-hook): Don't use
