@@ -34,16 +34,16 @@
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "01"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
   (product-define "T-gnus" nil
-		  (list 6 15 3
+		  (list 6 15 4
 			(string-to-number gnus-revision-number))))
 
-(defconst gnus-original-version-number "0.03"
+(defconst gnus-original-version-number "0.04"
   "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)

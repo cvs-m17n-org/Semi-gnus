@@ -1,3 +1,44 @@
+2001-05-05  Florian Weimer  <fw@deneb.enyo.de>
+
+	* gnus.texi (IMAP): Remove double paragraph (suggest by Norbert
+	Koch), fix NNTP reference.
+
+2001-05-04 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	Suggested by Dan Christensen <jdc@uwo.ca>
+
+	* gnus.texi (Mail Group Commands): Add pxref.
+	(Group Maintenance): Ditto.
+	(Topic Commands): Ditto.
+	(Expiring Mail): Typo.
+
+2001-05-04 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Raymond Scholz <ray-2001@zonix.de>
+
+	* gnus.texi (Summary Buffer Lines): Mention the meaning of a
+	colon.
+
+2001-05-03 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Sriram Karra <karra@cs.utah.edu>.
+
+	* gnus.texi: Add default value.
+
+2001-05-03 06:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Using GPG): Use example environment.
+
+2001-05-02 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Expunging mailboxes): Typo.
+
+2001-04-15 19:38:54  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Mail and Post): Fix.
+
+2001-04-29 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Remove a few The's.
+	(RSS): New.
+
 2001-04-26  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus.texi (Unread Articles): Say that dormants are similar to

@@ -508,7 +508,7 @@ and respond with new To and Cc headers."
   :group 'message-interface
   :type '(choice function (const nil)))
 
-(defcustom message-use-followup-to 'ask
+(defcustom message-use-followup-to t
   "*Specifies what to do with Followup-To header.
 If nil, always ignore the header.  If it is t, use its value, but
 query before using the \"poster\" value.  If it is the symbol `ask',
@@ -516,6 +516,7 @@ always query the user whether to use the value.  If it is the symbol
 `use', always use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
+		 (const :tag "use & query" t)
 		 (const :tag "maybe" t)
 		 (const :tag "always" use)
 		 (const :tag "ask" ask)))
@@ -896,8 +897,8 @@ Valid valued are `unique' and `unsent'."
 
 (defcustom message-dont-reply-to-names
   (and (boundp 'rmail-dont-reply-to-names) rmail-dont-reply-to-names)
-  "*A regexp specifying names to prune when doing wide replies.
-A value of nil means exclude your own name only."
+  "*A regexp specifying addresses to prune when doing wide replies.
+A value of nil means exclude your own user name only."
   :version "21.1"
   :group 'message
   :type '(choice (const :tag "Yourself" nil)
@@ -4557,11 +4558,14 @@ than 988 characters long, and if they are not, trim them until they are."
   ;; Rename the buffer.
   (if message-send-rename-function
       (funcall message-send-rename-function)
-    (when (string-match "\\`\\*\\(sent \\|unsent \\)?\\(.+\\)\\*[^\\*]*"
-			(buffer-name))
+    ;; Note: mail-abbrevs of XEmacs renames buffer name behind Gnus.
+    (when (string-match
+	   "\\`\\*\\(sent \\|unsent \\)?\\(.+\\)\\*[^\\*]*\\|\\`mail to "
+	   (buffer-name))
       (let ((name (match-string 2 (buffer-name)))
 	    to group)
-	(if (not (or (string-equal name "mail")
+	(if (not (or (null name)
+		     (string-equal name "mail")
 		     (string-equal name "news")))
 	    (setq name (concat "*sent " name "*"))
 	  (setq to (message-fetch-field "to"))
@@ -4846,6 +4850,7 @@ that further discussion should take place only in "
 	  (message-set-work-buffer)
 	  (if (and mft
 		   message-use-followup-to
+		   wide
 		   (or (not (eq message-use-followup-to 'ask))
 		       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
 You should normally obey the Mail-Followup-To: header.  In this

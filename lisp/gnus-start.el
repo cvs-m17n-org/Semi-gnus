@@ -1381,7 +1381,9 @@ newsgroup."
 	(setq info (pop newsrc)
 	      group (gnus-info-group info))
 	(unless (or (gnus-active group)	; Active
-		    (gnus-info-method info)) ; Foreign
+		    (and (gnus-info-method info)
+			 (not (gnus-secondary-method-p 
+			       (gnus-info-method info))))) ; Foreign
 	  ;; Found a bogus newsgroup.
 	  (push group bogus)))
       (if confirm

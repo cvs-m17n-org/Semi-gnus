@@ -272,7 +272,7 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000 
+Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000
 Free Software Foundation, Inc.
 
 
@@ -494,7 +494,7 @@ New Groups
 * Subscription Methods:: $B?7$7$$%0%k!<%W$KBP$7$F(B gnus $B$O2?$r$9$Y$-$+(B
 * Filtering New Groups:: Gnus $B$KFCDj$N?7$7$$%0%k!<%W$rL5;k$5$;$k(B
 
-The Group Buffer
+Group Buffer
 
 * Group Buffer Format::   $BI=<($5$l$F$$$k>pJs$HJQ99$NJ}K!(B
 * Group Maneuvering::     $B%0%k!<%W%P%C%U%!$r0\F0$9$k%3%^%s%I(B
@@ -535,7 +535,7 @@ Misc Group Stuff
 * Group Timestamp::       Gnus $B$K:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k(B
 * File Commands::         Gnus $B$N%U%!%$%k$NFI$_=q$-(B
 
-The Summary Buffer
+Summary Buffer
 
 * Summary Buffer Format::      $B35N,%P%C%U%!$N304Q$r7hDj$9$k(B
 * Summary Maneuvering::        $B35N,%P%C%U%!$rF0$-2s$k(B
@@ -648,7 +648,7 @@ Various Summary Stuff
 * Summary Generation Commands::     $B35N,%P%C%U%!$N(B ($B:F(B) $B:n@.(B
 * Really Various Summary Commands:: $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 
-The Article Buffer
+Article Buffer
 
 * Hiding Headers::       $B$I$N%X%C%@!<$rI=<($9$k$+$r7h$a$k(B
 * Using MIME::           @sc{mime} $B5-;v$H$7$F8+$;$k(B
@@ -677,7 +677,7 @@ Select Methods
 * Combined Groups::   $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
 * Gnus Unplugged::    $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
 
-The Server Buffer
+Server Buffer
 
 * Server Buffer Format::      $B$3$N%P%C%U%!$N308+$r%+%9%?%^%$%:$G$-$k(B
 * Server Commands::           $B%5!<%P!<$rA`$kL?Na(B
@@ -735,6 +735,7 @@ Browsing the Web
 * Ultimate::       Ultimate Bulletin Board $B%7%9%F%`(B
 * Web Archive::    $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::  $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
+* RSS::            RDF Site Summary $B$rFI$`(B
 * Customizing w3:: Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
 
 Other Sources
@@ -3089,13 +3090,15 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @kindex C-c C-x (Group)
 @findex gnus-group-expire-articles
 $B8=:_$N%0%k!<%W$N%(%/%9%Q%$%"5-;v$KBP$7$F(B ($B$b$7$"$l$P(B) $BA4$F%(%/%9%Q%$%"=h(B
-$BM}$r9T$$$^$9(B (@code{gnus-group-expire-articles})$B!#(B
+$BM}$r9T$$$^$9(B (@code{gnus-group-expire-articles})$B!#$3$l$O!"$=$N%0%k!<%W$K(B
+$B$7$P$i$/B8:_$7$F$$$?4|8B@Z$l:o=|2DG=$J$9$Y$F$N5-;v$r>C5n$9$k$H$$$&$3$H$G(B
+$B$9!#(B(@pxref{Expiring Mail})$B!#(B
 
 @item C-c M-C-x
 @kindex C-c M-C-x (Group)
 @findex gnus-group-expire-all-groups
-$BA4$F$N%0%k!<%W$NA4$F$N5-;v$KBP$7$F!"%(%/%9%Q%$%"=hM}$r9T$$$^(B
-$B$9(B (@code{gnus-group-expire-all-groups})$B!#(B
+$BA4$F$N%0%k!<%W$NA4$F$N4|8B@Z$l:o=|2DG=$J5-;v$KBP$7$F!"%(%/%9%Q%$%"=hM}$r(B
+$B9T$$$^$9!#(B(@code{gnus-group-expire-all-groups})$B!#(B
 
 @end table
 
@@ -3434,7 +3437,7 @@ Gnus
 @kindex C-c C-x (Topic)
 @findex gnus-topic-expire-articles
 ($B$b$7$"$l$P(B) $B8=:_$N%0%k!<%W$+%H%T%C%/$+$NA4$F$N;~8B>C5n2DG=5-;v$r;~8B>C(B
-$B5n$7$^$9(B (@code{gnus-topic-expire-articles})$B!#(B
+$B5n$7$^$9(B (@code{gnus-topic-expire-articles})$B!#(B(@pxref{Expiring Mail})$B!#(B
 
 @item C-k
 @kindex C-k (Topic)
@@ -3993,6 +3996,9 @@ Gnus $B$OJQ?t(B @code{gnus-extract-address-components} $B$NCM$r(B @code{From
 $B%U%!$G$N9T$NMM<0(B (format) $B$rJQ99$9$k$3$H$,$G$-$^$9!#$$$/$D$+$N3H(B
 $BD%(B (@pxref{Formatting Variables}) $B$r=|$$$F!"IaDL$N(B @code{format} $BJ8;zNs(B
 $B$HF1$8$h$&$KF0:n$7$^$9!#(B
+
+$B9T$K$O>o$K%3%m%s$,B8:_$7$F$$$J$1$l$P$J$j$^$;$s!#A`:n$7$?8e$K!"%+!<%=%k$O(B
+$B$$$D$b%3%m%s$N>l=j$K0\F0$7$^$9!#(B
 
 $B=i4|CM$NJ8;zNs$O(B @samp{%U%R%z%I%(%[%4L: %-20,20n%]%) %s\n} $B$G$9!#(B
 
@@ -5725,6 +5731,17 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B!X$:$l!Y$r%9%l%C%I$rJd40$9$k$N$KLr$KN)$D$+$r9MN8$;$:$KI=<($7$^$9!#:G8e$K!"(B
 $B$3$NJQ?t$,(B @code{more} $B$G$"$k$H!"(Bgnus $B$O$I$3$K$b$D$J$,$C$F$$$J$$;^MU$N$^(B
 $B$P$i$J@a$r@Z$jMn$H$7$^$;$s!#$3$NJQ?t$O%G%#%U%)%k%H$G$O(B @code{nil} $B$G$9!#(B
+
+@item gnus-read-all-available-headers
+@vindex gnus-read-all-available-headers
+$B$3$l$O$I$A$i$+$H8@$($P$"$^$jLr$KN)$?$J$$JQ?t$G$9!#%K%e!<%9$G$O$J$$%0%k!<(B
+$B%W$K$*$$$F35N,%P%C%U%!$,$H$F$bBg$-$/$J$j!"$7$+$b?F5-;v$rC)$k$3$H$,$G$-$J(B
+$B$$>l9g$K;H$&$3$H$rA[Dj$7$F$$$^$9!#$=$l$O<g$K(B @code{nnultimate} $B%0%k!<%W(B
+$B$N$h$&$J!"%&%'%V$K4p$E$$$?%0%k!<%W$G$9!#(B
+
+$B$3$l$r;H$o$J$$>l9g$O%G%#%U%)%k%H$N(B @code{nil} $B$N$^$^$K$7$F$*$/$N$,L5Fq$G(B
+$B$9!#;H$$$?$$>l9g$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$+!"$9$Y$F$N%0%k!<%WL>$K9g(B
+$BCW$9$k(B @code{t} $B$K$7$F2<$5$$!#(B
 @end table
 
 @node More Threading
@@ -8152,8 +8169,10 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @item B e
 @kindex B e ($B35N,(B)
 @findex gnus-summary-expire-articles
-$B%0%k!<%W$N$9$Y$F$N4|8B:o=|2DG=$J5-;v$r4|8B@Z$l:o=|$7$^(B
-$B$9(B (@code{gnus-summary-expire-articles})$B!#(B
+$B8=:_$N%0%k!<%W$N$9$Y$F$N4|8B:o=|2DG=$J5-;v$K$D$$$F!"4|8B:o=|$N=h(B
+$BM}(B (@code{gnus-summary-expire-articles}) $B$r9T$J$$$^$9!#$3$l$O!"$=$N%0%k!<(B
+$B%W$K$7$P$i$/B8:_$7$F$$$?4|8B@Z$l:o=|2DG=$J$9$Y$F$N5-;v$r>C5n$9$k$H$$$&$3(B
+$B$H$G$9!#(B(@pxref{Expiring Mail})$B!#(B
 
 @item B M-C-e
 @kindex B M-C-e ($B35N,(B)
@@ -8732,7 +8751,7 @@ Gnus is able to verify PGP or S/MIME signed messages or decrypt PGP
 encrypted messages.
 
 @enumerate
-@item 
+@item
 To verify or decrypt PGP messages, you have to install mailcrypt or
 gpg.el.
 
@@ -9299,12 +9318,13 @@ gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 
 @lisp
 (add-hook 'gnus-select-group-hook
-          (lambda ()
-            (cond
-             ((string-match "^de\\." gnus-newsgroup-name)
-              (ispell-change-dictionary "deutsch"))
-             (t
-              (ispell-change-dictionary "english")))))
+	  (lambda ()
+	    (cond
+	     ((string-match
+	       "^de\\." (gnus-group-real-name gnus-newsgroup-name))
+	      (ispell-change-dictionary "deutsch"))
+	     (t
+	      (ispell-change-dictionary "english")))))
 @end lisp
 
 $B$"$J$?$NI,MW$K1~$8$FJQ99$7$F2<$5$$!#(B
@@ -9669,10 +9689,10 @@ to 700, for your own safety.
 If you want to benefit of PGP2.6 compatibility, you might create a script named
 @file{gpg-2comp} with these instructions:
 
-@code{
+@example
 #!/bin/sh
 exec gpg --rfc1991 "$@@"
-}
+@end example
 
 If you don't want to use such compatibility, you can add the following line to
 your @file{~/.emacs} or @file{~/.gnus}:
@@ -11711,10 +11731,10 @@ Gnus $B$KK>$^$7$/$J$$%a!<%k$r:o=|$5$;$k$?$a$K$O!"5-;v$r(B @dfn{$B4|8B@Z$l>C5n
 
 $B<+F04|8B@Z$l>C5n2DG=%0%k!<%W$r:n$k;v$O!"A4$F$N4{FI5-;v$,4|8B@Z$l>C5n$5$l(B
 $B$k;v$G$O$J$$;v$K5$$rIU$1$F$/$@$5$$(B---$B4|8B@Z$l>C5n2DG=$H$7$F0u$NIU$$$?5-(B
-$B;v$@$1$,4|8B@Z$l>C5n$5$l$^$9!#L?Na(B @kbd{d}$B$,<+F0E*$K%0%k!<%W$r4|8B@Z$l>C(B
-$B5n2DG=$K$9$k$N$G$OL5$$$H$$$&;v$K$b5$$rIU$1$F$/$@$5$$(B---$BH><+F0$N!"<+F04|(B
-$B8B@Z$l>C5n2DG=%0%k!<%W$G5-;v$r4{FI$K0uIU$1$k$3$H$@$1$,5-;v$r4|8B@Z$l>C5n(B
-$B2DG=$K$7$^$9!#(B
+$B;v$@$1$,4|8B@Z$l>C5n$5$l$^$9!#L?Na(B @kbd{d}$B$,<+F0E*$K5-;v$r4|8B@Z$l>C5n2D(B
+$BG=$K$9$k$N$G$OL5$$$H$$$&;v$K$b5$$rIU$1$F$/$@$5$$(B---$BH><+F0$N!"<+F04|8B@Z(B
+$B$l>C5n2DG=%0%k!<%W$G5-;v$r4{FI$K0uIU$1$k$3$H$@$1$,5-;v$r4|8B@Z$l>C5n2DG=(B
+$B$K$7$^$9!#(B
 
 @lisp
 (setq gnus-auto-expirable-newsgroups
@@ -12020,16 +12040,18 @@ Gnus $B$O%a!<%k%0%k!<%W$rF0:n$9$k$h$&$K$9$k$H%a!<%k%9%W!<%k$rFI$_9~$_$^$9!#(B
 @table @code
 @item nnmbox-mbox-file
 @vindex nnmbox-mbox-file
-$BMxMQ<T$N%[!<%`%G%#%l%/%H%j!<$N%a!<%k%\%C%/%9$NL>A0!#(B
+$BMxMQ<T$N%[!<%`%G%#%l%/%H%j!<$N%a!<%k%\%C%/%9$NL>A0!#4{DjCM(B
+$B$O(B @file{~/mbox} $B$G$9!#(B
 
 @item nnmbox-activate-file
 @vindex nnmbox-active-file
-$B%a!<%k%\%C%/%9$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
+$B%a!<%k%\%C%/%9$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
+$B$O(B @file{~/.mbox-active} $B$G$9!#(B
 
 @item nnmbox-get-new-mail
 @vindex nnmbox-get-new-mail
 @code{nil} $B$G$J$1$l$P!"(B@code{nnmbox} $B$OF~$C$FMh$?%a!<%k$rFI$_9~$s$G%0%k!<(B
-$B%W$KJ,3d$7$^$9!#(B
+$B%W$KJ,3d$7$^$9!#4{DjCM$O(B @code{t} $B$G$9!#(B
 @end table
 
 @node Rmail Babyl
@@ -12048,15 +12070,17 @@ Gnus $B$O%a!<%k%0%k!<%W$rF0:n$9$k$h$&$K$9$k$H%a!<%k%9%W!<%k$rFI$_9~$_$^$9!#(B
 @table @code
 @item nnbabyl-mbox-file
 @vindex nnbabyl-mbox-file
-rmail mbox $B%U%!%$%k$NL>A0(B
+rmail mbox $B%U%!%$%k$NL>A0!#4{DjCM$O(B @file{~/RMAIL} $B$G$9!#(B
 
 @item nnbabyl-active-file
 @vindex nnbabyl-active-file
-rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
+rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM(B
+$B$O(B @file{~/.rmail-active} $B$G$9!#(B
 
 @item nnbabyl-get-new-mail
 @vindex nnbabyl-get-new-mail
 @code{nil} $B$G$J$1$l$P!"(B@code{nnbabyl} $B$OF~$C$F$/$k%a!<%k$rFI$_9~$_$^$9!#(B
+$B4{DjCM$O(B @code{t} $B$G$9!#(B
 @end table
 
 @node Mail Spool
@@ -12096,23 +12120,27 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 @item nnml-directory
 @vindex nnml-directory
 $BA4$F$N(B @code{nnml} $B%G%#%l%/%H%j!<$O$3$N%G%#%l%/%H%j!<$N2<$KCV$+$l$^$9!#(B
+$B4{DjCM$O(B `message-directory' $B$NCM(B ($B$=$N4{DjCM$O(B @file{~/Mail}) $B$G$9!#(B
 
 @item nnml-active-file
 @vindex nnml-active-file
-@code{nnml} $B%5!<%P!<$N$?$a$N%"%/%F%#%V%U%!%$%k!#(B
+@code{nnml} $B%5!<%P!<$N$?$a$N%"%/%F%#%V%U%!%$%k!#4{DjCM(B
+$B$O(B @file{~/Mail/active"} $B$G$9!#(B
 
 @item nnml-newsgroups-file
 @vindex nnml-newgroups-file
-@code{nnml} $B%0%k!<%W5-=R%U%!%$%k!#(B@xref{Newsgroups File Format}$B!#(B
+@code{nnml} $B%0%k!<%W5-=R%U%!%$%k!#(B@xref{Newsgroups File Format}$B!#4{DjCM(B
+$B$O(B @file{~/Mail/newsgroups"} $B$G$9!#(B
 
 @item nnml-get-new-mail
 @vindex nnml-get-new-mail
-@code{nil} $B$G$J$1$l$P!"(B@code{nnml} $B$OF~$C$FMh$?%a!<%kFI$_9~$_$^$9!#(B
+@code{nil} $B$G$J$1$l$P!"(B@code{nnml} $B$OF~$C$FMh$?%a!<%kFI$_9~$_$^$9!#4{Dj(B
+$BCM$O(B @code{t} $B$G$9!#(B
 
 @item nnml-nov-is-evil
 @vindex nnml-nov-is-evil
 @code{nil} $B$G$J$1$l$P!"$3$N%P%C%/%(%s%I$O$I$N(B @sc{nov} $B%U%!%$%k$bL5;k$7(B
-$B$^$9!#(B
+$B$^$9!#4{DjCM$O(B @code{nil} $B$G$9!#(B
 
 @item nnml-nov-file-name
 @vindex nnml-nov-file-name
@@ -12149,10 +12177,12 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 @item nnmh-directory
 @vindex nnmh-directory
 $BA4$F$N(B @code{nnmh} $B%G%#%l%/%H%j!<$O$3$N%G%#%l%/%H%j!<$N2<$KCV$+$l$^$9!#(B
+$B4{DjCM$O(B @code{message-directory} $B$NCM(B ($B$=$N4{DjCM$O(B @file{~/Mail}) $B$G$9!#(B
 
 @item nnmh-get-new-mail
 @vindex nnmh-get-new-mail
-@code{nil} $B$G$J$1$l$P!"(B@code{nnmh} $B$OF~$C$F$/$k%a!<%k$rFI$_9~$_$^$9!#(B
+@code{nil} $B$G$J$1$l$P!"(B@code{nnmh} $B$OF~$C$F$/$k%a!<%k$rFI$_9~$_$^$9!#4{(B
+$BDjCM$O(B @code{t} $B$G$9!#(B
 
 @item nnmh-be-safe
 @vindex nnmh-be-safe
@@ -12161,7 +12191,7 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 $BF|IU$HL\$KF~$kA4$F$N>pJs$rD4$Y$^$9$N$G!"$3$l$r(B @code{t} $B$K@_Dj$9$k;v$O?<(B
 $B9o$JB.EYDc2<$,5/$3$k$H$$$&;v$G$9!#$b$7(B @code{nnmh} $B5-;v$rFI$`$N(B
 $B$K(B gnus $B0J30$N$b$N$r;H$C$F$$$J$$$N$G$"$l$P!"$3$NJQ?t$r(B @code{t} $B$K@_Dj$9(B
-$B$kI,MW$O$"$j$^$;$s!#(B
+$B$kI,MW$O$"$j$^$;$s!#4{DjCM$O(B @code{nil} $B$G$9!#(B
 @end table
 
 @node Mail Folders
@@ -12181,19 +12211,22 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 @item nnfolder-directory
 @vindex nnfolder-directory
 $BA4$F$N(B @code{nnfolder} $B%a!<%k%\%C%/%9$O$3$N%G%#%l%/%H%j!<$N2<$KCV$+$l$^(B
-$B$9!#(B
+$B$9!#4{DjCM$O(B @code{message-directory} $B$NCM(B ($B$=$N4{DjCM(B
+$B$O(B @file{~/Mail}) $B$G$9!#(B
 
 @item nnfolder-active-file
 @vindex nnfolder-active-file
-$B%"%/%F%#%V%U%!%$%k$NL>A0!#(B
+$B%"%/%F%#%V%U%!%$%k$NL>A0!#4{DjCM$O(B @file{~/Mail/active} $B$G$9!#(B
 
 @item nnfolder-newgroups-file
 @vindex nnfolder-newsgroups-file
-$B%0%k!<%W5-=R%U%!%$%k$NL>A0!#(B@xref{Newsgroups File Format}$B!#(B
+$B%0%k!<%W5-=R%U%!%$%k$NL>A0!#(B@xref{Newsgroups File Format}$B!#4{DjCM(B
+$B$O(B @file{~/Mail/newsgroups"} $B$G$9!#(B
 
 @item nnfolder-get-new-mail
 @vindex nnfolder-get-new-mail
 @code{nil} $B$G$J$1$l$P!"(B@code{nnfolder} $B$OF~$C$F$/$k%a!<%k$rFI$_9~$_$^$9!#(B
+$B4{DjCM$O(B @code{t} $B$G$9!#(B
 
 @item nnfolder-save-buffer-hook
 @vindex nnfolder-save-buffer-hook
@@ -12219,6 +12252,7 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 @item nnfolder-nov-is-evil
 @vindex nnfolder-nov-is-evil
 $B$b$7Hs(B@code{nil}$B$J$i!"$3$N%P%C%/%(%s%I$O(B @sc{nov} $B%U%!%$%k$rL5;k$7$^$9!#(B
+$B4{DjCM$O(B @code{nil} $B$G$9!#(B
 
 @end table
 
@@ -12372,6 +12406,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 * Ultimate::       Ultimate Bulletin Board $B%7%9%F%`(B
 * Web Archive::    $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::  $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
+* RSS::            RDF Site Summary $B$rFI$`(B
 * Customizing w3:: Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
 @end menu
 
@@ -12658,6 +12693,28 @@ asahi RET an_group RET}$B!#(B(@sc{an_group} $B$r1\Mw$7$?$$5-;v%0%k!<%W$KCV$-4
 @lisp
 (nnshimbun "asahi" (nnshimbun-url "http://iij.asahi.com/"))
 @end lisp
+
+@node RSS
+@subsection RSS
+@cindex nnrss
+@cindex RSS
+
+$B$$$/$D$+$N%5%$%H$O(B RDF site summary (RSS) $B$r;}$C$F$$$^(B
+$B$9(B @uref{http://purl.org/rss/1.0/spec}$B!#$3$l$O$H$F$b5,B'E*$+$DNI<A$J%$%s(B
+$B%?!<%U%'!<%9$G!"(Bgnus $B$,%0%k!<%W$r>o$K?7$7$/$7$F$*$/$?$a$N>pJs$rF@$k$3$H(B
+$B$,$G$-$^$9!#(B
+
+$B4JC1$K(B @code{nnrss} $B$r;H$$;O$a$k$K$O!"%0%k!<%W%P%C%U%!(B
+$B$G(B @kbd{B nnrss RET RET} $B$H%?%$%W$7$F!"%0%k!<%W$r9VFI$7$F2<$5$$!#(B
+
+$B0J2<$N(B @code{nnrss} $BJQ?t$,JQ992DG=$G$9(B:
+
+@table @code
+@item nnrss-directory
+@vindex nnrss-directory
+@code{nnrss} $B$,%U%!%$%k$r=q$-9~$`%G%#%l%/%H%j!<$G!"%G%#%U%)%k%H(B
+$B$O(B @samp{~/News/rss/} $B$G$9!#(B
+@end table
 
 @node Customizing w3
 @subsection w3 $B$N%+%9%?%^%$%:(B
@@ -13593,8 +13650,8 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 
 $B%5!<%P$K%m%0%$%s$9$k$?$a$K;H$&G'>Z>pJs(B (authinfo) $B$r4^$`%U%!%$%k$G$9!#$=(B
 $B$N7A<0$O(B ($B$[$H$s$I(B) @code{ftp} $B$N(B @file{~/.netrc} $B%U%!%$%k$HF1$8$G$9!#87(B
-$BL)$JDj5A$O!"JQ?t(B @code{nntp-authinfo-file} $B$*$h$S(B @xref{NNTP} $B$r8+$F2<$5(B
-$B$$!#(B
+$BL)$JDj5A$O!"JQ?t(B @code{nntp-authinfo-file} $B$r8+$F2<$5$$!#$=$7(B
+$B$F(B @ref{NNTP} $B$b8+$F2<$5$$!#(B
 
 @end table
 
@@ -13792,9 +13849,9 @@ ACL $B$O(B Access Control List ($B;HMQ@)8B0lMw(B) $B$NN,$G$9!#(BIMAP $B$G
 @kindex G x
 @findex gnus-group-nnimap-expunge
 
-@code{nnimap-expunge-close} $B$K(B @code{never} $B$r@_Dj$7$F$$$l$P!"%a!<%k%\%C(B
-$B%/%9$NA4$F$N>C5n$5$l$?5-;v$r<jF0$G:o=|$7$?$$$H;W$&$G$7$g$&!#(B@kbd{G x} $B$,(B
-$B$^$5$K$3$N$3$H$r$7$^$9!#(B
+@code{nnimap-expunge-on-close} $B$K(B @code{never} $B$r@_Dj$7$F$$$l$P!"%a!<%k(B
+$B%\%C%/%9$NA4$F$N>C5n$5$l$?5-;v$r<jF0$G:o=|$7$?$$$H;W$&$G$7$g$&!#(B
+@kbd{G x} $B$,$^$5$K$3$N$3$H$r$7$^$9!#(B
 
 $B8=;~E@$G$O!">C5n$5$l$?5-;v$rI=<($9$kJ}K!$O$"$j$^$;$s!#$?$@>C5n$G$-$k$@$1(B
 $B$G$9!#(B
@@ -19682,7 +19739,7 @@ M******** sm*rtq**t*s $B$rE,@Z$JJ8>O$KK]0F$9$k?7$7$$L?Na$,$"$j$^$9(B---
 @subsubsection Pterodactyl Gnus
 
 Gnus 5.8 $B$N?7$7$$5!G=(B:
-  
+
 @itemize @bullet
 
 @item $B%a!<%k$r<h$j9~$`5!G=$,JQ$o$j$^$7$?!#$?$/$5$s$N>\:Y$K$D$$$F$O%^%K%e(B

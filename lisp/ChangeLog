@@ -1,3 +1,95 @@
+2001-05-05 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-request-expire-articles): Fix.
+
+	* nnrss.el (nnrss-open-server): Read server data when it is called.
+	(nnrss-request-expire-articles): Fix.
+
+2001-05-05 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-do-send-housekeeping): mail-abbrevs may
+	rename buffer behind Gnus.
+
+2001-05-04 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-check-group): Use nnheader-translate-file-chars.
+	(nnrss-group-alist): Add more resources.
+	(nnrss-check-group): Ignore errors.
+
+2001-05-04 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-request-expire-articles): Correct the return value.
+
+	* nnslashdot.el (nnslashdot-request-list): Add time.
+	(nnslashdot-request-expire-articles): New.
+
+	* gnus-start.el (gnus-check-bogus-newsgroups): Remove bogus
+	secondary methods too.
+
+2001-05-03 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-use-followup-to): Set default value to t.
+
+2001-05-03  Florian Weimer  <fw@deneb.enyo.de>
+
+	* message.el (message-dont-reply-to-names): Fix documentation.
+	(message-get-reply-headers): Use Mail-Followup-To only for wide
+	replies.
+
+2001-05-03 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-request-expire-articles): Calculate # of days
+	correctly.
+	(nnrss-check-group): Use time.
+
+2001-05-01 19:21:19 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.03 is released.
+
+2001-05-01 19:06:21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnultimate.el (nnultimate-topic-article-to-article): Use the
+	group.
+
+2001-04-24 19:50:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-srvr.el (gnus-server-insert-server-line): Add a space.
+
+2001-04-15 14:55:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnultimate.el (nnultimate-retrieve-headers): Return all
+	available headers. 
+
+	* gnus-sum.el (gnus-read-all-available-headers): New variable.
+	(gnus-get-newsgroup-headers-xover): Use it.
+
+2001-04-14 15:47:26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnultimate.el (nnultimate-retrieve-headers): Clean up.
+
+2001-04-30 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-retrieve-groups): Use throw instead of error.
+
+2001-04-29 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-insert-w3): Use cache before I figure out how to
+	disable it.
+
+	* gnus.el (gnus-info-nodes): Remove a few The's.
+
+2001-04-29 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mail-source.el (mail-source-movemail): Call-process may return a
+	signal description string.
+
+	* gnus-start.el (gnus-read-newsrc-el-file):
+	gnus-newsrc-file-version may be nil.
+
+	* nnmail.el (nnmail-get-new-mail): Use the exact file only.
+	Suggested by Michael Sperber [Mr. Preprocessor]  
+	<sperber@informatik.uni-tuebingen.de>.
+
 2001-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* mm-uu.el (mm-uu-configure-list): Fixed customize type.
