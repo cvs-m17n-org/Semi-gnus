@@ -2285,28 +2285,19 @@ to REFS-LIST."
       (let ((pos message-list-references-add-position))
 	(while (and refs-list
 		    (> pos 0))
-	  (setq saved-id (cons (car refs-list) saved-id)
-		refs-list (cdr refs-list)
-		pos (1- pos)))))
+	  (push (pop refs-list) saved-id)
+	  (setq pos (1- pos)))))
     (while refs-strs
-      (setq refs (car refs-strs)
-	    refs-strs (cdr refs-strs))
-      (when refs
+      (when (setq refs (pop refs-strs))
 	(setq refs (std11-parse-msg-ids (std11-lexical-analyze refs)))
 	(while refs
-	  (setq ref (car refs)
-		refs (cdr refs))
-	  (when (eq (car ref) 'msg-id)
-	    (setq id (concat "<"
-			     (mapconcat
-			      (function (lambda (p) (cdr p)))
-			      (cdr ref) "")
-			     ">"))
+	  (when (eq (car (setq ref (pop refs))) 'msg-id)
+	    (setq id (concat "<" (mapconcat 'cdr (cdr ref) "") ">"))
 	    (or (member id refs-list)
+		(member id saved-id)
 		(push id refs-list))))))
     (while saved-id
-      (setq refs-list (cons (car saved-id) refs-list)
-	    saved-id (cdr saved-id)))
+      (push (pop saved-id) refs-list))
     refs-list))
 
 (defvar gnus-article-copy)

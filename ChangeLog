@@ -1,3 +1,16 @@
+2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/message.el (message-list-references): Do not insert
+	duplicate Message-Id, when specified
+	`message-list-references-add-position'.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): Support group address.
+	(gnus-bbdb/insert-address-regexp): New function.
+
 2000-05-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-debug): Add "nntp.el" and `defvoo'.
