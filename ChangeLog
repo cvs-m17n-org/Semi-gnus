@@ -1,3 +1,43 @@
+2000-03-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.13 (This is alpha status.)
+	CAUTION: Changed coding system of ``~/.newsrc.eld''.
+
+	If you are using Nana-gnus 7.  Check your ~/.newsrc.eld before
+	start up after this version.
+	1. Quit your gnus.
+	2. Backup your ~/.newsrc.eld.
+	2. Find ~/.newsrc.eld with `binary' coding system.
+	3. If you used `gnus-compile', delete a line which start
+	   `(setq gnus-format-specs'.
+	4. Change buffer file coding system to `ctext'.
+	5. Save buffer.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.13.
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system): Use
+	`ctext' instead of `binaly'.
+
+* 2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-compile-user-specs): New user option.
+
+	* lisp/gnus-spec.el (gnus-compile): Modify the actual format specs
+	as well; don't bind `gnus-tmp-func'.
+	(gnus-update-format-specifications): Use
+	`gnus-update-format-specification-1'.
+	(gnus-update-format-specification-1): New function.
+	(gnus-format-specs-compiled): Modify the form.
+	(TopLevel): Require `alist'.
+
+* 2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-spec.el (gnus-compile): Don't modify the value of
+	`gnus-format-specs', generate compiled specs in
+	`gnus-format-specs-compiled' instead; don't touch the dribble
+	buffer.
+	(gnus-format-specs-compiled): New internal variable.
+
 2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.12 (This is alpha status.)
