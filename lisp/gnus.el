@@ -2823,9 +2823,8 @@ gnus-registry.el will populate this if it's loaded.")
 
 (eval-and-compile
   (unless (featurep 'xemacs)
-    (if (>= emacs-major-version 21)
-	(autoload 'x-face-decode-message-header "x-face-e21")
-      (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule"))))
+    (autoload 'x-face-decode-message-header "x-face-e21")
+    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
 
 (unless (and (fboundp 'base64-encode-string)
 	     (subrp (symbol-function 'base64-encode-string)))

@@ -1,3 +1,16 @@
+2004-01-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treat-smiley): Ignore Emacs version
+	number.
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Don't support old
+	Emacsen.
+
+	* lisp/gnus.el: Always autoload `x-face-decode-message-header' and
+	`x-face-mule-gnus-article-display-x-face'.
+
+	* lisp/pop3.el (pop3-md5): Always use the built-in `md5'.
+
 2004-01-07  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>
 
 	* etc/gnus-tut.txt: `G m' instead of `G V' (tiny patch).

@@ -1259,10 +1259,9 @@ See Info node `(gnus)Customizing Articles' and Info node
   (not (or (featurep 'xemacs)
 	   (gnus-image-type-available-p 'xpm)
 	   (gnus-image-type-available-p 'pbm)))
-  "If non-nil, gnus uses `smiley-mule' for displaying smileys rather than
-`smiley'.  It defaults to t when Emacs 20 or earlier is running.
+  "Non-nil means use `smiley-mule' to show smileys rather than `smiley'.
 `smiley-mule' is boundled in BITMAP-MULE package.  You can set it to t
-even if you are using Emacs 21+.  It has no effect on XEmacs."
+even if your Emacs supports images.  It has no effect on XEmacs."
   :group 'gnus-article-various
   :type 'boolean
   :get (lambda (symbol)
@@ -2052,8 +2051,7 @@ unfolded."
   "Toggle display of textual emoticons (\"smileys\") as small graphical icons."
   (interactive)
   (unless (featurep 'xemacs)
-    (when (and (>= emacs-major-version 21)
-	       (not gnus-article-should-use-smiley-mule)
+    (when (and (not gnus-article-should-use-smiley-mule)
 	       gnus-article-smiley-mule-loaded-p)
       (load "smiley" nil t)
       (setq gnus-article-smiley-mule-loaded-p nil))

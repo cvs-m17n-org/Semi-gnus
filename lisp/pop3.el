@@ -526,29 +526,11 @@ If NOW, use that time instead."
 					      coding-system noerror)))
 		      byte-compile-function-environment))))))
 
-;; Note that `pop3-md5' should never encode a given string to use for
-;; the apop authentication.
+;; Note that `pop3-md5' should never encode a given string to use for the
+;; apop authentication, so we should specify the `binary' coding system.
 (eval-and-compile
-  (if (fboundp 'md5)
-      (if (condition-case nil
-	      (md5 "\
-Check whether the 4th argument CODING-SYSTEM is allowed"
-		   nil nil 'binary)
-	    (error nil))
-	  ;; Emacs 21 or XEmacs 21
-	  ;; (md5 OBJECT &optional START END CODING-SYSTEM NOERROR)
-	  (defun pop3-md5 (string)
-	    (md5 string nil nil 'binary))
-	;; The reason why the program reaches here:
-	;; 1. XEmacs 20 is running and the built-in `md5' doesn't
-	;;    allow the 4th argument.
-	;; 2. `md5' has been defined by one of some lisp libraries.
-	;; 3. This file is being compiled in the Gnus source tree,
-	;;    and `md5' has been defined in lpath.el.
-	(defalias 'pop3-md5 'md5))
-    ;; The lisp function will be provided by FLIM or other libraries.
-    (autoload 'md5 "md5")
-    (defalias 'pop3-md5 'md5)))
+  (defalias 'pop3-md5 (lambda (string)
+			(md5 string nil nil 'binary))))
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
