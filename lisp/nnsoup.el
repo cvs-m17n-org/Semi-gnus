@@ -687,7 +687,7 @@ backend for the messages.")
 	    (message-remove-header message-ignored-mail-headers t))
 	  (goto-char (point-max))
 	  ;; require one newline at the end.
-	  (or (= (preceding-char) ?\n)
+	  (or (eq (char-before) ?\n)
 	      (insert ?\n))
 	  (let ((case-fold-search t))
 	    ;; Change header-delimiter to be what sendmail expects.

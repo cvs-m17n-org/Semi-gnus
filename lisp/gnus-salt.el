@@ -702,7 +702,7 @@ Two predefined functions are available:
 	  (while (progn
 		   (forward-line -1)
 		   (forward-char col)
-		   (= (following-char) ? ))
+		   (eq (char-after) ? ))
 	    (delete-char 1)
 	    (insert (caddr gnus-tree-parent-child-edges)))
 	  (goto-char beg)))

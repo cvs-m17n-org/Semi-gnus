@@ -1772,13 +1772,13 @@ newsgroup."
 		       (progn
 			 (skip-chars-forward " \t")
 			 (not
-			  (or (= (following-char) ?=)
-			      (= (following-char) ?x)
-			      (= (following-char) ?j)))))
+			  (or (eq (char-after) ?=)
+			      (eq (char-after) ?x)
+			      (eq (char-after) ?j)))))
 		  (progn
 		    (set group (cons min max))
 		    ;; if group is moderated, stick in moderation table
-		    (when (= (following-char) ?m)
+		    (when (eq (char-after) ?m)
 		      (unless gnus-moderated-hashtb
 			(setq gnus-moderated-hashtb (gnus-make-hashtable)))
 		      (gnus-sethash (symbol-name group) t
@@ -1813,7 +1813,7 @@ newsgroup."
     ;; Let the Gnus agent save the active file.
     (when (and gnus-agent real-active)
       (gnus-agent-save-groups method))
-    
+
     (goto-char (point-min))
     ;; We split this into to separate loops, one with the prefix
     ;; and one without to speed the reading up somewhat.
@@ -1836,7 +1836,7 @@ newsgroup."
       (let (min max group)
 	(while (not (eobp))
 	  (condition-case ()
-	      (when (= (following-char) ?2)
+	      (when (eq (char-after) ?2)
 		(read cur) (read cur)
 		(setq min (read cur)
 		      max (read cur))
@@ -2056,7 +2056,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(unless (boundp symbol)
 	  (set symbol nil))
 	;; It was a group name.
-	(setq subscribed (= (following-char) ?:)
+	(setq subscribed (eq (char-after) ?:)
 	      group (symbol-name symbol)
 	      reads nil)
 	(if (eolp)
@@ -2080,7 +2080,7 @@ If FORCE is non-nil, the .newsrc file is read."
 			   (read buf)))
 	      (widen)
 	      ;; If the next character is a dash, then this is a range.
-	      (if (= (following-char) ?-)
+	      (if (eq (char-after) ?-)
 		  (progn
 		    ;; We read the upper bound of the range.
 		    (forward-char 1)
@@ -2102,8 +2102,8 @@ If FORCE is non-nil, the .newsrc file is read."
 		(push num1 reads))
 	      ;; If the next char in ?\n, then we have reached the end
 	      ;; of the line and return nil.
-	      (/= (following-char) ?\n))
-	     ((= (following-char) ?\n)
+	      (not (eq (char-after) ?\n)))
+	     ((eq (char-after) ?\n)
 	      ;; End of line, so we end.
 	      nil)
 	     (t

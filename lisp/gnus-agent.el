@@ -2,6 +2,7 @@
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         Katsumi Yamaoka <yamaoka@jpl.org>
 ;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -92,7 +93,7 @@ If nil, only read articles will be expired."
 (defvar gnus-agent-spam-hashtb nil)
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
-(defvar gnus-agent-file-coding-system 'no-conversion)
+(defvar gnus-agent-file-coding-system 'raw-text)
 
 ;; Dynamic variables
 (defvar gnus-headers)

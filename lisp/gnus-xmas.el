@@ -2,6 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -56,7 +57,7 @@ automatically."
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
-(defcustom gnus-xmas-logo-color-style 'moss
+(defcustom gnus-xmas-logo-color-style 'sky
   "*Color styles used for the Gnus logo."
   :type '(choice (const flame) (const pine) (const moss)
 		 (const irish) (const sky) (const tin)
@@ -668,8 +669,13 @@ the resulting string may be narrower than END-COLUMN.
     (goto-char (point-min))
     (let* ((pheight (+ 20 (count-lines (point-min) (point-max))))
 	   (wheight (window-height))
-	   (rest (- wheight pheight)))
-      (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n))))
+	   (rest (1- (- wheight pheight))))
+      (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+    (goto-char (point-min))
+    (insert-char ?\ ;;;
+		 (max 0 (/ (- (window-width) (length gnus-version)) 2)))
+    (insert gnus-version "\n")
+    (put-text-property (point-min) (1- (point)) 'face 'gnus-splash-face))
    (t
     (insert
      (format "              %s
@@ -700,8 +706,13 @@ the resulting string may be narrower than END-COLUMN.
     (forward-line 1)
     (let* ((pheight (count-lines (point-min) (point-max)))
 	   (wheight (window-height))
-	   (rest (- wheight pheight)))
+	   (rest (1- (- wheight pheight))))
       (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+    (save-excursion
+      (goto-char (point-min))
+      (insert-char ? ;;;
+		   (max 0 (/ (- (window-width) (length gnus-version)) 2)))
+      (insert gnus-version "\n"))
     ;; Paint it.
     (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)))
   (setq modeline-buffer-identification

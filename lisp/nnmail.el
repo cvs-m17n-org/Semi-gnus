@@ -453,6 +453,11 @@ parameter.  It should return nil, `warn' or `delete'."
 		 (const warn)
 		 (const delete)))
 
+(defcustom nnmail-split-header-length-limit 1024
+  "Header lines longer than this limit are excluded from the split function."
+  :group 'nnmail
+  :type 'integer)
+
 ;;; Internal variables.
 
 (defvar nnmail-split-history nil
@@ -529,8 +534,7 @@ If this variable is `t', do not use password cache.")
 	  t)
       (file-error nil))))
 
-(defvar nnmail-pathname-coding-system
-  'iso-8859-1
+(defvar nnmail-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnmail-group-pathname (group dir &optional file)
@@ -887,7 +891,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -916,7 +920,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -1132,10 +1136,10 @@ FUNC will be called with the group name to determine the article number."
 	;; existence to process.
 	(goto-char (point-min))
 	(while (not (eobp))
-	  (end-of-line)
-	  (if (> (current-column) 1024)
-	      (gnus-delete-line)
-	    (forward-line 1)))
+	  (unless (< (move-to-column nnmail-split-header-length-limit)
+		     nnmail-split-header-length-limit)
+	    (delete-region (point) (progn (end-of-line) (point))))
+	  (forward-line 1))
 	;; Allow washing.
 	(goto-char (point-min))
 	(run-hooks 'nnmail-split-hook)
@@ -1789,11 +1793,11 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(goto-char (point-min))
 	(while (re-search-forward "[^ \t=]+" nil t)
 	  (setq name (match-string 0))
-	  (if (not (= (following-char) ?=))
+	  (if (not (eq (char-after) ?=))
 	      ;; Implied "yes".
 	      (setq value "yes")
 	    (forward-char 1)
-	    (if (not (= (following-char) ?\"))
+	    (if (not (eq (char-after) ?\"))
 		(if (not (looking-at "[^ \t]"))
 		    ;; Implied "no".
 		    (setq value "no")

@@ -1,4 +1,4 @@
-This package contains Semi-gnus 6.9.
+This package contains Semi-gnus 6.10.
 
 What is Semi-gnus?
 ==================
@@ -7,10 +7,10 @@ What is Semi-gnus?
 all features of Gnus and gnus-mime, so there are no need to install
 Gnus to use it, and you must not use gnus-mime for SEMI.
 
-  It requires SEMI package, so please get and install SEMI package
-before to install it. Nana-gnus 6.11 requires SEMI 1.12. You can get
-SEMI from
-ftp://ftp.jaist.ac.jp/pub/elisp/semi/
+  It requires APEL, FLIM and SEMI packages, so please get and install
+them before to install it. Semi-gnus 6.10 requires APEL 9.12 or later,
+the latest FLIM 1.12 and SEMI 1.12. You can get these packages from
+ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 Required environment for SEMI is written in README.en of SEMI package.
 
 How to get? (via CVS)
@@ -42,7 +42,7 @@ Major tags are following:
     semi-gnus		assigned to the latest stable version.  It is
 			very conservative.
 
-    for-semi-N1_N2	assigned to the latest stable version for SEMI 
+    for-semi-N1_N2	assigned to the latest stable version for SEMI
 			API N1.N2 (N1 and N2 are natural number).
 			(e.g. `for-semi-1_3' is for SEMI API 1.3)
 

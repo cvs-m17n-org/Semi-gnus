@@ -2222,7 +2222,7 @@ marks of articles."
     (while (setq point (pop config))
       (when (and (< point (point-max))
 		 (goto-char point)
-		 (= (following-char) ?\n))
+		 (eq (char-after) ?\n))
 	(subst-char-in-region point (1+ point) ?\n ?\r)))))
 
 ;; Various summary mode internalish functions.
@@ -3027,7 +3027,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 (defmacro gnus-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read buffer))))
 	   (if (numberp num) num 0)))
@@ -4439,7 +4439,6 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		      (setq ref
 			    (buffer-substring
 			     (progn
-                               ;; (end-of-line)
 			       (search-backward ">" end t)
 			       (1+ (point)))
 			     (progn
@@ -4571,7 +4570,7 @@ This is meant to be called in `gnus-article-internal-prepare-hook'."
 	  (save-restriction
 	    (nnheader-narrow-to-headers)
 	    (goto-char (point-min))
-	    (when (or (and (eq (downcase (following-char)) ?x)
+	    (when (or (and (eq (downcase (char-after)) ?x)
 			   (looking-at "Xref:"))
 		      (search-forward "\nXref:" nil t))
 	      (goto-char (1+ (match-end 0)))
@@ -5197,16 +5196,13 @@ The state which existed when entering the ephemeral is reset."
       (gnus-summary-recenter)
       (gnus-summary-position-point))))
 
-(defun gnus-summary-preview-mime-message (arg)
+(defun gnus-summary-preview-mime-message ()
   "MIME decode and play this message."
-  (interactive "P")
-  (or gnus-show-mime
-      (let ((gnus-break-pages nil)
-	    (gnus-show-mime t))
-	(gnus-summary-select-article t t)
-	))
-  (select-window (get-buffer-window gnus-article-buffer))
-  )
+  (interactive)
+  (let ((gnus-break-pages nil)
+	(gnus-show-mime t))
+    (gnus-summary-select-article gnus-show-all-headers t))
+  (select-window (get-buffer-window gnus-article-buffer)))
 
 ;;; Dead summaries.
 
@@ -7032,6 +7028,8 @@ and `request-accept' functions."
 	    ;; Copy any marks over to the new group.
 	    (let ((marks gnus-article-mark-lists)
 		  (to-article (cdr art-group)))
+	      (unless (gnus-group-auto-expirable-p to-newsgroup)
+		(setq marks (delete '(expirable . expire) marks)))
 
 	      ;; See whether the article is to be put in the cache.
 	      (when gnus-use-cache
@@ -7792,21 +7790,21 @@ marked."
 
 (defun gnus-summary-update-mark (mark type)
   (let ((forward (cdr (assq type gnus-summary-mark-positions)))
-        (buffer-read-only nil))
+	(buffer-read-only nil))
     (re-search-backward "[\n\r]" (gnus-point-at-bol) 'move-to-limit)
     (when (looking-at "\r")
       (incf forward))
     (when (and forward
-               (<= (+ forward (point)) (point-max)))
+	       (<= (+ forward (point)) (point-max)))
       ;; Go to the right position on the line.
       (goto-char (+ forward (point)))
       ;; Replace the old mark with the new mark.
-      (subst-char-in-region (point) (1+ (point)) (following-char) mark)
+      (subst-char-in-region (point) (1+ (point)) (char-after) mark)
       ;; Optionally update the marks by some user rule.
       (when (eq type 'unread)
-        (gnus-data-set-mark
-         (gnus-data-find (gnus-summary-article-number)) mark)
-        (gnus-summary-update-line (eq mark gnus-unread-mark))))))
+	(gnus-data-set-mark
+	 (gnus-data-find (gnus-summary-article-number)) mark)
+	(gnus-summary-update-line (eq mark gnus-unread-mark))))))
 
 (defun gnus-mark-article-as-read (article &optional mark)
   "Enter ARTICLE in the pertinent lists and remove it from others."

@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.16
+;; Version: 1.17
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -92,7 +92,8 @@
 ;;  "Goodbye Game"		; 1.12
 ;;  "Love is Gamble"		; 1.13
 ;;  "Lonely"			; 1.14
-  "Feel the wind"		; 1.16
+;;  "Feel the wind"		; 1.16
+  "Sadness like snow"		; 1.17
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -211,8 +212,8 @@ If there is any problem , please set this variable to nil(default).
 		  (substring inbox (match-end (string-match "^po:" inbox))
 			     (- (match-end (string-match "^.*@" inbox)) 1)))))
 	      (pop3-authentication-scheme
-	       (nth 1 (assoc inbox pop3-fma-spool-file-alist)))
-	      (pop3-fma-movemail-type (pop3-fma-get-movemail-type inbox)))
+	       (nth 1 (assoc inbox pop3-fma-spool-file-alist))))
+;;	      (pop3-fma-movemail-type (pop3-fma-get-movemail-type inbox)))
 	  (if (eq pop3-authentication-scheme 'pass)
 	      (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)
 	    (message "Checking new mail user %s at %s using APOP ..." pop3-maildrop pop3-mailhost))
@@ -223,13 +224,22 @@ If there is any problem , please set this variable to nil(default).
 		(if (and (not (memq pop3-password pop3-fma-commandline-arguments))
 			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-commandline-arguments)))
 		    (progn
-		      (setq pop3-fma-commandline-arguments
-			    (append
-			     pop3-fma-movemail-arguments
-				    (list
-				     (concat "po:" pop3-maildrop)
-				     crashbox
-				     pop3-password)))))
+		      (if (eq pop3-authentication-scheme 'apop)
+			  (setq pop3-fma-commandline-arguments
+				(append
+				 pop3-fma-movemail-arguments
+				 (list
+				  "-A"
+				  (concat "po:" pop3-maildrop)
+				  crashbox
+				  pop3-password)))
+			(setq pop3-fma-commandline-arguments
+			      (append
+			       pop3-fma-movemail-arguments
+			       (list
+				(concat "po:" pop3-maildrop)
+				crashbox
+				pop3-password))))))
 		(if (not (get-buffer movemail-output-buffer))
 		    (get-buffer-create movemail-output-buffer))
 		(set-buffer movemail-output-buffer)

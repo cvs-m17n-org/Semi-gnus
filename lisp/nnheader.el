@@ -4,6 +4,7 @@
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -272,13 +273,11 @@ on your system, you could say something like:
 
 (defmacro nnheader-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read (current-buffer)))))
 	   (if (numberp num) num 0)))
      (or (eobp) (forward-char 1))))
-
-;; (defvar nnheader-none-counter 0)
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -292,7 +291,7 @@ on your system, you could say something like:
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
-     (if (= (following-char) ?\n)
+     (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
      )))
@@ -387,6 +386,7 @@ the line could be found."
 ;; Various cruft the backends and Gnus need to communicate.
 
 (defvar nntp-server-buffer nil)
+(defvar nntp-process-response nil)
 (defvar gnus-verbose-backends 7
   "*A number that says how talkative the Gnus backends should be.")
 (defvar gnus-nov-is-evil nil
@@ -405,6 +405,7 @@ the line could be found."
     (erase-buffer)
     (kill-all-local-variables)
     (setq case-fold-search t)		;Should ignore case.
+    (set (make-local-variable 'nntp-process-response) nil)
     t))
 
 ;;; Various functions the backends use.
@@ -690,7 +691,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'iso-8859-1
+(defvar nnheader-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)

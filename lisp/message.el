@@ -4,7 +4,9 @@
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
-;;         Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;;         Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
+;;         Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -333,7 +335,7 @@ If t, use `message-user-organization-file'."
   :type 'boolean)
 
 (defcustom message-included-forward-headers
-  "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-\\|^Message-ID:\\|^References:\\|^Content-\\|^MIME-Version:"
+  "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-\\|^Message-ID:\\|^References:\\|^Content-Transfer-Encoding:\\|^Content-Type:\\|^MIME-Version:"
   "*Regexp matching headers to be included in forwarded messages."
   :group 'message-forwarding
   :type 'regexp)
@@ -614,7 +616,6 @@ If stringp, use this; if non-nil, use no host name (user name only)."
 
 (defvar message-reply-buffer nil)
 (defvar message-reply-headers nil)
-(defvar message-user-agent nil) ; XXX: This symbol is overloaded!  See below.
 (defvar message-sent-message-via nil)
 (defvar message-checksum nil)
 (defvar message-send-actions nil
@@ -1094,12 +1095,12 @@ The cdr of ech entry is a function for applying the face to a region.")
 			       (not paren))))
 		 (push (buffer-substring beg (point)) elems)
 		 (setq beg (match-end 0)))
-		((= (following-char) ?\")
+		((eq (char-after) ?\")
 		 (setq quoted (not quoted)))
-		((and (= (following-char) ?\()
+		((and (eq (char-after) ?\()
 		      (not quoted))
 		 (setq paren t))
-		((and (= (following-char) ?\))
+		((and (eq (char-after) ?\))
 		      (not quoted))
 		 (setq paren nil))))
 	(nreverse elems)))))
@@ -2157,11 +2158,56 @@ the user from the mailer."
 	(eval (car actions)))))
     (pop actions)))
 
+(defsubst message-maybe-split-and-send-mail ()
+  "Split a message if necessary, and send it via mail.
+Returns nil if sending succeeded, returns any string if sending failed.
+This sub function is for exclusive use of `message-send-mail'."
+  (let ((mime-edit-split-ignored-field-regexp
+	 mime-edit-split-ignored-field-regexp)
+	(case-fold-search t)
+	failure)
+    (while (string-match "Message-ID" mime-edit-split-ignored-field-regexp)
+      (setq mime-edit-split-ignored-field-regexp
+	    (concat (substring mime-edit-split-ignored-field-regexp
+			       0 (match-beginning 0))
+		    "Hey_MIME-Edit,_there_is_an_inviolable_Message_ID"
+		    "_so_don't_rape_it!"
+		    (substring mime-edit-split-ignored-field-regexp
+			       (match-end 0)))))
+    (setq failure
+	  (or
+	   (catch 'message-sending-mail-failure
+	     (mime-edit-maybe-split-and-send
+	      (function
+	       (lambda ()
+		 (interactive)
+		 (save-restriction
+		   (std11-narrow-to-header mail-header-separator)
+		   (goto-char (point-min))
+		   (when (re-search-forward "^Message-ID:" nil t)
+		     (delete-region (match-end 0) (std11-field-end))
+		     (insert " " (message-make-message-id))))
+		 (condition-case err
+		     (funcall message-send-mail-function)
+		   (error
+		    (throw 'message-sending-mail-failure err))))))
+	     nil)
+	   (condition-case err
+	       (progn
+		 (funcall message-send-mail-function)
+		 nil)
+	     (error err))))
+    (when failure
+      (if (eq 'error (car failure))
+	  (cadr failure)
+	(prin1-to-string failure)))))
+
 (defun message-send-mail (&optional arg)
   (require 'mail-utils)
   (let ((tembuf (message-generate-new-buffer-clone-locals " message temp"))
 	(case-fold-search nil)
-	(news (message-news-p)))
+	(news (message-news-p))
+	failure)
     (save-restriction
       (message-narrow-to-headers)
       ;; Insert some headers.
@@ -2176,7 +2222,6 @@ the user from the mailer."
     (if (not (message-check-mail-syntax))
 	(progn
 	  (message "")
-	  ;;(message "Posting not performed")
 	  nil)
       (unwind-protect
 	  (save-excursion
@@ -2186,25 +2231,24 @@ the user from the mailer."
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
+	      ;; Remove some headers.
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
-	    (or (= (preceding-char) ?\n)
+	    (or (eq (char-before) ?\n)
 		(insert ?\n))
 	    (when (and news
 		       (or (message-fetch-field "cc")
 			   (message-fetch-field "to")))
 	      (message-insert-courtesy-copy))
-	    (mime-edit-maybe-split-and-send
-	     (function
-	      (lambda ()
-		(interactive)
-		(funcall message-send-mail-function)
-		)))
-	    (funcall message-send-mail-function))
+	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
-      (push 'mail message-sent-message-via))))
+      (if failure
+	  (progn
+	    (message "Couldn't send message via mail: %s" failure)
+	    nil)
+	(push 'mail message-sent-message-via)))))
 
 (defun message-send-mail-with-sendmail ()
   "Send off the prepared buffer with sendmail."
@@ -2358,6 +2402,38 @@ to find out how to use this."
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
 
+(defsubst message-maybe-split-and-send-news (method)
+  "Split a message if necessary, and send it via news.
+Returns nil if sending succeeded, returns t if sending failed.
+This sub function is for exclusive use of `message-send-news'."
+  (let ((mime-edit-split-ignored-field-regexp
+	 mime-edit-split-ignored-field-regexp)
+	(case-fold-search t))
+    (while (string-match "Message-ID" mime-edit-split-ignored-field-regexp)
+      (setq mime-edit-split-ignored-field-regexp
+	    (concat (substring mime-edit-split-ignored-field-regexp
+			       0 (match-beginning 0))
+		    "Hey_MIME-Edit,_there_is_an_inviolable_Message_ID"
+		    "_so_don't_rape_it!"
+		    (substring mime-edit-split-ignored-field-regexp
+			       (match-end 0)))))
+    (or
+     (catch 'message-sending-news-failure
+       (mime-edit-maybe-split-and-send
+	(function
+	 (lambda ()
+	   (interactive)
+	   (save-restriction
+	     (std11-narrow-to-header mail-header-separator)
+	     (goto-char (point-min))
+	     (when (re-search-forward "^Message-ID:" nil t)
+	       (delete-region (match-end 0) (std11-field-end))
+	       (insert " " (message-make-message-id))))
+	   (unless (funcall message-send-news-function method)
+	     (throw 'message-sending-news-failure t)))))
+       nil)
+     (not (funcall message-send-news-function method)))))
+
 (defun message-send-news (&optional arg)
   (let ((tembuf (message-generate-new-buffer-clone-locals " *message temp*"))
 	(case-fold-search nil)
@@ -2381,10 +2457,7 @@ to find out how to use this."
       (run-hooks 'message-header-encoded-hook))
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
-	(progn
-	  (message "")
-	  ;;(message "Posting not performed")
-	  nil)
+	nil
       (unwind-protect
 	  (save-excursion
 	    (set-buffer tembuf)
@@ -2398,29 +2471,17 @@ to find out how to use this."
 	      (message-remove-header message-ignored-news-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
-	    (or (= (preceding-char) ?\n)
+	    (or (eq (char-before) ?\n)
 		(insert ?\n))
-	    (mime-edit-maybe-split-and-send
-	     (function
-	      (lambda ()
-		(interactive)
-		(save-restriction
-		  (std11-narrow-to-header mail-header-separator)
-		  (goto-char (point-min))
-		  (when (re-search-forward "^Message-Id:" nil t)
-		    (delete-region (match-end 0)(std11-field-end))
-		    (insert (concat " " (message-make-message-id)))
-		    ))
-		(funcall message-send-news-function method)
-		)))
-	    (setq result (funcall message-send-news-function method)))
+	    (setq result (message-maybe-split-and-send-news method)))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
       (if result
-	  (push 'news message-sent-message-via)
-	(message "Couldn't send message via news: %s"
-		 (nnheader-get-report (car method)))
-	nil))))
+	  (progn
+	    (message "Couldn't send message via news: %s"
+		     (nnheader-get-report (car method)))
+	    nil)
+	(push 'news message-sent-message-via)))))
 
 ;; 1997-09-29 by MORIOKA Tomohiko
 (defun message-send-news-with-gnus (method)
@@ -2780,8 +2841,8 @@ to find out how to use this."
        (concat "^" (regexp-quote mail-header-separator) "$"))
       (while (not (eobp))
 	(when (not (looking-at "[ \t\n]"))
- 	  (setq sum (logxor (ash sum 1) (if (natnump sum) 0 1)
- 			    (following-char))))
+	  (setq sum (logxor (ash sum 1) (if (natnump sum) 0 1)
+			    (char-after))))
 	(forward-char 1)))
     sum))
 
@@ -3194,7 +3255,9 @@ Headers already prepared in the buffer are not modified."
 		  (progn
 		    ;; The header was found.  We insert a space after the
 		    ;; colon, if there is none.
-		    (if (/= (following-char) ? ) (insert " ") (forward-char 1))
+		    (if (eq (char-after) ? )
+			(forward-char 1)
+		      (insert " "))
 		    ;; Find out whether the header is empty...
 		    (looking-at "[ \t]*$")))
 	  ;; So we find out what value we should insert.
@@ -3303,7 +3366,7 @@ Headers already prepared in the buffer are not modified."
       (goto-char (point-min))
       (while (not (eobp))
 	(skip-chars-forward "^,\"" (point-max))
-	(if (or (= (following-char) ?,)
+	(if (or (eq (char-after) ?,)
 		(eobp))
 	    (when (not quoted)
 	      (if (and (> (current-column) 78)
@@ -3375,7 +3438,7 @@ Headers already prepared in the buffer are not modified."
     (search-backward ":" )
     (widen)
     (forward-char 1)
-    (if (= (following-char) ? )
+    (if (eq (char-after) ? )
 	(forward-char 1)
       (insert " ")))
    (t
@@ -3577,12 +3640,12 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
-(defun message-reply (&optional to-address wide)
+(defun message-reply (&optional to-address wide references)
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
 	from subject date reply-to to cc
-	references message-id follow-to
+	message-id follow-to
 	(inhibit-point-motion-hooks t)
 	mct never-mct gnus-warning)
     (save-restriction
@@ -3605,7 +3668,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	    cc (message-fetch-field "cc")
 	    mct (message-fetch-field "mail-copies-to")
 	    reply-to (message-fetch-field "reply-to")
-	    references (message-fetch-field "references")
+	    references (or references (message-fetch-field "references"))
 	    message-id (message-fetch-field "message-id" t))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
@@ -3685,19 +3748,19 @@ OTHER-HEADERS is an alist of header/value pairs."
      cur)))
 
 ;;;###autoload
-(defun message-wide-reply (&optional to-address)
+(defun message-wide-reply (&optional to-address references)
   "Make a \"wide\" reply to the message in the current buffer."
   (interactive)
-  (message-reply to-address t))
+  (message-reply to-address t references))
 
 ;;;###autoload
-(defun message-followup (&optional to-newsgroups)
+(defun message-followup (&optional to-newsgroups references)
   "Follow up to the message in the current buffer.
 If TO-NEWSGROUPS, use that as the new Newsgroups line."
   (interactive)
   (let ((cur (current-buffer))
 	from subject date reply-to mct
-	references message-id follow-to
+	message-id follow-to
 	(inhibit-point-motion-hooks t)
 	(message-this-is-news t)
 	followup-to distribution newsgroups gnus-warning posted-to)
@@ -3713,7 +3776,7 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
       (setq from (message-fetch-field "from")
 	    date (message-fetch-field "date")
 	    subject (or (message-fetch-field "subject") "none")
-	    references (message-fetch-field "references")
+	    references (or references (message-fetch-field "references"))
 	    message-id (message-fetch-field "message-id" t)
 	    followup-to (message-fetch-field "followup-to")
 	    newsgroups (message-fetch-field "newsgroups")
@@ -4201,7 +4264,7 @@ which specify the range to operate on."
       (goto-char (min start end))
       (while (< (point) end1)
 	(or (looking-at "[_\^@- ]")
-	    (insert (following-char) "\b"))
+	    (insert (char-after) "\b"))
 	(forward-char 1)))))
 
 ;;;###autoload
@@ -4215,7 +4278,7 @@ which specify the range to operate on."
       (move-marker end1 (max start end))
       (goto-char (min start end))
       (while (re-search-forward "\b" end1 t)
-	(if (eq (following-char) (char-after (- (point) 2)))
+	(if (eq (char-after) (char-after (- (point) 2)))
 	    (delete-char -2))))))
 
 (defalias 'message-exchange-point-and-mark 'exchange-point-and-mark)
@@ -4395,21 +4458,6 @@ regexp varstr."
 (defun message-mime-setup ()
   (turn-on-mime-edit)
   (add-to-list 'buffer-file-format 'mime-message))
-
-;;; Miscellaneous functions
-
-;; stolen (and renamed) from nnheader.el
-(defun message-replace-chars-in-string (string from to)
-  "Replace characters in STRING from FROM to TO."
-  (let ((string (substring string 0))	;Copy string.
-	(len (length string))
-	(idx 0))
-    ;; Replace all occurrences of FROM with TO.
-    (while (< idx len)
-      (when (= (aref string idx) from)
-	(aset string idx to))
-      (setq idx (1+ idx)))
-    string))
 
 (run-hooks 'message-load-hook)
 

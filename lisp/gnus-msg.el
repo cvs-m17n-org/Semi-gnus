@@ -5,6 +5,8 @@
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;;      Katsumi Yamaoka  <yamaoka@jpl.org>
+;;	Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -93,7 +95,7 @@ Thank you.
 The first %s will be replaced by the Newsgroups header;
 the second with the current group name.")
 
-(defvar gnus-message-setup-hook nil
+(defvar gnus-message-setup-hook '(gnus-maybe-setup-default-charset)
   "Hook run after setting up a message buffer.")
 
 (defvar gnus-bug-create-help-buffer t
@@ -145,7 +147,6 @@ Please describe the bug in annoying, painstaking detail.
 
 Thank you for your help in stamping out bugs.
 "
-
 	  gnus-product-name
 	  (if (string= gnus-product-name "Semi-gnus")
 	      ""
@@ -307,6 +308,42 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (interactive "P")
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
+(defun gnus-summary-gather-references (articles)
+  (and articles
+  (let ((tbuf (gnus-get-buffer-create " *gnus-summary-gather-references*"))
+	refs ref article i)
+    (save-excursion
+      (set-buffer tbuf)
+      (erase-buffer)
+      (while (setq article (pop articles))
+	(save-window-excursion
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-select-article nil nil nil article)
+	  (gnus-summary-remove-process-mark article))
+	(gnus-copy-article-buffer)
+	(set-buffer gnus-article-copy)
+	(save-restriction
+	  (message-narrow-to-head)
+	  (setq refs (if articles
+			 (concat (message-fetch-field "references")
+				 (message-fetch-field "message-id"))
+		       (message-fetch-field "references"))
+		i 0)
+	  (widen)
+	  (if refs
+	      (progn (set-buffer tbuf)
+		     (while (string-match "<[^>]+>" refs i)
+		       (setq i (match-end 0)
+			     ref (substring refs (match-beginning 0) i))
+		       (goto-char (point-max))
+		       (unless (search-backward ref (point-min) t)
+			 (insert " " ref)))))))
+      (set-buffer tbuf)
+      (goto-char (point-min))
+      (if (looking-at "\\s +")
+	(goto-char (match-end 0)))
+	   (buffer-substring (point) (point-max))))))
+
 (defun gnus-inews-yank-articles (articles)
   (let (beg article)
     (message-goto-body)
@@ -353,7 +390,7 @@ This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
   (let ((article (gnus-summary-article-number))
-	gnus-message-setup-hook)
+	(gnus-message-setup-hook '(gnus-maybe-setup-default-charset)))
     (gnus-setup-message 'reply-yank
       (gnus-summary-select-article t)
       (set-buffer gnus-original-article-buffer)
@@ -449,7 +486,8 @@ header line with the old Message-ID."
 		(message-news (or to-group group))
 	      (set-buffer gnus-article-copy)
 	      (gnus-msg-treat-broken-reply-to)
-	      (message-followup (if (or newsgroup-p force-news) nil to-group)))
+	      (message-followup (if (or newsgroup-p force-news) nil to-group)
+				(gnus-summary-gather-references yank)))
 	  ;; The is mail.
 	  (if post
 	      (progn
@@ -463,7 +501,7 @@ header line with the old Message-ID."
 			message-send-actions)))
 	    (set-buffer gnus-article-copy)
 	    (gnus-msg-treat-broken-reply-to)
-	    (message-wide-reply to-address)))
+	    (message-wide-reply to-address (gnus-summary-gather-references yank))))
 	(when yank
 	  (gnus-inews-yank-articles yank))))))
 
@@ -545,10 +583,6 @@ If SILENT, don't prompt the user."
 
 
 
-;; Dummy to avoid byte-compile warning.
-;;(defvar nnspool-rejected-article-hook)
-;;(defvar xemacs-codename)
-
 (defun gnus-extended-version ()
   "Stringified gnus version."
   (interactive)
@@ -617,7 +651,7 @@ automatically."
       (gnus-summary-select-article)
       (set-buffer (gnus-copy-article-buffer))
       (gnus-msg-treat-broken-reply-to)
-      (message-reply nil wide)
+      (message-reply nil wide (gnus-summary-gather-references yank))
       (when yank
 	(gnus-inews-yank-articles yank)))))
 
@@ -955,7 +989,7 @@ this is a reply."
   (interactive "P")
   (gnus-summary-select-article t)
   (set-buffer gnus-original-article-buffer)
-  (let (gnus-message-setup-hook)
+  (let ((gnus-message-setup-hook '(gnus-maybe-setup-default-charset)))
     (gnus-setup-message 'compose-bounce
       (let* ((references (mail-fetch-field "references"))
 	     (parent (and references (gnus-parent-id references))))

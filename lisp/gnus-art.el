@@ -391,13 +391,6 @@ The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
 
-(defcustom gnus-article-display-method-for-encoded-word
-  'gnus-article-display-message-with-encoded-word
-  "*Function to display a message with MIME encoded-words.
-The function is called from the article buffer."
-  :group 'gnus-article-mime
-  :type 'function)
-
 (defcustom gnus-article-display-method-for-traditional
   'gnus-article-display-traditional-message
   "*Function to display a traditional message.
@@ -848,7 +841,7 @@ characters to translate to."
     (when (search-forward "\n\n" nil t)
       (let ((buffer-read-only nil))
 	(while (search-forward "\b" nil t)
-	  (let ((next (following-char))
+	  (let ((next (char-after))
 		(previous (char-after (- (point) 2))))
 	    ;; We do the boldification/underlining by hiding the
 	    ;; overstrikes and putting the proper text property
@@ -881,7 +874,7 @@ characters to translate to."
 	    (adaptive-fill-mode t))
 	(while (not (eobp))
 	  (and (>= (current-column) (min fill-column (window-width)))
-	       (/= (preceding-char) ?:)
+	       (not (eq (char-before) ?:))
 	       (fill-paragraph nil))
 	  (end-of-line 2))))))
 
@@ -1840,8 +1833,28 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   "\M-^" gnus-article-read-summary-keys
   "\M-g" gnus-article-read-summary-keys)
 
-(substitute-key-definition
- 'undefined 'gnus-article-read-summary-keys gnus-article-mode-map)
+;; Define almost undefined keys to `gnus-article-read-summary-keys'.
+(mapcar
+ (lambda (key)
+   (unless (lookup-key gnus-article-mode-map key)
+     (define-key gnus-article-mode-map key
+       'gnus-article-read-summary-keys)))
+ (delq nil
+       (append
+	(mapcar
+	 (lambda (elt)
+	   (let ((key (car elt)))
+	     (and (> (length key) 0)
+		  (not (eq 'menu-bar (aref key 0)))
+		  (symbolp (lookup-key gnus-summary-mode-map key))
+		  key)))
+	 (accessible-keymaps gnus-summary-mode-map))
+	(let ((c 127)
+	      keys)
+	  (while (>= c 32)
+	    (push (char-to-string c) keys)
+	    (decf c))
+	  keys))))
 
 (defun gnus-article-make-menu-bar ()
   (gnus-turn-off-edit-menu 'article)
@@ -1968,11 +1981,19 @@ commands:
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.
-  (let ((default-mime-charset (save-excursion
-				(set-buffer gnus-summary-buffer)
-				default-mime-charset)))
+  (let (charset all-headers)
+    (with-current-buffer gnus-summary-buffer
+      (setq charset default-mime-charset
+	    all-headers gnus-have-all-headers))
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
     (mime-display-message mime-message-structure
-			  gnus-article-buffer nil gnus-article-mode-map))
+			  gnus-article-buffer nil gnus-article-mode-map)
+    (when all-headers
+      (gnus-article-hide-headers nil -1))
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
+    )
   ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
@@ -1985,24 +2006,6 @@ commands:
   (let (buffer-read-only)
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)))
-
-(defun gnus-article-display-message-with-encoded-word ()
-  "Article display method for message with encoded-words."
-  (let ((charset (save-excursion
-		   (set-buffer gnus-summary-buffer)
-		   default-mime-charset)))
-    (make-local-variable 'default-mime-charset)
-    (setq default-mime-charset charset)
-    (gnus-article-display-traditional-message)
-    (make-local-variable 'default-mime-charset)
-    (setq default-mime-charset charset)
-    (let (buffer-read-only)
-      (mime-decode-header-in-buffer charset)
-      (goto-char (point-min))
-      (if (search-forward "\n\n" nil t)
-	  (decode-mime-charset-region (match-end 0) (point-max) charset)))
-    (mime-maybe-hide-echo-buffer))
-  (gnus-run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-make-full-mail-header (&optional number charset)
   "Create a new mail header structure in a raw article buffer."
@@ -2148,11 +2151,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (let ((method
 	 (if gnus-show-mime
 	     (progn
-	       (mime-parse-buffer)
-	       (if (or (not gnus-strict-mime)
-		       (mime-fetch-field "MIME-Version"))
-		   gnus-article-display-method-for-mime
-		 gnus-article-display-method-for-encoded-word))
+	       (setq mime-message-structure gnus-current-headers)
+	       gnus-article-display-method-for-mime)
 	   gnus-article-display-method-for-traditional)))
     (gnus-run-hooks 'gnus-tmp-internal-hook)
     (gnus-run-hooks 'gnus-article-prepare-hook)
@@ -3395,7 +3395,7 @@ forbidden in URL encoding."
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity)
+  (mime-insert-header entity)
   )
 
 (set-alist 'mime-header-presentation-method-alist
@@ -3403,13 +3403,10 @@ forbidden in URL encoding."
 	   #'gnus-article-header-presentation-method)
 
 (defun gnus-mime-preview-quitting-method ()
-  (if gnus-show-mime
-      (gnus-article-show-summary)
-    (mime-preview-kill-buffer)
-    (delete-other-windows)
-    (gnus-article-show-summary)
-    (gnus-summary-select-article nil t)
-    ))
+  (mime-preview-kill-buffer)
+  (delete-other-windows)
+  (gnus-article-show-summary)
+  (gnus-summary-select-article gnus-show-all-headers t))
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
@@ -3424,6 +3421,18 @@ forbidden in URL encoding."
 
 (set-alist 'mime-preview-following-method-alist
 	   'gnus-original-article-mode #'gnus-following-method)
+
+(set-alist 'mime-preview-over-to-previous-method-alist
+	   'gnus-original-article-mode
+	   (lambda ()
+	     (gnus-article-read-summary-keys
+	      nil (gnus-character-to-event ?P))))
+
+(set-alist 'mime-preview-over-to-next-method-alist
+	   'gnus-original-article-mode'
+	   (lambda ()
+	     (gnus-article-read-summary-keys
+	      nil (gnus-character-to-event ?N))))
 
 
 ;;; @ end
