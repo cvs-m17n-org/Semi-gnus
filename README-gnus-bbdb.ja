@@ -1,38 +1,38 @@
 -*- mode: text; fill-column: 70; -*-
 
 ---
-BBDB $B$r;HMQ$5$l$F$$$kJ}$O!"(B bbdb-gnus.elc $B$r(B Semi-gnus 6.8.X $B0JA0$N$b(B
-$B$N$H6&M-$9$k$3$H$O$G$-$^$;$s!#I,$:!"(B byte-compile $B$7D>$7$F$/$@$5$$!#(B
+BBDB ~~~~~~~~~~~ bbdb-gnus.elc ~ Semi-gnus 6.8.X ~~~~
+~~~~~~~~~~~~~~~~~~ byte-compile ~~~~~~~~~
 
-;; gnus $B$r5/F0$7$?$"$H$G!"(B bbdb-gnus.el $B$N$_$r(B byte-compile $B$9$k$H$$$&(B
-;; $B$N$,$*<j7Z$G$9!#(B :-)
+;; gnus ~~~~~~~~~ bbdb-gnus.el ~~~ byte-compile ~~~~~
+;; ~~~~~~~~ :-)
 
 ---
 gnus-bbdb.el
 
-Semi-gnus $B$KFC2=$7$?(B BBDB API $B%b%8%e!<%k$G$9!#$3$N%b%8%e!<%k$r;HMQ$9$k(B
-$B$3$H$K$h$C$F!"(B Semi-gnus $B$G;HMQ$9$k>l9g$K$O(B mime-bbdb $B$,ITMW$K$J$j$^$9!#(B
+Semi-gnus ~~~~~ BBDB API ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~ Semi-gnus ~~~~~~~~~ mime-bbdb ~~~~~~~~~
 
-1.11.3 $B0J9_$N(B FLIM $B$,I,MW$G$9!#(B
+1.11.3 ~~~ FLIM ~~~~~~
 
-bbdb-auto-notes-hook $B$r;HMQ$7$F$$$J$$J}$K$OITMW$G$9$,!";HMQ$7$F$$$kJ}(B
-$B$O(B bbdb.el / bbdb-hooks.el $B$K$3$N%U%!%$%k$N:G8e$K$"$k(B patch $B$r$"$F$kI,(B
-$BMW$,$"$j$^$9!#(B
+bbdb-auto-notes-hook ~~~~~~~~~~~~~~~~~~~~~~~~
+~ bbdb.el / bbdb-hooks.el ~~~~~~~~~~~~~ patch ~~~~~
+~~~~~~~
 
-$B@_DjNc(B:
+~~~:
 
-;; mime-bbdb $B$K4X$9$k@_Dj$OITMW$G$9!#(B
+;; mime-bbdb ~~~~~~~~~~~~
 ;(setq mime-bbdb/use-mail-extr nil)
 ;(eval-after-load "mail-extr" '(require 'mime-bbdb))
 
 (require 'bbdb)
 (require 'gnus-bbdb)
-(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus $B$O$O$:$7$F$/$@$5$$!#(B
+(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus ~~~~~~~~~~
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
 (add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
-FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$;$s$,!"$=$l(B
-$B$r6/@)E*$K(B decode $B$7$?$$>l9g$K$O!"<!$N@_Dj$r2C$($F$/$@$5$$!#(B
+FLIM ~~ quote ~~~ eword encoded word ~ decode ~~~~~~~~~
+~~~~~ decode ~~~~~~~~~~~~~~~~~~~~~
 
 (setq gnus-bbdb/decode-field-body-function
       (function
@@ -40,12 +40,12 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
          (eword-decode-string field-body))))
 
 ---
-$B0J2<$O(B bbdb.el / bbdb-hooks.el $B$K$"$F$k(B patch $B$G$9!#(B
+~~~ bbdb-com.el~bbdb-hooks.el ~~~ bbdb.el ~~~~ patch ~~~
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-2.33/lisp/bbdb-com.el~	Sat Sep  1 07:00:10 2001
-+++ bbdb-2.33/lisp/bbdb-com.el	Mon Sep 10 23:17:46 2001
-@@ -1654,7 +1654,7 @@
+--- bbdb-2.34/lisp/bbdb-com.el~	Tue Jan 15 23:00:57 2002
++++ bbdb-2.34/lisp/bbdb-com.el	Thu Jan 31 03:55:01 2002
+@@ -1686,7 +1686,7 @@
            ;; to be enclosed in quotes.  Double-quotes and backslashes have
            ;; already been escaped.  This quotes a few extra characters as
            ;; well (!,%, and $) just for common sense.
@@ -54,19 +54,19 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
             (format "\"%s\" <%s>" name net))
            (t
             (format "%s <%s>" name net)))))
---- bbdb-2.33/lisp/bbdb-hooks.el~	Sat Sep  1 07:00:10 2001
-+++ bbdb-2.33/lisp/bbdb-hooks.el	Mon Sep 10 23:17:46 2001
+--- bbdb-2.34/lisp/bbdb-hooks.el~	Tue Jan 15 09:00:11 2002
++++ bbdb-2.34/lisp/bbdb-hooks.el	Thu Jan 31 03:55:01 2002
 @@ -35,6 +35,8 @@
- ;; $Id: README-gnus-bbdb.ja,v 1.1.2.6.2.6 2002-01-21 05:45:06 yamaoka Exp $
+ ;; $Id: README-gnus-bbdb.ja,v 1.1.2.6.2.7 2002-01-31 04:33:18 yamaoka Exp $
  ;;
  
 +(eval-when-compile (require 'cl))
 +
  (require 'bbdb)
+ (require 'bbdb-com)
  
- (defvar rmail-buffer)
-@@ -384,13 +386,23 @@
-          (marker (bbdb-header-start))
+@@ -405,13 +407,23 @@
+          ignore
           field pairs fieldval  ; do all bindings here for speed
           regexp string notes-field-name notes
 -         replace-p)
@@ -94,7 +94,7 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
            ;; Don't do anything if this message is from us.  Note that we have
            ;; to look at the message instead of the record, because the record
            ;; will be of the recipient of the message if it is from us.
-@@ -400,7 +412,7 @@
+@@ -421,7 +433,7 @@
            (goto-char marker)
            (setq field (car (car ignore-all))
                  regexp (cdr (car ignore-all))
@@ -103,7 +103,7 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
            (if (and fieldval
                     (string-match regexp fieldval))
                (setq ignore t)
-@@ -413,7 +425,8 @@
+@@ -434,7 +446,8 @@
                  pairs (cdr (car rest))  ; (REGEXP . STRING) or
                                          ; (REGEXP FIELD-NAME STRING) or
                                          ; (REGEXP FIELD-NAME STRING REPLACE-P)
@@ -111,11 +111,11 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 +                fieldval (funcall extract-field-value-funtion field))
 +                                        ; e.g., Subject line
            (when fieldval
-             (while pairs
-               (setq regexp (car (car pairs))
---- bbdb-2.33/lisp/bbdb.el~	Wed Sep  5 07:00:12 2001
-+++ bbdb-2.33/lisp/bbdb.el	Mon Sep 10 23:17:46 2001
-@@ -707,6 +707,7 @@
+             ;; we perform the auto notes stuff only for authors of a message
+             ;; or if explicitly requested
+--- bbdb-2.34/lisp/bbdb.el~	Tue Jan 15 23:00:58 2002
++++ bbdb-2.34/lisp/bbdb.el	Thu Jan 31 03:55:01 2002
+@@ -737,6 +737,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
  (defvar bbdb-address-print-formatting-alist) ; "bbdb-print"
@@ -128,7 +128,7 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 ---
 gnus-bbdb/split-mail()
 
-nnmail-split-fancy $B$G;HMQ$9$k$?$a$N4X?t$G$9!#<!$N$h$&$K;HMQ$7$F$/$@$5$$!#(B
+nnmail-split-fancy ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (setq nnmail-split-methods 'nnmail-split-fancy
       nnmail-split-fancy
@@ -147,16 +147,16 @@ nnmail-split-fancy $B$G;HMQ$9$k$?$a$N4X?t$G$9!#<!$N$h$&$K;HMQ$7$F$/$@$5$$!#(B
         .....
         ))
 
-*1 : From, To, Cc $B$$$:$l$+$N%X%C%@!<!&%U%#!<%k%I$K4^$^$l$k%a%$%k!&%"%I(B
-     $B%l%9$N$&$A(B BBDB $B$N(B `company' $B%U%#!<%k%I$K(B `foo' $B$,4^$^$l$k>l9g!"(B
-     `foo-group' $B$K?6$jJ,$1$^$9!#(B
+*1 : From, To, Cc ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     ~~~~~ BBDB ~ `company' ~~~~~~ `foo' ~~~~~~~~
+     `foo-group' ~~~~~~~~
 
-*2 : `company' $B%U%#!<%k%I$,(B `bar' $B$G;O$^$C$F$$$k>l9g!"(B`company' $B%U%#!<(B
-     $B%k%I$NFbMF$r$=$N$^$^%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+*2 : `company' ~~~~~~ `bar' ~~~~~~~~~~`company' ~~~
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*3 : `group' $B%U%#!<%k%I$,$"$k>l9g!"(B`group' $B%U%#!<%k%I$NFbMF$r$=$N$^$^(B
-     $B%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+*3 : `group' ~~~~~~~~~~~`group' ~~~~~~~~~~~~~
+     ~~~~~~~~~~~~~~~~~~~
 
-*4 : `note' $B%U%#!<%k%I$K(B `my friend' $B$,4^$^$l$k>l9g!"$=$N8e$m$K;XDj$5(B
-     $B$l$?5,B'$G?6$jJ,$1$^$9!#$3$N5,B'$N5-=RJ}K!$O!"DL>o$N(B
-     `nnmail-split-fancy' $B$G$N5-=RJ}K!$HF1$8$b$N$G$9!#(B
+*4 : `note' ~~~~~~ `my friend' ~~~~~~~~~~~~~~~~
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     `nnmail-split-fancy' ~~~~~~~~~~~~~~
