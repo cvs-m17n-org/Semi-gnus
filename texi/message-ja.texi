@@ -462,8 +462,8 @@ message buffer (@code{message-yank-buffer}).
 @findex message-insert-headers
 メッセージのヘッダーを挿入します (@code{message-insert-headers})。
 
-@item C-c C-p
-@kindex C-c C-p
+@item C-c C-u
+@kindex C-c C-u
 @findex message-insert-or-toggle-importance
 値 @samp{high} を持つ @samp{Importance:} ヘッダーを挿入します。このヘッ
 ダーは受信者にそのメッセージの重要性を知らせるために使われるものです。も

@@ -1741,7 +1741,7 @@ Point is left at the beginning of the narrowed-to region."
 
   (define-key message-mode-map "\C-c\C-t" 'message-insert-to)
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
-  (define-key message-mode-map "\C-c\C-p" 'message-insert-or-toggle-importance)
+  (define-key message-mode-map "\C-c\C-u" 'message-insert-or-toggle-importance)
 
   (define-key message-mode-map "\C-c\C-y" 'message-yank-original)
   (define-key message-mode-map "\C-c\M-\C-y" 'message-yank-buffer)
@@ -1843,35 +1843,41 @@ Point is left at the beginning of the narrowed-to region."
 ;;
 ;; We use `after-change-functions' to keep special text properties
 ;; that interfer with the normal function of message mode out of the
-;; buffer.
+;; buffer. 
 
-(defcustom message-forbidden-properties
-  '(field insert-behind-hooks insert-in-front-hooks mouse-face
-	  point-entered point-left
-	  ;;intangible invisible modification-hooks read-only
-	  )
-  "List of text properties forbidden in message buffers.
-If you are using tamago version 4 for writing Japanese text, you should
-remove `intangible', `invisible', `modification-hooks' and `read-only'
-from the list."
+(defcustom message-strip-special-text-properties nil
+  "Strip special properties from the message buffer.
+
+Emacs has a number of special text properties which can break message
+composing in various ways.  If this option is set, message will strip
+these properties from the message composition buffer.  However, some
+packages like Tamago requires these properties to be present in order
+to work.  If you use one of these packages, turn this option off, and
+hope the message composition doesn't break too bad."
+  :group 'message-various
+  :type 'boolean)
+
+(defconst message-forbidden-properties 
+  ;; No reason this should be clutter up customize.  We make it a
+  ;; property list (rather than a list of property symbols), to be
+  ;; directly useful for `remove-text-properties'.
+  '(field nil read-only nil intangible nil invisible nil 
+	  mouse-face nil modification-hooks nil insert-in-front-hooks nil
+	  insert-behind-hooks nil point-entered nil point-left nil) 
   ;; Other special properties:
   ;; category, face, display: probably doesn't do any harm.
   ;; fontified: is used by font-lock.
   ;; syntax-table, local-map: I dunno.
   ;; We need to add XEmacs names to the list.
-  :group 'message-various
-  :type '(repeat sexp))
+  "Property list of with properties.forbidden in message buffers.
+The values of the properties are ignored, only the property names are used.")
 
 (defun message-strip-forbidden-properties (begin end &optional old-length)
   "Strip forbidden properties between BEGIN and END, ignoring the third arg.
 This function is intended to be called from `after-change-functions'.
 See also `message-forbidden-properties'."
-  (let ((props message-forbidden-properties)
-	plist)
-    (while props
-      (setq plist (plist-put plist (car props) nil)
-	    props (cdr props)))
-    (remove-text-properties begin end plist)))
+  (when message-strip-special-text-properties
+    (remove-text-properties begin end message-forbidden-properties)))
 
 ;;;###autoload
 (define-derived-mode message-mode text-mode "Message"
@@ -2344,16 +2350,18 @@ Prefix arg means justify as well."
 (defun message-insert-importance-high ()
   "Insert header to mark message as important."
   (interactive)
-  (message-remove-header "Importance")
-  (message-goto-eoh)
-  (insert "Importance: high\n"))
+  (save-excursion
+    (message-remove-header "Importance")
+    (message-goto-eoh)
+    (insert "Importance: high\n")))
 
 (defun message-insert-importance-low ()
   "Insert header to mark message as unimportant."
   (interactive)
-  (message-remove-header "Importance")
-  (message-goto-eoh)
-  (insert "Importance: low\n"))
+  (save-excursion
+    (message-remove-header "Importance")
+    (message-goto-eoh)
+    (insert "Importance: low\n")))
 
 (defun message-insert-or-toggle-importance ()
   "Insert a \"Importance: high\" header, or cycle through the header values.
