@@ -1,3 +1,22 @@
+1998-06-19  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-art.el (article-hide-boring-headers): Funcall
+	`gnus-extract-address-components'.
+
+	* lisp/gnus-picon.el (gnus-article-display-picons): Funcall
+	`gnus-extract-address-components'.
+
+	* lisp/gnus.el (gnus-extract-address-components): Modify
+	doc-string.
+
+	* lisp/message.el (message-check-news-header-syntax): Funcall
+	`gnus-extract-address-components'.
+	(message-user-mail-address): Ditto.
+	(message-generate-headers): Ditto.
+	(message-buffer-name): Ditto.
+	(message-cancel-news): Ditto.
+	(message-supersede): Ditto.
+
 1998-06-18  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-send-mail-with-smtp): New
