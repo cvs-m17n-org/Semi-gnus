@@ -182,6 +182,11 @@
 (defalias 'ange-ftp-re-read-dir 'ignore)
 (defalias 'define-mail-user-agent 'ignore)
 
+(defconst dgnushack-tool-files
+  '("dgnushack.el" "dgnuspath.el" "ptexinfmt.el"))
+(defconst dgnushack-unexported-files
+  '("dgnuspath.el" "ptexinfmt.el"))
+
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
   (unless warn
@@ -195,34 +200,31 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (delete "dgnuspath.el"
-		       (directory-files srcdir nil "^[^=].*\\.el$")))
-	(xemacs (string-match "XEmacs" emacs-version))
+  (let ((files (directory-files srcdir nil "^[^=].*\\.el$"))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
-    (condition-case ()
-	(require 'w3-forms)
-      (error
-       (dolist (file '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-		       "nnslashdot.el" "nnwarchive.el" "webmail.el"))
-	 (setq files (delete file files)))))
-    (condition-case ()
-	(require 'bbdb)
-      (error (setq files (delete "gnus-bbdb.el" files))))
+    (mapcar
+     (lambda (el) (setq files (delete el files)))
+     (nconc
+      dgnushack-tool-files
+      (condition-case nil
+	  (progn (require 'w3-forms) nil)
+	(error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
+		 "nnslashdot.el" "nnwarchive.el" "webmail.el")))
+      (condition-case nil
+	  (progn (require 'bbdb) nil)
+	(error '("gnus-bbdb.el")))
+      (unless (featurep 'xemacs)
+	'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
+	  "nnheaderxm.el" "smiley.el"))
+      (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
+	'("md5.el"))))
     (while (setq file (pop files))
-      (unless (or (and (not xemacs)
-		       (member file
-			       '("gnus-xmas.el" "gnus-picon.el"
-				 "messagexmas.el" "nnheaderxm.el"
-				 "smiley.el" "x-overlay.el")))
-		  (and (string-equal file "md5.el")
-		       (not (and (fboundp 'md5)
-				 (subrp (symbol-function 'md5))))))
-	(setq file (expand-file-name file srcdir))
-	(when (or (not (file-exists-p (setq elc (concat file "c"))))
-		  (file-newer-than-file-p file elc))
-	  (ignore-errors
-	    (byte-compile-file file)))))))
+      (setq file (expand-file-name file srcdir))
+      (when (or (not (file-exists-p (setq elc (concat file "c"))))
+		(file-newer-than-file-p file elc))
+	(ignore-errors
+	  (byte-compile-file file))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)
@@ -276,23 +278,16 @@ Modify to suit your needs."))
 
     (message "Generating MANIFEST.%s for the package..." product-name)
     (with-temp-buffer
-      (insert "pkginfo/MANIFEST." product-name "\n"
-	      lisp-dir
-	      (mapconcat
-	       'identity
-	       (sort (delete "dgnuspath.el"
-			     (delete "patchs.elc"
-				     (directory-files "." nil "\\.elc?$")))
-		     'string-lessp)
-	       (concat "\n" lisp-dir))
-	      "\ninfo/"
-	      (mapconcat
-	       'identity
-	       (sort (directory-files "../texi/"
-				      nil dgnushack-info-file-regexp)
-		     'string-lessp)
-	       "\ninfo/")
-	      "\n")
+      (insert "pkginfo/MANIFEST." product-name "\n")
+      (mapcar
+       (lambda (file)
+	 (unless (member file dgnushack-unexported-files)
+	   (insert lisp-dir file "\n")))
+       (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+      (mapcar
+       (lambda (file) (insert "info/" file "\n"))
+       (sort (directory-files "../texi/" nil dgnushack-info-file-regexp)
+	     'string-lessp))
       (write-file (concat "../MANIFEST." product-name)))))
 
 (defun dgnushack-install-package ()
@@ -332,11 +327,9 @@ You must specify the name of the package path as follows:
     (unless (file-directory-p pkginfo-dir)
       (make-directory pkginfo-dir))
 
-    (setq files
-	  (sort (delete "dgnuspath.el"
-			(delete "dgnuspath.elc"
-				(directory-files "." nil "\\.elc?$")))
-		'string-lessp))
+    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+    (mapcar (lambda (el) (setq files (delete el files)))
+	    dgnushack-unexported-files)
     (mapcar
      (lambda (file)
        (unless (or (member file files)
@@ -374,7 +367,6 @@ You must specify the name of the package path as follows:
 (defun dgnushack-texi-format (&optional addsuffix)
   (if (not noninteractive)
       (error "batch-texinfo-format may only be used -batch."))
-  (require 'texinfmt)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
 	coding-system-for-write
@@ -468,10 +460,5 @@ You must specify the name of the package path as follows:
 	     (message ">>  %s" s))
 	   (setq error 1))))
       (kill-emacs error))))
-
-;; Mule-2.3@19.34 fails to make info from texi.
-(when (boundp 'MULE)
-  (put 'detailmenu 'texinfo-format 'texinfo-discard-line)
-  (put 'detailmenu 'texinfo-end 'texinfo-discard-command))
 
 ;;; dgnushack.el ends here

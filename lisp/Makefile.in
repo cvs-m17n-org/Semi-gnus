@@ -30,10 +30,9 @@ clever some:
 		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
 install: clever
-	rm -f dgnushack.elc
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	@for p in *.el; do \
-	  if test "$$p" != "dgnuspath.el"; then \
+	  if test "$$p" != "dgnuspath.el" -a "$$p" != "ptexinfmt.el"; then \
 	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	    if test -f $$p"c"; then \
@@ -47,7 +46,6 @@ package:
 	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package
 
 install-package: clever
-	rm -f dgnushack.elc
 	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package \
 		-f dgnushack-install-package $(PACKAGEDIR)
 

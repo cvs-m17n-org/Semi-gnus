@@ -11,8 +11,10 @@ TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
 EMACS=@EMACS@
 EMACSINFO=$(EMACS) -batch -q -no-site-file
-INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
-XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
+INFOSWI=-l ./dgnushack.el -l ./ptexinfmt.el \
+	-f dgnushack-texi-format
+XINFOSWI=-l ./dgnushack.el -l ./ptexinfmt.el \
+	-f dgnushack-texi-add-suffix-and-format
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
