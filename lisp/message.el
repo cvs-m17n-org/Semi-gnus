@@ -3628,7 +3628,8 @@ OTHER-HEADERS is an alist of header/value pairs."
 			    (if wide to-address nil)))
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))
+	  (make-full-mail-header
+	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
      `((Subject . ,subject)
@@ -3753,7 +3754,8 @@ responses here are directed to other newsgroups."))
      cur)
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))))
+	  (make-full-mail-header
+	   0 subject from date message-id references 0 0 ""))))
 
 
 ;;;###autoload
