@@ -1,3 +1,11 @@
+1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* README.semi: Note that APEL 9.13 or later is required.
+	* README.semi.ja: Likewise.
+
+	* lisp/gnus-start.el (save-buffer-as-coding-system): Abolished.
+	This function is given in APEL 9.13 by now.
+
 1999-02-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* Makefile.in (add-info-suffix, remove-info-suffix): New targets.

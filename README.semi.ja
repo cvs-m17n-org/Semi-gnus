@@ -9,7 +9,7 @@ Semi-gnus とは？
 使用してはいけません。
 
   APEL, FLIM および SEMI パッケージが必要ですので、インストールする前
-にそれらをインストールしてください。Semi-gnus 6.10 は APEL 9.12 以上、
+にそれらをインストールしてください。Semi-gnus 6.10 は APEL 9.13 以上、
 最新の FLIM 1.12 および SEMI 1.12 を必要とします。
 それらのパッケージは
 ftp://ftp.jaist.ac.jp/pub/elisp/semi/
