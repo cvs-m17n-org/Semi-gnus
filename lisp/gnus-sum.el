@@ -6618,14 +6618,9 @@ be displayed."
 	  ;; The requested article is different from the current article.
 	  (progn
 	    (gnus-summary-display-article article all-headers)
-;;; Hidden headers are not hidden text any more.
-;;	    (when (or all-headers gnus-show-all-headers)
-;;	      (gnus-article-show-all-headers))
 	    (gnus-article-set-window-start
 	     (cdr (assq article gnus-newsgroup-bookmarks)))
 	    article)
-;;	(when (or all-headers gnus-show-all-headers)
-;;	  (gnus-article-show-all-headers))
 	'old))))
 
 (defun gnus-summary-force-verify-and-decrypt ()
@@ -8429,16 +8424,21 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	art-group to-method new-xref article to-groups)
     (unless (assq action names)
       (error "Unknown action %s" action))
-    ;; We have to select an article to give
-    ;; `gnus-read-move-group-name' an opportunity to suggest an
-    ;; appropriate default.
-    (unless (gnus-buffer-live-p gnus-original-article-buffer)
-      (let ((gnus-display-mime-function nil)
-	    (gnus-article-prepare-hook nil))
-	(gnus-summary-select-article nil nil nil (car articles))))
     ;; Read the newsgroup name.
     (when (and (not to-newsgroup)
 	       (not select-method))
+      (if (and gnus-move-split-methods
+	       (not
+		(and (memq gnus-current-article articles)
+		     (gnus-buffer-live-p gnus-original-article-buffer))))
+	  ;; When `gnus-move-split-methods' is non-nil, we have to
+	  ;; select an article to give `gnus-read-move-group-name' an
+	  ;; opportunity to suggest an appropriate default.  However,
+	  ;; we needn't render or mark the article.
+	  (let ((gnus-display-mime-function nil)
+		(gnus-article-prepare-hook nil)
+		(gnus-mark-article-hook nil))
+	    (gnus-summary-select-article nil nil nil (car articles))))
       (setq to-newsgroup
 	    (gnus-read-move-group-name
 	     (cadr (assq action names))
