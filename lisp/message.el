@@ -3149,9 +3149,9 @@ give as trustworthy answer as possible."
 (defvar gnus-inviolable-extended-version)
 
 (defun message-make-user-agent ()
-  "Return user-agent info if the value `message-user-agent' is non-nil and the
-\"User-Agent\" field which includes the same value of `message-user-agent' does
-not exist in the narrowed header."
+  "Return user-agent info if the value `message-user-agent' is non-nil. If the
+\"User-Agent\" field has already exist, it's value will be added in the return
+string."
   (when message-user-agent
     (save-excursion
       (goto-char (point-min))
@@ -3163,10 +3163,8 @@ not exist in the narrowed header."
 		    p (match-end 0)
 		    end (std11-field-end)
 		    user-agent (buffer-substring-no-properties p end))
-	      (unless (string-match (regexp-quote message-user-agent)
-				    user-agent)
-		(delete-region start (1+ end))
-		(concat message-user-agent " " user-agent)))
+	      (delete-region start (1+ end))
+	      (concat message-user-agent " " user-agent))
 	  message-user-agent)))))
 
 (defun message-generate-headers (headers)
