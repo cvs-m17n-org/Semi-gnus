@@ -806,9 +806,9 @@ which it may alter in any way.")
     (?s gnus-tmp-subject-or-nil ?s)
     (?n gnus-tmp-name ?s)
     (?A (std11-address-string
-	 (car (mime-read-field 'From gnus-tmp-header))) ?s)
+	 (car (mime-entity-read-field gnus-tmp-header 'From))) ?s)
     (?a (or (std11-full-name-string
-	     (car (mime-read-field 'From gnus-tmp-header)))
+	     (car (mime-entity-read-field gnus-tmp-header 'From)))
 	    gnus-tmp-from) ?s)
     (?F gnus-tmp-from ?s)
     (?x ,(macroexpand '(mail-header-xref gnus-tmp-header)) ?s)
@@ -3454,11 +3454,11 @@ If LINE, insert the rebuilt thread starting on line LINE."
 (defsubst gnus-article-sort-by-author (h1 h2)
   "Sort articles by root author."
   (string-lessp
-   (let ((addr (car (mime-read-field 'From h1))))
+   (let ((addr (car (mime-entity-read-field h1 'From))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
-   (let ((addr (car (mime-read-field 'From h2))))
+   (let ((addr (car (mime-entity-read-field h2 'From))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
