@@ -10,6 +10,12 @@ Gnus to use it, and you must not use gnus-mime for SEMI.
   It requires SEMI package, so please get and install SEMI package
 before to install it.
 
+  T-gnus major change has been done. It won't work with the old versions
+of SEMI packages, e.g. FLIM 1.10.5, SEMI 1.9.1, etc. If you have that one,
+please update your environment before installing it. The recommended
+versions of SEMI packages are APEL 9.5, FLIM 1.11.1, and SEMI 1.10.1 at
+the present time.
+
 
 How to get? (via CVS)
 =====================

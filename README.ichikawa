@@ -16,7 +16,8 @@ NEWS:
 * New Features
 
   Use T-gnus in offline(Unplugged) status using gnus-offline.
-  T-gnus have also features that have "shuhei-k" branch and MainTrunk.
+  T-gnus have also features that have "shuhei-k" branch, "chao-6_9" branch
+  and the MainTrunk.
 
   Enable to get Multiple Pop server in POP and APOP using pop3-fma.el
   (pop3 For Multi Account).
@@ -28,6 +29,7 @@ NEWS:
   See TODO.ja
 
 * T-gnus 6.8.19 is the last version Gnus 5.6 base.
-  After this , T-gnus 6.10 - this is based on pgnus.
+  After this , T-gnus 6.10 - this is based on Pterodactyl Gnus.
 
   Latest T-gnus is T-gnus 6.10.025 (Based on pgnus-0.36).
+
