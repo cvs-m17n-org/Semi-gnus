@@ -254,7 +254,7 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.33; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "Semi-gnus %s (based on Gnus 5.6.34; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-version-number)
   "Version string for this version of gnus.")
 

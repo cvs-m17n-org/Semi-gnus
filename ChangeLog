@@ -1,5 +1,7 @@
 1998-08-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Fix typo.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.11.
 
 	* Sync up with Gnus 5.6.34.
