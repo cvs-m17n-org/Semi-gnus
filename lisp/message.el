@@ -2910,12 +2910,15 @@ This sub function is for exclusive use of `message-send-mail'."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
-	    (when (and news
+	    (when
+		(save-restriction
+		  (message-narrow-to-headers)
+		  (and news
 		       (or (message-fetch-field "cc")
 			   (message-fetch-field "to"))
 		       (let ((ct (mime-read-Content-Type)))
 			 (and (eq 'text (cdr (assq 'type ct)))
-			      (eq 'plain (cdr (assq 'subtype ct))))))
+			      (eq 'plain (cdr (assq 'subtype ct)))))))
 	      (message-insert-courtesy-copy))
 	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
