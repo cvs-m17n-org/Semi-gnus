@@ -1,3 +1,8 @@
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
+	for Subject and From field.
+
 1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-parse-head): Use
