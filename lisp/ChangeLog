@@ -1,3 +1,19 @@
+2003-04-20  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-gssapi-open, imap-ssl-open): Erase buffer before
+	starting process, like imap-kerberos4-open does.
+
+	* mml-smime.el, rfc1843.el, dig.el, smime.el, uudecode.el: Fix
+	license template.
+
+	* mml-sec.el: Fix license template.
+
+	* gnus-sieve.el, sieve.el, sieve-manage.el, sieve-mode.el: Fix
+	license template.
+
+	* pgg-def.el, pgg.el, pgg-gpg.el, pgg-parse.el, pgg-pgp5.el,
+	pgg-pgp.el: Fix license template.
+
 2003-04-19  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-sum.el (gnus-summary-delete-article): Improve docstring.

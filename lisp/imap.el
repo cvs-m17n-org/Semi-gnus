@@ -532,6 +532,7 @@ sure of changing the value of `foo'."
 	cmd done)
     (while (and (not done) (setq cmd (pop cmds)))
       (message "Opening GSSAPI IMAP connection with `%s'..." cmd)
+      (erase-buffer)
       (let* ((port (or port imap-default-port))
 	     (process-connection-type imap-process-connection-type)
 	     (process (as-binary-process
@@ -595,6 +596,7 @@ sure of changing the value of `foo'."
 	cmd done)
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening SSL connection with `%s'..." cmd)
+      (erase-buffer)
       (let ((port (or port imap-default-ssl-port))
 	    (process-connection-type nil)
 	    process)
