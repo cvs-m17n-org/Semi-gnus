@@ -915,7 +915,6 @@ See the manual for details."
 (defvar gnus-treatment-function-alist
   '((gnus-treat-strip-banner gnus-article-strip-banner)
     (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
-    (gnus-treat-highlight-signature gnus-article-highlight-signature)
     (gnus-treat-buttonize gnus-article-add-buttons)
     (gnus-treat-fill-article gnus-article-fill-cited-article)
     (gnus-treat-fill-long-lines gnus-article-fill-long-lines)
@@ -1052,8 +1051,8 @@ Initialized from `text-mode-syntax-table.")
   (interactive (gnus-article-hidden-arg))
   ;; Lars said that this function might be inhibited.
   (if (gnus-article-check-hidden-text 'headers arg)
-      ;; Show boring headers as well.
       (progn
+	;; Show boring headers as well.
 	(gnus-article-show-hidden-text 'boring-headers)
 	(when (eq 1 (point-min))
 	  (set-window-start (get-buffer-window (current-buffer)) 1)))
@@ -1409,6 +1408,22 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 		    gnus-article-x-face-command))
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
+
+(autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
+
+(defun gnus-article-display-x-face-with-x-face-mule (&rest args)
+  "Decode and show X-Face with the function
+`x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
+narrowed to just the headers of the article."
+  (when (featurep 'xemacs)
+    (error "`%s' won't work under XEmacs."
+	   'gnus-article-display-x-face-with-x-face-mule))
+  (condition-case err
+      (x-face-mule-x-face-decode-message-header)
+    (error (error "%s"
+		  (if (featurep 'x-face-mule)
+		      "Please install x-face-mule 0.24 or later."
+		    err)))))
 
 (defun article-decode-mime-words ()
   "Decode all MIME-encoded words in the article."
@@ -1792,9 +1807,10 @@ how much time has lapsed since DATE. For `lapsed', the value of
 should replace the \"Date:\" one, or should be added below it."
   (interactive (list 'ut t))
   (let* ((header (or header
-		     (mail-header-date (save-excursion
-					 (set-buffer gnus-summary-buffer)
-					 gnus-current-headers))
+		     (and (eq 1 (point-min))
+			  (mail-header-date (save-excursion
+					      (set-buffer gnus-summary-buffer)
+					      gnus-current-headers)))
 		     (message-fetch-field "date")
 		     ""))
 	 (date (if (vectorp header) (mail-header-date header)
@@ -2738,48 +2754,43 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (goto-char (point-min))
   (when (re-search-forward "^[^\t ]+:" nil t)
     (goto-char (match-beginning 0)))
-  (save-restriction
-    (narrow-to-region (point)
-		      (if (search-forward "\n\n" nil t)
-			  (point)
-			(point-max)))
-    (gnus-treat-article 'head)
-    (goto-char (point-max)))
-  (let* ((start (point))
-	 (root-entity (unless number
-			(get-text-property (point-min) 'mime-view-entity)))
-	 (entity (if (and root-entity
-			  (eq 'multipart
-			      (mime-content-type-primary-type
-			       (mime-entity-content-type root-entity))))
-		     (get-text-property start 'mime-view-entity)
-		   root-entity))
+  (let* ((entity (if (eq 1 (point-min))
+		     (get-text-property 1 'mime-view-entity)
+		   (get-text-property (point) 'mime-view-entity)))
 	 (number (or number 0))
-	 content-type treat-type)
+	 start content-type treat-type ids)
+    (save-restriction
+      (narrow-to-region (point)
+			(if (search-forward "\n\n" nil t)
+			    (point)
+			  (point-max)))
+      (gnus-treat-article 'head)
+      (goto-char (setq start (point-max))))
     (while (and (not (eobp))
 		entity
 		(progn (mime-preview-move-to-next)
 		       (> (point) start)))
-      (if entity
-	  (progn
-	    (setq content-type (mime-entity-content-type entity)
-		  treat-type (format "%s/%s"
-				     (mime-content-type-primary-type
-				      content-type)
-				     (mime-content-type-subtype
-				      content-type)))
-	    (if (string-equal treat-type "message/rfc822")
-		(save-restriction
-		  (narrow-to-region start (point-max))
-		  (gnus-article-prepare-mime-display number)
-		  (goto-char (point-max)))
-	      (save-restriction
-		(narrow-to-region start (point))
-		(setq start (point)
-		      entity (get-text-property start 'mime-view-entity))
-		(gnus-treat-article nil (incf number) nil treat-type))))
-	(setq start (point)
-	      entity (get-text-property start 'mime-view-entity))))
+      (setq content-type (mime-entity-content-type entity)
+	    treat-type (format "%s/%s"
+			       (mime-content-type-primary-type
+				content-type)
+			       (mime-content-type-subtype
+				content-type)))
+      (save-restriction
+	(if (string-equal treat-type "message/rfc822")
+	    (progn
+	      (narrow-to-region start (point-max))
+	      (gnus-article-prepare-mime-display number))
+	  (narrow-to-region start (point))
+	  (setq start (point)
+		ids (length (mime-entity-node-id entity))
+		entity (get-text-property start 'mime-view-entity)
+		number (1+ number))
+	  (if (or (null entity)
+		  (< (length (mime-entity-node-id entity)) ids))
+	      (gnus-treat-article 'last number number treat-type)
+	    (gnus-treat-article nil number nil treat-type)))
+	(goto-char (point-max))))
     (unless (eobp)
       (save-restriction
 	(narrow-to-region (point) (point-max))
