@@ -3584,8 +3584,6 @@ does not read the newsgroup, so he wouldn't see any replies sent to it."))
 		    (setq message-this-is-news nil)
 		    (cons 'To (or reply-to from "")))
 		(cons 'Newsgroups newsgroups)))
-	     ((and mft message-use-mail-followup-to)
-	      (list (cons 'To mft)))
 	     (t
 	      (if (or (equal followup-to newsgroups)
 		      (not (eq message-use-followup-to 'ask))
@@ -3607,6 +3605,8 @@ Also, some source/announcement newsgroups are not indented for discussion;
 responses here are directed to other newsgroups."))
 		  (cons 'Newsgroups followup-to)
 		(cons 'Newsgroups newsgroups))))))
+          ((and mft message-use-mail-followup-to)
+           (list (cons 'To mft)))
 	  (posted-to
 	   `((Newsgroups . ,posted-to)))
 	  (t
