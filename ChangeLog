@@ -1,3 +1,18 @@
+2003-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu/group-prefixed-name): Removed.
+	(gnus-namazu/real-group-name): Removed.
+	(gnus-namazu/decode-group-name): Removed.
+	(gnus-namazu/directory-table): New internal variable.
+	(gnus-namazu/make-directory-table): New function.
+	(gnus-namazu/search): Call the above function, and use
+	`gnus-namazu/directory-table' to get a real group name from a file
+	name.
+	(gnus-namazu-create-index): Call `gnus-namazu/make-directory-table'.
+	(gnus-namazu/update-sentinel): Ditto.
+	(gnus-namazu-update-all-indices): Simplified.
+	(gnus-namazu-update-indices): New function.
+
 2003-07-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/group-prefixed-name): Return
