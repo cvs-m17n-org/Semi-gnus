@@ -494,7 +494,7 @@ noticing asynchronous data.")
 			(symbol-value 'enable-multibyte-characters))))
     (unwind-protect
 	;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
-	(progn
+	(let (default-enable-multibyte-characters)
 	  ;; `set-buffer-multibyte' will be provided by APEL for all Emacsen.
 	  (set-buffer-multibyte nil)
 	  (process-send-region (nntp-find-connection nntp-server-buffer)
