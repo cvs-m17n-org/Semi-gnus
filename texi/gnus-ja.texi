@@ -5896,6 +5896,11 @@ gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&%s
 @subsection $B%W%m%;%90u$rIU$1$k(B
 @cindex setting process marks
 
+$B%W%m%;%90u$O35N,%P%C%U%!!<$K(B @code{#} $B$H$7$FI=<($5$l!"B>$N%3%^%s%I$G=hM}(B
+$B$5$;$k5-;v$K0u$rIU$1$k$?$a$K;H$o$l$^$9!#Nc$($P!";M$D$N5-;v$K$K0u$rIU$1$F(B
+$B$+$i(B @kbd{*} $B%3%^%s%I$r;H$&$H!"(Bgnus $B$O$=$l$i;M$D$N5-;v$r%-%c%C%7%e$KF~$l(B
+$B$^$9!#>\$7$/$O(B @pxref{Process/Prefix} $B$r$I$&$>!#(B
+
 @table @kbd
 @item M P p
 @itemx #

@@ -3072,7 +3072,8 @@ or nil if no action could be taken."
       num)))
 
 (defun gnus-group-expire-articles (&optional n)
-  "Expire all expirable articles in the current newsgroup."
+  "Expire all expirable articles in the current newsgroup.
+Uses the process/prefix convention."
   (interactive "P")
   (let ((groups (gnus-group-process-prefix n))
 	group)
