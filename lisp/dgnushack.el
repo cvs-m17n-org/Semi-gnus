@@ -262,17 +262,23 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el")
-	  (unless (or (condition-case nil
+	  (unless (or (condition-case code
 			  (require 'w3-forms)
-			(error nil))
+			(error
+			 (message "No w3: %s %s retrying..." code
+				  (locate-library "w3-forms"))
+			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
 		      (let ((lp (delete dgnushack-w3-dir
 					(copy-sequence load-path))))
-			(when (condition-case nil
-				  (let ((load-path lp))
-				    (require 'w3-forms))
-				(error nil))
+			(when (let ((load-path lp))
+				(condition-case code
+				    (require 'w3-forms)
+				  (error
+				   (message "No w3: %s %s" code
+					    (locate-library "w3-forms"))
+				   nil)))
 			  ;; If success, fix `load-path' for compiling.
 			  (setq load-path lp))))
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
@@ -390,6 +396,13 @@ Modify to suit your needs."))
 				   (1+ (match-end 0))
 				 (point-max))))
 	      (goto-char (point-min))
+	      ;; Remove "@anchor" if it is not supported.
+	      (unless (fboundp 'texinfo-anchor)
+		(while (re-search-forward "^@anchor" nil t)
+		  (delete-region (match-beginning 0) (progn
+						       (forward-line 1)
+						       (point))))
+		(goto-char (point-min)))
 	      ;; Add suffix if it is needed.
 	      (when (and addsuffix
 			 (re-search-forward

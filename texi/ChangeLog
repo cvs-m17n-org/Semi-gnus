@@ -1,3 +1,77 @@
+2001-01-05 06:53:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* emacs-mime.texi (time-date): Addition.
+	(time-date): Addition.
+
+2001-01-04 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Newest Features): uref, not url.
+
+	* texi2latex.el (latexi-translate-file): Ignore anchor.
+
+2001-01-04  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Article Washing): Refer to `Customizing Articles' for
+	permanent changes.  Suggested by Russell Marks (russel dot marks
+	at ntlworld dot com).
+
+2001-01-03  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Article Washing): Mention `C-u g' as a sort of
+	anti-washing. 
+
+2001-01-01 11:40:34  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (extensions): Removed.
+
+2000-12-31 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* texi2latex.el (latexi-translate-file): Understand uref.
+
+2000-12-30  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Selecting a Group): Explain in more detail, what a
+	prefix arg means for SPC.  Refer people to M-g command from
+	summary buffer.  Kudos to Paul Repacholi <prep@prep.synonet.com>
+	and Dan Jacobson <jidanni@kimo.com.tw> for suggesting this.
+
+2000-12-29 21:43:20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Spelling): New.
+
+2000-12-29 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* texi2latex.el (latexi-translate-file): Support srcdir.
+	(latexi-translate-file): Understand ifnottex, dircategory, and
+	direntry. Set coding-system-for-write to iso-8859-1.
+
+	* Makefile.in: Fix for srcdir.
+
+	* gnus.texi (NoCeM): Use file instead of uref.
+	(Mail Source Specifiers): Use subsubsection instead of
+	subsubheading.
+
+2000-12-29 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Top): Set version to Oort Gnus v0.01.
+
+	* Makefile.in (install): The info files are in the current
+	directory.
+
+2000-12-29  Christopher Splinter  <chris@splinter.inka.de>
+
+	* gnus.texi (Customizing Articles): Added documentation for
+	`gnus-treat-hide-citation-maybe', `gnus-treat-date-iso8601' and
+	`gnus-treat-date-user-defined'.
+
+2000-12-29 00:38:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Posting Styles): Addition.
+
+2000-12-28 20:04:26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Buffer Entry): New section.
+
 2000-12-22  Christopher Splinter  <chris@splinter.inka.de>
 
 	* gnus.texi (Group Parameters): Add documentation for the `banner'

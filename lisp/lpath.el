@@ -13,6 +13,7 @@
 
 (maybe-fbind '(babel-fetch
 	       babel-wash create-image decode-coding-string display-graphic-p
+	       display-time-event-handler
 	       find-image font-create-object gnus-mule-get-coding-system
 	       font-lock-set-defaults
 	       image-size image-type-available-p insert-image
@@ -61,7 +62,8 @@
 		     set-buffer-multibyte set-char-table-range
 		     set-face-stipple set-frame-face-alist track-mouse
 		     url-retrieve w3-form-encode-xwfu window-at
-		     window-edges x-color-values x-popup-menu))
+		     window-edges x-color-values x-popup-menu browse-url
+		     frame-char-height frame-char-width))
       (maybe-bind '(buffer-display-table
 		    buffer-file-coding-system font-lock-defaults
 		    global-face-data gnus-article-x-face-too-ugly

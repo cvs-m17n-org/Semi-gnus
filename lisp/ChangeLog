@@ -1,3 +1,175 @@
+2001-01-05 06:49:37  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* time-date.el (time-to-number-of-days): New function.
+
+2001-01-04 11:06:14  Gregory Chernov  <greg@visiontech-dml.com>
+
+	* nnslashdot.el (nnslashdot-request-list): Always get the right
+	sid. 
+
+2001-01-05 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-minibuffer-local-map): New keymap.
+	(message-read-from-minibuffer): Use it.
+	* gnus-msg.el (gnus-summary-resend-message): Use it
+
+2001-01-04 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-start.el (gnus-display-time-event-handler): New function.
+	(gnus-after-getting-new-news-hook): Use it.
+
+2001-01-03 07:26:58  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-ignored-mail-headers): Add draft header.
+
+2001-01-02 06:28:28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-expire-articles): Don't save
+	excursion. 
+
+	* nnslashdot.el (nnslashdot-request-list): Get the right year.
+
+2001-01-01 00:52:44  Ed L. Cashin  <ecashin@coe.uga.edu>
+
+	* gnus-sum.el (gnus-summary-expire-articles): Save excursion.
+
+2000-12-31 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* qp.el (quoted-printable-decode-region): Don't backward-char.
+
+2000-12-31 03:57:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el: Mark articles as replied.
+
+	* gnus-sum.el (gnus-summary-add-mark): New function.
+
+	* gnus-group.el (gnus-add-mark): New function.
+
+	* gnus-sum.el (gnus-summary-buffer-name): New function.
+	(gnus-summary-setup-buffer): Use it.
+
+	* gnus-draft.el: Set things up with the right post method and
+	stuff. 
+
+	* message.el (message-ignored-news-headers): Remove X-Draft-From.
+
+	* gnus-msg.el (gnus-inews-insert-draft-meta-information): New function.
+
+	* gnus.el (gnus-draft-meta-information-header): New variable.
+
+2000-12-30 00:17:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-treatment-function-alist): Move the date
+	functions before the header sorting functions.
+
+	* mm-uu.el (mm-uu-pgp-signed-extract-1): Unquote "- " quotes.
+
+	* dgnushack.el (dgnushack-compile): Message whether there is w3. 
+	Don't (push "/usr/share/emacs/site-lisp" load-path).
+
+	* gnus-cite.el (gnus-article-fill-cited-article): Don't add space
+	to empty fill prefixes.
+
+2000-12-30 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-open-connection): Kill pbuffer if process is nil.
+	Suggested by Christoph Conrad <christoph.conrad@gmx.de>.
+
+2000-12-30 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnheader.el (autoload): Autoload gnus-sorted-intersection.
+
+	* nnml.el (autoload): Move to nnheader.el.
+
+	* nnfolder.el (nnfolder-existing-articles): Reversed, i.e. sorted.
+	(nnfolder-request-expire-articles): Use gnus-sorted-intersection.
+	(nnfolder-retrieve-headers): Use intersection. Suggested by Jonas
+	Kvarnstr,Av(Bm <jonkv@ida.liu.se>.
+
+2000-12-30 00:17:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (article-make-date-line): Get the hours right.
+	(gnus-ignored-headers): More hiding.
+
+	* nnmail.el (nnmail-expiry-wait): Not an integer.
+
+	* message.el (message-goto-body): Only expand abbrev when called
+	interactively. 
+	(message-make-lines): Use it.
+
+2000-12-29 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-inews-yank-articles): Reparse headers.
+
+2000-12-30 00:17:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-limit-include-expunged): Really
+	include the expunged articles.
+
+	* gnus-group.el (gnus-group-sort-by-server): New function.
+
+	* gnus.el (gnus-method-to-server-name): New function.
+	(gnus-group-prefixed-name): Use it.
+
+	* gnus-group.el (gnus-group-sort-function): Doc fix.
+	(gnus-group-sort-groups-by-server): New command.
+
+2000-12-29 13:25:10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-treat-date-english): New variable.
+	(article-date-english): New command.
+	(gnus-english-month-names): New variable.
+	(article-make-date-line): Do 'english.
+
+	* gnus-cite.el (gnus-article-fill-cited-article): Add a space
+	after the fill prefix.
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Removed "Enter
+	score...". 
+
+	* gnus-art.el (gnus-ignored-headers): Hide more headers.
+
+	* message.el (message-mode-map): Bind comment-region.
+
+	* gnus-art.el (gnus-mime-display-part): Let w3 display
+	multipart/related.
+
+	* mm-bodies.el (mm-long-lines-p): New function.
+	(mm-body-encoding): Use it.
+	(mm-body-encoding): Encode articles with lines longer than 1000
+	characters. 
+
+2000-12-29 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-enable-multibyte): Use
+	default-enable-multibyte-characters.
+	(mm-enable-multibyte-mule4): Ditto.
+	(mm-disable-multibyte): Test XEmacs.
+	(mm-disable-multibyte-mule4): Ditto.
+	(mm-with-unibyte-current-buffer): Simplified.
+	(mm-with-unibyte-current-buffer-mule4): Ditto.
+
+2000-12-28 19:44:56  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnheaderxm.el (nnheader-string-as-multibyte): New alias.
+
+	* nnheader.el (nnheader-string-as-multibyte): New alias.
+
+	* mm-view.el (mm-inline-text): Warn when bugging out in w3. 
+
+	* gnus-uu.el (gnus-message-process-mark): New function.
+	(gnus-uu-mark-by-regexp): Use it.
+	(gnus-new-processable): New function.
+
+2000-12-28 19:21:57  Inge Frick  <inge@nada.kth.se>
+
+	* gnus-sum.el (gnus-no-mark): New variable.
+
+2000-11-01 01:12:29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnwfm.el (nnwfm-create-mapping): Remove quote marks and
+	backslashes. 
+
 2000-12-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* gnus-art.el (gnus-article-banner-alist): Remove duplicate

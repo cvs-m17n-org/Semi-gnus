@@ -1650,6 +1650,7 @@ If nil, no default charset is assumed when posting."
 
 (defvar gnus-agent-gcc-header "X-Gnus-Agent-Gcc")
 (defvar gnus-agent-meta-information-header "X-Gnus-Agent-Meta-Information")
+(defvar gnus-draft-meta-information-header "X-Draft-From")
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
 (defvar gnus-original-article-buffer " *Original Article*")
 (defvar gnus-newsgroup-name nil)
@@ -1657,9 +1658,6 @@ If nil, no default charset is assumed when posting."
 
 (defvar gnus-agent nil
   "Whether we want to use the Gnus agent or not.")
-
-(defvar gnus-agent-fetching nil
-  "Whether Gnus agent is in fetching mode.")
 
 (defvar gnus-agent-fetching nil
   "Whether Gnus agent is in fetching mode.")
@@ -2616,21 +2614,24 @@ that that variable is buffer-local to the summary buffers."
       (and active
 	   (file-exists-p active))))))
 
+(defsubst gnus-method-to-server-name (method)
+  (concat
+   (format "%s" (car method))
+   (when (and
+	  (or (assoc (format "%s" (car method))
+		     (gnus-methods-using 'address))
+	      (gnus-server-equal method gnus-message-archive-method))
+	  (nth 1 method)
+	  (not (string= (nth 1 method) "")))
+     (concat "+" (nth 1 method)))))
+
 (defun gnus-group-prefixed-name (group method)
   "Return the whole name from GROUP and METHOD."
   (and (stringp method) (setq method (gnus-server-to-method method)))
   (if (or (not method)
 	  (gnus-server-equal method "native"))
       group
-    (concat (format "%s" (car method))
-	    (when (and
-		   (or (assoc (format "%s" (car method))
-			      (gnus-methods-using 'address))
-		       (gnus-server-equal method gnus-message-archive-method))
-		   (nth 1 method)
-		   (not (string= (nth 1 method) "")))
-	      (concat "+" (nth 1 method)))
-	    ":" group)))
+    (concat (gnus-method-to-server-name method) ":" group)))
 
 (defun gnus-group-real-prefix (group)
   "Return the prefix of the current group name."

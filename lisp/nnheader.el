@@ -37,6 +37,7 @@
 (require 'mail-utils)
 (require 'mime)
 (eval-and-compile
+  (autoload 'gnus-sorted-intersection "gnus-range")
   (autoload 'gnus-intersection "gnus-range")
   (autoload 'gnus-sorted-complement "gnus-range"))
 
@@ -1133,6 +1134,7 @@ find-file-hooks, etc.
 (defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-string-as-multibyte 'string-as-multibyte)
 
 (defun nnheader-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."

@@ -1,3 +1,10 @@
+2001-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Remove "@anchor" if it
+	is not supported.
+
 2000-12-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el: Bind `:parameter-type', `:parameter-document',

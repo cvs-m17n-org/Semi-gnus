@@ -232,13 +232,14 @@ included.  Organization, Lines and User-Agent are optional."
   :type 'sexp)
 
 (defcustom message-ignored-news-headers
-  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:"
+  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|X-Draft-From:"
   "*Regexp of headers to be removed unconditionally before posting."
   :group 'message-news
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-mail-headers "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:"
+(defcustom message-ignored-mail-headers
+  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|X-Draft-From:"
   "*Regexp of headers to be removed unconditionally before mailing."
   :group 'message-mail
   :group 'message-headers
@@ -643,6 +644,12 @@ The function `message-supersede' runs this hook."
   "Hook called narrowed to the headers when setting up a message buffer."
   :group 'message-various
   :type 'hook)
+
+(defcustom message-minibuffer-local-map 
+  (let ((map (make-sparse-keymap 'message-minibuffer-local-map)))
+    (set-keymap-parent map minibuffer-local-map)
+    map)
+  "Keymap for `message-read-from-minibuffer'.")
 
 ;;;###autoload
 (defcustom message-citation-line-function 'message-insert-citation-line
@@ -1661,7 +1668,7 @@ Return the number of headers removed."
   (goto-char (point-min)))
 
 (defun message-narrow-to-head-1 ()
-  "Like `message-narrow-to-head'. Don't widen."
+  "Like `message-narrow-to-head'.  Don't widen."
   (narrow-to-region
    (goto-char (point-min))
    (if (search-forward "\n\n" nil 1)
@@ -1810,6 +1817,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\M-q" 'message-fill-paragraph)
 
   (define-key message-mode-map "\t" 'message-tab)
+  (define-key message-mode-map "\M-;" 'comment-region)
 
   (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
   (define-key message-mode-map "\C-xk" 'message-mimic-kill-buffer))
@@ -1935,8 +1943,6 @@ M-RET    message-newline-and-reformat (break the line and reformat)."
   (message-setup-fill-variables)
   ;; Allow using comment commands to add/remove quoting.
   (set (make-local-variable 'comment-start) message-yank-prefix)
-  ;;(when (fboundp 'mail-hist-define-keys)
-  ;;  (mail-hist-define-keys))
   (if (featurep 'xemacs)
       (message-setup-toolbar)
     (set (make-local-variable 'font-lock-defaults)
@@ -2083,10 +2089,12 @@ a string \"never\" is inserted in default."
   (interactive)
   (message-position-on-field "Summary" "Subject"))
 
-(defun message-goto-body ()
+(defun message-goto-body (&optional interactivep)
   "Move point to the beginning of the message body."
-  (interactive)
-  (if (looking-at "[ \t]*\n") (expand-abbrev))
+  (interactive (list t))
+  (when (and interactivep
+	     (looking-at "[ \t]*\n"))
+    (expand-abbrev))
   (goto-char (point-min))
   (or (search-forward (concat "\n" mail-header-separator "\n") nil t)
       (search-forward "\n\n" nil t)))
@@ -3917,10 +3925,7 @@ If NOW, use that time instead."
   (save-excursion
     (save-restriction
       (widen)
-      (goto-char (point-min))
-      (re-search-forward
-       (concat "^" (regexp-quote mail-header-separator) "$"))
-      (forward-line 1)
+      (message-goto-body)
       (int-to-string (count-lines (point) (point-max))))))
 
 (defun message-make-in-reply-to ()
@@ -4805,20 +4810,21 @@ responses here are directed to other addresses.")))
       ;; Allow customizations to have their say.
       (if (not wide)
 	  ;; This is a regular reply.
-	  (if (message-functionp message-reply-to-function)
-	      (setq follow-to (funcall message-reply-to-function)))
-	;; This is a followup.
-	(if (message-functionp message-wide-reply-to-function)
+	  (when (message-functionp message-reply-to-function)
 	    (save-excursion
-	      (setq follow-to
-		    (funcall message-wide-reply-to-function)))))
+	      (setq follow-to (funcall message-reply-to-function))))
+	;; This is a followup.
+	(when (message-functionp message-wide-reply-to-function)
+	  (save-excursion
+	    (setq follow-to
+		  (funcall message-wide-reply-to-function)))))
       (setq message-id (message-fetch-field "message-id" t)
 	    references (message-fetch-field "references")
 	    date (message-fetch-field "date")
 	    from (message-fetch-field "from")
 	    subject (or (message-fetch-field "subject") "none"))
-      (if gnus-list-identifiers
-	  (setq subject (message-strip-list-identifiers subject)))
+      (when gnus-list-identifiers
+	(setq subject (message-strip-list-identifiers subject)))
       (setq subject (message-make-followup-subject subject))
 
       (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
@@ -5712,9 +5718,11 @@ regexp varstr."
   "Read from the minibuffer while providing abbrev expansion."
   (if (fboundp 'mail-abbrevs-setup)
       (let ((mail-abbrev-mode-regexp "")
-	    (minibuffer-setup-hook 'mail-abbrevs-setup))
+	    (minibuffer-setup-hook 'mail-abbrevs-setup)
+	    (minibuffer-local-map message-minibuffer-local-map))
 	(read-from-minibuffer prompt))
-    (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook))
+    (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook)
+	  (minibuffer-local-map message-minibuffer-local-map))
       (read-string prompt))))
 
 (defun message-use-alternative-email-as-from ()

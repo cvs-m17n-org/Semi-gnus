@@ -458,6 +458,11 @@ this variable specifies group names."
   :group 'gnus-summary-marks
   :type 'character)
 
+(defcustom gnus-no-mark ?  ;Whitespace
+  "*Mark used for articles that have no other secondary mark."
+  :group 'gnus-summary-marks
+  :type 'character)
+
 (defcustom gnus-ancient-mark ?O
   "*Mark used for ancient articles."
   :group 'gnus-summary-marks
@@ -1643,6 +1648,7 @@ increase the score of each group you read."
     "z" gnus-article-date-ut
     "u" gnus-article-date-ut
     "l" gnus-article-date-local
+    "p" gnus-article-date-english
     "e" gnus-article-date-lapsed
     "o" gnus-article-date-original
     "i" gnus-article-date-iso8601
@@ -1715,7 +1721,6 @@ increase the score of each group you read."
       "Score"
       (nconc
        (list
-	["Enter score..." gnus-summary-score-entry t]
 	["Customize" gnus-score-customize t])
        (gnus-make-score-map 'increase)
        (gnus-make-score-map 'lower)
@@ -2614,9 +2619,13 @@ display only a single character."
 	  (aset table i [??]))))
     (setq buffer-display-table table)))
 
+(defun gnus-summary-buffer-name (group)
+  "Return the summary buffer name of GROUP."
+  (concat "*Summary " group "*"))
+
 (defun gnus-summary-setup-buffer (group)
   "Initialize summary buffer."
-  (let ((buffer (concat "*Summary " group "*")))
+  (let ((buffer (gnus-summary-buffer-name group)))
     (if (get-buffer buffer)
 	(progn
 	  (set-buffer buffer)
@@ -2802,7 +2811,7 @@ buffer that was in action when the last article was fetched."
 		(gnus-tmp-replied gnus-replied-mark)
 		((memq gnus-tmp-current gnus-newsgroup-saved)
 		 gnus-saved-mark)
-		(t gnus-unread-mark)))
+		(t gnus-no-mark)))
 	 (gnus-tmp-from (mail-header-from gnus-tmp-header))
 	 (gnus-tmp-name
 	  (cond
@@ -4190,7 +4199,7 @@ or a straight list of headers."
 		    gnus-replied-mark)
 		   ((memq number gnus-newsgroup-saved)
 		    gnus-saved-mark)
-		   (t gnus-unread-mark))
+		   (t gnus-no-mark))
 	     gnus-tmp-from (mail-header-from gnus-tmp-header)
 	     gnus-tmp-name
 	     (cond
@@ -8402,6 +8411,20 @@ the actual number of articles unmarked is returned."
       (gnus-summary-remove-process-mark (car gnus-newsgroup-processable))))
   (gnus-summary-position-point))
 
+(defun gnus-summary-add-mark (article type)
+  "Mark ARTICLE with a mark of TYPE."
+  (let ((vtype (car (assq type gnus-article-mark-lists)))
+	var)
+    (if (not vtype)
+	(error "No such mark type: %s" type)
+      (setq var (intern (format "gnus-newsgroup-%s" type)))
+      (set var (cons article (symbol-value var)))
+      (if (memq type '(processable cached replied saved))
+	  (gnus-summary-update-secondary-mark article)
+	;;; !!! This is bobus.  We should find out what primary
+	;;; !!! mark we want to set.
+	(gnus-summary-update-mark gnus-del-mark 'unread)))))
+	
 (defun gnus-summary-mark-as-expirable (n)
   "Mark N articles forward as expirable.
 If N is negative, mark backward instead.  The difference between N and
@@ -8642,7 +8665,7 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	  gnus-replied-mark)
 	 ((memq article gnus-newsgroup-saved)
 	  gnus-saved-mark)
-	 (t gnus-unread-mark))
+	 (t gnus-no-mark))
    'replied)
   (when (gnus-visual-p 'summary-highlight 'highlight)
     (gnus-run-hooks 'gnus-summary-update-hook))
@@ -8786,6 +8809,11 @@ The difference between N and the number of marks cleared is returned."
 	      (gnus-read-mark-p mark))
       (gnus-summary-mark-article gnus-current-article gnus-read-mark))))
 
+(defun gnus-summary-mark-unread-as-ticked ()
+   "Intended to be used by `gnus-summary-mark-article-hook'."
+  (when (memq gnus-current-article gnus-newsgroup-unreads)
+    (gnus-summary-mark-article gnus-current-article gnus-ticked-mark)))
+
 (defun gnus-summary-mark-region-as-read (point mark all)
   "Mark all unread articles between point and mark as read.
 If given a prefix, mark all articles between point and mark as read,
@@ -8859,7 +8887,7 @@ even ticked and dormant ones."
     (let ((scored gnus-newsgroup-scored)
 	  headers h)
       (while scored
-	(unless (gnus-summary-goto-subject (caar scored))
+	(unless (gnus-number-to-header (caar scored))
 	  (and (setq h (gnus-summary-article-header (caar scored)))
 	       (< (cdar scored) gnus-summary-expunge-below)
 	       (push h headers)))

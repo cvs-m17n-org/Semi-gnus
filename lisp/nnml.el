@@ -37,8 +37,6 @@
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
-(eval-and-compile
-  (autoload 'gnus-sorted-intersection "gnus-range"))
 
 (nnoo-declare nnml)
 

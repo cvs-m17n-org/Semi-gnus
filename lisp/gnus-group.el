@@ -37,6 +37,7 @@
 (require 'gnus-win)
 (require 'gnus-undo)
 (require 'time-date)
+(require 'gnus-ems)
 
 (defcustom gnus-group-archive-directory
   "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
@@ -117,8 +118,8 @@ This function will be called with group info entries as the arguments
 for the groups to be sorted.  Pre-made functions include
 `gnus-group-sort-by-alphabet', `gnus-group-sort-by-real-name',
 `gnus-group-sort-by-unread', `gnus-group-sort-by-level',
-`gnus-group-sort-by-score', `gnus-group-sort-by-method', and
-`gnus-group-sort-by-rank'.
+`gnus-group-sort-by-score', `gnus-group-sort-by-method',
+`gnus-group-sort-by-server', and `gnus-group-sort-by-rank'.
 
 This variable can also be a list of sorting functions.	In that case,
 the most significant sort function should be the last function in the
@@ -131,6 +132,7 @@ list."
 		(function-item gnus-group-sort-by-level)
 		(function-item gnus-group-sort-by-score)
 		(function-item gnus-group-sort-by-method)
+		(function-item gnus-group-sort-by-server)
 		(function-item gnus-group-sort-by-rank)
 		(function :tag "other" nil)))
 
@@ -2677,6 +2679,12 @@ If REVERSE, sort in reverse order."
   (interactive "P")
   (gnus-group-sort-groups 'gnus-group-sort-by-method reverse))
 
+(defun gnus-group-sort-groups-by-server (&optional reverse)
+  "Sort the group buffer alphabetically by server name.
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-groups 'gnus-group-sort-by-server reverse))
+
 ;;; Selected group sorting.
 
 (defun gnus-group-sort-selected-groups (n func &optional reverse)
@@ -2780,6 +2788,15 @@ sort in reverse order."
 			      (gnus-info-group info1) info1)))
 	   (symbol-name (car (gnus-find-method-for-group
 			      (gnus-info-group info2) info2)))))
+
+(defun gnus-group-sort-by-server (info1 info2)
+  "Sort alphabetically by server name."
+  (string< (gnus-method-to-server-name
+	    (gnus-find-method-for-group
+	     (gnus-info-group info1) info1))
+	   (gnus-method-to-server-name
+	    (gnus-find-method-for-group
+	     (gnus-info-group info2) info2))))
 
 (defun gnus-group-sort-by-score (info1 info2)
   "Sort by group score."
@@ -3766,7 +3783,8 @@ and the second element is the address."
 	    (setcar (nthcdr 2 entry) info)
 	    (when (and (not (eq (car entry) t))
 		       (gnus-active (gnus-info-group info)))
-	      (setcar entry (length (gnus-list-of-unread-articles (car info))))))
+	      (setcar entry (length
+			     (gnus-list-of-unread-articles (car info))))))
 	(error "No such group: %s" (gnus-info-group info))))))
 
 (defun gnus-group-set-method-info (group select-method)
@@ -3800,6 +3818,16 @@ and the second element is the address."
 	  (setcdr m (gnus-compress-sequence
 		     (sort (nconc (gnus-uncompress-range (cdr m))
 				  (copy-sequence articles)) '<) t))))))
+
+(defun gnus-add-mark (group mark article)
+  "Mark ARTICLE in GROUP with MARK, whether the group is displayed or not."
+  (let ((buffer (gnus-summary-buffer-name group)))
+    (if (gnus-buffer-live-p buffer)
+	(save-excursion
+	  (set-buffer (get-buffer buffer))
+	  (gnus-summary-add-mark article mark))
+      (gnus-add-marked-articles group (cdr (assq mark gnus-article-mark-lists))
+				(list article)))))
 
 ;;;
 ;;; Group timestamps

@@ -1,5 +1,7 @@
 ;;; nnheaderxm.el --- making Gnus backends work under XEmacs
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;      Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka  <yamaoka@jpl.org>
@@ -56,6 +58,7 @@
 (defalias 'nnheader-run-at-time 'nnheader-xmas-run-at-time)
 (defalias 'nnheader-cancel-timer 'delete-itimer)
 (defalias 'nnheader-cancel-function-timers 'ignore)
+(defalias 'nnheader-string-as-multibyte 'identity)
 (defalias 'nnheader-Y-or-n-p 'nnheader-xmas-Y-or-n-p)
 
 (provide 'nnheaderxm)

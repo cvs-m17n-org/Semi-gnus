@@ -247,6 +247,7 @@ Thank you for your help in stamping out bugs.
 	   (progn
 	     ,@forms)
 	 (gnus-inews-add-send-actions ,winconf ,buffer ,article)
+	 (gnus-inews-insert-draft-meta-information ,group ,article)
 	 (setq gnus-message-buffer (current-buffer))
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,group ,article))
@@ -255,6 +256,15 @@ Thank you for your help in stamping out bugs.
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
+
+(defun gnus-inews-insert-draft-meta-information (group article)
+  (save-excursion
+    (when (and group
+	       (not (string= group ""))
+	       (not (message-fetch-field gnus-draft-meta-information-header)))
+      (goto-char (point-min))
+      (insert gnus-draft-meta-information-header ": (\"" group "\" "
+	      (if article (number-to-string article) "\"\"") ")\n"))))
 
 ;;;###autoload
 (defun gnus-msg-mail (&rest args)
@@ -269,8 +279,8 @@ Gcc: header for archiving purposes."
 
 ;;;###autoload
 (define-mail-user-agent 'gnus-user-agent
-      'gnus-msg-mail 'message-send-and-exit
-      'message-kill-buffer 'message-send-hook)
+  'gnus-msg-mail 'message-send-and-exit
+  'message-kill-buffer 'message-send-hook)
 
 (defun gnus-setup-posting-charset (group)
   (let ((alist gnus-group-posting-charset-alist)
@@ -415,7 +425,10 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 
       (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
-	    (message-reply-headers gnus-current-headers))
+	    (message-reply-headers 
+	     (with-current-buffer gnus-article-copy
+	       ;; The headers are decoded.
+	       (nnheader-parse-head t))))
 	(message-yank-original)
 	(setq beg (or beg (mark t))))
       (when articles
@@ -815,7 +828,9 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
-  (interactive "sResend message(s) to: \nP")
+  (interactive 
+   (list (message-read-from-minibuffer "Resend message(s) to: ") 
+	 current-prefix-arg))
   (let ((articles (gnus-summary-work-articles n))
 	article)
     (while (setq article (pop articles))
@@ -1202,7 +1217,7 @@ this is a reply."
 			    (gnus-set-active group (cons (car active) 
 							 (cdr group-art))))
 		      (gnus-activate-group group)))
-		  (let ((buffer (concat "*Summary " group "*"))
+		  (let ((buffer (gnus-summary-buffer-name group))
 			(mark gnus-read-mark)
 			(article (cdr group-art)))
 		    (unless 
