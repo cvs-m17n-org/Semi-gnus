@@ -53,56 +53,6 @@
 
 ;;; Mule functions.
 
-(defvar gnus-mule-bitmap-image-file nil)
-(defun gnus-mule-group-startup-message (&optional x y)
-  "Insert startup message in current buffer."
-  ;; Insert the message.
-  (erase-buffer)
-  (insert
-   (if (featurep 'bitmap)
-     (format "              %s
-
-"
-	     "" (if (and (stringp gnus-mule-bitmap-image-file)
-			 (file-exists-p gnus-mule-bitmap-image-file))
-		    (insert-file gnus-mule-bitmap-image-file)))
-     (format "              %s
-          _    ___ _             _
-          _ ___ __ ___  __    _ ___
-          __   _     ___    __  ___
-              _           ___     _
-             _  _ __             _
-             ___   __            _
-                   __           _
-                    _      _   _
-                   _      _    _
-                      _  _    _
-                  __  ___
-                 _   _ _     _
-                _   _
-              _    _
-             _    _
-            _
-          __
-
-"
-	     "")))
-  ;; And then hack it.
-  (gnus-indent-rigidly (point-min) (point-max)
-		       (/ (max (- (window-width) (or x 46)) 0) 2))
-  (goto-char (point-min))
-  (forward-line 1)
-  (let* ((pheight (count-lines (point-min) (point-max)))
-	 (wheight (window-height))
-	 (rest (- wheight pheight)))
-    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
-  ;; Fontify some.
-  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
-  (goto-char (point-min))
-  (setq mode-line-buffer-identification (concat " " gnus-version))
-  (setq gnus-simple-splash t)
-  (set-buffer-modified-p t))
-
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
       nil
@@ -232,12 +182,6 @@
 		    `(gnus-truncate-string
 		      val (- (string-width val) ,cut) ,cut))
 	       val)))))
-
-    (when window-system
-      (require 'path-util)
-      (if (module-installed-p 'bitmap)
-	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
-	))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
