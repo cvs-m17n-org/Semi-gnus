@@ -3,6 +3,8 @@
 	* texi/Makefile.in: Change to work on Windows environment and
 	other platforms.
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+	
 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-make-package): Fix typo.
