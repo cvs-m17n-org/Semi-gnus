@@ -824,11 +824,7 @@ article number, and the cdr is the string to be yanked."
 	 (list (or (assq 'References message-header-format-alist)
 		   '(References . message-shorten-references)))
 	 (list (cons 'References
-		     (mapconcat 'identity (nreverse refs) " "))))
-	(delete-region (point)
-		       (progn
-			 (skip-chars-backward "\n")
-			 (1+ (point)))))
+		     (mapconcat 'identity (nreverse refs) " ")))))
       (setq beg (mark t))
       (pop-mark))
 

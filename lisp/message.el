@@ -3474,12 +3474,9 @@ be added to the \"References\" field."
 		(mail-header-format
 		 (list (or (assq 'References message-header-format-alist)
 			   '(References . message-fill-references)))
-		 (list (cons 'References (mapconcat 'identity
-						    (nreverse newrefs) " "))))
-		(delete-region (point)
-			       (progn
-				 (skip-chars-backward "\n")
-				 (1+ (point)))))))))
+		 (list (cons 'References
+			     (mapconcat 'identity
+					(nreverse newrefs) " ")))))))))
       (unless arg
 	(if (and message-suspend-font-lock-when-citing
 		 (boundp 'font-lock-mode)
@@ -5745,8 +5742,7 @@ Headers already prepared in the buffer are not modified."
   (insert (capitalize (symbol-name header))
 	  ": "
 	  (std11-fill-msg-id-list-string
-	   (if (consp value) (car value) value))
-	  "\n"))
+	   (if (consp value) (car value) value))))
 
 (defun message-split-line ()
   "Split current line, moving portion beyond point vertically down.
