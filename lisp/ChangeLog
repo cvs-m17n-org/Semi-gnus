@@ -1,3 +1,17 @@
+2003-01-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bumped.
+
+2003-01-24 20:32:44 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.14 is released.
+
+2003-01-24  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-sum.el (gnus-summary-prepare-threads): Reset state for %B
+	before beginning.  Trivial patch from Mark Thomas
+	<swoon@bellatlantic.net>.
+
 2003-01-24  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* spam.el (spam-check-blackholes, spam-split) 
