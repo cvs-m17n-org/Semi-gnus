@@ -1,3 +1,8 @@
+1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Set
+	`gnus-article-current-summary' to `gnus-summary-buffer'.
+
 1998-12-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Bug (referring to
