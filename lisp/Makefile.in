@@ -11,7 +11,7 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
-PACKAGEDIR =
+PACKAGEDIR = @PACKAGEDIR@
 
 all total:
 	rm -f *.elc auto-autoloads.el custom-load.el ; \
