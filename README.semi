@@ -12,9 +12,9 @@ them before to install it.  T-gnus 6.13 requires APEL 9.20 or later,
 FLIM (1.13.1 or later) and SEMI/WEMI (1.13.5 or later).  You can get
 these packages from:
 
-ftp://ftp.etl.go.jp/pub/mule/apel/
-ftp://ftp.etl.go.jp/pub/mule/flim/flim-1.13/
-ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.13/
+ftp://ftp.m17n.org/pub/mule/apel/
+ftp://ftp.m17n.org/pub/mule/flim/flim-1.13/
+ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 Required environment for SEMI is written in README.en of SEMI package.
 
@@ -81,13 +81,19 @@ For more detailed information, please read README.branch.
 How to get? (via ftp)
 =====================
 
-  The released version of T-gnus is available from
+  The stable version of T-gnus is available from
 
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
+
+  and the experimental version of T-gnus is available from
+
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/
 
   In addition, semi-daily snapshots are also available from
 
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
+  or
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/snapshots/
 
   NOTE: These snapshots are manually created when the urge takes the
   administrator of the a-ftp site, and will usually not be tested.

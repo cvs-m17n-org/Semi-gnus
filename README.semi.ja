@@ -13,9 +13,9 @@ T-gnus とは？
 FLIM (1.13.1 以上) および SEMI/WEMI (1.13.5 以上) を必要とします。それ
 らのパッケージは
 
-ftp://ftp.etl.go.jp/pub/mule/apel/
-ftp://ftp.etl.go.jp/pub/mule/flim/flim-1.13/
-ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.13/
+ftp://ftp.m17n.org/pub/mule/apel/
+ftp://ftp.m17n.org/pub/mule/flim/flim-1.13/
+ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 から取得することができます。必要な環境は SEMI の README.ja を参照して
 ください。
@@ -83,12 +83,18 @@ ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.13/
 取得方法 (ftp)
 ==============
 
-  リリース版は
+  安定版は
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
 
-  から取得可能です。そしてほぼ毎日の snapshot が
+  から、そして開発版は
 
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
+
+  から、それぞれ取得可能です。そしてほぼ毎日の snapshot が
+
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
+  または
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/snapshots/
 
   から取得可能です。
