@@ -1,3 +1,29 @@
+1999-08-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 13.
+
+	* lisp/gnus-agent.el (gnus-agent-large-newsgroup): New variable.
+	(gnus-agent-fetch-headers): Limit downloadable articles if the
+	number of unread articles exceeds `gnus-agent-large-newsgroup'.
+	(gnus-agent-expire): Do not expire saved or replied articles when
+	`gnus-agent-expire-all' is nil.
+
+	* lisp/gnus-offline.el (gnus-offline-agent-automatic-expire): New
+	variable.
+	(gnus-offline-agent-expire): Check it; Bind
+	`gnus-agent-expire-all' to nil if `gnus-agent-expire-days' is 0.
+	(gnus-offline-after-jobs-done): Don't check
+	`gnus-agent-expire-all'.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-setting-file): Check if
+	`user-login-name' and `user-real-login-name' returns the same
+	value or not.
+	(gnus-ofsetup-prepare-for-miee): Write forms as a variable.
+	(gnus-ofsetup-update-setting-file): Ditto.
+	(gnus-ofsetup-prepare): New macro.
+	(gnus-setup-for-offline): Use it.
+	(gnus-ofsetup-customize-done): Ditto.
+
 1999-08-25  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 12.
