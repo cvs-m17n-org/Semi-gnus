@@ -1,5 +1,18 @@
 2003-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/binhex.el: Require `path-util'.
+	* lisp/gnus-audio.el: Ditto.
+	* lisp/spam.el: Ditto.
+	* lisp/uudecode.el: Ditto.
+
+	* lisp/binhex.el (binhex-use-external): Replace `executable-find'
+	with `exec-installed-p'.
+	* lisp/gnus-audio.el (gnus-audio-au-player): Ditto.
+	(gnus-audio-wav-player): Ditto.
+	* lisp/spam.el (spam-ifile-path): Ditto.
+	(spam-bogofilter-path): Ditto.
+	* lisp/uudecode.el (uudecode-use-external): Ditto.
+
 	* lisp/gnus-int.el (gnus-agent-expire): Make arguments optional.
 
 2003-01-13  Katsumi Yamaoka  <yamaoka@jpl.org>

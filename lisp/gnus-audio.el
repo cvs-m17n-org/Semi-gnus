@@ -30,6 +30,8 @@
 
 (require 'nnheader)
 
+(require 'path-util)
+
 (defgroup gnus-audio nil
   "Playing sound in Gnus."
   :version "21.1"
@@ -47,12 +49,12 @@
   :type '(choice directory (const nil))
   :group 'gnus-audio)
 
-(defcustom gnus-audio-au-player "/usr/bin/showaudio"
+(defcustom gnus-audio-au-player (exec-installed-p "play")
   "Executable program for playing sun AU format sound files."
   :group 'gnus-audio
   :type 'string)
 
-(defcustom gnus-audio-wav-player "/usr/local/bin/play"
+(defcustom gnus-audio-wav-player (exec-installed-p "play")
   "Executable program for playing WAV files."
   :group 'gnus-audio
   :type 'string)
@@ -93,7 +95,7 @@
 ;;;###autoload
 (defun gnus-audio-play (file)
   "Play a sound FILE through the speaker."
-  (interactive)
+  (interactive "fSound file name: ")
   (let ((sound-file (if (file-exists-p file)
 			file
 		      (expand-file-name file gnus-audio-directory))))

@@ -34,16 +34,13 @@
 
 ;;; Code:
 
+(require 'path-util)
+
 (require 'gnus-sum)
 
 (require 'gnus-uu)			; because of key prefix issues
 (require 'gnus)	; for the definitions of group content classification and spam processors
 (require 'message)			;for the message-fetch-field functions
-
-;; autoload executable-find
-(eval-and-compile
-  ;; executable-find is not autoloaded in Emacs 20
-  (autoload 'executable-find "executable"))
 
 ;; autoload query-dig
 (eval-and-compile
@@ -174,7 +171,7 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
   "Spam ifile configuration."
   :group 'spam)
 
-(defcustom spam-ifile-path (executable-find "ifile")
+(defcustom spam-ifile-path (exec-installed-p "ifile")
   "File path of the ifile executable program."
   :type '(choice (file :tag "Location of ifile")
 		 (const :tag "ifile is not installed"))
@@ -217,7 +214,7 @@ your main source of newsgroup names."
   :type 'integer
   :group 'spam-bogofilter)
 
-(defcustom spam-bogofilter-path (executable-find "bogofilter")
+(defcustom spam-bogofilter-path (exec-installed-p "bogofilter")
   "File path of the Bogofilter executable program."
   :type '(choice (file :tag "Location of bogofilter")
 		 (const :tag "Bogofilter is not installed"))

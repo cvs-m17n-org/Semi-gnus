@@ -1191,18 +1191,13 @@ and that there are no duplicates."
               (gnus-message 1
 			    "Duplicate overview line for %d" cur)
 	      (delete-region (point) (progn (forward-line 1) (point))))
-	     ((< cur 0)
+	     ((< cur prev-num)
 	      (or backed-up
                   (setq backed-up (gnus-agent-backup-overview-buffer)))
-              (gnus-message 1 "Junk article number %d" cur)
-	      (delete-region (point) (progn (forward-line 1) (point))))
-	     ((< cur prev-num)
+              (gnus-message 1 "Overview buffer not sorted!")
 	      (sort-numeric-fields 1 (point-min) (point-max))
 	      (goto-char (point-min))
-	      (setq prev-num -1)
-	      (or backed-up
-                  (setq backed-up (gnus-agent-backup-overview-buffer)))
-              (gnus-message 1 "Overview buffer not sorted!"))
+	      (setq prev-num -1))
 	     (t
 	      (setq prev-num cur)))
 	    (forward-line 1)))))))
@@ -1686,7 +1681,9 @@ of FILE placing the combined headers in nntp-server-buffer."
                             (gnus-summary-set-agent-mark article t)))
                         (dolist (article fetched-articles)
                           (if gnus-agent-mark-unread-after-downloaded
-                              (gnus-summary-mark-article article gnus-unread-mark)))
+                              (gnus-summary-mark-article article gnus-unread-mark))
+                          (when (gnus-summary-goto-subject article nil t)
+                            (gnus-summary-update-download-mark article)))
                         (dolist (article unfetched-articles)
                           (gnus-summary-mark-article article gnus-canceled-mark)))
                     ;; When some, or all, of the marked articles came
