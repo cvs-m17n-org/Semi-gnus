@@ -1,5 +1,11 @@
 1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.036.
+
+	* Sync up with Pterodactyl Gnus 0.50.
+
+1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-mimic-kill-buffer): New function.
 	(message-mode-map): Use it for `C-x k'.
 
