@@ -1,3 +1,10 @@
+1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Modify so that
+	the title of a popup menu is displayed under Emacs 19.34.
+	(gnus-offline-define-menu-and-key): Rewrite the function to change
+	the behavior of "Get new news" button, under XEmacs.
+
 1999-03-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el: Semi-gnus 6.10.10 is released.
