@@ -1,3 +1,9 @@
+1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.055.
+
+	* Sync up with Pterodactyl Gnus v0.72.
+
 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* README.semi.ja: Add keiichi and nana-gnus to the branches info.
