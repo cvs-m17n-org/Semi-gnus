@@ -455,6 +455,7 @@ the line could be found."
     (let* ((file nil)
 	   (number (length articles))
 	   (count 0)
+	   (file-name-coding-system 'binary)
 	   (pathname-coding-system 'binary)
 	   (case-fold-search t)
 	   (cur (current-buffer))

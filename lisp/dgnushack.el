@@ -379,7 +379,8 @@ You must specify the name of the package path as follows:
   (require 'texinfmt)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
-	coding-system-for-write)
+	coding-system-for-write
+	output-coding-system)
     (let ((error 0)
 	  file
 	  (files ()))
@@ -403,7 +404,9 @@ You must specify the name of the package path as follows:
 	    (progn
 	      (if buffer-file-name (kill-buffer (current-buffer)))
 	      (find-file file)
-	      (setq coding-system-for-write buffer-file-coding-system)
+	      (if (boundp 'MULE)
+		  (setq coding-system-for-write buffer-file-coding-system)
+		(setq output-coding-system (symbol-value 'file-coding-system)))
 	      (when (and addsuffix
 			 (re-search-forward
 			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)

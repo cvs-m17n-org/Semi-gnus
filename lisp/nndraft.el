@@ -196,8 +196,8 @@
   (nndraft-possibly-change-group group)
   (let ((nnmail-file-coding-system
 	 (if (equal group "drafts")
-	     mm-auto-save-coding-system
-	   mm-text-coding-system)))
+	     message-draft-coding-system
+	   mail-source-text-coding-system)))
     (nnoo-parent-function 'nndraft 'nnmh-request-replace-article
 			  (list article group buffer))))
 

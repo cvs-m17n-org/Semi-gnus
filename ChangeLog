@@ -1,3 +1,18 @@
+2000-05-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nndraft.el (nndraft-request-replace-article): Replace
+	`mm-text-coding-system' with `mail-source-text-coding-system';
+	Replace `mm-auto-save-coding-system' with
+	`message-draft-coding-system'.
+
+	* lisp/mail-source.el (mail-source-fetch-maildir): Replace
+	`mm-text-coding-system' with `mail-source-text-coding-system'.
+	(mail-source-text-coding-system): New variable.
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Use
+	`output-coding-system' instead of `coding-system-for-write' when
+	old Mule is used.
+
 2000-05-16  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-forward) Replace the use of `eolp' with

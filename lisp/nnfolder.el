@@ -586,33 +586,52 @@ deleted.  Point is left where the deleted region was."
   ;; Change group.
   (when (and group
 	     (not (equal group nnfolder-current-group)))
-    (nnmail-activate 'nnfolder)
-    (if dont-check
-	(setq nnfolder-current-group group
-	      nnfolder-current-buffer nil)
-      ;; If we have to change groups, see if we don't already have the
-      ;; folder in memory.  If we do, verify the modtime and destroy
-      ;; the folder if needed so we can rescan it.
-      (setq nnfolder-current-buffer
-	    (nth 1 (assoc group nnfolder-buffer-alist)))
+    (let ((file-name-coding-system nnmail-pathname-coding-system)
+	  (pathname-coding-system nnmail-pathname-coding-system))
+      (nnmail-activate 'nnfolder)
+      (when (and (not (assoc group nnfolder-group-alist))
+		 (not (file-exists-p
+		       (nnfolder-group-pathname group))))
+	;; The group doesn't exist, so we create a new entry for it.
+	(push (list group (cons 1 0)) nnfolder-group-alist)
+	(nnfolder-save-active nnfolder-group-alist nnfolder-active-file))
 
-      ;; If the buffer is not live, make sure it isn't in the alist.  If it
-      ;; is live, verify that nobody else has touched the file since last
-      ;; time.
-      (when (and nnfolder-current-buffer
-		 (not (gnus-buffer-live-p nnfolder-current-buffer)))
-	(setq nnfolder-current-buffer nil))
+      (if dont-check
+	  (setq nnfolder-current-group group
+		nnfolder-current-buffer nil)
+	(let (inf file)
+	  ;; If we have to change groups, see if we don't already have the
+	  ;; folder in memory.  If we do, verify the modtime and destroy
+	  ;; the folder if needed so we can rescan it.
+	  (setq nnfolder-current-buffer
+		(nth 1 (assoc group nnfolder-buffer-alist)))
 
-      (setq nnfolder-current-group group)
+	  ;; If the buffer is not live, make sure it isn't in the alist.  If it
+	  ;; is live, verify that nobody else has touched the file since last
+	  ;; time.
+	  (when (and nnfolder-current-buffer
+		     (not (gnus-buffer-live-p nnfolder-current-buffer)))
+	    (setq nnfolder-buffer-alist (delq inf nnfolder-buffer-alist)
+		  nnfolder-current-buffer nil))
 
-      (when (or (not nnfolder-current-buffer)
-		(not (verify-visited-file-modtime
-		      nnfolder-current-buffer)))
-	(save-excursion
-	  (when (setq nnfolder-current-buffer (nnfolder-read-folder group))
-	    (set-buffer nnfolder-current-buffer)
-	    (push (list group nnfolder-current-buffer)
-		  nnfolder-buffer-alist)))))))
+	  (setq nnfolder-current-group group)
+
+	  (when (or (not nnfolder-current-buffer)
+		    (not (verify-visited-file-modtime
+			  nnfolder-current-buffer)))
+	    (save-excursion
+	      (setq file (nnfolder-group-pathname group))
+	      ;; See whether we need to create the new file.
+	      (unless (file-exists-p file)
+		(gnus-make-directory (file-name-directory file))
+		(let ((nnmail-file-coding-system 
+		       (or nnfolder-file-coding-system-for-write
+			   nnfolder-file-coding-system-for-write)))
+		  (nnmail-write-region 1 1 file t 'nomesg)))
+	      (when (setq nnfolder-current-buffer (nnfolder-read-folder group))
+		(set-buffer nnfolder-current-buffer)
+		(push (list group nnfolder-current-buffer)
+		      nnfolder-buffer-alist)))))))))
 
 (defun nnfolder-save-mail (group-art-list)
   "Called narrowed to an article."

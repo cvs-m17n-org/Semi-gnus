@@ -77,6 +77,12 @@ If non-nil, this maildrop will be checked periodically for new mail."
   :group 'mail-source
   :type 'number)
 
+(defvar mail-source-text-coding-system
+  (if (memq system-type '(windows-nt ms-dos ms-windows))
+      'raw-text-dos
+    'raw-text)
+  "Text-safe coding system (For removing ^M).")
+
 ;;; Internal variables.
 
 (defvar mail-source-string ""
@@ -619,10 +625,14 @@ This only works when `display-time' is enabled."
 	    (when (and (not (file-directory-p file))
 		       (not (if function
 				(funcall function file mail-source-crash-box)
-			      (let ((coding-system-for-write 
-				     mm-text-coding-system)
-				    (coding-system-for-read 
-				     mm-text-coding-system))
+			      (let ((coding-system-for-write
+				     mail-source-text-coding-system)
+				    (coding-system-for-read
+				     mail-source-text-coding-system)
+				    (output-coding-system
+				     mail-source-text-coding-system)
+				    (input-coding-system
+				     mail-source-text-coding-system))
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
 				  (goto-char (point-min))

@@ -471,9 +471,10 @@ parameter.  It should return nil, `warn' or `delete'."
   (set-buffer nntp-server-buffer)
   (delete-region (point-min) (point-max))
   (let ((format-alist nil)
-        (after-insert-file-functions nil))
+	(after-insert-file-functions nil))
     (condition-case ()
 	(let ((auto-mode-alist (nnheader-auto-mode-alist))
+	      (file-name-coding-system nnmail-pathname-coding-system)
 	      (pathname-coding-system nnmail-pathname-coding-system))
 	  (insert-file-contents-as-coding-system
 	   nnmail-file-coding-system file)
@@ -1630,8 +1631,8 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((pathname-coding-system nnmail-pathname-coding-system))
-    
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system))
     (write-region-as-coding-system
      nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
