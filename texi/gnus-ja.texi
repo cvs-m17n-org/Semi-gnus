@@ -3741,13 +3741,15 @@ Gnus
 @kindex T # (トピック)
 @findex gnus-topic-mark-topic
 現在のトピックにあるグループ全てにプロセスマークをつけま
-す (@code{gnus-topic-mark-topic})。
+す (@code{gnus-topic-mark-topic})。接頭辞が与えられない場合、このコマン
+ドは副トピックに対して再帰的に働きます。
 
 @item T M-#
 @kindex T M-# (トピック)
 @findex gnus-topic-unmark-topic
 現在のトピックにある全てのグループからプロセスマークを消しま
-す (@code{gnus-topic-unmark-topic})。
+す (@code{gnus-topic-unmark-topic})。接頭辞が与えられない場合、このコマ
+ンドは副トピックに対して再帰的に働きます。
 
 @item C-c C-x
 @kindex C-c C-x (トピック)
