@@ -36,6 +36,7 @@
 (require 'nnheader)
 (require 'message)
 (require 'time-date)
+(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'rmail-insert-rmail-file-header "rmail")
@@ -109,15 +110,29 @@
      (when (gnus-buffer-exists-p buf)
        (kill-buffer buf))))
 
-(fset 'gnus-point-at-bol
-      (if (fboundp 'point-at-bol)
-	  'point-at-bol
-	'line-beginning-position))
+(static-if (fboundp 'point-at-bol)
+    (fset 'gnus-point-at-bol 'point-at-bol)
+  (static-if (fboundp 'line-beginning-position)
+      (fset 'gnus-point-at-bol 'line-beginning-position)
+    (defun gnus-point-at-bol ()
+      "Return point at the beginning of the line."
+      (let ((p (point)))
+	(beginning-of-line)
+	(prog1
+	    (point)
+	  (goto-char p))))))
 
-(fset 'gnus-point-at-eol
-      (if (fboundp 'point-at-eol)
-	  'point-at-eol
-	'line-end-position))
+(static-if (fboundp 'point-at-eol)
+    (fset 'gnus-point-at-eol 'point-at-eol)
+  (static-if (fboundp 'line-end-position)
+      (fset 'gnus-point-at-eol 'line-end-position)
+    (defun gnus-point-at-eol ()
+      "Return point at the end of the line."
+      (let ((p (point)))
+	(end-of-line)
+	(prog1
+	    (point)
+	  (goto-char p))))))
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
