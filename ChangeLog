@@ -2,6 +2,10 @@
 
 	* lisp/nnmh.el (nnmh-request-accept-article): Insert `Message-ID'
 	only if `group' name is neither "queue" nor "draft".
+	Fix typo (at 23:25).
+
+	*lisp/message.el (message-send-mail): Add different Message-ID in 
+	each message/partial
 
 1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 

@@ -2230,12 +2230,25 @@ the user from the mailer."
 		     (or (message-fetch-field "cc")
 			 (message-fetch-field "to")))
 	    (message-insert-courtesy-copy))
+;;	  (mime-edit-maybe-split-and-send
+;;	   (function
+;;	    (lambda ()
+;;	      (interactive)
+;;	      (funcall message-send-mail-function)
+;;	      )))
 	  (mime-edit-maybe-split-and-send
 	   (function
 	    (lambda ()
 	      (interactive)
-	      (funcall message-send-mail-function)
-	      )))
+	      (save-restriction
+		(std11-narrow-to-header mail-header-separator)
+		(goto-char (point-min))
+		(when (re-search-forward "^Message-Id:" nil t)
+		  (delete-region (match-end 0)(std11-field-end))
+		  (insert (concat " " (message-make-message-id)))
+		  ))
+	      (interactive)
+	      (funcall message-send-mail-function))))
 	  (funcall message-send-mail-function))
       (kill-buffer tembuf))
     (set-buffer message-edit-buffer)

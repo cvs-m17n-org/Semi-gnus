@@ -294,8 +294,8 @@
 
 (deffoo nnmh-request-accept-article (group &optional server last noinsert)
   (nnmh-possibly-change-directory group server)
-  (if (or (not (equal group "queue"))
-	  (not (equal group "draft")))
+  (if (and (not (equal group "queue"))
+	   (not (equal grouo "draft")))
       (nnmail-check-syntax))
   (when nnmail-cache-accepted-message-ids
     (nnmail-cache-insert (nnmail-fetch-field "message-id")))
