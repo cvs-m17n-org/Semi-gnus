@@ -26,47 +26,31 @@
 
 (require 'mmbuffer)
 
-(mm-define-backend gnus (buffer))
+(mm-define-backend gnus (generic))
 
-(mm-define-method entity-header-start ((entity gnus))
-  (save-excursion
-    (set-buffer (mime-entity-buffer-internal entity))
-    (goto-char (point-min))
-    ))
-
-(mm-define-method entity-header-end ((entity gnus))
-  (save-excursion
-    (set-buffer (mime-entity-buffer-internal entity))
-    (goto-char (point-min))
+(mm-define-method entity-buffer ((entity gnus))
+  ;; (if (with-current-buffer gnus-summary-buffer
+  ;;       (eq gnus-current-article (mail-header-number entity)))
+  ;;     ...)
+  (unless (mime-entity-header-start-internal entity)
+    (set-buffer gnus-original-article-buffer)
+    (mime-entity-set-header-start-internal entity (point-min))
+    (mime-entity-set-body-end-internal entity (point-max))
     (if (re-search-forward "^$" nil t)
-	(match-end 0)
-      )))
-
-(mm-define-method fetch-field ((entity gnus) field-name)
-  (save-excursion
-    (set-buffer (mime-entity-buffer-internal entity))
-    (unless (mime-entity-header-start-internal entity)
-      (mime-entity-set-header-start-internal entity (point-min))
-      (mime-entity-set-body-end-internal entity (point-max))
-      (if (re-search-forward "^$" nil t)
-	  (progn
-	    (mime-entity-set-header-end-internal entity (match-end 0))
-	    (mime-entity-set-body-start-internal
-	     entity
-	     (if (= (mime-entity-header-end-internal entity)
-		    (mime-entity-body-end-internal entity))
-		 (mime-entity-body-end-internal entity)
-	       (1+ (mime-entity-header-end-internal entity))
-	       ))
-	    )
-	(mime-entity-set-header-end-internal entity (point-min))
-	(mime-entity-set-body-start-internal entity (point-min))
-	))
-    (save-restriction
-      (narrow-to-region (mime-entity-header-start-internal entity)
-			(mime-entity-header-end-internal entity))
-      (std11-fetch-field field-name)
-      )))
+	(progn
+	  (mime-entity-set-header-end-internal entity (match-end 0))
+	  (mime-entity-set-body-start-internal
+	   entity
+	   (if (= (mime-entity-header-end-internal entity)
+		  (mime-entity-body-end-internal entity))
+	       (mime-entity-body-end-internal entity)
+	     (1+ (mime-entity-header-end-internal entity))
+	     ))
+	  )
+      (mime-entity-set-header-end-internal entity (point-min))
+      (mime-entity-set-body-start-internal entity (point-min))
+      ))
+  gnus-original-article-buffer)
 
 
 ;;; @ end
