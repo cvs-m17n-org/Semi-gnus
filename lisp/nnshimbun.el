@@ -100,7 +100,8 @@
 ;; The group parameter `nnshimbun-group-parameters' will have a
 ;; property list like the following:
 ;;
-;; '(index-range all prefetch-articles t expiry-wait 6)
+;; '(index-range all prefetch-articles off encapsulate-article on
+;;               expiry-wait 6)
 
 (gnus-define-group-parameter
  nnshimbun-group-parameters
@@ -115,7 +116,8 @@ Alist of nnshimbun group parameters.  Each element should be a cons of
 a group name regexp and a plist which consists of a keyword and a value
 pairs like the following:
 
-'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles t expiry-wait 6)
+'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles off
+  encapsulate-article on expiry-wait 6)
 
 `index-range' specifies a range of header indices as described below:
       all: Retrieve all header indices.
@@ -124,6 +126,9 @@ integer N: Retrieve N pages of header indices.
 
 `prefetch-articles' specifies whether to pre-fetch the unread articles
 when scanning the group.
+
+`encapsulate-article' specifies whether inline images in the shimbun
+article are encapsulated.
 
 `expiry-wait' is similar to the generic group parameter `expiry-wait',
 but it has a preference."
