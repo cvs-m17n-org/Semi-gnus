@@ -3153,12 +3153,11 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	   (nnheader-nov-field)			; subject
 	   (nnheader-nov-field)			; from
 	   (nnheader-nov-field)			; date
-	   (or (nnheader-nov-field)		; id
-	       (nnheader-generate-fake-message-id))
+	   (nnheader-nov-read-message-id)	; id
 	   (nnheader-nov-field)			; refs
 	   (nnheader-nov-read-integer)		; chars
 	   (nnheader-nov-read-integer)		; lines
-	   (unless (eq (char-after) ?\n)
+	   (unless (eobp)
 	     (nnheader-nov-field))		; misc
 	   (nnheader-nov-parse-extra)))		; extra
 
