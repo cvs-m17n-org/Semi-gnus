@@ -2637,7 +2637,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	      "\t0)\n"
 	      "    (error \"This file was created by later version of "
 	      "gnus.\"))\n"))
-    (insert "(setq gnus-product-file-version \n"
+    (insert "(setq gnus-product-file-version\n"
 	    "      '((product-version . "
 	    (prin1-to-string (product-version product)) ")\n"
 	    "\t(emacs-version . "

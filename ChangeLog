@@ -3,7 +3,6 @@
 	* lisp/gnus-clfns.el (butlast): Fix a serious bug that it behaved
 	like `nbutlast'.  Special thanks to Keiichi-san for the great
 	discovery.
-	(last, butlast): Use the native function if Emacs 21+ is used.
 
 	* lisp/gnus.el (gnus-product-variable-file-list): Add a check for
 	the value of `gnus-use-correct-string-widths' in the forms.
