@@ -27,15 +27,18 @@
 
 ;;; Code:
 
+(require 'poe)
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "17"
+(defconst gnus-revision-number "18"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
-  (product-define "T-gnus" nil '(6 14 1)))
+  (product-define "T-gnus" nil
+		  (list 6 14 1
+			(string-to-number gnus-revision-number))))
 
 (defconst gnus-original-version-number "5.8.3"
   "Version number for this version of Gnus.")
@@ -48,10 +51,11 @@
 (defconst gnus-product-name (product-name (product-find 'gnus-vers))
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number (mapconcat
-			       'number-to-string
-			       (product-version (product-find 'gnus-vers))
-			       ".")
+(defconst gnus-version-number
+  (mapconcat
+   'number-to-string
+   (butlast (product-version (product-find 'gnus-vers)))
+   ".")
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -70,7 +74,7 @@ If ARG, insert string at point."
 
 (defun gnus-extended-version ()
   "Stringified gnus version."
-  (concat (product-string 'gnus)
+  (concat gnus-product-name "/" gnus-version-number
 	  " (based on "
 	  gnus-original-product-name " v" gnus-original-version-number ")"
 	  (if (zerop (string-to-number gnus-revision-number))
