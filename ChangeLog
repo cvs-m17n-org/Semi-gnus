@@ -1,3 +1,8 @@
+2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Complete
+	completions.
+
 2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el: Add `CNET Japan' support.
