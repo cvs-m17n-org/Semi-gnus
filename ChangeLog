@@ -1,3 +1,7 @@
+2004-09-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/.cvsignore: Remove unused.
+
 2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/gnus-ja.texi: Uncomment the @copying section.
