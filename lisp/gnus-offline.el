@@ -120,7 +120,7 @@
      miee-popup-menu
      gnus-group-toolbar)))
 
-(if (eq system-type 'windows-nt)
+(if (featurep 'meadow)
     (define-process-argument-editing "/hang\\.exe\\'"
       (lambda (x)
 	(general-process-argument-editing-function
@@ -685,6 +685,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (let ((keys (key-description (this-command-keys)))
 	menu title str)
     (cond ((or (string= "misc-user" keys)
+	       (string= "S-mouse-2" keys)
 	       (string-match "^menu-bar" keys)
 	       (string-match "^mouse" keys))
 	   (setq title (gnus-offline-gettext 'menu-3))
