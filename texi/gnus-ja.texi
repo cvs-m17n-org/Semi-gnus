@@ -15679,20 +15679,10 @@ Namazu を使って、メールの山からあなたの好きなキーワードを含む記事を見
   @uref{http://namazu.org/}
 @end example
 
-次に、あなたの秘蔵のメールと永続記事の山の索引を作ります。そのためには、
-以下の2つのコマンドを実行する必要があるでしょう。
-
-@example
-  % mkdir ~/News/namazu
-  % mknmz -a -h -O ~/News/namazu ~/Mail ~/News/cache
-@end example
-
-このコマンドは、(1) @file{~/News/namazu/} というディレクトリを作成する、
-(2) そのディレクトリに @file{~/Mail/} 以下に保存されているメールと 
-@file{~/News/cache/} 以下に保存されている永続記事の索引を作成する、と
-いう意味です。
-
-さあ、これで準備ができました。
+@findex gnus-namazu-create-index
+次に、あなたの秘蔵のメールと永続記事の山の索引を作るために、
+@kbd{M-x gnus-namazu-create-index} としてください。さあ、これで準備が
+できたはずです。
 
 @kindex C-c C-n (グループ)
 @kindex C-c C-n (概略)
@@ -15714,7 +15704,7 @@ gnus の通常の数字接頭辞や、プロセス接頭辞を理解します。ですから、あな
 の行に移動して、次のように検索することができます。
 
 @example
-  @kbd{M-1 C-c C-n namazu RET}
+  @kbd{1 C-c C-n namazu RET}
 @end example
 
 また、概略バッファから、いきなり検索することもできます。この場合、検索
@@ -15726,11 +15716,31 @@ gnus の通常の数字接頭辞や、プロセス接頭辞を理解します。ですから、あな
   @kbd{C-c C-n +from:"Your E-Mail Address" RET}
 @end example
 
-最後に、Namazu をよく分かっている人には、不要な注意を一つ。Namazu は、
-事前に作成された索引を用いて検索を行い、索引にのっていないファイルには
-目もくれません。だから、定期的に @code{mknmz} を呼び出して、新たなメー
-ルの索引を追加しないと、新しいメールはいつまでたっても検索されないこと
-になりますから、あしからず。
+@vindex gnus-namazu-index-update-interval
+Namazu は、事前に準備された索引を用いて検索を行うように設計された検索
+エンジンなので、索引に登録されていないファイルは完全に無視されます。つ
+まり、定期的に @code{mknmz} を呼び出して、新たなメールの索引を追加しな
+いと、新しいメールはいつまでたっても検索対象にならないことになります。
+@file{gnus-namazu.el} は、@code{gnus-namazu-index-update-interval} に
+指定された期間毎に自動的に索引を更新する機能を提供しています。デフォル
+トの設定では、3日おきに索引を更新するようになっていますが、もっと頻繁
+に(例えば1日おき)に更新するようにしたいならば、以下の設定を 
+@file{~/.gnus} に追加してください。
+
+@example
+(setq gnus-namazu-index-update-interval 86400)
+@end example
+
+逆に、索引の更新を自動的に行いたくないならば、以下の指定を 
+@file{~/.gnus} に追加してください。
+
+@example
+(setq gnus-namazu-index-update-interval nil)
+@end example
+
+@findex{gnus-namazu-update-all-indices}
+この場合、索引を手動で更新するために @kbd{M-x
+gnus-namazu-update-all-indices} とする必要があるかもしれません。
 
 @node Gnus Unplugged
 @section Gnus の切り離し

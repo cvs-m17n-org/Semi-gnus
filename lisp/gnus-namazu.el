@@ -1,4 +1,4 @@
-;;; gnus-namazu.el --- Search mail with Namazu. -*- coding: iso-2022-7bit; -*-
+;;; gnus-namazu.el --- Search mail with Namazu -*- coding: iso-2022-7bit; -*-
 
 ;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
@@ -37,7 +37,7 @@
 ;;; Quick Start:
 
 ;; If this module has already been installed, only 3 steps are
-;; required to search articles.
+;; required to search articles with this module.
 ;;
 ;;   (1) Install Namazu.
 ;;   (2) Start Gnus and type M-x gnus-namazu-create-index RET to make
@@ -74,13 +74,14 @@
 ;; 3 days; this period is set to `gnus-namazu-index-update-interval'.
 ;;
 ;; Indices will be updated when `gnus-namazu-search' is called.  If
-;; you want to update indices whenever Gnus is started, you can put
-;; the following expression to your ~/.gnus or your ~/.emacs.
+;; you want to update indices everywhen Gnus is started, you can put
+;; the following expression to your ~/.gnus.
 ;;
 ;;      (add-hook 'gnus-startup-hook 'gnus-namazu-update-all-indices)
 ;;
-;; In order to control mknmz closely, disable this feature and run
-;; mknmz by yourself.  In this case, set nil to the above option.
+;; In order to control mknmz closely, disable the automatic updating
+;; feature and run mknmz by yourself.  In this case, set nil to the
+;; above option.
 ;;
 ;;      (setq gnus-namazu-index-update-interval nil)
 ;;
@@ -768,32 +769,21 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 
 (defun gnus-namazu/update-p (directory &optional force)
   "Return the DIRECTORY when the index undef the DIRECTORY should be updated."
-  (setq directory (expand-file-name directory))
-  (if gnus-namazu/update-process
-      (when force
-	(error "%s" "Can not run two update processes simultaneously"))
-    (and (or force
-	     (gnus-namazu/index-old-p directory))
-	 (let ((status-file (gnus-namazu/status-file-name directory)))
-	   (or (file-exists-p status-file)
-	       (when force
-		 (error "Can not find status file: %s" status-file))))
-	 (let ((lock-file (gnus-namazu/lock-file-name directory)))
-	   (or (not (file-exists-p lock-file))
-	       (when force
-		 (error "Found lock file: %s" lock-file))))
-	 directory)))
-
-;;;###autoload
-(defun gnus-namazu-update-all-indices (&optional directories force)
-  "Update all indices which is set to `gnus-namazu-index-directories'."
-  (interactive (list nil t))
-  (when (setq directories
-	      (delq nil (mapcar
-			 (lambda (d) (gnus-namazu/update-p d force))
-			 (or directories gnus-namazu-index-directories))))
-    (gnus-namazu-update-index (car directories) force)
-    (setq gnus-namazu/update-directories (cdr directories))))
+  (setq directory (file-name-as-directory (expand-file-name directory)))
+  (labels ((error-message (format &rest args)
+			  (apply (if force 'error 'message) format args)
+			  nil))
+    (if gnus-namazu/update-process
+	(error-message "%s" "Can not run two update processes simultaneously")
+      (and (or force
+	       (gnus-namazu/index-old-p directory))
+	   (let ((status-file (gnus-namazu/status-file-name directory)))
+	     (or (file-exists-p status-file)
+		 (error-message "Can not find status file: %s" status-file)))
+	   (let ((lock-file (gnus-namazu/lock-file-name directory)))
+	     (or (not (file-exists-p lock-file))
+		 (error-message "Found lock file: %s" lock-file)))
+	   directory))))
 
 ;;;###autoload
 (defun gnus-namazu-update-index (directory &optional force)
@@ -805,8 +795,7 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 			 (mapcar 'list gnus-namazu-index-directories) nil t)
       (gnus-namazu/default-index-directory))
     t))
-  (setq directory (file-name-as-directory (expand-file-name directory)))
-  (when (gnus-namazu/update-p directory force)
+  (when (setq directory (gnus-namazu/update-p directory force))
     (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
       (erase-buffer)
       (unless (file-directory-p directory)
@@ -826,6 +815,17 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 	  (when force
 	    (error "Can not start %s"
 		   gnus-namazu-make-index-command)))))))
+
+;;;###autoload
+(defun gnus-namazu-update-all-indices (&optional directories force)
+  "Update all indices which is set to `gnus-namazu-index-directories'."
+  (interactive (list nil t))
+  (when (setq directories
+	      (delq nil (mapcar
+			 (lambda (d) (gnus-namazu/update-p d force))
+			 (or directories gnus-namazu-index-directories))))
+    (setq gnus-namazu/update-directories (cdr directories))
+    (gnus-namazu-update-index (car directories))))
 
 (defun gnus-namazu/update-sentinel (process event)
   (let ((buffer (process-buffer process)))

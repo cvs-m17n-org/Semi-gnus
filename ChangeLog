@@ -1,3 +1,12 @@
+2002-08-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* texi/gnus-ja.texi (Namazu Groups): Update documents.
+
+	* lisp/gnus-namazu.el (gnus-namazu/update-p): Print error
+	messages.
+	(gnus-namazu-update-index): Small clean up.
+	(gnus-namazu-update-all-indices): Ditto.
+
 2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el: Bug fix of updating multiple indices.
