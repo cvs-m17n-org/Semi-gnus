@@ -74,14 +74,14 @@ Private Branches
 
     The following branch tags are curretly available.
 
-	himi		Owner: Miyashita Hisashi
-	ichikawa	Owner: Tatsuya Ichikawa
 	akr		Owner: Tanaka Akira
+	himi		Owner: Miyashita Hisashi
+	ichikawa	Codename: T-gnus, Owner: Tatsuya Ichikawa
 	shuhei-k	Codename: Shoe-gnus, Owner: Shuhei KOBAYASHI
 
 
 ========================================================================
-Semi-gnus revision tree (1998-07-30)
+Semi-gnus revision tree (1998-08-17)
 
     vendor      private     main trunk      public
     branch      branches                    branches
@@ -118,5 +118,5 @@ Gnus 5.6.22 ------>             |   feedback  6.7.7
        :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8
        :                        |             6.8.0		 or 1.9)
        :     sync               :               :
-Gnus 5.6.27 ------>             :             6.8.4
+Gnus 5.6.36 ------>             :             6.8.12
        :                        :               :
