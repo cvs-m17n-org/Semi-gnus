@@ -1,3 +1,15 @@
+2003-03-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-03-18 00:38:22 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.16 is released.
+
+2003-03-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lpath.el (featurep): Bind mm-w3m-mode-map.
+
 2003-03-12  Paul Jarc  <prj@po.cwru.edu>
 
 	* nnmail.el (nnmail-cache-primary-mail-backend): Not all
