@@ -1742,8 +1742,10 @@ echo $ECHO_N "checking where the TeXinfo docs should go... $ECHO_C" >&6
   else
     info_dir=$infodir
   fi
-  echo "$as_me:$LINENO: result: $info_dir" >&5
-echo "${ECHO_T}$info_dir" >&6
+  echo "$as_me:$LINENO: result: $info_dir
+         (it will be ignored when \"make install-package[-ja]\" is done)" >&5
+echo "${ECHO_T}$info_dir
+         (it will be ignored when \"make install-package[-ja]\" is done)" >&6
 
 
 
@@ -1853,8 +1855,8 @@ fi;
 	echo "$as_me:$LINENO: result: not found" >&5
 echo "${ECHO_T}not found" >&6
    else
-	echo "$as_me:$LINENO: result: \"${URL}\"" >&5
-echo "${ECHO_T}\"${URL}\"" >&6
+	echo "$as_me:$LINENO: result: ${URL}" >&5
+echo "${ECHO_T}${URL}" >&6
    fi
 
 
@@ -2108,8 +2110,8 @@ if test -z "${USE_FONTS}" ; then
   USE_FONTS=no
 fi
 USE_FONTS=`echo "${USE_FONTS}" | sed 's/,\([^,]*\)$/ and\1/'`
-echo "$as_me:$LINENO: result: \"${USE_FONTS}\"" >&5
-echo "${ECHO_T}\"${USE_FONTS}\"" >&6
+echo "$as_me:$LINENO: result: ${USE_FONTS}" >&5
+echo "${ECHO_T}${USE_FONTS}" >&6
 if test "${USE_FONTS}" = yes ; then
   USE_FONTS='Set in Adobe Bembo, Adobe Futura and Bitstream Courier.'
 elif test "${USE_FONTS}" = no ; then

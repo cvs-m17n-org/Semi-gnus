@@ -1,5 +1,10 @@
 2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* Makefile.in (xclever-package, xlick-package): New rules.
+	(install-package, install-package-ja, package, package-ja): Use them.
+
+	* aclocal.m4 (AC_PATH_INFO_DIR): Say a note for XEmacs package.
+
 	* lisp/dgnushack.el: Remove useless function bindings for XEmacs.
 	(dgnushack-install-package-manifest): Create the pkginfo directory.
 

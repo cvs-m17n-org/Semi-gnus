@@ -154,7 +154,8 @@ AC_DEFUN(AC_PATH_INFO_DIR, [
   else
     info_dir=$infodir
   fi
-  AC_MSG_RESULT($info_dir)
+  AC_MSG_RESULT([$info_dir
+         (it will be ignored when \"make install-package[[-ja]]\" is done)])
   AC_SUBST(info_dir)
 ])
 
@@ -265,7 +266,7 @@ fi
    if test -z "${EMACS_cv_ACCEPTABLE_URL}"; then
 	AC_MSG_RESULT(not found)
    else
-	AC_MSG_RESULT("${URL}")
+	AC_MSG_RESULT(${URL})
    fi
 ])
 
@@ -348,7 +349,7 @@ if test -z "${USE_FONTS}" ; then
   USE_FONTS=no
 fi
 USE_FONTS=`echo "${USE_FONTS}" | sed 's/,\([[^,]]*\)$/ and\1/'`
-AC_MSG_RESULT("${USE_FONTS}")
+AC_MSG_RESULT(${USE_FONTS})
 if test "${USE_FONTS}" = yes ; then
   USE_FONTS='Set in Adobe Bembo, Adobe Futura and Bitstream Courier.'
 elif test "${USE_FONTS}" = no ; then
