@@ -2535,6 +2535,17 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 $B$F$-$^$9!#$h$j4JC1$K(B @sc{nntp} $B%0%k!<%W$r9XFI$9$kJ}K!$O!"(B
 @pxref{Browse Foreign Server}$B!#(B
 
+@item G s
+@kindex G s (Group)
+@findex gnus-group-make-shimbun-group
+@cindex making groups
+@cindex nnshimbun
+@cindex Web Newspaper
+$B?7$7$$(B @code{nnshimbun} $B%0%k!<%W$r:n@.$7$^(B
+$B$9(B (@code{gnus-group-make-shimbun-group})$B!#(Bgnus $B$O%W%m%s%W%H$rI=<($7$F!"(B
+$B%5!<%P!<$N%"%I%l%9$r<($9%7%s%\%kL>$H5-;v%0%k!<%WL>$NF~NO$r5a$a$F$-$^$9!#(B
+@code{nnshimbun} $B$K4X$9$k>\:Y$O(B @pxref{Web Newspaper} $B$r;2>H$7$F2<$5$$!#(B
+
 @item G r
 @kindex G r (Group)
 @findex gnus-group-rename-group
@@ -13384,16 +13395,16 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
   @uref{http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/}
 @end example
 
-@code{nnshimbun} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
-$B$h$&$J$b$N$r$9$k$3$H$G$9(B:
-
-@example
-  @kbd{M-x gnus-group-make-shimbun-group RET asahi RET a_group RET}
-@end example
-
-$B>e$N(B @samp{a_group} $B$O1\Mw$7$?$$5-;v%0%k!<%W$KCV$-49$($F$/$@$5$$!#(B
-$B$^$?$O(B @kbd{B nnshimbun RET asahi RET} $B$G%P%C%/%(%s%I$r%V%i%&%:$7$F2<$5(B
-$B$$!#2C$($F!"(B@sc{html} $B$N%I%-%e%a%s%H$r%$%s%i%$%sI=<($5$;$?$$>l9g$O!"(B
+@findex gnus-group-make-shimbun-group
+@kindex G s (Group)
+@code{nnshimbun} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$NE,Ev$J(B
+$B>l=j$G(B @kbd{G s asahi RET national RET} $B$J$I$H%?%$%W$9$k$3$H$G$9!#(B
+@samp{asahi} $B$O@\B3$7$?$$%5!<%P!<$N%"%I%l%9$r<($9%7%s%\%k$K!"(B
+@samp{national} $B$O1\Mw$7$?$$5-;v%0%k!<%W$K$=$l$>$lCV$-49$($F$/$@$5$$!#N>(B
+$BJ}$H$bL>A0$NJd40$,$G$-$^$9!#(B
+@c $B$^$?$O(B @kbd{B nnshimbun RET asahi RET} $B$G%P%C%/%(%s%I$r%V%i%&%:$9$k$3$H(B
+@c $B$K$h$C$F$b5-;v$rFI$`$3$H$,$G$-$^$9!#(B
+$B2C$($F!"(B@sc{html} $B$N%I%-%e%a%s%H$r%$%s%i%$%sI=<($5$;$?$$>l9g$O!"(B
 @file{~/.gnus} $B%U%!%$%k$K0J2<$N@_Dj$r$7$F2<$5$$!#(B
 
 @lisp

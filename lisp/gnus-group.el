@@ -613,6 +613,7 @@ simple manner.")
     "k" gnus-group-make-kiboze-group
     "l" gnus-group-nnimap-edit-acl
     "m" gnus-group-make-group
+    "s" gnus-group-make-shimbun-group
     "E" gnus-group-edit-group
     "e" gnus-group-edit-group-method
     "p" gnus-group-edit-group-parameters
@@ -832,6 +833,7 @@ simple manner.")
 	["Kill all groups on level..." gnus-group-kill-level t])
        ("Foreign groups"
 	["Make a foreign group" gnus-group-make-group t]
+	["Make a shimbun group" gnus-group-make-shimbun-group t]
 	["Add a directory group" gnus-group-make-directory-group t]
 	["Add the help group" gnus-group-make-help-group t]
 	["Add the archive group" gnus-group-make-archive-group t]
