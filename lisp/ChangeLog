@@ -1,3 +1,33 @@
+2000-05-17 02:25:11  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-mark-line-p): New function.
+	(gnus-group-goto-group): New parameter.
+	(gnus-group-remove-mark): Use it.
+	* gnus-topic.el (gnus-topic-move-group): Ditto.
+	(gnus-topic-remove-group): Ditto.
+
+2000-05-17 00:49:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-list-dormant): New function.
+
+2000-05-16 23:20:42  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-synchronize): Use
+	nnheader-insert-file-contents.
+	(gnus-agent-save-active-1): Ditto.
+	(gnus-agent-write-active): Ditto.
+	(gnus-agent-expire): Ditto.
+	* gnus-cache.el (gnus-cache-read-active): Ditto.
+	* gnus-start.el (gnus-master-read-slave-newsrc): Ditto.
+	* gnus-sum.el (gnus-summary-import-article): Ditto.
+	
+	* gnus-agent.el (gnus-agent-write-servers): Bind coding-system.
+	(gnus-agent-save-group-info): Ditto.
+	(gnus-agent-save-alist): Ditto.
+	* gnus-util.el (gnus-make-directory): Ditto.
+	
+	* gnus-agent.el (gnus-agent-save-group-info): Disable multibyte.
+
 2000-05-16 21:13:24  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* mml.el (mml-generate-mime-preprocess-function): New variable.

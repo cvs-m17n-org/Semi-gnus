@@ -2820,6 +2820,11 @@ kill $(B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$(B!#
 $(B%-%c%C%7%e5-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B
 (@code{gnus-group-list-cached})$(B!#(B
 
+@item A ?
+@kindex A ? (Group)
+@findex gnus-group-list-dormant
+$(BJ]N15-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B (@code{gnus-group-list-dormant})$(B!#(B
+
 @end table
 
 @vindex gnus-permanently-visible-groups
