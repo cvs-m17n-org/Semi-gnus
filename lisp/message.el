@@ -663,6 +663,11 @@ articles."
   :group 'message-news
   :type 'message-header-lines)
 
+(defcustom message-mail-follow-up-address-checker nil
+  "A function of check follow up mail address."
+  :group 'message-mail
+  :type 'function)
+
 ;; Note: could use /usr/ucb/mail instead of sendmail;
 ;; options -t, and -v if not interactive.
 (defcustom message-mailer-swallows-blank-line
@@ -3786,7 +3791,10 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (message-tokenize-header (buffer-string))))
 	      (let ((s ccalist))
 		(while s
-		  (setq ccalist (delq (assoc (car (pop s)) s) ccalist)))))
+		  (setq ccalist (delq (assoc (car (pop s)) s) ccalist))))
+	      (when (functionp message-mail-follow-up-address-checker)
+		(setq ccalist (funcall message-mail-follow-up-address-checker
+				       ccalist))))
 	    (setq follow-to (list (cons 'To (cdr (pop ccalist)))))
 	    (when ccalist
 	      (let ((ccs (cons 'Cc (mapconcat
@@ -4464,6 +4472,66 @@ regexp varstr."
 	   (set (make-local-variable (car local))
 		(cdr local)))))
      locals)))
+
+;; @ For `message-mail-follow-up-address-checker'.
+
+(defcustom message-mailing-list-address-list nil
+  "*Regexp matching addresses that are mailing lists.
+It must be a simple regexp string or a list of regexp strings.
+This variable is used by \`message-check-mailing-list-with-address-list\'."
+  :group 'message-mail
+  :type '(repeat regexp))
+
+(defun message-check-mailing-list-with-address-list (alist)
+  (let ((s alist)
+	(regexp (if (stringp message-mailing-list-address-list)
+		    message-mailing-list-address-list
+		  (mapconcat
+		   (lambda (x)
+		     x)
+		   message-mailing-list-address-list
+		   "\\|")))
+	address non-mailing-list mailing-list)
+    (while (setq address (car (pop s)))
+      (if (string-match regexp address)
+	  (setq mailing-list t)
+	(setq non-mailing-list
+	      (append non-mailing-list (list address)))))
+    (if (or (not non-mailing-list)
+	    (not mailing-list)
+	    (not (y-or-n-p "Do you want to remove private address? ")))
+	alist
+      (setq s non-mailing-list)
+      (while s
+	(setq alist (delq (assoc (pop s) alist) alist)))
+      alist)
+    ))
+
+(defcustom message-mailing-list-address-p nil
+  "*The function return t if address is a mailing list.
+It must be function, and interface is (ADDRESS).
+ADDRESS is a string of mail address.
+This variable is used by \`message-check-mailing-list-with-function\'."
+  :group 'message-mail
+  :type 'function)
+
+(defun message-check-mailing-list-with-function (alist)
+  (let ((s alist)
+	address non-mailing-list mailing-list)
+    (while (setq address (car (pop s)))
+      (if (funcall message-mailing-list-address-p address)
+	  (setq mailing-list t)
+	(setq non-mailing-list
+	      (append non-mailing-list (list address)))))
+    (if (or (not non-mailing-list)
+	    (not mailing-list)
+	    (not (y-or-n-p "Do you want to remove private address? ")))
+	alist
+      (setq s non-mailing-list)
+      (while s
+	(setq alist (delq (assoc (pop s) alist) alist)))
+      alist)
+    ))
 
 ;;; @ for MIME Edit mode
 ;;;
