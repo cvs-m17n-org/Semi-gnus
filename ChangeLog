@@ -1,5 +1,27 @@
 1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+	(gnus-select-method): Use `condition-case' instead of
+	`ignore-errors'.
+
+	* lisp/gnus-start.el (gnus-site-init-file): Use `condition-case'
+	instead of `ignore-errors'.
+
+	* lisp/{gnus-ofsetup.el,gnus-offline.el}: Remove RCS magic cookie.
+
+	* lisp/{time-date.el,smiley.el,score-mode.el,pop3.el,nnweb.el,
+	nnvirtual.el,nntp.el,nnspool.el,nnsoup.el,nnoo.el,nnml.el,nnmh.el,
+	nnmbox.el,nnmail.el,nnlistserv.el,nnimap.el,nnheader.el,
+	nneething.el,nndraft.el,nndoc.el,nnbabyl.el,message.el,imap.el,
+	gnus-win.el,gnus-vm.el,gnus-util.el,gnus-topic.el,gnus-sum.el,
+	gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,gnus-salt.el,
+	gnus-range.el,gnus-picon.el,gnus-ofsetup.el,gnus-offline.el,
+	gnus-msg.el,gnus-mlspl.el,gnus-mailcap.el,gnus-logic.el,
+	gnus-kill.el,gnus-group.el,gnus-cite.el,gnus-async.el,gnus-art.el,
+	gnus-agent.el,earcon.el}: Require `cl' using `eval-when-compile'.
+
+1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
 	* lisp/{time-date.el,smiley.el,pop3.el,nnweb.el,nnvirtual.el,
