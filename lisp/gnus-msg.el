@@ -893,7 +893,7 @@ If YANK is non-nil, include the original article."
       (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
     (message-setup
-     `((To . ,gnus-maintainer) (Cc . ,semi-gnus-developers) (Subject . "")))
+     `((To . ,semi-gnus-developers) (Subject . "")))
     (when gnus-bug-create-help-buffer
       (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))
