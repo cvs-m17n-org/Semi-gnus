@@ -8299,17 +8299,17 @@ an attempt to provide more quoting characters.  If you see something
 like @code{\222} or @code{\264} where you're expecting some kind of
 apostrophe or quotation mark, then try this wash.
 
-@item W k
-@kindex W k (Summary)
+@item W Y f
 @kindex W Y f (Summary)
 @findex gnus-article-outlook-deuglify-article
 @cindex Outlook Express
-Deuglify broken Outlook (Express) articles.
+Full deuglify of broken Outlook (Express) articles: Treat dumbquotes,
+unwrap lines, repair attribution and rearrange citation.
 (@code{gnus-article-outlook-deuglify-article}).
 
 @item W Y u
 @kindex W Y u (Summary)
-@findex gnus-outlook-unwrap-lines
+@findex gnus-article-outlook-unwrap-lines
 Unwrap lines that appear to be wrapped citation lines.  You can control
 what lines will be unwrapped by frobbing
 @code{gnus-outlook-deuglify-unwrap-min} and
@@ -8319,15 +8319,15 @@ maximum length of an unwrapped citation line.
 
 @item W Y a
 @kindex W Y a (Summary)
-@findex gnus-outlook-repair-attribution
-Repair a broken attribution line
-(@code{gnus-outlook-repair-attribution}).
+@findex gnus-article-outlook-repair-attribution
+Repair a broken attribution line.
+(@code{gnus-article-outlook-repair-attribution}).
 
 @item W Y c
 @kindex W Y c (Summary)
-@findex gnus-outlook-rearrange-citation
+@findex gnus-article-outlook-rearrange-citation
 Repair broken citations by rearranging the text.
-(@code{gnus-outlook-rearrange-citation}).
+(@code{gnus-article-outlook-rearrange-citation}).
 
 @item W w
 @kindex W w (Summary)
@@ -10251,8 +10251,10 @@ however you need some external programs to get things to work:
 
 @enumerate
 @item
-To handle PGP messages, you have to install mailcrypt or gpg.el as
-well as a OpenPGP implementation (such as GnuPG).
+To handle PGP and PGP/MIME messages, you have to install an OpenPGP
+implementation such as GnuPG.  The lisp interface to GnuPG included
+with Gnus is called PGG (@pxref{Top, ,PGG, pgg, PGG Manual}), but
+Mailcrypt and gpg.el are also supported.
 
 @item
 To handle @sc{s/mime} message, you need to install OpenSSL.  OpenSSL 0.9.6
@@ -10275,6 +10277,18 @@ protocols. Otherwise, ask user.
 Option of decrypting encrypted parts.  @code{never}, no decryption;
 @code{always}, always decrypt; @code{known}, only decrypt known
 protocols. Otherwise, ask user.
+
+@item mml1991-use
+@vindex mml1991-use
+Symbol indicating elisp interface to OpenPGP implementation for PGP
+messages.  The default is @code{pgg}, but @code{mailcrypt} and
+@code{gpg} are also supported although deprecated.
+
+@item mml2015-use
+@vindex mml2015-use
+Symbol indicating elisp interface to OpenPGP implementation for
+PGP/MIME messages.  The default is @code{pgg}, but @code{mailcrypt}
+and @code{gpg} are also supported although deprecated.
 
 @end table
 
@@ -11441,10 +11455,6 @@ format or @sc{pgp/mime} or @sc{s/mime}.  For decoding such messages,
 see the @code{mm-verify-option} and @code{mm-decrypt-option} options
 (@pxref{Security}).
 
-For PGP, Gnus supports two external libraries, @sc{gpg.el} and
-@sc{Mailcrypt}, you need to install at least one of them.  The
-@sc{s/mime} support in Gnus requires the external program OpenSSL.
-
 Often, you would like to sign replies to people who send you signed
 messages.  Even more often, you might want to encrypt messages which
 are in reply to encrypted messages.  Gnus offers
@@ -11502,7 +11512,7 @@ Remove security related MML tags from message.
 
 @end table
 
-Also @xref{Security, ,Security, message, Message Manual}.
+@xref{Security, ,Security, message, Message Manual}, for more information.
 
 @node Select Methods
 @chapter Select Methods
@@ -19912,7 +19922,7 @@ might be used:
                      (vertical 0.24
                                (if (buffer-live-p gnus-summary-buffer)
                                    '(summary 0.5))
-                               (group 1.0)))))
+                               (group 1.0))))
 @end lisp
 
 One common desire for a multiple frame split is to have a separate frame
@@ -20972,26 +20982,33 @@ Gnus provides a few convenience functions and variables to allow
 easier insertion of X-Face headers in outgoing messages.
 
 @findex gnus-random-x-face
-@code{gnus-random-x-face} goes through all the @samp{pbm} files
-in @code{gnus-x-face-directory} and picks one at random, and then
+@code{gnus-random-x-face} goes through all the @samp{pbm} files in
+@code{gnus-x-face-directory} and picks one at random, and then
 converts it to the X-Face format by using the
 @code{gnus-convert-pbm-to-x-face-command} shell command.  The
-@samp{pbm} files should be 48x48 pixels big.
+@samp{pbm} files should be 48x48 pixels big.  It returns the X-Face
+header data as a string.
 
+@findex gnus-insert-random-x-face-header
+@code{gnus-insert-random-x-face-header} calls
+@code{gnus-random-x-face} and inserts a @samp{X-Face} header with the
+randomly generated data.
+
+@findex gnus-x-face-from-file
 @code{gnus-x-face-from-file} takes a GIF file as the parameter, and then
 converts the file to X-Face format by using the
 @code{gnus-convert-image-to-x-face-command} shell command.
 
-Here's how you would typically use the former function.  Put something
+Here's how you would typically use the second function.  Put something
 like the following in your @file{.gnus.el} file:
 
 @lisp
 (setq message-required-news-headers
       (nconc message-required-news-headers
-             (list '(X-Face . gnus-random-x-face))))
+             (list '(X-Face . gnus-insert-random-x-face-header))))
 @end lisp
 
-Using the latter function would be something like this:
+Using the last function would be something like this:
 
 @lisp
 (setq message-required-news-headers

@@ -1,3 +1,39 @@
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-sum.el: Removed `(when t ...)' around `gnus-define-keys'.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-score.el (gnus-score-edit-file-at-point): New function.
+	(gnus-score-find-trace): Bind it to `e' key.  Added `q' for quit.
+
+2003-01-13  Romain FRANCOISE  <romain@orebokech.com>
+
+	* gnus-fun.el (gnus-x-face-from-file): Quote file name. 
+	(gnus-face-from-file): Ditto.
+
+2003-01-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-articles-to-read): Don't just apply
+	gnus-alter-articles-to-read-function to the unread articles. 
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* deuglify.el (gnus-article-outlook-unwrap-lines)
+	(gnus-article-outlook-repair-attribution)
+	(gnus-article-outlook-rearrange-citation): New function names,
+	renamed from "gnus-outlook-" to "gnus-article-outlook-".  Changed
+	doc-string.
+
+	* gnus-sum.el (gnus-summary-mode-map): Use new function names,
+	removed `W k' key binding (use `W Y f' instead).
+	(gnus-summary-make-menu-bar): Use new function names.
+
+2003-01-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-fun.el (gnus-random-x-face): Doc fix.
+	(gnus-insert-random-x-face-header): New function.
+
 2003-01-13  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-sum.el (gnus-summary-make-menu-bar): Deactivate items if
@@ -14,6 +50,7 @@
 2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.el (gnus-version-number): Bumped version.
+	(gnus-summary-line-format): Doc fix.
 
 2003-01-12 22:02:49 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 

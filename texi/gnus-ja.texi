@@ -8138,17 +8138,17 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 $B$,$"$k$Y$-$H$3$m$K(B @code{\222} $B$d(B @code{\264} $B$N$h$&$J$b$N$,8+$($F$7$^$C(B
 $B$?$i!"@vBu$7$F$_$F2<$5$$!#(B
 
-@item W k
-@kindex W k ($B35N,(B)
+@item W Y f
 @kindex W Y f ($B35N,(B)
 @findex gnus-article-outlook-deuglify-article
 @cindex Outlook Express
-$B2u$l$?(B Outlook (Express) $B$N5-;v$r(B deuglify $B$7$^(B
-$B$9(B (@code{gnus-article-outlook-deuglify-article})$B!#(B
+$B2u$l$?(B Outlook (Express) $B$N5-;v$r40A4$K(B deuglify (sm*rtq**t*s $B$r=hM}!"9T(B
+$B$N@^$jJV$7$r2r=|!"B0@-9T$N=$I|$H0zMQ9T$NJB$YBX$((B) $B$7$^$9!#(B
+(@code{gnus-article-outlook-deuglify-article})$B!#(B
 
 @item W Y u
 @kindex W Y u ($B35N,(B)
-@findex gnus-outlook-unwrap-lines
+@findex gnus-article-outlook-unwrap-lines
 $B@^$jJV$5$l$?0zMQ9T$N$h$&$K8+$($k9T$N@^$jJV$7$r2r$-$^$9!#@^$jJV$7$,2r$+$l(B
 $B$?9T$N:G>.$*$h$S:GBg$ND9$5$rI=(B
 $B$9(B @code{gnus-outlook-deuglify-unwrap-min} $B$*$h(B
@@ -8158,15 +8158,15 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 
 @item W Y a
 @kindex W Y a ($B35N,(B)
-@findex gnus-outlook-repair-attribution
+@findex gnus-article-outlook-repair-attribution
 $B2u$l$?B0@-9T$r=$I|$7$^$9!#(B
-(@code{gnus-outlook-repair-attribution})$B!#(B
+(@code{gnus-article-outlook-repair-attribution})$B!#(B
 
 @item W Y c
 @kindex W Y c ($B35N,(B)
-@findex gnus-outlook-rearrange-citation
+@findex gnus-article-outlook-rearrange-citation
 $B2u$l$?0zMQ$r!"%F%-%9%H$rJB$YD>$9$3$H$K$h$C$F=$I|$7$^$9!#(B
-(@code{gnus-outlook-rearrange-citation})$B!#(B
+(@code{gnus-article-outlook-rearrange-citation})$B!#(B
 
 @item W w
 @kindex W w ($B35N,(B)
@@ -9733,8 +9733,10 @@ however you need some external programs to get things to work:
 
 @enumerate
 @item
-To handle PGP messages, you have to install mailcrypt or gpg.el as
-well as a OpenPGP implementation (such as GnuPG).
+To handle PGP and PGP/MIME messages, you have to install an OpenPGP
+implementation such as GnuPG.  The lisp interface to GnuPG included
+with Gnus is called PGG (@pxref{Top, ,PGG, pgg, PGG Manual}), but
+Mailcrypt and gpg.el are also supported.
 
 @item
 To handle @sc{s/mime} message, you need to install OpenSSL.  OpenSSL 0.9.6
@@ -9757,6 +9759,18 @@ protocols. Otherwise, ask user.
 Option of decrypting encrypted parts.  @code{never}, no decryption;
 @code{always}, always decrypt; @code{known}, only decrypt known
 protocols. Otherwise, ask user.
+
+@item mml1991-use
+@vindex mml1991-use
+Symbol indicating elisp interface to OpenPGP implementation for PGP
+messages.  The default is @code{pgg}, but @code{mailcrypt} and
+@code{gpg} are also supported although deprecated.
+
+@item mml2015-use
+@vindex mml2015-use
+Symbol indicating elisp interface to OpenPGP implementation for
+PGP/MIME messages.  The default is @code{pgg}, but @code{mailcrypt}
+and @code{gpg} are also supported although deprecated.
 @end table
 @end ignore
 
@@ -9887,10 +9901,10 @@ Gnus $B$O%X%C%@!<$rA*$jJ,$1$k$?$a$KFs$D$NJQ?t$rMQ0U$7$F$$$^$9!#(B
 @end table
 
 @vindex gnus-sorted-header-list
-Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T$o$l$^(B
-$B$9(B)$B!#$3$NJB$YBX$($O(B @code{gnus-sorted-header-list} $BJQ?t$r@_Dj$9$k$3$H$G(B
-$B@)8f$9$k$3$H$,$G$-$^$9!#$3$l$O%X%C%@!<$r$I$&$$$&=g=x$GI=<($9$k$+$r;XDj$9(B
-$B$k@55,I=8=$N%j%9%H$G$9!#(B
+Gnus $B$O%X%C%@!<$NJB$YBX$((B (sort) $B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T$o$l(B
+$B$^$9(B)$B!#$3$NJB$YBX$($O(B @code{gnus-sorted-header-list} $BJQ?t$r@_Dj$9$k$3$H(B
+$B$G@)8f$9$k$3$H$,$G$-$^$9!#$3$l$O%X%C%@!<$r$I$&$$$&=g=x$GI=<($9$k$+$r;XDj(B
+$B$9$k@55,I=8=$N%j%9%H$G$9!#(B
 
 $BNc$($P!"5-;v$NCx<TL>$r:G=i$K!"<!$KI=Bj$rI=<($7$?$1$l$P!"$3$s$JIw(B
 $B$K$J$k$G$7$g$&!#(B
@@ -10895,10 +10909,6 @@ format or @sc{pgp/mime} or @sc{s/mime}.  For decoding such messages,
 see the @code{mm-verify-option} and @code{mm-decrypt-option} options
 (@pxref{Security}).
 
-For PGP, Gnus supports two external libraries, @sc{gpg.el} and
-@sc{Mailcrypt}, you need to install at least one of them.  The
-@sc{s/mime} support in Gnus requires the external program OpenSSL.
-
 Often, you would like to sign replies to people who send you signed
 messages.  Even more often, you might want to encrypt messages which
 are in reply to encrypted messages.  Gnus offers
@@ -10956,7 +10966,7 @@ Remove security related MML tags from message.
 
 @end table
 
-Also @xref{Security, ,Security, message, Message Manual}.
+@xref{Security, ,Security, message, Message Manual}, for more information.
 
 @end ignore
 @node Select Methods
@@ -20505,22 +20515,27 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 $B$N(B @samp{pbm} $B$r$/$^$J$/C5$7$F%i%s%@%`$K0l$D$rA*$S<h$j!"%7%'%k%3%^%s(B
 $B%I(B @code{gnus-convert-pbm-to-x-face-command} $B$r;H$C$F$=$l$r(B X-Face $B$N7A(B
 $B<0$KJQ49$7$^$9!#(B@samp{pbm} $B%U%!%$%k$O(B 48$B!_(B48 $B2hAG$NBg$-$5$G$J$1$l$P$J$j(B
-$B$^$;$s!#(B
+$B$^$;$s!#$=$l$O(B X-Face $B%X%C%@!<$N%G!<%?$rJ8;zNs$GJV$7$^$9!#(B
 
+@findex gnus-insert-random-x-face-header
+@code{gnus-insert-random-x-face-header} $B$O(B @code{gnus-random-x-face} $B$r(B
+$B8F$s$G!"%i%s%@%`$K@8@.$5$l$?%G!<%?$K$h$k(B X-Face $B%X%C%@!<$rA^F~$7$^$9!#(B
+
+@findex gnus-x-face-from-file
 @code{gnus-x-face-from-file} $B$O%Q%i%a!<%?$H$7$F(B GIF $B%U%!%$%k$r<u$1<h$j!"(B
 $B%7%'%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N(B
 $B%U%!%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
 
-$BA0<T$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
+$BFsHVL\$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
 $B$r(B @file{.gnus.el} $B%U%!%$%k$K=q$$$F2<$5$$(B:
 
 @lisp
 (setq message-required-news-headers
       (nconc message-required-news-headers
-             (list '(X-Face . gnus-random-x-face))))
+             (list '(X-Face . gnus-insert-random-x-face-header))))
 @end lisp
 
-$B8e<T$N4X?t$r;H$&$N$O!"$3$N$h$&$K$J$k$G$7$g$&(B:
+$B:G8e$N4X?t$r;H$&$N$O!"$3$N$h$&$K$J$k$G$7$g$&(B:
 
 @lisp
 (setq message-required-news-headers

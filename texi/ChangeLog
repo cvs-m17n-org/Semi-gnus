@@ -1,3 +1,21 @@
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Window Layout): Fixed braces in example.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Washing): Use new function names in
+	`deuglify.el'.  Addition.
+
+2003-01-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (X-Face): Fix.
+
+	* message.texi (Security): Fix.
+
+	* gnus.texi (Security): Fix.
+	(Signing and encrypting): Fix.
+
 2003-01-12  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* gnus.texi (Filtering Spam Using The Spam ELisp Package): removed
