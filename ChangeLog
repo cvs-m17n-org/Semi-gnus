@@ -1,3 +1,7 @@
+1998-06-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Composing Messages".
+
 1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-ems.el (gnus-ems-redefine): Must require 'path-util
