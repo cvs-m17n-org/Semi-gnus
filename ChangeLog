@@ -1,3 +1,9 @@
+1999-11-09  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
+	Use mail-sources instead of nnmail-spool-file.
+	From: Toshiaki -PCX- Tanaka.
+
 1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-group-startup-message): Insert space before

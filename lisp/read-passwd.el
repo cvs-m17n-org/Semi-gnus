@@ -100,7 +100,7 @@ Argument PROMPT ."
 			       (format "%s:%s:%s" server user port)
 			       pw))
 		  (cdr (assoc from mail-source-password-cache)))))
-	    nnmail-spool-file))))
+	    mail-sources))))
 ;;
 ;;
 (defvar passwd nil)
