@@ -37,10 +37,11 @@
   (require 'gnus-win)
   (require 'cl))
 
-(add-to-list 'gnus-user-group-parameters
-	     '(bbdb-auto-create-p
-	       (const :tag "Auto register address to BBDB" t)
-	       "Create new bbdb records people you receive mail from."))
+(eval-after-load "gnus-cus"
+  '(add-to-list 'gnus-user-group-parameters
+		'(bbdb-auto-create-p
+		  (const :tag "Auto register address to BBDB" t)
+		  "Create new bbdb records people you receive mail from.")))
 
 (defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
   "*Field body decoder.")
@@ -76,11 +77,6 @@ the user confirms the creation."
 	  (bbdb-annotate-message-sender from t
 					(or (bbdb-invoke-hook-for-value
 					     bbdb/news-auto-create-p)
-					    (gnus-group-find-parameter
-					     (with-current-buffer
-						 gnus-article-current-summary
-					       gnus-newsgroup-name)
-					     'bbdb-auto-create-p t)
 					    offer-to-create)
 					offer-to-create))))))
 
@@ -604,6 +600,14 @@ beginning of the message headers."
     (setq dest (nreverse dest))
     (mapconcat 'identity dest " ")))
 
+(defun gnus-bbdb/article-prepare-hook ()
+  (let ((bbdb/news-auto-create-p (gnus-group-find-parameter
+				  (with-current-buffer
+				      gnus-article-current-summary
+				    gnus-newsgroup-name)
+				  'bbdb-auto-create-p)))
+    (gnus-bbdb/update-record)))
+
 ;;
 ;; Insinuation
 ;;
@@ -615,7 +619,7 @@ beginning of the message headers."
   (when (boundp 'bbdb-extract-field-value-function-list)
     (add-to-list 'bbdb-extract-field-value-function-list
 		 'gnus-bbdb/extract-field-value-init))
-  (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
+  (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/article-prepare-hook)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)
