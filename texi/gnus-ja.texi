@@ -443,7 +443,7 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 @end menu
 
 @node Starting Up
-@chapter Starting gnus
+@chapter gnus $B$N5/F0(B
 @cindex starting up
 
 @kindex M-x gnus
@@ -480,7 +480,7 @@ gnus-other-frame} $B$r;H$&$3$H$,$G$-$^$9!#(B
 
 
 @node Finding the News
-@section Finding the News
+@section $B%K%e!<%:$r8+$D$1$k(B
 @cindex finding news
 
 @vindex gnus-select-method
@@ -561,7 +561,7 @@ Gnus $B$K(B @sc{nntp} $B%5!<%P!<$NL>A0$NF~NO$rBPOCE*$K;XDj$9$k$3$H$b$G$-$^$9!
 $B$H@_Dj$7$^$9!#(B
 
 @node The First Time
-@section The First Time
+@section $B0lHV=i$a(B
 @cindex first time usage
 
 $B5/F0MQ%U%!%$%k$,B8:_$7$J$$$H$-$O!"(Bgnus $B$O%G%#%U%)%k%H$G$I$N%0%k!<%W$,9X(B
@@ -584,7 +584,7 @@ Gnus $B$K(B @sc{nntp} $B%5!<%P!<$NL>A0$NF~NO$rBPOCE*$K;XDj$9$k$3$H$b$G$-$^$9!
 
 
 @node The Server is Down
-@section The Server is Down
+@section $B%5!<%P!<$,Mn$A$F$$$k(B
 @cindex server errors
 
 $BI8=`(B (default) $B$N%5!<%P!<$,Mn$A$F$$$k$H$-$O!"EvA3(B gnus $B$N5/F0$K$$$/$D$+(B
@@ -611,7 +611,7 @@ Gnus $B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 
 
 @node Slave Gnusae
-@section Slave Gnusae
+@section gnus $B$r%9%l!<%V$K$9$k(B
 @cindex slave
 
 $B$"$J$?$O#2$D0J>e$N(B Emacs $B$H!"#2$D0J>e$N(B gnus $B$rF1;~$KF0$+$7$?$$$H;W$&$+(B
@@ -643,7 +643,7 @@ Gnus $B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 
 
 @node Fetching a Group
-@section Fetching a Group
+@section $B%0%k!<%W$r<hF@$9$k(B
 @cindex fetching a group
 
 @findex gnus-fetch-group
@@ -655,7 +655,7 @@ Gnus $B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 
 
 @node New Groups
-@section New Groups
+@section $B?7$7$$%0%k!<%W(B
 @cindex new groups
 @cindex subscription
 
@@ -678,7 +678,7 @@ Messages})$B!#(B
 
 
 @node Checking New Groups
-@subsection Checking New Groups
+@subsection $B?7$7$$%0%k!<%W$rD4$Y$k(B
 
 Gnus $B$O!"IaDL$O%0%k!<%W$,?7$7$$$+$I$&$+$r!"9XFI$7$F$$$k%0%k!<%W$H:o=|$5$l(B
 $B$F$$$k%0%k!<%W$N%j%9%H$H8=>u%U%!%$%k(B (active file) $B$rHf3S$9$k$3$H$K$h$j7h(B
@@ -715,7 +715,7 @@ Gnus $B$O!"IaDL$O%0%k!<%W$,?7$7$$$+$I$&$+$r!"9XFI$7$F$$$k%0%k!<%W$H:o=|$5$l(B
 
 
 @node Subscription Methods
-@subsection Subscription Methods
+@subsection $B9XFIJ}K!(B
 
 @vindex gnus-subscribe-newsgroup-method
 $B?7$7$$%0%k!<%W$KAx6x$7$?$H$-$K(B gnus $B$,2?$r$9$k$+$O!"JQ?t(B
@@ -777,7 +777,7 @@ Gnus $B$O!"IaDL$O%0%k!<%W$,?7$7$$$+$I$&$+$r!"9XFI$7$F$$$k%0%k!<%W$H:o=|$5$l(B
 
 
 @node Filtering New Groups
-@subsection Filtering New Groups
+@subsection $B?7$7$$%0%k!<%W$rA*JL$9$k(B
 
 $B$I$N?7$7$$%0%k!<%W$,9XFI!J$b$7$/$O!"L5;k!K$5$l$k$Y$-$+$r4IM}$9$k2wE,$G<j(B
 $B7Z$JJ}K!$O!"%U%!%$%k(B @file{.newsrc} $B$N@hF,$K(B @dfn{options} $B9T$rA^F~$9$k(B
@@ -821,7 +821,7 @@ options -n !alt.all !rec.all sci.all
 
 
 @node Changing Servers
-@section Changing Servers
+@section $B%5!<%P!<$r49$($k(B
 @cindex changing servers
 
 $B$H$-$I$-!"$"$k(B @sc{nntp} $B%5!<%P!<$+$iJL$N%5!<%P!<$X0\F0$7$J$1$l$P$J$i$J(B
@@ -869,7 +869,7 @@ gnus-group-clear-data-on-native-groups} $B$r;H$C$F!"4pK\%0%k!<%W$K4X$9$k%G!<(B
 
 
 @node Startup Files
-@section Startup Files
+@section $B5/F0%U%!%$%k(B
 @cindex startup files
 @cindex .newsrc
 @cindex .newsrc.el
@@ -955,7 +955,7 @@ Gnus $B$,5/F0$9$k$H!"(B@code{gnus-site-init-file} ($B%G%#%U%)%k%H$G$O(B
 
 
 @node Auto Save
-@section Auto Save
+@section $B<+F0J]B8(B
 @cindex dribble file
 @cindex auto-save
 
@@ -982,7 +982,7 @@ gnus $B$O%U%!%$%k(B@file{.newsrc} $B$NCV$+$l$F$$$k%G%#%l%/%H%j(B ($B$3$l$OI
 
 
 @node The Active File
-@section The Active File
+@section $B8=>u%U%!%$%k(B
 @cindex active file
 @cindex ignored groups
 
@@ -1039,7 +1039,7 @@ Gnus $B$O5/F0$7$?$H$-$d!"<B:]$K?7$7$$5-;v$,E~Ce$7$F$$$k$+$r7hDj$7$h$&$H$9(B
 
 
 @node Startup Variables
-@section Startup Variables
+@section $B5/F0JQ?t(B
 
 @table @code
 
@@ -3824,7 +3824,7 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 ($B$b$7$"$J$?$,!"(B@code{$B%k!<%H(B} (root) $B$G$"$j!"(B@code{$B%]%9%H%^%9%?!<(B}
 (postmaster) $B$G$b$"$j!"(B@code{$B%k!<%H(B} $B$K(B @code{$B%]%9%H%^%9%?!<(B} $B$X$N%a!<%k(B
 $B$r<u$1<h$C$?>l9g$O!"$=$l$r(B @code{$B%]%9%H%^%9%?!<(B} $B$K$b:FAw$7$?$$$H;W$&$G(B
-$B$7$g$&!#(BOrdnung mu.AN_ sein!)
+$B$7$g$&!#(BOrdnung mu,A_(B sein!)
 
 $B$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
