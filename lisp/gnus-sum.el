@@ -2871,25 +2871,24 @@ If NO-DISPLAY, don't generate a summary buffer."
 (defun gnus-dependencies-add-header (header dependencies force-new)
   "Enter HEADER into the DEPENDENCIES table if it is not already there.
 
-If FORCE-NEW is not NIL, enter HEADER into the DEPENDENCIES table even
+If FORCE-NEW is not nil, enter HEADER into the DEPENDENCIES table even
 if it was already present.
 
-If `gnus-summary-ignore-duplicates' is NIL then duplicate Message-IDs
+If `gnus-summary-ignore-duplicates' is nil then duplicate Message-IDs
 will not be entered in the DEPENDENCIES table.  Otherwise duplicate
 Message-IDs will be renamed be renamed to a unique Message-ID before
 being entered.
 
-Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
-
+Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
   (let* ((id (mail-header-id header))
 	 (id-dep (and id (intern id dependencies)))
 	 ref ref-dep ref-header)
-    ;; Enter this `header' in the `dependencies' table
+    ;; Enter this `header' in the `dependencies' table.
     (cond
      ((not id-dep)
       (setq header nil))
-     ;; The first two cases do the normal part : enter a new `header'
-     ;; in the `dependencies' table,
+     ;; The first two cases do the normal part: enter a new `header'
+     ;; in the `dependencies' table.
      ((not (boundp id-dep))
       (set id-dep (list header)))
      ((null (car (symbol-value id-dep)))
@@ -2897,10 +2896,9 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 
      ;; From here the `header' was already present in the
      ;; `dependencies' table.
-
      (force-new
-      ;; Overrides an existing entry,
-      ;; Just set the header part of the entry.
+      ;; Overrides an existing entry;
+      ;; just set the header part of the entry.
       (setcar (symbol-value id-dep) header))
 
      ;; Renames the existing `header' to a unique Message-ID.
@@ -2911,11 +2909,11 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 	   (list header))
       (mail-header-set-id header id))
 
-     ;;   - The last case ignores an existing entry, except it adds
-     ;;     any additional Xrefs (in case the two articles came from
-     ;;     different servers.
-     ;;     Also sets `header' to `nil' meaning that the
-     ;;     `dependencies' table was *not* modified.
+     ;; The last case ignores an existing entry, except it adds any
+     ;; additional Xrefs (in case the two articles came from different
+     ;; servers.
+     ;; Also sets `header' to `nil' meaning that the `dependencies'
+     ;; table was *not* modified.
      (t
       (mail-header-set-xref
        (car (symbol-value id-dep))
@@ -2932,9 +2930,10 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 		  (boundp ref-dep)
 		  (setq ref-header (car (symbol-value ref-dep))))
 	(if (string= id ref)
-	    ;; Yuk !  This is a reference loop.  Make the article be a
+	    ;; Yuk!  This is a reference loop.  Make the article be a
 	    ;; root article.
 	    (progn
+	      (debug)
 	      (mail-header-set-references (car (symbol-value id-dep)) "none")
 	      (setq ref nil))
 	  (setq ref (gnus-parent-id (mail-header-references ref-header)))))
@@ -2975,19 +2974,21 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 	  (erase-buffer)))
       (kill-buffer (current-buffer)))
     ;; Sort over trustworthiness.
-    (mapc #'(lambda (relation)
-	      (when (gnus-dependencies-add-header
-		     (make-full-mail-header gnus-reffed-article-number
-					    (cadddr relation)
-					    "" "" (cadr relation)
-					    (or (caddr relation) "") 0 0 "")
-		     gnus-newsgroup-dependencies nil)
-		(push gnus-reffed-article-number gnus-newsgroup-limit)
-		(push gnus-reffed-article-number gnus-newsgroup-sparse)
-		(push (cons gnus-reffed-article-number gnus-sparse-mark)
-		      gnus-newsgroup-reads)
-		(decf gnus-reffed-article-number)))
-	  (sort relations 'car-less-than-car))
+    (mapcar
+     (lambda (relation)
+       (when (gnus-dependencies-add-header
+	      (make-full-mail-header
+	       gnus-reffed-article-number
+	       (cadddr relation) "" (mail-header-date header)
+	       (cadr relation)
+	       (or (caddr relation) "") 0 0 "")
+	      gnus-newsgroup-dependencies nil)
+	 (push gnus-reffed-article-number gnus-newsgroup-limit)
+	 (push gnus-reffed-article-number gnus-newsgroup-sparse)
+	 (push (cons gnus-reffed-article-number gnus-sparse-mark)
+	       gnus-newsgroup-reads)
+	 (decf gnus-reffed-article-number)))
+     (sort relations 'car-less-than-car))
     (gnus-message 7 "Making sparse threads...done")))
 
 (defun gnus-build-old-threads ()
@@ -3010,11 +3011,66 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
+;; The following macros and functions were written by Felix Lee
+;; <flee@cse.psu.edu>.
+
+(defmacro gnus-nov-read-integer ()
+  '(prog1
+       (if (= (following-char) ?\t)
+	   0
+	 (let ((num (ignore-errors (read buffer))))
+	   (if (numberp num) num 0)))
+     (unless (eobp)
+       (search-forward "\t" eol 'move))))
+
+(defmacro gnus-nov-skip-field ()
+  '(search-forward "\t" eol 'move))
+
+(defmacro gnus-nov-field ()
+  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
+
+;; This function has to be called with point after the article number
+;; on the beginning of the line.
+(defsubst gnus-nov-parse-line (number dependencies &optional force-new)
+  (let ((eol (gnus-point-at-eol))
+	(buffer (current-buffer))
+	header)
+
+    ;; overview: [num subject from date id refs chars lines misc]
+    (unwind-protect
+	(progn
+	  (narrow-to-region (point) eol)
+	  (unless (eobp)
+	    (forward-char))
+
+	  (setq header
+		(make-full-mail-header
+		 number			; number
+		 (funcall
+		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
+		 (funcall
+		  gnus-structured-field-decoder (gnus-nov-field)) ; from
+		 (gnus-nov-field)	; date
+		 (or (gnus-nov-field)
+		     (nnheader-generate-fake-message-id)) ; id
+		 (gnus-nov-field)	; refs
+		 (gnus-nov-read-integer) ; chars
+		 (gnus-nov-read-integer) ; lines
+		 (unless (= (following-char) ?\n)
+		   (gnus-nov-field)))))	; misc
+
+      (widen))
+
+    (when gnus-alter-header-function
+      (funcall gnus-alter-header-function header))
+    (gnus-dependencies-add-header header dependencies force-new)))
+
 (defun gnus-build-get-header (id)
   ;; Look through the buffer of NOV lines and find the header to
   ;; ID.  Enter this line into the dependencies hash table, and return
   ;; the id of the parent article (if any).
-  (let (found header)
+  (let ((deps gnus-newsgroup-dependencies)
+	found header)
     (prog1
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
@@ -3030,8 +3086,8 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 	    (when found
 	      (beginning-of-line)
 	      (and
-	       (setq header (gnus-nov-parse-line (read (current-buffer))
-						 gnus-newsgroup-dependencies))
+	       (setq header (gnus-nov-parse-line
+			     (read (current-buffer)) deps))
 	       (gnus-parent-id (mail-header-references header))))))
       (when header
 	(let ((number (mail-header-number header)))
@@ -3047,6 +3103,7 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 (defun gnus-build-all-threads ()
   "Read all the headers."
   (let ((gnus-summary-ignore-duplicates t)
+	(dependencies gnus-newsgroup-dependencies)
 	found header article)
     (save-excursion
       (set-buffer nntp-server-buffer)
@@ -3054,9 +3111,9 @@ Returns HEADER if it was entered in the DEPENDENCIES. Returns NIL otherwise."
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (ignore-errors
-	    (setq article (read (current-buffer)))
-	    (setq header (gnus-nov-parse-line article
-					      gnus-newsgroup-dependencies)))
+	    (setq article (read (current-buffer))
+		  header (gnus-nov-parse-line
+			  article dependencies)))
 	  (when header
 	    (push header gnus-newsgroup-headers)
 	    (if (memq (setq article (mail-header-number header))
@@ -4402,75 +4459,13 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (setq id (mail-header-id header)
 		  ref (gnus-parent-id (mail-header-references header))))
 
-	  (setq header
-		(gnus-dependencies-add-header header dependencies force-new))
-	  (if header
-	      (push header headers))
+	  (when (setq header
+		      (gnus-dependencies-add-header
+		       header dependencies force-new))
+	    (push header headers))
 	  (goto-char (point-max))
 	  (widen))
 	(nreverse headers)))))
-
-;; The following macros and functions were written by Felix Lee
-;; <flee@cse.psu.edu>.
-
-(defmacro gnus-nov-read-integer ()
-  '(prog1
-       (if (= (following-char) ?\t)
-	   0
-	 (let ((num (ignore-errors (read buffer))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
-
-(defmacro gnus-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
-
-(defmacro gnus-nov-field ()
-  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
-
-;; (defvar gnus-nov-none-counter 0)
-
-;; This function has to be called with point after the article number
-;; on the beginning of the line.
-(defun gnus-nov-parse-line (number dependencies &optional force-new)
-  (let ((eol (gnus-point-at-eol))
-	(buffer (current-buffer))
-	header ref id id-dep ref-dep)
-
-    ;; overview: [num subject from date id refs chars lines misc]
-    (unwind-protect
-	(progn
-	  (narrow-to-region (point) eol)
-	  (unless (eobp)
-	    (forward-char))
-
-	  (setq header
-		(make-full-mail-header
-		 number			; number
-		 (funcall
-		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
-		 (funcall
-		  gnus-structured-field-decoder (gnus-nov-field)) ; from
-		 (gnus-nov-field)	; date
-		 (or (gnus-nov-field)
-		     (nnheader-generate-fake-message-id)) ; id
-		 (gnus-nov-field)	; refs
-		 (gnus-nov-read-integer) ; chars
-		 (gnus-nov-read-integer) ; lines
-		 (unless (= (following-char) ?\n)
-		   (gnus-nov-field)))))	; misc
-
-      (widen))
-
-    (when gnus-alter-header-function
-      (funcall gnus-alter-header-function header))
-
-    (setq id (mail-header-id header)
-	  ref (gnus-parent-id (mail-header-references header)))
-
-    (gnus-dependencies-add-header header dependencies force-new)
-
-    header))
 
 ;; Goes through the xover lines and returns a list of vectors
 (defun gnus-get-newsgroup-headers-xover (sequence &optional
