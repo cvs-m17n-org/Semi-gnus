@@ -1028,8 +1028,8 @@ A hook run as the very last thing after starting up gnus
 A hook that is run as the very last thing after starting up gnus
 successfully.
 
-@item gnus-started-hook
-@vindex gnus-started-hook
+@item gnus-setup-news-hook
+@vindex gnus-setup-news-hook
 A hook that is run after reading the @file{.newsrc} file(s), but before
 generating the group buffer.
 
