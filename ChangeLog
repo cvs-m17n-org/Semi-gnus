@@ -1,3 +1,19 @@
+1999-02-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+	
+	* lisp/read-passwd.el: Change location of (provide 'read-passwd)
+	
+	* lisp/gnus-offline.el: ditto.
+	
+1999-02-12   Hidekazu Nakamura <u90121@uis-inf.co.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): To work with APOP
+	authentication scheme.
+
+	* lisp/read-passwd..el (read-pw-set-mail-source-passwd-cache):
+	Undo my change.
+
 1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.

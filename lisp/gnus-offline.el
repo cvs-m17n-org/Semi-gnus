@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.32 1999-02-07 07:33:18 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.33 1999-02-12 06:57:09 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -82,6 +82,7 @@
 (require 'cl)
 (require 'custom)
 (require 'easymenu)
+(provide 'gnus-offline)
 
 (unless (and (condition-case ()
 		 (require 'custom)
@@ -883,5 +884,4 @@ If value is nil , dialup line is disconnected status.")
       (gnus-demon-remove-handler 'gnus-offline-gnus-get-new-news t)))
 ;;
 ;;
-(provide 'gnus-offline)
 ;;; gnus-offline.el ends here

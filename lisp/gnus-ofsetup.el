@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.13 1999-02-12 01:45:31 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.14 1999-02-12 06:57:10 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -227,7 +227,7 @@
 			    (append mail-source
 				    (list
 				     (list
-				      auth
+				      'pop
 				      :user user
 				      :server server
 				      :program
@@ -236,21 +236,23 @@
 					      args
 					      "po:%u"
 					      "%t"
-					      "%p"))))))
+					      "%p")
+					      :authentication auth)))))
 		  (setq mail-source
 			(append mail-source
 				(list
 				 (list
-				  auth
+				  'pop
 				  :user user
-				  :server server))))))
+				  :server server
+				  :authentication auth))))))
 	      (setq i (- i 1)))
 	    ;; Replace "hoge" -> 'hoge
 	    (mapcar
 	     (lambda (x)
-	       (if (string-equal (nth 0 x) "pop")
-		   (setcar x 'pop)
-		 (setcar x 'apop)))
+	       (if (string-equal (car (last x)) "pop")
+		   (setcar (last x) (quote 'pop))
+		 (setcar (last x) (quote 'apop))))
 	     mail-source)
 	    (setq gnus-offline-mail-source mail-source)))
 

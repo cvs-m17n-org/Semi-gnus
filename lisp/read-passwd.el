@@ -26,6 +26,7 @@
 ;;
 ;;
 (require 'mail-source)
+(provide 'read-passwd)
 
 (defun read-pw-read-passwd (prompt)
   (read-pw-read-noecho prompt t))
@@ -92,7 +93,7 @@ Argument PROMPT ."
 	      (mail-source-bind (pop x)
 		(let ((from (format "%s:%s:%s" server user port))
 		      (mail-source-string
-		       (format "%s:%s@%s" (car x) user server)))
+		       (format "pop:%s@%s" user server)))
 		  (setq pw (read-pw-return-passwd-string user server))
 		  (unless (assoc user mail-source-password-cache)
 		    (set-alist 'mail-source-password-cache
@@ -108,4 +109,4 @@ Argument PROMPT ."
 		(message "POP Password for %s at %s : " user server)))
   passwd)
 ;;
-(provide 'read-passwd)
+;; read-passwd.el ends here.
