@@ -1,27 +1,47 @@
-;;; -*- Mode:Emacs-Lisp -*-
+;; gnus-bbdb.el --- Interface to Nana-gnus version 6.10.2.
 
-;;; This file is part of Semi-gnus.
-;;; copyright (c) 1991, 1992, 1993 Jamie Zawinski <jwz@netscape.com>.
-;;;               1998             Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
+;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
+;; Copyright (C) 1997,1998 MORIOKA Tomohiko
+;; Copyright (C) 1998 Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
 
-;;; The Insidious Big Brother Database is free software; you can redistribute
-;;; it and/or modify it under the terms of the GNU General Public License as
-;;; published by the Free Software Foundation; either version 1, or (at your
-;;; option) any later version.
-;;;
-;;; BBDB is distributed in the hope that it will be useful, but WITHOUT ANY
-;;; WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-;;; FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-;;; details.
-;;;
-;;; You should have received a copy of the GNU General Public License
-;;; along with GNU Emacs; see the file COPYING.  If not, write to
-;;; the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+;; Author: Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;; Keywords: BBDB, MIME, multimedia, multilingual, mail, news
+
+;; This file is part of Nana-gnus.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Code:
 
 (require 'bbdb)
 (require 'gnus)
+(require 'std11)
 (eval-when-compile
   (require 'gnus-win))
+
+(defvar gnus-bbeb/decode-field-body-function 'nnheader-decode-field-body
+  "*Field body decoder.")
+
+(defmacro gnus-bbdb/decode-field-body (field-body field-name)
+  `(or (and (functionp gnus-bbeb/decode-field-body-function)
+	    (funcall gnus-bbeb/decode-field-body-function
+		     ,field-body ,field-name))
+       ,field-body))
 
 ;;;###autoload
 (defun gnus-bbdb/update-record (&optional offer-to-create)
@@ -34,20 +54,24 @@ the user confirms the creation."
     (let (from)
       (save-restriction
 	(set-buffer gnus-original-article-buffer)
-	(setq from (mail-header-from mime-message-structure))
+	(widen)
+	(narrow-to-region (point-min)
+			  (progn (goto-char (point-min))
+				 (or (search-forward "\n\n" nil t)
+				     (error "message unexists"))
+				 (- (point) 2)))
+	(when (setq from (mail-fetch-field "from"))
+	  (setq from (gnus-bbdb/extract-address-components
+		      (gnus-bbdb/decode-field-body from 'From))))
 	(when (or (null from)
 		  (string-match (bbdb-user-mail-names)
-				(mail-strip-quoted-names from)))
+				(car (cdr from))))
 	  ;; if logged-in user sent this, use recipients.
-	  (widen)
-	  (narrow-to-region (point-min)
-			    (progn (goto-char (point-min))
-				   (or (search-forward "\n\n" nil t)
-				       (error "message unexists"))
-				   (- (point) 2)))
 	  (let ((to (mail-fetch-field "to")))
 	    (when to
-	     (setq from (nnheader-decode-field-body to 'To 'unfolding))))))
+	      (setq from
+		    (gnus-bbdb/extract-address-components
+		     (gnus-bbdb/decode-field-body to 'To)))))))
       (when from
 	(bbdb-annotate-message-sender from t
 				      (or (bbdb-invoke-hook-for-value
@@ -225,7 +249,7 @@ strings.  In the future this should change."
 	 (data (and (or gnus-bbdb/summary-mark-known-posters
 			gnus-bbdb/summary-show-bbdb-names)
 		    (condition-case ()
-			(mail-extract-address-components from)
+			(gnus-bbdb/extract-address-components from)
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
@@ -282,7 +306,7 @@ This function is meant to be used with the user function defined in
   (let* ((from (mail-header-from header))
 	 (data (and gnus-bbdb/summary-show-bbdb-names
 		    (condition-case ()
-			(mail-extract-address-components from)
+			(gnus-bbdb/extract-address-components from)
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
@@ -318,7 +342,7 @@ This function is meant to be used with the user function defined in
   "Given a Gnus message header, returns a mark if the poster is in the BBDB, \" \" otherwise.  The mark itself is the value of the field indicated by `bbdb-message-marker-field' (`mark-char' by default) if the indicated field is in the poster's record, and `gnus-bbdb/summary-known-poster-mark' otherwise."
   (let* ((from (mail-header-from header))
 	 (data (condition-case ()
-		   (mail-extract-address-components from)
+		   (gnus-bbdb/extract-address-components from)
 		 (error nil)))
 	 (name (car data))
 	 (net (cadr data))
@@ -439,7 +463,54 @@ beginning of the message headers."
   ;; exist only in the message.
   (let (value)
     (when (setq value (mail-fetch-field field-name))
-      (nnheader-decode-field-body value field-name 'unfolding))))
+      (gnus-bbdb/decode-field-body value field-name))))
+
+;;; @ mail-extr
+;;;
+
+(defvar gnus-bbdb/canonicalize-full-name-methods
+  '(gnus-bbdb/canonicalize-dots
+    gnus-bbdb/canonicalize-spaces))
+
+(defun gnus-bbdb/extract-address-components (str)
+  (let* ((ret     (std11-extract-address-components str))
+         (phrase  (car ret))
+         (address (car (cdr ret)))
+         (methods gnus-bbdb/canonicalize-full-name-methods))
+    (while (and phrase methods)
+      (setq phrase  (funcall (car methods) phrase)
+            methods (cdr methods)))
+    (if (string= address "") (setq address nil))
+    (if (string= phrase "") (setq phrase nil))
+    (list phrase address)
+    ))
+
+;;; @ full-name canonicalization methods
+;;;
+
+(defun gnus-bbdb/canonicalize-spaces (str)
+  (let (dest)
+    (while (string-match "\\s +" str)
+      (setq dest (cons (substring str 0 (match-beginning 0)) dest))
+      (setq str (substring str (match-end 0)))
+      )
+    (or (string= str "")
+        (setq dest (cons str dest)))
+    (setq dest (nreverse dest))
+    (mapconcat 'identity dest " ")
+    ))
+
+(defun gnus-bbdb/canonicalize-dots (str)
+  (let (dest)
+    (while (string-match "\\." str)
+      (setq dest (cons (substring str 0 (match-end 0)) dest))
+      (setq str (substring str (match-end 0)))
+      )
+    (or (string= str "")
+        (setq dest (cons str dest)))
+    (setq dest (nreverse dest))
+    (mapconcat 'identity dest " ")
+    ))
 
 ;;
 ;; Insinuation
