@@ -20526,13 +20526,13 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 $B%7%'%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N(B
 $B%U%!%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
 
-$BFsHVL\$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
+$B0lHVL\$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
 $B$r(B @file{.gnus.el} $B%U%!%$%k$K=q$$$F2<$5$$(B:
 
 @lisp
 (setq message-required-news-headers
       (nconc message-required-news-headers
-             (list '(X-Face . gnus-insert-random-x-face-header))))
+             (list '(X-Face . gnus-random-x-face))))
 @end lisp
 
 $B:G8e$N4X?t$r;H$&$N$O!"$3$N$h$&$K$J$k$G$7$g$&(B:
