@@ -7179,7 +7179,9 @@ the @code{banner} group parameter (@pxref{Group Parameters}) to the
 group you want banners stripped from.  The parameter either be a string,
 which will be interpreted as a regular expression matching text to be
 removed, or the symbol @code{signature}, meaning that the (last)
-signature should be removed.
+signature should be removed, or other symbol, meaning that the
+corresponding regular expression in @code{gnus-article-banner-alist} is
+used.
 
 @item W W c
 @kindex W W c (Summary)

@@ -3100,6 +3100,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(gnus-set-global-variables)
 		(setq gnus-have-all-headers
 		      (or all-headers gnus-show-all-headers))))
+	    (save-excursion
+	      (gnus-configure-windows 'article))
 	    (when (or (numberp article)
 		      (stringp article))
 	      (gnus-article-prepare-display)
@@ -3114,7 +3116,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (gnus-set-mode-line 'article))
 	    (article-goto-body)
 	    (set-window-point (get-buffer-window (current-buffer)) (point))
-	    (gnus-configure-windows 'article)
 	    t))))))
 
 (defun gnus-article-prepare-mime-display (&optional number)
@@ -3390,9 +3391,9 @@ value of the variable `gnus-show-mime' is non-nil."
       (setq buffer-file-name nil))
     (goto-char (point-min))))
 
-(defun gnus-mime-inline-part (&optional handle)
+(defun gnus-mime-inline-part (&optional handle arg)
   "Insert the MIME part under point into the current buffer."
-  (interactive)
+  (interactive (list nil current-prefix-arg))
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 contents charset
@@ -3402,13 +3403,13 @@ value of the variable `gnus-show-mime' is non-nil."
 	(mm-remove-part handle)
       (setq contents (mm-get-part handle))
       (cond
-       ((not current-prefix-arg)
+       ((not arg)
 	(setq charset (or (mail-content-type-get
 			   (mm-handle-type handle) 'charset)
 			  gnus-newsgroup-charset)))
-       ((numberp current-prefix-arg)
+       ((numberp arg)
 	(setq charset
-	      (or (cdr (assq current-prefix-arg 
+	      (or (cdr (assq arg 
 			     gnus-summary-show-article-charset-alist))
 		  (read-coding-system "Charset: ")))))
       (forward-line 2)

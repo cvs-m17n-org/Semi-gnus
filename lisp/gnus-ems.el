@@ -174,7 +174,8 @@
 	pixmap file height beg i)
     (save-excursion
       (switch-to-buffer (gnus-get-buffer-create gnus-group-buffer))
-      (let ((buffer-read-only nil))
+      (let ((buffer-read-only nil)
+	    width height)
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file
@@ -246,7 +247,8 @@ for XEmacs."
 			      'delete '(t nil) nil
 			      (if gnus-article-compface-xbm
 				  '("-X"))))
-		 (unless gnus-article-compface-xbm
+		 (if gnus-article-compface-xbm
+		     t
 		   (goto-char (point-min))
 		   (progn (insert "/* Width=48, Height=48 */\n") t)
 		   (eq 0 (call-process-region (point-min) (point-max)
@@ -256,11 +258,19 @@ for XEmacs."
 		 ;; light on dark.
 		 (if (eq 'dark (cdr-safe (assq 'background-mode
 					       (frame-parameters))))
-		     (setq image (create-image (buffer-string) 'pbm t
+		     (setq image (create-image (buffer-string)
+					       (if gnus-article-compface-xbm
+						   'xbm
+						 'pbm)
+					       t
 					       :ascent 'center
 					       :foreground "black"
 					       :background "white"))
-		   (setq image (create-image (buffer-string) 'pbm t
+		   (setq image (create-image (buffer-string)
+					     (if gnus-article-compface-xbm
+						 'xbm
+					       'pbm)
+					     t
 					     :ascent 'center)))))
 	  (ring-insert gnus-article-xface-ring-internal (cons data image)))
 	(when image
