@@ -10971,6 +10971,30 @@ IMAP サーバーに渡すパスワードです。指定されていないときは、利用者は入力
 は、@samp{kerberos4}, @samp{cram-md5}, @samp{anonymous} か初期値
 の @samp{login} になります。
 
+@item :program
+:stream に `shell' が設定されているときは、この値が変
+数 `imap-shell-program' に割り当てられます。これは @code{format} ふうの
+文字列 (または文字列のリスト) でなければなりません。例を示しましょう。
+
+@example
+ssh %s imapd
+@end example
+
+有効な format 指示子は以下の通りです。
+
+@table @samp
+@item s
+サーバーの名前。
+
+@item l
+`imap-default-user' で設定されたユーザ名。
+
+@item p
+サーバーのポート番号。
+@end table
+
+これらの指定に使われる値は、対応するキーワードに与えた値から取ってきます。
+
 @item :mailbox
 メールを取得するメールボックスの名前。初期値は @samp{INBOX} で、これは普
 通は入ってくるメールを受け取るメールボックスです。

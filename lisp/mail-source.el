@@ -1,5 +1,5 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -93,12 +93,12 @@ See Info node `(gnus)Mail Source Specifiers'."
 			(const :format "" pop)
 			(checklist :tag "Options" :greedy t
 				   (group :inline t
-					  (const :format "" :value :server) 
+					  (const :format "" :value :server)
 					  (string :tag "Server"))
 				   (group :inline t
-					  (const :format "" :value :port) 
+					  (const :format "" :value :port)
 					  (choice :tag "Port"
-						  :value "pop3" 
+						  :value "pop3"
 						  (number :format "%v")
 						  (string :format "%v")))
 				   (group :inline t
@@ -120,7 +120,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (const :format "" :value :function)
 					  (function :tag "Function"))
 				   (group :inline t
-					  (const :format "" 
+					  (const :format ""
 						 :value :authentication)
 					  (choice :tag "Authentication"
 						  :value apop
@@ -146,8 +146,8 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (string :tag "Server"))
 				   (group :inline t
 					  (const :format "" :value :port)
-					  (choice :tag "Port" 
-						  :value 143 
+					  (choice :tag "Port"
+						  :value 143
 						  number string))
 				   (group :inline t
 					  (const :format "" :value :user)
@@ -161,6 +161,9 @@ See Info node `(gnus)Mail Source Specifiers'."
 						  :value network
 						  ,@mail-source-imap-streams))
 				   (group :inline t
+					  (const :format "" :value :program)
+					  (string :tag "Program"))
+				   (group :inline t
 					  (const :format ""
 						 :value :authenticator)
 					  (choice :tag "Authenticator"
@@ -172,7 +175,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 						  :value "INBOX"))
 				   (group :inline t
 					  (const :format "" :value :predicate)
-					  (string :tag "Predicate" 
+					  (string :tag "Predicate"
 						  :value "UNSEEN UNDELETED"))
 				   (group :inline t
 					  (const :format "" :value :fetchflag)
@@ -188,7 +191,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 		  (cons :tag "Webmail server"
 			(const :format "" webmail)
 			(checklist :tag "Options" :greedy t
-				   (group :inline t 
+				   (group :inline t
 					 (const :format "" :value :subtype)
 					 ;; Should be generated from
 					 ;; `webmail-type-definition', but we
@@ -301,6 +304,7 @@ Common keywords should be listed here.")
        (:server (getenv "MAILHOST"))
        (:port)
        (:stream)
+       (:program)
        (:authentication)
        (:user (or (user-login-name) (getenv "LOGNAME") (getenv "USER")))
        (:password)
@@ -752,7 +756,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defvar mail-source-report-new-mail-timer nil)
 (defvar mail-source-report-new-mail-idle-timer nil)
 
-(eval-when-compile 
+(eval-when-compile
   (if (featurep 'xemacs)
       (require 'itimer)
     (require 'timer)))
@@ -838,7 +842,7 @@ This only works when `display-time' is enabled."
 				  (goto-char (point-min))
 ;;;                               ;; Unix mail format
 ;;; 				  (unless (looking-at "\n*From ")
-;;; 				    (insert "From maildir " 
+;;; 				    (insert "From maildir "
 ;;; 					    (current-time-string) "\n"))
 ;;; 				  (while (re-search-forward "^From " nil t)
 ;;; 				    (replace-match ">From "))
@@ -875,6 +879,7 @@ This only works when `display-time' is enabled."
 	  (buf (get-buffer-create
 		(format " *imap source %s:%s:%s *" server user mailbox)))
 	  (mail-source-string (format "imap:%s:%s" server mailbox))
+	  (imap-shell-program (or (list program) imap-shell-program))
 	  remove)
       (if (and (imap-open server port stream authentication buf)
 	       (imap-authenticate
@@ -935,14 +940,14 @@ This only works when `display-time' is enabled."
       (when (eq authentication 'password)
 	(setq password
 	      (or password
-		  (cdr (assoc (format "webmail:%s:%s" subtype user) 
+		  (cdr (assoc (format "webmail:%s:%s" subtype user)
 			      mail-source-password-cache))
 		  (mail-source-read-passwd
 		   (format "Password for %s at %s: " user subtype))))
 	(when (and password
-		   (not (assoc (format "webmail:%s:%s" subtype user) 
+		   (not (assoc (format "webmail:%s:%s" subtype user)
 			       mail-source-password-cache)))
-	  (push (cons (format "webmail:%s:%s" subtype user) password) 
+	  (push (cons (format "webmail:%s:%s" subtype user) password)
 		mail-source-password-cache)))
       (webmail-fetch mail-source-crash-box subtype user password)
       (mail-source-callback callback (symbol-name subtype)))))
