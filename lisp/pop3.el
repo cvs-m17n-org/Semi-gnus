@@ -99,14 +99,12 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   (let* ((process (pop3-open-server pop3-mailhost pop3-port))
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
-	 (msgid 1)
-	 (msglen 0)
-	 message-count
 	 (pop3-password pop3-password)
 	 (pop3-uidl-file-name 
-	  (concat pop3-uidl-file-name "-" pop3-mailhost))
+	  (convert-standard-filename 
+	   (concat pop3-uidl-file-name "-" pop3-mailhost)))
 	 (retrieved-messages nil)
-	 messages)
+	 messages message-count)
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
     ;; query for password
@@ -122,31 +120,22 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     ;; get messages that are suitable for download
     (message "Retrieving message list...")
     (setq messages (pop3-get-message-numbers process)
-	  message-count (length messages))
-    (message (format "Retrieving message list...%d unread" message-count))
+	  message-count (length (cdr messages)))
+    (message (format "Retrieving message list...%d of %d unread" 
+		     message-count (pop messages)))
     (unwind-protect
-	(progn
-	  (while (<= n message-count)
-	    (setq msgid (caar messages)
-		  msglen (cdar messages)
-		  messages (cdr messages))
-	    ;; only retrieve messages matching our regexp or in the uidl list
-	    (unless (or (not msgid)
-			;; don't download messages that are too large
-			(and pop3-maximum-message-size 
-			     (> msglen pop3-maximum-message-size))
-			(and pop3-except-header-regexp
-			     (string-match pop3-except-header-regexp
-					   (pop3-top process msgid 0))))
-	      (message (format "Retrieving message %d of %d from %s..."
-			       n message-count pop3-mailhost))
-	      (pop3-retr process msgid crashbuf)
-	      (setq retrieved-messages (cons msgid retrieved-messages)))
-	    (setq n (1+ n)))
+	(unless (stringp crashbox)
+	  (while messages
+	    (message 
+	     (format "Retrieving message %d of %d (%d octets) from %s..."
+		     n message-count (cdar messages) pop3-mailhost))
+	    (pop3-retr process (caar messages) crashbuf)
+	    (push (caar messages) retrieved-messages)
+	    (setq messages (cdr messages)
+		  n (1+ n)))
 	  (with-current-buffer crashbuf
 	    (write-region-as-binary (point-min) (point-max)
-				    crashbox 'append 'nomesg)
-	    )
+				    crashbox 'append 'nomesg))
 	  ;; mark messages as read
 	  (when pop3-leave-mail-on-server
 	    (pop3-save-uidls))
@@ -159,7 +148,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	  )
       (pop3-quit process))
     (kill-buffer crashbuf)
-    t))
+    message-count))
 
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST.
@@ -317,18 +306,27 @@ Return the response string if optional second argument is non-nil."
   ;; we use the LIST comand first anyway to get the message lengths.
   ;; then if we're leaving mail on the server, see if the UIDL command
   ;; is implemented. if so, we use it to get the message number list.
-  (let ((messages (pop3-list process))
-	(uidl (if pop3-leave-mail-on-server
-		  (pop3-get-uidl process))))
-    (when messages
-      (pop messages)
-      (cond
-       ((eq pop3-uidl-support t)
-	;; remove elements not in the uidl, this assumes the uidl is short
-	(remove-if-not
-	 (lambda (message) (memq (car message) uidl))
-	 (reverse messages)))
-       (t messages)))))
+  (let* ((messages (pop3-list process))
+	 (total (or (pop messages) 0))
+	 (uidl (if pop3-leave-mail-on-server
+		   (pop3-get-uidl process)))
+	 out)
+    (while messages
+      ;; only retrieve messages matching our regexp or in the uidl list
+      (when (and
+	     ;; remove elements not in the uidl, this assumes the uidl is short
+	     (or (not (eq pop3-uidl-support t))
+		 (memq (caar messages) uidl))
+	     (caar messages)
+	     ;; don't download messages that are too large
+	     (not (and pop3-maximum-message-size
+		       (> (cdar messages) pop3-maximum-message-size)))
+	     (not (and pop3-except-header-regexp
+		       (string-match pop3-except-header-regexp
+				     (pop3-top process (caar messages) 0)))))
+	(push (car messages) out))
+      (setq messages (cdr messages)))
+    (cons total (reverse out))))
 
 (defun pop3-get-uidl (process)
   "Use PROCESS to get a list of unread message numbers."
@@ -371,18 +369,19 @@ Return the response string if optional second argument is non-nil."
 	       (dotimes (i (length pop3-uidl-obarray))
 		 (if (symbolp (aref pop3-uidl-obarray i))
 		     (throw 'found t)))))
+    (when (file-readable-p pop3-uidl-file-name)
+      (copy-file pop3-uidl-file-name
+		 (concat pop3-uidl-file-name ".old")
+		 'overwrite 'keeptime))
     (save-excursion
-      (with-temp-buffer
-        (when (file-readable-p pop3-uidl-file-name)
-          (copy-file pop3-uidl-file-name
-                     (concat pop3-uidl-file-name ".old")
-                     'overwrite 'keeptime))
+      (with-temp-file pop3-uidl-file-name
         (mapatoms 
 	 (lambda (atom)
 	   (when (car (symbol-value atom))
-	     (insert (format "%s\n" atom))))
-	 pop3-uidl-obarray)
-        (write-file pop3-uidl-file-name)))))
+	     (insert (format "%s\n" atom))
+	     (unintern atom pop3-uidl-obarray)))
+	 pop3-uidl-obarray)))))
+    
 
 ;; The Command Set
 
