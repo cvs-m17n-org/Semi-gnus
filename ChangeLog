@@ -1,3 +1,8 @@
+1999-01-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Bug fix -- Use
+	`gnus-offline-menu-on-agent' if `miee-popup-menu' does not exits.
+
 1999-01-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-last): Use `split-string' instead of

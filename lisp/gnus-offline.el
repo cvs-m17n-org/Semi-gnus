@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.4.2 1999-01-06 22:26:30 yamaoka Exp $
+;;; $Id: gnus-offline.el,v 1.1.4.3 1999-01-10 23:08:53 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -848,10 +848,11 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-popup-menu (event)
   "Popup menu for Gnus offline."
   (interactive "e")
-  (let* ((menu (or
-		(and (boundp 'miee-popup-menu)
-		     (assoc 'keymap (assoc 'Miee (assoc 'menu-bar global-map))))
-		gnus-offline-menu-on-agent))
+  (let* ((menu (if (boundp 'miee-popup-menu)
+		   (or (assoc 'keymap
+			      (assoc 'Miee (assoc 'menu-bar global-map)))
+		       miee-popup-menu)
+		 gnus-offline-menu-on-agent))
 	 (pop (x-popup-menu t menu))
 	 (func (and pop (lookup-key menu (apply 'vector pop)))))
     (and pop func (funcall func))))
