@@ -429,8 +429,7 @@ Can be used to turn version control on or off."
 		   (file-exists-p (concat file ".el"))
 		   (file-exists-p (concat file ".elc")))
 	       (condition-case var
-		   (let ((coding-system-for-read 'binary))
-		     (load file nil t))
+		   (load file nil t)
 		 (error
 		  (error "Error in %s: %s" file var)))))))))
 
