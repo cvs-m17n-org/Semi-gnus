@@ -464,16 +464,18 @@ header line with the old Message-ID."
 	  ;; Copy over the (displayed) article buffer, delete
 	  ;; hidden text and remove text properties.
 	  (widen)
-	  (copy-to-buffer gnus-article-copy (point-min) (point-max))
-	  (set-buffer gnus-article-copy)
-	  (gnus-article-delete-text-of-type 'annotation)
-	  (gnus-remove-text-with-property 'gnus-prev)
-	  (gnus-remove-text-with-property 'gnus-next)
-	  (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
-	  (insert
-	   (prog1
-	       (format "%s" (buffer-string))
-	     (erase-buffer)))
+	  (let ((inhibit-read-only t))
+	    (copy-to-buffer gnus-article-copy (point-min) (point-max))
+	    (set-buffer gnus-article-copy)
+	    (gnus-article-delete-text-of-type 'annotation)
+	    (gnus-remove-text-with-property 'gnus-prev)
+	    (gnus-remove-text-with-property 'gnus-next)
+	    (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
+	    (insert
+	     (prog1
+		 (format "%s" (buffer-string))
+	       (erase-buffer)))
+	    )
 	  ;; Find the original headers.
 	  (set-buffer gnus-original-article-buffer)
 	  (goto-char (point-min))
