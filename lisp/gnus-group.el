@@ -89,7 +89,7 @@ unread articles in the groups.
 
 If nil, no groups are permanently visible."
   :group 'gnus-group-listing
-  :type '(choice regexp (const nil)))
+  :type 'regexp)
 
 (defcustom gnus-list-groups-with-ticked-articles t
   "*If non-nil, list groups that have only ticked articles.
@@ -1575,6 +1575,8 @@ If REQUEST-ONLY, don't actually read the group; just request it.
 
 Return the name of the group is selection was successful."
   ;; Transform the select method into a unique server.
+  (when (stringp method)
+    (setq method (gnus-server-to-method method)))
   (let ((saddr (intern (format "%s-address" (car method)))))
     (setq method (gnus-copy-sequence method))
     (require (car method))

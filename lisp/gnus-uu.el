@@ -1202,6 +1202,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-grab-articles (articles process-function
 				       &optional sloppy limit no-errors)
   (let ((state 'first)
+	(gnus-asynchronous nil)
 	has-been-begin article result-file result-files process-state
 	gnus-summary-display-article-function
 	gnus-article-display-hook gnus-article-prepare-hook
