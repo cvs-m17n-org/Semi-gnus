@@ -1,5 +1,11 @@
 1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-summary-save-article-rmail): Use
+	`gnus-summary-save-in-rmail' instead of
+	`rmail-output-to-rmail-file'.
+
+1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-mimic-kill-buffer): Rewrite.
 
 1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
