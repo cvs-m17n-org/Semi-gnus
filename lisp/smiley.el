@@ -195,7 +195,7 @@ A list of images is returned."
 		(gnus-add-image 'smiley image)
 		(put-text-property (point)
 				   (progn
-				     (gnus-put-image image string)
+				     (gnus-put-image image string 'smiley)
 				     (point))
 				   'smilified t)))))
 	(put-text-property beg (or end (point-max)) 'smilified nil)
