@@ -751,37 +751,39 @@ the actual number of articles toggled is returned."
       (pop gnus-agent-group-alist))))
 
 (defun gnus-agent-fetch-headers (group &optional force)
-  (when (gnus-agent-load-alist group)
-    (let ((articles (gnus-uncompress-range 
-		     (cons (1+ (caar (last (gnus-agent-load-alist group))))
-			   (cdr (gnus-active group))))))
-      ;; Fetch them.
-      (when articles
-	(gnus-message 7 "Fetching headers for %s..." group)
-	(save-excursion
-	  (set-buffer nntp-server-buffer)
-	  (unless (eq 'nov (gnus-retrieve-headers articles group))
-	    (nnvirtual-convert-headers))
-	  (goto-char (point-min))
-	  (while (not (eobp))
-	    (goto-char (point-at-eol))
-	    (insert "\t")
-	    (forward-line 1))
-	  ;; Save these headers for later processing.
-	  (copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
-	  (let (file)
-	    (when (file-exists-p
-		   (setq file (gnus-agent-article-name ".overview" group)))
-	      (gnus-agent-braid-nov group articles file))
-	    (gnus-make-directory (nnheader-translate-file-chars
-				  (file-name-directory file)))
-	    (write-region (point-min) (point-max) file nil 'silent)
-	    (gnus-agent-save-alist group articles nil)
-	    (gnus-agent-enter-history
-	     "last-header-fetched-for-session"
-	     (list (cons group (nth (- (length  articles) 1) articles)))
-	     (gnus-time-to-day (current-time)))
-	    articles))))))
+  (gnus-agent-load-alist group)
+  ;; Find out what headers we need to retrieve.
+  (when articles
+    (while (and articles
+		(assq (car articles) gnus-agent-article-alist))
+      (pop articles))
+    (let ((arts articles))
+      (while (cdr arts)
+	(if (assq (cadr arts) gnus-agent-article-alist)
+	    (setcdr arts (cddr arts))
+	  (setq arts (cdr arts)))))
+    ;; Fetch them.
+    (when articles
+      (gnus-message 7 "Fetching headers for %s..." group)
+      (save-excursion
+	(set-buffer nntp-server-buffer)
+	(unless (eq 'nov (gnus-retrieve-headers articles group))
+	  (nnvirtual-convert-headers))
+	;; Save these headers for later processing.
+	(copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
+	(let (file)
+	  (when (file-exists-p
+		 (setq file (gnus-agent-article-name ".overview" group)))
+	    (gnus-agent-braid-nov group articles file))
+	  (gnus-make-directory (nnheader-translate-file-chars
+				(file-name-directory file)))
+	  (write-region (point-min) (point-max) file nil 'silent)
+	  (gnus-agent-save-alist group articles nil)
+	  (gnus-agent-enter-history "last-header-fetched-for-session"
+				    (list (cons group (nth (- (length  articles) 1) articles)))
+				    (gnus-time-to-day (current-time)))
+	t)))))
+
 
 (defsubst gnus-agent-copy-nov-line (article)
   (let (b e)

@@ -23,4 +23,7 @@ NEWS:
 
 * TODO
 
-  ......
+* T-gnus 6.8.17 is the last version Gnus 5.6 base.
+  After this , T-gnus 6.9 - this is based on pgnus.
+
+     T-gnus 6.9.0 - Based on pgnus-0.6
