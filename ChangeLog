@@ -1,12 +1,25 @@
-1998-06-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+1998-06-30  Keisuke Mori   <ksk@ntts.com>
 
-	* lisp/gnus-art.el : Bug fix.
-	* lisp/gnus-spec.el : Bug fix.
+	* texi/gnus-ja.texi: Add "Scroing".
+
+1998-06-30  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Scoring".
+
+1998-06-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* Sync up with Gnus 5.6.22
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.8.
+	* lisp/pop3-fma.el : Enable to get localhost mail spool.
 	
-1998-06-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+1998-06-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.7.6.
-	* Sync up with Gnus 5.6.21
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.7.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Set up
+	`gnus-article-current-summary' of gnus-article-buffer.
+	(gnus-request-article-this-buffer): Don't set up
+	`gnus-article-current-summary'.
 
 1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
@@ -34,12 +47,12 @@
 
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
-	* readme, README, texi/ChangeLog, texi/gnus.texi,
-	texi/message.texi, lisp/ChangeLog, lisp/nnweb.el, lisp/nnmail.el,
-	lisp/nndoc.el, lisp/message.el, lisp/lpath.el, lisp/gnus.el,
-	lisp/gnus-util.el, lisp/gnus-topic.el, lisp/gnus-sum.el,
-	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-ems.el,
-	lisp/gnus-demon.el, lisp/gnus-art.el: Sync up with Gnus 5.6.16.
+	* README, texi/ChangeLog, texi/gnus.texi, texi/message.texi,
+	lisp/ChangeLog, lisp/nnweb.el, lisp/nnmail.el, lisp/nndoc.el,
+	lisp/message.el, lisp/lpath.el, lisp/gnus.el, lisp/gnus-util.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-score.el,
+	lisp/gnus-group.el, lisp/gnus-ems.el, lisp/gnus-demon.el,
+	lisp/gnus-art.el: Sync up with Gnus 5.6.16.
 
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 

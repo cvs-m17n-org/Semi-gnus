@@ -2934,7 +2934,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	    ;; Yuk!  This is a reference loop.  Make the article be a
 	    ;; root article.
 	    (progn
-	      (debug)
 	      (mail-header-set-references (car (symbol-value id-dep)) "none")
 	      (setq ref nil))
 	  (setq ref (gnus-parent-id (mail-header-references ref-header)))))
