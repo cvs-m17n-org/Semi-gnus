@@ -9,6 +9,10 @@
 	(gnus-namazu-update-index): Ditto.
 	(gnus-namazu-update-indices): Ditto.
 
+2004-05-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.17.2 revision 00.
+
 2004-04-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (describe-key-briefly): Remove compiler macro.
