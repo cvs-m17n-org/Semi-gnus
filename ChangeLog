@@ -1,3 +1,19 @@
+1998-10-27  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-TIPS.ja: Update.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.4.
+
+	* lisp/message.el (message-header-encode-function): Rename from
+	`message-encode-header-function.
+	(message-header-encoded-hook): Rename from
+	`message-after-header-encode-hook'.
+	(message-mime-setup-function): Abolish valiable.
+	(message-check-mail-syntax): New function.
+	(message-send-mail): Check message syntax.
+	(message-default-encoding): New valiable.
+	(message-check-encoding): New function.
+
 1998-10-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.

@@ -11,33 +11,38 @@ TODO.ja $B$N!V(B*1998/10/03-01 $BG$0U%a%C%;!<%8(B cite $B5!G=$N<BAuJ}K!JQ99
 ;; $BG=@-$,$"$j$^$9!#(B
 
 ---
-message-setup-hook (Default: nil)
-message-mime-setup-function (Default: 'turn-on-mime-edit)
+message-syntax-checks
+message-default-encoding (Default: "7bit")
 
-Message $BJT=8MQ(B buffer $B$r(B MIME $B%a%C%;!<%8JT=8%b!<%I$K@Z$jBX$($k$?$a$N4X(B
-$B?t$r!"(B Semi-gnus $B$G$O(B message-setup-hook $B$+$i8F$S=P$7$F$$$^$9$,!"@lMQ(B
-$B$NJQ?t$r$b$&$1!"(B message-setup-hook $B$N<B9TA0$K$3$NJQ?t$K@_Dj$5$l$?4X?t(B
-$B$r8F$S=P$7$^$9!#(B
+Message $B$NAw?.;~$K(B Content-Transfer-Encoding $B$r%A%'%C%/$9$k$h$&$K$7$^(B
+$B$7$?!#(B
+$B%A%'%C%/$N4p=`$O(B header $B$K(B Content-Transfer-Encoding $B$,;XDj$5$l$F$$$k(B
+$B>l9g$K$O!"$=$l$K=>$$!";XDj$5$l$F$$$J$$>l9g$K$O!"(B
+message-default-encoding $B$G;XDj$5$l$F$$$k(B encodeing $B$K=>$$$^$9!#(B
 
-message-setup-hook $B$NFbMF$rJQ99$7$F$$$kJ}$OCm0U$,I,MW$G$9!#(B
-
+$B$3$N%A%'%C%/$r9T$$$?$/$J$$>l9g$K$O!"(B message-syntax-checks $B$K(B
+'(encoding . disable) $B$rDI2C$7$F$/$@$5$$!#(B
 ---
 message-header-hook
-message-encode-header-function (Default: 'eword-encode-header)
-message-after-header-encode-hook (Default: nil)
+
+message-header-encode-function (Default: 'eword-encode-header)
+*6.9.4: message-encode-header-function $B$+$i2~L>(B
+
+message-header-encode-hook (Default: nil)
+*6.9.4: message-after-header-encode-hook $B$+$i2~L>(B
 
 Header $B$r(B encode $B$9$k$?$a$N4X?t$r!"(B Semi-gnus $B$G$O(B message-header-hook
 $B$+$i8F$S=P$7$F$$$^$9$,!"@lMQ$NJQ?t$r$b$&$1!"(B message-header-hook $B$N<B(B
 $B9T8e$K$3$NJQ?t$K@_Dj$5$l$?4X?t$r8F$S=P$7$^$9!#(B
 
-$B$^$?!"?7$?$K(B message-after-header-encode-hook $B$r$b$&$1!"(B
-message-encode-header-function $B$N8F$S=P$78e$K$3$N(B hook $B$r<B9T$7$^$9!#(B
+$B$^$?!"?7$?$K(B message-header-encode-hook $B$r$b$&$1!"(B
+message-header-encode-function $B$N8F$S=P$78e$K$3$N(B hook $B$r<B9T$7$^$9!#(B
 
 message-setup-hook $B$NFbMF$rJQ99$7$F$$$kJ}$O!"Cm0U$,I,MW$G$9!#(B
 
 X-PGP-Sig $B%Q%C%1!<%8$r;HMQ$7$F$*$j!"(B message-header-hook $B$K(B
 x-pgp-sig-sign $B$r@_Dj$5$l$F$$$kJ}$O!"(B $B@_Dj@h$r(B
-message-after-header-encode-hook $B$K0\F0$7$F$/$@$5$$!#(B
+message-header-encode-hook $B$K0\F0$7$F$/$@$5$$!#(B
 
 ---
 Chao-gnus 6.9 $B$G$NJQ99$r<h$j9~$s$G$"$j$^$9$N$G!"(B apel $B$O(B 9.5 $B0J9_$N$b(B
@@ -48,3 +53,16 @@ Chao-gnus 6.9 $B$G$NJQ99$r<h$j9~$s$G$"$j$^$9$N$G!"(B apel $B$O(B 9.5 $B0J9_
 $B$$!#(B
 ;; gnus $B$r5/F0$7$?$"$H$G!"(B bbdb-gnus.el $B$N$_$r(B byte-compile $B$9$k$H$$$&(B
 ;; $B$N$,$*<j7Z$G$9!#(B :-)
+
+---
+*** 6.9.4: $B$G$3$NJQ99$OGQ;_$7$^$7$?!#(B ***
+message-setup-hook (Default: nil)
+message-mime-setup-function (Default: 'turn-on-mime-edit)
+
+Message $BJT=8MQ(B buffer $B$r(B MIME $B%a%C%;!<%8JT=8%b!<%I$K@Z$jBX$($k$?$a$N4X(B
+$B?t$r!"(B Semi-gnus $B$G$O(B message-setup-hook $B$+$i8F$S=P$7$F$$$^$9$,!"@lMQ(B
+$B$NJQ?t$r$b$&$1!"(B message-setup-hook $B$N<B9TA0$K$3$NJQ?t$K@_Dj$5$l$?4X?t(B
+$B$r8F$S=P$7$^$9!#(B
+
+message-setup-hook $B$NFbMF$rJQ99$7$F$$$kJ}$OCm0U$,I,MW$G$9!#(B
+*****************************************
