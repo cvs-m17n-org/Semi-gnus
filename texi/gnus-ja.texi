@@ -24380,53 +24380,55 @@ X-Faces ヘッダーの挿入が簡単になりました。
 @kbd{W m} を押すと、Gnus はモールスで符号化されたメッセージをデコードし
 ます。
 
-@c TRANSLATEME
 @item
-Unread count correct in nnimap groups.
+nnimap のグループにおける未読の数が正確になりました。
 
-The estimated number of unread articles in the group buffer should now
-be correct for nnimap groups.  This is achieved by calling
-@code{nnimap-fixup-unread-after-getting-new-news} from the
-@code{gnus-setup-news-hook} (called on startup) and
-@code{gnus-after-getting-new-news-hook}. (called after getting new
-mail).  If you have modified those variables from the default, you may
-want to add @code{nnimap-fixup-unread-after-getting-new-news} again.  If
-you were happy with the estimate and want to save some (minimal) time
-when getting new mail, remove the function.
-
-@item
-Group Carbon Copy (GCC) quoting
-
-To support groups that contains SPC and other weird characters, groups
-are quoted before they are placed in the Gcc: header.  This means
-variables such as @code{gnus-message-archive-group} should no longer
-contain quote characters to make groups containing SPC work.  Also, if
-you are using the string @samp{nnml:foo, nnml:bar} (indicating Gcc
-into two groups) you must change it to return the list
-@code{("nnml:foo" "nnml:bar")}, otherwise the Gcc: line will be quoted
-incorrectly.  Note that returning the string @samp{nnml:foo, nnml:bar}
-was incorrect earlier, it just didn't generate any problems since it
-was inserted directly.
+グループバッファで、nnimap グループの未読記事の数の見積りが正確になった
+はずです。これは @code{gnus-setup-news-hook} (起動時に呼ばれ
+る) と @code{gnus-after-getting-new-news-hook} (新しいメールを取得した直
+後に呼ばれる) から @code{nnimap-fixup-unread-after-getting-new-news} を
+呼ぶことによって成し遂げられます。これらの変数をディフォルトから変えてい
+る場合は、再び @code{nnimap-fixup-unread-after-getting-new-news} を追加
+する必要があるかもしれません。見積りに満足していて、新しいメールを取得す
+るときにいくらか (最小限度の) 時間を節約したいのであれば、その関数を外し
+て下さい。
 
 @item
-@file{~/News/overview/} not used.
+グループカーボンコピー (GCC) を引用符で囲む
 
-As a result of the following change, the @file{~/News/overview/}
-directory is not used any more.  You can safely delete the entire
-hierarchy.
+空白や他の変な文字を含むグループを扱えるようにするために、グループ
+は Gcc: header に置かれる前に引用符で囲まれます。これは、空白を含むグルー
+プが使えるようにするために、もはや @code{gnus-message-archive-group} の
+ような変数に引用文字を含めるべきではないことを意味します。さらに、文字
+列 @samp{nnml:foo, nnml:bar} (二つのグループに Gcc を格納することを示
+す) を使っているならば、リスト @code{("nnml:foo" "nnml:bar")} を返すよう
+に変更しなければなりません。さもないと、Gcc: 行は間違った囲まれ方をされ
+てしまうでしょう。初期のころに文字列 @samp{nnml:foo, nnml:bar} を返すよ
+うにしたことが間違いだったことに着目して下さい。それは直接挿入されたので、
+まったく問題を生じませんでした。
+
+@item
+@file{~/News/overview/} は不要。
+
+以下の変更の結果、今後は @file{~/News/overview/} ディレクトリは要りませ
+ん。すべての階層を安全に削除することができます。
 
 @item
 @code{gnus-agent}
 
-The Gnus Agent has seen a major updated and is now enabled by default,
-and all nntp and nnimap servers from @code{gnus-select-method} and
-@code{gnus-secondary-select-method} are agentized by default. Earlier
-only the server in @code{gnus-select-method} was agentized by the
-default, and the agent was disabled by default.  When the agent is
-enabled, headers are now also retrieved from the Agent cache instead
-of the back ends when possible. Earlier this only happened in the
-unplugged state.  You can enroll or remove servers with @kbd{J a} and
-@kbd{J r} in the server buffer.  Gnus will not download articles into
+Gnus エージェントは大規模な更新を経て、今やディフォルトで活性化されます。
+そし
+て @code{gnus-select-method} と @code{gnus-secondary-select-method} で指
+定されるすべての nntp と nnimap のサーバーが、ディフォルトでエージェント
+化されます。初期においては @code{gnus-select-method} のサーバーだけがディ
+フォルトでエージェント化され、エージェントはディフォルトで不活性化されて
+いました。エージェントが活性化されると、可能ならばバックエンドに代わって
+エージェントのキャッシュからヘッダーが取り寄せられます。初期には、これは
+オフライン (unplugged) の状態でのみ行なわれていました。サーバーバッファ
+で @kbd{J a} と @kbd{J r} を使うことによって、サーバーの登録と削除を行な
+うことができます。
+@c TRANSLATEME (この部分は改行せずにつなぐべし)
+Gnus will not download articles into
 the Agent cache, unless you instruct it to do so, though, by using
 @kbd{J u} or @kbd{J s} from the Group buffer.  You revert to the old
 behaviour of having the Agent disabled with @code{(setq gnus-agent
