@@ -1,3 +1,16 @@
+2001-06-15  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el (nnshimbun-group-parameters-custom): Add
+	`encapsulate-article' as a customizable option, and modified
+	`prefetch-articles'.
+	(nnshimbun-group-parameters): Add document for
+	`encapsulate-article'.
+	(nnshimbun-encapsulate-article): New server variable.
+	(nnshimbun-find-parameter): Add code for `encapsulate-article'.
+	(nnshimbun-request-article-1): Refer `encapsulate-article' group
+	parameter to control `shimbun-encapsulate-article' value when
+	`shimbun-article' is called.
+
 2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
@@ -24,7 +37,7 @@
 	(nnshimbun-group-parameters-custom): New variable.
 	(TopLevel): Require `gnus' expressly.
 
-2001-06-12  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-06-12  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (nnshimbun-find-parameter): New macro.
 	(nnshimbun-generate-nov-database): Use `nnshimbun-find-parameter'.
@@ -48,7 +61,7 @@
 	inhibiting the expiring when `nnshimbun-keep-unparsable-dated-articles'
 	is nil.
 
-2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-group.el (toplevel): Removed autoload code for
 	"nnshimbun".
@@ -66,7 +79,7 @@
 	* lisp/gnus.el: Autoload "nnshimbun" for the command `gnus-group-
 	make-shimbun-group'.
 
-2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el: Remove some garbage.
 
@@ -77,7 +90,7 @@
 	FSF Emacsen.
 	* texi/gnus-ja.texi: Ditto.
 
-2001-06-09  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-06-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (top-level): Updated comments.
 	(nnshimbun): New customize group.
@@ -93,7 +106,7 @@
 	(gnus-group-shimbun-server-history): Its definition is moved to
 	`nnshimbun.el'.
 
-2001-06-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-06-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (nnshimbun-use-entire-index): Removed.
 	(nnshimbun-index-range): New variable.
@@ -151,7 +164,7 @@
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): Remove a
 	useless non-global var; scroll the output window automatically.
 
-2001-05-31  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-05-31  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (nnshimbun-header-xref): Removed.
 	(nnshimbun-check-header): Removed.
@@ -187,7 +200,7 @@
 	(cl-run-time-functions): New variable.
 	(TopLevel): Don't require `cl' at run-time.
 
-2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* texi/gnus-ja.texi (Web Newspaper): Updated.
 
@@ -203,7 +216,7 @@
 	* Mule23@1934.ja: Ditto.
 	* Mule23@1934.en: Ditto.
 
-2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el: Reconstructed to use `shimbun'.
 
