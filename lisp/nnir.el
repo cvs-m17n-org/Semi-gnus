@@ -610,7 +610,7 @@ that it is for Namazu, not Glimpse."
     'gnus-group-make-nnir-group))
 (add-hook 'gnus-group-mode-hook
 	  (lambda ()
-	    (unless (string-ma "T-gnus" gnus-version)
+	    (unless (string-match "T-gnus" gnus-version)
 	      (nnir-group-mode-hook))))
 
 
