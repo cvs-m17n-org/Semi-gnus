@@ -1,0 +1,109 @@
+README.branch --- description of branches and tags. (DRAFT)
+========================================================================
+
+Semi-gnus revision tree (1998-07-16)
+
+    vendor      personal    main trunk      public
+    branch      branches                    branches
+------------------------------------------------------------------------
+qGnus 0.??  ------> Semi-gnus 6.0.0
+       :                        :
+       :        himi     <--  6.0.7
+       :        ichikawa <--  6.0.8
+       :        akr      <--  6.2.3
+       :        shuhei-k <--  6.3.1
+Gnus 5.6.11 ------>           6.3.3
+       :                      6.4.0 (for SEMI 1.5)
+       :                     (6.4.?)------> for SEMI 1.5
+       :                        |    \
+       :                        |     \
+(Synch with original Gnus       |      ---> for SEMI 1.6
+ was done many times, but    (6.4.?)------> 6.5 (for SEMI 1.7)
+ we don't include them.)        |        /    6.5.0
+       :                        |    (?)/
+       :                        |   <---
+       :                     (6.5.?)------> 6.6 (for SEMI 1.8, FLIM 1.7)
+       :                        |    \        6.6.0        stable branch
+       :                        |     \
+       :                        |      ---> 6.7 (for SEMI 1.8, FLIM 1.7)
+       :                        |             6.7.0       develop branch
+       :     sync               |               :
+Gnus 5.6.22 ------>             |   feedback  6.7.7
+       :                     (6.7.8)<------   6.7.8
+       :                        |    \
+       :                        |     \
+       :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8)
+       :     sync               |             6.8.0
+Gnus 5.6.24 ------>             |             6.8.1
+       :                        :               :
+       :                        :               :
+========================================================================
+
+The Vendor Branch
+
+    Original version of Gnus.
+    Each version has a tag of the form "qgnus-0_XY" or "gnus-5_X_Y" or
+    "pgnus-0_XY".
+
+    The branch tag for the vendor branch is "larsi".
+
+The Main Trunk
+
+    Semi-gnus was developed on the main trunk until current branch-
+    management plan (See "Public Branches" below) was introduced.
+    Each version has a tag of the form "gnus-6_N2_N3". (0 < N2 < 5)
+
+Public Branches
+
+    Current main stream of Semi-gnus development.
+
+    [Goal and policy of public branches here ???]
+
+    Each branch has a tag of the form "gnus-N1_N2" and each version
+    has a tag of the form "gnus-N1_N2_N3".
+
+    N1, N2, and N3 are changed by the following rules.
+
+    N1 will be incremented if any fundamental architecture change is
+    made.  Of cource, in this case, N2 and N3 will be reset to zero.
+
+    N2 will be incremented and new branch will be made if any "major
+    changes" are made.  "major changes" include API changes, major
+    version up of original Gnus, or synchronization with original Gnus
+    which requires design decision.
+
+    N3 will be incremented if some "minor changes" are made.  "minor
+    changes" include small bug fix or synchronization with original Gnus
+    without design decision.
+
+    The following branch tags are currently available.
+
+	for-semi-1_5	Semi-gnus for SEMI 1.5 API
+	for-semi-1_6	Semi-gnus for SEMI 1.6 API
+	gnus-6_5	Semi-gnus for SEMI 1.7 API
+	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
+	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API
+
+Personal Branches
+
+    Some Semi-gnus developers have their own "personal branches".
+    Each personal branch may have its own goal and/or policy.
+    See README.${tag} (if exists) for information of each branch.
+
+    The following branch tags are curretly available.
+
+	himi		Owner: Miyashita Hisashi
+	ichikawa	Owner: Tatsuya Ichikawa
+	akr		Owner: Tanaka Akira
+	shuhei-k	Owner: Shuhei KOBAYASHI
+
+"semi-gnus" Tag
+
+    Was assigned to the latest stable version.
+    Currently not maintained. (XXX: ???)
+
+"for-semi-N1_N2" Tags
+
+    Were assigned to corresponding version of SEMI API N1.N2.
+    We will not use this convention any longer. (XXX: ???)

@@ -3,6 +3,7 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -2007,6 +2008,38 @@ commands:
     (mime-maybe-hide-echo-buffer))
   (gnus-run-hooks 'gnus-mime-article-prepare-hook))
 
+(defun gnus-article-make-full-mail-header (&optional number charset)
+  "Create a new mail header structure in a raw article buffer."
+  (unless (and number charset)
+    (save-current-buffer
+      (set-buffer gnus-summary-buffer)
+      (unless number
+	(setq number (or (cdr gnus-article-current) 0)))
+      (unless charset
+	(setq charset (or default-mime-charset 'x-ctext)))))
+  (goto-char (point-min))
+  (let ((header-end (if (search-forward "\n\n" nil t)
+			(1- (point))
+		      (goto-char (point-max))))
+	(chars (- (point-max) (point)))
+	(lines (count-lines (point) (point-max)))
+	(default-mime-charset charset)
+	xref)
+    (narrow-to-region (point-min) header-end)
+    (setq xref (std11-fetch-field "xref"))
+    (prog1
+	(make-full-mail-header
+	 number
+	 (std11-fetch-field "subject")
+	 (std11-fetch-field "from")
+	 (std11-fetch-field "date")
+	 (std11-fetch-field "message-id")
+	 (std11-fetch-field "references")
+	 chars
+	 lines
+	 (when xref (concat "Xref: " xref)))
+      (widen))))
+
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
 ARTICLE should either be an article number or a Message-ID.
@@ -2100,25 +2133,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      ;; Hooks for getting information from the article.
-	      ;; This hook must be called before being narrowed.
-	      (let ((method
-		     (if gnus-show-mime
-			 (progn
-			   (setq mime-message-structure gnus-current-headers)
-                           (if (or (not gnus-strict-mime)
-				   (mime-fetch-field "MIME-Version"))
-			       gnus-article-display-method-for-mime
-			     gnus-article-display-method-for-encoded-word))
-		       gnus-article-display-method-for-traditional)))
-		(gnus-run-hooks 'gnus-tmp-internal-hook)
-		(gnus-run-hooks 'gnus-article-prepare-hook)
-		;; Display message.
-		(funcall method)
-		;; Associate this article with the current summary buffer.
-		(setq gnus-article-current-summary summary-buffer)
-		;; Perform the article display hooks.
-		(gnus-run-hooks 'gnus-article-display-hook))
+	      (gnus-article-prepare-display)
 	      ;; Do page break.
 	      (goto-char (point-min))
 	      (setq gnus-page-broken
@@ -2131,6 +2146,26 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (search-forward "\n\n" nil t)
 	    (set-window-point (get-buffer-window (current-buffer)) (point))
 	    t))))))
+
+(defun gnus-article-prepare-display ()
+  "Make the current buffer look like a nice article."
+  (let ((method
+	 (if gnus-show-mime
+	     (progn
+	       (mime-parse-buffer)
+	       (if (or (not gnus-strict-mime)
+		       (mime-fetch-field "MIME-Version"))
+		   gnus-article-display-method-for-mime
+		 gnus-article-display-method-for-encoded-word))
+	   gnus-article-display-method-for-traditional)))
+    (gnus-run-hooks 'gnus-tmp-internal-hook)
+    (gnus-run-hooks 'gnus-article-prepare-hook)
+    ;; Display message.
+    (funcall method)
+    ;; Associate this article with the current summary buffer.
+    (setq gnus-article-current-summary (current-buffer))
+    ;; Perform the article display hooks.
+    (gnus-run-hooks 'gnus-article-display-hook)))
 
 (defun gnus-article-wash-status ()
   "Return a string which display status of article washing."
@@ -2561,6 +2596,12 @@ If given a prefix, show the hidden text instead."
   :group 'gnus-article-various
   :type 'hook)
 
+(defcustom gnus-article-edit-article-setup-function
+  'gnus-article-mime-edit-article-setup
+  "Function called to setup an editing article buffer."
+  :group 'gnus-article-various
+  :type 'function)
+
 (defvar gnus-article-edit-done-function nil)
 
 (defvar gnus-article-edit-mode-map nil)
@@ -2618,6 +2659,8 @@ groups."
     (gnus-configure-windows 'edit-article)
     (setq gnus-article-edit-done-function exit-func)
     (setq gnus-prev-winconf winconf)
+    (when gnus-article-edit-article-setup-function
+      (funcall gnus-article-edit-article-setup-function))
     (gnus-message 6 "C-c C-c to end edits")))
 
 (defun gnus-article-edit-done (&optional arg)
@@ -2648,6 +2691,8 @@ groups."
   (let ((func gnus-article-edit-done-function)
 	(buf (current-buffer))
 	(start (window-start)))
+    (remove-hook 'gnus-article-mode-hook
+		 'gnus-article-mime-edit-article-unwind)
     (gnus-article-edit-exit)
     (save-excursion
       (set-buffer buf)
@@ -2697,6 +2742,86 @@ groups."
     (search-forward-regexp "^$" nil t)
     (let ((case-fold-search nil))
       (query-replace-regexp "\\([.!?][])}]* \\)\\([[({A-Z]\\)" "\\1 \\2"))))
+
+;;;
+;;; Article editing with MIME-Edit
+;;;
+
+(defcustom gnus-article-mime-edit-article-setup-hook nil
+  "Hook run after setting up a MIME editing article buffer."
+  :group 'gnus-article-various
+  :type 'hook)
+
+(defun gnus-article-mime-edit-article-unwind ()
+  "Unwind `gnus-article-buffer' if article editing was given up."
+  (remove-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (when mime-edit-mode-flag
+    (mime-edit-exit 'nomime 'no-error)
+    (message ""))
+  (when (featurep 'font-lock)
+    (setq font-lock-defaults nil)
+    (font-lock-mode 0)))
+
+(defun gnus-article-mime-edit-article-setup ()
+  "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
+after replacing with the original article."
+  (setq gnus-show-mime t)
+  (setq gnus-article-edit-done-function
+	`(lambda (&rest args)
+	   (when mime-edit-mode-flag
+	     (mime-edit-exit)
+	     (message ""))
+	   (goto-char (point-min))
+	   (let (case-fold-search)
+	     (when (re-search-forward
+		    (format "^%s$" (regexp-quote mail-header-separator))
+		    nil t)
+	       (replace-match "")))
+	   (when (featurep 'font-lock)
+	     (setq font-lock-defaults nil)
+	     (font-lock-mode 0))
+	   (apply ,gnus-article-edit-done-function args)
+	   (set-buffer gnus-original-article-buffer)
+	   (erase-buffer)
+	   (insert-buffer gnus-article-buffer)
+	   (setq gnus-current-headers (gnus-article-make-full-mail-header))
+	   (gnus-article-prepare-display)))
+  (define-key (current-local-map) "\C-c\C-k" 'gnus-article-mime-edit-exit)
+  (erase-buffer)
+  (insert-buffer gnus-original-article-buffer)
+  (mime-edit-again)
+  (when (featurep 'font-lock)
+    (set (make-local-variable 'font-lock-defaults)
+	 '(message-font-lock-keywords t))
+    (font-lock-set-defaults)
+    (turn-on-font-lock))
+  (add-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
+
+(defun gnus-article-mime-edit-exit ()
+  "Exit the article MIME editing without updating."
+  (interactive)
+  (let ((winconf gnus-prev-winconf)
+	buf)
+    (when mime-edit-mode-flag
+      (mime-edit-exit)
+      (message ""))
+    (goto-char (point-min))
+    (let (case-fold-search)
+      (when (re-search-forward
+	     (format "^%s$" (regexp-quote mail-header-separator)) nil t)
+	(replace-match "")))
+    (when (featurep 'font-lock)
+      (setq font-lock-defaults nil)
+      (font-lock-mode 0))
+    ;; We remove all text props from the article buffer.
+    (setq buf (format "%s" (buffer-string)))
+    (set-buffer (get-buffer-create gnus-original-article-buffer))
+    (erase-buffer)
+    (insert buf)
+    (setq gnus-current-headers (gnus-article-make-full-mail-header))
+    (gnus-article-prepare-display)
+    (set-window-configuration winconf)))
 
 ;;;
 ;;; Article highlights

@@ -11,7 +11,7 @@ To do list.
 *1998/10/02-2 設定ファイル群読み込み時の coding-system 問題
 
 ----------- 未対策 -----------
-    
+
 *1998/09/25-1 message/partial の結合機能の改良
 
 	Subject で summary を検索する代わりに、gnus-newsgroup-headers な
@@ -21,11 +21,6 @@ To do list.
 
     Offline 時にメッセージを作成した場合、 Message-Id の形式が不当なも
     のになってしまう。
-
-*1998/10/02-5 Edit article 時にメッセージを破壊する問題
-
-    nnml 等で保存してあるメッセージで edit article を使用して編集を行っ
-    た場合、 MIME entity を破壊してしまう。
 
 *1998/10/02-6 smtpmail.el 削除
 
@@ -63,7 +58,7 @@ To do list.
 
     ここには、他ブランチで対策中または、対策済で gnus-V1_V2 枝に取り込
     まれていないものを含む。
-    
+
 *1998/10/02-3 message/partial 使用時の Message-Id 問題
 
     message/partial 形式でメッセージを送信した場合、全パートの
@@ -107,3 +102,7 @@ To do list.
 *1998/10/02-1 Draft の編集・送信時の encode / decode 問題
 
     1998/11/04 - 完了
+
+*1998/10/02-5 Edit article 時にメッセージを破壊する問題
+
+    1998/11/12 - 完了

@@ -157,6 +157,11 @@ If this variable is nil, no such courtesy message will be added."
   :group 'message-interface
   :type 'regexp)
 
+(defcustom message-bounce-setup-function 'message-bounce-setup-for-mime-edit
+  "Function to setup a re-sending bounced message."
+  :group 'message-sending
+  :type 'function)
+
 ;;;###autoload
 (defcustom message-from-style 'default
   "*Specifies how \"From\" headers look.
@@ -479,6 +484,12 @@ The function `message-setup' runs this hook."
   "Normal hook, run each time a new outgoing message is initialized.
 It is run after the headers have been inserted and before
 the signature is inserted."
+  :group 'message-various
+  :type 'hook)
+
+(defcustom message-bounce-setup-hook nil
+  "Normal hook, run each time a a re-sending bounced message is initialized.
+The function `message-bounce' runs this hook."
   :group 'message-various
   :type 'hook)
 
@@ -4143,6 +4154,13 @@ Optional NEWS will use news to forward instead of mail."
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
 
+(defun message-bounce-setup-for-mime-edit ()
+  (goto-char (point-min))
+  (when (search-forward (concat "\n" mail-header-separator "\n") nil t)
+    (replace-match "\n\n"))
+  (set (make-local-variable 'message-setup-hook) nil)
+  (mime-edit-again))
+
 ;;;###autoload
 (defun message-bounce ()
   "Re-mail the current message.
@@ -4182,6 +4200,9 @@ you."
       (message-remove-header message-ignored-bounced-headers t)
       (goto-char (point-max))
       (insert mail-header-separator))
+    (when message-bounce-setup-function
+      (funcall message-bounce-setup-function))
+    (run-hooks 'message-bounce-setup-hook)
     (message-position-point)))
 
 ;;;
