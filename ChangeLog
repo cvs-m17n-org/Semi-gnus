@@ -1,3 +1,12 @@
+1998-10-29  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el: (gnus-article-edit-article): Call
+	`gnus-article-edit-article-setup-function' if it is non nil.
+	(gnus-article-mime-edit-article-setup): New function.
+	(gnus-article-mime-edit-article-setup-hook): New hook.
+	(gnus-article-edit-article-setup-function): New user option. Use
+	`gnus-article-mime-edit-article-setup' in default.
+
 1998-10-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el: Determin base64 encode/decode function by FLIM.
