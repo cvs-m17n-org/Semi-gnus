@@ -1,3 +1,8 @@
+1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in: Add entry `info-ja'.
+	* texi/Makefile.in: Add entry `ja'.
+
 1998-09-11  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-send): Don't call
