@@ -1,3 +1,9 @@
+1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.13.4 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
+
 1999-08-10  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.4b5.
