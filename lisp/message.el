@@ -2181,8 +2181,7 @@ With the prefix argument FORCE, insert the header anyway."
       (goto-char beg)
       (while (and (if (bobp) nil (forward-line -1) t)
 		  (not (looking-at paragraph-start))
-		  (not (looking-at message-cite-prefix-regexp))
-		  (equal quoted (match-string 0)))
+		  (not (looking-at message-cite-prefix-regexp)))
 	(setq beg (point))))
     (goto-char point)
     (save-restriction
