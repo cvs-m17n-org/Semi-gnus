@@ -62,7 +62,7 @@ gnus-load.el:
 
 clean:
 	rm -f *.orig *.rej *.elc *~
-	rm -f auto-autoload.el custom-load.el
+	rm -f auto-autoloads.el custom-load.el
 
 distclean: clean
 	rm -f Makefile
