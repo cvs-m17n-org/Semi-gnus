@@ -1,5 +1,10 @@
 2002-01-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/nnshimbun.el (nnshimbun-request-article): Handle the
+	article properly when no group is specified.
+	(nnshimbun-write-nov, nnshimbun-save-nov): Save nov databases only
+	when their sizes are greater than zero.
+
 	* lisp/gnus-namazu.el (gnus-namazu-query-highlight): New option.
 	(gnus-namazu-query-highlight-face): New face.
 	(gnus-namazu/check-cache-group): New function.
