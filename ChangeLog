@@ -1,5 +1,8 @@
 2001-01-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnheader.el: Require `pces', `poem' and `std11' to reduce
+	the required value of `recursive-load-depth-limit' for Emacs 21.
+
 	* lisp/message.el (message-followup): Handle "Mail-Copies-To:"
 	correctly.
 	(message-get-reply-headers): Ditto.
