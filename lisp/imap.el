@@ -290,7 +290,7 @@ stream.")
 
 NAME names the authenticator.  CHECK is a function returning non-nil if
 the server support the authenticator and AUTHENTICATE is a function
-for doing the actuall authentification.")
+for doing the actual authentication.")
 
 (defvar imap-error nil
   "Error codes from the last command.")

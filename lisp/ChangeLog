@@ -1,3 +1,28 @@
+2001-11-28 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-uu.el (gnus-uu-save-article): Use #part instead of #mml.
+
+2001-11-28 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnheader.el (nnheader-find-nov-line): Don't use macro
+	gnus-delete-line.
+
+	* gnus-group.el (gnus-group-name-decode): Defun instead of defsubst.
+	(gnus-group-name-charset): Ditto.
+
+	* gnus-util.el (gnus-buffer-live-p): Ditto.
+
+2001-11-28 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* sieve-manage.el (sieve-manage-stream-alist): Backslash before
+	open parenthesis in doc.
+	(sieve-manage-authenticator-alist): Typo in doc.
+	* imap.el (imap-authenticator-alist): Typo in doc.
+	(imap-stream-alist): Backslash.
+
+	* gnus-sum.el (gnus-summary-limit-to-author): Missing arguments.
+	  Thanks to david.goldberg6@verizon.net (David S. Goldberg)
+
 2001-11-27 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-topic.el (gnus-topic-mode): Add LOCAL for add-hook.
