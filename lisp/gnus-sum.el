@@ -837,6 +837,17 @@ default charset will be used instead."
   :type '(repeat symbol)
   :group 'gnus-charset)
 
+(defcustom gnus-group-highlight-words-alist nil
+  "Alist of group regexps and highlight regexps.
+This variable uses the same syntax as `gnus-emphasis-alist'."
+  :type '(repeat (cons (regexp :tag "Group")
+		       (repeat (list (regexp :tag "Highlight regexp")
+				     (number :tag "Group for entire word" 0)
+				     (number :tag "Group for displayed part" 0)
+				     (symbol :tag "Face" 
+					     gnus-emphasis-highlight-words)))))
+  :group 'gnus-summary-visual)
+
 ;;; Internal variables
 
 (defvar gnus-scores-exclude-files nil)
@@ -1025,6 +1036,7 @@ variable (string, integer, character, etc).")
 (defvar gnus-last-article nil)
 (defvar gnus-newsgroup-history nil)
 (defvar gnus-newsgroup-charset nil)
+(defvar gnus-newsgroup-emphasis-alist nil)
 
 (defconst gnus-summary-local-variables
   '(gnus-newsgroup-name
@@ -1058,7 +1070,7 @@ variable (string, integer, character, etc).")
     gnus-cache-removable-articles gnus-newsgroup-cached
     gnus-newsgroup-data gnus-newsgroup-data-reverse
     gnus-newsgroup-limit gnus-newsgroup-limits
-    gnus-newsgroup-charset)
+    gnus-newsgroup-charset gnus-newsgroup-emphasis-alist)
   "Variables that are buffer-local to the summary buffers.")
 
 ;; Byte-compiler warning.
@@ -1353,6 +1365,7 @@ increase the score of each group you read."
     "T" gnus-summary-limit-include-thread
     "d" gnus-summary-limit-exclude-dormant
     "t" gnus-summary-limit-to-age
+    "x" gnus-summary-limit-to-extra 
     "E" gnus-summary-limit-include-expunged
     "c" gnus-summary-limit-exclude-childless-dormant
     "C" gnus-summary-limit-mark-excluded-as-read)
@@ -1428,7 +1441,8 @@ increase the score of each group you read."
     "T" gnus-summary-refer-thread
     "g" gnus-summary-show-article
     "s" gnus-summary-isearch-article
-    "P" gnus-summary-print-article)
+    "P" gnus-summary-print-article
+    "t" gnus-article-babel)
 
   (gnus-define-keys (gnus-summary-wash-map "W" gnus-summary-mode-map)
     "b" gnus-article-add-buttons
@@ -1655,6 +1669,7 @@ increase the score of each group you read."
              ("Cache"
               ["Enter article" gnus-cache-enter-article t]
               ["Remove article" gnus-cache-remove-article t])
+	     ["Translate" gnus-article-babel t]
              ["Select article buffer" gnus-summary-select-article-buffer t]
              ["Enter digest buffer" gnus-summary-enter-digest-group t]
              ["Isearch article..." gnus-summary-isearch-article t]
@@ -1745,6 +1760,7 @@ increase the score of each group you read."
 	["Subject..." gnus-summary-limit-to-subject t]
 	["Author..." gnus-summary-limit-to-author t]
 	["Age..." gnus-summary-limit-to-age t]
+	["Extra..." gnus-summary-limit-to-extra t]
 	["Score" gnus-summary-limit-to-score t]
 	["Unread" gnus-summary-limit-to-unread t]
 	["Non-dormant" gnus-summary-limit-exclude-dormant t]
@@ -2388,7 +2404,8 @@ marks of articles."
 	  (gac gnus-article-current)
 	  (reffed gnus-reffed-article-number)
 	  (score-file gnus-current-score-file)
-	  (default-charset gnus-newsgroup-charset))
+	  (default-charset gnus-newsgroup-charset)
+	  (emphasis-alist gnus-newsgroup-emphasis-alist))
       (save-excursion
 	(set-buffer gnus-group-buffer)
 	(setq gnus-newsgroup-name name
@@ -2402,7 +2419,8 @@ marks of articles."
 	      gnus-original-article-buffer original
 	      gnus-reffed-article-number reffed
 	      gnus-current-score-file score-file
-	      gnus-newsgroup-charset default-charset)
+	      gnus-newsgroup-charset default-charset
+	      gnus-newsgroup-emphasis-alist emphasis-alist)
 	;; The article buffer also has local variables.
 	(when (gnus-buffer-live-p gnus-article-buffer)
 	  (set-buffer gnus-article-buffer)
@@ -3978,6 +3996,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
     (setq gnus-newsgroup-unselected nil)
     (setq gnus-newsgroup-unreads (gnus-list-of-unread-articles group))
     (gnus-summary-setup-default-charset)
+    (gnus-summary-setup-highlight-words)
 
     ;; Adjust and set lists of article marks.
     (when info
@@ -4251,27 +4270,24 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		(setq arts (cdr arts)))
 	      (setq list (cdr all)))))
 
-	  (when (gnus-check-backend-function 'request-set-mark
-					     gnus-newsgroup-name)
-	    ;; uncompressed:s are not proper flags (they are cons cells)
-	    ;; cache is a internal gnus flag
-	    (unless (memq (cdr type) (cons 'cache uncompressed))
-	      (let* ((old (cdr (assq (cdr type) (gnus-info-marks info))))
-		     (list (gnus-compress-sequence (sort list '<)))
-		     (del (gnus-remove-from-range old list))
-		     (add (gnus-remove-from-range list old)))
-		(if add
-		    (push (list add 'add (list (cdr type))) delta-marks))
-		(if del
-		    (push (list del 'del (list (cdr type))) delta-marks)))))
+       (or (memq (cdr type) uncompressed)
+           (setq list (gnus-compress-sequence (set symbol (sort list '<)) t)))
+       
+       (when (gnus-check-backend-function 'request-set-mark
+                                          gnus-newsgroup-name)
+         ;; uncompressed:s are not proper flags (they are cons cells)
+         ;; cache is a internal gnus flag
+         (unless (memq (cdr type) (cons 'cache uncompressed))
+           (let* ((old (cdr (assq (cdr type) (gnus-info-marks info))))
+                  (del (gnus-remove-from-range (gnus-copy-sequence old) list))
+                  (add (gnus-remove-from-range (gnus-copy-sequence list) old)))
+             (if add
+                 (push (list add 'add (list (cdr type))) delta-marks))
+             (if del
+                 (push (list del 'del (list (cdr type))) delta-marks)))))
 	  
 	(when list
-	  (push (cons (cdr type)
-		      (if (memq (cdr type) uncompressed) list
-			(gnus-compress-sequence
-			 (set symbol (sort list '<)) t)))
-		newmarked)))
-	
+         (push (cons (cdr type) list) newmarked)))
 
       (when delta-marks
 	(unless (gnus-check-group gnus-newsgroup-name)
@@ -4843,7 +4859,8 @@ executed with point over the summary line of the articles."
     `(let ((,articles (gnus-summary-work-articles ,arg)))
        (while ,articles
 	 (gnus-summary-goto-subject (car ,articles))
-	 ,@forms))))
+	 ,@forms
+	 (pop ,articles)))))
 
 (put 'gnus-summary-iterate 'lisp-indent-function 1)
 (put 'gnus-summary-iterate 'edebug-form-spec '(form body))
@@ -6112,7 +6129,7 @@ If given a prefix, remove all limits."
   "Limit the summary buffer to articles that are older than (or equal) AGE days.
 If YOUNGER-P (the prefix) is non-nil, limit the summary buffer to
 articles that are younger than AGE days."
-  (interactive "nTime in days: \nP")
+  (interactive "nLimit to articles older than (in days): \nP")
   (prog1
       (let ((data gnus-newsgroup-data)
 	    (cutoff (days-to-time age))
@@ -6129,6 +6146,30 @@ articles that are younger than AGE days."
 	      (push (gnus-data-number d) articles))))
 	(gnus-summary-limit (nreverse articles)))
     (gnus-summary-position-point)))
+
+(defun gnus-summary-limit-to-extra (header regexp)
+  "Limit the summary buffer to articles that match an 'extra' header."
+  (interactive
+   (let ((header
+	  (intern
+	   (gnus-completing-read
+	    (symbol-name (car gnus-extra-headers))	
+	    "Score extra header:"	
+	    (mapcar (lambda (x)	
+		      (cons (symbol-name x) x))
+		    gnus-extra-headers)
+	    nil			
+	    t))))
+     (list header
+	   (read-string (format "Limit to header %s (regexp): " header)))))
+  (when (not (equal "" regexp))
+    (prog1
+	(let ((articles (gnus-summary-find-matching
+			 (cons 'extra header) regexp 'all)))
+	  (unless articles
+	    (error "Found no matches for \"%s\"" regexp))
+	  (gnus-summary-limit articles))
+      (gnus-summary-position-point))))
 
 (defalias 'gnus-summary-delete-marked-as-read 'gnus-summary-limit-to-unread)
 (make-obsolete
@@ -6845,11 +6886,18 @@ in the comparisons."
   (let ((data (if (eq backward 'all) gnus-newsgroup-data
 		(gnus-data-find-list
 		 (gnus-summary-article-number) (gnus-data-list backward))))
-	(func `(lambda (h) (,(intern (concat "mail-header-" header)) h)))
 	(case-fold-search (not not-case-fold))
-	articles d)
-    (unless (fboundp (intern (concat "mail-header-" header)))
-      (error "%s is not a valid header" header))
+	articles d func)
+    (if (consp header)
+	(if (eq (car header) 'extra)
+	    (setq func
+		  `(lambda (h)
+		     (or (cdr (assq ',(cdr header) (mail-header-extra h)))
+			 "")))
+	  (error "%s is an invalid header" header))
+      (unless (fboundp (intern (concat "mail-header-" header)))
+	(error "%s is not a valid header" header))
+      (setq func `(lambda (h) (,(intern (concat "mail-header-" header)) h))))
     (while data
       (setq d (car data))
       (and (or (not unread)		; We want all articles...
@@ -7215,10 +7263,6 @@ and `request-accept' functions."
 	      (when gnus-use-cache
 		(gnus-cache-possibly-enter-article
 		 to-group to-article
-		 (let ((header (copy-sequence
-				(gnus-summary-article-header article))))
-		   (mail-header-set-number header to-article)
-		   header)
 		 (memq article gnus-newsgroup-marked)
 		 (memq article gnus-newsgroup-dormant)
 		 (memq article gnus-newsgroup-unreads)))
@@ -7885,7 +7929,6 @@ returned."
 	     (save-excursion
 	       (gnus-cache-possibly-enter-article
 		gnus-newsgroup-name article
-		(gnus-summary-article-header article)
 		(= mark gnus-ticked-mark)
 		(= mark gnus-dormant-mark) (= mark gnus-unread-mark))))
 
@@ -7931,7 +7974,6 @@ marked."
 	     (save-excursion
 	       (gnus-cache-possibly-enter-article
 		gnus-newsgroup-name article
-		(gnus-summary-article-header article)
 		(= mark gnus-ticked-mark)
 		(= mark gnus-dormant-mark) (= mark gnus-unread-mark))))
 
@@ -8774,11 +8816,8 @@ save those articles instead."
   (and (boundp group)
        (symbol-name group)
        (symbol-value group)
-       (memq 'respool
-	     (assoc (symbol-name
-		     (car (gnus-find-method-for-group
-			   (symbol-name group))))
-		    gnus-valid-select-methods))))
+       (gnus-get-function (gnus-find-method-for-group
+			   (symbol-name group)) 'request-accept-article t)))
 
 (defun gnus-read-move-group-name (prompt default articles prefix)
   "Read a group name."
@@ -8828,6 +8867,40 @@ save those articles instead."
 		  (error "Couldn't create group %s" to-newsgroup)))
 	  (error "No such group: %s" to-newsgroup)))
     to-newsgroup))
+
+(defun gnus-summary-save-parts (type dir n reverse)
+  "Save parts matching TYPE to DIR.
+If REVERSE, save parts that do not match TYPE."
+  (interactive
+   (list (read-string "Save parts of type: " "image/.*")
+	 (read-file-name "Save to directory: " t nil t)
+	 current-prefix-arg))
+  (gnus-summary-iterate n
+    (let ((gnus-display-mime-function nil)
+	  (gnus-inhibit-treatment t))
+      (gnus-summary-select-article))
+    (save-excursion
+      (set-buffer gnus-article-buffer)
+      (let ((handles (or (mm-dissect-buffer) (mm-uu-dissect))))
+	(when handles
+	  (gnus-summary-save-parts-1 type dir handles reverse))))))
+
+(defun gnus-summary-save-parts-1 (type dir handle reverse)
+  (if (stringp (car handle))
+      (mapcar (lambda (h) (gnus-summary-save-parts-1 type dir h reverse))
+	      (cdr handle))
+    (when (if reverse
+	      (not (string-match type (car (mm-handle-type handle))))
+	    (string-match type (car (mm-handle-type handle))))
+      (let ((file (expand-file-name
+		   (file-name-nondirectory
+		    (or
+		     (mail-content-type-get
+		      (mm-handle-disposition handle) 'filename)
+		     (concat gnus-newsgroup-name "." gnus-current-article)))
+		   dir)))
+	(unless (file-exists-p file)
+	  (mm-save-part-to-file handle file))))))
 
 ;; Summary extract commands
 
@@ -9457,6 +9530,25 @@ returned."
     (gnus-summary-position-point)
     (gnus-set-mode-line 'summary)
     n))
+
+;; Added by Shenghuo Zhu <zsh@cs.rochester.edu>
+(defun gnus-summary-setup-highlight-words (&optional highlight-words)
+  "Setup newsgroup emphasis alist."
+  (let ((name (and gnus-newsgroup-name
+		   (gnus-group-real-name gnus-newsgroup-name))))
+    (setq gnus-newsgroup-emphasis-alist 
+	  (nconc 
+	   (let ((alist gnus-group-highlight-words-alist) elem highlight)
+	     (while (setq elem (pop alist))
+	       (when (and name (string-match (car elem) name))
+		 (setq alist nil
+		       highlight (copy-list (cdr elem)))))
+	     highlight)
+	   (copy-list highlight-words)
+	   (if gnus-newsgroup-name
+	       (copy-list (gnus-group-find-parameter 
+			   gnus-newsgroup-name 'highlight-words t)))
+	   gnus-emphasis-alist))))
 
 (gnus-summary-make-all-marking-commands)
 
