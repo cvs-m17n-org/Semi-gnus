@@ -3287,39 +3287,44 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @item G P a
 @kindex G P a ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-alphabet
-$B%0%k!<%W$r!"%0%k!<%WL>$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^(B
+$B%0%k!<%W$r%0%k!<%WL>$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-alphabet})$B!#(B
 
 @item G P u
 @kindex G P u ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-unread
-$B%0%k!<%W$r!"L$FI5-;v$N?t$GJB$YBX$($^(B
+$B%0%k!<%W$rL$FI5-;v$N?t$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-unread})$B!#(B
 
 @item G P l
 @kindex G P l ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-level
-$B%0%k!<%W$r!"%0%k!<%W%l%Y%k$GJB$YBX$($^(B
+$B%0%k!<%W$r%0%k!<%W%l%Y%k$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-level})$B!#(B
 
 @item G P v
 @kindex G P v ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-score
-$B%0%k!<%W$r!"%0%k!<%W$N%9%3%"$GJB$YBX$($^(B
+$B%0%k!<%W$r%0%k!<%W$N%9%3%"$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-score})$B!#(B
 @xref{Group Score}.
 
 @item G P r
 @kindex G P r ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-rank
-$B%0%k!<%W$r!"%0%k!<%W$N%i%s%/$GJB$YBX$($^(B
+$B%0%k!<%W$r%0%k!<%W$N%i%s%/$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-rank})$B!#(B@xref{Group Score}.
 
 @item G P m
 @kindex G P m ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-method
-$B%0%k!<%W$r!"%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
+$B%0%k!<%W$r%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-method})$B!#(B
+
+@item G P s
+@kindex G P s ($B%0%k!<%W(B)
+@findex gnus-group-sort-selected-groups
+$B%0%k!<%W$r(B @code{gnus-group-sort-function} $B$K=>$C$FJB$YBX$($^$9!#(B
 @end table
 
 $B:G8e$K!"(B@kbd{C-k} $B$H(B @kbd{C-y} $B$r;H$C$F!"<jF0$G%0%k!<%W$r$"$A$3$A$K0\F0(B
@@ -6872,6 +6877,10 @@ Gnus $B$O$?$/$5$s$NJ}K!$G5-;v$rJ]B8$9$k;v$,$G$-$^$9!#0J2<$N$b$N$OHs>o$KN((B
 $B$k(B) $B$K$D$$$F$O(B@code{gnus-uu} $B$r;H$&$N$,NI$$$G$7$g(B
 $B$&(B (@pxref{Decoding Articles})$B!#(B
 
+$B$3$3$K:\$C$F$$$k%3%^%s%I$OBP>]$,%U%!%$%k$G$9!#%0%k!<%W$KJ]B8$7$?$$>l9g(B
+$B$O(B @kbd{B c} (@code{gnus-summary-copy-article}) $B%3%^%s%I$r;2>H$7$F2<$5(B
+$B$$(B (@pxref{Mail Group Commands})$B!#(B
+
 @vindex gnus-save-all-headers
 @code{gnus-save-all-headers} $B$,(B @code{nil} $B$G$J$$$H!"(Bgnus $B$O5-;v$rJ]B8$9(B
 $B$kA0$KK>$^$7$/$J$$%X%C%@!<$r>C5n$7$^$;$s!#(B
@@ -7922,9 +7931,9 @@ gnus $B$,5-;v$rI=<($9$k4{Dj$N$d$jJ}$rJQ$($?$$$H$-(B
 
 @item W v
 @kindex W v ($B35N,(B)
-@findex gnus-summary-verbose-header
+@findex gnus-summary-verbose-headers
 $B5-;v%P%C%U%!$K$9$Y$F$N%X%C%@!<$r1J1s$KI=<($9$k$+$I$&$+$r@Z$jBX$($^(B
-$B$9(B (@code{gnus-summary-verbose-header})$B!#(B
+$B$9(B (@code{gnus-summary-verbose-headers})$B!#(B
 
 @item W m
 @kindex W m ($B35N,(B)
@@ -10245,6 +10254,10 @@ Gnus $B$O$"$J$?$,Aw$C$?%a!<%k$H%K%e!<%9$rCy$a$F$*$/$?$a$N$$$/$D$+$N0c$C$?(B
 $B40A4$K6X;_$7$?$$$N$G$"$l$P!"(B
 $BJQ?t(B @code{gnus-message-archive-group} $B$O(B @code{nil} $B$K$J$k$Y$-$G!"$3$l(B
 $B$,%G%#%U%)%k%H$G$9!#(B
+
+$B$"$J$?$,FI$s$G6=L#$r;}$C$?%a%C%;!<%8$r%0%k!<%W$KJ]B8$9$k$K(B
+$B$O(B @kbd{B c} (@code{gnus-summary-copy-article}) $B%3%^%s%I$r;2>H$7$F2<$5(B
+$B$$(B (@pxref{Mail Group Commands})$B!#(B
 
 @vindex gnus-message-archive-method
 @code{gnus-message-archive-method} $B$OAw$C$?%a%C%;!<%8$rC_@Q$9$k$?$a$K$I(B

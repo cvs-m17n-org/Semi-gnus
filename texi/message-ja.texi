@@ -223,9 +223,14 @@ Message $B$OJVEz$,2?=h$K9T$/$+$r7hDj$9$k$?$a$KIaDL$NJ}K!$r;H$$$^$9$,!"(B
 $BJQ99$9$k;v$,$G$-$^$9!#$=$l$O(B @code{message-reply-to-function} $B$HF1$8$h$&(B
 $B$K;H$o$l$^$9(B (@pxref{Reply})$B!#(B
 
-@findex message-dont-reply-to-names
+@vindex message-dont-reply-to-names
 $B@55,I=8=(B @code{rmail-dont-reply-to-names} $B$K9gCW$9$k%"%I%l%9$O(B @code{Cc}
 $B%X%C%@!<$+$i<h$j=|$+$l$^$9!#(B
+
+@vindex message-wide-reply-confirm-recipients
+@code{message-wide-reply-confirm-recipients} $B$,Hs(B-@code{nil} $B$@$C$?$i!"(B
+$BJ#?t$N<u<h?M$KJV?.$9$k$+$I$&$+$N3NG'$r5a$a$i$l$^$9!#%G%#%U%)%k%H(B
+$B$O(B @code{nil} $B$G$9!#(B
 
 @node Followup
 @section $B%U%)%m!<%"%C%W(B
@@ -252,6 +257,10 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 
 @findex message-cancel-news
 $BL?Na(B @code{message-cancel-news} $B$O8=:_$N%P%C%U%!$N5-;v$r<h$j>C$7$^$9!#(B
+
+@vindex message-cancel-message
+@code{message-cancel-message} $B$NCM$,<h$j>C$75-;v$NK\J8$KA^F~$5$l$^$9!#%G%#(B
+$B%U%)%k%H$O(B @samp{I am canceling my own article.} $B$G$9!#(B
 
 @node Superseding
 @section $BBeBX(B
@@ -313,6 +322,11 @@ included as inline @sc{mime} RFC822 parts.  If it's @code{nil}, forwarded
 messages will just be copied inline to the new message, like previous,
 non @sc{mime}-savvy versions of gnus would do.
 @end ignore
+
+@item message-forward-before-signature
+@vindex message-forward-before-signature
+$BHs(B-@code{nil} $B$@$C$?$i=pL>$NA0$K!"$=$l0J30$@$C$?$i8e$K!"E>Aw$9$k%a%C%;!<(B
+$B%8$rCV$-$^$9!#(B
 @end table
 
 @node Resending
@@ -421,6 +435,7 @@ gnus $B$K$O$3$NJQ?t$N9%E,$J8uJd$G$"$k$H$3$m$N!"$"$i$+$8$aDj5A$5$l$F$$$k4X(B
       '(gnus-find-subscribed-addresses))
 @end lisp
 
+@vindex message-subscribed-address-file
 @item message-subscribed-address-file
 $B$"$J$?$O$b$7$+$7$?$i?l68$J?M(B ($B86E5(B: one organised human freak) $B$G!"9XFI(B
 $B$7$F$$$k$9$Y$F$N%a!<%j%s%0%j%9%H$N%"%I%l%9$N%j%9%H$rJL%U%!%$%k$G;}$C$F$$(B
@@ -875,6 +890,7 @@ documentation of your OpenPGP implementation, so we refer to it.
 @item C-c C-e
 @kindex C-c C-e
 @findex message-elide-region
+@vindex message-elide-ellipsis
 $B%]%$%s%H$H%^!<%/$N4V$NJ8$r>J$-$^$9(B (@code{message-elide-region})$B!#J8>O$O(B
 $B@Z$i$l$F(B (killed) $BJQ?t(B @code{message-elide-ellipsis} $B$NCM$GCV$-49$($i$l(B
 $B$^$9!#%G%#%U%)%k%H$N>JN,Id9f$H$7$F;H$o$l$kCM$O(B (@samp{[...]}) $B$G$9!#(B
@@ -929,6 +945,13 @@ documentation of your OpenPGP implementation, so we refer to it.
 $BJVEz$7$F$$$k5-;v$N(B @code{Followup-To} $B$b$7$/$O!"(B@code{Nesgroups} $B%X%C%@!<(B
 $B$rH?1G$7$?(B @code{Newsgroups} $B%X%C%@!<$rA^F~$7$^(B
 $B$9(B (@code{message-insert-newsgroups})$B!#(B
+
+@item C-c C-o
+@kindex C-c C-o
+@findex message-sort-headers
+@vindex message-header-format-alist
+@code{message-header-format-alist} $B$K=>$C$F%X%C%@!<$rJB$YBX$($^(B
+$B$9(B (@code{message-sort-headers})$B!#(B
 
 @item C-c M-r
 @kindex C-c M-r
@@ -1198,10 +1221,37 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 $B$J$?$N(B MH $B$,$3$l$i$N%X%C%@!<$r07$($k$N$G$"$l$P!"$=$l$r(B @code{nil} $B$K@_Dj(B
 $B$7$F2<$5$$!#(B
 
+@item message-qmail-inject-program
+@vindex message-qmail-inject-program
+@cindex qmail
+qmail-inject $B%W%m%0%i%`$G$9!#(B
+
+@item message-qmail-inject-args
+@vindex message-qmail-inject-args
+qmail-inject $B%W%m%0%i%`$KEO$90z?t$G$9!#$3$l$OJ8;zNs$N%j%9%H$G!"$=$l$>$l(B
+$B$N0z?t$O0l$D$NJ8;zNs$G$J$1$l$P$J$j$^$;$s!#$3$l$O4X?t$G$bNI$$$G$9!#(B
+
+$BNc$($P!"@5$7$$>l=j$KD7$MJV$7$?$j!"%a!<%j%s%0%j%9%H$N47=,$K=>$&$?$a(B
+$B$K(B envelope sender $B$N%"%I%l%9$r@_Dj$7$?$$>l9g$O!"$3$NJQ?t(B
+$B$r(B @code{'("-f" "you@@some.where")} $B$K@_Dj$9$l$PNI$$$G$7$g$&!#(B
+
+@item message-sendmail-f-is-evil
+@vindex message-sendmail-f-is-evil
+@cindex sendmail
+$BHs(B-@code{nil} $B$G(B sendmail $B$N%3%^%s%I9T$K(B @samp{-f username} $B$rIU2C$7$^$;(B
+$B$s!#$=$&$9$k$3$H$O!"IU2C$7$J$$$h$j<Y0-$G$9$i$"$k$G$7$g$&!#(B
+
+@item message-mailer-swallows-blank-line
+@vindex message-mailer-swallows-blank-line
+$B%7%9%F%`$N%a%$%i!<$,%X%C%@!<$HK\J8$r0l=o$K$7$F$7$^$&>l9g$O!"(B
+$BHs(B-@code{nil} $B$K@_Dj$7$F2<$5$$!#(B(Sunos 4 $B$G(B sendmail $B$,%j%b!<%H%b!<%I$G(B
+$BF0:n$9$k>l9g$,3:Ev$7$^$9!#(B) $BCM$O!">c32$,<B:]$K5/$-$k$+$I$&$+$r%F%9%H$9$k(B
+$B$?$a$N<0$K$9$Y$-$G$9!#(B
+
 @c @item message-send-mail-partially-limit
 @c @vindex message-send-mail-partially-limit
 @c The limitation of messages sent as message/partial.
-@c The lower bound of message size in characters, beyond which the message 
+@c The lower bound of message size in characters, beyond which the message
 @c should be sent in several parts. If it is nil, the size is unlimited.
 @end table
 
@@ -1234,6 +1284,8 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 
 @item Organization
 @cindex organization
+@vindex message-user-organization
+@vindex message-user-organization-file
 $B$3$NA*BrG$0U$J%X%C%@!<$OJQ?t(B @code{message-user-organization} $B$K0MB8$7$F(B
 $B:n@.$5$l$^$9!#$b$7$3$NJQ?t$,(B @code{t} $B$G$"$l$P!"(B
 @code{message-user-organization-file} $B$,;H$o$l$^$9!#$3$NJQ?t$OJ8;zNs$G$"(B
@@ -1267,17 +1319,20 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 
 @item Expires
 @cindex Expires
+@vindex message-expires
 $B$3$NHs>o$KA*Br<+M3$J%X%C%@!<$OJQ?t(B @code{message-expires} $B$K$7$?$,$C$FA^(B
 $BF~$5$l$^$9!#$3$l$O<+J,$,2?$r$7$F$$$k$+$rCN$i$J$$8B$j!";HMQ$OA4$/4+$a$i$l(B
 $B$^$;$s!#(B
 
 @item Distribution
 @cindex Distribution
+@vindex message-distribution-function
 $B$3$NA*Br<+M3$J%X%C%@!<$OJQ?t(B @code{message-distribution-function} $B$K$7$?(B
 $B$,$C$F:n$i$l$^$9!#$=$l$OHs?d>)$G!"Hs>o$K8m2r$5$l$?%X%C%@!<$G$9!#(B
 
 @item Path
 @cindex path
+@vindex message-user-path
 $B$3$NHs>o$KA*Br<+M3$J%X%C%@!<$O$*$=$i$/7h$7$F;H$o$l$F$O$J$i$J$$$G$7$g$&!#(B
 $B$7$+$7$$$/$D$+$N(B @emph{$B$H$F$b(B} $B8E$$%5!<%P!<$O$3$N%X%C%@!<$,B8:_$9$k;v$r(B
 $BMW5a$7$^$9!#(B@code{message-user-path} $B$,$3$N(B @code{Path} $B%X%C%@!<$,$I$N$h(B
@@ -1545,6 +1600,12 @@ follows this line--} $B$G$9!#(B
 $BB?$/$N%a!<%k$N$b$N$+$i;H$o$l$k%G%#%l%/%H%j!<$G$9!#=i4|CM(B
 $B$O(B @file{~/Mail/} $B$G$9!#(B
 
+@item message-auto-save-directory
+@vindex message-auto-save-directory
+gnus $B$,F0:n$7$F$$$J$$$H$-$K(B Message $B$,%P%C%U%!$r<+F0J]B8$9$k%G%#%l%/%H%j(B
+$B$G$9!#(B@code{nil} $B$@$C$?$i(B Message $B$O<+F0J]B8$r9T$J$$$^$;$s!#%G%#%U%)%k%H(B
+$B$O(B @file{~/Mail/drafts/} $B$G$9!#(B
+
 @item message-signature-setup-hook
 @vindex message-signature-setup-hook
 $B%a%C%;!<%8%P%C%U%!$r=i4|2=$9$k$H$-$K<B9T$5$l$k%U%C%/$G$9!#$=$l$O%X%C%@!<(B
@@ -1604,9 +1665,22 @@ follows this line--} $B$G$9!#(B
 @vindex message-sent-hook
 $B%a%C%;!<%8$rAw$k8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 
+@item message-cancel-hook
+@vindex message-cancel-hook
+$B%K%e!<%95-;v$r<h$j>C$9$H$-$K<B9T$5$l$k%U%C%/$G$9!#(B
+
 @item message-mode-syntax-table
 @vindex message-mode-syntax-table
 $B%a%C%;!<%8%b!<%I%P%C%U%!$G;H$o$l$k9=J8%F!<%V%k$G$9!#(B
+
+@item message-strip-special-text-properties
+@vindex message-strip-special-text-properties
+Emacs $B$O%a%C%;!<%8:n@.$r$$$m$$$m$K2u$7$F$7$^$&$3$H$,$G$-$kB?$/$N%F%-%9%H(B
+$BB0@-(B (text properties) $B$r;}$C$F$$$^$9!#$3$l$,@_Dj$5$l$F$$$k$H(B message $B$O(B
+$B$=$l$i$NB0@-$r%a%C%;!<%8$r:n@.$9$k%P%C%U%!$+$iGm$.<h$j$^$9!#$7$+$7$$$/$D(B
+$B$+$N%Q%C%1!<%8$O!"F0:n$9$k$?$a$K$=$l$i$NB0@-$,$"$k$3$H$,I,MW$G$9!#$=$l$i(B
+$B$N%Q%C%1!<%8$N0l$D$r;H$&$J$i$P!"$3$N%*%W%7%g%s$r(B off $B$K$7$F!"%a%C%;!<%8(B
+$B$,2u$l$F$7$^$o$J$$$3$H$r5'$C$F2<$5$$!#(B
 
 @item message-send-method-alist
 @vindex message-send-method-alist
@@ -1661,6 +1735,12 @@ been posted to %s as well.\n\n"} $B$G$9!#(B
 @c @vindex message-fcc-externalize-attachments
 @c If @code{nil}, attach files as normal parts in Fcc copies; if it is
 @c non-@code{nil}, attach local files as external parts.
+
+@item message-interactive
+@vindex message-interactive
+$BHs(B-@code{nil} $B$G!"%a%C%;!<%8$rAw?.$9$k$H$-$K%(%i!<$,=P$k$N$rBT$C$F$rI=<((B
+$B$7$^$9!#(B@code{nil} $B$@$C$?$i!"%a%$%i!<$K%(%i!<$NJs9p$r%a!<%k$G9T$J$o$;$^(B
+$B$9!#(B
 @end table
 
 @node Message Buffers

@@ -1004,14 +1004,6 @@ If nil, Message won't auto-save."
   :group 'message-buffers
   :type '(choice directory (const :tag "Don't auto-save" nil)))
 
-(defcustom message-buffer-naming-style 'unique
-  "*The way new message buffers are named.
-Valid valued are `unique' and `unsent'."
-  :version "21.1"
-  :group 'message-buffers
-  :type '(choice (const :tag "unique" unique)
-		 (const :tag "unsent" unsent)))
-
 (defcustom message-default-charset
   (and (featurep 'xemacs) (not (featurep 'mule)) 'iso-8859-1)
   "Default charset used in non-MULE XEmacsen."
@@ -4560,7 +4552,9 @@ give as trustworthy answer as possible."
 (defun message-make-mft ()
   "Return the Mail-Followup-To header."
   (let* ((case-fold-search t)
-	 (msg-recipients (message-options-get 'message-recipients))
+	 (to (message-fetch-field "To"))
+	 (cc (message-fetch-field "cc"))
+	 (msg-recipients (concat to (and to cc ", ") cc))
 	 (recipients
 	  (mapcar 'mail-strip-quoted-names
 		  (message-tokenize-header msg-recipients)))
@@ -6091,35 +6085,37 @@ which specify the range to operate on."
 (defun message-tool-bar-map ()
   (or message-tool-bar-map
       (setq message-tool-bar-map
-	    (and (fboundp 'tool-bar-add-item-from-menu)
-		 tool-bar-mode
-		 (let ((tool-bar-map (copy-keymap tool-bar-map))
-		       (load-path (mm-image-load-path)))
-		   ;; Zap some items which aren't so relevant and take
-		   ;; up space.
-		   (dolist (key '(print-buffer kill-buffer save-buffer
-					       write-file dired open-file))
-		     (define-key tool-bar-map (vector key) nil))
-		   (tool-bar-add-item-from-menu
-		    'message-send-and-exit "mail_send" message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'message-kill-buffer "close" message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'message-dont-send "cancel" message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'mime-edit-insert-file "attach" message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'ispell-message "spell" message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'message-insert-importance-high "important"
-		    message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'message-insert-importance-low "unimportant"
-		    message-mode-map)
-		   (tool-bar-add-item-from-menu
-		    'message-insert-disposition-notification-to "receipt"
-		    message-mode-map)
-		   tool-bar-map)))))
+	    (and
+	     (condition-case nil (require 'tool-bar) (error nil))
+	     (fboundp 'tool-bar-add-item-from-menu)
+	     tool-bar-mode
+	     (let ((tool-bar-map (copy-keymap tool-bar-map))
+		   (load-path (mm-image-load-path)))
+	       ;; Zap some items which aren't so relevant and take
+	       ;; up space.
+	       (dolist (key '(print-buffer kill-buffer save-buffer
+					   write-file dired open-file))
+		 (define-key tool-bar-map (vector key) nil))
+	       (tool-bar-add-item-from-menu
+		'message-send-and-exit "mail_send" message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'message-kill-buffer "close" message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'message-dont-send "cancel" message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'mime-edit-insert-file "attach" message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'ispell-message "spell" message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'message-insert-importance-high "important"
+		message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'message-insert-importance-low "unimportant"
+		message-mode-map)
+	       (tool-bar-add-item-from-menu
+		'message-insert-disposition-notification-to "receipt"
+		message-mode-map)
+	       tool-bar-map)))))
 
 ;;; Group name completion.
 

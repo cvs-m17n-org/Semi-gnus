@@ -1,3 +1,87 @@
+2002-04-07  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text-html-render-with-w3): Don't ignore
+	errors when debug.
+
+2002-04-07  Josh Huber  <huber@alum.wpi.edu>
+
+	* message.el (message-make-mft): Changed MFT code from using
+	message-recipients (which included Bcc) to use only the To and CC
+	headers.
+
+2002-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus-art.el (gnus-treat-from-picon): Add to gnus-picon group and
+	add link.
+	(gnus-treat-mail-picon): Ditto.
+	(gnus-treat-newsgroups-picon): Ditto.
+	(gnus-picon-databases): Fix custom type.
+	(gnus-picon-databases): Add link.
+	(gnus-article-x-face-command): Add to gnus-picon group.
+
+2002-04-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.el (message-buffer-naming-style): Remove.
+	
+2002-04-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-make-tool-bar): Load tool-bar first.
+
+	* message.el (message-tool-bar-map): Ditto.
+
+	* gnus-sum.el (gnus-summary-make-tool-bar): Ditto.
+
+2002-04-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el (nnwarchive-mail-archive-article): Fix typo.
+
+2002-04-01  Paul Jarc  <prj@po.cwru.edu>
+
+	* nnmaildir.el: fixed some buggy invocations of nnmaildir--pgname.
+
+2002-03-31  Andrew Cohen  <cohen@andy.bu.edu>
+
+	* dns.el: open-network-stream under XEmacs does udp.
+
+2002-03-31  Lars Magne Ingebrigtsen  <larsi@quimbies.gnus.org>
+
+	* spam.el (spam-enter-whitelist): New function.
+	(spam-parse-whitelist): Ditto.
+	(spam-refresh-list-cache): Ditto.
+	(spam-address-whitelisted-p): New function.
+
+	* dns.el (query-dns): Use TCP when make-network-process isn't
+	available. 
+	(dns-servers): New variable.
+	(dns-parse-resolv-conf): New function.
+	(query-dns): Use it.
+
+	* spam.el: New file.
+
+	* dns.el (query-dns): Test.
+
+2002-03-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lpath.el (featurep): Bind make-network-process.
+
+2002-03-31  Paul Jarc <prj@po.cwru.edu>
+
+	* nnmaildir.el: Use defstruct.  Use a single copy of
+	nnmail-extra-headers to save memory.  Store server's group name
+	prefix instead of each group's prefixed name.
+	* nnnil.el (nnnil-retrieve-headers, nnnil-request-list): Erase
+	nntp-server-buffer.
+
+2002-03-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dns.el: New file.
+
+2002-03-28  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-summary-dummy-line-format):
+	* gnus.el (gnus-summary-line-format): Fixing links to Info.
+	Trivial change from Bj,Av(Brn Torkelsson <torkel@pdc.kth.se>.
+
 2002-03-29  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-sum.el (gnus-summary-move-article)

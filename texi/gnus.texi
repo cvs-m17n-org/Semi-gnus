@@ -3238,6 +3238,11 @@ Sort the groups by group rank
 Sort the groups alphabetically by back end name
 (@code{gnus-group-sort-selected-groups-by-method}).
 
+@item G P s
+@kindex G P s (Group)
+@findex gnus-group-sort-selected-groups
+Sort the groups according to @code{gnus-group-sort-function}.
+
 @end table
 
 And finally, note that you can use @kbd{C-k} and @kbd{C-y} to manually
@@ -6958,6 +6963,10 @@ processing of the article is done before it is saved).  For a different
 approach (uudecoding, unsharing) you should use @code{gnus-uu}
 (@pxref{Decoding Articles}).
 
+For the commands listed here, the target is a file.  If you want to
+save to a group, see the @kbd{B c} (@code{gnus-summary-copy-article})
+command (@pxref{Mail Group Commands}).
+
 @vindex gnus-save-all-headers
 If @code{gnus-save-all-headers} is non-@code{nil}, gnus will not delete
 unwanted headers before saving the article.
@@ -8063,9 +8072,9 @@ Toggle whether to display all headers in the article buffer
 
 @item W v
 @kindex W v (Summary)
-@findex gnus-summary-verbose-header
+@findex gnus-summary-verbose-headers
 Toggle whether to display all headers in the article buffer permanently
-(@code{gnus-summary-verbose-header}).
+(@code{gnus-summary-verbose-headers}).
 
 @item W m
 @kindex W m (Summary)
@@ -10739,6 +10748,10 @@ send.  The default method is to use the @dfn{archive virtual server} to
 store the messages.  If you want to disable this completely, the
 @code{gnus-message-archive-group} variable should be @code{nil}, which
 is the default.
+
+For archiving interesting messages in a group you read, see the
+@kbd{B c} (@code{gnus-summary-copy-article}) command (@pxref{Mail
+Group Commands}).
 
 @vindex gnus-message-archive-method
 @code{gnus-message-archive-method} says what virtual server gnus is to
