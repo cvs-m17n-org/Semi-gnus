@@ -1,3 +1,25 @@
+1999-02-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.4.
+
+	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `nnheader-nov-field',
+	`nnheader-nov-read-integer' and `nnheader-nov-read-message-id'
+	instead of `gnus-nov-field', `gnus-nov-read-integer' or
+	`nnheader-generate-fake-message-id'; use `eobp' instead of
+	`(= (following-char) ?\n)' for checking whether a misc field
+	exists or not.
+	(gnus-nov-field): Abolished.
+	(gnus-nov-skip-field): Abolished.
+	(gnus-nov-read-integer): Abolished.
+
+	* lisp/nnheader.el (nnheader-parse-nov): Use
+	`nnheader-nov-read-message-id' instead of `nnheader-nov-field' or
+	`nnheader-generate-fake-message-id'.
+	(nnheader-nov-read-message-id): New macro.
+	(nnheader-nov-read-integer): New implementation.
+	(nnheader-nov-field): New implementation.
+	(nnheader-nov-next-field): New macro.
+
 1999-02-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `following-char'
