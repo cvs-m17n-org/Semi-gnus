@@ -1325,8 +1325,6 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
-    (gnus-treat-hide-citation gnus-article-hide-citation)
-    (gnus-treat-hide-citation-maybe gnus-article-hide-citation-maybe)
     (gnus-treat-strip-list-identifiers gnus-article-hide-list-identifiers)
     (gnus-treat-leading-whitespace gnus-article-remove-leading-whitespace)
     (gnus-treat-strip-pgp gnus-article-hide-pgp)
@@ -1335,7 +1333,6 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-mail-picon gnus-treat-mail-picon)
     (gnus-treat-newsgroups-picon gnus-treat-newsgroups-picon)
     (gnus-treat-highlight-headers gnus-article-highlight-headers)
-    (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
     (gnus-treat-strip-trailing-blank-lines
      gnus-article-remove-trailing-blank-lines)
@@ -1354,6 +1351,9 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-display-smileys gnus-treat-smiley)
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
     (gnus-treat-emphasize gnus-article-emphasize)
+    (gnus-treat-hide-citation gnus-article-hide-citation)
+    (gnus-treat-hide-citation-maybe gnus-article-hide-citation-maybe)
+    (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-body-boundary gnus-article-treat-body-boundary)
     (gnus-treat-play-sounds gnus-earcon-display)))
 
@@ -5174,9 +5174,9 @@ The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive "P")
   (let ((article (cdr gnus-article-current)) cont)
-    (if (not (mark))
+    (if (not (mark t))
 	(gnus-summary-reply (list (list article)) wide)
-      (setq cont (buffer-substring (point) (mark)))
+      (setq cont (buffer-substring (point) (mark t)))
       ;; Deactivate active regions.
       (when (and (boundp 'transient-mark-mode)
 		 transient-mark-mode)
@@ -5191,9 +5191,9 @@ the entire article will be yanked."
   (interactive)
   (let ((article (cdr gnus-article-current))
 	cont)
-    (if (not (mark))
+    (if (not (mark t))
 	(gnus-summary-followup (list (list article)))
-      (setq cont (buffer-substring (point) (mark)))
+      (setq cont (buffer-substring (point) (mark t)))
       ;; Deactivate active regions.
       (when (and (boundp 'transient-mark-mode)
 		 transient-mark-mode)

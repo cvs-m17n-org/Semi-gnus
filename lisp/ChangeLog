@@ -1,3 +1,36 @@
+2002-02-04  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-url.el (mm-url-load-url): New function.
+	(mm-url-insert-file-contents): Use it.
+
+	* gnus-msg.el (gnus-summary-mail-forward): Use gnus-article-charset.
+
+	* message.el (message-forward-make-body): Correctly copy
+	forward-buffer.
+
+	* rfc2047.el (rfc2047-decode-region): Don't decode us-ascii characters.
+	
+2002-02-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-art.el (gnus-article-followup-with-original): Mark with
+	force, prevent errors when following up from article buffer.
+	(gnus-article-reply-with-original): Ditto.
+
+	* binhex.el (binhex-decoder-switches): Fix doc.  From
+	Pavel@Janik.cz (Pavel Jan,Bm(Bk).
+
+2002-02-04  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-treatment-function-alist): Move hide-citation,
+	highlight-citation after emphasize.
+
+2002-02-04  Simon Josefsson  <jas@extundo.com>
+
+	* nnfolder.el (nnfolder-open-marks): 
+
+	* nnml.el (nnml-open-marks): Message when done.  From David
+	Edmondson <dme@sun.com>.
+
 2002-02-03  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	
 	* imap.el (imap-anonymous-auth): Fix typo. 

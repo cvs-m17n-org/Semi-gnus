@@ -5723,6 +5723,8 @@ Optional NEWS will use news to forward instead of mail."
 (defun message-forward-make-body (forward-buffer)
   ;; Put point where we want it before inserting the forwarded
   ;; message.
+  ;; Note that this function definition for T-gnus is totally different
+  ;; from the original Gnus."
   (if message-forward-before-signature
       (message-goto-body)
     (goto-char (point-max)))

@@ -1150,7 +1150,10 @@ The original article will be yanked."
 (defun gnus-summary-mail-forward (&optional full-headers post)
   "Forward the current message(s) to another user.
 If process marks exist, forward all marked messages;
-If FULL-HEADERS (the prefix), include full headers when forwarding."
+If FULL-HEADERS (the prefix), include full headers when forwarding.
+
+Note that this function definition for T-gnus is totally different
+from the original Gnus."
   (interactive "P")
   (if (null (cdr (gnus-summary-work-articles nil)))
       (gnus-setup-message 'forward
