@@ -7,6 +7,18 @@
 	Use `std11-extract-address-components'.
 	(message-use-mail-reply-to): Doc fix.
 
+1998-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-spec.el (gnus-parse-simple-format): Use
+	`gnus-tilde-pad-form' instead of the padding faculty of `format'
+	under XEmacs-mule.
+
+	* lisp/gnus-xmas.el
+	(gnus-xmas-redefine): Redifine `gnus-truncate-string',
+	`gnus-tilde-max-form' and `gnus-tilde-cut-form' for XEmacs-mule.
+	(gnus-xmas-define): New function 'gnus-tilde-pad-form' for
+	XEmacs-mule.
+
 1998-08-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
