@@ -68,7 +68,6 @@
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-sum)
-(require 'std11)
 
 
 (defgroup gnus-namazu nil
@@ -276,7 +275,7 @@ options make any sense in this context."
        (bufferp gnus-namazu/read-query-original-buffer)
        (with-current-buffer gnus-namazu/read-query-original-buffer
 	 (when (eq major-mode 'gnus-summary-mode)
-	   (cadr (std11-extract-address-components
+	   (cadr (mail-extract-address-components
 		  (mail-header-from
 		   (gnus-summary-article-header))))))))
 

@@ -1,5 +1,10 @@
 2001-09-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-namazu.el (top): Not require `std11'.
+	(gnus-namazu/get-current-from): Use
+	`mail-extract-address-components' instead of
+	`std11-extract-address-components'.
+
 	* lisp/gnus-namazu.el: New file.
 
 	* lisp/gnus.el (top): Add autoload of `gnus-namazu-search'.
