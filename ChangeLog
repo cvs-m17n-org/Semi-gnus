@@ -1,3 +1,8 @@
+2003-05-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Check whether
+	Mule 2 is running.
+
 2003-05-14  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
 
 	* lisp/gnus-msg.el (gnus-user-agent): Added `gnus-mime-edit'.
