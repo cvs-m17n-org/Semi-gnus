@@ -233,6 +233,10 @@ any confusion."
   :group 'message-various
   :type 'regexp)
 
+;;; Some sender agents encode the whole subject including leading "Re: ".
+;;; And if followup agent does not decode it for some reason (e.g. unknown
+;;; charset) and just add a new "Re: " in front of the encoded-word, the
+;;; result will contain multiple "Re: "'s.
 (defcustom message-subject-encoded-re-regexp
   (concat
    "^[ \t]*"
@@ -262,13 +266,13 @@ an encoded-word."
   :type 'regexp)
 
 (defcustom message-use-subject-re t
-  "*If non-nil, remove any (buggy) \"Re: \"'s from the subject of the
-precursor and add a new \"Re: \".  If nil, use the subject \"as-is\".
-If it is the symbol `guess', try to find \"Re: \" within an encoded-word."
+  "*If t, remove any (buggy) \"Re: \"'s from the subject of the precursor
+and add a new \"Re: \".  If it is nil, use the subject \"as-is\".  If it
+is the symbol `guess', try to detect \"Re: \" within an encoded-word."
   :group 'message-various
   :type '(choice (const :tag "off" nil)
-		 (const :tag "on" t)
-		 (const guess)))
+                 (const :tag "on" t)
+                 (const guess)))
 
 ;;;###autoload
 (defcustom message-signature-separator "^-- *$"
