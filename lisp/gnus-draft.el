@@ -98,6 +98,11 @@
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup-for-editing article gnus-newsgroup-name)
+    (set-buffer-modified-p t)
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers)
+	(message-remove-header "date")))
     (message-save-drafts)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
@@ -118,8 +123,8 @@
     (while (setq article (pop articles))
       (gnus-summary-remove-process-mark article)
       (unless (memq article gnus-newsgroup-unsendable)
-	(let ((message-sending-message 
-	       (format "Sending message %d of %d..." 
+	(let ((message-sending-message
+	       (format "Sending message %d of %d..."
 		       (- total (length articles)) total)))
 	  (gnus-draft-send article gnus-newsgroup-name t))
 	(gnus-summary-mark-article article gnus-canceled-mark)))))
@@ -128,7 +133,7 @@
   "Send message ARTICLE."
   (let ((message-syntax-checks (if interactive nil
 				 'dont-check-for-anything-just-trust-me))
-	(message-inhibit-body-encoding (or (not group) 
+	(message-inhibit-body-encoding (or (not group)
 					   (equal group "nndraft:queue")
 					   message-inhibit-body-encoding))
 	(message-send-hook (and group (not (equal group "nndraft:queue"))
@@ -157,17 +162,14 @@
 		    (function
 		     (lambda ()
 		       (interactive)
-		       (funcall message-send-news-function method)
-		       )))
-		   (funcall message-send-news-function method)
-		   )
+		       (funcall message-send-news-function method))))
+		   (funcall message-send-news-function method))
 		  ((eq type 'mail)
 		   (mime-edit-maybe-split-and-send
 		    (function
 		     (lambda ()
 		       (interactive)
-		       (funcall message-send-mail-function)
-		       )))
+		       (funcall message-send-mail-function))))
 		   (funcall message-send-mail-function)
 		   t)))
       (let ((gnus-verbose-backends nil))
@@ -243,6 +245,7 @@
 	  (forward-line 1)
 	  (setq ga (message-fetch-field gnus-draft-meta-information-header))
 	  (message-set-auto-save-file-name))))
+    (gnus-backlog-remove-article group narticle)
     (when (and ga
 	       (ignore-errors (setq ga (car (read-from-string ga)))))
       (setq message-post-method
@@ -260,8 +263,7 @@
     (set-buffer gnus-draft-send-draft-buffer)
     (erase-buffer)
     (if (not (gnus-request-restore-buffer article group))
-	(error "Couldn't restore the article")
-      )))
+	(error "Couldn't restore the article"))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."
