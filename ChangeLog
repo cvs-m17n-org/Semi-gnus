@@ -1,5 +1,15 @@
 2000-04-27  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
+	* Nana-gnus: Version 7.1.0.18 (This is alpha status.)
+	Fix a bug.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.18.
+
+	* lisp/pop3.el (pop3-retr): Fix bug.
+	(pop3-movemail):  Fix bug.
+
+2000-04-27  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
 	* Nana-gnus: Version 7.1.0.17 (This is alpha status.)
 	Only sync up with Gnus 5.8.5.
 
