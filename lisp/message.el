@@ -1167,27 +1167,51 @@ candidates:
   "Face used for displaying MML."
   :group 'message-faces)
 
+(defun message-font-lock-make-header-matcher (regexp)
+  (let ((form
+	 `(lambda (limit)
+	    (let ((start (point)))
+	      (save-restriction
+		(widen)
+		(goto-char (point-min))
+		(if (re-search-forward
+		     (concat "^" (regexp-quote mail-header-separator) "$")
+		     nil t)
+		    (setq limit (min limit (match-beginning 0))))
+		(goto-char start))
+	      (and (< start limit)
+		   (re-search-forward ,regexp limit t))))))
+    (if (featurep 'bytecomp)
+	(byte-compile form)
+      form)))
+
 (defvar message-font-lock-keywords
   (let ((content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)\n?"))
-    `((,(concat "^\\([Tt]o:\\)" content)
+    `((,(message-font-lock-make-header-matcher
+	 (concat "^\\([Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-to-face nil t))
-      (,(concat "^\\([GBF]?[Cc][Cc]:\\|[Rr]eply-[Tt]o:\\|"
-		"[Mm]ail-[Cc]opies-[Tt]o:\\|"
-		"[Mm]ail-[Rr]eply-[Tt]o:\\|"
-		"[Mm]ail-[Ff]ollowup-[Tt]o:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([GBF]?[Cc][Cc]:\\|[Rr]eply-[Tt]o:\\|"
+		 "[Mm]ail-[Cc]opies-[Tt]o:\\|"
+		 "[Mm]ail-[Rr]eply-[Tt]o:\\|"
+		 "[Mm]ail-[Ff]ollowup-[Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-cc-face nil t))
-      (,(concat "^\\([Ss]ubject:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([Ss]ubject:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-subject-face nil t))
-      (,(concat "^\\([Nn]ewsgroups:\\|Followup-[Tt]o:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([Nn]ewsgroups:\\|Followup-[Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-newsgroups-face nil t))
-      (,(concat "^\\([A-Z][^: \n\t]+:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([A-Z][^: \n\t]+:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-other-face nil t))
-      (,(concat "^\\(X-[A-Za-z0-9-]+:\\|In-Reply-To:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\(X-[A-Za-z0-9-]+:\\|In-Reply-To:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-name-face))
       ,@(if (and mail-header-separator
