@@ -1,3 +1,9 @@
+1999-08-03  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
+
+	* Makefile.in (clean): Exec make clean in both lisp and texi
+	subdirectories.
+	(distclean): Use $(MAKE), not `make'.
+
 1999-08-03  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* message.el (TopLevel): Autoload "mu-cite" for the function
