@@ -95,7 +95,7 @@
   (interactive)
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup article gnus-newsgroup-name)
+    (gnus-draft-setup-or-editing article gnus-newsgroup-name)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
@@ -149,7 +149,7 @@
 (defvar gnus-draft-send-draft-buffer " *send draft*")
 (defun gnus-draft-send (article &optional group)
   "Send message ARTICLE."
-  (gnus-draft-setup article (or group "nndraft:queue"))
+  (gnus-draft-setup-for-sending article (or group "nndraft:queue"))
   (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me)
 	message-send-hook type method)
     ;; We read the meta-information that says how and where
@@ -182,10 +182,14 @@
 		  (gnus-request-expire-articles
 		   (list article) (or group "nndraft:queue") t))
 		(if (get-buffer gnus-draft-send-draft-buffer)
-		    (kill-buffer gnus-draft-send-draft-buffer))))))
+		    (kill-buffer gnus-draft-send-draft-buffer)))
+	    (error "No recipients."))))
     ;; Send draft via NNTP.
     (gnus-open-server method)
     (gnus-request-post method)
+    (let ((gnus-verbose-backends nil))
+      (gnus-request-expire-articles
+       (list article) (or group "nndraft:queue") t))
     (if (get-buffer gnus-draft-send-draft-buffer)
 	(kill-buffer gnus-draft-send-draft-buffer))))
 ;; For draft TEST
@@ -213,15 +217,15 @@
 
 ;;; Utility functions
 
-;;(defcustom gnus-draft-decoding-function
-;;  (function
-;;   (lambda ()
-;;     (mime-edit-decode-buffer nil)
-;;     (eword-decode-header)
-;;     ))
-;;  "*Function called to decode the message from network representation."
-;;  :group 'gnus-agent
-;;  :type 'function)
+(defcustom gnus-draft-decoding-function
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (eword-decode-header)
+     ))
+  "*Function called to decode the message from network representation."
+  :group 'gnus-agent
+  :type 'function)
 
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!This is because `gnus-setup-message' uses uninterned symbols.
@@ -247,7 +251,24 @@
 ;;
 ;; For draft TEST
 (progn
-(defun gnus-draft-setup (narticle group)
+(defun gnus-draft-setup-for-editing (narticle group)
+  (gnus-setup-message 'forward
+    (let ((article narticle))
+      (message-mail)
+      (erase-buffer)
+      (if (not (gnus-request-restore-buffer article group))
+	  (error "Couldn't restore the article")
+	Insert the separator.
+	(funcall gnus-draft-decoding-function)
+	(goto-char (point-min))
+	(search-forward "\n\n")
+	(forward-char -1)
+	(insert mail-header-separator)
+	(forward-line 1)
+	(message-set-auto-save-file-name))))))
+;;
+(progn
+(defun gnus-draft-setup-for-sending (narticle group)
   (let ((article narticle))
     (if (not (get-buffer gnus-draft-send-draft-buffer))
 	(get-buffer-create gnus-draft-send-draft-buffer))

@@ -1,3 +1,50 @@
+1998-09-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-user-agent): Use
+	`gnus-inviolable-extended-version' if `message-user-agent' is nil.
+
+	* lisp/message.el (message-make-user-agent): In message-mode, make
+	the most of the	`User-Agent' field value if already exists.
+
+	* lisp/gnus-msg.el (gnus-inviolable-extended-version): New constant.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Remove trailing white
+	space.
+
+1998-09-17  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send-draft): Expire queued message
+	after news posting.
+
+1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send-draft): Error if no
+	recipients.
+
+1998-09-17  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Uncommented.
+
+1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
+	`gnus-draft-setup-for-editing' instead of `gnus-draft-setup'.
+
+	* lisp/gnus-draft.el (gnus-draft-send): Use
+	`gnus-draft-setup-for-sending' instead of `gnus-draft-setup'.
+
+	* lisp/gnus-draft.el (gnus-draft-setup-for-editing): New function.
+
+	* lisp/gnus-draft.el (gnus-draft-setup-for-sending): Renamed from
+	`gnus-draft-setup'.
+
+1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* texi/gnus-ja.texi: Sync up with Semi-gnus 6.8.18.
+
+	* Makefile.in: Add entry `info-ja'.
+	* texi/Makefile.in: Add entry `ja'.
+
 1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.020.

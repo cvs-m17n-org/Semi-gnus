@@ -12754,9 +12754,9 @@ line)} に設定してください。
 @lisp
 (setq gnus-home-score-file
       ;; All groups that match the regexp "\\.emacs"
-      '("\\.emacs" "emacs.SCORE")
-      ;; All the comp groups in one score file
-       ("^comp" "comp.SCORE"))
+      '(("\\.emacs" "emacs.SCORE")
+        ;; All the comp groups in one score file
+        ("^comp" "comp.SCORE")))
 @end lisp
 
 @vindex gnus-home-adapt-file

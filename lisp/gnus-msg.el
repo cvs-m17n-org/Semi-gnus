@@ -193,7 +193,9 @@ Thank you for your help in stamping out bugs.
   "Stringified gnus version."
   (interactive) ; ???
   (concat gnus-product-name "/" gnus-version-number " (based on "
-	  gnus-original-product-name " " gnus-original-version-number ") "))
+	  gnus-original-product-name " " gnus-original-version-number ")"))
+
+(defconst gnus-inviolable-extended-version (gnus-extended-version))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)

@@ -3123,66 +3123,94 @@ give as trustworthy answer as possible."
 (defun message-make-user-agent ()
   "Return user-agent info."
   (let ((user-agent
-	 (concat
-	  ;; SEMI: '("SEMI" "CODENAME" V1 V2 V3)
-	  (format "%s/%s (%s)"
-		  (nth 0 mime-user-interface-version)
-		  (mapconcat #'number-to-string
-			     (cdr (cdr mime-user-interface-version))
-			     ".")
-		  (nth 1 mime-user-interface-version))
-	  ;; FLIM: "FLIM VERSION - \"CODENAME\"[...]"
-	  (if (string-match
-	       "\\`\\([^ ]+\\) \\([^ ]+\\) - \"\\([^\"]+\\)\"\\(.*\\)\\'"
-	       mime-library-version-string)
-	      (format " %s/%s (%s%s)"
-		      (match-string 1 mime-library-version-string)
-		      (match-string 2 mime-library-version-string)
-		      (match-string 3 mime-library-version-string)
-		      (match-string 4 mime-library-version-string))
-	    " FLIM")
-	  "\n "
-	  ;; EMACS/VERSION
-	  (if (featurep 'xemacs)
-	      ;; XEmacs
-	      (concat
-	       (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
-	       (if (and (boundp 'emacs-beta-version) emacs-beta-version)
-		   (format "beta%d" emacs-beta-version)
-		 "")
-	       (if (and (boundp 'xemacs-codename) xemacs-codename)
-		   (concat " (" xemacs-codename ")")
-		 "")
-	       )
-	    ;; not XEmacs
-	    (concat
-	     (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
-	     (if (>= emacs-major-version 20)
-		 (if (and (boundp 'enable-multibyte-characters)
-			  enable-multibyte-characters)
-		     ""			; Should return " (multibyte)"?
-		   " (unibyte)"))
-	     ))
-	  ;; MULE[/VERSION]
-	  (if (featurep 'mule)
-	      (if (and (boundp 'mule-version) mule-version)
-		  (concat " MULE/" mule-version)
-		" MULE")		; no mule-version
-	    "")				; not Mule
-	  ;; Meadow/VERSION
-	  (if (featurep 'meadow)
-	      (let ((version (Meadow-version)))
-		(if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
-		    (concat " Meadow/"
-			    (match-string 1 version)
-			    (match-string 2 version)
-			    )
-		  "Meadow"))		; unknown format
-	    "")				; not Meadow
-	  )))
-    (if message-user-agent
-	(concat message-user-agent "\n " user-agent)
-      user-agent)))
+	 (or
+	  (if (eq message-encoding-buffer (current-buffer))
+	      (save-excursion
+		(save-restriction
+		  (message-narrow-to-headers)
+		  (let ((case-fold-search t)
+			(inhibit-read-only t)
+			buffer-read-only start value)
+		    (when (and (not (re-search-forward
+				     "^Resent-User-Agent" nil t))
+			       (re-search-forward "^User-Agent:" nil t))
+		      (setq start (match-beginning 0)
+			    value (buffer-substring-no-properties
+				   (match-end 0) (std11-field-end)))
+		      (when (string-match "^[\n\t ]+" value)
+			(setq value (substring value (match-end 0))))
+		      (when (string-match "[\n\t ]+$" value)
+			(setq value
+			      (substring value 0 (match-beginning 0))))
+		      (unless (string-match
+			       (concat
+				"^" (regexp-quote
+				     gnus-inviolable-extended-version))
+			       value)
+			(delete-region start (1+ (point))))
+		      (if (string-equal "" value)
+			  nil
+			value))))))
+	  (concat
+	   ;; SEMI: '("SEMI" "CODENAME" V1 V2 V3)
+	   (format "%s/%s (%s)"
+		   (nth 0 mime-user-interface-version)
+		   (mapconcat #'number-to-string
+			      (cdr (cdr mime-user-interface-version))
+			      ".")
+		   (nth 1 mime-user-interface-version))
+	   ;; FLIM: "FLIM VERSION - \"CODENAME\"[...]"
+	   (if (string-match
+		"\\`\\([^ ]+\\) \\([^ ]+\\) - \"\\([^\"]+\\)\"\\(.*\\)\\'"
+		mime-library-version-string)
+	       (format " %s/%s (%s%s)"
+		       (match-string 1 mime-library-version-string)
+		       (match-string 2 mime-library-version-string)
+		       (match-string 3 mime-library-version-string)
+		       (match-string 4 mime-library-version-string))
+	     " FLIM")
+	   "\n "
+	   ;; EMACS/VERSION
+	   (if (featurep 'xemacs)
+	       ;; XEmacs
+	       (concat
+		(format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+		(if (and (boundp 'emacs-beta-version) emacs-beta-version)
+		    (format "beta%d" emacs-beta-version)
+		  "")
+		(if (and (boundp 'xemacs-codename) xemacs-codename)
+		    (concat " (" xemacs-codename ")")
+		  "")
+		)
+	     ;; not XEmacs
+	     (concat
+	      (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+	      (if (>= emacs-major-version 20)
+		  (if (and (boundp 'enable-multibyte-characters)
+			   enable-multibyte-characters)
+		      ""		; Should return " (multibyte)"?
+		    " (unibyte)"))
+	      ))
+	   ;; MULE[/VERSION]
+	   (if (featurep 'mule)
+	       (if (and (boundp 'mule-version) mule-version)
+		   (concat " MULE/" mule-version)
+		 " MULE")		; no mule-version
+	     "")			; not Mule
+	   ;; Meadow/VERSION
+	   (if (featurep 'meadow)
+	       (let ((version (Meadow-version)))
+		 (if (string-match
+		      "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
+		     (concat " Meadow/"
+			     (match-string 1 version)
+			     (match-string 2 version)
+			     )
+		   "Meadow"))		; unknown format
+	     "")			; not Meadow
+	   ))))
+    (concat (or message-user-agent gnus-inviolable-extended-version)
+	    "\n " user-agent)))
 
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
