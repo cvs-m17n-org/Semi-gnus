@@ -53,7 +53,7 @@
 	 mml2015-gpg-encrypt
 	 mml2015-gpg-verify
 	 mml2015-gpg-decrypt
-	 nil
+	 mml2015-gpg-clear-verify
 	 mml2015-gpg-clear-decrypt))
   "Alist of PGP/MIME functions.")
 
@@ -139,7 +139,8 @@
   (catch 'error
     (let (part)
       (unless (setq part (mm-find-raw-part-by-type 
-			  ctl (or (mail-content-type-get ctl 'protocol)
+			  ctl (or (mm-handle-multipart-ctl-parameter 
+				   ctl 'protocol)
 				  "application/pgp-signature")
 			  t))
 	(mm-set-handle-multipart-parameter 
@@ -149,7 +150,8 @@
 	(insert "-----BEGIN PGP SIGNED MESSAGE-----\n")
 	(insert (format "Hash: %s\n\n" 
 			(or (mml2015-fix-micalg
-			     (mail-content-type-get ctl 'micalg))
+			     (mm-handle-multipart-ctl-parameter 
+			      ctl 'micalg))
 			    "SHA1")))
 	(save-restriction
 	  (narrow-to-region (point) (point))
@@ -331,7 +333,8 @@
   (catch 'error
     (let (part message signature)
       (unless (setq part (mm-find-raw-part-by-type 
-			  ctl (or (mail-content-type-get ctl 'protocol)
+			  ctl (or (mm-handle-multipart-ctl-parameter 
+				   ctl 'protocol)
 				  "application/pgp-signature")
 			  t))
 	(mm-set-handle-multipart-parameter 
@@ -368,6 +371,22 @@
 	(mm-set-handle-multipart-parameter 
 	 mm-security-handle 'gnus-info "OK"))
       handle)))
+
+(defun mml2015-gpg-clear-verify ()
+  (if (condition-case err
+	  (funcall mml2015-verify-function)
+	(error 
+	 (mm-set-handle-multipart-parameter 
+	  mm-security-handle 'gnus-details (cadr err)) 
+	 nil)
+	(quit
+	 (mm-set-handle-multipart-parameter 
+	  mm-security-handle 'gnus-details "Quit.") 
+	 nil))
+      (mm-set-handle-multipart-parameter 
+       mm-security-handle 'gnus-info "OK")
+    (mm-set-handle-multipart-parameter 
+     mm-security-handle 'gnus-info "Failed")))
 
 (defun mml2015-gpg-sign (cont)
   (let ((boundary 

@@ -1,3 +1,88 @@
+2000-11-19 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-verify-x-pgp-sig): Check whether
+	original-article-buffer exists.
+
+	* rfc2047.el (rfc2047-q-encoding-alist): Match Resent-.
+	(rfc2047-header-encoding-alist): Addresses are different from text.
+	(rfc2047-encode-message-header): Ditto.
+	(rfc2047-dissect-region): Extra parameter.
+	(rfc2047-encode-region): Ditto.
+	(rfc2047-encode-string): Ditto.
+
+2000-11-19 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-pgp-encrypted-extract-1): New function.
+	(mm-uu-pgp-encrypted-extract): Use it.
+	(mm-uu-pgp-signed-extract-1): New function.
+	(mm-uu-pgp-signed-extract): Use it.
+
+	* gnus-art.el (gnus-mime-display-security): New function.
+	(gnus-mime-display-part): Use it.
+	(gnus-mime-security-verify-or-decrypt): New function.
+	(gnus-mime-security-press-button): New function.
+	(gnus-insert-mime-security-button): Use it.
+
+	* mm-decode.el (mm-possibly-verify-or-decrypt): Use mm-h-m-c-p.
+	(mm-find-raw-part-by-type): Ditto.
+	(mm-verify-function-alist): Add x-gnus-pgp-signature handle.
+	(mm-decrypt-function-alist): Add x-gnus-pgp-encrypted handle.
+	(mm-destroy-parts): Kill nested multibyte buffer.
+
+	* mml2015.el (mml2015-mailcrypt-verify): Use mm-h-m-c-p.
+	(mml2015-gpg-verify): Ditto.
+
+2000-11-18  Simon Josefsson  <sj@extundo.com>
+
+	* mml2015.el (mml2015-mailcrypt-clear-verify): New function.
+	(mml2015-function-alist): Use it.
+
+	* mml-sec.el (mml-sign-alist): Update names.
+	(mml-encrypt-alist): Ditto.
+	(mml-secure-part-smime-sign): Moved to mml-smime.el
+	as `mml-smime-sign-query'.
+	(mml-secure-part-smime-encrypt-by-file): Moved to mml-smime.el as
+	`mml-smime-get-file-cert'.
+	(mml-secure-part-smime-encrypt-by-dns): Moved to mml-smime.el as
+	`mml-smime-get-dns-cert'.
+	(mml-secure-part-smime-encrypt): Moved to mml-smime.el as
+	`mml-smime-encrypt-query'.
+	(mml-smime-sign-buffer): Use mml-smime-sign.
+	(mml-smime-encrypt-buffer): Use mml-smime-encrypt.
+
+	* mml-smime.el (mml-smime-sign): New function.
+	(mml-smime-encrypt): 
+	(mml-smime-sign-query): 
+	(mml-smime-get-file-cert): 
+	(mml-smime-get-dns-cert): 
+	(mml-smime-encrypt-query): Moved from mml-sec.el.
+
+2000-11-16  Simon Josefsson  <sj@extundo.com>
+
+	* mml2015.el (mml2015-gpg-clear-verify): New function.
+	(mml2015-function-alist): Add it.
+
+2000-11-17 14:21  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-setup-fill-variables): Use
+	message-cite-prefix-regexp.
+	(message-newline-and-reformat): Check the end of citation, leading
+	WSP, break in the cite prefix.
+	(message-fill-paragraph): New function.
+
+2000-11-17 13:44  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* lpath.el: Shut up.
+
+2000-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus-msg.el (gnus-group-posting-charset-alist): No longer allow
+	raw 8-bit in headers in dk.* newsgroups.
+
+2000-11-17 08:02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-newline-and-reformat): Match extra WSPs.
+
 2000-11-16 23:31  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* mml.el (mml-generate-mime-1): Ignore ascii.

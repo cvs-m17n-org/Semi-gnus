@@ -2762,72 +2762,73 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 (defun article-verify-x-pgp-sig ()
   "Verify X-PGP-Sig."
   (interactive)
-  (let ((sig (with-current-buffer gnus-original-article-buffer
-	       (gnus-fetch-field "X-PGP-Sig")))
-	items info headers)
-    (when (and sig (mm-uu-pgp-signed-test))
-      (with-temp-buffer
-	(insert-buffer gnus-original-article-buffer)
-	(setq items (split-string sig))
-	(message-narrow-to-head)
-	(let ((inhibit-point-motion-hooks t)
-	      (case-fold-search t))
-	  ;; Don't verify multiple headers.
-	  (setq headers (mapconcat (lambda (header)
-				     (concat header ": " 
-					     (mail-fetch-field header) "\n"))
-				   (split-string (nth 1 items) ",") "")))
-	(delete-region (point-min) (point-max))
-	(insert "-----BEGIN PGP SIGNED MESSAGE-----\n\n")
-	(insert "X-Signed-Headers: " (nth 1 items) "\n")
-	(insert headers)
-	(widen)
-	(forward-line)
-	(while (not (eobp))
-	  (if (looking-at "^-")
-	      (insert "- "))
-	  (forward-line))
-	(insert "\n-----BEGIN PGP SIGNATURE-----\n")
-	(insert "Version: " (car items) "\n\n")
-	(insert (mapconcat 'identity (cddr items) "\n"))
-	(insert "\n-----END PGP SIGNATURE-----\n")
-	(let ((mm-security-handle (list (format "multipart/signed"))))
-	  (mml2015-clean-buffer)
-	  (let ((coding-system-for-write (or gnus-newsgroup-charset
-					     'iso-8859-1)))
-	    (funcall (mml2015-clear-verify-function)))
-	  (setq info 
-		(or (mm-handle-multipart-ctl-parameter 
-		     mm-security-handle 'gnus-details)
-		    (mm-handle-multipart-ctl-parameter 
-		     mm-security-handle 'gnus-info)))))
-      (when info
-	(let (buffer-read-only bface eface)
-	  (save-restriction
+  (if (gnus-buffer-live-p gnus-original-article-buffer)
+      (let ((sig (with-current-buffer gnus-original-article-buffer
+		   (gnus-fetch-field "X-PGP-Sig")))
+	    items info headers)
+	(when (and sig (mm-uu-pgp-signed-test))
+	  (with-temp-buffer
+	    (insert-buffer gnus-original-article-buffer)
+	    (setq items (split-string sig))
 	    (message-narrow-to-head)
-	    (goto-char (point-max))
-	    (forward-line -1)
-	    (setq bface (get-text-property (gnus-point-at-bol) 'face)
-		  eface (get-text-property (1- (gnus-point-at-eol)) 'face))
-	    (message-remove-header "X-Gnus-PGP-Verify")
-	    (if (re-search-forward "^X-PGP-Sig:" nil t)
-		(forward-line)
-	      (goto-char (point-max)))
-	    (narrow-to-region (point) (point))
-	    (insert "X-Gnus-PGP-Verify: " info "\n")
-	    (goto-char (point-min))
+	    (let ((inhibit-point-motion-hooks t)
+		  (case-fold-search t))
+	      ;; Don't verify multiple headers.
+	      (setq headers (mapconcat (lambda (header)
+					 (concat header ": " 
+						 (mail-fetch-field header) "\n"))
+				       (split-string (nth 1 items) ",") "")))
+	    (delete-region (point-min) (point-max))
+	    (insert "-----BEGIN PGP SIGNED MESSAGE-----\n\n")
+	    (insert "X-Signed-Headers: " (nth 1 items) "\n")
+	    (insert headers)
+	    (widen)
 	    (forward-line)
 	    (while (not (eobp))
-	      (if (not (looking-at "^[ \t]"))
-		  (insert " "))
+	      (if (looking-at "^-")
+		  (insert "- "))
 	      (forward-line))
-	    ;; Do highlighting.
-	    (goto-char (point-min))
-	    (when (looking-at "\\([^:]+\\): *")
-	      (put-text-property (match-beginning 1) (1+ (match-end 1))
-				 'face bface)
-	      (put-text-property (match-end 0) (point-max)
-				 'face eface))))))))
+	    (insert "\n-----BEGIN PGP SIGNATURE-----\n")
+	    (insert "Version: " (car items) "\n\n")
+	    (insert (mapconcat 'identity (cddr items) "\n"))
+	    (insert "\n-----END PGP SIGNATURE-----\n")
+	    (let ((mm-security-handle (list (format "multipart/signed"))))
+	      (mml2015-clean-buffer)
+	      (let ((coding-system-for-write (or gnus-newsgroup-charset
+						 'iso-8859-1)))
+		(funcall (mml2015-clear-verify-function)))
+	      (setq info 
+		    (or (mm-handle-multipart-ctl-parameter 
+			 mm-security-handle 'gnus-details)
+			(mm-handle-multipart-ctl-parameter 
+			 mm-security-handle 'gnus-info)))))
+	  (when info
+	    (let (buffer-read-only bface eface)
+	      (save-restriction
+		(message-narrow-to-head)
+		(goto-char (point-max))
+		(forward-line -1)
+		(setq bface (get-text-property (gnus-point-at-bol) 'face)
+		      eface (get-text-property (1- (gnus-point-at-eol)) 'face))
+		(message-remove-header "X-Gnus-PGP-Verify")
+		(if (re-search-forward "^X-PGP-Sig:" nil t)
+		    (forward-line)
+		  (goto-char (point-max)))
+		(narrow-to-region (point) (point))
+		(insert "X-Gnus-PGP-Verify: " info "\n")
+		(goto-char (point-min))
+		(forward-line)
+		(while (not (eobp))
+		  (if (not (looking-at "^[ \t]"))
+		      (insert " "))
+		  (forward-line))
+		;; Do highlighting.
+		(goto-char (point-min))
+		(when (looking-at "\\([^:]+\\): *")
+		  (put-text-property (match-beginning 1) (1+ (match-end 1))
+				     'face bface)
+		  (put-text-property (match-end 0) (point-max)
+				     'face eface)))))))))
 
 (eval-and-compile
   (mapcar
@@ -3946,13 +3947,11 @@ In no internal viewer is available, use an external viewer."
    ((equal (car handle) "multipart/signed")
     (or (memq 'signed gnus-article-wash-types)
 	(push 'signed gnus-article-wash-types))
-    (gnus-insert-mime-security-button handle)
-    (gnus-mime-display-mixed (cdr handle)))
+    (gnus-mime-display-security handle))
    ((equal (car handle) "multipart/encrypted")
     (or (memq 'encrypted gnus-article-wash-types)
 	(push 'encrypted gnus-article-wash-types))
-    (gnus-insert-mime-security-button handle)
-    (gnus-mime-display-mixed (cdr handle)))
+    (gnus-mime-display-security handle))
    ;; Other multiparts are handled like multipart/mixed.
    (t
     (gnus-mime-display-mixed (cdr handle)))))
@@ -5627,6 +5626,11 @@ For example:
 %t  The security MIME type
 %i  Additional info")
 
+(defvar gnus-mime-security-button-end-line-format "%{%([[End of %t]]%)%}\n"
+  "The following specs can be used:
+%t  The security MIME type
+%i  Additional info")
+
 (defvar gnus-mime-security-button-line-format-alist
   '((?t gnus-tmp-type ?s)
     (?i gnus-tmp-info ?s)))
@@ -5639,6 +5643,26 @@ For example:
     map))
 
 (defvar gnus-mime-security-details-buffer nil)
+
+(defun gnus-mime-security-verify-or-decrypt (handle)
+  (mm-remove-parts (cdr handle))
+  (let ((region (mm-handle-multipart-ctl-parameter handle 'gnus-region))
+	buffer-read-only)
+    (when region 
+      (delete-region (car region) (cdr region))
+      (set-marker (car region) nil)
+      (set-marker (cdr region) nil)))
+  (with-current-buffer (mm-handle-multipart-original-buffer handle)
+    (let* ((mm-verify-option 'known)
+	   (mm-decrypt-option 'known)
+	   (nparts (mm-possibly-verify-or-decrypt (cdr handle) handle)))
+      (unless (eq nparts (cdr handle))
+	(mm-destroy-parts (cdr handle))
+	(setcdr handle nparts))))
+  (let ((point (point))
+	buffer-read-only)
+    (gnus-mime-display-security handle)
+    (goto-char point)))
 
 (defun gnus-mime-security-show-details (handle)
   (let ((details (mm-handle-multipart-ctl-parameter handle 'gnus-details)))
@@ -5655,6 +5679,11 @@ For example:
 	  (pop-to-buffer gnus-mime-security-details-buffer))
       (gnus-message 5 "No details."))))
 
+(defun gnus-mime-security-press-button (handle)
+  (if (mm-handle-multipart-ctl-parameter handle 'gnus-info)
+      (gnus-mime-security-show-details handle)
+    (gnus-mime-security-verify-or-decrypt handle)))
+
 (defun gnus-insert-mime-security-button (handle &optional displayed)
   (let* ((protocol (mm-handle-multipart-ctl-parameter handle 'protocol))
 	 (gnus-tmp-type
@@ -5663,7 +5692,8 @@ For example:
 	       (nth 2 (assoc protocol mm-decrypt-function-alist))
 	       "Unknown")
 	   (if (equal (car handle) "multipart/signed")
-	       " Signed" " Encrypted")))
+	       " Signed" " Encrypted")
+	   " Part"))
 	 (gnus-tmp-info
 	  (or (mm-handle-multipart-ctl-parameter handle 'gnus-info)
 	      "Undecided"))
@@ -5676,7 +5706,7 @@ For example:
      gnus-mime-security-button-line-format-alist
      `(local-map ,gnus-mime-security-button-map
 		 keymap ,gnus-mime-security-button-map
-		 gnus-callback gnus-mime-security-show-details
+		 gnus-callback gnus-mime-security-press-button
 		 article-type annotation
 		 gnus-data ,handle))
     (setq e (point))
@@ -5694,6 +5724,22 @@ For example:
        (format
 	"%S: show detail"
 	(aref gnus-mouse-2 0))))))
+
+(defun gnus-mime-display-security (handle)
+  (save-restriction
+    (narrow-to-region (point) (point))
+    (gnus-insert-mime-security-button handle)
+    (gnus-mime-display-mixed (cdr handle))
+    (unless (bolp)
+      (insert "\n"))
+    (let ((gnus-mime-security-button-line-format 
+	   gnus-mime-security-button-end-line-format))
+      (gnus-insert-mime-security-button handle))
+    (mm-set-handle-multipart-parameter handle 'gnus-region 
+				       (cons (set-marker (make-marker)
+							 (point-min))
+					     (set-marker (make-marker)
+							 (point-max))))))
 
 
 ;;; @ for mime-view

@@ -22,12 +22,14 @@
 	       rmail-select-summary rmail-summary-exists rmail-update-summary
 	       sc-cite-regexp set-font-family set-font-size temp-directory
 	       url-view-url vcard-pretty-print
+	       url-insert-file-contents
 	       w3-coding-system-for-mime-charset w3-prepare-buffer w3-region
 	       widget-make-intangible x-defined-colors))
 
 (maybe-bind '(adaptive-fill-first-line-regexp
 	      adaptive-fill-regexp babel-history babel-translations
 	      display-time-mail-function imap-password mail-mode-hook
+	      mc-pgp-always-sign
 	      url-current-callback-func url-be-asynchronous
 	      url-current-callback-data url-working-buffer
 	      url-current-mime-headers w3-meta-charset-content-type-regexp
@@ -93,8 +95,7 @@
       (maybe-bind '(mh-lib-progs)))
   ;; FSFmacs
   (maybe-fbind '(charsetp
-		 function-max-args propertize smiley-encode-buffer
-		 url-insert-file-contents))
+		 function-max-args propertize smiley-encode-buffer))
   (if (boundp 'MULE)
       (progn
 	(maybe-fbind '(coding-system-get
