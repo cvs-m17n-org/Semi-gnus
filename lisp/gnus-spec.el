@@ -282,6 +282,11 @@
        (if (equal val ,ignore-value)
 	   "" val))))
 
+;;; dummy function. XEmacs will redefine this.
+(defun gnus-tilde-pad-form (el pad-width)
+  "Return a form that pads EL to PAD-WIDTH."
+  )
+
 (defun gnus-parse-format (format spec-alist &optional insert)
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return the

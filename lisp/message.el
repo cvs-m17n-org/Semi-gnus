@@ -3164,7 +3164,7 @@ give as trustworthy answer as possible."
 	    "")				; not Meadow
 	  )))
     (if message-user-agent
-	(concat message-user-agent " " user-agent)
+	(concat message-user-agent "\n " user-agent)
       user-agent)))
 
 (defun message-generate-headers (headers)

@@ -62,6 +62,7 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
   "Set up `default-mime-charset' of summary buffer.
 It is specified by variable `gnus-newsgroup-default-charset-alist'
 \(cf. function `gnus-set-newsgroup-default-charset')."
+  ;; We are in `nntp-server-buffer' now.
   (if (buffer-live-p gnus-summary-buffer)
       (let* ((qgroup (save-excursion
 		       (set-buffer gnus-summary-buffer)
@@ -84,12 +85,22 @@ It is specified by variable `gnus-newsgroup-default-charset-alist'
 	(if charset
 	    (progn
 	      (save-excursion
+		;; Set `default-mime-charset' in summary buffer.
 		(set-buffer gnus-summary-buffer)
 		(make-local-variable 'default-mime-charset)
 		(setq default-mime-charset charset))
+	      ;; Also set `default-mime-charset' in current buffer.
 	      (make-local-variable 'default-mime-charset)
 	      (setq default-mime-charset charset))
+	  ;; Reset `default-mime-charset' in current buffer.
 	  (kill-local-variable 'default-mime-charset)))))
+
+(defun gnus-get-summary-default-charset ()
+  "Get the value of `default-mime-charset' from summary buffer."
+  (and (buffer-live-p gnus-summary-buffer)
+       (save-excursion
+	 (set-buffer gnus-summary-buffer)
+	 default-mime-charset)))
 
 
 ;;; @ end
