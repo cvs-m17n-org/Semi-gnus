@@ -3695,13 +3695,17 @@ used to distinguish whether the invisible text is a MIME part or not."
 						  'mime-edit-invisible t))
 	  (when (> mime-from mime-to)
 	    (setq hidden-start (or hidden-start mime-to))
-	    (put-text-property mime-to mime-from 'invisible nil))
+	    (add-text-properties mime-to mime-from
+				 '(invisible nil face highlight
+					     font-lock-face highlight)))
 	  (setq mime-to (or (text-property-not-all mime-from to
 						   'mime-edit-invisible t)
 			    to)))
 	(when (< mime-to to)
 	  (setq hidden-start (or hidden-start mime-to))
-	  (put-text-property mime-to to 'invisible nil)))
+	  (add-text-properties mime-to to
+			       '(invisible nil face highlight
+					   font-lock-face highlight))))
       (when hidden-start
 	(goto-char hidden-start)
 	(set-window-start (selected-window) (gnus-point-at-bol))
@@ -3720,14 +3724,15 @@ used to distinguish whether the invisible text is a MIME part or not."
 			 (memq (char-charset char)
 			       '(eight-bit-control eight-bit-graphic
 						   control-1)))))
-	  (add-text-properties (point) (1+ (point)) '(highlight t))
+	  (add-text-properties (point) (1+ (point))
+			       '(font-lock-face highlight face highlight))
 	  (setq found t))
 	(forward-char)
 	(skip-chars-forward mm-7bit-chars))
       (when found
 	(setq choice
 	      (gnus-multiple-choice
-	       "Illegible text found. Continue posting? "
+	       "Illegible text found.  Continue posting?"
 	       '((?d "Remove and continue posting")
 		 (?r "Replace with dots and continue posting")
 		 (?i "Ignore and continue posting")
@@ -3744,10 +3749,11 @@ used to distinguish whether the invisible text is a MIME part or not."
 				 '(eight-bit-control eight-bit-graphic
 						     control-1)))))
 	    (if (eq choice ?i)
-		(remove-text-properties (point) (1+ (point)) '(highlight t))
+		(remove-text-properties (point) (1+ (point))
+					'(font-lock-face highlight face highlight))
 	      (delete-char 1)
-	      (if (eq choice ?r)
-		  (insert "."))))
+	      (when (eq choice ?r)
+		(insert "."))))
 	  (forward-char)
 	  (skip-chars-forward mm-7bit-chars))))))
 
