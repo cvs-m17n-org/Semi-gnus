@@ -9223,6 +9223,17 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 @itemize @bullet
 @item 文字列
 メッセージはそのグループに保存されます。
+
+あなたはグループ名に選択方法を含めることができますが、そうするとそのメッ
+セージは @code{gnus-message-archive-method} で指定した選択方法ではなくて、
+代わりにグループ名の選択方法で保存されることに注意しましょう。上に示した
+ように @code{gnus-message-archive-method} は、ディフォルト値を持つもので
+あると考えて下さい。ですか
+ら @code{gnus-message-archive-group} を @code{"foo"} にしておけば、外へ
+出て行くメッセージは @samp{nnfolder+archive:foo} に保存されますが、もし
+あなたが @code{"nnml:foo"} という値を使うと、@samp{nnml:foo} に保存され
+ます。
+@samp{nnml:foo}.
 @item 文字列のリスト
 メッセージはそれらの全てのグループに保存されます。
 @item 正規表現、関数、様式の連想リスト
