@@ -1207,57 +1207,57 @@ if it is a string, only list groups matching REGEXP."
 	      params (gnus-info-params info)
 	      newsrc (cdr newsrc)
 	      unread (car (gnus-gethash group gnus-newsrc-hashtb)))
-	(if not-in-list
-	    (setq not-in-list (delete group not-in-list)))
-	(and
-	 (gnus-group-prepare-logic
-	  group
-	  (and unread		; This group might be unchecked
-	       (or (not (stringp regexp))
-		   (string-match regexp group))
-	       (<= (setq clevel (gnus-info-level info)) level)
-	       (>= clevel lowest)
-	       (cond
-		((functionp predicate)
-		 (funcall predicate info))
-		(predicate t)		; We list all groups?
-		(t
-		 (or
-		  (if (eq unread t)	; Unactivated?
-		      gnus-group-list-inactive-groups
+	(when not-in-list
+	  (setq not-in-list (delete group not-in-list)))
+	(when (gnus-group-prepare-logic
+	       group
+	       (and unread		; This group might be unchecked
+		    (or (not (stringp regexp))
+			(string-match regexp group))
+		    (<= (setq clevel (gnus-info-level info)) level)
+		    (>= clevel lowest)
+		    (cond
+		     ((functionp predicate)
+		      (funcall predicate info))
+		     (predicate t)	; We list all groups?
+		     (t
+		      (or
+		       (if (eq unread t) ; Unactivated?
+			   gnus-group-list-inactive-groups
 					; We list unactivated
-		    (> unread 0))
+			 (> unread 0))
 					; We list groups with unread articles
-		  (and gnus-list-groups-with-ticked-articles
-		       (cdr (assq 'tick (gnus-info-marks info))))
+		       (and gnus-list-groups-with-ticked-articles
+			    (cdr (assq 'tick (gnus-info-marks info))))
 					; And groups with tickeds
-		  ;; Check for permanent visibility.
-		  (and gnus-permanently-visible-groups
-		       (string-match gnus-permanently-visible-groups group))
-		  (memq 'visible params)
-		  (cdr (assq 'visible params)))))))
-	 (gnus-group-insert-group-line
-	  group (gnus-info-level info)
-	  (gnus-info-marks info) unread (gnus-info-method info)))))
+		       ;; Check for permanent visibility.
+		       (and gnus-permanently-visible-groups
+			    (string-match gnus-permanently-visible-groups
+					  group))
+		       (memq 'visible params)
+		       (cdr (assq 'visible params)))))))
+	  (gnus-group-insert-group-line
+	   group (gnus-info-level info)
+	   (gnus-info-marks info) unread (gnus-info-method info)))))
 
     ;; List dead groups.
-    (if (or gnus-group-listed-groups
-	    (and (>= level gnus-level-zombie)
-		 (<= lowest gnus-level-zombie)))
-	(gnus-group-prepare-flat-list-dead
-	 (setq gnus-zombie-list (sort gnus-zombie-list 'string<))
-	 gnus-level-zombie ?Z
-	 regexp))
-    (if not-in-list
-	(dolist (group gnus-zombie-list)
-	  (setq not-in-list (delete group not-in-list))))
-    (if (or gnus-group-listed-groups
-	    (and (>= level gnus-level-killed) (<= lowest gnus-level-killed)))
-	(gnus-group-prepare-flat-list-dead
-	 (gnus-union
-	  not-in-list
-	  (setq gnus-killed-list (sort gnus-killed-list 'string<)))
-	 gnus-level-killed ?K regexp))
+    (when (or gnus-group-listed-groups
+	      (and (>= level gnus-level-zombie)
+		   (<= lowest gnus-level-zombie)))
+      (gnus-group-prepare-flat-list-dead
+       (setq gnus-zombie-list (sort gnus-zombie-list 'string<))
+       gnus-level-zombie ?Z
+       regexp))
+    (when not-in-list
+      (dolist (group gnus-zombie-list)
+	(setq not-in-list (delete group not-in-list))))
+    (when (or gnus-group-listed-groups
+	      (and (>= level gnus-level-killed) (<= lowest gnus-level-killed)))
+      (gnus-group-prepare-flat-list-dead
+       (gnus-union
+	not-in-list
+	(setq gnus-killed-list (sort gnus-killed-list 'string<)))
+       gnus-level-killed ?K regexp))
 
     (gnus-group-set-mode-line)
     (setq gnus-group-list-mode (cons level predicate))
