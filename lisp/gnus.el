@@ -250,12 +250,15 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.8.19.1"
+(defconst gnus-product-name "Nana-gnus"
+  "Product name of this version of gnus.")
+
+(defconst gnus-version-number "6.8.19.2"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Nana-gnus %s (based on Gnus 5.6.44; for SEMI 1.8, FLIM 1.8/1.9)"
-          gnus-version-number)
+  (format "%s %s (based on Gnus 5.6.44; for SEMI 1.8, FLIM 1.8/1.9)"
+          gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1481,14 +1484,30 @@ want."
   "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
   "The mail address of the Gnus maintainers.")
 
+(defconst semi-gnus-developers
+  "Semi-gnus Developers:
+ semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
+ semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
+  "The mail address of the Semi-gnus developers.")
+
+(defcustom gnus-info-filename nil
+  "*Controls language of gnus Info.
+If nil and current-language-environment is Japanese, go to gnus-ja.
+Otherwise go to corresponding Info.
+This variable can be nil, gnus or gnus-ja."
+  :group 'gnus-start
+  :type '(choice (const nil)
+		 (const :tag "English" gnus)
+		 (const :tag "Japanese" gnus-ja)))
+
 (defvar gnus-info-nodes
-  '((gnus-group-mode "(gnus)The Group Buffer")
-    (gnus-summary-mode "(gnus)The Summary Buffer")
-    (gnus-article-mode "(gnus)The Article Buffer")
-    (mime/viewer-mode "(gnus)The Article Buffer")
-    (gnus-server-mode "(gnus)The Server Buffer")
-    (gnus-browse-mode "(gnus)Browse Foreign Server")
-    (gnus-tree-mode "(gnus)Tree Display"))
+  '((gnus-group-mode "The Group Buffer")
+    (gnus-summary-mode "The Summary Buffer")
+    (gnus-article-mode "The Article Buffer")
+    (mime/viewer-mode "The Article Buffer")
+    (gnus-server-mode "The Server Buffer")
+    (gnus-browse-mode "Browse Foreign Server")
+    (gnus-tree-mode "Tree Display"))
   "Alist of major modes and related Info nodes.")
 
 (defvar gnus-group-buffer "*Group*")
@@ -2020,7 +2039,11 @@ If ARG, insert string at point."
   (interactive)
   ;; Enlarge info window if needed.
   (let (gnus-info-buffer)
-    (Info-goto-node (cadr (assq major-mode gnus-info-nodes)))
+    (Info-goto-node (format "(%s)%s" 
+			    (or gnus-info-filename
+				(get-language-info current-language-environment 'gnus-info)
+				"gnus")
+			    (cadr (assq major-mode gnus-info-nodes))))
     (setq gnus-info-buffer (current-buffer))
     (gnus-configure-windows 'info)))
 

@@ -1,7 +1,19 @@
 1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Change to "6.8.19.2"
+
+	* lisp/message.el (message-mime-insert-article): Bug fix.
+
+	* Sync up with Semi-gnus 6.8.19
+
+1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
 	* lisp/gnus.el (gnus-version-number): Change to "6.8.19.1"
 	(gnus-version): Change to "Nana-gnus".
+
+1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* TODO.ja: New file.
 
 1998-10-06  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
@@ -25,6 +37,24 @@
 	* lisp/gnus-msg.el (gnus-setup-message): Setup
 	`message-startup-parameter-alist'.
 
+1998-10-05  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus.el (gnus-info-filename): New variable.
+	(gnus-info-find-node): Use `gnus-info-filename' and
+	`current-language-environment'.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send): Call
+	`message-send-news-function' or `message-send-mail-function'
+	instead of `message-send-and-exit'.
+
+1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Bug fix.
+	Delete variable pop3-fma-movemail options.
+	Add new variabel pop3-fma-commandline-arguments.
+
 1998-09-30  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Sync up with Semi-gnus 6.8.19.
@@ -34,6 +64,17 @@
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.19.
 
 	* Sync up with Gnus 5.6.44.
+
+1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
+	`gnus-draft-setup-for-editing' instead of `gnus-draft-setup'.
+	(gnus-draft-send): Use `gnus-draft-setup-for-sending' instead of
+	`gnus-draft-setup'.
+	(gnus-draft-setup-for-editing): New function (renamed from
+	`gnus-draft-setup').
+	(gnus-draft-setup-for-sending): New function.
+	(gnus-draft-send-draft-buffer): New variable.
 
 1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 

@@ -121,7 +121,13 @@ the second with the current group name.")
 (defvar gnus-message-group-art nil)
 
 (defconst gnus-bug-message
-  "Sending a bug report to the Gnus Towers.
+  (format "Sending a bug report to the Gnus Towers.
+========================================
+
+This gnus is the %s%s.
+If you think the bug is a Semi-gnus bug, send a bug report to Semi-gnus
+Developers. (the addresses below are mailing list addresses)
+
 ========================================
 
 The buffer below is a mail buffer.  When you press `C-c C-c', it will
@@ -138,7 +144,12 @@ and include the backtrace in your bug report.
 Please describe the bug in annoying, painstaking detail.
 
 Thank you for your help in stamping out bugs.
-")
+"
+
+	  gnus-product-name
+	  (if (string= gnus-product-name "Semi-gnus")
+	      ""
+	    ", a modified version of Semi-gnus")))
 
 (eval-and-compile
   (autoload 'gnus-uu-post-news "gnus-uu" nil t)
@@ -218,7 +229,7 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-newsreader (setq message-mailer (gnus-extended-version)))
+  (setq message-user-agent (gnus-extended-version))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action
@@ -535,13 +546,10 @@ If SILENT, don't prompt the user."
 (defvar nnspool-rejected-article-hook)
 (defvar xemacs-codename)
 
-;;; Since the X-Newsreader/X-Mailer are ``vanity'' headers, they might
-;;; as well include the Emacs version as well.
-;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
   "Stringified gnus version."
   (interactive)
-  gnus-version)
+  (concat gnus-product-name "/" gnus-version-number))
 
 
 ;;;
@@ -807,7 +815,8 @@ If YANK is non-nil, include the original article."
       (insert gnus-bug-message)
       (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
-    (message-setup `((To . ,gnus-maintainer) (Subject . "")))
+    (message-setup
+     `((To . ,gnus-maintainer) (Cc . ,semi-gnus-developers) (Subject . "")))
     (when gnus-bug-create-help-buffer
       (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))

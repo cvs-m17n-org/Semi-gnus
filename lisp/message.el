@@ -3,6 +3,7 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;         Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
 ;; Keywords: mail, news, MIME
 
@@ -187,11 +188,11 @@ shorten-followup-to existing-newsgroups buffer-file-name unchanged."
 (defcustom message-required-news-headers
   '(From Newsgroups Subject Date Message-ID
 	 (optional . Organization) Lines
-	 (optional . X-Newsreader))
+	 (optional . User-Agent))
   "*Headers to be generated or prompted for when posting an article.
 RFC977 and RFC1036 require From, Date, Newsgroups, Subject,
 Message-ID.  Organization, Lines, In-Reply-To, Expires, and
-X-Newsreader are optional.  If don't you want message to insert some
+User-Agent are optional.  If don't you want message to insert some
 header, remove it from this list."
   :group 'message-news
   :group 'message-headers
@@ -199,10 +200,10 @@ header, remove it from this list."
 
 (defcustom message-required-mail-headers
   '(From Subject Date (optional . In-Reply-To) Message-ID Lines
-	 (optional . X-Mailer))
+	 (optional . User-Agent))
   "*Headers to be generated or prompted for when mailing a message.
 RFC822 required that From, Date, To, Subject and Message-ID be
-included.  Organization, Lines and X-Mailer are optional."
+included.  Organization, Lines and User-Agent are optional."
   :group 'message-mail
   :group 'message-headers
   :type '(repeat sexp))
@@ -633,6 +634,10 @@ actually occur."
   :group 'message-sending
   :type 'sexp)
 
+;;; XXX: This symbol is overloaded!  See below.
+(defvar message-user-agent nil
+  "String of the form of PRODUCT/VERSION.  Used for User-Agent header field.")
+
 ;; Ignore errors in case this is used in Emacs 19.
 ;; Don't use ignore-errors because this is copied into loaddefs.el.
 ;;;###autoload
@@ -969,8 +974,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Expires)
     (Message-ID)
     (References . message-fill-references)
-    (X-Mailer)
-    (X-Newsreader))
+    (User-Agent))
   "Alist used for formatting headers.")
 
 (eval-and-compile
@@ -1387,8 +1391,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq paragraph-separate paragraph-start)
   (make-local-variable 'message-reply-headers)
   (setq message-reply-headers nil)
-  (make-local-variable 'message-newsreader)
-  (make-local-variable 'message-mailer)
+  (make-local-variable 'message-user-agent)
   (make-local-variable 'message-post-method)
   (make-local-variable 'message-sent-message-via)
   (setq message-sent-message-via nil)
@@ -3096,6 +3099,24 @@ give as trustworthy answer as possible."
   (or mail-host-address
       (message-make-fqdn)))
 
+(defun message-make-user-agent ()
+  "Return user-agent info."
+  (if message-user-agent
+      (save-excursion
+	(goto-char (point-min))
+	(let ((case-fold-search t)
+	      user-agent beg p end)
+	  (if (re-search-forward "^User-Agent:[ \t]*" nil t)
+	      (progn
+		(setq beg (match-beginning 0)
+		      p (match-end 0)
+		      end (std11-field-end)
+		      user-agent (buffer-substring p end))
+		(delete-region beg (1+ end))
+		(concat message-user-agent " " user-agent)
+		)
+	    message-user-agent)))))
+
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
@@ -3112,9 +3133,7 @@ Headers already prepared in the buffer are not modified."
 	   (To nil)
 	   (Distribution (message-make-distribution))
 	   (Lines (message-make-lines))
-	   (X-Newsreader message-newsreader)
-	   (X-Mailer (and (not (message-fetch-field "X-Newsreader"))
-			  message-mailer))
+	   (User-Agent (message-make-user-agent))
 	   (Expires (message-make-expires))
 	   (case-fold-search t)
 	   header value elem)
@@ -4310,10 +4329,10 @@ regexp varstr."
   (interactive)
   (let ((message-cite-function 'mime-edit-inserted-message-filter)
 	(message-reply-buffer (message-get-original-reply-buffer))
-	)
+	(start (point)))
     (message-yank-original nil)
     (save-excursion
-      (narrow-to-region (goto-char (mark))
+      (narrow-to-region (goto-char start)
 			(if (search-forward "\n\n" nil t)
 			    (1- (point))
 			  (point-max)))
