@@ -2064,8 +2064,28 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   "\M-^" gnus-article-read-summary-keys
   "\M-g" gnus-article-read-summary-keys)
 
-(substitute-key-definition
- 'undefined 'gnus-article-read-summary-keys gnus-article-mode-map)
+;; Define almost undefined keys to `gnus-article-read-summary-keys'.
+(mapcar
+ (lambda (key)
+   (unless (lookup-key gnus-article-mode-map key)
+     (define-key gnus-article-mode-map key
+       'gnus-article-read-summary-keys)))
+ (delq nil
+       (append
+	(mapcar
+	 (lambda (elt)
+	   (let ((key (car elt)))
+	     (and (> (length key) 0)
+		  (not (eq 'menu-bar (aref key 0)))
+		  (symbolp (lookup-key gnus-summary-mode-map key))
+		  key)))
+	 (accessible-keymaps gnus-summary-mode-map))
+	(let ((c 127)
+	      keys)
+	  (while (>= c 32)
+	    (push (char-to-string c) keys)
+	    (decf c))
+	  keys))))
 
 (defun gnus-article-make-menu-bar ()
   (gnus-turn-off-edit-menu 'article)

@@ -110,6 +110,8 @@ This buffer will be in bbdb-mode, with associated keybindings."
 	(bbdb-display-records (list record))
 	(error "unperson"))))
 
+;; Avoid byte-compile warning.
+(defvar bbdb-pop-up-elided-display)
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
   "Make the *BBDB* buffer be displayed along with the GNUS windows,
