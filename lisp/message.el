@@ -221,7 +221,7 @@ included.  Organization, Lines and User-Agent are optional."
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:"
+(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:\\|^X-Trace:\\|^X-Complaints-To:"
   "*Header lines matching this regexp will be deleted before posting.
 It's best to delete old Path and Date headers before posting to avoid
 any confusion."
@@ -3027,7 +3027,13 @@ Headers already prepared in the buffer are not modified."
 	      (setq header (car elem)))
 	  (setq header elem))
 	(when (or (not (re-search-forward
-			(concat "^" (downcase (symbol-name header)) ":")
+			(concat "^"
+				(regexp-quote
+				 (downcase
+				  (if (stringp header)
+				      header
+				    (symbol-name header))))
+				":")
 			nil t))
 		  (progn
 		    ;; The header was found.  We insert a space after the
@@ -3069,7 +3075,8 @@ Headers already prepared in the buffer are not modified."
 		  (progn
 		    ;; This header didn't exist, so we insert it.
 		    (goto-char (point-max))
-		    (insert (symbol-name header) ": " value "\n")
+		    (insert (if (stringp header) header (symbol-name header))
+			    ": " value "\n")
 		    (forward-line -1))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.

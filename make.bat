@@ -31,8 +31,8 @@ copy *.el* %1\lisp
 
 :info
 cd ..\texi
-call %1\bin\emacs.bat -batch -q -no-site-file gnus.texi -l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -fsave-buffer
-call %1\bin\emacs.bat -batch -q -no-site-file message.texi -l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -fsave-buffer
+call %1\bin\emacs.bat -batch -q -no-site-file gnus.texi -l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
+call %1\bin\emacs.bat -batch -q -no-site-file message.texi -l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
 if not "%2" == "copy" goto done
 copy gnus %1\info
 copy gnus-?? %1\info
@@ -47,7 +47,7 @@ cd ..
 goto end
 
 :usage
-echo Usage: install ^<emacs-dir^> [copy]
+echo Usage: make ^<emacs-dir^> [copy]
 echo.
 echo where: ^<emacs-dir^> is the directory you installed emacs in
 echo                    eg. d:\emacs\19.34
