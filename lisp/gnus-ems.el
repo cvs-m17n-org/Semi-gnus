@@ -272,18 +272,6 @@ for XEmacs."
       (setq alist (cdr alist)))
     element))
 
-(defun-maybe subst-char-in-string (fromchar tochar string &optional inplace)
-  "Replace FROMCHAR with TOCHAR in STRING each time it occurs.
-Unless optional argument INPLACE is non-nil, return a new string.
-\[Emacs 20.4 emulating function]."
-  (let ((i (length string))
-	(newstr (if inplace string (copy-sequence string))))
-    (while (> i 0)
-      (setq i (1- i))
-      (if (eq (aref newstr i) fromchar)
-	  (aset newstr i tochar)))
-    newstr))
-
 
 ;;; Language support staffs.
 
