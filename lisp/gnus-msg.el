@@ -1178,10 +1178,10 @@ begin to compose a message:
 		     nil)
 		    ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$"
 				   emacs-version)
-		     (concat (if (boundp 'MULE)
-				 "Mule/2.3@"
-			       "Emacs/")
-			     (match-string 1 emacs-version)
+		     (concat (format (if (boundp 'MULE)
+					 "Mule/2.3 (based on Emacs %s)"
+				       "Emacs/%s")
+				     (match-string 1 emacs-version))
 			     (if system-v
 				 (concat " (" system-v ")")
 			       "")))

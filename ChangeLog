@@ -1,3 +1,8 @@
+2003-05-21  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Don't use `@'
+	for rfc2616 compliance.
+
 2003-05-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-message-make-user-agent): Check whether
