@@ -349,7 +349,7 @@ If t, use `message-user-organization-file'."
   :type 'boolean)
 
 (defcustom message-included-forward-headers
-  "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-\\|^Message-ID:\\|^References:\\|^Content-Transfer-Encoding:\\|^Content-Type:\\|^MIME-Version:"
+  "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^\\(Mail-\\)?Followup-To:\\|^\\(Mail-\\)?Reply-To:\\|^Mail-Copies-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-\\|^Message-ID:\\|^References:\\|^Content-\\|^MIME-Version:"
   "*Regexp matching headers to be included in forwarded messages."
   :group 'message-forwarding
   :type 'regexp)
@@ -375,7 +375,7 @@ The provided functions are:
   :group 'message-forwarding
   :type 'boolean)
 
-(defcustom message-ignored-resent-headers "^Return-receipt"
+(defcustom message-ignored-resent-headers "^Return-Receipt"
   "*All headers that match this regexp will be deleted when resending a message."
   :group 'message-interface
   :type 'regexp)
@@ -478,7 +478,7 @@ query the user whether to use the value.  If it is t or the symbol
   "*Specifies what to do with Mail-Reply-To/Reply-To header.
 If nil, always ignore the header.  If it is t or the symbol `use', use
 its value.  If it is the symbol `ask', always query the user whether to
-use the value.  Not that if \"Reply-To\" is marked as \"broken\", its value
+use the value.  Note that if \"Reply-To\" is marked as \"broken\", its value
 is never used."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
@@ -1050,8 +1050,6 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    ;; (References . message-shorten-references)
-    ;; (References . message-fill-header)
     (References . message-fill-references)
     (User-Agent))
   "Alist used for formatting headers.")
@@ -1906,7 +1904,7 @@ prefix, and don't delete any headers."
       ;; Also peel off any blank lines before the signature.
       (forward-line -1)
       (while (looking-at "^[ \t]*$")
- 	(forward-line -1))
+	(forward-line -1))
       (forward-line 1)
       (delete-region (point) end))
     (goto-char start)
@@ -2020,24 +2018,6 @@ The text will also be indented the normal way."
       (message-do-actions actions)
       (message-delete-frame frame org-frame))))
 
-(defun message-delete-frame (frame org-frame)
-  "Delete frame for editing message."
-  (when (and (or (and (featurep 'xemacs)
-		      (not (eq 'tty (device-type))))
-		 window-system)
-	     (or (and (eq message-delete-frame-on-exit t)
-		      (select-frame frame)
-		      (or (eq frame org-frame)
-			  (prog1
-			      (y-or-n-p "Delete this frame?")
-			    (message ""))))
-		 (and (eq message-delete-frame-on-exit 'ask)
-		      (select-frame frame)
-		      (prog1
-			  (y-or-n-p "Delete this frame?")
-			(message "")))))
-    (delete-frame frame)))
-
 (defun message-dont-send ()
   "Don't send the message you have been editing."
   (interactive)
@@ -2059,6 +2039,25 @@ The text will also be indented the normal way."
       (kill-buffer (current-buffer))
       (message-do-actions actions)
       (message-delete-frame frame org-frame))))
+
+(defun message-delete-frame (frame org-frame)
+  "Delete frame for editing message."
+  (when (and (or (and (featurep 'xemacs)
+		      (not (eq 'tty (device-type))))
+		 window-system
+		 (>= emacs-major-version 20))
+	     (or (and (eq message-delete-frame-on-exit t)
+		      (select-frame frame)
+		      (or (eq frame org-frame)
+			  (prog1
+			      (y-or-n-p "Delete this frame?")
+			    (message ""))))
+		 (and (eq message-delete-frame-on-exit 'ask)
+		      (select-frame frame)
+		      (prog1
+			  (y-or-n-p "Delete this frame?")
+			(message "")))))
+    (delete-frame frame)))
 
 (defun message-bury (buffer)
   "Bury this mail buffer."
@@ -2645,7 +2644,7 @@ to find out how to use this."
    (message-check 'from
      (let* ((case-fold-search t)
 	    (from (message-fetch-field "from"))
-	    (ad (nth 1 (funcall gnus-extract-address-components from))))
+	    (ad (nth 1 (std11-extract-address-components from))))
        (cond
 	((not from)
 	 (message "There is no From line.  Posting is denied.")
@@ -2934,10 +2933,9 @@ to find out how to use this."
       (when mid
 	(concat mid
 		(when from
-		  (let ((stop-pos 
-			 (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
+		  (let ((pair (std11-extract-address-components from)))
 		    (concat "\n ("
-			    (if stop-pos (substring from 0 stop-pos) from)
+			    (or (car pair) (cadr pair))
 			    "'s message of " 
 			    (if (or (not date) (string= date ""))
 				"(unknown date)" date)
@@ -3045,7 +3043,7 @@ give as trustworthy answer as possible."
   "Return the pertinent part of `user-mail-address'."
   (when user-mail-address
     (if (string-match " " user-mail-address)
-	(nth 1 (funcall gnus-extract-address-components user-mail-address))
+	(nth 1 (std11-extract-address-components user-mail-address))
       user-mail-address)))
 
 (defun message-make-fqdn ()
@@ -3081,6 +3079,57 @@ give as trustworthy answer as possible."
   (or mail-host-address
       (message-make-fqdn)))
 
+;; Dummy to avoid byte-compile warning.
+(defvar mule-version)
+(defvar emacs-beta-version)
+(defvar xemacs-codename)
+
+(defun message-make-user-agent ()
+  "Return user-agent info."
+  (let ((user-agent
+	 (concat
+	  ;; EMACS/VERSION
+	  (if (featurep 'xemacs)
+	      ;; XEmacs
+	      (concat
+	       (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+	       (if (and (boundp 'emacs-beta-version) emacs-beta-version)
+		   (format "beta%d" emacs-beta-version)
+		 "")
+	       (if (and (boundp 'xemacs-codename) xemacs-codename)
+		   (concat " (" xemacs-codename ")")
+		 "")
+	       )
+	    ;; not XEmacs
+	    (concat
+	     (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+	     (if (>= emacs-major-version 20)
+		 (if (and (boundp 'enable-multibyte-characters)
+			  enable-multibyte-characters)
+		     ""			; Should return " (multibyte)"?
+		   " (unibyte)"))
+	     ))
+	  ;; MULE[/VERSION]
+	  (if (featurep 'mule)
+	      (if (and (boundp 'mule-version) mule-version)
+		  (concat " MULE/" mule-version)
+		" MULE")		; no mule-version
+	    "")				; not Mule
+	  ;; Meadow/VERSION
+	  (if (featurep 'meadow)
+	      (let ((version (Meadow-version)))
+		(if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
+		    (concat " Meadow/"
+			    (match-string 1 version)
+			    (match-string 2 version)
+			    )
+		  "Meadow"))		; unknown format
+	    "")				; not Meadow
+	  )))
+    (if message-user-agent
+	(concat message-user-agent " " user-agent)
+      user-agent)))
+
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
@@ -3097,7 +3146,7 @@ Headers already prepared in the buffer are not modified."
 	   (To nil)
 	   (Distribution (message-make-distribution))
 	   (Lines (message-make-lines))
-	   (User-Agent message-user-agent)
+	   (User-Agent (message-make-user-agent))
 	   (Expires (message-make-expires))
 	   (case-fold-search t)
 	   header value elem)
@@ -3125,7 +3174,13 @@ Headers already prepared in the buffer are not modified."
 	      (setq header (car elem)))
 	  (setq header elem))
 	(when (or (not (re-search-forward
-			(concat "^" (downcase (symbol-name header)) ":")
+			(concat "^"
+				(regexp-quote
+				 (downcase
+				  (if (stringp header)
+				      header
+				    (symbol-name header))))
+				":")
 			nil t))
 		  (progn
 		    ;; The header was found.  We insert a space after the
@@ -3167,7 +3222,8 @@ Headers already prepared in the buffer are not modified."
 		  (progn
 		    ;; This header didn't exist, so we insert it.
 		    (goto-char (point-max))
-		    (insert (symbol-name header) ": " value "\n")
+		    (insert (if (stringp header) header (symbol-name header))
+			    ": " value "\n")
 		    (forward-line -1))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
@@ -3187,15 +3243,13 @@ Headers already prepared in the buffer are not modified."
 		   (not (message-check-element 'sender))
 		   (not (string=
 			 (downcase
-			  (cadr (funcall gnus-extract-address-components
-					 from)))
+			  (cadr (std11-extract-address-components from)))
 			 (downcase secure-sender)))
 		   (or (null sender)
 		       (not
 			(string=
 			 (downcase
-			  (cadr (funcall gnus-extract-address-components
-					 sender)))
+			  (cadr (std11-extract-address-components sender)))
 			 (downcase secure-sender)))))
 	  (goto-char (point-min))
 	  ;; Rename any old Sender headers to Original-Sender.
@@ -3334,7 +3388,7 @@ Headers already prepared in the buffer are not modified."
      (concat "*" type
 	     (if to
 		 (concat " to "
-			 (or (car (funcall gnus-extract-address-components to))
+			 (or (car (std11-extract-address-components to))
 			     to) "")
 	       "")
 	     (if (and group (not (string= group ""))) (concat " on " group) "")
@@ -3345,7 +3399,22 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((buffer (get-buffer name)))
+  (let ((pop-up-frames pop-up-frames)
+	(special-display-buffer-names special-display-buffer-names)
+	(special-display-regexps special-display-regexps)
+	(same-window-buffer-names same-window-buffer-names)
+	(same-window-regexps same-window-regexps)
+	(buffer (get-buffer name)))
+    (if (or (and (featurep 'xemacs)
+		 (not (eq 'tty (device-type))))
+	    window-system)
+	(when message-use-multi-frames
+	  (setq pop-up-frames t
+		special-display-buffer-names nil
+		special-display-regexps nil
+		same-window-buffer-names nil
+		same-window-regexps nil))
+      (setq pop-up-frames nil))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
@@ -3836,10 +3905,10 @@ that further discussion should take place only in "
  			  (downcase sender)
  			  (downcase (message-make-sender))))
  		    (string-equal
- 		     (downcase (cadr (funcall gnus-extract-address-components
-					      from)))
- 		     (downcase (cadr (funcall gnus-extract-address-components
-					      (message-make-from))))))
+ 		     (downcase (cadr (std11-extract-address-components
+				      from)))
+ 		     (downcase (cadr (std11-extract-address-components
+				      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
@@ -3869,18 +3938,13 @@ that further discussion should take place only in "
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((cur (current-buffer))
-	(sender (message-fetch-field "sender"))
-	(from (message-fetch-field "from")))
+  (let ((cur (current-buffer)))
     ;; Check whether the user owns the article that is to be superseded.
-    (unless (or (and sender
-		     (string-equal
-		      (downcase sender)
-		      (downcase (message-make-sender))))
-		(string-equal
-		 (downcase (cadr (mail-extract-address-components from)))
-		 (downcase (cadr (mail-extract-address-components
-				  (message-make-from))))))
+    (unless (string-equal
+	     (downcase (or (message-fetch-field "sender")
+			   (cadr (std11-extract-address-components
+				  (message-fetch-field "from")))))
+	     (downcase (message-make-sender)))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
     (message-pop-to-buffer (message-buffer-name "supersede"))
@@ -4320,7 +4384,7 @@ regexp varstr."
   (let ((locals (save-excursion
 		  (set-buffer buffer)
 		  (buffer-local-variables)))
- 	(regexp "^\\(gnus\\|nn\\|message\\|user-\\(mail-address\\|full-name\\)\\)"))
+	(regexp "^gnus\\|^nn\\|^message"))
     (mapcar
      (lambda (local)
        (when (and (consp local)

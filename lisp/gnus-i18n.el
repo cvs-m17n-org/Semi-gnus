@@ -44,14 +44,12 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
 (defun gnus-set-newsgroup-default-charset (newsgroup charset)
   "Set CHARSET for the NEWSGROUP as default MIME charset."
   (let* ((ng-regexp (concat "^" (regexp-quote newsgroup) "\\($\\|\\.\\)"))
-	 (pair (assoc ng-regexp gnus-newsgroup-default-charset-alist))
-	 )
+	 (pair (assoc ng-regexp gnus-newsgroup-default-charset-alist)))
     (if pair
 	(setcdr pair charset)
       (setq gnus-newsgroup-default-charset-alist
 	    (cons (cons ng-regexp charset)
-		  gnus-newsgroup-default-charset-alist))
-      )))
+		  gnus-newsgroup-default-charset-alist)))))
 
 
 ;;; @ localization

@@ -778,7 +778,7 @@ used to 899, you would say something along these lines:
   :group 'gnus-files
   :group 'gnus-server
   :type 'file)
-  
+
 ;; This function is used to check both the environment variable
 ;; NNTPSERVER and the /etc/nntpserver file to see whether one can find
 ;; an nntp server name default.
