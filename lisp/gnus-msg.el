@@ -1165,46 +1165,10 @@ begin to compose a message:
 		     (concat gnus-v " " mime-edit-user-agent-value)
 		   gnus-v)))
 	  (t
-	   (let* ((system-v
-		   (cond
-		    ((eq gnus-user-agent 'emacs-gnus-config)
-		     system-configuration)
-		    ((eq gnus-user-agent 'emacs-gnus-type)
-		     (symbol-name system-type))
-		    (t nil)))
-		  (emacs-v
-		   (cond
-		    ((eq gnus-user-agent 'gnus)
-		     nil)
-		    ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$"
-				   emacs-version)
-		     (concat (format (if (boundp 'MULE)
-					 "Mule/2.3 (based on Emacs %s)"
-				       "Emacs/%s")
-				     (match-string 1 emacs-version))
-			     (if system-v
-				 (concat " (" system-v ")")
-			       "")))
-		    ((string-match
-		      "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-		      emacs-version)
-		     (concat
-		      (match-string 1 emacs-version)
-		      (format "/%d.%d" emacs-major-version emacs-minor-version)
-		      (if (match-beginning 3)
-			  (match-string 3 emacs-version)
-			"")
-		      (if (boundp 'xemacs-codename)
-			  (concat
-			   " (" xemacs-codename
-			   (if system-v
-			       (concat ", " system-v ")")
-			     ")"))
-			"")))
-		    (t emacs-version))))
-	     (setq user-agent (if (stringp gnus-user-agent)
-				  gnus-user-agent
-				(concat gnus-v
+	   (setq user-agent (if (stringp gnus-user-agent)
+				gnus-user-agent
+			      (concat gnus-v
+				      (let ((emacs-v (gnus-emacs-version)))
 					(when emacs-v
 					  (concat " " emacs-v))))))))
     (when max-column
