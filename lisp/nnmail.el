@@ -524,7 +524,7 @@ If this variable is `t', do not use password cache.")
         (after-insert-file-functions nil))
     (condition-case ()
 	(let ((pathname-coding-system 'binary))
-	  (insert-file-contents-as-specified-coding-system
+	  (insert-file-contents-as-coding-system
 	   file nnmail-file-coding-system)
 	  t)
       (file-error nil))))
@@ -1753,8 +1753,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
   (let ((pathname-coding-system 'binary))
-    (write-region-as-specified-coding-system
-     start end filename append visit lockname nnmail-file-coding-system)
+    (write-region-as-coding-system
+     start end filename nnmail-file-coding-system append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
 
 ;;;
