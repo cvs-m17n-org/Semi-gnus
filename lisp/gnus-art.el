@@ -1294,6 +1294,14 @@ See Info node `(gnus)Customizing Articles' for details."
   :group 'mime-security
   :type gnus-article-treat-custom)
 
+(defcustom gnus-treat-monafy nil
+  "Display body part with mona font.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' for details."
+  :group 'gnus-article-treat
+  :group 'mime-security
+  :type gnus-article-treat-custom)
+
 (defvar gnus-article-encrypt-protocol-alist
   '(("PGP" . mml2015-self-encrypt)))
 
@@ -1324,6 +1332,7 @@ It is a string, such as \"PGP\". If nil, ask user."
   '((gnus-treat-decode-article-as-default-mime-charset
      gnus-article-decode-article-as-default-mime-charset)
     (gnus-treat-x-pgp-sig gnus-article-verify-x-pgp-sig)
+    (gnus-treat-monafy gnus-article-monafy)
     (gnus-treat-strip-banner gnus-article-strip-banner)
     (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
     (gnus-treat-buttonize gnus-article-add-buttons)
@@ -3436,6 +3445,21 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   (if (gnus-buffer-live-p gnus-original-article-buffer)
       (canlock-verify gnus-original-article-buffer)))
 
+(defun article-monafy ()
+  "Display body part with mona font."
+  (interactive)
+  (unless (if (featurep 'xemacs)
+	      (find-face 'gnus-mona-face)
+	    (facep 'gnus-mona-face))
+    (require 'navi2ch-mona)
+    (set-face-font (make-face 'gnus-mona-face) navi2ch-mona-font))
+  (save-excursion
+    (let ((buffer-read-only nil))
+      (article-goto-body)
+      (gnus-overlay-put
+       (gnus-make-overlay (point) (point-max))
+       'face 'gnus-mona-face))))
+
 (eval-and-compile
   (mapcar
    (lambda (func)
@@ -3458,6 +3482,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
    '(article-hide-headers
      article-verify-x-pgp-sig
      article-verify-cancel-lock
+     article-monafy
      article-hide-boring-headers
      article-toggle-headers
      article-treat-overstrike
