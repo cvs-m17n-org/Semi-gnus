@@ -2240,6 +2240,7 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @vindex gnus-select-group-hook
 @vindex gnus-auto-select-first
+@vindex gnus-auto-select-subject
 $B$b$7(B @code{gnus-auto-select-first} $B$,Hs(B-@code{nil} $B$@$C$?$i!"(B
 @kbd{SPACE} $B%3%^%s%I$G%0%k!<%W$KF~$C$?$H$-$K<+F0E*$K5-;v$rA*Br$7$^$9!#$I(B
 $B$N5-;v$,A*Br$5$l$k$+$O!"JQ?t(B @code{gnus-auto-select-subject} $B$G@)8f$5$l(B
