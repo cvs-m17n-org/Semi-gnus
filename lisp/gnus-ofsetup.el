@@ -146,10 +146,6 @@
 			"(add-hook"
 			"'gnus-after-getting-new-news-hook"
 			"'gnus-offline-after-get-new-news)"))
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'gnus-after-getting-news-hook"
-			"'gnus-offline-after-get-new-news)"))
 	(when (eq news-method 'nnspool)
 	  (insert (format "%s %s %s\n"
 			  "(add-hook"
@@ -219,7 +215,7 @@
 Method to fetch news articles.")
     (param-dialup-program-1 . "Dialup Program")
     (param-dialup-program-2 . "Use program..")
-    (param-dialup-program-3 . "Don't auto-dial.")
+    (param-dialup-program-3 . "Don't use a program.")
     (param-dialup-program-4 . "\
 Program which does dial.")
     (param-dialup-program-arg-1 . "Dialup Program Arguments")
@@ -228,7 +224,7 @@ Program which does dial.")
 Program arguments of gnus-offline-dialup-program.")
     (param-hangup-program-1 . "Hangup Program")
     (param-hangup-program-2 . "Use program..")
-    (param-hangup-program-3 . "Don't auto-hangup.")
+    (param-hangup-program-3 . "Don't use a program.")
     (param-hangup-program-4 . "\
 Program which does hangup.")
     (param-hangup-program-arg-1 . "Hangup Program Arguments")
@@ -314,7 +310,7 @@ restarted.")
     (setup-16 . "movemail プログラムの名前: ")
     (setup-17 . "movemail プログラムに渡す引数: ")
     (setup-18 . "newsrc ファイルに POP パスワードを保存しますか? ")
-    
+
     (param-news-method-4 . "\
 ニュース記事を取得する方法です。")
     (param-dialup-program-4 . "\
@@ -381,12 +377,12 @@ mail source specifier とか上記のようなキーワードについてもっとよく
      (param-news-method-3 . "nnspool")
      (param-dialup-program-1 . "ダイヤル接続プログラム")
      (param-dialup-program-2 . "プログラムを使う..")
-     (param-dialup-program-3 . "自動ダイヤル接続はしない")
+     (param-dialup-program-3 . "プログラムは指定しない")
      (param-dialup-program-arg-1 . "ダイヤル接続プログラムの引数")
      (param-dialup-program-arg-2 . "引数")
      (param-hangup-program-1 . "ダイヤル切断プログラム")
      (param-hangup-program-2 . "プログラムを使う..")
-     (param-hangup-program-3 . "自動ダイヤル切断はしない")
+     (param-hangup-program-3 . "プログラムは指定しない")
      (param-hangup-program-arg-1 . "ダイヤル切断プログラムの引数")
      (param-hangup-program-arg-2 . "引数")
      (param-interval-1 . "自動送受信ジョブの間隔")
