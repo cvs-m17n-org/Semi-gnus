@@ -330,7 +330,7 @@ should return the new buffer name."
   :group 'message-buffers
   :type '(choice (const :tag "off" nil)
 		 (const :tag "unique" unique)
-		 (const :tag "unsuniqueent" unsent)
+		 (const :tag "unsent" unsent)
 		 (function fun)))
 
 (defcustom message-kill-buffer-on-exit nil
@@ -3639,10 +3639,6 @@ Headers already prepared in the buffer are not modified."
 (defun message-buffer-name (type &optional to group)
   "Return a new (unique) buffer name based on TYPE and TO."
   (cond
-   ;; Check whether `message-generate-new-buffers' is a function,
-   ;; and if so, call it.
-   ((message-functionp message-generate-new-buffers)
-    (funcall message-generate-new-buffers type to group))
    ;; Generate a new buffer name The Message Way.
    ((eq message-generate-new-buffers 'unique)
     (generate-new-buffer-name
@@ -3654,6 +3650,10 @@ Headers already prepared in the buffer are not modified."
 	       "")
 	     (if (and group (not (string= group ""))) (concat " on " group) "")
 	     "*")))
+   ;; Check whether `message-generate-new-buffers' is a function,
+   ;; and if so, call it.
+   ((message-functionp message-generate-new-buffers)
+    (funcall message-generate-new-buffers type to group))
    ((eq message-generate-new-buffers 'unsent)
     (generate-new-buffer-name
      (concat "*unsent " type

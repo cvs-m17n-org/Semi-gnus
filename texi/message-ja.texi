@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message-ja
-@settitle Message 6.10.040 Manual
+@settitle Message 6.10.041 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -60,7 +60,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Message 6.10.040 Manual
+@title Message 6.10.041 Manual
 
 @author by Lars Magne Ingebrigtsen
 @translated by members of Semi-gnus mailing-list
@@ -112,7 +112,7 @@ Gnus $B$NA4$F$N%a%C%;!<%8$N:n@.(B ($B%a!<%k$H%K%e!<%9$NN>J}(B) $B$O%a%C%;!<
 * Key Index::         $B%a%C%;!<%8%b!<%I%-!<$N0lMw!#(B
 @end menu
 
-$B$3$N%^%K%e%"%k$O(B Message 6.10.040 $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e%"%k$H(B
+$B$3$N%^%K%e%"%k$O(B Message 6.10.041 $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e%"%k$H(B
 $BF1$8HGHV9f$N(B Gnus $B$NG[I[$H6&$KG[I[$5$l$^$9!#(B
 
 
