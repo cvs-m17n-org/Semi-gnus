@@ -1,6 +1,6 @@
 2000-06-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
-	* Nana-gnus: Version 7.1.0.21 (This is alpha status.)
+	* Nana-gnus: Version 7.1.0.22 (This is alpha status.)
 	Fix bugs.
 
 	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Do not disable
