@@ -1,3 +1,10 @@
+1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.024.
+	Fix supported version for FLIM and SEMI.
+
+	* Sync up with Pterodactyl Gnus 0.35.
+
 1998-10-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-setup-needed-hooks): Change
