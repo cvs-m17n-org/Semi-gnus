@@ -5194,6 +5194,7 @@ Headers already prepared in the buffer are not modified."
 	   (User-Agent (message-make-user-agent))
 	   (Expires (message-make-expires))
 	   (case-fold-search t)
+	   (optionalp nil)
 	   header value elem)
       ;; First we remove any old generated headers.
       (let ((headers message-deletable-headers))
@@ -5215,7 +5216,8 @@ Headers already prepared in the buffer are not modified."
 	(setq elem (pop headers))
 	(if (consp elem)
 	    (if (eq (car elem) 'optional)
-		(setq header (cdr elem))
+		(setq header (cdr elem)
+		      optionalp t)
 	      (setq header (car elem)))
 	  (setq header elem))
 	(when (or (not (re-search-forward
@@ -5231,7 +5233,7 @@ Headers already prepared in the buffer are not modified."
 		    ;; The header was found.  We insert a space after the
 		    ;; colon, if there is none.
 		    (if (/= (char-after) ? ) (insert " ") (forward-char 1))
-		    ;; Find out whether the header is empty...
+		    ;; Find out whether the header is empty.
 		    (looking-at "[ \t]*\n[^ \t]")))
 	  ;; So we find out what value we should insert.
 	  (setq value
@@ -5288,9 +5290,12 @@ Headers already prepared in the buffer are not modified."
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
 		(delete-region (point) (gnus-point-at-eol))
-		(insert value)
-		(when (bolp)
-		  (delete-char -1)))
+		;; If the header is optional, and the header was
+		;; empty, we can't insert it anyway.
+		(unless optionalp
+		  (insert value)
+		  (when (bolp)
+		    (delete-char -1))))
 	      ;; Add the deletable property to the headers that require it.
 	      (and (memq header message-deletable-headers)
 		   (progn (beginning-of-line) (looking-at "[^:]+: "))
