@@ -1,4 +1,4 @@
-;;; smtp.el --- basic functions of SMTP protocol (RFC 821)
+;;; smtp.el --- basic functions to send mail with SMTP server
 
 ;; Copyright (C) 1995, 1996, 1998 Free Software Foundation, Inc.
 
@@ -376,19 +376,21 @@ don't define this value."
 	(simple-address-list "")
 	this-line
 	this-line-end
-	addr-regexp)
-    
+	addr-regexp
+	(smtp-address-buffer (generate-new-buffer " *smtp-mail*")))
     (unwind-protect
 	(save-excursion
 	  ;;
-	  (set-buffer smtp-address-buffer) (erase-buffer)
+	  (set-buffer smtp-address-buffer)
+	  (erase-buffer)
 	  (insert-buffer-substring smtp-text-buffer
 				   header-start header-end)
 	  (goto-char (point-min))
 	  ;; RESENT-* fields should stop processing of regular fields.
 	  (save-excursion
 	    (if (re-search-forward "^RESENT-TO:" header-end t)
-		(setq addr-regexp "^\\(RESENT-TO:\\|RESENT-CC:\\|RESENT-BCC:\\)")
+		(setq addr-regexp
+		      "^\\(RESENT-TO:\\|RESENT-CC:\\|RESENT-BCC:\\)")
 	      (setq addr-regexp  "^\\(TO:\\|CC:\\|BCC:\\)")))
 
 	  (while (re-search-forward addr-regexp header-end t)
@@ -401,15 +403,19 @@ don't define this value."
 	    (setq this-line-end (point-marker))
 	    (setq simple-address-list
 		  (concat simple-address-list " "
-			  (mail-strip-quoted-names (buffer-substring this-line this-line-end))))
+			  (mail-strip-quoted-names
+			   (buffer-substring this-line this-line-end))))
 	    )
 	  (erase-buffer)
 	  (insert-string " ")
 	  (insert-string simple-address-list)
 	  (insert-string "\n")
-	  (subst-char-in-region (point-min) (point-max) 10 ?  t);; newline --> blank
-	  (subst-char-in-region (point-min) (point-max) ?, ?  t);; comma   --> blank
-	  (subst-char-in-region (point-min) (point-max)  9 ?  t);; tab     --> blank
+	  ;; newline --> blank
+	  (subst-char-in-region (point-min) (point-max) 10 ?  t)
+	  ;; comma   --> blank
+	  (subst-char-in-region (point-min) (point-max) ?, ?  t)
+	  ;; tab     --> blank
+	  (subst-char-in-region (point-min) (point-max)  9 ?  t)
 
 	  (goto-char (point-min))
 	  ;; tidyness in case hook is not robust when it looks at this
@@ -419,15 +425,14 @@ don't define this value."
 	  (let (recipient-address-list)
 	    (while (re-search-forward " \\([^ ]+\\) " (point-max) t)
 	      (backward-char 1)
-	      (setq recipient-address-list (cons (buffer-substring (match-beginning 1) (match-end 1))
-						 recipient-address-list))
+	      (setq recipient-address-list
+		    (cons (buffer-substring (match-beginning 1) (match-end 1))
+			  recipient-address-list))
 	      )
 	    (setq smtp-recipient-address-list recipient-address-list))
-
 	  )
-      )
-    )
-  )
+      (kill-buffer smtp-address-buffer))
+    ))
 
 (defun smtp-do-bcc (header-end)
   "Delete BCC: and their continuation lines from the header area.
