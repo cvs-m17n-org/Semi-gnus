@@ -1,3 +1,8 @@
+2000-04-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-yank-message): Rewrite for the use
+	of the separated message frames; use `gnus-copy-article-buffer'.
+
 2000-04-13  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 18.
