@@ -1,3 +1,9 @@
+1998-09-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.012.
+
+	* Sync up with Pterodactyl Gnus 0.18.
+
 1998-09-07  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-draft.el (gnus-draft-setup): Do not use message mode.
