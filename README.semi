@@ -1,0 +1,102 @@
+This package contains Semi-gnus 6.9.
+
+What is Semi-gnus?
+==================
+
+  Semi-gnus is a replacement of Gnus with gnus-mime for SEMI.  It has
+all features of Gnus and gnus-mime, so there are no need to install
+Gnus to use it, and you must not use gnus-mime for SEMI.
+
+  It requires SEMI package, so please get and install SEMI package
+before to install it. Semi-gnus 6.9 requires SEMI 1.11. You can get
+SEMI from
+ftp://ftp.jaist.ac.jp/pub/elisp/semi/
+Required environment for SEMI is written in README.en of SEMI package.
+
+How to get? (via CVS)
+=====================
+
+(0) cvs login (first time only)
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	login
+
+    CVS password: [CR] # NULL string
+
+(1) checkout
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	checkout [-r TAG] gnus
+
+(2) compile
+
+    % cd gnus
+    % make EMACS=<file name of your emacs>
+
+(3) update
+
+    % cvs update [-r TAG]
+
+Major tags are following:
+
+    semi-gnus		assigned to the latest stable version.  It is
+			very conservative.
+
+    for-semi-N1_N2	assigned to the latest stable version for SEMI 
+			API N1.N2 (N1 and N2 are natural number).
+			(e.g. `for-semi-1_3' is for SEMI API 1.3)
+
+    gnus-N1_N2_N3	assigned to gnus(Gnus) N1.N2.N3
+			(e.g. `gnus-6_2_1' means gnus 6.2.1).
+
+    larsi		Original Gnus
+
+    himi		himi branch
+
+    ichikawa		ichikawa branch
+
+    pgnus-ichikawa	ichikawa branch. Based on pGnus
+
+    akr			akr branch
+
+    shuhei-k		shuhei-k branch
+			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
+
+For more detailed information, please read README.branch.
+
+
+How to get? (via ftp)
+=====================
+
+  Semi-daily snapshots are also available from
+
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+
+  NOTE: These snapshots are automatically created from our repository
+if something was changed within a day, and will usually not be tested.
+
+
+How to join development
+=======================
+
+  If you have found a bug in Gnus proper, please do `M-x gnus-bug' and
+send a bug report to the Gnus maintainers.
+
+  If you have found a bug in Semi-gnus, or if you're not sure whether it
+is a Gnus proper, please send a bug report to the Semi-gnus mailing list:
+
+    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+
+Suggestions for Semi-gnus improvements are also welcome.
+
+  Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
+the latest release of Semi-gnus, and discuss future enhancements to
+Semi-gnus.  To join the Semi-gnus ML, send an empty e-mail to
+
+    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+
+  In addition, we need developers.  If you would like to develop it,
+please send mail to cvs@chamonix.jaist.ac.jp with your account name
+and UNIX /etc/passwd style crypted password.

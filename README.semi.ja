@@ -1,0 +1,110 @@
+このパッケージには Semi-gnus 6.9 が入っています。
+
+Semi-gnus とは？
+==================
+
+  Semi-gnus は SEMI のための gnus-mime と Gnus の組合せを置き換えるも
+のです。Gnus と gnus-mime の全ての機能を持っていますので、これを使用す
+るために Gnus をインストールする必要はなく、SEMI のための gnus-mime は
+使用してはいけません。
+
+  SEMI パッケージを要求しますので、インストールする前に SEMI パッケー
+ジをインストールしてください。Semi-gnus 6.9 は SEMI 1.11 を要求します。
+SEMI は
+ftp://ftp.jaist.ac.jp/pub/elisp/semi/ 
+から取得することができます。必要な環境は SEMI の README.ja を参照して
+ください。
+
+
+取得方法 (CVS)
+=====================
+
+(0) cvs login (初回のみ)
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	login
+
+    CVS password: [CR] # 空文字列
+
+(1) checkout
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	checkout [-r TAG] gnus
+
+(2) compile
+
+    % cd gnus
+    % make EMACS=<file name of your emacs>
+
+(3) update
+
+    % cvs update [-r TAG]
+
+主なタグは以下のようになっています:
+
+    semi-gnus		最新の安定版に割り当てられます。非常に保守的で
+			す。(現在は使用されていません。)
+
+    for-semi-N1_N2	SEMI API N1.N2 (N1 と N2 は自然数) に対応して
+			最新の安定版に割り当てられます。(例
+			`for-semi-1_3' は SEMI API 1.3 用です。)
+			(現在は使用されていません。)
+
+    gnus-N1_N2_N3	gnus(Gnus) N1.N2.N3 に割り当てられます。
+			(例 `gnus-6_2_1' は gnus 6.2.1 です。)
+
+    larsi		元の Gnus
+
+    himi		himi branch
+
+    ichikawa		ichikawa branch
+
+    pgnus-ichikawa	ichikawa branch. Based on pGnus
+	
+    akr			akr branch
+
+    shuhei-k		shuhei-k branch
+			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
+
+詳しくは、README.branch.ja を参照してください。
+
+
+取得方法 (ftp)
+=====================
+
+  ほぼ毎日の snapshot が
+
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+
+  から取得可能です。
+
+  注意: これらの snapshot はその日の間に repository に何か変更があった
+  ときに自動的に作成され、普通はテストされていません。
+
+
+開発への参加方法
+=======================
+
+  Gnus のバグを見つけたときは、`M-x gnus-bug' として、Gnus の維持者に
+  バグ報告を送ってください。
+
+  Semi-gnus のバグを見つけたか、Gnus のバグであるかどうかが分からない
+  ときは、バグ報告を Semi-gnus メーリングリストに送ってください:
+
+    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(英語)
+    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(日本語)
+
+Semi-gnus の改善のための提案も歓迎されます。
+
+  Semi-gnus ML では、Semi-gnus 関連のバグを報告したり、最新の
+  Semi-gnus のリリースを取得したり、Semi-gnus の将来の拡張を議論したり
+  することができます。Semi-gnus ML に参加するためには
+
+    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(英語)
+    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(日本語)
+
+  に空のメールを送ってください。
+
+  加えて、開発者を必要としています。開発に参加したい場合は、
+cvs@chamonix.jaist.ac.jp にアカウント名と UNIX の /etc/passwd の様式で
+暗号化されたパスワードをメールを送ってください。

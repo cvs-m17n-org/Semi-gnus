@@ -1,0 +1,111 @@
+README.branch.ja --- branch と tag の説明 (草稿)
+========================================================================
+
+Semi-gnus revision tree (1998-07-16)
+
+    vendor      personal    main trunk      public
+    branch      branches                    branches
+------------------------------------------------------------------------
+qGnus 0.??  ------> Semi-gnus 6.0.0
+       :                        :
+       :        himi     <--  6.0.7
+       :        ichikawa <--  6.0.8
+       :        akr      <--  6.2.3
+       :        shuhei-k <--  6.3.1
+Gnus 5.6.11 ------>           6.3.3
+       :                      6.4.0 (for SEMI 1.5)
+       :                     (6.4.?)------> for SEMI 1.5
+       :                        |    \
+       :                        |     \
+(元の Gnus との Sync は何度     |      ---> for SEMI 1.6
+ もなされていますが、ここに  (6.4.?)------> 6.5 (for SEMI 1.7)
+ は書きません。)                |        /    6.5.0
+       :                        |    (?)/
+       :                        |   <---
+       :                     (6.5.?)------> 6.6 (for SEMI 1.8, FLIM 1.7)
+       :                        |    \        6.6.0        stable branch
+       :                        |     \
+       :                        |      ---> 6.7 (for SEMI 1.8, FLIM 1.7)
+       :                        |             6.7.0       develop branch
+       :     sync               |               :
+Gnus 5.6.22 ------>             |   feedback  6.7.7
+       :                     (6.7.8)<------   6.7.8
+       :                        |    \
+       :                        |     \
+       :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8)
+       :     sync               |             6.8.0
+Gnus 5.6.24 ------>             |             6.8.1
+       :                        :               :
+       :                        :               :
+========================================================================
+
+The Vendor Branch
+
+    Gnus の元のバージョンです。
+    それぞれのバージョンは "qgnus-0_XY" や "gnus-5_X_Y" や
+    "pgnus-0_XY" という形式の tag が付いています。
+
+    vendor branch の branch tag は "larsi" です。
+
+The Main Trunk
+
+    現在の branch 管理計画が導入されるまで、Semi-gnus は main trunk で
+    開発されていました (下の "Public Branches" を読んでください)。それ
+    ぞれのバージョンは "gnus-6_N2_N3" という形式です。(0 < N2 < 5)
+
+Public Branches
+
+    現在の Semi-gnus 開発の主流です。
+
+    [public branch の目標と主義を書く ???]
+
+    それぞれの branch は "gnus-N1_N2" という形式の tag が付いていて、
+    それぞれのバージョンは "gnus-N1_N2_N3" という形式の tag が付いてい
+    ます。
+
+    N1, N2, N3 は以下の規則に従って変更されます。
+
+    N1 は基礎的な仕組みの変更がなされたときに増やされます。もちろん、
+    この場合は N2 と N3 は 0 になります。
+
+    N2 は新しい branch が "主な変更" を行ったときに増やされます。 "主
+    な変更" とは、API の変更、元の Gnus の大きな更新、設計の決定を伴う
+    ような元の Gnus との同期などです。
+
+    N3 は "小さな変更" がなされたときに増やされます。"小さな変更" は小
+    さなバグ修正や、設計の決定を伴わない元の Gnus との同期などです。
+
+    現在は以下の branch tag が使用可能です。
+    The following branch tags are currently available.
+
+	for-semi-1_5	Semi-gnus for SEMI 1.5 API
+	for-semi-1_6	Semi-gnus for SEMI 1.6 API
+	gnus-6_5	Semi-gnus for SEMI 1.7 API
+	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API
+	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API (stable)
+	gnus-6_9	Semi-gnus for SEMI 1.11 FLIM 1.12 API (develop)
+
+Personal Branches
+
+    Semi-gnus 開発者の中には自分の "personal branch" を持っている人も
+    います。それぞれの personal branch は目標、主義を持っているでしょ
+    う。それぞれの branch の情報は (存在するならば、) README.${tag} を
+    読んでください。
+
+    以下の branch tag が現在使用可能です。
+
+	himi		Owner: Miyashita Hisashi
+	ichikawa	Owner: Tatsuya Ichikawa
+	akr		Owner: Tanaka Akira
+	shuhei-k	Owner: Shuhei KOBAYASHI
+
+"semi-gnus" Tag
+
+    これは最新の安定版に割り当てられていました。現在は維持されていませ
+    ん。(XXX: ???)
+
+"for-semi-N1_N2" Tags
+
+    これは SEMI API N1.N2 に対応するバージョンに割り当てられていました。
+    この習慣はもう使われません。(XXX: ???)
