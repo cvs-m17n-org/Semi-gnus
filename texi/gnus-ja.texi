@@ -673,12 +673,12 @@ Gnus $(B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 @vindex gnus-check-new-newsgroups
 $(B?7$7$$%K%e!<%9%0%k!<%W$rA4$/8+$J$$$GK~B-$G$"$k$J$i$P!"(B
 @code{gnus-check-new-newsgroups} $(B$r(B @code{nil} $(B$K@_Dj$9$k$3$H$,$G$-$^$9!#(B
-$(B$3$l$r@_Dj$7$?>l9g!"5/F0$K$+$+$k;~4V$,C;$/$J$j$^$9!#$3$NJQ?t$,(B nil $(B$K@_(B
-$(BDj$5$l$F$$$F$b!"%0%k!<%W%P%C%U%!$G(B @kbd{U} $(B$r2!$;$P$$$D$G$b?7$7$$%0%k!<(B
-$(B%W$r9XFI$9$k$3$H$,$G$-$^$9(B (@pxref{Group Maintenance})$(B!#=i4|@_Dj$G$O$3$N(B
-$(BJQ?t$O(B @code{ask-server} $(B$G$9!#$3$NJQ?t$,(B @code{always} $(B$K@_Dj$5$l$F$$$k(B
-$(B$H!"L?Na(B @kbd{g} $(B$r<B9T$7$?$H$-$G$b(B gnus $(B$O%P%C%/%(%s%I$K?7$7$$%0%k!<%W(B
-$(B$rC5$9$3$H$r5a$a$^$9(B (@pxref{Scanning New Messages})$(B!#(B
+$(B$3$l$r@_Dj$7$?>l9g!"5/F0$K$+$+$k;~4V$,C;$/$J$j$^$9!#$3$NJQ?t$,(B
+@code{nil} $(B$K@_Dj$5$l$F$$$F$b!"%0%k!<%W%P%C%U%!$G(B @kbd{U} $(B$r2!$;$P$$$D$G(B
+$(B$b?7$7$$%0%k!<%W$r9XFI$9$k$3$H$,$G$-$^$9(B (@pxref{Group Maintenance})$(B!#=i(B
+$(B4|@_Dj$G$O$3$NJQ?t$O(B @code{ask-server} $(B$G$9!#$3$NJQ?t$,(B @code{always} $(B$K(B
+$(B@_Dj$5$l$F$$$k$H!"L?Na(B @kbd{g} $(B$r<B9T$7$?$H$-$G$b(B gnus $(B$O%P%C%/%(%s%I$K(B
+$(B?7$7$$%0%k!<%W$rC5$9$3$H$r5a$a$^$9(B (@pxref{Scanning New Messages})$(B!#(B
 
 @menu
 * Checking New Groups::      $(B$I$N%0%k!<%W$,?7$7$$$+$r7hDj$9$k!#(B
@@ -9707,7 +9707,7 @@ W3 $(B$NG[I[$+$i(B) $(B$,I,MW$K$J$j$^$9(B)$(B!#$=$l$+$i%5!<%P!<$r<!$N$h$&$K
 @vindex nnspool-sift-nov-with-sed
 @cindex sed
 @code{nil} $(B$G$J$$$H!"$3$l$,%G%#%U%)%k%H$G$9$,!"354Q%U%!%$%k(B (overview)
-$(B$+$i4XO"$9$kItJ,$rF@$k$?$a$K(B @code{sed} $(B$r;H$$$^$9!#$b$7(B nil $(B$@$H!"(B
+$(B$+$i4XO"$9$kItJ,$rF@$k$?$a$K(B @code{sed} $(B$r;H$$$^$9!#$b$7(B @code{nil} $(B$@$H!"(B
 @code{nnspool} $(B$O%U%!%$%kA4BN$r%P%C%U%!$KFI$_9~$s$G!"$=$3$G<B9T$7$^$9!#(B
 
 @end table
@@ -10218,7 +10218,7 @@ IMAP $(B%a!<%k%=!<%9$NNc(B:
 
 @item webmail
 www.hotmail.com, mail.yahoo.com, www.netaddress.com $(B$J$I$N%&%'%V%a!<%k%5!<(B
-$(B%S%9$+$i%a!<%k$r<hF@$7$^$9!#(B
+$(B%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 
 $(BCm(B: $(B%&%'%V%a!<%k$O(B w3 (url) $(B%Q%C%1!<%8$N%P!<%8%g%s(B "WWW 4.0pre.46
 1999/10/01" $(B$KBg$-$/0MB8$7$^$9!#$=$l0JA0$N$b$N$O$*$=$i$/F0:n$7$J$$$G$7$g(B
@@ -11481,12 +11481,12 @@ gnus $(B$N%0%k!<%W$H$7$F9XFI$7!"$3$l$i$N%0%k!<%W$KF~$k$3$H$G%3%a%s%H$rFI$`(B
 $(BFI$9$k$3$H$KCm0U$7$F$/$@$5$$!#B>$NJ}K!$b;H$($^$9(B (@pxref{Subscription
 Methods})$(B!#(B
 
-@code{nnslashdot} $(B%3%a%s%H$K%U%)%m!<%"%C%W(B ($(B?7$7$$%3%a%s%H$NEj9F(B) $(B$r$9$k(B
-$(B$H$-$O!">/$7(B @sc{html} $(B$KJQ49$5$l$^$9!#FC$K!"(B@samp{> } $(B$G0zMQ$5$l$?%F%-(B
-$(B%9%H$O$=$NBe$o$j$K(B @code{blockquote} $(B$G0zMQ$5$l!"=pL>$K$O$=$l$>$l$N9T$N(B
-$(B:G8e$K(B @code{br} $(B$,DI2C$5$l$^$9!#$=$l0J30$O!"%a%C%;!<%8%P%C%U%!$KD>@\(B
-@sc{html} $(B$r=q$/$3$H$,$G$-$^$9!#(BSlashdot $(B$O$$$/$D$+(B @sc{html} $(B$rA*JL$9$k(B
-$(B$3$H$K5$$r$D$1$F$/$@$5$$!#(B
+@code{nnslashdot} $(B%3%a%s%H$K%U%)%m!<%"%C%W(B ($(B$^$?$O?7$7$$%3%a%s%H$NEj9F(B)
+$(B$r$9$k$H$-$O!">/$7(B @sc{html} $(B$KJQ49$5$l$^$9!#FC$K!"(B@samp{> } $(B$G0zMQ$5$l(B
+$(B$?%F%-%9%H$O$=$NBe$o$j$K(B @code{blockquote} $(B$G0zMQ$5$l!"=pL>$K$O$=$l$>$l(B
+$(B$N9T$N:G8e$K(B @code{br} $(B$,DI2C$5$l$^$9!#$=$l0J30$O!"%a%C%;!<%8%P%C%U%!$K(B
+$(BD>@\(B @sc{html} $(B$r=q$/$3$H$,$G$-$^$9!#(BSlashdot $(B$O$$$/$D$+(B @sc{html} $(B$rA*(B
+$(BJL$9$k$3$H$K5$$r$D$1$F$/$@$5$$!#(B
 
 $(B0J2<$NJQ?t$G?6$kIq$$$rJQ$($k$3$H$,$G$-$^$9(B:
 
@@ -12462,7 +12462,7 @@ Nnmail $(B$GBP1~$9$k$b$N(B: @code{nnmail-crosspost}.
 @vindex nnimap-split-inbox
 
 $(BJ,3d$N85$H$J$k(B IMAP $(B$N%a!<%k%\%C%/%9$NL>A0$r;XDj$7$?J8;zNs$+J8;zNs$N%j%9(B
-$(B%H$G$9!#=i4|CM$O(B nil $(B$G!"J,3d$O;HMQ$7$J$$$h$&$K$J$C$F$$$^$9(B!
+$(B%H$G$9!#=i4|CM$O(B @code{nil} $(B$G!"J,3d$O;HMQ$7$J$$$h$&$K$J$C$F$$$^$9(B!
 
 @lisp
 (setq nnimap-split-inbox '("INBOX" ("~/friend/Mail" . "lists/*") "lists.imap"))
@@ -12496,12 +12496,12 @@ INBOX.spam $(B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $(B$KF~$l$^$9!#(B
 $(B$K;HMQ$5$l$k$N$HF1$8$h$&$J!"(B`\\1' $(B7A<0$r4^$`$3$H$,$G$-$^$9!#Nc$($P(B:
 
 @lisp
-          ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@")
+          ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
 @end lisp
 
 2$(B$DL\$NMWAG$O4X?t$G$"$k$3$H$b$G$-$^$9!#$=$N>l9g$O!"5-;v$N%X%C%@!<$,$"$k(B
 $(B%P%C%U%!$G!"$=$N5,B'$N:G=i$NMWAG$r0z?t$H$7$F8F$P$l$^$9!#%a!<%k$,$=$N%0%k!<(B
-$(B%W$KB0$9$k$H9M$($k>l9g$O!"(Bnil $(B$G$J$$CM$rJV$9I,MW$,$"$j$^$9!#(B
+$(B%W$KB0$9$k$H9M$($k>l9g$O!"(B@code{nil} $(B$G$J$$CM$rJV$9I,MW$,$"$j$^$9!#(B
 
 Nnmail $(B$NMxMQ<T$O:G8e$N@55,I=8=$OA4$F$N5-;v$K9gCW$9$k$h$&$K6u$G$J$/$F$O(B
 $(B$J$i$J$$$3$H$r3P$($F$$$k$+$b$7$l$^$;$s(B ($(B>e$NNc$N$h$&$K(B)$(B!#(B $(B$3$l$O(B nnimap
@@ -13003,7 +13003,6 @@ gnus $(B%(!<%8%'%s%H$,$=$N5-;v$r(B SPAM $(B$@$H8+Pv$7$?$i??!#$3$NH/8+E*(B
 $(B>e$N$h$&$J$b$N$r;H$&$H$-$O!"@$$NCf$K$O@5$7$/@_Dj$5$l$F$$$J$$%7%9%F%`(B/$(B%a(B
 $(B!<%i!<$,$"$j!"5-;v$NF|IU$O$$$DEj9F$5$l$?$+$r>o$K3N<B$K<($9$o$1$G$O$"$j$^(B
 $(B$;$s!#$"$!!"$=$l$rA4$/5$$K$7$J$$?M$b$$$^$9!#(B
-
 
 $(B>e$N=R8l$O$=$NJ,N`$KB0$9$k(B*$(BA4$F(B*$(B$N%0%k!<%W$KE,MQ$5$l$^$9!#$7$+$7!"J,N`Cf(B
 $(B$N8D!9$N%0%k!<%W$KFCDj$N=R8l$rK>$s$@$j!"BUBF2a$.$F?7$7$$J,N`$r@_Dj$G$-$J(B
@@ -16775,10 +16774,10 @@ Gnus $(B$r=*N;$9$k$H$-$K(B picon $(B%-%c%C%7%e$r>C$75n$k$+$I$&$+!#(BGnus
 $(B$^$9!#(B
 
 $(B0l8@$G8@$($P(B --- gnus $(B$G%9%^%$%j!<$r;H$&$K$O!"0J2<$r(B
-@file{.gnus.el} $(B$U$!$$$k$K=q$$$F$/$@$5$$!#(B
+@file{.gnus.el} $(B%U%!%$%k$K=q$$$F$/$@$5$$!#(B
 
 @lisp
-(setq gnus-treat-display-smiley t)
+(setq gnus-treat-display-smileys t)
 @end lisp
 
 $(B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}$(B!"(B@samp{:-=}$(B!"(B
@@ -17205,7 +17204,7 @@ but at the common table.@*
 $(B$?!#(B
 
 $(B$3$NL5Ni$r9T$C$??MJ*$rD4$Y$F$_$?$$$N$J$i!"$"$J$?$N(B ($(B$/$=!*(B) $(B%&%'%V%V%i%&(B
-$(B%6!<$r(B @file{http://www.stud.ifi.uio.no/~larsi/} $(B$K8~$1$k;v$,$G$-$^$9!#(B
+$(B%6!<$r(B @file{http://quimby.gnus.org/~larsi/} $(B$K8~$1$k;v$,$G$-$^$9!#(B
 $(B$3$l$O?7$7$/$F?h$JHG$N(B gnus $(B$NBh0lG[I[>l=j$G!"(BNewsrc $(B$r$V$C2u$7$F?M!9$r(B
 $(B7cE\$5$l$k%5%$%H$H$7$FCN$i$l$F$$$^$9!#(B
 
@@ -17266,19 +17265,17 @@ Gnus5.0 $(B$N(B15$(B%j%j!<%9(B)$(B!#(B
 
 
 @node Other Gnus Versions
-@subsection Other Gnus Versions
+@subsection $(BB>$N(B gnus $(B$N%P!<%8%g%s(B
 @cindex Semi-gnus
 
-In addition to the versions of Gnus which have had their releases
-coordinated by Lars, one major development has been Semi-gnus from
-Japan.  It's based on a library called @sc{semi}, which provides
-@sc{mime} capabilities.
+Lars $(B$5$s$,D4@=$7$F%j%j!<%9$7$?(B Gnus $(B$K2C$($F!"F|K\$G$O(B Semi-gnus $(B$N3+H/(B
+$(B$,9T$J$o$l$F$$$^$9!#$3$l$O(B SEMI $(B$H$$$&(B MIME $(B$N5!G=$r<B8=$9$k$?$a$N%i%$%V(B
+$(B%i%j$r;H$&$3$H$rA0Ds$H$7$F$$$^$9!#(B
 
-These Gnusae are based mainly on Gnus 5.6 and Pterodactyl Gnus.
-Collectively, they are called ``Semi-gnus'', and different strains are
-called T-gnus, ET-gnus, Nana-gnus and Chaos.  These provide powerful
-@sc{mime} and multilingualization things, especially important for
-Japanese users.
+$(B$3$l$i$N(B gnus $(B$O(B Gnus 5.6 $(B$H(B Pterodactyl Gnus $(B$r85$K$7$F$$$^$9!#$=$l$i$O(B
+``Semi-gnus'' $(B$HAm>N$5$l!"(BT-gnus, Nana-gnus $(B$*$h$S(B Chaos $(B$N0[$J$C$?7OE}(B
+$(B$,$"$j$^$9!#$3$l$i$O6/NO$J(B MIME $(B$N5!G=$H3F9q8lBP1~$N5!G=$rDs6!$9$k$b$N$G!"(B
+$(BFC$KF|K\?M$N%f!<%6$K$H$C$FBg;v$J$b$N$G$9!#(B
  
 
 @node Why?
