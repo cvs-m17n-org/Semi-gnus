@@ -28,6 +28,7 @@
 (eval-when-compile (require 'cl))
 (require 'nnheader)
 (eval-and-compile
+  (defvar pop3-leave-mail-on-server)
   (autoload 'pop3-movemail "pop3")
   (autoload 'pop3-get-message-count "pop3"))
 (require 'format-spec)
@@ -114,7 +115,8 @@ Common keywords should be listed here.")
        (:function)
        (:password)
        (:connection)
-       (:authentication password))
+       (:authentication password)
+       (:leave))
       (maildir
        (:path (or (getenv "MAILDIR") "~/Maildir/"))
        (:subdirs ("new" "cur"))
@@ -480,7 +482,11 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    (pop3-port port)
 		    (pop3-authentication-scheme
 		     (if (eq authentication 'apop) 'apop 'pass))
-		    (pop3-connection-type connection))
+		    (pop3-connection-type connection)
+		    (pop3-leave-mail-on-server
+		     (or leave
+			 (and (boundp 'pop3-leave-mail-on-server)
+			      pop3-leave-mail-on-server))))
 		(save-excursion (pop3-movemail mail-source-crash-box))))))
       (if result
 	  (progn
