@@ -1827,6 +1827,28 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 	  (forward-line 1))))
     (goto-char start)))
 
+(defun message-list-references (refs-list &rest refs-strs)
+  "Add `Message-ID's which appear in REFS-STRS but not in REFS-LIST,
+to REFS-LIST."
+  (let (refs ref id)
+    (while refs-strs
+      (setq refs (car refs-strs)
+	    refs-strs (cdr refs-strs))
+      (when refs
+	(setq refs (std11-parse-msg-ids (std11-lexical-analyze refs)))
+	(while refs
+	  (setq ref (car refs)
+		refs (cdr refs))
+	  (when (eq (car ref) 'msg-id)
+	    (setq id (concat "<"
+			     (mapconcat
+			      (function (lambda (p) (cdr p)))
+			      (cdr ref) "")
+			     ">"))
+	    (or (member id refs-list)
+		(push id refs-list))))))
+    refs-list))
+
 (defvar gnus-article-copy)
 (defun message-yank-original (&optional arg)
   "Insert the message being replied to, if any.
@@ -1845,7 +1867,7 @@ be added to \"References\" field."
   (interactive "P")
   (let ((modified (buffer-modified-p))
 	(buffer (message-eval-parameter message-reply-buffer))
-	refs references)
+	refs)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
@@ -1857,38 +1879,24 @@ be added to \"References\" field."
 	  (save-restriction
 	    (narrow-to-region (point) (mark t))
 	    (std11-narrow-to-header)
-	    (unless (setq refs (message-fetch-field "References"))
-	      (if (and (setq refs (message-fetch-field "In-Reply-To"))
-		       (string-match "<[^>]+>" refs))
-		  (setq refs (match-string 0 refs))
-		(setq refs nil)))
-	    (setq refs (concat (or refs "")
-			       " "
-			       (or (message-fetch-field "Message-ID") "")))
-	    (unless (string-match "^ +$" refs)
+	    (when (setq refs (message-list-references
+			      '()
+			      (or (message-fetch-field "References")
+				  (message-fetch-field "In-Reply-To"))
+			      (message-fetch-field "Message-ID")))
 	      (widen)
 	      (message-narrow-to-headers)
-	      (setq references (message-fetch-field "References"))
-	      (when references
-		(setq references (split-string references)))
-	      (mapcar
-	       (lambda (ref)
-		 (or (zerop (length ref))
-		     (member ref references)
-		     (setq references (append references (list ref)))))
-	       (split-string refs))
-	      (when references
-		(goto-char (point-min))
-		(let ((case-fold-search t))
-		  (if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
-		      (replace-match "")
-		    (goto-char (point-max))))
-		(mail-header-format
-		 (list (or (assq 'References message-header-format-alist)
-			   '(References . message-fill-references)))
-		 (list (cons 'References
-			     (mapconcat 'identity references " "))))
-		(backward-delete-char 1))))))
+	      (goto-char (point-min))
+	      (let ((case-fold-search t))
+		(if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+		    (replace-match "")
+		  (goto-char (point-max))))
+	      (mail-header-format
+	       (list (or (assq 'References message-header-format-alist)
+			 '(References . message-fill-references)))
+	       (list (cons 'References
+			   (mapconcat 'identity (nreverse refs) " "))))
+	      (backward-delete-char 1)))))
 
       (funcall message-cite-function)
       (message-exchange-point-and-mark)
