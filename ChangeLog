@@ -1,6 +1,19 @@
 2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.16.5 revision 00.
+
+2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.16.4 revision 00.
+
+2004-01-03  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Update copyright.
+
+	* etc/gnus-tut.txt (Gnus FAQ): Remove text version.  Refer to info
+	documentation and online version instead.
+
+	* GNUS-NEWS: Changed "Dired integration"
 
 2004-01-02  Reiner Steib  <Reiner.Steib@gmx.de>
 

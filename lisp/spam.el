@@ -1,7 +1,5 @@
-;; TODO: spam scores, detection of spam in newsgroups, cross-server splitting, remote processing, training through files
-
 ;;; spam.el --- Identifying spam
-;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: network
@@ -34,6 +32,9 @@
 
 ;;; Several TODO items are marked as such
 
+;; TODO: spam scores, detection of spam in newsgroups, cross-server splitting,
+;; remote processing, training through files
+
 ;;; Code:
 
 (require 'path-util)
@@ -44,7 +45,7 @@
 
 (require 'gnus-uu)			; because of key prefix issues
 ;;; for the definitions of group content classification and spam processors
-(require 'gnus)	
+(require 'gnus)
 (require 'message)		;for the message-fetch-field functions
 
 ;; for nnimap-split-download-body-default
@@ -98,13 +99,13 @@ spam groups."
   :group 'spam)
 
 (defcustom spam-split-symbolic-return nil
-  "Whether spam-split should work with symbols or group names."
+  "Whether `spam-split' should work with symbols or group names."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-split-symbolic-return-positive nil
-  "Whether spam-split should ALWAYS work with symbols or group
-  names.  Do not set this if you use spam-split in a fancy split
+  "Whether `spam-split' should ALWAYS work with symbols or group names.
+Do not set this if you use `spam-split' in a fancy split
   method."
   :type 'boolean
   :group 'spam)
@@ -115,27 +116,26 @@ spam groups."
   :group 'spam)
 
 (defcustom spam-mark-only-unseen-as-spam t
-  "Whether only unseen articles should be marked as spam in spam
-groups.  When nil, all unread articles in a spam group are marked as
+  "Whether only unseen articles should be marked as spam in spam groups.
+When nil, all unread articles in a spam group are marked as
 spam.  Set this if you want to leave an article unread in a spam group
 without losing it to the automatic spam-marking process."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-mark-ham-unread-before-move-from-spam-group nil
-  "Whether ham should be marked unread before it's moved out of a spam
-group according to ham-process-destination.  This variable is an
-official entry in the international Longest Variable Name
+  "Whether ham should be marked unread before it's moved.
+The article is moved out of a spam group according to ham-process-destination.
+This variable is an official entry in the international Longest Variable Name
 Competition."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-disable-spam-split-during-ham-respool nil
-  "Whether spam-split should be ignored while resplitting ham in
-a process destination.  This is useful to prevent ham from ending
-up in the same spam group after the resplit.  Don't set this to t
-if you have spam-split as the last rule in your split
-configuration."
+  "Whether `spam-split' should be ignored while resplitting ham in a process
+destination.  This is useful to prevent ham from ending up in the same spam
+group after the resplit.  Don't set this to t if you have spam-split as the
+last rule in your split configuration."
   :type 'boolean
   :group 'spam)
 
@@ -160,12 +160,12 @@ The regular expression is matched against the address."
   :group 'spam)
 
 (defcustom spam-use-dig t
-  "Whether query-dig should be used instead of query-dns."
+  "Whether `query-dig' should be used instead of `query-dns'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-blacklist nil
-  "Whether the blacklist should be used by spam-split."
+  "Whether the blacklist should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
@@ -175,148 +175,148 @@ The regular expression is matched against the address."
   :group 'spam)
 
 (defcustom spam-use-whitelist nil
-  "Whether the whitelist should be used by spam-split."
+  "Whether the whitelist should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-whitelist-exclusive nil
-  "Whether whitelist-exclusive should be used by spam-split.
+  "Whether whitelist-exclusive should be used by `spam-split'.
 Exclusive whitelisting means that all messages from senders not in the whitelist
 are considered spam."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-blackholes nil
-  "Whether blackholes should be used by spam-split."
+  "Whether blackholes should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-hashcash nil
-  "Whether hashcash payments should be detected by spam-split."
+  "Whether hashcash payments should be detected by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-regex-headers nil
-  "Whether a header regular expression match should be used by spam-split.
+  "Whether a header regular expression match should be used by `spam-split'.
 Also see the variables `spam-regex-headers-spam' and `spam-regex-headers-ham'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-regex-body nil
-  "Whether a body regular expression match should be used by spam-split.
+  "Whether a body regular expression match should be used by `spam-split'.
 Also see the variables `spam-regex-body-spam' and `spam-regex-body-ham'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-bogofilter-headers nil
-  "Whether bogofilter headers should be used by spam-split.
+  "Whether bogofilter headers should be used by `spam-split'.
 Enable this if you pre-process messages with Bogofilter BEFORE Gnus sees them."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-bogofilter nil
-  "Whether bogofilter should be invoked by spam-split.
+  "Whether bogofilter should be invoked by `spam-split'.
 Enable this if you want Gnus to invoke Bogofilter on new messages."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-BBDB nil
-  "Whether BBDB should be used by spam-split."
+  "Whether BBDB should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-BBDB-exclusive nil
-  "Whether BBDB-exclusive should be used by spam-split.
-Exclusive BBDB means that all messages from senders not in the BBDB are 
+  "Whether BBDB-exclusive should be used by `spam-split'.
+Exclusive BBDB means that all messages from senders not in the BBDB are
 considered spam."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-ifile nil
-  "Whether ifile should be used by spam-split."
+  "Whether ifile should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-stat nil
-  "Whether spam-stat should be used by spam-split."
+  "Whether `spam-stat' should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-use-spamoracle nil
-  "Whether spamoracle should be used by spam-split."
+  "Whether spamoracle should be used by `spam-split'."
   :type 'boolean
   :group 'spam)
 
 (defcustom spam-install-hooks (or
 			       spam-use-dig
 			       spam-use-blacklist
-			       spam-use-whitelist 
-			       spam-use-whitelist-exclusive 
-			       spam-use-blackholes 
-			       spam-use-hashcash 
-			       spam-use-regex-headers 
-			       spam-use-regex-body 
-			       spam-use-bogofilter-headers 
-			       spam-use-bogofilter 
-			       spam-use-BBDB 
-			       spam-use-BBDB-exclusive 
-			       spam-use-ifile 
+			       spam-use-whitelist
+			       spam-use-whitelist-exclusive
+			       spam-use-blackholes
+			       spam-use-hashcash
+			       spam-use-regex-headers
+			       spam-use-regex-body
+			       spam-use-bogofilter-headers
+			       spam-use-bogofilter
+			       spam-use-BBDB
+			       spam-use-BBDB-exclusive
+			       spam-use-ifile
 			       spam-use-stat
 			       spam-use-spamoracle)
-  "Whether the spam hooks should be installed, default to t if one of
-the spam-use-* variables is set."
+  "Whether the spam hooks should be installed.
+Default to t if one of the spam-use-* variables is set."
   :group 'spam
   :type 'boolean)
 
 (defcustom spam-split-group "spam"
-  "Group name where incoming spam should be put by spam-split."
+  "Group name where incoming spam should be put by `spam-split'."
   :type 'string
   :group 'spam)
 
 ;;; TODO: deprecate this variable, it's confusing since it's a list of strings,
 ;;; not regular expressions
-(defcustom spam-junk-mailgroups (cons 
-				 spam-split-group 
+(defcustom spam-junk-mailgroups (cons
+				 spam-split-group
 				 '("mail.junk" "poste.pourriel"))
   "Mailgroups with spam contents.
 All unmarked article in such group receive the spam mark on group entry."
   :type '(repeat (string :tag "Group"))
   :group 'spam)
 
-(defcustom spam-blackhole-servers '("bl.spamcop.net" "relays.ordb.org" 
+(defcustom spam-blackhole-servers '("bl.spamcop.net" "relays.ordb.org"
 				    "dev.null.dk" "relays.visi.com")
   "List of blackhole servers."
   :type '(repeat (string :tag "Server"))
   :group 'spam)
 
 (defcustom spam-blackhole-good-server-regex nil
-  "String matching IP addresses that should not be checked in the blackholes"
+  "String matching IP addresses that should not be checked in the blackholes."
   :type '(radio (const nil)
 		(regexp :format "%t: %v\n" :size 0))
   :group 'spam)
 
 (defcustom spam-face 'gnus-splash-face
-  "Face for spam-marked articles"
+  "Face for spam-marked articles."
   :type 'face
   :group 'spam)
 
 (defcustom spam-regex-headers-spam '("^X-Spam-Flag: YES")
-  "Regular expression for positive header spam matches"
+  "Regular expression for positive header spam matches."
   :type '(repeat (regexp :tag "Regular expression to match spam header"))
   :group 'spam)
 
 (defcustom spam-regex-headers-ham '("^X-Spam-Flag: NO")
-  "Regular expression for positive header ham matches"
+  "Regular expression for positive header ham matches."
   :type '(repeat (regexp :tag "Regular expression to match ham header"))
   :group 'spam)
 
 (defcustom spam-regex-body-spam '()
-  "Regular expression for positive body spam matches"
+  "Regular expression for positive body spam matches."
   :type '(repeat (regexp :tag "Regular expression to match spam body"))
   :group 'spam)
 
 (defcustom spam-regex-body-ham '()
-  "Regular expression for positive body ham matches"
+  "Regular expression for positive body ham matches."
   :type '(repeat (regexp :tag "Regular expression to match ham body"))
   :group 'spam)
 
@@ -337,20 +337,20 @@ All unmarked article in such group receive the spam mark on group entry."
   :group 'spam-ifile)
 
 (defcustom spam-ifile-spam-category "spam"
-  "Name of the spam ifile category."  
+  "Name of the spam ifile category."
   :type 'string
   :group 'spam-ifile)
 
 (defcustom spam-ifile-ham-category nil
-  "Name of the ham ifile category.  If nil, the current group name will
-be used."
+  "Name of the ham ifile category.
+If nil, the current group name will be used."
   :type '(choice (string :tag "Use a fixed category")
 		 (const :tag "Use the current group name"))
   :group 'spam-ifile)
 
 (defcustom spam-ifile-all-categories nil
   "Whether the ifile check will return all categories, or just spam.
-Set this to t if you want to use the spam-split invocation of ifile as
+Set this to t if you want to use the `spam-split' invocation of ifile as
 your main source of newsgroup names."
   :type 'boolean
   :group 'spam-ifile)
@@ -397,7 +397,7 @@ your main source of newsgroup names."
 
 (defcustom spam-bogofilter-database-directory nil
   "Directory path of the Bogofilter databases."
-  :type '(choice (directory 
+  :type '(choice (directory
 		  :tag "Location of the Bogofilter database directory")
 		 (const :tag "Use the default"))
   :group 'spam-bogofilter)
@@ -406,7 +406,7 @@ your main source of newsgroup names."
   "Spam spamoracle configuration."
   :group 'spam)
 
-(defcustom spam-spamoracle-database nil 
+(defcustom spam-spamoracle-database nil
   "Location of spamoracle database file. When nil, use the default
 spamoracle database."
   :type '(choice (directory :tag "Location of spamoracle database file.")
@@ -435,21 +435,22 @@ spamoracle database."
   "List of old spam articles, generated when a group is entered.")
 
 (defvar spam-split-disabled nil
-  "If non-nil, spam-split is disabled, and always returns nil.")
+  "If non-nil, `spam-split' is disabled, and always returns nil.")
 
 (defvar spam-split-last-successful-check nil
-  "spam-split will set this to nil or a spam-use-XYZ check if it
+  "`spam-split' will set this to nil or a spam-use-XYZ check if it
   finds ham or spam.")
 
 ;; convenience functions
-(defun spam-xor (a b) ; logical exclusive or
+(defun spam-xor (a b)
+  "Logical exclusive `or'."
   (and (or a b) (not (and a b))))
 
 (defun spam-group-ham-mark-p (group mark &optional spam)
   (when (stringp group)
     (let* ((marks (spam-group-ham-marks group spam))
-	   (marks (if (symbolp mark) 
-		      marks 
+	   (marks (if (symbolp mark)
+		      marks
 		    (mapcar 'symbol-value marks))))
       (memq mark marks))))
 
@@ -471,13 +472,13 @@ spamoracle database."
 (defun spam-group-spam-contents-p (group)
   (if (stringp group)
       (or (member group spam-junk-mailgroups)
-	  (memq 'gnus-group-spam-classification-spam 
+	  (memq 'gnus-group-spam-classification-spam
 		(gnus-parameter-spam-contents group)))
     nil))
-  
+
 (defun spam-group-ham-contents-p (group)
   (if (stringp group)
-      (memq 'gnus-group-spam-classification-ham 
+      (memq 'gnus-group-spam-classification-ham
 	    (gnus-parameter-spam-contents group))
     nil))
 
@@ -503,8 +504,8 @@ spam-use-* variable.")
   (if (and (stringp group)
 	   (symbolp processor))
       (or (member processor (nth 0 (gnus-parameter-spam-process group)))
-	  (spam-group-processor-multiple-p 
-	   group 
+	  (spam-group-processor-multiple-p
+	   group
 	   (cdr-safe (assoc processor spam-list-of-processors))))
     nil))
 
@@ -563,9 +564,9 @@ spam-use-* variable.")
 ;;; Summary entry and exit processing.
 
 (defun spam-summary-prepare ()
-  (setq spam-old-ham-articles 
+  (setq spam-old-ham-articles
 	(spam-list-articles gnus-newsgroup-articles 'ham))
-  (setq spam-old-spam-articles 
+  (setq spam-old-spam-articles
 	(spam-list-articles gnus-newsgroup-articles 'spam))
   (spam-mark-junk-as-spam-routine))
 
@@ -578,10 +579,10 @@ spam-use-* variable.")
     ;; we have to iterate over the processors, or else we'll be too slow
     (dolist (classification '(spam ham))
       (let* ((old-articles (if (eq classification 'spam)
-			       spam-old-spam-articles 
+			       spam-old-spam-articles
 			     spam-old-ham-articles))
-	     (new-articles (spam-list-articles 
-			    gnus-newsgroup-articles 
+	     (new-articles (spam-list-articles
+			    gnus-newsgroup-articles
 			    classification))
 	     (changed-articles (gnus-set-difference old-articles new-articles)))
 	;; now that we have the changed articles, we go through the processors
@@ -592,14 +593,14 @@ spam-use-* variable.")
 		unregister-list)
 	    (dolist (article changed-articles)
 	      (let ((id (spam-fetch-field-message-id-fast article)))
-		(when (spam-log-unregistration-needed-p 
+		(when (spam-log-unregistration-needed-p
 		       id 'process classification check)
 		  (push article unregister-list))))
 	    ;; call spam-register-routine with specific articles to unregister,
 	    ;; when there are articles to unregister and the check is enabled
 	    (when (and unregister-list (symbol-value check))
 	      (spam-register-routine classification check t unregister-list))))))
-      
+
     ;; find all the spam processors applicable to this group
     (dolist (processor-param spam-list-of-processors)
       (let ((processor (nth 0 processor-param))
@@ -609,13 +610,13 @@ spam-use-* variable.")
 		   (spam-group-processor-p gnus-newsgroup-name processor))
 	  (spam-register-routine classification check))))
 
-    (if spam-move-spam-nonspam-groups-only      
+    (if spam-move-spam-nonspam-groups-only
 	(when (not (spam-group-spam-contents-p gnus-newsgroup-name))
 	  (spam-mark-spam-as-expired-and-move-routine
 	   (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
-      (gnus-message 5 "Marking spam as expired and moving it to %s" 
+      (gnus-message 5 "Marking spam as expired and moving it to %s"
 		    gnus-newsgroup-name)
-      (spam-mark-spam-as-expired-and-move-routine 
+      (spam-mark-spam-as-expired-and-move-routine
        (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
 
     ;; now we redo spam-mark-spam-as-expired-and-move-routine to only
@@ -655,10 +656,10 @@ spam-use-* variable.")
   ;; group parameters
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
     (gnus-message 5 "Marking %s articles as spam"
-		  (if spam-mark-only-unseen-as-spam 
+		  (if spam-mark-only-unseen-as-spam
 		      "unseen"
 		    "unread"))
-    (let ((articles (if spam-mark-only-unseen-as-spam 
+    (let ((articles (if spam-mark-only-unseen-as-spam
 			gnus-newsgroup-unseen
 		      gnus-newsgroup-unreads)))
       (dolist (article articles)
@@ -677,7 +678,7 @@ spam-use-* variable.")
 	(when (eq (gnus-summary-article-mark article) gnus-spam-mark)
 	  (gnus-summary-mark-article article gnus-expirable-mark)
 	  (push article tomove)))
-    
+
       ;; now do the actual copies
       (dolist (group groups)
 	(when (and tomove
@@ -687,11 +688,11 @@ spam-use-* variable.")
 	  (when tomove
 	    (if (or (not backend-supports-deletions)
 		    (> (length groups) 1))
-		(progn 
+		(progn
 		  (gnus-summary-copy-article nil group)
 		  (setq deletep t))
 	      (gnus-summary-move-article nil group)))))
-    
+
       ;; now delete the articles, if there was a copy done, and the
       ;; backend allows it
       (when (and deletep backend-supports-deletions)
@@ -700,9 +701,9 @@ spam-use-* variable.")
 	(when tomove
 	  (let ((gnus-novice-user nil))	; don't ask me if I'm sure
 	    (gnus-summary-delete-article nil))))
-    
+
       (gnus-summary-yank-process-mark))))
- 
+
 (defun spam-ham-copy-or-move-routine (copy groups)
   (gnus-summary-kill-process-mark)
   (let ((todo (spam-list-articles gnus-newsgroup-articles 'ham))
@@ -735,7 +736,7 @@ spam-use-* variable.")
 		(gnus-summary-copy-article nil group)
 		(setq deletep t))
 	    (gnus-summary-move-article nil group))))) ; else move articles
-    
+
     ;; now delete the articles, unless a) copy is t, and there was a copy done
     ;;                                 b) a move was done to a single group
     ;;                                 c) backend-supports-deletions is nil
@@ -746,19 +747,19 @@ spam-use-* variable.")
 	(when todo
 	  (let ((gnus-novice-user nil))	; don't ask me if I'm sure
 	    (gnus-summary-delete-article nil))))))
-  
+
   (gnus-summary-yank-process-mark))
- 
+
 (defun spam-ham-copy-routine (&rest groups)
   (if (and (car-safe groups) (listp (car-safe groups)))
       (apply 'spam-ham-copy-routine (car groups))
     (spam-ham-copy-or-move-routine t groups)))
- 
+
 (defun spam-ham-move-routine (&rest groups)
   (if (and (car-safe groups) (listp (car-safe groups)))
       (apply 'spam-ham-move-routine (car groups))
     (spam-ham-copy-or-move-routine nil groups)))
- 
+
 (eval-and-compile
   (defalias 'spam-point-at-eol (if (fboundp 'point-at-eol)
 				   'point-at-eol
@@ -786,9 +787,9 @@ spam-use-* variable.")
 ;; (defun spam-get-article-as-filename (article)
 ;;   (let ((article-filename))
 ;;     (when (numberp article)
-;;       (nnml-possibly-change-directory 
+;;       (nnml-possibly-change-directory
 ;;        (gnus-group-real-name gnus-newsgroup-name))
-;;       (setq article-filename (expand-file-name 
+;;       (setq article-filename (expand-file-name
 ;;	  		        (int-to-string article) nnml-current-directory)))
 ;;     (if (file-exists-p article-filename)
 ;; 	article-filename
@@ -798,7 +799,7 @@ spam-use-* variable.")
   "Fetch the `from' field quickly, using the internal gnus-data-list function"
   (if (and (numberp article)
 	   (assoc article (gnus-data-list nil)))
-      (mail-header-from 
+      (mail-header-from
        (gnus-data-header (assoc article (gnus-data-list nil))))
     nil))
 
@@ -807,7 +808,7 @@ spam-use-* variable.")
   gnus-data-list function"
   (if (and (numberp article)
 	   (assoc article (gnus-data-list nil)))
-      (mail-header-subject 
+      (mail-header-subject
        (gnus-data-header (assoc article (gnus-data-list nil))))
     nil))
 
@@ -816,7 +817,7 @@ spam-use-* variable.")
   gnus-data-list function"
   (if (and (numberp article)
 	   (assoc article (gnus-data-list nil)))
-      (mail-header-message-id 
+      (mail-header-message-id
        (gnus-data-header (assoc article (gnus-data-list nil))))
     nil))
 
@@ -850,10 +851,10 @@ and further checks are also inhibited.  The usual mailgroup name
 is the value of `spam-split-group', meaning that the message is
 definitely a spam.")
 
-(defvar spam-list-of-statistical-checks 
+(defvar spam-list-of-statistical-checks
   '(spam-use-ifile
-    spam-use-regex-body 
-    spam-use-stat 
+    spam-use-regex-body
+    spam-use-stat
     spam-use-bogofilter
     spam-use-spamoracle)
   "The spam-list-of-statistical-checks list contains all the mail
@@ -862,7 +863,7 @@ splitters that need to have the full message body available.")
 ;;;TODO: modify to invoke self with each check if invoked without specifics
 (defun spam-split (&rest specific-checks)
   "Split this message into the `spam' group if it is spam.
-This function can be used as an entry in `nnmail-split-fancy',
+This function can be used as an entry in the variable `nnmail-split-fancy',
 for example like this: (: spam-split).  It can take checks as
 parameters.  A string as a parameter will set the
 spam-split-group to that string.
@@ -876,7 +877,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(when (stringp check)
 	  (setq spam-split-group-choice check)
 	  (setq specific-checks (delq check specific-checks))))
-      
+
       (let ((spam-split-group spam-split-group-choice))
 	(save-excursion
 	  (save-restriction
@@ -894,7 +895,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		  (when (and (symbol-value (car pair))
 			     (or (null specific-checks)
 				 (memq (car pair) specific-checks)))
-		    (gnus-message 5 "spam-split: calling the %s function" 
+		    (gnus-message 5 "spam-split: calling the %s function"
 				  (symbol-name (cdr pair)))
 		    (setq decision (funcall (cdr pair)))
 		    ;; if we got a decision at all, save the current check
@@ -905,7 +906,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		      (if spam-split-symbolic-return
 			  (setq decision spam-split-group)
 			(gnus-error
-			 5 
+			 5
 			 (format "spam-split got %s but %s is nil"
 				 (symbol-name decision)
 				 (symbol-name spam-split-symbolic-return))))))))
@@ -914,14 +915,14 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		decision))))))))
 
 (defun spam-find-spam ()
-  "This function will detect spam in the current newsgroup using spam-split"
+  "This function will detect spam in the current newsgroup using spam-split."
   (interactive)
-  
+
   (let* ((group gnus-newsgroup-name)
 	 (autodetect (gnus-parameter-spam-autodetect group))
 	 (methods (gnus-parameter-spam-autodetect-methods group))
 	 (first-method (nth 0 methods)))
-  (when (and autodetect 
+  (when (and autodetect
 	     (not (equal first-method 'none)))
     (mapcar
      (lambda (article)
@@ -934,8 +935,8 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		  (spam-split-symbolic-return-positive t)
 		  (split-return
 		   (with-temp-buffer
-		     (gnus-request-article-this-buffer 
-		      article 
+		     (gnus-request-article-this-buffer
+		      article
 		      group)
 		     (if (or (null first-method)
 			     (equal first-method 'default))
@@ -949,7 +950,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		 (gnus-registry-add-group
 		  id group subject sender))
 
-	       (spam-log-processing-to-registry 
+	       (spam-log-processing-to-registry
 		id
 		'incoming
 		split-return
@@ -962,7 +963,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 (defvar spam-registration-functions
   ;; first the ham register, second the spam register function
   ;; third the ham unregister, fourth the spam unregister function
-  '((spam-use-blacklist  nil 
+  '((spam-use-blacklist  nil
 			 spam-blacklist-register-routine
 			 nil
 			 spam-blacklist-unregister-routine)
@@ -970,31 +971,31 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 			 nil
 			 spam-whitelist-unregister-routine
 			 nil)
-    (spam-use-BBDB	 spam-BBDB-register-routine 
+    (spam-use-BBDB	 spam-BBDB-register-routine
 			 nil
-			 spam-BBDB-unregister-routine 
+			 spam-BBDB-unregister-routine
 			 nil)
-    (spam-use-ifile	 spam-ifile-register-ham-routine 
+    (spam-use-ifile	 spam-ifile-register-ham-routine
 			 spam-ifile-register-spam-routine
-			 spam-ifile-unregister-ham-routine 
+			 spam-ifile-unregister-ham-routine
 			 spam-ifile-unregister-spam-routine)
-    (spam-use-spamoracle spam-spamoracle-learn-ham 
+    (spam-use-spamoracle spam-spamoracle-learn-ham
 			 spam-spamoracle-learn-spam
-			 spam-spamoracle-unlearn-ham 
+			 spam-spamoracle-unlearn-ham
 			 spam-spamoracle-unlearn-spam)
-    (spam-use-stat	 spam-stat-register-ham-routine 
+    (spam-use-stat	 spam-stat-register-ham-routine
 			 spam-stat-register-spam-routine
-			 spam-stat-unregister-ham-routine 
+			 spam-stat-unregister-ham-routine
 			 spam-stat-unregister-spam-routine)
     ;; note that spam-use-gmane is not a legitimate check
-    (spam-use-gmane      nil 
+    (spam-use-gmane      nil
 			 spam-report-gmane-register-routine
 			 ;; does Gmane support unregistration?
 			 nil
 			 nil)
-    (spam-use-bogofilter spam-bogofilter-register-ham-routine 
+    (spam-use-bogofilter spam-bogofilter-register-ham-routine
 			 spam-bogofilter-register-spam-routine
-			 spam-bogofilter-unregister-ham-routine 
+			 spam-bogofilter-unregister-ham-routine
 			 spam-bogofilter-unregister-spam-routine))
   "The spam-registration-functions list contains pairs
 associating a parameter variable with the ham and spam
@@ -1028,8 +1029,8 @@ functions")
       (nth 2 flist))))
 
 (defun spam-list-articles (articles classification)
-  (let ((mark-check (if (eq classification 'spam) 
-			'spam-group-spam-mark-p 
+  (let ((mark-check (if (eq classification 'spam)
+			'spam-group-spam-mark-p
 		      'spam-group-ham-mark-p))
 	list mark-cache-yes mark-cache-no)
     (dolist (article articles)
@@ -1039,7 +1040,7 @@ functions")
 	      (push article list)
 	    ;; else, we have to actually check the mark
 	    (if (funcall mark-check
-			 gnus-newsgroup-name 
+			 gnus-newsgroup-name
 			 mark)
 		(progn
 		  (push article list)
@@ -1047,9 +1048,9 @@ functions")
 	      (push mark mark-cache-no))))))
     list))
 
-(defun spam-register-routine (classification 
-			      check 
-			      &optional unregister 
+(defun spam-register-routine (classification
+			      check
+			      &optional unregister
 			      specific-articles)
   (when (and (spam-classification-valid-p classification)
 	     (spam-registration-check-valid-p check))
@@ -1057,8 +1058,8 @@ functions")
 	    (spam-registration-function classification check))
 	   (unregister-function
 	    (spam-unregistration-function classification check))
-	   (run-function (if unregister 
-			     unregister-function 
+	   (run-function (if unregister
+			     unregister-function
 			   register-function))
 	   (log-function (if unregister
 			     'spam-log-undo-registration
@@ -1068,8 +1069,8 @@ functions")
       (when run-function
 	;; make list of articles, using specific-articles if given
 	(setq articles (or specific-articles
-			   (spam-list-articles 
-			    gnus-newsgroup-articles 
+			   (spam-list-articles
+			    gnus-newsgroup-articles
 			    classification)))
 	;; process them
 	(gnus-message 5 "%s %d %s articles with classification %s, check %s"
@@ -1113,7 +1114,7 @@ functions")
     (if (and (stringp id)
 	     (spam-process-type-valid-p type))
 	(cdr-safe (gnus-registry-fetch-extra id type))
-      (progn 
+      (progn
 	(gnus-message 5 (format "%s called with bad ID, type, classification, or check"
 				"spam-log-registered-p"))
 	nil))))
@@ -1133,7 +1134,7 @@ functions")
 			 (eq check (nth 1 cell)))
 		(setq found t))))
 	  found)
-      (progn 
+      (progn
 	(gnus-message 5 (format "%s called with bad ID, type, classification, or check"
 				"spam-log-unregistration-needed-p"))
 	nil))))
@@ -1157,12 +1158,12 @@ functions")
 	   id
 	   type
 	   new-cell-list))
-      (progn 
+      (progn
 	(gnus-message 5 (format "%s called with bad ID, type, check, or group"
 				"spam-log-undo-registration"))
 	nil))))
 
-;;; set up IMAP widening if it's necessary  
+;;; set up IMAP widening if it's necessary
 (defun spam-setup-widening ()
   (dolist (check spam-list-of-statistical-checks)
     (when (symbol-value check)
@@ -1182,7 +1183,7 @@ functions")
 (defun spam-check-regex-headers (&optional body)
   (let ((type (if body "body" "header"))
 	(spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group))
 	ret found)
     (dolist (h-regex spam-regex-headers-ham)
@@ -1213,7 +1214,7 @@ functions")
   "Check the Received headers for blackholed relays."
   (let ((headers (nnmail-fetch-field "received"))
 	(spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group))
 	ips matches)
     (when headers
@@ -1230,7 +1231,7 @@ functions")
 	(dolist (ip ips)
 	  (unless (and spam-blackhole-good-server-regex
 		       ;; match the good-server-regex against the reversed (again) IP string
-		       (string-match 
+		       (string-match
 			spam-blackhole-good-server-regex
 			(spam-reverse-ip-string ip)))
 	    (unless matches
@@ -1238,7 +1239,7 @@ functions")
 		(if spam-use-dig
 		    (let ((query-result (query-dig query-string)))
 		      (when query-result
-			(gnus-message 5 "(DIG): positive blackhole check '%s'" 
+			(gnus-message 5 "(DIG): positive blackhole check '%s'"
 				      query-result)
 			(push (list ip server query-result)
 			      matches)))
@@ -1255,7 +1256,7 @@ functions")
 (condition-case nil
     (progn
       (require 'hashcash)
-      
+
       (defun spam-check-hashcash ()
 	"Check the headers for hashcash payments."
 	(mail-check-payment)))	 ;mail-check-payment returns a boolean
@@ -1264,7 +1265,7 @@ functions")
 		(defalias 'mail-check-payment 'ignore)
 		(defalias 'spam-check-hashcash 'ignore))))
 
-;;;; BBDB 
+;;;; BBDB
 
 ;;; original idea for spam-check-BBDB from Alexander Kotelnikov
 ;;; <sacha@giotto.sj.ru>
@@ -1275,29 +1276,29 @@ functions")
     (progn
       (require 'bbdb)
       (require 'bbdb-com)
-      
+
       (defun spam-enter-ham-BBDB (addresses &optional remove)
 	"Enter an address into the BBDB; implies ham (non-spam) sender"
 	(dolist (from addresses)
 	  (when (stringp from)
 	    (let* ((parsed-address (gnus-extract-address-components from))
 		   (name (or (nth 0 parsed-address) "Ham Sender"))
-		   (remove-function (if remove 
+		   (remove-function (if remove
 					'bbdb-delete-record-internal
 				      'ignore))
 		   (net-address (nth 1 parsed-address))
-		   (record (and net-address 
+		   (record (and net-address
 				(bbdb-search-simple nil net-address))))
 	      (when net-address
-		(gnus-message 5 "%s address %s %s BBDB" 
-			      (if remove "Deleting" "Adding") 
+		(gnus-message 5 "%s address %s %s BBDB"
+			      (if remove "Deleting" "Adding")
 			      from
 			      (if remove "from" "to"))
 		(if record
 		    (funcall remove-function record)
-		  (bbdb-create-internal name nil net-address nil nil 
+		  (bbdb-create-internal name nil net-address nil nil
 					"ham sender added by spam.el")))))))
-      
+
       (defun spam-BBDB-register-routine (articles &optional unregister)
 	(let (addresses)
 	  (dolist (article articles)
@@ -1313,12 +1314,12 @@ functions")
 	"Mail from people in the BBDB is classified as ham or non-spam"
 	(let ((who (nnmail-fetch-field "from"))
 	      (spam-split-group (if spam-split-symbolic-return
-				    'spam 
+				    'spam
 				  spam-split-group)))
 	  (when who
 	    (setq who (nth 1 (gnus-extract-address-components who)))
 	    (if (bbdb-search-simple nil who)
-		t 
+		t
 	      (if spam-use-BBDB-exclusive
 		  spam-split-group
 		nil))))))
@@ -1344,12 +1345,12 @@ functions")
   (if spam-ifile-database-path
       (format "--db-file=%s" spam-ifile-database-path)
     nil))
-    
+
 (defun spam-check-ifile ()
-  "Check the ifile backend for the classification of this message"
-  (let ((article-buffer-name (buffer-name)) 
+  "Check the ifile backend for the classification of this message."
+  (let ((article-buffer-name (buffer-name))
 	(spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group))
 	category return)
     (with-temp-buffer
@@ -1387,7 +1388,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	    (insert article-string))))
       (apply 'call-process-region
 	     (point-min) (point-max) spam-ifile-path
-	     nil nil nil 
+	     nil nil nil
 	     add-or-delete-option category
 	     (if db `(,db "-h") `("-h"))))))
 
@@ -1410,11 +1411,11 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
     (progn
       (let ((spam-stat-install-hooks nil))
 	(require 'spam-stat))
-      
+
       (defun spam-check-stat ()
 	"Check the spam-stat backend for the classification of this message"
 	(let ((spam-split-group (if spam-split-symbolic-return
-				    'spam 
+				    'spam
 				  spam-split-group))
 	      (spam-stat-split-fancy-spam-group spam-split-group) ; override
 	      (spam-stat-buffer (buffer-name)) ; stat the current buffer
@@ -1447,7 +1448,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 
       (defun spam-maybe-spam-stat-load ()
 	(when spam-use-stat (spam-stat-load)))
-      
+
       (defun spam-maybe-spam-stat-save ()
 	(when spam-use-stat (spam-stat-save))))
 
@@ -1481,16 +1482,16 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 
 ;;; address can be a list, too
 (defun spam-enter-whitelist (address &optional remove)
-  "Enter ADDRESS (list or single) into the whitelist.  With a
-  non-nil REMOVE, remove them."
+  "Enter ADDRESS (list or single) into the whitelist.
+With a non-nil REMOVE, remove them."
   (interactive "sAddress: ")
   (spam-enter-list address spam-whitelist remove)
   (setq spam-whitelist-cache nil))
 
 ;;; address can be a list, too
 (defun spam-enter-blacklist (address &optional remove)
-  "Enter ADDRESS (list or single) into the blacklist.  With a
-  non-nil REMOVE, remove them."
+  "Enter ADDRESS (list or single) into the blacklist.
+With a non-nil REMOVE, remove them."
   (interactive "sAddress: ")
   (spam-enter-list address spam-blacklist remove)
   (setq spam-blacklist-cache nil))
@@ -1527,11 +1528,11 @@ REMOVE not nil, remove the ADDRESSES."
 (defun spam-check-whitelist ()
   ;; FIXME!  Should it detect when file timestamps change?
   (let ((spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group)))
     (unless spam-whitelist-cache
       (setq spam-whitelist-cache (spam-parse-list spam-whitelist)))
-    (if (spam-from-listed-p spam-whitelist-cache) 
+    (if (spam-from-listed-p spam-whitelist-cache)
 	t
       (if spam-use-whitelist-exclusive
 	  spam-split-group
@@ -1540,7 +1541,7 @@ REMOVE not nil, remove the ADDRESSES."
 (defun spam-check-blacklist ()
   ;; FIXME!  Should it detect when file timestamps change?
   (let ((spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group)))
     (unless spam-blacklist-cache
       (setq spam-blacklist-cache (spam-parse-list spam-blacklist)))
@@ -1578,7 +1579,7 @@ REMOVE not nil, remove the ADDRESSES."
 (defun spam-filelist-register-routine (articles blacklist &optional unregister)
   (let ((de-symbol (if blacklist 'spam-use-whitelist 'spam-use-blacklist))
 	(declassification (if blacklist 'ham 'spam))
-	(enter-function 
+	(enter-function
 	 (if blacklist 'spam-enter-blacklist 'spam-enter-whitelist))
 	(remove-function
 	 (if blacklist 'spam-enter-whitelist 'spam-enter-blacklist))
@@ -1595,7 +1596,7 @@ REMOVE not nil, remove the ADDRESSES."
 	      (setq sender-ignored t)))
 	  ;; remember the messages we need to unregister, unless remove is set
 	  (when (and
-		 (null unregister) 
+		 (null unregister)
 		 (spam-log-unregistration-needed-p
 		  id 'process declassification de-symbol))
 	    (push from unregister-list))
@@ -1637,7 +1638,7 @@ REMOVE not nil, remove the ADDRESSES."
 (defun spam-check-bogofilter-headers (&optional score)
   (let ((header (nnmail-fetch-field spam-bogofilter-header))
 	(spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group)))
     (when header			; return nil when no header
       (if score				; scoring mode
@@ -1672,37 +1673,37 @@ REMOVE not nil, remove the ADDRESSES."
 	(save-excursion
 	  (set-buffer article-buffer-name)
 	  (apply 'call-process-region
-		 (point-min) (point-max) 
+		 (point-min) (point-max)
 		 spam-bogofilter-path
 		 nil temp-buffer-name nil
 		 (if db `("-d" ,db "-v") `("-v"))))
 	(setq return (spam-check-bogofilter-headers score))))
     return))
 
-(defun spam-bogofilter-register-with-bogofilter (articles 
-						 spam 
+(defun spam-bogofilter-register-with-bogofilter (articles
+						 spam
 						 &optional unregister)
   "Register an article, given as a string, as spam or non-spam."
   (dolist (article articles)
     (let ((article-string (spam-get-article-as-string article))
 	  (db spam-bogofilter-database-directory)
 	  (switch (if unregister
-		      (if spam 
+		      (if spam
 			  spam-bogofilter-spam-strong-switch
 			spam-bogofilter-ham-strong-switch)
-		    (if spam 
-			spam-bogofilter-spam-switch 
+		    (if spam
+			spam-bogofilter-spam-switch
 		      spam-bogofilter-ham-switch))))
       (when (stringp article-string)
 	(with-temp-buffer
 	  (insert article-string)
 
 	  (apply 'call-process-region
-		 (point-min) (point-max) 
+		 (point-min) (point-max)
 		 spam-bogofilter-path
 		 nil nil nil switch
 		 (if db `("-d" ,db "-v") `("-v"))))))))
-  
+
 (defun spam-bogofilter-register-spam-routine (articles &optional unregister)
   (spam-bogofilter-register-with-bogofilter articles t unregister))
 
@@ -1722,16 +1723,16 @@ REMOVE not nil, remove the ADDRESSES."
   "Run spamoracle on an article to determine whether it's spam."
   (let ((article-buffer-name (buffer-name))
 	(spam-split-group (if spam-split-symbolic-return
-			      'spam 
+			      'spam
 			    spam-split-group)))
     (with-temp-buffer
       (let ((temp-buffer-name (buffer-name)))
 	(save-excursion
 	  (set-buffer article-buffer-name)
-	  (let ((status 
-		 (apply 'call-process-region 
+	  (let ((status
+		 (apply 'call-process-region
 			(point-min) (point-max)
-			spam-spamoracle-binary 
+			spam-spamoracle-binary
 			nil temp-buffer-name nil
 			(if spam-spamoracle-database
 			    `("-f" ,spam-spamoracle-database "mark")
@@ -1753,15 +1754,15 @@ REMOVE not nil, remove the ADDRESSES."
 	(dolist (article articles)
 	  (insert (spam-get-article-as-string article)))
 	(let* ((arg (if (spam-xor unregister article-is-spam-p)
-			"-spam" 
+			"-spam"
 		      "-good"))
-	       (status 
+	       (status
 		(apply 'call-process-region
 		       (point-min) (point-max)
 		       spam-spamoracle-binary
 		       nil temp-buffer-name nil
 		       (if spam-spamoracle-database
-			   `("-f" ,spam-spamoracle-database 
+			   `("-f" ,spam-spamoracle-database
 			     "add" ,arg)
 			 `("add" ,arg)))))
 	  (when (not (eq 0 status))
@@ -1816,3 +1817,7 @@ REMOVE not nil, remove the ADDRESSES."
 (provide 'spam)
 
 ;;; spam.el ends here.
+
+(provide 'spam)
+
+;;; spam.el ends here

@@ -301,7 +301,7 @@
 \thispagestyle{empty}
 
 Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003
+2002, 2003, 2004
 Free Software Foundation, Inc.
 
 
@@ -901,6 +901,7 @@ Various
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
+* Other modes::                 $BB>$N%b!<%I$H$NAj8_:nMQ(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 
 Formatting Variables
@@ -16880,11 +16881,17 @@ Commands}) $B$+!"$^$?$O%(!<%8%'%s%H$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l(B
 @item gnus-agent-cat-length-when-long
 @code{gnus-agent-long-article} $B$r>e=q$-$9$k@0?t!#(B
 
-@item gnus-agent-cat-disable-undownloaded-faces
+@c @item gnus-agent-cat-disable-undownloaded-faces
+@c $B%@%&%s%m!<%I$5$l$F$$$J$$5-;v$r(B gnus-summary-*-undownloaded-face $B$r;H$C$F(B
+@c $B35N,%P%C%U%!$KI=<($9$Y$-(B @emph{$B$G$O$J$$(B} $B$3$H$r<($9%7%s%\%k!#CM(B
+@c $B$,(B @code{nil} $B$@$H!"B>$N%7%s%\%k$,$=$l$i$rM^@)$7$F$$$F$b!"%@%&%s%m!<%I$5(B
+@c $B$l$F$$$J$$5-;vMQ$N%U%'!<%9$r;H$($k$h$&$K$J$j$^$9!#(B
+
+@item gnus-agent-cat-enable-undownloaded-faces
 $B%@%&%s%m!<%I$5$l$F$$$J$$5-;v$r(B gnus-summary-*-undownloaded-face $B$r;H$C$F(B
-$B35N,%P%C%U%!$K$9$Y$-(B @emph{$B$G$O$J$$(B} $B$3$H$r<($9%7%s%\%k!#CM(B
-$B$,(B @code{nil} $B$@$H!"B>$N%7%s%\%k$,$=$l$i$rM^@)$7$F$$$F$b!"%@%&%s%m!<%I$5(B
-$B$l$F$$$J$$5-;vMQ$N%U%'!<%9$r;H$($k$h$&$K$J$j$^$9!#(B
+$B35N,%P%C%U%!$KI=<($9$Y$-$G$"$k$3$H$r<($9%7%s%\%k!#CM$,(B @code{nil} $B$@$H!"(B
+$BB>$N%7%s%\%k$,$=$l$i$rM-8z$K$7$F$$$F$b!"%@%&%s%m!<%I$5$l$F$$$J$$5-;vMQ$N(B
+$B%U%'!<%9$r;H$o$J$$$h$&$K$J$j$^$9!#(B
 @end table
 
 $B$$$C$?$sJ,N`$,:n$i$l$?$i!"J,N`$NL>A0$rJQ$($k$3$H$O$G$-$^$;$s!#(B
@@ -19701,6 +19708,7 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
+* Other modes::                 $BB>$N%b!<%I$H$NAj8_:nMQ(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 @end menu
 
@@ -22991,6 +22999,37 @@ Reduce table size: (spam-stat-reduce-size)
 Save table: (spam-stat-save)
 @end example
 
+@node Other modes
+@section $BB>$N%b!<%I$H$NAj8_:nMQ(B
+
+@subsection Dired
+@cindex dired
+
+@code{gnus-dired-minor-mode} $B$O(B dired $B%P%C%U%!$G;H$($k$$$/$D$+$NJXMx$J5!(B
+$BG=$rDs6!$7$^$9!#$3$l$O<!$N<0$GM-8z$K$J$j$^$9(B:
+
+@lisp
+(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
+@end lisp
+
+@table @kbd
+@item C-c C-m C-a
+@findex gnus-dired-attach
+Dired $B$G0u$rIU$1$?$b$N$rE:IU%U%!%$%k$H$7$FAw?.$7$^(B
+$B$9(B (@code{gnus-dired-attach})$B!#(BMessage $B%P%C%U%!$G3NG'$r5a$a$i$l$^$9!#(B
+
+@item C-c C-m C-l
+@findex gnus-dired-find-file-mailcap
+$BE,@Z$J(B mailcap $B9`L\$K=>$C$F%U%!%$%k$r3+$-$^(B
+$B$9(B (@code{gnus-dired-find-file-mailcap})$B!#@\F,<-$rIU$1$k$H!"%U%!%$%k$r?7(B
+$B$7$$%P%C%U%!$G3+$-$^$9!#(B
+
+@item C-c C-m C-p
+@findex gnus-dired-print
+mailcap $B9`L\$K=>$C$F%U%!%$%k$r0u:~$7$^$9(B (@code{gnus-dired-print})$B!#0u:~(B
+$B%3%^%s%I$,L5$$>l9g$O(B PostScript $B2hA|$K0u:~$7$^$9!#(B
+@end table
+
 @node Various Various
 @section $B$$$m$$$m$N$$$m$$$m(B
 @cindex mode lines
@@ -24613,14 +24652,9 @@ Buttons}. $B$9$Y$F$N5-;v$N%\%?%s$N8+1I$($r@)8f$9$k$?$a(B
 @item
 Dired $B$NE}9g(B
 
-@code{gnus-dired-minor-mode} $B$O!"(Bdired $B$N%P%C%U%!$G%-!<@_Dj(B -- $BE:IU%U%!(B
-$B%$%k$NAw?.(B (@kbd{C-c C-a})$B!"(Bmailcap $B$NE,@Z$J9`L\$r;H$C$F%U%!%$%k$r3+(B
-$B$/(B (@kbd{C-c C-l})$B!"$=$l$K(B mailcap $B$N9`L\$r;H$C$F%U%!%$%k$r0u:~$9(B
-$B$k(B (@kbd{C-c P}) -- $B$r9T$J$$$^$9!#$3$l$O<!$N<0$r;H$&$HM-8z$K$J$j$^$9!#(B
-
-@lisp
-(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
-@end lisp
+@code{gnus-dired-minor-mode} (@ref{Other modes} $B;2>H(B) $B$O!"(Bdired $B$N%P%C%U%!(B
+$B$G%-!<@_Dj(B -- $BE:IU%U%!%$%k$NAw?.!"(Bmailcap $B$NE,@Z$J9`L\$r;H$C$F%U%!%$%k$r(B
+$B3+$/!"$=$l$K(B mailcap $B$N9`L\$r;H$C$F%U%!%$%k$r0u:~$9$k(B -- $B$r9T$J$$$^$9!#(B
 
 @item
 Gnus $B$O(B RSS $B$N%K%e!<%9G[Aw$r!"%K%e!<%9%0%k!<%W$H$7$FI=<($7$^$9!#(B
