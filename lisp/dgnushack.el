@@ -326,6 +326,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (if (emacs-version>= 21 5)
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
+    (autoload 'sgml-mode "psgml" nil t)
     (autoload 'smtpmail-send-it "smtpmail")
     (autoload 'sort-numeric-fields "sort" nil t)
     (autoload 'sort-subr "sort")
