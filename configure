@@ -1019,10 +1019,10 @@ fi
 if test "${HAVE_w3_forms}" = "yes"; then
 	EMACS_cv_ACCEPTABLE_W3=yes
 else
-	EMACS_cv_ACCEPTABLE_W3=no
+	EMACS_cv_ACCEPTABLE_W3=
 fi
 
-if test "${EMACS_cv_ACCEPTABLE_W3}" = "yes"; then
+if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
 	
 elisp="(file-name-directory (locate-library \"w3-forms\"))"
 if test -z ""noecho""; then
@@ -1061,11 +1061,15 @@ fi
 
    W3=${EMACS_cv_ACCEPTABLE_W3}
    
-   echo "$ac_t"""${W3}"" 1>&6
+   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
+	echo "$ac_t"""${W3}"" 1>&6
+   else
+	echo "$ac_t"""not found"" 1>&6
+   fi
 
   if test ${EMACS_FLAVOR} = xemacs; then
     echo $ac_n "checking where the XEmacs package is""... $ac_c" 1>&6
-echo "configure:1069: checking where the XEmacs package is" >&5
+echo "configure:1073: checking where the XEmacs package is" >&5
     # Check whether --with-packagedir or --without-packagedir was given.
 if test "${with_packagedir+set}" = set; then
   withval="$with_packagedir"
@@ -1088,7 +1092,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1092: checking for PACKAGEDIR" >&5
+echo "configure:1096: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1127,7 +1131,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1131: checking for PACKAGEDIR" >&5
+echo "configure:1135: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1164,7 +1168,7 @@ if test "${with_addpath+set}" = set; then
   withval="$with_addpath"
   if test x$withval != xyes -a x$withval != x; then
       echo $ac_n "checking where to find the additional elisp libraries""... $ac_c" 1>&6
-echo "configure:1168: checking where to find the additional elisp libraries" >&5
+echo "configure:1172: checking where to find the additional elisp libraries" >&5
       ADDITIONAL_LOAD_PATH=$withval
       echo "$ac_t""$ADDITIONAL_LOAD_PATH" 1>&6
     fi

@@ -107,10 +107,6 @@
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
-(condition-case err
-    (load "~/.lpath.el" t nil t)
-  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
-
 (condition-case nil
     (char-after)
   (wrong-number-of-arguments
@@ -131,10 +127,19 @@
 	 '(char-before (point))
        form))))
 
-(push srcdir load-path)
+;; Don't load path-util until `char-after' and `char-before' have been
+;; optimized because it requires `poe' and then modify the functions.
+(or (featurep 'path-util)
+    (load "apel/path-util"))
+(add-path "apel")
+(add-path "flim")
+(add-path "semi")
 
-;; `char-after' and `char-before' must be well-behaved before lpath.el
-;; is loaded.  Because it requires `poe' via `path-util'.
+(condition-case err
+    (load "~/.lpath.el" t nil t)
+  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
+
+(push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t t)
 
 (unless (fboundp 'byte-compile-file-form-custom-declare-variable)

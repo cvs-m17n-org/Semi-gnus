@@ -2,12 +2,6 @@
 
 (defvar byte-compile-default-warnings)
 
-(or (featurep 'path-util)
-    (load "apel/path-util"))
-(add-path "apel")
-(add-path "flim")
-(add-path "semi")
-
 (defun maybe-fbind (args)
   (while args
     (or (fboundp (car args))
@@ -93,14 +87,14 @@
 		 window-pixel-height window-pixel-width)))
 
 ;; T-gnus.
-(maybe-fbind '(md5))
 (if (featurep 'xemacs)
     (progn
       (maybe-fbind '(propertize))
       (maybe-bind '(mh-lib-progs)))
   ;; FSFmacs
   (maybe-fbind '(charsetp
-		 function-max-args propertize smiley-encode-buffer))
+		 function-max-args propertize smiley-encode-buffer
+		 url-insert-file-contents))
   (if (boundp 'MULE)
       (progn
 	(maybe-fbind '(coding-system-get

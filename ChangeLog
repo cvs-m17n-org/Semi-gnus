@@ -1,3 +1,20 @@
+2000-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* configure: Regenerate.
+
+	* aclocal.m4 (AC_CHECK_W3): Substitute `W3' with empty string
+	instead of "no" if it is not acceptable.
+
+	* lisp/dgnushack.el: Load ~/.lpath.el just before `srcdir' is added
+	to `load-path'.
+
+	* lisp/lpath.el: Move out `load-path' modification for APEL, FLIM
+	and SEMI to dgnushack.el.
+	* lisp/dgnushack.el: Move here.
+
+	* lisp/lpath.el (md5): Don't bind.
+	(url-insert-file-contents): Fbind for FSF Emacsen.
+
 2000-11-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/Makefile.in (install-ja-info): Specify `EMACS' and

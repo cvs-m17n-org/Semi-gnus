@@ -138,10 +138,10 @@ AC_EMACS_CHECK_LIB(w3_forms, w3-form-encode-xwfu,"noecho")
 if test "${HAVE_w3_forms}" = "yes"; then
 	EMACS_cv_ACCEPTABLE_W3=yes
 else
-	EMACS_cv_ACCEPTABLE_W3=no
+	EMACS_cv_ACCEPTABLE_W3=
 fi
 
-if test "${EMACS_cv_ACCEPTABLE_W3}" = "yes"; then
+if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
 	AC_EMACS_LISP(w3_dir,(file-name-directory (locate-library \"w3-forms\")),"noecho")
 	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_dir
 fi
@@ -149,7 +149,11 @@ fi
    AC_ARG_WITH(w3,[  --with-w3=DIR           Specify where to find the w3 package], [ EMACS_cv_ACCEPTABLE_W3=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` ])
    W3=${EMACS_cv_ACCEPTABLE_W3}
    AC_SUBST(W3)
-   AC_MSG_RESULT("${W3}")
+   if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
+	AC_MSG_RESULT("${W3}")
+   else
+	AC_MSG_RESULT("not found")
+   fi
 ])
 
 AC_DEFUN(AC_EXAMINE_PACKAGEDIR,
