@@ -556,6 +556,9 @@ displayed by the first non-nil matching CONTENT face."
 			       (item :tag "skip" nil)
 			       (face :value default)))))
 
+(defcustom gnus-article-decode-hook nil
+  "*Hook run to decode charsets in articles.")
+
 ;;; Internal variables
 
 (defvar article-lapsed-timer nil)
@@ -817,7 +820,7 @@ always hide."
 (defun article-treat-dumbquotes ()
   "Translate M******** sm*rtq**t*s into proper text."
   (interactive)
-  (article-translate-characters "\221\222\223\223" "`'\"\""))
+  (article-translate-characters "\221\222\223\224" "`'\"\""))
 
 (defun article-translate-characters (from to)
   "Translate all characters in the body of the article according to FROM and TO.
@@ -2508,6 +2511,9 @@ If given a prefix, show the hidden text instead."
 	    (insert-buffer-substring gnus-article-buffer))
 	  (setq gnus-original-article (cons group article))))
 
+      ;; Decode charsets.
+      (run-hooks 'gnus-article-decode-hook)
+      
       ;; Update sparse articles.
       (when (and do-update-line
 		 (or (numberp article)

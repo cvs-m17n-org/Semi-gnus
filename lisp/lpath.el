@@ -36,7 +36,7 @@
 		     x-color-values widget-make-intangible error-message-string
 		     w3-form-encode-xwfu gnus-mule-get-coding-system
 		     decode-coding-string mail-aliases-setup
-		     mm-copy-tree url-view-url w3-prepare-buffer
+		     url-view-url w3-prepare-buffer
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
 		     mule-write-region-no-coding-system
@@ -69,7 +69,7 @@
 		 pp-to-string color-name 
 		 gnus-mule-get-coding-system decode-coding-string
 		 mail-aliases-setup
-		 mm-copy-tree url-view-url w3-prepare-buffer
+		 url-view-url w3-prepare-buffer
 		 mule-write-region-no-coding-system char-int)))
 
 (setq load-path (cons "." load-path))
