@@ -1,3 +1,16 @@
+2001-12-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-case-sensitive-filesystem): New
+	option.
+	(gnus-namazu/group-alist): New internal variable.
+	(gnus-namazu/setup): Initialize it.
+	(gnus-namazu/shutdown) New function.
+	(gnus-namazu/request-list): Ditto.
+	(gnus-namazu/group-prefixed-name): Ditto.
+	(gnus-namazu/search): Call it instead of
+	`gnus-group-prefixed-name' in order to normalize a group name on a
+	case-insensitive file system.
+
 2001-12-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu-need-path-normalization): New

@@ -75,7 +75,9 @@
 ;; To suppress byte-compile warning.
 (eval-when-compile
   (defvar nnml-directory)
-  (defvar nnmh-directory))
+  (defvar nnml-group-alist)
+  (defvar nnmh-directory)
+  (defvar nnmh-group-alist))
 
 (defgroup gnus-namazu nil
   "Search nnmh and nnml groups in Gnus with Namazu."
@@ -84,7 +86,10 @@
   :prefix "gnus-namazu-")
 
 (defcustom gnus-namazu-indexed-servers nil
-  "*List of servers indexed with Namazu."
+  "*List of servers indexed with Namazu.
+When this variable equals to nil, appropriate servers are chosen from
+`gnus-select-method' and `gnus-secondary-select-methods' and are set
+to it."
   :type '(repeat gnus-select-method)
   :group 'gnus-namazu)
 
@@ -139,12 +144,22 @@ options make any sense in this context."
   :type 'boolean
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-case-sensitive-filesystem
+  (not (eq system-type 'windows-nt))
+  "*Non-nil means that the using file system distinguishes cases of characters."
+  :type 'boolean
+  :group 'gnus-namazu)
+
+
+;;; Internal Variable:
+(defvar gnus-namazu/group-alist nil
+  "Associative list to map groups in lower case to official names.")
+
 
 (defmacro gnus-namazu/make-article (group number)
   `(cons ,group ,number))
 (defmacro gnus-namazu/article-group  (x) `(car ,x))
 (defmacro gnus-namazu/article-number (x) `(cdr ,x))
-
 
 (defun gnus-namazu/setup ()
   (unless gnus-namazu-indexed-servers
@@ -157,19 +172,39 @@ options make any sense in this context."
 			      gnus-secondary-select-methods)))))
   (unless gnus-namazu-indexed-servers
     (error "%s" "Can't find either nnml backend or nnmh backend"))
+  (or gnus-namazu-case-sensitive-filesystem
+      gnus-namazu/group-alist
+      (dolist (server gnus-namazu-indexed-servers)
+	(dolist (group (gnus-namazu/request-list server))
+	  (let ((name (gnus-group-prefixed-name group server)))
+	    (unless (assoc name gnus-namazu/group-alist)
+	      (push (cons (downcase name) name) gnus-namazu/group-alist))))))
   (when (or (not gnus-namazu-index-directories)
 	    (memq nil (mapcar
 		       (lambda (dir)
 			 (and (stringp dir)
 			      (file-directory-p dir)
-			      (file-readable-p
-			       (expand-file-name "NMZ.i" dir))
+			      (file-readable-p (expand-file-name "NMZ.i" dir))
 			      dir))
 		       gnus-namazu-index-directories)))
     (error "%s" "Can't find index.  Check `gnus-namazu-index-directories'")))
 
+(defun gnus-namazu/shutdown ()
+  (setq gnus-namazu/group-alist nil))
+(add-hook 'gnus-exit-gnus-hook 'gnus-namazu/shutdown)
+
+(defun gnus-namazu/request-list (server)
+  "Return the groups of the server SERVER."
+  (and (memq (car server) '(nnml nnmh))
+       (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
+       (gnus-request-list server)
+       (mapcar (function car)
+	       (if (eq 'nnml (car server))
+		   nnml-group-alist
+		 nnmh-group-alist))))
+
 (defun gnus-namazu/server-directory (server)
-  "Return the top directory of articles in SERVER."
+  "Return the top directory of articles of ther server SERVER."
   (and (memq (car server) '(nnml nnmh))
        (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
        (file-name-as-directory
@@ -209,6 +244,14 @@ options make any sense in this context."
 	     ,query
 	     ,@gnus-namazu-index-directories))))
 
+(defsubst gnus-namazu/group-prefixed-name (group method)
+  "Return the whole name from GROUP and METHOD."
+  (if gnus-namazu-case-sensitive-filesystem
+      (gnus-group-prefixed-name group method)
+    (let ((name (gnus-group-prefixed-name group method)))
+      (or (cdr (assoc name gnus-namazu/group-alist))
+	  name))))
+
 (defun gnus-namazu/search (groups query)
   (with-temp-buffer
     (when (zerop (gnus-namazu/call-namazu query))
@@ -236,7 +279,7 @@ options make any sense in this context."
 		   (setq group (substring file 0 (match-beginning 0))
 			 file (match-string 1 file))
 		   (setq group
-			 (gnus-group-prefixed-name
+			 (gnus-namazu/group-prefixed-name
 			  (nnheader-replace-chars-in-string group ?/ ?.)
 			  server))
 		   (when (or (not groups)
@@ -248,6 +291,7 @@ options make any sense in this context."
 	(nreverse articles)))))
 
 
+;;; User Interface:
 (defun gnus-namazu/get-target-groups ()
   (cond
    ((eq major-mode 'gnus-group-mode)
@@ -447,7 +491,6 @@ and make a virtual group contains its results."
 		 '<)))
       (message "No entry."))))
 
-
 (defun gnus-namazu-insinuate ()
   (add-hook
    'gnus-group-mode-hook
@@ -457,7 +500,6 @@ and make a virtual group contains its results."
    'gnus-summary-mode-hook
    (lambda ()
      (define-key gnus-summary-mode-map "\C-c\C-n" 'gnus-namazu-search))))
-
 
 (provide 'gnus-namazu)
 ;; gnus-namazu.el ends here.
