@@ -444,7 +444,7 @@ The provided functions are:
 
 (defcustom message-cite-prefix-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\([ \t]*[-_.[:word:]]+>+\\|[ \t]*[]>»|:}+]\\)+" 
+      "\\([ \t]*[-_.[:word:]]+>+\\|[ \t]*[]>»|:}+]\\)+"
     ;; ?-, ?_ or ?. MUST NOT be in syntax entry w.
     "\\([ \t]*\\(\\w\\|[-_.]\\)+>+\\|[ \t]*[]>»|:}+]\\)+")
   "*Regexp matching the longest possible citation prefix on a line."
@@ -1990,7 +1990,7 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
 
 (defun message-setup-fill-variables ()
   "Setup message fill variables."
-  (set (make-local-variable 'fill-paragraph-function) 
+  (set (make-local-variable 'fill-paragraph-function)
        'message-fill-paragraph)
   (make-local-variable 'paragraph-separate)
   (make-local-variable 'paragraph-start)
@@ -4751,7 +4751,7 @@ OTHER-HEADERS is an alist of header/value pairs."
      (nconc
       `((To . ,(or to "")) (Subject . ,(or subject "")))
       (when other-headers other-headers))
-     replybuffer)
+     replybuffer send-actions)
     ;; FIXME: Should return nil if failure.
     t))
 
