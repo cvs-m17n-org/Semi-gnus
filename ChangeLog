@@ -1,3 +1,9 @@
+1998-12-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: (gnus-offline-define-menu-on-miee)
+	(gnus-offline-define-menu-on-agent): Use Japanized menu when using
+	under Meadow.
+
 1998-12-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.051.

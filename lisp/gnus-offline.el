@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.20 1998-12-14 12:39:32 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.21 1998-12-16 13:16:51 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -760,44 +760,79 @@ If value is nil , dialup line is disconnected status.")
 ;;
 (defun gnus-offline-define-menu-on-miee ()
   "*Set and change menu bar on MIEE menu."
-  (easy-menu-change
-   nil
-   "Miee"
-   '(
-     ["Post news in spool" news-spool-post t]
-     ["Send mails in spool" mail-spool-send t]
-     "----"
-     ["Message Offline" message-offline-state (not message-offline-state)]
-     ["Message Online" message-online-state message-offline-state]
-     "----"
-     ("Gnus Offline"
-      ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
-      ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
-      ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
-      ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-      "----"
-      ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
-      ["Set interval time" gnus-offline-set-interval-time t]
-      "----"
-      ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
-      ))))
+  (if (featurep 'meadow)
+      (easy-menu-change
+       nil
+       "Miee"
+       '(
+	 ["Spool にある記事の送信" news-spool-post t]
+	 ["Spool にある Mail の送信" mail-spool-send t]
+	 "----"
+	 ["Offline 状態へ" message-offline-state (not message-offline-state)]
+	 ["Online 状態へ" message-online-state message-offline-state]
+	 "----"
+	 ("Gnus Offline"
+	  ["movemail の切替え" gnus-offline-toggle-movemail-program t]
+	  ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
+	  ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
+	  ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
+	  "----"
+	  ["取得済記事を消す" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+	  ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
+	  "----"
+	  ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
+	 ))
+    (easy-menu-change
+     nil
+     "Miee"
+     '(
+       ["Post news in spool" news-spool-post t]
+       ["Send mails in spool" mail-spool-send t]
+       "----"
+       ["Message Offline" message-offline-state (not message-offline-state)]
+       ["Message Online" message-online-state message-offline-state]
+       "----"
+       ("Gnus Offline"
+	["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+	["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
+	["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
+	["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
+	"----"
+	["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+	["Set interval time" gnus-offline-set-interval-time t]
+	"----"
+	["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
+	)))))
 ;;
 ;; define menu without miee.
 ;;
 (defun gnus-offline-define-menu-on-agent ()
   "*Set menu bar on OFFLINE menu."
   (easy-menu-define 
-   gnus-offline-menu-on-agent gnus-group-mode-map "Gnus offline Menu"
-   '("Offline"
-     ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
-     ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
-     ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
-     ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-     "----"
-     ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
-     ["Set interval time" gnus-offline-set-interval-time t]
-     "----"
-     ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]))
+   gnus-offline-menu-on-agent
+   gnus-group-mode-map
+   "Gnus offline Menu"
+   (if (featurep 'meadow)
+       '("Offline"
+	 ["movemail の切替え" gnus-offline-toggle-movemail-program t]
+	 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
+	 ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
+	 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
+	 "----"
+	 ["取得済記事を消す" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+	 ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
+	 "----"
+	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
+     '("Offline"
+       ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+       ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
+       ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
+       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
+       "----"
+       ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+       ["Set interval time" gnus-offline-set-interval-time t]
+       "----"
+       ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected])))
   (and (featurep 'xemacs)
        (easy-menu-add gnus-offline-menu-on-agent)))
 
