@@ -40,10 +40,9 @@ all-ja: lick info info-ja
 lick:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" all
 
-#install: install-lisp install-info install-etc
-install: install-lisp install-info
+install: install-lisp install-info install-etc
 
-install-ja: install install-info-ja
+install-ja: install install-info-ja install-etc
 
 install-lisp:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" install
@@ -62,13 +61,16 @@ install-package: \
 	xclever-package \
 	remove-extra-files-in-package \
 	install-package-lisp \
-	install-package-info install-package-manifest
+	install-package-info \
+	install-package-etc \
+	install-package-manifest
 
 install-package-ja: \
 	xclever-package \
 	remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-info-ja \
+	install-package-etc \
 	install-package-manifest
 
 package: xlick-package xinfo
@@ -110,6 +112,17 @@ install-package-info-ja:
 		"infodir=$$package_dir""/info install-ja-info"; \
 	cd texi && $(MAKE) EMACS="$(XEMACS)" \
 		infodir="$$package_dir""/info" install-ja-info
+
+install-package-etc:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd etc && $(MAKE) EMACS=$(XEMACS)" \
+		"etcdir=$$package_dir""/etc install"; \
+	cd etc && $(MAKE) EMACS="$(XEMACS)" \
+		etcdir="$$package_dir""/etc" install
 
 install-package-manifest:
 	@if test x$(PACKAGEDIR) = x; then \

@@ -1,6 +1,6 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;; 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -690,6 +690,22 @@ dgnushack-compile."
 				     t)
 		    'string-lessp))
 	(while (setq file (pop files))
-	  (insert "info/" file "\n"))))))
+	  (insert "info/" file "\n"))
+	(insert "etc/gnus-tut.txt\n")
+	(setq files
+	      (sort (directory-files "../etc/images/gnus/" nil
+				     "\\.\\(pbm\\|xbm\\|xpm\\)\\'"
+				     t)
+		    'string-lessp))
+	(while (setq file (pop files))
+	  (insert "etc/images/gnus/" file "\n"))
+	(insert "etc/images/gnus/x-splash\n")
+	(setq files
+	      (sort (directory-files "../etc/images/smilies/" nil
+				     "\\.\\(pbm\\|xpm\\)\\'"
+				     t)
+		    'string-lessp))
+	(while (setq file (pop files))
+	  (insert "etc/images/smilies/" file "\n"))))))
 
 ;;; dgnushack.el ends here

@@ -1,3 +1,14 @@
+2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (install): Run install-etc.
+	(install-ja): Ditto.
+	(install-package): Run install-package-etc.
+	(install-package-ja): Ditto.
+	(install-package-etc): New rule.
+
+	* lisp/dgnushack.el (dgnushack-install-package-manifest): List
+	icon files.
+
 2005-02-19  Miles Bader  <miles@gnu.org>
 
 	* etc/Makefile.in (install): Create $(etcdir)/images/gnus dir.
