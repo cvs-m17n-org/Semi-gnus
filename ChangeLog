@@ -1,7 +1,33 @@
+1999-01-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Bind `in-reply-to'
+	and `cur' as temporary variables.
+
+1999-01-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-article-sort-by-author): fixed.
+
+1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Add new
+	optional arguments `dependencies' and `force-new'; new
+	implementation; call `retrieve-parsed-headers' if it is found.
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): New function.
+
+1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-select-newsgroup): Use
+	`gnus-retrieve-parsed-headers' instead of `gnus-retrieve-headers'
+	and `gnus-get-newsgroup-headers-xover' or
+	`gnus-get-newsgroup-headers'.
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): New function.
+
 1999-01-26  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el: Add security notice.
-	
+
 1999-01-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* README-offline.ja: New file - Variable and command description
@@ -9,7 +35,7 @@
 	* README-offline.en: New file - Ditto (English edition).
 
 1999-01-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-	
+
 	* lisp/gnus-offline.el (gnus-offline-pop-password-file): New
 	variable.
 	(gnus-offline-pop-password-decoding-function): New variable.
@@ -18,7 +44,7 @@
 	by this variable, and don't store the passwords as a variable.
 	* lisp/smiley.el (smiley-buffer): Avoid a few duplicate
 	translations.
-	
+
 1999-01-23  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
 
 	* lisp/gnus-msg.el (gnus-inews-yank-articles): Use
