@@ -2716,8 +2716,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (funcall method)
     ;; Associate this article with the current summary buffer.
     (setq gnus-article-current-summary gnus-summary-buffer)
-    ;; Call the treatment functions.
-    (gnus-treat-article nil)
     ;; Perform the article display hooks.
     (gnus-run-hooks 'gnus-article-display-hook)))
 
