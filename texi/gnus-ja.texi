@@ -722,7 +722,7 @@ Gnus は、普通はグループが新しいかどうかを、購読しているグループと削除さ
 
 @vindex gnus-subscribe-newsgroup-method
 新しいグループに遭遇したときに gnus が何をするかは、変数
-@code{gnus-subscribe-nesgroup-method} によって決定されます。
+@code{gnus-subscribe-newsroup-method} によって決定されます。
 
 この変数は関数を含んでいる必要があります。この関数は新しいグループの名前
 を唯一の引数として呼ばれます。
@@ -802,10 +802,10 @@ options -n !alt.all !rec.all sci.all
 
 @vindex gnus-options-not-subscribe
 @vindex gnus-options-subscribe
-ファイル @file{.newrc} をいじりたくない場合は、
+ファイル @file{.newsrc} をいじりたくない場合は、
 @code{gnus-options-subscribe} と @code{gnus-options-not-subscribe} の２
 つの変数だけを設定することもできます。この２つの変数はファイル 
-@file{.newrc} の @samp{optinos -n} 行と全く同じことをします。どちらの変
+@file{.newsrc} の @samp{optinos -n} 行と全く同じことをします。どちらの変
 数も正規表現で、新しいグループは前者に合致すれば無条件に購読され、後者に
 合致すると無視されます。
 
@@ -879,7 +879,7 @@ gnus-group-clear-data-on-native-groups} を使って、基本グループに関するデー
 @cindex .newsrc.el
 @cindex .newsrc.eld
 
-今や、あなたはファイル @file{.newrc} についてすべて知っています。すべて
+今や、あなたはファイル @file{.newsrc} についてすべて知っています。すべて
 の購読情報は伝統的にこのファイルに蓄積されます。
 
 @sc{GNUS} では物事が少々複雑になっています。ファイル @file{.newsrc} を最
@@ -4040,8 +4040,8 @@ Prefixes})。
 
 記事に付けられる印はいくつかあります。
 
-記事の @dfn{購読度}（おぉ、ニート・キーノ新語句だ！）を決定する印がありま
-す。英字の印は一般的には@dfn{既読}を意味し、英字でない文字は一般的に
+記事の @dfn{購読度}（おぉ、すんごい新語句だ！）を決定する印がありま
+す。英字の印は一般的には @dfn{既読}を意味し、英字でない文字は一般的に
 @dfn{未読}を意味します。
 
 加えて、購読度に影響しない印もあります。
@@ -7470,7 +7470,7 @@ Parameters}) を編集します (@code{gnus-summary-edit-parameters})。
 @kindex Z s （概略）
 @findex gnus-summary-save-newsrc
 現在の既読/印付き記事の数をドリブルバッファ (dribble buffer) に保存し、
-それからドリブルバッファを保存します (@code{gnus-summary-save-newrc})。
+それからドリブルバッファを保存します (@code{gnus-summary-save-newsrc})。
 もし接頭引数を与えられれば、ファイル @file{.newsrc} も保存します。この命
 令を使うと、更新なしで抜け出る事 (@kbd{Q} 命令) は意味が無くなります。
 @end table
@@ -11003,8 +11003,8 @@ To: alt-religion-emacs@@GATEWAY
 @table @code
 
 @item nngateway-simple-header-transformaton
-@var{nesgroup}@@@code{nngateway-address} のような @code{To} ヘッダーをつ
-くります。
+@var{newsgroup}@@@code{nngateway-address} のような @code{To} ヘッダーを
+つくります。
 
 @findex nngateway-mail2news-header-transformation
 
@@ -15524,11 +15524,11 @@ Gnus は全ての @sc{gnus} 起動ファイルを理解します。
 Gnus は MIME の扱いをせず、この標準になるものは すごく良いと考えているの
 で、我々はここに大きな穴が空いている事になります。
 
-@item X-Nesreader
+@item X-Newsreader
 これは ``つまらないヘッダー'' と考えられていますが、私は消費者の情報であ
 ると見なしています。@code{tin} と @code{Netscape} から送られてくる非常に
 多くの様式に沿っていない記事を見た後で、私はそれらを記事を投稿するために
-は使わない方が良いという事を知りました。もし @code{X-Nesreader} ヘッダー
+は使わない方が良いという事を知りました。もし @code{X-Newsreader} ヘッダー
 が無ければ私はその情報を得る事はなかったでしょう。
 @end table
 
@@ -17823,8 +17823,8 @@ Solve the halting problem.
 @item バックエンド (backend)
 @cindex backend
 Gnus はニュースとメールの両方のいろいろなバックエンドが与えた記事を得ま
-す。Gnus はは、いわゆる下に横たわっているメディアを扱う事はしません---こ
-れはすべてバックエンドによってなされます。
+す。Gnus は、いわゆる下に横たわっているメディアを扱う事はしません---これ
+はすべてバックエンドによってなされます。
 
 @item 基本 (native)
 @cindex native
