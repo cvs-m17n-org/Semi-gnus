@@ -8,7 +8,7 @@ features of Gnus and gnus-mime, so there are no need to install Gnus
 to use it, and you must not use gnus-mime for SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
-them before to install it.  T-gnus 6.14 requires APEL 9.20 or later,
+them before to install it.  T-gnus 6.14 requires APEL 10.0 or later,
 FLIM (1.13.1 or later) and SEMI/WEMI (1.13.5 or later).  You can get
 these packages from:
 
