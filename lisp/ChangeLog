@@ -33,7 +33,7 @@
 	to `binary'.
 	(pop3-open-server): Guard `coding-system-for-read' by `binary'.
 
-1998-01-06  shuhei-k  <shuhei-k@mousai.jaist.ac.jp>
+1998-01-06  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
 
 	* nnoo.el, nnml.el, message.el, gnus.el, gnus-sum.el,
 	gnus-start.el, gnus-ems.el, gnus-draft.el, gnus-agent.el,
