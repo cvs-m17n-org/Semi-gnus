@@ -7,7 +7,12 @@
 $B$l$F$$$^$9!#(B
 
 $B$^$?!"(Bgnspool $B$J$I$N30It%W%m%0%i%`$rMQ$$$?(B nnspool $B$G$b;H$&$3$H$,$G$-$^(B
-$B$9!#$^$?!"JLESG[I[$N(B Miee.el $B$rAw?.$K;HMQ$9$k$3$H$b2DG=$G$9!#(B
+$B$9!#$^$?!"JLESG[I[$N(B miee.el $B$rAw?.$K;HMQ$9$k$3$H$b2DG=$G$9!#(B
+
+     (*) nspool $B$K$D$$$F$O(B info $B$r;2>H$7$F$/$@$5$$!#(B
+     (*) gnspool $B$O(B gn $B$H$$$&%K%e!<%9%j!<%@!<$H6&$KG[I[$5$l$F$$$^$9!#(B
+     (*) miee.el $B$N:G?7HG$O0J2<$N>l=j$+$i<hF@$G$-$^$9!#(B
+         http://www.shiojiri.ne.jp/%7Et-ichi/meadow.html
 
 ;; gnus-offline $B$r;H$o$J$/$F$b%*%U%i%$%s$G$NFI$_=q$-$O=PMh$^$9$,!"(B
 ;; gnus-offline $B$r;H$($P$h$j@_Dj!&A`:n$,4JC1$K=PMh$^$9!#(B
@@ -20,15 +25,23 @@
 $B%M%C%H%K%e!<%9$NAw<u?.(B->$B%@%$%"%k%"%C%W$N@ZCG(B $B$H$$$&F0:n$r0l5$$K9T$&$3$H(B
 $B$,2DG=$K$J$j$^$9!#(B($B$?$@$7@\B3!&$*$h$S@ZCG$OJLES@lMQ$N%D!<%k$,I,MW$G$9(B)
 
-$B$J$*!"$3$N%I%-%e%a%s%H$G$OAw<u?.$H$b$K(B gnus-agent $B$r;H$&$3$H$rA0Ds$K2r@b(B
-$B$7$^$9!#(B
+$B$J$*!"$3$N%I%-%e%a%s%H$G$O<g$K(B T-gnus 6.10.56 $B0J9_$N%P!<%8%g%s$KImB0$9$k(B 
+gnus-offline.el$B$K$D$$$F!"Aw<u?.$H$b$K(B gnus-agent $B$r;H$&$3$H$rA0Ds$K2r@b(B
+$B$7$^$9!#(B (*)
+
+      (*) T-gnus $B$O(B Gnus $B$N%F%9%H%P!<%8%g%s$r%Y!<%9$K$7$F$$$^$9!#$3$l$O(B
+          Pterodactyl Gnus $B$^$?$O(B pGnus $B$H8F$P$l$F$$$^$9!#(B 
+          $B0lJ}(B Semi-gnus $B$NB?$/$N%P!<%8%g%s$O(B Gnus 5.6 $B7ONs$r%Y!<%9$K$7(B
+          $B$F$$$^$9!#(B
+          $BN><T$G$O(B gnus-offline $B$N@_Dj$K$*$$$F0[$J$kItJ,$,$"$j$^$9!#(B
+          $B$3$NJ8=q$G$OI,MW$K1~$8!"$3$l$i$N0c$$$K$D$$$F@bL@$7$F$$$^$9!#(B
 
 2) $B%$%s%9%H!<%k(B
 
-Semi-gnus $B$r$*;H$$$N>l9g!"(Bgnus-offline.el $B$OFC$K2?$b9M$($J$/$F$b(B
-Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(B
-$BDL$C$?%G%#%l%/%H%j$K(B gnus-offline.el $B$H(B gnus-ofsetup.el $B$r(B($B%P%$%H%3%s(B
-$B%Q%$%k$7$F(B)$BCV$-$^$9!#(B
+T-gnus $B$r$*;H$$$N>l9g!"(Bgnus-offline.el $B$OFC$K2?$b9M$($J$/$F$b(B T-gnus $B$H(B
+$BF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$NDL$C$?%G%#%l%/(B
+$B%H%j$K(B gnus-offline.el $B$H(B gnus-ofsetup.el $B$r(B($B%P%$%H%3%s%Q%$%k$7$F(B)$BCV$-$^(B
+$B$9!#(B
 
 3) $B;H$$J}(B
 
@@ -48,7 +61,11 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $B$KI,MW$JJQ?t$N@_Dj$r9T$$$^$9!#(B($B2?$rF~NO$7$?$i$$$$$+$o$+$i$J$$>l9g$O(B 4) 
 $B$r;2>H$9$k$+!"(BTAB $B$GF~NO2DG=$J8uJd$r0lMwI=<($5$;$k$+$7$F$/$@$5$$(B)$B$9$Y$F(B
 $B@_Dj$9$k$H%[!<%`%G%#%l%/%H%j$K(B .gnus-offline.el $B$H$$$&%U%!%$%k$,=PMh>e$,(B
-$B$j$^$9!#(B
+$B$j$^$9!#(B(*)
+
+      (*) $B!V(BPOP $B%Q%9%o!<%I$r(B ~/.newsrc.eld $B$KJ]B8$9$k$+$I$&$+!W<ALd$5$l(B
+          $B$^$9!#$l$K$O$h$/9MN8$7$?>e$GEz$($F$/$@$5$$!#>\$7$/$O(B 6) $B$r;2>H(B
+          $B$7$F2<$5$$!#(B
 
 $B!&$3$N$"$H0lC6%*%s%i%$%s$G%5!<%P!<$K@\B3$7$F!"9XFI$9$k%0%k!<%W$r7h$a$F$/(B
 $B$@$5$$!#(B($B>\$7$$J}K!$O(B Gnus $B$N(B info $B$r8+$F$/$@$5$$(B)
@@ -61,9 +78,17 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $BA05-$NF0:n$r$9$k$O$:$G$9!#(B
 
 
-$B"!$^$?!"F1:-$N(B pop3-fma.el $B$rMQ$$$k$HJ#?t$N%a%$%k%"%+%&%s%H$r4IM}$9$k$3(B
-$B$H$,=PMh$^$9!#(B
+$B$^$?!"(BT-gnus 6.10.56 $B0J9_$N$b$N$G$O(B Gnus $B<+BN$,J#?t$N%a%$%k%"%+%&%s%H$r(B
+$B07$($^$9!#(B(6.10.55 $B0JA0$N(B T-gnus $B$G$bF1:-$N(B pop3-fma.el $B$rMQ$$$F$bJ#?t$N(B
+$B%a%$%k%"%+%&%s%H$r4IM}$9$k$3$H$,=PMh$^$9!#(B)
 
+<<<<<< $BCm0U(B >>>>>>>>>>> 
+
+T-gnus 6.10.56 $B0J9_$N%P!<%8%g%s$K$O(B pop3-fma.el $B$O4^$^$l$F$$$^$;$s!#%P!<(B
+$B%8%g%s%"%C%W$5$l$?J}$O4{B8$N(B pop3-fma.el $B$N@_Dj$O30$7$F$/$@$5$$!#(B
+($B4{B8$N(B .gnus-offline.el $B$r>C$9$N$,$b$C$H$b4JC1$G$9(B)
+
+$B!Z(BSemi-gnus + pop3-fma.el$B![(B
 $B!&(Bpop3-fma-spool-file-alist 
 $B!!!!!!!!(B'(
 	("po:$B%"%+%&%s%H(B1@pop$B%5!<%P(B1" pass) 
@@ -74,6 +99,14 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $B!&(Bpop3-fma-movemail-type 
       $B%a%$%k<u?.$K(B movemail.exe $B$r;H$&(B('exe)$B$+(B pop3.el('lisp) $B$r;H$&$+!#(B
 
+$B!Z(BT-gnus 6.10.56$B!A![(B
+$BBe$o$j$K0J2<$N$h$&$J@_Dj$,$5$l$^$9!#(B
+
+$B!&(Bgnus-offline-mail-source '(
+	(pop :user "manbou" :server "pop.ceres.dti.ne.jp")
+	(pop :user "imp9397" :server "mvb.biglobe.ne.jp")
+$B!!!!!!!!!D!D!D!D!D!D!D!D(B
+	)
 
 4) gnus-offline $B$G@_Dj2DG=$JJQ?t0lMw(B
 
@@ -117,9 +150,6 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
        'News ... News $B$@$1<u?.(B
     $B%G%U%)%k%HCM$O(B 'both $B$G$9!#(B
 
-$B!&(Bgnus-offline-popup-menu
-    $B%a%K%e!<$r;H$&$+$I$&$+$r;XDj$7$^$9!#%G%U%)%k%H$O(B "t" $B$G$9!#(B
-
 $B!&(Bgnus-offline-load-hook
     gnus-offline $B$,(B load $B$5$l$k$H$-$KI>2A$5$l$k(B hook
 
@@ -157,6 +187,9 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $B!&(Bgnus-offline-hangup-function
   $B@ZCG$K;HMQ$9$k4X?tL>(B
 
+$B!&(Bgnus-offline-mail-source
+  $B%a!<%k%5!<%P!<!"%f!<%6!<L>$N%j%9%H(B
+
 $B!&(Bgnus-offline-pop-password-file 
   $B%f!<%6!<L>!"%a!<%k%5!<%P!<!"%Q%9%o!<%I$rJ]B8$9$k$?$a$N%U%!%$%kL>(B
 
@@ -190,10 +223,20 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $B!&(BM-x gnus-offline-agent-expire
   $B4{FI$N5-;v$r(B expire $B$7$^$9!#(B
 
+
 6)$B!Z(B!!!$B=EMW(B!!!$B![(B pop $B%Q%9%o!<%I$N4IM}J}K!$K$D$$$F(B
 
-$B%G%U%)%k%H$G$O(B pop $B%5!<%P$N%Q%9%o!<%I$O(B pop $B%5!<%P!<$K%"%/%;%9$9$kEY$KF~(B
-$BNO$9$kI,MW$,$"$j$^$9!#(B($B4pK\E*$K$3$N$^$^$K$7$F$*$/$3$H$r?d>)$7$^$9(B)
+;;;$B%P!<%8%g%s$K$h$j0[$J$kItJ,$,B?$$$N$G$4Cm0U$/$@$5$$!#$^$?$3$NItJ,$O:#(B
+;;;$B8e$b2~D{$5$l$k$3$H$,M=A[$5$l$^$9!#(B
+
+<<<<<< $BCm0U(B >>>>>>>>>>>
+T-gnus 6.10.56 $B0J9_$N%P!<%8%g%s$r;HMQ$9$kJ}$O(B pop3-fma.el $B$O4^$^$l$F$$$^(B
+$B$;$s!#(BGnus $B$,J#?t$N(B POP3 $B%"%+%&%s%H$r07$($k$h$&$K$J$j$^$7$?$N$G!"(B
+$B%P!<%8%g%s%"%C%W$5$l$k:]$O4{B8$N(B pop3-fma.el $B$N@_Dj$O30$7$F$/$@$5$$!#(B
+
+Semi-gnus + pop3-fma.el $B$G$O!"%G%U%)%k%H$G$O(B pop $B%5!<%P$N%Q%9%o!<%I$O(B
+pop $B%5!<%P!<$K%"%/%;%9$9$kEY$KF~NO$9$kI,MW$,$"$j$^$9!#(B($B4pK\E*$K$3$N$^$^(B
+$B$K$7$F$*$/$3$H$r?d>)$7$^$9(B)
 
 $B$7$+$7!"!V$3$l$@$HLLE]$@$7$I$&$;<+J,0l?M$7$+;H$o$J$$%3%s%T%e!<%?$@$+$i$=(B
 $B$l$[$I%Q%9%o!<%I$N4IM}$K$OCm0U$rJ'$&I,MW$,$J$$!W$H$$$&>l9g$K$O$$$/$D$+$N(B
@@ -201,39 +244,38 @@ Semi-gnus $B$HF1;~$K%$%s%9%H!<%k$5$l$^$9!#$=$&$G$J$$>l9g$O(B load-path $B$N(
 $B$9$N$G0J2<$NJ}K!$N$$$:$l$+$r<B9T$9$k:]$K$O(B 100% $B<+8J$N@UG$$N$b$H$G9T$C$F(B
 $B$/$@$5$$!#(B
 
+<$BJ}K!(B1>
+$B=i2s5/F0;~$N(B gnus-ofsetup.el $B$K$h$kJQ?t@_Dj$N:]!"(B(=~/.gnus-offline.el $B$,(B
+$B$J$$$H$-(B)$B%Q%9%o!<%I$r(B ~/.newsrc.eld $B$KJ]B8$9$k$+$I$&$+<ALd$5$l!"!H(By$B!I$H(B
+$BEz$($k$HJ]B8$5$l$k$h$&$K$J$j$^$9!#(B (*)
 
-$B$^$:!"%Q%9%o!<%I$r%U%!%$%k$K;D$7$F$OCV$-$?$/$J$$$,%a%b%j>e$KJQ?t$H$7$F;D$C(B
+      (*) $B<B:]$K$O(B ~/.gnus-offline.el $B$K0J2<$N%3!<%I$,DI2C$5$l$^$9!#(B
+
+         $B!Z(BSemi-gnus + pop3-fma.el$B![(B
+
+            (add-hook 'gnus-setup-news-hook 
+             (lambda ()
+              (add-to-list 'gnus-variable-list 'pop3-fma-password)))
+
+         $B!Z(BT-gnus 6.10.56 $B0J9_![(B
+
+            (add-hook 'gnus-setup-news-hook 
+             (lambda ()
+              (add-to-list 'gnus-variable-list 'mail-source-password-cache)))
+
+$B$?$@$7$3$N>l9g$OJ]B8$5$l$k%Q%9%o!<%I$OJ?J8$N$^$^$J$N$G$+$J$j4m81$G$"$k$3(B
+$B$H$r$4>5CN$N$&$($*;H$$$/$@$5$$!#(B
+
+<$BJ}K!(B2>
+$B%Q%9%o!<%I$r%U%!%$%k$K;D$7$F$OCV$-$?$/$J$$$,%a%b%j>e$KJQ?t$H$7$F;D$C(B
 $B$F$$$F$b9=$o$J$$!"$H$$$&>l9g$O!"(B~/.gnus-offline.el $B$K0J2<$N$h$&$J%3!<%I(B
 $B$r2C$($F$/$@$5$$!#(B
 
 (setq pop3-fma-save-password-information t)
 
 $B$3$&$9$k$3$H$K$h$j!"%Q%9%o!<%I$O(B Gnus $B5/F0;~$KF~NO$9$k$@$1$K$J$j$^$9!#(B
+$B%Q%9%o!<%I$O(B pop3-fma-password $B$H$$$&JQ?t$H$7$FJ];}$5$l$^$9!#(B
 
-$B$^$?!"%U%!%$%k$K;D$7$F$b9=$o$J$$$,%a%b%j>e$NJQ?t$H$7$F;D$7$?$/$J$$>l9g!"(B
-$B$^$?$OA4$/%Q%9%o!<%I$NF~NO$r>J$-$?$$>l9g$O!"(B.gnus-offline.el $B$K0J2<$N$h(B
-$B$&$J%3!<%I$r2C$(!"%Q%9%o!<%I%U%!%$%k$r;XDj$7$^$9!#(B
-
-(setq gnus-offline-pop-password-file "~/.pop.passwd")
-
-$B;XDj$7$?%Q%9%o!<%I%U%!%$%k(B($B$3$NNc$G$O(B~/.pop.passwd)$B$r:n@.$7!"%Q%9%o!<%I(B
-$B$N>pJs$r0J2<$N$h$&$J7A<0$G=q$-$^$9!#(B
-
-   (setq pop3-fma-password
-	 '(("SERVER1" "ACCOUNT1" "PASSWORD1")
-	   ("SERVER2" "ACCOUNT2" "PASSWORD2")
-	   ............................
-          ))
-
-$B$3$N%U%!%$%k$r$&$C$+$j3+$$$F$7$^$C$F$b%Q%9%o!<%I$,8+$($J$$$h$&$K!"(B
-base64 $B$G%(%s%3!<%I$9$k$3$H$r$*4+$a$7$^$9!#$=$N0Y$K$O(B
-
-    M-: (base64-encode-region (point-min) (point-max))
-
-$B$N$h$&$K$7$^$9(B(M-: $B$ODL>o(B eval-expression $B$K3d$j$"$F$i$l$F$$$^$9(B)$B!#(B
-$B$b$7$3$3$G%(%s%3!<%I$7$J$+$C$?$J$i$P!"(B~/.gnus-offline.el $B$K(B
-
- (setq gnus-offline-pop-password-decoding-function nil)
-
-$B$H=q$-$^$9!#(B($B$?$@$7$3$l$OHs>o$K4m81$G$9!#(B)
-             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+T-gnus 6.10.56 $B0J9_$N%P!<%8%g%s$r;HMQ$9$kJ}$OFC$K@_Dj$7$J$/$F$b$3$l$HF1(B
+$B$8>uBV$,%G%U%)%k%H$K$J$C$F$$$^$9!#%Q%9%o!<%I$O(B mail-source-password-cache
+$B$H$$$&JQ?t$KJ];}$5$l$^$9!#(B
