@@ -747,7 +747,7 @@ Getting Mail
 * Group Mail Splitting::        メール分割を駆動するためにグループカスタマイズを使う
 * Incorporating Old Mail::      あなたが持っている古いメールをどうするか?
 * Expiring Mail::               欲しくないメールを取り除く
-* Washing Mail::                取得したメールから嫌なものを取り除く
+* Washing Mail::                取得したメールから要らないものを取り除く
 * Duplicates::                  重複したメールを扱う
 * Not Reading Mail::            他のファイルを読むためにメールバックエンドを使う
 * Choosing a Mail Back End::    Gnus は色々なメール様式を読む事ができる
@@ -5433,8 +5433,8 @@ Gnus は、取り消すときに『現在』の選択方法を使います。標準の投稿方法を使
 @code{d} (日), @code{w} (週), @code{M} (月) および @code{Y} (年) です。
 
 @item
-日付。@code{YYYYY-MM-DD} のような形式で指定します。。メッセージの送信は
-その日の特定の時刻 (ディフォルトは 8 時) まで遅らせられます。
+日付。@code{YYYY-MM-DD} のような形式で指定します。。メッセージの送信はそ
+の日の特定の時刻 (ディフォルトは 8 時) まで遅らせられます。
 @code{gnus-delay-default-hour} も参照して下さい。
 
 @item
@@ -12179,7 +12179,7 @@ Emacs のセッション全体をラップして、ディフォルトのメソッドを使うというの
 * Group Mail Splitting::        メール分割を駆動するためにグループカスタマイズを使う
 * Incorporating Old Mail::      あなたが持っている古いメールをどうするか?
 * Expiring Mail::               欲しくないメールを取り除く
-* Washing Mail::                取得したメールから嫌なものを取り除く
+* Washing Mail::                取得したメールから要らないものを取り除く
 * Duplicates::                  重複したメールを扱う
 * Not Reading Mail::            他のファイルを読むためにメールバックエンドを使う
 * Choosing a Mail Back End::    Gnus は色々なメール様式を読む事ができる

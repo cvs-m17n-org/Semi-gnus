@@ -1483,7 +1483,7 @@ qmail-inject プログラムに渡す引数です。これは文字列のリストで、それぞれ
 @item message-mailer-swallows-blank-line
 @vindex message-mailer-swallows-blank-line
 システムのメイラーがヘッダーと本文を一緒にしてしまう場合は、
-非-@code{nil} に設定して下さい。(Sunos 4 で sendmail がリモートモードで
+非-@code{nil} に設定して下さい。(SunOS 4 で sendmail がリモートモードで
 動作する場合が該当します。) 値は、障害が実際に起きるかどうかをテストする
 ための式にすべきです。
 
