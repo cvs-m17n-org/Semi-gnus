@@ -1,3 +1,13 @@
+2000-03-04  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.10 (This is alpha status.)
+	Fix a bug.
+
+	* lisp/message.el (message-narrow-to-headers-or-head): Copy from
+	Gnus 5.8.3.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.10.
+
 2000-03-03  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.9 (This is alpha status.)
