@@ -1,5 +1,10 @@
 1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.7.
+	(gnus-version): Modify for SEMI 1.10.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
 	for Subject and From field.
 
