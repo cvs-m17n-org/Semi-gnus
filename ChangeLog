@@ -1,3 +1,8 @@
+2003-10-27  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el: Don't fiddle with the `features' variable;
+	fix directories relative to the ../lisp directory in `load-path'.
+
 2003-10-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Makefile.in (install-package): Don't call `compose-package'.
