@@ -1,5 +1,9 @@
 1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.4.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus-draft.el (gnus-draft-send): Call
 	`message-send-news-function' or `message-send-mail-function'
 	instead of `message-send-and-exit'.
