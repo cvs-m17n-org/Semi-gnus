@@ -1,3 +1,14 @@
+2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mail-header-field-value): Alias to
+	`std11-field-value'.
+	(std11-field-value): New function.
+
+2002-01-08  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnheader.el (mail-header-parse-addresses): New function.
+	(std11-extract-addresses-components): New function.
+
 2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-picon.el: Don't require `mail-parse'.

@@ -1209,7 +1209,7 @@ find-file-hooks, etc.
 	'multibyte-string-p
       'ignore)))
 
-;; rfc2047 stuff.
+;; mail-parse stuff.
 (unless (featurep 'mail-parse)
   (defun-maybe std11-narrow-to-field ()
     "Narrow the buffer to the header on the current line."
@@ -1235,7 +1235,47 @@ find-file-hooks, etc.
 	  (delete-region (point-min) (point-max))
 	  (insert str)))))
 
-  (defalias 'mail-header-fold-field 'std11-fold-field))
+  (defalias 'mail-header-fold-field 'std11-fold-field)
+
+  (defun-maybe std11-extract-addresses-components (string)
+    "Extract a list of full name and canonical address from STRING.  Each
+element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
+If no name can be extracted, FULL-NAME will be nil."
+    (mapcar (function
+	     (lambda (structure)
+	       (list (std11-full-name-string structure)
+		     (std11-address-string structure))))
+	    (std11-parse-addresses-string (std11-unfold-string string))))
+
+  (defun mail-header-parse-addresses (string)
+    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
+    (mapcar (function
+	     (lambda (components)
+	       (cons (nth 1 components) (car components))))
+	    (std11-extract-addresses-components string)))
+
+  (defun-maybe std11-field-value (&optional dont-include-last-newline)
+    "Return the value of the field at point.  If the optional argument is
+given, the return value will not contain the last newline."
+    (let ((begin (point))
+	  (inhibit-point-motion-hooks t)
+	  start value)
+      (beginning-of-line)
+      (unless (eobp)
+	(while (and (memq (char-after) '(?\t ?\ ))
+		    (zerop (forward-line -1))))
+	(when (looking-at ".+:[\t\n ]+")
+	  (goto-char (setq start (match-end 0)))
+	  (forward-line 1)
+	  (while (and (memq (char-after) '(?\t ?\ ))
+		      (zerop (forward-line 1))))
+	  (when dont-include-last-newline
+	    (skip-chars-backward "\t\n " start))
+	  (setq value (buffer-substring start (point)))))
+      (goto-char begin)
+      value))
+
+  (defalias 'mail-header-field-value 'std11-field-value))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
