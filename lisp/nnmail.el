@@ -432,6 +432,9 @@ parameter.  It should return nil, `warn' or `delete'."
 
 ;;; Internal variables.
 
+(defvar nnmail-article-buffer " *nnmail incoming*"
+  "The buffer used for splitting incoming mails.")
+
 (defvar nnmail-split-history nil
   "List of group/article elements that say where the previous split put messages.")
 
@@ -897,7 +900,7 @@ FUNC will be called with the buffer narrowed to each mail."
 				nnmail-split-methods)))
     (save-excursion
       ;; Insert the incoming file.
-      (set-buffer (get-buffer-create " *nnmail incoming*"))
+      (set-buffer (get-buffer-create nnmail-article-buffer))
       (erase-buffer)
       (let ((nnheader-file-coding-system nnmail-incoming-coding-system))
 	(nnheader-insert-file-contents incoming))

@@ -13819,10 +13819,16 @@ gnus-secondary-select-methods に nnimap を登録して下さい。これによっ
 @end itemize
 
 @vindex imap-kerberos4-program
-@samp{imtest} プログラムは Cyrus IMAPD に含まれています。
-nnimap は @samp{imtest} バージョン 1.5.x と 1.6.x の両方をサポートします。
-変数 @code{imap-kerberos4-program} は imtest プログラムに渡すパタメータ
-を含みます。
+@samp{imtest} プログラムは Cyrus IMAPD に含まれています。もしあなた
+が 2.0.14 未満の Cyrus IMAPD に含まれている @samp{imtest} (バージョ
+ン 1.5.x と 1.6.x) を使っているなら、
+@code{imap-process-connection-type} をいじり回して、
+@code{imap.el} が @samp{imtest} と通信するときにパイプではなく
+て pty を使うようにさせる必要があります。そうするとあなたは IMAP コマン
+ドの行の長さの制限に悩まされるでしょう。それはメールボックスにたくさんの
+記事があるときに Gnus を無期限にハングさせてしまうかもしれません。変
+数 @code{imap-kerberos4-program} は imtest プログラムに渡すパタメータを
+含みます。
 
 @vindex imap-ssl-program
 SSL 接続のための OpenSSL プログラムは @uref{http://www.openssl.org/} か

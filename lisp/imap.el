@@ -187,10 +187,10 @@ the list is tried until a successful connection is made."
   :group 'imap
   :type '(repeat string))
 
-(defcustom imap-ssl-program '("openssl s_client -ssl3 -connect %s:%p"
-			      "openssl s_client -ssl2 -connect %s:%p"
-			      "s_client -ssl3 -connect %s:%p"
-			      "s_client -ssl2 -connect %s:%p")
+(defcustom imap-ssl-program '("openssl s_client -quiet -ssl3 -connect %s:%p"
+			      "openssl s_client -quiet -ssl2 -connect %s:%p"
+			      "s_client -quiet -ssl3 -connect %s:%p"
+			      "s_client -quiet -ssl2 -connect %s:%p")
   "A string, or list of strings, containing commands for SSL connections.
 Within a string, %s is replaced with the server address and %p with
 port number on server.  The program should accept IMAP commands on
@@ -212,6 +212,11 @@ and write IMAP response to stdout. Each entry in the list is tried
 until a successful connection is made."
   :group 'imap
   :type '(repeat string))
+
+(defcustom imap-process-connection-type nil
+  "*Value for `process-connection-type' to use for Kerberos4 and GSSAPI."
+  :group 'imap
+  :type 'boolean)
 
 (defvar imap-shell-host "gateway"
   "Hostname of rlogin proxy.")
@@ -438,6 +443,7 @@ If ARGS, PROMPT is used as an argument to `format'."
       (message "Opening Kerberos 4 IMAP connection with `%s'..." cmd)
       (erase-buffer)
       (let* ((port (or port imap-default-port))
+	     (process-connection-type imap-process-connection-type)
 	     (process (as-binary-process
 		       (start-process
 			name buffer shell-file-name shell-command-switch
@@ -499,6 +505,7 @@ If ARGS, PROMPT is used as an argument to `format'."
     (while (and (not done) (setq cmd (pop cmds)))
       (message "Opening GSSAPI IMAP connection with `%s'..." cmd)
       (let* ((port (or port imap-default-port))
+	     (process-connection-type imap-process-connection-type)
 	     (process (as-binary-process
 		       (start-process
 			name buffer shell-file-name shell-command-switch
@@ -2229,7 +2236,11 @@ Return nil if no complete line has arrived."
   (let (flag-list start)
     (assert (eq (char-after) ?\())
     (while (and (not (eq (char-after) ?\)))
-		(setq start (progn (imap-forward) (point)))
+		(setq start (progn
+			      (imap-forward)
+			      ;; next line for Courier IMAP bug.
+			      (skip-chars-forward " ")
+			      (point)))
 		(> (skip-chars-forward "^ )" (imap-point-at-eol)) 0))
       (push (buffer-substring start (point)) flag-list))
     (assert (eq (char-after) ?\)))
