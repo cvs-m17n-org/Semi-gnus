@@ -31,7 +31,7 @@
 ;; browse its results with Gnus.  This module requires the external
 ;; command Namazu.  Visit the following page for more information.
 ;;
-;;     http://www.namazu.org/
+;;     http://namazu.org/
 
 
 ;;; Install:
@@ -41,18 +41,20 @@
 ;;	 % mkdir ~/News/namazu
 ;;       % mknmz -a -h -O ~/News/namazu ~/Mail
 ;;
-;; Furthermore, put these expressions to your ~/.gnus, to set the path
-;; of the index files to `gnus-namazu-index-directories'.
+;; When you put index files of Namazu into the directory other than
+;; the default one (~/News/namazu), it is necessary to put this
+;; expression to your ~/.gnus, in order to set the path of index files
+;; to `gnus-namazu-index-directories'.
 ;;
-;;    (setq gnus-namazu-index-directories
-;;          (list (expand-file-name "~/News/namazu")))
-
+;;      (setq gnus-namazu-index-directories
+;;            (list (expand-file-name "~/namazu")))
+;;
 ;; If you would like to use this module in Gnus (not T-gnus), put this
 ;; file into the lisp/ directory in the Gnus source tree and run `make
 ;; install'.  And then, put the following expressions into your ~/.gnus.
 ;;
-;;    (require 'gnus-namazu)
-;;    (gnus-namazu-insinuate)
+;;      (require 'gnus-namazu)
+;;      (gnus-namazu-insinuate)
 
 
 ;;; Usage:
@@ -79,40 +81,30 @@
   (defvar nnmh-directory)
   (defvar nnmh-group-alist))
 
+
 (defgroup gnus-namazu nil
   "Search nnmh and nnml groups in Gnus with Namazu."
   :group 'namazu
   :group 'gnus
   :prefix "gnus-namazu-")
 
-(defcustom gnus-namazu-indexed-servers nil
-  "*List of servers indexed with Namazu.
-When this variable equals to nil, appropriate servers are chosen from
-`gnus-select-method' and `gnus-secondary-select-methods' and are set
-to it."
-  :type '(repeat gnus-select-method)
-  :group 'gnus-namazu)
-
 (defcustom gnus-namazu-index-directories
   (list
-   (cond
-    ((boundp 'nnir-namazu-index-directory)
-     (symbol-value 'nnir-namazu-index-directory))
-    ((boundp 'gnus-namazu-index-directory)
-     (symbol-value 'gnus-namazu-index-directory))
-    (t
-     (expand-file-name "namazu" gnus-directory))))
+   (or (and (boundp 'gnus-namazu-index-directory)
+	    (symbol-value 'gnus-namazu-index-directory))
+       (and (boundp 'nnir-namazu-index-directory)
+	    (symbol-value 'nnir-namazu-index-directory))
+       (expand-file-name "namazu" gnus-directory)))
   "*Index directory of Namazu."
   :type '(repeat directory)
   :group 'gnus-namazu)
 
 (defcustom gnus-namazu-command
-  (cond
-   ((boundp 'namazu-command)
-    (symbol-value 'namazu-command))
-   ((boundp 'nnir-namazu-program)
-    (symbol-value 'nnir-namazu-program))
-   (t "namazu"))
+  (or (and (boundp 'namazu-command)
+	   (symbol-value 'namazu-command))
+      (and (boundp 'nnir-namazu-program)
+	   (symbol-value 'nnir-namazu-program))
+      "namazu")
   "*Name of the executable file of Namazu."
   :group 'gnus-namazu
   :type 'string)
@@ -132,8 +124,8 @@ options make any sense in this context."
 
 (defcustom gnus-namazu-coding-system
   (if (memq system-type '(windows-nt OS/2 emx))
-      (if (>= emacs-major-version 20) 'shift_jis '*sjis*)
-    (if (>= emacs-major-version 20) 'euc-japan '*euc-japan*))
+      (if (boundp 'MULE) '*sjis* 'shift_jis)
+    (if (boundp 'MULE) '*euc-japan* 'euc-japan))
   "*Coding system for Namazu process."
   :type 'coding-system
   :group 'gnus-namazu)
@@ -154,6 +146,7 @@ options make any sense in this context."
 ;;; Internal Variable:
 (defvar gnus-namazu/group-alist nil
   "Associative list to map groups in lower case to official names.")
+(defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
 
 (defmacro gnus-namazu/make-article (group number)
@@ -161,33 +154,25 @@ options make any sense in this context."
 (defmacro gnus-namazu/article-group  (x) `(car ,x))
 (defmacro gnus-namazu/article-number (x) `(cdr ,x))
 
+(defsubst gnus-namazu/indexed-servers ()
+  "Choice appropriate servers from opened ones, and return thier list."
+  (append
+   (gnus-servers-using-backend 'nnml)
+   (gnus-servers-using-backend 'nnmh)))
+
 (defun gnus-namazu/setup ()
-  (unless gnus-namazu-indexed-servers
-    (setq gnus-namazu-indexed-servers
-	  (delq nil
-		(mapcar (lambda (method)
-			  (when (memq (car method) '(nnml nnmh))
-			    method))
-			(cons gnus-select-method
-			      gnus-secondary-select-methods)))))
-  (unless gnus-namazu-indexed-servers
-    (error "%s" "Can't find either nnml backend or nnmh backend"))
-  (or gnus-namazu-case-sensitive-filesystem
-      gnus-namazu/group-alist
-      (dolist (server gnus-namazu-indexed-servers)
-	(dolist (group (gnus-namazu/request-list server))
-	  (let ((name (gnus-group-prefixed-name group server)))
-	    (unless (assoc name gnus-namazu/group-alist)
-	      (push (cons (downcase name) name) gnus-namazu/group-alist))))))
-  (when (or (not gnus-namazu-index-directories)
-	    (memq nil (mapcar
-		       (lambda (dir)
-			 (and (stringp dir)
-			      (file-directory-p dir)
-			      (file-readable-p (expand-file-name "NMZ.i" dir))
-			      dir))
-		       gnus-namazu-index-directories)))
-    (error "%s" "Can't find index.  Check `gnus-namazu-index-directories'")))
+  (add-to-list 'gnus-group-name-charset-group-alist
+	       (cons gnus-namazu/group-name-regexp gnus-namazu-coding-system))
+  (unless gnus-namazu-case-sensitive-filesystem
+    ;; FIXME: The alist to map group names in lower case to real names
+    ;; is reconstructed every when gnus-namazu/setup() is called.
+    ;; This reconstruction make gnus-namazu-search() slow.
+    (setq gnus-namazu/group-alist nil)
+    (dolist (server (gnus-namazu/indexed-servers))
+      (dolist (group (gnus-namazu/request-list server))
+	(let ((name (gnus-group-prefixed-name group server)))
+	  (unless (assoc name gnus-namazu/group-alist)
+	    (push (cons (downcase name) name) gnus-namazu/group-alist)))))))
 
 (defun gnus-namazu/shutdown ()
   (setq gnus-namazu/group-alist nil))
@@ -204,7 +189,7 @@ options make any sense in this context."
 		 nnmh-group-alist))))
 
 (defun gnus-namazu/server-directory (server)
-  "Return the top directory of articles of ther server SERVER."
+  "Return the top directory of the server SERVER."
   (and (memq (car server) '(nnml nnmh))
        (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
        (file-name-as-directory
@@ -214,6 +199,7 @@ options make any sense in this context."
 
 ;;; Functions to call Namazu.
 (defsubst gnus-namazu/normalize-results ()
+  "Normalize file names returned by Namazu in this current buffer."
   (goto-char (point-min))
   (while (not (eobp))
     (when (if gnus-namazu-need-path-normalization
@@ -249,12 +235,14 @@ options make any sense in this context."
   (if gnus-namazu-case-sensitive-filesystem
       (gnus-group-prefixed-name group method)
     (let ((name (gnus-group-prefixed-name group method)))
-      (or (cdr (assoc name gnus-namazu/group-alist))
+      (or (cdr (assoc (downcase name) gnus-namazu/group-alist))
 	  name))))
 
 (defun gnus-namazu/search (groups query)
   (with-temp-buffer
-    (when (zerop (gnus-namazu/call-namazu query))
+    (let ((exit-status (gnus-namazu/call-namazu query)))
+      (unless (zerop exit-status)
+	(error "Namazu finished abnormally: %d" exit-status))
       (let* ((articles)
 	     (server-alist
 	      (delq nil
@@ -263,17 +251,19 @@ options make any sense in this context."
 		       (lambda (s)
 			 (when (setq dir (gnus-namazu/server-directory s))
 			   (cons (file-name-as-directory dir) s)))
-		       gnus-namazu-indexed-servers))))
-	     (topdir-regexp
-	      (regexp-opt (mapcar 'car server-alist) t)))
+		       (gnus-namazu/indexed-servers)))))
+	     (topdir-regexp (regexp-opt (mapcar 'car server-alist))))
 	(gnus-namazu/normalize-results)
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (let (server group file)
 	    (and (looking-at topdir-regexp)
-		 (setq server (cdr (assoc (match-string 1) server-alist))
-		       file (buffer-substring-no-properties
-			     (match-end 0) (point-at-eol)))
+		 ;; Check a discovered file is managed by Gnus servers.
+		 (setq file (buffer-substring-no-properties
+			     (match-end 0) (gnus-point-at-eol))
+		       server (cdr (assoc (match-string-no-properties 0)
+					  server-alist)))
+		 ;; Check validity of the file name.
 		 (string-match "/\\([0-9]+\\)\\'" file)
 		 (progn
 		   (setq group (substring file 0 (match-beginning 0))
@@ -306,7 +296,7 @@ options make any sense in this context."
     (if current-prefix-arg
 	(list (gnus-read-group "Group: "))
       (if (and (gnus-ephemeral-group-p gnus-newsgroup-name)
-	       (string-match "\\`nnvirtual:namazu-search" gnus-newsgroup-name))
+	       (string-match gnus-namazu/group-name-regexp gnus-newsgroup-name))
 	  (cadr (assq 'gnus-namazu-target-groups
 		      (gnus-info-method (gnus-get-info gnus-newsgroup-name))))
 	(list gnus-newsgroup-name))))))
@@ -314,7 +304,7 @@ options make any sense in this context."
 (defun gnus-namazu/get-current-query ()
   (and (eq major-mode 'gnus-summary-mode)
        (gnus-ephemeral-group-p gnus-newsgroup-name)
-       (string-match "\\`nnvirtual:namazu-search" gnus-newsgroup-name)
+       (string-match gnus-namazu/group-name-regexp gnus-newsgroup-name)
        (cadr (assq 'gnus-namazu-current-query
 		   (gnus-info-method (gnus-get-info gnus-newsgroup-name))))))
 
@@ -454,17 +444,19 @@ and make a virtual group contains its results."
   (interactive
    (list
     (gnus-namazu/get-target-groups)
-    (gnus-namazu/read-query "Enter Keyword: ")))
+    (gnus-namazu/read-query "Enter query: ")))
   (gnus-namazu/setup)
   (let ((articles (gnus-namazu/search groups query)))
     (if articles
 	(let ((real-groups groups)
 	      (vgroup
-	       (apply 'format
-		      "nnvirtual:namazu-search?query=%s&groups=%s&id=%d%d%d"
-		      query
-		      (if groups (mapconcat 'identity groups ",") "ALL")
-		      (current-time))))
+	       (encode-coding-string
+		(apply (function format)
+		       "nnvirtual:namazu-search?query=%s&groups=%s&id=%d%d%d"
+		       query
+		       (if groups (mapconcat 'identity groups ",") "ALL")
+		       (current-time))
+		gnus-namazu-coding-system)))
 	  (gnus-namazu/truncate-article-list articles)
 	  (unless real-groups
 	    (dolist (a articles)
@@ -502,4 +494,5 @@ and make a virtual group contains its results."
      (define-key gnus-summary-mode-map "\C-c\C-n" 'gnus-namazu-search))))
 
 (provide 'gnus-namazu)
+
 ;; gnus-namazu.el ends here.
