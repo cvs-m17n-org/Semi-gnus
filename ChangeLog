@@ -1,5 +1,9 @@
 1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Fix.
+
+1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
 
 	* lisp/gnus-offline.el (gnus-offline-popup-menu): Modify so that
