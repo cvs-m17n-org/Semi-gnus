@@ -2935,11 +2935,11 @@ give as trustworthy answer as possible."
       (message-make-fqdn)))
 
 (defun message-generate-filled-references (references message-id)
-  "Return filled References field from REFERENCES MESSAGE-ID."
+  "Return filled References field from REFERENCES and MESSAGE-ID."
   (std11-fill-msg-id-list-string (concat references message-id)))
 
 (defun message-generate-folded-references (references message-id)
-  "Return folded References field from REFERENCES MESSAGE-ID."
+  "Return folded References field from REFERENCES and MESSAGE-ID."
   (if references
       (let (quote)
 	(setq references
@@ -2965,7 +2965,7 @@ give as trustworthy answer as possible."
     message-id))
 
 (defun message-generate-unfolded-references (references message-id)
-  "Return folded References field from REFERENCES MESSAGE-ID."
+  "Return folded References field from REFERENCES and MESSAGE-ID."
   (if references
       (if message-id
 	  (concat references " " message-id)
