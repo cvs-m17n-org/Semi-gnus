@@ -3504,8 +3504,9 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	    (progn
 	      (gnus-configure-windows 'summary)
 	      (let ((art (gnus-summary-article-number)))
-		(unless (or (memq art gnus-newsgroup-undownloaded)
-			    (memq art gnus-newsgroup-downloadable))
+		(unless (and (not gnus-plugged)
+			     (or (memq art gnus-newsgroup-undownloaded)
+				 (memq art gnus-newsgroup-downloadable)))
 		  (gnus-summary-goto-article art))))
 	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
