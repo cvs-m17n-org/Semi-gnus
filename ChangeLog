@@ -1,3 +1,23 @@
+1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+1999-10-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* gnus-art.el (gnus-treat-predicate): Examine whether the argument
+	is list or not before condition.
+
+1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* gnus-art.el (gnus-treat-predicate): Work for (typep "something").
+
+1999-10-07  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare-display):
+	Pass argument nil as a condition to gnus-treat-article.
+	* lisp/gnus-art.el (gnus-article-prepare-mime-display):
+	Ditto. Also, treat last part of multipart article correctly.
+
 1999-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.

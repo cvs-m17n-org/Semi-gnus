@@ -4,7 +4,7 @@
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;;	Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
+;;	Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "04"
+(defconst gnus-revision-number "05"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"

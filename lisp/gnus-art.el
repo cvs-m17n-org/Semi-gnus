@@ -2922,8 +2922,12 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (let* ((entity (if (eq 1 (point-min))
 		     (get-text-property 1 'mime-view-entity)
 		   (get-text-property (point) 'mime-view-entity)))
-	 (number (or number 0))
-	 next type ids)
+	 last-entity child-entity next type)
+    (setq child-entity (mime-entity-children entity))
+    (if child-entity
+	(setq last-entity (nth (1- (length child-entity))
+			       child-entity))
+      (setq last-entity entity))
     (save-restriction
       (narrow-to-region (point)
 			(if (search-forward "\n\n" nil t)
@@ -2934,8 +2938,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (goto-char (point-max)))
     (while (and (not (eobp))
 		entity
-		(setq next (next-single-property-change (point)
-							'mime-view-entity)))
+		(setq next 
+		      (or (next-single-property-change (point)
+						       'mime-view-entity)
+			  (point-max))))
       (let ((types (mime-entity-content-type entity)))
 	(while (eq 'multipart (mime-content-type-primary-type types))
 	  (setq entity (car (mime-entity-children entity))
@@ -2945,34 +2951,37 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			     (mime-content-type-primary-type types)
 			     (mime-content-type-subtype types)))))
       (if (string-equal type "message/rfc822")
-	  (save-restriction
-	    (narrow-to-region (point) (point-max))
-	    (gnus-article-prepare-mime-display number)
-	    (goto-char (point-max)))
-	(setq ids (length (mime-entity-node-id entity))
-	      entity (get-text-property next 'mime-view-entity)
-	      number (1+ number))
+	  (let ((start (point)) last-children)
+	    (setq last-children
+		  (nth (1- (length (mime-entity-children entity)))
+		       (mime-entity-children entity)))
+	    (while (and 
+		    (not (eq last-children
+			     (get-text-property (point) 'mime-view-entity)))
+		    (setq next
+			  (next-single-property-change (point)
+						       'mime-view-entity)))
+	      (goto-char next))
+	    (setq next 
+		  (1- (or (next-single-property-change (point)
+						       'mime-view-entity)
+			  (point-max))))
+	    (goto-char start)
+	    (save-restriction
+	      (narrow-to-region start next )
+	      (gnus-article-prepare-mime-display))
+	    (goto-char (1+ next))
+	    (setq entity (get-text-property (point) 'mime-view-entity)))
 	(save-restriction
 	  (narrow-to-region (point) next)
-	  (if (or (null entity)
-		  (< (length (mime-entity-node-id entity)) ids))
-	      (gnus-treat-article 'last number number type)
-	    (gnus-treat-article t number nil type))
-	  (goto-char (point-max)))))
-    (unless (eobp)
-      (save-restriction
-	(narrow-to-region (point) (point-max))
-	(if entity
-	    (progn
-	      (setq type (mime-entity-content-type entity)
-		    type (format "%s/%s"
-				 (mime-content-type-primary-type type)
-				 (mime-content-type-subtype type)))
-	      (if (string-equal type "message/rfc822")
-		  (gnus-article-prepare-mime-display number)
-		(incf number)
-		(gnus-treat-article 'last number number type)))
-	  (gnus-treat-article t))))))
+	  ;; Kludge. We have to count true number, but for now,
+	  ;; part number is here only to achieve `last'.
+	  (gnus-treat-article nil 1 
+			      (if (eq entity last-entity)
+				  1 2)
+			      type)
+	  (setq entity (get-text-property next 'mime-view-entity))
+	  (goto-char (point-max)))))))
 
 ;;;###autoload
 (defun gnus-article-prepare-display ()
@@ -3013,7 +3022,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(goto-char (point-max))
 	(widen)
 	(narrow-to-region (point) (point-max))
-	(gnus-treat-article t))
+	(gnus-treat-article nil))
       (put-text-property (point-min) (point-max) 'read-only nil)))
   ;; Perform the article display hooks.  Incidentally, this hook is
   ;; an obsolete variable by now.
@@ -4973,10 +4982,13 @@ For example:
 (defvar length)
 (defun gnus-treat-predicate (val)
   (cond
-   ((eq val 'mime)
-    (not (not gnus-show-mime)))
    ((null val)
     nil)
+   ((and (listp val)
+	 (stringp (car val)))
+    (apply 'gnus-or (mapcar `(lambda (s)
+			       (string-match s ,(or gnus-newsgroup-name "")))
+			    val)))
    ((listp val)
     (let ((pred (pop val)))
       (cond
@@ -4987,24 +4999,21 @@ For example:
        ((eq pred 'not)
 	(not (gnus-treat-predicate (car val))))
        ((eq pred 'typep)
-	(equal (cadr val) type))
+	(equal (car val) type))
        (t
-	(gnus-treat-predicate pred)))))
-   ((eq val t)
-    t)
+	(error "%S is not a valid predicate" pred)))))
+   ((eq val 'mime)
+    gnus-show-mime)
    (condition
     (eq condition val))
+   ((eq val t)
+    t)
    ((eq val 'head)
     nil)
    ((eq val 'last)
     (eq part-number total-parts))
    ((numberp val)
     (< length val))
-   ((and (listp val)
-	 (stringp (car val)))
-    (apply 'gnus-or (mapcar `(lambda (s)
-			       (string-match s ,(or gnus-newsgroup-name "")))
-			    val)))
    (t
     (error "%S is not a valid value" val))))
 
