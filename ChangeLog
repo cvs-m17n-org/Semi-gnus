@@ -1,3 +1,12 @@
+1999-07-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-cite.el (gnus-ems-redefine): Don't replace the function
+	`gnus-cite-add-face' with `gnus-mule-cite-add-face' because the
+	former will work well under old Emacsen by now.
+	(gnus-mule-cite-add-face): Abolish function.
+
 1999-07-27  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
