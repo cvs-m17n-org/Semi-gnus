@@ -12704,7 +12704,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
   @kbd{M-x gnus-group-make-shimbun-group RET asahi RET a_group RET}
 
-上の @samp{a_group} は閲覧したい記事グループに置き換えてください。@*
+上の @samp{a_group} は閲覧したい記事グループに置き換えてください。
 または @kbd{B nnshimbun RET asahi RET} でバックエンドをブラウズして下さ
 い。
 
@@ -12723,6 +12723,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 検索は遅くなりますが、記事の閲覧時に待たされることは少なくなります。
 @end table
 
+@noindent
 @cindex expiry-wait
 @vindex nnmail-expiry-wait-function
 @vindex nnmail-expiry-wait
@@ -12731,11 +12732,12 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 したからといって、新聞社のサーバーにある三日前の記事が消えてしまうわけで
 はありません。消えるのはあなた個人が持っている @code{nnshimbun} 用
 の @sc{nov} ファイルの該当する部分で、それによってその記事は二度と概略バッ
-ファに現れなくなります。@*
+ファに現れなくなります。
+
 @code{nnshimbun} バックエンドでは記事の期限切れ消去を行なわない
 と @sc{nov} ファイルが際限無く太り続け、新聞社のサーバーではとっくに無く
 なっている三年前の記事が、概略バッファではあたかも存在しているように見え
-ます。それを読もうとしても記事バッファには何も現れません。@*
+ます。それを読もうとしても記事バッファには何も現れません。
 一方メーリングリストの記事を提供しているサーバーの場合には、過去の全記事
 を保有している場合が少なくないでしょう。昔あなたが興じた一連の記事を読み
 返して懐かしむために、そういうグループでは期限切れ消去はさせたくないと思
@@ -12743,12 +12745,16 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 実は @code{nnshimbun} バックエンドでも、他のメールバックエンドと同様の方
 法でグループ毎に自動期限切れ消去可能にしたり、残しておく期間を設定するこ
-とができるのです (@xref {Expiring Mail})。@*
+とができるのです (@xref {Expiring Mail})。
+
 ただ @code{nnshimbun} バックエンドの期限切れ消去には、他のメールバックエ
 ンドと少しだけ違う点があります。第一に、残しておく期間のディフォルト値に
 @code{shimbun} ライブラリが提供する値が関係し、以下の優先度で期間が決定
 されることです。
 
+@c Note: `texinfmt' has a bug that the command `@*' affects all the
+@c line-breaks in a paragraph even though `makeinfo' processes only the
+@c line itself.  We should never use it except for a case as such as:
   グループパラメータの @code{expiry-wait}@*
   @code{nnmail-expiry-wait-function} を評価した値@*
   @code{shimbun} ライブラリが提供するグループ毎のディフォルト値@*
@@ -12760,10 +12766,11 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 プ名だけが与えられるのに、です。一つ例を挙げましょう。
 
 @lisp
+@c We should untabify the following to keep the correct indentations.
 (setq nnmail-expiry-wait-function
       (lambda (group)
-	(cond ((string-equal group "wl") 7)
-	      ((string-equal group "nnshimbun+airs:wl" 'never)))))
+        (cond ((string-equal group "wl") 7)
+              ((string-equal group "nnshimbun+airs:wl") 'never))))
 @end lisp
 
 これは、例えば @code{nnml} や @code{nnmh} で受信している Wanderlust メー
