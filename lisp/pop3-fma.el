@@ -251,7 +251,8 @@ Argument PROMPT ."
 ;;
 ;;
 (defun pop3-fma-message-add-header ()
-  (pop3-fma-add-custom-header "X-Ya-Pop3:" pop3-fma-version))
+  (if (message-mail-p)
+      (pop3-fma-add-custom-header "X-Ya-Pop3:" pop3-fma-version)))
   
 ;;
 ;; Add your custom header.
