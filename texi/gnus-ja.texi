@@ -14014,7 +14014,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 @example
   @uref{http://emacs-w3m.namazu.org/}
-  @uref{http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/}
+  @uref{http://w3m.sourceforge.net/}
 @end example
 
 @findex gnus-group-make-shimbun-group

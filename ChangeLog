@@ -1,3 +1,7 @@
+2002-07-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* texi/gnus-ja.texi (Web Newspaper): Update the url of w3m.
+
 2002-07-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-mode-map): Replace
