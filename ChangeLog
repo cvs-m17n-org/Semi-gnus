@@ -1,3 +1,30 @@
+2002-01-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el: Update comments.
+	(gnus-namazu/search): Convert `gnus-cache-directory' to absolute
+	before the regular expression which matches paths of persistent
+	articles is generated.  Clean up codes.
+
+2002-01-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-article): Handle the
+	article properly when no group is specified.
+	(nnshimbun-write-nov, nnshimbun-save-nov): Save nov databases only
+	when their sizes are greater than zero.
+
+	* lisp/gnus-namazu.el (gnus-namazu-query-highlight): New option.
+	(gnus-namazu-query-highlight-face): New face.
+	(gnus-namazu/check-cache-group): New function.
+	(gnus-namazu/cache-group-candidates): Ditto.
+	(gnus-namazu/search): Call `gnus-namazu/check-cache-group' to get
+	groups for cached articles.
+	(gnus-namazu/highlight-words): New function.
+	(gnus-namazu-search): Set the group parameter `highlight-words'
+	when `gnus-namazu-query-highlight' is equal to the other value
+	than nil.
+
+	* lisp/gnus-ja.texi (Namazu Groups): Updated.
+
 2001-12-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu-summary-buffer-name): Changed

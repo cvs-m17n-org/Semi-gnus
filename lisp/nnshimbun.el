@@ -389,7 +389,14 @@ GROUP has a full name."
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)
     (when (stringp article)
-      (setq article (nnshimbun-search-id group article)))
+      (let ((num (when (or group (setq group nnshimbun-current-group))
+		   (nnshimbun-search-id group article))))
+	(unless num
+	  (let ((groups (shimbun-groups (shimbun-open server))))
+	    (while (and (not num) groups)
+	      (setq group (pop groups)
+		    num (nnshimbun-search-id group article)))))
+	(setq article num)))
     (if (integerp article)
 	(nnshimbun-request-article-1 article group server to-buffer)
       (nnheader-report 'nnshimbun "Couldn't retrieve article: %s"
@@ -637,19 +644,20 @@ also be nil."
     (when (buffer-live-p buffer)
       (save-excursion
 	(set-buffer buffer)
-	(buffer-modified-p)
-	(nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-			     nil 'nomesg)))))
+	(and (> (buffer-size) 0)
+	     (buffer-modified-p)
+	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+				  nil 'nomesg))))))
 
 (defun nnshimbun-save-nov ()
   (save-excursion
     (while nnshimbun-nov-buffer-alist
       (when (buffer-name (cdar nnshimbun-nov-buffer-alist))
 	(set-buffer (cdar nnshimbun-nov-buffer-alist))
-	(when (buffer-modified-p)
-	  (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-			       nil 'nomesg))
-	(set-buffer-modified-p nil)
+	(and (> (buffer-size) 0)
+	     (buffer-modified-p)
+	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+				  nil 'nomesg))
 	(kill-buffer (current-buffer)))
       (setq nnshimbun-nov-buffer-alist (cdr nnshimbun-nov-buffer-alist)))))
 

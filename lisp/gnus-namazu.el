@@ -1,11 +1,9 @@
 ;;; gnus-namazu.el --- Search mail with Namazu.
 
-;; Copyright (C) 2000,2001 Tsuchiya Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000,2001,2002 Tsuchiya Masatoshi <tsuchiya@namazu.org>
 
 ;; Author: Tsuchiya Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
-
-;;; Copyright:
 
 ;; This file is a part of Semi-Gnus.
 
@@ -27,9 +25,10 @@
 
 ;;; Commentary:
 
-;; This file defines the command to search mails with Namazu and
-;; browse its results with Gnus.  This module requires the external
-;; command Namazu.  Visit the following page for more information.
+;; This file defines the command to search mails and persistent
+;; articles with Namazu and browse its results with Gnus.  This module
+;; requires the external command, Namazu.  Visit the following page
+;; for more information.
 ;;
 ;;     http://namazu.org/
 
@@ -39,7 +38,11 @@
 ;; Make index of articles with Namzu before using this module.
 ;;
 ;;	 % mkdir ~/News/namazu
-;;       % mknmz -a -h -O ~/News/namazu ~/Mail
+;;       % mknmz -a -h -O ~/News/namazu ~/Mail ~/News/cache
+;;
+;; The first command makes the directory for index files, and the
+;; second command generates index files of mails and persistent
+;; articles.
 ;;
 ;; When you put index files of Namazu into the directory other than
 ;; the default one (~/News/namazu), it is necessary to put this
@@ -142,6 +145,21 @@ options make any sense in this context."
   :type 'boolean
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-query-highlight t
+  "Non-nil means that queried words is highlighted."
+  :type 'boolean
+  :group 'gnus-namazu)
+
+(defface gnus-namazu-query-highlight-face
+  '((((type tty pc) (class color))
+     (:background "magenta4" :foreground "cyan1"))
+    (((class color) (background light))
+     (:background "magenta4" :foreground "lightskyblue1"))
+    (((class color) (background dark))
+     (:background "palevioletred2" :foreground "brown4"))
+    (t (:inverse-video t)))
+  "Face used for namazu query matching words."
+  :group 'gnus-namazu)
 
 ;;; Internal Variable:
 (defvar gnus-namazu/group-alist nil
@@ -265,6 +283,41 @@ options make any sense in this context."
       (or (cdr (assoc (downcase name) gnus-namazu/group-alist))
 	  name))))
 
+(defun gnus-namazu/check-cache-group (str)
+  "Get the news group from the partial path STR of the cached article."
+  (if (gnus-use-long-file-name 'not-cache)
+      str
+    (catch 'found-group
+      (dolist (group (gnus-namazu/cache-group-candidates
+		      (nnheader-replace-chars-in-string str ?/ ?.)))
+	(when (gnus-gethash group gnus-newsrc-hashtb)
+	  (throw 'found-group group))))))
+
+(defun gnus-namazu/cache-group-candidates (str)
+  "Regard the string STR as the partial path of the cached article and
+generate possible group names from it."
+  (if (string-match "_\\(_\\(_\\)?\\)?" str)
+      (let ((prefix (substring str 0 (match-beginning 0)))
+	    (suffix (substring str (match-end 0))))
+	(cond
+	 ((match-beginning 2) ;; The number of discoverd underscores = 3
+	  (nconc
+	   (gnus-namazu/cache-group-candidates (concat prefix "/__" suffix))
+	   (gnus-namazu/cache-group-candidates (concat prefix ".._" suffix))))
+	 ((match-beginning 1) ;; The number of discoverd underscores = 2
+	  (nconc
+	   (gnus-namazu/cache-group-candidates (concat prefix "//" suffix))
+	   (gnus-namazu/cache-group-candidates (concat prefix ".." suffix))))
+	 (t ;; The number of discoverd underscores = 1
+	  (gnus-namazu/cache-group-candidates (concat prefix "/" suffix)))))
+    (if (string-match "\\." str)
+	;; Handle the first occurence of period.
+	(list (concat (substring str 0 (match-beginning 0))
+		      ":"
+		      (substring str (match-end 0)))
+	      str)
+      (list str))))
+
 (defun gnus-namazu/search (groups query)
   (with-temp-buffer
     (let ((exit-status (gnus-namazu/call-namazu query)))
@@ -279,31 +332,41 @@ options make any sense in this context."
 			 (when (setq dir (gnus-namazu/server-directory s))
 			   (cons (file-name-as-directory dir) s)))
 		       (gnus-namazu/indexed-servers)))))
-	     (topdir-regexp (regexp-opt (mapcar 'car server-alist))))
+	     (topdir-regexp (regexp-opt (mapcar 'car server-alist)))
+	     (cache-regexp (concat
+			    (regexp-quote
+			     (file-name-as-directory
+			      (expand-file-name gnus-cache-directory)))
+			    "\\(.*\\)/\\([0-9]+\\)$")))
 	(gnus-namazu/normalize-results)
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (let (server group file)
-	    (and (looking-at topdir-regexp)
-		 ;; Check a discovered file is managed by Gnus servers.
-		 (setq file (buffer-substring-no-properties
-			     (match-end 0) (gnus-point-at-eol))
-		       server (cdr (assoc (match-string-no-properties 0)
-					  server-alist)))
-		 ;; Check validity of the file name.
-		 (string-match "/\\([0-9]+\\)\\'" file)
-		 (progn
-		   (setq group (substring file 0 (match-beginning 0))
-			 file (match-string 1 file))
-		   (setq group
-			 (gnus-namazu/group-prefixed-name
-			  (nnheader-replace-chars-in-string group ?/ ?.)
-			  server))
-		   (when (or (not groups)
-			     (member group groups))
-		     (push (gnus-namazu/make-article
-			    group (string-to-number file))
-			   articles)))))
+	    (and (or
+		  ;; Check the discoverd file is the persistent article.
+		  (and (looking-at cache-regexp)
+		       (setq file (match-string-no-properties 2)
+			     group (gnus-namazu/check-cache-group
+				    (match-string-no-properties 1))))
+		  ;; Check the discovered file is managed by Gnus servers.
+		  (and (looking-at topdir-regexp)
+		       (setq file (buffer-substring-no-properties
+				   (match-end 0) (gnus-point-at-eol))
+			     server (cdr (assoc (match-string-no-properties 0)
+						server-alist)))
+		       ;; Check validity of the file name.
+		       (string-match "/\\([0-9]+\\)\\'" file)
+		       (progn
+			 (setq group (substring file 0 (match-beginning 0))
+			       file (match-string 1 file))
+			 (setq group
+			       (gnus-namazu/group-prefixed-name
+				(nnheader-replace-chars-in-string group ?/ ?.)
+				server)))))
+		 (or (not groups)
+		     (member group groups))
+		 (push (gnus-namazu/make-article group (string-to-number file))
+		       articles)))
 	  (forward-line 1))
 	(nreverse articles)))))
 
@@ -322,8 +385,9 @@ options make any sense in this context."
     ;; In Summary buffer.
     (if current-prefix-arg
 	(list (gnus-read-group "Group: "))
-      (if (and (gnus-ephemeral-group-p gnus-newsgroup-name)
-	       (string-match gnus-namazu/group-name-regexp gnus-newsgroup-name))
+      (if (and
+	   (gnus-ephemeral-group-p gnus-newsgroup-name)
+	   (string-match gnus-namazu/group-name-regexp gnus-newsgroup-name))
 	  (cadr (assq 'gnus-namazu-target-groups
 		      (gnus-info-method (gnus-get-info gnus-newsgroup-name))))
 	(list gnus-newsgroup-name))))))
@@ -449,6 +513,35 @@ options make any sense in this context."
     (read-from-minibuffer prompt initial gnus-namazu/read-query-map nil
 			  'gnus-namazu/read-query-history)))
 
+(defun gnus-namazu/highlight-words (query)
+  (let ((strings)
+	(start 0))
+    (while (string-match
+	    "[ \t\r\f\n]*\\(\\(and\\|or\\|\\(not\\)\\)[ \t\r\f\n]+\\)?\
+\\(\\+[^ \t\r\f\n]+:\\)?\\(/\\([^/]+\\)/\\|\\(\"\\([^\"]+\\)\"\\|\
+{\\([^{}]+\\)}\\)\\|[^ \t\r\f\n]+\\)" query start)
+      (setq start (match-end 0))
+      (or (match-beginning 3)		; NOT search
+	  (match-beginning 4)		; Field search
+	  (match-beginning 6)		; Regular expression search
+	  (if (match-beginning 7)	; Phrase search
+	      (dolist (str (split-string
+			    (if (match-beginning 8)
+				(match-string 8 query)
+			      (match-string 9 query))))
+		(when (> (length str) 0)
+		  (push str strings)))
+	    (push (match-string 5 query) strings))))
+    (and strings
+	 (list
+	  (list
+	   (regexp-opt (mapcar
+			(lambda (str)
+			  (if (string-match "\\`\\*?\\([^\\*]*\\)\\*?\\'" str)
+			      (match-string 1 str) str))
+			strings))
+	   0 0 'gnus-namazu-query-highlight-face)))))
+
 (defun gnus-namazu/truncate-article-list (articles)
   (let ((hit (length articles)))
     (when (> hit gnus-large-newsgroup)
@@ -499,6 +592,9 @@ and make a virtual group contains its results."
 			     (gnus-namazu-target-groups ,groups)
 			     (gnus-namazu-current-query ,query))
 		 t (cons (current-buffer) (current-window-configuration)) t))
+	  (when gnus-namazu-query-highlight
+	    (gnus-group-set-parameter vgroup 'highlight-words
+				      (gnus-namazu/highlight-words query)))
 	  ;; Generate new summary buffer which contains search results.
 	  (gnus-group-read-group
 	   t t vgroup
