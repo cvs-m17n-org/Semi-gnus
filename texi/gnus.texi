@@ -10973,6 +10973,9 @@ package correctly.  An example:
 @lisp
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-default-smtp-server "YOUR SMTP HOST")
+;; The following variable needs to be set because of the FLIM version of
+;; smtpmail.el.  Which smtpmail.el is used depends on the `load-path'.
+(setq smtp-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
 To the thing similar to this, there is @code{message-smtpmail-send-it}.

@@ -10434,6 +10434,9 @@ gnus は常に投稿にどの方法を使うかをあなたに尋ねます。
 @lisp
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-default-smtp-server "YOUR SMTP HOST")
+;; FLIM 版の smtpmail.el のために、以下の変数を設定する必用があります。
+;; どちらの smtpmail.el が使われるかは `load-path' に依ります。
+(setq smtp-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
 これと似たものに @code{message-smtpmail-send-it} があります。
