@@ -1,3 +1,77 @@
+2003-01-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-ham-marks, spam-spam-marks): changed list
+	customization and list itself to store mark symbol rather than
+	mark character.
+	(spam-bogofilter-register-routine): added logic to generate mark
+	values list from spam-ham-marks and spam-spam-marks, so (member)
+	would work.
+
+2003-01-01  Raymond Scholz  <ray-2002@zonix.de>
+
+	* message.el (message-signature-insert-empty-line): New variable. 
+
+2002-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el: Renamed functions and variables: "xpost" ->
+	"cross-post", "-fup2" -> "-followup-to".
+	(message-cross-post-old-target, message-cross-post-default,
+	message-cross-post-note, message-followup-to-note,
+	message-cross-post-note-function): New variables names.
+	(message-xpost-old-target, message-xpost-default,
+	message-xpost-note, message-fup2-note,
+	message-xpost-note-function): Removed variable names.
+	(message-cross-post-followup-to-header,
+	message-cross-post-insert-note, message-cross-post-followup-to):
+	New function names.
+	(message-xpost-fup2-header, message-xpost-insert-note,
+	message-xpost-fup2): Removed function names.
+
+2002-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el (message-send-mail): Added message-cleanup-headers to
+	prevent newlines in headers.
+
+2003-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dns.el (dns-make-network-process): Comment.
+
+	* gnus-sum.el (gnus-summary-display-while-building): Default to
+	nil. 
+
+2003-01-01  Wes Hardaker  <wes@hardakers.net>
+
+	* gnus-sum.el (gnus-summary-display-while-building): New
+	variable. 
+
+2002-01-01  Raymond Scholz  <ray-2003@zonix.de>
+
+	* deuglify.el (gnus-outlook-rearrange-article): Kill overlays
+          before rearranging the article.
+
+2003-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nndraft.el (nndraft-generate-headers): New function.
+	(nndraft-request-associate-buffer): Use it to write headers on
+	buffer save.
+
+	* message.el (message-generate-headers): Let the function be a
+	lambda form.
+	(message-draft-headers): New variable.
+
+	* gnus-msg.el (gnus-inews-make-draft-meta-information): New
+	function. 
+	(gnus-setup-message): Use it.
+
+	* message.el (message-generate-headers-first): Doc fix.
+	(message-setup-1): Use new function for getting which headers to
+	generate. 
+	(message-headers-to-generate): New function.
+
+2003-01-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-save-alist): Make directory.
+
 2002-12-31  Reiner Steib  <4uce.02.r.steib@gmx.net>
 
 	* gnus-sum.el (gnus-summary-limit-to-age): Make prompt string

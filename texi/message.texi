@@ -1130,8 +1130,13 @@ look sufficiently similar.
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-If non-@code{nil}, generate all required headers before starting to
-compose the message.
+If @code{t}, generate all required headers before starting to
+compose the message.  This can also be a list of headers to generate:
+
+@lisp
+(setq message-generate-headers-first
+      '(References))
+@end lisp
 
 @vindex message-required-headers
 The variables @code{message-required-headers},
@@ -1141,6 +1146,12 @@ required.
 
 Note that some headers will be removed and re-generated before posting,
 because of the variable @code{message-deletable-headers} (see below).
+
+@item message-draft-headers
+@vindex message-draft-headers
+When running Message from Gnus, the message buffers are associated
+with a draft group.  @code{message-draft-headers} says which headers
+should be generated when a draft is written to the draft group.
 
 @item message-from-style
 @vindex message-from-style
@@ -1634,6 +1645,11 @@ If this variable is @code{nil}, no signature will be inserted at all.
 @vindex message-signature-file
 File containing the signature to be inserted at the end of the buffer.
 The default is @file{~/.signature}.
+
+@item message-signature-insert-empty-line
+@vindex message-signature-insert-empty-line
+If @code{t} (the default value) an empty line is inserted before the
+signature separator.
 
 @end table
 

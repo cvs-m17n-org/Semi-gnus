@@ -1134,8 +1134,13 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-@code{nil} $B$G$J$1$l$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$NI,MW$J%X%C%@!<(B
-$B$r:n@.$7$^$9!#(B
+@code{t} $B$J$i$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$NI,MW$J%X%C%@!<$r:n@.(B
+$B$7$^$9!#$3$l$O:n@.$9$k%X%C%@!<$N%j%9%H$G$"$k$3$H$b$G$-$^$9(B:
+
+@lisp
+(setq message-generate-headers-first
+      '(References))
+@end lisp
 
 @vindex message-required-headers
 $BJQ?t(B @code{message-required-headers}$B!"(B
@@ -1145,6 +1150,13 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 $B$$$/$D$+$N%X%C%@!<$O!"Aw?.$9$kA0$K>C$5$l$?$j:n$jD>$5$l$?$j$7$^$9!#$3$l$K(B
 $B$OJQ?t(B @code{message-deletable-headers} ($B8e=R(B) $B$,4X78$7$^$9!#(B
+
+@item message-draft-headers
+@vindex message-draft-headers
+Message $B$,(B gnus $B>e$GAv$C$F$$$k>l9g!"%a%C%;!<%8%P%C%U%!$O%I%i%U%H%0%k!<%W(B
+$B$H4XO"IU$1$i$l$F$$$^$9!#(B@code{message-draft-headers} $B$O!"$=$N%I%i%U%H%0(B
+$B%k!<%W$K%I%i%U%H$,5-O?$5$l$k$H$-$K!"$I$N%X%C%@!<$,:n@.$5$l$k$Y$-$+$r;X<((B
+$B$7$^$9!#(B
 
 @item message-from-style
 @vindex message-from-style
@@ -1616,6 +1628,11 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 @vindex message-signature-file
 $B%P%C%U%!$N:G8e$KA^F~$5$l$k=pL>$NF~$C$F$$$k%U%!%$%k$G$9!#=i4|CM(B
 $B$O(B @file{~/.signature} $B$G$9!#(B
+
+@item message-signature-insert-empty-line
+@vindex message-signature-insert-empty-line
+@code{t} ($B%G%#%U%)%k%H(B) $B$@$C$?$i!"=pL>$HK\BN$rJ,N%$9$k5-9f$NA0$K6u9T$,A^(B
+$BF~$5$l$^$9!#(B
 @end table
 
 RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$-$G$"$k(B
@@ -1644,7 +1661,8 @@ RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$
 @c
 @item message-signature-separator
 @vindex message-signature-separator
-$B=pL>J,N%$K9gCW$9$k@55,I=8=$G$9!#=i4|CM$O(B @samp{^-- *$} $B$G$9!#(B
+$B=pL>$HK\BN$rJ,N%$9$k5-9f$K9gCW$9$k@55,I=8=$G$9!#=i4|CM(B
+$B$O(B @samp{^-- *$} $B$G$9!#(B
 
 @item mail-header-separator
 @vindex mail-header-separator

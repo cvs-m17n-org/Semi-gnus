@@ -263,21 +263,21 @@ If nil, don't insert any text in the body."
 ;; inspired by JoH-followup-to by Jochem Huhman <joh  at gmx.de>
 ;; new suggestions by R. Weikusat <rw at another.de>
 
-(defvar message-xpost-old-target nil
+(defvar message-cross-post-old-target nil
   "Old target for cross-posts or follow-ups.")
-(make-variable-buffer-local 'message-xpost-old-target)
+(make-variable-buffer-local 'message-cross-post-old-target)
 
 ;;;###autoload
-(defcustom message-xpost-default t
-  "When non-nil `message-xpost-fup2' will normally perform a crosspost.
-If nil, `message-xpost-fup2' will only do a followup.  Note that you
-can explicitly override this setting by calling `message-xpost-fup2'
-with a prefix."
+(defcustom message-cross-post-default t
+  "When non-nil `message-cross-post-followup-to' will normally perform a
+crosspost.  If nil, `message-cross-post-followup-to' will only do a followup.
+Note that you can explicitly override this setting by calling
+`message-cross-post-followup-to' with a prefix."
   :type 'boolean
   :group 'message-various)
 
 ;;;###autoload
-(defcustom message-xpost-note
+(defcustom message-cross-post-note
   "Crosspost & Followup-To: "
   "Note to insert before signature to notify of xpost and follow-up."
   :type 'string
@@ -291,12 +291,12 @@ with a prefix."
   :group 'message-various)
 
 ;;;###autoload
-(defcustom message-xpost-note-function
-  'message-xpost-insert-note
+(defcustom message-cross-post-note-function
+  'message-cross-post-insert-note
   "Function to use to insert note about Crosspost or Followup-To.  
 The function will be called with four arguments.  The function should not only
 insert a note, but also ensure old notes are deleted.  See the documentation
-for `message-xpost-insert-note'. "
+for `message-cross-post-insert-note'. "
   :type 'function
   :group 'message-various)
 
@@ -349,6 +349,12 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
   "*Headers to be generated or promted for when sending a message.
 Also see `message-required-news-headers' and
 1message-required-mail-headers'."
+  :group 'message-news
+  :group 'message-headers
+  :type '(repeat sexp))
+
+(defcustom message-draft-headers '(References)
+  "*Headers to be generated when saving a draft message."
   :group 'message-news
   :group 'message-headers
   :type '(repeat sexp))
@@ -832,6 +838,8 @@ variable isn't used."
   "*If non-nil, generate all required headers before composing.
 The variables `message-required-news-headers' and
 `message-required-mail-headers' specify which headers to generate.
+This can also be a list of headers that should be generated before
+composing.
 
 Note that the variable `message-deletable-headers' specifies headers which
 are to be deleted and then re-generated before sending, so this variable
@@ -988,6 +996,12 @@ If a form, the result from the form will be used instead."
 Ignored if the named file doesn't exist.
 If nil, don't insert a signature."
   :type '(choice file (const :tags "None" nil))
+  :group 'message-insertion)
+
+;;;###autoload
+(defcustom message-signature-insert-empty-line t
+  "*If non-nil, insert an empty line before the signature separator."
+  :type 'boolean
   :group 'message-insertion)
 
 (defcustom message-distribution-function nil
@@ -1885,7 +1899,7 @@ body, set  `message-archive-note' to nil."
       (message-sort-headers)))
 
 ;;;###autoload
-(defun message-xpost-fup2-header (target-group)
+(defun message-cross-post-followup-to-header (target-group)
   "Mangles FollowUp-To and Newsgroups header to point to TARGET-GROUP.
 With prefix-argument just set Follow-Up, don't cross-post."
   (interactive
@@ -1900,19 +1914,19 @@ With prefix-argument just set Follow-Up, don't cross-post."
   (message-goto-newsgroups)
   (beginning-of-line)
   ;; if we already did a crosspost before, kill old target
-  (if (and message-xpost-old-target
+  (if (and message-cross-post-old-target
 	   (re-search-forward
-	    (regexp-quote (concat "," message-xpost-old-target))
+	    (regexp-quote (concat "," message-cross-post-old-target))
 	    nil t))
       (replace-match ""))
   ;; unless (followup is to poster or user explicitly asked not
   ;; to cross-post, or target-group is already in Newsgroups)
   ;; add target-group to Newsgroups line.
   (cond ((and (or
-	       ;; def: xpost, req:no
-	       (and message-xpost-default (not current-prefix-arg))  
-	       ;; def: no-xpost, req:yes
-	       (and (not message-xpost-default) current-prefix-arg))
+	       ;; def: cross-post, req:no
+	       (and message-cross-post-default (not current-prefix-arg))  
+	       ;; def: no-cross-post, req:yes
+	       (and (not message-cross-post-default) current-prefix-arg))
 	      (not (string-match "poster" target-group))
 	      (not (string-match (regexp-quote target-group)
 				 (message-fetch-field "Newsgroups"))))
@@ -1926,13 +1940,14 @@ With prefix-argument just set Follow-Up, don't cross-post."
 				 "[ \t]*$")
 			 (message-fetch-field "Newsgroups")))
       (insert (concat "\nFollowup-To: " target-group)))
-  (setq message-xpost-old-target target-group))
+  (setq message-cross-post-old-target target-group))
 
 ;;;###autoload
-(defun message-xpost-insert-note (target-group xpost in-old old-groups)
+(defun message-cross-post-insert-note (target-group cross-post in-old
+						    old-groups)
   "Insert a in message body note about a set Followup or Crosspost.
 If there have been previous notes, delete them.  TARGET-GROUP specifies the
-group to Followup-To.  When XPOST is t, insert note about
+group to Followup-To.  When CROSS-POST is t, insert note about
 crossposting.  IN-OLD specifies whether TARGET-GROUP is a member of
 OLD-GROUPS.  OLD-GROUPS lists the old-groups the posting would have
 been made to before the user asked for a Crosspost."
@@ -1943,25 +1958,25 @@ been made to before the user asked for a Crosspost."
 	       nil t))) ; just search in body
     (message-goto-signature)
     (while (re-search-backward
-	    (concat "^" (regexp-quote message-xpost-note) ".*")
+	    (concat "^" (regexp-quote message-cross-post-note) ".*")
 	    head t)
       (message-delete-line))
     (message-goto-signature)
     (while (re-search-backward
-	    (concat "^" (regexp-quote message-fup2-note) ".*")
+	    (concat "^" (regexp-quote message-followup-to-note) ".*")
 	    head t)
       (message-delete-line))
     ;; insert new note
     (if (message-goto-signature)
 	(re-search-backward message-signature-separator))
     (if (or in-old
-	    (not xpost)
+	    (not cross-post)
 	    (string-match "^[ \t]*poster[ \t]*$" target-group))
-	(insert (concat message-fup2-note target-group "\n"))
-      (insert (concat message-xpost-note target-group "\n")))))
+	(insert (concat message-followup-to-note target-group "\n"))
+      (insert (concat message-cross-post-note target-group "\n")))))
 
 ;;;###autoload
-(defun message-xpost-fup2 (target-group)
+(defun message-cross-post-followup-to (target-group)
   "Crossposts message and sets Followup-To to TARGET-GROUP.
 With prefix-argument just set Follow-Up, don't cross-post."
   (interactive
@@ -1990,13 +2005,13 @@ With prefix-argument just set Follow-Up, don't cross-post."
 				      "[ \t]*$")
 			      old-groups)))
 		    ;; yes, Newsgroups line must change
-		    (message-xpost-fup2-header target-group)
-		    ;; insert note whether we do xpost or fup2
-		    (funcall message-xpost-note-function
+		    (message-cross-post-followup-to-header target-group)
+		    ;; insert note whether we do cross-post or fup2
+		    (funcall message-cross-post-note-function
 			     target-group
-			     (if (or (and message-xpost-default
+			     (if (or (and message-cross-post-default
 					  (not current-prefix-arg))
-				     (and (not message-xpost-default)
+				     (and (not message-cross-post-default)
 					  current-prefix-arg)) t)
 			     in-old old-groups))))))))
 
@@ -2216,8 +2231,8 @@ Point is left at the beginning of the narrowed-to region."
   ;; modify headers (and insert notes in body)
   (define-key message-mode-map "\C-c\C-fs"    'message-change-subject)
   ;;
-  (define-key message-mode-map "\C-c\C-fx"    'message-xpost-fup2)
-  ;; prefix+message-xpost-fup2 = same w/o xpost
+  (define-key message-mode-map "\C-c\C-fx"    'message-cross-post-followup-to)
+  ;; prefix+message-cross-post-followup-to = same w/o cross-post
   (define-key message-mode-map "\C-c\C-ft"    'message-reduce-to-to-cc)
   (define-key message-mode-map "\C-c\C-fa"    'message-add-archive-header)
   ;; mark inserted text
@@ -2334,8 +2349,8 @@ Point is left at the beginning of the narrowed-to region."
    ["Keywords" message-goto-keywords t]
    ["Newsgroups" message-goto-newsgroups t]
    ["Followup-To" message-goto-followup-to t]
-   ;; ["Followup-To (with note in body)" message-xpost-fup2 t]
-   ["Crosspost / Followup-To..." message-xpost-fup2 t]
+   ;; ["Followup-To (with note in body)" message-cross-post-followup-to t]
+   ["Crosspost / Followup-To..." message-cross-post-followup-to t]
    ["Distribution" message-goto-distribution t]
    ["X-No-Archive:" message-add-archive-header t ]
    "----"
@@ -2931,6 +2946,8 @@ Prefix arg means justify as well."
       (goto-char (point-max))
       ;; Insert the signature.
       (unless (bolp)
+	(insert "\n"))
+      (when message-signature-insert-empty-line
 	(insert "\n"))
       (insert "\n" message-signature-separator-for-insertion)
       (unless (bolp)
@@ -3903,6 +3920,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
+	    (message-cleanup-headers)
 	    (when
 		(save-restriction
 		  (message-narrow-to-headers)
@@ -5186,21 +5204,27 @@ Headers already prepared in the buffer are not modified."
 	  ;; So we find out what value we should insert.
 	  (setq value
 		(cond
-		 ((and (consp elem) (eq (car elem) 'optional))
+		 ((and (consp elem)
+		       (eq (car elem) 'optional))
 		  ;; This is an optional header.  If the cdr of this
 		  ;; is something that is nil, then we do not insert
 		  ;; this header.
 		  (setq header (cdr elem))
-		  (or (and (fboundp (cdr elem)) (funcall (cdr elem)))
-		      (and (boundp (cdr elem)) (symbol-value (cdr elem)))))
+		  (or (and (message-functionp (cdr elem))
+			   (funcall (cdr elem)))
+		      (and (boundp (cdr elem))
+			   (symbol-value (cdr elem)))))
 		 ((consp elem)
 		  ;; The element is a cons.  Either the cdr is a
 		  ;; string to be inserted verbatim, or it is a
 		  ;; function, and we insert the value returned from
 		  ;; this function.
-		  (or (and (stringp (cdr elem)) (cdr elem))
-		      (and (fboundp (cdr elem)) (funcall (cdr elem)))))
-		 ((and (boundp header) (symbol-value header))
+		  (or (and (stringp (cdr elem))
+			   (cdr elem))
+		      (and (message-functionp (cdr elem))
+			   (funcall (cdr elem)))))
+		 ((and (boundp header)
+		       (symbol-value header))
 		  ;; The element is a symbol.  We insert the value
 		  ;; of this symbol, if any.
 		  (symbol-value header))
@@ -5581,6 +5605,31 @@ than 988 characters long, and if they are not, trim them until they are."
 			      headers)
 		      nil switch-function yank-action actions)))))
 
+(defun message-headers-to-generate (headers included-headers excluded-headers)
+  "Return a list that includes all headers from HEADERS.
+If INCLUDED-HEADERS is a list, just include those headers.  If if is
+t, include all headers.  In any case, headers from EXCLUDED-HEADERS
+are not included."
+  (let ((result nil)
+	header-name)
+    (dolist (header headers)
+      (setq header-name (cond
+			 ((and (consp header)
+			       (eq (car header) 'optional))
+			  ;; On the form (optional . Header)
+			  (cdr header))
+			 ((consp header)
+			  ;; On the form (Header . function)
+			  (car header))
+			 (t
+			  ;; Just a Header.
+			  header)))
+      (when (and (not (memq header-name excluded-headers))
+		 (or (eq included-headers t)
+		     (memq header-name included-headers)))
+	(push header result)))
+    (nreverse result)))
+
 (defun message-setup-1 (headers &optional replybuffer actions)
   (dolist (action actions)
     (condition-case nil
@@ -5617,18 +5666,22 @@ than 988 characters long, and if they are not, trim them until they are."
       (or (bolp) (insert ?\n)))
     (when message-generate-headers-first
       (message-generate-headers
-       (delq 'Lines
-	     (delq 'Subject
-		   (copy-sequence message-required-news-headers))))))
+       (message-headers-to-generate
+	(append message-required-news-headers
+		message-required-headers)
+	message-generate-headers-first
+	'(Lines Subject)))))
   (when (message-mail-p)
     (when message-default-mail-headers
       (insert message-default-mail-headers)
       (or (bolp) (insert ?\n)))
     (when message-generate-headers-first
       (message-generate-headers
-       (delq 'Lines
-	     (delq 'Subject
-		   (copy-sequence message-required-mail-headers))))))
+       (message-headers-to-generate
+	(append message-required-mail-headers
+		message-required-headers)
+	message-generate-headers-first
+	'(Lines Subject)))))
   (run-hooks 'message-signature-setup-hook)
   (message-insert-signature)
   (save-restriction
