@@ -78,6 +78,14 @@ If nil, only read articles will be expired."
   :group 'gnus-agent
   :type 'hook)
 
+(defcustom gnus-agent-large-newsgroup nil
+  "*The number of articles which indicates a large newsgroup.
+If the number of unread articles exceeds it, The number of articles to be
+fetched will be limited to it. If not a positive integer, never consider it."
+  :group 'gnus-agent
+  :type '(choice (const nil)
+		 (integer :tag "Number")))
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -798,9 +806,16 @@ the actual number of articles toggled is returned."
       (pop gnus-agent-group-alist))))
 
 (defun gnus-agent-fetch-headers (group &optional force)
-  (let ((articles (gnus-list-of-unread-articles group))
-	(gnus-decode-encoded-word-function 'identity)
-	(file (gnus-agent-article-name ".overview" group)))
+  (let* ((articles (gnus-list-of-unread-articles group))
+	 (len (length articles))
+	 (gnus-decode-encoded-word-function 'identity)
+	 (file (gnus-agent-article-name ".overview" group))
+	 i)
+    ;; Check the number of articles is not too large.
+    (when (and (integerp gnus-agent-large-newsgroup)
+	       (< 0 gnus-agent-large-newsgroup))
+      (and (< 0 (setq i (- len gnus-agent-large-newsgroup)))
+	   (setq articles (nthcdr i articles))))
     ;; add article with marks to list of article headers we want to fetch
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
       (setq articles (union (gnus-uncompress-sequence (cdr arts))
@@ -1407,8 +1422,11 @@ The following commands are available:
 		   marked (nconc (gnus-uncompress-range
 				  (cdr (assq 'tick (gnus-info-marks info))))
 				 (gnus-uncompress-range
-				  (cdr (assq 'dormant
-					     (gnus-info-marks info)))))
+				  (cdr (assq 'dormant (gnus-info-marks info))))
+				 (gnus-uncompress-range
+				  (cdr (assq 'save (gnus-info-marks info))))
+				 (gnus-uncompress-range
+				  (cdr (assq 'reply (gnus-info-marks info)))))
 		   nov-file (gnus-agent-article-name ".overview" group)
 		   lowest nil
 		   highest nil)
