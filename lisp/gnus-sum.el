@@ -4221,6 +4221,41 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; GROUP is successfully selected.
       (or gnus-newsgroup-headers t)))))
 
+(defun gnus-summary-read-number-from-minibuffer (prompt default max)
+  (let ((cursor-in-echo-area nil)
+	(message-log-max nil)
+	rest char)
+    (while (not rest)
+      (message "%s (n, SPC, RET, x, 0-9, -, ? or C-h): " prompt)
+      (setq char (read-event))
+      (cond 
+       ((memq char '(?\  ?n ?\C-j ?\C-m))
+	(setq rest default))
+       ((eq char ?x)
+	(setq rest max))
+       ((memq char '(?? ?\C-h))
+	(message
+	 "n, SPC or RET: default (%d), x: max(%d), 0-9 or `-': input number"
+	 default max)
+	(sit-for 30))
+       (t
+	(let (init)
+	  (cond
+	   ((eq char ?-)
+	    (setq init "-"))
+	   ((eq char ?0)
+	    (setq init ""))
+	   ((memq char '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9))
+	    (setq init (char-to-string char)))
+	   (t
+	    (setq char nil)))
+	  (when char
+	    (let ((cursor-in-echo-area nil))
+	      (setq rest (read-from-minibuffer (concat prompt ": ") init))
+	      (if (string-match "^[ \t]*$" rest)
+		  (setq rest max))))))))
+    rest))
+
 (defun gnus-articles-to-read (group &optional read-all)
   ;; Find out what articles the user wants to read.
   (let* ((articles
@@ -4252,15 +4287,14 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		 ((and (or (<= scored marked) (= scored number))
 		       (numberp gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let* ((cursor-in-echo-area nil)
-			 (input (read-from-minibuffer
-				 (format
-				  "How many articles from %s (max %d): "
-				  (gnus-limit-string gnus-newsgroup-name 35)
-				  number)
-				 (cons (number-to-string gnus-large-newsgroup)
-				       0))))
-		    (if (string-match "^[ \t]*$" input) number input)))
+		  (let* ((cursor-in-echo-area nil))
+		    (gnus-summary-read-number-from-minibuffer
+		     (format
+		      "How many articles from %s"
+		      (gnus-limit-string gnus-newsgroup-name 35)
+		      number)
+		     gnus-large-newsgroup
+		     number)))
 		 ((and (> scored marked) (< scored number)
 		       (> (- scored number) 20))
 		  (let ((input
