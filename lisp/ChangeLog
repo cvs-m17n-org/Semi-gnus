@@ -1,3 +1,37 @@
+Thu Nov 19 04:37:45 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.45 is released.
+
+1998-11-08 00:42:58  Andrew Innes  <andrewi@harlequin.co.uk>
+
+	* nntp.el (nntp-request-group): Allow for error codes.
+
+1998-10-12  Andrew Innes  <andrewi@harlequin.co.uk>
+
+	* gnus/nntp.el (nntp-possibly-change-group): Allow for unexpected
+	responses to GROUP command, since this may be called from a timer
+	with quit inhibited.
+
+1998-10-11 01:16:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-expire): Check (car expired).
+
+1998-10-02 04:49:27  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-cache.el (gnus-cache-generate-active): Ignore directories
+	that start with a dot.
+
+1998-10-01 07:42:40  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnmail.el (nnmail-article-group): Expand properly.
+
+	* gnus-group.el (gnus-group-apropos): Also do non-active groups. 
+
+1998-09-29 13:12:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-async.el (gnus-make-async-article-function): Don't use
+	push. 
+
 Thu Sep 24 19:29:43 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.44 is released.

@@ -1140,8 +1140,7 @@ FUNC will be called with the group name to determine the article number."
 		       ;; group twice.
 		       (not (assoc (car method) group-art)))
 		  (push (cons (if regrepp
-				  (replace-match
-				   (car method) nil nil (car method))
+				  (nnmail-expand-newtext (car method))
 				(car method))
 			      (funcall func (car method)))
 			group-art))
@@ -1685,11 +1684,13 @@ If ARGS, PROMPT is used as an argument to `format'."
 	     (apply 'format prompt args)
 	   prompt)))
     (unless nnmail-read-passwd
-      (if (load "passwd" t)
+      (if (functionp 'read-passwd)
 	  (setq nnmail-read-passwd 'read-passwd)
-	(unless (fboundp 'ange-ftp-read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp"))
-	(setq nnmail-read-passwd 'ange-ftp-read-passwd)))
+	(if (load "passwd" t)
+	    (setq nnmail-read-passwd 'read-passwd)
+	  (unless (fboundp 'ange-ftp-read-passwd)
+	    (autoload 'ange-ftp-read-passwd "ange-ftp"))
+	  (setq nnmail-read-passwd 'ange-ftp-read-passwd))))
     (funcall nnmail-read-passwd prompt)))
 
 (defun nnmail-check-syntax ()
