@@ -388,6 +388,9 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
+(defvar gnus-startup-file-coding-system 'binary
+  "*Coding system for startup file.")
+
 ;;; Internal variables
 
 (defvar gnus-newsrc-file-version nil)
@@ -1899,7 +1902,8 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
       (condition-case nil
-	  (load ding-file t t t)
+	  (let ((coding-system-for-read gnus-startup-file-coding-system))
+	    (load ding-file t t t))
 	(error
 	 (ding)
 	 (unless (gnus-yes-or-no-p

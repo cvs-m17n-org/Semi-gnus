@@ -524,7 +524,8 @@ If SILENT, don't prompt the user."
 ;; Dummy to avoid byte-compile warning.
 (defvar nnspool-rejected-article-hook)
 (defvar mule-version)
-(defvar xemacs-betaname)
+;; (defvar xemacs-betaname)
+(defvar emacs-beta-version)
 (defvar xemacs-codename)
 
 (defun gnus-extended-version ()
@@ -537,23 +538,20 @@ If SILENT, don't prompt the user."
    (if (featurep 'xemacs)
        ;; XEmacs
        (concat
-	(format " XEmacs/%d.%d%s" emacs-major-version emacs-minor-version
-		(if (and (boundp 'xemacs-betaname) xemacs-betaname)
-		    (if (string-match "\\`(\\(.*\\))\\'" xemacs-betaname)
-			(match-string 1 xemacs-betaname)
-		      "")		; unknown format
-		  ""))			; not beta
-	(if (boundp 'xemacs-codename)
+	(format " XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+	(if (and (boundp 'emacs-beta-version) emacs-beta-version)
+	    (format "beta%d" emacs-beta-version)
+	  "")
+	(if (and (boundp 'xemacs-codename) xemacs-codename)
 	    (concat " (" xemacs-codename ")")
-	  "")				; no codename
+	  "")
 	)
      ;; not XEmacs
      (concat
       (format " Emacs/%d.%d" emacs-major-version emacs-minor-version)
       (if (and (boundp 'enable-multibyte-characters)
 	       enable-multibyte-characters)
-	  ;; Should return " (multibyte)" ?
-	  ""
+	  ""				; Should return " (multibyte)"?
 	" (unibyte)")
       ))
    ;; MULE[/VERSION]
@@ -1112,8 +1110,8 @@ this is a reply."
 	      ;; This is a header to be added to the headers when
 	      ;; posting. 
 	      (when value-value
-		(make-local-variable message-required-mail-headers)
-		(make-local-variable message-required-news-headers)
+		(make-local-variable 'message-required-mail-headers)
+		(make-local-variable 'message-required-news-headers)
 		(push (cons (car attribute) value-value) 
 		      message-required-mail-headers)
 		(push (cons (car attribute) value-value) 

@@ -857,6 +857,7 @@ ARG is passed to the first function."
 
 (defvar gnus-netrc-syntax-table
   (let ((table (copy-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?@ "w" table)
     (modify-syntax-entry ?- "w" table)
     (modify-syntax-entry ?_ "w" table)
     (modify-syntax-entry ?! "w" table)
@@ -976,6 +977,12 @@ ARG is passed to the first function."
   (unless (symbolp alist)
     (error "Not a symbol: %s" alist))
   `(setq ,alist (delq (assq ,key ,alist) ,alist)))
+
+(defun gnus-globalify-regexp (re)
+  "Returns a regexp that matches a whole line, iff RE matches a part of it."
+  (concat (unless (string-match "^\\^" re) "^.*")
+	  re
+	  (unless (string-match "\\$$" re) ".*$")))
 
 (provide 'gnus-util)
 

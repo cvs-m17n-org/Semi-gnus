@@ -31,6 +31,7 @@
 (require 'timezone)
 (require 'message)
 (require 'custom)
+(require 'gnus-util)
 
 (eval-and-compile
   (autoload 'gnus-error "gnus-util")
@@ -658,6 +659,9 @@ parameter.  It should return nil, `warn' or `delete'."
 			    (set-file-modes
 			     tofile nnmail-default-file-modes))))
 		    ;; Probably a real error.
+		    ;; We nix out the password in case the error
+		    ;; was because of a wrong password being given.
+		    (setq nnmail-internal-password nil)
 		    (subst-char-in-region (point-min) (point-max) ?\n ?\  )
 		    (goto-char (point-max))
 		    (skip-chars-backward " \t")
@@ -693,8 +697,7 @@ nn*-request-list should have been called before calling this function."
 	      group-assoc)))
     group-assoc))
 
-(defvar nnmail-active-file-coding-system
-  'iso-8859-1
+(defvar nnmail-active-file-coding-system 'binary
   "*Coding system for active file.")
 
 (defun nnmail-save-active (group-assoc file-name)

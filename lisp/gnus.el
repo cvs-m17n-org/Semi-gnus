@@ -253,11 +253,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Shoe-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.2"
+(defconst gnus-version-number "6.8.3"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.24; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "%s %s (based on Gnus 5.6.27; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -843,6 +843,7 @@ that case, just return a fully prefixed name of the group --
 \"nnml+private:mail.misc\", for instance."
   :group 'gnus-message
   :type '(choice (const :tag "none" nil)
+		 sexp
 		 string))
 
 (defcustom gnus-secondary-servers nil
@@ -2178,7 +2179,14 @@ that that variable is buffer-local to the summary buffers."
   "Return non-nil if GROUP (and ARTICLE) come from a news server."
   (or (gnus-member-of-valid 'post group) ; Ordinary news group.
       (and (gnus-member-of-valid 'post-mail group) ; Combined group.
-	   (eq (gnus-request-type group article) 'news))))
+	   (if (or (null article)
+		   (not (< article 0)))
+	       (eq (gnus-request-type group article) 'news)
+	     (if (not (vectorp article))
+		 nil
+	       ;; It's a real article.
+	       (eq (gnus-request-type group (mail-header-id article))
+		   'news))))))
 
 ;; Returns a list of writable groups.
 (defun gnus-writable-groups ()

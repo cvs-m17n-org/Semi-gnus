@@ -242,7 +242,7 @@ This must be bound to a button-down mouse event."
     (let (event end end-point last-end-point (end-of-range (point)))
       (track-mouse
        (while (progn
-		(setq event (read-event))
+		(setq event (gnus-read-event-char))
 		(or (mouse-movement-p event)
 		    (eq (car-safe event) 'switch-frame)))
 	 (if (eq (car-safe event) 'switch-frame)
@@ -379,7 +379,8 @@ This must be bound to a button-down mouse event."
   "If non-nil, minimize the tree buffer window.
 If a number, never let the tree buffer grow taller than that number of
 lines."
-  :type 'boolean
+  :type '(choice boolean
+		 integer)
   :group 'gnus-summary-tree)
 
 (defcustom gnus-selected-tree-face 'modeline
