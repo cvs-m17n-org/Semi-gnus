@@ -969,7 +969,6 @@ Image Enhancements
 * Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<((B
                                 $B$9$kJ}K!(B
 * X-Face::                      $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
-* Toolbar::                     $B%/%j%C%/1n(B
 * XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
 
 Thwarting Email Spam
@@ -10938,6 +10937,9 @@ format or @sc{pgp/mime} or @sc{s/mime}.  For decoding such messages,
 see the @code{mm-verify-option} and @code{mm-decrypt-option} options
 (@pxref{Security}).
 
+@vindex gnus-message-replysign
+@vindex gnus-message-replyencrypt
+@vindex gnus-message-replysignencrypted
 Often, you would like to sign replies to people who send you signed
 messages.  Even more often, you might want to encrypt messages which
 are in reply to encrypted messages.  Gnus offers
@@ -20252,7 +20254,6 @@ gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 * Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<((B
                                 $B$9$kJ}K!(B
 * X-Face::                      $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
-* Toolbar::                     $B%/%j%C%/1n(B
 * XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
 @end menu
 
@@ -20356,52 +20357,27 @@ Picon $B$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N=gHV%j%9%H$G$9!#%G%#%U%)%k%H$O!"(B
 (setq gnus-treat-display-smileys t)
 @end lisp
 
-$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{:-=}, @samp{:-(} $B$J$I(B
+$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{8-)}, @samp{:-(} $B$J$I(B
 $B$H$$$C$?$b$N(B --- $B$r3($KBP1~$5$;!"J8;z$N4i%^!<%/$NBe$o$j$K$=$N3($rI=<($7(B
 $B$^$9!#$3$NJQ49$OJ8;z$K%^%C%A$9$k@55,I=8=$H$=$l$N%U%!%$%kL>$X$NBP1~$N%j%9(B
 $B%H$G@)8f$5$l$^$9!#(B
 
-@vindex smiley-nosey-regexp-alist
-@vindex smiley-deformed-regexp-alist
-$B%9%^%$%j!<$O=i4|@_Dj$G$OFs$D$NJQ49O"A[%j%9%H$NNc$rDs6!$7$F$$$^$9!#(B
-@code{smiley-deformed-regexp-alist} (@samp{:)}, @samp{:(} $B$J$I$K%^%C%A(B
-$B$9$k(B) $B$H!"(B@code{smiley-nosey-regexp-alist} (@samp{:-)}, @samp{:-(} $B$J$I(B
-$B$K%^%C%A$9$k(B) $B$G$9!#(B
+@vindex smiley-regexp-alist
+$B;H$o$l$kO"A[%j%9%H$O!"JQ?t(B @code{smiley-regexp-alist} $B$G@_Dj$7$^$9!#3FMW(B
+$BAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$($?$$(B
+$B%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$%k$N(B
+$BL>A0$G$9!#(B
 
-$B;HMQ$5$l$kO"A[%j%9%H$O(B @code{smiley-regexp-alist} $BJQ?t$G;XDj$5$l$^$9!#$3(B
-$B$N=i4|@_DjCM$O(B @code{smiley-deformed-regexp-alist} $B$G$9!#(B
-
-$B3FMWAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$((B
-$B$?$$%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$(B
-$B%k$NL>A0$G$9!#(B
-
-$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j!"$"$k$$$O$I$N?'$r;H(B
-$B$&$+$H!"$=$NB>$N$b$N$r%+%9%?%^%$%:$7$^$9!#(B
+$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j$r%+%9%?%^%$%:$7$^$9(B:
 
 @table @code
 @item smiley-data-directory
 @vindex smiley-data-directory
 $B%9%^%$%j!<$,4i%U%!%$%k$rC5$9>l=j!#(B
 
-@item smiley-flesh-color
-@vindex smiley-flesh-color
-$BH)$N?'!#=i4|@_DjCM$O!"?M<o:9JLE*$@$1$I(B @samp{yellow} $B$G$9!#(B
-
-@item smiley-features-color
-@vindex smiley-features-color
-$B%U%'%$%9$N5!G=$N?'!#=i4|@_DjCM$O(B @samp{black} $B$G$9!#(B
-
-@item smiley-tongue-color
-@vindex smiley-tongue-color
-$B@e$N?'!#=i4|@_DjCM$O(B @samp{red} $B$G$9!#(B
-
-@item smiley-circle-color
-@vindex smiley-circle-color
-$B4i$N<~$j$N4]$N?'!#=i4|@_DjCM$O(B @samp{black} $B$G$9!#(B
-
-@item smiley-mouse-face
-@vindex smiley-mouse-face
-$B%^%&%9$G6/D4I=<($7$?$H$-$N4i!#(B
+@item gnus-smiley-file-types
+@vindex gnus-smiley-file-types
+$B%9%^%$%j!<$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N%j%9%H$G$9!#(B
 @end table
 
 @node X-Face
@@ -20489,35 +20465,6 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
                                  "~/My-face.gif"))))))
 @end lisp
 
-@node Toolbar
-@subsection $B%D!<%k%P!<(B
-
-@table @code
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-@item gnus-use-toolbar
-@vindex gnus-use-toolbar
-@code{nil} $B$J$i$P%D!<%k%P!<$rI=<($7$J$$!#(B@code{nil} $B0J30$N>l9g$O!"(B
-@code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar}, @code{right-toolbar}, @code{left-toolbar} $B$N(B
-$B$I$l$+$G$J$/$F$O$J$j$^$;$s!#(B
-
-@item gnus-group-toolbar
-@vindex gnus-group-toolbar
-$B%0%k!<%W%P%C%U%!Fb$N%D!<%k%P!<!#(B
-
-@item gnus-summary-toolbar
-@vindex gnus-summary-toolbar
-$B35N,%P%C%U%!Fb$N%D!<%k%P!<!#(B
-
-@item gnus-summary-mail-toolbar
-@vindex gnus-summary-mail-toolbar
-$B%a!<%k%0%k!<%W$N35N,%P%C%U%!Fb$N%D!<%k%P!<!#(B
-@end table
-
 @node XVarious
 @subsection $B$5$^$6$^$J(B XEmacs $BJQ?t(B
 
@@ -20536,20 +20483,43 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 @item gnus-xmas-logo-color-style
 @vindex gnus-xmas-logo-color-style
 $B$3$l$OA05-$NO"A[%j%9%H$G?'$r8!:w$9$k$N$K;H$o$l$k%-!<$G$9!#M-8z$JCM$K(B
-$B$O(B @code{flame}, @code{pine}, @code{moss}, @code{irish}, @code{sky}, @code{tin}, @code{velvet}, @code{grape}, @code{labia}, @code{berry}, @code{neutral}, @code{september} $B$,(B
-$B$"$j$^$9!#(B
+$B$O(B @code{flame}, @code{pine}, @code{moss}, @code{irish}, @code{sky},
+@code{tin}, @code{velvet}, @code{grape}, @code{labia}, @code{berry},
+@code{neutral}, @code{september} $B$,$"$j$^$9!#(B
 
 @item gnus-xmas-modeline-glyph
 @vindex gnus-xmas-modeline-glyph
 $BA4$F$N(B gnus $B%b!<%I9T$GI=<($5$l$k3(J8;z!#$3$l$O=i4|@_Dj$G$O$A$$$5$J(B
 $B%L!<(B (gnu) $B$NF,$G$9!#(B
+@end table
+
+@subsubsection $B%D!<%k%P!<(B
+
+@table @code
+@item gnus-use-toolbar
+@vindex gnus-use-toolbar
+@code{nil} $B$J$i$P%D!<%k%P!<$rI=<($7$^$;$s!#(B@code{nil} $B0J30$N>l9g$O!"(B
+@code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar},
+@code{right-toolbar}, @code{left-toolbar} $B$N$I$l$+$G$J$/$F$O$J$j$^$;$s!#(B
+
+@item gnus-group-toolbar
+@vindex gnus-group-toolbar
+$B%0%k!<%W%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+
+@item gnus-summary-toolbar
+@vindex gnus-summary-toolbar
+$B35N,%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+
+@item gnus-summary-mail-toolbar
+@vindex gnus-summary-mail-toolbar
+$B%a!<%k%0%k!<%W$N35N,%P%C%U%!Fb$N%D!<%k%P!<$G$9!#(B
+@end table
 
 @iftex
 @iflatex
 \margindex{}
 @end iflatex
 @end iftex
-@end table
 
 @node Fuzzy Matching
 @section $B%U%!%8!<$J0lCW(B
