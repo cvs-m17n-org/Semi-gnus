@@ -21614,8 +21614,7 @@ Headers,message-ja, The Message Manual}) をカスタマイズして下さい:
 @item hashcash-default-payment
 @vindex hashcash-default-payment
 この変数はハッシュの衝突を成すディフォルトのビット数を示します。規定値
-は 10 で、それはいささか低い値です。提唱されている有効な値は 17 か
-ら 29 までの数です。
+は 20 です。提唱されている有効な値は 17 から 29 までの数です。
 
 @item hashcash-payment-alist
 @vindex hashcash-payment-alist
