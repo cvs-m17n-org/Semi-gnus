@@ -1011,13 +1011,17 @@ ARG is passed to the first function."
 	(delete-char 1)))))
 
 (defun gnus-union (a b)
-  "Add members of list A to list B
-if they are not equal to items already in B."
+  "Add members of list A to list B if they are not equal to items already
+in B.  This function is copied from `shadow-union' in file shadowfile.el.
+It is faster than cl-`union' and it uses `member' even though cl-`union'
+uses `memq' for comparing each element."
   (if (null a)
       b
     (if (member (car a) b)
 	(gnus-union (cdr a) b)
       (gnus-union (cdr a) (cons (car a) b)))))
+
+(gnus-ems-redefine)
 
 (provide 'gnus-util)
 
