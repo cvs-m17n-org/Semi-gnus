@@ -9078,18 +9078,27 @@ forward."
   "Decode IDNA encoded domain names in the current articles.
 IDNA encoded domain names looks like `xn--bar'.  If a string
 remain unencoded after running this function, it is likely an
-invalid IDNA string (`xn--bar' is invalid)."
+invalid IDNA string (`xn--bar' is invalid).
+
+You must have GNU Libidn (`http://www.gnu.org/software/libidn/')
+installed for this command to work."
   (interactive "P")
-  (gnus-summary-select-article)
-  (let ((mail-header-separator ""))
-    (gnus-eval-in-buffer-window gnus-article-buffer
-      (save-restriction
-	(widen)
-	(let ((start (window-start))
-	      buffer-read-only)
-	  (while (re-search-forward "\\(xn--[-0-9a-z]+\\)" nil t)
-	    (replace-match (idna-to-unicode (match-string 1))))
-	  (set-window-start (get-buffer-window (current-buffer)) start))))))
+  (if (not (and (condition-case nil (require 'idna)
+		  (file-error))
+		(mm-coding-system-p 'utf-8)
+		(executable-find idna-program)))
+      (gnus-message
+       5 "GNU Libidn not installed properly (`idn' or `idna.el' missing)")
+    (gnus-summary-select-article)
+    (let ((mail-header-separator ""))
+      (gnus-eval-in-buffer-window gnus-article-buffer
+	(save-restriction
+	  (widen)
+	  (let ((start (window-start))
+		buffer-read-only)
+	    (while (re-search-forward "\\(xn--[-0-9a-z]+\\)" nil t)
+	      (replace-match (idna-to-unicode (match-string 1))))
+	    (set-window-start (get-buffer-window (current-buffer)) start)))))))
 
 (autoload 'unmorse-region "morse"
   "Convert morse coded text in region to ordinary ASCII text."
