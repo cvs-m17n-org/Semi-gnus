@@ -1,3 +1,47 @@
+1998-11-16  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Sync up with gnus-6_8.
+
+* 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* README-gnus-bbdb.en, README-gnus-bbdb.ja: New files.
+
+	* lisp/gnus-bbdb.el: Replace string in comment "Nana-" to "Semi-".
+
+* 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-resend-bounced-mail): Bind
+	`gnus-message-setup-hook' to nil.
+
+	* lisp/message.el (message-bounce-setup-for-mime-edit): New
+	function.
+	(message-bounce-setup-function): New user option. Use
+	`message-bounce-setup-for-mime-edit' in default.
+	(message-bounce): Call `message-bounce-setup-function' if it is
+	non-nil.
+	(message-bounce-setup-hook): New user option.
+
+	* lisp/gnus-art.el (gnus-article-edit-done): Remove
+	`gnus-article-mime-edit-article-unwind' from
+	`gnus-article-mode-hook' before run `gnus-article-edit-exit'.
+	(gnus-article-edit-article): Call
+	`gnus-article-edit-article-setup-function' if it is non-nil.
+	(gnus-article-edit-article-setup-function): New user option. Use
+	`gnus-article-mime-edit-article-setup' in default.
+	(gnus-article-mime-edit-article-setup-hook): New hook.
+	(gnus-article-mime-edit-exit): New function. Use
+	`gnus-article-make-full-mail-header'.
+	(gnus-article-mime-edit-article-setup): Ditto.
+	(gnus-article-mime-edit-article-unwind): New function.
+	(gnus-article-make-full-mail-header): New function.
+	(gnus-article-prepare-display): New function.
+	(gnus-article-prepare): Use it.
+
+* 1998-11-09  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' as a
+	symbol `pop3-fma-read-passwd'.
+
 1998-11-13  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/nnheader.el (nnheader-decode-subject): Change mode to `nov'
@@ -19,26 +63,32 @@
 
 1998-11-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
-	* lisp/message.el (message-do-fcc): Sync up with Semi-gnus 6.8.
-	(message-8bit-encoding-list): New variable.
+	* Sync up with Semi-gnus 6.8.
+
+	* lisp/message.el: (message-8bit-encoding-list): New variable.
 	(message-check-encoding): Use `message-8bit-encoding-list'. Change
 	search pattern.
+
+*1998-11-04  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/message.el: (message-do-fcc): Don't run message-header-hook
+	and message-before-do-fcc-hook.
 
 1998-11-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Sync up with Chao-gnus 6.12.
 
-1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+* 1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.3.
 
-1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+* 1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/mmgnus.el (entity-buffer): Must move to (point-min) before
 	search boundary between header and body (to fix problem with
 	Emacs).
 
-1998-11-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+* 1998-11-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/nnmh.el (nnmh-retrieve-headers): Don't use
 	`nnheader-fold-continuation-lines'.
@@ -72,8 +122,8 @@
 
 1998-11-02  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
 
-	* lisp/message.el: Generate In-Reply-To header according to
-	draft-ietf-drums-msg-fmt-05.
+	* lisp/message.el: (message-make-in-reply-to): Generate
+	In-Reply-To header according to draft-ietf-drums-msg-fmt-05.
 
 1998-10-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
