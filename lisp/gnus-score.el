@@ -2155,15 +2155,20 @@ SCORE is the score to add."
 	(progn
 	  (set-syntax-table gnus-adaptive-word-syntax-table)
 	  (while (re-search-forward "\\b\\w+\\b" nil t)
-	    (setq val
-		  (gnus-gethash
-		   (setq word (downcase (buffer-substring
-					 (match-beginning 0) (match-end 0))))
+	    (condition-case err
+		(progn
+		  (setq val
+			(gnus-gethash
+			 (setq word (downcase
+				     (buffer-substring
+				      (match-beginning 0) (match-end 0))))
+			 hashtb))
+		  (gnus-sethash
+		   word
+		   (append (get-text-property (gnus-point-at-eol) 'articles)
+			   val)
 		   hashtb))
-	    (gnus-sethash
-	     word
-	     (append (get-text-property (gnus-point-at-eol) 'articles) val)
-	     hashtb)))
+	      (error (gnus-error 1.1 "%s" err)))))
       (set-syntax-table syntab))
     ;; Make all the ignorable words ignored.
     (let ((ignored (append gnus-ignored-adaptive-words
