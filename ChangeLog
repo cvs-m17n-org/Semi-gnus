@@ -1,3 +1,32 @@
+1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-resend-bounced-mail): Bind
+	`gnus-message-setup-hook' to nil.
+
+	* lisp/message.el (message-bounce-setup-for-mime-edit): New
+	function.
+	(message-bounce-setup-function): New user option. Use
+	`message-bounce-setup-for-mime-edit' in default.
+	(message-bounce): Call `message-bounce-setup-function' if it is
+	non-nil.
+	(message-bounce-setup-hook): New user option.
+
+	* lisp/gnus-art.el (gnus-article-edit-done): Remove
+	`gnus-article-mime-edit-article-unwind' from
+	`gnus-article-mode-hook' before run `gnus-article-edit-exit'.
+	(gnus-article-edit-article): Call
+	`gnus-article-edit-article-setup-function' if it is non-nil.
+	(gnus-article-edit-article-setup-function): New user option. Use
+	`gnus-article-mime-edit-article-setup' in default.
+	(gnus-article-mime-edit-article-setup-hook): New hook.
+	(gnus-article-mime-edit-exit): New function. Use
+	`gnus-article-make-full-mail-header'.
+	(gnus-article-mime-edit-article-setup): Ditto.
+	(gnus-article-mime-edit-article-unwind): New function.
+	(gnus-article-make-full-mail-header): New function.
+	(gnus-article-prepare-display): New function.
+	(gnus-article-prepare): Use it.
+
 1998-11-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/message.el (message-mode-map): Add new command key
