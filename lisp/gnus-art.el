@@ -2511,12 +2511,13 @@ commands:
 	    all-headers gnus-have-all-headers))
     (make-local-variable 'default-mime-charset)
     (setq default-mime-charset charset)
+    (with-current-buffer (get-buffer-create gnus-article-buffer)
+      (make-local-variable 'default-mime-charset)
+      (setq default-mime-charset charset))
     (mime-display-message mime-message-structure
 			  gnus-article-buffer nil gnus-article-mode-map)
     (when all-headers
       (gnus-article-hide-headers nil -1))
-    (make-local-variable 'default-mime-charset)
-    (setq default-mime-charset charset)
     )
   ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)

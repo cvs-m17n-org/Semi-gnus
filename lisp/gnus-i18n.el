@@ -29,13 +29,13 @@
 ;;;
 
 (defvar gnus-newsgroup-default-charset-alist
-  '(("^\\(fj\\|tnn\\|japan\\)\\."	. iso-2022-jp-2)
-    ("^han\\."				. euc-kr)
-    ("^relcom\\."			. koi8-r)
-    ("^alt\\.chinese\\.text\\.big5"	. cn-big5)
-    ("^hk\\(star\\)?\\."		. cn-big5)
-    ("^tw\\."				. cn-big5)
-    ("^alt\\.chinese"			. hz-gb-2312)
+  '(("\\(^\\|:\\)\\(fj\\|tnn\\|japan\\)\\."	. iso-2022-jp-2)
+    ("\\(^\\|:\\)han\\."			. euc-kr)
+    ("\\(^\\|:\\)relcom\\."			. koi8-r)
+    ("\\(^\\|:\\)alt\\.chinese\\.text\\.big5"	. cn-big5)
+    ("\\(^\\|:\\)hk\\(star\\)?\\."		. cn-big5)
+    ("\\(^\\|:\\)tw\\."				. cn-big5)
+    ("\\(^\\|:\\)alt\\.chinese"			. hz-gb-2312)
     )
   "Alist of newsgroup patterns vs. corresponding default MIME charset.
 Each element looks like (REGEXP . SYMBOL).  REGEXP is pattern for
@@ -69,10 +69,6 @@ It is specified by variable `gnus-newsgroup-default-charset-alist'
 			(set-buffer gnus-summary-buffer)
 			gnus-newsgroup-name))
 		     (alist gnus-newsgroup-default-charset-alist))
-		 ;; Strip method and foreign server name.
-		 (when (string-match ":" group)
-		   (setq group (substring group (match-end 0)))
-		   )
 		 (while alist
 		   (let ((pair (car alist)))
 		     (if (string-match (car pair) group)
