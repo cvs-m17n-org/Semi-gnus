@@ -35,25 +35,46 @@
 
 ;; This program was inspired by Kyle E. Jones's vm-pop program.
 
-;; You have to set the variable `pop3-connection-type' to `ssl' or
-;; `tls' expressly, if you would like to use this module with Gnus
-;; (not T-gnus) for those connection types.  For examples:
+;;; Gnus:
+
+;; You can use this program for Gnus, without needing any modification.
+;; There are two ways to do that; one is to replace Gnus' pop3.el with
+;; it when installing Gnus; the other is to replace Gnus' pop3.el which
+;; has been installed with this module and byte-compile it.
+
+;; Note: you should not modify the value for the `pop' section of the
+;; `mail-source-keyword-map' variable.
+
+;; This program provides the following features in addition to Gnus:
+
+;; 1. You can use SSL or STARTTLS stream to connect to mail servers.
+;;    For example, specify the `:connection' keyword and the value pair
+;;    in a mail-source as follows:
 ;;
-;;(setq mail-sources '((pop :server "POPSERVER" :port 995 :connection ssl
-;;                          :authentication apop)))
-;;(setq pop3-connection-type 'ssl)
+;;(setq mail-sources '((pop :server "pop3.mail.server" :port 995
+;;			  :connection ssl :authentication apop)))
+;;
+;;    For STARTTLS stream, use `tls' isntead of `ssl'.  The default
+;;    connection type is defined by `pop3-connection-type' which
+;;    defaults to nil.
+
+;; 2. You can fetch mails without deleting them in mail servers.  To do
+;;    that, specify the `:leave' keyword with the value t as follows:
+;;
+;;(setq mail-sources '((pop :server "pop3.mail.server" :leave t)))
+;;
+;;    Already read mails are registered into the ~/.uidls-SERVER file
+;;    (which is the default, see `pop3-uidl-file-name'), and You will
+;;    never need to fetch them twice.  The default value for the
+;;    `:leave' keyword is specified by the `pop3-leave-mail-on-server'
+;;    variable.  You have no need to modify that value normally.
+
+;; 3. See the source code for some other miscellaneous extended features.
 
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl)
-  ;; For compiling this module in Gnus with XEmacs -no-autoloads.
-  (require 'advice))
-
-;; as-binary-process, open-network-stream-as-binary, write-region-as-binary
-(require 'pces)
-;; exec-installed-p
-(require 'path-util)
+  (require 'cl))
 
 (require 'mail-utils)
 (require 'nnheader)
@@ -108,7 +129,7 @@ Users don't have to set this value.")
   (autoload 'starttls-negotiate "starttls"))
 
 (defvar pop3-ssl-program-name
-  (if (exec-installed-p "openssl")
+  (if (executable-find "openssl")
       "openssl"
     "ssleay")
   "The program to run in a subprocess to open an SSL connection.")
@@ -162,8 +183,10 @@ Users don't have to set this value.")
 	    (setq messages (cdr messages)
 		  n (1+ n)))
 	  (with-current-buffer crashbuf
-	    (write-region-as-binary (point-min) (point-max)
-				    crashbox 'append 'nomesg))
+	    (let ((coding-system-for-write 'binary)
+		  jka-compr-compression-info-list jam-zcat-filename-list)
+	      (write-region (point-min) (point-max)
+			    crashbox 'append 'nomesg)))
 	  ;; mark messages as read
 	  (when pop3-leave-mail-on-server
 	    (pop3-save-uidls))
@@ -218,8 +241,9 @@ Argument PORT specifies connecting port."
 	((eq pop3-connection-type 'tls)
 	 (pop3-open-tls-stream "POP" (current-buffer) mailhost port))
 	(t
-	 (open-network-stream-as-binary "POP" (current-buffer)
-					mailhost port))))
+	 (let ((coding-system-for-read 'binary)
+	       (coding-system-for-write 'binary))
+	   (open-network-stream "POP" (current-buffer) mailhost port)))))
       (let ((response (pop3-read-response process t)))
 	(setq pop3-timestamp
 	      (substring response (or (string-match "<" response) 0)
@@ -255,17 +279,20 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (as-binary-process
-   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+  (let (selective-display ;; Disable ^M to nl translation.
+	(coding-system-for-read 'binary)
+	(coding-system-for-write 'binary))
+    (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	(pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (let ((process
-	 (as-binary-process (starttls-open-stream
-			     name buffer host service))))
+  (let* (selective-display ;; Disable ^M to nl translation.
+	 (coding-system-for-read 'binary)
+	 (coding-system-for-write 'binary)
+	 (process (starttls-open-stream name buffer host service)))
     (pop3-stls process)
     (starttls-negotiate process)
     process))
@@ -679,6 +706,23 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (setq end (point-marker))
     (pop3-clean-region start end)
     (list start end)))
+
+;;; Advise the mail-source function in order to use this module in Gnus.
+
+(eval-after-load "mail-source"
+  '(if (member '(:connection)
+	       (assq 'pop (symbol-value 'mail-source-keyword-map)))
+       nil ;; T-gnus is running.
+     (defadvice mail-source-fetch-pop (around bind-t-gnus-keywords activate)
+       "Bind `pop3-connection-type' and `pop3-leave-mail-on-server' according
+to `mail-sources' while fetching mails with Gnus."
+       (let ((pop3-connection-type (or (plist-get (cdr (ad-get-arg 0))
+						  :connection)
+				       pop3-connection-type))
+	     (pop3-leave-mail-on-server (or (plist-get (cdr (ad-get-arg 0))
+						       :leave)
+					    pop3-leave-mail-on-server)))
+	 ad-do-it))))
 
 
 ;; Summary of POP3 (Post Office Protocol version 3) commands and responses
