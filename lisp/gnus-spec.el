@@ -127,6 +127,9 @@
 	     ,gnus-summary-line-format-spec))
   "Alist of format specs.")
 
+(defvar gnus-format-specs-compiled nil
+  "Alist of compiled format specs.")
+
 (defvar gnus-article-mode-line-format-spec nil)
 (defvar gnus-summary-mode-line-format-spec nil)
 (defvar gnus-group-mode-line-format-spec nil)
@@ -164,7 +167,7 @@
     (lisp-interaction-mode)
     (insert (pp-to-string spec))))
 
-(defun gnus-update-format-specifications (&optional force &rest types)
+(defun gnus-update-format-specifications-1 (force types)
   "Update all (necessary) format specifications."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
@@ -173,7 +176,8 @@
 			(cdr (assq 'version gnus-format-specs))))
 	    (not (equal gnus-version gnus-newsrc-file-version)))
     (message "%s" "Force update format specs.")
-    (setq gnus-format-specs nil))
+    (setq gnus-format-specs nil
+	  gnus-newsrc-file-version gnus-version))
 
   ;; Go through all the formats and see whether they need updating.
   (let (new-format entry type val)
@@ -216,6 +220,13 @@
 
   (unless (assq 'version gnus-format-specs)
     (push (cons 'version emacs-version) gnus-format-specs)))
+
+(defun gnus-update-format-specifications (&optional force &rest types)
+  "Update all (necessary) format specifications."
+  (if gnus-format-specs-compiled
+      (let ((gnus-format-specs gnus-format-specs-compiled))
+	(gnus-update-format-specifications-1 force types))
+    (gnus-update-format-specifications-1 force types)))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
@@ -533,6 +544,7 @@ If PROPS, insert the result."
     (save-excursion
       (gnus-message 7 "Compiling format specs...")
 
+      (setq gnus-format-specs-compiled nil)
       (while entries
 	(setq entry (pop entries))
 	(if (memq (car entry) '(version gnus-version))
@@ -546,11 +558,12 @@ If PROPS, insert the result."
 				 (byte-code-function-p (cadr form)))))
 	      (fset 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
-	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))
+	      (push (nconc (butlast entry)
+			   (list (gnus-byte-code 'gnus-tmp-func)))
+		    gnus-format-specs-compiled)))))
 
       (push (cons 'version emacs-version) gnus-format-specs)
-      ;; Mark the .newsrc.eld file as "dirty".
-      (gnus-dribble-touch)
+      (push (cons 'version emacs-version) gnus-format-specs-compiled)
       (gnus-message 7 "Compiling user specs...done"))))
 
 (defun gnus-set-format (type &optional insertable)
