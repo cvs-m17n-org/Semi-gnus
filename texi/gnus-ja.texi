@@ -9750,7 +9750,7 @@ Gnus $B$KK>$^$7$/$J$$%a!<%k$r:o=|$5$;$k$?$a$K$O!"5-;v$r(B @dfn{$B4|8B@Z$l>C5n
 $B$G$"$k$H(B ``$B$7$J$$(B'' $B$J$i!"(Bgnus $B$O(B ``$B7h$7$F(B'' $B$=$l$i$N(B ``$B5-;v(B'' $B$r>C5n$7(B
 $B$^$;$s!#(B
 
-@vindex gnus-auto-expirable-newgroups
+@vindex gnus-auto-expirable-newsgroups
 $B<j$G5-;v$K4|8B@Z$l>C5n2DG=$N0u$rIU$1$J$1$l$P$J$i$J$$$o$G$G$O$"$j$^$;$s!#(B
 $B@55,I=8=(B @code{gnus-auto-expirable-newsgroups} $B$K9gCW$9$k%0%k!<%W$OA4$F(B
 $B$N4{FI5-;v$K<+F0E*$K4|8B@Z$l>C5n2DG=$N0u$,IU$1$i$l$^$9!#A4$F$N4|8B@Z$l>C(B
@@ -9777,7 +9777,7 @@ Gnus $B$KK>$^$7$/$J$$%a!<%k$r:o=|$5$;$k$?$a$K$O!"5-;v$r(B @dfn{$B4|8B@Z$l>C5n
 $B2DG=$K$7$^$9!#(B
 
 @lisp
-(setq gnus-auto-expirable-newgroups
+(setq gnus-auto-expirable-newsgroups
       "mail.nosense-list\\|mail.nice-list")
 @end lisp
 
