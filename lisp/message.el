@@ -3295,21 +3295,18 @@ This sub function is for exclusive use of `message-send-news'."
 	  (gnus-group-name-charset method newsgroups-field))
 	 (followup-field-charset
 	  (gnus-group-name-charset method (or followup-field "")))
-;;; FIXME: Newsgroups or Followup-To fields should be treated as UTF-8.
-;;;	 (rfc2047-header-encoding-alist
-;;;	  (append (when group-field-charset
-;;;		    (list (cons "Newsgroups" group-field-charset)))
-;;;		  (when followup-field-charset
-;;;		    (list (cons "Followup-To" followup-field-charset)))
-;;;		  rfc2047-header-encoding-alist))
+	 (mime-field-encoding-method-alist
+	  (append (when group-field-charset
+		    (list (cons "Newsgroups" group-field-charset)))
+		  (when followup-field-charset
+		    (list (cons "Followup-To" followup-field-charset)))
+		  mime-field-encoding-method-alist))
 	 (message-syntax-checks
 	  (if arg
 	      (cons '(existing-newsgroups . disabled)
 		    message-syntax-checks)
 	    message-syntax-checks))
 	 (message-this-is-news t)
-;;;	 (message-posting-charset
-;;;	  (gnus-setup-posting-charset newsgroups-field))
 	 result)
     (save-restriction
       (message-narrow-to-headers)

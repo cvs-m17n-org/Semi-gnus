@@ -686,7 +686,7 @@ displayed by the first non-nil matching CONTENT face."
 			       (item :tag "skip" nil)
 			       (face :value default)))))
 
-(defcustom gnus-article-decode-hook '(article-decode-group-name)
+(defcustom gnus-article-decode-hook nil
   "*Hook run to decode charsets in articles."
   :group 'gnus-article-headers
   :type 'hook)
@@ -6280,7 +6280,7 @@ For example:
 
 (defun gnus-article-header-presentation-method (entity situation)
   (mime-insert-header entity)
-  )
+  (article-decode-group-name))
 
 (set-alist 'mime-header-presentation-method-alist
 	   'gnus-original-article-mode
