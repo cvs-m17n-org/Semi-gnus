@@ -405,8 +405,9 @@ You must specify the name of the package path as follows:
 	      (if buffer-file-name (kill-buffer (current-buffer)))
 	      (find-file file)
 	      (if (boundp 'MULE)
-		  (setq coding-system-for-write buffer-file-coding-system)
-		(setq output-coding-system (symbol-value 'file-coding-system)))
+		  (setq output-coding-system (symbol-value
+					      'file-coding-system))
+		(setq coding-system-for-write buffer-file-coding-system))
 	      (when (and addsuffix
 			 (re-search-forward
 			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)

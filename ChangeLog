@@ -1,3 +1,9 @@
+2000-05-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Fix last change.
+
 2000-05-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* nnshimbun.el: New backend.
