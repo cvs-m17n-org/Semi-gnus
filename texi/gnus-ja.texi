@@ -7387,6 +7387,18 @@ CRLF $B$NAH(B ($B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $B$r(B LF $B$KJQ49$7$^
 $B$O(B DOS $B$N9TKv$N@$OC$r$7$^$9(B)$B!"$=$7$F$=$l$+$i;D$j$N(B CR $B$r(B LF $B$KJQ49$7$^(B
 $B$9(B ($B$3$l$O(B MAC $B$N9TKv$N@$OC$r$7$^$9(B) (@code{gnus-article-remove-cr})$B!#(B
 
+@c @item W q
+@c @kindex W q (Summary)
+@c @findex gnus-article-de-quoted-unreadable
+@c Treat quoted-printable (@code{gnus-article-de-quoted-unreadable}).
+@c Quoted-Printable is one common @sc{mime} encoding employed when sending
+@c non-ASCII (i. e., 8-bit) articles.  It typically makes strings like
+@c @samp{d,Ai(Bj,A`(B vu} look like @samp{d=E9j=E0 vu}, which doesn't look very
+@c readable to me.  Note that the this is usually done automatically by
+@c Gnus if the message in question has a @code{Content-Transfer-Encoding}
+@c header that says that this encoding has been done. 
+@c If a prefix is given, a charset will be asked for.
+
 @c @item W 6
 @c @kindex W 6 (Summary)
 @c @findex gnus-article-de-base64-unreadable
@@ -7396,6 +7408,7 @@ CRLF $B$NAH(B ($B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $B$r(B LF $B$KJQ49$7$^
 @c automatically by Gnus if the message in question has a
 @c @code{Content-Transfer-Encoding} header that says that this encoding has
 @c been done.
+@c If a prefix is given, a charset will be asked for.
 
 @item W Z
 @kindex W Z (Summary)
@@ -7411,6 +7424,7 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 @c Note that the this is usually done automatically by Gnus if the message
 @c in question has a @code{Content-Type} header that says that this type
 @c has been done.
+@c If a prefix is given, a charset will be asked for.
 
 @item W f
 @kindex W f ($B35N,(B)
