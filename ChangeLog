@@ -1,3 +1,14 @@
+1999-01-16  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
+
+	* lisp/message.el (message-reply): Accept references as a new
+	optional arg.
+	(message-followup): Ditto.
+	(message-wide-reply): Ditto.
+
+	* lisp/gnus-msg.el (gnus-summary-gather-references): New function.
+	(gnus-summary-reply): Use it
+	(gnus-post-news): Use it.
+
 1999-01-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.054.
