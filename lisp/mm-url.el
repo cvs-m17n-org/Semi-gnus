@@ -30,7 +30,6 @@
 ;;; Code:
 
 (require 'mm-util)
-
 (require 'path-util)
 
 (eval-when-compile (require 'cl))
