@@ -1,6 +1,35 @@
+2000-10-05  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (rfc2047-fold-region): Use gnus-point-at-bol.
+	(rfc2047-charset-encoding-alist): Add iso-8859-1[45].
+
+	* binhex.el: Use defalias, not fset.
+
+	* rfc1843.el: Require cl when compiling.
+
+2000-10-05 12:25:08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-fetch-group-1): Score-param could be nil.
+
+2000-10-05 11:43:25  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode-region): Merge only if regions are
+	adjacent.
+
+2000-10-05 09:41:33  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-multibyte-p): In XEmacs, it is (feature 'mule).
+	(mm-find-charset-region): Merge conditions, delete ascii.
+	(mm-charset-after): Rewrite.
+	* mm-bodies.el (mm-encode-body): Use it.
+
+2000-10-05 09:04:32  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-hotmail-list): Fix.
+
 2000-10-05  Stefan Monnier <monnier+gnu/emacs@rum.cs.yale.edu>
 
-       * nnimap.el (require): cl.
+	* nnimap.el (require): cl.
 
 2000-10-04 15:24:46  ShengHuo ZHU  <zsh@cs.rochester.edu>
 

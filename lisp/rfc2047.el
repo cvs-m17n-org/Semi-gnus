@@ -61,6 +61,8 @@ The values can be:
     (iso-8859-7 . Q)
     (iso-8859-8 . Q)
     (iso-8859-9 . Q)
+    (iso-8859-14 . Q)
+    (iso-8859-15 . Q)
     (iso-2022-jp . B)
     (iso-2022-kr . B)
     (gb2312 . B)
@@ -224,7 +226,8 @@ Should be called narrowed to the head of the message."
   (let ((words (rfc2047-dissect-region b e))
 	beg end current word)
     (while (setq word (pop words))
-      (if (equal (nth 2 word) current)
+      (if (and (eq (nth 2 word) current)
+	       (eq beg (nth 1 word)))
 	  (setq beg (nth 0 word))
 	(when current
 	  (if (and (eq beg (nth 1 word)) (nth 2 word))
@@ -297,7 +300,7 @@ Should be called narrowed to the head of the message."
 	  (setq break (point)))
 	 ((and break
 	       (looking-at "\\?=")
-	       (> (- (point) (save-excursion (beginning-of-line) (point))) 76))
+	       (> (- (point) (gnus-point-at-bol)) 76))
 	  (goto-char break)
 	  (setq break nil)
 	  (insert "\n ")))
