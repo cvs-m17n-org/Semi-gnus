@@ -1,3 +1,18 @@
+2002-04-23  Simon Josefsson  <jas@extundo.com>
+
+	* netrc.el: New file, functions copied from gnus-util.el by Ted
+	Zlatanov <tzz@lifelogs.com>.
+
+	* gnus-util.el: Require netrc.
+	(gnus-netrc-get, gnus-netrc-machine, gnus-parse-netrc): Aliased to
+	new code in netrc.el.
+
+2002-04-23  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-msg.el (gnus-summary-resend-message-edit): Remove
+	message-ignored-resent-headers, too.  From Matthieu Moy
+	<Matthieu.Moy@imag.fr>.
+
 2002-04-22  Bj,Av(Brn Torkelsson  <torkel@acc.umu.se>
 
 	* gnus-srvr.el (gnus-server-browse-in-group-buffer): it is a

@@ -1332,6 +1332,7 @@ composing a new message."
 
 	;; Gnus will generate a new one when sending.
 	(message-remove-header "Message-ID")
+	(message-remove-header message-ignored-resent-headers t)
 	;; Remove unwanted headers.
 	(goto-char (point-max))
 	(insert mail-header-separator)
