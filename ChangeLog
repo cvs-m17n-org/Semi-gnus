@@ -1,5 +1,9 @@
 2001-09-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
+
+2001-09-27  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/message.el (message-find-invisible-regions): Look for the
 	text-property `mime-edit-invisible' as well as `message-invisible'.
 	(message-save-drafts): Copy the text-property `mime-edit-invisible'
