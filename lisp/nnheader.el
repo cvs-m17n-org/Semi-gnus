@@ -107,6 +107,14 @@ on your system, you could say something like:
 (defalias 'nnheader-decode-from
   (mime-find-field-decoder 'From 'unfolding))
 
+(defsubst nnheader-decode-field-body (field-body field-name
+						 &optional mode max-column)
+  (mime-decode-field-body field-body
+                          (if (stringp field-name)
+                              (intern (capitalize field-name))
+                            field-name)
+                          mode max-column))
+
 (defsubst make-full-mail-header (&optional number subject from date id
 					   references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
