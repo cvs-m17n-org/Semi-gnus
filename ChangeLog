@@ -1,3 +1,8 @@
+1998-11-02  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/message.el: Generate In-Reply-To header according to
+	draft-ietf-drums-msg-fmt-05.
+
 1998-10-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el: Add autoload setting for `pop3-fma'.
