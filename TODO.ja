@@ -11,22 +11,11 @@ To do list.
 *1998/10/02-2 設定ファイル群読み込み時の coding-system 問題
 
 ----------- 未対策 -----------
-    
+
 *1998/09/25-1 message/partial の結合機能の改良
 
 	Subject で summary を検索する代わりに、gnus-newsgroup-headers な
 	どの情報を使って、確実に自動結合できるようにする。
-
-*1998/10/02-1 Draft の編集・送信時の encode / decode 問題
-
-    編集中のメッセージを draft 内に保存する場合、通常のテキスト・デー
-    タとして保存しているが、これを network 形式で保存するように変更し、
-    再編集は decode してから行い、送信はそのままの形式で行うようにする。
-
-*1998/10/02-4 Offline 時に作成したメッセージの Message-Id 問題
-
-    Offline 時にメッセージを作成した場合、 Message-Id の形式が不当なも
-    のになってしまう。
 
 *1998/10/02-5 Edit article 時にメッセージを破壊する問題
 
@@ -60,6 +49,11 @@ To do list.
     .emacs に (setq gnus-plugged nil)
     .gnus.el に (gnus-agentize) として使用した方がよいのではないか?
 
+    もしくは
+
+    .emacs に (gnus-unplugged)
+    .gnus.el に (gnus-agentize) として利用した方が良いのではないか?
+
 *1998/10/02-11 message.el の独立した使用時の問題
 
     message.el は単独(Semi-gnusが起動されていない状態)で使用される可能
@@ -83,20 +77,14 @@ To do list.
 
     ここには、他ブランチで対策中または、対策済で gnus-V1_V2 枝に取り込
     まれていないものを含む。
-    
+
 *1998/10/02-3 message/partial 使用時の Message-Id 問題
 
     message/partial 形式でメッセージを送信した場合、全パートの
     Messge-Id が同じものになってしまう。
 
-    [対策]
-
-    現状では、各メッセージに Message-Id を付加しないという方法で対策済。
-
-    [案]
-
-    ただし、それぞれに Message-Id を付加する実装があれば、そちらに変更
-    する。(ichikawa 枝の実装?)
+    →ただし、それぞれに Message-Id を付加する実装があれば、そちらに変更
+      する。(pgnus-ichikawa branch … News と同じ修正)
 
 *1998/10/03-01 任意メッセージ cite 機能の実装方法変更 (keiichi branch)
 
@@ -111,14 +99,38 @@ To do list.
     Gnusでは C-c TABでそれぞれのbufferに対応するinfoのnodeを開くことが
     できるようになってるので日本語Infoも読めるようにする。(動的に選択
     できるようにする。)
-    
+
     [補足]
 
     Semi-gnusの成果のひとつである日本語Infoをそのまま読めるようにした
     い。gnus/gnus-jaは動的に選択できるようにしたい。
 
+*1998/10/16-1 Draft の編集・送信時の encode / decode 問題
+
+    編集中のメッセージを draft 内に保存する場合、通常のテキスト・デー
+    タとして保存しているが、これを network 形式で保存するように変更し、
+    再編集は decode してから行い、送信はそのままの形式で行うようにする。
+
+   → (pgus-ichikawa branch で修正済み)
+
+*1998/10/16-2 Offline 時に作成したメッセージの Message-Id 問題
+
+    Offline 時にメッセージを作成した場合、 Message-Id の形式が不当なも
+    のになってしまう。
+
+   → 現状では Message-ID を付けない事で対策(pgus-ichikawa branch で修
+      正済み)
+
 ----------- 対策済 -----------
-    
+
 *1998/10/02-8 User-Agent ヘッダー・フィールド採用
 
     1998/10/05 - 完了
+
+*1998/10/02-10 はじめて gnus-agent を使用したときの問題
+
+    1998/10/16 - 完了 (cf. semi-gnus-ja: 1482, 1536)
+
+*1998/10/03-2 Info (gnus/gnus-ja) の選択
+
+    1998/10/06 - 完了 (cf. semi-gnus-ja: 1452)

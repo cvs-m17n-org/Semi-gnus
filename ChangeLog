@@ -1,3 +1,16 @@
+1998-10-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Replace the default
+	value to `gnus-maybe-setup-default-charset'.
+	(gnus-maybe-setup-default-charset): New function. It is called
+	`message-maybe-setup-default-charset' at one time.
+
+	* lisp/message.el (message-maybe-setup-default-charset): Abolished.
+
+1998-10-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* TODO.ja: Update.
+
 1998-10-15  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-spec.el (gnus-update-format-specifications): Force
