@@ -1,3 +1,9 @@
+2000-11-07  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* texi/gnus-ja.texi: Do not use characters other than ascii ones
+	for direntries.
+	* texi/message-ja.texi: Ditto.
+
 2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/Makefile.in (install): Don't check for the file names.
