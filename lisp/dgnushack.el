@@ -295,10 +295,9 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 		   (while form
 		     (setq elem (pop form))
 		     (unless (memq (car-safe elem)
-				   '(\` backquote defcustom defgroup
-				     define-widget quote
-				     widget-convert-button
-				     widget-create widget-put))
+				   '(\` backquote
+				     defcustom defface defgroup
+				     define-widget quote))
 		       (while (consp elem)
 			 (push (car elem) form)
 			 (setq elem (cdr elem)))
