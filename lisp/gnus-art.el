@@ -691,7 +691,7 @@ See the manual for details."
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-buttonize-head 'highlight t)
 
-(defcustom gnus-treat-emphasize t
+(defcustom gnus-treat-emphasize nil
   "Emphasize text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -949,6 +949,7 @@ See the manual for details."
     (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
+    (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-hide-citation gnus-article-hide-citation)
     (gnus-treat-strip-list-identifiers gnus-article-hide-list-identifiers)
     (gnus-treat-strip-pgp gnus-article-hide-pgp)
@@ -957,7 +958,6 @@ See the manual for details."
     (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
-    (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-date-ut gnus-article-date-ut)
     (gnus-treat-date-local gnus-article-date-local)
     (gnus-treat-date-lapsed gnus-article-date-lapsed)
@@ -4547,19 +4547,24 @@ do the highlighting.  See the documentation for those functions."
 It does this by highlighting everything after
 `gnus-signature-separator' using `gnus-signature-face'."
   (interactive)
+  (when gnus-signature-face
+    (save-excursion
+      (set-buffer gnus-article-buffer)
+      (let ((buffer-read-only nil)
+	    (inhibit-point-motion-hooks t))
+	(save-restriction
+	  (when (gnus-article-narrow-to-signature)
+	    (gnus-overlay-put (gnus-make-overlay (point-min) (point-max))
+			      'face gnus-signature-face)))))))
+
+(defun gnus-article-buttonize-signature ()
+  "Add button to the signature."
+  (interactive)
   (save-excursion
     (set-buffer gnus-article-buffer)
     (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t)
-	  start end)
-      (when (save-restriction
-	      (when (gnus-article-narrow-to-signature)
-		(setq start (point-min)
-		      end (point-max))))
-	(when gnus-signature-face
-	  (gnus-overlay-put (gnus-make-overlay start end)
-			    'face gnus-signature-face))
-	(gnus-article-search-signature)
+	  (inhibit-point-motion-hooks t))
+      (when (gnus-article-search-signature)
 	(gnus-article-add-button (match-beginning 0) (match-end 0)
 				 'gnus-signature-toggle
 				 (set-marker (make-marker)
@@ -4987,7 +4992,7 @@ For example:
 	(entity (static-unless (featurep 'xemacs)
 		  (when (eq 'head condition)
 		    (get-text-property (point-min) 'mime-view-entity))))
-	val elem)
+	val elem buttonized)
     (gnus-run-hooks 'gnus-part-display-hook)
     (unless gnus-inhibit-treatment
       (while (setq elem (pop alist))
@@ -4997,6 +5002,12 @@ For example:
 		   (gnus-treat-predicate val)
 		   (or (not (get (car elem) 'highlight))
 		       highlightp))
+	  (when (and (not buttonized)
+		     (memq (car elem)
+			   '(gnus-treat-hide-signature
+			     gnus-treat-highlight-signature)))
+	    (gnus-article-buttonize-signature)
+	    (setq buttonized t))
 	  (save-restriction
 	    (funcall (cadr elem)))))
       ;; FSF Emacsen does not inherit the existing text properties
