@@ -1,3 +1,10 @@
+1999-10-06  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-read-move-group-name): Revert
+	to previous version until problem of respooling from
+	nnimap to nnml is solved.
+	(gnus-summary-move-article): Ditto.
+
 1999-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
