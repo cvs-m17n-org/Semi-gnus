@@ -225,7 +225,7 @@ included.  Organization, Lines and X-Mailer are optional."
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-mail-headers "^[GF]cc:\\|^Resent-Fcc:"
+(defcustom message-ignored-mail-headers "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:"
   "*Regexp of headers to be removed unconditionally before mailing."
   :group 'message-mail
   :group 'message-headers
@@ -341,7 +341,8 @@ The headers should be delimited by a line whose contents match the
 variable `mail-header-separator'.
 
 Legal values include `message-send-mail-with-sendmail' (the default),
-`message-send-mail-with-mh' and `message-send-mail-with-qmail'."
+`message-send-mail-with-mh', `message-send-mail-with-qmail' and
+`message-send-mail-with-smtp'."
   :type '(radio (function-item message-send-mail-with-sendmail)
 		(function-item message-send-mail-with-mh)
 		(function-item message-send-mail-with-qmail)
@@ -797,7 +798,7 @@ Defaults to `text-mode-abbrev-table'.")
        1 'message-separator-face)
       (,(concat "^[ \t]*"
 		"\\([" cite-prefix "]+[" cite-suffix "]*\\)?"
-		"[>|}].*")
+		"[:>|}].*")
        (0 'message-cited-text-face))))
   "Additional expressions to highlight in Message mode.")
 
@@ -1831,6 +1832,7 @@ The text will also be indented the normal way."
 (defun message-dont-send ()
   "Don't send the message you have been editing."
   (interactive)
+  (save-buffer)
   (let ((actions message-postpone-actions))
     (message-bury (current-buffer))
     (message-do-actions actions)))
@@ -1863,15 +1865,9 @@ Otherwise any failure is reported in a message back to
 the user from the mailer."
   (interactive "P")
   ;; Disabled test.
-  (when (if (and buffer-file-name
-		 nil)
-	    (y-or-n-p (format "Send buffer contents as %s message? "
-			      (if (message-mail-p)
-				  (if (message-news-p) "mail and news" "mail")
-				"news")))
-	  (or (buffer-modified-p)
-	      (message-check-element 'unchanged)
-	      (y-or-n-p "No changes in the buffer; really send? ")))
+  (when (or (buffer-modified-p)
+	    (message-check-element 'unchanged)
+	    (y-or-n-p "No changes in the buffer; really send? "))
     ;; Make it possible to undo the coming changes.
     (undo-boundary)
     (let ((inhibit-read-only t))
@@ -3177,7 +3173,7 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-fill-header (header value)
   (let ((begin (point))
-	(fill-column 78)
+	(fill-column 990)
 	(fill-prefix "\t"))
     (insert (capitalize (symbol-name header))
 	    ": "
