@@ -1,6 +1,6 @@
 1999-01-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* nnmail.el (nnmail-article-group): Don't infloop.
+	* lisp/nnmail.el (nnmail-article-group): Don't infloop.
 
 1999-01-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
