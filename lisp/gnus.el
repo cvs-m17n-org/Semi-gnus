@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Shoe-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.8"
+(defconst gnus-version-number "6.8.9"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -1483,6 +1483,12 @@ want."
 (defconst gnus-maintainer
   "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
   "The mail address of the Gnus maintainers.")
+
+(defconst semi-gnus-developers
+  "Semi-gnus Developers:
+ semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
+ semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
+  "The mail address of the Semi-gnus developers.")
 
 (defvar gnus-info-nodes
   '((gnus-group-mode "(gnus)The Group Buffer")
