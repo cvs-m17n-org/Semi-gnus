@@ -1,3 +1,8 @@
+1999-11-29  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-after-getting-new-news-hook): Don't use
+	the macro `when' in the arg of `defcustom'.  Use `if' instead.
+
 1999-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
