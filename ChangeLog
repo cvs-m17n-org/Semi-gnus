@@ -1,3 +1,7 @@
+1998-11-25  Hasebe Satoshi  <hasebe@mtgcb.telcom.oki.co.jp>
+
+	* lisp/gnus-util.el: Require RMAIL in a different way.
+
 1998-11-24  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el (pop3-fma-save-password-information): New
