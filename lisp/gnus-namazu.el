@@ -42,16 +42,17 @@
 ;;       % mknmz -a -h -O ~/News/namazu ~/Mail
 ;;
 ;; Furthermore, put these expressions to your ~/.gnus, to set the path
-;; of the index files to `gnus-namazu-index-directory'.
+;; of the index files to `gnus-namazu-index-directories'.
 ;;
-;;       (setq gnus-namazu-index-directory (expand-file-name "~/News/namazu"))
+;;    (setq gnus-namazu-index-directories
+;;          (list (expand-file-name "~/News/namazu")))
 
 ;; If you would like to use this module in Gnus (not T-gnus), put this
 ;; file into the lisp/ directory in the Gnus source tree and run `make
 ;; install'.  And then, put the following expressions into your ~/.gnus.
 ;;
-;;	 (require 'gnus-namazu)
-;;       (gnus-namazu-insinuate)
+;;    (require 'gnus-namazu)
+;;    (gnus-namazu-insinuate)
 
 
 ;;; Usage:
@@ -71,6 +72,11 @@
 (eval-and-compile
   (autoload 'regexp-opt "regexp-opt"))
 
+;; To suppress byte-compile warning.
+(eval-when-compile
+  (defvar nnml-directory)
+  (defvar nnmh-directory))
+
 (defgroup gnus-namazu nil
   "Search nnmh and nnml groups in Gnus with Namazu."
   :group 'namazu
@@ -82,12 +88,17 @@
   :type '(repeat gnus-select-method)
   :group 'gnus-namazu)
 
-(defcustom gnus-namazu-index-directory
-  (if (boundp 'nnir-namazu-index-directory)
-      (symbol-value 'nnir-namazu-index-directory)
-    (expand-file-name "namazu" gnus-directory))
+(defcustom gnus-namazu-index-directories
+  (list
+   (cond
+    ((boundp 'nnir-namazu-index-directory)
+     (symbol-value 'nnir-namazu-index-directory))
+    ((boundp 'gnus-namazu-index-directory)
+     (symbol-value 'gnus-namazu-index-directory))
+    (t
+     (expand-file-name "namazu" gnus-directory))))
   "*Index directory of Namazu."
-  :type 'directory
+  :type '(repeat directory)
   :group 'gnus-namazu)
 
 (defcustom gnus-namazu-command
@@ -115,7 +126,9 @@ options make any sense in this context."
   :group 'gnus-namazu)
 
 (defcustom gnus-namazu-coding-system
-  (if (>= emacs-major-version 20) 'euc-japan '*euc-japan*)
+  (if (memq system-type '(windows-nt OS/2 emx))
+      (if (>= emacs-major-version 20) 'shift_jis '*sjis*)
+    (if (>= emacs-major-version 20) 'euc-japan '*euc-japan*))
   "*Coding system for Namazu process."
   :type 'coding-system
   :group 'gnus-namazu)
@@ -138,17 +151,16 @@ options make any sense in this context."
 			      gnus-secondary-select-methods)))))
   (unless gnus-namazu-indexed-servers
     (error "%s" "Can't find either nnml backend or nnmh backend"))
-  (unless (and (stringp gnus-namazu-index-directory)
-	       (file-directory-p gnus-namazu-index-directory)
-	       (file-readable-p
-		(expand-file-name "NMZ.i" gnus-namazu-index-directory)))
-    (error "%s" "Can't find index.  Check `gnus-namazu-index-directory'")))
-
-
-;; To suppress byte-compile warning.
-(eval-when-compile
-  (defvar nnml-directory)
-  (defvar nnmh-directory))
+  (when (or (not gnus-namazu-index-directories)
+	    (memq nil (mapcar
+		       (lambda (dir)
+			 (and (stringp dir)
+			      (file-directory-p dir)
+			      (file-readable-p
+			       (expand-file-name "NMZ.i" dir))
+			      dir))
+		       gnus-namazu-index-directories)))
+    (error "%s" "Can't find index.  Check `gnus-namazu-index-directories'")))
 
 (defun gnus-namazu/server-directory (server)
   "Return the top directory of articles in SERVER."
@@ -159,21 +171,27 @@ options make any sense in this context."
 			      nnml-directory
 			    nnmh-directory)))))
 
-
 ;;; Functions to call Namazu.
+(defsubst gnus-namazu/normalize-results ()
+  (goto-char (point-min))
+  (while (not (eobp))
+    (cond
+     ((eq ?~ (char-after (point)))
+      (insert (expand-file-name (buffer-substring (gnus-point-at-bol)
+						  (gnus-point-at-eol))))
+      (delete-region (point) (gnus-point-at-eol)))
+     ((and (eq system-type 'windows-nt)
+	   (looking-at "/\\(.\\)|/"))
+      (replace-match "\\1:/")))
+    (forward-line 1)))
+
 (defsubst gnus-namazu/call-namazu (query)
   (let ((coding-system-for-read gnus-namazu-coding-system)
 	(coding-system-for-write gnus-namazu-coding-system)
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
-	(process-environment
-	 (copy-sequence process-environment)))
-    ;; Disable locale.
-    (dolist (env process-environment)
-      (when (string-match "\
-\\`\\(L\\(ANG\\|C_\\(ALL\\|CTYPE\\|COLLATE\\|TIME\\|NUMERIC\\|MONETARY\\|MESSAGES\\)\\)\\)=" env)
-	(setenv (match-string 1 env) nil)))
-    (setenv "LANG" "C")
+	(file-name-coding-system gnus-namazu-coding-system)
+	(pathname-coding-system gnus-namazu-coding-system))
     (apply 'call-process
 	   `(,gnus-namazu-command
 	     nil			; input from /dev/null
@@ -184,7 +202,7 @@ options make any sense in this context."
 	     "-l"			; use list format
 	     ,@gnus-namazu-additional-arguments
 	     ,query
-	     ,gnus-namazu-index-directory))))
+	     ,@gnus-namazu-index-directories))))
 
 (defun gnus-namazu/search (groups query)
   (with-temp-buffer
@@ -200,6 +218,7 @@ options make any sense in this context."
 		       gnus-namazu-indexed-servers))))
 	     (topdir-regexp
 	      (regexp-opt (mapcar 'car server-alist) t)))
+	(gnus-namazu/normalize-results)
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (let (server group file)
@@ -207,7 +226,7 @@ options make any sense in this context."
 		 (setq server (cdr (assoc (match-string 1) server-alist))
 		       file (buffer-substring-no-properties
 			     (match-end 0) (point-at-eol)))
-		 (string-match "/\\([0-9]+\\)$" file)
+		 (string-match "/\\([0-9]+\\)\\'" file)
 		 (progn
 		   (setq group (substring file 0 (match-beginning 0))
 			 file (match-string 1 file))
@@ -238,7 +257,7 @@ options make any sense in this context."
     (if current-prefix-arg
 	(list (gnus-read-group "Group: "))
       (if (and (gnus-ephemeral-group-p gnus-newsgroup-name)
-	       (string-match "^nnvirtual:namazu-search" gnus-newsgroup-name))
+	       (string-match "\\`nnvirtual:namazu-search" gnus-newsgroup-name))
 	  (cadr (assq 'gnus-namazu-target-groups
 		      (gnus-info-method (gnus-get-info gnus-newsgroup-name))))
 	(list gnus-newsgroup-name))))))
@@ -246,7 +265,7 @@ options make any sense in this context."
 (defun gnus-namazu/get-current-query ()
   (and (eq major-mode 'gnus-summary-mode)
        (gnus-ephemeral-group-p gnus-newsgroup-name)
-       (string-match "^nnvirtual:namazu-search" gnus-newsgroup-name)
+       (string-match "\\`nnvirtual:namazu-search" gnus-newsgroup-name)
        (cadr (assq 'gnus-namazu-current-query
 		   (gnus-info-method (gnus-get-info gnus-newsgroup-name))))))
 
@@ -375,7 +394,7 @@ options make any sense in this context."
 		  "Too many articles were retrieved.  How many articles (max %d): "
 		  hit)
 		 (cons (number-to-string gnus-large-newsgroup) 0)))))
-	(unless (string-match "^[ \t]*$" input)
+	(unless (string-match "\\`[ \t]*\\'" input)
 	  (setcdr (nthcdr (min (1- (string-to-number input)) hit) articles)
 		  nil))))
     articles))

@@ -1,3 +1,22 @@
+2001-12-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-index-directory): Abolished.
+	(gnus-namazu-index-directories): New option.
+	(gnus-namazu-coding-system): Changed the default value for Windows
+	and OS/2.
+	(gnus-namazu/setup): Follow the abolition of
+	`gnus-namazu-index-directory'.
+	(gnus-namazu/normalize-results): New inline function.
+	(gnus-namazu/call-namazu): Set `file-name-coding-system' and
+	`pathname-coding-system' to handle querys which include multibyte
+	characters.  Not reset locale environments.  Refer
+	`gnus-namazu-locale' and `gnus-namazu-index-directories'.
+	(gnus-namazu/search): Call `gnus-namazu/normalize-results'.
+	Modify a regular expression.
+	(gnus-namazu/get-target-groups): Modify a regular expression.
+	(gnus-namazu/get-current-query): Ditto.
+	(gnus-namazu/truncate-article-list): Ditto.
+
 2001-12-03  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/mm-url.el: Require `path-util'.
@@ -21,7 +40,7 @@
 	* lisp/message.el (message-strip-special-text-properties): Default
 	to t because of the new function `message-tamago-not-in-use-p'.
 
-2001-11-26  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-11-26  Kai Gro.AN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make-x.bat: Use parameter "/copy" rather than "copy" for increased
 	dwimishness for old-time DOS users.  From Frank Schmitt
@@ -92,7 +111,7 @@
 
 	* lisp/message.el (rfc822-goto-eoh): Remove.
 
-2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-10-19  Kai GroN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Frank Schmitt <ich@Frank-Schmitt.net>.
 
 	* make-x.bat: Use correct directory structure for XEmacs on Windows.
@@ -190,7 +209,7 @@
 
 	* configure.in: Generate texi/ps/Makefile.
 
-2001-09-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-09-21  Kai GroN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make.bat: Use parameter "/copy" rather than "copy" for increased
 	dwimishness for old-time DOS users.
