@@ -2,8 +2,9 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;;	   Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -120,7 +121,13 @@ the second with the current group name.")
 (defvar gnus-message-group-art nil)
 
 (defconst gnus-bug-message
-  "Sending a bug report to the Gnus Towers.
+  (format "Sending a bug report to the Gnus Towers.
+========================================
+
+This gnus is the %s%s.
+If you think the bug is a Semi-gnus bug, send a bug report to Semi-gnus
+Developers. (the addresses below are mailing list addresses)
+
 ========================================
 
 The buffer below is a mail buffer.  When you press `C-c C-c', it will
@@ -137,7 +144,11 @@ and include the backtrace in your bug report.
 Please describe the bug in annoying, painstaking detail.
 
 Thank you for your help in stamping out bugs.
-")
+"
+	  gnus-product-name
+	  (if (string= gnus-product-name "Semi-gnus")
+	      ""
+	    ", a modified version of Semi-gnus")))
 
 (eval-and-compile
   (autoload 'gnus-uu-post-news "gnus-uu" nil t)
@@ -168,8 +179,8 @@ Thank you for your help in stamping out bugs.
   "\M-c" gnus-summary-mail-crosspost-complaint
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
-  "Om" gnus-uu-digest-mail-forward
-  "Op" gnus-uu-digest-post-forward)
+  "Om" gnus-summary-mail-digest
+  "Op" gnus-summary-post-digest)
 
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
@@ -177,6 +188,11 @@ Thank you for your help in stamping out bugs.
   "r" gnus-summary-resend-message)
 
 ;;; Internal functions.
+
+(defun gnus-extended-version ()
+  "Stringified gnus version."
+  (interactive) ; ???
+  (concat gnus-product-name "/" gnus-version-number))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
@@ -194,6 +210,9 @@ Thank you for your help in stamping out bugs.
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-gcc)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-archive-gcc)
        (add-hook 'message-mode-hook 'gnus-configure-posting-styles)
+       (add-hook 'message-mode-hook
+		 (lambda ()
+		   (setq message-user-agent (gnus-extended-version))))
        (unwind-protect
 	   (progn
 	     ,@forms)
@@ -213,7 +232,6 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-user-agent (gnus-extended-version))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action
@@ -358,7 +376,7 @@ header line with the old Message-ID."
   (setq gnus-article-copy (gnus-get-buffer-create " *gnus article copy*"))
   (buffer-disable-undo gnus-article-copy)
   (let ((article-buffer (or article-buffer gnus-article-buffer))
-	end beg contents)
+	end beg)
     (if (not (and (get-buffer article-buffer)
 		  (gnus-buffer-exists-p article-buffer)))
 	(error "Can't find any article buffer")
@@ -525,61 +543,6 @@ If SILENT, don't prompt the user."
      (t gnus-select-method))))
 
 
-
-;; Dummy to avoid byte-compile warning.
-(defvar nnspool-rejected-article-hook)
-(defvar mule-version)
-(defvar xemacs-betaname)
-(defvar xemacs-codename)
-
-(defun gnus-extended-version ()
-  "Stringified Gnus version and Emacs version."
-  (interactive) ; ???
-  (concat
-   ;; Semi-gnus/VERSION
-   gnus-product-name "/" gnus-version-number
-   ;; EMACS/VERSION
-   (if (featurep 'xemacs)
-       ;; XEmacs
-       (concat
-	(format " XEmacs/%d.%d%s" emacs-major-version emacs-minor-version
-		(if (and (boundp 'xemacs-betaname) xemacs-betaname)
-		    (if (string-match "\\`(\\(.*\\))\\'" xemacs-betaname)
-			(match-string 1 xemacs-betaname)
-		      "")		; unknown format
-		  ""))			; not beta
-	(if (boundp 'xemacs-codename)
-	    (concat " (" xemacs-codename ")")
-	  "")				; no codename
-	)
-     ;; not XEmacs
-     (concat
-      (format " Emacs/%d.%d" emacs-major-version emacs-minor-version)
-      (if (and (boundp 'enable-multibyte-characters)
-	       enable-multibyte-characters)
-	  ;; Should return " (multibyte)" ?
-	  ""
-	" (unibyte)")
-      ))
-   ;; MULE[/VERSION]
-   (if (featurep 'mule)
-       (if (and (boundp 'mule-version) mule-version)
-	   (concat " MULE/" mule-version)
-	 " MULE")			; no mule-version
-     "")				; not Mule
-   ;; Meadow/VERSION
-   (if (featurep 'meadow)
-       (let ((version (Meadow-version)))
-	 (if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
-	     (concat " Meadow/"
-		     (match-string 1 version)
-		     (match-string 2 version)
-		     )
-	   "Meadow"))			; unknown format
-     "")				; not Meadow
-   ))
-
-
 ;;;
 ;;; Gnus Mail Functions
 ;;;
@@ -642,6 +605,39 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
 
+(defun gnus-summary-post-forward (&optional full-headers)
+  "Forward the current article to a newsgroup.
+If FULL-HEADERS (the prefix), include full headers when forwarding."
+  (interactive "P")
+  (gnus-summary-mail-forward full-headers t))
+
+;;; XXX: generate Subject and ``Topics''?
+(defun gnus-summary-mail-digest (&optional n post)
+  "Digests and forwards all articles in this series."
+  (interactive "P")
+  (let ((subject "Digested Articles")
+	(articles (gnus-summary-work-articles n))
+	article)
+    (gnus-setup-message 'forward
+      (gnus-summary-select-article)
+      (if post (message-news nil subject) (message-mail nil subject))
+      (message-goto-body)
+      (while (setq article (pop articles))
+	(save-window-excursion
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-select-article nil nil nil article)
+	  (gnus-summary-remove-process-mark article))
+	(insert (mime-make-tag "message" "rfc822") "\n")
+	(insert-buffer-substring gnus-original-article-buffer))
+      (push-mark)
+      (message-goto-body)
+      (mime-edit-enclose-digest-region (point)(mark t)))))
+
+(defun gnus-summary-post-digest (&optional n)
+  "Digest and forwards all articles in this series to a newsgroup."
+  (interactive "P")
+  (gnus-summary-mail-digest n t))
+ 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive "sResend message(s) to: \nP")
@@ -652,12 +648,6 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
       (save-excursion
 	(set-buffer gnus-original-article-buffer)
 	(message-resend address)))))
-
-(defun gnus-summary-post-forward (&optional full-headers)
-  "Forward the current article to a newsgroup.
-If FULL-HEADERS (the prefix), include full headers when forwarding."
-  (interactive "P")
-  (gnus-summary-mail-forward full-headers t))
 
 (defvar gnus-nastygram-message
   "The following article was inappropriately posted to %s.\n\n"
@@ -817,7 +807,8 @@ If YANK is non-nil, include the original article."
       (insert gnus-bug-message)
       (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
-    (message-setup `((To . ,gnus-maintainer) (Subject . "")))
+    (message-setup
+     `((To . ,gnus-maintainer) (Cc . ,semi-gnus-developers) (Subject . "")))
     (when gnus-bug-create-help-buffer
       (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))

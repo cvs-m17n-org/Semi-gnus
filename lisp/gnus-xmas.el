@@ -478,7 +478,28 @@ call it with the value of the `gnus-data' text property."
 	    'x-color-values
 	  (lambda (color)
 	    (color-instance-rgb-components
-	     (make-color-instance color))))))
+	     (make-color-instance color)))))
+
+  (when (featurep 'mule)
+    (defun gnus-tilde-pad-form (el pad-width)
+      "Return a form that pads EL to PAD-WIDTH."
+      (let ((pad (abs pad-width)))
+	(if (symbolp el)
+	    (if (< pad-width 0)
+		`(concat ,el (make-string
+			      (max 0 (- ,pad (string-width ,el))) ?\ ))
+	      `(concat (make-string
+			(max 0 (- ,pad (string-width ,el))) ?\ )
+		       ,el))
+	  (if (< pad-width 0)
+	      `(let ((val (eval ,el)))
+		 (concat val (make-string
+			      (max 0 (- ,pad (string-width val))) ?\ )))
+	    `(let ((val (eval ,el)))
+	       (concat (make-string
+			(max 0 (- ,pad (string-width val))) ?\ )
+		       val))))))
+    ))
 
 (defun gnus-xmas-redefine ()
   "Redefine lots of Gnus functions for XEmacs."
@@ -524,8 +545,91 @@ call it with the value of the `gnus-data' text property."
   (add-hook 'gnus-draft-mode-hook 'gnus-xmas-draft-menu-add)
   (add-hook 'gnus-summary-mode-hook
 	    'gnus-xmas-switch-horizontal-scrollbar-off)
-  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off))
+  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off)
 
+  (when (featurep 'mule)
+    (defun gnus-truncate-string (str end-column &optional start-column padding)
+      "Truncate string STR to end at column END-COLUMN.
+The optional 2nd arg START-COLUMN, if non-nil, specifies
+the starting column; that means to return the characters occupying
+columns START-COLUMN ... END-COLUMN of STR.
+
+The optional 3rd arg PADDING, if non-nil, specifies a padding character
+to add at the end of the result if STR doesn't reach column END-COLUMN,
+or if END-COLUMN comes in the middle of a character in STR.
+PADDING is also added at the beginning of the result
+if column START-COLUMN appears in the middle of a character in STR.
+
+If PADDING is nil, no padding is added in these cases, so
+the resulting string may be narrower than END-COLUMN.
+\[Emacs 20.3 emulating function]"
+      (or start-column
+	  (setq start-column 0))
+      (let ((len (length str))
+	    (idx 0)
+	    (column 0)
+	    (head-padding "") (tail-padding "")
+	    ch last-column last-idx from-idx)
+	(condition-case nil
+	    (while (< column start-column)
+	      (setq ch (aref str idx)
+		    column (+ column (char-width ch))
+		    idx (1+ idx)))
+	  (args-out-of-range (setq idx len)))
+	(if (< column start-column)
+	    (if padding (make-string end-column padding) "")
+	  (if (and padding (> column start-column))
+	      (setq head-padding
+		    (make-string (- column start-column) padding)))
+	  (setq from-idx idx)
+	  (if (< end-column column)
+	      (setq idx from-idx)
+	    (condition-case nil
+		(while (< column end-column)
+		  (setq last-column column
+			last-idx idx
+			ch (aref str idx)
+			column (+ column (char-width ch))
+			idx (1+ idx)))
+	      (args-out-of-range (setq idx len)))
+	    (if (> column end-column)
+		(setq column last-column idx last-idx))
+	    (if (and padding (< column end-column))
+		(setq tail-padding
+		      (make-string (- end-column column) padding))))
+	  (setq str (substring str from-idx idx))
+	  (if padding
+	      (concat head-padding str tail-padding)
+	    str))))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    (if (< max-width 0)
+		`(let ((width (string-width ,el)))
+		   (gnus-truncate-string ,el width (- width ,max)))
+	      `(gnus-truncate-string ,el ,max))
+	  (if (< max-width 0)
+	      `(let* ((val (eval ,el))
+		      (width (string-width val)))
+		 (gnus-truncate-string val width (- width ,max)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val ,max))))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    (if (< cut-width 0)
+		`(gnus-truncate-string ,el (- (string-width ,el) ,cut))
+	      `(gnus-truncate-string ,el (string-width ,el) ,cut))
+	  (if (< cut-width 0)
+	      `(let ((val (eval ,el)))
+		 (gnus-truncate-string val (- (string-width val) ,cut)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val (string-width val) ,cut))))))
+    ))
 
 ;;; XEmacs logo and toolbar.
 

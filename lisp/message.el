@@ -338,7 +338,7 @@ If t, use `message-user-organization-file'."
   :type 'string)
 
 (defcustom message-forward-end-separator
-  ""
+  (concat (mime-make-tag "text" "plain") "\n")
   "*Delimiter inserted after forwarded messages."
   :group 'message-forwarding
   :type 'string)
@@ -1917,6 +1917,7 @@ prefix, and don't delete any headers."
 	(insert "\n"))
       (funcall message-citation-line-function))))
 
+(defvar mail-citation-hook) ;Compiler directive
 (defun message-cite-original ()
   "Cite function in the standard Message manner."
   (if (and (boundp 'mail-citation-hook)
@@ -3344,23 +3345,7 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((pop-up-frames pop-up-frames)
-	(special-display-buffer-names special-display-buffer-names)
-	(special-display-regexps special-display-regexps)
-	(same-window-buffer-names same-window-buffer-names)
-	(same-window-regexps same-window-regexps)
-	(buffer (get-buffer name))
-	(cur (current-buffer)))
-    (if (or (and (featurep 'xemacs)
-		 (not (eq 'tty (device-type))))
-	    window-system)
-	(when message-use-multi-frames
-	  (setq pop-up-frames t
-		special-display-buffer-names nil
-		special-display-regexps nil
-		same-window-buffer-names nil
-		same-window-regexps nil))
-      (setq pop-up-frames nil))
+  (let ((buffer (get-buffer name)))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
@@ -3884,13 +3869,18 @@ that further discussion should take place only in "
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((cur (current-buffer)))
+  (let ((cur (current-buffer))
+	(sender (message-fetch-field "sender"))
+	(from (message-fetch-field "from")))
     ;; Check whether the user owns the article that is to be superseded.
-    (unless (string-equal
-	     (downcase (or (message-fetch-field "sender")
-			   (cadr (funcall gnus-extract-address-components
-					  (message-fetch-field "from")))))
-	     (downcase (message-make-sender)))
+    (unless (or (and sender
+		     (string-equal
+		      (downcase sender)
+		      (downcase (message-make-sender))))
+		(string-equal
+		 (downcase (cadr (mail-extract-address-components from)))
+		 (downcase (cadr (mail-extract-address-components
+				  (message-make-from))))))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
     (message-pop-to-buffer (message-buffer-name "supersede"))
@@ -3935,7 +3925,7 @@ header line with the old Message-ID."
     (goto-char (point-min))
     ;; strip Re/Fwd stuff off the beginning
     (while (re-search-forward
-	    "\\([Rr][Ee]:\\|[Ff][Ww][Dd]:\\|[Ff][Ww]:\\)" nil t)
+	    "\\([Rr][Ee]:\\|[Ff][Ww][Dd]\\(\\[[0-9]*\\]\\)?:\\|[Ff][Ww]:\\)" nil t)
       (replace-match ""))
 
     ;; and gnus-style forwards [foo@bar.com] subject
@@ -4261,7 +4251,6 @@ Do a `tab-to-tab-stop' if not in those headers."
 					    (point))))
 	 (hashtb (and (boundp 'gnus-active-hashtb) gnus-active-hashtb))
 	 (completions (all-completions string hashtb))
-	 (cur (current-buffer))
 	 comp)
     (delete-region b (point))
     (cond

@@ -75,10 +75,10 @@
 	 (set symbol nil))
      symbol))
 
-(defun gnus-string-width (str)
-  (length str))
-
-(defun gnus-truncate-string (str width)
+;; Avoid byte-compile warning.
+;; In Mule, this function will be redefined to `truncate-string',
+;; which takes 3 or 4 args.
+(defun gnus-truncate-string (str width &rest ignore)
   (substring str 0 width))
 
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
@@ -841,8 +841,7 @@ with potentially long computations."
 (defun gnus-map-function (funs arg)
   "Applies the result of the first function in FUNS to the second, and so on.
 ARG is passed to the first function."
-  (let ((myfuns funs)
-        (myarg arg))
+  (let ((myfuns funs))
     (while myfuns
       (setq arg (funcall (pop myfuns) arg)))
     arg))
@@ -943,6 +942,7 @@ ARG is passed to the first function."
 
 ;;; Various
 
+(defvar gnus-group-buffer) ; Compiler directive
 (defun gnus-alive-p ()
   "Say whether Gnus is running or not."
   (and (boundp 'gnus-group-buffer)

@@ -245,40 +245,32 @@
   "Return a form that limits EL to MAX-WIDTH."
   (let ((max (abs max-width)))
     (if (symbolp el)
-	`(if (> (gnus-string-width ,el) ,max)
+	`(if (> (length ,el) ,max)
 	     ,(if (< max-width 0)
-		  `(gnus-truncate-string
-		    ,el (gnus-string-width ,el)
-		    (- (gnus-string-width ,el) ,max))
-		`(gnus-truncate-string ,el ,max))
+		  `(substring ,el (- (length el) ,max))
+		`(substring ,el 0 ,max))
 	   ,el)
       `(let ((val (eval ,el)))
-	 (if (> (gnus-string-width val) ,max)
+	 (if (> (length val) ,max)
 	     ,(if (< max-width 0)
-		  `(gnus-truncate-string
-		    val (gnus-string-width val)
-		    (- (gnus-string-width val) ,max))
-		`(gnus-truncate-string val ,max))
+		  `(substring val (- (length val) ,max))
+		`(substring val 0 ,max))
 	   val)))))
 
 (defun gnus-tilde-cut-form (el cut-width)
   "Return a form that cuts CUT-WIDTH off of EL."
   (let ((cut (abs cut-width)))
     (if (symbolp el)
-	`(if (> (gnus-string-width ,el) ,cut)
+	`(if (> (length ,el) ,cut)
 	     ,(if (< cut-width 0)
-		  `(gnus-truncate-string
-		    ,el (- (gnus-string-width ,el) ,cut))
-		`(gnus-truncate-string
-		  ,el (- (gnus-string-width ,el) ,cut) ,cut))
+		  `(substring ,el 0 (- (length el) ,cut))
+		`(substring ,el ,cut))
 	   ,el)
       `(let ((val (eval ,el)))
-	 (if (> (gnus-string-width val) ,cut)
+	 (if (> (length val) ,cut)
 	     ,(if (< cut-width 0)
-		  `(gnus-truncate-string
-		    val (- (gnus-string-width val) ,cut))
-		`(gnus-truncate-string
-		  val (- (gnus-string-width val) ,cut) ,cut))
+		  `(substring val 0 (- (length val) ,cut))
+		`(substring val ,cut))
 	   val)))))
 
 (defun gnus-tilde-ignore-form (el ignore-value)
@@ -534,7 +526,7 @@ If PROPS, insert the result."
 
       (push (cons 'version emacs-version) gnus-format-specs)
       ;; Mark the .newsrc.eld file as "dirty".
-      (gnus-dribble-enter " ")
+      (gnus-dribble-touch)
       (gnus-message 7 "Compiling user specs...done"))))
 
 (defun gnus-set-format (type &optional insertable)

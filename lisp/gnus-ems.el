@@ -69,14 +69,6 @@
                 gnus-cite-overlay-list)
           (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
 
-(defun gnus-mule-max-width-function (el max-width)
-  (` (let* ((val (eval (, el)))
-	    (valstr (if (numberp val)
-			(int-to-string val) val)))
-       (if (> (length valstr) (, max-width))
-	   (truncate-string valstr (, max-width))
-	 valstr))))
-
 (defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
@@ -228,6 +220,50 @@
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
 
+    (if (fboundp 'truncate-string-to-width)
+	(fset 'gnus-truncate-string 'truncate-string-to-width)
+      (fset 'gnus-truncate-string 'truncate-string))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			,el (string-width ,el)
+			(- (string-width ,el) ,max))
+		    `(gnus-truncate-string ,el ,max))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			val (string-width val)
+			(- (string-width val) ,max))
+		    `(gnus-truncate-string val ,max))
+	       val)))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			,el (- (string-width ,el) ,cut))
+		    `(gnus-truncate-string
+		      ,el (- (string-width ,el) ,cut) ,cut))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			val (- (string-width val) ,cut))
+		    `(gnus-truncate-string
+		      val (- (string-width val) ,cut) ,cut))
+	       val)))))
+
     (when window-system
       (require 'path-util)
       (if (module-installed-p 'bitmap)
@@ -239,31 +275,9 @@
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (unless (and (fboundp 'set-buffer-multibyte)
-		 (subrp (symbol-function 'set-buffer-multibyte)))
-      ;; For Emacs 20.1 and 20.2
-      (defalias 'gnus-truncate-string 'truncate-string)
-      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
-      (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
+    (when (fboundp 'chars-in-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
 
-      (defun gnus-tilde-max-form (el max-width)
-	"Return a form that limits EL to MAX-WIDTH."
-	(let ((max (abs max-width)))
-	  (if (symbolp el)
-	      `(if (> (length ,el) ,max)
-		   ,(if (< max-width 0)
-			`(truncate-string
-			  ,el (string-width ,el) (- (string-width ,el) ,max))
-		      `(truncate-string ,el ,max))
-		 ,el)
-	    `(let ((val (eval ,el)))
-	       (if (> (length val) ,max)
-		   ,(if (< max-width 0)
-			`(truncate-string
-			  val (string-width val) (- (string-width val) ,max))
-		      `(truncate-string val ,max))
-		 val)))))
-      )
     )))
 
 (defun gnus-region-active-p ()
