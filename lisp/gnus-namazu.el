@@ -1,11 +1,9 @@
 ;;; gnus-namazu.el --- Search mail with Namazu.
 
-;; Copyright (C) 2000,2001 Tsuchiya Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000,2001,2002 Tsuchiya Masatoshi <tsuchiya@namazu.org>
 
 ;; Author: Tsuchiya Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
-
-;;; Copyright:
 
 ;; This file is a part of Semi-Gnus.
 
@@ -27,9 +25,10 @@
 
 ;;; Commentary:
 
-;; This file defines the command to search mails with Namazu and
-;; browse its results with Gnus.  This module requires the external
-;; command Namazu.  Visit the following page for more information.
+;; This file defines the command to search mails and persistent
+;; articles with Namazu and browse its results with Gnus.  This module
+;; requires the external command, Namazu.  Visit the following page
+;; for more information.
 ;;
 ;;     http://namazu.org/
 
@@ -39,7 +38,11 @@
 ;; Make index of articles with Namzu before using this module.
 ;;
 ;;	 % mkdir ~/News/namazu
-;;       % mknmz -a -h -O ~/News/namazu ~/Mail
+;;       % mknmz -a -h -O ~/News/namazu ~/Mail ~/News/cache
+;;
+;; The first command makes the directory for index files, and the
+;; second command generates index files of mails and persistent
+;; articles.
 ;;
 ;; When you put index files of Namazu into the directory other than
 ;; the default one (~/News/namazu), it is necessary to put this
@@ -332,36 +335,38 @@ generate possible group names from it."
 	     (topdir-regexp (regexp-opt (mapcar 'car server-alist)))
 	     (cache-regexp (concat
 			    (regexp-quote
-			     (file-name-as-directory gnus-cache-directory))
+			     (file-name-as-directory
+			      (expand-file-name gnus-cache-directory)))
 			    "\\(.*\\)/\\([0-9]+\\)$")))
 	(gnus-namazu/normalize-results)
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (let (server group file)
-	    (when (or
-		   (and (looking-at cache-regexp)
-			(setq file (match-string-no-properties 2)
-			      group (gnus-namazu/check-cache-group
-				     (match-string-no-properties 1))))
-		   (and (looking-at topdir-regexp)
-			;; Check a discovered file is managed by Gnus servers.
-			(setq file (buffer-substring-no-properties
-				    (match-end 0) (gnus-point-at-eol))
-			      server (cdr (assoc (match-string-no-properties 0)
-						 server-alist)))
-			;; Check validity of the file name.
-			(string-match "/\\([0-9]+\\)\\'" file)
-			(progn
-			  (setq group (substring file 0 (match-beginning 0))
-				file (match-string 1 file))
-			  (setq group
-				(gnus-namazu/group-prefixed-name
-				 (nnheader-replace-chars-in-string group ?/ ?.)
-				 server)))))
-	      (when (or (not groups)
-			(member group groups))
-		(push (gnus-namazu/make-article group (string-to-number file))
-		      articles))))
+	    (and (or
+		  ;; Check the discoverd file is the persistent article.
+		  (and (looking-at cache-regexp)
+		       (setq file (match-string-no-properties 2)
+			     group (gnus-namazu/check-cache-group
+				    (match-string-no-properties 1))))
+		  ;; Check the discovered file is managed by Gnus servers.
+		  (and (looking-at topdir-regexp)
+		       (setq file (buffer-substring-no-properties
+				   (match-end 0) (gnus-point-at-eol))
+			     server (cdr (assoc (match-string-no-properties 0)
+						server-alist)))
+		       ;; Check validity of the file name.
+		       (string-match "/\\([0-9]+\\)\\'" file)
+		       (progn
+			 (setq group (substring file 0 (match-beginning 0))
+			       file (match-string 1 file))
+			 (setq group
+			       (gnus-namazu/group-prefixed-name
+				(nnheader-replace-chars-in-string group ?/ ?.)
+				server)))))
+		 (or (not groups)
+		     (member group groups))
+		 (push (gnus-namazu/make-article group (string-to-number file))
+		       articles)))
 	  (forward-line 1))
 	(nreverse articles)))))
 
