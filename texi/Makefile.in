@@ -28,7 +28,7 @@ most: texi2latex.elc latex latexps
 
 .texi:
 	if test $(MAKEINFO) = no; then \
-	  $(EMACSINFO) -eval '(find-file "$<")' $(XINFOSWI); \
+	  $(EMACSINFO) $< $(XINFOSWI); \
 	else \
 	  makeinfo -o $* $<; \
 	fi
