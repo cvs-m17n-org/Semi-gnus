@@ -1,6 +1,6 @@
 ;;; hashcash.el --- Add hashcash payments to email
 
-;; $Revision: 1.1.2.2 $
+;; $Revision: 1.1.2.3 $
 ;; Copyright (C) 1997,2001 Paul E. Foley
 
 ;; Maintainer: Paul Foley <mycroft@actrix.gen.nz>
@@ -96,12 +96,14 @@ Prefix arg sets default payment temporarily."
     (save-excursion
       (save-restriction
 	(goto-char (point-min))
-	(search-forward mail-header-separator)
+	(re-search-forward (concat "^\\("
+				   (regexp-quote mail-header-separator)
+				   "\\)?$"))
 	(beginning-of-line)
 	(narrow-to-region (point-min) (point))
 	(let ((to (hashcash-strip-quoted-names (mail-fetch-field "To" nil t)))
 	      (cc (hashcash-strip-quoted-names (mail-fetch-field "Cc" nil t)))
-	      (ng (hashcash-strip-quoted-names 
+	      (ng (hashcash-strip-quoted-names
 		   (mail-fetch-field "Newsgroups" nil t))))
 	  (when to
 	    (setq addrlist (split-string to ",[ \t\n]*")))
@@ -109,8 +111,8 @@ Prefix arg sets default payment temporarily."
 	    (setq addrlist (nconc addrlist (split-string cc ",[ \t\n]*"))))
 	  (when ng
 	    (setq addrlist (nconc addrlist (split-string ng ",[ \t\n]*")))))
-	(when addrlist
-	  (mapc #'hashcash-insert-payment addrlist)))))
+	(while addrlist
+	  (hashcash-insert-payment (pop addrlist))))))
   t)
 
 (provide 'hashcash)

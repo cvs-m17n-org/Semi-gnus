@@ -2,6 +2,8 @@
 
 	* contrib/hashcash.el: Require `cl' when compiling.
 	(hashcash-strip-quoted-names): Replace `subseq' with `substring'.
+	(mail-add-payment): Allow no `mail-header-separator' in the buffer;
+	don't use `mapc'.
 
 2002-06-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
