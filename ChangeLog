@@ -1,3 +1,9 @@
+1999-02-22  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-art.el (gnus-narrow-to-page): Fix that "^L" do not work.
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
 1999-02-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/mail-source.el (mail-source-fetch-pop): Comment out

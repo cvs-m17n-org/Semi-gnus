@@ -3238,6 +3238,7 @@ If given a numerical ARG, move forward ARG pages."
   (save-excursion
     (set-buffer gnus-article-buffer)
     (goto-char (point-min))
+    (widen)
     ;; Remove any old next/prev buttons.
     (when (gnus-visual-p 'page-marker)
       (let ((buffer-read-only nil))
