@@ -118,9 +118,9 @@
 
 (static-cond
  ((fboundp 'point-at-bol)
-  (fset 'gnus-point-at-bol 'point-at-bol))
+  (defalias 'gnus-point-at-bol 'point-at-bol))
  ((fboundp 'line-beginning-position)
-  (fset 'gnus-point-at-bol 'line-beginning-position))
+  (defalias 'gnus-point-at-bol 'line-beginning-position))
  (t
   (defun gnus-point-at-bol ()
     "Return point at the beginning of the line."
@@ -132,9 +132,9 @@
   ))
 (static-cond
  ((fboundp 'point-at-eol)
-  (fset 'gnus-point-at-eol 'point-at-eol))
+  (defalias 'gnus-point-at-eol 'point-at-eol))
  ((fboundp 'line-end-position)
-  (fset 'gnus-point-at-eol 'line-end-position))
+  (defalias 'gnus-point-at-eol 'line-end-position))
  (t
   (defun gnus-point-at-eol ()
     "Return point at the end of the line."
