@@ -11664,6 +11664,11 @@ www.my-deja.com などのウェブメールサーバーからメールを取得します。
 @vindex mail-source-default-file-modes
 全ての新しいメールファイルはこのファイルモードになります。初期値
 は 384 です。
+
+@item mail-source-movemail-program
+@vindex mail-source-movemail-program
+非-nil だったら新着メールの取り込むためのプログラムの名前。nil だった
+ら @var{exec-directory} にある @code{movemail}。
 @end table
 
 @node Fetching Mail

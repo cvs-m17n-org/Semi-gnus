@@ -69,9 +69,9 @@ most: texi2latex.elc latex latexps
 	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
 
-dvi: tmps gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
+dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
 
-pdf: tmps gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
+pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
 
 .texi.dvi :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
