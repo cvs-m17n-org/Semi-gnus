@@ -1,3 +1,32 @@
+1999-04-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-vm.el (gnus-summary-save-in-vm): To read the name of
+	FOLDER in the way of VM; give the value of `gnus-current-article'
+	to the function `gnus-summary-select-article' if it is called non
+	interactively.
+	(gnus-summary-save-article-vm): Accept the optional 2nd arg FOLDER.
+	If it is called interactively the name of FOLDER is read from the
+	minibuffer; bind `mime-display-header-hook',
+	`mime-display-text/plain-hook', `mime-text-decode-hook',
+	`mime-view-define-keymap-hook' and `mime-view-mode-hook' to nil
+	when the function `gnus-summary-save-article' is called.
+	(gnus-summary-save-article-vm-count,
+	gnus-summary-save-article-vm-folder): New internal variables.
+	(gnus-vm-make-folder): Bind `mime-display-header-hook',
+	`mime-display-text/plain-hook', `mime-text-decode-hook',
+	`mime-view-define-keymap-hook' and `mime-view-mode-hook' to nil
+	when the function `vm-mode' is called.
+	(vm-use-toolbar, vm-primary-inbox, vm-folder-history,
+	vm-folder-directory): Define variables for avoiding byte compile
+	warning.
+	(gnus-vm-inhibit-window-system): Abolish variable; don't require
+	`win-vm'.
+	(TopLevel): Don't autoload "vm" for the functions
+	`vm-forward-message', `vm-reply' or `vm-mail'; don't require
+	`sendmail', `message', `gnus' or `gnus-msg' but `gnus-art'.
+
 1999-04-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
