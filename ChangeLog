@@ -1,3 +1,21 @@
+1999-06-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/message.el (message-pop-to-buffer-1): New macro.
+	(message-pop-to-buffer): Use it.
+	(message-delete-frame): Use `static-if'.
+	(TopLevel): Autoload "mu-cite".
+	(message-cite-function): Add `mu-cite/cite-original'.
+
+	* lisp/dgnushack.el (TopLevel): Bind functions defined by
+	`defun-maybe' for all Emacsen.
+
+	* lisp/Makefile.in (clean): Fix typo.
+
+	* Makefile.in (elclean): Remove auto-autoloads.el and
+	custom-load.el as well.
+
 1999-06-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.04.
