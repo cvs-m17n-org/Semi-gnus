@@ -12753,7 +12753,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 (setq nnmail-expiry-wait-function
       (lambda (group)
 	(cond ((string-equal group "wl") 7)
-	      ((string-group group "nnshimbun+airs:wl" 'never)))))
+	      ((string-equal group "nnshimbun+airs:wl" 'never)))))
 @end lisp
 
 これは、例えば @code{nnml} や @code{nnmh} で受信している Wanderlust メー
