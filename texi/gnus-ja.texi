@@ -563,7 +563,8 @@ The Summary Buffer
 * Mail Group Commands::        $B$$$/$D$+$NL?Na$O%a!<%k%0%k!<%W$@$1$G;H$&(B
                                $B$3$H$,$G$-$k(B
 * Various Summary Stuff::      $BB>$N$I$N>l=j$K$b9g$o$J$+$C$?$b$N(B
-* Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k(B
+* Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k!"(B
+                               $B$^$?$O8=:_$N%0%k!<%W$r:F$SA*Br$9$k(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
 @c * Security::                    Decrypt and Verify.
@@ -4333,6 +4334,9 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW(B
 
 $B0J2<$N0\F0%3%^%s%I$O$I$l$b?tCM@\F,0z?t$r<u$1IU$1$:!"5-;v$rA*Br$7!"I=<($7(B
 $B$^$9!#(B
+
+$B?7$7$$5-;v$r<h$j9~$s$@$j!"%0%k!<%W$r:FI=<($7$?$$$H$-$O(B @ref{Exiting the
+Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 
 @table @kbd
 @item SPACE
@@ -15769,7 +15773,10 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 
 @vindex message-sent-hook
 $B$3$l$iFs$D$N4X?t$O!"4pK\E*$K$O$I$A$i$b(B @code{message-sent-hook} $B$N$h$&$J(B
-$B%U%C%/$NCf$G;H$&$?$a$N$b$N$G$9!#(B
+$B%U%C%/$NCf$G;H$&$?$a$N$b$N$G$9!#Nc$($P$3$N$h$&$K(B:
+@lisp
+(add-hook 'message-sent-hook 'gnus-score-followup-thread)
+@end lisp
 
 $B$"$J$?$N<+J,$N(B @code{Message-ID} $B$r$8$C$/$j$HD/$a$F$_$k$H!"$O$8$a$NFs!"(B
 $B;0J8;z$O>o$KF1$8$G$"$k$3$H$K5$$,$D$/$G$7$g$&!#0J2<$NFs$D$O;d$N$b$N$G$9!#(B
@@ -15785,7 +15792,7 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 
 @lisp
 ("references"
- ("<x6[0-9a-z]+\\.fsf\\(_-_\\)?@@.*eyesore.no>"
+ ("<x6[0-9a-z]+\\.fsf\\(_-_\\)?@@.*eyesore\\.no>"
   1000 nil r))
 @end lisp
 
@@ -18341,12 +18348,14 @@ but at the common table.@*
 $B$K(B (99 $B%j%j!<%9$H(B CVS $B%j%]%8%H%j$G$N:n6H$N8e(B) ``Gnus 5.8'' $B$H$7$F%j%j!<(B
 $B%9$5$l$^$7$?!#(B
 
+2000$BG/(B10$B7n(B26$BF|$K(B Oort Gnus $B$,3+;O$5$l$^$7$?!#(B
+
 $B$b$7@\F,<-$r;}$C$?HG$N(B Gnus -- ``(ding) Gnus'', ``September Gnus'',
-``Red Gnus'', ``Quassia Gnus'' -- $B$K=P2q$C$F$b!":.Mp$7$J$$$G$/$@$5$$!#$"(B
-$B$J$?$,62$,$C$F$$$k;v$rCN$i$l$F$O$$$1$^$;$s!#8e$m$K2<$,$j$J$5$$!#$f$C$/$j(B
-$B$H!#B>$K2?$r$7$F$b!"Av$C$F$O$$$1$^$;$s!#$=$l$,FO$+$/$J$k$^$G!"@E$+$KJb$-(B
-$B5n$j$J$5$$!#E,@Z$K%j%j!<%9$5$l$?HG$N(B Gnus $B$r8+$D$1$F!"Be$o$j$K$=$l$K4s$j(B
-$BE:$C$F2<$5$$!#(B
+``Red Gnus'', ``Quassia Gnus'', ``Pterodactyl Gnus'', ``Oort Gnus''
+-- $B$K=P2q$C$F$b!":.Mp$7$J$$$G$/$@$5$$!#$"$J$?$,62$,$C$F$$$k;v$rCN$i$l$F(B
+$B$O$$$1$^$;$s!#8e$m$K2<$,$j$J$5$$!#$f$C$/$j$H!#B>$K2?$r$7$F$b!"Av$C$F$O$$(B
+$B$1$^$;$s!#$=$l$,FO$+$/$J$k$^$G!"@E$+$KJb$-5n$j$J$5$$!#E,@Z$K%j%j!<%9$5$l(B
+$B$?HG$N(B Gnus $B$r8+$D$1$F!"Be$o$j$K$=$l$K4s$jE:$C$F2<$5$$!#(B
 
 @node Other Gnus Versions
 @subsection $BB>$N(B gnus $B$N%P!<%8%g%s(B
