@@ -458,6 +458,18 @@ given, the return value will not contain the last newline."
 
   (defalias 'mail-header-field-value 'std11-field-value))
 
+;; ietf-drums stuff.
+(unless (featurep 'ietf-drums)
+  ;; Should keep track of `ietf-drums-unfold-fws' in ietf-drums.el.
+  (defun nnheader-unfold-fws ()
+    "Unfold folding white space in the current buffer."
+    (goto-char (point-min))
+    (while (re-search-forward "[ \t]*\n[ \t]+" nil t)
+      (replace-match " " t t))
+    (goto-char (point-min)))
+
+  (defalias 'ietf-drums-unfold-fws 'nnheader-unfold-fws))
+
 ;;; Header access macros.
 
 ;; These macros may look very much like the ones in GNUS 4.1.  They
