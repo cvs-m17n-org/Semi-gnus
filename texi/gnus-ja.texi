@@ -19200,8 +19200,7 @@ gnus は通常ほとんどのバッファで、ポイントを各行のあらかじめ決められた場
 それを救済するために、あなた
 は @code{gnus-use-correct-string-widths} を @code{t} に設定することがで
 きます。これはバッファの生成を遅くしますが、より美しい結果を得ることがで
-きるでしょう。既定値は XEmacs では @code{t} ですが Emacs で
-は @code{nil} です。
+きるでしょう。既定値は XEmacs では @code{t} です。
 
 @node Window Layout
 @section ウィンドウの配置
