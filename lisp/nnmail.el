@@ -252,6 +252,14 @@ to be moved to."
   :group 'nnmail-retrieve
   :type 'string)
 
+(defcustom nnmail-movemail-program-apop-option "-A"
+  "*APOP option parameter for a command to be executed to move mail
+ from the inbox.
+The default is \"-A\"."
+  :group 'nnmail-files
+  :group 'nnmail-retrieve
+  :type 'string)
+
 (defcustom nnmail-pop-password-required nil
   "*Non-nil if a password is required when reading mail using POP."
   :group 'nnmail-retrieve
@@ -631,7 +639,7 @@ If this variable is `t', do not use password cache.")
 			(list (cons inbox password)))))
 
 ;; Function rewritten from rmail.el.
-(defun nnmail-move-inbox (inbox)
+(defun nnmail-move-inbox (inbox &optional inbox-options)
   "Move INBOX to `nnmail-crash-box'."
   (if (not (file-writable-p nnmail-crash-box))
       (gnus-error 1 "Can't write to crash box %s.  Not moving mail"
@@ -655,9 +663,9 @@ If this variable is `t', do not use password cache.")
 	  nil
 	(if popmail
 	    (progn
-	      (when (and nnmail-pop-password
-			 (not nnmail-internal-password-cache))
-		(setq nnmail-internal-password-cache nnmail-pop-password))
+	      (when (and (not nnmail-internal-password-cache)
+			 nnmail-pop-password)
+		(nnmail-set-password nil nnmail-pop-password))
 	      (setq nnmail-internal-password (nnmail-get-password inbox))
 	      (nnheader-message 5 "Getting mail from the post office %s..."
 				inbox))
@@ -687,32 +695,16 @@ If this variable is `t', do not use password cache.")
 		(if (nnheader-functionp nnmail-movemail-program)
 		    (condition-case err
 			(progn
-			  (funcall nnmail-movemail-program inbox tofile)
+			  (funcall nnmail-movemail-program
+				   inbox tofile inbox-options)
 			  (setq result 0))
 		      (error
 		       (save-excursion
 			 (set-buffer errors)
 			 (insert (prin1-to-string err))
 			 (setq result 255))))
-		  (let ((default-directory "/")
-			(inbox-info (nnmail-parse-spool-file-name inbox)))
-		    (and popmail
-			 (setenv "MAILHOST"
-				 (nnmail-spool-mailhost inbox-info)))
-		    (setq result
-			  (apply
-			   'call-process
-			   (append
-			    (list
-			     (expand-file-name
-			      nnmail-movemail-program exec-directory)
-			     nil errors nil 
-			     (concat (if popmail "po:" "")
-				     (nnmail-spool-maildrop inbox-info))
-			     tofile)
-			    (and popmail
-				 nnmail-internal-password
-				 (list nnmail-internal-password)))))))
+		  (setq result (nnmail-exec-movemail-program
+				inbox tofile popmail errors inbox-options))))
 		(push inbox nnmail-moved-inboxes)
 		(if (and (not (buffer-modified-p errors))
 			 (zerop result))
@@ -746,8 +738,7 @@ If this variable is `t', do not use password cache.")
 			     (format "movemail: %s (%d return).  Continue? "
 				     (buffer-string) result))
 			     (error "%s" (buffer-string)))
-		    (setq tofile nil)))
-		))))
+		    (setq tofile nil))))))
 	(nnmail-set-password inbox nnmail-internal-password)
 	(nnheader-message 5 "Getting mail from %s...done" inbox)
 	(and errors
@@ -1658,7 +1649,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
   "Read new incoming mail."
   (let* ((spools (nnmail-get-spool-files group))
 	 (group-in group)
-	 nnmail-current-spool incoming incomings spool)
+	 nnmail-current-spool incoming incomings spool spool-options)
     (when (and (nnmail-get-value "%s-get-new-mail" method)
 	       nnmail-spool-file)
       ;; We first activate all the groups.
@@ -1670,7 +1661,10 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       ;; The we go through all the existing spool files and split the
       ;; mail from each.
       (while spools
-	(setq spool (pop spools))
+	(if (listp (setq spool (pop spools)))
+	    (setq spool-options (cdr spool)
+		  setq spool (car spool))
+	  (setq spool-options nil))
 	;; We read each spool file if either the spool is a POP-mail
 	;; spool, or the file exists.  We can't check for the
 	;; existence of POPped mail.
@@ -1678,7 +1672,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 		  (and (file-exists-p (file-truename spool))
 		       (> (nnheader-file-size (file-truename spool)) 0)))
 	  (nnheader-message 3 "%s: Reading incoming mail..." method)
-	  (when (and (nnmail-move-inbox spool)
+	  (when (and (nnmail-move-inbox spool spool-options)
 		     (file-exists-p nnmail-crash-box))
 	    (setq nnmail-current-spool spool)
 	    ;; There is new mail.  We first find out if all this mail
@@ -1873,15 +1867,50 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      his nil)))
     found))
 
+(defun nnmail-exec-movemail-program (inbox tofile popmail err-buf
+					   inbox-options)
+  (let ((default-directory "/")
+	(inbox-info (nnmail-parse-spool-file-name inbox))
+	args)
+    (if popmail
+	(let ((auth-scheme (car (cdr (memq :auth-scheme inbox-options)))))
+	  (setenv "MAILHOST" (nnmail-spool-mailhost inbox-info))
+	  (when nnmail-internal-password
+	    (push nnmail-internal-password args))
+	  (push tofile args)
+	  (push (concat "po:" (nnmail-spool-maildrop inbox-info)) args)
+	  (cond
+	   ((or (not auth-scheme) (eq auth-scheme 'pass)))
+	   ((eq auth-scheme 'apop)
+	    (push nnmail-movemail-program-apop-option args))
+	   (t (error "Invalid POP3 authentication scheme."))))
+      (setq args (list (nnmail-spool-maildrop inbox-info)
+		       tofile)))
+    (apply
+     'call-process
+     (expand-file-name nnmail-movemail-program exec-directory)
+     nil err-buf nil
+     args)))
+
 (eval-and-compile
   (autoload 'pop3-movemail "pop3"))
+(eval-when-compile
+  (require 'pop3))
 
-(defun nnmail-pop3-movemail (inbox crashbox)
+(defun nnmail-pop3-movemail (inbox crashbox options)
   "Function to move mail from INBOX on a pop3 server to file CRASHBOX."
   (let* ((inbox-info (nnmail-parse-spool-file-name inbox))
-	 (pop3-maildrop (nnmail-spool-maildrop inbox-info))
-	 (pop3-mailhost (nnmail-spool-mailhost inbox-info))
-	 (pop3-password nnmail-internal-password))
+	 (pop3-maildrop (or (nnmail-spool-maildrop inbox-info)
+			    pop3-maildrop))
+	 (pop3-password (or nnmail-internal-password
+			    pop3-password))
+	 (pop3-authentication-scheme
+	  (or (car (cdr (assq :auth-scheme options)))
+	      pop3-authentication-scheme))
+	 (pop3-mailhost (or (nnmail-spool-mailhost inbox-info)
+			    pop3-mailhost))
+	 (pop3-port (or (car (cdr (assq :port options)))
+			pop3-port)))
     (pop3-movemail crashbox)))
 
 (defun nnmail-within-headers-p ()
