@@ -583,6 +583,7 @@ simple manner.")
     "<" beginning-of-buffer
     ">" end-of-buffer
     "\C-c\C-b" gnus-bug
+    "\C-c\C-n" gnus-namazu-search
     "\C-c\C-s" gnus-group-sort-groups
     "t" gnus-topic-mode
     "\C-c\M-g" gnus-activate-all-groups
@@ -614,7 +615,6 @@ simple manner.")
     "D" gnus-group-enter-directory
     "f" gnus-group-make-doc-group
     "G" gnus-group-make-nnir-group
-    "S" gnus-group-make-shimbun-group
     "w" gnus-group-make-web-group
     "r" gnus-group-rename-group
     "c" gnus-group-customize

@@ -1,3 +1,15 @@
+2001-09-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el: New file.
+
+	* lisp/gnus.el (top): Add autoload of `gnus-namazu-search'.
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Define "\C-c\C-n" as
+	`gnus-namazu-search'.
+
+	* lisp/gnus-group.el (gnus-group-mode-map): Define "\C-c\C-n" as
+	`gnus-namazu-search', and removed `gnus-group-make-shimbun-group'.
+
 2001-09-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-xmas.el (gnus-tilde-pad-form): Abolished.  Use the
