@@ -1,5 +1,8 @@
 1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/message.el (message-locale-detect): Fix, when no locale
+	detected.
+
 	* Nana-gnus: Version 6.12.6 released.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.6.
