@@ -1,3 +1,10 @@
+2001-10-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nndoc.el (nndoc-oe-dbx-type-p): Use `string-as-multibyte'
+	instead of `mm-string-as-multibyte'.
+	(nndoc-possibly-change-buffer): Use `nnheader-insert-file-contents'
+	instead of `mm-insert-file-contents'.
+
 2001-09-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
