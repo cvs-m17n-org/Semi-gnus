@@ -523,7 +523,7 @@ COMMAND must be a lisp expression or a string representing a key sequence."
 	  (if (listp kill-list)
 	      ;; It is a list.
 	      (if (not (consp (cdr kill-list)))
-		  ;; It's on the form (regexp . date).
+		  ;; It's of the form (regexp . date).
 		  (if (zerop (gnus-execute field (car kill-list)
 					   command nil (not all)))
 		      (when (> (days-between date (cdr kill-list))
@@ -685,6 +685,7 @@ Usage: emacs -batch -l ~/.emacs -l gnus -f gnus-batch-score"
 		   (mapconcat 'identity command-line-args-left " "))))
 	 (gnus-expert-user t)
 	 (nnmail-spool-file nil)
+	 (mail-sources nil)
 	 (gnus-use-dribble-file nil)
 	 (gnus-batch-mode t)
 	 info group newsrc entry

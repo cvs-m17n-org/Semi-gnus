@@ -47,7 +47,8 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 主なタグは以下のようになっています:
 
-    t-gnus-6_12		最新の T-gnus の安定版に割り当てられます。
+    t-gnus-6_15-quimby	最新の T-gnus に割り当てられ、開発と Oort Gnus
+			との同期を行ないます。
 
     t-gnus-6_14		最新の T-gnus の開発版に割り当てられます。
 

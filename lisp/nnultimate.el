@@ -1,4 +1,4 @@
-;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system
+;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system -*- coding: iso-latin-1 -*-
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -57,6 +57,8 @@
 (defvoo nnultimate-groups nil)
 (defvoo nnultimate-headers nil)
 (defvoo nnultimate-articles nil)
+(defvar nnultimate-table-regexp 
+  "postings.*editpost\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio")
 
 ;;; Interface functions
 
@@ -75,6 +77,8 @@
 	   (old-total (or (nth 6 entry) 1))
 	   (furl "forumdisplay.cgi?action=topics&number=%d&DaysPrune=1000")
 	   (furls (list (concat nnultimate-address (format furl sid))))
+	   (nnultimate-table-regexp
+	    "postings.*editpost\\|forumdisplay\\|getbio")
 	   headers article subject score from date lines parent point
 	   contents tinfo fetchers map elem a href garticles topic old-max
 	   inc datel table string current-page total-contents pages
@@ -162,7 +166,7 @@
 	      (setq date (substring (car datel) (match-end 0))
 		    datel nil))
 	    (pop datel))
-	  (setq date (delete "" (split-string date "[- \n\t\r †††]")))
+	  (setq date (delete "" (split-string date "[- \n\t\r Å†Å†Å†]")))
 	  (if (or (member "AM" date)
 		  (member "PM" date))
 	      (setq date (format "%s %s %s %s"
@@ -215,6 +219,10 @@
       (nnheader-insert
        "211 %d %d %d %s\n" (cadr elem) 1 (cadr elem)
        (prin1-to-string group))))))
+
+(deffoo nnultimate-request-close ()
+  (setq nnultimate-groups-alist nil
+	nnultimate-groups nil))
 
 (deffoo nnultimate-request-article (article &optional group server buffer)
   (nnultimate-possibly-change-server group server)
@@ -327,7 +335,7 @@
       ;; the group is entered, there's 2 new articles in topic one
       ;; and 1 in topic three.  Then Gnus article number 8-9 be 5-6
       ;; in topic one and 10 will be the 2 in topic three.
-      (dolist (row (reverse forum-contents))
+      (dolist (row (nreverse forum-contents))
 	(setq row (nth 2 row))
 	(when (setq a (nnweb-parse-find 'a row))
 	  (setq subject (car (last (nnweb-text a)))
@@ -435,9 +443,7 @@
 		     (nth 2 parse))))
     (let ((href (cdr (assq 'href (nth 1 (nnweb-parse-find 'a parse 20)))))
 	  case-fold-search)
-      (when (and href (string-match
-		       "postings\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio"
-		       href))
+      (when (and href (string-match nnultimate-table-regexp href))
 	t))))
 
 (provide 'nnultimate)

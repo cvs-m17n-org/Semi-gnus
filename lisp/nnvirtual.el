@@ -368,8 +368,16 @@ component group will show up when you enter the virtual group.")
   (nnvirtual-possibly-change-server server)
   (setq nnvirtual-component-groups
 	(delete (nnvirtual-current-group) nnvirtual-component-groups))
-  (dolist (group nnvirtual-component-groups)
-    (gnus-group-expire-articles-1 group)))
+  (let (unexpired)
+    (dolist (group nnvirtual-component-groups)
+      (setq unexpired (nconc unexpired
+			     (mapcar
+			      #'(lambda (article)
+				  (nnvirtual-reverse-map-article
+				   group article))
+			      (gnus-uncompress-range
+			       (gnus-group-expire-articles-1 group))))))
+    (sort unexpired '<)))
 
 
 ;;; Internal functions.

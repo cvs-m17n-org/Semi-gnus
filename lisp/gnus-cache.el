@@ -650,6 +650,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (let ((gnus-mark-article-hook nil)
 	(gnus-expert-user t)
 	(nnmail-spool-file nil)
+	(mail-sources nil)
 	(gnus-use-dribble-file nil)
 	(gnus-novice-user nil)
 	(gnus-large-newsgroup nil))
@@ -690,9 +691,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (gnus-write-active-file-as-coding-system
-     gnus-cache-write-file-coding-system
-     gnus-cache-active-file gnus-cache-active-hashtb t)
+    (gnus-write-active-file gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 
@@ -762,7 +761,8 @@ If LOW, update the lower bound instead."
   (interactive (list gnus-cache-directory))
   (gnus-cache-close)
   (let ((nnml-generate-active-function 'identity))
-    (nnml-generate-nov-databases-1 dir)))
+    (nnml-generate-nov-databases-1 dir))
+  (gnus-cache-open))
 
 (defun gnus-cache-move-cache (dir)
   "Move the cache tree to somewhere else."

@@ -64,7 +64,7 @@
     (set-extent-property annot 'duplicable t)))
 
 (eval-and-compile
-  (if (string-match "XEmacs" (emacs-version))
+  (if (featurep 'xemacs)
       (defalias 'mm-inline-image 'mm-inline-image-xemacs)
     (defalias 'mm-inline-image 'mm-inline-image-emacs)))
 
@@ -113,10 +113,15 @@
 	    (save-window-excursion
 	      (save-restriction
 		(let ((w3-strict-width width)
+		      ;; Don't let w3 set the global version of
+		      ;; this variable.
+		      (fill-column fill-column)
 		      (url-standalone-mode t))
 		  (condition-case var
 		      (w3-region (point-min) (point-max))
-		    (error)))))
+		    (error
+		     (message
+		      "Error while rendering html; showing as text/plain"))))))
 	    (mm-handle-set-undisplayer
 	     handle
 	     `(lambda ()
@@ -151,8 +156,14 @@
       (let ((b (point))
 	    (charset (mail-content-type-get
 		      (mm-handle-type handle) 'charset)))
-	(if (eq charset 'gnus-decoded)
-	    (mm-insert-part handle)
+	(if (or (eq charset 'gnus-decoded)
+		;; This is probably not entirely correct, but
+		;; makes rfc822 parts with embedded multiparts work. 
+		(eq mail-parse-charset 'gnus-decoded))
+	    (save-restriction
+	      (narrow-to-region (point) (point))
+	      (mm-insert-part handle)
+	      (goto-char (point-max)))
 	  (insert (mm-decode-string (mm-get-part handle) charset)))
 	(when (and (equal type "plain")
 		   (equal (cdr (assoc 'format (mm-handle-type handle)))
@@ -245,20 +256,19 @@
 	 handle
 	 `(lambda ()
 	    (let (buffer-read-only)
-	      (condition-case nil
+	      (if (fboundp 'remove-specifier)
 		  ;; This is only valid on XEmacs.
 		  (mapcar (lambda (prop)
 			    (remove-specifier
 			     (face-property 'default prop) (current-buffer)))
-			  '(background background-pixmap foreground))
-		(error nil))
+			  '(background background-pixmap foreground)))
 	      (delete-region ,(point-min-marker) ,(point-max-marker)))))))))
 
-(defun mm-display-patch-inline (handle)
+(defun mm-display-inline-fontify (handle mode)
   (let (text)
     (with-temp-buffer
       (mm-insert-part handle)
-      (diff-mode)
+      (funcall mode)
       (font-lock-fontify-buffer)
       (when (fboundp 'extent-list)
 	(map-extents (lambda (ext ignored)
@@ -267,6 +277,12 @@
 		     nil nil nil nil nil 'text-prop))
       (setq text (buffer-string)))
     (mm-insert-inline handle text)))
+
+(defun mm-display-patch-inline (handle)
+  (mm-display-inline-fontify handle 'diff-mode))
+
+(defun mm-display-elisp-inline (handle)
+  (mm-display-inline-fontify handle 'emacs-lisp-mode))
 
 (provide 'mm-view)
 

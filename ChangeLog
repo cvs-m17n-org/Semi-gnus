@@ -1,11 +1,16 @@
+2001-01-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.6.
+	(gnus-revision-number): Clear to 00.
+
+	* Sync up with Gnus v5.8.8.
+
 2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-copy-article-buffer): Remove smiley
 	extents for XEmacs 21.1 using `format'.
 
 2001-01-10  Katsumi Yamaoka <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
 
 	* lisp/gnus.el: Don't autoload "smiley" for `smiley-toggle-buffer';
 	don't autoload "gnus-bitmap" or "x-face-mule" when Emacs 21 is
@@ -14,10 +19,29 @@
 	* lisp/gnus-art.el (TopLevel): Autoload "gnus-bitmap" for
 	`smiley-toggle-buffer' when compiling.
 	(gnus-treatment-function-alist): Use `gnus-smiley-display' for
-	`gnus-treat-display-smileys' by default when XEmacs is running.
+	`gnus-treat-display-smileys' by default when XEmacs or Emacs 21 is
+	running.
 	(gnus-treat-display-smileys): Check for `smiley-mule' instead of
 	`gnus-bitmap'.
 	(gnus-article-x-face-command): Don't check for xbm for x-face-e21.
+
+2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-debug): Use `sit-for' in the inside of
+	`save-excursion'.
+	(gnus-bug): Pop up the sending buffer first.
+
+	* lisp/dgnushack.el
+	(byte-compile-file-form-custom-declare-variable): Use `defvar'
+	instead of `custom-declare-variable' to make the variable
+	uncustomizable if the arguments has the keyword `:version'.
+
+2000-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (TopLevel): Byte-optimize
+	`custom-declare-variable', `custom-declare-group, and
+	`custom-declare-face' to omit unsupported keywords when Mule is
+	running.
 
 2000-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -34,11 +58,22 @@
 	(nnshimbun-meta-content-type-charset-regexp): New constant.
 	(nnshimbun-meta-charset-content-type-regexp): Ditto.
 
+2000-12-03  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* texi/gnus-ja.texi: Fixes for the last modification.
+
+2000-12-02  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* texi/gnus-ja.texi: Translate description about
+	`nnmail-split-fancy-with-parent'.
+
+	* texi/message-ja.texi: Use two lines for direntry.
+
 2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/lpath.el: Attempt to add another FLIM path to `load-path' if
-	the module `mel' does not found.  This procedure may be needed when
-	recent FLIM 1.14 is used under old Emacsen.
+	* lisp/dgnushack.el: Attempt to add another FLIM path to `load-path'
+	if the module `mel' does not found.  This procedure may be needed
+	when recent FLIM 1.14 is used under old Emacsen.
 
 2000-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -46,17 +81,6 @@
 
 	* lisp/message.el (message-send-mail-with-smtp): Leave the error
 	handling in `smtp-send-buffer's own care.
-
-2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
-
-	* lisp/message.el: Undo changes.
-
-2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
-
-	* lisp/message.el (message-send-mail-with-smtp): Change error
-	handling 'cause delete-process will return nil on most platform,
-	then message-send-mail-with-smtp seems fail to send message even
-	sending message success.
 
 2000-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -71,19 +95,131 @@
 	`x-face-decode-message-header' when Emacs 21 is running and
 	x-face-e21 is installed.
 
-2000-11-21  KANEMATSU Daiji <kanematu@sra.co.jp>
-
-	* lisp/gnus-art.el (gnus-treat-display-xface): Default to `head'
-	when Emacs 21 is running and uncompface command is available.
-
 2000-11-21  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send-mail-with-smtp): Use
 	`smtp-send-buffer' if it exists instead of `smtp-via-smtp'.
 
+	* lisp/dgnushack.el (describe-key-briefly): New compiler macro for
+	old Emacsen.
+
+2000-11-17  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnheader.el (nnheader-header-value): Save point.
+
 2000-11-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* texi/gnus-ja.texi (Drafts): Fix typo.
+
+2000-11-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-verify-x-pgp-sig): Autoload "mm-uu".
+	(gnus-treat-x-pgp-sig): Default to nil.
+
+2000-11-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Mule23@1934.en, Mule23@1934.ja, sample.lpath.el: Upgrade.
+
+	* configure: Regenerate.
+	* aclocal.m4 (AC_PATH_PACKAGEDIR): No need to quote a string for
+	`AC_MSG_RESULT'.
+	(AC_CHECK_W3): Ignore cache; no need to quote a string for
+	`AC_MSG_RESULT'.
+	(AC_CHECK_EMACS_FLAVOR): Ignore cache.
+	(AC_CHECK_EMACS): Ignore cache.
+	(AC_DEFINE_GNUS_PRODUCT_NAME): Cache.
+
+2000-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* configure: Regenerate.
+
+	* aclocal.m4 (AC_CHECK_W3): Substitute `W3' with empty string
+	instead of "no" if it is not acceptable.
+
+	* lisp/dgnushack.el: Load dgnuspath.el and ~/.lpath.el just before
+	path-util is loaded.
+	(dgnushack-compile): Show `load-path'.
+	(dgnushack-w3-dir): Ignore the env var W3DIR if it is empty.
+
+	* lisp/lpath.el: Move out `load-path' modification for APEL, FLIM
+	and SEMI to dgnushack.el.
+	* lisp/dgnushack.el: Move here.
+
+	* lisp/lpath.el (md5): Don't bind.
+	(url-insert-file-contents): Fbind for FSF Emacsen.
+
+2000-11-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/Makefile.in (install-ja-info): Specify `EMACS' and
+	`infodir'.
+	(install-info): Ditto.
+	(install-ja): Ditto.
+
+	* lisp/lpath.el (md5): Fbind using `maybe-fbind'.
+
+	* lisp/dgnushack.el (dgnushack-compose-package): Remove function.
+	(dgnushack-install-package-info-ja): Remove function.
+	(dgnushack-install-package-info): Remove function.
+	(dgnushack-install-package-lick): Remove function.
+	(dgnushack-install-package-pkginfo): Remove function.
+	(dgnushack-install-package-info-files): Remove function.
+	(dgnushack-install-package-manifest): New function.
+	(dgnushack-remove-extra-files-in-package): New function.
+	(dgnushack-gnus-product-name): Remove function.
+	(dgnushack-examine-package-dir): Remove function.
+	(dgnushack-exporting-files): Rename from `dgnushack-exported-files'.
+	(dgnushack-unexporting-files): Rename from
+	`dgnushack-unexported-files'; attempt to fix `load-path' for W3 and
+	retry to load `w3-forms' if it is failed.
+	(dgnushack-w3-dir): New variable.
+
+	* lisp/Makefile.in (remove-extra-files-in-package): New target.
+	(install-package-manifest): New target.
+	(install-package-info-ja): Remove target.
+	(install-package-info): Remove target.
+	(install-package-lick): Remove target.
+	(install-lisp): New target detached from `install'.
+	(install): Call `clever' and `install-lisp'.
+	(EXPORTING_FILES, GNUS_PRODUCT_NAME): New variables.
+
+	* configure: Regenerate.
+
+	* aclocal.m4 (AC_PATH_PACKAGEDIR): Examine `PACKAGEDIR' if it is
+	not specified under XEmacs.
+	(AC_EXAMINE_PACKAGEDIR): New function.
+	(AC_PATH_LISPDIR): Don't say annotations about install-package if
+	FSFmacs is used.
+	(AC_DEFINE_GNUS_PRODUCT_NAME): Add substitution for
+	`GNUS_PRODUCT_NAME'.
+
+	* Makefile.in (remove-extra-files-in-package): New target.
+	(install-package-manifest): New target.
+	(install-package-info-ja): Examine `PACKAGEDIR' if it is not
+	specified; call install-ja-info in texi/Makefile.
+	(install-package-info): Examine `PACKAGEDIR' if it is not
+	specified; call install-info in texi/Makefile.
+	(install-package-lisp): Rename from `install-package-lick'; examine
+	`PACKAGEDIR' if it is not specified; call `install-lisp' in
+	lisp/Makefile.
+	(install-package-ja): Call `xlick', `compose-package',
+	`remove-extra-files-in-package', `install-package-lisp',
+	`install-package-info', `install-package-info-ja' and
+	`install-package-manifest'.
+	(install-package): Call `xlick', `compose-package',
+	`remove-extra-files-in-package', `install-package-lisp',
+	`install-package-info' and `install-package-manifest'.
+	(install-info-ja, install-info): Specify `infodir'.
+	(EXAMINE_PACKAGEDIR, GNUS_PRODUCT_NAME, infodir): New variables.
+
+2000-11-07  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* texi/gnus-ja.texi: Do not use characters other than ascii ones
+	for direntries.
+	* texi/message-ja.texi: Ditto.
+
+2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (install): Don't check for the file names.
 
 2000-11-04  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
@@ -95,10 +231,68 @@
 	* lisp/gnus-topic.el (gnus-topic-rename): Use current topic as
 	initial value for read-string.
 
+2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (install): Use the lisp function
+	`dgnushack-exported-files'.
+
+	* lisp/nnmail.el (nnmail-pathname-coding-system): Default to
+	`binary'.
+	* lisp/nnheader.el (nnheader-pathname-coding-system): Ditto.
+
+	* lisp/message.el (message-get-reply-headers): Remove useless
+	`concat'.
+
+	* lisp/md5.el: Restore the file.
+
+	* lisp/dgnushack.el (dgnushack-compile): Refer to the constant
+	`dgnushack-exported-files'.
+	(dgnushack-exported-files): New function.
+	(dgnushack-exported-files): New constant.
+	(dgnushack-unexported-files): Add some files.
+	(dgnushack-tool-files): Remove, merge it into
+	`dgnushack-unexported-files'.
+
+	* lisp/base64.el: New file -- base64 encoding functions using MEL.
+
 2000-11-05  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* lisp/smiley.el (smiley-deformed-regexp-alist): Modify regexp for
 	the winking face.
+
+2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-make-manifest): Fix info directory.
+
+2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Makefile.in (install-package-ja): Compile and install lisp files
+	first.
+	(install-package): Ditto.
+	(compose-package, install-package-info-ja, install-package-info,
+	install-package-lick): New sub targets.
+
+	* lisp/Makefile.in (install-package-info-ja, install-package-info,
+	install-package-lick): New targets.
+	(compose-package): Rename from `package'.
+	(install-package): Remove.
+
+	* lisp/dgnushack.el (dgnushack-install-package-info-ja,
+	dgnushack-install-package-info, dgnushack-install-package-lick,
+	dgnushack-install-package-pkginfo,
+	dgnushack-install-package-info-files, dgnushack-make-manifest,
+	dgnushack-gnus-product-name, dgnushack-examine-package-dir,
+	dgnushack-make-autoloads): New functions.
+	(dgnushack-install-package): Remove.
+	(dgnushack-compose-package): Rename from `dgnushack-make-package'.
+	(dgnushack-info-file-regexp-ja, dgnushack-info-file-regexp-en):
+	Split from `dgnushack-info-file-regexp'.
+	(dgnushack-texi-file-regexp): Remove.
+
+2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Remove @ignore'd areas
+	before processing.
 
 2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -111,9 +305,35 @@
 
 2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el: Bind `:key-type' and `:value-type' for old
+	Emacsen.
+
+2000-10-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-format-direntry): Fixed broken
+	direntry generate probrem.
+	(Advised by Tetsuo Tsukamoto <czkmt@remus.dti.ne.jp>)
+
+2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-sum.el (gnus-summary-insert-line): Work with quoted
 	double-quote characters.
 	(gnus-summary-prepare-threads): Ditto.
+
+2000-10-30  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (ptexinfmt-disable-broken-notice-flag): Renamed
+	from `ptexinfmt-disable-broken-notice'.
+
+2000-10-27  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-format-printindex): Mule for Windows
+	detection fixed.
+
+2000-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-group-startup-message): Rewrite for Emacs 21.
+	* lisp/lpath.el: Fbind `propertize'.
 
 2000-10-22  Katsuhiro Hermit Endo <hermit@tomato.saino.ne.jp>
 
@@ -123,6 +343,23 @@
 
 	* lisp/nnshimbun.el (nnshimbun-netbsd-get-headers): Fix regular
 	expression to extract xover urls.
+
+2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
+
+	* make.bat: Makes it possible to generate the Info files on
+	windows again.
+
+2000-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Makefile.in (info-ja, xinfo-ja): No need to use `MAKEINFO=no'.
+	(install-info-ja, install-info, install-lisp, install-ja): New
+	targets (possibly for FSF Emacsen).
+
+	* texi/Makefile.in (install-ja-info, install-info, install-ja,
+	%-ja.info, %-ja): New targets.
+
+	* texi/message-ja.texi (direntry): Replace "message" with
+	"message-ja".
 
 2000-10-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
@@ -138,6 +375,9 @@
 	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Don't use
 	`gnus-point-at-eol'.
 	* lisp/gnus.el (gnus-group-startup-message): Ditto.
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Revive annulling of
+	`gnus-summary-set-display-table'.
 
 2000-10-04  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
@@ -158,13 +398,21 @@
 	* lisp/gnus-art.el (gnus-article-add-button): Quote
 	`:button-keymap' for Mule 2.3 but it won't work.
 
-	* lisp/dgnushack.el: (dgnushack-compile): Don't compile
-	dgnushack.el nor lpath.el.
-
 2000-09-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-ignored-supersedes-headers): Synch with
 	Gnus.
+
+2000-09-27  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* list/ptexinfmt.el (texinfo-multitable-widths): Fix
+	broken-facility probrem when use multitable unsupported
+	texinfmt.el.
+
+2000-09-26  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-format-printindex): Use (featurep
+	'meadow) instead of `texinfmt-version'.
 
 2000-09-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -173,6 +421,12 @@
 	* texi/gnus-faq-ja.texi, lisp/gnus.el, README.semi.ja, README.semi,
 	README: Replace "<semi-gnus-*@meadow.scphys.kyoto-u.ac.jp>" with
 	"<semi-gnus-*@meadowy.org>".
+
+2000-09-22  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-format-printindex): Add
+	broken-facility check, for Mule for Windows.
+	(texinfo-format-printindex): New function.
 
 2000-09-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -191,9 +445,17 @@
 
 2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-compile): Don't compile gnus-ml.el
+	when FSFmacs is running.
+
+	* lisp/gnus-ml.el: Bind some undeclared variables.
+
 	* lisp/gnus-art.el (gnus-article-add-button): Add widget button.
 	(gnus-article-display-mime-message): Don't set
 	`mime-button-mother-dispatcher'.
+
+	* lisp/message.el: Require `reporter' for the function
+	`define-mail-user-agent' when Mule 2.3 is running.
 
 2000-09-07  Tadashi Watanabe  <watanabe@sigmaitec.co.jp>
 
@@ -229,6 +491,17 @@
 
 	* lisp/pop3.el (pop3-ssl-program-name): New variable.
 
+2000-08-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* lisp/ptexinfmt.el (texinfo-multitable-widths,
+	texinfo-multitable-item): Apply char-width probrem fix patch
+	(by KOIE Hidetaka <koie@skipjack.koie.org>).
+	Newsgroups: fj.editor.emacs
+	Message-ID: <5dzom3nxq7.fsf@skipjack.koie.org>
+
+	* lisp/ptexinfmt.el (ptexinfmt-disable-broken-notice): New
+	variable.
+
 2000-08-29  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-zdnet-get-headers): Follow changes
@@ -254,6 +527,12 @@
 	* lisp/gnus-group.el (gnus-group-rename-group): Inhibit renaming of
 	zombie or killed groups.
 
+2000-08-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-replace-chars-in-string): Use
+	`static-if'.
+	* lisp/message.el (message-replace-chars-in-string): Ditto.
+
 2000-08-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-type-definition): Follow changes of
@@ -265,6 +544,22 @@
             Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
 	* lisp/nnshimbun.el: Add `mew' and `xemacs' support.
+
+2000-08-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Require `ptexinfmt'
+	instead of `texinfmt'.
+	(dgnushack-install-package): Don't install ptexinfmt.el.
+	(dgnushack-make-package): Don't include ptexinfmt.el in MANIFEST.
+	(dgnushack-compile): Don't compile dgnushack.el nor ptexinfmt.el.
+	(dgnushack-unexported-files, dgnushack-tool-files): New constants.
+
+	* lisp/Makefile.in (install-package): No need to remove
+	dgnushack.elc.
+	(install): Don't install ptexinfmt.el; no need to remove
+	dgnushack.elc.
+
+	* lisp/ptexinfmt.el: New file imported from Wanderlust.
 
 2000-08-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -292,12 +587,18 @@
 	AC_CHECK_EMACS, AC_DEFINE_GNUS_PRODUCT_NAME): New macros.
 	(AC_PATH_LISPDIR): Set `lispdir' to ".../site-lisp/t-gnus" by
 	default.
+	(AC_CHECK_EMACS_FLAVOR): Rename from `AC_XEMACS_P'; check for
+	`MULE' as well.
 	(AM_PATH_LISPDIR): Remove.
 
 	* acinclude.m4: Remove.
 
 	* lisp/dgnushack.el: Don't add "/usr/share/emacs/site-lisp" to
 	`load-path'.
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Defalias
+	`gnus-summary-set-display-table' to `(lambda ())' instead of
+	`ignore' (don't synch. with Gnus).
 
 2000-07-21   Daiki Ueno  <ueno@unixuser.org>
 
@@ -334,6 +635,28 @@
 	(nnimap-request-article-part): Ditto.
 
 	* lisp/imap.el (imap-open): Set process buffer as unibyte.
+
+2000-07-13 10:09:52  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* acinclude.m4 (AC_CHECK_W3): Fix typo.
+
+2000-07-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* configure: Regenerate with autoconf v2.14.1.
+	* aclocal.m4: Regenerate with aclocal v1.4.
+
+	* configure.in: Don't call `AC_CHECK_PROG' for `EMACS'.
+
+	* acinclude.m4: Merge ShengHuo's changes.
+	(AC_CHECK_W3): Use `quote' instead of '.
+	(AC_XEMACS_P): Don't modify the value of `XEMACS'.
+	(AC_EMACS_LISP): Safely quote the elisp form.
+
+2000-07-12 15:47:06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4: Stolen macros from w3.
+	* configure.in: Use them.
+	* configure: Generate it.
 
 2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
 

@@ -91,7 +91,7 @@
             (nnslashdot-threaded-retrieve-headers articles group)
           (nnslashdot-sane-retrieve-headers articles group)))
     (search-failed (nnslashdot-lose why))))
-  
+
 (deffoo nnslashdot-threaded-retrieve-headers (articles group)
   (let ((last (car (last articles)))
 	(did nil)
@@ -114,11 +114,9 @@
 	  (search-forward " on ")
 	  (setq date (nnslashdot-date-to-date
 		      (buffer-substring (point) (1- (search-forward "<")))))
-	  (forward-line 2)
-	  (setq lines (count-lines
-		       (point)
-		       (re-search-forward
-			"A href=\"\\(http://slashdot.org\\)?/article" nil t)))
+	  (setq lines (/ (- (point)
+			    (progn (forward-line 1) (point)))
+			 60))
 	  (push
 	   (cons
 	    1
@@ -156,11 +154,15 @@
 	    (forward-line 1)
 	    (if (looking-at
 		 "by <a[^>]+>\\([^<]+\\)</a>[ \t\n]*.*(\\([^)]+\\))")
-		(setq from (concat (nnweb-decode-entities-string (match-string 1))
-				   " <" (match-string 2) ">"))
-	      (looking-at "by \\(.+\\) on ")
-	      (setq from (nnweb-decode-entities-string (match-string 1))))
-	    (goto-char (- (match-end 0) 5))
+		(progn
+		  (goto-char (- (match-end 0) 5))
+		  (setq from (concat 
+			      (nnweb-decode-entities-string (match-string 1))
+			      " <" (match-string 2) ">")))
+	      (setq from "")
+	      (when (looking-at "by \\(.+\\) on ")
+		(goto-char (- (match-end 0) 5))
+		(setq from (nnweb-decode-entities-string (match-string 1)))))
 	    (search-forward " on ")
 	    (setq date
 		  (nnslashdot-date-to-date
@@ -195,8 +197,9 @@
     (save-excursion
       (set-buffer nntp-server-buffer)
       (erase-buffer)
-      (dolist (header nnslashdot-headers)
-	(nnheader-insert-nov (cdr header))))
+      (mm-with-unibyte-current-buffer
+       (dolist (header nnslashdot-headers)
+	 (nnheader-insert-nov (cdr header)))))
     'nov))
 
 (deffoo nnslashdot-sane-retrieve-headers (articles group)
@@ -253,11 +256,15 @@
 	  (forward-line 1)
 	  (if (looking-at
 	       "by <a[^>]+>\\([^<]+\\)</a>[ \t\n]*.*(\\([^)]+\\))")
-	      (setq from (concat (nnweb-decode-entities-string (match-string 1))
-                                 " <" (match-string 2) ">"))
-	    (looking-at "by \\(.+\\) on ")
-	    (setq from (nnweb-decode-entities-string (match-string 1))))
-	  (goto-char (- (match-end 0) 5))
+	      (progn
+		(goto-char (- (match-end 0) 5))
+		(setq from (concat 
+			    (nnweb-decode-entities-string (match-string 1))
+			    " <" (match-string 2) ">")))
+	    (setq from "")
+	    (when (looking-at "by \\(.+\\) on ")
+	      (goto-char (- (match-end 0) 5))
+	      (setq from (nnweb-decode-entities-string (match-string 1)))))
 	  (search-forward " on ")
 	  (setq date
 		(nnslashdot-date-to-date
@@ -292,8 +299,9 @@
     (save-excursion
       (set-buffer nntp-server-buffer)
       (erase-buffer)
-      (dolist (header nnslashdot-headers)
-	(nnheader-insert-nov (cdr header))))
+      (mm-with-unibyte-current-buffer
+	(dolist (header nnslashdot-headers)
+	  (nnheader-insert-nov (cdr header)))))
     'nov))
 
 (deffoo nnslashdot-request-group (group &optional server dont-check)
@@ -350,17 +358,18 @@
       (save-excursion
 	(set-buffer (or buffer nntp-server-buffer))
 	(erase-buffer)
-	(insert contents)
-	(goto-char (point-min))
-	(while (re-search-forward "\\(<br>\r?\\)+" nil t)
-	  (replace-match "<p>" t t))
-	(goto-char (point-min))
-	(insert "Content-Type: text/html\nMIME-Version: 1.0\n")
-	(insert "Newsgroups: " (caddr (assoc group nnslashdot-groups))
-		"\n")
-	(let ((header (cdr (assq article nnslashdot-headers))))
-	  (nnheader-insert-header header))
-	(nnheader-report 'nnslashdot "Fetched article %s" article)
+	(mm-with-unibyte-current-buffer
+	  (insert contents)
+	  (goto-char (point-min))
+	  (while (re-search-forward "\\(<br>\r?\\)+" nil t)
+	    (replace-match "<p>" t t))
+	  (goto-char (point-min))
+	  (insert "Content-Type: text/html\nMIME-Version: 1.0\n")
+	  (insert "Newsgroups: " (caddr (assoc group nnslashdot-groups))
+		  "\n")
+	  (let ((header (cdr (assq article nnslashdot-headers))))
+	    (nnheader-insert-header header))
+	  (nnheader-report 'nnslashdot "Fetched article %s" article))
 	(cons group article)))))
 
 (deffoo nnslashdot-close-server (&optional server)
@@ -484,6 +493,10 @@
 				nnslashdot-groups))
   (nnslashdot-write-groups))
 
+(deffoo nnslashdot-request-close ()
+  (setq nnslashdot-headers nil
+	nnslashdot-groups nil))
+
 (nnoo-define-skeleton nnslashdot)
 
 ;;; Internal functions
@@ -540,10 +553,12 @@
 (defun nnslashdot-lose (why)
   (error "Slashdot HTML has changed; please get a new version of nnslashdot"))
 
-(defun nnslashdot-sid-strip (sid)
-  (if (string-match "^00/" sid)
-      (substring sid (match-end 0))
-    sid))
+;(defun nnslashdot-sid-strip (sid)
+;  (if (string-match "^00/" sid)
+;      (substring sid (match-end 0))
+;    sid))
+
+(defalias 'nnslashdot-sid-strip 'identity)
 
 (provide 'nnslashdot)
 

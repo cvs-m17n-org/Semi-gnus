@@ -125,6 +125,9 @@ from the document.")
     (rfc822-forward
      (article-begin . "^\n")
      (body-end-function . nndoc-rfc822-forward-body-end-function))
+    (outlook
+     (article-begin-function . nndoc-outlook-article-begin)
+     (body-end .  "\0"))
     (guess
      (guess . t)
      (subtype nil))
@@ -589,6 +592,14 @@ from the document.")
   (when (looking-at "From - ")
     t))
 
+(defun nndoc-outlook-article-begin ()
+  (prog1 (re-search-forward "From:\\|Received:" nil t)
+    (goto-char (match-beginning 0))))
+
+(defun nndoc-outlook-type-p ()
+  ;; FIXME: Is JMF the magic of outlook mailbox? -- ShengHuo.
+  (looking-at "JMF"))
+
 (deffoo nndoc-request-accept-article (group &optional server last)
   nil)
 
@@ -690,7 +701,8 @@ PARENT is the message-ID of the parent summary line, or nil for none."
 	subject content-type type subtype boundary-regexp)
     ;; Gracefully handle a missing body.
     (goto-char head-begin)
-    (if (search-forward "\n\n" body-end t)
+    (if (or (and (eq (char-after) ?\n) (or (forward-char 1) t))
+	    (search-forward "\n\n" body-end t))
 	(setq head-end (1- (point))
 	      body-begin (point))
       (setq head-end body-end
@@ -772,7 +784,7 @@ PARENT is the message-ID of the parent summary line, or nil for none."
       (let ((part-counter 0)
 	    part-begin part-end eof-flag)
 	(while (string-match "\
-^\\(Lines\\|Content-\\(Type\\|Transfer-Encoding\\)\\):.*\n\\([ \t].*\n\\)*"
+^\\(Lines\\|Content-\\(Type\\|Transfer-Encoding\\|Disposition\\)\\):.*\n\\([ \t].*\n\\)*"
 			     article-insert)
 	  (setq article-insert (replace-match "" t t article-insert)))
 	(let ((case-fold-search nil))

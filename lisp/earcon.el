@@ -1,7 +1,11 @@
 ;;; earcon.el --- Sound effects for messages
-;; Copyright (C) 1996 Free Software Foundation
+
+;; Copyright (C) 1996, 2000 Free Software Foundation
 
 ;; Author: Steven L. Baur <steve@miranova.com>
+
+;; This file is part of GNU Emacs.
+
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -21,9 +25,6 @@
 ;; This file provides access to sound effects in Gnus.
 
 ;;; Code:
-
-(if (null (boundp 'running-xemacs))
-    (defvar running-xemacs (string-match "XEmacs\\|Lucid" emacs-version)))
 
 (eval-when-compile (require 'cl))
 (require 'gnus)

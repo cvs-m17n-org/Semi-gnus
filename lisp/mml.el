@@ -27,11 +27,12 @@
 (require 'mm-bodies)
 (require 'mm-encode)
 (require 'mm-decode)
-(eval-when-compile 'cl)
+(eval-when-compile (require 'cl))
 
 (eval-and-compile
   (autoload 'message-make-message-id "message")
   (autoload 'gnus-setup-posting-charset "gnus-msg")
+  (autoload 'gnus-add-minor-mode "gnus-ems")
   (autoload 'message-fetch-field "message")
   (autoload 'message-posting-charset "message"))
 
@@ -126,16 +127,13 @@ The function is called with one parameter, which is the generated part.")
 		warn t))
 	(setq raw (cdr (assq 'raw tag))
 	      point (point)
-	      contents (if raw
-			   (mm-with-unibyte-current-buffer
-			     (mml-read-part (eq 'mml (car tag))))
-			 (mml-read-part (eq 'mml (car tag))))
+	      contents (mml-read-part (eq 'mml (car tag)))
 	      charsets (if raw nil 
 			 (mm-find-mime-charset-region point (point))))
 	(when (and (not raw) (memq nil charsets))
 	  (if (or (memq 'unknown-encoding mml-confirmation-set)
 		  (y-or-n-p
-		   "Warning: You message contains characters with unknown encoding. Really send?"))
+		   "Message contains characters with unknown encoding.  Really send?"))
 	      (if (setq use-ascii 
 			(or (memq 'use-ascii mml-confirmation-set)
 			    (y-or-n-p "Use ASCII as charset?")))
@@ -230,7 +228,7 @@ The function is called with one parameter, which is the generated part.")
     (setq name (buffer-substring-no-properties
 		(point) (progn (forward-sexp 1) (point))))
     (skip-chars-forward " \t\n")
-    (while (not (looking-at ">"))
+    (while (not (looking-at ">[ \t]*\n?"))
       (setq elem (buffer-substring-no-properties
 		  (point) (progn (forward-sexp 1) (point))))
       (skip-chars-forward "= \t\n")
@@ -240,8 +238,9 @@ The function is called with one parameter, which is the generated part.")
 	(setq val (match-string 1 val)))
       (push (cons (intern elem) val) contents)
       (skip-chars-forward " \t\n"))
-    (forward-char 1)
-    (skip-chars-forward " \t\n")
+    (goto-char (match-end 0))
+    ;; Don't skip the leading space.
+    ;;(skip-chars-forward " \t\n")
     (cons (intern name) (nreverse contents))))
 
 (defun mml-read-part (&optional mml)
@@ -352,8 +351,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		  coded (buffer-string))))
 	(mml-insert-mime-headers cont type charset encoding)
 	(insert "\n")
-	(mm-with-unibyte-current-buffer
-	  (insert coded))))
+	(insert coded)))
      ((eq (car cont) 'external)
       (insert "Content-Type: message/external-body")
       (let ((parameters (mml-parameter-string
@@ -449,12 +447,6 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	      (format "%x" number)
 	    "")
 	  mml-base-boundary))
-
-(defun mml-make-string (num string)
-  (let ((out ""))
-    (while (not (zerop (decf num)))
-      (setq out (concat out string)))
-    out))
 
 (defun mml-insert-mime-headers (cont type charset encoding)
   (let (parameters disposition description)
@@ -675,17 +667,12 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 
 \\{mml-mode-map}"
   (interactive "P")
-  (if (not (set (make-local-variable 'mml-mode)
-		(if (null arg) (not mml-mode)
-		  (> (prefix-numeric-value arg) 0))))
-      nil
-    (set (make-local-variable 'mml-mode) t)
-    (unless (assq 'mml-mode minor-mode-alist)
-      (push `(mml-mode " MML") minor-mode-alist))
-    (unless (assq 'mml-mode minor-mode-map-alist)
-      (push (cons 'mml-mode mml-mode-map)
-	    minor-mode-map-alist)))
-  (run-hooks 'mml-mode-hook))
+  (when (set (make-local-variable 'mml-mode)
+	     (if (null arg) (not mml-mode)
+	       (> (prefix-numeric-value arg) 0)))
+    (gnus-add-minor-mode 'mml-mode " MML" mml-mode-map)
+    (easy-menu-add mml-menu mml-mode-map)
+    (run-hooks 'mml-mode-hook)))
 
 ;;;
 ;;; Helper functions for reading MIME stuff from the minibuffer and
@@ -705,6 +692,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     file))
 
 (defun mml-minibuffer-read-type (name &optional default)
+  (mailcap-parse-mimetypes)
   (let* ((default (or default
 		      (mm-default-file-encoding name)
 		      ;; Perhaps here we should check what the file
@@ -713,25 +701,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		      "application/octet-stream"))
 	 (string (completing-read
 		  (format "Content type (default %s): " default)
-		  (mapcar
-		   'list
-		   (mm-delete-duplicates
-		    (nconc
-		     (mapcar 'cdr mailcap-mime-extensions)
-		     (apply
-		      'nconc
-		      (mapcar
-		       (lambda (l)
-			 (delq nil
-			       (mapcar
-				(lambda (m)
-				  (let ((type (cdr (assq 'type (cdr m)))))
-				    (if (equal (cadr (split-string type "/"))
-					       "*")
-					nil
-				      type)))
-				(cdr l))))
-		       mailcap-mime-data))))))))
+		  (mapcar 'list (mailcap-mime-types)))))
     (if (not (equal string ""))
 	string
       default)))
@@ -857,7 +827,12 @@ If RAW, don't highlight the article."
 	(replace-match "\n"))
     (mml-to-mime)
     (if raw
-	(mm-disable-multibyte)
+	(when (fboundp 'set-buffer-multibyte)
+	  (let ((s (buffer-string)))
+	    ;; Insert the content into unibyte buffer.
+	    (erase-buffer)
+	    (mm-disable-multibyte)
+	    (insert s)))
       (let ((gnus-newsgroup-charset (car message-posting-charset)))
 	(run-hooks 'gnus-article-decode-hook)
 	(let ((gnus-newsgroup-name "dummy"))

@@ -45,7 +45,8 @@ How to get? (via CVS)
 
 Major tags are following:
 
-    t-gnus-6_12		Assigned to the latest stable version of T-gnus.
+    t-gnus-6_15-quimby	Assigned to the latest version of T-gnus for
+			developing and synchronizing with Oort Gnus.
 
     t-gnus-6_14		Assigned to the latest development version of
 			T-gnus.

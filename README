@@ -21,8 +21,17 @@ in your .emacs file, or wherever you keep such things.
 
 To enable reading the Gnus manual, you could say something like:
 
+  (require 'info)
   (setq Info-default-directory-list 
         (cons "~/gnus-5.6.53/texi" Info-default-directory-list))
+
+or
+
+  (require 'info)
+  (setq Info-directory-list 
+        (cons "~/gnus-5.6.53/texi" Info-directory-list))
+
+depending on which version of Emacs or XEmacs you're using.
 
 Note that Gnus and GNUS can't coexist in a single Emacs. They both use
 the same function and variable names.  If you have been running GNUS

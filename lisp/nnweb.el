@@ -42,11 +42,13 @@
     (require 'w3)
     (require 'url)
     (require 'w3-forms)))
+
 ;; Report failure to find w3 at load time if appropriate.
-(eval '(progn
-	 (require 'w3)
-	 (require 'url)
-	 (require 'w3-forms)))
+(unless noninteractive
+  (eval '(progn
+	   (require 'w3)
+	   (require 'url)
+	   (require 'w3-forms))))
 
 (nnoo-declare nnweb)
 
@@ -350,8 +352,12 @@ and `altavista'.")
       (setq url-current-callback-data data
 	    url-be-asynchronous t
 	    url-current-callback-func callback)
-      (url-retrieve url))
+      (url-retrieve url nil))
     (setq-default url-be-asynchronous old-asynch)))
+
+(if (fboundp 'url-retrieve-synchronously)
+    (defun nnweb-url-retrieve-asynch (url callback &rest data)
+      (url-retrieve url callback data)))
 
 ;;;
 ;;; DejaNews functions.
@@ -723,20 +729,21 @@ and `altavista'.")
   "Decode all HTML entities."
   (goto-char (point-min))
   (while (re-search-forward "&\\(#[0-9]+\\|[a-z]+\\);" nil t)
-    (replace-match (char-to-string 
-		    (if (eq (aref (match-string 1) 0) ?\#)
+    (let ((elem (if (eq (aref (match-string 1) 0) ?\#)
 			(let ((c
 			       (string-to-number (substring 
 						  (match-string 1) 1))))
 			  (if (mm-char-or-char-int-p c) c 32))
 		      (or (cdr (assq (intern (match-string 1))
 				     w3-html-entities))
-			  ?#)))
-		   t t)))
+			  ?#))))
+      (unless (stringp elem)
+	(setq elem (char-to-string elem)))
+      (replace-match elem t t))))
 
-(defun nnweb-decode-entities-string (str)
+(defun nnweb-decode-entities-string (string)
   (with-temp-buffer
-    (insert str)
+    (insert string)
     (nnweb-decode-entities)
     (buffer-substring (point-min) (point-max))))
 
@@ -761,7 +768,7 @@ If FOLLOW-REFRESH is non-nil, redirect refresh url in META."
 	  (url-insert-file-contents url)
 	  (goto-char (point-min))
 	  (when (re-search-forward 
-		 "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\"" nil t)
+		 "<meta[ \t\r\n]*http-equiv=\"Refresh\"[^>]*URL=\\([^\"]+\\)\"" nil t)
 	    (let ((url (match-string 1)))
 	      (delete-region (point-min) (point-max))
 	      (nnweb-insert url t))))
@@ -816,6 +823,11 @@ If FOLLOW-REFRESH is non-nil, redirect refresh url in META."
       (when (and (consp element)
 		 (listp (cdr element)))
 	(nnweb-text-1 element)))))
+
+(defun nnweb-replace-in-string (string match newtext)
+  (while (string-match match string)
+    (setq string (replace-match newtext t t string)))
+  string)
 
 (provide 'nnweb)
 

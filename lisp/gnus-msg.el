@@ -106,8 +106,11 @@ the second with the current group name.")
 (defvar gnus-posting-styles nil
   "*Alist of styles to use when posting.")
 
+(defvar gnus-inews-mark-gcc-as-read nil
+  "If non-nil, automatically mark Gcc articles as read.")
+
 (defcustom gnus-group-posting-charset-alist
-  '(("^\\(no\\|fr\\|dk\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\|dk\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+  '(("^\\(no\\|fr\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
     ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
     (message-this-is-mail nil nil)
     (message-this-is-news nil t))
@@ -252,6 +255,22 @@ Thank you for your help in stamping out bugs.
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
 
+;;;###autoload
+(defun gnus-msg-mail (&rest args)
+  "Start editing a mail message to be sent.
+Like `message-mail', but with Gnus paraphernalia, particularly the
+Gcc: header for archiving purposes."
+  (interactive)
+  (gnus-setup-message 'message
+    (apply 'message-mail args))
+  ;; COMPOSEFUNC should return t if succeed.  Undocumented ???
+  t)
+
+;;;###autoload
+(define-mail-user-agent 'gnus-user-agent
+      'gnus-msg-mail 'message-send-and-exit
+      'message-kill-buffer 'message-send-hook)
+
 (defun gnus-setup-posting-charset (group)
   (let ((alist gnus-group-posting-charset-alist)
 	(group (or group ""))
@@ -269,7 +288,11 @@ Thank you for your help in stamping out bugs.
 
 (defun gnus-inews-add-send-actions (winconf buffer article)
   (make-local-hook 'message-sent-hook)
-  (add-hook 'message-sent-hook 'gnus-inews-do-gcc nil t)
+  (add-hook 'message-sent-hook (if gnus-agent 'gnus-agent-possibly-do-gcc
+				 'gnus-inews-do-gcc) nil t)
+  (when gnus-agent
+    (make-local-hook 'message-header-hook)
+    (add-hook 'message-header-hook 'gnus-agent-possibly-save-gcc nil t))
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
@@ -626,7 +649,9 @@ If SILENT, don't prompt the user."
 	(setq method-alist
 	      (mapcar
 	       (lambda (m)
-		 (list (concat (cadr m) " (" (symbol-name (car m)) ")") m))
+		 (if (equal (cadr m) "")
+		     (list (symbol-name (car m)) m)
+		   (list (concat (cadr m) " (" (symbol-name (car m)) ")") m)))
 	       post-methods))
 	;; Query the user.
 	(cadr
@@ -1038,9 +1063,9 @@ The source file has to be in the Emacs load path."
 	(point (point))
 	file expr olist sym)
     (gnus-message 4 "Please wait while we snoop your variables...")
-    (sit-for 0)
     ;; Go through all the files looking for non-default values for variables.
     (save-excursion
+      (sit-for 0)
       (set-buffer (gnus-get-buffer-create " *gnus bug info*"))
       (while files
 	(erase-buffer)
@@ -1115,6 +1140,21 @@ this is a reply."
 
 ;;; Gcc handling.
 
+(defun gnus-inews-group-method (group)
+  (cond ((and (null (gnus-get-info group))
+	      (eq (car gnus-message-archive-method)
+		  (car
+		   (gnus-server-to-method
+		    (gnus-group-method group)))))
+	 ;; If the group doesn't exist, we assume
+	 ;; it's an archive group...
+	 gnus-message-archive-method)
+	;; Use the method.
+	((gnus-info-method (gnus-get-info group))
+	 (gnus-info-method (gnus-get-info group)))
+	;; Find the method.
+	(t (gnus-group-method group))))
+
 ;; Do Gcc handling, which copied the message over to some group.
 (defun gnus-inews-do-gcc (&optional gcc)
   (interactive)
@@ -1134,21 +1174,7 @@ this is a reply."
 	    ;; Copy the article over to some group(s).
 	    (while (setq group (pop groups))
 	      (gnus-check-server
-	       (setq method
-		     (cond ((and (null (gnus-get-info group))
-				 (eq (car gnus-message-archive-method)
-				     (car
-				      (gnus-server-to-method
-				       (gnus-group-method group)))))
-			    ;; If the group doesn't exist, we assume
-			    ;; it's an archive group...
-			    gnus-message-archive-method)
-			   ;; Use the method.
-			   ((gnus-info-method (gnus-get-info group))
-			    (gnus-info-method (gnus-get-info group)))
-			   ;; Find the method.
-			   (t (gnus-group-method group)))))
-	      (gnus-check-server method)
+	       (setq method (gnus-inews-group-method group)))
 	      (unless (gnus-request-group group t method)
 		(gnus-request-create-group group method))
 	      (save-excursion

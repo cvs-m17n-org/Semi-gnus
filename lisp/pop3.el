@@ -7,7 +7,6 @@
 ;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 ;; Maintainer: FSF
 ;; Keywords: mail
-;; Version: 1.3s
 
 ;; This file is part of GNU Emacs.
 
@@ -41,8 +40,6 @@
 (eval-when-compile (require 'static))
 
 (require 'mail-utils)
-
-(defconst pop3-version "1.3s")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -258,8 +255,8 @@ Args are NAME BUFFER HOST SERVICE."
     )
 
 (defun pop3-read-response (process &optional return)
-  "Read the response from the server PROCESS.
-Return the response string if optional second argument RETURN is non-nil."
+  "Read the response from the server.
+Return the response string if optional second argument is non-nil."
   (let ((case-fold-search nil)
 	match-end)
     (save-excursion

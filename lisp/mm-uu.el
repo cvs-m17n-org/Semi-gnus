@@ -1,4 +1,4 @@
-;;; mm-uu.el -- Return uu stuffs as mm handles
+;;; mm-uu.el -- Return uu stuff as mm handles
 ;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
@@ -77,7 +77,7 @@ decoder, such as hexbin."
   :group 'gnus-article-mime) 
 
 (defconst mm-uu-shar-begin-line "^#! */bin/sh")
-(defconst mm-uu-shar-end-line "^exit 0\\|^$")
+(defconst mm-uu-shar-end-line "^exit 0")
 
 ;;; Thanks to Edward J. Sabol <sabol@alderaan.gsfc.nasa.gov> and 
 ;;; Peter von der Ah\'e <pahe@daimi.au.dk>
@@ -191,7 +191,8 @@ To disable dissecting shar codes, for instance, add
 	      ((eq type 'uu)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
 			       (list (or (and file-name
-					      (string-match "\\.[^\\.]+$" file-name)
+					      (string-match "\\.[^\\.]+$"
+							    file-name)
 					      (mailcap-extension-to-mime
 					       (match-string 0 file-name)))
 					 "application/octet-stream"))

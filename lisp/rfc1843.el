@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; Keywords: news HZ HZ+
+;; Keywords: news HZ HZ+ mail i18n
 
 ;; This file is a part of GNU Emacs.
 
@@ -32,6 +32,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mm-util)
 
 (defvar rfc1843-word-regexp
@@ -157,7 +158,6 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 (defvar rfc1843-old-gnus-decode-header-function  nil)
 (defvar gnus-decode-header-methods)
 (defvar gnus-decode-encoded-word-methods)
-(defvar gnus-decode-encoded-word-function)
 
 (defun rfc1843-gnus-setup ()
   "Setup HZ decoding for Gnus."

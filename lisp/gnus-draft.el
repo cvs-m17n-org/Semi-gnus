@@ -112,12 +112,16 @@
 (defun gnus-draft-send-message (&optional n)
   "Send the current draft."
   (interactive "P")
-  (let ((articles (gnus-summary-work-articles n))
-	article)
+  (let* ((articles (gnus-summary-work-articles n))
+	 (total (length articles))
+	 article)
     (while (setq article (pop articles))
       (gnus-summary-remove-process-mark article)
       (unless (memq article gnus-newsgroup-unsendable)
-	(gnus-draft-send article gnus-newsgroup-name t)
+	(let ((message-sending-message 
+	       (format "Sending message %d of %d..." 
+		       (- total (length articles)) total)))
+	  (gnus-draft-send article gnus-newsgroup-name t))
 	(gnus-summary-mark-article article gnus-canceled-mark)))))
 
 (defun gnus-draft-send (article &optional group interactive)
@@ -143,6 +147,8 @@
 	(setq type (ignore-errors (read (current-buffer)))
 	      method (ignore-errors (read (current-buffer))))
 	(message-remove-header gnus-agent-meta-information-header)))
+    ;; Let Agent restore any GCC lines and have message.el perform them.
+    (gnus-agent-restore-gcc)
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
     (when (let ((mail-header-separator ""))
@@ -184,14 +190,14 @@
 			(cdr (assq 'unsend
 				   (gnus-info-marks
 				    (gnus-get-info "nndraft:queue"))))))
-	   (n (length articles))
-	   article i)
+	   (total (length articles))
+	   article)
       (while (setq article (pop articles))
-	(setq i (- n (length articles)))
-	(message "Sending message %d of %d." i n)
-	(if (memq article unsendable)
-	    (message "Message %d of %d is unsendable." i n)
-	  (gnus-draft-send article))))))
+	(unless (memq article unsendable)
+	  (let ((message-sending-message
+		 (format "Sending message %d of %d..."
+			 (- total (length articles)) total)))
+	    (gnus-draft-send article)))))))
 
 ;;; Utility functions
 

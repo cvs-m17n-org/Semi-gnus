@@ -58,7 +58,7 @@ If there is more than one non-ASCII MULE charset, then list of found
 MULE charsets are returned.
 If successful, the MIME charset is returned.
 If no encoding was done, nil is returned."
-  (if (not (featurep 'mule))
+  (if (not (mm-multibyte-p))
       ;; In the non-Mule case, we search for non-ASCII chars and
       ;; return the value of `mail-parse-charset' if any are found.
       (save-excursion
@@ -231,13 +231,13 @@ The characters in CHARSET should then be decoded."
 
 (defun mm-decode-string (string charset)
   "Decode STRING with CHARSET."
-  (if (stringp charset)
-      (setq charset (intern (downcase charset))))
-  (if (or (not charset) 
-	  (eq 'gnus-all mail-parse-ignored-charsets)
-	  (memq 'gnus-all mail-parse-ignored-charsets)
-	  (memq charset mail-parse-ignored-charsets))
-      (setq charset mail-parse-charset))
+  (when (stringp charset)
+    (setq charset (intern (downcase charset))))
+  (when (or (not charset) 
+	    (eq 'gnus-all mail-parse-ignored-charsets)
+	    (memq 'gnus-all mail-parse-ignored-charsets)
+	    (memq charset mail-parse-ignored-charsets))
+    (setq charset mail-parse-charset))
   (or
    (when (featurep 'mule)
      (let ((mule-charset (mm-charset-to-coding-system charset)))

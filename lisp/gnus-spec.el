@@ -1,4 +1,4 @@
-;;; gnus-spec.el --- format spec functions for Gnus
+;;; gnus-spec.el --- format spec functions for Gnus  -*- coding: iso-latin-1 -*-
 ;; Copyright (C) 1996, 1997, 1998, 1999, 2000
 ;;        Free Software Foundation, Inc.
 
@@ -386,7 +386,7 @@ by `gnus-xmas-redefine'."
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let ((xemacs-mule-p (and gnus-xemacs (featurep 'mule)))
+  (let ((xemacs-mule-p (and (featurep 'xemacs) (featurep 'mule)))
 	max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
@@ -578,7 +578,7 @@ If PROPS, insert the result."
 		       ;; Under XEmacs, it's (funcall #<compiled-function ...>)
 		       (not (and (eq 'funcall (car form))
 				 (byte-code-function-p (cadr form)))))
-	      (fset 'gnus-tmp-func `(lambda () ,form))
+	      (defalias 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
 	      (setq compiled-function (gnus-byte-code 'gnus-tmp-func))
 	      (set (intern (format "gnus-%s-line-format-spec" type))
