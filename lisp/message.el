@@ -469,7 +469,7 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook '(turn-on-mime-edit)
+(defcustom message-setup-hook '(message-mime-setup)
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
@@ -4435,6 +4435,32 @@ regexp varstr."
 (set-alist 'mime-edit-message-inserter-alist
 	   'message-mode (function message-mime-insert-article))
 
+(defun message-mime-encode (start end &optional orig-buf)
+  (save-restriction
+    (narrow-to-region start end)
+    (when (with-current-buffer orig-buf
+	    mime-edit-mode-flag)
+      (run-hooks 'mime-edit-translate-hook)
+      (mime-edit-translate-buffer)
+      )
+    (goto-char start)
+    (and (search-forward (concat "\n" mail-header-separator "\n") nil t)
+	 (replace-match "\n\n"))
+    ))
+
+(set-alist 'format-alist
+	   'mime-message
+	   `("MIME message."
+	     ,(concat "\\(" std11-field-name-regexp
+		      ":[^\n]*\\(\n[ \t][^\n]*\\)*\\)*\n\n")
+	     nil
+	     message-mime-encode
+	     t nil))
+
+(defun message-mime-setup ()
+  (turn-on-mime-edit)
+  (add-to-list 'buffer-file-format 'mime-message))
+
 ;;; Miscellaneous functions
 
 ;; stolen (and renamed) from nnheader.el
@@ -4449,21 +4475,6 @@ regexp varstr."
 	(aset string idx to))
       (setq idx (1+ idx)))
     string))
-
-(defvar message-save-buffer " *encoding")
-(defun message-save-drafts ()
-  (interactive)
-  (if (not (get-buffer message-save-buffer))
-      (get-buffer-create message-save-buffer))
-  (let ((filename buffer-file-name)
-	(buffer (current-buffer)))
-    (set-buffer message-save-buffer)
-    (erase-buffer)
-    (insert-buffer buffer)
-    (mime-edit-translate-buffer)
-    (write-region (point-min) (point-max) filename)
-    (set-buffer buffer)
-    (set-buffer-modified-p nil)))
 
 (run-hooks 'message-load-hook)
 
