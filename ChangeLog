@@ -1,3 +1,8 @@
+2002-07-22  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/mmgnus.el (mime-entity-body): Eliminate message for
+	debugging.
+
 2002-07-19  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.32 (This is alpha status.)
