@@ -3974,24 +3974,27 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (dolist (overlay (nconc (car lists) (cdr lists)))
 	    (delete-overlay overlay)))))
     (gnus-run-hooks 'gnus-tmp-internal-hook))
-  (set-buffer gnus-original-article-buffer)
-  ;; Display message.
-  (setq mime-message-structure gnus-current-headers)
-  (mime-buffer-entity-set-buffer-internal mime-message-structure
-					  gnus-original-article-buffer)
-  (mime-entity-set-representation-type-internal mime-message-structure
-						'mime-buffer-entity)
-  (luna-send mime-message-structure 'initialize-instance
-	     mime-message-structure)
-  (if gnus-show-mime
-      (let (mime-display-header-hook mime-display-text/plain-hook)
-	(funcall gnus-article-display-method-for-mime))
-    (funcall gnus-article-display-method-for-traditional))
-  ;; Call the treatment functions.
-  (let ((inhibit-read-only t))
+  (let ((show-mime (unless (member gnus-newsgroup-name '("nndraft:delayed"
+							 "nndraft:drafts"))
+		     gnus-show-mime))
+	(inhibit-read-only t))
+    (set-buffer gnus-original-article-buffer)
+    ;; Display message.
+    (setq mime-message-structure gnus-current-headers)
+    (mime-buffer-entity-set-buffer-internal mime-message-structure
+					    gnus-original-article-buffer)
+    (mime-entity-set-representation-type-internal mime-message-structure
+						  'mime-buffer-entity)
+    (luna-send mime-message-structure 'initialize-instance
+	       mime-message-structure)
+    (if show-mime
+	(let (mime-display-header-hook mime-display-text/plain-hook)
+	  (funcall gnus-article-display-method-for-mime))
+      (funcall gnus-article-display-method-for-traditional))
+    ;; Call the treatment functions.
     (save-restriction
       (widen)
-      (if gnus-show-mime
+      (if show-mime
 	  (gnus-article-prepare-mime-display)
 	(narrow-to-region (goto-char (point-min))
 			  (if (search-forward "\n\n" nil t)
@@ -4009,7 +4012,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 (defun gnus-article-decode-article-as-default-mime-charset ()
   "Decode an article as `default-mime-charset'.  It won't work if the
 value of the variable `gnus-show-mime' is non-nil."
-  (unless gnus-show-mime
+  (unless (or gnus-show-mime
+	      (member gnus-newsgroup-name '("nndraft:delayed"
+					    "nndraft:drafts")))
     (set (make-local-variable 'default-mime-charset)
 	 (with-current-buffer gnus-summary-buffer
 	   default-mime-charset))
