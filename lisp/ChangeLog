@@ -1,3 +1,20 @@
+2003-05-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-picon.el (gnus-picon-transform-address): Parse the encoded
+	address.
+
+2003-05-08  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-start.el (gnus-clear-system): added gnus-registry-alist to
+	the list of cleared variables
+
+	* gnus-registry.el (gnus-registry-split-fancy-with-parent):
+	nnmail-split-fancy-with-parent-ignore-groups can be a single regex
+	in addition to a list of regexes.
+
+	* spam.el (spam-use-regex-headers): docstring fix.  From Niklas
+	Morberg <niklas.morberg@axis.com>
+
 2003-05-08  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
 
 	* gnus-sum.el (gnus-summary-next-page): Mention
