@@ -3011,8 +3011,8 @@ after replacing with the original article."
   (setq gnus-article-edit-done-function
 	`(lambda (&rest args)
 	   (when (featurep 'font-lock)
-	     (setq font-lock-defaults nil)
-	     (turn-off-font-lock))
+	     (setq font-lockfont-lock-defaults-defaults nil)
+	     (font-lock-mode 0))
 	   (mime-edit-exit)
 	   (let (case-fold-search)
 	     (goto-char (point-min))
