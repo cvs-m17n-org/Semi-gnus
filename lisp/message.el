@@ -3131,14 +3131,11 @@ Headers already prepared in the buffer are not modified."
     (forward-line 1)))
 
 (defun message-fill-references (header value)
-  (let ((begin (point))
-	(fill-column 990)
-	(fill-prefix "\t"))
-    (insert (capitalize (symbol-name header))
-	    ": "
-	    (std11-fill-msg-id-list-string
-	     (if (consp value) (car value) value))
-	    "\n")))
+  (insert (capitalize (symbol-name header))
+	  ": "
+	  (std11-fill-msg-id-list-string
+	   (if (consp value) (car value) value))
+	  "\n"))
 
 (defun message-fill-header (header value)
   (let ((begin (point))
