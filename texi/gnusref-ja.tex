@@ -1,0 +1,735 @@
+% include file for the Gnus refcard and booklet
+\def\progver{5.0}\def\refver{5.0} % program and refcard versions
+\def\date{16 September 1995}
+\def\author{Vladimir Alexiev $<$vladimir@cs.ualberta.ca$>$}
+\raggedbottom\raggedright
+\newlength{\logowidth}\setlength{\logowidth}{6.861in}
+\newlength{\logoheight}\setlength{\logoheight}{7.013in}
+\newlength{\keycolwidth}
+\newenvironment{keys}[1]% #1 is the widest key
+  {\nopagebreak%\noindent%
+   \settowidth{\keycolwidth}{#1}%
+   \addtolength{\keycolwidth}{\tabcolsep}%
+   \addtolength{\keycolwidth}{-\columnwidth}%
+   \begin{tabular}{@{}l@{\hspace{\tabcolsep}}p{-\keycolwidth}@{}}}%
+  {\end{tabular}\\}
+\catcode`\^=12 % allow ^ to be typed literally
+\newcommand{\B}[1]{{\bf#1})}    % bold l)etter
+
+\def\Title{
+\begin{center}
+{\bf\LARGE Gnus \progver\ Reference \Guide\\}
+%{\normalsize \Guide\ version \refver}
+\end{center}
+}
+
+\newcommand\Logo[1]{\centerline{
+\makebox[\logoscale\logowidth][l]{\vbox to \logoscale\logoheight
+{\vfill\special{psfile=gnuslogo.#1}}\vspace{-\baselineskip}}}}
+
+\def\CopyRight{
+\begin{center}
+Copyright \copyright\ 1995 Free Software Foundation, Inc.\\*
+Copyright \copyright\ 1995 \author.\\*
+Created from the Gnus manual Copyright \copyright\ 1994 Lars Magne
+Ingebrigtsen.\\*
+and the Emacs Help Bindings feature (C-h b).\\*
+Gnus logo copyright \copyright\ 1995 Luis Fernandes.\\*
+\end{center}
+
+Permission is granted to make and distribute copies of this reference
+\guide{} provided the copyright notice and this permission are preserved on
+all copies.  Please send corrections, additions and suggestions to the
+above email address. \Guide{} last edited on \date.
+}
+
+\def\Notes{
+\subsec{Notes}
+{\samepage
+Gnus は複雑です. 現在は 346 もの対話的 (利用者の使用できる) 関数があり
+ます. これらの 279 は 2 つの主モード (グループと概略/記事) のものです. 
+これらの関数の多くは一つを超えるキー束縛があり, 中には 3, さらには 4
+束縛のものさえあります. キー束縛の総数は 389 です. ですから,  40 \% の
+場所の節約のために, この \guide では全ての関数は ``より論理的'' な束縛
+で一度だけ表示されています. 他の束縛は記述の最初に括弧の中で与えられて
+います. 
+
+多くの gnus の命令は数値引数に影響されます. 普通はメタキーを押している
+間に接頭引数を入力しますが, たいていの gnus のモードでは, 数字が自分自
+身を挿入しないため, メタを使う必要はありません. 接頭引数の付いたときの
+振る舞いは [角括弧] で書かれています. 接頭引数はしばしば
+
+\quad [距離] ポイントがどのくらいのオブジェクトを飛ばすか. 
+
+\quad [範囲] どのくらいのオブジェクトが作用されるか (現在の物を含む). 
+
+\quad [p/p] ``プロセス/接頭引数の習慣'': 接頭引数が与えられると, 作用
+する対象の数を決定します. プロセス印 \# で印の付いた対象があれば, それ
+らが作用されます. そうでなければ, 現在の対象だけが影響を受けます. 
+
+\quad [レベル] グループ講読度レベルです. 同等かそれより低いグループの
+みが作用の影響を受けます. 接頭引数が与えられないと, 
+`gnus-group-default-list-level' が使われます. 
+`gnus-group-use-permanent-levels' が真であると, `g' と `l' 命令への接
+頭引数は初期レベルも設定します. 
+
+\quad [score] 記事のスコアです. 接頭引数が与えられないと, 
+`gnus-summary-default-score' が使われます. 
+%Some functions were not yet documented at the time of creating this
+%\guide and are clearly indicated as such.
+\\*[\baselineskip]
+\begin{keys}{C-c C-i}
+C-c C-i & Gnus のオンライン {\bf info} に移動します.\\
+C-c C-b & Gnus の {\bf bug} 報告を送ります.\\
+\end{keys}
+}}
+
+\def\GroupLevels{
+\subsec{グループ講読度レベル}
+下の表は初期 gnus レベルを使っていることを仮定しています. 利用者用レベ
+ルを空の欄に書いてください. \\[1\baselineskip]
+
+\begin{tabular}{|c|l|l|}
+\hline
+レベル & グループ & 状態 \\
+\hline
+1 & メールグループ &             \\
+2 & メールグループ &             \\
+3 &               & 講読         \\
+4 &               &              \\
+5 & 初期一覧レベル &             \\
+\hline
+6 &               & 非講読       \\
+7 &               &              \\
+\hline
+8 &               & ゾンビ       \\
+\hline
+9 &               & 削除         \\
+\hline
+\end{tabular}
+}
+
+\def\Marks{
+\subsec{印指示文字}
+{\samepage 命令が直接印を付ける場合は, 括弧で表示されています. \\*
+\newlength{\markcolwidth}
+\settowidth{\markcolwidth}{` '}% widest character
+\addtolength{\markcolwidth}{4\tabcolsep}
+\addtolength{\markcolwidth}{-\columnwidth}
+\newlength{\markdblcolwidth}
+\setlength{\markdblcolwidth}{\columnwidth}
+\addtolength{\markdblcolwidth}{-2\tabcolsep}
+\begin{tabular}{|c|p{-\markcolwidth}|}
+\hline
+\multicolumn{2}{|p{\markdblcolwidth}|}{{\bf ``既読'' 印.}
+  これらの印の全ては概略行の最初の桁に現れますので, 共存することはでき
+  ません.}\\
+\hline
+` ' & (M-u, M SPC, M c) 未読.\\
+!   & (!, M !, M t) 可視 (興味深い).\\
+?   & (?, M ?) 保留 (フォローアップのみに興味がある).\\
+C   & (C, S c) {\bf キャンセル済み} (自分自身の記事のみ.\\
+\hline\hline
+\multicolumn{2}{|p{\markdblcolwidth}|}{下の印は記事が既読 (切られた, 
+  興味のない) ということを意味し, 大体同様な効果を持ちます. しかし命令
+  にはそれらで明らかな違いがあるものもあります (例. \ M M-C-r, 適応ス
+  コア).}\\
+\hline
+r   & (d, M d, M r) 消去 (既読 ({\bf read}) として印付けられた).\\
+C   & (M C; M C-c; M H; c, Z c; Z n; Z C) {\bf catch-up} で切られた.\\
+O   & 古い ({\bf old}) (前回のセッションで既読の印が付いた).\\
+K   & (k, M k; C-k, M K) 切られた ({\bf Killed}).\\
+R   & 既読 ({\bf read}) (実際に閲覧された).\\
+X   & キルファイルで切られた.\\
+Y   & 低スコアによって切られた.\\
+\hline\multicolumn{2}{c}{\vspace{1ex}}\\\hline
+\multicolumn{2}{|p{\markdblcolwidth}|}{他の印 ({\bf Other marks})}\\
+\hline
+\#  & (\#, M \#, M P p) 実行可能 (次の作用で影響を受ける).\\
+A   & 応答済み ({\bf answered}) (フォローアップもしくは返答をした).\\
++   & 初期スコアより上.\\
+$-$ & 初期スコアより下.\\
+=   & 子を持つ (その下にスレッドを). `\%e' `gnus-summary-line-format'
+を加えます.\\
+
+\hline
+\end{tabular}
+}}
+
+\def\GroupMode{
+\sec{グループモード}
+\begin{keys}{C-c M-C-x}
+RET     & (=) このグループを選択します. [接頭引数: どれくらいの (既読)
+記事を取得するか. 正: 最新の記事, 負: 最古のもの.]\\
+SPC     & このグループを選択して, 最初の未読記事を表示します. [接頭引
+数は上と同じです.]\\ 
+?       & 非常に短いヘルプメッセージを与えます.\\
+$<$     & グループバッファの最初に移動します.\\
+$>$     & グループバッファの最後に移動します.\\
+,       & 最低レベルの未読記事に飛びます.\\
+.       & 最初の未読記事のあるグループに飛びます.\\
+^       & サーバーバッファモードに入ります.\\
+a       & 記事 ({\bf article}) をグループに投稿します.\\
+b       & 偽 ({\bf bogus}) グループを見つけて消去します.\\
+c       & 全ての未印記事に既読の印を付けます ({\bf catch-up}). [p/p]\\
+g       & 新しい記事があるか, サーバーを調べます ({\bf get}). [レベル]\\
+j       & グループに飛びます ({\bf jump}).\\
+m       & 誰かにメール ({\bf mail}) を送ります.\\
+n       & 未読記事のある次 ({\bf next}) のグループに移動します.
+[距離]\\
+p       & (DEL) 未読記事のある前 ({\bf previous}) のグループに移動しま
+す.
+[距離]\\ 
+q       & Gnus を終了 ({\bf Quit}) します.\\
+r       & 初期化ファイルを読み込みます (再設定 ({\bf reset})).\\
+s       & `.newsrc.eld' ファイルを保存 ({\bf save}) します (それと, 
+`gnus-save-newsrc-file' が真であれば `.newsrc' も保存します.)\\ 
+z       & Gnus を一時停止します (バッファを切ります).\\
+B       & 外部サーバーを概観 ({\bf browse}) します.\\
+C       & このグループの全ての記事を既読として印付けます ({\bf
+Catch-up}). [p/p]\\
+F       & 新しいグループを見つけ ({\bf find}) それらに作業を実行します.\\ 
+N       & 次 ({\bf next}) のグループに移動します. [距離]\\
+P       & Go to the {\bf previous} group. [距離]\\
+Q       & 起動 (.newsrc) ファイルを保存せずに Gnus を終了 ({\bf Quit})
+します.\\
+R       & Gnus を再起動 ({\bf Restart}) します.\\
+V       & Gnus バージョン ({\bf version}) 番号を表示します.\\
+Z       & ドリブルバッファを消去します.\\
+C-c C-d & このグループの説明 ({\bf description}) を表示します. [接頭引
+数: サーバーから再読み込みをします.]\\ 
+C-c C-s & グループを名前, グループ名, レベル
+(`gnus-group-sort-function' に依存します) で未読記事の数で並び換え
+({\bf Sort}) ます.   .\\
+C-c C-x & このグループの全ての時限消去可能記事を時限消去 ({\bf
+expiry}) の過程にかけます.\\
+C-c M-C-x & このグループの全ての記事を時限消去 ({\bf expiry}) の過程に
+かけます.\\
+C-x C-t & 2つのグループの位置を変更します ({\bf transpose}).\\
+M-d     & 全てのグループの説明 ({\bf describe}) をします. [接頭引数:
+サーバーから説明を再読み込みします.]\\
+M-f     & このグループの {\bf FAQ} を (ange-ftp を使って) 取得します.\\
+M-g     & このグループに新しい記事があるかどうか, サーバーを調べます.
+({\bf get}). [p/p]\\
+M-n     & 前 ({\bf previous}) の同じか低いレベルの未読グループへ移動し
+ます. [距離]\\ 
+M-p     & 次 ({\bf next}) の同じか低いレベルの未読グループへ移動します.
+[距離]\\ 
+\end{keys}
+}
+
+\def\GroupCommands{
+\subsec{グループの一覧表示}
+{\samepage
+\begin{keys}{A m}
+A a     & (C-c C-a) 正規表現に合う全てのグループを一覧表示します ({\bf
+apropos}).\\ 
+A d     & 名前か説明 ({\bf descriptions}) が正規表現に合う全てのグルー
+プを一覧表示します.\\ 
+A k     & (C-c C-l) 全ての削除された ({\bf killed}) グループを一覧表示
+します.\\
+A m     & 正規表現に合い ({\bf match}), 未読記事を持つグループを一覧表
+示します. [レベル]\\ 
+A s     & (l) 未読記事のある講読グループ {\bf subscribed} を一覧表示し
+ます. [レベル]\\
+A u     & (L) 全てのグループ (非講読 ({\bf unsubscribed}) を含む) を一
+覧表示します. [接頭辞が与えられないと, 初期値はレベル7です]\\ 
+A z     & ゾンビ ({\bf zombie}) グループを一覧表示します.\\
+A M     & 正規表現に合う ({\bf match}) 全てのグループを一覧表示します.\\
+\end{keys}
+}
+
+\subsec{外部グループの作成/編集}
+{\samepage
+選択方法は括弧の中に示されています.\\*
+\begin{keys}{G m}
+G a     & Gnus リスト {\bf archive} グループを作ります. (ange-ftp を通
+じての nndir)\\
+G d     & ディレクトリー ({\bf directory}) グループ を作ります (全ての
+ファイルは投稿記事で, ファイルは数字の名前でなくてはなません).
+(nndir)\\
+G e     & (M-e) このグループの選択方法を編集 ({\bf edit}) します.\\
+G f     & ファイル ({\bf file}) に基づいたグループを作ります.
+(nndoc)\\
+G h     & Gnus のヘルプ ({\bf help}) (説明) グループを作成します.
+(nndoc)\\
+G k     & {\bf kiboze} グループを作成します. (nnkiboze)\\
+G m     & 新しいグループを作成 ({\bf make}) します.\\
+G p     & このグループのパラメータ ({\bf parameters}) を編集します.\\
+G v     & このグループを仮想 ({\bf virtual}) グループに追加します.
+[p/p]\\
+G D     & ディレクトリー ({\bf directory}) に (一時) グループとして入
+ります. (記事の既読を記録しない nneething.)\\
+G E     & このグループの情報 (選択方法, 記事の既読, などなど) を編集
+({\bf edit}) します.\\
+G V     & 新しい空の仮想 ({\bf virtual}) グループを作成します.
+(nnvirtual)\\
+\end{keys}
+メールグループを作成してメールを nnmbox, nnbabyl, nnml, nnmh, nnfolder
+の1つの方法を使ってGnus で読むこともできます (メーリグリストを講読して
+いると非常に役に立ちます). オンライン info で読んでください (C-c C-i g
+Reading Mail RET).
+}
+
+%\subsubsec{Soup Commands}
+%\begin{keys}{G s w}
+%G s b   & gnus-group-brew-soup: not documented.\\
+%G s p   & gnus-soup-pack-packet: not documented.\\
+%G s r   & nnsoup-pack-replies: not documented.\\
+%G s s   & gnus-soup-send-replies: not documented.\\
+%G s w   & gnus-soup-save-areas: not documented.\\
+%\end{keys}
+
+\subsec{グループの印付け}
+\begin{keys}{M m}
+M m     & (\#) このグループにプロセス印 {\bf mark} を付けます. [範囲]\\
+M u     & (M-\#) このグループからプロセス印を取り除きます (印消去 {\bf
+unmark}).
+[範囲]\\ 
+M w     & 現在のリージョンの全てのグループに印を付けます.\\
+\end{keys}
+
+\subsec{非講読, グループを切り貼りする}
+\begin{keys}{S w}
+S k     & (C-k) このグループを切ります ({\bf kill}).\\
+S l     & このグループのレベル ({\bf level}) を設定します. [p/p]\\
+S s     & (U) グループの入力を促進してその講読 ({\bf subscription}) を
+切り替えます.\\
+S t     & (u) このグループの講読を切り替え ({\bf toggle}) ます.
+[p/p]\\
+S w     & (C-w) リージョンの全てのグループを切ります.\\
+S y     & (C-y) 最後に kill されたグループを貼ります ({\bf yank}) .\\
+S z     & 全てのゾンビ ({\bf zombie}) グループを切ります.\\
+\end{keys}
+}
+
+\def\SummaryMode{
+\sec{概略モード}  %{Summary and Article Modes}
+\begin{keys}{SPC}
+SPC     & (A SPC, A n) 記事の選択, 1ページスクロール, 次の記事への移動, 
+です.\\ 
+DEL     & (A DEL, A p, b) この記事を1ページスクロールして戻します. [距
+離]\\
+RET     & この記事を一行先にスクロールします. [距離]\\
+=       & 概略のウィンドウを拡張します. [接頭辞: 記事ウィンドウを表示
+するように縮めます]\\
+$<$     & (A $<$, A b) この記事の最初にスクロールします.\\
+$>$     & (A $>$, A e) この記事の最後にスクロールします.\\
+\&      & 正規表現に合う全ての記事に命令を実行します. [接頭辞: 後ろに
+移動します.]\\
+j       & (G g) 記事番号を尋ねて, その概略行に飛び ({\bf jump}) ます.\\
+C-t     & 概略行の切り取り ({\bf truncation}) を切り換えます.\\
+M-\&    & プロセス印の付いている全ての記事に命令を実行します.\\
+M-k     & このグループの {\bf kill} ファイルを編集します.\\
+M-n     & (G M-n) 次の ({\bf next}) 未読記事の概略行に移動します. [距
+離]\\ 
+M-p     & (G M-p) 前の ({\bf previous}) 未読記事の概略行に移動します.
+[距離]\\ 
+M-r     & 正規表現で前の全ての記事を検索します.\\
+M-s     & 正規表現で続く全ての記事を検索 ({\bf earch}) します.\\
+M-K     & 総合 {\bf kill} ファイルを編集します.\\
+\end{keys}
+}
+
+\def\SortSummary{
+\subsec{概略バッファの並び換え}
+\begin{keys}{C-c C-s C-a}
+C-c C-s C-a & 著者 ({\bf author}) で概略を並び換えます.\\
+C-c C-s C-d & 日付け ({\bf date}) で概略を並び換えます.\\
+C-c C-s C-i & 記事のスコアで概略を並び換えます.\\
+C-c C-s C-n & 記事の番号 ({\bf number}) で概略を並び換えます.\\
+C-c C-s C-s & 表題 ({\bf subject}) で概略を並び換えます.\\
+\end{keys}
+}
+
+\def\Asubmap{
+\subsec{記事バッファ命令}
+\begin{keys}{A m}
+A g     & (g) この記事を(再)取得します ({\bf get}). [接頭辞: 記事を表
+示するだけです.]\\ 
+A r     & (^, A ^) この記事の親に移動します ({\bf References} ヘッダー
+です).\\ 
+M-^     & 与えられた Message-ID の記事を取得します.\\
+A s     & (s) 記事バッファで i{\bf search} を実行します.\\
+A D     & (C-d) 別のグループに集配配送メッセージを再配送 ({\bf
+digestify}) します.\\
+\end{keys}
+}
+
+\def\Bsubmap{
+\subsec{メールグループ命令}
+{\samepage
+これらの命令 (`B c' を除く) はメールグループでのみ有効です.\\*
+\begin{keys}{B M-C-e}
+B DEL   & {メール記事をディスクから消去 (\bf delete}) します (!). [p/p]\\
+B c     & この記事をどこかのグループからメールグループに複製 ({\bf
+copy}) します. [p/p]\\
+B e     & このグループの全ての時限消去可能記事を時限消去 ({\bf
+expire}) します. [p/p]\\
+B i     & ランダムなファイルをこのグループの取り込み ({\bf import}) ま
+す.\\
+B m     & あるメールグループから別のグループへ記事を移動 ({\bf move})
+します. [p/p]\\
+B q     & 特級分割で記事がどこに行くかを尋ねます ({\bf query}).\\
+B r     & このメール記事を再スプール ({\bf respool}) します. [p/p]\\
+B w     & (e) この記事を編集します.\\
+B M-C-e & このグループの全ての時限消去可能記事を削除 ({\bf expunge})
+(ディスクから消します) (!). [p/p]\\ 
+\end{keys}
+}}
+
+\def\Gsubmap{
+\subsec{記事選択}
+{\samepage
+これらの命令は対象記事を選択します. 接頭引数は理解しません. \\*
+\begin{keys}{G C-n}
+G b     & (,) 最高 ({\bf best}) の記事に移動します (最高スコアのもので
+す).\\
+G f     & (.) 最初 ({\bf first}) の未読記事に移動します.\\
+G l     & (l) 最後 ({\bf last}) の既読記事に移動します.\\
+G n     & (n) 次 ({\bf next}) の未読記事に移動します.\\
+p       & 前 ({\bf previous}) の未読記事に移動します.\\
+G p     & 概略の履歴から記事を取り出し ({\bf pop}) それに移動します.\\
+G N     & (N) 次 ({\bf next}) の記事に移動します\\
+G P     & (P) 前 ({\bf previous}) の記事に移動します.\\
+G C-n   & (M-C-n) 同じ表題の次 ({\bf next}) の記事に移動します.\\
+G C-p   & (M-C-p) 同じ表題の前 ({\bf previous}) の記事に移動します.\\
+\end{keys}
+}}
+
+\def\Hsubmap{
+\subsec{ヘルプ命令}
+\begin{keys}{H d}
+H d     & (C-c C-d) このグループの記述 ({\bf describe}) をします. [接
+頭辞: サーバーから説明を再読み込みします.]\\
+H f     & ange-ftp を使ってこのグループの {\bf FAQ} を取得しようとしま
+す.\\
+H h     & 非常に短いヘルプ ({\bf help}) メッセージを表示します.\\
+H i     & (C-c C-i) Gnus のオンライン {\bf info} に移動します.\\
+H v     & Gnus のバージョン ({\bf version}) 番号を表示します.\\
+\end{keys}
+}
+
+\def\Msubmap{
+\subsec{記事に印を付ける}
+\begin{keys}{M M-C-r}
+d       & (M d, M r) この記事に既読の印を付けて, 次のものに移動します.
+[範囲]\\ 
+D       & この記事に既読の印を付けて, 前のものに移動します. [範囲]\\
+u       & (!, M !, M t) この記事に可視印 (興味深いとして印を付け) 次の
+ものに移動します. [範囲]\\
+U       & この記事に可視印を付け, 前のものに移動します. [範囲]\\ 
+M-u     & (M SPC, M c) この記事の全ての印を消去し, 次の記事に移動しま
+す. [範囲]\\ 
+M-U     & この記事の全ての印を消去し, 前の記事に移動します. [範囲]\\ 
+M ?     & (?) この記事に保留の印を付けます (フォローアップにだけ興味が
+ある). [範囲]\\ 
+M b     & この記事にしおり ({\bf bookmark}) を設定します.\\
+M e     & (E, M x) この記事を時限消去可能 ({\bf expirable}) として印を
+付けます. [範囲]\\
+M k     & (k) 同じ表題の全ての記事を切り ({\bf kill}), 次の記事を選択
+します.\\
+M B     & この記事からしおり ({\bf bookmark}) を取り除きます.\\
+M C     & 可視印でない記事をキャッチアップ ({\bf catch-up}) します.\\
+M D     & 全ての保留 ({\bf dormant}) 記事を表示します (普通はフォロー
+アップがない限り隠されています).\\
+M H     & このグループでここ ({\bf here}) までキャッチアップ (既読の印
+を付ける) します.\\
+M K     & (C-k) この記事と同じ表題の全ての記事を {\bf kill} します.\\
+C-w     & ポイントとマークの間の全ての記事に既読の印を付けます.\\
+M S     & (C-c M-C-s) 全ての削除記事を表示 ({\bf show}) します.\\
+M C-c   & このグループの全ての記事をキャッチアップ ({\bf catch-up}) し
+ます.\\
+M M-r   & (x) このグループの全ての既読 ({\bf read}) 記事を消去します.\\
+M M-D   & 全ての保留 ({\bf dormant}) 記事を隠します.\\
+M M-C-r & 与えられた印の全ての記事を消去します.\\
+\end{keys}
+
+\subsubsec{スコアに基づいた印}
+\begin{keys}{M s m}
+M V c   & 全ての高スコアの記事から全ての印を消去 ({\bf clear}) します.
+[score]\\
+M V k   & 全ての低スコアの記事を切ります ({\bf kill}). [score]\\
+M V m   & 全ての高スコアの記事に与えらえれた印 ({\bf mark}) を付けます.
+[score]\\
+M V u   & 全ての高スコアの記事をおもしろいとして印を付けます (可視印を
+付けます). [score]\\
+\end{keys}
+
+\subsubsec{プロセス印}
+{\samepage 
+これらの命令はプロセス印 \# を付けたり消去したりします. 操作したい記事
+が連続していないときだけそれを使う必要があるでしょう. そうでなければ数
+値引数を使います.\\*
+\begin{keys}{M P R}
+M P a   & 全て ({\bf all}) の記事に印を付けます (順番に).\\
+M P p   & (\#, M \#) この記事に印を付けます.\\
+M P r   & 区域 ({\bf region}) の全ての記事に印を付けます.\\
+M P s   & 現在の連続物 ({\bf series}) の全てに印を付けます.\\
+M P t   & この (副)スレッド ({\bf thread}) の全ての記事に印を付けます.\\
+M P u   & (M-\#, M M-\#) この記事から印を消します ({\bf unmark}).\\
+M P R   & 正規表現 ({\bf regexp}) に合う全ての記事に印を付けます.\\
+M P S   & 印付きの記事を含む全ての連続した記事 ({\bf series}) に印を付
+けます.\\
+M P U   & 全ての記事から印を消します ({\bf unmark}).\\
+\end{keys}
+}}
+
+\def\Osubmap{
+\subsec{記事の出力}
+\begin{keys}{O m}
+O f     & この記事をプレインファイル ({\bf file}) 形式で保存します.
+[p/p]\\
+O h     & この記事を {\bf mh} フォルダーの形式で保存します. [p/p]\\
+O m     & この記事をメール ({\bf mail}) 形式で保存します. [p/p]\\
+O o     & (o, C-o) この記事を初期記事保存器を使って保存します. [p/p]\\
+O p     & ($\mid$) この記事をシェルコマンドにパイプで送ります. [p/p]\\
+O r     & この記事を {\bf rmail} 形式で保存します. [p/p]\\
+O v     & この記事を {\bf vm} の形式で保存します. [p/p]\\
+\end{keys}
+}
+
+\def\Ssubmap{
+\subsec{投稿, フォローアップ, 返答, 転送, 取り消し}
+{\samepage
+これらの命令は別の投稿かメールバッファに行きます. 記事を編集した後,
+C-c C-c を押して送信します. 外部グループにいて, 外部サーバーを使って記
+事を投稿したいなら, C-c C-c に接頭辞を与えてください.\\*
+\begin{keys}{S O m}
+S b     & この記事へのフォローアップの投稿と, 返答の送信の両方 ({\bf
+both}) をします.\\
+S c     & (C) この記事を取り消します ({\bf cancel}) (自分自身のものに
+のみ動作します).\\
+S f     & (f) この記事へのフォローアップ ({\bf followup}) を投稿します.\\
+S m     & (m) 誰か別の人にメール {\bf mail} を送ります.\\
+S o m   & (C-c C-f) この記事を一にメールを送る ({\bf mail}) ことで転送
+します.\\
+S o p   & この記事をニュースグループへの投稿 ({\bf post}) として転送し
+ます.\\
+S p     & (a) このグループに記事を投稿 ({\bf post}) します.\\
+S r     & (r) この記事の著者にメールで返答 ({\bf reply}) します.\\
+S s     & この記事を新しい記事で代替します ({\bf supersede}) (自分の記
+事のみ).\\ 
+S u     & ファイルを {\bf uuencode} して連続として投稿します.\\
+S B     & 元記事を引用してフォローアップの投稿, 返答の送信の両方 ({\bf
+both}) をします. [p/p]\\ 
+S F     & (F) 元記事を引用してフォローアップ ({\bf followup}) を投稿し
+ます. [p/p]\\
+S O m   & これらの連続を集配形式にしてメール ({\bf mail}) で転送します.
+[p/p]\\
+S O p   & これらの連続を集配形式にしてニュースグループに投稿 ({\bf
+post}) します. [p/p]\\ 
+S R     & (R) 元記事を引用してメールで返答 ({\bf reply}) します.
+[p/p]\\
+\end{keys}
+たった今投稿した記事を取り消したり代替したければ (サーバーに現れる前に), 
+*post-news* バッファに移動して, `Message-ID' を `Cancel' か
+`Supersedes' に換えて C-c C-c でもう一度送信してください. 
+}}
+
+\def\Tsubmap{
+\subsec{スレッド命令}
+\begin{keys}{T \#}
+T \#    & このスレッドにプロセス印を付けます.\\
+T d     & このスレッドの次の記事に移動します ({\bf down}). [距離]\\
+T h     & この (副)スレッドを隠します ({\bf hide}).\\
+T i     & このスレッドのスコアを上げます ({\bf increase}).\\
+T k     & (M-C-k) 現在の (副)スレッドを切ります ({\bf kill}). [負の引
+数: 可視印, 正の引数: 印を消す.]\\
+T l     & (M-C-l) このスレッドのスコアを下げます ({\bf lower}).\\
+T n     & (M-C-f) 次 ({\bf next}) のスレッドに移動します. [距離]\\
+T p     & (M-C-b) 前 ({\bf previous}) のスレッドに移動します. [距離]\\
+T s     & この記事で隠れているスレッドを表示 ({\bf show}) します.\\
+T u     & このスレッドの前の記事に移動します ({\bf up}). [距離]\\
+T H     & 全てのスレッドを隠します ({\bf hide}).\\
+T S     & 全ての隠されたスレッドを表示 ({\bf show}) します.\\
+T T     & (M-C-t) スレッド表示を切り替えます ({\bf toggle}).\\
+\end{keys}
+}
+
+\def\Vsubmap{
+\subsec{スコア (値) 命令}
+{\samepage
+オンライン info で適応スコアを読んでください.\\*
+\begin{keys}{\bf A p m l}
+V a     & 全ての要素を指定して新しいスコア登録を加え ({\bf add}) ます.\\
+V c     & 新しいスコアファイルを現在のもの ({\bf current}) として指定
+します.\\
+V e     & 現在のスコアの連想リストを編集 ({\bf edit}) します.\\
+V f     & スコアファイル ({\bf file}) を編集して現在のものとします.\\
+V m     & 与えられたスコアより下の記事に既読に印 ({\bf mark}) を付けま
+す.\\
+V s     & この記事のスコア ({\bf score}) を設定します.\\
+V t     & この記事に適用された全てのスコア規則を表示します ({\bf track}).\\
+V x     & 全ての低スコアの記事を消去 ({\bf expunge}) します. [score]\\
+V C     & 現在のスコアファイルを利用者に分かりやすいインターフェースで
+カスタマイズ ({\bf customize}) します.\\ 
+V S     & この記事のスコア ({\bf score}) を表示します.\\
+\bf A p m l& この記事に基づいたスコア登録を作ります.\\
+\end{keys}
+
+4つの文字は以下の意味です:\\*
+\quad \B{A}ction: I)ncrease, L)ower;\\*
+\quad \B{p}art: a)utor (from), s)ubject, x)refs (cross-posting), d)ate, l)ines,
+message-i)d, t)references (parent), f)ollowup, b)ody, h)ead (全てのヘッ
+ダー);\\*
+\quad \B{m}atch type:\\*
+\qquad string: s)ubstring, e)xact, r)egexp, f)uzzy,\\*
+\qquad date: b)efore, a)t, n)this,\\*
+\qquad number: $<$, =, $>$;\\*
+\quad \B{l}ifetime: t)emporary, p)ermanent, i)mmediate.
+
+2番目の文字を大文字で入力すると, 残りの2つは s)ubstring と t)emporary
+であるとみなされます. 3番目の文字を大文字で入力すると, 最後のものは
+t)emporary であるとみなされます. 
+
+\quad スコアファイルの手での編集のための追加のキー:\\*
+\begin{keys}{C-c C-c}
+C-c C-c & スコアファイルの編集を終えます.\\
+C-c C-d & 現在の日付け ({\bf date}) を日数として挿入します.\\
+\end{keys}
+}}
+
+\def\Wsubmap{
+\subsec{記事バッファの洗濯}
+\begin{keys}{W C-c}
+W b     & 記事の中の Message-ID と URL をマウスでクリック可能にします {\bf
+  buttons}.\\  
+W c     & 記事から余分な {\bf CRs} (^M) を取り除きます.\\
+W f     & X-{\bf Face} ヘッダーを探して表示します.\\
+W l     & (w) 記事からページの区切り ({\bf^L}) を取り除きます.\\
+W m     & {\bf MIME} の実行を切り換えます.\\
+W o     & 記事の {\bf overstrike} か 下線(^H\_) を扱います.\\
+W q     & 記事の {\bf quoted}-printable を扱います.\\
+W r     & (C-c C-r) 記事にカエサル回転 ({\bf rotate}) (rot13) を行います.\\
+W t     & (t) 全てのヘッダー表示を切り替えます ({\bf toggle}).\\
+v       & 全てのヘッダーの冗長な ({\bf verbose}) 表示を切り替えます.\\
+W w     & 記事の語の折り返し ({\bf wrap}) を行います.\\
+W T e   & 記事の時刻を送られた時から経過した ({\bf elapsed}) 時間に変
+  換します.\\
+W T l   & 記事の時刻をローカル ({\bf local}) 標準時刻帯に変換します.\\
+W T u   & (W T z) 記事の時刻を {\bf UTC} ({\bf Zulu}, GMT) に変換しま
+  す.\\ 
+\end{keys}
+
+\subsubsec{記事の部分を隠す/ハイライトする}
+\begin{keys}{W W C-c}
+W W a   & 全ての ({\bf all}) 望ましくない部分を隠します. W W h, W W s,
+W W C-c を実行します.\\
+W W c   & 記事の引用 ({\bf citation}) を隠します.\\
+W W h   & 記事のヘッダー ({\bf headers}) を隠します.\\
+W W s   & 記事の署名 ({\bf signature}) を隠します.\\
+W W C-c & 記事の引用 ({\bf citation}) をより洗練されたアルゴリズムを使っ
+て隠します.\\
+%\end{keys}
+%
+%\subsubsec{Highlight Parts of the Article}
+%\begin{keys}{W H A}
+W H a   & 全て ({\bf all}) の部分を隠します. W b, W H c, W H h, W H
+s. を実行します\\
+W H c   & 記事の引用 ({\bf citation}) をハイライトします.\\
+W H h   & 記事のヘッダー ({\bf headers}) をハイライトします.\\
+W H s   & 記事の署名 ({\bf signature}) をハイライトします.\\
+\end{keys}
+}
+
+\def\Xsubmap{
+\subsec{連続の展開 (Uudecode など)}
+{\samepage
+Gnus は現在の記事が連続物 (それぞれの部分が表題において, 例えば
+{}1/10\dots10/10 のように, 数字で同定される複数の投稿) の一部であると, 
+それを認識してその連続物をそれぞれ実行過程にかけます. 1つ以上の連続物
+に印を付けて実行することができます. 投稿がアーカイブを含んでいれば, 新
+しいグループで展開され, 集められます.\\*
+\begin{keys}{X p}
+X b     & 連続物を {\bf binhex} で展開します. [p/p]\\
+X o     & 単に連続物を出力 ({\bf output}) します (復号化はしません).
+[p/p]\\ 
+X p     & ポストスクリプト ({\bf postscript}) の連続物を展開します.
+[p/p]\\
+X s     & 連続物を {\bf shar} で展開します. [p/p]\\
+X u     & 連続物を {\bf uudecode} します. [p/p]\\
+\end{keys}
+
+これらのそれぞれには4つの異形があります:\\*
+\begin{keys}{X v \bf Z}
+X   \bf z & 連続物を復号化します. [p/p]\\
+X   \bf Z & 連続物を復号化して保存します. [p/p]\\
+X v \bf z & 連続物を復号化して閲覧します. [p/p]\\
+X v \bf Z & 連続物を復号化し, 保存し, 閲覧します. [p/p]\\
+\end{keys}
+{\bf z} や {\bf Z} は復号化の方法を示します (b, o, p, s, u).
+
+これらの命令で最も良く使われる別の束縛は\\*
+\begin{keys}{C-c C-v C-v}
+C-c C-v C-v & (X v u) 連続物を uudecode し閲覧します. [p/p]\\
+\end{keys}
+}}
+
+\def\Zsubmap{
+\subsec{現在のグループを出る}
+\begin{keys}{Z G}
+Z c     & (c) 全ての可視印付きでない記事に既読の印を付け ({\bf
+catch-up}, キャッチアップ) 終了します.\\
+Z n     & 全ての記事に既読の印を付け, 次 ({\bf next}) のグループに移動
+します.\\
+Z C     & 全ての記事に既読の印を付け ({\bf catch-up}, キャッチアップ)
+終了します.\\
+Z E     & (Q) グループ情報を更新せずに終了 ({\bf Exit}) します.\\
+Z G     & (M-g) グループの新しい記事を調べます ({\bf get}, 取得).\\
+Z N     & 終了して次の ({\bf next}) グループへ移動します.\\
+Z P     & 終了して前の ( {\bf previous}) グループに移動します.\\
+Z R     & グループを終了して, 再び入ります ({\bf reenter}, 再実行).
+[接頭引数: 未読も既読も全ての記事を選択します.]\\
+Z Z     & (q, Z Q) グループを終了します.\\
+\end{keys}
+}
+
+\def\ArticleMode{
+\sec{記事モード}
+{\samepage
+% 概略モードの全てのキーは記事モードでも動作します.
+普通の操作キーは記事モードで動作します.
+追加のキーは:\\*
+\begin{keys}{C-c C-m}
+RET     & (真中のマウスボタン) ポイントのあるボタンを活動化して, URL
+や Message-ID に移動します.\\
+TAB     & ポイントを次のボタンに移動します.\\
+h       & (s) {\bf 概略} バッファの記事のヘッダー ({\bf header}) 行に
+移動します.\\ 
+C-c ^   & ポイントの近くの Message-ID の記事を取得します.\\
+C-c C-m & ポイントの近くのアドレスにメール ({\bf mail}) で返答します
+(接頭引数: 元の記事を含める).\\ 
+\end{keys}
+}}
+
+\def\ServerMode{
+\sec{サーバーモード}
+{\samepage
+このモードに入るためには, グループモードで `^' を押してください.\\*
+\begin{keys}{SPC}
+SPC     & (RET) このサーバーを概観します.\\
+a       & 新しいサーバーを追加 {\bf add} します.\\
+c       & このサーバーを複写 {\bf copy} します.\\
+e       & サーバーを編集 {\bf edit} します.\\
+k       & このサーバーを切ります {\bf kill}. [範囲]\\
+l       & 全てのサーバーを一覧表示 {\bf list} します.\\
+q       & グループバッファに戻ります (終了 {\bf quit}).\\
+y       & 以前に切ったサーバーを貼り付け {\bf yank} ます.\\
+\end{keys}
+}}
+
+\def\BrowseServer{
+\sec{サーバー概観モード}
+{\samepage
+このモードに入るためには, グループモードで `B' を押してください.\\*
+\begin{keys}{RET}
+RET     & 現在のグループに入ります.\\
+SPC     & 現在のグループに入って最初の記事を表示します.\\
+?       & とても短いヘルプメッセージを表示します.\\
+n       & {\bf 次} のグループに移動します. [距離]\\
+p       & {\bf 前} のグループに移動します. [距離]\\
+q       & (l) 概観モードを {\bf 終了} します.\\
+u       & 現在のグループを講読します. [範囲]\\
+\end{keys}
+}}
