@@ -1,3 +1,8 @@
+1998-12-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Change 
+	easy-menu-define to easy-menu-change to override miee menu.
+	
 1998-12-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Call

@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.15 1998-12-10 09:58:13 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.16 1998-12-11 02:06:34 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -746,10 +746,11 @@ If value is nil , dialup line is disconnected status.")
 ;;
 ;;
 (defun gnus-offline-define-menu-on-miee ()
-  "*Set menu bar on MIEE menu."
-  (easy-menu-define
-   gnus-offline-menu-on-miee gnus-group-mode-map "Gnus offline menu on Miee"
-   '("Miee"
+  "*Set and change menu bar on MIEE menu."
+  (easy-menu-change
+   nil
+   "Miee"
+   '(nil
      ["Post news in spool" news-spool-post t]
      ["Send mails in spool" mail-spool-send t]
      "----"
@@ -757,16 +758,16 @@ If value is nil , dialup line is disconnected status.")
      ["Message Online" message-online-state message-online-state]
      "----"
      ("Gnus Offline"
-       ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
-       ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
-       ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
-       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-       "----"
-       ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
-       ["Set interval time" gnus-offline-set-interval-time t]
-       "----"
-       ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]
-       ))))
+      ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+      ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
+      ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
+      ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
+      "----"
+      ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+      ["Set interval time" gnus-offline-set-interval-time t]
+      "----"
+      ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]
+      ))))
 ;;
 ;; define menu without miee.
 ;;
