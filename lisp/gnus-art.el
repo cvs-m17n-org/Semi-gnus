@@ -4358,7 +4358,9 @@ The uncompress method used is derived from `buffer-file-name'."
             (jka-compr-delete-temp-file err-file)))))))
 
 (defun gnus-mime-copy-part (&optional handle)
-  "Put the MIME part under point into a new buffer."
+  "Put the MIME part under point into a new buffer.
+If `auto-compression-mode' is enabled, compressed files like .gz and .bz2
+are decompressed."
   (interactive)
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
@@ -4390,13 +4392,12 @@ The uncompress method used is derived from `buffer-file-name'."
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (contents (and handle (mm-get-part handle)))
 	 (file (mm-make-temp-file (expand-file-name "mm." mm-tmp-directory)))
-	 (printer (mailcap-mime-info (mm-handle-type handle) "print")))
+	 (printer (mailcap-mime-info (mm-handle-media-type handle) "print")))
     (when contents
 	(if printer
 	    (unwind-protect
 		(progn
-		  (with-temp-file file
-		    (insert contents))
+		  (mm-save-part-to-file handle file)
 		  (call-process shell-file-name nil
 				(generate-new-buffer " *mm*")
 				nil
@@ -5379,36 +5380,38 @@ Argument LINES specifies lines to be scrolled down."
 The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive "P")
-  (let ((article (cdr gnus-article-current)) cont)
-    (if (not (mark t))
+  (let ((article (cdr gnus-article-current))
+	contents)
+    (if (not (gnus-mark-active-p))
 	(with-current-buffer gnus-summary-buffer
 	  (gnus-summary-reply (list (list article)) wide))
-      (setq cont (buffer-substring (point) (mark t)))
+      (setq contents (buffer-substring (point) (mark t)))
       ;; Deactivate active regions.
       (when (and (boundp 'transient-mark-mode)
 		 transient-mark-mode)
 	(setq mark-active nil))
       (with-current-buffer gnus-summary-buffer
 	(gnus-summary-reply
-	 (list (list article cont)) wide)))))
+	 (list (list article contents)) wide)))))
 
 (defun gnus-article-followup-with-original ()
   "Compose a followup to the current article.
 The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive)
-  (let ((article (cdr gnus-article-current)) cont)
-      (if (not (mark t))
+  (let ((article (cdr gnus-article-current))
+	contents)
+      (if (not (gnus-mark-active-p))
 	  (with-current-buffer gnus-summary-buffer
 	    (gnus-summary-followup (list (list article))))
-	(setq cont (buffer-substring (point) (mark t)))
+	(setq contents (buffer-substring (point) (mark t)))
 	;; Deactivate active regions.
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
 	  (setq mark-active nil))
 	(with-current-buffer gnus-summary-buffer
 	  (gnus-summary-followup
-	   (list (list article cont)))))))
+	   (list (list article contents)))))))
 
 (defun gnus-article-hide (&optional arg force)
   "Hide all the gruft in the current article.
@@ -5935,8 +5938,8 @@ after replacing with the original article."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~`%&*+|\\/:;.,[:word:]]+[-a-z0-9_=#$@~`%&*+|\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~`%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~`%&*+\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~`%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~`%&*+\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)

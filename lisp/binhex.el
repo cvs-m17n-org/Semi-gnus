@@ -25,9 +25,9 @@
 
 ;;; Code:
 
-(autoload 'executable-find "executable")
-
 (eval-when-compile (require 'cl))
+
+(require 'path-util)
 
 (eval-and-compile
   (defalias 'binhex-char-int
@@ -48,7 +48,7 @@ input and write the converted data to its standard output."
   :type '(repeat string))
 
 (defcustom binhex-use-external
-  (executable-find binhex-decoder-program)
+  (exec-installed-p binhex-decoder-program)
   "*Use external binhex program."
   :group 'gnus-extract
   :type 'boolean)

@@ -1,9 +1,22 @@
+2003-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.13 revision 00.
+
 2003-01-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el (infohack-texi-format): Insert one excessive
 	newline after a @foo{bar} thing to prevent clinging of a line and
 	a line (old texinfmt bug?) if it should be considered only one
 	thing in a line.
+
+2003-01-17  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* .cvsignore: Import from Oort Gnus.
+	* contrib/.cvsignore: Ditto.
+	* etc/.cvsignore: Ditto.
+	* lisp/.cvsignore: Ditto.
+	* texi/.cvsignore: Ditto.
+	* texi/ps/.cvsignore: Ditto.
 
 2003-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -16,15 +29,45 @@
 	* lisp/gnus-msg.el (gnus-summary-mail-forward): To many lists of
 	lists.
 
+2003-01-15  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add.  Fix from Reiner Steib
+	<4uce.02.r.steib@gmx.net>.
+
 2003-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Allow a list of
-	articles to be marked as well.
+	* lisp/binhex.el: Require `path-util'.
+	* lisp/gnus-audio.el: Ditto.
+	* lisp/spam.el: Ditto.
+	* lisp/uudecode.el: Ditto.
+
+	* lisp/binhex.el (binhex-use-external): Replace `executable-find'
+	with `exec-installed-p'.
+	* lisp/gnus-audio.el (gnus-audio-au-player): Ditto.
+	(gnus-audio-wav-player): Ditto.
+	* lisp/spam.el (spam-ifile-path): Ditto.
+	(spam-bogofilter-path): Ditto.
+	* lisp/uudecode.el (uudecode-use-external): Ditto.
+
+	* lisp/gnus-int.el (gnus-agent-expire): Make arguments optional.
 
 2003-01-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-util.el (gnus-read-event-char): Take an optional
 	parameter even if Mule 2.3 is running.
+
+2003-01-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Removed "-no-init-file" (it's the same as "-q").  Use
+	new variables EMACSBATCH and GNUS_INFO_DIR.  Install gnus-?,
+	message-?, sieve and pgg (in texi).  Added hint for dir entries.
+
+	* make-x.bat: Ditto.
+
+2003-01-13  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add smileys, Sender:, message-utils.
+	Expand anti-spam.  Fixes.
 
 2003-01-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 

@@ -26,9 +26,9 @@
 
 ;;; Code:
 
-(autoload 'executable-find "executable")
-
 (eval-when-compile (require 'cl))
+
+(require 'path-util)
 
 (eval-and-compile
   (defalias 'uudecode-char-int
@@ -49,7 +49,7 @@ input and write the converted data to its standard output."
   :type '(repeat string))
 
 (defcustom uudecode-use-external
-  (executable-find uudecode-decoder-program)
+  (exec-installed-p uudecode-decoder-program)
   "*Use external uudecode program."
   :group 'gnus-extract
   :type 'boolean)

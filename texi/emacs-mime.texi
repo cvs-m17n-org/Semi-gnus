@@ -18,7 +18,8 @@
 
 This file documents the Emacs MIME interface functionality.
 
-Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+          Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -47,7 +48,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1998, 1999, 2000, 2001, 2002 Free Software
+Copyright @copyright{} 1998, 1999, 2000, 2001, 2002, 2003 Free Software
 Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -308,6 +309,11 @@ be displayed automatically.
 @vindex mm-automatic-external-display
 This is a list of types that will be displayed automatically in an
 external viewer.
+
+@item mm-keep-viewer-alive-types
+@vindex mm-keep-viewer-alive-types
+This is a list of media types for which the external viewer will not
+be killed when selecting a different article.
 
 @item mm-attachment-override-types
 @vindex mm-attachment-override-types
@@ -718,7 +724,7 @@ by using the @code{encoding} MML tag (@pxref{MML Definition}).
 @item mm-coding-system-priorities
 @vindex mm-coding-system-priorities
 Prioritize coding systems to use for outgoing messages.  The default
-is nil, which means to use the defaults in Emacs.  It is a list of
+is @code{nil}, which means to use the defaults in Emacs.  It is a list of
 coding system symbols (aliases of coding systems does not work, use
 @kbd{M-x describe-coding-system} to make sure you are not specifying
 an alias in this variable).  For example, if you have configured Emacs
@@ -739,7 +745,7 @@ the @code{encoding} MML tag (@pxref{MML Definition}).
 
 @item mm-use-ultra-safe-encoding
 @vindex mm-use-ultra-safe-encoding
-When this is non-nil, it means that textual parts are encoded as
+When this is non-@code{nil}, it means that textual parts are encoded as
 quoted-printable if they contain lines longer than 76 characters or
 starting with "From " in the body.  Non-7bit encodings (8bit, binary)
 are generally disallowed.  This reduce the probability that a non-8bit
@@ -1589,7 +1595,7 @@ Interface functions:
 @table @code
 @item mailcap-parse-mailcaps
 @findex mailcap-parse-mailcaps
-Parse the @code{~/.mailcap} file.
+Parse the @file{~/.mailcap} file.
 
 @item mailcap-mime-info
 Takes a @sc{mime} type as its argument and returns the matching viewer.
