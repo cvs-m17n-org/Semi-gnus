@@ -8143,6 +8143,9 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @code{gnus-move-split-methods} $B$O(B @code{gnus-split-methods} $B$HF1$89=J8$r(B
 $B;H$&JQ?t$G$9(B (@pxref{Saving Articles})$B!#$"$J$?$,BEEv$@$H;W$&$h$&$JDs0F$r(B
 $B$9$k$h$&$K$=$NJQ?t$r%+%9%?%^%$%:$9$k;v$,$G$-$^$9!#(B
+(@code{gnus-split-methods} $B$,%U%!%$%kL>$r;H$&$N$KBP$7(B
+$B$F(B @code{gnus-move-split-methods} $B$O%0%k!<%WL>$r;H$&$3$H$KCm0U$7$F2<$5(B
+$B$$!#(B)
 
 @lisp
 (setq gnus-move-split-methods
