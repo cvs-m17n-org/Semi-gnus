@@ -288,6 +288,18 @@ nil, ."
 	(and (fboundp 'coding-system-p) (coding-system-p sym))))
   (defalias 'mm-coding-system-p 'nnheader-coding-system-p)
 
+  (defalias 'mm-disable-multibyte
+    (static-if (featurep 'xemacs)
+	'ignore
+      (lambda nil (set-buffer-multibyte nil))))
+  (defalias 'mm-enable-multibyte
+    (static-if (featurep 'xemacs)
+	'ignore
+      ;; Why isn't it t but `to'?  See mm-util.el.
+      (lambda nil (set-buffer-multibyte 'to))))
+
+  (defalias 'mm-encode-coding-region 'encode-coding-region)
+
   (defalias 'mm-string-make-unibyte
     (if (fboundp 'string-make-unibyte)
 	'string-make-unibyte

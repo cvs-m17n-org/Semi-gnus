@@ -1,8 +1,11 @@
 2004-05-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/nnheader.el (mm-string-make-unibyte): New function.
+	* lisp/nnheader.el (mm-disable-multibyte): New function.
+	(mm-enable-multibyte): New function.
+	(mm-encode-coding-region): New function.
+	(mm-string-make-unibyte): New function.
 
-	* lisp/utf7.el: Require `mm-util' only when compiling.
+	* lisp/utf7.el: Require `nnheader' instead of `mm-util'.
 
 2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
