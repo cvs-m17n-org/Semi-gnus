@@ -400,13 +400,6 @@ Modify to suit your needs."))
 				   (1+ (match-end 0))
 				 (point-max))))
 	      (goto-char (point-min))
-	      ;; Remove "@anchor" if it is not supported.
-	      (unless (fboundp 'texinfo-anchor)
-		(while (re-search-forward "^@anchor" nil t)
-		  (delete-region (match-beginning 0) (progn
-						       (forward-line 1)
-						       (point))))
-		(goto-char (point-min)))
 	      ;; Add suffix if it is needed.
 	      (when (and addsuffix
 			 (re-search-forward

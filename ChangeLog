@@ -1,3 +1,7 @@
+2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Cancel last change.
+
 2001-01-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.

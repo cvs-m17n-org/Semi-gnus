@@ -32,7 +32,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; Fixme: this should be a gnus variable, not nnmail-.
+  (defvar nnmail-pathname-coding-system))
 (eval-when-compile (require 'static))
 
 (require 'custom)
@@ -557,6 +560,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
+  (require 'nnmail)
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(pathname-coding-system nnmail-pathname-coding-system))
     (when (and directory

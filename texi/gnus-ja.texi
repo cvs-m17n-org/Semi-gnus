@@ -7342,7 +7342,7 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 \include{xface}
 @end iflatex
 @end iftex
-@anchor{X-Face}
+@c @anchor{X-Face}
 $B$9$Y$F$N(B X-Face $BMs$rC5$7$FI=<($7$^$9(B(@code{gnus-article-display-x-face})$B!#(B
 $B$3$NL?Na$OJQ?t(B @code{gnus-article-x-face-command} $B$K$h$C$FM?$($i$l$?4X?t(B
 $B$K$h$C$F<B9T$5$l$^$9!#$3$NJQ?t$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B(B
