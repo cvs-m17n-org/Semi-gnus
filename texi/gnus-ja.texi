@@ -16715,41 +16715,41 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 
 $B$^$:!"$$$/$D$+$NMQ8l$rJRIU$1$F$*$-$^$7$g$&!#(B
 
-$B$"$J$?$,%M%C%H%o!<%/$H$NDL?.$,@Z$l$F$$$k$H$-(B($B$G%(!<%8%'%s%H$,$=$l$rCN$i(B
-$B$5$l$F$$$k$H$-(B)$B$O!"(Bgnus $B%(!<%8%'%s%H$O@Z$jN%$5$l$F$$$k(B (@dfn{unplugged})$B!"(B
-$B$H8@$$$^$9!#%M%C%H%o!<%/$NDL?.$,I|3h$7(B ($B$=$7$F(B gnus $B$,$=$l$rCN$l$P(B)$B!"%(!<(B
-$B%8%'%s%H$O:9$79~$^$l$F$$$k(B (@dfn{plugged})$B!"$H8@$$$^$9!#(B
+$B%M%C%H%o!<%/$H$NDL?.$,@Z$l$F$$$k$H$-(B ($B$=$7$F%(!<%8%'%s%H$,$=$l$rCN$i$5$l(B
+$B$F$$$k$H$-(B)$B!"(Bgnus $B%(!<%8%'%s%H$O@Z$jN%$5$l$F$$$k(B (@dfn{unplugged}) $B$H8@(B
+$B$$$^$9!#%M%C%H%o!<%/$NDL?.$,I|3h$7(B ($B$=$7$F(B gnus $B$,$=$l$rCN$l$P(B)$B!"%(!<%8%'(B
+$B%s%H$O:9$79~$^$l$F$$$k(B (@dfn{plugged}) $B$H8@$$$^$9!#(B
 
 $B%m!<%+%k(B (@dfn{local}) $B%^%7%s$H$O!"$"$J$?$,?($C$F$$$k%^%7%s$G!"%M%C%H%o!<(B
 $B%/$K7QB3E*$K@\B3$5$l$F$$$k$b$N$G$O$"$j$^$;$s!#(B
 
-$B%@%&%s%m!<%I(B (@dfn{download}) $B$H$O%M%C%H%o!<%/$+$i2?$+$r$"$J$?$N%m!<%+%k(B
-$B%^%7%s$K<h$C$F$/$k$3$H$r0UL#$7$^$9!#%"%C%W%m!<%I(B (@dfn{upload}) $B$O$=$N5U(B
-$B$r$9$k$3$H$G$9!#(B
+$B%@%&%s%m!<%I(B (@dfn{downloading}) $B$H$O%M%C%H%o!<%/$+$i2?$+$r$"$J$?$N%m!<(B
+$B%+%k%^%7%s$K<h$C$F$/$k$3$H$r0UL#$7$^$9!#%"%C%W%m!<(B
+$B%I(B (@dfn{uploading}) $B$O$=$N5U$r$9$k$3$H$G$9!#(B
 
-@c TRANSLATEME
-You know that Gnus gives you all the opportunity you'd ever want for
-shooting yourself in the foot.  Some people call it flexibility.  Gnus
-is also customizable to a great extent, which means that the user has a
-say on how Gnus behaves.  Other newsreaders might unconditionally shoot
-you in your foot, but with Gnus, you have a choice!
+$B$4B8CN$N$h$&$K(B gnus $B$O$"$J$?$,%I%8$rF'$`$9$Y$F$N5!2q$rDs6!$7$^$9!#$=$l$r(B
+$B=@Fp@-$H8@$&?M$b$$$^$9!#$5$i$K(B gnus $B$OBg$$$K%+%9%?%^%$%:2DG=$G!"$=$l$O%f!<(B
+$B%6$,!"(Bgnus $B$,$I$N$h$&$KF0:n$9$k$+$K$D$$$FH/8@8"$r;}$C$F$$$k$3$H$r0UL#$7(B
+$B$^$9!#B>$N%K%e!<%9%j!<%@!<$OM-L5$r8@$o$:$"$J$?$K%I%8$rF'$^$;$k$+$b$7$l$^(B
+$B$;$s$,!"(Bgnus $B$G$O$"$J$?$KA*Br8"$,$"$j$^$9(B!
 
-Gnus is never really in plugged or unplugged state.  Rather, it applies
-that state to each server individually.  This means that some servers
-can be plugged while others can be unplugged.  Additionally, some
-servers can be ignored by the Agent altogether (which means that
-they're kinda like plugged always).
+Gnus $B$O<B:]$K$O(B plugged $B$^$?$O(B unplugged $B$N$I$A$i$N>uBV$K$b$"$j$^$;$s!#(B
+$B$b$C$H@53N$K8@$($P!"%5!<%P!<$4$H$K$=$l$>$l$N>uBV$r;}$A$^$9!#$3$l$O!"$$$/(B
+$B$D$+$N%5!<%P!<$,@\B3$G$-$J$$$H$-$K!"B>$N%5!<%P!<$O@\B3$G$-$k$3$H$r0UL#$7(B
+$B$^$9!#$5$i$K!"(B Agent $B$K$h$C$F$$$/$D$+$N%5!<%P!<$r$9$Y$FL5;k$9$k$3$H$,$G(B
+$B$-$^$9(B ($B$=$N0UL#$O!"$=$l$i$,$$$D$b(B plugged $B$K$J$C$F$$$k$N$H;w$F$$$k$H$$(B
+$B$&$3$H$G$9(B)$B!#(B
 
-So when you unplug the Agent and then wonder why is Gnus opening a
-connection to the Net, the next step to do is to look whether all
-servers are agentized.  If there is an unagentized server, you found
-the culprit.
+Agent $B$r@Z$jN%$7$F$b!"$J$<(B gnus $B$,%M%C%H$K@\B3$7$F$$$k$N$,$$$V$+$7$/;W(B
+$B$o$l$?$H$-!"9T$&$Y$-<!$N%9%F%C%W$O%5!<%P!<$,$9$Y$F%(!<%8%'%s%H2=$5$l$F$$(B
+$B$k$+$I$&$+$r4Q;!$9$k$3$H$G$9!#%(!<%8%'%s%H2=$5$l$F$$$J$$%5!<%P!<$,$"$C$?(B
+$B$i!"$"$J$?$OHH?M$r8+$D$1$?$N$G$9!#(B
 
-Another thing is the @dfn{offline} state.  Sometimes, servers aren't
-reachable.  When Gnus notices this, it asks you whether you want the
-server to be switched to offline state.  If you say yes, then the
-server will behave somewhat as if it was unplugged, except that Gnus
-will ask you whether you want to switch it back online again.
+$B$b$&0l$D$N>uBV$O(B @dfn{offline} $B$G$9!#%5!<%P!<$O$H$-$I$-E~C#2DG=$G$O$J$/(B
+$B$J$j$^$9!#(BGnus $B$,$3$N$3$H$rCN$k$H!"$=$N%5!<%P!<$r(B offline $B$N>uBV$K@Z$j49(B
+$B$($F$bNI$$$+$I$&$+$r?R$M$^$9!#$O$$!"$HEz$($?$J$i$P!"(B(offline $B$KLa$7$FNI(B
+$B$$$+$H(B gnus $B$,?R$M$?>l9g0J30$O(B) $B%5!<%P!<$OB?>/(B unplugged $B$@$C$?$H$-$N$h(B
+$B$&$K?6$kIq$$$^$9!#(B
 
 $B%(!<%8%'%s%H$r;H$C$?E57?E*$J(B gnus $B$NBPOCA`:n$r8+$F$_$^$7$g$&!#(B
 
