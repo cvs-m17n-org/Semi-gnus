@@ -4970,6 +4970,7 @@ groups."
     (set-buffer gnus-article-buffer)
     (gnus-article-edit-mode)
     (funcall start-func)
+    (set-buffer-modified-p nil)
     (gnus-configure-windows 'edit-article)
     (setq gnus-article-edit-done-function exit-func)
     (setq gnus-prev-winconf winconf)
@@ -4985,7 +4986,20 @@ groups."
 	(start (window-start)))
     (remove-hook 'gnus-article-mode-hook
 		 'gnus-article-mime-edit-article-unwind)
-    (gnus-article-edit-exit)
+    ;; We remove all text props from the article buffer.
+    (let ((content
+	   (buffer-substring-no-properties (point-min) (point-max)))
+	  (p (point)))
+      (erase-buffer)
+      (insert content)
+      (let ((winconf gnus-prev-winconf))
+	(gnus-article-mode)
+	(set-window-configuration winconf)
+	;; Tippy-toe some to make sure that point remains where it was.
+	(save-current-buffer
+	  (set-buffer buf)
+	  (set-window-start (get-buffer-window (current-buffer)) start)
+	  (goto-char p))))
     (save-excursion
       (set-buffer buf)
       (let ((buffer-read-only nil))
@@ -5009,21 +5023,22 @@ groups."
 (defun gnus-article-edit-exit ()
   "Exit the article editing without updating."
   (interactive)
-  ;; We remove all text props from the article buffer.
-  (let ((buf (buffer-substring-no-properties (point-min) (point-max)))
-	(curbuf (current-buffer))
-	(p (point))
-	(window-start (window-start)))
-    (erase-buffer)
-    (insert buf)
-    (let ((winconf gnus-prev-winconf))
-      (gnus-article-mode)
-      (set-window-configuration winconf)
-      ;; Tippy-toe some to make sure that point remains where it was.
-      (save-current-buffer
-	(set-buffer curbuf)
-	(set-window-start (get-buffer-window (current-buffer)) window-start)
-	(goto-char p)))))
+  (when (or (not (buffer-modified-p))
+	    (yes-or-no-p "Article modified; kill anyway? "))
+    (let ((curbuf (current-buffer))
+	  (p (point))
+	  (window-start (window-start)))
+      (erase-buffer)
+      (if (gnus-buffer-live-p gnus-original-article-buffer)
+	  (insert-buffer gnus-original-article-buffer))
+      (let ((winconf gnus-prev-winconf))
+	(gnus-article-mode)
+	(set-window-configuration winconf)
+	;; Tippy-toe some to make sure that point remains where it was.
+	(save-current-buffer
+	  (set-buffer curbuf)
+	  (set-window-start (get-buffer-window (current-buffer)) window-start)
+	  (goto-char p))))))
 
 (defun gnus-article-edit-full-stops ()
   "Interactively repair spacing at end of sentences."
@@ -5051,7 +5066,7 @@ groups."
     (message ""))
   (when (featurep 'font-lock)
     (setq font-lock-defaults nil)
-    (font-lock-mode 0)))
+    (font-lock-mode -1)))
 
 (defun gnus-article-mime-edit-article-setup ()
   "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
@@ -5070,7 +5085,7 @@ after replacing with the original article."
 	       (replace-match "")))
 	   (when (featurep 'font-lock)
 	     (setq font-lock-defaults nil)
-	     (font-lock-mode 0))
+	     (font-lock-mode -1))
 	   (apply ,gnus-article-edit-done-function args)
 	   (set-buffer gnus-original-article-buffer)
 	   (erase-buffer)
@@ -5106,7 +5121,7 @@ after replacing with the original article."
 	(replace-match "")))
     (when (featurep 'font-lock)
       (setq font-lock-defaults nil)
-      (font-lock-mode 0))
+      (font-lock-mode -1))
     ;; We remove all text props from the article buffer.
     (setq buf (buffer-substring-no-properties (point-min) (point-max)))
     (set-buffer (get-buffer-create gnus-original-article-buffer))

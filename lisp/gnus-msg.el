@@ -42,8 +42,8 @@
 (defcustom gnus-post-method 'current
   "*Preferred method for posting USENET news.
 
-If this variable is `current', Gnus will use the \"current\" select
-method when posting.  If it is nil (which is the default), Gnus will
+If this variable is `current' (which is the default), Gnus will use
+the \"current\" select method when posting.  If it is nil, Gnus will
 use the native select method when posting.
 
 This method will not be used in mail groups and the like, only in
@@ -1238,28 +1238,7 @@ this is a reply."
 				group (gnus-status-message method))
 		  (sit-for 2))
 		(when (and group-art gnus-inews-mark-gcc-as-read)
-		  (gnus-activate-group group)
-		  (let ((buffer (gnus-summary-buffer-name group))
-			(mark gnus-read-mark)
-			(article (cdr group-art)))
-		    (unless
-			(and
-			 (get-buffer buffer)
-			 (with-current-buffer buffer
-			   (when gnus-newsgroup-prepared
-			     (when (and gnus-newsgroup-auto-expire
-					(memq mark gnus-auto-expirable-marks))
-			       (setq mark gnus-expirable-mark))
-			     (setq mark (gnus-request-update-mark
-					 group article mark))
-			     (gnus-mark-article-as-read article mark)
-			     (setq gnus-newsgroup-active (gnus-active group))
-			     t)))
-		      (gnus-group-make-articles-read group
-						     (list article))
-		      (when (gnus-group-auto-expirable-p group)
-			(gnus-add-marked-articles
-			 group 'expire (list article))))))
+		  (gnus-group-mark-article-read group (cdr group-art)))
 		(kill-buffer (current-buffer))))))))))
 
 (defun gnus-inews-insert-gcc ()

@@ -1,8 +1,56 @@
+2001-02-25 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From NAGY Andras <nagya@inf.elte.hu>.
+
+	* gnus.el (gnus-parameters): Typo.
+
+2001-02-24 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-read-method): Remove redundancy.
+
+2001-02-23 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-backslash-url): New.
+	(nnslashdot-request-list): Use it.
+
+2001-02-23 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnml.el (nnml-generate-active-info): Fix the case when there is
+	no file.
+
+	* gnus-sum.el (gnus-summary-import-article): Display it. Enable edit. 
+	(gnus-summary-create-article): New.
+
+	* gnus-group.el (gnus-group-mark-article-read): New.
+
+	* gnus-msg.el (gnus-inews-do-gcc): Use it.
+
+	* gnus-art.el (gnus-article-edit-article): Set modified-p nil.
+
+2001-02-23 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-edit-done): Don't use
+	gnus-article-edit-exit.
+	(gnus-article-edit-exit): Confirm and insert original-article-buffer.
+
+	* gnus.el (gnus-parameters): New. 
+	Suggested by NAGY Andras <nagya@inf.elte.hu>.
+	(gnus-parameters-get-parameter): New.
+	(gnus-group-find-parameter): Use it.
+
+2001-02-23  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus-msg.el (gnus-post-method): Fix documentation to reflect
+	change of default value to `current'.
+
+2001-02-23 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nneething.el (nneething-get-head): Insert unreadable file too.
+
 2001-02-22 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-sum.el (gnus-summary-insert-articles): Remove fetched headers.
 
-	* webmail.el (webmail-type-definition): Deja is brought by google.
+	* webmail.el (webmail-type-definition): Deja is bought by google.
 
 2001-02-22 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 

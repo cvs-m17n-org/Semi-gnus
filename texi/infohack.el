@@ -46,6 +46,12 @@
 	(Info-split))
     (save-buffer)))
 
+(defun batch-makeinfo ()
+  "Emacs makeinfo in batch mode."
+  (infohack-texi-format (car command-line-args-left)
+			(car (cdr command-line-args-left)))
+  (setq command-line-args-left nil))
+
 
 (let ((default-directory (expand-file-name "../lisp/"))
       (features (cons 'w3-forms (copy-sequence features))))

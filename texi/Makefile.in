@@ -10,7 +10,8 @@ TEXI2DVI=texi2dvi
 TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
 EMACS=@EMACS@
-EMACSINFO=$(EMACS) -batch -q -no-site-file
+EMACSCOMP=$(EMACS) -batch -q -no-site-file
+EMACSINFO=$(EMACSCOMP) -l $(srcdir)/infohack.el -f batch-makeinfo
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
@@ -39,19 +40,16 @@ message-ja.info: message-ja.texi
 most: texi2latex.elc latex latexps
 
 %-ja: %-ja.texi
-	$(EMACSINFO) -l $(srcdir)/infohack.el \
-		-eval '(infohack-texi-format "$<")'
+	$(EMACSINFO) $<
 
 %-ja.info: %-ja.texi
-	$(EMACSINFO) -l $(srcdir)/infohack.el \
-		-eval '(infohack-texi-format "$<" t)'
+	$(EMACSINFO) $< t
 
 %.info: %.texi
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
-	  $(EMACSINFO) -l $(srcdir)/infohack.el \
-		-eval '(infohack-texi-format "$<" t)'; \
+	  $(EMACSINFO) $< t; \
 	else \
 	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
 	fi
@@ -62,8 +60,7 @@ most: texi2latex.elc latex latexps
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
-	  $(EMACSINFO) -l $(srcdir)/infohack.el \
-		-eval '(infohack-texi-format "$<")'; \
+	  $(EMACSINFO) $<; \
 	else \
 	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
@@ -111,10 +108,10 @@ makeinfo:
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	srcdir=$(srcdir)/../lisp $(EMACSINFO) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
+	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
 
 latex gnus.latexi gnus-faq.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi texi2latex.elc
-	srcdir=$(srcdir) $(EMACSINFO) -l ./texi2latex.elc -f latexi-translate
+	srcdir=$(srcdir) $(EMACSCOMP) -l ./texi2latex.elc -f latexi-translate
 
 latexps: gnus.latexi
 	$(MAKE) texi2latex.elc

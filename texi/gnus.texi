@@ -7146,7 +7146,7 @@ groupings will be hidden.)  The fourth is the face used for
 highlighting.
 
 @lisp
-(setq gnus-article-emphasis
+(setq gnus-emphasis-alist
       '(("_\\(\\w+\\)_" 0 1 gnus-emphasis-underline)
         ("\\*\\(\\w+\\)\\*" 0 1 gnus-emphasis-bold)))
 @end lisp
@@ -9638,9 +9638,11 @@ Thank you for asking.  I hate you.
 
 @vindex gnus-post-method
 
-It can be quite complicated.  Normally, gnus will use the same native
-server.  However.  If your native server doesn't allow posting, just
-reading, you probably want to use some other server to post your
+It can be quite complicated.  Normally, Gnus will post using the same
+select method as you're reading from (which might be convenient if
+you're reading lots of groups from different private servers).
+However.  If the server you're reading from doesn't allow posting,
+just reading, you probably want to use some other server to post your
 (extremely intelligent and fabulously interesting) articles.  You can
 then set the @code{gnus-post-method} to some other method:
 
@@ -9651,7 +9653,7 @@ then set the @code{gnus-post-method} to some other method:
 Now, if you've done this, and then this server rejects your article, or
 this server is down, what do you do then?  To override this variable you
 can use a non-zero prefix to the @kbd{C-c C-c} command to force using
-the ``current'' server for posting.
+the ``current'' server, to get back the default behaviour, for posting.
 
 If you give a zero prefix (i.e., @kbd{C-u 0 C-c C-c}) to that command,
 gnus will prompt you for what method to use for posting.
@@ -9660,10 +9662,8 @@ You can also set @code{gnus-post-method} to a list of select methods.
 If that's the case, gnus will always prompt you for what method to use
 for posting.
 
-Finally, if you want to always post using the same select method as
-you're reading from (which might be convenient if you're reading lots of
-groups from different private servers), you can set this variable to
-@code{current}.
+Finally, if you want to always post using the native select method,
+you can set this variable to @code{nil}.
 
 
 @node Mail and Post
@@ -14171,7 +14171,7 @@ if it thinks that the mail belongs in that group.
 Nnmail users might recollect that the last regexp had to be empty to
 match all articles (like in the example above).  This is not required in
 nnimap.  Articles not matching any of the regexps will not be moved out
-of your inbox.  (This might might affect performance if you keep lots of
+of your inbox.  (This might affect performance if you keep lots of
 unread articles in your inbox, since the splitting code would go over
 them every time you fetch new mail.)
 
@@ -14840,7 +14840,7 @@ your desired @code{downloading} criteria for a group are the same as your
 
 These directives in either the category definition or a group's
 parameters will cause the agent to read in all the applicable score
-files for a group, *filtering out* those those sections that do not
+files for a group, *filtering out* those sections that do not
 relate to one of the permitted subset of scoring keywords.
 
 @itemize @bullet
@@ -16260,7 +16260,7 @@ A list.  The elements in this list can be:
 @enumerate
 @item
 @code{(@var{regexp} @var{file-name})}.  If the @var{regexp} matches the
-group name, the @var{file-name} will will be used as the home score file.
+group name, the @var{file-name} will be used as the home score file.
 
 @item
 A function.  If the function returns non-nil, the result will be used as
@@ -18197,7 +18197,7 @@ never be totally undoable.
 @findex gnus-undo
 The undoability is provided by the @code{gnus-undo-mode} minor mode.  It
 is used if @code{gnus-use-undo} is non-@code{nil}, which is the
-default.  The @kbd{M-C-_} key performs the @code{gnus-undo} command
+default.  The @kbd{M-C-_} key performs the @code{gnus-undo} 
 command, which should feel kinda like the normal Emacs @code{undo}
 command.
 

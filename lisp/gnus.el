@@ -877,6 +877,20 @@ be set in `.emacs' instead."
 (require 'gnus-util)
 (require 'nnheader)
 
+(defvar gnus-parameters nil
+  "Alist of group parameters.
+
+For example:
+   ((\"mail\\\\..*\"  (gnus-show-threads nil)
+                  (gnus-use-scoring nil)
+                  (gnus-summary-line-format
+                        \"%U%R%z%I%(%[%d:%ub%-20,20f%]%) %s\\n\")
+                  (gcc-self . t)
+                  (display . all))
+     (\"mail\\\\.me\" (gnus-use-scoring  t))
+     (\"list\\\\..*\" (total-expire . t)
+                  (broken-reply-to . t)))")
+
 (defvar gnus-group-parameters-more nil)
 
 (condition-case nil
@@ -2749,12 +2763,28 @@ You should probably use `gnus-find-method-for-group' instead."
   "Say whether the group is secondary or not."
   (gnus-secondary-method-p (gnus-find-method-for-group group)))
 
+(defun gnus-parameters-get-parameter (group)
+  "Return the group parameters for GROUP from `gnus-parameters'."
+  (let ((alist gnus-parameters)
+	params-list)
+    (while alist
+      (when (string-match (caar alist) group)
+	(setq params-list 
+	      (nconc (copy-sequence (cdar alist))
+		     params-list)))
+      (pop alist))
+    params-list))
+
 (defun gnus-group-find-parameter (group &optional symbol allow-list)
   "Return the group parameters for GROUP.
 If SYMBOL, return the value of that symbol in the group parameters."
   (save-excursion
     (set-buffer gnus-group-buffer)
-    (let ((parameters (funcall gnus-group-get-parameter-function group)))
+    (let ((parameters 
+	   (nconc
+	    (copy-sequence
+	     (funcall gnus-group-get-parameter-function group))
+	    (gnus-parameters-get-parameter group))))
       (if symbol
 	  (gnus-group-parameter-value parameters symbol allow-list)
 	parameters))))
@@ -3044,11 +3074,19 @@ Disallow invalid group names."
 (defun gnus-read-method (prompt)
   "Prompt the user for a method.
 Allow completion over sensible values."
-  (let* ((servers
-	  (append gnus-valid-select-methods
-		  (mapcar (lambda (i) (list (format "%s:%s" (caar i)
-						    (cadar i))))
-			  gnus-opened-servers)
+  (let* ((open-servers 
+	  (mapcar (lambda (i) (cons (format "%s:%s" (caar i) (cadar i)) i))
+		  gnus-opened-servers))
+	 (valid-methods
+	  (let (methods)
+	    (dolist (method gnus-valid-select-methods)
+	      (if (or (memq 'prompt-address method)
+		      (not (assoc (format "%s:" (car method)) open-servers)))
+		  (push method methods)))
+	    methods))
+	 (servers
+	  (append valid-methods
+		  open-servers
 		  gnus-predefined-server-alist
 		  gnus-server-alist))
 	 (method
@@ -3063,13 +3101,7 @@ Allow completion over sensible values."
 			       (assoc method gnus-valid-select-methods))
 			 (read-string "Address: ")
 		       "")))
-	(or (let ((opened gnus-opened-servers))
-	      (while (and opened
-			  (not (equal (format "%s:%s" method address)
-				      (format "%s:%s" (caaar opened)
-					      (cadaar opened)))))
-		(pop opened))
-	      (caar opened))
+	(or (cadr (assoc (format "%s:%s" method address) open-servers))
 	    (list (intern method) address))))
      ((assoc method servers)
       method)
