@@ -133,7 +133,7 @@
      (index-url     . (nnshimbun-mew-concat-url "index.html"))
      (make-contents . nnshimbun-make-mhonarc-contents))
     ("xemacs"
-     (url . "http://www.xemacs.org/list-archives/")
+     (url . "http://list-archives.xemacs.org/")
      (groups "xemacs-announce" "xemacs-beta-ja" "xemacs-beta"
 	     "xemacs-build-reports" "xemacs-cvs" "xemacs-mule"
 	     "xemacs-nt" "xemacs-patches" "xemacs-users-ja" "xemacs")
@@ -1302,7 +1302,7 @@ is enclosed by at least one regexp grouping construct."
   (let (headers auxs aux)
     (catch 'stop
       (while (re-search-forward
-	      (concat "<A HREF=\"/list-archives/" nnshimbun-current-group
+	      (concat "<A HREF=\"/" nnshimbun-current-group
 		      "/\\([12][0-9][0-9][0-9][0-1][0-9]\\)/\">\\[Index\\]")
 	      nil t)
 	(setq auxs (append auxs (list (match-string 1)))))
