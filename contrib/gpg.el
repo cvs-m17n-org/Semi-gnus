@@ -110,6 +110,10 @@
 (eval-when-compile 
   (require 'cl))
 
+
+(if (featurep 'xemacs)
+	  (defalias 'line-end-position 'point-at-eol))
+
 ;;;; Customization:
 
 ;;; Customization: Groups:
@@ -1077,12 +1081,7 @@ documentation for details)."
 
 (defun gpg-key-lessp (a b)
   "Returns t if primary user ID of A is less than B."
-  (let ((res (compare-strings (gpg-key-primary-user-id a) 0 nil
-			      (gpg-key-primary-user-id b) 0 nil
-			      t)))
-    (if (eq res t)
-	nil
-      (< res 0))))
+  (string-lessp (gpg-key-primary-user-id a) (gpg-key-primary-user-id b) ))
 
 ;;; Accessing the key database:
 

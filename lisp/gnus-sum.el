@@ -51,6 +51,7 @@
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-cache-write-active "gnus-cache")
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
+(autoload 'gnus-mailing-list-insinuate "gnus-ml" nil t)
 
 (defcustom gnus-kill-summary-on-exit t
   "*If non-nil, kill the summary buffer when you exit from it.
@@ -1569,9 +1570,8 @@ increase the score of each group you read."
     "g" gnus-summary-show-article
     "s" gnus-summary-isearch-article
     "P" gnus-summary-print-article
-    "t" gnus-article-babel
-    "d" gnus-summary-decrypt-article
-    "v" gnus-summary-verify-article)
+    "M" gnus-mailing-list-insinuate
+    "t" gnus-article-babel)
 
   (gnus-define-keys (gnus-summary-wash-map "W" gnus-summary-mode-map)
     "b" gnus-article-add-buttons
@@ -1816,6 +1816,7 @@ increase the score of each group you read."
              ["Fetch referenced articles" gnus-summary-refer-references t]
              ["Fetch current thread" gnus-summary-refer-thread t]
              ["Fetch article with id..." gnus-summary-refer-article t]
+             ["Setup Mailing List Params" gnus-mailing-list-insinuate t]
              ["Redisplay" gnus-summary-show-article t])))
       (easy-menu-define
        gnus-summary-article-menu gnus-summary-mode-map ""

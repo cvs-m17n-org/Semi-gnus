@@ -2745,7 +2745,9 @@ It should typically alter the sending method in some way or other."
       (save-excursion
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
-	(insert-buffer message-edit-buffer)
+	;; Avoid copying text props.
+	(insert (with-current-buffer message-edit-buffer
+		  (buffer-substring-no-properties (point-min) (point-max))))
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
@@ -4400,13 +4402,13 @@ than 988 characters long, and if they are not, trim them until they are."
     (setq message-buffer-list
 	  (nconc message-buffer-list (list (current-buffer))))))
 
-(defvar mc-modes-alist)
+;;;(defvar mc-modes-alist)
 (defun message-setup (headers &optional replybuffer actions)
-  (when (and (boundp 'mc-modes-alist)
-	     (not (assq 'message-mode mc-modes-alist)))
-    (push '(message-mode (encrypt . mc-encrypt-message)
-			 (sign . mc-sign-message))
-	  mc-modes-alist))
+;;;   (when (and (boundp 'mc-modes-alist)
+;;; 	     (not (assq 'message-mode mc-modes-alist)))
+;;;     (push '(message-mode (encrypt . mc-encrypt-message)
+;;; 			 (sign . mc-sign-message))
+;;; 	  mc-modes-alist))
   (when actions
     (setq message-send-actions actions))
   (setq message-reply-buffer

@@ -22,13 +22,12 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'gnus)
 (require 'gnus-art)
 (require 'gnus-range)
 (require 'message)	; for message-cite-prefix-regexp
-
-(eval-when-compile (require 'static))
 
 ;;; Customization:
 
@@ -661,22 +660,24 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (gnus-article-search-signature)
 	       (point)))
 	(prefix-regexp (concat "^\\(" message-cite-prefix-regexp "\\)"))
-	alist entry start begin end numbers prefix mc-flag)
+	alist entry start begin end numbers prefix guess-limit mc-flag)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)
       ;; Each line.
       (setq begin (point)
+	    guess-limit (progn (skip-chars-forward "^> \t\r\n") (point))
 	    end (progn (beginning-of-line 2) (point))
 	    start end)
       (goto-char begin)
       ;; Ignore standard Supercite attribution prefix.
-      (when (looking-at gnus-supercite-regexp)
+      (when (and (< guess-limit (+ begin gnus-cite-max-prefix))
+		 (looking-at gnus-supercite-regexp))
 	(if (match-end 1)
 	    (setq end (1+ (match-end 1)))
 	  (setq end (1+ begin))))
       ;; Ignore very long prefixes.
-      (when (> end (+ (point) gnus-cite-max-prefix))
-	(setq end (+ (point) gnus-cite-max-prefix)))
+      (when (> end (+ begin gnus-cite-max-prefix))
+	(setq end (+ begin gnus-cite-max-prefix)))
       (while (re-search-forward prefix-regexp (1- end) t)
 	;; Each prefix.
 	(setq end (match-end 0)
@@ -909,7 +910,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	(static-if (or (featurep 'xemacs)
 		       (and (eq emacs-major-version 20)
 			    (>= emacs-minor-version 3))
-		       (> emacs-major-version 20));-)
+		       (>= emacs-major-version 21))
 	    (forward-char (length prefix))
 	  (move-to-column (string-width prefix)))
 	(skip-chars-forward " \t")

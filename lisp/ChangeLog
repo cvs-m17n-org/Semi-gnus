@@ -1,4 +1,30 @@
-2000-11-22  dme@dme.org
+2000-11-22 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-setup): Discourage using mc-install-*-mode.
+
+	* gnus-setup.el (gnus-use-mailcrypt): Don't hook mail-crypt.
+
+2000-11-22 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-cite.el (gnus-cite-parse): Guess citation length.
+
+2000-11-22 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ml.el (gnus-mailing-list-insinuate): New function.
+
+2000-11-22 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ml.el (gnus-mailing-list-archive): Find the real url.
+
+2000-11-22 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-xmas.el (gnus-xmas-article-display-xface): Use
+	insert-buffer-substring.
+
+	* message.el (message-send-mail): Use buffer-substring-no-properties.
+	(message-send-news): Ditto.
+
+2000-11-22  David Edmondson <dme@dme.org>
 
 	* imap.el (imap-wait-for-tag): Message read info.
 
