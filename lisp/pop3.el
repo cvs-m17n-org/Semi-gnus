@@ -94,6 +94,12 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls"))
 
+(defvar pop3-ssl-program-name
+  (if (exec-installed-p "openssl")
+      "openssl"
+    "ssleay")
+  "The program to run in a subprocess to open an SSL connection.")
+
 (defvar pop3-ssl-program-arguments
   '("s_client" "-quiet")
   "Arguments to be passed to the program `pop3-ssl-program-name'.")
@@ -188,10 +194,7 @@ Argument PORT specifies connecting port."
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
   (require 'path-util)
   (let* ((ssl-program-name
-	  (cond ((exec-installed-p "openssl")
-		 "openssl")
-		(t
-		 "ssleay")))
+	  pop3-ssl-program-name)
 	 (ssl-program-arguments
 	  `(,@pop3-ssl-program-arguments ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))

@@ -1,3 +1,11 @@
+2000-09-04   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/mail-source.el (pop3-leave-mail-on-server): Declare.
+	(mail-source-keyword-map): New keyword `:leave' for pop.
+	(mail-source-fetch-pop): Refer it.
+
+	* lisp/pop3.el (pop3-ssl-program-name): New variable.
+
 2000-08-31  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* lisp/ptexinfmt.el (texinfo-multitable-widths,
