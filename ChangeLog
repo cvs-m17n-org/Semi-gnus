@@ -1,3 +1,7 @@
+1998-05-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-yapop3.el: New file. To handle multiple POP3 account.
+
 1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.1.
