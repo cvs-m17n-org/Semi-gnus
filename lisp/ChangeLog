@@ -1,3 +1,17 @@
+2001-02-21 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* smiley.el (gnus-smiley-display): Don't do widening.
+
+	* smiley-ems.el (gnus-smiley-display): Don't do widening. Smiley
+	within body.
+
+	* gnus-msg.el (gnus-inews-do-gcc): Activate group anyway.
+
+	* gnus-art.el (gnus-mime-display-multipart-alternative-as-mixed):
+	New.
+	(gnus-mime-display-multipart-related-as-mixed): New.
+	(gnus-mime-display-part): Use them.
+	 	
 2001-02-20 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-start.el (gnus-setup-news): Allow gnus-group-line-format to be
