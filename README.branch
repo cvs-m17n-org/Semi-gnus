@@ -1,7 +1,7 @@
 README.branch --- description of branches and tags. (DRAFT)
 ========================================================================
 
-Semi-gnus revision tree (1998-07-16)
+Semi-gnus revision tree (1998-07-24)
 
     vendor      personal    main trunk      public
     branch      branches                    branches
@@ -17,9 +17,9 @@ Gnus 5.6.11 ------>           6.3.3
        :                     (6.4.?)------> for SEMI 1.5
        :                        |    \
        :                        |     \
-(Synch with original Gnus       |      ---> for SEMI 1.6
+(Sync. with original Gnus       |      ---> for SEMI 1.6
  was done many times, but    (6.4.?)------> 6.5 (for SEMI 1.7)
- we don't include them.)        |        /    6.5.0
+ we don't include them here.)   |        /    6.5.0
        :                        |    (?)/
        :                        |   <---
        :                     (6.5.?)------> 6.6 (for SEMI 1.8, FLIM 1.7)
@@ -32,10 +32,10 @@ Gnus 5.6.22 ------>             |   feedback  6.7.7
        :                     (6.7.8)<------   6.7.8
        :                        |    \
        :                        |     \
-       :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8)
-       :     sync               |             6.8.0
+       :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8
+       :     sync               |             6.8.0		 or 1.9)
 Gnus 5.6.24 ------>             |             6.8.1
-       :                        :               :
+       :                        :             6.8.2
        :                        :               :
 ========================================================================
 
@@ -66,14 +66,16 @@ Public Branches
     N1 will be incremented if any fundamental architecture change is
     made.  Of cource, in this case, N2 and N3 will be reset to zero.
 
-    N2 will be incremented and new branch will be made if any "major
-    changes" are made.  "major changes" include API changes, major
-    version up of original Gnus, or synchronization with original Gnus
-    which requires design decision.
+    N2 will be incremented (and new branch will be created) if any "major
+    changes" are made.  The following cases are "major changes".
+      * API changes of FLIM/SEMI(or any other modules used by Semi-gnus).
+      * major version up of original Gnus.
+      * synchronization with original Gnus which requires design decision.
 
-    N3 will be incremented if some "minor changes" are made.  "minor
-    changes" include small bug fix or synchronization with original Gnus
-    without design decision.
+    N3 will be incremented if some "minor changes" are made.  The follwoing
+    cases are "minor changes".
+      * small bug fix.
+      * synchronization with original Gnus without design decision.
 
     The following branch tags are currently available.
 
@@ -82,7 +84,7 @@ Public Branches
 	gnus-6_5	Semi-gnus for SEMI 1.7 API
 	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
 	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
-	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 or 1.9 API
 
 Personal Branches
 
