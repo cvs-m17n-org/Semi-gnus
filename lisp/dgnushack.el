@@ -526,7 +526,12 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'font-lock-mode "font-lock" nil t)
     (autoload 'read-kbd-macro "edmacro" nil t)
-    (autoload 'turn-on-font-lock "font-lock" nil t)))
+    (autoload 'turn-on-font-lock "font-lock" nil t))
+  (autoload 'nnheader-detect-coding-region "nnheader")
+  (autoload 'std11-extract-addresses-components "nnheader")
+  (autoload 'std11-fold-region "nnheader")
+  (autoload 'std11-narrow-to-field "nnheader")
+  (autoload 'std11-unfold-region "nnheader"))
 
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")

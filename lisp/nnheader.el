@@ -140,19 +140,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
-(eval-and-compile
-  (unless (featurep 'mm-util)
-    ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
-    (defun nnheader-detect-coding-region (start end)
-      "Like 'detect-coding-region' except returning the best one."
-      (let ((coding-systems
-	     (static-if (boundp 'MULE)
-		 (code-detect-region (point) (point-max))
-	       (detect-coding-region (point) (point-max)))))
-	(or (car-safe coding-systems)
-	    coding-systems)))
-    (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)))
-
 (unless (featurep 'mm-util)
   ;; Should keep track of `mm-image-load-path' in mm-util.el.
   (defun nnheader-image-load-path (&optional package)
@@ -183,6 +170,17 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-encode-coding-string 'encode-coding-string)
   (defalias 'mm-decode-coding-string 'decode-coding-string)
 
+  ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
+  (defun nnheader-detect-coding-region (start end)
+    "Like 'detect-coding-region' except returning the best one."
+    (let ((coding-systems
+	   (static-if (boundp 'MULE)
+	       (code-detect-region (point) (point-max))
+	     (detect-coding-region (point) (point-max)))))
+      (or (car-safe coding-systems)
+	  coding-systems)))
+  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+
   ;; Should keep track of `mm-detect-mime-charset-region' in mm-util.el.
   (defun nnheader-detect-mime-charset-region (start end)
     "Detect MIME charset of the text in the region between START and END."
@@ -193,10 +191,10 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
   ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
-    "Create a temporary buffer, and evaluate FORMS there like `progn'.
+  "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-    `(let (default-enable-multibyte-characters default-mc-flag)
-       (with-temp-buffer ,@forms)))
+  `(let (default-enable-multibyte-characters default-mc-flag)
+     (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
   (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
@@ -252,29 +250,29 @@ nil, ."
 
   ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
   (defun nnheader-guess-mime-charset ()
-    "Guess the default MIME charset from the language environment."
-    (let ((language-info
-	   (and (boundp 'current-language-environment)
-		(assoc current-language-environment
-		       language-info-alist)))
-	  item)
-      (cond
-       ((null language-info)
-	'iso-8859-1)
-       ((setq item
-	      (cadr
-	       (or (assq 'coding-priority language-info)
-		   (assq 'coding-system language-info))))
-	(if (fboundp 'coding-system-get)
-	    (or (coding-system-get item 'mime-charset)
-		item)
-	  item))
-       ((setq item (car (last (assq 'charset language-info))))
-	(if (eq item 'ascii)
-	    'iso-8859-1
-	  (charsets-to-mime-charset (list item))))
-       (t
-	'iso-8859-1))))
+  "Guess the default MIME charset from the language environment."
+  (let ((language-info
+	 (and (boundp 'current-language-environment)
+	      (assoc current-language-environment
+		     language-info-alist)))
+	item)
+    (cond
+     ((null language-info)
+      'iso-8859-1)
+     ((setq item
+	    (cadr
+	     (or (assq 'coding-priority language-info)
+		 (assq 'coding-system language-info))))
+      (if (fboundp 'coding-system-get)
+	  (or (coding-system-get item 'mime-charset)
+	      item)
+	item))
+     ((setq item (car (last (assq 'charset language-info))))
+      (if (eq item 'ascii)
+	  'iso-8859-1
+	 (charsets-to-mime-charset (list item))))
+     (t
+      'iso-8859-1))))
   (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
 
   (defalias 'mm-char-int 'char-int)
@@ -312,72 +310,42 @@ nil, ."
   (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
 
 ;; mail-parse stuff.
-(eval-and-compile
-  (unless (featurep 'mail-parse)
-    ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
-    (defun-maybe std11-narrow-to-field ()
-      "Narrow the buffer to the header on the current line."
-      (forward-line 0)
-      (narrow-to-region (point)
-			(progn
-			  (std11-field-end)
-			  (when (eolp) (forward-line 1))
-			  (point)))
-      (goto-char (point-min)))
-    (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+(unless (featurep 'mail-parse)
+  ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
+  (defun-maybe std11-narrow-to-field ()
+    "Narrow the buffer to the header on the current line."
+    (forward-line 0)
+    (narrow-to-region (point)
+		      (progn
+			(std11-field-end)
+			(when (eolp) (forward-line 1))
+			(point)))
+    (goto-char (point-min)))
+  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
 
-    ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
-    (defun-maybe std11-fold-region (b e)
-      "Fold long lines in region B to E."
-      (save-restriction
-	(narrow-to-region b e)
-	(goto-char (point-min))
-	(let ((break nil)
-	      (qword-break nil)
-	      (first t)
-	      (bol (save-restriction
-		     (widen)
-		     (gnus-point-at-bol))))
-	  (while (not (eobp))
-	    (when (and (or break qword-break)
-		       (> (- (point) bol) 76))
-	      (goto-char (or break qword-break))
-	      (setq break nil
-		    qword-break nil)
-	      (if (looking-at "[ \t]")
-		  (insert "\n")
-		(insert "\n "))
-	      (setq bol (1- (point)))
-	      ;; Don't break before the first non-LWSP characters.
-	      (skip-chars-forward " \t")
-	      (unless (eobp)
-		(forward-char 1)))
-	    (cond
-	     ((eq (char-after) ?\n)
-	      (forward-char 1)
-	      (setq bol (point)
-		    break nil
-		    qword-break nil)
-	      (skip-chars-forward " \t")
-	      (unless (or (eobp) (eq (char-after) ?\n))
-		(forward-char 1)))
-	     ((eq (char-after) ?\r)
-	      (forward-char 1))
-	     ((memq (char-after) '(?  ?\t))
-	      (skip-chars-forward " \t")
-	      (if first
-		  ;; Don't break just after the header name.
-		  (setq first nil)
-		(setq break (1- (point)))))
-	     ((not break)
-	      (if (not (looking-at "=\\?[^=]"))
-		  (if (eq (char-after) ?=)
-		      (forward-char 1)
-		    (skip-chars-forward "^ \t\n\r="))
-		(setq qword-break (point))
-		(skip-chars-forward "^ \t\n\r")))
-	     (t
-	      (skip-chars-forward "^ \t\n\r"))))
+  ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
+  (defun mail-narrow-to-head ()
+    "Narrow to the header section in the current buffer."
+    (narrow-to-region
+     (goto-char (point-min))
+     (if (re-search-forward "^\r?$" nil 1)
+	 (match-beginning 0)
+       (point-max)))
+    (goto-char (point-min)))
+
+  ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
+  (defun-maybe std11-fold-region (b e)
+    "Fold long lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((break nil)
+	    (qword-break nil)
+	    (first t)
+	    (bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol))))
+	(while (not (eobp))
 	  (when (and (or break qword-break)
 		     (> (- (point) bol) 76))
 	    (goto-char (or break qword-break))
@@ -390,55 +358,46 @@ nil, ."
 	    ;; Don't break before the first non-LWSP characters.
 	    (skip-chars-forward " \t")
 	    (unless (eobp)
-	      (forward-char 1))))))
-
-    ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
-    (defun-maybe std11-unfold-region (b e)
-      "Unfold lines in region B to E."
-      (save-restriction
-	(narrow-to-region b e)
-	(goto-char (point-min))
-	(let ((bol (save-restriction
-		     (widen)
-		     (gnus-point-at-bol)))
-	      (eol (gnus-point-at-eol)))
-	  (forward-line 1)
-	  (while (not (eobp))
-	    (if (and (looking-at "[ \t]")
-		     (< (- (gnus-point-at-eol) bol) 76))
-		(delete-region eol (progn
-				     (goto-char eol)
-				     (skip-chars-forward "\r\n")
-				     (point)))
-	      (setq bol (gnus-point-at-bol)))
-	    (setq eol (gnus-point-at-eol))
-	    (forward-line 1)))))
-
-    ;; This is the original function in T-gnus.
-    (defun-maybe std11-extract-addresses-components (string)
-      "Extract a list of full name and canonical address from STRING.  Each
-element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
-If no name can be extracted, FULL-NAME will be nil."
-      (when string
-	(let (addresses)
-	  (dolist (structure (std11-parse-addresses-string
-			      (std11-unfold-string string))
-			     addresses)
-	    (push (list (std11-full-name-string structure)
-			(std11-address-string structure))
-		  addresses))
-	  (nreverse addresses))))))
-
-(unless (featurep 'mail-parse)
-  ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
-  (defun mail-narrow-to-head ()
-    "Narrow to the header section in the current buffer."
-    (narrow-to-region
-     (goto-char (point-min))
-     (if (re-search-forward "^\r?$" nil 1)
-	 (match-beginning 0)
-       (point-max)))
-    (goto-char (point-min)))
+	      (forward-char 1)))
+	  (cond
+	   ((eq (char-after) ?\n)
+	    (forward-char 1)
+	    (setq bol (point)
+		  break nil
+		  qword-break nil)
+	    (skip-chars-forward " \t")
+	    (unless (or (eobp) (eq (char-after) ?\n))
+	      (forward-char 1)))
+	   ((eq (char-after) ?\r)
+	    (forward-char 1))
+	   ((memq (char-after) '(?  ?\t))
+	    (skip-chars-forward " \t")
+	    (if first
+		;; Don't break just after the header name.
+		(setq first nil)
+	      (setq break (1- (point)))))
+	   ((not break)
+	    (if (not (looking-at "=\\?[^=]"))
+		(if (eq (char-after) ?=)
+		    (forward-char 1)
+		  (skip-chars-forward "^ \t\n\r="))
+	      (setq qword-break (point))
+	      (skip-chars-forward "^ \t\n\r")))
+	   (t
+	    (skip-chars-forward "^ \t\n\r"))))
+	(when (and (or break qword-break)
+		   (> (- (point) bol) 76))
+	  (goto-char (or break qword-break))
+	  (setq break nil
+		qword-break nil)
+	  (if (looking-at "[ \t]")
+	      (insert "\n")
+	    (insert "\n "))
+	  (setq bol (1- (point)))
+	  ;; Don't break before the first non-LWSP characters.
+	  (skip-chars-forward " \t")
+	  (unless (eobp)
+	    (forward-char 1))))))
 
   ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
   (defun-maybe std11-fold-field ()
@@ -450,6 +409,28 @@ If no name can be extracted, FULL-NAME will be nil."
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
+  ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
+  (defun-maybe std11-unfold-region (b e)
+    "Unfold lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol)))
+	    (eol (gnus-point-at-eol)))
+	(forward-line 1)
+	(while (not (eobp))
+	  (if (and (looking-at "[ \t]")
+		   (< (- (gnus-point-at-eol) bol) 76))
+	      (delete-region eol (progn
+				   (goto-char eol)
+				   (skip-chars-forward "\r\n")
+				   (point)))
+	    (setq bol (gnus-point-at-bol)))
+	  (setq eol (gnus-point-at-eol))
+	  (forward-line 1)))))
+
   ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
   (defun-maybe std11-unfold-field ()
     "Fold the current line."
@@ -459,6 +440,21 @@ If no name can be extracted, FULL-NAME will be nil."
 	(std11-unfold-region (point-min) (point-max)))))
 
   (defalias 'mail-header-unfold-field 'std11-unfold-field)
+
+  ;; This is the original function in T-gnus.
+  (defun-maybe std11-extract-addresses-components (string)
+    "Extract a list of full name and canonical address from STRING.  Each
+element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
+If no name can be extracted, FULL-NAME will be nil."
+    (when string
+      (let (addresses)
+	(dolist (structure (std11-parse-addresses-string
+			    (std11-unfold-string string))
+			   addresses)
+	  (push (list (std11-full-name-string structure)
+		      (std11-address-string structure))
+		addresses))
+	(nreverse addresses))))
 
   ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
   (defun mail-header-parse-addresses (string)
