@@ -4928,9 +4928,7 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
       ;; Associate this article with the current summary buffer.
       (setq gnus-article-current-summary gnus-summary-buffer)
 
-      ;; T-gnus change: Copy the requested article from
-      ;; `gnus-original-article-buffer' to the current buffer when
-      ;; this function is called.
+      ;; Copy the requested article from `gnus-original-article-buffer'.
       (insert-buffer gnus-original-article-buffer)
 
       ;; Decode charsets.
