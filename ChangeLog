@@ -1,3 +1,16 @@
+2000-05-26  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-write-nov): New function.
+	(nnshimbun-close-group): Call nnshimbun-write-nov.
+	(nnshimbun-generate-nov-database): Ditto.
+	(nnshimbun-generate-nov-for-each-group): Fix bug which occur new
+	entries add NOV database.
+	(nnshimbun-generate-nov-for-all-groups): Ditto.
+	(nnshimbun-search-id): Add argument to return header, and modify
+	for search of original message id.
+	(nnshimbun-nov-fix-header): New function.
+	(nnshimbun-make-date-string): Fix for a two-digit year.
+
 2000-05-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-make-html-contents): Show X-Face.
