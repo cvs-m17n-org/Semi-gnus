@@ -12,41 +12,71 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
 PACKAGEDIR = @PACKAGEDIR@
+W3DIR = @W3@
+GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
+EXPORTING_FILES = $(EMACS) $(FLAGS) -f dgnushack-exporting-files 2>/dev/null
 
 all total:
 	rm -f *.elc auto-autoloads.el custom-load.el
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
+	W3DIR=$(W3DIR) lispdir=$(lispdir) \
+		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
 warn:
 	rm -f *.elc
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
+	W3DIR=$(W3DIR) lispdir=$(lispdir) srcdir=$(srcdir) $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
 
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
 clever some:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
+	@if test -f $(srcdir)/gnus.elc; then \
+	  echo \
+	    "checking for whether the all elc files should be recompiled..."; \
+	  RM_ELC=nil; \
+	  if test `$(EMACS) -batch -q -no-site-file \
+		-eval "(princ (format \"%s\" (featurep (quote xemacs))))" \
+		2>/dev/null` = t; then \
+	    test ! -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	  else \
+	    test -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	  fi; \
+	  if test $$RM_ELC = t; then \
+	    echo " => maybe yes;" \
+		"rm -f *.elc auto-autoloads.el custom-load.el"; \
+	    rm -f *.elc auto-autoloads.el custom-load.el; \
+	  else \
+	    echo " => maybe unnecessary"; \
+	  fi; \
+	fi
+	W3DIR=$(W3DIR) lispdir=$(lispdir) \
+		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
-install: clever
-	rm -f dgnushack.elc
+install: clever install-without-compiling
+
+install-without-compiling:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
-	@for p in *.el; do \
-	  if test "$$p" != "dgnuspath.el"; then \
-	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \
-	    if test -f $$p"c"; then \
-	      echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
-	      $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
-	    fi; \
+	@for p in `$(EXPORTING_FILES)`; do \
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	  if test -f $$p"c"; then \
+	    echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
+	    $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
 	  fi; \
 	done
 
-package:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package
+# Rule for XEmacs package.
+install-package-manifest:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-install-package-manifest \
+		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
-install-package: clever
-	rm -f dgnushack.elc
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package \
-		-f dgnushack-install-package $(PACKAGEDIR)
+compose-package:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-autoloads
+
+remove-extra-files-in-package:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-remove-extra-files-in-package \
+		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
+#
 
 tags:
 	etags *.el

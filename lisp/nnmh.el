@@ -1,5 +1,7 @@
 ;;; nnmh.el --- mhspool access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -32,6 +34,8 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-start)
@@ -49,7 +53,10 @@
   "*Hook run narrowed to an article before saving.")
 
 (defvoo nnmh-be-safe nil
-  "*If non-nil, nnmh will check all articles to make sure whether they are new or not.")
+  "*If non-nil, nnmh will check all articles to make sure whether they are new or not.
+Go through the .nnmh-articles file and compare with the actual
+articles in this folder.  The articles that are \"new\" will be marked
+as unread by Gnus.")
 
 
 
@@ -61,7 +68,10 @@
 
 (defvoo nnmh-status-string "")
 (defvoo nnmh-group-alist nil)
-(defvoo nnmh-allow-delete-final nil)
+;; Don't even think about setting this variable.  It does not exist.
+;; Forget about it.  Uh-huh.  Nope.  Nobody here.  It's only bound
+;; dynamically by certain functions in nndraft.
+(defvar nnmh-allow-delete-final nil)
 
 
 
@@ -78,7 +88,8 @@
 	   (large (and (numberp nnmail-large-newsgroup)
 		       (> number nnmail-large-newsgroup)))
 	   (count 0)
-	   (pathname-coding-system 'binary)
+	   (file-name-coding-system nnmail-pathname-coding-system)
+	   (pathname-coding-system nnmail-pathname-coding-system)
 	   beg article)
       (nnmh-possibly-change-directory newsgroup server)
       ;; We don't support fetching by Message-ID.
@@ -106,7 +117,7 @@
 	  (and large
 	       (zerop (% count 20))
 	       (nnheader-message 5 "nnmh: Receiving headers... %d%%"
-			(/ (* count 100) number))))
+				 (/ (* count 100) number))))
 
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
@@ -125,6 +136,7 @@
 	   (large (and (numberp nnmail-large-newsgroup)
 		       (> number nnmail-large-newsgroup)))
 	   (count 0)
+	   (file-name-coding-system 'binary)
 	   (pathname-coding-system 'binary)
 	   (case-fold-search t)
 	   ;;beg
@@ -161,7 +173,8 @@
   (let ((file (if (stringp id)
 		  nil
 		(concat nnmh-current-directory (int-to-string id))))
-	(pathname-coding-system 'binary)
+	(file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system)
 	(nntp-server-buffer (or buffer nntp-server-buffer)))
     (and (stringp file)
 	 (file-exists-p file)
@@ -173,7 +186,8 @@
   (nnheader-init-server-buffer)
   (nnmh-possibly-change-directory group server)
   (let ((pathname (nnmail-group-pathname group nnmh-directory))
-	(pathname-coding-system 'binary)
+	(file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system)
 	dir)
     (cond
      ((not (file-directory-p pathname))
@@ -196,19 +210,19 @@
 	       (mapcar (lambda (name) (string-to-int name))
 		       (directory-files pathname nil "^[0-9]+$" t))
 	       '<))
-	  (cond
-	   (dir
-	    (setq nnmh-group-alist
-		  (delq (assoc group nnmh-group-alist) nnmh-group-alist))
-	    (push (list group (cons (car dir) (car (last dir))))
-		  nnmh-group-alist)
-	    (nnheader-report 'nnmh "Selected group %s" group)
-	    (nnheader-insert
-	     "211 %d %d %d %s\n" (length dir) (car dir)
-	     (car (last dir)) group))
-	   (t
-	    (nnheader-report 'nnmh "Empty group %s" group)
-	    (nnheader-insert (format "211 0 1 0 %s\n" group))))))))))
+	(cond
+	 (dir
+	  (setq nnmh-group-alist
+		(delq (assoc group nnmh-group-alist) nnmh-group-alist))
+	  (push (list group (cons (car dir) (car (last dir))))
+		nnmh-group-alist)
+	  (nnheader-report 'nnmh "Selected group %s" group)
+	  (nnheader-insert
+	   "211 %d %d %d %s\n" (length dir) (car dir)
+	   (car (last dir)) group))
+	 (t
+	  (nnheader-report 'nnmh "Empty group %s" group)
+	  (nnheader-insert (format "211 0 1 0 %s\n" group))))))))))
 
 (deffoo nnmh-request-scan (&optional group server)
   (nnmail-get-new-mail 'nnmh nil nnmh-directory group))
@@ -216,7 +230,8 @@
 (deffoo nnmh-request-list (&optional server dir)
   (nnheader-insert "")
   (nnmh-possibly-change-directory nil server)
-  (let ((pathname-coding-system 'binary)
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system)
 	(nnmh-toplev
 	 (file-truename (or dir (file-name-as-directory nnmh-directory)))))
     (nnmh-request-list-1 nnmh-toplev))
@@ -299,7 +314,7 @@
   t)
 
 (deffoo nnmh-request-move-article
-  (article group server accept-form &optional last)
+    (article group server accept-form &optional last)
   (let ((buf (get-buffer-create " *nnmh move*"))
 	result)
     (and
@@ -431,7 +446,8 @@
     (nnmh-open-server server))
   (when newsgroup
     (let ((pathname (nnmail-group-pathname newsgroup nnmh-directory))
-	  (pathname-coding-system 'binary))
+	  (file-name-coding-system nnmail-pathname-coding-system)
+	  (pathname-coding-system nnmail-pathname-coding-system))
       (if (file-directory-p pathname)
 	  (setq nnmh-current-directory pathname)
 	(error "No such newsgroup: %s" newsgroup)))))
@@ -480,7 +496,8 @@
   "Compute the next article number in GROUP."
   (let ((active (cadr (assoc group nnmh-group-alist)))
 	(dir (nnmail-group-pathname group nnmh-directory))
-	(pathname-coding-system 'binary)
+	(file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system)
 	file)
     (unless active
       ;; The group wasn't known to nnmh, so we just create an active

@@ -1,5 +1,7 @@
 ;;; gnus-picon.el --- displaying pretty icons in Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;      Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
 ;; Keywords: news xpm annotation glyph faces
@@ -26,6 +28,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus)
 ;; (require 'xpm)
 (require 'annotations)
@@ -97,9 +100,9 @@ Some people may want to add \"unknown\" to this list."
   (when (featurep 'x)
     (let ((types (list "xbm")))
       (when (featurep 'gif)
-	(setq types (cons "gif" types)))
+	(push "gif" types))
       (when (featurep 'xpm)
-	(setq types (cons "xpm" types)))
+	(push "xpm" types))
       types))
   "*List of suffixes on picon file names to try."
   :type '(repeat string)
@@ -255,9 +258,8 @@ arguments necessary for the job.")
     (when (and (featurep 'xpm)
 	       (or (not (fboundp 'device-type)) (equal (device-type) 'x))
 	       (setq from (mail-fetch-field "from"))
-	       (setq from (downcase (or (cadr
-					 (funcall gnus-extract-address-components
-						  from))
+	       (setq from (downcase (or (cadr (mail-extract-address-components
+					       from))
 					"")))
 	       (or (setq at-idx (string-match "@" from))
 		   (setq at-idx (length from))))
@@ -524,8 +526,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 (defun gnus-picons-parse-value (name)
   (goto-char (point-min))
   (if (re-search-forward (concat "<strong>"
-			     (regexp-quote name)
-			     "</strong> *= *<kbd> *\\([^ <][^<]*\\) *</kbd>")
+				 (regexp-quote name)
+				 "</strong> *= *<kbd> *\\([^ <][^<]*\\) *</kbd>")
 			 nil t)
       (buffer-substring (match-beginning 1) (match-end 1))))
 
@@ -696,8 +698,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 (defun gnus-picons-network-search (user addrs dbs sym-ann right-p marker)
   (let* ((host (mapconcat 'identity addrs "."))
 	 (key (list (or user "unknown") host (if user
-						  gnus-picons-user-directories
-						dbs)))
+						 gnus-picons-user-directories
+					       dbs)))
 	 (cache (assoc key gnus-picons-url-alist)))
     (if (null cache)
 	(gnus-picons-url-retrieve

@@ -1,5 +1,6 @@
 ;;; mail-parse.el --- Interface functions for parsing mail
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -42,13 +43,15 @@
 (require 'rfc2047)
 (require 'rfc2045)
 
-(defalias 'mail-header-parse-content-type 'rfc2231-parse-string)
-(defalias 'mail-header-parse-content-disposition 'rfc2231-parse-string)
+(defalias 'mail-header-parse-content-type 'rfc2231-parse-qp-string)
+(defalias 'mail-header-parse-content-disposition 'rfc2231-parse-qp-string)
 (defalias 'mail-content-type-get 'rfc2231-get-value)
-(defalias 'mail-header-encode-parameter 'rfc2045-encode-string)
+;(defalias 'mail-header-encode-parameter 'rfc2045-encode-string)
+(defalias 'mail-header-encode-parameter 'rfc2231-encode-string)
 
 (defalias 'mail-header-remove-comments 'ietf-drums-remove-comments)
 (defalias 'mail-header-remove-whitespace 'ietf-drums-remove-whitespace)
+(defalias 'mail-header-strip 'ietf-drums-strip)
 (defalias 'mail-header-get-comment 'ietf-drums-get-comment)
 (defalias 'mail-header-parse-address 'ietf-drums-parse-address)
 (defalias 'mail-header-parse-addresses 'ietf-drums-parse-addresses)

@@ -1,5 +1,6 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -33,9 +34,9 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
 (require 'custom)
 (require 'nnheader)
-(require 'message)
 (require 'time-date)
 
 (eval-and-compile
@@ -116,9 +117,9 @@
 
 (static-cond
  ((fboundp 'point-at-bol)
-  (fset 'gnus-point-at-bol 'point-at-bol))
+  (defalias 'gnus-point-at-bol 'point-at-bol))
  ((fboundp 'line-beginning-position)
-  (fset 'gnus-point-at-bol 'line-beginning-position))
+  (defalias 'gnus-point-at-bol 'line-beginning-position))
  (t
   (defun gnus-point-at-bol ()
     "Return point at the beginning of the line."
@@ -130,9 +131,9 @@
   ))
 (static-cond
  ((fboundp 'point-at-eol)
-  (fset 'gnus-point-at-eol 'point-at-eol))
+  (defalias 'gnus-point-at-eol 'point-at-eol))
  ((fboundp 'line-end-position)
-  (fset 'gnus-point-at-eol 'line-end-position))
+  (defalias 'gnus-point-at-eol 'line-end-position))
  (t
   (defun gnus-point-at-eol ()
     "Return point at the end of the line."
@@ -195,8 +196,8 @@
 	(and (string-match "(.*" from)
 	     (setq name (substring from (1+ (match-beginning 0))
 				   (match-end 0)))))
-    ;; Fix by Hallvard B Furuseth <h.b.furuseth@usit.uio.no>.
-    (list (or name from) (or address from))))
+    (list (if (string= name "") nil name) (or address from))))
+
 
 (defun gnus-fetch-field (field)
   "Return the value of the header FIELD of current article."
@@ -341,11 +342,11 @@ Cache the result as a text property stored in DATE."
 	     time)))))
 
 (defsubst gnus-time-iso8601 (time)
-  "Return a string of TIME in YYMMDDTHHMMSS format."
+  "Return a string of TIME in YYYYMMDDTHHMMSS format."
   (format-time-string "%Y%m%dT%H%M%S" time))
 
 (defun gnus-date-iso8601 (date)
-  "Convert the DATE to YYMMDDTHHMMSS."
+  "Convert the DATE to YYYYMMDDTHHMMSS."
   (condition-case ()
       (gnus-time-iso8601 (gnus-date-get-time date))
     (error "")))
@@ -481,14 +482,6 @@ If N, return the Nth ancestor instead."
 		     (file-name-nondirectory file))))
   (copy-file file to))
 
-(defun gnus-kill-all-overlays ()
-  "Delete all overlays in the current buffer."
-  (let* ((overlayss (overlay-lists))
-	 (buffer-read-only nil)
-	 (overlays (delq nil (nconc (car overlayss) (cdr overlayss)))))
-    (while overlays
-      (delete-overlay (pop overlays)))))
-
 (defvar gnus-work-buffer " *gnus work*")
 
 (defun gnus-set-work-buffer ()
@@ -536,6 +529,7 @@ If N, return the Nth ancestor instead."
 	      first 't2
 	      last 't1))
        ((gnus-functionp function)
+	;; Do nothing.
 	)
        (t
 	(error "Invalid sort spec: %s" function))))
@@ -567,17 +561,21 @@ Bind `print-quoted' and `print-readably' to t while printing."
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
-  (when (and directory
-	     (not (file-exists-p directory)))
-    (make-directory directory t))
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system))
+    (when (and directory
+	       (not (file-exists-p directory)))
+      (make-directory directory t)))
   t)
 
 (defun gnus-write-buffer (file)
   "Write the current buffer's contents to FILE."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
-  ;; Write the buffer.
-  (write-region (point-min) (point-max) file nil 'quietly))
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system))
+    ;; Write the buffer.
+    (write-region (point-min) (point-max) file nil 'quietly)))
 
 (defun gnus-write-buffer-as-binary (file)
   "Write the current buffer's contents to FILE without code conversion."
@@ -611,7 +609,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (save-excursion
       (save-restriction
 	(goto-char beg)
-	(while (re-search-forward "[ \t]*\n" end 'move)
+	(while (re-search-forward gnus-emphasize-whitespace-regexp end 'move)
 	  (gnus-put-text-property beg (match-beginning 0) prop val)
 	  (setq beg (point)))
 	(gnus-put-text-property beg (point) prop val)))))
@@ -725,7 +723,8 @@ with potentially long computations."
 		  (set-buffer file-buffer)
 		  (rmail-insert-rmail-file-header)
 		  (let ((require-final-newline nil))
-		    (gnus-write-buffer filename)))
+		    (gnus-write-buffer-as-coding-system
+		     nnheader-text-coding-system filename)))
 		(kill-buffer file-buffer))
 	    (error "Output file does not exist")))
       (set-buffer tmpbuf)
@@ -776,7 +775,8 @@ with potentially long computations."
 	      (save-excursion
 		(set-buffer file-buffer)
 		(let ((require-final-newline nil))
-		  (gnus-write-buffer-as-binary filename)))
+		  (gnus-write-buffer-as-coding-system
+		   nnheader-text-coding-system filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
       (set-buffer tmpbuf)
@@ -850,7 +850,8 @@ ARG is passed to the first function."
   (when (file-exists-p file)
     (with-temp-buffer
       (let ((tokens '("machine" "default" "login"
-		      "password" "account" "macdef" "force"))
+		      "password" "account" "macdef" "force"
+		      "port"))
 	    alist elem result pair)
 	(insert-file-contents file)
 	(goto-char (point-min))
@@ -898,16 +899,30 @@ ARG is passed to the first function."
 	  (forward-line 1))
 	(nreverse result)))))
 
-(defun gnus-netrc-machine (list machine)
-  "Return the netrc values from LIST for MACHINE or for the default entry."
-  (let ((rest list))
-    (while (and list
-		(not (equal (cdr (assoc "machine" (car list))) machine)))
+(defun gnus-netrc-machine (list machine &optional port defaultport)
+  "Return the netrc values from LIST for MACHINE or for the default entry.
+If PORT specified, only return entries with matching port tokens.
+Entries without port tokens default to DEFAULTPORT."
+  (let ((rest list)
+	result)
+    (while list
+      (when (equal (cdr (assoc "machine" (car list))) machine)
+	(push (car list) result))
       (pop list))
-    (car (or list
-	     (progn (while (and rest (not (assoc "default" (car rest))))
-		      (pop rest))
-		    rest)))))
+    (unless result
+      ;; No machine name matches, so we look for default entries.
+      (while rest
+	(when (assoc "default" (car rest))
+	  (push (car rest) result))
+	(pop rest)))
+    (when result
+      (setq result (nreverse result))
+      (while (and result
+		  (not (equal (or port defaultport "nntp")
+			      (or (gnus-netrc-get (car result) "port")
+				  defaultport "nntp"))))
+	(pop result))
+      (car result))))
 
 (defun gnus-netrc-get (alist type)
   "Return the value of token TYPE from ALIST."
@@ -987,11 +1002,9 @@ ARG is passed to the first function."
 	(throw 'found nil)))
     t))
 
-(defun gnus-write-active-file-as-coding-system (coding-system file hashtb
-							      &optional
-							      full-names)
-  (let ((output-coding-system coding-system)
-	(coding-system-for-write coding-system))
+(defun gnus-write-active-file (file hashtb &optional full-names)
+  (let ((output-coding-system nnmail-active-file-coding-system)
+	(coding-system-for-write nnmail-active-file-coding-system))
     (with-temp-file file
       (mapatoms
        (lambda (sym)
@@ -1010,14 +1023,46 @@ ARG is passed to the first function."
       (while (search-backward "\\." nil t)
 	(delete-char 1)))))
 
-(defun gnus-union (a b)
-  "Add members of list A to list B
-if they are not equal to items already in B."
-  (if (null a)
-      b
-    (if (member (car a) b)
-	(gnus-union (cdr a) b)
-      (gnus-union (cdr a) (cons (car a) b)))))
+(if (fboundp 'union)
+    (defalias 'gnus-union 'union)
+  (defun gnus-union (l1 l2)
+    "Set union of lists L1 and L2."
+    (cond ((null l1) l2)
+	  ((null l2) l1)
+	  ((equal l1 l2) l1)
+	  (t
+	   (or (>= (length l1) (length l2))
+	       (setq l1 (prog1 l2 (setq l2 l1))))
+	   (while l2
+	     (or (member (car l2) l1)
+		 (push (car l2) l1))
+	     (pop l2))
+	   l1))))
+
+(defun gnus-add-text-properties-when
+  (property value start end properties &optional object)
+  "Like `gnus-add-text-properties', only applied on where PROPERTY is VALUE."
+  (let (point)
+    (while (and start
+		(< start end) ;; XEmacs will loop for every when start=end.
+		(setq point (text-property-not-all start end property value)))
+      (gnus-add-text-properties start point properties object)
+      (setq start (text-property-any point end property value)))
+    (if start
+	(gnus-add-text-properties start end properties object))))
+
+(defun gnus-remove-text-properties-when
+  (property value start end properties &optional object)
+  "Like `remove-text-properties', only applied on where PROPERTY is VALUE."
+  (let (point)
+    (while (and start
+		(< start end)
+		(setq point (text-property-not-all start end property value)))
+      (remove-text-properties start point properties object)
+      (setq start (text-property-any point end property value)))
+    (if start
+	(remove-text-properties start end properties object))
+    t))
 
 (provide 'gnus-util)
 

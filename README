@@ -21,8 +21,17 @@ in your .emacs file, or wherever you keep such things.
 
 To enable reading the Gnus manual, you could say something like:
 
+  (require 'info)
   (setq Info-default-directory-list 
         (cons "~/gnus-5.6.53/texi" Info-default-directory-list))
+
+or
+
+  (require 'info)
+  (setq Info-directory-list 
+        (cons "~/gnus-5.6.53/texi" Info-directory-list))
+
+depending on which version of Emacs or XEmacs you're using.
 
 Note that Gnus and GNUS can't coexist in a single Emacs. They both use
 the same function and variable names.  If you have been running GNUS
@@ -30,7 +39,14 @@ in your Emacs, you should probably exit that Emacs and start a new one
 to fire up Gnus.
 
 Gnus does absolutely not work with anything older than Emacs 20.3 or
-XEmacs 20.0.  So you definitely need a new Emacs.
+XEmacs 21.1.1.  So you definitely need a new Emacs.  However, T-gnus
+does support `Mule 2.3 based on Emacs 19.34' (it is commonly called
+"Mule 2.3@19.34").  See the file `Mule23@1934.{en,ja}' for details.
+Furthermore, you might be able to use the versions of XEmacs prior to
+21.1.1, e.g. 20.4, with a little work.  For that, copy the file
+`timer.el' in the `contrib' directory to the `site-lisp' directory and
+do a `M-x byte-compile-file'.  This file is imported from one of the
+XEmacs package `fsf-compat-1.07-pkg.tar.gz'.
 
 Then you do a `M-x gnus', and everything should... uhm... it should
 work, but it might not. Set `debug-on-error' to t, and mail me the
@@ -49,4 +65,4 @@ There are four main things I want your help and input on:
    bit, and features you would like to see.
 
 Send any comments and all your bug fixes/complaints to
-`bugs@gnus.org'. 
+`semi-gnus-ja@meadowy.org' (or `bugs@gnus.org'). 

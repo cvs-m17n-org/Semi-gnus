@@ -1,14 +1,10 @@
 ;;; binhex.el -- elisp native binhex decode
-;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
+;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; Create Date: Oct 1, 1998
-;; $Revision: 1.1.2.8 $
-;; Time-stamp: <Tue Oct  6 23:48:38 EDT 1998 zsh>
-;; Keywords: binhex
+;; Keywords: binhex news
 
-;; This file is not part of GNU Emacs, but the same permissions
-;; apply.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,8 +25,13 @@
 
 ;;; Code:
 
-(if (not (fboundp 'char-int))
-    (fset 'char-int 'identity))
+(eval-when-compile (require 'cl))
+
+(eval-and-compile
+  (defalias 'binhex-char-int
+    (if (fboundp 'char-int)
+	'char-int
+      'identity)))
 
 (defvar binhex-decoder-program "hexbin"
   "*Non-nil value should be a string that names a uu decoder.
@@ -68,7 +69,7 @@ input and write the converted data to its standard output.")
 	((boundp 'temporary-file-directory) temporary-file-directory)
 	("/tmp/")))
 
-(if (string-match "XEmacs" emacs-version)
+(if (featurep 'xemacs)
     (defalias 'binhex-insert-char 'insert-char)
   (defun binhex-insert-char (char &optional count ignored buffer)
     (if (or (null buffer) (eq buffer (current-buffer)))
@@ -133,14 +134,14 @@ input and write the converted data to its standard output.")
 (defun binhex-string-big-endian (string)
   (let ((ret 0) (i 0) (len (length string)))
     (while (< i len)
-      (setq ret (+ (lsh ret 8) (char-int (aref string i)))
+      (setq ret (+ (lsh ret 8) (binhex-char-int (aref string i)))
 	    i (1+ i)))
     ret))
 
 (defun binhex-string-little-endian (string)
   (let ((ret 0) (i 0) (shift 0) (len (length string)))
     (while (< i len)
-      (setq ret (+ ret (lsh (char-int (aref string i)) shift))
+      (setq ret (+ ret (lsh (binhex-char-int (aref string i)) shift))
 	    i (1+ i)
 	    shift (+ shift 8)))
     ret))
@@ -150,11 +151,11 @@ input and write the converted data to its standard output.")
     (let ((pos (point-min)) len)
       (vector
        (prog1
-	   (setq len (char-int (char-after pos)))
+	   (setq len (binhex-char-int (char-after pos)))
 	 (setq pos (1+ pos)))
        (buffer-substring pos (setq pos (+ pos len)))
        (prog1
-	   (setq len (char-int (char-after pos)))
+	   (setq len (binhex-char-int (char-after pos)))
 	 (setq pos (1+ pos)))
        (buffer-substring pos (setq pos (+ pos 4)))
        (buffer-substring pos (setq pos (+ pos 4)))
@@ -199,15 +200,8 @@ If HEADER-ONLY is non-nil only decode header and return filename."
 	(save-excursion
 	  (goto-char start)
 	  (when (re-search-forward binhex-begin-line end t)
-	    (if (and (not (string-match "XEmacs\\|Lucid" emacs-version))
-		     (boundp 'enable-multibyte-characters))
-		(let ((multibyte
-		       (default-value 'enable-multibyte-characters)))
-		  (setq-default enable-multibyte-characters nil)
-		  (setq work-buffer (generate-new-buffer " *binhex-work*"))
-		  (setq-default enable-multibyte-characters multibyte))
+	    (let (default-enable-multibyte-characters)
 	      (setq work-buffer (generate-new-buffer " *binhex-work*")))
-	    (buffer-disable-undo work-buffer)
 	    (beginning-of-line)
 	    (setq bits 0 counter 0)
 	    (while tmp
@@ -251,26 +245,26 @@ If HEADER-ONLY is non-nil only decode header and return filename."
 	     ((= counter 2)
 	      (binhex-push-char (logand (lsh bits -10) 255) 1 nil
 				work-buffer))))
-      (if header-only nil
-	(binhex-verify-crc work-buffer
-			   data-fork-start
-			   (+ data-fork-start (aref header 6) 2))
-	(or (markerp end) (setq end (set-marker (make-marker) end)))
-	(goto-char start)
-	(insert-buffer-substring work-buffer
-				 data-fork-start (+ data-fork-start
-						    (aref header 6)))
-	(delete-region (point) end)))
+	  (if header-only nil
+	    (binhex-verify-crc work-buffer
+			       data-fork-start
+			       (+ data-fork-start (aref header 6) 2))
+	    (or (markerp end) (setq end (set-marker (make-marker) end)))
+	    (goto-char start)
+	    (insert-buffer-substring work-buffer
+				     data-fork-start (+ data-fork-start
+							(aref header 6)))
+	    (delete-region (point) end)))
       (and work-buffer (kill-buffer work-buffer)))
     (if header (aref header 1))))
 
 (defun binhex-decode-region-external (start end)
-  "Binhex decode region between START and END using external decoder"
+  "Binhex decode region between START and END using external decoder."
   (interactive "r")
   (let ((cbuf (current-buffer)) firstline work-buffer status
-	(file-name (concat binhex-temporary-file-directory
-			   (binhex-decode-region start end t)
-			   ".data")))
+	(file-name (expand-file-name
+		    (concat (binhex-decode-region start end t) ".data")
+		    binhex-temporary-file-directory)))
     (save-excursion
       (goto-char start)
       (when (re-search-forward binhex-begin-line nil t)

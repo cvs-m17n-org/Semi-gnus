@@ -1,5 +1,5 @@
 ;;; mm-view.el --- Functions for viewing MIME objects
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mail-parse)
 (require 'mailcap)
 (require 'mm-bodies)
@@ -32,16 +33,22 @@
   (autoload 'gnus-article-prepare-display "gnus-art")
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard")
+  (autoload 'fill-flowed "flow-fill")
   (autoload 'diff-mode "diff-mode"))
-
-;; Avoid byte compile warning.
-(defvar gnus-article-mime-handles)
 
 ;;;
 ;;; Functions for displaying various formats inline
 ;;;
+(defun mm-inline-image-emacs (handle)
+  (let ((b (point-marker))
+	buffer-read-only)
+    (insert "\n")
+    (put-image (mm-get-image handle) b)
+    (mm-handle-set-undisplayer
+     handle
+     `(lambda () (remove-images ,b (1+ ,b))))))
 
-(defun mm-inline-image (handle)
+(defun mm-inline-image-xemacs (handle)
   (let ((b (point))
 	(annot (make-annotation (mm-get-image handle) nil 'text))
 	buffer-read-only)
@@ -55,6 +62,11 @@
 			 ,(set-marker (make-marker) (point))))))
     (set-extent-property annot 'mm t)
     (set-extent-property annot 'duplicable t)))
+
+(eval-and-compile
+  (if (featurep 'xemacs)
+      (defalias 'mm-inline-image 'mm-inline-image-xemacs)
+    (defalias 'mm-inline-image 'mm-inline-image-emacs)))
 
 (defvar mm-w3-setup nil)
 (defun mm-setup-w3 ()
@@ -91,28 +103,35 @@
 		    (and (boundp 'w3-meta-charset-content-type-regexp)
 			 (re-search-forward
 			  w3-meta-charset-content-type-regexp nil t)))
-		(setq charset (w3-coding-system-for-mime-charset 
-			       (buffer-substring-no-properties 
-				(match-beginning 2) 
-				(match-end 2)))))
+		(setq charset (or (w3-coding-system-for-mime-charset 
+				   (buffer-substring-no-properties 
+				    (match-beginning 2) 
+				    (match-end 2)))
+				  charset)))
 	    (delete-region (point-min) (point-max))
 	    (insert (mm-decode-string text charset))
 	    (save-window-excursion
 	      (save-restriction
 		(let ((w3-strict-width width)
+		      ;; Don't let w3 set the global version of
+		      ;; this variable.
+		      (fill-column fill-column)
 		      (url-standalone-mode t))
 		  (condition-case var
 		      (w3-region (point-min) (point-max))
-		    (error)))))
+		    (error
+		     (message
+		      "Error while rendering html; showing as text/plain"))))))
 	    (mm-handle-set-undisplayer
 	     handle
 	     `(lambda ()
 		(let (buffer-read-only)
 		  (if (functionp 'remove-specifier)
-		      (mapc (lambda (prop)
-			      (remove-specifier
-			       (face-property 'default prop) (current-buffer)))
-			    '(background background-pixmap foreground)))
+		      (mapcar (lambda (prop)
+				(remove-specifier
+				 (face-property 'default prop)
+				 (current-buffer)))
+			      '(background background-pixmap foreground)))
 		  (delete-region ,(point-min-marker)
 				 ,(point-max-marker)))))))))
      ((or (equal type "enriched")
@@ -128,15 +147,32 @@
       (mm-insert-inline
        handle
        (concat "\n-- \n"
-	       (vcard-format-string
-		(vcard-parse-string (mm-get-part handle)
-				    'vcard-standard-filter)))))
+	       (if (fboundp 'vcard-pretty-print)
+		   (vcard-pretty-print (mm-get-part handle))
+		 (vcard-format-string
+		  (vcard-parse-string (mm-get-part handle)
+				      'vcard-standard-filter))))))
      (t
-      (setq text (mm-get-part handle))
       (let ((b (point))
 	    (charset (mail-content-type-get
 		      (mm-handle-type handle) 'charset)))
-	(insert (mm-decode-string text charset))
+	(if (or (eq charset 'gnus-decoded)
+		;; This is probably not entirely correct, but
+		;; makes rfc822 parts with embedded multiparts work. 
+		(eq mail-parse-charset 'gnus-decoded))
+	    (save-restriction
+	      (narrow-to-region (point) (point))
+	      (mm-insert-part handle)
+	      (goto-char (point-max)))
+	  (insert (mm-decode-string (mm-get-part handle) charset)))
+	(when (and (equal type "plain")
+		   (equal (cdr (assoc 'format (mm-handle-type handle)))
+			  "flowed"))
+	  (save-restriction
+	    (narrow-to-region b (point))
+	    (goto-char b)
+	    (fill-flowed)
+	    (goto-char (point-max))))
 	(save-restriction
 	  (narrow-to-region b (point))
 	  (set-text-properties (point-min) (point-max) nil)
@@ -173,7 +209,7 @@
   (mm-enable-multibyte)
   (let (handles)
     (let (gnus-article-mime-handles)
-      ;; Double decode problem may happen. See mm-inline-message.
+      ;; Double decode problem may happen.  See mm-inline-message.
       (run-hooks 'gnus-article-decode-hook)
       (gnus-article-prepare-display)
       (setq handles gnus-article-mime-handles))
@@ -190,12 +226,20 @@
 	(charset (mail-content-type-get
 		  (mm-handle-type handle) 'charset))
 	gnus-displaying-mime handles)
+    (when (and charset
+	       (stringp charset))
+      (setq charset (intern (downcase charset)))
+      (when (eq charset 'us-ascii)
+	(setq charset nil)))
     (save-excursion
       (save-restriction
 	(narrow-to-region b b)
 	(mm-insert-part handle)
 	(let (gnus-article-mime-handles
-	      (gnus-newsgroup-charset (or charset gnus-newsgroup-charset)))
+	      ;; disable prepare hook 
+	      gnus-article-prepare-hook  
+	      (gnus-newsgroup-charset
+	       (or charset gnus-newsgroup-charset)))
 	  (run-hooks 'gnus-article-decode-hook)
 	  (gnus-article-prepare-display)
 	  (setq handles gnus-article-mime-handles))
@@ -212,19 +256,19 @@
 	 handle
 	 `(lambda ()
 	    (let (buffer-read-only)
-	      (ignore-errors
-		;; This is only valid on XEmacs.
-		(mapc (lambda (prop)
-			(remove-specifier
-			 (face-property 'default prop) (current-buffer)))
-		      '(background background-pixmap foreground)))
+	      (if (fboundp 'remove-specifier)
+		  ;; This is only valid on XEmacs.
+		  (mapcar (lambda (prop)
+			    (remove-specifier
+			     (face-property 'default prop) (current-buffer)))
+			  '(background background-pixmap foreground)))
 	      (delete-region ,(point-min-marker) ,(point-max-marker)))))))))
 
-(defun mm-display-patch-inline (handle)
+(defun mm-display-inline-fontify (handle mode)
   (let (text)
     (with-temp-buffer
       (mm-insert-part handle)
-      (diff-mode)
+      (funcall mode)
       (font-lock-fontify-buffer)
       (when (fboundp 'extent-list)
 	(map-extents (lambda (ext ignored)
@@ -233,6 +277,12 @@
 		     nil nil nil nil nil 'text-prop))
       (setq text (buffer-string)))
     (mm-insert-inline handle text)))
+
+(defun mm-display-patch-inline (handle)
+  (mm-display-inline-fontify handle 'diff-mode))
+
+(defun mm-display-elisp-inline (handle)
+  (mm-display-inline-fontify handle 'emacs-lisp-mode))
 
 (provide 'mm-view)
 

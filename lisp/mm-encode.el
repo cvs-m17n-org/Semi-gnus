@@ -1,5 +1,5 @@
 ;;; mm-encode.el --- Functions for encoding MIME things 
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -24,8 +24,11 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mail-parse)
 (require 'gnus-mailcap)
+(eval-and-compile
+  (autoload 'mm-body-7-or-8 "mm-bodies"))
 
 (defvar mm-content-transfer-encoding-defaults
   '(("text/x-patch" 8bit)
@@ -37,6 +40,18 @@
   "Alist of regexps that match MIME types and their encodings.
 If the encoding is `qp-or-base64', then either quoted-printable
 or base64 will be used, depending on what is more efficient.")
+
+(defvar mm-use-ultra-safe-encoding nil
+  "If non-nil, use encodings aimed at Procrustean bed survival.
+
+This means that textual parts are encoded as quoted-printable if they
+contain lines longer than 76 characters or starting with \"From \" in
+the body.  Non-7bit encodings (8bit, binary) are generally disallowed.
+This is to reduce the probability that a broken MTA or MDA changes the
+message.
+
+This variable should never be set directly, but bound before a call to
+`mml-generate-mime' or similar functions.")
 
 (defun mm-insert-rfc822-headers (charset encoding)
   "Insert text/plain headers with CHARSET and ENCODING."
@@ -50,8 +65,7 @@ or base64 will be used, depending on what is more efficient.")
   "Insert multipart/mixed headers."
   (let ((boundary "=-=-="))
     (insert "MIME-Version: 1.0\n")
-    (insert (format "Content-Type: multipart/mixed; boundary=\"%s\"\n"
-		    boundary))
+    (insert "Content-Type: multipart/mixed; boundary=\"" boundary "\"\n")
     boundary))
 
 (defun mm-default-file-encoding (file)
@@ -59,6 +73,14 @@ or base64 will be used, depending on what is more efficient.")
   (if (not (string-match "\\.[^.]+$" file))
       "application/octet-stream"
     (mailcap-extension-to-mime (match-string 0 file))))
+
+(defun mm-safer-encoding (encoding)
+  "Return a safer but similar encoding."
+  (cond
+   ((memq encoding '(7bit 8bit quoted-printable)) 'quoted-printable)
+   ;; The remaing encodings are binary and base64 (and perhaps some
+   ;; non-standard ones), which are both turned into base64.
+   (t 'base64)))
 
 (defun mm-encode-content-transfer-encoding (encoding &optional type)
   (cond
@@ -75,8 +97,10 @@ or base64 will be used, depending on what is more efficient.")
        (message "Error while decoding: %s" error)
        nil)))
    ((memq encoding '(7bit 8bit binary))
+    ;; Do nothing.
     )
    ((null encoding)
+    ;; Do nothing.
     )
    ((functionp encoding)
     (ignore-errors (funcall encoding (point-min) (point-max))))
@@ -119,9 +143,13 @@ The encoding used is returned."
       (while rules
 	(when (string-match (caar rules) type)
 	  (throw 'found
-		 (if (eq (cadar rules) 'qp-or-base64)
-		     (mm-qp-or-base64)
-		   (cadar rules))))
+		 (let ((encoding 
+			(if (eq (cadr (car rules)) 'qp-or-base64)
+			    (mm-qp-or-base64)
+			  (cadr (car rules)))))
+		   (if mm-use-ultra-safe-encoding
+		       (mm-safer-encoding encoding)
+		     encoding))))
 	(pop rules)))))
 
 (defun mm-qp-or-base64 ()

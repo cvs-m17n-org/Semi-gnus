@@ -7,84 +7,112 @@ top_srcdir = @top_srcdir@
 @SET_MAKE@
 VPATH=$(srcdir)
 TEXI2DVI=texi2dvi
-EMACS=@EMACS@
+TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
-FLAGS=-batch -q -no-site-file
+EMACS=@EMACS@
+EMACSINFO=$(EMACS) -batch -q -no-site-file
 INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
 XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
+PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
-PERL=perl
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 PAPERTYPE=a4
+INFO_DEPS=gnus message emacs-mime
+INFO_DEPS_JA=gnus-ja message-ja
+INFO_DEPS_INFO=gnus.info message.info emacs-mime.info
+INFO_DEPS_JA_INFO=gnus-ja.info message-ja.info
 
-all: gnus message emacs-mime
-all-info: gnus.info message.info emacs-mime.info
+all: $(INFO_DEPS)
+all-info: $(INFO_DEPS_INFO)
 
 gnus.info: gnus.texi gnus-faq.texi
 message.info: message.texi
 emacs-mime.info: emacs-mime.texi
 
-ja: gnus-ja message-ja
-ja-info: gnus-ja.info message-ja.info
+ja: $(INFO_DEPS_JA)
+ja-info: $(INFO_DEPS_JA_INFO)
 
 gnus-ja.info: gnus-ja.texi gnus-faq-ja.texi
 message-ja.info: message-ja.texi
 
 most: texi2latex.elc latex latexps
 
+%-ja: %-ja.texi
+	cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<
+
+%-ja.info: %-ja.texi
+	cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<
+
 %.info: %.texi
-	if test $(MAKEINFO) = no; then \
-	  cd ../lisp && $(EMACS) $(FLAGS) $(XINFOSWI) ../texi/$<; \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
+	  cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<; \
 	else \
-	  makeinfo -o $@ $<; \
+	  $(MAKEINFO) -o $@ $<; \
 	fi
 
-.SUFFIXES: .texi .dvi .ps
+.SUFFIXES: .texi .dvi .ps .pdf
 
 .texi:
-	if test $(MAKEINFO) = no; then \
-	  cd ../lisp && $(EMACS) $(FLAGS) $(INFOSWI) ../texi/$<; \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
+	  cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<; \
 	else \
-	  makeinfo $<; \
+	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
 
+pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
+
 .texi.dvi :
-	$(PERL) -n -e 'print unless (/\@iflatex/ .. /\@end iflatex/)' $< > gnustmp.texi
+	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
 	$(TEXI2DVI) gnustmp.texi
 	cp gnustmp.dvi $*.dvi
+	rm gnustmp.*
+
+.texi.pdf :
+	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
+	$(TEXI2PDF) gnustmp.texi
+	cp gnustmp.pdf $*.pdf
 	rm gnustmp.*
 
 refcard.dvi: refcard.tex gnuslogo.refcard gnusref.tex
 	$(LATEX) refcard.tex
 
+
+refcard.pdf: refcard.tex gnuslogo.refcard gnusref.tex
+	epstopdf gnuslogo.refcard --outfile=gnuslogo.refcard.pdf
+	$(PDFLATEX) refcard.tex
+
 clean:
-	rm -f gnus.*.bak *.ky *.cp *.fn *.cps *.kys *.log *.aux *.dvi *.vr \
-	*.tp *.toc *.pg gnus.latexi *.aux *.[cgk]idx \
-	gnus.ilg gnus.ind gnus.[cgk]ind gnus.idx \
-	gnus.tmptexi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
-	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi \
-	gnus.info* gnus-ja.info* message.info* message-ja.info* \
-	emacs-mime.info
-	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9]
-	rm -f message message-[0-9]
-	rm -f emacs-mime
-	rm -f gnus-ja gnus-ja-[0-9] gnus-ja-[0-9][0-9]
-	rm -f message-ja message-ja-[0-9]
+	rm -f *.orig *.rej *.elc *~ gnus-[0-9] gnus-[0-9][0-9]
+	rm -f message-[0-9]
+	rm -f $(INFO_DEPS)
+	rm -f gnus-ja-[0-9] gnus-ja-[0-9][0-9]
+	rm -f message-ja-[0-9]
+	rm -f $(INFO_DEPS_JA)
+	rm -f gnus.info-[0-9] gnus.info-[0-9][0-9]
+	rm -f message.info-[0-9]
+	rm -f $(INFO_DEPS_INFO)
+	rm -f gnus-ja.info-[0-9] gnus-ja.info-[0-9][0-9]
+	rm -f message-ja.info-[0-9]
+	rm -f $(INFO_DEPS_JA_INFO)
 
 makeinfo:
 	makeinfo -o gnus gnus.texi
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	$(EMACS) -batch -l bytecomp --eval '(byte-compile-file "texi2latex.el")'
+	$(EMACSINFO) -batch -l bytecomp --eval '(byte-compile-file "texi2latex.el")'
 
 latex: gnus.texi texi2latex.elc
-	$(EMACS) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
+	$(EMACSINFO) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
 
 latexps:
 	$(MAKE) texi2latex.elc
@@ -137,16 +165,37 @@ veryclean: clean
 distclean: clean
 	rm -f Makefile
 
-install:
+install: $(INFO_DEPS)
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
-	@for file in gnus message emacs-mime gnus-ja message-ja; do \
-	  for ifile in `echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
-	    if test -f $$ifile; then \
-	      echo " $(INSTALL_DATA) $$ifile $(infodir)/$$ifile"; \
-	      $(INSTALL_DATA) $$ifile $(infodir)/$$ifile; \
+	@list='$(INFO_DEPS)'; \
+	for file in $$list; do \
+	  d=$(srcdir); \
+	  for ifile in `CDPATH=: && cd $$d && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
+	    if test -f $$d/$$ifile; then \
+	      echo " $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile"; \
+	      $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile; \
 	    else : ; fi; \
 	  done; \
 	done
+	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
+	  list='$(INFO_DEPS)'; \
+	  for file in $$list; do \
+	    echo " install-info --info-dir=$(infodir) $(infodir)/$$file";\
+	    install-info --info-dir=$(infodir) $(infodir)/$$file || :;\
+	  done; \
+	else : ; fi
+
+install-ja: $(INFO_DEPS_JA)
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
+
+install-info: $(INFO_DEPS_INFO)
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_INFO)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
+
+install-ja-info: $(INFO_DEPS_JA_INFO)
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA_INFO)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
 
 tmps:
 	if [ ! -e tmp ]; then mkdir tmp; fi

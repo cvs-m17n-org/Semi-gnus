@@ -1,5 +1,7 @@
 ;;; nneething.el --- arbitrary file access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -27,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
@@ -106,7 +109,7 @@ included.")
 	  (and large
 	       (zerop (% count 20))
 	       (nnheader-message 5 "nneething: Receiving headers... %d%%"
-			(/ (* count 100) number))))
+				 (/ (* count 100) number))))
 
 	(when large
 	  (nnheader-message 5 "nneething: Receiving headers...done"))
@@ -230,13 +233,13 @@ included.")
       (let ((map nneething-map)
 	    prev)
 	(while map
-	  (if (and (member (cadar map) files)
+	  (if (and (member (cadr (car map)) files)
 		   ;; We also remove files that have changed mod times.
 		   (equal (nth 5 (file-attributes
-				  (nneething-file-name (cadar map))))
-			  (caddar map)))
+				  (nneething-file-name (cadr (car map)))))
+			  (cadr (cdar map))))
 	      (progn
-		(push (cadar map) map-files)
+		(push (cadr (car map)) map-files)
 		(setq prev map))
 	    (setq touched t)
 	    (if prev
@@ -294,8 +297,7 @@ included.")
 	   (concat "Lines: " (int-to-string
 			      (count-lines (point-min) (point-max)))
 		   "\n"))
-       "")
-     )))
+       ""))))
 
 (defun nneething-from-line (uid &optional file)
   "Return a From header based of UID."
@@ -362,9 +364,9 @@ included.")
         fname)
     (if (numberp article)
 	(if (setq fname (cadr (assq article nneething-map)))
-	    (concat dir fname)
-	  (make-temp-name (concat dir "nneething")))
-      (concat dir article))))
+	    (expand-file-name fname dir)
+	  (make-temp-name (expand-file-name "nneething" dir)))
+      (expand-file-name article dir))))
 
 (provide 'nneething)
 

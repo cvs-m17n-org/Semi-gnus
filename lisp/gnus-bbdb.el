@@ -1,15 +1,15 @@
-;; gnus-bbdb.el --- Interface to Semi-gnus
+;; gnus-bbdb.el --- Interface to T-gnus
 
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
 ;; Copyright (C) 1997,1998 MORIOKA Tomohiko
-;; Copyright (C) 1998 Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Copyright (C) 1998,1999 Keiichi Suzuki <keiichi@nanap.org>
 
-;; Author: Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;; Keywords: BBDB, MIME, multimedia, multilingual, mail, news
 
-;; This file is part of Semi-gnus.
+;; This file is part of T-gnus.
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -29,10 +29,13 @@
 ;;; Code:
 
 (require 'bbdb)
+(require 'bbdb-com)
 (require 'gnus)
 (require 'std11)
 (eval-when-compile
-  (require 'gnus-win))
+  (defvar bbdb-pop-up-elided-display)	; default unbound.
+  (require 'gnus-win)
+  (require 'cl))
 
 (defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
   "*Field body decoder.")
@@ -45,40 +48,32 @@
 
 ;;;###autoload
 (defun gnus-bbdb/update-record (&optional offer-to-create)
-  "returns the record corresponding to the current GNUS message, creating 
-or modifying it as necessary.  A record will be created if 
+  "returns the record corresponding to the current GNUS message, creating
+or modifying it as necessary.  A record will be created if
 bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (save-excursion
-      (save-restriction
-	(let (from)
-	  (set-buffer gnus-original-article-buffer)
-	  (widen)
-	  (narrow-to-region (point-min)
-			    (progn (goto-char (point-min))
-				   (or (search-forward "\n\n" nil t)
-				       (error "message unexists"))
-				   (- (point) 2)))
-	  (when (setq from (mail-fetch-field "from"))
-	    (setq from (gnus-bbdb/extract-address-components
-			(gnus-bbdb/decode-field-body from 'From))))
-	  (when (and (car (cdr from))
-		     (string-match (bbdb-user-mail-names)
-				   (car (cdr from))))
-	    ;; if logged-in user sent this, use recipients.
-	    (let ((to (mail-fetch-field "to")))
-	      (when to
-		(setq from
-		      (gnus-bbdb/extract-address-components
-		       (gnus-bbdb/decode-field-body to 'To))))))
-	(when from
+    (let ((from (mime-entity-fetch-field gnus-current-headers "from")))
+      (when from
+	(setq from (gnus-bbdb/extract-address-components
+		    (gnus-bbdb/decode-field-body from 'From))))
+      (when (and (car (cdr from))
+		 (string-match (bbdb-user-mail-names)
+			       (car (cdr from))))
+	;; if logged-in user sent this, use recipients.
+	(let ((to (mime-entity-fetch-field gnus-current-headers "to")))
+	  (when to
+	    (setq from
+		  (gnus-bbdb/extract-address-components
+		   (gnus-bbdb/decode-field-body to 'To))))))
+      (when from
+	(save-excursion
 	  (bbdb-annotate-message-sender from t
 					(or (bbdb-invoke-hook-for-value
 					     bbdb/news-auto-create-p)
 					    offer-to-create)
-					offer-to-create)))))))
+					offer-to-create))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
@@ -87,7 +82,7 @@ corresponding to the sender of this message.  If REPLACE is non-nil,
 replace the existing notes entry (if any)."
   (interactive (list (if bbdb-readonly-p
 			 (error "The Insidious Big Brother Database is read-only.")
-			 (read-string "Comments: "))))
+		       (read-string "Comments: "))))
   (bbdb-annotate-notes (gnus-bbdb/update-record t) string 'notes replace))
 
 (defun gnus-bbdb/edit-notes (&optional arg)
@@ -110,41 +105,119 @@ This buffer will be in bbdb-mode, with associated keybindings."
 	(bbdb-display-records (list record))
 	(error "unperson"))))
 
-;; Avoid byte-compile warning.
-(defvar bbdb-pop-up-elided-display)
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
   "Make the *BBDB* buffer be displayed along with the GNUS windows,
 displaying the record corresponding to the sender of the current message."
-  (let ((bbdb-gag-messages t)
-	(bbdb-use-pop-up nil)
-	(bbdb-electric-p nil))
-    (let ((record (gnus-bbdb/update-record offer-to-create))
-	  (bbdb-elided-display (bbdb-pop-up-elided-display))
-	  (b (current-buffer)))
+  (let* ((bbdb-gag-messages t)
+	 (bbdb-electric-p nil)
+	 (record
+	  (let (bbdb-use-pop-up)
+	    (gnus-bbdb/update-record offer-to-create)))
+	 (bbdb-elided-display (bbdb-pop-up-elided-display)))
+    (save-current-buffer
       ;; display the bbdb buffer iff there is a record for this article.
-      (cond (record
-	     (bbdb-pop-up-bbdb-buffer
-	      (function (lambda (w)
-			  (let ((b (current-buffer)))
-			    (set-buffer (window-buffer w))
-			    (prog1 (or (eq major-mode 'mime-veiw-mode)
-				       (eq major-mode 'gnus-article-mode))
-				   (set-buffer b))))))
-	     (bbdb-display-records (list record)))
-	    (t
-	     (or bbdb-inside-electric-display
-		 (not (get-buffer-window bbdb-buffer-name))
-		 (let (w)
-		   (delete-other-windows)
-		   (if (assq 'article gnus-buffer-configuration)
-		       (gnus-configure-windows 'article)
-		     (gnus-configure-windows 'SelectArticle))
-		   (if (setq w (get-buffer-window gnus-summary-buffer))
-		       (select-window w))
-		   ))))
-      (set-buffer b)
-      record)))
+      (cond
+       (record
+	(bbdb-pop-up-bbdb-buffer
+	 (lambda (w)
+	   (with-current-buffer (window-buffer w)
+	     (memq major-mode
+		   '(mime-view-mode gnus-article-mode)))))
+	(bbdb-display-records (list record)))
+       ((and (not bbdb-inside-electric-display)
+	     (get-buffer-window bbdb-buffer-name))
+	(delete-other-windows)
+	(if (assq 'article gnus-buffer-configuration)
+	    (gnus-configure-windows 'article)
+	  (gnus-configure-windows 'SelectArticle))
+	(let ((w (get-buffer-window gnus-summary-buffer)))
+	  (if w (select-window w))))))
+    record))
+
+;;;###autoload
+(defun gnus-bbdb/split-mail (header-field bbdb-field
+					  &optional regexp group)
+  "Mail split method for `nnmail-split-fancy'.
+HEADER-FIELD is a regexp or list of regexps as mail header field name
+for gathering mail addresses.  If HEADER-FIELD is a string, then it's
+used for just matching pattern.  If HEADER-FIELD is a list of strings,
+then these strings have priorities in the order.
+
+BBDB-FIELD is field name of BBDB.
+Optional argument REGEXP is regexp string for matching BBDB-FIELD value.
+If REGEXP is nil or not specified, then all BBDB-FIELD value is matched.
+
+If GROUP is nil or not specified, then BBDB-FIELD value is returned as
+group name.  If GROUP is a symbol `&', then list of all matching group's
+BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
+  (if (listp header-field)
+      (if (eq group '&)
+	  (gnus-bbdb/split-mail (mapconcat 'identity header-field "\\|")
+				bbdb-field regexp group)
+	(let (rest)
+	  (while (and header-field
+		      (null (setq rest (gnus-bbdb/split-mail
+					(car header-field) bbdb-field
+					regexp group))))
+	    (setq header-field (cdr header-field)))
+	  rest))
+    (let ((pat (concat "^\\(" header-field "\\):[ \t]"))
+	  header-values)
+      (goto-char (point-min))
+      (while (re-search-forward pat nil t)
+	(setq header-values (cons (buffer-substring (point)
+						    (std11-field-end))
+				  header-values)))
+      (let ((address-regexp
+	     (with-temp-buffer
+	       (let (lal)
+		 (while header-values
+		   (setq lal (std11-parse-addresses-string
+			      (pop header-values)))
+		   (while lal
+		     (gnus-bbdb/insert-address-regexp (pop lal)))))
+	       (buffer-string))))
+	(unless (zerop (length address-regexp))
+	  (gnus-bbdb/split-mail-1 address-regexp bbdb-field regexp group))))))
+
+(defun gnus-bbdb/insert-address-regexp (address)
+  "Insert string of address part from parsed ADDRESS of RFC 822."
+  (cond ((eq (car address) 'group)
+	 (setq address (cdr address))
+	 (while address
+	   (gnus-bbdb/insert-address-regexp (pop address))))
+	((eq (car address) 'mailbox)
+	 (unless (eq (point) (point-min))
+	   (insert "\\|"))
+	 (let ((addr (nth 1 address)))
+	   (insert (std11-addr-to-string
+		    (if (eq (car addr) 'phrase-route-addr)
+			(nth 2 addr)
+		      (cdr addr))))))))
+
+(defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
+  (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
+	prop rest)
+    (or regexp (setq regexp ""))
+    (catch 'done
+      (cond
+       ((eq group '&)
+	(while records
+	  (when (and (setq prop (bbdb-record-getprop (car records) bbdb-field))
+		     (string-match regexp prop)
+		     (not (member prop rest)))
+	    (setq rest (cons prop rest)))
+	  (setq records (cdr records)))
+	(throw 'done (when rest (cons '& rest))))
+       (t
+	(while records
+	  (when (or (null bbdb-field) 
+		    (and (setq prop (bbdb-record-getprop (car records)
+							 bbdb-field))
+			 (string-match regexp prop)))
+	    (throw 'done (or group prop)))
+	  (setq records (cdr records))))))))
 
 ;;
 ;; Announcing BBDB entries in the summary buffer
@@ -167,8 +240,10 @@ This variable has no effect on the marking controlled by
   :group 'bbdb-mua-specific-gnus
   :type '(choice (const :tag "Mark known posters" t)
 		 (const :tag "Do not mark known posters" nil)))
-(defvaralias 'gnus-bbdb/mark-known-posters
-  'gnus-bbdb/summary-mark-known-posters)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/mark-known-posters
+    'gnus-bbdb/summary-mark-known-posters))
 
 (defcustom gnus-bbdb/summary-known-poster-mark "+"
   "This is the default character to prefix author names with if
@@ -187,8 +262,10 @@ people who aren't in the database, of course.  (`gnus-optional-headers'
 must be `gnus-bbdb/lines-and-from' for GNUS users.)"
   :group 'bbdb-mua-specific-gnus
   :type 'boolean)
-(defvaralias 'gnus-bbdb/header-show-bbdb-names
-  'gnus-bbdb/summary-show-bbdb-names)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/header-show-bbdb-names
+    'gnus-bbdb/summary-show-bbdb-names))
 
 (defcustom gnus-bbdb/summary-prefer-bbdb-data t
   "If t, then for posters who are in our BBDB, replace the information
@@ -207,8 +284,10 @@ See `gnus-bbdb/lines-and-from' for GNUS users, or
   :group 'bbdb-mua-specific-gnus
   :type '(choice (const :tag "Prefer real names" t)
 		 (const :tag "Prefer network addresses" nil)))
-(defvaralias 'gnus-bbdb/header-prefer-real-names
-  'gnus-bbdb/summary-prefer-real-names)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/header-prefer-real-names
+    'gnus-bbdb/summary-prefer-real-names))
 
 (defcustom gnus-bbdb/summary-user-format-letter "B"
   "This is the gnus-user-format-function- that will be used to insert
@@ -442,17 +521,7 @@ addresses better than the traditionally static global scorefile."
   gnus-bbdb/score-alist)
 
 (defun gnus-bbdb/extract-field-value-init ()
-  (when (or (and (eq (current-buffer) (get-buffer gnus-article-buffer))
-		 (buffer-live-p gnus-original-article-buffer)
-		 (set-buffer gnus-original-article-buffer))
-	    (eq (current-buffer) (get-buffer gnus-original-article-buffer)))
-    (widen)
-    (narrow-to-region (point-min)
-		      (progn (goto-char (point-min))
-			     (or (search-forward "\n\n" nil t)
-				 (error "message unexists"))
-			     (- (point) 2)))
-    'gnus-bbdb/extract-field-value))
+  (function gnus-bbdb/extract-field-value))
 
 (defun gnus-bbdb/extract-field-value (field-name)
   "Given the name of a field (like \"Subject\") this returns the value of
@@ -465,7 +534,8 @@ beginning of the message headers."
   ;; divided real-names from addresses; the actual From: and Subject: fields
   ;; exist only in the message.
   (let (value)
-    (when (setq value (mail-fetch-field field-name))
+    (when (setq value (mime-entity-fetch-field
+		       gnus-current-headers field-name))
       (gnus-bbdb/decode-field-body value field-name))))
 
 ;;; @ mail-extr
@@ -486,8 +556,7 @@ beginning of the message headers."
     (if (string= address "") (setq address nil))
     (if (string= phrase "") (setq phrase nil))
     (when (or phrase address)
-      (list phrase address))
-    ))
+      (list phrase address))))
 
 ;;; @ full-name canonicalization methods
 ;;;
@@ -496,25 +565,21 @@ beginning of the message headers."
   (let (dest)
     (while (string-match "\\s +" str)
       (setq dest (cons (substring str 0 (match-beginning 0)) dest))
-      (setq str (substring str (match-end 0)))
-      )
+      (setq str (substring str (match-end 0))))
     (or (string= str "")
         (setq dest (cons str dest)))
     (setq dest (nreverse dest))
-    (mapconcat 'identity dest " ")
-    ))
+    (mapconcat 'identity dest " ")))
 
 (defun gnus-bbdb/canonicalize-dots (str)
   (let (dest)
     (while (string-match "\\." str)
       (setq dest (cons (substring str 0 (match-end 0)) dest))
-      (setq str (substring str (match-end 0)))
-      )
+      (setq str (substring str (match-end 0))))
     (or (string= str "")
         (setq dest (cons str dest)))
     (setq dest (nreverse dest))
-    (mapconcat 'identity dest " ")
-    ))
+    (mapconcat 'identity dest " ")))
 
 ;;
 ;; Insinuation

@@ -1,5 +1,7 @@
 ;;; nnspool.el --- spool access for GNU Emacs
-;; Copyright (C) 198,998,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
+
+;; Copyright (C) 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997, 1998,
+;;	2000 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -27,6 +29,8 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (require 'nnheader)
 (require 'nntp)
 (require 'nnoo)
@@ -137,8 +141,9 @@ there.")
 	      (inline (nnheader-insert-head file))
 	      (goto-char beg)
 	      (if (search-forward "\n\n" nil t)
-		  (progn (forward-char -1)
-			 (insert ".\n"))
+		  (progn
+		    (forward-char -1)
+		    (insert ".\n"))
 		(goto-char (point-max))
 		(if (bolp)
 		    (insert ".\n")
@@ -148,7 +153,7 @@ there.")
 	    (and do-message
 		 (zerop (% (incf count) 20))
 		 (nnheader-message 5 "nnspool: Receiving headers... %d%%"
-			  (/ (* count 100) number))))
+				   (/ (* count 100) number))))
 
 	  (when do-message
 	    (nnheader-message 5 "nnspool: Receiving headers...done"))
@@ -298,8 +303,8 @@ there.")
 			     (read (current-buffer)))
 			   seconds))
 		      (push (buffer-substring
-					  (match-beginning 1) (match-end 1))
-					 groups)
+			     (match-beginning 1) (match-end 1))
+			    groups)
 		      (zerop (forward-line -1))))
 	  (erase-buffer)
 	  (while groups

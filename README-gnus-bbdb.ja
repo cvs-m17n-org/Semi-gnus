@@ -29,6 +29,7 @@ bbdb-auto-notes-hook $B$r;HMQ$7$F$$$J$$J}$K$OITMW$G$9$,!";HMQ$7$F$$$kJ}(B
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'gnus / 'Gnus $B$O$O$:$7$F$/$@$5$$!#(B
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
 FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$;$s$,!"$=$l(B
 $B$r6/@)E*$K(B decode $B$7$?$$>l9g$K$O!"<!$N@_Dj$r2C$($F$/$@$5$$!#(B
@@ -42,15 +43,35 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 $B0J2<$O(B bbdb.el / bbdb-hooks.el $B$K$"$F$k(B patch $B$G$9!#(B
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
-+++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
-@@ -352,12 +352,22 @@
- 	(marker (bbdb-header-start))
- 	field pairs fieldval  ; do all bindings here for speed
- 	regexp string notes-field-name notes
--	 replace-p replace-or-add-msg)
-+	replace-p replace-or-add-msg
-+	extract-field-value-funtion)
+--- bbdb-2.32/lisp/bbdb-com.el~	Sun Feb 18 08:00:39 2001
++++ bbdb-2.32/lisp/bbdb-com.el	Sun Feb 18 08:00:39 2001
+@@ -1620,7 +1620,7 @@
+           ;; to be enclosed in quotes.  Double-quotes and backslashes have
+           ;; already been escaped.  This quotes a few extra characters as
+           ;; well (!,%, and $) just for common sense.
+-          ((string-match "[][\000-\037\177()<>@,;:.!$%]" name)
++	  ((string-match "[][\000-\037\177<>@,;.!$%]" name)
+            (format "\"%s\" <%s>" name net))
+           (t
+            (format "%s <%s>" name net)))))
+--- bbdb-2.32/lisp/bbdb-hooks.el~	Tue Jan 30 08:00:56 2001
++++ bbdb-2.32/lisp/bbdb-hooks.el	Tue Jan 30 08:00:56 2001
+@@ -83,6 +83,8 @@
+ ;;
+ ;;
+ 
++(eval-when-compile (require 'cl))
++
+ (require 'bbdb)
+ 
+ (defmacro the-v18-byte-compiler-sucks-wet-farts-from-dead-pigeons ()
+@@ -415,12 +417,23 @@
+          (marker (bbdb-header-start))
+          field pairs fieldval  ; do all bindings here for speed
+          regexp string notes-field-name notes
+-         replace-p replace-or-add-msg)
++         replace-p replace-or-add-msg
++	 extract-field-value-funtion)
      (set-buffer (marker-buffer marker))
      (save-restriction
 -      (widen)
@@ -60,38 +81,40 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 +	    function)
 +	(or (progn
 +	      (while (and (not extract-field-value-funtion)
-+			  (setq function (pop function-list)))
-+		(setq extract-field-value-funtion (funcall function)))
++			  (setq function (car function-list)))
++		(setq extract-field-value-funtion (funcall function)
++		      function-list (cdr function-list)))
 +	      extract-field-value-funtion)
 +	    (progn
 +	      (widen)
 +	      (goto-char marker)
 +	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
 +      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
- 	       (string-match (bbdb-user-mail-names) fieldval))
- 	  ;; Don't do anything if this message is from us.  Note that we have
- 	  ;; to look at the message instead of the record, because the record
-@@ -368,7 +378,7 @@
- 	  (goto-char marker)
- 	  (setq field (car (car ignore-all))
- 		regexp (cdr (car ignore-all))
--		fieldval (bbdb-extract-field-value field))
-+		fieldval (funcall extract-field-value-funtion field))
- 	  (if (and fieldval
- 		   (string-match regexp fieldval))
- 	      (setq ignore t)
-@@ -382,7 +392,7 @@
- 		pairs (cdr (car rest))	; (REGEXP . STRING) or
- 					; (REGEXP FIELD-NAME STRING) or
- 					; (REGEXP FIELD-NAME STRING REPLACE-P)
--		fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
-+		fieldval (funcall extract-field-value-funtion field)) ; e.g., Subject line
- 	  (if fieldval
- 	      (while pairs
- 		(setq regexp (car (car pairs))
---- bbdb.el~	Tue Oct 13 03:14:55 1998
-+++ bbdb.el	Fri Oct 30 17:05:53 1998
-@@ -620,6 +620,7 @@
+                (string-match (bbdb-user-mail-names) fieldval))
+           ;; Don't do anything if this message is from us.  Note that we have
+           ;; to look at the message instead of the record, because the record
+@@ -431,7 +444,7 @@
+           (goto-char marker)
+           (setq field (car (car ignore-all))
+                 regexp (cdr (car ignore-all))
+-                fieldval (bbdb-extract-field-value field))
++                fieldval (funcall extract-field-value-funtion field))
+           (if (and fieldval
+                    (string-match regexp fieldval))
+               (setq ignore t)
+@@ -444,7 +457,8 @@
+                 pairs (cdr (car rest))  ; (REGEXP . STRING) or
+                                         ; (REGEXP FIELD-NAME STRING) or
+                                         ; (REGEXP FIELD-NAME STRING REPLACE-P)
+-                fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
++                fieldval (funcall extract-field-value-funtion field))
++                                        ; e.g., Subject line
+           (when fieldval
+             (while pairs
+               (setq regexp (car (car pairs))
+--- bbdb-2.32/lisp/bbdb.el~	Sun Mar  4 20:30:09 2001
++++ bbdb-2.32/lisp/bbdb.el	Sun Mar  4 20:30:09 2001
+@@ -710,6 +710,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
  (defvar bbdb-elided-display nil)
@@ -102,3 +125,37 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 
 ---
+gnus-bbdb/split-mail()
+
+nnmail-split-fancy $B$G;HMQ$9$k$?$a$N4X?t$G$9!#<!$N$h$&$K;HMQ$7$F$/$@$5$$!#(B
+
+(setq nnmail-split-methods 'nnmail-split-fancy
+      nnmail-split-fancy
+      '(|
+        .....
+*1      (: gnus-bbdb/split-mail "from\\|to\\|cc"
+           'company "foo" "foo-group") 
+        .....
+*2      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'company "^bar")
+        .....
+*3      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'group)
+        .....
+*4      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'note "my friend"
+          '(|
+             .....
+        .....
+        ))
+
+*1 : From, To, Cc $B$$$:$l$+$N%X%C%@!<!&%U%#!<%k%I$K4^$^$l$k%a%$%k!&%"%I(B
+     $B%l%9$N$&$A(B BBDB $B$N(B `company' $B%U%#!<%k%I$K(B `foo' $B$,4^$^$l$k>l9g!"(B
+     `foo-group' $B$K?6$jJ,$1$^$9!#(B
+
+*2 : `company' $B%U%#!<%k%I$,(B `bar' $B$G;O$^$C$F$$$k>l9g!"(B`company' $B%U%#!<(B
+     $B%k%I$NFbMF$r$=$N$^$^%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+
+*3 : `group' $B%U%#!<%k%I$,$"$k>l9g!"(B`group' $B%U%#!<%k%I$NFbMF$r$=$N$^$^(B
+     $B%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+
+*4 : `note' $B%U%#!<%k%I$K(B `my friend' $B$,4^$^$l$k>l9g!"$=$N8e$m$K;XDj$5(B
+     $B$l$?5,B'$G?6$jJ,$1$^$9!#$3$N5,B'$N5-=RJ}K!$O!"DL>o$N(B
+     `nnmail-split-fancy' $B$G$N5-=RJ}K!$HF1$8$b$N$G$9!#(B

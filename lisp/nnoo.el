@@ -1,5 +1,7 @@
 ;;; nnoo.el --- OO Gnus Backends
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -302,6 +304,20 @@ All functions will return nil and report an error."
 		   (&rest args)
 		 (nnheader-report ',backend ,(format "%s-%s not implemented"
 						     backend function))))))))
+
+(defun nnoo-set (server &rest args)
+  (let ((parents (nnoo-parents (car server)))
+	(nnoo-parent-backend (car server)))
+    (while parents
+      (nnoo-change-server (caar parents)
+			  (cadr server)
+			  (cdar parents))
+      (pop parents)))
+  (nnoo-change-server (car server)
+		      (cadr server) (cddr server))
+  (while args
+    (set (pop args) (pop args))))
+
 (provide 'nnoo)
 
 ;;; nnoo.el ends here.

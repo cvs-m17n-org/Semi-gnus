@@ -1,11 +1,12 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996-1999 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-;; Keywords: mail, pop3
-;; Version: 1.3s
+;; Maintainer: FSF
+;; Keywords: mail
 
 ;; This file is part of GNU Emacs.
 
@@ -36,9 +37,9 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(require 'mail-utils)
+(eval-when-compile (require 'static))
 
-(defconst pop3-version "1.3s")
+(require 'mail-utils)
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -90,8 +91,14 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls"))
 
+(defvar pop3-ssl-program-name
+  (if (exec-installed-p "openssl")
+      "openssl"
+    "ssleay")
+  "The program to run in a subprocess to open an SSL connection.")
+
 (defvar pop3-ssl-program-arguments
-  '("-quiet")
+  '("s_client" "-quiet")
   "Arguments to be passed to the program `pop3-ssl-program-name'.")
 
 (defun pop3-progress-message (format percent &rest args)
@@ -103,12 +110,12 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   (let* ((process (pop3-open-server pop3-mailhost pop3-port))
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
+	 message-count
 	 (pop3-password pop3-password)
-	 (pop3-uidl-file-name
-	  (convert-standard-filename
-	   (concat pop3-uidl-file-name "-" pop3-mailhost)))
-	 (retrieved-messages nil)
-	 messages message-count)
+	 (pop3-uidl-file-name (convert-standard-filename
+			       (concat pop3-uidl-file-name "-"
+				       pop3-mailhost)))
+	 retrieved-messages messages)
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
     ;; query for password
@@ -125,8 +132,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (message "Retrieving message list...")
     (setq messages (pop3-get-message-numbers process)
 	  message-count (length (cdr messages)))
-    (message (format "Retrieving message list...%d of %d unread"
-		     message-count (pop messages)))
+    (message "Retrieving message list...%d of %d unread"
+	     message-count (pop messages))
     (unwind-protect
 	(unless (not (stringp crashbox))
 	  (while messages
@@ -147,8 +154,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	  ;; now delete the messages we have retrieved
 	  (unless pop3-leave-mail-on-server
 	    (dolist (n retrieved-messages)
-	      (message (format "Deleting message %d of %d from %s..."
-			       n message-count pop3-mailhost))
+	      (message "Deleting message %d of %d from %s..."
+		       n message-count pop3-mailhost)
 	      (pop3-dele process n)))
 	  )
       (pop3-quit process))
@@ -156,33 +163,36 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     message-count))
 
 (defun pop3-open-server (mailhost port)
-  "Open TCP connection to MAILHOST.
+  "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection.
 Argument PORT specifies connecting port."
-  (let ((process-buffer
-	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process))
+  (let (process)
     (save-excursion
-      (set-buffer process-buffer)
-      (erase-buffer))
-    (setq
-     process
-     (cond
-      ((eq pop3-connection-type 'ssl)
-       (pop3-open-ssl-stream "POP" process-buffer mailhost port))
-      ((eq pop3-connection-type 'tls)
-       (pop3-open-tls-stream "POP" process-buffer mailhost port))
-      (t
-       (open-network-stream-as-binary "POP" process-buffer mailhost port))))
-    (setq pop3-read-point (point-min))
-    (let ((response (pop3-read-response process t)))
-      (setq pop3-timestamp
-	    (substring response (or (string-match "<" response) 0)
-		       (+ 1 (or (string-match ">" response) -1)))))
-    process))
+      (set-buffer (get-buffer-create (concat " trace of POP session to "
+					     mailhost)))
+      (erase-buffer)
+      (setq pop3-read-point (point-min))
+      (setq
+       process
+       (cond
+	((eq pop3-connection-type 'ssl)
+	 (pop3-open-ssl-stream "POP" (current-buffer) mailhost port))
+	((eq pop3-connection-type 'tls)
+	 (pop3-open-tls-stream "POP" (current-buffer) mailhost port))
+	(t
+	 (open-network-stream-as-binary "POP" (current-buffer)
+					mailhost port))))
+      (let ((response (pop3-read-response process t)))
+	(setq pop3-timestamp
+	      (substring response (or (string-match "<" response) 0)
+			 (+ 1 (or (string-match ">" response) -1)))))
+      process)))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
-  (let* ((ssl-program-arguments
+  (require 'path-util)
+  (let* ((ssl-program-name
+	  pop3-ssl-program-name)
+	 (ssl-program-arguments
 	  `(,@pop3-ssl-program-arguments ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
          (process (open-ssl-stream name buffer host service)))
@@ -203,9 +213,16 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (as-binary-process
-   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+  (cond ((eq system-type 'windows-nt)
+	 (let (selective-display
+	       (coding-system-for-write 'binary)
+	       (coding-system-for-read 'raw-text-dos))
+	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+	(t
+	 (as-binary-process
+	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
@@ -238,8 +255,8 @@ Args are NAME BUFFER HOST SERVICE."
     )
 
 (defun pop3-read-response (process &optional return)
-  "Read the response from the server PROCESS.
-Return the response string if optional second argument RETURN is non-nil."
+  "Read the response from the server.
+Return the response string if optional second argument is non-nil."
   (let ((case-fold-search nil)
 	match-end)
     (save-excursion
@@ -251,7 +268,7 @@ Return the response string if optional second argument RETURN is non-nil."
       (setq match-end (point))
       (goto-char pop3-read-point)
       (if (looking-at "-ERR")
-	  (signal 'error (list (buffer-substring (point) (- match-end 2))))
+	  (error (buffer-substring (point) (- match-end 2)))
 	(if (not (looking-at "+OK"))
 	    (progn (setq pop3-read-point match-end) nil)
 	  (setq pop3-read-point match-end)
@@ -263,7 +280,7 @@ Return the response string if optional second argument RETURN is non-nil."
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)
   (if (not pop3-read-passwd)
-      (if (functionp 'read-passwd)
+      (if (fboundp 'read-passwd)
 	  (setq pop3-read-passwd 'read-passwd)
 	(if (load "passwd" t)
 	    (setq pop3-read-passwd 'read-passwd)
@@ -401,8 +418,9 @@ Return the response string if optional second argument RETURN is non-nil."
 	 (lambda (atom)
 	   (when (car (symbol-value atom))
 	     (insert (format "%s\n" atom))))
-	 pop3-uidl-obarray)))))
-    
+	 pop3-uidl-obarray)))
+    (fillarray pop3-uidl-obarray 0)))
+
 
 ;; The Command Set
 
@@ -422,15 +440,45 @@ Return the response string if optional second argument RETURN is non-nil."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-(autoload 'md5 "md5")
+(static-unless (and (fboundp 'md5) (subrp (symbol-function 'md5)))
+  (eval-and-compile
+    (require 'path-util)
+    (if (module-installed-p 'md5)
+	(progn
+	  (autoload 'md5 "md5")
+	  (fset 'pop3-md5 'md5))
+
+      (defvar pop3-md5-program "md5"
+	"*Program to encode its input in MD5.")
+
+      (defun pop3-md5 (string)
+	(with-temp-buffer
+	  (insert string)
+	  (call-process-region (point-min) (point-max)
+			       (or shell-file-name "/bin/sh")
+			       t (current-buffer) nil
+			       "-c" pop3-md5-program)
+	  ;; The meaningful output is the first 32 characters.
+	  ;; Don't return the newline that follows them!
+	  (buffer-substring (point-min) (+ (point-min) 32))))
+      )))
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
-  (let ((hash (md5 (concat pop3-timestamp pop3-password))))
-    (pop3-send-command process (format "APOP %s %s" user hash))
-    (let ((response (pop3-read-response process t)))
-      (if (not (and response (string-match "+OK" response)))
-	  (pop3-quit process)))))
+  (let ((pass pop3-password))
+    (if (and pop3-password-required (not pass))
+	(setq pass
+	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+    (if pass
+	(let ((hash (static-if (and (fboundp 'md5)
+				    (subrp (symbol-function 'md5)))
+			(md5 (concat pop3-timestamp pass))
+		      (pop3-md5 (concat pop3-timestamp pass)))))
+	  (pop3-send-command process (format "APOP %s %s" user hash))
+	  (let ((response (pop3-read-response process t)))
+	    (if (not (and response (string-match "+OK" response)))
+		(pop3-quit process)))))
+    ))
 
 (defun pop3-stls (process)
   "Query whether TLS extension is supported"
@@ -445,8 +493,8 @@ Return the response string if optional second argument RETURN is non-nil."
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (split-string response)))
-	  (string-to-int (nth 2 (split-string response))))
+    (list (string-to-int (nth 1 (split-string response " ")))
+	  (string-to-int (nth 2 (split-string response " "))))
     ))
 
 (defun pop3-retr (process msg crashbuf)
@@ -474,7 +522,7 @@ Return the response string if optional second argument RETURN is non-nil."
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (split-string response)))
+    (string-to-int (nth 1 (split-string response " ")))
     ))
 
 (defun pop3-rset (process)
@@ -494,14 +542,7 @@ and close the connection."
     (save-excursion
       (set-buffer (process-buffer process))
       (goto-char (point-max))
-      (delete-process process)
-      ))
-  (when pop3-leave-mail-on-server
-    (mapatoms
-     (lambda (atom)
-       (when (car (symbol-value atom))
-	 (unintern atom pop3-uidl-obarray)))
-     pop3-uidl-obarray)))
+      (delete-process process))))
 
 (defun pop3-uidl (process &optional msgno)
   "Return the results of a UIDL command in PROCESS for optional MSGNO.

@@ -1,5 +1,6 @@
 prefix = @prefix@
 datadir = @datadir@
+infodir = @infodir@
 lispdir = @lispdir@
 srcdir = @srcdir@
 
@@ -7,6 +8,30 @@ srcdir = @srcdir@
 EMACS = @EMACS@
 XEMACS = @XEMACS@
 PACKAGEDIR = @PACKAGEDIR@
+GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
+
+# It may be needed for Meadow/NTEmacs when sh.exe is used for SHELL.
+# Because Meadow/NTEmacs will get the value of the current-directory from
+# the environment variable PWD, but sh.exe will not take care of it even
+# if the current-directory has changed.  So we should invalidate it.
+PWD=
+
+# It will be used to look for the XEmacs package path if this file is
+# mis-configured (e.g. configured for FSFmacs).
+EXAMINE_PACKAGEDIR = $(XEMACS) -batch -q -no-site-file -eval \
+	"(let (package-dir) \
+	   (if (boundp (quote early-packages)) \
+	       (let ((dirs (delq nil (append (if early-package-load-path \
+						 early-packages) \
+					     (if late-package-load-path \
+						 late-packages) \
+					     (if last-package-load-path \
+						 last-packages))))) \
+		 (while (and dirs (not package-dir)) \
+		   (if (file-directory-p (car dirs)) \
+		       (setq package-dir (car dirs) \
+			     dirs (cdr dirs)))))) \
+	   (princ (or package-dir \"\")))" 2>/dev/null
 
 all: lick info
 
@@ -15,24 +40,97 @@ all-ja: lick info info-ja
 lick:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" all
 
-install:
+install: install-lisp install-info
+
+install-ja: install install-info-ja
+
+install-lisp:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" install
-	cd texi && $(MAKE) EMACS="$(EMACS)" install
 
-# Rule for XEmacs package.
-package: xlick xinfo
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
+install-info:
+	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install
 
-install-package: xinfo
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
-		install-package
+install-info-ja:
+	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install-ja
 
-package-ja: xlick xinfo xinfo-ja
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
+## Rule for XEmacs package.
+install-package: xclever compose-package remove-extra-files-in-package \
+	install-package-lisp \
+	install-package-info install-package-manifest
 
-install-package-ja: xinfo xinfo-ja
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
-		install-package
+install-package-ja: xclever compose-package remove-extra-files-in-package \
+	install-package-lisp \
+	install-package-info install-package-info-ja \
+	install-package-manifest
+
+package: xlick xinfo compose-package
+
+package-ja: xlick xinfo xinfo-ja compose-package
+
+# Sub-rule for XEmacs package.
+install-package-lisp:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd lisp && $(MAKE) EMACS=$(XEMACS)" \
+		"lispdir=$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
+		"install-without-compiling"; \
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
+		lispdir="$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
+		install-without-compiling
+
+install-package-info:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd texi && $(MAKE) EMACS=$(XEMACS)" \
+		"infodir=$$package_dir""/info install-info"; \
+	cd texi && $(MAKE) EMACS="$(XEMACS)" \
+		infodir="$$package_dir""/info" install-info
+
+install-package-info-ja:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd texi && $(MAKE) EMACS=$(XEMACS)" \
+		"infodir=$$package_dir""/info install-ja-info"; \
+	cd texi && $(MAKE) EMACS="$(XEMACS)" \
+		infodir="$$package_dir""/info" install-ja-info
+
+install-package-manifest:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$$package_dir" \
+		"install-package-manifest"; \
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR=$$package_dir \
+		install-package-manifest
+
+remove-extra-files-in-package:
+	@if test x$(PACKAGEDIR) = x; then \
+	  package_dir=`$(EXAMINE_PACKAGEDIR)`; \
+	else \
+	  package_dir="$(PACKAGEDIR)"; \
+	fi; \
+	echo "cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$$package_dir" \
+		"remove-extra-files-in-package"; \
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR=$$package_dir \
+		remove-extra-files-in-package
+
+compose-package:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" compose-package
+##
+
+xclever:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" clever
 
 xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all
@@ -41,7 +139,7 @@ xinfo:
 	cd texi && $(MAKE) EMACS="$(XEMACS)" all-info
 
 xinfo-ja:
-	cd texi && $(MAKE) EMACS="$(XEMACS)" MAKEINFO=no ja-info
+	cd texi && $(MAKE) EMACS="$(XEMACS)" ja-info
 
 # Rule for Lars and nobody else.
 some:
@@ -53,15 +151,12 @@ info:
 	cd texi && $(MAKE) EMACS="$(EMACS)" all
 
 info-ja:
-	cd texi && $(MAKE) EMACS=$(EMACS) MAKEINFO=no ja
+	cd texi && $(MAKE) EMACS=$(EMACS) ja
 
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
 	rm -f MANIFEST.*
 	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
-
-xsome:
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
 
 elclean:
 	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
@@ -69,13 +164,13 @@ elclean:
 x:
 	$(MAKE) EMACS="$(XEMACS)"
 
+xsome:
+	$(MAKE) EMACS="$(XEMACS)" some
+
 distclean: clean
 	rm -rf *~
 	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
-
-osome:
-	$(MAKE) EMACS="$(XEMACS)" some
 
 config.status: $(srcdir)/configure
 	$(SHELL) ./config.status --recheck

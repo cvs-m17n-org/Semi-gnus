@@ -1,5 +1,7 @@
 ;;; nnmbox.el --- mail mbox access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -26,6 +28,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
@@ -60,11 +63,9 @@
 (defvoo nnmbox-group-alist nil)
 (defvoo nnmbox-active-timestamp nil)
 
-(defvoo nnmbox-file-coding-system
-    (if (memq system-type '(windows-nt ms-dos ms-windows))
-	'raw-text-dos 'raw-text))
+(defvoo nnmbox-file-coding-system 'binary)
 (defvoo nnmbox-file-coding-system-for-write nil)
-(defvoo nnmbox-active-file-coding-system nnmbox-file-coding-system)
+(defvoo nnmbox-active-file-coding-system 'binary)
 (defvoo nnmbox-active-file-coding-system-for-write nil)
 
 
@@ -253,7 +254,7 @@
   (nnheader-report 'nnmbox "LIST NEWSGROUPS is not implemented."))
 
 (deffoo nnmbox-request-expire-articles
-  (articles newsgroup &optional server force)
+    (articles newsgroup &optional server force)
   (nnmbox-possibly-change-newsgroup newsgroup server)
   (let* ((is-old t)
 	 rest)
@@ -288,7 +289,7 @@
       (nconc rest articles))))
 
 (deffoo nnmbox-request-move-article
-  (article group server accept-form &optional last)
+    (article group server accept-form &optional last)
   (let ((buf (get-buffer-create " *nnmbox move*"))
 	result)
     (and
@@ -528,7 +529,8 @@
 (defun nnmbox-create-mbox ()
   (when (not (file-exists-p nnmbox-mbox-file))
     (let ((nnmail-file-coding-system
-	   nnmbox-file-coding-system-for-write))
+	   (or nnmbox-file-coding-system-for-write
+	       nnmbox-file-coding-system)))
       (nnmail-write-region 1 1 nnmbox-mbox-file t 'nomesg))))
 
 (defun nnmbox-read-mbox ()
@@ -558,26 +560,31 @@
 	  (when (and (re-search-backward
 		      (format "^X-Gnus-Newsgroup: %s:\\([0-9]+\\) "
 			      (caar alist)) nil t)
-		     (>= (setq number
-			       (string-to-number
-				(buffer-substring
-				 (match-beginning 1) (match-end 1))))
-			 (cdadar alist)))
-	    (setcdr (cadar alist) (1+ number)))
+		     (> (setq number
+			      (string-to-number
+			       (buffer-substring
+				(match-beginning 1) (match-end 1))))
+			(cdadar alist)))
+	    (setcdr (cadar alist) number))
 	  (setq alist (cdr alist)))
 
 	(goto-char (point-min))
 	(while (re-search-forward delim nil t)
 	  (setq start (match-beginning 0))
-	  (when (not (search-forward "\nX-Gnus-Newsgroup: "
-				     (save-excursion
-				       (setq end
-					     (or
-					      (and
-					       (re-search-forward delim nil t)
-					       (match-beginning 0))
-					      (point-max))))
-				     t))
+	  (unless (search-forward
+		   "\nX-Gnus-Newsgroup: "
+		   (save-excursion
+		     (setq end
+			   (or
+			    (and
+			     ;; skip to end of headers first, since mail
+			     ;; which has been respooled has additional
+			     ;; "From nobody" lines.
+			     (search-forward "\n\n" nil t)
+			     (re-search-forward delim nil t)
+			     (match-beginning 0))
+			    (point-max))))
+		   t)
 	    (save-excursion
 	      (save-restriction
 		(narrow-to-region start end)

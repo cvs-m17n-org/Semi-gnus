@@ -1,30 +1,38 @@
 How to build T-gnus with Mule 2.3 based on Emacs 19.34.
 
-FIX loaddefs.el
-===============
+FIXING loaddefs.el
+==================
 
 Unfortunately, some variables for `message' are predefined in lisp/
 loaddefs.el which is dumped in Mule executable file.  It is uninvited,
 moreover, it has a bad influence.  So you should remove these
 definitions from lisp/loaddefs.el and rebuild Mule.  However, if you
-don't want to rebuild Mule, put the following lines in the beginning
-of .emacs file instead.
+don't want to rebuild Mule, you may put the following lines in the
+beginning of .emacs file instead of rebuilding Mule.
 
-(mapcar
- (lambda (symbol)
-   (makunbound (intern (format "message-%s" symbol))))
- '(citation-line-function
-   cite-function courtesy-message default-headers default-mail-headers
-   default-news-headers deletable-headers fcc-handler-function
-   followup-to-function from-style generate-headers-first generate-new-buffers
-   ignored-bounced-headers ignored-cited-headers ignored-mail-headers
-   ignored-news-headers ignored-resent-headers ignored-supersedes-headers
-   included-forward-headers indent-citation-function interactive
-   kill-buffer-on-exit post-method reply-to-function required-mail-headers
-   required-news-headers send-mail-function send-news-function
-   signature signature-before-forwarded-message signature-file
-   signature-separator syntax-checks use-followup-to user-organization-file
-   wide-reply-to-function yank-prefix))
+(let ((symbols '(citation-line-function
+		 cite-function courtesy-message default-headers
+		 default-mail-headers default-news-headers
+		 deletable-headers fcc-handler-function
+		 followup-to-function from-style
+		 generate-headers-first generate-new-buffers
+		 ignored-bounced-headers ignored-cited-headers
+		 ignored-mail-headers ignored-news-headers
+		 ignored-resent-headers ignored-supersedes-headers
+		 included-forward-headers indent-citation-function
+		 interactive kill-buffer-on-exit post-method
+		 reply-to-function required-mail-headers
+		 required-news-headers send-mail-function
+		 send-news-function signature
+		 signature-before-forwarded-message signature-file
+		 signature-separator syntax-checks use-followup-to
+		 user-organization-file wide-reply-to-function
+		 yank-prefix))
+      symbol)
+  (while symbols
+    (setq symbol (car symbols)
+	  symbols (cdr symbol))
+    (makunbound (intern (format "message-%s" symbol)))))
 
 
 INSTALL CUSTOM, APEL, FLIM, SEMI/WEMI
@@ -57,20 +65,83 @@ ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 INSTALL T-gnus
 ==============
 
-There are two ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
+There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
 
- 1. Use the configure option `--with-addpath=' to specify the colon
-    separated directory names where EMU, APEL or CUSTOM packages have
-    already installed.  For example:
+1. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages
+   under the standard load-path, for instance:
 
-    % configure --with-emacs=mule\
-      --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
-    % make install
+   EMU:  /usr/local/share/mule/19.34/site-lisp/
+   APEL: /usr/local/share/mule/site-lisp/apel/
+   FLIM: /usr/local/share/mule/site-lisp/flim/
+   SEMI: /usr/local/share/mule/site-lisp/semi/
 
- 2. Copy `sample.lpath.el' to `~/.lpath.el' and modify it suitably for
-    your environment.  Then type as following:
+   What is more, if you have been replaced old CUSTOM with new CUSTOM
+   or if you have installed new CUSTOM directly under the standard
+   load-path as such as /usr/local/share/mule/19.34/site-lisp/, you
+   may have nothing to be done; type the following commands right now.
 
-    % configure
-    % make EMACS=mule
+   % ./configure --with-emacs=mule
+   % make install
 
-    In this case, you shuold install manually.
+   However, if you have installed new CUSTOM in the subdirectory under
+   the standard load-path, use the configure option `--with-addpath='
+   as follows:
+
+   % ./configure --with-emacs=mule\
+     --with-addpath=/usr/local/share/mule/site-lisp/custom/
+   % make install
+
+   or you can use the file subdirs.el under the parent directory of
+   the subdirectory of CUSTOM to add it into load-path which contain
+   the following contents:
+
+   (normal-top-level-add-to-load-path
+    '("custom/" "and the other subdirectories.../"))
+
+   and then just type:
+
+   % ./configure --with-emacs=mule
+   % make install
+
+2. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages in
+   the non-standard load-path, use the configure option
+   `--with-addpath=' with the colon separated directory names where
+   EMU, APEL or CUSTOM packages are installed.  For example:
+
+   % ./configure --with-emacs=mule\
+     --with-addpath=~/elisp/emu/:~/elisp/apel/:~/elisp/custom/
+   % make install
+
+   In this case, you have no need to add paths of FLIM, SEMI or WEMI
+   if they are installed under the directory which is same as the
+   parent directory of APEL.
+
+3. This is another way to install T-gnus when you have installed EMU,
+   APEL, FLIM and SEMI or WEMI packages in the non-standard load-path.
+   Copy the file `sample.lpath.el' which is included in the
+   distribution to `~/.lpath.el' and modify it suitably for your
+   environment.  And then type the following command.
+
+   % ./configure --with-emacs=mule
+   % make install
+
+
+USING Emacs W3
+==============
+
+;; By the way, it is the point, does anyone know where do we find
+;; Emacs W3 package fitting with Mule 2.3 based on Emacs 19.34? :-p
+
+Some modules of T-gnus (e.g. nnshimbun) requires Emacs W3.  You can
+build T-gnus to be abel to use them, if you already have Emacs W3
+installed.  For that, you should specify the path where Emacs W3 is
+installed using the configure option `--with-w3=' or editing the file
+`~/.lpath.el'.  Here is an example for using the configure option:
+
+   % ./configure --with-emacs=mule\
+     --with-w3=/usr/local/share/mule/site-lisp/w3/
+   % make install
+
+Don't mind if configure says "W3... not found".  It is currently
+malfunction when the configure option `--with-w3=' is not used even if
+the path of Emacs W3 is specified in the file `~/.lpath.el'.

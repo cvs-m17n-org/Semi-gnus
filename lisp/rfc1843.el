@@ -1,10 +1,10 @@
 ;;; rfc1843.el --- HZ (rfc1843) decoding
-;; Copyright (c) 1998,1999 by Shenghuo Zhu <zsh@cs.rochester.edu>
+;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; Keywords: news HZ
+;; Keywords: news HZ HZ+ mail i18n
 
-;; This file is a part of GNU Emacs, but the same permissions apply.
+;; This file is a part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published
@@ -32,20 +32,21 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mm-util)
 
 (defvar rfc1843-word-regexp
-  "~\\({\\([\041-\167][\041-\176]\\| \\)+\\(~}\\|$\\)")
+  "~\\({\\([\041-\167][\041-\176]\\| \\)+\\)\\(~}\\|$\\)")
 
 (defvar rfc1843-word-regexp-strictly
-      "~\\({\\([\041-\167][\041-\176]\\)+\\(~}\\|$\\)")
+  "~\\({\\([\041-\167][\041-\176]\\)+\\)\\(~}\\|$\\)")
 
 (defvar rfc1843-hzp-word-regexp
   "~\\({\\([\041-\167][\041-\176]\\| \\)+\\|\
 [<>]\\([\041-\175][\041-\176]\\| \\)+\\)\\(~}\\|$\\)")
 
 (defvar rfc1843-hzp-word-regexp-strictly
-      "~\\({\\([\041-\167][\041-\176]\\)+\\|\
+  "~\\({\\([\041-\167][\041-\176]\\)+\\|\
 [<>]\\([\041-\175][\041-\176]\\)+\\)\\(~}\\|$\\)")
 
 (defcustom rfc1843-decode-loosely nil
@@ -86,7 +87,10 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 	    (while (re-search-forward (if rfc1843-decode-hzp
 					  rfc1843-hzp-word-regexp
 					rfc1843-word-regexp) (point-max) t)
-	      (setq str (match-string 1))
+	      ;;; Text with extents may cause XEmacs crash
+	      (setq str (buffer-substring-no-properties 
+			 (match-beginning 1)
+			 (match-end 1)))
 	      (setq firstc (aref str 0))
 	      (insert (mm-decode-coding-string
 		       (rfc1843-decode
@@ -100,8 +104,8 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 	      (cond ((eq (char-after) ?\n)
 		     (delete-char -1)
 		     (delete-char 1))
-		  ((eq (char-after) ?~)
-		   (delete-char 1)))))))))
+		    ((eq (char-after) ?~)
+		     (delete-char 1)))))))))
 
 (defun rfc1843-decode-string (string)
   "Decode HZ STRING and return the results."
@@ -115,7 +119,7 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
       (buffer-string))))
 
 (defun rfc1843-decode (word &optional firstc)
-  "Decode HZ WORD and return it"
+  "Decode HZ WORD and return it."
   (let ((i -1) (s (substring word 0)) v)
     (if (or (not firstc) (eq firstc ?{))
 	(while (< (incf i) (length s))
@@ -130,31 +134,30 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
     s))
 
 (defun rfc1843-decode-article-body ()
-   "Decode HZ encoded text in the article body."
-   (if (string-match (concat "\\<\\(" rfc1843-newsgroups-regexp "\\)\\>")
-		     (or gnus-newsgroup-name ""))
-       (save-excursion
-	 (save-restriction
-	   (message-narrow-to-head)
-	   (let* ((inhibit-point-motion-hooks t)
-		  (case-fold-search t)
-		  (ct (message-fetch-field "Content-Type" t))
-		  (ctl (and ct (ignore-errors
-				 (mail-header-parse-content-type ct)))))
-	     (if (and ctl (not (string-match "/" (car ctl)))) 
-		 (setq ctl nil))
-	     (goto-char (point-max))
-	     (widen)
-	     (forward-line 1)
-	     (narrow-to-region (point) (point-max))
-	     (when (or (not ctl)
-		       (equal (car ctl) "text/plain"))
-	       (rfc1843-decode-region (point) (point-max))))))))
+  "Decode HZ encoded text in the article body."
+  (if (string-match (concat "\\<\\(" rfc1843-newsgroups-regexp "\\)\\>")
+		    (or gnus-newsgroup-name ""))
+      (save-excursion
+	(save-restriction
+	  (message-narrow-to-head)
+	  (let* ((inhibit-point-motion-hooks t)
+		 (case-fold-search t)
+		 (ct (message-fetch-field "Content-Type" t))
+		 (ctl (and ct (ignore-errors
+				(mail-header-parse-content-type ct)))))
+	    (if (and ctl (not (string-match "/" (car ctl)))) 
+		(setq ctl nil))
+	    (goto-char (point-max))
+	    (widen)
+	    (forward-line 1)
+	    (narrow-to-region (point) (point-max))
+	    (when (or (not ctl)
+		      (equal (car ctl) "text/plain"))
+	      (rfc1843-decode-region (point) (point-max))))))))
 
 (defvar rfc1843-old-gnus-decode-header-function  nil)
 (defvar gnus-decode-header-methods)
 (defvar gnus-decode-encoded-word-methods)
-(defvar gnus-decode-encoded-word-function)
 
 (defun rfc1843-gnus-setup ()
   "Setup HZ decoding for Gnus."

@@ -1,5 +1,7 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;      Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -407,26 +409,28 @@ call it with the value of the `gnus-data' text property."
   (cond
    ((fboundp 'char-or-char-int-p)
     ;; Handle both types of marks for XEmacs-20.x.
-    (fset 'gnus-characterp 'char-or-char-int-p))
+    (defalias 'gnus-characterp 'char-or-char-int-p))
    ;; V19 of XEmacs, probably.
    (t
-    (fset 'gnus-characterp 'characterp)))
+    (defalias 'gnus-characterp 'characterp)))
 
-  (fset 'gnus-make-overlay 'make-extent)
-  (fset 'gnus-delete-overlay 'delete-extent)
-  (fset 'gnus-overlay-put 'set-extent-property)
-  (fset 'gnus-move-overlay 'gnus-xmas-move-overlay)
-  (fset 'gnus-overlay-end 'extent-end-position)
-  (fset 'gnus-kill-all-overlays 'gnus-xmas-kill-all-overlays)
-  (fset 'gnus-extent-detached-p 'extent-detached-p)
-  (fset 'gnus-add-text-properties 'gnus-xmas-add-text-properties)
-  (fset 'gnus-put-text-property 'gnus-xmas-put-text-property)
-  (fset 'gnus-deactivate-mark 'ignore)
-  (fset 'gnus-window-edges 'window-pixel-edges)
+  (defalias 'gnus-make-overlay 'make-extent)
+  (defalias 'gnus-delete-overlay 'delete-extent)
+  (defalias 'gnus-overlay-put 'set-extent-property)
+  (defalias 'gnus-move-overlay 'gnus-xmas-move-overlay)
+  (defalias 'gnus-overlay-buffer 'extent-object)
+  (defalias 'gnus-overlay-start 'extent-start-position)
+  (defalias 'gnus-overlay-end 'extent-end-position)
+  (defalias 'gnus-kill-all-overlays 'gnus-xmas-kill-all-overlays)
+  (defalias 'gnus-extent-detached-p 'extent-detached-p)
+  (defalias 'gnus-add-text-properties 'gnus-xmas-add-text-properties)
+  (defalias 'gnus-put-text-property 'gnus-xmas-put-text-property)
+  (defalias 'gnus-deactivate-mark 'ignore)
+  (defalias 'gnus-window-edges 'window-pixel-edges)
 
   (if (and (<= emacs-major-version 19)
  	   (< emacs-minor-version 14))
-      (fset 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
+      (defalias 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
 
   (when (fboundp 'turn-off-scroll-in-place)
     (add-hook 'gnus-article-mode-hook 'turn-off-scroll-in-place))
@@ -443,34 +447,34 @@ call it with the value of the `gnus-data' text property."
 	  (list 'funcall fval)
 	(cons 'progn (cdr (cdr fval))))))
 
-  (fset 'gnus-x-color-values
-	(if (fboundp 'x-color-values)
-	    'x-color-values
-	  (lambda (color)
-	    (color-instance-rgb-components
-	     (make-color-instance color))))))
+  (defalias 'gnus-x-color-values
+    (if (fboundp 'x-color-values)
+	'x-color-values
+      (lambda (color)
+	(color-instance-rgb-components
+	 (make-color-instance color))))))
 
 (defun gnus-xmas-redefine ()
   "Redefine lots of Gnus functions for XEmacs."
-  (fset 'gnus-summary-set-display-table 'gnus-xmas-summary-set-display-table)
-  (fset 'gnus-visual-turn-off-edit-menu 'identity)
-  (fset 'gnus-summary-recenter 'gnus-xmas-summary-recenter)
-  (fset 'gnus-extent-start-open 'gnus-xmas-extent-start-open)
-  (fset 'gnus-article-push-button 'gnus-xmas-article-push-button)
-  (fset 'gnus-window-top-edge 'gnus-xmas-window-top-edge)
-  (fset 'gnus-read-event-char 'gnus-xmas-read-event-char)
-  (fset 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
-  (fset 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
-  (fset 'gnus-appt-select-lowest-window
+  (defalias 'gnus-summary-set-display-table 'gnus-xmas-summary-set-display-table)
+  (defalias 'gnus-visual-turn-off-edit-menu 'identity)
+  (defalias 'gnus-summary-recenter 'gnus-xmas-summary-recenter)
+  (defalias 'gnus-extent-start-open 'gnus-xmas-extent-start-open)
+  (defalias 'gnus-article-push-button 'gnus-xmas-article-push-button)
+  (defalias 'gnus-window-top-edge 'gnus-xmas-window-top-edge)
+  (defalias 'gnus-read-event-char 'gnus-xmas-read-event-char)
+  (defalias 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
+  (defalias 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
+  (defalias 'gnus-appt-select-lowest-window
 	'gnus-xmas-appt-select-lowest-window)
-  (fset 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
-  (fset 'gnus-character-to-event 'character-to-event)
-  (fset 'gnus-mode-line-buffer-identification
+  (defalias 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
+  (defalias 'gnus-character-to-event 'character-to-event)
+  (defalias 'gnus-mode-line-buffer-identification
 	'gnus-xmas-mode-line-buffer-identification)
-  (fset 'gnus-key-press-event-p 'key-press-event-p)
-  (fset 'gnus-region-active-p 'region-active-p)
-  (fset 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
-  (fset 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
+  (defalias 'gnus-key-press-event-p 'key-press-event-p)
+  (defalias 'gnus-region-active-p 'region-active-p)
+  (defalias 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
+  (defalias 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
 
   (add-hook 'gnus-group-mode-hook 'gnus-xmas-group-menu-add)
   (add-hook 'gnus-summary-mode-hook 'gnus-xmas-summary-menu-add)
@@ -572,34 +576,6 @@ the resulting string may be narrower than END-COLUMN.
 	       (concat (make-string
 			(max 0 (- ,pad (string-width val))) ?\ )
 		       val))))))
-
-    (defun gnus-tilde-max-form (el max-width)
-      "Return a form that limits EL to MAX-WIDTH."
-      (let ((max (abs max-width)))
-	(if (symbolp el)
-	    (if (< max-width 0)
-		`(let ((width (string-width ,el)))
-		   (gnus-truncate-string ,el width (- width ,max)))
-	      `(gnus-truncate-string ,el ,max))
-	  (if (< max-width 0)
-	      `(let* ((val (eval ,el))
-		      (width (string-width val)))
-		 (gnus-truncate-string val width (- width ,max)))
-	    `(let ((val (eval ,el)))
-	       (gnus-truncate-string val ,max))))))
-
-    (defun gnus-tilde-cut-form (el cut-width)
-      "Return a form that cuts CUT-WIDTH off of EL."
-      (let ((cut (abs cut-width)))
-	(if (symbolp el)
-	    (if (< cut-width 0)
-		`(gnus-truncate-string ,el (- (string-width ,el) ,cut))
-	      `(gnus-truncate-string ,el (string-width ,el) ,cut))
-	  (if (< cut-width 0)
-	      `(let ((val (eval ,el)))
-		 (gnus-truncate-string val (- (string-width val) ,cut)))
-	    `(let ((val (eval ,el)))
-	       (gnus-truncate-string val (string-width val) ,cut))))))
     ))
 
 ;;; XEmacs logo and toolbar.
@@ -645,10 +621,11 @@ the resulting string may be narrower than END-COLUMN.
 		(concat " (r" gnus-revision-number ")"))
 	      " based on " gnus-original-product-name " v"
 	      gnus-original-version-number "\n")
-      (goto-char (point-min))
-      (put-text-property (point) (gnus-point-at-eol) 'face 'gnus-splash-face)
-      (insert-char ?\ ; space
-		   (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+      (end-of-line 0)
+      (put-text-property (point-min) (point) 'face 'gnus-splash-face)
+      (insert-char ?\  (prog1
+			   (max 0 (/ (- (window-width) (point)) 2))
+			 (goto-char (point-min))))
       (forward-line 1)
       (insert-char ?\n rest)
       (set-window-start (selected-window) (point-min))))
@@ -681,9 +658,9 @@ the resulting string may be narrower than END-COLUMN.
 	      (concat " (r" gnus-revision-number ")"))
 	    " based on " gnus-original-product-name " v"
 	    gnus-original-version-number)
-    (goto-char (point-min))
-    (insert-char ?\ ; space
-		 (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+    (insert-char ?\  (prog1
+			 (max 0 (/ (- (window-width) (point)) 2))
+		       (goto-char (point-min))))
     (forward-line 1)
     ;; And then hack it.
     (gnus-indent-rigidly (point) (point-max)
@@ -762,8 +739,7 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      gnus-summary-catchup t "Catchup"]
     [gnus-summary-catchup-and-exit
      gnus-summary-catchup-and-exit t "Catchup and exit"]
-    [gnus-summary-exit gnus-summary-exit t "Exit this summary"]
-    )
+    [gnus-summary-exit gnus-summary-exit t "Exit this summary"])
   "The summary buffer toolbar.")
 
 (defvar gnus-summary-mail-toolbar
@@ -773,14 +749,10 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     [gnus-summary-next-unread
      gnus-summary-next-unread-article t "Next unread article"]
     [gnus-summary-mail-reply gnus-summary-reply t "Reply"]
-;    [gnus-summary-mail-get gnus-mail-get t "Message get"]
     [gnus-summary-mail-originate gnus-summary-post-news t "Originate"]
     [gnus-summary-mail-save gnus-summary-save-article t "Save"]
     [gnus-summary-mail-copy gnus-summary-copy-article t "Copy message"]
-;    [gnus-summary-mail-delete gnus-summary-delete-article t "Delete message"]
     [gnus-summary-mail-forward gnus-summary-mail-forward t "Forward message"]
-;    [gnus-summary-mail-spell gnus-mail-spell t "Spell"]
-;    [gnus-summary-mail-help gnus-mail-help  t "Message help"]
     [gnus-summary-caesar-message
      gnus-summary-caesar-message t "Rot 13"]
     [gnus-uu-decode-uu
@@ -793,8 +765,7 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      gnus-summary-catchup t "Catchup"]
     [gnus-summary-catchup-and-exit
      gnus-summary-catchup-and-exit t "Catchup and exit"]
-    [gnus-summary-exit gnus-summary-exit t "Exit this summary"]
-    )
+    [gnus-summary-exit gnus-summary-exit t "Exit this summary"])
   "The summary buffer mail toolbar.")
 
 (defun gnus-xmas-setup-group-toolbar ()
@@ -840,7 +811,7 @@ XEmacs compatibility workaround."
 	     (let ((cur (current-buffer)))
 	       (save-excursion
 		 (gnus-set-work-buffer)
-		 (insert (format "%s" (buffer-substring beg end cur)))
+		 (insert-buffer-substring cur beg end)
 		 (gnus-xmas-call-region "uncompface")
 		 (goto-char (point-min))
 		 (insert "/* Width=48, Height=48 */\n")
@@ -926,6 +897,80 @@ XEmacs compatibility workaround."
     (set-buffer (event-buffer event))
     (goto-char (event-point event))
     (funcall (event-function response) (event-object response))))
+
+(defun gnus-group-add-icon ()
+  "Add an icon to the current line according to `gnus-group-icon-list'."
+  (let* ((p (point))
+	 (end (progn (end-of-line) (point)))
+	 ;; now find out where the line starts and leave point there.
+	 (beg (progn (beginning-of-line) (point))))
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char beg)
+      (when (search-forward "==&&==" nil t)
+	(let* ((group (gnus-group-group-name))
+	       (entry (gnus-group-entry group))
+	       (unread (if (numberp (car entry)) (car entry) 0))
+	       (active (gnus-active group))
+	       (total (if active (1+ (- (cdr active) (car active))) 0))
+	       (info (nth 2 entry))
+	       (method (gnus-server-get-method group (gnus-info-method info)))
+	       (marked (gnus-info-marks info))
+	       (mailp (memq 'mail (assoc (symbol-name
+					  (car (or method gnus-select-method)))
+					 gnus-valid-select-methods)))
+	       (level (or (gnus-info-level info) gnus-level-killed))
+	       (score (or (gnus-info-score info) 0))
+	       (ticked (gnus-range-length (cdr (assq 'tick marked))))
+	       (group-age (gnus-group-timestamp-delta group))
+	       (inhibit-read-only t)
+	       (list gnus-group-icon-list)
+	       (mystart (match-beginning 0))
+	       (myend (match-end 0)))
+	  (goto-char (point-min))
+	  (while (and list
+		      (not (eval (caar list))))
+	    (setq list (cdr list)))
+	  (if list
+	      (let* ((file (cdar list))
+		     (glyph (gnus-group-icon-create-glyph
+			     (buffer-substring mystart myend)
+			     file)))
+		(if glyph
+		    (progn
+		      (mapcar 'delete-annotation (annotations-at myend))
+		      (let ((ext (make-extent mystart myend))
+			    (ant (make-annotation glyph myend 'text)))
+			;; set text extent params
+			(set-extent-property ext 'end-open t)
+			(set-extent-property ext 'start-open t)
+			(set-extent-property ext 'invisible t)))
+		  (delete-region mystart myend)))
+	    (delete-region mystart myend))))
+      (widen))
+    (goto-char p)))
+
+(defun gnus-group-icon-create-glyph (substring pixmap)
+  "Create a glyph for insertion into a group line."
+  (or
+   (cdr-safe (assoc pixmap gnus-group-icon-cache))
+   (let* ((glyph (make-glyph
+		  (list
+		   (cons 'x
+			 (expand-file-name pixmap gnus-xmas-glyph-directory))
+		   (cons 'mswindows
+			 (expand-file-name pixmap gnus-xmas-glyph-directory))
+		   (cons 'tty substring)))))
+     (setq gnus-group-icon-cache
+	   (cons (cons pixmap glyph) gnus-group-icon-cache))
+     (set-glyph-face glyph 'default)
+     glyph)))
+
+(defun gnus-xmas-mailing-list-menu-add ()
+  (gnus-xmas-menu-add mailing-list
+		      gnus-mailing-list-menu))
+
+(add-hook 'gnus-mailing-list-mode-hook 'gnus-xmas-mailing-list-menu-add)
 
 (provide 'gnus-xmas)
 

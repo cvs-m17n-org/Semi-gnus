@@ -28,6 +28,7 @@ of this file should be applied. If not, it might not.
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'Gnus or 'gnus should be deleted.
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
  If you would like to decode the quoted encoded words forcibly, even
 though FLIM does not decode them, put the following lines in your
@@ -42,15 +43,35 @@ though FLIM does not decode them, put the following lines in your
  This is a patch for bbdb.el / bbdb-hooks.el.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
-+++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
-@@ -352,12 +352,22 @@
- 	(marker (bbdb-header-start))
- 	field pairs fieldval  ; do all bindings here for speed
- 	regexp string notes-field-name notes
--	 replace-p replace-or-add-msg)
-+	replace-p replace-or-add-msg
-+	extract-field-value-funtion)
+--- bbdb-2.32/lisp/bbdb-com.el~	Sun Feb 18 08:00:39 2001
++++ bbdb-2.32/lisp/bbdb-com.el	Sun Feb 18 08:00:39 2001
+@@ -1620,7 +1620,7 @@
+           ;; to be enclosed in quotes.  Double-quotes and backslashes have
+           ;; already been escaped.  This quotes a few extra characters as
+           ;; well (!,%, and $) just for common sense.
+-          ((string-match "[][\000-\037\177()<>@,;:.!$%]" name)
++	  ((string-match "[][\000-\037\177<>@,;.!$%]" name)
+            (format "\"%s\" <%s>" name net))
+           (t
+            (format "%s <%s>" name net)))))
+--- bbdb-2.32/lisp/bbdb-hooks.el~	Tue Jan 30 08:00:56 2001
++++ bbdb-2.32/lisp/bbdb-hooks.el	Tue Jan 30 08:00:56 2001
+@@ -83,6 +83,8 @@
+ ;;
+ ;;
+ 
++(eval-when-compile (require 'cl))
++
+ (require 'bbdb)
+ 
+ (defmacro the-v18-byte-compiler-sucks-wet-farts-from-dead-pigeons ()
+@@ -415,12 +417,23 @@
+          (marker (bbdb-header-start))
+          field pairs fieldval  ; do all bindings here for speed
+          regexp string notes-field-name notes
+-         replace-p replace-or-add-msg)
++         replace-p replace-or-add-msg
++	 extract-field-value-funtion)
      (set-buffer (marker-buffer marker))
      (save-restriction
 -      (widen)
@@ -60,38 +81,40 @@ though FLIM does not decode them, put the following lines in your
 +	    function)
 +	(or (progn
 +	      (while (and (not extract-field-value-funtion)
-+			  (setq function (pop function-list)))
-+		(setq extract-field-value-funtion (funcall function)))
++			  (setq function (car function-list)))
++		(setq extract-field-value-funtion (funcall function)
++		      function-list (cdr function-list)))
 +	      extract-field-value-funtion)
 +	    (progn
 +	      (widen)
 +	      (goto-char marker)
 +	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
 +      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
- 	       (string-match (bbdb-user-mail-names) fieldval))
- 	  ;; Don't do anything if this message is from us.  Note that we have
- 	  ;; to look at the message instead of the record, because the record
-@@ -368,7 +378,7 @@
- 	  (goto-char marker)
- 	  (setq field (car (car ignore-all))
- 		regexp (cdr (car ignore-all))
--		fieldval (bbdb-extract-field-value field))
-+		fieldval (funcall extract-field-value-funtion field))
- 	  (if (and fieldval
- 		   (string-match regexp fieldval))
- 	      (setq ignore t)
-@@ -382,7 +392,7 @@
- 		pairs (cdr (car rest))	; (REGEXP . STRING) or
- 					; (REGEXP FIELD-NAME STRING) or
- 					; (REGEXP FIELD-NAME STRING REPLACE-P)
--		fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
-+		fieldval (funcall extract-field-value-funtion field)) ; e.g., Subject line
- 	  (if fieldval
- 	      (while pairs
- 		(setq regexp (car (car pairs))
---- bbdb.el~	Tue Oct 13 03:14:55 1998
-+++ bbdb.el	Fri Oct 30 17:05:53 1998
-@@ -620,6 +620,7 @@
+                (string-match (bbdb-user-mail-names) fieldval))
+           ;; Don't do anything if this message is from us.  Note that we have
+           ;; to look at the message instead of the record, because the record
+@@ -431,7 +444,7 @@
+           (goto-char marker)
+           (setq field (car (car ignore-all))
+                 regexp (cdr (car ignore-all))
+-                fieldval (bbdb-extract-field-value field))
++                fieldval (funcall extract-field-value-funtion field))
+           (if (and fieldval
+                    (string-match regexp fieldval))
+               (setq ignore t)
+@@ -444,7 +457,8 @@
+                 pairs (cdr (car rest))  ; (REGEXP . STRING) or
+                                         ; (REGEXP FIELD-NAME STRING) or
+                                         ; (REGEXP FIELD-NAME STRING REPLACE-P)
+-                fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
++                fieldval (funcall extract-field-value-funtion field))
++                                        ; e.g., Subject line
+           (when fieldval
+             (while pairs
+               (setq regexp (car (car pairs))
+--- bbdb-2.32/lisp/bbdb.el~	Sun Mar  4 20:30:09 2001
++++ bbdb-2.32/lisp/bbdb.el	Sun Mar  4 20:30:09 2001
+@@ -710,6 +710,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
  (defvar bbdb-elided-display nil)

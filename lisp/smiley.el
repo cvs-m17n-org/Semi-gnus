@@ -1,5 +1,6 @@
 ;;; smiley.el --- displaying smiley faces
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
 ;; Keywords: fun
@@ -36,15 +37,22 @@
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
 (eval-when-compile (require 'cl))
-(require 'annotations)
-(require 'messagexmas)
 (require 'custom)
 
+(eval-and-compile
+  (when (featurep 'xemacs)
+    (require 'annotations)
+    (require 'messagexmas)))
+
 (defgroup smiley nil
-  "Turn :-)'s into real images (XEmacs)."
+  "Turn :-)'s into real images."
   :group 'gnus-visual)
 
-(defcustom smiley-data-directory (message-xmas-find-glyph-directory "smilies")
+;; FIXME: Where is the directory when using Emacs?
+(defcustom smiley-data-directory
+  (if (featurep 'xemacs)
+      (message-xmas-find-glyph-directory "smilies")
+    "/usr/local/lib/xemacs/xemacs-packages/etc/smilies")
   "*Location of the smiley faces files."
   :type 'directory
   :group 'smiley)
@@ -73,7 +81,7 @@
     ("\\(:-*|\\)\\W" 1 "FaceStraight.xpm")
     ("\\(:-*p\\)\\W" 1 "FaceTalking.xpm")
     ("\\(:-*d\\)\\W" 1 "FaceTasty.xpm")
-    ("\\(;-*[>)}ｻ]+\\)\\W" 1 "FaceWinking.xpm")
+    ("[^^;_]\\(;-*[>)}ｻ]+\\)\\W" 1 "FaceWinking.xpm")
     ("\\(:-*[Vvｵ]\\)\\W" 1 "FaceWry.xpm")
     ("\\([:|]-*P\\)\\W" 1 "FaceYukky.xpm"))
   "*Normal and deformed faces for smilies."
@@ -151,10 +159,9 @@ above them."
   :group 'smiley)
 
 (defvar smiley-glyph-cache nil)
-(defvar smiley-running-xemacs (string-match "XEmacs" emacs-version))
 
 (defvar smiley-map (make-sparse-keymap "smiley-keys")
- "Keymap to toggle smiley states.")
+  "Keymap to toggle smiley states.")
 
 (define-key smiley-map [(button2)] 'smiley-toggle-extent)
 (define-key smiley-map [(button3)] 'smiley-popup-menu)
@@ -167,25 +174,30 @@ above them."
      ["Toggle All Smilies" (smiley-toggle-extents ,e) t])))
 
 (defun smiley-create-glyph (smiley pixmap)
-  (and
-   smiley-running-xemacs
-   (or
-    (cdr-safe (assoc pixmap smiley-glyph-cache))
-    (let* ((xpm-color-symbols
-	    (and (featurep 'xpm)
-		 (append `(("flesh" ,smiley-flesh-color)
-			   ("features" ,smiley-features-color)
-			   ("tongue" ,smiley-tongue-color))
-			 xpm-color-symbols)))
-	   (glyph (make-glyph
-		   (list
-		    (cons 'x (expand-file-name pixmap smiley-data-directory))
-		    (cons 'mswindows
-			  (expand-file-name pixmap smiley-data-directory))
-		    (cons 'tty smiley)))))
-      (setq smiley-glyph-cache (cons (cons pixmap glyph) smiley-glyph-cache))
-      (set-glyph-face glyph 'default)
-      glyph))))
+  (or
+   (cdr-safe (assoc pixmap smiley-glyph-cache))
+   (let* ((xpm-color-symbols
+	   (and (featurep 'xpm)
+		(append `(("flesh" ,smiley-flesh-color)
+			  ("features" ,smiley-features-color)
+			  ("tongue" ,smiley-tongue-color))
+			xpm-color-symbols)))
+	  (glyph (make-glyph
+		  (list
+		   (cons (if (featurep 'gtk) 'gtk 'x)
+			 (expand-file-name pixmap smiley-data-directory))
+		   (cons 'mswindows
+			 (expand-file-name pixmap smiley-data-directory))
+		   (cons 'tty smiley)))))
+     (setq smiley-glyph-cache (cons (cons pixmap glyph) smiley-glyph-cache))
+     (set-glyph-face glyph 'default)
+     glyph)))
+
+(defun smiley-create-glyph-ems (smiley pixmap)
+  (condition-case e
+      (create-image (expand-file-name pixmap smiley-data-directory))
+    (error nil)))
+
 
 ;;;###autoload
 (defun smiley-region (beg end)
@@ -210,6 +222,14 @@ above them."
 	    (reveal-annotation ant)
 	    (set-extent-property ext 'invisible t)))))))
 
+;; FIXME::
+(defun smiley-toggle-extent-ems (event)
+  "Toggle smiley at given point.
+Note -- this function hasn't been implemented yet."
+  (interactive "e")
+  (error "This function hasn't been implemented yet.")
+)
+
 (defun smiley-toggle-extents (e)
   (interactive "e")
   (map-extents
@@ -226,10 +246,16 @@ above them."
        nil))
    (event-buffer e)))
 
+;; FIXME::
+(defun smiley-toggle-extents-ems (e)
+  (interactive "e")
+  (error "This function hasn't been implemented yet.")
+)
+
 ;;;###autoload
 (defun smiley-buffer (&optional buffer st nd)
   (interactive)
-  (when (featurep '(or x mswindows))
+  (when (featurep '(or x gtk mswindows))
     (save-excursion
       (when buffer
 	(set-buffer buffer))
@@ -256,13 +282,8 @@ above them."
 	  (while (re-search-forward regexp nd t)
 	    (let* ((start (match-beginning group))
 		   (end (match-end group))
-		   (glyph
-		    (and (or (eq start 1)
-			     (not (string-match "\\(\\^\\|;\\|_\\);)"
-						(buffer-substring
-						 (1- start) (+ start 2)))))
-			 (smiley-create-glyph (buffer-substring start end)
-					      file))))
+		   (glyph (smiley-create-glyph (buffer-substring start end)
+					       file)))
 	      (when glyph
 		(mapcar 'delete-annotation (annotations-at end))
 		(let ((ext (make-extent start end))
@@ -295,6 +316,44 @@ Mouse button3 - menu")
 Mouse button3 - menu"))
 		(when (smiley-end-paren-p start end)
 		  (make-annotation ")" end 'text))
+		(goto-char end)))))))))
+
+;; FIXME: No popup menu, no customized color
+(defun smiley-buffer-ems (&optional buffer st nd)
+  (interactive)
+  (when window-system
+    (save-excursion
+      (when buffer
+	(set-buffer buffer))
+      (let ((buffer-read-only nil)
+	    (alist (if (symbolp smiley-regexp-alist)
+		       (symbol-value smiley-regexp-alist)
+		     smiley-regexp-alist))
+	    (case-fold-search nil)
+	    entry regexp beg group file)
+	(dolist (overlay (overlays-in (or st (point-min))
+				      (or nd (point-max))))
+	  (when (overlay-get overlay 'smiley)
+	    (remove-text-properties (overlay-start overlay)  
+				    (overlay-end overlay) '(display))
+	    (delete-overlay overlay)))
+	(goto-char (or st (point-min)))
+	(setq beg (point))
+	;; loop through alist
+	(while (setq entry (pop alist))
+	  (setq regexp (car entry)
+		group (cadr entry)
+		file (caddr entry))
+	  (goto-char beg)
+	  (while (re-search-forward regexp nd t)
+	    (let* ((start (match-beginning group))
+		   (end (match-end group))
+		   (glyph (smiley-create-glyph nil file))
+		   (overlay (make-overlay start end)))
+	      (when glyph
+		(add-text-properties start end
+				     `(display ,glyph))
+		(overlay-put overlay 'smiley glyph)
 		(goto-char end)))))))))
 
 (defun smiley-end-paren-p (start end)
@@ -336,6 +395,32 @@ With arg, turn displaying on if and only if arg is positive."
 	(set-extent-property (cdar on) 'invisible nil)
 	(setq on (cdr on))))))
 
+;; Simply removing all smiley if existing.
+;; FIXME: make it work as the one in XEmacs.
+(defun smiley-toggle-buffer-ems (&optional arg buffer st nd)
+  "Toggle displaying smiley faces.
+With arg, turn displaying on if and only if arg is positive." 
+  (interactive "P")
+  (save-excursion
+    (when buffer
+      (set-buffer buffer))
+    (let (found)
+      (dolist (overlay (overlays-in (or st (point-min))
+				    (or nd (point-max))))
+	(when (overlay-get overlay 'smiley)
+	  (remove-text-properties (overlay-start overlay)  
+				  (overlay-end overlay) '(display))
+	  (setq found t)))
+      (unless found
+	(smiley-buffer buffer st nd)))))
+
+(unless (featurep 'xemacs)
+  (defalias 'smiley-create-glyph 'smiley-create-glyph-ems)
+  (defalias 'smiley-toggle-extent 'smiley-toggle-extent-ems)
+  (defalias 'smiley-toggle-extents 'smiley-toggle-extents-ems)
+  (defalias 'smiley-buffer 'smiley-buffer-ems)
+  (defalias 'smiley-toggle-buffer 'smiley-toggle-buffer-ems))
+
 (defvar gnus-article-buffer)
 ;;;###autoload
 (defun gnus-smiley-display (&optional arg)
@@ -347,8 +432,13 @@ With arg, turn displaying on if and only if arg is positive."
     (save-restriction
       (widen)
       (article-goto-body)
-      (smiley-toggle-buffer arg (current-buffer) (point) (point-max)))))
+      (let (buffer-read-only)
+	(smiley-toggle-buffer arg (current-buffer) (point) (point-max))))))
 
 (provide 'smiley)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; smiley.el ends here

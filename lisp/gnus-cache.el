@@ -1,5 +1,6 @@
 ;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -28,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
 
 (require 'gnus)
 (require 'gnus-int)
@@ -62,7 +64,7 @@ If a group matches both gnus-cacheable-groups and gnus-uncacheable-groups
 it's not cached."
   :group 'gnus-cache
   :type '(choice (const :tag "off" nil)
-                regexp))
+		 regexp))
 
 (defcustom gnus-uncacheable-groups nil
   "*Groups that match this regexp will not be cached.
@@ -178,6 +180,7 @@ it's not cached."
 	    t				; The article already is saved.
 	  (save-excursion
 	    (set-buffer nntp-server-buffer)
+	    (require 'gnus-art)
 	    (let ((gnus-use-cache nil)
 		  (gnus-article-decode-hook nil))
 	      (gnus-request-article-this-buffer number group))
@@ -428,7 +431,7 @@ Returns the list of articles removed."
 (defun gnus-summary-insert-cached-articles ()
   "Insert all the articles cached for this group into the current buffer."
   (interactive)
-  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '<))
+  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '>))
 	(gnus-verbose (max 6 gnus-verbose)))
     (unless cached
       (gnus-message 3 "No cached articles for this group"))
@@ -647,6 +650,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (let ((gnus-mark-article-hook nil)
 	(gnus-expert-user t)
 	(nnmail-spool-file nil)
+	(mail-sources nil)
 	(gnus-use-dribble-file nil)
 	(gnus-novice-user nil)
 	(gnus-large-newsgroup nil))
@@ -687,9 +691,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (gnus-write-active-file-as-coding-system
-     gnus-cache-write-file-coding-system
-     gnus-cache-active-file gnus-cache-active-hashtb t)
+    (gnus-write-active-file gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 
@@ -759,7 +761,8 @@ If LOW, update the lower bound instead."
   (interactive (list gnus-cache-directory))
   (gnus-cache-close)
   (let ((nnml-generate-active-function 'identity))
-    (nnml-generate-nov-databases-1 dir)))
+    (nnml-generate-nov-databases-1 dir))
+  (gnus-cache-open))
 
 (defun gnus-cache-move-cache (dir)
   "Move the cache tree to somewhere else."

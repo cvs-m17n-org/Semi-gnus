@@ -360,10 +360,10 @@ Returns a vector of 16 bytes containing the message digest."
      c (md5-II c d a b (aref in  2) 15 '(10967 . 53947))
      b (md5-II b c d a (aref in  9) 21 '(60294 . 54161)))
 
-     (aset md5-buffer 0 (md5-add (aref md5-buffer 0) a))
-     (aset md5-buffer 1 (md5-add (aref md5-buffer 1) b))
-     (aset md5-buffer 2 (md5-add (aref md5-buffer 2) c))
-     (aset md5-buffer 3 (md5-add (aref md5-buffer 3) d))))
+    (aset md5-buffer 0 (md5-add (aref md5-buffer 0) a))
+    (aset md5-buffer 1 (md5-add (aref md5-buffer 1) b))
+    (aset md5-buffer 2 (md5-add (aref md5-buffer 2) c))
+    (aset md5-buffer 3 (md5-add (aref md5-buffer 3) d))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Here begins the merger with the XEmacs API and the md5.el from the URL
@@ -378,7 +378,7 @@ hash of a portion of OBJECT.
 The optional CODING and NOERROR arguments are ignored.  They are only
 placeholders to ensure the compatibility with XEmacsen with file-coding or
 Mule support."
- (let ((buffer nil))
+  (let ((buffer nil))
     (unwind-protect
 	(save-excursion
 	  (setq buffer (generate-new-buffer " *md5-work*"))
