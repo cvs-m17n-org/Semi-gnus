@@ -2180,6 +2180,7 @@ The text will also be indented the normal way."
 	(bufname (read-buffer (format "Kill buffer: (default %s) "
 				      (buffer-name)))))
     (if (or (not bufname)
+	    (string-equal bufname "")
 	    (string-equal bufname (buffer-name)))
 	(message-kill-buffer)
       (message "%s must be invoked only for the current buffer." command))))
