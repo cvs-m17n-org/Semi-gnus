@@ -1,3 +1,34 @@
+1999-01-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: Rewrite to work with pGnus v0.74 based T-gnus.
+	* lisp/gnus-ofsetup.el: Ditto.
+
+	* lisp/pop3-fma.el: Removed because after pGnus0.73 , pGnus can treat
+	multiple pop3 account.
+
+1999-01-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/read-password.el: New file.
+
+1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (running-pterodactyl-gnus-0_73-or-later): Provide as
+	a new feature.
+
+	* lisp/mail-source.el (mail-source-read-passwd): Don't load
+	"passwd" if the function `read-passwd' already exists.
+
+	* lisp/gnus-start.el (gnus-read-active-file): Eliminate duplicated
+	select methods.
+
+	* lisp/gnus-group.el (gnus-group-catchup-current): Fix typo.
+
+1999-01-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.056.
+
+	* Sync up with Pterodactyl Gnus v0.74.
+
 1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-mail-digest): Reselect the message

@@ -1,3 +1,17 @@
+1999-01-25 04:24:01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (MIME): New.
+
+	* gnus.texi (Mail Sources): New.
+	(Mail Source Specifiers): New.
+	(Mail Source Customization): New.
+	(Fetching Mail): New.
+
+1999-01-23 09:47:16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Washing): Removed.
+	(Customizing Articles): Addition.
+
 1999-01-16 20:36:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Customizing Articles): Rewrite.
@@ -25,7 +39,7 @@
 
 1998-12-03  Didier Verna  <verna@inf.enst.fr>
 
-	* gnus.texi (Group Parameters): update for the posting-style group 
+	* gnus.texi (Group Parameters): update for the posting-style group
 	parameter.
 
 1998-12-02 01:04:22  Lars Magne Ingebrigtsen  <larsi@gnus.org>
@@ -149,4 +163,3 @@
 1998-08-27 07:29:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Mail Folders): Addition.
-
