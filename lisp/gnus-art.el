@@ -1,4 +1,4 @@
-;;; gnus-art.el --- article mode commands for Open gnus
+;;; gnus-art.el --- article mode commands for Semi-gnus
 ;; Copyright (C) 1996,97 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -158,7 +158,10 @@ longer (in lines) than that number.  If it is a function, the function
 will be called without any parameters, and if it returns nil, there is
 no signature in the buffer.  If it is a string, it will be used as a
 regexp.  If it matches, the text in question is not a signature."
-  :type '(choice integer number function regexp)
+  :type '(choice (integer :value 200)
+		 (number :value 4.0)
+		 (function :value fun)
+		 (regexp :value ".*"))
   :group 'gnus-article-signature)
 
 (defcustom gnus-hidden-properties '(invisible t intangible t)
@@ -273,7 +276,7 @@ each invocation of the saving commands."
   :group 'gnus-article-saving
   :type '(choice (item always)
 		 (item :tag "never" nil)
-		 (sexp :tag "once" :format "%t")))
+		 (sexp :tag "once" :format "%t\n" :value t)))
 
 (defcustom gnus-saved-headers gnus-visible-headers
   "Headers to keep if `gnus-save-all-headers' is nil.
@@ -352,9 +355,9 @@ If this form or function returns a string, this string will be used as
 a possible file name; and if it returns a non-nil list, that list will
 be used as possible file names."
   :group 'gnus-article-saving
-  :type '(repeat (choice (list function)
-			 (cons regexp (repeat string))
-			 sexp)))
+  :type '(repeat (choice (list :value (fun) function)
+			 (cons :value ("" "") regexp (repeat string))
+			 (sexp :value nil))))
 
 (defcustom gnus-strict-mime t
   "*If nil, MIME-decode even if there is no Mime-Version header."
@@ -918,90 +921,11 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-;; (defun gnus-hack-decode-rfc1522 ()
-;;   "Emergency hack function for avoiding problems when decoding."
-;;   (let ((buffer-read-only nil))
-;;     (goto-char (point-min))
-;;     ;; Remove encoded TABs.
-;;     (while (search-forward "=09" nil t)
-;;       (replace-match " " t t))
-;;     ;; Remove encoded newlines.
-;;     (goto-char (point-min))
-;;     (while (search-forward "=10" nil t)
-;;       (replace-match " " t t))))
-
-;; (defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
-;; (defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
-;; (defun article-decode-rfc1522 ()
-;;   "Hack to remove QP encoding from headers."
-;;   (let ((case-fold-search t)
-;;         (inhibit-point-motion-hooks t)
-;;         (buffer-read-only nil)
-;;         string)
-;;     (save-restriction
-;;       (narrow-to-region
-;;        (goto-char (point-min))
-;;        (or (search-forward "\n\n" nil t) (point-max)))
-;;       (goto-char (point-min))
-;;       (while (re-search-forward
-;;               "=\\?iso-8859-1\\?q\\?\\([^?\t\n]*\\)\\?=" nil t)
-;;         (setq string (match-string 1))
-;;         (save-restriction
-;;           (narrow-to-region (match-beginning 0) (match-end 0))
-;;           (delete-region (point-min) (point-max))
-;;           (insert string)
-;;           (article-mime-decode-quoted-printable
-;;            (goto-char (point-min)) (point-max))
-;;           (subst-char-in-region (point-min) (point-max) ?_ ? )
-;;           (goto-char (point-max)))
-;;         (goto-char (point-min))))))
-
 (defun gnus-article-decode-rfc1522 ()
   "Decode MIME encoded-words in header fields."
   (let (buffer-read-only)
     (eword-decode-header)
     ))
-
-;; (defun article-de-quoted-unreadable (&optional force)
-;;   "Do a naive translation of a quoted-printable-encoded article.
-;; This is in no way, shape or form meant as a replacement for real MIME
-;; processing, but is simply a stop-gap measure until MIME support is
-;; written.
-;; If FORCE, decode the article whether it is marked as quoted-printable
-;; or not."
-;;   (interactive (list 'force))
-;;   (save-excursion
-;;     (let ((case-fold-search t)
-;;           (buffer-read-only nil)
-;;           (type (gnus-fetch-field "content-transfer-encoding")))
-;;       (gnus-article-decode-rfc1522)
-;;       (when (or force
-;;                 (and type (string-match "quoted-printable" (downcase type))))
-;;         (goto-char (point-min))
-;;         (search-forward "\n\n" nil 'move)
-;;         (article-mime-decode-quoted-printable (point) (point-max))))))
-
-;; (defun article-mime-decode-quoted-printable-buffer ()
-;;   "Decode Quoted-Printable in the current buffer."
-;;   (article-mime-decode-quoted-printable (point-min) (point-max)))
-
-;; (defun article-mime-decode-quoted-printable (from to)
-;;   "Decode Quoted-Printable in the region between FROM and TO."
-;;   (interactive "r")
-;;   (goto-char from)
-;;   (while (search-forward "=" to t)
-;;     (cond ((eq (following-char) ?\n)
-;;            (delete-char -1)
-;;            (delete-char 1))
-;;           ((looking-at "[0-9A-F][0-9A-F]")
-;;            (subst-char-in-region
-;;             (1- (point)) (point) ?=
-;;             (hexl-hex-string-to-integer
-;;              (buffer-substring (point) (+ 2 (point)))))
-;;            (delete-char 2))
-;;           ((looking-at "=")
-;;            (delete-char 1))
-;;           ((gnus-message 3 "Malformed MIME quoted-printable message")))))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -2722,7 +2646,7 @@ groups."
     ("\\(\\b<\\(url: ?\\)?news:\\(//\\)?\\([^>\n\t ]*\\)>\\)" 1 t
      gnus-button-fetch-group 4)
     ("\\bnews:\\(//\\)?\\([^'\">\n\t ]+\\)" 0 t gnus-button-fetch-group 2)
-    ("\\bin\\( +article\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)" 2
+    ("\\bin\\( +article\\| +message\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)" 2
      t gnus-button-message-id 3)
     ("\\(<URL: *\\)mailto: *\\([^> \n\t]+\\)>" 0 t gnus-url-mailto 2)
     ("\\bmailto:\\([^ \n\t]+\\)" 0 t gnus-url-mailto 1)
