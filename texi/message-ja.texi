@@ -240,7 +240,7 @@ Message がニュース記事をポストするとき、ディフォルト
 を @file{~/.gnus.el} ファイルに入れて下さい:
 
 @lisp
-(setq canlock-password "Salam Shalom"
+(setq canlock-password "geheimnis"
       canlock-password-for-verify canlock-password)
 @end lisp
 
