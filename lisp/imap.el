@@ -192,8 +192,7 @@ stdin and return responses to stdout.")
   '((kerberos4 imap-kerberos4s-p imap-kerberos4-open)
     (ssl       imap-ssl-p        imap-ssl-open)
     (network   imap-network-p    imap-network-open)
-    (starttls  imap-starttls-p   imap-starttls-open)
-    (tls       imap-tls-p        imap-tls-open))
+    (starttls  imap-starttls-p   imap-starttls-open))
   "Definition of network streams.
 
 (NAME CHECK OPEN)
