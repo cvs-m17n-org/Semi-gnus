@@ -270,7 +270,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "7.1.0.12"
+(defconst gnus-version-number "7.1.0.13"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -1579,6 +1579,13 @@ If nil, no default charset is assumed when posting."
 			gnus-topic-topology gnus-topic-alist
 			gnus-format-specs)
   "Gnus variables saved in the quick startup file.")
+
+(defcustom gnus-compile-user-specs t
+  "If non-nil, the user-defined format specs will be byte-compiled
+automatically.
+It has an effect on the values of `gnus-*-line-format-spec'."
+  :group 'gnus
+  :type 'boolean)
 
 (defvar gnus-newsrc-alist nil
   "Assoc list of read articles.
