@@ -216,7 +216,7 @@ Modify to suit your needs."))
 	(error '("gnus-bbdb.el")))
       (unless (featurep 'xemacs)
 	'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-	  "nnheaderxm.el" "smiley.el"))
+	  "nnheaderxm.el" "smiley.el" "gnus-ml.el"))
       (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	'("md5.el"))))
     (while (setq file (pop files))

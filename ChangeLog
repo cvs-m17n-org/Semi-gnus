@@ -1,5 +1,8 @@
 2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-compile): Don't compile gnus-ml.el
+	when FSFmacs is running.
+
 	* lisp/gnus-ml.el: Bind some undeclared variables.
 
 	* lisp/gnus-art.el (gnus-article-add-button): Add widget button.
