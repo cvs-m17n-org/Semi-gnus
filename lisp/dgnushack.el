@@ -467,4 +467,9 @@ You must specify the name of the package path as follows:
 	   (setq error 1))))
       (kill-emacs error))))
 
+;; Mule-2.3@19.34 fails to make info from texi.
+(when (boundp 'MULE)
+  (put 'detailmenu 'texinfo-format 'texinfo-discard-line)
+  (put 'detailmenu 'texinfo-end 'texinfo-discard-command))
+
 ;;; dgnushack.el ends here
