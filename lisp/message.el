@@ -3966,24 +3966,25 @@ It should typically alter the sending method in some way or other."
 (put 'message-check 'edebug-form-spec '(form body))
 
 ;; Advise the function `invisible-region'.
-(let (current-load-list)
-  (eval
-   `(defadvice invisible-region (around add-mime-edit-invisible (start end)
-					activate)
-      "Advised by T-gnus Message.
+(unless noninteractive
+  (let (current-load-list)
+    (eval
+     `(defadvice invisible-region (around add-mime-edit-invisible (start end)
+					  activate)
+	"Advised by T-gnus Message.
 Add the text property `mime-edit-invisible' to an invisible text when
 the buffer's major mode is `message-mode'.  The added property will be
 used to distinguish whether the invisible text is a MIME part or not."
-      ,(if (featurep 'xemacs)
-	   '(if (eq ?\n (char-after start))
-		(setq start (1+ start)))
-	 '(if (eq ?\n (char-after (1- end)))
-	      (setq end (1- end))))
-      (setq ad-return-value
-	    (if (eq 'message-mode major-mode)
-		(add-text-properties start end
-				     '(invisible t mime-edit-invisible t))
-	      (put-text-property start end 'invisible t))))))
+	,(if (featurep 'xemacs)
+	     '(if (eq ?\n (char-after start))
+		  (setq start (1+ start)))
+	   '(if (eq ?\n (char-after (1- end)))
+		(setq end (1- end))))
+	(setq ad-return-value
+	      (if (eq 'message-mode major-mode)
+		  (add-text-properties start end
+				       '(invisible t mime-edit-invisible t))
+		(put-text-property start end 'invisible t)))))))
 
 (defun message-text-with-property (prop &optional start end reverse)
   "Return a list of start and end positions where the text has PROP.
