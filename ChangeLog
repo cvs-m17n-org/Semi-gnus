@@ -1,3 +1,51 @@
+1998-08-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
+	(semi-gnus-developers): New constant.
+
+	* lisp/gnus-agent.el (gnus-agent-read-file): Use
+	`nnheader-insert-file-contents'.
+	(gnus-agent-save-group-info): Ditto.
+
+	* lisp/gnus-art.el (gnus-article-narrow-to-signature): Removed TM
+	stuff.
+	(gnus-article-display-mime-message): Set
+	`mime-button-mother-dispatcher' in correct buffer.
+	(gnus-url-mailto): Use `gnus-setup-message'.
+	(gnus-button-mailto): Ditto.
+	(gnus-button-reply): Ditto.
+
+	* lisp/gnus-ems.el (gnus-string-width): Removed.
+	(gnus-truncate-string): Use `truncate-string-to-width' if
+	available.
+	(gnus-tilde-max-form): Moved from gnus-spec.el.
+	(gnus-tilde-cut-form): Ditto.
+
+	* lisp/gnus-msg.el (gnus-bug-message): About Semi-gnus.
+	(gnus-extended-version): Return gnus version only.
+	(gnus-setup-message): Setup `message-user-agent'.
+	(gnus-inews-add-send-actions): Would set `message-user-agent' too
+	late.
+	(gnus-bug): Add Semi-gnus developers to recipients.
+	(gnus-summary-mail-digest): New function.
+	(gnus-summary-post-digest): New function.
+
+	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Use
+	`gnus-summary-mail-digest' and `gnus-summary-post-digest' instead
+	of `gnus-uu-digest-mail-forward' and `gnus-uu-digest-post-forward'.
+
+	* lisp/gnus-spec.el (gnus-tilde-max-form): Move current code to
+	gnus-ems.el and revert to original.
+	(gnus-tilde-cut-form): Ditto.
+
+	* lisp/gnus-util.el (gnus-string-width): Removed.
+	(gnus-truncate-string): Ignore more than two arguments.
+
+	* lisp/message.el (message-forward-end-separator): Use
+	`text/plain' tag.
+	(message-make-user-agent): New function.
+	(message-generate-headers): Use it.
+
 1998-08-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-frames): New custom group.
@@ -39,7 +87,7 @@
 	* lisp/gnus-spec.el (gnus-tilde-max-form): Use `gnus-string-width'
 	and `gnus-truncate-string'.
 	(gnus-tilde-cut-form): Ditto.
-	
+
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
@@ -92,7 +140,7 @@
 1998-08-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/smtp.el: Do not insert empty line at the end of message.
-	
+
 1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-ems.el (gnus-ems-redefine): Redefine
@@ -184,7 +232,7 @@
 1998-07-02  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* Sync up with Semi-gnus 6.8.0 and Gnus 5.6.23.
-	
+
 1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-header-format-alist): Repair to use
@@ -217,7 +265,7 @@
 	* Sync up with Gnus 5.6.22
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.8.
 	* lisp/pop3-fma.el : Enable to get localhost mail spool.
-	
+
 1998-06-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.7.
@@ -297,9 +345,9 @@
 	Gnus 5.6.13.
 
 1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-	
+
 	* Sync up with Gnus 5.6.13.
-	
+
 1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-display-mime-message): Don't
@@ -417,9 +465,9 @@
 1998-06-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el: Small bug fix.
-	
+
 	* lisp/pop3-fma.el: Delete variable pop3-fma-cypher-key
-	Use base64-encode-string , base64-decode-string instead. 
+	Use base64-encode-string , base64-decode-string instead.
 	Both change by Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
 
 1998-06-13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
@@ -530,7 +578,7 @@
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.4.
 	And fix typo 5.6.10 -> 5.6.11.
-	
+
 1998-06-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.3.
@@ -574,11 +622,11 @@
 	(message-reply): Use "Mail-Followup-To:" and "Mail-Reply-To:" if
 	present.
 	(message-followup): Ditto.
-	
+
 	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Save original
 	value of "From:" and "Subject:" fields to `raw-text' property.
 	(gnus-nov-field): Ditto.
-	
+
 	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
 	`raw-text' property for saving cache file.
 
@@ -771,14 +819,14 @@
 	`nnheader-insert-file-contents'.
 	(gnus-agent-braid-nov): Ditto.
 	(gnus-agent-expire): Ditto.
-	
+
 	* lisp/gnus-cache.el (gnus-cache-request-article): Ditto.
 	(gnus-cache-retrieve-headers): Ditto.
 	(gnus-cache-change-buffer): Ditto.
 	(gnus-cache-braid-nov): Ditto.
-	
+
 	* lisp/gnus-sum.el (gnus-summary-import-article): Ditto.
-	
+
 	* lisp/nnkiboze.el (nnkiboze-retrieve-headers): Ditto.
 
 	* lisp/message.el (message-generate-headers): Fix regexp.
@@ -844,7 +892,7 @@
 	* lisp/gnus.el (gnus-bdf-image-file): New variable.
 	(gnus-mule-group-startup-message): Display bitmap image using
 	bitmap.el running with Emacs 20.
-	
+
 	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Fix problem when
 	Xref field is not exist.
 
