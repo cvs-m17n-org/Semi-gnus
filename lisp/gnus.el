@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "06"
+(defconst gnus-revision-number "07"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -1784,7 +1784,7 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
-      gnus-article-show-all-headers
+      gnus-article-show-all-headers gnus-article-show-all
       gnus-article-edit-mode gnus-article-edit-article
       gnus-article-edit-done article-decode-encoded-words
       gnus-start-date-timer gnus-stop-date-timer
