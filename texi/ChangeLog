@@ -1,3 +1,23 @@
+2003-04-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: nil -> @code{nil}
+
+2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-faq.texi: Allow inclusion in `gnus.texi' again.
+
+2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
+		
+	* gnus-faq.texi: New, the Gnus FAQ from http://my.gnus.org/FAQ.
+	From Frank Schmitt <ich@frank-schmitt.net>.
+
+	* gnus.texi (Server Variables): Added server parameters and index.
+
+2003-04-21  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus.texi (Group Parameters): Pointer to
+	gnus-newsgroup-variables.
+
 2003-04-20  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus.texi (Summary Buffer Lines): Add

@@ -3049,6 +3049,18 @@ Sieve}。
 @code{gnus-show-threads} は、その概略バッファの中のローカル変数になり、
 form の @code{nil} はそこで評価されます。
 
+この機能は、変数を概略バッファでローカルに設定することに注意して下さい。
+でも、いくつかの変数は記事バッファか (返信、フォロー、あるいは新規に作ら
+れたメッセージの) メッセージバッファで評価されます。代わりに、問題の変数
+を @code{gnus-newsgroup-variables} に加えることが助けになるかもしれませ
+ん。したがって、グループパラメータを介して @code{message-from-style} を
+設定したいならば、@file{~/.gnus}ファイルのどこか他のところに、次の述語が
+必要になるかもしれません:
+
+@lisp
+(add-to-list 'gnus-newsgroup-variables 'message-from-style)
+@end lisp
+
 @vindex gnus-list-identifiers
 この機能の用途の一つは、記事の題名欄からメーリングリストの標識タグをはぎ
 取ることです。もしニュースグルー
@@ -11555,6 +11567,8 @@ Remove security related MML tags from message.
 
 @node Server Variables
 @subsection サーバー変数
+@cindex server variables
+@cindex server parameters
 
 変数を定義する一つのやっかいな点は (バックエンドと Emacs 一般の両方で)、
 変数の定義がロードされている間に、いくつかの変数は他の変数で初期化さ
@@ -11578,6 +11592,8 @@ Remove security related MML tags from message.
       (nnml-active-file "~/my-mail/active")
       (nnml-newsgroups-file "~/my-mail/newsgroups"))
 @end lisp
+
+サーバー変数はしばしば @dfn{サーバーパラメータ} と呼ばれます。
 
 @node Servers and Methods
 @subsection サーバーと方法
@@ -12874,7 +12890,6 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 
 @table @code
 @item :plugged
-
 @code{nil} でなかったら、gnus が @dfn{unplugged} であってもメールを取得
 します。もしあなたがディレクトリをメールソースに使っているならば、この例
 のように指定することができます:

@@ -4322,77 +4322,80 @@ General format specifiers can also be used.  See Info node
 Replace it with some information about the removed part."
   (interactive)
   (gnus-article-check-buffer)
-  (let* ((data (get-text-property (point) 'gnus-data))
-	 (handles gnus-article-mime-handles)
-	 (none "(none)")
-	 (description
-	  (or
-	   (mail-decode-encoded-word-string (or (mm-handle-description data)
-						none))))
-	 (filename
-	  (or (mail-content-type-get (mm-handle-disposition data) 'filename)
-	      none))
-	 (type (mm-handle-media-type data)))
-    (if (mm-multiple-handles gnus-article-mime-handles)
-	(error "This function is not implemented"))
-    (with-current-buffer (mm-handle-buffer data)
-      (let ((bsize (format "%s" (buffer-size))))
-	(erase-buffer)
-	(insert
-	 (concat
-	  "<#part type=text/plain nofile=yes disposition=attachment"
-	  " description=\"Deleted attachment (" bsize " Byte)\">"
-	  ",----\n"
-	  "| The following attachment has been deleted:\n"
-	  "|\n"
-	  "| Type:           " type "\n"
-	  "| Filename:       " filename "\n"
-	  "| Size (encoded): " bsize " Byte\n"
-	  "| Description:    " description "\n"
-	  "`----\n"
-	  "<#/part>"))
-	(setcdr data
-		(cdr (mm-make-handle nil `("text/plain"))))))
-    (set-buffer gnus-summary-buffer)
-    ;; FIXME: maybe some of the following code (borrowed from
-    ;; `gnus-mime-save-part-and-strip') isn't necessary?
-    (gnus-article-edit-article
-     `(lambda ()
-	(erase-buffer)
-	(let ((mail-parse-charset (or gnus-article-charset
-				      ',gnus-newsgroup-charset))
-	      (mail-parse-ignored-charsets
-	       (or gnus-article-ignored-charsets
-		   ',gnus-newsgroup-ignored-charsets))
-	      (mbl mml-buffer-list))
-	  (setq mml-buffer-list nil)
-	  (insert-buffer gnus-original-article-buffer)
-	  (mime-to-mml ',handles)
-	  (setq gnus-article-mime-handles nil)
-	  (let ((mbl1 mml-buffer-list))
-	    (setq mml-buffer-list mbl)
-	    (set (make-local-variable 'mml-buffer-list) mbl1))
-	  ;; LOCAL argument of add-hook differs between GNU Emacs
-	  ;; and XEmacs. make-local-hook makes sure they are local.
-	  (make-local-hook 'kill-buffer-hook)
-	  (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
-     `(lambda (no-highlight)
-	(let ((mail-parse-charset (or gnus-article-charset
-				      ',gnus-newsgroup-charset))
-	      (message-options message-options)
-	      (message-options-set-recipient)
-	      (mail-parse-ignored-charsets
-	       (or gnus-article-ignored-charsets
-		   ',gnus-newsgroup-ignored-charsets)))
-	  (mml-to-mime)
-	  (mml-destroy-buffers)
-	  (remove-hook 'kill-buffer-hook
-		       'mml-destroy-buffers t)
-	  (kill-local-variable 'mml-buffer-list))
-	(gnus-summary-edit-article-done
-	 ,(or (mail-header-references gnus-current-headers) "")
-	 ,(gnus-group-read-only-p)
-	 ,gnus-summary-buffer no-highlight))))
+  (unless (and gnus-novice-user
+	       (not (gnus-yes-or-no-p
+		     "Really delete attachment forever? ")))
+    (let* ((data (get-text-property (point) 'gnus-data))
+	   (handles gnus-article-mime-handles)
+	   (none "(none)")
+	   (description
+	    (or
+	     (mail-decode-encoded-word-string (or (mm-handle-description data)
+						  none))))
+	   (filename
+	    (or (mail-content-type-get (mm-handle-disposition data) 'filename)
+		none))
+	   (type (mm-handle-media-type data)))
+      (if (mm-multiple-handles gnus-article-mime-handles)
+	  (error "This function is not implemented"))
+      (with-current-buffer (mm-handle-buffer data)
+	(let ((bsize (format "%s" (buffer-size))))
+	  (erase-buffer)
+	  (insert
+	   (concat
+	    "<#part type=text/plain nofile=yes disposition=attachment"
+	    " description=\"Deleted attachment (" bsize " Byte)\">"
+	    ",----\n"
+	    "| The following attachment has been deleted:\n"
+	    "|\n"
+	    "| Type:           " type "\n"
+	    "| Filename:       " filename "\n"
+	    "| Size (encoded): " bsize " Byte\n"
+	    "| Description:    " description "\n"
+	    "`----\n"
+	    "<#/part>"))
+	  (setcdr data
+		  (cdr (mm-make-handle nil `("text/plain"))))))
+      (set-buffer gnus-summary-buffer)
+      ;; FIXME: maybe some of the following code (borrowed from
+      ;; `gnus-mime-save-part-and-strip') isn't necessary?
+      (gnus-article-edit-article
+       `(lambda ()
+	  (erase-buffer)
+	  (let ((mail-parse-charset (or gnus-article-charset
+					',gnus-newsgroup-charset))
+		(mail-parse-ignored-charsets
+		 (or gnus-article-ignored-charsets
+		     ',gnus-newsgroup-ignored-charsets))
+		(mbl mml-buffer-list))
+	    (setq mml-buffer-list nil)
+	    (insert-buffer gnus-original-article-buffer)
+	    (mime-to-mml ',handles)
+	    (setq gnus-article-mime-handles nil)
+	    (let ((mbl1 mml-buffer-list))
+	      (setq mml-buffer-list mbl)
+	      (set (make-local-variable 'mml-buffer-list) mbl1))
+	    ;; LOCAL argument of add-hook differs between GNU Emacs
+	    ;; and XEmacs. make-local-hook makes sure they are local.
+	    (make-local-hook 'kill-buffer-hook)
+	    (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
+       `(lambda (no-highlight)
+	  (let ((mail-parse-charset (or gnus-article-charset
+					',gnus-newsgroup-charset))
+		(message-options message-options)
+		(message-options-set-recipient)
+		(mail-parse-ignored-charsets
+		 (or gnus-article-ignored-charsets
+		     ',gnus-newsgroup-ignored-charsets)))
+	    (mml-to-mime)
+	    (mml-destroy-buffers)
+	    (remove-hook 'kill-buffer-hook
+			 'mml-destroy-buffers t)
+	    (kill-local-variable 'mml-buffer-list))
+	  (gnus-summary-edit-article-done
+	   ,(or (mail-header-references gnus-current-headers) "")
+	   ,(gnus-group-read-only-p)
+	   ,gnus-summary-buffer no-highlight)))))
   ;; Not in `gnus-mime-save-part-and-strip':
   (gnus-article-edit-done)
   (gnus-summary-expand-window)
@@ -6081,8 +6084,8 @@ after replacing with the original article."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|nntp\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|nntp\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -6446,9 +6449,9 @@ positives are possible."
      0 (>= gnus-button-message-level 0) gnus-button-handle-news 3)
     ("\\b\\(nntp\\|news\\):\\([^>\n\t ]*@[^>)!;:,\n\t ]*\\)" 0 t
      gnus-button-handle-news 2)
-    ("\\(\\b<\\(url:[>\n\t ]*\\)?\\(news\\|nntp\\):[>\n\t ]*\\(//\\)?\\([^>\n\t ]*\\)>\\)"
+    ("\\(\\b<\\(url:[>\n\t ]*\\)?\\(nntp\\|news\\):[>\n\t ]*\\(//\\)?\\([^>\n\t ]*\\)>\\)"
      1 (>= gnus-button-message-level 0) gnus-button-fetch-group 5)
-    ("\\b\\(news\\|nntp\\):\\(//\\)?\\([^'\">\n\t ]+\\)"
+    ("\\b\\(nntp\\|news\\):\\(//\\)?\\([^'\">\n\t ]+\\)"
      0 (>= gnus-button-message-level 0) gnus-button-fetch-group 3)
     ("\\bin\\( +article\\| +message\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)"
      2 (>= gnus-button-message-level 0) gnus-button-message-id 3)
@@ -6575,7 +6578,7 @@ variable it the real callback function."
      0 (>= gnus-button-browse-level 0) browse-url 0)
     ("^[^:]+:" "\\bmailto:\\([-a-z.@_+0-9%=?]+\\)"
      0 (>= gnus-button-message-level 0) gnus-url-mailto 1)
-    ("^[^:]+:" "\\(<\\(url: \\)?\\(news\\|nntp\\):\\([^>\n ]*\\)>\\)"
+    ("^[^:]+:" "\\(<\\(url: \\)?\\(nntp\\|news\\):\\([^>\n ]*\\)>\\)"
      1 (>= gnus-button-message-level 0) gnus-button-message-id 4))
   "*Alist of headers and regexps to match buttons in article heads.
 
