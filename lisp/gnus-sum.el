@@ -1629,7 +1629,7 @@ increase the score of each group you read."
     "t" gnus-article-toggle-headers
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
-    "H" gnus-article-strip-headers-in-body
+    "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
     "p" gnus-article-verify-x-pgp-sig
     "d" gnus-article-treat-dumbquotes
     "s" gnus-smiley-display)
@@ -1670,7 +1670,8 @@ increase the score of each group you read."
     "a" gnus-article-strip-blank-lines
     "A" gnus-article-strip-all-blank-lines
     "s" gnus-article-strip-leading-space
-    "e" gnus-article-strip-trailing-space)
+    "e" gnus-article-strip-trailing-space
+    "w" gnus-article-remove-leading-whitespace)
 
   (gnus-define-keys (gnus-summary-help-map "H" gnus-summary-mode-map)
     "v" gnus-version
@@ -1783,7 +1784,9 @@ increase the score of each group you read."
                ["All of the above" gnus-article-strip-blank-lines t]
                ["All" gnus-article-strip-all-blank-lines t]
                ["Leading space" gnus-article-strip-leading-space t]
-	       ["Trailing space" gnus-article-strip-trailing-space t])
+	       ["Trailing space" gnus-article-strip-trailing-space t]
+               ["Leading space in headers" 
+		gnus-article-remove-leading-whitespace t])
               ["Overstrike" gnus-article-treat-overstrike t]
               ["Dumb quotes" gnus-article-treat-dumbquotes t]
               ["Emphasis" gnus-article-emphasize t]

@@ -1,3 +1,75 @@
+2001-02-12 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-topic.el (gnus-subscribe-topics): Return nil if not
+	subscribe.
+
+	* gnus-start.el (gnus-call-subscribe-functions): New.
+	(gnus-find-new-newsgroups): Use it.
+	(gnus-ask-server-for-new-groups): Use it.
+	(gnus-check-first-time-used): Use it.
+	(gnus-subscribe-newsgroup-method): Grok a list of functions.
+	(gnus-subscribe-options-newsgroup-method): Ditto.
+	(gnus-subscribe-hierarchically): Return gnus-subscribe-newsgroup's
+	return .
+
+2001-02-12  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-cus.el (gnus-score-customize): Doc fix.
+
+2001-02-11  Jesper Harder <harder@ifa.au.dk>
+
+	* dgnushack.el (my-getenv): Typo.
+
+2001-02-11 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el (dgnushack-make-load): Don't autoload smiley functions.
+
+2001-02-11 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-suspend): Offer save summaries.
+
+	* gnus-art.el (gnus-treat-leading-whitespace): New.
+	(gnus-treatment-function-alist): Use it.
+	(article-remove-leading-whitespace): New.
+	(gnus-article-make-menu-bar): Use it.
+
+	* gnus-sum.el (gnus-summary-wash-empty-map): Add
+	remove-leading-whitespace.
+	(gnus-summary-wash-map): Bind strip-headers-in-body to `W a',
+	because of conflict.
+
+2001-02-09 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in: Hack generating gnus-load.el.
+	* dgnushack.el: Ditto.
+	* gnus-load.el: Remove it.
+
+2001-02-09 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el : Add URLDIR.
+	
+	* Makefile.in (EMACS_COMP): Ditto.
+
+2001-02-09 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-cus.el (gnus-score-customize): Error on no score file.
+
+2001-02-09 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-merge-handles): New function.
+
+	* mm-view.el (mm-inline-message): Use it.
+	(mm-view-message): Ditto.
+	
+	* mm-partial.el (mm-inline-partial): Ditto.
+
+	* mm-extern.el (mm-inline-external-body): Ditto.
+
+	* gnus-art.el (gnus-mime-view-part): Ditto.
+	(gnus-mime-view-part-as-type): Ditto.
+	(gnus-mime-save-part-and-strip): Prevent users to strip in some
+	cases.
+
 2001-02-08 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-cancel-news): Allow to shoot foot.

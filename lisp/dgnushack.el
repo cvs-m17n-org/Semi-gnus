@@ -52,11 +52,15 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(defvar dgnushack-w3-dir (let ((w3dir (getenv "W3DIR")))
-			   (unless (zerop (length w3dir))
-			     (file-name-as-directory w3dir))))
-(when dgnushack-w3-dir
-  (push dgnushack-w3-dir load-path))
+(let ((urldir (getenv "URLDIR")))
+  (unless (zerop (length urldir))
+    (push (file-name-as-directory urldir) load-path)))
+
+(defvar dgnushack-w3-directory (let ((w3dir (getenv "W3DIR")))
+				 (unless (zerop (length w3dir))
+				   (file-name-as-directory w3dir))))
+(when dgnushack-w3-directory
+  (push dgnushack-w3-directory load-path))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -269,7 +273,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
-		      (let ((lp (delete dgnushack-w3-dir
+		      (let ((lp (delete dgnushack-w3-directory
 					(copy-sequence load-path))))
 			(if (let ((load-path lp))
 			      (condition-case nil
@@ -356,6 +360,93 @@ Modify to suit your needs."))
 (defun dgnushack-recompile ()
   (require 'gnus)
   (byte-recompile-directory "." 0))
+
+(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el"))
+(defvar	dgnushack-cus-load-file (expand-file-name "cus-load.el"))
+
+(defun dgnushack-make-cus-load ()
+  (when (condition-case nil
+	    (load "cus-dep")
+	  (error nil))
+    (let ((cusload-base-file dgnushack-cus-load-file))
+      (if (fboundp 'custom-make-dependencies)
+	  (custom-make-dependencies)
+	(Custom-make-dependencies)))))
+
+(defun dgnushack-make-auto-load ()
+  (require 'autoload)
+  (let ((generated-autoload-file dgnushack-gnus-load-file)
+	(make-backup-files nil)
+	(autoload-package-name "gnus"))
+    (if (featurep 'xemacs)
+	(if (file-exists-p generated-autoload-file)
+	    (delete-file generated-autoload-file))
+      (with-temp-file generated-autoload-file
+	(insert ?\014)))
+    (if (featurep 'xemacs)
+	(let ((si:message (symbol-function 'message)))
+	  (defun message (fmt &rest args)
+	    (cond ((and (string-equal "Generating autoloads for %s..." fmt)
+			(file-exists-p (file-name-nondirectory (car args))))
+		   (funcall si:message
+			    fmt (file-name-nondirectory (car args))))
+		  ((string-equal "No autoloads found in %s" fmt))
+		  ((string-equal "Generating autoloads for %s...done" fmt))
+		  (t (apply si:message fmt args))))
+	  (unwind-protect
+	      (batch-update-autoloads)
+	    (fset 'message si:message)))
+      (batch-update-autoloads))))
+
+(defun dgnushack-make-load ()
+  (message (format "Generating %s..." dgnushack-gnus-load-file))
+  (with-temp-file dgnushack-gnus-load-file
+    (insert-file-contents dgnushack-cus-load-file)
+    (delete-file dgnushack-cus-load-file)
+    (goto-char (point-min))
+    (search-forward ";;; Code:")
+    (forward-line)
+    (delete-region (point-min) (point))
+    (insert "\
+;;; gnus-load.el --- automatically extracted custom dependencies and autoload
+;;
+;;; Code:
+")
+    (goto-char (point-max))
+    (if (search-backward "custom-versions-load-alist" nil t)
+	(forward-line -1)
+      (forward-line -1)
+      (while (eq (char-after) ?\;)
+	(forward-line -1))
+      (forward-line))
+    (delete-region (point) (point-max))
+    (insert "\n")
+    ;; smiley-* are duplicated. Remove them all.
+    (let ((point (point)))
+      (insert-file-contents dgnushack-gnus-load-file)
+      (goto-char point)
+      (while (search-forward "smiley-" nil t)
+	(beginning-of-line)
+	(if (looking-at "(autoload ")
+	    (delete-region (point) (progn (forward-sexp) (point)))
+	  (forward-line))))
+    ;;
+    (goto-char (point-max))
+    (when (search-backward "\n(provide " nil t)
+      (forward-line -1)
+      (delete-region (point) (point-max)))
+    (insert "\
+
+\(provide 'gnus-load)
+
+;;; Local Variables:
+;;; version-control: never
+;;; no-byte-compile: t
+;;; no-update-autoloads: t
+;;; End:
+;;; gnus-load.el ends here\n"))
+  (message (format "Compiling %s..." dgnushack-gnus-load-file))
+  (byte-compile-file dgnushack-gnus-load-file))
 
 
 (defconst dgnushack-info-file-regexp-en
