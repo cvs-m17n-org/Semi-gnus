@@ -3429,9 +3429,11 @@ value of the variable `gnus-show-mime' is non-nil."
 		  (read-coding-system "Charset: ")))))
       (forward-line 2)
       (mm-insert-inline handle
-			(if charset 
-			    (mm-decode-coding-string
-			     contents (mm-charset-to-coding-system charset))
+			(if (and charset 
+				 (setq charset (mm-charset-to-coding-system 
+						charset))
+				 (not (eq charset 'ascii)))
+			    (mm-decode-coding-string contents charset)
 			  contents))
       (goto-char b))))
 
@@ -3551,6 +3553,11 @@ In no internal viewer is available, use an external viewer."
 	  (when (eq (gnus-mm-display-part handle) 'internal)
 	    (gnus-set-window-start)))))))
 
+(defsubst gnus-article-mime-total-parts ()
+  (if (bufferp (car gnus-article-mime-handles))
+      1 ;; single part
+    (1- (length gnus-article-mime-handles))))
+
 (defun gnus-mm-display-part (handle)
   "Display HANDLE and fix MIME button."
   (let ((id (get-text-property (point) 'gnus-part))
@@ -3584,7 +3591,7 @@ In no internal viewer is available, use an external viewer."
 		      (narrow-to-region (point) (point-max))
 		      (gnus-treat-article
 		       nil id
-		       (1- (length gnus-article-mime-handles))
+		       (gnus-article-mime-total-parts)
 		       (mm-handle-media-type handle)))))
 	      (select-window window))))
       (goto-char point)
@@ -3772,7 +3779,8 @@ In no internal viewer is available, use an external viewer."
 	    (setq display t)
 	  (when (equal (mm-handle-media-supertype handle) "text")
 	    (setq text t)))
-	(let ((id (1+ (length gnus-article-mime-handle-alist))))
+	(let ((id (1+ (length gnus-article-mime-handle-alist)))
+	      beg)
 	  (push (cons id handle) gnus-article-mime-handle-alist)
 	  (when (or (not display)
 		    (not (gnus-unbuttonized-mime-type-p type)))
@@ -3781,8 +3789,8 @@ In no internal viewer is available, use an external viewer."
 	     handle id (list (or display (and not-attachment text))))
 	    (gnus-article-insert-newline)
 	    ;(gnus-article-insert-newline)
-	    (setq move t)))
-	(let ((beg (point)))
+	    (setq move t))
+	  (setq beg (point))
 	  (cond
 	   (display
 	    (when move
@@ -3808,8 +3816,8 @@ In no internal viewer is available, use an external viewer."
 	    (save-restriction
 	      (narrow-to-region beg (point))
 	      (gnus-treat-article
-	       nil (length gnus-article-mime-handle-alist)
-	       (1- (length gnus-article-mime-handles))
+	       nil id 
+	       (gnus-article-mime-total-parts)
 	       (mm-handle-media-type handle)))))))))
 
 (defun gnus-unbuttonized-mime-type-p (type)
@@ -3911,7 +3919,7 @@ In no internal viewer is available, use an external viewer."
 		  (narrow-to-region (car begend) (point-max))
 		  (gnus-treat-article
 		   nil (length gnus-article-mime-handle-alist)
-		   (1- (length gnus-article-mime-handles))
+		   (gnus-article-mime-total-parts)
 		   (mm-handle-media-type handle))))))
 	  (goto-char (point-max))
 	  (setcdr begend (point-marker)))))
