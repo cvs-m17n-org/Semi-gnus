@@ -1,7 +1,48 @@
+2002-02-18  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus-util.el (gnus-parent-id): Ignore trailing whitespace in the
+	References header field.  From Mark Thomas <mthomas@cmu.edu>.
+
+2002-02-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-render-with-file): With unibyte buffer.
+	(mm-inline-render-with-stdin): Ditto.
+	(mm-inline-render-with-function): Ditto.
+	(mm-inline-wash-with-file): Bind coding-system-for-write.
+	(mm-inline-wash-with-stdin): Ditto.
+
+2002-02-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	Suggested by Felix Natter <fnatter@gmx.net>
+
+	* gnus-art.el (gnus-mime-view-part-externally): Rename from
+	gnus-mime-externalize-view.
+	(gnus-mime-view-part-internally): Rename from
+	gnus-mime-internalize-view.
+	(gnus-article-view-part-externally): Rename from
+	gnus-article-externalize-part.
+	(gnus-mime-action-alist): Change correspondingly.
+	(gnus-mime-button-commands): Ditto.
+	(gnus-mime-action-alist): Remove duplication.
+
+	* gnus-sum.el (gnus-summary-mime-map): Change correspondingly.
+
+2002-02-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-dissect-buffer): Add loose-mime parameter.
+
+	* gnus-art.el (gnus-display-mime): Use it.
+
+	* mm-partial.el (mm-partial-find-parts): Use it.
+
+	* gnus-sum.el (gnus-article-loose-mime): Rename from
+	gnus-article-no-strict-mime.
+	(gnus-summary-save-parts): Use it.
+
 2002-02-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-fun.el (gnus-convert-gray-x-face-to-xpm): Remove unused
-	local varriable.
+	local variable.
 
 	* gnus-art.el (article-display-x-face): Don't sort multiple
 	X-Faces.

@@ -107,11 +107,13 @@ The defined renderer types are:
 `w3'   : using Emacs/W3;
 `w3m'  : using emacs-w3m;
 `links': using links;
-`lynx' : using lynx."
+`lynx' : using lynx;
+`nil'  : using external viewer."
   :type '(choice (symbol w3)
 		 (symbol w3m)
 		 (symbol links)
 		 (symbol lynx)
+		 (symbol nil)
 		 (function))
   :version "21.3"
   :group 'mime-display)
@@ -454,13 +456,14 @@ for types in mm-keep-viewer-alive-types."
     (message "Destroying external MIME viewers")
     (mm-destroy-parts mm-postponed-undisplay-list)))
 
-(defun mm-dissect-buffer (&optional no-strict-mime)
+(defun mm-dissect-buffer (&optional no-strict-mime loose-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
     (let (ct ctl type subtype cte cd description id result from)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
+		  loose-mime
 		  (mail-fetch-field "mime-version"))
 	  (setq ct (mail-fetch-field "content-type")
 		ctl (ignore-errors (mail-header-parse-content-type ct))

@@ -1064,8 +1064,8 @@ that were fetched.  Say, for nnultimate groups."
   :group 'gnus-summary
   :type 'string)
 
-(defcustom gnus-article-no-strict-mime nil
-  "If non-nil, don't require strict MIME.
+(defcustom gnus-article-loose-mime nil
+  "If non-nil, don't require MIME-Version header.
 Some brain-damaged MUA/MTA, e.g. Lotus Domino 5.0.6 clients, does not
 supply the MIME-Version header or deliberately strip it From the mail.
 Set it to non-nil, Gnus will treat some articles as MIME even if
@@ -1866,7 +1866,7 @@ increase the score of each group you read."
     "o" gnus-article-save-part
     "c" gnus-article-copy-part
     "C" gnus-article-view-part-as-charset
-    "e" gnus-article-externalize-part
+    "e" gnus-article-view-part-externally
     "E" gnus-article-encrypt-body
     "i" gnus-article-inline-part
     "|" gnus-article-pipe-part))
@@ -10438,8 +10438,7 @@ If REVERSE, save parts that do not match TYPE."
     (save-excursion
       (set-buffer gnus-article-buffer)
       (let ((handles (or gnus-article-mime-handles
-			 (mm-dissect-buffer
-			  gnus-article-no-strict-mime)
+			 (mm-dissect-buffer nil gnus-article-loose-mime)
 			 (mm-uu-dissect))))
 	(when handles
 	  (gnus-summary-save-parts-1 type dir handles reverse)

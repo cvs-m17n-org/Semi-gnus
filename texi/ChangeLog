@@ -1,3 +1,9 @@
+2002-02-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* emacs-mime.texi (mailcap): Addition.
+
+	* gnus.texi (Using MIME): Rename functions. Addition.
+
 2002-02-16  Simon Josefsson  <jas@extundo.com>
 
 	* gnus.texi (Top): Change description of Posting Server node.

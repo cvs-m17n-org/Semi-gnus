@@ -40,22 +40,22 @@
 (defvar mm-text-html-renderer-alist
   '((w3  . mm-inline-text-html-render-with-w3)
     (w3m . mm-inline-text-html-render-with-w3m)
-    (links mm-inline-render-with-file 
+    (links mm-inline-render-with-file
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
     (lynx  mm-inline-render-with-stdin nil
 	   "lynx" "-dump" "-force_html" "-stdin"))
-  "The attributes of renderer types.")
+  "The attributes of renderer types for text/html.")
 
 (defvar mm-text-html-washer-alist
   '((w3  . gnus-article-wash-html-with-w3)
     (w3m . gnus-article-wash-html-with-w3m)
-    (links mm-inline-wash-with-file 
+    (links mm-inline-wash-with-file
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
     (lynx  mm-inline-wash-with-stdin nil
 	   "lynx" "-dump" "-force_html" "-stdin"))
-  "The attributes of washer types.")
+  "The attributes of washer types for text/html.")
 
 ;;; Internal variables.
 
@@ -309,9 +309,10 @@ will not be substituted.")
     (delete-region (match-beginning 0) (match-end 0))))
 
 (defun mm-inline-wash-with-file (post-func cmd &rest args)
-  (let ((file (make-temp-name 
+  (let ((file (make-temp-name
 	       (expand-file-name "mm" mm-tmp-directory))))
-    (write-region (point-min) (point-max) file nil 'silent)
+    (let ((coding-system-for-write 'binary))
+      (write-region (point-min) (point-max) file nil 'silent))
     (delete-region (point-min) (point-max))
     (unwind-protect
 	(apply 'call-process cmd nil t nil (mapcar 'eval args))
@@ -319,33 +320,34 @@ will not be substituted.")
     (and post-func (funcall post-func))))
 
 (defun mm-inline-wash-with-stdin (post-func cmd &rest args)
-  (apply 'call-process-region (point-min) (point-max)
-	 cmd t t nil args)
+  (let ((coding-system-for-write 'binary))
+    (apply 'call-process-region (point-min) (point-max)
+	   cmd t t nil args))
   (and post-func (funcall post-func)))
 
 (defun mm-inline-render-with-file (handle post-func cmd &rest args)
   (let ((source (mm-get-part handle)))
     (mm-insert-inline
      handle
-     (with-temp-buffer
+     (mm-with-unibyte-buffer
        (insert source)
        (apply 'mm-inline-wash-with-file post-func cmd args)
        (buffer-string)))))
 
 (defun mm-inline-render-with-stdin (handle post-func cmd &rest args)
   (let ((source (mm-get-part handle)))
-    (mm-insert-inline 
-     handle 
-     (with-temp-buffer
+    (mm-insert-inline
+     handle
+     (mm-with-unibyte-buffer
        (insert source)
        (apply 'mm-inline-wash-with-stdin post-func cmd args)
        (buffer-string)))))
 
 (defun mm-inline-render-with-function (handle func &rest args)
   (let ((source (mm-get-part handle)))
-    (mm-insert-inline 
-     handle 
-     (with-temp-buffer
+    (mm-insert-inline
+     handle
+     (mm-with-unibyte-buffer
        (insert source)
        (apply func args)
        (buffer-string)))))
