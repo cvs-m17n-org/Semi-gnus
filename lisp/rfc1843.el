@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.4 $
+;; $Revision: 1.1.2.5 $
 ;; Keywords: news HZ 
 ;; Time-stamp: <Tue Oct  6 23:48:49 EDT 1998 zsh>
   
@@ -146,6 +146,7 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 (defvar rfc1843-old-gnus-decode-header-function  nil)
 (defvar gnus-decode-header-methods)
 (defvar gnus-decode-encoded-word-methods)
+(defvar gnus-decode-encoded-word-function)
 
 (defun rfc1843-gnus-setup ()
   "Setup HZ decoding for Gnus."

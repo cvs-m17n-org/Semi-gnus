@@ -846,6 +846,6 @@ The path of COMMAND will be returned iff COMMAND is a command."
 		       (not (file-directory-p file)))
 	      (throw 'found file))))))))
 
-(provide 'mailcap)
+(provide 'gnus-mailcap)
 
 ;;; mailcap.el ends here

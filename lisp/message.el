@@ -2524,7 +2524,7 @@ to find out how to use this."
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
 
-(defsubst message-maybe-split-and-send-news ()
+(defsubst message-maybe-split-and-send-news (method)
   "Split a message if necessary, and send it via news.
 Returns nil if sending succeeded, returns t if sending failed.
 This sub function is for exclusive use of `message-send-news'."
@@ -2592,7 +2592,7 @@ This sub function is for exclusive use of `message-send-news'."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
-	    (setq result (message-maybe-split-and-send-news)))
+	    (setq result (message-maybe-split-and-send-news method)))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
       (if result

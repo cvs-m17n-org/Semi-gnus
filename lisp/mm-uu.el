@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.3 $
+;; $Revision: 1.1.2.4 $
 ;; Keywords: news postscript uudecode binhex shar
   
 ;; This file is not part of GNU Emacs, but the same permissions
@@ -27,6 +27,8 @@
 ;;
 
 ;;; Code:
+
+(require 'gnus-mailcap)
 
 (eval-and-compile
   (autoload 'binhex-decode-region "binhex")

@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'mail-parse)
-(require 'mailcap)
+(require 'gnus-mailcap)
 (require 'mm-bodies)
 
 ;;; Convenience macros.

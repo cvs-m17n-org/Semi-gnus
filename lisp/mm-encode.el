@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'mail-parse)
-(require 'mailcap)
+(require 'gnus-mailcap)
 
 (defvar mm-content-transfer-encoding-defaults
   '(("text/.*" quoted-printable)
