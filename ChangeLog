@@ -1,7 +1,12 @@
 1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus-art.el (gnus-article-check-buffer): Check a major-mode
-	in `gnus-original-article-buffer' as well.
+	* lisp/gnus-bbdb.el (toplevel): Define `bbdb-pop-up-elided-display'
+	for avoiding byte-compile warning.
+
+	* lisp/gnus-art.el (gnus-article-mode-map): Define almost undefined
+	keys to `gnus-article-read-summary-keys'.
+	(gnus-article-check-buffer): Check for a major-mode in
+	`gnus-original-article-buffer' as well.
 	(gnus-article-prepare-display): Set `gnus-article-current-summary'
 	to `gnus-summary-buffer'.
 
