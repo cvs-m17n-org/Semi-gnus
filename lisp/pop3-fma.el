@@ -134,7 +134,7 @@ Lisp means `nnmail-movemail-program' is lisp function.
 (defvar pop3-fma-password nil
   "*POP3 password , user , mailhost information for Gnus.")
 
-(defvar pop3-fma-movemail-program "movemail.exe"
+(defvar pop3-fma-movemail-program "movemail"
   "*External program name your movemail.
 Please do not set this valiable non-nil if you do not use Meadow.")
 
