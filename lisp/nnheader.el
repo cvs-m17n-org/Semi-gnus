@@ -426,6 +426,7 @@ the line could be found."
 ;; Various cruft the backends and Gnus need to communicate.
 
 (defvar nntp-server-buffer nil)
+(defvar nntp-process-response nil)
 (defvar gnus-verbose-backends 7
   "*A number that says how talkative the Gnus backends should be.")
 (defvar gnus-nov-is-evil nil
@@ -444,6 +445,7 @@ the line could be found."
     (erase-buffer)
     (kill-all-local-variables)
     (setq case-fold-search t)		;Should ignore case.
+    (set (make-local-variable 'nntp-process-response) nil)
     t))
 
 ;;; Various functions the backends use.
