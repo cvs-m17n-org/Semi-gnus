@@ -1,3 +1,10 @@
+1998-06-07  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-make-in-reply-to): New format.
+	(message-use-mail-followup-to): Add doc string.
+	(message-reply): Use `message-use-mail-followup-to'.
+	(message-followup): Ditto.
+
 1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-ems.el (gnus-ems-redefine): Must require 'path-util
