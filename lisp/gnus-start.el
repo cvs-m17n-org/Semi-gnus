@@ -2369,9 +2369,10 @@ If FORCE is non-nil, the .newsrc file is read."
 	(gnus-group-set-mode-line)))))
 
 ;; Call the function above at C-x C-c.
-(defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe activate)
+(defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe
+					   activate preactivate)
   "Save .newsrc and .newsrc.eld when Emacs is killed."
-  (when (get-buffer gnus-group-buffer)
+  (when (gnus-alive-p)
     (gnus-run-hooks 'gnus-exit-gnus-hook)
     (gnus-offer-save-summaries)
     (gnus-save-newsrc-file)))
