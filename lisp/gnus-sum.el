@@ -866,6 +866,25 @@ This variable uses the same syntax as `gnus-emphasis-alist'."
 					     gnus-emphasis-highlight-words)))))
   :group 'gnus-summary-visual)
 
+(defcustom gnus-use-wheel nil
+  "Use Intelli-mouse on summary movement"
+  :type 'boolean
+  :group 'gnus-summary-maneuvering)
+
+(defcustom gnus-wheel-scroll-amount '(5 . 1)
+  "Amount to scroll messages by spinning the mouse wheel.
+This is actually a cons cell, where the first item is the amount to scroll
+on a normal wheel event, and the second is the amount to scroll when the
+wheel is moved with the shift key depressed."
+  :type '(cons (integer :tag "Shift") integer)
+  :group 'gnus-summary-maneuvering)
+
+(defcustom gnus-wheel-edge-resistance 2
+  "How hard it should be to change the current article
+by moving the mouse over the edge of the article window."
+  :type 'integer
+  :group 'gnus-summary-maneuvering)
+
 ;;; Internal variables
 
 (defvar gnus-scores-exclude-files nil)
@@ -9510,6 +9529,56 @@ treated as multipart/mixed."
       (let ((gnus-unbuttonized-mime-types nil))
 	(gnus-summary-show-article))
     (gnus-summary-show-article)))
+
+;;;
+;;; Intelli-mouse commmands
+;;;
+
+(defun gnus-wheel-summary-scroll (event)
+  (interactive "e")
+  (let ((amount (if (memq 'shift (event-modifiers event))
+		    (car gnus-wheel-scroll-amount)
+		  (cdr gnus-wheel-scroll-amount)))
+	(direction (- (* (event-button event) 2) 9))
+	edge)
+    (gnus-summary-scroll-up (* amount direction))
+    (when (gnus-eval-in-buffer-window gnus-article-buffer
+	    (save-restriction 
+	      (widen) 
+	      (and (if (< 0 direction)
+		       (gnus-article-next-page 0)
+		     (gnus-article-prev-page 0)
+		     (bobp))
+		   (if (setq edge (get-text-property 
+				   (point-min) 'gnus-wheel-edge))
+		       (setq edge (* edge direction))
+		     (setq edge -1))
+		   (or (plusp edge)
+		       (progn
+			 (put-text-property (point-min) (point-max) 
+					    'gnus-wheel-edge direction)
+			 nil))
+		   (or (> edge gnus-wheel-edge-resistance)
+		       (progn
+			 (put-text-property (point-min) (point-max) 
+					    'gnus-wheel-edge 
+					    (* (1+ edge) direction))
+			 nil))
+		   (eq last-command 'gnus-wheel-summary-scroll))
+	      ))
+      (gnus-summary-next-article nil nil (minusp direction)))
+    ))
+
+(defun gnus-wheel-install ()
+  "Enable mouse wheel support on summary window."
+  (when gnus-use-wheel
+    (let ((keys 
+	   '([(mouse-4)] [(shift mouse-4)] [(mouse-5)] [(shift mouse-5)])))
+      (dolist (key keys)
+	(define-key gnus-summary-mode-map key
+	  'gnus-wheel-summary-scroll)))))
+
+(add-hook 'gnus-summary-mode-hook 'gnus-wheel-install)
 
 ;;;
 ;;; with article
