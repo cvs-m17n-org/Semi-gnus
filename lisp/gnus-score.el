@@ -437,21 +437,57 @@ of the last successful match.")
 
 (defconst gnus-header-index
   ;; Name to index alist.
-  '(("number" 0 gnus-score-integer)
-    ("subject" 1 gnus-score-string)
-    ("from" 2 gnus-score-string)
-    ("date" 3 gnus-score-date)
-    ("message-id" 4 gnus-score-string)
-    ("references" 5 gnus-score-string)
-    ("chars" 6 gnus-score-integer)
-    ("lines" 7 gnus-score-integer)
-    ("xref" 8 gnus-score-string)
-    ("extra" 9 gnus-score-string)
+  `(("number"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'location)
+     gnus-score-integer)
+    ("subject"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'subject)
+     gnus-score-string)
+    ("from"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'from)
+     gnus-score-string)
+    ("date"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'date)
+     gnus-score-date)
+    ("message-id"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'id)
+     gnus-score-string)
+    ("references"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'references)
+     gnus-score-string)
+    ("chars"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'chars)
+     gnus-score-integer)
+    ("lines"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'lines)
+     gnus-score-integer)
+    ("xref"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'xref)
+     gnus-score-string)
+    ("extra"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'extra)
+     gnus-score-string)
     ("head" -1 gnus-score-body)
     ("body" -1 gnus-score-body)
     ("all" -1 gnus-score-body)
-    ("followup" 2 gnus-score-followup)
-    ("thread" 5 gnus-score-thread)))
+    ("followup"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'from)
+     gnus-score-followup)
+    ("thread"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'references)
+     gnus-score-thread)))
 
 ;;; Summary mode score maps.
 
@@ -1342,7 +1378,7 @@ EXTRA is the possible non-standard header."
       (while cache
 	(current-buffer)
 	(setq entry (pop cache)
-	      file (nnheader-translate-file-chars (car entry) t)
+	      file (nnheader-translate-file-chars (car entry))
 	      score (cdr entry))
 	(if (or (not (equal (gnus-score-get 'touched score) '(t)))
 		(gnus-score-get 'read-only score)
@@ -1981,7 +2017,14 @@ EXTRA is the possible non-standard header."
 	    ;; Do exact matching.
 	    (goto-char (point-min))
 	    (while (and (not (eobp))
-			(funcall search-func match nil t))
+			(condition-case err
+			    (funcall search-func match nil t)
+			  (error 
+			   (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				       err (cadaar alist))
+			   (gnus-score-set 'touched '(t) alist)
+			   (setcdr entries (cddr entries))
+			   nil)))
 	      ;; Is it really exact?
 	      (and (eolp)
 		   (= (gnus-point-at-bol) (match-beginning 0))
@@ -2026,7 +2069,14 @@ EXTRA is the possible non-standard header."
 	    (when (string= match "")
 	      (setq match "\n"))
 	    (while (and (not (eobp))
-			(funcall search-func match nil t))
+			(condition-case err
+			    (funcall search-func match nil t)
+			  (error 
+			   (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				       err (cadaar alist))
+			   (gnus-score-set 'touched '(t) alist)
+			   (setcdr entries (cddr entries))
+			   nil)))
 	      (goto-char (match-beginning 0))
 	      (end-of-line)
 	      (setq found (setq arts (get-text-property (point) 'articles)))
@@ -2073,7 +2123,14 @@ EXTRA is the possible non-standard header."
 	       found)
 	  (goto-char (point-min))
 	  (while (and (not (eobp))
-		      (search-forward match nil t))
+		      (condition-case err
+			  (search-forward match nil t)
+			(error 
+			 (gnus-error 3.2 "Problem with score data: %s, remove this entry %s"
+				     err (cadaar fuzzies))
+			       (gnus-score-set 'touched '(t) (cdar fuzzies))
+			       (setcdr (caar fuzzies) (cddaar fuzzies))
+			       nil)))
 	    (when (and (= (gnus-point-at-bol) (match-beginning 0))
 		       (eolp))
 	      (setq found (setq arts (get-text-property (point) 'articles)))
@@ -2153,11 +2210,20 @@ EXTRA is the possible non-standard header."
 	(progn
 	  (set-syntax-table gnus-adaptive-word-syntax-table)
 	  (while (re-search-forward "\\b\\w+\\b" nil t)
-	    (setq val
-		  (gnus-gethash
-		   (setq word (downcase (buffer-substring
-					 (match-beginning 0) (match-end 0))))
+	    (condition-case err
+		(progn
+		  (setq val
+			(gnus-gethash
+			 (setq word (downcase
+				     (buffer-substring
+				      (match-beginning 0) (match-end 0))))
+			 hashtb))
+		  (gnus-sethash
+		   word
+		   (append (get-text-property (gnus-point-at-eol) 'articles)
+			   val)
 		   hashtb))
+	      (error (gnus-error 1.1 "%s" err)))
 	    (gnus-sethash
 	     word
 	     (append (get-text-property (gnus-point-at-eol) 'articles) val)
