@@ -100,7 +100,7 @@ all.  This may very well take some time.")
       (let ((file nil)
 	    (number (length sequence))
 	    (count 0)
-	    (pathname-coding-system 'binary)
+	    (pathname-coding-system nnheader-pathname-coding-system)
 	    beg article)
 	(if (stringp (car sequence))
 	    'headers
@@ -163,7 +163,7 @@ all.  This may very well take some time.")
 (deffoo nnml-request-article (id &optional group server buffer)
   (nnml-possibly-change-directory group server)
   (let* ((nntp-server-buffer (or buffer nntp-server-buffer))
-	 (pathname-coding-system 'binary)
+	 (pathname-coding-system nnheader-pathname-coding-system)
 	 path gpath group-num)
     (if (stringp id)
 	(when (and (setq group-num (nnml-find-group-number id))
@@ -192,7 +192,7 @@ all.  This may very well take some time.")
 	    (string-to-int (file-name-nondirectory path)))))))
 
 (deffoo nnml-request-group (group &optional server dont-check)
-  (let ((pathname-coding-system 'binary))
+  (let ((pathname-coding-system nnheader-pathname-coding-system))
     (cond
      ((not (nnml-possibly-change-directory group server))
       (nnheader-report 'nnml "Invalid group (no such directory)"))
@@ -248,10 +248,7 @@ all.  This may very well take some time.")
 
 (deffoo nnml-request-list (&optional server)
   (save-excursion
-    (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (pathname-coding-system 'binary)) ; for XEmacs/mule
-      (nnmail-find-file nnml-active-file)
-      )
+    (nnmail-find-active-file nnml-active-file)
     (setq nnml-group-alist (nnmail-get-active))
     t))
 
@@ -568,7 +565,7 @@ all.  This may very well take some time.")
   (if (not group)
       t
     (let ((pathname (nnmail-group-pathname group nnml-directory))
-	  (pathname-coding-system 'binary))
+	  (pathname-coding-system nnheader-pathname-coding-system))
       (when (not (equal pathname nnml-current-directory))
 	(setq nnml-current-directory pathname
 	      nnml-current-group group
