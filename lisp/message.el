@@ -2705,7 +2705,8 @@ give as trustworthy answer as possible."
 	   (string-match "\\." mail-host-address))
       mail-host-address)
      ;; We try `user-mail-address' as a backup.
-     ((and (string-match "\\." user-mail)
+     ((and user-mail
+	   (string-match "\\." user-mail)
 	   (string-match "@\\(.*\\)\\'" user-mail))
       (match-string 1 user-mail))
      ;; Default to this bogus thing.

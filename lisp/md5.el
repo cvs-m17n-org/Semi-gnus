@@ -91,7 +91,7 @@
 
 ;;; Code: ---------------------------------------------------------------------
 
-(defvar md5-program "md5"
+(defvar md5-program "md5sum"
   "*Program that reads a message on its standard input and writes an
 MD5 digest on its output.")
 
