@@ -269,7 +269,7 @@ Modify to suit your needs."))
     (with-temp-buffer
       (let ((standard-output (current-buffer)))
 	(Custom-make-dependencies "."))
-      (message (buffer-string)))
+      (message "%s" (buffer-string)))
     (require 'cus-load)
     (byte-compile-file "custom-load.el")
 

@@ -563,6 +563,8 @@ If PROPS, insert the result."
 	(symbol-value (intern (format "gnus-%s-line-format-alist" type)))
 	insertable)))
 
+(gnus-ems-redefine)
+
 (provide 'gnus-spec)
 
 ;; Local Variables:

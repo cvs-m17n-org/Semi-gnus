@@ -64,7 +64,7 @@ Argument PROMPT ."
 	      (1+ (- (length msg) (window-width (minibuffer-window)))))
 	(and (> truncate 0)
 	     (setq msg (concat "$" (substring msg (1+ truncate))))))
-      (message msg)
+      (message "%s" msg)
       (setq c (read-pw-read-char-exclusive))
       (cond ((eq ?\C-g c)
 	     (setq quit-flag t

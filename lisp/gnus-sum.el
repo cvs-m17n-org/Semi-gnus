@@ -2995,7 +2995,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
   "Query where the respool algorithm would put this article."
   (interactive)
   (gnus-summary-select-article)
-  (message (gnus-general-simplify-subject (gnus-summary-article-subject))))
+  (message "%s"
+	   (gnus-general-simplify-subject (gnus-summary-article-subject))))
 
 (defun gnus-gather-threads-by-subject (threads)
   "Gather threads by looking at Subject headers."

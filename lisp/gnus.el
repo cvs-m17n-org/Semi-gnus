@@ -268,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.14.1"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "03"
+(defconst gnus-revision-number "04"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "5.8.3"
@@ -2112,8 +2112,8 @@ STRINGS will be evaluated in normal `or' order."
 If ARG, insert string at point."
   (interactive "P")
   (if arg
-      (insert (message gnus-version))
-    (message gnus-version)))
+      (insert (message "%s" gnus-version))
+    (message "%s" gnus-version)))
 
 (defun gnus-continuum-version (version)
   "Return VERSION as a floating point number."

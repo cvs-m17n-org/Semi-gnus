@@ -126,8 +126,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (message "Retrieving message list...")
     (setq messages (pop3-get-message-numbers process)
 	  message-count (length (cdr messages)))
-    (message (format "Retrieving message list...%d of %d unread"
-		     message-count (pop messages)))
+    (message "Retrieving message list...%d of %d unread"
+	     message-count (pop messages))
     (unwind-protect
 	(unless (not (stringp crashbox))
 	  (while messages
@@ -148,8 +148,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	  ;; now delete the messages we have retrieved
 	  (unless pop3-leave-mail-on-server
 	    (dolist (n retrieved-messages)
-	      (message (format "Deleting message %d of %d from %s..."
-			       n message-count pop3-mailhost))
+	      (message "Deleting message %d of %d from %s..."
+		       n message-count pop3-mailhost)
 	      (pop3-dele process n)))
 	  )
       (pop3-quit process))
