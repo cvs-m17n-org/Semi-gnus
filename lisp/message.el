@@ -1407,6 +1407,7 @@ Point is left at the beginning of the narrowed-to region."
 
   (define-key message-mode-map "\t" 'message-tab)
 
+  (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
   (define-key message-mode-map "\C-xk" 'message-kill-buffer))
 
 (easy-menu-define
@@ -4545,6 +4546,21 @@ regexp varstr."
 				 (eq encoding '7bit))))
 	      (mm-insert-rfc822-headers charset encoding))
 	    (mm-encode-body)))))))
+
+(defvar message-save-buffer " *encoding")
+(defun message-save-drafts ()
+  (interactive)
+  (if (not (get-buffer message-save-buffer))
+      (get-buffer-create message-save-buffer))
+  (let ((filename buffer-file-name)
+	(buffer (current-buffer)))
+    (set-buffer message-save-buffer)
+    (erase-buffer)
+    (insert-buffer buffer)
+    (mime-edit-translate-buffer)
+    (write-region (point-min) (point-max) filename)
+    (set-buffer buffer)
+    (set-buffer-modified-p nil)))
 
 (run-hooks 'message-load-hook)
 
