@@ -6,7 +6,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 1.51
+;;; Version: 1.52
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -114,7 +114,7 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "1.51")
+(defconst gnus-offline-version-number "1.52")
 (defconst gnus-offline-codename
 ;;  "You may be right"		; 1.40
 ;;  "Chilstie Lee"		; 1.45
@@ -122,8 +122,8 @@
 ;;  "Easy money"		; 1.47
 ;;  "An Innocent man"		; 1.48
 ;;  "Tell her about it"		; 1.50
-  "This night"			; 1.51
-;;  "Movin'out"
+;;  "This night"		; 1.51
+  "Movin'out"			; 1.52
 ;;  "Longest night"
 ;;  "Leave a tender moment alone"
 ;;  "Back in the U.S.S.R"
@@ -222,7 +222,7 @@ smtp means use smtp.el.
   :type '(choice (const smtp)
 		 (const sendmail)))
 
-(defcustom gnus-offline-drafts-queue-type 'miee
+(defcustom gnus-offline-drafts-queue-type 'agent
   "*Type of to queue drafts method.
 'miee means drafts are queued and sent by miee.el.
 'agent means drafts are queued and sent by gnus-agent.el"
@@ -326,8 +326,15 @@ If value is nil , dialup line is disconnected status.")
   
   ;; Spool directory setting - Miee
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (setq sendmail-to-spool-directory gnus-offline-mail-spool-directory
-	    news-spool-request-post-directory gnus-offline-news-spool-directory))
+      (progn
+	(if (not (file-exists-p gnus-offline-mail-spool-directory))
+	    (progn
+	      (make-directory gnus-offline-mail-spool-directory t)
+	      (setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)))
+	(if (not (file-exists-p gnus-offline-news-spool-directory))
+	    (progn
+	      (make-directory gnus-offline-news-spool-directory t)
+	      (setq news-spool-request-post-directory gnus-offline-news-spool-directory)))))
   
   ;; When startup ... state is offline.
   (setq gnus-nntp-service nil
