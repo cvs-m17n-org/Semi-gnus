@@ -1,3 +1,12 @@
+1999-08-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-split-it): Match whole word for getting
+	group name with `\N'.
+
 1999-08-19  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
@@ -25,7 +34,7 @@
 	(gnus-insert-next-page-button, gnus-insert-prev-page-button):
 	Succeed to the value of the text property `mime-view-situation' in
 	the Next/Prev buttons; make `gnus-{next|prev}-page-map' have the
-	current local map as an parent under FSF Emacsen.
+	current local map as a parent under FSF Emacsen.
 
 1999-08-18  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
