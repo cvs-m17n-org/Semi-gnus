@@ -7767,7 +7767,7 @@ If ARG is a negative number, hide the unwanted header lines."
 (defun gnus-summary-show-all-headers ()
   "Make all header lines visible."
   (interactive)
-  (gnus-article-show-all-headers))
+  (gnus-summary-toggle-header 1))
 
 (defun gnus-summary-toggle-mime (&optional arg)
   "Toggle MIME processing.
