@@ -1593,6 +1593,16 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	      his nil)))
     found))
 
+(defun nnmail-new-mail-numbers (group)
+  "Say how many articles has been incorporated to GROUP."
+  (let ((his (apply 'append nnmail-split-history))
+	numbers)
+    (while his
+      (when (string= group (caar his))
+	(push (cdar his) numbers))
+      (setq his (cdr his)))
+    numbers))
+
 (defun nnmail-within-headers-p ()
   "Check to see if point is within the headers of a unix mail message.
 Doesn't change point."
