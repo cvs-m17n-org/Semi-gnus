@@ -987,10 +987,6 @@ See the manual for details."
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)))
 
-(unless gnus-xemacs
-  (set-alist 'gnus-treatment-function-alist
-	     'gnus-treat-display-smileys '(smiley-buffer)))
-
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
 (defvar gnus-article-current-summary nil)
