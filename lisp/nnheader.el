@@ -103,9 +103,9 @@ on your system, you could say something like:
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
 (defalias 'nnheader-decode-subject
-  (mime-find-field-decoder 'Subject 'unfolding))
+  (mime-find-field-decoder 'Subject 'nov))
 (defalias 'nnheader-decode-from
-  (mime-find-field-decoder 'From 'unfolding))
+  (mime-find-field-decoder 'From 'nov))
 
 (defsubst make-full-mail-header (&optional number subject from date id
 					   references chars lines xref)
