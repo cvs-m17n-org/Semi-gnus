@@ -84,7 +84,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.21")
+(defconst pop3-fma-version-number "1.00")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
