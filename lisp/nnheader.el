@@ -257,20 +257,27 @@ on your system, you could say something like:
 	(goto-char (point-min))
 	(delete-char 1)))))
 
-(defmacro nnheader-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
+(defmacro nnheader-nov-next-field ()
+  ;; Go to the beginning of the next field and returns a point of
+  ;; the end of the current field.
+  '(if (search-forward "\t" eol t)
+       (1- (point))
+     eol))
 
 (defmacro nnheader-nov-field ()
-  '(buffer-substring (point) (if (nnheader-nov-skip-field) (1- (point)) eol)))
+  '(buffer-substring (point) (nnheader-nov-next-field)))
 
 (defmacro nnheader-nov-read-integer ()
-  '(prog1
-       (if (eq (char-after) ?\t)
-	   0
-	 (let ((num (ignore-errors (read (current-buffer)))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
+  '(let ((field (buffer-substring (point) (nnheader-nov-next-field))))
+     (if (string-match "^[0-9]+$" field)
+	 (string-to-number field)
+       0)))
+
+(defmacro nnheader-nov-read-message-id ()
+  '(let ((id (buffer-substring (point) (nnheader-nov-next-field))))
+     (if (string-match "^<[^>]+>$" id)
+	 id
+       (nnheader-generate-fake-message-id))))
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -279,8 +286,7 @@ on your system, you could say something like:
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
      (nnheader-nov-field)		; date
-     (or (nnheader-nov-field)
-	 (nnheader-generate-fake-message-id)) ; id
+     (nnheader-nov-read-message-id)	; id
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines

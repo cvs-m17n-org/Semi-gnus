@@ -3022,24 +3022,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
-;; The following macros and functions were written by Felix Lee
-;; <flee@cse.psu.edu>.
-
-(defmacro gnus-nov-read-integer ()
-  '(prog1
-       (if (eq (char-after) ?\t)
-	   0
-	 (let ((num (ignore-errors (read buffer))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
-
-(defmacro gnus-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
-
-(defmacro gnus-nov-field ()
-  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
-
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
@@ -3056,17 +3038,16 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 	  (setq header
 		(make-full-mail-header
-		 number			; number
-		 (gnus-nov-field)	; subject
-		 (gnus-nov-field)	; from
-		 (gnus-nov-field)	; date
-		 (or (gnus-nov-field)
-		     (nnheader-generate-fake-message-id)) ; id
-		 (gnus-nov-field)	; refs
-		 (gnus-nov-read-integer) ; chars
-		 (gnus-nov-read-integer) ; lines
-		 (unless (= (following-char) ?\n)
-		   (gnus-nov-field)))))	; misc
+		 number				; number
+		 (nnheader-nov-field)		; subject
+		 (nnheader-nov-field)		; from
+		 (nnheader-nov-field)		; date
+		 (nnheader-nov-read-message-id)	; id
+		 (nnheader-nov-field)		; refs
+		 (nnheader-nov-read-integer)	; chars
+		 (nnheader-nov-read-integer)	; lines
+		 (unless (eobp)
+		   (nnheader-nov-field)))))	; misc
 
       (widen))
 
