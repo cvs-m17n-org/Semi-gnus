@@ -1,3 +1,7 @@
+2004-08-02  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el (slanted): Rename @s to @slanted.
+
 2004-07-29  KOSEKI Yoshinori  <kose@meadowy.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/make-directory-table): Fix
