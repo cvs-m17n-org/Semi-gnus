@@ -541,8 +541,7 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook
-  '(message-maybe-setup-default-charset turn-on-mime-edit)
+(defcustom message-setup-hook '(turn-on-mime-edit)
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
@@ -1385,7 +1384,10 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-z" 'message-kill-to-signature)
   (define-key message-mode-map "\M-\r" 'message-newline-and-reformat)
 
-  (define-key message-mode-map "\t" 'message-tab))
+  (define-key message-mode-map "\t" 'message-tab)
+
+  (substitute-key-definition 'kill-buffer 'message-kill-buffer
+			     message-mode-map))
 
 (easy-menu-define
  message-mode-menu message-mode-map "Message Menu."
@@ -2073,7 +2075,7 @@ The text will also be indented the normal way."
   (when (or (not (buffer-modified-p))
 	    (eq t message-kill-buffer-query-function)
 	    (funcall message-kill-buffer-query-function
-		     "Message modified; kill anyway? "))
+		     "The buffer modified; kill anyway? "))
     (let ((actions message-kill-actions)
 	  (frame (selected-frame))
 	  (org-frame message-original-frame))
@@ -3146,138 +3148,26 @@ give as trustworthy answer as possible."
 (defvar xemacs-codename)
 (defvar gnus-inviolable-extended-version)
 
-(defun message-make-user-agent (&optional max-column)
-  "Return user-agent info. If the optional arg MAX-COLUMN is specified,
-the return value will be folded up in the proper way."
-  (let ((user-agent
-	 (or
-	  (if (eq message-encoding-buffer (current-buffer))
-	      (save-excursion
-		(save-restriction
-		  (message-narrow-to-headers)
-		  (let ((case-fold-search t)
-			(inhibit-read-only t)
-			buffer-read-only start value)
-		    (when (and (not (re-search-forward
-				     "^Resent-User-Agent" nil t))
-			       (re-search-forward "^User-Agent:" nil t))
-		      (setq start (match-beginning 0)
-			    value (buffer-substring-no-properties
-				   (match-end 0) (std11-field-end)))
-		      (when (string-match "^[\n\t ]+" value)
-			(setq value (substring value (match-end 0))))
-		      (when (string-match "[\n\t ]+$" value)
-			(setq value
-			      (substring value 0 (match-beginning 0))))
-		      (when (boundp 'gnus-inviolable-extended-version)
-			(unless (string-match
-				 (concat
-				  "^" (regexp-quote
-				       gnus-inviolable-extended-version))
-				 value)
-			  (delete-region start (1+ (point)))))
-		      (if (string-equal "" value)
-			  nil
-			value))))))
-	  (concat
-	   ;; SEMI: '("SEMI" "CODENAME" V1 V2 V3)
-	   (format "%s/%s (%s)"
-		   (nth 0 mime-user-interface-version)
-		   (mapconcat #'number-to-string
-			      (cdr (cdr mime-user-interface-version))
-			      ".")
-		   (nth 1 mime-user-interface-version))
-	   ;; FLIM: "FLIM VERSION - \"CODENAME\"[...]"
-	   (if (string-match
-		"\\`\\([^ ]+\\) \\([^ ]+\\) - \"\\([^\"]+\\)\"\\(.*\\)\\'"
-		mime-library-version-string)
-	       (format " %s/%s (%s%s)"
-		       (match-string 1 mime-library-version-string)
-		       (match-string 2 mime-library-version-string)
-		       (match-string 3 mime-library-version-string)
-		       (match-string 4 mime-library-version-string))
-	     " FLIM")
-	   "\n "
-	   ;; EMACS/VERSION
-	   (if (featurep 'xemacs)
-	       ;; XEmacs
-	       (concat
-		(format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
-		(if (and (boundp 'emacs-beta-version) emacs-beta-version)
-		    (format "beta%d" emacs-beta-version)
-		  "")
-		(if (and (boundp 'xemacs-codename) xemacs-codename)
-		    (concat " (" xemacs-codename ")")
-		  "")
-		" (" system-configuration ")"
-		)
-	     ;; not XEmacs
-	     (concat
-	      "Emacs/"
-	      (let ((versions (split-string emacs-version "\\.")))
-		(mapconcat 'identity
-			   (if (> (length versions) 2)
-			       (nreverse (cdr (nreverse versions)))
-			     versions)
-			   "."))
-	      (if (>= emacs-major-version 20)
-		  (if (and (boundp 'enable-multibyte-characters)
-			   enable-multibyte-characters)
-		      ""		; Should return " (multibyte)"?
-		    " (unibyte)"))
-	      " (" system-configuration ")"
-	      ))
-	   ;; MULE[/VERSION]
-	   (if (featurep 'mule)
-	       (if (and (boundp 'mule-version) mule-version)
-		   (concat " MULE/" mule-version)
-		 " MULE")		; no mule-version
-	     "")			; not Mule
-	   ;; Meadow/VERSION
-	   (if (featurep 'meadow)
-	       (let ((version (Meadow-version)))
-		 (if (string-match
-		      "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
-		     (concat " Meadow/"
-			     (match-string 1 version)
-			     (match-string 2 version)
-			     )
-		   "Meadow"))		; unknown format
-	     "")			; not Meadow
-	   ))))
-    (cond (message-user-agent
-	   (setq user-agent (concat message-user-agent "\n " user-agent)))
-	  ((boundp 'gnus-inviolable-extended-version)
-	   (setq user-agent
-		 (concat gnus-inviolable-extended-version "\n " user-agent))))
-    (if max-column
-	(let (boundary)
-	  (unless (natnump max-column) (setq max-column 76))
-	  (with-temp-buffer
-	    (insert "            " user-agent)
-	    (goto-char 13)
-	    (while (re-search-forward "[\n\t ]+" nil t)
-	      (replace-match " "))
-	    (goto-char 13)
-	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
-	      (while (eq ?\( (char-after (point)))
-		(forward-list)
-		(skip-chars-forward " "))
-	      (skip-chars-backward " ")
-	      (if (> (current-column) max-column)
-		  (progn
-		    (if (or (not boundary) (eq ?\n (char-after boundary)))
-			(progn
-			  (setq boundary (point))
-			  (unless (eobp)
-			    (delete-char 1)
-			    (insert "\n ")))
-		      (goto-char boundary)
-		      (delete-char 1)
-		      (insert "\n ")))
-		(setq boundary (point))))
-	    (buffer-substring 13 (point-max))))
-      user-agent)))
+(defun message-make-user-agent ()
+  "Return user-agent info if the value `message-user-agent' is non-nil and the
+\"User-Agent\" field which includes the same value of `message-user-agent' does
+not exist in the narrowed header."
+  (when message-user-agent
+    (save-excursion
+      (goto-char (point-min))
+      (let ((case-fold-search t)
+	    user-agent start p end)
+	(if (re-search-forward "^User-Agent:[\t ]*" nil t)
+	    (progn
+	      (setq start (match-beginning 0)
+		    p (match-end 0)
+		    end (std11-field-end)
+		    user-agent (buffer-substring-no-properties p end))
+	      (unless (string-match (regexp-quote message-user-agent)
+				    user-agent)
+		(delete-region start (1+ end))
+		(concat message-user-agent " " user-agent)))
+	  message-user-agent)))))
 
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
