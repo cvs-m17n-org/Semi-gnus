@@ -12001,6 +12001,10 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 すると、gnus は新しいメールソースを一回だけ調べるようになります。これは、
 指定したレベルのメールグループだけを調べたいときに、とりわけ便利です。
 
+@code{nnmail-resplit-incoming} という変数もあり、これを非-@code{nil} に
+すると通常の分割処理がディレクトリー中のすべてのファイルに対して行なわれ
+ます。
+
 キーワード:
 
 @table @code
