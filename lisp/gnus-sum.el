@@ -873,6 +873,21 @@ automatically when it is selected."
   :group 'gnus-summary
   :type 'hook)
 
+(defcustom gnus-summary-article-move-hook nil
+  "*A hook called after an article is moved, copied, respooled, or crossposted."
+  :group 'gnus-summary
+  :type 'hook)
+
+(defcustom gnus-summary-article-delete-hook nil
+  "*A hook called after an article is deleted."
+  :group 'gnus-summary
+  :type 'hook)
+
+(defcustom gnus-summary-article-expire-hook nil
+  "*A hook called after an article is expired."
+  :group 'gnus-summary
+  :type 'hook)
+
 (defcustom gnus-summary-display-arrow
   (and (fboundp 'display-graphic-p)
        (display-graphic-p))
@@ -1410,26 +1425,24 @@ buffers. For example:
 
 (defun gnus-simplify-whitespace (str)
   "Remove excessive whitespace from STR."
-  (let ((mystr str))
-    ;; Multiple spaces.
-    (while (string-match "[ \t][ \t]+" mystr)
-      (setq mystr (concat (substring mystr 0 (match-beginning 0))
-			  " "
-			  (substring mystr (match-end 0)))))
-    ;; Leading spaces.
-    (when (string-match "^[ \t]+" mystr)
-      (setq mystr (substring mystr (match-end 0))))
-    ;; Trailing spaces.
-    (when (string-match "[ \t]+$" mystr)
-      (setq mystr (substring mystr 0 (match-beginning 0))))
-    mystr))
+  ;; Multiple spaces.
+  (while (string-match "[ \t][ \t]+" str)
+    (setq str (concat (substring str 0 (match-beginning 0))
+			" "
+			(substring str (match-end 0)))))
+  ;; Leading spaces.
+  (when (string-match "^[ \t]+" str)
+    (setq str (substring str (match-end 0))))
+  ;; Trailing spaces.
+  (when (string-match "[ \t]+$" str)
+    (setq str (substring str 0 (match-beginning 0))))
+  str)
 
 (defun gnus-simplify-all-whitespace (str)
   "Remove all whitespace from STR."
-  (let ((mystr str))
-    (while (string-match "[ \t\n]+" mystr)
-      (setq mystr (replace-match "" nil nil mystr)))
-    mystr))
+  (while (string-match "[ \t\n]+" str)
+    (setq str (replace-match "" nil nil str)))
+  str)
 
 (defsubst gnus-simplify-subject-re (subject)
   "Remove \"Re:\" from subject lines."
@@ -2344,7 +2357,8 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	 ["Kill" gnus-summary-kill-process-mark t]
 	 ["Yank" gnus-summary-yank-process-mark
 	  gnus-newsgroup-process-stack]
-	 ["Save" gnus-summary-save-process-mark t]))
+	 ["Save" gnus-summary-save-process-mark t]
+	 ["Run command on marked..." gnus-summary-universal-argument t]))
        ("Scroll article"
 	["Page forward" gnus-summary-next-page
 	 ,@(if (featurep 'xemacs) '(t)
@@ -2399,7 +2413,7 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
        ["See old articles" gnus-summary-insert-old-articles t]
        ["See new articles" gnus-summary-insert-new-articles t]
        ["Filter articles..." gnus-summary-execute-command t]
-       ["Run command on subjects..." gnus-summary-universal-argument t]
+       ["Run command on articles..." gnus-summary-universal-argument t]
        ["Search articles forward..." gnus-summary-search-article-forward t]
        ["Search articles backward..." gnus-summary-search-article-backward t]
        ["Toggle line truncation" gnus-summary-toggle-truncation t]
@@ -4945,13 +4959,13 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	(gnus-activate-group group)	; Or we can activate it...
 	(progn				; Or we bug out.
 	  (when (equal major-mode 'gnus-summary-mode)
-	    (kill-buffer (current-buffer)))
+	    (gnus-kill-buffer (current-buffer)))
 	  (error "Couldn't activate group %s: %s"
 		 group (gnus-status-message group))))
 
     (unless (gnus-request-group group t)
       (when (equal major-mode 'gnus-summary-mode)
-	(kill-buffer (current-buffer)))
+	(gnus-kill-buffer (current-buffer)))
       (error "Couldn't request group %s: %s"
 	     group (gnus-status-message group)))
 
@@ -6116,18 +6130,18 @@ displayed, no centering will be performed."
   ;; Suggested by earle@mahendo.JPL.NASA.GOV (Greg Earle).
   ;; Recenter only when requested.  Suggested by popovich@park.cs.columbia.edu.
   (interactive)
-  (let* ((top (cond ((< (window-height) 4) 0)
-		    ((< (window-height) 7) 1)
-		    (t (if (numberp gnus-auto-center-summary)
-			   gnus-auto-center-summary
-			 2))))
-	 (height (1- (window-height)))
-	 (bottom (save-excursion (goto-char (point-max))
-				 (forward-line (- height))
-				 (point)))
-	 (window (get-buffer-window (current-buffer))))
-    ;; The user has to want it.
-    (when gnus-auto-center-summary
+  ;; The user has to want it.
+  (when gnus-auto-center-summary
+    (let* ((top (cond ((< (window-height) 4) 0)
+		      ((< (window-height) 7) 1)
+		      (t (if (numberp gnus-auto-center-summary)
+			     gnus-auto-center-summary
+			   2))))
+	   (height (1- (window-height)))
+	   (bottom (save-excursion (goto-char (point-max))
+				   (forward-line (- height))
+				   (point)))
+	   (window (get-buffer-window (current-buffer))))
       (when (get-buffer-window gnus-article-buffer)
 	;; Only do recentering when the article buffer is displayed,
 	;; Set the window start to either `bottom', which is the biggest
@@ -7966,16 +7980,16 @@ of what's specified by the `gnus-refer-thread-limit' variable."
   (let ((id (mail-header-id (gnus-summary-article-header)))
 	(limit (if limit (prefix-numeric-value limit)
 		 gnus-refer-thread-limit)))
-    ;; We want to fetch LIMIT *old* headers, but we also have to
-    ;; re-fetch all the headers in the current buffer, because many of
-    ;; them may be undisplayed.  So we adjust LIMIT.
-    (when (numberp limit)
-      (incf limit (- gnus-newsgroup-end gnus-newsgroup-begin)))
     (unless (eq gnus-fetch-old-headers 'invisible)
       (gnus-message 5 "Fetching headers for %s..." gnus-newsgroup-name)
       ;; Retrieve the headers and read them in.
       (if (eq (gnus-retrieve-headers
-	       (list gnus-newsgroup-end) gnus-newsgroup-name limit)
+	       (list (min
+		      (+ (mail-header-number
+			  (gnus-summary-article-header))
+			 limit)
+		      gnus-newsgroup-end))
+	       gnus-newsgroup-name (* limit 2))
 	      'nov)
 	  (gnus-build-all-threads)
 	(error "Can't fetch thread from backends that don't support NOV"))
@@ -8307,6 +8321,12 @@ Optional argument BACKWARD means do search for backward.
 	(gnus-use-article-prefetch nil)
 	(gnus-xmas-force-redisplay nil)	;Inhibit XEmacs redisplay.
 	(gnus-use-trees nil)		;Inhibit updating tree buffer.
+	(gnus-visual nil)
+	(gnus-keep-backlog nil)
+	(gnus-break-pages nil)
+	(gnus-summary-display-arrow nil)
+	(gnus-updated-mode-lines nil)
+	(gnus-auto-center-summary nil)
 	(sum (current-buffer))
 	(found nil)
 	point treated)
@@ -8894,8 +8914,14 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 		      (nnheader-get-report (car to-method))))
        ((eq art-group 'junk)
 	(when (eq action 'move)
-	  (gnus-summary-mark-article article gnus-canceled-mark)
-	  (gnus-message 4 "Deleted article %s" article)))
+	  (let ((id (mail-header-id (gnus-data-header 
+				     (assoc article (gnus-data-list nil))))))
+	    (gnus-summary-mark-article article gnus-canceled-mark)
+	    (gnus-message 4 "Deleted article %s" article)
+	    ;; run the move/copy/crosspost/respool hook
+	    (run-hook-with-args 'gnus-summary-article-delete-hook 
+				action id gnus-newsgroup-name nil
+				select-method))))
        (t
 	(let* ((pto-group (gnus-group-prefixed-name
 			   (car art-group) to-method))
@@ -8979,7 +9005,14 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	      (gnus-request-article-this-buffer article gnus-newsgroup-name)
 	      (nnheader-replace-header "Xref" new-xref)
 	      (gnus-request-replace-article
-	       article gnus-newsgroup-name (current-buffer)))))
+	       article gnus-newsgroup-name (current-buffer))))
+
+	  ;; run the move/copy/crosspost/respool hook
+	  (let ((id (mail-header-id (gnus-data-header 
+				   (assoc article (gnus-data-list nil))))))
+	  (run-hook-with-args 'gnus-summary-article-move-hook 
+			      action id gnus-newsgroup-name to-newsgroup
+			      select-method)))
 
 	;;;!!!Why is this necessary?
 	(set-buffer gnus-summary-buffer)
@@ -9200,7 +9233,13 @@ This will be the case if the article has both been mailed and posted."
 	      (dolist (article expirable)
 		(when (and (not (memq article es))
 			   (gnus-data-find article))
-		  (gnus-summary-mark-article article gnus-canceled-mark))))))
+		  (gnus-summary-mark-article article gnus-canceled-mark)
+		  (let ((id (mail-header-id (gnus-data-header 
+					     (assoc article 
+						    (gnus-data-list nil))))))
+		    (run-hook-with-args 'gnus-summary-article-expire-hook
+					'delete id gnus-newsgroup-name nil
+					nil)))))))
 	(gnus-message 6 "Expiring articles...done")))))
 
 (defun gnus-summary-expire-articles-now ()
@@ -9249,6 +9288,12 @@ delete these instead."
 	;; after all.
 	(unless (memq (car articles) not-deleted)
 	  (gnus-summary-mark-article (car articles) gnus-canceled-mark))
+	(let* ((article (car articles))
+	       (id (mail-header-id (gnus-data-header 
+				    (assoc article (gnus-data-list nil))))))
+	  (run-hook-with-args 'gnus-summary-article-delete-hook
+			      'delete id gnus-newsgroup-name nil
+			      nil))
 	(setq articles (cdr articles)))
       (when not-deleted
 	(gnus-message 4 "Couldn't delete articles %s" not-deleted)))

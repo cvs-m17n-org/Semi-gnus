@@ -60,6 +60,10 @@
   :link '(custom-manual "(gnus)Article Caching")
   :group 'gnus)
 
+(defgroup gnus-registry nil
+  "Article Registry."
+  :group 'gnus)
+
 (defgroup gnus-start nil
   "Starting your favorite newsreader."
   :group 'gnus)
@@ -994,7 +998,7 @@ defaults to a proper value only if this file is byte-compiled by make.")
 (defmacro gnus-define-group-parameter (param &rest rest)
   "Define a group parameter PARAM.
 REST is a plist of following:
-:type               One of `bool', `list' or `nil'.
+:type               One of `bool', `list' or nil.
 :function           The name of the function.
 :function-document  The documentation of the function.
 :parameter-type     The type for customizing the parameter.
@@ -1369,7 +1373,7 @@ newsgroups."
   "*The number of articles which indicates a large newsgroup.
 If the number of articles in a newsgroup is greater than this value,
 confirmation is required for selecting the newsgroup.
-If it is `nil', no confirmation is required."
+If it is nil, no confirmation is required."
   :group 'gnus-group-select
   :type '(choice (const :tag "No limit" nil)
 		 integer))
@@ -1775,7 +1779,7 @@ posting an article."
 
 This number will be prompted as the initial value of the number of
 articles to list when the group is a large newsgroup (see
-`gnus-large-newsgroup').  If it is `nil', the default value is the
+`gnus-large-newsgroup').  If it is nil, the default value is the
 total number of articles in the group.")
 
 ;; group parameters for spam processing added by Ted Zlatanov <tzz@lifelogs.com>
@@ -1821,13 +1825,13 @@ This only makes sense for mail groups."
 			  (choice
 			   (variable-item gnus-group-spam-classification-spam)
 			   (variable-item gnus-group-spam-classification-ham)
-			   (other :tag "Unclassified" nil))))
+			   (const :tag "Unclassified" nil))))
 
    :parameter-type '(list :tag "Group contents spam/ham classification"
 			  (choice :tag "Group contents classification for spam sorting"
 				  (variable-item gnus-group-spam-classification-spam)
 				  (variable-item gnus-group-spam-classification-ham)
-				  (other :tag "Unclassified" nil)))
+				  (const :tag "Unclassified" nil)))
    :parameter-document
    "The spam classification (spam, ham, or neither) of this group.
 When a spam group is entered, all unread articles are marked as spam.")
@@ -1915,7 +1919,7 @@ for mail groups."
    spam-process-destination
    :parameter-type '(choice :tag "Destination for spam-processed articles at summary exit"
 			    (string :tag "Move to a group")
-			    (other :tag "Expire" nil))
+			    (const :tag "Expire" nil))
    :function-document
    "Where spam-processed articles will go at summary exit."
    :variable gnus-spam-process-destinations
@@ -1925,7 +1929,7 @@ for mail groups."
 another group, or expire them (the default).  If non-nil, this should
 be a list of group name regexps that should match all groups in which
 to do spam-processed article moving, associated with the destination
-group or `nil' for explicit expiration.  This only makes sense for
+group or nil for explicit expiration.  This only makes sense for
 mail groups."
    :variable-group spam
    :variable-type '(repeat 
@@ -1935,7 +1939,7 @@ mail groups."
 		     (choice 
 		      :tag "Destination for spam-processed articles at summary exit"
 		      (string :tag "Move to a group")
-		      (other :tag "Expire" nil))))
+		      (const :tag "Expire" nil))))
    :parameter-document
    "Where spam-processed articles will go at summary exit.")
 
@@ -1944,7 +1948,7 @@ mail groups."
    :parameter-type '(choice 
 		     :tag "Destination for ham articles at summary exit from a spam group"
 		     (string :tag "Move to a group")
-		     (other :tag "Do nothing" nil))
+		     (const :tag "Do nothing" nil))
    :function-document
    "Where ham articles will go at summary exit from a spam group."
    :variable gnus-ham-process-destinations
@@ -1954,7 +1958,7 @@ mail groups."
 another group, or do nothing (the default).  If non-nil, this should
 be a list of group name regexps that should match all groups in which
 to do ham article moving, associated with the destination
-group or `nil' for explicit ignoring.  This only makes sense for
+group or nil for explicit ignoring.  This only makes sense for
 mail groups, and only works in spam groups."
    :variable-group spam
    :variable-type '(repeat 
@@ -1964,7 +1968,7 @@ mail groups, and only works in spam groups."
 		     (choice 
 		      :tag "Destination for ham articles at summary exit from spam group"
 		      (string :tag "Move to a group")
-		      (other :tag "Expire" nil))))
+		      (const :tag "Expire" nil))))
    :parameter-document
    "Where ham articles will go at summary exit from a spam group."))
 
@@ -3196,14 +3200,29 @@ that that variable is buffer-local to the summary buffers."
 (defsubst gnus-method-to-full-server-name (method)
   (format "%s+%s" (car method) (nth 1 method)))
 
-(defun gnus-group-prefixed-name (group method)
-  "Return the whole name from GROUP and METHOD."
+(defun gnus-group-prefixed-name (group method &optional full)
+  "Return the whole name from GROUP and METHOD.  Call with full set to
+get the fully qualified group name (even if the server is native)."
   (and (stringp method) (setq method (gnus-server-to-method method)))
   (if (or (not method)
-	  (gnus-server-equal method "native")
+	  (and (not full) (gnus-server-equal method "native"))
 	  (string-match ":" group))
       group
     (concat (gnus-method-to-server-name method) ":" group)))
+
+(defun gnus-group-guess-prefixed-name (group)
+  "Guess the whole name from GROUP and METHOD."
+  (gnus-group-prefixed-name group (gnus-find-method-for-group
+			       group)))
+
+(defun gnus-group-full-name (group method)
+  "Return the full name from GROUP and METHOD, even if the method is
+native."
+  (gnus-group-prefixed-name group method t))
+
+(defun gnus-group-guess-full-name (group)
+  "Guess the full name from GROUP, even if the method is native."
+  (gnus-group-full-name group (gnus-find-method-for-group group)))
 
 (defun gnus-group-real-prefix (group)
   "Return the prefix of the current group name."

@@ -261,14 +261,14 @@ This variable is used only when `gnus-post-method' is `current'."
 
 (defcustom gnus-message-replysign
   nil
-  "Automatically sign replys to signed messages.
+  "Automatically sign replies to signed messages.
 See also the `mml-default-sign-method' variable."
   :group 'gnus-message
   :type 'boolean)
 
 (defcustom gnus-message-replyencrypt
   nil
-  "Automatically encrypt replys to encrypted messages.
+  "Automatically encrypt replies to encrypted messages.
 See also the `mml-default-encrypt-method' variable."
   :group 'gnus-message
   :type 'boolean)
@@ -306,6 +306,12 @@ If nil, Gnus will never ask for confirmation if replying to mail."
   "If non-nil, Gnus tries to suggest a default address to resend to.
 If nil, the address field will always be empty after invoking
 `gnus-summary-resend-message'."
+  :group 'gnus-message
+  :type 'boolean)
+
+(defcustom gnus-version-expose-system nil
+  "If non-nil, `system-configuration' is exposed in `gnus-extended-version'.
+Note that this variable is ineffective in T-gnus."
   :group 'gnus-message
   :type 'boolean)
 

@@ -131,7 +131,7 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 	(byte-optimize-form
 	 '(and
 	   (< 0 1)
-	   (message "The subform `(< 0 1)' should be optimized to `t'"))
+	   (message "The subform `(< 0 1)' should be optimized to t"))
 	 'for-effect))
        '(< 0 1))
   (defadvice byte-optimize-form-code-walker

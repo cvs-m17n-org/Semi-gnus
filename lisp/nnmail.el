@@ -1,5 +1,5 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -35,8 +35,6 @@
 (require 'mail-source)
 
 (eval-and-compile
-  (autoload 'gnus-error "gnus-util")
-  (autoload 'gnus-buffer-live-p "gnus-util")
   (autoload 'gnus-add-buffer "gnus"))
 
 (defgroup nnmail nil
@@ -166,10 +164,10 @@ can also be `immediate' and `never'."
 
 (defcustom nnmail-expiry-wait-function nil
   "Variable that holds function to specify how old articles should be before they are expired.
-  The function will be called with the name of the group that the
-expiry is to be performed in, and it should return an integer that
-says how many days an article can be stored before it is considered
-\"old\".  It can also return the values `never' and `immediate'.
+The function will be called with the name of the group that the expiry
+is to be performed in, and it should return an integer that says how
+many days an article can be stored before it is considered \"old\".
+It can also return the values `never' and `immediate'.
 
 Eg.:
 
@@ -347,6 +345,11 @@ The functions in this hook are free to modify the buffer
 contents in any way they choose -- the buffer contents are
 discarded after running the split process."
   :group 'nnmail-split
+  :type 'hook)
+
+(defcustom nnmail-spool-hook nil
+  "*A hook called when a new article is spooled."
+  :group 'nnmail
   :type 'hook)
 
 (defcustom nnmail-large-newsgroup 50
@@ -999,8 +1002,7 @@ FUNC will be called with the buffer narrowed to each mail."
 FUNC will be called with the group name to determine the article number."
   (let ((methods (or nnmail-split-methods '(("bogus" ""))))
 	(obuf (current-buffer))
-	(beg (point-min))
-	end group-art method grp)
+	group-art method grp)
     (if (and (sequencep methods)
 	     (= (length methods) 1))
 	;; If there is only just one group to put everything in, we
@@ -1009,13 +1011,17 @@ FUNC will be called with the group name to determine the article number."
 	      (list (cons (caar methods) (funcall func (caar methods)))))
       ;; We do actual comparison.
       (save-excursion
-	;; Find headers.
-	(goto-char beg)
-	(setq end (if (search-forward "\n\n" nil t) (point) (point-max)))
+	;; Copy the article into the work buffer.
 	(set-buffer nntp-server-buffer)
 	(erase-buffer)
-	;; Copy the headers into the work buffer.
-	(insert-buffer-substring obuf beg end)
+	(insert-buffer-substring obuf)
+	;; Narrow to headers.
+	(narrow-to-region
+	 (goto-char (point-min))
+	 (if (search-forward "\n\n" nil t)
+	     (point)
+	   (point-max)))
+	(goto-char (point-min))
 	;; Decode MIME headers and charsets.
 	(when nnmail-mail-splitting-decodes
 	  (mime-decode-header-in-region (point-min) (point-max)
@@ -1107,6 +1113,7 @@ FUNC will be called with the group name to determine the article number."
 	    (goto-char (point-min))
 	    (gnus-configure-windows 'split-trace)
 	    (set-buffer restore)))
+	(widen)
 	;; See whether the split methods returned `junk'.
 	(if (equal group-art '(junk))
 	    nil
@@ -1325,7 +1332,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 		;; correct match positions.
 		(re-search-backward (concat "\\<" value "\\>") start-of-value))
 	      (dolist (sp (nnmail-split-it (car split-rest)))
-		(unless (memq sp split-result)
+		(unless (member sp split-result)
 		  (push sp split-result))))))
 	split-result))
 
@@ -1470,13 +1477,15 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 			   nnmail-message-id-cache-file nil 'silent)
       (set-buffer-modified-p nil)
       (setq nnmail-cache-buffer nil)
-      (kill-buffer (current-buffer)))))
+      (gnus-kill-buffer (current-buffer)))))
 
 ;; Compiler directives.
 (defvar group)
 (defvar group-art-list)
 (defvar group-art)
 (defun nnmail-cache-insert (id grp)
+  (run-hook-with-args 'nnmail-spool-hook 
+		      id grp)
   (when nnmail-treat-duplicates
     ;; Store some information about the group this message is written
     ;; to.  This is passed in as the grp argument -- all locations this
@@ -1880,7 +1889,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
   "Remove all instances of GROUP from `nnmail-split-history'."
   (let ((history nnmail-split-history))
     (while history
-      (setcar history (gnus-delete-if (lambda (e) (string= (car e) group))
+      (setcar history (gnus-remove-if (lambda (e) (string= (car e) group))
 				      (car history)))
       (pop history))
     (setq nnmail-split-history (delq nil nnmail-split-history))))

@@ -1,7 +1,7 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002
+;;        1997, 1998, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -36,7 +36,7 @@
 
 ;; Requiring `gnus-util' at compile time creates a circular
 ;; dependency between nnheader.el and gnus-util.el.
-;(eval-when-compile (require 'gnus-util))
+;;(eval-when-compile (require 'gnus-util))
 
 (require 'mail-utils)
 
@@ -119,6 +119,10 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
    ((find-coding-system 'no-conversion) 'no-conversion)
    (t nil))
   "Coding system of auto save file.")
+
+(defvar nnheader-directory-separator-character
+  (string-to-char (substring (file-name-as-directory ".") -1))
+  "*A character used to a directory separator.")
 
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
@@ -1397,7 +1401,7 @@ without formatting."
 		     (expand-file-name
 		      (file-name-as-directory top))))
        (error "")))
-   ?/ ?.))
+   nnheader-directory-separator-character ?.))
 
 (defun nnheader-message (level &rest args)
   "Message if the Gnus backends are talkative."

@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -134,6 +134,8 @@
 (defmacro gnus-kill-buffer (buffer)
   `(let ((buf ,buffer))
      (when (gnus-buffer-exists-p buf)
+       (when (boundp 'gnus-buffers)
+	 (setq gnus-buffers (delete (get-buffer buf) gnus-buffers)))
        (kill-buffer buf))))
 
 (static-cond
@@ -658,9 +660,13 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (prin1 form (current-buffer))))
 
 (defun gnus-prin1-to-string (form)
-  "The same as `prin1', but bind `print-quoted' and `print-readably' to t."
+  "The same as `prin1'.
+Bind `print-quoted' and `print-readably' to t, and `print-length'
+and `print-level' to nil."
   (let ((print-quoted t)
-	(print-readably t))
+	(print-readably t)
+	(print-length nil)
+	(print-level nil))
     (prin1-to-string form)))
 
 (defun gnus-make-directory (directory)
@@ -953,17 +959,14 @@ with potentially long computations."
 (defun gnus-map-function (funs arg)
   "Applies the result of the first function in FUNS to the second, and so on.
 ARG is passed to the first function."
-  (let ((myfuns funs))
-    (while myfuns
-      (setq arg (funcall (pop myfuns) arg)))
-    arg))
+  (while funs
+    (setq arg (funcall (pop funs) arg)))
+  arg)
 
 (defun gnus-run-hooks (&rest funcs)
-  "Does the same as `run-hooks', but saves excursion."
-  (let ((buf (current-buffer)))
-    (unwind-protect
-	(apply 'run-hooks funcs)
-      (set-buffer buf))))
+  "Does the same as `run-hooks', but saves the current buffer."
+  (save-current-buffer
+    (apply 'run-hooks funcs)))
 
 ;;; Various
 
@@ -977,20 +980,20 @@ ARG is passed to the first function."
 	 (eq major-mode 'gnus-group-mode))))
 
 (defun gnus-remove-duplicates (list)
-  (let (new (tail list))
-    (while tail
-      (or (member (car tail) new)
-	  (setq new (cons (car tail) new)))
-      (setq tail (cdr tail)))
+  (let (new)
+    (while list
+      (or (member (car list) new)
+	  (setq new (cons (car list) new)))
+      (setq list (cdr list)))
     (nreverse new)))
 
-(defun gnus-delete-if (predicate list)
-  "Delete elements from LIST that satisfy PREDICATE."
+(defun gnus-remove-if (predicate list)
+  "Return a copy of LIST with all items satisfying PREDICATE removed."
   (let (out)
     (while list
       (unless (funcall predicate (car list))
 	(push (car list) out))
-      (pop list))
+      (setq list (cdr list)))
     (nreverse out)))
 
 (if (fboundp 'assq-delete-all)
@@ -1112,7 +1115,7 @@ Return the modified alist."
 
 (defcustom gnus-use-byte-compile t
   "If non-nil, byte-compile crucial run-time codes.
-Setting it to `nil' has no effect after first time running
+Setting it to nil has no effect after first time running
 `gnus-byte-compile'."
   :type 'boolean
   :version "21.1"

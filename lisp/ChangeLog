@@ -1,3 +1,351 @@
+2003-02-08 23:23:27 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.15 is released.
+
+2003-02-08  Michael Welsh Duggan  <md5i@cs.cmu.edu>
+
+	* nnmail.el (nnmail-split-it): If a message ends up matching the
+	  same mailbox more than once, it will cause duplicates to appear
+	  in the mailbox.
+
+2003-02-08  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-summary-select-article): Remove blink removal
+	code that only worked under Emacs.
+
+	* pgg-gpg.el (pgg-gpg-process-region): Don't blink.  From Satyaki
+	Das <satyaki@chicory.stanford.edu>.
+
+2003-02-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-refer-article): Use
+	gnus-replace-in-string.
+
+	* gnus-util.el (gnus-map-function): Remove unneeded let-binding.
+	(gnus-remove-duplicates): do.
+
+2003-02-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-int.el (gnus-internal-registry-spool-current-method): new variable
+	(gnus-request-scan): set
+	gnus-internal-registry-spool-current-method to gnus-command-method
+	before a request-scan operation
+
+	* gnus-registry.el (regtest-nnmail): use
+	gnus-internal-registry-spool-current-method
+
+	
+
+2003-02-07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-fetch): Typo fix.
+
+2003-02-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* nnmail.el (nnmail-spool-hook): new hook
+	(nnmail-cache-insert): call nnmail-spool-hook
+
+	* gnus-registry.el: new file with examples of using the hooks
+
+	* gnus.el (gnus-registry): added registry customization group
+	(gnus-group-prefixed-name): improve function to return full group
+	name optionally
+	(gnus-group-guess-prefixed-name): shortcut to
+	gnus-group-prefixed-name, using just the group name
+	(gnus-group-full-name): always get a group's full name
+	(gnus-group-guess-full-name): shortcut, using just the group name
+
+	* gnus-sum.el (gnus-summary-article-move-hook) 
+	(gnus-summary-article-delete-hook) 
+	(gnus-summary-article-expire-hook): new hooks
+	(gnus-summary-move-article, gnus-summary-expire-articles) 
+	(gnus-summary-delete-article): invoke the new hooks
+
+2003-02-07  Frank Weinberg  <frank@usenet-rundfahrt.de>
+
+        * gnus-art.el (gnus-article-refer-article): Strip leading "news:"
+          from message-ID
+
+2003-02-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-run-hooks): Use save-current-buffer.
+
+2003-02-07  John Paul Wallington  <jpw@gnu.org>
+
+	* mm-util.el (mm-delete-duplicates, mm-append-to-file)
+	(mm-write-region, mm-detect-coding-region): Doc fixes.
+
+2003-02-07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-fetch): Ignore errors.
+	(mail-source-ignore-errors): New variable.
+
+	* gnus-sum.el (gnus-summary-refer-thread): Don't re-fetch current
+	articles. 
+
+	* gnus-msg.el (gnus-version-expose-system): Change default.
+
+2003-02-07  Vasily Korytov  <deskpot@myrealbox.com>
+
+	* gnus-msg.el (gnus-version-expose-system): New variable.
+
+2003-02-07  Simon Josefsson  <jas@extundo.com>
+
+	* mml-sec.el (mml-unsecure-message): Don't use kill-region.  Tiny
+	patch from deskpot@myrealbox.com (Vasily Korytov).
+
+2003-02-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (article-display-face): Get the Face header from
+	the current buffer.
+
+2003-02-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-art.el (gnus-mime-view-part-internally): Bind
+	buffer-read-only to nil.
+
+2003-02-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-agent.el (gnus-agent-expire-1,2): Pass the dir argument
+	from g-a-e-1 to g-a-e-2.
+
+2003-02-05  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-check-BBDB): no need to regexp-quote the argument
+	of bbdb-search-simple, use spam-use-BBDB-exclusive
+	(spam-check-whitelist): use spam-use-whitelist-exclusive
+	(spam-use-whitelist-exclusive): new variable affecting
+	spam-use-whitelist
+	(spam-use-BBDB-exclusive): new variable affecting spam-use-BBDB
+
+2003-02-05  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-agent.el (gnus-agent-expire-days): Change default to nil.
+	(gnus-agent-expire): Don't expire if g-a-e-d is nil.
+	(gnus-agent-expire): Move most code into gnus-agent-expire-1.
+	(gnus-agent-expire-1): New.
+	(gnus-agent-expire-1): Move code into gnus-agent-expire-2.
+	(gnus-agent-expire-2): New.
+
+2003-02-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-delete-if): Rename to gnus-remove-if.
+	"delete-if" is misleading because it isn't actually destructive.
+
+	* gnus-topic.el (gnus-group-prepare-topics): Use new name.
+	
+	* nnmail.el (nnmail-purge-split-history): do.
+
+	* gnus-win.el (gnus-get-buffer-window): do.
+	
+	* gnus-sum.el (gnus-simplify-whitespace): Remove unnecessary
+	let-binding.
+	(gnus-simplify-all-whitespace): do.
+
+2003-02-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-delay.el (gnus-delay-article): Fix binding of the
+	nndraft:delayed group.
+
+2003-02-04  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.el (spam group parameters): change 'other to 'const in
+	the group parameter definitions to soothe XEmacs
+
+2003-02-04  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-delay.el (gnus-delay-article): Really create
+	nndraft:delayed group if it doesn't exist.
+
+2003-02-04  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-search-article): Speed up by
+	disabling various visual features while searching.
+	(gnus-summary-recenter): Test gnus-auto-center-summary first.
+
+2003-02-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* spam.el (spam-list-of-checks): Don't quote nil and t in
+	docstrings.  From the elisp manual:
+
+	   When a documentation string refers to a Lisp symbol, write
+	   it [..] with single-quotes around it.  [..] There are two
+	   exceptions: write t and nil without single-quotes.
+
+	* messcompat.el (message-from-style): do.
+
+	* message.el (message-send-mail): do.
+
+	* gnus-util.el (gnus-use-byte-compile): do.
+
+	* gnus-score.el (gnus-score-lower-thread): do.
+
+	* gnus-int.el (gnus-server-unopen-status): do.
+
+	* gnus.el (gnus-define-group-parameter, gnus-large-newsgroup)
+	(large-newsgroup-initial, gnus-install-group-spam-parameters): do.
+
+	* gnus-cus.el (gnus-group-customize, gnus-score-parameters)
+	(gnus-group-parameters): do.
+
+	* gnus-art.el (gnus-article-mime-match-handle-function): do.
+
+	* mm-decode.el (mm-text-html-renderer): do.
+
+2003-02-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nnheader.el (nnheader-directory-separator-character): Change the
+	way to compute the dafault value.
+
+2003-02-02  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-button-handle-describe-key): Implement it.
+	(gnus-button-alist): Fix regexp for describe-key.
+	(gnus-button-handle-describe-function)
+	(gnus-button-handle-describe-variable)
+	(gnus-button-handle-apropos, gnus-button-handle-apropos-command)
+	(gnus-button-handle-apropos-variable)
+	(gnus-button-handle-apropos-documentation): Docstring fix.
+
+	* gnus-util.el (gnus-kill-buffer): Use get-buffer.
+
+2003-02-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el (gnus-group-send-queue): Bind gnus-posting-styles
+	to nil.
+
+	* nnmail.el: Removed gnus-util autoload.
+
+	* gnus.el: Use gnus-prin1-to-string throughout.
+
+	* gnus-util.el (gnus-prin1-to-string): Bind print-length and
+	print-level. 
+
+	* gnus-art.el (article-display-x-face): Removed grey x-face stuff.
+	(gnus-treat-display-grey-xface): Removed.
+
+	* gnus-fun.el (gnus-grab-cam-face): New.
+	(gnus-convert-image-to-gray-x-face): Removed.
+	(gnus-convert-gray-x-face-to-xpm): removed.
+	(gnus-convert-gray-x-face-region): Removed.
+	(gnus-grab-gray-x-face): Removed.
+
+	* nnmail.el (nnmail-expiry-wait-function): Doc indent.
+
+2003-01-31  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-kill-buffer): Functions in gnus-util
+	shouldn't depend on the rest of Gnus, so test if gnus-buffers is
+	bound.
+
+	* nnmail.el (nnmail-cache-close): Use gnus-kill-buffer.
+
+2003-01-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-cite.el (gnus-cite-reply-regexp, gnus-cite-always-check):
+	Remove -- these are bogus options which are never used.
+
+2003-01-29  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-mode): Use summary tool bar.
+
+2003-01-27  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-check-blackholes) 
+	(spam-blackhole-good-server-regex): new variable to skip some IPs
+	when checking blackholes; use it
+	(spam-check-bogofilter-headers) 
+	(spam-bogofilter-bogosity-positive-spam-header): new variable, in
+	case more X-Bogosity is used than just "Yes/No"
+	(spam-ham-move-routine): semi-fixed, only first article is
+	properly moved now
+
+2003-01-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-kill-buffer): Remove buffer from gnus-buffers
+	as well.
+	
+	* gnus-sum.el (gnus-select-newsgroup): Use gnus-kill-buffer.
+	
+	* gnus-score.el (gnus-score-headers, gnus-score-find-bnews): do.
+	
+	* gnus-start.el (gnus-save-newsrc-file, gnus-clear-system): do.
+	
+	* gnus-bcklg.el (gnus-backlog-shutdown): do.
+	
+	* gnus-srvr.el (gnus-server-exit, gnus-browse-exit): do.
+
+2003-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-fun.el (gnus-face-encode): New function.
+	(gnus-convert-png-to-face): Use it.
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Added M-& to marks. 
+
+2003-01-26  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-decode.el (mm-dissection-list): Remove.
+	(mm-dissect-singlepart): Don't push to mm-dissection-list, it's
+	only used in mm-remove-all-parts.
+	(mm-remove-all-parts): Remove it, it's never called.
+
+2003-01-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-group.el (gnus-group-make-group): Report errors.
+
+	* nnimap.el (nnimap-request-create-group): Ditto.
+
+	* sieve-manage.el (sieve-manage-is-okno): Parse literal strings.
+
+	* sieve.el (sieve-upload): Fix error printing.
+
+	* mm-encode.el (mm-qp-or-base64): Always QP iff
+	mm-use-ultra-safe-encoding and cleartext PGP.
+
+	* gnus-sum.el (gnus-summary-select-article): Inhibit
+	redisplay (mainly for secured messages).
+
+	* nnmail.el (nnmail-article-group): Copy body too (but don't
+	process it).
+
+2003-01-25  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-setup-buffer): Reset
+	gnus-button-marker-list.
+
+2003-01-25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nntp.el (nntp-read-timeout): Default to using a second delay
+	under Microsoft Windows.
+
+2003-01-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnheader.el (nnheader-directory-separator-character): New
+	variable. 
+
+2003-01-24  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-agent.el (gnus-agent-max-fetch-size)
+	(gnus-agent-article-alist, gnus-agent-get-undownloaded-list)
+	(gnus-agent-catchup, gnus-agent-summary-fetch-group)
+	(gnus-agent-fetch-articles, gnus-agent-backup-overview-buffer)
+	(gnus-agent-flush-cache, gnus-agent-fetch-headers)
+	(gnus-agent-braid-nov, gnus-agent-load-alist)
+	(gnus-agent-article-alist-save-format)
+	(gnus-agent-read-agentview, gnus-agent-save-alist)
+	(gnus-agent-fetch-group-1, gnus-agent-expire)
+	(gnus-agent-uncached-articles, gnus-agent-retrieve-headers)
+	(gnus-agent-regenerate-group): Reformat to keep under eighty
+	columns.  Reword docstrings so that first line is under eighty
+	chars and a complete sentence.  Still need to work on the rear
+	end of the file, in particular gnus-agent-expire.	
+
+2003-01-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agentize): Indent.
+
+	* gnus.el (gnus-version-number): Bumped.
+
 2003-01-24 20:32:44 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.14 is released.
@@ -5,7 +353,7 @@
 2003-01-24  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
 
 	* gnus-sum.el (gnus-summary-prepare-threads): Reset state for %B
-	before beginning.  Trivial patch from Mark Thomas
+	before beginning.  Tiny patch from Mark Thomas
 	<swoon@bellatlantic.net>.
 
 2003-01-24  Teodor Zlatanov  <tzz@lifelogs.com>

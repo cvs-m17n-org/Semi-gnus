@@ -1,5 +1,5 @@
 ;;; spam.el --- Identifying spam
-;; Copyright (C) 2002 Free Software Foundation, Inc.
+;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: network
@@ -97,6 +97,13 @@ The regular expression is matched against the address."
   :type 'boolean
   :group 'spam)
 
+(defcustom spam-use-whitelist-exclusive nil
+  "Whether whitelist-exclusive should be used by spam-split.
+Exclusive whitelisting means that all messages from senders not in the whitelist
+are considered spam."
+  :type 'boolean
+  :group 'spam)
+
 (defcustom spam-use-blackholes nil
   "Whether blackholes should be used by spam-split."
   :type 'boolean
@@ -125,6 +132,13 @@ Enable this if you want Gnus to invoke Bogofilter on new messages."
   :type 'boolean
   :group 'spam)
 
+(defcustom spam-use-BBDB-exclusive nil
+  "Whether BBDB-exclusive should be used by spam-split.
+Exclusive BBDB means that all messages from senders not in the BBDB are 
+considered spam."
+  :type 'boolean
+  :group 'spam)
+
 (defcustom spam-use-ifile nil
   "Whether ifile should be used by spam-split."
   :type 'boolean
@@ -150,6 +164,11 @@ All unmarked article in such group receive the spam mark on group entry."
 				    "dev.null.dk" "relays.visi.com")
   "List of blackhole servers."
   :type '(repeat (string :tag "Server"))
+  :group 'spam)
+
+(defcustom spam-blackhole-good-server-regex nil
+  "String matching IP addresses that should not be checked in the blackholes"
+  :type 'regexp
   :group 'spam)
 
 (defcustom spam-ham-marks (list 'gnus-del-mark 'gnus-read-mark 
@@ -238,6 +257,11 @@ your main source of newsgroup names."
 (defcustom spam-bogofilter-header "X-Bogosity"
   "The header that Bogofilter inserts in messages."
   :type 'string
+  :group 'spam-bogofilter)
+
+(defcustom spam-bogofilter-bogosity-positive-spam-header "^\\(Yes\\|Spam\\)"
+  "The regex on `spam-bogofilter-header' for positive spam identification."
+  :type 'regexp
   :group 'spam-bogofilter)
 
 (defcustom spam-bogofilter-database-directory nil
@@ -400,15 +424,15 @@ your main source of newsgroup names."
 (defun spam-ham-move-routine (&optional group)
   (let ((articles gnus-newsgroup-articles)
 	article ham-mark-values mark)
+
     (dolist (mark spam-ham-marks)
       (push (symbol-value mark) ham-mark-values))
-
-    (while articles
-      (setq article (pop articles))
-      (when (and (memq mark ham-mark-values)
+    
+    (dolist (article articles)
+      (when (and (memq (gnus-summary-article-mark article) ham-mark-values)
 		 (stringp group))
-	  (let ((gnus-current-article article))
-	    (gnus-summary-move-article nil group))))))
+	(let ((gnus-current-article article))
+	  (gnus-summary-move-article nil group))))))
  
 (defun spam-generic-register-routine (spam-func ham-func)
   (let ((articles gnus-newsgroup-articles)
@@ -501,9 +525,9 @@ your main source of newsgroup names."
 "The spam-list-of-checks list contains pairs associating a parameter
 variable with a spam checking function.  If the parameter variable is
 true, then the checking function is called, and its value decides what
-happens.  Each individual check may return `nil', `t', or a mailgroup
-name.  The value `nil' means that the check does not yield a decision,
-and so, that further checks are needed.  The value `t' means that the
+happens.  Each individual check may return nil, t, or a mailgroup
+name.  The value nil means that the check does not yield a decision,
+and so, that further checks are needed.  The value t means that the
 message is definitely not spam, and that further spam checks should be
 inhibited.  Otherwise, a mailgroup name is returned where the mail
 should go, and further checks are also inhibited.  The usual mailgroup
@@ -572,18 +596,20 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		ips)))
       (dolist (server spam-blackhole-servers)
 	(dolist (ip ips)
-	  (let ((query-string (concat ip "." server)))
-	    (if spam-use-dig
-		(let ((query-result (query-dig query-string)))
-		  (when query-result
-		    (gnus-message 5 "(DIG): positive blackhole check '%s'" query-result)
-		    (push (list ip server query-result)
-			  matches)))
-	      ;; else, if not using dig.el
-	      (when (query-dns query-string)
-		(gnus-message 5 "positive blackhole check")
-		(push (list ip server (query-dns query-string 'TXT))
-		      matches)))))))
+	  (unless (and spam-blackhole-good-server-regex
+		       (string-match spam-blackhole-good-server-regex ip))
+	    (let ((query-string (concat ip "." server)))
+	      (if spam-use-dig
+		  (let ((query-result (query-dig query-string)))
+		    (when query-result
+		      (gnus-message 5 "(DIG): positive blackhole check '%s'" query-result)
+		      (push (list ip server query-result)
+			    matches)))
+		;; else, if not using dig.el
+		(when (query-dns query-string)
+		  (gnus-message 5 "positive blackhole check")
+		  (push (list ip server (query-dns query-string 'TXT))
+			matches))))))))
     (when matches
       spam-split-group)))
 
@@ -620,13 +646,15 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
        (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
 
   (defun spam-check-BBDB ()
-    "Mail from people in the BBDB is never considered spam"
+    "Mail from people in the BBDB is classified as ham or non-spam"
     (let ((who (message-fetch-field "from")))
       (when who
-	(setq who (regexp-quote (cadr
-				 (gnus-extract-address-components who))))
+	(setq who (cadr (gnus-extract-address-components who)))
 	(if (bbdb-search-simple nil who)
-	    nil spam-split-group)))))
+	    t 
+	  (if spam-use-BBDB-exclusive
+	      spam-split-group
+	    nil))))))
 
   (file-error (progn
 		(defalias 'bbdb-search-simple 'ignore)
@@ -780,12 +808,16 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
     (insert address "\n")
     (save-buffer)))
 
-;;; returns nil if the sender is in the whitelist, spam-split-group otherwise
+;;; returns t if the sender is in the whitelist, nil or spam-split-group otherwise
 (defun spam-check-whitelist ()
   ;; FIXME!  Should it detect when file timestamps change?
   (unless spam-whitelist-cache
     (setq spam-whitelist-cache (spam-parse-list spam-whitelist)))
-  (if (spam-from-listed-p spam-whitelist-cache) nil spam-split-group))
+  (if (spam-from-listed-p spam-whitelist-cache) 
+      t
+    (if spam-use-whitelist-exclusive
+	spam-split-group
+      nil)))
 
 (defun spam-check-blacklist ()
   ;; FIXME!  Should it detect when file timestamps change?
@@ -843,12 +875,12 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 (defun spam-check-bogofilter-headers (&optional score)
   (let ((header (message-fetch-field spam-bogofilter-header)))
       (when (and header
-	       (string-match "^Yes" header))
+		 (string-match spam-bogofilter-bogosity-positive-spam-header
+			       header))
 	  (if score
 	      (when (string-match "spamicity=\\([0-9.]+\\)" header)
 		(match-string 1 header))
 	    spam-split-group))))
-	  
 
 ;; return something sensible if the score can't be determined
 (defun spam-bogofilter-score ()
