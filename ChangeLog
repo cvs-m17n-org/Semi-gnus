@@ -1,7 +1,10 @@
 2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Makefile.in (xclever-package, xlick-package): New rules.
-	(install-package, install-package-ja, package, package-ja): Use them.
+	(install-package, install-package-ja, package, package-ja): Use
+	them.
+	(install-package-manifest, remove-extra-files-in-package,
+	compose-package): Specify the lisp directory for XEmacs package.
 
 	* aclocal.m4 (AC_PATH_INFO_DIR): Say a note for XEmacs package.
 
