@@ -1,3 +1,10 @@
+1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
+	implementation.
+
 1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
