@@ -166,7 +166,6 @@
 	    (nnmbox-article-group-number)))))))
 
 (deffoo nnmbox-request-group (group &optional server dont-check)
-  (nnmbox-possibly-change-newsgroup nil server)
   (let ((active (cadr (assoc group nnmbox-group-alist))))
     (cond
      ((or (null active)
@@ -266,6 +265,7 @@
      (nnmbox-request-article article group server)
      (save-excursion
        (set-buffer buf)
+       (buffer-disable-undo (current-buffer))
        (erase-buffer)
        (insert-buffer-substring nntp-server-buffer)
        (goto-char (point-min))
@@ -426,9 +426,8 @@
     (save-excursion
       (set-buffer (setq nnmbox-mbox-buffer
 			(nnheader-find-file-noselect
-			 nnmbox-mbox-file nil t)))
-      (mm-enable-multibyte)
-      (buffer-disable-undo)))
+			 nnmbox-mbox-file nil 'raw)))
+      (buffer-disable-undo (current-buffer))))
   (when (not nnmbox-group-alist)
     (nnmail-activate 'nnmbox))
   (if newsgroup
@@ -514,9 +513,8 @@
 	    start end number)
 	(set-buffer (setq nnmbox-mbox-buffer
 			  (nnheader-find-file-noselect
-			   nnmbox-mbox-file nil t)))
-	(mm-enable-multibyte)
-	(buffer-disable-undo)
+			   nnmbox-mbox-file nil 'raw)))
+	(buffer-disable-undo (current-buffer))
 
 	;; Go through the group alist and compare against
 	;; the mbox file.

@@ -33,10 +33,12 @@
 (require 'custom)
 (eval-when-compile (require 'cl))
 (require 'nnheader)
+(require 'timezone)
 (require 'message)
-(require 'time-date)
+(eval-when-compile (require 'rmail))
 
 (eval-and-compile
+  (autoload 'nnmail-date-to-time "nnmail")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
   (autoload 'rmail-show-message "rmail"))
@@ -74,6 +76,9 @@
 	 (set symbol nil))
      symbol))
 
+(defun gnus-truncate-string (str width)
+  (substring str 0 width))
+
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
 ;; to limit the length of a string.  This function is necessary since
 ;; `(substr "abc" 0 30)' pukes with "Args out of range".
@@ -102,15 +107,25 @@
      (when (gnus-buffer-exists-p buf)
        (kill-buffer buf))))
 
-(fset 'gnus-point-at-bol
-      (if (fboundp 'point-at-bol)
-	  'point-at-bol
-	'line-beginning-position))
+(if (fboundp 'point-at-bol)
+    (fset 'gnus-point-at-bol 'point-at-bol)
+  (defun gnus-point-at-bol ()
+    "Return point at the beginning of the line."
+    (let ((p (point)))
+      (beginning-of-line)
+      (prog1
+	  (point)
+	(goto-char p)))))
 
-(fset 'gnus-point-at-eol
-      (if (fboundp 'point-at-eol)
-	  'point-at-eol
-	'line-end-position))
+(if (fboundp 'point-at-eol)
+    (fset 'gnus-point-at-eol 'point-at-eol)
+  (defun gnus-point-at-eol ()
+    "Return point at the end of the line."
+    (let ((p (point)))
+      (end-of-line)
+      (prog1
+	  (point)
+	(goto-char p)))))
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -217,6 +232,43 @@
 
 ;;; Time functions.
 
+(defun gnus-days-between (date1 date2)
+  ;; Return the number of days between date1 and date2.
+  (- (gnus-day-number date1) (gnus-day-number date2)))
+
+(defun gnus-day-number (date)
+  (let ((dat (mapcar (lambda (s) (and s (string-to-int s)) )
+		     (timezone-parse-date date))))
+    (timezone-absolute-from-gregorian
+     (nth 1 dat) (nth 2 dat) (car dat))))
+
+(defun gnus-time-to-day (time)
+  "Convert TIME to day number."
+  (let ((tim (decode-time time)))
+    (timezone-absolute-from-gregorian
+     (nth 4 tim) (nth 3 tim) (nth 5 tim))))
+
+(defun gnus-encode-date (date)
+  "Convert DATE to internal time."
+  (let* ((parse (timezone-parse-date date))
+	 (date (mapcar (lambda (d) (and d (string-to-int d))) parse))
+	 (time (mapcar 'string-to-int (timezone-parse-time (aref parse 3)))))
+    (encode-time (caddr time) (cadr time) (car time)
+		 (caddr date) (cadr date) (car date)
+		 (* 60 (timezone-zone-to-minute (nth 4 date))))))
+
+(defun gnus-time-minus (t1 t2)
+  "Subtract two internal times."
+  (let ((borrow (< (cadr t1) (cadr t2))))
+    (list (- (car t1) (car t2) (if borrow 1 0))
+	  (- (+ (if borrow 65536 0) (cadr t1)) (cadr t2)))))
+
+(defun gnus-time-less (t1 t2)
+  "Say whether time T1 is less than time T2."
+  (or (< (car t1) (car t2))
+      (and (= (car t1) (car t2))
+	   (< (nth 1 t1) (nth 1 t2)))))
+
 (defun gnus-file-newer-than (file date)
   (let ((fdate (nth 5 (file-attributes file))))
     (or (> (car fdate) (car date))
@@ -291,7 +343,20 @@
 
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
-  (format-time-string "%d-%b" (safe-date-to-time messy-date)))
+  (let ((datevec (ignore-errors (timezone-parse-date messy-date))))
+    (if (or (not datevec)
+	    (string-equal "0" (aref datevec 1)))
+	"??-???"
+      (format "%2s-%s"
+	      (condition-case ()
+		  ;; Make sure leading zeroes are stripped.
+		  (number-to-string (string-to-number (aref datevec 2)))
+		(error "??"))
+	      (capitalize
+	       (or (car
+		    (nth (1- (string-to-number (aref datevec 1)))
+			 timezone-months-assoc))
+		   "???"))))))
 
 (defmacro gnus-date-get-time (date)
   "Convert DATE string to Emacs time.
@@ -302,7 +367,7 @@ Cache the result as a text property stored in DATE."
 	 '(0 0)
        (or (get-text-property 0 'gnus-time d)
 	   ;; or compute the value...
-	   (let ((time (safe-date-to-time d)))
+	   (let ((time (nnmail-date-to-time d)))
 	     ;; and store it back in the string.
 	     (put-text-property 0 1 'gnus-time time d)
 	     time)))))
@@ -386,7 +451,7 @@ jabbering all the time."
 	    ids))
     (nreverse ids)))
 
-(defsubst gnus-parent-id (references &optional n)
+(defun gnus-parent-id (references &optional n)
   "Return the last Message-ID in REFERENCES.
 If N, return the Nth ancestor instead."
   (when references
@@ -433,8 +498,20 @@ If N, return the Nth ancestor instead."
     (cons (and (numberp event) event) event)))
 
 (defun gnus-sortable-date (date)
-  "Make string suitable for sorting from DATE."
-  (gnus-time-iso8601 (date-to-time date)))
+  "Make sortable string by string-lessp from DATE.
+Timezone package is used."
+  (condition-case ()
+      (progn
+	(setq date (inline (timezone-fix-time
+			    date nil
+			    (aref (inline (timezone-parse-date date)) 4))))
+	(inline
+	  (timezone-make-sortable-date
+	   (aref date 0) (aref date 1) (aref date 2)
+	   (inline
+	     (timezone-make-time-string
+	      (aref date 3) (aref date 4) (aref date 5))))))
+    (error "")))
 
 (defun gnus-copy-file (file &optional to)
   "Copy FILE to TO."
@@ -466,7 +543,7 @@ If N, return the Nth ancestor instead."
 	(erase-buffer))
     (set-buffer (gnus-get-buffer-create gnus-work-buffer))
     (kill-all-local-variables)
-    (mm-enable-multibyte)))
+    (buffer-disable-undo (current-buffer))))
 
 (defmacro gnus-group-real-name (group)
   "Find the real name of a foreign newsgroup."
@@ -478,35 +555,21 @@ If N, return the Nth ancestor instead."
 (defun gnus-make-sort-function (funs)
   "Return a composite sort condition based on the functions in FUNC."
   (cond
-   ;; Just a simple function.
-   ((gnus-functionp funs) funs)
-   ;; No functions at all.
+   ((not (listp funs)) funs)
    ((null funs) funs)
-   ;; A list of functions.
-   ((or (cdr funs)
-	(listp (car funs)))
+   ((cdr funs)
     `(lambda (t1 t2)
        ,(gnus-make-sort-function-1 (reverse funs))))
-   ;; A list containing just one function.
    (t
     (car funs))))
 
 (defun gnus-make-sort-function-1 (funs)
   "Return a composite sort condition based on the functions in FUNC."
-  (let ((function (car funs))
-	(first 't1)
-	(last 't2))
-    (when (consp function)
-      (if (eq (car function) 'not)
-	  (setq function (cadr function)
-		first 't2
-		last 't1)
-	(error "Invalid sort spec: %s" function)))
-    (if (cdr funs)
-	`(or (,function ,first ,last)
-	     (and (not (,function ,last ,first))
-		  ,(gnus-make-sort-function-1 (cdr funs))))
-      `(,function ,first ,last))))
+  (if (cdr funs)
+      `(or (,(car funs) t1 t2)
+	   (and (not (,(car funs) t2 t1))
+		,(gnus-make-sort-function-1 (cdr funs))))
+    `(,(car funs) t1 t2)))
 
 (defun gnus-turn-off-edit-menu (type)
   "Turn off edit menu in `gnus-TYPE-mode-map'."
@@ -553,7 +616,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (setq string (replace-match "" t t string)))
   string)
 
-(defsubst gnus-put-text-property-excluding-newlines (beg end prop val)
+(defun gnus-put-text-property-excluding-newlines (beg end prop val)
   "The same as `put-text-property', but don't put this prop on any newlines in the region."
   (save-match-data
     (save-excursion
@@ -910,24 +973,17 @@ ARG is passed to the first function."
       (setq alist (delq entry alist)))
     alist))
 
-(defmacro gnus-pull (key alist &optional assoc-p)
+(defmacro gnus-pull (key alist)
   "Modify ALIST to be without KEY."
   (unless (symbolp alist)
     (error "Not a symbol: %s" alist))
-  (let ((fun (if assoc-p 'assoc 'assq)))
-    `(setq ,alist (delq (,fun ,key ,alist) ,alist))))
+  `(setq ,alist (delq (assq ,key ,alist) ,alist)))
 
 (defun gnus-globalify-regexp (re)
   "Returns a regexp that matches a whole line, iff RE matches a part of it."
   (concat (unless (string-match "^\\^" re) "^.*")
 	  re
 	  (unless (string-match "\\$$" re) ".*$")))
-
-(defun gnus-set-window-start (&optional point)
-  "Set the window start to POINT, or (point) if nil."
-  (let ((win (get-buffer-window (current-buffer) t)))
-    (when win
-      (set-window-start win (or point (point))))))
 
 (provide 'gnus-util)
 

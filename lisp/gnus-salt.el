@@ -131,8 +131,7 @@ It accepts the same format specs that `gnus-summary-line-format' does."
 	       (set-buffer gnus-summary-buffer)
 	       gnus-pick-mode))
     (message-add-action
-     '(gnus-configure-windows ,gnus-current-window-configuration t)
-     'send 'exit 'postpone 'kill)))
+     '(gnus-configure-windows 'pick t) 'send 'exit 'postpone 'kill)))
 
 (defvar gnus-pick-line-number 1)
 (defun gnus-pick-line-number ()
@@ -469,7 +468,7 @@ Two predefined functions are available:
   (setq mode-name "Tree")
   (setq major-mode 'gnus-tree-mode)
   (use-local-map gnus-tree-mode-map)
-  (buffer-disable-undo)
+  (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (setq truncate-lines t)
   (save-excursion
@@ -520,14 +519,12 @@ Two predefined functions are available:
 
 (defun gnus-tree-article-region (article)
   "Return a cons with BEG and END of the article region."
-  (let ((pos (text-property-any
-	      (point-min) (point-max) 'gnus-number article)))
+  (let ((pos (text-property-any (point-min) (point-max) 'gnus-number article)))
     (when pos
       (cons pos (next-single-property-change pos 'gnus-number)))))
 
 (defun gnus-tree-goto-article (article)
-  (let ((pos (text-property-any
-	      (point-min) (point-max) 'gnus-number article)))
+  (let ((pos (text-property-any (point-min) (point-max) 'gnus-number article)))
     (when pos
       (goto-char pos))))
 
@@ -705,7 +702,7 @@ Two predefined functions are available:
 	  (while (progn
 		   (forward-line -1)
 		   (forward-char col)
-		   (eq (char-after) ? ))
+		   (= (following-char) ? ))
 	    (delete-char 1)
 	    (insert (caddr gnus-tree-parent-child-edges)))
 	  (goto-char beg)))
@@ -763,7 +760,7 @@ Two predefined functions are available:
 	  (forward-char -1)
 	  ;; Draw "-" lines leftwards.
 	  (while (and (> (point) 1)
-		      (eq (char-after (1- (point))) ? ))
+		      (= (char-after (1- (point))) ? ))
 	    (delete-char -1)
 	    (insert (car gnus-tree-parent-child-edges))
 	    (forward-char -1))
@@ -970,7 +967,7 @@ The following commands are available:
   (setq mode-name "Gnus Carpal")
   (setq mode-line-process nil)
   (use-local-map gnus-carpal-mode-map)
-  (buffer-disable-undo)
+  (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (make-local-variable 'gnus-carpal-attached-buffer)
   (gnus-run-hooks 'gnus-carpal-mode-hook))

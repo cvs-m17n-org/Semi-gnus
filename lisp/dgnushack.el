@@ -30,6 +30,7 @@
 
 (require 'cl)
 (require 'bytecomp)
+(push "~/lisp/custom" load-path)
 (push "." load-path)
 (load "./lpath.el" nil t)
 

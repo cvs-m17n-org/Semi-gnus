@@ -77,12 +77,16 @@
   (save-excursion
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (let* (article)
+    (let* ((buf (get-buffer-create " *draft headers*"))
+	   article)
+      (set-buffer buf)
+      (buffer-disable-undo (current-buffer))
+      (erase-buffer)
       ;; We don't support fetching by Message-ID.
       (if (stringp (car articles))
 	  'headers
 	(while articles
-	  (narrow-to-region (point) (point))
+	  (set-buffer buf)
 	  (when (nndraft-request-article
 		 (setq article (pop articles)) group server (current-buffer))
 	    (goto-char (point-min))
@@ -90,10 +94,10 @@
 		(forward-line -1)
 	      (goto-char (point-max)))
 	    (delete-region (point) (point-max))
-	    (goto-char (point-min))
-	    (insert (format "221 %d Article retrieved.\n" article))
-	    (widen)
+	    (set-buffer nntp-server-buffer)
 	    (goto-char (point-max))
+	    (insert (format "221 %d Article retrieved.\n" article))
+	    (insert-buffer-substring buf)
 	    (insert ".\n")))
 
 	(nnheader-fold-continuation-lines)
@@ -150,13 +154,13 @@
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
 	 article file)
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert-buffer buf)
       (setq article (nndraft-request-accept-article
-		     group (nnoo-current-server 'nndraft) t 'noinsert)
-	    file (nndraft-article-filename article)))
-    (setq buffer-file-name (expand-file-name file)
-	  buffer-auto-save-file-name (make-auto-save-file-name))
+		     group (nnoo-current-server 'nndraft) t 'noinsert))
+      (setq file (nndraft-article-filename article)))
+    (setq buffer-file-name (expand-file-name file))
+    (setq buffer-auto-save-file-name (make-auto-save-file-name))
     (clear-visited-file-modtime)
     article))
 

@@ -12,17 +12,22 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
 
-all total:
+total:
+	rm -f *.elc ; $(EMACS) $(FLAGS) -f dgnushack-compile
+
+all:
 	rm -f *.elc ; $(EMACS) $(FLAGS) -f dgnushack-compile
 
 warn:
 	rm -f *.elc ; $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
 
-clever some:
+clever:
+	$(EMACS) $(FLAGS) -f dgnushack-compile
+
+some:
 	$(EMACS) $(FLAGS) -f dgnushack-compile
 
 install: clever
-	rm -f dgnushack.elc
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	for p in *.elc; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \

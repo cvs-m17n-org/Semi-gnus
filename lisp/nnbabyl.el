@@ -568,13 +568,13 @@
 	    start end number)
 	(set-buffer (setq nnbabyl-mbox-buffer
 			  (nnheader-find-file-noselect
-			   nnbabyl-mbox-file nil t)))
+			   nnbabyl-mbox-file nil 'raw)))
 	;; Save previous buffer mode.
 	(setq nnbabyl-previous-buffer-mode
 	      (cons (cons (point-min) (point-max))
 		    major-mode))
 
-	(buffer-disable-undo)
+	(buffer-disable-undo (current-buffer))
 	(widen)
 	(setq buffer-read-only nil)
 	(fundamental-mode)

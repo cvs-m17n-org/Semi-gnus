@@ -28,7 +28,6 @@
 (require 'text-props)
 (defvar menu-bar-mode (featurep 'menubar))
 (require 'messagexmas)
-(require 'wid-edit)
 
 (defgroup gnus-xmas nil
   "XEmacsoid support for Gnus"
@@ -42,8 +41,6 @@ automatically."
 		 directory)
   :group 'gnus-xmas)
 
-;;(format "%02x%02x%02x" 114 66 20) "724214"
-
 (defvar gnus-xmas-logo-color-alist
   '((flame "#cc3300" "#ff2200")
     (pine "#c0cc93" "#f8ffb8")
@@ -55,18 +52,16 @@ automatically."
     (grape "#b264cc" "#cf7df")
     (labia "#cc64c2" "#fd7dff")
     (berry "#cc6485" "#ff7db5")
-    (dino "#724214" "#1e3f03")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
-(defcustom gnus-xmas-logo-color-style 'dino
+(defcustom gnus-xmas-logo-color-style 'moss
   "*Color styles used for the Gnus logo."
   :type '(choice (const flame) (const pine) (const moss)
 		 (const irish) (const sky) (const tin)
 		 (const velvet) (const grape) (const labia)
-		 (const berry) (const neutral) (const september)
-		 (const dino))
+		 (const berry) (const neutral) (const september))
   :group 'gnus-xmas)
 
 (defvar gnus-xmas-logo-colors
@@ -246,7 +241,6 @@ call it with the value of the `gnus-data' text property."
   (let* ((pos (event-closest-point event))
 	 (data (get-text-property pos 'gnus-data))
 	 (fun (get-text-property pos 'gnus-callback)))
-    (goto-char pos)
     (when fun
       (funcall fun data))))
 
@@ -258,6 +252,21 @@ call it with the value of the `gnus-data' text property."
   (map-extents (lambda (extent ignore)
 		 (delete-extent extent)
 		 nil)))
+
+;; Fixed by Christopher Davis <ckd@loiosh.kei.com>.
+(defun gnus-xmas-article-add-button (from to fun &optional data)
+  "Create a button between FROM and TO with callback FUN and data DATA."
+  (when gnus-article-button-face
+    (gnus-overlay-put (gnus-make-overlay from to)
+		      'face gnus-article-button-face))
+  (gnus-add-text-properties
+   from to
+   (nconc
+    (and gnus-article-mouse-face
+	 (list 'mouse-face gnus-article-mouse-face))
+    (list 'gnus-callback fun)
+    (and data (list 'gnus-data data))
+    (list 'highlight t))))
 
 (defun gnus-xmas-window-top-edge (&optional window)
   (nth 1 (window-pixel-edges window)))
@@ -385,10 +394,26 @@ call it with the value of the `gnus-data' text property."
 	       (event-to-character event))
 	  event)))
 
+(defun gnus-xmas-seconds-since-epoch (date)
+  "Return a floating point number that says how many seconds have lapsed between Jan 1 12:00:00 1970 and DATE."
+  (let* ((tdate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date date)))
+	 (ttime (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-time
+			 (aref (timezone-parse-date date) 3))))
+	 (edate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date "Jan 1 12:00:00 1970")))
+	 (tday (- (timezone-absolute-from-gregorian
+		   (nth 1 tdate) (nth 2 tdate) (nth 0 tdate))
+		  (timezone-absolute-from-gregorian
+		   (nth 1 edate) (nth 2 edate) (nth 0 edate)))))
+    (+ (nth 2 ttime)
+       (* (nth 1 ttime) 60)
+       (* (float (nth 0 ttime)) 60 60)
+       (* (float tday) 60 60 24))))
+
 (defun gnus-xmas-define ()
   (setq gnus-mouse-2 [button2])
-  (setq gnus-mouse-3 [button3])
-  (setq gnus-widget-button-keymap widget-button-keymap)
 
   (unless (memq 'underline (face-list))
     (and (fboundp 'make-face)
@@ -431,6 +456,16 @@ call it with the value of the `gnus-data' text property."
 
   (defvar gnus-mouse-face-prop 'highlight)
 
+  (unless (fboundp 'encode-time)
+    (defun encode-time (sec minute hour day month year &optional zone)
+      (let ((seconds
+	     (gnus-xmas-seconds-since-epoch
+	      (timezone-make-arpa-date
+	       year month day (timezone-make-time-string hour minute sec)
+	       zone))))
+	(list (floor (/ seconds (expt 2 16)))
+	      (round (mod seconds (expt 2 16)))))))
+
   (defun gnus-byte-code (func)
     "Return a form that can be `eval'ed based on FUNC."
     (let ((fval (indirect-function func)))
@@ -452,6 +487,7 @@ call it with the value of the `gnus-data' text property."
   (fset 'gnus-summary-recenter 'gnus-xmas-summary-recenter)
   (fset 'gnus-extent-start-open 'gnus-xmas-extent-start-open)
   (fset 'gnus-article-push-button 'gnus-xmas-article-push-button)
+  (fset 'gnus-article-add-button 'gnus-xmas-article-add-button)
   (fset 'gnus-window-top-edge 'gnus-xmas-window-top-edge)
   (fset 'gnus-read-event-char 'gnus-xmas-read-event-char)
   (fset 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
@@ -464,9 +500,7 @@ call it with the value of the `gnus-data' text property."
 	'gnus-xmas-mode-line-buffer-identification)
   (fset 'gnus-key-press-event-p 'key-press-event-p)
   (fset 'gnus-region-active-p 'region-active-p)
-  (fset 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
-  (fset 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
-  
+
   (add-hook 'gnus-group-mode-hook 'gnus-xmas-group-menu-add)
   (add-hook 'gnus-summary-mode-hook 'gnus-xmas-summary-menu-add)
   (add-hook 'gnus-article-mode-hook 'gnus-xmas-article-menu-add)
@@ -791,20 +825,6 @@ XEmacs compatibility workaround."
 (defun gnus-xmas-splash ()
   (when (eq (device-type) 'x)
     (gnus-splash)))
-
-(defun gnus-xmas-annotation-in-region-p (b e)
-  (map-extents (lambda (e u) t) nil b e nil nil 'mm t))
-
-(defun gnus-xmas-mime-button-menu (event)
-  "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
-  (let ((response (get-popup-menu-response
-		   `("MIME Part"
-		     ,@(mapcar (lambda (c) `[,(caddr c) ,(car c) t])
-			       gnus-mime-button-commands)))))
-    (set-buffer (event-buffer event))
-    (goto-char (event-point event))
-    (funcall (event-function response) (event-object response))))
 
 (provide 'gnus-xmas)
 

@@ -201,7 +201,9 @@
 		  (gnus-parse-format
 		   new-format
 		   (symbol-value
-		    (intern (format "gnus-%s-line-format-alist" type)))
+		    (intern (format "gnus-%s-line-format-alist"
+				    (if (eq type 'article-mode)
+					'summary-mode type))))
 		   (not (string-match "mode$" (symbol-name type))))))
 	  ;; Enter the new format spec into the list.
 	  (if entry
@@ -238,12 +240,6 @@
   `(gnus-add-text-properties
     (point) (progn ,@form (point))
     '(gnus-face t face ,(symbol-value (intern (format "gnus-face-%d" type))))))
-
-(defun gnus-balloon-face-function (form type)
-  `(gnus-put-text-property 
-    (point) (progn ,@form (point))
-    'balloon-help
-    ,(intern (format "gnus-balloon-face-%d" type))))
 
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
@@ -291,10 +287,8 @@
   ;; SPEC-ALIST and returns a list that can be eval'ed to return the
   ;; string.  If the FORMAT string contains the specifiers %( and %)
   ;; the text between them will have the mouse-face text property.
-  ;; If the FORMAT string contains the specifiers %< and %>, the text between
-  ;; them will have the balloon-help text property.
   (if (string-match
-       "\\`\\(.*\\)%[0-9]?[{(<]\\(.*\\)%[0-9]?[})>]\\(.*\n?\\)\\'"
+       "\\`\\(.*\\)%[0-9]?[{(]\\(.*\\)%[0-9]?[})]\\(.*\n?\\)\\'"
        format)
       (gnus-parse-complex-format format spec-alist)
     ;; This is a simple format.
@@ -309,17 +303,13 @@
       (replace-match "\\\"" nil t))
     (goto-char (point-min))
     (insert "(\"")
-    (while (re-search-forward "%\\([0-9]+\\)?\\([{}()<>]\\)" nil t)
+    (while (re-search-forward "%\\([0-9]+\\)?\\([{}()]\\)" nil t)
       (let ((number (if (match-beginning 1)
 			(match-string 1) "0"))
 	    (delim (aref (match-string 2) 0)))
 	(if (or (= delim ?\()
-		(= delim ?\{)
-		(= delim ?\<))
-	    (replace-match (concat "\"(" 
-				   (cond ((= delim ?\() "mouse")
-					 ((= delim ?\{) "face")
-					 (t "balloon"))
+		(= delim ?\{))
+	    (replace-match (concat "\"(" (if (= delim ?\() "mouse" "face")
 				   " " number " \""))
 	  (replace-match "\")\""))))
     (goto-char (point-max))
@@ -400,9 +390,9 @@
 	     (t
 	      nil)))
 	;; User-defined spec -- find the spec name.
-	(when (eq (setq spec (char-after)) ?u)
+	(when (= (setq spec (following-char)) ?u)
 	  (forward-char 1)
-	  (setq user-defined (char-after)))
+	  (setq user-defined (following-char)))
 	(forward-char 1)
 	(delete-region spec-beg (point))
 
@@ -529,7 +519,7 @@ If PROPS, insert the result."
 		       (not (eq 'byte-code (car form)))
 		       ;; Under XEmacs, it's (funcall #<compiled-function ...>)
 		       (not (and (eq 'funcall (car form))
-				 (byte-code-function-p (cadr form)))))
+				 (compiled-function-p (cadr form)))))
 	      (fset 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
 	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))

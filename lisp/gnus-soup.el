@@ -140,19 +140,21 @@ move those articles instead."
     (buffer-disable-undo tmp-buf)
     (save-excursion
       (while articles
+	;; Find the header of the article.
+	(set-buffer gnus-summary-buffer)
+	(when (setq headers (gnus-summary-article-header (car articles)))
 	  ;; Put the article in a buffer.
-	(set-buffer tmp-buf)
-	(when (gnus-request-article-this-buffer
-	       (car articles) gnus-newsgroup-name)
-	  (setq headers (nnheader-parse-head t))
-	  (save-restriction
-	    (message-narrow-to-head)
-	    (message-remove-header gnus-soup-ignored-headers t))
-	  (gnus-soup-store gnus-soup-directory prefix headers
-			   gnus-soup-encoding-type
-			   gnus-soup-index-type)
-	  (gnus-soup-area-set-number
-	   area (1+ (or (gnus-soup-area-number area) 0))))
+	  (set-buffer tmp-buf)
+	  (when (gnus-request-article-this-buffer
+		 (car articles) gnus-newsgroup-name)
+	    (save-restriction
+	      (message-narrow-to-head)
+	      (message-remove-header gnus-soup-ignored-headers t))
+	    (gnus-soup-store gnus-soup-directory prefix headers
+			     gnus-soup-encoding-type
+			     gnus-soup-index-type)
+	    (gnus-soup-area-set-number
+	     area (1+ (or (gnus-soup-area-number area) 0)))))
 	;; Mark article as read.
 	(set-buffer gnus-summary-buffer)
 	(gnus-summary-remove-process-mark (car articles))
@@ -166,11 +168,11 @@ move those articles instead."
   "Make a SOUP packet from the SOUP areas."
   (interactive)
   (gnus-soup-read-areas)
-  (if (file-exists-p gnus-soup-directory)
-      (if (directory-files gnus-soup-directory nil "\\.MSG$")
-	  (gnus-soup-pack gnus-soup-directory gnus-soup-packer)
-	(message "No files to pack."))
-    (message "No such directory: %s" gnus-soup-directory)))
+  (unless (file-exists-p gnus-soup-directory)
+    (message "No such directory: %s" gnus-soup-directory))
+  (when (null (directory-files gnus-soup-directory nil "\\.MSG$"))
+    (message "No files to pack."))
+  (gnus-soup-pack gnus-soup-directory gnus-soup-packer))
 
 (defun gnus-group-brew-soup (n)
   "Make a soup packet from the current group.
@@ -372,7 +374,7 @@ though the two last may be nil if they are missing."
     (when (file-exists-p file)
       (save-excursion
 	(set-buffer (nnheader-find-file-noselect file 'force))
-	(buffer-disable-undo)
+	(buffer-disable-undo (current-buffer))
 	(goto-char (point-min))
 	(while (not (eobp))
 	  (push (vector (gnus-soup-field)
@@ -395,7 +397,7 @@ file.  The vector contain three strings, [prefix name encoding]."
   (let (replies)
     (save-excursion
       (set-buffer (nnheader-find-file-noselect file))
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (goto-char (point-min))
       (while (not (eobp))
 	(push (vector (gnus-soup-field) (gnus-soup-field)
@@ -420,7 +422,7 @@ file.  The vector contain three strings, [prefix name encoding]."
   "Write the AREAS file."
   (interactive)
   (when gnus-soup-areas
-    (with-temp-file (concat gnus-soup-directory "AREAS")
+    (nnheader-temp-write (concat gnus-soup-directory "AREAS")
       (let ((areas gnus-soup-areas)
 	    area)
 	(while (setq area (pop areas))
@@ -441,7 +443,7 @@ file.  The vector contain three strings, [prefix name encoding]."
 
 (defun gnus-soup-write-replies (dir areas)
   "Write a REPLIES file in DIR containing AREAS."
-  (with-temp-file (concat dir "REPLIES")
+  (nnheader-temp-write (concat dir "REPLIES")
     (let (area)
       (while (setq area (pop areas))
 	(insert (format "%s\t%s\t%s\n"

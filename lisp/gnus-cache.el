@@ -175,8 +175,7 @@ it's not cached."
 	    t				; The article already is saved.
 	  (save-excursion
 	    (set-buffer nntp-server-buffer)
-	    (let ((gnus-use-cache nil)
-		  (gnus-article-decode-hook nil))
+	    (let ((gnus-use-cache nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer file)
@@ -201,7 +200,17 @@ it's not cached."
 		    (beginning-of-line))
 		(forward-line 1))
 	      (beginning-of-line)
-	      (nnheader-insert-nov headers)
+	      ;; [number subject from date id references chars lines xref]
+	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
+			      (mail-header-number headers)
+			      (mail-header-subject headers)
+			      (mail-header-from headers)
+			      (mail-header-date headers)
+			      (mail-header-id headers)
+			      (or (mail-header-references headers) "")
+			      (or (mail-header-chars headers) "")
+			      (or (mail-header-lines headers) "")
+			      (or (mail-header-xref headers) "")))
 	      ;; Update the active info.
 	      (set-buffer gnus-summary-buffer)
 	      (gnus-cache-update-active group number)
@@ -386,6 +395,7 @@ Returns the list of articles removed."
 	    (cons group
 		  (set-buffer (gnus-get-buffer-create
 			       " *gnus-cache-overview*"))))
+      (buffer-disable-undo (current-buffer))
       ;; Insert the contents of this group's cache overview.
       (erase-buffer)
       (let ((file (gnus-cache-file-name group ".overview")))
@@ -477,6 +487,7 @@ Returns the list of articles removed."
     (gnus-cache-save-buffers)
     (save-excursion
       (set-buffer cache-buf)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (insert-file-contents (or file (gnus-cache-file-name group ".overview")))
       (goto-char (point-min))
@@ -506,6 +517,7 @@ Returns the list of articles removed."
   (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
       (set-buffer cache-buf)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer))
     (set-buffer nntp-server-buffer)
     (goto-char (point-min))
@@ -583,7 +595,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (with-temp-file gnus-cache-active-file
+    (nnheader-temp-write gnus-cache-active-file
       (mapatoms
        (lambda (sym)
 	 (when (and sym (boundp sym))
@@ -644,7 +656,7 @@ If LOW, update the lower bound instead."
     ;; Go through all the other files.
     (while alphs
       (when (and (file-directory-p (car alphs))
-		 (not (string-match "^\\.\\.?$"
+		 (not (string-match "^\\."
 				    (file-name-nondirectory (car alphs)))))
 	;; We descend directories.
 	(gnus-cache-generate-active (car alphs)))

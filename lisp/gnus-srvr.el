@@ -161,7 +161,7 @@ The following commands are available:
   (gnus-set-default-directory)
   (setq mode-line-process nil)
   (use-local-map gnus-server-mode-map)
-  (buffer-disable-undo)
+  (buffer-disable-undo (current-buffer))
   (setq truncate-lines t)
   (setq buffer-read-only t)
   (gnus-run-hooks 'gnus-server-mode-hook))
@@ -550,9 +550,9 @@ The following commands are available:
 
 (defun gnus-browse-foreign-server (server &optional return-buffer)
   "Browse the server SERVER."
-  (setq gnus-browse-current-method (gnus-server-to-method server))
+  (setq gnus-browse-current-method server)
   (setq gnus-browse-return-buffer return-buffer)
-  (let* ((method gnus-browse-current-method)
+  (let* ((method (gnus-server-to-method server))
 	 (gnus-select-method method)
 	 groups group)
     (gnus-message 5 "Connecting to %s..." (nth 1 method))
@@ -575,7 +575,7 @@ The following commands are available:
       (when gnus-carpal
 	(gnus-carpal-setup-buffer 'browse))
       (gnus-configure-windows 'browse)
-      (buffer-disable-undo)
+      (buffer-disable-undo (current-buffer))
       (let ((buffer-read-only nil))
 	(erase-buffer))
       (gnus-browse-mode)
@@ -636,7 +636,7 @@ buffer.
   (setq mode-name "Browse Server")
   (setq mode-line-process nil)
   (use-local-map gnus-browse-mode-map)
-  (buffer-disable-undo)
+  (buffer-disable-undo (current-buffer))
   (setq truncate-lines t)
   (gnus-set-default-directory)
   (setq buffer-read-only t)
@@ -706,7 +706,7 @@ buffer.
     (save-excursion
       (beginning-of-line)
       ;; If this group it killed, then we want to subscribe it.
-      (when (eq (char-after) ?K)
+      (when (= (following-char) ?K)
 	(setq sub t))
       (setq group (gnus-browse-group-name))
       (when (and sub
