@@ -2,7 +2,7 @@
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         MORIOKA Tomohiko <tomo@m17n.org>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;; Keywords: mail, news, MIME, offline
 

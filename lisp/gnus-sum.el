@@ -2,7 +2,7 @@
 ;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         MORIOKA Tomohiko <tomo@m17n.org>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
@@ -3058,7 +3058,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		 (nnheader-nov-field)		; subject
 		 (nnheader-nov-field)		; from
 		 (nnheader-nov-field)		; date
-		 (nnheader-nov-read-message-id)	; id
+		 (or (nnheader-nov-field)
+		     (nnheader-generate-fake-message-id)) ; id
 		 (nnheader-nov-field)		; refs
 		 (nnheader-nov-read-integer)	; chars
 		 (nnheader-nov-read-integer)	; lines

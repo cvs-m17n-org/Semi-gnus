@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 1996,1997 Free Software Foundation, Inc.
 
-;; Author: MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Author: MORIOKA Tomohiko <tomo@m17n.org>
 ;; Created: 1997/11/27
 ;; Keywords: internationalization, news, mail
 

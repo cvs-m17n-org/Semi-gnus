@@ -91,7 +91,7 @@
 
 ;;; Tools for MIME by
 ;;; UMEDA Masanobu <umerin@mse.kyutech.ac.jp>
-;;; MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;; MORIOKA Tomohiko <tomo@m17n.org>
 
 (when gnus-use-tm
   (when (and (not gnus-use-installed-tm)

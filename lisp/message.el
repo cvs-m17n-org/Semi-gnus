@@ -2,7 +2,7 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         MORIOKA Tomohiko <tomo@m17n.org>
 ;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;         Keiichi Suzuki   <keiichi@nanap.org>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>

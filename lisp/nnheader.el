@@ -3,7 +3,7 @@
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         MORIOKA Tomohiko <tomo@m17n.org>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
@@ -69,6 +69,8 @@ on your system, you could say something like:
 
 ;;; Header access macros.
 
+(require 'mmgnus)
+
 (defmacro mail-header-number (header)
   "Return article number in HEADER."
   `(mime-entity-location-internal ,header))
@@ -77,31 +79,32 @@ on your system, you could say something like:
   "Set article number of HEADER to NUMBER."
   `(mime-entity-set-location-internal ,header ,number))
 
-(defalias 'mail-header-subject 'mime-entity-decoded-subject-internal)
-(defalias 'mail-header-set-subject 'mime-entity-set-decoded-subject-internal)
+(defalias 'mail-header-subject 'mime-gnus-entity-subject-internal)
+(defalias 'mail-header-set-subject 'mime-gnus-entity-set-subject-internal)
 
-(defalias 'mail-header-from 'mime-entity-decoded-from-internal)
-(defalias 'mail-header-set-from 'mime-entity-set-decoded-from-internal)
+(defalias 'mail-header-from 'mime-gnus-entity-from-internal)
+(defalias 'mail-header-set-from 'mime-gnus-entity-set-from-internal)
 
-(defalias 'mail-header-date 'mime-entity-date-internal)
-(defalias 'mail-header-set-date 'mime-entity-set-date-internal)
+(defalias 'mail-header-date 'mime-gnus-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-gnus-entity-set-date-internal)
 
-(defalias 'mail-header-message-id 'mime-entity-message-id-internal)
-(defalias 'mail-header-id 'mime-entity-message-id-internal)
-(defalias 'mail-header-set-message-id 'mime-entity-set-message-id-internal)
-(defalias 'mail-header-set-id 'mime-entity-set-message-id-internal)
+(defalias 'mail-header-message-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-set-message-id 'mime-gnus-entity-set-id-internal)
+(defalias 'mail-header-set-id 'mime-gnus-entity-set-id-internal)
 
-(defalias 'mail-header-references 'mime-entity-references-internal)
-(defalias 'mail-header-set-references 'mime-entity-set-references-internal)
+(defalias 'mail-header-references 'mime-gnus-entity-references-internal)
+(defalias 'mail-header-set-references
+  'mime-gnus-entity-set-references-internal)
 
-(defalias 'mail-header-chars 'mime-entity-chars-internal)
-(defalias 'mail-header-set-chars 'mime-entity-set-chars-internal)
+(defalias 'mail-header-chars 'mime-gnus-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-gnus-entity-set-chars-internal)
 
-(defalias 'mail-header-lines 'mime-entity-lines-internal)
-(defalias 'mail-header-set-lines 'mime-entity-set-lines-internal)
+(defalias 'mail-header-lines 'mime-gnus-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-gnus-entity-set-lines-internal)
 
-(defalias 'mail-header-xref 'mime-entity-xref-internal)
-(defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
+(defalias 'mail-header-xref 'mime-gnus-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-gnus-entity-set-xref-internal)
 
 (defalias 'nnheader-decode-subject
   (mime-find-field-decoder 'Subject 'nov))
@@ -119,33 +122,58 @@ on your system, you could say something like:
 (defsubst make-full-mail-header (&optional number subject from date id
 					   references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
-  (make-mime-entity-internal
-   'gnus number
-   nil
-   nil nil nil
-   (if subject
-       (nnheader-decode-subject subject)
-     )
-   (if from
-       (nnheader-decode-from from)
-     )
-   date id references
-   chars lines xref
-   (list (cons 'Subject subject)
-	 (cons 'From from))
-   ))
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject (if subject
+				 (nnheader-decode-subject subject))
+		    :from (if from
+			      (nnheader-decode-from from))
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref
+		    :original-header (list (cons 'Subject subject)
+					   (cons 'From from)))
+  ;;(make-mime-entity-internal
+  ;; 'gnus number
+  ;; nil
+  ;; nil nil nil
+  ;;  (if subject
+  ;;      (nnheader-decode-subject subject)
+  ;;    )
+  ;;  (if from
+  ;;      (nnheader-decode-from from)
+  ;;    )
+  ;; date id references
+  ;; chars lines xref
+  ;;  (list (cons 'Subject subject)
+  ;;        (cons 'From from)))
+  )
 
 (defsubst make-full-mail-header-from-decoded-header
   (&optional number subject from date id references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
-  (make-mime-entity-internal
-   'gnus number
-   nil
-   nil nil nil
-   subject
-   from
-   date id references
-   chars lines xref))
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject subject
+		    :from from
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref)
+  ;;(make-mime-entity-internal
+  ;; 'gnus number
+  ;; nil
+  ;; nil nil nil
+  ;; subject
+  ;; from
+  ;; date id references
+  ;; chars lines xref)
+  )
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
@@ -265,13 +293,6 @@ on your system, you could say something like:
 	(goto-char (point-min))
 	(delete-char 1)))))
 
-(defmacro nnheader-nov-next-field ()
-  ;; Go to the beginning of the next field and returns a point of
-  ;; the end of the current field.
-  '(if (search-forward "\t" eol t)
-       (1- (point))
-     eol))
-
 (defmacro nnheader-nov-skip-field ()
   '(search-forward "\t" eol 'move))
 
@@ -279,16 +300,15 @@ on your system, you could say something like:
   '(buffer-substring (point) (if (nnheader-nov-skip-field) (1- (point)) eol)))
 
 (defmacro nnheader-nov-read-integer ()
-  '(let ((field (buffer-substring (point) (nnheader-nov-next-field))))
-     (if (string-match "^[0-9]+$" field)
-	 (string-to-number field)
-       0)))
+  '(prog1
+       (if (eq (char-after) ?\t)
+	   0
+	 (let ((num (ignore-errors (read (current-buffer)))))
+	   (if (numberp num) num 0)))
+     (unless (eobp)
+       (search-forward "\t" eol 'move))))
 
-(defmacro nnheader-nov-read-message-id ()
-  '(let ((id (buffer-substring (point) (nnheader-nov-next-field))))
-     (if (string-match "^<[^>]+>$" id)
-	 id
-       (nnheader-generate-fake-message-id))))
+;; (defvar nnheader-none-counter 0)
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -297,7 +317,8 @@ on your system, you could say something like:
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
      (nnheader-nov-field)		; date
-     (nnheader-nov-read-message-id)	; id
+     (or (nnheader-nov-field)
+	 (nnheader-generate-fake-message-id)) ; id
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
@@ -393,6 +414,191 @@ the line could be found."
     (beginning-of-line)
     (eq num article)))
 
+(defun nnheader-retrieve-headers-from-directory* (articles
+						  directory dependencies
+						  &optional
+						  fetch-old force-new large
+						  backend)
+  (with-temp-buffer
+    (let* ((file nil)
+	   (number (length articles))
+	   (count 0)
+	   (pathname-coding-system 'binary)
+	   (case-fold-search t)
+	   (cur (current-buffer))
+	   article
+	   headers header id end ref in-reply-to lines chars ctype)
+      ;; We don't support fetching by Message-ID.
+      (if (stringp (car articles))
+	  'headers
+	(while articles
+	  (when (and (file-exists-p
+		      (setq file (expand-file-name
+				  (int-to-string
+				   (setq article (pop articles)))
+				  directory)))
+		     (not (file-directory-p file)))
+	    (erase-buffer)
+	    (nnheader-insert-head file)
+	    (save-restriction
+	      (std11-narrow-to-header)
+	      (setq
+	       header
+	       (make-full-mail-header
+		;; Number.
+		article
+		;; Subject.
+		(or (std11-fetch-field "Subject")
+		    "(none)")
+		;; From.
+		(or (std11-fetch-field "From")
+		    "(nobody)")
+		;; Date.
+		(or (std11-fetch-field "Date")
+		    "")
+		;; Message-ID.
+		(progn
+		  (goto-char (point-min))
+		  (setq id (if (re-search-forward
+				"^Message-ID: *\\(<[^\n\t> ]+>\\)" nil t)
+			       ;; We do it this way to make sure the Message-ID
+			       ;; is (somewhat) syntactically valid.
+			       (buffer-substring (match-beginning 1)
+						 (match-end 1))
+			     ;; If there was no message-id, we just fake one
+			     ;; to make subsequent routines simpler.
+			     (nnheader-generate-fake-message-id))))
+		;; References.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nReferences: " nil t)
+		      (progn
+			(setq end (point))
+			(prog1
+			    (buffer-substring (match-end 0) (std11-field-end))
+			  (setq ref
+				(buffer-substring
+				 (progn
+				   ;; (end-of-line)
+				   (search-backward ">" end t)
+				   (1+ (point)))
+				 (progn
+				   (search-backward "<" end t)
+				   (point))))))
+		    ;; Get the references from the in-reply-to header if there
+		    ;; were no references and the in-reply-to header looks
+		    ;; promising.
+		    (if (and (search-forward "\nIn-Reply-To: " nil t)
+			     (setq in-reply-to
+				   (buffer-substring (match-end 0)
+						     (std11-field-end)))
+			     (string-match "<[^>]+>" in-reply-to))
+			(let (ref2)
+			  (setq ref (substring in-reply-to (match-beginning 0)
+					       (match-end 0)))
+			  (while (string-match "<[^>]+>"
+					       in-reply-to (match-end 0))
+			    (setq ref2
+				  (substring in-reply-to (match-beginning 0)
+					     (match-end 0)))
+			    (when (> (length ref2) (length ref))
+			      (setq ref ref2)))
+			  ref)
+		      (setq ref nil))))
+		;; Chars.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nChars: " nil t)
+		      (if (numberp (setq chars (ignore-errors (read cur))))
+			  chars 0)
+		    0))
+		;; Lines.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nLines: " nil t)
+		      (if (numberp (setq lines (ignore-errors (read cur))))
+			  lines 0)
+		    0))
+		;; Xref.
+		(std11-fetch-field "Xref")
+		))
+	      (goto-char (point-min))
+	      (if (setq ctype (std11-fetch-field "Content-Type"))
+		  (mime-entity-set-content-type-internal
+		   header (mime-parse-Content-Type ctype)))
+	      )
+	    (when (setq header
+			(gnus-dependencies-add-header
+			 header dependencies force-new))
+	      (push header headers))
+	    )
+	  (setq count (1+ count))
+
+	  (and large
+	       (zerop (% count 20))
+	       (nnheader-message 5 "%s: Receiving headers... %d%%"
+				 backend
+				 (/ (* count 100) number))))
+
+	(when large
+	  (nnheader-message 5 "%s: Receiving headers...done" backend))
+
+	headers))))
+
+(defun nnheader-retrieve-headers-from-directory (articles
+						 directory dependencies
+						 &optional
+						 fetch-old force-new large
+						 backend)
+  (cons 'header
+	(nreverse (nnheader-retrieve-headers-from-directory*
+		   articles directory dependencies
+		   fetch-old force-new large backend))))
+
+(defun nnheader-get-newsgroup-headers-xover* (sequence
+					      &optional
+					      force-new dependencies
+					      group)
+  "Parse the news overview data in the server buffer, and return a
+list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
+  ;; Get the Xref when the users reads the articles since most/some
+  ;; NNTP servers do not include Xrefs when using XOVER.
+  ;; (setq gnus-article-internal-prepare-hook '(gnus-article-get-xrefs))
+  (let ((cur nntp-server-buffer)
+	number headers header)
+    (save-excursion
+      (set-buffer nntp-server-buffer)
+      ;; Allow the user to mangle the headers before parsing them.
+      (gnus-run-hooks 'gnus-parse-headers-hook)
+      (goto-char (point-min))
+      (while (not (eobp))
+	(condition-case ()
+	    (while (and sequence (not (eobp)))
+	      (setq number (read cur))
+	      (while (and sequence
+			  (< (car sequence) number))
+		(setq sequence (cdr sequence)))
+	      (and sequence
+		   (eq number (car sequence))
+		   (progn
+		     (setq sequence (cdr sequence))
+		     (setq header (inline
+				    (gnus-nov-parse-line
+				     number dependencies force-new))))
+		   (push header headers))
+	      (forward-line 1))
+	  (error
+	   (gnus-error 4 "Strange nov line (%d)"
+		       (count-lines (point-min) (point)))))
+	(forward-line 1))
+      ;; A common bug in inn is that if you have posted an article and
+      ;; then retrieves the active file, it will answer correctly --
+      ;; the new article is included.  However, a NOV entry for the
+      ;; article may not have been generated yet, so this may fail.
+      ;; We work around this problem by retrieving the last few
+      ;; headers using HEAD.
+      headers)))
+
 ;; Various cruft the backends and Gnus need to communicate.
 
 (defvar nntp-server-buffer nil)
@@ -414,8 +620,8 @@ the line could be found."
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (kill-all-local-variables)
-    (setq case-fold-search t)		;Should ignore case.
     (set (make-local-variable 'nntp-process-response) nil)
+    (setq case-fold-search t)		;Should ignore case.
     t))
 
 ;;; Various functions the backends use.

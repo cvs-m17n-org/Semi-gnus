@@ -3,7 +3,7 @@
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	MORIOKA Tomohiko <tomo@m17n.org>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;      Katsumi Yamaoka  <yamaoka@jpl.org>
 ;;      Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
