@@ -1087,18 +1087,18 @@ is enclosed by at least one regexp grouping construct."
 	(delete-region start (point))))
     (goto-char (point-min))
     (while (re-search-forward
-	    "<a href=\"\\(\\([0-9][0-9]\\)\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([^\\.]+\\).html\\)\"><font size=\"4\"><strong>"
+	    "<a href=\"\\(/news/\\)?\\(\\([0-9][0-9]\\)\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([^\\.]+\\).html\\)\"><font size=\"4\"><strong>"
 	    nil t)
-      (let ((year  (+ 2000 (string-to-number (match-string 2))))
-	    (month (string-to-number (match-string 3)))
-	    (day   (string-to-number (match-string 4)))
+      (let ((year  (+ 2000 (string-to-number (match-string 3))))
+	    (month (string-to-number (match-string 4)))
+	    (day   (string-to-number (match-string 5)))
 	    (id    (format "<%s%s%s%s%%%s>"
-			   (match-string 2)
 			   (match-string 3)
 			   (match-string 4)
 			   (match-string 5)
+			   (match-string 6)
 			   nnshimbun-current-group))
-	    (url (match-string 1)))
+	    (url (match-string 2)))
 	(push (make-full-mail-header
 	       0
 	       (nnshimbun-mime-encode-string
