@@ -9473,7 +9473,7 @@ Gnus $B$,F1$8(B @code{Message-ID} $B$r;}$DFs$D$N5-;v$rH/8+$7$?$H$-$O!"2?$+;W$
 @item H f
 @kindex H f ($B35N,(B)
 @findex gnus-summary-fetch-faq
-@vindex gnus-grou-faq-directory
+@vindex gnus-group-faq-directory
 $B8=:_$N%0%k!<%W$N(B @acronym{FAQ} (frequently asked questions ($BIQHK$K$5$l$k(B
 $B<ALd(B) $B$N%j%9%H(B) $B$r<hF@$7$h$&$H$7$^$9(B (@code{gnus-summary-fetch-faq})$B!#(B
 gnus $B$OIaDL$O1s3V%^%7%s$N%G%#%l%/%H%j$G$"(B
@@ -18352,6 +18352,7 @@ Gnus $B$O0lHLE*$J%9%3%"%U%!%$%k$rFCDj$N%9%3%"%U%!%$%k8~$1$N$b$N$h$jA0$KE,(B
 
 $BNc$($P!"%5!<%P!<$rFCDj$7$J$$A4BN%9%3%"%U%!%$%k$r;H$C$F!"?F%0%k!<%W$K=`$8(B
 $B$?%9%3%"IU$1$r9T$J$&$J$i$P!"<!$NCM$r;H$($PNI$$$G$7$g$&!#(B
+
 @example
 (list (lambda (group) ("all.SCORE"))
       'gnus-score-find-hierarchical)
@@ -22044,8 +22045,9 @@ Spam $B5-;v$@$1$N(B @samp{$} $B0u$r4XO"IU$1$k:G>.$N@$OC$K$h$C$F!"(BBogofilte
 $B$N5-;v$N(B @emph{spamicity} ($BLuCm(B: spam $BEY(B?) $B%9%3%"(B (0.0$B!A(B1.0) $B$rI=<($7$^(B
 $B$9!#(B
 
-Bogofilter $B$O!"%3%s%Q%$%k;~$K@_Dj$5$l$kFbIt$NogCM$K4p$E$$$F!"%a%C%;!<%8(B
-$B$,(B spam $B$+$I$&$+$r7hDj$7$^$9!#ogCM$O%+%9%?%^%$%:$G$-$^$;$s!#(B
+Bogofilter $B$O!"$"$k0lDj$NogCM$K4p$E$$$F!"%a%C%;!<%8$,(B spam $B$+$I$&$+$r8+(B
+$B6K$a$^$9!#ogCM$O%+%9%?%^%$%:$G$-$^$9!#(BBogofilter $B$N%I%-%e%a%s%H$rD4$Y$F(B
+$B2<$5$$!#(B
 
 Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N=hM}$O(B
 $B<h$j>C$5$l$^$9!#(B
@@ -22308,9 +22310,11 @@ SpamOracle $B$O%a%C%;!<%8$,(B spam $B$+(B ham $B$+$r8+6K$a$k$?$a$KE}7WE*$J<
 @end lisp
 
 @code{spam-list-of-checks} $B$K(B
+
 @example
     (spam-use-blackbox . spam-check-blackbox)
 @end example
+
 $B$rDI2C!#(B
 
 @item
