@@ -126,7 +126,8 @@ it's not cached."
 	  (overview-file (gnus-cache-file-name
 			  (car gnus-cache-buffer) ".overview")))
       ;; write the overview only if it was modified
-      (when (and (buffer-live-p buffer) (buffer-modified-p buffer))
+      (when (and (buffer-live-p buffer)
+		 (buffer-modified-p buffer))
 	(with-current-buffer buffer
 	  (if (> (buffer-size) 0)
 	      ;; Non-empty overview, write it to a file.
@@ -143,8 +144,8 @@ it's not cached."
 		(delete-directory (file-name-directory overview-file))
 	      (error)))
 
-	  (gnus-cache-update-overview-total-fetched-for (car gnus-cache-buffer) 
-							overview-file)))
+	  (gnus-cache-update-overview-total-fetched-for
+	   (car gnus-cache-buffer) overview-file)))
       ;; Kill the buffer -- it's either unmodified or saved.
       (gnus-kill-buffer buffer)
       (setq gnus-cache-buffer nil))))
@@ -155,7 +156,8 @@ it's not cached."
 	     (numberp article)
 	     (> article 0)		; This might be a dummy article.
 	     (vectorp headers))
-    (let ((number article) file)
+    (let ((number article)
+	  file lines-chars)
       ;; If this is a virtual group, we find the real group.
       (when (gnus-virtual-group-p group)
 	(let ((result (nnvirtual-find-group-art
@@ -185,9 +187,12 @@ it's not cached."
 	      (gnus-write-buffer-as-coding-system
 	       gnus-cache-write-file-coding-system file)
 	      (gnus-cache-update-file-total-fetched-for group file)
+	      (setq lines-chars (nnheader-get-lines-and-char))
 	      (nnheader-remove-body)
 	      (setq headers (nnheader-parse-naked-head))
 	      (mail-header-set-number headers number)
+	      (mail-header-set-lines headers (car lines-chars))
+	      (mail-header-set-chars headers (cadr lines-chars))
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))
 	      (goto-char (point-max))

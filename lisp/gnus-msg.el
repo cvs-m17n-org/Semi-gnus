@@ -396,10 +396,10 @@ Thank you for your help in stamping out bugs.
 
 ;;; Internal functions.
 
-(defun gnus-inews-make-draft ()
+(defun gnus-inews-make-draft (articles)
   `(lambda ()
      (gnus-inews-make-draft-meta-information
-      ,gnus-newsgroup-name ',gnus-article-reply)))
+      ,gnus-newsgroup-name ',@articles)))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
@@ -443,7 +443,7 @@ Thank you for your help in stamping out bugs.
 		  (not (string= ,group "")))
 	 (push (cons
 		(intern gnus-draft-meta-information-header)
-		(gnus-inews-make-draft))
+		(gnus-inews-make-draft ,yanked))
 	       message-required-headers))
        (unwind-protect
 	   (progn
@@ -462,12 +462,14 @@ Thank you for your help in stamping out bugs.
        (run-hooks 'post-command-hook)
        (set-buffer-modified-p nil))))
 
-(defun gnus-inews-make-draft-meta-information (group article)
+(defun gnus-inews-make-draft-meta-information (group &rest articles)
   (concat "(\"" group "\" "
-	  (if article (number-to-string
-		       (if (listp article)
-			   (car article)
-			 article)) "\"\"")
+	  (if articles (mapconcat
+			(lambda (elem)
+			  (if (consp elem)
+			      (car elem)
+			    elem))
+			articles " "))
 	  ")"))
 
 ;;;###autoload

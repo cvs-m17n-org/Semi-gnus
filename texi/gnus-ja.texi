@@ -3071,8 +3071,20 @@ nntp+news.gnus.org:gmane.text.docbook.apps
 これはもし必要であれば、グループ毎のフック関数としても使用できます。もし
 あるグループに入ったときにビープ音を鳴らしたければ、そのグループのパラメー
 タに @code{(dummy-variable (ding))} みたいなものを書いておくこともできま
-す。@code{dummy-variable} という変数に @code{(ding)} の評価結果が設定さ
-れますが、まあ、誰も気にしないでしょ?
+す。@code{dummy-variable} という変数に (無意味な) @code{(ding)} の評価結
+果が設定されます。
+
+あるいは、@var{variable} はそのグループに対してローカルになるので、この
+様式は一時的にフックを変更するために使うことができます。例えば、以下のも
+のがグループパラメータに追加されると、
+
+@lisp
+(gnus-summary-prepared-hook
+  '(lambda nil (local-set-key "d" (local-key-binding "n"))))
+@end lisp
+
+そのグループに入ったときに @kbd{d} キーは記事に期限切れ消去の印を付けな
+いようになります。
 @end table
 
 グループパラメータの修正には @kbd{G p} か @kbd{G c} 命令を使ってくださ

@@ -1211,6 +1211,14 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
      (point-max)))
   (goto-char (point-min)))
 
+(defun nnheader-get-lines-and-char ()
+  "Return the number of lines and chars in the article body."
+  (goto-char (point-min))
+  (if (not (re-search-forward "\n\r?\n" nil t))
+      (list 0 0)
+    (list (count-lines (point) (point-max))
+	  (- (point-max) (point)))))
+
 (defun nnheader-remove-body ()
   "Remove the body from an article in this current buffer."
   (goto-char (point-min))

@@ -1050,7 +1050,8 @@ The following commands are available:
   (use-local-map gnus-group-mode-map)
   (buffer-disable-undo)
   (setq truncate-lines t)
-  (setq buffer-read-only t)
+  (setq buffer-read-only t
+	show-trailing-whitespace nil)
   (gnus-set-default-directory)
   (gnus-update-format-specifications nil 'group 'group-mode)
   (gnus-update-group-mark-positions)
@@ -1945,7 +1946,10 @@ group."
 No article is selected automatically.
 If the group is opened, just switch the summary buffer.
 If ALL is non-nil, already read articles become readable.
-If ALL is a number, fetch this number of articles."
+If ALL is a positive number, fetch this number of the latest
+articles in the group.
+If ALL is a negative number, fetch this number of the earliest
+articles in the group."
   (interactive "P")
   (when (and (eobp) (not (gnus-group-group-name)))
     (forward-line -1))
