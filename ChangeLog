@@ -1,3 +1,25 @@
+2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus.el (toplevel): Add autoloads for
+	`gnus-namazu-create-index', and `gnus-namazu-update-all-indices'
+	and `gnus-namazu-update-index'.
+
+	* lisp/gnus-namazu.el: Support automatically updating multiple
+	indices.
+	(gnus-namazu-make-index-interval): Abolished.
+	(gnus-namazu-index-update-interval): New option.
+	(gnus-namazu/setup): Call `gnus-namazu-update-all-indices' instead
+	of `gnus-namazu-make-index'.
+	(gnus-namazu/mknmz-process): Abolished.
+	(gnus-namazu/status-file-name): New macro.
+	(gnus-namazu-make-index, gnus-namazu-make-index-stop,
+	gnus-namazu/mknmz-sentinel): Removed.
+	(gnus-namazu/mknmz-cleanup, gnus-namazu/index-old-p): New function.
+	(gnus-namazu-create-index, gnus-namazu-update-all-indices,
+	gnus-namazu-update-index, gnus-namazu-stop-update): New command.
+	(gnus-namazu/update-directories, gnus-namazu/update-process): New
+	internal variable.
+
 2002-07-31  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el: Support automatically updating index.

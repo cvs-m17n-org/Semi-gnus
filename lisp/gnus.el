@@ -2291,6 +2291,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 ;; To search articles with Namazu.
 (autoload 'gnus-namazu-search "gnus-namazu" nil t)
+(autoload 'gnus-namazu-create-index "gnus-namazu" nil t)
+(autoload 'gnus-namazu-update-index "gnus-namazu" nil t)
+(autoload 'gnus-namazu-update-all-indices "gnus-namazu" nil t)
 
 ;; To make nnir groups.
 (autoload 'gnus-group-make-nnir-group "nnir" nil t)
