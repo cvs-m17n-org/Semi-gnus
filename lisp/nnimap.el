@@ -938,12 +938,15 @@ function is generally only called when Gnus is shutting down."
       (erase-buffer)
       (dolist (pattern (nnimap-pattern-to-list-arguments
 			nnimap-list-pattern))
-	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil 
+	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil
 					nnimap-server-buffer))
-	  (or (member-if (lambda (mailbox)
-			   (string= (downcase mailbox) "\\noselect"))
-			 (imap-mailbox-get 'list-flags mbx
-					   nnimap-server-buffer))
+	  (or (let ((mailboxes (imap-mailbox-get 'list-flags mbx
+						 nnimap-server-buffer)))
+		(while (and mailboxes
+			    (not (string-equal (downcase (car mailboxes))
+					       "\\noselect")))
+		  (pop mailboxes))
+		mailboxes)
 	      ;; Escape SPC in mailboxes xxx relies on gnus internals
 	      (let ((info (nnimap-find-minmax-uid mbx 'examine)))
 		(when info
