@@ -1,3 +1,29 @@
+1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-draft.el: Remove some useless comments.
+
+	* lisp/gnus-draft.el (gnus-draft-send-draft): Abolished.
+
+1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-yank-original):  Use the value of
+	`message-reply-buffer' as a function if it is a function.
+	(message-fetch-reply-field): Ditto.
+
+	* lisp/message.el (message-setup): Set the value of
+	`message-reply-buffer' if the variable
+	`gnus-message-get-reply-buffer' exists.
+
+	* lisp/gnus-msg.el (gnus-setup-message): Bind
+	`message-get-reply-buffer' as the function
+	`gnus-copy-article-buffer'.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send): Call
+	`message-send-news-function' or `message-send-mail-function'
+	instead of `message-send-and-exit'.
+
 1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-mode-map): Use `define-key' instead of
@@ -148,14 +174,12 @@
 
 	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
 	`gnus-draft-setup-for-editing' instead of `gnus-draft-setup'.
-
-	* lisp/gnus-draft.el (gnus-draft-send): Use
-	`gnus-draft-setup-for-sending' instead of `gnus-draft-setup'.
-
-	* lisp/gnus-draft.el (gnus-draft-setup-for-editing): New function.
-
-	* lisp/gnus-draft.el (gnus-draft-setup-for-sending): Renamed from
+	(gnus-draft-send): Use `gnus-draft-setup-for-sending' instead of
 	`gnus-draft-setup'.
+	(gnus-draft-setup-for-editing): New function (renamed from
+	`gnus-draft-setup').
+	(gnus-draft-setup-for-sending): New function.
+	(gnus-draft-send-draft-buffer): New variable.
 
 1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
