@@ -413,6 +413,15 @@ For example:
   :group 'gnus-charset
   :type '(repeat (cons (regexp :tag "Group") (symbol :tag "Charset"))))
 
+(defcustom gnus-group-jump-to-group-prompt nil
+  "Default prompt for `gnus-group-jump-to-group'.
+If non-nil, the value should be a string, e.g. \"nnml:\",
+in which case `gnus-group-jump-to-group' offers \"Group: nnml:\"
+in the minibuffer prompt."
+  :group 'gnus-group-various
+  :type '(choice (string :tag "Prompt string")
+                 (const :tag "Empty" nil)))
+
 ;;; Internal variables
 
 (defvar gnus-group-sort-alist-function 'gnus-group-sort-flat
@@ -1833,7 +1842,7 @@ Return the name of the group if selection was successful."
    (list (completing-read
 	  "Group: " gnus-active-hashtb nil
 	  (gnus-read-active-file-p)
-	  nil
+	  gnus-group-jump-to-group-prompt
 	  'gnus-group-history)))
 
   (when (equal group "")
