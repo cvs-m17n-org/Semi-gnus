@@ -614,43 +614,41 @@ See also the documentation for `gnus-article-highlight-citation'."
 ;;; Internal functions:
 
 
-(defun gnus-cite-parse-maybe (&optional force)
-  ;; Parse if the buffer has changes since last time.
-  (if (and (not force)
-	   (equal gnus-cite-article gnus-article-current))
+(defun gnus-cite-parse-maybe (&optional force no-overlay)
+  "Always parse the buffer."
+  (gnus-cite-localize)
+  ;;Reset parser information.
+  (setq gnus-cite-prefix-alist nil
+	gnus-cite-attribution-alist nil
+	gnus-cite-loose-prefix-alist nil
+	gnus-cite-loose-attribution-alist nil)
+  (unless no-overlay
+    (gnus-cite-delete-overlays))
+  ;; Parse if not too large.
+  (if (and gnus-cite-parse-max-size
+	   (> (buffer-size) gnus-cite-parse-max-size))
       ()
-    (gnus-cite-localize)
-    ;;Reset parser information.
-    (setq gnus-cite-prefix-alist nil
-	  gnus-cite-attribution-alist nil
-	  gnus-cite-loose-prefix-alist nil
-	  gnus-cite-loose-attribution-alist nil)
-    (while gnus-cite-overlay-list
-      (gnus-delete-overlay (pop gnus-cite-overlay-list)))
-    ;; Parse if not too large.
-    (if (and (not force)
-	     gnus-cite-parse-max-size
-	     (> (buffer-size) gnus-cite-parse-max-size))
-	()
-      (setq gnus-cite-article (cons (car gnus-article-current)
-				    (cdr gnus-article-current)))
-      (gnus-cite-parse-wrapper))))
+    (setq gnus-cite-article (cons (car gnus-article-current)
+				  (cdr gnus-article-current)))
+    (gnus-cite-parse-wrapper)))
+
+(defun gnus-cite-delete-overlays ()
+  (dolist (overlay gnus-cite-overlay-list)
+    (when (or (not (gnus-overlay-end overlay))
+	      (and (>= (gnus-overlay-end overlay) (point-min))
+		   (<= (gnus-overlay-end overlay) (point-max))))
+      (setq gnus-cite-overlay-list (delete overlay gnus-cite-overlay-list))
+      (gnus-delete-overlay overlay))))
 
 (defun gnus-cite-parse-wrapper ()
   ;; Wrap chopped gnus-cite-parse
   (article-goto-body)
   (save-excursion
     (gnus-cite-parse-attributions))
-  ;; Try to avoid check citation if there is no reason to believe
-  ;; that article has citations
-  (if (or gnus-cite-always-check
-	  (save-excursion
-	    (re-search-backward gnus-cite-reply-regexp nil t))
-	  gnus-cite-loose-attribution-alist)
-      (progn (save-excursion
-	       (gnus-cite-parse))
-	     (save-excursion
-	       (gnus-cite-connect-attributions)))))
+  (save-excursion
+    (gnus-cite-parse))
+  (save-excursion
+    (gnus-cite-connect-attributions)))
 
 (defun gnus-cite-parse ()
   ;; Parse and connect citation prefixes and attribution lines.
@@ -921,7 +919,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 (defun gnus-cite-toggle (prefix)
   (save-excursion
     (set-buffer gnus-article-buffer)
-    (gnus-cite-parse-maybe)
+    (gnus-cite-parse-maybe nil t)
     (let ((buffer-read-only nil)
 	  (numbers (cdr (assoc prefix gnus-cite-prefix-alist)))
 	  (inhibit-point-motion-hooks t)
