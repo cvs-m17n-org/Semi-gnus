@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -388,7 +388,7 @@ Thank you for your help in stamping out bugs.
 (defun gnus-inews-make-draft ()
   `(lambda ()
      (gnus-inews-make-draft-meta-information
-      ,gnus-newsgroup-name ,gnus-article-reply)))
+      ,gnus-newsgroup-name ',gnus-article-reply)))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
@@ -619,7 +619,8 @@ a news."
 	   ""))
 	;; make sure last viewed article doesn't affect posting styles:
 	(gnus-article-copy))
-    (gnus-post-news 'post gnus-newsgroup-name)))
+    (gnus-post-news 'post gnus-newsgroup-name nil nil nil nil
+		    (string= gnus-newsgroup-name ""))))
 
 (defun gnus-summary-mail-other-window (&optional arg)
   "Start composing a mail in another window.
@@ -1704,17 +1705,15 @@ The source file has to be in the Emacs load path."
       (insert ";----------------- Environment follows ------------------\n\n"))
     (while olist
       (if (boundp (car olist))
-	  (condition-case ()
-	      (pp `(setq ,(car olist)
-			 ,(if (or (consp (setq sym (symbol-value (car olist))))
-				  (and (symbolp sym)
-				       (not (or (eq sym nil)
-						(eq sym t)))))
-			      (list 'quote (symbol-value (car olist)))
-			    (symbol-value (car olist))))
-		  (current-buffer))
-	    (error
-	     (format "(setq %s 'whatever)\n" (car olist))))
+	  (ignore-errors
+	    (pp `(setq ,(car olist)
+		       ,(if (or (consp (setq sym (symbol-value (car olist))))
+				(and (symbolp sym)
+				     (not (or (eq sym nil)
+					      (eq sym t)))))
+			    (list 'quote (symbol-value (car olist)))
+			  (symbol-value (car olist))))
+		(current-buffer)))
 	(insert ";; (makeunbound '" (symbol-name (car olist)) ")\n"))
       (setq olist (cdr olist)))
     ;; Remove any control chars - they seem to cause trouble for some
@@ -1810,6 +1809,7 @@ this is a reply."
 			      group (gnus-status-message method))
 		(sit-for 2))
 	      (when (and group-art
+			 (gnus-alive-p)
 			 (or gnus-gcc-mark-as-read
 			     gnus-inews-mark-gcc-as-read))
 		(gnus-group-mark-article-read group (cdr group-art)))
@@ -2017,7 +2017,9 @@ this is a reply."
 			   (let ((value ,(cdr result)))
 			     (when value
 			       (message-goto-eoh)
-			       (insert ,header ": " value "\n"))))))))
+			       (insert ,header ": " value)
+			       (unless (bolp)
+				 (insert "\n")))))))))
 		  nil 'local))
       (when (or name address)
 	(add-hook 'message-setup-hook

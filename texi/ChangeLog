@@ -1,3 +1,111 @@
+2003-01-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Header Commands): Addition.
+
+2003-01-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Washing): Added gnus-outlook-unwrap-lines,
+	gnus-outlook-repair-attribution, gnus-outlook-rearrange-citation.
+
+2003-01-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi: Change .gnus to .gnus.el.
+	(Agent Commands): Remove batch here.
+	(MIME Commands): Add.
+
+	* message.texi (Canceling News): Document canlock.
+
+2003-01-10  Alex Schroeder  <alex@emacswiki.org>
+
+	* gnus.texi (Creating a spam-stat dictionary): Explain how using
+	the Gnus Agent with nnimap might work to do this.
+	(Splitting mail using spam-stat): Use nnimap-split-fancy if you
+	use the nnimap back end.
+
+2003-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Filtering Spam Using spam.el): Trivial fix.
+
+2003-01-10  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Choosing Variables, Agent Caveats): Add.
+
+2003-01-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using spam.el, ifile spam filtering) 
+	(spam-stat spam filtering): added new functionality and explained
+	old functionality better, especially where it has changed in
+	ham/spam/unclassified group exit processing.
+
+2003-01-09  Alex Schroeder  <alex@emacswiki.org>
+
+	* gnus.texi (Splitting mail using spam-stat): Fix typo.
+	(Creating a spam-stat dictionary, Splitting mail using spam-stat):
+	Fix markup in a few places.
+
+2003-01-08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Positioning Point): %~ => ~*.
+
+2003-01-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.texi: Updated copyright line.
+	(Mailing Lists): Updated (renamed) function names.
+	(Header Commands): Updated (renamed) function names.
+	(Header Commands): Added message-to-list-only,
+	message-change-subject, message-cross-post-followup-to,
+	message-reduce-to-to-cc and message-add-archive-header.  Moved
+	message-sort-headers, message-insert-to, message-insert-newsgroups
+	and message-insert-disposition-notification-to from other
+	sections.
+	(Insertion): Added message-mark-inserted-region,
+	message-mark-insert-file.  Moved
+	message-insert-disposition-notification-to to section (Header
+	Commands).
+	(Various Commands): Moved message-insert-wide-reply,
+	message-insert-to, message-insert-newsgroups and
+	message-sort-headers to (Header Commands) section.
+	(Message Headers): Added message-subject-trailing-was-query.
+	(Insertion Variables): Added message-mark-insert-begin and
+	message-mark-insert-end.
+
+2003-01-08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Optional Back End Functions): Addition.
+	(Positioning Point): Changed to %~.
+
+2003-01-08  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (MIME Commands): Add.
+
+2003-01-06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Various Commands): Addition.
+
+2003-01-05  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using spam.el) 
+	(Blacklists and Whitelists, BBDB Whitelists, Blackholes) 
+	(Bogofilter, Ifile spam filtering, Extending spam.el): updated
+	documentation for the new spam.el functionality
+
+2003-01-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* refcard.tex: Fix pagebreak.
+
+	* gnusref.tex: Additions and fixes.
+
+	* booklet.tex: Add missing sections.
+
+	* gnus.texi (Mail Group Commands): Fix typo.
+	(XEmacs): Add sh-script.
+	(Article Washing): Fix.
+
+2003-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Setting Process Marks): Addition.
+	(Group Line Specification): Addition.
+
 2003-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Group Line Specification): Addition.

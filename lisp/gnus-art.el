@@ -151,7 +151,7 @@
      "^X-Request-PGP:" "^X-Fingerprint:" "^X-WRIEnvto:" "^X-WRIEnvfrom:"
      "^X-Virus-Scanned:" "^X-Delivery-Agent:" "^Posted-Date:" "^X-Gateway:"
      "^X-Local-Origin:" "^X-Local-Destination:" "^X-UserInfo1:"
-     "^X-Received-Date:" "^X-Hashcash:")
+     "^X-Received-Date:" "^X-Hashcash:" "^Face:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -758,7 +758,8 @@ displayed by the first non-nil matching CONTENT face."
 
 (defcustom gnus-unbuttonized-mime-types '(".*/.*")
   "List of MIME types that should not be given buttons when rendered inline.
-See also `gnus-buttonized-mime-types' which may override this variable."
+See also `gnus-buttonized-mime-types' which may override this variable.
+This variable is only used when `gnus-inhibit-mime-unbuttonizing' is nil."
   :version "21.1"
   :group 'gnus-article-mime
   :type '(repeat regexp))
@@ -767,7 +768,8 @@ See also `gnus-buttonized-mime-types' which may override this variable."
   "List of MIME types that should be given buttons when rendered inline.
 If set, this variable overrides `gnus-unbuttonized-mime-types'.
 To see e.g. security buttons you could set this to
-`(\"multipart/signed\")'."
+`(\"multipart/signed\")'.
+This variable is only used when `gnus-inhibit-mime-unbuttonizing' is nil."
   :version "21.1"
   :group 'gnus-article-mime
   :type '(repeat regexp))
@@ -1222,6 +1224,24 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
   "Internal variable used to say whether `smiley-mule' is loaded (whether
 smiley functions are not overridden by `smiley').")
 
+(defcustom gnus-treat-display-face
+  (and (not noninteractive)
+       (or (and (fboundp 'image-type-available-p)
+		(image-type-available-p 'png))
+	   (and (featurep 'xemacs)
+		(featurep 'png)))
+       'head)
+  "Display Face headers.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)X-Face' for details."
+  :group 'gnus-article-treat
+  :version "21.1"
+  :link '(custom-manual "(gnus)Customizing Articles")
+  :link '(custom-manual "(gnus)X-Face")
+  :type gnus-article-treat-head-custom)
+(put 'gnus-treat-display-xface 'highlight t)
+
 (defcustom gnus-treat-display-grey-xface
   (and (not noninteractive)
        (or (featurep 'xemacs)
@@ -1431,6 +1451,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-date-original gnus-article-date-original)
     (gnus-treat-date-user-defined gnus-article-date-user)
     (gnus-treat-date-iso8601 gnus-article-date-iso8601)
+    (gnus-treat-display-face gnus-article-display-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
@@ -2041,6 +2062,28 @@ unfolded."
 	   (forward-line -1))
 	 (forward-line 1)
 	 (point))))))
+
+(defun article-display-face ()
+  "Display any Face headers in the header."
+  (interactive)
+  (gnus-with-article-headers
+    (let ((face nil))
+      (save-excursion
+	(when (gnus-buffer-live-p gnus-original-article-buffer)
+	  (set-buffer gnus-original-article-buffer)
+	  (setq face (message-fetch-field "face"))))
+      (when face
+	(let ((png (gnus-convert-face-to-png face))
+	      image)
+	  (when png
+	    (setq image (gnus-create-image png 'png t))
+	    (gnus-article-goto-header "from")
+	    (when (bobp)
+	      (insert "From: [no `from' set]\n")
+	      (forward-char -17))
+	    (gnus-add-wash-type 'face)
+	    (gnus-add-image 'face image)
+	    (gnus-put-image image)))))))
 
 (defun article-display-x-face (&optional force)
   "Look for an X-Face header and display it if present."
@@ -3525,6 +3568,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-remove-cr
      article-remove-leading-whitespace
      article-display-x-face
+     article-display-face
      article-de-quoted-unreadable
      article-de-base64-unreadable
      article-decode-HZ
@@ -4671,9 +4715,10 @@ If no internal viewer is available, use an external viewer."
 	  ;; We have to do this since selecting the window
 	  ;; may change the point.  So we set the window point.
 	  (set-window-point window point)))
-      (let* ((handles (or ihandles (mm-dissect-buffer
-				    nil gnus-article-loose-mime)
-			  (mm-uu-dissect)))
+      (let* ((handles (or ihandles
+			  (mm-dissect-buffer nil gnus-article-loose-mime)
+			  (and gnus-article-emulate-mime
+			       (mm-uu-dissect))))
 	     buffer-read-only handle name type b e display)
 	(when (and (not ihandles)
 		   (not gnus-displaying-mime))
@@ -5610,7 +5655,7 @@ If given a prefix, show the hidden text instead."
     "\C-c\C-f\C-k" message-goto-keywords
     "\C-c\C-f\C-u" message-goto-summary
     "\C-c\C-f\C-i" message-insert-or-toggle-importance
-    "\C-c\C-f\C-a" message-gen-unsubscribed-mft
+    "\C-c\C-f\C-a" message-generate-unsubscribed-mail-followup-to
     "\C-c\C-b" message-goto-body
     "\C-c\C-i" message-goto-signature
 

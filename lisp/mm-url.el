@@ -62,7 +62,8 @@
    ((exec-installed-p "lynx") 'lynx)
    ((exec-installed-p "curl") 'curl)
    (t "GET"))
-  "The url grab program."
+  "The url grab program.
+Likely values are `wget', `w3m', `lynx' and `curl'."
   :type '(choice
 	  (symbol :tag "wget" wget)
 	  (symbol :tag "w3m" w3m)

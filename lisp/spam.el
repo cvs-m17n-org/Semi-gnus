@@ -38,25 +38,12 @@
 
 (require 'gnus-uu)			; because of key prefix issues
 (require 'gnus)	; for the definitions of group content classification and spam processors
-
-;; FIXME!  We should not require `message' until we actually need
-;; them.  Best would be to declare needed functions as auto-loadable.
-(require 'message)
-
-;; Attempt to load BBDB macros
-(eval-when-compile
-  (condition-case nil
-      (require 'bbdb-com)
-    (file-error (defalias 'bbdb-search 'ignore))))
+(require 'message)			;for the message-fetch-field functions
 
 ;; autoload executable-find
 (eval-and-compile
   ;; executable-find is not autoloaded in Emacs 20
   (autoload 'executable-find "executable"))
-
-;; autoload ifile-spam-filter
-(eval-and-compile
-  (autoload 'ifile-spam-filter "ifile-gnus"))
 
 ;; autoload query-dig
 (eval-and-compile
@@ -75,6 +62,14 @@
   "Directory for spam whitelists and blacklists."
   :type 'directory
   :group 'spam)
+
+(defcustom spam-move-spam-nonspam-groups-only t
+  "Whether spam should be moved in non-spam groups only.
+When nil, only ham and unclassified groups will have their spam moved
+to the spam-process-destination.  When t, spam will also be moved from
+spam groups."
+  :type 'boolean
+  :group 'spam-ifile)
 
 (defcustom spam-whitelist (expand-file-name "whitelist" spam-directory)
   "The location of the whitelist.
@@ -125,25 +120,31 @@ The regular expression is matched against the address."
   :type 'boolean
   :group 'spam)
 
+(defcustom spam-use-stat nil
+  "Whether spam-stat should be used by spam-split."
+  :type 'boolean
+  :group 'spam)
+
 (defcustom spam-split-group "spam"
   "Group name where incoming spam should be put by spam-split."
   :type 'string
   :group 'spam)
 
-;; FIXME!  The mailgroup list evidently depends on other choices made by the
-;; user, so the built-in default below is not likely to be appropriate.
 (defcustom spam-junk-mailgroups (cons spam-split-group '("mail.junk" "poste.pourriel"))
   "Mailgroups with spam contents.
 All unmarked article in such group receive the spam mark on group entry."
   :type '(repeat (string :tag "Group"))
   :group 'spam)
 
-(defcustom spam-blackhole-servers '("bl.spamcop.net" "relays.ordb.org" "dev.null.dk" "relays.visi.com")
+(defcustom spam-blackhole-servers '("bl.spamcop.net" "relays.ordb.org" 
+				    "dev.null.dk" "relays.visi.com")
   "List of blackhole servers."
   :type '(repeat (string :tag "Server"))
   :group 'spam)
 
-(defcustom spam-ham-marks (list 'gnus-del-mark 'gnus-read-mark 'gnus-killed-mark 'gnus-kill-file-mark 'gnus-low-score-mark)
+(defcustom spam-ham-marks (list 'gnus-del-mark 'gnus-read-mark 
+				'gnus-killed-mark 'gnus-kill-file-mark 
+				'gnus-low-score-mark)
   "Marks considered as being ham (positively not spam).
 Such articles will be processed as ham (non-spam) on group exit."
   :type '(set
@@ -168,6 +169,34 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
   "Face for spam-marked articles"
   :type 'face
   :group 'spam)
+
+(defgroup spam-ifile nil
+  "Spam ifile configuration."
+  :group 'spam)
+
+(defcustom spam-ifile-path (executable-find "ifile")
+  "File path of the ifile executable program."
+  :type '(choice (file :tag "Location of ifile")
+		 (const :tag "ifile is not installed"))
+  :group 'spam-ifile)
+
+(defcustom spam-ifile-database-path nil
+  "File path of the ifile database."
+  :type '(choice (file :tag "Location of the ifile database")
+		 (const :tag "Use the default"))
+  :group 'spam-ifile)
+
+(defcustom spam-ifile-spam-category "spam"
+  "Name of the spam ifile category."  
+  :type 'string
+  :group 'spam-ifile)
+
+(defcustom spam-ifile-all-categories nil
+  "Whether the ifile check will return all categories, or just spam.
+Set this to t if you want to use the spam-split invocation of ifile as
+your main source of newsgroup names."
+  :type 'boolean
+  :group 'spam-ifile)
 
 (defgroup spam-bogofilter nil
   "Spam bogofilter configuration."
@@ -199,7 +228,8 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
 ;; (and previously X-NoSpam) are produced by the `NoSpam' tool, which has
 ;; never been published, so it might not be reasonable leaving it in the
 ;; list.
-(defcustom spam-bogofilter-spaminfo-header-regexp "^X-\\(jf\\|Junk\\|NoSpam\\|Spam\\|SB\\)[^:]*:"
+(defcustom spam-bogofilter-spaminfo-header-regexp 
+  "^X-\\(jf\\|Junk\\|NoSpam\\|Spam\\|SB\\)[^:]*:"
   "Regexp for spam markups in headers.
 Markup from spam recognisers, as well as `Xref', are to be removed from
 articles before they get registered by Bogofilter."
@@ -226,12 +256,14 @@ articles before they get registered by Bogofilter."
 (defun spam-group-spam-contents-p (group)
   (if (stringp group)
       (or (member group spam-junk-mailgroups)
-	  (memq 'gnus-group-spam-classification-spam (gnus-parameter-spam-contents group)))
+	  (memq 'gnus-group-spam-classification-spam 
+		(gnus-parameter-spam-contents group)))
     nil))
   
 (defun spam-group-ham-contents-p (group)
   (if (stringp group)
-      (memq 'gnus-group-spam-classification-ham (gnus-parameter-spam-contents group))
+      (memq 'gnus-group-spam-classification-ham 
+	    (gnus-parameter-spam-contents group))
     nil))
 
 (defun spam-group-processor-p (group processor)
@@ -240,53 +272,84 @@ articles before they get registered by Bogofilter."
       (member processor (car (gnus-parameter-spam-process group)))
     nil))
 
-(defun spam-group-processor-bogofilter-p (group)
+(defun spam-group-spam-processor-bogofilter-p (group)
   (spam-group-processor-p group 'gnus-group-spam-exit-processor-bogofilter))
 
-(defun spam-group-processor-ifile-p (group)
-  (spam-group-processor-p group 'gnus-group-spam-exit-processor-ifile))
-
-(defun spam-group-processor-blacklist-p (group)
+(defun spam-group-spam-processor-blacklist-p (group)
   (spam-group-processor-p group 'gnus-group-spam-exit-processor-blacklist))
 
-(defun spam-group-processor-whitelist-p (group)
+(defun spam-group-spam-processor-ifile-p (group)
+  (spam-group-processor-p group 'gnus-group-spam-exit-processor-ifile))
+
+(defun spam-group-ham-processor-ifile-p (group)
+  (spam-group-processor-p group 'gnus-group-ham-exit-processor-ifile))
+
+(defun spam-group-spam-processor-stat-p (group)
+  (spam-group-processor-p group 'gnus-group-spam-exit-processor-stat))
+
+(defun spam-group-ham-processor-stat-p (group)
+  (spam-group-processor-p group 'gnus-group-ham-exit-processor-stat))
+
+(defun spam-group-ham-processor-whitelist-p (group)
   (spam-group-processor-p group 'gnus-group-ham-exit-processor-whitelist))
 
-(defun spam-group-processor-BBDB-p (group)
+(defun spam-group-ham-processor-BBDB-p (group)
   (spam-group-processor-p group 'gnus-group-ham-exit-processor-BBDB))
 
-;;; Hooks dispatching.  A bit raw for now.
+;;; Summary entry and exit processing.
 
 (defun spam-summary-prepare ()
   (spam-mark-junk-as-spam-routine))
 
+(add-hook 'gnus-summary-prepare-hook 'spam-summary-prepare)
+
 (defun spam-summary-prepare-exit ()
   ;; The spam processors are invoked for any group, spam or ham or neither
   (when (and spam-bogofilter-path
-	     (spam-group-processor-bogofilter-p gnus-newsgroup-name))
+	     (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name))
     (spam-bogofilter-register-routine))
   
-  (when (spam-group-processor-ifile-p gnus-newsgroup-name)
-    (spam-ifile-register-routine))
+  (when (and spam-ifile-path
+	     (spam-group-spam-processor-ifile-p gnus-newsgroup-name))
+    (spam-ifile-register-spam-routine))
   
-  (when (spam-group-processor-bogofilter-p gnus-newsgroup-name)
+  (when (spam-group-spam-processor-stat-p gnus-newsgroup-name)
+    (spam-stat-register-spam-routine))
+
+  (when (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name)
     (spam-blacklist-register-routine))
 
-  ;; Only for spam groups, we expire and maybe move articles
-  (when (spam-group-spam-contents-p gnus-newsgroup-name)
-    (spam-mark-spam-as-expired-and-move-routine (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+  (if spam-move-spam-nonspam-groups-only      
+      (when (not (spam-group-spam-contents-p gnus-newsgroup-name))
+	(spam-mark-spam-as-expired-and-move-routine
+	 (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+    (spam-mark-spam-as-expired-and-move-routine 
+     (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+
+  ;; now we redo spam-mark-spam-as-expired-and-move-routine to only
+  ;; expire spam, in case the above did not expire them
+  (spam-mark-spam-as-expired-and-move-routine nil)
 
   (when (spam-group-ham-contents-p gnus-newsgroup-name)
-    (when (spam-group-processor-whitelist-p gnus-newsgroup-name)
+    (when (spam-group-ham-processor-whitelist-p gnus-newsgroup-name)
       (spam-whitelist-register-routine))
-    (when (spam-group-processor-BBDB-p gnus-newsgroup-name)
-      (spam-BBDB-register-routine))))
+    (when (spam-group-ham-processor-ifile-p gnus-newsgroup-name)
+      (spam-ifile-register-ham-routine))
+    (when (spam-group-ham-processor-stat-p gnus-newsgroup-name)
+      (spam-stat-register-ham-routine))
+    (when (spam-group-ham-processor-BBDB-p gnus-newsgroup-name)
+      (spam-BBDB-register-routine)))
 
-(add-hook 'gnus-summary-prepare-hook 'spam-summary-prepare)
+  ;; now move all ham articles out of spam groups
+  (when (spam-group-spam-contents-p gnus-newsgroup-name)
+    (spam-ham-move-routine
+     (gnus-parameter-ham-process-destination gnus-newsgroup-name))))
+
 (add-hook 'gnus-summary-prepare-exit-hook 'spam-summary-prepare-exit)
 
 (defun spam-mark-junk-as-spam-routine ()
-  ;; check the global list of group names spam-junk-mailgroups and the group parameters
+  ;; check the global list of group names spam-junk-mailgroups and the
+  ;; group parameters
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
     (let ((articles gnus-newsgroup-articles)
 	  article)
@@ -306,12 +369,27 @@ articles before they get registered by Bogofilter."
 	  (let ((gnus-current-article article))
 	    (gnus-summary-move-article nil group)))))))
  
+(defun spam-ham-move-routine (&optional group)
+  (let ((articles gnus-newsgroup-articles)
+	article ham-mark-values mark)
+    (dolist (mark spam-ham-marks)
+      (push (symbol-value mark) ham-mark-values))
+
+    (while articles
+      (setq article (pop articles))
+      (when (and (memq mark ham-mark-values)
+		 (stringp group))
+	  (let ((gnus-current-article article))
+	    (gnus-summary-move-article nil group))))))
+ 
 (defun spam-generic-register-routine (spam-func ham-func)
   (let ((articles gnus-newsgroup-articles)
-	article mark ham-articles spam-articles spam-mark-values ham-mark-values)
+	article mark ham-articles spam-articles spam-mark-values 
+	ham-mark-values)
 
-    ;; marks are stored as symbolic values, so we have to dereference them for memq to work
-    ;; we wouldn't have to do this if gnus-summary-article-mark returned a symbol.
+    ;; marks are stored as symbolic values, so we have to dereference
+    ;; them for memq to work.  we wouldn't have to do this if
+    ;; gnus-summary-article-mark returned a symbol.
     (dolist (mark spam-ham-marks)
       (push (symbol-value mark) ham-mark-values))
 
@@ -325,15 +403,41 @@ articles before they get registered by Bogofilter."
 	    ((memq article gnus-newsgroup-saved))
 	    ((memq mark ham-mark-values) (push article ham-articles))))
     (when (and ham-articles ham-func)
-      (mapc ham-func ham-articles))	; we use mapc because unlike mapcar it discards the return values
+      (mapc ham-func ham-articles))	; we use mapc because unlike
+					; mapcar it discards the
+					; return values
     (when (and spam-articles spam-func)
-      (mapc spam-func spam-articles))))	; we use mapc because unlike mapcar it discards the return values
+      (mapc spam-func spam-articles))))	; we use mapc because unlike
+					; mapcar it discards the
+					; return values
+
+(eval-and-compile
+  (defalias 'spam-point-at-eol (if (fboundp 'point-at-eol)
+				   'point-at-eol
+				 'line-end-position)))
+
+(defun spam-get-article-as-string (article)
+  (let ((article-string))
+    (when (numberp article)
+      (save-window-excursion
+	(gnus-summary-goto-subject article)
+	(gnus-summary-show-article t)
+	(set-buffer gnus-article-buffer)
+	(setq article-string (buffer-string))))
+    article-string))
 
 (defun spam-fetch-field-from-fast (article)
-  "Fetch the `from' field quickly, using the Gnus internal gnus-data-list function"
+  "Fetch the `from' field quickly, using the internal gnus-data-list function"
   (if (and (numberp article)
 	   (assoc article (gnus-data-list nil)))
       (mail-header-from (gnus-data-header (assoc article (gnus-data-list nil))))
+    nil))
+
+(defun spam-fetch-field-subject-fast (article)
+  "Fetch the `subject' field quickly, using the internal gnus-data-list function"
+  (if (and (numberp article)
+	   (assoc article (gnus-data-list nil)))
+      (mail-header-subject (gnus-data-header (assoc article (gnus-data-list nil))))
     nil))
 
 
@@ -344,6 +448,7 @@ articles before they get registered by Bogofilter."
     (spam-use-whitelist  . spam-check-whitelist)
     (spam-use-BBDB	 . spam-check-BBDB)
     (spam-use-ifile	 . spam-check-ifile)
+    (spam-use-stat	 . spam-check-stat)
     (spam-use-blackholes . spam-check-blackholes)
     (spam-use-bogofilter . spam-check-bogofilter))
 "The spam-list-of-checks list contains pairs associating a parameter
@@ -365,6 +470,9 @@ example like this: (: spam-split)
 
 See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (interactive)
+  
+  ;; load the spam-stat tables if needed
+  (when spam-use-stat (spam-stat-load))
 
   (let ((list-of-checks spam-list-of-checks)
 	decision)
@@ -399,7 +507,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	    (if spam-use-dig
 		(let ((query-result (query-dig query-string)))
 		  (when query-result
-		    (message "spam detected with blackhole check of relay %s (dig query result '%s')" query-string query-result)
+		    (message "spam: positive blackhole check '%s'" query-result)
 		    (push (list ip server query-result)
 			  matches)))
 	      ;; else, if not using dig.el
@@ -409,66 +517,169 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
     (when matches
       spam-split-group)))
 
-;;;; BBDB
-;;; original idea for spam-check-BBDB from Alexander Kotelnikov <sacha@giotto.sj.ru>
+;;;; BBDB 
+
+;;; original idea for spam-check-BBDB from Alexander Kotelnikov
+;;; <sacha@giotto.sj.ru>
 
 ;; all this is done inside a condition-case to trap errors
+
 (condition-case nil
     (progn
-
+      (require 'bbdb)
       (require 'bbdb-com)
+      
+  (defun spam-enter-ham-BBDB (from)
+    "Enter an address into the BBDB; implies ham (non-spam) sender"
+    (when (stringp from)
+      (let* ((parsed-address (gnus-extract-address-components from))
+	     (name (or (car parsed-address) "Ham Sender"))
+	     (net-address (car (cdr parsed-address))))
+	(message "Adding address %s to BBDB" from)
+	(when (and net-address
+		   (not (bbdb-search-simple nil net-address)))
+	  (bbdb-create-internal name nil net-address nil nil 
+				"ham sender added by spam.el")))))
 
-      (defun spam-enter-ham-BBDB (from)
-	"Enter an address into the BBDB; implies ham (non-spam) sender"
-	(when (stringp from)
-	  (let* ((parsed-address (gnus-extract-address-components from))
-		 (name (or (car parsed-address) "Ham Sender"))
-		 (net-address (car (cdr parsed-address))))
-	    (message "Adding address %s to BBDB" from)
-	    (when (and net-address
-		       (not (bbdb-search (bbdb-records) nil nil net-address)))
-	      (bbdb-create-internal name nil net-address nil nil "ham sender added by spam.el")))))
+  (defun spam-BBDB-register-routine ()
+    (spam-generic-register-routine 
+     ;; spam function
+     nil
+     ;; ham function
+     (lambda (article)
+       (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
 
-      (defun spam-BBDB-register-routine ()
-	(spam-generic-register-routine 
-	 ;; spam function
-	 nil
-	 ;; ham function
-	 (lambda (article)
-	   (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
-
-      (defun spam-check-BBDB ()
-	"Mail from people in the BBDB is never considered spam"
-	(let ((who (message-fetch-field "from")))
-	  (when who
-	    (setq who (regexp-quote (cadr (gnus-extract-address-components who))))
-	    (if (bbdb-search (bbdb-records) nil nil who) nil spam-split-group)))))
+  (defun spam-check-BBDB ()
+    "Mail from people in the BBDB is never considered spam"
+    (let ((who (message-fetch-field "from")))
+      (when who
+	(setq who (regexp-quote (cadr
+				 (gnus-extract-address-components who))))
+	(if (bbdb-search-simple nil who)
+	    nil spam-split-group)))))
 
   (file-error (progn
-		(setq spam-list-of-checks
-		      (delete (assoc 'spam-use-BBDB spam-list-of-checks)
-			      spam-list-of-checks))
-		(defun spam-check-BBDB ()
-		  message "spam-check-BBDB was invoked, but it shouldn't have")
-		(defun spam-BBDB-register-routine ()
-		  (spam-generic-register-routine nil nil)))))
+		(defalias 'bbdb-search-simple 'ignore)
+		(defalias 'spam-check-BBDB 'ignore)
+		(defalias 'spam-BBDB-register-routine 'ignore)
+		(defalias 'spam-enter-ham-BBDB 'ignore)
+		(defalias 'bbdb-create-internal 'ignore)
+		(defalias 'bbdb-records 'ignore))))
 
 
 ;;;; ifile
-;;; uses ifile-gnus.el from http://www.ai.mit.edu/people/jhbrown/ifile-gnus.html
-;;; check the ifile backend; return nil if the mail was NOT classified as spam
-;;; TODO: we can't (require 'ifile-gnus), because it will insinuate itself automatically
-(defun spam-check-ifile ()
-  (let ((ifile-primary-spam-group spam-split-group))
-    (ifile-spam-filter nil)))
 
-;; TODO: add ifile registration 
-;; We need ifile-gnus.el to support nnimap; we could feel the message
-;; directly to ifile like we do with bogofilter but that's ugly.
-(defun spam-ifile-register-routine ()
-  (spam-generic-register-routine nil nil))
+;;; check the ifile backend; return nil if the mail was NOT classified
+;;; as spam
+
+(defun spam-get-ifile-database-parameter ()
+  "Get the command-line parameter for ifile's database from spam-ifile-database-path."
+  (if spam-ifile-database-path
+      (format "--db-file=%s" spam-ifile-database-path)
+    nil))
+    
+(defun spam-check-ifile ()
+  "Check the ifile backend for the classification of this message"
+  (let ((article-buffer-name (buffer-name)) 
+	category return)
+    (with-temp-buffer
+      (let ((temp-buffer-name (buffer-name))
+	    (db-param (spam-get-ifile-database-parameter)))
+	(save-excursion
+	  (set-buffer article-buffer-name)
+	  (if db-param
+	      (call-process-region (point-min) (point-max) spam-ifile-path
+				   nil temp-buffer-name nil "-q" "-c" db-param)
+	    (call-process-region (point-min) (point-max) spam-ifile-path
+				 nil temp-buffer-name nil "-q" "-c")))
+	(goto-char (point-min))
+	(if (not (eobp))
+	    (setq category (buffer-substring (point) (spam-point-at-eol))))
+	(when (not (zerop (length category))) ; we need a category here
+	  (if spam-ifile-all-categories
+	      (setq return category)
+	    ;; else, if spam-ifile-all-categories is not set...
+	    (when (string-equal spam-ifile-spam-category category)
+	      (setq return spam-split-group))))))
+    return))
+
+(defun spam-ifile-register-with-ifile (article-string category)
+  "Register an article, given as a string, with a category.
+Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
+  (when (stringp article-string)
+    (let ((category (or category gnus-newsgroup-name))
+          (db-param (spam-get-ifile-database-parameter)))
+      (with-temp-buffer
+	(insert-string article-string)
+	(if db-param
+            (call-process-region (point-min) (point-max) spam-ifile-path 
+                                 nil nil nil 
+                                 "-h" "-i" category db-param)
+          (call-process-region (point-min) (point-max) spam-ifile-path 
+                               nil nil nil 
+                               "-h" "-i" category))))))
+
+(defun spam-ifile-register-spam-routine ()
+  (spam-generic-register-routine 
+   (lambda (article)
+     (spam-ifile-register-with-ifile 
+      (spam-get-article-as-string article) spam-ifile-spam-category))
+   nil))
+
+(defun spam-ifile-register-ham-routine ()
+  (spam-generic-register-routine 
+   nil
+   (lambda (article)
+     (spam-ifile-register-with-ifile 
+      (spam-get-article-as-string article) nil))))
 
 
+;;;; spam-stat
+
+(condition-case nil
+    (progn
+      (let ((spam-stat-install-hooks nil))
+	(require 'spam-stat))
+      
+      (defun spam-check-stat ()
+	"Check the spam-stat backend for the classification of this message"
+	(let ((spam-stat-split-fancy-spam-group spam-split-group) ; override
+	      (spam-stat-buffer (buffer-name)) ; stat the current buffer
+	      category return)
+	  (spam-stat-split-fancy)))
+
+      (defun spam-stat-register-spam-routine ()
+	(spam-generic-register-routine 
+	 (lambda (article)
+	   (let ((article-string (spam-get-article-as-string article)))
+	     (with-temp-buffer
+	       (insert-string article-string)
+	       (spam-stat-buffer-is-spam))))
+	 nil)
+	(spam-stat-save))
+
+      (defun spam-stat-register-ham-routine ()
+	(spam-generic-register-routine 
+	 nil
+	 (lambda (article)
+	   (let ((article-string (spam-get-article-as-string article)))
+	     (with-temp-buffer
+	       (insert-string article-string)
+	       (spam-stat-buffer-is-non-spam)))))
+	(spam-stat-save)))
+
+  (file-error (progn
+		(defalias 'spam-stat-register-ham-routine 'ignore)
+		(defalias 'spam-stat-register-spam-routine 'ignore)
+		(defalias 'spam-stat-buffer-is-spam 'ignore)
+		(defalias 'spam-stat-buffer-is-non-spam 'ignore)
+		(defalias 'spam-stat-split-fancy 'ignore)
+		(defalias 'spam-stat-load 'ignore)
+		(defalias 'spam-stat-save 'ignore)
+		(defalias 'spam-check-stat 'ignore))))
+
+
+
 ;;;; Blacklists and whitelists.
 
 (defvar spam-whitelist-cache nil)
@@ -511,11 +722,6 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (unless spam-blacklist-cache
     (setq spam-blacklist-cache (spam-parse-list spam-blacklist)))
   (and (spam-from-listed-p spam-blacklist-cache) spam-split-group))
-
-(eval-and-compile
-  (defalias 'spam-point-at-eol (if (fboundp 'point-at-eol)
-				   'point-at-eol
-				 'line-end-position)))
 
 (defun spam-parse-list (file)
   (when (file-readable-p file)
@@ -566,14 +772,15 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 
 ;;; See Paul Graham article, at `http://www.paulgraham.com/spam.html'.
 
-;;; This page is for those wanting to control spam with the help of Eric
-;;; Raymond's speedy Bogofilter, see http://www.tuxedo.org/~esr/bogofilter.
-;;; This has been tested with a locally patched copy of version 0.4.
+;;; This page is for those wanting to control spam with the help of
+;;; Eric Raymond's speedy Bogofilter, see
+;;; http://www.tuxedo.org/~esr/bogofilter.  This has been tested with
+;;; a locally patched copy of version 0.4.
 
-;;; Make sure Bogofilter is installed.  Bogofilter internally uses Judy fast
-;;; associative arrays, so you need to install Judy first, and Bogofilter
-;;; next.  Fetch both distributions by visiting the following links and
-;;; downloading the latest version of each:
+;;; Make sure Bogofilter is installed.  Bogofilter internally uses
+;;; Judy fast associative arrays, so you need to install Judy first,
+;;; and Bogofilter next.  Fetch both distributions by visiting the
+;;; following links and downloading the latest version of each:
 ;;;
 ;;;     http://sourceforge.net/projects/judy/
 ;;;     http://www.tuxedo.org/~esr/bogofilter/
@@ -584,14 +791,15 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 ;;;     make
 ;;;     make install
 ;;;
-;;; You will likely need to become super-user for the last step.  Then, unpack
-;;; the Bogofilter distribution and enter its main directory:
+;;; You will likely need to become super-user for the last step.
+;;; Then, unpack the Bogofilter distribution and enter its main
+;;; directory:
 ;;;
 ;;;     make
 ;;;     make install
 ;;;
-;;; Here as well, you need to become super-user for the last step.  Now,
-;;; initialize your word lists by doing, under your own identity:
+;;; Here as well, you need to become super-user for the last step.
+;;; Now, initialize your word lists by doing, under your own identity:
 ;;;
 ;;;     mkdir ~/.bogofilter
 ;;;     touch ~/.bogofilter/badlist
@@ -599,52 +807,59 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 ;;;
 ;;; These two files are text files you may edit, but you normally don't!
 
-;;; The `M-d' command gets added to Gnus summary mode, marking current article
-;;; as spam, showing it with the `H' mark.  Whenever you see a spam article,
-;;; make sure to mark its summary line with `M-d' before leaving the group.
-;;; Some groups, as per variable `spam-junk-mailgroups' below, receive articles
-;;; from Gnus splitting on clues added by spam recognisers, so for these
-;;; groups, we tack an `H' mark at group entry for all summary lines which
-;;; would otherwise have no other mark.  Make sure to _remove_ `H' marks for
-;;; any article which is _not_ genuine spam, before leaving such groups: you
-;;; may use `M-u' to "unread" the article, or `d' for declaring it read the
-;;; non-spam way.  When you leave a group, all `H' marked articles, saved or
-;;; unsaved, are sent to Bogofilter which will study them as spam samples.
+;;; The `M-d' command gets added to Gnus summary mode, marking current
+;;; article as spam, showing it with the `H' mark.  Whenever you see a
+;;; spam article, make sure to mark its summary line with `M-d' before
+;;; leaving the group.  Some groups, as per variable
+;;; `spam-junk-mailgroups' below, receive articles from Gnus splitting
+;;; on clues added by spam recognisers, so for these groups, we tack
+;;; an `H' mark at group entry for all summary lines which would
+;;; otherwise have no other mark.  Make sure to _remove_ `H' marks for
+;;; any article which is _not_ genuine spam, before leaving such
+;;; groups: you may use `M-u' to "unread" the article, or `d' for
+;;; declaring it read the non-spam way.  When you leave a group, all
+;;; `H' marked articles, saved or unsaved, are sent to Bogofilter
+;;; which will study them as spam samples.
 
 ;;; Messages may also be deleted in various other ways, and unless
-;;; `spam-ham-marks-form' gets overridden below, marks `R' and `r' for default
-;;; read or explicit delete, marks `X' and 'K' for automatic or explicit
-;;; kills, as well as mark `Y' for low scores, are all considered to be
-;;; associated with articles which are not spam.  This assumption might be
-;;; false, in particular if you use kill files or score files as means for
-;;; detecting genuine spam, you should then adjust `spam-ham-marks-form'.  When
-;;; you leave a group, all _unsaved_ articles bearing any the above marks are
-;;; sent to Bogofilter which will study these as not-spam samples.  If you
-;;; explicit kill a lot, you might sometimes end up with articles marked `K'
-;;; which you never saw, and which might accidentally contain spam.  Best is
-;;; to make sure that real spam is marked with `H', and nothing else.
+;;; `spam-ham-marks-form' gets overridden below, marks `R' and `r' for
+;;; default read or explicit delete, marks `X' and 'K' for automatic
+;;; or explicit kills, as well as mark `Y' for low scores, are all
+;;; considered to be associated with articles which are not spam.
+;;; This assumption might be false, in particular if you use kill
+;;; files or score files as means for detecting genuine spam, you
+;;; should then adjust `spam-ham-marks-form'.  When you leave a group,
+;;; all _unsaved_ articles bearing any the above marks are sent to
+;;; Bogofilter which will study these as not-spam samples.  If you
+;;; explicit kill a lot, you might sometimes end up with articles
+;;; marked `K' which you never saw, and which might accidentally
+;;; contain spam.  Best is to make sure that real spam is marked with
+;;; `H', and nothing else.
 
-;;; All other marks do not contribute to Bogofilter pre-conditioning.  In
-;;; particular, ticked, dormant or souped articles are likely to contribute
-;;; later, when they will get deleted for real, so there is no need to use
-;;; them prematurely.  Explicitly expired articles do not contribute, command
-;;; `E' is a way to get rid of an article without Bogofilter ever seeing it.
+;;; All other marks do not contribute to Bogofilter pre-conditioning.
+;;; In particular, ticked, dormant or souped articles are likely to
+;;; contribute later, when they will get deleted for real, so there is
+;;; no need to use them prematurely.  Explicitly expired articles do
+;;; not contribute, command `E' is a way to get rid of an article
+;;; without Bogofilter ever seeing it.
 
-;;; In a word, with a minimum of care for associating the `H' mark for spam
-;;; articles only, Bogofilter training all gets fairly automatic.  You should
-;;; do this until you get a few hundreds of articles in each category, spam
-;;; or not.  The shell command `head -1 ~/.bogofilter/*' shows both article
-;;; counts.  The command `S S' in summary mode, either for debugging or for
-;;; curiosity, triggers Bogofilter into displaying in another buffer the
-;;; "spamicity" score of the current article (between 0.0 and 1.0), together
-;;; with the article words which most significantly contribute to the score.
+;;; In a word, with a minimum of care for associating the `H' mark for
+;;; spam articles only, Bogofilter training all gets fairly automatic.
+;;; You should do this until you get a few hundreds of articles in
+;;; each category, spam or not.  The shell command `head -1
+;;; ~/.bogofilter/*' shows both article counts.  The command `S S' in
+;;; summary mode, either for debugging or for curiosity, triggers
+;;; Bogofilter into displaying in another buffer the "spamicity" score
+;;; of the current article (between 0.0 and 1.0), together with the
+;;; article words which most significantly contribute to the score.
 
-;;; The real way for using Bogofilter, however, is to have some use tool like
-;;; `procmail' for invoking it on message reception, then adding some
-;;; recognisable header in case of detected spam.  Gnus splitting rules might
-;;; later trip on these added headers and react by sorting such articles into
-;;; specific junk folders as per `spam-junk-mailgroups'.  Here is a possible
-;;; `.procmailrc' contents (still untested -- please tell me how it goes):
+;;; The real way for using Bogofilter, however, is to have some use
+;;; tool like `procmail' for invoking it on message reception, then
+;;; adding some recognisable header in case of detected spam.  Gnus
+;;; splitting rules might later trip on these added headers and react
+;;; by sorting such articles into specific junk folders as per
+;;; `spam-junk-mailgroups'.  Here is a possible `.procmailrc' contents
+;;; (still untested -- please tell me how it goes):
 ;;;
 ;;; :0HBf:
 ;;; * ? bogofilter
@@ -681,10 +896,12 @@ spamicity coefficient of each, and the overall article spamicity."
 
 (defun spam-bogofilter-register-routine ()
   (let ((articles gnus-newsgroup-articles)
-	article mark ham-articles spam-articles spam-mark-values ham-mark-values)
+	article mark ham-articles spam-articles spam-mark-values 
+	ham-mark-values)
 
-    ;; marks are stored as symbolic values, so we have to dereference them for memq to work
-    ;; we wouldn't have to do this if gnus-summary-article-mark returned a symbol.
+    ;; marks are stored as symbolic values, so we have to dereference
+    ;; them for memq to work we wouldn't have to do this if
+    ;; gnus-summary-article-mark returned a symbol.
     (dolist (mark spam-ham-marks)
       (push (symbol-value mark) ham-mark-values))
 
@@ -705,7 +922,8 @@ spamicity coefficient of each, and the overall article spamicity."
 (defun spam-bogofilter-articles (type option articles)
   (let ((output-buffer (get-buffer-create spam-bogofilter-output-buffer-name))
 	(article-copy (get-buffer-create " *Bogofilter Article Copy*"))
-	(remove-regexp (concat spam-bogofilter-spaminfo-header-regexp "\\|Xref:"))
+	(remove-regexp (concat spam-bogofilter-spaminfo-header-regexp 
+			       "\\|Xref:"))
 	(counter 0)
 	prefix process article)
     (when type

@@ -57,6 +57,9 @@
 (autoload 'gnus-article-outlook-deuglify-article "deuglify"
   "Deuglify broken Outlook (Express) articles and redisplay."
   t)
+(autoload 'gnus-outlook-unwrap-lines "deuglify" nil t)
+(autoload 'gnus-outlook-repair-attribution "deuglify" nil t)
+(autoload 'gnus-outlook-rearrange-citation "deuglify" nil t)
 
 (defcustom gnus-kill-summary-on-exit t
   "*If non-nil, kill the summary buffer when you exit from it.
@@ -120,7 +123,7 @@ given by the `gnus-summary-same-subject' variable.)"
 		 (const adopt)
 		 (const empty)))
 
-(defcustom gnus-summary-make-false-root-always t
+(defcustom gnus-summary-make-false-root-always nil
   "Always make a false dummy root."
   :group 'gnus-thread
   :type 'boolean)
@@ -820,6 +823,7 @@ following hook:
 (defcustom gnus-select-article-hook nil
   "*A hook called when an article is selected."
   :group 'gnus-summary-choose
+  :options '(gnus-agent-fetch-selected-article)
   :type 'hook)
 
 (defcustom gnus-visual-mark-article-hook
@@ -888,11 +892,11 @@ automatically when it is selected."
   '(((eq mark gnus-canceled-mark)
      . gnus-summary-cancelled-face)
     ((and uncached (> score default-high))
-     . gnus-summary-high-uncached-face)
+     . gnus-summary-high-undownloaded-face)
     ((and uncached (< score default-low))
-     . gnus-summary-low-uncached-face)
+     . gnus-summary-low-undownloaded-face)
     (uncached
-     . gnus-summary-normal-uncached-face)
+     . gnus-summary-normal-undownloaded-face)
     ((and (> score default-high)
 	  (or (eq mark gnus-dormant-mark)
 	      (eq mark gnus-ticked-mark)))
@@ -1082,6 +1086,14 @@ supply the MIME-Version header or deliberately strip it From the mail.
 Set it to non-nil, Gnus will treat some articles as MIME even if
 the MIME-Version header is missed."
   :version "21.3"
+  :type 'boolean
+  :group 'gnus-article)
+
+(defcustom gnus-article-emulate-mime t
+  "If non-nil, use MIME emulation for uuencode and the like.
+This means that Gnus will search message bodies for text that look
+like uuencoded bits, yEncoded bits, and so on, and present that using
+the normal Gnus MIME machinery."
   :type 'boolean
   :group 'gnus-article)
 
@@ -1380,7 +1392,12 @@ buffers. For example:
 ")
 
 ;; Byte-compiler warning.
-(eval-when-compile (defvar gnus-article-mode-map))
+;(eval-when-compile (defvar gnus-article-mode-map))
+(eval-when-compile
+  (let ((features (cons 'gnus-sum features)))
+    (require 'gnus)
+    (require 'gnus-agent)
+    (require 'gnus-art)))
 
 ;; Subject simplification.
 
@@ -1796,7 +1813,14 @@ increase the score of each group you read."
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
     "p" gnus-article-verify-x-pgp-sig
     "d" gnus-article-treat-dumbquotes
-    "k" gnus-article-outlook-deuglify-article)
+    "k" gnus-article-outlook-deuglify-article) ;; mnemonic: outloo*k*
+
+  (gnus-define-keys (gnus-summary-wash-deuglify-map "Y" gnus-summary-wash-map)
+    ;; mnemonic: deuglif*Y*
+    "u" gnus-outlook-unwrap-lines
+    "a" gnus-outlook-repair-attribution
+    "c" gnus-outlook-rearrange-citation
+    "f" gnus-article-outlook-deuglify-article) ;; mnemonic: full deuglify
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide
@@ -2094,7 +2118,12 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	      ["URLs" gnus-article-unsplit-urls t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
 	      ["HZ" gnus-article-decode-HZ t]
-	      ["OutlooK deuglify" gnus-article-outlook-deuglify-article t]
+	      ("(Outlook) Deuglify"
+	       ["Unwrap lines" gnus-outlook-unwrap-lines t]
+	       ["Repair attribution" gnus-outlook-repair-attribution t]
+	       ["Rearrange citation" gnus-outlook-rearrange-citation t]
+	       ["Full (Outlook) deuglify"
+		gnus-article-outlook-deuglify-article t])
 	      )
 	     ("Output"
 	      ["Save in default format" gnus-summary-save-article
@@ -2177,6 +2206,7 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
     (easy-menu-define
      gnus-summary-thread-menu gnus-summary-mode-map ""
      '("Threads"
+       ["Find all messages in thread" gnus-summary-refer-thread t]
        ["Toggle threading" gnus-summary-toggle-threads t]
        ["Hide threads" gnus-summary-hide-all-threads t]
        ["Show threads" gnus-summary-show-all-threads t]
@@ -2857,6 +2887,7 @@ article number."
 This is all marks except unread, ticked, dormant, and expirable."
   (not (or (= mark gnus-unread-mark)
 	   (= mark gnus-ticked-mark)
+	   (= mark gnus-spam-mark)
 	   (= mark gnus-dormant-mark)
 	   (= mark gnus-expirable-mark))))
 
@@ -3093,7 +3124,7 @@ buffer that was in action when the last article was fetched."
     (let ((gnus-replied-mark 129)
 	  (gnus-score-below-mark 130)
 	  (gnus-score-over-mark 130)
-	  (gnus-downloaded-mark 131)
+	  (gnus-undownloaded-mark 131)
 	  (spec gnus-summary-line-format-spec)
 	  gnus-visual pos)
       (save-excursion
@@ -3104,7 +3135,7 @@ buffer that was in action when the last article was fetched."
 	   (make-full-mail-header 0 "" "nobody"
 				  "05 Apr 2001 23:33:09 +0400"
 				  "" "" 0 0 "" nil)
-	   0 nil nil 128 t nil "" nil 1)
+	   0 nil t 128 t nil "" nil 1)
 	  (goto-char (point-min))
 	  (setq pos (list (cons 'unread (and (search-forward "\200" nil t)
 					     (- (point) (point-min) 1)))))
@@ -3497,8 +3528,9 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	    (progn
 	      (gnus-configure-windows 'summary)
 	      (let ((art (gnus-summary-article-number)))
-		(unless (or (memq art gnus-newsgroup-undownloaded)
-			    (memq art gnus-newsgroup-downloadable))
+		(unless (and (not gnus-plugged)
+			     (or (memq art gnus-newsgroup-undownloaded)
+				 (memq art gnus-newsgroup-downloadable)))
 		  (gnus-summary-goto-article art))))
 	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
@@ -3515,7 +3547,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	;; Mark this buffer as "prepared".
 	(setq gnus-newsgroup-prepared t)
 	(gnus-run-hooks 'gnus-summary-prepared-hook)
-	(gnus-group-update-group group)
+	(unless (gnus-ephemeral-group-p group)
+	  (gnus-group-update-group group))
 	t)))))
 
 (defun gnus-summary-auto-select-subject ()
@@ -5572,7 +5605,8 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	;; Update the number of unread articles.
 	(setcar entry num)
 	;; Update the group buffer.
-	(gnus-group-update-group group t)))))
+	(unless (gnus-ephemeral-group-p group)
+	  (gnus-group-update-group group t))))))
 
 (defvar gnus-newsgroup-none-id 0)
 
@@ -6394,7 +6428,10 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	(set-buffer gnus-group-buffer)
 	(gnus-summary-clear-local-variables)
 	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
-	  (gnus-summary-clear-local-variables)))
+	  (gnus-summary-clear-local-variables))
+	;; Return to group mode buffer.
+	(when (eq mode 'gnus-summary-mode)
+	  (gnus-kill-buffer buf)))
       (setq gnus-current-select-method gnus-select-method)
       (pop-to-buffer gnus-group-buffer)
       (if (not quit-config)
@@ -6409,9 +6446,6 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	      (set-window-start (selected-window) (point))
 	      (goto-char group-point)))
 	(gnus-handle-ephemeral-exit quit-config))
-      ;; Return to group mode buffer.
-      (when (eq mode 'gnus-summary-mode)
-	(gnus-kill-buffer buf))
       ;; Clear the current group name.
       (unless quit-config
 	(setq gnus-newsgroup-name nil)))))
@@ -6458,7 +6492,8 @@ If FORCE (the prefix), also save the .newsrc file(s)."
       (gnus-configure-windows 'group 'force)
       ;; Clear the current group name.
       (setq gnus-newsgroup-name nil)
-      (gnus-group-update-group group)
+      (unless (gnus-ephemeral-group-p group)
+	(gnus-group-update-group group))
       (when (equal (gnus-group-group-name) group)
 	(gnus-group-next-unread-group 1))
       (when quit-config
@@ -6708,7 +6743,8 @@ Returns the article selected or nil if there are no unread articles."
 	(let ((data gnus-newsgroup-data))
 	  (while (and data
 		      (and (not (and undownloaded
-				     (memq (car data) gnus-newsgroup-undownloaded)))
+				     (memq (car data)
+					   gnus-newsgroup-undownloaded)))
 			   (if unseen
 			       (or (not (memq
 					 (gnus-data-number (car data))
@@ -9583,7 +9619,7 @@ If NO-EXPIRE, auto-expiry will be inhibited."
 	(gnus-summary-goto-unread
 	 (and gnus-summary-goto-unread
 	      (not (eq gnus-summary-goto-unread 'never))
-	      (not (memq mark (list gnus-unread-mark
+	      (not (memq mark (list gnus-unread-mark gnus-spam-mark
 				    gnus-ticked-mark gnus-dormant-mark)))))
 	(n (abs n))
 	(mark (or mark gnus-del-mark)))
@@ -10803,7 +10839,8 @@ If REVERSE, save parts that do not match TYPE."
       (set-buffer gnus-article-buffer)
       (let ((handles (or gnus-article-mime-handles
 			 (mm-dissect-buffer nil gnus-article-loose-mime)
-			 (mm-uu-dissect))))
+			 (and gnus-article-emulate-mime
+			      (mm-uu-dissect)))))
 	(when handles
 	  (gnus-summary-save-parts-1 type dir handles reverse)
 	  (unless gnus-article-mime-handles ;; Don't destroy this case.

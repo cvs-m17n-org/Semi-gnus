@@ -40,6 +40,11 @@
   :group 'gnus-fun
   :type 'string)
 
+(defcustom gnus-convert-image-to-face-command "djpeg %s | ppmnorm | pnmscale -width 48 -height 48 | ppmquant %d | pnmtopng"
+  "Command for converting a GIF to an X-Face."
+  :group 'gnus-fun
+  :type 'string)
+
 (defun gnus-shell-command-to-string (command)
   "Like `shell-command-to-string' except not mingling ERROR."
   (with-output-to-string
@@ -73,6 +78,50 @@ Output to the current buffer, replace text, and don't mingle error."
     (gnus-shell-command-to-string
      (format gnus-convert-image-to-x-face-command
 	     (shell-quote-argument file)))))
+
+(defun gnus-face-from-file (file)
+  "Return an Face header based on an image file."
+  (interactive "fImage file name:" )
+  (when (file-exists-p file)
+    (let ((done nil)
+	  (attempt "")
+	  (step 72)
+	  (quant 16))
+      (while (and (not done)
+		  (> quant 1))
+	(setq attempt
+	      (gnus-shell-command-to-string
+	       (format gnus-convert-image-to-face-command
+		       (shell-quote-argument file)
+		       quant)))
+	(if (> (length attempt) 740)
+	    (progn
+	      (setq quant (- quant 2))
+	      (message "Length %d; trying quant %d"
+		       (length attempt) quant))
+	  (setq done t)))
+      (if done
+	  (mm-with-unibyte-buffer	
+	    (insert attempt)
+	    (base64-encode-region (point-min) (point-max))
+	    (goto-char (point-min))
+	    (while (search-forward "\n" nil t)
+	      (replace-match ""))
+	    (goto-char (point-min))
+	    (while (> (- (point-max) (point))
+		      step)
+	      (forward-char step)
+	      (insert "\n ")
+	      (setq step 76))
+	    (buffer-string))
+	nil))))
+
+;;;###autoload
+(defun gnus-convert-face-to-png (face)
+  (mm-with-unibyte-buffer
+    (insert face)
+    (base64-decode-region (point-min) (point-max))
+    (buffer-string)))
 
 (defun gnus-convert-image-to-gray-x-face (file depth)
   (let* ((mapfile (mm-make-temp-file (expand-file-name "gnus."
