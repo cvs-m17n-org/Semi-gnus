@@ -24,6 +24,9 @@
 	first argument optional.
 	(nnshimbun-open-nov): Bind variables to set coding systems for
 	path names.
+	(nnshimbun-possibly-change-group, nnshimbun-request-article)
+	(nnshimbun-write-nov): Strict checking.
+	(nnshimbun-request-expire-articles): Small fix.
 
 2002-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 

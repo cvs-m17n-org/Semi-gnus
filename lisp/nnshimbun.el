@@ -280,8 +280,9 @@ GROUP has a full name."
 (nnoo-define-basics nnshimbun)
 
 (defun nnshimbun-possibly-change-group (group &optional server)
-  (when (or (not server)
-	    (nnshimbun-open-server server))
+  (when (if server
+	    (nnshimbun-open-server server)
+	  nnshimbun-shimbun)
     (or (not group)
 	(when (condition-case err
 		  (shimbun-open-group nnshimbun-shimbun group)
@@ -387,20 +388,19 @@ GROUP has a full name."
 
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)
-    (when (stringp article)
-      (let ((num (when (or group (setq group (nnshimbun-current-group)))
-		   (nnshimbun-search-id group article))))
-	(unless num
-	  (let ((groups (shimbun-groups (shimbun-open server))))
-	    (while (and (not num) groups)
-	      (setq group (pop groups)
-		    num (nnshimbun-search-id group article)))))
-	(setq article num)))
-    (if (integerp article)
+    (if (or (integerp article)
+	    (when (stringp article)
+	      (setq article
+		    (or (when (or group (setq group (nnshimbun-current-group)))
+			  (nnshimbun-search-id group article))
+			(catch 'found
+			  (dolist (x (shimbun-groups nnshimbun-shimbun))
+			    (and (nnshimbun-possibly-change-group x)
+				 (setq x (nnshimbun-search-id x article))
+				 (throw 'found x))))))))
 	(nnshimbun-request-article-1 article group server to-buffer)
       (nnheader-report 'nnshimbun "Couldn't retrieve article: %s"
-		       (prin1-to-string article))
-      nil)))
+		       (prin1-to-string article)))))
 
 (deffoo nnshimbun-request-group (group &optional server dont-check)
   (if (not (nnshimbun-possibly-change-group group server))
@@ -647,24 +647,26 @@ also be nil."
   (let ((buffer (nnshimbun-nov-buffer-name group)))
     (when (gnus-buffer-live-p buffer)
       (with-current-buffer buffer
-	(and (> (buffer-size) 0)
-	     (buffer-modified-p)
-	     (nnmail-write-region 1 (point-max)
-				  (nnshimbun-nov-file-name group)
-				  nil 'nomesg))
-	(when close
-	  (kill-buffer (current-buffer)))))))
+	(let ((file-name-coding-system nnmail-pathname-coding-system)
+	      (pathname-coding-system nnmail-pathname-coding-system)
+	      (nov (nnshimbun-nov-file-name group)))
+	  (when (and (buffer-modified-p)
+		     (or (> (buffer-size) 0)
+			 (file-exists-p nov)))
+	    (nnmail-write-region 1 (point-max) nov nil 'nomesg)
+	    (set-buffer-modified-p nil))))
+      (when close
+	(kill-buffer buffer)))))
 
 (deffoo nnshimbun-request-expire-articles (articles group
 						    &optional server force)
   "Do expiration for the specified ARTICLES in the nnshimbun GROUP.
 Notice that nnshimbun does not actually delete any articles, it just
 delete the corresponding entries in the NOV database locally.  The
-expiration will be performed only when the current SERVER is specified
-and the NOV is open.  The optional fourth argument FORCE is ignored."
+optional fourth argument FORCE is ignored."
   (when (nnshimbun-possibly-change-group group server)
     (let* ((expirable (copy-sequence articles))
-	   (name (concat "nnshimbun+" server ":" group))
+	   (name (concat "nnshimbun+" (nnshimbun-current-server) ":" group))
 	   ;; If the group's parameter `expiry-wait' is non-nil, the
 	   ;; value of the option `nnmail-expiry-wait' will be bound
 	   ;; to that value, and the value of the option
