@@ -1,3 +1,7 @@
+2002-02-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Bind `navi2ch-mona-font'.
+
 2002-02-18  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-art.el (gnus-treat-monafy): New user option.

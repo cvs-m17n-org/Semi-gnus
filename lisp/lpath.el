@@ -120,7 +120,7 @@
 		 xml-parse-region)))
 
 ;; T-gnus.
-(let ((functions-variables
+(let ((functions
        (cond
 	((featurep 'xemacs)
 	 nil)
@@ -132,9 +132,25 @@
 	    find-coding-systems-for-charsets find-coding-systems-region
 	    function-max-args get-charset-property smiley-encode-buffer)))
 	(t
-	 '((function-max-args smiley-encode-buffer))))))
-  (maybe-fbind (car functions-variables))
-  (maybe-bind (car (cdr functions-variables))))
+	 '((function-max-args smiley-encode-buffer)))))
+      (common-fns
+       nil)
+      (variables
+       (cond
+	((featurep 'xemacs)
+	 nil)
+	((>= emacs-major-version 21)
+	 nil)
+	((boundp 'MULE)
+	 nil)
+	(t
+	 nil)))
+      (common-vars
+       '(navi2ch-mona-font)))
+  (maybe-fbind functions)
+  (maybe-fbind common-fns)
+  (maybe-bind variables)
+  (maybe-bind common-vars))
 
 (defun nnkiboze-score-file (a)
   )
