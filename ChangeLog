@@ -1,5 +1,14 @@
 1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* Nana-gnus: Version 6.13.5 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.5.
+
+	* lisp/nnmail.el (nnmail-split-it): Match whole word for getting
+	group name with `\N'.
+
+1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 6.13.4 released.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
