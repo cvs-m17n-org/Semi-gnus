@@ -1,3 +1,25 @@
+1999-07-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/dgnushack.el: Load ./paths.el.
+
+	* lisp/paths.el.in: New file.
+
+	* lisp/Makefile.in (distclean): Remove paths.el.
+
+	* Mule23@1934: Update for the new configure usage.
+
+	* configure: Regenerate.
+
+1999-07-22  TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* configure.in: Add an option `--with-addpath' to specify load-path.
+
+	* aclocal.m4: New implementation.
+
+	* acinclude.m4: New file.
+
 1999-07-20   Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
