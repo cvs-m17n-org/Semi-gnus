@@ -10805,13 +10805,16 @@ If REVERSE, save parts that do not match TYPE."
   "Burst a forwarded article."
   (save-excursion
     (set-buffer gnus-summary-buffer)
-    (let ((group (completing-read "Group: " gnus-active-hashtb
-				  nil (gnus-read-active-file-p)
-				  gnus-newsgroup-name 'gnus-group-history))
-	  article summary buffers)
+    (let* ((group (completing-read "Group: " gnus-active-hashtb
+				   nil (gnus-read-active-file-p)
+				   gnus-newsgroup-name 'gnus-group-history))
+	   (old (cdr (gnus-active group)))
+	   article summary buffers)
       (gnus-summary-goto-subject gnus-current-article)
       (gnus-summary-copy-article 1 group)
       (setq article (cdr (gnus-active group)))
+      (unless (> article old)
+	(error "Something wrong on bursting; check articles in %s" group))
       (with-temp-buffer
 	(mime-insert-entity-content entity)
 	(gnus-request-replace-article article group (current-buffer) t))
