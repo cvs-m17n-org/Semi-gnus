@@ -1039,8 +1039,14 @@ Initialized from `text-mode-syntax-table.")
 
 (defun article-hide-headers (&optional arg delete)
   "Hide unwanted headers and possibly sort them as well."
-  (interactive)
-  ;; This function might be inhibited.
+  (interactive (gnus-article-hidden-arg))
+  ;; Lars said that this function might be inhibited.
+  (if (gnus-article-check-hidden-text 'headers arg)
+      ;; Show boring headers as well.
+      (progn
+	(gnus-article-show-hidden-text 'boring-headers)
+	(when (eq 1 (point-min))
+	  (set-window-start (get-buffer-window (current-buffer)) 1)))
   (unless gnus-inhibit-hiding
     (save-excursion
       (save-restriction
@@ -1067,7 +1073,11 @@ Initialized from `text-mode-syntax-table.")
 	  (while (looking-at "From ")
 	    (forward-line 1))
 	  (unless (bobp)
-	    (delete-region (point-min) (point)))
+	    (if delete
+		(delete-region (point-min) (point))
+	      (gnus-article-hide-text (point-min) (point)
+				      (nconc (list 'article-type 'headers)
+					     gnus-hidden-properties))))
 	  ;; Then treat the rest of the header lines.
 	  ;; Then we use the two regular expressions
 	  ;; `gnus-ignored-headers' and `gnus-visible-headers' to
@@ -1087,10 +1097,15 @@ Initialized from `text-mode-syntax-table.")
 	  (message-sort-headers-1)
 	  (when (setq beg (text-property-any
 			   (point-min) (point-max) 'message-rank (+ 2 max)))
-	    ;; We delete the unwanted headers.
-	    (add-text-properties (point-min) (+ 5 (point-min))
-				 '(article-type headers dummy-invisible t))
-	    (delete-region beg (point-max))))))))
+	    ;; We delete or make invisible the unwanted headers.
+	    (if delete
+		(progn
+		  (add-text-properties
+		   (point-min) (+ 5 (point-min))
+		   '(article-type headers dummy-invisible t))
+		  (delete-region beg (point-max)))
+	      (gnus-article-hide-text-type beg (point-max) 'headers))))))))
+  )
 
 (defun article-hide-boring-headers (&optional arg)
   "Toggle hiding of headers that aren't very interesting.
