@@ -1,3 +1,8 @@
+2002-04-17   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-delay.el (gnus-delay-article): Use `message-save-drafts'
+        instead of `save-buffer'.
+
 2002-04-08  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-draft.el (gnus-draft-send): Always enter the Message
