@@ -4882,7 +4882,9 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
       (setq gnus-article-current-summary gnus-summary-buffer)
 
       ;; Copy the requested article from `gnus-original-article-buffer'.
-      (insert-buffer gnus-original-article-buffer)
+      (unless (equal (buffer-name (current-buffer))
+		     (buffer-name (get-buffer gnus-original-article-buffer)))
+	(insert-buffer gnus-original-article-buffer))
 
       ;; Decode charsets.
       (run-hooks 'gnus-article-decode-hook)
