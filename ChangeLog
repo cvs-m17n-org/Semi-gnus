@@ -1,3 +1,8 @@
+1998-09-06  Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Add error handle.
+	(pop3-fma-get-movemail-type): Fix typo.
+
 1998-08-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Bug Fix.
@@ -16,10 +21,6 @@
 
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Match
 	"real" newsgroup name; strip "backend+server" prefix.
-
-	* lisp/message.el (message-make-in-reply-to):
-	Use `std11-extract-address-components'.
-	(message-use-mail-reply-to): Doc fix.
 
 1998-08-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
@@ -105,7 +106,7 @@
 	(message-make-forward-subject): Failed to sync.
 	(message-setup): Ditto.
 	(message-clone-locals): Modify regexp.
-	
+
 	* lisp/message.el (message-fill-references): Reverted.
 
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
@@ -143,16 +144,16 @@
 	*lisp/gnus-offline.el (gnus-offline-setup) : To create spol directory
 	if not exists.
 	Change default value of gnus-offline-drafts-queue-type 'miee to 'agent
-	
+
 1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.12.
 
 	* Sync up with Gnus 5.6.36.
-	
+
 	* lisp/gnus-offline.el : New file.
 	Merge gnus-offline to ichikawa branch.
-	
+
 1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Update.
@@ -171,13 +172,13 @@
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.11.
 
 	* Sync up with Gnus 5.6.34.
-	
+
 1998-08-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.10.
 
 	* Sync up with Gnus 5.6.33.
-	
+
 1998-08-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-frames): New custom group.
@@ -189,19 +190,19 @@
 	(message-kill-buffer): Ditto.
 	(message-delete-frame): New function.
 	(message-pop-to-buffer): Make new frame when edit message.
-	
+
 1998-08-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
 
 	* Sync up with Gnus 5.6.31.
-	
+
 1998-08-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.8.
 
 	* Sync up with Gnus 5.6.30.
-	
+
 1998-08-10  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
@@ -209,13 +210,13 @@
 1998-08-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	*lisp/smtp.el: Do not insert empty line at the end of message.
-	
+
 1998-08-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.6.
 
 	* Sync up with Gnus 5.6.29.
-	
+
 1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-start.el (gnus-read-init-file): Fix indent.
@@ -327,7 +328,7 @@
 	* Sync up with Gnus 5.6.22
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.8.
 	* lisp/pop3-fma.el : Enable to get localhost mail spool.
-	
+
 1998-06-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.7.
@@ -400,9 +401,9 @@
 	Gnus 5.6.13.
 
 1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-	
+
 	* Sync up with Gnus 5.6.13.
-	
+
 1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-display-mime-message): Don't
@@ -487,7 +488,7 @@
 1998-06-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el: Small bug fix.
-	
+
 	* lisp/pop3-fma.el: Delete variable pop3-fma-cypher-key
 	Use base64-encode-string , base64-decode-string instead. 
 	Both change by Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
@@ -535,7 +536,7 @@
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.4.
 	And fix typo 5.6.10 -> 5.6.11.
-	
+
 1998-06-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.3.
@@ -739,14 +740,14 @@
 	`nnheader-insert-file-contents'.
 	(gnus-agent-braid-nov): Ditto.
 	(gnus-agent-expire): Ditto.
-	
+
 	* lisp/gnus-cache.el (gnus-cache-request-article): Ditto.
 	(gnus-cache-retrieve-headers): Ditto.
 	(gnus-cache-change-buffer): Ditto.
 	(gnus-cache-braid-nov): Ditto.
-	
+
 	* lisp/gnus-sum.el (gnus-summary-import-article): Ditto.
-	
+
 	* lisp/nnkiboze.el (nnkiboze-retrieve-headers): Ditto.
 
 	* lisp/message.el (message-generate-headers): Fix regexp.
@@ -812,7 +813,7 @@
 	* lisp/gnus.el (gnus-bdf-image-file): New variable.
 	(gnus-mule-group-startup-message): Display bitmap image using
 	bitmap.el running with Emacs 20.
-	
+
 	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Fix problem when
 	Xref field is not exist.
 
