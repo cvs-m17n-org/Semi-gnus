@@ -107,7 +107,9 @@
 
 (defcustom pop3-connection-type nil
   "*POP3 connection type."
-  :type 'boolean
+  :type '(choice (const :tag "Not specified" nil)
+		 (const tls)
+		 (const ssl))
   :group 'pop3)
 
 (defcustom pop3-password-required t
@@ -156,11 +158,9 @@ Used for APOP authentication.")
   :type '(file :format "%t: %v\n" :size 0)
   :group 'pop3)
 
-(defcustom pop3-uidl-support nil
+(defvar pop3-uidl-support nil
   "Alist of servers and flags of whether they support UIDLs.
-Users don't have to set this value."
-  :type 'boolean
-  :group 'pop3)
+Users don't have to set this value.")
 
 (defvar pop3-uidl-obarray (make-vector 31 0)
   "Uidl hash table.")
