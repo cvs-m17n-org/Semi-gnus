@@ -1,3 +1,8 @@
+2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Autoload "nnshimbun" for the command `gnus-group-
+	make-shimbun-group'.
+
 2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el: Remove some garbage.

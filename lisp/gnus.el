@@ -2123,6 +2123,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	     (subrp (symbol-function 'base64-encode-string)))
   (require 'base64))
 
+;; To make shimbun groups.
+(autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
+
 ;; A tool for the developers.
 (autoload 'find-cl-run-time-functions "gnus-clfns" nil t)
 
