@@ -12740,16 +12740,20 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 @cindex group parameters
 @code{nnshimbun} は Gnus が提供する汎用のグループパラメー
-タ (@xref{Group Parameters}) に加えて、@code{nnshimbun} 専用のグループパ
-ラメータを利用することができます。それら
-は @code{nnshimbun-group-parameters} という単一のグループパラメータにま
-とめられていますが、それが各グループ毎に持つことができる値はプロパティリ
-ストで、例えば次のような値です。
+タ @footnote{グループパラメータを設定するための最も手軽な方法は、グルー
+プバッファで、設定したいグループの場所にカーソルがある状態
+で @kbd{G c} をタイプすることです (@xref{Group Parameters})。} に加えて、
+@code{nnshimbun} 専用のグループパラメータを利用することができます。それ
+らは @code{nnshimbun-group-parameters} という単一のグループパラメータに
+まとめられていますが、それが各グループ毎に持つことができる値はプロパティ
+リストで、例えば次のような値です。
 
 @example
   '(index-range all prefetch-articles t expiry-wait 6)
 @end example
 
+実際にはこのようなリストの先頭に @code{nnshimbun-group-parameters} とい
+うシンボルが付加されたものが、``~/.newsrc.eld'' ファイルに記録されます。
 以降は、これらのグループパラメータと、それに関連する変数の説明です。
 
 @table @code
@@ -12798,8 +12802,8 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 @vindex nnshimbun-group-parameters-alist
 @code{nnshimbun-group-parameters-alist} はカスタマイズ可能なユーザオプショ
 ンで、各要素にグループ名の正規表現と @code{nnshimbun} 専用のグループパラ
-メータと同じプロパティリストを持つことができる連想リストです。各要素は次
-のような値を持ちます。
+メータと同じプロパティリストを持つことができる連想リストです。連想リスト
+の各要素は次のような値を持ちます。
 
 @lisp
 '("^nnshimbun\\+asahi:"
@@ -12807,21 +12811,32 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 @end lisp
 
 似た性格を持つ複数のグループに対して同じ設定を行なうことができるので、個々
-のグループに対してそれぞれグループパラメータをを設定する代わりに使うこと
-ができます。もし正規表現にマッチするグループでグループパラメータの設定が
-行なわれていた場合は、その設定値の方が優先されます。
+のグループに対してそれぞれグループパラメータを設定する代わりに使うことが
+できます。もし正規表現にマッチするグループでグループパラメータの設定が行
+なわれていた場合は、その設定値の方が優先されます。
 @end table
 
 @cindex article expiry
+@cindex auto-expire
 @cindex expiry-wait
 @vindex nnmail-expiry-wait-function
 @vindex nnmail-expiry-wait
 ところで @code{nnshimbun} バックエンドでは、記事の期限切れ消去を行なうこ
-とができます。ああ、もちろんあなたが三日前の新聞記事を消去するように設定
-したからといって、新聞社のサーバーにある三日前の記事が消えてしまうわけで
-はありません。消えるのはあなた個人が持っている @code{nnshimbun} 用
-の @sc{nov} ファイルの該当する部分で、それによってその記事は二度と概略バッ
-ファに現れなくなります。
+とができます @footnote{@code{nnshimbun} グループで自動期限切れ消去を行な
+う方法には主に二種類あります。一つは ``^nnshimbun\\+'' で始まるグループ
+名の正規表現を @code{gnus-auto-expirable-newsgroups} に追加して、消去す
+るまでの日数を各グループ毎に @code{nnmail-expiry-wait-function} で指定す
+ること。もう一つは @code{nnshimbun} の各グループ毎にグループパラメー
+タ @code{auto-expire} を @code{t} にして、同じくグループパラメー
+タ @code{expiry-wait} で消去するまでの日数を指定するやり方です。詳しいこ
+とは @xref{Expiring Mail} を参照して下さい。なお本編でも触れていますが、
+個々に日数を設定しない場合はディフォルトの値が適用されます。}。ああ、も
+ちろんあなたが三日前の新聞記事を消去するように設定したからといって、新聞
+社のサーバーにある三日前の記事が消えてしまうわけではありません。消えるの
+はあなた個人が持っている @code{nnshimbun} 用の @sc{nov} ファイ
+ル @footnote{@code{nnshimbun} 用の @sc{nov} ファイルと
+は ``~/News/shimbun/asahi/national/.overview'' のようなものです。} の該
+当する部分で、それによってその記事は二度と概略バッファに現れなくなります。
 
 @code{nnshimbun} バックエンドでは記事の期限切れ消去を行なわない
 と @sc{nov} ファイルが際限無く太り続け、新聞社のサーバーではとっくに無く
@@ -12834,7 +12849,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 実は @code{nnshimbun} バックエンドでも、他のメールバックエンドと同様の方
 法でグループ毎に自動期限切れ消去可能にしたり、残しておく期間を設定するこ
-とができるのです (@xref{Expiring Mail})。
+とができるのです。
 
 ただ @code{nnshimbun} バックエンドの期限切れ消去には、他のメールバックエ
 ンドと少しだけ違う点があります。第一に、残しておく期間のディフォルト値に
@@ -12886,8 +12901,14 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 これは、グループバッファで @kbd{G c} をタイプしたときに現れる編集画面に
 おいて、@code{nnshimbun} に関係するものを一箇所に集めるためと、ユーザオ
 プション @code{nnshimbun-group-parameters-alist} で一括して管理できるよ
-うにすることを目的に用意したものです。設定できる値は汎用のグループパラメー
-タと同様に、時限消去の日数、@code{never} または @code{immediate} です。
+うにすることを目的に用意したものです @footnote{な
+ぜ @code{auto-expire} なども @code{nnshimbun} 専用のグループパラメータに
+含めておいてくれないの? という問いに対する答えを用意しています。
+@code{expiry-wait} を参照するのが @code{nnshimbun} バックエンドなのに対
+して、@code{auto-expire} などを参照するのは Gnus の本体なのですが、本体
+の機能を特定のバックエンドの面倒を見るように拡張するのは、Gnus の設計思
+想に反しているからです。}。設定できる値は汎用のグループパラメータと同様
+に、時限消去の日数、@code{never} または @code{immediate} です。
 
 @item nnshimbun-keep-unparsable-dated-articles
 @vindex nnshimbun-keep-unparsable-dated-articles
