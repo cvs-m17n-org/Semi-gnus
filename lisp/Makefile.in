@@ -60,9 +60,12 @@ gnus-load.el:
 	echo >> gnus-load.el
 	echo ";;; gnus-load.el ends here" >> gnus-load.el
 
-distclean:
-	rm -f *.orig *.rej *.elc *~ Makefile
+clean:
+	rm -f *.orig *.rej *.elc *~
 	rm -f auto-autoload.el custom-load.el
+
+distclean: clean
+	rm -f Makefile
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \
