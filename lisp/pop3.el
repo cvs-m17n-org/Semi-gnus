@@ -421,8 +421,9 @@ Return the response string if optional second argument RETURN is non-nil."
 	 (lambda (atom)
 	   (when (car (symbol-value atom))
 	     (insert (format "%s\n" atom))))
-	 pop3-uidl-obarray)))))
-    
+	 pop3-uidl-obarray)))
+    (fillarray pop3-uidl-obarray 0)))
+
 
 ;; The Command Set
 
