@@ -1,3 +1,8 @@
+2002-03-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-resend-message-edit): Use
+	`mime-edit-again' instead of `mime-to-mml' to recompose a message.
+
 2002-03-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (mm-make-temp-file): Copied from mm-util.el.

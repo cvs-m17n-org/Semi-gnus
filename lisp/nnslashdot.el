@@ -253,7 +253,7 @@
 			   (point)
 			   (progn
 			     (re-search-forward
-			      "&lt;&nbsp;[ \t\r\n]*<A HREF=\"\\(\\(http:\\)?//slashdot\\.org\\)?/article")
+			      "<!-- no ad 6 -->\\|&lt;&nbsp;[ \t\r\n]*<A HREF=\"\\(\\(http:\\)?//slashdot\\.org\\)?/article")
 			     (match-beginning 0)))))
 		(setq cid (cdr (assq article
 				     (nth 4 (assoc group nnslashdot-groups)))))

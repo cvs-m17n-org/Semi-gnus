@@ -2151,6 +2151,7 @@ increase the score of each group you read."
        ["Digest and mail" gnus-summary-digest-mail-forward t]
        ["Digest and post" gnus-summary-digest-post-forward t]
        ["Resend message" gnus-summary-resend-message t]
+       ["Resend message edit" gnus-summary-resend-message-edit t]
        ["Send bounced mail" gnus-summary-resend-bounced-mail t]
        ["Send a mail" gnus-summary-mail-other-window t]
        ["Create a local message" gnus-summary-news-other-window t]

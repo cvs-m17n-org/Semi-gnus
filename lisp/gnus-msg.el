@@ -311,7 +311,8 @@ Thank you for your help in stamping out bugs.
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
   ;; "c" gnus-summary-send-draft
-  "r" gnus-summary-resend-message)
+  "r" gnus-summary-resend-message
+  "e" gnus-summary-resend-message-edit)
 
 ;;; Internal functions.
 
@@ -1255,6 +1256,55 @@ forward those articles instead."
 	(set-buffer gnus-original-article-buffer)
 	(message-resend address))
       (gnus-summary-mark-article-as-forwarded article))))
+
+;; From: Matthieu Moy <Matthieu.Moy@imag.fr>
+(defun gnus-summary-resend-message-edit ()
+  "Resend an article that has already been sent.
+A new buffer will be created to allow the user to modify body and
+contents of the message, and then, everything will happen as when
+composing a new message."
+  (interactive)
+  (let ((article (gnus-summary-article-number)))
+    (gnus-setup-message 'reply-yank
+      (gnus-summary-select-article t)
+      (set-buffer gnus-original-article-buffer)
+      (let ((cur (current-buffer))
+	    (to (message-fetch-field "to")))
+	;; Get a normal message buffer.
+	(message-pop-to-buffer (message-buffer-name "Resend" to))
+	(insert-buffer-substring cur)
+
+	;; T-gnus change: Use MIME-Edit to recompose a message.
+	;;(mime-to-mml)
+	(let ((ofn (symbol-function 'mime-edit-decode-single-part-in-buffer)))
+	  (fset 'mime-edit-decode-single-part-in-buffer
+		(lambda (&rest args)
+		  (if (let ((content-type (car args)))
+			(and (eq 'message (mime-content-type-primary-type
+					   content-type))
+			     (eq 'rfc822 (mime-content-type-subtype
+					  content-type))))
+		      (setcar (cdr args) 'not-decode-text))
+		  (apply ofn args)))
+	  (unwind-protect
+	      (mime-edit-again nil t)
+	    (fset 'mime-edit-decode-single-part-in-buffer ofn)))
+	(message-narrow-to-head-1)
+	(insert "From: " (message-make-from) "\n")
+	(while (re-search-forward "^From:" nil t)
+	  (beginning-of-line)
+	  (insert "Original-"))
+	(message-remove-header "^>From[\t ]" t)
+
+	;; Gnus will generate a new one when sending.
+	(message-remove-header "Message-ID")
+	;; Remove unwanted headers.
+	(goto-char (point-max))
+	(insert mail-header-separator)
+	(goto-char (point-min))
+	(re-search-forward "^To:\\|^Newsgroups:" nil 'move)
+	(forward-char 1)
+	(widen)))))
 
 (defun gnus-summary-post-forward (&optional full-headers)
   "Forward the current article to a newsgroup.
