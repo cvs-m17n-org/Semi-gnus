@@ -2676,9 +2676,8 @@ buffer that was in action when the last article was fetched."
 	  (cond
 	   ((string-match "<[^>]+> *$" gnus-tmp-from)
 	    (let ((beg (match-beginning 0)))
-	      (or (and (string-match "^\"[^\"]*\"" gnus-tmp-from)
-		       (substring gnus-tmp-from (1+ (match-beginning 0))
-				  (1- (match-end 0))))
+	      (or (and (string-match "^\".+\"" gnus-tmp-from)
+		       (substring gnus-tmp-from 1 (1- (match-end 0))))
 		  (substring gnus-tmp-from 0 beg))))
 	   ((string-match "(.+)" gnus-tmp-from)
 	    (substring gnus-tmp-from
@@ -4065,9 +4064,8 @@ or a straight list of headers."
 	     (cond
 	      ((string-match "<[^>]+> *$" gnus-tmp-from)
 	       (setq beg-match (match-beginning 0))
-	       (or (and (string-match "^\"[^\"]*\"" gnus-tmp-from)
-			(substring gnus-tmp-from (1+ (match-beginning 0))
-				   (1- (match-end 0))))
+	       (or (and (string-match "^\".+\"" gnus-tmp-from)
+			(substring gnus-tmp-from 1 (1- (match-end 0))))
 		   (substring gnus-tmp-from 0 beg-match)))
 	      ((string-match "(.+)" gnus-tmp-from)
 	       (substring gnus-tmp-from
