@@ -1,3 +1,14 @@
+1999-01-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-pop-password-file): New
+	variable.
+	(gnus-offline-pop-password-decoding-function): New variable.
+	(gnus-offline-get-new-news): When `gnus-offline-pop-password-file'
+	is non-nil, get one's password information from a file specified
+	by this variable, and don't store the passwords as a variable.
+	* lisp/smiley.el (smiley-buffer): Avoid a few duplicate
+	translations.
+
 1999-01-23  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
 
 	* lisp/gnus-msg.el (gnus-inews-yank-articles): Use
