@@ -1,3 +1,7 @@
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el: Remove some garbage.
+
 2001-06-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/message-ja.texi: Use `iso-2022-7bit' instead of

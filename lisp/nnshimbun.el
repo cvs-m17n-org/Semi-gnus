@@ -37,9 +37,8 @@
 ;; If you would like to use this module in Gnus (not T-gnus), put this
 ;; file into the lisp/ directory in the Gnus source tree and run `make
 ;; install'.  And then, put the following expression into your ~/.gnus.
-
-;; (autoload 'gnus-group-make-shimbun-group
-;;   "nnshimbun" "Create a nnshimbun group." t)
+;;
+;; (autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
 
 
 ;;; Definitions:
@@ -231,12 +230,12 @@ longer last."
 	(with-current-buffer (or to-buffer nntp-server-buffer)
 	  (delete-region (point-min) (point-max))
 	  (shimbun-article nnshimbun-shimbun header)
-	  ;; Kludge! replace a date string in `gnus-newsgroup-data'
-	  ;; based on the newly retrieved article.
-	  (let ((x (gnus-summary-article-header article)))
-	    (when x
-	      (mail-header-set-date x (shimbun-header-date header))))
 	  (when (> (buffer-size) 0)
+	    ;; Kludge! replace a date string in `gnus-newsgroup-data'
+	    ;; based on the newly retrieved article.
+	    (let ((x (gnus-summary-article-header article)))
+	      (when x
+		(mail-header-set-date x (shimbun-header-date header))))
 	    (nnshimbun-replace-nov-entry group article header original-id)
 	    (nnshimbun-backlog
 	      (gnus-backlog-enter-article group article (current-buffer)))
@@ -278,7 +277,7 @@ longer last."
 	  (forward-line -1)
 	  (setq end (ignore-errors (read (current-buffer)))
 		lines (count-lines (point-min) (point-max))))
-	(nnheader-report 'nnshimbunw "Selected group %s" group)
+	(nnheader-report 'nnshimbun "Selected group %s" group)
 	(nnheader-insert "211 %d %d %d %s\n"
 			 lines (or beg 0) (or end 0) group))))))
 
@@ -622,13 +621,12 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 
 ;;; Command to create nnshimbun group
 
-(defvar gnus-group-shimbun-server-history nil)
+(defvar nnshimbun-server-history nil)
 
 ;;;###autoload
 (defun gnus-group-make-shimbun-group ()
   "Create a nnshimbun group."
   (interactive)
-  (require 'nnshimbun)
   (let* ((minibuffer-setup-hook
 	  (append minibuffer-setup-hook '(beginning-of-line)))
 	 (alist
@@ -647,9 +645,9 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	 (server (completing-read
 		  "Shimbun address: " 
 		  alist nil t
-		  (or (car gnus-group-shimbun-server-history)
+		  (or (car nnshimbun-server-history)
 		      (caar alist))
-		  'gnus-group-shimbun-server-history))
+		  'nnshimbun-server-history))
 	 (groups)
 	 (nnshimbun-pre-fetch-article))
     (require (intern (concat "sb-" server)))
