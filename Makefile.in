@@ -2,6 +2,7 @@ prefix = @prefix@
 datadir = @datadir@
 lispdir = @lispdir@
 srcdir = @srcdir@
+PACKAGEDIR =
 
 @SET_MAKE@
 EMACS = @EMACS@
@@ -17,6 +18,20 @@ lick:
 install:
 	cd lisp && $(MAKE) EMACS=$(EMACS) lispdir=$(lispdir) install
 	cd texi && $(MAKE) EMACS=$(EMACS) install
+
+package: all
+	cd lisp && $(MAKE) EMACS="$(EMACS)" package
+
+install-package: info
+	cd lisp && $(MAKE) EMACS="$(EMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
+		install-package
+
+package-ja: all-ja
+	cd lisp && $(MAKE) EMACS="$(EMACS)" package
+
+install-package-ja: info info-ja
+	cd lisp && $(MAKE) EMACS="$(EMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
+		install-package
 
 # Rule for Lars and nobody else.
 some:
