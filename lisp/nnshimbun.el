@@ -48,6 +48,14 @@
 
 (defvar nnshimbun-check-interval 300)
 
+(defconst nnshimbun-mew-groups
+  '(("meadow-develop" "meadow-develop" nil t)
+    ("meadow-users-jp" "meadow-users-jp")
+    ("mule-win32" "mule-win32")
+    ("mew-win32" "mew-win32")
+    ("mew-dist" "mew-dist/3300" t)
+    ("mgp-users-jp" "mgp-users-jp/A" t t)))
+
 (defvar nnshimbun-type-definition
   `(("asahi"
      (url . "http://spin.asahi.com/")
@@ -115,6 +123,24 @@
      (make-contents  . nnshimbun-make-html-contents)
      (contents-start . "<!--BODY-->")
      (contents-end   . "<!--BODYEND-->"))
+    ("mew"
+     (url . "http://www.mew.org/archive/")
+     (groups ,@(mapcar #'car nnshimbun-mew-groups))
+     (coding-system . ,(if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
+     (generate-nov  . nnshimbun-generate-nov-for-each-group)
+     (get-headers   . nnshimbun-mew-get-headers)
+     (index-url     . (nnshimbun-mew-concat-url "index.html"))
+     (make-contents . nnshimbun-make-mhonarc-contents))
+    ("xemacs"
+     (url . "http://www.xemacs.org/list-archives/")
+     (groups "xemacs-announce" "xemacs-beta-ja" "xemacs-beta"
+	     "xemacs-build-reports" "xemacs-cvs" "xemacs-mule"
+	     "xemacs-nt" "xemacs-patches" "xemacs-users-ja" "xemacs")
+     (coding-system . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
+     (generate-nov  . nnshimbun-generate-nov-for-each-group)
+     (get-headers   . nnshimbun-xemacs-get-headers)
+     (index-url     . (nnshimbun-xemacs-concat-url nil))
+     (make-contents . nnshimbun-make-mhonarc-contents))
     ))
 
 (defvar nnshimbun-x-face-alist
@@ -759,6 +785,71 @@ is enclosed by at least one regexp grouping construct."
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
+(defun nnshimbun-make-mhonarc-contents (header &rest args)
+  (require 'mml)
+  (if (search-forward "<!--X-Head-End-->" nil t)
+      (progn
+	(forward-line 0)
+	;; Processing headers.
+	(save-restriction
+	  (narrow-to-region (point-min) (point))
+	  (nnweb-decode-entities)
+	  (goto-char (point-min))
+	  (while (search-forward "<!--X-" nil t)
+	    (replace-match ""))
+	  (goto-char (point-min))
+	  (while (search-forward " -->" nil t)
+	    (replace-match ""))
+	  (goto-char (point-min))
+	  (let (refs id)
+	    (while (not (eobp))
+	      (cond
+	       ((looking-at "<!--")
+		(delete-region (point) (progn (forward-line 1) (point))))
+	       ((looking-at "Message-Id: ")
+		(setq id (concat "<" (nnheader-header-value) ">"))
+		(forward-line 1))
+	       ((looking-at "Reference: ")
+		(push (concat "<" (nnheader-header-value) ">") refs)
+		(delete-region (point) (progn (forward-line 1) (point))))
+	       ((looking-at "Content-Type: ")
+		(unless (search-forward "charset" (gnus-point-at-eol) t)
+		  (end-of-line)
+		  (insert "; charset=ISO-2022-JP"))
+		(forward-line 1))
+	       (t (forward-line 1))))
+	    (let (buf)
+	      (dolist (ref refs)
+		(and
+		 (setq ref (nnshimbun-search-id nnshimbun-current-group ref 'nov))
+		 (push (mail-header-id ref) buf)))
+	      (setq refs buf))
+	    (insert "References: "
+		    (setq refs (mapconcat #'identity refs " "))
+		    "\nMIME-Version: 1.0\n")
+	    (nnshimbun-nov-fix-header nnshimbun-current-group
+				      header
+				      `((id . ,id)
+					(references . ,refs))))
+	  (goto-char (point-max)))
+	;; Processing body.
+	(save-restriction
+	  (narrow-to-region (point) (point-max))
+	  (delete-region
+	   (point)
+	   (progn
+	     (search-forward "\n<!--X-Body-of-Message-->\n" nil t)
+	     (point)))
+	  (when (search-forward "\n<!--X-Body-of-Message-End-->\n" nil t)
+	    (forward-line -1)
+	    (delete-region (point) (point-max)))
+	  (nnweb-remove-markup)
+	  (nnweb-decode-entities)))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n"))
+  (encode-coding-string (buffer-string)
+			(mime-charset-to-coding-system "ISO-2022-JP")))
 
 
 ;;; www.asahi.com
@@ -1023,6 +1114,147 @@ is enclosed by at least one regexp grouping construct."
 	      headers)))
     (nreverse headers)))
 
+;;; MLs on www.mew.org
+
+(defmacro nnshimbun-mew-concat-url (url)
+  `(concat nnshimbun-url
+	   (nth 1 (assoc nnshimbun-current-group nnshimbun-mew-groups))
+	   "/"
+	   ,url))
+
+(defmacro nnshimbun-mew-reverse-order-p ()
+  `(nth 2 (assoc nnshimbun-current-group nnshimbun-mew-groups)))
+
+(defmacro nnshimbun-mew-spew-p ()
+  `(nth 3 (assoc nnshimbun-current-group nnshimbun-mew-groups)))
+
+(defsubst nnshimbun-mew-retrieve-xover (aux)
+  (erase-buffer)
+  (nnshimbun-retrieve-url
+   (nnshimbun-mew-concat-url (if (= aux 1) "index.html" (format "mail%d.html" aux)))
+   t))
+
+(defconst nnshimbun-mew-regexp "<A[^>]*HREF=\"\\(msg\\([0-9]+\\).html\\)\">\\([^<]+\\)<")
+
+(defmacro nnshimbun-mew-extract-header-values ()
+  `(progn
+     (setq url (nnshimbun-mew-concat-url (match-string 1))
+	   id (format "<%05d%%%s>"
+		      (1- (string-to-number (match-string 2)))
+		      nnshimbun-current-group)
+	   subject (match-string 3))
+     (forward-line 1)
+     (if (nnshimbun-search-id nnshimbun-current-group id)
+	 (throw 'stop headers)
+       (push (make-full-mail-header
+	      0
+	      (nnshimbun-mime-encode-string subject)
+	      (if (looking-at "<EM>\\([^<]+\\)<")
+		  (nnshimbun-mime-encode-string (match-string 1))
+		"")
+	      "" id "" 0 0 url)
+	     headers))))
+
+(eval-and-compile
+  (if (fboundp 'mime-entity-fetch-field)
+      ;; For Semi-Gnus.
+      (defmacro nnshimbun-mew-mail-header-subject (header)
+	`(mime-entity-fetch-field ,header 'Subject))
+    ;; For pure Gnus.
+    (defalias 'nnshimbun-mew-mail-header-subject 'mail-header-subject)))
+
+(defun nnshimbun-mew-get-headers ()
+  (if (nnshimbun-mew-spew-p)
+      (let ((headers (nnshimbun-mew-get-headers-1)))
+	(erase-buffer)
+	(insert-buffer-substring (nnshimbun-open-nov nnshimbun-current-group))
+	(delq nil
+	      (mapcar
+	       (lambda (header)
+		 (goto-char (point-min))
+		 (let ((subject (nnshimbun-mew-mail-header-subject header))
+		       (found))
+		   (while (and (not found)
+			       (search-forward subject nil t))
+		     (if (not (and (search-backward "\t" nil t)
+				   (not (search-backward "\t" (gnus-point-at-bol) t))))
+			 (forward-line 1)
+		       (setq found t)))
+		   (if found
+		       nil
+		     (goto-char (point-max))
+		     (nnheader-insert-nov header)
+		     header)))
+	       headers)))
+    (nnshimbun-mew-get-headers-1)))
+
+(defun nnshimbun-mew-get-headers-1 ()
+  (let (headers)
+    (when (re-search-forward
+	   "<A[^>]*HREF=\"mail\\([0-9]+\\)\\.html\">\\[?Last Page\\]?</A>" nil t)
+      (let ((limit (string-to-number (match-string 1))))
+	(catch 'stop
+	  (if (nnshimbun-mew-reverse-order-p)
+	      (let ((aux 1))
+		(while (let (id url subject)
+			 (while (re-search-forward nnshimbun-mew-regexp nil t)
+			   (nnshimbun-mew-extract-header-values))
+			 (< aux limit))
+		  (nnshimbun-mew-retrieve-xover (setq aux (1+ aux)))))
+	    (while (> limit 0)
+	      (nnshimbun-mew-retrieve-xover limit)
+	      (setq limit (1- limit))
+	      (let (id url subject)
+		(goto-char (point-max))
+		(while (re-search-backward nnshimbun-mew-regexp nil t)
+		  (nnshimbun-mew-extract-header-values)
+		  (forward-line -2)))))
+	  headers)))))
+
+;;; MLs on www.xemacs.org
+
+(defmacro nnshimbun-xemacs-concat-url (url)
+  `(concat nnshimbun-url nnshimbun-current-group "/" ,url))
+
+(defun nnshimbun-xemacs-get-headers ()
+  (let (headers auxs aux)
+    (catch 'stop
+      (while (re-search-forward
+	      (concat "<A HREF=\"/list-archives/" nnshimbun-current-group
+		      "/\\([12][0-9][0-9][0-9][0-1][0-9]\\)/\">\\[Index\\]")
+	      nil t)
+	(setq auxs (append auxs (list (match-string 1)))))
+      (while auxs
+	(erase-buffer)
+	(nnshimbun-retrieve-url
+	 (nnshimbun-xemacs-concat-url (concat (setq aux (car auxs)) "/")))
+	(let (id url subject)
+	  (goto-char (point-max))
+	  (while (re-search-backward
+		  "<A[^>]*HREF=\"\\(msg\\([0-9]+\\).html\\)\">\\([^<]+\\)<"
+		  nil t)
+	    (setq url (nnshimbun-xemacs-concat-url
+		       (concat aux "/" (match-string 1)))
+		  id (format "<%s%05d%%%s>"
+			     aux
+			     (string-to-number (match-string 2))
+			     nnshimbun-current-group)
+		  subject (match-string 3))
+	    (forward-line 1)
+	    (if (nnshimbun-search-id nnshimbun-current-group id)
+		(throw 'stop headers)
+	      (push (make-full-mail-header
+		     0
+		     (nnshimbun-mime-encode-string subject)
+		     (if (looking-at "<td><em>\\([^<]+\\)<")
+			 (match-string 1)
+		       "")
+		     "" id "" 0 0 url)
+		    headers))
+	    (message "%s" id)
+	    (forward-line -2)))
+	(setq auxs (cdr auxs))))
+    headers))
 
 
 (provide 'nnshimbun)
