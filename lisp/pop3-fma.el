@@ -180,7 +180,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
      (setq byte-compile-warnings nil))))
 
 (defun pop3-fma-init-message-hook ()
-  (add-hook 'mime-edit-translate-hook 'pop3-fma-message-add-header))
+  (add-hook 'message-send-hook 'pop3-fma-message-add-header))
 
 (eval-after-load "message"
   '(pop3-fma-init-message-hook))
