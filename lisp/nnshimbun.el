@@ -1285,7 +1285,7 @@ is enclosed by at least one regexp grouping construct."
 (defun nnshimbun-netbsd-get-headers ()
   (let ((case-fold-search t) headers months)
     (goto-char (point-min))
-    (while (re-search-forward "<A HREF=\"\\([0-9]+\\)/threads.html\">" nil t)
+    (while (re-search-forward "<A HREF=\"\\([0-9]+\\)/\\(threads.html\\)?\">" nil t)
       (push (match-string 1) months))
     (setq months (nreverse months))
     (catch 'exit
