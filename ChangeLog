@@ -1,5 +1,15 @@
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el: Make sure `dolist' is available.
+
+	* texi/infohack.el: Load dgnushack.el and ptexinfmt.el first.
+
+2003-04-27  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Fix PGP entry.  Doc GCC variable change.
+
+2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.15.20 (quimby) revision 00.
 
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>

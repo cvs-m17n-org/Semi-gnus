@@ -49,8 +49,16 @@
 (defalias 'facep 'ignore)
 
 (require 'cl)
-(unless (dolist (var nil t))
-  ;; Override the macro `dolist' which may have been defined in egg.el.
+
+(and (fboundp 'dolist)
+     (dolist (var nil t)))
+
+
+(unless (and
+	 ;; `dolist' might not be available because of ``-no-autoloads''.
+	 (fboundp 'dolist)
+	 ;; It may have been defined in egg.el.
+	 (dolist (var nil t)))
   (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
@@ -550,6 +558,13 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
     "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
   "Files which should not be byte-compiled.")
+
+(defun dgnushack-compile-verbosely ()
+  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
+patches to gnus, you should consider modifying make.bat to call
+dgnushack-compile-verbosely.  All other users should continue to use
+dgnushack-compile."
+  (dgnushack-compile t))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)

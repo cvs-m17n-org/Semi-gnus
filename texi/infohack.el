@@ -25,7 +25,11 @@
 
 ;;; Code:
 
-(require 'texinfmt)
+(let ((default-directory (expand-file-name "../lisp/"))
+      (features (cons 'w3-forms (copy-sequence features))))
+  ;; Adjust `load-path' for APEL.
+  (load-file "dgnushack.el"))
+(load-file (expand-file-name "ptexinfmt.el" "./"))
 
 (defun infohack-remove-unsupported ()
   (goto-char (point-min))
@@ -86,12 +90,6 @@ Both characters must have the same length of multi-byte form."
   (setq command-line-args-left nil))
 
 
-(let ((default-directory (expand-file-name "../lisp/"))
-      (features (cons 'w3-forms (copy-sequence features))))
-  ;; Adjust `load-path' for APEL.
-  (load-file "dgnushack.el"))
-(load-file (expand-file-name "ptexinfmt.el" "./"))
-
 (defun infohack-texi-format (file &optional addsuffix)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
