@@ -119,7 +119,7 @@ Modify to suit your needs."))
 
     (with-temp-buffer
       (insert ";;;###autoload
-;(package-provide '" product-name "
+\(package-provide '" product-name "
 		 :version " version "
 		 :type 'regular)
 ")
