@@ -1,3 +1,7 @@
+1998-07-27  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/message-ja.texi: Japanese translation of "message.texi".
+
 1998-07-26  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.3.
