@@ -1,5 +1,8 @@
 2002-11-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/nndraft.el (nndraft-request-article): Don't give a special
+	treatment to Mule.
+
 	* lisp/nnheader.el (nnheader-auto-save-coding-system): Undo last
 	change to restore the default value to emacs-mule or escape-quoted.
 

@@ -117,13 +117,10 @@
 	   ;; files may have been saved using that coding-system.
 	   (maybe-emacs-mule-p (and (not (featurep 'xemacs))
 				    (not (equal "queue" group))
-				    (static-if (boundp 'MULE)
-					(eq message-draft-coding-system
-					    ;; The present default value.
-					    '*iso-2022-jp*)
-				      (eq message-draft-coding-system
-					  ;; The present default value.
-					  'iso-2022-7bit)))))
+				    (eq message-draft-coding-system
+					;; The present default value.
+					'iso-2022-7bit)
+				    (find-coding-system 'emacs-mule))))
       (when (and (file-exists-p newest)
 		 (if (equal "queue" group)
 		     (nnmail-find-file newest)
@@ -141,11 +138,9 @@
 	  (when maybe-emacs-mule-p
 	    (goto-char (point-min))
 	    (if (re-search-forward "[^\000-\177]" nil t)
-		;; Consider the file has been saved using `emacs-mule'.
+		;; Consider the file has been saved as `emacs-mule'.
 		(decode-coding-region (point-min) (point-max)
-				      (static-if (boundp 'MULE)
-					  '*internal*
-					'emacs-mule))
+				      nnheader-auto-save-coding-system)
 	      (decode-coding-region (point-min) (point-max)
 				    message-draft-coding-system)))
 	  (goto-char (point-min))
