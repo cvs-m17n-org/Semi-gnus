@@ -1,3 +1,9 @@
+2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Attempt to add another FLIM path to `load-path'
+	if the module `mel' does not found.  This procedure may be needed
+	when recent FLIM 1.14 is used under old Emacsen.
+
 2000-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
