@@ -234,7 +234,9 @@ any confusion."
   :group 'message-various)
 
 (defcustom message-elide-elipsis "\n[...]\n\n"
-  "*The string which is inserted for elided text.")
+  "*The string which is inserted for elided text."
+  :type 'string
+  :group 'message-various)
 
 (defcustom message-interactive nil
   "*Non-nil means when sending a message wait for and display errors.
@@ -1465,7 +1467,8 @@ With the prefix argument FORCE, insert the header anyway."
   (interactive)
   (let ((point (point)))
     (message-goto-signature)
-    (forward-line -2)
+    (unless (eobp)
+      (forward-line -2))
     (kill-region point (point))
     (unless (bolp)
       (insert "\n"))))
@@ -1524,8 +1527,9 @@ With the prefix argument FORCE, insert the header anyway."
       (or (bolp) (insert "\n")))))
 
 (defun message-elide-region (b e)
-  "Elide the text between point and mark.  An ellipsis (from
-message-elide-elipsis) will be inserted where the text was killed."
+  "Elide the text between point and mark.
+An ellipsis (from `message-elide-elipsis') will be inserted where the
+text was killed."
   (interactive "r")
   (kill-region b e)
   (unless (bolp)
@@ -1821,6 +1825,7 @@ The text will also be indented the normal way."
 (defun message-dont-send ()
   "Don't send the message you have been editing."
   (interactive)
+  (set-buffer-modified-p t)
   (save-buffer)
   (let ((actions message-postpone-actions))
     (message-bury (current-buffer))
