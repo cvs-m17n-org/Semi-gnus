@@ -1,3 +1,11 @@
+1999-12-07  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-gettext): Rename from
+	`gnus-offline-get-message'.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-gettext): Rename from
+	`gnus-ofsetup-get-message'.
+
 1999-12-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
