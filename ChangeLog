@@ -1,3 +1,12 @@
+1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.10.
+
+	* lisp/gnus-sum.el: Add code to check latest SEMI.
+	(mime-acting-condition): Separate type and subtype; rename
+ 	`mime-combine-message/partials-automatically' ->
+ 	`mime-method-to-combine-message/partial-pieces'.
+
 1998-03-08  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.9.
