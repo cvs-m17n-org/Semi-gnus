@@ -9473,7 +9473,7 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 が @code{nil}でない値を帰せば、様式は @code{合致した} と言います。
 
 それぞれの様式は任意の量の @dfn{属性} を持つ事ができます。それぞれの属性
-は @code{(@var{name} . @var{value})} の対により成り立っています。属性名
+は @code{(@var{name} @var{value})} の対により成り立っています。属性名
 は、@code{signature}, @code{signature-file}, @code{organization}, @code{address}, @code{name}, @code{body} の
 どれかである事ができます。属性名は文字列である事もできます。その場合は、
 これはヘッダー名として使われ、その値が記事のヘッダーに挿入されます。もし

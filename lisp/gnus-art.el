@@ -3151,12 +3151,9 @@ If variable `gnus-use-long-file-name' is non-nil, it is
     (unless (lookup-key gnus-article-mode-map key)
       (define-key gnus-article-mode-map key 'gnus-article-read-summary-keys))))
 
-(eval-when-compile
-  (defvar gnus-article-commands-menu))
-
-(defvar gnus-article-post-menu nil)
-
 (defun gnus-article-make-menu-bar ()
+  (unless (boundp 'gnus-article-commands-menu)
+    (gnus-summary-make-menu-bar))
   (gnus-turn-off-edit-menu 'article)
   (unless (boundp 'gnus-article-article-menu)
     (easy-menu-define
@@ -3183,16 +3180,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency
 
-    (when (boundp 'gnus-summary-post-menu)
-      (cond
-       ((not (keymapp gnus-summary-post-menu))
-	(setq gnus-article-post-menu gnus-summary-post-menu))
-       ((not gnus-article-post-menu)
-	;; Don't share post menu.
-	(setq gnus-article-post-menu
-	      (copy-keymap gnus-summary-post-menu))))
-      (define-key gnus-article-mode-map [menu-bar post]
-	(cons "Post" gnus-article-post-menu)))
+    ;; Note "Post" menu is defined in gnus-sum.el for consistency
 
     (gnus-run-hooks 'gnus-article-menu-hook)))
 
