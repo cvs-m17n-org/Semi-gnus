@@ -206,8 +206,10 @@ BBDB-FEILD values is returned.  Otherwise, GROUP is returned."
 	(throw 'done (when rest (cons '& rest))))
        (t
 	(while records
-	  (when (and (setq prop (bbdb-record-getprop (car records) bbdb-field))
-		     (string-match regexp prop))
+	  (when (or (null bbdb-field) 
+		    (and (setq prop (bbdb-record-getprop (car records)
+							 bbdb-field))
+			 (string-match regexp prop)))
 	    (throw 'done (or group prop)))
 	  (setq records (cdr records))))))))
 
