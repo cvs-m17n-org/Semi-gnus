@@ -23,6 +23,8 @@ INFO_DEPS=gnus message emacs-mime sieve
 INFO_DEPS_JA=gnus-ja message-ja
 INFO_DEPS_INFO=gnus.info message.info emacs-mime.info sieve.info
 INFO_DEPS_JA_INFO=gnus-ja.info message-ja.info
+REFCARD=gnus-refcard
+LOGO=gnus-logo
 
 all: $(INFO_DEPS)
 all-info: $(INFO_DEPS_INFO)
@@ -84,9 +86,9 @@ GNUS-NEWS:	gnus-news.texi gnus-news.el
 	$(EMACSCOMP) -l $(srcdir)/gnus-news.el -f batch-gnus-news $< $@
 	mv $@ ../$@
 
-dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi sieve.dvi
+dvi: gnus.dvi message.dvi $(REFCARD).dvi emacs-mime.dvi sieve.dvi
 
-pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf sieve.pdf
+pdf: gnus.pdf message.pdf $(REFCARD).pdf emacs-mime.pdf sieve.pdf
 
 .texi.dvi :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
@@ -103,30 +105,35 @@ pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf sieve.pdf
 	cp gnustmp.pdf $*.pdf
 	rm -f gnustmp.*
 
-refcard.dvi: refcard.tex gnuslogo-refcard.eps gnusref.tex
-	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) refcard.tex
+$(LOGO).pdf:	$(LOGO).eps
+	epstopdf $< --outfile=$@
 
-refcard.pdf: refcard.tex gnuslogo-refcard.eps gnusref.tex
-	epstopdf $(srcdir)/gnuslogo-refcard.eps --outfile=gnuslogo-refcard.pdf
-	TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) refcard.tex
+$(REFCARD).dvi: $(REFCARD).tex $(LOGO).eps
+	TEXINPUTS=$(srcdir):$$TEXINPUTS:: $(LATEX) $(REFCARD).tex
 
-booklet.dvi: booklet.tex gnuslogo-refcard.eps gnusref.tex
+$(REFCARD).pdf: $(REFCARD).tex $(LOGO).pdf
+	TEXINPUTS=$(srcdir):$$TEXINPUTS:: $(PDFLATEX) $(REFCARD).tex
+
+gnus-booklet.dvi: $(REFCARD).tex $(LOGO).eps
 	if [ "$(PAPERTYPE)" == a4 ]; then \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) bk-a4.tex && \
-		mv bk-a4.dvi booklet.dvi ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(LATEX) '\def\booklettrue{}\input{$(REFCARD)}' && \
+	  mv $(REFCARD).dvi $@ ;\
 	else \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) bk-lt.tex && \
-		mv bk-lt.dvi booklet.dvi;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(LATEX) '\def\booklettrue{}\def\letterpapertrue{}\input{$(REFCARD)}' && \
+	  mv $(REFCARD).dvi $@ ;\
 	fi
 
-booklet.pdf: booklet.tex gnuslogo-refcard.eps gnusref.tex
-	epstopdf $(srcdir)/gnuslogo-booklet.eps --outfile=gnuslogo-booklet.pdf
+gnus-booklet.pdf: $(REFCARD).tex  $(LOGO).pdf
 	if [ "$(PAPERTYPE)" == a4 ]; then \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) bk-a4.tex &&\
-		mv bk-a4.pdf booklet.pdf ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(PDFLATEX) '\def\booklettrue{}\input{$(REFCARD)}' && \
+	  mv -v $(REFCARD).pdf $@ ;\
 	else \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) bk-lt.tex &&\
-		mv bk-lt.pdf booklet.pdf ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(PDFLATEX) '\def\booklettrue{}\def\letterpapertrue{}\input{$(REFCARD)}' && \
+	  mv -v $(REFCARD).pdf $@ ;\
 	fi
 
 gnus-faq-full-update:  gnus-faq-clean gnus-faq.texi
@@ -138,12 +145,12 @@ gnus-faq.xml:
 	  { echo "Update of $@ failed."; : rm $@.tmp; exit 1; }
 	mv $@.tmp $@
 
-gnus-faq.texi: gnus-faq.xml
+gnus-faq.texi: gnus-faq.xml xml2texi.sh xml2texi.scm
 	./xml2texi.sh $< $@.tmp
 	@echo
 # FIXME: This should be done in xml2texi.scm or gnus-faq.xml should be
 # changed:
-	sed '/\$$Id: Makefile.in,v 7.12 2005/03/24 09:14:37 miles Exp $$/d' < $@.tmp > $@
+	sed '/[$$]Id:.*[$$]/d' < $@.tmp > $@
 
 gnus-faq-clean:
 	rm -f gnus-faq.xml gnus-faq.*.tmp gnus-faq.texi

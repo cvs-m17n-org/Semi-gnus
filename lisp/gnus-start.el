@@ -1,5 +1,5 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -3278,12 +3278,10 @@ If this variable is nil, don't do anything."
 	    (file-name-as-directory (expand-file-name gnus-default-directory))
 	  default-directory)))
 
-(eval-and-compile
-(defalias 'gnus-display-time-event-handler
-  (if (gnus-boundp 'display-time-timer)
-      'display-time-event-handler
-    (lambda () "Does nothing as `display-time-timer' is not bound.
-Would otherwise be an alias for `display-time-event-handler'." nil))))
+(defun gnus-display-time-event-handler ()
+  (if (and (fboundp 'display-time-event-handler)
+	   (gnus-boundp 'display-time-timer))
+      (display-time-event-handler)))
 
 ;;;###autoload
 (defun gnus-fixup-nnimap-unread-after-getting-new-news ()
