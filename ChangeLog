@@ -1,3 +1,9 @@
+2004-09-30  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (GNUS-NEWS): Depend on texi/gnus-news.texi.
+
+	* GNUS-NEWS: Generated.
+
 2004-09-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-encrypt.el: Bind password-cache-expiry when compiling.

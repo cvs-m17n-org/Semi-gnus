@@ -1439,6 +1439,12 @@ Lines (optional . User-Agent))} です。
 @vindex message-default-mail-headers
 この文字列はメールとして初期化された全てのメッセージバッファのヘッダーの
 最後の挿入されます。
+
+@item message-generate-hashcash
+@vindex message-generate-hashcash
+メッセージに @samp{X-Hashcash} ヘッダーを付加すべきかどうかを指示するブー
+ル (値が @code{nil} か非-@code{nil} の) 変数です。@xref{Hashcash,
+,Hashcash,gnus-ja,The Gnus Manual}.
 @end table
 
 @node Mail Variables

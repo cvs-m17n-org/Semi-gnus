@@ -21620,16 +21620,13 @@ Spam と戦うための新しい技法は、いくばくかの負担にはなるが明らかに独特な
 は @uref{http://www.cypherspace.org/~adam/hashcash/} を参照して下さい。
 さらなる情報が @uref{http://www.camram.org/} で見つかるでしょう。
 
-送信するメッセージのそれぞれについて hashcash を呼ぼうと思うなら、こんな
-ふうにして下さい:
+送信するメッセージのそれぞれについて hashcash を生成させようと思うなら、
+以下のように @code{message-generate-hashcash} (@pxref{Mail Headers,,Mail
+Headers,message-ja, The Message Manual}) をカスタマイズして下さい:
 
 @lisp
-(add-hook 'message-send-hook 'mail-add-payment)
+(setq message-generate-hashcash t)
 @end lisp
-
-@file{hashcash.el} ライブラリは Gnus の中で、また
-は @uref{http://users.actrix.gen.nz/mycroft/hashcash.el} として見つける
-ことができます。
 
 いくつかの追加の変数の設定もしなければなりません:
 
@@ -21637,8 +21634,8 @@ Spam と戦うための新しい技法は、いくばくかの負担にはなるが明らかに独特な
 @item hashcash-default-payment
 @vindex hashcash-default-payment
 この変数はハッシュの衝突を成すディフォルトのビット数を示します。規定値
-は 0 で、何も行なわれないことを意味します。提案されている有効な値
-は 17 から 29 までの数です。
+は 10 で、それはいささか低い値です。提唱されている有効な値は 17 か
+ら 29 までの数です。
 
 @item hashcash-payment-alist
 @vindex hashcash-payment-alist

@@ -40,7 +40,8 @@
   (require 'cl)
   (require 'smtp)
   (defvar gnus-message-group-art)
-  (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
+  (defvar gnus-list-identifiers) ; gnus-sum is required where necessary
+  (require 'hashcash))
 (require 'canlock)
 (require 'mailheader)
 (require 'nnheader)
@@ -1635,6 +1636,12 @@ no, only reply back to the author."
   :type '(choice (const :tag "Ask" ask)
 		 (const :tag "Never" nil)
 		 (const :tag "Always" t)))
+
+(defcustom message-generate-hashcash nil
+  "*Whether to generate X-Hashcash: headers."
+  :group 'message-headers
+  :link '(custom-manual "(message)Mail Headers")
+  :type 'boolean)
 
 ;;; Internal variables.
 
@@ -4212,6 +4219,13 @@ This sub function is for exclusive use of `message-send-mail'."
 	 (message-this-is-mail t)
 	 (headers message-required-mail-headers)
 	 failure)
+    (when message-generate-hashcash
+      (save-restriction
+	(message-narrow-to-headers)
+	(message-remove-header "X-Hashcash"))
+      (message "Generating hashcash...")
+      (mail-add-payment)
+      (message "Generating hashcash...done"))
     (save-restriction
       (message-narrow-to-headers)
       ;; Generate the Mail-Followup-To header if the header is not there...
