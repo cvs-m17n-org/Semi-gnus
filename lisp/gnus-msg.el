@@ -168,7 +168,7 @@ See Info node `(gnus)Posting Styles'."
 
 (defcustom gnus-gcc-mark-as-read nil
   "If non-nil, automatically mark Gcc articles as read."
-  :version "21.1"
+  :version "21.4"
   :group 'gnus-message
   :type 'boolean)
 
@@ -180,7 +180,7 @@ See Info node `(gnus)Posting Styles'."
 If it is `all', attach files as external parts;
 if a regexp and matches the Gcc group name, attach files as external parts;
 if nil, attach files as normal parts."
-  :version "21.1"
+  :version "21.4"
   :group 'gnus-message
   :type '(choice (const nil :tag "None")
 		 (const all :tag "Any")
@@ -238,7 +238,7 @@ List of charsets that are permitted to be unencoded.")
     "gnus-agent.el" "gnus-cache.el" "gnus-srvr.el"
     "mm-util.el" "mm-decode.el" "nnmail.el" "nntp.el" "message.el")
   "Files whose variables will be reported in `gnus-bug'."
-  :version "21.1"
+  :version "21.4"
   :group 'gnus-message
   :type '(repeat (string :tag "File")))
 
@@ -246,7 +246,7 @@ List of charsets that are permitted to be unencoded.")
   '(mm-mime-mule-charset-alist
     nnmail-split-fancy message-minibuffer-local-map)
   "Variables that should not be reported in `gnus-bug'."
-  :version "21.1"
+  :version "21.4"
   :group 'gnus-message
   :type '(repeat (symbol :tag "Variable")))
 
@@ -254,7 +254,7 @@ List of charsets that are permitted to be unencoded.")
   '(nndraft nnml nnimap nnmaildir nnmh nnfolder nndir)
   "A list of back ends that are not used in \"real\" newsgroups.
 This variable is used only when `gnus-post-method' is `current'."
-  :version "21.3"
+  :version "21.4"
   :group 'gnus-group-foreign
   :type '(repeat (symbol :tag "Back end")))
 
@@ -286,6 +286,7 @@ This can also be a function receiving the group name as the only
 parameter which should return non-nil iff a confirmation is needed, or
 a regexp, in which case a confirmation is asked for iff the group name
 matches the regexp."
+  :version "21.4"
   :group 'gnus-message
   :type '(choice (const :tag "No" nil)
 		 (const :tag "Yes" t)
@@ -298,6 +299,7 @@ matches the regexp."
 when replying by mail.  See the `gnus-confirm-mail-reply-to-news' variable
 for fine-tuning this.
 If nil, Gnus will never ask for confirmation if replying to mail."
+  :version "21.4"
   :group 'gnus-message
   :type 'boolean)
 
