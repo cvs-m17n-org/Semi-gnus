@@ -41,7 +41,7 @@
 (require 'mime-view)
 (eval-when-compile
   (ignore-errors
-    (require 'xml)))
+   (require 'xml)))
 (eval '(require 'xml))
 
 ;; Reload mm-util emulating macros for compiling.
@@ -88,6 +88,12 @@ ARTICLE is the article number of the current headline.")
 
 (defvar nnrss-file-coding-system nnheader-auto-save-coding-system
   "Coding system used when reading and writing files.")
+
+(defvar nnrss-compatible-encoding-alist '((iso-8859-1 . windows-1252))
+  "Alist of encodings and those supersets.
+The cdr of each element is used to decode data if it is available when
+the car is what the data specify as the encoding. Or, the car is used
+for decoding when the cdr that the data specify is not available.")
 
 (nnoo-define-basics nnrss)
 
@@ -151,8 +157,8 @@ ARTICLE is the article number of the current headline.")
   'nov)
 
 (deffoo nnrss-request-group (group &optional server dont-check)
-  (nnheader-message 6 (concat "nnrss: Requesting " group "..."))
   (setq group (nnrss-decode-group-name group))
+  (nnheader-message 6 "nnrss: Requesting %s..." group)
   (nnrss-possibly-change-group group server)
   (prog1
       (if dont-check
@@ -163,7 +169,7 @@ ARTICLE is the article number of the current headline.")
 	 "211 %d %d %d %s\n" nnrss-group-max nnrss-group-min nnrss-group-max
 	 (prin1-to-string group)
 	 t))
-    (nnheader-message 6 (concat "nnrss: Requesting " group "...done"))))
+    (nnheader-message 6 "nnrss: Requesting %s...done" group)))
 
 (deffoo nnrss-close-group (group &optional server)
   t)
@@ -296,7 +302,7 @@ The return value will be `html' or `text'."
 	(delq (assoc group nnrss-server-data) nnrss-server-data))
   (nnrss-save-server-data server)
   (ignore-errors
-    (delete-file (nnrss-make-filename group server)))
+   (delete-file (nnrss-make-filename group server)))
   t)
 
 (deffoo nnrss-request-list-newsgroups (&optional server)
@@ -315,16 +321,24 @@ The return value will be `html' or `text'."
 (eval-when-compile (defun xml-rpc-method-call (&rest args)))
 
 (defun nnrss-get-encoding ()
-  "Return an encoding attribute specified in the current xml contents."
+  "Return an encoding attribute specified in the current xml contents.
+If `nnrss-compatible-encoding-alist' specifies the compatible encoding,
+it is used instead.  If the xml contents doesn't specify the encoding,
+return `utf-8' which is the default encoding for xml if it is available,
+otherwise return nil."
   (goto-char (point-min))
-  (mm-coding-system-p
-   (if (re-search-forward
-	"<\\?[^>]*encoding=\\(?:\"\\([^\">]+\\)\"\\|'\\([^'>]+\\)'\\)"
-	nil t)
-       (intern-soft (downcase (or (match-string-no-properties 1)
-				  (match-string-no-properties 2))))
-     ;; The default encoding for xml.
-     'utf-8)))
+  (if (re-search-forward
+       "<\\?[^>]*encoding=\\(?:\"\\([^\">]+\\)\"\\|'\\([^'>]+\\)'\\)"
+       nil t)
+      (let ((encoding (intern (downcase (or (match-string 1)
+					    (match-string 2))))))
+	(or
+	 (mm-coding-system-p (cdr (assq encoding
+					nnrss-compatible-encoding-alist)))
+	 (mm-coding-system-p encoding)
+	 (mm-coding-system-p (car (rassq encoding
+					 nnrss-compatible-encoding-alist)))))
+    (mm-coding-system-p 'utf-8)))
 
 (defun nnrss-fetch (url &optional local)
   "Fetch URL and put it in a the expected Lisp structure."
@@ -518,11 +532,11 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 		    (second (assoc group nnrss-group-alist))))
       (unless url
 	(setq url
-             (cdr
-              (assoc 'href
-                     (nnrss-discover-feed
-                      (read-string
-                       (format "URL to search for %s: " group) "http://")))))
+	      (cdr
+	       (assoc 'href
+		      (nnrss-discover-feed
+		       (read-string
+			(format "URL to search for %s: " group) "http://")))))
 	(let ((pair (assoc group nnrss-server-data)))
 	  (if pair
 	      (setcdr (cdr pair) (list url))
@@ -567,7 +581,7 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 	 nnrss-group-data)
 	(puthash (or url extra) t nnrss-group-hashtb)
 	(setq changed t))
-      	(setq extra nil))
+      (setq extra nil))
     (when changed
       (nnrss-save-group-data group server)
       (let ((pair (assoc group nnrss-server-data)))
@@ -582,12 +596,12 @@ Read the file and attempt to subscribe to each Feed in the file."
   (interactive "fImport file: ")
   (mapcar
    (lambda (node) (gnus-group-make-rss-group
-                   (cdr (assq 'xmlUrl (cadr node)))))
+		   (cdr (assq 'xmlUrl (cadr node)))))
    (nnrss-find-el 'outline
-                  (progn
-                    (find-file opml-file)
-                    (xml-parse-region (point-min)
-                                      (point-max))))))
+		  (progn
+		    (find-file opml-file)
+		    (xml-parse-region (point-min)
+				      (point-max))))))
 
 (defun nnrss-opml-export ()
   "OPML subscription export.
@@ -595,26 +609,23 @@ Export subscriptions to a buffer in OPML Format."
   (interactive)
   (with-current-buffer (get-buffer-create "*OPML Export*")
     (mm-set-buffer-file-coding-system 'utf-8)
-    (insert (concat
-	     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-	     "<!-- OPML generated by Emacs Gnus' nnrss.el -->\n"
-	     "<opml version=\"1.1\">\n"
-	     "  <head>\n"
-	     "    <title>mySubscriptions</title>\n"
-	     "    <dateCreated>" (format-time-string "%a, %d %b %Y %T %z")
-	     "</dateCreated>\n"
-	     "    <ownerEmail>" user-mail-address "</ownerEmail>\n"
-	     "    <ownerName>" (user-full-name) "</ownerName>\n"
-	     "  </head>\n"
-	     "  <body>\n"))
+    (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+	    "<!-- OPML generated by Emacs Gnus' nnrss.el -->\n"
+	    "<opml version=\"1.1\">\n"
+	    "  <head>\n"
+	    "    <title>mySubscriptions</title>\n"
+	    "    <dateCreated>" (format-time-string "%a, %d %b %Y %T %z")
+	    "</dateCreated>\n"
+	    "    <ownerEmail>" user-mail-address "</ownerEmail>\n"
+	    "    <ownerName>" (user-full-name) "</ownerName>\n"
+	    "  </head>\n"
+	    "  <body>\n")
     (mapc (lambda (sub)
-	    (insert (concat
-		     "    <outline text=\"" (car sub) "\" xmlUrl=\""
-		     (cadr sub) "\"/>\n")))
+	    (insert "    <outline text=\"" (car sub) "\" xmlUrl=\""
+		    (cadr sub) "\"/>\n"))
 	  nnrss-group-alist)
-    (insert (concat
-	     "  </body>\n"
-           "</opml>\n")))
+    (insert "  </body>\n"
+	    "</opml>\n"))
   (pop-to-buffer "*OPML Export*")
   (when (fboundp 'sgml-mode)
     (sgml-mode)))
@@ -685,7 +696,7 @@ It is useful when `(setq nnrss-use-local t)'."
 (defun nnrss-find-el (tag data &optional found-list)
   "Find the all matching elements in the data.
 Careful with this on large documents!"
-  (when (listp data)
+  (when (consp data)
     (mapc (lambda (bit)
 	    (when (car-safe bit)
 	      (when (equal tag (car bit))
@@ -696,7 +707,7 @@ Careful with this on large documents!"
 		(setq found-list
 		      (append found-list
 			      (list bit))))
-	      (if (and (listp (car-safe (caddr bit)))
+	      (if (and (consp (car-safe (caddr bit)))
 		       (not (stringp (caddr bit))))
 		  (setq found-list
 			(append found-list
@@ -732,12 +743,11 @@ DATA should be the output of `xml-parse-region' or
 	    (cdr (assoc 'href (cadr ahref))))
 	  (nnrss-find-el 'a data)))
 
-(defmacro nnrss-match-macro (base-uri item
-					   onsite-list offsite-list)
+(defmacro nnrss-match-macro (base-uri item onsite-list offsite-list)
   `(cond ((or (string-match (concat "^" ,base-uri) ,item)
-	       (not (string-match "://" ,item)))
-	   (setq ,onsite-list (append ,onsite-list (list ,item))))
-	  (t (setq ,offsite-list (append ,offsite-list (list ,item))))))
+	      (not (string-match "://" ,item)))
+	  (setq ,onsite-list (append ,onsite-list (list ,item))))
+	 (t (setq ,offsite-list (append ,offsite-list (list ,item))))))
 
 (defun nnrss-order-hrefs (base-uri hrefs)
   "Given a list of hrefs, sort them using the following priorities:
@@ -810,17 +820,17 @@ whether they are `offsite' or `onsite'."
 		 (hrefs (nnrss-order-hrefs
 			 base-uri (nnrss-extract-hrefs parsed-page)))
 		 (rss-link nil))
-	  (while (and (eq rss-link nil) (not (eq hrefs nil)))
-	    (let ((href-data (nnrss-fetch (car hrefs))))
-	      (if (nnrss-rss-p href-data)
-		  (let* ((rss-ns (nnrss-get-namespace-prefix href-data "http://purl.org/rss/1.0/")))
-		    (setq rss-link (nnrss-rss-title-description
-				    rss-ns href-data (car hrefs))))
-		(setq hrefs (cdr hrefs)))))
-	  (if rss-link rss-link
+	    (while (and (eq rss-link nil) (not (eq hrefs nil)))
+	      (let ((href-data (nnrss-fetch (car hrefs))))
+		(if (nnrss-rss-p href-data)
+		    (let* ((rss-ns (nnrss-get-namespace-prefix href-data "http://purl.org/rss/1.0/")))
+		      (setq rss-link (nnrss-rss-title-description
+				      rss-ns href-data (car hrefs))))
+		  (setq hrefs (cdr hrefs)))))
+	    (if rss-link rss-link
 
 ;;    4. check syndic8
-	    (nnrss-find-rss-via-syndic8 url))))))))
+	      (nnrss-find-rss-via-syndic8 url))))))))
 
 (defun nnrss-find-rss-via-syndic8 (url)
   "Query syndic8 for the rss feeds it has for URL."
