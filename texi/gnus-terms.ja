@@ -4,28 +4,33 @@
 単語				訳語
 
 active				作動する、作動している
-active file			現状ファイル
+active file			現状ファイル、アクティブファイル
 adapt				適用
 address				アドレス
 alist				連想リスト
 alternate			代替
+anything group			なんでもグループ
 archive				アーカイブ
 asterisk			アスタリスク
+auto-save file			自動保存ファイル
 backend				バックエンド
 bogus group			偽グループ
 browse				ブラウズ、参照、概観
 buffer				バッファ
 buggy				故障がち
 collapsed group	name		短縮グループ名
+combined groups			結合グループ
 command				命令
 configure (shell script)	環境設定
 copy				コピー、複写
 crosspost			相互投稿、クロスポスト
 customize			カスタマイズ
-default				初期設定 (ディフォルト)?
+default				初期設定/初期設定値 (ディフォルト)?
+directory			ディレクトリー
 dormant article			保留記事
 dotted pair			ドットペア、ドット対
 dribble file			ドリブルファイル
+duplicate suppression		重複抑制
 expire				期限切れ消去、期限切れ削除
 expunge				消去
 field				フィールド
@@ -41,8 +46,10 @@ history				履歴
 inbox				インボックス
 indentation			字下げ
 interactive command		対話命令
+interface			インターフェース
 kiboze				kiboze
 key (alist)			キー
+kiboze				kiboze
 kill				削除、切る、キル
 level				レベル
 lower lebel			小さいレベル
@@ -58,12 +65,16 @@ modeline			モード行
 moderated			モデレーテッド、修正された
 native				基本
 native method			基本方法
+native server			基本サーバー
 news				ニュース (ニューズ)
 newsgroup			ニュースグループ (ニューズグループ)
+news reader			ニュースリーダ
 numeric prefix			数字接頭引数
 overview			概観ファイル
+pack				梱包する
 parameter			パラメータ
 point				ポイント、カーソル位置
+predicate function		述語関数
 prefix				接頭引数
 process mark			(プロセスマーク)、プロセス印
 process/prefix convention	プロセス/接頭引数の習慣 (プロセスマーク・プレフィックスルール)
@@ -72,12 +83,17 @@ rank				ランク
 region				(リージョン)
 release				リリース
 remote system			遠隔システム
+reply packet			返信パケット
+response packet			返信パケット
 startup file			起動ファイル
 score				スコア
+secondary server		二次サーバー
 select method			選択方法
 server				サーバー
 sesssion			セッション
+solid group			固定グループ
 sort				ソート 並べ替え
+SOUP packets			SOUP パケット
 startup file			起動ファイル
 sub-topic			副トピック
 submap				サブマップ
@@ -86,6 +102,7 @@ subscribedness			購読度
 summary buffer			概略バッファ
 superseding			代替
 text properties			テキスト属性
+thread				スレッド
 ticked article			(印付き記事)
 toggle				トグル 切り替え
 token
@@ -94,6 +111,8 @@ unsubscribe			非購読
 user				利用者
 value (alist)			値
 web				ウェブ
+Web browser			ウェブブラウザー
+Web search			ウェブ検索
 yank				貼り付け
 zombie				ゾンビ
 
