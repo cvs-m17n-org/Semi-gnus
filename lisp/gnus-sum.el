@@ -1,5 +1,5 @@
 ;;; gnus-sum.el --- summary mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -2174,7 +2174,7 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	      ["Word wrap" gnus-article-fill-cited-article t]
 	      ["Fill long lines" gnus-article-fill-long-lines t]
 	      ["Capitalize sentences" gnus-article-capitalize-sentences t]
-	      ["CR" gnus-article-remove-cr t]
+	      ["Remove CR" gnus-article-remove-cr t]
 	      ["Quoted-Printable" gnus-article-de-quoted-unreadable t]
 	      ["Base64" gnus-article-de-base64-unreadable t]
 	      ["Rot 13" gnus-summary-caesar-message
@@ -2190,9 +2190,9 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	      ["Unfold headers" gnus-article-treat-unfold-headers t]
 	      ["Fold newsgroups" gnus-article-treat-fold-newsgroups t]
 	      ["Html" gnus-article-wash-html t]
-	      ["URLs" gnus-article-unsplit-urls t]
+	      ["Unsplit URLs" gnus-article-unsplit-urls t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
-	      ["HZ" gnus-article-decode-HZ t]
+	      ["Decode HZ" gnus-article-decode-HZ t]
 	      ("(Outlook) Deuglify"
 	       ["Unwrap lines" gnus-article-outlook-unwrap-lines t]
 	       ["Repair attribution" gnus-article-outlook-repair-attribution t]
@@ -5043,9 +5043,9 @@ If SELECT-ARTICLES, only select those articles from GROUP."
             (gnus-set-active group (cons (caar alist) (cdr active)))))
 
       (setq gnus-summary-use-undownloaded-faces
-            (not (gnus-agent-find-parameter
-                  group
-                  'agent-disable-undownloaded-faces))))
+	    (gnus-agent-find-parameter
+	     group
+	     'agent-enable-undownloaded-faces)))
 
     (setq gnus-newsgroup-name group
 	  gnus-newsgroup-unselected nil

@@ -18,7 +18,7 @@
 
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 
 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -88,7 +88,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Message v5.10.4.  Message is distributed
+This manual corresponds to Message v5.10.5.  Message is distributed
 with the Gnus distribution bearing the same version number as this
 manual.
 
@@ -1415,6 +1415,13 @@ hidden when composing a message.
 (setq message-hidden-headers
       '(not "From" "Subject" "To" "Cc" "Newsgroups"))
 @end lisp
+
+@item message-header-synonyms
+@vindex message-header-synonyms
+A list of lists of header synonyms.  E.g., if this list contains a
+member list with elements @code{Cc} and @code{To}, then
+@code{message-carefully-insert-headers} will not insert a @code{To}
+header when the message is already @code{Cc}ed to the recipient.
 
 @end table
 

@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Gnus v5.10.4}
+\newcommand{\gnusversionname}{Gnus v5.10.5}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -301,7 +301,7 @@
 \thispagestyle{empty}
 
 Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003
+2002, 2003, 2004
 Free Software Foundation, Inc.
 
 
@@ -397,7 +397,7 @@ can be gotten by any nefarious means you can think of---@acronym{NNTP}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Gnus v5.10.4.
+This manual corresponds to Gnus v5.10.5.
 
 @end ifinfo
 
@@ -839,6 +839,7 @@ Various
 * Image Enhancements::          Modern versions of Emacs/XEmacs can display images.
 * Fuzzy Matching::              What's the big fuzz?
 * Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
+* Other modes::                 Interaction with other modes.
 * Various Various::             Things that are really various.
 
 Formatting Variables
@@ -17628,11 +17629,17 @@ an integer that overrides the value of
 @item gnus-agent-cat-length-when-long
 an integer that overrides the value of @code{gnus-agent-long-article}.
 
-@item gnus-agent-cat-disable-undownloaded-faces
-a symbol indicating whether the summary buffer should @emph{not} display
+@c @item gnus-agent-cat-disable-undownloaded-faces
+@c a symbol indicating whether the summary buffer should @emph{not} display
+@c undownloaded articles using the gnus-summary-*-undownloaded-face
+@c faces.  The symbol nil will enable the use of undownloaded faces while
+@c all other symbols disable them.
+
+@item gnus-agent-cat-enable-undownloaded-faces
+a symbol indicating whether the summary buffer should display
 undownloaded articles using the gnus-summary-*-undownloaded-face
-faces.  The symbol nil will enable the use of undownloaded faces while
-all other symbols disable them.
+faces.  The symbol nil will disable the use of undownloaded faces while
+all other symbols enable them.
 @end table
 
 The name of a category can not be changed once the category has been
@@ -20494,6 +20501,7 @@ four days, Gnus will decay the scores four times, for instance.
 * Image Enhancements::          Modern versions of Emacs/XEmacs can display images.
 * Fuzzy Matching::              What's the big fuzz?
 * Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
+* Other modes::                 Interaction with other modes.
 * Various Various::             Things that are really various.
 @end menu
 
@@ -23876,6 +23884,36 @@ Reduce table size: (spam-stat-reduce-size)
 Save table: (spam-stat-save)
 @end smallexample
 
+@node Other modes
+@section Interaction with other modes
+
+@subsection Dired
+@cindex dired
+
+@code{gnus-dired-minor-mode} provided some useful functions for dired
+buffers.  It is enabled with
+@lisp
+(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
+@end lisp
+
+@table @kbd
+@item C-c C-m C-a
+@findex gnus-dired-attach
+Send dired's marked files as an attachment (@code{gnus-dired-attach}).
+You will be prompted for a message buffer.
+
+@item C-c C-m C-l
+@findex gnus-dired-find-file-mailcap
+Visit a file according to the appropriate mailcap entry
+(@code{gnus-dired-find-file-mailcap}).  With prefix, open file in a new
+buffer.
+
+@item C-c C-m C-p
+@findex gnus-dired-print
+Print file according to the mailcap entry (@code{gnus-dired-print}).  If
+there is no print command, print in a PostScript image.
+@end table
+
 @node Various Various
 @section Various Various
 @cindex mode lines
@@ -25479,13 +25517,10 @@ appearance of all article buttons.  @xref{Article Button Levels}.
 @item
 Dired integration
 
-@code{gnus-dired-minor-mode} installs key bindings in dired buffers to send
-a file as an attachment (@kbd{C-c C-a}), open a file using the appropriate
-mailcap entry (@kbd{C-c C-l}), and print a file using the mailcap entry
-(@kbd{C-c P}).  It is enabled with
-@lisp
-(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
-@end lisp
+@code{gnus-dired-minor-mode} (see @ref{Other modes}) installs key
+bindings in dired buffers to send a file as an attachment, open a file
+using the appropriate mailcap entry, and print a file using the mailcap
+entry.
 
 @item
 Gnus can display RSS newsfeeds as a newsgroup.  @xref{RSS}.
@@ -26464,7 +26499,7 @@ Gnus will work.
 
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
-like @samp{Gnus v5.10.4} you have the right files loaded.  Otherwise
+like @samp{Gnus v5.10.5} you have the right files loaded.  Otherwise
 you have some old @file{.el} files lying around.  Delete these.
 
 @item
