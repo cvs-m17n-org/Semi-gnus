@@ -326,11 +326,6 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
    (byte-compile 'dgnushack-bind-colon-keywords)
    (dgnushack-bind-colon-keywords)))
 
-;; If you are using Mule 2.3 based on Emacs 19.34, you may also put the
-;; following lines in your .emacs file, before gnus related modules are
-;; loaded.  It is not always necessary.  However if it is done, you will
-;; be able to load or evaluate gnus related *.el (not compiled) files.
-;; ------ cut here ------ cut here ------ cut here ------ cut here ------
 (if (boundp 'MULE)
     (progn
       (setq :version ':version
@@ -342,7 +337,6 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 	"Don't signal an error even if unsupported keyword is given."
 	(if (not (memq (ad-get-arg 1) '(:version :set-after)))
 	    ad-do-it))))
-;; ------ cut here ------ cut here ------ cut here ------ cut here ------
 
 (when (boundp 'MULE)
   (put 'custom-declare-face 'byte-optimizer
