@@ -210,7 +210,6 @@
 
 ;; Local Variables:
 ;; coding: iso-8859-1
-;; buffer-file-coding-system: iso-8859-1
 ;; End:
 
 ;;; mml1991.el ends here

@@ -1640,5 +1640,4 @@ Message は事実上、それ自身の変数しか使いません---古い @code{mail-} 
 @c Local Variables:
 @c mode: texinfo
 @c coding: iso-2022-7bit
-@c buffer-file-coding-system: iso-2022-7bit
 @c End:
