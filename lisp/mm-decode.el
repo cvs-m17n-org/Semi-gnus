@@ -502,7 +502,8 @@ external if displayed external."
        ((string= total "%t")
 	(push (mm-quote-arg (car type-list)) out))
        (t
-	(push (mm-quote-arg (or (mime-parameter sub ctl) "")) out))))
+	(push (mm-quote-arg (or (mime-content-type-parameter sub ctl) ""))
+	      out))))
     (push (substring method beg (length method)) out)
     (mapconcat 'identity (nreverse out) "")))
     
