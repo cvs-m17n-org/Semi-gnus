@@ -21450,25 +21450,15 @@ Spam と戦うための新しい技法は、メッセージを送信する際にいくばくかの負担
 分析することです。@dfn{Ham} は @file{spam.el} のいたる所で spam ではない
 メッセージを示すために使う名前です。
 
+第一に、@code{spam.el} を自動読み込み (autoload) して @code{spam.el} の
+各フックをインストールするために、関
+数 @code{spam-initialize} を @strong{実行しなければなりません}:
+
+@example
+(spam-initialize)
+@end example
+
 では @file{spam.el} を読み込むと何が起きるでしょうか?
-
-第一に、変数 @code{spam-install-hooks} を @code{t} に、そし
-て @code{spam.el} のフックを @strong{設定しなければなりません}:
-
-@example
-(setq spam-install-hooks t)
-(spam-install-hooks-function)
-@end example
-
-これは、以下で説明される @code{spam-use-*} 変数群の一つを設定した後
-で @code{spam.el} をロードすれば、自動的に行なわれます。したがって、
-@code{spam-use-*} 変数群の一つを設定した後で、@code{spam.el} をロードし
-なければなりません:
-
-@example
-(setq spam-use-bogofilter t)
-(require 'spam)
-@end example
 
 以下のキーボード命令が使えるようになります:
 
