@@ -640,8 +640,8 @@ the resulting string may be narrower than END-COLUMN.
       (insert gnus-product-name " " gnus-version-number
 	      (if (zerop (string-to-number gnus-revision-number))
 		  ""
-		(concat " (r" gnus-revision-number ") "))
-	      "based on " gnus-original-product-name " v"
+		(concat " (r" gnus-revision-number ")"))
+	      " based on " gnus-original-product-name " v"
 	      gnus-original-version-number "\n")
       (goto-char (point-min))
       (put-text-property (point) (gnus-point-at-eol) 'face 'gnus-splash-face)
@@ -676,8 +676,8 @@ the resulting string may be narrower than END-COLUMN.
     (insert gnus-product-name " " gnus-version-number
 	    (if (zerop (string-to-number gnus-revision-number))
 		""
-	      (concat " (r" gnus-revision-number ") "))
-	    "based on " gnus-original-product-name " v"
+	      (concat " (r" gnus-revision-number ")"))
+	    " based on " gnus-original-product-name " v"
 	    gnus-original-version-number)
     (goto-char (point-min))
     (insert-char ?\ ; space
