@@ -268,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.14.0"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "11"
+(defconst gnus-revision-number "12"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "5.8.2"
