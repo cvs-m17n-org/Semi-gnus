@@ -115,17 +115,14 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process)
-	(coding-system-for-read 'binary)   ;; 000000000 00000 000
-	(coding-system-for-write 'binary)  ;; 00 000000
-	)
+	(process))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
       (setq pop3-read-point (point-min))
       )
     (setq process
-	  (open-network-stream "POP" process-buffer mailhost port))
+	  (open-network-stream-as-binary "POP" process-buffer mailhost port))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)

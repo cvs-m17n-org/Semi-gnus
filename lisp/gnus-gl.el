@@ -257,7 +257,8 @@ If this times out we give up and assume that something has died..." )
   (catch 'done
     (condition-case error
 	(setq grouplens-bbb-process
-	      (open-network-stream "BBBD" grouplens-bbb-buffer host port))
+	      (open-network-stream-as-binary
+	       "BBBD" grouplens-bbb-buffer host port))
       (error (gnus-message 3 "Error: Failed to connect to BBB")
 	     nil))
     (and (null grouplens-bbb-process)
