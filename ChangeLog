@@ -1,3 +1,10 @@
+1999-04-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-art.el (TopLevel): Remove symbol's function definition
+	for `gnus-article-mime-decode-quoted-printable'.
+
 1999-04-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
