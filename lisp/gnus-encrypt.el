@@ -38,6 +38,9 @@
   (autoload 'password-read-and-add "password")
   (autoload 'password-cache-remove "password"))
 
+(eval-when-compile
+  (defvar password-cache-expiry))
+
 (defgroup gnus-encrypt nil
   "Gnus encryption configuration.")
 
