@@ -353,8 +353,8 @@ spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
 Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
-supports your right to read crazy messages including big images or other
-various kinds of formats.  Semi-gnus also supports
+supports your right to read strange messages including big images or
+other various kinds of formats.  Semi-gnus also supports
 internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
@@ -630,13 +630,13 @@ also save you some time at startup.  Even if this variable is
 @code{nil}, you can always subscribe to the new groups just by pressing
 @kbd{U} in the group buffer (@pxref{Group Maintenance}).  This variable
 is @code{ask-server} by default.  If you set this variable to
-@code{always}, then Gnus will query the backends for new groups even
+@code{always}, then gnus will query the backends for new groups even
 when you do the @kbd{g} command (@pxref{Scanning New Messages}).
 
 @menu
 * Checking New Groups::      Determining what groups are new.
-* Subscription Methods::     What Gnus should do with new groups.
-* Filtering New Groups::     Making Gnus ignore certain new groups.
+* Subscription Methods::     What gnus should do with new groups.
+* Filtering New Groups::     Making gnus ignore certain new groups.
 @end menu
 
 
@@ -646,7 +646,7 @@ when you do the @kbd{g} command (@pxref{Scanning New Messages}).
 Gnus normally determines whether a group is new or not by comparing the
 list of groups from the active file(s) with the lists of subscribed and
 dead groups.  This isn't a particularly fast method.  If
-@code{gnus-check-new-newsgroups} is @code{ask-server}, Gnus will ask the
+@code{gnus-check-new-newsgroups} is @code{ask-server}, gnus will ask the
 server for new groups since the last time.  This is both faster and
 cheaper.  This also means that you can get rid of the list of killed
 groups altogether, so you may set @code{gnus-save-killed-list} to
@@ -658,15 +658,15 @@ I bet I know what you're thinking now: How do I find out whether my
 server supports @code{ask-server}?  No?  Good, because I don't have a
 fail-safe answer.  I would suggest just setting this variable to
 @code{ask-server} and see whether any new groups appear within the next
-few days.  If any do, then it works.  If none do, then it doesn't
-work.  I could write a function to make Gnus guess whether the server
-supports @code{ask-server}, but it would just be a guess.  So I won't.
-You could @code{telnet} to the server and say @code{HELP} and see
-whether it lists @samp{NEWGROUPS} among the commands it understands.  If
-it does, then it might work.  (But there are servers that lists
-@samp{NEWGROUPS} without supporting the function properly.)
+few days.  If any do, then it works.  If none do, then it doesn't work.
+I could write a function to make gnus guess whether the server supports
+@code{ask-server}, but it would just be a guess.  So I won't.  You could
+@code{telnet} to the server and say @code{HELP} and see whether it lists
+@samp{NEWGROUPS} among the commands it understands.  If it does, then it
+might work.  (But there are servers that lists @samp{NEWGROUPS} without
+supporting the function properly.)
 
-This variable can also be a list of select methods.  If so, Gnus will
+This variable can also be a list of select methods.  If so, gnus will
 issue an @code{ask-server} command to each of the select methods, and
 subscribe them (or not) using the normal methods.  This might be handy
 if you are monitoring a few servers for new groups.  A side effect is
@@ -678,7 +678,7 @@ Use the mantra ``dingnusdingnusdingnus'' to achieve permanent bliss.
 @subsection Subscription Methods
 
 @vindex gnus-subscribe-newsgroup-method
-What Gnus does when it encounters a new group is determined by the
+What gnus does when it encounters a new group is determined by the
 @code{gnus-subscribe-newsgroup-method} variable.
 
 This variable should contain a function.  This function will be called
@@ -715,9 +715,9 @@ up.  Or something like that.
 
 @item gnus-subscribe-interactively
 @vindex gnus-subscribe-interactively
-Subscribe new groups interactively.  This means that Gnus will ask
-you about @strong{all} new groups.  The groups you choose to subscribe
-to will be subscribed hierarchically.
+Subscribe new groups interactively.  This means that gnus will ask you
+about @strong{all} new groups.  The groups you choose to subscribe to
+will be subscribed hierarchically.
 
 @item gnus-subscribe-killed
 @vindex gnus-subscribe-killed
@@ -728,7 +728,7 @@ Kill all new groups.
 @vindex gnus-subscribe-hierarchical-interactive
 A closely related variable is
 @code{gnus-subscribe-hierarchical-interactive}.  (That's quite a
-mouthful.)  If this variable is non-@code{nil}, Gnus will ask you in a
+mouthful.)  If this variable is non-@code{nil}, gnus will ask you in a
 hierarchical fashion whether to subscribe to new groups or not.  Gnus
 will ask you for each sub-hierarchy whether you want to descend the
 hierarchy or not.
