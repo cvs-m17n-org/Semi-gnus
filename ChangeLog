@@ -1,3 +1,8 @@
+1999-07-05  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-expire): Refresh the value of
+	`gnus-active-hashtb' for each method.
+
 1999-07-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.069.
