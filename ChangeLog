@@ -1,3 +1,60 @@
+2000-07-18  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.23 (This is alpha status.)
+	Changes for Chao 1.14 and REMI 1.14.
+	`message-mail-follow-up-address-checker'. (same as Nana-gnus 6.x)
+	`gnus-bbdb/show-to' and `gnus-bbdb/edit-notes-to' to `[' and `]'
+	in `gnus-summary-mode-map'.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.23.
+
+	* lisp/mmgnus.el (TopLevel): Require `mmgeneric' always.
+	(mmgnus-entiry::mime-entity-fetch-field): Define method.
+	(mmgnus-entiry::mime-entity-body): Do not error.
+	(mmgnus-entiry::mime-insert-text-content): Define method.
+	(mmgnus-entiry::mime-insert-entity-body): Ditto.
+	(mime-gnus-entity::mime-entity-fetch-field): Ditto.
+	(mime-gnus-entity::mime-entity-body): Ditto.
+	(mime-gnus-entity::mime-entity-content): Ditto.
+	(mime-gnus-entity::mime-insert-entity-content): Ditto.
+	(mime-gnus-entity::mime-insert-text-content): Ditto.
+	(mime-gnus-entity::mime-write-entity-content): Ditto.
+	(mime-gnus-entity::mime-insert-entity): Ditto.
+	(mime-gnus-entity::mime-write-entity): Ditto.
+	(mime-gnus-entity::mime-insert-entity-body): Ditto.
+	(mime-gnus-entity::mime-write-entity-body): Ditto.
+
+	* lisp/mm-decode.el (mm-dissect-buffer-header): Use
+	`mime-entry-fetch-field' instead of `mail-fetch-field'.
+
+	* lisp/message.el (message-get-reply-headers): Use
+	`message-mail-follow-up-address-checker'. (same as Nana-gnus 6.x)
+
+*1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
+            Katsumi Yamaoka   <yamaoka@jpl.org>,
+            Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): If the number of
+	unread articles is more than `gnus-large-newsgroup', use it in
+	default instead of the maximum number.
+
+*2000-07-14  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/ignore-sender): New function.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/edit-notes-to): Ditto.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/show-to): Ditto.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb-insinuate): Bind
+	`gnus-bbdb/show-to' and `gnus-bbdb/edit-notes-to' to `[' and `]'
+	in `gnus-summary-mode-map'.
+
+*2000-06-13  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
+
+	* lisp/gnus-bbdb.el(gnus-bbdb/update-record): Fix to fetch last
+	mail field.
+
 2000-06-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.22 (This is alpha status.)
