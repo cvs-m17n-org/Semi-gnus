@@ -7,7 +7,7 @@
 @synindex pg cp
 @dircategory Editors
 @direntry
-* Gnus-ja: (gnus-ja).         The newsreader gnus (日本語版).
+* Gnus-ja: (gnus-ja).         The newsreader gnus (Japanese).
 @end direntry
 @iftex
 @finalout
