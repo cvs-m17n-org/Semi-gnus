@@ -1,0 +1,364 @@
+Sat Sep 13 21:21:38 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.1 is released.
+
+Sat Sep 27 04:32:45 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.11 is released.
+
+Sat Sep 27 03:50:12 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.el (message-send): Post without asking.
+	(message-mode): Modify paragraphs-start and paragraph-separate. 
+	(message-newline-and-reformat): New command and keystroke.
+
+Thu Sep 25 00:13:41 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nnmail.el (nnmail-activate): Init server buffer.
+
+Wed Sep 24 04:11:59 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-draft.el (gnus-draft-setup): Inexplicable binding problem
+	worked around.
+
+	* nnsoup.el (nnsoup-always-save): Renamed.
+
+Wed Sep 24 04:11:02 1997  Nelson Jose dos Santos Ferreira  <Nelson.Ferreira@inesc.pt>
+
+	* nnsoup.el (nnsoup-commit-reply-now): New variable.
+	(nnsoup-store-reply): Use it.
+
+Wed Sep 24 02:30:44 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-ems.el (gnus-deactivate-mark): New alias.
+
+Tue Sep 23 07:56:07 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.el: Win-away!
+
+	* gnus-msg.el (gnus-setup-message): Don't trust make-symbol.
+
+Tue Sep 23 07:45:11 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.10 is released.
+
+Tue Sep 23 01:41:04 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-read-all-headers): New function.
+	(gnus-select-newsgroup): Use it.
+	(gnus-summary-refer-thread): Ditto.
+	(gnus-refer-thread-limit): New variable.
+	(gnus-summary-refer-thread): Use it.
+
+	* gnus-nocem.el (gnus-nocem-message-wanted-p): New function.
+	(gnus-nocem-check-article): Use it.
+	(gnus-nocem-issuers): Dox ofx.
+
+	* dgnushack.el (dgnushack-compile): Check for cus-edit.
+
+	* message.el (message-included-forward-headers): Include Mime
+	headers. 
+	(message-send): Allow posting without confirming from Agent.
+
+Mon Sep 22 05:43:14 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* dgnushack.el (byte-compile-warnings): Don't warn about obsolete
+	variables. 
+
+	* gnus-sum.el (gnus-summary-refer-thread): New command and
+	keystroke. 
+	(gnus-summary-limit-include-thread): New command and keystroke. 
+	(gnus-summary-articles-in-thread): New function.
+	(gnus-articles-in-thread): Renamed.
+
+Sun Sep 21 23:54:50 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.9 is released.
+
+Sun Sep 21 23:38:46 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.el (gnus-splash-face): ForestGreen everywhere.
+
+	* gnus-sum.el (gnus-simplify-subject-fully): Use new variable.
+	(gnus-general-simplify-subject): Ditto.
+
+Sun Sep 21 23:34:13 1997  Kurt Swanson  <kurt@dna.lth.se>
+
+	* gnus-sum.el (gnus-simplify-subject-functions): New variable.
+	(gnus-simplify-whitespace): New function.
+
+	* gnus-util.el (gnus-map-function): New function.
+
+Sun Sep 21 23:22:04 1997  Michelangelo Grigni  <mic@mathcs.emory.edu>
+
+	* gnus-score.el (gnus-score-regexp-bad-p): New function.
+
+Sun Sep 21 00:14:40 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-score.el (gnus-summary-lower-score): Use sym pref.
+	(gnus-summary-increase-score): Use it.
+
+	* gnus.el (gnus-current-prefix-symbol): New variable.
+	(gnus-current-prefix-symbols): New variable.
+
+	* gnus-score.el (gnus-summary-increase-score): Take symbolic
+	prefix. 
+
+	* gnus.el (gnus-interactive): Removed.
+	(gnus-interactive): Renamed from gnus-interactive-1.
+	(gnus-symbolic-argument): New command.
+
+	* gnus-draft.el (gnus-draft-send-message): Disable message
+	checks. 
+	(gnus-draft-send): Ditto.
+	(gnus-draft-setup): Don't save buffer.
+
+	* dgnushack.el (dgnushack-compile): Warn people about Custom.
+
+	* gnus-group.el (gnus-group-iterate): Use gensymmed variables.
+
+	* pop3.el (pop3-md5): `with-temp-buffer' doesn't exist in Emacs
+	19.34. 
+
+	* nneething.el (nneething-directory): Defvarred.
+
+	* message.el: Autoloaded nndraft things.
+	(message-set-auto-save-file-name): Use it.
+
+	* dgnushack.el (dgnushack-compile): Warn about things.
+
+	* gnus-art.el: Autoload w3-region.
+
+	* gnus-vm.el (gnus-summary-save-in-vm): Simplified.
+
+	* gnus.el: Changed `compiled-function-p' to `byte-code-function-p'
+	throughout.
+
+	* gnus-sum.el (gnus-summary-edit-article): Supply additional
+	param. 
+
+	* gnus-group.el (gnus-group-iterate): Undo bogus change.
+
+	* gnus-agent.el (gnus-agentize): Just call gnus-open-agent
+	directly. 
+
+	* gnus.el (gnus-interactive): New macro.
+	(gnus-interactive-1): New function.
+
+	* gnus-sum.el (gnus-fetch-old-headers): Allow `invisible'.
+	(gnus-cut-thread): Use it.
+	(gnus-cut-threads): Ditto.
+	(gnus-summary-initial-limit): Ditto.
+	(gnus-summary-limit-children): Ditto.
+
+	* gnus-art.el (gnus-article-edit-done): Accept a prefix arg.
+	(gnus-boring-article-headers): Allow `long-to' param.
+	(article-hide-boring-headers): Use it.
+
+	* gnus-sum.el (gnus-summary-edit-article-done): Accept a
+	no-highlight param.
+
+	* nntp.el (nntp-rlogin-program): New variable.
+	(nntp-open-rlogin): Use it.
+
+	* nnvirtual.el (nnvirtual-request-post): New function.
+
+	* gnus-msg.el (gnus-message-group-art): New variable.
+
+	* gnus-draft.el (gnus-draft-setup): Don't use message-setup.
+
+	* nndraft.el (nndraft): Allow editing articles.
+
+	* gnus-ems.el (gnus-x-splash): Ditto.
+
+	* gnus.el (gnus-splash-face): Darker face.
+
+	* gnus-draft.el (gnus-draft-setup): Clobbered variables.
+
+Sat Sep 20 23:23:49 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.8 is released.
+
+Sat Sep 20 20:41:16 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-start.el (gnus-setup-news-hook): New hook.
+
+	* gnus-agent.el (gnus-agentize): Really set up queue group.
+	(gnus-open-agent): Setup queue here.
+
+Sat Sep 20 20:23:07 1997  Matt Simmons  <simmonmt@acm.org>
+
+	* message.el (message-set-auto-save-file-name): Make things work
+	without drafts.
+
+Sat Sep 20 18:32:02 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nnmh.el (nnmh-request-list-1): Check for links to ".".
+
+	* nndraft.el (nndraft-possibly-change-group): New function.
+
+	* gnus-agent.el (gnus-agent-queue-setup): New function.
+
+Thu Sep 18 04:54:59 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.7 is released.
+
+Thu Sep 18 03:33:54 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-msg.el (gnus-setup-message): Slap a progn around forms.
+
+	* nndraft.el (nndraft-articles): Make sure directory exists. 
+
+	* message.el (message-mode): Don't delete article.
+
+	* nnmh.el (nnmh-request-accept-article): Don't save when
+	noinsert. 
+
+Wed Sep 17 03:37:59 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nndraft.el (nndraft-directory): Changed defaults.
+
+	* gnus-agent.el (gnus-agent-fetch-session): Bind command method.
+
+Wed Sep 17 03:28:36 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.6 is released.
+
+1997-08-17  SL Baur  <steve@altair.xemacs.org>
+
+	* dgnushack.el (dgnushack-compile): Ignore .el files beginning
+	with an `=' character.
+
+Wed Sep 17 02:30:04 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-build-sparse-threads): Allow display of looped
+	References.
+
+	* gnus-agent.el (gnus-agent-fetch-group-1): Separated out into
+	function. 
+
+	* message.el (message-delete-not-region): New command and
+	keystroke. 
+
+Tue Sep 16 00:58:26 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nndraft.el (nndraft-directory): Changed value.
+
+	* message.el (message-kill-buffer): Disassociate draft.
+	(message-mode): Use kill hook to disassociate.
+	(message-disassociate-draft): Double-check.
+
+	* gnus-agent.el (gnus-agentize): Don't set twice.
+
+	* gnus-art.el (gnus-article-prepare): Go to the right line before
+	marking. 
+
+	* gnus-start.el: Renamed the drafts group.
+
+	* gnus-agent.el (gnus-agent-lib-file): Changed name of directory.
+
+	* gnus-draft.el (gnus-draft-mode): Simplify.
+
+Tue Sep 16 00:18:11 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.5 is released.
+
+Mon Sep 15 00:53:50 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-alter-header-function): New variable.
+	(gnus-nov-parse-line): Use it.
+	(gnus-get-newsgroup-headers): Ditto.
+
+	* gnus-draft.el (gnus-group-send-drafts): Don't send when
+	unplugged. 
+
+	* gnus-sum.el (gnus-summary-read-group): Don't show-all when
+	skipping groups.
+
+	* gnus-start.el (gnus-start-draft-setup): Changed name.
+
+Mon Sep 15 00:40:09 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.4 is released.
+
+Mon Sep 15 00:19:07 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-summary-goto-article): Accept Message-ID's.
+
+Sun Sep 14 21:41:35 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-group-make-articles-read): No params.
+
+	* nndraft.el (nndraft-status-string): Fix.
+
+	* gnus-draft.el (gnus-group-send-drafts): New command.
+
+	* gnus-sum.el (gnus-compute-read-articles): Separated.
+	(gnus-update-read-articles): Allow computation.
+
+	* nndraft.el (nndraft-articles): New function.
+
+	* message.el (message-send): Disabled test.
+
+Sun Sep 14 21:17:34 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.3 is released.
+
+Sun Sep 14 01:51:45 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-agent.el (gnus-agent-short-article): New variables.
+
+	* message.el (message-set-auto-save-file-name): Use drafts.
+
+	* nndraft.el (nndraft-request-expire-articles): Use it.
+
+	* nnmh.el (nnmh-deletable-article-p): Change.
+	(nnmh-allow-delete-final): New variable.
+
+	* gnus-msg.el (gnus-summary-send-draft): Removed.
+
+	* gnus.el (gnus-article-mark-lists): Save unsendable marks.
+
+	* gnus-sum.el (gnus-newsgroup-unsendable): New variable.
+
+	* gnus-draft.el: New file.
+
+	* gnus-sum.el (gnus-unsendable-mark): New variable.
+
+	* nndraft.el (nndraft-execute-nnmh-command): Cleanup.
+
+	* message.el (message-send-news): Use `gnus-request-post'.
+
+	* gnus-agent.el (gnus-agentize): New command.
+
+	* gnus-bcklg.el (gnus-backlog-remove-article): Remove the ident
+	from the list.
+
+Sun Sep 14 00:26:47 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.2 is released.
+
+Sun Sep 14 00:24:52 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-score.el (gnus-score-headers): Make sure the summary buffer
+	exists.
+
+Sat Sep 13 23:35:28 1997  Greg Stark  <gsstark@mit.edu>
+
+	* gnus-ems.el (gnus-x-splash): New function.
+
+Sat Sep 13 22:46:16 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-start.el (gnus-1): Use it.
+
+	* gnus-ems.el (gnus-decode-coding-string): New alias.
+
+	* message.el (message-unix-mail-delimiter): Dox fox.
+
+	* nnmh.el (nnmh-request-list-1): Don't use coding system.
+
+	* gnus-sum.el (gnus-summary-catchup): Reverse logic.
+
+Sat Sep 13 21:21:38 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.1 is released.

@@ -1,0 +1,65 @@
+% Reference Card for (ding) Gnus, 3 twocolumn pages.
+% To be processed with latex 2.09
+\def\Guide{Card}\def\guide{card}
+\def\logoscale{0.25}
+\def\sec{\section*}
+\def\subsec{\subsection*}
+\def\subsubsec{\subsubsection*}
+\documentstyle{article}
+\textwidth 7.26in \textheight 10in \topmargin -1.0in
+% the same settings work for A4, although there is a bit of space at the
+% top and bottom of the page. 
+\oddsidemargin -0.5in \evensidemargin -0.5in
+\begin{document}
+\twocolumn\scriptsize\pagestyle{empty}
+\input{gnusref}
+
+% page 1, left column
+\Title
+\par
+\vspace{0.5\baselineskip}
+\Logo{refcard}
+\vspace*{\fill}
+\GroupLevels
+\GroupMode
+\pagebreak
+
+% page 1, right column
+\Notes
+\vspace*{\fill}
+\GroupCommands
+\pagebreak
+
+% page 2, left column
+\SummaryMode
+\Asubmap
+\Bsubmap
+\Gsubmap
+\Hsubmap
+\Tsubmap
+\pagebreak
+
+% page 2, right column
+\Msubmap
+\Marks
+\pagebreak
+
+% page 3
+\Osubmap
+\Ssubmap
+\Xsubmap
+\Vsubmap
+\SortSummary
+\Wsubmap
+\Zsubmap
+\ArticleMode
+\ServerMode
+
+% page 4
+\BrowseServer
+\pagebreak
+\onecolumn
+\vspace*{\fill}
+\CopyRight
+
+\end{document}
