@@ -17627,7 +17627,7 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B @acronym{NOV} $B$H5-;v$r;H$&$+$I$&
 $B%k%H$G$9$,!"%(!<%8%'%s%H$OL$FI$N5-;v$r%@%&%s%m!<%I$9$k$+$I$&$+$@$1$r=R8l(B
 $B$K7hDj$5$;$^$9!#$3$l$rM-8z$K$9$k$K$O!"8e$G%(!<%8%'%s%H$,4|8B@Z$l>C5n$9$k(B
 $B5-;v$r2?EY$b7+$jJV$7%@%&%s%m!<%I$7$J$$$h$&$K!"%(!<%8%'%s%H$N4|8B@Z$l>C5n(B
-$B$N@_Dj(B (@pxref{Category Variables})$B$r8+D>$9I,MW$b$"$k$+$b$7$l$^$;$s!#(B
+$B$N@_Dj(B (@pxref{Category Variables}) $B$r8+D>$9I,MW$b$"$k$+$b$7$l$^$;$s!#(B
 
 @item gnus-agent-max-fetch-size
 @vindex gnus-agent-max-fetch-size
