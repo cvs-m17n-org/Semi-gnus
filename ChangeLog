@@ -1,5 +1,9 @@
 1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Fix.
+
+1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus-offline.el (gnus-offline-popup-menu): Modify so that
 	the title of a popup menu is displayed under Emacs 19.34.
 	(gnus-offline-define-menu-and-key): Rewrite the function to change

@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.4.9 1999-03-22 18:18:47 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.4.10 1999-03-22 21:48:14 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -923,22 +923,21 @@ If value is nil , dialup line is disconnected status.")
   (interactive "e")
   (unless gnus-offline-popup-menu
     (setq gnus-offline-popup-menu
-	  (or (featurep 'xemacs)
-	      (let ((menu
-		     (if (boundp 'miee-popup-menu)
-			 (or (assoc 'keymap
-				    (assoc 'Miee (assoc 'menu-bar global-map)))
-			     miee-popup-menu)
-		       gnus-offline-menu-on-agent)))
-		(if (string< emacs-version "20")
-		    (append (list 'keymap
-				  (if (boundp 'miee-popup-menu)
-				      '(nil "Miee")
-				    '(nil "Offline"))
-				  '(nil "")
-				  '(nil ""))
-			    (cdr menu))
-		  menu)))))
+	  (let ((menu
+		 (if (boundp 'miee-popup-menu)
+		     (or (assoc 'keymap
+				(assoc 'Miee (assoc 'menu-bar global-map)))
+			 miee-popup-menu)
+		   gnus-offline-menu-on-agent)))
+	    (if (string< emacs-version "20")
+		(append (list 'keymap
+			      (if (boundp 'miee-popup-menu)
+				  '(nil "Miee")
+				'(nil "Offline"))
+			      '(nil "")
+			      '(nil ""))
+			(cdr menu))
+	      menu))))
   (let* ((pop (x-popup-menu t gnus-offline-popup-menu))
 	 (func (and pop (lookup-key gnus-offline-popup-menu
 				    (apply 'vector pop)))))
