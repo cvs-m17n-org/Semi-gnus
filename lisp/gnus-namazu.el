@@ -243,8 +243,11 @@ options make any sense in this context."
 (defsubst gnus-namazu/call-namazu (query)
   (let ((coding-system-for-read gnus-namazu-coding-system)
 	(coding-system-for-write gnus-namazu-coding-system)
+	(input-coding-system gnus-namazu-coding-system)
+	(output-coding-system gnus-namazu-coding-system)
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
+	program-coding-system-alist
 	(file-name-coding-system gnus-namazu-coding-system)
 	(pathname-coding-system gnus-namazu-coding-system))
     (apply 'call-process

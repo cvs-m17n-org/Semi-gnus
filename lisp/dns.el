@@ -287,7 +287,9 @@ If TCP-P, the first two bytes of the package with be the length field."
 	 (open-network-stream "dns" (current-buffer) ,server "domain" 'udp))
     `(let ((server ,server)
 	   (coding-system-for-read 'binary)
-	   (coding-system-for-write 'binary))
+	   (coding-system-for-write 'binary)
+	   (default-process-coding-system '(binary . binary))
+	   program-coding-system-alist)
        (if (fboundp 'make-network-process)
 	   (make-network-process
 	    :name "dns"

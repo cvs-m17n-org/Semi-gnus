@@ -378,6 +378,7 @@ ARTICLE is the article number of the current headline.")
     (when (file-exists-p file)
       (with-temp-buffer
 	(let ((coding-system-for-read 'binary)
+	      (input-coding-system 'binary)
 	      emacs-lisp-mode-hook)
 	  (insert-file-contents file)
 	  (emacs-lisp-mode)
@@ -394,6 +395,7 @@ ARTICLE is the article number of the current headline.")
 			server ".el"))
 	       nnrss-directory)))
     (let ((coding-system-for-write 'binary)
+	  (output-coding-system 'binary)
 	  print-level print-length)
       (with-temp-file file
 	(insert "(setq nnrss-server-data '"
@@ -416,6 +418,7 @@ ARTICLE is the article number of the current headline.")
     (when (file-exists-p file)
       (with-temp-buffer
 	(let ((coding-system-for-read 'binary)
+	      (input-coding-system 'binary)
 	      emacs-lisp-mode-hook)
 	  (insert-file-contents file)
 	  (emacs-lisp-mode)
@@ -438,6 +441,7 @@ ARTICLE is the article number of the current headline.")
 			server ".el"))
 	       nnrss-directory)))
     (let ((coding-system-for-write 'binary)
+	  (output-coding-system 'binary)
 	  print-level print-length)
       (with-temp-file file
 	(insert "(setq nnrss-group-data '"

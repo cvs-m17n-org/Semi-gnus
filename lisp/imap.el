@@ -607,9 +607,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 			(cond ((eq system-type 'windows-nt)
 			       (let (selective-display
 				     (coding-system-for-write 'binary)
-				     (coding-system-for-read 'raw-text-dos)
-				     (output-coding-system 'binary)
-				     (input-coding-system 'raw-text-dos))
+				     (coding-system-for-read 'raw-text-dos))
 				 (open-ssl-stream name buffer server port)))
 			      (t
 			       (as-binary-process

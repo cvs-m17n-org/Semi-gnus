@@ -106,7 +106,7 @@ the second with the current group name."
   :group 'gnus-message
   :type 'string)
 
-(defcustom gnus-message-setup-hook '(gnus-maybe-setup-default-charset)
+(defcustom gnus-message-setup-hook nil
   "Hook run after setting up a message buffer."
   :group 'gnus-message
   :type 'hook)
@@ -381,6 +381,7 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,group ,article))
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
+	 (gnus-maybe-setup-default-charset)
 	 (gnus-run-hooks 'gnus-message-setup-hook))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
@@ -774,8 +775,7 @@ post using the current select method."
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((article (gnus-summary-article-number))
-	(gnus-message-setup-hook '(gnus-maybe-setup-default-charset)))
+  (let ((article (gnus-summary-article-number)))
     (gnus-setup-message 'reply-yank
       (gnus-summary-select-article t)
       (set-buffer gnus-original-article-buffer)
@@ -1667,15 +1667,14 @@ this is a reply."
   (interactive "P")
   (gnus-summary-select-article t)
   (set-buffer gnus-original-article-buffer)
-  (let ((gnus-message-setup-hook '(gnus-maybe-setup-default-charset)))
-    (gnus-setup-message 'compose-bounce
-      (let* ((references (mail-fetch-field "references"))
-	     (parent (and references (gnus-parent-id references))))
-	(message-bounce)
-	;; If there are references, we fetch the article we answered to.
-	(and fetch parent
-	     (gnus-summary-refer-article parent)
-	     (gnus-summary-show-all-headers))))))
+  (gnus-setup-message 'compose-bounce
+    (let* ((references (mail-fetch-field "references"))
+	   (parent (and references (gnus-parent-id references))))
+      (message-bounce)
+      ;; If there are references, we fetch the article we answered to.
+      (and fetch parent
+	   (gnus-summary-refer-article parent)
+	   (gnus-summary-show-all-headers)))))
 
 ;;; Gcc handling.
 

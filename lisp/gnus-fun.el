@@ -122,6 +122,8 @@ Output to the current buffer, replace text, and don't mingle error."
 	 (ok-p t)
 	 (coding-system-for-read 'binary)
 	 (coding-system-for-write 'binary)
+	 (input-coding-system 'binary)
+	 (output-coding-system 'binary)
 	 default-enable-multibyte-characters
 	 start bit-array bit-arrays pixel)
     (with-temp-buffer

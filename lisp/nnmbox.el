@@ -189,18 +189,11 @@
 		       (1+ (- (cdr active) (car active)))
 		       (car active) (cdr active) group)))))
 
-(static-if (boundp 'MULE)
-    (defun nnmbox-save-buffer ()
-      (let ((output-coding-system
-	     (or nnmbox-file-coding-system-for-write
-		 nnmbox-file-coding-system)))
-	(save-buffer)))
-  (defun nnmbox-save-buffer ()
-    (let ((coding-system-for-write
-	   (or nnmbox-file-coding-system-for-write
-	       nnmbox-file-coding-system)))
-      (save-buffer)))
-  )
+(defun nnmbox-save-buffer ()
+  (let* ((coding-system-for-write (or nnmbox-file-coding-system-for-write
+				      nnmbox-file-coding-system))
+	 (output-coding-system coding-system-for-write))
+    (save-buffer)))
 
 (defun nnmbox-save-active (group-alist active-file)
   (let ((nnmail-active-file-coding-system

@@ -1,3 +1,43 @@
+2002-06-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Default to nil.
+	(gnus-setup-message): Run `gnus-maybe-setup-default-charset'.
+	(gnus-summary-supersede-article): Don't bind the value for
+	`gnus-message-setup-hook'.
+	(gnus-summary-resend-bounced-mail): Ditto.
+
+	* lisp/dns.el (dns-make-network-process): Bind
+	`default-process-coding-system' to `(binary . binary)'; bind
+	`program-coding-system-alist' to nil.
+
+	* lisp/gnus-fun.el (gnus-convert-gray-x-face-to-xpm): Bind
+	`input-coding-system' and `output-coding-system' to `binary'.
+
+	* lisp/gnus-namazu.el (gnus-namazu/call-namazu): Bind
+	`input-coding-system' and `output-coding-system' to the velue of
+	`gnus-namazu-coding-system'.
+
+	* lisp/imap.el (imap-ssl-open): Don't bind the values for
+	`input-coding-system' and `output-coding-system'.
+
+	* lisp/nnmaildir.el (nnmaildir-request-scan): Bind
+	`output-coding-system' to the value of
+	`nnheader-file-coding-system'; bind `file-coding-system' to nil.
+	(nnmaildir-request-rename-group): Ditto.
+	(nnmaildir-request-replace-article): Ditto.
+	(nnmaildir-request-accept-article): Ditto.
+	(nnmaildir-request-set-mark): Ditto.
+
+	* lisp/nnmbox.el (nnmbox-save-buffer): Simplify the source code.
+
+	* lisp/nnrss.el (nnrss-read-server-data): Bind
+	`input-coding-system' to `binary'.
+	(nnrss-save-server-data): Bind `output-coding-system' to `binary'.
+	(nnrss-read-group-data): Bind `input-coding-system' to `binary'.
+	(nnrss-save-group-data): Bind `output-coding-system' to `binary'.
+
 2002-06-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Add a comment for the use of `ssl' or `tls'
