@@ -705,7 +705,7 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @findex message-change-subject
 @cindex Subject
 $B8=:_$N(B @samp{Subject} $B%X%C%@!<$rJQ99$7$^$9!#?7$7$$(B @samp{Subject} $B$r?R$M(B
-$B$F(B @code{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|$9(B
+$B$F(B @samp{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|$9(B
 $B$k$3$H$,$G$-$^$9!#(B@code{message-subject-trailing-was-query}
 (@pxref{Message Headers}) $B$r8+$F2<$5$$!#(B
 
@@ -923,10 +923,10 @@ message a single part tag will be used.  This way, message mode will
 do the Right Thing (TM) with signed/encrypted multipart messages.
 
 @vindex mml-signencrypt-style-alist
-By default, when encrypting a message, Gnus will use the "signencrypt"
+By default, when encrypting a message, Gnus will use the ``signencrypt''
 mode.  If you would like to disable this for a particular message,
-give the mml-secure-message-encrypt-* command a prefix argument. (for
-example, C-u C-c C-m c p).  Additionally, by default Gnus will
+give the @code{mml-secure-message-encrypt-* command a prefix argument}. (for
+example, @kbd{C-u C-c C-m c p}).  Additionally, by default Gnus will
 separately sign, then encrypt a message which has the mode
 signencrypt.  If you would like to change this behavior you can
 customize the @code{mml-signencrypt-style-alist} variable.  For
