@@ -61,7 +61,7 @@
       (let ((auth (gnus-ofsetup-completing-read-symbol 
 		   "Authentification Method"
 		   'pass 'apop)))
-	(list (concat account "@" server) :auth-scheme auth)))))
+	(list (concat "po:" account "@" server) :auth-scheme auth)))))
 
 (defun gnus-setup-for-offline ()
   "*Set up Gnus for offline environment."
