@@ -1,3 +1,11 @@
+1999-01-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-last): Use `split-string' instead of
+	`pop3-string-to-list'.
+	(pop3-stat): Likewise.
+	(pop3-munge-message-separator): Likewise.
+	(pop3-string-to-list): Abolished.
+
 1999-01-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-setup): Don't call

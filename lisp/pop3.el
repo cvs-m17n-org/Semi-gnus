@@ -4,7 +4,7 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3m
+;; Version: 1.3m+
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3m")
+(defconst pop3-version "1.3m+")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -91,7 +91,7 @@ Used for APOP authentication.")
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(append-to-file (point-min) (point-max) crashbox)
+	(write-region-as-binary (point-min) (point-max) crashbox 'append)
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))
@@ -111,23 +111,19 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process)
-	(coding-system-for-read 'binary)   ;; because FSF Emacs 20 and
-	(coding-system-for-write 'binary)  ;; XEmacs 20/1 are st00pid 
-    )
+	(process))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
       (setq pop3-read-point (point-min))
       )
     (setq process
-	  (open-network-stream "POP" process-buffer mailhost port))
+	  (open-network-stream-as-binary "POP" process-buffer mailhost port))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
@@ -163,7 +159,7 @@ Return the response string if optional second argument is non-nil."
       (setq match-end (point))
       (goto-char pop3-read-point)
       (if (looking-at "-ERR")
-	  (signal 'error (list (buffer-substring (point) (- match-end 2))))
+	  (error (buffer-substring (point) (- match-end 2)))
 	(if (not (looking-at "+OK"))
 	    (progn (setq pop3-read-point match-end) nil)
 	  (setq pop3-read-point match-end)
@@ -172,29 +168,15 @@ Return the response string if optional second argument is non-nil."
 	    t)
 	  )))))
 
-(defun pop3-string-to-list (string &optional regexp)
-  "Chop up a string into a list."
-  (let ((list)
-	(regexp (or regexp " "))
-	(string (if (string-match "\r" string)
-		    (substring string 0 (match-beginning 0))
-		  string)))
-    (store-match-data nil)
-    (while string
-      (if (string-match regexp string)
-	  (setq list (cons (substring string 0 (- (match-end 0) 1)) list)
-		string (substring string (match-end 0)))
-	(setq list (cons string list)
-	      string nil)))
-    (nreverse list)))
-
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)
   (if (not pop3-read-passwd)
-      (if (load "passwd" t)
+      (if (functionp 'read-passwd)
 	  (setq pop3-read-passwd 'read-passwd)
-	(autoload 'ange-ftp-read-passwd "ange-ftp")
-	(setq pop3-read-passwd 'ange-ftp-read-passwd)))
+	(if (load "passwd" t)
+	    (setq pop3-read-passwd 'read-passwd)
+	  (autoload 'ange-ftp-read-passwd "ange-ftp")
+	  (setq pop3-read-passwd 'ange-ftp-read-passwd))))
   (funcall pop3-read-passwd prompt))
 
 (defun pop3-clean-region (start end)
@@ -221,8 +203,8 @@ Return the response string if optional second argument is non-nil."
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (pop3-string-to-list (or (mail-fetch-field "Date")
-					       (message-make-date))))
+		(date (split-string (or (mail-fetch-field "Date")
+					(message-make-date))))
 		(From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
@@ -281,8 +263,8 @@ Return the response string if optional second argument is non-nil."
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (pop3-string-to-list response)))
-	  (string-to-int (nth 2 (pop3-string-to-list response))))
+    (list (string-to-int (nth 1 (split-string response)))
+	  (string-to-int (nth 2 (split-string response))))
     ))
 
 (defun pop3-list (process &optional msg)
@@ -344,7 +326,7 @@ This function currently does nothing.")
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (pop3-string-to-list response)))
+    (string-to-int (nth 1 (split-string response)))
     ))
 
 (defun pop3-rset (process)
