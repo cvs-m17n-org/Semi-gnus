@@ -7,7 +7,7 @@
 ;; Keywords: crypto
 ;; Created: 2000-04-15
 
-;; $Id: gpg.el,v 1.1.1.4 2003-05-03 11:32:18 yamaoka Exp $
+;; $Id: gpg.el,v 1.1.1.5 2004-01-05 00:12:59 yamaoka Exp $
 
 ;; This file is NOT (yet?) part of GNU Emacs.
 

@@ -7,7 +7,7 @@
 ;; Keywords: extensions
 ;; Created: 1997-09-27
 
-;; $Id: vcard.el,v 1.1.1.3 2002-01-06 22:11:27 yamaoka Exp $
+;; $Id: vcard.el,v 1.1.1.4 2004-01-05 00:12:59 yamaoka Exp $
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

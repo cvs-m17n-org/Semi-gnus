@@ -298,7 +298,7 @@
 
 ;;; Setup Code:
 
-(defconst nnir-version "$Id: nnir.el,v 1.1.1.1 2003-12-30 10:00:25 yamaoka Exp $"
+(defconst nnir-version "$Id: nnir.el,v 1.1.1.2 2004-01-05 00:12:59 yamaoka Exp $"
   "Version of NNIR.")
 
 (require 'cl)
