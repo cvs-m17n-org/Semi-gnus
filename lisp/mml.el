@@ -1,5 +1,5 @@
 ;;; mml.el --- A package for parsing and validating MML documents
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -151,6 +151,7 @@ one charsets.")
 	(let* (secure-mode
 	       (taginfo (mml-read-tag))
 	       (recipients (cdr (assq 'recipients taginfo)))
+	       (sender (cdr (assq 'sender taginfo)))
 	       (location (cdr (assq 'tag-location taginfo)))
 	       (mode (cdr (assq 'mode taginfo)))
 	       (method (cdr (assq 'method taginfo)))
@@ -173,8 +174,10 @@ one charsets.")
 		 (setq tags (list "sign" method "encrypt" method))))
 	  (eval `(mml-insert-tag ,secure-mode
 				 ,@tags
-				 ,(if recipients 'recipients)
-				 ,recipients))
+				 ,(if recipients "recipients")
+				 ,recipients
+				 ,(if sender "sender")
+				 ,sender))
 	  ;; restart the parse
 	  (goto-char location)))
        ((looking-at "<#multipart")
@@ -334,7 +337,7 @@ A message part needs to be split into %d charset parts.  Really send? "
   "Return the buffer up till the next part, multipart or closing part or multipart.
 If MML is non-nil, return the buffer up till the correspondent mml tag."
   (let ((beg (point)) (count 1))
-   ;; If the tag ended at the end of the line, we go to the next line.
+    ;; If the tag ended at the end of the line, we go to the next line.
     (when (looking-at "[ \t]*\n")
       (forward-line 1))
     (if mml
@@ -431,26 +434,26 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		      ;; ignore 0x1b, it is part of iso-2022-jp
 		      (setq encoding (mm-body-7-or-8))))
 		   (t
+		    ;; Only perform format=flowed filling on text/plain
+		    ;; parts where there either isn't a format parameter
+		    ;; in the mml tag or it says "flowed" and there
+		    ;; actually are hard newlines in the text.
+		    (let (use-hard-newlines)
+		      (when (and (string= type "text/plain")
+				 (or (null (assq 'format cont))
+				     (string= (cdr (assq 'format cont))
+					      "flowed"))
+				 (setq use-hard-newlines
+				       (text-property-any
+					(point-min) (point-max) 'hard 't)))
+			(fill-flowed-encode)
+			;; Indicate that `mml-insert-mime-headers' should
+			;; insert a "; format=flowed" string unless the
+			;; user has already specified it.
+			(setq flowed (null (assq 'format cont)))))
 		    (setq charset (mm-encode-body charset))
 		    (setq encoding (mm-body-encoding
 				    charset (cdr (assq 'encoding cont))))))
-		  ;; Only perform format=flowed filling on text/plain
-		  ;; parts where there either isn't a format parameter
-		  ;; in the mml tag or it says "flowed" and there
-		  ;; actually are hard newlines in the text.
-		  (let (use-hard-newlines)
-		    (when (and (string= type "text/plain")
-			       (or (null (assq 'format cont))
-				   (string= (cdr (assq 'format cont))
-					    "flowed"))
-			       (setq use-hard-newlines
-				     (text-property-any
-				      (point-min) (point-max) 'hard 't)))
-		      (fill-flowed-encode)
-		      ;; Indicate that `mml-insert-mime-headers' should
-		      ;; insert a "; format=flowed" string unless the
-		      ;; user has already specified it.
-		      (setq flowed (null (assq 'format cont)))))
 		  (setq coded (buffer-string)))
 		(mml-insert-mime-headers cont type charset encoding flowed)
 		(insert "\n")
@@ -790,14 +793,22 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
 (defvar mml-mode-map
   (let ((sign (make-sparse-keymap))
 	(encrypt (make-sparse-keymap))
+	(signpart (make-sparse-keymap))
+	(encryptpart (make-sparse-keymap))
 	(map (make-sparse-keymap))
 	(main (make-sparse-keymap)))
     (define-key sign "p" 'mml-secure-message-sign-pgpmime)
     (define-key sign "o" 'mml-secure-message-sign-pgp)
     (define-key sign "s" 'mml-secure-message-sign-smime)
+    (define-key signpart "p" 'mml-secure-sign-pgpmime)
+    (define-key signpart "o" 'mml-secure-sign-pgp)
+    (define-key signpart "s" 'mml-secure-sign-smime)
     (define-key encrypt "p" 'mml-secure-message-encrypt-pgpmime)
     (define-key encrypt "o" 'mml-secure-message-encrypt-pgp)
     (define-key encrypt "s" 'mml-secure-message-encrypt-smime)
+    (define-key encryptpart "p" 'mml-secure-encrypt-pgpmime)
+    (define-key encryptpart "o" 'mml-secure-encrypt-pgp)
+    (define-key encryptpart "s" 'mml-secure-encrypt-smime)
     (define-key map "\C-n" 'mml-unsecure-message)
     (define-key map "f" 'mml-attach-file)
     (define-key map "b" 'mml-attach-buffer)
@@ -808,7 +819,9 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
     (define-key map "v" 'mml-validate)
     (define-key map "P" 'mml-preview)
     (define-key map "s" sign)
+    (define-key map "S" signpart)
     (define-key map "c" encrypt)
+    (define-key map "C" encryptpart)
     ;;(define-key map "n" 'mml-narrow-to-part)
     ;; `M-m' conflicts with `back-to-indentation'.
     ;; (define-key main "\M-m" map)
@@ -818,19 +831,26 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
 (easy-menu-define
   mml-menu mml-mode-map ""
   `("Attachments"
-    ["Attach File" mml-attach-file
+    ["Attach File..." mml-attach-file
      ,@(if (featurep 'xemacs) '(t)
 	 '(:help "Attach a file at point"))]
-    ["Attach Buffer" mml-attach-buffer t]
-    ["Attach External" mml-attach-external t]
-    ["Insert Part" mml-insert-part t]
-    ["Insert Multipart" mml-insert-multipart t]
+    ["Attach Buffer..." mml-attach-buffer t]
+    ["Attach External..." mml-attach-external t]
+    ["Insert Part..." mml-insert-part t]
+    ["Insert Multipart..." mml-insert-multipart t]
     ["PGP/MIME Sign" mml-secure-message-sign-pgpmime t]
     ["PGP/MIME Encrypt" mml-secure-message-encrypt-pgpmime t]
     ["PGP Sign" mml-secure-message-sign-pgp t]
     ["PGP Encrypt" mml-secure-message-encrypt-pgp t]
     ["S/MIME Sign" mml-secure-message-sign-smime t]
     ["S/MIME Encrypt" mml-secure-message-encrypt-smime t]
+    ("Secure MIME part"
+     ["PGP/MIME Sign Part" mml-secure-sign-pgpmime t]
+     ["PGP/MIME Encrypt Part" mml-secure-encrypt-pgpmime t]
+     ["PGP Sign Part" mml-secure-sign-pgp t]
+     ["PGP Encrypt Part" mml-secure-encrypt-pgp t]
+     ["S/MIME Sign Part" mml-secure-sign-smime t]
+     ["S/MIME Encrypt Part" mml-secure-encrypt-smime t])
     ["Encrypt/Sign off" mml-unsecure-message t]
     ;;["Narrow" mml-narrow-to-part t]
     ["Quote MML" mml-quote-region t]
@@ -861,7 +881,7 @@ See Info node `(emacs-mime)Composing'.
 
 (defun mml-minibuffer-read-file (prompt)
   (let ((file (read-file-name prompt nil nil t)))
-   ;; Prevent some common errors.  This is inspired by similar code in
+    ;; Prevent some common errors.  This is inspired by similar code in
     ;; VM.
     (when (file-directory-p file)
       (error "%s is a directory, cannot attach" file))
@@ -919,7 +939,9 @@ See Info node `(emacs-mime)Composing'.
       (when value
 	;; Quote VALUE if it contains suspicious characters.
 	(when (string-match "[\"'\\~/*;() \t\n]" value)
-	  (setq value (prin1-to-string value)))
+	  (setq value (with-output-to-string
+			(let (print-escape-nonascii)
+			  (prin1 value)))))
 	(insert (format " %s=%s" key value)))))
   (insert ">\n"))
 
@@ -987,6 +1009,16 @@ TYPE is the MIME type to use."
   (mml-insert-tag 'part 'type type 'disposition "inline")
   (forward-line -1))
 
+(defun mml-preview-insert-mft ()
+  "Insert a Mail-Followup-To header before previewing an article.
+Should be adopted if code in `message-send-mail' is changed."
+  (when (and (message-mail-p)
+	     (message-subscribed-p)
+	     (not (mail-fetch-field "mail-followup-to"))
+	     (message-make-mft))
+    (message-position-on-field "Mail-Followup-To" "X-Draft-From")
+    (insert (message-make-mft))))
+
 (defun mml-preview (&optional raw)
   "Display current buffer with Gnus, in a new buffer.
 If RAW, don't highlight the article."
@@ -994,6 +1026,7 @@ If RAW, don't highlight the article."
   (save-excursion
     (let* ((buf (current-buffer))
 	   (message-options message-options)
+	   (message-this-is-mail (message-mail-p))
 	   (message-this-is-news (message-news-p))
 	   (message-posting-charset (or (gnus-setup-posting-charset
 					 (save-restriction
@@ -1006,6 +1039,7 @@ If RAW, don't highlight the article."
 				   "*MIME preview of ") (buffer-name))))
       (erase-buffer)
       (insert-buffer buf)
+      (mml-preview-insert-mft)
       (let ((message-deletable-headers (if (message-news-p)
 					   nil
 					 message-deletable-headers)))

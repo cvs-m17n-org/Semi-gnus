@@ -46,27 +46,39 @@
 (defvar mml-default-encrypt-method (caar mml-encrypt-alist)
   "Default encryption method.")
 
-(defvar mml-signencrypt-style-alist
+(defcustom mml-signencrypt-style-alist
   '(("smime"   separate)
     ("pgp"     separate)
     ("pgpmime" separate))
-  "Alist specifying whether or not a single sign & encrypt
-operation should be perfomed when requesting signencrypt.
-Note that combined sign & encrypt is NOT supported by pgp v2!
-Also note that you should access this with mml-signencrypt-style")
-
+  "Alist specifying if `signencrypt' results in two separate operations or not.
+The first entry indicates the MML security type, valid entries include
+the strings \"smime\", \"pgp\", and \"pgpmime\".  The second entry is
+a symbol `separate' or `combined' where `separate' means that MML signs
+and encrypt messages in a two step process, and `combined' means that MML
+signs and encrypt the message in one step.
+Note that the `combined' mode is NOT supported by all OpenPGP implementations,
+in particular PGP version 2 does not support it!"
+  :type '(repeat (list (choice (const :tag "S/MIME" "smime")
+			       (const :tag "PGP" "pgp")
+			       (const :tag "PGP/MIME" "pgpmime")
+			       (string :tag "User defined"))
+		       (choice (const :tag "Separate" separate)
+			       (const :tag "Combined" combined)))))
+			      
 ;;; Configuration/helper functions
 
 (defun mml-signencrypt-style (method &optional style)
   "Function for setting/getting the signencrypt-style used.  Takes two
 arguments, the method (e.g. \"pgp\") and optionally the mode
-(e.g. combined).  If the mode is omitted, the current value is returned.
+\(e.g. combined).  If the mode is omitted, the current value is returned.
 
 For example, if you prefer to use combined sign & encrypt with
 smime, putting the following in your Gnus startup file will
 enable that behavior:
 
- (mml-set-signencrypt-style \"smime\" combined)"
+\(mml-set-signencrypt-style \"smime\" combined)
+
+You can also customize or set `mml-signencrypt-style-alist' instead."
   (let ((style-item (assoc method mml-signencrypt-style-alist)))
     (if style-item
 	(if (or (eq style 'separate)
@@ -83,7 +95,10 @@ enable that behavior:
   (or (mml-smime-sign cont)
       (error "Signing failed... inspect message logs for errors")))
 
-(defun mml-smime-encrypt-buffer (cont)
+(defun mml-smime-encrypt-buffer (cont &optional sign)
+  (when sign
+    (message "Combined sign and encrypt S/MIME not support yet")
+    (sit-for 1))
   (or (mml-smime-encrypt cont)
       (error "Encryption failed... inspect message logs for errors")))
 
@@ -91,8 +106,8 @@ enable that behavior:
   (or (mml1991-sign cont)
       (error "Signing failed... inspect message logs for errors")))
 
-(defun mml-pgp-encrypt-buffer (cont)
-  (or (mml1991-encrypt cont)
+(defun mml-pgp-encrypt-buffer (cont &optional sign)
+  (or (mml1991-encrypt cont sign)
       (error "Encryption failed... inspect message logs for errors")))
 
 (defun mml-pgpmime-sign-buffer (cont)

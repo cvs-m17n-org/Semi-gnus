@@ -60,6 +60,7 @@
 This variable is a list of mail source specifiers.
 See Info node `(gnus)Mail Source Specifiers'."
   :group 'mail-source
+  :link '(custom-manual "(gnus)Mail Source Specifiers")
   :type `(repeat
 	  (choice :format "%[Value Menu%] %v"
 		  :value (file)
@@ -83,10 +84,16 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (function :tag "Predicate"))
 				   (group :inline t
 					  (const :format "" :value :prescript)
-					  (string :tag "Prescript"))
+					  (choice :tag "Prescript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :postscript)
-					  (string :tag "Postscript"))
+					  (choice :tag "Postscript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :plugged)
 					  (boolean :tag "Plugged"))))
@@ -113,10 +120,16 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (string :tag "Program"))
 				   (group :inline t
 					  (const :format "" :value :prescript)
-					  (string :tag "Prescript"))
+					  (choice :tag "Prescript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :postscript)
-					  (string :tag "Postscript"))
+					  (choice :tag "Postscript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :function)
 					  (function :tag "Function"))
@@ -465,7 +478,12 @@ Return the number of files that were found."
 		   (error
 		    (unless (yes-or-no-p
 			     (format "Mail source %s error (%s).  Continue? "
-				     source
+				     (if (memq ':password source)
+					 (let ((s (copy-sequence source)))
+					   (setcar (cdr (memq ':password s)) 
+						   "********")
+					   s)
+				       source)
 				     (cadr err)))
 		      (error "Cannot get new mail"))
 		    0)))))))))
@@ -602,7 +620,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun mail-source-run-script (script spec &optional delay)
   (when script
-    (if (and (symbolp script) (fboundp script))
+    (if (functionp script)
 	(funcall script)
       (mail-source-call-script
        (format-spec script spec))))
@@ -771,6 +789,24 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (delq (assoc from mail-source-password-cache)
 		    mail-source-password-cache)))
       result)))
+
+(defun mail-source-touch-pop ()
+  "Open and close a POP connection shortly.
+POP server should be defined in `mail-source-primary-source' (which is
+preferred) or `mail-sources'.  You may use it for the POP-before-SMTP
+authentication.  To do that, you need to set the option
+`message-send-mail-function' to `message-smtpmail-send-it' and put the
+following line in .gnus file:
+
+\(add-hook 'message-send-mail-hook 'mail-source-touch-pop)
+"
+  (let ((sources (if mail-source-primary-source
+		     (list mail-source-primary-source)
+		   mail-sources)))
+    (while sources
+      (if (eq 'pop (car (car sources)))
+	  (mail-source-check-pop (car sources)))
+      (setq sources (cdr sources)))))
 
 (defun mail-source-new-mail-p ()
   "Handler for `display-time' to indicate when new mail is available."

@@ -111,7 +111,7 @@
       (when (and (file-exists-p newest)
 		 (let ((nnmail-file-coding-system
 			(if (file-newer-than-file-p file auto)
-			    (if (equal group "drafts")
+			    (if (member group '("drafts" "delayed"))
 				message-draft-coding-system
 			      mm-text-coding-system)
 			  mm-auto-save-coding-system)))
@@ -122,7 +122,7 @@
 	  ;; If there's a mail header separator in this file,
 	  ;; we remove it.
 	  (when (re-search-forward
-		 (concat "^" mail-header-separator "$") nil t)
+		 (concat "^" (regexp-quote mail-header-separator) "$") nil t)
 	    (replace-match "" t t)))
 	t))))
 
@@ -152,6 +152,12 @@
 		nil))))
   t)
 
+(defun nndraft-generate-headers ()
+  (save-excursion
+    (message-generate-headers
+     (message-headers-to-generate
+      message-required-headers message-draft-headers nil))))
+
 (deffoo nndraft-request-associate-buffer (group)
   "Associate the current buffer with some article in the draft group."
   (nndraft-open-server "")
@@ -168,6 +174,8 @@
     (setq buffer-file-name (expand-file-name file)
 	  buffer-auto-save-file-name (make-auto-save-file-name))
     (clear-visited-file-modtime)
+    (make-local-variable 'write-contents-hooks)
+    (push 'nndraft-generate-headers write-contents-hooks)
     article))
 
 (deffoo nndraft-request-group (group &optional server dont-check)
@@ -219,8 +227,8 @@
 (deffoo nndraft-request-replace-article (article group buffer)
   (nndraft-possibly-change-group group)
   (let ((nnmail-file-coding-system
-	 (if (equal group "drafts")
-	     mm-auto-save-coding-system
+	 (if (member group '("drafts" "delayed"))
+	     message-draft-coding-system
 	   mm-text-coding-system)))
     (nnoo-parent-function 'nndraft 'nnmh-request-replace-article
 			  (list article group buffer))))

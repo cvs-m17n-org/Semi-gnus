@@ -43,7 +43,7 @@
 ;; 2000-02-17  posted on ding mailing list
 ;; 2000-02-19  use `point-at-{b,e}ol' in XEmacs
 ;; 2000-03-11  no compile warnings for point-at-bol stuff
-;; 2000-03-26  commited to gnus cvs
+;; 2000-03-26  committed to gnus cvs
 ;; 2000-10-23  don't flow "-- " lines, make "quote-depth wins" rule
 ;;             work when first line is at level 0.
 ;; 2002-01-12  probably incomplete encoding support
@@ -109,7 +109,8 @@ RFC 2646 suggests 66 characters for readability."
       (when (save-excursion
 	      (beginning-of-line)
 	      (looking-at "^\\(>*\\)\\( ?\\)"))
-	(let ((quote (match-string 1)) sig)
+	(let ((quote (match-string 1))
+	      sig)
 	  (if (string= quote "")
 	      (setq quote nil))
 	  (when (and quote (string= (match-string 2) ""))
@@ -126,7 +127,8 @@ RFC 2646 suggests 66 characters for readability."
 		      (save-excursion
 			(unless (eobp)
 			  (forward-char 1)
-			  (looking-at (format "^\\(%s\\)\\([^>]\\)" (or quote " ?"))))))
+			  (looking-at (format "^\\(%s\\)\\([^>]\\)"
+					      (or quote " ?"))))))
 	    (save-excursion
 	      (replace-match (if (string= (match-string 2) " ")
 				 "" "\\2")))
@@ -138,9 +140,12 @@ RFC 2646 suggests 66 characters for readability."
 		      (fill-column (eval fill-flowed-display-column))
 		      filladapt-mode)
 		  (fill-region (fill-flowed-point-at-bol)
-			       (min (1+ (fill-flowed-point-at-eol)) (point-max))
+			       (min (1+ (fill-flowed-point-at-eol))
+				    (point-max))
 			       'left 'nosqueeze))
-	      (error nil))))))))
+	      (error
+	       (forward-line 1)
+	       nil))))))))
 
 (provide 'flow-fill)
 

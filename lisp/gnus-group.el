@@ -1,5 +1,5 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -38,6 +38,8 @@
 (require 'gnus-undo)
 (require 'time-date)
 (require 'gnus-ems)
+
+(eval-when-compile (require 'mm-url))
 
 (defcustom gnus-group-archive-directory
   "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
@@ -141,7 +143,7 @@ list."
 			 (function-item gnus-group-sort-by-rank)
 			 (function :tag "other" nil))))
 
-(defcustom gnus-group-line-format "%M\%S\%p\%P\%5y: %(%g%)%l %O\n"
+(defcustom gnus-group-line-format "%M\%S\%p\%P\%5y:%B%(%g%)%l %O\n"
   "*Format of group lines.
 It works along the same lines as a normal formatting string,
 with some simple extensions.
@@ -164,6 +166,7 @@ with some simple extensions.
 %s    Select method (string)
 %o    Moderated group (char, \"m\")
 %p    Process mark (char)
+%B    Whether a summary buffer for the group is open (char, \"*\")
 %O    Moderated group (string, \"(m)\" or \"\")
 %P    Topic indentation (string)
 %m    Whether there is new(ish) mail in the group (char, \"%\")
@@ -192,7 +195,7 @@ of these specs, you must probably re-start Gnus to see them go into
 effect.
 
 General format specifiers can also be used.
-See `(gnus)Formatting Variables'."
+See Info node `(gnus)Formatting Variables'."
   :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-group-visual
   :type 'string)
@@ -440,6 +443,7 @@ simple manner.")
 
 ;;; Internal variables
 
+(defvar gnus-group-is-exiting-p nil)
 (defvar gnus-group-sort-alist-function 'gnus-group-sort-flat
   "Function for sorting the group buffer.")
 
@@ -484,6 +488,7 @@ simple manner.")
     (?n gnus-tmp-news-method ?s)
     (?P gnus-group-indentation ?s)
     (?E gnus-tmp-group-icon ?s)
+    (?B gnus-tmp-summary-live ?c)
     (?l gnus-tmp-grouplens ?s)
     (?z gnus-tmp-news-method-string ?s)
     (?m (gnus-group-new-mail gnus-tmp-group) ?c)
@@ -636,7 +641,8 @@ simple manner.")
     "l" gnus-group-sort-groups-by-level
     "v" gnus-group-sort-groups-by-score
     "r" gnus-group-sort-groups-by-rank
-    "m" gnus-group-sort-groups-by-method)
+    "m" gnus-group-sort-groups-by-method
+    "n" gnus-group-sort-groups-by-real-name)
 
   (gnus-define-keys (gnus-group-sort-selected-map "P" gnus-group-group-map)
     "s" gnus-group-sort-selected-groups
@@ -645,7 +651,8 @@ simple manner.")
     "l" gnus-group-sort-selected-groups-by-level
     "v" gnus-group-sort-selected-groups-by-score
     "r" gnus-group-sort-selected-groups-by-rank
-    "m" gnus-group-sort-selected-groups-by-method)
+    "m" gnus-group-sort-selected-groups-by-method
+    "n" gnus-group-sort-selected-groups-by-real-name)
 
   (gnus-define-keys (gnus-group-list-map "A" gnus-group-mode-map)
     "k" gnus-group-list-killed
@@ -701,6 +708,8 @@ simple manner.")
     "f" gnus-score-flush-cache)
 
   (gnus-define-keys (gnus-group-help-map "H" gnus-group-mode-map)
+    "c" gnus-group-fetch-charter
+    "C" gnus-group-fetch-control
     "d" gnus-group-describe-group
     "f" gnus-group-fetch-faq
     "v" gnus-version)
@@ -745,6 +754,12 @@ simple manner.")
 	,@(if (featurep 'xemacs) nil
 	    '(:help "Display description of the current group"))]
        ["Fetch FAQ" gnus-group-fetch-faq (gnus-group-group-name)]
+       ["Fetch charter" gnus-group-fetch-charter :active (gnus-group-group-name)
+	,@(if (featurep 'xemacs) nil
+	    '(:help "Display the charter of the current group"))]
+       ["Fetch control message" gnus-group-fetch-control :active (gnus-group-group-name)
+	,@(if (featurep 'xemacs) nil
+	    '(:help "Display the archived control message for the current group"))]
        ;; Actually one should check, if any of the marked groups gives t for
        ;; (gnus-check-backend-function 'request-expire-articles ...)
        ["Expire articles" gnus-group-expire-articles
@@ -752,7 +767,7 @@ simple manner.")
 		 (gnus-check-backend-function
 		  'request-expire-articles
 		  (gnus-group-group-name))) gnus-group-marked)]
-       ["Set group level" gnus-group-set-current-level
+       ["Set group level..." gnus-group-set-current-level
 	(gnus-group-group-name)]
        ["Select quick" gnus-group-quick-select-group (gnus-group-group-name)]
        ["Customize" gnus-group-customize (gnus-group-group-name)]
@@ -822,22 +837,22 @@ simple manner.")
 	["Execute command" gnus-group-universal-argument
 	 (or gnus-group-marked (gnus-group-group-name))])
        ("Subscribe"
-	["Subscribe to a group" gnus-group-unsubscribe-group t]
+	["Subscribe to a group..." gnus-group-unsubscribe-group t]
 	["Kill all newsgroups in region" gnus-group-kill-region t]
 	["Kill all zombie groups" gnus-group-kill-all-zombies
 	 gnus-zombie-list]
 	["Kill all groups on level..." gnus-group-kill-level t])
        ("Foreign groups"
-	["Make a foreign group" gnus-group-make-group t]
-	["Add a directory group" gnus-group-make-directory-group t]
+	["Make a foreign group..." gnus-group-make-group t]
+	["Add a directory group..." gnus-group-make-directory-group t]
 	["Add the help group" gnus-group-make-help-group t]
 	["Add the archive group" gnus-group-make-archive-group t]
-	["Make a doc group" gnus-group-make-doc-group t]
-	["Make a web group" gnus-group-make-web-group t]
-	["Make a kiboze group" gnus-group-make-kiboze-group t]
-	["Make a virtual group" gnus-group-make-empty-virtual t]
-	["Add a group to a virtual" gnus-group-add-to-virtual t]
-	["Rename group" gnus-group-rename-group
+	["Make a doc group..." gnus-group-make-doc-group t]
+	["Make a web group..." gnus-group-make-web-group t]
+	["Make a kiboze group..." gnus-group-make-kiboze-group t]
+	["Make a virtual group..." gnus-group-make-empty-virtual t]
+	["Add a group to a virtual..." gnus-group-add-to-virtual t]
+	["Rename group..." gnus-group-rename-group
 	 (gnus-check-backend-function
 	  'request-rename-group (gnus-group-group-name))]
 	["Delete group" gnus-group-delete-group
@@ -851,7 +866,7 @@ simple manner.")
 	["Next unread same level" gnus-group-next-unread-group-same-level t]
 	["Previous unread same level"
 	 gnus-group-prev-unread-group-same-level t]
-	["Jump to group" gnus-group-jump-to-group t]
+	["Jump to group..." gnus-group-jump-to-group t]
 	["First unread group" gnus-group-first-unread-group t]
 	["Best unread group" gnus-group-best-unread-group t])
        ("Sieve"
@@ -887,7 +902,7 @@ simple manner.")
        ["Activate all groups" gnus-activate-all-groups t]
        ["Restart Gnus" gnus-group-restart t]
        ["Read init file" gnus-group-read-init-file t]
-       ["Browse foreign server" gnus-group-browse-foreign-server t]
+       ["Browse foreign server..." gnus-group-browse-foreign-server t]
        ["Enter server buffer" gnus-group-enter-server-mode t]
        ["Expire all expirable articles" gnus-group-expire-all-groups t]
        ["Generate any kiboze groups" nnkiboze-generate-groups t]
@@ -1154,57 +1169,57 @@ if it is a string, only list groups matching REGEXP."
 	      params (gnus-info-params info)
 	      newsrc (cdr newsrc)
 	      unread (car (gnus-gethash group gnus-newsrc-hashtb)))
-	(if not-in-list
-	    (setq not-in-list (delete group not-in-list)))
-	(and
-	 (gnus-group-prepare-logic
-	  group
-	  (and unread		; This group might be unchecked
-	       (or (not (stringp regexp))
-		   (string-match regexp group))
-	       (<= (setq clevel (gnus-info-level info)) level)
-	       (>= clevel lowest)
-	       (cond
-		((functionp predicate)
-		 (funcall predicate info))
-		(predicate t)		; We list all groups?
-		(t
-		 (or
-		  (if (eq unread t)	; Unactivated?
-		      gnus-group-list-inactive-groups
+	(when not-in-list
+	  (setq not-in-list (delete group not-in-list)))
+	(when (gnus-group-prepare-logic
+	       group
+	       (and unread		; This group might be unchecked
+		    (or (not (stringp regexp))
+			(string-match regexp group))
+		    (<= (setq clevel (gnus-info-level info)) level)
+		    (>= clevel lowest)
+		    (cond
+		     ((functionp predicate)
+		      (funcall predicate info))
+		     (predicate t)	; We list all groups?
+		     (t
+		      (or
+		       (if (eq unread t) ; Unactivated?
+			   gnus-group-list-inactive-groups
 					; We list unactivated
-		    (> unread 0))
+			 (> unread 0))
 					; We list groups with unread articles
-		  (and gnus-list-groups-with-ticked-articles
-		       (cdr (assq 'tick (gnus-info-marks info))))
+		       (and gnus-list-groups-with-ticked-articles
+			    (cdr (assq 'tick (gnus-info-marks info))))
 					; And groups with tickeds
-		  ;; Check for permanent visibility.
-		  (and gnus-permanently-visible-groups
-		       (string-match gnus-permanently-visible-groups group))
-		  (memq 'visible params)
-		  (cdr (assq 'visible params)))))))
-	 (gnus-group-insert-group-line
-	  group (gnus-info-level info)
-	  (gnus-info-marks info) unread (gnus-info-method info)))))
+		       ;; Check for permanent visibility.
+		       (and gnus-permanently-visible-groups
+			    (string-match gnus-permanently-visible-groups
+					  group))
+		       (memq 'visible params)
+		       (cdr (assq 'visible params)))))))
+	  (gnus-group-insert-group-line
+	   group (gnus-info-level info)
+	   (gnus-info-marks info) unread (gnus-info-method info)))))
 
     ;; List dead groups.
-    (if (or gnus-group-listed-groups
-	    (and (>= level gnus-level-zombie)
-		 (<= lowest gnus-level-zombie)))
-	(gnus-group-prepare-flat-list-dead
-	 (setq gnus-zombie-list (sort gnus-zombie-list 'string<))
-	 gnus-level-zombie ?Z
-	 regexp))
-    (if not-in-list
-	(dolist (group gnus-zombie-list)
-	  (setq not-in-list (delete group not-in-list))))
-    (if (or gnus-group-listed-groups
-	    (and (>= level gnus-level-killed) (<= lowest gnus-level-killed)))
-	(gnus-group-prepare-flat-list-dead
-	 (gnus-union
-	  not-in-list
-	  (setq gnus-killed-list (sort gnus-killed-list 'string<)))
-	 gnus-level-killed ?K regexp))
+    (when (or gnus-group-listed-groups
+	      (and (>= level gnus-level-zombie)
+		   (<= lowest gnus-level-zombie)))
+      (gnus-group-prepare-flat-list-dead
+       (setq gnus-zombie-list (sort gnus-zombie-list 'string<))
+       gnus-level-zombie ?Z
+       regexp))
+    (when not-in-list
+      (dolist (group gnus-zombie-list)
+	(setq not-in-list (delete group not-in-list))))
+    (when (or gnus-group-listed-groups
+	      (and (>= level gnus-level-killed) (<= lowest gnus-level-killed)))
+      (gnus-group-prepare-flat-list-dead
+       (gnus-union
+	not-in-list
+	(setq gnus-killed-list (sort gnus-killed-list 'string<)))
+       gnus-level-killed ?K regexp))
 
     (gnus-group-set-mode-line)
     (setq gnus-group-list-mode (cons level predicate))
@@ -1346,6 +1361,11 @@ if it is a string, only list groups matching REGEXP."
 	  (if (and (numberp number)
 		   (zerop number)
 		   (cdr (assq 'tick gnus-tmp-marked)))
+	      ?* ? ))
+	 (gnus-tmp-summary-live
+	  (if (and (not gnus-group-is-exiting-p)
+		   (gnus-buffer-live-p (gnus-summary-buffer-name
+					gnus-tmp-group)))
 	      ?* ? ))
 	 (gnus-tmp-process-marked
 	  (if (member gnus-tmp-group gnus-group-marked)
@@ -1851,13 +1871,13 @@ be permanent."
      (gnus-group-prefixed-name group method) method)))
 
 ;;;###autoload
-(defun gnus-fetch-group (group)
+(defun gnus-fetch-group (group &optional articles)
   "Start Gnus if necessary and enter GROUP.
 Returns whether the fetching was successful or not."
   (interactive (list (completing-read "Group name: " gnus-active-hashtb)))
   (unless (get-buffer gnus-group-buffer)
     (gnus-no-server))
-  (gnus-group-read-group nil nil group))
+  (gnus-group-read-group articles nil group))
 
 ;;;###autoload
 (defun gnus-fetch-group-other-frame (group)
@@ -1933,11 +1953,12 @@ Return the name of the group if selection was successful."
 (defun gnus-group-jump-to-group (group)
   "Jump to newsgroup GROUP."
   (interactive
-   (list (completing-read
-	  "Group: " gnus-active-hashtb nil
-	  (gnus-read-active-file-p)
-	  gnus-group-jump-to-group-prompt
-	  'gnus-group-history)))
+   (list (mm-string-make-unibyte
+	  (completing-read
+	   "Group: " gnus-active-hashtb nil
+	   (gnus-read-active-file-p)
+	   gnus-group-jump-to-group-prompt
+	   'gnus-group-history))))
 
   (when (equal group "")
     (error "Empty group name"))
@@ -2195,7 +2216,8 @@ doing the deletion."
 	  (gnus-group-goto-group group)
 	  (gnus-group-kill-group 1 t)
 	  (gnus-sethash group nil gnus-active-hashtb)
-	  (when gnus-cache-active-hashtb
+	  (when (and (boundp 'gnus-cache-active-hashtb)
+		     gnus-cache-active-hashtb)
 	    (gnus-sethash group nil gnus-cache-active-hashtb)
 	    (setq gnus-cache-active-altered t))
 	  t))
@@ -2848,10 +2870,10 @@ sort in reverse order."
 
 (defun gnus-group-sort-by-method (info1 info2)
   "Sort alphabetically by backend name."
-  (string< (symbol-name (car (gnus-find-method-for-group
-			      (gnus-info-group info1) info1)))
-	   (symbol-name (car (gnus-find-method-for-group
-			      (gnus-info-group info2) info2)))))
+  (string< (car (gnus-find-method-for-group
+		 (gnus-info-group info1) info1))
+	   (car (gnus-find-method-for-group
+		 (gnus-info-group info2) info2))))
 
 (defun gnus-group-sort-by-server (info1 info2)
   "Sort alphabetically by server name."
@@ -3494,7 +3516,7 @@ to use."
     (gnus-group-group-name)
     (when current-prefix-arg
       (completing-read
-       "Faq dir: " (and (listp gnus-group-faq-directory)
+       "FAQ dir: " (and (listp gnus-group-faq-directory)
 			(mapcar #'list
 				gnus-group-faq-directory))))))
   (unless group
@@ -3512,6 +3534,60 @@ to use."
 	(let ((enable-local-variables nil))
 	  (find-file file)
 	  (setq found t))))))
+
+(defun gnus-group-fetch-charter (group)
+  "Fetch the charter for the current group.
+If given a prefix argument, prompt for a group."
+  (interactive
+   (list (or (when current-prefix-arg
+	       (completing-read "Group: " gnus-active-hashtb))
+	     (gnus-group-group-name)
+	     gnus-newsgroup-name)))
+  (unless group
+    (error "No group name given"))
+  (require 'mm-url)
+  (condition-case nil (require 'url-http) (error nil))
+  (let ((name (mm-url-form-encode-xwfu (gnus-group-real-name group)))
+	url hierarchy)
+    (when (string-match "\\(^[^\\.]+\\)\\..*" name)
+      (setq hierarchy (match-string 1 name))
+      (if (and (setq url (cdr (assoc hierarchy gnus-group-charter-alist)))
+	       (if (fboundp 'url-http-file-exists-p)
+		   (url-http-file-exists-p (eval url))
+		 t))
+	  (browse-url (eval url))
+	(setq url (concat "http://" hierarchy
+			  ".news-admin.org/charters/" name))
+	(if (and (fboundp 'url-http-file-exists-p) 
+		 (url-http-file-exists-p url))
+	    (browse-url url)
+	  (gnus-group-fetch-control group))))))
+
+(defun gnus-group-fetch-control (group)
+  "Fetch the archived control messages for the current group.
+If given a prefix argument, prompt for a group."
+  (interactive
+   (list (or (when current-prefix-arg
+	       (completing-read "Group: " gnus-active-hashtb))
+	     (gnus-group-group-name)
+	     gnus-newsgroup-name)))
+  (unless group
+    (error "No group name given"))
+  (let ((name (gnus-group-real-name group))
+	hierarchy)
+    (when (string-match "\\(^[^\\.]+\\)\\..*" name)
+      (setq hierarchy (match-string 1 name))
+      (if gnus-group-fetch-control-use-browse-url
+	  (browse-url (concat "ftp://ftp.isc.org/usenet/control/"
+			      hierarchy "/" name ".Z"))
+	(let ((enable-local-variables nil))
+	  (gnus-group-read-ephemeral-group
+	   group
+	   `(nndoc ,group (nndoc-address 
+			   ,(find-file-noselect
+			     (concat "/ftp@ftp.isc.org:/usenet/control/" 
+				     hierarchy "/" name ".Z")))
+		   (nndoc-article-type mbox)) t nil nil))))))
 
 (defun gnus-group-describe-group (force &optional group)
   "Display a description of the current newsgroup."
@@ -4065,8 +4141,7 @@ This command may read the active file."
 	      (setq gnus-newsgroup-unselected
 		    (nreverse gnus-newsgroup-unselected)))))
       (gnus-activate-group group)
-      (gnus-group-make-articles-read group
-				     (list article))
+      (gnus-group-make-articles-read group (list article))
       (when (gnus-group-auto-expirable-p group)
 	(gnus-add-marked-articles
 	 group 'expire (list article))))))

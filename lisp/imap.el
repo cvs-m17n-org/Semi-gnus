@@ -390,7 +390,7 @@ human readable response text (a string).")
 
 (defvar imap-continuation nil
   "Non-nil indicates that the server emitted a continuation request.
-The actually value is really the text on the continuation line.")
+The actual value is really the text on the continuation line.")
 
 (defvar imap-callbacks nil
   "List of response tags and callbacks, on the form `(number . function)'.
@@ -672,7 +672,8 @@ If ARGS, PROMPT is used as an argument to `format'."
   nil)
 
 (defun imap-shell-open (name buffer server port)
-  (let ((cmds imap-shell-program)
+  (let ((cmds (if (listp imap-shell-program) imap-shell-program
+		(list imap-shell-program)))
 	cmd done)
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening IMAP connection with `%s'..." cmd)
@@ -692,7 +693,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(when process
 	  (while (and (memq (process-status process) '(open run))
 		      (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
-		      (goto-char (point-min))
+		      (goto-char (point-max))
+		      (forward-line -1)
 		      (not (imap-parse-greeting)))
 	    (accept-process-output process 1)
 	    (sit-for 1))
@@ -756,7 +758,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defun imap-interactive-login (buffer loginfunc)
   "Login to server in BUFFER.
 LOGINFUNC is passed a username and a password, it should return t if
-it where sucessful authenticating itself to the server, nil otherwise.
+it where successful authenticating itself to the server, nil otherwise.
 Returns t if login was successful, nil otherwise."
   (with-current-buffer buffer
     (make-local-variable 'imap-username)
@@ -925,7 +927,7 @@ AUTH indicates authenticator to use, see `imap-authenticators' for
 available authenticators.  If nil, it choices the best stream the
 server is capable of.
 BUFFER can be a buffer or a name of a buffer, which is created if
-necessery.  If nil, the buffer name is generated."
+necessary.  If nil, the buffer name is generated."
   (setq buffer (or buffer (format " *imap* %s:%d" server (or port 0))))
   (with-current-buffer (get-buffer-create buffer)
     (if (imap-opened buffer)
@@ -2131,7 +2133,7 @@ Return nil if no complete line has arrived."
 	  ((search-forward "UIDNEXT \\([0-9]+\\)" nil t)
 	   (imap-mailbox-put 'uidnext (match-string 1)))
 	  ((search-forward "UNSEEN " nil t)
-	   (imap-mailbox-put 'unseen (read (current-buffer))))
+	   (imap-mailbox-put 'first-unseen (read (current-buffer))))
 	  ((looking-at "UIDVALIDITY \\([0-9]+\\)")
 	   (imap-mailbox-put 'uidvalidity (match-string 1)))
 	  ((search-forward "READ-ONLY" nil t)
@@ -2294,26 +2296,32 @@ Return nil if no complete line has arrived."
 
 (defun imap-parse-status ()
   (let ((mailbox (imap-parse-mailbox)))
-    (when (and mailbox (search-forward "(" nil t))
-      (while (not (eq (char-after) ?\)))
-	(let ((token (read (current-buffer))))
-	  (cond ((eq token 'MESSAGES)
+    (if (eq (char-after) ? )
+	(forward-char))
+    (when (and mailbox (eq (char-after) ?\())
+      (while (and (not (eq (char-after) ?\)))
+		  (or (forward-char) t)
+		  (looking-at "\\([A-Za-z]+\\) "))
+	(let ((token (match-string 1)))
+	  (goto-char (match-end 0))
+	  (cond ((string= token "MESSAGES")
 		 (imap-mailbox-put 'messages (read (current-buffer)) mailbox))
-		((eq token 'RECENT)
+		((string= token "RECENT")
 		 (imap-mailbox-put 'recent (read (current-buffer)) mailbox))
-		((eq token 'UIDNEXT)
-		 (and (looking-at " \\([0-9]+\\)")
-		      (imap-mailbox-put 'uidnext (match-string 1) mailbox)
-		      (goto-char (match-end 1))))
-		((eq token 'UIDVALIDITY)
-		 (and (looking-at " \\([0-9]+\\)")
-		      (imap-mailbox-put 'uidvalidity (match-string 1) mailbox)
-		      (goto-char (match-end 1))))
-		((eq token 'UNSEEN)
+		((string= token "UIDNEXT")
+		 (and (looking-at "[0-9]+")
+		      (imap-mailbox-put 'uidnext (match-string 0) mailbox)
+		      (goto-char (match-end 0))))
+		((string= token "UIDVALIDITY")
+		 (and (looking-at "[0-9]+")
+		      (imap-mailbox-put 'uidvalidity (match-string 0) mailbox)
+		      (goto-char (match-end 0))))
+		((string= token "UNSEEN")
 		 (imap-mailbox-put 'unseen (read (current-buffer)) mailbox))
 		(t
 		 (message "Unknown status data %s in mailbox %s ignored"
-			  token mailbox))))))))
+			  token mailbox)
+		 (read (current-buffer)))))))))
 
 ;;   acl_data        ::= "ACL" SPACE mailbox *(SPACE identifier SPACE
 ;;                        rights)

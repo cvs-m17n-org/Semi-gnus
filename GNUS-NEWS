@@ -8,13 +8,57 @@ For older news, see Gnus info node "New Features".
 
 * Changes in Oort Gnus
 
+** Improved anti-speam features.
+
+** Easy inclusion of X-Faces headers.
+
+** In the summary buffer, the new command / N inserts new messages and
+/ o inserts old messages.
+
+** Gnus decodes morse encoded messages if you press W m.
+
+** Unread count correct in nnimap groups.
+
+The estimated number of unread articles in the group buffer should now
+be correct for nnimap groups.  This is achieved by calling
+`nnimap-fixup-unread-after-getting-new-news' from the
+`gnus-setup-news-hook' (called on startup) and
+gnus-after-getting-new-news-hook. (called after getting new mail).  If
+you have modified those variables from the default, you may want to
+add n-f-u-a-g-n-n again.  If you were happy with the estimate and want
+to save some (minimal) time when getting new mail, remove the
+function.
+
+** Group Carbon Copy (GCC) quoting
+
+To support groups that contains SPC and other weird characters, groups
+are quoted before they are placed in the Gcc: header.  This means
+variables such as `gnus-message-archive-group' should no longer
+contain quote characters to make groups containing SPC work.  Also, if
+you are using the string "nnml:foo, nnml:bar" (indicating Gcc into two
+groups) you must change it to return the list ("nnml:foo" "nnml:bar"),
+otherwise the Gcc: line will be quoted incorrectly.  Note that
+returning the string "nnml:foo, nnml:bar" was incorrect earlier, it
+just didn't generate any problems since it was inserted directly.
+
+** ~/News/overview/ not used.
+
+As a result of the following change, the ~/News/overview/ directory is
+not used any more.  You can safely delete the entire hierarchy.
+
 ** gnus-agent
 
-The Gnus Agent is now enabled by default.  This means that, e.g.,
-headers are not downloaded from agentized servers by default (agentize
-servers by using `J a' in the server buffer).  Gnus will not start to
-download articles unless you instruct it to do so, though, by using
-e.g. J u or J s from the group buffer.  Revert to the old behaviour
+The Gnus Agent has seen a major updated and is now enabled by default,
+and all nntp and nnimap servers from gnus-select-method and
+gnus-secondary-select-method are agentized by default. Earlier only
+the server in gnus-select-method was agentized by the default, and the
+agent was disabled by default.  When the agent is enabled, headers are
+now also retrieved from the Agent cache instead of the backends when
+possible. Earlier this only happened in the unplugged state.  You can
+enroll or remove servers with `J a' and `J r' in the server buffer.
+Gnus will not download articles into the Agent cache, unless you
+instruct it to do so, though, by using `J u' or `J s' from the Group
+buffer.  You revert to the old behaviour of having the Agent disabled
 with `(setq gnus-agent nil)'.  Note that putting (gnus-agentize) in
 ~/.gnus is not needed any more.
 
@@ -116,7 +160,7 @@ Gnus supports Muttprint natively with O P from the Summary and Article
 buffers.  Also, each individual MIME part can be printed using p on
 the MIME button.
 
-** Message supports the Importance: header.
+** Message supports the Importance: (RFC 2156) header.
 
 In the message buffer, C-c C-f C-i or C-u cycles through the valid values.
 
@@ -183,7 +227,9 @@ variables should change those regexps accordingly. For example:
    ("^han\\>" euc-kr) -> ("\\(^\\|:\\)han\\>" euc-kr)
 
 ** Gnus supports PGP (RFC 1991/2440), PGP/MIME (RFC 2015/3156) and
-S/MIME (RFC 2630-2633).
+** S/MIME (RFC 2630-2633).
+It needs an external S/MIME and OpenPGP implementation, but no additional
+lisp libraries.
 
 ** Gnus inlines external parts (message/external).
 
@@ -191,6 +237,8 @@ S/MIME (RFC 2630-2633).
 
 This change was made to avoid conflict with the standard binding of
 `back-to-indentation', which is also useful in message mode.
+
+** Bug fixes.
 
 
 * Changes in Pterodactyl Gnus (5.8/5.9)

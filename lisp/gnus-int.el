@@ -35,12 +35,16 @@
   :group 'gnus-start
   :type 'hook)
 
-(defvar gnus-server-unopen-status nil
+(defcustom gnus-server-unopen-status nil
   "The default status if the server is not able to open.
 If the server is covered by Gnus agent, the possible values are
 `denied', set the server denied; `offline', set the server offline;
 `nil', ask user.  If the server is not covered by Gnus agent, set the
-server denied.")
+server denied."
+  :group 'gnus-start
+  :type '(choice (const :tag "Ask" nil)
+		 (const :tag "Deny server" denied)
+		 (const :tag "Unplugg Agent" offline)))
 
 ;;;
 ;;; Server Communication
@@ -262,7 +266,7 @@ If it is down, start it up (again)."
 
 (defun gnus-status-message (gnus-command-method)
   "Return the status message from GNUS-COMMAND-METHOD.
-If GNUS-COMMAND-METHOD is a string, it is interpreted as a group name.   The method
+If GNUS-COMMAND-METHOD is a string, it is interpreted as a group name.  The method
 this group uses will be queried."
   (let ((gnus-command-method
 	 (if (stringp gnus-command-method)
@@ -479,9 +483,22 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
     (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
   (when (gnus-check-backend-function
 	 'request-update-info (car gnus-command-method))
-    (funcall (gnus-get-function gnus-command-method 'request-update-info)
-	     (gnus-group-real-name (gnus-info-group info))
-	     info (nth 1 gnus-command-method))))
+    (let ((group (gnus-info-group info)))
+      (and (funcall (gnus-get-function gnus-command-method
+				       'request-update-info)
+		    (gnus-group-real-name group)
+		    info (nth 1 gnus-command-method))
+	   ;; If the minimum article number is greater than 1, then all
+	   ;; smaller article numbers are known not to exist; we'll
+	   ;; artificially add those to the 'read range.
+	   (let* ((active (gnus-active group))
+		  (min (car active)))
+	     (when (> min 1)
+	       (let* ((range (if (= min 2) 1 (cons 1 (1- min))))
+		      (read (gnus-info-read info))
+		      (new-read (gnus-range-add read (list range))))
+		 (gnus-info-set-read info new-read)))
+	     info)))))
 
 (defun gnus-request-expire-articles (articles group &optional force)
   (let* ((gnus-command-method (gnus-find-method-for-group group))

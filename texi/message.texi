@@ -47,7 +47,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002 
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002
      Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -380,9 +380,9 @@ way.  The following variables would come in handy.
 @vindex message-subscribed-addresses
 @item message-subscribed-addresses
 This should be a list of addresses the user is subscribed to.  Its
-default value is @code{nil}.   Example: 
+default value is @code{nil}.   Example:
 @lisp
-(setq message-subscribed-addresses 
+(setq message-subscribed-addresses
       '("ding@@gnus.org" "bing@@noose.org"))
 @end lisp
 
@@ -624,9 +624,11 @@ Move to the signature of the message (@code{message-goto-signature}).
 @item C-a
 @kindex C-a
 @findex message-beginning-of-line
+@vindex message-beginning-of-line
 If at beginning of header value, go to beginning of line, else go to
 beginning of header value.  (The header value comes after the header
-name and the colon.)
+name and the colon.)  This behaviour can be disabled by toggling
+the variable @code{message-beginning-of-line}.
 
 @end table
 
@@ -774,18 +776,27 @@ a multipart tag will be used; if no other parts are present in your
 message a single part tag will be used.  This way, message mode will
 do the Right Thing (TM) with signed/encrypted multipart messages.
 
+@vindex mml-signencrypt-style-alist
 By default, when encrypting a message, Gnus will use the "signencrypt"
 mode.  If you would like to disable this for a particular message,
 give the mml-secure-message-encrypt-* command a prefix argument. (for
 example, C-u C-c C-m c p).  Additionally, by default Gnus will
 separately sign, then encrypt a message which has the mode
-signencrypt.  If you would like to change this behavior use the
-@code{mml-signencrypt-style} function.  For example
+signencrypt.  If you would like to change this behavior you can
+customize the @code{mml-signencrypt-style-alist} variable.  For
+example:
 
-@code{(mml-signencrypt-style "pgpmime" 'combined)}
+
+@lisp
+(setq mml-signencrypt-style-alist '(("smime" combined)
+                                    ("pgp" combined)
+                                    ("pgpmime" combined)))
+@end lisp
 
 Will cause Gnus to sign and encrypt in one pass, thus generating a
-single signed and encrypted part.
+single signed and encrypted part.  Note that combined sign and encrypt
+does not work with all supported OpenPGP implementations (in
+particular, PGP version 2 do not support this).
 
 Since signing and especially encryption often is used when sensitive
 information is sent, you may want to have some way to ensure that your
@@ -960,6 +971,14 @@ Sort headers according to @code{message-header-format-alist}
 Rename the buffer (@code{message-rename-buffer}).  If given a prefix,
 prompt for a new buffer name.
 
+@item TAB
+@kindex TAB
+@findex message-tab
+@vindex message-tab-body-function
+If non-@code{nil} execute the function specified in
+@code{message-tab-body-function}.  Otherwise use the function bound to
+@kbd{TAB} in @code{text-mode-map} or @code{global-map}.
+
 @end table
 
 
@@ -1095,14 +1114,28 @@ look sufficiently similar.
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-If non-@code{nil}, generate all required headers before starting to
-compose the message.
+If @code{t}, generate all required headers before starting to
+compose the message.  This can also be a list of headers to generate:
 
-The variables @code{message-required-mail-headers} and
-@code{message-required-news-headers} specify which headers are required.
+@lisp
+(setq message-generate-headers-first
+      '(References))
+@end lisp
+
+@vindex message-required-headers
+The variables @code{message-required-headers},
+@code{message-required-mail-headers} and
+@code{message-required-news-headers} specify which headers are
+required.
 
 Note that some headers will be removed and re-generated before posting,
 because of the variable @code{message-deletable-headers} (see below).
+
+@item message-draft-headers
+@vindex message-draft-headers
+When running Message from Gnus, the message buffers are associated
+with a draft group.  @code{message-draft-headers} says which headers
+should be generated when a draft is written to the draft group.
 
 @item message-from-style
 @vindex message-from-style
@@ -1171,6 +1204,13 @@ responding to a message:
 A regexp to match the alternative email addresses.  The first matched
 address (not primary one) is used in the @code{From} field.
 
+@item message-allow-no-recipients
+@vindex message-allow-no-recipients
+Specifies what to do when there are no recipients other than
+@code{Gcc} or @code{Fcc}.  If it is @code{always}, the posting is
+allowed.  If it is @code{never}, the posting is not allowed.  If it is
+@code{ask} (the default), you are prompted.
+
 @end table
 
 
@@ -1206,12 +1246,14 @@ buffers that are initialized as mail.
 @findex message-send-mail-with-sendmail
 @findex message-send-mail-with-mh
 @findex message-send-mail-with-qmail
+@findex message-smtpmail-send-it
 @findex smtpmail-send-it
 @findex feedmail-send-it
 Function used to send the current buffer as mail. The default is
 @code{message-send-mail-with-sendmail}. Other valid values include
 @code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
-@code{smtpmail-send-it} and @code{feedmail-send-it}.
+@code{message-smtpmail-send-it}, @code{smtpmail-send-it} and
+@code{feedmail-send-it}.
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1252,7 +1294,7 @@ the problem will actually occur.
 @item message-send-mail-partially-limit
 @vindex message-send-mail-partially-limit
 The limitation of messages sent as message/partial.
-The lower bound of message size in characters, beyond which the message 
+The lower bound of message size in characters, beyond which the message
 should be sent in several parts. If it is nil, the size is unlimited.
 
 @end table
@@ -1563,6 +1605,11 @@ If this variable is @code{nil}, no signature will be inserted at all.
 File containing the signature to be inserted at the end of the buffer.
 The default is @file{~/.signature}.
 
+@item message-signature-insert-empty-line
+@vindex message-signature-insert-empty-line
+If @code{t} (the default value) an empty line is inserted before the
+signature separator.
+
 @end table
 
 Note that RFC1036bis says that a signature should be preceded by the three
@@ -1586,8 +1633,8 @@ that you are silly and have nothing important to say.
 Symbol naming a @sc{mime} charset.  Non-ASCII characters in messages are
 assumed to be encoded using this charset.  The default is @code{nil},
 which means ask the user.  (This variable is used only on non-@sc{mule}
-Emacsen.  
-@xref{Charset Translation, , Charset Translation, emacs-mime, 
+Emacsen.
+@xref{Charset Translation, , Charset Translation, emacs-mime,
       Emacs MIME Manual}, for details on the @sc{mule}-to-@sc{mime}
 translation process.
 

@@ -36,7 +36,7 @@
       'identity)))
 
 (defcustom binhex-decoder-program "hexbin"
-  "*Non-nil value should be a string that names a uu decoder.
+  "*Non-nil value should be a string that names a binhex decoder.
 The program should expect to read binhex data on its standard
 input and write the converted data to its standard output."
   :type 'string
@@ -81,13 +81,16 @@ input and write the converted data to its standard output."
 	((boundp 'temporary-file-directory) temporary-file-directory)
 	("/tmp/")))
 
-(if (featurep 'xemacs)
-    (defalias 'binhex-insert-char 'insert-char)
-  (defun binhex-insert-char (char &optional count ignored buffer)
-    (if (or (null buffer) (eq buffer (current-buffer)))
-	(insert-char char count)
-      (with-current-buffer buffer
-	(insert-char char count)))))
+(eval-and-compile
+  (defalias 'binhex-insert-char
+    (if (featurep 'xemacs)
+	'insert-char
+      (lambda (char &optional count ignored buffer)
+	"Insert COUNT copies of CHARACTER into BUFFER."
+	(if (or (null buffer) (eq buffer (current-buffer)))
+	    (insert-char char count)
+	  (with-current-buffer buffer
+	    (insert-char char count)))))))
 
 (defvar binhex-crc-table
   [0  4129  8258  12387  16516  20645  24774  28903
@@ -245,7 +248,7 @@ If HEADER-ONLY is non-nil only decode header and return filename."
 			 (>= (buffer-size) data-fork-start)))
 		  (progn
 		    (binhex-verify-crc work-buffer
-				       1 data-fork-start)
+				       (point-min) data-fork-start)
 		    (setq header (binhex-header work-buffer))
 		    (if header-only (setq tmp nil counter 0))))
 	      (setq tmp (and tmp (not (eq inputpos end)))))

@@ -1,3 +1,322 @@
+2003-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Line Specification): Addition.
+
+2003-01-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: Fix typos.
+
+2003-01-02  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Troubleshooting): Add.
+
+2003-01-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Buttons): Regexps are case insensitive here.
+
+2003-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Summary Generation Commands): Addition.
+
+2003-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Message Headers): Added example.
+	(Message Headers): Addition.
+
+2002-12-31  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus.texi (Top): Add pointers to related manuals.  Suggested by
+	Reiner Steib.
+
+2002-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Saving Articles): Addition.
+
+2002-12-30  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Blackholes): added information on query-dig and
+	dig.el; users are told that using blackhole checks is OK now
+
+2002-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Loose Threads): add
+	gnus-summary-make-false-root-always. 
+	(Finding the Parent): Change name of nnweb server.
+
+2002-12-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi: Fix typos.  Index variables.  Add
+	mm-automatic-external-display, mm-w3m-safe-url-regexp and
+	mm-external-terminal-program.
+
+2002-12-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi (Message Headers): Add message-allow-no-recipients.
+	(Various Commands): Add TAB and message-tab-body-function.
+
+2002-12-19  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus.texi (Optional Back End Functions):
+	nnchoke-request-update-info need not return the info object.
+	
+2002-12-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnusref.tex: Additions.
+
+2002-12-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Mail): Explain nil value of gnus-uu-digest-headers.
+
+2002-12-10  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus.texi (Posting Styles): Clarify the `(header MATCH REGEXP)'
+	case.
+	(Back End Interface): Mention nnnotbackends.  Suggested by Jan
+	Rychter.
+
+2002-11-29  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus.texi (MIME Commands): Document gnus-inhibit-mime-unbuttonizing.
+
+2002-11-27  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Expiring in IMAP): backend -> back end.
+	(Wide Characters): The default value of
+	gnus-use-correct-string-widths under Emacs is nil.
+	(Filtering Spam Using spam.el): backend -> back end.
+	(Extending spam.el): backend -> back end.
+	(Filtering Spam Using Statistics (spam-stat.el)): Fix typo.
+	(Creating a spam-stat dictionary): Fix typo.
+	(Creating a spam-stat dictionary): backend -> back end.
+
+2002-11-22  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Extending spam.el): fixed typos and wrong @items
+
+2002-11-21  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi:
+	added new keyboard commands
+
+	* gnus.texi: added extended section on spam
+
+2002-11-18  jas
+
+	* gnus.texi: Fix IMAP expiring typos.
+
+2002-11-18  kaig
+
+	* gnus.texi: *** empty log message ***
+
+2002-11-18  jas
+
+	* gnus.texi: More morse.
+
+	* gnus.texi (Article Washing): Add morse.
+
+2002-11-17  jas
+
+	* gnus.texi: Fix typo.
+
+	* gnus.texi (Expiring in IMAP): Add.
+	(Group Parameters): Add reference.
+
+2002-11-16  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus.texi (Expiring Mail): Give summary on difference between
+	auto-expire and total-expire and provide information for choosing
+	between them.
+
+2002-11-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Article Washing): Add morse.
+
+2002-11-17  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Expiring in IMAP): Add.
+	(Group Parameters): Add reference.
+
+2002-10-24  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (RSS): Add gnus-summary-mark-as-read-forward into the
+	example code. From Christoph Conrad <christoph.conrad@gmx.de>.
+
+2002-10-17  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Other Marks): Document gnus-downloadable-mark and
+	gnus-undownloaded-mark.  Adapted idea from Sriram Karra
+	<karra@shakti.homelinux.net>.
+	(Formatting Fonts): Say that guillemets are wrong.  (How to enter
+	guillemets in Texinfo files?)
+
+2002-10-12  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Movement): Add.
+
+2002-10-11  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Formatting Fonts): Fix for balloon help in GNU Emacs.
+
+2002-10-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Delayed Articles): Fix gnus-delay-initialize.
+
+2002-10-10  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Security): Fix.
+
+2002-10-04  Simon Josefsson  <jas@extundo.com>
+
+	* pgg.texi: Document sign parameter.
+
+	* gnus.texi: Add \gnuskey tex command.
+
+	* texi2latex.el (latexi-translate-file): Do PGG.  (Poor) support
+	of @set, @deffn, @defvar, @defun, @key.  Improve error.
+
+	* Makefile.in: Add PGG.
+
+	* pgg.texi: New file.
+
+2002-10-03  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Group Information): Mention prefix argument for
+	gnus-group-fetch-charter and gnus-group-fetch-control.
+	From Jesper Harder.
+
+2002-09-26  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Agent Variables): Add.
+
+2002-09-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Troubleshooting): Add.
+
+2002-09-23  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Maneuvering): Fix gnus-auto-select-next.
+
+2002-09-19  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (X-Face): Add GIF.
+
+2002-09-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (A note on namespaces): New.
+
+2002-09-16  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Splitting Mail): "By default, splitting is performed
+	on all incoming messages."  This sentence had a "not" too many.
+	Explicitly say that `nnmail-resplit-incoming' has effect only for
+	`directory' mail-sources entries.
+
+2002-09-15  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Mail Source Specifiers): Say "one-to-one
+	correspondence" in the description of `directory'.
+
+2002-09-11  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Top, Summary Buffer): Add info to "Delayed Articles"
+	menu line.
+
+2002-09-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Article Hiding): Add a document for
+	gnus-article-address-banner-alist.
+
+2002-09-11  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Splitting in IMAP): Fix.
+
+2002-09-10  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Other Marks): Fix.
+
+2002-09-09  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Splitting Mail): Typo.
+	(Comparing Mail Back Ends): Say "back end" instead of "backend".
+	(Terminology): Try to explain "back end" better.
+
+2002-09-09  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Article Buttons): Add.
+
+2002-09-09  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Splitting Mail): Document nnmail-resplit-incoming,
+	xref to Mail Source Specifiers.
+	(Mail Source Specifiers): Add index entry for
+	nnmail-scan-directory-mail-source-once.  Add index entry for
+	nnmail-resplit-incoming, with xref to Splitting Mail.
+
+2002-09-06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Browse Foreign Server): Addition.
+	(Limiting): Addition.articles
+
+2002-09-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Source Specifiers): Fix.
+
+2002-09-03  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Direct Functions, Common Variables): Named ports like
+	"snews" doesn't work with some external tools.  Thanks to
+	"D. Watson" <djwatson@u.washington.edu> for noting this.
+
+2002-09-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Gnus Unplugged): Fix, agent is now enabled by default.
+	(Agent as Cache): New.
+
+2002-08-26  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Information): Add gnus-group-fetch-charter and
+	gnus-group-fetch-control.
+
+2002-08-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Posting Server): Document message-smtpmail-send-it.
+
+	* message.texi (Mail Variables): Add message-smtpmail-send-it.
+
+2002-08-27  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Source Specifiers): Fix :path default.
+
+2002-08-22  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Mail Commands): Add
+	gnus-summary-reply-broken-reply-to and
+	gnus-summary-reply-broken-reply-to-with-original.
+	(Setting Process Marks): Add gnus-uu-unmark-region
+	(Article Header): Fix typo.
+	(MIME Commands): Fix typo.
+	(MIME Commands): Index gnus-article-decode-mime-words,
+	gnus-article-decode-charset and gnus-mime-view-all-parts.
+
+2002-08-20  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Mail Source Specifiers): Mention variable
+	nnmail-resplit-incoming under `directory' specifier.
+
+2002-08-18  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Summary Buffer Lines): Document the %k specifier.
+
+2002-08-15  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Line Specification): Add %C.
+	(Group Parameters): Comments can be displayed in the group line.
+
+2002-08-07  Jesper harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Non-MIME): Add yenc.
+	(yenc): New node.
+
 2002-08-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Summary Sorting): Document randomization.
@@ -127,7 +446,7 @@
 2002-05-01  Lars Magne Ingebrigtsen  <larsi@quimbies.gnus.org>
 
 	* message.texi (Message Headers): Remove colon from index
-	entries. 
+	entries.
 
 2002-05-01  Simon Josefsson  <jas@extundo.com>
 

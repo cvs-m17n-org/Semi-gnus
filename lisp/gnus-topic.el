@@ -62,7 +62,7 @@ with some simple extensions.
 %A  Number of unread articles in the groups in the topic and its subtopics.
 
 General format specifiers can also be used.
-See (gnus)Formatting Variables."
+See Info node `(gnus)Formatting Variables'."
   :link '(custom-manual "(gnus)Formatting Variables")
   :type 'string
   :group 'gnus-topic)
@@ -696,7 +696,8 @@ articles in the topic and its subtopics."
 	 (unfound t)
 	 entry)
     ;; Try to jump to a visible group.
-    (while (and g (not (gnus-group-goto-group (car g) t)))
+    (while (and g
+		(not (gnus-group-goto-group (car g) t)))
       (pop g))
     ;; It wasn't visible, so we try to see where to insert it.
     (when (not g)
@@ -708,20 +709,31 @@ articles in the topic and its subtopics."
       (when (and unfound
 		 topic
 		 (not (gnus-topic-goto-missing-topic topic)))
-	(let* ((top (gnus-topic-find-topology topic))
-	       (children (cddr top))
-	       (type (cadr top))
-	       (unread 0)
-	       (entries (gnus-topic-find-groups
-			 (car type) (car gnus-group-list-mode)
-			 (cdr gnus-group-list-mode))))
-	  (while children
-	    (incf unread (gnus-topic-unread (caar (pop children)))))
-	  (while (setq entry (pop entries))
-	    (when (numberp (car entry))
-	      (incf unread (car entry))))
-	  (gnus-topic-insert-topic-line
-	   topic t t (car (gnus-topic-find-topology topic)) nil unread))))))
+	(gnus-topic-display-missing-topic topic)))))
+
+(defun gnus-topic-display-missing-topic (topic)
+  "Insert topic lines recursively for missing topics."
+  (let ((parent (gnus-topic-find-topology
+		 (gnus-topic-parent-topic topic))))
+    (when (and parent
+	       (not (gnus-topic-goto-missing-topic (caadr parent))))
+      (gnus-topic-display-missing-topic (caadr parent))))
+  (gnus-topic-goto-missing-topic topic)
+  (let* ((top (gnus-topic-find-topology topic))
+	 (children (cddr top))
+	 (type (cadr top))
+	 (unread 0)
+	 (entries (gnus-topic-find-groups
+		   (car type) (car gnus-group-list-mode)
+		   (cdr gnus-group-list-mode)))
+	entry)
+    (while children
+      (incf unread (gnus-topic-unread (caar (pop children)))))
+    (while (setq entry (pop entries))
+      (when (numberp (car entry))
+	(incf unread (car entry))))
+    (gnus-topic-insert-topic-line
+     topic t t (car (gnus-topic-find-topology topic)) nil unread)))
 
 (defun gnus-topic-goto-missing-topic (topic)
   (if (gnus-topic-goto-topic topic)
@@ -1087,18 +1099,18 @@ articles in the topic and its subtopics."
      '("Topics"
        ["Toggle topics" gnus-topic-mode t]
        ("Groups"
-	["Copy" gnus-topic-copy-group t]
-	["Move" gnus-topic-move-group t]
+	["Copy..." gnus-topic-copy-group t]
+	["Move..." gnus-topic-move-group t]
 	["Remove" gnus-topic-remove-group t]
-	["Copy matching" gnus-topic-copy-matching t]
+	["Copy matching..." gnus-topic-copy-matching t]
 	["Move matching" gnus-topic-move-matching t])
        ("Topics"
-	["Goto" gnus-topic-jump-to-topic t]
+	["Goto..." gnus-topic-jump-to-topic t]
 	["Show" gnus-topic-show-topic t]
 	["Hide" gnus-topic-hide-topic t]
 	["Delete" gnus-topic-delete t]
-	["Rename" gnus-topic-rename t]
-	["Create" gnus-topic-create-topic t]
+	["Rename..." gnus-topic-rename t]
+	["Create..." gnus-topic-create-topic t]
 	["Mark" gnus-topic-mark-topic t]
 	["Indent" gnus-topic-indent t]
 	["Sort" gnus-topic-sort-topics t]
@@ -1684,7 +1696,7 @@ If REVERSE, sort in reverse order."
   top)
 
 (defun gnus-topic-sort-topics (&optional topic reverse)
-  "Sort topics in TOPIC alphabeticaly by topic name.
+  "Sort topics in TOPIC alphabetically by topic name.
 If REVERSE, reverse the sorting order."
   (interactive
    (list (completing-read "Sort topics in : " gnus-topic-alist nil t
