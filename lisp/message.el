@@ -2280,7 +2280,7 @@ the user from the mailer."
 	(eval (car actions)))))
     (pop actions)))
 
-(defun message-maybe-split-and-send-mail ()
+(defsubst message-maybe-split-and-send-mail ()
   "Split a message if necessary, and send it via mail.
 Returns nil if sending succeeded, returns any string if sending failed.
 This sub function is for exclusive use of `message-send-mail'."
@@ -2520,7 +2520,7 @@ to find out how to use this."
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
 
-(defun message-maybe-split-and-send-news ()
+(defsubst message-maybe-split-and-send-news ()
   "Split a message if necessary, and send it via news.
 Returns nil if sending succeeded, returns t if sending failed.
 This sub function is for exclusive use of `message-send-news'."
