@@ -1423,6 +1423,13 @@ qmail-inject プログラムに渡す引数です。これは文字列のリストで、それぞれ
 非-@code{nil} で sendmail のコマンド行に @samp{-f username} を付加しませ
 ん。そうすることは、付加しないより邪悪ですらあるでしょう。
 
+@item message-sendmail-envelope-from
+@vindex message-sendmail-envelope-from
+@code{message-sendmail-f-is-evil} が @code{nil} のとき、これで SMTP エン
+ベロープで使うアドレスを指定します。@code{nil} だった
+ら @code{user-mail-address} を使います。シンボル @code{header} だったら、
+メッセージの @samp{From} ヘッダーを使います。
+
 @item message-mailer-swallows-blank-line
 @vindex message-mailer-swallows-blank-line
 システムのメイラーがヘッダーと本文を一緒にしてしまう場合は、
