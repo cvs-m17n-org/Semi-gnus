@@ -59,12 +59,6 @@
   (require 'mml))
 
 (require 'rfc822)
-(eval-and-compile
-  (autoload 'gnus-find-method-for-group "gnus")
-  (autoload 'nnvirtual-find-group-art "nnvirtual")
-  (autoload 'gnus-group-decoded-name "gnus-group"))
-(eval-when-compile
-  (autoload 'sha1 "sha1-el"))
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -1739,28 +1733,35 @@ no, only reply back to the author."
   :type 'regexp)
 
 (eval-and-compile
-  (autoload 'message-setup-toolbar "messagexmas")
-  (autoload 'mh-new-draft-name "mh-comp")
-  (autoload 'mh-send-letter "mh-comp")
-  (autoload 'gnus-output-to-rmail "gnus-util")
-  (autoload 'gnus-output-to-mail "gnus-util")
-  (autoload 'nndraft-request-associate-buffer "nndraft")
-  (autoload 'nndraft-request-expire-articles "nndraft")
-  (autoload 'gnus-open-server "gnus-int")
-  (autoload 'gnus-request-post "gnus-int")
-  (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
-  (autoload 'gnus-server-string "gnus")
+  (autoload 'gnus-delay-article "gnus-delay")
+  (autoload 'gnus-extract-address-components "gnus-util")
+  (autoload 'gnus-find-method-for-group "gnus")
+  (autoload 'gnus-group-decoded-name "gnus-group")
   (autoload 'gnus-group-name-charset "gnus-group")
   (autoload 'gnus-group-name-decode "gnus-group")
   (autoload 'gnus-groups-from-server "gnus")
-  (autoload 'rmail-output "rmailout")
-  (autoload 'gnus-delay-article "gnus-delay")
   (autoload 'gnus-make-local-hook "gnus-util")
-  (autoload 'gnus-extract-address-components "gnus-util"))
+  (autoload 'gnus-open-server "gnus-int")
+  (autoload 'gnus-output-to-mail "gnus-util")
+  (autoload 'gnus-output-to-rmail "gnus-util")
+  (autoload 'gnus-request-post "gnus-int")
+  (autoload 'gnus-server-string "gnus")
+  (autoload 'idna-to-ascii "idna")
+  (autoload 'message-setup-toolbar "messagexmas")
+  (autoload 'mh-new-draft-name "mh-comp")
+  (autoload 'mh-send-letter "mh-comp")
+  (autoload 'mu-cite-original "mu-cite")
+  (autoload 'nndraft-request-associate-buffer "nndraft")
+  (autoload 'nndraft-request-expire-articles "nndraft")
+  (autoload 'nnvirtual-find-group-art "nnvirtual")
+  (autoload 'rmail-dont-reply-to "mail-utils")
+  (autoload 'rmail-msg-is-pruned "rmail")
+  (autoload 'rmail-msg-restore-non-pruned-header "rmail")
+  (autoload 'rmail-output "rmailout"))
 
-(eval-and-compile
-  (autoload 'mu-cite-original "mu-cite"))
+(eval-when-compile
+  (autoload 'sha1 "sha1-el"))
 
 
 
@@ -5494,8 +5495,6 @@ I.e., calling it on a Subject: header is useless."
 	  (incf paren))
 	(and (= (% dquote 2) 1) (= (% paren 2) 1))))))
 
-(autoload 'idna-to-ascii "idna")
-
 (defun message-idna-to-ascii-rhs-1 (header)
   "Interactively potentially IDNA encode domain names in HEADER."
   (let (rhs ace start startpos endpos ovl)
@@ -6986,8 +6985,6 @@ Optional NEWS will use news to forward instead of mail."
 (defun message-forward-rmail-make-body (forward-buffer)
   (save-window-excursion
     (set-buffer forward-buffer)
-    ;; Rmail doesn't have rmail-msg-restore-non-pruned-header in Emacs
-    ;; 20.  FIXIT, or we drop support for rmail in Emacs 20.
     (if (rmail-msg-is-pruned)
 	(rmail-msg-restore-non-pruned-header)))
   (message-forward-make-body forward-buffer))

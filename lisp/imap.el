@@ -1,5 +1,5 @@
 ;;; imap.el --- imap library
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
@@ -150,7 +150,6 @@
   (autoload 'digest-md5-digest-uri "digest-md5")
   (autoload 'digest-md5-challenge "digest-md5")
   (autoload 'rfc2104-hash "rfc2104")
-  (autoload 'md5 "md5")
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
