@@ -508,7 +508,7 @@ and respond with new To and Cc headers."
   :group 'message-interface
   :type '(choice function (const nil)))
 
-(defcustom message-use-followup-to t
+(defcustom message-use-followup-to 'ask
   "*Specifies what to do with Followup-To header.
 If nil, always ignore the header.  If it is t, use its value, but
 query before using the \"poster\" value.  If it is the symbol `ask',
@@ -533,17 +533,6 @@ the value.  If it is the symbol `use', always use the value."
 		 (const :tag "always" use)
 		 (const :tag "ask" ask)))
 
-(defcustom message-use-mail-followup-to 'ask
-  "*Specifies what to do with Mail-Followup-To header.
-If nil, always ignore the header.  If it is the symbol `ask', always
-query the user whether to use the value.  If it is t or the symbol
-`use', always use the value."
-  :group 'message-interface
-  :type '(choice (const :tag "ignore" nil)
-		 (const :tag "maybe" t)
-		 (const :tag "always" use)
-		 (const :tag "ask" ask)))
-
 ;;; XXX: 'ask and 'use are not implemented yet.
 (defcustom message-use-mail-reply-to 'ask
   "*Specifies what to do with Mail-Reply-To/Reply-To header.
@@ -551,6 +540,17 @@ If nil, always ignore the header.  If it is t or the symbol `use', use
 its value.  If it is the symbol `ask', always query the user whether to
 use the value.  Note that if \"Reply-To\" is marked as \"broken\", its value
 is never used."
+  :group 'message-interface
+  :type '(choice (const :tag "ignore" nil)
+		 (const :tag "maybe" t)
+		 (const :tag "always" use)
+		 (const :tag "ask" ask)))
+
+(defcustom message-use-mail-followup-to t
+  "*Specifies what to do with Mail-Followup-To header.
+If nil, always ignore the header.  If it is the symbol `ask', always
+query the user whether to use the value.  If it is t or the symbol
+`use', always use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
 		 (const :tag "maybe" t)
@@ -4860,8 +4860,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	  mrt (when message-use-mail-reply-to
 		(message-fetch-field "mail-reply-to"))
 	  mft (when (and (not (or to-address mrt reply-to))
-			 (or message-use-followup-to
-			     message-use-mail-followup-to))
+			 message-use-mail-followup-to)
 		(message-fetch-field "mail-followup-to")))
 
     ;; Handle special values of Mail-Copies-To.
@@ -4902,8 +4901,7 @@ sends a copy of your response to " (if (string-match "," mct)
 
     ;; Handle Mail-Followup-To.
     (when (and mft
-	       (eq (or message-use-followup-to
-		       message-use-mail-followup-to) 'ask)
+	       (eq message-use-mail-followup-to 'ask)
 	       (not (message-y-or-n-p
 		     (concat "Obey Mail-Followup-To: " mft "? ") t "\
 You should normally obey the Mail-Followup-To: header.
@@ -4933,9 +4931,8 @@ that further discussion should take place only in "
 	(save-excursion
 	  (message-set-work-buffer)
 	  (if (and mft
-		   message-use-followup-to
 		   wide
-		   (or (not (eq message-use-followup-to 'ask))
+		   (or (not (eq message-use-mail-followup-to 'ask))
 		       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
 You should normally obey the Mail-Followup-To: header.  In this
 article, it has the value of
@@ -4946,8 +4943,12 @@ which directs your response to " (if (string-match "," mft)
 				     "the specified addresses"
 				   "that address only") ".
 
-If a message is posted to several mailing lists, Mail-Followup-To is
-often used to direct the following discussion to one list only,
+Most commonly, Mail-Followup-To is used by a mailing list poster to
+express that responses should be sent to just the list, and not the
+poster as well.
+
+If a message is posted to several mailing lists, Mail-Followup-To may
+also be used to direct the following discussion to one list only,
 because discussions that are spread over several lists tend to be
 fragmented and very difficult to follow.
 
@@ -5095,8 +5096,7 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
 	    distribution (message-fetch-field "distribution")
 	    mct (when message-use-mail-copies-to
 		  (message-fetch-field "mail-copies-to"))
-	    mft (when (or message-use-followup-to
-			  message-use-mail-followup-to)
+	    mft (when message-use-mail-followup-to
 		  (message-fetch-field "mail-followup-to")))
       (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
 		 (string-match "<[^>]+>" gnus-warning))
@@ -5183,8 +5183,7 @@ responses here are directed to other newsgroups."))
 	    (setq follow-to (list (cons 'Newsgroups newsgroups)))))))
        ;; Handle Mail-Followup-To, followup via e-mail.
        ((and mft
-	     (or (not (eq (or message-use-followup-to
-			      message-use-mail-followup-to) 'ask))
+	     (or (not (eq message-use-mail-followup-to 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Followup-To: " mft "? ") t "\
 You should normally obey the Mail-Followup-To: header.

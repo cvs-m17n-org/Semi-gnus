@@ -1,3 +1,7 @@
+2001-07-04  Yair Friedman  <yairfr@Amdocs.com>
+
+	* make.bat: Use infohack.el to create info files.
+
 2001-07-09  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
 	* README.semi: Modify URI of emacs-w3m.
@@ -5,10 +9,10 @@
 	* Mule23@1934.en: Ditto.
 	* Mule23@1934.ja: Ditto.
 	* lisp/nnshimbun.el: Ditto.
-	
+
 	* texi/gnus-ja.texi (Top, Article Treatment): Fix typo.
 	(Web Newspaper): Modify URI of emacs-w3m.
-	
+
 2001-07-06  KITAGAWA Takurou  <i30x1641@ip.media.kyoto-u.ac.jp>
 
 	* lisp/Makefile.in (clever): Use `if test... then' instead of

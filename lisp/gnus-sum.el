@@ -5219,7 +5219,7 @@ Return a list of headers that match SEQUENCE (see
 	   (nreverse headers)
 	   ;;;!!! FIXME: temporary fix for an infloop on nnimap.
 	   (if (eq 'nnimap (car (gnus-find-method-for-group group)))
-	       (when (gnus-retrieve-headers sequence group)
+	       (when (eq (gnus-retrieve-headers sequence group) 'headers)
 		 (gnus-get-newsgroup-headers))
 	     (gnus-retrieve-parsed-headers sequence group))))))))
 
