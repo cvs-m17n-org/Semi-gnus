@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.7 1999-09-12 05:02:43 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.8 1999-10-06 16:02:53 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -663,7 +663,9 @@ mail source specifier とか上記のようなキーワードについてもっとよく
   (widget-create 'info-link
 		 :help-echo (gnus-ofsetup-get-message 'customize-6)
 		 :tag "<Info> mail sources"
-		 "(gnus)Mail Sources")
+		 (if (string-match "^ja" gnus-offline-lang)
+		     "(gnus-ja)Mail Sources"
+		   "(gnus)Mail Sources"))
 
   (use-local-map widget-keymap)
   (local-set-key "q" 'bury-buffer)
