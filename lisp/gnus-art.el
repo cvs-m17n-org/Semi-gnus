@@ -35,7 +35,10 @@
 
 (require 'path-util)
 (require 'gnus)
-(require 'gnus-sum)
+;; Avoid the "Recursive load suspected" error in Emacs 21.1.
+(eval-and-compile
+  (let ((recursive-load-depth-limit 100))
+    (require 'gnus-sum)))
 (require 'gnus-spec)
 (require 'gnus-int)
 (require 'gnus-win)
