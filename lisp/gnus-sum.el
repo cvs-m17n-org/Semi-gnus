@@ -791,7 +791,8 @@ which it may alter in any way.")
   :group 'gnus-summary
   :type '(repeat symbol))
 
-(defcustom gnus-ignored-from-addresses (regexp-quote user-mail-address)
+(defcustom gnus-ignored-from-addresses
+  (and user-mail-address (regexp-quote user-mail-address))
   "*Regexp of From headers that may be suppressed in favor of To headers."
   :group 'gnus-summary
   :type 'regexp)
@@ -1785,6 +1786,7 @@ increase the score of each group you read."
 		     ("article body" "body" string)
 		     ("article head" "head" string)
 		     ("xref" "xref" string)
+		     ("extra header" "extra" string)
 		     ("lines" "lines" number)
 		     ("followups to author" "followup" string)))
 	  (types '((number ("less than" <)
@@ -2351,7 +2353,7 @@ marks of articles."
 (defun gnus-summary-last-article-p (&optional article)
   "Return whether ARTICLE is the last article in the buffer."
   (if (not (setq article (or article (gnus-summary-article-number))))
-      t		; All non-existent numbers are the last article.  :-)
+      t					; All non-existent numbers are the last article.  :-)
     (not (cdr (gnus-data-find-list article)))))
 
 (defun gnus-make-thread-indent-array ()
@@ -2576,7 +2578,7 @@ If NO-DISPLAY, don't generate a summary buffer."
 				   kill-buffer no-display
 				   select-articles)
 				  (setq show-all nil
-				   select-articles nil)))))
+					select-articles nil)))))
 		(eq gnus-auto-select-next 'quietly))
       (set-buffer gnus-group-buffer)
       ;; The entry function called above goes to the next
@@ -4171,7 +4173,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
   (let ((types gnus-article-mark-lists)
 	(info (gnus-get-info gnus-newsgroup-name))
 	(uncompressed '(score bookmark killed))
-       type list newmarked symbol delta-marks)
+	type list newmarked symbol delta-marks)
     (when info
       ;; Add all marks lists that are non-nil to the list of marks lists.
       (while (setq type (pop types))
@@ -4602,6 +4604,9 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 	number headers header)
     (save-excursion
       (set-buffer nntp-server-buffer)
+      (goto-char (point-min))
+      (while (search-forward "\r" nil t)
+	(replace-match " " t t))
       ;; Allow the user to mangle the headers before parsing them.
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (goto-char (point-min))
@@ -4670,14 +4675,14 @@ the subject line on."
   (let* ((line (and (numberp old-header) old-header))
 	 (old-header (and (vectorp old-header) old-header))
 	 (header (cond ((and old-header use-old-header)
-		       old-header)
-		      ((and (numberp id)
-			    (gnus-number-to-header id))
-		       (gnus-number-to-header id))
-		      (t
-		       (gnus-read-header id))))
-	(number (and (numberp id) id))
-	d)
+			old-header)
+		       ((and (numberp id)
+			     (gnus-number-to-header id))
+			(gnus-number-to-header id))
+		       (t
+			(gnus-read-header id))))
+	 (number (and (numberp id) id))
+	 d)
     (when header
       ;; Rebuild the thread that this article is part of and go to the
       ;; article we have fetched.
@@ -5917,9 +5922,9 @@ Return nil if there are no articles."
   (interactive)
   (prog1
       (when (gnus-summary-first-subject)
-      (gnus-summary-show-thread)
-      (gnus-summary-first-subject)
-      (gnus-summary-display-article (gnus-summary-article-number)))
+	(gnus-summary-show-thread)
+	(gnus-summary-first-subject)
+	(gnus-summary-display-article (gnus-summary-article-number)))
     (gnus-summary-position-point)))
 
 (defun gnus-summary-best-unread-article ()
@@ -6703,6 +6708,7 @@ Optional argument BACKWARD means do search for backward.
   ;; We have to require this here to make sure that the following
   ;; dynamic binding isn't shadowed by autoloading.
   (require 'gnus-async)
+  (require 'gnus-art)
   (let ((gnus-select-article-hook nil)	;Disable hook.
 	(gnus-article-display-hook nil)
 	(gnus-mark-article-hook nil)	;Inhibit marking as read.
@@ -9029,7 +9035,7 @@ save those articles instead."
 	(push (cons prev (cdr active)) read))
       (setq read (if (> (length read) 1) (nreverse read) read))
       (if compute
-         read
+	  read
 	(save-excursion
 	  (set-buffer gnus-group-buffer)
 	  (gnus-undo-register
@@ -9039,7 +9045,7 @@ save those articles instead."
 	       (gnus-get-unread-articles-in-group ',info (gnus-active ,group))
 	       (gnus-group-update-group ,group t))))
 	;; Enter this list into the group info.
-       (gnus-info-set-read info read)
+	(gnus-info-set-read info read)
 	;; Set the number of unread articles in gnus-newsrc-hashtb.
 	(gnus-get-unread-articles-in-group info (gnus-active group))
 	t))))
