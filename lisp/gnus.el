@@ -2029,6 +2029,7 @@ spam-autodetect-recheck-messages is set.")
      (const default)
      (set :tag "Use specific methods"
 	  (variable-item spam-use-blacklist)
+	  (variable-item spam-use-gmane-xref)
 	  (variable-item spam-use-regex-headers)
 	  (variable-item spam-use-regex-body)
 	  (variable-item spam-use-whitelist)
@@ -2062,6 +2063,7 @@ set."
        (const default)
        (set :tag "Use specific methods"
 	(variable-item spam-use-blacklist)
+	(variable-item spam-use-gmane-xref)
 	(variable-item spam-use-regex-headers)
 	(variable-item spam-use-regex-body)
 	(variable-item spam-use-whitelist)
