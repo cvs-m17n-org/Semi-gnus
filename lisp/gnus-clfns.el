@@ -291,7 +291,7 @@ not be reported."
 		       (push fn fns)))
 		(when (and (consp form)
 			   (condition-case nil
-			       ;; Ignore a case `(a b .c)'.
+			       ;; Ignore a case `(a b . c)'.
 			       (length form)
 			     (error nil)))
 		  (setq forms (append (delq nil
