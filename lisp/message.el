@@ -593,12 +593,19 @@ Otherwise, directly inline the old message in the forwarded message."
   :group 'message-forwarding
   :type 'boolean)
 
-(defcustom message-forward-show-mml nil
-  "*Non-nil means show forwarded messages as mml.
-Otherwise, forwarded messages are unchanged."
+(defcustom message-forward-show-mml 'best
+  "*Non-nil means show forwarded messages as MML (decoded from MIME).
+Otherwise, forwarded messages are unchanged.
+Can also be the symbol `best' to indicate that MML should be
+used, except when it is a bad idea to use MML.  One example where
+it is a bad idea is when forwarding a signed or encrypted
+message, because converting MIME to MML would invalidate the
+digital signature."
   :version "21.1"
   :group 'message-forwarding
-  :type 'boolean)
+  :type '(choice (const :tag "use MML" t)
+		 (const :tag "don't use MML " nil)
+		 (const :tag "use MML when appropriate" best)))
 
 (defcustom message-forward-before-signature t
   "*Non-nil means put forwarded message before signature, else after."
@@ -6719,6 +6726,95 @@ Optional NEWS will use news to forward instead of mail."
       (message-mail nil subject))
     (message-forward-make-body cur)))
 
+(defun message-forward-make-body-plain (forward-buffer)
+  (insert
+   "\n-------------------- Start of forwarded message --------------------\n")
+  (let ((b (point)) e)
+    (save-restriction
+      (narrow-to-region (point) (point))
+      (mml-insert-buffer forward-buffer)
+      (goto-char (point-min))
+      (when (looking-at "From ")
+	(replace-match "X-From-Line: "))
+      (goto-char (point-max)))
+    (setq e (point))
+    (insert
+     "\n-------------------- End of forwarded message --------------------\n")))
+
+(defun message-forward-make-body-mime (forward-buffer)
+  (insert "\n\n<#part type=message/rfc822 disposition=inline raw=t>\n")
+  (let ((b (point)) e)
+    (save-restriction
+      (narrow-to-region (point) (point))
+      (mml-insert-buffer forward-buffer)
+      (goto-char (point-min))
+      (when (looking-at "From ")
+	(replace-match "X-From-Line: "))
+      (goto-char (point-max)))
+    (setq e (point))
+    (insert "<#/part>\n")))
+
+(defun message-forward-make-body-mml (forward-buffer)
+  (insert "\n\n<#mml type=message/rfc822 disposition=inline>\n")
+  (let ((b (point)) e)
+    (if (not message-forward-decoded-p)
+	(insert
+	 (with-temp-buffer
+	   (mm-disable-multibyte)
+	   (insert
+	    (with-current-buffer forward-buffer
+	      (mm-with-unibyte-current-buffer (buffer-string))))
+	   (mm-enable-multibyte)
+	   (mime-to-mml)
+	   (goto-char (point-min))
+	   (when (looking-at "From ")
+	     (replace-match "X-From-Line: "))
+	   (buffer-string)))
+      (save-restriction
+	(narrow-to-region (point) (point))
+	(mml-insert-buffer forward-buffer)
+	(goto-char (point-min))
+	(when (looking-at "From ")
+	  (replace-match "X-From-Line: "))
+	(goto-char (point-max))))
+    (setq e (point))
+    (insert "<#/mml>\n")
+    (when (and (not current-prefix-arg)
+	       message-forward-ignored-headers)
+      (save-restriction
+	(narrow-to-region b e)
+	(goto-char b)
+	(narrow-to-region (point)
+			  (or (search-forward "\n\n" nil t) (point)))
+	(message-remove-header message-forward-ignored-headers t)))))
+
+(defun message-forward-make-body-digest-plain (forward-buffer)
+  (insert
+   "\n-------------------- Start of forwarded message --------------------\n")
+  (let ((b (point)) e)
+    (mml-insert-buffer forward-buffer)
+    (setq e (point))
+    (insert
+     "\n-------------------- End of forwarded message --------------------\n")))
+
+(defun message-forward-make-body-digest-mime (forward-buffer)
+  (insert "\n<#multipart type=digest>\n")
+  (let ((b (point)) e)
+    (insert-buffer-substring forward-buffer)
+    (setq e (point))
+    (insert "<#/multipart>\n")
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char b)
+      (narrow-to-region (point)
+			(or (search-forward "\n\n" nil t) (point)))
+      (delete-region (point-min) (point-max)))))
+
+(defun message-forward-make-body-digest (forward-buffer)
+  (if message-forward-as-mime
+      (message-forward-make-body-digest-mime forward-buffer)
+    (message-forward-make-body-digest-plain forward-buffer)))
+
 ;;;###autoload
 (defun message-forward-make-body (forward-buffer)
   ;; Put point where we want it before inserting the forwarded
@@ -6788,7 +6884,7 @@ Optional NEWS will use news to forward instead of mail."
 	    message-setup-hook)
 	(message-setup `((To . ,address))))
       ;; Insert our usual headers.
-      (message-generate-headers '(From Date To))
+      (message-generate-headers '(From Date To Message-ID))
       (message-narrow-to-headers)
       ;; Remove X-Draft-From header etc.
       (message-remove-header message-ignored-mail-headers t)

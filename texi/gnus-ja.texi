@@ -53,6 +53,8 @@
 
 \newcommand{\gnustt}[1]{{\gnusselectttfont{}#1}}
 \newcommand{\gnuscode}[1]{\gnustt{#1}}
+\newcommand{\gnusasis}[1]{\gnustt{#1}}
+\newcommand{\gnusurl}[1]{\gnustt{#1}}
 \newcommand{\gnuscommand}[1]{\gnustt{#1}}
 \newcommand{\gnusenv}[1]{\gnustt{#1}}
 \newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\gnusselectttfont{}#1}''}
@@ -150,6 +152,11 @@
 }
 
 \newenvironment{codelist}%
+{\begin{list}{}{
+}
+}{\end{list}}
+
+\newenvironment{asislist}%
 {\begin{list}{}{
 }
 }{\end{list}}
@@ -13291,31 +13298,32 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 たーくさんのメーリングリストを購読しているけれど、手でメール分割規則を維
 持したくないときは、グループメール分割というものがあなたのためにあります。
 グループパラメータかグループカスタマイズ
-で @var{to-list}, @var{to-address} の両方もしくはどちらかを設定し
+で @code{to-list}, @code{to-address} の両方もしくはどちらかを設定し
 て @code{nnmail-split-methods} を @code{gnus-group-split} に設定するだけ
 です。分割関数は全てのグループでこれらのパラメータを走査し、それに従って
 分割します。すなわち、メールグループのパラメー
-タ @var{to-list} か @var{to-address} で指定されたアドレスから投稿された
-ものか、そのアドレスへ投稿されたメッセージがそのグループに保存されます。
+タ @code{to-list} か @code{to-address} で指定されたアドレスから投稿され
+たものか、そのアドレスへ投稿されたメッセージがそのグループに保存されます。
 
 ときには、メーリングリストには複数のアドレスがあり、メール分割にそれら全
-てを認識させる必要があるかもしれません: @var{extra-aliases} グループパラ
-メータを追加のアドレスのリストに設定するだけで終りです。正規表現を使いた
-ければ、@var{split-regexp} を設定してください。
+てを認識させる必要があるかもしれません: @code{extra-aliases} グループパ
+ラメータを追加のアドレスのリストに設定するだけで終りです。正規表現を使い
+たければ、@code{split-regexp} を設定してください。
 
 これらの全てのグループのパラメータは、@code{nnmail-split-fancy} 分割を作
 成するために使用され、それは @var{field} が @samp{any} で、
-@var{value} が @var{to-list}, @var{to-address}, @var{extra-aliases} の全
-て、@var{split-regexp} の全ての合致に合致する単独の正規表現、
-@var{split} がグループの名前になります。@var{restrict} も使用できます:
-@var{split-exclude} パラメータを正規表現のリストに設定するだけです。
+@var{value} が @code{to-list}, @code{to-address},
+@code{extra-aliases} のすべて、@code{split-regexp} の全ての合致に合致す
+る単独の正規表現、@var{split} がグループの名前になります。@var{restrict}
+も使用できます: @code{split-exclude} パラメータを正規表現のリストに設定
+するだけです。
 
 これらの全てのパラメータを使って正しい分割が生成されないときや、何か違っ
 たものが必要なときは、パラメー
-タ @var{split-spec} を @code{nnmail-split-fancy} 分割に設定することがで
+タ @code{split-spec} を @code{nnmail-split-fancy} 分割に設定することがで
 きます。この場合は、他の前に書いた全てのパラメータ
 は @code{gnus-group-split} に無視されます。特に、
-@var{split-spec} は @code{nil} に設定することができ、その場合はグループ
+@code{split-spec} は @code{nil} に設定することができ、その場合はグループ
 は @code{gnus-group-split} に無視されます。
 
 @vindex gnus-group-split-default-catch-all-group
@@ -13324,7 +13332,7 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 ます。メッセージがどの分割にも合致しなければ、どれかのグループ
 で @var{split-spec} が @code{catch-all} に設定されていない場合
 は @code{gnus-group-split-default-catch-all-group} で指定されているグルー
-プに保存されます。@var{split-spec} が @code{catch-all} に設定されている
+プに保存されます。@code{split-spec} が @code{catch-all} に設定されている
 グループがある場合は、そのグループが全てを捕獲するグループとして使用され
 ます。この変数はしばしば単にグループを指定するために使われますが、任意の
 複雑な特級分割をも設定する (結局、グループ名は特級分割なのです) ので、個
@@ -13375,10 +13383,10 @@ nnml:mail.others:
 めに使うことができます。その場合、単一の @code{|} 分割が出力されます。
 @var{catch-all} は @code{gnus-group-split-default-catch-all-group} のよ
 うに、最後の手段として使われる特級分割です。
-@var{catch-all} が @code{nil} であるか、@var{split-regexp} がどれかの選
+@var{catch-all} が @code{nil} であるか、@code{split-regexp} がどれかの選
 択されたグループ空文字列に合致すると、全捕獲分割は行われません。そうでな
-い場合、グループに @var{split-spec} が @code{catch-all} に設定されている
-ものがあると、このグループが @var{catch-all} 引数を上書きします。
+い場合、グループに @code{split-spec} が @code{catch-all} に設定されてい
+るものがあると、このグループが @var{catch-all} 引数を上書きします。
 
 @findex gnus-group-split-setup
 不運なことに、全てのグルプとパラメータを走査することは非常に遅いです。特

@@ -345,7 +345,7 @@ Common keywords should be listed here.")
        (:leave))
       (maildir
        (:path (or (getenv "MAILDIR") "~/Maildir/"))
-       (:subdirs ("new" "cur"))
+       (:subdirs ("cur" "new"))
        (:function))
       (imap
        (:server (getenv "MAILHOST"))

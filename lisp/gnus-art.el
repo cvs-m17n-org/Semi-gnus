@@ -159,7 +159,7 @@
      "X-Virus-Scanned" "X-Delivery-Agent" "Posted-Date" "X-Gateway"
      "X-Local-Origin" "X-Local-Destination" "X-UserInfo1"
      "X-Received-Date" "X-Hashcash" "Face" "X-DMCA-Notifications"
-     "X-Abuse-and-DMCA-Info" "X-Postfilter"))
+     "X-Abuse-and-DMCA-Info" "X-Postfilter" "X-Gpg-.*" "X-Disclaimer"))
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -3100,9 +3100,12 @@ function and want to see what the date was before converting."
 	 (lambda (w)
 	   (set-buffer (window-buffer w))
 	   (when (eq major-mode 'gnus-article-mode)
-	     (goto-char (point-min))
-	     (when (re-search-forward "^X-Sent:" nil t)
-	       (article-date-lapsed t))))
+	     (let ((mark (point-marker)))
+	       (goto-char (point-min))
+	       (when (re-search-forward "^X-Sent:" nil t)
+		 (article-date-lapsed t))
+	       (goto-char (marker-position mark))
+	       (move-marker mark nil))))
 	 nil 'visible)))))
 
 (defun gnus-start-date-timer (&optional n)
@@ -3802,7 +3805,7 @@ commands:
       (set (make-local-variable 'tool-bar-map) gnus-summary-tool-bar-map)))
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
-  (make-local-variable 'gnus-page-broken)
+  (set (make-local-variable 'gnus-page-broken) nil)
   (make-local-variable 'gnus-button-marker-list)
   (make-local-variable 'gnus-article-current-summary)
   (make-local-variable 'gnus-article-mime-handles)
@@ -4040,10 +4043,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (gnus-article-prepare-display)
 	      ;; Do page break.
 	      (goto-char (point-min))
-	      (setq gnus-page-broken
-		    (when gnus-break-pages
-		      (gnus-narrow-to-page)
-		      t)))
+	      (when gnus-break-pages
+		(gnus-narrow-to-page)))
 	    (let ((gnus-article-mime-handle-alist-1
 		   gnus-article-mime-handle-alist))
 	      (gnus-set-mode-line 'article))
@@ -4393,8 +4394,6 @@ Replace it with some information about the removed part."
 	  (erase-buffer)
 	  (insert
 	   (concat
-	    "<#part type=text/plain nofile=yes disposition=attachment"
-	    " description=\"Deleted attachment (" bsize " Byte)\">"
 	    ",----\n"
 	    "| The following attachment has been deleted:\n"
 	    "|\n"
@@ -4402,10 +4401,12 @@ Replace it with some information about the removed part."
 	    "| Filename:       " filename "\n"
 	    "| Size (encoded): " bsize " Byte\n"
 	    "| Description:    " description "\n"
-	    "`----\n"
-	    "<#/part>"))
+	    "`----\n"))
 	  (setcdr data
-		  (cdr (mm-make-handle nil `("text/plain"))))))
+		  (cdr (mm-make-handle
+			nil `("text/plain") nil nil
+			(list "attachment")
+			(format "Deleted attachment (%s bytes)" bsize))))))
       (set-buffer gnus-summary-buffer)
       ;; FIXME: maybe some of the following code (borrowed from
       ;; `gnus-mime-save-part-and-strip') isn't necessary?
@@ -5319,6 +5320,7 @@ If given a numerical ARG, move forward ARG pages."
 	       (re-search-backward page-delimiter nil 'move (1+ (abs arg))))
 	      ((> arg 0)
 	       (re-search-forward page-delimiter nil 'move arg)))
+      (setq gnus-page-broken t)
       (goto-char (match-end 0)))
     (narrow-to-region
      (point)
@@ -5381,7 +5383,8 @@ Argument LINES specifies lines to be scrolled up."
       (if (or (not gnus-page-broken)
 	      (save-excursion
 		(save-restriction
-		  (widen) (forward-line 1) (eobp)))) ;Real end-of-buffer?
+		  (widen)
+		  (eobp)))) ;Real end-of-buffer?
 	  (progn
 	    (when gnus-article-over-scroll
 	      (gnus-article-next-page-1 lines))

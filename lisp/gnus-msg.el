@@ -1550,8 +1550,8 @@ composing a new message."
 	(goto-char (point-max))
 	(insert mail-header-separator)
 	(goto-char (point-min))
-	(re-search-forward "^To:\\|^Newsgroups:" nil 'move)
-	(forward-char 1)
+	(when (re-search-forward "^To:\\|^Newsgroups:" nil 'move)
+	  (forward-char 1))
 	(widen)))))
 
 (defun gnus-summary-post-forward (&optional full-headers)
@@ -2016,9 +2016,14 @@ this is a reply."
 		     (if (string-match " " gcc-self-val)
 			 (concat "\"" gcc-self-val "\"")
 		       gcc-self-val)
-		   (if (string-match " " group)
-		       (concat "\"" group "\"")
-		     group)))
+		   ;; In nndoc groups, we use the parent group name
+		   ;; instead of the current group.
+		   (let ((group (or (gnus-group-find-parameter
+				     gnus-newsgroup-name 'parent-group)
+				    group)))
+		     (if (string-match " " group)
+			 (concat "\"" group "\"")
+		       group))))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
 		  (gnus-delete-line)))
