@@ -1,5 +1,8 @@
 2000-08-23  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-group-startup-message): Use `image-size' to
+	simplify the program.
+
 	* lisp/gnus-group.el (gnus-group-rename-group): Inhibit renaming of
 	zombie or killed groups.
 
