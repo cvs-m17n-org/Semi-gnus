@@ -4756,18 +4756,29 @@ forbidden in URL encoding."
   (define-key gnus-prev-page-map gnus-mouse-2 'gnus-button-prev-page)
   (define-key gnus-prev-page-map "\r" 'gnus-button-prev-page))
 
-(defun gnus-insert-prev-page-button ()
-  (let ((buffer-read-only nil))
-    (gnus-eval-format
-     gnus-prev-page-line-format nil
-     `(gnus-prev t local-map ,gnus-prev-page-map
-		 gnus-callback gnus-article-button-prev-page
-		 article-type annotation))))
+(static-if (featurep 'xemacs)
+    (defun gnus-insert-prev-page-button ()
+      (let ((buffer-read-only nil))
+	(gnus-eval-format
+	 gnus-prev-page-line-format nil
+	 `(gnus-prev t local-map ,gnus-prev-page-map
+		     gnus-callback gnus-article-button-prev-page
+		     article-type annotation))))
+  (defun gnus-insert-prev-page-button ()
+    (let ((buffer-read-only nil)
+	  (situation (get-text-property (point-min) 'mime-view-situation)))
+      (set-keymap-parent gnus-prev-page-map (current-local-map))
+      (gnus-eval-format
+       gnus-prev-page-line-format nil
+       `(gnus-prev t local-map ,gnus-prev-page-map
+		   gnus-callback gnus-article-button-prev-page
+		   article-type annotation
+		   mime-view-situation ,situation))))
+  )
 
 (defvar gnus-next-page-map nil)
 (unless gnus-next-page-map
-  (setq gnus-next-page-map (make-keymap))
-  (suppress-keymap gnus-prev-page-map)
+  (setq gnus-next-page-map (make-sparse-keymap))
   (define-key gnus-next-page-map gnus-mouse-2 'gnus-button-next-page)
   (define-key gnus-next-page-map "\r" 'gnus-button-next-page))
 
@@ -4787,13 +4798,25 @@ forbidden in URL encoding."
     (gnus-article-prev-page)
     (select-window win)))
 
-(defun gnus-insert-next-page-button ()
-  (let ((buffer-read-only nil))
-    (gnus-eval-format gnus-next-page-line-format nil
-		      `(gnus-next
-			t local-map ,gnus-next-page-map
-			gnus-callback gnus-article-button-next-page
-			article-type annotation))))
+(static-if (featurep 'xemacs)
+    (defun gnus-insert-next-page-button ()
+      (let ((buffer-read-only nil))
+	(gnus-eval-format gnus-next-page-line-format nil
+			  `(gnus-next
+			    t local-map ,gnus-next-page-map
+			    gnus-callback gnus-article-button-next-page
+			    article-type annotation))))
+  (defun gnus-insert-next-page-button ()
+    (let ((buffer-read-only nil)
+	  (situation (get-text-property (point-min) 'mime-view-situation)))
+      (set-keymap-parent gnus-next-page-map (current-local-map))
+      (gnus-eval-format gnus-next-page-line-format nil
+			`(gnus-next
+			  t local-map ,gnus-next-page-map
+			  gnus-callback gnus-article-button-next-page
+			  article-type annotation
+			  mime-view-situation ,situation))))
+  )
 
 (defun gnus-article-button-next-page (arg)
   "Go to the next page."
@@ -4955,14 +4978,18 @@ For example:
 (set-alist 'mime-preview-over-to-previous-method-alist
 	   'gnus-original-article-mode
 	   (lambda ()
-	     (gnus-article-read-summary-keys
-	      nil (gnus-character-to-event ?P))))
+	     (if (> (point-min) 1)
+		 (gnus-article-prev-page)
+	       (gnus-article-read-summary-keys
+		nil (gnus-character-to-event ?P)))))
 
 (set-alist 'mime-preview-over-to-next-method-alist
 	   'gnus-original-article-mode'
 	   (lambda ()
-	     (gnus-article-read-summary-keys
-	      nil (gnus-character-to-event ?N))))
+	     (if (< (point-max) (buffer-size))
+		 (gnus-article-next-page)
+	       (gnus-article-read-summary-keys
+		nil (gnus-character-to-event ?N)))))
 
 
 ;;; @ end
