@@ -5284,24 +5284,40 @@ With arg, turn line truncation on iff arg is positive."
   (redraw-display))
 
 (defun gnus-summary-reselect-current-group (&optional all rescan)
-  "Rescan the current newsgroup, exit and then reselect it.
+  "Exit and then reselect the current newsgroup.
 The prefix argument ALL means to select all articles."
   (interactive "P")
   (when (gnus-ephemeral-group-p gnus-newsgroup-name)
     (error "Ephemeral groups can't be reselected"))
   (let ((current-subject (gnus-summary-article-number))
-	(group gnus-newsgroup-name))
-    (save-excursion
-      (set-buffer gnus-group-buffer)
-      ;; We have to adjust the point of group mode buffer because
-      ;; point was moved to the next unread newsgroup by exiting.
-      (gnus-summary-jump-to-group group)
-      (when rescan
-	(save-excursion
-	  (gnus-group-get-new-news-this-group 1))))
+	(group gnus-newsgroup-name)
+	masquerade)
+    (when rescan
+      (setq masquerade (get-buffer-create " *masquerade-summary*"))
+      (let ((pos (- (point) (window-start)))
+	    (id mode-line-buffer-identification))
+	(copy-to-buffer masquerade (window-start) (point-max))
+	(with-current-buffer masquerade
+	  (set-buffer-modified-p nil)
+	  (goto-char (1+ (max 0 pos)))
+	  (setq mode-line-buffer-identification id
+		mode-name "Masquerade"))))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
-    (gnus-group-read-group all t group)
+    (if rescan
+	(progn
+	  (switch-to-buffer masquerade)
+	  (set-window-start (selected-window) (point-min))
+	  (set-buffer gnus-group-buffer)
+	  (gnus-group-jump-to-group group)
+	  (unwind-protect
+	      (save-excursion
+		(gnus-group-get-new-news-this-group 1))
+	    (kill-buffer masquerade)))
+      ;; We have to adjust the point of group mode buffer because
+      ;; point was moved to the next unread newsgroup by exiting.
+      (gnus-summary-jump-to-group group))
+    (gnus-group-read-group all t)
     (gnus-summary-goto-subject current-subject nil t)))
 
 (defun gnus-summary-rescan-group (&optional all)
