@@ -6236,7 +6236,9 @@ The state which existed when entering the ephemeral is reset."
   (let ((gnus-break-pages nil)
 	(gnus-show-mime t))
     (gnus-summary-select-article gnus-show-all-headers t))
-  (select-window (get-buffer-window gnus-article-buffer)))
+  (let ((w (get-buffer-window gnus-article-buffer)))
+    (when w
+      (select-window (get-buffer-window gnus-article-buffer)))))
 
 ;;; Dead summaries.
 
