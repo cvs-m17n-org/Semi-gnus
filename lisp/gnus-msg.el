@@ -210,7 +210,7 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-user-agent (concat gnus-product-name "/" gnus-version-number))
+  (setq message-user-agent (product-string 'gnus))
   (unless message-use-multi-frames
     (message-add-action
      `(set-window-configuration ,winconf) 'exit 'postpone 'kill))
