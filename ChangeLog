@@ -1,3 +1,7 @@
+2000-11-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* texi/gnus-ja.texi (Drafts): Fix typo.
+
 2000-11-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-verify-x-pgp-sig): Autoload "mm-uu".
