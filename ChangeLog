@@ -1,3 +1,7 @@
+2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* texi/gnus-ja.texi (Web Newspaper): Updated.
+
 2001-05-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
