@@ -1,3 +1,13 @@
+2001-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nntp.el (nntp-request-newgroups): Use UTC date for
+	NEWGROUPS command.
+
+	* lisp/gnus-start.el (gnus-find-new-newsgroups): Use
+	`message-make-date' instead of `current-time-string'.
+	(gnus-ask-server-for-new-groups): Ditto.
+	(gnus-check-first-time-used): Ditto.
+
 2000-08-23  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.24 (This is alpha status.)
