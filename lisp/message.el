@@ -1769,6 +1769,9 @@ no, only reply back to the author."
   (autoload 'rmail-output "rmailout")
   (autoload 'gnus-delay-article "gnus-delay")
   (autoload 'gnus-make-local-hook "gnus-util")
+  (autoload 'gnus-extract-address-components "gnus-util"))
+
+(eval-and-compile
   (autoload 'mu-cite-original "mu-cite"))
 
 
@@ -6784,7 +6787,7 @@ news, Source is the list of newsgroups is was posted to."
 	    (if group
 		(gnus-group-decoded-name group)
 	      (or (and (setq from (message-fetch-field "from"))
-		       (car (std11-extract-address-components 
+		       (car (std11-extract-address-components
 			     (nnheader-decode-from from))))
 		  "(nowhere)")))
 	  "] " subject))
