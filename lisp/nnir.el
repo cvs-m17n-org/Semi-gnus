@@ -1242,11 +1242,7 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
              (exitstatus
 	      (let ((process-environment (copy-sequence process-environment)))
 		;; Disable locale.
-		(dolist (env process-environment)
-		  (when (string-match "\
-\\`\\(L\\(ANG\\|C_\\(ALL\\|CTYPE\\|COLLATE\\|TIME\\|NUMERIC\\|MONETARY\\|MESSAGES\\)\\)\\)=" env)
-		    (setenv (match-string 1 env) nil)))
-		(setenv "LANG" "C")
+		(setenv "LC_ALL" "C")
                 (message "%s args: %s" nnir-namazu-program
                          (mapconcat 'identity (cddddr cp-list) " "))
 		(apply 'call-process cp-list))))
