@@ -24045,98 +24045,104 @@ Gnus posting styles が再び改装されました。現在は微妙に違う規則で動作しま
 Gnus は @code{nnimap} によって @acronym{IMAP} メールを読むことができます。
 @end itemize
 
-@c TRANSLATEME
 @node Oort Gnus
 @subsubsection Oort Gnus
 @cindex Oort Gnus
 
-New features in Gnus 5.10:
+Gnus 5.10 の新しい機能:
 
 @itemize @bullet
 
 @item
-The revised Gnus @acronym{FAQ} is included in the manual,
-@xref{Frequently Asked Questions}.
+改定された Gnus @acronym{FAQ} がマニュアルに含まれています。
+@xref{Frequently Asked Questions}。(訳注: T-gnus のため
+の @acronym{FAQ} は永らく改定されていません。)
 
 @item
-Upgrading from previous (stable) version if you have used Oort.
+Oort を使ったことがある場合の、以前の (安定な) 版からのグレードアップ。
 
-If you have tried Oort (the unstable Gnus branch leading to this
-release) but went back to a stable version, be careful when upgrading to
-this version.  In particular, you will probably want to remove all
-@file{.marks} (nnml) and @file{.mrk} (nnfolder) files, so that flags are
-read from your @file{.newsrc.eld} instead of from the
-@file{.marks}/@file{.mrk} file where this release store flags.  See a
-later entry for more information about marks.  Note that downgrading
-isn't save in general.
-
-@item
-Article Buttons
-
-More buttons for URLs, mail addresses, Message-IDs, Info links, man
-pages and Emacs or Gnus related references.  @xref{Article Buttons}.  The
-variables @code{gnus-button-@var{*}-level} can be used to control the
-appearance of all article buttons.  @xref{Article Button Levels}.
+Oort (このリリースに先立つ安定ではない Gnus の枝) を使ってみたものの、安
+定版に戻してしまったならば、この版にグレードアップするときに注意して下さ
+い。特に、おそらくすべて
+の @file{.marks} (nnml) と @file{.mrk} (nnfolder) ファイルを消去する必要
+があるでしょう。この版 (の Gnus) がフラグを格納す
+る @file{.marks}/@file{.mrk} ファイルではなくて @file{.newsrc.eld} から
+フラグが読まれるようになっていたからです。後述の項目で、印 (marks) に関
+するより多くの情報を読んで下さい。グレードを下げても一般には助けにならな
+いことに注意して下さい。
 
 @item
-Dired integration
+記事のボタン
 
-@code{gnus-dired-minor-mode} installs key bindings in dired buffers to send
-a file as an attachment (@kbd{C-c C-a}), open a file using the approriate
-mailcap entry (@kbd{C-c C-l}), and print a file using the mailcap entry
-(@kbd{C-c P}).  It is enabled with 
+URL、メールアドレス、Message-ID、Info へのリンク、man ページと Emacs ま
+たは Gnus に関連した参考文献のための、より多くのボタン。@xref{Article
+Buttons}。すべての記事のボタンの見栄えを制御するため
+に @code{gnus-button-@var{*}-level} 変数を使うことができます。
+@xref{Article Button Levels}。
+
+@item
+Dired の統合
+
+@code{gnus-dired-minor-mode} は、dired のバッファでキー設定 -- 添付ファ
+イルの送信 (@kbd{C-c C-a})、mailcap の適切な項目を使ってファイルを開
+く (@kbd{C-c C-l})、それに mailcap の項目を使ってファイルを印刷す
+る (@kbd{C-c P}) -- を行ないます。これは次の式を使うと有効になります。
+
 @lisp
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 @end lisp
 
 @item
-Gnus can display RSS newsfeeds as a newsgroup.  @xref{RSS}.
+Gnus は RSS のニュース配送を、ニュースグループとして表示します。
+@xref{RSS}。
 
 @item
-Single-part yenc encoded attachments can be decoded.
+単一の yenc でエンコードされた添付パートがデコードできます。
 
 @item
 Picons
 
-The picons code has been reimplemented to work in GNU Emacs---some of
-the previous options have been removed or renamed.
+Picon のコードが、GNU Emacs で動作させるために再実装されました。以前のい
+くつかのオプションが、削除または改名されています。
 
-Picons are small ``personal icons'' representing users, domain and
-newsgroups, which can be displayed in the Article buffer.
-@xref{Picons}.
-
-@item
-If the new option @code{gnus-treat-body-boundary} is non-@code{nil}, a
-boundary line is drawn at the end of the headers.
+Picon は、ユーザー、ドメイン、それにニュースグループを表現するための「個
+人的なアイコン (personal icons)」で、記事バッファに表示することができま
+す。@xref{Picons}。
 
 @item
-Retrieval of charters and control messages
-
-There are new commands for fetching newsgroup charters (@kbd{H c}) and
-control messages (@kbd{H C}).
+新しいオプション @code{gnus-treat-body-boundary} を非-@code{nil} にする
+と、ヘッダーのおしまいに境界線が描かれます。
 
 @item
-Delayed articles
+憲章とコントロールメッセージの取得
 
-You can delay the sending of a message with @kbd{C-c C-j} in the Message
-buffer.  The messages are delivered at specified time.  This is useful
-for sending yourself reminders.  @xref{Delayed Articles}.
-
-@item
-If @code{auto-compression-mode} is enabled, attachments are automatically
-decompressed when activated.
+二つのコマンド -- ニュースグループの憲章を取り込む (@kbd{H c})、コントロー
+ルメッセージを取得 (@kbd{H C}) -- があります。
 
 @item
-If the new option @code{nnml-use-compressed-files} is non-@code{nil}, 
-the nnml back end allows compressed message files.
+遅延記事
+
+Message バッファにおける @kbd{C-c C-j} で、メッセージの送信を遅らせるこ
+とができます。メッセージは指定された時刻に配送されます。これはあなた自信
+のための忘備録として役に立つでしょう。@xref{Delayed Articles}。
 
 @item
-Signed article headers (X-PGP-Sig) can be verified with @kbd{W p}.
+@code{auto-compression-mode} が有効になっていると、添付ファイルを見ると
+きに自動で圧縮が解かれます。
 
 @item
-The Summary Buffer uses an arrow in the fringe to indicate the current 
-article.  Use @code{(setq gnus-summary-display-arrow nil)} to disable it.
+新しいオプション @code{nnml-use-compressed-files} を非-@code{nil} にする
+ことによって、nnml が圧縮されたメッセージファイルを扱うことができるよう
+になります。
 
+@item
+記事の署名ヘッダー (X-PGP-Sig) を、@kbd{W p} で認証することができます。
+
+@item
+概略バッファは fringe の中の矢印で現在の記事を示します。これを無効にする
+には @code{(setq gnus-summary-display-arrow nil)} を使って下さい。
+
+@c TRANSLATEME
 @item
 Warn about email replies to news
 
