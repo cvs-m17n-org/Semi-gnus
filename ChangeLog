@@ -1,3 +1,8 @@
+1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-vm.el (gnus-summary-save-in-vm): Save window config,
+	select the article before saving.
+
 1999-01-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-popup-menu): Bug fix -- Use

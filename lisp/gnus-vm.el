@@ -92,13 +92,15 @@ save those articles instead."
 	 "Save %s in VM folder:" folder
 	 gnus-mail-save-name gnus-newsgroup-name
 	 gnus-current-headers 'gnus-newsgroup-last-mail))
-  (gnus-eval-in-buffer-window gnus-original-article-buffer
-    (save-excursion
-      (save-restriction
-	(widen)
-	(let ((vm-folder (gnus-vm-make-folder)))
-	  (vm-save-message folder)
-	  (kill-buffer vm-folder))))))
+  (save-window-excursion
+    (gnus-summary-select-article gnus-show-all-headers)
+    (gnus-eval-in-buffer-window gnus-original-article-buffer
+      (save-excursion
+	(save-restriction
+	  (widen)
+	  (let ((vm-folder (gnus-vm-make-folder)))
+	    (vm-save-message folder)
+	    (kill-buffer vm-folder)))))))
 
 (provide 'gnus-vm)
 
