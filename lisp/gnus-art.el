@@ -555,8 +555,7 @@ displayed by the first non-nil matching CONTENT face."
 			       (item :tag "skip" nil)
 			       (face :value default)))))
 
-(defcustom gnus-article-decode-hook
-  '(article-decode-charset article-decode-encoded-words)
+(defcustom gnus-article-decode-hook '(article-decode-encoded-words)
   "*Hook run to decode charsets in articles."
   :group 'gnus-article-headers
   :type 'hook)
@@ -2805,9 +2804,15 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (mail-parse-ignored-charsets 
 	   (save-excursion (set-buffer gnus-summary-buffer)
 			   gnus-newsgroup-ignored-charsets)))
-      (if (listp handles)
-	  (mapcar 'mm-display-part handles)
-	(gnus-mime-view-all-parts (mm-handle-child handles))))))
+      (when handles
+	(if (listp handles)
+	    (mapcar 'mm-display-part handles)
+	  (unless (or (mm-display-part handles)
+		      (mm-handle-child handles))
+	    (goto-char (point-max))
+	    (mm-display-part handles))
+	  (when (mm-handle-child handles)
+	    (gnus-mime-view-all-parts (mm-handle-child handles))))))))
 
 (defun gnus-mime-save-part ()
   "Save the MIME part under point."
@@ -3112,8 +3117,7 @@ In no internal viewer is available, use an external viewer."
 	  ;; We allow users to glean info from the handles.
 	  (when gnus-article-mime-part-function
 	    (gnus-mime-part-function handles)))
-	(if (and handles
-		 (mm-handle-child handles))
+	(if handles
 	    (progn
 	      (when (and (not ihandles)
 			 (not gnus-displaying-mime))
