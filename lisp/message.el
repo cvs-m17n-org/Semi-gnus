@@ -4395,7 +4395,8 @@ OTHER-HEADERS is an alist of header/value pairs."
       (if wide to-address nil)))
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
      `((Subject . ,subject)
