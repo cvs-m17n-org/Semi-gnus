@@ -16,6 +16,7 @@ PERL=perl
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
+PAPERTYPE=a4
 
 all: gnus message
 
@@ -73,7 +74,7 @@ latexps:
 	cat postamble.tex >> gnus.tmplatexi
 	$(LATEX) gnus.tmplatexi
 	$(LATEX) gnus.tmplatexi
-	$(DVIPS) -f gnus.dvi > gnus.ps
+	$(DVIPS) -t $(PAPERTYPE) -f gnus.dvi > gnus.ps
 
 pss:
 	make latex
@@ -89,7 +90,7 @@ latexboth:
 	make latexps
 	mv /local/tmp/larsi/gnus.ps /local/tmp/larsi/gnus-manual-a4.ps
 	gzip /local/tmp/larsi/gnus-manual-a4.ps
-	sed 's/,a4paper//' gnus.latexi > gnus-standard.latexi
+	sed 's/,a4paper/,letterpaper/' gnus.latexi > gnus-standard.latexi
 	mv gnus-standard.latexi gnus.latexi
 	make latexps
 	mv /local/tmp/larsi/gnus.ps /local/tmp/larsi/gnus-manual-standard.ps
