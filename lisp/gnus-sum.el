@@ -2047,6 +2047,7 @@ The following commands are available:
   (let ((data gnus-newsgroup-data))
     (save-excursion
       (gnus-save-hidden-threads
+	(gnus-summary-show-all-threads)
 	(goto-char (point-min))
 	(while data
 	  (while (get-text-property (point) 'gnus-intangible)
@@ -3411,6 +3412,7 @@ If LINE, insert the rebuilt thread starting on line LINE."
 		  (while thread
 		    (gnus-remove-thread-1 (car thread))
 		    (setq thread (cdr thread))))
+	      (gnus-summary-show-all-threads)
 	      (gnus-remove-thread-1 thread))))))))
 
 (defun gnus-remove-thread-1 (thread)
@@ -5149,12 +5151,12 @@ gnus-exit-group-hook is called with no arguments if that value is non-nil."
 	  (gnus-kill-buffer buf)))
       (setq gnus-current-select-method gnus-select-method)
       (pop-to-buffer gnus-group-buffer)
-      ;; Clear the current group name.
       (if (not quit-config)
 	  (progn
 	    (goto-char group-point)
 	    (gnus-configure-windows 'group 'force))
 	(gnus-handle-ephemeral-exit quit-config))
+      ;; Clear the current group name.
       (unless quit-config
 	(setq gnus-newsgroup-name nil)))))
 
@@ -7210,10 +7212,7 @@ latter case, they will be copied into the relevant groups."
 	      lines (count-lines (point-min) (point-max)))
 	(insert "From: " (read-string "From: ") "\n"
 		"Subject: " (read-string "Subject: ") "\n"
-		"Date: " (timezone-make-date-arpa-standard
-			  (current-time-string (nth 5 atts))
-			  (current-time-zone now)
-			  (current-time-zone now))
+		"Date: " (message-make-date (nth 5 atts))
 		"\n"
 		"Message-ID: " (message-make-message-id) "\n"
 		"Lines: " (int-to-string lines) "\n"
@@ -7695,6 +7694,8 @@ returned."
 		   (= mark gnus-read-mark) (= mark gnus-souped-mark)
 		   (= mark gnus-duplicate-mark)))
       (setq mark gnus-expirable-mark)
+      ;; Let the backend know about the mark change.
+      (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
       (push article gnus-newsgroup-expirable))
     ;; Set the mark in the buffer.
     (gnus-summary-update-mark mark 'unread)
@@ -7704,6 +7705,8 @@ returned."
   "Mark the current article quickly as unread with MARK."
   (let* ((article (gnus-summary-article-number))
 	 (old-mark (gnus-summary-article-mark article)))
+    ;; Allow the backend to change the mark.
+    (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
     (if (eq mark old-mark)
 	t
       (if (<= article 0)
@@ -7759,6 +7762,8 @@ marked."
   (let* ((mark (or mark gnus-del-mark))
 	 (article (or article (gnus-summary-article-number)))
 	 (old-mark (gnus-summary-article-mark article)))
+    ;; Allow the backend to change the mark.
+    (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
     (if (eq mark old-mark)
 	t
       (unless article

@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.010 Manual
+@settitle Semi-gnus 6.10.011 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.010 Manual
+@title Semi-gnus 6.10.011 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.010.
+This manual corresponds to Semi-gnus 6.10.011.
 
 @end ifinfo
 
@@ -7374,6 +7374,11 @@ It is called after the summary buffer has been generated.  You might use
 it to, for instance, highlight lines or modify the look of the buffer in
 some other ungodly manner.  I don't care.
 
+@vindex gnus-summary-prepared-hook
+@item gnus-summary-prepared-hook
+A hook called as the very last thing after the summary buffer has been
+generated.
+
 @vindex gnus-summary-ignore-duplicates
 @item gnus-summary-ignore-duplicates
 When gnus discovers two articles that have the same @code{Message-ID},
@@ -8478,7 +8483,7 @@ So here's a new example:
          (signature my-funny-signature-randomizer))
         ((equal (system-name) "gnarly")
          (signature my-quote-randomizer))
-        (message-this-is-new
+        (message-this-is-news
          (signature my-news-signature))
         (posting-from-work-p
          (signature-file "~/.work-signature")
@@ -15712,8 +15717,8 @@ We do have some breaches to this one.
 @table @emph
 
 @item MIME
-Gnus does no MIME handling, and this standard-to-be seems to think that
-MIME is the bees' knees, so we have major breakage here.
+Gnus does not yet fully handle MIME, and this standard-to-be seems to
+think that MIME is the bees' knees, so we have major breakage here.
 
 @item X-Newsreader
 This is considered to be a ``vanity header'', while I consider it to be
@@ -15722,6 +15727,13 @@ coming from @code{tin} and @code{Netscape} I know not to use either of
 those for posting articles.  I would not have known that if it wasn't
 for the @code{X-Newsreader} header.
 @end table
+
+@item USEFOR
+@cindex USEFOR
+USEFOR is an IETF working group writing a successor to RFC 1036, based
+on Son-of-RFC 1036.  They have produced a number of drafts proposing
+various changes to the format of news articles.  The Gnus towers will
+look into implementing the changes when the draft is accepted as an RFC.
 
 @end table
 
@@ -15742,13 +15754,10 @@ Gnus should work on :
 @itemize @bullet
 
 @item
-Emacs 19.32 and up.
+Emacs 20.2 and up.
 
 @item
-XEmacs 19.14 and up.
-
-@item
-Mule versions based on Emacs 19.32 and up.
+XEmacs 20.4 and up.
 
 @end itemize
 
