@@ -1,3 +1,17 @@
+2002-01-22  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.30 (This is alpha status.)
+	Change user operation when open the large group.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.30.
+
+	* lisp/gnus-sum.el (gnus-summary-default-select-to-read): New variable.
+	(gnus-summary-select-to-read-help-winconf): Ditto.
+	(gnus-summary-select-to-read): Rename from
+	`gnus-summary-read-number-from-minibuffer' and rewrite.
+	(gnus-summary-select-to-read-kill-help-buffer): New function.
+	(gnus-articles-to-read): Use `gnus-summary-select-to-read'.
+
 2002-01-16  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.29 (This is alpha status.)
