@@ -1,3 +1,10 @@
+2004-04-08  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-util.el (gnus-set-work-buffer): Set buffer multibyte.
+	(gnus-select-frame-set-input-focus): Don't check whether
+	`focus-follows-mouse' is bound.
+	(frame-parameter): Remove.
+
 2004-03-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Don't require `advice', `pces' and `path-util'.

@@ -31,18 +31,23 @@
 ;; Gnus first.
 
 ;; [Unfortunately, it does depend on other parts of Gnus, e.g. the
-;; autoloads below...]
+;; autoloads and defvars below...]
 
 ;;; Code:
 
 (eval-when-compile
   (require 'cl)
   ;; Fixme: this should be a gnus variable, not nnmail-.
-  (defvar nnmail-pathname-coding-system))
-(eval-when-compile (require 'static))
+  (defvar nnmail-pathname-coding-system)
+
+  ;; Inappropriate references to other parts of Gnus.
+  (defvar gnus-emphasize-whitespace-regexp)
+  )
 
 (require 'time-date)
 (require 'netrc)
+
+(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'message-fetch-field "message")
@@ -560,7 +565,8 @@ If N, return the Nth ancestor instead."
 	(set-buffer gnus-work-buffer)
 	(erase-buffer))
     (set-buffer (gnus-get-buffer-create gnus-work-buffer))
-    (kill-all-local-variables)))
+    (kill-all-local-variables)
+    (set-buffer-multibyte t)))
 
 (defmacro gnus-group-real-name (group)
   "Find the real name of a foreign newsgroup."
@@ -1364,16 +1370,8 @@ CHOICE is a list of the choice char and help message at IDX."
 		(x-focus-frame frame))
 	       ((eq window-system 'w32)
 		(w32-focus-frame frame)))
-	 (when (or (not (boundp 'focus-follows-mouse))
-		   (symbol-value 'focus-follows-mouse))
+	 (when focus-follows-mouse
 	   (set-mouse-position frame (1- (frame-width frame)) 0)))))
-
-(unless (fboundp 'frame-parameter)
-  (defalias 'frame-parameter
-    (lambda (frame parameter)
-      "Return FRAME's value for parameter PARAMETER.
-If FRAME is nil, describe the currently selected frame."
-      (cdr (assq parameter (frame-parameters frame))))))
 
 (defun gnus-frame-or-window-display-name (object)
   "Given a frame or window, return the associated display name.
@@ -1477,6 +1475,28 @@ predicate on the elements."
 	      ")"))
 	 "")))
      (t emacs-version))))
+
+(defun gnus-rename-file (old-path new-path &optional trim)
+  "Rename OLD-PATH as NEW-PATH.  If TRIM, recursively delete
+empty directories from OLD-PATH."
+  (when (file-exists-p old-path)
+    (let* ((old-dir (file-name-directory old-path))
+	   (old-name (file-name-nondirectory old-path))
+	   (new-dir (file-name-directory new-path))
+	   (new-name (file-name-nondirectory new-path))
+	   temp)
+      (gnus-make-directory new-dir)
+      (rename-file old-path new-path t)
+      (when trim
+	(while (progn (setq temp (directory-files old-dir))
+		      (while (member (car temp) '("." ".."))
+			(setq temp (cdr temp)))
+		      (= (length temp) 0))
+	  (delete-directory old-dir)
+	  (setq old-dir (file-name-as-directory 
+			 (file-truename 
+			  (concat old-dir "..")))))))))
+
 
 (provide 'gnus-util)
 
