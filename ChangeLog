@@ -1,3 +1,9 @@
+2001-06-11  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Fix
+	inhibiting the expiring when `nnshimbun-keep-unparsable-dated-articles'
+	is nil.
+
 2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/gnus-group.el (toplevel): Removed autoload code for

@@ -546,13 +546,14 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 				  (if (search-forward "\t" end t)
 				      (1- (point))
 				    end)))))
-		(when (and (or (setq time (condition-case nil
-					      (apply 'encode-time time)
-					    (error nil)))
-			       ;; Inhibit expiration if there's no parsable
-			       ;; date and the following option is non-nil.
-			       (not nnshimbun-keep-unparsable-dated-articles))
-			   (nnmail-expired-article-p name time nil))
+		(when (cond ((setq time (condition-case nil
+					    (apply 'encode-time time)
+					  (error nil)))
+			     (nnmail-expired-article-p name time nil))
+			    (t
+			     ;; Inhibit expiration if there's no parsable
+			     ;; date and the following option is non-nil.
+			     (not nnshimbun-keep-unparsable-dated-articles)))
 		  (beginning-of-line)
 		  (delete-region (point) (1+ end))
 		  (setq articles (delq article articles)))))
