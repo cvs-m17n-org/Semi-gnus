@@ -1,3 +1,17 @@
+2005-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-user-agent): Default to
+	`(emacs gnus mime config mule)'.
+
+	* lisp/gnus-vers.el (gnus-extended-version): Include SEMI, FLIM
+	and APEL versions.
+
+	* lisp/gnus-util.el (gnus-emacs-version): Include Mule and Meadow
+	versions.
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Invalidate
+	optional the 1st arg.
+
 2005-01-02  Romain Francoise  <romain@orebokech.com>
 
 	* GNUS-NEWS: Generated.

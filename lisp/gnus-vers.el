@@ -1,6 +1,7 @@
 ;;; gnus-vers.el --- Declare gnus version
 
-;; Copyright (C) 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005
+;; Free Software Foundation, Inc.
 
 ;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -74,13 +75,43 @@ If ARG, insert string at point."
       (insert (message "%s" gnus-version))
     (message "%s" gnus-version)))
 
+(eval-when-compile
+  (defvar mime-user-interface-product)
+  (require 'mime-def))
+
 (defun gnus-extended-version ()
-  "Stringified gnus version."
-  (concat gnus-product-name "/" gnus-version-number
-	  " (based on "
-	  gnus-original-product-name " v" gnus-original-version-number ")"
-	  (if (zerop (string-to-number gnus-revision-number))
-	      ""
-	    (concat " (revision " gnus-revision-number ")"))))
+  "Stringified Gnus, Emacs, SEMI, FLIM and APEL versions.
+See the variable `gnus-user-agent'."
+  (if (stringp gnus-user-agent)
+      gnus-user-agent
+    ;; `gnus-user-agent' is a list:
+    (let* ((float-output-format nil)
+	   (gnus-v (when (memq 'gnus gnus-user-agent)
+		     (concat
+		      gnus-product-name "/" gnus-version-number " ("
+		      (unless (zerop (string-to-number gnus-revision-number))
+			(concat "r" gnus-revision-number ", "))
+		      "based on " gnus-original-product-name
+		      " v" gnus-original-version-number ")")))
+	   (emacs-v (gnus-emacs-version))
+	   (mime-v (when (memq 'mime gnus-user-agent)
+		     (concat
+		      (mime-product-name mime-user-interface-product) "/"
+		      (mapconcat
+		       #'number-to-string
+		       (mime-product-version mime-user-interface-product)
+		       ".")
+		      " ("
+		      (mime-product-code-name mime-user-interface-product)
+		      ") "
+		      (mime-product-name mime-library-product) "/"
+		      (mapconcat
+		       #'number-to-string
+		       (mime-product-version mime-library-product)
+		       ".")
+		      " ("
+		      (mime-product-code-name mime-library-product)
+		      ") " (apel-version)))))
+      (mapconcat 'identity (delq nil (list gnus-v mime-v emacs-v)) " "))))
 
 ;; gnus-vers.el ends here

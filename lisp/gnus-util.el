@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -1504,42 +1504,64 @@ predicate on the elements."
       (nconc (nreverse res) list1 list2))))
 
 (eval-when-compile
-  (defvar xemacs-codename))
+  (defvar xemacs-codename)
+  (defvar sxemacs-codename)
+  (defvar emacs-program-version)
+  (unless (featurep 'meadow)
+    (defalias 'Meadow-version 'ignore)))
 
 (defun gnus-emacs-version ()
   "Stringified Emacs version."
-  (let ((system-v
-	 (cond
-	  ((eq gnus-user-agent 'emacs-gnus-config)
-	   system-configuration)
-	  ((eq gnus-user-agent 'emacs-gnus-type)
-	   (symbol-name system-type))
-	  (t nil))))
+  (let* ((lst (if (listp gnus-user-agent)
+		  gnus-user-agent
+		'(gnus emacs type)))
+	 (system-v (cond ((memq 'config lst)
+			  system-configuration)
+			 ((memq 'type lst)
+			  (symbol-name system-type))
+			 (t nil)))
+	 (mule-v (when (and (memq 'mule lst)
+			    (featurep 'mule))
+		   (concat
+		    " MULE"
+		    (when (boundp 'mule-version)
+		      (concat "/" (symbol-value 'mule-version)))
+		    (when (featurep 'meadow)
+		      (let ((mver (Meadow-version)))
+			(if (string-match "^Meadow-" mver)
+			    (concat " Meadow/"
+				    (substring mver (match-end 0)))))))))
+	 codename emacsname)
+    (cond ((featurep 'sxemacs)
+	   (setq emacsname "SXEmacs"
+		 codename sxemacs-codename))
+	  ((featurep 'xemacs)
+	   (setq emacsname "XEmacs"
+		 codename xemacs-codename))
+	  (t
+	   (setq emacsname "Emacs")))
     (cond
-     ((eq gnus-user-agent 'gnus)
+     ((not (memq 'emacs lst))
       nil)
      ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
+      ;; Emacs:
       (concat "Emacs/" (match-string 1 emacs-version)
 	      (if system-v
 		  (concat " (" system-v ")")
-		"")))
-     ((string-match
-       "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-       emacs-version)
-      (concat
-       (match-string 1 emacs-version)
-       (format "/%d.%d" emacs-major-version emacs-minor-version)
-       (if (match-beginning 3)
-	   (match-string 3 emacs-version)
-	 "")
-       (if (boundp 'xemacs-codename)
-	   (concat
-	    " (" xemacs-codename
-	    (if system-v
-		(concat ", " system-v ")")
-	      ")"))
-	 "")))
-     (t emacs-version))))
+		"")
+	      mule-v))
+     ((or (featurep 'sxemacs) (featurep 'xemacs))
+      ;; XEmacs or SXEmacs:
+      (concat emacsname "/" emacs-program-version
+	      " ("
+	      (when (and (memq 'codename lst)
+			 codename)
+		(concat codename
+			(when system-v ", ")))
+	      (when system-v system-v)
+	      ")"
+	      mule-v))
+     (t (concat emacs-version mule-v)))))
 
 (defun gnus-rename-file (old-path new-path &optional trim)
   "Rename OLD-PATH as NEW-PATH.  If TRIM, recursively delete
