@@ -3268,9 +3268,8 @@ It is registered to variable `mime-view-content-header-filter-alist'."
 	   'gnus-original-article-mode
 	   (function mime-text-decode-buffer))
 
-(set-alist 'mime-view-quitting-method-alist
-	   'gnus-original-article-mode
-	   (function mime-view-quitting-method-for-gnus))
+(set-alist 'mime-preview-quitting-method-alist
+	   'gnus-original-article-mode #'mime-view-quitting-method-for-gnus)
 
 (set-alist 'mime-view-show-summary-method
 	   'gnus-original-article-mode
