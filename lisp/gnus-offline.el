@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.9 1998-11-20 12:20:35 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.10 1998-11-24 07:42:46 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -7,7 +7,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 2.00b5
+;;; Version: 2.00
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -98,10 +98,10 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.00b5")
+(defconst gnus-offline-version-number "2.00")
 (defconst gnus-offline-codename
-  "Beta5"			; Beta
-;;  "This is the time"		; 2.00
+;;  "Beta5"			; Beta
+  "This is the time"		; 2.00
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Code of silence"
