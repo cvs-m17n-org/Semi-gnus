@@ -46,7 +46,8 @@ the user confirms the creation."
 				       (error "message unexists"))
 				   (- (point) 2)))
 	  (let ((to (mail-fetch-field "to")))
-	     (setq from (mime-decode-field-body to 'To 'unfolding)))))
+	    (when to
+	      (setq from (mime-decode-field-body to 'To 'unfolding))))))
       (when from
 	(bbdb-annotate-message-sender from t
 				      (or (bbdb-invoke-hook-for-value
