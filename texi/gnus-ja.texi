@@ -13132,9 +13132,10 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 
 @item mail-source-directory
 @vindex mail-source-directory
-ファイルが (もしあれば) 保存されるディレクトリーです。初期値
-は @file{~/Mail/} です。現時点では、これが使われる唯一のものは前の変数
-が @code{nil} であった場合、入ってきたファイルが保存される場所の指定です。
+入ってきたメールソースのファイルが (もしあれば) 保存されるディレクトリー
+です。初期値は @file{~/Mail/} です。現時点では、これが使われる唯一のもの
+は変数 @code{mail-source-delete-incoming} が @code{nil} または数字であっ
+た場合、入ってきたファイルが保存される場所の指定です。
 
 @item mail-source-incoming-file-prefix
 @vindex mail-source-incoming-file-prefix
