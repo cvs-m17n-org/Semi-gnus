@@ -419,42 +419,52 @@ noticing asynchronous data.")
       (set-buffer nntp-server-buffer)
       (erase-buffer)))
   (let* ((command (mapconcat 'identity strings " "))
-	 (buffer (process-buffer (nntp-find-connection nntp-server-buffer)))
-	 (pos (with-current-buffer buffer (point))))
-    (prog1
-	(nntp-retrieve-data command
-			    nntp-address nntp-port-number nntp-server-buffer
-			    wait-for nnheader-callback-function)
-      ;; If nothing to wait for, still remove possibly echo'ed commands
-      (unless wait-for
-	(nntp-accept-response)
-	(save-excursion
-	  (set-buffer buffer)
-	  (goto-char pos)
-	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn
-				   (forward-line 1)
-				   (gnus-point-at-bol)))))))))
+	 (process (nntp-find-connection nntp-server-buffer))
+	 (buffer (and process (process-buffer process)))
+	 (pos (and buffer (with-current-buffer buffer (point)))))
+    (if process
+	(prog1
+	    (nntp-retrieve-data command
+				nntp-address nntp-port-number
+				nntp-server-buffer
+				wait-for nnheader-callback-function)
+	  ;; If nothing to wait for, still remove possibly echo'ed commands
+	  (unless wait-for
+	    (nntp-accept-response)
+	    (save-excursion
+	      (set-buffer buffer)
+	      (goto-char pos)
+	      (if (looking-at (regexp-quote command))
+		  (delete-region pos (progn (forward-line 1)
+					    (gnus-point-at-bol))))
+	      )))
+      (nnheader-report 'nntp "Couldn't open connection to %s."
+		       nntp-address))))
 
 (defun nntp-send-command-nodelete (wait-for &rest strings)
   "Send STRINGS to server and wait until WAIT-FOR returns."
   (let* ((command (mapconcat 'identity strings " "))
-	 (buffer (process-buffer (nntp-find-connection nntp-server-buffer)))
-	 (pos (with-current-buffer buffer (point))))
-    (prog1
-	(nntp-retrieve-data command
-			    nntp-address nntp-port-number nntp-server-buffer
-			    wait-for nnheader-callback-function)
-      ;; If nothing to wait for, still remove possibly echo'ed commands
-      (unless wait-for
-	(nntp-accept-response)
-	(save-excursion
-	  (set-buffer buffer)
-	  (goto-char pos)
-	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn
-				   (forward-line 1)
-				   (gnus-point-at-bol)))))))))
+	 (process (nntp-find-connection nntp-server-buffer))
+	 (buffer (and process (process-buffer process)))
+	 (pos (and buffer (with-current-buffer buffer (point)))))
+    (if process
+	(prog1
+	    (nntp-retrieve-data command
+				nntp-address nntp-port-number
+				nntp-server-buffer
+				wait-for nnheader-callback-function)
+	  ;; If nothing to wait for, still remove possibly echo'ed commands
+	  (unless wait-for
+	    (nntp-accept-response)
+	    (save-excursion
+	      (set-buffer buffer)
+	      (goto-char pos)
+	      (if (looking-at (regexp-quote command))
+		  (delete-region pos (progn (forward-line 1)
+					    (gnus-point-at-bol))))
+	      )))
+      (nnheader-report 'nntp "Couldn't open connection to %s."
+		       nntp-address))))
 
 (defun nntp-send-command-and-decode (wait-for &rest strings)
   "Send STRINGS to server and wait until WAIT-FOR returns."
@@ -464,22 +474,26 @@ noticing asynchronous data.")
       (set-buffer nntp-server-buffer)
       (erase-buffer)))
   (let* ((command (mapconcat 'identity strings " "))
-	 (buffer (process-buffer (nntp-find-connection nntp-server-buffer)))
-	 (pos (with-current-buffer buffer (point))))
-    (prog1
-	(nntp-retrieve-data command
-			    nntp-address nntp-port-number nntp-server-buffer
-			    wait-for nnheader-callback-function t)
-      ;; If nothing to wait for, still remove possibly echo'ed commands
-      (unless wait-for
-	(nntp-accept-response)
-	(save-excursion
+	 (process (nntp-find-connection nntp-server-buffer))
+	 (buffer (and process (process-buffer process)))
+	 (pos (and buffer (with-current-buffer buffer (point)))))
+    (if process
+	(prog1
+	    (nntp-retrieve-data command
+				nntp-address nntp-port-number
+				nntp-server-buffer
+				wait-for nnheader-callback-function t)
+	  ;; If nothing to wait for, still remove possibly echo'ed commands
+	  (unless wait-for
+	    (nntp-accept-response)
+	    (save-excursion
 	  (set-buffer buffer)
 	  (goto-char pos)
 	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn
-				   (forward-line 1)
-				   (gnus-point-at-bol)))))))))
+	      (delete-region pos (progn (forward-line 1) (gnus-point-at-bol))))
+	  )))
+      (nnheader-report 'nntp "Couldn't open connection to %s."
+		       nntp-address))))
 
 (defun nntp-send-buffer (wait-for)
   "Send the current buffer to server and wait until WAIT-FOR returns."
@@ -612,6 +626,10 @@ noticing asynchronous data.")
 	      (command (if nntp-server-list-active-group
 			   "LIST ACTIVE" "GROUP")))
 	  (while groups
+	    ;; Timeout may have killed the buffer.
+	    (unless (gnus-buffer-live-p buf)
+	      (nnheader-report 'nntp "Connection to %s is closed." server)
+	      (throw 'done nil))
 	    ;; Send the command to the server.
 	    (nntp-send-command nil command (pop groups))
 	    (incf count)
@@ -1663,7 +1681,8 @@ Please refer to the following variables to customize the connection:
     (push nntp-via-rlogin-command command)
     (and nntp-pre-command
 	 (push nntp-pre-command command))
-    (setq proc (apply 'start-process "nntpd" buffer command))
+    (setq proc (as-binary-process
+		(apply 'start-process "nntpd" buffer command)))
     (save-excursion
       (set-buffer buffer)
       (nntp-wait-for-string "^\r*20[01]")

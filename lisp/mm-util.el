@@ -286,7 +286,10 @@ prefer iso-2022-jp to japanese-shift-jis:
 
 (defvar mm-use-find-coding-systems-region
   (fboundp 'find-coding-systems-region)
-  "Use `find-coding-systems-region' to find proper coding systems.")
+  "Use `find-coding-systems-region' to find proper coding systems.
+
+Setting it to nil is useful on Emacsen supporting Unicode if sending
+mail with multiple parts is preferred to sending a Unicode one.")
 
 ;;; Internal variables:
 
@@ -754,6 +757,45 @@ If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers."
     "Detect MIME charset of the text in the region between START and END."
     (let ((cs (mm-detect-coding-region start end)))
       cs)))
+
+(defun mm-guess-mime-charset ()
+  "Guess the default MIME charset from the language environment."
+  (let ((language-info
+	 (and (boundp 'current-language-environment)
+	      (assoc current-language-environment
+		     language-info-alist)))
+	item)
+    (cond
+     ((null language-info)
+      'iso-8859-1)
+     ((setq item
+	    (cadr
+	     (or (assq 'coding-priority language-info)
+		 (assq 'coding-system language-info))))
+      (if (fboundp 'coding-system-get)
+	  (or (coding-system-get item 'mime-charset)
+	      item)
+	item))
+     ((setq item (car (last (assq 'charset language-info))))
+      (if (eq item 'ascii)
+	  'iso-8859-1
+	(mm-mime-charset item)))
+     (t
+      'iso-8859-1))))
+
+;; It is not a MIME function, but some MIME functions use it.
+(defalias 'mm-make-temp-file
+  (if (fboundp 'make-temp-file)
+      'make-temp-file
+    (lambda (prefix &optional dir-flag)
+      (let ((file (expand-file-name
+		   (make-temp-name prefix)
+		   (if (fboundp 'temp-directory)
+		       (temp-directory)
+		     temporary-file-directory))))
+	(if dir-flag
+	    (make-directory file))
+	file))))
 
 (provide 'mm-util)
 

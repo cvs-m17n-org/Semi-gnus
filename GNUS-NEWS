@@ -1,5 +1,5 @@
 GNUS NEWS -- history of user-visible changes.
-Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 See the end for copying conditions.
 
 Please send Gnus bug reports to bugs@gnus.org.
@@ -7,6 +7,73 @@ For older news, see Gnus info node "New Features".
 
 
 * Changes in Oort Gnus
+
+** gnus-summary-line-format
+
+The default value changed to "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n".
+Moreover gnus-extra-headers, nnmail-extra-headers and
+gnus-ignored-from-addresses changed their default so that the users
+name will be replaced by the recipient's name or the group name
+posting to for NNTP groups.
+
+** deuglify.el (gnus-article-outlook-deuglify-article)
+
+A new file from Raymond Scholz <rscholz@zonix.de> for deuglifying
+broken Outlook (Express) articles.
+
+** (require 'gnus-load)
+
+If you use a stand-alone Gnus distribution, you'd better add (require
+'gnus-load) into your ~/.emacs after adding the Gnus lisp directory
+into load-path.
+
+File gnus-load.el contains autoload commands, functions and variables,
+some of which may not be included in distributions of Emacsen.
+
+** gnus-slave-unplugged
+
+A new command which starts gnus offline in slave mode.
+
+** message-insinuate-rmail
+
+Adding (message-insinuate-rmail) and (setq mail-user-agent
+'gnus-user-agent) in .emacs convinces RMAIL to compose, reply and
+forward messages in message-mode, where you can enjoy the power of
+MML.
+
+** message-minibuffer-local-map
+
+The line below enables BBDB in resending a message:
+
+(define-key message-minibuffer-local-map [(tab)] 'bbdb-complete-name)
+
+** Externalize attachments.
+
+If gnus-gcc-externalize-attachments (or
+message-fcc-externalize-attachments) is non-nil, attach local files as
+external parts.
+
+Command gnus-mime-save-part-and-strip (bound to \C-o on MIME buttons)
+saves a part and replaces the part with an external one. It works only
+on back ends that support editing.
+
+** gnus-default-charset
+
+The default value is determined from the current-language-environment
+variable, instead of 'iso-8859-1. Also the ".*" item in
+gnus-group-charset-alist is removed.
+
+** gnus-posting-styles
+
+Add a new format of match like
+
+        ((header "to" "larsi.*org")
+         (Organization "Somewhere, Inc."))
+
+The old format like the lines below is obsolete.
+
+        (header "to" "larsi.*org"
+         (Organization "Somewhere, Inc."))
 
 ** message-ignored-news-headers and message-ignored-mail-headers
 
@@ -172,7 +239,7 @@ ever-changing layouts.
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the

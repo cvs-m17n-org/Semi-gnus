@@ -65,7 +65,7 @@
 ;;
 ;; 2001-10-31 Committed to Oort Gnus.
 ;;
-;; $Id: sieve-manage.el,v 1.1.4.2 2002-01-21 05:45:12 yamaoka Exp $
+;; $Id: sieve-manage.el,v 1.1.4.3 2002-05-07 02:55:07 yamaoka Exp $
 
 ;;; Code:
 

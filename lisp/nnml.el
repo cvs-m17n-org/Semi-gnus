@@ -77,17 +77,14 @@ corresponding marks file (usually named `.marks' in the nnml group
 directory, but see `nnml-marks-file-name') for the group.  Then the
 marks file will be regenerated properly by Gnus.")
 
-(defvoo nnml-filenames-are-evil t
-  "If non-nil, Gnus will not assume that the articles file name
-is the same as the article number listed in the nov database.  This
-variable should be set if any of the files are compressed.")
-
 (defvoo nnml-prepare-save-mail-hook nil
   "Hook run narrowed to an article before saving.")
 
 (defvoo nnml-inhibit-expiry nil
   "If non-nil, inhibit expiry.")
 
+(defvoo nnml-use-compressed-files nil
+  "If non-nil, allow using compressed message files.")
 
 
 
@@ -308,7 +305,8 @@ variable should be set if any of the files are compressed.")
     (setq articles (gnus-sorted-intersection articles active-articles))
 
     (while (and articles is-old)
-      (if (and (setq article (nnml-article-to-file (setq number (pop articles))))
+      (if (and (setq article (nnml-article-to-file
+			      (setq number (pop articles))))
 	       (setq mod-time (nth 5 (file-attributes article)))
 	       (nnml-deletable-article-p group number)
 	       (setq is-old (nnmail-expired-article-p group mod-time force
@@ -523,16 +521,19 @@ variable should be set if any of the files are compressed.")
 (defun nnml-article-to-file (article)
   (nnml-update-file-alist)
   (let (file)
-    (if (setq file (cdr (assq article nnml-article-file-alist)))
+    (if (setq file
+	      (if nnml-use-compressed-files
+		  (cdr (assq article nnml-article-file-alist))
+		(number-to-string article)))
 	(expand-file-name file nnml-current-directory)
-      (if (not nnheader-directory-files-is-safe)
-	  ;; Just to make sure nothing went wrong when reading over NFS --
-	  ;; check once more.
-	  (when (file-exists-p
-		 (setq file (expand-file-name (number-to-string article)
-					      nnml-current-directory)))
-	    (nnml-update-file-alist t)
-	    file)))))
+      (when (not nnheader-directory-files-is-safe)
+	;; Just to make sure nothing went wrong when reading over NFS --
+	;; check once more.
+	(when (file-exists-p
+	       (setq file (expand-file-name (number-to-string article)
+					    nnml-current-directory)))
+	  (nnml-update-file-alist t)
+	  file)))))
 
 (defun nnml-deletable-article-p (group article)
   "Say whether ARTICLE in GROUP can be deleted."
@@ -746,8 +747,8 @@ variable should be set if any of the files are compressed.")
       (when (buffer-name (cdar nnml-nov-buffer-alist))
 	(set-buffer (cdar nnml-nov-buffer-alist))
 	(when (buffer-modified-p)
-	  (nnmail-write-region 1 (point-max) nnml-nov-buffer-file-name
-			       nil 'nomesg))
+	  (nnmail-write-region (point-min) (point-max)
+			       nnml-nov-buffer-file-name nil 'nomesg))
 	(set-buffer-modified-p nil)
 	(kill-buffer (current-buffer)))
       (setq nnml-nov-buffer-alist (cdr nnml-nov-buffer-alist)))))
@@ -836,7 +837,7 @@ variable should be set if any of the files are compressed.")
 	   (progn
 	     (re-search-forward "\n\r?\n" nil t)
 	     (setq chars (- (point-max) (point)))
-	     (max 1 (1- (point)))))
+	     (max (point-min) (1- (point)))))
 	  (unless (zerop (buffer-size))
 	    (goto-char (point-min))
 	    (setq headers (nnml-parse-head chars (caar files)))
@@ -848,7 +849,7 @@ variable should be set if any of the files are compressed.")
 	(setq files (cdr files)))
       (save-excursion
 	(set-buffer nov-buffer)
-	(nnmail-write-region 1 (point-max) nov nil 'nomesg)
+	(nnmail-write-region (point-min) (point-max) nov nil 'nomesg)
 	(kill-buffer (current-buffer))))))
 
 (defun nnml-nov-delete-article (group article)
@@ -868,10 +869,11 @@ variable should be set if any of the files are compressed.")
     t))
 
 (defun nnml-update-file-alist (&optional force)
-  (when (or (not nnml-article-file-alist)
-	    force)
-    (setq nnml-article-file-alist
-	  (nnml-current-group-article-to-file-alist))))
+  (when nnml-use-compressed-files
+    (when (or (not nnml-article-file-alist)
+	      force)
+      (setq nnml-article-file-alist
+	    (nnml-current-group-article-to-file-alist)))))
 
 (defun nnml-directory-articles (dir)
   "Return a list of all article files in a directory.
@@ -900,7 +902,6 @@ Use the nov database for that directory if available."
 Use the nov database for the current group if available."
   (if (or gnus-nov-is-evil
 	  nnml-nov-is-evil
-	  nnml-filenames-are-evil
 	  (not (file-exists-p
 		(expand-file-name nnml-nov-file-name
 				  nnml-current-directory))))
@@ -908,8 +909,8 @@ Use the nov database for the current group if available."
     ;; build list from .overview if available
     (save-excursion
       (let ((alist nil)
-	    art
-	    (buffer (nnml-get-nov-buffer nnml-current-group)))
+	    (buffer (nnml-get-nov-buffer nnml-current-group))
+	    art)
 	(set-buffer buffer)
 	(goto-char (point-min))
 	(while (not (eobp))
@@ -1017,7 +1018,8 @@ Use the nov database for the current group if available."
 	(push (cons 'read (gnus-info-read info)) nnml-marks)
 	(dolist (el gnus-article-unpropagated-mark-lists)
 	  (setq nnml-marks (gnus-remassoc el nnml-marks)))
-	(nnml-save-marks group server)))))
+	(nnml-save-marks group server)
+	(nnheader-message 7 "Bootstrapping marks for %s...done" group)))))
 
 (provide 'nnml)
 

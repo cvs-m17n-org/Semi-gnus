@@ -1,5 +1,5 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -22,14 +22,6 @@
 
 ;;; Commentary:
 
-;; Jaap-Henk Hoepman (jhh@xs4all.nl):
-;;
-;; Added support for delayed destroy of external MIME viewers. All external
-;; viewers for mime types in mm-keep-viewer-alive-types will remain active
-;; after switching articles or groups, and will only be removed when exiting
-;; gnus.
-;;
-
 ;;; Code:
 
 (require 'mail-parse)
@@ -39,6 +31,7 @@
 		   (require 'term))
 
 (eval-and-compile
+  (autoload 'executable-find "executable")
   (autoload 'mm-inline-partial "mm-partial")
   (autoload 'mm-inline-external-body "mm-extern")
   (autoload 'mm-insert-inline "mm-view"))
@@ -103,6 +96,50 @@
   `(list ,buffer ,type ,encoding ,undisplayer
 	 ,disposition ,description ,cache ,id))
 
+(defcustom mm-text-html-renderer
+  (cond ((locate-library "w3") 'w3)
+	((locate-library "w3m") 'w3m)
+	((executable-find "links") 'links)
+	((executable-find "lynx") 'lynx)
+	(t 'html2text))
+  "Render of HTML contents.
+It is one of defined renderer types, or a rendering function.
+The defined renderer types are:
+`w3'   : using Emacs/W3;
+`w3m'  : using emacs-w3m;
+`links': using links;
+`lynx' : using lynx;
+`html2text' : using html2text;
+`nil'  : using external viewer."
+  :type '(choice (const w3)
+		 (const w3m)
+		 (const links)
+		 (const lynx)
+		 (const html2text)
+		 (const nil)
+		 (function))
+  :version "21.3"
+  :group 'mime-display)
+
+(defvar mm-inline-text-html-renderer nil
+  "Function used for rendering inline HTML contents.
+It is suggested to customize `mm-text-html-renderer' instead.")
+
+(defcustom mm-inline-text-html-with-images nil
+  "If non-nil, Gnus will allow retrieving images in the HTML contents
+with <img> tags.  It has no effect on Emacs/w3.  For emacs-w3m, the
+value of the option `w3m-display-inline-images' will be bound with
+this value.  In addition, the variable `w3m-safe-url-regexp' will be
+bound with the value nil if it is non-nil to make emacs-w3m show all
+images, however this behavior may be changed in the future."
+  :type 'boolean
+  :group 'mime-display)
+
+(defcustom mm-inline-text-html-with-w3m-keymap t
+  "If non-nil, use emacs-w3m command keys in the article buffer."
+  :type 'boolean
+  :group 'mime-display)
+
 (defcustom mm-inline-media-tests
   '(("image/jpeg"
      mm-inline-image
@@ -153,11 +190,12 @@
     ("application/emacs-lisp" mm-display-elisp-inline identity)
     ("application/x-emacs-lisp" mm-display-elisp-inline identity)
     ("text/html"
-     mm-inline-text
+     mm-inline-text-html
      (lambda (handle)
-       (locate-library "w3")))
+       (or mm-inline-text-html-renderer
+	   mm-text-html-renderer)))
     ("text/x-vcard"
-     mm-inline-text
+     mm-inline-text-vcard
      (lambda (handle)
        (or (featurep 'vcard)
 	   (locate-library "vcard"))))
@@ -197,6 +235,7 @@
 (defcustom mm-inlined-types
   '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
     "message/partial" "message/external-body" "application/emacs-lisp"
+    "application/x-emacs-lisp"
     "application/pgp-signature" "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
     "application/pkcs7-mime")
@@ -218,7 +257,8 @@ when selecting a different article."
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
     "message/rfc822" "text/x-patch" "application/pgp-signature"
-    "application/emacs-lisp" "application/x-pkcs7-signature"
+    "application/emacs-lisp" "application/x-emacs-lisp"
+    "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
     "application/pkcs7-mime")
   "A list of MIME types to be displayed automatically."
@@ -421,13 +461,14 @@ for types in mm-keep-viewer-alive-types."
     (message "Destroying external MIME viewers")
     (mm-destroy-parts mm-postponed-undisplay-list)))
 
-(defun mm-dissect-buffer (&optional no-strict-mime)
+(defun mm-dissect-buffer (&optional no-strict-mime loose-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
     (let (ct ctl type subtype cte cd description id result from)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
+		  loose-mime
 		  (mail-fetch-field "mime-version"))
 	  (setq ct (mail-fetch-field "content-type")
 		ctl (ignore-errors (mail-header-parse-content-type ct))
@@ -531,7 +572,9 @@ for types in mm-keep-viewer-alive-types."
 	  (save-restriction
 	    (narrow-to-region start (point))
 	    (setq parts (nconc (list (mm-dissect-buffer t)) parts)))))
-      (forward-line 2)
+      (end-of-line 2)
+      (or (looking-at boundary)
+	  (forward-line 1))
       (setq start (point)))
     (when (and start (< start end))
       (save-excursion
@@ -626,8 +669,8 @@ external if displayed external."
 		  (mm-handle-set-undisplayer handle mm)))))
 	;; The function is a string to be executed.
 	(mm-insert-part handle)
-	(let* ((dir (make-temp-name
-		     (expand-file-name "emm." mm-tmp-directory)))
+	(let* ((dir (mm-make-temp-file
+		     (expand-file-name "emm." mm-tmp-directory) 'dir))
 	       (filename (or
 			  (mail-content-type-get
 			   (mm-handle-disposition handle) 'filename)
@@ -640,12 +683,13 @@ external if displayed external."
 	       (copiousoutput (assoc "copiousoutput" mime-info))
 	       file buffer)
 	  ;; We create a private sub-directory where we store our files.
-	  (make-directory dir)
 	  (set-file-modes dir 448)
 	  (if filename
-	      (setq file (expand-file-name (file-name-nondirectory filename)
-					   dir))
-	    (setq file (make-temp-name (expand-file-name "mm." dir))))
+	      (setq file (expand-file-name 
+			  (gnus-map-function mm-file-name-rewrite-functions
+                                             (file-name-nondirectory filename))
+			  dir))
+	    (setq file (mm-make-temp-file (expand-file-name "mm." dir))))
 	  (let ((coding-system-for-write mm-binary-coding-system))
 	    (write-region (point-min) (point-max) file nil 'nomesg))
 	  (message "Viewing with %s" method)
@@ -975,9 +1019,8 @@ like underscores."
 					(file-name-nondirectory filename))))
     (setq file
 	  (read-file-name "Save MIME part to: "
-			  (expand-file-name
-			   (or filename name "")
-			   (or mm-default-directory default-directory))))
+			  (or mm-default-directory default-directory)
+			  nil nil (or filename name "")))
     (setq mm-default-directory (file-name-directory file))
     (and (or (not (file-exists-p file))
 	     (yes-or-no-p (format "File %s already exists; overwrite? "
@@ -1126,7 +1169,7 @@ be determined."
     ;; (without a ton of work) is to write them
     ;; out to a file, and then create a file
     ;; specifier.
-    (let ((file (make-temp-name
+    (let ((file (mm-make-temp-file
 		 (expand-file-name "emm.xbm"
 				   mm-tmp-directory))))
       (unwind-protect

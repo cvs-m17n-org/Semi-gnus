@@ -109,7 +109,12 @@
 	   (newest (if (file-newer-than-file-p file auto) file auto))
 	   (nntp-server-buffer (or buffer nntp-server-buffer)))
       (when (and (file-exists-p newest)
-		 (let ((nnmail-file-coding-system nnheader-text-coding-system))
+		 (let ((nnmail-file-coding-system
+			(if (file-newer-than-file-p file auto)
+			    (if (equal group "drafts")
+				message-draft-coding-system
+			      nnheader-text-coding-system)
+			  nnheader-auto-save-coding-system)))
 		   (nnmail-find-file newest)))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)

@@ -98,13 +98,13 @@
   (let ((article (gnus-summary-article-number))
 	(group gnus-newsgroup-name))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup-for-editing article group)
+    (gnus-draft-setup article group t)
     (set-buffer-modified-p t)
     (save-excursion
       (save-restriction
 	(message-narrow-to-headers)
 	(message-remove-header "date")))
-    (message-save-drafts)
+    (save-buffer)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) group t))
     (push
@@ -132,7 +132,7 @@
 
 (defun gnus-draft-send (article &optional group interactive)
   "Send message ARTICLE."
-  (let ((message-syntax-checks (if interactive nil
+  (let ((message-syntax-checks (if interactive message-syntax-checks
 				 'dont-check-for-anything-just-trust-me))
 	(message-inhibit-body-encoding (or (not group)
 					   (equal group "nndraft:queue")
@@ -142,7 +142,7 @@
 	(message-setup-hook (and group (not (equal group "nndraft:queue"))
 				 message-setup-hook))
 	type method)
-    (gnus-draft-setup-for-sending article (or group "nndraft:queue"))
+    (gnus-draft-setup article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
     (save-restriction
@@ -157,22 +157,16 @@
     (gnus-agent-restore-gcc)
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (when (let ((mail-header-separator ""))
-	    (cond ((eq type 'news)
-		   (mime-edit-maybe-split-and-send
-		    (function
-		     (lambda ()
-		       (interactive)
-		       (funcall message-send-news-function method))))
-		   (funcall message-send-news-function method))
-		  ((eq type 'mail)
-		   (mime-edit-maybe-split-and-send
-		    (function
-		     (lambda ()
-		       (interactive)
-		       (funcall message-send-mail-function))))
-		   (funcall message-send-mail-function)
-		   t)))
+    (when (and (or (null method)
+		   (gnus-server-opened method)
+		   (gnus-open-server method))
+	       (if type
+		   (let ((message-this-is-news (eq type 'news))
+			 (message-this-is-mail (eq type 'mail))
+			 (gnus-post-method method)
+			 (message-post-method method))
+		     (message-send-and-exit))
+		 (message-send-and-exit)))
       (let ((gnus-verbose-backends nil))
 	(gnus-request-expire-articles
 	 (list article) (or group "nndraft:queue") t)))))
@@ -229,7 +223,7 @@
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
-(defun gnus-draft-setup-for-editing (narticle group)
+(defun gnus-draft-setup (narticle group &optional restore)
   (let (ga)
     (gnus-setup-message 'forward
       (let ((article narticle))
@@ -237,7 +231,9 @@
 	(erase-buffer)
 	(if (not (gnus-request-restore-buffer article group))
 	    (error "Couldn't restore the article")
-	  (funcall gnus-draft-decoding-function)
+	  (when (and restore
+		     (equal group "nndraft:queue"))
+	    (funcall gnus-draft-decoding-function))
 	  ;; Insert the separator.
 	  (goto-char (point-min))
 	  (search-forward "\n\n")
@@ -261,16 +257,6 @@
 	    (gnus-request-set-mark ,(car ga) (list (list (list ,(cadr ga))
 							 'add '(reply)))))
 	 'send)))))
-
-(defvar gnus-draft-send-draft-buffer " *send draft*")
-(defun gnus-draft-setup-for-sending (narticle group)
-  (let ((article narticle))
-    (if (not (get-buffer gnus-draft-send-draft-buffer))
-	(get-buffer-create gnus-draft-send-draft-buffer))
-    (set-buffer gnus-draft-send-draft-buffer)
-    (erase-buffer)
-    (if (not (gnus-request-restore-buffer article group))
-	(error "Couldn't restore the article"))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."

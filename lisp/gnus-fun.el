@@ -35,10 +35,23 @@
   :group 'gnus-fun
   :type 'string)
 
-(defcustom gnus-convert-image-to-x-face-command "giftopnm %s | ppmnorm 2>/dev/null | pnmscale -width 48 -height 48 | ppmtopgm | pgmtopbm | pbmtoxbm | compface"
+(defcustom gnus-convert-image-to-x-face-command "giftopnm %s | ppmnorm | pnmscale -width 48 -height 48 | ppmtopgm | pgmtopbm | pbmtoxbm | compface"
   "Command for converting a GIF to an X-Face."
   :group 'gnus-fun
   :type 'string)
+
+(defun gnus-shell-command-to-string (command)
+  "Like `shell-command-to-string' except not mingling ERROR."
+  (with-output-to-string
+    (call-process shell-file-name nil (list standard-output nil)
+		  nil shell-command-switch command)))
+
+(defun gnus-shell-command-on-region (start end command)
+  "A simplified `shell-command-on-region'.
+Output to the current buffer, replace text, and don't mingle error."
+  (call-process-region start end shell-file-name t
+		       (list (current-buffer) nil)
+		       nil shell-command-switch command))
 
 ;;;###autoload
 (defun gnus-random-x-face ()
@@ -48,7 +61,7 @@
     (let* ((files (directory-files gnus-x-face-directory t "\\.pbm$"))
 	   (file (nth (random (length files)) files)))
       (when file
-	(shell-command-to-string
+	(gnus-shell-command-to-string
 	 (format gnus-convert-pbm-to-x-face-command
 		 (shell-quote-argument file)))))))
 
@@ -57,12 +70,13 @@
   "Insert an X-Face header based on an image file."
   (interactive "fImage file name:" )
   (when (file-exists-p file)
-    (shell-command-to-string
+    (gnus-shell-command-to-string
      (format gnus-convert-image-to-x-face-command
 	     (shell-quote-argument file)))))
 
 (defun gnus-convert-image-to-gray-x-face (file depth)
-  (let* ((mapfile (make-temp-name (expand-file-name "gnus." mm-tmp-directory)))
+  (let* ((mapfile (mm-make-temp-file (expand-file-name "gnus."
+						       mm-tmp-directory)))
 	 (levels (expt 2 depth))
 	 (step (/ 255 (1- levels)))
 	 color-alist bits bits-list mask pixel x-faces)
@@ -76,8 +90,8 @@
 	(push (cons (* step i) i) color-alist)))
     (when (file-exists-p file)
       (with-temp-buffer
-	(insert (shell-command-to-string
-		 (format "giftopnm %s | ppmnorm 2>/dev/null | pnmscale -width 48 -height 48 | ppmquant -fs -map %s 2>/dev/null | ppmtopgm | pnmnoraw"
+	(insert (gnus-shell-command-to-string
+		 (format "giftopnm %s | ppmnorm | pnmscale -width 48 -height 48 | ppmquant -fs -map %s | ppmtopgm | pnmnoraw"
 			 (shell-quote-argument file)
 			 mapfile)))
 	(goto-char (point-min))
@@ -91,10 +105,10 @@
 	    (insert "P1\n48 48\n")
 	    (dolist (bits bits-list)
 	      (insert (if (zerop (logand bits mask)) "0 " "1 ")))
-	    (shell-command-on-region
+	    (gnus-shell-command-on-region
 	     (point-min) (point-max)
-	     "pbmtoxbm | compface"
-	     (current-buffer) t)
+	     ;; the following is taken from xbmtoikon:
+	     "pbmtoicon | sed '/^[ 	]*[*\\\\/]/d; s/[ 	]//g; s/,$//' | tr , '\\012' | sed 's/^0x//; s/^/0x/' | pr -l1 -t -w22 -3 -s, | sed 's/,*$/,/' | compface")
 	    (push (buffer-string) x-faces))))
       (dotimes (i (length x-faces))
 	(insert (if (zerop i) "X-Face:" (format "X-Face-%s:" i))
@@ -106,41 +120,41 @@
   (let* ((depth (length faces))
 	 (scale (/ 255 (1- (expt 2 depth))))
 	 (ok-p t)
-	 bit-list bit-lists pixels pixel)
-    (dolist (face faces)
-      (setq bit-list nil)
-      (with-temp-buffer
+	 (coding-system-for-read 'binary)
+	 (coding-system-for-write 'binary)
+	 default-enable-multibyte-characters
+	 start bit-array bit-arrays pixel)
+    (with-temp-buffer
+      (dolist (face faces)
+	(erase-buffer)
 	(insert (uncompface face))
-	(shell-command-on-region
+	(gnus-shell-command-on-region
 	 (point-min) (point-max)
-	 "pnmnoraw 2>/dev/null"
-	 (current-buffer) t)
+	 "pnmnoraw")
 	(goto-char (point-min))
 	(forward-line 2)
+	(setq start (point))
+	(insert "[")
 	(while (not (eobp))
-	  (cond
-	   ((eq (following-char) ?0)
-	    (push 0 bit-list))
-	   ((eq (following-char) ?1)
-	    (push 1 bit-list)))
-	  (forward-char 1)))
-      (unless (= (length bit-list) (* 48 48))
-	(setq ok-p nil))
-      (push bit-list bit-lists))
-    (when ok-p
-      (dotimes (i (* 48 48))
-	(setq pixel 0)
-	(dotimes (plane depth)
-	  (setq pixel (+ (* pixel 2) (nth i (nth plane bit-lists)))))
-	(push pixel pixels))
-      (with-temp-buffer
+	  (forward-char 1)
+	  (insert " "))
+	(insert "]")
+	(goto-char start)
+	(setq bit-array (read (current-buffer)))
+	(unless (= (length bit-array) (* 48 48))
+	  (setq ok-p nil))
+	(push bit-array bit-arrays))
+      (when ok-p
+	(erase-buffer)
 	(insert "P2\n48 48\n255\n")
-	(dolist (pixel pixels)
+	(dotimes (i (* 48 48))
+	  (setq pixel 0)
+	  (dotimes (plane depth)
+	    (setq pixel (+ (* pixel 2) (aref (nth plane bit-arrays) i))))
 	  (insert (number-to-string (* scale pixel)) " "))
-	(shell-command-on-region
+	(gnus-shell-command-on-region
 	 (point-min) (point-max)
-	 "ppmtoxpm 2>/dev/null"
-	 (current-buffer) t)
+	 "ppmtoxpm")
 	(buffer-string)))))
 
 ;;;###autoload

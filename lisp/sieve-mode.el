@@ -45,7 +45,7 @@
 ;;                        added keymap and menubar to hook into sieve-manage
 ;; 2001-10-31 version 1.2 committed to Oort Gnus
 ;;
-;; $Id: sieve-mode.el,v 1.1.4.2 2002-01-21 05:45:12 yamaoka Exp $
+;; $Id: sieve-mode.el,v 1.1.4.3 2002-05-07 02:55:07 yamaoka Exp $
 
 ;;; Code:
 

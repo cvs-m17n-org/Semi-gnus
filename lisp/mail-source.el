@@ -1,5 +1,5 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -291,6 +291,9 @@ Common keywords should be listed here.")
        (:path (or (getenv "MAIL")
 		  (expand-file-name (user-login-name) rmail-spool-directory))))
       (directory
+       (:prescript)
+       (:prescript-delay)
+       (:postscript)
        (:path)
        (:suffix ".spool")
        (:predicate identity))
@@ -380,7 +383,7 @@ the `mail-source-keyword-map' variable."
      ,@body))
 
 (put 'mail-source-bind 'lisp-indent-function 1)
-(put 'mail-source-bind 'edebug-form-spec '(form body))
+(put 'mail-source-bind 'edebug-form-spec '(sexp body))
 
 (defun mail-source-set-1 (source)
   (let* ((type (pop source))
@@ -423,7 +426,7 @@ See `mail-source-bind'."
      ,@body))
 
 (put 'mail-source-bind-common 'lisp-indent-function 1)
-(put 'mail-source-bind-common 'edebug-form-spec '(form body))
+(put 'mail-source-bind-common 'edebug-form-spec '(sexp body))
 
 (defun mail-source-value (value)
   "Return the value of VALUE."
@@ -463,17 +466,21 @@ Return the number of files that were found."
 		     (funcall function source callback)
 		   (error
 		    (unless (yes-or-no-p
-			     (format "Mail source error (%s).  Continue? " err))
+			     (format "Mail source error (%s).  Continue? "
+				     (cadr err)))
 		      (error "Cannot get new mail"))
 		    0)))))))))
 
-(defun mail-source-make-complex-temp-name (prefix)
-  (let ((newname (make-temp-name prefix))
-	(newprefix prefix))
-    (while (file-exists-p newname)
-      (setq newprefix (concat newprefix "x"))
-      (setq newname (make-temp-name newprefix)))
-    newname))
+(eval-and-compile
+  (if (fboundp 'make-temp-file)
+      (defalias 'mail-source-make-complex-temp-name 'make-temp-file)
+    (defun mail-source-make-complex-temp-name (prefix)
+      (let ((newname (make-temp-name prefix))
+	    (newprefix prefix))
+	(while (file-exists-p newname)
+	  (setq newprefix (concat newprefix "x"))
+	  (setq newname (make-temp-name newprefix)))
+	newname))))
 
 (defun mail-source-callback (callback info)
   "Call CALLBACK on the mail file, and then remove the mail file.
@@ -632,6 +639,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defun mail-source-fetch-directory (source callback)
   "Fetcher for directory sources."
   (mail-source-bind (directory source)
+    (mail-source-run-script
+     prescript (format-spec-make ?t path)
+     prescript-delay)
     (let ((found 0)
 	  (mail-source-string (format "directory:%s" path)))
       (dolist (file (directory-files
@@ -640,6 +650,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 		   (funcall predicate file)
 		   (mail-source-movemail file mail-source-crash-box))
 	  (incf found (mail-source-callback callback file))))
+      (mail-source-run-script
+       postscript (format-spec-make ?t path))
       found)))
 
 (defun mail-source-fetch-pop (source callback)

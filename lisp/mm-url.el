@@ -1,5 +1,5 @@
 ;;; mm-url.el --- a wrapper of url functions/commands for Gnus
-;; Copyright (C) 2001 Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 
@@ -32,10 +32,10 @@
 (eval-when-compile (require 'cl))
 
 (require 'mm-util)
+(require 'gnus)
 
 (eval-and-compile
-  (autoload 'exec-installed-p "path-util")
-  (autoload 'url-insert-file-contents "url-handlers"))
+  (autoload 'exec-installed-p "path-util"))
 
 (defgroup mm-url nil
   "A wrapper of url package and external url command for Gnus."
@@ -43,7 +43,7 @@
 
 (defcustom mm-url-use-external (not
 				(condition-case nil
-				    (require 'url-handlers)
+				    (require 'url)
 				  (error nil)))
   "*If not-nil, use external grab program `mm-url-program'."
   :type 'boolean
@@ -51,18 +51,21 @@
 
 (defvar mm-url-predefined-programs
   '((wget "wget" "-q" "-O" "-")
+    (w3m  "w3m" "-dump_source")
     (lynx "lynx" "-source")
     (curl "curl")))
 
 (defcustom mm-url-program
   (cond
    ((exec-installed-p "wget") 'wget)
+   ((executable-find "w3m") 'w3m)
    ((exec-installed-p "lynx") 'lynx)
    ((exec-installed-p "curl") 'curl)
    (t "GET"))
   "The url grab program."
   :type '(choice
 	  (symbol :tag "wget" wget)
+	  (symbol :tag "w3m" w3m)
 	  (symbol :tag "lynx" lynx)
 	  (symbol :tag "curl" curl)
 	  (string :tag "other"))
@@ -72,6 +75,16 @@
   "The arguments for `mm-url-program'."
   :type '(repeat string)
   :group 'mm-url)
+
+
+;;; Internal variables
+
+(defvar mm-url-package-name
+  (gnus-replace-in-string
+   (gnus-replace-in-string gnus-version " v.*$" "")
+   " " "-"))
+
+(defvar	mm-url-package-version gnus-version-number)
 
 ;; Stolen from w3.
 (defvar mm-url-html-entities
@@ -246,15 +259,32 @@
   "A list of characters that are _NOT_ reserved in the URL spec.
 This is taken from RFC 2396.")
 
+(defun mm-url-load-url ()
+  "Load `url-insert-file-contents'."
+  (unless (condition-case ()
+	      (require 'url-handlers)
+	    (error nil))
+    ;; w3-4.0pre0.46 or earlier version.
+    (require 'w3-vars)
+    (require 'url)))
+
 (defun mm-url-insert-file-contents (url)
   (if mm-url-use-external
       (if (string-match "^file:/+" url)
 	  (insert-file-contents (substring url (1- (match-end 0))))
 	(mm-url-insert-file-contents-external url))
-    (require 'url-handlers)
-    (let ((name buffer-file-name))
+    (mm-url-load-url)
+    (let ((name buffer-file-name)
+	  (url-package-name (or mm-url-package-name
+				url-package-name))
+	  (url-package-version (or mm-url-package-version
+				   url-package-version)))
       (prog1
 	  (url-insert-file-contents url)
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (re-search-forward "\r 1000\r ?" nil t)
+	    (replace-match "")))
 	(setq buffer-file-name name)))))
 
 (defun mm-url-insert-file-contents-external (url)
@@ -344,7 +374,7 @@ spaces.  Die Die Die."
 
 (defun mm-url-fetch-form (url pairs)
   "Fetch a form from URL with PAIRS as the data using the POST method."
-  (require 'url-handlers)
+  (mm-url-load-url)
   (let ((url-request-data (mm-url-encode-www-form-urlencoded pairs))
 	(url-request-method "POST")
 	(url-request-extra-headers
@@ -354,7 +384,7 @@ spaces.  Die Die Die."
   t)
 
 (defun mm-url-fetch-simple (url content)
-  (require 'url-handlers)
+  (mm-url-load-url)
   (let ((url-request-data content)
 	(url-request-method "POST")
 	(url-request-extra-headers

@@ -518,7 +518,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 				(not (string-match "failed" response))))
 		(setq done process)
 	      (if (memq (process-status process) '(open run))
-		  (imap-send-command-wait "LOGOUT"))
+		  (imap-send-command "LOGOUT"))
 	      (delete-process process)
 	      nil)))))
     done))
@@ -576,7 +576,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 				(not (string-match "failed" response))))
 		(setq done process)
 	      (if (memq (process-status process) '(open run))
-		  (imap-send-command-wait "LOGOUT"))
+		  (imap-send-command "LOGOUT"))
 	      (delete-process process)
 	      nil)))))
     done))
@@ -755,7 +755,7 @@ Returns t if login was successful, nil otherwise."
       (while (or (not user) (not passwd))
 	(setq user (or imap-username
 		       (read-from-minibuffer
-			(concat "IMAP username for " imap-server 
+			(concat "IMAP username for " imap-server
 				" (using stream `" (symbol-name imap-stream)
 				"'): ")
 			(or user imap-default-user))))
@@ -848,7 +848,7 @@ Returns t if login was successful, nil otherwise."
   t)
 
 (defun imap-anonymous-auth (buffer)
-  (message "imap: Loging in anonymously...")
+  (message "imap: Logging in anonymously...")
   (with-current-buffer buffer
     (imap-ok-p (imap-send-command-wait
 		(concat "LOGIN anonymous \"" (concat (user-login-name) "@"
@@ -948,15 +948,15 @@ necessery.  If nil, the buffer name is generated."
 		    (set-buffer-multibyte nil)
 		    (buffer-disable-undo)
 		    (setq imap-server (or server imap-server))
-		    (setq imap-port imap-port)
-		    (setq imap-auth imap-auth)
+		    (setq imap-port (or port imap-port))
+		    (setq imap-auth (or auth imap-auth))
 		    (message "imap: Reconnecting with stream `%s'..." stream)
 		    (if (null (let ((imap-stream stream))
 				(imap-open-1 (current-buffer))))
 			(progn
 			  (kill-buffer (current-buffer))
-			  (message 
-			   "imap: Reconnecting with stream `%s'...failed" 
+			  (message
+			   "imap: Reconnecting with stream `%s'...failed"
 			   stream))
 		      ;; We're done, kill the first connection
 		      (imap-close buffer)
@@ -974,7 +974,7 @@ necessery.  If nil, the buffer name is generated."
 		(setq streams nil))))))
       (when (imap-opened buffer)
 	(setq imap-mailbox-data (make-vector imap-mailbox-prime 0)))
-      (when imap-stream 
+      (when imap-stream
 	buffer))))
 
 (defun imap-opened (&optional buffer)
@@ -1003,7 +1003,7 @@ password is remembered in the buffer."
       (if user (setq imap-username user))
       (if passwd (setq imap-password passwd))
       (if imap-auth
-	  (and (funcall (nth 2 (assq imap-auth 
+	  (and (funcall (nth 2 (assq imap-auth
 				     imap-authenticator-alist)) buffer)
 	       (setq imap-state 'auth))
 	;; Choose authenticator.
@@ -1308,6 +1308,20 @@ returned, if ITEMS is a symbol only it's value is returned."
 		    (imap-mailbox-get item mailbox))
 		  items)
 	(imap-mailbox-get items mailbox)))))
+
+(defun imap-mailbox-status-asynch (mailbox items &optional buffer)
+  "Send status item request ITEM on MAILBOX to server in BUFFER.
+ITEMS can be a symbol or a list of symbols, valid symbols are one of
+the STATUS data items -- ie 'messages, 'recent, 'uidnext, 'uidvalidity
+or 'unseen.  The IMAP command tag is returned."
+  (with-current-buffer (or buffer (current-buffer))
+    (imap-send-command (list "STATUS \""
+			     (imap-utf7-encode mailbox)
+			     "\" "
+			     (format "%s"
+				     (if (listp items)
+					 items
+				       (list items)))))))
 
 (defun imap-mailbox-acl-get (&optional mailbox buffer)
   "Get ACL on mailbox from server in BUFFER."
@@ -2102,8 +2116,8 @@ Return nil if no complete line has arrived."
     (imap-forward)
     (cond ((search-forward "PERMANENTFLAGS " nil t)
 	   (imap-mailbox-put 'permanentflags (imap-parse-flag-list)))
-	  ((search-forward "UIDNEXT " nil t)
-	   (imap-mailbox-put 'uidnext (read (current-buffer))))
+	  ((search-forward "UIDNEXT \\([0-9]+\\)" nil t)
+	   (imap-mailbox-put 'uidnext (match-string 1)))
 	  ((search-forward "UNSEEN " nil t)
 	   (imap-mailbox-put 'unseen (read (current-buffer))))
 	  ((looking-at "UIDVALIDITY \\([0-9]+\\)")
@@ -2276,7 +2290,9 @@ Return nil if no complete line has arrived."
 		((eq token 'RECENT)
 		 (imap-mailbox-put 'recent (read (current-buffer)) mailbox))
 		((eq token 'UIDNEXT)
-		 (imap-mailbox-put 'uidnext (read (current-buffer)) mailbox))
+		 (and (looking-at " \\([0-9]+\\)")
+		      (imap-mailbox-put 'uidnext (match-string 1) mailbox)
+		      (goto-char (match-end 1))))
 		((eq token 'UIDVALIDITY)
 		 (and (looking-at " \\([0-9]+\\)")
 		      (imap-mailbox-put 'uidvalidity (match-string 1) mailbox)

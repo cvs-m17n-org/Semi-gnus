@@ -1,30 +1,294 @@
+2002-04-30  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/message.el (message-expand-name-function): New user option.
+	(message-expand-name): Use it.
+	* lisp/lpath.el: Don't bind lsdb-complete-name and bbdb-complete-name.
+
+2002-04-30  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/message.el (message-expand-name): Use lsdb-complete-name if
+	available.
+	* lisp/lpath.el: Bind lsdb-complete-name.
+
+2002-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Also examine
+	backquote'd forms.
+
+	* lisp/nnheader.el (nnheader-with-unibyte): New macro.
+	(mm-with-unibyte): Alias to `nnheader-with-unibyte'.
+
+2002-04-26  Steve Youngs  <youngs@xemacs.org>
+
+	* aclocal.m4 (AC_PATH_INFODIR): New.  Defaults to '$prefix/info'
+	for Emacs and 'site-packages/info' for XEmacs.
+	(AC_PATH_ETCDIR): Drop 'gnus' off the end of the default directory
+	for XEmacs.
+
+	* configure.in: Use 'AC_PATH_INFO_DIR'.
+
+2002-04-23  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Disregard the
+	message cache when bbdb/news-auto-create-p is nil.
+
+2002-04-23  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Work around the
+	incompatibility with BBDB 2.3x.
+
+2002-04-22  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/message.el (message-make-user-agent): Remove product tokens
+	for gnus-vers.  [cf. <semi-gnus-ja:6798>]
+
+2002-04-22  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Tweak BBDB message
+	caching.
+	(gnus-bbdb/extract-message-sender-function): New user option.
+	(gnus-bbdb/extract-message-sender): New function.
+
+2002-04-20  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-sum.el: Don't autoload gnus-set-summary-default-charset.
+	(gnus-summary-inherit-default-charset): New function.
+	(gnus-parse-headers-hook): Use it.
+	(gnus-summary-setup-default-charset): Set default-mime-charset here.
+	
+	* lisp/gnus-delay.el (gnus-delay-article): Undo the last change.
+
+	* lisp/gnus-draft.el: Revert to the original implementation.
+	(gnus-draft-edit-message): Pass restore as the 3rd argument of
+	gnus-draft-setup; call save-buffer instead of message-save-drafts.
+	(gnus-draft-setup): Rename from gnus-draft-setup-for-editing.
+	(gnus-draft-setup-for-sending): Abolish.
+
+	* lisp/nnheader.el (nnheader-auto-save-coding-system): New variable.
+
+	* lisp/message.el (message-draft-coding-system): Delegate the
+	value to nnheader-auto-save-coding-system.
+	(message-mode-map): Don't bind message-save-drafts.
+	(message-dont-send): Use save-buffer instead of message-save-buffer.
+	(message-save-drafts): Abolish.
+
+	* lisp/nndraft.el (nndraft-request-article): Revert to the
+	original implementation.
+
+2002-04-18   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-draft.el (gnus-group-send-queue): Pass group and
+	interactive as the arguments of gnus-draft-send.
+	(gnus-draft-send): Don't give "nndraft:queue" special treatment.
+
+2002-04-17   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-delay.el (gnus-delay-article): Use `message-save-drafts'
+        instead of `save-buffer'.
+
+2002-04-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-draft.el (gnus-draft-send): Always enter the Message
+	mode.
+
+2002-03-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-completing-read-group-name): Use
+	`mapatoms' to extract all groups from `gnus-active-hashtb'.
+
+2002-03-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-completing-read-group-name):
+	Improve to speed up.
+	(gnus-group-name-charset-group-alist): Change the default value.
+
+2002-03-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/message.el (message-save-drafts, message-check-8bit,
+	message-send-news, message-send-mail, message-send): Replace
+	`insert-buffer' with `insert-buffer-substring'.
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup,
+	gnus-article-edit-exit, article-verify-x-pgp-sig): Ditto.
+
+2002-03-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Don't provide
+	"View as different encoding" submenu if the function
+	`coding-system-list' is not available.
+
 2002-03-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-md5): Treat a given string as binary.
 
-2002-03-13  Simon Josefsson  <jas@extundo.com>
+2002-03-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/pop3.el (pop3-open-server): Revert multibyte change.  From
-	Pavel@Janik.cz (Pavel Jan,Bm(Bk).
+	* lisp/gnus-msg.el (gnus-summary-resend-message-edit): Use
+	`mime-edit-again' instead of `mime-to-mml' to recompose a message.
 
-2002-03-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+2002-03-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/pop3.el (pop3-open-server): Set process buffer unibyte.
+	* lisp/message.el (mm-make-temp-file): Copied from mm-util.el.
+
+2002-03-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Bind
+	`mm-7bit-chars' to the value that concat the original value and
+	escape.
+
+	* lisp/nnheader.el (mm-7bit-chars): Remove.
+
+2002-03-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-edit-mode): Don't call `mml-mode'.
+
+	* lisp/nnheader.el (mm-7bit-chars): Copied from mm-bodies.el.
+	(mm-multibyte-p): New alias.
+	(mm-char-int): Alias to `char-int'.
+
+2002-02-26  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-art.el (gnus-request-article-this-buffer): Sync up
+	with Oort-gnus.
+
+	* lisp/nntp.el (nntp-open-via-rlogin-and-telnet): Wrap
+	`call-process' with `as-binary-process'.
+
+2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/smiley.el (smiley-regexp-alist): Fix the order of faces.
+
+2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/smiley.el (smiley-regexp-alist): Use faces which originate
+	in etc-0.27.tar.gz if exist.
+	(gnus-smiley-file-types): Add xbm if available.
+	(smiley-region): Don't put two or more faces in one place.
 
 2002-02-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-request-article-this-buffer): Temporally
 	fix: erase the buffer before inserting (and saving) an article.
 
+2002-02-22  Steve Youngs  <youngs@xemacs.org>
+
+	* aclocal.m4 (AC_PATH_LISPDIR): Default to
+	.../site-packages/lisp/gnus for XEmacs.
+	(AC_PATH_ETCDIR): Default to .../site-packages/etc/gnus for
+	XEmacs.
+
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-group.el (gnus-group-name-encode): New function.
+	(gnus-group-encoded-name): New function.
+	(gnus-group-completing-read-group-name): New function.
+	(gnus-fetch-group): Use it.
+	(gnus-group-jump-to-group): Use it.
+	(gnus-group-unsubscribe-current-group): Use it.
+
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/nnheader.el (mm-string-as-unibyte): Undo the last change.
+	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Ditto.
+
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/nnheader.el (mm-string-as-unibyte): Alias to
+	`string-as-unibyte'.
+
+	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Return unibyte
+	group names.
+
+2002-02-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Bind `navi2ch-mona-font'.
+
+2002-02-18  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-art.el (gnus-treat-monafy): New user option.
+	(article-monafy): New function.
+
 2002-02-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (std11-field-value): Fix regexp.
+
+2002-02-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treat-display-grey-xface): Default to nil
+	under NTEmacs 21.
+
+2002-02-14  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-kill-summary-buffers): New
+	advice.
+
+2002-02-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/mm-view.el: Require `gnus-mailcap' rather than `mailcap'.
+
+	* lisp/nnheader.el (mm-with-unibyte-buffer): Bind `default-mc-flag'
+	instead of `mc-flag'.
+	(nnheader-with-unibyte-current-buffer): New macro.
+	(mm-with-unibyte-current-buffer): Alias to
+	`nnheader-with-unibyte-current-buffer'.
+	(nnheader-guess-mime-charset): New macro.
+	(mm-guess-mime-charset): Alias to `nnheader-guess-mime-charset'.
+	(shell-command-to-string): New function for old Emacsen.
+
+	* lisp/lpath.el: Don't fbind `shell-command-to-string'.
+
+2002-02-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/group-alist): Abolished.
+	(gnus-namazu/setup): Not set it.
+	(gnus-namazu/shutdown): Removed.
+	(gnus-namazu/group-prefixed-name): Handle case-insensitive file
+	names by itself.
+
+2002-02-09  NISHIDA Masakazu  <m_nisida@ca2.so-net.ne.jp>
+
+	* lisp/gnus-namazu.el (gnus-namazu/complete-query): Relaxed the
+	regexp which matches field search keywords.
+
+2002-02-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* etc/gnus/gnus.xpm: Remove some garbages at the end of the file.
+
+2002-02-03  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/nnir.el (nnir-run-namazu): According to SUSv3, LC_ALL is
+	prior to the other environment variables whose names are starting
+	with "LC_".  So there is no need to setting them.
+
+2002-02-03  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/nnir.el (nnir-imap-default-charset): New user option.
+	(nnir-run-imap): Supply the charset of a search criteria.
 
 2002-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 	Suggested by Kenichi OKADA <okada@opaopa.org>
 
 	* lisp/message.el (message-save-drafts): Override
 	`mime-header-encode-method-alist'.
+
+2002-02-01  Taiji Can  <Taiji.Can@grd.advantest.co.jp>
+
+	* texi/gnus-ja.texi (Posting Styles): Fix typo.
+
+2002-01-31  ARISAWA Akihiro  <ari@atesoft.advantest.co.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-traditional-message):
+	Reverted.
+
+2002-01-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-setup-buffer): Enable multibyte
+	in `gnus-original-article-buffer'.
 
 2002-01-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -51,15 +315,47 @@
 	* lisp/dgnushack.el: Load base64.el before canlock-om.el to avoid
 	damage to define `base64-encode-string' by MEL.
 
+2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-article-commands-menu): Bind "Html" to
+	the command `gnus-article-wash-html'.
+	(gnus-summary-article-menu): Ditto.
+	(gnus-summary-wash-map): Bind "h" to the command
+	`gnus-article-wash-html'.
+
+	* lisp/gnus-art.el (gnus-article-treatment-menu): Bind
+	"Treat html" to the command `gnus-article-wash-html'.
+
+	* lisp/nnheader.el: Place mm- stuff and mail-parse stuff in front
+	of the codes which use (or may use) them.
+
 2002-01-21  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
 
 	* lisp/gnus-art.el (gnus-article-display-traditional-message): Use
 	`set-buffer-multibyte'.
 
+2002-01-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-sum.el (gnus-summary-preview-mime-message): Protect
+	against dead windows.
+
+	* lisp/nnheader.el (mm-encode-coding-string): Alias to
+	`encode-coding-string'.
+	(mm-decode-coding-string): Alias to 'decode-coding-string'.
+
 2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el: T-gnus 6.15.5 revision 02 (merged
-	t-gnus-6_15-quimby branch).
+	* lisp/gnus-vers.el: T-gnus 6.15.6 revision 00.
+
+	* lisp/nnheader.el (std11-unfold-region): New function copied from
+	`rfc2047-unfold-region'.
+	(std11-unfold-field): New function.
+	(mail-header-unfold-field): Alias to `std11-unfold-field'.
+
+2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02 (synch
+	with the released version of Oort Gnus v0.05).
 
 2002-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -100,7 +396,7 @@
 
 2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 11 in
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01 in
 	order to force update cached format specs.
 
 	* lisp/gnus-spec.el (gnus-use-correct-string-widths): Default to t.

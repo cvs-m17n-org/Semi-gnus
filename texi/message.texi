@@ -47,7 +47,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996, 1997, 1998, 1999, 2000 
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002 
      Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -193,10 +193,14 @@ but you can change the behavior to suit your needs by fiddling with the
 @code{message-wide-reply-to-function}.  It is used in the same way as
 @code{message-reply-to-function} (@pxref{Reply}).
 
-@findex message-dont-reply-to-names
+@vindex message-dont-reply-to-names
 Addresses that match the @code{message-dont-reply-to-names} regular
 expression will be removed from the @code{Cc} header.
 
+@vindex message-wide-reply-confirm-recipients
+If @code{message-wide-reply-confirm-recipients} is non-@code{nil} you
+will be asked to confirm that you want to reply to multiple
+recipients.  The default is @code{nil}.
 
 @node Followup
 @section Followup
@@ -225,6 +229,11 @@ it is @code{nil}, don't use the value.
 @findex message-cancel-news
 The @code{message-cancel-news} command cancels the article in the
 current buffer.
+
+@vindex message-cancel-message
+The value of @code{message-cancel-message} is inserted in the body of
+the cancel message.  The default is @samp{I am canceling my own
+article.}.
 
 
 @node Superseding
@@ -283,9 +292,14 @@ constructed.  The default value is @code{nil}.
 @item message-forward-as-mime
 @vindex message-forward-as-mime
 If this variable is @code{t} (the default), forwarded messages are
-included as inline MIME RFC822 parts.  If it's @code{nil}, forwarded
+included as inline @sc{mime} RFC822 parts.  If it's @code{nil}, forwarded
 messages will just be copied inline to the new message, like previous,
-non MIME-savvy versions of gnus would do.
+non @sc{mime}-savvy versions of gnus would do.
+
+@item message-forward-before-signature
+@vindex message-forward-before-signature
+If non-@code{nil}, put forwarded message before signature, else after.
+
 @end table
 
 
@@ -326,11 +340,16 @@ followups to the post to specific places.  The Mail-Followup-To (MFT)
 was created to enable just this.  Two example scenarios where this is
 useful:
 
-@itemize
+@itemize @bullet
 @item
 A mailing list poster can use MFT to express that responses should be
 sent to just the list, and not the poster as well.  This will happen
 if the poster is already subscribed to the list.
+
+@item
+A mailing list poster can use MFT to express that responses should be
+sent to the list and the poster as well.  This will happen if the poster
+is not subscribed to the list.
 
 @item
 If a message is posted to several mailing lists, MFT may also be used
@@ -359,6 +378,7 @@ way.  The following variables would come in handy.
 
 @table @code
 
+@vindex message-subscribed-addresses
 @item message-subscribed-addresses
 This should be a list of addresses the user is subscribed to.  Its
 default value is @code{nil}.   Example: 
@@ -367,20 +387,34 @@ default value is @code{nil}.   Example:
       '("ding@@gnus.org" "bing@@noose.org"))
 @end lisp
 
+@vindex message-subscribed-regexps
 @item message-subscribed-regexps
 This should be a list of regexps denoting the addresses of mailing
 lists subscribed to.  Default value is @code{nil}.  Example: If you
 want to achieve the same result as above:
 @lisp
 (setq message-subscribed-regexps
-      '("[bd]ing@@\\(gnus\\|noose\\)\\.org"))
+      '("\\(ding@@gnus\\)\\|\\(bing@@noose\\)\\.org")
 @end lisp
 
+@vindex message-subscribed-address-functions
 @item message-subscribed-address-functions
 This can be a list of functions to be called (one at a time!!) to
 determine the value of MFT headers.  It is advisable that these
 functions not take any arguments.  Default value is @code{nil}.
 
+There is a pre-defined function in Gnus that is a good candidate for
+this variable.  @code{gnus-find-subscribed-addresses} is a function
+that returns a list of addresses corresponding to the groups that have
+the @code{subscribed} (@pxref{(gnus)subscribed})
+group parameter set to a non-nil value.  This is how you would do it.
+
+@lisp
+(setq message-subscribed-address-functions
+      '(gnus-find-subscribed-addresses))
+@end lisp
+
+@vindex message-subscribed-address-file
 @item message-subscribed-address-file
 You might be one organised human freak and have a list of addresses of
 all subscribed mailing lists in a separate file!  Then you can just
@@ -391,39 +425,50 @@ set this variable to the name of the file and life would be good.
 You can use one or more of the above variables.  All their values are
 ``added'' in some way that works :-)
 
-Now you are all set.  Just start composing a message as you normally
-do.  And just send it; as always.  Just before the message is sent
-out, Gnus' MFT generation thingy kicks in and checks if the message
-already has a MFT header.  If there is one, the header is left alone.
-If not then the list of recipient addresses (in the To: and Cc:
-headers) is checked to see if one of them is a list address you are
-subscribed to.  If none of them is a list address, then no MFT is
-generated; otherwise, a MFT is added to the other headers and set to
-the value of all addresses in To: and Cc:
+Now you are all set.  Just start composing a message as you normally do.
+And just send it; as always.  Just before the message is sent out, Gnus'
+MFT generation thingy kicks in and checks if the message already has a
+MFT field.  If there is one, it is left alone.  (Except if it's empty -
+in that case, the field is removed and is not replaced with an
+automatically generated one.  This lets you disable MFT generation on a
+per-message basis.)  If there is none, then the list of recipient
+addresses (in the To: and Cc: headers) is checked to see if one of them
+is a list address you are subscribed to.  If none of them is a list
+address, then no MFT is generated; otherwise, a MFT is added to the
+other headers and set to the value of all addresses in To: and Cc:
 
+@kindex C-c C-f C-a
+@findex message-gen-unsubscribed-mft
+@kindex C-c C-f C-m
+@findex message-goto-mail-followup-to
 Hm. ``So'', you ask, ``what if I send an email to a list I am not
-subscribed to?''  Well, the kind folks at Gnus Towers are working on a
-database of all known mailing list addresses that can be used for this
-purpose.  Till then, you could, like, insert a MFT header manually,
-with the help of @kbd{C-c C-f m} !!
+subscribed to?  I want my MFT to say that I want an extra copy.''
+(This is supposed to be interpreted by others the same way as if there
+were no MFT, but you can use an explicit MFT to override someone
+else's to-address group parameter.)  The function
+@code{message-gen-unsubscribed-mft} might come in handy.  It is bound
+to @kbd{C-c C-f C-a} by default.  In any case, you can insert a MFT of
+your own choice; @kbd{C-c C-f C-m}
+(@code{message-goto-mail-followup-to}) will help you get started.
 
 @c @node Honoring an MFT post
 @subsection Honoring an MFT post
 
+@vindex message-use-mail-followup-to
 When you followup to a post on a mailing list, and the post has a MFT
 header, Gnus' action will depend on the value of the variable
 @code{message-use-mail-followup-to}.  This variable can be one of:
 
 @table @code
-@item t
+@item use
  Always honor MFTs.  The To: and Cc: headers in your followup will be
- derived from the MFT header of the original post.
+ derived from the MFT header of the original post.  This is the default.
 
 @item nil
  Always dishonor MFTs (just ignore the darned thing)
 
 @item ask
-Gnus will prompt you for an action.  This is the default.
+Gnus will prompt you for an action.
 
 @end table
 
@@ -650,7 +695,7 @@ automatically add the @code{Content-Type} and
 
 The most typical thing users want to use the multipart things in
 @sc{mime} for is to add ``attachments'' to mail they send out.  This can
-be done with the @code{C-c C-a} command, which will prompt for a file
+be done with the @kbd{C-c C-a} command, which will prompt for a file
 name and a @sc{mime} type.
 
 You can also create arbitrarily complex multiparts using the MML
@@ -665,72 +710,84 @@ Manual}).
 @cindex PGP/MIME
 @cindex sign
 @cindex encrypt
+@cindex secure
 
 Using the MML language, Message is able to create digitally signed and
 digitally encrypted messages.  Message (or rather MML) currently
-support PGP (RFC 1991), PGP/MIME (RFC 2015/3156) and S/MIME.
-Instructing MML to perform security operations on a MIME part is done
-using the @code{C-c C-m s} key map for signing and the @code{C-c C-m
-c} key map for encryption, as follows.
+support PGP (RFC 1991), @sc{pgp/mime} (RFC 2015/3156) and @sc{s/mime}.
+Instructing MML to perform security operations on a @sc{mime} part is
+done using the @kbd{C-c C-m s} key map for signing and the @kbd{C-c
+C-m c} key map for encryption, as follows.
 
 @table @kbd
 
 @item C-c C-m s s
 @kindex C-c C-m s s
-@findex mml-secure-sign-smime
+@findex mml-secure-message-sign-smime
 
-Digitally sign current MIME part using S/MIME.
+Digitally sign current message using @sc{s/mime}.
 
 @item C-c C-m s o
 @kindex C-c C-m s o
-@findex mml-secure-sign-pgp
+@findex mml-secure-message-sign-pgp
 
-Digitally sign current MIME part using PGP.
+Digitally sign current message using PGP.
 
 @item C-c C-m s p
 @kindex C-c C-m s p
-@findex mml-secure-sign-pgp
+@findex mml-secure-message-sign-pgpmime
 
-Digitally sign current MIME part using PGP/MIME.
+Digitally sign current message using @sc{pgp/mime}.
 
 @item C-c C-m c s
 @kindex C-c C-m c s
-@findex mml-secure-encrypt-smime
+@findex mml-secure-message-encrypt-smime
 
-Digitally encrypt current MIME part using S/MIME.
+Digitally encrypt current message using @sc{s/mime}.
 
 @item C-c C-m c o
 @kindex C-c C-m c o
-@findex mml-secure-encrypt-pgp
+@findex mml-secure-message-encrypt-pgp
 
-Digitally encrypt current MIME part using PGP.
+Digitally encrypt current message using PGP.
 
 @item C-c C-m c p
 @kindex C-c C-m c p
-@findex mml-secure-encrypt-pgpmime
+@findex mml-secure-message-encrypt-pgpmime
 
-Digitally encrypt current MIME part using PGP/MIME.
+Digitally encrypt current message using @sc{pgp/mime}.
+
+@item C-c C-m C-n
+@kindex C-c C-m C-n
+@findex mml-unsecure-message
+Remove security related MML tags from message.
 
 @end table
 
 These commands do not immediately sign or encrypt the message, they
-merely insert proper MML tags to instruct the MML engine to perform that
-operation when the message is actually sent.  They may perform other
-operations too, such as locating and retrieving a S/MIME certificate of
-the person you wish to send encrypted mail to.
+merely insert the proper MML secure tag to instruct the MML engine to
+perform that operation when the message is actually sent. They may
+perform other operations too, such as locating and retrieving a
+@sc{s/mime} certificate of the person you wish to send encrypted mail
+to.  When the mml parsing engine converts your MML into a properly
+encoded @sc{mime} message, the secure tag will be replaced with either
+a part or a multipart tag.  If your message contains other mml parts,
+a multipart tag will be used; if no other parts are present in your
+message a single part tag will be used.  This way, message mode will
+do the Right Thing (TM) with signed/encrypted multipart messages.
 
 Since signing and especially encryption often is used when sensitive
 information is sent, you may want to have some way to ensure that your
 mail is actually signed or encrypted.  After invoking the above
 sign/encrypt commands, it is possible to preview the raw article by
-using @code{C-u C-m P} (@code{mml-preview}).  Then you can verify that
-your long rant about what your ex-significant other or whomever actually
-did with that funny looking person at that strange party the other
-night, actually will be sent encrypted.
+using @kbd{C-u C-c RET P} (@code{mml-preview}).  Then you can
+verify that your long rant about what your ex-significant other or
+whomever actually did with that funny looking person at that strange
+party the other night, actually will be sent encrypted.
 
-@emph{Note!}  Neither PGP/MIME nor S/MIME encrypt/signs RFC822 headers.
-They only operate on the MIME object.  Keep this in mind before sending
-mail with a sensitive Subject line.
+@emph{Note!}  Neither @sc{pgp/mime} nor @sc{s/mime} encrypt/signs
+RFC822 headers.  They only operate on the @sc{mime} object.  Keep this
+in mind before sending mail with a sensitive Subject line.
 
 Actually using the security commands above is not very difficult.  At
 least not compared with making sure all involved programs talk with each
@@ -740,52 +797,54 @@ programs are required to make things work, and some small general hints.
 @subsection Using S/MIME
 
 @emph{Note!}  This section assume you have a basic familiarity with
-modern cryptography, S/MIME, various PKCS standards, OpenSSL and so on.
+modern cryptography, @sc{s/mime}, various PKCS standards, OpenSSL and
+so on.
 
-The S/MIME support in Message (and MML) require OpenSSL.  OpenSSL
-perform the actual S/MIME sign/encrypt operations.  OpenSSL can be found
-at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
-Version 0.9.5a cannot extract mail addresses from certificates, and it
-insert a spurious CR character into MIME separators so you may wish to
-avoid it if you would like to avoid being regarded as someone who send
-strange mail. (Although by sending S/MIME messages you've probably
-already lost that contest.)
+The @sc{s/mime} support in Message (and MML) require OpenSSL.  OpenSSL
+perform the actual @sc{s/mime} sign/encrypt operations.  OpenSSL can
+be found at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later
+should work.  Version 0.9.5a cannot extract mail addresses from
+certificates, and it insert a spurious CR character into @sc{mime}
+separators so you may wish to avoid it if you would like to avoid
+being regarded as someone who send strange mail. (Although by sending
+@sc{s/mime} messages you've probably already lost that contest.)
 
 To be able to send encrypted mail, a personal certificate is not
 required.  Message (MML) need a certificate for the person to whom you
 wish to communicate with though.  You're asked for this when you type
-@code{C-c C-m c s}.  Currently there are two ways to retrieve this
-certificate, from a local file or from DNS.  If you chose a local file,
-it need to contain a X.509 certificate in PEM format.  If you chose DNS,
-you're asked for the domain name where the certificate is stored, the
-default is a good guess.  To my belief, Message (MML) is the first mail
-agent in the world to support retrieving S/MIME certificates from DNS,
-so you're not likely to find very many certificates out there.  At least
-there should be one, stored at the domain @code{simon.josefsson.org}.
-LDAP is a more popular method of distributing certificates, support for
-it is planned.  (Meanwhile, you can use @code{ldapsearch} from the
-command line to retrieve a certificate into a file and use it.)
+@kbd{C-c C-m c s}.  Currently there are two ways to retrieve this
+certificate, from a local file or from DNS.  If you chose a local
+file, it need to contain a X.509 certificate in PEM format.  If you
+chose DNS, you're asked for the domain name where the certificate is
+stored, the default is a good guess.  To my belief, Message (MML) is
+the first mail agent in the world to support retrieving @sc{s/mime}
+certificates from DNS, so you're not likely to find very many
+certificates out there.  At least there should be one, stored at the
+domain @code{simon.josefsson.org}.  LDAP is a more popular method of
+distributing certificates, support for it is planned.  (Meanwhile, you
+can use @code{ldapsearch} from the command line to retrieve a
+certificate into a file and use it.)
 
 As for signing messages, OpenSSL can't perform signing operations
 without some kind of configuration.  Especially, you need to tell it
 where your private key and your certificate is stored.  MML uses an
-Emacs interface to OpenSSL, aptly named @code{smime.el}, and it contain
-a @code{custom} group used for this configuration.  So, try @code{M-x
-customize-group RET smime RET} and look around.
+Emacs interface to OpenSSL, aptly named @code{smime.el}, and it
+contain a @code{custom} group used for this configuration.  So, try
+@kbd{M-x customize-group RET smime RET} and look around.
 
-Currently there is no support for talking to a CA (or RA) to create your
-own certificate.  None is planned either.  You need to do this manually
-with OpenSSL or using some other program.  I used Netscape and got a
-free S/MIME certificate from one of the big CA's on the net.  Netscape
-is able to export your private key and certificate in PKCS #12 format.
-Use OpenSSL to convert this into a plain X.509 certificate in PEM format
-as follows.
+Currently there is no support for talking to a CA (or RA) to create
+your own certificate.  None is planned either.  You need to do this
+manually with OpenSSL or using some other program.  I used Netscape
+and got a free @sc{s/mime} certificate from one of the big CA's on the
+net.  Netscape is able to export your private key and certificate in
+PKCS #12 format.  Use OpenSSL to convert this into a plain X.509
+certificate in PEM format as follows.
 
 @example
 $ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
 @end example
 
-The @code{key+cert.pem} file should be pointed to from the
+The @file{key+cert.pem} file should be pointed to from the
 @code{smime-keys} variable.  You should now be able to send signed mail.
 
 @emph{Note!}  Your private key is store unencrypted in the file, so take
@@ -793,9 +852,9 @@ care in handling it.
 
 @subsection Using PGP/MIME
 
-PGP/MIME requires an external OpenPGP implementation, such as GNU
-Privacy Guard (@uref{http://www.gnupg.org/}).  It also requires an Emacs
-interface to it, such as Mailcrypt (available from
+@sc{pgp/mime} requires an external OpenPGP implementation, such as GNU
+Privacy Guard (@uref{http://www.gnupg.org/}).  It also requires an
+Emacs interface to it, such as Mailcrypt (available from
 @uref{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
 Florian Weimer's @code{gpg.el}.
 
@@ -822,6 +881,7 @@ many places to rotate the text.  The default is 13.
 @item C-c C-e
 @kindex C-c C-e
 @findex message-elide-region
+@vindex message-elide-ellipsis
 Elide the text between point and mark (@code{message-elide-region}).
 The text is killed and replaced with the contents of the variable
 @code{message-elide-ellipsis}. The default value is to use an ellipsis
@@ -875,6 +935,13 @@ Insert a @code{To} header that contains the @code{Reply-To} or
 Insert a @code{Newsgroups} header that reflects the @code{Followup-To}
 or @code{Newsgroups} header of the article you're replying to
 (@code{message-insert-newsgroups}).
+
+@item C-c C-o
+@kindex C-c C-o
+@findex message-sort-headers
+@vindex message-header-format-alist
+Sort headers according to @code{message-header-format-alist}
+(@code{message-sort-headers}).
 
 @item C-c M-r
 @kindex C-c M-r
@@ -1081,9 +1148,9 @@ buffers.
 
 @item message-subject-re-regexp
 @vindex message-subject-re-regexp
-@cindex Aw:
-@cindex Sv:
-@cindex Re:
+@cindex Aw
+@cindex Sv
+@cindex Re
 Responses to messages have subjects that start with @samp{Re: }.  This
 is @emph{not} an abbreviation of the English word ``response'', but is
 Latin, and means ``in response to''.  Some illiterate nincompoops have
@@ -1099,7 +1166,7 @@ responding to a message:
 
 @lisp
 (setq message-subject-re-regexp
-     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\))
+     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\)")
 @end lisp
 
 @item message-alternative-emails
@@ -1157,6 +1224,34 @@ the default), these headers will be removed before mailing when sending
 messages via MH.  Set it to @code{nil} if your MH can handle these
 headers.
 
+@item message-qmail-inject-program
+@vindex message-qmail-inject-program
+@cindex qmail
+Location of the qmail-inject program.
+
+@item message-qmail-inject-args
+@vindex message-qmail-inject-args
+Arguments passed to qmail-inject programs.
+This should be a list of strings, one string for each argument.  It
+may also be a function.
+
+For e.g., if you wish to set the envelope sender address so that bounces
+go to the right place or to deal with listserv's usage of that address, you
+might set this variable to @code{'("-f" "you@@some.where")}.
+
+@item message-sendmail-f-is-evil
+@vindex message-sendmail-f-is-evil
+@cindex sendmail
+Non-@code{nil} means don't add @samp{-f username} to the sendmail
+command line.  Doing so would be even more evil than leaving it out.
+
+@item message-mailer-swallows-blank-line
+@vindex message-mailer-swallows-blank-line
+Set this to non-@code{nil} if the system's mailer runs the header and
+body together.  (This problem exists on Sunos 4 when sendmail is run
+in remote mode.)  The value should be an expression to test whether
+the problem will actually occur.
+
 @item message-send-mail-partially-limit
 @vindex message-send-mail-partially-limit
 The limitation of messages sent as message/partial.
@@ -1196,6 +1291,8 @@ to.  If it isn't present already, it will be prompted for.
 
 @item Organization
 @cindex organization
+@vindex message-user-organization
+@vindex message-user-organization-file
 This optional header will be filled out depending on the
 @code{message-user-organization} variable.
 @code{message-user-organization-file} will be used if this variable is
@@ -1229,18 +1326,21 @@ header of the article being replied to.
 
 @item Expires
 @cindex Expires
+@vindex message-expires
 This extremely optional header will be inserted according to the
 @code{message-expires} variable.  It is highly deprecated and shouldn't
 be used unless you know what you're doing.
 
 @item Distribution
 @cindex Distribution
+@vindex message-distribution-function
 This optional header is filled out according to the
 @code{message-distribution-function} variable.  It is a deprecated and
 much misunderstood header.
 
 @item Path
 @cindex path
+@vindex message-user-path
 This extremely optional header should probably never be used.
 However, some @emph{very} old servers require that this header is
 present.  @code{message-user-path} further controls how this
@@ -1480,7 +1580,7 @@ If this variable is @code{nil}, no signature will be inserted at all.
 @item message-signature-file
 @vindex message-signature-file
 File containing the signature to be inserted at the end of the buffer.
-The default is @samp{~/.signature}.
+The default is @file{~/.signature}.
 
 @end table
 
@@ -1523,6 +1623,11 @@ follows this line--} by default.
 @item message-directory
 @vindex message-directory
 Directory used by many mailey things.  The default is @file{~/Mail/}.
+
+@item message-auto-save-directory
+@vindex message-auto-save-directory
+Directory where Message auto-saves buffers if Gnus isn't running.  If
+@code{nil}, Message won't auto-save.  The default is @file{~/Mail/drafts/}.
 
 @item message-signature-setup-hook
 @vindex message-signature-setup-hook
@@ -1583,9 +1688,22 @@ Hook run before sending news messages.
 @vindex message-sent-hook
 Hook run after sending messages.
 
+@item message-cancel-hook
+@vindex message-cancel-hook
+Hook run when cancelling news articles.
+
 @item message-mode-syntax-table
 @vindex message-mode-syntax-table
 Syntax table used in message mode buffers.
+
+@item message-strip-special-text-properties
+@vindex message-strip-special-text-properties
+Emacs has a number of special text properties which can break message
+composing in various ways.  If this option is set, message will strip
+these properties from the message composition buffer.  However, some
+packages requires these properties to be present in order to work.  If
+you use one of these packages, turn this option off, and hope the
+message composition doesn't break too bad.
 
 @item message-send-method-alist
 @vindex message-send-method-alist
@@ -1639,6 +1757,16 @@ newsgroups the article has been posted to will be inserted there.  If
 this variable is @code{nil}, no such courtesy message will be added.
 The default value is @samp{"The following message is a courtesy copy of
 an article\\nthat has been posted to %s as well.\\n\\n"}.
+
+@item message-fcc-externalize-attachments
+@vindex message-fcc-externalize-attachments
+If @code{nil}, attach files as normal parts in Fcc copies; if it is
+non-@code{nil}, attach local files as external parts.
+
+@item message-interactive
+@vindex message-interactive
+If non-@code{nil} wait for and display errors when sending a message;
+if @code{nil} let the mailer mail back a message to report errors.
 
 @end table
 
@@ -1762,7 +1890,7 @@ a form to be @code{eval}ed.
 
 Message uses virtually only its own variables---older @code{mail-}
 variables aren't consulted.  To force Message to take those variables
-into account, you can put the following in your @code{.emacs} file:
+into account, you can put the following in your @file{.emacs} file:
 
 @lisp
 (require 'messcompat)

@@ -140,6 +140,18 @@ If this is `ask' the hook will query the user."
 		 (const :tag "Ask" ask))
   :group 'gnus-agent)
 
+(defcustom gnus-agent-mark-unread-after-downloaded t
+  "Indicate whether to mark articles unread after downloaded."
+  :version "21.1"
+  :type 'boolean
+  :group 'gnus-agent)
+
+(defcustom gnus-agent-download-marks '(download)
+  "Marks for downloading."
+  :version "21.1"
+  :type '(repeat (symbol :tag "Mark"))
+  :group 'gnus-agent)
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -155,6 +167,7 @@ If this is `ask' the hook will query the user."
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
 (defvar gnus-agent-file-coding-system 'raw-text)
+(defvar gnus-agent-file-loading-cache nil)
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -390,6 +403,13 @@ If this is `ask' the hook will query the user."
   (interactive)
   (setq gnus-plugged t)
   (gnus))
+
+;;;###autoload
+(defun gnus-slave-unplugged (&optional arg)
+  "Read news as a slave unplugged."
+  (interactive "P")
+  (setq gnus-plugged nil)
+  (gnus arg nil 'slave))
 
 ;;;###autoload
 (defun gnus-agentize ()
@@ -684,7 +704,8 @@ the actual number of articles toggled is returned."
 	  (push article gnus-newsgroup-undownloaded))
       (setq gnus-newsgroup-undownloaded
 	    (delq article gnus-newsgroup-undownloaded))
-      (push article gnus-newsgroup-downloadable))
+      (setq gnus-newsgroup-downloadable
+	    (gnus-add-to-sorted-list gnus-newsgroup-downloadable article)))
     (gnus-summary-update-mark
      (if unmark gnus-undownloaded-mark gnus-downloadable-mark)
      'unread)))
@@ -696,12 +717,21 @@ the actual number of articles toggled is returned."
 	       (gnus-agent-method-p gnus-command-method))
       (gnus-agent-load-alist gnus-newsgroup-name)
       ;; First mark all undownloaded articles as undownloaded.
-      (dolist (article (mapcar (lambda (header) (mail-header-number header))
-			       gnus-newsgroup-headers))
-	(unless (or (cdr (assq article gnus-agent-article-alist))
-		    (memq article gnus-newsgroup-downloadable)
-		    (memq article gnus-newsgroup-cached))
-	  (push article gnus-newsgroup-undownloaded)))
+      (let ((articles (mapcar (lambda (header) (mail-header-number header))
+			      gnus-newsgroup-headers))
+	    (agent-articles gnus-agent-article-alist)
+	    candidates article)
+	(while (setq article (pop articles))
+	  (while (and agent-articles
+		      (< (caar agent-articles) article))
+	    (setq agent-articles (cdr agent-articles)))
+	  (when (or (not (cdar agent-articles))
+		    (not (= (caar agent-articles) article)))
+	    (push article candidates)))
+	(dolist (article candidates)
+	  (unless (or (memq article gnus-newsgroup-downloadable)
+		      (memq article gnus-newsgroup-cached))
+	    (push article gnus-newsgroup-undownloaded))))
       ;; Then mark downloaded downloadable as not-downloadable,
       ;; if you get my drift.
       (dolist (article gnus-newsgroup-downloadable)
@@ -736,7 +766,8 @@ the actual number of articles toggled is returned."
 	    (dolist (article articles)
 	      (setq gnus-newsgroup-downloadable
 		    (delq article gnus-newsgroup-downloadable))
-	      (gnus-summary-mark-article article gnus-unread-mark))))
+	      (if gnus-agent-mark-unread-after-downloaded
+		  (gnus-summary-mark-article article gnus-unread-mark)))))
       (when (and (not state)
 		 gnus-plugged)
 	(gnus-agent-toggle-plugged nil)))))
@@ -949,32 +980,33 @@ the actual number of articles toggled is returned."
 	  (while pos
 	    (narrow-to-region (cdar pos) (or (cdadr pos) (point-max)))
 	    (goto-char (point-min))
-	    (when (search-forward "\n\n" nil t)
-	      (when (search-backward "\nXrefs: " nil t)
-		;; Handle crossposting.
-		(skip-chars-forward "^ ")
-		(skip-chars-forward " ")
-		(setq crosses nil)
-		(while (looking-at "\\([^: \n]+\\):\\([0-9]+\\) +")
-		  (push (cons (buffer-substring (match-beginning 1)
-						(match-end 1))
-			      (buffer-substring (match-beginning 2)
-						(match-end 2)))
-			crosses)
-		  (goto-char (match-end 0)))
-		(gnus-agent-crosspost crosses (caar pos))))
-	    (goto-char (point-min))
-	    (if (not (re-search-forward "^Message-ID: *<\\([^>\n]+\\)>" nil t))
-		(setq id "No-Message-ID-in-article")
-	      (setq id (buffer-substring (match-beginning 1) (match-end 1))))
-	    (write-region-as-coding-system
-	     gnus-agent-file-coding-system
-	     (point-min) (point-max)
-	     (concat dir (number-to-string (caar pos))) nil 'silent)
-	    (when (setq elem (assq (caar pos) gnus-agent-article-alist))
-	      (setcdr elem t))
-	    (gnus-agent-enter-history
-	     id (or crosses (list (cons group (caar pos)))) date)
+	    (unless (eobp)  ;; Don't save empty articles.
+	      (when (search-forward "\n\n" nil t)
+		(when (search-backward "\nXrefs: " nil t)
+		  ;; Handle cross posting.
+		  (skip-chars-forward "^ ")
+		  (skip-chars-forward " ")
+		  (setq crosses nil)
+		  (while (looking-at "\\([^: \n]+\\):\\([0-9]+\\) +")
+		    (push (cons (buffer-substring (match-beginning 1)
+						  (match-end 1))
+				(buffer-substring (match-beginning 2)
+						  (match-end 2)))
+			  crosses)
+		    (goto-char (match-end 0)))
+		  (gnus-agent-crosspost crosses (caar pos))))
+	      (goto-char (point-min))
+	      (if (not (re-search-forward
+			"^Message-ID: *<\\([^>\n]+\\)>" nil t))
+		  (setq id "No-Message-ID-in-article")
+		(setq id (buffer-substring (match-beginning 1) (match-end 1))))
+	      (write-region-as-coding-system
+	       gnus-agent-file-coding-system (point-min) (point-max)
+	       (concat dir (number-to-string (caar pos))) nil 'silent)
+	      (when (setq elem (assq (caar pos) gnus-agent-article-alist))
+		(setcdr elem t))
+	      (gnus-agent-enter-history
+	       id (or crosses (list (cons group (caar pos)))) date))
 	    (widen)
 	    (pop pos)))
 	(gnus-agent-save-alist group)))))
@@ -1036,13 +1068,14 @@ the actual number of articles toggled is returned."
 	   (setq articles (nthcdr i articles))))
     ;; add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
-      (setq articles (gnus-range-add articles (cdr arts))))
+      (unless (memq (car arts) '(seen recent))
+	(setq articles (gnus-range-add articles (cdr arts)))))
     (setq articles (sort (gnus-uncompress-sequence articles) '<))
     ;; Remove known articles.
     (when (gnus-agent-load-alist group)
-      (setq articles (gnus-sorted-intersection
+      (setq articles (gnus-list-range-intersection
 		      articles
-		      (gnus-uncompress-range
+		      (list
 		       (cons (1+ (caar (last gnus-agent-article-alist)))
 			     (cdr (gnus-active group)))))))
     ;; Fetch them.
@@ -1069,79 +1102,88 @@ the actual number of articles toggled is returned."
 	articles))))
 
 (defsubst gnus-agent-copy-nov-line (article)
-  (let (b e)
+  (let (art b e)
     (set-buffer gnus-agent-overview-buffer)
-    (unless (eobp)
+    (while (and (not (eobp))
+		(< (setq art (read (current-buffer))) article))
+      (forward-line 1))
+    (beginning-of-line)
+    (if (or (eobp)
+	    (not (eq article art)))
+	(set-buffer nntp-server-buffer)
       (setq b (point))
-      (if (eq article (read (current-buffer)))
-	  (setq e (progn (forward-line 1) (point)))
-	(progn
-	  (beginning-of-line)
-	  (setq e b)))
+      (setq e (progn (forward-line 1) (point)))
       (set-buffer nntp-server-buffer)
       (insert-buffer-substring gnus-agent-overview-buffer b e))))
 
 (defun gnus-agent-braid-nov (group articles file)
-  (set-buffer gnus-agent-overview-buffer)
-  (goto-char (point-min))
-  (set-buffer nntp-server-buffer)
-  (erase-buffer)
-  (nnheader-insert-file-contents file)
-  (goto-char (point-max))
-  (if (or (= (point-min) (point-max))
-	  (progn
-	    (forward-line -1)
-	    (< (read (current-buffer)) (car articles))))
-      ;; We have only headers that are after the older headers,
-      ;; so we just append them.
-      (progn
-	(goto-char (point-max))
-	(insert-buffer-substring gnus-agent-overview-buffer))
-    ;; We do it the hard way.
-    (nnheader-find-nov-line (car articles))
-    (gnus-agent-copy-nov-line (car articles))
-    (pop articles)
-    (while (and articles
-		(not (eobp)))
-      (while (and (not (eobp))
-		  (< (read (current-buffer)) (car articles)))
-	(forward-line 1))
-      (beginning-of-line)
-      (unless (eobp)
-	(gnus-agent-copy-nov-line (car articles))
-	(setq articles (cdr articles))))
+  (let (start last)
+    (set-buffer gnus-agent-overview-buffer)
+    (goto-char (point-min))
     (set-buffer nntp-server-buffer)
-    (when articles
-      (let (b e)
-	(set-buffer gnus-agent-overview-buffer)
-	(setq b (point)
-	      e (point-max))
+    (erase-buffer)
+    (nnheader-insert-file-contents file)
+    (goto-char (point-max))
+    (unless (or (= (point-min) (point-max))
+		(progn
+		  (forward-line -1)
+		  (< (setq last (read (current-buffer))) (car articles))))
+      ;; We do it the hard way.
+      (nnheader-find-nov-line (car articles))
+      (gnus-agent-copy-nov-line (pop articles))
+      (while (and articles
+		  (not (eobp)))
 	(while (and (not (eobp))
-		    (<= (read (current-buffer)) (car articles)))
-	  (forward-line 1)
-	  (setq b (point)))
-	(set-buffer nntp-server-buffer)
-	(insert-buffer-substring gnus-agent-overview-buffer b e)))))
+		    (< (read (current-buffer)) (car articles)))
+	  (forward-line 1))
+	(beginning-of-line)
+	(unless (eobp)
+	  (gnus-agent-copy-nov-line (pop articles)))))
+    ;; Copy the rest lines
+    (set-buffer nntp-server-buffer)
+    (goto-char (point-max))
+    (when articles
+      (when last
+	(set-buffer gnus-agent-overview-buffer)
+	(while (and (not (eobp))
+		    (<= (read (current-buffer)) last))
+	  (forward-line 1))
+	(beginning-of-line)
+	(setq start (point))
+	(set-buffer nntp-server-buffer))
+      (insert-buffer-substring gnus-agent-overview-buffer start))))
 
 (defun gnus-agent-load-alist (group &optional dir)
   "Load the article-state alist for GROUP."
-  (setq gnus-agent-article-alist
-	(gnus-agent-read-file
-	 (if dir
-	     (expand-file-name ".agentview" dir)
-	   (gnus-agent-article-name ".agentview" group)))))
+  (let ((file))
+    (setq gnus-agent-article-alist
+	  (gnus-cache-file-contents
+	   (if dir
+	       (expand-file-name ".agentview" dir)
+	     (gnus-agent-article-name ".agentview" group))
+	   'gnus-agent-file-loading-cache
+	   'gnus-agent-read-file))))
 
 (defun gnus-agent-save-alist (group &optional articles state dir)
   "Save the article-state alist for GROUP."
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system)
-	print-level print-length item)
-    (dolist (art articles)
-      (if (setq item (memq art gnus-agent-article-alist))
-	  (setcdr item state)
-	(push  (cons art state) gnus-agent-article-alist)))
-    (setq gnus-agent-article-alist
-	  (sort gnus-agent-article-alist 'car-less-than-car))
+  (let* ((file-name-coding-system nnmail-pathname-coding-system)
+	 (pathname-coding-system nnmail-pathname-coding-system)
+	 (prev (cons nil gnus-agent-article-alist))
+	 (all prev)
+	 print-level print-length item article)
+    (while (setq article (pop articles))
+      (while (and (cdr prev)
+		  (< (caadr prev) article))
+	(setq prev (cdr prev)))
+      (cond
+       ((not (cdr prev))
+	(setcdr prev (list (cons article state))))
+       ((> (caadr prev) article)
+	(setcdr prev (cons (cons article state) (cdr prev))))
+       ((= (caadr prev) article)
+	(setcdr (cadr prev) state)))
+      (setq prev (cdr prev)))
+    (setq gnus-agent-article-alist (cdr all))
     (with-temp-file (if dir
 			(expand-file-name ".agentview" dir)
 		      (gnus-agent-article-name ".agentview" group))
@@ -1187,12 +1229,12 @@ the actual number of articles toggled is returned."
 		      (gnus-agent-fetch-group-1 group gnus-command-method))))))
 	  (error
 	   (unless (funcall gnus-agent-confirmation-function
-			    (format "Error (%s).  Continue? " err))
+			    (format "Error (%s).  Continue? " (cadr err)))
 	     (error "Cannot fetch articles into the Gnus agent")))
 	  (quit
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Quit fetching session (%s).  Continue? "
-				    err))
+				    (cadr err)))
 	     (signal 'quit "Cannot fetch articles into the Gnus agent"))))
 	(pop methods))
       (run-hooks 'gnus-agent-fetch-hook)
@@ -1262,18 +1304,20 @@ the actual number of articles toggled is returned."
       (when arts
 	(gnus-agent-fetch-articles group arts)))
     ;; Perhaps we have some additional articles to fetch.
-    (setq arts (assq 'download (gnus-info-marks
-				(setq info (gnus-get-info group)))))
-    (when (cdr arts)
-      (gnus-message 8 "Agent is downloading marked articles...")
-      (gnus-agent-fetch-articles
-       group (gnus-uncompress-range (cdr arts)))
-      (setq marks (delq arts (gnus-info-marks info)))
-      (gnus-info-set-marks info marks)
-      (gnus-dribble-enter
-       (concat "(gnus-group-set-info '"
-	       (gnus-prin1-to-string info)
-	       ")")))))
+    (dolist (mark gnus-agent-download-marks)
+      (setq arts (assq mark (gnus-info-marks
+			     (setq info (gnus-get-info group)))))
+      (when (cdr arts)
+	(gnus-message 8 "Agent is downloading marked articles...")
+	(gnus-agent-fetch-articles
+	 group (gnus-uncompress-range (cdr arts)))
+	(when (eq mark 'download)
+	  (setq marks (delq arts (gnus-info-marks info)))
+	  (gnus-info-set-marks info marks)
+	  (gnus-dribble-enter
+	   (concat "(gnus-group-set-info '"
+		   (gnus-prin1-to-string info)
+		   ")")))))))
 
 ;;;
 ;;; Agent Category Mode
@@ -1597,9 +1641,11 @@ The following commands are available:
 (defun gnus-get-predicate (predicate)
   "Return the predicate for CATEGORY."
   (or (cdr (assoc predicate gnus-category-predicate-cache))
-      (cdar (push (cons predicate
-			(gnus-category-make-function predicate))
-		  gnus-category-predicate-cache))))
+      (let ((func (gnus-category-make-function predicate)))
+	(setq gnus-category-predicate-cache
+	      (nconc gnus-category-predicate-cache
+		     (list (cons predicate func))))
+	func)))
 
 (defun gnus-group-category (group)
   "Return the category GROUP belongs to."
@@ -1834,15 +1880,15 @@ The following commands are available:
 	  (erase-buffer)
 	  (let ((nnheader-file-coding-system
 		 gnus-agent-file-coding-system))
-	    (nnheader-insert-file-contents file))
-	  (goto-char (point-min))
+	    (nnheader-insert-nov-file file (car articles)))
+	  (nnheader-find-nov-line (car articles))
 	  (while (not (eobp))
 	    (when (looking-at "[0-9]")
 	      (push (read (current-buffer)) cached-articles))
 	    (forward-line 1))
-	  (setq cached-articles (sort cached-articles '<))))
+	  (setq cached-articles (nreverse cached-articles))))
       (if (setq uncached-articles
-		(gnus-set-difference articles cached-articles))
+		(gnus-sorted-difference articles cached-articles))
 	  (progn
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer)
@@ -1890,8 +1936,9 @@ The following commands are available:
 		  (gnus-agent-directory)
 		  (gnus-agent-group-path group) "/"
 		  (number-to-string article)))
-	(buffer-read-only nil))
-    (when (file-exists-p file)
+	 (buffer-read-only nil))
+    (when (and (file-exists-p file)
+	       (> (nth 7 (file-attributes file)) 0))
       (erase-buffer)
       (gnus-kill-all-overlays)
       (insert-file-contents-as-coding-system gnus-cache-coding-system file)

@@ -311,7 +311,7 @@ hierarchy in its entirety."
   :type 'boolean)
 
 (defcustom gnus-auto-subscribed-groups
-  "^nnml\\|^nnfolder\\|^nnmbox\\|^nnmh\\|^nnbabyl"
+  "^nnml\\|^nnfolder\\|^nnmbox\\|^nnmh\\|^nnbabyl\\|^nnmaildir"
   "*All new groups that match this regexp will be subscribed automatically.
 Note that this variable only deals with new groups.  It has no effect
 whatsoever on old groups.
@@ -457,7 +457,7 @@ Can be used to turn version control on or off."
 	    (condition-case var
 		(load file nil t)
 	      (error
-	       (error "Error in %s: %s" file var)))))))))
+	       (error "Error in %s: %s" file (cadr var))))))))))
 
 ;; For subscribing new newsgroup
 
@@ -715,6 +715,8 @@ prompt the user for the name of an NNTP server to use."
     (nnheader-init-server-buffer)
     (setq gnus-slave slave)
     (gnus-read-init-file)
+    (if gnus-agent
+	(gnus-agentize))
 
     (when gnus-simple-splash
       (setq gnus-simple-splash nil)
@@ -1575,6 +1577,7 @@ newsgroup."
 ;; Go though `gnus-newsrc-alist' and compare with `gnus-active-hashtb'
 ;; and compute how many unread articles there are in each group.
 (defun gnus-get-unread-articles (&optional level)
+  (setq gnus-server-method-cache nil)
   (let* ((newsrc (cdr gnus-newsrc-alist))
 	 (level (or level gnus-activate-level (1+ gnus-level-subscribed)))
 	 (foreign-level
@@ -1942,7 +1945,7 @@ newsgroup."
     (goto-char (point-min))
     (let (group max min)
       (while (not (eobp))
-	(condition-case err
+	(condition-case ()
 	    (progn
 	      (narrow-to-region (point) (gnus-point-at-eol))
 	      ;; group gets set to a symbol interned in the hash table
@@ -2742,7 +2745,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
   (save-excursion
     (set-buffer gnus-dribble-buffer)
     (let ((slave-name
-	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
+	   (mm-make-temp-file (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
       (gnus-write-buffer-as-coding-system gnus-ding-file-coding-system
@@ -2871,7 +2874,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 		     (name (symbol-name group))
 		     (charset
 		      (or (gnus-group-name-charset method name)
-			  (gnus-parameter-charset name))))
+			  (gnus-parameter-charset name)
+			  gnus-default-charset)))
 		(when (and str charset (featurep 'mule))
 		  (setq str (decode-coding-string str charset)))
 		(set group str)))

@@ -341,11 +341,12 @@ discarded after running the split process."
   :type 'hook)
 
 (defcustom nnmail-large-newsgroup 50
-  "*The number of the articles which indicates a large newsgroup.
+  "*The number of the articles which indicates a large newsgroup or nil.
 If the number of the articles is greater than the value, verbose
 messages will be shown to indicate the current status."
   :group 'nnmail-various
-  :type 'integer)
+  :type '(choice (const :tag "infinite" nil)
+                 (number :tag "count")))
 
 (defcustom nnmail-split-fancy "mail.misc"
   "Incoming mail can be split according to this fancy variable.
@@ -380,8 +381,8 @@ GROUP: Mail will be stored in GROUP (a string).
 junk: Mail will be deleted.  Use with care!  Do not submerge in water!
   Example:
   (setq nnmail-split-fancy
-        '(| (\"Subject\" \"MAKE MONEY FAST\" junk)
-            ...other.rules.omitted...))
+	'(| (\"Subject\" \"MAKE MONEY FAST\" junk)
+	    ...other.rules.omitted...))
 
 FIELD must match a complete field name.  VALUE must match a complete
 word according to the `nnmail-split-fancy-syntax-table' syntax table.
@@ -476,6 +477,11 @@ parameter.  It should return nil, `warn' or `delete'."
   :version "21.1"
   :group 'nnmail
   :type 'integer)
+
+(defcustom nnmail-mail-splitting-charset nil
+  "Default charset to be used when splitting incoming mail."
+  :group 'nnmail
+  :type 'symbol)
 
 ;;; Internal variables.
 
@@ -994,6 +1000,9 @@ FUNC will be called with the group name to determine the article number."
 	(erase-buffer)
 	;; Copy the headers into the work buffer.
 	(insert-buffer-substring obuf beg end)
+	;; Decode MIME headers and charsets.
+	(mime-decode-header-in-region (point-min) (point-max)
+				      nnmail-mail-splitting-charset)
 	;; Fold continuation lines.
 	(goto-char (point-min))
 	(while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)
@@ -1023,8 +1032,8 @@ FUNC will be called with the group name to determine the article number."
 		       (or (funcall nnmail-split-methods)
 			   '("bogus"))
 		     (error
-		      (nnheader-message 5
-					"Error in `nnmail-split-methods'; using `bogus' mail group")
+		      (nnheader-message
+		       5 "Error in `nnmail-split-methods'; using `bogus' mail group")
 		      (sit-for 1)
 		      '("bogus")))))
 	      (setq split (gnus-remove-duplicates split))
@@ -1076,7 +1085,8 @@ FUNC will be called with the group name to determine the article number."
 	    (nnheader-set-temp-buffer "*Split Trace*")
 	    (gnus-add-buffer)
 	    (dolist (trace (nreverse nnmail-split-trace))
-	      (insert trace "\n"))
+	      (prin1 trace (current-buffer))
+	      (insert "\n"))
 	    (goto-char (point-min))
 	    (gnus-configure-windows 'split-trace)
 	    (set-buffer restore)))
@@ -1223,7 +1233,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
      ;; A group name.  Do the \& and \N subs into the string.
      ((stringp split)
       (when nnmail-split-tracing
-	(push (format "\"%s\"" split) nnmail-split-trace))
+	(push split nnmail-split-trace))
       (list (nnmail-expand-newtext split)))
 
      ;; Junk the message.
@@ -1262,7 +1272,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	(while (and (goto-char end-point)
 		    (re-search-backward (cdr cached-pair) nil t))
 	  (when nnmail-split-tracing
-	    (push (cdr cached-pair) nnmail-split-trace))
+	    (push split nnmail-split-trace))
 	  (let ((split-rest (cddr split))
 		(end (match-end 0))
 		;; The searched regexp is \(\(FIELD\).*\)\(VALUE\).  So,
@@ -1447,7 +1457,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 (defvar group)
 (defvar group-art-list)
 (defvar group-art)
-(defun nnmail-cache-insert (id)
+(defun nnmail-cache-insert (id &optional grp)
   (when nnmail-treat-duplicates
     ;; Store some information about the group this message is written
     ;; to.  This function might have been called from various places.
@@ -1458,7 +1468,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
     ;; the car of a pair is a group name.  Should we check that the
     ;; length of the list is equal to 1? -- kai
     (let ((g nil))
-      (cond ((and (boundp 'group) group)
+      (cond (grp
+	     (setq g grp))
+	    ((and (boundp 'group) group)
 	     (setq g group))
 	    ((and (boundp 'group-art-list) group-art-list
 		  (listp group-art-list))

@@ -38,7 +38,7 @@ How to get? (via CVS)
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_15 gnus
+	checkout -r t-gnus-6_15-quimby gnus
 
 (2) compile
 
@@ -48,7 +48,7 @@ How to get? (via CVS)
 
 (3) update
 
-    % cvs update -r t-gnus-6_15 gnus
+    % cvs update -r t-gnus-6_15-quimby gnus
 
 Major tags are following:
 

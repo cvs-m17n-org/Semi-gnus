@@ -95,11 +95,19 @@ AC_DEFUN(AC_PATH_LISPDIR, [
     if test "$theprefix" = NONE; then
 	theprefix=$ac_default_prefix
     fi
-    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-packages/lisp/${GNUS_PRODUCT_NAME}"
+    else
+	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+    fi
     for thedir in share lib; do
 	potential=
 	if test -d ${theprefix}/${thedir}/${EMACS_FLAVOR}/site-lisp; then
-	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+	   if test "$EMACS_FLAVOR" = "xemacs"; then
+	       lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-packages/lisp/${GNUS_PRODUCT_NAME}"
+	   else
+	       lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+	   fi
 	   break
 	fi
     done
@@ -117,11 +125,36 @@ AC_DEFUN(AC_PATH_ETCDIR, [
   AC_ARG_WITH(etcdir,[  --with-etcdir=DIR       Where to install etc files], etcdir=${withval})
   AC_MSG_CHECKING([where etc files should go])
   if test -z "$etcdir"; then
-    dnl Set default value
+    dnl Set default value.
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+      etcdir="\$(lispdir)/../../etc"
+    else
     etcdir="\$(lispdir)/../etc"
+    fi
   fi
   AC_MSG_RESULT($etcdir)
   AC_SUBST(etcdir)
+])
+
+dnl 
+dnl This is a bit on the "evil hack" side of things.  It is so we can
+dnl have a different default infodir for XEmacs.  A user can still specify
+dnl someplace else with '--infodir=DIR'.
+dnl
+AC_DEFUN(AC_PATH_INFO_DIR, [
+  AC_MSG_CHECKING([where the TeXinfo docs should go])
+  dnl Set default value.  This must be an absolute path.
+  if test "$infodir" = "\${prefix}/info"; then
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+      info_dir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-packages/info"
+    else
+      info_dir="\$(prefix)/info"
+    fi
+  else
+    info_dir=$infodir
+  fi
+  AC_MSG_RESULT($info_dir)
+  AC_SUBST(info_dir)
 ])
 
 dnl
@@ -251,13 +284,13 @@ if test -z "${USE_FONTS}"; then
       if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
 	:
       else
-        if test -z "${USE_FONTS}"; then
+	 if test -z "${USE_FONTS}"; then
 	  USE_FONTS="Adobe Futura"
-        else
+	 else
 	  USE_FONTS="${USE_FONTS}, Adobe Futura"
-        fi
-        WITH_FONTS_pfu=
-        WITHOUT_FONTS_pfu='%'
+	 fi
+	 WITH_FONTS_pfu=
+	 WITHOUT_FONTS_pfu='%'
       fi
     fi
     echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{bcr}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
@@ -265,13 +298,13 @@ if test -z "${USE_FONTS}"; then
       if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
 	:
       else
-        if test -z "${USE_FONTS}"; then
+	 if test -z "${USE_FONTS}"; then
 	  USE_FONTS="Bitstream Courier"
-        else
+	 else
 	  USE_FONTS="${USE_FONTS}, Bitstream Courier"
-        fi
-        WITH_FONTS_bcr=
-        WITHOUT_FONTS_bcr='%'
+	 fi
+	 WITH_FONTS_bcr=
+	 WITHOUT_FONTS_bcr='%'
       fi
     fi
     rm -f ${OUTPUT} ${OUTPUT}.aux ${OUTPUT}.log ${OUTPUT}.dvi

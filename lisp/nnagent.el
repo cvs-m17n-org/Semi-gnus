@@ -130,30 +130,35 @@
 
 (deffoo nnagent-retrieve-headers (articles &optional group server fetch-old)
   (let ((file (gnus-agent-article-name ".overview" group))
-	arts n)
+	arts n first)
     (save-excursion
       (gnus-agent-load-alist group)
-      (setq arts (gnus-set-difference articles 
-				      (mapcar 'car gnus-agent-article-alist)))
+      (setq arts (gnus-sorted-difference
+		  articles (mapcar 'car gnus-agent-article-alist)))
+      ;; Assume that articles with smaller numbers than the first one
+      ;; Agent knows are gone.
+      (setq first (caar gnus-agent-article-alist))
+      (when first 
+	(while (and arts (< (car arts) first))
+	  (pop arts)))
       (set-buffer nntp-server-buffer)
       (erase-buffer)
-      (nnheader-insert-file-contents file)
-      (goto-char (point-min)) 
-      (while (and arts (not (eobp)))
-	(cond 
-	 ((looking-at "[0-9]")
+      (nnheader-insert-nov-file file (car articles))
+      (goto-char (point-min))
+      (gnus-parse-without-error
+	(while (and arts (not (eobp)))
 	  (setq n (read (current-buffer)))
-	  (if (> n (car arts))
-	      (beginning-of-line))
+	  (when (> n (car arts))
+	    (beginning-of-line))
 	  (while (and arts (> n (car arts)))
-	    (insert (format 
+	    (insert (format
 		     "%d\t[Undownloaded article %d]\tGnus Agent\t\t\t\n"
 		     (car arts) (car arts)))
 	    (pop arts))
-	  (if (and arts (= n (car arts)))
-	    (pop arts))))
-	(forward-line 1))
-      (while (and arts)
+	  (when (and arts (= n (car arts)))
+	    (pop arts))
+	  (forward-line 1)))
+      (while arts
 	(insert (format
 		 "%d\t[Undownloaded article %d]\tGnus Agent\t\t\t\n"
 		 (car arts) (car arts)))
@@ -167,6 +172,9 @@
 	 (car (last articles)))
 	t)
       'nov)))
+
+(deffoo nnagent-request-expire-articles (articles group &optional server force)
+  articles)
 
 (deffoo nnagent-request-group (group &optional server dont-check)
   (nnoo-parent-function 'nnagent 'nnml-request-group
@@ -191,10 +199,6 @@
 (deffoo nnagent-request-delete-group (group &optional force server)
   (nnoo-parent-function 'nnagent 'nnml-request-delete-group
 			(list group force (nnagent-server server))))
-
-(deffoo nnagent-request-expire-articles (articles group &optional server force)
-  (nnoo-parent-function 'nnagent 'nnml-request-expire-articles
-			(list articles group (nnagent-server server) force)))
 
 (deffoo nnagent-request-list (&optional server)
   (nnoo-parent-function 'nnagent 'nnml-request-list

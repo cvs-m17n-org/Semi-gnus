@@ -1,5 +1,5 @@
 ;;; mml2015.el --- MIME Security with Pretty Good Privacy (PGP)
-;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: PGP MIME MML
@@ -127,7 +127,11 @@ by you.")
 	(setq handles (mm-dissect-buffer t)))
       (mm-destroy-parts handle)
       (mm-set-handle-multipart-parameter
-       mm-security-handle 'gnus-info "OK")
+       mm-security-handle 'gnus-info
+       (concat "OK"
+	       (let ((sig (with-current-buffer mml2015-result-buffer
+			    (mml2015-gpg-extract-signature-details))))
+		 (concat ", Signer: " sig))))
       (if (listp (car handles))
 	  handles
 	(list handles)))))

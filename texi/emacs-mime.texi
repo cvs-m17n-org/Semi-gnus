@@ -47,7 +47,8 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright @copyright{} 1998, 1999, 2000, 2001, 2002 Free Software
+Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -92,7 +93,7 @@ read at least RFC2045 and RFC2047.
 * Interface Functions::   An abstraction over the basic functions.
 * Basic Functions::       Utility and basic parsing functions.
 * Decoding and Viewing::  A framework for decoding and viewing.
-* Composing::             MML; a language for describing MIME parts.
+* Composing::             MML; a language for describing @sc{mime} parts.
 * Standards::             A summary of RFCs and working documents used.
 * Index::                 Function and variable index.
 @end menu
@@ -119,16 +120,16 @@ both the old syntax as well as the new syntax, and if there is only one
 library, one must choose between the old version of the library and the
 new version of the library.
 
-The Emacs MIME library takes a different tack.  It defines a series of
-low-level libraries (@file{rfc2047.el}, @file{rfc2231.el} and so on)
-that parses strictly according to the corresponding standard.  However,
-normal programs would not use the functions provided by these libraries
-directly, but instead use the functions provided by the
-@code{mail-parse} library.  The functions in this library are just
-aliases to the corresponding functions in the latest low-level
-libraries.  Using this scheme, programs get a consistent interface they
-can use, and library developers are free to create write code that
-handles new standards.
+The Emacs @sc{mime} library takes a different tack.  It defines a
+series of low-level libraries (@file{rfc2047.el}, @file{rfc2231.el}
+and so on) that parses strictly according to the corresponding
+standard.  However, normal programs would not use the functions
+provided by these libraries directly, but instead use the functions
+provided by the @code{mail-parse} library.  The functions in this
+library are just aliases to the corresponding functions in the latest
+low-level libraries.  Using this scheme, programs get a consistent
+interface they can use, and library developers are free to create
+write code that handles new standards.
 
 The following functions are defined by this library:
 
@@ -241,7 +242,7 @@ at the beginning of the narrowed buffer.
 @item mail-header-narrow-to-field
 @findex mail-header-narrow-to-field
 Narrow the buffer to the header under point.  Understands continuation
-headers. 
+headers.
 
 @item mail-header-fold-field
 @findex mail-header-fold-field
@@ -647,7 +648,7 @@ Take a year number and say whether it's a leap year.
 
 @item time-to-day-in-year
 Take a time and return the day number within the year that the time is
-in. 
+in.
 
 @end table
 
@@ -795,10 +796,12 @@ Here's an example file:
 @example
 image/*; gimp -8 %s
 audio/wav; wavplayer %s
+application/msword; catdoc %s ; copiousoutput ; nametemplate=%s.doc
 @end example
 
-This says that all image files should be displayed with @code{gimp}, and
-that WAVE audio files should be played by @code{wavplayer}.
+This says that all image files should be displayed with @code{gimp},
+that WAVE audio files should be played by @code{wavplayer}, and that
+MS-WORD files should be inlined by @code{catdoc}.
 
 The @code{mailcap} library parses this file, and provides functions for
 matching types.
@@ -856,10 +859,10 @@ descend the message, following the structure, and return a tree of
 @node Non-MIME
 @section Non-MIME
 
-Gnus also understands some non-MIME attachments, such as postscript,
-uuencode, binhex, shar, forward, gnatsweb, pgp.  Each of these features
-can be disabled by add an item into @code{mm-uu-configure-list}.
-For example,
+Gnus also understands some non-@sc{mime} attachments, such as
+postscript, uuencode, binhex, shar, forward, gnatsweb, pgp.  Each of
+these features can be disabled by add an item into
+@code{mm-uu-configure-list}.  For example,
 
 @lisp
 (require 'mm-uu)
@@ -1003,7 +1006,7 @@ Prompt for a mailcap method to use to view the part.
 
 @item mm-inline-media-tests
 This is an alist where the key is a @sc{mime} type, the second element
-is a function to display the part @dfn{inline} (i.e., inside Emacs), and 
+is a function to display the part @dfn{inline} (i.e., inside Emacs), and
 the third element is a form to be @code{eval}ed to say whether the part
 can be displayed inline.
 
@@ -1023,7 +1026,7 @@ be displayed automatically.
 
 @item mm-attachment-override-types
 Some @sc{mime} agents create parts that have a content-disposition of
-@samp{attachment}.  This variable allows overriding that disposition and 
+@samp{attachment}.  This variable allows overriding that disposition and
 displaying the part inline.  (Note that the disposition is only
 overridden if we are able to, and want to, display the part inline.)
 
@@ -1062,6 +1065,29 @@ list containing that type.  For example assuming @code{mm-inlined-types}
 includes @samp{text/.*}, then including @samp{text/html} in this
 variable will cause @samp{text/html} parts to be treated as attachments.
 
+@item mm-inline-text-html-renderer
+This selects the function used to render @sc{html}.  The predefined
+renderers are selected by the symbols @code{w3},
+@code{w3m}@footnote{See @uref{http://emacs-w3m.namazu.org/} for more
+information about emacs-w3m}, @code{links}, @code{lynx} or
+@code{html2text}.  You can also specify a function, which will be
+called with a @sc{mime} handle as the argument.
+
+@item mm-inline-text-html-with-images
+Some @sc{html} mails might have the trick of spammers using
+@samp{<img>} tags.  It is likely to be intended to verify whether you
+have read the mail.  You can prevent your personal informations from
+leaking by setting this option to @code{nil} (which is the default).
+It is currently ignored by Emacs/w3.  For emacs-w3m, you may use the
+command @kbd{t} on the image anchor to show an image even if it is
+@code{nil}.@footnote{The command @kbd{T} will load all images.  If you
+have set the option @code{w3m-key-binding} to @code{info}, use @kbd{i}
+or @kbd{I} instead.}
+
+@item mm-inline-text-html-with-w3m-keymap
+You can use emacs-w3m command keys in the inlined text/html part by
+setting this option to non-@code{nil}.  The default value is @code{t}.
+
 @end table
 
 
@@ -1082,7 +1108,7 @@ Here's an example viewer for displaying @code{text/enriched} inline:
 @end lisp
 
 We see that the function takes a @sc{mime} handle as its parameter.  It
-then goes to a temporary buffer, inserts the text of the part, does some 
+then goes to a temporary buffer, inserts the text of the part, does some
 work on the text, stores the result, goes back to the buffer it was
 called from and inserts the result.
 
@@ -1114,7 +1140,7 @@ string containing the @sc{mime} message.
 * Simple MML Example::             An example MML document.
 * MML Definition::                 All valid MML elements.
 * Advanced MML Example::           Another example MML document.
-* Charset Translation::            How charsets are mapped from @sc{mule} to MIME.
+* Charset Translation::            How charsets are mapped from @sc{mule} to @sc{mime}.
 * Conversion::                     Going from @sc{mime} to MML and vice versa.
 * Flowed text::                    Soft and hard newlines.
 @end menu
@@ -1215,6 +1241,10 @@ RFC822 date when the part was modified (@code{Content-Disposition}).
 
 @item read-date
 RFC822 date when the part was read (@code{Content-Disposition}).
+
+@item recipients
+Who to encrypt/sign the part to.  This field is used to override any
+auto-detection based on the To/CC headers.
 
 @item size
 The size (in octets) of the part (@code{Content-Disposition}).
@@ -1377,7 +1407,7 @@ given by @code{mail-parse-charset} (a symbol) is used.  (Never set this
 variable directly, though.  If you want to change the default charset,
 please consult the documentation of the package which you use to process
 @sc{mime} messages.
-@xref{Various Message Variables, , Various Message Variables, message, 
+@xref{Various Message Variables, , Various Message Variables, message,
       Message Manual}, for example.)
 If there are only ASCII characters, the @sc{mime} charset US-ASCII is
 used, of course.
@@ -1482,7 +1512,7 @@ Registration Procedures
 Conformance Criteria and Examples
 
 @item RFC2231
-MIME Parameter Value and Encoded Word Extensions: Character Sets,
+@sc{mime} Parameter Value and Encoded Word Extensions: Character Sets,
 Languages, and Continuations
 
 @item RFC1843
@@ -1493,7 +1523,7 @@ ASCII characters
 Draft for the successor of RFC822
 
 @item RFC2112
-The MIME Multipart/Related Content-type
+The @sc{mime} Multipart/Related Content-type
 
 @item RFC1892
 The Multipart/Report Content Type for the Reporting of Mail System

@@ -1,6 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
 ;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
-;;        2001 Free Software Foundation, Inc.
+;;        2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -320,7 +320,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defvar gnus-uu-saved-article-name nil)
 
-(defvar gnus-uu-begin-string "^begin[ \t]+[0-7][0-7][0-7][ \t]+\\(.*\\)$")
+(defvar gnus-uu-begin-string "^begin[ \t]+0?[0-7][0-7][0-7][ \t]+\\(.*\\)$")
 (defvar gnus-uu-end-string "^end[ \t]*$")
 
 (defvar gnus-uu-body-line "^M")
@@ -335,7 +335,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defvar gnus-uu-shar-file-name nil)
 (defvar gnus-uu-shar-name-marker
-  "begin [0-7][0-7][0-7][ \t]+\\(\\(\\w\\|\\.\\)*\\b\\)")
+  "begin 0?[0-7][0-7][0-7][ \t]+\\(\\(\\w\\|[.\\:]\\)*\\b\\)")
 
 (defvar gnus-uu-postscript-begin-string "^%!PS-")
 (defvar gnus-uu-postscript-end-string "^%%EOF$")
@@ -351,56 +351,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defvar gnus-uu-default-dir gnus-article-save-directory)
 (defvar gnus-uu-digest-from-subject nil)
 (defvar gnus-uu-digest-buffer nil)
-
-;; Keymaps
-
-(gnus-define-keys (gnus-uu-mark-map "P" gnus-summary-mark-map)
-  "p" gnus-summary-mark-as-processable
-  "u" gnus-summary-unmark-as-processable
-  "U" gnus-summary-unmark-all-processable
-  "v" gnus-uu-mark-over
-  "s" gnus-uu-mark-series
-  "r" gnus-uu-mark-region
-  "g" gnus-uu-unmark-region
-  "R" gnus-uu-mark-by-regexp
-  "G" gnus-uu-unmark-by-regexp
-  "t" gnus-uu-mark-thread
-  "T" gnus-uu-unmark-thread
-  "a" gnus-uu-mark-all
-  "b" gnus-uu-mark-buffer
-  "S" gnus-uu-mark-sparse
-  "k" gnus-summary-kill-process-mark
-  "y" gnus-summary-yank-process-mark
-  "w" gnus-summary-save-process-mark
-  "i" gnus-uu-invert-processable)
-
-(gnus-define-keys (gnus-uu-extract-map "X" gnus-summary-mode-map)
-  ;;"x" gnus-uu-extract-any
-  "m" gnus-summary-save-parts
-  "u" gnus-uu-decode-uu
-  "U" gnus-uu-decode-uu-and-save
-  "s" gnus-uu-decode-unshar
-  "S" gnus-uu-decode-unshar-and-save
-  "o" gnus-uu-decode-save
-  "O" gnus-uu-decode-save
-  "b" gnus-uu-decode-binhex
-  "B" gnus-uu-decode-binhex
-  "p" gnus-uu-decode-postscript
-  "P" gnus-uu-decode-postscript-and-save)
-
-(gnus-define-keys
-    (gnus-uu-extract-view-map "v" gnus-uu-extract-map)
-  "u" gnus-uu-decode-uu-view
-  "U" gnus-uu-decode-uu-and-save-view
-  "s" gnus-uu-decode-unshar-view
-  "S" gnus-uu-decode-unshar-and-save-view
-  "o" gnus-uu-decode-save-view
-  "O" gnus-uu-decode-save-view
-  "b" gnus-uu-decode-binhex-view
-  "B" gnus-uu-decode-binhex-view
-  "p" gnus-uu-decode-postscript-view
-  "P" gnus-uu-decode-postscript-and-save-view)
-
 
 ;; Commands.
 
@@ -456,7 +406,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 			  gnus-uu-default-dir
 			  gnus-uu-default-dir))))
   (setq gnus-uu-binhex-article-name
-	(make-temp-name (concat gnus-uu-work-dir "binhex")))
+	(mm-make-temp-file (expand-file-name "binhex" gnus-uu-work-dir)))
   (gnus-uu-decode-with-method 'gnus-uu-binhex-article n dir))
 
 (defun gnus-uu-decode-uu-view (&optional n)
@@ -509,7 +459,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	 (read-file-name "Unbinhex, view and save in dir: "
 			 gnus-uu-default-dir gnus-uu-default-dir)))
   (setq gnus-uu-binhex-article-name
-	(make-temp-name (concat gnus-uu-work-dir "binhex")))
+	(mm-make-temp-file (expand-file-name "binhex" gnus-uu-work-dir)))
   (let ((gnus-view-pseudos (or gnus-view-pseudos 'automatic)))
     (gnus-uu-decode-binhex n file)))
 
@@ -520,7 +470,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   "Digests and forwards all articles in this series."
   (interactive "P")
   (let ((gnus-uu-save-in-digest t)
-	(file (make-temp-name (nnheader-concat gnus-uu-tmp-dir "forward")))
+	(file (mm-make-temp-file (nnheader-concat gnus-uu-tmp-dir "forward")))
 	(message-forward-as-mime message-forward-as-mime)
 	(mail-parse-charset gnus-newsgroup-charset)
 	(mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets)
@@ -1001,7 +951,8 @@ When called interactively, prompt for REGEXP."
 	(if (looking-at gnus-uu-binhex-begin-line)
 	    (progn
 	      (setq state (list 'begin))
-	      (write-region 1 1 gnus-uu-binhex-article-name))
+	      (write-region (point-min) (point-min)
+			    gnus-uu-binhex-article-name))
 	  (setq state (list 'middle)))
 	(goto-char (point-max))
 	(re-search-backward (concat gnus-uu-binhex-body-line "\\|"
@@ -1114,7 +1065,7 @@ When called interactively, prompt for REGEXP."
     (while (re-search-forward "[ \t]+" nil t)
       (replace-match "[ \t]+" t t))
 
-    (buffer-substring 1 (point-max))))
+    (buffer-substring (point-min) (point-max))))
 
 (defun gnus-uu-get-list-of-articles (n)
   ;; If N is non-nil, the article numbers of the N next articles
@@ -1206,10 +1157,11 @@ When called interactively, prompt for REGEXP."
 	;; Expand numbers.
 	(goto-char (point-min))
 	(while (re-search-forward "[0-9]+" nil t)
-	  (replace-match
-	   (format "%06d"
-		   (string-to-int (buffer-substring
-				   (match-beginning 0) (match-end 0))))))
+	  (ignore-errors
+	    (replace-match
+	     (format "%06d"
+		     (string-to-int (buffer-substring
+				     (match-beginning 0) (match-end 0)))))))
 	(setq string (buffer-substring 1 (point-max)))
 	(setcar (car string-list) string)
 	(setq string-list (cdr string-list))))
@@ -1781,8 +1733,7 @@ Gnus might fail to display all of it.")
 		 gnus-uu-tmp-dir)))
 
       (setq gnus-uu-work-dir
-	    (make-temp-name (concat gnus-uu-tmp-dir "gnus")))
-      (gnus-make-directory gnus-uu-work-dir)
+	    (mm-make-temp-file (concat gnus-uu-tmp-dir "gnus") 'dir))
       (set-file-modes gnus-uu-work-dir 448)
       (setq gnus-uu-work-dir (file-name-as-directory gnus-uu-work-dir))
       (push (cons gnus-newsgroup-name gnus-uu-work-dir)
@@ -1964,7 +1915,7 @@ The user will be asked for a file name."
     (goto-char (point-min))
     (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
     (forward-line -1)
-    (narrow-to-region 1 (point))
+    (narrow-to-region (point-min) (point))
     (unless (mail-fetch-field "mime-version")
       (widen)
       (insert "MIME-Version: 1.0\n"))
@@ -2054,7 +2005,7 @@ If no file has been included, the user will be asked for a file."
       (erase-buffer)
       (insert-buffer-substring post-buf beg-binary end-binary)
       (goto-char (point-min))
-      (setq length (count-lines 1 (point-max)))
+      (setq length (count-lines (point-min) (point-max)))
       (setq parts (/ length gnus-uu-post-length))
       (unless (< (% length gnus-uu-post-length) 4)
 	(incf parts)))
@@ -2067,7 +2018,7 @@ If no file has been included, the user will be asked for a file."
     (re-search-forward
      (concat "^" (regexp-quote mail-header-separator) "$") nil t)
     (beginning-of-line)
-    (setq header (buffer-substring 1 (point)))
+    (setq header (buffer-substring (point-min) (point)))
 
     (goto-char (point-min))
     (when gnus-uu-post-separate-description

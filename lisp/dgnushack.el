@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -86,6 +86,14 @@
 	(t (concat filename ".elc"))))
 
 (require 'bytecomp)
+;; To avoid having defsubsts and inlines happen.
+;(if (featurep 'xemacs)
+;    (require 'byte-optimize)
+;  (require 'byte-opt))
+;(defun byte-optimize-inline-handler (form)
+;  "byte-optimize-handler for the `inline' special-form."
+;  (cons 'progn (cdr form)))
+;(defalias 'byte-compile-file-form-defsubst 'byte-compile-file-form-defun)
 
 (when (boundp 'MULE)
   (let (current-load-list)
@@ -337,8 +345,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		     (while form
 		       (setq elem (pop form))
 		       (unless (memq (car-safe elem)
-				     '(\` backquote
-				       defcustom defface defgroup
+				     '(defcustom defface defgroup
 				       define-widget quote))
 			 (while (consp elem)
 			   (push (car elem) form)
@@ -457,8 +464,11 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error
-			 (message "No w3: %s %s retrying..." code
-				  (locate-library "w3-parse"))
+			 (message "No w3: %s%s, retrying..."
+				  (error-message-string code)
+				  (if (setq code (locate-library "w3-parse"))
+				      (concat " (" code ")")
+				    ""))
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
@@ -481,22 +491,35 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	  (condition-case code
 	      (progn (require 'mh-e) nil)
 	    (error
-	     (message "No mh-e: %s %s (ignored)" code (locate-library "mh-e"))
+	     (message "No mh-e: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "mh-e"))
+			  (concat " (" code ")")
+			""))
 	     '("gnus-mh.el")))
 	  (condition-case code
 	      (progn (require 'xml) nil)
 	    (error
-	     (message "No xml: %s %s (ignored)" code (locate-library "xml"))
+	     (message "No xml: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "xml"))
+			  (concat " (" code ")")
+			""))
 	     '("nnrss.el")))
 	  (condition-case code
 	      (progn (require 'bbdb) nil)
 	    (error
-	     (message "No bbdb: %s %s (ignored)" code (locate-library "bbdb"))
+	     (message "No bbdb: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "bbdb"))
+			  (concat " (" code ")")
+			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el" "smiley.el"))
-	  (when (or (featurep 'xemacs) (<= emacs-major-version 20))
-	    '("smiley-ems.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
+	  (when (and (not (featurep 'xemacs))
+		     (<= emacs-major-version 20))
+	    '("smiley.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
