@@ -42,6 +42,11 @@ NEWS:
 
   Fold long(> 76 chars) lines.
 
+* Manual (bad news)
+
+  Shoe-gnus specific features are not described in the manual.
+  Please read doc-string (if provided).
+
 TODO:
 
 * Completion for Mail-Followup-To:.  Use `to-list' info?

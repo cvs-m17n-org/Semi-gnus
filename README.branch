@@ -1,17 +1,100 @@
 README.branch --- description of branches and tags. (DRAFT)
 ========================================================================
 
-Semi-gnus revision tree (1998-07-24)
+Public Branches
 
-    vendor      personal    main trunk      public
+    Current main stream of Semi-gnus development.
+    Semi-gnus developers share and maintain them.
+
+    Each public branch has a tag of the form "gnus-N1_N2" and each version
+    has a tag of the form "gnus-N1_N2_N3".
+
+    N1, N2, and N3 are changed by the following rules.
+
+    N1 will be incremented if any fundamental architecture change is
+    made.  Of cource, in this case, N2 and N3 will be reset to zero.
+
+    N2 will be incremented (and new branch will be created) if any "major
+    changes" are made.  The following cases are "major changes".
+      * API changes of FLIM/SEMI(or any other modules used by Semi-gnus).
+      * major version up of original Gnus.(e.g. Red/5.[34] -> Quassia/5.[56])
+      * synchronization with original Gnus which requires design decision.
+
+    N3 will be incremented if some "minor changes" are made.  The follwoing
+    cases are "minor changes".
+      * small bug fix.
+      * synchronization with original Gnus without design decision.
+
+    The following branch tags are currently available.
+
+	for-semi-1_5	Semi-gnus for SEMI 1.5 API
+	for-semi-1_6	Semi-gnus for SEMI 1.6 API
+	gnus-6_5	Semi-gnus for SEMI 1.7 API
+	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
+	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 or 1.9 API
+
+
+The Vendor Branch
+
+    Original version of Gnus.
+    Each version has a tag of the form "qgnus-0_XY" or "gnus-5_X_Y".
+
+    The branch tag for the vendor branch is "larsi".
+
+
+The Main Trunk
+
+    Semi-gnus was developed on the main trunk until current branch-
+    management plan (See "Public Branches" above) was introduced.
+    Now the main trunk is used only for the root of branches --- when
+    creating new branches, current develop branch is merged back to the
+    main trunk and new branches are created from there.
+
+    Each version has a tag of the form "gnus-6_N2_N3" (0 < N2 < 5) or
+    "semi-gnus-6_N2_N3" (N2 > ??).
+
+
+"semi-gnus" Tag
+
+    Assigned to the latest stable version. (on the main trunk???)
+
+
+"for-semi-N1_N2" Tags
+
+    Were assigned to corresponding version of SEMI API N1.N2.
+    We don't use this convention now.
+
+
+Private Branches
+
+    Some Semi-gnus developers have their own "private branches".
+    Each private branch may have its own goal and/or policy.
+    See README.${tag} (if exists) for information of each branch.
+
+    The following branch tags are curretly available.
+
+	himi		Owner: Miyashita Hisashi
+	ichikawa	Owner: Tatsuya Ichikawa
+	akr		Owner: Tanaka Akira
+	shuhei-k	Codename: Shoe-gnus, Owner: Shuhei KOBAYASHI
+
+
+========================================================================
+Semi-gnus revision tree (1998-07-30)
+
+    vendor      private     main trunk      public
     branch      branches                    branches
 ------------------------------------------------------------------------
 qGnus 0.??  ------> Semi-gnus 6.0.0
        :                        :
        :        himi     <--  6.0.7
        :        ichikawa <--  6.0.8
+       :                        :
        :        akr      <--  6.2.3
+       :                        :
        :        shuhei-k <--  6.3.1
+       :       (Shoe-gnus)      :
 Gnus 5.6.11 ------>           6.3.3
        :                      6.4.0 (for SEMI 1.5)
        :                     (6.4.?)------> for SEMI 1.5
@@ -33,78 +116,7 @@ Gnus 5.6.22 ------>             |   feedback  6.7.7
        :                        |    \
        :                        |     \
        :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8
-       :     sync               |             6.8.0		 or 1.9)
-Gnus 5.6.24 ------>             |             6.8.1
-       :                        :             6.8.2
+       :                        |             6.8.0		 or 1.9)
+       :     sync               :               :
+Gnus 5.6.27 ------>             :             6.8.4
        :                        :               :
-========================================================================
-
-The Vendor Branch
-
-    Original version of Gnus.
-    Each version has a tag of the form "qgnus-0_XY" or "gnus-5_X_Y".
-
-    The branch tag for the vendor branch is "larsi".
-
-The Main Trunk
-
-    Semi-gnus was developed on the main trunk until current branch-
-    management plan (See "Public Branches" below) was introduced.
-    Each version has a tag of the form "gnus-6_N2_N3". (0 < N2 < 5)
-
-Public Branches
-
-    Current main stream of Semi-gnus development.
-
-    [Goal and policy of public branches here ???]
-
-    Each branch has a tag of the form "gnus-N1_N2" and each version
-    has a tag of the form "gnus-N1_N2_N3".
-
-    N1, N2, and N3 are changed by the following rules.
-
-    N1 will be incremented if any fundamental architecture change is
-    made.  Of cource, in this case, N2 and N3 will be reset to zero.
-
-    N2 will be incremented (and new branch will be created) if any "major
-    changes" are made.  The following cases are "major changes".
-      * API changes of FLIM/SEMI(or any other modules used by Semi-gnus).
-      * major version up of original Gnus.
-      * synchronization with original Gnus which requires design decision.
-
-    N3 will be incremented if some "minor changes" are made.  The follwoing
-    cases are "minor changes".
-      * small bug fix.
-      * synchronization with original Gnus without design decision.
-
-    The following branch tags are currently available.
-
-	for-semi-1_5	Semi-gnus for SEMI 1.5 API
-	for-semi-1_6	Semi-gnus for SEMI 1.6 API
-	gnus-6_5	Semi-gnus for SEMI 1.7 API
-	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
-	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
-	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 or 1.9 API
-
-Personal Branches
-
-    Some Semi-gnus developers have their own "personal branches".
-    Each personal branch may have its own goal and/or policy.
-    See README.${tag} (if exists) for information of each branch.
-
-    The following branch tags are curretly available.
-
-	himi		Owner: Miyashita Hisashi
-	ichikawa	Owner: Tatsuya Ichikawa
-	akr		Owner: Tanaka Akira
-	shuhei-k	Owner: Shuhei KOBAYASHI
-
-"semi-gnus" Tag
-
-    Was assigned to the latest stable version.
-    Currently not maintained. (XXX: ???)
-
-"for-semi-N1_N2" Tags
-
-    Were assigned to corresponding version of SEMI API N1.N2.
-    We will not use this convention any longer. (XXX: ???)
