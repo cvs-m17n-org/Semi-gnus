@@ -3070,13 +3070,19 @@ to find out how to use this."
     (run-hooks 'message-send-mail-hook)
     (if recipients
 	(let ((result (static-if (fboundp 'smtp-send-buffer)
-			  (smtp-send-buffer user-mail-address recipients
-					    (current-buffer))
+			  (condition-case error
+			      (progn
+				(smtp-send-buffer user-mail-address recipients
+						  (current-buffer))
+				t)
+			    (error
+			     (format "%d %s"
+				     (car (cdr error)) (cdr (cdr error)))))
 			(smtp-via-smtp user-mail-address
 				       recipients
 				       (current-buffer)))))
 	  (unless (eq result t)
-	    (error "Sending failed; " result)))
+	    (error "Sending failed; %s" result)))
       (error "Sending failed; no recipients"))))
 
 (defsubst message-maybe-split-and-send-news (method)
