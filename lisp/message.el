@@ -1035,10 +1035,10 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defvar message-draft-coding-system 
   (cond 
-   ((not (fboundp 'coding-system-p)) nil)
-   ((coding-system-p 'emacs-mule) 'emacs-mule)
-   ((coding-system-p 'escape-quoted) 'escape-quoted)
-   ((coding-system-p 'no-conversion) 'no-conversion)
+   ((not (fboundp 'find-coding-system)) nil)
+   ((find-coding-system 'emacs-mule) 'emacs-mule)
+   ((find-coding-system 'escape-quoted) 'escape-quoted)
+   ((find-coding-system 'no-conversion) 'no-conversion)
    (t nil))
   "Coding system to compose mail.")
 
