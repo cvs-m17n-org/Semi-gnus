@@ -439,7 +439,7 @@ You must specify the name of the package path as follows:
 					     dgnushack-info-file-regexp-ja))
 		    'string-lessp))
 	(while (setq file (pop files))
-	  (insert lisp-dir file "\n"))))))
+	  (insert "info/" file "\n"))))))
 
 (defun dgnushack-install-package-info-files (package-dir regexp)
   "Install info files as an XEmacs package."

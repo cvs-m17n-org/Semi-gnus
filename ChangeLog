@@ -1,5 +1,9 @@
 2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-make-manifest): Fix info directory.
+
+2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* Makefile.in (install-package-ja): Compile and install lisp files
 	first.
 	(install-package): Ditto.
