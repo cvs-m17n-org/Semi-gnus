@@ -2112,7 +2112,7 @@ The following commands are available:
   `(nth 3 ,data))
 
 (defmacro gnus-data-set-header (data header)
-  `(setf (nth 3 ,data) ,header))
+  `(setcar (nthcdr 3 ,data) ,header))
 
 (defmacro gnus-data-level (data)
   `(nth 4 ,data))
