@@ -153,13 +153,13 @@
 	(match-string 1)))))
   (let* ((type (intern (progn (string-match "gnus-\\([-a-z]+\\)-line" var)
 			      (match-string 1 var))))
-	 (entry (assq type gnus-format-specs))
 	 (value (symbol-value (intern var)))
 	 (spec (set
 		(intern (format "%s-spec" var))
 		(gnus-parse-format
 		 value (symbol-value (intern (format "%s-alist" var)))
-		 (not (string-match "mode" var))))))
+		 (not (string-match "mode" var)))))
+	 (entry (assq type gnus-format-specs)))
     (if entry
 	(let ((elem (assoc value entry)))
 	  (if elem
@@ -173,36 +173,38 @@
     (lisp-interaction-mode)
     (insert (pp-to-string spec))))
 
-(defmacro gnus-search-or-regist-spec (specs type format spec entry elem
-					    &rest body)
-  `(let* ((,entry (assq ,type ,specs))
-	  (,elem (assoc ,format (cdr ,entry))))
-     (or (cdr ,elem)
-	 (when (progn ,@body)
-	   (if ,entry
-	       (if ,elem
-		   (setcdr ,elem ,spec)
-		 (setcdr ,entry (cons (cons ,format ,spec) (cdr ,entry))))
-	     (push (list ,type (cons ,format ,spec)) ,specs))
-	   (gnus-product-variable-touch (quote ,specs)))
-	 ,spec)))
+(put 'gnus-search-or-regist-spec 'lisp-indent-function 1)
+(defmacro gnus-search-or-regist-spec (mspec &rest body)
+  (let ((specs (nth 0 mspec)) (type (nth 1 mspec)) (format (nth 2 mspec))
+	(spec (nth 3 mspec)) (entry (nth 4 mspec)) (elem (nth 5 mspec)))
+    `(let* ((,entry (assq ,type ,specs))
+	    (,elem (assoc ,format (cdr ,entry))))
+       (or (cdr ,elem)
+	   (when (progn ,@body)
+	     (if ,entry
+		 (if ,elem
+		     (setcdr ,elem ,spec)
+		   (setcdr ,entry (cons (cons ,format ,spec) (cdr ,entry))))
+	       (push (list ,type (cons ,format ,spec)) ,specs))
+	     (gnus-product-variable-touch (quote ,specs)))
+	   ,spec))))
 
 (defun gnus-update-format-specification-1 (type format val)
   (set (intern (format "gnus-%s-line-format-spec" type))
-       (gnus-search-or-regist-spec
-	gnus-format-specs-compiled type format val entry elem
-	(when (and gnus-compile-user-specs val)
-	  (setq val (prog1
-			(progn
-			  (fset 'gnus-tmp-func `(lambda () ,val))
-			  (require 'bytecomp)
-			  (let (byte-compile-warnings)
-			    (byte-compile 'gnus-tmp-func))
-			  (gnus-byte-code 'gnus-tmp-func))
-		      (when (get-buffer "*Compile-Log*")
-			(bury-buffer "*Compile-Log*"))
-		      (when (get-buffer "*Compile-Log-Show*")
-			(bury-buffer "*Compile-Log-Show*"))))))))
+       (gnus-search-or-regist-spec (gnus-format-specs-compiled
+				    type format val entry elem)
+	 (when (and gnus-compile-user-specs val)
+	   (setq val (prog1
+			 (progn
+			   (fset 'gnus-tmp-func `(lambda () ,val))
+			   (require 'bytecomp)
+			   (let (byte-compile-warnings)
+			     (byte-compile 'gnus-tmp-func))
+			   (gnus-byte-code 'gnus-tmp-func))
+		       (when (get-buffer "*Compile-Log*")
+			 (bury-buffer "*Compile-Log*"))
+		       (when (get-buffer "*Compile-Log-Show*")
+			 (bury-buffer "*Compile-Log-Show*"))))))))
 
 (defun gnus-update-format-specifications (&optional force &rest types)
   "Update all (necessary) format specifications."
@@ -233,19 +235,19 @@
 	      ;; This is a new format.
 	      (gnus-update-format-specification-1
 	       type new-format
-	       (gnus-search-or-regist-spec
-		gnus-format-specs type new-format val entry elem
-		(setq val (if (stringp new-format)
-			      ;; This is a "real" format.
-			      (gnus-parse-format
-			       new-format
-			       (symbol-value
-				(intern (format "gnus-%s-line-format-alist"
-						type)))
-			       (not (string-match "mode$"
-						  (symbol-name type))))
-			    ;; This is a function call or something.
-			    new-format))))))))))
+	       (gnus-search-or-regist-spec (gnus-format-specs
+					    type new-format val entry elem)
+		 (setq val (if (stringp new-format)
+			       ;; This is a "real" format.
+			       (gnus-parse-format
+				new-format
+				(symbol-value
+				 (intern (format "gnus-%s-line-format-alist"
+						 type)))
+				(not (string-match "mode$"
+						   (symbol-name type))))
+			     ;; This is a function call or something.
+			     new-format))))))))))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
