@@ -1,4 +1,4 @@
-@c \input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit-ss2; -*-
+@c \input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit; -*-
 
 @setfilename gnus-ja
 @settitle T-gnus 6.15 Manual
@@ -4681,7 +4681,7 @@ gnus $B$O$=$N%a!<%k$r<hF@$7$F!"$=$l$N%X%C%@!<$N@:L)D4::$,$G$-$k$h$&$K2hLL(B
 @code{$B%]%9%H%^%9%?!<(B} (postmaster) $B$G$b$"$j!"(B@code{$B%k!<%H(B} $B$K(B @code{$B%]%9(B
 $B%H%^%9%?!<(B} $B$X$N%a!<%k$r<u$1<h$C$?>l9g$O!"$=$l(B
 $B$r(B @code{$B%]%9%H%^%9%?!<(B} $B$K$b:FAw$7$?$$$H;W$&$G$7$g(B
-$B$&!#(BOrdnung mu.AN_ sein!)
+$B$&!#(BOrdnung mu,A_(B sein!)
 
 $B$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
@@ -6527,7 +6527,8 @@ gnus $B$,J]B8$9$k5-;v$N(B @code{Archive-name} $B9T$rD4$Y$F!"$=$l$r%U%!%$%kL>$
 
 @lisp
 (setq gnus-use-long-file-name '(not-save)) ; to get a hierarchy
-(setq gnus-default-article-saver 'gnus-summary-save-in-file) ; no encoding
+(setq gnus-default-article-saver 
+      'gnus-summary-save-in-file) ; no encoding
 @end lisp
 
 $B$=$l$+$i(B @kbd{o} $B$K$h$C$F5-;v$rJ]B8$9$k$@$1$G$9!#$=$l$+$i$3$N3,AX$rC;L?(B
@@ -7652,7 +7653,7 @@ UT ($BJLL>(B GMT, ZULU) $B$GF|IU$rI=<($7$^$9(B (@code{gnus-article-date-ut})
 $B$9(B (@code{gnus-article-date-lapsed})$B!#$3$s$J$U$&$K!#(B
 
 @example
-X-Sent: 9 years, 6 weeks, 4 days, 9 hours, 3 minutes, 28 seconds ago
+X-Sent: 6 weeks, 4 days, 1 hour, 3 minutes, 8 seconds ago
 @end example
 
 @code{gnus-article-date-lapsed-new-header} $B$NCM$G$3$N%X%C%@!<$r4{B8(B
@@ -10254,7 +10255,8 @@ default force yes
 
 @lisp
 '(("nntpd 1\\.5\\.11t"
-   (remove-hook 'nntp-server-opened-hook 'nntp-send-mode-reader)))
+   (remove-hook 'nntp-server-opened-hook 
+                'nntp-send-mode-reader)))
 @end lisp
 
 $B$G!"$3$l$O(B nntpd 1.5.11t $B$K$OL?Na(B @code{MODE READER} $B$rAw$i$J$$;v$r3N<B(B
@@ -10392,10 +10394,12 @@ default force yes
 @lisp
 ;; Type `C-c C-c after you'ver finished editing.
 ;;
-;; "snews" is port 563 and is predefined in our /etc/services
+;; "snews" is port 563 and is predefined 
+;; in our /etc/services
 ;;
 (nntp "snews.bar.com"
-      (nntp-open-connection-function nntp-open-ssl-stream)
+      (nntp-open-connection-function 
+        nntp-open-ssl-stream)
       (nntp-port-number "snews")
       (nntp-address "snews.bar.com"))
 @end lisp
@@ -11036,11 +11040,13 @@ Maildir $B$N%5%V%G%#%l%/%H%j$G$9!#=i4|CM$O(B @samp{("new" "cur")} $B$G$9!#(B
 Maildir $B%a!<%k%=!<%9$NNc$r$U$?$D(B:
 
 @lisp
-(maildir :path "/home/user-name/Maildir/" :subdirs ("cur" "new"))
+(maildir :path "/home/user-name/Maildir/" 
+         :subdirs ("cur" "new"))
 @end lisp
 
 @lisp
-(maildir :path "/user@@remotehost.org:~/Maildir/" :subdirs ("new"))
+(maildir :path "/user@@remotehost.org:~/Maildir/" 
+         :subdirs ("new"))
 @end lisp
 
 @item imap
@@ -11111,12 +11117,12 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 $B$-(B @sc{imap} $B%/%i%$%"%s%H$G%a!<%k%\%C%/%9$r=|$-!"$$$/$D$+$N5-;v$K4{(B
 $BFI(B ($B$b$7$/$O!"(BSEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{nil} $B$K@_Dj$7$?$$$+$b$7$l$^(B
 $B$;$s!#$=$&$9$l$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:<hF@$5$l(B
-$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 .AN'6.4.4 $B$rFI$s$G$/$@$5$$!#(B
+$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 ,A'(B6.4.4 $B$rFI$s$G$/$@$5$$!#(B
 
 @item :fetchflag
 $B%5!<%P!<$G!"<hF@$7$?5-;v$K0u$rIU$1$kJ}K!!#=i4|CM$N(B @samp{\Deleted} $B$O$=(B
 $B$l$i$K>C5n$N0u$rIU$1$^$9$,!"B>$K(B @samp{\Seen} $B$G$OC1$K4{FI$N0u$rIU$1$^$9!#(B
-$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 .AN'2.3.2 $B$GDj5A$5(B
+$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 ,A'(B2.3.2 $B$GDj5A$5(B
 $B$l$F$$$^$9!#(B
 
 @item :dontexpunge
@@ -11128,7 +11134,9 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 IMAP $B%a!<%k%=!<%9$NNc(B:
 
 @lisp
-(imap :server "mail.mycorp.com" :stream kerberos4 :fetchflag "\\Seen")
+(imap :server "mail.mycorp.com" 
+      :stream kerberos4 
+      :fetchflag "\\Seen")
 @end lisp
 
 @item webmail
@@ -11166,7 +11174,9 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 $B%&%'%V%a!<%k$N%=!<%9$NNc$G$9(B:
 
 @lisp
-(webmail :subtype 'hotmail :user "user-name" :password "secret")
+(webmail :subtype 'hotmail 
+         :user "user-name" 
+         :password "secret")
 @end lisp
 @end table
 
@@ -12590,7 +12600,7 @@ Slashdot (@uref{http://slashdot.org/}) $B$O?M5$$N$"$k%K%e!<%9%5%$%H$G!"%K%e!<(
 @item nnslashdot-active-url
 @vindex nnslashdot-active-url
 $B%K%e!<%95-;v$H%3%a%s%H$r<hF@$9$k$?$a$K;H$o$l$k(B @sc{url} $B$NJ8;zNs$G$9!#=i(B
-$B4|CM$O(B @samp{http://slashdot.org/search.pl?section=&min=%d} $B$G$9!#(B
+$B4|CM(B: @samp{http://slashdot.org/search.pl?section=&min=%d}$B!#(B
 
 @item nnslashdot-comments-url
 @vindex nnslashdot-comments-url
@@ -13506,9 +13516,10 @@ To: alt-religion-emacs@@GATEWAY
 
 @lisp
 (setq gnus-post-method
-      '(nngateway "mail2news@@replay.com"
-                  (nngateway-header-transformation
-                   nngateway-mail2news-header-transformation)))
+      '(nngateway 
+        "mail2news@@replay.com"
+        (nngateway-header-transformation
+         nngateway-mail2news-header-transformation)))
 @end lisp
 
 @end table
@@ -13815,7 +13826,8 @@ Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 
 @lisp
 (setq nnimap-split-rule
-      '(("INBOX.nnimap"  "^Sender: owner-nnimap@@vic20.globalcom.se")
+      '(("INBOX.nnimap"  
+         "^Sender: owner-nnimap@@vic20.globalcom.se")
         ("INBOX.junk"    "^Subject:.*MAKE MONEY")
         ("INBOX.private" "")))
 @end lisp
@@ -15430,7 +15442,8 @@ Gnus $B$O0lHLE*$J%9%3%"%U%!%$%k$rFCDj$N%9%3%"%U%!%$%k8~$1$N$b$N$h$jA0$KE,(B
 $BNc$($P!"%5!<%P!<$rFCDj$7$J$$A4BN%9%3%"%U%!%$%k$r;H$C$F!"?F%0%k!<%W$K=`$8(B
 $B$?%9%3%"IU$1$r9T$J$&$J$i$P!"<!$NCM$r;H$($PNI$$$G$7$g$&!#(B
 @example
-(list (lambda (group) ("all.SCORE")) 'gnus-score-find-hierarchical)
+(list (lambda (group) ("all.SCORE")) 
+      'gnus-score-find-hierarchical)
 @end example
 
 @item gnus-score-expiry-days
@@ -16097,7 +16110,9 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 $B$/$7$?$1$l$P!"(B
 
 @lisp
-("xref" ("[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+" -1000 nil r))
+("xref" 
+  ("[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+"
+   -1000 nil r))
 @end lisp
 
 @item $BK\J8$X$N%^%C%A(B
@@ -16178,6 +16193,7 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 @end lisp
 
 @findex gnus-score-search-global-directories
+@noindent
 $B$I$&$@$$!"4JC1$@$m$&(B? $B%G%#%l%/%H%jL>$O(B @samp{/} $B$G=*$o$i$J$/$F$O$J$j$^$;(B
 $B$s!#$3$l$i$N%G%#%l%/%H%j$OIaDL$O!"0l2s$N(B gnus $B;HMQ4|4VCf$K0l2s$@$1$7$+FI(B
 $B$_9~$_$^$;$s!#$b$71s3V%G%#%l%/%H%j$r<jF0$G:FFI$_9~$_$9$kI,MW$,=P$F$-$?$i!"(B
@@ -16567,7 +16583,7 @@ bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B 9000 $B$G$9!#(
 
 @item !
 @itemx not
-@itemx .AN,
+@itemx ,A,(B
 $B$3$NO@M}:nMQ;R$OC10l$N0z?t$N$_$r$H$j$^$9!#$=$l$O$=$N0z?t$NCM$NO@M}H]Dj$r(B
 $BJV$7$^$9!#(B
 
@@ -17173,13 +17189,13 @@ Emacs $B$,(B @samp{%b} $B$r<u$1<h$k$H!"(BEmacs $B$N%b!<%I9TI=<($NItJ,$,$=$l
 $B$^$9(B:
 
 @example
-split       = frame | horizontal | vertical | buffer | form
-frame       = "(frame " size *split ")"
-horizontal  = "(horizontal " size *split ")"
-vertical    = "(vertical " size *split ")"
-buffer      = "(" buffer-name " " size *[ "point" ] *[ "frame-focus"] ")"
-size        = number | frame-params
-buffer-name = group | article | summary ...
+split      = frame | horizontal | vertical | buffer | form
+frame      = "(frame " size *split ")"
+horizontal = "(horizontal " size *split ")"
+vertical   = "(vertical " size *split ")"
+buffer     = "(" buf-name " " size *[ "point" ] *[ "frame-focus"] ")"
+size       = number | frame-params
+buf-name   = group | article | summary ...
 @end example
 
 $B@)8B$K$O!"(B@code{frame} $B$O:G>e0L$NJ,3d$H$7$F$7$+8=$l$k;v$,$G$-$J$$$H$$$&(B
@@ -17272,13 +17288,14 @@ The GNU Emacs Lisp Reference Manual}. XEmacs $B$G$O!"%U%l!<%`%W%m%Q%F%#%j(B
 $B$N$h$&$J$b$N$G$G$-$^$9!#(B
 
 @lisp
-(message (frame 1.0
-                (if (not (buffer-live-p gnus-summary-buffer))
-                    (car (cdr (assoc 'group gnus-buffer-configuration)))
-                  (car (cdr (assoc 'summary gnus-buffer-configuration))))
-                (vertical ((user-position . t) (top . 1) (left . 1)
-                           (name . "Message"))
-                          (message 1.0 point))))
+(message
+  (frame 1.0
+         (if (not (buffer-live-p gnus-summary-buffer))
+             (car (cdr (assoc 'group gnus-buffer-configuration)))
+           (car (cdr (assoc 'summary gnus-buffer-configuration))))
+         (vertical ((user-position . t) (top . 1) (left . 1)
+                    (name . "Message"))
+                   (message 1.0 point))))
 @end lisp
 
 @findex gnus-add-configuration
@@ -18947,7 +18964,7 @@ Kevin Davidson---@dfn{ding} $B$NL>A0$r;W$$IU$-$^$7$?!#$G$9$+$i!"H`$r@U$a$F(B
 $B2<$5$$!#(B
 
 @item
-Fran.ANgois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
+Fran,Ag(Bois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
 $B%5%]!<%H!#(B
 
 @end itemize
@@ -18960,7 +18977,7 @@ Borges $B$K$h$C$F9;@5$5$l!"(BJost Krieger $B$K$h$C$F0lItJ,$r9;@5$5$l$^$7$?!#
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K.ANegedal,
+David K,Ae(Bgedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -19046,7 +19063,7 @@ Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
 Miguel de Icaza,
-Fran.ANgois Felix Ingrand,
+Fran,Ag(Bois Felix Ingrand,
 Tatsuya Ichikawa, @c ?
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
@@ -21139,7 +21156,9 @@ description-buffer = *description-line
   "*Non-nil means that nndir will never retrieve NOV headers."
   nnml-nov-is-evil)
 
-(defvoo nndir-current-group "" nil nnml-current-group nnmh-current-group)
+(defvoo nndir-current-group "" 
+  nil 
+  nnml-current-group nnmh-current-group)
 (defvoo nndir-top-directory nil nil nnml-directory nnmh-directory)
 (defvoo nndir-get-new-mail nil nil nnml-get-new-mail nnmh-get-new-mail)
 
@@ -21157,7 +21176,8 @@ description-buffer = *description-line
   (unless (assq 'nndir-directory defs)
     (push `(nndir-directory ,server) defs))
   (push `(nndir-current-group
-          ,(file-name-nondirectory (directory-file-name nndir-directory)))
+          ,(file-name-nondirectory 
+            (directory-file-name nndir-directory)))
         defs)
   (push `(nndir-top-directory
           ,(file-name-directory (directory-file-name nndir-directory)))
@@ -21293,47 +21313,47 @@ description-buffer = *description-line
 $B%9%3%"%U%!%$%k$N(B BNF $BDj5A$G$9!#(B
 
 @example
-score-file       = "" / "(" *element ")"
-element          = rule / atom
-rule             = string-rule / number-rule / date-rule
-string-rule      = "(" quote string-header quote space *string-match ")"
-number-rule      = "(" quote number-header quote space *number-match ")"
-date-rule        = "(" quote date-header quote space *date-match ")"
-quote            = <ascii 34>
-string-header    = "subject" / "from" / "references" / "message-id" /
-                   "xref" / "body" / "head" / "all" / "followup"
-number-header    = "lines" / "chars"
-date-header      = "date"
-string-match     = "(" quote <string> quote [ "" / [ space score [ "" /
-                   space date [ "" / [ space string-match-t ] ] ] ] ] ")"
-score            = "nil" / <integer>
-date             = "nil" / <natural number>
-string-match-t   = "nil" / "s" / "substring" / "S" / "Substring" /
-                   "r" / "regex" / "R" / "Regex" /
-                   "e" / "exact" / "E" / "Exact" /
-                   "f" / "fuzzy" / "F" / "Fuzzy"
-number-match     = "(" <integer> [ "" / [ space score [ "" /
-                   space date [ "" / [ space number-match-t ] ] ] ] ] ")"
-number-match-t   = "nil" / "=" / "<" / ">" / ">=" / "<="
-date-match       = "(" quote <string> quote [ "" / [ space score [ "" /
-                   space date [ "" / [ space date-match-t ] ] ] ] ")"
-date-match-t     = "nil" / "at" / "before" / "after"
-atom             = "(" [ required-atom / optional-atom ] ")"
-required-atom    = mark / expunge / mark-and-expunge / files /
-                   exclude-files / read-only / touched
-optional-atom    = adapt / local / eval
-mark             = "mark" space nil-or-number
-nil-or-number    = "nil" / <integer>
-expunge          = "expunge" space nil-or-number
+score-file      = "" / "(" *element ")"
+element         = rule / atom
+rule            = string-rule / number-rule / date-rule
+string-rule     = "(" quote string-header quote space *string-match ")"
+number-rule     = "(" quote number-header quote space *number-match ")"
+date-rule       = "(" quote date-header quote space *date-match ")"
+quote           = <ascii 34>
+string-header   = "subject" / "from" / "references" / "message-id" /
+                  "xref" / "body" / "head" / "all" / "followup"
+number-header   = "lines" / "chars"
+date-header     = "date"
+string-match    = "(" quote <string> quote [ "" / [ space score [ "" /
+                  space date [ "" / [ space string-match-t ] ] ] ] ] ")"
+score           = "nil" / <integer>
+date            = "nil" / <natural number>
+string-match-t  = "nil" / "s" / "substring" / "S" / "Substring" /
+                  "r" / "regex" / "R" / "Regex" /
+                  "e" / "exact" / "E" / "Exact" /
+                  "f" / "fuzzy" / "F" / "Fuzzy"
+number-match    = "(" <integer> [ "" / [ space score [ "" /
+                  space date [ "" / [ space number-match-t ] ] ] ] ] ")"
+number-match-t  = "nil" / "=" / "<" / ">" / ">=" / "<="
+date-match      = "(" quote <string> quote [ "" / [ space score [ "" /
+                  space date [ "" / [ space date-match-t ] ] ] ] ")"
+date-match-t    = "nil" / "at" / "before" / "after"
+atom            = "(" [ required-atom / optional-atom ] ")"
+required-atom   = mark / expunge / mark-and-expunge / files /
+                  exclude-files / read-only / touched
+optional-atom   = adapt / local / eval
+mark            = "mark" space nil-or-number
+nil-or-number   = "nil" / <integer>
+expunge         = "expunge" space nil-or-number
 mark-and-expunge = "mark-and-expunge" space nil-or-number
-files            = "files" *[ space <string> ]
-exclude-files    = "exclude-files" *[ space <string> ]
-read-only        = "read-only" [ space "nil" / space "t" ]
-adapt            = "adapt" [ space "ignore" / space "t" / space adapt-rule ]
-adapt-rule       = "(" *[ <string> *[ "(" <string> <integer> ")" ] ")"
-local            = "local" *[ space "(" <string> space <form> ")" ]
-eval             = "eval" space <form>
-space            = *[ " " / <TAB> / <NEWLINE> ]
+files           = "files" *[ space <string> ]
+exclude-files   = "exclude-files" *[ space <string> ]
+read-only       = "read-only" [ space "nil" / space "t" ]
+adapt        = "adapt" [ space "ignore" / space "t" / space adapt-rule ]
+adapt-rule      = "(" *[ <string> *[ "(" <string> <integer> ")" ] ")"
+local           = "local" *[ space "(" <string> space <form> ")" ]
+eval            = "eval" space <form>
+space           = *[ " " / <TAB> / <NEWLINE> ]
 @end example
 
 $B%9%3%"%U%!%$%k$NG'<1IT2DG=$JMWAG$OL5;k$5$l$k$Y$-$G$9$,!"<N$F$i$l$k$o$1$G(B
@@ -21681,9 +21701,9 @@ no.general 1000 900 y
 
 @example
 active      = *group-line
-group-line  = group space high-number space low-number space flag <NEWLINE>
+group-line  = group spc high-number spc low-number spc flag <NEWLINE>
 group       = <non-white-space string>
-space       = " "
+spc         = " "
 high-number = <non-negative integer>
 low-number  = <positive integer>
 flag        = "y" / "n" / "m" / "j" / "x" / "=" group
