@@ -1,3 +1,11 @@
+1999-10-21  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 11.
+
+	* lisp/gnus-offline.el (TopLevel): Call `mime-set-field-decoder'
+	when "eword-decode" is loaded. It is for X-Gnus-Offline-Backend
+	header.
+
 1999-10-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
