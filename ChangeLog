@@ -1,3 +1,11 @@
+1999-12-03  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
+            Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* imap.el (imap-base64-encode-string, imap-base64-decode-string):
+	New functions.  They are identical to the built-in codec if
+	possible, otherwise the functions defined in mel are used.
+	(imap-cram-md5-auth): Use them.
+
 1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/imap.el: Remove autoload settings for `base64-decode-string'
