@@ -13240,6 +13240,24 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 使われます。同様に、要素 @samp{\\1} から @samp{\\9} まではグループ付
 け 1 から 9 までで合致した文字列で代替されます。
 
+@vindex nnmail-split-fancy-match-partial-words
+@code{nnmail-split-fancy-match-partial-words} は、特級分割で部分的な語が
+合致するかどうかを制御します。
+
+通常 @code{nnmail-split-fancy} で与えられる正規表現は、暗に語の区切りを
+表す @code{\<...\>} 印で囲まれています。この変数が真であると、それらは何
+によっても暗に囲まれません。
+
+@example
+(any "joe" "joemail")
+@end example
+
+この例で、通常 @samp{joedavis@@foo.org} から来たメッセージ
+は @samp{joemail} に格納されません。しかし、
+@code{nnmail-split-fancy-match-partial-words} を t に設定すると合致が起
+きます。要するに、語を区切る条件が削除され、代わりに合致がよ
+り grep らしくなるのです。
+
 @findex nnmail-split-fancy-with-parent
 関数 @code{nnmail-split-fancy-with-parent} は、フォローアップ記事を親記
 事と同じグループに振り分けるために使います。メールの振り分けを一生懸命設
@@ -14798,9 +14816,7 @@ Gnus はこれらのソースへの界面を提供するバックエンド群を少し備えつつあり
 
 @item nnslashdot-comments-url
 @vindex nnslashdot-comments-url
-コメントを取得するために使用される @sc{url} 文字列です。初期値
-は @samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=@/%d&mode=flat&startat=%d} で
-す。
+コメントを取得するために使用される @sc{url} 文字列です。
 
 @item nnslashdot-article-url
 @vindex nnslashdot-article-url
