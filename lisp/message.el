@@ -647,6 +647,7 @@ Predefined functions include `message-cite-original' and
 Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
   :type '(radio (function-item message-cite-original)
 		(function-item message-cite-original-without-signature)
+		(function-item mu-cite/cite-original)
 		(function-item sc-cite-original)
 		(function :tag "Other"))
   :group 'message-insertion)
@@ -1167,7 +1168,8 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'gnus-request-post "gnus-int")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
-  (autoload 'rmail-output "rmail"))
+  (autoload 'rmail-output "rmail")
+  (autoload 'mu-cite/cite-original "mu-cite"))
 
 
 
@@ -2294,9 +2296,9 @@ The text will also be indented the normal way."
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
-  (when (and (or (and (featurep 'xemacs)
-		      (not (eq 'tty (device-type))))
-		 window-system
+  (when (and (or (static-if (featurep 'xemacs)
+		     (device-on-window-system-p)
+		   window-system)
 		 (>= emacs-major-version 20))
 	     (or (and (eq message-delete-frame-on-exit t)
 		      (select-frame frame)
@@ -3762,40 +3764,36 @@ Headers already prepared in the buffer are not modified."
    (t
     (format "*%s message*" type))))
 
+(defmacro message-pop-to-buffer-1 (buffer)
+  `(if pop-up-frames
+       (let (special-display-buffer-names
+	     special-display-regexps
+	     same-window-buffer-names
+	     same-window-regexps)
+	 (pop-to-buffer ,buffer))
+     (pop-to-buffer ,buffer)))
+
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((pop-up-frames pop-up-frames)
-	(special-display-buffer-names special-display-buffer-names)
-	(special-display-regexps special-display-regexps)
-	(same-window-buffer-names same-window-buffer-names)
-	(same-window-regexps same-window-regexps)
-	(buffer (get-buffer name))
-	(cur (current-buffer)))
-    (if (or (and (featurep 'xemacs)
-		 (not (eq 'tty (device-type))))
-	    window-system
-	    (>= emacs-major-version 20))
-	(when message-use-multi-frames
-	  (setq pop-up-frames t
-		special-display-buffer-names nil
-		special-display-regexps nil
-		same-window-buffer-names nil
-		same-window-regexps nil))
-      (setq pop-up-frames nil))
+  (let ((buffer (get-buffer name))
+	(pop-up-frames (and (or (static-if (featurep 'xemacs)
+				    (device-on-window-system-p)
+				  window-system)
+				(>= emacs-major-version 20))
+			    message-use-multi-frames)))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
-	  (set-buffer (pop-to-buffer buffer))
+	  (message-pop-to-buffer-1 buffer)
 	  (when (and (buffer-modified-p)
 		     (not (y-or-n-p
 			   "Message already being composed; erase? ")))
 	    (error "Message being composed")))
-      (set-buffer (pop-to-buffer name)))
+      (message-pop-to-buffer-1 name))
     (erase-buffer)
     (message-mode)
     (when pop-up-frames
-      (make-local-variable 'message-original-frame)
-      (setq message-original-frame (selected-frame)))))
+      (set (make-local-variable 'message-original-frame) (selected-frame)))))
 
 (defun message-do-send-housekeeping ()
   "Kill old message buffers."
