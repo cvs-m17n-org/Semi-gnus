@@ -1,3 +1,10 @@
+1998-04-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Modify styles.
+
+	* texi/gnus.texi: Modify for Semi-gnus (sync up with
+ 	gnus-ja.texi).
+
 1998-04-20  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Add "New Groups".
