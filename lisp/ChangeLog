@@ -1,3 +1,56 @@
+2004-01-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (article-decode-mime-words, article-babel)
+	(gnus-article-highlight-signature, gnus-article-add-buttons)
+	(gnus-signature-toggle): Use gnus-with-article-buffer.
+	
+	* gnus-art.el (gnus-article-highlight-headers)
+	(gnus-article-add-buttons-to-head): Use gnus-with-article-headers.
+	
+	* gnus-art.el (gnus-mm-display-part, gnus-article-wash-status)
+	(gnus-article-set-globals, gnus-request-article-this-buffer)
+	(gnus-button-message-id, gnus-article-maybe-hide-headers)
+	(gnus-mime-view-part-externally, gnus-mime-view-part-internally)
+	(gnus-mime-display-alternative): Use with-current-buffer.
+
+2004-01-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-generate-fake-headers): rewrite to be simpler,
+	also under 80 char limit, and call gnus-error if needed
+	(spam-fetch-article-header): finally fixed - it was a
+	buffer-local variable (gnus-newsgroup-data)
+	(spam-find-spam): use spam-generate-fake-headers, forget about
+	spam-insert-fake-headers
+	(spam-insert-fake-headers): removed
+
+2004-01-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* deuglify.el (gnus-article-outlook-unwrap-lines)
+	(gnus-outlook-rearrange-article)
+	(gnus-outlook-repair-attribution-outlook)
+	(gnus-outlook-repair-attribution-block)
+	(gnus-outlook-repair-attribution-other): Remove redundant
+	save-excursion.
+
+2004-01-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-fetch-field-fast, spam-fetch-field-from-fast)
+	(spam-fetch-field-subject-fast)
+	(spam-fetch-field-message-id-fast, spam-generate-fake-headers)
+	(spam-fetch-article-header): new functions to deal with Gnus
+	internals for fast retrieval of article header data
+	(spam-initialize): put spam-find-spam in the gnus-summary-prepared-hook
+
+2004-01-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* pop3.el (pop3-md5): Remove.
+	(pop3-apop): Replace pop3-md5 with md5.
+
+	* mm-bodies.el: base64 is always built-in.
+
+	* gnus-sum.el (gnus-summary-from-or-to-or-newsgroups): Use
+	with-current-buffer.
+
 2004-01-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* canlock.el (canlock-insert-header): Remove excessive grouping in

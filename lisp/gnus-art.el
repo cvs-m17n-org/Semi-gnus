@@ -2272,14 +2272,12 @@ unfolded."
 (defun article-decode-mime-words ()
   "Decode all MIME-encoded words in the article."
   (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
+  (gnus-with-article-buffer
     (let ((inhibit-point-motion-hooks t)
-	  buffer-read-only
 	  (mail-parse-charset gnus-newsgroup-charset)
 	  (mail-parse-ignored-charsets
-	   (save-excursion (set-buffer gnus-summary-buffer)
-			   gnus-newsgroup-ignored-charsets)))
+	   (with-current-buffer gnus-summary-buffer
+	     gnus-newsgroup-ignored-charsets)))
       (mail-decode-encoded-word-region (point-min) (point-max)))))
 
 (defun article-decode-charset (&optional prompt)
@@ -2652,11 +2650,9 @@ always hide."
   "Translate article using an online translation service."
   (interactive)
   (require 'babel)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
+  (gnus-with-article-buffer
     (when (article-goto-body)
-      (let* ((buffer-read-only nil)
-	     (start (point))
+      (let* ((start (point))
 	     (end (point-max))
 	     (orig (buffer-substring start end))
 	     (trans (babel-as-string orig)))
@@ -4661,8 +4657,8 @@ specified charset."
 	 (mm-inlined-types nil)
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets
-	  (save-excursion (set-buffer gnus-summary-buffer)
-			  gnus-newsgroup-ignored-charsets)))
+	  (with-current-buffer gnus-summary-buffer
+	    gnus-newsgroup-ignored-charsets)))
     (when handle
       (if (mm-handle-undisplayer handle)
 	  (mm-remove-part handle)
@@ -4678,8 +4674,8 @@ If no internal viewer is available, use an external viewer."
 	 (mm-inline-large-images t)
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets
-	  (save-excursion (set-buffer gnus-summary-buffer)
-			  gnus-newsgroup-ignored-charsets))
+	  (with-current-buffer gnus-summary-buffer
+	    gnus-newsgroup-ignored-charsets))
 	 buffer-read-only)
     (when handle
       (if (mm-handle-undisplayer handle)
@@ -4790,8 +4786,7 @@ N is the numerical prefix."
 	      (mail-parse-charset gnus-newsgroup-charset)
 	      (mail-parse-ignored-charsets
 	       (if (gnus-buffer-live-p gnus-summary-buffer)
-		   (save-excursion
-		     (set-buffer gnus-summary-buffer)
+		   (with-current-buffer gnus-summary-buffer
 		     gnus-newsgroup-ignored-charsets)
 		 nil)))
 	  (save-excursion
@@ -5180,8 +5175,8 @@ If displaying \"text/html\" is discouraged \(see
 	      (gnus-display-mime preferred)
 	    (let ((mail-parse-charset gnus-newsgroup-charset)
 		  (mail-parse-ignored-charsets
-		   (save-excursion (set-buffer gnus-summary-buffer)
-				   gnus-newsgroup-ignored-charsets)))
+		   (with-current-buffer gnus-summary-buffer
+		     gnus-newsgroup-ignored-charsets)))
 	      (mm-display-part preferred)
 	      ;; Do highlighting.
 	      (save-excursion
@@ -5233,8 +5228,7 @@ is the string to use when it is inactive.")
 
 (defun gnus-article-wash-status ()
   "Return a string which display status of article washing."
-  (save-excursion
-    (set-buffer gnus-article-buffer)
+  (with-current-buffer gnus-article-buffer
     (let ((cite (memq 'cite gnus-article-wash-types))
 	  (headers (memq 'headers gnus-article-wash-types))
 	  (boring (memq 'boring-headers gnus-article-wash-types))
@@ -5284,8 +5278,8 @@ is the string to use when it is inactive.")
   "Hide unwanted headers if `gnus-have-all-headers' is nil.
 Provided for backwards compatibility."
   (when (and (or (not (gnus-buffer-live-p gnus-summary-buffer))
-		 (not (save-excursion (set-buffer gnus-summary-buffer)
-				      gnus-have-all-headers)))
+		 (not (with-current-buffer gnus-summary-buffer
+			gnus-have-all-headers)))
 	     (not gnus-inhibit-hiding))
     (gnus-article-hide-headers)))
 
@@ -5745,16 +5739,14 @@ If given a prefix, show the hidden text instead."
 		 gnus-summary-buffer
 		 (get-buffer gnus-summary-buffer)
 		 (gnus-buffer-exists-p gnus-summary-buffer)
-		 (eq (cdr (save-excursion
-			    (set-buffer gnus-summary-buffer)
+		 (eq (cdr (with-current-buffer gnus-summary-buffer
 			    (assq article gnus-newsgroup-reads)))
 		     gnus-canceled-mark))
 	    nil)
 	   ;; We first check `gnus-original-article-buffer'.
 	   ((and (get-buffer gnus-original-article-buffer)
 		 (numberp article)
-		 (save-excursion
-		   (set-buffer gnus-original-article-buffer)
+		 (with-current-buffer gnus-original-article-buffer
 		   (and (equal (car gnus-original-article) group)
 			(eq (cdr gnus-original-article) article))))
 	    (insert-buffer-substring gnus-original-article-buffer)
@@ -6813,41 +6805,35 @@ do the highlighting.  See the documentation for those functions."
 (defun gnus-article-highlight-headers ()
   "Highlight article headers as specified by `gnus-header-face-alist'."
   (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (save-restriction
-      (let ((alist gnus-header-face-alist)
-	    (buffer-read-only nil)
-	    (case-fold-search t)
-	    (inhibit-point-motion-hooks t)
-	    entry regexp header-face field-face from hpoints fpoints)
-	(article-narrow-to-head)
-	(while (setq entry (pop alist))
-	  (goto-char (point-min))
-	  (setq regexp (concat "^\\("
-			       (if (string-equal "" (nth 0 entry))
-				   "[^\t ]"
-				 (nth 0 entry))
-			       "\\)")
-		header-face (nth 1 entry)
-		field-face (nth 2 entry))
-	  (while (and (re-search-forward regexp nil t)
-		      (not (eobp)))
-	    (beginning-of-line)
-	    (setq from (point))
-	    (unless (search-forward ":" nil t)
-	      (forward-char 1))
-	    (when (and header-face
-		       (not (memq (point) hpoints)))
-	      (push (point) hpoints)
-	      (gnus-put-text-property from (point) 'face header-face))
-	    (when (and field-face
-		       (not (memq (setq from (point)) fpoints)))
-	      (push from fpoints)
-	      (if (re-search-forward "^[^ \t]" nil t)
-		  (forward-char -2)
-		(goto-char (point-max)))
-	      (gnus-put-text-property from (point) 'face field-face))))))))
+  (gnus-with-article-headers
+    (let ((alist gnus-header-face-alist)
+	  entry regexp header-face field-face from hpoints fpoints)
+      (while (setq entry (pop alist))
+	(goto-char (point-min))
+	(setq regexp (concat "^\\("
+			     (if (string-equal "" (nth 0 entry))
+				 "[^\t ]"
+			       (nth 0 entry))
+			     "\\)")
+	      header-face (nth 1 entry)
+	      field-face (nth 2 entry))
+	(while (and (re-search-forward regexp nil t)
+		    (not (eobp)))
+	  (beginning-of-line)
+	  (setq from (point))
+	  (unless (search-forward ":" nil t)
+	    (forward-char 1))
+	  (when (and header-face
+		     (not (memq (point) hpoints)))
+	    (push (point) hpoints)
+	    (gnus-put-text-property from (point) 'face header-face))
+	  (when (and field-face
+		     (not (memq (setq from (point)) fpoints)))
+	    (push from fpoints)
+	    (if (re-search-forward "^[^ \t]" nil t)
+		(forward-char -2)
+	      (goto-char (point-max)))
+	    (gnus-put-text-property from (point) 'face field-face)))))))
 
 (defun gnus-article-highlight-signature ()
   "Highlight the signature in an article.
@@ -6855,10 +6841,8 @@ It does this by highlighting everything after
 `gnus-signature-separator' using `gnus-signature-face'."
   (interactive)
   (when gnus-signature-face
-    (save-excursion
-      (set-buffer gnus-article-buffer)
-      (let ((buffer-read-only nil)
-	    (inhibit-point-motion-hooks t))
+    (gnus-with-article-buffer
+      (let ((inhibit-point-motion-hooks t))
 	(save-restriction
 	  (when (gnus-article-narrow-to-signature)
 	    (gnus-overlay-put (gnus-make-overlay (point-min) (point-max))
@@ -6886,10 +6870,8 @@ It does this by highlighting everything after
 \"External references\" are things like Message-IDs and URLs, as
 specified by `gnus-button-alist'."
   (interactive (list 'force))
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t)
+  (gnus-with-article-buffer
+    (let ((inhibit-point-motion-hooks t)
 	  (case-fold-search t)
 	  (alist gnus-button-alist)
 	  beg entry regexp)
@@ -6930,40 +6912,33 @@ specified by `gnus-button-alist'."
 (defun gnus-article-add-buttons-to-head ()
   "Add buttons to the head of the article."
   (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (save-restriction
-      (let ((buffer-read-only nil)
-	    (inhibit-point-motion-hooks t)
-	    (case-fold-search t)
-	    (alist gnus-header-button-alist)
-	    entry beg end)
-	(article-narrow-to-head)
-	(while alist
-	  ;; Each alist entry.
-	  (setq entry (car alist)
-		alist (cdr alist))
-	  (goto-char (point-min))
-	  (while (re-search-forward (car entry) nil t)
-	    ;; Each header matching the entry.
-	    (setq beg (match-beginning 0))
-	    (setq end (or (and (re-search-forward "^[^ \t]" nil t)
-			       (match-beginning 0))
-			  (point-max)))
-	    (goto-char beg)
-	    (while (re-search-forward (eval (nth 1 entry)) end t)
-	      ;; Each match within a header.
-	      (let* ((entry (cdr entry))
-		     (start (match-beginning (nth 1 entry)))
-		     (end (match-end (nth 1 entry)))
-		     (form (nth 2 entry)))
-		(goto-char (match-end 0))
-		(when (eval form)
-		  (gnus-article-add-button
-		   start end (nth 3 entry)
-		   (buffer-substring (match-beginning (nth 4 entry))
-				     (match-end (nth 4 entry)))))))
-	    (goto-char end)))))))
+  (gnus-with-article-headers
+    (let ((alist gnus-header-button-alist)
+	  entry beg end)
+      (while alist
+	;; Each alist entry.
+	(setq entry (pop alist))
+	(goto-char (point-min))
+	(while (re-search-forward (car entry) nil t)
+	  ;; Each header matching the entry.
+	  (setq beg (match-beginning 0))
+	  (setq end (or (and (re-search-forward "^[^ \t]" nil t)
+			     (match-beginning 0))
+			(point-max)))
+	  (goto-char beg)
+	  (while (re-search-forward (eval (nth 1 entry)) end t)
+	    ;; Each match within a header.
+	    (let* ((entry (cdr entry))
+		   (start (match-beginning (nth 1 entry)))
+		   (end (match-end (nth 1 entry)))
+		   (form (nth 2 entry)))
+	      (goto-char (match-end 0))
+	      (when (eval form)
+		(gnus-article-add-button
+		 start end (nth 3 entry)
+		 (buffer-substring (match-beginning (nth 4 entry))
+				   (match-end (nth 4 entry)))))))
+	  (goto-char end))))))
 
 ;;; External functions:
 
@@ -6986,15 +6961,12 @@ specified by `gnus-button-alist'."
 ;;; Internal functions:
 
 (defun gnus-article-set-globals ()
-  (save-excursion
-    (set-buffer gnus-summary-buffer)
+  (with-current-buffer gnus-summary-buffer
     (gnus-set-global-variables)))
 
 (defun gnus-signature-toggle (end)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t)
+  (gnus-with-article-buffer
+    (let ((inhibit-point-motion-hooks t)
 	  (limit (next-single-property-change end 'mime-view-entity
 					      nil (point-max))))
       (if (text-property-any end limit 'article-type 'signature)
@@ -7132,8 +7104,7 @@ specified by `gnus-button-alist'."
 
 (defun gnus-button-message-id (message-id)
   "Fetch MESSAGE-ID."
-  (save-excursion
-    (set-buffer gnus-summary-buffer)
+  (with-current-buffer gnus-summary-buffer
     (gnus-summary-refer-article message-id)))
 
 (defun gnus-button-fetch-group (address)

@@ -511,27 +511,6 @@ If NOW, use that time instead."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-;; When this file is being compiled in the Gnus (not T-gnus) source
-;; tree, `md5' might have been defined in w3/md5.el, ./lpath.el or one
-;; of some other libraries and `md5' will accept only 3 arguments.  We
-;; will deceive the byte-compiler not to say warnings.
-(eval-when-compile
-  (if (boundp 'byte-compile-function-environment)
-      (let ((def (assq 'md5 byte-compile-function-environment)))
-	(if def
-	    (setcdr def '(lambda (object &optional start end
-					 coding-system noerror)))
-	  (setq byte-compile-function-environment
-		(cons '(md5 . (lambda (object &optional start end
-					      coding-system noerror)))
-		      byte-compile-function-environment))))))
-
-;; Note that `pop3-md5' should never encode a given string to use for the
-;; apop authentication, so we should specify the `binary' coding system.
-(eval-and-compile
-  (defalias 'pop3-md5 (lambda (string)
-			(md5 string nil nil 'binary))))
-
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
   (let ((pass pop3-password))
@@ -539,7 +518,9 @@ If NOW, use that time instead."
 	(setq pass
 	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
-	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
+	;; Note that `md5' should never encode a given string to use for
+	;; the apop authentication, so we should specify `binary'.
+	(let ((hash (md5 (concat pop3-timestamp pass) nil nil 'binary)))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
