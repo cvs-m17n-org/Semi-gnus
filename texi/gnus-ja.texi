@@ -2766,8 +2766,9 @@ form の @code{nil} はそこで評価されます。
 
 @end table
 
-グループパラメータの修正には @kbd{G p} 命令を使ってください。トピックパ
-ラメータについて読んでみることも面白いでしょ
+グループパラメータの修正には @kbd{G p} か @kbd{G c} 命令を使ってくださ
+い (@kbd{G p} は Lisp ベースの、@kbd{G c} は Custom ふうのインターフェー
+スを提供します)。トピックパラメータについて読んでみることも面白いでしょ
 う (@pxref{Topic Parameters})。
 
 @node Listing Groups
@@ -4130,7 +4131,7 @@ gnus に、@code{gnus-summary-line-format} 変数の @code{%n} 仕様
 を @code{%f} 仕様に変更することで、データを表示するように指示する必要が
 あります。
 
-要約すると、普通は以下のようなことをすることになります:
+要約すると、普通は以下のようなものを @file{~/.gnus} に置くことになります:
 
 @lisp
 (setq gnus-extra-headers
