@@ -1,3 +1,14 @@
+1999-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-art.el (gnus-treat-article): Buttonize the signature
+	before highlighting or hiding it.
+	(gnus-article-buttonize-signature): New function.
+	(gnus-article-highlight-signature): Don't buttonize.
+	(gnus-treatment-function-alist): Undo the last change.
+	(gnus-treat-emphasize): Default to nil.
+
 1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
