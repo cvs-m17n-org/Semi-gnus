@@ -2247,7 +2247,8 @@ doing the deletion."
 	  (gnus-group-goto-group group)
 	  (gnus-group-kill-group 1 t)
 	  (gnus-sethash group nil gnus-active-hashtb)
-	  (when gnus-cache-active-hashtb
+	  (when (and (boundp 'gnus-cache-active-hashtb)
+		     gnus-cache-active-hashtb)
 	    (gnus-sethash group nil gnus-cache-active-hashtb)
 	    (setq gnus-cache-active-altered t))
 	  t))
