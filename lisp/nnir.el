@@ -461,6 +461,11 @@ that it is for EWS, not Glimpse."
   :type '(regexp)
   :group 'nnir)
 
+(defcustom nnir-imap-default-charset nil
+  "*Name of the charset of the strings that appear in the search criteria."
+  :type '(choice (const nil) string)
+  :group 'nnir)
+
 ;; Swish++.  Next three variables Copyright (C) 2000, 2001 Christoph
 ;; Conrad <christoph.conrad@gmx.de>.
 ;; Swish++ home page: http://homepage.mac.com/pauljlucas/software/swish/
@@ -968,6 +973,7 @@ pairs (also vectors, actually)."
 (defun nnir-run-imap (query &optional group)
   (require 'imap)
   (require 'nnimap)
+  (require 'mm-util)
   (unless group
     (error "Must specify groups for IMAP searching."))
   (save-excursion
@@ -981,13 +987,30 @@ pairs (also vectors, actually)."
 	    (setq buf nnimap-server-buffer) ;; xxx
 	    (message "Searching %s..." group)
             (let ((arts 0)
-                  (mbx (gnus-group-real-name group)))
+                  (mbx (gnus-group-real-name group))
+		  (multibyte-p (mm-multibyte-p))
+		  charset coding-system)
               (when (imap-mailbox-select mbx nil buf)
+		(with-temp-buffer
+		  (if multibyte-p
+		      (mm-enable-multibyte))
+		  (insert qstring)
+		  (setq charset (car (mm-find-mime-charset-region
+				      (point-min)(point-max)))))
+		(unless charset
+		  (setq charset nnir-imap-default-charset))
                 (mapcar
                  (lambda (artnum)
                    (push (vector mbx artnum 1) artlist)
                    (setq arts (1+ arts)))
-                 (imap-search (concat "TEXT \"" qstring "\"") buf))
+		 (if (and (not (eq charset 'us-ascii))
+			  (setq coding-system (mm-charset-to-coding-system
+					       charset)))
+		     (imap-search
+		      (concat "CHARSET " (symbol-name charset) " TEXT \""
+			      (mm-encode-coding-string qstring coding-system)
+			      "\"") buf)
+		   (imap-search (concat "TEXT \"" qstring "\"") buf)))
                 (message "Searching %s... %d matches" mbx arts)))
             (message "Searching %s...done" group))
         (quit nil))
