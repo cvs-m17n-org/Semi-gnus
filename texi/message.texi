@@ -1031,7 +1031,7 @@ $ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
 The @file{key+cert.pem} file should be pointed to from the
 @code{smime-keys} variable.  You should now be able to send signed mail.
 
-@emph{Note!}  Your private key is store unencrypted in the file, so take
+@emph{Note!}  Your private key is stored unencrypted in the file, so take
 care in handling it.
 
 @subsection Using PGP/MIME
@@ -1363,6 +1363,17 @@ Specifies what to do when there are no recipients other than
 @code{Gcc} or @code{Fcc}.  If it is @code{always}, the posting is
 allowed.  If it is @code{never}, the posting is not allowed.  If it is
 @code{ask} (the default), you are prompted.
+
+@item message-hidden-headers
+@vindex message-hidden-headers
+A regexp, a list of regexps, or a list where the first element is
+@code{not} and the rest are regexps.  It says which headers to keep
+hidden when composing a message.
+
+@lisp
+(setq message-hidden-headers
+      '(not "From" "Subject" "To" "Cc" "Newsgroups"))
+@end lisp
 
 @end table
 

@@ -1,5 +1,5 @@
 ;;; mm-uu.el --- Return uu stuff as mm handles
-;; Copyright (c) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: postscript uudecode binhex shar forward gnatsweb pgp
@@ -78,6 +78,11 @@ This can be either \"inline\" or \"attachment\".")
 (defvar mm-uu-emacs-sources-regexp "gnu\\.emacs\\.sources"
   "The regexp of emacs sources groups.")
 
+(defcustom mm-uu-diff-groups-regexp "gnus\\.commits"
+  "*Regexp matching diff groups."
+  :type 'regexp
+  :group 'gnus-article-mime)
+
 (defvar mm-uu-type-alist
   '((postscript
      "^%!PS-"
@@ -139,7 +144,13 @@ This can be either \"inline\" or \"attachment\".")
      "^;;;?[ \t]*\\([^ \t]+\\.el\\)[ \t]+ends here"
      mm-uu-emacs-sources-extract
      nil
-     mm-uu-emacs-sources-test)))
+     mm-uu-emacs-sources-test)
+    (diff
+     "^Index: "
+     nil
+     mm-uu-diff-extract
+     nil
+     mm-uu-diff-test)))
 
 (defcustom mm-uu-configure-list '((shar . disabled))
   "A list of mm-uu configuration.
@@ -175,8 +186,13 @@ To disable dissecting shar codes, for instance, add
   "Copy the contents of the current buffer to a fresh buffer.
 Return that buffer."
   (save-excursion
-    (let ((obuf (current-buffer)))
+    (let ((obuf (current-buffer))
+	  (coding-system
+	   ;; Might not exist in non-MULE XEmacs
+	   (when (boundp 'buffer-file-coding-system)
+	     buffer-file-coding-system)))
       (set-buffer (generate-new-buffer " *mm-uu*"))
+      (setq buffer-file-coding-system coding-system)
       (insert-buffer-substring obuf from to)
       (current-buffer))))
 
@@ -246,6 +262,15 @@ Return that buffer."
   (and gnus-newsgroup-name
        mm-uu-emacs-sources-regexp
        (string-match mm-uu-emacs-sources-regexp gnus-newsgroup-name)))
+
+(defun mm-uu-diff-extract ()
+  (mm-make-handle (mm-uu-copy-to-buffer start-point end-point)
+		  '("text/x-patch")))
+
+(defun mm-uu-diff-test ()
+  (and gnus-newsgroup-name
+       mm-uu-diff-groups-regexp
+       (string-match mm-uu-diff-groups-regexp gnus-newsgroup-name)))
 
 (defun mm-uu-forward-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer
