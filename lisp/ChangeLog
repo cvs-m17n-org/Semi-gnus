@@ -1,3 +1,12 @@
+2002-10-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* pgg.el (pgg-snarf-keys): Do not refer unbinded local variables.
+
+2002-10-22  Simon Josefsson  <jas@extundo.com>
+
+	* pgg.el (pgg-encrypt, pgg-decrypt, pgg-sign, pgg-verify) 
+	(pgg-snarf-keys): Add.
+
 2002-10-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lpath.el: Fbind bbdb-records.
