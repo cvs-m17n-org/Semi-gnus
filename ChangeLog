@@ -1,3 +1,14 @@
+2002-09-26  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-cus.el (gnus-user-group-parameters): New variable.
+	(gnus-group-customize): Add `gnus-user-group-parameters' to
+	customize list.
+
+	* lisp/gnus-bbdb.el (TopLevel): Add gourp parameter
+	`bbdb-auto-create-p'.
+	(gnus-bbdb/update-record): Use group parameter
+	`bbdb-auto-create-p'.
+
 2002-07-22  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/mmgnus.el (mime-entity-body): Eliminate message for
