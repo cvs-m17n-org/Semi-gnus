@@ -1242,10 +1242,18 @@ of FILE placing the combined headers in nntp-server-buffer."
     (erase-buffer)
     (nnheader-insert-file-contents file)
     (goto-char (point-max))
+    (forward-line -1)
+    (unless (looking-at "[0-9]+\t")
+      ;; Remove corrupted lines
+      (gnus-message 1 "Overview %s is corrupted. Removing corrupted lines..." file)
+      (goto-char (point-min))
+      (while (not (eobp))
+	(if (looking-at "[0-9]+\t")
+	    (forward-line 1)
+	  (delete-region (point) (progn (forward-line 1) (point)))))
+      (forward-line -1))
     (unless (or (= (point-min) (point-max))
-		(progn
-		  (forward-line -1)
-		  (< (setq last (read (current-buffer))) (car articles))))
+		(< (setq last (read (current-buffer))) (car articles)))
       ;; We do it the hard way.
       (when (nnheader-find-nov-line (car articles))
         ;; Replacing existing NOV entry
