@@ -107,7 +107,6 @@ license to the document, as described in section 6 of the license.
 $B$K$h$C$F!"9T$J$&$3$H$,$G$-$^$9!#(B
 @end titlepage
 @page
-
 @end tex
 
 @node Top
@@ -279,7 +278,6 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @vindex message-forward-ignored-headers
 $B$3$N@55,I=8=$K9gCW$9$k$9$Y$F$N%X%C%@!<$,!"E>Aw$5$l$k%a%C%;!<%8$+$i:o=|$5(B
 $B$l$^$9!#(B
-
 @end table
 
 @node Resending
@@ -403,7 +401,6 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @kindex C-c C-f C-u
 @findex message-goto-summary
 @code{Summary} $B%X%C%@!<$K9T$-$^$9(B (@code{message-goto-summary})$B!#(B
-
 @end table
 
 @node Movement
@@ -420,6 +417,11 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @findex message-goto-signature
 $B%a%C%;!<%8$N=pL>$K0\F0$7$^$9(B (@code{message-goto-signature})$B!#(B
 
+@item C-a
+@kindex C-a
+@findex message-beginning-of-line
+$B%X%C%@!<$NCM$N$H$3$m$K$$$k$H$-$O9T$N@hF,$K0\F0$7!"$=$&$G$J$$$H$-$O%X%C%@!<(B
+$B$NCM$N@hF,$K0\F0$7$^$9!#(B($B%X%C%@!<$NCM$O%X%C%@!<L>$H%3%m%s$N8e$KMh$^$9!#(B)
 @end table
 
 @node Insertion
@@ -459,7 +461,6 @@ message buffer (@code{message-yank-buffer}).
 @kindex C-c M-h
 @findex message-insert-headers
 $B%a%C%;!<%8$N%X%C%@!<$rA^F~$7$^$9(B (@code{message-insert-headers})$B!#(B
-
 @end table
 
 @table @code
@@ -574,7 +575,6 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 @vindex message-signature-file
 $B%P%C%U%!$N:G8e$KA^F~$5$l$k=pL>$NF~$C$F$$$k%U%!%$%k$G$9!#=i4|CM(B
 $B$O(B @samp{~/.signature} $B$G$9!#(B
-
 @end table
 
 RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$-$G$"$k(B
@@ -648,7 +648,6 @@ Digitally encrypt current MIME part using S/MIME.
 @findex mml-secure-encrypt-pgpmime
 
 Digitally encrypt current MIME part using PGP/MIME.
-
 @end table
 
 These commands do not immediately sign or encrypt the message, they
@@ -739,7 +738,6 @@ Florian Weimer's @code{gpg.el}.
 
 Creating your own OpenPGP key is described in detail in the
 documentation of your OpenPGP implementation, so we refer to it.
-
 @end ignore
 @node Various Commands
 @section $B$$$m$$$m$JL?Na(B
@@ -817,7 +815,6 @@ documentation of your OpenPGP implementation, so we refer to it.
 @findex message-rename-buffer
 $B%P%C%U%!$NL>A0$rJQ99$7$^$9(B (@code{message-rename-buffer})$B!#@\F,0z?t$rM?(B
 $B$($i$l$l$P!"?7$7$$%P%C%U%!L>$NF~NO$rB%?J$7$^$9!#(B
-
 @end table
 
 @node Sending
@@ -844,7 +841,6 @@ documentation of your OpenPGP implementation, so we refer to it.
 @kindex C-c C-k
 @findex message-kill-buffer
 $B%a%C%;!<%8%P%C%U%!$r@Z$C$F=*N;$7$^$9(B (@code{message-kill-buffer})$B!#(B
-
 @end table
 
 @node Mail Aliases
@@ -973,7 +969,6 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 $B$=$l$,0zMQId9f$rMW5a$7$J$1$l$P(B @code{angles} $B$N$h$&$K8+$(!"$b$70zMQId9f(B
 $B$,MW5a$5$l$k>l9g$O(B @code{parens} $B$N$h$&$K8+$($^$9!#(B@code{parens} $B$,0zMQ(B
 $BId9f$rMW5a$7$?$H$7$F$b!"$H$K$+$/(B @code{angles} $B$r;H$$$^$9!#(B
-
 @end table
 
 @item message-deletable-headers
@@ -1010,7 +1005,6 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 ($BLuCm(B: To $B$+(B Cc $B$K$"$k%"%I%l%9$G!":G=i$K$3$N@55,I=8=$K9gCW$7!"(B
 $B$+$D(B @code{user-mail-address} $B$H$O0c$&$b$N$,!"(B@code{From} $B%U%#!<%k%I$N%a!<(B
 $B%k%"%I%l%9$H$7$F;H$o$l$^$9!#(B)
-
 @end table
 
 @node Mail Headers
@@ -1032,7 +1026,6 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @vindex message-default-mail-headers
 $B$3$NJ8;zNs$O%a!<%k$H$7$F=i4|2=$5$l$?A4$F$N%a%C%;!<%8%P%C%U%!$N%X%C%@!<$N(B
 $B:G8e$NA^F~$5$l$^$9!#(B
-
 @end table
 
 @node Mail Variables
@@ -1066,7 +1059,6 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @c The limitation of messages sent as message/partial.
 @c The lower bound of message size in characters, beyond which the message 
 @c should be sent in several parts. If it is nil, the size is unlimited.
-
 @end table
 
 @node News Headers
@@ -1237,7 +1229,6 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-default-news-headers
 $B$3$NJ8;zNs$O%K%e!<%9$H$7$F=i4|2=$5$l$?$9$Y$F$N%a%C%;!<%8%P%C%U%!$N%X%C%@!<(B
 $B$N:G8e$KA^F~$5$l$^$9!#(B
-
 @end table
 
 @node News Variables
@@ -1253,7 +1244,6 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-post-method
 $B=`Hw$5$l$?%K%e!<%9%a%C%;!<%8$rEj9F$9$k$N$K;H$o$l$k(B gnus $B$N(B @dfn{$BA*BrJ}K!(B}
 ($B>\:Y$O(B gnus $B%^%K%e%"%k$r8+$F2<$5$$(B) $B$G$9!#(B
-
 @end table
 
 @node Various Message Variables
@@ -1375,7 +1365,6 @@ follows this line--} $B$G$9!#(B
 ((news message-news-p message-send-via-news)
  (mail message-mail-p message-send-via-mail))
 @end lisp
-
 @end table
 
 @node Sending Variables
@@ -1397,7 +1386,6 @@ follows this line--} $B$G$9!#(B
 $B$,(B @code{nil} $B$G$"$l$P!"$=$N$h$&$J?F@Z%a%C%;!<%8$O2C$($i$l$^$;$s!#=i4|CM(B
 $B$O(B @samp{"The following message is a courtesy copy of an article\nthat has
 been posted to %s as well.\n\n"} $B$G$9!#(B
-
 @end table
 
 @node Message Buffers
@@ -1450,7 +1438,6 @@ Message $B$O$"$J$?$,%a%C%;!<%8%P%C%U%!$rMW5a$7$?$H$-$K!"B>$KL5$$M#0l$N%P%C(B
 @item message-kill-buffer-on-exit
 @findex message-kill-buffer-on-exit
 @code{nil} $B$G$J$1$l$P!"=*N;;~$K$9$0$K%P%C%U%!$r:o=|$7$^$9!#(B
-
 @end table
 
 @node Message Actions
@@ -1560,12 +1547,10 @@ Message $B$O;v<B>e!"$=$l<+?H$NJQ?t$7$+;H$$$^$;$s(B---$B8E$$(B @code{mail-} 
 @item Followup-To
 
 @item Newsgroups
-
 @end table
 
 $B$b$7(B @code{Mail-Copies-To} $B%X%C%@!<$,B8:_$9$k$H!"$=$l$,(B @samp{never} $B$G(B
-$B$J$1$l$P!"?7$7$$(B @code{Cc} $B%X%C%@!<$N4p$H$7$F;H$o$l!"$^$9!#(B
-
+$B$J$1$l$P!"?7$7$$(B @code{Cc} $B%X%C%@!<$N4p$H$7$F;H$o$l$^$9!#(B
 @end table
 
 @node Index

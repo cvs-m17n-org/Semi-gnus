@@ -55,6 +55,7 @@
   (require 'mml))
 
 (require 'rfc822)
+(autoload 'sha1 "sha1-el")
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -1762,6 +1763,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\M-\r" 'message-newline-and-reformat)
   ;;(define-key message-mode-map "\M-q" 'message-fill-paragraph)
 
+  (define-key message-mode-map "\C-a" 'message-beginning-of-line)
   (define-key message-mode-map "\t" 'message-tab)
   (define-key message-mode-map "\M-;" 'comment-region)
 
@@ -2270,15 +2272,19 @@ Prefix arg means justify as well."
     (message-newline-and-reformat arg t)
     t))
 
+;; Is it better to use `mail-header-end'?
+(defun message-point-in-header-p ()
+  "Return t if point is in the header."
+  (save-excursion
+    (let ((p (point)))
+      (goto-char (point-min))
+      (not (re-search-forward
+	    (concat "^" (regexp-quote mail-header-separator) "\n")
+	    p t)))))
+
 (defun message-do-auto-fill ()
   "Like `do-auto-fill', but don't fill in message header."
-  (when (> (point) (save-excursion 
-		     (goto-char (point-min))
-		     (if (re-search-forward
-			  (concat "^" (regexp-quote mail-header-separator)
-				  "\n") nil t)
-			 (match-beginning 0)
-		       (point-max))))
+  (unless (message-point-in-header-p)
     (do-auto-fill)))
 
 (defun message-insert-signature (&optional force)
@@ -3369,10 +3375,10 @@ This sub function is for exclusive use of `message-send-news'."
 (defun message-canlock-generate ()
   "Return a string that is non-trival to guess.
 Do not use this for anything important, it is cryptographically weak."
-  (md5 (concat (message-unique-id)
-	       (format "%x%x%x" (random) (random t) (random))
-	       (prin1-to-string (recent-keys))
-	       (prin1-to-string (garbage-collect)))))
+  (sha1 (concat (message-unique-id)
+		(format "%x%x%x" (random) (random t) (random))
+		(prin1-to-string (recent-keys))
+		(prin1-to-string (garbage-collect)))))
 
 (defun message-canlock-password ()
   "The password used by message for cancel locks.
@@ -4615,6 +4621,19 @@ than 988 characters long, and if they are not, trim them until they are."
     (unless (looking-at "$")
       (forward-line 2)))
    (sit-for 0)))
+
+(defun message-beginning-of-line (&optional n)
+  "Move point to beginning of header value or to beginning of line."
+  (interactive "p")
+  (if (message-point-in-header-p)
+      (let* ((here (point))
+	     (bol (progn (beginning-of-line n) (point)))
+	     (eol (gnus-point-at-eol))
+	     (eoh (re-search-forward ": *" eol t)))
+	(if (or (not eoh) (equal here eoh))
+	    (goto-char bol)
+	  (goto-char eoh)))
+    (beginning-of-line n)))
 
 (defun message-buffer-name (type &optional to group)
   "Return a new (unique) buffer name based on TYPE and TO."
