@@ -6208,7 +6208,9 @@ those headers."
 (defun message-expand-name ()
   (if (fboundp 'bbdb-complete-name)
       (bbdb-complete-name)
-    (expand-abbrev)))
+    (if (fboundp 'lsdb-complete-name)
+	(lsdb-complete-name)
+      (expand-abbrev))))
 
 ;;; Help stuff.
 

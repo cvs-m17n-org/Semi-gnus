@@ -136,7 +136,7 @@
 	(t
 	 '(function-max-args smiley-encode-buffer))))
       (common-fns
-       nil)
+       '(lsdb-complete-name))
       (variables
        (cond
 	((featurep 'xemacs)
