@@ -1,10 +1,10 @@
 1999-01-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* nnmail.el (nnmail-article-group): Don't infloop.
+	* lisp/nnmail.el (nnmail-article-group): Don't infloop.
 
 1998-12-19 23:02:26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
-	* nnmail.el (nnmail-split-header-length-limit): New variable.
+	* lisp/nnmail.el (nnmail-split-header-length-limit): New variable.
 
 1999-01-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
