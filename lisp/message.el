@@ -4107,14 +4107,14 @@ the message."
       (current-buffer)
       (message-narrow-to-head)
       (let ((funcs message-make-forward-subject-function)
-	    (subject (if message-wash-forwarded-subjects
-			 (message-wash-subject
-			  (or (nnheader-decode-subject
-			       (message-fetch-field "Subject"))
-			      ""))
-		       (or (nnheader-decode-subject
-			    (message-fetch-field "Subject"))
-			   ""))))
+	    (subject (message-fetch-field "Subject")))
+	(setq subject
+	      (if subject
+		  (if message-wash-forwarded-subjects
+		      (message-wash-subject
+		       (nnheader-decode-subject subject))
+		    (nnheader-decode-subject subject))
+		"(none)"))
 	;; Make sure funcs is a list.
 	(and funcs
 	     (not (listp funcs))

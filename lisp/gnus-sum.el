@@ -3,6 +3,7 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -35,6 +36,9 @@
 (require 'gnus-int)
 (require 'gnus-undo)
 (require 'mime-view)
+
+(eval-when-compile
+  (require 'mime-play))
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
@@ -3022,24 +3026,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
-;; The following macros and functions were written by Felix Lee
-;; <flee@cse.psu.edu>.
-
-(defmacro gnus-nov-read-integer ()
-  '(prog1
-       (if (eq (char-after) ?\t)
-	   0
-	 (let ((num (ignore-errors (read buffer))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
-
-(defmacro gnus-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
-
-(defmacro gnus-nov-field ()
-  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
-
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
@@ -3056,17 +3042,16 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 	  (setq header
 		(make-full-mail-header
-		 number			; number
-		 (gnus-nov-field)	; subject
-		 (gnus-nov-field)	; from
-		 (gnus-nov-field)	; date
-		 (or (gnus-nov-field)
-		     (nnheader-generate-fake-message-id)) ; id
-		 (gnus-nov-field)	; refs
-		 (gnus-nov-read-integer) ; chars
-		 (gnus-nov-read-integer) ; lines
-		 (unless (= (following-char) ?\n)
-		   (gnus-nov-field)))))	; misc
+		 number				; number
+		 (nnheader-nov-field)		; subject
+		 (nnheader-nov-field)		; from
+		 (nnheader-nov-field)		; date
+		 (nnheader-nov-read-message-id)	; id
+		 (nnheader-nov-field)		; refs
+		 (nnheader-nov-read-integer)	; chars
+		 (nnheader-nov-read-integer)	; lines
+		 (unless (eobp)
+		   (nnheader-nov-field)))))	; misc
 
       (widen))
 
@@ -3984,15 +3969,20 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	    (condition-case ()
 		(cond
 		 ((and (or (<= scored marked) (= scored number))
-		       (numberp gnus-large-newsgroup)
+		       (natnump gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let ((input
-			 (read-string
-			  (format
-			   "How many articles from %s (default %d): "
-			   (gnus-limit-string gnus-newsgroup-name 35)
-			   number))))
-		    (if (string-match "^[ \t]*$" input) number input)))
+		  (let* ((minibuffer-setup-hook (append
+						 minibuffer-setup-hook
+						 '(beginning-of-line)))
+			 (input (read-string
+				 (format
+				  "How many articles from %s (max %d): "
+				  (gnus-limit-string gnus-newsgroup-name 35)
+				  number)
+				 (number-to-string gnus-large-newsgroup))))
+		    (if (string-match "^[ \t]*$" input)
+			number
+		      input)))
 		 ((and (> scored marked) (< scored number)
 		       (> (- scored number) 20))
 		  (let ((input
@@ -9014,6 +9004,100 @@ save those articles instead."
 	   (summary-buffer-exp . gnus-summary-buffer)
 	   (request-partial-message-method . gnus-request-partial-message)
 	   ))
+
+
+;;; @ for message/rfc822
+;;;
+
+(defun gnus-mime-extract-message/rfc822 (entity situation)
+  (let (group article num cwin swin cur)
+    (with-current-buffer (mime-entity-buffer entity)
+      (save-restriction
+	(narrow-to-region (mime-entity-body-start entity)
+			  (mime-entity-body-end entity))
+	(setq group (or (cdr (assq 'group situation))
+			(completing-read "Group: "
+					 gnus-active-hashtb
+					 nil
+					 (gnus-read-active-file-p)
+					 gnus-newsgroup-name))
+	      article (gnus-request-accept-article group)
+	      )
+	))
+    (when (and (consp article)
+	       (numberp (setq article (cdr article))))
+      (setq num (1+ (or (cdr (assq 'number situation)) 0))
+	    cwin (get-buffer-window (current-buffer) t)
+	    )
+      (save-window-excursion
+	(if (setq swin (get-buffer-window gnus-summary-buffer t))
+	    (select-window swin)
+	  (set-buffer gnus-summary-buffer)
+	  )
+	(setq cur gnus-current-article)
+	(forward-line num)
+	(let (gnus-show-threads)
+	  (gnus-summary-goto-subject article t)
+	  )
+	(gnus-summary-clear-mark-forward 1)
+	(gnus-summary-goto-subject cur)
+	)
+      (when (and cwin (window-frame cwin))
+	(select-frame (window-frame cwin))
+	)
+      (when (boundp 'mime-acting-situation-to-override)
+	(set-alist 'mime-acting-situation-to-override
+		   'group
+		   group)
+	(set-alist 'mime-acting-situation-to-override
+		   'after-method
+		   `(progn
+		      (save-current-buffer
+			(set-buffer gnus-group-buffer)
+			(gnus-activate-group ,group)
+			)
+		      (gnus-summary-goto-article ,cur
+						 gnus-show-all-headers)
+		      ))
+	(set-alist 'mime-acting-situation-to-override
+		   'number num)
+	)
+      )))
+
+(mime-add-condition
+ 'action '((type . message)(subtype . rfc822)
+	   (major-mode . gnus-original-article-mode)
+	   (method . gnus-mime-extract-message/rfc822)
+	   (mode . "extract")
+	   ))
+
+(mime-add-condition
+ 'action '((type . message)(subtype . news)
+	   (major-mode . gnus-original-article-mode)
+	   (method . gnus-mime-extract-message/rfc822)
+	   (mode . "extract")
+	   ))
+
+(defun gnus-mime-extract-multipart (entity situation)
+  (let ((children (mime-entity-children entity))
+	mime-acting-situation-to-override
+	f)
+    (while children
+      (mime-play-entity (car children)
+			(cons (assq 'mode situation)
+			      mime-acting-situation-to-override))
+      (setq children (cdr children)))
+    (if (setq f (cdr (assq 'after-method
+			   mime-acting-situation-to-override)))
+	(eval f)
+      )))  
+
+(mime-add-condition
+ 'action '((type . multipart)
+	   (method . gnus-mime-extract-multipart)
+	   (mode . "extract")
+	   )
+ 'with-default)
 
 
 ;;; @ end

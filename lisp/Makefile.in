@@ -11,12 +11,15 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
+PACKAGEDIR =
 
 total:
-	rm -f *.elc ; $(EMACS) $(FLAGS) -f dgnushack-compile
+	rm -f *.elc auto-autoloads.el custom-load.el ; \
+	$(EMACS) $(FLAGS) -f dgnushack-compile
 
 all:
-	rm -f *.elc ; $(EMACS) $(FLAGS) -f dgnushack-compile
+	rm -f *.elc auto-autoloads.el custom-load.el ; \
+	$(EMACS) $(FLAGS) -f dgnushack-compile
 
 warn:
 	rm -f *.elc ; $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
@@ -33,6 +36,14 @@ install: clever
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	done
+
+package:
+	$(EMACS) $(FLAGS) -f dgnushack-make-package
+
+install-package: clever
+	rm -f dgnushack.elc
+	$(EMACS) $(FLAGS) -f dgnushack-make-package \
+		-f dgnushack-install-package $(PACKAGEDIR)
 
 tags:
 	etags *.el

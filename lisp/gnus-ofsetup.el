@@ -1,7 +1,5 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.6.2 1999-02-05 02:59:08 keiichi Exp $
-;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;;
@@ -88,7 +86,7 @@
 		nil t nil))
 	      (mail-method 'nnmail)
 	      (program
-	       (read-file-name "Dialup/Hangup program(type nil you do not use): "))
+	       (read-file-name "Dialup/Hangup program(type nil or null string you do not use): "))
 	      (mta-type
 	       (completing-read
 		"Select MTA type for sending mail (TAB to completion): "
@@ -110,7 +108,8 @@
 	  (setq gnus-offline-use-miee use-miee)
 	  
 	  ;; Set programs.
-	  (if (string-equal program "nil")
+	  (if (or (string-equal program "nil")
+		  (string-equal program ""))
 	      (progn
 		(setq gnus-offline-hangup-program nil)
 		(setq gnus-offline-dialup-program nil))
@@ -227,26 +226,32 @@
 			    (append mail-source
 				    (list
 				     (list
-				      auth
+				      'pop
 				      :user user
 				      :server server
-				      :program prog
-				      :args (format "%s %s" args
-						    (concat "po:" user)))))))
+				      :program
+				      (format "%s %s %s %s %s"
+					      prog
+					      args
+					      "po:%u"
+					      "%t"
+					      "%p")
+					      :authentication auth)))))
 		  (setq mail-source
 			(append mail-source
 				(list
 				 (list
-				  auth
+				  'pop
 				  :user user
-				  :server server))))))
+				  :server server
+				  :authentication auth))))))
 	      (setq i (- i 1)))
 	    ;; Replace "hoge" -> 'hoge
 	    (mapcar
 	     (lambda (x)
-	       (if (string-equal (nth 0 x) "pop")
-		   (setcar x 'pop)
-		 (setcar x 'apop)))
+	       (if (string-equal (car (last x)) "pop")
+		   (setcar (last x) (quote 'pop))
+		 (setcar (last x) (quote 'apop))))
 	     mail-source)
 	    (setq gnus-offline-mail-source mail-source)))
 
@@ -334,7 +339,9 @@
 	(insert "(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news)\n")
 	(insert "(add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)\n")
 	(if (eq gnus-offline-news-fetch-method 'nnspool)
-	    (insert "(add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n"))
+	    (progn
+	      (insert "(add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n")
+	      (insert "(add-hook 'gnus-before-startup-hook (lambda () (setq nnmail-spool-file nil)))\n")))
 	(insert "(add-hook 'message-send-hook 'gnus-offline-message-add-header)\n")
 	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
 	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
@@ -342,7 +349,6 @@
 	(if (not (locate-library "mail-source"))
 	    (progn
 	      ;; Write setting about pop3-fma.
-	      (insert "(setq nnmail-spool-file nil)\n")
 	      (insert "(require 'pop3-fma)\n")
 	      (insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
 	      (insert "(setq pop3-fma-spool-file-alist '")

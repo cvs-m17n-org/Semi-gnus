@@ -1,7 +1,8 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1994,95,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Version: 4.19
 ;; Keywords: news, path
 
@@ -88,5 +89,125 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-;;; dgnushack.el ends here
+
+;; Avoid byte-compile warnings.
+(defvar gnus-revision-number)
+(defvar gnus-version-number)
+(defvar gnus-product-name)
+(defvar configure-package-path)
+(defvar package-path)
 
+(defconst dgnushack-info-file-regexp
+  "^\\(gnus\\|message\\|gnus-ja\\|message-ja\\)\\.info\\(-[0-9]+\\)?$")
+
+(defconst dgnushack-texi-file-regexp
+  "^\\(gnus\\|message\\|gnus-ja\\|message-ja\\)\\.texi$")
+
+(defun dgnushack-make-package ()
+  (require 'gnus)
+  (let* ((product-name (downcase gnus-product-name))
+	 (lisp-dir (concat "lisp/" product-name "/"))
+	 make-backup-files)
+
+    (message "Updating autoloads for directory %s..." default-directory)
+    (let ((generated-autoload-file "auto-autoloads.el")
+	  noninteractive)
+      (update-autoloads-from-directory default-directory))
+    (byte-compile-file "auto-autoloads.el")
+
+    (with-temp-buffer
+      (let ((standard-output (current-buffer)))
+	(Custom-make-dependencies "."))
+      (message (buffer-string)))
+    (require 'cus-load)
+    (byte-compile-file "custom-load.el")
+
+    (message "Generating MANIFEST.%s for the package..." product-name)
+    (with-temp-buffer
+      (insert "pkginfo/MANIFEST." product-name "\n"
+	      lisp-dir
+	      (mapconcat
+	       'identity
+	       (sort (directory-files "." nil "\\.elc?$")
+		     'string-lessp)
+	       (concat "\n" lisp-dir))
+	      "\ninfo/"
+	      (mapconcat
+	       'identity
+	       (sort (directory-files "../texi/"
+				      nil dgnushack-info-file-regexp)
+		     'string-lessp)
+	       "\ninfo/")
+	      "\n")
+      (write-file (concat "../MANIFEST." product-name)))))
+
+(defun dgnushack-install-package ()
+  (let* ((package-dir (file-name-as-directory
+		       (or (car command-line-args-left)
+			   (if (boundp 'configure-package-path)
+			       (car configure-package-path)
+			     (car package-path)))))
+	 (info-dir (expand-file-name "info/" package-dir))
+	 (pkginfo-dir (expand-file-name "pkginfo/" package-dir))
+	 product-name lisp-dir manifest files)
+    (require 'gnus)
+    (setq product-name (downcase gnus-product-name)
+	  lisp-dir (expand-file-name (concat "lisp/" product-name "/")
+				     package-dir)
+	  manifest (concat "MANIFEST." product-name))
+
+    (unless (file-directory-p lisp-dir)
+      (make-directory lisp-dir t))
+    (unless (file-directory-p info-dir)
+      (make-directory info-dir))
+    (unless (file-directory-p pkginfo-dir)
+      (make-directory pkginfo-dir))
+
+    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+    (mapcar
+     (lambda (file)
+       (unless (member file files)
+	 (setq file (expand-file-name file lisp-dir))
+	 (message "Removing %s..." file)
+	 (condition-case nil
+	     (delete-file file)
+	   (error nil))))
+     (directory-files lisp-dir nil nil nil t))
+    (mapcar
+     (lambda (file)
+       (message "Copying %s to %s..." file lisp-dir)
+       (copy-file file (expand-file-name file lisp-dir) t t))
+     files)
+
+    (mapcar
+     (lambda (file)
+       (message "Copying ../texi/%s to %s..." file info-dir)
+       (copy-file (expand-file-name file "../texi/")
+		  (expand-file-name file info-dir)
+		  t t))
+     (sort (directory-files "../texi/" nil dgnushack-info-file-regexp)
+	   'string-lessp))
+
+    (message "Copying ../%s to %s..." manifest pkginfo-dir)
+    (copy-file (expand-file-name manifest "../")
+	       (expand-file-name manifest pkginfo-dir) t t)
+
+    (message "Done")))
+
+(defun dgnushack-add-info-suffix-maybe ()
+  ;; This function must be invoked from texi directory.
+  (let ((coding-system-for-read 'raw-text)
+	(coding-system-for-write 'raw-text)
+	(files (directory-files "." nil dgnushack-texi-file-regexp))
+	file make-backup-files)
+    (while (setq file (pop files))
+      (find-file file)
+      (when (and (re-search-forward
+		  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
+		 (not (string-match "\\.info$" (match-string 1))))
+	(copy-file file (concat file "_") nil t)
+	(insert ".info")
+	(save-buffer))
+      (kill-buffer (current-buffer)))))
+
+;;; dgnushack.el ends here

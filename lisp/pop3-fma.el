@@ -50,9 +50,6 @@
 ;;	pass means normal authentication USER/PASS.
 ;;	apop means authentication using APOP.
 ;;
-;; When using apop , Please set pop3-fma-movemail-type 'lisp.
-;; movemail.exe does not work on APOP protocol.
-;;
 ;; Variables
 ;;
 ;;  pop3-fma-spool-file-alist      ... Spool file alist of POP3 protocol
@@ -118,8 +115,7 @@ Type must be pass or apop."
 (defcustom pop3-fma-movemail-type 'lisp
   "*Type of movemail program.
 Lisp means `nnmail-movemail-program' is lisp function.
- Exe means `nnmail-movemail-program' is external program.
- Please do not use exe if you do not use Meadow."
+ Exe means `nnmail-movemail-program' is external program."
   :group 'pop3-fma
   :type '(choice (const lisp)
 		 (const exe)))
@@ -217,8 +213,7 @@ If there is any problem , please set this variable to nil(default).
 	  (if (eq pop3-authentication-scheme 'pass)
 	      (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)
 	    (message "Checking new mail user %s at %s using APOP ..." pop3-maildrop pop3-mailhost))
-	  (if (and (eq system-type 'windows-nt)
-		   (eq pop3-fma-movemail-type 'exe))
+	  (if (eq pop3-fma-movemail-type 'exe)
 	      (progn
 		(setenv "MAILHOST" pop3-mailhost)
 		(if (and (not (memq pop3-password pop3-fma-commandline-arguments))
