@@ -1,3 +1,16 @@
+1999-08-17  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/pop3.el (pop3-get-extended-response): Enable timeout of
+	`accept-process-output'; Move point to the end of the normal
+	response.
+	(pop3-movemail): Add suffix to `pop3-uidl-file-name'.
+	(pop3-get-list): Abolish.
+	(pop3-retr): Don't use `save-restriction'.
+	(pop3-uidl): Don't use `condition-case' when checking UIDL support.
+	(pop3-list): Likewise.
+
 1999-08-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
