@@ -2923,10 +2923,6 @@ If this variable is nil, don't do anything."
   (when (gnus-boundp 'display-time-timer)
     (display-time-event-handler)))
 
-;; Byte-compiler warning.
-(eval-when-compile
-  (defvar nnimap-mailbox-info))
-
 ;;;###autoload
 (defun gnus-fixup-nnimap-unread-after-getting-new-news ()
   (let (server group info)
@@ -2937,7 +2933,9 @@ If this variable is nil, don't do anything."
 		  (setq info (symbol-value sym)))
 	 (gnus-sethash group (cons (nth 2 info) (cdr (gnus-group-entry group)))
 		       gnus-newsrc-hashtb)))
-     nnimap-mailbox-info)))
+     (if (boundp 'nnimap-mailbox-info)
+	 (symbol-value 'nnimap-mailbox-info)
+       (make-vector 1 0)))))
 
 
 (provide 'gnus-start)
