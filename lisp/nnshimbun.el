@@ -1,7 +1,8 @@
-;;; -*- mode: Emacs-Lisp; coding: junet -*-
+;;; nnshimbun.el --- interfacing with web newspapers -*- coding: junet; -*-
 
-;;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
-;;; Keywords: news
+;; Authors: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+;;          Akihiro Arisawa    <ari@atesoft.advantest.co.jp>
+;; Keywords: news
 
 ;;; Copyright:
 
