@@ -21216,11 +21216,12 @@ nnml バックエンドは一通のメールにつき一つのファイルで、すべてのメールを
 
 これは必要な gnus のコードとあなたが作った辞書を load します。
 
-次に、特級分割の規則を適合させる、どうやって @code{spam-stat} を使うかを
-決めて下さい。では @samp{mail.misc} と @samp{mail.spam} の二つのグループ
-だけがある最も単純な事例ではどうなるか。以下の式はメールが spam であるか、
-またはそれが @samp{mail.misc} に行くべきだと言っています。もし spam だっ
-たら @code{spam-stat-split-fancy} は @samp{mail.spam} を返します。
+次に、特級分割の規則を適合させる必要があります: どうやっ
+て @code{spam-stat} を使うかを決めて下さい。で
+は @samp{mail.misc} と @samp{mail.spam} の二つのグループだけがある最も単
+純な事例ではどうなるか。以下の式はメールが spam であるか、またはそれ
+が @samp{mail.misc} に行くべきだと言っています。もし spam だった
+ら @code{spam-stat-split-fancy} は @samp{mail.spam} を返します。
 
 @example
 (setq nnmail-split-fancy
