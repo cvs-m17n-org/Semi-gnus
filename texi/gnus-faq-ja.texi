@@ -376,12 +376,12 @@ Q5.1: $B%a%$%j%s%0!&%j%9%H$+$iC&B`$9$k$K$O(B?
 
 @table @var
 @item $BF|K\8lMQ(B
-@file{semi-gnus-ja-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a%$(B
-$B%k$rAw$C$F2<$5$$!#(B(Subject $B$bITMW$G$9!#(B)
+@file{semi-gnus-ja-unsubscribe@@meadowy.org} $B$K6u$N%a%$%k$rAw$C$F2<$5$$!#(B
+(Subject $B$bITMW$G$9!#(B)
 
 @item $B1Q8lMQ(B
-@file{semi-gnus-en-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a%$(B
-$B%k$rAw$C$F2<$5$$!#(B(Subject $B$bITMW$G$9!#(B)
+@file{semi-gnus-en-unsubscribe@@meadowy.org} $B$K6u$N%a%$%k$rAw$C$F2<$5$$!#(B
+(Subject $B$bITMW$G$9!#(B)
 
 @end table
 
@@ -394,12 +394,12 @@ T-gnus $B$G$O!"MxMQ<T$H0];}<T$H$$$&=>Mh$NB?$/$N%Q%C%1!<%8$G:NMQ$5$l$F$$$k(B
 
 @table @var
 @item $BF|K\8lMQ(B
-@file{semi-gnus-ja-help@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a!<%k$rAw$C(B
-$B$F!"Aw$i$l$F$/$k%a!<%k$N;X<($K=>$C$F$/$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
+@file{semi-gnus-ja-help@@meadowy.org} $B$K6u$N%a!<%k$rAw$C$F!"Aw$i$l$F$/$k(B
+$B%a!<%k$N;X<($K=>$C$F$/$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
 @item $B1Q8lMQ(B
-@file{semi-gnus-en-help@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a!<%k$rAw$C(B
-$B$F!"Aw$i$l$F$/$k%a!<%k$N;X<($K=>$C$F$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
+@file{semi-gnus-en-help@@meadowy.org} $B$K6u$N%a!<%k$rAw$C$F!"Aw$i$l$F$/$k(B
+$B%a!<%k$N;X<($K=>$C$F$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
 @end table
 
@@ -417,8 +417,8 @@ T-gnus $B$N3+H/Ey$K4X$9$kJ}?K$N7hDj$OA4$F(B Semi-gnus-ja/en $B%a!<%j%s%0%j%9%
 $B$7$F$OE,MQ$5$l$J$$!#(B
 
 @item
-$B8xE*$J0F7o$NDs0F$*$h$S5DO@$O(B semi-gnus-ja@@meadow.scphys.kyoto-u.ac.jp $B$b(B
-$B$7$/$O(Bsemi-gnus-en@@meadow.scphys.kyoto-u.ac.jp $B$G9T$&!#(B
+$B8xE*$J0F7o$NDs0F$*$h$S5DO@$O(B semi-gnus-ja@@meadowy.org $B$b$7$/(B
+$B$O(B semi-gnus-en@@meadowy.org $B$G9T$&!#(B
 
 @item
 $B:G=*E*$JJ}?K$O%"%s%1!<%H7k2L$NB??t0U8+$r:NMQ$9$k!#(B
