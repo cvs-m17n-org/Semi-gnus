@@ -4221,40 +4221,87 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; GROUP is successfully selected.
       (or gnus-newsgroup-headers t)))))
 
-(defun gnus-summary-read-number-from-minibuffer (prompt default max)
+(defvar gnus-summary-default-select-to-read ?a)
+(defvar gnus-summary-select-to-read-help-winconf nil)
+
+(defun gnus-summary-select-to-read (prompt)
   (let ((cursor-in-echo-area nil)
 	(message-log-max nil)
+	(char-to-method
+	 '((?a "Number of `gnus-large-newsgroup' in the marked and unread."
+	       (cons 'all gnus-large-newsgroup))
+	   (?A "All of the marked and unread." (cons 'all nil))
+	   (?m "Number of `gnus-large-newsgroup' in the marked."
+	       (cons 'marked gnus-large-newsgroup))
+	   (?M "All of the marked." (cons 'marked nil))
+	   (?r "Number of `gnus-large-newsgroup' in the unread."
+	       (cons 'unread gnus-large-newsgroup))
+	   (?R "All of the unread." (cons 'unread nil))))
 	rest char)
-    (while (not rest)
-      (message "%s (n, SPC, RET, x, 0-9, -, ? or C-h): " prompt)
-      (setq char (read-event))
-      (cond 
-       ((memq char '(?\  ?n ?\C-j ?\C-m))
-	(setq rest default))
-       ((eq char ?x)
-	(setq rest max))
-       ((memq char '(?? ?\C-h))
-	(message
-	 "n, SPC or RET: default (%d), x: max(%d), 0-9 or `-': input number"
-	 default max)
-	(sit-for 30))
-       (t
-	(let (init)
+    (unwind-protect
+	(while (not rest)
+	  (message "%s (aAmMnrR, SPC, RET, 0-9, -, ? or C-h): " prompt
+		   gnus-summary-default-select-to-read)
+	  (setq char (car (gnus-read-event-char)))
+	  (when (memq char '(?\  ?n ?\C-j ?\C-m))
+	    (setq char gnus-summary-default-select-to-read))
 	  (cond
-	   ((eq char ?-)
-	    (setq init "-"))
-	   ((eq char ?0)
-	    (setq init ""))
-	   ((memq char '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9))
-	    (setq init (char-to-string char)))
+	   ((setq rest (cddr (assq char char-to-method)))
+	    (setq rest (eval (car rest))
+		  gnus-summary-default-select-to-read char))
+	   ((memq char '(?? ?\C-h))
+	    (setq gnus-summary-select-to-read-help-winconf
+		  (current-window-configuration))
+	    (save-excursion
+	      (set-buffer (gnus-get-buffer-create "*Summary select help*"))
+	      (buffer-disable-undo)
+	      (delete-windows-on (current-buffer))
+	      (erase-buffer)
+	      (insert
+	       "Do you want to read:\n\n"
+	       (format
+		"SPACE, C-j, C-m, RET: Default method. (currently same as %c)\n"
+		gnus-summary-default-select-to-read)
+	       "0-9 or -: Number of input value in the marked and unread.\n")
+	      (let ((list char-to-method)
+		    elem)
+		(while (setq elem (pop list))
+		  (insert (format "%c: %s\n" (car elem) (cadr elem)))))
+	      (gnus-appt-select-lowest-window)
+	      (split-window)
+	      (pop-to-buffer "*Summary select help*")
+	      (let ((window-min-height 1))
+		(shrink-window-if-larger-than-buffer))
+	      (select-window (get-buffer-window gnus-group-buffer t))))
 	   (t
-	    (setq char nil)))
-	  (when char
-	    (let ((cursor-in-echo-area nil))
-	      (setq rest (read-from-minibuffer (concat prompt ": ") init))
-	      (if (string-match "^[ \t]*$" rest)
-		  (setq rest max))))))))
+	    (let (init)
+	      (cond
+	       ((eq char ?-)
+		(setq init "-"))
+	       ((eq char ?0)
+		(setq init ""))
+	       ((memq char '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9))
+		(setq init (char-to-string char)))
+	       (t
+		(setq char nil)))
+	      (when char
+		(let ((cursor-in-echo-area nil))
+		  (setq rest (read-from-minibuffer (concat prompt ": ") init))
+		  (setq rest (cons 'all
+				   (if (string-match "^[ \t]*$" rest)
+				       nil
+				     rest)))))
+	      (setq char nil)))))
+      (gnus-summary-select-to-read-kill-help-buffer))
+    (when char
+      (setq gnus-summary-default-select-to-read char))
     rest))
+
+(defun gnus-summary-select-to-read-kill-help-buffer ()
+  (when (get-buffer "*Summary select help*")
+    (kill-buffer "*Summary select help*")
+    (when gnus-summary-select-to-read-help-winconf
+      (set-window-configuration gnus-summary-select-to-read-help-winconf))))
 
 (defun gnus-articles-to-read (group &optional read-all)
   ;; Find out what articles the user wants to read.
@@ -4287,14 +4334,28 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		 ((and (or (<= scored marked) (= scored number))
 		       (numberp gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let* ((cursor-in-echo-area nil))
-		    (gnus-summary-read-number-from-minibuffer
-		     (format
-		      "How many articles from %s"
-		      (gnus-limit-string gnus-newsgroup-name 35)
-		      number)
-		     gnus-large-newsgroup
-		     number)))
+		  (let* ((cursor-in-echo-area nil)
+			 (rest (gnus-summary-select-to-read
+				(format
+				 "Which articles from %s"
+				 (gnus-limit-string gnus-newsgroup-name 20))))
+			 (method (car rest)))
+		    (if (eq method 'all)
+			(or (cdr rest) number)
+		      (setq articles (sort
+				      (cond
+				       ((eq method 'marked)
+					(append gnus-newsgroup-dormant
+						gnus-newsgroup-marked))
+				       ((eq method 'unread)
+					(copy-sequence
+					 gnus-newsgroup-unreads)))
+				      '<)
+			    scored-list (gnus-killed-articles
+					 gnus-newsgroup-killed articles)
+			    scored (length scored-list)
+			    number (length articles))
+		      (or (cdr rest) number))))
 		 ((and (> scored marked) (< scored number)
 		       (> (- scored number) 20))
 		  (let ((input
