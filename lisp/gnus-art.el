@@ -2736,6 +2736,17 @@ Originally it is hide instead of DUMMY."
     (second . 1))
   "Mapping from time units to seconds.")
 
+(defun gnus-article-forward-header ()
+  "Move point to the start of the next header.
+If the current header is a continuation header, this can be several
+lines forward."
+  (let ((ended nil))
+    (while (not ended)
+      (forward-line 1)
+      (if (looking-at "[ \t]+[^ \t]")
+	  (forward-line 1)
+	(setq ended t)))))
+
 (defun article-date-ut (&optional type highlight header)
   "Convert DATE date to universal time in the current article.
 If TYPE is `local', convert to local time; if it is `lapsed', output
