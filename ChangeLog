@@ -11,7 +11,7 @@
 	* lisp/gnus-art.el (gnus-article-add-button): Quote
 	`:button-keymap' for Mule 2.3 but it won't work.
 
-	* lisp/dgnushack.el: (dgnushack-compile): Don't conpile
+	* lisp/dgnushack.el: (dgnushack-compile): Don't compile
 	dgnushack.el nor lpath.el.
 
 2000-09-29  Katsumi Yamaoka <yamaoka@jpl.org>
