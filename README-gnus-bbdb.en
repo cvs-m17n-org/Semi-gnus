@@ -37,7 +37,7 @@ of this file should be applied. If not, it might not.
 though FLIM does not decode them, put the following lines in your
 .gnus file.
 
-(setq gnus-bbeb/decode-field-body-function
+(setq gnus-bbdb/decode-field-body-function
       (function
        (lambda (field-body field-name)
          (eword-decode-string field-body))))
