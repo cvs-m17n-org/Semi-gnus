@@ -264,13 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "ET-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.11.00"
+(defconst gnus-version-number "6.11.01"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "02"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.84"
+(defconst gnus-original-version-number "0.86"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -2504,12 +2504,14 @@ You should probably use `gnus-find-method-for-group' instead."
 
 (defun gnus-method-simplify (method)
   "Return the shortest uniquely identifying string or method for METHOD."
-  (cond ((gnus-native-method-p method)
-        nil)
-       ((gnus-secondary-method-p method)
-        (format "%s:%s" (nth 0 method) (nth 1 method)))
-       (t
-        method)))
+  (cond ((stringp method)
+	 method)
+	((gnus-native-method-p method)
+	 nil)
+	((gnus-secondary-method-p method)
+	 (format "%s:%s" (nth 0 method) (nth 1 method)))
+	(t
+	 method)))
 
 (defun gnus-groups-from-server (server)
   "Return a list of all groups that are fetched from SERVER."

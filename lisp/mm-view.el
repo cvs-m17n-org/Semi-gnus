@@ -33,6 +33,10 @@
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard"))
 
+;; Avoid byte compile warnings for the use of old W3.
+(defvar w3-meta-content-type-charset-regexp)
+(defvar w3-meta-charset-content-type-regexp)
+
 ;;;
 ;;; Functions for displaying various formats inline
 ;;;
@@ -65,11 +69,21 @@
 	    (url-standalone-mode t)
 	    (url-current-object
 	     (url-generic-parse-url (format "cid:%s" (mm-handle-id handle))))
-	    (width (window-width)))
+	    (width (window-width))
+	    (charset (mail-content-type-get
+		      (mm-handle-type handle) 'charset)))
 	(save-excursion
 	  (insert text)
 	  (save-restriction
 	    (narrow-to-region b (point))
+	    (goto-char (point-min))
+	    (if (or (re-search-forward w3-meta-content-type-charset-regexp nil t)
+		    (re-search-forward w3-meta-charset-content-type-regexp nil t))
+		(setq charset (w3-coding-system-for-mime-charset 
+			       (buffer-substring-no-properties 
+				(match-beginning 2) 
+				(match-end 2)))))
+	    (mm-decode-body charset)
 	    (save-window-excursion
 	      (let ((w3-strict-width width)
 		    (url-standalone-mode t))

@@ -133,22 +133,22 @@
       (viewer . mm-view-message)
       (test   . (and (featurep 'gnus)
 		     (gnus-alive-p)))
-      (type   . "message/rfc-822"))
+      (type   . "message/rfc822"))
      ("rfc-*822"
       (viewer . vm-mode)
       (test   . (fboundp 'vm-mode))
-      (type   . "message/rfc-822"))
+      (type   . "message/rfc822"))
      ("rfc-*822"
       (viewer . w3-mode)
       (test   . (fboundp 'w3-mode))
-      (type   . "message/rfc-822"))
+      (type   . "message/rfc822"))
      ("rfc-*822"
       (viewer . view-mode)
       (test   . (fboundp 'view-mode))
-      (type   . "message/rfc-822"))
+      (type   . "message/rfc822"))
      ("rfc-*822"
       (viewer . fundamental-mode)
-      (type   . "message/rfc-822")))
+      (type   . "message/rfc822")))
     ("image"
      ("x-xwd"
       (viewer  . "xwud -in %s")
@@ -179,11 +179,6 @@
       ("needsx11"))
      (".*"
       (viewer . "ee %s")
-      (type . "image/*")
-      (test   . (eq (mm-device-type) 'x))
-      ("needsx11"))
-     (".*"
-      (viewer . "xv -perfect %s")
       (type . "image/*")
       (test   . (eq (mm-device-type) 'x))
       ("needsx11")))

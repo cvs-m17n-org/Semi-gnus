@@ -203,7 +203,7 @@ regexp.  If it matches, the text in question is not a signature."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-article-x-face-command
-  "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | xv -quit -"
+  "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"
   "*String or function to be executed to display an X-Face header.
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
@@ -279,6 +279,11 @@ is the face used for highlighting."
   '((t (:bold t :italic t :underline t)))
   "Face used for displaying underlined bold italic emphasized text.
 Esample: (_/*word*/_)."
+  :group 'gnus-article-emphasis)
+
+(defface gnus-emphasis-highlight-words
+  '((t (:background "black" :foreground "yellow")))
+  "Face used for displaying highlighted words."
   :group 'gnus-article-emphasis)
 
 (defcustom gnus-article-time-format "%a, %b %d %Y %T %Z"
@@ -640,6 +645,7 @@ be added below it (otherwise)."
 	   (const :tag "Header" head)
 	   (const :tag "Last" last)
 	   (integer :tag "Less")
+	   (repeat :tag "Groups" regexp)
 	   (sexp :tag "Predicate")))
 
 (defvar gnus-article-treat-head-custom
@@ -908,6 +914,13 @@ decode the body, '(or header t) for the whole article, etc."
 		(const :tag "Decode body" t)
 		(const :tag "Decode all" (or head t))))
 
+(defcustom gnus-treat-translate nil
+  "Translate articles from one language to another.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See the manual for details."
+  :group 'gnus-article-treat
+  :type gnus-article-treat-custom)
+
 ;;; Internal variables
 
 (defvar article-goto-body-goes-to-point-min-p nil)
@@ -922,6 +935,7 @@ decode the body, '(or header t) for the whole article, etc."
     (gnus-treat-fill-long-lines gnus-article-fill-long-lines)
     (gnus-treat-strip-cr gnus-article-remove-cr)
     (gnus-treat-emphasize gnus-article-emphasize)
+    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
@@ -946,7 +960,6 @@ decode the body, '(or header t) for the whole article, etc."
     (gnus-treat-strip-blank-lines gnus-article-strip-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
-    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-display-smileys gnus-smiley-display)
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)
@@ -1646,6 +1659,33 @@ always hide."
 	    (while (re-search-forward banner nil t)
 	      (delete-region (match-beginning 0) (match-end 0))))))))))
 
+(defun article-babel-prompt ()
+  "Prompt for a babel translation."
+  (require 'babel)
+  (completing-read "Translate from: "
+		   babel-translations nil t
+		   (car (car babel-translations))
+		   babel-history))
+
+(defun article-babel (translation)
+  "Translate article according to TRANSLATION using babelfish."
+  (interactive (list (article-babel-prompt)))
+  (require 'babel)
+  (save-excursion
+    (set-buffer gnus-article-buffer)
+    (when (article-goto-body)
+      (let* ((buffer-read-only nil)
+	     (start (point))
+	     (end (point-max))
+	     (msg (buffer-substring start end)))
+	(save-restriction
+	  (narrow-to-region start end)
+	  (delete-region start end)
+	  (babel-fetch msg (cdr (assoc translation babel-translations)))
+	  (save-restriction
+	    (narrow-to-region start (point-max))
+	    (babel-wash)))))))
+
 (defun article-hide-signature (&optional arg)
   "Hide the signature in the current article.
 If given a negative prefix, always show; if given a positive prefix,
@@ -2099,7 +2139,7 @@ This format is defined by the `gnus-article-time-format' variable."
   (interactive (gnus-article-hidden-arg))
   (unless (gnus-article-check-hidden-text 'emphasis arg)
     (save-excursion
-      (let ((alist gnus-emphasis-alist)
+      (let ((alist (or gnus-newsgroup-emphasis-alist gnus-emphasis-alist))
 	    (buffer-read-only nil)
 	    (props (append '(article-type emphasis)
 			   gnus-hidden-properties))
@@ -2441,6 +2481,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-de-quoted-unreadable
      article-hide-pgp
      article-strip-banner
+     article-babel
      article-hide-pem
      article-hide-signature
      article-strip-headers-in-body
@@ -3123,6 +3164,7 @@ Type any key: "
     (set-buffer gnus-article-buffer)
     (when (> n (length gnus-article-mime-handle-alist))
       (error "No such part"))
+    (gnus-article-goto-part n)
     (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
       (funcall function handle))))
 
@@ -4852,6 +4894,11 @@ For example:
     (eq part-number total-parts))
    ((numberp val)
     (< length val))
+   ((and (listp val)
+	 (stringp (car val)))
+    (apply 'gnus-or (mapcar `(lambda (s)
+			       (string-match s ,(or gnus-newsgroup-name "")))
+			    val)))
    (t
     (error "%S is not a valid value" val))))
 
