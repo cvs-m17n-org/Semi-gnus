@@ -365,7 +365,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (autoload 'std11-unfold-region "nnheader"))
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
+  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el"
+	    "legacy-gnus-agent.el")
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error

@@ -1,3 +1,8 @@
+2004-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	legacy-gnus-agent.el.
+
 2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
 
 	* make.bat: Make sure that gnus-load.el and sieve are writable to
