@@ -41,7 +41,6 @@
 (require 'mailheader)
 (require 'nnheader)
 (require 'easymenu)
-(require 'custom)
 (if (string-match "XEmacs\\|Lucid" emacs-version)
     (require 'mail-abbrevs)
   (require 'mailabbrev))
@@ -2791,7 +2790,8 @@ This sub function is for exclusive use of `message-send-mail'."
 (defun message-send-mail-with-sendmail ()
   "Send off the prepared buffer with sendmail."
   (let ((errbuf (if message-interactive
-		    (message-generate-new-buffer-clone-locals " sendmail errors")
+		    (message-generate-new-buffer-clone-locals
+		     " sendmail errors")
 		  0))
 	resend-to-addresses delimline)
     (let ((case-fold-search t))
@@ -3069,7 +3069,7 @@ This sub function is for exclusive use of `message-send-news'."
 (defun message-check-news-header-syntax ()
   (and
    ;; Check Newsgroups header.
-   (message-check 'newsgroyps
+   (message-check 'newsgroups
      (let ((group (message-fetch-field "newsgroups")))
        (or
 	(and group
@@ -4696,6 +4696,8 @@ header line with the old Message-ID."
     (cond ((save-window-excursion
 	     (if (not (eq system-type 'vax-vms))
 		 (with-output-to-temp-buffer "*Directory*"
+		   (with-current-buffer standard-output
+		     (fundamental-mode)) ; for Emacs 20.4+
 		   (buffer-disable-undo standard-output)
 		   (let ((default-directory "/"))
 		     (call-process
@@ -5091,6 +5093,7 @@ The following arguments may contain lists of values."
 	(save-excursion
 	  (with-output-to-temp-buffer " *MESSAGE information message*"
 	    (set-buffer " *MESSAGE information message*")
+	    (fundamental-mode)		; for Emacs 20.4+
 	    (mapcar 'princ text)
 	    (goto-char (point-min))))
 	(funcall ask question))

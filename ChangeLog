@@ -306,6 +306,12 @@
 	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Remove
 	confusing tabs from original header.
 
+2000-02-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-md5): Fset to `md5' if the module `md5' is
+	installed.
+	(pop3-apop): Use built-in `md5' if it exists.
+
 2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.

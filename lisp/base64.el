@@ -50,6 +50,8 @@
   (mel-find-function 'mime-encode-region "base64"))
 
 (static-when nil
+(eval-when-compile (require 'cl))
+
 ;; For non-MULE
 (if (not (fboundp 'char-int))
     (fset 'char-int 'identity))

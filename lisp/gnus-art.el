@@ -1591,6 +1591,8 @@ If PROMPT (the prefix), prompt for a coding system to use."
 		      (mm-read-coding-system "Charset to decode: "))
 		     (ctl
 		      (mail-content-type-get ctl 'charset))))
+      (when cte
+	(setq cte (mail-header-strip cte)))
       (if (and ctl (not (string-match "/" (car ctl)))) 
 	  (setq ctl nil))
       (goto-char (point-max)))
@@ -1625,11 +1627,7 @@ or not."
       (when (or force
 		(and type (string-match "quoted-printable" (downcase type))))
 	(article-goto-body)
-	(save-restriction
-	  (narrow-to-region (point) (point-max))
-	  (quoted-printable-decode-region (point-min) (point-max))
-	  (when charset
-	    (mm-decode-body charset)))))))
+	(quoted-printable-decode-region (point) (point-max) charset)))))
 
 (eval-when-compile
   (require 'rfc1843))
@@ -2664,7 +2662,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   "s" gnus-article-show-summary
   "\C-c\C-m" gnus-article-mail
   "?" gnus-article-describe-briefly
-  "e" gnus-summary-article-edit
+  "e" gnus-summary-edit-article
   "<" beginning-of-buffer
   ">" end-of-buffer
   "\C-c\C-i" gnus-info-find-node
