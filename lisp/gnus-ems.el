@@ -307,7 +307,7 @@
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file (concat dir "x-splash"))))
-	  (nnheader-temp-write nil
+	  (with-temp-file nil
 	    (insert-file-contents file)
 	    (goto-char (point-min))
 	    (ignore-errors

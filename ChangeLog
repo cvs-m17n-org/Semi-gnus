@@ -1,5 +1,9 @@
 1998-08-31  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/gnus-agent.el: Do not use nnheader-temp-write.
+	
+	* lisp/gnus-ems.el: Do not use nnheader-temp-write.
+	
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.02.
 
 	* Sync up with Pterodactyl Gnus 0.8.
