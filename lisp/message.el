@@ -4508,9 +4508,25 @@ than 988 characters long, and if they are not, trim them until they are."
   ;; Rename the buffer.
   (if message-send-rename-function
       (funcall message-send-rename-function)
-    (when (string-match "\\`\\*\\(unsent \\)?" (buffer-name))
-      (rename-buffer
-       (concat "*sent " (substring (buffer-name) (match-end 0))) t)))
+    (when (string-match "\\`\\*\\(sent \\|unsent \\)?\\(.+\\)\\*[^\\*]*"
+			(buffer-name))
+      (let ((name (match-string 2 (buffer-name)))
+	    to group)
+	(if (not (or (string-equal name "mail")
+		     (string-equal name "news")))
+	    (setq name (concat "*sent " name "*"))
+	  (setq to (message-fetch-field "to"))
+	  (setq group (message-fetch-field "newsgroups"))
+	  (setq name
+		(cond
+		 (to (concat "*sent mail to "
+			     (or (car (mail-extract-address-components to))
+				 to) "*"))
+		 ((and group (not (string= group "")))
+		  (concat "*sent news on " group "*"))
+		 (t "*sent mail*"))))
+	(unless (string-equal name (buffer-name))
+	  (rename-buffer name t)))))
   ;; Push the current buffer onto the list.
   (when message-max-buffers
     (setq message-buffer-list
@@ -4762,8 +4778,10 @@ that further discussion should take place only in "
 			       "that mailing list") ".")))
       (setq mft nil))
 
-    (if (or (not wide)
-	    to-address)
+    (if (and (or (not message-use-followup-to)
+                 (not mft))
+             (or (not wide)
+                 to-address))
 	(progn
 	  (setq follow-to (list (cons 'To
 				      (or to-address mrt reply-to mft from))))
@@ -5063,29 +5081,28 @@ If ARG, allow editing of the cancellation message."
   (interactive "P")
   (unless (message-news-p)
     (error "This is not a news article; canceling is impossible"))
-  (when (yes-or-no-p "Do you really want to cancel this article? ")
-    (let (from newsgroups message-id distribution buf sender)
-      (save-excursion
-	;; Get header info from original article.
-	(save-restriction
-	  (message-narrow-to-head-1)
-	  (setq from (message-fetch-field "from")
-		sender (message-fetch-field "sender")
-		newsgroups (message-fetch-field "newsgroups")
-		message-id (message-fetch-field "message-id" t)
-		distribution (message-fetch-field "distribution")))
-	;; Make sure that this article was written by the user.
-	(unless (or (message-gnksa-enable-p 'cancel-messages)
-		    (and sender
-			 (string-equal
-			  (downcase sender)
-			  (downcase (message-make-sender))))
-		    (string-equal
-		     (downcase (cadr (std11-extract-address-components
-				      from)))
-		     (downcase (cadr (std11-extract-address-components
-				      (message-make-from))))))
-	  (error "This article is not yours"))
+  (let (from newsgroups message-id distribution buf sender)
+    (save-excursion
+      ;; Get header info from original article.
+      (save-restriction
+	(message-narrow-to-head-1)
+	(setq from (message-fetch-field "from")
+	      sender (message-fetch-field "sender")
+	      newsgroups (message-fetch-field "newsgroups")
+	      message-id (message-fetch-field "message-id" t)
+	      distribution (message-fetch-field "distribution")))
+      ;; Make sure that this article was written by the user.
+      (unless (or (message-gnksa-enable-p 'cancel-messages)
+		  (and sender
+		       (string-equal
+			(downcase sender)
+			(downcase (message-make-sender))))
+		  (string-equal
+		   (downcase (cadr (std11-extract-address-components from)))
+		   (downcase (cadr (std11-extract-address-components
+				    (message-make-from))))))
+	(error "This article is not yours"))
+      (when (yes-or-no-p "Do you really want to cancel this article? ")
 	;; Make control message.
 	(if arg
 	    (message-news)
@@ -5101,8 +5118,8 @@ If ARG, allow editing of the cancellation message."
 		mail-header-separator "\n"
 		message-cancel-message)
 	(run-hooks 'message-cancel-hook)
-	(message "Canceling your article...")
 	(unless arg
+	  (message "Canceling your article...")
 	  (if (let ((message-syntax-checks
 		     'dont-check-for-anything-just-trust-me)
 		    (message-encoding-buffer (current-buffer))
