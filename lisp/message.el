@@ -5,7 +5,9 @@
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;         Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
+;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
+;;         Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -545,6 +547,12 @@ to the headers."
   "*Prefix inserted on the lines of yanked messages.
 nil means use indentation."
   :type 'string
+  :group 'message-insertion)
+
+(defcustom message-yank-add-new-references t
+  "*Non-nil means new IDs will be added to \"References\" field when an
+article is yanked by the command `message-yank-original' interactively."
+  :type 'boolean
   :group 'message-insertion)
 
 (defcustom message-indentation-spaces 3
@@ -1832,6 +1840,28 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 	  (forward-line 1))))
     (goto-char start)))
 
+(defun message-list-references (refs-list &rest refs-strs)
+  "Add `Message-ID's which appear in REFS-STRS but not in REFS-LIST,
+to REFS-LIST."
+  (let (refs ref id)
+    (while refs-strs
+      (setq refs (car refs-strs)
+	    refs-strs (cdr refs-strs))
+      (when refs
+	(setq refs (std11-parse-msg-ids (std11-lexical-analyze refs)))
+	(while refs
+	  (setq ref (car refs)
+		refs (cdr refs))
+	  (when (eq (car ref) 'msg-id)
+	    (setq id (concat "<"
+			     (mapconcat
+			      (function (lambda (p) (cdr p)))
+			      (cdr ref) "")
+			     ">"))
+	    (or (member id refs-list)
+		(push id refs-list))))))
+    refs-list))
+
 (defvar gnus-article-copy)
 (defun message-yank-original (&optional arg)
   "Insert the message being replied to, if any.
@@ -1842,14 +1872,45 @@ if `message-yank-prefix' is non-nil, insert that prefix on each line.
 This function uses `message-cite-function' to do the actual citing.
 
 Just \\[universal-argument] as argument means don't indent, insert no
-prefix, and don't delete any headers."
+prefix, and don't delete any headers.
+
+In addition, if `message-yank-add-new-references' is non-nil and this
+command is called interactively, new IDs from the yanked article will
+be added to \"References\" field."
   (interactive "P")
   (let ((modified (buffer-modified-p))
-	(buffer (message-eval-parameter message-reply-buffer)))
+	(buffer (message-eval-parameter message-reply-buffer))
+	refs)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
-      (insert-buffer buffer)
+      (insert-buffer buffer) ; mark will be set at the end of article.
+
+      ;; Add new IDs to References field.
+      (when (and message-yank-add-new-references (interactive-p))
+	(save-excursion
+	  (save-restriction
+	    (narrow-to-region (point) (mark t))
+	    (std11-narrow-to-header)
+	    (when (setq refs (message-list-references
+			      '()
+			      (or (message-fetch-field "References")
+				  (message-fetch-field "In-Reply-To"))
+			      (message-fetch-field "Message-ID")))
+	      (widen)
+	      (message-narrow-to-headers)
+	      (goto-char (point-min))
+	      (let ((case-fold-search t))
+		(if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+		    (replace-match "")
+		  (goto-char (point-max))))
+	      (mail-header-format
+	       (list (or (assq 'References message-header-format-alist)
+			 '(References . message-fill-references)))
+	       (list (cons 'References
+			   (mapconcat 'identity (nreverse refs) " "))))
+	      (backward-delete-char 1)))))
+
       (funcall message-cite-function)
       (message-exchange-point-and-mark)
       (unless (bolp)
@@ -3646,7 +3707,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	from subject date reply-to to cc
 	references message-id follow-to
 	(inhibit-point-motion-hooks t)
-	mct never-mct gnus-warning)
+	mct never-mct gnus-warning in-reply-to)
     (save-restriction
       (message-narrow-to-head)
       ;; Allow customizations to have their say.
@@ -3669,6 +3730,12 @@ OTHER-HEADERS is an alist of header/value pairs."
 	    reply-to (message-fetch-field "reply-to")
 	    references (message-fetch-field "references")
 	    message-id (message-fetch-field "message-id" t))
+      ;; Get the references from "In-Reply-To" field if there were
+      ;; no references and "In-Reply-To" field looks promising.
+      (unless references
+	(when (and (setq in-reply-to (message-fetch-field "in-reply-to"))
+		   (string-match "<[^>]+>" in-reply-to))
+	  (setq references (match-string 0 in-reply-to))))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
       (when (string-match message-subject-re-regexp subject)
@@ -4413,6 +4480,67 @@ regexp varstr."
     (end-of-invisible)
     (run-hooks 'mime-edit-exit-hook)
     ))
+
+(defcustom message-mime-charset-detect-method
+  'message-mime-charset-detect-by-ask
+  "*A function called to detect MIME charset for sending message."
+  :group 'message-sending
+  :type 'function)
+
+(defcustom message-mime-charset-specify-method
+  'message-mime-charset-specify-none
+  "*A function called to detect MIME charset for sending message."
+  :group 'message-sending
+  :type 'function)
+
+(defvar message-mime-charset-detect-args nil)
+
+(defun message-maybe-encode-with-specified-charset ()
+  (when message-mime-mode
+    (let ((default-mime-charset-detect-method-for-write
+	    message-mime-charset-detect-method)
+	  (charsets-mime-charset-alist charsets-mime-charset-alist)
+	  message-mime-charset-detect-args)
+      (run-hooks 'mime-edit-translate-hook)
+      (when message-mime-charset-specify-method
+	(funcall message-mime-charset-specify-method))
+      (if (catch 'mime-edit-error
+	    (save-excursion
+	      (mime-edit-translate-body)
+	      ))
+	  (error "Translation error!")
+	))
+    (end-of-invisible)
+    (run-hooks 'mime-edit-exit-hook)
+    ))
+
+(defun message-mime-charset-detect-by-ask (type charsets &rest region)
+  (let* ((charsets-mime-charset-alist
+	  (cdr (assq 'charsets-mime-charset-alist
+		     message-mime-charset-detect-args)))
+	 (default-charset 
+	   (upcase (symbol-name
+		    (or (charsets-to-mime-charset charsets)
+			default-mime-charset-for-write))))
+	 (mime-charset-list
+	  (mapcar
+	   (lambda (X)
+	     (list (upcase (symbol-name (car X)))))
+	   mime-charset-type-list))
+	 charset)
+    (while (not charset)
+      (setq charset
+	    (completing-read "What MIME charset: "
+			     mime-charset-list nil t default-charset))
+      (when (string= charset "")
+	(setq charset nil)))
+    (intern (downcase charset))
+  ))
+
+(defun message-mime-charset-specify-none ()
+  (add-to-list 'message-mime-charset-detect-args
+	       (cons 'charsets-mime-charset-alist charsets-mime-charset-alist))
+  (setq charsets-mime-charset-alist nil))
 
 (defun message-mime-insert-article (&optional message)
   (interactive)
