@@ -1,3 +1,10 @@
+2003-03-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-ofsetup.el: Don't require `read-passwd'; don't set
+	`mail-source-read-passwd' and `gnus-setup-news-hook'.
+
+	* contrib/passwd.el: New file.
+
 2003-02-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-offline.el (gnus-offline-add-custom-header): Use
