@@ -246,11 +246,12 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.6.2"
-  "Version number for this version of Gnus.")
+(defconst gnus-version-number "6.0.9"
+  "Version number for this version of gnus.")
 
-(defconst gnus-version (format "Gnus v%s" gnus-version-number)
-  "Version string for this version of Gnus.")
+(defconst gnus-version
+  (format "Semi-gnus %s (based on Gnus 5.6.2)" gnus-version-number)
+  "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
@@ -1331,7 +1332,6 @@ want."
 	     gnus-article-emphasize
 	     gnus-article-fill-cited-article
 	     gnus-article-remove-cr
-	     gnus-article-de-quoted-unreadable
 	     gnus-summary-stop-page-breaking
 	     ;; gnus-summary-caesar-message
 	     ;; gnus-summary-verbose-headers
@@ -1525,8 +1525,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	(if (eq (nth 1 package) ':interactive)
 	    (cdddr package)
 	  (cdr package)))))
-   '(("metamail" metamail-buffer)
-     ("info" Info-goto-node)
+   '(("info" Info-goto-node)
      ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
      ("ps-print" ps-print-preprint)
@@ -1651,7 +1650,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
-      gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-display-x-face
       gnus-article-mime-decode-quoted-printable gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local

@@ -1,4 +1,4 @@
-;;; gnus-agent.el --- unplugged support for Gnus
+;;; gnus-agent.el --- unplugged support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -708,6 +708,17 @@ the actual number of articles toggled is returned."
 	(set-buffer nntp-server-buffer)
 	(unless (eq 'nov (gnus-retrieve-headers articles group))
 	  (nnvirtual-convert-headers))
+	;;
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (goto-char (point-at-eol))
+	  (insert "\t")
+	  (forward-line 1))
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;;
 	;; Save these headers for later processing.
 	(copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
 	(let (file)

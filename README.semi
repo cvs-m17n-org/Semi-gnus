@@ -1,0 +1,71 @@
+This package contains Semi-gnus.
+
+What is Semi-gnus?
+==================
+
+  Semi-gnus is a replacement of Gnus with gnus-mime for SEMI.  It has
+all features of Gnus and gnus-mime, so there are no need to install
+Gnus to use it, and you must not use gnus-mime for SEMI.
+
+  It requires SEMI package, so please get and install SEMI package
+before to install it.
+
+
+How to get?
+===========
+
+(0) cvs login
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	login
+
+    CVS password: [CR] # NULL string
+
+(1) checkout
+
+    Please do following in a directory to extract (ex. site-lisp):
+
+    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+	checkout -r semi-gnus gnus
+
+(2) compile
+
+    ;; as same as Gnus
+
+    % cd gnus
+
+    % make EMACS=<file name of your emacs>
+
+(3) update
+
+    Please do following in your Open gnus directory:
+
+    % cvs update -r semi-gnus
+
+
+  (semi-)daily snapshot is also available from
+
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+
+  Note that this snapshot is automatically created from our repository
+and will usually not be tested, and may not even work.
+
+
+How to join development
+=======================
+
+  If you write bug-reports and/or suggestions for improvement, please
+send them to the Semi-gnus mailing list:
+
+    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+
+  Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
+the latest release of Semi-gnus, and discuss future enhancements to
+Semi-gnus.  To join the Semi-gnus ML, send an empty e-mail to
+
+    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+
+  In addition, we need developers.  If you would like to develop it,
+please send mail to cvs@chamonix.jaist.ac.jp.
