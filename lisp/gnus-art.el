@@ -3225,7 +3225,7 @@ forbidden in URL encoding."
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity nil nil)
+  (mime-insert-decoded-header entity)
   )
 
 (set-alist 'mime-header-presentation-method-alist
@@ -3240,9 +3240,6 @@ forbidden in URL encoding."
     (gnus-article-show-summary)
     (gnus-summary-select-article nil t)
     ))
-
-(set-alist 'mime-raw-representation-type-alist
-	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
