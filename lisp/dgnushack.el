@@ -96,7 +96,11 @@ Modify to suit your needs."))
 (defvar package-path)
 
 (defconst dgnushack-info-file-regexp
-  "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)\\(-[0-9]+\\)?$")
+  (concat "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)"
+	  "\\.info\\(-[0-9]+\\)?$"))
+
+(defconst dgnushack-texi-file-regexp
+  "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)\\.texi$")
 
 (defun dgnushack-make-package ()
   (require 'gnus)
@@ -188,5 +192,21 @@ Modify to suit your needs."))
 	       (expand-file-name manifest pkginfo-dir) t t)
 
     (message "Done")))
+
+(defun dgnushack-add-info-suffix-maybe ()
+  ;; This function must be invoked from texi directory.
+  (let ((coding-system-for-read 'raw-text)
+	(coding-system-for-write 'raw-text)
+	(files (directory-files "." nil dgnushack-texi-file-regexp))
+	file make-backup-files)
+    (while (setq file (pop files))
+      (find-file file)
+      (when (and (re-search-forward
+		  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
+		 (not (string-match "\\.info$" (match-string 1))))
+	(copy-file file (concat file "_") nil t)
+	(insert ".info")
+	(save-buffer))
+      (kill-buffer (current-buffer)))))
 
 ;;; dgnushack.el ends here
