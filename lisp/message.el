@@ -2241,6 +2241,7 @@ to find out how to use this."
 
 (defun message-send-mail-with-smtp ()
   "Send off the prepared buffer with SMTP."
+  (require 'smtp) ; XXX
   (let ((case-fold-search t)
 	recipients)
     (save-restriction
