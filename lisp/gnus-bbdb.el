@@ -117,35 +117,31 @@ This buffer will be in bbdb-mode, with associated keybindings."
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
   "Make the *BBDB* buffer be displayed along with the GNUS windows,
 displaying the record corresponding to the sender of the current message."
-  (let ((bbdb-gag-messages t)
-	(bbdb-use-pop-up nil)
-	(bbdb-electric-p nil))
-    (let ((record (gnus-bbdb/update-record offer-to-create))
-	  (bbdb-elided-display (bbdb-pop-up-elided-display))
-	  (b (current-buffer)))
+  (let* ((bbdb-gag-messages t)
+	 (bbdb-electric-p nil)
+	 (record
+	  (let (bbdb-use-pop-up)
+	    (gnus-bbdb/update-record offer-to-create)))
+	 (bbdb-elided-display (bbdb-pop-up-elided-display)))
+    (save-current-buffer
       ;; display the bbdb buffer iff there is a record for this article.
-      (cond (record
-	     (bbdb-pop-up-bbdb-buffer
-	      (function (lambda (w)
-			  (let ((b (current-buffer)))
-			    (set-buffer (window-buffer w))
-			    (prog1 (or (eq major-mode 'mime-veiw-mode)
-				       (eq major-mode 'gnus-article-mode))
-				   (set-buffer b))))))
-	     (bbdb-display-records (list record)))
-	    (t
-	     (or bbdb-inside-electric-display
-		 (not (get-buffer-window bbdb-buffer-name))
-		 (let (w)
-		   (delete-other-windows)
-		   (if (assq 'article gnus-buffer-configuration)
-		       (gnus-configure-windows 'article)
-		     (gnus-configure-windows 'SelectArticle))
-		   (if (setq w (get-buffer-window gnus-summary-buffer))
-		       (select-window w))
-		   ))))
-      (set-buffer b)
-      record)))
+      (cond
+       (record
+	(bbdb-pop-up-bbdb-buffer
+	 (function (lambda (w)
+		     (with-current-buffer (window-buffer w)
+		       (memq major-mode
+			     '(mime-view-mode gnus-article-mode))))))
+	(bbdb-display-records (list record)))
+       ((and (not bbdb-inside-electric-display)
+	     (get-buffer-window bbdb-buffer-name))
+	(delete-other-windows)
+	(if (assq 'article gnus-buffer-configuration)
+	    (gnus-configure-windows 'article)
+	  (gnus-configure-windows 'SelectArticle))
+	(let ((w (get-buffer-window gnus-summary-buffer)))
+	  (if w (select-window w))))))
+    record))
 
 ;;;###autoload
 (defun gnus-bbdb/split-mail (header-field bbdb-field
