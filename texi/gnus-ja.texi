@@ -53,6 +53,7 @@
 
 \newcommand{\gnustt}[1]{{\gnusselectttfont{}#1}}
 \newcommand{\gnuscode}[1]{\gnustt{#1}}
+\newcommand{\gnuscommand}[1]{\gnustt{#1}}
 \newcommand{\gnusenv}[1]{\gnustt{#1}}
 \newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\gnusselectttfont{}#1}''}
 \newcommand{\gnuslisp}[1]{\gnustt{#1}}
@@ -20831,38 +20832,37 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
                                  "~/My-face.gif"))))))
 @end lisp
 
-@c TRANSLATEME
 @node Face
 @subsection Face
 @cindex face
 
 @c #### FIXME: faces and x-faces'implementations should really be harmonized.
 
-@code{Face} headers are essentially a funkier version of @code{X-Face}
-ones. They describe a 48x48 pixel colored image that's supposed to
-represent the author of the message.
+@code{Face} $B%X%C%@!<$O!"K\<AE*$K$h$j%U%!%s%-!<$J(B @code{X-Face} $B$NJQ7A$G(B
+$B$9!#$=$l$i$O!"%a%C%;!<%8$r=q$$$??M$r>]D'$7$F$$$k$3$H$,4|BT$5$l$k!"(B
+48$B!_(B48 $B2hAG$N%+%i!<2hA|$rIA$-$^$9!#(B
 
 @cindex face
 @findex gnus-article-display-face
-The contents of a @code{Face} header must be a base64 encoded PNG image.
-See @url{http://quimby.gnus.org/circus/face/} for the precise
-specifications.
+@code{Face} $B%X%C%@!<$NFbMF$O!"(Bbase64 $B$G%(%s%3!<%I$5$l$?(B PNG $B$N2hA|$G$J$1(B
+$B$l$P$J$j$^$;$s!#@53N$J;EMM$K$D$$$F!"(B
+@uref{http://quimby.gnus.org/circus/face/} $B$r;2>H$7$F2<$5$$!#(B
 
-Gnus provides a few convenience functions and variables to allow
-easier insertion of Face headers in outgoing messages.
+$BAw?.$9$k%a%C%;!<%8$K4JC1$K(B Face $B%X%C%@!<$rA^F~$G$-$k$h$&$K$9$k$?$a$K!"(B
+Gnus $B$O(B 2$B!A(B3 $B$N4X?t$HJQ?t$rDs6!$7$^$9!#(B
 
 @findex gnus-convert-png-to-face
-@code{gnus-convert-png-to-face} takes a 48x48 PNG image, no longer than
-726 bytes long, and converts it to a face.
+@code{gnus-convert-png-to-face} $B$O(B 726-byte $B0J2<$N(B 48$B!_(B48 $B$N(B PNG $B$N2hA|(B
+$B$rFI$_9~$s$G!"$=$l$r(B Face $B$KJQ49$7$^$9!#(B
 
 @findex gnus-face-from-file
 @vindex gnus-convert-image-to-face-command
-@code{gnus-face-from-file} takes a JPEG file as the parameter, and then
-converts the file to Face format by using the
-@code{gnus-convert-image-to-face-command} shell command.
+@code{gnus-face-from-file} $B$O(B JPEG $B$N%U%!%$%kL>$r%Q%i%a!<%?$H$7$F<u$1<h(B
+$B$j!"(Bshell $B%3%^%s%I(B @code{gnus-convert-image-to-face-command} $B$r;H$C$F$=(B
+$B$N%U%!%$%k$r(B Face $B%U%)!<%^%C%H$KJQ49$7$^$9!#(B
 
-Here's how you would typically use this function. Put something like the
-following in your @file{~/.gnus.el} file:
+$B$3$N4X?t$NBeI=E*$J;H$$J}$r5s$2$F$*$-$^$7$g$&!#0J2<$N$h$&$J$b$N(B
+$B$r(B @file{~/.gnus.el} $B%U%!%$%k$KF~$l$F2<$5$$(B:
 
 @lisp
 (setq message-required-news-headers
