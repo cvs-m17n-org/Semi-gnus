@@ -30,9 +30,11 @@ after quering the user about whether to do so.
 ** IMAP identity (RFC 2971) is supported.
 
 By default, Gnus do not send any information about itself, but you can
-customize it using `nnimap-id'.
+customize it via the variable `nnimap-id'.
 
 ** The "all.SCORE" file can now be edited from the group buffer using `W e'.
+
+** The prompt for creating new groups (`G m') now auto complete known groups.
 
 
 * For older news, see Gnus info node "New Features".
@@ -40,7 +42,7 @@ customize it using `nnimap-id'.
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
