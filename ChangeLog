@@ -1,7 +1,27 @@
+1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
+            Katsumi Yamaoka   <yamaoka@jpl.org>,
+            Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): If the number of
+	unread articles is more than `gnus-large-newsgroup', use it in
+	default instead of the maximum number.
+
+1999-02-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>,
+            Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-multipart): New function;
+	add it to the acting-condition for extracting mulitpart messages.
+	(gnus-mime-extract-message/rfc822): New function; add it to the
+	acting-condition for extracting message/rfc822 or message/news.
+
 1999-02-08  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
-	
+
 	* lisp/nntp.el: Change nnmail-read-passwd -> mail-source-read-passwd.
 
 1999-02-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
@@ -14,7 +34,7 @@
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
 
 1999-02-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
-	
+
 	* lisp/gnus-offline.el: Delete security notice.
 	(gnus-offline-pop-password-file): Removed.
 	(gnus-offline-pop-password-decoding-function): Removed.
