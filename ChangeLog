@@ -1,3 +1,10 @@
+1999-09-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/gnus-art.el (gnus-treat-article): Inherit the text property
+	`mime-view-entity' in the modified header under FSF Emacsen.
+
 1999-09-13  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* README-offline.en: Rewrite the usage description.
