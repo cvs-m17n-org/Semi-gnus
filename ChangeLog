@@ -1,3 +1,20 @@
+1999-12-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-offline.el (gnus): Don't advise here.
+	(TopLevel): Call `gnus-offline-define-menu-and-key'.
+	(gnus-offline-setup): Don't call
+	`gnus-offline-define-menu-and-key' here.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-update-setting-file): Don't
+	rely on `gnus-load-hook'.
+	(gnus): New advice. Call `gnus-offline-setup' when everything is
+	done.
+
+	* lisp/gnus-start.el (save-buffers-kill-emacs): Compile the advice
+	at the compile time. Use `gnus-alive-p'.
+
 1999-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
