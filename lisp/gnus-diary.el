@@ -4,18 +4,18 @@
 
 ;; Author:        Didier Verna <didier@xemacs.org>
 ;; Maintainer:    Didier Verna <didier@xemacs.org>
-;; Created:       Tue Jul 20 10:42:55 1999 under XEmacs 21.2 (beta 18)
+;; Created:       Tue Jul 20 10:42:55 1999
 ;; Last Revision: Wed Sep 12 12:31:09 2001
 ;; Keywords:      calendar mail news
 
-;; This file is part of NNDiary.
+;; This file is part of Gnus.
 
-;; NNDiary is free software; you can redistribute it and/or modify
+;; Gnus is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2 of the License, or
 ;; (at your option) any later version.
 
-;; NNDiary is distributed in the hope that it will be useful,
+;; Gnus is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
@@ -134,6 +134,17 @@ There are currently two built-in format functions:
 
 (defconst gnus-diary-version nndiary-version
   "Current Diary backend version.")
+
+
+;; Compatibility functions ==================================================
+
+(eval-and-compile
+  (if (fboundp 'kill-entire-line)
+      (defalias 'gnus-diary-kill-entire-line 'kill-entire-line)
+    (defun gnus-diary-kill-entire-line ()
+      (beginning-of-line)
+      (let ((kill-whole-line t))
+	(kill-line)))))
 
 
 ;; Summary line format ======================================================
@@ -268,8 +279,7 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
   (interactive "P")
   (gnus-summary-sort 'schedule reverse))
 
-(defvar gnus-summary-misc-menu)
-
+(defvar gnus-summary-misc-menu) ;; Avoid byte compiler warning.
 ;; The function `easy-menu-add-item' is not available under Emacs
 ;; versions prior to 20.3.  Could anyone try to emulate it?
 (if (eval-when-compile
@@ -346,14 +356,6 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
 
 ;; Diary Message Checking ===================================================
 
-(eval-and-compile
-  (if (fboundp 'kill-entire-line)
-      (defalias 'gnus-diary-kill-entire-line 'kill-entire-line)
-    (defun gnus-diary-kill-entire-line ()
-      (beginning-of-line)
-      (let ((kill-whole-line t))
-	(kill-line)))))
-
 (defvar gnus-diary-header-value-history nil
   ;; History variable for header value prompting
   )
@@ -424,16 +426,14 @@ If ARG (or prefix) is non-nil, force prompting for all fields."
 	   (let ((prompt (concat (and invalid
 				      (prog1 "(current value invalid) "
 					(beep)))
-				 header
-				 (and (not value) " (defaults to `*')")
-				 ": ")))
+				 header ": ")))
 	     (setq value
 		   (if (listp (nth 1 head))
 		       (completing-read prompt (cons '("*" nil) (nth 1 head))
 					nil t value
-					gnus-diary-header-value-history "*")
+					gnus-diary-header-value-history)
 		     (read-string prompt value
-				  gnus-diary-header-value-history "*"))))
+				  gnus-diary-header-value-history))))
 	   (setq ask nil)
 	   (setq invalid nil)
 	   (condition-case ()

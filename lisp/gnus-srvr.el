@@ -221,7 +221,7 @@ The following specs are understood:
 All normal editing commands are switched off.
 \\<gnus-server-mode-map>
 For more in-depth information on this mode, read the manual
-(`\\[gnus-info-find-node]').
+\(`\\[gnus-info-find-node]').
 
 The following commands are available:
 
@@ -242,20 +242,22 @@ The following commands are available:
   (if (featurep 'xemacs)
       (put 'gnus-server-mode 'font-lock-defaults '(gnus-server-font-lock-keywords t))
     (set (make-local-variable 'font-lock-defaults)
-         '(gnus-server-font-lock-keywords t)))
+	 '(gnus-server-font-lock-keywords t)))
   (gnus-run-hooks 'gnus-server-mode-hook))
 
 (defun gnus-server-insert-server-line (gnus-tmp-name method)
   (let* ((gnus-tmp-how (car method))
 	 (gnus-tmp-where (nth 1 method))
 	 (elem (assoc method gnus-opened-servers))
-	 (gnus-tmp-status (cond ((eq (nth 1 elem) 'denied)
-				 "(denied)")
-				((or (gnus-server-opened method)
-				     (eq (nth 1 elem) 'ok))
-				 "(opened)")
-				(t
-				 "(closed)")))
+	 (gnus-tmp-status
+	  (if (eq (nth 1 elem) 'denied)
+	      "(denied)"
+	    (condition-case nil
+		(if (or (gnus-server-opened method)
+			(eq (nth 1 elem) 'ok))
+		    "(opened)"
+		  "(closed)")
+	      ((error) "(error)"))))
 	 (gnus-tmp-agent (if (and gnus-agent
 				  (member method
 					  gnus-agent-covered-methods))
