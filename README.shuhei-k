@@ -42,7 +42,11 @@ NEWS:
 
   Fold long(> 76 chars) lines.
 
-* Manual (bad news)
+* Generating multipart/digest article using MIME-Edit:
+
+  It replaces gnus-uu function(s).
+
+* Manual: (bad news)
 
   Shoe-gnus specific features are not described in the manual.
   Please read doc-string (if provided).

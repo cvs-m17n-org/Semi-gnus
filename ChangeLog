@@ -1,3 +1,12 @@
+1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Match
+	"real" newsgroup name; strip "backend+server" prefix.
+
+	* lisp/message.el (message-make-in-reply-to): 
+	Use `std11-extract-address-components'.
+	(message-use-mail-reply-to): Doc fix.
+
 1998-08-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
