@@ -190,12 +190,18 @@
 	(charset (mail-content-type-get
 		  (mm-handle-type handle) 'charset))
 	gnus-displaying-mime handles)
+    (when (and charset
+	       (stringp charset))
+      (setq charset (intern (downcase charset)))
+      (when (eq charset 'us-ascii)
+	(setq charset nil)))
     (save-excursion
       (save-restriction
 	(narrow-to-region b b)
 	(mm-insert-part handle)
 	(let (gnus-article-mime-handles
-	      (gnus-newsgroup-charset (or charset gnus-newsgroup-charset)))
+	      (gnus-newsgroup-charset
+	       (or charset gnus-newsgroup-charset)))
 	  (run-hooks 'gnus-article-decode-hook)
 	  (gnus-article-prepare-display)
 	  (setq handles gnus-article-mime-handles))

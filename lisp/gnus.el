@@ -265,18 +265,18 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.13.4"
+(defconst gnus-version-number "6.14.0"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "01"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.99"
+(defconst gnus-original-version-number "5.8.2"
   "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
 
-(defconst gnus-original-product-name "Pterodactyl Gnus"
+(defconst gnus-original-product-name "Gnus"
   "Product name of the original version of Gnus.")
 
 (defconst gnus-version
@@ -2812,6 +2812,8 @@ If NEWSGROUP is nil, return the global kill file name instead."
   (or gnus-override-method
       (and (not group)
 	   gnus-select-method)
+      (and (not (gnus-group-entry group)) ;; a new group
+	   (gnus-group-name-to-method group))
       (let ((info (or info (gnus-get-info group)))
 	    method)
 	(if (or (not info)

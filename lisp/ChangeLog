@@ -1,3 +1,184 @@
+Fri Dec  3 20:34:11 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v5.8.2 is released.
+
+Fri Dec  3 20:09:41 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v5.8.1 is released.
+
+1999-11-11  Hrvoje Niksic  <hniksic@iskon.hr>
+
+	* mml.el (mml-insert-tag): Don't close the tag.
+	(mml-insert-empty-tag): New function.
+	(mml-attach-file): Use mml-insert-empty-tag instead of
+	mml-insert-tag.
+	(mml-attach-buffer): Ditto.
+	(mml-attach-external): Ditto.
+	(mml-insert-multipart): Ditto.
+
+1999-12-03 08:49:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnfolder.el (nnfolder-request-article): Return -1 if not find
+ 	the article number.
+
+1999-12-03 01:12:41  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-find-method-for-group): The method of a new group
+ 	is not the native one.
+
+1999-12-03 01:26:55  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-button-embedded-url): Always call browse-url. 
+
+1999-12-02 18:00:15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnultimate.el (nnultimate-retrieve-headers): Use
+	mm-with-unibyte-current-buffer. 
+	(nnultimate-request-article): Ditto.
+
+1999-12-02 14:57:46  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-retrieve-groups): Set to process buffer.
+
+1999-12-02 11:14:50  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-with-unibyte-current-buffer): New macro.
+	* nnweb.el (nnweb-retrieve-headers): Use it.
+	(nnweb-request-article): Use it.
+	
+	* nnweb.el (nnweb-dejanews-create-mapping): Set a default date in
+ 	case matching failed.
+
+1999-12-02  John Wiegley <jwiegley@inprise.com>
+
+	* mail-source.el (mail-source-keyword-map): Add backslash to
+	Delete-flag.
+
+1999-12-02 07:24:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-group-charset-alist): Default nnweb groups to
+	Latin-1.
+	(gnus-group-charset-alist): No, don't.
+
+	* nnweb.el (nnweb-init): Make the buffer unibyte.
+
+1999-12-01 23:02:48  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mail-source.el (mail-source-set-common-1): Fix to get the
+ 	default value.
+
+1999-12-02 00:27:46  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnslashdot.el (nnslashdot-read-groups): Unibyte.
+
+	* nnultimate.el (nnultimate-request-list): Use unibyte.
+
+	* gnus-uu.el (gnus-uu-grab-articles): Bind
+	gnus-display-mime-function to nil.
+
+	* message.el (message-send-mail-with-sendmail): Use the
+	user-mail-address variable.
+
+	* gnus-art.el (gnus-ignored-headers): More headers.
+
+	* message.el (message-shorten-1): Use list.
+
+1999-12-01 21:59:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-configure-posting-styles): Ignore nil
+	signatures. 
+
+	* nnweb.el (nnweb-dejanews-create-mapping): Get the data.
+	(nnweb-dejanews-create-mapping): Do the properish date.
+
+1999-12-01 17:41:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mail-source.el (mail-source-common-keyword-map): New variable.
+	(mail-source-bind-common): New macro.
+	(mail-source-fetch): Support plugged mail source.
+	* gnus-int.el (gnus-request-scan): Use them.
+
+1999-12-01 21:59:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-view.el (mm-inline-message): Check whether charset is a
+	string. 
+
+	* nnslashdot.el (nnslashdot-request-post): Insert <p>'s.
+
+	* message.el (message-mode-map): Changed keystroke for
+	message-yank-buffer. 
+
+1999-11-26  Hrvoje Niksic  <hniksic@iskon.hr>
+
+	* message.el (message-shorten-references): Cut references to 31
+	elements, then either fold them or shorten them to 988 characters.
+	(message-shorten-1): New function.
+	(message-cater-to-broken-inn): New variable.
+
+1999-12-01 21:47:10  Eric Marsden  <emarsden@mail.dotcom.fr>
+
+	* nnslashdot.el (nnslashdot-lose): New function.
+
+1999-12-01 21:08:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-view.el (mm-inline-message): Not the right type of charset is 
+	being fetched here.  Let the group charset rule.
+	(mm-inline-message): Ignore us-ascii.
+
+1999-11-24  Carsten Leonhardt  <leo@arioch.oche.de>
+
+	* mail-source.el (mail-source-fetch-maildir): work around the
+	ommitted "file-regular-p" in efs/ange-ftp
+
+1999-12-01 19:59:25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mml.el (mml-generate-mime-1): Don't insert extra empty line.
+	(mml-generate-mime-1): Use the encoding param.
+
+	* gnus-sum.el (gnus-summary-show-article): Don't bind gnus-visual.
+
+	* gnus-cache.el (gnus-cache-possibly-enter-article): Require
+	gnus-art before binding its variables.
+
+	* gnus-art.el (gnus-article-prepare-display): Run the prepare
+	after the MIME.
+
+1999-12-01 19:48:14  Rupa Schomaker  <rupa-list@rupa.com>
+
+	* message.el (message-clone-locals): Use it.
+
+	* gnus-msg.el (gnus-configure-posting-styles): Make
+	user-mail-address local.
+
+1999-11-20  Simon Josefsson  <jas@pdc.kth.se>
+
+        * gnus-start.el (gnus-get-unread-articles): Scan each method only
+	once.
+
+1999-12-01 17:37:18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-generate-new-buffer-clone-locals): Use varstr.
+	(message-clone-locals): Ditto.
+
+	* gnus-sum.el (gnus-summary-enter-digest-group): Have the digest
+	group inherit reply-to or from.
+
+1999-12-01 13:04:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-show-article): Support numbered ARG
+	for charset.
+	(gnus-summary-show-article-charset-alist): New variable.
+	
+	* mm-bodies.el (mm-decode-string): Support gnus-all and
+	gnus-unknown.
+	(mm-decode-body): Ditto.
+	* rfc2047.el (rfc2047-decode): Ditto.
+
+1999-12-01 17:37:18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-delete-incoming): Change default to
+	t.
+
 Wed Dec  1 16:31:31 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Pterodactyl Gnus v0.99 is released.

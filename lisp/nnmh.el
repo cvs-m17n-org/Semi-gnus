@@ -61,7 +61,7 @@
 
 (defvoo nnmh-status-string "")
 (defvoo nnmh-group-alist nil)
-(defvoo nnmh-allow-delete-final nil)
+(defvar nnmh-allow-delete-final nil)
 
 
 

@@ -113,7 +113,7 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(push srcdir load-path)
+;(push "/usr/share/emacs/site-lisp" load-path)
 
 ;; Attempt to pickup the additional load-path(s).
 (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)

@@ -1311,11 +1311,13 @@ this is a reply."
 		     ((eq 'signature (car result))
 		      (set (make-local-variable 'message-signature) nil)
 		      (set (make-local-variable 'message-signature-file) nil)
-		      `(lambda ()
-			 (save-excursion
-			   (let ((message-signature ,(cdr result)))
-			     (when message-signature
-			       (message-insert-signature))))))
+		      (if (not (cdr result))
+			  'ignore
+			`(lambda ()
+			   (save-excursion
+			     (let ((message-signature ,(cdr result)))
+			       (when message-signature
+				 (message-insert-signature)))))))
 		     (t
 		      (let ((header
 			     (if (symbolp (car result))
@@ -1329,6 +1331,8 @@ this is a reply."
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
+ 		     (set (make-local-variable 'user-mail-address)
+ 			  ,(or (cdr address) user-mail-address))
 		     (let ((user-full-name ,(or (cdr name) (user-full-name)))
 			   (user-mail-address
 			    ,(or (cdr address) user-mail-address)))

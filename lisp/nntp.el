@@ -498,6 +498,7 @@ noticing asynchronous data.")
 	    (received 0)
 	    (last-point (point-min))
 	    (nntp-inhibit-erase t)
+	    (buf (nntp-find-connection-buffer nntp-server-buffer))
 	    (command (if nntp-server-list-active-group "LIST ACTIVE" "GROUP")))
 	(while groups
 	  ;; Send the command to the server.
@@ -509,6 +510,9 @@ noticing asynchronous data.")
 		    (zerop (% count nntp-maximum-request)))
 	    (nntp-accept-response)
 	    (while (progn
+		     ;; Search `blue moon' in this file for the
+		     ;; reason why set-buffer here.
+		     (set-buffer buf)
 		     (goto-char last-point)
 		     ;; Count replies.
 		     (while (re-search-forward "^[0-9]" nil t)
@@ -518,10 +522,12 @@ noticing asynchronous data.")
 	      (nntp-accept-response))))
 
 	;; Wait for the reply from the final command.
+	(set-buffer buf)
 	(goto-char (point-max))
 	(re-search-backward "^[0-9]" nil t)
 	(when (looking-at "^[23]")
 	  (while (progn
+		   (set-buffer buf)
 		   (goto-char (point-max))
 		   (if (not nntp-server-list-active-group)
 		       (not (re-search-backward "\r?\n" (- (point) 3) t))
@@ -529,6 +535,7 @@ noticing asynchronous data.")
 	    (nntp-accept-response)))
 
 	;; Now all replies are received.  We remove CRs.
+	(set-buffer buf)
 	(goto-char (point-min))
 	(while (search-forward "\r" nil t)
 	  (replace-match "" t t))
