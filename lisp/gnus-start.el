@@ -2153,24 +2153,36 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 (defun gnus-product-read-variable-file-1 (file checking-methods coding
 					       &rest variables)
   (let (error gnus-product-file-version method file-ver)
-    (when (or
-	   (condition-case err
-	       (let ((coding-system-for-read coding)
-		     (input-coding-system coding))
-		 (load (expand-file-name file gnus-product-directory) t nil t)
-		 nil)
-	     (error
-	      (message "%s" err)
-	      (setq error t)))
-	   (and (assq 'emacs-version checking-methods)
-		(not (string= emacs-version
+    (when (or (condition-case err
+		  (let ((coding-system-for-read coding)
+			(input-coding-system coding))
+		    (load (expand-file-name file gnus-product-directory)
+			  nil nil t)
+		    nil)
+		(error
+		 (message "Error while reading %s: %s"
+			  (expand-file-name file gnus-product-directory)
+			  (error-message-string err))
+		 (setq error t)))
+	      (and (setq method (assq 'product-version checking-methods))
+		   (not (and (setq file-ver
+				   (cdr (assq 'product-version
+					      gnus-product-file-version)))
+			     (zerop (product-version-compare file-ver
+							     (cadr method))))))
+	      (and (assq 'emacs-version checking-methods)
+		   (not (and (assq 'emacs-version gnus-product-file-version)
+			     (string-equal
+			      emacs-version
 			      (cdr (assq 'emacs-version
-					 gnus-product-file-version)))))
-	   (and (setq method (assq 'product-version checking-methods))
-		(or (not (setq file-ver
-			       (cdr (assq 'product-version
-					  gnus-product-file-version))))
-		    (< (product-version-compare file-ver (cadr method)) 0))))
+					 gnus-product-file-version))))))
+	      (and (assq 'correct-string-widths checking-methods)
+		   (not (and (assq 'correct-string-widths
+				   gnus-product-file-version)
+			     (eq (and gnus-use-correct-string-widths t)
+				 (and (cdr (assq 'correct-string-widths
+						 gnus-product-file-version))
+				      t))))))
       (unless error
 	(message "\"%s\" seems to have mismatched contents, updating..."
 		 file))
@@ -2624,7 +2636,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
   "Insert gnus product depend variables in lisp format."
   (let ((print-quoted t)
 	(print-escape-newlines t)
-	variable param)
+	print-length print-level variable param)
     (insert (format ";; -*- Mode: emacs-lisp; coding: %s -*-\n" coding))
     (insert (format ";; %s startup file.\n" (product-name product)))
     (when (setq param (cdr (assq 'product-version checking-methods)))
@@ -2637,7 +2649,11 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
     (insert "(setq gnus-product-file-version \n"
 	    "      '((product-version . "
 	    (prin1-to-string (product-version product)) ")\n"
-	    "\t(emacs-version . " (prin1-to-string emacs-version) ")))\n")
+	    "\t(emacs-version . "
+	    (prin1-to-string emacs-version) ")\n"
+	    "\t(correct-string-widths . "
+	    (if gnus-use-correct-string-widths "t" "nil")
+	    ")))\n")
     (while variables
       (when (and (boundp (setq variable (pop variables)))
 		 (symbol-value variable))

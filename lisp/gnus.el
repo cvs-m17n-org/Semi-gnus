@@ -1941,13 +1941,29 @@ This variable can be nil, gnus or gnus-ja."
 (defvar gnus-product-variable-file-list
   (let ((version (product-version (product-find 'gnus-vers)))
 	(codesys (static-if (boundp 'MULE) '*ctext* 'ctext)))
-    `(("strict-cache" ((product-version ,version) (emacs-version))
+    `(("strict-cache"
+       ((product-version ,version)
+	(emacs-version)
+	(correct-string-widths))
        binary
        gnus-format-specs-compiled)
-      ("cache" ((product-version ,version) (emacs-version))
+      ("cache"
+       ((product-version ,version)
+	(emacs-version)
+	(correct-string-widths))
        ,codesys
        gnus-format-specs)))
-  "Gnus variables are saved in the produce depend quick startup files.")
+  "Alist of the methods for checking whether the contents of the T-gnus
+quick startup files are valid.  One is for the byte-compiled format
+specifications, the other is for the source form.  Each element should
+be a list which looks like follows:
+
+\(\"FILE_NAME\"
+ ((VARIABLE EXPECTED_VALUE_or_NIL)
+  (VARIABLE EXPECTED_VALUE_or_NIL)
+  ...)
+ CODING-SYSTEM_FOR_READING_FILE
+ SYMBOL_OF_FORMAT_SPECS)")
 
 (defcustom gnus-compile-user-specs t
   "If non-nil, the user-defined format specs will be byte-compiled

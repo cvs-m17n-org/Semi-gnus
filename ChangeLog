@@ -1,3 +1,13 @@
+2002-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-product-variable-file-list): Add a check for
+	the value of `gnus-use-correct-string-widths' in the forms.
+
+	* lisp/gnus-start.el (gnus-product-quick-file-format): Include the
+	value of `gnus-use-correct-string-widths' in the file form.
+	(gnus-product-read-variable-file-1): Check for the equality in the
+	value of `gnus-use-correct-string-widths' as well.
+
 2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 11 in
