@@ -294,8 +294,8 @@
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file (concat dir "x-splash"))))
-	  (with-temp-file nil
-	    (insert-file-contents file)
+	  (with-temp-buffer
+	    (insert-file-contents-as-binary file)
 	    (goto-char (point-min))
 	    (ignore-errors
 	      (setq pixmap (read (current-buffer))))))
@@ -304,7 +304,7 @@
 	    (make-face 'gnus-splash))
 	  (setq height (/ (car pixmap) (frame-char-height))
 		width (/ (cadr pixmap) (frame-char-width)))
-	  (set-face-foreground 'gnus-splash "ForestGreen")
+	  (set-face-foreground 'gnus-splash "Brown")
 	  (set-face-stipple 'gnus-splash pixmap)
 	  (insert-char ?\n (* (/ (window-height) 2 height) height))
 	  (setq i height)
