@@ -1,3 +1,70 @@
+2000-11-30 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-add-text-properties-when): New function.
+	(gnus-remove-text-properties-when): Ditto.
+
+	* gnus-cite.el (gnus-article-hide-citation): Use them.
+	(gnus-article-toggle-cited-text): Use them.
+	
+	* gnus-art.el (gnus-signature-toggle): Use them.
+	(gnus-article-show-hidden-text): Ditto.
+	(gnus-article-hide-text): Ditto.
+
+2000-11-30 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-charset-region): Remove eight-bit-*.
+
+2000-11-30  Simon Josefsson  <sj@extundo.com>
+
+	* smime.el (smime-point-at-eol): New alias.
+	(smime-buffer-as-string-region): Use it.
+
+2000-11-29 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndraft.el (nndraft-request-restore-buffer): Remove Date field.
+
+2000-11-29 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnfolder.el (nnfolder-request-expire-articles): expiry-target.
+	
+	* nnbabyl.el (nnbabyl-request-expire-articles): Ditto.
+	
+	* nnmbox.el (nnmbox-request-expire-articles): Ditto.
+
+2000-11-22  Jan Nieuwenhuizen  <janneke@gnu.org>
+
+	* nnmh.el (nnmh-request-expire-articles): Implemented
+	expiry-target for nnmh backend.
+
+2000-11-30  Simon Josefsson  <sj@extundo.com>
+
+	* mm-decode.el (mm-security-from): New variable.
+	(mm-possibly-verify-or-decrypt): Use it rather than `from'.
+
+	* mml-smime.el (mml-smime-verify): Use `mm-security-from' rather
+	than `from'.
+
+2000-11-30  Simon Josefsson  <sj@extundo.com>
+
+	* mml-smime.el (mml-smime-verify): Verify that certificate mail
+	address match sender address.
+
+	* mm-decode.el (mm-possibly-verify-or-decrypt): Bind sender address.
+
+	* smime.el (smime-verify-region): Don't copy buffer.
+	(smime-decrypt-buffer): Use expand-file-name on keyfile.
+	(smime-pkcs7-region): New function.
+	(smime-pkcs7-certificates-region): Ditto.
+	(smime-pkcs7-email-region): Ditto.
+	(smime-buffer-as-string-region): Ditto.
+
+	* gnus-art.el (gnus-mime-security-show-details): Goto beginning of
+	buffer.
+
+2000-11-23  Jens Krinke <j.krinke@gmx.de>
+
+	* smime.el (smime-decrypt-region): Fix keyfile argument.
+
 2000-11-29 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* nnmail.el (nnmail-cache-accepted-message-ids): Add doc.
