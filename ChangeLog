@@ -1,3 +1,7 @@
+1999-07-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
 1999-07-05  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-agent.el (gnus-agent-expire): Refresh the value of
