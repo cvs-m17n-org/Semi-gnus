@@ -120,7 +120,7 @@ when scanning the group.
 
 `expiry-wait' is similar to the generic group parameter `expiry-wait',
 but it has a preference."
- :variable-group shimbun
+ :variable-group nnshimbun
  :variable-type `(repeat (cons :format "%v" (regexp :tag "Group name regexp"
 						    :value "^nnshimbun\\+")
 			       ,nnshimbun-group-parameters-custom))
@@ -145,7 +145,7 @@ but it has a preference.")
   :type 'boolean)
 
 
-;; Define baekend
+;; Define backend
 (gnus-declare-backend "nnshimbun" 'address)
 (nnoo-declare nnshimbun)
 
@@ -164,7 +164,7 @@ nnshimbun groups.  You can specify the nnshimbun group parameter
 `prefecth-articles' for each nnshimbun group.")
 
 (defvoo nnshimbun-index-range nil
-  "*Range of indecis to detect new pages.  Note that this variable has
+  "*Range of indices to detect new pages.  Note that this variable has
 just a default value for all the nnshimbun groups.  You can specify
 the nnshimbun group parameter `index-range' for each nnshimbun group.")
 
@@ -507,12 +507,10 @@ GROUP has a full name."
     (cond ((eq 'index-range (eval symbol))
 	   `(or (plist-get (nnshimbun-find-group-parameters ,name)
 			   'index-range)
-		;; For the backward compatibility.
 		nnshimbun-index-range))
 	  ((eq 'prefetch-articles (eval symbol))
 	   `(or (plist-get (nnshimbun-find-group-parameters ,name)
 			   'prefetch-articles)
-		;; For the backward compatibility.
 		nnshimbun-pre-fetch-article))
 	  ((eq 'expiry-wait (eval symbol))
 	   (if full-name-p
