@@ -10915,7 +10915,7 @@ POP サーバーからメールを取得するために使う関数です。その関数は一つのパラ
 
 @end table
 
-@code{:pregram} と @code{:function} キーワードが指定されていないと、
+@code{:program} と @code{:function} キーワードが指定されていないと、
 @code{pop3-movemail} が使用されます。
 
 これはいくつかの例です。初期利用者名で、初期 POP サーバーから取得し、初
