@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.065 Manual
+@settitle Semi-gnus 6.10.066 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -319,7 +319,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.065 Manual
+@title Semi-gnus 6.10.066 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -362,7 +362,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.065.
+This manual corresponds to Semi-gnus 6.10.066.
 
 @end ifinfo
 
