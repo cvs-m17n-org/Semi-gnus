@@ -58,14 +58,16 @@ ftp://ftp.jaist.ac.jp/pub/elisp/semi/
 
     himi		himi branch
 
-    ichikawa		ichikawa branch
-
-    pgnus-ichikawa	ichikawa branch. Based on pGnus
+    pgnus-ichikawa	ichikawa branch
+			Based on pGnus.
 
     akr			akr branch
 
     shuhei-k		shuhei-k branch
 			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
+
+    keiichi             keiichi branch
+    nana-gnus-N1_N2     Stable version of `keiichi branch'.
 
 詳しくは、README.branch.ja を参照してください。
 
@@ -75,7 +77,7 @@ ftp://ftp.jaist.ac.jp/pub/elisp/semi/
 
   ほぼ毎日の snapshot が
 
-    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/chamonix/gnus/
 
   から取得可能です。
 
