@@ -109,6 +109,7 @@ the second with the current group name.")
 (defcustom gnus-group-posting-charset-alist
   '(("^no\\." iso-8859-1)
     (message-this-is-mail nil)
+    ("^de\\." nil)
     (".*" iso-8859-1)
     (message-this-is-news iso-8859-1))
   "Alist of regexps (to match group names) and default charsets to be unencoded when posting."
@@ -615,6 +616,7 @@ If SILENT, don't prompt the user."
      ;; Override normal method.
      ((and (eq gnus-post-method 'current)
 	   (not (eq (car group-method) 'nndraft))
+	   (gnus-get-function group-method 'request-post t)
 	   (not arg))
       group-method)
      ((and gnus-post-method
@@ -1332,6 +1334,21 @@ this is a reply."
 	  (make-local-variable 'default-mime-charset)
 	  (setq default-mime-charset charset)
 	  ))))
+
+
+;;; @ for MIME view mode
+;;;
+
+(defun gnus-following-method (buf)
+  (gnus-setup-message 'reply-yank
+    (set-buffer buf)
+    (if (message-news-p)
+	(message-followup)
+      (message-reply nil 'wide))
+    (let ((message-reply-buffer buf))
+      (message-yank-original))
+    (message-goto-body))
+  (kill-buffer buf))
 
 
 ;;; Allow redefinition of functions.

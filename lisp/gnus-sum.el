@@ -852,7 +852,7 @@ which it may alter in any way.")
 		       (symbol :tag "Charset")))
   :group 'gnus-charset)
 
-(defcustom gnus-newsgroup-ignored-charsets '(unknown-8bit)
+(defcustom gnus-newsgroup-ignored-charsets '(unknown-8bit x-unknown)
   "List of charsets that should be ignored.
 When these charsets are used in the \"charset\" parameter, the
 default charset will be used instead."
@@ -4859,7 +4859,8 @@ This is meant to be called in `gnus-article-internal-prepare-hook'."
 	  (save-restriction
 	    (nnheader-narrow-to-headers)
 	    (goto-char (point-min))
-	    (when (or (and (eq (downcase (char-after)) ?x)
+	    (when (or (and (not (eobp))
+			   (eq (downcase (char-after)) ?x)
 			   (looking-at "Xref:"))
 		      (search-forward "\nXref:" nil t))
 	      (goto-char (1+ (match-end 0)))
@@ -7046,6 +7047,7 @@ Optional argument BACKWARD means do search for backward.
   (require 'gnus-art)
   (let ((gnus-select-article-hook nil)	;Disable hook.
 	(gnus-article-display-hook nil)
+	(gnus-article-prepare-hook nil)
 	(gnus-mark-article-hook nil)	;Inhibit marking as read.
 	(gnus-use-article-prefetch nil)
 	(gnus-xmas-force-redisplay nil)	;Inhibit XEmacs redisplay.
@@ -7299,9 +7301,12 @@ If ARG is a negative number, hide the unwanted header lines."
       (let* ((buffer-read-only nil)
 	     (inhibit-point-motion-hooks t)
 	     hidden e)
-	(save-restriction 
-	  (article-narrow-to-head)
-	  (setq hidden (gnus-article-hidden-text-p 'headers)))
+	(setq hidden
+	      (if (numberp arg)
+		  (>= arg 0)
+		(save-restriction 
+		  (article-narrow-to-head)
+		  (gnus-article-hidden-text-p 'headers))))
 	(goto-char (point-min))
 	(when (search-forward "\n\n" nil t)
 	  (delete-region (point-min) (1- (point))))
@@ -7314,8 +7319,7 @@ If ARG is a negative number, hide the unwanted header lines."
 	(save-restriction
 	  (narrow-to-region (point-min) (point))
 	  (article-decode-encoded-words)
-	  (if (or hidden
-		  (and (numberp arg) (< arg 0)))
+	  (if  hidden
 	      (let ((gnus-treat-hide-headers nil)
 		    (gnus-treat-hide-boring-headers nil))
 		(gnus-treat-article 'head))

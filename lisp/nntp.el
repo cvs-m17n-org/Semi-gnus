@@ -1141,9 +1141,10 @@ password contained in '~/.nntp-authinfo'."
    ((numberp nntp-nov-gap)
     (let ((count 0)
 	  (received 0)
-	  (last-point (point-min))
+	  last-point
+	  in-process-buffer-p
 	  (buf nntp-server-buffer)
-	  ;;(process-buffer (nntp-find-connection (current-buffer))))
+	  (process-buffer (nntp-find-connection-buffer nntp-server-buffer))
 	  first)
       ;; We have to check `nntp-server-xover'.  If it gets set to nil,
       ;; that means that the server does not understand XOVER, but we
@@ -1156,40 +1157,55 @@ password contained in '~/.nntp-authinfo'."
 		    (< (- (nth 1 articles) (car articles)) nntp-nov-gap))
 	  (setq articles (cdr articles)))
 
-	(when (nntp-send-xover-command first (car articles))
-	  (setq articles (cdr articles)
-		count (1+ count))
-
+	(setq in-process-buffer-p (stringp nntp-server-xover))
+	(nntp-send-xover-command first (car articles))
+	(setq articles (cdr articles))
+	
+	(when (and nntp-server-xover in-process-buffer-p)
+	  ;; Don't count tried request.
+	  (setq count (1+ count))
+	  
 	  ;; Every 400 requests we have to read the stream in
 	  ;; order to avoid deadlocks.
 	  (when (or (null articles)	;All requests have been sent.
 		    (zerop (% count nntp-maximum-request)))
-	    (accept-process-output)
+
+	    (nntp-accept-response)
 	    ;; On some Emacs versions the preceding function has
 	    ;; a tendency to change the buffer.  Perhaps.  It's
 	    ;; quite difficult to reproduce, because it only
 	    ;; seems to happen once in a blue moon.
-	    (set-buffer buf)
+	    (set-buffer process-buffer)
 	    (while (progn
-		     (goto-char last-point)
+		     (goto-char (or last-point (point-min)))
 		     ;; Count replies.
 		     (while (re-search-forward "^[0-9][0-9][0-9] " nil t)
 		       (setq received (1+ received)))
 		     (setq last-point (point))
 		     (< received count))
-	      (accept-process-output)
-	      (set-buffer buf)))))
+	      (nntp-accept-response)
+	      (set-buffer process-buffer))
+	    (set-buffer buf))))
 
       (when nntp-server-xover
-	;; Wait for the reply from the final command.
-	(goto-char (point-max))
-	(re-search-backward "^[0-9][0-9][0-9] " nil t)
-	(when (looking-at "^[23]")
-	  (while (progn
-		   (goto-char (point-max))
-		   (forward-line -1)
-		   (not (looking-at "^\\.\r?\n")))
-	    (nntp-accept-response)))
+	(when in-process-buffer-p
+	  (set-buffer process-buffer)
+	  ;; Wait for the reply from the final command.
+	  (goto-char (point-max))
+	  (re-search-backward "^[0-9][0-9][0-9] " nil t)
+	  (when (looking-at "^[23]")
+	    (while (progn
+		     (goto-char (point-max))
+		     (forward-line -1)
+		     (not (looking-at "^\\.\r?\n")))
+	      (nntp-accept-response)
+	      (set-buffer process-buffer)))
+	  (set-buffer buf)
+	  (goto-char (point-max))
+	  (insert-buffer-substring process-buffer)
+	  (set-buffer process-buffer)
+	  (erase-buffer)
+	  (set-buffer buf))
 
 	;; We remove any "." lines and status lines.
 	(goto-char (point-min))
@@ -1212,7 +1228,7 @@ password contained in '~/.nntp-authinfo'."
 	    (nntp-send-command-nodelete
 	     "\r?\n\\.\r?\n" nntp-server-xover range)
 	  ;; We do not wait for the reply.
-	  (nntp-send-command-nodelete "\r?\n\\.\r?\n" nntp-server-xover range))
+	  (nntp-send-command-nodelete nil nntp-server-xover range))
       (let ((commands nntp-xover-commands))
 	;; `nntp-xover-commands' is a list of possible XOVER commands.
 	;; We try them all until we get at positive response.

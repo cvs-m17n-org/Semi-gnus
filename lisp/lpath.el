@@ -46,14 +46,14 @@
 		     rmail-summary-exists rmail-select-summary
 		     rmail-update-summary url-retrieve
 		     temp-directory babel-fetch babel-wash babel-as-string
-		     ))
+		     sc-cite-regexp))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
 		    font-lock-defaults user-full-name user-login-name
 		    gnus-newsgroup-name gnus-article-x-face-too-ugly
 		    gnus-newsgroup-charset gnus-newsgroup-emphasis-alist
-		    mail-mode-hook enable-multibyte-characters
+		    mail-mode-hook
 		    adaptive-fill-first-line-regexp adaptive-fill-regexp
 		    url-current-mime-headers buffer-file-coding-system
 		    w3-image-mappings url-current-mime-type
@@ -94,7 +94,7 @@
 		 w3-coding-system-for-mime-charset
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
-		 babel-fetch babel-wash babel-as-string
+		 babel-fetch babel-wash babel-as-string sc-cite-regexp
 		 smiley-encode-buffer)))
 
 (setq load-path (cons "." load-path))

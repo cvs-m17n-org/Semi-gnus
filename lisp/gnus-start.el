@@ -2561,8 +2561,9 @@ If FORCE is non-nil, the .newsrc file is read."
 	      (let ((str (buffer-substring
 			  (point) (progn (end-of-line) (point))))
 		    (coding
-		     (and (boundp 'enable-multibyte-characters)
-			  enable-multibyte-characters
+		     (and (or gnus-xemacs
+			      (and (boundp 'enable-multibyte-characters)
+				   enable-multibyte-characters))
 			  (fboundp 'gnus-mule-get-coding-system)
 			  (gnus-mule-get-coding-system (symbol-name group)))))
 		(when coding

@@ -62,17 +62,18 @@
 (condition-case nil
     (char-after)
   (wrong-number-of-arguments
-   ;; Optimize byte code for `char-after',
+   ;; Optimize byte code for `char-after'.
    (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
    (defun byte-optimize-char-after (form)
      (if (null (cdr form))
 	 '(char-after (point))
-       form))))
+       form))
+   (byte-defop-compiler char-after 0-1)))
 
 (condition-case nil
     (char-before)
   (wrong-number-of-arguments
-   ;; Optimize byte code for `char-before',
+   ;; Optimize byte code for `char-before'.
    (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
    (defun byte-optimize-char-before (form)
      (if (null (cdr form))

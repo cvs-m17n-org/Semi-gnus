@@ -646,6 +646,22 @@ be added below it (otherwise)."
   :group 'gnus-article-headers
   :type 'boolean)
 
+(defcustom gnus-article-mime-match-handle-function 'undisplayed-alternative
+  "Function called with a MIME handle as the argument.
+This is meant for people who want to view first matched part.
+For `undisplayed-alternative' (default), the first undisplayed 
+part or alternative part is used. For `undisplayed', the first 
+undisplayed part is used. For a function, the first part which 
+the function return `t' is used. For `nil', the first part is
+used."
+  :group 'gnus-article-mime
+  :type '(choice 
+	  (item :tag "first" :value nil)
+	  (item :tag "undisplayed" :value undisplayed)
+	  (item :tag "undisplayed or alternative" 
+		:value undisplayed-alternative)
+	  (function)))
+
 ;;;
 ;;; The treatment variables
 ;;;
@@ -1147,6 +1163,7 @@ Initialized from `text-mode-syntax-table.")
 	  (when (setq beg (text-property-any
 			   (point-min) (point-max) 'message-rank (+ 2 max)))
 	    ;; We delete or make invisible the unwanted headers.
+	    (push 'headers gnus-article-wash-types)
 	    (if delete
 		(progn
 		  (add-text-properties
@@ -1638,9 +1655,9 @@ header in the current article."
 	(when (re-search-forward "^-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
 	  (push 'pgp gnus-article-wash-types)
 	  (delete-region (match-beginning 0) (match-end 0))
-	  ;; PGP 5 and GNU PG add a `Hash: <>' comment, hide that too
-	  (when (looking-at "Hash:.*$")
-	    (delete-region (point) (1+ (gnus-point-at-eol))))
+	  ;; Remove armor headers (rfc2440 6.2)
+	  (delete-region (point) (or (re-search-forward "^[ \t]*\n" nil t)
+				     (point)))
 	  (setq beg (point))
 	  ;; Hide the actual signature.
 	  (and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
@@ -2080,9 +2097,13 @@ should replace the \"Date:\" one, or should be added below it."
 	 (format-time-string gnus-article-time-format time))))
      ;; ISO 8601.
      ((eq type 'iso8601)
-      (concat
-       "Date: "
-       (format-time-string "%Y%m%dT%H%M%S" time)))
+      (let ((tz (car (current-time-zone time))))
+	(concat
+	 "Date: "
+	 (format-time-string "%Y%m%dT%H%M%S" time)
+	 (format "%s%02d%02d"
+		 (if (> tz 0) "+" "-") (/ (abs tz) 3600) 
+		 (/ (% (abs tz) 3600) 60)))))
      ;; Do an X-Sent lapsed format.
      ((eq type 'lapsed)
       ;; If the date is seriously mangled, the timezone functions are
@@ -2231,6 +2252,7 @@ This format is defined by the `gnus-article-time-format' variable."
 		face (nth 3 elem))
 	  (while (re-search-forward regexp nil t)
  	    (when (and (match-beginning visible) (match-beginning invisible))
+	      (push 'emphasis gnus-article-wash-types)
  	      (gnus-article-hide-text
  	       (match-beginning invisible) (match-end invisible) props)
  	      (gnus-article-unhide-text-type
@@ -3297,11 +3319,33 @@ value of the variable `gnus-show-mime' is non-nil."
   (interactive "p")
   (gnus-article-part-wrapper n 'gnus-mime-inline-part))
 
-(defun gnus-article-view-part (n)
+(defun gnus-article-mime-match-handle-first (condition)
+  (if condition
+      (let ((alist gnus-article-mime-handle-alist) ihandle n)
+	(while (setq ihandle (pop alist))
+	  (if (and (cond 
+		    ((functionp condition)
+		     (funcall condition (cdr ihandle)))
+		    ((eq condition 'undisplayed) 
+		     (not (or (mm-handle-undisplayer (cdr ihandle))
+			      (equal (mm-handle-media-type (cdr ihandle))
+				 "multipart/alternative"))))
+		    ((eq condition 'undisplayed-alternative)
+		     (not (mm-handle-undisplayer (cdr ihandle))))
+		    (t t))
+		   (gnus-article-goto-part (car ihandle))
+		   (or (not n) (< (car ihandle) n)))
+	      (setq n (car ihandle))))
+	(or n 1))
+    1))
+
+(defun gnus-article-view-part (&optional n)
   "View MIME part N, which is the numerical prefix."
-  (interactive "p")
+  (interactive "P")
   (save-current-buffer
     (set-buffer gnus-article-buffer)
+    (or (numberp n) (setq n (gnus-article-mime-match-handle-first 
+			     gnus-article-mime-match-handle-function)))
     (when (> n (length gnus-article-mime-handle-alist))
       (error "No such part"))
     (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
@@ -5096,14 +5140,6 @@ For example:
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
-
-(defun gnus-following-method (buf)
-  (set-buffer buf)
-  (message-followup)
-  (message-yank-original)
-  (kill-buffer buf)
-  (goto-char (point-min))
-  )
 
 (set-alist 'mime-preview-following-method-alist
 	   'gnus-original-article-mode #'gnus-following-method)
