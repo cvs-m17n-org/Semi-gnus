@@ -1,3 +1,9 @@
+1998-05-31  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* pop3-fma.el: Remove japanese comment.
+	Update to pop3-fma.el version 0.11.
+	Small bug fix.
+
 1998-05-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.2

@@ -1,7 +1,7 @@
 ;; pop3-fma.el.el --- POP3 for Multiple Account for Gnus.
-;; Copyright (C) 1996,97,98 Free Software Foundation, Inc. , Tatsuya Ichikawa 
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc. , Tatsuya Ichikawa
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;; Version: 0.10
+;; Version: 0.11
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -25,6 +25,7 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+;;; Commentary:
 ;;
 ;;
 ;; How to use.
@@ -33,7 +34,7 @@
 ;;
 ;;  (autoload 'pop3-fma-set-pop3-password "pop3-fma")
 ;;  (add-hook 'gnus-load-hook 'pop3-fma-set-pop3-password)
-;;  (setq pop3-fma-spool-file-alist 
+;;  (setq pop3-fma-spool-file-alist
 ;;        '(
 ;;  	    "po:username0@mailhost0.your.domain0"
 ;;	    "po:username1@mailhost1.your.domain1"
@@ -49,6 +50,8 @@
 ;;                                         'lisp use pop3.el
 ;;                                         'exe use movemail
 ;;  pop3-fma-movemail-arguments    ... List of options of movemail program.
+;;
+;;; Code:
 
 (require 'cl)
 (require 'custom)
@@ -70,9 +73,21 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.10")
+(defconst pop3-fma-version-number "0.11")
 (defconst pop3-fma-codename
-  "Feel the wind." ; 0.10
+;  "Feel the wind"		; 0.10
+  "My home town"  		; 0.11
+;  "On the road"		; 0.xx
+;  "Before generation of Love"	; 0.xx
+;  "Lonely Christmas eve"	; 0.xx
+;  "Rock'n Roll city"		; 0.xx
+;  "Money"			; 0.xx
+;  "Midnight blue train" 	; 0.xx
+;  "Still 19"       		; 0.xx
+;  "J boy"          		; 0.xx
+;  "Blood line"			; 0.xx
+;  "Star ring"			; 0.xx
+;  "Goodbye Game"		; 0.xx
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -80,7 +95,7 @@
 
 (defcustom pop3-fma-spool-file-alist nil
   "*Spoolfile to get mail using pop3 protocol.
- You should specify this variable like
+You should specify this variable like
  '(
    \"po:user1@mailhost1\"
    \"po:user2@mailhost2\"
@@ -90,8 +105,8 @@
 
 (defcustom pop3-fma-movemail-type 'lisp
   "*Type of movemail program.
- Lisp means nnmail-movemail-program is lisp function.
- Exe means nnmail-movemail-program is external program.
+Lisp means `nnmail-movemail-program' is lisp function.
+ Exe means `nnmail-movemail-program' is external program.
  Please do not use exe if you do not use Meadow."
   :group 'pop3-fma
   :type '(choice (const lisp)
@@ -108,7 +123,7 @@
 
 (defvar pop3-fma-movemail-program "movemail.exe"
   "*External program name your movemail.
- Please do not set this valiable non-nil if you do not use Meadow.")
+Please do not set this valiable non-nil if you do not use Meadow.")
 
 ;; Temporary variable
 (defvar hdr nil)
@@ -131,7 +146,7 @@
 		    (- (match-end (string-match "^.*@" inbox)) 1)))
 	(pop3-mailhost
 	 (substring inbox (match-end (string-match "^.*@" inbox)))))
-    (let ((pop3-password 
+    (let ((pop3-password
 	   (pop3-fma-read-passwd pop3-mailhost)))
       (message "Checking new mail user %s at %s..." pop3-maildrop pop3-mailhost)
       (if (and (eq system-type 'windows-nt)
@@ -151,7 +166,7 @@
 	    (apply 'call-process (concat
 				  exec-directory
 				  pop3-fma-movemail-program)
-		   nil nil nil 
+		   nil nil nil
 		   pop3-fma-movemail-arguments))
 	(pop3-movemail crashbox)))))
 ;;
@@ -168,10 +183,10 @@
    (list (pop3-fma-read-noecho
 	  (format "POP Password for %s at %s: " pop3-maildrop pop3-mailhost) t)))
   (if (not (assoc pop3-mailhost pop3-fma-password))
-      (setq pop3-fma-password 
+      (setq pop3-fma-password
 	    (append pop3-fma-password
 		    (list
-		     (list 
+		     (list
 		      pop3-mailhost
 		      pop3-maildrop
 		      passwd))))
@@ -196,7 +211,8 @@
   (setq nnmail-spool-file pop3-fma-spool-file-alist))
 ;;
 (defun pop3-fma-read-noecho (prompt &optional stars)
-  "Read a single line of text from user without echoing, and return it."
+  "Read a single line of text from user without echoing, and return it.
+Argument PROMPT ."
   (let ((ans "")
 	(c 0)
 	(echo-keystrokes 0)
@@ -259,3 +275,6 @@
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
+
+(provide 'pop3-fma)
+;;; pop3-fma.el ends here
