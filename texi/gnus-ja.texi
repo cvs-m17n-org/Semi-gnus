@@ -772,6 +772,22 @@ Gnus $B$O!"IaDL$O%0%k!<%W$,?7$7$$$+$I$&$+$r!"9XFI$7$F$$$k%0%k!<%W$H:o=|$5(B
 @vindex gnus-subscribe-killed
 $B$9$Y$F$N?7$7$$%0%k!<%W$r:o=|$7$^$9!#(B
 
+@item gnus-subscribe-topics
+@vindex gnus-subscribe-topics
+Put the groups into the topic that has a matching @code{subscribe} topic 
+parameter (@pxref{Topic Parameters}).  For instance, a @code{subscribe}
+topic parameter that looks like
+
+@example
+"nnslashdot"
+@end example
+
+will mean that all groups that match that regex will be subscribed under 
+that topic.
+
+If no topics match the groups, the groups will be subscribed in the
+top-level topic.
+
 @end table
 
 @vindex gnus-subscribe-hierarchical-interactive
@@ -1336,8 +1352,8 @@ Formatting}) $B$r@_Dj$9$k$3$H$GJQ99$G$-$^$9!#$3$$$D$O;XDjJ8;z$r$"$s$^$j$?(B
 
 @vindex gnus-group-highlight
 $B%0%k!<%W%P%C%U%!$N%O%$%i%$%H$O(B @code{gnus-group-highlight} $BJQ?t(B
-$B$K$h$C$F@)8f$5$l$F$$$^$9!#$3$l$O(B @var{(form . face)} $B$N$h$&$J$b(B
-$B$N$rMWAG$K;}$DO"A[%j%9%H$G$9!#(B@var{form} $B$,2?$+(B @code{nil} $B0J30(B
+$B$K$h$C$F@)8f$5$l$F$$$^$9!#$3$l$O(B @code{(@var{form} . @var{face})} $B$N$h(B
+$B$&$J$b$N$rMWAG$K;}$DO"A[%j%9%H$G$9!#(B@var{form} $B$,2?$+(B @code{nil} $B0J30(B
 $B$KI>2A$5$l$k$b$N$J$i!"$=$N9T$KBP$7$F(B @var{face} $B$,;HMQ$5$l$^$9!#(B
 
 $B0J2<$,$3$NJQ?t$NCM$NNc$G$9!#$3$l$OGX7J$,0E$$@_Dj$G$O$-$l$$$K8+$((B
@@ -1495,7 +1511,7 @@ Formatting}) $B$r@_Dj$9$k$3$H$GJQ99$G$-$^$9!#$3$$$D$O;XDjJ8;z$r$"$s$^$j$?(B
 $B$N%0%k!<%W$NA4$F$N8E$$5-;v$r<hF@$7$h$&$H$7$^$9!#(B@var{N} $B$N?t;z@\F,0z?t$r(B
 $BM?$($k$H!"(Bgnus $B$N<hF@$9$k5-;v?t$O(B @var{N} $B$K$J$j$^$9!#(B@var{N} $B$,@5$N?t(B
 $B$G$"$l$P(B gnus$B$O?7$7$$J}$+$i(B @var{N} $B8D$N5-;v$r<hF@$7!"(B @var{N} $B$,Ii$N?t$G(B
-$B$"$l$P(B gnus $B$O8E$$J}$+$i(B @var{N} $B8D$N5-;v$r<hF@$7$^$9!#(B
+$B$"$l$P(B gnus $B$O8E$$J}$+$i(B @code{abs(@var{N})} $B8D$N5-;v$r<hF@$7$^$9!#(B
 
 @item RET
 @kindex RET (Group)
@@ -2206,7 +2222,7 @@ alt.sysadmin.recovery shaving} $B$N$h$&$J9gCW$9$kJ8;zNs$rMQ$$$k$3$H$K$h$C(B
 @c  @code{iso-8859-1} the default charset; that is, the charset that will be
 @c  used for all articles that do not specify a charset.
 
-@item @var{(variable form)}
+@item (@var{variable} @var{form})
 $B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
 $B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
 $B$$$?$/$J$$$H$-$O!"$=$N%0%k!<%W$K%0%k!<%W%Q%i%a!<%?$K(B
@@ -3003,6 +3019,18 @@ Gnus
 $B%/%Q%i%a!<%?$+$i7Q>5$7$^$9!#%0%k!<%W%Q%i%a!<%?$H$7$F@5$7$$$b$N$OA4$F!"%H%T%C(B
 $B%/%Q%i%a!<%?$H$7$F$b@5$7$$$b$N$G$9(B(@pxref{Group Parameters})$B!#(B
 
+In addition, the following parameters are only valid as topic
+parameters:
+
+@table @code
+@item subscribe
+When subscribing new groups by topic (@pxref{Subscription Methods}), the 
+@code{subscribe} topic parameter says what groups go in what topic.  Its 
+value should be a regexp to match the groups that should go in that
+topic. 
+
+@end table
+
 $B%0%k!<%W%Q%i%a!<%?$O!J$b$A$m$s!K%H%T%C%/%Q%i%a!<%?$h$j$bM%@h$5$l!"I{%H%T%C(B
 $B%/$N%H%T%C%/%Q%i%a!<%?$O?F%H%T%C%/$N%H%T%C%/%Q%i%a!<%?$h$j$bM%@h$5$l$^$9!#(B
 $BJ,$+$k$h$M!#$4$/IaDL$N7Q>5%k!<%k$G$9!J%k!<%k(B (@dfn{Rules}) $B$O$3$3$G$OL>;l(B
@@ -3314,6 +3342,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx(B
 * Choosing Articles::           $B5-;v$rFI$`!#(B
 * Paging the Article::          $BFI$s$G$$$k5-;v$r%9%/%m!<%k$9$k!#(B
 * Reply Followup and Post::     $B5-;v$rEj9F$9$k!#(B
+* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
 * Canceling and Superseding::   $B!X$"$!!"$"$s$J$U$&$K8@$&$s$8$c$J$+$C$?!#!Y(B
 * Marking Articles::            $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k!#(B
 * Limiting::                    $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k!#(B
@@ -3651,14 +3680,15 @@ Gnus $B%P!<%8%g%s!#(B
 @item gnus-summary-highlight
 @vindex gnus-summary-highlight
 $B35N,9T$O$3$NJQ?t$K$7$?$,$C$F%O%$%i%$%H$5$l$^$9!#$3$NJQ?t$OMWAG$,(B
-@var{(FORM . FACE)} $B$N7A<0$N%j%9%H$G$9!#Nc$($P!"$b$70uIU$-$N5-;v$r%$%?%j%C(B
-$B%/!"9b$$%9%3%"$N5-;v$r%\!<%k%I$K$7$?$1$l$P!"$3$NJQ?t$r<!$N$h$&$K$G$-$^$9!#(B
+@code{(@var{form} . @var{face})} $B$N7A<0$N%j%9%H$G$9!#Nc$($P!"$b$70uIU$-(B
+$B$N5-;v$r%$%?%j%C%/!"9b$$%9%3%"$N5-;v$r%\!<%k%I$K$7$?$1$l$P!"$3$NJQ?t$r(B
+$B<!$N$h$&$K$G$-$^$9!#(B
 @lisp
 (((eq mark gnus-ticked-mark) . italic)
  ((> score default) . bold))
 @end lisp
-$B$4A[A|$N$H$*$j!"$b$7(B @var{FORM} $B$,(B @code{nil} $B$G$J$$CM$rJV$9$H!"(B
-@var{FACE} $B$,$=$N9T$KE,MQ$5$l$^$9!#(B
+$B$4A[A|$N$H$*$j!"$b$7(B @var{form} $B$,(B @code{nil} $B$G$J$$CM$rJV$9$H!"(B
+@var{face} $B$,$=$N9T$KE,MQ$5$l$^$9!#(B
 @end table
 
 
@@ -3952,6 +3982,8 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 @menu
 * Summary Mail Commands::            $B%a!<%k$rAw$k!#(B
 * Summary Post Commands::            $B%K%e!<%9$rAw$k!#(B
+* Summary Message Commands::    Other Message-related commands.
+* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
 @end menu
 
 
@@ -4149,8 +4181,23 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 $B$^$?(B @pxref{(message)Header Commands} $B$K$5$i$J$k>pJs$,$"$j$^$9!#(B
 
 
+@node Summary Message Commands
+@subsection Summary Message Commands
+
+@table @kbd
+@item S y
+@kindex S y (Summary)
+@findex gnus-summary-yank-message
+Yank the current article into an already existing Message composition
+buffer (@code{gnus-summary-yank-message}).  This command prompts for
+what message buffer you want to yank into, and understands the
+process/prefix convention (@pxref{Process/Prefix}).
+
+@end table
+
+
 @node Canceling and Superseding
-@section $B5-;v$r<h$j>C$9(B
+@subsection $B5-;v$r<h$j>C$9(B
 @cindex canceling articles
 @cindex superseding articles
 
@@ -4310,7 +4357,7 @@ Prefixes})$B!#(B
 
 @item F
 @vindex gnus-souped-mark
-@sc{SOUP} $B$5$l$F$$$k5-;v(B (@code{gnus-souped-mark})$B!#(B @xref{SOUP}.
+@sc{soup} $B$5$l$F$$$k5-;v(B (@code{gnus-souped-mark})$B!#(B @xref{SOUP}.
 
 @item Q
 @vindex gnus-sparse-mark
@@ -6292,7 +6339,8 @@ gnus $B$,Ds0F$r$7$^$9!K$rF~NO$9$k$h$&$KB%$5$l!"$=$l$+$iL?Na$,<B9T$5$l$^$9!#(B
 @vindex gnus-header-face-alist
 $B%X%C%@!<$r%O%$%i%$%H$7$^$9(B (@code{gnus-article-highlight-headers})$B!#%O%$(B
 $B%i%$%H$OJQ?t(B @code{gnus-header-face-alist} $B$K$7$?$,$C$F$J$5$l!"$=$l$O$=(B
-$B$l$>$l$NMWAG$,(B @var{($B@55,I=8=(B $BL>A0(B $BFbMF(B)} $B$H$$$&MM<0$N%j%9%H$G$9!#(B
+$B$l$>$l$NMWAG$,(B @code{(@var{$B@55,I=8=(B} @var{$BL>A0(B} @var{$BFbMF(B})} $B$H$$$&MM<0(B
+$B$N%j%9%H$G$9!#(B
 @var{$B@55,I=8=(B}$B$O%X%C%@!<$K9gCW$9$k@55,I=8=!"(B@var{$BL>A0(B}$B$O%X%C%@!<$NL>A0$r(B
 $B%O%$%i%$%H$9$k$N$K;H$o$l$k%U%'%$%9(B (face) (@pxref{Faces and Fonts})$B!"(B
 @var{$BFbMF(B}$B$O%X%C%@!<$NCM$r%O%$%i%$%H$9$k%U%'%$%9$G$9!#:G=i$K9gCW$7$?$b$N(B
@@ -6515,6 +6563,10 @@ Signature}.
 @item W W B
 @kindex W W B ($B35N,(B)
 @findex gnus-article-strip-banner
+@cindex banner
+@cindex OneList
+@cindex stripping advertisments
+@cindex advertisments
 @code{banner} $B%0%k!<%W%Q%i%a!<%?$G;XDj$5$l$?%P%J!<$r<h$j=|$-$^$9(B
 (@code{gnus-article-strip-banner})$B!#$3$l$O<g$K!"$$$/$D$+$N%a!<%j%s%0%j%9(B
 $B%H$d;J2q<TIU$-$N%0%k!<%W$,A4$F$N%0%k!<%W$KDI2C$9$k!"15F+$7$$%P%J!<$H(B/$B$b(B
@@ -6845,7 +6897,7 @@ Gnus $B$O9gCW$7$?$b$N$N$I$NItJ,$,%O%$%i%$%H$5$l$k$N$+$rCN$i$J$1$l$P$J$j$^(B
 (HEADER REGEXP BUTTON-PAR USE-P FUNCTION DATA-PAR)
 @end lisp
 
-@var{HEADER} $B$O@55,I=8=$G$9!#(B
+@var{header} $B$O@55,I=8=$G$9!#(B
 
 @item gnus-button-url-regexp
 @vindex gnus-button-url-regexp
@@ -7161,6 +7213,20 @@ Translate the article from one language to another
 $B$r99?7$7$F$$$k$HHs>o$KNI$$$G$7$g$&!#$7$+$7!"$=$l$O$I$&$7$F$bI,MW$J$o$1$G$O(B
 $B$"$j$^$;$s!#(B
 
+It can also be a list of select methods, as well as the special symbol
+@code{current}, which means to use the current select method.  If it
+is a list, Gnus will try all the methods in the list until it finds a
+match.
+
+Here's an example setting that will first try the current method, and
+then ask Deja if that fails:
+
+@lisp
+(setq gnus-refer-article-method
+      '(current
+        (nnweb "refer" (nnweb-type dejanews))))
+@end lisp
+
 $B$[$H$s$I$N%a!<%k%P%C%/%(%s%I$O(B @code{Message-ID} $B$G$N<hF@$,2DG=$G$9$,!"(B
 $B$"$^$jM%2m$JJ}K!$G$d$C$F$$$k$o$1$G$O$"$j$^$;$s!#(B@code{nnmbox} $B$H(B
 @code{nnbabyl} $B$O$I$N%0%k!<%W$+$i$N5-;v$b0LCV$rF@$k$3$H$,$G$-$^$9$,!"(B
@@ -7339,10 +7405,9 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @item gnus-tree-brackets
 @vindex gnus-tree-brackets
 $B$3$l$O!XK\Ev$N!Y5-;v$H!X$^$P$i5-;v!Y$K0c$$$rIU$1$k$?$a$K;H$o$l$^$9!#(B
-$BMM<0$O(B
-@var{(($BK\Ev$N3+(B . $BK\Ev$NJD(B) ($B$^$P$i3+(B . $B$^$P$iJD(B) ($B56$N3+(B . $B56$NJD(B))}
-$B$H$J$C$F$$$F!"%G%#%U%)%k%H$O(B
-@code{((?[ . ?]) (?( . ?)) (?@{ . ?@}) (?< . ?>))} $B$G$9!#(B
+$BMM<0$O(B @code{((@var{$BK\Ev$N3+(B} . @var{$BK\Ev$NJD(B}) (@var{$B$^$P$i3+(B} . 
+@var{$B$^$P$iJD(B}) (@var{$B56$N3+(B} . @var{$B56$NJD(B}))} $B$H$J$C$F$$$F!"%G%#%U%)(B
+$B%k%H$O(B @code{((?[ . ?]) (?( . ?)) (?@{ . ?@}) (?< . ?>))} $B$G$9!#(B
 
 @item gnus-tree-parent-child-edges
 @vindex gnus-tree-parent-child-edges
@@ -8271,7 +8336,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B$3$H$b$G$-$^$9!#4X?t$O$=$NItJ,$KHO0O$,69$a$i$l$?>uBV$G8F$P$l!"$[$H$s$I$J(B
 $B$s$G$b9%$-$J$3$H$r$G$-$^$9!#%P%C%U%!$KJ]B8$7$F$*$+$J$1$l$P$J$i$J$$>pJs$O(B
 $B$"$j$^$;$s(B---$B2?$G$bJQ$($k$3$H$,$G$-$^$9!#$7$+$7!"%X%C%@!<$r>C$7$F$O$$$1(B
-$B$^$;$s!#$=$NBe$o$j$K!"$=$l$r>C$75n$j$?$$$H$-$O!"IT2D;k$K$7$F$/$@$5$$!#(B
+$B$^$;$s!#(B
 
 
 @node Article Keymap
@@ -8632,7 +8697,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
       '((if (message-news-p)
             "misc-news"
           (concat "mail." (format-time-string
-                           "%Y-%m" (current-time))))))
+			   "%Y-%m" (current-time))))))
 @end lisp
 
 $B!J(BXEmacs 19.13 $B$K$O(B @code{format-time-string} $B$O$"$j$^$;$s$N$G!"$=$N(B
@@ -8707,14 +8772,18 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 
 $B$=$l$>$l$NMM<0$N:G=i$NMWAG$O(B @code{$B9gCW(B} (match) $B$H8F$P$l$^$9!#$b$7$=$l(B
 $B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=8=$H$7$F9gCWA`:n$r9T$$(B
-$B$^$9!#$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#(B
-$B$=$l$,JQ?t$N%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l(B
-$B$P!"$=$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil}
-$B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
+$B$^$9!#(B
+If it is the symbol @code{header}, then Gnus will look for header that
+match the next element in the match, and compare that to the last header
+in the match.
+$B$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#$=$l$,(B
+$BJQ?t$N%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l$P!"$=(B
+$B$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil} $B$G$J$$(B
+$BCM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
-$B$O(B @var{(name value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
-@code{signature}, @code{signature-file}, @code{organization},
+$B$O(B @code{(@var{name} . @var{value})} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>(B
+$B$O!"(B@code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
 $B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7B0@-L>$,(B @code{eval} $B$@$C$?$i(B
@@ -8748,6 +8817,8 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
          (signature my-quote-randomizer))
         ((message-news-p)
          (signature my-news-signature))
+        ((header "From.*To" "larsi.*org")
+         (Organization "Somewhere, Inc."))
         ((posting-from-work-p)
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
@@ -8883,6 +8954,7 @@ Buffer})$B!#(B
 * The Server Buffer::     $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k!#(B
 * Getting News::          USENET $B%K%e!<%9$r(B gnus $B$GFI$`!#(B
 * Getting Mail::          $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`!#(B
+* Browsing the Web::      Getting messages from a plethora of Web sources.
 * Other Sources::         $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`!#(B
 * Combined Groups::       $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k!#(B
 * Gnus Unplugged::        $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`!#(B
@@ -9030,8 +9102,8 @@ Buffer})$B!#(B
 @dfn{$B%"%I%l%9(B} (address) $B!"$b$7$/$O$=$&8F$S$?$$$N$G$"$l$P!"(B@dfn{$BL>A0(B} $B$G(B
 $B$9!#(B
 
-$B$3$l$i$N(B2$B$D$NMWAG$N8e$K$O!"G$0U$N?t$N(B @var{($BJQ?t(B $BMM<0(B)} $B$NBP$rF~$l$k;v$,(B
-$B$G$-$^$9!#(B
+$B$3$l$i$N(B2$B$D$NMWAG$N8e$K$O!"G$0U$N?t$N(B @code{(@var{$BJQ?t(B} @var{$BMM<0(B})} $B$N(B
+$BBP$rF~$l$k;v$,$G$-$^$9!#(B
 
 $B:G=i$NNc$KLa$j$^$7$g$&(B---$B$=$N%^%7%s$N%]!<%H(B15$B$+$iFI$_$?$+$C$?$H;W$C$F$/(B
 $B$@$5$$!#$3$l$,$=$N;~$K!"$J$k$Y$-A*BrJ}K!$G$9(B:
@@ -9696,10 +9768,10 @@ gnus $B$O$U$D$&F1$8<jK!$G$9$Y$F$N%0%k!<%W$r07$$$^$9!#$"$J$?$O$"$k%0%k!<(B
 $B$l$i$O$I$3$+$KJ]B8$5$l$F$$$k$+$i$G$9!#(B
 
 $B$"$k?M$?$A$O>.?M?t$KMxMQ$5$l$F$$$k%m!<%+%k%K%e!<%9%0%k!<%W$r9VFI$7$F$$(B
-$B$^$9!#$=$l$i$O(B NNTP $B$GG[Aw$5$l$k!"%K%e!<%9!"$G$9!#;d$?$A$O<+J,$N;E;v$K(B
-$BLrN)$F$k$?$a$K!"$=$l$i$NKDBg$J5-;v$NCGJR$rFI$s$@$jJV;v$r$7$J$1$l$P$J$j(B
-$B$^$;$s!#$=$7$F$=$l$i$OJ]B8$5$l$F$$$J$$$+$b$7$l$^$;$s$+$i!"6=L#$N$"$k5-(B
-$B;v$r8D?M%a!<%k$HF1$8$h$&$KJ]B8$7$J$1$l$P$J$i$J$$$G$7$g$&!#(B
+$B$^$9!#$=$l$i$O(B @sc{nntp} $B$GG[Aw$5$l$k!"%K%e!<%9!"$G$9!#;d$?$A$O<+J,$N;E(B
+$B;v$KLrN)$F$k$?$a$K!"$=$l$i$NKDBg$J5-;v$NCGJR$rFI$s$@$jJV;v$r$7$J$1$l$P(B
+$B$J$j$^$;$s!#$=$7$F$=$l$i$OJ]B8$5$l$F$$$J$$$+$b$7$l$^$;$s$+$i!"6=L#$N$"(B
+$B$k5-;v$r8D?M%a!<%k$HF1$8$h$&$KJ]B8$7$J$1$l$P$J$i$J$$$G$7$g$&!#(B
 
 $BG[Aw$N;EAH$_$N0c$$$O$I$&$G$b$h$$$3$H$G!"Bg;v$J$N$O$$$+$K<gBj$K6=L#$r;}$C(B
 $B$F$$$k$+$H!"$b$&0lEYFI$_$?$$$H$-$K$$$+$K4JC1$K8F$S=P$;$k$+$J$N$G$9!#(B
@@ -9901,6 +9973,33 @@ Gnus $B$O$"$J$?$K<+J,<+?H$KD7$MJV$C$F$/$k$h$&$J2DG=@-$N$"$kA4$F$N5!2q$rDs(B
 (file)
 @end lisp
 
+If the mail spool file is not located on the local machine, it's best to 
+use POP or @sc{imap} or the like to fetch the mail.  You can not you ange-ftp 
+file names here---it has no way to lock the mail spool while moving the
+mail.
+
+If it's impossible to set up a proper server, you can use ssh instead.
+
+@lisp
+(setq mail-sources
+      '((file :prescript "ssh host bin/getmail >%t")))
+@end lisp
+
+The @samp{getmail} script would look something like the following:
+
+@example
+#!/bin/sh
+#  getmail - move mail from spool to stdout
+#  flu@@iki.fi
+
+MOVEMAIL=/usr/lib/emacs/20.3/i386-redhat-linux/movemail
+TMP=~/Mail/tmp
+rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
+@end example
+
+Alter this script to fit find the @samp{movemail} you want to use.
+
+
 @item directory
 $B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL$O(B
 procmail $B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ$5(B
@@ -10049,30 +10148,29 @@ maildir $B%a!<%k%=!<%9$NNc$G$9(B:
 (maildir :path "/home/user-name/Maildir/cur")
 @end lisp
 
-@c TRANSLATEME
 @item imap
-Get mail from a IMAP server. If you don't want to use IMAP as intended,
-as a network mail reading protocol, for some reason or other Gnus let
-you treat it similar to a POP server and fetches articles from a given
-IMAP mailbox.
+Get mail from a @sc{imap} server. If you don't want to use @sc{imap} as intended,
+as a network mail reading protocol (ie with nnimap), for some reason or
+other, Gnus let you treat it similar to a POP server and fetches
+articles from a given @sc{imap} mailbox.
 
 Keywords:
 
 @table @code
 @item :server
-The name of the IMAP server.  The default is taken from the
+The name of the @sc{imap} server.  The default is taken from the
 @code{MAILHOST} environment variable.
 
 @item :port
-The port number of the IMAP server.  The default is @samp{143}, or
+The port number of the @sc{imap} server.  The default is @samp{143}, or
 @samp{993} for SSL connections.
 
 @item :user
-The user name to give to the IMAP server.  The default is the login
+The user name to give to the @sc{imap} server.  The default is the login
 name.
 
 @item :password
-The password to give to the IMAP server.  If not specified, the user is
+The password to give to the @sc{imap} server.  If not specified, the user is
 prompted.
 
 @item :stream
@@ -10093,19 +10191,60 @@ which normally is the mailbox which receive incoming mail.
 @item :predicate
 The predicate used to find articles to fetch. The default, 
 @samp{UNSEEN UNDELETED}, is probably the best choice for most people,
-but if you sometimes peek in your mailbox with a IMAP client and mark
+but if you sometimes peek in your mailbox with a @sc{imap} client and mark
 some articles as read (or; SEEN) you might want to set this to
 @samp{nil}. Then all articles in the mailbox is fetched, no matter
 what. For a complete list of predicates, see RFC2060 §6.4.4.
 
+@item :fetchflag
+How to flag fetched articles on the server, the default @samp{\Deleted}
+will mark them as deleted, an alternative would be @samp{\Seen} which
+would simply mark them as read. Theese are the two most likely choices,
+but more flags are defined in RFC2060 §2.3.2.
+
+@item :dontexpunge
+If non-nil, don't remove all articles marked as deleted in the mailbox
+after finishing the fetch.
+
 @end table
 
-An example IMAP mail source:
+An example @sc{imap} mail source:
 
 @lisp
 (imap :server "mail.mycorp.com" :stream kerberos4)
 @end lisp
 
+@item webmail
+Get mail from a webmail server, such as www.hotmail.com, 
+mail.yahoo.com, and www.netaddress.com. 
+
+NOTE: Webmail largely depends on w3 (url) package, whose version of "WWW
+4.0pre.46 1999/10/01" or previous ones may not work.
+
+WARNING: Mails may lost. NO WARRANTY.
+
+Keywords:
+
+@table @code
+@item :subtype
+The type of the webmail server.  The default is @code{hotmail}. The
+alternatives are @code{yahoo}, @code{netaddress}.
+
+@item :user
+The user name to give to the webmail server.  The default is the login
+name.
+
+@item :password
+The password to give to the webmail server.  If not specified, the user is
+prompted.
+
+@end table
+
+An example webmail source:
+
+@lisp
+(webmail :subtype 'yahoo :user "user-name" :password "secret")
+@end lisp
 @end table
 
 
@@ -10292,50 +10431,52 @@ An example IMAP mail source:
 $B$9!#IaDL$N@55,I=8=$N9gCW$,$J$5$l$^$9!#Nc$O2<$NJ}$r8+$F2<$5$$!#(B
 
 @item
-@var{(FIELD VALUE [- RESTRICT [- RESTRICT [...]]] SPLIT)}: $B$b$7J,3d$,%j(B
-$B%9%H$G!":G=i$NMWAG$,J8;zNs$G$"$j!"%X%C%@!<(B FIELD ($B@55,I=8=(B) $B$,(B VALUE ($B$3(B
-$B$l$b@55,I=8=(B) $B$r4^$s$G$$$k>l9g!"%a%C%;!<%8$r(B SPLIT $B$G;XDj$5$l$?$H$3$m$K(B
-$BC_@Q$7$^$9!#(BRESTRICT ($B$^$?B>$N@55,I=8=(B) $B$,(B FIELD $B$N8e$G!"9gCW$7$?(B VALUE
-$B$N:G8e$NA0$N$N$$$/$D$+$NJ8;zNs$K9gCW$7$?$i!"(BSPLIT $B$OL5;k$5$l$^$9!#(B
-RESTRICT $B$NJDJq$N$I$l$b$,9gCW$7$J$1$l$P!"(BSPLIT $B$,<B9T$5$l$^$9!#(B
+@code{(@var{field} @var{value} @code{[-} @var{restrict} @code{[-} @var{restrict} @code{[@dots{}]}@code{]]} 
+@var{split})}: $B$b$7J,3d$,%j%9%H$G!":G=i$NMWAG$,J8;zNs$G$"$j!"%X%C%@!<(B
+@var{field} ($B@55,I=8=(B) $B$,(B @var{value} ($B$3$l$b@55,I=8=(B) $B$r4^$s$G$$$k>l9g!"(B
+$B%a%C%;!<%8$r(B @var{split} $B$G;XDj$5$l$?$H$3$m$KC_@Q$7$^$9!#(B@var{restrict}
+ ($B$^$?B>$N@55,I=8=(B) $B$,(B @var{field} $B$N8e$G!"9gCW$7$?(B @var{value} $B$N:G8e$N(B
+$BA0$N$N$$$/$D$+$NJ8;zNs$K9gCW$7$?$i!"(B@var{split} $B$OL5;k$5$l$^$9!#(B
+@var{restrict} $B$NJDJq$N$I$l$b$,9gCW$7$J$1$l$P(B @var{split} $B$,<B9T$5$l$^(B
+$B$9!#(B
 
 @item
-@var{(| SPLIT...)}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{|} ($B?bD>K@(B) $B$G$"(B
-$B$k$H!"$=$l$>$l$N(B SPLIT $B$r$=$N$&$A$N0l$D$,9gCW$9$k$^$G<B9T$7$^$9!#(B SPLIT
-$B$O%a!<%k%a%C%;!<%8$,0l$D0J>e$N%0%k!<%W$KC_@Q$5$l$?$H$-$K(B ``$B9gCW$7$?(B'' $B$H(B
-$B$7$^$9!#(B
+@code{(| @var{split}@dots{})}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{|}
+($B?bD>K@(B) $B$G$"$k$H!"$=$l$>$l$N(B @var{split} $B$r$=$N$&$A$N0l$D$,9gCW$9$k$^$G(B
+$B<B9T$7$^$9!#(B@var{split} $B$O%a!<%k%a%C%;!<%8$,0l$D0J>e$N%0%k!<%W$KC_@Q$5$l(B
+$B$?$H$-$K(B ``$B9gCW$7$?(B'' $B$H$7$^$9!#(B
 
 @item
-@var{(& SPLIT...)}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{t} $B$G$"$k$H!"%j%9(B
-$B%H$NA4$F$N(B SPLIT $B$r<B9T$7$^$9!#(B
+@code{(& @var{split}@dots{})}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{t} $B$G(B
+$B$"$k$H!"%j%9%H$NA4$F$N(B @var{split} ($BJ#?t(B) $B$r<B9T$7$^$9!#(B
 
 @item
 @code{junk}: $B$b$7J,3d$,%7%s%\%k(B @code{junk} $B$G$"$k$H!"$=$N%a%C%;!<%8$rJ](B
 $BB8$7$^$;$s!#Hs>o$KCm0U$7$F;H$C$F2<$5$$!#(B
 
 @item
-@var{(: function arg1 arg2 ...)}: $B$b$7J,3d$,%j%9%H$G!":G=i$N4X?t$,(B
-@code{:} $B$G$"$k$H!"(B2$BHVL\$NMWAG$,(B @var{args} $B$r0z?t$H$7$F4X?t$H$7$F8F$P$l(B
-$B$^$9!#4X?t$O(B SPLIT $B$rJV$9$Y$-$G$9!#(B
+@code{(: @var{function} @var{arg1} @var{arg2} @dots{})}: $B$b$7J,3d$,%j%9(B
+$B%H$G!":G=i$N4X?t$,(B @code{:} $B$G$"$k$H!"(B2$BHVL\$NMWAG$,(B @var{args} $B$r0z?t$H(B
+$B$7$F4X?t$H$7$F8F$P$l$^$9!#4X?t$O(B @var{split} $B$rJV$9$Y$-$G$9!#(B
 
 @item
-@var{(! FUNC SPLIT)}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{!} $B$G$"$k$H!"(B
-SPLIT $B$,<B9T$5$l!"(BFUNC $B$O(B SPLIT $B$N7k2L$r0z?t$H$7$F8F$P$l$^$9!#(BFUNC $B$OJ,(B
-$B3d$rJV$9$Y$-$G$9!#(B
+@code{(! @var{func} @var{split})}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{!}
+$B$G$"$k$H(B @var{split} $B$,<B9T$5$l!"(B@var{func} $B$O(B @var{split} $B$N7k2L$r0z?t(B
+$B$H$7$F8F$P$l$^$9!#(B@var{func} $B$OJ,3d$rJV$9$Y$-$G$9!#(B
 
 @item
 @code{nil}: $B$b$7J,3d$,(B @code{nil} $B$G$"$l$P!"$=$l$OL5;k$5$l$^$9!#(B
 
 @end enumerate
 
-$B$3$l$i$NJ,3d$G!"(B@var{FIELD} $B$O40A4$J%U%#!<%k%IL>$K9gCW$7$J$1$l$P$J$j$^$;(B
-$B$s!#(B@var{VALUE} $B$O4pAC%b!<%I(B (fundamental mode) $B9=J8%F!<%V%k(B (syntax
+$B$3$l$i$NJ,3d$G!"(B@var{fileld} $B$O40A4$J%U%#!<%k%IL>$K9gCW$7$J$1$l$P$J$j$^(B
+$B$;$s!#(B@var{value} $B$O4pAC%b!<%I(B (fundamental mode) $B9=J8%F!<%V%k(B (syntax
 table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $B8l$NItJ,$K9gCW$5$;$k$?$a$K(B @code{.*} $B$r;H$&;v$,$G$-$^$9!#8@$$49$($l$P!"(B
-$BA4$F$N(B @var{VALUE} $B$O(B @samp{\<} $B$H(B @samp{\>} $B$NBP$G0O$^$l$^$9!#(B
+$BA4$F$N(B @var{value} $B$O(B @samp{\<} $B$H(B @samp{\>} $B$NBP$G0O$^$l$^$9!#(B
 
 @vindex nnmail-split-abbrev-alist
-@var{FIELD} $B$H(B @var{VALUE} $B$O(B lisp $B%7%s%\%k(B (symbol) $B$G$"$k;v$b$G$-!"$=(B
+@var{field} $B$H(B @var{value} $B$O(B lisp $B%7%s%\%k(B (symbol) $B$G$"$k;v$b$G$-!"$=(B
 $B$N>l9g$O$=$l$i$O(B @code{nnmail-split-abbrev-alist} $B$G;XDj$5$l$F$$$k$h$&$K(B
 $BE83+$5$l$^$9!#$3$l$O%;%k$N(B @code{car} $B$,%-!<$r4^$s$G$$$F!"(B@code{cdr} $B$,(B
 $B4XO"IU$1$i$l$?CM$r;}$C$F$$$k%3%s%9%;%k(B (cons cell) $B$NO"A[%j%9%H$G$9!#(B
@@ -10380,10 +10521,10 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $B;H$$$?$1$l$P!"(B@var{split-regexp} $B$r@_Dj$7$F$/$@$5$$!#(B
 
 $B$3$l$i$NA4$F$N%0%k!<%W$N%Q%i%a!<%?$O!"(B@code{nnmail-split-fancy} $BJ,3d$r:n(B
-$B@.$9$k$?$a$K;HMQ$5$l!"$=$l$O(B @var{FIELD} $B$,(B @samp{any} $B$G!"(B@var{VALUE} 
+$B@.$9$k$?$a$K;HMQ$5$l!"$=$l$O(B @var{field} $B$,(B @samp{any} $B$G!"(B@var{value} 
 $B$,(B@var{to-list}, @var{to-address}, @var{extra-aliases} $B$NA4$F!"(B
-@var{split-regexp} $B$NA4$F$N9gCW$K9gCW$9$kC1FH$N@55,I=8=!"(B@var{SPLIT} $B$,(B
-$B%0%k!<%W$NL>A0$K$J$j$^$9!#(B@var{RESTRICT} $B$b;HMQ$G$-$^$9(B:
+@var{split-regexp} $B$NA4$F$N9gCW$K9gCW$9$kC1FH$N@55,I=8=!"(B@var{split} $B$,(B
+$B%0%k!<%W$NL>A0$K$J$j$^$9!#(B@var{restrict} $B$b;HMQ$G$-$^$9(B:
 @var{split-exclude} $B%Q%i%a!<%?$r@55,I=8=$N%j%9%H$K@_Dj$9$k$@$1$G$9!#(B
 
 $B$3$l$i$NA4$F$N%Q%i%a!<%?$r;H$C$F@5$7$$J,3d$,@8@.$5$l$J$$$H$-$d!"2?$+0c$C(B
@@ -10440,14 +10581,14 @@ nnml:mail.others:
 (: gnus-mlsplt-fancy GROUPS NO-CROSSPOST CATCH-ALL)
 @end lisp
 
-@var{GROUPS} $B$O=PNO$NJ,3d$r@8@.$9$k$?$a$K%Q%i%a!<%?$,Av::$5$l$k%0%k!<%W(B
-$BL>$N%j%9%H$+@55,I=8=$G$9!#(B@var{NO-CROSSPOST} $B$OAj8_Ej9F$r;HMQ6X;_$K$k$?(B
+@var{groups} $B$O=PNO$NJ,3d$r@8@.$9$k$?$a$K%Q%i%a!<%?$,Av::$5$l$k%0%k!<%W(B
+$BL>$N%j%9%H$+@55,I=8=$G$9!#(B@var{no-crosspost} $B$OAj8_Ej9F$r;HMQ6X;_$K$k$?(B
 $B$a$K;H$&$3$H$,$G$-$^$9!#$=$N>l9g!"C10l$N(B @code{|} $BJ,3d$,=PNO$5$l$^$9!#(B
-@var{CATCH-ALL} $B$O=i4|A4Ja3M%0%k!<%W$H$7$F;HMQ$5$l$k%0%k!<%WL>$G$9!#(B
-@var{CATCH-ALL} $B$,(B @code{nil} $B$G$"$k$+!"(B@var{SPLIT-REGEXP} $B$,$I$l$+$NA*(B
+@var{catch-all} $B$O=i4|A4Ja3M%0%k!<%W$H$7$F;HMQ$5$l$k%0%k!<%WL>$G$9!#(B
+@var{catch-all} $B$,(B @code{nil} $B$G$"$k$+!"(B@var{split-regexp} $B$,$I$l$+$NA*(B
 $BBr$5$l$?%0%k!<%W6uJ8;zNs$K9gCW$9$k$H!"A4Ja3MJ,3d$O9T$o$l$^$;$s!#$=$&$G$J(B
-$B$$>l9g!"%0%k!<%W$K(B @var{SPLIT-SPEC} $B$,(B @code{catch-all} $B$K@_Dj$5$l$F$$$k(B
-$B$b$N$,$"$k$H!"$3$N%0%k!<%W$,(B @var{CATCH-ALL} $B0z?t$r>e=q$-$7$^$9!#(B
+$B$$>l9g!"%0%k!<%W$K(B @var{split-spec} $B$,(B @code{catch-all} $B$K@_Dj$5$l$F$$$k(B
+$B$b$N$,$"$k$H!"$3$N%0%k!<%W$,(B @var{catch-all} $B0z?t$r>e=q$-$7$^$9!#(B
 
 @findex gnus-group-split-setup
 $BIT1?$J$3$H$K!"A4$F$N%0%k%W$H%Q%i%a!<%?$rAv::$9$k$3$H$OHs>o$KCY$$$G$9!#FC(B
@@ -10470,10 +10611,10 @@ nnml:mail.others:
 (gnus-group-split-setup AUTO-UPDATE CATCH-ALL)
 @end lisp
 
-@var{AUTO-UPDATE} $B$,(B @code{nil} $B$GL5$$$H!"(B@code{gnus-group-split-update}
+@var{auto-update} $B$,(B @code{nil} $B$GL5$$$H!"(B@code{gnus-group-split-update}
 $B$,(B @code{nnmail-pre-get-new-mail-hook} $B$KDI2C$5$l!"FsEY$H(B 
 @code{nnmail-split-fancy} $B$N99?7$r?4G[$9$kI,MW$O$"$j$^$;$s!#(B
-@var{CATCH-ALL} $B$r>JN,$7$J$$>l9g$O(B ($B$=$l$O%*%W%7%g%s$G$9(B) 
+@var{catch-all} $B$r>JN,$7$J$$>l9g$O(B ($B$=$l$O%*%W%7%g%s$G$9(B) 
 @code{gnus-group-split-default-catch-all-group} $B$O$=$NCM$K@_Dj$5$l$^$9!#(B
 
 @vindex gnus-group-split-updated-hook
@@ -11082,13 +11223,13 @@ nnfolder-generate-active-file} $B$r;H$&;v$,$G$-$^$9!#$3$l$OD9$$%U%!%$%kL>(B
 $B$NA*Br$O!"%a!<%k$r(B gnus $B$N$9$06a$/$K<hF@$9$k$?$a$KMW5a$5$l$k!"$H$$$&$b$N(B
 $B$G$9!#(B
 
-$BF1$835G0$,(B Usenet $B<+?H$K$bB8:_$7$^$9!#5-;v$X$N@\?($O:#F|$G$O!"IaDL$O(B
-NNTP $B$G$J$5$l$^$9$,!"@N!9$NM+]5$J?<Lk$N;~Be$O!"3'$O5-;v$,B8:_$9$k%^%7%s(B
-($B:#F|$G$O(B NNTP $B%5!<%P!<$H8F$V$b$N(B) $B$G%j!<%@!<$rF0$+$7!"%j!<%@!<$+$i$N@\(B
-$BB3$O!"D>@\5-;v$N%G%#%l%/%H%j!<%9%W!<%k$KF'$_9~$`$H$$$&$b$N$G$7$?!#$=$l$G(B
-$B$b!"$?$^$?$^%5!<%P!<(B ($B$b$7$/$O!"(BNFS $B$G%9%W!<%k$,FI$a$k$h$&$J>l9g(B) $B$K$$$k(B
-$B$h$&$J>l9g$O!"$3$l$i$NJ}K!$rA*$V$?$a$K(B @code{nntp} $B$d(B @code{nnspool} $B%P%C(B
-$B%/%(%s%I$N$I$A$i$+$rA*$V$3$H$,$G$-$^$7$?!#(B
+$BF1$835G0$,(B Usenet $B<+?H$K$bB8:_$7$^$9!#5-;v$X$N@\?($O:#F|$G$O!"IaDL$O(B 
+@sc{nntp} $B$G$J$5$l$^$9$,!"@N!9$NM+]5$J?<Lk$N;~Be$O!"3'$O5-;v$,B8:_$9$k(B
+$B%^%7%s(B ($B:#F|$G$O(B @sc{nntp} $B%5!<%P!<$H8F$V$b$N(B) $B$G%j!<%@!<$rF0$+$7!"%j!<(B
+$B%@!<$+$i$N@\B3$O!"D>@\5-;v$N%G%#%l%/%H%j!<%9%W!<%k$KF'$_9~$`$H$$$&$b$N(B
+$B$G$7$?!#$=$l$G$b!"$?$^$?$^%5!<%P!<(B ($B$b$7$/$O!"(BNFS $B$G%9%W!<%k$,FI$a$k$h(B
+$B$&$J>l9g(B) $B$K$$$k$h$&$J>l9g$O!"$3$l$i$NJ}K!$rA*$V$?$a$K(B @code{nntp} $B$d(B 
+@code{nnspool} $B%P%C%/%(%s%I$N$I$A$i$+$rA*$V$3$H$,$G$-$^$7$?!#(B
 
 $B%a!<%k%P%C%/%(%s%I$rA*Br$9$k$3$H$N%4!<%k$O!"85$N7A<0$r07$&$N$KE,$7$?J}K!(B
 $B$H!">-Mh;HMQ$9$k$?$a$KJXMx$J7A<0$K%a!<%k$r;D$9$3$H$NN>J}$rF1;~$KI=8=$9$k(B
@@ -11183,6 +11324,289 @@ gnus $B$,$=$l$>$l$NJL$N%0%k!<%W$K$I$N$/$i$$$N%a%C%;!<%8$,$"$k$+$rD4$Y$k$?(B
 @end table
 
 
+@node Browsing the Web
+@section Browsing the Web
+@cindex web
+@cindex browsing the web
+@cindex www
+@cindex http
+
+Web-based discussion forums are getting more and more popular.  On many
+subjects, the web-based forums have become the most important forums,
+eclipsing the importance of mailing lists and news groups.  The reason
+is easy to understand---they are friendly to new users; you just point
+and click, and there's the discussion.  With mailing lists, you have to
+go through a cumbersome subscription procedure, and most people don't
+even know what a news group is.
+
+The problem with this scenario is that web browsers are not very good at 
+being newsreaders.  They do not keep track of what articles you've read; 
+they do not allow you to score on subjects you're interested in; they do 
+not allow off-line browsing; they require you to click around and drive
+you mad in the end.
+
+So---if web browsers suck at reading discussion forums, why not use Gnus 
+to do it instead?
+
+Gnus has been getting a bit of a collection of backends for providing
+interfaces to these sources.
+
+@menu
+* Web Searches::          Creating groups from articles that match a string.
+* Slashdot::              Reading the Slashdot comments.
+* Ultimate::              The Ultimate Bulletin Board systems.
+* Web Archive::           Reading mailing list archived on web.
+@end menu
+
+The main caveat with all these web sources is that they probably won't
+work for a very long time.  Gleaning information from the @sc{html} data 
+is guesswork at best, and when the layout is altered, the Gnus backend
+will fail.  If you have reasonably new versions of these backends,
+though, you should be ok.
+
+One thing all these Web methods have in common is that the Web sources
+are often down, unavailable or just plain too slow to be fun.  In those
+cases, it makes a lot of sense to let the Gnus Agent (@pxref{Gnus
+Unplugged}) handle downloading articles, and then you can read them at
+leisure from your local disk.  No more World Wide Wait for you.
+
+
+@node Web Searches
+@subsection Web Searches
+@cindex nnweb
+@cindex DejaNews
+@cindex Alta Vista
+@cindex InReference
+@cindex Usenet searches
+@cindex searching the Usenet
+
+It's, like, too neat to search the Usenet for articles that match a
+string, but it, like, totally @emph{sucks}, like, totally, to use one of
+those, like, Web browsers, and you, like, have to, rilly, like, look at
+the commercials, so, like, with Gnus you can do @emph{rad}, rilly,
+searches without having to use a browser.
+
+The @code{nnweb} backend allows an easy interface to the mighty search
+engine.  You create an @code{nnweb} group, enter a search pattern, and
+then enter the group and read the articles like you would any normal
+group.  The @kbd{G w} command in the group buffer (@pxref{Foreign
+Groups}) will do this in an easy-to-use fashion.
+
+@code{nnweb} groups don't really lend themselves to being solid
+groups---they have a very fleeting idea of article numbers.  In fact,
+each time you enter an @code{nnweb} group (not even changing the search
+pattern), you are likely to get the articles ordered in a different
+manner.  Not even using duplicate suppression (@pxref{Duplicate
+Suppression}) will help, since @code{nnweb} doesn't even know the
+@code{Message-ID} of the articles before reading them using some search
+engines (DejaNews, for instance).  The only possible way to keep track
+of which articles you've read is by scoring on the @code{Date}
+header---mark all articles posted before the last date you read the
+group as read.
+
+If the search engine changes its output substantially, @code{nnweb}
+won't be able to parse it and will fail.  One could hardly fault the Web
+providers if they were to do this---their @emph{raison d'être} is to
+make money off of advertisements, not to provide services to the
+community.  Since @code{nnweb} washes the ads off all the articles, one
+might think that the providers might be somewhat miffed.  We'll see.
+
+You must have the @code{url} and @code{w3} package installed to be able
+to use @code{nnweb}.
+
+Virtual server variables:
+
+@table @code
+@item nnweb-type
+@vindex nnweb-type
+What search engine type is being used.  The currently supported types
+are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
+@code{reference}.
+
+@item nnweb-search
+@vindex nnweb-search
+The search string to feed to the search engine.
+
+@item nnweb-max-hits
+@vindex nnweb-max-hits
+Advisory maximum number of hits per search to display.  The default is
+100.
+
+@item nnweb-type-definition
+@vindex nnweb-type-definition
+Type-to-definition alist.  This alist says what @code{nnweb} should do
+with the various search engine types.  The following elements must be
+present:
+
+@table @code
+@item article
+Function to decode the article and provide something that Gnus
+understands.
+
+@item map
+Function to create an article number to message header and URL alist.
+
+@item search
+Function to send the search string to the search engine.
+
+@item address
+The address the aforementioned function should send the search string
+to.
+
+@item id
+Format string URL to fetch an article by @code{Message-ID}.
+@end table
+
+@end table
+
+
+@node Slashdot
+@subsection Slashdot
+@cindex Slashdot
+@cindex nnslashdot
+
+Slashdot (@file{http://slashdot.org/}) is a popular news site, with
+lively discussion following the news articles.  @code{nnslashdot} will
+let you read this forum in a convenient manner.
+
+The easiest way to read this source is to put something like the
+following in your @file{.gnus.el} file:
+
+@lisp
+(setq gnus-secondary-select-methods
+      '((nnslashdot "")))
+@end lisp
+
+This will make Gnus query the @code{nnslashdot} backend for new comments
+and groups.  The @kbd{F} command will subscribe each new news article as
+a new Gnus group, and you can read the comments by entering these
+groups.  (Note that the default subscription method is to subscribe new
+groups as zombies.  Other methods are available (@pxref{Subscription
+Methods}).
+
+When following up to @code{nnslashdot} comments (or posting new
+comments), some light @sc{html}izations will be performed.  In
+particular, text quoted with @samp{> } will be quoted with
+@code{blockquote} instead, and signatures will have @code{br} added to
+the end of each line.  Other than that, you can just write @sc{html}
+directly into the message buffer.  Note that Slashdot filters out some
+@sc{html} forms.
+
+The following variables can be altered to change its behavior:
+
+@table @code
+@item nnslashdot-threaded
+Whether @code{nnslashdot} should display threaded groups or not.  The
+default is @code{t}.  To be able to display threads, @code{nnslashdot}
+has to retrieve absolutely all comments in a group upon entry.  If a
+threaded display is not required, @code{nnslashdot} will only retrieve
+the comments that are actually wanted by the user.  Threading is nicer,
+but much, much slower than untreaded.
+
+@item nnslashdot-login-name
+@vindex nnslashdot-login-name
+The login name to use when posting.
+
+@item nnslashdot-password
+@vindex nnslashdot-password
+The password to use when posting.
+
+@item nnslashdot-directory
+@vindex nnslashdot-directory
+Where @code{nnslashdot} will store its files.  The default value is
+@samp{~/News/slashdot/}.
+
+@item nnslashdot-active-url
+@vindex nnslashdot-active-url
+The @sc{url} format string that will be used to fetch the information on 
+news articles and comments.  The default is
+@samp{http://slashdot.org/search.pl?section=&min=%d}.
+
+@item nnslashdot-comments-url
+@vindex nnslashdot-comments-url
+The @sc{url} format string that will be used to fetch comments.  The
+default is
+@samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=%d&mode=flat&startat=%d}.
+
+@item nnslashdot-article-url
+@vindex nnslashdot-article-url
+The @sc{url} format string that will be used to fetch the news article.  The
+default is
+@samp{http://slashdot.org/article.pl?sid=%s&mode=nocomment}.
+
+@item nnslashdot-threshold
+@vindex nnslashdot-threshold
+The score threshold.  The default is -1.
+
+@item nnslashdot-group-number
+@vindex nnslashdot-group-number
+The number of old groups, in addition to the ten latest, to keep
+updated.  The default is 0.
+
+@end table
+
+
+
+@node Ultimate
+@subsection Ultimate
+@cindex nnultimate
+@cindex Ultimate Bulletin Board
+
+The Ultimate Bulletin Board (@file{http://www.ultimatebb.com/}) is
+probably the most popular Web bulletin board system used.  It has a
+quite regular and nice interface, and it's possible to get the
+information Gnus needs to keep groups updated.
+
+The easiest way to get started with @code{nnultimate} is to say
+something like the following in the group buffer:  @kbd{B nnultimate RET 
+http://www.tcj.com/messboard/ubbcgi/ RET}.  (Substitute the @sc{url}
+(not including @samp{Ultimate.cgi} or the like at the end) for a forum
+you're interested in; there's quite a list of them on the Ultimate web
+site.)  Then subscribe to the groups you're interested in from the
+server buffer, and read them from the group buffer.
+
+The following @code{nnultimate} variables can be altered:
+
+@table @code
+@item nnultimate-directory
+@vindex nnultimate-directory
+The directory where @code{nnultimate} stores its files.  The default is
+@samp{~/News/ultimate/}.
+@end table
+
+@node Web Archive
+@subsection Web Archive
+@cindex nnwarchive
+@cindex Web Archive
+
+Some mailing lists only have archives on Web servers, such as
+(@file{http://www.egroups.com/}). It has a quite regular and nice
+interface, and it's possible to get the information Gnus needs to keep
+groups updated.
+
+The easiest way to get started with @code{nnwarchive} is to say
+something like the following in the group buffer: @kbd{M-x
+gnus-group-make-nnwarchive-group RET an_egroup RET egroups RET
+www.egroups.com RET your@@email.address RET}.  (Substitute the
+@sc{an_egroup} with the mailing list you subscribed, the
+@sc{your@@email.address} with your email address.)
+
+The following @code{nnwarchive} variables can be altered:
+
+@table @code
+@item nnwarchive-directory
+@vindex nnwarchive-directory
+The directory where @code{nnwarchive} stores its files.  The default is
+@samp{~/News/warchive/}.
+
+@item nnwarchive-login
+@vindex nnwarchive-login
+The account name on the web server.
+
+@item nnwarchive-passwd
+@vindex nnwarchive-passwd
+The password for your account on the web server.
+@end table
 
 @node Other Sources
 @section $B$=$NB>$N%0%k!<%W8;(B
@@ -11196,11 +11620,9 @@ Gnus $B$O$?$@C1$K%K%e!<%9$d%a!<%k$rFI$`0J>e$N$3$H$,$G$-$^$9!#0J2<(B
 * Directory Groups::      $B%G%#%l%/%H%j!<$r%K%e!<%9%0%k!<%W$N$h$&$KFI$`!#(B
 * Anything Groups::       Dired?  $BC/$,(B dired $B$J$s$F;H$&$N(B?
 * Document Groups::       $B8DJL$N%U%!%$%k72$O%0%k!<%W$NAG!#(B
-* SOUP::                  @sc{SOUP} $B%Q%1%C%H$r(B ``$B%*%U%i%$%s(B''$B$GFI$`!#(B
-* Web Searches::          $BJ8;zNs$K%^%C%A$9$k5-;v$+$i%0%k!<%W$r:n$k!#(B
+* SOUP::                  @sc{soup} $B%Q%1%C%H$r(B ``$B%*%U%i%$%s(B''$B$GFI$`!#(B
 * Mail-To-News Gateways:: $B%a!<%k$+$i%K%e!<%9$X$N%2!<%H%&%'%$$rDL$7$F5-;v$rEj9F$9$k!#(B
-@c TRANSLATEME
-* IMAP::                  Using Gnus as a IMAP client.
+* IMAP::                  Using Gnus as a @sc{imap} client.
 @end menu
 
 
@@ -11566,13 +11988,13 @@ PC $B$N@$3&$N?M!9$O$h$/!"(B``$B%*%U%i%$%s(B'' $B%K%e!<%9%j!<%@$K$D$$$FOC$r
 @item message packets
 $B$3$l$O%5!<%P!<$G:n$i$l$k%Q%1%C%H$G!"IaDL$O$"$J$?$,FI$`$?$a$N$?(B
 $B$/$5$s$N%a%C%;!<%8$,4^$^$l$F$$$^$9!#$3$l$i$O=i4|@_Dj$G$O(B
-@file{SoupoutX.tgz} $B$H$$$&L>A0$G$9!#$3$3$G(B @var{X} $B$O?t;z$G$9!#(B
+@file{SoupoutX.tgz} $B$H$$$&L>A0$G$9!#$3$3$G(B @var{x} $B$O?t;z$G$9!#(B
 
 @item response packets
 ($BJV?.%Q%1%C%H(B)
 $B$3$N%Q%1%C%H$O<+Bp%^%7%s$G:n$i$l$k%Q%1%C%H$G!"IaDL$O$"$J$?$N=q$$(B
 $B$?JV;v$,4^$^$l$F$$$^$9!#$3$l$i$O=i4|@_Dj$G$O(B
-@file{SoupinX.tgz} $B$H$$$&L>A0$G$9!#$3$3$G(B @var{X} $B$O?t;z$G$9!#(B
+@file{SoupinX.tgz} $B$H$$$&L>A0$G$9!#$3$3$G(B @var{x} $B$O?t;z$G$9!#(B
 
 @end table
 
@@ -11814,95 +12236,6 @@ gnus $B$,JV?.%Q%1%C%H$rC5$7$K9T$/>l=j!#=i4|@_DjCM$O(B @file{~/}$B!#(B
 @sc{soup} $B$5$;$?$+$C$?$i!"FsHVL\$r;H$C$F$/$@$5$$!#(B
 
 
-@node Web Searches
-@subsection $B%&%'%V8!:w(B
-@cindex nnweb
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
-@cindex Usenet searches
-@cindex searching the Usenet
-
-$B$=$l$O!"$J$s$H$$$&$+!"(BUsenet $B$+$iJ8;zNs$K%^%C%A$9$k5-;v$r8!:w$9(B
-$B$k$N$O$H$F$bAG@2$i$7$$$s$@$1$I!"$=$N!"$"$N%&%'%V%V%i%&%6!<$C$F$d(B
-$B$D$r;H$C$F!"$=$s$G$b$C$F!"@kEA$rFI$^$;$i$l$k$C$F$$$&$N$O!"$=$N!"(B
-$B$J$s$H$$$&$+!"$[$s$H$&$K(B @emph{$B!VITMM$M!W(B} $B$H$$$&$+!"$=$l$G!"(B
-gnus $B$G$O%V%i%&%6!<$r;H$o$:$K!"$=$N!"(B@emph{$BD6$+$C$3$h$/(B}$B$=$l$,$G(B
-$B$-$k!"$C$F$3$H$G$9!#(B
-
-@code{nnweb} $B%P%C%/%(%s%I$O!"6/NO$J8!:w%(%s%8%s$KBP$7$F4JC1$J%$(B
-$B%s%?!<%U%'!<%9$rDs6!$7$^$9!#(B@code{nnweb} $B%0%k!<%W$r:n@.$7!"8!:w(B
-$B%Q%?!<%s$rF~NO$7!"$=$7$F$=$N%0%k!<%W$KF~$C$FB>$NIaDL$N%0%k!<%W$N(B
-$B$h$&$K5-;v$rFI$_$^$9!#%0%k!<%W%P%C%U%!(B (@pxref{Foreign
-Groups}) $B$N(B @kbd{G w} $BL?Na$K$h$C$F$*<j7Z$K$3$l$,$G$-$^$9!#(B
-
-@code{nnweb} $B%0%k!<%W$O!"8GDj%0%k!<%W$K$J$m$&$H$O$7$^$;$s(B --- $B$3(B
-$B$N%0%k!<%W$G$O5-;vHV9f$O$4$/0l;~E*$J$b$N$H$7$F07$$$^$9!#$D$^$j!"(B
-@code{nnweb} $B%0%k!<%W$KF~$k$?$S$K(B($B$?$H$(8!:w%Q%?!<%s$rJQ99$7$F$$(B
-$B$J$/$H$b(B)$B!"5-;v$N=g=x$,0c$C$F$$$k$+$b$7$l$^$;$s!#$^$?!"=EJ#M^@)(B
-(@pxref{Duplicate Suppression}) $B$r;H$C$F$b$&$^$/F/$+$J$$$G$7$g$&!#(B
-$B$H$$$&$N$O!"(B@code{nnweb} $B$O8!:w%(%s%8%s(B($BNc$($P(B DejaNews) $B$r;H$C(B
-$B$F5-;v$rFI$_9~$`$^$G$O!"(B@code{Message-ID} $B$rCN$k$3$H$O$G$-$J$$$+(B
-$B$i$G$9!#$"$J$?$,FI$s$@5-;v$r21$($F$*$/$?$a$NM#0l$NJ}K!$O!"(B
-@code{Date} $B%X%C%@!<$r$b$H$K%9%3%"$rIU$1$k$3$H$@$1$G$9(B --- $B$D$^(B
-$B$j$"$J$?$,$=$N%0%k!<%W$r:G8e$KFI$s$@F|IU$h$j!"A0$KEj9F$5$l$?5-;v(B
-$B$rA4$F4{FI$K$9$k!"$H$$$&$3$H$G$9!#(B
-
-$B$b$78!:w%(%s%8%s$N=PNO7A<0$,JQ99$5$l$k$H!"(B@code{nnweb} $B$O$=$l$r(B
-$B$&$^$/2r<a$G$-$:!"=hM}$O<:GT$9$k$G$7$g$&!#$b$7%&%'%VDs6!<TC#$,$=(B
-$B$s$J$3$H$r$7$?$i!"H`$i$r7c$7$/@U$a$k$Y$-$G$7$g$&(B --- $B$=$l$O9-9p(B
-$B$G6b$r2T$0$N$,H`$i$N(B @emph{$BB8:_M}M3(B} $B$G$"$j!"<R2q$K%5!<%S%9$rDs(B
-$B6!$9$k$3$H$G$O$J$$$+$i$G$9!#(B@code{nnweb} $B$OA4$F$N5-;v$+$i9-9p$r(B
-$B@v$$N.$7$F$7$^$&$N$G!"Ds6!<T$?$A$,%`%+$D$$$F$$$k$H;W$o$l$k$+$bCN(B
-$B$l$^$;$s!#$^$"8+$F$F$/$@$5$$!#(B
-
-@code{nnweb} $B$r;H$&$K$O!"(B@code{url} $B$H(B @code{w3} $B%Q%C%1!<%8$r%$(B
-$B%s%9%H!<%k$7$F$*$+$J$/$F$J$J$j$^$;$s!#(B
-
-$B0J2<$O2>A[%5!<%P!<JQ?t$G$9!#(B
-
-@table @code
-@item nnweb-type
-@vindex nnweb-type
-$B$I$N8!:w%(%s%8%s$r;H$C$F$$$k$+!#8=:_%5%]!<%H$5$l$F$$$k<oN`$O!"(B
-@code{dejanews}$B!"(B @code{dejanewsold}$B!"(B @code{altavista}$B!"(B
-@code{reference} $B$G$9!#(B
-
-@item nnweb-search
-@vindex nnweb-search
-$B8!:w%(%s%8%s$KM?$($k8!:wJ8;zNs!#(B
-
-@item nnweb-max-hits
-@vindex nnweb-max-hits
-$BI=<($9$k8!:w7k2L$N:GBg?t!#=i4|CM$O(B 100 $B$G$9!#(B
-
-@item nnweb-type-definition
-@vindex nnweb-type-definition
-$B7?!&Dj5AO"A[%j%9%H!#$3$NO"A[%j%9%H$O!"$5$^$6$^$J8!:w%(%s%8%s$N<o(B
-$BN`$KBP$7$F!"(B @code{nnweb} $B$,$I$&$9$Y$-$+$rM?$($^$9!#0J2<$K<($9MW(B
-$BAG$rM?$($J$/$F$O$J$j$^$;$s!#(B
-
-@table @code
-@item article
-$B5-;v$rI|9f2=$7!"(Bgnus $B$,M}2r$G$-$k7A$GDs6!$9$k4X?t!#(B
-
-@item map
-$B5-;vHV9f$+$i%a%C%;!<%8%X%C%@!<$H(B URL $B$rF@$kO"A[%j%9%H$r:n@.$9$k4X?t!#(B
-
-@item search
-$B8!:w%(%s%8%s$K8!:wJ8;zNs$rAw$k4X?t!#(B
-
-@item address
-$BA0=R$N4X?t$,8!:wJ8;zNs$rAw$k$Y$-%"%I%l%9!#(B
-
-@item id
-@code{Message-ID} $B$r$b$H$K5-;v$r<hF@$9$k$?$a$N(B URL $B7A<0J8;zNs!#(B
-@end table
-
-@end table
-
-
-
 @node Mail-To-News Gateways
 @subsection $B%a!<%k$+$i%K%e!<%9$X$N%2!<%H%&%'%$(B
 @cindex mail-to-news gateways
@@ -11982,14 +12315,13 @@ To: alt-religion-emacs@@GATEWAY
 
 
 
-@c TRANSLATEME
 @node IMAP
-@subsection IMAP
+@subsection @sc{imap}
 @cindex nnimap
-@cindex IMAP
+@cindex @sc{imap}
 
-IMAP is a network protocol for reading mail (or news, or ...), think of
-it as a modernized NNTP. Connecting to a IMAP server is much similar to
+@sc{imap} is a network protocol for reading mail (or news, or ...), think of
+it as a modernized @sc{nntp}. Connecting to a @sc{imap} server is much similar to
 connecting to a news server, you just specify the network address of the
 server.
 
@@ -12001,7 +12333,7 @@ server:
 @item nnimap-address
 @vindex nnimap-address
 
-The address of the remote IMAP server. Defaults to the virtual server
+The address of the remote @sc{imap} server. Defaults to the virtual server
 name if not specified.
 
 @item nnimap-server-port
@@ -12012,7 +12344,7 @@ Port on server to contact. Defaults to port 143, or 993 for SSL.
 @vindex nnimap-list-pattern
 String or list of strings of mailboxes to limit available groups
 to. This is used when the server has very many mailboxes and you're only
-interested in a few -- some servers export your home directory via IMAP,
+interested in a few -- some servers export your home directory via @sc{imap},
 you'll probably want to limit the mailboxes to those in @file{~/Mail/*}
 then.
 
@@ -12061,8 +12393,8 @@ use the most secure authenticator your server is capable of.
 @item nnimap-expunge-on-close
 @cindex Expunging
 @vindex nnimap-expunge-on-close
-Unlike Parmenides the IMAP designers has decided that things that
-doesn't exist actually does exist. More specifically, IMAP has this
+Unlike Parmenides the @sc{imap} designers has decided that things that
+doesn't exist actually does exist. More specifically, @sc{imap} has this
 concept of marking articles @code{Deleted} which doesn't actually delete
 them, and this (marking them @code{Deleted}, that is) is what nnimap
 does when you delete a article in Gnus (with @kbd{G DEL} or similair).
@@ -12084,7 +12416,7 @@ The default behaviour, delete all articles marked as "Deleted" when
 closing a mailbox.
 @item never
 Never actually delete articles. Currently there is no way of showing the
-articles marked for deletion in nnimap, but other IMAP clients may allow
+articles marked for deletion in nnimap, but other @sc{imap} clients may allow
 you to do this. If you ever want to run the EXPUNGE command manually,
 @xref{Expunging mailboxes}.
 @item ask
@@ -12103,13 +12435,13 @@ articles or not.
 
 
 @node Splitting in IMAP
-@subsubsection Splitting in IMAP
+@subsubsection Splitting in @sc{imap}
 @cindex splitting imap mail
 
 Splitting is something Gnus users has loved and used for years, and now
-the rest of the world is catching up. Yeah, dream on, not many IMAP
+the rest of the world is catching up. Yeah, dream on, not many @sc{imap}
 server has server side splitting and those that have splitting seem to
-use some non-standard protocol. This means that IMAP support for Gnus
+use some non-standard protocol. This means that @sc{imap} support for Gnus
 has to do it's own splitting.
 
 And it does.
@@ -12133,7 +12465,7 @@ Nnmail equivalent: @code{nnmail-crosspost}.
 @cindex inbox
 @vindex nnimap-split-inbox
 
-A string or a list of strings that gives the name(s) of IMAP mailboxes
+A string or a list of strings that gives the name(s) of @sc{imap} mailboxes
 to split from. Defaults to nil, which means that splitting is disabled!
 
 @lisp
@@ -12150,7 +12482,7 @@ New mail found in @code{nnimap-split-inbox} will be split according to
 this variable.
 
 This variable contains a list of lists, where the first element in the
-sublist gives the name of the IMAP mailbox to move articles matching the
+sublist gives the name of the @sc{imap} mailbox to move articles matching the
 regexp in the second element in the sublist. Got that? Neither did I, we
 need examples.
 
@@ -12170,7 +12502,7 @@ replace-match to insert sub-expressions from the matched text. For
 instance:
 
 @lisp
-          ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@")
+("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
 @end lisp
 
 The second element can also be a function. In that case, it will be
@@ -12196,15 +12528,15 @@ Nnmail equivalent: @code{nnmail-split-methods}.
 @end table
 
 @node Editing IMAP ACLs
-@subsubsection Editing IMAP ACLs
+@subsubsection Editing @sc{imap} ACLs
 @cindex editing imap acls
 @cindex Access Control Lists
-@cindex Editing IMAP ACLs
+@cindex Editing @sc{imap} ACLs
 @kindex G l
 @findex gnus-group-nnimap-edit-acl
 
-ACL stands for Access Control List.  ACLs are used in IMAP for limiting
-(or enabling) other users access to your mail boxes. Not all IMAP
+ACL stands for Access Control List.  ACLs are used in @sc{imap} for limiting
+(or enabling) other users access to your mail boxes. Not all @sc{imap}
 servers support this, this function will give an error if it doesn't.
 
 To edit a ACL for a mailbox, type @kbd{G l}
@@ -12221,7 +12553,7 @@ follow the list without subscribing to it.
 @item
 At least with the Cyrus server, you are required to give the user
 "anyone" posting ("p") capabilities to have "plussing" work (that is,
-mail sent to user+mailbox@@domain ending up in the IMAP mailbox
+mail sent to user+mailbox@@domain ending up in the @sc{imap} mailbox
 INBOX.mailbox).
 @end itemize
 
@@ -13104,7 +13436,7 @@ Gnus $B%(!<%8%'%s%H$,%U%!%$%k$r3JG<$9$k>l=j!#=i4|@_DjCM$O(B
 
 @lisp
 ;;; Gnus $B$,$I$N$h$&$K%K%e!<%9$r<hF@$9$k$+$rDj5A$9$k!#$3$3$G$O(B
-;;; ISP $B$N%5!<%P!<$+$i(B NNTP $B$G<h$C$F$/$k$3$H$K$9$k!#(B
+;;; ISP $B$N%5!<%P!<$+$i(B @sc{nntp} $B$G<h$C$F$/$k$3$H$K$9$k!#(B
 (setq gnus-select-method '(nntp "news.your-isp.com"))
 
 ;;; Gnus $B$,$I$N$h$&$K%a!<%k$rFI$`$+$rDj5A$9$k!#(BISP $B$N(B POP $B%5!<%P!<(B
@@ -13883,9 +14215,9 @@ Date ($BF|IU(B) $B%X%C%@!<$K$O(B3$B$D$N$J$s$H$J$/$P$+$2$F$$$k9gCW$N7?$,$"$j
 
 @item Thread
 $B$3$N9gCW%-!<$O(B @code{Followup} $B9gCW%-!<$HF1$89T$KF0:n$7$^$9!#(B
-@code{Message-ID} @var{X} $B$G;O$^$C$F$$$k(B ($BI{(B)$B%9%l%C%I$K%9%3%"$rIU$1$?$$(B
+@code{Message-ID} @var{x} $B$G;O$^$C$F$$$k(B ($BI{(B)$B%9%l%C%I$K%9%3%"$rIU$1$?$$(B
 $B$N$G$"$l$P!"(B@samp{thread} $B9gCW$rIU$12C$($^$9!#$3$l$O(B @code{Reference} $B%X%C(B
-$B%@!<$K(B @var{X} $B$r;}$D$=$l$>$l$N5-;v$K?7$7$$(B @samp{thread} $B9gCW$rDI2C$7$^(B
+$B%@!<$K(B @var{x} $B$r;}$D$=$l$>$l$N5-;v$K?7$7$$(B @samp{thread} $B9gCW$rDI2C$7$^(B
 $B$9!#(B ($B$3$l$i$N?7$7$$(B @samp{thread} $B9gCW$O$3$l$i$N9gCW$9$k5-;v$N(B
 @code{Message-ID} $B$r;H$$$^$9!#(B) $B$3$l$O%9%l%C%I$N$$$/$D$+$N5-;v$,40A4$J(B
 @code{References} $B%X%C%@!<$r;}$C$F$$$J$+$C$?$H$7$F$b!"%9%l%C%IA4BN$N%9%3(B
@@ -14218,8 +14550,8 @@ gnus $B$O%0%k!<%WL>$NA4$F$N8l$K$D$$$F!"C18lE,1~@-%9%3%"$r$7$^$;$s!#$[$H$s(B
 
 @enumerate
 @item
-@var{(regexp file-name)}$B!#(B@var{regexp} $B$,%0%k!<%WL>$K%^%C%A$9$l(B
-$B$P!"(B@var{file-name} $B$,%[!<%`%9%3%"%U%!%$%k$H$7$F;HMQ$5$l$^$9!#(B
+@code{(@var{regexp} @var{file-name})}$B!#(B@var{regexp} $B$,%0%k!<%WL>$K%^%C%A(B
+$B$9$l$P!"(B@var{file-name} $B$,%[!<%`%9%3%"%U%!%$%k$H$7$F;HMQ$5$l$^$9!#(B
 
 @item
 $B4X?t!#$3$N4X?t$,(B @code{nil} $B0J30$rJV$;$P!"$=$NJV5QCM$,%[!<%`%9%3(B
@@ -14849,7 +15181,7 @@ bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B9000$B$G$9!#(B
 
 @item !
 @itemx not
-@itemx \254
+@itemx ¬
 $B$3$NO@M}:nMQ;R$OC10l$N0z?t$N$_$r$H$j$^$9!#$=$l$O$=$N0z?t$NCM$NO@M}H]Dj$r(B
 $BJV$7$^$9!#(B
 
@@ -15994,10 +16326,10 @@ Richard E. Depew --- $B%"%a%j%+$NC1FHH?%9%Q%`2H!#<g$KHs%P%$%J%j%0(B
 $B%@!<$,$D$$$F$*$j!"$3$l$O$=$N%a%C%;!<%8$N87L)$JDj5A$rM?$($F$$$^$9(B($BB?>/$O(B
 $B87L)$J!"DxEY$M!#$?$$$F$$$O>/$@$1$I(B)$B!#NI$/;H$o$l$k<oJL$K$O!"(B@samp{spam}$B!"(B
 @samp{spew}$B!"(B @samp{mmf}$B!"(B@samp{binary}$B!"(B@samp{troll} $B$,$"$j$^$9!#$3$l$r(B
-$B;XDj$9$k$K$O!"%j%9%H$NCf$G(B @var{($BH/9T<T(B $B>r7o(B ...)} $BMWAG$r;H$&I,MW$,$"$j(B
-$B$^$9!#3F>r7o$OJ8;zNs(B ($B;H$$$?$$<oJL$K%^%C%A$9$k@55,I=8=(B) $B$+!"$^$?$O(B
-@code{(not $BJ8;zNs(B)} $B$H$$$&7A<0$N%j%9%H$G$9!#$3$N>l9g$O(B @var{$BJ8;zNs(B} $B$O;H(B
-$B$$$?$/$J$$<oJL$K%^%C%A$9$k@55,I=8=$G$9!#(B
+$B;XDj$9$k$K$O!"%j%9%H$NCf$G(B @code{(@var{$BH/9T<T(B} @var{$B>r7o(B} @dots{})} $BMWAG(B
+$B$r;H$&I,MW$,$"$j$^$9!#3F>r7o$OJ8;zNs(B ($B;H$$$?$$<oJL$K%^%C%A$9$k@55,I=8=(B) 
+$B$+!"$^$?$O(B @code{(not @var{$BJ8;zNs(B})} $B$H$$$&7A<0$N%j%9%H$G$9!#$3$N>l9g$O(B
+@var{$BJ8;zNs(B} $B$O;H$$$?$/$J$$<oJL$K%^%C%A$9$k@55,I=8=$G$9!#(B
 
 $BNc$($P!"(BChris Lewis $B$+$i$N(B NoCeM $B%a%C%;!<%8$G!"(B@samp{troll} $B%a%C(B
 $B%;!<%80J30$NA4$F$rM_$7$$>l9g$K$O!"(B
@@ -16862,6 +17194,7 @@ but at the common table.@*
 
 @menu
 * History::                        $B$I$&$d$C$F(B gnus $B$,:#F|$N$h$&$K$J$C$?$+!#(B
+* On Writing Manuals::             Why this is not a beginner's guide.
 * Terminology::                    $B2f!9$OK\Ev$KFq$7$$!"8l$N$h$&$J8l$r;H$&!#(B
 * Customization::                  $B$"$J$?$NMW5a$K1h$C$F(B gnus $B$r;EN)$F$k!#(B
 * Troubleshooting::                $B>e<j$/9T$+$J$+$C$?$H$-$K;n$9$+$b$7$l$J$$;v!#(B
@@ -17161,6 +17494,12 @@ Micro$oft---$B$"$!!#%"%^%A%e%"!#;d$O(B @emph{$B$b$C$H(B} $B0-$$!#(B ($B$b
 $BG_ED(B $B@/?.(B---$B85$N(B @sc{gnus} $B$r=q$$$??M$G$9!#(B
 
 @item
+Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el, webmail.el,
+nnwarchive and many, many other things connected with @sc{mime} and
+other types of en/decoding, as well as general bug fixing, new
+functionality and stuff.
+
+@item
 Per Abrahamsen--custom$B!"%9%3%"!"%O%$%i%$%H$H(B @sc{soup} $B%3!<%I(B ($BB>$NB?$/(B
 $B$N;v$H6&$K(B)$B!#(B
 
@@ -17169,10 +17508,6 @@ Luis Fernandes---$B%G%6%$%s$H%0%i%U%#%C%/!#(B
 
 @item
 Erik Naggum---$B1g=u!"9M$(!"%5%]!<%H!"%3!<%I$H$=$NB>!#(B
-
-@item
-Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el $B$H(B @sc{mime} $B$HB>$NId9f(B
-$B2=I|9f2=$K4X$9$kB?$/$N$b$N!#(B
 
 @item
 Wes Hardaker---@file{gnus-picon.el} $B$H(B @dfn{picon} $B$NItJ,$N%^%K%e%"%k(B
@@ -17938,9 +18273,9 @@ Commands})$B!#(B
 Process Marks})$B!#(B
 
 @item
-$B?7$7$$%a!<%k$+$i%K%e!<%9$X$N%P%C%/%(%s%I$,(B NNTP $B%5!<%P!<$,Ej9F$r5v2D$7$F(B
-$B$$$J$$>l9g$G$b!"Ej9F$G$-$k$h$&$K$J$j$^$7$?(B (@pxref{Mail-To-News
-Gateways})$B!#(B
+$B?7$7$$%a!<%k$+$i%K%e!<%9$X$N%P%C%/%(%s%I$,(B @sc{nntp} $B%5!<%P!<$,Ej9F$r(B
+$B5v2D$7$F$$$J$$>l9g$G$b!"Ej9F$G$-$k$h$&$K$J$j$^$7$?(B 
+(@pxref{Mail-To-News Gateways})$B!#(B
 
 @item
 $B%&%'%V8!:w%(%s%8%s(B (@dfn{DejaNews}$B!"(B@dfn{Alta Vista}$B!"(B@dfn{InReference})
@@ -19248,7 +19583,7 @@ New limit command---limit to articles that have a certain string
 in the head or body.
 
 @item
-Allow breaking lengthy NNTP commands.
+Allow breaking lengthy @sc{nntp} commands.
 
 @item
 gnus-article-highlight-limit, to disable highlighting in big articles.
@@ -19317,16 +19652,8 @@ Crossposted articles should "inherit" the % or @ mark from the other
 groups it has been crossposted to, or something.  (Agent.)
 
 @item
-`S D r' should allow expansion of aliases.
-
-@item
 If point is on a group that appears multiple times in topics, and
 you press `l', point will move to the first instance of the group.
-
-@item
-Fetch by Message-ID from dejanews.
-
-<URL:http://search.dejanews.com/msgid.xp?MID=%3C62h9l9$hm4@@basement.replay.com%3E&fmt=raw>
 
 @item
 A spec for the group line format to display the number of
@@ -19378,6 +19705,19 @@ Allow "orphan" scores in the Agent scoring.
     --> the old subject line appears in Summary buffer, not the one that was
     just changed to.
 @end example
+
+
+@item
+Remove list identifiers from the subject in the summary when doing `^'
+and the like.
+
+@item
+Have the Agent write out articles, one by one, as it retrieves them,
+to avoid having to re-fetch them all if Emacs should crash while
+fetching. 
+
+@item
+Be able to forward groups of messages as MIME digests.
 
 @item
 Solve the halting problem.
@@ -19441,6 +19781,26 @@ Solve the halting problem.
 @end iflatex
 
 @end iftex
+
+
+@node On Writing Manuals
+@section On Writing Manuals
+
+I guess most manuals are written after-the-fact; documenting a program
+that's already there.  This is not how this manual is written.  When
+implementing something, I write the manual entry for that something
+straight away.  I then see that it's difficult to explain the
+functionality, so I write how it's supposed to be, and then I change the 
+implementation.  Writing the documentation and writing the code goes
+hand in hand.
+
+This, of course, means that this manual has no, or little, flow.  It
+documents absolutely everything in Gnus, but often not where you're
+looking for it.  It is a reference manual, and not a guide to how to get 
+started with Gnus.
+
+That would be a totally different book, that should be written using the 
+reference manual as source material.  It would look quite differently.
 
 
 @page
@@ -20205,7 +20565,7 @@ gnus $B$,K\Ev$N%0%k!<%W$H5-;vHV9f$rCN$k$3$H$,$G$-$k$h$&$K$J$k$G$7$g(B
 @var{group} $B$N%G!<%?$r<hF@$7$^$9!#$3$N4X?t$O!"(B@var{group} $B$r8=:_(B
 $B$N%0%k!<%W$K$9$k!"$H$$$&I{:nMQ$b$"$j$^$9!#(B
 
-@var{FAST} $B$,$"$l$P!"JXMx$J%G!<%?$rJV$9LLE]$r9T$J$o$:$K!"C1$K(B
+@var{fast} $B$,$"$l$P!"JXMx$J%G!<%?$rJV$9LLE]$r9T$J$o$:$K!"C1$K(B
 @var{group} $B$r8=:_$N%0%k!<%W$K$7$^$9!#(B
 
 $B$3$l$,7k2L$N%G!<%?$NNc$H!"$=$l$NDj5A$G$9!#(B
@@ -20331,8 +20691,8 @@ Gnus $B%0%k!<%W>pJs(B (@pxref{Group Info}) $B$,JQ992U=j$H$7$F%P%C%/%((B
 
 $B5-;v$N0u$r@_Dj(B/$B>C5n(B/$BDI2C$7$^$9!#IaDL$O(B gnus $B$O5-;v$N0u(B ($B4{FI!"2D;k!";~8B(B
 $B>C5n$J$I(B) $B$rFbIt$G07$$!"(B@code{~/.newsrc.eld} $B$KJ]B8$7$^$9!#$7$+$7!"%P%C(B
-$B%/%(%s%I$K$O(B (IMAP $B$N$h$&$K(B) $B5-;v$NA4$F$N>pJs$r%5!<%P!<$K<}$a$k$N$G!"(B
-gnus $B$O0u$N>pJs$r%5!<%P!<$KEAC#$7$J$1$l$P$J$i$J$$$b$N$,$"$j$^$9!#(B
+$B%/%(%s%I$K$O(B (@sc{imap} $B$N$h$&$K(B) $B5-;v$NA4$F$N>pJs$r%5!<%P!<$K<}$a$k$N(B
+$B$G!"(Bgnus $B$O0u$N>pJs$r%5!<%P!<$KEAC#$7$J$1$l$P$J$i$J$$$b$N$,$"$j$^$9!#(B
 
 ACTION $B$O$3$N$h$&$JMM<0$N0u@_Dj$NMW5a$N%j%9%H$G$9(B:
 

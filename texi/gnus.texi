@@ -1,4 +1,4 @@
-@c \input texinfo                  @c -*-texinfo-*-
+\input texinfo                  @c -*-texinfo-*-  -*- coding: iso-latin-1 -*-
 
 @setfilename gnus
 @settitle T-gnus 6.13 Manual
@@ -729,6 +729,22 @@ to will be subscribed hierarchically.
 @vindex gnus-subscribe-killed
 Kill all new groups.
 
+@item gnus-subscribe-topics
+@vindex gnus-subscribe-topics
+Put the groups into the topic that has a matching @code{subscribe} topic 
+parameter (@pxref{Topic Parameters}).  For instance, a @code{subscribe}
+topic parameter that looks like
+
+@example
+"nnslashdot"
+@end example
+
+will mean that all groups that match that regex will be subscribed under 
+that topic.
+
+If no topics match the groups, the groups will be subscribed in the
+top-level topic.
+
 @end table
 
 @vindex gnus-subscribe-hierarchical-interactive
@@ -1296,7 +1312,7 @@ The native select method.
 @vindex gnus-group-highlight
 Highlighting in the group buffer is controlled by the
 @code{gnus-group-highlight} variable.  This is an alist with elements
-that look like @var{(form . face)}.  If @var{form} evaluates to
+that look like @code{(@var{form} . @var{face})}.  If @var{form} evaluates to
 something non-@code{nil}, the @var{face} will be used on the line.
 
 Here's an example value for this variable that might look nice if the
@@ -1454,7 +1470,7 @@ this command, gnus will offer to fetch all the old articles in this
 group from the server.  If you give a numerical prefix @var{N}, @var{N}
 determines the number of articles gnus will fetch.  If @var{N} is
 positive, gnus fetches the @var{N} newest articles, if @var{N} is
-negative, gnus fetches the @var{abs(N)} oldest articles.
+negative, Gnus fetches the @code{abs(@var{N})} oldest articles.
 
 @item RET
 @kindex RET (Group)
@@ -2171,7 +2187,7 @@ Elements that look like @code{(charset . iso-8859-1)} will make
 @code{iso-8859-1} the default charset; that is, the charset that will be
 used for all articles that do not specify a charset.
 
-@item @var{(variable form)}
+@item (@var{variable} @var{form})
 You can use the group parameters to set variables local to the group you
 are entering.  If you want to turn threading off in @samp{news.answers},
 you could put @code{(gnus-show-threads nil)} in the group parameters of
@@ -2959,6 +2975,18 @@ All groups in a topic will inherit group parameters from the parent (and
 ancestor) topic parameters.  All valid group parameters are valid topic
 parameters (@pxref{Group Parameters}).
 
+In addition, the following parameters are only valid as topic
+parameters:
+
+@table @code
+@item subscribe
+When subscribing new groups by topic (@pxref{Subscription Methods}), the 
+@code{subscribe} topic parameter says what groups go in what topic.  Its 
+value should be a regexp to match the groups that should go in that
+topic. 
+
+@end table
+
 Group parameters (of course) override topic parameters, and topic
 parameters in sub-topics override topic parameters in super-topics.  You
 know.  Normal inheritance rules.  (@dfn{Rules} is here a noun, not a
@@ -3264,7 +3292,6 @@ You can have as many summary buffers open as you wish.
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
-* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -3610,15 +3637,16 @@ highlight the current article in the summary buffer.
 @item gnus-summary-highlight
 @vindex gnus-summary-highlight
 Summary lines are highlighted according to this variable, which is a
-list where the elements are of the format @var{(FORM . FACE)}.  If you
-would, for instance, like ticked articles to be italic and high-scored
-articles to be bold, you could set this variable to something like
+list where the elements are of the format @code{(@var{form}
+. @var{face})}.  If you would, for instance, like ticked articles to be
+italic and high-scored articles to be bold, you could set this variable
+to something like
 @lisp
 (((eq mark gnus-ticked-mark) . italic)
  ((> score default) . bold))
 @end lisp
-As you may have guessed, if @var{FORM} returns a non-@code{nil} value,
-@var{FACE} will be applied to the line.
+As you may have guessed, if @var{form} returns a non-@code{nil} value,
+@var{face} will be applied to the line.
 @end table
 
 
@@ -3931,8 +3959,10 @@ Select the article buffer (@code{gnus-summary-select-article-buffer}).
 @section Reply, Followup and Post
 
 @menu
-* Summary Mail Commands::            Sending mail.
-* Summary Post Commands::            Sending news.
+* Summary Mail Commands::       Sending mail.
+* Summary Post Commands::       Sending news.
+* Summary Message Commands::    Other Message-related commands.
+* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
 @end menu
 
 
@@ -4134,8 +4164,23 @@ Uuencode a file, split it into parts, and post it as a series
 Also @pxref{(message)Header Commands} for more information.
 
 
+@node Summary Message Commands
+@subsection Summary Message Commands
+
+@table @kbd
+@item S y
+@kindex S y (Summary)
+@findex gnus-summary-yank-message
+Yank the current article into an already existing Message composition
+buffer (@code{gnus-summary-yank-message}).  This command prompts for
+what message buffer you want to yank into, and understands the
+process/prefix convention (@pxref{Process/Prefix}).
+
+@end table
+
+
 @node Canceling and Superseding
-@section Canceling Articles
+@subsection Canceling Articles
 @cindex canceling articles
 @cindex superseding articles
 
@@ -4299,7 +4344,7 @@ Canceled article (@code{gnus-canceled-mark})
 
 @item F
 @vindex gnus-souped-mark
-@sc{SOUP}ed article (@code{gnus-souped-mark}).  @xref{SOUP}.
+@sc{soup}ed article (@code{gnus-souped-mark}).  @xref{SOUP}.
 
 @item Q
 @vindex gnus-sparse-mark
@@ -6357,8 +6402,9 @@ text, the signature, and adds buttons to the body and the head.
 @vindex gnus-header-face-alist
 Highlight the headers (@code{gnus-article-highlight-headers}).  The
 highlighting will be done according to the @code{gnus-header-face-alist}
-variable, which is a list where each element has the form @var{(regexp
-name content)}.  @var{regexp} is a regular expression for matching the
+variable, which is a list where each element has the form
+@code{(@var{regexp} @var{name} @var{content})}.
+@var{regexp} is a regular expression for matching the
 header, @var{name} is the face used for highlighting the header name
 (@pxref{Faces and Fonts}) and @var{content} is the face for highlighting
 the header value.  The first match made will be used.  Note that
@@ -6588,6 +6634,10 @@ Hide @sc{pem} (privacy enhanced messages) cruft
 @item W W B
 @kindex W W B (Summary)
 @findex gnus-article-strip-banner
+@cindex banner
+@cindex OneList
+@cindex stripping advertisments
+@cindex advertisments
 Strip the banner specified by the @code{banner} group parameter
 (@code{gnus-article-strip-banner}).  This is mainly used to hide those
 annoying banners and/or signatures that some mailing lists and moderated
@@ -6930,7 +6980,7 @@ used to say what headers to apply the buttonize coding to:
 (HEADER REGEXP BUTTON-PAR USE-P FUNCTION DATA-PAR)
 @end lisp
 
-@var{HEADER} is a regular expression.
+@var{header} is a regular expression.
 
 @item gnus-button-url-regexp
 @vindex gnus-button-url-regexp
@@ -7111,7 +7161,51 @@ Translate the article from one language to another
 @section @sc{mime} Commands
 @cindex MIME decoding
 
+The following commands all understand the numerical prefix.  For
+instance, @kbd{3 b} means ``view the third @sc{mime} part''.
+
 @table @kbd
+@item b
+@itemx K b
+@kindex b (Summary)
+@kindex K b (Summary)
+View the @sc{mime} part.
+
+@item K o
+@kindex K o (Summary)
+Save the @sc{mime} part.
+
+@item K c
+@kindex K c (Summary)
+Copy the @sc{mime} part.
+
+@item K e
+@kindex K e (Summary)
+View the @sc{mime} part externally.
+
+@item K i
+@kindex K i (Summary)
+View the @sc{mime} part internally.
+
+@item K |
+@kindex K | (Summary)
+Pipe the @sc{mime} part to an external command.
+@end table
+
+The rest of these @sc{mime} commands do not use the numerical prefix in
+the same manner:
+
+@table @kbd
+@item K b
+@kindex K b (Summary)
+Make all the @sc{mime} parts have buttons in from of them.
+
+@item K m
+@kindex K m (Summary)
+Some multipart messages are transmitted with missing or faulty headers.
+This command will attempt to ``repair'' these messages so that they can
+be viewed in a more pleasant manner.
+
 @item X m
 @kindex X m (Summary)
 @findex gnus-summary-save-parts
@@ -7371,6 +7465,20 @@ would, perhaps, be best if the @sc{nntp} server you consult is the one
 updating the spool you are reading from, but that's not really
 necessary.
 
+It can also be a list of select methods, as well as the special symbol
+@code{current}, which means to use the current select method.  If it
+is a list, Gnus will try all the methods in the list until it finds a
+match.
+
+Here's an example setting that will first try the current method, and
+then ask Deja if that fails:
+
+@lisp
+(setq gnus-refer-article-method
+      '(current
+        (nnweb "refer" (nnweb-type dejanews))))
+@end lisp
+
 Most of the mail backends support fetching by @code{Message-ID}, but do
 not do a particularly excellent job at it.  That is, @code{nnmbox} and
 @code{nnbabyl} are able to locate articles from any groups, while
@@ -7558,8 +7666,8 @@ Variables related to the display are:
 @item gnus-tree-brackets
 @vindex gnus-tree-brackets
 This is used for differentiating between ``real'' articles and
-``sparse'' articles.  The format is @var{((real-open . real-close)
-(sparse-open . sparse-close) (dummy-open . dummy-close))}, and the
+``sparse'' articles.  The format is @code{((@var{real-open} . @var{real-close})
+(@var{sparse-open} . @var{sparse-close}) (@var{dummy-open} . @var{dummy-close}))}, and the
 default is @code{((?[ . ?]) (?( . ?)) (?@{ . ?@}) (?< . ?>))}.
 
 @item gnus-tree-parent-child-edges
@@ -8514,8 +8622,7 @@ You can, of course, write your own functions to be called from
 @code{gnus-part-display-hook}.  The functions are called narrowed to the
 part, and you can do anything you like, pretty much.  There is no
 information that you have to keep in the buffer---you can change
-everything.  However, you shouldn't delete any headers.  Instead make
-them invisible if you want to make them go away.
+everything.  
 
 
 @node Article Keymap
@@ -8883,8 +8990,7 @@ messages in one file per month:
 (setq gnus-message-archive-group
       '((if (message-news-p)
             "misc-news"
-          (concat "mail." (format-time-string
-                           "%Y-%m" (current-time))))))
+          (concat "mail." (format-time-string "%Y-%m")))))
 @end lisp
 
 (XEmacs 19.13 doesn't have @code{format-time-string}, so you'll have to
@@ -8964,15 +9070,17 @@ signature and the @samp{What me?} @code{Organization} header.
 
 The first element in each style is called the @code{match}.  If it's a
 string, then Gnus will try to regexp match it against the group name.
-If it's a function symbol, that function will be called with no
-arguments.  If it's a variable symbol, then the variable will be
+If it is the symbol @code{header}, then Gnus will look for header that
+match the next element in the match, and compare that to the last header
+in the match.  If it's a function symbol, that function will be called
+with no arguments.  If it's a variable symbol, then the variable will be
 referenced.  If it's a list, then that list will be @code{eval}ed.  In
 any case, if this returns a non-@code{nil} value, then the style is said
 to @dfn{match}.
 
 Each style may contain a arbitrary amount of @dfn{attributes}.  Each
-attribute consists of a @var{(name value)} pair.  The attribute name
-can be one of @code{signature}, @code{signature-file},
+attribute consists of a @code{(@var{name} . @var{value})} pair.  The
+attribute name can be one of @code{signature}, @code{signature-file},
 @code{organization}, @code{address}, @code{name} or @code{body}.  The
 attribute name can also be a string.  In that case, this will be used as
 a header name, and the value will be inserted in the headers of the
@@ -9008,6 +9116,8 @@ So here's a new example:
          (signature my-quote-randomizer))
         ((message-news-p)
          (signature my-news-signature))
+        ((header "From.*To" "larsi.*org")
+         (Organization "Somewhere, Inc."))
         ((posting-from-work-p)
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
@@ -9145,6 +9255,7 @@ The different methods all have their peculiarities, of course.
 * The Server Buffer::     Making and editing virtual servers.
 * Getting News::          Reading USENET news with Gnus.
 * Getting Mail::          Reading your personal mail with Gnus.
+* Browsing the Web::      Getting messages from a plethora of Web sources.
 * Other Sources::         Reading directories, files, SOUP packets.
 * Combined Groups::       Combining groups into one group.
 * Gnus Unplugged::        Reading news and mail offline.
@@ -9314,7 +9425,7 @@ backend, and the second is the @dfn{address}, or @dfn{name}, if you
 will.
 
 After these two elements, there may be an arbitrary number of
-@var{(variable form)} pairs.
+@code{(@var{variable} @var{form})} pairs.
 
 To go back to the first example---imagine that you want to read from
 port 15 on that machine.  This is what the select method should
@@ -9999,7 +10110,7 @@ need to save them because if we should need to read one again, they are
 archived somewhere else.
 
 Some people have local news groups which have only a handful of readers.
-These are transported via NNTP, and are therefore news.  But we may need
+These are transported via @sc{nntp}, and are therefore news.  But we may need
 to read and answer a large fraction of the messages very carefully in
 order to do our work.  And there may not be an archive, so we may need
 to save the interesting messages the same way we would personal mail.
@@ -10210,6 +10321,33 @@ Or using the default path:
 (file)
 @end lisp
 
+If the mail spool file is not located on the local machine, it's best to 
+use POP or @sc{imap} or the like to fetch the mail.  You can not you ange-ftp 
+file names here---it has no way to lock the mail spool while moving the
+mail.
+
+If it's impossible to set up a proper server, you can use ssh instead.
+
+@lisp
+(setq mail-sources
+      '((file :prescript "ssh host bin/getmail >%t")))
+@end lisp
+
+The @samp{getmail} script would look something like the following:
+
+@example
+#!/bin/sh
+#  getmail - move mail from spool to stdout
+#  flu@@iki.fi
+
+MOVEMAIL=/usr/lib/emacs/20.3/i386-redhat-linux/movemail
+TMP=~/Mail/tmp
+rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
+@end example
+
+Alter this script to fit find the @samp{movemail} you want to use.
+
+
 @item directory
 Get mail from several files in a directory.  This is typically used when
 you have procmail split the incoming mail into several files.
@@ -10364,28 +10502,28 @@ An example maildir mail source:
 @end lisp
 
 @item imap
-Get mail from a IMAP server. If you don't want to use IMAP as intended,
-as a network mail reading protocol, for some reason or other Gnus let
-you treat it similar to a POP server and fetches articles from a given
-IMAP mailbox.
+Get mail from a @sc{imap} server. If you don't want to use @sc{imap} as intended,
+as a network mail reading protocol (ie with nnimap), for some reason or
+other, Gnus let you treat it similar to a POP server and fetches
+articles from a given @sc{imap} mailbox.
 
 Keywords:
 
 @table @code
 @item :server
-The name of the IMAP server.  The default is taken from the
+The name of the @sc{imap} server.  The default is taken from the
 @code{MAILHOST} environment variable.
 
 @item :port
-The port number of the IMAP server.  The default is @samp{143}, or
+The port number of the @sc{imap} server.  The default is @samp{143}, or
 @samp{993} for SSL connections.
 
 @item :user
-The user name to give to the IMAP server.  The default is the login
+The user name to give to the @sc{imap} server.  The default is the login
 name.
 
 @item :password
-The password to give to the IMAP server.  If not specified, the user is
+The password to give to the @sc{imap} server.  If not specified, the user is
 prompted.
 
 @item :stream
@@ -10406,19 +10544,60 @@ which normally is the mailbox which receive incoming mail.
 @item :predicate
 The predicate used to find articles to fetch. The default, 
 @samp{UNSEEN UNDELETED}, is probably the best choice for most people,
-but if you sometimes peek in your mailbox with a IMAP client and mark
+but if you sometimes peek in your mailbox with a @sc{imap} client and mark
 some articles as read (or; SEEN) you might want to set this to
 @samp{nil}. Then all articles in the mailbox is fetched, no matter
 what. For a complete list of predicates, see RFC2060 §6.4.4.
 
+@item :fetchflag
+How to flag fetched articles on the server, the default @samp{\Deleted}
+will mark them as deleted, an alternative would be @samp{\Seen} which
+would simply mark them as read. Theese are the two most likely choices,
+but more flags are defined in RFC2060 §2.3.2.
+
+@item :dontexpunge
+If non-nil, don't remove all articles marked as deleted in the mailbox
+after finishing the fetch.
+
 @end table
 
-An example IMAP mail source:
+An example @sc{imap} mail source:
 
 @lisp
 (imap :server "mail.mycorp.com" :stream kerberos4)
 @end lisp
 
+@item webmail
+Get mail from a webmail server, such as www.hotmail.com, 
+mail.yahoo.com, and www.netaddress.com. 
+
+NOTE: Webmail largely depends on w3 (url) package, whose version of "WWW
+4.0pre.46 1999/10/01" or previous ones may not work.
+
+WARNING: Mails may lost. NO WARRANTY.
+
+Keywords:
+
+@table @code
+@item :subtype
+The type of the webmail server.  The default is @code{hotmail}. The
+alternatives are @code{yahoo}, @code{netaddress}.
+
+@item :user
+The user name to give to the webmail server.  The default is the login
+name.
+
+@item :password
+The password to give to the webmail server.  If not specified, the user is
+prompted.
+
+@end table
+
+An example webmail source:
+
+@lisp
+(webmail :subtype 'yahoo :user "user-name" :password "secret")
+@end lisp
 @end table
 
 
@@ -10615,51 +10794,54 @@ name.  Normal regexp match expansion will be done.  See below for
 examples.
 
 @item
-@var{(FIELD VALUE [- RESTRICT [- RESTRICT [...]]] SPLIT)}: If the split
-is a list, the first element of which is a string, then store the
-message as specified by SPLIT, if header FIELD (a regexp) contains VALUE
-(also a regexp).  If RESTRICT (yet another regexp) matches some string
-after FIELD and before the end of the matched VALUE, the SPLIT is
-ignored.  If none of the RESTRICT clauses match, SPLIT is processed.
+@code{(@var{field} @var{value} @code{[-} @var{restrict} @code{[-} @var{restrict} @code{[@dots{}]}@code{]]} 
+@var{split})}: If the split is a list, the first element of which is a
+string, then store the message as specified by @var{split}, if header
+@var{field} (a regexp) contains @var{value} (also a regexp).  If
+@var{restrict} (yet another regexp) matches some string after
+@var{field} and before the end of the matched @var{value}, the
+@var{split} is ignored.  If none of the @var{restrict} clauses match,
+@var{split} is processed.
 
 @item
-@var{(| SPLIT...)}: If the split is a list, and the first element is
-@code{|} (vertical bar), then process each SPLIT until one of them
-matches.  A SPLIT is said to match if it will cause the mail message to
-be stored in one or more groups.
+@code{(| @var{split}@dots{})}: If the split is a list, and the first
+element is @code{|} (vertical bar), then process each @var{split} until
+one of them matches.  A @var{split} is said to match if it will cause
+the mail message to be stored in one or more groups.
 
 @item
-@var{(& SPLIT...)}: If the split is a list, and the first element is
-@code{&}, then process all SPLITs in the list.
+@code{(& @var{split}@dots{})}: If the split is a list, and the first
+element is @code{&}, then process all @var{split}s in the list.
 
 @item
 @code{junk}: If the split is the symbol @code{junk}, then don't save
 this message. Use with extreme caution.
 
 @item
-@var{(: function arg1 arg2 ...)}:  If the split is a list, and the first
-element is @code{:}, then the second element will be called as a
-function with @var{args} given as arguments.  The function should return
-a SPLIT.
+@code{(: @var{function} @var{arg1} @var{arg2} @dots{})}:  If the split is
+a list, and the first element is @code{:}, then the second element will
+be called as a function with @var{args} given as arguments.  The
+function should return a @var{split}.
 
 @item
-@var{(! FUNC SPLIT)}: If the split is a list, and the first element
-is @code{!}, then SPLIT will be processed, and FUNC will be called as a
-function with the result of SPLIT as argument. FUNC should return a split.
+@code{(! @var{func} @var{split})}: If the split is a list, and the first
+element is @code{!}, then SPLIT will be processed, and FUNC will be
+called as a function with the result of SPLIT as argument. FUNC should
+return a split.
 
 @item
 @code{nil}: If the split is @code{nil}, it is ignored.
 
 @end enumerate
 
-In these splits, @var{FIELD} must match a complete field name.
-@var{VALUE} must match a complete word according to the fundamental mode
+In these splits, @var{field} must match a complete field name.
+@var{value} must match a complete word according to the fundamental mode
 syntax table.  You can use @code{.*} in the regexps to match partial
-field names or words.  In other words, all @var{VALUE}'s are wrapped in
+field names or words.  In other words, all @var{value}'s are wrapped in
 @samp{\<} and @samp{\>} pairs.
 
 @vindex nnmail-split-abbrev-alist
-@var{FIELD} and @var{VALUE} can also be lisp symbols, in that case they
+@var{field} and @var{value} can also be lisp symbols, in that case they
 are expanded as specified by the variable
 @code{nnmail-split-abbrev-alist}.  This is an alist of cons cells, where
 the @code{car} of a cell contains the key, and the @code{cdr} contains the associated
@@ -10707,11 +10889,11 @@ parameter to the list of additional addresses and it's done.  If you'd
 rather use a regular expression, set @var{split-regexp}.
 
 All these parameters in a group will be used to create an
-@code{nnmail-split-fancy} split, in which the @var{FIELD} is @samp{any},
-the @var{VALUE} is a single regular expression that matches
+@code{nnmail-split-fancy} split, in which the @var{field} is @samp{any},
+the @var{value} is a single regular expression that matches
 @var{to-list}, @var{to-address}, all of @var{extra-aliases} and all
-matches of @var{split-regexp}, and the @var{SPLIT} is the name of the
-group.  @var{RESTRICT}s are also supported: just set the
+matches of @var{split-regexp}, and the @var{split} is the name of the
+group.  @var{restrict}s are also supported: just set the
 @var{split-exclude} parameter to a list of regular expressions.
 
 If you can't get the right split to be generated using all these
@@ -10768,15 +10950,15 @@ splits like this:
 (: gnus-mlsplt-fancy GROUPS NO-CROSSPOST CATCH-ALL)
 @end lisp
 
-@var{GROUPS} may be a regular expression or a list of group names whose
+@var{groups} may be a regular expression or a list of group names whose
 parameters will be scanned to generate the output split.
-@var{NO-CROSSPOST} can be used to disable cross-posting; in this case, a
-single @code{|} split will be output.  @var{CATCH-ALL} may be the name
+@var{no-crosspost} can be used to disable cross-posting; in this case, a
+single @code{|} split will be output.  @var{catch-all} may be the name
 of a group to be used as the default catch-all group.  If
-@var{CATCH-ALL} is @code{nil}, or if @var{SPLIT-REGEXP} matches the
+@var{catch-all} is @code{nil}, or if @var{split-regexp} matches the
 empty string in any selected group, no catch-all split will be issued.
-Otherwise, if some group has @var{SPLIT-SPEC} set to @code{catch-all},
-this group will override the value of the @var{CATCH-ALL} argument.
+Otherwise, if some group has @var{split-spec} set to @code{catch-all},
+this group will override the value of the @var{catch-all} argument.
 
 @findex gnus-group-split-setup
 Unfortunately, scanning all groups and their parameters can be quite
@@ -10799,10 +10981,10 @@ you.  For example, add to your @file{.gnus}:
 (gnus-group-split-setup AUTO-UPDATE CATCH-ALL)
 @end lisp
 
-If @var{AUTO-UPDATE} is non-@code{nil}, @code{gnus-group-split-update}
+If @var{auto-update} is non-@code{nil}, @code{gnus-group-split-update}
 will be added to @code{nnmail-pre-get-new-mail-hook}, so you won't ever
 have to worry about updating @code{nnmail-split-fancy} again.  If you
-don't omit @var{CATCH-ALL} (it's optional),
+don't omit @var{catch-all} (it's optional),
 @code{gnus-group-split-default-catch-all-group} will be set to its
 value.
 
@@ -11430,9 +11612,9 @@ and so selection of a suitable backend is required in order to get that
 mail within spitting distance of Gnus.
 
 The same concept exists for Usenet itself: Though access to articles is
-typically done by NNTP these days, once upon a midnight dreary, everyone
+typically done by @sc{nntp} these days, once upon a midnight dreary, everyone
 in the world got at Usenet by running a reader on the machine where the
-articles lay (the machine which today we call an NNTP server), and
+articles lay (the machine which today we call an @sc{nntp} server), and
 access was by the reader stepping into the articles' directory spool
 area directly.  One can still select between either the @code{nntp} or
 @code{nnspool} backends, to select between these methods, if one happens
@@ -11541,6 +11723,289 @@ friendly mail backend all over.
 @end table
 
 
+@node Browsing the Web
+@section Browsing the Web
+@cindex web
+@cindex browsing the web
+@cindex www
+@cindex http
+
+Web-based discussion forums are getting more and more popular.  On many
+subjects, the web-based forums have become the most important forums,
+eclipsing the importance of mailing lists and news groups.  The reason
+is easy to understand---they are friendly to new users; you just point
+and click, and there's the discussion.  With mailing lists, you have to
+go through a cumbersome subscription procedure, and most people don't
+even know what a news group is.
+
+The problem with this scenario is that web browsers are not very good at 
+being newsreaders.  They do not keep track of what articles you've read; 
+they do not allow you to score on subjects you're interested in; they do 
+not allow off-line browsing; they require you to click around and drive
+you mad in the end.
+
+So---if web browsers suck at reading discussion forums, why not use Gnus 
+to do it instead?
+
+Gnus has been getting a bit of a collection of backends for providing
+interfaces to these sources.
+
+@menu
+* Web Searches::          Creating groups from articles that match a string.
+* Slashdot::              Reading the Slashdot comments.
+* Ultimate::              The Ultimate Bulletin Board systems.
+* Web Archive::           Reading mailing list archived on web.
+@end menu
+
+The main caveat with all these web sources is that they probably won't
+work for a very long time.  Gleaning information from the @sc{html} data 
+is guesswork at best, and when the layout is altered, the Gnus backend
+will fail.  If you have reasonably new versions of these backends,
+though, you should be ok.
+
+One thing all these Web methods have in common is that the Web sources
+are often down, unavailable or just plain too slow to be fun.  In those
+cases, it makes a lot of sense to let the Gnus Agent (@pxref{Gnus
+Unplugged}) handle downloading articles, and then you can read them at
+leisure from your local disk.  No more World Wide Wait for you.
+
+
+@node Web Searches
+@subsection Web Searches
+@cindex nnweb
+@cindex DejaNews
+@cindex Alta Vista
+@cindex InReference
+@cindex Usenet searches
+@cindex searching the Usenet
+
+It's, like, too neat to search the Usenet for articles that match a
+string, but it, like, totally @emph{sucks}, like, totally, to use one of
+those, like, Web browsers, and you, like, have to, rilly, like, look at
+the commercials, so, like, with Gnus you can do @emph{rad}, rilly,
+searches without having to use a browser.
+
+The @code{nnweb} backend allows an easy interface to the mighty search
+engine.  You create an @code{nnweb} group, enter a search pattern, and
+then enter the group and read the articles like you would any normal
+group.  The @kbd{G w} command in the group buffer (@pxref{Foreign
+Groups}) will do this in an easy-to-use fashion.
+
+@code{nnweb} groups don't really lend themselves to being solid
+groups---they have a very fleeting idea of article numbers.  In fact,
+each time you enter an @code{nnweb} group (not even changing the search
+pattern), you are likely to get the articles ordered in a different
+manner.  Not even using duplicate suppression (@pxref{Duplicate
+Suppression}) will help, since @code{nnweb} doesn't even know the
+@code{Message-ID} of the articles before reading them using some search
+engines (DejaNews, for instance).  The only possible way to keep track
+of which articles you've read is by scoring on the @code{Date}
+header---mark all articles posted before the last date you read the
+group as read.
+
+If the search engine changes its output substantially, @code{nnweb}
+won't be able to parse it and will fail.  One could hardly fault the Web
+providers if they were to do this---their @emph{raison d'être} is to
+make money off of advertisements, not to provide services to the
+community.  Since @code{nnweb} washes the ads off all the articles, one
+might think that the providers might be somewhat miffed.  We'll see.
+
+You must have the @code{url} and @code{w3} package installed to be able
+to use @code{nnweb}.
+
+Virtual server variables:
+
+@table @code
+@item nnweb-type
+@vindex nnweb-type
+What search engine type is being used.  The currently supported types
+are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
+@code{reference}.
+
+@item nnweb-search
+@vindex nnweb-search
+The search string to feed to the search engine.
+
+@item nnweb-max-hits
+@vindex nnweb-max-hits
+Advisory maximum number of hits per search to display.  The default is
+100.
+
+@item nnweb-type-definition
+@vindex nnweb-type-definition
+Type-to-definition alist.  This alist says what @code{nnweb} should do
+with the various search engine types.  The following elements must be
+present:
+
+@table @code
+@item article
+Function to decode the article and provide something that Gnus
+understands.
+
+@item map
+Function to create an article number to message header and URL alist.
+
+@item search
+Function to send the search string to the search engine.
+
+@item address
+The address the aforementioned function should send the search string
+to.
+
+@item id
+Format string URL to fetch an article by @code{Message-ID}.
+@end table
+
+@end table
+
+
+@node Slashdot
+@subsection Slashdot
+@cindex Slashdot
+@cindex nnslashdot
+
+Slashdot (@file{http://slashdot.org/}) is a popular news site, with
+lively discussion following the news articles.  @code{nnslashdot} will
+let you read this forum in a convenient manner.
+
+The easiest way to read this source is to put something like the
+following in your @file{.gnus.el} file:
+
+@lisp
+(setq gnus-secondary-select-methods
+      '((nnslashdot "")))
+@end lisp
+
+This will make Gnus query the @code{nnslashdot} backend for new comments
+and groups.  The @kbd{F} command will subscribe each new news article as
+a new Gnus group, and you can read the comments by entering these
+groups.  (Note that the default subscription method is to subscribe new
+groups as zombies.  Other methods are available (@pxref{Subscription
+Methods}).
+
+When following up to @code{nnslashdot} comments (or posting new
+comments), some light @sc{html}izations will be performed.  In
+particular, text quoted with @samp{> } will be quoted with
+@code{blockquote} instead, and signatures will have @code{br} added to
+the end of each line.  Other than that, you can just write @sc{html}
+directly into the message buffer.  Note that Slashdot filters out some
+@sc{html} forms.
+
+The following variables can be altered to change its behavior:
+
+@table @code
+@item nnslashdot-threaded
+Whether @code{nnslashdot} should display threaded groups or not.  The
+default is @code{t}.  To be able to display threads, @code{nnslashdot}
+has to retrieve absolutely all comments in a group upon entry.  If a
+threaded display is not required, @code{nnslashdot} will only retrieve
+the comments that are actually wanted by the user.  Threading is nicer,
+but much, much slower than untreaded.
+
+@item nnslashdot-login-name
+@vindex nnslashdot-login-name
+The login name to use when posting.
+
+@item nnslashdot-password
+@vindex nnslashdot-password
+The password to use when posting.
+
+@item nnslashdot-directory
+@vindex nnslashdot-directory
+Where @code{nnslashdot} will store its files.  The default value is
+@samp{~/News/slashdot/}.
+
+@item nnslashdot-active-url
+@vindex nnslashdot-active-url
+The @sc{url} format string that will be used to fetch the information on 
+news articles and comments.  The default is
+@samp{http://slashdot.org/search.pl?section=&min=%d}.
+
+@item nnslashdot-comments-url
+@vindex nnslashdot-comments-url
+The @sc{url} format string that will be used to fetch comments.  The
+default is
+@samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=%d&mode=flat&startat=%d}.
+
+@item nnslashdot-article-url
+@vindex nnslashdot-article-url
+The @sc{url} format string that will be used to fetch the news article.  The
+default is
+@samp{http://slashdot.org/article.pl?sid=%s&mode=nocomment}.
+
+@item nnslashdot-threshold
+@vindex nnslashdot-threshold
+The score threshold.  The default is -1.
+
+@item nnslashdot-group-number
+@vindex nnslashdot-group-number
+The number of old groups, in addition to the ten latest, to keep
+updated.  The default is 0.
+
+@end table
+
+
+
+@node Ultimate
+@subsection Ultimate
+@cindex nnultimate
+@cindex Ultimate Bulletin Board
+
+The Ultimate Bulletin Board (@file{http://www.ultimatebb.com/}) is
+probably the most popular Web bulletin board system used.  It has a
+quite regular and nice interface, and it's possible to get the
+information Gnus needs to keep groups updated.
+
+The easiest way to get started with @code{nnultimate} is to say
+something like the following in the group buffer:  @kbd{B nnultimate RET 
+http://www.tcj.com/messboard/ubbcgi/ RET}.  (Substitute the @sc{url}
+(not including @samp{Ultimate.cgi} or the like at the end) for a forum
+you're interested in; there's quite a list of them on the Ultimate web
+site.)  Then subscribe to the groups you're interested in from the
+server buffer, and read them from the group buffer.
+
+The following @code{nnultimate} variables can be altered:
+
+@table @code
+@item nnultimate-directory
+@vindex nnultimate-directory
+The directory where @code{nnultimate} stores its files.  The default is
+@samp{~/News/ultimate/}.
+@end table
+
+@node Web Archive
+@subsection Web Archive
+@cindex nnwarchive
+@cindex Web Archive
+
+Some mailing lists only have archives on Web servers, such as
+(@file{http://www.egroups.com/}). It has a quite regular and nice
+interface, and it's possible to get the information Gnus needs to keep
+groups updated.
+
+The easiest way to get started with @code{nnwarchive} is to say
+something like the following in the group buffer: @kbd{M-x
+gnus-group-make-nnwarchive-group RET an_egroup RET egroups RET
+www.egroups.com RET your@@email.address RET}.  (Substitute the
+@sc{an_egroup} with the mailing list you subscribed, the
+@sc{your@@email.address} with your email address.)
+
+The following @code{nnwarchive} variables can be altered:
+
+@table @code
+@item nnwarchive-directory
+@vindex nnwarchive-directory
+The directory where @code{nnwarchive} stores its files.  The default is
+@samp{~/News/warchive/}.
+
+@item nnwarchive-login
+@vindex nnwarchive-login
+The account name on the web server.
+
+@item nnwarchive-passwd
+@vindex nnwarchive-passwd
+The password for your account on the web server.
+@end table
 
 @node Other Sources
 @section Other Sources
@@ -11553,10 +12018,9 @@ newsgroups.
 * Directory Groups::      You can read a directory as if it was a newsgroup.
 * Anything Groups::       Dired?  Who needs dired?
 * Document Groups::       Single files can be the basis of a group.
-* SOUP::                  Reading @sc{SOUP} packets ``offline''.
-* Web Searches::          Creating groups from articles that match a string.
+* SOUP::                  Reading @sc{soup} packets ``offline''.
 * Mail-To-News Gateways:: Posting articles via mail-to-news gateways.
-* IMAP::                  Using Gnus as a IMAP client.
+* IMAP::                  Using Gnus as a @sc{imap} client.
 @end menu
 
 
@@ -11907,12 +12371,12 @@ of packets:
 @item message packets
 These are packets made at the server, and typically contain lots of
 messages for you to read.  These are called @file{SoupoutX.tgz} by
-default, where @var{X} is a number.
+default, where @var{x} is a number.
 
 @item response packets
 These are packets made at the home machine, and typically contains
 replies that you've written.  These are called @file{SoupinX.tgz} by
-default, where @var{X} is a number.
+default, where @var{x} is a number.
 
 @end table
 
@@ -12148,96 +12612,6 @@ system you just use the first line.  If you only want mail to be
 @sc{soup}ed you use the second.
 
 
-@node Web Searches
-@subsection Web Searches
-@cindex nnweb
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
-@cindex Usenet searches
-@cindex searching the Usenet
-
-It's, like, too neat to search the Usenet for articles that match a
-string, but it, like, totally @emph{sucks}, like, totally, to use one of
-those, like, Web browsers, and you, like, have to, rilly, like, look at
-the commercials, so, like, with Gnus you can do @emph{rad}, rilly,
-searches without having to use a browser.
-
-The @code{nnweb} backend allows an easy interface to the mighty search
-engine.  You create an @code{nnweb} group, enter a search pattern, and
-then enter the group and read the articles like you would any normal
-group.  The @kbd{G w} command in the group buffer (@pxref{Foreign
-Groups}) will do this in an easy-to-use fashion.
-
-@code{nnweb} groups don't really lend themselves to being solid
-groups---they have a very fleeting idea of article numbers.  In fact,
-each time you enter an @code{nnweb} group (not even changing the search
-pattern), you are likely to get the articles ordered in a different
-manner.  Not even using duplicate suppression (@pxref{Duplicate
-Suppression}) will help, since @code{nnweb} doesn't even know the
-@code{Message-ID} of the articles before reading them using some search
-engines (DejaNews, for instance).  The only possible way to keep track
-of which articles you've read is by scoring on the @code{Date}
-header---mark all articles posted before the last date you read the
-group as read.
-
-If the search engine changes its output substantially, @code{nnweb}
-won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'être} is to
-make money off of advertisements, not to provide services to the
-community.  Since @code{nnweb} washes the ads off all the articles, one
-might think that the providers might be somewhat miffed.  We'll see.
-
-You must have the @code{url} and @code{w3} package installed to be able
-to use @code{nnweb}.
-
-Virtual server variables:
-
-@table @code
-@item nnweb-type
-@vindex nnweb-type
-What search engine type is being used.  The currently supported types
-are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
-@code{reference}.
-
-@item nnweb-search
-@vindex nnweb-search
-The search string to feed to the search engine.
-
-@item nnweb-max-hits
-@vindex nnweb-max-hits
-Advisory maximum number of hits per search to display.  The default is
-100.
-
-@item nnweb-type-definition
-@vindex nnweb-type-definition
-Type-to-definition alist.  This alist says what @code{nnweb} should do
-with the various search engine types.  The following elements must be
-present:
-
-@table @code
-@item article
-Function to decode the article and provide something that Gnus
-understands.
-
-@item map
-Function to create an article number to message header and URL alist.
-
-@item search
-Function to send the search string to the search engine.
-
-@item address
-The address the aforementioned function should send the search string
-to.
-
-@item id
-Format string URL to fetch an article by @code{Message-ID}.
-@end table
-
-@end table
-
-
-
 @node Mail-To-News Gateways
 @subsection Mail-To-News Gateways
 @cindex mail-to-news gateways
@@ -12318,12 +12692,12 @@ So, to use this, simply say something like:
 
 
 @node IMAP
-@subsection IMAP
+@subsection @sc{imap}
 @cindex nnimap
-@cindex IMAP
+@cindex @sc{imap}
 
-IMAP is a network protocol for reading mail (or news, or ...), think of
-it as a modernized NNTP. Connecting to a IMAP server is much similar to
+@sc{imap} is a network protocol for reading mail (or news, or ...), think of
+it as a modernized @sc{nntp}. Connecting to a @sc{imap} server is much similar to
 connecting to a news server, you just specify the network address of the
 server.
 
@@ -12335,7 +12709,7 @@ server:
 @item nnimap-address
 @vindex nnimap-address
 
-The address of the remote IMAP server. Defaults to the virtual server
+The address of the remote @sc{imap} server. Defaults to the virtual server
 name if not specified.
 
 @item nnimap-server-port
@@ -12346,7 +12720,7 @@ Port on server to contact. Defaults to port 143, or 993 for SSL.
 @vindex nnimap-list-pattern
 String or list of strings of mailboxes to limit available groups
 to. This is used when the server has very many mailboxes and you're only
-interested in a few -- some servers export your home directory via IMAP,
+interested in a few -- some servers export your home directory via @sc{imap},
 you'll probably want to limit the mailboxes to those in @file{~/Mail/*}
 then.
 
@@ -12395,8 +12769,8 @@ use the most secure authenticator your server is capable of.
 @item nnimap-expunge-on-close
 @cindex Expunging
 @vindex nnimap-expunge-on-close
-Unlike Parmenides the IMAP designers has decided that things that
-doesn't exist actually does exist. More specifically, IMAP has this
+Unlike Parmenides the @sc{imap} designers has decided that things that
+doesn't exist actually does exist. More specifically, @sc{imap} has this
 concept of marking articles @code{Deleted} which doesn't actually delete
 them, and this (marking them @code{Deleted}, that is) is what nnimap
 does when you delete a article in Gnus (with @kbd{G DEL} or similair).
@@ -12418,7 +12792,7 @@ The default behaviour, delete all articles marked as "Deleted" when
 closing a mailbox.
 @item never
 Never actually delete articles. Currently there is no way of showing the
-articles marked for deletion in nnimap, but other IMAP clients may allow
+articles marked for deletion in nnimap, but other @sc{imap} clients may allow
 you to do this. If you ever want to run the EXPUNGE command manually,
 @xref{Expunging mailboxes}.
 @item ask
@@ -12437,13 +12811,13 @@ articles or not.
 
 
 @node Splitting in IMAP
-@subsubsection Splitting in IMAP
+@subsubsection Splitting in @sc{imap}
 @cindex splitting imap mail
 
 Splitting is something Gnus users has loved and used for years, and now
-the rest of the world is catching up. Yeah, dream on, not many IMAP
+the rest of the world is catching up. Yeah, dream on, not many @sc{imap}
 server has server side splitting and those that have splitting seem to
-use some non-standard protocol. This means that IMAP support for Gnus
+use some non-standard protocol. This means that @sc{imap} support for Gnus
 has to do it's own splitting.
 
 And it does.
@@ -12467,7 +12841,7 @@ Nnmail equivalent: @code{nnmail-crosspost}.
 @cindex inbox
 @vindex nnimap-split-inbox
 
-A string or a list of strings that gives the name(s) of IMAP mailboxes
+A string or a list of strings that gives the name(s) of @sc{imap} mailboxes
 to split from. Defaults to nil, which means that splitting is disabled!
 
 @lisp
@@ -12484,7 +12858,7 @@ New mail found in @code{nnimap-split-inbox} will be split according to
 this variable.
 
 This variable contains a list of lists, where the first element in the
-sublist gives the name of the IMAP mailbox to move articles matching the
+sublist gives the name of the @sc{imap} mailbox to move articles matching the
 regexp in the second element in the sublist. Got that? Neither did I, we
 need examples.
 
@@ -12504,7 +12878,7 @@ replace-match to insert sub-expressions from the matched text. For
 instance:
 
 @lisp
-          ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@")
+("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
 @end lisp
 
 The second element can also be a function. In that case, it will be
@@ -12530,15 +12904,15 @@ Nnmail equivalent: @code{nnmail-split-methods}.
 @end table
 
 @node Editing IMAP ACLs
-@subsubsection Editing IMAP ACLs
+@subsubsection Editing @sc{imap} ACLs
 @cindex editing imap acls
 @cindex Access Control Lists
-@cindex Editing IMAP ACLs
+@cindex Editing @sc{imap} ACLs
 @kindex G l
 @findex gnus-group-nnimap-edit-acl
 
-ACL stands for Access Control List.  ACLs are used in IMAP for limiting
-(or enabling) other users access to your mail boxes. Not all IMAP
+ACL stands for Access Control List.  ACLs are used in @sc{imap} for limiting
+(or enabling) other users access to your mail boxes. Not all @sc{imap}
 servers support this, this function will give an error if it doesn't.
 
 To edit a ACL for a mailbox, type @kbd{G l}
@@ -12555,7 +12929,7 @@ follow the list without subscribing to it.
 @item
 At least with the Cyrus server, you are required to give the user
 "anyone" posting ("p") capabilities to have "plussing" work (that is,
-mail sent to user+mailbox@@domain ending up in the IMAP mailbox
+mail sent to user+mailbox@@domain ending up in the @sc{imap} mailbox
 INBOX.mailbox).
 @end itemize
 
@@ -13431,7 +13805,7 @@ setup, you may be able to use something like the following as your
 @file{.gnus.el} file to get started.
 
 @lisp
-;;; Define how Gnus is to fetch news.  We do this over NNTP
+;;; Define how Gnus is to fetch news.  We do this over @sc{nntp}
 ;;; from your ISP's server.
 (setq gnus-select-method '(nntp "news.your-isp.com"))
 
@@ -14138,13 +14512,14 @@ files.)
 
 @item Thread
 This match key works along the same lines as the @code{Followup} match
-key.  If you say that you want to score on a (sub-)thread started by an article with a @code{Message-ID} @var{X}, then you add a
-@samp{thread} match.  This will add a new @samp{thread} match for each
-article that has @var{X} in its @code{References} header.  (These new
-@samp{thread} matches will use the @code{Message-ID}s of these matching
-articles.)  This will ensure that you can raise/lower the score of an
-entire thread, even though some articles in the thread may not have
-complete @code{References} headers.  Note that using this may lead to
+key.  If you say that you want to score on a (sub-)thread started by an
+article with a @code{Message-ID} @var{x}, then you add a @samp{thread}
+match.  This will add a new @samp{thread} match for each article that
+has @var{x} in its @code{References} header.  (These new @samp{thread}
+matches will use the @code{Message-ID}s of these matching articles.)
+This will ensure that you can raise/lower the score of an entire thread,
+even though some articles in the thread may not have complete
+@code{References} headers.  Note that using this may lead to
 undeterministic scores of the articles in the thread.  (Using this match
 key will lead to creation of @file{ADAPT} files.)
 @end table
@@ -14473,8 +14848,8 @@ A list.  The elements in this list can be:
 
 @enumerate
 @item
-@var{(regexp file-name)}.  If the @var{regexp} matches the group name,
-the @var{file-name} will will be used as the home score file.
+@code{(@var{regexp} @var{file-name})}.  If the @var{regexp} matches the
+group name, the @var{file-name} will will be used as the home score file.
 
 @item
 A function. If the function returns non-nil, the result will be used as
@@ -16265,10 +16640,10 @@ messages from the people you like.  Each NoCeM message has a @dfn{type}
 header that gives the message a (more or less, usually less) rigorous
 definition.  Common types are @samp{spam}, @samp{spew}, @samp{mmf},
 @samp{binary}, and @samp{troll}.  To specify this, you have to use
-@var{(issuer conditions ...)} elements in the list.  Each condition is
-either a string (which is a regexp that matches types you want to use)
-or a list on the form @code{(not STRING)}, where @var{string} is a
-regexp that matches types you don't want to use.
+@code{(@var{issuer} @var{conditions} @dots{})} elements in the list.
+Each condition is either a string (which is a regexp that matches types
+you want to use) or a list on the form @code{(not @var{string})}, where
+@var{string} is a regexp that matches types you don't want to use.
 
 For instance, if you want all NoCeM messages from Chris Lewis except his
 @samp{troll} messages, you'd say:
@@ -17076,6 +17451,7 @@ but at the common table.@*
 
 @menu
 * History::                        How Gnus got where it is today.
+* On Writing Manuals::             Why this is not a beginner's guide.
 * Terminology::                    We use really difficult, like, words here.
 * Customization::                  Tailoring Gnus to your needs.
 * Troubleshooting::                What you might try if things do not work.
@@ -17379,6 +17755,12 @@ wrong show.
 Masanobu @sc{Umeda}---the writer of the original @sc{gnus}.
 
 @item
+Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el, webmail.el,
+nnwarchive and many, many other things connected with @sc{mime} and
+other types of en/decoding, as well as general bug fixing, new
+functionality and stuff.
+
+@item
 Per Abrahamsen---custom, scoring, highlighting and @sc{soup} code (as
 well as numerous other things).
 
@@ -17387,10 +17769,6 @@ Luis Fernandes---design and graphics.
 
 @item
 Erik Naggum---help, ideas, support, code and stuff.
-
-@item
-Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el and many other things
-connected with @sc{mime} and other types of en/decoding.
 
 @item
 Wes Hardaker---@file{gnus-picon.el} and the manual section on
@@ -18155,7 +18533,7 @@ Process mark sets can be pushed and popped (@pxref{Setting Process
 Marks}).
 
 @item
-A new mail-to-news backend makes it possible to post even when the NNTP
+A new mail-to-news backend makes it possible to post even when the @sc{nntp}
 server doesn't allow posting (@pxref{Mail-To-News Gateways}).
 
 @item
@@ -19460,7 +19838,7 @@ New limit command---limit to articles that have a certain string
 in the head or body.
 
 @item
-Allow breaking lengthy NNTP commands.
+Allow breaking lengthy @sc{nntp} commands.
 
 @item
 gnus-article-highlight-limit, to disable highlighting in big articles.
@@ -19532,16 +19910,8 @@ Crossposted articles should "inherit" the % or @ mark from the other
 groups it has been crossposted to, or something.  (Agent.)
 
 @item
-`S D r' should allow expansion of aliases.
-
-@item
 If point is on a group that appears multiple times in topics, and
 you press `l', point will move to the first instance of the group.
-
-@item
-Fetch by Message-ID from dejanews.
-
-<URL:http://search.dejanews.com/msgid.xp?MID=%3C62h9l9$hm4@@basement.replay.com%3E&fmt=raw>
 
 @item
 A spec for the group line format to display the number of
@@ -19593,6 +19963,19 @@ Allow "orphan" scores in the Agent scoring.
     --> the old subject line appears in Summary buffer, not the one that was
     just changed to.
 @end example
+
+
+@item
+Remove list identifiers from the subject in the summary when doing `^'
+and the like.
+
+@item
+Have the Agent write out articles, one by one, as it retrieves them,
+to avoid having to re-fetch them all if Emacs should crash while
+fetching. 
+
+@item
+Be able to forward groups of messages as MIME digests.
 
 @item
 Solve the halting problem.
@@ -19662,6 +20045,26 @@ of the mysteries of this world, I guess.)
 @end iflatex
 
 @end iftex
+
+
+@node On Writing Manuals
+@section On Writing Manuals
+
+I guess most manuals are written after-the-fact; documenting a program
+that's already there.  This is not how this manual is written.  When
+implementing something, I write the manual entry for that something
+straight away.  I then see that it's difficult to explain the
+functionality, so I write how it's supposed to be, and then I change the 
+implementation.  Writing the documentation and writing the code goes
+hand in hand.
+
+This, of course, means that this manual has no, or little, flow.  It
+documents absolutely everything in Gnus, but often not where you're
+looking for it.  It is a reference manual, and not a guide to how to get 
+started with Gnus.
+
+That would be a totally different book, that should be written using the 
+reference manual as source material.  It would look quite differently.
 
 
 @page
@@ -20423,7 +20826,7 @@ on successful article retrieval.
 Get data on @var{group}.  This function also has the side effect of
 making @var{group} the current group.
 
-If @var{FAST}, don't bother to return useful data, just make @var{group}
+If @var{fast}, don't bother to return useful data, just make @var{group}
 the current group.
 
 Here's an example of some result data and a definition of the same:
@@ -20548,7 +20951,7 @@ There should be no result data from this function.
 
 Set/remove/add marks on articles. Normally Gnus handles the article
 marks (such as read, ticked, expired etc) internally, and store them in
-@code{~/.newsrc.eld}. Some backends (such as IMAP) however carry all
+@code{~/.newsrc.eld}. Some backends (such as @sc{imap}) however carry all
 information about the articles on the server, so Gnus need to propagate
 the mark information to the server.
 

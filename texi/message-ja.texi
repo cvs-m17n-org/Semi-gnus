@@ -420,6 +420,12 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 貼り付けます。普通は @code{gnus-article-copy} はあなたが返答しようとして
 いるメッセージです (@code{messsage-yank-original})。
 
+@item C-c C-Y
+@kindex C-c C-Y
+@findex message-yank-buffer
+Prompt for a buffer name and yank the contents of that buffer into the
+message buffer (@code{message-yank-buffer}).
+
 @item C-c C-q
 @kindex C-c C-q
 @findex message-fill-yanked-message
@@ -849,10 +855,9 @@ Lines (optional . X-Mailer))} です。
 @cindex Sun
 この必要なヘッダーは Message により作成されます。日付、時間、利用者名、
 システム名に基づいた他に無い ID が作成されます。Message は 
-@code{mail-host-address} が定義されていれば、それを fully qualified
-domain name (FQDN) (完全に条件を満たしたドメイン名) として使います。もし
-そうでなければ、それは @code{system-name} を使い、それはいくつかのマシン 
--- 主に Sun では、FQDN を報告しません。
+@code{system-name} をシステム名を決めるために使います。もしこれが fully
+qualified domain name (FQDN) (完全に条件を満たしたドメイン名) でないなら
+ば、Message は @code{mail-host-address} を FQDN として使います。
 
 @item X-Newsreader
 @cindex X-Nesreader

@@ -5,6 +5,7 @@ subdir = texi
 top_srcdir = @top_srcdir@
 
 @SET_MAKE@
+VPATH=$(srcdir)
 TEXI2DVI=texi2dvi
 EMACS=@EMACS@
 MAKEINFO=@MAKEINFO@
