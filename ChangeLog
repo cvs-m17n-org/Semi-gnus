@@ -1,3 +1,9 @@
+2005-03-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Use configure-package-path instead of
+	system-configuration-options to add early-package-load-path to
+	load-path for XEmacs 21.5.
+
 2005-02-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/ptexinfmt.el (texinfo-multitable-widths): Reverse the logic

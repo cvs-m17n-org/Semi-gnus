@@ -158,21 +158,22 @@ fixed in Emacs after 21.3."
 	  (setq ad-return-value (cons fn (nreverse backwards))))
       ad-do-it)))
 
-;; Add `early-package-load-path' to `load-path' for XEmacs.  Those paths
+;; Add `configure-package-path' to `load-path' for XEmacs.  Those paths
 ;; won't appear in `load-path' when XEmacs starts with the `-no-autoloads'
-;; option because of a bug. :<
+;; option or the `-vanilla' option because of a bug. :<
 (when (and (featurep 'xemacs)
-	   (string-match "--package-path=\\([^ ]+\\)"
-			 system-configuration-options))
+	   (boundp 'configure-package-path)
+	   (listp configure-package-path))
   (let ((paths
 	 (apply 'nconc
 		(mapcar
 		 (lambda (path)
-		   (when (file-directory-p
-			  (setq path (expand-file-name "lisp" path)))
+		   (when (and (stringp path)
+			      (not (string-equal path ""))
+			      (file-directory-p
+			       (setq path (expand-file-name "lisp" path))))
 		     (directory-files path t)))
-		 (split-string (match-string 1 system-configuration-options)
-			       "::"))))
+		 configure-package-path)))
 	path adds)
     (while paths
       (setq path (car paths)
