@@ -12773,27 +12773,25 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 このグループパラメータが @code{off} または @code{nil} 以外の値にセットさ
 れているグループでは、@code{nnshimbun} は新着記事を検索と同時に記事のダ
 ウンロードも行います。これによって新着記事の検索は遅くなりますが、記事の
-閲覧時に待たされることは少なくなります。もし、変
-数 @code{nnshimbun-pre-fetch-article} が @code{off} または @code{nil} 以
-外の値にセットされていたならば、グループパラメー
-タ @code{prefetch-articles} が設定されていないか、その値が @code{off} ま
-たは @code{nil} になっているグループでも、前もって記事のダウンロードを行
-ないます。変数 @code{nnshimbun-pre-fetch-article} のディフォルト値
+閲覧時に待たされることは少なくなります。グループパラメー
+タ @code{prefetch-articles} が設定されていないか、その値が @code{nil} に
+なっているグループでは、グループパラメータ @code{prefetch-articles} の代
+わりにディフォルト値として変数 @code{nnshimbun-pre-fetch-article} の値が
+使われます。この変数 @code{nnshimbun-pre-fetch-article} の初期値
 は @code{off} です。
 
 @item encapsulate-images
 @vindex nnshimbun-encapsulate-images
 このグループパラメータが @code{off} または @code{nil} 以外の値にセットさ
 れているグループでは、@code{nnshimbun} は元の記事に埋め込まれている画像
-データを @samp{multipart/related} の形式で記事にはめ込みます。もし、変
-数 @code{nnshimbun-encapsulate-images} が @code{off} また
-は @code{nil} 以外の値にセットされていたならば、グループパラメー
-タ @code{encapsulate-images} が設定されていないか、その値
-が @code{off} または @code{nil} になっているグループでも、画像データ
-を @samp{multipart/related} の形式で記事にはめ込みます。変
+データを @samp{multipart/related} の形式で記事にはめ込みます。グループパ
+ラメータ @code{encapsulate-images} が設定されていないか、その値が
+@code{nil} になっているグループでは、グループパラメー
+タ @code{encapsulate-images} の代わりにディフォルト値として変
+数 @code{nnshimbun-encapsulate-images} の値が使われます。この変
 数 @code{nnshimbun-encapsulate-images} のディフォルト値は、
 @code{shimbun} ライブラリの変数 @code{shimbun-encapsulate-images} の値で
-す (たぶんそのディフォルト値は @code{t} です)。
+す (たぶんその初期値は @code{t} です)。
 
 @item index-range
 @vindex nnshimbun-index-range
