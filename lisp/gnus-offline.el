@@ -1,5 +1,4 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.10 1999-11-22 07:09:32 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -78,7 +77,7 @@
 
 (eval '(run-hooks 'gnus-offline-load-hook))
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'custom)
 (require 'easymenu)
 (provide 'gnus-offline)

@@ -1,7 +1,5 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.10 1999-11-22 07:09:30 yamaoka Exp $
-;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;;      Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>
@@ -32,7 +30,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (eval-and-compile
   (defvar gnus-offline-lang
