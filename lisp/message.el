@@ -4554,7 +4554,18 @@ when could not found legal MIME charset for sending message."
   :group 'message-sending)
 
 (defvar message-mime-charset-recover-args nil)
-(defvar message-charsets-mime-charset-alist nil)
+
+(defmacro message-mime-charset-recover-args-set (symbol)
+  `(cons (cons ,symbol (symbol-value ,symbol))
+	 message-mime-charset-recover-args))
+
+(defmacro message-mime-charset-recover-args (symbol)
+  `(cdr (assq (quote ,symbol) message-mime-charset-recover-args))
+  )
+
+(defmacro message-mime-charset-recover-args-original (symbol)
+  `(or (message-mime-charset-recover-args ,symbol) ,symbol)
+  )
 
 (defun message-maybe-encode ()
   (when message-mime-mode
@@ -4565,12 +4576,14 @@ when could not found legal MIME charset for sending message."
     (run-hooks 'mime-edit-translate-hook))
   (let ((locale-list (message-locale-detect)))
     (when message-mime-mode
-      (let* ((default-mime-charset-detect-method-for-write
+      (let ((message-mime-charset-recover-args
+	     (mapcar (lambda (symbol) (cons symbol (symbol-value symbol)))
+		     '(default-mime-charset-detect-method-for-write
+			charsets-mime-charset-alist)))
+	    (default-mime-charset-detect-method-for-write
 	       (or message-mime-charset-recover-function
 		   default-mime-charset-detect-method-for-write))
-	     message-mime-charset-recover-args
-	     (charsets-mime-charset-alist charsets-mime-charset-alist)
-	     (message-charsets-mime-charset-alist charsets-mime-charset-alist))
+	    (charsets-mime-charset-alist charsets-mime-charset-alist))
 	(message-mime-charset-setup locale-list)
 	(if (catch 'mime-edit-error
 	      (save-excursion
@@ -4675,7 +4688,8 @@ This funtion will by called from \`message-mime-charset-recover-by-ask\'."
 (defun message-mime-charset-recover-by-ask (type charsets &rest args)
   (let ((default-charset
 	  (let ((charsets-mime-charset-alist
-		 message-charsets-mime-charset-alist))
+		 (message-mime-charset-recover-args
+		  charsets-mime-charset-alist)))
 	    (charsets-to-mime-charset charsets)))
 	charset)
     (save-excursion
@@ -4846,13 +4860,19 @@ This funtion will by called from \`message-mime-charset-recover-by-ask\'."
 	   'message-mode (function message-mime-insert-article))
 
 (defun message-mime-encode (start end &optional orig-buf)
-  (save-restriction
-    (narrow-to-region start end)
-    (when (with-current-buffer orig-buf
-	    mime-edit-mode-flag)
-      (mime-edit-translate-body)
-      (mime-edit-translate-header)
-      )
+  (let ((charsets-mime-charset-alist
+	 (message-mime-charset-recover-args-original
+	  charsets-mime-charset-alist))
+	(default-mime-charset-detect-method-for-write
+	 (message-mime-charset-recover-args-original
+	  default-mime-charset-detect-method-for-write)))
+    (save-restriction
+      (narrow-to-region start end)
+      (when (with-current-buffer orig-buf
+	      mime-edit-mode-flag)
+	(mime-edit-translate-body)
+	(mime-edit-translate-header)
+	))
     (goto-char start)
     (and (search-forward (concat "\n" mail-header-separator "\n") nil t)
 	 (replace-match "\n\n"))
