@@ -1,14 +1,14 @@
 ;; pop3-fma.el.el --- POP3 for Multiple Account for Gnus.
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc. , Tatsuya Ichikawa
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;; Version: 0.11
+;; Version: 0.12
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
 ;;    Keiichi Suzuki <kei-suzu@mail.wbs.or.jp>
 ;;    Katsumi Yamaoka <yamaoka@jpl.org>
 ;;
-;; This file is part of GNU Emacs.
+;; This file is not part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -73,21 +73,21 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.11")
+(defconst pop3-fma-version-number "0.12")
 (defconst pop3-fma-codename
-;  "Feel the wind"		; 0.10
-  "My home town"  		; 0.11
-;  "On the road"		; 0.xx
-;  "Before generation of Love"	; 0.xx
-;  "Lonely Christmas eve"	; 0.xx
-;  "Rock'n Roll city"		; 0.xx
-;  "Money"			; 0.xx
-;  "Midnight blue train" 	; 0.xx
-;  "Still 19"       		; 0.xx
-;  "J boy"          		; 0.xx
-;  "Blood line"			; 0.xx
-;  "Star ring"			; 0.xx
-;  "Goodbye Game"		; 0.xx
+;;;  "Feel the wind"		; 0.10
+;;  "My home town"  		; 0.11
+  "On the road"			; 0.12
+;;  "Before generation of Love"	; 0.xx
+;;  "Lonely Christmas eve"	; 0.xx
+;;  "Rock'n Roll city"		; 0.xx
+;;  "Money"			; 0.xx
+;;  "Midnight blue train" 	; 0.xx
+;;  "Still 19"       		; 0.xx
+;;  "J boy"          		; 0.xx
+;;  "Blood line"		; 0.xx
+;;  "Star ring"			; 0.xx
+;;  "Goodbye Game"		; 0.xx
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -128,6 +128,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 ;; Temporary variable
 (defvar hdr nil)
 (defvar passwd nil)
+(defvar str nil)
 (defvar pop3-fma-movemail-options pop3-fma-movemail-arguments)
 
 (defun pop3-fma-init-hooks ()
@@ -275,6 +276,3 @@ Argument PROMPT ."
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
-
-(provide 'pop3-fma)
-;;; pop3-fma.el ends here

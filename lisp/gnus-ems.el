@@ -184,7 +184,7 @@
 (eval-and-compile
   (let ((case-fold-search t))
     (cond
-     ((string-match "windows-nt\\|os/2\\|emx" (format "%s" system-type))
+     ((string-match "windows-nt\\|os/2\\|emx" (symbol-name system-type))
       (setq nnheader-file-name-translation-alist
 	    (append nnheader-file-name-translation-alist
 		    '((?: . ?_)
@@ -234,9 +234,11 @@
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
 
-    (and window-system
-	 (module-installed-p 'bitmap)
-	 (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message))
+    (when window-system
+      (require 'path-util)
+      (if (module-installed-p 'bitmap)
+	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
+	))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting

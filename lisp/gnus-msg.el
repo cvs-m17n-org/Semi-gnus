@@ -95,6 +95,9 @@ the second with the current group name.")
 (defvar gnus-message-setup-hook nil
   "Hook run after setting up a message buffer.")
 
+(defvar gnus-bug-create-help-buffer t
+  "*Should we create the *Gnus Help Bug* buffer?")
+
 ;;; Internal variables.
 
 (defvar gnus-message-buffer "*Mail Gnus*")
@@ -505,7 +508,7 @@ If SILENT, don't prompt the user."
 ;;; as well include the Emacs version as well.
 ;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified Gnus version"
+  "Stringified Gnus version."
   (interactive)
   gnus-version)
 
@@ -740,18 +743,20 @@ If YANK is non-nil, include the original article."
     (error "Gnus has been shut down"))
   (gnus-setup-message 'bug
     (delete-other-windows)
-    (switch-to-buffer (get-buffer-create "*Gnus Help Bug*"))
-    (erase-buffer)
-    (insert gnus-bug-message)
-    (goto-char (point-min))
+    (when gnus-bug-create-help-buffer
+      (switch-to-buffer "*Gnus Help Bug*")
+      (erase-buffer)
+      (insert gnus-bug-message)
+      (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
     (message-setup `((To . ,gnus-maintainer) (Subject . "")))
-    (push `(gnus-bug-kill-buffer) message-send-actions)
+    (when gnus-bug-create-help-buffer
+      (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))
     (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
     (forward-line 1)
-    (insert (gnus-version) "\n")
-    (insert (emacs-version) "\n")
+    (insert (gnus-version) "\n"
+	    (emacs-version) "\n")
     (when (and (boundp 'nntp-server-type)
 	       (stringp nntp-server-type))
       (insert nntp-server-type))

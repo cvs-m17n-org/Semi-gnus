@@ -227,6 +227,11 @@ any confusion."
   :group 'message-interface
   :type 'regexp)
 
+(defcustom message-subject-re-regexp "^[ \t]*\\([Rr][Ee]:[ \t]*\\)*[ \t]*"
+  "*Regexp matching \"Re: \" in the subject line."
+  :group 'message-various
+  :type 'regexp)
+
 ;;;###autoload
 (defcustom message-signature-separator "^-- *$"
   "Regexp matching the signature separator."
@@ -1047,7 +1052,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-strip-subject-re (subject)
   "Remove \"Re:\" from subject lines."
-  (if (string-match "^[Rr][Ee]: *" subject)
+  (if (string-match message-subject-re-regexp subject)
       (substring subject (match-end 0))
     subject))
 
@@ -1927,7 +1932,7 @@ the user from the mailer."
 	t))))
 
 (defun message-send-via-mail (arg)
-  "Send the current message via mail."  
+  "Send the current message via mail."
   (message-send-mail arg))
 
 (defun message-send-via-news (arg)
@@ -3397,7 +3402,7 @@ Headers already prepared in the buffer are not modified."
 	    message-id (message-fetch-field "message-id" t))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
-      (when (string-match "^[ \t]*[Rr][Ee]:[ \t]*" subject)
+      (when (string-match message-subject-re-regexp subject)
 	(setq subject (substring subject (match-end 0))))
       (setq subject (concat "Re: " subject))
 
@@ -3518,7 +3523,7 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
 	(setq distribution nil))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
-      (when (string-match "^[ \t]*[Rr][Ee]:[ \t]*" subject)
+      (when (string-match message-subject-re-regexp subject)
 	(setq subject (substring subject (match-end 0))))
       (setq subject (concat "Re: " subject))
       (widen))

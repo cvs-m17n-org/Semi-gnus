@@ -3254,17 +3254,12 @@ It is registered to variable `mime-view-content-header-filter-alist'."
       (gnus-summary-select-article nil t)
     ))
 
-(set-alist 'mime-raw-buffer-coding-system-alist
-	   'gnus-original-article-mode
-	   'raw-text)
-
 (set-alist 'mime-view-content-header-filter-alist
 	   'gnus-original-article-mode
 	   #'gnus-content-header-filter)
 
-(set-alist 'mime-text-decoder-alist
-	   'gnus-original-article-mode
-	   #'mime-text-decode-buffer)
+(set-alist 'mime-raw-representation-type-alist
+	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode
