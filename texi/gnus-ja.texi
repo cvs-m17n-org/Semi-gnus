@@ -703,6 +703,7 @@ Browsing the Web
 * Slashdot::              Slashdot のコメントを読む。
 * Ultimate::              Ultimate Bulletin Board システム.
 * Web Archive::           ウェブに保管されたメーリングリストを読む。
+* Web Newspaper::         ウェブに保管された新聞を読む。
 * Customizing w3::        Gnus から Emacs/w3 を操作する。
 
 Other Sources
@@ -12006,6 +12007,7 @@ Gnus はこれらのソースへの界面を提供するバックエンド群を少し備えつつあり
 * Slashdot::              Slashdot のコメントを読む。
 * Ultimate::              Ultimate Bulletin Board システム.
 * Web Archive::           ウェブに保管されたメーリングリストを読む。
+* Web Newspaper::         ウェブに保管された新聞を読む。
 * Customizing w3::        Gnus から Emacs/w3 を操作する。
 @end menu
 
