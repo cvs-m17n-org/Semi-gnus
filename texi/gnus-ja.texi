@@ -3830,10 +3830,17 @@ Gnus $B$,CN$C$F$$$k%H%T%C%/2=$5$l$?%0%k!<%W$rA4$FI=<($7$^(B
 @findex gnus-topic-sort-groups-by-server
 $B8=:_$N%H%T%C%/$r%5!<%P!<$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-server})$B!#(B
+
+@item T S s
+@kindex T S s ($B%H%T%C%/(B)
+@findex gnus-topic-sort-groups
+$B8=:_$N%H%T%C%/$r!"JQ?t(B @code{gnus-group-sort-function} $B$GM?$($i$l$k4X?t(B
+$B$K=>$C$FJB$YBX$($^$9(B (@code{gnus-topic-sort-groups})$B!#(B
 @end table
 
-$B%0%k!<%W$N%=!<%H$K$D$$$F$N$5$i$J$k>pJs$O(B @xref{Sorting Groups} $B$r;2>H$7(B
-$B$F$/$@$5$$!#(B
+$B@\F,0z?t$,M?$($i$l$?$i!"$3$l$i$9$Y$F$N%3%^%s%I$O5U=g$NJB$YBX$($r9T$J$$$^(B
+$B$9!#%0%k!<%W$N%=!<%H$K$D$$$F$N$5$i$J$k>pJs$O(B @xref{Sorting Groups} $B$r;2(B
+$B>H$7$F$/$@$5$$!#(B
 
 @node Topic Topology
 @subsection $B%H%T%C%/$N0LAj9=B$(B
@@ -4412,7 +4419,7 @@ Gnus $B$OJQ?t(B @code{gnus-extract-address-components} $B$NCM$r(B @code{From
 $B$^$8$-$3$H$G$9!#4X?t(B @code{gnus-goto-colon} $B$r!"$"$J$?$,9%$-$J%+!<%=%k$N(B
 $BF0$-$K$J$k$h$&$K!"?7$?$K=q$1$PNI$$$N$G$9!#(B) @xref{Positioning Point}$B!#(B
 
-$B=i4|CM$NJ8;zNs$O(B @samp{%U%R%z%I%(%[%4L: %-23,23n%]%) %s\n} $B$G$9!#(B
+$B=i4|CM$NJ8;zNs$O(B @samp{%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n} $B$G$9!#(B
 
 $B0J2<$NMM<0;X<(J8;z$H3HD%MM<0;X<($r;H$&$3$H$,$G$-$^$9(B:
 
@@ -5967,9 +5974,9 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 
 @item / p
 @kindex / p ($B35N,(B)
-@findex gnus-summary-limit-to-display-parameter
+@findex gnus-summary-limit-to-display-predicate
 $B35N,%P%C%U%!$r(B @code{display} $B%0%k!<%W%Q%i%a!<%?$N=R8l$rK~B-$5$;$k$h$&$K(B
-$B@)8B$7$^$9(B (@code{gnus-summary-limit-to-display-parameter})$B!#$3$N=R8l$K(B
+$B@)8B$7$^$9(B (@code{gnus-summary-limit-to-display-predicate})$B!#$3$N=R8l$K(B
 $B4X$9$k>\:Y$O(B @pxref{Group Parameters} $B$r;2>H$7$F2<$5$$!#(B
 
 @item / E
@@ -6499,8 +6506,8 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @table @kbd
 @item T n
 @kindex T n ($B35N,(B)
-@itemx C-M-n
-@kindex C-M-n ($B35N,(B)
+@itemx C-M-f
+@kindex C-M-f ($B35N,(B)
 @itemx M-down
 @kindex M-down ($B35N,(B)
 @findex gnus-summary-next-thread
@@ -6508,8 +6515,8 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 
 @item T p
 @kindex T p ($B35N,(B)
-@itemx C-M-p
-@kindex C-M-p ($B35N,(B)
+@itemx C-M-b
+@kindex C-M-b ($B35N,(B)
 @itemx M-up
 @kindex M-up ($B35N,(B)
 @findex gnus-summary-prev-thread
@@ -7946,6 +7953,13 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 $B$,$"$k$Y$-$H$3$m$K(B @code{\222} $B$d(B @code{\264} $B$N$h$&$J$b$N$,8+$($F$7$^$C(B
 $B$?$i!"@vBu$7$F$_$F2<$5$$!#(B
 
+@item W k
+@kindex W k ($B35N,(B)
+@findex gnus-article-outlook-deuglify-article
+@cindex Outlook Express
+$B2u$l$?(B Outlook (Express) $B$N5-;v$r(B deuglify $B$7$F:FI=<($7$^(B
+$B$9(B (@code{gnus-article-outlook-deuglify-article})$B!#(B
+
 @item W w
 @kindex W w ($B35N,(B)
 @findex gnus-article-fill-cited-article
@@ -8067,9 +8081,9 @@ emacs-w3m $B$r;H$$$^$9(B ($B$b$C$H>\$7$$$3$H(B
 
 @item W W H
 @kindex W W H ($B35N,(B)
-@findex gnus-article-strip-headers-from-body
+@findex gnus-article-strip-headers-in-body
 $B5-;v$NK\BN$N@hF,$+$i(B @code{X-No-Archive} $B%X%C%@!<$N$h$&$J%X%C%@!<$r<h$j(B
-$B=|$-$^$9(B (@code{gnus-article-strip-headers-from-body})$B!#(B
+$B=|$-$^$9(B (@code{gnus-article-strip-headers-in-body})$B!#(B
 
 @item W E l
 @kindex W E l ($B35N,(B)
@@ -8138,6 +8152,12 @@ emacs-w3m $B$r;H$$$^$9(B ($B$b$C$H>\$7$$$3$H(B
 @findex gnus-article-treat-fold-header
 $B$9$Y$F$N%a%C%;!<%8%X%C%@!<$r@^$jJV$7$^(B
 $B$9(B (@code{gnus-article-treat-fold-headers})$B!#(B
+
+@item W E w
+@kindex W E w ($B35N,(B)
+@findex gnus-article-remove-leading-whitespace
+$B$9$Y$F$N%X%C%@!<$+$iM>7W$J6uGr$r<h$j=|$-$^(B
+$B$9(B (@code{gnus-article-remove-leading-whitespace})$B!#(B
 @end table
 
 @node Article Buttons
@@ -8352,7 +8372,7 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @findex gnus-treat-newsgroups-picon
 $B$9$Y$F$N%K%e!<%9%X%C%@!<(B ($B$9$J$o(B
 $B$A(B @code{Newsgroups} $B$H(B @code{Followup-To}) $B$r(B Picon $B2=$7$^(B
-$B$9(B (@code{gnus-treat-from-picon})$B!#(B
+$B$9(B (@code{gnus-treat-newsgroups-picon})$B!#(B
 
 @item W D D
 @kindex W D D ($B35N,(B)
@@ -8893,7 +8913,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @findex gnus-summary-move-article
 @vindex gnus-preserve-marks
 $B$"$k%a!<%k%0%k!<%W$+$iJL$N$H$3$m$X5-;v$r0\F0$7$^(B
-$B$9(B (@code{gnus-summary-move-article})$B!#(B@var{gnus-preserve-marks} $B$NCM(B
+$B$9(B (@code{gnus-summary-move-article})$B!#(B@code{gnus-preserve-marks} $B$NCM(B
 $B$,(B nil $B$G$O$J$$$J$i$P(B ($B$3$l$,=i4|CM$G$9$,(B)$B!"%^!<%/$OJ]B8$5$l$^$9!#(B
 
 @item B c
@@ -8902,7 +8922,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @findex gnus-summary-copy-article
 @c @icon{gnus-summary-mail-copy}
 $B$"$k%0%k!<%W(B ($B%a!<%k%0%k!<%W$dB>$N$b$N(B) $B$+$i%a!<%k%0%k!<%W$K5-;v$rJ#@=$7(B
-$B$^$9(B (@code{gnus-summary-copy-article})$B!#(B@var{gnus-preserve-marks} $B$NCM(B
+$B$^$9(B (@code{gnus-summary-copy-article})$B!#(B@code{gnus-preserve-marks} $B$NCM(B
 $B$,(B nil $B$G$O$J$$$J$i$P(B ($B$3$l$,=i4|CM$G$9$,(B)$B!"%^!<%/$OJ]B8$5$l$^$9!#(B
 
 @item B B
@@ -8920,6 +8940,13 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 $B$9(B (@code{gnus-summary-import-article})$B!#$"$J$?$O%U%!%$%kL>$H!"(B
 @code{From} $BMs$H(B @code{Subject} $BMs$NF~NO$rB%$5$l$^$9!#(B
 
+@item B I
+@kindex B I ($B35N,(B)
+@findex gnus-summary-create-article
+$B6u$N5-;v$r8=:_$N%a!<%k%0%k!<%W$K:n$j$^(B
+$B$9(B (@code{gnus-summary-create-article})$B!#(B@code{From} $B%X%C%@!<(B
+$B$H(B @code{Subject} $B%X%C%@!<$NFbMF$r?R$M$i$l$^$9!#(B
+
 @item B r
 @kindex B r ($B35N,(B)
 @findex gnus-summary-respool-article
@@ -8927,8 +8954,8 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @code{gnus-summary-respool-default-method} $B$,:F%9%W!<%k$9$k$H$-$N%G%#%U%)(B
 $B%k%H$NA*BrJ}K!$H$7$F;HMQ$5$l$^$9!#$3$NJQ?t$O%G%#%U%)%k%H$G(B @code{nil} $B$G!"(B
 $B$3$l$O8=:_$N%0%k!<%W$NA*BrJ}K!$,Be$o$j$K;H$o$l$k$H$$$&;v$G$9!#(B
-@var{gnus-preserve-marks} $B$NCM$,(B nil $B$G$O$J$$$J$i$P(B ($B$3$l$,=i4|CM$G$9$,(B)$B!"(B
-$B%^!<%/$OJ]B8$5$l$^$9!#(B
+@code{gnus-preserve-marks} $B$NCM$,(B nil $B$G$O$J$$$J$i$P(B ($B$3$l$,=i4|CM$G$9(B
+$B$,(B)$B!"%^!<%/$OJ]B8$5$l$^$9!#(B
 
 @item B w
 @itemx e
@@ -8936,10 +8963,12 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @kindex e ($B35N,(B)
 @findex gnus-summary-edit-article
 @kindex C-c C-c ($B5-;v(B)
+@findex gnus-summary-edit-article-done
 $B8=:_$N5-;v$rJT=8$7$^$9(B (@code{gnus-summary-edit-article})$B!#JT=8$r=*N;$7(B
-$B$FJQ99$r1J1s$K$9$k$?$a$K!"(B@kbd{C-c C-c} $B$rBG$A$^$9!#$b$7L?(B
-$BNa(B @kbd{C-c C-c} $B$K?tCM@\F,0z?t$rM?$($k$H!"(Bgnus $B$O5-;v$r:F%O%$%i%$%H$7$^(B
-$B$;$s!#(B
+$B$FJQ99$r1J1s$K$9$k$?$a(B
+$B$K(B @kbd{C-c C-c} (@code{gnus-summary-edit-article-done}) $B$rBG$A$^$9!#$b(B
+$B$7L?Na(B @kbd{C-c C-c} $B$K?tCM@\F,0z?t$rM?$($k$H!"(Bgnus $B$O5-;v$r:F%O%$%i%$%H(B
+$B$7$^$;$s!#(B
 
 @item B q
 @kindex B q ($B35N,(B)
@@ -8967,6 +8996,14 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 $B8+$7$J$+$C$?$H$7$F$b!"$=$l$O$H$K$+$/Ej9F$5$l$F$$$k$+$b$7$l$^$;$s!=!=%a!<(B
 $B%k$NEAC#$O%K%e!<%9$NEAC#$h$j$b$:$C$HB.$/!"%K%e!<%9$NJ#@=$,$^$@E~Ce$7$F$$(B
 $B$J$$$@$1$+$b$7$l$J$$$N$G$9!#(B
+
+@c @item K E
+@c @kindex K E (Summary)
+@c @findex gnus-article-encrypt-body
+@c @vindex gnus-article-encrypt-protocol
+@c Encrypt the body of an article (@code{gnus-article-encrypt-body}).
+@c The body is encrypted with the encryption protocol specified by the
+@c variable @code{gnus-article-encrypt-protocol}.
 @end table
 
 @vindex gnus-move-split-methods
@@ -9488,10 +9525,12 @@ protocols. Otherwise, ask user.
 @node Mailing List
 @section $B%a!<%j%s%0%j%9%H(B
 
+@kindex A M ($B35N,(B)
+@findex gnus-mailing-list-insinuate
 Gnus $B$O(B RFC 2369 $B$G4{Dj$5$l$?3F<o$N%a!<%j%s%0%j%9%H$G;H$o$l$k%U%#!<%k%I(B
 $B$rM}2r$7$^$9!#$3$l$rM-8z$K$9$k$K$O(B `to-list' $B%0%k!<%W%Q%i%a!<(B
-$B%?(B (@pxref{Group Parameters}) $B$rDI2C$7$F!"35N,%P%C%U%!$G(B @kbd{A M} $B$r;H(B
-$B$&$+(B
+$B%?(B (@pxref{Group Parameters}) $B$rDI2C$7$F!"35N,%P%C%U%!(B
+$B$G(B @kbd{A M} (@code{gnus-mailing-list-insinuate}) $B$r;H$&$+(B
 
 @lisp
 (add-hook 'gnus-summary-mode-hook 'turn-on-gnus-mailing-list-mode)
@@ -9802,6 +9841,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-unsplit-urls (t, integer)
+@item gnus-treat-decode-article-as-default-mime-charset (t, integer)
 
 @xref{Article Washing}.
 
@@ -9859,8 +9899,9 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-unfold-headers (head)
 @item gnus-treat-fold-headers (head)
 @item gnus-treat-fold-newsgroups (head)
+@item gnus-treat-leading-whitespace (head)
 
-@item gnus-treat-decode-article-as-default-mime-charset
+@xref{Article Header}.
 @end table
 
 @vindex gnus-part-display-hook
@@ -10608,6 +10649,11 @@ Digitally encrypt current @sc{mime} part using PGP.
 
 Digitally encrypt current @sc{mime} part using @sc{pgp/mime}.
 
+@item C-c C-m C-n
+@kindex C-c C-m C-n
+@findex mml-unsecure-message
+Remove security related MML tags from message.
+
 @end table
 
 Also @xref{Security, ,Security, message, Message Manual}.
@@ -11012,6 +11058,11 @@ Also @xref{Security, ,Security, message, Message Manual}.
 @findex gnus-server-remove-denials
 Gnus $B$,$I$l$+$N%5!<%P!<$+$i@\B35qH]$r<u$1$?$+$I$&$+$NA4$F$N0u$r>C5n$7$^(B
 $B$9(B (@code{gnus-server-remove-denials})$B!#(B
+
+@item L
+@kindex L (Server)
+@findex gnus-server-offline-server
+$B%5!<%P!<$N>uBV$r%*%U%i%$%s$K$7$^$9(B (@code{gnus-server-offline-server})$B!#(B
 @end table
 
 @node Getting News
@@ -11029,7 +11080,7 @@ Gnus $B$,$I$l$+$N%5!<%P!<$+$i@\B35qH]$r<u$1$?$+$I$&$+$NA4$F$N0u$r>C5n$7$^(B
 @end menu
 
 @node NNTP
-@subsection @sc{nntp}
+@subsection NNTP
 @cindex nntp
 
 @sc{nntp} $B%5!<%P!<$N30It%0%k!<%W$r9XFI$9$k$N$OHf3SE*4JC1$G$9!#C1(B
@@ -14176,7 +14227,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B$9$k$h$&$K$J$k$G$7$g$&!#(B
 
 @node IMAP
-@section @sc{imap}
+@section IMAP
 @cindex nnimap
 @cindex IMAP
 
@@ -14458,7 +14509,7 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 @end menu
 
 @node Splitting in IMAP
-@subsection @sc{imap} $B$G$NJ,3d(B
+@subsection IMAP $B$G$NJ,3d(B
 @cindex splitting imap mail
 
 $BJ,3d$O(B gnus $B$NMxMQ<T$,2?G/$b$N4V0&$7$F$-$?$b$N$G!":#$d;D$j$N@$3&$bDI$$$D(B
@@ -14607,7 +14658,7 @@ Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-fancy}.
 @end table
 
 @node Editing IMAP ACLs
-@subsection @sc{imap} $B$N(B ACL $B$rJT=8$9$k!#(B
+@subsection IMAP $B$N(B ACL $B$rJT=8$9$k!#(B
 @cindex editing imap acls
 @cindex Access Control Lists
 @cindex Editing @sc{imap} ACLs
@@ -15189,7 +15240,7 @@ gnus $B$,JV?.%Q%1%C%H$rC5$7$K9T$/>l=j!#=i4|@_DjCM$O(B @file{~/}$B!#(B
 @end table
 
 @node SOUP Groups
-@subsubsection @sc{soup} $B%0%k!<%W(B
+@subsubsection SOUP $B%0%k!<%W(B
 @cindex nnsoup
 
 @code{nnsoup} $B$O(B @sc{soup} $B%Q%1%C%H$rFI$`$?$a$N%P%C%/%(%s%I$G$9!#$3$l$O(B
@@ -16608,6 +16659,12 @@ Gnus $B$O35N,%P%C%U%!$r:n@.$9$kA0$K!"8=:_$N%0%k!<%W$KE,MQ$5$l$k$I$s(B
 @findex gnus-score-find-trace
 $B8=:_$N5-;v$K;H$o$l$F$$$kA4$F$N%9%3%"K!B'(B (score rule) $B$rI=<($7$^(B
 $B$9(B (@code{gnus-score-find-trace})$B!#(B
+
+@item V w
+@kindex V w ($B35N,(B)
+@findex gnus-score-find-favourite-words
+$B%9%3%"$K;H$o$l$F$$$k8l$N%j%9%H$rI=<($7$^(B
+$B$9(B (@code{gnus-score-find-favourite-words})$B!#(B
 
 @item V R
 @kindex V R ($B35N,(B)
@@ -21979,7 +22036,7 @@ Gnus $B$,%0%k!<%W$KF~$k$H!"%0%k!<%W$NA4$F$NL$FI5-;v$N%X%C%@!<$r%P%C%/%(%s(B
 @end menu
 
 @node Slow/Expensive Connection
-@subsection $BCY$$(B/$B9b$$(B @sc{nntp} $B@\B3(B
+@subsection $BCY$$(B/$B9b$$(B NNTP $B@\B3(B
 
 $B$b$7(B Emacs $B$r%m!<%+%k$N%^%7%s$G<B9T$7$F$$$F!"Hs>o$K:Y$$@~$N8~$3$&$N%^%7(B
 $B%s$+$i%K%e!<%9$r<hF@$7$F$$$k$N$G$"$l$P!"(Bgnus $B$,(B @sc{nntp} $B%5!<%P!<$+$i<h(B

@@ -444,14 +444,17 @@ gnus にはこの変数の好適な候補であるところの、あらかじめ定義されている関
 他のヘッダーに付け加えられ、その値は To: と Cc: にあるすべてのアドレスに
 設定されます。
 
+@kindex C-c C-f C-m
+@findex message-goto-mail-followup-to
 うーむ。そうするとあなたは「購読していないメーリングリストにメールを送信
 するときはどうなるの?  私は余分のコピーが欲しいことを MFT で言いたい」と
 尋ねますね (たぶん他の人は MFT が無かった場合と同様に処理してしまうだろ
 うけれど、誰かの to-address グループパラメータを上書きするために、明示的
 な MFT を使うことができるのです)。えーと、親切な Gnus タワーの人たちが、
 この目的で使えるすべての既知のメーリングリストのアドレスのデータベースの
-作成にいそしんでいます。それまでは、@kbd{C-c C-f C-m} を使って手動で MFT
-ヘッダーを挿入するなどして下さい!!
+作成にいそしんでいます。それまで
+は @kbd{C-c C-f C-m} (@code{message-goto-mail-followup-to}) を使って手動
+で MFT ヘッダーを挿入するなどして下さい!!
 
 @c @node Honoring an MFT post
 @subsection MFT 投稿の尊重
@@ -747,6 +750,11 @@ Digitally encrypt current message using PGP.
 @findex mml-secure-message-encrypt-pgpmime
 
 Digitally encrypt current message using @sc{pgp/mime}.
+
+@item C-c C-m C-n
+@kindex C-c C-m C-n
+@findex mml-unsecure-message
+Remove security related MML tags from message.
 
 @end table
 
