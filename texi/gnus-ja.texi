@@ -497,7 +497,7 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 
 Other related manuals
 
-* Message:(message).            Composing messages.
+* Message:(message).            $B%a%C%;!<%8$N:n@.(B
 * Emacs-MIME:(emacs-mime).      Composing messages; @acronym{MIME}-specific parts.
 * Sieve:(sieve).                Managing Sieve scripts in Emacs.
 * PGG:(pgg).                    @acronym{PGP/MIME} with Gnus.
@@ -815,6 +815,7 @@ Gnus Unplugged
 * Agent Basics::                $B$3$l$i$O$I$&F0$/$N$+(B
 * Agent Categories::            $B2?$r%@%&%s%m!<%I$9$k$+$r(B gnus $B%(!<%8%'%s%H$K65$($kJ}K!(B
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
+* Agent Visuals::               $B%(!<%8%'%s%H$,35N,%P%C%U%!$KJQ2=$r$b$?$i$9$+$b$7$l$J$$J}K!(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
 * Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
@@ -2150,17 +2151,17 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 @end table
 
 @vindex gnus-large-newsgroup
-@code{gnus-large-newsgroup} $BJQ?t$O!"2?$rBg$-$J%0%k!<%W$H9M$($k$Y$-$+!"(B
-$B$r(B gnus $B$KM?$($^$9!#$3$l$O=i4|@_Dj$G$O(B 200 $B$G$9!#%0%k!<%W$K(B ($BL$FI$H0uIU(B
-$B$-$N(B) $B5-;v$,$3$N?t0J>e$"$l$P!"(Bgnus $B$O$=$N%0%k!<%W$KF~$kA0$KMxMQ<T$K3NG'(B
-$B$r5a$a$^$9!#MxMQ<T$O%5!<%P$+$i$$$/$D$N5-;v$r<hF@$9$k$+$r;XDj$G$-$^$9!#$b(B
-$B$7MxMQ<T$,Ii$N?t(B (@code{-n}) $B$r;XDj$9$l$P!"8E$$J}$+$i(B @code{n} $B8D$N5-;v(B
-$B$r<hF@$7$^$9!#@5$N?t$G$"$l$P!"?7$7$/E~Ce$7$?J}$+$i(B @code{n} $B8D$N5-;v$r<h(B
-$BF@$7$^$9!#(B
+@code{gnus-large-newsgroup} $BJQ?t$O!"2?$rBg$-$J%0%k!<%W$H9M$($k$Y$-$+(B
+$B$r(B gnus $B$KM?$($^$9!#(B@code{nil} $B$@$C$?$i!"$I$N%0%k!<%W$bBg$-$$$H9M$($^$;(B
+$B$s!#%G%#%U%)%k%HCM$O(B 200 $B$G$9!#%0%k!<%W$K(B ($BL$FI$H0uIU$-$N(B) $B5-;v$,$3$N?t(B
+$B0J>e$"$l$P!"(Bgnus $B$O$=$N%0%k!<%W$KF~$kA0$KMxMQ<T$K3NG'$r5a$a$^$9!#MxMQ<T(B
+$B$O%5!<%P$+$i$$$/$D$N5-;v$r<hF@$9$k$+$r;XDj$G$-$^$9!#$b$7MxMQ<T$,Ii$N?t(B
+(@var{-n}) $B$r;XDj$9$l$P!"8E$$J}$+$i(B @var{n} $B8D$N5-;v$r<hF@$7$^$9!#@5$N?t(B
+$B$G$"$l$P!"?7$7$/E~Ce$7$?J}$+$i(B @var{n} $B8D$N5-;v$r<hF@$7$^$9!#(B
 
 @vindex gnus-large-ephemeral-newsgroup
-@code{gnus-large-newsgroup} $B$HF1$8$G$9$,!"0l;~%K%e!<%9%0%k!<%W$N$?$a$K$@(B
-$B$1;H$o$l$^$9!#(B
+@code{gnus-large-ephemeral-newsgroup} $B$O(B @code{gnus-large-newsgroup} $B$H(B
+$BF1$8$G$9$,!"0l;~%K%e!<%9%0%k!<%W$N$?$a$K$@$1;H$o$l$^$9!#(B
 
 @vindex gnus-select-group-hook
 @vindex gnus-auto-select-first
@@ -16698,6 +16699,7 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 * Agent Basics::                $B$3$l$i$O$I$&F0$/$N$+(B
 * Agent Categories::            $B2?$r%@%&%s%m!<%I$9$k$+$r(B gnus $B%(!<%8%'%s%H$K65$($kJ}K!(B
 * Agent Commands::              $B3F%P%C%U%!!<$G$N?7$7$$L?Na(B
+* Agent Visuals::               $B%(!<%8%'%s%H$,35N,%P%C%U%!$KJQ2=$r$b$?$i$9$+$b$7$l$J$$J}K!(B
 * Agent as Cache::              $B%(!<%8%'%s%H$OBg$-$J%-%c%C%7%e$G$b$"$k(B
 * Agent Expiry::                $B8E$$5-;v$r>C$9J}K!(B
 * Agent Regeneration::          $BDL?.@ZCG$dB>$N;v8N$+$i2sI|$9$kJ}K!(B
@@ -16715,17 +16717,41 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 
 $B$^$:!"$$$/$D$+$NMQ8l$rJRIU$1$F$*$-$^$7$g$&!#(B
 
-$B$"$J$?$,%M%C%H%o!<%/$H$NDL?.$,@Z$l$F$$$k$H$-(B($B$G%(!<%8%'%s%H$,$=$l$rCN$i(B
-$B$5$l$F$$$k$H$-(B)$B$O!"(Bgnus $B%(!<%8%'%s%H$O@Z$jN%$5$l$F$$$k(B (@dfn{unplugged})$B!"(B
-$B$H8@$$$^$9!#%M%C%H%o!<%/$NDL?.$,I|3h$7(B ($B$=$7$F(B gnus $B$,$=$l$rCN$l$P(B)$B!"%(!<(B
-$B%8%'%s%H$O:9$79~$^$l$F$$$k(B (@dfn{plugged})$B!"$H8@$$$^$9!#(B
+$B%M%C%H%o!<%/$H$NDL?.$,@Z$l$F$$$k$H$-(B ($B$=$7$F%(!<%8%'%s%H$,$=$l$rCN$i$5$l(B
+$B$F$$$k$H$-(B)$B!"(Bgnus $B%(!<%8%'%s%H$O@Z$jN%$5$l$F$$$k(B (@dfn{unplugged}) $B$H8@(B
+$B$$$^$9!#%M%C%H%o!<%/$NDL?.$,I|3h$7(B ($B$=$7$F(B gnus $B$,$=$l$rCN$l$P(B)$B!"%(!<%8%'(B
+$B%s%H$O:9$79~$^$l$F$$$k(B (@dfn{plugged}) $B$H8@$$$^$9!#(B
 
 $B%m!<%+%k(B (@dfn{local}) $B%^%7%s$H$O!"$"$J$?$,?($C$F$$$k%^%7%s$G!"%M%C%H%o!<(B
 $B%/$K7QB3E*$K@\B3$5$l$F$$$k$b$N$G$O$"$j$^$;$s!#(B
 
-$B%@%&%s%m!<%I(B (@dfn{download}) $B$H$O%M%C%H%o!<%/$+$i2?$+$r$"$J$?$N%m!<%+%k(B
-$B%^%7%s$K<h$C$F$/$k$3$H$r0UL#$7$^$9!#%"%C%W%m!<%I(B (@dfn{upload}) $B$O$=$N5U(B
-$B$r$9$k$3$H$G$9!#(B
+$B%@%&%s%m!<%I(B (@dfn{downloading}) $B$H$O%M%C%H%o!<%/$+$i2?$+$r$"$J$?$N%m!<(B
+$B%+%k%^%7%s$K<h$C$F$/$k$3$H$r0UL#$7$^$9!#%"%C%W%m!<(B
+$B%I(B (@dfn{uploading}) $B$O$=$N5U$r$9$k$3$H$G$9!#(B
+
+$B$4B8CN$N$h$&$K(B gnus $B$O$"$J$?$,%I%8$rF'$`$9$Y$F$N5!2q$rDs6!$7$^$9!#$=$l$r(B
+$B=@Fp@-$H8@$&?M$b$$$^$9!#$5$i$K(B gnus $B$OBg$$$K%+%9%?%^%$%:2DG=$G!"$=$l$O%f!<(B
+$B%6$,!"(Bgnus $B$,$I$N$h$&$KF0:n$9$k$+$K$D$$$FH/8@8"$r;}$C$F$$$k$3$H$r0UL#$7(B
+$B$^$9!#B>$N%K%e!<%9%j!<%@!<$OM-L5$r8@$o$:$"$J$?$K%I%8$rF'$^$;$k$+$b$7$l$^(B
+$B$;$s$,!"(Bgnus $B$G$O$"$J$?$KA*Br8"$,$"$j$^$9(B!
+
+Gnus $B$O<B:]$K$O(B plugged $B$^$?$O(B unplugged $B$N$I$A$i$N>uBV$K$b$"$j$^$;$s!#(B
+$B$b$C$H@53N$K8@$($P!"%5!<%P!<$4$H$K$=$l$>$l$N>uBV$r;}$A$^$9!#$3$l$O!"$$$/(B
+$B$D$+$N%5!<%P!<$,@\B3$G$-$J$$$H$-$K!"B>$N%5!<%P!<$O@\B3$G$-$k$3$H$r0UL#$7(B
+$B$^$9!#$5$i$K!"(B Agent $B$K$h$C$F$$$/$D$+$N%5!<%P!<$r$9$Y$FL5;k$9$k$3$H$,$G(B
+$B$-$^$9(B ($B$=$N0UL#$O!"$=$l$i$,$$$D$b(B plugged $B$K$J$C$F$$$k$N$H;w$F$$$k$H$$(B
+$B$&$3$H$G$9(B)$B!#(B
+
+Agent $B$r@Z$jN%$7$F$b!"$J$<(B gnus $B$,%M%C%H$K@\B3$7$F$$$k$N$+$,$$$V$+$7$/;W(B
+$B$o$l$?$H$-!"9T$&$Y$-<!$N%9%F%C%W$O%5!<%P!<$,$9$Y$F%(!<%8%'%s%H2=$5$l$F$$(B
+$B$k$+$I$&$+$r4Q;!$9$k$3$H$G$9!#%(!<%8%'%s%H2=$5$l$F$$$J$$%5!<%P!<$,$"$C$?(B
+$B$i!"$"$J$?$OHH?M$r8+$D$1$?$N$G$9!#(B
+
+$B$b$&0l$D$N>uBV$O(B @dfn{offline} $B$G$9!#%5!<%P!<$O$H$-$I$-E~C#2DG=$G$O$J$/(B
+$B$J$j$^$9!#(BGnus $B$,$3$N$3$H$rCN$k$H!"$=$N%5!<%P!<$r(B offline $B$N>uBV$K@Z$j49(B
+$B$($F$bNI$$$+$I$&$+$r?R$M$^$9!#$O$$!"$HEz$($?$J$i$P!"(B(offline $B$KLa$7$FNI(B
+$B$$$+$H(B gnus $B$,?R$M$?>l9g0J30$O(B) $B%5!<%P!<$OB?>/(B unplugged $B$@$C$?$H$-$N$h(B
+$B$&$K?6$kIq$$$^$9!#(B
 
 $B%(!<%8%'%s%H$r;H$C$?E57?E*$J(B gnus $B$NBPOCA`:n$r8+$F$_$^$7$g$&!#(B
 
@@ -16770,11 +16796,11 @@ PPP $B4X78(B($B$J$I(B)$B$rJD$8$^$9!#$=$&$7$F%K%e!<%9$r%*%U%i%$%s$GFI$`$3$H$
 $B$I$N%5!<%P!<$r%(!<%8%'%s%H$GLLE]$r8+$k$+$r7h$a$^$9!#$b$7%a!<%k%P%C%/%(%s(B
 $B%I$,$"$l$P!"$=$l$r%(!<%8%'%s%H$KLLE]$r8+$5$;$k$N$O$*$=$i$/L50UL#$G$7$g$&!#(B
 $B%5!<%P!<%P%C%U%!!<$K0\F0$7(B ($B%0%k!<%W%P%C%U%!!<$G(B @kbd{^})$B!"%(!<%8%'%s%H(B
-$B$K07$C$FM_$7$$%5!<%P!<(B($BJ#?t2D(B)$B$G(B @kbd{J a} $B$r2!$9$+!"$^$?$O%(!<%8%'%s%H(B
-$B$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l$?%5!<%P!<$G(B @kbd{J r} $B$r2!$7$^$9!#(B
-$B%G%#%U%)%k%H$G(B
+$B$K07$C$FM_$7$$%5!<%P!<(B($BJ#?t2D(B)$B$G(B @kbd{J a} $B$r2!$9(B (@pxref{Server Agent
+Commands}) $B$+!"$^$?$O%(!<%8%'%s%H$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l(B
+$B$?%5!<%P!<$G(B @kbd{J r} $B$r2!$7$^$9!#%G%#%U%)%k%H$G(B
 $B$O(B @code{gnus-select-method} $B$H(B @code{gnus-secondary-select-methods} $B$K(B
-$B$"$k$9$Y$F$N(B @code{nntp} $B$H(B @code{nnimap} $B%0%k!<%W$,%(!<%8%'%s%H2=$5$l$^(B
+$B$"$k$9$Y$F$N(B @code{nntp} $B$H(B @code{nnimap} $B%5!<%P!<$,%(!<%8%'%s%H2=$5$l$^(B
 $B$9!#(B
 
 @item
@@ -17379,6 +17405,69 @@ parameters at one time (@code{gnus-category-customize-category}).
 $B8=:_$N%5!<%P!<$r!"(Bgnus $B%(!<%8%'%s%H$G07$o$l$k%5!<%P!<$N0lMw$+$i:o=|$9(B
 $B$k(B (@code{gnus-agent-remove-server})$B!#(B
 @end table
+
+@c TRANSLATEME
+@node Agent Visuals
+@subsection Agent Visuals
+
+If you open a summary while unplugged and, Gnus knows from the group's
+active range that there are more articles than the headers currently
+stored in the Agent, you may see some articles whose subject looks
+something like @samp{[Undownloaded article #####]}.  These are
+placeholders for the missing headers.  Aside from setting a mark,
+there is not much that can be done with one of these placeholders.
+When Gnus finally gets a chance to fetch the group's headers, the
+placeholders will automatically be replaced by the actual headers.
+You can configure the summary buffer's maneuvering to skip over the
+placeholders if you care (See @code{gnus-auto-goto-ignores}).
+
+While it may be obvious to all, the only headers and articles
+available while unplugged are those headers and articles that were
+fetched into the Agent while previously plugged.  To put it another
+way, "If you forget to fetch something while plugged, you might have a
+less than satisfying unplugged session".  For this reason, the Agent
+adds two visual effects to your summary buffer.  These effects display
+the download status of each article so that you always know which
+articles will be available when unplugged.
+
+The first visual effect is the @samp{%O} spec.  If you customize
+gnus-summary-line-format to include this specifier, you will add a
+single character field that indicates an article's download status.
+Articles that have been fetched into either the Agent or the Cache,
+will display @code{gnus-downloaded-mark} (defaults to @samp{+}).  All
+other articles will display @code{gnus-undownloaded-mark} (defaults to
+@samp{-}).  If you open a group that has not been agentized, a space
+(@samp{ }) will be displayed.
+
+The second visual effect are the undownloaded faces.  The faces, there
+are three indicating the article's score (low, normal, high), seem to
+result in a love/hate response from many Gnus users.  The problem is
+that the face selection is controlled by a list of condition tests and
+face names (See @code{gnus-summary-highlight}).  Each condition is
+tested in the order in which it appears in the list so early
+conditions have precedence over later conditions.  All of this means
+that, if you tick an undownloaded article, the article will continue
+to be displayed in the undownloaded face rather than the ticked face.
+
+If you use the Agent as a cache (to avoid downloading the same article
+each time you visit it or to minimize your connection time), the
+undownloaded face will probably seem like a good idea.  The reason
+being that you do all of our work (marking, reading, deleting) with
+downloaded articles so the normal faces always appear.
+
+For occasional Agent users, the undownloaded faces may appear to be an
+absolutely horrible idea.  The issue being that, since most of their
+articles have not been fetched into the Agent, most of the normal
+faces will be obscured by the undownloaded faces.  If this is your
+situation, you have two choices available.  First, you can completely
+disable the undownload faces by customizing
+@code{gnus-summary-highlight} to delete the three cons-cells that
+refer to the gnus-summary*-undownloaded-face faces.  Second, if you
+prefer to take a more fine-grained approach, you may set the
+@code{agent-disable-undownloaded-faces} group parameter to t.  This
+parameter, like all other agent parameters, may be set on an Agent
+Category (@pxref{Agent Categories}), a Group Topic (@pxref{Topic
+Parameters}), or an individual group (@pxref{Group Parameters}).
 
 @node Agent as Cache
 @subsection $B%-%c%C%7%e$H$7$F$N%(!<%8%'%s%H(B
@@ -21292,13 +21381,6 @@ Spam $B$KBP=h$9$k0l$D$NJ}K!$O!"(Bgnus $B$KA4$F$N(B spam $B$r(B @samp{spam}
 $B$k$H;W$C$F$$$k$J$i!"$=$l$>$l$N2!$7IU$1@kEA%a!<%k$N4X78Ev6I$K6l>p$rAw$jIU(B
 $B$1$k$3$H$5$($b$G$-$^$9(B --- $B2K$J$H$-$K$G$b$M!#(B
 
-$B$^$?!"$"$J$?$,BU$1<T$N%M%C%H%o!<%/;TL1$G$b$"$k$J$i!"(B
-@file{gnus-junk.el} $B%Q%C%1!<%8$K$h$C$F<+F0E*$K6l>p$r$$$&J}$,NI$$$H;W$&$+(B
-$B$b$7$l$^$;$s!#$3$l(B
-$B$O(B @* @uref{http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html} $B$+(B
-$B$i!VL5NA$G!WMxMQ$G$-$^$9!#$[$H$s$I$N(B spam $B%a!<%k$O<+F0E*$KAw$i$l$F$$$k$N(B
-$B$G!"$A$g$C$H$@$11'Ch$N%P%i%s%9$,$H$l$k$+$b$7$l$^$;$s!#(B
-
 $B$3$l$G;d$N$H$3$m$G$OF0$$$F$$$^$9!#$3$l$G$_$s$J$O4JC1$JJ}K!$G;d$KO"Mm$r<h(B
 $B$k$3$H$,$G$-(B ($BIaDL$K(B @kbd{r} $B$r2!$9$@$1$G$G$-$k(B)$B!";d$O(B spam $B$KHQ$o$5$l$k(B
 $B$3$H$OA4$/$"$j$^$;$s!#F@!9>uBV$G$9!#;d$N0U8+$H$7$F$O!"(B@code{From} $B%X%C%@!<(B
@@ -21614,12 +21696,12 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 $B%U%)%k%H$G$O$=$N%0%k!<%WL>$O(B @samp{spam} $B$G$9$,!"(B
 @code{spam-split-group} $B$r%+%9%?%^%$%:$9$k$3$H$,2DG=$G$9!#(B
 
-@c TRANSLATEME
-You can also give @code{spam-split} a parameter,
-e.g. @samp{'spam-use-regex-headers}.  Why is this useful?
+$B$^$?!"(B@code{spam-split} $B$K%Q%i%a!<%?!"Nc$((B
+$B$P(B @samp{spam-use-regex-headers} $B$rM?$($k$3$H$b$G$-$^$9!#$J$<$3$l$,M-MQ(B
+$B$J$N$G$7$g$&$+(B?
 
-Take these split rules (with @code{spam-use-regex-headers} and
-@code{spam-use-blackholes} set):
+$B$3$l$i$N(B (@code{spam-use-regex-headers} $B$H(B @code{spam-use-blackholes} $B$N(B
+$B@_Dj$K$h$k(B) $BJ,3d$N5,B'$r8+$F2<$5$$(B:
 
 @example
  nnimap-split-fancy '(|
@@ -21629,16 +21711,16 @@ Take these split rules (with @code{spam-use-regex-headers} and
 		      "mail")
 @end example
 
-Now, the problem is that you want all ding messages to make it to the
-ding folder.  But that will let obvious spam (for example, spam
-detected by SpamAssassin, and @code{spam-use-regex-headers}) through,
-when it's sent to the ding list.  On the other hand, some messages to
-the ding list are from a mail server in the blackhole list, so the
-invocation of @code{spam-split} can't be before the ding rule.
+$B$5$F!"LdBj$O(B ding $B08$F$N%a%C%;!<%8$r$9$Y$F(B ding $B%U%)%k%@!<$KF~$l$h$&$H$7(B
+$B$F$$$k$3$H$G$9!#$G$b$=$l$O(B ding $B%a!<%j%s%0%j%9%H08$F$KAw$i$l$?(B spam ($BNc(B
+$B$($P(B SpamAssassin $B$H(B @code{spam-use-regex-headers} $B$K$h$C$F8!=P$5$l(B
+$B$k(B spam) $B$r5v$7$F$7$^$&$G$7$g$&!#0lJ}!"$$$/$D$+$N(B ding $B08$F$N%a%C%;!<%8(B
+$B$O%V%i%C%/%[!<%k%j%9%H$K:\$C$F$$$k%a!<%k%5!<%P!<$+$i$d$C$FMh$k$N$G!"(B
+ding $B$N5,B'$h$jA0$K(B @code{spam-split} $B$rH/F0$9$k$3$H$,$G$-$^$;$s!#(B
 
-You can let SpamAssassin headers supercede ding rules, but all other
-@code{spam-split} rules (including a second invocation of the
-regex-headers check) will be after the ding rule:
+SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>(B
+$B$N$9$Y$F$N(B @code{spam-split} $B$N5,B'(B ($BBhFs$N@55,I=8=%X%C%@!<8!::$r4^(B
+$B$`(B) $B$O(B ding $B$N5,B'$N8e$K$J$C$F$7$^$&$G$7$g$&!#(B
 
 @example
  nnimap-split-fancy '(|
@@ -21649,19 +21731,18 @@ regex-headers check) will be after the ding rule:
 		      "mail")
 @end example
 
-Basically, this lets you invoke specific @code{spam-split} checks
-depending on your particular needs.  You don't have to throw all mail
-into all the spam tests.  Another reason why this is nice is that
-messages to mailing lists you have rules for don't have to have
-resource-intensive blackhole checks performed on them.  You could also
-specify different spam checks for your nnmail split vs. your nnimap
-split.  Go crazy.
+$B4pK\E*$K!"$3$l$OFC$K$"$J$?$NI,MW$K0MB8$7$?FCDj$N(B @code{spam-split} $B8!(B
+$B::$r5/F0$5$;$^$9!#$9$Y$F$N%a!<%k$r$9$Y$F$N(B spam $B%F%9%H$KEj$2$kI,MW$O$"$j(B
+$B$^$;$s!#$3$l$,NI$$JL$NM}M3$O!"5,B'$r;}$C$F$$$k%a!<%j%s%0%j%9%H$X$N%a%C%;!<(B
+$B%8$KBP$7$F!";q8;=8LsE*$J%V%i%C%/%[!<%k!&%A%'%C%/$r<B9T$9$kI,MW$,$J$$$H$$(B
+$B$&$3$H$G$9!#$5$i$K(B nnmail $BJ,3d$KBP$7$F(B nnimap $BJ,3d$N$?$a$N!"0[$J$k(B spam
+$B8!::$r;XDj$9$k$3$H$b$G$-$^$9!#5$$,68$&!<!#(B
 
-You still have to have specific checks such as
-@code{spam-use-regex-headers} set to t, even if you specifically
-invoke @code{spam-split} with the check.  The reason is that when
-loading @code{spam.el}, some conditional loading is done depending on
-what @code{spam-use-xyz} variables you have set.
+$B8!::$HF1;~$KL@$i$+$K(B @code{spam-split} $B$r<B9T$9$k$H$7$F$b!":#$^$G$H$*(B
+$B$j(B @code{spam-use-regex-headers} $B$r(B t $B$K@_Dj$9$k$h$&$J8!::$r9T$C$F$$$J$1(B
+$B$l$P$J$j$^$;$s!#$J$<$J$i(B @file{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?$,2?(B
+$B$N(B @code{spam-use-xyz} $BJQ?t$r@_Dj$7$F$$$k$+$K1~$8$?!"$$$/$D$+$N>r7oIU$-(B
+$B$NFI$_9~$_$,9T$o$l$k$+$i$G$9!#(B
 
 @emph{@acronym{IMAP} $BMxMQ<T$X$NCm0U(B}
 
@@ -21813,9 +21894,8 @@ what @code{spam-use-xyz} variables you have set.
 
 @end defvar
 
-@c TRANSLATEME
 @node Gmane Spam Reporting
-@subsubsection Gmane Spam Reporting
+@subsubsection Gmane Spam $BJs9p(B
 @cindex spam reporting
 @cindex Gmane, spam reporting
 @cindex Gmane, spam reporting
@@ -21823,30 +21903,30 @@ what @code{spam-use-xyz} variables you have set.
 
 @defvar gnus-group-spam-exit-processor-report-gmane
 
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameters or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is
-added to a group's @code{spam-process} parameter, the spam-marked
-articles groups will be reported to the Gmane administrators.
+$B%0%k!<%W%Q%i%a!<%?$+JQ?t(B @code{gnus-spam-process-newsgroups} $B$r%+%9%?%^(B
+$B%$%:$7$F!"$3$N%7%s%\%k$r%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$((B
+$B$F2<$5$$!#$3$l$,2C$($i$l$k$H!"(Bspam $B0u$,IU$$$?5-;v$N%0%k!<%W$,(B Gmane $B$N4I(B
+$BM}<T$KJs9p$5$l$^$9!#(B($BLuCm(B: gmane $B%K%e!<%9%0%k!<%W$rFI$s$G$$$k$H$-$K8+$D(B
+$B$+$C$?(B spam $B$N5-;vHV9f$H%0%k!<%WL>$r(B http $B7PM3$GEA$($^$9!#(B
+@file{spam-report.el} $B;2>H!#(B)
 
 @end defvar
 
 @node Anti-spam Hashcash Payments
-@subsubsection Anti-spam Hashcash Payments
+@subsubsection $BHs(B-spam Hashcash $B0u(B
 @cindex spam filtering
 @cindex hashcash, spam filtering
 @cindex spam
 
 @defvar spam-use-hashcash
 
-Similar to @code{spam-use-whitelist} (@pxref{Blacklists and
-Whitelists}), but uses hashcash tokens for whitelisting messages
-instead of the sender address.  You must have the @code{hashcash.el}
-package loaded for @code{spam-use-hashcash} to work properly.
-Messages without a hashcash payment token will be sent to the next
-spam-split rule.  This is an explicit filter, meaning that unless a
-hashcash token is found, the messages are not assumed to be spam or
-ham.
+@code{spam-use-whitelist} (@pxref{Blacklists and Whitelists}) $B$K;w$F$$$^(B
+$B$9$,!"Aw?.<T$N%"%I%l%9$NBe$o$j$K!"7iGr$J%a%C%;!<%8$N$?$a$N(B hashcash $B$N(B
+$B0u(B (tokens) $B$r;H$$$^$9!#(B@code{spam-use-hashcash} $B$,@5$7$/F/$/$h$&$K$9$k(B
+$B$?$a$K!"(B@file{hashcash.el} $B$rFI$_9~$s$G$*$+$J$1$l$P$J$j$^$;$s!#(B
+Hashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,3d(B (spam-split) $B5,B'$KAw$i$l$^(B
+$B$9!#$3$l$O(B hashcash $B0u$,8+Ev$?$i$J$$%a%C%;!<%8$O(B spam $B$H$b(B ham $B$H$b8+$J(B
+$B$5$l$J$$$3$H$r0UL#$9$k!"L@<(E*$J_I2a4o$G$9!#(B
 
 @end defvar
 
@@ -22109,7 +22189,7 @@ Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
 
 @code{spam-list-of-checks} $B$K(B
 @example
-    (spam-use-blackbox	 . spam-check-blackbox)
+    (spam-use-blackbox . spam-check-blackbox)
 @end example
 $B$rDI2C!#(B
 
@@ -22877,7 +22957,7 @@ Message Mode $B$O<u?.<T$K3+Iu3NG'$rMW5a$9$k$3$H$,$G$-$^$9!#(B
 @cindex RFC 1991
 @cindex RFC 2440
 RFC 1991 is the original @acronym{PGP} message specification,
-published as a Information RFC.  RFC 2440 was the follow-up, now
+published as an informational RFC.  RFC 2440 was the follow-up, now
 called Open PGP, and put on the Standards Track.  Both document a
 non-@acronym{MIME} aware @acronym{PGP} format.  Gnus supports both
 encoding (signing and encryption) and decoding (verification and
@@ -24023,210 +24103,217 @@ Gnus posting styles $B$,:F$S2~Au$5$l$^$7$?!#8=:_$OHyL/$K0c$&5,B'$GF0:n$7$^(B
 Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B @acronym{IMAP} $B%a!<%k$rFI$`$3$H$,$G$-$^$9!#(B
 @end itemize
 
-@c TRANSLATEME
 @node Oort Gnus
 @subsubsection Oort Gnus
 @cindex Oort Gnus
 
-New features in Gnus 5.10:
+Gnus 5.10 $B$N?7$7$$5!G=(B:
 
 @itemize @bullet
 
 @item
-The revised Gnus @acronym{FAQ} is included in the manual,
-@xref{Frequently Asked Questions}.
+$B2~Dj$5$l$?(B Gnus @acronym{FAQ} $B$,%^%K%e%"%k$K4^$^$l$F$$$^$9!#(B
+@xref{Frequently Asked Questions}$B!#(B($BLuCm(B: T-gnus $B$N$?$a(B
+$B$N(B @acronym{FAQ} $B$O1J$i$/2~Dj$5$l$F$$$^$;$s!#(B)
 
 @item
-Upgrading from previous (stable) version if you have used Oort.
+Oort $B$r;H$C$?$3$H$,$"$k>l9g$N!"0JA0$N(B ($B0BDj$J(B) $BHG$+$i$N%0%l!<%I%"%C%W!#(B
 
-If you have tried Oort (the unstable Gnus branch leading to this
-release) but went back to a stable version, be careful when upgrading to
-this version.  In particular, you will probably want to remove all
-@file{.marks} (nnml) and @file{.mrk} (nnfolder) files, so that flags are
-read from your @file{.newsrc.eld} instead of from the
-@file{.marks}/@file{.mrk} file where this release store flags.  See a
-later entry for more information about marks.  Note that downgrading
-isn't save in general.
-
-@item
-Article Buttons
-
-More buttons for URLs, mail addresses, Message-IDs, Info links, man
-pages and Emacs or Gnus related references.  @xref{Article Buttons}.  The
-variables @code{gnus-button-@var{*}-level} can be used to control the
-appearance of all article buttons.  @xref{Article Button Levels}.
+Oort ($B$3$N%j%j!<%9$K@hN)$D0BDj$G$O$J$$(B Gnus $B$N;^(B) $B$r;H$C$F$_$?$b$N$N!"0B(B
+$BDjHG$KLa$7$F$7$^$C$?$J$i$P!"$3$NHG$K%0%l!<%I%"%C%W$9$k$H$-$KCm0U$7$F2<$5(B
+$B$$!#FC$K!"$*$=$i$/$9$Y$F(B
+$B$N(B @file{.marks} (nnml) $B$H(B @file{.mrk} (nnfolder) $B%U%!%$%k$r>C5n$9$kI,MW(B
+$B$,$"$k$G$7$g$&!#$3$NHG(B ($B$N(B Gnus) $B$,%U%i%0$r3JG<$9(B
+$B$k(B @file{.marks}/@file{.mrk} $B%U%!%$%k$G$O$J$/$F(B @file{.newsrc.eld} $B$+$i(B
+$B%U%i%0$,FI$^$l$k$h$&$K$J$C$F$$$?$+$i$G$9!#8e=R$N9`L\$G!"0u(B (marks) $B$K4X(B
+$B$9$k$h$jB?$/$N>pJs$rFI$s$G2<$5$$!#%0%l!<%I$r2<$2$F$b0lHL$K$O=u$1$K$J$i$J(B
+$B$$$3$H$KCm0U$7$F2<$5$$!#(B
 
 @item
-Dired integration
+$B5-;v$N%\%?%s(B
 
-@code{gnus-dired-minor-mode} installs key bindings in dired buffers to send
-a file as an attachment (@kbd{C-c C-a}), open a file using the approriate
-mailcap entry (@kbd{C-c C-l}), and print a file using the mailcap entry
-(@kbd{C-c P}).  It is enabled with 
+URL$B!"%a!<%k%"%I%l%9!"(BMessage-ID$B!"(BInfo $B$X$N%j%s%/!"(Bman $B%Z!<%8$H(B Emacs $B$^(B
+$B$?$O(B Gnus $B$K4XO"$7$?;29MJ88%$N$?$a$N!"$h$jB?$/$N%\%?%s!#(B@xref{Article
+Buttons}$B!#$9$Y$F$N5-;v$N%\%?%s$N8+1I$($r@)8f$9$k$?$a(B
+$B$K(B @code{gnus-button-@var{*}-level} $BJQ?t$r;H$&$3$H$,$G$-$^$9!#(B
+@xref{Article Button Levels}$B!#(B
+
+@item
+Dired $B$NE}9g(B
+
+@code{gnus-dired-minor-mode} $B$O!"(Bdired $B$N%P%C%U%!$G%-!<@_Dj(B -- $BE:IU%U%!(B
+$B%$%k$NAw?.(B (@kbd{C-c C-a})$B!"(Bmailcap $B$NE,@Z$J9`L\$r;H$C$F%U%!%$%k$r3+(B
+$B$/(B (@kbd{C-c C-l})$B!"$=$l$K(B mailcap $B$N9`L\$r;H$C$F%U%!%$%k$r0u:~$9(B
+$B$k(B (@kbd{C-c P}) -- $B$r9T$J$$$^$9!#$3$l$O<!$N<0$r;H$&$HM-8z$K$J$j$^$9!#(B
+
 @lisp
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 @end lisp
 
 @item
-Gnus can display RSS newsfeeds as a newsgroup.  @xref{RSS}.
+Gnus $B$O(B RSS $B$N%K%e!<%9G[Aw$r!"%K%e!<%9%0%k!<%W$H$7$FI=<($7$^$9!#(B
+@xref{RSS}$B!#(B
 
 @item
-Single-part yenc encoded attachments can be decoded.
+$BC10l$N(B yenc $B$G%(%s%3!<%I$5$l$?E:IU%Q!<%H$,%G%3!<%I$G$-$^$9!#(B
 
 @item
 Picons
 
-The picons code has been reimplemented to work in GNU Emacs---some of
-the previous options have been removed or renamed.
+Picon $B$N%3!<%I$,!"(BGNU Emacs $B$GF0:n$5$;$k$?$a$K:F<BAu$5$l$^$7$?!#0JA0$N$$(B
+$B$/$D$+$N%*%W%7%g%s$,!":o=|$^$?$O2~L>$5$l$F$$$^$9!#(B
 
-Picons are small ``personal icons'' representing users, domain and
-newsgroups, which can be displayed in the Article buffer.
-@xref{Picons}.
-
-@item
-If the new option @code{gnus-treat-body-boundary} is non-@code{nil}, a
-boundary line is drawn at the end of the headers.
+Picon $B$O!"%f!<%6!<!"%I%a%$%s!"$=$l$K%K%e!<%9%0%k!<%W$rI=8=$9$k$?$a$N!V8D(B
+$B?ME*$J%"%$%3%s(B (personal icons)$B!W$G!"5-;v%P%C%U%!$KI=<($9$k$3$H$,$G$-$^(B
+$B$9!#(B@xref{Picons}$B!#(B
 
 @item
-Retrieval of charters and control messages
-
-There are new commands for fetching newsgroup charters (@kbd{H c}) and
-control messages (@kbd{H C}).
+$B?7$7$$%*%W%7%g%s(B @code{gnus-treat-body-boundary} $B$rHs(B-@code{nil} $B$K$9$k(B
+$B$H!"%X%C%@!<$N$*$7$^$$$K6-3&@~$,IA$+$l$^$9!#(B
 
 @item
-Delayed articles
+$B7{>O$H%3%s%H%m!<%k%a%C%;!<%8$N<hF@(B
 
-You can delay the sending of a message with @kbd{C-c C-j} in the Message
-buffer.  The messages are delivered at specified time.  This is useful
-for sending yourself reminders.  @xref{Delayed Articles}.
-
-@item
-If @code{auto-compression-mode} is enabled, attachments are automatically
-decompressed when activated.
+$BFs$D$N%3%^%s%I(B -- $B%K%e!<%9%0%k!<%W$N7{>O$r<h$j9~$`(B (@kbd{H c})$B!"%3%s%H%m!<(B
+$B%k%a%C%;!<%8$r<hF@(B (@kbd{H C}) -- $B$,$"$j$^$9!#(B
 
 @item
-If the new option @code{nnml-use-compressed-files} is non-@code{nil}, 
-the nnml back end allows compressed message files.
+$BCY1d5-;v(B
+
+Message $B%P%C%U%!$K$*$1$k(B @kbd{C-c C-j} $B$G!"%a%C%;!<%8$NAw?.$rCY$i$;$k$3(B
+$B$H$,$G$-$^$9!#%a%C%;!<%8$O;XDj$5$l$?;~9o$KG[Aw$5$l$^$9!#$3$l$O$"$J$?<+?.(B
+$B$N$?$a$NK:HwO?$H$7$FLr$KN)$D$G$7$g$&!#(B@xref{Delayed Articles}$B!#(B
 
 @item
-Signed article headers (X-PGP-Sig) can be verified with @kbd{W p}.
+@code{auto-compression-mode} $B$,M-8z$K$J$C$F$$$k$H!"E:IU%U%!%$%k$r8+$k$H(B
+$B$-$K<+F0$G05=L$,2r$+$l$^$9!#(B
 
 @item
-The Summary Buffer uses an arrow in the fringe to indicate the current 
-article.  Use @code{(setq gnus-summary-display-arrow nil)} to disable it.
+$B?7$7$$%*%W%7%g%s(B @code{nnml-use-compressed-files} $B$rHs(B-@code{nil} $B$K$9$k(B
+$B$3$H$K$h$C$F!"(Bnnml $B$,05=L$5$l$?%a%C%;!<%8%U%!%$%k$r07$&$3$H$,$G$-$k$h$&(B
+$B$K$J$j$^$9!#(B
 
 @item
-Warn about email replies to news
-
-Do you often find yourself replying to news by email by mistake?  Then
-the new option @code{gnus-confirm-mail-reply-to-news} is just the thing for
-you.
+$B5-;v$N=pL>%X%C%@!<(B (X-PGP-Sig) $B$r!"(B@kbd{W p} $B$GG'>Z$9$k$3$H$,$G$-$^$9!#(B
 
 @item
-If the new option @code{gnus-summary-display-while-building} is
-non-@code{nil}, the summary buffer is shown and updated as it's being
-built.
+$B35N,%P%C%U%!$O(B fringe $B$NCf$NLp0u$G8=:_$N5-;v$r<($7$^$9!#$3$l$rL58z$K$9$k(B
+$B$K$O(B @code{(setq gnus-summary-display-arrow nil)} $B$r;H$C$F2<$5$$!#(B
 
 @item
-The new @code{recent} mark @samp{.} indicates newly arrived messages (as
-opposed to old but unread messages).
+$B%K%e!<%9$K%a!<%k$GJV?.$7$h$&$H$7$?$i7Y9p(B
+
+$B4V0c$C$F%K%e!<%9$K%a!<%k$GJV?.$7$h$&$H$7$F$7$^$&$3$H$,!"$7$g$C$A$e$&$"$j(B
+$B$^$;$s$+(B?  $B$=$s$J$"$J$?$K?7%*%W%7%g(B
+$B%s(B @code{gnus-confirm-mail-reply-to-news}$B!#(B
 
 @item
-The new option @code{gnus-gcc-mark-as-read} automatically marks 
-Gcc articles as read.
+$B?7$7$$%*%W%7%g%s(B @code{gnus-summary-display-while-building} $B$r(B
+$BHs(B-@code{nil} $B$K$9$k$H!"35N,%P%C%U%!$,:n$i$l$F$$$/MM;R$,I=<($5$l$^$9!#(B
 
 @item
-The nndoc back end now supports mailman digests and exim bounces.
+$B?7$7$$(B @code{recent} $B0u(B @samp{.} $B$G!"?75,$KFO$$$?%a%C%;!<%8$r(B ($BL$FI$@$1(B
+$B$l$I$b8E$$5-;v$H$O6hJL$7$F(B) $BI=<($7$^$9!#(B
 
 @item
-Gnus supports RFC 2369 mailing list headers, and adds a number of 
-related commands in mailing list groups.  @xref{Mailing List}.
+$B?7$7$$%*%W%7%g%s(B @code{gnus-gcc-mark-as-read} $B$O!"(BGcc $B$N5-;v$K<+F0E*$K4{(B
+$BFI$N0u$rIU$1$^$9!#(B
 
 @item
-The Date header can be displayed in a format that can be read aloud
-in English.  @xref{Article Date}.
+nndoc $B%P%C%/%(%s%I$O!"(Bmailman $B$N$^$H$aAw$j$H(B exim $B$,CF$$$?%a%C%;!<%8$r%5(B
+$B%]!<%H$9$k$h$&$K$J$j$^$7$?!#(B
 
 @item
-The envelope sender address can be customized when using Sendmail.
-@xref{Mail Variables, Mail Variables,, message, Message Manual}.
+Gnus $B$O(B RFC 2369 $B$N%a!<%j%s%0%j%9%H$N%X%C%@!<$r%5%]!<%H$7$^$9!#$^$?!"%a!<(B
+$B%j%s%0%j%9%H$N%0%k!<%WMQ$K?t!9$N%3%^%s%I$rMQ0U$7$^$7$?!#(B@xref{Mailing
+List}$B!#(B
 
 @item
-diffs are automatically highlighted in groups matching
-@code{mm-uu-diff-groups-regexp}
+$BF|IU%X%C%@!<$r!"1Q8l$GH/2;$G$-$k7A<0$GI=<($9$k$3$H$,$G$-$^$9!#(B
+@xref{Article Date}$B!#(B
 
 @item
-@acronym{TLS} wrapper shipped with Gnus
-
-@acronym{TLS}/@acronym{SSL} is now supported in @acronym{IMAP} and
-@acronym{NNTP} via @file{tls.el} and GNUTLS.  The old
-@acronym{TLS}/@acronym{SSL} support via (external third party)
-@file{ssl.el} and OpenSSL still works.
+Sendmail $B$r;H$&$H$-$N%(%s%Y%m!<%WAw?.<T(B (envelope sender) $B$N%"%I%l%9$,!"(B
+$B%+%9%?%^%$%:$G$-$k$h$&$K$J$j$^$7$?!#(B@xref{Mail Variables, Mail
+Variables,, message, Message Manual}$B!#(B
 
 @item
-New @file{make.bat} for compiling and installing Gnus under MS Windows
-
-Use @file{make.bat} if you want to install Gnus under MS Windows, the
-first argument to the batch-program should be the directory where
-@file{xemacs.exe} respectively @file{emacs.exe} is located, iff you want
-to install Gnus after compiling it, give @file{make.bat} @code{/copy} as
-the second parameter.
-
-@file{make.bat} has been rewritten from scratch, it now features
-automatic recognition of XEmacs and GNU Emacs, generates
-@file{gnus-load.el}, checks if errors occur while compilation and
-generation of info files and reports them at the end of the build
-process. It now uses @code{makeinfo} if it is available and falls
-back to @file{infohack.el} otherwise.  @file{make.bat} should now
-install all files which are necessary to run Gnus and be generally a
-complete replacement for the @code{configure; make; make install}
-cycle used under Unix systems.
-
-The new @file{make.bat} makes @file{make-x.bat} superfluous, so it has
-been removed.
+@code{mm-uu-diff-groups-regexp} $B$K9gCW$9$k%0%k!<%W$G$O!":9J,(B (diffs) $B$,(B
+$B<+F0E*$K%O%$%i%$%H$5$l$^$9!#(B
 
 @item
-Support for non-@acronym{ASCII} domain names
+@acronym{TLS} $B%i%C%Q!<$,(B Gnus $B$KF1:-(B
 
-Message supports non-@acronym{ASCII} domain names in From:, To: and
-Cc: and will query you whether to perform encoding when you try to
-send a message.  The variable @code{message-use-idna} controls this.
-Gnus will also decode non-@acronym{ASCII} domain names in From:, To:
-and Cc: when you view a message.  The variable @code{gnus-use-idna}
-controls this.
+@acronym{TLS}/@acronym{SSL} $B$,!"(B@file{tls.el} $B$H(B GNUTLS $B$r2p$7(B
+$B$F(B @acronym{IMAP} $B$H(B @acronym{NNTP} $B$G%5%]!<%H$5$l$k$h$&$K$J$j$^$7$?!#(B
+($B%5!<%I%Q!<%F%#!<$N(B) @file{ssl.el} $B$H(B OpenSSL $B$K$h$k8E(B
+$B$$(B @acronym{TLS}/@acronym{SSL} $B$O!"$^$@;H$($^$9!#(B
 
 @item
-Better handling of Microsoft citation styles
+MS $B%&%#%s%I%&%:$G(B Gnus $B$r%3%s%Q%$%k$7$F%$%s%9%H!<%k$9$k$?$a$N!"?7$7(B
+$B$$(B @file{make.bat}
 
-Gnus now tries to recognize the mangled header block that some Microsoft
-mailers use to indicate that the rest of the message is a citation, even
-though it is not quoted in any way.  The variable
-@code{gnus-cite-unsightly-citation-regexp} matches the start of these
-citations.
+MS $B%&%#%s%I%&%:$G(B Gnus $B$r%$%s%9%H!<%k$9$k$K$O(B @file{make.bat} $B$r;H$C$F2<(B
+$B$5$$!#$3$N%P%C%A!&%W%m%0%i%`$NBh0l0z?t$O%G%#%l%/%H%j$G$9!#$=$3(B
+$B$G(B @file{xemacs.exe} $B$H(B @file{emacs.exe} $B$,=g$KA\$7=P$5$l$^$9!#%3%s%Q%$(B
+$B%k$7$F$+$i(B Gnus $B$r%$%s%9%H!<%k$7$?$$$H$-$O!"(B@file{make.bat} $B$NBhFs0z?t(B
+$B$K(B @code{/copy} $B$rM?$($F2<$5$$!#(B
+
+@file{make.bat} $B$O%<%m$+$i=q$-D>$5$l$^$7$?!#(BXEmacs $B$H(B GNU Emacs $B$r<+F0G'(B
+$B<1$7!"(B@file{gnus-load.el} $B$r@8@.$7!"%3%s%Q%$%kCf$H(B info $B%U%!%$%k$N@8@.Cf(B
+$B$K%(%i!<$,5/$-$?$i9=C[=hM}$N:G8e$KJs9p$7$^$9!#(B@code{makeinfo} $B$,MxMQ2DG=(B
+$B$G$"$l$P$=$l$r;H$$!"$5$b$J$1$l$P(B @file{infohack.el} $B$KMj$j$^$9!#:#(B
+$B$d(B @file{make.bat} $B$O(B Gnus $B$rF0:n$5$;$k$?$a$KI,MW$J$9$Y$F$N%U%!%$%k$r%$(B
+$B%s%9%H!<%k$9$k$O$:$G!"BgBN$K$*$$$F(B Unix $B%7%9%F%`$K$*$1(B
+$B$k(B @code{configure; make; make install} $B%5%$%/%k$N40A4$JCV$-49$($K$J$j$^(B
+$B$7$?!#(B
+
+$B?7$7$$(B @file{make.bat} $B$O(B @file{make-x.bat} $B$rITMW$K$7$?$N$G!"$=$l$O:o=|(B
+$B$5$l$^$7$?!#(B
+
+@item
+$BHs(B-@acronym{ASCII} $B%I%a%$%sL>$N%5%]!<%H(B
+
+Message $B$O(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%I%a%$%sL>$r%5(B
+$B%]!<%H$7!"%a%C%;!<%8$NAw?.$r;n$_$k$H$-$K%(%s%3!<%I$9$k$+$I$&$+$r?R$M$^$9!#(B
+@code{message-use-idna} $BJQ?t$G$3$l$r@)8f$7$^$9!#(BGnus $B$b$^$?!"%a%C%;!<%8(B
+$B$r8+$k$H$-$K(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%I%a%$%sL>$r(B
+$B%G%3!<%I$7$^$9!#$3$l$r@)8f$9$k$N$O(B @code{gnus-use-idna} $BJQ?t$G$9!#(B
+
+@item
+$B%^%$%/%m%=%U%H0zMQMM<0$N$h$jNI$$<h$j07$$(B
+
+$B$$$/$D$+$N%^%$%/%m%=%U%H$N%a%$%i!<$,!"%a%C%;!<%8$N;D$j$NItJ,$,0zMQ$G$"$k(B
+$B$3$H$r<($9$?$a$K;H$&BfL5$7$K$5$l$?%X%C%@!<%V%m%C%/$r!"$?$H$($=$l$,0zMQId(B
+$B$G0O$^$l$F$$$J$/$F$b!"(BGnus $B$OG'<1$7$h$&$H$7$^$9!#JQ(B
+$B?t(B @code{gnus-cite-unsightly-citation-regexp} $B$O!"$=$l$i$N0zMQ$N@hF,$K9g(B
+$BCW$7$^$9!#(B
 
 @item
 @code{gnus-article-skip-boring}
 
-If you set @code{gnus-article-skip-boring} to @code{t}, then Gnus will
-not scroll down to show you a page that contains only boring text,
-which by default means cited text and signature.  You can customize
-what is skippable using @code{gnus-article-boring-faces}.
+@code{gnus-article-skip-boring} $B$r(B @code{t} $B$K@_Dj$9$k$H!"(BGnus $B$O$&$s$6(B
+$B$j$9$kJ8$7$+4^$s$G$$$J$$%Z!<%8$r8+$;$k$?$a$K!"2<J}$K%9%/%m!<%k$7$^$;$s!#(B
+@code{gnus-article-boring-faces} $B$r;H$C$F!"2?$rFI$_Ht$P$7$F$7$^$C$F$bNI(B
+$B$$$+$r%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9!#(B
 
-This feature is especially useful if you read many articles that
-consist of a little new content at the top with a long, untrimmed
-message cited below.
-
-@item
-The format spec @code{%C} for positioning point has changed to @code{%*}.
+$BD9$/$F4"$j9~$^$l$F$$$J$$0zMQ$,!"$F$C$Z$s$K>/$7$@$1$"$k?75,$JFbMF$KB3$$$F(B
+$B$$$k$?$/$5$s$N5-;v$rFI$`>l9g$K!"$3$l$OFC$KLr$KN)$A$^$9!#(B
 
 @item
-The new variable @code{gnus-parameters} can be used to set group parameters.
+$B%]%$%s%H$N0LCV7h$a$N$?$a$N%U%)!<%^%C%H$N;EMM(B (format spec) $B$G$"(B
+$B$k(B @code{%C} $B$O!"(B@code{%*} $B$KJQ99$5$l$^$7$?!#(B
 
-Earlier this was done only via @kbd{G p} (or @kbd{G c}), which stored
-the parameters in @file{~/.newsrc.eld}, but via this variable you can
-enjoy the powers of customize, and simplified backups since you set the
-variable in @file{~/.emacs} instead of @file{~/.newsrc.eld}.  The
-variable maps regular expressions matching group names to group
-parameters, a'la:
+@item
+$B?7$7$$JQ?t(B @code{gnus-parameters} $B$,!"%0%k!<%W%Q%i%a!<%?$r@_Dj$9$k$?$a$K(B
+$B;H$&$3$H$,$G$-$^$9!#(B
+
+$B$3$l$O=i4|$K$O!"%Q%i%a!<%?$r(B @file{~/.newsrc.eld} $B$K3JG<$9$k(B @kbd{G p}
+($B$^$?$O(B @kbd{G c}) $B$G$7$+9T$J$&$3$H$,$G$-$^$;$s$G$7$?$,!"$3$NJQ?t$K$h$C(B
+$B$F%+%9%?%^%$%:$N0RNO$r4.G=$9$k$3$H$,$G$-$^$9!#$^$?!"$=$NJQ?t(B
+$B$O(B @file{~/.newsrc.eld} $B$G$O$J$/$F(B @file{~/.emacs} $B$G@_Dj$9$k$N$G!"%P%C(B
+$B%/%"%C%W$,4JC1$K$J$j$^$9!#$=$NJQ?t$O!"%0%k!<%WL>$K9gCW$9$k@55,I=8=$r!"0J(B
+$B2<$N$h$&$JN.57$G%0%k!<%W%Q%i%a!<%?$K3d$jEv$F$^$9(B:
 @lisp
 (setq gnus-parameters
       '(("mail\\..*"
@@ -24237,58 +24324,63 @@ parameters, a'la:
 @end lisp
 
 @item
-Smileys (@samp{:-)}, @samp{;-)} etc) are now iconized for Emacs too.
+$B%9%^%$%j!<(B (@samp{:-)}, @samp{;-)} $B$J$I(B) $B$,(B Emacs $B$G$b%"%$%3%s2=$5$l$k$h(B
+$B$&$K$J$j$^$7$?!#(B
 
-Put @code{(setq gnus-treat-display-smileys nil)} in @file{~/.emacs} to
-disable it.
-
-@item
-Gnus no longer generate the Sender: header automatically.
-
-Earlier it was generated iff the user configurable email address was
-different from the Gnus guessed default user address.  As the guessing
-algorithm is rarely correct these days, and (more controversally) the
-only use of the Sender: header was to check if you are entitled to
-cancel/supersede news (which is now solved by Cancel Locks instead,
-see another entry), generation of the header has been disabled by
-default.  See the variables @code{message-required-headers},
-@code{message-required-news-headers}, and
-@code{message-required-mail-headers}.
+$B$3$l$rF/$+$J$$$h$&$K$9$k$K$O!"(B@code{(setq gnus-treat-display-smileys
+nil)} $B$r(B @file{~/.emacs} $B$KCV$$$F2<$5$$!#(B
 
 @item
-Features from third party @file{message-utils.el} added to @file{message.el}.
+Gnus $B$O:#$G$O(B Sender: $B%X%C%@!<$r<+F0$G$O@8@.$7$^$;$s!#(B
 
-Message now asks if you wish to remove @samp{(was: <old subject>)} from
-subject lines (see @code{message-subject-trailing-was-query}).  @kbd{C-c
-M-m} and @kbd{C-c M-f} inserts markers indicating included text.
-@kbd{C-c C-f a} adds a X-No-Archive: header.  @kbd{C-c C-f x} inserts
-appropriate headers and a note in the body for cross-postings and
-followups (see the variables @code{message-cross-post-@var{*}}).
-
-@item
-References and X-Draft-Headers are no longer generated when you start
-composing messages and @code{message-generate-headers-first} is
-@code{nil}.
+$B=i4|$N$3$m!"$=$l$O%f!<%6!<$,@_Dj$G$-$k(B email $B%"%I%l%9$,!"(BGnus $B$,A[Dj$7$?(B
+$B%f!<%6!<$N%G%#%U%)%k%H$N%"%I%l%9$H0c$C$F$$$?>l9g$K@8@.$5$l$^$7$?!#:#F|$G(B
+$B$O$=$NA[Dj%"%k%4%j%:%`$,@5$7$$$3$H$O$^$l$G!"(BSender: $B%X%C%@!<$NM#0l$N(B ($B5D(B
+$BO@$NE*$K$J$k(B) $BMQES$O!"%K%e!<%9$r(B cancel/supersede $B$9$k;q3J$,$"$k$+$I$&$+(B
+$B$r8!::$9$k$3$H(B ($B$3$l$OBe$o$j$K!"B>$N9`$G=R$Y$i$l$k(B Cancel Locks $B$K$h$C$F(B
+$B2r7h$5$l$?(B) $B$J$N$G!"$=$N%X%C%@!<$N@8@.$O%G%#%U%)%k%H$GM^@)$5$l$F$$$^$9!#(B
+$BJQ?t(B @code{message-required-headers}$B!"(B
+@code{message-required-news-headers} $B$*$h(B
+$B$S(B @code{message-required-mail-headers} $B$r;2>H$7$F2<$5$$!#(B
 
 @item
-Improved anti-spam features.
+$B%5!<%I%Q!<%F%#!<$K$h$k(B @file{message-utils.el} $B$N5!G=(B
+$B$,(B @file{message.el} $B$K2C$($i$l$^$7$?!#(B
 
-Gnus is now able to take out spam from your mail and news streams
-using a wide variety of programs and filter rules. Among the supported
-methods are RBL blocklists, bogofilter and white/blacklists.  Hooks
-for easy use of external packages such as SpamAssassin and Hashcash
-are also new.  @xref{Thwarting Email Spam}.
-
-@item
-Easy inclusion of X-Faces headers.
-
-@item
-In the summary buffer, the new command @kbd{/ N} inserts new messages
-and @kbd{/ o} inserts old messages.
+Message $B$OI=Bj(B (subject) $B$N9T$+$i(B @samp{(was: <old subject>)} $B$r:o=|$9$k(B
+$B$+$I$&$+$r?R$M$k$h$&$K$J$j$^$7(B
+$B$?(B (@code{message-subject-trailing-was-query} $B;2>H(B)$B!#(B
+@kbd{C-c M-m} $B$H(B @kbd{C-c M-f} $B$OA^F~$5$l$?%F%-%9%H$r<($90u$rA^F~$7$^$9!#(B
+@kbd{C-c C-f a} $B$O(B X-No-Archive: $B%X%C%@!<$rIU$12C$($^$9!#(B@kbd{C-c C-f
+x} $B$O!"E,@Z$J%X%C%@!<$H!"%/%m%9%]%9%H$H%U%)%m!<@h$K$D$$$F$NCm0U=q$-$rK\(B
+$BJ8$KA^F~$7$^$9(B (@code{message-cross-post-@var{*}} $BJQ?t72$r8+$F2<$5$$(B)$B!#(B
 
 @item
-Gnus decodes morse encoded messages if you press @kbd{W m}.
+$B:#$d(B @code{message-generate-headers-first} $B$,(B @code{nil} $B$@$C$?$i!"%a%C(B
+$B%;!<%8$N:n@.$r;O$a$k$H$-$K(B References $B$H(B X-Draft-Headers $B$O@8@.$5$l$^$;(B
+$B$s!#(B
 
+@item
+$B2~NI$5$l$?(B spam $BBP935!G=!#(B
+
+Gnus $B$OHs>o$KJQ2=$KIY$s$@%W%m%0%i%`$H_I2a$N5,B'$r;H$C$F!"%a!<%k$d%K%e!<(B
+$B%9$NK[N.$+$i(B spam $B$rH4$-<h$C$F$7$^$&$3$H$,$G$-$k$h$&$K$J$j$^$7$?!#BP1~$7(B
+$B$F$$$kJ}<0$O!"(BRBL blocklists$B!"(Bbogofilter $B$=$l$K%[%o%$%H(B/$B%V%i%C%/%j%9%H$G(B
+$B$9!#$^$?(B SpamAssassin $B$d(B Hashcash $B$N$h$&$J30It%Q%C%1!<%8$r4JC1$K;H$&$?$a(B
+$B$N(B hook $B$b?7$7$/$J$j$^$7$?!#(B@xref{Thwarting Email Spam}$B!#(B
+
+@item
+X-Faces $B%X%C%@!<$NA^F~$,4JC1$K$J$j$^$7$?!#(B
+
+@item
+$B35N,%P%C%U%!$K!"?7$7$$%3%^%s%I(B @kbd{/ N} $B$O?7Ce%a%C%;!<%8$rA^F~$7!"(B
+@kbd{/ o} $B$O8E$$%a%C%;!<%8$rA^F~$7$^$9!#(B
+
+@item
+@kbd{W m} $B$r2!$9$H!"(BGnus $B$O%b!<%k%9$GId9f2=$5$l$?%a%C%;!<%8$r%G%3!<%I$7(B
+$B$^$9!#(B
+
+@c TRANSLATEME
 @item
 Unread count correct in nnimap groups.
 
@@ -24471,7 +24563,7 @@ the valid values.
 Gnus supports Cancel Locks in News.
 
 This means a header @samp{Cancel-Lock} is inserted in news posting.  It is
-used to determine if you wrote a article or not (for cancelling and
+used to determine if you wrote an article or not (for cancelling and
 superseding).  Gnus generates a random password string the first time
 you post a message, and saves it in your @file{~/.emacs} using the Custom
 system.  While the variable is called @code{canlock-password}, it is not
@@ -24508,7 +24600,7 @@ out other articles.
 @item Some limiting commands accept a @kbd{C-u} prefix to negate the match.
 
 If @kbd{C-u} is used on subject, author or extra headers, i.e., @kbd{/
-s'}, @kbd{/ a}, and @kbd{/ x}
+s}, @kbd{/ a}, and @kbd{/ x}
 (@code{gnus-summary-limit-to-@{subject,author,extra@}}) respectively, the
 result will be to display all articles that do not match the expression.
 
@@ -24520,7 +24612,7 @@ This is supposedly what USEFOR wanted to migrate to.  See
 @code{gnus-group-name-charset-method-alist} for customization.
 
 @item
-The nnml and nnfolder backends store marks for each groups.
+The nnml and nnfolder back ends store marks for each groups.
 
 This makes it possible to take backup of nnml/nnfolder servers/groups
 separately of @file{~/.newsrc.eld}, while preserving marks.  It also

@@ -35,6 +35,18 @@
   (eval-when-compile (require 'cl))
   (require 'pym)
 
+  (define-compiler-macro assq-delete-all (&whole form key alist)
+    (if (>= emacs-major-version 21)
+	form
+      `(let* ((key ,key)
+	      (alist ,alist)
+	      (tail alist))
+	 (while tail
+	   (if (and (consp (car tail)) (eq (car (car tail)) key))
+	       (setq alist (delq (car tail) alist)))
+	   (setq tail (cdr tail)))
+	 alist)))
+
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (>= emacs-major-version 21)
 	form

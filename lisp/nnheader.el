@@ -39,6 +39,7 @@
 ;;(eval-when-compile (require 'gnus-util))
 
 (require 'mail-utils)
+(require 'gnus-util)
 
 ;; Reduce the required value of `recursive-load-depth-limit' for Emacs 21.
 (require 'pces)

@@ -318,6 +318,7 @@ be set in `.emacs' instead."
   (defalias 'gnus-appt-select-lowest-window 'appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'identity)
+  (defalias 'gnus-assq-delete-all 'assq-delete-all)
   (defalias 'gnus-add-text-properties 'add-text-properties)
   (defalias 'gnus-put-text-property 'put-text-property)
   (defvar gnus-mode-line-image-cache t)
@@ -852,6 +853,7 @@ be set in `.emacs' instead."
     (storm "#666699" "#99ccff")
     (pdino "#9999cc" "#99ccff")
     (purp "#9999cc" "#666699")
+    (no "#000000" "#ff0000")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
@@ -1789,6 +1791,26 @@ articles to list when the group is a large newsgroup (see
 `gnus-large-newsgroup').  If it is nil, the default value is the
 total number of articles in the group.")
 
+;; The Gnus registry's ignored groups
+(gnus-define-group-parameter
+ registry-ignore
+ :type list
+ :function-document
+ "Whether this group should be ignored by the registry."
+ :variable gnus-registry-ignored-groups
+ :variable-default nil
+ :variable-document
+ "*Groups in which the registry should be turned off."
+ :variable-group gnus-registry
+ :variable-type '(repeat
+		  (list
+		   (regexp :tag "Group Name Regular Expression")
+		   (boolean :tag "Ignored")))
+ 
+ :parameter-type '(boolean :tag "Group Ignored by the Registry")
+ :parameter-document
+ "Whether the Gnus Registry should ignore this group.")
+
 ;; group parameters for spam processing added by Ted Zlatanov <tzz@lifelogs.com>
 (defcustom gnus-install-group-spam-parameters t
   "*Disable the group parameters for spam detection.  
@@ -1909,8 +1931,7 @@ Only applicable to non-spam (unclassified and ham) groups.")
    "*Groups in which to automatically process spam or ham articles with
 a backend on summary exit.  If non-nil, this should be a list of group
 name regexps that should match all groups in which to do automatic
-spam processing, associated with the appropriate processor.  This only makes sense
-for mail groups."
+spam processing, associated with the appropriate processor."
    :variable-group spam
    :variable-type '(repeat :tag "Spam/Ham Processors" 
 			   (list :tag "Spam Summary Exit Processor Choices"
@@ -2161,7 +2182,7 @@ You also need to enable `gnus-agent' for this to have any affect."
   :group 'gnus-agent
   :type 'boolean)
 
-(defcustom gnus-default-charset 'iso-8859-1
+(defcustom gnus-default-charset 'undecided
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
 `gnus-group-charset-alist' variable and is only used on groups not
@@ -2171,7 +2192,7 @@ covered by that variable."
 
 (defcustom gnus-agent t
   "Whether we want to use the Gnus agent or not.
-Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
+Putting (gnus-agentize) in ~/.gnus is obsoleted by (setq gnus-agent t)."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -2332,8 +2353,6 @@ This variable can be nil, gnus or gnus-ja."
   '(gnus-newsrc-options gnus-newsrc-options-n
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
-			gnus-registry-alist
-			gnus-registry-headers-alist
 			gnus-killed-list gnus-zombie-list
 			gnus-topic-topology gnus-topic-alist
 			gnus-agent-covered-methods)
@@ -2379,10 +2398,6 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-registry-alist nil
   "Assoc list of registry data.
-gnus-registry.el will populate this if it's loaded.")
-
-(defvar gnus-registry-headers-alist nil
-  "Assoc list of registry header data.
 gnus-registry.el will populate this if it's loaded.")
 
 (defvar gnus-newsrc-hashtb nil

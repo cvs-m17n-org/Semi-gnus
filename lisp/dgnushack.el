@@ -741,7 +741,7 @@ Modify to suit your needs."))
       (batch-update-autoloads))))
 
 (defun dgnushack-make-load ()
-  (message (format "Generating %s..." dgnushack-gnus-load-file))
+  (message "Generating %s..." dgnushack-gnus-load-file)
   (with-temp-file dgnushack-gnus-load-file
     (if (file-exists-p dgnushack-cus-load-file)
 	(progn
@@ -811,7 +811,7 @@ Modify to suit your needs."))
 	(search-forward "\n;;; Code:" nil t)
 	(forward-line 1)
 	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
-  (message (format "Compiling %s..." dgnushack-gnus-load-file))
+  (message "Compiling %s..." dgnushack-gnus-load-file)
   (byte-compile-file dgnushack-gnus-load-file))
 
 
