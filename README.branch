@@ -25,7 +25,7 @@ qGnus 0.??  ------> Semi-gnus 6.0.0
        :        akr      <--  6.2.3             :     \      (for FLIM 1.12,
        :        shuhei-k <--  6.3.1                    \      stable)
 Gnus 5.6.11 ------>           6.3.3                     \
-       :                      6.4.0 (for SEMI 1.5)       --> t-gnus-6_13
+       :                      6.4.0 (for SEMI 1.5)       --> t-gnus-6_14
        :                     (6.4.?)------> for SEMI 1.5     (for FLIM 1.13,
        :                        |    \                        develop)
        :                        |     \
@@ -112,7 +112,7 @@ Public Branches
 	gnus-6_10	Semi-gnus for SEMI 1.12, FLIM 1.12 API (develop)
 	pgnus-ichikawa	(Main trunk of T-gnus)
 	t-gnus-6_12	T-gnus for SEMI 1.12/1.13, FLIM 1.12 API (stable)
-	t-gnus-6_13	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
+	t-gnus-6_14	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 
 Personal Branches
 

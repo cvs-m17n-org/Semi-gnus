@@ -1,4 +1,4 @@
-このパッケージには T-gnus 6.13 が入っています。
+このパッケージには T-gnus 6.14 が入っています。
 
 T-gnus とは？
 =============
@@ -9,7 +9,7 @@ T-gnus とは？
 してはいけません。
 
   APEL, FLIM および SEMI パッケージが必要ですので、インストールする前
-にそれらをインストールしてください。T-gnus 6.13 は APEL 9.20 以上、
+にそれらをインストールしてください。T-gnus 6.14 は APEL 9.20 以上、
 FLIM (1.13.1 以上) および SEMI/WEMI (1.13.5 以上) を必要とします。それ
 らのパッケージは
 
@@ -34,7 +34,7 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 (1) checkout
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout -r t-gnus-6_13 gnus
+	checkout -r t-gnus-6_14 gnus
 
 (2) compile
 
@@ -44,13 +44,13 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 (3) update
 
-    % cvs update -r t-gnus-6_13 gnus
+    % cvs update -r t-gnus-6_14 gnus
 
 主なタグは以下のようになっています:
 
     t-gnus-6_12		最新の T-gnus の安定版に割り当てられます。
 
-    t-gnus-6_13		最新の T-gnus の開発版に割り当てられます。
+    t-gnus-6_14		最新の T-gnus の開発版に割り当てられます。
 
     pgnus-ichikawa	T-gnus の幹です。
 
@@ -89,13 +89,13 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
   から、そして開発版は
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/
 
   から、それぞれ取得可能です。そしてほぼ毎日の snapshot が
 
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
   または
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/snapshots/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/snapshots/
 
   から取得可能です。
 
