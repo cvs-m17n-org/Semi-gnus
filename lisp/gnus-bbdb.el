@@ -63,7 +63,7 @@ the user confirms the creation."
 			    (progn (goto-char (point-min))
 				   (or (search-forward "\n\n" nil t)
 				       (error "message unexists"))
-				   (- (point) 2)))
+				   (1- (point))))
 	  (when (setq from (mail-fetch-field "from"))
 	    (setq from (gnus-bbdb/extract-address-components
 			(gnus-bbdb/decode-field-body from 'From))))
