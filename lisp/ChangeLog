@@ -1,3 +1,116 @@
+2001-08-04  Nuutti Kotivuori  <nuutti.kotivuori@smarttrust.com>
+	Committed by ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-show-article): Call
+	gnus-summary-update-secondary-secondary-mark.
+	* gnus-sum.el (gnus-summary-edit-article-done): Ditto.
+	* gnus-sum.el (gnus-summary-reparent-thread): Ditto.
+	
+2001-08-07 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Misc -> Gnus.
+	
+	* gnus-group.el (gnus-group-make-menu-bar): Ditto.
+
+	* mm-uu.el (mm-uu-dissect): Autoload. From Gerd M,Av(Bllmann
+	<gerd@gnu.org>.
+
+	* gnus-art.el (gnus-output-to-file): Bind file-name-coding-system.
+
+	* gnus-util.el (gnus-output-to-rmail): Ditto.
+	(gnus-output-to-mail): Ditto.
+
+	* nnmail.el (nnmail-pathname-coding-system): Set default to nil.
+
+2001-08-06  Florian Weimer   <fw@deneb.enyo.de>
+
+	* message.el (message-indent-citation): Use
+	`message-yank-cited-prefix' for empty lines.
+
+2001-08-05  Florian Weimer   <fw@deneb.enyo.de>
+
+	* message.el (message-indent-citation): Quote only lines starting
+	with ">" using `message-yank-cited-prefix'.
+
+2001-08-05  Nuutti Kotivuori  <nuutti.kotivuori@smarttrust.com>
+
+	* gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	gnus-cache-fully-p.
+
+2001-08-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-cache.el (gnus-cache-possibly-update-active): Create active
+	file if it doesn't exist (by calling gnus-cache-read-active).
+
+2001-08-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-cache.el (gnus-cache-possibly-enter-article): Revert.
+	(gnus-cache-passively-or-fully-p): Removed.
+	(gnus-cache-fully-p): Fix it.
+
+	* mm-view.el (mm-pkcs7-signed-magic): Support more ASN.1 lengths.
+
+2001-08-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-cache.el (gnus-cache-fully-p)
+	(gnus-cache-passively-or-fully-p): New functions.
+	(gnus-cache-possibly-enter-article): Cosmetic change, use
+	`g-c-p-o-f-p'.
+	(gnus-cache-possibly-enter-article): Use `g-c-p-u-a'; last change
+	was bogus (`g-c-p-a-a' does not change active info, just change
+	the functions parameters).
+	(gnus-cache-possibly-remove-articles-1): Make sure articles are
+	not removed in groups that match `gnus-uncacheable-groups'.
+
+	Reported and modifications based on discussions with Nuutti
+	Kotivuori <nuutti.kotivuori@smarttrust.com>.
+
+2001-08-04  Nuutti Kotivuori <nuutti.kotivuori@smarttrust.com>
+	Committed by Simon Josefsson  <jas@extundo.com>
+
+	* gnus-cache.el (gnus-cache-possibly-update-active): New function;
+	calls `gnus-cache-update-active' if bounds has been extended.
+
+2001-08-04 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-security-verify-or-decrypt): Insert
+	before remove.
+	(gnus-mime-security-show-details): Ditto.
+
+2001-08-04  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* nnmail.el (nnmail-split-fancy-with-parent): Correct `mapconcat'
+	syntax.  Protect string-match against nil string and regexp.
+
+2001-08-03 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-charset-region): Remove control-1.
+
+2001-08-03 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-readable-p): Emacs 20 takes one argument.
+
+2001-08-04  Simon Josefsson  <jas@extundo.com>
+
+	* smime.el (smime-sign-region, smime-encrypt-region): Fix details
+	buffer.  Delete MIME-Version header.
+
+2001-08-03  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-cache.el (gnus-cache-possibly-enter-article): The article
+	that is entered does not necessarily have the highest article
+	number in the group, so use `gnus-cache-possibly-alter-active'
+	instead of `gnus-cache-update-active'.
+
+2001-08-03 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml2015.el (mml2015-gpg-extract-signature-details): Don't barf.
+
+2001-08-03  Simon Josefsson  <jas@extundo.com>
+
+	* mml.el (mml-menu): Rename from MML to Mime. Collapse Security
+	menu.
+
 2001-08-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus.el (post-method): New group parameter.  It also provides

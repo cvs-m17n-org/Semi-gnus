@@ -735,7 +735,10 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (write-region-as-binary (point-min) (point-max) filename 'append)
+	    (let ((file-name-coding-system nnmail-pathname-coding-system)
+		  (pathname-coding-system nnmail-pathname-coding-system))
+	      (write-region-as-binary (point-min) (point-max)
+				      filename 'append))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil)
@@ -804,8 +807,10 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(write-region-as-binary (point-min) (point-max)
-					filename 'append)))
+		(let ((file-name-coding-system nnmail-pathname-coding-system)
+		      (pathname-coding-system nnmail-pathname-coding-system))
+		  (write-region-as-binary (point-min) (point-max)
+					  filename 'append))))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil))

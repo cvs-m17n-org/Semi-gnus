@@ -704,7 +704,7 @@ an article is yanked by the command `message-yank-original' interactively."
   :group 'message-insertion)
 
 (defcustom message-yank-cited-prefix ">"
-  "*Prefix inserted on cited lines of yanked messages.
+  "*Prefix inserted on cited or empty lines of yanked messages.
 Fix `message-cite-prefix-regexp' if it is set to an abnormal value.
 See also `message-yank-prefix'."
   :type 'string
@@ -2358,11 +2358,31 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 	(indent-rigidly start (mark t) message-indentation-spaces)
       (save-excursion
 	(goto-char start)
-	(while (< (point) (mark t))
-	  (if (looking-at message-cite-prefix-regexp)
+	(let (last-line)
+	  ;; `last-line' describes the contents of the last line
+	  ;; encountered in the loop below. nil means "empty line",
+	  ;; spaces "line consisting entirely of whitespace",
+	  ;; right-angle "line starts with >", quoted "quote character
+	  ;; at the beginning of the line", text "the remaining cases".
+	  (while (< (point) (mark t))
+	    (cond
+	     ((eolp)
 	      (insert message-yank-cited-prefix)
-	    (insert message-yank-prefix))
-	  (forward-line 1))))
+	      (setq last-line nil))
+	     ((looking-at ">")
+	      (if (memq last-line '(nil spaces right-angle quoted))
+		  (progn
+		    (insert message-yank-cited-prefix)
+		    (setq last-line 'quoted))
+		(insert message-yank-prefix)
+		(setq last-line 'right-angle)))
+	     ((looking-at "\\s-+$")
+	      (insert message-yank-prefix)
+	      (setq last-line 'spaces))
+	     (t
+	      (insert message-yank-prefix)
+	      (setq last-line 'text)))
+	    (forward-line 1)))))
     (goto-char start)))
 
 (defun message-list-references (refs-list &rest refs-strs)

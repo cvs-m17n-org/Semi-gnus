@@ -4466,7 +4466,9 @@ Provided for backwards compatibility."
       ;; save it to file.
       (goto-char (point-max))
       (insert "\n")
-      (write-region-as-binary (point-min) (point-max) file-name 'append)
+      (let ((file-name-coding-system nnmail-pathname-coding-system)
+	    (pathname-coding-system nnmail-pathname-coding-system))
+	(write-region-as-binary (point-min) (point-max) file-name 'append))
       t)))
 
 (defun gnus-narrow-to-page (&optional arg)
@@ -5642,8 +5644,8 @@ specified by `gnus-button-alist'."
   (if (not (string-match "[:/]" address))
       ;; This is just a simple group url.
       (gnus-group-read-ephemeral-group address gnus-select-method)
-    (if (not 
-	 (string-match 
+    (if (not
+	 (string-match
 	  "^\\([^:/]+\\)\\(:\\([^/]+\\)\\)?/\\([^/]+\\)\\(/\\([0-9]+\\)\\)?"
 	  address))
 	(error "Can't parse %s" address)
@@ -6072,21 +6074,25 @@ For example:
 (defun gnus-mime-security-verify-or-decrypt (handle)
   (mm-remove-parts (cdr handle))
   (let ((region (mm-handle-multipart-ctl-parameter handle 'gnus-region))
-	buffer-read-only)
+	point buffer-read-only)
+    (if region
+	(goto-char (car region)))
+    (save-restriction
+      (narrow-to-region (point) (point))
+      (with-current-buffer (mm-handle-multipart-original-buffer handle)
+	(let* ((mm-verify-option 'known)
+	       (mm-decrypt-option 'known)
+	       (nparts (mm-possibly-verify-or-decrypt (cdr handle) handle)))
+	  (unless (eq nparts (cdr handle))
+	    (mm-destroy-parts (cdr handle))
+	    (setcdr handle nparts))))
+      (setq point (point))
+      (gnus-mime-display-security handle)
+      (goto-char (point-max)))
     (when region
-      (delete-region (car region) (cdr region))
+      (delete-region (point) (cdr region))
       (set-marker (car region) nil)
-      (set-marker (cdr region) nil)))
-  (with-current-buffer (mm-handle-multipart-original-buffer handle)
-    (let* ((mm-verify-option 'known)
-	   (mm-decrypt-option 'known)
-	   (nparts (mm-possibly-verify-or-decrypt (cdr handle) handle)))
-      (unless (eq nparts (cdr handle))
-	(mm-destroy-parts (cdr handle))
-	(setcdr handle nparts))))
-  (let ((point (point))
-	buffer-read-only)
-    (gnus-mime-display-security handle)
+      (set-marker (cdr region) nil))
     (goto-char point)))
 
 (defun gnus-mime-security-show-details (handle)
@@ -6102,13 +6108,15 @@ For example:
 			 gnus-mime-security-button-line-format)
 		(forward-char -1))
 	      (forward-char)
+	      (save-restriction
+		(narrow-to-region (point) (point))
+		(gnus-insert-mime-security-button handle))
 	      (delete-region (point)
 			     (or (text-property-not-all
 				  (point) (point-max)
 				  'gnus-line-format
 				  gnus-mime-security-button-line-format)
-				 (point-max)))
-	      (gnus-insert-mime-security-button handle))
+				 (point-max))))
 	  (if (gnus-buffer-live-p gnus-mime-security-details-buffer)
 	      (with-current-buffer gnus-mime-security-details-buffer
 		(erase-buffer)

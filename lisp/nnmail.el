@@ -478,7 +478,7 @@ parameter.  It should return nil, `warn' or `delete'."
   nnheader-text-coding-system
   "Coding system used in reading inbox")
 
-(defvar nnmail-pathname-coding-system 'binary
+(defvar nnmail-pathname-coding-system nil
   "*Coding system for pathname.")
 
 (defun nnmail-find-file (file)
@@ -1485,7 +1485,10 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	 (references nil)
 	 (res nil)
 	 (regexp (if (consp nnmail-split-fancy-with-parent-ignore-groups)
-		     (mapconcat 'nnmail-split-fancy-with-parent-ignore-groups " *\\|")
+		     (mapconcat
+		      (lambda (x) (format "\\(%s\\)" x))
+		      nnmail-split-fancy-with-parent-ignore-groups
+		      "\\|")
 		   nnmail-split-fancy-with-parent-ignore-groups)))
     (when refstr
       (setq references (nreverse (gnus-split-references refstr)))
@@ -1494,7 +1497,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
       (mapcar (lambda (x)
 		(setq res (or (nnmail-cache-fetch-group x) res))
 		(when (or (string= "drafts" res)
-			  (and regexp (string-match regexp res)))
+			  (and regexp res (string-match regexp res)))
 		  (setq res nil)))
 	      references)
       res)))
