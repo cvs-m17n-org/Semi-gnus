@@ -3432,6 +3432,11 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @findex gnus-browse-exit
 $B1\Mw%b!<%I(B (browse mode) $B$r=*N;$7$^$9(B (@code{gnus-browse-exit})$B!#(B
 
+@item d
+@kindex d ($B1\Mw(B)
+@findex gnus-browse-describe-group
+$B8=:_$N%0%k!<%W$r9XFI$K$7$^$9(B (@code{gnus-browse-describe-group})$B!#(B
+
 @item ?
 @kindex ? ($B1\Mw(B)
 @findex gnus-browse-describe-briefly
@@ -6034,6 +6039,12 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $BA0$N@)8B$r%9%?%C%/$+$i<h$j=P$7$F!"I|85$7$^(B
 $B$9(B (@code{gnus-summary-pop-limit})$B!#$b$7@\F,0z?t$rM?$($i$l$l$P!"$9$Y$F$N(B
 $B@)8B$r%9%?%C%/$+$i<h$j=P$7$^$9!#(B
+
+@item / .
+@kindex / . (Summary)
+@findex gnus-summary-limit-to-unseen
+$B35N,%P%C%U%!$r$^$@FI$^$l$?$3$H$,L5$$5-;v$K@)8B$7$^(B
+$B$9(B (@code{gnus-summary-limit-to-unseen})$B!#(B
 
 @item / v
 @kindex / v ($B35N,(B)

@@ -662,6 +662,7 @@ The following commands are available:
     "L" gnus-browse-exit
     "q" gnus-browse-exit
     "Q" gnus-browse-exit
+    "d" gnus-browse-describe-group
     "\C-c\C-c" gnus-browse-exit
     "?" gnus-browse-describe-briefly
 
@@ -677,6 +678,7 @@ The following commands are available:
        ["Subscribe" gnus-browse-unsubscribe-current-group t]
        ["Read" gnus-browse-read-group t]
        ["Select" gnus-browse-select-group t]
+       ["Describe" gnus-browse-describe-groups t]
        ["Next" gnus-browse-next-group t]
        ["Prev" gnus-browse-prev-group t]
        ["Exit" gnus-browse-exit t]))
@@ -719,22 +721,22 @@ The following commands are available:
 	    (delete-matching-lines gnus-ignored-newsgroups))
 	  (while (not (eobp))
 	    (ignore-errors
-	      (push (cons
-		     (if (eq (char-after) ?\")
-			 (read cur)
-		       (let ((p (point)) (name ""))
-			 (skip-chars-forward "^ \t\\\\")
-			 (setq name (buffer-substring p (point)))
-			 (while (eq (char-after) ?\\)
-			   (setq p (1+ (point)))
-			   (forward-char 2)
-			   (skip-chars-forward "^ \t\\\\")
-			   (setq name (concat name (buffer-substring
-						    p (point)))))
-			 name))
-		     (let ((last (read cur)))
-		       (cons (read cur) last)))
-		    groups))
+	     (push (cons
+		    (if (eq (char-after) ?\")
+			(read cur)
+		      (let ((p (point)) (name ""))
+			(skip-chars-forward "^ \t\\\\")
+			(setq name (buffer-substring p (point)))
+			(while (eq (char-after) ?\\)
+			  (setq p (1+ (point)))
+			  (forward-char 2)
+			  (skip-chars-forward "^ \t\\\\")
+			  (setq name (concat name (buffer-substring
+						   p (point)))))
+			name))
+		    (let ((last (read cur)))
+		      (cons (read cur) last)))
+		   groups))
 	    (forward-line))))
       (setq groups (sort groups
 			 (lambda (l1 l2)
@@ -764,18 +766,19 @@ The following commands are available:
 	      (list
 	       (format
 		"Gnus: %%b {%s:%s}" (car method) (cadr method))))
-	(let ((buffer-read-only nil) charset
+	(let ((buffer-read-only nil)
+	      charset
 	      (prefix (let ((gnus-select-method orig-select-method))
 			(gnus-group-prefixed-name "" method))))
-	  (while groups
-	    (setq group (car groups))
+	  (dolist (group groups)
 	    (setq charset (gnus-group-name-charset method (car group)))
 	    (gnus-add-text-properties
 	     (point)
 	     (prog1 (1+ (point))
 	       (insert
 		(format "%c%7d: %s\n"
-			(let ((level (gnus-group-level (concat prefix (car group)))))
+			(let ((level (gnus-group-level
+				      (concat prefix (car group)))))
 			  (cond
 			   ((<= level gnus-level-subscribed) ? )
 			   ((<= level gnus-level-unsubscribed) ?U)
@@ -878,6 +881,11 @@ buffer.
 	     (match-string-no-properties 1))
 	 gnus-browse-current-method)))))
 
+(defun gnus-browse-describe-group (group)
+  "Describe the current group."
+  (interactive (list (gnus-browse-group-name)))
+  (gnus-group-describe-group nil group))
+
 (defun gnus-browse-unsubscribe-group ()
   "Toggle subscription of the current group in the browse buffer."
   (let ((sub nil)
@@ -889,10 +897,6 @@ buffer.
       (unless (eq (char-after) ? )
 	(setq sub t))
       (setq group (gnus-browse-group-name))
-      ;;;;
-      ;;(when (and sub
-      ;;		 (cadr (gnus-gethash group gnus-newsrc-hashtb)))
-      ;;(error "Group already subscribed"))
       (if sub
 	  (progn
 	    ;; Make sure the group has been properly removed before we

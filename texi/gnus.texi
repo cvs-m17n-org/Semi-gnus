@@ -3352,6 +3352,11 @@ subscribe to it (@code{gnus-browse-unsubscribe-current-group}).
 @findex gnus-browse-exit
 Exit browse mode (@code{gnus-browse-exit}).
 
+@item d
+@kindex d (Browse)
+@findex gnus-browse-describe-group
+Describe the current group (@code{gnus-browse-describe-group}).
+
 @item ?
 @kindex ? (Browse)
 @findex gnus-browse-describe-briefly
@@ -6066,6 +6071,12 @@ convention (@pxref{Process/Prefix}).
 Pop the previous limit off the stack and restore it
 (@code{gnus-summary-pop-limit}).  If given a prefix, pop all limits off
 the stack.
+
+@item / .
+@kindex / . (Summary)
+@findex gnus-summary-limit-to-unseen
+Limit the summary buffer to the unseen articles
+(@code{gnus-summary-limit-to-unseen}).
 
 @item / v
 @kindex / v (Summary)
