@@ -1202,27 +1202,6 @@ find-file-hooks, etc.
 	(read-coding-system prompt))
     'read-coding-system))
 
-(defun-maybe customize-save-variable (var val)
-  "Set the default for VARIABLE to VALUE, and save it for future sessions.
-If VARIABLE has a `custom-set' property, that is used for setting
-VARIABLE, otherwise `set-default' is used.
-
-The `customized-value' property of the VARIABLE will be set to a list
-with a quoted VALUE as its sole list member.
-
-If VARIABLE has a `variable-interactive' property, that is used as if
-it were the arg to `interactive' (which see) to interactively read the value.
-
-If VARIABLE has a `custom-type' property, it must be a widget and the
-`:prompt-value' property of that widget will be used for reading the value.
-
-NOTE: This function is imported from Emacs 20.7 for old Emacsen."
-  (interactive (custom-prompt-variable "Set and ave variable: "
-				       "Set and save value for %s as: "))
-  (funcall (or (get var 'custom-set) 'set-default) var val)
-  (put var 'saved-value (list (custom-quote val)))
-  (custom-save-all))
-
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
 

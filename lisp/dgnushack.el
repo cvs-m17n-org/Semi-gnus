@@ -225,6 +225,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
+(when (boundp 'MULE)
+  ;; Load special macros for compiling canlock.el.
+  (load (expand-file-name "canlock-om.el" srcdir) nil t t))
+
 (require 'custom)
 
 ;; Bind functions defined by `defun-maybe'.
@@ -485,7 +489,9 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-	    '("md5.el")))
+	    '("md5.el"))
+	  (unless (boundp 'MULE)
+	    '("canlock-om.el")))
   "Files which will not be installed.")
 
 (defconst dgnushack-exporting-files

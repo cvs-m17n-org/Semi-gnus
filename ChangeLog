@@ -1,3 +1,16 @@
+2001-11-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
+
+	* lisp/canlock-om.el: New file.
+	* lips/dgnushack.el: Load canlock-om.el for compiling canlock.el
+	when `MULE' is bound.
+	(dgnushack-unexporting-files): Add canlock-om.el when `MULE' is
+	not bound.
+	* lisp/message.el: Require `canlock-om' when Mule is running;
+	autoload cus-edit for the function `customize-save-variable'.
+	* lisp/nnheader.el (customize-save-variable): Remove.
+
 2001-11-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-strip-special-text-properties): Default

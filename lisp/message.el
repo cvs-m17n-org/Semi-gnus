@@ -40,7 +40,10 @@
   (require 'cl)
   (require 'smtp)
   (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
-(require 'canlock)
+(eval-and-compile
+  (if (boundp 'MULE)
+      (require 'canlock-om)
+    (require 'canlock)))
 (require 'mailheader)
 (require 'nnheader)
 ;; This is apparently necessary even though things are autoloaded:
@@ -56,7 +59,8 @@
 
 (require 'rfc822)
 (eval-and-compile
-  (autoload 'sha1 "sha1-el"))
+  (autoload 'sha1 "sha1-el")
+  (autoload 'customize-save-variable "cus-edit"));; for Mule 2.
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
