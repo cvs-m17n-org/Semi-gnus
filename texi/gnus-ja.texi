@@ -10045,7 +10045,7 @@ procmail $(B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ$5(B
 
 @end table
 
-$(B%G%#%l%/%H%j!<%a!<%k%=!<%k$NNc$G$9(B:
+$(B%G%#%l%/%H%j!<%a!<%k%=!<%9$NNc$G$9(B:
 
 @lisp
 (directory :path "/home/user-name/procmail-dir/"
@@ -10489,7 +10489,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 $(B$?$H$-$K(B ``$(B9gCW$7$?(B'' $(B$H$7$^$9!#(B
 
 @item
-@code{(& @var{split}@dots{})}: $(BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{t} $(B$G(B
+@code{(& @var{split}@dots{})}: $(BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{&} $(B$G(B
 $(B$"$k$H!"%j%9%H$NA4$F$N(B @var{split} ($(BJ#?t(B) $(B$r<B9T$7$^$9!#(B
 
 @item
@@ -10498,7 +10498,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 
 @item
 @code{(: @var{function} @var{arg1} @var{arg2} @dots{})}: $(B$b$7J,3d$,%j%9(B
-$(B%H$G!":G=i$N4X?t$,(B @code{:} $(B$G$"$k$H!"(B2$(BHVL\$NMWAG$,(B @var{args} $(B$r0z?t$H(B
+$(B%H$G!":G=i$NMWAG$,(B @code{:} $(B$G$"$k$H!"(B2$(BHVL\$NMWAG$,(B @var{args} $(B$r0z?t$H(B
 $(B$7$F4X?t$H$7$F8F$P$l$^$9!#4X?t$O(B @var{split} $(B$rJV$9$Y$-$G$9!#(B
 
 @item
@@ -10538,7 +10538,7 @@ table) $(B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 
 $(B$b$7J8;zNs$,MWAG(B @samp{\&} $(B$r4^$s$G$$$k$H!"Be$o$j$KA0$G9gCW$7$?J8;zNs$,(B
 $(B;H$o$l$^$9!#F1MM$K!"MWAG(B @samp{\\1} $(B$+$i(B @samp{\\9} $(B$^$G$O%0%k!<%WIU$1(B 1
-$(B$+$i(B 9 $(B$^$G$G9gCW$7$?J8;zJ8$GBeBX$5$l$^$9!#(B
+$(B$+$i(B 9 $(B$^$G$G9gCW$7$?J8;zNs$GBeBX$5$l$^$9!#(B
 
 
 @node Group Mail Splitting
@@ -10717,7 +10717,7 @@ mbox $(B%U%!%$%k$NA4$F$N%a!<%k%a%C%;!<%8$b:#$d$"$J$?$N(B @code{nnml} $(B%0%k!
 $(B$j$^$9!#(B Gnus $(B$O%a!<%k$rFI$`;v$KBP$7$F!"4pK\E*$KA4$/0c$C$?J}K!$r<h$j$^$9!#(B
 
 Gnus $(B$O4pK\E*$K%a!<%k$rHf3SE*FCJL$JJ}K!$G<u$1<h$i$l$?%K%e!<%9$G$"$k$H$_(B
-$(B$J$7$^$9!#$=$l$O<B:]$K%a!<%k$rJQ99$7$"$j!"%a!<%k%a%C%;!<%8$r>C$98"NO$,$"(B
+$(B$J$7$^$9!#$=$l$O<B:]$K%a!<%k$rJQ99$7$?$j!"%a!<%k%a%C%;!<%8$r>C$98"NO$,$"(B
 $(B$k$H$O9M$($^$;$s!#%a!<%k%0%k!<%W$KF~$C$F!"5-;v$K(B ``$(B4{FI(B'' $(B$N0u$rIU$1$?$j!"(B
 $(BB>$NN.57$G@Z$C$?$j$7$F$b!"%a!<%k5-;v$O$^$@%7%9%F%`$KB8:_$7$F$$$^$9!#7+$j(B
 $(BJV$7$^$9(B: gnus $(B$O$"$J$?$N8E$$!"4{FI%a!<%k$r>C5n$7$^$;$s!#$b$A$m$s!"$"$J(B
@@ -10734,7 +10734,7 @@ Gnus $(B$KK>$^$7$/$J$$%a!<%k$r:o=|$5$;$k$?$a$K$O!"5-;v$r(B @dfn{$(B4|8B@Z$l>C
 $(B$^$;$s!#(B
 
 @vindex gnus-auto-expirable-newsgroups
-$(B<j$G5-;v$K4|8B@Z$l>C5n2DG=$N0u$rIU$1$J$1$l$P$J$i$J$$$o$G$G$O$"$j$^$;$s!#(B
+$(B<j$G5-;v$K4|8B@Z$l>C5n2DG=$N0u$rIU$1$J$1$l$P$J$i$J$$$o$1$G$O$"$j$^$;$s!#(B
 $(B@55,I=8=(B @code{gnus-auto-expirable-newsgroups} $(B$K9gCW$9$k%0%k!<%W$OA4$F(B
 $(B$N4{FI5-;v$K<+F0E*$K4|8B@Z$l>C5n2DG=$N0u$,IU$1$i$l$^$9!#A4$F$N4|8B@Z$l>C(B
 $(B5n2DG=$N0u$NIU$$$?5-;v$O35N,%P%C%U%!$N:G=i$N7e$K(B @samp{E} $(B$,I=<($5$l$^$9!#(B
