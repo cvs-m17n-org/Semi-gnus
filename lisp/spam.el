@@ -775,6 +775,8 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 
 ;; return something sensible if the score can't be determined
 (defun spam-bogofilter-score ()
+  "Get the Bogofilter spamicity score"
+  (interactive)
   (or (spam-check-bogofilter t)
       0))
 
