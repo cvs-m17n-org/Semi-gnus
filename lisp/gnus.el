@@ -1365,11 +1365,11 @@ commands will still require prompting."
   :type 'boolean)
 
 (defcustom gnus-extract-address-components 'gnus-extract-address-components
-  "*Function for extracting address components from a From header.
-Two pre-defined function exist: `gnus-extract-address-components',
-which is the default, quite fast, and too simplistic solution, and
+  "Function for extracting address components from a From header.
+Three pre-defined functions exist: `gnus-extract-address-components',
+which is the default, quite fast, and too simplistic solution,
 `mail-extract-address-components', which works much better, but is
-slower."
+slower, and `std11-extract-address-components'."
   :group 'gnus-summary-format
   :type '(radio (function-item gnus-extract-address-components)
 		(function-item mail-extract-address-components)

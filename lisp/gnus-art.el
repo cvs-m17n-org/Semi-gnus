@@ -1383,11 +1383,12 @@ always hide."
 		 'boring-headers)))
 	     ;; Hide boring Newsgroups header.
 	     ((eq elem 'newsgroups)
-	      (when (equal (gnus-fetch-field "newsgroups")
-			   (gnus-group-real-name
-			    (if (boundp 'gnus-newsgroup-name)
-				gnus-newsgroup-name
-			      "")))
+	      (when (gnus-string-equal
+		     (gnus-fetch-field "newsgroups")
+		     (gnus-group-real-name
+		      (if (boundp 'gnus-newsgroup-name)
+			  gnus-newsgroup-name
+			"")))
 		(gnus-article-hide-header "newsgroups")))
 	     ((eq elem 'to-address)
 	      (let ((to (message-fetch-field "to"))
@@ -1397,14 +1398,15 @@ always hide."
 			  gnus-newsgroup-name "") 'to-address)))
 		(when (and to to-address
 			   (ignore-errors
-			     (equal
+			     (gnus-string-equal
 			      ;; only one address in To
 			      (nth 1 (mail-extract-address-components to))
 			      to-address)))
 		  (gnus-article-hide-header "to"))))
 	     ((eq elem 'followup-to)
-	      (when (equal (message-fetch-field "followup-to")
-			   (message-fetch-field "newsgroups"))
+	      (when (gnus-string-equal
+		     (message-fetch-field "followup-to")
+		     (message-fetch-field "newsgroups"))
 		(gnus-article-hide-header "followup-to")))
 	     ((eq elem 'reply-to)
 	      (let ((from (message-fetch-field "from"))
@@ -1412,9 +1414,9 @@ always hide."
 		(when (and
 		       from reply-to
 		       (ignore-errors
-			 (equal
-			  (nth 1 (funcall gnus-extract-address-components from))
-			  (nth 1 (funcall gnus-extract-address-components reply-to)))))
+			 (gnus-string-equal
+			  (nth 1 (mail-extract-address-components from))
+			  (nth 1 (mail-extract-address-components reply-to)))))
 		  (gnus-article-hide-header "reply-to"))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
