@@ -172,17 +172,17 @@ but it has a preference.")
 
 (defvoo nnshimbun-nov-file-name ".overview")
 
-(defvoo nnshimbun-pre-fetch-article nil
-  "*Non nil means that nnshimbun fetch unread articles when scanning
-groups.  Note that this variable has just a default value for all the
-nnshimbun groups.  You can specify the nnshimbun group parameter
-`prefecth-articles' for each nnshimbun group.")
+(defvoo nnshimbun-pre-fetch-article 'off
+  "*If it is neither `off' nor nil, nnshimbun fetch unread articles when
+scanning groups.  Note that this variable has just a default value for
+all the nnshimbun groups.  You can specify the nnshimbun group
+parameter `prefecth-articles' for each nnshimbun group.")
 
 (defvoo nnshimbun-encapsulate-images shimbun-encapsulate-images
-  "*If non-nil, inline images will be encapsulated in the articles.
-Note that this variable has just a default value for all the nnshimbun
-groups.  You can specify the nnshimbun group parameter
-`encapsulate-images' for each nnshimbun group.")
+  "*If it is neither `off' nor nil, inline images will be encapsulated in
+the articles.  Note that this variable has just a default value for
+all the nnshimbun groups.  You can specify the nnshimbun group
+parameter `encapsulate-images' for each nnshimbun group.")
 
 (defvoo nnshimbun-index-range nil
   "*Range of indices to detect new pages.  Note that this variable has
@@ -239,12 +239,12 @@ GROUP has a full name."
 	   `(let ((v (or (plist-get (nnshimbun-find-group-parameters ,name)
 				    'prefetch-articles)
 			 nnshimbun-pre-fetch-article)))
-	      (if (eq v 'off) nil v)))
+	      (if (memq v '(off nil)) nil v)))
 	  ((eq 'encapsulate-images (eval symbol))
 	   `(let ((v (or (plist-get (nnshimbun-find-group-parameters ,name)
 				    'encapsulate-images)
 			 nnshimbun-encapsulate-images)))
-	      (if (eq v 'off) nil v)))
+	      (if (memq v '(off nil)) nil v)))
 	  ((eq 'expiry-wait (eval symbol))
 	   (if full-name-p
 	       `(or (plist-get (nnshimbun-find-group-parameters ,group)
