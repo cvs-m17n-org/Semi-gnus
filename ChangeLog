@@ -1,3 +1,9 @@
+2001-07-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Add the parent directory of the directory
+	where the APEL modules are installed to `load-path' according to
+	the description of the file Mule23@1934.
+
 2001-07-09  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
 	* README.semi: Modify URI of emacs-w3m.
@@ -8,7 +14,7 @@
 
 	* texi/gnus-ja.texi (Top, Article Treatment): Fix typo.
 	(Web Newspaper): Modify URI of emacs-w3m.
-	
+
 2001-07-06  KITAGAWA Takurou  <i30x1641@ip.media.kyoto-u.ac.jp>
 
 	* lisp/Makefile.in (clever): Use `if test... then' instead of
