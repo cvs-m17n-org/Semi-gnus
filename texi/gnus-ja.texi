@@ -5083,6 +5083,19 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 $B$9(B (@code{gnus-summary-very-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;(B
 $B%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
 
+@item S B r
+@kindex S B r ($B35N,(B)
+@findex gnus-summary-reply-broken-reply-to
+$B8=:_$N5-;v$r=q$$$??M$KBP$7$FJVEz$r$7$^$9$,(B @code{Reply-To} $B%U%#!<%k%I$O(B
+$BL5;k$7$^$9(B (@code{gnus-summary-reply-broken-reply-to})$B!#(B
+
+@item S B R
+@kindex S B R ($B35N,(B)
+@findex gnus-summary-reply-broken-reply-to-with-original
+$B8=:_$N5-;v$r=q$$$??M$KBP$7$FK\5-;v$r4^$s$@JVEz$r$7$^$9(B
+$B$,(B @code{Reply-To} $B%U%#!<%k%I$OL5;k$7$^(B
+$B$9(B (@code{gnus-summary-reply-broken-reply-to-with-original})$B!#(B
+
 @item S o m
 @itemx C-c C-f
 @kindex S o m ($B35N,(B)
@@ -5853,6 +5866,11 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @kindex M P r ($B35N,(B)
 @findex gnus-uu-mark-region
 $B%j!<%8%g%s$N5-;v$K0u$rIU$1$^$9(B (@code{gnus-uu-mark-region})$B!#(B
+
+@item M P g
+@kindex M P g ($B35N,(B)
+@findex gnus-uu-unmark-region
+$B%j!<%8%g%s$N5-;v$+$i0u$r:o=|$7$^$9(B (@code{gnus-uu-unmark-region})$B!#(B
 
 @item M P t
 @kindex M P t ($B35N,(B)
@@ -8195,7 +8213,7 @@ html2text ($B%7%s%W%k$J(B @sc{html} $B%3%s%P!<%?!<!"(Bgnus $B$K4^$^$l$F$$$k
 
 @item W G f
 @kindex W G f ($B35N,(B)
-@findex gnus-article-treat-fold-header
+@findex gnus-article-treat-fold-headers
 $B$9$Y$F$N%a%C%;!<%8%X%C%@!<$r@^$jJV$7$^(B
 $B$9(B (@code{gnus-article-treat-fold-headers})$B!#(B
 
