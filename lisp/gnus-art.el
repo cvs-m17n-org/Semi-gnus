@@ -3099,11 +3099,7 @@ Argument LINES specifies lines to be scrolled down."
 
 (defun gnus-article-check-buffer ()
   "Beep if not in an article buffer."
-  (unless (or (equal major-mode 'gnus-article-mode)
-	      (equal (save-current-buffer
-		       (set-buffer gnus-original-article-buffer)
-		       major-mode)
-		     'gnus-original-article-mode))
+  (unless (eq (get-buffer gnus-article-buffer) (current-buffer))
     (error "Command invoked outside of a Gnus article buffer")))
 
 (defun gnus-article-read-summary-keys (&optional arg key not-restore-window)
