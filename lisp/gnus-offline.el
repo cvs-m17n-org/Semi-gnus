@@ -858,9 +858,12 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 			      (throw 'tag nil)))
 			  gnus-group-toolbar)))))
    (t
-    (define-key gnus-group-mode-map
-      (static-if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
-      'gnus-offline-popup-menu))))
+    (add-hook
+     'gnus-group-mode-hook
+     `(lambda ()
+	(define-key gnus-group-mode-map
+	  ,(static-if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
+	  'gnus-offline-popup-menu))))))
 ;;
 ;;
 (defun gnus-offline-popup (menu &optional title)
@@ -868,7 +871,10 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
    ((featurep 'xemacs)
     (popup-menu menu))
    (t
-    (let (keymap keymap pop func)
+    (let ((menu-func (or (and (fboundp 'easy-menu-create-menu)
+			      'easy-menu-create-menu)
+			 'easy-menu-create-keymaps))
+	  keymap pop func)
       (static-cond ((< emacs-major-version 20)
 		    ;; For Emacsen from 19.34 down to 19.28.
 		    ;; Seems the first item in MENU will be ignored.
@@ -888,18 +894,17 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 					    '(nil "")
 					    '(nil ""))
 				      (cdr menu))
-			    (easy-menu-create-keymaps (car menu)
-						      (cdr menu)))))
+			    (funcall menu-func (car menu) (cdr menu)))))
 		   (t
-		    (if (keymapp menu)
-			(setq keymap menu)
-		      (easy-menu-define keymap nil "" menu))))
+		    (setq keymap
+			  (if (keymapp menu)
+			      menu
+			    (funcall menu-func (car menu) (cdr menu))))))
       ;; Display the popup menu.
       (if (and (setq pop (x-popup-menu t keymap))
 	       (setq func (lookup-key keymap
 				      (apply 'vector pop))))
-	  (prog1 keymap
-	    (funcall func)))))))
+	  (funcall func))))))
 
 (defun gnus-offline-get-menu-items (list)
   (mapcar
