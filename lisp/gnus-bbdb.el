@@ -248,8 +248,10 @@ This variable has no effect on the marking controlled by
   :group 'bbdb-mua-specific-gnus
   :type '(choice (const :tag "Mark known posters" t)
 		 (const :tag "Do not mark known posters" nil)))
-(defvaralias 'gnus-bbdb/mark-known-posters
-  'gnus-bbdb/summary-mark-known-posters)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/mark-known-posters
+    'gnus-bbdb/summary-mark-known-posters))
 
 (defcustom gnus-bbdb/summary-known-poster-mark "+"
   "This is the default character to prefix author names with if
@@ -268,8 +270,10 @@ people who aren't in the database, of course.  (`gnus-optional-headers'
 must be `gnus-bbdb/lines-and-from' for GNUS users.)"
   :group 'bbdb-mua-specific-gnus
   :type 'boolean)
-(defvaralias 'gnus-bbdb/header-show-bbdb-names
-  'gnus-bbdb/summary-show-bbdb-names)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/header-show-bbdb-names
+    'gnus-bbdb/summary-show-bbdb-names))
 
 (defcustom gnus-bbdb/summary-prefer-bbdb-data t
   "If t, then for posters who are in our BBDB, replace the information
@@ -288,8 +292,10 @@ See `gnus-bbdb/lines-and-from' for GNUS users, or
   :group 'bbdb-mua-specific-gnus
   :type '(choice (const :tag "Prefer real names" t)
 		 (const :tag "Prefer network addresses" nil)))
-(defvaralias 'gnus-bbdb/header-prefer-real-names
-  'gnus-bbdb/summary-prefer-real-names)
+(static-when (and (fboundp 'defvaralias)
+		  (subrp (symbol-function 'defvaralias)))
+  (defvaralias 'gnus-bbdb/header-prefer-real-names
+    'gnus-bbdb/summary-prefer-real-names))
 
 (defcustom gnus-bbdb/summary-user-format-letter "B"
   "This is the gnus-user-format-function- that will be used to insert
