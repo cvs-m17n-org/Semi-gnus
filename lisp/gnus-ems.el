@@ -112,6 +112,8 @@
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
 
+    (defalias 'gnus-summary-set-display-table (lambda ()))
+
     (if (fboundp 'truncate-string-to-width)
 	(fset 'gnus-truncate-string 'truncate-string-to-width)
       (fset 'gnus-truncate-string 'truncate-string))
