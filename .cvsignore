@@ -1,0 +1,8 @@
+Makefile
+config.cache
+config.log
+config.status
+diff-lisp.el
+diffit
+makepub
+cvs-access
