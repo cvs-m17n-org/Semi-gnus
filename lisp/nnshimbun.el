@@ -153,6 +153,14 @@
      (get-headers    . nnshimbun-netbsd-get-headers)
      (index-url      . (format "%s%s/index.html" nnshimbun-url nnshimbun-current-group))
      (make-contents  . nnshimbun-make-mhonarc-contents))
+    ("bbdb-ml"
+     (url . "http://www.rc.tutrp.tut.ac.jp/bbdb-ml/")
+     (groups "bbdb-ml")
+     (coding-system . ,(static-if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
+     (generate-nov . nnshimbun-generate-nov-for-each-group)
+     (get-headers . nnshimbun-fml-get-headers)
+     (index-url . nnshimbun-url)
+     (make-contents . nnshimbun-make-fml-contents))
     ))
 
 (defvar nnshimbun-x-face-alist
@@ -929,6 +937,64 @@ is enclosed by at least one regexp grouping construct."
   (encode-coding-string (buffer-string)
 			(mime-charset-to-coding-system "ISO-2022-JP")))
 
+(defun nnshimbun-make-fml-contents (header &rest args)
+  (require 'mml)
+  (catch 'stop
+    (if (search-forward "<SPAN CLASS=mailheaders>" nil t)
+	(delete-region (point-min) (point))
+      (throw 'stop nil))
+    (if (search-forward "</PRE>")
+	(progn
+	  (beginning-of-line)
+	  (delete-region (point) (point-max)))
+      (throw 'stop nil))
+    (if (search-backward "</SPAN>")
+	(progn
+	  (beginning-of-line)
+	  (kill-line))
+      (throw 'stop nil))
+    (save-restriction
+      (narrow-to-region (point-min) (point))
+      (subst-char-in-region (point-min) (point-max) ?\t ?  t)
+      (nnweb-decode-entities)
+      (goto-char (point-min))
+      (let (buf field value start value-beg end)
+	(while (and (setq start (point))
+		    (re-search-forward "<SPAN CLASS=\\(.*\\)>\\(.*\\)</SPAN>:"
+				       nil t)
+		    (setq field (match-string 2))
+		    (re-search-forward 
+		     (concat "<SPAN CLASS=" (match-string 1) "-value>") nil t)
+		    (setq value-beg (point))
+		    (search-forward "</SPAN>" nil t)
+		    (setq end (point)))
+	  (setq value (buffer-substring value-beg
+					(progn (search-backward "</SPAN>")
+					       (point))))
+	  (delete-region start end)
+	  (cond ((string= field "Date")
+		 (push (cons 'date value) buf))
+		((string= field "From")
+		 (push (cons 'from value) buf))
+		((string= field "Subject")
+		 (push (cons 'subject value) buf))
+		((string= field "Message-Id")
+		 (push (cons 'id value) buf))
+		((string= field "References")
+		 (push (cons 'references value) buf))
+		(t
+		 (insert (concat field ": " value "\n")))))
+	(nnshimbun-nov-fix-header nnshimbun-current-group header buf)
+	(goto-char (point-min))
+	(nnshimbun-insert-header header))
+      (goto-char (point-max)))
+    ;; Processing body.
+    (save-restriction
+      (narrow-to-region (point) (point-max))
+      (nnweb-remove-markup)
+      (nnweb-decode-entities)))
+  (encode-coding-string (buffer-string)
+			(mime-charset-to-coding-system "ISO-2022-JP")))
 
 ;;; www.asahi.com
 
@@ -1377,6 +1443,42 @@ is enclosed by at least one regexp grouping construct."
 		     "" id "" 0 0 url)
 		    headers)))))
       headers)))
+
+;;; MLs using fml
+(defun nnshimbun-fml-get-headers ()
+  (let (headers auxs aux)
+    (catch 'stop
+      (while (re-search-forward "<a href=\"\\([0-9]+\\(\\.week\\|\\.month\\)?\\)/index.html\">" nil t)
+	(setq auxs (append auxs (list (match-string 1)))))
+      (while auxs
+	(erase-buffer)
+	(nnshimbun-retrieve-url
+	 (concat nnshimbun-url (setq aux (car auxs)) "/"))
+	(subst-char-in-region (point-min) (point-max) ?\t ?  t)
+	(let (id url date subject from)
+	  (goto-char (point-min))
+	  (while (re-search-forward
+		  "<LI><A HREF=\"\\([0-9]+\\.html\\)\">Article .*</A> <DIV><SPAN CLASS=article>Article <SPAN CLASS=article-value>\\([0-9]+\\)</SPAN></SPAN> at <SPAN CLASS=Date-value>\\([^<]*\\)</SPAN> <SPAN CLASS=Subject>Subject: <SPAN CLASS=Subject-value>\\([^<]*\\)</SPAN></SPAN></DIV><DIV><SPAN CLASS=From>From: <SPAN CLASS=From-value>\\([^<]*\\)</SPAN></SPAN></DIV>"
+		  nil t)
+	    (setq url (concat nnshimbun-url aux "/" (match-string 1))
+		  id (format "<%s%05d%%%s>"
+			     aux
+			     (string-to-number (match-string 2))
+			     nnshimbun-current-group)
+		  date (match-string 3)
+		  subject (match-string 4)
+		  from (match-string 5))
+	    (forward-line 1)
+	    (if (nnshimbun-search-id nnshimbun-current-group id)
+		(throw 'stop headers)
+	      (push (make-full-mail-header
+		     0
+		     (nnshimbun-mime-encode-string subject)
+		     from date id "" 0 0 url)
+		    headers))
+;	    (message "%s" id)))
+	(setq auxs (cdr auxs))))
+    headers))
 
 (provide 'nnshimbun)
 ;;; nnshimbun.el ends here.

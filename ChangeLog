@@ -1,3 +1,7 @@
+2001-02-08  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnshimbun.el: Add `bbdb-ml' support.
+
 2001-02-02  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-type-definition): Follow URL change
