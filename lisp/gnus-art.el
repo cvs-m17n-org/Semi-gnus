@@ -1512,7 +1512,10 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
     (set-buffer gnus-article-buffer)
     (let ((inhibit-point-motion-hooks t)
 	  buffer-read-only
-	  (mail-parse-charset gnus-newsgroup-charset))
+	  (mail-parse-charset gnus-newsgroup-charset)
+	  (mail-parse-ignored-charsets 
+	   (save-excursion (set-buffer gnus-summary-buffer)
+			   gnus-newsgroup-ignored-charsets)))
       (mail-decode-encoded-word-region (point-min) (point-max)))))
 
 (defun article-decode-charset (&optional prompt)
@@ -1534,9 +1537,10 @@ If PROMPT (the prefix), prompt for a coding system to use."
 		       (ctl
 			(mail-content-type-get ctl 'charset))))
 	     (mail-parse-charset gnus-newsgroup-charset)
+	     (mail-parse-ignored-charsets 
+	      (save-excursion (set-buffer gnus-summary-buffer)
+			      gnus-newsgroup-ignored-charsets))
 	     buffer-read-only)
-	(when (memq charset gnus-newsgroup-ignored-charsets)
-	  (setq charset nil))
 	(goto-char (point-max))
 	(widen)
 	(forward-line 1)
@@ -3085,7 +3089,10 @@ Type any key: "
   (save-current-buffer
     (set-buffer gnus-article-buffer)
     (let ((handles (or handles gnus-article-mime-handles))
-	  (mail-parse-charset gnus-newsgroup-charset))
+	  (mail-parse-charset gnus-newsgroup-charset)
+	  (mail-parse-ignored-charsets 
+	   (save-excursion (set-buffer gnus-summary-buffer)
+			   gnus-newsgroup-ignored-charsets)))
       (if (stringp (car handles))
 	  (gnus-mime-view-all-parts (cdr handles))
 	(mapcar 'mm-display-part handles)))))
@@ -3156,7 +3163,10 @@ Type any key: "
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (mm-user-display-methods nil)
 	 (mm-all-images-fit t)
-	 (mail-parse-charset gnus-newsgroup-charset))
+	 (mail-parse-charset gnus-newsgroup-charset)
+	 (mail-parse-ignored-charsets 
+	  (save-excursion (set-buffer gnus-summary-buffer)
+			  gnus-newsgroup-ignored-charsets)))
     (if (mm-handle-undisplayer handle)
 	(mm-remove-part handle)
       (mm-display-part handle))))
@@ -3168,7 +3178,10 @@ Type any key: "
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (mm-user-display-methods '((".*" . inline)))
 	 (mm-all-images-fit t)
-	 (mail-parse-charset gnus-newsgroup-charset))
+	 (mail-parse-charset gnus-newsgroup-charset)
+	 (mail-parse-ignored-charsets 
+	  (save-excursion (set-buffer gnus-summary-buffer)
+			  gnus-newsgroup-ignored-charsets)))
     (if (mm-handle-undisplayer handle)
 	(mm-remove-part handle)
       (mm-display-part handle))))
@@ -3234,7 +3247,10 @@ Type any key: "
     (forward-line 1)
     (prog1
 	(let ((window (selected-window))
-	      (mail-parse-charset gnus-newsgroup-charset))
+	      (mail-parse-charset gnus-newsgroup-charset)
+	      (mail-parse-ignored-charsets 
+	       (save-excursion (set-buffer gnus-summary-buffer)
+			       gnus-newsgroup-ignored-charsets)))
 	  (save-excursion
 	    (unwind-protect
 		(let ((win (get-buffer-window (current-buffer) t))
@@ -3346,9 +3362,10 @@ Type any key: "
 	(when (and (not ihandles)
 		   (not gnus-displaying-mime))
 	  ;; Top-level call; we clean up.
-	  (mm-destroy-parts gnus-article-mime-handles)
-	  (setq gnus-article-mime-handles handles
-		gnus-article-mime-handle-alist nil)
+	  (when gnus-article-mime-handles
+	    (mm-destroy-parts gnus-article-mime-handles)
+	    (setq gnus-article-mime-handle-alist nil)) ;; A trick.
+	  (setq gnus-article-mime-handles handles)
 	  ;; We allow users to glean info from the handles.
 	  (when gnus-article-mime-part-function
 	    (gnus-mime-part-function handles)))
@@ -3368,12 +3385,13 @@ Type any key: "
 	    (narrow-to-region (point) (point-max))
 	    (gnus-treat-article nil 1 1)
 	    (widen)))
-	;; Highlight the headers.
-	(save-excursion
-	  (save-restriction
-	    (article-goto-body)
-	    (narrow-to-region (point-min) (point))
-	    (gnus-treat-article 'head)))))))
+	(if (not ihandles)
+	    ;; Highlight the headers.
+	    (save-excursion
+	      (save-restriction
+		(article-goto-body)
+		(narrow-to-region (point-min) (point))
+		(gnus-treat-article 'head))))))))
 
 (defvar gnus-mime-display-multipart-as-mixed nil)
 
@@ -3448,7 +3466,10 @@ Type any key: "
 	   (display
 	    (when move
 	      (forward-line -2))
-	    (let ((mail-parse-charset gnus-newsgroup-charset))
+	    (let ((mail-parse-charset gnus-newsgroup-charset)
+		  (mail-parse-ignored-charsets 
+		   (save-excursion (set-buffer gnus-summary-buffer)
+				   gnus-newsgroup-ignored-charsets)))
 	      (mm-display-part handle t))
 	    (goto-char (point-max)))
 	   ((and text not-attachment)
@@ -3556,7 +3577,10 @@ Type any key: "
 	(when preferred
 	  (if (stringp (car preferred))
 	      (gnus-display-mime preferred)
-	    (let ((mail-parse-charset gnus-newsgroup-charset))
+	    (let ((mail-parse-charset gnus-newsgroup-charset)
+		  (mail-parse-ignored-charsets 
+		   (save-excursion (set-buffer gnus-summary-buffer)
+				   gnus-newsgroup-ignored-charsets)))
 	      (mm-display-part preferred)))
 	  (goto-char (point-max))
 	  (setcdr begend (point-marker)))))
@@ -3782,7 +3806,10 @@ Argument LINES specifies lines to be scrolled down."
       (set-buffer gnus-article-current-summary)
       (let (gnus-pick-mode)
         (push (or key last-command-event) unread-command-events)
-        (setq keys (read-key-sequence nil))))
+        (setq keys (if gnus-xemacs
+		       (events-to-keys (read-key-sequence nil))
+		     (read-key-sequence nil)))))
+		     
     (message "")
 
     (if (or (member keys nosaves)

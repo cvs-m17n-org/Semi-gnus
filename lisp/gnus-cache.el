@@ -184,6 +184,8 @@ it's not cached."
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer-as-coding-system
 	       gnus-cache-write-file-coding-system file)
+	      (setq headers (nnheader-parse-head t))
+	      (mail-header-set-number headers number)
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))
 	      (goto-char (point-max))
@@ -306,7 +308,9 @@ it's not cached."
 	    ;; unsuccessful), so we use the cached headers exclusively.
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer)
-	    (nnheader-insert-file-contents cache-file)
+	    (let ((nnheader-file-coding-system
+		   gnus-cache-overview-coding-system))
+	      (nnheader-insert-file-contents cache-file))
 	    'nov)
 	   ((eq type 'nov)
 	    ;; We have both cached and uncached NOV headers, so we
@@ -542,7 +546,9 @@ Returns the list of articles removed."
     (save-excursion
       (set-buffer cache-buf)
       (erase-buffer)
-      (nnheader-insert-file-contents (or file (gnus-cache-file-name group ".overview")))
+      (let ((nnheader-file-coding-system gnus-cache-overview-coding-system))
+	(nnheader-insert-file-contents
+	 (or file (gnus-cache-file-name group ".overview"))))
       (goto-char (point-min))
       (insert "\n")
       (goto-char (point-min)))
@@ -584,7 +590,9 @@ Returns the list of articles removed."
       (save-excursion
 	(set-buffer cache-buf)
 	(erase-buffer)
-	(nnheader-insert-file-contents (gnus-cache-file-name group (car cached)))
+	(let ((nnheader-file-coding-system gnus-cache-coding-system))
+	  (nnheader-insert-file-contents
+	   (gnus-cache-file-name group (car cached))))
 	(goto-char (point-min))
 	(insert "220 ")
 	(princ (car cached) (current-buffer))

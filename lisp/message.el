@@ -1048,7 +1048,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (cond
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule)
-    (if (string-match "nt" system-configuration)
+    (if (string-match "nt\\|windows" system-configuration)
 	'emacs-mule-dos 'emacs-mule))
    ((find-coding-system 'escape-quoted) 'escape-quoted)
    ((find-coding-system 'no-conversion) 'no-conversion)
