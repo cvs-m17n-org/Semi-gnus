@@ -1,5 +1,9 @@
 1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-install-package): Don't refer to
+	`configure-package-path'. Use `early-packages', `late-packages' or
+	`last-packages' instead.
+
 	* README.semi: Note that APEL 9.13 or later is required.
 	* README.semi.ja: Likewise.
 
