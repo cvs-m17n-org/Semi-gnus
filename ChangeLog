@@ -1,10 +1,3 @@
-1998-10-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
-
-	* lisp/nnheader.el (make-full-mail-header-from-decoded-header):
-	Fix typo.
-	(nnheader-parse-head): Use `make-full-mail-header' instead of
-	`make-full-mail-header-from-decoded-header'.
-
 1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
