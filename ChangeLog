@@ -1,5 +1,9 @@
 2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.15.22 revision 00.
+
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.15.20 revision 00.
 
 2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
