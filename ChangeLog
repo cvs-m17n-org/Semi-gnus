@@ -1,3 +1,11 @@
+1999-01-15 23:08:47  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnmail.el (nnmail-pathname-coding-system): Default to binary.
+
+1998-09-08 11:40:45  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnheader.el (nnheader-pathname-coding-system): Changed to binary.
+
 1999-01-16  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
 
 	* lisp/message.el (message-reply): Accept references as a new
