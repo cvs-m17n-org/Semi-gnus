@@ -1,6 +1,14 @@
+1999-11-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.13.10 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.10.
+
+	* lisp/gnus-util.el (TopLevel): Do not require `rmail'.
+
 1999-10-05  Keiichi Suzuki  <keiichi@nanap.org>
 
-	* Nana-gnus: Version 6.13.8 released.
+	* Nana-gnus: Version 6.13.9 released.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.9.
 
