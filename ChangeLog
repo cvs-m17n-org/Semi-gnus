@@ -1,5 +1,11 @@
 1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-group-startup-message): Insert space before
+	"based on".
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Ditto.
+
+1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
 	(gnus-revision-number): Clear to 00.
 
