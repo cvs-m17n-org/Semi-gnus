@@ -267,7 +267,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.10.064"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "09"
+(defconst gnus-revision-number "10"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.84"
@@ -1430,59 +1430,6 @@ face."
   :group 'gnus-visual
   :type 'face)
 
-(defcustom gnus-article-display-hook
-  (if (and (string-match "XEmacs" emacs-version)
-	   (featurep 'xface))
-      '(gnus-article-hide-headers-if-wanted
-	gnus-article-hide-boring-headers
-	gnus-article-treat-overstrike
-	gnus-article-maybe-highlight
-	gnus-article-display-x-face)
-    '(gnus-article-hide-headers-if-wanted
-      gnus-article-hide-boring-headers
-      gnus-article-treat-overstrike
-      gnus-article-maybe-highlight))
-  "*Controls how the article buffer will look.
-
-If you leave the list empty, the article will appear exactly as it is
-stored on the disk.  The list entries will hide or highlight various
-parts of the article, making it easier to find the information you
-want."
-  :group 'gnus-article-highlight
-  :group 'gnus-visual
-  :type 'hook
-  :options '(gnus-article-add-buttons
-	     gnus-article-add-buttons-to-head
-	     gnus-article-emphasize
-	     gnus-article-fill-cited-article
-	     gnus-article-remove-cr
-	     gnus-summary-stop-page-breaking
-	     ;; gnus-summary-caesar-message
-	     ;; gnus-summary-verbose-headers
-	     gnus-summary-toggle-mime
-	     gnus-article-hide
-	     gnus-article-hide-headers
-	     gnus-article-hide-boring-headers
-	     gnus-article-hide-signature
-	     gnus-article-hide-citation
-	     gnus-article-hide-pgp
-	     gnus-article-hide-pem
-	     gnus-article-highlight
-	     gnus-article-highlight-headers
-	     gnus-article-highlight-citation
-	     gnus-article-highlight-signature
-	     gnus-article-date-ut
-	     gnus-article-date-local
-	     gnus-article-date-lapsed
-	     gnus-article-date-original
-	     gnus-article-remove-trailing-blank-lines
-	     gnus-article-strip-leading-blank-lines
-	     gnus-article-strip-multiple-blank-lines
-	     gnus-article-strip-blank-lines
-	     gnus-article-treat-overstrike
-	     gnus-article-display-x-face
-	     gnus-smiley-display))
-
 (defcustom gnus-article-save-directory gnus-directory
   "*Name of the directory articles will be saved in (default \"~/News\")."
   :group 'gnus-article-saving
@@ -1665,6 +1612,11 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 (defvar rmail-default-rmail-file)
 
 (defvar gnus-dead-summary nil)
+
+(defvar gnus-article-display-hook nil
+  "Controls how the article buffer will look.  This is an obsolete variable;
+use the article treating faculties instead.  Is is described in Info node
+`Customizing Articles'.")
 
 ;;; End of variables.
 
