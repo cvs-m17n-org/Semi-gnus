@@ -1,3 +1,23 @@
+1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/smtp.el (smtp-via-smtp): Use `open-network-stream-as-binary'
+	instead of `open-network-stream'.
+	* lisp/pop3.el (pop3-open-server): Likewise.
+	* lisp/nntp.el (nntp-open-network-stream): Likewise.
+	* lisp/gnus-gl.el (bbb-connect-to-bbbd): Likewise.
+
+	* lisp/nntp.el (nntp-open-rlogin): Enclose `start-process' with
+	`as-binary-process'.
+	(nntp-open-telnet): Likewise.
+
+	* lisp/smtp.el (smtp-coding-system): Abolished.
+
+	* lisp/nntp.el (nntp-coding-system-for-write): Abolished.
+	(nntp-coding-system-for-read): Abolished.
+
+	* lisp/nntp.el: Don't require `tcp'.
+	* lisp/nndb.el: Likewise.
+
 1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-get-parameter-with-eval): Call
@@ -7,7 +27,7 @@
 
 	* lisp/gnus.el: (gnus-version-number): Update to 6.9.1.
 	(gnus-version): Modified for SEMI 1.11, FLIM 1.12.
-	
+
 	* lisp/gnus-draft.el: (gnus-draft-decoding-buffer): Call
 	`mime-edit-decode-message-in-buffer' instead of
 	`mime-edit-decode-buffer'.
@@ -27,7 +47,7 @@
 	(message-supersede-setup-function): New user option. Use
 	`message-supersede-setup-for-mime-edit' in default.
 	(message-supersede): Call `message-supersede-setup-function' if it
- 	is non-nil.
+	is non-nil.
 	(message-supersede-setup-hook): New user option.
 
 	* lisp/message.el (message-bounce-setup-for-mime-edit): Don't
@@ -161,7 +181,7 @@
 1998-11-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/message.el (message-mode-map): Add new command key
- 	`C-x C-s' for `message-save-drafts'.
+	`C-x C-s' for `message-save-drafts'.
 
 1998-11-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
