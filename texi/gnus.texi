@@ -433,7 +433,7 @@ New Groups
 * Subscription Methods::     What Gnus should do with new groups.
 * Filtering New Groups::     Making Gnus ignore certain new groups.
 
-The Group Buffer
+Group Buffer
 
 * Group Buffer Format::    Information listed and how you can change it.
 * Group Maneuvering::      Commands for moving in the group buffer.
@@ -474,7 +474,7 @@ Misc Group Stuff
 * Group Timestamp::       Making Gnus keep track of when you last read a group.
 * File Commands::         Reading and writing the Gnus files.
 
-The Summary Buffer
+Summary Buffer
 
 * Summary Buffer Format::       Deciding how the summary buffer is to look.
 * Summary Maneuvering::         Moving around the summary buffer.
@@ -584,7 +584,7 @@ Various Summary Stuff
 * Summary Generation Commands::       (Re)generating the summary buffer.
 * Really Various Summary Commands::   Those pesky non-conformant commands.
 
-The Article Buffer
+Article Buffer
 
 * Hiding Headers::        Deciding what headers should be displayed.
 * Using MIME::            Pushing articles through @sc{mime} before reading them.
@@ -613,7 +613,7 @@ Select Methods
 * Combined Groups::       Combining groups into one group.
 * Gnus Unplugged::        Reading news and mail offline.
 
-The Server Buffer
+Server Buffer
 
 * Server Buffer Format::      You can customize the look of this buffer.
 * Server Commands::           Commands to manipulate servers.
@@ -665,6 +665,8 @@ Browsing the Web
 * Slashdot::              Reading the Slashdot comments.
 * Ultimate::              The Ultimate Bulletin Board systems.
 * Web Archive::           Reading mailing list archived on web.
+* RSS::                   Reading RDF site summary.
+* Customizing w3::        Doing stuff to Emacs/w3 from Gnus.
 
 Other Sources
 
@@ -4937,6 +4939,8 @@ Marked as dormant (@code{gnus-dormant-mark}).
 @dfn{Dormant articles} will only appear in the summary buffer if there
 are followups to it.  If you want to see them even if they don't have
 followups, you can use the @kbd{/ D} command (@pxref{Limiting}).
+Otherwise (except for the visibility issue), they are just like ticked
+messages.
 
 @item SPACE
 @vindex gnus-unread-mark
@@ -5795,6 +5799,18 @@ question.)  If this variable is @code{t}, Gnus will display all these
 thread or not.  Finally, if this variable is @code{more}, Gnus won't cut
 off sparse leaf nodes that don't lead anywhere.  This variable is
 @code{nil} by default.
+
+@item gnus-read-all-available-headers
+@vindex gnus-read-all-available-headers
+This is a rather obscure variable that few will find useful.  It's
+intended for those non-news newsgroups where the backend has to fetch
+quite a lot to present the summary buffer, and where it's impossible to
+go back to parents of articles.  This is mostly the case in the
+web-based groups, like the @code{nnultimate} groups.
+
+If you don't use those, then it's safe to leave this as the default
+@code{nil}.  If you want to use this variable, it should be a regexp
+that matches the group name, or @code{t} for all groups.
 
 @end table
 
@@ -9775,7 +9791,8 @@ you're in, you could say something like the following:
 (add-hook 'gnus-select-group-hook
           (lambda ()
             (cond
-             ((string-match "^de\\." gnus-newsgroup-name)
+             ((string-match
+               "^de\\." (gnus-group-real-name gnus-newsgroup-name))
               (ispell-change-dictionary "deutsch"))
              (t
               (ispell-change-dictionary "english")))))
@@ -12902,6 +12919,7 @@ interfaces to these sources.
 * Slashdot::              Reading the Slashdot comments.
 * Ultimate::              The Ultimate Bulletin Board systems.
 * Web Archive::           Reading mailing list archived on web.
+* RSS::                   Reading RDF site summary.
 * Customizing w3::        Doing stuff to Emacs/w3 from Gnus.
 @end menu
 
@@ -13163,6 +13181,29 @@ The account name on the web server.
 The password for your account on the web server.
 @end table
 
+@node RSS
+@subsection RSS
+@cindex nnrss
+@cindex RSS
+
+Some sites have RDF site summary (RSS)
+@uref{http://purl.org/rss/1.0/spec}.  It has a quite regular and nice
+interface, and it's possible to get the information Gnus needs to keep
+groups updated.
+
+The easiest way to get started with @code{nnrss} is to say something
+like the following in the group buffer: @kbd{B nnrss RET RET}, then
+subscribe groups.
+
+The following @code{nnrss} variables can be altered:
+
+@table @code
+@item nnrss-directory
+@vindex nnrss-directory
+The directory where @code{nnrss} stores its files.  The default is
+@samp{~/News/rss/}.
+
+@end table
 
 @node Customizing w3
 @subsection Customizing w3

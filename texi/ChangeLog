@@ -1,3 +1,17 @@
+2001-04-15 19:38:54  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Mail and Post): Fix.
+
+2001-04-29 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Remove a few The's.
+	(RSS): New.
+
+2001-04-26  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Unread Articles): Say that dormants are similar to
+	ticked.
+
 2001-04-13  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus.texi (Sorting Groups): Note `C-k' and `C-y' for manually

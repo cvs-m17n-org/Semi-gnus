@@ -256,7 +256,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.02"
+(defconst gnus-version-number "0.03"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -1772,10 +1772,10 @@ covered by that variable."
   "The mail address of the Gnus maintainers.")
 
 (defvar gnus-info-nodes
-  '((gnus-group-mode "(gnus)The Group Buffer")
-    (gnus-summary-mode "(gnus)The Summary Buffer")
-    (gnus-article-mode "(gnus)The Article Buffer")
-    (gnus-server-mode "(gnus)The Server Buffer")
+  '((gnus-group-mode "(gnus)Group Buffer")
+    (gnus-summary-mode "(gnus)Summary Buffer")
+    (gnus-article-mode "(gnus)Article Buffer")
+    (gnus-server-mode "(gnus)Server Buffer")
     (gnus-browse-mode "(gnus)Browse Foreign Server")
     (gnus-tree-mode "(gnus)Tree Display"))
   "Alist of major modes and related Info nodes.")
