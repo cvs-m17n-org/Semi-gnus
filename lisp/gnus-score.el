@@ -435,53 +435,20 @@ of the last successful match.")
 
 (defconst gnus-header-index
   ;; Name to index alist.
-  `(("number"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'location)
-     gnus-score-integer)
-    ("subject"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'subject)
-     gnus-score-string)
-    ("from"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'from)
-     gnus-score-string)
-    ("date"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'date)
-     gnus-score-date)
-    ("message-id"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'id)
-     gnus-score-string)
-    ("references"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'references)
-     gnus-score-string)
-    ("chars"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'chars)
-     gnus-score-integer)
-    ("lines"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'lines)
-     gnus-score-integer)
-    ("xref"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'xref)
-     gnus-score-string)
+  '(("number" 1 gnus-score-integer)
+    ("subject" 8 gnus-score-string)
+    ("from" 9 gnus-score-string)
+    ("date" 10 gnus-score-date)
+    ("message-id" 11 gnus-score-string)
+    ("references" 12 gnus-score-string)
+    ("chars" 13 gnus-score-integer)
+    ("lines" 14 gnus-score-integer)
+    ("xref" 15 gnus-score-string)
     ("head" -1 gnus-score-body)
     ("body" -1 gnus-score-body)
     ("all" -1 gnus-score-body)
-    ("followup"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'from)
-     gnus-score-followup)
-    ("thread"
-     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
-			     'references)
-     gnus-score-thread)))
+    ("followup" 9 gnus-score-followup)
+    ("thread" 12 gnus-score-thread)))
 
 ;;; Summary mode score maps.
 
@@ -2155,15 +2122,20 @@ SCORE is the score to add."
 	(progn
 	  (set-syntax-table gnus-adaptive-word-syntax-table)
 	  (while (re-search-forward "\\b\\w+\\b" nil t)
-	    (setq val
-		  (gnus-gethash
-		   (setq word (downcase (buffer-substring
-					 (match-beginning 0) (match-end 0))))
+	    (condition-case err
+		(progn
+		  (setq val
+			(gnus-gethash
+			 (setq word (downcase
+				     (buffer-substring
+				      (match-beginning 0) (match-end 0))))
+			 hashtb))
+		  (gnus-sethash
+		   word
+		   (append (get-text-property (gnus-point-at-eol) 'articles)
+			   val)
 		   hashtb))
-	    (gnus-sethash
-	     word
-	     (append (get-text-property (gnus-point-at-eol) 'articles) val)
-	     hashtb)))
+	      (error (gnus-error 1.1 "%s" err)))))
       (set-syntax-table syntab))
     ;; Make all the ignorable words ignored.
     (let ((ignored (append gnus-ignored-adaptive-words

@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'bbdb)
+(require 'bbdb-com)
 (require 'gnus)
 (require 'std11)
 (eval-when-compile
@@ -145,37 +146,72 @@ displaying the record corresponding to the sender of the current message."
       record)))
 
 ;;;###autoload
-(defun gnus-bbdb/split-mail (header-filed bbdb-field &optional regexp group)
+(defun gnus-bbdb/split-mail (header-field bbdb-field
+					  &optional regexp group)
   "Mail split method for `nnmail-split-fancy'.
-HEADER-FILED is regexp of mail header field name for gathering mail
-addresses. BBDB-FIELD is field name of BBDB.
-Optional argument REGEXP is regexp of matching BBDB-FIELD value.
-If REGEXP is nil or not specified, then all BBDB-FIELD value is match.
-If GROUP is nil or not specified, then use BBDB-FIELD value as group
-name. Otherwise use GROUP."
-  (or regexp (setq regexp ""))
-  (let ((pat (concat "\\(" header-filed "\\)" ":[ \t]"))
-	rest prop answer)
-    (goto-char (point-min))
+HEADER-FIELED is a regexp or list of regexps as mail header field name
+for gathering mail addresses.  If HEADER-FIELED is a string, then it's
+used for just matching pattern.  If HEADER-FIELED is a list of strings,
+then these strings have priorities in the order.
+
+BBDB-FIELD is field name of BBDB.
+Optional argument REGEXP is regexp string for matching BBDB-FIELD value.
+If REGEXP is nil or not specified, then all BBDB-FIELD value is matched.
+
+If GROUP is nil or not specified, then BBDB-FIELD value is returned as
+group name.  If GROUP is a symbol `&', then list of all matcing group's
+BBDB-FEILD values is returned.  Otherwise, GROUP is returned."
+  (if (listp header-field)
+      (if (eq group '&)
+	  (gnus-bbdb/split-mail (mapconcat 'identity header-field "\\|")
+				bbdb-field regexp group)
+	(let (rest)
+	  (while (and header-field
+		      (null (setq rest (gnus-bbdb/split-mail
+					(car header-field) bbdb-field
+					regexp group))))
+	    (setq header-field (cdr header-field)))
+	  rest))
+    (let ((pat (concat "^\\(" header-field "\\):[ \t]"))
+	  header-values)
+      (goto-char (point-min))
+      (while (re-search-forward pat nil t)
+	(setq header-values (cons (buffer-substring (point)
+						(std11-field-end))
+				  header-values)))
+      (let ((address-regexp
+	     (mapconcat
+	      (lambda (lal)
+		(regexp-quote (std11-address-string lal)))
+	      (apply 'nconc
+		     (mapcar #'std11-parse-addresses-string
+			     header-values))
+	      "\\|")))
+	(unless (zerop (length address-regexp))
+	  (gnus-bbdb/split-mail-1 address-regexp bbdb-field regexp group))))))
+
+(defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
+  (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
+	prop rest)
+    (or regexp (setq regexp ""))
     (catch 'done
-      (while (< (point) (point-max))
-	(when (looking-at pat)
-	  (mapcar 
-	   (lambda (lal)
-	     (condition-case nil
-		 (let ((prop (bbdb-record-getprop
-			      (bbdb-search-simple nil
-						  (std11-address-string lal))
-			      bbdb-field)))
-		   (and (string-match regexp prop)
-			(throw 'done (or group prop))))
-	       (error nil)
-	       ))
-	   (std11-parse-addresses-string (buffer-substring (match-end 0)
-							   (std11-field-end)))
-	   ))
-	(forward-line)
-	))))
+      (cond
+       ((eq group '&)
+	(while records
+	  (when (and (setq prop (bbdb-record-getprop (car records) bbdb-field))
+		     (string-match regexp prop)
+		     (not (member prop rest)))
+	    (setq rest (cons prop rest)))
+	  (setq records (cdr records)))
+	(throw 'done (when rest (cons '& rest))))
+       (t
+	(while records
+	  (when (or (null bbdb-field) 
+		    (and (setq prop (bbdb-record-getprop (car records)
+							 bbdb-field))
+			 (string-match regexp prop)))
+	    (throw 'done (or group prop)))
+	  (setq records (cdr records))))))))
 
 ;;
 ;; Announcing BBDB entries in the summary buffer

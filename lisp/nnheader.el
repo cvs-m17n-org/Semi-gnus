@@ -43,6 +43,8 @@
 
 (require 'mail-utils)
 (require 'mime)
+(require 'poem)				; For using coding system
+					; `raw-text-dos' on XEmacs.
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
