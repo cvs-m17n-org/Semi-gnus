@@ -20601,14 +20601,16 @@ Spam の除去 (filtering) への最も単純な取り組みは濾過するこ
 直接の濾過は有益になり得ます。
 
 もう一つの電子メール濾過への取り組みは分散型 spam 処理で、DCC (訳注:
-Direct Client Connection) がそのようなシステムを導入しています。本質的に
-は、世界中の @code{N} 個のシステムが、中国、ガーナあるいはカリフォルニア
-にあるマシン @samp{X} が spam 電子メールを送出していることを認めたら、そ
-れら @code{N} 個のシステムは @samp{X} または @samp{X} からやって来
-た spam メールをデータベースに記入します。Spam 検出の基準は変わります。
-それは送られたメッセージの数やメッセージの内容などであるかもしれません。
-メッセージが spam かどうかを分散処理システムのユーザが知りたい場合、彼は
-それらの @code{N} 個のシステムのうちの一つを調べます。
+Distributed Checksum Clearinghouse --
+@uref{http://www.rhyolite.com/anti-spam/dcc/}) がそのようなシステムを導
+入しています。本質的には、世界中の @code{N} 個のシステムが、中国、ガーナ
+あるいはカリフォルニアにあるマシン @samp{X} が spam 電子メールを送出して
+いることを認めたら、それら @code{N} 個のシステムは @samp{X} また
+は @samp{X} からやって来た spam メールをデータベースに記入します。
+Spam 検出の基準は変わります。それは送られたメッセージの数やメッセージの
+内容などであるかもしれません。メッセージが spam かどうかを分散処理システ
+ムのユーザが知りたい場合、彼はそれらの @code{N} 個のシステムのうちの一つ
+を調べます。
 
 分散型 spam 処理は同時に多くのメッセージを送る spammers と非常によく戦っ
 てくれますが、それはユーザーがかなり複雑なチェックを設定することを求めま
@@ -20989,7 +20991,7 @@ Bogofilter か ifile (@code{spam-use-bogofilter} と @code{spam-use-if
 れ @file{whitelist} と @file{blacklist} という名前が付けられます。
 
 @node BBDB Whitelists
-@subsubsection BBDB Whitelists
+@subsubsection BBDB ホワイトリスト
 @cindex spam filtering
 @cindex BBDB whitelists, spam filtering
 @cindex BBDB, spam filtering
@@ -20997,29 +20999,29 @@ Bogofilter か ifile (@code{spam-use-bogofilter} と @code{spam-use-if
 
 @defvar spam-use-bbdb
 
-Analogous to @code{spam-use-whitelist} (@pxref{Blacklists and
-Whitelists}), but uses the BBDB as the source of whitelisted addresses,
-without regular expressions.  You must have the BBDB loaded for
-@code{spam-use-bbdb} to work properly.  Only addresses in the BBDB
-will be allowed through; all others will be classified as spam.
+@code{spam-use-whitelist} (@pxref{Blacklists and Whitelists}) に似ていま
+すが、ホワイトリストのアドレスの源として、正規表現ではない BBDB を使いま
+す。@code{spam-use-bbdb} をちゃんと動作させるには BBDB を load しなけれ
+ばなりません。BBDB にあるアドレスだけが許され、他はすべて spam として分
+類されます。
 
 @end defvar
 
 @node Blackholes
-@subsubsection Blackholes
+@subsubsection ブラックホール
 @cindex spam filtering
 @cindex blackholes, spam filtering
 @cindex spam.el
 
 @defvar spam-use-blackholes
 
-You can let Gnus consult the blackhole-type distributed spam
-processing systems (DCC, for instance) when you set this option.  The
-variable @code{spam-blackhole-servers} holds the list of blackhole servers
-Gnus will consult.
+このオプションをセットすると、gnus にブラックホール型の分散 spam 処理シ
+ステム (例えば DCC) を調べさせることができます。変
+数 @code{spam-blackhole-servers} は、gnus が意見を求めるブラックホール・
+サーバーのリストを持ちます。
 
-This variable is disabled by default.  It is not recommended at this
-time because of bugs in the @code{dns.el} code.
+この変数はディフォルトで無効になっています。@code{dns.el} のコードにバグ
+があるので、現時点では推奨されません。
 
 @end defvar
 
@@ -21031,44 +21033,45 @@ time because of bugs in the @code{dns.el} code.
 
 @defvar spam-use-bogofilter
 
-Set this variable if you want to use Eric Raymond's speedy Bogofilter.
-This has been tested with a locally patched copy of version 0.4.  Make
-sure to read the installation comments in @code{spam.el}.
+Eric Raymond の迅速な Bogofilter を使用したい場合は、この変数をセットし
+てください。これは、バージョン 0.4 のローカルにパッチが当たったコピーで
+テストされました。@code{spam.el} にあるインストールに関するコメントを読
+んで確かめて下さい。
 
-With a minimum of care for associating the @samp{H} mark for spam
-articles only, Bogofilter training all gets fairly automatic.  You
-should do this until you get a few hundreds of articles in each
-category, spam or not.  The shell command @command{head -1
-~/.bogofilter/*} shows both article counts.  The command @kbd{S t} in
-summary mode, either for debugging or for curiosity, triggers
-Bogofilter into displaying in another buffer the @emph{spamicity}
-score of the current article (between 0.0 and 1.0), together with the
-article words which most significantly contribute to the score.
+Spam 記事だけの @samp{H} 印を関連付ける最小の世話によって、Bogofilter ト
+レーニングはすべてかなり自動的になります。各カテゴリーの spam かそうでな
+い数百 (a few hundreds) の記事を入手するまで、これをやらなければなりませ
+ん。シェルコマンド @command{head -1 ~/.bogofilter/*} は両方の記事の計数
+を表示します。概略モードにおけるデバッグのための、あるいは好奇心のための
+コマンド @kbd{S t} は、Bogofilter が現在の記事の @emph{spamicity} (訳注:
+smap 度?) スコア (0.0〜1.0) を、スコアに最も著しく寄与する記事の語といっ
+しょに、他のバッファに表示することを促します。
 
 @end defvar
 
 @node Ifile spam filtering
-@subsubsection Ifile spam filtering
+@subsubsection Ifile による spam の濾過
 @cindex spam filtering
 @cindex ifile, spam filtering
 @cindex spam.el
 
 @defvar spam-use-ifile
 
-Enable this variable if you want to use Ifile, a statistical analyzer
-similar to Bogofilter.  Currently you must have @code{ifile-gnus.el}
-loaded.  The integration of Ifile with @code{spam.el} is not finished
-yet, but you can use @code{ifile-gnus.el} on its own if you like.
+Bogofilter に似た統計分析器である Ifile を使いたい場合は、この変数を有効
+にして下さい。今のところ @code{ifile-gnus.el} を load しなければなりませ
+ん。Ifile の @code{spam.el} への統合はまだ済んでいませんが、それを好むな
+らば @code{ifile-gnus.el} を単独に使うことができます。
 
 @end defvar
 
 @node Extending spam.el
-@subsubsection Extending spam.el
+@subsubsection spam.el の拡張。
 @cindex spam filtering
 @cindex spam.el, extending
 @cindex extending spam.el
 
-Say you want to add a new backend called blackbox.  Provide the following:
+新しいバックエンド blackbox を追加したいあなたのために、以下を提供しましょ
+う:
 
 @enumerate
 @item documentation
@@ -21077,54 +21080,52 @@ Say you want to add a new backend called blackbox.  Provide the following:
 
 @example
 (defvar spam-use-blackbox nil
-  "True if blackbox should be used.")
+  "Blackbox を使うときは t にする。")
 @end example
 
-Add
+@code{spam-list-of-checks} に
 @example
     (spam-use-blackbox	 . spam-check-blackbox)
 @end example
-to @code{spam-list-of-checks}.
+を追加。
 
 @item
-Write the @code{spam-check-blackbox} function.  It should return
-@samp{nil} or @code{spam-split-group}.  See the existing
-@code{spam-check-*} functions for examples of what you can do.
+@code{spam-check-blackbox} 関数を書いて下さい。それ
+は @samp{nil} か @code{spam-split-group} を返さなければなりません。あな
+たにできることの例は、既存の @code{spam-check-*} 関数を参照してください。
 @end enumerate
 
 @node Filtering Spam Using Statistics (spam-stat.el)
-@subsection Filtering Spam Using Statistics (spam-stat.el)
+@subsection Spam の濾過に統計を使う (spam-stat.el)
 @cindex Paul Graham
 @cindex Graham, Paul
 @cindex naive Bayesian spam filtering
 @cindex Bayesian spam filtering, naive
 @cindex spam filtering, naive Bayesian
 
-Paul Graham has written an excellent essay about spam filterung using
-statisticts: @uref{http://www.paulgraham.com/spam.html,A Plan for
-Spam}.  In it he describes the inherent deficiency of rule-based
-filtering as used by SpamAssassin, for example: Somebody has to write
-the rules, and everybody else has to install these rules.  You are
-always late.  It would be much better, he argues, to filter mail based
-on wether it somehow resembles spam or non-spam.  One way to measure
-this is word distribution.  He then goes on to describe a solution
-that checks wether a new mail resembles any of your other spam mails
-or not.
+Paul Graham は、統計を使った spam の濾過に関する優れたエッセイを書きまし
+た: @uref{http://www.paulgraham.com/spam.html,A Plan for Spam}。そこで彼
+は SpamAssassin によって使われているようなルールベースの濾過に固有な欠陥
+について述べています。例えば: 誰かがルールを書かなければならないし、他の
+すべての人はこれらのルールをインストールしなければなりません。あなたはい
+つも遅れます。それが何やら spam または非 spam 似ているかどうかに基づいて
+メールを濾過するほうが、はるかに良いだろうと彼は主張します。これを測定す
+る一つの手段は単語の分布です。その後彼は、新着メールがあなたの他
+の spam メールに似ているかどうかをチェックする方法の記述に進みます。
 
-The basic idea is this:  Create a two collections of your mail, one
-with spam, one with non-spam.  Count how often each word appears in
-either collection, weight this by the total number of mails in the
-collections, and store this information in a dictionary.  For every
-word in a new mail, determine its probability to belong to a spam or a
-non-spam mail.  Use the 15 most conspicuous words, compute the total
-probability of the mail being spam.  If this probability is higher
-than a certain threshold, the mail is considered to be spam.
+基本的な案はこれです: あなたのメールの二つのコレクションを作ります。一つ
+は spam、もう一つは非 spam で。両方のコレクションにおける各単語の出現頻
+度を数えて、コレクションのメールの総数で重み付けを行ない、この情報を辞書
+に格納します。新着メールのすべての単語について、spam か非 spam メールに
+属する確率を決定します。15の最も顕著な単語を使って、そのメール
+が spam であることの確率の総計を計算します。この確率がある閾値より高かっ
+たら、そのメールは spam であると考えられます。
 
-Gnus supports this kind of filtering.  But it needs some setting up.
-First, you need two collections of your mail, one with spam, one with
-non-spam.  Then you need to create a dictionary using these two
-collections, and save it.  And last but not least, you need to use
-this dictionary in your fancy mail splitting rules.
+gnus はこの種の濾過をサポートします。しかしそれにはいくつかの設定が必要
+です。第一に、あなたのメールの二つのコレクションが要ります。一つは spam、
+もう一つは非 spam で。そして、それらの二つのコレクションを使って辞書を作
+り、それをセーブして下さい。そして特に最後に、あなたの特級分割の規則でこ
+の辞書を使って下さい。
 
 @menu
 * Creating a spam-stat dictionary::  
