@@ -523,7 +523,7 @@ to the headers."
    :type 'hook)
 
 (defcustom message-header-encode-function
-  'eword-encode-header
+  '(lambda () (eword-encode-header t))
   "A function called to encode header."
   :group 'message-various
   :type 'function)
