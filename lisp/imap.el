@@ -138,8 +138,6 @@
   (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
-  (autoload 'base64-decode-string "mel")
-  (autoload 'base64-encode-string "mel")
   (autoload 'rfc2104-hash "rfc2104")
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
