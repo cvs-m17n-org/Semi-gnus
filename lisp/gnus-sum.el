@@ -5892,14 +5892,7 @@ be displayed."
 	      force)
 	  ;; The requested article is different from the current article.
 	  (progn
-	    (when (gnus-buffer-live-p gnus-article-buffer)
-	      (with-current-buffer gnus-article-buffer
-		(mm-enable-multibyte)))
 	    (gnus-summary-display-article article all-headers)
-	    (when (gnus-buffer-live-p gnus-article-buffer)
-	      (with-current-buffer gnus-article-buffer
-		(if (not gnus-article-decoded-p) ;; a local variable
-		    (mm-disable-multibyte))))
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
 	    (gnus-article-set-window-start
