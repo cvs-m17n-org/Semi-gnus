@@ -27,8 +27,7 @@ NEWS:
 
   See TODO.ja
 
-* T-gnus 6.8.17 is the last version Gnus 5.6 base.
+* T-gnus 6.8.19 is the last version Gnus 5.6 base.
   After this , T-gnus 6.10 - this is based on pgnus.
 
-  Latest T-gnus is T-gnus 6.10.023 (Based on pgnus-0.34).
-
+  Latest T-gnus is T-gnus 6.10.025 (Based on pgnus-0.36).
