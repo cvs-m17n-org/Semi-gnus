@@ -1005,6 +1005,15 @@ ARG is passed to the first function."
 			   (car (symbol-value sym))))))
        hashtb))))
 
+(defun gnus-union (a b)
+  "Add members of list A to list B
+if they are not equal to items already in B."
+  (if (null a)
+      b
+    (if (member (car a) b)
+	(gnus-union (cdr a) b)
+      (gnus-union (cdr a) (cons (car a) b)))))
+
 (provide 'gnus-util)
 
 ;;; gnus-util.el ends here
