@@ -1,3 +1,41 @@
+2002-09-27  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-fixup-unread-after-getting-new-news): Autoload
+	it just in case.
+	(nnimap-update-unseen): New function; update unseen count in
+	`n-m-info'.
+	(nnimap-close-group): Call it.
+
+	* gnus-start.el (gnus-setup-news-hook): Add n-f-u-a-g-n-n.
+	(gnus-after-getting-new-news-hook): Ditto.
+
+	* nnimap.el (nnimap-retrieve-groups): Move the quick mail check
+	message into verboselevel 9.  Change slow mail check message.
+	(nnimap-retrieve-groups): Use prefixed names in n-mailbox-info.
+	(nnimap-fixup-unread-after-getting-new-news): New function, to be
+	used as a hook after getting new mail.
+
+2002-09-26  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-parse-resp-text-code): The UNSEEN value in
+	SELECT/EXAMINE is first unseen article, not number of unseen
+	articles.  Make them distinct by renaming the former to
+	`first-unseen' instead of `unseen'.
+
+	* nnimap.el (nnimap-retrieve-groups): Get uidvalidity and unseen
+	too.
+	(nnimap-retrieve-groups): Don't used cached data if uidvalidity
+	changed.
+	(nnimap-retrieve-groups): Store uidvalidity and unseen data too.
+
+	* gnus-int.el (gnus-server-unopen-status): Defcustom.
+
+	* mml-sec.el (mml-signencrypt-style): Docstring to font-lock
+	better.
+
+	* mml2015.el (mml2015-pgg-decrypt): Only add security information
+	if dissecting resulting buffer actually had any information.
+
 2002-09-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-group.el (gnus-group-sort-by-method): Remove `symbol-name'

@@ -874,10 +874,22 @@ function is generally only called when Gnus is shutting down."
 	     (nnheader-report 'nnimap "Group %s selected" group)
 	     t)))))
 
+(defun nnimap-update-unseen (group &optional server)
+  "Update the unseen count in `nnimap-mailbox-info'."
+  (gnus-sethash
+   (gnus-group-prefixed-name group server)
+   (let ((old (gnus-gethash (gnus-group-prefixed-name group server) 
+			    nnimap-mailbox-info)))
+     (list (nth 0 old) (nth 1 old)
+	   (imap-mailbox-status group 'unseen nnimap-server-buffer)
+	   (nth 3 old)))
+   nnimap-mailbox-info))
+
 (defun nnimap-close-group (group &optional server)
   (with-current-buffer nnimap-server-buffer
     (when (and (imap-opened)
 	       (nnimap-possibly-change-group group server))
+      (nnimap-update-unseen group server)
       (case nnimap-expunge-on-close
 	(always (progn
 		  (imap-mailbox-expunge nnimap-close-asynchronous)
@@ -972,29 +984,40 @@ function is generally only called when Gnus is shutting down."
 	(if (null nnimap-retrieve-groups-asynchronous)
 	    (setq slowgroups groups)
 	  (dolist (group groups)
-	    (gnus-message 7 "nnimap: Checking mailbox %s" group)
-	    (add-to-list (if (gnus-gethash-safe (concat server group)
-						nnimap-mailbox-info)
+	    (gnus-message 9 "nnimap: Quickly checking mailbox %s" group)
+	    (add-to-list (if (gnus-gethash-safe
+			      (gnus-group-prefixed-name group server)
+			      nnimap-mailbox-info)
 			     'asyncgroups
 			   'slowgroups)
 			 (list group (imap-mailbox-status-asynch
-				      group 'uidnext nnimap-server-buffer))))
+				      group '(uidvalidity uidnext unseen) 
+				      nnimap-server-buffer))))
 	  (dolist (asyncgroup asyncgroups)
 	    (let ((group (nth 0 asyncgroup))
 		  (tag   (nth 1 asyncgroup))
 		  new old)
 	      (when (imap-ok-p (imap-wait-for-tag tag nnimap-server-buffer))
-		(if (nnimap-string-lessp-numerical
-		     (car (gnus-gethash
-			   (concat server group) nnimap-mailbox-info))
-		     (imap-mailbox-get 'uidnext group nnimap-server-buffer))
+		(if (or (not (string=
+			      (nth 0 (gnus-gethash (gnus-group-prefixed-name
+						    group server)
+						   nnimap-mailbox-info))
+			      (imap-mailbox-get 'uidvalidity group 
+						nnimap-server-buffer)))
+			(not (string=
+			      (nth 1 (gnus-gethash (gnus-group-prefixed-name
+						    group server)
+						   nnimap-mailbox-info))
+			      (imap-mailbox-get 'uidnext group
+						nnimap-server-buffer))))
 		    (push (list group) slowgroups)
-		  (insert (cdr (gnus-gethash (concat server group)
-					     nnimap-mailbox-info))))))))
+		  (insert (nth 3 (gnus-gethash (gnus-group-prefixed-name
+						group server)
+					       nnimap-mailbox-info))))))))
 	(dolist (group slowgroups)
 	  (if nnimap-retrieve-groups-asynchronous
 	      (setq group (car group)))
-	  (gnus-message 7 "nnimap: Rechecking mailbox %s" group)
+	  (gnus-message 7 "nnimap: Mailbox %s modified" group)
 	  (imap-mailbox-put 'uidnext nil group nnimap-server-buffer)
 	  (or (member "\\NoSelect" (imap-mailbox-get 'list-flags group
 						     nnimap-server-buffer))
@@ -1009,11 +1032,19 @@ function is generally only called when Gnus is shutting down."
 		(insert str)
 		(when nnimap-retrieve-groups-asynchronous
 		  (gnus-sethash
-		   (concat server group)
-		   (cons (or (imap-mailbox-get
+		   (gnus-group-prefixed-name group server)
+		   (list (or (imap-mailbox-get
+			      'uidvalidity group nnimap-server-buffer)
+			     (imap-mailbox-status
+			      group 'uidvalidity nnimap-server-buffer))
+			 (or (imap-mailbox-get
 			      'uidnext group nnimap-server-buffer)
 			     (imap-mailbox-status
 			      group 'uidnext nnimap-server-buffer))
+			 (or (imap-mailbox-get
+			      'unseen group nnimap-server-buffer)
+			     (imap-mailbox-status
+			      group 'unseen nnimap-server-buffer))
 			 str)
 		   nnimap-mailbox-info)))))))
     (gnus-message 5 "nnimap: Checking mailboxes...done")
@@ -1519,6 +1550,18 @@ be used in a STORE FLAGS command."
 (defun nnimap-mark-permanent-p (mark &optional group)
   "Return t iff MARK can be permanently (between IMAP sessions) saved on articles, in GROUP."
   (imap-message-flag-permanent-p (nnimap-mark-to-flag mark)))
+
+;;;###autoload
+(defun nnimap-fixup-unread-after-getting-new-news ()
+  (let (server group info)
+    (mapatoms
+     (lambda (sym)
+       (when (and (setq group (symbol-name sym))
+		  (gnus-group-entry group)
+		  (setq info (symbol-value sym)))
+	 (gnus-sethash group (cons (nth 2 info) (cdr (gnus-group-entry group)))
+		       gnus-newsrc-hashtb)))
+     nnimap-mailbox-info)))
 
 (when nnimap-debug
   (require 'trace)
