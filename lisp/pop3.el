@@ -70,6 +70,9 @@ message retrieval.")
 (defvar pop3-maximum-message-size nil
   "If non-nil only download messages smaller than this.")
 
+(defvar pop3-except-header-regexp nil
+  "If non-nil we do not retrieve messages whose headers are matching this regexp.")
+
 (defvar pop3-uidl-file-name "~/.uidls"
   "File in which to store the UIDL of processed messages.")
 
@@ -131,7 +134,10 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	    (unless (or (not msgid)
 			;; don't download messages that are too large
 			(and pop3-maximum-message-size 
-			     (> msglen pop3-maximum-message-size)))
+			     (> msglen pop3-maximum-message-size))
+			(and pop3-except-header-regexp
+			     (string-match pop3-except-header-regexp
+					   (pop3-top process msgid 0))))
 	      (message (format "Retrieving message %d of %d from %s..."
 			       n message-count pop3-mailhost))
 	      (pop3-retr process msgid crashbuf)
@@ -420,11 +426,10 @@ Return the response string if optional second argument is non-nil."
   (pop3-send-command process (format "RETR %s" msg))
   (pop3-read-response process)
   (save-excursion
-    (save-restriction
-      (apply 'narrow-to-region (pop3-get-extended-response process))
-      (pop3-munge-message-separator (point-min) (point-max))
-      (append-to-buffer crashbuf (point-min) (point-max))
-      (delete-region (point-min) (point-max))
+    (let ((region (pop3-get-extended-response process)))
+      (pop3-munge-message-separator (car region) (cadr region))
+      (append-to-buffer crashbuf (car region) (cadr region))
+      (delete-region (car region) (cadr region))
       )))
 
 (defun pop3-dele (process msg)
@@ -525,6 +530,16 @@ where
 	  (cons (length pairs) (nreverse pairs))
 	  )))))
 
+(defun pop3-top (process msgno &optional lines)
+  "Return the top LINES of messages for PROCESS and MSGNO.
+If msgno is invalid, return nil.  Otherwise, return a string."
+  (pop3-send-command process (format "TOP %d %d" msgno (or lines 1)))
+  (if (pop3-read-response process t)
+      nil ;; MSGNO is not valid number
+    (save-excursion
+      (apply 'buffer-substring (pop3-get-extended-response process)))
+    ))
+
 ;;; Utility code
 
 (defun pop3-get-extended-response (process)
@@ -580,6 +595,13 @@ where
 ;; Restrictions: transaction state; msg must not be deleted
 ;; Possible responses:
 ;;  +OK [scan listing follows]
+;;  -ERR [no such message]
+
+;; TOP msg [lines]
+;; Arguments: a message-id (required), number of lines (optional)
+;; Restrictions: transaction state; msg must not be deleted
+;; Possible responses:
+;;  +OK [partial message listing follows]
 ;;  -ERR [no such message]
 
 ;; UIDL [msg]
