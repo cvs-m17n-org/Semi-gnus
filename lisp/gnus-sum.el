@@ -1206,24 +1206,32 @@ gnus-simplify-subject-fuzzy-regexp."
        "^ *\\(re\\|fw\\|fwd\\)[[{(^0-9]*[])}]?[:;] *")
       (gnus-simplify-buffer-fuzzy-step "^[[].*:\\( .*\\)[]]$" "\\1"))
 
+    (goto-char (point-min))
+    (while (re-search-forward " +" nil t)
+      (delete-region (match-beginning 0) (match-end 0))
+      (or (bolp) (eobp)
+	  (> (char-after) 127) (> (char-before) 127)
+	  (insert " ")))
     (gnus-simplify-buffer-fuzzy-step " *[[{(][^()\n]*[]})] *$")
-    (gnus-simplify-buffer-fuzzy-step "  +" " ")
     (gnus-simplify-buffer-fuzzy-step " $")
     (gnus-simplify-buffer-fuzzy-step "^ +")))
 
 (defun gnus-simplify-subject-fuzzy (subject)
   "Simplify a subject string fuzzily.
 See `gnus-simplify-buffer-fuzzy' for details."
-  (save-excursion
-    (gnus-set-work-buffer)
-    (let ((case-fold-search t))
-      ;; Remove uninteresting prefixes.
-      (when (and gnus-simplify-ignored-prefixes
-		 (string-match gnus-simplify-ignored-prefixes subject))
-	(setq subject (substring subject (match-end 0))))
-      (insert subject)
-      (inline (gnus-simplify-buffer-fuzzy))
-      (buffer-string))))
+  (let ((fuzzy-regexp gnus-simplify-subject-fuzzy-regexp)) ; Group parameter.
+    ;; Remove uninteresting prefixes.
+    (when (and gnus-simplify-ignored-prefixes
+	       (let ((case-fold-search t))
+		 (string-match gnus-simplify-ignored-prefixes subject)))
+      (setq subject (substring subject (match-end 0))))
+    (save-excursion
+      (gnus-set-work-buffer)
+      (let ((case-fold-search t)
+	    (gnus-simplify-subject-fuzzy-regexp fuzzy-regexp))
+	(insert subject)
+	(inline (gnus-simplify-buffer-fuzzy))
+	(buffer-string)))))
 
 (defsubst gnus-simplify-subject-fully (subject)
   "Simplify a subject string according to gnus-summary-gather-subject-limit."
@@ -2538,7 +2546,8 @@ marks of articles."
 	(let ((gnus-summary-line-format-spec spec)
 	      (gnus-newsgroup-downloadable '((0 . t))))
 	  (gnus-summary-insert-line
-	   [0 "" "" "" "" "" 0 0 "" nil]  0 nil 128 t nil "" nil 1)
+	   (make-full-mail-header 0 "" "" "" "" "" 0 0 "" nil)
+	   0 nil 128 t nil "" nil 1)
 	  (goto-char (point-min))
 	  (setq pos (list (cons 'unread (and (search-forward "\200" nil t)
 					     (- (point) 2)))))
@@ -3256,17 +3265,15 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number				; number
-		 (funcall gnus-decode-encoded-word-function
-			  (nnheader-nov-field))	; subject
-		 (funcall gnus-decode-encoded-word-function
-			  (nnheader-nov-field))	; from
+		 (nnheader-nov-field)		; subject
+		 (nnheader-nov-field)		; from
 		 (nnheader-nov-field)		; date
 		 (nnheader-nov-read-message-id)	; id
 		 (nnheader-nov-field)		; refs
 		 (nnheader-nov-read-integer)	; chars
 		 (nnheader-nov-read-integer)	; lines
 		 (unless (eobp)
-		   (nnheader-nov-field))		; misc
+		   (nnheader-nov-field))	; misc
 		 (nnheader-nov-parse-extra))))	; extra
 
       (widen))
@@ -4644,7 +4651,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	  ;; doesn't always go hand in hand.
 	  (setq
 	   header
-	   (vector
+	   (make-full-mail-header
 	    ;; Number.
 	    (prog1
 		(read cur)
@@ -4658,15 +4665,13 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (funcall gnus-decode-encoded-word-function
-			   (nnheader-header-value))
+		  (nnheader-header-value)
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (funcall gnus-decode-encoded-word-function
-			   (nnheader-header-value))
+		  (nnheader-header-value)
 		"(nobody)"))
 	    ;; Date.
 	    (progn
@@ -9022,7 +9027,8 @@ If REVERSE, save parts that do not match TYPE."
       (gnus-summary-select-article))
     (save-excursion
       (set-buffer gnus-article-buffer)
-      (let ((handles (or (mm-dissect-buffer) (mm-uu-dissect))))
+      (let ((handles (or (mm-dissect-buffer gnus-current-headers)
+			 (mm-uu-dissect))))
 	(when handles
 	  (gnus-summary-save-parts-1 type dir handles reverse)
 	  (mm-destroy-parts handles))))))
