@@ -364,17 +364,16 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
    (byte-compile 'dgnushack-bind-colon-keywords)
    (dgnushack-bind-colon-keywords)))
 
-(if (boundp 'MULE)
-    (progn
-      (setq :version ':version
-	    :set-after ':set-after)
-      (require 'custom)
-      (defadvice custom-handle-keyword
-	(around dont-signal-an-error-even-if-unsupported-keyword-is-given
-		activate)
-	"Don't signal an error even if unsupported keyword is given."
-	(if (not (memq (ad-get-arg 1) '(:version :set-after)))
-	    ad-do-it))))
+(when (boundp 'MULE)
+  (setq :version ':version
+	:set-after ':set-after)
+  (require 'custom)
+  (defadvice custom-handle-keyword
+    (around dont-signal-an-error-even-if-unsupported-keyword-is-given
+	    activate)
+    "Don't signal an error even if unsupported keyword is given."
+    (if (not (memq (ad-get-arg 1) '(:version :set-after)))
+	ad-do-it)))
 
 (when (boundp 'MULE)
   (put 'custom-declare-face 'byte-optimizer
@@ -419,7 +418,18 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 						     (car (cdr args))))))
 	      (setq args (cdr (cdr args))))
 	    newform)
-	form))))
+	form)))
+
+  (defadvice byte-compile-inline-expand (around ignore-built-in-functions
+						(form) activate)
+    "Ignore built-in functions."
+    (let* ((name (car form))
+	   (fn (and (fboundp name)
+		    (symbol-function name))))
+      (if (subrp fn)
+	  ;; Give up on inlining.
+	  form
+	ad-do-it))))
 
 ;; Unknown variables and functions.
 (unless (boundp 'buffer-file-coding-system)

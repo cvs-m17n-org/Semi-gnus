@@ -1,3 +1,8 @@
+2002-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Advise `byte-compile-inline-expand' for Mule
+	to ignore built-in functions as Emacs 20+ does.
+
 2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-adjust-marked-articles): Fix the record
