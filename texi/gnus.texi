@@ -8384,7 +8384,6 @@ customize this is to examine the @code{gnus-article-treat} customization
 group.
 
 @table @code
-@item gnus-treat-highlight-signature
 @item gnus-treat-buttonize
 @item gnus-treat-buttonize-head
 @item gnus-treat-emphasize
@@ -8412,6 +8411,7 @@ group.
 @item gnus-treat-display-xface
 @item gnus-treat-display-smileys
 @item gnus-treat-display-picons
+@item gnus-treat-decode-message-body-as-default-mime-charset
 @end table
 
 @vindex gnus-part-display-hook
