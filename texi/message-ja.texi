@@ -306,32 +306,30 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 $B%U%!$r:n$j>e$2$kA0$K<h$j=|$+$l$^$9!#=i4|CM(B
 $B$O(B @samp{^\\(Received\\|Return-Path\\):} $B$G$9!#(B
 
-@c TRANSLATE_ME!!
 @node Mailing Lists
-@section Mailing Lists
+@section $B%a!<%j%s%0%j%9%H(B
 
-Sometimes while posting to mailing lists, the poster needs to direct
-followups to the post to specific places.  The Mail-Followup-To (MFT)
-was created to enable just this.  Two example scenarios where this is
-useful:
+$B%a!<%j%s%0%j%9%H$KEj9F$9$k$H$-!"H/?.<T$O$=$N5-;v$KBP$9$k%U%)%m!<%"%C%W5-(B
+$B;v$N08@h$r;XDj$7$J$1$l$P$J$i$J$$$3$H$,$"$j$^$9!#(BMail-Followup-To
+(MFT) $B$O$^$5$K$3$l$r2DG=$K$9$k$?$a$K:n$i$l$^$7$?!#$3$l$,Lr$KN)$D>l9g$NNc(B
+$B$rFs$D(B:
 
 @itemize
 @item
-A mailing list poster can use MFT to express that responses should be
-sent to just the list, and not the poster as well.  This will happen
-if the poster is already subscribed to the list.
+$B%a!<%j%s%0%j%9%H$KH/?.$9$k?M$O!"JV;v$rH/?.<T$G$O$J$/C1$K%a!<%j%s%0%j%9%H(B
+$B$@$1$KAw?.$9$Y$-$G$"$k$3$H$r!"(BMFT $B$r;H$C$FI=8=$9$k$3$H$,$G$-$^$9!#$3$l$O!"(B
+$BH/?.<T$,$9$G$K$=$N%a!<%j%s%0%j%9%H$r9XFI$7$F$$$k>l9g$G$9!#(B
 
 @item
-If a message is posted to several mailing lists, MFT may also be used
-to direct the following discussion to one list only, because
-discussions that are spread over several lists tend to be fragmented
-and very difficult to follow.
-
+$B%a%C%;!<%8$,$$$/$D$+$N%a!<%j%s%0%j%9%H$KEj9F$5$l$F$$$k>l9g$K!"$=$l0J9_$N(B
+$B5DO@$r0l$D$N%a!<%j%s%0%j%9%H$@$1$G9T$J$&$3$H$r;XDj$9$k$?$a$K$b(B MFT $B$O;H(B
+$B$o$l$^$9!#5DO@$,$$$/$D$+$N%a!<%j%s%0%j%9%H$G9T$J$o$l$F$7$^$&$H$P$i$P$i$K(B
+$B$J$j$d$9$$$7!"%U%)%m!<$9$k$N$,Fq$7$/$J$C$F$7$^$$$^$9$+$i!#(B
 @end itemize
 
-Gnus honors the MFT header in other's messages (i.e. while following
-up to someone else's post) and also provides support for generating
-sensible MFT headers for outgoing messages as well.
+gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$@$l$+JL(B
+$B$N?M$NEj9F$K%U%)%m!<%"%C%W$9$k$H$-(B)$B!"$^$?!"30$K=P$F$$$/%a%C%;!<%8$N$?$a(B
+$B$K!"F;M}$K$+$J$C$?(B MFT $B%X%C%@!<$r:n@.$9$k$3$H$N%5%]!<%H$bDs6!$7$^$9!#(B
 
 @c @menu
 @c * Honoring an MFT post::        What to do when one already exists
@@ -339,86 +337,85 @@ sensible MFT headers for outgoing messages as well.
 @c @end menu
 
 @c @node Composing with a MFT header
-@subsection  Composing a correct MFT header automagically
+@subsection  $B@5$7$$(B MFT $B%X%C%@!<$r<+F0E*$K:n$k(B
 
-The first step in getting Gnus to automagically generate a MFT header
-in posts you make is to give Gnus a list of the mailing lists
-addresses you are subscribed to.  You can do this in more than one
-way.  The following variables would come in handy.
+$BEj9F$9$k5-;v$KBP$7$F(B gnus $B$,<+F0E*$K(B MFT $B%X%C%@!<$r:n$C$F$/$l$k$h$&$K$9(B
+$B$k$?$a$K9T$J$&$3$H$NBh0lJb$O!"$"$J$?$,9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I(B
+$B%l%9$N%j%9%H$r(B gnus $B$KM?$($k$3$H$G$9!#0l$D0J>e$NJ}K!$G$3$l$r9T$J$&$3$H$,(B
+$B$G$-$^$9!#0J2<$NJQ?t$,<j$4$m$G$7$g$&!#(B
 
 @table @code
-
 @item message-subscribed-addresses
-This should be a list of addresses the user is subscribed to.  Its
-default value is @code{nil}.   Example: 
+$B$3$l$O9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I%l%9$N%j%9%H$G$J$1$l$P$J$j$^$;$s!#(B
+$B%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#Nc(B:
 @lisp
-(setq message-subscribed-addresses 
+(setq message-subscribed-addresses
       '("ding@@gnus.org" "bing@@noose.org"))
 @end lisp
 
 @item message-subscribed-regexps
-This should be a list of regexps denoting the addresses of mailing
-lists subscribed to.  Default value is @code{nil}.  Example: If you
-want to achieve the same result as above:
+$B$3$l$O9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I%l%9$r<($9@55,I=8=$N%j%9%H$G$J$1(B
+$B$l$P$J$j$^$;$s!#%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#>e5-$HF1$87k2L$r@.$7?k(B
+$B$2$?$$>l9g$NNc(B:
 @lisp
 (setq message-subscribed-regexps
       '("[bd]ing@@\\(gnus\\|noose\\)\\.org"))
 @end lisp
 
 @item message-subscribed-address-functions
-This can be a list of functions to be called (one at a time!!) to
-determine the value of MFT headers.  It is advisable that these
-functions not take any arguments.  Default value is @code{nil}.
+$B$3$l$O(B MFT $B%X%C%@!<$NCM$r7h$a$k$?$a$K(B ($B0lEY$K0l2s(B!!) $B8F$P$l$k4X?t$N%j%9(B
+$B%H$G$"$k$3$H$,$G$-$^$9!#$=$l$i$N4X?t$K$O0z?t$,L5$$$3$H$rCi9p$7$F$*$-$^$9!#(B
+$B%G%#%U%)%k%HCM$O(B @code{nil} $B$G$9!#(B
 
 @item message-subscribed-address-file
-You might be one organised human freak and have a list of addresses of
-all subscribed mailing lists in a separate file!  Then you can just
-set this variable to the name of the file and life would be good.
-
+$B$"$J$?$O$b$7$+$7$?$i?l68$J?M(B ($B86E5(B: one organised human freak) $B$G!"9XFI(B
+$B$7$F$$$k$9$Y$F$N%a!<%j%s%0%j%9%H$N%"%I%l%9$N%j%9%H$rJL%U%!%$%k$G;}$C$F$$(B
+$B$k$+$b$7$l$^$;$s(B! $B$=$&$J$i$P!"C1$K$3$NJQ?t$r$=$N%U%!%$%kL>$K$9$k$3$H$K$h$C(B
+$B$F!"?M@8$ONI$-$b$N$K$J$k$G$7$g$&!#(B
 @end table
 
-You can use one or more of the above variables.  All their values are
-``added'' in some way that works :-)
+$B>e5-0J30$K0l$D0J>e$NJQ?t$r;H$&$3$H$,$G$-$^$9!#$9$Y$F$=$l$i$NCM$O2?$i$+$N(B
+$BJ}K!$G!V2C$($i$l$k!W$3$H$GF0:n$7$^$9(B :-)
 
-Now you are all set.  Just start composing a message as you normally
-do.  And just send it; as always.  Just before the message is sent
-out, Gnus' MFT generation thingy kicks in and checks if the message
-already has a MFT header.  If there is one, the header is left alone.
-If not then the list of recipient addresses (in the To: and Cc:
-headers) is checked to see if one of them is a list address you are
-subscribed to.  If none of them is a list address, then no MFT is
-generated; otherwise, a MFT is added to the other headers and set to
-the value of all addresses in To: and Cc:
+$B$5$"MQ0U$,$G$-$^$7$?!#$$$D$b$N$h$&$K%a%C%;!<%8$N:n@.$r;O$a$^$7$g$&!#$=$7(B
+$B$F$$$D$bDL$j$KAw?.$7$^$7$g$&!#%a%C%;!<%8$,Aw=P$5$l$kD>A0(B
+$B$K(B gnus $B$N(B MFT $B$r:n$k;E3]$1$,F0:n$7$F!"%a%C%;!<%8$,$9$G$K(B MFT $B%X%C%@!<$r(B
+$B;}$C$F$$$k$+$I$&$+$rD4$Y$^$9!#$b$7$=$l$,0l$D$J$i!"$=$l$OJ|$C$F$*$+$l$^$9!#(B
+$BL5$+$C$?>l9g$O<u<h?M$N%"%I%l%9$N%j%9%H(B (To: $B$H(B Cc: $B%X%C%@!<$K$"$k(B) $B$r!"(B
+$B$=$l$i$N0l$D$,9XFI$7$F$$$k%a!<%j%s%0%j%9%H$N%"%I%l%9$+$I$&$+$rD4$Y$^$9!#(B
+$B$=$l$i$N$I$l$b$,%a!<%j%s%0%j%9%H$N%"%I%l%9$G$J$+$C$?$i!"(BMFT $B$O:n$i$l$^$;(B
+$B$s!#$=$l0J30$N>l9g$K$O(B MFT $B$,$=$NB>$N%X%C%@!<$KIU$12C$($i$l!"$=$NCM(B
+$B$O(B To: $B$H(B Cc: $B$K$"$k$9$Y$F$N%"%I%l%9$K@_Dj$5$l$^$9!#(B
 
-Hm. ``So'', you ask, ``what if I send an email to a list I am not
-subscribed to?''  Well, the kind folks at Gnus Towers are working on a
-database of all known mailing list addresses that can be used for this
-purpose.  Till then, you could, like, insert a MFT header manually,
-with the help of @kbd{C-c C-f m} !!
+$B$&!<$`!#$=$&$9$k$H$"$J$?$O!V9XFI$7$F$$$J$$%a!<%j%s%0%j%9%H$K%a!<%k$rAw?.(B
+$B$9$k$H$-$O$I$&$J$k$N(B?$B!W$H?R$M$^$9$M!#$(!<$H!"?F@Z$J(B Gnus $B%?%o!<$N?M$?$A(B
+$B$,!"$3$NL\E*$G;H$($k$9$Y$F$N4{CN$N%a!<%j%s%0%j%9%H$N%"%I%l%9$N%G!<%?%Y!<(B
+$B%9$N:n@.$K$$$=$7$s$G$$$^$9!#$=$l$^$G$O!"(B@kbd{C-c C-f m} $B$r;H$C$F<jF0(B
+$B$G(B MFT $B%X%C%@!<$rA^F~$9$k$J$I$7$F2<$5$$(B!!
 
 @c @node Honoring an MFT post
-@subsection Honoring an MFT post
+@subsection MFT $BEj9F$NB:=E(B
 
-When you followup to a post on a mailing list, and the post has a MFT
-header, Gnus' action will depend on the value of the variable
-@code{message-use-mail-followup-to}.  This variable can be one of:
+$B%a!<%j%s%0%j%9%H$KEj9F$5$l$?5-;v$K%U%)%m!<%"%C%W$9$k$H$-!"$=$N5-;v(B
+$B$,(B MFT $B%X%C%@!<$r;}$C$F$$$?$i!"(Bgnus $B$NF0:n$OJQ(B
+$B?t(B @code{message-use-mail-followup-to} $B$NCM$K$h$C$F7h$^$j$^$9!#$3$NCM$O(B
+$B0J2<$N$I$l$+$K$J$j$^$9(B:
 
 @table @code
 @item t
- Always honor MFTs.  The To: and Cc: headers in your followup will be
- derived from the MFT header of the original post.
+$B>o$K(B MFT $B$rB:=E$7$^$9!#%U%)%m!<%"%C%W5-;v$N(B To: $B$H(B Cc: $B%X%C%@!<$O!"85$N(B
+$B5-;v$N(B MFT $B%X%C%@!<$+$i0z$-=P$7$^$9!#(B
 
 @item nil
- Always dishonor MFTs (just ignore the darned thing)
+$B>o$K(B MFT $B$rB:=E$7$^$;$s(B ($B40`z$KL5;k(B)$B!#(B
 
 @item ask
-Gnus will prompt you for an action.  This is the default.
-
+$B$I$&$9$k$+?R$M$^$9!#$3$l$,%G%#%U%)%k%H$G$9!#(B
 @end table
 
-It is considered good nettiquette to honor MFT, as it is assumed the
-fellow who posted a message knows where the followups need to go
-better than you do.
+MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^(B
+$B$9!#$=$l$O!"$I$3$K%U%)%m!<%"%C%W$9$kI,MW$,$"$k$+$r!"%a%C%;!<%8$rEj9F$7$?(B
+$B?M$O$"$J$?$h$j$h$/CN$C$F$$$k!"$H;W$o$l$k$+$i$G$9!#(B
 
 @node Commands
 @chapter $BL?Na(B
@@ -441,13 +438,13 @@ better than you do.
 @cindex undo
 @kindex C-_
 
-$B2?$+B>$N%a%C%;!<%8$KJVEz$9$k$H$-!"$"$J$?$O$?$$$F$$%a%C%;!<%8%P%C%U%!$G=q(B
-$B$->e$2$^$9$h$M!#(BMessage $B$OB?$/$N0zMQJ8$r07$$!"=pL>$N:o=|$dJ8>O$N@07A$r$7(B
-$B$?$j!"$"$k$$$O$"$?$J$,;H$C$F$$$k@_Dj$K0MB8$7$F$$$^$9!#(BMessage $B$OIaDL$O$&(B
-$B$^$/F0:n$7$^$9$,!"$H$-$I$-4V0c$($b$7$^$9!#$=$l$i$N4V0c$$$r%f!<%6$,@5$9$3(B
-$B$H$,$G$-$k$h$&$K!"(BMessage $B$O$=$l$>$l<gMW$JF0:n$r9T$J$&A0$K%"%s%I%%$N6-3&(B
-$B$r@_Dj$7$^$9!#$"$J$?$O2?2s$+%"%s%I%%$N%-!<(B ($BDL>o(B @kbd{C-_}) $B$r2!$;$P!"L$(B
-$BJT=8$N%a%C%;!<%8$KLa$9$3$H$,$G$-$^$9!#(B
+$B2?$+B>$N%a%C%;!<%8$KJVEz$9$k$H$-!"$?$$$F$$$O%a%C%;!<%8%P%C%U%!$G=q$->e$2(B
+$B$^$9$h$M!#(BMessage $B$OB?$/$N0zMQJ8$r07$$!"=pL>$N:o=|$dJ8>O$N@07A$r$7$?$j!"(B
+$B$"$k$$$O$"$J$?$,;H$C$F$$$k@_Dj$K0MB8$7$F$$$^$9!#(BMessage $B$OIaDL$O$&$^$/F0(B
+$B:n$7$^$9$,!"$H$-$I$-4V0c$($b$7$^$9!#$=$l$i$N4V0c$$$r%f!<%6$,@5$9$3$H$,$G(B
+$B$-$k$h$&$K!"(BMessage $B$O$=$l$>$l<gMW$JF0:n$r9T$J$&A0$K%"%s%I%%$N6-3&$r@_Dj(B
+$B$7$^$9!#2?2s$+%"%s%I%%$N%-!<(B ($BDL>o(B @kbd{C-_}) $B$r2!$;$P!"L$JT=8$N%a%C%;!<(B
+$B%8$KLa$9$3$H$,$G$-$^$9!#(B
 
 @node Header Commands
 @section $B%X%C%@!<L?Na(B
@@ -574,14 +571,14 @@ better than you do.
 @kindex C-c C-y
 @findex message-yank-original
 $B%P%C%U%!(B @code{gnus-article-copy} $B$K$"$k%a%C%;!<%8$r%a%C%;!<%8%P%C%U%!$K(B
-$BE=$jIU$1$^$9!#IaDL$O(B @code{gnus-article-copy} $B$O$"$J$?$,JVEz$7$h$&$H$7$F(B
-$B$$$k%a%C%;!<%8$G$9(B (@code{messsage-yank-original})$B!#(B
+$BE=$jIU$1$^$9!#IaDL$O(B @code{gnus-article-copy} $B$OJVEz$7$h$&$H$7$F$$$k%a%C(B
+$B%;!<%8$G$9(B (@code{messsage-yank-original})$B!#(B
 
 @item C-c C-M-y
 @kindex C-c C-M-y
 @findex message-yank-buffer
-Prompt for a buffer name and yank the contents of that buffer into the
-message buffer (@code{message-yank-buffer}).
+$B%P%C%U%!L>$r?R$M$F!"$=$N%P%C%U%!$NFbMF$r%a%C%;!<%8%P%C%U%!$KE=$jIU$1$^(B
+$B$9(B (@code{message-yank-buffer})$B!#(B
 
 @item C-c C-q
 @kindex C-c C-q
@@ -919,7 +916,7 @@ alias lmi "Lars Magne Ingebrigtsen <larsi@@ifi.uio.no>"
 alias ding "ding@@ifi.uio.no (ding mailing list)"
 @end example
 
-$B$3$N$h$&$J9T$r$"$J$?$N(B @file{~/.mailrc} $B%U%!%$%k$KDI2C$7$?8e$G!"(B
+$B$3$N$h$&$J9T$r(B @file{~/.mailrc} $B%U%!%$%k$KDI2C$7$?8e$G!"(B
 @code{To} $B$d(B @code{Cc} ($BEy$J$I(B) $B$N%X%C%@!<$G(B @samp{lmi} $B$H=q$$$F!"(B
 @kbd{SPC} $B$r2!$9$@$1$GJLL>$r?-D%$7$^$9!#(B
 
@@ -1214,10 +1211,10 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 
 @findex yow
 @cindex Mime-Version
-$B2C$($F!"$"$J$?$O(B cons $B$r%j%9%H$KF~$l$k;v$,$G$-$^$9!#(Bcons $B$N(B car $B$O%7%s%\(B
-$B%k$G$"$k$Y$-$G$9!#$3$N%7%s%\%kL>$O%X%C%@!<L>$G!"(Bcdr $B$O$3$N%X%C%@!<$NCM$H(B
-$B$7$F$=$N$^$^F~$l$i$l$k$3$H$K$J$kJ8;zNs$+!"8F$P$l$k4X?t$N$I$A$i$+$G$"$k;v(B
-$B$,$G$-$^$9!#Nc$($P!"$b$7(B @code{Mime-Version: 1.0} $B$rA^F~$7$?$$$J$i!"(B
+$B2C$($F(B cons $B$r%j%9%H$KF~$l$k;v$,$G$-$^$9!#(Bcons $B$N(B car $B$O%7%s%\%k$G$"$k$Y(B
+$B$-$G$9!#$3$N%7%s%\%kL>$O%X%C%@!<L>$G!"(Bcdr $B$O$3$N%X%C%@!<$NCM$H$7$F$=$N$^(B
+$B$^F~$l$i$l$k$3$H$K$J$kJ8;zNs$+!"8F$P$l$k4X?t$N$I$A$i$+$G$"$k;v$,$G$-$^$9!#(B
+$BNc$($P!"$b$7(B @code{Mime-Version: 1.0} $B$rA^F~$7$?$$$J$i!"(B
 @code{(Mime-Version . "1.0")} $B$r%j%9%H$KF~$l$k$Y$-$G$7$g$&!#$b$7$*$b$7$m(B
 $B$$0zMQ$rA^F~$7$?$$$J$i!"(B@code{(X-Yow . yow)} $B$N$h$&$J$b$N$r%j%9%H$KF~$l(B
 $B$k;v$,$G$-$k$G$7$g$&!#4X?t(B @code{yow} $B$O$=$N8e$G0z?tL5$7$G8F$P$l$^$9!#(B
@@ -1350,9 +1347,9 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 @vindex message-yank-prefix
 @cindex yanking
 @cindex quoting
-$B$"$J$?$,5-;v$KJVEz$+%U%)%m!<%"%C%W$r$7$F$$$k$H$-$O!"IaDL$O$"$J$?$,1~Ez$7(B
-$B$F$$$k?M$N$b$N$K0zMQId$rIU$1$?$$$G$7$g$&!#0zMQJ8$NA^F~$O(B @dfn{$BE=$jIU$1(B}
-$B$K$h$C$F$J$5$l(B ($B$9$G$K0zMQId$,IU$$$F$$$k$b$N$H6u9T$OBP>]30!"(B
+$B5-;v$KJVEz$+%U%)%m!<%"%C%W$r$9$k$H$-$O!"IaDL$O$"$J$?$,1~Ez$7$F$$$k?M$N$b(B
+$B$N$K0zMQId$rIU$1$?$$$G$7$g$&!#0zMQJ8$NA^F~$O(B @dfn{$BE=$jIU$1(B} $B$K$h$C$F$J$5(B
+$B$l(B ($B$9$G$K0zMQId$,IU$$$F$$$k$b$N$H6u9T$OBP>]30!"(B
 @code{message-yank-cited-prefix} $B$r;2>H$N$3$H(B)$B!"$=$l$>$l$NE=$jIU$1$i$l$?(B
 $B9T$O$=$NA0$K(B @code{message-yank-prefix} $B$rIU$1$i$l$^$9!#=i4|CM(B
 $B$O(B @samp{> } $B$G$9!#(B
@@ -1483,9 +1480,9 @@ follows this line--} $B$G$9!#(B
 @vindex message-header-setup-hook
 $B%X%C%@!<$r=i4|2=$7$?8e$K!"%X%C%@!<$KHO0O$r8BDj$7$F8F$P$l$k%U%C%/$G$9!#(B
 
-$BNc$($P!"(Bgnus $B$r<B9T$7$F$$$F!"$"$J$?$,A4$F$N%K%e!<%95-;v$H%a!<%j%s%0%j%9(B
-$B%H$KAw$kA4$F$N%a%C%;!<%8$K(B @samp{Mail-Copies-To} $B%X%C%@!<$rA^F~$7$?$$$N(B
-$B$G$"$l$P!"0J2<$N$h$&$J;v$,$G$-$^$9(B:
+$BNc$($P!"(Bgnus $B$r<B9T$7$F$$$F!"$9$Y$F$N%K%e!<%95-;v$H%a!<%j%s%0%j%9%H$KAw(B
+$B$kA4$F$N%a%C%;!<%8$K(B @samp{Mail-Copies-To} $B%X%C%@!<$rA^F~$7$?$$$N$G$"$l(B
+$B$P!"0J2<$N$h$&$J;v$,$G$-$^$9(B:
 
 @lisp
 (defun my-message-header-setup-hook ()
@@ -1698,7 +1695,7 @@ Message $B$O$3$l$i$N%j%9%H$H:nMQ$9$k4X?t$rDs6!$7$F$$$^$9(B:
 
 Message $B$O;v<B>e!"$=$l<+?H$NJQ?t$7$+;H$$$^$;$s(B---$B8E$$(B @code{mail-} $B$NJQ(B
 $B?t$O9MN8$5$l$^$;$s!#(BMessage $B$K$3$l$i$NJQ?t$r7W;;$KF~$l$5$;$?$$$N$G$"$l$P!"(B
-$B0J2<$N$b$N$r$"$J$?$N(B @code{.emacs} $B%U%!%$%k$KF~$l$k;v$,$G$-$^$9(B:
+$B0J2<$N$b$N$r(B @code{.emacs} $B%U%!%$%k$KF~$l$k;v$,$G$-$^$9(B:
 
 @lisp
 (require 'messcompat)
@@ -1732,10 +1729,10 @@ Message $B$O;v<B>e!"$=$l<+?H$NJQ?t$7$+;H$$$^$;$s(B---$B8E$$(B @code{mail-} 
 @end table
 
 @item wide reply
-@dfn{$B9-$$JVEz(B} (wide reply) $B$O$"$J$?$,1~Ez$7$h$&$H$7$F$$$k%a%C%;!<%8$K=q(B
-$B$+$l$F$$$?(B @emph{$BA4$F$N(B} $B<BBN$r4^$`%a!<%k$K$h$k1~Ez$G$9!#0J2<$N%X%C%@!<(B
-$B$+$i$NA4$F$N%a!<%k%\%C%/%9$,O"7k$5$l$F!"=P$F$$$/(B @code{To}/@code{Cc} $B%X%C(B
-$B%@!<$r$D$/$j$^$9(B:
+@dfn{$B9-$$JVEz(B} (wide reply) $B$O1~Ez$7$h$&$H$7$F$$$k%a%C%;!<%8$K=q$+$l$F$$(B
+$B$?(B @emph{$BA4$F$N(B} $B<BBN$r4^$`%a!<%k$K$h$k1~Ez$G$9!#0J2<$N%X%C%@!<$+$i$NA4(B
+$B$F$N%a!<%k%\%C%/%9$,O"7k$5$l$F!"=P$F$$$/(B @code{To}/@code{Cc} $B%X%C%@!<$r(B
+$B$D$/$j$^$9(B:
 
 @table @code
 @item From
