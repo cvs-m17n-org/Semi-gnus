@@ -23,6 +23,9 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (require 'ietf-drums)
 
 (defun rfc2231-get-value (ct attribute)
