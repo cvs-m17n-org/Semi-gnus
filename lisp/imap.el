@@ -431,9 +431,15 @@ argument to `format'."
 	 (ssl-program-arguments (append imap-ssl-arguments extra-ssl-args
 					(list "-connect" 
 					      (format "%s:%d" server port))))
-	 (process (ignore-errors 
-		    (as-binary-process 
-		     (open-ssl-stream name buffer server port)))))
+	 (process (ignore-errors
+		    (cond ((eq system-type 'windows-nt)
+			   (let (selective-display
+				 (coding-system-for-write 'binary)
+				 (coding-system-for-read 'raw-text-dos))
+			     (open-ssl-stream name buffer server port)))
+			  (t
+			   (as-binary-process 
+			    (open-ssl-stream name buffer server port)))))))
     (when process
       (with-current-buffer buffer
 	(goto-char (point-min))
