@@ -1,3 +1,23 @@
+1999-05-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 15.
+
+	* texi/gnus.texi (Customizing Articles): Abolish the treatment
+	variable `nomime' and rename
+	`gnus-treat-decode-message-body-as-default-mime-charset' with
+	`gnus-treat-decode-article-as-default-mime-charset'.
+
+	* lisp/gnus-art.el (gnus-treat-predicate): Abolish the treatment
+	variable `nomime'.
+	(gnus-article-prepare-mime-display): Call `gnus-treat-article' with
+	the 1st arg t for treating if the part is not the last one.
+	(gnus-article-decode-article-as-default-mime-charset): Renamed from
+	`gnus-article-decode-message-body-as-default-mime-charset'; Don't
+	work if `gnus-show-mime' is non-nil.
+	(gnus-treat-decode-article-as-default-mime-charset): Renamed from
+	`gnus-treat-decode-message-body-as-default-mime-charset'; add
+	choice item for decoding the whole article.
+
 1999-05-28  Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* lisp/message.el (message-header-hook): Pass optional argument
