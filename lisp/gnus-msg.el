@@ -1393,7 +1393,9 @@ If YANK is non-nil, include the original article."
       (insert nntp-server-type))
     (insert "\n\n\n\n\n")
     (let (mime-content-types)
-      (mime-edit-insert-tag "text" "plain" "; type=emacs-lisp"))
+      (mime-edit-insert-tag
+       "application" "emacs-lisp"
+       "\nContent-Disposition: inline\nContent-Description: User settings"))
     (insert (with-temp-buffer
 	      (gnus-debug)
 	      (buffer-string)))

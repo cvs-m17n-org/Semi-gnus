@@ -1,6 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
+
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997,
+;; 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -2939,7 +2940,7 @@ You should probably use `gnus-find-method-for-group' instead."
   (let (new)
     (dolist (elem parameters)
       (if (and (stringp (cdr elem))
-	       (string-match "\\\\" (cdr elem)))
+	       (string-match "\\\\[0-9&]" (cdr elem)))
 	  (push (cons (car elem)
 		      (gnus-expand-group-parameter match (cdr elem) group))
 		new)
