@@ -364,22 +364,22 @@ Return the response string if optional second argument is non-nil."
 (defun pop3-save-uidls ()
   "Save the updated UIDLs to disk for use next time."
   (when (and pop3-leave-mail-on-server 
-	     pop3-uidl-obarray
-	     (catch 'found
-	       (dotimes (i (length pop3-uidl-obarray))
-		 (if (symbolp (aref pop3-uidl-obarray i))
-		     (throw 'found t)))))
+	     ;; UIDL hash table is non-empty
+	     (let ((len (length pop3-uidl-obarray)))
+	       (while (< 0 len)
+		 (setq len (if (symbolp (aref pop3-uidl-obarray (1- len)))
+			       -1 (1- len))))
+	       (minusp len)))
     (when (file-readable-p pop3-uidl-file-name)
       (copy-file pop3-uidl-file-name
 		 (concat pop3-uidl-file-name ".old")
 		 'overwrite 'keeptime))
     (save-excursion
       (with-temp-file pop3-uidl-file-name
-        (mapatoms 
+	(mapatoms 
 	 (lambda (atom)
 	   (when (car (symbol-value atom))
-	     (insert (format "%s\n" atom))
-	     (unintern atom pop3-uidl-obarray)))
+	     (insert (format "%s\n" atom))))
 	 pop3-uidl-obarray)))))
     
 
@@ -466,7 +466,13 @@ and close the connection."
       (set-buffer (process-buffer process))
       (goto-char (point-max))
       (delete-process process)
-      )))
+      ))
+  (when pop3-leave-mail-on-server 
+    (mapatoms 
+     (lambda (atom)
+       (when (car (symbol-value atom))
+	 (unintern atom pop3-uidl-obarray)))
+     pop3-uidl-obarray)))
 
 (defun pop3-uidl (process &optional msgno)
   "Return the results of a UIDL command in PROCESS for optional MSGNO.
