@@ -1,5 +1,5 @@
 ;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
 ;; Keywords: news
@@ -252,7 +252,7 @@ variable to \"^nnml\"."
     (when (file-exists-p file)
       (erase-buffer)
       (gnus-kill-all-overlays)
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       t)))
 
 (defun gnus-cache-possibly-alter-active (group active)
@@ -298,7 +298,7 @@ variable to \"^nnml\"."
 	    ;; unsuccessful), so we use the cached headers exclusively.
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer)
-	    (insert-file-contents cache-file)
+	    (nnheader-insert-file-contents cache-file)
 	    'nov)
 	   ((eq type 'nov)
 	    ;; We have both cached and uncached NOV headers, so we
@@ -316,7 +316,6 @@ variable to \"^nnml\"."
 If not given a prefix, use the process marked articles instead.
 Returns the list of articles entered."
   (interactive "P")
-  (gnus-set-global-variables)
   (let ((articles (gnus-summary-work-articles n))
 	article out)
     (while (setq article (pop articles))
@@ -338,7 +337,6 @@ Returns the list of articles entered."
 If not given a prefix, use the process marked articles instead.
 Returns the list of articles removed."
   (interactive "P")
-  (gnus-set-global-variables)
   (gnus-cache-change-buffer gnus-newsgroup-name)
   (let ((articles (gnus-summary-work-articles n))
 	article out)
@@ -362,9 +360,12 @@ Returns the list of articles removed."
   (let ((cached gnus-newsgroup-cached)
 	(gnus-verbose (max 6 gnus-verbose)))
     (unless cached
-      (error "No cached articles for this group"))
+      (gnus-message 3 "No cached articles for this group"))
     (while cached
       (gnus-summary-goto-subject (pop cached) t))))
+
+(defalias 'gnus-summary-limit-include-cached
+  'gnus-summary-insert-cached-articles)
 
 ;;; Internal functions.
 
@@ -473,7 +474,7 @@ Returns the list of articles removed."
       (set-buffer cache-buf)
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (insert-file-contents (or file (gnus-cache-file-name group ".overview")))
+      (nnheader-insert-file-contents (or file (gnus-cache-file-name group ".overview")))
       (goto-char (point-min))
       (insert "\n")
       (goto-char (point-min)))
@@ -516,7 +517,7 @@ Returns the list of articles removed."
       (save-excursion
 	(set-buffer cache-buf)
 	(erase-buffer)
-	(insert-file-contents (gnus-cache-file-name group (car cached)))
+	(nnheader-insert-file-contents (gnus-cache-file-name group (car cached)))
 	(goto-char (point-min))
 	(insert "220 ")
 	(princ (car cached) (current-buffer))
@@ -560,13 +561,14 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   "Read the cache active file."
   (gnus-make-directory gnus-cache-directory)
   (if (or (not (file-exists-p gnus-cache-active-file))
+	  (not (zerop (nth 7 (file-attributes gnus-cache-active-file))))
 	  force)
       ;; There is no active file, so we generate one.
       (gnus-cache-generate-active)
     ;; We simply read the active file.
     (save-excursion
       (gnus-set-work-buffer)
-      (insert-file-contents gnus-cache-active-file)
+      (nnheader-insert-file-contents gnus-cache-active-file)
       (gnus-active-to-gnus-format
        nil (setq gnus-cache-active-hashtb
 		 (gnus-make-hashtable
