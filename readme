@@ -6,9 +6,9 @@ To use Gnus you first have to unpack the files, which you've obviously
 done, because you are reading this.
 
 You should definitely byte-compile the source files. To do that, you
-can simply say "make" in this directory.  If you are using XEmacs, you
-*must* say "make EMACS=xemacs".  In that case you may also want to
-pull down the package of nice glyphs from
+can simply say "./configure; make" in this directory.  If you are
+using XEmacs, you *must* say "make EMACS=xemacs".  In that case you
+may also want to pull down the package of nice glyphs from
 <URL:http://www.gnus.org/~larsi/etc.tar.gz>.  It should be installed
 into the "gnus-5.4.53/etc" directory.
 
