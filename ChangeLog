@@ -1,3 +1,40 @@
+1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-coding-system' (renamed from
+	`find-file-noselect-as-specified-coding-system').
+
+	* lisp/nnmail.el (nnmail-find-file): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+	* lisp/nnheader.el (nnheader-insert-file-contents): Likewise.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	(gnus-read-newsrc-el-file): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+
+	* lisp/gnus-cache.el (gnus-cache-save-buffers): Use
+	`gnus-write-buffer-as-coding-system' (renamed from
+	`gnus-write-buffer-as-specified-coding-system').
+
+	* lisp/gnus-util.el (gnus-write-buffer-as-coding-system):
+	Renamed from `gnus-write-buffer-as-specified-coding-system'.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Likewise.
+	* lisp/gnus-agent.el (gnus-agent-expire): Likewise.
+	(gnus-agent-fetch-headers): Likewise.
+	(gnus-agent-flush-cache): Likewise.
+	(gnus-agent-fetch-articles): Likewise.
+	(gnus-agent-save-history): Likewise.
+	(gnus-agent-save-groups): Likewise.
+	(gnus-agent-save-active): Likewise.
+
 1998-12-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Call
