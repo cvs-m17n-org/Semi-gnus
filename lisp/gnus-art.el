@@ -3234,13 +3234,12 @@ forbidden in URL encoding."
 	   #'gnus-article-header-presentation-method)
 
 (defun mime-preview-quitting-method-for-gnus ()
-  (if (not gnus-show-mime)
-      (mime-preview-kill-buffer))
-  (delete-other-windows)
-  (gnus-article-show-summary)
-  (if (or (not gnus-show-mime)
-	  (null gnus-have-all-headers))
-      (gnus-summary-select-article nil t)
+  (if gnus-show-mime
+      (gnus-article-show-summary)
+    (mime-preview-kill-buffer)
+    (delete-other-windows)
+    (gnus-article-show-summary)
+    (gnus-summary-select-article nil t)
     ))
 
 (set-alist 'mime-raw-representation-type-alist
