@@ -192,7 +192,8 @@ Thank you for your help in stamping out bugs.
 (defun gnus-extended-version ()
   "Stringified gnus version."
   (interactive) ; ???
-  (concat gnus-product-name "/" gnus-version-number))
+  (concat gnus-product-name "/" gnus-version-number " (based on "
+	  gnus-original-product-name " " gnus-original-version-number ") "))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)

@@ -115,6 +115,33 @@
 	(gnus-draft-send article gnus-newsgroup-name)
 	(gnus-summary-mark-article article gnus-canceled-mark)))))
 
+;;(defun gnus-draft-send (article &optional group)
+;;  "Send message ARTICLE."
+;;  (gnus-draft-setup article (or group "nndraft:queue"))
+;;  (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me)
+;;	message-send-hook type method)
+;;    ;; We read the meta-information that says how and where
+;;    ;; this message is to be sent.
+;;    (save-restriction
+;;      (message-narrow-to-head)
+;;      (when (re-search-forward
+;;	     (concat "^" (regexp-quote gnus-agent-meta-information-header) ":")
+;;	     nil t)
+;;	(setq type (ignore-errors (read (current-buffer)))
+;;	      method (ignore-errors (read (current-buffer))))
+;;	(message-remove-header gnus-agent-meta-information-header)))
+;;    ;; Then we send it.  If we have no meta-information, we just send
+;;    ;; it and let Message figure out how.
+;;    (if type
+;;	(let ((message-this-is-news (eq type 'news))
+;;	      (message-this-is-mail (eq type 'mail))
+;;	      (gnus-post-method method)
+;;	      (message-post-method method))
+;;	  (message-send-and-exit))
+;;      (message-send-and-exit))))
+
+;; For draft TEST
+(defvar gnus-draft-send-draft-buffer " *send draft*")
 (defun gnus-draft-send (article &optional group)
   "Send message ARTICLE."
   (gnus-draft-setup article (or group "nndraft:queue"))
@@ -132,13 +159,19 @@
 	(message-remove-header gnus-agent-meta-information-header)))
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (if type
-	(let ((message-this-is-news (eq type 'news))
-	      (message-this-is-mail (eq type 'mail))
-	      (gnus-post-method method)
-	      (message-post-method method))
-	  (message-send-and-exit))
-      (message-send-and-exit))))
+    (if (eq type 'mail)
+	(progn
+	  (require 'smtp)
+	  (let ((recipients (smtp-deduce-address-list
+			     (current-buffer)
+			     (goto-char (point-min)) (search-forward "\n\n"))))
+	    (if (not (null recipients))
+		(if (not (smtp-via-smtp user-mail-address recipients (current-buffer)))
+		    (error "Sending failed: SMTP protocol error")))))
+      (gnus-open-server method)
+      (gnus-request-post method)))
+  (kill-buffer gnus-draft-send-draft-buffer))
+;; For draft TEST
 
 (defun gnus-draft-send-all-messages ()
   "Send all the sendable drafts."
@@ -163,37 +196,49 @@
 
 ;;; Utility functions
 
-(defcustom gnus-draft-decoding-function
-  (function
-   (lambda ()
-     (mime-edit-decode-buffer nil)
-     (eword-decode-header)
-     ))
-  "*Function called to decode the message from network representation."
-  :group 'gnus-agent
-  :type 'function)
+;;(defcustom gnus-draft-decoding-function
+;;  (function
+;;   (lambda ()
+;;     (mime-edit-decode-buffer nil)
+;;     (eword-decode-header)
+;;     ))
+;;  "*Function called to decode the message from network representation."
+;;  :group 'gnus-agent
+;;  :type 'function)
 
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!This is because `gnus-setup-message' uses uninterned symbols.
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
+;;(progn
+;;(defun gnus-draft-setup (narticle group)
+;;  (gnus-setup-message 'forward
+;;    (let ((article narticle))
+;;      (message-mail)
+;;      (erase-buffer)
+;;      (if (not (gnus-request-restore-buffer article group))
+;;	  (error "Couldn't restore the article")
+;;	;; Insert the separator.
+;;	(funcall gnus-draft-decoding-function)
+;;	(goto-char (point-min))
+;;	(search-forward "\n\n")
+;;	(forward-char -1)
+;;	(insert mail-header-separator)
+;;	(forward-line 1)
+;;	(message-set-auto-save-file-name))))))
+;;
+;; For draft TEST
 (progn
 (defun gnus-draft-setup (narticle group)
-  (gnus-setup-message 'forward
-    (let ((article narticle))
-      (message-mail)
-      (erase-buffer)
-      (if (not (gnus-request-restore-buffer article group))
-	  (error "Couldn't restore the article")
-	;; Insert the separator.
-	(funcall gnus-draft-decoding-function)
-	(goto-char (point-min))
-	(search-forward "\n\n")
-	(forward-char -1)
-	(insert mail-header-separator)
-	(forward-line 1)
-	(message-set-auto-save-file-name))))))
+  (let ((article narticle))
+    (get-buffer-create gnus-draft-send-draft-buffer)
+    (set-buffer gnus-draft-send-draft-buffer)
+    (erase-buffer)
+    (if (not (gnus-request-restore-buffer article group))
+	(error "Couldn't restore the article")
+      ))))
+;; For draft TEST
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."

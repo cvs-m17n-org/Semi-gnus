@@ -1,3 +1,14 @@
+1998-09-07  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-setup): Do not use message mode.
+	(gnus-draft-send): Ditto.
+	gnus-draft-send-draft-buffer: New variable.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Display original Gnus
+	version.
+
+	* lisp/gnus-agent.el : Use pGnus 0.17 gnus-agent.el
+
 1998-09-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-continuum-version): Use `char-int' instead of
