@@ -1,3 +1,7 @@
+2000-06-01  KANEMATSU Daiji <kanematu@sra.co.jp>
+
+	* texi/gnus-ja.texi (gnus-summary-hide-all-threads): Fix typo.
+
 2000-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* nnshimbun.el (nnshimbun-request-article-1): Fix to insert x-face
