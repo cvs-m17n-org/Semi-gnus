@@ -7,7 +7,7 @@
 2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-insert-line): Work with quoted
-	double-quote charcters.
+	double-quote characters.
 	(gnus-summary-prepare-threads): Ditto.
 
 2000-10-30  TAKAHASHI Kaoru  <kaoru@kaisei.org>
