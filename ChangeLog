@@ -1,3 +1,38 @@
+1999-12-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/gnus-agent.el (gnus): New advice. Always synchronize the
+	modeline "Plugged" status display with the value of
+	`gnus-plugged'.
+
+	* lisp/gnus-offline.el (TopLevel): Require `gnus-group' at the
+	compile time.
+	(gnus-offline-set-online-sendmail-function): defsubst.
+	(gnus-offline-set-offline-sendmail-function): Ditto.
+	(gnus-offline-set-offline-post-news-function): Ditto.
+	(gnus-offline-set-online-post-news-function): Ditto.
+	(gnus-offline-disable-fetch-mail): Ditto.
+	(gnus-offline-enable-fetch-mail): Ditto.
+	(gnus-offline-setup): Fix typo.
+	(gnus-offline-gnus-get-new-news): Abolish.
+	(gnus-offline-toggle-plugged): Ditto.
+	(gnus-offline-agent-expire): Ditto.
+	(gnus-group-get-new-news): New advice which does things
+	`gnus-offline-gnus-get-new-news' was doing.
+	(gnus-agent-toggle-plugged): New advice which does thing
+	`gnus-offline-toggle-plugged' was doing.
+	(gnus-agent-expire): New advice which does things
+	`gnus-offline-agent-expire' was doing.
+	(gnus-offline-define-menu-and-key): No longer substitute key
+	definitions on `gnus-group-mode-map'. No longer swap commands for
+	a toolbar button.
+	(gnus-offline-after-get-new-news): Do jobs only when
+	`gnus-plugged' is t.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-customize): Compile lambda
+	expressions.
+
 1999-12-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-yank-add-new-references): Fix doc string.
