@@ -27,7 +27,10 @@
 
 (eval-when-compile (require 'cl))
 
-(require 'smime)
+;; EMIKO doesn't provide the smime.el module.
+(condition-case nil
+    (require 'smime)
+  (error))
 (require 'mm-decode)
 (autoload 'message-narrow-to-headers "message")
 (autoload 'message-fetch-field "message")
