@@ -83,15 +83,18 @@ on your system, you could say something like:
   `(mime-entity-set-parsed-header-internal
     (aref ,header 1)
     (put-alist 'Subject ,subject
-	       (mime-entity-parsed-header-internal (aref ,header 10)))))
+	       (mime-entity-parsed-header-internal (aref ,header 1)))))
 
 (defmacro mail-header-from (header)
   "Return author string in HEADER."
-  `(aref ,header 2))
+  `(mime-read-field 'From (aref ,header 1)))
 
 (defmacro mail-header-set-from (header from)
   "Set article author of HEADER to FROM."
-  `(aset ,header 2 ,from))
+  `(mime-entity-set-parsed-header-internal
+    (aref ,header 1)
+    (put-alist 'From ,from
+	       (mime-entity-parsed-header-internal (aref ,header 1)))))
 
 (defmacro mail-header-date (header)
   "Return date in HEADER."
@@ -151,8 +154,10 @@ on your system, you could say something like:
 					references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
   (let ((entity (make-mime-entity-internal nil nil)))
-    (mime-entity-set-parsed-header-internal entity
-					    (list (cons 'Subject subject)))
+    (mime-entity-set-parsed-header-internal
+     entity
+     (list (cons 'Subject subject)
+	   (cons 'From from)))
     (vector number entity from date id references chars lines xref)
     ))
 
