@@ -1,3 +1,14 @@
+1999-02-08  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+	
+	* lisp/nntp.el: Change nnmail-read-passwd -> mail-source-read-passwd.
+
+1999-02-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* README-offline.ja: Change for current version.
+	* README-offline.en: Ditto.
+
 1999-02-07  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.

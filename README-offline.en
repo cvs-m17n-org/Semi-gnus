@@ -1,78 +1,109 @@
 1) What's "gnus-offline (Gnus Offline Backend Utility)" ?
+=========================================================
 
-This program is a utility to handle messages(mail & news) in "offline"
-status with Semi-gnus in more simple way.
+This program is a utility for Semi-gnus that handles messages
+(i.e. mail and news) in the "offline" state in a more simple way.
 
-It designed mainly for "gnus-agent".
+It is basically designed for "gnus-agent". (See info about gnus-agent.)
 
-So, you can use it with function "nnspool" (which needs external
-programs (such as "gnspool")). And also with "Miee.el" (for only
-posting/sending).
+You can also use it with a function "nnspool"(*1) (which needs an
+external program such as "gnspool"(*2) ), or with "miee.el"(*3) for
+posting and/or sending messages.
 
-;; Of course, you can handle messages in offline status without
-;; "gnus-offline", but using "gnus-offline" provides you a simple way
-;; to setup and operation.
+     (*1) See info about nnspool.
+     (*2) gnspool comes with a newsreader "gn".
+     (*3) The latest version of miee.el (or MIEE) is available at
+          http://www.shiojiri.ne.jp/%7Et-ichi/meadow.html
+
+You can handle messages in the offline state without "gnus-offline",
+but "gnus-offline" provides a simple way for setup and operation.
 
 **Features**
 
-o Simple configuration -- An "INTERACTIVE" way to set variables for
-         configuration.
+o Simple configuration -- An "INTERACTIVE" configuration to set
+         the variables.
 
-o Simple operation -- Only typing "g" on *Groups* buffer, then "dialing ->
-         sending mails & posting news articles, and fetch new mails &
-         articles -> hang-up line".(For automatic dialing and hang-up, some
-         external software needed.)
+o Simple operation -- Type "g" in the *Group* buffer, and gnus-offline 
+         will:
+           o Dial (*)
+           o Send mails & post news articles
+           o Fetch new mails & articles
+           o Hang up (*)
 
-So, this document is written for using "gnus-agent",mainly for bundled
-with T-gnus 6.10.56 or later.
+      (*) For dialing and hanging up, external softwares are needed.
+          But you can do without ones if you connect and disconnect
+          manually.
 
-2)Installation
+This document is written mainly for the case using "gnus-agent" with
+gnus-offline.el bundled in Semi-gnus. (*)
 
-If you use "gnus-offline" with "T-gnus", installation is very
-simple. It would automatically install with "T-gnus".
+      (*) T-gnus is based on the latest test version of Gnus. It is
+          called Pterodactyl Gnus or pGnus.
+          Most versions of Semi-gnus other than T-gnus are based on
+          Gnus version 5.6.xx.
+          There are a lot of changes between Gnus 5.6.xx and pGnus.
+          This document will refer to the differences caused by the
+          changes when it is important.
 
-If not, you may byte-compile "gnus-offline.el" and "gnus-ofsetup.el",
-and set load-path.
+2) Installation
+===============
+
+As you are reading this document, this version of Semi-gnus includes
+gnus-offline. Installation is simple. "make install" will
+automatically install "gnus-offline".
+
+If the Semi-gnus comes without gnus-offline, or you want to install
+the latest version of gnus-offline, you may manually byte-compile
+"gnus-offline.el" and "gnus-ofsetup.el". Make sure they are in one of
+the `load-path' directories. 
 
 3) How to use
+=============
 
-o First, you must set up general configuration for Semi-gnus.(See info)
+o First, you must do a general setup for Semi-gnus (See info about the 
+ setup).
 
-o Add following code to your ~/.emacs
+o Add the following code to ~/.emacs
 
 	(load "gnus-ofsetup")
     	(gnus-setup-for-offline)
     	(load gnus-offline-setting-file)
 
-o Add following code to your ~/.gnus
+o Add the following code to ~/.gnus
 
 	(gnus-agentize)
 
-o Please restart emacs. Then, gnus-ofsetup.el ask you some questions
- (when you don't know how to answer,see next section of this document
- or type "TAB" key for completion) and then gnus-ofsetup.el will creates
- ~/.gnus-offline.el.
+o Restart Emacs. gnus-ofsetup.el will ask you some questions and
+ create ~/.gnus-offline.el. (*)
 
-o At first time, you must connect "online" status for subscribe
-  group.(See info)
+      (*) If you don't know how to answer some questions, typing "TAB"
+          key may show you the possible answers. See the next section
+          which explains the user options.
+          You will also be asked whether to save the POP password in
+          ~/.newsrc.eld or not. Answer it carefully. See section 6)
+          for details.
 
-o Add following code to ~/.gnus
+o At the first time, you must start Gnus in the "online" state and
+ decide which groups to subscribe (See info about subscribing).
+
+o Add the following code to ~/.gnus
 
 	(gnus-agent-toggle-plugged nil)
 
-Then restart Gnus and try to type "g" on *Groups" buffer.
+That's all. Restart Gnus and try typing "g" in the *Group* buffer.
 
 ***Note***
 
-In T-gnus 6.10.56 or later,"pop3-fma.el" doesn't need for multiple
-mail-accounts.
+Most versions of Semi-gnus have pop3-fma.el to operate multiple POP
+accounts. T-gnus 6.10.56 or later does not because it can handle
+multiple POP accounts itself.
 
 <<<<<ATTENTION!!>>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". So if you had
-use T-gnus 6.10.55(or older) and update to 6.10.56(or later), change
-your settings.(most simple way is deleting old ~/.gnus-offline.el.)
+T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.56 or later, remove the setting for
+pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
-[6.10.55 or older]
+[Semi-gnus with pop3-fma.el]
 o pop3-fma-spool-file-alist 
 　　　　'(
 	("po:account1@pop-server1" pass) 
@@ -83,7 +114,7 @@ o pop3-fma-spool-file-alist
 o pop3-fma-movemail-type 
       use movemail.exe ('exe) or pop3.el('lisp) 
 
-[6.10.56 or later]
+[T-gnus 6.10.56 or later]
 
 o gnus-offline-mail-source 
 	'(
@@ -91,11 +122,11 @@ o gnus-offline-mail-source
 	(pop :user "imp9397" :server "mvb.biglobe.ne.jp")
         :
         :
-	)
- 
+	) 
 
 
-3)User definable variables in gnus-offline
+4) User customizable variables in gnus-offline
+==============================================
 
 o gnus-offline-dialup-program  
     Program name to dialup.
@@ -119,7 +150,7 @@ o gnus-offline-news-spool-directory
 
 o gnus-offline-mail-treat-environ
     If t , gnus-offline sends mail to spool first.
-    If nil , gnus-offline sends mail immediatry.
+    If nil , gnus-offline sends mail immediately.
 
 o gnus-offline-articles-to-fetch
     Article type you want to fetch.
@@ -129,9 +160,6 @@ o gnus-offline-articles-to-fetch
        'News ... Fetch only News.
 
     Default value is both.
-
-o gnus-offline-popup-menu
-    Whether use menu.
 
 o gnus-offline-load-hook
     Hook before gnus-offline load.
@@ -175,7 +203,8 @@ o gnus-offline-pop-password-file
 o gnus-offline-pop-password-decoding-function 
    Function to decode password.
 
-4)Commands in gnus-offline.
+5) Commands in gnus-offline
+===========================
 
 o M-x gnus-offline-toggle-plugged
    Toggle offline/online state.
@@ -198,76 +227,57 @@ o M-x gnus-offline-set-interval-time
 o M-x gnus-offline-agent-expire
    Expire articles.
 
-5)[!!!IMPORTANT!!!] About pop password
+6) [!!!IMPORTANT!!!] About the pop password
+===========================================
 
-<<<<< ATTENTION >>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". So if you had
-use T-gnus 6.10.55 or older, and update to 6.10.56 or later, change
-your configuration.(most simple way is deleting old
-~/.gnus-offline.el.)
+<<<<<ATTENTION!!>>>>>
+T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.56 or later, remove the setting for
+pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
-In T-gnus 6.10.55 or older, you must enter password for pop server per 
-accesses.(This way is recommended.)
+Under Semi-gnus with pop3-fma.el, you must enter the password for the
+pop server every time you accesses the server. (We recommend you do
+it.)
 
-If your machine is stand alone, and nobody but you use it, you can
-save password in some way.(Of course, it is in your responsibility!)
-
-The first way to save password(it is not save in file but in memory as
-variable), add following code in your ~/.gnus-offline.el.
-
-         (setq pop3-fma-save-password-information t)
-
-In this way, you must enter password only at startup of Gnus.
-(In T-gnus 6.10.56 or later, this status is default.)
+If your machine is stand alone, and nobody else uses it, you can save
+the password in some ways. (But, on your own responsibility!)
 
 ---
 
-The other way (save password in file but not save in memory) is
-following.
+One way is provided by gnus-ofsetup.el. At the first interactive
+configuration, it will ask you whether to save the password in
+~/.newsrc.eld or not. When you answer "y" to this question, the
+password will be saved in ~/.newsrc.eld. (*)
 
-o Add following code to ~/.gnus-offline.el
+       (*) Actually the following will be added to ~/.gnus-offline.el.
 
-	(setq gnus-offline-pop-password-file "~/.pop.passwd")
+           [Semi-gnus with pop3-fma.el]
 
-o In T-gnus 6.10.56 or later, comment out following code in
-  ~/.gnus-offline.el.
+            (add-hook 'gnus-setup-news-hook 
+             (lambda ()
+              (add-to-list 'gnus-variable-list 'pop3-fma-password)))
 
-	(require 'read-passwd)
-	(setq mail-source-read-passwd 'read-pw-read-passwd)
-	(add-hook 'gnus-before-startup-hook 'read-pw-set-mail-source-passwd-cache)
+           [T-gnus 6.10.56 or later]
 
-o Create password-file (e.g.~/.pop.passwd)
+            (add-hook 'gnus-setup-news-hook 
+             (lambda ()
+              (add-to-list 'gnus-variable-list 'mail-source-password-cache)))
 
-  [T-gnus 6.10.55 or older]
+Answer this question carefully, because the password will NOT be
+encoded!
 
-	 (setq pop3-fma-password
-	 '(("SERVER1" "ACCOUNT1" "PASSWORD1")
-	   ("SERVER2" "ACCOUNT2" "PASSWORD2")
-	   ............................
-          ))
+---
 
- [T-gnus 6.10.56 or later]
+There is another way. It will not save the password in a file but keep
+it in the memory as a variable.
 
-	(setq mail-source-password-cache
-      	'(("SERVER1:ACCOUNT1:pop3" .  "PASSWORD1")
-	  ("SERVER2:ACCOUNT2:pop3" .  "PASSWORD2")
-	 	  ............................
-	))
+For Semi-gnus with pop3-fma.el, add the following code in
+~/.gnus-offline.el.
 
-To prevent accidents, encoding this file with Base64 is recommended.
-For this purpose,
-	M-: (base64-encode-region (point-min) (point-max))
-can be used.
+         (setq pop3-fma-save-password-information t)
 
-If you don't need encoding, add following code to ~/.gnus-offline.el.
+In this way, Once you enter the password at the startup of Gnus, it
+will be kept as a variable `pop3-fma-password' until you quit Gnus.
 
-	(setq gnus-offline-pop-password-decoding-function nil)
-	
-But it is so dangerous!!
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-;;; In T-gnus 6.10.57 (or later), gnus-ofsetup.el will ask you whether
-;;; save password to ~/.newsrc.eld or not. When you answer "y" to this
-;;; question, your password might be saved to ~/.newsrc.eld.  But in
-;;; this way, be careful to answer "y", because your saved password is
-;;; NOT encoded!(of course, you can use above way to save password.)
+Under T-gnus 6.10.56 or later, the password will be kept as a variable
+`mail-source-password-cache' by default.
