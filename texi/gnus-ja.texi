@@ -21003,17 +21003,23 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 
 @emph{Spam} $B%0%k!<%W$rH4$1$k$H$-$K!"(Bspam $B0u$,IU$$$F$$$k$9$Y$F$N5-;v(B
 $B$K$O(B spam $B%W%m%;%C%5!<$G=hM}$7$?8e$G4|8B@Z$l>C5n$N0u$,IU$1$i$l$^$9!#$3$l(B
-$B$O(B @emph{$BL$J,N`(B} $B$^$?$O(B @emph{ham} $B%0%k!<%W$KBP$7$F$O9T$J$o$l$^$;$s!#(B
+$B$O(B @emph{$BL$J,N`(B} $B$^$?$O(B @emph{ham} $B%0%k!<%W$KBP$7$F$O9T$J$o$l$^$;$s!#$5(B
+$B$i$K(B spam $B%0%k!<%W$K$"$k$I$N(B @strong{ham} $B5-;v$b!"(B
+@code{ham-process-destination} $B%0%k!<%W%Q%i%a!<%?(B
+$B$+(B @code{gnus-ham-process-destinations} $BJQ?t$N$I$A$i$+$G7h$a$i$l$F$$$k>l(B
+$B=j$K0\$5$l$^$9!#>l=j$H$$$&$N$O%0%k!<%WL>$N$3$H$G$9!#(B
+@code{ham-process-destination} $B%Q%i%a!<%?$,@_Dj$5$l$F$$$J$$$H!"(Bspam $B5-;v(B
+$B$OC1$K4|8B@Z$l>C5n$5$l$^$9!#(B
 
 @emph{Ham} $B%0%k!<%W$rH4$1$k$H$-$K!"(Bham $B0u$,IU$$$F$$$k$9$Y$F$N5-;v(B
 $B$O(B ham $B%W%m%;%C%5!<$KAw$i$l!"$=$l$i$r(B spam $B$G$O$J$$I8K\$H$7$F3X=,$7$^$9!#(B
 
-@strong{TODO: @code{spam-use-ifile} $B$O8=>u$G$OF0:n$7$^$;$s!#;d(B ($BLuCm(B:
-Teodor Zlatanov) $B$O$=$N5!G=$,(B @code{spam.el} $B$G$O$J$/(B
-$B$F(B @code{ifile-gnus.el} $B$G9T$J$o$l$k$Y$-$@$H;W$&$N$G!"(B
-@code{ifile-gnus.el} $B$N:n<T$+$i$N(B info $B$rBT$C$F$$$^$9!#F~$C$F$/$k%a!<%k(B
-$B$rJ,3d$9$k$?$a$K(B ifile $B$r;H$$$?$$$H(B @code{spam-split} $B$KEA$($k$?$a$K!":#(B
-$B$^$G$I$*$j(B @code{spam-use-ifile} $B$r;H$&$3$H$O$G$-$^$9!#(B}
+@emph{Ham} $B$^$?$O(B @emph{$BL$J,N`(B} $B%0%k!<%W$rH4$1$k$H$-$K!"$9$Y$F(B
+$B$N(B @strong{spam} $B5-;v$O!"(B@code{spam-process-destination} $B%0%k!<%W%Q%i%a!<(B
+$B%?$+(B @code{gnus-spam-process-destinations} $BJQ?t$N$I$A$i$+$G7h$a$i$l$F$$(B
+$B$k>l=j$K0\$5$l$^$9!#>l=j$H$$$&$N$O%0%k!<%WL>$N$3$H$G$9!#(B
+@code{spam-process-destination} $B%Q%i%a!<%?$,@_Dj$5$l$F$$$J$$$H!"(Bspam $B5-(B
+$B;v$OC1$K4|8B@Z$l>C5n$5$l$^$9!#(B
 
 $BF~$C$F$/$k%a!<%k$r_I2a$9$kL\E*$G(B @code{spam.el} $B$r;H$&$K$O!"FC5iJ,3d%j%9(B
 $B%H(B @code{nnmail-split-fancy} $B$^$?$O(B @code{nnimap-split-fancy} $B$K0J2<$rDI(B
@@ -21032,6 +21038,14 @@ Teodor Zlatanov) $B$O$=$N5!G=$,(B @code{spam.el} $B$G$O$J$/(B
 $B%U%)%k%H$G$O$=$N%0%k!<%WL>$O(B @samp{spam} $B$G$9$,!"%+%9%?%^%$%:$9$k$3$H$O(B
 $B2DG=$G$9!#(B
 
+@emph{TODO: $B8=>u(B spam.el $B$O5-;v$r%P%C%/%(%s%I$KEjF~$9$k$3$H$@$1$r%5%]!<(B
+$B%H$7$^$9!#5-;v$,$b$O$d(B spam $B$^$?$O(B ham $B$G$O$J$$$H(B spam.el $B$KEA$($kJ}K!$O(B
+$B$"$j$^$;$s!#(B}
+
+@emph{TODO: spam.el $B$O$9$Y$F$NE}7W%G!<%?%Y!<%9$r71N}$9$k$?$a$N0lDjITJQ$N(B
+$BJ}K!$rDs6!$9$kI,MW$,$"$j$^$9!#$$$/$D$+$O$=$N5!G=$r<+A0$G;}$C$F$$$^$9$,!"(B
+$B$=$&$G$J$$$b$N$b$"$j$^$9!#(B}
+
 $B0J2<$O(B @code{spam-split} $B$NF0:n$r@)8f$9$k$?$a$K;H$&$3$H$,$G$-$k3F<o$NJ}(B
 $BK!$H!"$=$l$i$KBP1~$9$k(B spam $B$H(B ham $B$N%W%m%;%C%5!<$G$9(B:
 
@@ -21040,7 +21054,8 @@ Teodor Zlatanov) $B$O$=$N5!G=$,(B @code{spam.el} $B$G$O$J$/(B
 * BBDB Whitelists::             
 * Blackholes::                  
 * Bogofilter::                  
-* Ifile spam filtering::        
+* ifile spam filtering::        
+* spam-stat filtering::         
 * Extending spam.el::           
 @end menu
 
@@ -21209,25 +21224,87 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 $B$D$N(B spam $B%W%m%;%C%5!<$G$"$k$3$H$KCm0U$7$F2<$5$$!#(B}
 @end defvar
 
-@node Ifile spam filtering
-@subsubsection Ifile $B$K$h$k(B spam $B$N_I2a(B
+@node ifile spam filtering
+@subsubsection ifile $B$K$h$k(B spam $B$N_I2a(B
 @cindex spam filtering
 @cindex ifile, spam filtering
 @cindex spam.el
 
 @defvar spam-use-ifile
 
-Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r(B @code{spam-split} $B$K;H$$$?$$(B
-$B>l9g$O!"$3$NJQ?t$rM-8z$K$7$F2<$5$$!#:#$N$H$3(B
-$B$m(B @code{ifile-gnus.el} $B$r(B load $B$7$J$1$l$P$J$j$^$;$s!#(B
-Ifile $B$N(B @code{spam.el} $B$X$NE}9g$O$^$@:Q$s$G$$$^$;$s$,!"$=$l$r9%$`$J$i(B
-$B$P(B @code{ifile-gnus.el} $B$rC1FH$K;H$&$3$H$,$G$-$^$9!#(B
+Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B ifile $B$r(B @code{spam-split} $B$K;H$$$?$$(B
+$B>l9g$O!"$3$NJQ?t$rM-8z$K$7$F2<$5$$!#(B
 
 @end defvar
 
-Ifile $B$O!"(B@code{spam-split} $B$rDL$7$FF~$C$FMh$?%a!<%k$r(B spam $B$H(B ham $B$K_I(B
-$B2a$9$k$@$1$N$?$a$K;H$&$3$H$,$G$-$^$9!#$=$l$O(B @code{ifile-gnus.el} $B$N<!$N(B
-$B%j%j!<%9$r;}$D(B @code{spam.el} $B$K0lAX$h$/E}9g$5$l$k$G$7$g$&!#(B
+@defvar spam-ifile-all-categories
+
+@c TRANSLATEME!
+Enable this variable if you want @code{spam-use-ifile} to give you all
+the ifile categories, not just spam/non-spam.  If you use this, make
+sure you train ifile as described in its documentation.
+
+@end defvar
+
+@defvar spam-ifile-spam-category
+
+This is the category of spam messages as far as ifile is concerned.
+The actual string used is irrelevant, but you probably want to leave
+the default value of @samp{spam}.
+@end defvar
+
+@defvar spam-ifile-database-path
+
+This is the filename for the ifile database.  It is not specified by
+default, so ifile will use its own default database name.
+
+@end defvar
+
+The ifile mail classifier is similar to Bogofilter in intent and
+purpose.  A ham and a spam processor are provided, plus the
+@code{spam-use-ifile} variable to indicate to spam-split that ifile
+should be used.  The 1.2.1 version of ifile was used to test this
+functionality.
+
+@node spam-stat spam filtering
+@subsubsection spam-stat spam filtering
+@cindex spam filtering
+@cindex spam-stat, spam filtering
+@cindex spam-stat.el
+@cindex spam.el
+
+@xref{Filtering Spam Using Statistics (spam-stat.el)}.
+
+@defvar spam-use-stat
+
+Enable this variable if you want @code{spam-split} to use
+spam-stat.el, an Emacs Lisp statistical analyzer.
+
+@end defvar
+
+@defvar gnus-group-spam-exit-processor-stat
+Add this symbol to a group's @code{spam-process} parameter by
+customizing the group parameters or the
+@code{gnus-spam-process-newsgroups} variable.  When this symbol is
+added to a group's @code{spam-process} parameter, the spam-marked
+articles will be added to the spam-stat database of spam messages.
+@end defvar
+
+@defvar gnus-group-ham-exit-processor-stat
+Add this symbol to a group's @code{spam-process} parameter by
+customizing the group parameters or the
+@code{gnus-spam-process-newsgroups} variable.  When this symbol is
+added to a group's @code{spam-process} parameter, the ham-marked
+articles in @emph{ham} groups will be added to the spam-stat database
+of non-spam messages.  Note that this ham processor has no effect in
+@emph{spam} or @emph{unclassified} groups.
+@end defvar
+
+This enables spam.el to cooperate with spam-stat.el.  spam-stat.el
+provides an internal (Lisp-only) spam database, which unlike ifile or
+Bogofilter does not require external programs.  A spam and a ham
+processor, and the @code{spam-use-stat} variable for @code{spam-split}
+are provided.
 
 @node Extending spam.el
 @subsubsection spam.el $B$N3HD%(B
@@ -21392,20 +21469,19 @@ nnml $B%P%C%/%(%s%I$O0lDL$N%a!<%k$K$D$-0l$D$N%U%!%$%k$G!"$9$Y$F$N%a!<%k$r(B
 $B$N(B -- $B$r;}$A$^$9!#$3$N%O%C%7%e%F!<%V%k$O!"APJ}$N%3%l%/%7%g%s$N$9$Y$F$NC1(B
 $B8l$K$D$$$F(B spam $B$*$h$SHs(B-spam $B%a!<%k$K$*$1$k=P8=IQEY$rI=$9%Y%/%H%k$r3JG<(B
 $B$7$^$9!#(B
+@end defvar
 
 $BE}7W$r:G=i$+$i:n$jD>$7$?$$$H$-$O!"<-=q$r%j%;%C%H$9$kI,MW$,$"$j$^$9!#(B
 
-@end defvar
-
 @defun spam-stat-reset
 @code{spam-stat} $B%O%C%7%e%F!<%V%k$r%j%;%C%H$7!"$9$Y$F$NE}7W$r:o=|$7$^$9!#(B
+@end defun
 
 $B9T$J$C$?$i<-=q$r%;!<%V$7$J$1$l$P$J$j$^$;$s!#<-=q$O$+$J$jBg$-$/$J$k$+$b$7(B
 $B$l$^$;$s!#<-=q$rDI2C99?7$7$J$$>l9g(B ($B8@$$49$($k$H!"Nc$($PKh7n0l2s:n$jD>$9(B
 $B>l9g(B)$B!"IQHK$K8=$l$J$$$+!"$^$?$O(B spam $B$+Hs(B-spam $B$N$I$A$i$KB0$9$k$+$,$O$C(B
 $B$-$j$7$J$$$9$Y$F$NC18l$r:o=|$9$k$3$H$K$h$C$F!"<-=q$N%5%$%:$r>.$5$/$9$k$3(B
 $B$H$,$G$-$^$9!#(B
-@end defun
 
 @defun spam-stat-reduce-size
 $B<-=q$N%5%$%:$r>.$5$/$7$^$9!#$3$l$O<-=q$rDI2C99?7$7$?$/$J$$>l9g$@$1;H$C$F(B
@@ -21496,65 +21572,58 @@ Spam $BMQ$N%0%k!<%W$G$9!#%G%#%U%)%k%H$O(B @samp{mail.spam} $B$G$9!#(B
 @code{spam-stat} $B$r;H$&$?$a$N<g%$%s%?!<%U%'!<%9$O0J2<$N4X?t$G$9(B:
 
 @defun spam-stat-buffer-is-spam
-Spam $B$G$"$k$H9M$($i$l$k?7Ce%a!<%k$,$"$k%P%C%U%!$G8F$P$l$^$9(B; $B=hM}A0$N?7(B
+Spam $B$G$"$k$H9M$($i$l$k?7Ce%a!<%k$,$"$k%P%C%U%!$G8F$P$l$^$9!#=hM}A0$N?7(B
 $BCe%a!<%k$KBP$7$F;H$C$F2<$5$$!#(B
-
 @end defun
 
 @defun spam-stat-buffer-is-no-spam
-$BHs(B-spam $B$G$"$k$H9M$($i$l$k?7Ce%a!<%k$,$"$k%P%C%U%!$G8F$P$l$^$9(B; $B=hM}A0$N(B
+$BHs(B-spam $B$G$"$k$H9M$($i$l$k?7Ce%a!<%k$,$"$k%P%C%U%!$G8F$P$l$^$9!#=hM}A0$N(B
 $B?7Ce%a!<%k$KBP$7$F;H$C$F2<$5$$!#(B
-
 @end defun
 
 @defun spam-stat-buffer-change-to-spam
 Spam $B$G$O$J$$DL>o$N%a!<%k$@$H$O$b$O$d9M$($i$l$J$$%a!<%k$,$"$k%P%C%U%!$G(B
-$B8F$P$l$^$9(B; $B$9$G$KHs(B-spam $B$G$"$k$b$N$H$7$F=hM}$5$l$F$7$^$C$?%a!<%k$NCO0L(B
+$B8F$P$l$^$9!#$9$G$KHs(B-spam $B$G$"$k$b$N$H$7$F=hM}$5$l$F$7$^$C$?%a!<%k$NCO0L(B
 $B$NJQ99$K;H$C$F2<$5$$!#(B
-
 @end defun
 
 @defun spam-stat-buffer-change-to-non-spam
 $BDL>o$N%a!<%k$G$O$J$$(B spam $B$@$H$O$b$O$d9M$($i$l$J$$%a!<%k$,$"$k%P%C%U%!$G(B
-$B8F$P$l$^$9(B; $B$9$G$K(B spam $B$G$"$k$b$N$H$7$F=hM}$5$l$F$7$^$C$?%a!<%k$NCO0L$N(B
+$B8F$P$l$^$9!#$9$G$K(B spam $B$G$"$k$b$N$H$7$F=hM}$5$l$F$7$^$C$?%a!<%k$NCO0L$N(B
 $BJQ99$K;H$C$F2<$5$$!#(B
-
 @end defun
 
 @defun spam-stat-save
-$B%O%C%7%e%F!<%V%k$r%U%!%$%k$K%;!<%V$7$^$9(B; $BJQ?t(B @code{spam-stat-file} $B$G(B
+$B%O%C%7%e%F!<%V%k$r%U%!%$%k$K%;!<%V$7$^$9!#JQ?t(B @code{spam-stat-file} $B$G(B
 $B@_Dj$5$l$?%U%!%$%kL>$,;H$o$l$^$9!#(B
-
 @end defun
 
 @defun spam-stat-load
-$B%O%C%7%e%F!<%V%k$r%U%!%$%k$+$i(B load $B$7$^$9(B; $BJQ(B
+$B%O%C%7%e%F!<%V%k$r%U%!%$%k$+$i(B load $B$7$^$9!#JQ(B
 $B?t(B @code{spam-stat-file} $B$G@_Dj$5$l$?%U%!%$%kL>$,;H$o$l$^$9!#(B
-
 @end defun
 
 @defun spam-stat-score-word
 $BC18l$N(B spam $B%9%3%"$rJV$7$^$9!#(B
-
 @end defun
 
 @defun spam-stat-score-buffer
 $B%P%C%U%!$N(B spam $B%9%3%"$rJV$7$^$9!#(B
-
 @end defun
 
 @defun spam-stat-split-fancy
-$BFC5i%a!<%kJ,3d$N$?$a$K!"(B@code{nnmail-split-fancy} $B$K5,(B
-$BB'(B @samp{(: spam-stat-split-fancy)} $B$rDI2C$7$^$9!#(B
+$BFC5i%a!<%kJ,3d$N$?$a$K$3$N4X?t$r;H$C$F2<$5$$!#(B
+@code{nnmail-split-fancy} $B$K5,B'(B @samp{(: spam-stat-split-fancy)} $B$rDI2C(B
+$B$7$^$9!#(B
+@end defun
 
-$B$3$l$K$O(B @file{~/.gnus} $B$K0J2<$,I,MW$G$9(B:
+$B$=$l$r;H$&A0$K!"I,$:<-=q$,(B load $B$5$l$F$$$k$h$&$K$7$F2<$5$$!#$3$l$K(B
+$B$O(B @file{~/.gnus} $B%U%!%$%k$K0J2<$,I,MW$G$9(B:
 
 @example
 (require 'spam-stat)
 (spam-stat-load)
 @end example
-
-@end defun
 
 $BBeI=E*$J%F%9%H$O0J2<$N4X?t8F=P$7$rI,MW$H$7$^$9(B:
 

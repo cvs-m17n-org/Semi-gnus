@@ -21472,17 +21472,22 @@ and nothing else.
 
 When you leave a @emph{spam} group, all spam-marked articles are
 marked as expired after processing with the spam processor.  This is
-not done for @emph{unclassified} or @emph{ham} groups.
+not done for @emph{unclassified} or @emph{ham} groups.  Also, any
+@strong{ham} articles in a spam group will be moved to a location
+determined by either the @code{ham-process-destination} group
+parameter or the @code{gnus-ham-process-destinations} variable.  The
+location is a group name.  If the @code{ham-process-destination}
+parameter is not set, spam articles are only expired.
 
 When you leave a @emph{ham} group, all ham-marked articles are sent to
 a ham processor, which will study these as non-spam samples.
 
-@strong{TODO: The @code{ifile} spam processor does not work at this
-time.  I'm waiting for info from the author of @code{ifile-gnus.el},
-because I think that functionality should go in @code{ifile-gnus.el}
-rather than @code{spam.el}.  You can still use @code{spam-use-ifile}
-to tell @code{spam-split} you want to use ifile for splitting incoming
-mail.}
+When you leave a @emph{ham} or @emph{unclassified} group, all
+@strong{spam} articles are moved to a location determined by either
+the @code{spam-process-destination} group parameter or the
+@code{gnus-spam-process-destinations} variable.  The location is a
+group name.  If the @code{spam-process-destination} parameter is not
+set, the spam articles are only expired.
 
 To use the @code{spam.el} facilities for incoming mail filtering, you
 must add the following to your fancy split list
@@ -21501,6 +21506,14 @@ mail considered to be spam into the group name given by the variable
 @code{spam-split-group}.  By default that group name is @samp{spam},
 but you can customize it.
 
+@emph{TODO: Currently, spam.el only supports insertion of articles
+into a backend.  There is no way to tell spam.el that an article is no
+longer spam or ham.}
+
+@emph{TODO: spam.el needs to provide a uniform way of training all the
+statistical databases.  Some have that functionality built-in, others
+don't.}
+
 The following are the methods you can use to control the behavior of
 @code{spam-split} and their corresponding spam and ham processors:
 
@@ -21509,7 +21522,8 @@ The following are the methods you can use to control the behavior of
 * BBDB Whitelists::             
 * Blackholes::                  
 * Bogofilter::                  
-* Ifile spam filtering::        
+* ifile spam filtering::        
+* spam-stat filtering::        
 * Extending spam.el::           
 @end menu
 
@@ -21681,25 +21695,86 @@ Bogofilter spam processor is the only spam processor to also do ham
 processing.}
 @end defvar
 
-@node Ifile spam filtering
-@subsubsection Ifile spam filtering
+@node ifile spam filtering
+@subsubsection ifile spam filtering
 @cindex spam filtering
 @cindex ifile, spam filtering
 @cindex spam.el
 
 @defvar spam-use-ifile
 
-Enable this variable if you want @code{spam-split} to use Ifile, a
-statistical analyzer similar to Bogofilter.  Currently you must have
-@code{ifile-gnus.el} loaded.  The integration of Ifile with
-@code{spam.el} is not finished yet, but you can use
-@code{ifile-gnus.el} on its own if you like.
+Enable this variable if you want @code{spam-split} to use ifile, a
+statistical analyzer similar to Bogofilter.
 
 @end defvar
 
-Ifile can only be used to filter incoming mail into spam and ham
-through the @code{spam-split} function.  It will be better integrated
-with @code{spam.el} with the next release of @code{ifile-gnus.el}.
+@defvar spam-ifile-all-categories
+
+Enable this variable if you want @code{spam-use-ifile} to give you all
+the ifile categories, not just spam/non-spam.  If you use this, make
+sure you train ifile as described in its documentation.
+
+@end defvar
+
+@defvar spam-ifile-spam-category
+
+This is the category of spam messages as far as ifile is concerned.
+The actual string used is irrelevant, but you probably want to leave
+the default value of @samp{spam}.
+@end defvar
+
+@defvar spam-ifile-database-path
+
+This is the filename for the ifile database.  It is not specified by
+default, so ifile will use its own default database name.
+
+@end defvar
+
+The ifile mail classifier is similar to Bogofilter in intent and
+purpose.  A ham and a spam processor are provided, plus the
+@code{spam-use-ifile} variable to indicate to spam-split that ifile
+should be used.  The 1.2.1 version of ifile was used to test this
+functionality.
+
+@node spam-stat spam filtering
+@subsubsection spam-stat spam filtering
+@cindex spam filtering
+@cindex spam-stat, spam filtering
+@cindex spam-stat.el
+@cindex spam.el
+
+@xref{Filtering Spam Using Statistics (spam-stat.el)}.
+
+@defvar spam-use-stat
+
+Enable this variable if you want @code{spam-split} to use
+spam-stat.el, an Emacs Lisp statistical analyzer.
+
+@end defvar
+
+@defvar gnus-group-spam-exit-processor-stat
+Add this symbol to a group's @code{spam-process} parameter by
+customizing the group parameters or the
+@code{gnus-spam-process-newsgroups} variable.  When this symbol is
+added to a group's @code{spam-process} parameter, the spam-marked
+articles will be added to the spam-stat database of spam messages.
+@end defvar
+
+@defvar gnus-group-ham-exit-processor-stat
+Add this symbol to a group's @code{spam-process} parameter by
+customizing the group parameters or the
+@code{gnus-spam-process-newsgroups} variable.  When this symbol is
+added to a group's @code{spam-process} parameter, the ham-marked
+articles in @emph{ham} groups will be added to the spam-stat database
+of non-spam messages.  Note that this ham processor has no effect in
+@emph{spam} or @emph{unclassified} groups.
+@end defvar
+
+This enables spam.el to cooperate with spam-stat.el.  spam-stat.el
+provides an internal (Lisp-only) spam database, which unlike ifile or
+Bogofilter does not require external programs.  A spam and a ham
+processor, and the @code{spam-use-stat} variable for @code{spam-split}
+are provided.
 
 @node Extending spam.el
 @subsubsection Extending spam.el
@@ -21865,14 +21940,14 @@ This variable holds the hash-table with all the statistics -- the
 dictionary we have been talking about.  For every word in either
 collection, this hash-table stores a vector describing how often the
 word appeared in spam and often it appeared in non-spam mails.
+@end defvar
 
 If you want to regenerate the statistics from scratch, you need to
 reset the dictionary.
 
-@end defvar
-
 @defun spam-stat-reset
 Reset the @code{spam-stat} hash-table, deleting all the statistics.
+@end defun
 
 When you are done, you must save the dictionary.  The dictionary may
 be rather large.  If you will not update the dictionary incrementally
@@ -21880,7 +21955,6 @@ be rather large.  If you will not update the dictionary incrementally
 can reduce the size of the dictionary by deleting all words that did
 not appear often enough or that do not clearly belong to only spam or
 only non-spam mails.
-@end defun
 
 @defun spam-stat-reduce-size
 Reduce the size of the dictionary.  Use this only if you do not want
@@ -21927,7 +22001,7 @@ The group to use for spam.  Default is @samp{mail.spam}.
 @end defvar
 
 If you also filter mail with specific subjects into other groups, use
-the following expression.  It only the mails not matching the regular
+the following expression.  Only mails not matching the regular
 expression are considered potential spam.
 
 @example
@@ -21972,65 +22046,57 @@ dictionary!
 The main interface to using @code{spam-stat}, are the following functions:
 
 @defun spam-stat-buffer-is-spam
-called in a buffer, that buffer is considered to be a new spam mail;
-use this for new mail that has not been processed before
-
+Called in a buffer, that buffer is considered to be a new spam mail.
+Use this for new mail that has not been processed before.
 @end defun
 
 @defun spam-stat-buffer-is-no-spam
-called in a buffer, that buffer is considered to be a new non-spam
-mail; use this for new mail that has not been processed before
-
+Called in a buffer, that buffer is considered to be a new non-spam
+mail.  Use this for new mail that has not been processed before.
 @end defun
 
 @defun spam-stat-buffer-change-to-spam
-called in a buffer, that buffer is no longer considered to be normal
-mail but spam; use this to change the status of a mail that has
-already been processed as non-spam
-
+Called in a buffer, that buffer is no longer considered to be normal
+mail but spam.  Use this to change the status of a mail that has
+already been processed as non-spam.
 @end defun
 
 @defun spam-stat-buffer-change-to-non-spam
-called in a buffer, that buffer is no longer considered to be spam but
-normal mail; use this to change the status of a mail that has already
-been processed as spam
-
+Called in a buffer, that buffer is no longer considered to be spam but
+normal mail.  Use this to change the status of a mail that has already
+been processed as spam.
 @end defun
 
 @defun spam-stat-save
-save the hash table to the file; the filename used is stored in the
-variable @code{spam-stat-file}
-
+Save the hash table to the file.  The filename used is stored in the
+variable @code{spam-stat-file}.
 @end defun
 
 @defun spam-stat-load
-load the hash table from a file; the filename used is stored in the
-variable @code{spam-stat-file}
-
+Load the hash table from a file.  The filename used is stored in the
+variable @code{spam-stat-file}.
 @end defun
 
 @defun spam-stat-score-word
-return the spam score for a word
-
+Return the spam score for a word.
 @end defun
 
 @defun spam-stat-score-buffer
-return the spam score for a buffer
-
+Return the spam score for a buffer.
 @end defun
 
 @defun spam-stat-split-fancy
-for fancy mail splitting; add the rule @samp{(: spam-stat-split-fancy)} to
-@code{nnmail-split-fancy}
+Use this function for fancy mail splitting.  Add the rule @samp{(:
+spam-stat-split-fancy)} to @code{nnmail-split-fancy}
+@end defun
 
-This requires the following in your @file{~/.gnus} file:
+Make sure you load the dictionary before using it.  This requires the
+following in your @file{~/.gnus} file:
 
 @example
 (require 'spam-stat)
 (spam-stat-load)
 @end example
-
-@end defun
 
 Typical test will involve calls to the following functions:
 
