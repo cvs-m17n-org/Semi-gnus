@@ -3225,7 +3225,7 @@ forbidden in URL encoding."
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity nil nil default-mime-charset)
+  (mime-insert-decoded-header entity nil nil)
   )
 
 (set-alist 'mime-header-presentation-method-alist
