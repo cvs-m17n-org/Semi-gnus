@@ -11488,9 +11488,10 @@ Emacs のセッション全体をラップして、ディフォルトのメソッドを使うというの
 @vindex nntp-via-rlogin-command-switches
 @code{nntp-via-rlogin-command} のコマンドのスイッチとして使われる文字列
 のリストです。ディフォルトは @code{nil} です。も
-し @samp{ssh} を @code{nntp-via-rlogin-command} の値として使い、かつ中間
-のホストで telnet コマンドが疑似端末を必要とするならば、これ
-を @samp{("-t")} にして下さい。
+し @samp{ssh} を @code{nntp-via-rlogin-command} の値として使うならば、デー
+タ接続を圧縮するために @samp{("-C")} を使うことができます。あるいは、も
+し中間のホストで telnet コマンドが疑似端末を必要とするならば、これ
+を @samp{("-t")} または @samp{("-C" "-t")} にして下さい。
 @end table
 
 @item nntp-open-via-telnet-and-telnet
