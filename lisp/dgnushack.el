@@ -328,7 +328,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'read-passwd "passwd")
     (autoload 'regexp-opt "regexp-opt")
     (autoload 'reporter-submit-bug-report "reporter")
-    (if (emacs-version>= 21 5)
+    (if (and (emacs-version>= 21 5)
+	     (not (featurep 'sxemacs)))
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
     (autoload 'sgml-mode "psgml" nil t)
@@ -350,7 +351,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (defalias 'overlays-in 'ignore)
     (defalias 'replace-dehighlight 'ignore)
     (defalias 'replace-highlight 'ignore)
-    (defalias 'run-with-idle-timer 'ignore)
     (defalias 'w3-coding-system-for-mime-charset 'ignore)))
 
 ;; T-gnus stuff.
@@ -424,8 +424,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
-	      "run-at-time.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
