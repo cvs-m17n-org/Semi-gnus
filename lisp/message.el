@@ -3069,9 +3069,12 @@ to find out how to use this."
     (backward-char 1)
     (run-hooks 'message-send-mail-hook)
     (if recipients
-	(let ((result (smtp-via-smtp user-mail-address
-				     recipients
-				     (current-buffer))))
+	(let ((result (static-if (fboundp 'smtp-send-buffer)
+			  (smtp-send-buffer user-mail-address recipients
+					    (current-buffer))
+			(smtp-via-smtp user-mail-address
+				       recipients
+				       (current-buffer)))))
 	  (unless (eq result t)
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
