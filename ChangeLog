@@ -1,5 +1,11 @@
 1999-12-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus-offline.el (gnus-offline-after-get-new-news): Refer to
+	`gnus-offline-connected', not `gnus-plugged'.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): No need to use
+	`unless'. Use `when'.
+
 	* lisp/imap.el (base64-encode-string): Fix. May work.
 
 1999-12-16  Katsumi Yamaoka <yamaoka@jpl.org>
