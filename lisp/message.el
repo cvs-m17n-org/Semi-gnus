@@ -32,7 +32,9 @@
 (eval-when-compile (require 'cl))
 
 (require 'mailheader)
-(require 'rmail)
+(condition-case nil
+    (require 'rmail)
+  (t (message "Ignore any errors about rmail from this file")))
 (require 'nnheader)
 (require 'timezone)
 (require 'easymenu)
@@ -2419,6 +2421,7 @@ to find out how to use this."
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
 	(buf (current-buffer))
+	(coding-system-for-write 'raw-text)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
@@ -2430,6 +2433,7 @@ to find out how to use this."
 	(while (setq file (message-fetch-field "fcc"))
 	  (push file list)
 	  (message-remove-header "fcc" nil t)))
+      (run-hooks 'message-before-do-fcc-hook)
       (goto-char (point-min))
       (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
       (replace-match "" t t)
@@ -2563,11 +2567,10 @@ to find out how to use this."
 (defun message-make-organization ()
   "Make an Organization header."
   (let* ((organization
-	  (or (getenv "ORGANIZATION")
-	      (when message-user-organization
+	  (when message-user-organization
 		(if (message-functionp message-user-organization)
 		    (funcall message-user-organization)
-		  message-user-organization)))))
+		  message-user-organization))))
     (save-excursion
       (message-set-work-buffer)
       (cond ((stringp organization)
@@ -3176,7 +3179,10 @@ Headers already prepared in the buffer are not modified."
       (unless follow-to
 	(if (or (not wide)
 		to-address)
-	    (setq follow-to (list (cons 'To (or to-address reply-to from))))
+	    (progn
+	      (setq follow-to (list (cons 'To (or to-address reply-to from))))
+	      (when (and wide mct)
+		(push (cons 'Cc mct) follow-to)))
 	  (let (ccalist)
 	    (save-excursion
 	      (message-set-work-buffer)
