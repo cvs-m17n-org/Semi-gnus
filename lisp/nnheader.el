@@ -1,4 +1,3 @@
-
 ;;; nnheader.el --- header access macros for Gnus and its backends
 ;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
 
@@ -56,6 +55,8 @@ on your system, you could say something like:
 
 ;;; Header access macros.
 
+(require 'mmgnus)
+
 ;; These macros may look very much like the ones in GNUS 4.1.  They
 ;; are, in a way, but you should note that the indices they use have
 ;; been changed from the internal GNUS format to the NOV format.  The
@@ -67,97 +68,98 @@ on your system, you could say something like:
 ;; (That next-to-last entry is defined as "misc" in the NOV format,
 ;; but Gnus uses it for xrefs.)
 
-(defmacro mail-header-number (header)
-  "Return article number in HEADER."
-  `(aref ,header 0))
+(defalias 'mail-header-number 'mime-entity-location-internal)
+(defalias 'mail-header-set-number 'mime-entity-set-location-internal)
 
-(defmacro mail-header-set-number (header number)
-  "Set article number of HEADER to NUMBER."
-  `(aset ,header 0 ,number))
+(defalias 'mail-header-subject 'mime-gnus-entity-subject-internal)
+(defalias 'mail-header-set-subject 'mime-gnus-entity-set-subject-internal)
 
-(defmacro mail-header-subject (header)
-  "Return subject string in HEADER."
-  `(aref ,header 1))
+(defalias 'mail-header-from 'mime-gnus-entity-from-internal)
+(defalias 'mail-header-set-from 'mime-gnus-entity-set-from-internal)
 
-(defmacro mail-header-set-subject (header subject)
-  "Set article subject of HEADER to SUBJECT."
-  `(aset ,header 1 ,subject))
+(defalias 'mail-header-date 'mime-gnus-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-gnus-entity-set-date-internal)
 
-(defmacro mail-header-from (header)
-  "Return author string in HEADER."
-  `(aref ,header 2))
+(defalias 'mail-header-message-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-set-message-id 'mime-gnus-entity-set-id-internal)
+(defalias 'mail-header-set-id 'mime-gnus-entity-set-id-internal)
 
-(defmacro mail-header-set-from (header from)
-  "Set article author of HEADER to FROM."
-  `(aset ,header 2 ,from))
+(defalias 'mail-header-references 'mime-gnus-entity-references-internal)
+(defalias 'mail-header-set-references 
+  'mime-gnus-entity-set-references-internal)
 
-(defmacro mail-header-date (header)
-  "Return date in HEADER."
-  `(aref ,header 3))
+(defalias 'mail-header-chars 'mime-gnus-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-gnus-entity-set-chars-internal)
 
-(defmacro mail-header-set-date (header date)
-  "Set article date of HEADER to DATE."
-  `(aset ,header 3 ,date))
+(defalias 'mail-header-lines 'mime-gnus-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-gnus-entity-set-lines-internal)
 
-(defalias 'mail-header-message-id 'mail-header-id)
-(defmacro mail-header-id (header)
-  "Return Id in HEADER."
-  `(aref ,header 4))
+(defalias 'mail-header-xref 'mime-gnus-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-gnus-entity-set-xref-internal)
 
-(defalias 'mail-header-set-message-id 'mail-header-set-id)
-(defmacro mail-header-set-id (header id)
-  "Set article Id of HEADER to ID."
-  `(aset ,header 4 ,id))
+(defalias 'mail-header-extra 'mime-gnus-entity-extra-internal)
+(defalias 'mail-header-set-extra 'mime-gnus-entity-set-extra-internal)
 
-(defmacro mail-header-references (header)
-  "Return references in HEADER."
-  `(aref ,header 5))
+(defalias 'nnheader-decode-subject (mime-find-field-decoder 'Subject 'nov))
+(defalias 'nnheader-decode-from (mime-find-field-decoder 'From 'nov))
 
-(defmacro mail-header-set-references (header ref)
-  "Set article references of HEADER to REF."
-  `(aset ,header 5 ,ref))
-
-(defmacro mail-header-chars (header)
-  "Return number of chars of article in HEADER."
-  `(aref ,header 6))
-
-(defmacro mail-header-set-chars (header chars)
-  "Set number of chars in article of HEADER to CHARS."
-  `(aset ,header 6 ,chars))
-
-(defmacro mail-header-lines (header)
-  "Return lines in HEADER."
-  `(aref ,header 7))
-
-(defmacro mail-header-set-lines (header lines)
-  "Set article lines of HEADER to LINES."
-  `(aset ,header 7 ,lines))
-
-(defmacro mail-header-xref (header)
-  "Return xref string in HEADER."
-  `(aref ,header 8))
-
-(defmacro mail-header-set-xref (header xref)
-  "Set article xref of HEADER to xref."
-  `(aset ,header 8 ,xref))
-
-(defmacro mail-header-extra (header)
-  "Return the extra headers in HEADER."
-  `(aref ,header 9))
-
-(defmacro mail-header-set-extra (header extra)
-  "Set the extra headers in HEADER to EXTRA."
-  `(aset ,header 9 ',extra))
-
-(defsubst make-mail-header (&optional init)
-  "Create a new mail header structure initialized with INIT."
-  (make-vector 10 init))
+(defsubst nnheader-decode-field-body (field-body field-name
+						 &optional mode max-column)
+  (mime-decode-field-body field-body
+                          (if (stringp field-name)
+                              (intern (capitalize field-name))
+                            field-name)
+                          mode max-column))
 
 (defsubst make-full-mail-header (&optional number subject from date id
 					   references chars lines xref
 					   extra)
   "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref extra))
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject (if subject
+				 (nnheader-decode-subject subject))
+		    :from (if from
+			      (nnheader-decode-from from))
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref
+		    :extra (mapcar
+			    (lambda (field)
+			      (cons (car field)
+				    (funcall (mime-find-field-decoder
+					      (car field) 'nov)
+					     (cdr field))))
+			    extra)
+		    :original-header
+		    (apply 'list
+			   (cons 'Subject subject)
+			   (cons 'From from)
+			   extra)))
+
+(defsubst make-full-mail-header-from-decoded-header
+  (&optional number subject from date id references chars lines xref extra)
+  "Create a new mail header structure initialized with the parameters given."
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject subject
+		    :from from
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref
+		    :extra extra))
+
+(defsubst make-mail-header (&optional init)
+  "Create a new mail header structure initialized with INIT."
+  (make-full-mail-header init init init init init
+			 init init init init init))
 
 ;; fake message-ids: generation and detection
 
@@ -193,7 +195,7 @@ on your system, you could say something like:
 	  ;; about twice as fast, even though it looks messier.	 You
 	  ;; can't have everything, I guess.  Speed and elegance
 	  ;; don't always go hand in hand.
-	  (vector
+	  (make-full-mail-header
 	   ;; Number.
 	   (if naked
 	       (progn
@@ -318,7 +320,7 @@ on your system, you could say something like:
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
-    (vector
+    (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
@@ -336,8 +338,8 @@ on your system, you could say something like:
   (princ (mail-header-number header) (current-buffer))
   (insert
    "\t"
-   (or (mail-header-subject header) "(none)") "\t"
-   (or (mail-header-from header) "(nobody)") "\t"
+   (or (mime-entity-fetch-field header 'Subject) "(none)") "\t"
+   (or (mime-entity-fetch-field header 'From) "(nobody)") "\t"
    (or (mail-header-date header) "") "\t"
    (or (mail-header-id header)
        (nnmail-message-id))
@@ -353,11 +355,12 @@ on your system, you could say something like:
 	    (mail-header-extra header))
     (insert "\t"))
   (when (mail-header-extra header)
-    (let ((extra (mail-header-extra header)))
+    (let ((extra (mail-header-extra header))
+	  value field)
       (while extra
-	(insert (symbol-name (caar extra))
-		": " (cdar extra) "\t")
-        (pop extra))))
+	(setq field (pop extra)
+	      value (mime-entity-fetch-field header (car field)))
+	(insert (symbol-name (car field)) ": " (or value (cdr field)) "\t"))))
   (insert "\n"))
 
 (defun nnheader-insert-header (header)
