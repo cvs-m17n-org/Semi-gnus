@@ -625,12 +625,11 @@ function is generally only called when Gnus is shutting down."
   (with-current-buffer nnimap-callback-buffer
     (insert
      (with-current-buffer nnimap-server-buffer
-       (nnimap-demule
-        (if (imap-capability 'IMAP4rev1) 
-            ;; xxx don't just use car? alist doesn't contain
-            ;; anything else now, but it might...
-            (nth 2 (car (imap-message-get (imap-current-message) 'BODYDETAIL)))
-          (imap-message-get (imap-current-message) 'RFC822)))))
+       (if (imap-capability 'IMAP4rev1) 
+	   ;; xxx don't just use car? alist doesn't contain
+	   ;; anything else now, but it might...
+	   (nth 2 (car (imap-message-get (imap-current-message) 'BODYDETAIL)))
+	 (imap-message-get (imap-current-message) 'RFC822))))
     (nnheader-ms-strip-cr)
     (funcall nnimap-callback-callback-function t)))
 
@@ -650,9 +649,7 @@ function is generally only called when Gnus is shutting down."
 	      (let ((data (imap-fetch article part prop nil
 				      nnimap-server-buffer)))
 		(when data
-		  (insert (nnimap-demule (if detail
-					     (nth 2 (car data))
-					   data)))
+		  (insert (if detail (nth 2 (car data)) data))
 		  (nnheader-ms-strip-cr)
 		  (gnus-message 9
 				"nnimap: Fetching (part of) article %d...done"

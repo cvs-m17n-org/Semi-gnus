@@ -761,6 +761,7 @@ necessery.  If nil, the buffer name is generated."
     (if (imap-opened buffer)
 	(imap-close buffer))
     (mapcar 'make-variable-buffer-local imap-local-variables)
+    (set-buffer-multibyte nil)
     (buffer-disable-undo)
     (setq imap-server (or server imap-server))
     (setq imap-port (or port imap-port))
