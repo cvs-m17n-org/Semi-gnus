@@ -1,3 +1,13 @@
+2001-03-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Hide again the
+	invisible property of encoded binary data parts after checking is
+	done.
+	(message-find-invisible-regions): New function.
+	(message-save-drafts, message-send): Inherit the invisible property
+	of encoded binary data parts to make MIME-Edit find the MIME part
+	boundaries.
+
 2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-prepare-display): Setup MIME

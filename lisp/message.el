@@ -2702,8 +2702,15 @@ It should typically alter the sending method in some way or other."
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
 	;; Avoid copying text props.
-	(insert (with-current-buffer message-edit-buffer
-		  (buffer-substring-no-properties (point-min) (point-max))))
+	(let (message-invisibles)
+	  (insert
+	   (with-current-buffer message-edit-buffer
+	     (setq message-invisibles (message-find-invisible-regions))
+	     (buffer-substring-no-properties (point-min) (point-max))))
+	  ;; Inherit the invisible property of texts to make MIME-Edit
+	  ;; find the MIME part boundaries.
+	  (dolist (region message-invisibles)
+	    (put-text-property (car region) (cdr region) 'invisible t)))
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
@@ -2773,6 +2780,20 @@ It should typically alter the sending method in some way or other."
 (eval-after-load "invisible"
   '(defalias 'invisible-region 'message-invisible-region))
 
+(defun message-find-invisible-regions ()
+  "Find invisible texts with the property `message-invisible' and
+return a list of points."
+  (let (from
+	(to (point-min))
+	regions)
+    (while (setq from (text-property-any to (point-max)
+					 'message-invisible t))
+      (setq to (or (text-property-not-all from (point-max)
+					  'message-invisible t)
+		   (point-max)))
+      (push (cons from to) regions))
+    regions))
+
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
   ;; Make sure there's a newline at the end of the message.
@@ -2782,21 +2803,20 @@ It should typically alter the sending method in some way or other."
     (insert "\n"))
   ;; Expose all invisible text with the property `message-invisible'.
   ;; We should believe that the things might be created by MIME-Edit.
-  (let (start)
-    (while (setq start (text-property-any (point-min) (point-max)
-					  'message-invisible t))
-      (remove-text-properties start
-			      (or (text-property-not-all start (point-max)
-							 'message-invisible t)
-				  (point-max))
-			      '(invisible nil message-invisible nil))))
-  ;; Expose all invisible text.
-  (message-check 'invisible-text
-    (when (text-property-any (point-min) (point-max) 'invisible t)
-      (put-text-property (point-min) (point-max) 'invisible nil)
-      (unless (yes-or-no-p
-	       "Invisible text found and made visible; continue posting? ")
-	(error "Invisible text found and made visible")))))
+  (let ((message-invisibles (message-find-invisible-regions)))
+    (dolist (region message-invisibles)
+      (put-text-property (car region) (cdr region) 'invisible nil))
+    ;; Expose all invisible text.
+    (message-check 'invisible-text
+      (when (text-property-any (point-min) (point-max) 'invisible t)
+	(put-text-property (point-min) (point-max) 'invisible nil)
+	(unless (yes-or-no-p
+		 "Invisible text found and made visible; continue posting? ")
+	  (error "Invisible text found and made visible"))))
+    ;; Hide again all text with the property `message-invisible'.
+    ;; It is needed to make MIME-Edit find the MIME part boundaries.
+    (dolist (region message-invisibles)
+      (put-text-property (car region) (cdr region) 'invisible t))))
 
 (defun message-add-action (action &rest types)
   "Add ACTION to be performed when doing an exit of type TYPES."
@@ -5577,9 +5597,14 @@ regexp varstr."
   (interactive)
   (message "Saving %s..." buffer-file-name)
   (let ((reply-headers message-reply-headers)
-	(msg (buffer-substring-no-properties (point-min) (point-max))))
+	(msg (buffer-substring-no-properties (point-min) (point-max)))
+	(message-invisibles (message-find-invisible-regions)))
     (with-temp-file buffer-file-name
       (insert msg)
+      ;; Inherit the invisible property of texts to make MIME-Edit
+      ;; find the MIME part boundaries.
+      (dolist (region message-invisibles)
+	(put-text-property (car region) (cdr region) 'invisible t))
       (setq message-reply-headers reply-headers)
       (message-generate-headers '((optional . In-Reply-To)))
       (mime-edit-translate-buffer))
