@@ -75,6 +75,9 @@
 	 (set symbol nil))
      symbol))
 
+(defun gnus-string-width (str)
+  (length str))
+
 (defun gnus-truncate-string (str width)
   (substring str 0 width))
 
