@@ -1,3 +1,21 @@
+2001-02-08 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-cancel-news): Allow to shoot foot.
+	(message-supersede): Ditto.
+
+2001-02-08  Tommi Vainikainen <thv@iki.fi> 
+
+	* gnus-sum.el (gnus-simplify-subject-re): Use
+	message-subject-re-regexp.
+
+2001-02-08 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnmail.el (nnmail-expiry-target-group): Bind
+	nnmail-cache-accepted-message-ids to nil.
+
+	* gnus-xmas.el (gnus-xmas-article-display-xface): Use binary
+	coding system.
+
 2001-02-07 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* qp.el (quoted-printable-encode-region): Make sure characters are
