@@ -10671,7 +10671,7 @@ POP $(B%5!<%P!<$+$i%a!<%k$r<hF@$9$k$?$a$K;H$&4X?t$G$9!#$=$N4X?t$O0l$D$N%Q%i(B
 @end lisp
 
 @item maildir
-maildir $(B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $(B$H(B postfix $(B$G$N$_$G%5%]!<(B
+Maildir $(B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $(B$H(B postfix $(B$G$N$_$G%5%]!<(B
 $(B%H$5$l$F$$$k(B mailbox $(B7A<0$G!"FCJL$N%G%#%l%/%H%j!<$N$=$l$>$l$N%U%!%$%k$,(B
 $(B@53N$K(B1$(B%a!<%k$H$J$C$F$$$^$9!#(B
 
@@ -10679,26 +10679,28 @@ maildir $(B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $(B$H(B postfix $(B$G
 
 @table @code
 @item :path
-$(B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$N%Q%9$G$9!#=i4|CM$O(B
-@samp{~/Maildir/new} $(B$G$9!#(B
+$(B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$N%Q%9$G$9!#=i4|CM$O4D6-JQ?t(B
+@code{MAILDIR} $(B$+$i<hF@$7$?CM$+!"$^$?$O(B @samp{~/Maildir/} $(B$G$9!#(B
+@item :subdirs
+Maildir $(B$N%5%V%G%#%l%/%H%j$G$9!#=i4|CM$O(B @samp{("new" "cur")} $(B$G$9!#(B
 
-Gnus $(B$G<hF@$9$kA0$K!"$H$-$I$-(B pop3 $(B%G!<%b%s$G%a!<%k$rC5$9$J$i!"0J2<$N:G(B
-$(B=i$NNc$N$h$&$K!"(Bmaildir $(B$NCf$N(B @code{cur} $(B%G%#%l%/%H%j!<$+$i$b%a!<%k$r<h(B
-$(BF@$9$kI,MW$,$"$j$^$9!#(B
+@c Gnus $(B$G<hF@$9$kA0$K!"$H$-$I$-(B pop3 $(B%G!<%b%s$G%a!<%k$rC5$9$J$i!"0J2<$N:G(B
+@c $(B=i$NNc$N$h$&$K!"(Bmaildir $(B$NCf$N(B @code{cur} $(B%G%#%l%/%H%j!<$+$i$b%a!<%k$r<h(B
+@c $(BF@$9$kI,MW$,$"$j$^$9!#(B
 
 $(B%j%b!<%H%^%7%s$+$i%a!<%k$r<h$j4s$;$k$3$H$b=PMh$^$9!#(B
 ($(B$H$$$&$N$b!"(Bmaildir $(B$O%m%C%/$NLdBj$r5$$K$;$:$K:Q$`$+$i!#(B)
 
 @end table
 
-maildir $(B%a!<%k%=!<%9$NNc$r$U$?$D(B:
+Maildir $(B%a!<%k%=!<%9$NNc$r$U$?$D(B:
 
 @lisp
-(maildir :path "/home/user-name/Maildir/cur")
+(maildir :path "/home/user-name/Maildir/" :subdirs ("cur" "new"))
 @end lisp
 
 @lisp
-(maildir :path "/user@@remotehost.org:~/Maildir/new")
+(maildir :path "/user@@remotehost.org:~/Maildir/" :subdirs ("new"))
 @end lisp
 
 @item imap
