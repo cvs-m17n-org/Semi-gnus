@@ -11654,6 +11654,13 @@ default force yes
 $B$9$Y$F$N%5!<%P!<$,?d>)(B ID $B$r%5%]!<%H$7$F$$$k$o$1$G$O$J$$$3$H$KCm0U$7$F2<(B
 $B$5$$!#$3$l$ONc$($P(B INN 2.3.0 $B0J>e$GF0:n$7$^$9!#(B
 
+@item nntp-read-timeout
+@vindex nntp-read-timeout
+Nntp $B$,=PNO$,=*N;$7$?$3$H$r3NG'$9$k$?$a$KBT$D$Y$-;~4V$G$9!#CM$rC;$/$9$l(B
+$B$PH?1~$,B.$/$J$j$^$9$,(B CPU $B$r?)$$$^$9!#%G%#%U%)%k%H$O(B 0.1 $BIC$G$9!#%5!<%P!<(B
+$B$KCY$$2s@~$G@\B3$7$F$$$k>l9g$O(B ($B$=$7$F(B Emacs $B$,(B CPU $B%Q%o!<$r?)$&$N$rK>$^(B
+$B$J$1$l$P(B)$B!"$3$l$rNc$($P(B 1 $B$K$7$F$b9=$$$^$;$s!#(B
+
 @item nntp-list-options
 @vindex nntp-list-options
 LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$7$?%K%e!<(B
@@ -21038,6 +21045,7 @@ spam-check-bogofilter$B!"(Bspam-check-ifile $B$^$?$O(B spam-check-stat ($B$
 * Blacklists and Whitelists::   
 * BBDB Whitelists::             
 * Blackholes::                  
+* Regular Expressions Header Matching::  
 * Bogofilter::                  
 * ifile spam filtering::        
 * spam-stat spam filtering::    
@@ -21171,6 +21179,40 @@ spam-check-bogofilter$B!"(Bspam-check-ifile $B$^$?$O(B spam-check-stat ($B$
 
 $B%V%i%C%/%[!<%k!&%A%'%C%/$OF~$C$FMh$k%a!<%k$KBP$7$F$@$19T$J$o$l$^$9!#%V%i%C(B
 $B%/%[!<%k$K(B spam $B$^$?$O(B ham $B%W%m%;%C%5!<$O$"$j$^$;$s!#(B
+
+@node Regular Expressions Header Matching
+@subsubsection $B@55,I=8=$K$h$k%X%C%@!<$N9gCW8!::(B
+@cindex spam filtering
+@cindex regular expressions header matching, spam filtering
+@cindex spam
+
+@defvar spam-use-regex-headers
+
+$B$3$N%*%W%7%g%s$O%G%#%U%)%k%H$GL58z$K$J$C$F$$$^$9!#$3$N%*%W%7%g%s$r%;%C%H(B
+$B$9$k$H!"(Bgnus $B$K@55,I=8=$N%j%9%H$H%a%C%;!<%8%X%C%@!<$r>H9g$5$;$k$3$H$,$G(B
+$B$-$^$9!#JQ?t(B @code{spam-regex-headers-spam} $B$*$h(B
+$B$S(B @code{spam-regex-headers-ham} $B$,@55,I=8=$N%j%9%H$r;}$A$^$9!#%a%C%;!<(B
+$B%8$,(B spam $B$^$?$O(B ham $B$+$I$&$+$r7h$a$k$?$a$K!"(BGnus $B$O%a%C%;!<%8%X%C%@!<$N(B
+$B$=$l$>$l$r8!::$7$^$9!#(B
+
+@end defvar
+
+@defvar spam-regex-headers-spam
+
+$B%a%C%;!<%8%X%C%@!<$NCf$G0lCW$7$?;~$K!"$=$l$,L@$i$+$K(B spam $B$G$"$k$3$H$r8+(B
+$BJ,$1$k$?$a$N@55,I=8=$N%j%9%H$G$9!#(B
+
+@end defvar
+
+@defvar spam-regex-headers-ham
+
+$B%a%C%;!<%8%X%C%@!<$NCf$G0lCW$7$?;~$K!"$=$l$,L@$i$+$K(B ham $B$G$"$k$3$H$r8+(B
+$BJ,$1$k$?$a$N@55,I=8=$N%j%9%H$G$9!#(B
+
+@end defvar
+
+$B@55,I=8=$K$h$k%X%C%@!<$N8!::$O!"F~$C$F$-$?%a!<%k$KBP$7$F$@$19T$J$o$l$^$9!#(B
+$B@55,I=8=$N$?$a$KFCM-$J(B spam $B$^$?$O(B ham $B%W%m%;%C%5!<$O$"$j$^$;$s!#(B
 
 @node Bogofilter
 @subsubsection Bogofilter
