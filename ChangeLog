@@ -1,3 +1,11 @@
+1999-12-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/imap.el (imap-streams,imap-stream-alist,
+	imap-authenticators,imap-authenticator-alist,
+	imap-digest-md5-p): Sync with latest Gnus.
+	(imap-starttls-p): Rename from `imap-tls-p'.
+	(imap-starttls-open): Rename from `imap-tls-open'.
+
 1999-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
