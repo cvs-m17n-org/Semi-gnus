@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.7 1998-11-20 12:20:35 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.8 1998-12-11 15:54:35 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -260,7 +260,10 @@
 	      (insert ")\n")
 	      (insert "(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)\n")
 	      (insert "(setq news-spool-request-post-directory gnus-offline-news-spool-directory)\n")
-	      (insert "(load \"miee\")\n")))
+	      (insert "(load \"miee\")\n")
+	      (insert "(setq message-send-news-function '")
+	      (insert (prin1-to-string message-send-news-function))
+	      (insert ")\n")))
 
 	;; write setting about nnspool and gnus-agent.
 	(if (equal gnus-offline-news-fetch-method 'nnspool)
