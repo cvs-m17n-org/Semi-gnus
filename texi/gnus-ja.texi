@@ -4990,7 +4990,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @item gnus-select-article-hook
 @vindex gnus-select-article-hook
 $B$3$N%U%C%/$O5-;v$,A*Br$5$l$?$H$-$K>o$K8F$P$l$^$9!#=i4|@_Dj$G$O!"A*Br$5$l(B
-$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#(B
+$B$?5-;v$N2<$K1#$l$F$$$k%9%l%C%I$r8+$;$k$h$&$K$J$C$F$$$^$9!#%(!<%8%'%s%H$,(B
+$B$9$Y$F$N4{FI$N5-;v$r%;!<%V$9$k$h$&$K$5$;$?$$>l9g$O!"$3$N%U%C%/(B
+$B$K(B @code{gnus-agent-fetch-selected-article} $B$rDI2C$9$k$3$H$G!"$=$l$r$9$k(B
+$B$O$:$G$9!#(B
 
 @item gnus-mark-article-hook
 @vindex gnus-mark-article-hook
@@ -17017,7 +17020,9 @@ Gnus Agent $B$O$h$/$"$kB>$N%*%U%i%$%s%K%e!<%9%j!<%@!<$N$h$&$K$OF0:n$7$^$;(B
 @table @dfn
 @item $B@\B3$5$l$F$$$k$H$-$K5-;v$rFI$s$@$i!"$=$l$O(B Agent $B$KF~$k$N$G$9$+(B?
 
-@strong{$B$$$$$((B}$B!#(B
+@strong{$B$$$$$((B}$B!#$3$NF0:n$rK>$`$N$J$i$P!"(B
+@code{gnus-select-article-hook} $B$K(B @code{gnus-agent-fetch-selected-article} $B$r(B
+$B2C$($F2<$5$$!#(B
 
 @item $B@\B3$5$l$F$$$k$H$-$K5-;v$rFI$s$G!"(BAgent $B$K5-;v$,B8:_$7$F$$$k>l9g!"(B
 $B$b$&0l2s%@%&%s%m!<%I$5$l$k$N$G$9$+(B?
@@ -21055,7 +21060,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 * Blackholes::                  
 * Bogofilter::                  
 * ifile spam filtering::        
-* spam-stat filtering::         
+* spam-stat spam filtering::    
 * Extending spam.el::           
 @end menu
 
