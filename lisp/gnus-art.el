@@ -37,6 +37,7 @@
 (require 'gnus-int)
 (require 'alist)
 (require 'mime-view)
+(require 'wid-edit)
 
 ;; Avoid byte-compile warnings.
 (eval-when-compile
@@ -44,7 +45,6 @@
   (require 'mail-parse)
   (require 'mm-decode)
   (require 'mm-view)
-  (require 'wid-edit)
   (require 'mm-uu)
   )
 
