@@ -7281,6 +7281,10 @@ and `request-accept' functions."
 	      (when gnus-use-cache
 		(gnus-cache-possibly-enter-article
 		 to-group to-article
+		 (let ((header (copy-sequence
+				(gnus-summary-article-header article))))
+		   (mail-header-set-number header to-article)
+		   header)
 		 (memq article gnus-newsgroup-marked)
 		 (memq article gnus-newsgroup-dormant)
 		 (memq article gnus-newsgroup-unreads)))
@@ -7947,6 +7951,7 @@ returned."
 	     (save-excursion
 	       (gnus-cache-possibly-enter-article
 		gnus-newsgroup-name article
+		(gnus-summary-article-header article)
 		(= mark gnus-ticked-mark)
 		(= mark gnus-dormant-mark) (= mark gnus-unread-mark))))
 
@@ -7992,6 +7997,7 @@ marked."
 	     (save-excursion
 	       (gnus-cache-possibly-enter-article
 		gnus-newsgroup-name article
+		(gnus-summary-article-header article)
 		(= mark gnus-ticked-mark)
 		(= mark gnus-dormant-mark) (= mark gnus-unread-mark))))
 
