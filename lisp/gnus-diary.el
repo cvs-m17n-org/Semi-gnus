@@ -268,6 +268,8 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
   (interactive "P")
   (gnus-summary-sort 'schedule reverse))
 
+(defvar gnus-summary-misc-menu)
+
 (add-hook 'gnus-summary-menu-hook
 	  (lambda ()
 	    (easy-menu-add-item gnus-summary-misc-menu
@@ -335,14 +337,13 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
 
 ;; Diary Message Checking ===================================================
 
-(if (fboundp 'kill-entire-line)
+(eval-and-compile
+  (if (fboundp 'kill-entire-line)
+      (defalias 'gnus-diary-kill-entire-line 'kill-entire-line)
     (defun gnus-diary-kill-entire-line ()
-      (kill-entire-line))
-  (defun gnus-diary-kill-entire-line ()
-    (beginning-of-line)
-    (let ((kill-whole-line t))
-      (kill-line)))
-  )
+      (beginning-of-line)
+      (let ((kill-whole-line t))
+	(kill-line)))))
 
 (defvar gnus-diary-header-value-history nil
   ;; History variable for header value prompting
@@ -394,7 +395,7 @@ If ARG (or prefix) is non-nil, force prompting for all fields."
 	   (when (re-search-forward (concat "^" header ":") nil t)
 	     (unless (eq (char-after) ? )
 	       (insert " "))
-	     (setq value (buffer-substring (point) (point-at-eol)))
+	     (setq value (buffer-substring (point) (gnus-point-at-eol)))
 	     (and (string-match "[ \t]*\\([^ \t]+\\)[ \t]*" value)
 		  (setq value (match-string 1 value)))
 	     (condition-case ()
