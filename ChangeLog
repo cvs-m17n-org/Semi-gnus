@@ -1,3 +1,21 @@
+2001-07-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-yank-original): Unwind-protect while
+	suspending font-lock.
+	(message-mode): Modify for the following changes.
+	(message-font-lock-keywords-2): Abolished.
+	(message-font-lock-keywords-1): Abolished.
+	(message-font-lock-keywords): Unified.
+	(message-font-lock-cited-text-matcher): Abolished.
+	(font-lock-after-change-function): Don't advise it.
+	(message-font-lock-last-position): Abolished.
+	(message-font-lock-citation-name-max-column): Abolished.
+	(message-font-lock-cited-text-regexp) Abolished.
+	(message-font-lock-fence-close-position): Abolished.
+	(message-font-lock-fence-open-position): Abolished.
+	(message-font-lock-fence-close-regexp): Abolished.
+	(message-font-lock-fence-open-regexp): Abolished.
+
 2001-07-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-font-lock-keywords-1): Replace regexp
