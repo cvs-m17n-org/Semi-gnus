@@ -7956,29 +7956,6 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 $B$N%j%9%H$G$"$k$3$H$b$G$-$^$9!#(B
 @end table
 
-@item W W p
-@kindex W W p ($B35N,(B)
-@findex gnus-article-hide-pgp
-@vindex gnus-article-hide-pgp-hook
-@sc{pgp} $B=pL>$r1#$7$^$9(B (@code{gnus-article-hide-pgp})$B!#(B@sc{pgp} $B=pL>$,(B
-$B1#$5$l$?8e$K%U%C%/(B @code{gnus-article-hide-pgp-hook} $B$,<B9T$5$l$^$9!#(B
-$BNc$($P!"=pL>$r;}$D5-;v$r<+F0E*$KG'>Z$9$k$K$O(B:
-
-@lisp
-;;; Hide pgp cruft if any.
-
-(setq gnus-treat-strip-pgp t)
-
-;;; After hiding pgp, verify the message;
-;;; only happens if pgp signature is found.
-
-(add-hook 'gnus-article-hide-pgp-hook
-          (lambda ()
-            (save-excursion
-              (set-buffer gnus-original-article-buffer)
-              (mc-verify))))
-@end lisp
-
 @item W W P
 @kindex W W P ($B35N,(B)
 @findex gnus-article-hide-pem
@@ -10145,7 +10122,6 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-strip-leading-blank-lines (t, integer)
 @item gnus-treat-strip-multiple-blank-lines (t, integer)
 @item gnus-treat-strip-pem (t, last, integer)
-@item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-unsplit-urls (t, integer)
 @item gnus-treat-wash-html (t, integer)
