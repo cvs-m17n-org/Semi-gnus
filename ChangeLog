@@ -1,3 +1,12 @@
+1998-10-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheaderxm.el (nnheader-xmas-Y-or-n-p): New function.
+	It will be used for the substitute of `nnheader-Y-or-n-p' under
+	XEmacs.
+
+	* lisp/nnheader.el (nnheader-Y-or-n-p): Rewrite for Emacs 19 or
+	later except for XEmacs.
+
 1998-10-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-mode-map): Define key `C-x k'.
