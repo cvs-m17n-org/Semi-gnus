@@ -1248,7 +1248,7 @@ The following commands are available:
     (gnus-edit-form
      (cadr info) (format "Editing the predicate for category %s" category)
      `(lambda (predicate)
-	(setf (cadr (assq ',category gnus-category-alist)) predicate)
+	(setcar (cdr (assq ',category gnus-category-alist)) predicate)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
@@ -1260,7 +1260,7 @@ The following commands are available:
      (caddr info)
      (format "Editing the score expression for category %s" category)
      `(lambda (groups)
-	(setf (caddr (assq ',category gnus-category-alist)) groups)
+	(setcar (nthcdr 2 (assq ',category gnus-category-alist)) groups)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
@@ -1271,7 +1271,7 @@ The following commands are available:
     (gnus-edit-form
      (cadddr info) (format "Editing the group list for category %s" category)
      `(lambda (groups)
-	(setf (cadddr (assq ',category gnus-category-alist)) groups)
+	(setcar (nthcdr 3 (assq ',category gnus-category-alist)) groups)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
