@@ -1,3 +1,20 @@
+2001-02-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-show-article): Bind
+	`gnus-inhibit-treatment' to t while fetching the raw article.
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-exit): Bind
+	`mime-edit-insert-user-agent-field' to nil while `mime-edit-exit'
+	is being done;  turn off font-lock first;  query if the buffer is
+	modified.
+	(gnus-article-mime-edit-done): New function.
+	(gnus-article-mime-edit-article-setup): Make the window fill its
+	frame;  clear the buffere modified flag;  substitute key definition
+	`gnus-article-edit-done' with `gnus-article-mime-edit-done';  don't
+	turn off font-lock here;  bind `mime-edit-insert-user-agent-field'
+	to nil while `mime-edit-exit' is being done.
+	(gnus-article-mime-edit-article-unwind): Turn off font-lock first.
+
 2001-02-23  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Don't require `emu'.
