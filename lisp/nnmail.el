@@ -1,5 +1,5 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98,99, 00 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -468,32 +468,50 @@ parameter.  It should return nil, `warn' or `delete'."
 		  ?. ?_))
      (setq group (nnheader-translate-file-chars group))
      ;; If this directory exists, we use it directly.
-     (if (or nnmail-use-long-file-names
-	     (file-directory-p (concat dir group)))
-	 (concat dir group "/")
-       ;; If not, we translate dots into slashes.
-       (concat dir
-	       (mm-encode-coding-string
-		(nnheader-replace-chars-in-string group ?. ?/)
-		nnmail-pathname-coding-system)
-	       "/")))
+     (file-name-as-directory
+      (if (or nnmail-use-long-file-names
+	      (file-directory-p (concat dir group)))
+	  (expand-file-name group dir)
+	;; If not, we translate dots into slashes.
+	(expand-file-name
+	 (mm-encode-coding-string
+	  (nnheader-replace-chars-in-string group ?. ?/)
+	  nnmail-pathname-coding-system)
+	 dir))))
    (or file "")))
 
 (defun nnmail-get-active ()
   "Returns an assoc of group names and active ranges.
 nn*-request-list should have been called before calling this function."
-  (let (group-assoc)
-    ;; Go through all groups from the active list.
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (goto-char (point-min))
-      (while (re-search-forward
-	      "^\\([^ \t]+\\)[ \t]+\\([0-9]+\\)[ \t]+\\([0-9]+\\)" nil t)
-	;; We create an alist with `(GROUP (LOW . HIGH))' elements.
-	(push (list (match-string 1)
-		    (cons (string-to-int (match-string 3))
-			  (string-to-int (match-string 2))))
-	      group-assoc)))
+  ;; Go through all groups from the active list.
+  (save-excursion
+    (set-buffer nntp-server-buffer)
+    (nnmail-parse-active)))
+
+(defun nnmail-parse-active ()
+  "Parse the active file in the current buffer and return an alist."
+  (goto-char (point-min))
+  (unless (re-search-forward "[\\\"]" nil t)
+    (goto-char (point-max))
+    (while (re-search-backward "[][';?()#]" nil t)
+      (insert ?\\)))
+  (goto-char (point-min))
+  (let ((buffer (current-buffer))
+	group-assoc group max min)
+    (while (not (eobp))
+      (condition-case err
+	  (progn
+	    (narrow-to-region (point) (gnus-point-at-eol))
+	    (setq group (read buffer))
+	    (unless (stringp group)
+	      (setq group (symbol-name group)))
+	    (if (and (numberp (setq max (read nntp-server-buffer)))
+		     (numberp (setq min (read nntp-server-buffer))))
+		(push (list group (cons min max))
+		      group-assoc)))
+	(error nil))
+      (widen)
+      (forward-line 1))
     group-assoc))
 
 (defvar nnmail-active-file-coding-system 'raw-text
@@ -511,8 +529,11 @@ nn*-request-list should have been called before calling this function."
   (erase-buffer)
   (let (group)
     (while (setq group (pop alist))
-      (insert (format "%s %d %d y\n" (car group) (cdadr group)
-		      (caadr group))))))
+      (insert (format "%S %d %d y\n" (intern (car group)) (cdadr group)
+		      (caadr group))))
+    (goto-char (point-max))
+    (while (search-backward "\\." nil t)
+      (delete-char 1))))
 
 (defun nnmail-get-split-group (file source)
   "Find out whether this FILE is to be split into GROUP only.
@@ -1066,7 +1087,10 @@ Return the number of characters in the body."
     (goto-char (point-min))
     (when (re-search-forward "^References:" nil t)
       (beginning-of-line)
-      (insert "X-Gnus-Broken-Eudora-"))))
+      (insert "X-Gnus-Broken-Eudora-"))
+    (goto-char (point-min))
+    (when (re-search-forward "^In-Reply-To:[^\n]+\\(\n[ \t]+\\)" nil t)
+      (replace-match "" t t nil 1))))
 
 (custom-add-option 'nnmail-prepare-incoming-header-hook
 		   'nnmail-fix-eudora-headers)
@@ -1577,6 +1601,8 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
   (unless nnmail-split-history
     (error "No current split history"))
   (with-output-to-temp-buffer "*nnmail split history*"
+    (with-current-buffer standard-output
+      (fundamental-mode))		; for Emacs 20.4+
     (let ((history nnmail-split-history)
 	  elem)
       (while (setq elem (pop history))

@@ -33,7 +33,6 @@
 (require 'mailheader)
 (require 'nnheader)
 (require 'easymenu)
-(require 'custom)
 (if (string-match "XEmacs\\|Lucid" emacs-version)
     (require 'mail-abbrevs)
   (require 'mailabbrev))
@@ -2135,7 +2134,10 @@ It should typically alter the sending method in some way or other."
 	 (news (message-news-p))
 	 (mailbuf (current-buffer))
 	 (message-this-is-mail t)
-	 (message-posting-charset (gnus-setup-posting-charset nil)))
+	 (message-posting-charset
+	  (if (fboundp 'gnus-setup-posting-charset)
+	      (gnus-setup-posting-charset nil)
+	    message-posting-charset)))
     (save-restriction
       (message-narrow-to-headers)
       ;; Insert some headers.
@@ -2179,7 +2181,8 @@ It should typically alter the sending method in some way or other."
 (defun message-send-mail-with-sendmail ()
   "Send off the prepared buffer with sendmail."
   (let ((errbuf (if message-interactive
-		    (message-generate-new-buffer-clone-locals " sendmail errors")
+		    (message-generate-new-buffer-clone-locals
+		     " sendmail errors")
 		  0))
 	resend-to-addresses delimline)
     (let ((case-fold-search t))
@@ -2397,7 +2400,7 @@ to find out how to use this."
 (defun message-check-news-header-syntax ()
   (and
    ;; Check Newsgroups header.
-   (message-check 'newsgroyps
+   (message-check 'newsgroups
      (let ((group (message-fetch-field "newsgroups")))
        (or
 	(and group
@@ -3793,6 +3796,8 @@ header line with the old Message-ID."
     (cond ((save-window-excursion
 	     (if (not (eq system-type 'vax-vms))
 		 (with-output-to-temp-buffer "*Directory*"
+		   (with-current-buffer standard-output
+		     (fundamental-mode)) ; for Emacs 20.4+
 		   (buffer-disable-undo standard-output)
 		   (let ((default-directory "/"))
 		     (call-process
@@ -4161,6 +4166,7 @@ The following arguments may contain lists of values."
 	(save-excursion
 	  (with-output-to-temp-buffer " *MESSAGE information message*"
 	    (set-buffer " *MESSAGE information message*")
+	    (fundamental-mode)		; for Emacs 20.4+
 	    (mapcar 'princ text)
 	    (goto-char (point-min))))
 	(funcall ask question))

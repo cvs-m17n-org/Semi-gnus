@@ -220,6 +220,8 @@ to:
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
 		id (mail-fetch-field "content-id"))))
+      (when cte
+	(setq cte (mail-header-strip cte)))
       (if (or (not ctl)
 	      (not (string-match "/" (car ctl))))
 	  (mm-dissect-singlepart
@@ -255,7 +257,9 @@ to:
 
 (defun mm-dissect-singlepart (ctl cte &optional force cdl description id)
   (when (or force
-	    (not (equal "text/plain" (car ctl))))
+	    (if (equal "text/plain" (car ctl))
+		(assoc 'format ctl)
+	      t))
     (let ((res (mm-make-handle
 		(mm-copy-to-buffer) ctl cte nil cdl description nil id)))
       (push (car res) mm-dissection-list)
@@ -433,20 +437,28 @@ external if displayed external."
 (defun mm-mailcap-command (method file type-list)
   (let ((ctl (cdr type-list))
 	(beg 0)
+	(uses-stdin t)
 	out sub total)
-    (while (string-match "%{\\([^}]+\\)}\\|%s\\|%t" method beg)
+    (while (string-match "%{\\([^}]+\\)}\\|%s\\|%t\\|%%" method beg)
       (push (substring method beg (match-beginning 0)) out)
       (setq beg (match-end 0)
 	    total (match-string 0 method)
 	    sub (match-string 1 method))
       (cond
+       ((string= total "%%")
+	(push "%" out))
        ((string= total "%s")
+	(setq uses-stdin nil)
 	(push (mm-quote-arg file) out))
        ((string= total "%t")
 	(push (mm-quote-arg (car type-list)) out))
        (t
 	(push (mm-quote-arg (or (cdr (assq (intern sub) ctl)) "")) out))))
     (push (substring method beg (length method)) out)
+    (if uses-stdin
+	(progn
+	  (push "<" out)
+	  (push (mm-quote-arg file) out)))
     (mapconcat 'identity (nreverse out) "")))
     
 (defun mm-remove-parts (handles)

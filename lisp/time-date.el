@@ -3,6 +3,8 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu Umeda <umerin@mse.kyutech.ac.jp>
+;; Keywords: mail news util
+
 ;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -26,6 +28,7 @@
 
 (require 'parse-time)
 
+;;;###autoload
 (defun date-to-time (date)
   "Convert DATE into time."
   (condition-case ()
@@ -36,7 +39,7 @@
   "Convert TIME to a floating point number."
   (+ (* (car time) 65536.0)
      (cadr time)
-     (/ (or (caddr time) 0) 1000000.0)))
+     (/ (or (nth 2 time) 0) 1000000.0)))
 
 (defun seconds-to-time (seconds)
   "Convert SECONDS (a floating point number) to an Emacs time structure."
@@ -116,6 +119,7 @@ The Gregorian date Sunday, December 31, 1bce is imaginary."
        (- (/ (1- year) 100))		;	- century years
        (/ (1- year) 400))))		;	+ Gregorian leap years
 
+;;;###autoload
 (defun safe-date-to-time (date)
   "Parse DATE and return a time structure.
 If DATE is malformed, a zero time will be returned."

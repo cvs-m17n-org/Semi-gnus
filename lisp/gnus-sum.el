@@ -696,7 +696,8 @@ is not run if `gnus-visual' is nil."
   :type 'hook)
 
 (defcustom gnus-exit-group-hook nil
-  "*A hook called when exiting (not quitting) summary mode."
+  "*A hook called when exiting summary mode.
+This hook is not called from the non-updating exit commands like `Q'."
   :group 'gnus-various
   :type 'hook)
 
@@ -5537,7 +5538,8 @@ The state which existed when entering the ephemeral is reset."
       (rename-buffer
        (concat (substring name 0 (match-beginning 0)) "Dead "
 	       (substring name (match-beginning 0)))
-       t))))
+       t)
+      (bury-buffer))))
 
 (defun gnus-kill-or-deaden-summary (buffer)
   "Kill or deaden the summary BUFFER."
@@ -5796,37 +5798,34 @@ be displayed."
     (set-buffer gnus-summary-buffer))
   (let ((article (or article (gnus-summary-article-number)))
 	(all-headers (not (not all-headers))) ;Must be T or NIL.
-	gnus-summary-display-article-function
-	did)
+	gnus-summary-display-article-function)
     (and (not pseudo)
 	 (gnus-summary-article-pseudo-p article)
 	 (error "This is a pseudo-article"))
-    (prog1
-	(save-excursion
-	  (set-buffer gnus-summary-buffer)
-	  (if (or (and gnus-single-article-buffer
-		       (or (null gnus-current-article)
-			   (null gnus-article-current)
-			   (null (get-buffer gnus-article-buffer))
-			   (not (eq article (cdr gnus-article-current)))
-			   (not (equal (car gnus-article-current)
-				       gnus-newsgroup-name))))
-		  (and (not gnus-single-article-buffer)
-		       (or (null gnus-current-article)
-			   (not (eq gnus-current-article article))))
-		  force)
-	      ;; The requested article is different from the current article.
-	      (prog1
-		  (gnus-summary-display-article article all-headers)
-		(setq did article)
-		(when (or all-headers gnus-show-all-headers)
-		  (gnus-article-show-all-headers)))
+    (save-excursion
+      (set-buffer gnus-summary-buffer)
+      (if (or (and gnus-single-article-buffer
+		   (or (null gnus-current-article)
+		       (null gnus-article-current)
+		       (null (get-buffer gnus-article-buffer))
+		       (not (eq article (cdr gnus-article-current)))
+		       (not (equal (car gnus-article-current)
+				   gnus-newsgroup-name))))
+	      (and (not gnus-single-article-buffer)
+		   (or (null gnus-current-article)
+		       (not (eq gnus-current-article article))))
+	      force)
+	  ;; The requested article is different from the current article.
+	  (progn
+	    (gnus-summary-display-article article all-headers)
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
-	    'old))
-      (when did
-	(gnus-article-set-window-start
-	 (cdr (assq article gnus-newsgroup-bookmarks)))))))
+	    (gnus-article-set-window-start
+	     (cdr (assq article gnus-newsgroup-bookmarks)))
+	    article)
+	(when (or all-headers gnus-show-all-headers)
+	  (gnus-article-show-all-headers))
+	'old))))
 
 (defun gnus-summary-set-current-mark (&optional current-mark)
   "Obsolete function."
@@ -6986,6 +6985,7 @@ Optional argument BACKWARD means do search for backward.
     (gnus-save-hidden-threads
       (gnus-summary-select-article)
       (set-buffer gnus-article-buffer)
+      (goto-char (window-point (get-buffer-window (current-buffer))))
       (when backward
 	(forward-line -1))
       (while (not found)
@@ -7236,8 +7236,11 @@ If ARG is a negative number, hide the unwanted header lines."
 	  (if  hidden
 	      (let ((gnus-treat-hide-headers nil)
 		    (gnus-treat-hide-boring-headers nil))
+		(setq gnus-article-wash-types
+		      (delq 'headers gnus-article-wash-types))
 		(gnus-treat-article 'head))
-	    (gnus-treat-article 'head)))))))
+	    (gnus-treat-article 'head)))
+	(gnus-set-mode-line 'article)))))
 
 (defun gnus-summary-show-all-headers ()
   "Make all header lines visible."
@@ -7304,7 +7307,10 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 		    'request-replace-article gnus-newsgroup-name)))
 	 (error "The current group does not support article editing")))
   (let ((articles (gnus-summary-work-articles n))
-	(prefix (gnus-group-real-prefix gnus-newsgroup-name))
+	(prefix (if (gnus-check-backend-function
+		    'request-move-article gnus-newsgroup-name)
+		    (gnus-group-real-prefix gnus-newsgroup-name)
+		  ""))
 	(names '((move "Move" "Moving")
 		 (copy "Copy" "Copying")
 		 (crosspost "Crosspost" "Crossposting")))
@@ -7393,10 +7399,10 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	(gnus-message 1 "Couldn't %s article %s: %s"
 		      (cadr (assq action names)) article
 		      (nnheader-get-report (car to-method))))
-       ((and (eq art-group 'junk)
-	     (eq action 'move))
-	(gnus-summary-mark-article article gnus-canceled-mark)
-	(gnus-message 4 "Deleted article %s" article))
+       ((eq art-group 'junk)
+	(when (eq action 'move)
+	  (gnus-summary-mark-article article gnus-canceled-mark)
+	  (gnus-message 4 "Deleted article %s" article)))
        (t
 	(let* ((pto-group (gnus-group-prefixed-name
 			   (car art-group) to-method))
@@ -9041,12 +9047,12 @@ save those articles instead."
 	  (error "No such group: %s" to-newsgroup)))
     to-newsgroup))
 
-(defun gnus-summary-save-parts (type dir n reverse)
+(defun gnus-summary-save-parts (type dir n &optional reverse)
   "Save parts matching TYPE to DIR.
 If REVERSE, save parts that do not match TYPE."
   (interactive
    (list (read-string "Save parts of type: " "image/.*")
-	 (read-file-name "Save to directory: " t nil t)
+	 (read-file-name "Save to directory: " nil nil t)
 	 current-prefix-arg))
   (gnus-summary-iterate n
     (let ((gnus-display-mime-function nil)

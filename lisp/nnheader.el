@@ -1,6 +1,7 @@
-
 ;;; nnheader.el --- header access macros for Gnus and its backends
-;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
+
+;; Copyright (C) 1987, 88, 89, 90, 93, 94, 95, 96, 97, 98, 99
+;;   Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -728,14 +729,14 @@ without formatting."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
      ;; If this directory exists, we use it directly.
-     (if (file-directory-p (concat dir group))
-	 (concat dir group "/")
-       ;; If not, we translate dots into slashes.
-       (concat dir
-	       (mm-encode-coding-string
-		(nnheader-replace-chars-in-string group ?. ?/)
-		nnheader-pathname-coding-system)
-	       "/")))
+     (file-name-as-directory
+      (if (file-directory-p (concat dir group))
+	  (expand-file-name group dir)
+	;; If not, we translate dots into slashes.
+	(expand-file-name (mm-encode-coding-string
+			   (nnheader-replace-chars-in-string group ?. ?/)
+			  nnheader-pathname-coding-system)
+			  dir))))
    (cond ((null file) "")
 	 ((numberp file) (int-to-string file))
 	 (t file))))

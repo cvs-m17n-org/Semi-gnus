@@ -33,6 +33,7 @@
   (autoload 'gnus-article-prepare-display "gnus-art")
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard")
+  (autoload 'fill-flowed "fill-flowed")
   (autoload 'diff-mode "diff-mode"))
 
 ;;;
@@ -127,15 +128,25 @@
       (mm-insert-inline
        handle
        (concat "\n-- \n"
-	       (vcard-format-string
-		(vcard-parse-string (mm-get-part handle)
-				    'vcard-standard-filter)))))
+	       (if (fboundp 'vcard-pretty-print)
+		   (vcard-pretty-print (mm-get-part handle))
+		 (vcard-format-string
+		  (vcard-parse-string (mm-get-part handle)
+				      'vcard-standard-filter))))))
      (t
       (setq text (mm-get-part handle))
       (let ((b (point))
 	    (charset (mail-content-type-get
 		      (mm-handle-type handle) 'charset)))
 	(insert (mm-decode-string text charset))
+	(when (and (equal type "plain")
+		   (equal (cdr (assoc 'format (mm-handle-type handle)))
+			  "flowed"))
+	  (save-restriction
+	    (narrow-to-region b (point))
+	    (goto-char b)
+	    (fill-flowed)
+	    (goto-char (point-max))))
 	(save-restriction
 	  (narrow-to-region b (point))
 	  (set-text-properties (point-min) (point-max) nil)
