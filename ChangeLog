@@ -1,5 +1,14 @@
 1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
+
+	* lisp/mmgnus.el: New module.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use content of
+	`gnus-current-headers' as mime-message-structure.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.1.
 	(gnus-version): Modify for Chao 1.11.
 
