@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.9.01"
+(defconst gnus-version-number "6.9.02"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.6"
+(defconst gnus-original-version-number "0.8"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1708,8 +1708,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
-      gnus-article-display-x-face
-      gnus-article-mime-decode-quoted-printable gnus-article-hide-pgp
+      gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
