@@ -2272,12 +2272,12 @@ This format is defined by the `gnus-article-time-format' variable."
 	       (while (setq elem (pop alist))
 		 (when (and name (string-match (car elem) name))
 		   (setq alist nil
-			 highlight (copy-list (cdr elem)))))
+			 highlight (copy-sequence (cdr elem)))))
 	       highlight)
-	     (copy-list highlight-words)
+	     (copy-sequence highlight-words)
 	     (if gnus-newsgroup-name
-		 (copy-list (gnus-group-find-parameter
-			     gnus-newsgroup-name 'highlight-words t)))
+		 (copy-sequence (gnus-group-find-parameter
+				 gnus-newsgroup-name 'highlight-words t)))
 	     gnus-emphasis-alist)))))
 
 (defvar gnus-summary-article-menu)
