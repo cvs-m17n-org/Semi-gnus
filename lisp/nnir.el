@@ -1,10 +1,10 @@
 ;;; nnir.el --- search mail with various search engines
 ;; Copyright (C) 1998 Kai Groﬂjohann
 
-;; $Id: nnir.el,v 1.72 2001/08/17 11:15:13 grossjoh Exp $
+;; $Id: nnir.el,v 1.1.2.1 2001/09/04 10:32:55 tsuchiya Exp $
 
 ;; Author: Kai Groﬂjohann <grossjohann@ls6.cs.uni-dortmund.de>
-;; Keywords: news, mail, searching, ir, glimpse, wais
+;; Keywords: news, mail, searching, ir, glimpse, wais, Namazu
 
 ;; This file is not part of GNU Emacs.
 
@@ -204,6 +204,10 @@
 ;; For maximum searching efficiency I have a cron job set to run this
 ;; command every four hours.
 
+;; 3. Namazu
+;;
+;;
+
 ;; Developer information:
 
 ;; I have tried to make the code expandable.  Basically, it is divided
@@ -287,7 +291,7 @@
 
 ;;; Setup Code:
 
-(defconst nnir-version "$Id: nnir.el,v 1.72 2001/08/17 11:15:13 grossjoh Exp $"
+(defconst nnir-version "$Id: nnir.el,v 1.1.2.1 2001/09/04 10:32:55 tsuchiya Exp $"
   "Version of NNIR.")
 
 (require 'cl)
@@ -307,6 +311,8 @@
 (defvar nnir-engines
   '((glimpse nnir-run-glimpse
              ((group . "Group spec: ")))
+    (namazu nnir-run-namazu
+            ((group . "Group spec: ")))
     (wais    nnir-run-waissearch
              ())
     (excite  nnir-run-excite-search
@@ -341,7 +347,8 @@ Add an entry here when adding a new search engine.")
 ;;; User Customizable Variables:
 
 (defgroup nnir nil
-  "Search nnmh and nnml groups in Gnus with Glimpse, freeWAIS-sf, or EWS.")
+  "Search nnmh and nnml groups in Gnus with Glimpse, freeWAIS-sf, Namazu, 
+or EWS.")
 
 ;; Mail backend.
 
@@ -410,6 +417,24 @@ Note that this should be a list.  Ie, do NOT use the following:
 Instead, use this:
     (setq nnir-glimpse-additional-switches '(\"-i\" \"-w\"))"
   :type '(repeat (string))
+  :group 'nnir)
+
+;; Namazu engine.
+
+(defcustom nnir-namazu-program "namazu"
+  "*Name of Namazu executable."
+  :type '(string)
+  :group 'nnir)
+
+(defcustom nnir-namazu-index (expand-file-name "Namazu/" (getenv "HOME"))
+  "*Namazu index directory"
+  :type '(directory)
+  :group 'nnir)
+
+(defcustom nnir-namazu-remove-prefix (concat (getenv "HOME") "/Mail/")
+  "*The prefix to remove from each file name returned by Namazu
+in order to get a group name (albeit with / instead of .)."
+  :type '(directory)
   :group 'nnir)
 
 ;; freeWAIS-sf.
@@ -864,6 +889,94 @@ pairs (also vectors, actually)."
                              t
                            (< (nnir-artitem-number x)
                               (nnir-artitem-number y))))))
+      )))
+
+;; Namazu interface
+(defun nnir-run-namazu (query &optional group)
+  "Run given query against namazu.  Returns a vector of (group name, file name)
+pairs (also vectors, actually)."
+  (save-excursion
+    (let ((artlist nil)
+          (groupspec (cdr (assq 'group query)))
+          (qstring (cdr (assq 'query query)))
+	  (coding-system-for-read 'euc-japan)
+	  (coding-system-for-write 'euc-japan))
+      (when (and group groupspec)
+        (error (concat "It does not make sense to use a group spec"
+                       " with process-marked groups.")))
+      (when group
+        (setq groupspec (gnus-group-real-name group)))
+      (set-buffer (get-buffer-create nnir-tmp-buffer))
+      (erase-buffer)
+      (if groupspec
+          (message "Doing namazu query %s on %s..." query groupspec)
+        (message "Doing namazu query %s..." query))
+      (let* ((cp-list
+              `( ,nnir-namazu-program
+                 nil                    ; input from /dev/null
+                 t                      ; output
+                 nil                    ; don't redisplay
+		 "--all" "--list" "--early"
+		 ,(if groupspec
+                      (format "+uri:%s %s" groupspec qstring)
+		    (format "%s" qstring))
+		 ,nnir-namazu-index	; index
+                ))
+             (exitstatus
+              (progn
+                (message "%s args: %s" nnir-namazu-program
+                         (mapconcat 'identity (cddddr cp-list) " "))
+                (apply 'call-process cp-list))))
+        (unless (or (null exitstatus)
+                    (zerop exitstatus))
+          (nnheader-report "Couldn't run namazu: %s" exitstatus)
+          ;; Namazu failure reason is in this buffer, show it if
+          ;; the user wants it.
+          (when (> gnus-verbose 6)
+            (display-buffer nnir-tmp-buffer))))
+      (if groupspec
+          (message "Doing namazu query %s on %s..." query groupspec)
+        (message "Doing namazu query %s...done" query))
+      (sit-for 0)
+      ;; CCC: The following work of extracting group name and article
+      ;; number from the Namazu output can probably better be done by
+      ;; just going through the buffer once, and plucking out the
+      ;; right information from each line.
+      ;; remove superfluous stuff from namazu output
+      (goto-char (point-min))
+      (delete-non-matching-lines "/[0-9]+$")
+      ;;(delete-matching-lines "\\.overview~?$")
+      (goto-char (point-min))
+      (while (re-search-forward (concat "^" nnir-namazu-remove-prefix) nil t)
+        (replace-match ""))
+      ;; separate group name from article number with \t
+      ;; XEmacs compatible version
+      (goto-char (point-max))
+      (while (re-search-backward "/[0-9]+$" nil t)
+        (delete-char 1 nil)
+        (insert-char ?\t 1))
+; Emacs compatible version
+;      (goto-char (point-min))
+;      (while (re-search-forward "\\(/\\)[0-9]+$" nil t)
+;        (replace-match "\t" t t nil 1))
+      ;; replace / with . in group names
+      (subst-char-in-region (point-min) (point-max) ?/ ?. t)
+      ;; massage buffer to contain some Lisp;
+      ;; this depends on the artlist encoding internals
+      ;; maybe this dependency should be removed?
+      (goto-char (point-min))
+      (while (not (eobp))
+        (insert "(\"")
+        (skip-chars-forward "^\t")
+        (insert "\" ")
+        (end-of-line)
+        (insert " 1000 )")              ; 1000 = score
+        (forward-line 1))
+      (insert "))\n")
+      (goto-char (point-min))
+      (insert "(setq artlist '(\n")
+      (eval-buffer)
+      artlist
       )))
 
 ;; freeWAIS-sf interface.
