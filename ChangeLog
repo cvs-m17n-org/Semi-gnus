@@ -1,5 +1,9 @@
 2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/message.el (message-save-drafts): Rewrite.
+
+2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
 
 	* lisp/message.el (message-fix-before-sending): Don't check for
