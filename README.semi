@@ -47,20 +47,17 @@ How to join development
 =======================
 
   If you write bug-reports and/or suggestions for improvement, please
-send them to the tm Mailing List:
+send them to the Semi-gnus mailing list:
 
-	bug-tm-en@chamonix.jaist.ac.jp	(English)
-	bug-tm-ja@chamonix.jaist.ac.jp	(Japanese)
+    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
-  Via the tm ML, you can report SEMI related bugs, obtain the latest
-release of SEMI, and discuss future enhancements to SEMI.  To join the
-tm ML, send e-mail to
+  Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
+the latest release of Semi-gnus, and discuss future enhancements to
+Semi-gnus.  To join the Semi-gnus ML, send e-mail to
 
-	tm-ja-admin@chamonix.jaist.ac.jp	(Japanese)
-	tm-en-admin@chamonix.jaist.ac.jp	(English)
-
-  Since the user registration is done manually, please write the mail
-body in human-recognizable language (^_^).
+    semi-gnus-ja-subscribe@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+    semi-gnus-en-subscribe@meadow.scphys.kyoto-u.ac.jp	(English)
 
   In addition, we need developers.  If you would like to develop it,
 please send mail to cvs@chamonix.jaist.ac.jp.
