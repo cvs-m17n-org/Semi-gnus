@@ -26,14 +26,13 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 (0) cvs login (初回のみ)
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	login
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root login
 
     CVS password: [CR] # 空文字列
 
 (1) checkout
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
 	checkout -r t-gnus-6_14 gnus
 
 (2) compile
@@ -127,12 +126,12 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
   に空のメールを送ってください。
 
   加えて、開発者を必要としています。開発に参加したい場合は、
-  cvs@chamonix.jaist.ac.jp にアカウント名と UNIX の /etc/passwd の様式
-  で暗号化されたパスワードをメールを送ってください。
-  chamonix open CVS server で行なわれた変更をメールで通知してもらうこ
-  とも可能です。これには gnus 以外の module に関する情報も含まれます。
+  cvs@cvs.m17n.org にアカウント名と UNIX の /etc/passwd の様式で暗号化
+  されたパスワードをメールを送ってください。
+  m17n open CVS server で行なわれた変更をメールで通知してもらうことも
+  可能です。これには gnus 以外の module に関する情報も含まれます。
   必要な方は
 
-    cvs-info-help@chamonix.jaist.ac.jp
+    cvs-info-help@cvs.m17n.org
 
   に空のメールを送って案内に従って下さい。

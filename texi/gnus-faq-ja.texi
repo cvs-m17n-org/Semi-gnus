@@ -97,8 +97,7 @@ CVS での取得
 @item login
 次の方法でログインします。% はプロンプトです。
 
-% cvs -d \
-   :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root login
+% cvs -d :pserver:anonymous@@cvs.m17n.org:/cvs/root login
 
   CVS password: [CR] # NULL string
 
@@ -106,15 +105,14 @@ CVS での取得
 T-gnus をチェックアウトします。実際には、-r t-gnus-6_14 のようにタグを付
 けて実行します。
 
-% cvs -d \
-   :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root \
+% cvs -d :pserver:anonymous@@cvs.m17n.org:/cvs/root \
    checkout [-r TAG] gnus
 
 @end itemize
 
 2回目からは、
 
-% cvs -d :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root \
+% cvs -d :pserver:anonymous@@cvs.m17n.org:/cvs/root \
    update [-r TAG] gnus
 
 により取得します。

@@ -24,14 +24,13 @@ How to get? (via CVS)
 
 (0) cvs login (first time only)
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	login
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root login
 
     CVS password: [CR] # NULL string
 
 (1) checkout
 
-    % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
 	checkout -r t-gnus-6_14 gnus
 
 (2) compile
@@ -122,10 +121,10 @@ To join the Semi-gnus ML, send an empty e-mail to
     semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
-please send mail to cvs@chamonix.jaist.ac.jp with your account name
-and UNIX /etc/passwd style crypted password.  You can get the notice
-of modifications in chamonix open CVS server via the mail which also
-contains informations on the other modules.  To subscribe it, send an
-empty e-mail to
+please send mail to cvs@cvs.m17n.org with your account name and UNIX
+/etc/passwd style crypted password.  You can get the notice of
+modifications in m17n open CVS server via the mail which also contains
+informations on the other modules.  To subscribe it, send an empty
+e-mail to
 
-    cvs-info-help@chamonix.jaist.ac.jp
+    cvs-info-help@cvs.m17n.org
