@@ -93,6 +93,10 @@ Modify to suit your needs."))
        (dolist (file '("nnweb.el" "nnlistserv.el" "nnultimate.el"
 		       "nnslashdot.el" "nnwarchive.el" "webmail.el"))
 	 (setq files (delete file files)))))
+    (condition-case ()
+	(require 'bbdb)
+      (error (setq files (delete "gnus-bbdb.el"
+				 (delete "mess-bbdb.el" files)))))
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
       (when (or (and (not xemacs)
