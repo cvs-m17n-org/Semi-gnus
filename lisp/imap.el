@@ -139,7 +139,7 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 (eval-when-compile
-  (ignore-errors (require 'digest-md5)))
+  (ignore-errors (require 'sasl)))
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
@@ -147,10 +147,6 @@
   (autoload 'base64-encode-string "base64")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
-  (autoload 'digest-md5-parse-digest-challenge "digest-md5")
-  (autoload 'digest-md5-digest-response "digest-md5")
-  (autoload 'digest-md5-digest-uri "digest-md5")
-  (autoload 'digest-md5-challenge "digest-md5")
   (autoload 'rfc2104-hash "rfc2104")
   (autoload 'md5 "md5")
   (autoload 'utf7-encode "utf7")
@@ -715,16 +711,11 @@ Returns t if login was successful, nil otherwise."
 	     (list
 	      "AUTHENTICATE DIGEST-MD5"
 	      (lambda (challenge)
-		(digest-md5-parse-digest-challenge
-		 (base64-decode-string challenge))
-		(let* ((digest-uri
-			(digest-md5-digest-uri 
-			 "imap" (digest-md5-challenge 'realm)))
-		       (response
-			(digest-md5-digest-response 
-			 user passwd digest-uri)))
-		  (base64-encode-string response 'no-line-break))))
-	     )))
+		(base64-encode-string
+		 (sasl-digest-md5-digest-response
+		  (base64-decode-string challenge)
+		  user passwd "imap" imap-server)
+		 'no-line-break))))))
        (if (not (eq (imap-wait-for-tag tag) 'INCOMPLETE))
 	   nil
 	 (setq imap-continuation nil)
