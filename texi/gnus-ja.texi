@@ -21239,35 +21239,34 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B ifile $B$r(B @code{spam-split} $B$K;H
 
 @defvar spam-ifile-all-categories
 
-@c TRANSLATEME!
-Enable this variable if you want @code{spam-use-ifile} to give you all
-the ifile categories, not just spam/non-spam.  If you use this, make
-sure you train ifile as described in its documentation.
+@code{spam-use-ifile} $B$K!"C1$J$k(B smap/$BHs(B-spam $B$G$O$J$/$F(B ifile $B$N$9$Y$F(B
+$B$N%+%F%4%j!<$rM?$($F$b$i$$$?$$$J$i$P!"$3$NJQ?t$rM-8z$K$7$F2<$5$$!#$3$l$r(B
+$B;H$&>l9g$O!"$=$NJ88%$K=q$+$l$F$$$k$h$&$K(B ifile $B$r71N}$7$F$*$+$J$1$l$P$J(B
+$B$j$^$;$s!#(B
 
 @end defvar
 
 @defvar spam-ifile-spam-category
 
-This is the category of spam messages as far as ifile is concerned.
-The actual string used is irrelevant, but you probably want to leave
-the default value of @samp{spam}.
+ifile $B$K4X$9$k8B$j!"$3$l$O(B spam $B%a%C%;!<%8$N%+%F%4%j!<$G$9!#<B:]$K;H$o$l(B
+$B$kJ8;zNs$OL54X78$G$9$,!"$?$V$s$"$J$?$O(B @samp{spam} $B$NCM$r;D$7$F$*$-$?$$(B
+$B$G$7$g$&!#(B
 @end defvar
 
 @defvar spam-ifile-database-path
 
-This is the filename for the ifile database.  It is not specified by
-default, so ifile will use its own default database name.
+$B$3$l$O(B ifile $B%G!<%?%Y!<%9$N%U%!%$%kL>$G$9!#%G%#%U%)%k%H$G$ODj5A$5$l$F$$(B
+$B$J$$$N$G!"(Bifile $B$O$=$l<+?H$N%G%#%U%)%k%H$N%G!<%?%Y!<%9L>$r;H$$$^$9!#(B
 
 @end defvar
 
-The ifile mail classifier is similar to Bogofilter in intent and
-purpose.  A ham and a spam processor are provided, plus the
-@code{spam-use-ifile} variable to indicate to spam-split that ifile
-should be used.  The 1.2.1 version of ifile was used to test this
-functionality.
+ifile $B$N%a!<%kJ,N`4o$O!"0U?^$HL\E*$NE@$G(B Bogofilter $B$K;w$F$$$^$9!#(B
+Spam $B$H(B ham $B$N%W%m%;%C%5!<!"$=$l$K(B spam-$BJ,3d(B (spam-split) $B$K(B ifile $B$,;H(B
+$B$o$l$k$Y$-$G$"$k$3$H$r<($9(B @code{spam-use-ifile} $BJQ?t$rDs6!$7$^$9!#$3$N(B
+$B5!G=$r8!::$9$k$?$a$K(B ifile $B$N%P!<%8%g%s(B 1.2.1 $B$,;H$o$l$^$7$?!#(B
 
 @node spam-stat spam filtering
-@subsubsection spam-stat spam filtering
+@subsubsection spam-$BE}7W(B (spam-stat) $B$K$h$k(B spam $B$N_I2a(B
 @cindex spam filtering
 @cindex spam-stat, spam filtering
 @cindex spam-stat.el
@@ -21277,34 +21276,34 @@ functionality.
 
 @defvar spam-use-stat
 
-Enable this variable if you want @code{spam-split} to use
-spam-stat.el, an Emacs Lisp statistical analyzer.
+Emacs Lisp $B$K$h$kE}7WJ,@O4o$G$"$k(B spam-stat.el $B$r(B @code{spam-split} $B$K;H(B
+$B$o$;$?$$$J$i$P!"$3$NJQ?t$rM-8z$K$7$F2<$5$$!#(B
 
 @end defvar
 
 @defvar gnus-group-spam-exit-processor-stat
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameters or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is
-added to a group's @code{spam-process} parameter, the spam-marked
-articles will be added to the spam-stat database of spam messages.
+$B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
+$B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
+$B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
+$B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bspam $B0u$,IU$$(B
+$B$?5-;v$,(B spam $B5-;vMQ$N(B spam-stat $B%G!<%?%Y!<%9$KDI2C$5$l$^$9!#(B
 @end defvar
 
 @defvar gnus-group-ham-exit-processor-stat
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameters or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is
-added to a group's @code{spam-process} parameter, the ham-marked
-articles in @emph{ham} groups will be added to the spam-stat database
-of non-spam messages.  Note that this ham processor has no effect in
-@emph{spam} or @emph{unclassified} groups.
+$B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
+$B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
+$B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
+$B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
+$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$,Hs(B-spam $B5-;vMQ$N(B spam-stat $B%G!<%?%Y!<%9$K(B
+$BDI2C$5$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<(B
+$B%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
 @end defvar
 
-This enables spam.el to cooperate with spam-stat.el.  spam-stat.el
-provides an internal (Lisp-only) spam database, which unlike ifile or
-Bogofilter does not require external programs.  A spam and a ham
-processor, and the @code{spam-use-stat} variable for @code{spam-split}
-are provided.
+$B$3$l$O(B spam.el $B$,(B spam-stat.el $B$HF/$-9g$&$3$H$r2DG=$K$7$^$9!#(B
+spam-stat.el $B$O(B (Lisp $B$@$1$N(B) spam $BFbIt%G!<%?%Y!<%9$rDs6!$7$^$9$,!"$=$l(B
+$B$O(B ifile $B$d(B Bogofilter $B$H0c$C$F30It%W%m%0%i%`$rI,MW$H$7$^$;$s!#(B
+Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
+$B$N(B @code{spam-use-stat} $BJQ?t$,Ds6!$5$l$^$9!#(B
 
 @node Extending spam.el
 @subsubsection spam.el $B$N3HD%(B
@@ -21435,7 +21434,7 @@ gnus $B$O$3$N<o$N_I2a$r%5%]!<%H$7$^$9!#$7$+$7$=$l$K$O$$$/$D$+$N@_Dj$,I,MW(B
 @end menu
 
 @node Creating a spam-stat dictionary
-@subsubsection spam-stat $B<-=q$r:n$k(B
+@subsubsection spam-$BE}7W(B (spam-stat) $B<-=q$r:n$k(B
 
 $BE}7W$K4p$E$$$?(B spam $B_I2a$r;O$a$k$K$O!"$"$J$?$OFs$D$N%a!<%k$N%3%l%/%7%g%s(B
 $B$K4p$E$$$?E}7W$r:n$i$J$1$l$P$J$j$^$;$s!#0l$D$O(B spam $B$b$&0l$D$OHs(B-spam $B$G!#(B
@@ -21498,7 +21497,7 @@ nnml $B%P%C%/%(%s%I$O0lDL$N%a!<%k$K$D$-0l$D$N%U%!%$%k$G!"$9$Y$F$N%a!<%k$r(B
 @end defvar
 
 @node Splitting mail using spam-stat
-@subsubsection spam-stat $B$r;H$C$F%a!<%k$rJ,3d$9$k(B
+@subsubsection spam-$BE}7W(B (spam-stat) $B$r;H$C$F%a!<%k$rJ,3d$9$k(B
 
 @code{spam-stat} $B$r;H$C$F%a!<%k$rJ,3d$9$k$?$a$K!"(B@file{~/.gnus} $B%U%!%$%k(B
 $B$K0J2<$rDI2C$9$kI,MW$,$"$j$^$9!#(B
@@ -21567,7 +21566,7 @@ Spam $BMQ$N%0%k!<%W$G$9!#%G%#%U%)%k%H$O(B @samp{mail.spam} $B$G$9!#(B
 @end example
 
 @node Low-level interface to the spam-stat dictionary
-@subsubsection spam-stat $B<-=q$X$NDc3,AX%$%s%?!<%U%'!<%9(B
+@subsubsection spam-$BE}7W(B (spam-stat) $B<-=q$X$NDc3,AX%$%s%?!<%U%'!<%9(B
 
 @code{spam-stat} $B$r;H$&$?$a$N<g%$%s%?!<%U%'!<%9$O0J2<$N4X?t$G$9(B:
 
