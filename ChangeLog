@@ -1,7 +1,17 @@
+1998-10-02  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-kill-buffer): Refer to
+	`message-kill-buffer-query-function'.
+
+	* lisp/message.el (message-kill-buffer-query-function): New user
+	option.
+
+	* lisp/nnheader.el (nnheader-Y-or-n-p): New function.
+
 1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el(pop3-fma-movemail): Bug fix.
-	
+
 1998-10-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el: Fix my stupid changes.
