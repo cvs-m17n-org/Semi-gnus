@@ -1066,10 +1066,10 @@ FUNC will be called with the group name to determine the article number."
 	;; existence to process.
 	(goto-char (point-min))
 	(while (not (eobp))
-	  (end-of-line)
-	  (if (> (current-column) nnmail-split-header-length-limit)
-	      (delete-region (point) (progn (end-of-line) (point)))
-	    (forward-line 1)))
+	  (unless (< (move-to-column nnmail-split-header-length-limit)
+		     nnmail-split-header-length-limit)
+	    (delete-region (point) (progn (end-of-line) (point))))
+	  (forward-line 1))
 	;; Allow washing.
 	(goto-char (point-min))
 	(run-hooks 'nnmail-split-hook)
