@@ -1,3 +1,12 @@
+1999-09-07  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.13.7 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.7.
+
+	* lisp/nnmail.el (nnmail-move-inbox): Do not change current
+	buffer. And change require timing of password.
+
 1999-09-01  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.13.6 released.
