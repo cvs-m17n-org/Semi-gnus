@@ -246,13 +246,14 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.0.10"
+(defconst gnus-version-number "6.1.1"
   "Version number for this version of gnus.")
-  
+
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.3)" gnus-version-number)
+  (format "Semi-gnus %s (based on Gnus 5.6.3; for SEMI 1.1)"
+          gnus-version-number)
   "Version string for this version of gnus.")
-  
+
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
 This variable is used before `.gnus.el' is loaded, so it should

@@ -3079,7 +3079,7 @@ Headers already prepared in the buffer are not modified."
 	    (insert "Original-")
 	    (beginning-of-line))
 	  (when (or (message-news-p)
-		    (string-match "^[^@]@.+\\..+" secure-sender))
+		    (string-match "^[^@]+@.+\\..+" secure-sender))
 	    (insert "Sender: " secure-sender "\n")))))))
 
 (defun message-insert-courtesy-copy ()
@@ -3586,7 +3586,7 @@ responses here are directed to other newsgroups."))
 	;; Make sure that this article was written by the user.
 	(unless (string-equal
 		 (downcase
-		  (or sender (cadr (mail-extract-address-components from))))
+		  (or sender (cadr (std11-extract-address-components from))))
 		 (downcase (message-make-address)))
 	  (error "This article is not yours"))
 	;; Make control message.

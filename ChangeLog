@@ -1,4 +1,7 @@
-1998-03-20  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+1998-03-20  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el	(gnus-version-number): Update to 6.1.1.
+	(gnus-version): Include corresponding SEMI version.
 
 	* Sync up with Gnus 5.6.3.
 
