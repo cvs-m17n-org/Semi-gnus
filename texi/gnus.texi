@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v0.11}
+\newcommand{\gnusversionname}{Oort Gnus v0.12}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -385,7 +385,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Oort Gnus v0.11.
+This manual corresponds to Oort Gnus v0.12.
 
 @end ifinfo
 
@@ -8746,6 +8746,12 @@ they'll be removed.
 Display an @code{X-Face} in the @code{From} header.
 (@code{gnus-article-display-x-face}).
 
+@item W D d
+@kindex W D d (Summary)
+@findex gnus-article-display-face
+Display a @code{Face} in the @code{From} header.
+(@code{gnus-article-display-face}).
+
 @item W D s
 @kindex W D s (Summary)
 @findex gnus-treat-smiley
@@ -10990,10 +10996,20 @@ that have none when you do a @kbd{a}.
 
 @item gnus-confirm-mail-reply-to-news
 @vindex gnus-confirm-mail-reply-to-news
-If non-@code{nil}, Gnus requests confirmation when replying to news.
+This can also be a function receiving the group name as the only
+parameter which should return non-@code{nil} if a confirmation is
+needed, or a regular expression matching group names, where
+confirmation is should be asked for.
+
 If you find yourself never wanting to reply to mail, but occasionally
 press R anyway, this variable might be for you.
 
+@item gnus-confirm-treat-mail-like-news
+@vindex gnus-confirm-treat-mail-like-news
+If non-@code{nil}, Gnus also requests confirmation according to
+@code{gnus-confirm-mail-reply-to-news} when replying to mail.  This is
+useful for treating mailing lists like newsgroups.
+ 
 @end table
 
 
