@@ -1,3 +1,9 @@
+2001-11-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* texi/infohack.el (infohack-texi-format): To process
+	write-protected files safely, make this buffer be writable after
+	`find-file'
+
 2001-11-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (customize-save-variable): Defun-maybe.
@@ -17,7 +23,7 @@
 
 	* lisp/message.el (rfc822-goto-eoh): Remove.
 
-2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-10-19  Kai Gro.AN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Frank Schmitt <ich@Frank-Schmitt.net>.
 
 	* make-x.bat: Use correct directory structure for XEmacs on Windows.
@@ -115,7 +121,7 @@
 
 	* configure.in: Generate texi/ps/Makefile.
 
-2001-09-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-09-21  Kai GroN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make.bat: Use parameter "/copy" rather than "copy" for increased
 	dwimishness for old-time DOS users.

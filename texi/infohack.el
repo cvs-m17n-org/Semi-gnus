@@ -79,6 +79,7 @@
     (condition-case err
 	(progn
 	  (find-file file)
+	  (setq buffer-read-only nil)
 	  (buffer-disable-undo (current-buffer))
 	  (if (boundp 'MULE)
 	      (setq output-coding-system file-coding-system)
