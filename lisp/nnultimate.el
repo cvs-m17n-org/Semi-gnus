@@ -36,17 +36,11 @@
 (require 'gnus)
 (require 'nnmail)
 (require 'mm-util)
-(require 'nnweb)
 (eval-when-compile
   (ignore-errors
-    (require 'w3)
-    (require 'url)
-    (require 'w3-forms)))
+    (require 'nnweb)))
 ;; Report failure to find w3 at load time if appropriate.
-(eval '(progn
-	 (require 'w3)
-	 (require 'url)
-	 (require 'w3-forms)))
+(eval '(require 'nnweb))
 
 (nnoo-declare nnultimate)
 
@@ -143,7 +137,7 @@
 	    ;;(setq total-contents (nreverse total-contents))
 	    (dolist (art (cdr elem))
 	      (if (not (nth (1- (cdr art)) total-contents))
-		  ();(debug)
+		  ()			;(debug)
 		(push (list (car art)
 			    (nth (1- (cdr art)) total-contents)
 			    subject)
@@ -374,8 +368,8 @@
     (nnultimate-open-server server))
   (unless nnultimate-groups-alist
     (nnultimate-read-groups)
-  (setq nnultimate-groups (cdr (assoc nnultimate-address
-				      nnultimate-groups-alist)))))
+    (setq nnultimate-groups (cdr (assoc nnultimate-address
+					nnultimate-groups-alist)))))
 
 (deffoo nnultimate-open-server (server &optional defs connectionless)
   (nnheader-init-server-buffer)
@@ -439,9 +433,13 @@
 	  case-fold-search)
       (when (and href (string-match
 		       "postings\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio"
-				    href))
+		       href))
 	t))))
 
 (provide 'nnultimate)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; nnultimate.el ends here

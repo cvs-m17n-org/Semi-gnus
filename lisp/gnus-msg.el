@@ -44,8 +44,8 @@ This method will not be used in mail groups and the like, only in
 \"real\" newsgroups.
 
 If not nil nor `native', the value must be a valid method as discussed
-in the documentation of `gnus-select-method'. It can also be a list of
-methods. If that is the case, the user will be queried for what select
+in the documentation of `gnus-select-method'.  It can also be a list of
+methods.  If that is the case, the user will be queried for what select
 method to use when posting."
   :group 'gnus-group-foreign
   :type `(choice (const nil)
@@ -99,17 +99,6 @@ the second with the current group name.")
 
 (defvar gnus-posting-styles nil
   "*Alist of styles to use when posting.")
-
-(defcustom gnus-group-posting-charset-alist
-  '(("^no\\." iso-8859-1)
-    (message-this-is-mail nil)
-    ("^de\\." nil)
-    (".*" iso-8859-1)
-    (message-this-is-news iso-8859-1))
-  "Alist of regexps (to match group names) and default charsets to be unencoded when posting."
-  :type '(repeat (list (regexp :tag "Group")
-		       (symbol :tag "Charset")))
-  :group 'gnus-charset)
 
 ;;; Internal variables.
 
@@ -210,29 +199,10 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,group ,article))
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
-	 (set (make-local-variable 'default-mime-chaset)
-	      (gnus-setup-posting-charset ,group))
-	 (gnus-setup-posting-charset ,group)
 	 (gnus-run-hooks 'gnus-message-setup-hook))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
-
-(defun gnus-setup-posting-charset (group)
-  (let ((alist gnus-group-posting-charset-alist)
-	(group (or group ""))
-	elem)
-    (when group
-      (catch 'found
-	(while (setq elem (pop alist))
-	  (when (or (and (stringp (car elem))
-			 (string-match (car elem) group))
-		    (and (gnus-functionp (car elem))
-			 (funcall (car elem) group))
-		    (and (symbolp (car elem))
-			 (symbol-value (car elem))))
-	    (throw 'found (cadr elem))))
-	default-mime-charset))))
 
 (defun gnus-inews-add-send-actions (winconf buffer article)
   (make-local-hook 'message-sent-hook)

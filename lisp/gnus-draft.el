@@ -67,8 +67,8 @@
   (interactive "P")
   (when (eq major-mode 'gnus-summary-mode)
     (when (set (make-local-variable 'gnus-draft-mode)
-		  (if (null arg) (not gnus-draft-mode)
-		    (> (prefix-numeric-value arg) 0)))
+	       (if (null arg) (not gnus-draft-mode)
+		 (> (prefix-numeric-value arg) 0)))
       ;; Set up the menu.
       (when (gnus-visual-p 'draft-menu 'menu)
 	(gnus-draft-make-menu-bar))
@@ -205,21 +205,22 @@
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
-(defun gnus-draft-setup-for-editing (narticle group)
-  (gnus-setup-message 'forward
-    (let ((article narticle))
-      (message-mail)
-      (erase-buffer)
-      (if (not (gnus-request-restore-buffer article group))
-	  (error "Couldn't restore the article")
-	;; Insert the separator.
-	(funcall gnus-draft-decoding-function)
-	(goto-char (point-min))
-	(search-forward "\n\n")
-	(forward-char -1)
-	(insert mail-header-separator)
-	(forward-line 1)
-	(message-set-auto-save-file-name)))))
+(progn
+  (defun gnus-draft-setup-for-editing (narticle group)
+    (gnus-setup-message 'forward
+      (let ((article narticle))
+	(message-mail)
+	(erase-buffer)
+	(if (not (gnus-request-restore-buffer article group))
+	    (error "Couldn't restore the article")
+	  ;; Insert the separator.
+	  (funcall gnus-draft-decoding-function)
+	  (goto-char (point-min))
+	  (search-forward "\n\n")
+	  (forward-char -1)
+	  (insert mail-header-separator)
+	  (forward-line 1)
+	  (message-set-auto-save-file-name))))))
 
 (defvar gnus-draft-send-draft-buffer " *send draft*")
 (defun gnus-draft-setup-for-sending (narticle group)

@@ -1,10 +1,10 @@
 ;;; mm-uu.el -- Return uu stuffs as mm handles
-;; Copyright (c) 1998,99 by Shenghuo Zhu
+;; Copyright (c) 1998,99 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; Keywords: postscript uudecode binhex shar forward
+;; Keywords: postscript uudecode binhex shar forward news
 
-;; This file is part of pgnus.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ To disable dissecting shar codes, for instance, add
 		       (let ((nnheader-file-name-translation-alist
 			      '((?/ . ?,) (? . ?_) (?* . ?_) (?$ . ?_))))
 			 (nnheader-translate-file-chars (match-string 1))))))
-	(forward-line) ;; in case of failure
+	(forward-line);; in case of failure
 	(setq start-char-1 (point))
 	(setq end-line (symbol-value
 			(intern (concat "mm-uu-" (symbol-name type)
@@ -172,48 +172,48 @@ To disable dissecting shar codes, for instance, add
 	    (if (> start-char text-start)
 		(push
 		 (mm-make-handle (mm-uu-copy-to-buffer text-start start-char)
-		       text-plain-type)
+				 text-plain-type)
 		 result))
 	    (push
 	     (cond
 	      ((eq type 'postscript)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
-		     '("application/postscript")))
+			       '("application/postscript")))
 	      ((eq type 'forward)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char-1 end-char-1)
 			       '("message/rfc822" (charset . gnus-decoded))))
 	      ((eq type 'uu)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
-		     (list (or (and file-name
-				    (string-match "\\.[^\\.]+$" file-name)
-				    (mm-mailcap-extension-to-mime
-				     (match-string 0 file-name)))
-			       "application/octet-stream"))
-		     'x-uuencode nil
-		     (if (and file-name (not (equal file-name "")))
-			 (list mm-dissect-disposition
-			       (cons 'filename file-name)))))
+			       (list (or (and file-name
+					      (string-match "\\.[^\\.]+$" file-name)
+					      (mm-mailcap-extension-to-mime
+					       (match-string 0 file-name)))
+					 "application/octet-stream"))
+			       'x-uuencode nil
+			       (if (and file-name (not (equal file-name "")))
+				   (list mm-dissect-disposition
+					 (cons 'filename file-name)))))
 	      ((eq type 'binhex)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
-		     (list (or (and file-name
-				    (string-match "\\.[^\\.]+$" file-name)
-				    (mm-mailcap-extension-to-mime
-				     (match-string 0 file-name)))
-			       "application/octet-stream"))
-		     'x-binhex nil
-		     (if (and file-name (not (equal file-name "")))
-			 (list mm-dissect-disposition
-			       (cons 'filename file-name)))))
+			       (list (or (and file-name
+					      (string-match "\\.[^\\.]+$" file-name)
+					      (mm-mailcap-extension-to-mime
+					       (match-string 0 file-name)))
+					 "application/octet-stream"))
+			       'x-binhex nil
+			       (if (and file-name (not (equal file-name "")))
+				   (list mm-dissect-disposition
+					 (cons 'filename file-name)))))
 	      ((eq type 'shar)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
-		     '("application/x-shar"))))
+			       '("application/x-shar"))))
 	     result)
 	    (setq text-start end-char))))
       (when result
 	(if (> (point-max) (1+ text-start))
 	    (push
 	     (mm-make-handle (mm-uu-copy-to-buffer text-start (point-max))
-		   text-plain-type)
+			     text-plain-type)
 	     result))
 	(setq result (cons "multipart/mixed" (nreverse result))))
       result)))

@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mail-parse)
 (require 'mm-mailcap)
 (require 'mm-bodies)
@@ -106,10 +107,11 @@
 	     `(lambda ()
 		(let (buffer-read-only)
 		  (if (functionp 'remove-specifier)
-		      (mapc (lambda (prop)
-			      (remove-specifier
-			       (face-property 'default prop) (current-buffer)))
-			    '(background background-pixmap foreground)))
+		      (mapcar (lambda (prop)
+				(remove-specifier
+				 (face-property 'default prop)
+				 (current-buffer)))
+			      '(background background-pixmap foreground)))
 		  (delete-region ,(point-min-marker)
 				 ,(point-max-marker)))))))))
      ((or (equal type "enriched")
@@ -170,7 +172,7 @@
   (mm-enable-multibyte)
   (let (handles)
     (let (gnus-article-mime-handles)
-      ;; Double decode problem may happen. See mm-inline-message.
+      ;; Double decode problem may happen.  See mm-inline-message.
       (run-hooks 'gnus-article-decode-hook)
       (gnus-article-prepare-display)
       (setq handles gnus-article-mime-handles))
@@ -213,12 +215,13 @@
 	 handle
 	 `(lambda ()
 	    (let (buffer-read-only)
-	      (ignore-errors
-		;; This is only valid on XEmacs.
-		(mapc (lambda (prop)
-			(remove-specifier
-			 (face-property 'default prop) (current-buffer)))
-		      '(background background-pixmap foreground)))
+	      (condition-case nil
+		  ;; This is only valid on XEmacs.
+		  (mapcar (lambda (prop)
+			    (remove-specifier
+			     (face-property 'default prop) (current-buffer)))
+			  '(background background-pixmap foreground))
+		(error nil))
 	      (delete-region ,(point-min-marker) ,(point-max-marker)))))))))
 
 (defun mm-display-patch-inline (handle)

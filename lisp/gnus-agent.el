@@ -77,6 +77,11 @@ If nil, only read articles will be expired."
   :group 'gnus-agent
   :type 'hook)
 
+(defcustom gnus-agent-confirmation-function 'y-or-n-p
+  "Function to confirm when error happens."
+  :group 'gnus-agent
+  :type 'function)
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -694,11 +699,15 @@ the actual number of articles toggled is returned."
   (save-excursion
     (set-buffer gnus-agent-current-history)
     (goto-char (point-max))
-    (insert id "\t" (number-to-string date) "\t")
-    (while group-arts
-      (insert (caar group-arts) " " (number-to-string (cdr (pop group-arts)))
-	      " "))
-    (insert "\n")))
+    (let ((p (point)))
+      (insert id "\t" (number-to-string date) "\t")
+      (while group-arts
+	(insert (format "%S" (intern (caar group-arts)))
+		" " (number-to-string (cdr (pop group-arts)))
+		" "))
+      (insert "\n")
+      (while (search-backward "\\." p t)
+	(delete-char 1)))))
 
 (defun gnus-agent-article-in-history-p (id)
   (save-excursion
@@ -727,7 +736,7 @@ the actual number of articles toggled is returned."
     ;; Prune off articles that we have already fetched.
     (while (and articles
 		(cdr (assq (car articles) gnus-agent-article-alist)))
-     (pop articles))
+      (pop articles))
     (let ((arts articles))
       (while (cdr arts)
 	(if (cdr (assq (cadr arts) gnus-agent-article-alist))
@@ -748,7 +757,10 @@ the actual number of articles toggled is returned."
 	  (with-temp-buffer
 	    (let (article)
 	      (while (setq article (pop articles))
-		(when (gnus-request-article article group)
+		(when (or 
+		       (gnus-backlog-request-article group article 
+						     nntp-server-buffer)
+		       (gnus-request-article article group))
 		  (goto-char (point-max))
 		  (push (cons article (point)) pos)
 		  (insert-buffer-substring nntp-server-buffer)))
@@ -807,7 +819,7 @@ the actual number of articles toggled is returned."
       (setcdr alist (cons (cons (cdar crosses) t) (cdr alist)))
       (save-excursion
 	(set-buffer (gnus-get-buffer-create (format " *Gnus agent overview %s*"
-					       group)))
+						    group)))
 	(when (= (point-max) (point-min))
 	  (push (cons group (current-buffer)) gnus-agent-buffer-alist)
 	  (ignore-errors
@@ -842,15 +854,15 @@ the actual number of articles toggled is returned."
     ;; add article with marks to list of article headers we want to fetch
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
       (setq articles (union (gnus-uncompress-sequence (cdr arts))
-                           articles)))
+			    articles)))
     (setq articles (sort articles '<))
     ;; remove known articles
     (when (gnus-agent-load-alist group)
       (setq articles (gnus-sorted-intersection
-                     articles
-                     (gnus-uncompress-range
-                      (cons (1+ (caar (last gnus-agent-article-alist)))
-                            (cdr (gnus-active group)))))))
+		      articles
+		      (gnus-uncompress-range
+		       (cons (1+ (caar (last gnus-agent-article-alist)))
+			     (cdr (gnus-active group)))))))
     ;; Fetch them.
     (gnus-make-directory (nnheader-translate-file-chars
 			  (file-name-directory file)))
@@ -947,12 +959,18 @@ the actual number of articles toggled is returned."
   (concat (gnus-agent-directory) (gnus-agent-group-path group) "/"
 	  (if (stringp article) article (string-to-number article))))
 
+(defun gnus-agent-batch-confirmation (msg)
+  "Show error message and return t."
+  (gnus-message 1 msg)
+  t)
+
 ;;;###autoload
 (defun gnus-agent-batch-fetch ()
   "Start Gnus and fetch session."
   (interactive)
   (gnus)
-  (gnus-agent-fetch-session)
+  (let ((gnus-agent-confirmation-function 'gnus-agent-batch-confirmation))
+    (gnus-agent-fetch-session))
   (gnus-group-exit))
 
 (defun gnus-agent-fetch-session ()
@@ -966,14 +984,20 @@ the actual number of articles toggled is returned."
 	groups group gnus-command-method)
     (save-excursion
       (while methods
-	(setq gnus-command-method (car methods))
-	(when (or (gnus-server-opened gnus-command-method)
-		  (gnus-open-server gnus-command-method))
-	  (setq groups (gnus-groups-from-server (car methods)))
-	  (gnus-agent-with-fetch
-	    (while (setq group (pop groups))
-	      (when (<= (gnus-group-level group) gnus-agent-handle-level)
-		(gnus-agent-fetch-group-1 group gnus-command-method)))))
+	(condition-case err
+	    (progn
+	      (setq gnus-command-method (car methods))
+	      (when (or (gnus-server-opened gnus-command-method)
+			(gnus-open-server gnus-command-method))
+		(setq groups (gnus-groups-from-server (car methods)))
+		(gnus-agent-with-fetch
+		  (while (setq group (pop groups))
+		    (when (<= (gnus-group-level group) gnus-agent-handle-level)
+		      (gnus-agent-fetch-group-1 group gnus-command-method))))))
+	  (error 
+	   (unless (funcall gnus-agent-confirmation-function
+			    (format "Error (%s).  Continue? " err))
+	     (error "Cannot fetch articles into the Gnus agent."))))
 	(pop methods))
       (gnus-message 6 "Finished fetching articles into the Gnus agent"))))
 
@@ -1002,12 +1026,12 @@ the actual number of articles toggled is returned."
 			 (gnus-get-newsgroup-headers-xover articles nil nil 
 							   group)))
 		 ;; `gnus-agent-overview-buffer' may be killed for
-		 ;; timeout reason. If so, recreate it.
+		 ;; timeout reason.  If so, recreate it.
 		 (gnus-agent-create-buffer)))
       (setq category (gnus-group-category group))
       (setq predicate
 	    (gnus-get-predicate
-            (or (gnus-group-find-parameter group 'agent-predicate t)
+	     (or (gnus-group-find-parameter group 'agent-predicate t)
 		 (cadr category))))
       ;; Do we want to download everything, or nothing?
       (if (or (eq (caaddr predicate) 'gnus-agent-true)
@@ -1240,7 +1264,7 @@ The following commands are available:
     (gnus-edit-form
      (cadr info) (format "Editing the predicate for category %s" category)
      `(lambda (predicate)
-	(setf (cadr (assq ',category gnus-category-alist)) predicate)
+	(setcar (cdr (assq ',category gnus-category-alist)) predicate)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
@@ -1252,7 +1276,7 @@ The following commands are available:
      (caddr info)
      (format "Editing the score expression for category %s" category)
      `(lambda (groups)
-	(setf (caddr (assq ',category gnus-category-alist)) groups)
+	(setcar (cddr (assq ',category gnus-category-alist)) groups)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
@@ -1263,7 +1287,7 @@ The following commands are available:
     (gnus-edit-form
      (cadddr info) (format "Editing the group list for category %s" category)
      `(lambda (groups)
-	(setf (cadddr (assq ',category gnus-category-alist)) groups)
+	(setcar (nthcdr 3 (assq ',category gnus-category-alist)) groups)
 	(gnus-category-write)
 	(gnus-category-list)))))
 
@@ -1433,8 +1457,9 @@ The following commands are available:
 		    (forward-line 1)
 		  ;; Old article.  Schedule it for possible nuking.
 		  (while (not (eolp))
-		    (setq sym (let ((obarray expiry-hashtb))
-				(read (current-buffer))))
+		    (setq sym (let ((obarray expiry-hashtb) s)
+				(setq s (read (current-buffer)))
+				(if (stringp s) (intern s) s)))
 		    (if (boundp sym)
 			(set sym (cons (cons (read (current-buffer)) (point))
 				       (symbol-value sym)))
@@ -1464,7 +1489,7 @@ The following commands are available:
 		 (set-buffer overview)
 		 (erase-buffer)
 		 (when (file-exists-p nov-file)
-	       (nnheader-insert-file-contents nov-file))
+		   (nnheader-insert-file-contents nov-file))
 		 (goto-char (point-min))
 		 (setq article 0)
 		 (while (setq elem (pop articles))
