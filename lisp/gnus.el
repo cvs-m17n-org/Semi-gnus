@@ -1784,8 +1784,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-summary-post-forward gnus-summary-wide-reply-with-original
       gnus-summary-post-forward)
      ("gnus-picon" :interactive t gnus-article-display-picons
-      gnus-group-display-picons gnus-picons-article-display-x-face
-      gnus-picons-display-x-face)
+      gnus-group-display-picons)
      ("gnus-picon" gnus-picons-buffer-name)
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
