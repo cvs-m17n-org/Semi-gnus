@@ -285,6 +285,14 @@ in some newsgroups, set the variable to nil in
 		 (function-item gnus-summary-first-unread-article)
 		 (function-item gnus-summary-best-unread-article)))
 
+(defcustom gnus-dont-select-after-jump-to-other-group nil
+  "If non-nil, don't select the first unread article after entering the
+other group by the command `gnus-summary-jump-to-other-group'.  If nil,
+it is depend on the value of `gnus-auto-select-first' whether to select
+or not."
+  :group 'gnus-group-select
+  :type 'boolean)
+
 (defcustom gnus-auto-select-next t
   "*If non-nil, offer to go to the next group from the end of the previous.
 If the value is t and the next newsgroup is empty, Gnus will exit
@@ -2694,7 +2702,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	      (and gnus-newsgroup-name
 		   (string-equal gnus-newsgroup-name group)))
     (gnus-summary-exit)
-    (gnus-summary-read-group group show-all t)))
+    (gnus-summary-read-group group show-all
+			     gnus-dont-select-after-jump-to-other-group)))
 
 (defun gnus-summary-read-group-1 (group show-all no-article
 					kill-buffer no-display
