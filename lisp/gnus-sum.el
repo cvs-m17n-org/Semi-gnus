@@ -3065,7 +3065,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		 (gnus-nov-field)	; refs
 		 (gnus-nov-read-integer) ; chars
 		 (gnus-nov-read-integer) ; lines
-		 (unless (= (char-after) ?\n)
+		 (unless (= (following-char) ?\n)
 		   (gnus-nov-field)))))	; misc
 
       (widen))
