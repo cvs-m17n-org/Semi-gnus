@@ -552,8 +552,7 @@ noticing asynchronous data.")
    (t
     nil)))
 
-(eval-when-compile
-  (defvar nntp-with-open-group-first-pass nil))
+(defvar nntp-with-open-group-first-pass nil)
 
 (defmacro nntp-with-open-group (group server &optional connectionless &rest forms)
   "Protect against servers that don't like clients that keep idle connections opens.  The problem
