@@ -275,7 +275,6 @@ be fed to `format-time-string'."
   :group 'gnus-article-washing)
 
 (eval-and-compile
-  (autoload 'hexl-hex-string-to-integer "hexl")
   (autoload 'timezone-make-date-arpa-standard "timezone")
   (autoload 'mail-extract-address-components "mail-extr"))
 
@@ -958,6 +957,18 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
+(defun gnus-article-decode-mime-words ()
+  "Decode all MIME-encoded words in the article."
+  (interactive)
+  (save-excursion
+    (let ((inhibit-point-motion-hooks t)
+	  buffer-read-only)
+      (mm-decode-words-region (point-min) (point-max)))))
+
+(defalias 'gnus-decode-rfc1522 'gnus-article-decode-rfc1522)
+
+;;
+;; Semi-gnus specific
 (defun gnus-article-decode-rfc1522 ()
   "Decode MIME encoded-words in header fields."
   (let (buffer-read-only)
@@ -966,6 +977,27 @@ characters to translate to."
 		     default-mime-charset)))
       (eword-decode-header charset)
       )))
+;;
+;; Semi-gnus specific
+
+(defun article-de-quoted-unreadable (&optional force)
+  "Translate a quoted-printable-encoded article.
+If FORCE, decode the article whether it is marked as quoted-printable
+or not."
+  (interactive (list 'force))
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (type (gnus-fetch-field "content-transfer-encoding")))
+      (gnus-article-decode-rfc1522)
+      (when (or force
+		(and type (string-match "quoted-printable" (downcase type))))
+	(goto-char (point-min))
+	(search-forward "\n\n" nil 'move)
+	(quoted-printable-decode-region (point) (point-max))))))
+
+(defun article-mime-decode-quoted-printable-buffer ()
+  "Decode Quoted-Printable in the current buffer."
+  (quoted-printable-decode-region (point-min) (point-max)))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1162,7 +1194,7 @@ Put point at the beginning of the signature separator."
 	   (setq b (point))
 	 (point-max))
        (setq e (point-max)))
-      (nnheader-temp-write nil
+      (with-temp-buffer
 	(insert-buffer-substring gnus-article-buffer b e)
 	(require 'url)
 	(save-window-excursion
@@ -1907,6 +1939,8 @@ commands:
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (set-syntax-table gnus-article-mode-syntax-table)
+  (when (fboundp 'set-buffer-multibyte)
+    (set-buffer-multibyte t))
   (gnus-run-hooks 'gnus-article-mode-hook))
 
 (defun gnus-article-setup-buffer ()
@@ -2160,7 +2194,7 @@ Provided for backwards compatibility."
 (defun gnus-output-to-file (file-name)
   "Append the current article to a file named FILE-NAME."
   (let ((artbuf (current-buffer)))
-    (nnheader-temp-write nil
+    (with-temp-buffer
       (insert-buffer-substring artbuf)
       ;; Append newline at end of the buffer as separator, and then
       ;; save it to file.
@@ -3097,7 +3131,7 @@ specified by `gnus-button-alist'."
 
 (defun gnus-url-parse-query-string (query &optional downcase)
   (let (retval pairs cur key val)
-    (setq pairs (gnus-split-string query "&"))
+    (setq pairs (split-string query "&"))
     (while pairs
       (setq cur (car pairs)
             pairs (cdr pairs))

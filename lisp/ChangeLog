@@ -1,3 +1,67 @@
+ Sun Aug 30 00:59:15 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+  
+ 	* gnus.el: Pterodactyl Gnus v0.6 is released.
+  
+1998-08-30 00:36:28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+  
+ 	* nnheader.el (fboundp): Protect code-coding-string.
+  
+ 	* gnus-art.el (gnus-article-mode): Check that set-buffer-multibyte 
+ 	is available.
+  
+Sat Aug 29 23:24:31 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+  
+ 	* gnus.el: Pterodactyl Gnus v0.5 is released.
+  
+1998-08-29 22:38:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+  
+ 	* gnus-art.el (gnus-article-mode): Make article buffer multibyte. 
+ 	(gnus-hack-decode-rfc1522): Removed.
+  
+ 	* mm-decode.el (mm-charset-coding-system-alist): Check better.
+  
+Sat Aug 29 22:20:39 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+  
+ 	* gnus.el: Gnus v0.4 is released.
+  
+1998-08-29 20:53:29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+  
+ 	* gnus-art.el (gnus-article-decode-mime-words): New command and
+  	keystroke. 
+  
+ 	* qp.el (quoted-printable-decode-region): Don't use hexl.
+  
+ 	* gnus-xmas.el (gnus-xmas-logo-color-style): Changed to dino.
+  
+ 	* gnus-sum.el (gnus-parse-headers-hook): Default to nil.
+ 	(gnus-structured-field-decoder): Removed.
+ 	(gnus-unstructured-field-decoder): Ditto.
+  
+ 	* mm-decode.el: New file.
+  
+ 	* qp.el: New file.
+  
+ 	* gnus-art.el (article-mime-decode-quoted-printable): Removed.
+  
+ 	* gnus-ems.el (fboundp): Removed gnus-split-string.
+  
+ 	* gnus.el (gnus-splash-face): Doc fix.
+  
+ 	* gnus-ems.el (fboundp): Don't bind mail-file-babyl-p.
+  
+ 	* gnus-art.el (article-mime-decode-quoted-printable): Don't use
+ 	hexl. 
+  
+ 	* nnheader.el (nnheader-temp-write): Removed.
+  
+Sat Aug 29 20:34:17 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+  
+ 	* gnus.el: Gnus v0.3 is released.
+  
+Sat Aug 29 19:32:06 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+  
+ 	* gnus.el: Gnus v0.2 is released.
+  
 Sat Aug 29 19:17:19 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.42 is released.
@@ -242,7 +306,7 @@ Sun Aug 16 18:59:41 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* gnus-sum.el (gnus-remove-thread): Didn't work with sparse
 	threads. 
 
-1998-08-14  François Pinard  <pinard@iro.umontreal.ca>
+1998-08-14  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* nndoc.el (nndoc-generate-mime-parts-head): Use original Subject,
 	Message-ID, and References in fully blown articles.
@@ -409,7 +473,7 @@ Sun Aug  9 19:37:40 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.31 is released.
 
-1998-08-09  François Pinard  <pinard@iro.umontreal.ca>
+1998-08-09  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* nndoc.el: Split MIME multipart messages, maybe recursively.
 	(nndoc-mime-parts-type-p, nndoc-transform-mime-parts,
@@ -550,7 +614,7 @@ Tue Aug  4 05:25:01 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* gnus-group.el (gnus-group-read-ephemeral-group): Make the server
 	unique.
 
-1998-07-28  François Pinard  <pinard@iro.umontreal.ca>
+1998-07-28  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* gnus-uu.el (gnus-uu-reginize-string): Consider the number of
 	parts as part of the fixed subject, instead of a wild quantity.
@@ -733,7 +797,7 @@ Fri Jul 10 04:15:35 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 
 	* nntp.el (nntp-server-opened-hook): Doc change.
 
-Fri Jul 10 03:03:48 1998  François Pinard  <pinard@iro.umontreal.ca>
+Fri Jul 10 03:03:48 1998  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* gnus-sum.el (gnus-summary-respool-trace): New command and
 	keystroke.
@@ -793,7 +857,7 @@ Wed Jul  1 12:52:32 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 	* nntp.el (nntp-record-command): Give more precise time info.
 	(nntp-next-result-arrived-p): Look for the end of error lines.
 
-Wed Jul  1 12:24:06 1998  François Pinard  <pinard@iro.umontreal.ca>
+Wed Jul  1 12:24:06 1998  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* gnus-util.el (gnus-delete-if): Would do the opposite.
 
@@ -1806,7 +1870,7 @@ Sat Feb 28 08:10:27 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 	* gnus-picon.el (gnus-picons-display-x-face): `buf' -- unbound
 	var.
 
-Sat Feb 28 08:03:23 1998  François Pinard  <pinard@iro.umontreal.ca>
+Sat Feb 28 08:03:23 1998  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* gnus: configure'd.
 
@@ -2160,7 +2224,7 @@ Fri Feb 13 19:01:19 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 
 	* gnus-sum.el (gnus-summary-exit): Call purging function.
 
-Fri Feb 13 18:59:16 1998  François Pinard  <pinard@iro.umontreal.ca>
+Fri Feb 13 18:59:16 1998  Fran$BmP(Bis Pinard  <pinard@iro.umontreal.ca>
 
 	* nnmail.el (nnmail-get-new-mail): Don't clear split-history.
 	(nnmail-purge-split-history): New function.

@@ -253,12 +253,19 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.17"
+(defconst gnus-version-number "6.9.01"
   "Version number for this version of gnus.")
 
+(defconst gnus-original-version-number "0.6"
+    "Version number for this version of Gnus.")
+
+(defconst gnus-original-product-name "Pterodactyl Gnus"
+    "Version number for this version of Gnus.")
+
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.42; for SEMI 1.8, FLIM 1.8/1.9)"
-          gnus-product-name gnus-version-number)
+  (format "%s %s (based on %s %s ; for SEMI 1.8, FLIM 1.8/1.9)"
+          gnus-product-name gnus-version-number
+	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -642,13 +649,13 @@ be set in `.emacs' instead."
 (defface gnus-splash-face
   '((((class color)
       (background dark))
-     (:foreground "ForestGreen"))
+     (:foreground "Brown"))
     (((class color)
       (background light))
-     (:foreground "ForestGreen"))
+     (:foreground "Brown"))
     (t
      ()))
-  "Level 1 newsgroup face.")
+  "Face of the splash screen.")
 
 (defun gnus-splash ()
   (save-excursion
@@ -1574,6 +1581,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
    '(("info" Info-goto-node)
      ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
+     ("qp" quoted-printable-decode-region quoted-printable-decode-string)
+     ("mm-decode" mm-decode-words-region mm-decode-words-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
@@ -2008,7 +2017,7 @@ If ARG, insert string at point."
 		    ((member alpha '("September" "s")) "5.01")
 		    ((member alpha '("Red" "r")) "5.03")
 		    ((member alpha '("Quassia" "q")) "5.05")
-		    ((member alpha '("p")) "5.07")
+		    ((member alpha '("Pterodactyl" "p")) "5.07")
 		    ((member alpha '("o")) "5.09")
 		    ((member alpha '("n")) "5.11"))
 		   minor least)
