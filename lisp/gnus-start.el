@@ -2095,6 +2095,14 @@ If FORCE is non-nil, the .newsrc file is read."
 		   (gnus-yes-or-no-p
 		    (format "Error in %s; continue? " ding-file))
 		   (error "Error in %s" ding-file))))))
+;;	;; Older versions of `gnus-format-specs' are no longer valid
+;;	;; in Oort Gnus 0.01.
+;;	(let ((version
+;;	       (and gnus-newsrc-file-version
+;;		    (gnus-continuum-version gnus-newsrc-file-version))))
+;;	  (when (or (not version)
+;;		    (< version 5.090009))
+;;	    (setq gnus-format-specs gnus-default-format-specs)))
 	(when gnus-newsrc-assoc
 	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
     (gnus-make-hashtable-from-newsrc-alist)
