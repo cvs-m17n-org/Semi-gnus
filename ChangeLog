@@ -1,3 +1,8 @@
+2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
+
+	* make.bat: Makes it possible to generate the Info files on
+	windows again.
+
 2000-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* Makefile.in (info-ja, xinfo-ja): No need to use `MAKEINFO=no'.
