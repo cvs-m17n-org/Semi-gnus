@@ -1,6 +1,8 @@
 2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-art.el (mime-button-mother-dispatcher): Bind.
+	* lisp/gnus-art.el (gnus-article-add-button): Add widget button.
+	(gnus-article-display-mime-message): Don't set
+	`mime-button-mother-dispatcher'.
 
 2000-09-07  Tadashi Watanabe  <watanabe@sigmaitec.co.jp>
 
