@@ -3657,9 +3657,7 @@ commands:
   (set-buffer gnus-article-buffer)
   (let (buffer-read-only)
     (erase-buffer)
-    (set-buffer-multibyte nil)
-    (insert-buffer-substring gnus-original-article-buffer)
-    (set-buffer-multibyte t)))
+    (insert-buffer-substring gnus-original-article-buffer)))
 
 (defun gnus-article-make-full-mail-header (&optional number charset)
   "Create a new mail header structure in a raw article buffer."

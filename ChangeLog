@@ -1,3 +1,8 @@
+2002-01-31  ARISAWA Akihiro  <ari@atesoft.advantest.co.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-traditional-message):
+	Reverted.
+
 2002-01-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-setup-buffer): Enable multibyte
