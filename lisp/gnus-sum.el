@@ -6916,34 +6916,63 @@ If BACKWARD, search backward instead."
 	   (if (, backward) (beginning-of-line) (end-of-line))
 	 (goto-char (if (, backward) (point-max) (point-min))))))
 
-  (defmacro gnus-summary-search-article-highlight-matched-text (backward
-								treated)
+  (defmacro gnus-summary-search-article-highlight-goto-x-face (opoint)
+    "Place point where X-Face image is displayed."
+    (if (featurep 'xemacs)
+	(` (let ((end (if (search-forward "\n\n" nil t)
+			  (goto-char (1- (point)))
+			(point-min)))
+		 extent)
+	     (or (search-backward "\n\n" nil t) (goto-char (point-min)))
+	     (unless (and (re-search-forward "^From:" end t)
+			  (setq extent (extent-at (point)))
+			  (extent-begin-glyph extent))
+	       (goto-char (, opoint)))))
+      (` (let ((end (if (search-forward "\n\n" nil t)
+			(goto-char (1- (point)))
+		      (point-min))))
+	   (goto-char
+	    (or (text-property-any (or (search-backward "\n\n" nil t)
+				       (point-min))
+				   end 'x-face-mule-bitmap-image t)
+		(, opoint)))))))
+
+  (defmacro gnus-summary-search-article-highlight-matched-text
+    (backward treated x-face)
     "Highlight matched text in the function `gnus-summary-search-article'."
-    (` (let ((start (match-beginning 0))
-	     (end (match-end 0))
+    (` (let ((start (set-marker (make-marker) (match-beginning 0)))
+	     (end (set-marker (make-marker) (match-end 0)))
 	     (inhibit-read-only t)
 	     buffer-read-only)
 	 (unless treated
-	   (let (, (let ((items (mapcar 'car gnus-treatment-function-alist)))
-		     (mapcar
-		      (lambda (item) (setq items (delq item items)))
-		      '(gnus-treat-buttonize
-			gnus-treat-fill-article
-			gnus-treat-fill-long-lines
-			gnus-treat-emphasize
-			gnus-treat-highlight-headers
-			gnus-treat-highlight-citation
-			gnus-treat-highlight-signature
-			gnus-treat-overstrike
-			gnus-treat-buttonize-head
-			gnus-treat-decode-article-as-default-mime-charset))
-		     items))
-	     (gnus-article-prepare-mime-display))
-	   (goto-char (if (, backward) start end)))
+	   (let ((,@
+		  (let ((items (mapcar 'car gnus-treatment-function-alist)))
+		    (mapcar
+		     (lambda (item) (setq items (delq item items)))
+		     '(gnus-treat-buttonize
+		       gnus-treat-fill-article
+		       gnus-treat-fill-long-lines
+		       gnus-treat-emphasize
+		       gnus-treat-highlight-headers
+		       gnus-treat-highlight-citation
+		       gnus-treat-highlight-signature
+		       gnus-treat-overstrike
+		       gnus-treat-display-xface
+		       gnus-treat-buttonize-head
+		       gnus-treat-decode-article-as-default-mime-charset))
+		    items))
+		 (gnus-treat-display-xface
+		  (when (, x-face) gnus-treat-display-xface)))
+	     (gnus-article-prepare-mime-display)))
+	 (goto-char (if (, backward) start end))
+	 (when (, x-face)
+	   (gnus-summary-search-article-highlight-goto-x-face (point)))
 	 (setq gnus-summary-search-article-matched-data
 	       (list start end (buffer-substring start end)))
-	 (put-text-property start end 'face
-			    (or (find-face 'isearch) 'secondary-selection)))))
+	 (unless (eq start end);; matched text has been deleted. :-<
+	   (put-text-property start end 'face
+			      (or (find-face 'isearch)
+				  'secondary-selection))))))
   )
 
 (defun gnus-summary-search-article (regexp &optional backward)
@@ -6984,8 +7013,8 @@ Optional argument BACKWARD means do search for backward.
 	      (re-search-forward regexp nil t))
 	    ;; We found the regexp.
 	    (progn
-	      (gnus-summary-search-article-highlight-matched-text backward
-								  treated)
+	      (gnus-summary-search-article-highlight-matched-text
+	       backward treated (string-match "^\\^X-Face:" regexp))
 	      (setq found 'found)
 	      (forward-line
 	       (/ (- 2 (window-height
