@@ -239,7 +239,7 @@ This means that the group \"nnimap+server:INBOX.group\" is placed in
 		(string :tag "Base path of groups")))
   :set (lambda (symbol value)
 	 (prog1 (set-default symbol value)
-	   (gnus-namazu/make-directory-table))))
+	   (gnus-namazu/make-directory-table t))))
 
 ;;; Internal Variable:
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
@@ -367,7 +367,7 @@ This means that the group \"nnimap+server:INBOX.group\" is placed in
 	       (setq dir (nnmail-group-pathname
 			  (substring group (match-end 0))
 			  "/"))
-	       (push (cons (concat (cdr dir) (substring dir 1)) group)
+	       (push (cons (concat (cdr pair) (substring dir 1)) group)
 		     alist)))))
        gnus-newsrc-hashtb)
       (dolist (pair (nconc agent cache alist))
