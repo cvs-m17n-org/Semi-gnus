@@ -56,10 +56,9 @@ most: texi2latex.elc latex latexps
 	  rm -f $@; \
 	  $(EMACSINFO) $< t; \
 	else \
-	  echo "LANG=C; export LANG;" \
+	  echo "LC_ALL=C" \
 	    "$(MAKEINFO) -I $(srcdir) --enable-encoding -o $@ $<"; \
-	  LANG=C; export LANG; \
-	    $(MAKEINFO) -I $(srcdir) --enable-encoding -o $@ $<; \
+	  LC_ALL=C $(MAKEINFO) -I $(srcdir) --enable-encoding -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf .latexi .dvi-x .pdf-x
@@ -72,10 +71,9 @@ most: texi2latex.elc latex latexps
 	  rm -f $@; \
 	  $(EMACSINFO) $<; \
 	else \
-	  echo "LANG=C; export LANG;" \
-	    "$(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<"; \
-	  LANG=C; export LANG; \
-	    $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
+	  echo "LC_ALL=C" \
+	    $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<"; \
+	  LC_ALL=C $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
 	fi
 
 # Files included in gnus.texi
@@ -140,8 +138,8 @@ clean:
 	thumbdta.tex xface.tex *.tpt gnus-manual-*.pdf gnus-manual-*.ps.gz
 
 makeinfo:
-	LANG=C; export LANG; makeinfo --enable-encoding -o gnus gnus.texi
-	LANG=C; export LANG; makeinfo --enable-encoding -o message message.texi
+	LC_ALL=C makeinfo --enable-encoding -o gnus gnus.texi
+	LC_ALL=C makeinfo --enable-encoding -o message message.texi
 
 texi2latex.elc: texi2latex.el
 	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
