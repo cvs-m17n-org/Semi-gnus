@@ -46,7 +46,7 @@ message-header-encode-hook $B$K0\F0$7$F$/$@$5$$!#(B
 
 ---
 Chao-gnus 6.9 $B$G$NJQ99$r<h$j9~$s$G$"$j$^$9$N$G!"(B apel $B$O(B 9.5 $B0J9_$N$b(B
-$B$N!"(B FLIM $B$O(B 1.11.1 $B0J9_$N$b$N(B SEMI $B$O(B 1.10.0 $B0J9_$N$b$N$,I,MW$G$9!#(B
+$B$N!"(B FLIM $B$O(B 1.11.2 $B0J9_$N$b$N(B SEMI $B$O(B 1.10.0 $B0J9_$N$b$N$,I,MW$G$9!#(B
 
 $B$^$?!"(B BBDB $B$r;HMQ$5$l$F$$$kJ}$O!"(B bbdb-gnus.elc $B$r(B Semi-gnus 6.8.X $B0J(B
 $BA0$N$b$N$H6&M-$9$k$3$H$O$G$-$^$;$s!#I,$:!"(B byte-compile $B$7D>$7$F$/$@$5(B
@@ -55,7 +55,31 @@ Chao-gnus 6.9 $B$G$NJQ99$r<h$j9~$s$G$"$j$^$9$N$G!"(B apel $B$O(B 9.5 $B0J9_
 ;; $B$N$,$*<j7Z$G$9!#(B :-)
 
 ---
-*** 6.9.4: $B$G$3$NJQ99$OGQ;_$7$^$7$?!#(B ***
+gnus-bbdb.el
+
+Chao-gnus 6.9 $B$r<h$j9~$s$@(B Semi-gnus $B$KFC2=$7$?(B BBDB API $B%b%8%e!<%k$G(B
+$B$9!#(B 
+$B$3$N%b%8%e!<%k$r;HMQ$9$k$3$H$K$h$C$F!"(B Semi-gnus $B$G;HMQ$9$k>l9g$K$O(B
+mime-bbdb $B$,ITMW$K$J$j$^$9!#(B
+
+1.11.2 $B0J9_$N(B FLIM $B$,I,MW$G$9!#(B
+
+bbdb-auto-notes-hook $B$r;HMQ$7$F$$$J$$J}$K$OITMW$G$9$,!";HMQ$7$F$$$kJ}(B
+$B$O(B bbdb.el / bbdb-hooks.el $B$K$3$N%U%!%$%k$N:G8e$K$"$k(B patch $B$r$"$F$kI,(B
+$BMW$,$"$j$^$9!#(B
+
+$B@_DjNc(B:
+
+;; mime-bbdb $B$K4X$9$k@_Dj$OITMW$G$9!#(B
+;(setq mime-bbdb/use-mail-extr nil)
+;(eval-after-load "mail-extr" '(require 'mime-bbdb))
+
+(require 'bbdb)
+(require 'gnus-bbdb)
+(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus $B$O$O$:$7$F$/$@$5$$!#(B
+(add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+
+--- 6.9.4: $B$G$3$NJQ99$OGQ;_$7$^$7$?!#(B
 message-setup-hook (Default: nil)
 message-mime-setup-function (Default: 'turn-on-mime-edit)
 
@@ -65,4 +89,94 @@ Message $BJT=8MQ(B buffer $B$r(B MIME $B%a%C%;!<%8JT=8%b!<%I$K@Z$jBX$($k$?$
 $B$r8F$S=P$7$^$9!#(B
 
 message-setup-hook $B$NFbMF$rJQ99$7$F$$$kJ}$OCm0U$,I,MW$G$9!#(B
-*****************************************
+---
+
+*** org/bbdb.el	Tue May 12 10:51:51 1998
+--- bbdb.el	Thu Oct 29 11:52:25 1998
+***************
+*** 620,625 ****
+--- 620,626 ----
+  (defvar bbdb-showing-changed-ones nil)
+  (defvar bbdb-modified-p nil)
+  (defvar bbdb-elided-display nil)
++ (defvar bbdb-extract-field-value-function-list nil)
+  
+  (defvar bbdb-debug t)
+  (defmacro bbdb-debug (&rest body)
+
+---
+*** org/bbdb-hooks.el	Tue May 12 10:51:49 1998
+--- bbdb-hooks.el	Thu Oct 29 13:03:52 1998
+***************
+*** 352,363 ****
+  	(marker (bbdb-header-start))
+  	field pairs fieldval  ; do all bindings here for speed
+  	regexp string notes-field-name notes
+! 	 replace-p replace-or-add-msg)
+      (set-buffer (marker-buffer marker))
+      (save-restriction
+!       (widen)
+!       (goto-char marker)
+!       (if (and (setq fieldval (bbdb-extract-field-value "From"))
+  	       (string-match (bbdb-user-mail-names) fieldval))
+  	  ;; Don't do anything if this message is from us.  Note that we have
+  	  ;; to look at the message instead of the record, because the record
+--- 352,373 ----
+  	(marker (bbdb-header-start))
+  	field pairs fieldval  ; do all bindings here for speed
+  	regexp string notes-field-name notes
+! 	replace-p replace-or-add-msg
+! 	extract-field-value-funtion)
+      (set-buffer (marker-buffer marker))
+      (save-restriction
+!       (let ((function-list bbdb-extract-field-value-function-list)
+! 	    function)
+! 	(or (progn
+! 	      (while (and (not extract-field-value-funtion)
+! 			  (setq function (pop function-list)))
+! 		(setq extract-field-value-funtion (funcall function)))
+! 	      extract-field-value-funtion)
+! 	    (progn
+! 	      (widen)
+! 	      (goto-char marker)
+! 	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
+!       (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
+  	       (string-match (bbdb-user-mail-names) fieldval))
+  	  ;; Don't do anything if this message is from us.  Note that we have
+  	  ;; to look at the message instead of the record, because the record
+***************
+*** 368,374 ****
+  	  (goto-char marker)
+  	  (setq field (car (car ignore-all))
+  		regexp (cdr (car ignore-all))
+! 		fieldval (bbdb-extract-field-value field))
+  	  (if (and fieldval
+  		   (string-match regexp fieldval))
+  	      (setq ignore t)
+--- 378,384 ----
+  	  (goto-char marker)
+  	  (setq field (car (car ignore-all))
+  		regexp (cdr (car ignore-all))
+! 		fieldval (funcall extract-field-value-funtion field))
+  	  (if (and fieldval
+  		   (string-match regexp fieldval))
+  	      (setq ignore t)
+***************
+*** 382,388 ****
+  		pairs (cdr (car rest))	; (REGEXP . STRING) or
+  					; (REGEXP FIELD-NAME STRING) or
+  					; (REGEXP FIELD-NAME STRING REPLACE-P)
+! 		fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
+  	  (if fieldval
+  	      (while pairs
+  		(setq regexp (car (car pairs))
+--- 392,398 ----
+  		pairs (cdr (car rest))	; (REGEXP . STRING) or
+  					; (REGEXP FIELD-NAME STRING) or
+  					; (REGEXP FIELD-NAME STRING REPLACE-P)
+! 		fieldval (funcall extract-field-value-funtion field)) ; e.g., Subject line
+  	  (if fieldval
+  	      (while pairs
+  		(setq regexp (car (car pairs))
+
+---
