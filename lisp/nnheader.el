@@ -105,6 +105,14 @@ on your system, you could say something like:
 (defalias 'mail-header-extra 'ignore)
 (defalias 'mail-header-set-extra 'ignore)
 
+(defsubst nnheader-decode-field-body (field-body field-name
+						 &optional mode max-column)
+  (mime-decode-field-body field-body
+                          (if (stringp field-name)
+                              (intern (capitalize field-name))
+                            field-name)
+                          mode max-column))
+
 (defsubst make-full-mail-header
   (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
