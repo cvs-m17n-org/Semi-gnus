@@ -1,3 +1,15 @@
+1998-08-20  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.14.
+
+	* Sync up with Gnus 5.6.38.
+
+	* lisp/gnus-offline.el (gnus-offline-enable-fetch-mail): Enable to get 
+	APOP server.
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Enable to get from APOP server.
+	(pop3-fma-set-pop3-password) Enable to get from APOP server.
+
 1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.13.
@@ -44,8 +56,15 @@
 	
 1998-08-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
-	* lisp/message.el: Generate New frame when write new message.
-	And delete message buffer.
+	* lisp/message.el (message-frames): New custom group.
+	(message-original-frame): New variable.
+	(message-use-multi-frames): New variable.
+	(message-delete-frame-on-exit): New variable.
+	(message-send-and-exit): Delete frame which made for editing
+	message.
+	(message-kill-buffer): Ditto.
+	(message-delete-frame): New function.
+	(message-pop-to-buffer): Make new frame when edit message.
 	
 1998-08-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
@@ -59,10 +78,6 @@
 
 	* Sync up with Gnus 5.6.30.
 	
-1998-08-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
-
-	* lisp/message.el (message-yank-original): For citing any message.
-
 1998-08-10  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
