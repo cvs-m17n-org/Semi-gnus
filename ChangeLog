@@ -1,3 +1,9 @@
+1998-11-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: bug fix.
+
+	* lisp/gnus-ofsetup.el: Bug fix.
+
 1998-11-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send-mail): Protect against errors.

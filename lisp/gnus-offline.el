@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.6 1998-11-10 14:53:51 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.7 1998-11-11 14:36:13 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -254,6 +254,9 @@ If value is nil , dialup line is disconnected status.")
      (setq byte-compile-warnings nil))))
        
 (put 'gnus-offline-set-unplugged-state 'menu-enable 'gnus-offline-connected)
+(define-process-argument-editing "/hang\\.exe\\'"
+  (lambda (x) (general-process-argument-editing-function
+	       x nil t t nil t t)))
 ;;; Functions
 ;;
 ;; Setting up...
