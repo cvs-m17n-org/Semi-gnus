@@ -1,3 +1,16 @@
+2001-10-31 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* sieve-manage.el (sieve-string-bytes): No complain.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-group.el (gnus-group-mode-map): Bind "D u" to
+	`gnus-sieve-update' and "D g" to `gnus-sieve-generate'. (Functions
+	has autoload cookies, so no `require' should be necessary.)
+
+	* sieve.el, sieve-mode.el, sieve-manage.el, gnus-sieve.el: New
+	files.
+
 2001-10-31  Simon Josefsson  <jas@extundo.com>
 
 	* gnus-cus.el (gnus-group-parameters): Support integer `display'

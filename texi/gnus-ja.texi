@@ -565,6 +565,7 @@ Misc Group Stuff
 * Group Timestamp::             Gnus $B$K:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-(B
                                 $BO?$5$;$k(B
 * File Commands::               Gnus $B$N%U%!%$%k$NFI$_=q$-(B
+* Sieve Commands::              Sieve $B%9%/%j%W%H$N4IM}(B
 
 Summary Buffer
 
@@ -2936,6 +2937,27 @@ See also @code{gnus-group-ignored-charsets-alist}.
 $B=|(B) $B$dO"A[%j%9%H(B @code{gnus-article-banner-alist} $B$N3FMWAG$r;H$&$3$H$b$G(B
 $B$-$^$9!#(B
 
+@item sieve
+@cindex sieve
+$B$3$N%Q%i%a!<%?$O!"F~$C$F$-$?%a!<%k$,$3$N%0%k!<%W$KCV$/$KCM$9$k$+$I$&$+$r(B
+$BD4$Y$k(B Sieve ($B$U$k$$(B) $B%F%9%H$r;}$A$^$9!#$3$N%0%k!<%W%Q%i%a!<%?$r85(B
+$B$K(B @samp{fileinto "group.name";} $B$H$$$&%F%9%H>r7o$rK\BN$K;}$D!"(B
+Sieve $B$N(B @samp{IF} $B@)8f9=B$BN$,:n$i$l$^$9!#(B
+
+$BNc$($P!"$b$7(B INBOX.list.sieve $B%0%k!<%W$,(B @code{(sieve address "sender"
+"sieve-admin@@extundo.com")} $B$H$$$&%0%k!<%W%Q%i%a!<%?$r;}$C$F$$$?$J$i$P!"(B
+$B%0%k!<%W%Q%i%a!<%?$r(B Sieve $B%9%/%j%W%H$KJQ49$9(B
+$B$k(B (@pxref{Sieve Commands}) $B$H$-$K!"0J2<$N(B Sieve $B%3!<%I$,:n$i$l$^$9(B:
+
+@example
+  if address \"sender\" \"sieve-admin@@extundo.com\" @{
+          fileinto \"INBOX.list.sieve\";
+  @}
+@end example
+
+Sieve $B8@8l$O(B RFC 3028 $B$G=R$Y$i$l$F$$$^$9!#(B@xref{Top, , Top, sieve, Emacs
+Sieve}$B!#(B
+
 @item (@var{variable} @var{form})
 $B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
 $B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
@@ -3868,6 +3890,7 @@ Gnus
 * Group Timestamp::             Gnus $B$K:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-(B
                                 $BO?$5$;$k(B
 * File Commands::               Gnus $B$N%U%!%$%k$NFI$_=q$-(B
+* Sieve Commands::              Sieve $B%9%/%j%W%H$N4IM}(B
 @end menu
 
 @table @kbd
@@ -4113,6 +4136,46 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 @c @findex gnus-group-clear-dribble
 @c $B%I%j%V%k%U%!%$%k$r%/%j%"$9$k(B
 @c (@code{gnus-group-clear-dribble})$B!#(B
+@end table
+
+@node Sieve Commands
+@subsection Sieve $B%3%^%s%I(B
+@cindex group sieve commands
+
+Sieve $B$O%5!<%P!<B&$G;H$o$l$k%a!<%k%U%#%k%?!<8@8l$G$9!#(Bgnus $B$G$O!"3F%0%k!<(B
+$B%W$KE,MQ$5$l$k(B sieve $B$N5,B'$r;XDj$9$k!"(B@code{sieve} $B%0%k!<%W%Q%i%a!<(B
+$B%?(B (@pxref{Group Parameters}) $B$r;H$&$3$H$,$G$-$^$9!#(Bguns $B$O$=$l$i$9$Y$F(B
+$B$N%0%k!<%W%Q%i%a!<%?$r!"%5!<%P!<$G;H$&$3$H$b2DG=$J@5$7$$(B Sieve $B%9%/%j%W(B
+$B%H$KK]Lu$9$k!"Fs$D$N%3%^%s%I$rDs6!$7$^$9!#(B
+
+@vindex gnus-sieve-file
+@vindex gnus-sieve-region-start
+@vindex gnus-sieve-region-end
+$B:n@.$5$l$?(B Sieve $B%9%/%j%W%H$O(B @code{gnus-sieve-file} ($B%G%#%U%)%k%H(B
+$B$O(B @file{~/.sieve}) $B$KCV$+$l$^$9!#(Bgnus $B$,:n$k%3!<%I$OFs$D$N6h@Z$j5-(B
+$B9f(B @code{gnus-sieve-region-start} $B$H(B @code{gnus-sieve-region-end} $B$N4V$K(B
+$BCV$+$l$k$N$G!"$3$l$i$N6h@Z$j5-9f$N30$KDI2C$N(B Sieve $B%3!<%I$r=q$$$F$b!"<!(B
+$B2s(B Sieve $B%9%/%j%W%H$r:F:n@.$9$k$H$-$K>C$5$l$F$7$^$&$3$H$O$"$j$^$;$s!#(B
+
+@xref{Top, ,Top, sieve, Emacs Sieve}.
+
+@table @kbd
+@item D g
+@kindex D g (Group)
+@findex gnus-sieve-generate
+@vindex gnus-sieve-file
+@cindex generating sieve script
+@code{sieve} $B%0%k!<%W%Q%i%a!<%?$+$i(B Sieve $B%9%/%j%W%H$r:F:n@.$7$F!"(B
+@code{gnus-sieve-file} $B$K=q$-9~$_$^$9!#0JA0$NFbMF$OJ]B8$5$l$^$;$s!#(B
+
+@item D u
+@kindex D u (Group)
+@findex gnus-sieve-update
+@vindex gnus-sieve-file
+@cindex updating sieve script
+@code{sieve} $B%0%k!<%W%Q%i%a!<%?$r85$K(B @code{gnus-sieve-file} $B$N(B gnus $B$,(B
+$B4IM}$7$F$$$kItJ,$r:F:n@.$7$F%U%!%$%k$K%;!<%V$7!"(B@code{sieveshell} $B%W%m%0(B
+$B%i%`$r;H$C$F%5!<%P!<$K%"%C%W%m!<%I$7$^$9!#(B
 @end table
 
 @node Summary Buffer
@@ -17624,6 +17687,8 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 @iflatex
 @chapter Message
 @include message-ja.texi
+@chapter Sieve
+@include sieve.texi
 @end iflatex
 @end iftex
 
