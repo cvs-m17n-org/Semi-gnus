@@ -381,10 +381,10 @@ Returns the list of articles removed."
   (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '>))
 	(gnus-verbose (max 6 gnus-verbose)))
     (if cached
-        (progn
-          (gnus-summary-limit cached)
-          (gnus-summary-position-point))
-        (gnus-message 3 "No cached articles for this group"))))
+	(progn
+	  (gnus-summary-limit cached)
+	  (gnus-summary-position-point))
+      (gnus-message 3 "No cached articles for this group"))))
 
 ;;; Internal functions.
 

@@ -174,7 +174,7 @@ group/function elements."
 			 (nnimap-strict-function :tag "User-defined function"))
 		 (repeat :menu-tag "Multi-server (extended)"
 			 :tag "Multi-server list"
-			 (list (regexp :tag "Server regexp") 
+			 (list (regexp :tag "Server regexp")
 			       (list (regexp :tag "Incoming Mailbox regexp")
 				     (repeat :tag "Rules for matching server(s) and mailbox(es)"
 					     (list (string :tag "Destination mailbox")

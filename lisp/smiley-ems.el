@@ -95,7 +95,7 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
 					      smiley-data-directory)))
 	  (setq file nil)))
       (when type
-	(let ((image (find-image (list (list :type (intern type) 
+	(let ((image (find-image (list (list :type (intern type)
 					     :file file
 					     :ascent 'center)))))
 	  (when image

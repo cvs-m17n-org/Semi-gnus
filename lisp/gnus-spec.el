@@ -462,7 +462,7 @@ characters when given a pad value."
 	    `(let (gnus-position)
 	       ,@(gnus-complex-form-to-spec form spec-alist)
 	       (if gnus-position
-		   (gnus-put-text-property gnus-position (1+ gnus-position) 
+		   (gnus-put-text-property gnus-position (1+ gnus-position)
 					   'gnus-position t)))
 	  `(progn
 	     ,@(gnus-complex-form-to-spec form spec-alist)))))))

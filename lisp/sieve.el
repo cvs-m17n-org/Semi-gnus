@@ -142,7 +142,7 @@ require \"fileinto\";
     ["Activate script" sieve-activate t]
     ["Deactivate script" sieve-deactivate t]))
 
-;; This is necessary to allow correct handling of \\[cvs-mode-diff-map] 
+;; This is necessary to allow correct handling of \\[cvs-mode-diff-map]
 ;; in substitute-command-keys.
 ;(fset 'sieve-manage-mode-map sieve-manage-mode-map)
 

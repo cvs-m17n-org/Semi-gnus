@@ -57,7 +57,7 @@ The following specs are understood:
 %s status
 %a agent covered
 
-General format specifiers can also be used.  
+General format specifiers can also be used.
 See (gnus)Formatting Variables."
   :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-server-visual

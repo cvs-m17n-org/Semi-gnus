@@ -62,7 +62,7 @@ with some simple extensions.
 %a  Number of unread articles in the groups in the topic.
 %A  Number of unread articles in the groups in the topic and its subtopics.
 
-General format specifiers can also be used.  
+General format specifiers can also be used.
 See (gnus)Formatting Variables."
   :link '(custom-manual "(gnus)Formatting Variables")
   :type 'string

@@ -176,7 +176,7 @@ colors of the displayed X-Faces."
 	(save-restriction
 	  (article-narrow-to-head)
 	  (gnus-article-goto-header "from")
-	  (when (bobp) 
+	  (when (bobp)
 	    (insert "From: \n")
 	    (forward-char -2))
 	  (gnus-add-image

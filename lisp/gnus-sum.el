@@ -600,7 +600,7 @@ with some simple extensions.
 
 %S  The subject
 
-General format specifiers can also be used.  
+General format specifiers can also be used.
 See (gnus)Formatting Variables."
   :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-threading
@@ -7048,10 +7048,10 @@ articles that are younger than AGE days."
        (when (> (length days) 0)
 	 (setq days (read days)))
        (if (numberp days)
-	   (progn 
+	   (progn
 	     (setq days-got t)
 	     (if (< days 0)
-		 (progn 
+		 (progn
 		   (setq younger (not younger))
 		   (setq days (* days -1)))))
 	 (message "Please enter a number.")

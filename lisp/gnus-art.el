@@ -1870,7 +1870,7 @@ unfolded."
 (defun gnus-article-treat-body-boundary ()
   "Place a boundary line at the end of the headers."
   (interactive)
-  (when (and gnus-body-boundary-delimiter 
+  (when (and gnus-body-boundary-delimiter
 	     (> (length gnus-body-boundary-delimiter) 0))
     (gnus-with-article-headers
       (goto-char (point-max))

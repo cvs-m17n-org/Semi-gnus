@@ -389,7 +389,7 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-put-text-property 'gnus-xmas-put-text-property)
   (defalias 'gnus-deactivate-mark 'ignore)
   (defalias 'gnus-window-edges 'window-pixel-edges)
-  
+
   (if (and (<= emacs-major-version 19)
 	   (< emacs-minor-version 14))
       (defalias 'gnus-set-text-properties 'gnus-xmas-set-text-properties))

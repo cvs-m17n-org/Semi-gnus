@@ -71,7 +71,7 @@ current newsgroup name and then returns a suitable group name (or list
 of names)."
   :group 'gnus-message
   :type '(choice (string :tag "Group")
-                 (function)))
+		 (function)))
 
 (defcustom gnus-mailing-list-groups nil
   "*Regexp matching groups that are really mailing lists.
@@ -145,7 +145,7 @@ See Info node `(gnus)Posting Styles'."
 (defvar gnus-inews-mark-gcc-as-read nil
   "Obsolete variable. Use `gnus-gcc-mark-as-read' instead.")
 
-(make-obsolete-variable 'gnus-inews-mark-gcc-as-read 
+(make-obsolete-variable 'gnus-inews-mark-gcc-as-read
 			'gnus-gcc-mark-as-read)
 
 (defcustom gnus-gcc-externalize-attachments nil
@@ -1577,7 +1577,7 @@ this is a reply."
 		(gnus-message 1 "Couldn't store article in group %s: %s"
 			      group (gnus-status-message method))
 		(sit-for 2))
-	      (when (and group-art 
+	      (when (and group-art
 			 (or gnus-gcc-mark-as-read
 			     gnus-inews-mark-gcc-as-read))
 		(gnus-group-mark-article-read group (cdr group-art)))
