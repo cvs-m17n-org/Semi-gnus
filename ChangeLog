@@ -1,3 +1,14 @@
+1999-06-23  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): Use
+	`read-from-minibuffer' with specifying the input position instead
+	of the use of `read-string' with modifying `minibuffer-setup-hook'.
+	Exceptionally, don't specify the input position under Emacs 19 or
+	earlier against the mysterious bug. [cf. <semi-gnus-ja:3469>]
+	(TopLevel): Require `static'.
+
 1999-06-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
