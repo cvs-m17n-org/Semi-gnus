@@ -10324,21 +10324,22 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 それぞれの様式の最初の要素は @code{合致} (match) と呼ばれます。もしそれ
 が文字列であれば、gnus はそれをグループ名に正規表元現として合致操作を行
-います。シンボル @code{header} であれば、gnus は元の記事の中からその合致
-の中の次の要素に合致するヘッダーを探し、それをその合致の最後の正規表元現
-と比較します。もしそれが関数のシンボルであれば、その関数が引数無しで呼ば
-れます。それが変数のシンボルであれば、その変数が参照されます。それがリス
-トであれば、そのリストが @code{評価} されます。どの場合でも、これ
-が @code{nil}でない値を帰せば、様式は @code{合致した} と言います。
+います。@code{(header 合致 正規表現)} という様式であれば、gnus は元の記
+事の中から名前が合致するヘッダーを探し、それを正規表元と比較します。合致
+と正規表現は文字列です。もしそれが関数のシンボルであれば、その関数が引数
+無しで呼ばれます。それが変数のシンボルであれば、その変数が参照されます。
+それがリストであれば、そのリストが @code{評価} されます。どの場合でも、
+これが @code{nil}でない値を帰せば、様式は @code{合致した} と言います。
 
 それぞれの様式は任意の量の @dfn{属性} を持つ事ができます。それぞれの属性
 は @code{(@var{name} @var{value})} の対により成り立っています。属性名
-は、@code{signature}, @code{signature-file}, @code{address} (ユーザーの
-電子メールアドレス), @code{name} (ユーザーの名前) または @code{body} の
-どれかである事ができます。属性名は文字列またはシンボルである事もできます。
-その場合は、これはヘッダー名として使われ、その値が記事のヘッダーに挿入さ
-れます。もし属性名が @code{nil} だったらそのヘッダー名は削除されます。も
-し属性名が @code{eval} だったらその様式が評価され、結果は捨てられます。
+は、@code{signature}, @code{signature-file}, @code{address}
+(@code{user-mail-address} を上書きする), @code{name}
+(@code{(user-full-name) を上書きする) または @code{body} のどれかである
+事ができます。属性名は文字列またはシンボルである事もできます。その場合は、
+これはヘッダー名として使われ、その値が記事のヘッダーに挿入されます。もし
+属性名が @code{nil} だったらそのヘッダー名は削除されます。もし属性名が
+@code{eval} だったらその様式が評価され、結果は捨てられます。
 
 属性値は文字列 (そのまま使われます)、引数の無い関数 (返り値が使われます)、
 変数 (その値が使われます) またはリスト (それは @code{評価} されて、返り
@@ -10369,16 +10370,16 @@ from date id references chars lines xref extra の各ヘッダーから成るベク
          (organization "People's Front Against MWM"))
         ("^rec.humor"
          (signature my-funny-signature-randomizer))
-        ((equal (system-name) "gnarly")  ;; s 式
+        ((equal (system-name) "gnarly")  ;; 様式
          (signature my-quote-randomizer))
         (message-news-p        ;; 関数シンボル
          (signature my-news-signature))
         (window-system         ;; 変数シンボル
          ("X-Window-System" (format "%s" window-system)))
-        ;; Larsi さんに返事をするときは
+        ;; Lars さんに返事をするときは
         ;; Organization ヘッダーを付けよう。
-        (header "to" "larsi.*org"
-                (Organization "Somewhere, Inc."))
+        ((header "to" "larsi.*org")
+         (Organization "Somewhere, Inc."))
         ((posting-from-work-p) ;; ユーザーが定義した関数
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")

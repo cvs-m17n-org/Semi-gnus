@@ -121,8 +121,11 @@ the second with the current group name."
 See Info node `(gnus)Posting Styles'."
   :group 'gnus-message
   :type '(repeat (cons (choice (regexp)
-			       (function)
 			       (variable)
+			       (list (const header)
+				     (string :tag "Header")
+				     (regexp :tag "Regexp"))
+			       (function)
 			       (sexp))
 		       (repeat (list
 				(choice (const signature)
@@ -131,6 +134,7 @@ See Info node `(gnus)Posting Styles'."
 					(const address)
 					(const name)
 					(const body)
+					(symbol)
 					(string :tag "Header"))
 				(choice (string)
 					(function)
@@ -139,6 +143,7 @@ See Info node `(gnus)Posting Styles'."
 
 (defcustom gnus-gcc-mark-as-read nil
   "If non-nil, automatically mark Gcc articles as read."
+  :version "21.1"
   :group 'gnus-message
   :type 'boolean)
 
@@ -153,6 +158,7 @@ See Info node `(gnus)Posting Styles'."
 If it is `all', attach files as external parts;
 if a regexp and matches the Gcc group name, attach files as external parts;
 If nil, attach files as normal parts."
+  :version "21.1"
   :group 'gnus-message
   :type '(choice (const nil :tag "None")
 		 (const all :tag "Any")
@@ -1727,6 +1733,7 @@ this is a reply."
 		;; Regexp string match on the group name.
 		(string-match match group))
 	       ((eq match 'header)
+		;; Obsolete format of header match.
 		(and (gnus-buffer-live-p gnus-article-copy)
 		     (with-current-buffer gnus-article-copy
 		       (let ((header (message-fetch-field (pop style))))
@@ -1742,8 +1749,17 @@ this is a reply."
 		  ;; Variable to be checked.
 		  (symbol-value match))))
 	       ((listp match)
-		;; This is a form to be evaled.
-		(eval match)))
+		(cond
+		 ((eq (car match) 'header)
+		  ;; New format of header match.
+		  (and (gnus-buffer-live-p gnus-article-copy)
+		       (with-current-buffer gnus-article-copy
+			 (let ((header (message-fetch-field (nth 1 match))))
+			   (and header
+				(string-match (nth 2 match) header))))))
+		 (t
+		  ;; This is a form to be evaled.
+		  (eval match)))))
 	  ;; We have a match, so we set the variables.
 	  (dolist (attribute style)
 	    (setq element (pop attribute)
