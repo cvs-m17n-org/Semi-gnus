@@ -1,5 +1,10 @@
 1999-12-09  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail-1): Fix bug for last
+	change.
+
+1999-12-09  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* lisp/gnus.el (gnus-version): Update to 6.13.11.1.
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): New implementation,
