@@ -4,7 +4,7 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3r
+;; Version: 1.3m+
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3r")
+(defconst pop3-version "1.3m+")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -59,6 +59,9 @@ values are 'apop.")
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
+
+(defvar pop3-movemail-file-coding-system 'binary
+  "Crashbox made by pop3-movemail with this coding system.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
@@ -91,7 +94,8 @@ Used for APOP authentication.")
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(write-region (point-min) (point-max) crashbox t 'nomesg)
+	(let ((coding-system-for-write pop3-movemail-file-coding-system))
+	  (append-to-file (point-min) (point-max) crashbox))
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))
@@ -104,7 +108,7 @@ Used for APOP authentication.")
     (pop3-quit process)
     (kill-buffer crashbuf)
     )
-  t)
+  )
 
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST.
@@ -113,7 +117,7 @@ Returns the process associated with the connection."
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
 	(process)
 	(coding-system-for-read 'binary)   ;; because FSF Emacs 20 and
-	(coding-system-for-write 'binary)  ;; XEmacs 20/1 are st00pid
+	(coding-system-for-write 'binary)  ;; XEmacs 20/1 are st00pid 
     )
     (save-excursion
       (set-buffer process-buffer)
@@ -126,8 +130,7 @@ Returns the process associated with the connection."
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
@@ -163,7 +166,7 @@ Return the response string if optional second argument is non-nil."
       (setq match-end (point))
       (goto-char pop3-read-point)
       (if (looking-at "-ERR")
-	  (signal 'error (list (buffer-substring (point) (- match-end 2))))
+	  (error (buffer-substring (point) (- match-end 2)))
 	(if (not (looking-at "+OK"))
 	    (progn (setq pop3-read-point match-end) nil)
 	  (setq pop3-read-point match-end)
@@ -246,15 +249,7 @@ Return the response string if optional second argument is non-nil."
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
-	    (insert From_)
-	    (re-search-forward "\n\n")
-	    (narrow-to-region (point) (point-max))
-	    (let ((size (- (point-max) (point-min))))
-	      (goto-char (point-min))
-	      (widen)
-	      (forward-line -2)
-	      (insert (format "Content-Length: %s\n" size)))
-	    )))))
+	    (insert From_))))))
 
 ;; The Command Set
 

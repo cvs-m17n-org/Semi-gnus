@@ -1,8 +1,9 @@
-;;; nnmh.el --- mhspool access for Gnus
+;;; nnmh.el --- mhspool access for Chaos
 ;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;         Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -110,8 +111,31 @@
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
 
-	(nnheader-fold-continuation-lines)
+        ;; (nnheader-fold-continuation-lines)
 	'headers))))
+
+(deffoo nnmh-retrieve-parsed-headers (articles
+				      dependencies
+				      &optional newsgroup server fetch-old
+				      force-new)
+  (save-excursion
+    (set-buffer nntp-server-buffer)
+    (let* ((file nil)
+	   (number (length articles))
+	   (large (and (numberp nnmail-large-newsgroup)
+		       (> number nnmail-large-newsgroup)))
+	   (count 0)
+	   (pathname-coding-system 'binary)
+	   (case-fold-search t)
+	   ;;beg
+	   article
+	   headers header id end ref lines chars ctype)
+      (nnmh-possibly-change-directory newsgroup server)
+      ;; We don't support fetching by Message-ID.
+      (nnheader-retrieve-headers-from-directory
+       articles nnmh-current-directory dependencies
+       fetch-old force-new large "nnmh")
+      )))
 
 (deffoo nnmh-open-server (server &optional defs)
   (nnoo-change-server 'nnmh server defs)
@@ -229,8 +253,8 @@
 				(expand-file-name nnmh-toplev))))
 	       dir)
 	      (nnheader-replace-chars-in-string
-	       (mm-decode-coding-string (substring dir (match-end 0))
-					nnmail-pathname-coding-system)
+	       (gnus-decode-coding-string (substring dir (match-end 0))
+					  nnmail-pathname-coding-system)
 	       ?/ ?.))
 	    (apply 'max files)
 	    (apply 'min files)))))))
@@ -533,7 +557,7 @@
     (setq articles (sort articles (lambda (art1 art2)
 				    (> (car art1) (car art2)))))
     ;; Finally write this list back to the .nnmh-articles file.
-    (with-temp-file nnmh-file
+    (nnheader-temp-write nnmh-file
       (insert ";; Gnus article active file for " group "\n\n")
       (insert "(setq nnmh-newsgroup-articles '")
       (gnus-prin1 articles)

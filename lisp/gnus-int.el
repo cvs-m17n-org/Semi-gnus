@@ -1,7 +1,8 @@
-;;; gnus-int.el --- backend interface functions for Gnus
+;;; gnus-int.el --- backend interface functions for Chaos
 ;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -91,7 +92,6 @@ If CONFIRM is non-nil, the user will be asked for an NNTP server."
        ;; gnus-open-server-hook might have opened it
        (gnus-server-opened gnus-select-method)
        (gnus-open-server gnus-select-method)
-       gnus-batch-mode
        (gnus-y-or-n-p
 	(format
 	 "%s (%s) open error: '%s'.  Continue? "
@@ -269,14 +269,6 @@ this group uses will be queried."
       (funcall (gnus-get-function gnus-command-method func)
 	       (gnus-group-real-name group) (nth 1 gnus-command-method)))))
 
-(defun gnus-request-group-articles (group)
-  "Request a list of existing articles in GROUP."
-  (let ((gnus-command-method (gnus-find-method-for-group group))
-	(func 'request-group-articles))
-    (when (gnus-check-backend-function func group)
-      (funcall (gnus-get-function gnus-command-method func)
-	       (gnus-group-real-name group) (nth 1 gnus-command-method)))))
-
 (defun gnus-close-group (group)
   "Request the GROUP be closed."
   (let ((gnus-command-method (inline (gnus-find-method-for-group group))))
@@ -292,6 +284,43 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
       (funcall (gnus-get-function gnus-command-method 'retrieve-headers)
 	       articles (gnus-group-real-name group)
 	       (nth 1 gnus-command-method) fetch-old))))
+
+(defun gnus-retrieve-parsed-headers (articles group &optional fetch-old
+					      dependencies force-new)
+  "Request parsed-headers for ARTICLES in GROUP.
+If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
+  (unless dependencies
+    (setq dependencies
+	  (save-excursion
+	    (set-buffer gnus-summary-buffer)
+	    gnus-newsgroup-dependencies)))
+  (let ((gnus-command-method (gnus-find-method-for-group group))
+	headers)
+    (if (and gnus-use-cache (numberp (car articles)))
+	(setq headers
+	      (gnus-cache-retrieve-parsed-headers articles group fetch-old
+						  dependencies force-new))
+      (let ((func (gnus-get-function gnus-command-method
+				     'retrieve-parsed-headers 'no-error)))
+	(if func
+	    (setq headers (funcall func articles dependencies
+				   (gnus-group-real-name group)
+				   (nth 1 gnus-command-method) fetch-old
+				   force-new)
+		  gnus-headers-retrieved-by (car headers)
+		  headers (cdr headers))
+	  (setq gnus-headers-retrieved-by
+		(funcall
+		 (gnus-get-function gnus-command-method 'retrieve-headers)
+		 articles (gnus-group-real-name group)
+		 (nth 1 gnus-command-method) fetch-old))
+	  )))
+    (or headers
+	(if (eq gnus-headers-retrieved-by 'nov)
+	    (gnus-get-newsgroup-headers-xover
+	     articles nil dependencies gnus-newsgroup-name t)
+	  (gnus-get-newsgroup-headers dependencies)))
+    ))
 
 (defun gnus-retrieve-articles (articles group)
   "Request ARTICLES in GROUP."
@@ -315,16 +344,6 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
 	'unknown
       (funcall (gnus-get-function gnus-command-method 'request-type)
 	       (gnus-group-real-name group) article))))
-
-(defun gnus-request-set-mark (group action)
-  "Set marks on articles in the backend."
-  (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (if (not (gnus-check-backend-function
-	      'request-set-mark (car gnus-command-method)))
-	action
-      (funcall (gnus-get-function gnus-command-method 'request-set-mark)
-	       (gnus-group-real-name group) action
-	       (nth 1 gnus-command-method)))))
 
 (defun gnus-request-update-mark (group article mark)
   "Allow the backend to change the mark the user tries to put on an article."
@@ -442,8 +461,7 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	     article (gnus-group-real-name group)
 	     (nth 1 gnus-command-method) accept-function last)))
 
-(defun gnus-request-accept-article (group &optional gnus-command-method last
-					  no-encode)
+(defun gnus-request-accept-article (group &optional gnus-command-method last)
   ;; Make sure there's a newline at the end of the article.
   (when (stringp gnus-command-method)
     (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
@@ -453,11 +471,6 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (mail-encode-encoded-word-buffer))
-    (message-encode-message-body))
   (let ((func (car (or gnus-command-method
 		       (gnus-find-method-for-group group)))))
     (funcall (intern (format "%s-request-accept-article" func))
@@ -465,12 +478,7 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	     (cadr gnus-command-method)
 	     last)))
 
-(defun gnus-request-replace-article (article group buffer &optional no-encode)
-  (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (mail-encode-encoded-word-buffer))
-    (message-encode-message-body))
+(defun gnus-request-replace-article (article group buffer)
   (let ((func (car (gnus-group-name-to-method group))))
     (funcall (intern (format "%s-request-replace-article" func))
 	     article (gnus-group-real-name group) buffer)))

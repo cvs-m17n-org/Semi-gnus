@@ -1,7 +1,8 @@
-;;; gnus-cache.el --- cache interface for Gnus
+;;; gnus-cache.el --- cache interface for Chaos
 ;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -75,9 +76,6 @@ it's not cached."
 		 regexp))
 
 (defvar gnus-cache-overview-coding-system 'raw-text
-  "Coding system used on Gnus cache files.")
-
-(defvar gnus-cache-coding-system 'binary
   "Coding system used on Gnus cache files.")
 
 
@@ -178,8 +176,7 @@ it's not cached."
 	    t				; The article already is saved.
 	  (save-excursion
 	    (set-buffer nntp-server-buffer)
-	    (let ((gnus-use-cache nil)
-		  (gnus-article-decode-hook nil))
+	    (let ((gnus-use-cache nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer file)
@@ -204,7 +201,17 @@ it's not cached."
 		    (beginning-of-line))
 		(forward-line 1))
 	      (beginning-of-line)
-	      (nnheader-insert-nov headers)
+	      ;; [number subject from date id references chars lines xref]
+	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
+			      (mail-header-number headers)
+			      (mime-fetch-field 'Subject headers)
+			      (mime-fetch-field 'From headers)
+			      (mail-header-date headers)
+			      (mail-header-id headers)
+			      (or (mail-header-references headers) "")
+			      (or (mail-header-chars headers) "")
+			      (or (mail-header-lines headers) "")
+			      (or (mail-header-xref headers) "")))
 	      ;; Update the active info.
 	      (set-buffer gnus-summary-buffer)
 	      (gnus-cache-update-active group number)
@@ -258,8 +265,7 @@ it's not cached."
     (when (file-exists-p file)
       (erase-buffer)
       (gnus-kill-all-overlays)
-      (let ((coding-system-for-read gnus-cache-coding-system))
-	(insert-file-contents file))
+      (nnheader-insert-file-contents file)
       t)))
 
 (defun gnus-cache-possibly-alter-active (group active)
@@ -305,7 +311,7 @@ it's not cached."
 	    ;; unsuccessful), so we use the cached headers exclusively.
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer)
-	    (insert-file-contents cache-file)
+	    (nnheader-insert-file-contents cache-file)
 	    'nov)
 	   ((eq type 'nov)
 	    ;; We have both cached and uncached NOV headers, so we
@@ -317,6 +323,65 @@ it's not cached."
 	    (gnus-cache-braid-heads group (gnus-sorted-intersection
 					   cached articles))
 	    type)))))))
+
+(defun gnus-cache-retrieve-parsed-headers (articles group &optional fetch-old
+						    dependencies force-new)
+  "Retrieve the parsed-headers for ARTICLES in GROUP."
+  (let ((cached
+	 (setq gnus-newsgroup-cached (gnus-cache-articles-in-group group))))
+    (if (not cached)
+	;; No cached articles here, so we just retrieve them
+	;; the normal way.
+	(let ((gnus-use-cache nil))
+	  (gnus-retrieve-parsed-headers articles group fetch-old
+					dependencies force-new))
+      (let ((uncached-articles (gnus-sorted-intersection
+				(gnus-sorted-complement articles cached)
+				articles))
+	    (cache-file (gnus-cache-file-name group ".overview")))
+	(gnus-cache-braid-headers
+	 ;; We first retrieve all the headers that we don't have in
+	 ;; the cache.
+	 (prog1
+	     (let ((gnus-use-cache nil))
+	       (when uncached-articles
+		 (and articles
+		      (gnus-retrieve-parsed-headers
+		       uncached-articles group fetch-old
+		       dependencies))
+		 ))
+	   (gnus-cache-save-buffers))
+	 ;; Then we insert the cached headers.
+	 (cond ((not (file-exists-p cache-file))
+		;; There are no cached headers.
+		)
+	       ((eq gnus-headers-retrieved-by 'nov)
+		(with-current-buffer nntp-server-buffer
+		  (erase-buffer)
+		  (nnheader-insert-file-contents cache-file)
+		  (nnheader-get-newsgroup-headers-xover*
+		   articles nil dependencies group)
+		  ))
+	       (t
+		;; We braid HEADs.
+		(nnheader-retrieve-headers-from-directory*
+		 cached
+		 (expand-file-name
+		  (file-name-as-directory
+		   (nnheader-translate-file-chars
+		    (if (gnus-use-long-file-name 'not-cache)
+			group
+		      (let ((group
+			     (nnheader-replace-chars-in-string group ?/ ?_)))
+			;; Translate the first colon into a slash.
+			(when (string-match ":" group)
+			  (aset group (match-beginning 0) ?/))
+			(nnheader-replace-chars-in-string group ?. ?/)))
+		    t))
+		  gnus-cache-directory)
+		 dependencies)
+		)))
+	))))
 
 (defun gnus-cache-enter-article (&optional n)
   "Enter the next N articles into the cache.
@@ -390,6 +455,7 @@ Returns the list of articles removed."
 	    (cons group
 		  (set-buffer (gnus-get-buffer-create
 			       " *gnus-cache-overview*"))))
+      (buffer-disable-undo (current-buffer))
       ;; Insert the contents of this group's cache overview.
       (erase-buffer)
       (let ((file (gnus-cache-file-name group ".overview")))
@@ -423,7 +489,7 @@ Returns the list of articles removed."
 (defun gnus-cache-update-article (group article)
   "If ARTICLE is in the cache, remove it and re-enter it."
   (gnus-cache-change-buffer group)
-  (when (gnus-cache-possibly-remove-article article nil nil nil t)
+  (when (gnus-cache-possibly-remove-article article nil nil nil t)    
     (let ((gnus-use-cache nil))
       (gnus-cache-possibly-enter-article
        gnus-newsgroup-name article (gnus-summary-article-header article)
@@ -481,8 +547,9 @@ Returns the list of articles removed."
     (gnus-cache-save-buffers)
     (save-excursion
       (set-buffer cache-buf)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (insert-file-contents (or file (gnus-cache-file-name group ".overview")))
+      (nnheader-insert-file-contents (or file (gnus-cache-file-name group ".overview")))
       (goto-char (point-min))
       (insert "\n")
       (goto-char (point-min)))
@@ -510,6 +577,7 @@ Returns the list of articles removed."
   (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
       (set-buffer cache-buf)
+      (buffer-disable-undo (current-buffer))
       (erase-buffer))
     (set-buffer nntp-server-buffer)
     (goto-char (point-min))
@@ -524,7 +592,7 @@ Returns the list of articles removed."
       (save-excursion
 	(set-buffer cache-buf)
 	(erase-buffer)
-	(insert-file-contents (gnus-cache-file-name group (car cached)))
+	(nnheader-insert-file-contents (gnus-cache-file-name group (car cached)))
 	(goto-char (point-min))
 	(insert "220 ")
 	(princ (car cached) (current-buffer))
@@ -536,6 +604,36 @@ Returns the list of articles removed."
       (insert-buffer-substring cache-buf)
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
+
+(defun gnus-cache-braid-headers (headers cached-headers)
+  (if cached-headers
+      (if headers
+	  (let (cached-header hrest nhrest)
+	    (nconc (catch 'tag
+		     (while cached-headers
+		       (setq cached-header (car cached-headers))
+		       (if (< (mail-header-number cached-header)
+			      (mail-header-number (car headers)))
+			   (throw 'tag (nreverse cached-headers))
+			 (setq hrest headers
+			       nhrest (cdr hrest))
+			 (while (and nhrest
+				     (> (mail-header-number cached-header)
+					(mail-header-number (car nhrest))))
+			   (setq hrest nhrest
+				 nhrest (cdr nhrest))
+			   )
+			 ;;(if nhrest
+			 (setcdr hrest (cons cached-header nhrest))
+                         ;; (setq headers
+                         ;;         (nconc headers (list cached-header)))
+			 ;; (throw 'tag nil)
+			 ;;)
+			 )
+		       (setq cached-headers (cdr cached-headers))))
+		   headers))
+	(nreverse cached-headers))
+    headers))
 
 ;;;###autoload
 (defun gnus-jog-cache ()
@@ -568,14 +666,14 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   "Read the cache active file."
   (gnus-make-directory gnus-cache-directory)
   (if (or (not (file-exists-p gnus-cache-active-file))
-	  (zerop (nth 7 (file-attributes gnus-cache-active-file)))
+	  (not (zerop (nth 7 (file-attributes gnus-cache-active-file))))
 	  force)
       ;; There is no active file, so we generate one.
       (gnus-cache-generate-active)
     ;; We simply read the active file.
     (save-excursion
       (gnus-set-work-buffer)
-      (insert-file-contents gnus-cache-active-file)
+      (nnheader-insert-file-contents gnus-cache-active-file)
       (gnus-active-to-gnus-format
        nil (setq gnus-cache-active-hashtb
 		 (gnus-make-hashtable
@@ -587,7 +685,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (with-temp-file gnus-cache-active-file
+    (nnheader-temp-write gnus-cache-active-file
       (mapatoms
        (lambda (sym)
 	 (when (and sym (boundp sym))

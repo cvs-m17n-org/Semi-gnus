@@ -1,5 +1,5 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -28,7 +28,6 @@
 (require 'text-props)
 (defvar menu-bar-mode (featurep 'menubar))
 (require 'messagexmas)
-(require 'wid-edit)
 
 (defgroup gnus-xmas nil
   "XEmacsoid support for Gnus"
@@ -42,8 +41,6 @@ automatically."
 		 directory)
   :group 'gnus-xmas)
 
-;;(format "%02x%02x%02x" 114 66 20) "724214"
-
 (defvar gnus-xmas-logo-color-alist
   '((flame "#cc3300" "#ff2200")
     (pine "#c0cc93" "#f8ffb8")
@@ -55,18 +52,16 @@ automatically."
     (grape "#b264cc" "#cf7df")
     (labia "#cc64c2" "#fd7dff")
     (berry "#cc6485" "#ff7db5")
-    (dino "#724214" "#1e3f03")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
-(defcustom gnus-xmas-logo-color-style 'dino
+(defcustom gnus-xmas-logo-color-style 'moss
   "*Color styles used for the Gnus logo."
   :type '(choice (const flame) (const pine) (const moss)
 		 (const irish) (const sky) (const tin)
 		 (const velvet) (const grape) (const labia)
-		 (const berry) (const neutral) (const september)
-		 (const dino))
+		 (const berry) (const neutral) (const september))
   :group 'gnus-xmas)
 
 (defvar gnus-xmas-logo-colors
@@ -181,9 +176,7 @@ displayed, no centering will be performed."
 		     (- (window-height) 2)))
 	   (top (cond ((< height 4) 0)
 		      ((< height 7) 1)
-		      (t (if (numberp gnus-auto-center-summary)
-			     gnus-auto-center-summary
-			   2))))
+		      (t 2)))
 	   (bottom (save-excursion (goto-char (point-max))
 				   (forward-line (- height))
 				   (point)))
@@ -248,7 +241,6 @@ call it with the value of the `gnus-data' text property."
   (let* ((pos (event-closest-point event))
 	 (data (get-text-property pos 'gnus-data))
 	 (fun (get-text-property pos 'gnus-callback)))
-    (goto-char pos)
     (when fun
       (funcall fun data))))
 
@@ -260,6 +252,21 @@ call it with the value of the `gnus-data' text property."
   (map-extents (lambda (extent ignore)
 		 (delete-extent extent)
 		 nil)))
+
+;; Fixed by Christopher Davis <ckd@loiosh.kei.com>.
+(defun gnus-xmas-article-add-button (from to fun &optional data)
+  "Create a button between FROM and TO with callback FUN and data DATA."
+  (when gnus-article-button-face
+    (gnus-overlay-put (gnus-make-overlay from to)
+		      'face gnus-article-button-face))
+  (gnus-add-text-properties
+   from to
+   (nconc
+    (and gnus-article-mouse-face
+	 (list 'mouse-face gnus-article-mouse-face))
+    (list 'gnus-callback fun)
+    (and data (list 'gnus-data data))
+    (list 'highlight t))))
 
 (defun gnus-xmas-window-top-edge (&optional window)
   (nth 1 (window-pixel-edges window)))
@@ -387,10 +394,26 @@ call it with the value of the `gnus-data' text property."
 	       (event-to-character event))
 	  event)))
 
+(defun gnus-xmas-seconds-since-epoch (date)
+  "Return a floating point number that says how many seconds have lapsed between Jan 1 12:00:00 1970 and DATE."
+  (let* ((tdate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date date)))
+	 (ttime (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-time
+			 (aref (timezone-parse-date date) 3))))
+	 (edate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date "Jan 1 12:00:00 1970")))
+	 (tday (- (timezone-absolute-from-gregorian
+		   (nth 1 tdate) (nth 2 tdate) (nth 0 tdate))
+		  (timezone-absolute-from-gregorian
+		   (nth 1 edate) (nth 2 edate) (nth 0 edate)))))
+    (+ (nth 2 ttime)
+       (* (nth 1 ttime) 60)
+       (* (float (nth 0 ttime)) 60 60)
+       (* (float tday) 60 60 24))))
+
 (defun gnus-xmas-define ()
   (setq gnus-mouse-2 [button2])
-  (setq gnus-mouse-3 [button3])
-  (setq gnus-widget-button-keymap widget-button-keymap)
 
   (unless (memq 'underline (face-list))
     (and (fboundp 'make-face)
@@ -433,6 +456,16 @@ call it with the value of the `gnus-data' text property."
 
   (defvar gnus-mouse-face-prop 'highlight)
 
+  (unless (fboundp 'encode-time)
+    (defun encode-time (sec minute hour day month year &optional zone)
+      (let ((seconds
+	     (gnus-xmas-seconds-since-epoch
+	      (timezone-make-arpa-date
+	       year month day (timezone-make-time-string hour minute sec)
+	       zone))))
+	(list (floor (/ seconds (expt 2 16)))
+	      (round (mod seconds (expt 2 16)))))))
+
   (defun gnus-byte-code (func)
     "Return a form that can be `eval'ed based on FUNC."
     (let ((fval (indirect-function func)))
@@ -445,7 +478,28 @@ call it with the value of the `gnus-data' text property."
 	    'x-color-values
 	  (lambda (color)
 	    (color-instance-rgb-components
-	     (make-color-instance color))))))
+	     (make-color-instance color)))))
+
+  (when (featurep 'mule)
+    (defun gnus-tilde-pad-form (el pad-width)
+      "Return a form that pads EL to PAD-WIDTH."
+      (let ((pad (abs pad-width)))
+	(if (symbolp el)
+	    (if (< pad-width 0)
+		`(concat ,el (make-string
+			      (max 0 (- ,pad (string-width ,el))) ?\ ))
+	      `(concat (make-string
+			(max 0 (- ,pad (string-width ,el))) ?\ )
+		       ,el))
+	  (if (< pad-width 0)
+	      `(let ((val (eval ,el)))
+		 (concat val (make-string
+			      (max 0 (- ,pad (string-width val))) ?\ )))
+	    `(let ((val (eval ,el)))
+	       (concat (make-string
+			(max 0 (- ,pad (string-width val))) ?\ )
+		       val))))))
+    ))
 
 (defun gnus-xmas-redefine ()
   "Redefine lots of Gnus functions for XEmacs."
@@ -454,6 +508,7 @@ call it with the value of the `gnus-data' text property."
   (fset 'gnus-summary-recenter 'gnus-xmas-summary-recenter)
   (fset 'gnus-extent-start-open 'gnus-xmas-extent-start-open)
   (fset 'gnus-article-push-button 'gnus-xmas-article-push-button)
+  (fset 'gnus-article-add-button 'gnus-xmas-article-add-button)
   (fset 'gnus-window-top-edge 'gnus-xmas-window-top-edge)
   (fset 'gnus-read-event-char 'gnus-xmas-read-event-char)
   (fset 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
@@ -466,8 +521,6 @@ call it with the value of the `gnus-data' text property."
 	'gnus-xmas-mode-line-buffer-identification)
   (fset 'gnus-key-press-event-p 'key-press-event-p)
   (fset 'gnus-region-active-p 'region-active-p)
-  (fset 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
-  (fset 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
 
   (add-hook 'gnus-group-mode-hook 'gnus-xmas-group-menu-add)
   (add-hook 'gnus-summary-mode-hook 'gnus-xmas-summary-menu-add)
@@ -492,8 +545,91 @@ call it with the value of the `gnus-data' text property."
   (add-hook 'gnus-draft-mode-hook 'gnus-xmas-draft-menu-add)
   (add-hook 'gnus-summary-mode-hook
 	    'gnus-xmas-switch-horizontal-scrollbar-off)
-  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off))
+  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off)
 
+  (when (featurep 'mule)
+    (defun gnus-truncate-string (str end-column &optional start-column padding)
+      "Truncate string STR to end at column END-COLUMN.
+The optional 2nd arg START-COLUMN, if non-nil, specifies
+the starting column; that means to return the characters occupying
+columns START-COLUMN ... END-COLUMN of STR.
+
+The optional 3rd arg PADDING, if non-nil, specifies a padding character
+to add at the end of the result if STR doesn't reach column END-COLUMN,
+or if END-COLUMN comes in the middle of a character in STR.
+PADDING is also added at the beginning of the result
+if column START-COLUMN appears in the middle of a character in STR.
+
+If PADDING is nil, no padding is added in these cases, so
+the resulting string may be narrower than END-COLUMN.
+\[Emacs 20.3 emulating function]"
+      (or start-column
+	  (setq start-column 0))
+      (let ((len (length str))
+	    (idx 0)
+	    (column 0)
+	    (head-padding "") (tail-padding "")
+	    ch last-column last-idx from-idx)
+	(condition-case nil
+	    (while (< column start-column)
+	      (setq ch (aref str idx)
+		    column (+ column (char-width ch))
+		    idx (1+ idx)))
+	  (args-out-of-range (setq idx len)))
+	(if (< column start-column)
+	    (if padding (make-string end-column padding) "")
+	  (if (and padding (> column start-column))
+	      (setq head-padding
+		    (make-string (- column start-column) padding)))
+	  (setq from-idx idx)
+	  (if (< end-column column)
+	      (setq idx from-idx)
+	    (condition-case nil
+		(while (< column end-column)
+		  (setq last-column column
+			last-idx idx
+			ch (aref str idx)
+			column (+ column (char-width ch))
+			idx (1+ idx)))
+	      (args-out-of-range (setq idx len)))
+	    (if (> column end-column)
+		(setq column last-column idx last-idx))
+	    (if (and padding (< column end-column))
+		(setq tail-padding
+		      (make-string (- end-column column) padding))))
+	  (setq str (substring str from-idx idx))
+	  (if padding
+	      (concat head-padding str tail-padding)
+	    str))))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    (if (< max-width 0)
+		`(let ((width (string-width ,el)))
+		   (gnus-truncate-string ,el width (- width ,max)))
+	      `(gnus-truncate-string ,el ,max))
+	  (if (< max-width 0)
+	      `(let* ((val (eval ,el))
+		      (width (string-width val)))
+		 (gnus-truncate-string val width (- width ,max)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val ,max))))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    (if (< cut-width 0)
+		`(gnus-truncate-string ,el (- (string-width ,el) ,cut))
+	      `(gnus-truncate-string ,el (string-width ,el) ,cut))
+	  (if (< cut-width 0)
+	      `(let ((val (eval ,el)))
+		 (gnus-truncate-string val (- (string-width val) ,cut)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val (string-width val) ,cut))))))
+    ))
 
 ;;; XEmacs logo and toolbar.
 
@@ -577,7 +713,7 @@ call it with the value of the `gnus-data' text property."
 				'default-toolbar
 			      nil)
   "*If nil, do not use a toolbar.
-If it is non-nil, it must be a toolbar.  The five valid values are
+If it is non-nil, it must be a toolbar.  The five legal values are
 `default-toolbar', `top-toolbar', `bottom-toolbar',
 `right-toolbar', and `left-toolbar'."
   :type '(choice (const default-toolbar)
@@ -702,25 +838,24 @@ XEmacs compatibility workaround."
   "Display any XFace headers in the current article."
   (save-excursion
     (let ((xface-glyph
-	   (cond
-	    ((featurep 'xface)
-	     (make-glyph (vector 'xface :data
-				 (concat "X-Face: "
-					 (buffer-substring beg end)))))
-	    ((featurep 'xpm)
-	     (let ((cur (current-buffer)))
-	       (save-excursion
-		 (gnus-set-work-buffer)
-		 (insert (format "%s" (buffer-substring beg end cur)))
-		 (gnus-xmas-call-region "uncompface")
-		 (goto-char (point-min))
-		 (insert "/* Width=48, Height=48 */\n")
-		 (gnus-xmas-call-region "icontopbm")
-		 (gnus-xmas-call-region "ppmtoxpm")
-		 (make-glyph
-		  (vector 'xpm :data (buffer-string))))))
-	    (t
-	     (make-glyph [nothing]))))
+	   (cond ((featurep 'xface)
+		  (make-glyph (vector 'xface :data
+				      (concat "X-Face: "
+					      (buffer-substring beg end)))))
+		 ((featurep 'xpm)
+		  (let ((cur (current-buffer)))
+		    (save-excursion
+		      (gnus-set-work-buffer)
+		      (insert (format "%s" (buffer-substring beg end cur)))
+		      (gnus-xmas-call-region "uncompface")
+		      (goto-char (point-min))
+		      (insert "/* Width=48, Height=48 */\n")
+		      (gnus-xmas-call-region "icontopbm")
+		      (gnus-xmas-call-region "ppmtoxpm")
+		      (make-glyph
+		       (vector 'xpm :data (buffer-string))))))
+		 (t
+		  (make-glyph [nothing]))))
 	  (ext (make-extent (progn
 			      (goto-char (point-min))
 			      (re-search-forward "^From:" nil t)
@@ -730,12 +865,26 @@ XEmacs compatibility workaround."
       (set-extent-begin-glyph ext xface-glyph)
       (set-extent-property ext 'duplicable t))))
 
+;;(defvar gnus-xmas-pointer-glyph
+;;  (progn
+;;    (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory
+;;                                     "gnus"))
+;;    (let ((file-xpm (expand-file-name "gnus-pointer.xpm"
+;;				      gnus-xmas-glyph-directory))
+;;	  (file-xbm (expand-file-name "gnus-pointer.xbm"
+;;				      gnus-xmas-glyph-directory)))
+;;      (make-pointer-glyph
+;;       (list (vector 'xpm ':file file-xpm)
+;;	     (vector 'xbm ':file file-xbm))))))
+
 (defvar gnus-xmas-modeline-left-extent
   (let ((ext (copy-extent modeline-buffer-id-left-extent)))
+;    (set-extent-property ext 'pointer gnus-xmas-pointer-glyph)
     ext))
 
 (defvar gnus-xmas-modeline-right-extent
   (let ((ext (copy-extent modeline-buffer-id-right-extent)))
+;    (set-extent-property ext 'pointer gnus-xmas-pointer-glyph)
     ext))
 
 (defvar gnus-xmas-modeline-glyph
@@ -752,7 +901,7 @@ XEmacs compatibility workaround."
 			  `[xpm :file ,file-xpm])
 			 ((featurep 'xbm)
 			  ;; Then a not-so-nifty XBM
-			  `[xbm :file ,file-xbm])
+			  [xbm :file ,file-xbm])
 			 ;; Then the simple string
 			 (t [string :data "Gnus:"])))))
       (set-glyph-face glyph 'modeline-buffer-id)
@@ -780,23 +929,6 @@ XEmacs compatibility workaround."
 (defun gnus-xmas-splash ()
   (when (eq (device-type) 'x)
     (gnus-splash)))
-
-(defun gnus-xmas-annotation-in-region-p (b e)
-  (or (map-extents (lambda (e u) t) nil b e nil nil 'mm t)
-      (if (= b e)
-	  (eq (cadr (memq 'gnus-undeletable (text-properties-at b))) t)
-	(text-property-any b e 'gnus-undeletable t))))
-
-(defun gnus-xmas-mime-button-menu (event)
-  "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
-  (let ((response (get-popup-menu-response
-		   `("MIME Part"
-		     ,@(mapcar (lambda (c) `[,(caddr c) ,(car c) t])
-			       gnus-mime-button-commands)))))
-    (set-buffer (event-buffer event))
-    (goto-char (event-point event))
-    (funcall (event-function response) (event-object response))))
 
 (provide 'gnus-xmas)
 

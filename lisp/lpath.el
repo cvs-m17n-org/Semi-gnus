@@ -2,6 +2,12 @@
 
 (defvar byte-compile-default-warnings)
 
+(or (featurep 'path-util)
+    (load "apel/path-util"))
+(add-path "apel")
+(add-path "flim")
+(add-path "semi")
+
 (defun maybe-fbind (args)
   (while args
     (or (fboundp (car args))
@@ -25,41 +31,22 @@
 		     run-with-idle-timer mouse-minibuffer-check window-edges
 		     event-click-count track-mouse read-event mouse-movement-p
 		     event-end mouse-scroll-subr overlay-lists delete-overlay
-		     set-face-stipple mail-abbrevs-setup
+		     set-face-stipple mail-abbrevs-setup char-int
 		     make-char-table set-char-table-range font-create-object
 		     x-color-values widget-make-intangible error-message-string
 		     w3-form-encode-xwfu gnus-mule-get-coding-system
-		     decode-coding-string mail-aliases-setup
-		     mm-copy-tree url-view-url w3-prepare-buffer
-		     set-buffer-multibyte
-		     find-non-ascii-charset-region char-charset
-		     mule-write-region-no-coding-system
-		     find-charset-region
-		     find-coding-systems-region get-charset-property
-		     coding-system-get w3-region
-		     rmail-summary-exists rmail-select-summary
-		     rmail-update-summary url-retrieve
-		     temp-directory
-		     ))
+		     decode-coding-string mail-aliases-setup))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
 		    font-lock-defaults user-full-name user-login-name
 		    gnus-newsgroup-name gnus-article-x-face-too-ugly
-		    gnus-newsgroup-charset
 		    mail-mode-hook enable-multibyte-characters
-		    adaptive-fill-first-line-regexp adaptive-fill-regexp
-		    url-current-mime-headers buffer-file-coding-system
-		    w3-image-mappings url-current-mime-type
-		    url-current-callback-func url-current-callback-data
-		    url-be-asynchronous temporary-file-directory)))
+		    adaptive-fill-first-line-regexp adaptive-fill-regexp)))
   (maybe-bind '(mail-mode-hook
 		enable-multibyte-characters browse-url-browser-function
-		adaptive-fill-first-line-regexp adaptive-fill-regexp
-		url-current-mime-headers help-echo-owns-message))
-  (maybe-fbind '(color-instance-rgb-components temp-directory
-		 glyph-width annotation-glyph window-pixel-width glyph-height
-		 window-pixel-height
+		adaptive-fill-first-line-regexp adaptive-fill-regexp))
+  (maybe-fbind '(color-instance-rgb-components
 		 make-color-instance color-instance-name specifier-instance
 		 device-type device-class get-popup-menu-response event-object
 		 x-defined-colors read-color add-submenu set-font-family
@@ -70,17 +57,9 @@
 		 widget-make-intangible glyphp make-glyph set-glyph-image
 		 set-glyph-property event-glyph glyph-property event-point
 		 device-on-window-system-p make-gui-button Info-goto-node
-		 pp-to-string color-name
+		 pp-to-string color-name 
 		 gnus-mule-get-coding-system decode-coding-string
-		 mail-aliases-setup
-		 mm-copy-tree url-view-url w3-prepare-buffer
-		 mule-write-region-no-coding-system char-int
-		 annotationp delete-annotation make-image-specifier
-		 make-annotation
-		 w3-do-setup w3-region
-		 rmail-summary-exists rmail-select-summary rmail-update-summary
-		 url-generic-parse-url valid-image-instantiator-format-p
-		 )))
+		 mail-aliases-setup)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

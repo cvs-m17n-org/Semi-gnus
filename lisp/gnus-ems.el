@@ -1,7 +1,8 @@
-;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         Tatsuya Ichikawa <t-ichi@niagara.shiojiri.ne.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -33,9 +34,7 @@
   "Non-nil if running under XEmacs.")
 
 (defvar gnus-mouse-2 [mouse-2])
-(defvar gnus-down-mouse-3 [down-mouse-3])
 (defvar gnus-down-mouse-2 [down-mouse-2])
-(defvar gnus-widget-button-keymap nil)
 (defvar gnus-mode-line-modified
   (if (or gnus-xemacs
 	  (< emacs-major-version 20))
@@ -47,15 +46,84 @@
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
 
+(or (fboundp 'mail-file-babyl-p)
+    (fset 'mail-file-babyl-p 'rmail-file-p))
+
 ;;; Mule functions.
 
-(defun gnus-mule-max-width-function (el max-width)
-  (` (let* ((val (eval (, el)))
-	    (valstr (if (numberp val)
-			(int-to-string val) val)))
-       (if (> (length valstr) (, max-width))
-	   (truncate-string-to-width valstr (, max-width))
-	 valstr))))
+(defun gnus-mule-cite-add-face (number prefix face)
+  ;; At line NUMBER, ignore PREFIX and add FACE to the rest of the line.
+  (when face
+    (let ((inhibit-point-motion-hooks t)
+	  from to)
+      (goto-line number)
+      (unless (eobp)            ; Sometimes things become confused (broken).
+	(forward-char (chars-in-string prefix))
+        (skip-chars-forward " \t")
+        (setq from (point))
+        (end-of-line 1)
+        (skip-chars-backward " \t")
+        (setq to (point))
+        (when (< from to)
+          (push (setq overlay (gnus-make-overlay from to))
+                gnus-cite-overlay-list)
+          (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
+
+(defvar gnus-mule-bitmap-image-file nil)
+(defun gnus-mule-group-startup-message (&optional x y)
+  "Insert startup message in current buffer."
+  ;; Insert the message.
+  (erase-buffer)
+  (insert
+   (if (featurep 'bitmap)
+     (format "              %s
+
+"
+	     "" (if (and (stringp gnus-mule-bitmap-image-file)
+			 (file-exists-p gnus-mule-bitmap-image-file))
+		    (insert-file gnus-mule-bitmap-image-file)))
+     (format "              %s
+          _    ___ _             _
+          _ ___ __ ___  __    _ ___
+          __   _     ___    __  ___
+              _           ___     _
+             _  _ __             _
+             ___   __            _
+                   __           _
+                    _      _   _
+                   _      _    _
+                      _  _    _
+                  __  ___
+                 _   _ _     _
+                _   _
+              _    _
+             _    _
+            _
+          __
+
+"
+	     "")))
+  ;; And then hack it.
+  (gnus-indent-rigidly (point-min) (point-max)
+		       (/ (max (- (window-width) (or x 46)) 0) 2))
+  (goto-char (point-min))
+  (forward-line 1)
+  (let* ((pheight (count-lines (point-min) (point-max)))
+	 (wheight (window-height))
+	 (rest (- wheight pheight)))
+    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+  ;; Fontify some.
+  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+  (goto-char (point-min))
+  (setq mode-line-buffer-identification (concat " " gnus-version))
+  (setq gnus-simple-splash t)
+  (set-buffer-modified-p t))
+
+(defun gnus-encode-coding-string (string system)
+  string)
+
+(defun gnus-decode-coding-string (string system)
+  string)
 
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
@@ -67,6 +135,20 @@
   (cond
    ((string-match "XEmacs\\|Lucid" emacs-version)
     (gnus-xmas-define))
+
+   ((or (not (boundp 'emacs-minor-version))
+	(and (< emacs-major-version 20)
+	     (< emacs-minor-version 30)))
+    ;; Remove the `intangible' prop.
+    (let ((props (and (boundp 'gnus-hidden-properties)
+		      gnus-hidden-properties)))
+      (while (and props (not (eq (car (cdr props)) 'intangible)))
+	(setq props (cdr props)))
+      (when props
+	(setcdr props (cdr (cdr (cdr props))))))
+    (unless (fboundp 'buffer-substring-no-properties)
+      (defun buffer-substring-no-properties (beg end)
+	(format "%s" (buffer-substring beg end)))))
 
    ((boundp 'MULE)
     (provide 'gnusutil))))
@@ -80,7 +162,14 @@
       (while funcs
 	(unless (fboundp (car funcs))
 	  (fset (car funcs) 'gnus-dummy-func))
-	(setq funcs (cdr funcs)))))))
+	(setq funcs (cdr funcs))))))
+  (unless (fboundp 'file-regular-p)
+    (defun file-regular-p (file)
+      (and (not (file-directory-p file))
+	   (not (file-symlink-p file))
+	   (file-exists-p file))))
+  (unless (fboundp 'face-list)
+    (defun face-list (&rest args))))
 
 (eval-and-compile
   (let ((case-fold-search t))
@@ -127,31 +216,68 @@
 
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
-    (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
     (fset 'gnus-summary-set-display-table (lambda ()))
+    (fset 'gnus-encode-coding-string 'encode-coding-string)
+    (fset 'gnus-decode-coding-string 'decode-coding-string)
+
+    (if (fboundp 'truncate-string-to-width)
+	(fset 'gnus-truncate-string 'truncate-string-to-width)
+      (fset 'gnus-truncate-string 'truncate-string))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			,el (string-width ,el)
+			(- (string-width ,el) ,max))
+		    `(gnus-truncate-string ,el ,max))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			val (string-width val)
+			(- (string-width val) ,max))
+		    `(gnus-truncate-string val ,max))
+	       val)))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			,el (- (string-width ,el) ,cut))
+		    `(gnus-truncate-string
+		      ,el (- (string-width ,el) ,cut) ,cut))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			val (- (string-width val) ,cut))
+		    `(gnus-truncate-string
+		      val (- (string-width val) ,cut) ,cut))
+	       val)))))
+
+    (when window-system
+      (require 'path-util)
+      (if (module-installed-p 'bitmap)
+	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
+	))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (defun gnus-summary-line-format-spec ()
-      (insert gnus-tmp-unread gnus-tmp-replied
-	      gnus-tmp-score-char gnus-tmp-indentation)
-      (put-text-property
-       (point)
-       (progn
-	 (insert
-	  gnus-tmp-opening-bracket
-	  (format "%4d: %-20s"
-		  gnus-tmp-lines
-		  (if (> (length gnus-tmp-name) 20)
-		      (truncate-string-to-width gnus-tmp-name 20)
-		    gnus-tmp-name))
-	  gnus-tmp-closing-bracket)
-	 (point))
-       gnus-mouse-face-prop gnus-mouse-face)
-      (insert " " gnus-tmp-subject-or-nil "\n"))
+    (when (fboundp 'chars-in-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
+
     )))
 
 (defun gnus-region-active-p ()
@@ -181,22 +307,23 @@
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file (concat dir "x-splash"))))
-	  (with-temp-buffer
+	  (nnheader-temp-write nil
 	    (insert-file-contents file)
 	    (goto-char (point-min))
 	    (ignore-errors
 	      (setq pixmap (read (current-buffer))))))
 	(when pixmap
+	  (erase-buffer)
 	  (unless (facep 'gnus-splash)
 	    (make-face 'gnus-splash))
 	  (setq height (/ (car pixmap) (frame-char-height))
 		width (/ (cadr pixmap) (frame-char-width)))
-	  (set-face-foreground 'gnus-splash "Brown")
+	  (set-face-foreground 'gnus-splash "ForestGreen")
 	  (set-face-stipple 'gnus-splash pixmap)
 	  (insert-char ?\n (* (/ (window-height) 2 height) height))
 	  (setq i height)
 	  (while (> i 0)
-	    (insert-char ?  (* (/ (window-width) 2 width) width))
+	    (insert-char ?  (* (+ (/ (window-width) 2 width) 1) width))
 	    (setq beg (point))
 	    (insert-char ?  width)
 	    (set-text-properties beg (point) '(face gnus-splash))
@@ -204,6 +331,16 @@
 	    (decf i))
 	  (goto-char (point-min))
 	  (sit-for 0))))))
+
+(if (fboundp 'split-string)
+    (fset 'gnus-split-string 'split-string)
+  (defun gnus-split-string (string pattern)
+    "Return a list of substrings of STRING which are separated by PATTERN."
+    (let (parts (start 0))
+      (while (string-match pattern string start)
+	(setq parts (cons (substring string start (match-beginning 0)) parts)
+	      start (match-end 0)))
+      (nreverse (cons (substring string start) parts)))))
 
 (provide 'gnus-ems)
 

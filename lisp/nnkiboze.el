@@ -1,5 +1,5 @@
 ;;; nnkiboze.el --- select virtual news access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -136,7 +136,7 @@
   ;; Remove NOV lines of articles that are marked as read.
   (when (and (file-exists-p (nnkiboze-nov-file-name))
 	     nnkiboze-remove-read-articles)
-    (with-temp-file (nnkiboze-nov-file-name)
+    (nnheader-temp-write (nnkiboze-nov-file-name)
       (let ((cur (current-buffer)))
 	(nnheader-insert-file-contents (nnkiboze-nov-file-name))
 	(goto-char (point-min))
@@ -209,7 +209,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 
 (defun nnkiboze-generate-group (group)
   (let* ((info (nth 2 (gnus-gethash group gnus-newsrc-hashtb)))
-	 (newsrc-file (concat nnkiboze-directory
+	 (newsrc-file (concat nnkiboze-directory 
                               (nnheader-translate-file-chars
                                (concat group ".newsrc"))))
 	 (nov-file (concat nnkiboze-directory
@@ -230,9 +230,9 @@ Finds out what articles are to be part of the nnkiboze groups."
     ;; Load the kiboze newsrc file for this group.
     (when (file-exists-p newsrc-file)
       (load newsrc-file))
-    (with-temp-file nov-file
+    (nnheader-temp-write nov-file
       (when (file-exists-p nov-file)
-	(insert-file-contents nov-file))
+	(nnheader-insert-file-contents nov-file))
       (setq nov-buffer (current-buffer))
       ;; Go through the active hashtb and add new all groups that match the
       ;; kiboze regexp.
@@ -287,7 +287,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 					   (car ginfo)))
 				  0))
 			   (progn
-			     (ignore-errors
+			     (ignore-errors 
 			       (gnus-group-select-group nil))
 			     (eq major-mode 'gnus-summary-mode)))
 		  ;; We are now in the group where we want to be.
@@ -318,7 +318,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	(gnus-message 3 "nnkiboze: Checking %s...done" (caar newsrc))
 	(setq newsrc (cdr newsrc))))
     ;; We save the kiboze newsrc for this group.
-    (with-temp-file newsrc-file
+    (nnheader-temp-write newsrc-file
       (insert "(setq nnkiboze-newsrc '")
       (gnus-prin1 nnkiboze-newsrc)
       (insert ")\n")))
