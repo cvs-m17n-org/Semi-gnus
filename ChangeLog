@@ -1,3 +1,8 @@
+1998-06-13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-subject-encoded-re-regexp): Add
+	comment. Modify doc-string.
+
 1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus-i18n.el: Synch up with `akr' branch.
