@@ -5785,7 +5785,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	 (or dependencies
 	     (with-current-buffer gnus-summary-buffer
 	       gnus-newsgroup-dependencies)))
-	headers id end ref
+	headers id end ref number
 	(mail-parse-charset gnus-newsgroup-charset)
 	(mail-parse-ignored-charsets
 	 (save-excursion (condition-case nil
@@ -5818,7 +5818,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	   (make-full-mail-header
 	    ;; Number.
 	    (prog1
-		(read cur)
+		(setq number (read cur))
 	      (end-of-line)
 	      (setq p (point))
 	      (narrow-to-region (point)
@@ -5853,7 +5853,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 					     (match-end 1))
 			 ;; If there was no message-id, we just fake one
 			 ;; to make subsequent routines simpler.
-			 (nnheader-generate-fake-message-id))))
+			 (nnheader-generate-fake-message-id number))))
 	    ;; References.
 	    (progn
 	      (goto-char p)
