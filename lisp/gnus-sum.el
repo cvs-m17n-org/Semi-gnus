@@ -1152,7 +1152,7 @@ increase the score of each group you read."
     [delete] gnus-summary-prev-page
     [backspace] gnus-summary-prev-page
     "\r" gnus-summary-scroll-up
-    "\e\r" gnus-summary-scroll-down
+    "\M-\r" gnus-summary-scroll-down
     "n" gnus-summary-next-unread-article
     "p" gnus-summary-prev-unread-article
     "N" gnus-summary-next-article
@@ -1359,6 +1359,7 @@ increase the score of each group you read."
     [delete] gnus-summary-prev-page
     "p" gnus-summary-prev-page
     "\r" gnus-summary-scroll-up
+    "\M-\r" gnus-summary-scroll-down
     "<" gnus-summary-beginning-of-article
     ">" gnus-summary-end-of-article
     "b" gnus-summary-beginning-of-article
@@ -1393,6 +1394,7 @@ increase the score of each group you read."
     "b" gnus-article-hide-boring-headers
     "s" gnus-article-hide-signature
     "c" gnus-article-hide-citation
+    "C" gnus-article-hide-citation-in-followups
     "p" gnus-article-hide-pgp
     "P" gnus-article-hide-pem
     "\C-c" gnus-article-hide-citation-maybe)
@@ -2278,8 +2280,7 @@ marks of articles."
 	  (setq gnus-summary-buffer (current-buffer))
 	  (not gnus-newsgroup-prepared))
       ;; Fix by Sudish Joseph <joseph@cis.ohio-state.edu>
-      (setq gnus-summary-buffer (set-buffer (get-buffer-create buffer)))
-      (gnus-add-current-to-buffer-list)
+      (setq gnus-summary-buffer (set-buffer (gnus-get-buffer-create buffer)))
       (gnus-summary-mode group)
       (when gnus-carpal
 	(gnus-carpal-setup-buffer 'summary))
@@ -5239,12 +5240,6 @@ The state which existed when entering the ephemeral is reset."
   (select-window (get-buffer-window gnus-article-buffer))
   )
 
-(defun gnus-summary-scroll-down ()
-  "Scroll down one line current article."
-  (interactive)
-  (gnus-summary-scroll-up -1)
-  )
-
 ;;; Dead summaries.
 
 (defvar gnus-dead-summary-mode-map nil)
@@ -5813,6 +5808,12 @@ Argument LINES specifies lines to be scrolled up (or down if negative)."
 	     (gnus-article-prev-page (- lines))))))
   (gnus-summary-recenter)
   (gnus-summary-position-point))
+
+(defun gnus-summary-scroll-down (lines)
+  "Scroll down (or up) one line current article.
+Argument LINES specifies lines to be scrolled down (or up if negative)."
+  (interactive "p")
+  (gnus-summary-scroll-up (- lines)))
 
 (defun gnus-summary-next-same-subject ()
   "Select next article which has the same subject as current one."
@@ -7204,7 +7205,7 @@ latter case, they will be copied into the relevant groups."
 	(not (file-regular-p file))
 	(error "Can't read %s" file))
     (save-excursion
-      (set-buffer (get-buffer-create " *import file*"))
+      (set-buffer (gnus-get-buffer-create " *import file*"))
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (nnheader-insert-file-contents file)

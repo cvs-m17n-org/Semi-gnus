@@ -1,5 +1,11 @@
 1998-08-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.5.
+
+	* Sync up with Gnus 5.6.36.
+
+1998-08-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.4.
 
 	* Sync up with Gnus 5.6.30.

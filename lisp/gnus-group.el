@@ -816,9 +816,8 @@ The following commands are available:
     (or level gnus-group-default-list-level gnus-level-subscribed))))
 
 (defun gnus-group-setup-buffer ()
-  (set-buffer (get-buffer-create gnus-group-buffer))
+  (set-buffer (gnus-get-buffer-create gnus-group-buffer))
   (unless (eq major-mode 'gnus-group-mode)
-    (gnus-add-current-to-buffer-list)
     (gnus-group-mode)
     (when gnus-carpal
       (gnus-carpal-setup-buffer 'group))))
@@ -1472,7 +1471,7 @@ and with point over the group in question."
 	    (save-selected-window
 	      (save-excursion
 		(funcall ,function ,group)))))))))
-  
+
 (put 'gnus-group-iterate 'lisp-indent-function 1)
 
 ;; Selecting groups.
@@ -1900,6 +1899,8 @@ and NEW-NAME will be prompted for."
 	(gnus-set-active new-name (gnus-active group))
 	(gnus-message 6 "Renaming group %s to %s...done" group new-name)
 	new-name)
+    (setq gnus-killed-list (delete group gnus-killed-list))
+    (gnus-set-active group nil)
     (gnus-dribble-touch)
     (gnus-group-position-point)))
 
@@ -2912,17 +2913,19 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	 (ret (if (numberp n) (- n (length groups)) 0))
 	 (beg (unless n
 		(point)))
-	 group)
+	 group method)
     (while (setq group (pop groups))
       (gnus-group-remove-mark group)
       ;; Bypass any previous denials from the server.
-      (gnus-remove-denial (gnus-find-method-for-group group))
+      (gnus-remove-denial (setq method (gnus-find-method-for-group group)))
       (if (gnus-activate-group group (if dont-scan nil 'scan))
 	  (progn
 	    (gnus-get-unread-articles-in-group
 	     (gnus-get-info group) (gnus-active group) t)
 	    (unless (gnus-virtual-group-p group)
 	      (gnus-close-group group))
+	    (gnus-agent-save-group-info
+	     method (gnus-group-real-name group) (gnus-active group))
 	    (gnus-group-update-group group))
 	(if (eq (gnus-server-status (gnus-find-method-for-group group))
 		'denied)
@@ -3021,6 +3024,7 @@ to use."
      (lambda (group)
        (and (symbol-name group)
 	    (string-match regexp (symbol-name group))
+	    (symbol-value group)
 	    (push (symbol-name group) groups)))
      gnus-active-hashtb)
     ;; Also go through all descriptions that are known to Gnus.
@@ -3121,12 +3125,14 @@ group."
 (defun gnus-group-find-new-groups (&optional arg)
   "Search for new groups and add them.
 Each new group will be treated with `gnus-subscribe-newsgroup-method.'
-If ARG (the prefix), use the `ask-server' method to query
-the server for new groups."
-  (interactive "P")
-  (gnus-find-new-newsgroups arg)
+With 1 C-u, use the `ask-server' method to query the server for new
+groups.
+With 2 C-u's, use most complete method possible to query the server
+for new groups, and subscribe the new groups as zombies."
+  (interactive "p")
+  (gnus-find-new-newsgroups (or arg 1))
   (gnus-group-list-groups))
-  
+
 (defun gnus-group-edit-global-kill (&optional article group)
   "Edit the global kill file.
 If GROUP, edit that local kill file instead."
@@ -3156,16 +3162,13 @@ The hook gnus-suspend-gnus-hook is called before actually suspending."
   (interactive)
   (gnus-run-hooks 'gnus-suspend-gnus-hook)
   ;; Kill Gnus buffers except for group mode buffer.
-  (let* ((group-buf (get-buffer gnus-group-buffer))
-	 ;; Do this on a separate list in case the user does a ^G before we finish
-	 (gnus-buffer-list
-	  (delete group-buf (delete gnus-dribble-buffer
-				    (append gnus-buffer-list nil)))))
-    (while gnus-buffer-list
-      (gnus-kill-buffer (pop gnus-buffer-list)))
+  (let* ((group-buf (get-buffer gnus-group-buffer)))
+    (apply (lambda (buf)
+	     (unless (equal buf group-buf)
+	       (kill-buffer buf)))
+	   (gnus-buffers))
     (gnus-kill-gnus-frames)
     (when group-buf
-      (setq gnus-buffer-list (list group-buf))
       (bury-buffer group-buf)
       (delete-windows-on group-buf t))))
 
