@@ -77,16 +77,12 @@
   (save-excursion
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (let* ((buf (get-buffer-create " *draft headers*"))
-	   article)
-      (set-buffer buf)
-      (buffer-disable-undo (current-buffer))
-      (erase-buffer)
+    (let* (article)
       ;; We don't support fetching by Message-ID.
       (if (stringp (car articles))
 	  'headers
 	(while articles
-	  (set-buffer buf)
+	  (narrow-to-region (point) (point))
 	  (when (nndraft-request-article
 		 (setq article (pop articles)) group server (current-buffer))
 	    (goto-char (point-min))
@@ -94,10 +90,10 @@
 		(forward-line -1)
 	      (goto-char (point-max)))
 	    (delete-region (point) (point-max))
-	    (set-buffer nntp-server-buffer)
-	    (goto-char (point-max))
+	    (goto-char (point-min))
 	    (insert (format "221 %d Article retrieved.\n" article))
-	    (insert-buffer-substring buf)
+	    (widen)
+	    (goto-char (point-max))
 	    (insert ".\n")))
 
 	(nnheader-fold-continuation-lines)
@@ -154,7 +150,7 @@
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
 	 article file)
-    (nnheader-temp-write nil
+    (with-temp-buffer
       (insert-buffer buf)
       (setq article (nndraft-request-accept-article
 		     group (nnoo-current-server 'nndraft) t 'noinsert))

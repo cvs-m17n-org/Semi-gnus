@@ -28,15 +28,13 @@
 (eval-when-compile (require 'cl))
 
 (require 'nnheader)
-(require 'timezone)
 (require 'message)
 (require 'custom)
 (require 'gnus-util)
 
 (eval-and-compile
   (autoload 'gnus-error "gnus-util")
-  (autoload 'gnus-buffer-live-p "gnus-util")
-  (autoload 'gnus-encode-coding-string "gnus-ems"))
+  (autoload 'gnus-buffer-live-p "gnus-util"))
 
 (defgroup nnmail nil
   "Reading mail with Gnus."
@@ -409,7 +407,7 @@ Example:
   :group 'nnmail-split
   :type '(repeat (cons :format "%v" symbol regexp)))
 
-(defcustom nnmail-delete-incoming t
+(defcustom nnmail-delete-incoming nil
   "*If non-nil, the mail backends will delete incoming files after
 splitting."
   :group 'nnmail-retrieve
@@ -483,18 +481,19 @@ parameter.  It should return nil, `warn' or `delete'."
 (defun nnmail-request-post (&optional server)
   (mail-send-and-exit nil))
 
-(defvar nnmail-file-coding-system 'raw-text
+(defvar nnmail-file-coding-system 'binary
   "Coding system used in nnmail.")
 
 (defun nnmail-find-file (file)
   "Insert FILE in server buffer safely."
   (set-buffer nntp-server-buffer)
-  (erase-buffer)
+  (delete-region (point-min) (point-max))
   (let ((format-alist nil)
         (after-insert-file-functions nil))
     (condition-case ()
 	(let ((coding-system-for-read nnmail-file-coding-system)
-	      (pathname-coding-system 'binary))
+	      (auto-mode-alist (nnheader-auto-mode-alist))
+	      (pathname-coding-system nnmail-file-coding-system))
 	  (insert-file-contents file)
 	  t)
       (file-error nil))))
@@ -514,54 +513,11 @@ parameter.  It should return nil, `warn' or `delete'."
 	 (concat dir group "/")
        ;; If not, we translate dots into slashes.
        (concat dir
-	       (gnus-encode-coding-string
+	       (mm-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
 		nnmail-pathname-coding-system)
 	       "/")))
    (or file "")))
-
-(defun nnmail-date-to-time (date)
-  "Convert DATE into time."
-  (condition-case ()
-      (let* ((d1 (timezone-parse-date date))
-	     (t1 (timezone-parse-time (aref d1 3))))
-	(apply 'encode-time
-	       (mapcar (lambda (el)
-			 (and el (string-to-number el)))
-		       (list
-			(aref t1 2) (aref t1 1) (aref t1 0)
-			(aref d1 2) (aref d1 1) (aref d1 0)
-			(number-to-string
-			 (* 60 (timezone-zone-to-minute
-                                (or (aref d1 4) (current-time-zone)))))))))
-    ;; If we get an error, then we just return a 0 time.
-    (error (list 0 0))))
-
-(defun nnmail-time-less (t1 t2)
-  "Say whether time T1 is less than time T2."
-  (or (< (car t1) (car t2))
-      (and (= (car t1) (car t2))
-	   (< (nth 1 t1) (nth 1 t2)))))
-
-(defun nnmail-days-to-time (days)
-  "Convert DAYS into time."
-  (let* ((seconds (* 1.0 days 60 60 24))
-	 (rest (expt 2 16))
-	 (ms (condition-case nil (floor (/ seconds rest))
-	       (range-error (expt 2 16)))))
-    (list ms (condition-case nil (round (- seconds (* ms rest)))
-	       (range-error (expt 2 16))))))
-
-(defun nnmail-time-since (time)
-  "Return the time since TIME, which is either an internal time or a date."
-  (when (stringp time)
-    ;; Convert date strings to internal time.
-    (setq time (nnmail-date-to-time time)))
-  (let* ((current (current-time))
-	 (rest (when (< (nth 1 current) (nth 1 time))
-		 (expt 2 16))))
-    (list (- (+ (car current) (if rest -1 0)) (car time))
-	  (- (+ (or rest 0) (nth 1 current)) (nth 1 time)))))
 
 ;; Function rewritten from rmail.el.
 (defun nnmail-move-inbox (inbox)
@@ -706,7 +662,7 @@ nn*-request-list should have been called before calling this function."
   "Save GROUP-ASSOC in ACTIVE-FILE."
   (let ((coding-system-for-write nnmail-active-file-coding-system))
     (when file-name
-      (nnheader-temp-write file-name
+      (with-temp-file file-name
 	(nnmail-generate-active group-assoc)))))
 
 (defun nnmail-generate-active (alist)
@@ -1031,7 +987,6 @@ FUNC will be called with the buffer narrowed to each mail."
     (save-excursion
       ;; Insert the incoming file.
       (set-buffer (get-buffer-create " *nnmail incoming*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (nnheader-insert-file-contents incoming)
       (unless (zerop (buffer-size))
@@ -1140,8 +1095,7 @@ FUNC will be called with the group name to determine the article number."
 		       ;; group twice.
 		       (not (assoc (car method) group-art)))
 		  (push (cons (if regrepp
-				  (replace-match
-				   (car method) nil nil (car method))
+				  (nnmail-expand-newtext (car method))
 				(car method))
 			      (funcall func (car method)))
 			group-art))
@@ -1203,8 +1157,9 @@ Return the number of characters in the body."
       (insert (format "Xref: %s" (system-name)))
       (while group-alist
 	(insert (format " %s:%d"
-			(gnus-encode-coding-string (caar group-alist)
-					      nnmail-pathname-coding-system)
+			(mm-encode-coding-string
+			 (caar group-alist)
+			 nnmail-pathname-coding-system)
 			(cdar group-alist)))
 	(setq group-alist (cdr group-alist)))
       (insert "\n"))))
@@ -1485,7 +1440,6 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       (set-buffer
        (setq nnmail-cache-buffer
 	     (get-buffer-create " *nnmail message-id cache*")))
-      (buffer-disable-undo (current-buffer))
       (when (file-exists-p nnmail-message-id-cache-file)
 	(nnheader-insert-file-contents nnmail-message-id-cache-file))
       (set-buffer-modified-p nil)
@@ -1553,9 +1507,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
     ;; Let the backend save the article (or not).
     (cond
      ((not duplication)
-      (nnmail-cache-insert message-id)
       (funcall func (setq group-art
-			  (nreverse (nnmail-article-group artnum-func)))))
+			  (nreverse (nnmail-article-group artnum-func))))
+      (nnmail-cache-insert message-id))
      ((eq action 'delete)
       (setq group-art nil))
      ((eq action 'warn)
@@ -1672,9 +1626,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	     ;; This is an ange-ftp group, and we don't have any dates.
 	     nil)
 	    ((numberp days)
-	     (setq days (nnmail-days-to-time days))
+	     (setq days (days-to-time days))
 	     ;; Compare the time with the current time.
-	     (nnmail-time-less days (nnmail-time-since time)))))))
+	     (time-less-p days (time-since time)))))))
 
 (defvar nnmail-read-passwd nil)
 (defun nnmail-read-passwd (prompt &rest args)

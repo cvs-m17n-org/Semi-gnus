@@ -175,7 +175,8 @@ it's not cached."
 	    t				; The article already is saved.
 	  (save-excursion
 	    (set-buffer nntp-server-buffer)
-	    (let ((gnus-use-cache nil))
+	    (let ((gnus-use-cache nil)
+		  (gnus-article-decode-hook nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer file)
@@ -395,7 +396,6 @@ Returns the list of articles removed."
 	    (cons group
 		  (set-buffer (gnus-get-buffer-create
 			       " *gnus-cache-overview*"))))
-      (buffer-disable-undo (current-buffer))
       ;; Insert the contents of this group's cache overview.
       (erase-buffer)
       (let ((file (gnus-cache-file-name group ".overview")))
@@ -487,7 +487,6 @@ Returns the list of articles removed."
     (gnus-cache-save-buffers)
     (save-excursion
       (set-buffer cache-buf)
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (insert-file-contents (or file (gnus-cache-file-name group ".overview")))
       (goto-char (point-min))
@@ -517,7 +516,6 @@ Returns the list of articles removed."
   (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
       (set-buffer cache-buf)
-      (buffer-disable-undo (current-buffer))
       (erase-buffer))
     (set-buffer nntp-server-buffer)
     (goto-char (point-min))
@@ -595,7 +593,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (nnheader-temp-write gnus-cache-active-file
+    (with-temp-file gnus-cache-active-file
       (mapatoms
        (lambda (sym)
 	 (when (and sym (boundp sym))
@@ -642,6 +640,8 @@ If LOW, update the lower bound instead."
     (when top
       (gnus-message 5 "Generating the cache active file...")
       (setq gnus-cache-active-hashtb (gnus-make-hashtable 123)))
+    (when (string-match "^\\(nn[^_]+\\)_" group)
+      (setq group (replace-match "\\1:" t t group)))
     ;; Separate articles from all other files and directories.
     (while files
       (if (string-match "^[0-9]+$" (file-name-nondirectory (car files)))

@@ -25,21 +25,33 @@
 		     run-with-idle-timer mouse-minibuffer-check window-edges
 		     event-click-count track-mouse read-event mouse-movement-p
 		     event-end mouse-scroll-subr overlay-lists delete-overlay
-		     set-face-stipple mail-abbrevs-setup char-int
+		     set-face-stipple mail-abbrevs-setup 
 		     make-char-table set-char-table-range font-create-object
 		     x-color-values widget-make-intangible error-message-string
 		     w3-form-encode-xwfu gnus-mule-get-coding-system
-		     decode-coding-string mail-aliases-setup))
+		     decode-coding-string mail-aliases-setup
+		     mm-copy-tree url-view-url w3-prepare-buffer
+		     set-buffer-multibyte
+		     find-non-ascii-charset-region char-charset
+		     mule-write-region-no-coding-system
+		     find-charset-region base64-decode-string
+		     find-coding-systems-region get-charset-property
+		     coding-system-get w3-region
+		     rmail-summary-exists rmail-select-summary
+		     rmail-update-summary
+		     ))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
 		    font-lock-defaults user-full-name user-login-name
 		    gnus-newsgroup-name gnus-article-x-face-too-ugly
 		    mail-mode-hook enable-multibyte-characters
-		    adaptive-fill-first-line-regexp adaptive-fill-regexp)))
+		    adaptive-fill-first-line-regexp adaptive-fill-regexp
+		    url-current-mime-headers buffer-file-coding-system)))
   (maybe-bind '(mail-mode-hook
 		enable-multibyte-characters browse-url-browser-function
-		adaptive-fill-first-line-regexp adaptive-fill-regexp))
+		adaptive-fill-first-line-regexp adaptive-fill-regexp
+		url-current-mime-headers))
   (maybe-fbind '(color-instance-rgb-components
 		 make-color-instance color-instance-name specifier-instance
 		 device-type device-class get-popup-menu-response event-object
@@ -53,7 +65,14 @@
 		 device-on-window-system-p make-gui-button Info-goto-node
 		 pp-to-string color-name 
 		 gnus-mule-get-coding-system decode-coding-string
-		 mail-aliases-setup)))
+		 mail-aliases-setup
+		 mm-copy-tree url-view-url w3-prepare-buffer
+		 mule-write-region-no-coding-system char-int
+		 annotationp delete-annotation make-image-specifier
+		 make-annotation base64-decode-string base64-encode-region
+		 w3-do-setup w3-region
+		 rmail-summary-exists rmail-select-summary rmail-update-summary
+		 )))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

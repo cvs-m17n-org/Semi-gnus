@@ -40,6 +40,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'mail-utils)
+(require 'mm-util)
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -61,8 +62,7 @@ on your system, you could say something like:
  (autoload 'cancel-function-timers "timers")
  (autoload 'gnus-point-at-eol "gnus-util")
  (autoload 'gnus-delete-line "gnus-util")
- (autoload 'gnus-buffer-live-p "gnus-util")
- (autoload 'gnus-encode-coding-string "gnus-ems"))
+ (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
 
@@ -399,6 +399,7 @@ the line could be found."
   (save-excursion
     (unless (gnus-buffer-live-p nntp-server-buffer)
       (setq nntp-server-buffer (get-buffer-create " *nntpd*")))
+    (mm-enable-multibyte)
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (kill-all-local-variables)
@@ -493,56 +494,10 @@ the line could be found."
 (defun nnheader-set-temp-buffer (name &optional noerase)
   "Set-buffer to an empty (possibly new) buffer called NAME with undo disabled."
   (set-buffer (get-buffer-create name))
-  (buffer-disable-undo (current-buffer))
+  (buffer-disable-undo)
   (unless noerase
     (erase-buffer))
   (current-buffer))
-
-(defmacro nnheader-temp-write (file &rest forms)
-  "Create a new buffer, evaluate FORMS there, and write the buffer to FILE.
-Return the value of FORMS.
-If FILE is nil, just evaluate FORMS and don't save anything.
-If FILE is t, return the buffer contents as a string."
-  (let ((temp-file (make-symbol "temp-file"))
-	(temp-buffer (make-symbol "temp-buffer"))
-	(temp-results (make-symbol "temp-results")))
-    `(save-excursion
-       (let* ((,temp-file ,file)
-	      (default-major-mode 'fundamental-mode)
-	      (,temp-buffer
-	       (set-buffer
-		(get-buffer-create
-		 (generate-new-buffer-name " *nnheader temp*"))))
-	      ,temp-results)
-	 (unwind-protect
-	     (progn
-	       (setq ,temp-results (progn ,@forms))
-	       (cond
-		;; Don't save anything.
-		((null ,temp-file)
-		 ,temp-results)
-		;; Return the buffer contents.
-		((eq ,temp-file t)
-		 (set-buffer ,temp-buffer)
-		 (buffer-string))
-		;; Save a file.
-		(t
-		 (set-buffer ,temp-buffer)
-		 ;; Make sure the directory where this file is
-		 ;; to be saved exists.
-		 (when (not (file-directory-p
-			     (file-name-directory ,temp-file)))
-		   (make-directory (file-name-directory ,temp-file) t))
-		 ;; Save the file.
-		 (write-region (point-min) (point-max)
-			       ,temp-file nil 'nomesg)
-		 ,temp-results)))
-	   ;; Kill the buffer.
-	   (when (buffer-name ,temp-buffer)
-	     (kill-buffer ,temp-buffer)))))))
-
-(put 'nnheader-temp-write 'lisp-indent-function 1)
-(put 'nnheader-temp-write 'edebug-form-spec '(form body))
 
 (defvar jka-compr-compression-info-list)
 (defvar nnheader-numerical-files
@@ -688,7 +643,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'iso-8859-1
+(defvar nnheader-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)
@@ -700,7 +655,7 @@ without formatting."
 	 (concat dir group "/")
        ;; If not, we translate dots into slashes.
        (concat dir
-	       (gnus-encode-coding-string
+	       (mm-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
 		nnheader-pathname-coding-system)
 	       "/")))
@@ -822,8 +777,6 @@ find-file-hooks, etc.
   `(let ((new (generate-new-buffer " *nnheader replace*"))
 	 (cur (current-buffer))
 	 (start (point-min)))
-     (set-buffer new)
-     (buffer-disable-undo (current-buffer))
      (set-buffer cur)
      (goto-char (point-min))
      (while (,(if regexp 're-search-forward 'search-forward)

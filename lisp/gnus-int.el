@@ -91,6 +91,7 @@ If CONFIRM is non-nil, the user will be asked for an NNTP server."
        ;; gnus-open-server-hook might have opened it
        (gnus-server-opened gnus-select-method)
        (gnus-open-server gnus-select-method)
+       gnus-batch-mode
        (gnus-y-or-n-p
 	(format
 	 "%s (%s) open error: '%s'.  Continue? "
@@ -423,7 +424,8 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	     article (gnus-group-real-name group)
 	     (nth 1 gnus-command-method) accept-function last)))
 
-(defun gnus-request-accept-article (group &optional gnus-command-method last)
+(defun gnus-request-accept-article (group &optional gnus-command-method last
+					  no-encode)
   ;; Make sure there's a newline at the end of the article.
   (when (stringp gnus-command-method)
     (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
@@ -433,6 +435,11 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
+  (unless no-encode
+    (save-restriction
+      (message-narrow-to-head)
+      (mail-encode-encoded-word-buffer))
+    (message-encode-message-body))
   (let ((func (car (or gnus-command-method
 		       (gnus-find-method-for-group group)))))
     (funcall (intern (format "%s-request-accept-article" func))
@@ -440,7 +447,12 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	     (cadr gnus-command-method)
 	     last)))
 
-(defun gnus-request-replace-article (article group buffer)
+(defun gnus-request-replace-article (article group buffer &optional no-encode)
+  (unless no-encode
+    (save-restriction
+      (message-narrow-to-head)
+      (mail-encode-encoded-word-buffer))
+    (message-encode-message-body))
   (let ((func (car (gnus-group-name-to-method group))))
     (funcall (intern (format "%s-request-replace-article" func))
 	     article (gnus-group-real-name group) buffer)))

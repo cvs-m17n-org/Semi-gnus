@@ -30,10 +30,6 @@
 
 (nnoo-declare nntp)
 
-(eval-and-compile
-  (unless (fboundp 'open-network-stream)
-    (require 'tcp)))
-
 (eval-when-compile (require 'cl))
 
 (defvoo nntp-address nil
@@ -728,7 +724,7 @@ If this variable is nil, which is the default, no timers are set.")
     (prog1
 	(nntp-send-command
 	 "^\\.\r?\n" "NEWGROUPS"
-	 (format-time-string "%y%m%d %H%M%S" (nnmail-date-to-time date)))
+	 (format-time-string "%y%m%d %H%M%S" (date-to-time date)))
       (nntp-decode-text))))
 
 (deffoo nntp-request-post (&optional server)
@@ -796,7 +792,7 @@ If SEND-IF-FORCE, only send authinfo to the server if the
 The authinfo login name is taken from the user's login name and the
 password contained in '~/.nntp-authinfo'."
   (when (file-exists-p "~/.nntp-authinfo")
-    (nnheader-temp-write nil
+    (with-temp-buffer
       (insert-file-contents "~/.nntp-authinfo")
       (goto-char (point-min))
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" (user-login-name))
@@ -825,7 +821,7 @@ password contained in '~/.nntp-authinfo'."
       (format " *server %s %s %s*"
 	      nntp-address nntp-port-number
 	      (gnus-buffer-exists-p buffer))))
-    (buffer-disable-undo (current-buffer))
+    (mm-enable-multibyte)
     (set (make-local-variable 'after-change-functions) nil)
     (set (make-local-variable 'nntp-process-wait-for) nil)
     (set (make-local-variable 'nntp-process-callback) nil)
