@@ -28,6 +28,7 @@ of this file should be applied. If not, it might not.
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'Gnus or 'gnus should be deleted.
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
  If you would like to decode the quoted encoded words forcibly, even
 though FLIM does not decode them, put the following lines in your
@@ -44,7 +45,7 @@ though FLIM does not decode them, put the following lines in your
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
 +++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
-@@ -352,12 +352,22 @@
+@@ -352,12 +352,23 @@
  	(marker (bbdb-header-start))
  	field pairs fieldval  ; do all bindings here for speed
  	regexp string notes-field-name notes
@@ -60,8 +61,9 @@ though FLIM does not decode them, put the following lines in your
 +	    function)
 +	(or (progn
 +	      (while (and (not extract-field-value-funtion)
-+			  (setq function (pop function-list)))
++			  (setq function (car function-list)))
 +		(setq extract-field-value-funtion (funcall function)))
++		      function-list (cdr function-list)))
 +	      extract-field-value-funtion)
 +	    (progn
 +	      (widen)

@@ -2865,6 +2865,7 @@ commands:
     ;; Init original article buffer.
     (save-excursion
       (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
+      (set-buffer-multibyte nil)
       (setq major-mode 'gnus-original-article-mode)
       (make-local-variable 'gnus-original-article))
     (if (get-buffer name)
@@ -4260,6 +4261,7 @@ If given a prefix, show the hidden text instead."
 	  (if (get-buffer gnus-original-article-buffer)
 	      (set-buffer gnus-original-article-buffer)
 	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
+	    (set-buffer-multibyte nil)
 	    (buffer-disable-undo)
 	    (setq major-mode 'gnus-original-article-mode)
 	    (setq buffer-read-only t))
