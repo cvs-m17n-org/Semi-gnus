@@ -1981,12 +1981,16 @@ commands:
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.
-  (let ((charset (with-current-buffer gnus-summary-buffer
-		   default-mime-charset)))
+  (let (charset all-headers)
+    (with-current-buffer gnus-summary-buffer
+      (setq charset default-mime-charset
+	    all-headers gnus-have-all-headers))
     (make-local-variable 'default-mime-charset)
     (setq default-mime-charset charset)
     (mime-display-message mime-message-structure
 			  gnus-article-buffer nil gnus-article-mode-map)
+    (when all-headers
+      (gnus-article-hide-headers nil -1))
     (make-local-variable 'default-mime-charset)
     (setq default-mime-charset charset)
     )
@@ -3399,13 +3403,10 @@ forbidden in URL encoding."
 	   #'gnus-article-header-presentation-method)
 
 (defun gnus-mime-preview-quitting-method ()
-  (if gnus-show-mime
-      (gnus-article-show-summary)
-    (mime-preview-kill-buffer)
-    (delete-other-windows)
-    (gnus-article-show-summary)
-    (gnus-summary-select-article nil t)
-    ))
+  (mime-preview-kill-buffer)
+  (delete-other-windows)
+  (gnus-article-show-summary)
+  (gnus-summary-select-article gnus-show-all-headers t))
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
