@@ -1,3 +1,10 @@
+1999-05-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Undo the last
+	change - don't call `gnus-treat-article'.
+
 1999-05-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
