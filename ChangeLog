@@ -1,3 +1,10 @@
+1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Reselect the
+	message frame after selecting a new article if the value of
+	`message-use-multi-frames' is non-nil and plural articles are
+	given.
+
 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* README.semi.ja: Delete "ichikawa" from the branches info, and
