@@ -15065,6 +15065,15 @@ nnimap $BFCM-$NFC5iJ,3dJ}<0$r(B @code{nnimap-split-fancy} $B$KDj5A$7$F2<$5$$!
 @end lisp
 
 Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-fancy}.
+
+@item nnimap-split-download-body
+@findex nnimap-split-download-body
+@vindex nnimap-split-download-body
+
+$BJ,3d$7$F$$$k$H$-$K$9$Y$F$N5-;v$r%@%&%s%m!<%I$9$k$K$OHs(B-nil $B$K@_Dj$7$F2<(B
+$B$5$$!#$3$l$OIaDL$OI,MW$G$O$J$/!"J*;v$rAjEv$KCY$/$7$F$7$^$&$G$7$g$&!#5-;v(B
+$B$rJ,3d$9$k$?$a$KK\J8$rJ,@O$9$k9bEY$J4X?t$r;H$$$?$$>l9g$K$O!"I,MW$+$b$7$l(B
+$B$^$;$s!#(B
 @end table
 
 @node Expiring in IMAP

@@ -1,3 +1,31 @@
+2003-01-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-xmas.el (gnus-xmas-redefine): Use region-exists-p in
+	XEmacs.
+
+	* gnus-ems.el (gnus-mark-active-p): do.
+
+2003-01-15  Kevin Ryde  <user42@zip.com.au>
+
+	* gnus.texi (Using MIME): Mention auto-compression-mode with
+	gnus-mime-copy-part.
+
+2003-01-15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-send): Don't warn about duplicates when
+	superseding. 
+
+2003-01-15  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-split-download-body): New variable.
+	(nnimap-split-articles): Use it.
+
+2003-01-15  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.el (gnus-install-group-spam-parameters): new variable, t by
+	default, in the gnus-start customization group.  Used to disable
+	the spam-*/ham-* parameters.
+
 2002-01-14  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus-agent.el (gnus-agent-check-overview-buffer): This data
