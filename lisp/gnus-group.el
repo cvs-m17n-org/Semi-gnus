@@ -2220,15 +2220,27 @@ If SOLID (the prefix), create a solid group."
 		    nnshimbun-type-definition)
 	    nil t nil 'gnus-group-shimbun-type-history)
 	   default-type))
+	 (default-address
+	   (cdr (assq 'address
+		      (assq (intern type) nnshimbun-type-definition))))
 	 (address
-	  (read-string "Shimbun address: "
-		       nil 'gnus-group-shimbun-address-history))
+	  (gnus-string-or
+	   (read-string
+	    (if default-address
+		(format "Shimbun address (default %s): " default-address)
+	      "Shimbun address: ")
+	    nil 'gnus-group-shimbun-address-history)
+	   default-address))
 	 (group
 	  (completing-read
 	   "Group name: "
 	   (mapcar (lambda (elem) (list elem))
 		   (cdr (assq 'groups (cdr (assq (intern type) nnshimbun-type-definition)))))
 	   nil t nil)))
+    (setq gnus-group-shimbun-type-history
+	  (delete "" gnus-group-shimbun-type-history)
+	  gnus-group-shimbun-address-history
+	  (delete "" gnus-group-shimbun-address-history))
     (gnus-group-make-group group `(nnshimbun ,address (nnshimbun-type ,(intern type))))))
 
 (defun gnus-group-make-archive-group (&optional all)
