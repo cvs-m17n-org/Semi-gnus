@@ -467,7 +467,12 @@ Return the number of files that were found."
 		   (error
 		    (unless (yes-or-no-p
 			     (format "Mail source %s error (%s).  Continue? "
-				     source
+				     (if (memq ':password source)
+					 (let ((s (copy-sequence source)))
+					   (setcar (cdr (memq ':password s)) 
+						   "********")
+					   s)
+				       source)
 				     (cadr err)))
 		      (error "Cannot get new mail"))
 		    0)))))))))
