@@ -1,7 +1,7 @@
 ;;; nnml.el --- mail spool access for Gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
@@ -84,6 +84,8 @@ all.  This may very well take some time.")
 
 (defvoo nnml-generate-active-function 'nnml-generate-active-info)
 
+(defvar nnml-nov-buffer-file-name nil)
+
 
 
 ;;; Interface functions.
@@ -98,8 +100,6 @@ all.  This may very well take some time.")
       (let ((file nil)
 	    (number (length sequence))
 	    (count 0)
-	    ;; 1997/8/12 by MORIOKA Tomohiko
-	    ;;	for XEmacs/mule.
 	    (pathname-coding-system 'binary)
 	    beg article)
 	(if (stringp (car sequence))
@@ -163,8 +163,6 @@ all.  This may very well take some time.")
 (deffoo nnml-request-article (id &optional group server buffer)
   (nnml-possibly-change-directory group server)
   (let* ((nntp-server-buffer (or buffer nntp-server-buffer))
-	 ;; 1997/8/12 by MORIOKA Tomohiko
-	 ;;	for XEmacs/mule.
 	 (pathname-coding-system 'binary)
 	 path gpath group-num)
     (if (stringp id)
@@ -228,7 +226,14 @@ all.  This may very well take some time.")
 
 (deffoo nnml-request-create-group (group &optional server args)
   (nnmail-activate 'nnml)
-  (unless (assoc group nnml-group-alist)
+  (cond
+   ((assoc group nnml-group-alist)
+    t)
+   ((and (file-exists-p (nnmail-group-pathname group nnml-directory))
+	 (not (file-directory-p (nnmail-group-pathname group nnml-directory))))
+    (nnheader-report 'nnml "%s is a file"
+		     (nnmail-group-pathname group nnml-directory)))
+   (t
     (let (active)
       (push (list group (setq active (cons 1 0)))
 	    nnml-group-alist)
@@ -238,13 +243,11 @@ all.  This may very well take some time.")
 	(when articles
 	  (setcar active (apply 'min articles))
 	  (setcdr active (apply 'max articles))))
-      (nnmail-save-active nnml-group-alist nnml-active-file)))
-  t)
+      (nnmail-save-active nnml-group-alist nnml-active-file)
+      t))))
 
 (deffoo nnml-request-list (&optional server)
   (save-excursion
-    ;; 1997/8/12 by MORIOKA Tomohiko
-    ;;	for XEmacs/mule.
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
 	  (pathname-coding-system 'binary)) ; for XEmacs/mule
       (nnmail-find-file nnml-active-file)
@@ -267,6 +270,11 @@ all.  This may very well take some time.")
 	(is-old t)
 	article rest mod-time number)
     (nnmail-activate 'nnml)
+
+    (setq active-articles (sort active-articles '<))
+    ;; Articles not listed in active-articles are already gone,
+    ;; so don't try to expire them.
+    (setq articles (gnus-sorted-intersection articles active-articles))
 
     (while (and articles is-old)
       (when (setq article (nnml-article-to-file (setq number (pop articles))))
@@ -477,8 +485,8 @@ all.  This may very well take some time.")
       ;; Just to make sure nothing went wrong when reading over NFS --
       ;; check once more.
       (when (file-exists-p
-	     (setq file (concat nnml-current-directory "/"
-				(number-to-string article))))
+	     (setq file (expand-file-name (number-to-string article)
+					  nnml-current-directory)))
 	(nnml-update-file-alist t)
 	file))))
 
@@ -560,8 +568,6 @@ all.  This may very well take some time.")
   (if (not group)
       t
     (let ((pathname (nnmail-group-pathname group nnml-directory))
-	  ;; 1997/8/14 by MORIOKA Tomohiko
-	  ;;	for XEmacs/mule.
 	  (pathname-coding-system 'binary))
       (when (not (equal pathname nnml-current-directory))
 	(setq nnml-current-directory pathname
@@ -661,10 +667,10 @@ all.  This may very well take some time.")
   "Parse the head of the current buffer."
   (save-excursion
     (save-restriction
-      (goto-char (point-min))
-      (narrow-to-region
-       (point)
-       (1- (or (search-forward "\n\n" nil t) (point-max))))
+      (unless (zerop (buffer-size))
+	(narrow-to-region
+	 (goto-char (point-min))
+	 (if (search-forward "\n\n" nil t) (1- (point)) (point-max))))
       ;; Fold continuation lines.
       (goto-char (point-min))
       (while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)
@@ -678,12 +684,15 @@ all.  This may very well take some time.")
 
 (defun nnml-open-nov (group)
   (or (cdr (assoc group nnml-nov-buffer-alist))
-      (let ((buffer (nnheader-find-file-noselect
-		     (concat (nnmail-group-pathname group nnml-directory)
-			     nnml-nov-file-name))))
+      (let ((buffer (get-buffer-create (format " *nnml overview %s*" group))))
 	(save-excursion
 	  (set-buffer buffer)
-	  (buffer-disable-undo (current-buffer)))
+	  (set (make-local-variable 'nnml-nov-buffer-file-name)
+	       (concat (nnmail-group-pathname group nnml-directory)
+		       nnml-nov-file-name))
+	  (erase-buffer)
+	  (when (file-exists-p nnml-nov-buffer-file-name)
+	    (nnheader-insert-file-contents nnml-nov-buffer-file-name)))
 	(push (cons group buffer) nnml-nov-buffer-alist)
 	buffer)))
 
@@ -693,7 +702,8 @@ all.  This may very well take some time.")
       (when (buffer-name (cdar nnml-nov-buffer-alist))
 	(set-buffer (cdar nnml-nov-buffer-alist))
 	(when (buffer-modified-p)
-	  (nnmail-write-region 1 (point-max) (buffer-file-name) nil 'nomesg))
+	  (nnmail-write-region 1 (point-max) nnml-nov-buffer-file-name
+			       nil 'nomesg))
 	(set-buffer-modified-p nil)
 	(kill-buffer (current-buffer)))
       (setq nnml-nov-buffer-alist (cdr nnml-nov-buffer-alist)))))
@@ -729,7 +739,12 @@ all.  This may very well take some time.")
     ;; Do this directory.
     (let ((files (sort (nnheader-article-to-file-alist dir)
 		       'car-less-than-car)))
-      (when files
+      (if (not files)
+	  (let* ((group (nnheader-file-to-group
+			 (directory-file-name dir) nnml-directory))
+		 (info (cadr (assoc group nnml-group-alist))))
+	    (when info
+	      (setcar info (1+ (cdr info)))))
 	(funcall nnml-generate-active-function dir)
 	;; Generate the nov file.
 	(nnml-generate-nov-file dir files)

@@ -1,7 +1,7 @@
 ;;; gnus-srvr.el --- virtual server support for Gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -106,7 +106,7 @@ The following specs are understood:
        ["Close All" gnus-server-close-all-servers t]
        ["Reset All" gnus-server-remove-denials t]))
 
-    (run-hooks 'gnus-server-menu-hook)))
+    (gnus-run-hooks 'gnus-server-menu-hook)))
 
 (defvar gnus-server-mode-map nil)
 (put 'gnus-server-mode 'mode-class 'special)
@@ -164,7 +164,7 @@ The following commands are available:
   (buffer-disable-undo (current-buffer))
   (setq truncate-lines t)
   (setq buffer-read-only t)
-  (run-hooks 'gnus-server-mode-hook))
+  (gnus-run-hooks 'gnus-server-mode-hook))
 
 (defun gnus-server-insert-server-line (name method)
   (let* ((how (car method))
@@ -221,7 +221,9 @@ The following commands are available:
     ;; Then we insert the list of servers that have been opened in
     ;; this session.
     (while opened
-      (unless (member (caar opened) done)
+      (when (and (not (member (caar opened) done))
+		 ;; Just ignore ephemeral servers.
+		 (not (member (caar opened) gnus-ephemeral-servers)))
 	(push (caar opened) done)
 	(gnus-server-insert-server-line
 	 (setq op-ser (format "%s:%s" (caaar opened) (nth 1 (caar opened))))
@@ -318,7 +320,7 @@ The following commands are available:
 (defun gnus-server-exit ()
   "Return to the group buffer."
   (interactive)
-  (run-hooks 'gnus-server-exit-hook)
+  (gnus-run-hooks 'gnus-server-exit-hook)
   (kill-buffer (current-buffer))
   (gnus-configure-windows 'group t))
 
@@ -473,7 +475,7 @@ The following commands are available:
   (interactive (list (gnus-server-server-name)))
   (let ((buf (current-buffer)))
     (prog1
-	(gnus-browse-foreign-server (gnus-server-to-method server) buf)
+	(gnus-browse-foreign-server server buf)
       (save-excursion
 	(set-buffer buf)
 	(gnus-server-update-server (gnus-server-server-name))
@@ -536,21 +538,20 @@ The following commands are available:
        ["Next" gnus-browse-next-group t]
        ["Prev" gnus-browse-next-group t]
        ["Exit" gnus-browse-exit t]))
-    (run-hooks 'gnus-browse-menu-hook)))
+    (gnus-run-hooks 'gnus-browse-menu-hook)))
 
 (defvar gnus-browse-current-method nil)
 (defvar gnus-browse-return-buffer nil)
 
 (defvar gnus-browse-buffer "*Gnus Browse Server*")
 
-(defun gnus-browse-foreign-server (method &optional return-buffer)
-  "Browse the server METHOD."
-  (setq gnus-browse-current-method method)
+(defun gnus-browse-foreign-server (server &optional return-buffer)
+  "Browse the server SERVER."
+  (setq gnus-browse-current-method server)
   (setq gnus-browse-return-buffer return-buffer)
-  (when (stringp method)
-    (setq method (gnus-server-to-method method)))
-  (let ((gnus-select-method method)
-	groups group)
+  (let* ((method (gnus-server-to-method server))
+	 (gnus-select-method method)
+	 groups group)
     (gnus-message 5 "Connecting to %s..." (nth 1 method))
     (cond
      ((not (gnus-check-server method))
@@ -635,17 +636,21 @@ buffer.
   (setq truncate-lines t)
   (gnus-set-default-directory)
   (setq buffer-read-only t)
-  (run-hooks 'gnus-browse-mode-hook))
+  (gnus-run-hooks 'gnus-browse-mode-hook))
 
 (defun gnus-browse-read-group (&optional no-article)
   "Enter the group at the current line."
   (interactive)
   (let ((group (gnus-browse-group-name)))
-    (unless (gnus-group-read-ephemeral-group
-	     group gnus-browse-current-method nil
-	     (cons (current-buffer) 'browse))
-      (error "Couldn't enter %s" group))))
-
+    (if (or (not (gnus-get-info group))
+	    (gnus-ephemeral-group-p group))
+	(unless (gnus-group-read-ephemeral-group
+		 group gnus-browse-current-method nil
+		 (cons (current-buffer) 'browse))
+	  (error "Couldn't enter %s" group))
+      (unless (gnus-group-read-group nil no-article group)
+	(error "Couldn't enter %s" group)))))
+      
 (defun gnus-browse-select-group ()
   "Select the current group."
   (interactive)
@@ -699,18 +704,22 @@ buffer.
       ;; If this group it killed, then we want to subscribe it.
       (when (= (following-char) ?K)
 	(setq sub t))
-      (when (gnus-gethash (setq group (gnus-browse-group-name))
-			  gnus-newsrc-hashtb)
+      (setq group (gnus-browse-group-name))
+      (when (and sub
+		 (cadr (gnus-gethash group gnus-newsrc-hashtb)))
 	(error "Group already subscribed"))
-      ;; Make sure the group has been properly removed before we
-      ;; subscribe to it.
-      (gnus-kill-ephemeral-group group)
       (delete-char 1)
       (if sub
 	  (progn
+	    ;; Make sure the group has been properly removed before we
+	    ;; subscribe to it.
+	    (gnus-kill-ephemeral-group group)
 	    (gnus-group-change-level
 	     (list t group gnus-level-default-subscribed
-		   nil nil gnus-browse-current-method)
+		   nil nil (if (gnus-server-equal
+				gnus-browse-current-method "native")
+			       nil
+			     gnus-browse-current-method))
 	     gnus-level-default-subscribed gnus-level-killed
 	     (and (car (nth 1 gnus-newsrc-alist))
 		  (gnus-gethash (car (nth 1 gnus-newsrc-alist))

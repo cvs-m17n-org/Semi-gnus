@@ -1,7 +1,7 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994,95,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1994,95,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Version: 4.19
 ;; Keywords: news, path
 
@@ -30,9 +30,9 @@
 
 (require 'cl)
 (require 'bytecomp)
-(push "." load-path)
 (push "~/lisp/custom" load-path)
-(require 'lpath)
+(push "." load-path)
+(load "./lpath.el")
 
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
@@ -67,7 +67,7 @@ Modify to suit your needs."))
 	file elc)
     (condition-case ()
 	(require 'w3-forms)
-      (error (setq files (delete "nnweb.el" files))))
+      (error (setq files (delete "nnweb.el" (delete "nnlistserv.el" files)))))
     (while (setq file (pop files))
       (when (or (and (not xemacs)
 		     (not (member file '("gnus-xmas.el" "gnus-picon.el"

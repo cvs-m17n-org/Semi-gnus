@@ -1,7 +1,7 @@
 ;;; nndraft.el --- draft article access for Gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -30,7 +30,10 @@
 (require 'gnus-start)
 (require 'nnmh)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; This is just to shut up the byte-compiler.
+  (fset 'nndraft-request-group 'ignore))
 
 (nnoo-declare nndraft
   nnmh)
@@ -125,6 +128,8 @@
   "Request a new buffer that is restored to the state of ARTICLE."
   (nndraft-possibly-change-group group)
   (when (nndraft-request-article article group server (current-buffer))
+    (message-remove-header "xref")
+    (message-remove-header "lines")
     (let ((gnus-verbose-backends nil))
       (nndraft-request-expire-articles (list article) group server t))
     t))
@@ -145,6 +150,8 @@
 
 (deffoo nndraft-request-associate-buffer (group)
   "Associate the current buffer with some article in the draft group."
+  (nndraft-open-server "")
+  (nndraft-request-group group)
   (nndraft-possibly-change-group group)
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
@@ -154,7 +161,7 @@
       (setq article (nndraft-request-accept-article
 		     group (nnoo-current-server 'nndraft) t 'noinsert))
       (setq file (nndraft-article-filename article)))
-    (setq buffer-file-name file)
+    (setq buffer-file-name (expand-file-name file))
     (setq buffer-auto-save-file-name (make-auto-save-file-name))
     (clear-visited-file-modtime)
     article))
@@ -162,9 +169,9 @@
 (deffoo nndraft-request-expire-articles (articles group &optional server force)
   (nndraft-possibly-change-group group)
   (let* ((nnmh-allow-delete-final t)
-	 (res (nndraft-execute-nnmh-command
-	       `(nnmh-request-expire-articles
-		 ',articles group ,server ,force)))
+	 (res (nnoo-parent-function 'nndraft
+				    'nnmh-request-expire-articles
+				    (list articles group server force)))
 	 article)
     ;; Delete all the "state" files of articles that have been expired.
     (while articles
@@ -178,8 +185,8 @@
 (deffoo nndraft-request-accept-article (group &optional server last noinsert)
   (nndraft-possibly-change-group group)
   (let ((gnus-verbose-backends nil))
-    (nndraft-execute-nnmh-command
-     `(nnmh-request-accept-article group ,server ,last noinsert))))
+    (nnoo-parent-function 'nndraft 'nnmh-request-accept-article
+			  (list group server last noinsert))))
 
 (deffoo nndraft-request-create-group (group &optional server args)
   (nndraft-possibly-change-group group)
@@ -199,18 +206,10 @@
 (defun nndraft-possibly-change-group (group)
   (when (and group
 	     (not (equal group nndraft-current-group)))
+    (nndraft-open-server "")
     (setq nndraft-current-group group)
     (setq nndraft-current-directory
 	  (nnheader-concat nndraft-directory group))))
-
-(defun nndraft-execute-nnmh-command (command)
-  (let* ((dir (directory-file-name
-	       (expand-file-name nndraft-current-directory)))
-	 (group (file-name-nondirectory dir))
-	 (nnmh-directory (file-name-directory dir))
-	 (nnmail-keep-last-article nil)
-	 (nnmh-get-new-mail nil))
-    (eval command)))
 
 (defun nndraft-article-filename (article &rest args)
   (apply 'concat

@@ -1,7 +1,7 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
-;; Copyright (C) 1985,86,87,93,94,95,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1985,86,87,93,94,95,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
 ;; Keyword: news
 
@@ -71,7 +71,7 @@
     ("\\.\\(flc\\|fli\\|rle\\|iff\\|pfx\\|avi\\|sme\\|rpza\\|dl\\|qt\\|rsrc\\|mov\\)$" "xanim")
     ("\\.\\(tar\\|arj\\|zip\\|zoo\\|arc\\|gz\\|Z\\|lzh\\|ar\\|lha\\)$"
      "gnus-uu-archive"))
-  "Default actions to be taken when the user asks to view a file.
+  "*Default actions to be taken when the user asks to view a file.
 To change the behaviour, you can either edit this variable or set
 `gnus-uu-user-view-rules' to something useful.
 
@@ -111,7 +111,7 @@ details."
 
 (defcustom gnus-uu-user-view-rules-end
   '(("" "file"))
-  "What actions are to be taken if no rule matched the file name.
+  "*What actions are to be taken if no rule matched the file name.
 See the documentation on the `gnus-uu-default-view-rules' variable for
 details."
   :group 'gnus-extract-view
@@ -129,7 +129,7 @@ details."
     ("\\.Z$" "uncompress")
     ("\\.gz$" "gunzip")
     ("\\.arc$" "arc -x"))
-  "See `gnus-uu-user-archive-rules'."
+  "*See `gnus-uu-user-archive-rules'."
   :group 'gnus-extract-archive
   :type '(repeat (group regexp (string :tag "Command"))))
 
@@ -283,10 +283,15 @@ so I simply dropped them."
   :group 'gnus-extract
   :type 'boolean)
 
+(defcustom gnus-uu-pre-uudecode-hook nil
+  "Hook run before sending a message to uudecode."
+  :group 'gnus-extract
+  :type 'hook)
+
 (defcustom gnus-uu-digest-headers
   '("^Date:" "^From:" "^To:" "^Cc:" "^Subject:" "^Message-ID:" "^Keywords:"
-    "^Summary:" "^References:")
-  "List of regexps to match headers included in digested messages.
+    "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:")
+  "*List of regexps to match headers included in digested messages.
 The headers will be included in the sequence they are matched."
   :group 'gnus-extract
   :type '(repeat regexp))
@@ -309,10 +314,10 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defvar gnus-uu-saved-article-name nil)
 
-(defconst gnus-uu-begin-string "^begin[ \t]+[0-7][0-7][0-7][ \t]+\\(.*\\)$")
-(defconst gnus-uu-end-string "^end[ \t]*$")
+(defvar gnus-uu-begin-string "^begin[ \t]+[0-7][0-7][0-7][ \t]+\\(.*\\)$")
+(defvar gnus-uu-end-string "^end[ \t]*$")
 
-(defconst gnus-uu-body-line "^M")
+(defvar gnus-uu-body-line "^M")
 (let ((i 61))
   (while (> (setq i (1- i)) 0)
     (setq gnus-uu-body-line (concat gnus-uu-body-line "[^a-z]")))
@@ -320,21 +325,21 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 ;"^M.............................................................?$"
 
-(defconst gnus-uu-shar-begin-string "^#! */bin/sh")
+(defvar gnus-uu-shar-begin-string "^#! */bin/sh")
 
 (defvar gnus-uu-shar-file-name nil)
-(defconst gnus-uu-shar-name-marker "begin [0-7][0-7][0-7][ \t]+\\(\\(\\w\\|\\.\\)*\\b\\)")
+(defvar gnus-uu-shar-name-marker "begin [0-7][0-7][0-7][ \t]+\\(\\(\\w\\|\\.\\)*\\b\\)")
 
-(defconst gnus-uu-postscript-begin-string "^%!PS-")
-(defconst gnus-uu-postscript-end-string "^%%EOF$")
+(defvar gnus-uu-postscript-begin-string "^%!PS-")
+(defvar gnus-uu-postscript-end-string "^%%EOF$")
 
 (defvar gnus-uu-file-name nil)
-(defconst gnus-uu-uudecode-process nil)
+(defvar gnus-uu-uudecode-process nil)
 (defvar gnus-uu-binhex-article-name nil)
 
 (defvar gnus-uu-work-dir nil)
 
-(defconst gnus-uu-output-buffer-name " *Gnus UU Output*")
+(defvar gnus-uu-output-buffer-name " *Gnus UU Output*")
 
 (defvar gnus-uu-default-dir gnus-article-save-directory)
 (defvar gnus-uu-digest-from-subject nil)
@@ -348,7 +353,9 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   "v" gnus-uu-mark-over
   "s" gnus-uu-mark-series
   "r" gnus-uu-mark-region
+  "g" gnus-uu-unmark-region
   "R" gnus-uu-mark-by-regexp
+  "G" gnus-uu-unmark-by-regexp
   "t" gnus-uu-mark-thread
   "T" gnus-uu-unmark-thread
   "a" gnus-uu-mark-all
@@ -558,7 +565,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-by-regexp (regexp &optional unmark)
   "Ask for a regular expression and set the process mark on all articles that match."
   (interactive (list (read-from-minibuffer "Mark (regexp): ")))
-  (gnus-set-global-variables)
   (let ((articles (gnus-uu-find-articles-matching regexp)))
     (while articles
       (if unmark
@@ -575,7 +581,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-series ()
   "Mark the current series with the process mark."
   (interactive)
-  (gnus-set-global-variables)
   (let ((articles (gnus-uu-find-articles-matching)))
     (while articles
       (gnus-summary-set-process-mark (car articles))
@@ -586,7 +591,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-region (beg end &optional unmark)
   "Set the process mark on all articles between point and mark."
   (interactive "r")
-  (gnus-set-global-variables)
   (save-excursion
     (goto-char beg)
     (while (< (point) end)
@@ -614,7 +618,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-thread ()
   "Marks all articles downwards in this thread."
   (interactive)
-  (gnus-set-global-variables)
   (let ((level (gnus-summary-thread-level)))
     (while (and (gnus-summary-set-process-mark (gnus-summary-article-number))
 		(zerop (gnus-summary-next-subject 1))
@@ -624,7 +627,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-unmark-thread ()
   "Unmarks all articles downwards in this thread."
   (interactive)
-  (gnus-set-global-variables)
   (let ((level (gnus-summary-thread-level)))
     (while (and (gnus-summary-remove-process-mark
 		 (gnus-summary-article-number))
@@ -634,6 +636,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defun gnus-uu-invert-processable ()
   "Invert the list of process-marked articles."
+  (interactive)
   (let ((data gnus-newsgroup-data)
 	d number)
     (save-excursion
@@ -662,7 +665,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-sparse ()
   "Mark all series that have some articles marked."
   (interactive)
-  (gnus-set-global-variables)
   (let ((marked (nreverse gnus-newsgroup-processable))
 	subject articles total headers)
     (unless marked
@@ -687,7 +689,6 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-mark-all ()
   "Mark all articles in \"series\" order."
   (interactive)
-  (gnus-set-global-variables)
   (setq gnus-newsgroup-processable nil)
   (save-excursion
     (let ((data gnus-newsgroup-data)
@@ -844,7 +845,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
       (save-excursion
-	(set-buffer (get-buffer "*gnus-uu-body*"))
+	(set-buffer "*gnus-uu-body*")
 	(goto-char (setq beg (point-max)))
 	(save-excursion
 	  (save-restriction
@@ -858,10 +859,10 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	    (re-search-forward "\n\n")
 	    ;; Quote all 30-dash lines.
 	    (save-excursion
-	      (while (re-search-forward delim nil t)
+	      (while (re-search-forward "^-" nil t)
 		(beginning-of-line)
 		(delete-char 1)
-		(insert " ")))
+		(insert "- ")))
 	    (setq body (buffer-substring (1- (point)) (point-max)))
 	    (narrow-to-region (point-min) (point))
 	    (if (not (setq headers gnus-uu-digest-headers))
@@ -886,16 +887,16 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	(when (re-search-forward "^Subject: \\(.*\\)$" nil t)
 	  (setq subj (buffer-substring (match-beginning 1) (match-end 1)))
 	  (save-excursion
-	    (set-buffer (get-buffer "*gnus-uu-pre*"))
+	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "   %s\n" subj)))))
       (when (or (eq in-state 'last)
 		(eq in-state 'first-and-last))
 	(save-excursion
-	  (set-buffer (get-buffer "*gnus-uu-pre*"))
+	  (set-buffer "*gnus-uu-pre*")
 	  (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
 	  (gnus-write-buffer gnus-uu-saved-article-name))
 	(save-excursion
-	  (set-buffer (get-buffer "*gnus-uu-body*"))
+	  (set-buffer "*gnus-uu-body*")
 	  (goto-char (point-max))
 	  (insert
 	   (concat (setq end-string (format "End of %s Digest" name))
@@ -903,8 +904,8 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	  (insert (concat (make-string (length end-string) ?*) "\n"))
 	  (write-region
 	   (point-min) (point-max) gnus-uu-saved-article-name t))
-	(kill-buffer (get-buffer "*gnus-uu-pre*"))
-	(kill-buffer (get-buffer "*gnus-uu-body*"))
+	(gnus-kill-buffer "*gnus-uu-pre*")
+	(gnus-kill-buffer "*gnus-uu-body*")
 	(push 'end state))
       (if (memq 'begin state)
 	  (cons gnus-uu-saved-article-name state)
@@ -912,11 +913,11 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 ;; Binhex treatment - not very advanced.
 
-(defconst gnus-uu-binhex-body-line
+(defvar gnus-uu-binhex-body-line
   "^[^:]...............................................................$")
-(defconst gnus-uu-binhex-begin-line
+(defvar gnus-uu-binhex-begin-line
   "^:...............................................................$")
-(defconst gnus-uu-binhex-end-line
+(defvar gnus-uu-binhex-end-line
   ":$")
 
 (defun gnus-uu-binhex-article (buffer in-state)
@@ -1208,6 +1209,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 (defun gnus-uu-grab-articles (articles process-function
 				       &optional sloppy limit no-errors)
   (let ((state 'first)
+	(gnus-asynchronous nil)
 	has-been-begin article result-file result-files process-state
 	gnus-summary-display-article-function
 	gnus-article-display-hook gnus-article-prepare-hook
@@ -1440,6 +1442,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	    ;; Try to correct mishandled uucode.
 	    (when gnus-uu-correct-stripped-uucode
 	      (gnus-uu-check-correct-stripped-uucode start-char (point)))
+	    (gnus-run-hooks 'gnus-uu-pre-uudecode-hook)
 
 	    ;; Send the text to the process.
 	    (condition-case nil
@@ -1839,7 +1842,8 @@ The user will be asked for a file name."
 
 ;; Encodes with base64 and adds MIME headers
 (defun gnus-uu-post-encode-mime (path file-name)
-  (when (gnus-uu-post-encode-file "mmencode" path file-name)
+  (when (zerop (call-process shell-file-name nil t nil shell-command-switch
+			     (format "%s %s -o %s" "mmencode" path file-name)))
     (gnus-uu-post-make-mime file-name "base64")
     t))
 

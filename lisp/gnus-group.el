@@ -1,7 +1,7 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996,97 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -37,13 +37,13 @@
 (require 'gnus-undo)
 
 (defcustom gnus-group-archive-directory
-  "/ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
+  "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
   "*The address of the (ding) archives."
   :group 'gnus-group-foreign
   :type 'directory)
 
 (defcustom gnus-group-recent-archive-directory
-  "/ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list-recent/"
+  "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list-recent/"
   "*The address of the most recent (ding) articles."
   :group 'gnus-group-foreign
   :type 'directory)
@@ -89,7 +89,7 @@ unread articles in the groups.
 
 If nil, no groups are permanently visible."
   :group 'gnus-group-listing
-  :type '(choice regexp (const nil)))
+  :type 'regexp)
 
 (defcustom gnus-list-groups-with-ticked-articles t
   "*If non-nil, list groups that have only ticked articles.
@@ -261,10 +261,13 @@ variable."
   :type 'hook)
 
 (defcustom gnus-useful-groups
-  `(("(ding) mailing list mirrored at sunsite.auc.dk"
+  '(("(ding) mailing list mirrored at sunsite.auc.dk"
      "emacs.ding"
      (nntp "sunsite.auc.dk"
-			(nntp-address "sunsite.auc.dk")))
+	   (nntp-address "sunsite.auc.dk")))
+    ("gnus-bug archive"
+     "gnus-bug"
+     (nndir "/ftp@ftp.ifi.uio.no:/pub/emacs/gnus/gnus-bug/"))
     ("Gnus help group"
      "gnus-help"
      (nndoc "gnus-help"
@@ -275,7 +278,7 @@ variable."
 		       (unless file
 			 (error "Couldn't find doc group"))
 		       file))))))
-  "Alist of useful group-server pairs."
+  "*Alist of useful group-server pairs."
   :group 'gnus-group-listing
   :type '(repeat (list (string :tag "Description")
 		       (string :tag "Name")
@@ -316,7 +319,7 @@ variable."
      gnus-group-mail-low-empty-face)
     (t .
      gnus-group-mail-low-face))
-  "Controls the highlighting of group buffer lines.
+  "*Controls the highlighting of group buffer lines.
 
 Below is a list of `Form'/`Face' pairs.  When deciding how a a
 particular group line should be displayed, each form is
@@ -428,6 +431,7 @@ ticked: The number of ticked articles."
     "p" gnus-group-prev-unread-group
     "\177" gnus-group-prev-unread-group
     [delete] gnus-group-prev-unread-group
+    [backspace] gnus-group-prev-unread-group
     "N" gnus-group-next-group
     "P" gnus-group-prev-group
     "\M-n" gnus-group-next-unread-group-same-level
@@ -707,7 +711,7 @@ ticked: The number of ticked articles."
 	 (fboundp 'gnus-soup-pack-packet)]
 	["Pack packet" gnus-soup-pack-packet (fboundp 'gnus-soup-pack-packet)]
 	["Save areas" gnus-soup-save-areas (fboundp 'gnus-soup-pack-packet)]
-	["Brew SOUP" gnus-soup-brew-soup (fboundp 'gnus-soup-pack-packet)])
+	["Brew SOUP" gnus-group-brew-soup (fboundp 'gnus-soup-pack-packet)])
        ["Send a bug report" gnus-bug t]
        ["Send a mail" gnus-group-mail t]
        ["Post an article..." gnus-group-post-news t]
@@ -729,7 +733,7 @@ ticked: The number of ticked articles."
        ["Exit from Gnus" gnus-group-exit t]
        ["Exit without saving" gnus-group-quit t]))
 
-    (run-hooks 'gnus-group-menu-hook)))
+    (gnus-run-hooks 'gnus-group-menu-hook)))
 
 (defun gnus-group-mode ()
   "Major mode for reading news.
@@ -768,13 +772,14 @@ The following commands are available:
   (add-hook 'post-command-hook 'gnus-clear-inboxes-moved nil t)
   (when gnus-use-undo
     (gnus-undo-mode 1))
-  (run-hooks 'gnus-group-mode-hook))
+  (gnus-run-hooks 'gnus-group-mode-hook))
 
 (defun gnus-update-group-mark-positions ()
   (save-excursion
-    (let ((gnus-process-mark 128)
+    (let ((gnus-process-mark ?\200)
 	  (gnus-group-marked '("dummy.group"))
-	  (gnus-active-hashtb (make-vector 10 0)))
+	  (gnus-active-hashtb (make-vector 10 0))
+	  (topic ""))
       (gnus-set-active "dummy.group" '(0 . 0))
       (gnus-set-work-buffer)
       (gnus-group-insert-group-line "dummy.group" 0 nil 0 nil)
@@ -810,7 +815,7 @@ The following commands are available:
     (or level gnus-group-default-list-level gnus-level-subscribed))))
 
 (defun gnus-group-setup-buffer ()
-  (switch-to-buffer (get-buffer-create gnus-group-buffer))
+  (set-buffer (get-buffer-create gnus-group-buffer))
   (unless (eq major-mode 'gnus-group-mode)
     (gnus-add-current-to-buffer-list)
     (gnus-group-mode)
@@ -946,7 +951,7 @@ If REGEXP, only list groups matching REGEXP."
 
     (gnus-group-set-mode-line)
     (setq gnus-group-list-mode (cons level all))
-    (run-hooks 'gnus-group-prepare-hook)
+    (gnus-run-hooks 'gnus-group-prepare-hook)
     t))
 
 (defun gnus-group-prepare-flat-list-dead (groups level mark regexp)
@@ -1088,7 +1093,7 @@ If REGEXP, only list groups matching REGEXP."
 		  gnus-level ,gnus-tmp-level))
     (when (inline (gnus-visual-p 'group-highlight 'highlight))
       (forward-line -1)
-      (run-hooks 'gnus-group-update-hook)
+      (gnus-run-hooks 'gnus-group-update-hook)
       (forward-line))
     ;; Allow XEmacs to remove front-sticky text properties.
     (gnus-group-remove-excess-properties)))
@@ -1111,7 +1116,7 @@ If REGEXP, only list groups matching REGEXP."
 	 (mailp (memq 'mail (assoc (symbol-name
 				    (car (or method gnus-select-method)))
 				   gnus-valid-select-methods)))
-	 (level (or (gnus-info-level info) 9))
+	 (level (or (gnus-info-level info) gnus-level-killed))
 	 (score (or (gnus-info-score info) 0))
 	 (ticked (gnus-range-length (cdr (assq 'tick marked))))
 	 (group-age (gnus-group-timestamp-delta group))
@@ -1161,7 +1166,7 @@ already."
 	    (gnus-group-insert-group-line-info group)
 	    (save-excursion
 	      (forward-line -1)
-	      (run-hooks 'gnus-group-update-group-hook)))
+	      (gnus-run-hooks 'gnus-group-update-group-hook)))
 	  (setq loc (1+ loc)))
 	(unless (or found visible-only)
 	  ;; No such line in the buffer, find out where it's supposed to
@@ -1183,7 +1188,7 @@ already."
 	    (gnus-group-insert-group-line-info group)
 	    (save-excursion
 	      (forward-line -1)
-	      (run-hooks 'gnus-group-update-group-hook))))
+	      (gnus-run-hooks 'gnus-group-update-group-hook))))
 	(when gnus-group-update-group-function
 	  (funcall gnus-group-update-group-function group))
 	(gnus-group-set-mode-line)))
@@ -1229,7 +1234,8 @@ already."
 (defun gnus-group-group-name ()
   "Get the name of the newsgroup on the current line."
   (let ((group (get-text-property (gnus-point-at-bol) 'gnus-group)))
-    (and group (symbol-name group))))
+    (when group
+      (symbol-name group))))
 
 (defun gnus-group-group-level ()
   "Get the level of the newsgroup on the current line."
@@ -1254,8 +1260,8 @@ already."
 (defun gnus-group-level (group)
   "Return the estimated level of GROUP."
   (or (gnus-info-level (gnus-get-info group))
-      (and (member group gnus-zombie-list) 8)
-      9))
+      (and (member group gnus-zombie-list) gnus-level-zombie)
+      gnus-level-killed))
 
 (defun gnus-group-search-forward (&optional backward all level first-too)
   "Find the next newsgroup with unread articles.
@@ -1417,9 +1423,9 @@ Take into consideration N (the prefix) and the list of marked groups."
 	  (n (abs n))
 	  group groups)
       (save-excursion
-	(while (and (> n 0)
-		    (setq group (gnus-group-group-name)))
-	  (push group groups)
+	(while (> n 0)
+	  (if (setq group (gnus-group-group-name))
+	      (push group groups))
 	  (setq n (1- n))
 	  (gnus-group-next-group way)))
       (nreverse groups)))
@@ -1444,6 +1450,8 @@ Take into consideration N (the prefix) and the list of marked groups."
     (let ((group (gnus-group-group-name)))
       (and group (list group))))))
 
+;;; !!!Surely gnus-group-iterate should be a macro instead?  I can't
+;;; imagine why I went through these contortions...
 (eval-and-compile
   (let ((function (make-symbol "gnus-group-iterate-function"))
 	(window (make-symbol "gnus-group-iterate-window"))
@@ -1558,7 +1566,7 @@ be permanent."
 Returns whether the fetching was successful or not."
   (interactive "sGroup name: ")
   (unless (get-buffer gnus-group-buffer)
-    (gnus))
+    (gnus-no-server))
   (gnus-group-read-group nil nil group))
 
 (defvar gnus-ephemeral-group-server 0)
@@ -1575,14 +1583,16 @@ If REQUEST-ONLY, don't actually read the group; just request it.
 
 Return the name of the group is selection was successful."
   ;; Transform the select method into a unique server.
-  (let ((saddr (intern (format "%s-address" (car method)))))
-    (setq method (gnus-copy-sequence method))
-    (require (car method))
-    (when (boundp saddr)
-      (unless (assq saddr method)
-	(nconc method `((,saddr ,(cadr method))))
-	(setf (cadr method) (format "%s-%d" (cadr method)
-				    (incf gnus-ephemeral-group-server))))))
+  (when (stringp method)
+    (setq method (gnus-server-to-method method)))
+;;;  (let ((saddr (intern (format "%s-address" (car method)))))
+;;;    (setq method (gnus-copy-sequence method))
+;;;    (require (car method))
+;;;    (when (boundp saddr)
+;;;      (unless (assq saddr method)
+;;;	(nconc method `((,saddr ,(cadr method))))
+;;;	(setf (cadr method) (format "%s-%d" (cadr method)
+;;;				    (incf gnus-ephemeral-group-server))))))
   (let ((group (if (gnus-group-foreign-p group) group
 		 (gnus-group-prefixed-name group method))))
     (gnus-sethash
@@ -1594,6 +1604,7 @@ Return the name of the group is selection was successful."
 				(cons gnus-summary-buffer
 				      gnus-current-window-configuration))))))
      gnus-newsrc-hashtb)
+    (push method gnus-ephemeral-servers)
     (set-buffer gnus-group-buffer)
     (unless (gnus-check-server method)
       (error "Unable to contact server: %s" (gnus-status-message method)))
@@ -1892,6 +1903,7 @@ and NEW-NAME will be prompted for."
 	(gnus-set-active new-name (gnus-active group))
 	(gnus-message 6 "Renaming group %s to %s...done" group new-name)
 	new-name)
+    (gnus-dribble-touch)
     (gnus-group-position-point)))
 
 (defun gnus-group-edit-group (group &optional part)
@@ -2401,16 +2413,15 @@ If REVERSE, sort in reverse order."
 
 (defun gnus-group-catchup-current (&optional n all)
   "Mark all articles not marked as unread in current newsgroup as read.
-If prefix argument N is numeric, the ARG next newsgroups will be
+If prefix argument N is numeric, the next N newsgroups will be
 caught up.  If ALL is non-nil, marked articles will also be marked as
 read.  Cross references (Xref: header) of articles are ignored.
-The difference between N and actual number of newsgroups that were
-caught up is returned."
+The number of newsgroups that this function was unable to catch
+up is returned."
   (interactive "P")
-  (unless (gnus-group-group-name)
-    (error "No group on the current line"))
   (let ((groups (gnus-group-process-prefix n))
 	(ret 0))
+    (unless groups (error "No groups selected"))
     (if (not
 	 (or (not gnus-interactive-catchup) ;Without confirmation?
 	     gnus-expert-user
@@ -2474,7 +2485,7 @@ or nil if no action could be taken."
 	  (gnus-add-marked-articles group 'tick nil nil 'force)
 	  (gnus-add-marked-articles group 'dormant nil nil 'force))
 	(let ((gnus-newsgroup-name group))
-	  (run-hooks 'gnus-group-catchup-group-hook))
+	  (gnus-run-hooks 'gnus-group-catchup-group-hook))
 	num))))
 
 (defun gnus-group-expire-articles (&optional n)
@@ -2598,7 +2609,7 @@ group line."
 	  'gnus-group-history)))
   (let ((newsrc (gnus-gethash group gnus-newsrc-hashtb)))
     (cond
-     ((string-match "^[ \t]$" group)
+     ((string-match "^[ \t]*$" group)
       (error "Empty group name"))
      (newsrc
       ;; Toggle subscription flag.
@@ -2707,14 +2718,18 @@ of groups killed."
 		(delq (assoc group gnus-newsrc-alist)
 		      gnus-newsrc-alist))
 	  (when gnus-group-change-level-function
-	    (funcall gnus-group-change-level-function group 9 3))
+	    (funcall gnus-group-change-level-function
+		     group gnus-level-killed 3))
 	  (cond
 	   ((setq entry (gnus-gethash group gnus-newsrc-hashtb))
 	    (push (cons (car entry) (nth 2 entry))
 		  gnus-list-of-killed-groups)
 	    (setcdr (cdr entry) (cdddr entry)))
 	   ((member group gnus-zombie-list)
-	    (setq gnus-zombie-list (delete group gnus-zombie-list)))))
+	    (setq gnus-zombie-list (delete group gnus-zombie-list))))
+	  ;; There may be more than one instance displayed.
+	  (while (gnus-group-goto-group group)
+	    (gnus-delete-line)))
 	(gnus-make-hashtable-from-newsrc-alist)))
 
     (gnus-group-position-point)
@@ -2849,7 +2864,7 @@ entail asking the server for the groups."
 
 (defun gnus-activate-all-groups (level)
   "Activate absolutely all groups."
-  (interactive (list 7))
+  (interactive (list gnus-level-unsubscribed))
   (let ((gnus-activate-level level)
 	(gnus-activate-foreign-newsgroups level))
     (gnus-group-get-new-news)))
@@ -2861,7 +2876,7 @@ re-scanning.  If ARG is non-nil and not a number, this will force
 \"hard\" re-reading of the active files from all servers."
   (interactive "P")
   (let ((gnus-inhibit-demon t))
-    (run-hooks 'gnus-get-new-news-hook)
+    (gnus-run-hooks 'gnus-get-new-news-hook)
 
     ;; Read any slave files.
     (unless gnus-slave
@@ -2888,7 +2903,7 @@ re-scanning.  If ARG is non-nil and not a number, this will force
 	  (gnus-get-unread-articles arg))
       (let ((gnus-read-active-file (if arg nil gnus-read-active-file)))
 	(gnus-get-unread-articles arg)))
-    (run-hooks 'gnus-after-getting-new-news-hook)
+    (gnus-run-hooks 'gnus-after-getting-new-news-hook)
     (gnus-group-list-groups (and (numberp arg)
 				 (max (car gnus-group-list-mode) arg)))))
 
@@ -2944,8 +2959,10 @@ to use."
       (setq dirs (list dirs)))
     (while (and (not found)
 		(setq dir (pop dirs)))
-      (setq file (concat (file-name-as-directory dir)
-			 (gnus-group-real-name group)))
+      (let ((name (gnus-group-real-name group)))
+	(while (string-match "\\." name)
+	  (setq name (replace-match "/" t t name)))
+	(setq file (concat (file-name-as-directory dir) name)))
       (if (not (file-exists-p file))
 	  (gnus-message 1 "No such file: %s" file)
 	(let ((enable-local-variables nil))
@@ -3143,7 +3160,7 @@ If GROUP, edit that local kill file instead."
 In fact, cleanup buffers except for group mode buffer.
 The hook gnus-suspend-gnus-hook is called before actually suspending."
   (interactive)
-  (run-hooks 'gnus-suspend-gnus-hook)
+  (gnus-run-hooks 'gnus-suspend-gnus-hook)
   ;; Kill Gnus buffers except for group mode buffer.
   (let* ((group-buf (get-buffer gnus-group-buffer))
 	 ;; Do this on a separate list in case the user does a ^G before we finish
@@ -3173,7 +3190,7 @@ The hook `gnus-exit-gnus-hook' is called before actually exiting."
 	  (not gnus-interactive-exit)	;Without confirmation
 	  gnus-expert-user
 	  (gnus-y-or-n-p "Are you sure you want to quit reading news? "))
-    (run-hooks 'gnus-exit-gnus-hook)
+    (gnus-run-hooks 'gnus-exit-gnus-hook)
     ;; Offer to save data from non-quitted summary buffers.
     (gnus-offer-save-summaries)
     ;; Save the newsrc file(s).
@@ -3183,7 +3200,7 @@ The hook `gnus-exit-gnus-hook' is called before actually exiting."
     ;; Reset everything.
     (gnus-clear-system)
     ;; Allow the user to do things after cleaning up.
-    (run-hooks 'gnus-after-exiting-gnus-hook)))
+    (gnus-run-hooks 'gnus-after-exiting-gnus-hook)))
 
 (defun gnus-group-quit ()
   "Quit reading news without updating .newsrc.eld or .newsrc.
@@ -3197,14 +3214,14 @@ The hook `gnus-exit-gnus-hook' is called before actually exiting."
 	    (gnus-yes-or-no-p
 	     (format "Quit reading news without saving %s? "
 		     (file-name-nondirectory gnus-current-startup-file))))
-    (run-hooks 'gnus-exit-gnus-hook)
+    (gnus-run-hooks 'gnus-exit-gnus-hook)
     (gnus-configure-windows 'group t)
     (gnus-dribble-save)
     (gnus-close-backends)
     (gnus-clear-system)
     (gnus-kill-buffer gnus-group-buffer)
     ;; Allow the user to do things after cleaning up.
-    (run-hooks 'gnus-after-exiting-gnus-hook)))
+    (gnus-run-hooks 'gnus-after-exiting-gnus-hook)))
 
 (defun gnus-group-describe-briefly ()
   "Give a one line description of the group mode commands."
@@ -3338,7 +3355,7 @@ or `gnus-group-catchup-group-hook'."
 
 (defsubst gnus-group-timestamp (group)
   "Return the timestamp for GROUP."
-  (gnus-group-get-parameter group 'timestamp))
+  (gnus-group-get-parameter group 'timestamp t))
 
 (defun gnus-group-timestamp-delta (group)
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."

@@ -1,7 +1,7 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -34,7 +34,7 @@
   :group 'gnus)
 
 (defcustom gnus-xmas-glyph-directory nil
-  "*Directory where Gnus logos and icons are located.
+  "Directory where Gnus logos and icons are located.
 If this variable is nil, Gnus will try to locate the directory
 automatically."
   :type '(choice (const :tag "autodetect" nil)
@@ -57,7 +57,7 @@ automatically."
   "Color alist used for the Gnus logo.")
 
 (defcustom gnus-xmas-logo-color-style 'moss
-  "Color styles used for the Gnus logo."
+  "*Color styles used for the Gnus logo."
   :type '(choice (const flame) (const pine) (const moss)
 		 (const irish) (const sky) (const tin)
 		 (const velvet) (const grape) (const labia)
@@ -73,7 +73,7 @@ automatically."
 	  (featurep 'xpm))
       'gnus-xmas-article-display-xface
     "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | xv -quit -")
-  "String or function to be executed to display an X-Face header.
+  "*String or function to be executed to display an X-Face header.
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
   :type '(choice string function))
@@ -153,7 +153,7 @@ It is provided only to ease porting of broken FSF Emacs programs."
 		     gnus-summary-selected-face)))
 
 (defcustom gnus-xmas-force-redisplay nil
-  "If non-nil, force a redisplay before recentering the summary buffer.
+  "*If non-nil, force a redisplay before recentering the summary buffer.
 This is ugly, but it works around a bug in `window-displayed-height'."
   :type 'boolean
   :group 'gnus-xmas)
@@ -210,6 +210,8 @@ displayed, no centering will be performed."
     ;; selective display).
     (aset table ?\n nil)
     (aset table ?\r nil)
+    ;; We keep TAB as well.
+    (aset table ?\t nil)
     ;; We nix out any glyphs over 126 below ctl-arrow.
     (let ((i (if (integerp ctl-arrow) ctl-arrow 160)))
       (while (>= (setq i (1- i)) 127)
@@ -244,7 +246,13 @@ call it with the value of the `gnus-data' text property."
       (funcall fun data))))
 
 (defun gnus-xmas-move-overlay (extent start end &optional buffer)
-  (set-extent-endpoints extent start end))
+  (set-extent-endpoints extent start end buffer))
+
+(defun gnus-xmas-kill-all-overlays ()
+  "Delete all extents in the current buffer."
+  (map-extents (lambda (extent ignore)
+		 (delete-extent extent)
+		 nil)))
 
 ;; Fixed by Christopher Davis <ckd@loiosh.kei.com>.
 (defun gnus-xmas-article-add-button (from to fun &optional data)
@@ -342,9 +350,25 @@ call it with the value of the `gnus-data' text property."
   (gnus-xmas-menu-add binary
     gnus-binary-menu))
 
+(defun gnus-xmas-agent-summary-menu-add ()
+  (gnus-xmas-menu-add agent-summary
+    gnus-agent-summary-menu))
+
+(defun gnus-xmas-agent-group-menu-add ()
+  (gnus-xmas-menu-add agent-group
+    gnus-agent-group-menu))
+
+(defun gnus-xmas-agent-server-menu-add ()
+  (gnus-xmas-menu-add agent-server
+    gnus-agent-server-menu))
+
 (defun gnus-xmas-tree-menu-add ()
   (gnus-xmas-menu-add tree
     gnus-tree-menu))
+
+(defun gnus-xmas-draft-menu-add ()
+  (gnus-xmas-menu-add draft
+    gnus-draft-menu))
 
 (defun gnus-xmas-server-menu-add ()
   (gnus-xmas-menu-add menu
@@ -410,15 +434,17 @@ call it with the value of the `gnus-data' text property."
     (fset 'gnus-characterp 'characterp)))
 
   (fset 'gnus-make-overlay 'make-extent)
+  (fset 'gnus-delete-overlay 'delete-extent)
   (fset 'gnus-overlay-put 'set-extent-property)
   (fset 'gnus-move-overlay 'gnus-xmas-move-overlay)
   (fset 'gnus-overlay-end 'extent-end-position)
+  (fset 'gnus-kill-all-overlays 'gnus-xmas-kill-all-overlays)
   (fset 'gnus-extent-detached-p 'extent-detached-p)
   (fset 'gnus-add-text-properties 'gnus-xmas-add-text-properties)
   (fset 'gnus-put-text-property 'gnus-xmas-put-text-property)
   (fset 'gnus-deactivate-mark 'ignore)
+  (fset 'gnus-window-edges 'window-pixel-edges)
 
-  (require 'text-props)
   (if (and (<= emacs-major-version 19)
  	   (< emacs-minor-version 14))
       (fset 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
@@ -443,8 +469,8 @@ call it with the value of the `gnus-data' text property."
 
   (defun gnus-byte-code (func)
     "Return a form that can be `eval'ed based on FUNC."
-    (let ((fval (symbol-function func)))
-      (if (byte-code-function-p fval)
+    (let ((fval (indirect-function func)))
+      (if (compiled-function-p fval)
 	  (list 'funcall fval)
 	(cons 'progn (cdr (cdr fval))))))
 
@@ -492,6 +518,11 @@ call it with the value of the `gnus-data' text property."
   (add-hook 'gnus-group-mode-hook 'gnus-xmas-setup-group-toolbar)
   (add-hook 'gnus-summary-mode-hook 'gnus-xmas-setup-summary-toolbar)
 
+  (add-hook 'gnus-agent-summary-mode-hook 'gnus-xmas-agent-summary-menu-add)
+  (add-hook 'gnus-agent-group-mode-hook 'gnus-xmas-agent-group-menu-add)
+  (add-hook 'gnus-agent-server-mode-hook 'gnus-xmas-agent-server-menu-add)
+
+  (add-hook 'gnus-draft-mode-hook 'gnus-xmas-draft-menu-add)
   (add-hook 'gnus-summary-mode-hook
 	    'gnus-xmas-switch-horizontal-scrollbar-off)
   (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off))
@@ -511,23 +542,24 @@ call it with the value of the `gnus-data' text property."
     (let* ((logo-xpm (expand-file-name "gnus.xpm" gnus-xmas-glyph-directory))
 	   (logo-xbm (expand-file-name "gnus.xbm" gnus-xmas-glyph-directory))
 	   (glyph (make-glyph
-		   `(,@(if (featurep 'xpm)
-			   (list
-			    (vector 'xpm
-			     ':file logo-xpm
-			     ':color-symbols
-			     `(("thing" . ,(car gnus-xmas-logo-colors))
-			       ("shadow" . ,(cadr gnus-xmas-logo-colors))
-			       ("background" . ,(face-background 'default))))))
-		       ,(vector 'xbm :file logo-xbm)
-		       ,(vector 'nothing)))))
+		   (cond ((featurep 'xpm)
+			  `[xpm
+			    :file ,logo-xpm
+			    :color-symbols
+			    (("thing" . ,(car gnus-xmas-logo-colors))
+			     ("shadow" . ,(cadr gnus-xmas-logo-colors))
+			     ("background" . ,(face-background 'default)))])
+			 ((featurep 'xbm)
+			  `[xbm :file ,logo-xbm])
+			 (t [nothing])))))
       (insert " ")
       (set-extent-begin-glyph (make-extent (point) (point)) glyph)
       (goto-char (point-min))
       (while (not (eobp))
 	(insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
 			     ?\ ))
-	(forward-line 1)))
+	(forward-line 1))
+      (setq gnus-simple-splash nil))
     (goto-char (point-min))
     (let* ((pheight (+ 20 (count-lines (point-min) (point-max))))
 	   (wheight (window-height))
@@ -720,12 +752,15 @@ XEmacs compatibility workaround."
 		      (make-glyph
 		       (vector 'xpm :data (buffer-string))))))
 		 (t
-		  (make-glyph [nothing])))))
+		  (make-glyph [nothing]))))
+	  (ext (make-extent (progn
+			      (goto-char (point-min))
+			      (re-search-forward "^From:" nil t)
+			      (point))
+			    (1+ (point)))))
       (set-glyph-face xface-glyph 'gnus-x-face)
-      (goto-char (point-min))
-      (re-search-forward "^From:" nil t)
-      (set-extent-begin-glyph
-       (make-extent (point) (1+ (point))) xface-glyph))))
+      (set-extent-begin-glyph ext xface-glyph)
+      (set-extent-property ext 'duplicable t))))
 
 ;;(defvar gnus-xmas-pointer-glyph
 ;;  (progn
@@ -753,19 +788,19 @@ XEmacs compatibility workaround."
   (progn
     (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory "gnus"))
     (let* ((file-xpm (expand-file-name "gnus-pointer.xpm"
-				    gnus-xmas-glyph-directory))
+				       gnus-xmas-glyph-directory))
 	   (file-xbm (expand-file-name "gnus-pointer.xbm"
-				    gnus-xmas-glyph-directory))
+				       gnus-xmas-glyph-directory))
 	   (glyph (make-glyph
 		   ;; Gag gag gag.
-		   `(
-		     ,@(if (featurep 'xpm)
-			   ;; Let's try a nifty XPM
-			   (list (vector 'xpm ':file file-xpm)))
-		       ;; Then a not-so-nifty XBM
-		       ,(vector 'xbm ':file file-xbm)
-		       ;; Then the simple string
-		       ,(vector 'string ':data "Gnus:")))))
+		   (cond ((featurep 'xpm)
+			  ;; Let's try a nifty XPM
+			  `[xpm :file ,file-xpm])
+			 ((featurep 'xbm)
+			  ;; Then a not-so-nifty XBM
+			  [xbm :file ,file-xbm])
+			 ;; Then the simple string
+			 (t [string :data "Gnus:"])))))
       (set-glyph-face glyph 'modeline-buffer-id)
       glyph)))
 

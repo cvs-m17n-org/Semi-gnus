@@ -1,7 +1,7 @@
-;;; nnlsitserv.el --- retrieving articles via web mailing list archives
-;; Copyright (C) 1997 Free Software Foundation, Inc.
+;;; nnlistserv.el --- retrieving articles via web mailing list archives
+;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -29,8 +29,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
-(push '("nnlistserv" none) gnus-valid-select-methods)
 
 (require 'nnoo)
 (require 'nnweb)
@@ -113,7 +111,7 @@
 		 nil 0 0 url))
 	       map)
 	      (nnweb-set-hashtb (cadar map) (car map))
-	      (message "%s %s %s" (cdr active) (point) pages)
+	      (nnheader-message 5 "%s %s %s" (cdr active) (point) pages)
 	      ))))
       ;; Return the articles in the right order.
       (setq nnweb-articles

@@ -1,7 +1,7 @@
 ;;; gnus-nocem.el --- NoCeM pseudo-cancellation treatment
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -40,7 +40,7 @@
 (defcustom gnus-nocem-groups
   '("news.lists.filters" "news.admin.net-abuse.bulletins"
     "alt.nocem.misc" "news.admin.net-abuse.announce")
-  "List of groups that will be searched for NoCeM messages."
+  "*List of groups that will be searched for NoCeM messages."
   :group 'gnus-nocem
   :type '(repeat (string :tag "Group")))
 
@@ -52,11 +52,11 @@
     "snowhare@xmission.com"		; Benjamin "Snowhare" Franz
     "red@redpoll.mrfs.oh.us (Richard E. Depew)" ; ARMM! ARMM!
     )
-  "List of NoCeM issuers to pay attention to.
+  "*List of NoCeM issuers to pay attention to.
 
 This can also be a list of `(ISSUER CONDITIONS)' elements."
   :group 'gnus-nocem
-  :type '(repeat string))
+  :type '(repeat (choice string sexp)))
 
 (defcustom gnus-nocem-directory
   (nnheader-concat gnus-article-save-directory "NoCeM/")
@@ -228,7 +228,7 @@ active file."
       (while (setq condition (pop conditions))
 	(cond
 	 ((stringp condition)
-	  (setq wanted (string-match condition) type))
+	  (setq wanted (string-match condition type)))
 	 ((and (consp condition)
 	       (eq (car condition) 'not)
 	       (stringp (cadr condition)))
@@ -345,7 +345,8 @@ active file."
 
 (defun gnus-nocem-unwanted-article-p (id)
   "Say whether article ID in the current group is wanted."
-  (gnus-gethash id gnus-nocem-hashtb))
+  (and gnus-nocem-hashtb
+       (gnus-gethash id gnus-nocem-hashtb)))
 
 (provide 'gnus-nocem)
 

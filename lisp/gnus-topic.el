@@ -1,8 +1,8 @@
 ;;; gnus-topic.el --- a folding minor mode for Gnus group buffers
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Ilja Weis <kult@uni-paderborn.de>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -186,7 +186,7 @@ with some simple extensions.
   (let ((groups (cdr (assoc topic gnus-topic-alist)))
         info clevel unread group params visible-groups entry active)
     (setq lowest (or lowest 1))
-    (setq level (or level 7))
+    (setq level (or level gnus-level-unsubscribed))
     ;; We go through the newsrc to look for matches.
     (while groups
       (when (setq group (pop groups))
@@ -199,7 +199,7 @@ with some simple extensions.
 			      active
 			      (- (1+ (cdr active)) (car active))))
 	      clevel (or (gnus-info-level info)
-			 (if (member group gnus-zombie-list) 8 9))))
+			 (if (member group gnus-zombie-list) gnus-level-zombie gnus-level-killed))))
       (and
        unread				; nil means that the group is dead.
        (<= clevel level)
@@ -398,7 +398,7 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
 
       (gnus-group-set-mode-line)
       (setq gnus-group-list-mode (cons level all))
-      (run-hooks 'gnus-group-prepare-hook))))
+      (gnus-run-hooks 'gnus-group-prepare-hook))))
 
 (defun gnus-topic-prepare-topic (topicl level &optional list-level all silent
 					lowest)
@@ -431,7 +431,7 @@ articles in the topic and its subtopics."
 	(if (stringp entry)
 	    ;; Dead groups.
 	    (gnus-group-insert-group-line
-	     entry (if (member entry gnus-zombie-list) 8 9)
+	     entry (if (member entry gnus-zombie-list) gnus-level-zombie gnus-level-killed)
 	     nil (- (1+ (cdr (setq active (gnus-active entry))))
 		    (car active))
 	     nil)
@@ -512,7 +512,8 @@ articles in the topic and its subtopics."
 	 (indentation (make-string (* gnus-topic-indent-level level) ? ))
 	 (total-number-of-articles unread)
 	 (number-of-groups (length entries))
-	 (active-topic (eq gnus-topic-alist gnus-topic-active-alist)))
+	 (active-topic (eq gnus-topic-alist gnus-topic-active-alist))
+	 gnus-tmp-header)
     (beginning-of-line)
     ;; Insert the text.
     (gnus-add-text-properties
@@ -626,7 +627,7 @@ articles in the topic and its subtopics."
     (when parent
       (forward-line -1)
       (gnus-topic-update-topic-line
-       parent (- old-unread (gnus-group-topic-unread))))
+       parent (- (or old-unread 0) (or (gnus-group-topic-unread) 0))))
     unread))
 
 (defun gnus-topic-group-indentation ()
@@ -733,55 +734,60 @@ articles in the topic and its subtopics."
   "Run when changing levels to enter/remove groups from topics."
   (save-excursion
     (set-buffer gnus-group-buffer)
-    (gnus-group-goto-group (or (car (nth 2 previous)) group))
-    (when (and gnus-topic-mode
-	       gnus-topic-alist
-	       (not gnus-topic-inhibit-change-level))
-      ;; Remove the group from the topics.
-      (when (and (< oldlevel gnus-level-zombie)
-		 (>= level gnus-level-zombie))
-	(let (alist)
-	  (forward-line -1)
-	  (when (setq alist (assoc (gnus-current-topic) gnus-topic-alist))
-	    (setcdr alist (gnus-delete-first group (cdr alist))))))
-      ;; If the group is subscribed we enter it into the topics.
-      (when (and (< level gnus-level-zombie)
-		 (>= oldlevel gnus-level-zombie))
-	(let* ((prev (gnus-group-group-name))
-	       (gnus-topic-inhibit-change-level t)
-	       (gnus-group-indentation
-		(make-string
-		 (* gnus-topic-indent-level
-		    (or (save-excursion
-			  (gnus-topic-goto-topic (gnus-current-topic))
-			  (gnus-group-topic-level))
-			0))
-		 ? ))
-	       (yanked (list group))
-	       alist talist end)
-	  ;; Then we enter the yanked groups into the topics they belong
-	  ;; to.
-	  (when (setq alist (assoc (save-excursion
-				     (forward-line -1)
-				     (or
-				      (gnus-current-topic)
-				      (caar gnus-topic-topology)))
-				   gnus-topic-alist))
-	    (setq talist alist)
-	    (when (stringp yanked)
-	      (setq yanked (list yanked)))
-	    (if (not prev)
-		(nconc alist yanked)
-	      (if (not (cdr alist))
-		  (setcdr alist (nconc yanked (cdr alist)))
-		(while (and (not end) (cdr alist))
-		  (when (equal (cadr alist) prev)
-		    (setcdr alist (nconc yanked (cdr alist)))
-		    (setq end t))
-		  (setq alist (cdr alist)))
-		(unless end
-		  (nconc talist yanked))))))
-	(gnus-topic-update-topic)))))
+    (let ((buffer-read-only nil))
+      (unless gnus-topic-inhibit-change-level
+	(gnus-group-goto-group (or (car (nth 2 previous)) group))
+	(when (and gnus-topic-mode
+		   gnus-topic-alist
+		   (not gnus-topic-inhibit-change-level))
+	  ;; Remove the group from the topics.
+	  (if (and (< oldlevel gnus-level-zombie)
+		   (>= level gnus-level-zombie))
+	      (let ((alist gnus-topic-alist))
+		(while (gnus-group-goto-group group)
+		  (gnus-delete-line))
+		(while alist
+		  (when (member group (car alist))
+		    (setcdr (car alist) (delete group (cdar alist))))
+		  (pop alist)))
+	    ;; If the group is subscribed we enter it into the topics.
+	    (when (and (< level gnus-level-zombie)
+		       (>= oldlevel gnus-level-zombie))
+	      (let* ((prev (gnus-group-group-name))
+		     (gnus-topic-inhibit-change-level t)
+		     (gnus-group-indentation
+		      (make-string
+		       (* gnus-topic-indent-level
+			  (or (save-excursion
+				(gnus-topic-goto-topic (gnus-current-topic))
+				(gnus-group-topic-level))
+			      0))
+		       ? ))
+		     (yanked (list group))
+		     alist talist end)
+		;; Then we enter the yanked groups into the topics they belong
+		;; to.
+		(when (setq alist (assoc (save-excursion
+					   (forward-line -1)
+					   (or
+					    (gnus-current-topic)
+					    (caar gnus-topic-topology)))
+					 gnus-topic-alist))
+		  (setq talist alist)
+		  (when (stringp yanked)
+		    (setq yanked (list yanked)))
+		  (if (not prev)
+		      (nconc alist yanked)
+		    (if (not (cdr alist))
+			(setcdr alist (nconc yanked (cdr alist)))
+		      (while (and (not end) (cdr alist))
+			(when (equal (cadr alist) prev)
+			  (setcdr alist (nconc yanked (cdr alist)))
+			  (setq end t))
+			(setq alist (cdr alist)))
+		      (unless end
+			(nconc talist yanked))))))
+	      (gnus-topic-update-topic))))))))
 
 (defun gnus-topic-goto-next-group (group props)
   "Go to group or the next group after group."
@@ -975,7 +981,7 @@ articles in the topic and its subtopics."
       ;; We check the topology.
       (when gnus-newsrc-alist
 	(gnus-topic-check-topology))
-      (run-hooks 'gnus-topic-mode-hook))
+      (gnus-run-hooks 'gnus-topic-mode-hook))
     ;; Remove topic infestation.
     (unless gnus-topic-mode
       (remove-hook 'gnus-summary-exit-hook 'gnus-topic-update-topic)
@@ -1180,7 +1186,7 @@ If COPYP, copy the groups instead."
   (if (not topic)
       (call-interactively 'gnus-group-mark-group)
     (save-excursion
-      (let ((groups (gnus-topic-find-groups topic 9 t)))
+      (let ((groups (gnus-topic-find-groups topic gnus-level-killed t)))
 	(while groups
 	  (funcall (if unmark 'gnus-group-remove-mark 'gnus-group-set-mark)
 		   (gnus-info-group (nth 2 (pop groups)))))))))
@@ -1245,6 +1251,10 @@ If COPYP, copy the groups instead."
    (let ((topic (gnus-current-topic)))
      (list topic
 	   (read-string (format "Rename %s to: " topic)))))
+  ;; Check whether the new name exists.
+  (when (gnus-topic-find-topology new-name)
+    (error "Topic '%s' already exists"))
+  ;; Do the renaming.
   (let ((top (gnus-topic-find-topology old-name))
 	(entry (assoc old-name gnus-topic-alist)))
     (when top
@@ -1304,7 +1314,7 @@ If FORCE, always re-read the active file."
   (let ((gnus-topic-topology gnus-topic-active-topology)
 	(gnus-topic-alist gnus-topic-active-alist)
 	gnus-killed-list gnus-zombie-list)
-    (gnus-group-list-groups 9 nil 1)))
+    (gnus-group-list-groups gnus-level-killed nil 1)))
 
 (defun gnus-topic-toggle-display-empty-topics ()
   "Show/hide topics that have no unread articles."

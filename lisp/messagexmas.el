@@ -1,7 +1,7 @@
 ;;; messagexmas.el --- XEmacs extensions to message
-;; Copyright (C) 1996,97 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: mail, news
 
 ;; This file is part of GNU Emacs.
@@ -93,9 +93,8 @@ If it is non-nil, it must be a toolbar.  The five legal values are
 (fset 'message-exchange-point-and-mark 'message-xmas-exchange-point-and-mark)
 
 (defun message-xmas-maybe-fontify ()
-  (when (and (featurep 'font-lock)
-	     font-lock-auto-fontify)
-    (turn-on-font-lock)))
+  (when (featurep 'font-lock)
+    (font-lock-set-defaults)))
 
 (defun message-xmas-make-caesar-translation-table (n)
   "Create a rot table with offset N."

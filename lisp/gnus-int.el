@@ -1,7 +1,7 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996,97 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -86,7 +86,7 @@ If CONFIRM is non-nil, the user will be asked for an NNTP server."
        (t
 	(require 'nntp)))
       (setq gnus-current-select-method gnus-select-method)
-      (run-hooks 'gnus-open-server-hook)
+      (gnus-run-hooks 'gnus-open-server-hook)
       (or
        ;; gnus-open-server-hook might have opened it
        (gnus-server-opened gnus-select-method)
@@ -121,7 +121,7 @@ If it is down, start it up (again)."
 	(gnus-message 5 "Opening %s server%s..." (car method)
 		      (if (equal (nth 1 method) "") ""
 			(format " on %s" (nth 1 method)))))
-      (run-hooks 'gnus-open-server-hook)
+      (gnus-run-hooks 'gnus-open-server-hook)
       (prog1
 	  (gnus-open-server method)
 	(unless silent
@@ -134,17 +134,24 @@ If it is down, start it up (again)."
     (error "Attempted use of a nil select method"))
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
-  (let ((func (intern (format "%s-%s" (if gnus-agent
-					  (gnus-agent-get-function method)
-					(car method))
-			      function))))
-    ;; If the functions isn't bound, we require the backend in
-    ;; question.
+  ;; Check cache of constructed names.
+  (let* ((method-sym (if gnus-agent
+			 (gnus-agent-get-function method)
+		       (car method)))
+	 (method-fns (get method-sym 'gnus-method-functions))
+	 (func (let ((method-fnlist-elt (assq function method-fns)))
+		 (unless method-fnlist-elt
+		   (setq method-fnlist-elt
+			 (cons function
+			       (intern (format "%s-%s" method-sym function))))
+		   (put method-sym 'gnus-method-functions
+			(cons method-fnlist-elt method-fns)))
+		 (cdr method-fnlist-elt))))
+    ;; Maybe complain if there is no function.
     (unless (fboundp func)
       (require (car method))
       (when (and (not (fboundp func))
 		 (not noerror))
-	;; This backend doesn't implement this function.
 	(error "No such function: %s" func)))
     func))
 
@@ -346,10 +353,31 @@ If BUFFER, insert the article in that group."
 
 (defun gnus-request-body (article group)
   "Request the body of ARTICLE in GROUP."
-  (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (funcall (gnus-get-function gnus-command-method 'request-body)
-	     article (gnus-group-real-name group)
-	     (nth 1 gnus-command-method))))
+  (let* ((gnus-command-method (gnus-find-method-for-group group))
+	 (head (gnus-get-function gnus-command-method 'request-body t))
+	 res clean-up)
+    (cond
+     ;; Check the cache.
+     ((and gnus-use-cache
+	   (numberp article)
+	   (gnus-cache-request-article article group))
+      (setq res (cons group article)
+	    clean-up t))
+     ;; Use `head' function.
+     ((fboundp head)
+      (setq res (funcall head article (gnus-group-real-name group)
+			 (nth 1 gnus-command-method))))
+     ;; Use `article' function.
+     (t
+      (setq res (gnus-request-article article group)
+	    clean-up t)))
+    (when clean-up
+      (save-excursion
+	(set-buffer nntp-server-buffer)
+	(goto-char (point-min))
+	(when (search-forward "\n\n" nil t)
+	  (delete-region (point-min) (1- (point))))))
+    res))
 
 (defun gnus-request-post (gnus-command-method)
   "Post the current buffer using GNUS-COMMAND-METHOD."
@@ -361,12 +389,13 @@ If BUFFER, insert the article in that group."
 (defun gnus-request-scan (group gnus-command-method)
   "Request a SCAN being performed in GROUP from GNUS-COMMAND-METHOD.
 If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
-  (let ((gnus-command-method
-	 (if group (gnus-find-method-for-group group) gnus-command-method))
-	(gnus-inhibit-demon t))
-    (funcall (gnus-get-function gnus-command-method 'request-scan)
-	     (and group (gnus-group-real-name group))
-	     (nth 1 gnus-command-method))))
+  (when gnus-plugged
+    (let ((gnus-command-method
+	   (if group (gnus-find-method-for-group group) gnus-command-method))
+	  (gnus-inhibit-demon t))
+      (funcall (gnus-get-function gnus-command-method 'request-scan)
+	       (and group (gnus-group-real-name group))
+	       (nth 1 gnus-command-method)))))
 
 (defsubst gnus-request-update-info (info gnus-command-method)
   "Request that GNUS-COMMAND-METHOD update INFO."

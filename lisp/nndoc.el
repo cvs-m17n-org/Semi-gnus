@@ -1,7 +1,7 @@
 ;;; nndoc.el --- single file access for Gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news
 
@@ -43,6 +43,11 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
 (defvoo nndoc-post-type 'mail
   "*Whether the nndoc group is `mail' or `post'.")
 
+(defvoo nndoc-open-document-hook 'nnheader-ms-strip-cr
+  "Hook run after opening a document.
+The default function removes all trailing carriage returns
+from the document.")  
+
 (defvar nndoc-type-alist
   `((mmdf
      (article-begin .  "^\^A\^A\^A\^A\n")
@@ -82,12 +87,12 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
      (file-end . "")
      (subtype digest guess))
     (standard-digest
-     (first-article . ,(concat "^" (make-string 70 ?-) "\n\n+"))
-     (article-begin . ,(concat "^\n" (make-string 30 ?-) "\n\n+"))
+     (first-article . ,(concat "^" (make-string 70 ?-) "\n *\n+"))
+     (article-begin . ,(concat "^\n" (make-string 30 ?-) "\n *\n+"))
      (prepare-body-function . nndoc-unquote-dashes)
      (body-end-function . nndoc-digest-body-end)
-     (head-end . "^ ?$")
-     (body-begin . "^ ?\n")
+     (head-end . "^ *$")
+     (body-begin . "^ *\n")
      (file-end . "^End of .*digest.*[0-9].*\n\\*\\*\\|^End of.*Digest *$")
      (subtype digest guess))
     (slack-digest
@@ -279,7 +284,8 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
 	(erase-buffer)
 	(if (stringp nndoc-address)
 	    (nnheader-insert-file-contents nndoc-address)
-	  (insert-buffer-substring nndoc-address)))))
+	  (insert-buffer-substring nndoc-address))
+	(run-hooks 'nndoc-open-document-hook))))
     ;; Initialize the nndoc structures according to this new document.
     (when (and nndoc-current-buffer
 	       (not nndoc-dissection-alist))
@@ -390,7 +396,7 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
 
 (defun nndoc-babyl-body-begin ()
   (re-search-forward "^\n" nil t)
-  (when (looking-at "\*\*\* EOOH \*\*\*")
+  (when (looking-at "\\*\\*\\* EOOH \\*\\*\\*")
     (let ((next (or (save-excursion
 		      (re-search-forward nndoc-article-begin nil t))
 		    (point-max))))
@@ -402,7 +408,7 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
 
 (defun nndoc-babyl-head-begin ()
   (when (re-search-forward "^[0-9].*\n" nil t)
-    (when (looking-at "\*\*\* EOOH \*\*\*")
+    (when (looking-at "\\*\\*\\* EOOH \\*\\*\\*")
       (forward-line 1))
     t))
 
@@ -529,6 +535,9 @@ One of `mbox', `babyl', `digest', `news', `rnews', `mmdf', `forward',
       (setq from (replace-match "" t t from)))
     (insert "From: "  (or from "unknown")
  	    "\nSubject: " (or subject "(no subject)") "\n")))
+
+(deffoo nndoc-request-accept-article (group &optional server last)
+  nil)
 
 
 

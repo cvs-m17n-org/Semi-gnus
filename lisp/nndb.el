@@ -1,5 +1,5 @@
 ;;; nndb.el --- nndb access for Gnus
-;; Copyright (C) 1997 Free Software Foundation, Inc.
+;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Kai Grossjohann <grossjohann@ls6.informatik.uni-dortmund.de>
@@ -70,7 +70,8 @@
   (autoload 'cancel-timer "timer")
   (autoload 'telnet "telnet" nil t)
   (autoload 'telnet-send-input "telnet" nil t)
-  (autoload 'timezone-parse-date "timezone"))
+  (autoload 'timezone-parse-date "timezone")
+  (autoload 'gnus-declare-backend "gnus-start"))
 
 ;; Declare nndb as derived from nntp
 
@@ -194,7 +195,7 @@ article was posted to nndb")
 	  (nntp-send-command "^[23].*\n" "X-DELETE" delete-list))
       )
 	
-    (message "")
+    (nnheader-message 5 "")
     (nconc rest articles)))
 
 (defun nndb-get-remote-expire-response ()
@@ -296,7 +297,7 @@ Optional LAST is ignored."
     (or (string-match "^\\([0-9]+\\)" msg)
 	(error "nndb: %s" msg))
     (setq art (substring msg (match-beginning 1) (match-end 1)))
-    (message "nndb: accepted %s" art)
+    (nnheader-message 5 "nndb: accepted %s" art)
     (list art)))
 
 (deffoo nndb-request-replace-article (article group buffer)

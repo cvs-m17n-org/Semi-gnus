@@ -1,3 +1,201 @@
+Tue May 19 02:44:31 1998  Mike Pullen  <mpullen@midwest.net>
+
+	* gnus.texi.orig: Typo fixes.
+
+Wed Apr 29 21:52:28 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Key Index): Untabified.
+	(Group Parameters): Fix.
+
+Sun Apr 26 15:32:45 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Summary Post Commands): Ref to Message.
+
+	* message.texi (Various Message Variables): Deletia.
+
+Fri Apr 24 16:00:40 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Unread Articles): Typo.
+	(Summary Buffer Lines): Fix.
+	(Foreign Groups): Addition.
+	(Posting Server): Addition.
+
+Sat Mar 28 08:57:46 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Example Methods): Addition.
+
+Thu Mar 26 15:47:54 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Limiting): Mention `/ *'.
+
+Thu Mar 19 13:02:20 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (NNTP): Addition.
+	Removed spurious white space.
+
+Fri Mar 13 21:05:47 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Quassia Gnus): Fix.
+	(Agent Expiry): Addition.
+
+Sun Mar  8 13:56:37 1998  James Troup  <J.J.Troup@scm.brad.ac.uk>
+
+	* gnus.texi (Group Highlighting): Removed old example.
+
+Sun Mar  8 00:19:24 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Group Info): Fix ".".
+
+Sat Mar  7 17:09:49 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi: Took direntries out again, since makeinfo doesn't
+	understand them.
+	(Agent Expiry): New.
+	(Quassia Gnus): New.
+
+Sat Mar  7 16:14:10 1998  Dan Christensen  <jdc@chow.mat.jhu.edu>
+
+	* gnus.texi (Group Parameters): Mention add-to-list.
+
+Sat Feb 28 14:21:12 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (NNTP): Addition.
+
+1998-03-01  Kim-Minh Kaplan  <KimMinh.Kaplan@utopia.eunet.fr>
+
+	* gnus.texi (Easy Picons): Removed references to
+	`gnus-group-display-picons'.
+	(Hard Picons): Ditto.
+
+1998-03-01  Kim-Minh Kaplan  <KimMinh.Kaplan@utopia.eunet.fr>
+
+	* gnus.texi (Easy Picons): Removed references to
+	`gnus-group-display-picons'.
+	(Hard Picons): Ditto.
+
+Mon Feb 23 18:05:09 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi: Direntry not handled by Emacs 19.34.
+
+1998-02-21  SL Baur  <steve@altair.xemacs.org>
+
+	* gnus.texi: Add a direntry field.
+	* message.texi: Ditto.  (Data taken from Emacs 20.2 info/dir).
+
+Sun Feb 22 03:24:43 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Score File Format): Addition.
+
+1998-02-18  Jason R Mastaler  <jason@4b.org>
+
+	* gnus.texi: Corrected typo.
+
+Thu Feb 19 02:20:29 1998  Francois Felix Ingrand  <felix@laas.fr>
+
+	* gnus.texi (Sorting): Fix order of args.
+
+Sun Feb 15 23:04:02 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (NNTP): Change.
+
+Sat Feb 14 17:46:33 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Virtual Groups): Fix.
+	(NNTP): Addition.
+	(Really Various Summary Commands): Addition.
+
+Fri Feb 13 18:23:19 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Mail Group Commands): Typo.
+	(NNTP): Addition.
+	(Mail and Procmail): Addition.
+
+Mon Feb  9 16:30:30 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Article Date): Addition.
+
+Sun Feb  8 16:28:35 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Newest Features): Addition.
+
+Mon Feb  2 19:21:43 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Agent Variables): Addition.
+
+Sun Feb  1 18:08:45 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Using MIME): Addition.
+
+Tue Jan  6 07:22:41 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Batching Agents): New.
+
+1998-01-04  Christoph Wedler  <wedler@fmi.uni-passau.de>
+
+	* gnus.texi (Newest Features): Delete spaces after @end example.
+	In XEmacs, `texinfo-format-buffer' would bug out.
+
+Sun Jan  4 12:04:45 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Conformity): Removed GNKSA.
+
+Sun Dec 14 11:06:23 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Adaptive Scoring): Addition.
+
+1997-11-26  SL Baur  <steve@altair.xemacs.org>
+
+	* message.texi (Insertion): Fix typo.
+	(Responses): Ditto.
+	(Reply): Ditto.
+
+Wed Nov 26 12:57:00 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.texi (Insertion): Addition.
+
+Wed Nov 26 12:55:15 1997  Hallvard B. Furuseth  <h.b.furuseth@usit.uio.no>
+
+	* message.texi (Insertion): Addition.
+
+Wed Nov 26 12:36:08 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.texi (Responses): New.
+	(Appendices): New.
+
+	* gnus.texi (Group Info): Fix.
+
+Tue Nov 25 17:53:55 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Article Date): Addition.
+
+Mon Nov 24 16:01:20 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Faces & Fonts): New.
+
+Mon Oct 13 00:08:06 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Agent Commands): Addition.
+
+Sun Oct 12 16:50:23 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Article Washing): Addition.
+	(Group Highlighting): New.
+	(Canceling and Superseding): Addition.
+
+Wed Oct  1 18:37:55 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus.texi (Startup Files): Addition.
+
+Sat Sep 27 09:37:17 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.texi (Sending Variables): Fix.
+
+	* gnus.texi (Choosing Commands): Addition.
+
+Sat Sep 27 05:56:44 1997  Hallvard B. Furuseth  <h.b.furuseth@usit.uio.no>
+
+	* gnus.texi: Various fixes.
+
 Sat Sep 27 04:24:41 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 
 	* message.texi (Various Commands): Addition.

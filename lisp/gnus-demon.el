@@ -1,7 +1,7 @@
 ;;; gnus-demon.el --- daemonic Gnus behaviour
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -30,6 +30,8 @@
 (require 'gnus)
 (require 'gnus-int)
 (require 'nnheader)
+(require 'nntp)
+(require 'nnmail)
 (eval-and-compile
   (if (string-match "XEmacs" (emacs-version))
       (require 'itimer)
@@ -259,6 +261,18 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
   (save-window-excursion
     (gnus-close-backends)))
 
+(defun gnus-demon-add-nntp-close-connection ()
+  "Add daemonic nntp server disconnection to Gnus.
+If no commands have gone out via nntp during the last five
+minutes, the connection is closed."
+  (gnus-demon-add-handler 'gnus-demon-close-connections 5 nil))
+
+(defun gnus-demon-nntp-close-connection ()
+  (save-window-excursion
+    (when (nnmail-time-less '(0 300)
+			    (nnmail-time-since nntp-last-command-time))
+      (nntp-close-server))))
+
 (defun gnus-demon-add-scanmail ()
   "Add daemonic scanning of mail from the mail backends."
   (gnus-demon-add-handler 'gnus-demon-scan-mail 120 60))
@@ -267,6 +281,7 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
   (save-window-excursion
     (let ((servers gnus-opened-servers)
 	  server)
+      (gnus-clear-inboxes-moved)
       (while (setq server (car (pop servers)))
 	(and (gnus-check-backend-function 'request-scan (car server))
 	     (or (gnus-server-opened server)
@@ -278,11 +293,15 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
   (gnus-demon-add-handler 'gnus-demon-scan-news 120 60))
 
 (defun gnus-demon-scan-news ()
-  (save-window-excursion
-    (when (gnus-alive-p)
-      (save-excursion
-	(set-buffer gnus-group-buffer)
-	(gnus-group-get-new-news)))))
+  (let ((win (current-window-configuration)))
+    (unwind-protect
+	(save-window-excursion
+	  (save-excursion
+	    (when (gnus-alive-p)
+	      (save-excursion
+		(set-buffer gnus-group-buffer)
+		(gnus-group-get-new-news)))))
+      (set-window-configuration win))))
 
 (defun gnus-demon-add-scan-timestamps ()
   "Add daemonic updating of timestamps in empty newgroups."

@@ -1,8 +1,8 @@
 ;;; nnvirtual.el --- virtual newsgroups access for Gnus
-;; Copyright (C) 1994,95,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1994,95,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: David Moore <dmoore@ucsd.edu>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news
 
@@ -38,7 +38,8 @@
 (require 'gnus-util)
 (require 'gnus-start)
 (require 'gnus-sum)
-(eval-when-compile (require 'cl))
+(require 'gnus-msg)
+(require 'cl)
 
 (nnoo-declare nnvirtual)
 
@@ -260,7 +261,9 @@ to virtual article number.")
    (t
     (when (or (not dont-check)
 	      nnvirtual-always-rescan)
-      (nnvirtual-create-mapping))
+      (nnvirtual-create-mapping)
+      (when nnvirtual-always-rescan
+	(nnvirtual-request-update-info group (gnus-get-info group))))
     (setq nnvirtual-current-group group)
     (nnheader-insert "211 %d 1 %d %s\n"
 		     nnvirtual-mapping-len nnvirtual-mapping-len group))))
