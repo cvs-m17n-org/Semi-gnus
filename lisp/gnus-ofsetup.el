@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.8 1999-10-06 16:02:53 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.9 1999-10-24 10:27:14 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -627,9 +627,6 @@ mail source specifier とか上記のようなキーワードについてもっとよく
      ,(gnus-ofsetup-get-message 'param-mail-source-2))))
 
 (defvar gnus-ofsetup-params)
-
-(eval-and-compile
-  (autoload 'gnus-custom-mode "gnus-cus"))
 
 (defun gnus-ofsetup-customize ()
   "Edit the gnus-offline parameters."
