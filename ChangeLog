@@ -1,5 +1,10 @@
 2002-04-22  Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/message.el (message-make-user-agent): Remove product tokens
+	for gnus-vers.  [cf. <semi-gnus-ja:6798>]
+
+2002-04-22  Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Tweak BBDB message
