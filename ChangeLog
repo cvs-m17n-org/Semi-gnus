@@ -1,5 +1,22 @@
 1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/nnheader.el (mail-header-entity): New macro.
+	(mail-header-set-entity): New macro.
+	(mail-header-set-field): New macro.
+	(mail-header-set-parsed-field): New macro.
+	(mail-header-subject): Use `mail-header-entity'.
+	(mail-header-set-subject): Use `mail-header-set-parsed-field'.
+	(mail-header-from): Use `mail-header-entity'.
+	(mail-header-set-from): Use `mail-header-set-parsed-field'.
+	(mail-header-date): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-date): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Date to
+	mime-entity.
+	(make-mail-header): Use `make-full-mail-header'.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/nnheader.el (mail-header-from): Use `mime-read-field'.
 	(mail-header-set-from): Store to mime-entity.
 	(make-full-mail-header): Modify data structure to store Subject to
