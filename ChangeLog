@@ -1,3 +1,15 @@
+2000-05-25  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.21 (This is alpha status.)
+	You can use `nnshimbun' backend.
+
+	* lisp/nnshimbun.el: New file; import from T-gnus.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): New
+	function; import from T-gnus.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.21.
+
 2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.20 (This is alpha status.)
