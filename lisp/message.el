@@ -5704,7 +5704,8 @@ are not included."
   (message-insert-signature)
   (save-restriction
     (message-narrow-to-headers)
-    (if message-alternative-emails
+    (if (and replybuffer
+	     message-alternative-emails)
 	(message-use-alternative-email-as-from))
     (run-hooks 'message-header-setup-hook))
   (set-buffer-modified-p nil)
