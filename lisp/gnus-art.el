@@ -230,17 +230,20 @@ regexp.  If it matches, the text in question is not a signature."
 
 ;; Fixme: This isn't the right thing for mixed graphical and and
 ;; non-graphical frames in a session.
-;; gnus-xmas.el overrides this for XEmacs.
 (defcustom gnus-article-x-face-command
   (cond
+   ((featurep 'xemacs)
+    (if (or (featurep 'xface)
+	    (featurep 'xpm))
+	'gnus-xmas-article-display-xface
+      "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | ee -"))
    ((and (fboundp 'image-type-available-p)
 	 (module-installed-p 'x-face-e21))
     'x-face-decode-message-header)
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
     'gnus-article-display-xface)
-   ((and (not (featurep 'xemacs))
-	 window-system
+   ((and window-system
 	 (module-installed-p 'x-face-mule))
     'x-face-mule-gnus-article-display-x-face)
    (gnus-article-compface-xbm
@@ -251,13 +254,28 @@ display -"))
   "*String or function to be executed to display an X-Face header.
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
-  :type '(choice string
-		 (function-item
-		  :tag "x-face-decode-message-header (x-face-e21)"
-		  x-face-decode-message-header)
-		 (function-item gnus-article-display-xface)
-		 (function-item x-face-mule-gnus-article-display-x-face)
-		 function)
+  :type `(choice
+	  ,@(let (x-face-e21 x-face-mule)
+	      (if (featurep 'xemacs)
+		  nil
+		(setq x-face-e21 (module-installed-p 'x-face-e21)
+		      x-face-mule (module-installed-p 'x-face-mule)))
+	      (delq nil
+		    (list
+		     'string
+		     (if (and (featurep 'xemacs)
+			      (or (featurep 'xface)
+				  (featurep 'xpm)))
+			 '(function-item gnus-xmas-article-display-xface))
+		     (if (and x-face-e21
+			      (fboundp 'image-type-available-p))
+			 '(function-item
+			   :tag "x-face-decode-message-header (x-face-e21)"
+			   x-face-decode-message-header))
+		     (if x-face-mule
+			 '(function-item
+			   x-face-mule-gnus-article-display-x-face))
+		     'function))))
   ;;:version "21.1"
   :group 'gnus-article-washing)
 
