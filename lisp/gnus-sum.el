@@ -1374,7 +1374,6 @@ increase the score of each group you read."
     "e" gnus-article-emphasize
     "w" gnus-article-fill-cited-article
     "c" gnus-article-remove-cr
-    "q" gnus-article-de-quoted-unreadable
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1627,7 +1626,6 @@ increase the score of each group you read."
 	["Word wrap" gnus-article-fill-cited-article t]
 	["CR" gnus-article-remove-cr t]
 	["Show X-Face" gnus-article-display-x-face t]
-	["Quoted-Printable" gnus-article-de-quoted-unreadable t]
 	["UnHTMLize" gnus-article-treat-html t]
 	["Rot 13" gnus-summary-caesar-message t]
 	["Unix pipe" gnus-summary-pipe-message t]
