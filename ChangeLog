@@ -1,6 +1,10 @@
+2002-03-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-md5): Treat a given string as binary.
+
 2002-03-13  Simon Josefsson  <jas@extundo.com>
 
-	* pop3.el (pop3-open-server): Revert multibyte change.  From
+	* lisp/pop3.el (pop3-open-server): Revert multibyte change.  From
 	Pavel@Janik.cz (Pavel Jan,Bm(Bk).
 
 2002-03-12  Katsumi Yamaoka  <yamaoka@jpl.org>
