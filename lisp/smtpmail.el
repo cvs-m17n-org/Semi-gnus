@@ -69,6 +69,9 @@ This is relative to `smtpmail-queue-dir'.")
 (defvar smtpmail-queue-index (concat smtpmail-queue-dir
 				     smtpmail-queue-index-file))
 
+(defvar smtpmail-recipient-address-list nil)
+
+
 ;;;
 ;;;
 ;;;
@@ -200,16 +203,16 @@ This is relative to `smtpmail-queue-dir'.")
 	  ;;
 	  ;;
 	  ;;
-	  (setq smtp-recipient-address-list
+	  (setq smtpmail-recipient-address-list
 		(or resend-to-addresses
 		    (smtp-deduce-address-list tembuf (point-min) delimline)))
 
 	  (smtp-do-bcc delimline)
 	  ; Send or queue
 	  (if (not smtpmail-queue-mail)
-	      (if (not (null smtp-recipient-address-list))
-		  (if (not (smtp-via-smtp 
-			    smtp-recipient-address-list tembuf))
+	      (if smtpmail-recipient-address-list
+		  (if (not (smtp-via-smtp
+			    smtpmail-recipient-address-list tembuf))
 		      (error "Sending failed; SMTP protocol error"))
 		(error "Sending failed; no recipients"))
 	    (let* ((file-data (concat 
@@ -228,8 +231,8 @@ This is relative to `smtpmail-queue-dir'.")
 		(set-buffer buffer-elisp)
 		(erase-buffer)
 		(insert (concat
-			 "(setq smtp-recipient-address-list '"
-			 (prin1-to-string smtp-recipient-address-list)
+			 "(setq smtpmail-recipient-address-list '"
+			 (prin1-to-string smtpmail-recipient-address-list)
 			 ")\n"))	    	    
 		(write-file file-elisp)
 		(set-buffer (generate-new-buffer buffer-scratch))
@@ -261,9 +264,8 @@ This is relative to `smtpmail-queue-dir'.")
 						   (point))))
 	(load file-msg)
 	(setq tembuf (find-file-noselect file-msg))
-	(if (not (null smtp-recipient-address-list))
-	    (if (not (smtp-via-smtp smtp-recipient-address-list 
-					tembuf))
+	(if smtpmail-recipient-address-list
+	    (if (not (smtp-via-smtp smtpmail-recipient-address-list tembuf))
 		(error "Sending failed; SMTP protocol error"))
 	  (error "Sending failed; no recipients"))  
 	(delete-file file-msg)
