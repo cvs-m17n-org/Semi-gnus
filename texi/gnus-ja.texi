@@ -11951,6 +11951,26 @@ POP $B%5!<%P!<$+$i%a!<%k$r<hF@$9$k$?$a$K;H$&4X?t$G$9!#$=$N4X?t$O0l$D$N%Q%i(B
 @item :authentication
 $B$3$l$O(B @code{password} $B$+%7%s%\%k(B @code{apop} $B$G!"$I$NG'>ZJ}<0$r;H$&$+$r(B
 $B7h$a$k$b$N$N$I$A$i$+$G$9!#=i4|@_Dj$O(B @code{password} $B$G$9!#(B
+
+@item :connection
+$B%5!<%P!<$K@\B3$9$k$H$-$K;H$&%9%H%j!<%`$G!"(B@code{ssl}, @code{tls} $B$^$?$O(B
+$B$=$l0J30$r;XDj$G$-$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G!"0BA4$G$O$J$$@\B3$r(B
+$BMQ$$$^$9!#(BSSL/TLS $B$G$O30It%W%m%0%i%`$H%i%$%V%i%j$,I,MW$G$"$k$3$H$KCm0U$7(B
+$B$F2<$5$$(B:
+
+@itemize @bullet
+@item
+@dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i%`(B) $B$+(B SSLeay
+(@samp{s_client}) $B$H30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G$9!#(B
+@item
+@dfn{starttls:} STARTTLS (SSL $B$KN`;w(B) $B$r;H$$$^$9!#30It%i%$%V%i(B
+$B%j(B @samp{starttls.el} $B$H(B @samp{starttls} $B%W%m%0%i%`$,I,MW$G$9!#(B
+@samp{starttls}.
+@end itemize
+
+@item :leave
+$BHs(B-@code{nil} $B$G%a!<%k$r%5!<%P!<$K;D$7!"%a%C%;!<%8$N<hF@$K(B UIDL $B$r;H$$$^(B
+$B$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
 @end table
 
 @code{:program} $B$H(B @code{:function} $B%-!<%o!<%I$,;XDj$5$l$F$$$J$$$H!"(B
@@ -14281,9 +14301,8 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 @dfn{starttls:} STARTTLS (SSL $B$KN`;w(B) $B$r;H$$$^$9!#30It%i%$%V%i(B
 $B%j(B @samp{starttls.el} $B$H(B @samp{starttls} $B%W%m%0%i%`$,I,MW$G$9!#(B
 @item
-@dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i(B
-$B%`(B) $B$+(B SSLeay (@samp{s_client}) $B$H30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G(B
-$B$9!#(B
+@dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i%`(B) $B$+(B SSLeay
+(@samp{s_client}) $B$H30It%i%$%V%i%j(B @samp{ssl.el} $B$,I,MW$G$9!#(B
 @item
 @dfn{shell:} $B%7%'%kL?Na$r;H$C$F(B @sc{imap} $B@\B3$r3+;O$7$^$9!#(B
 @item

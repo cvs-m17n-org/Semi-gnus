@@ -12505,6 +12505,27 @@ This can be either the symbol @code{password} or the symbol @code{apop}
 and says what authentication scheme to use.  The default is
 @code{password}.
 
+@item :connection
+What stream to use for connecting to the server, this can be the symbol
+@code{ssl}, the symbol @code{tls} or others.  The default is @code{nil}
+and use insecure connections.  Note that for SSL/TLS, you need external
+programs and libraries:
+
+@itemize @bullet
+@item
+@dfn{ssl:} Connect through SSL@. Requires OpenSSL (the program
+@samp{openssl}) or SSLeay (@samp{s_client}) as well as the external
+library @samp{ssl.el}.
+@item
+@dfn{starttls:} Connect via the STARTTLS extension (similar to SSL)@.
+Requires the external library @samp{starttls.el} and program
+@samp{starttls}.
+@end itemize
+
+@item :leave
+Non-@code{nil} if mail is to be left on the server and UIDL used for
+message retrieval.  The default is @code{nil}.
+
 @end table
 
 If the @code{:program} and @code{:function} keywords aren't specified,
