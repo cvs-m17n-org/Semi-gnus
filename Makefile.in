@@ -69,7 +69,7 @@ xsome:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
 
 elclean:
-	rm -f lisp/*.elc
+	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
 
 x:
 	$(MAKE) EMACS="$(XEMACS)"
