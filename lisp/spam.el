@@ -75,6 +75,14 @@ spam groups."
   :type 'boolean
   :group 'spam)
 
+(defcustom spam-mark-only-unseen-as-spam t
+  "Whether only unseen articles should be marked as spam in spam
+groups.  When nil, all unread articles in a spam group are marked as
+spam.  Set this if you want to leave an article unread in a spam group
+without losing it to the automatic spam-marking process."
+  :type 'boolean
+  :group 'spam)
+
 (defcustom spam-mark-ham-unread-before-move-from-spam-group nil
   "Whether ham should be marked unread before it's moved out of a spam
 group according to ham-process-destination.  This variable is an
@@ -449,13 +457,15 @@ your main source of newsgroup names."
   ;; check the global list of group names spam-junk-mailgroups and the
   ;; group parameters
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
-    (gnus-message 5 "Marking unread articles as spam")
-    (let ((articles gnus-newsgroup-articles)
-	  article)
-      (while articles
-	(setq article (pop articles))
-	(when (eq (gnus-summary-article-mark article) gnus-unread-mark)
-	  (gnus-summary-mark-article article gnus-spam-mark))))))
+    (gnus-message 5 "Marking %s articles as spam"
+		  (if spam-mark-only-unseen-as-spam 
+		      "unseen"
+		    "unread"))
+    (let ((articles (if spam-mark-only-unseen-as-spam 
+			gnus-newsgroup-unseen
+		      gnus-newsgroup-unreads)))
+      (dolist (article articles)
+	(gnus-summary-mark-article article gnus-spam-mark)))))
 
 (defun spam-mark-spam-as-expired-and-move-routine (&optional group)
   (gnus-summary-kill-process-mark)
