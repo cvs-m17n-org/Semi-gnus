@@ -592,7 +592,7 @@ beginning of the message headers."
   (when (boundp 'bbdb-extract-field-value-function-list)
     (add-to-list 'bbdb-extract-field-value-function-list
 		 'gnus-bbdb/extract-field-value-init))
-  (add-hook 'gnus-article-display-hook 'gnus-bbdb/update-record)
+  (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)

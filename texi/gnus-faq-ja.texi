@@ -269,22 +269,14 @@ Q2.1: T-gnus $B$N%P!<%8%g%s$r$"$2$?$i(B BBDB $B$,F0$+$J$/$J$C$F$7$^$$$^$7$?!#
 Semi-gnus 6.8 $B0J9_$N%P!<%8%g%s$G$O!"%*%j%8%J%k$N(B bbdb-gnus.el $B$OF0:n$7$^(B
 $B$;$s!#(B $B<!$N$h$&$KBP1~$7$F$/$@$5$$!#(B
 
-@enumerate a
-@item
 bbdb-gnus.el $B$G!"(B gnus-article-buffer $B$NBe$j$K(B
 gnus-original-article-buffer $B$r;2>H$9$k$h$&$K$9$k!#(B
 
 $B$b$7!"%*%j%8%J%k$N(B Gnus (September $B0J9_(B) $B$r;H$C$F$$$k$N$G$"$l$P!"$3$NJ}(B
 $BK!$,NI$$$G$7$g$&!#(B
 
-@item
-bbdb/gnus-update-record $B$r(B gnus-article-prepare-hook $B$NBe$j$K(B
-gnus-article-display-hook $B$KDI2C$9$k!#(B
-
-@end enumerate
-
-a $B$NJ}K!!"$*$h$S(B bbdb-user-mail-names $B$KBP1~$7$?(B BBDB 2.00.01 $B$KBP$9$k(B
-patch $B!"4pK\E*$J@_DjNc$,!"(B
+$B$3$NJ}K!!"$*$h$S(B bbdb-user-mail-names $B$KBP1~$7$?(B BBDB 2.00.01 $B$KBP$9(B
+$B$k(B patch $B!"4pK\E*$J@_DjNc$,!"(B
 @file{http://www.mdcnet.co.jp/~keiichi/bbdb.shtml} $B$K$"$j$^$9!#(B
 
 @item
@@ -370,7 +362,7 @@ gnus-posting-style $B$r;HMQ$9$k;v$b$G$-$^$9!#(B
 @node Mailing list FAQ
 @subsection $B%a!<%j%s%0%j%9%H(B
 
-@itemize bullet
+@itemize @bullet
 @item
 Q5.1: $B%a%$%j%s%0!&%j%9%H$+$iC&B`$9$k$K$O(B?
 

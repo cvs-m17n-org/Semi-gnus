@@ -1708,11 +1708,6 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-dead-summary nil)
 
-(defvar gnus-article-display-hook nil
-  "Controls how the article buffer will look.  This is an obsolete variable;
-use the article treating faculties instead.  Is is described in Info node
-`Customizing Articles'.")
-
 (defvar gnus-invalid-group-regexp "[: `'\"/]\\|^$"
   "Regexp matching invalid groups.")
 

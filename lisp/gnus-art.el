@@ -3236,7 +3236,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Make the current buffer look like a nice article."
   (setq gnus-article-wash-types nil)
   (gnus-run-hooks 'gnus-tmp-internal-hook)
-  (gnus-run-hooks 'gnus-article-prepare-hook)
   ;; Display message.
   (let (mime-display-header-hook mime-display-text/plain-hook)
     (funcall (if gnus-show-mime
@@ -3272,9 +3271,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(narrow-to-region (point) (point-max))
 	(gnus-treat-article nil))
       (put-text-property (point-min) (point-max) 'read-only nil)))
-  ;; Perform the article display hooks.  Incidentally, this hook is
-  ;; an obsolete variable by now.
-  (gnus-run-hooks 'gnus-article-display-hook))
+  (gnus-run-hooks 'gnus-article-prepare-hook))
 
 (defun gnus-article-decode-article-as-default-mime-charset ()
   "Decode an article as `default-mime-charset'.  It won't work if the
