@@ -245,7 +245,7 @@ asynchronously.	 The compressed face will be piped to this command."
       ,@(mapcar
 	 (lambda (spec)
 	   (list
-	    (format format (car spec) (cadr spec))
+	    (format format (car spec) (car (cdr spec)))
 	    2 3 (intern (format "gnus-emphasis-%s" (nth 2 spec)))))
 	 types)))
   "*Alist that says how to fontify certain phrases.
