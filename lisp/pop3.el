@@ -225,6 +225,9 @@ Argument PORT specifies connecting port."
 			 (+ 1 (or (string-match ">" response) -1)))))
       process)))
 
+(eval-when-compile
+  (autoload 'open-ssl-stream "ssl"))
+
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
   (require 'ssl)
   (let* ((ssl-program-name
