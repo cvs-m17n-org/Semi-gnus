@@ -7897,6 +7897,12 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 @vindex gnus-cite-attribution-face
 $BB0@-9T$K;H$o$l$k%U%'%$%9$G$9!#$=$NB0@-$KB0$9$kJ8$N$?$a$N%U%'%$%9$HM;9g$5(B
 $B$l$^$9!#(B
+
+@item gnus-cite-ignore-quoted-from
+@vindex gnus-cite-ignore-quoted-from
+$BHs(B-@code{nil} $B$@$C$?$i!"(B@samp{>From } $B$G;O$^$k9T$G0zMQ%O%$%i%$%H$O9T$o$l(B
+$B$^$;$s!#$=$l$i$N9T$O!"%(%s%Y%m!<%W(B From $B9T$H:.F1$7$J$$$h$&$K!"(BMTA $B$,%/%*!<(B
+$B%H$7$?2DG=@-$,$"$j$^$9!#%G%#%U%)%k%HCM$O(B @code{t} $B$G$9!#(B
 @end table
 
 @item W H s
