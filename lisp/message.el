@@ -138,11 +138,6 @@ mailbox format."
   :group 'message-sending
   :type 'function)
 
-(defcustom message-default-encoding "7bit"
-  "*Default content transfer encoding type."
-  :group 'message-sending
-  :type 'string)
-
 (defcustom message-8bit-encoding-list '(8bit binary)
   "*8bit encoding type in Content-Transfer-Encoding field."
   :group 'message-sending
@@ -2771,9 +2766,9 @@ to find out how to use this."
 	 (y-or-n-p
 	  "The article contains control characters.  Really post? ")
        t))
-   ;; Check content transfer encoding.
-   (message-check 'encoding
-     (message-check-encoding))
+   ;; Check 8bit characters.
+   (message-check '8bit
+     (message-check-8bit))
    ;; Check excessive size.
    (message-check 'size
      (if (> (buffer-size) 60000)
@@ -2822,33 +2817,32 @@ to find out how to use this."
 
 (defun message-check-mail-body-syntax ()
   (and
-   ;; Check content transfer encoding.
-   (message-check 'encoding
-     (message-check-encoding)
+   ;; Check 8bit characters.
+   (message-check '8bit
+     (message-check-8bit)
      )))
 
-(defun message-check-encoding ()
-  "Check content encoding type."
-  (let ((case-fold-search t)
-	field-value exist)
-    (save-excursion
-      (set-buffer message-encoding-buffer)
-      (message-narrow-to-headers)
-      (widen)
-      (set-buffer (get-buffer-create " message syntax"))
-      (erase-buffer)
-      (goto-char (point-min))
-      (set-buffer-multibyte nil)
-      (insert-buffer message-encoding-buffer)
-      (setq exist (re-search-forward "[^\x00-\x7f]" nil t))
-      (message-narrow-to-headers)
-      (message-fetch-field "content-transfer-encoding")
-      (or (not exist)
-	  (assq (intern
-		 (downcase (or field-value message-default-encoding)))
-		message-8bit-encoding-list)
-	  (y-or-n-p
-	   "The article contains 8bit characters.  Really post? ")))))
+(defun message-check-8bit ()
+  "Check the article contains 8bit characters."
+  (save-excursion
+    (set-buffer message-encoding-buffer)
+    (message-narrow-to-headers)
+    (let* ((case-fold-search t)
+	   (field-value (message-fetch-field "content-transfer-encoding")))
+      (if (and field-value
+	       (member (downcase field-value) message-8bit-encoding-list))
+	  t
+	(widen)
+	(set-buffer (get-buffer-create " message syntax"))
+	(erase-buffer)
+	(goto-char (point-min))
+	(set-buffer-multibyte nil)
+	(insert-buffer message-encoding-buffer)
+	(goto-char (point-min))
+	(if (re-search-forward "[^\x00-\x7f]" nil t)
+	    (y-or-n-p
+	     "The article contains 8bit characters.  Really post? ")
+	  t)))))
 
 (defun message-checksum ()
   "Return a \"checksum\" for the current buffer."
