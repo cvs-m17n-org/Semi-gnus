@@ -4659,22 +4659,110 @@ This funtion will by called from \`message-mime-charset-recover-by-ask\'."
   :group 'message-sending)
 
 (defun message-mime-charset-recover-by-ask (type charsets &rest args)
-  (let* ((charsets-mime-charset-alist message-charsets-mime-charset-alist)
-	 (default-charset 
-	   (upcase (symbol-name
-		    (or (charsets-to-mime-charset charsets)
-			default-mime-charset-for-write))))
-	 charset)
+  (let ((default-charset
+	  (let ((charsets-mime-charset-alist
+		 message-charsets-mime-charset-alist))
+	    (charsets-to-mime-charset charsets)))
+	charset)
     (save-excursion
       (save-restriction
 	(save-window-excursion
 	  (when (eq type 'region)
 	    (narrow-to-region (car args) (car (cdr args)))
-	    (pop-to-buffer (current-buffer) nil t))
-	  (if (setq charset (funcall message-mime-charset-recover-ask-function
-				     default-charset charsets))
+	    (message-highlight-illegal-chars charsets)
+	    (pop-to-buffer (current-buffer) nil t)
+	    (recenter 1))
+	  (if (setq charset
+		    (funcall message-mime-charset-recover-ask-function
+			     (upcase (symbol-name
+				      (or default-charset
+					  default-mime-charset-for-write)))
+			     charsets))
 		   (intern (downcase charset))
 	    (error "Canceled.")))))))
+
+(defface message-illegal-charset-face
+  '((((class color))
+     (:foreground "black" :background "red"))
+    (t
+     (:bold t :underline t)))
+  "Face used for displaying illegal charset."
+  :group 'message-faces)
+
+(defface message-warning-charset-face
+  '((((class color))
+     (:foreground "black" :background "yellow"))
+    (t
+     (:bold t :underline t)))
+  "Face used for displaying illegal charset."
+  :group 'message-faces)
+
+(defun message-highlight-illegal-chars (charsets)
+  (when charsets-mime-charset-alist
+    (let* ((min 65535)
+	   (delta-lists
+	    (delq nil
+		  (mapcar
+		   (lambda (x)
+		     (when (<= (length x) min)
+		       x))
+		   (delq nil (mapcar
+			      (lambda (x)
+				(setq x (delq nil
+					      (mapcar
+					       (lambda (y)
+						 (unless (memq y (car x))
+						   y))
+					       charsets)
+					      ))
+				(when (<= (length x) min)
+				  (setq min (length x))
+				  x))
+			      charsets-mime-charset-alist)))))
+	   top cs done rest errors warns list)
+      (while (setq top (pop delta-lists))
+	(while (setq cs (pop top))
+	  (setq done nil
+		list delta-lists)
+	  (when cs
+	    (while (setq rest (pop list))
+	      (if (setq rest (memq cs rest))
+		  (setcar rest nil)
+		(push cs warns)
+		(setq done t)))
+	    (unless done
+	      (push cs errors)))))
+      (put-text-property (point-min) (point-max) 'face nil)
+      (if (setq top (message-set-charsets-face
+		     errors
+		     'message-illegal-charset-face))
+	  (message-set-charsets-face warns 'message-warning-charsets-face)
+	(setq top (message-set-charsets-face
+		   warns 'message-warning-charset-face)))
+      (if top
+	  (goto-char top)
+	(goto-char (point-min))))))
+
+(defun message-set-charsets-face (charsets face &optional start end)
+  (or start
+      (setq start (point-min)))
+  (or end
+      (setq end (point-max)))
+  (goto-char start)
+  (when charsets
+    (let (top)
+      (while (< (point) end)
+	(if (memq (charset-after) charsets)
+	    (let ((start (point)))
+	      (unless top
+		(setq top (point)))
+	      (forward-char 1)
+	      (while (and (< (point) end)
+			  (memq (charset-after) charsets))
+		(forward-char 1))
+	      (put-text-property start (point) 'face face))
+	  (forward-char 1)))
+      top)))
 
 (defun message-mime-charset-recover-ask-y-or-n (default-charset charsets)
   (or (y-or-n-p (format "MIME charset %s is selected. OK? "
