@@ -1,5 +1,12 @@
 2005-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Don't delete newlines.
+
+	* lisp/message.el (message-yank-original): Don't delete newlines.
+	(message-fill-references): Don't insert a newline.
+
+2005-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/message.el (message-yank-original): Delete newlines only if
 	they are excessive.
 
