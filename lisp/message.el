@@ -3670,7 +3670,8 @@ header line with the old Message-ID."
       (concat "[" (or (message-fetch-field
 		       (if (message-news-p) "newsgroups" "from"))
 		      "(nowhere)")
-	      "] " (or (message-fetch-field "Subject") "")))))
+	      "] " (or (eword-decode-unstructured-field-body
+			(message-fetch-field "Subject") ""))))))
 
 ;;;###autoload
 (defun message-forward (&optional news)
