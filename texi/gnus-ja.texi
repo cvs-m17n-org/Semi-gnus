@@ -21075,13 +21075,15 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8
 
 @enumerate
 @item
+documentation
+
+@item
+code
 
 @example
 (defvar spam-use-blackbox nil
   "Blackbox $B$r;H$&$H$-$O(B t $B$K$9$k!#(B")
 @end example
-
-@item
 
 @code{spam-list-of-checks} $B$K(B
 @example
@@ -21090,6 +21092,8 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8
 $B$rDI2C!#(B
 
 @item
+functionality
+
 @code{spam-check-blackbox} $B4X?t$r=q$$$F2<$5$$!#$=$l(B
 $B$O(B @samp{nil} $B$+(B @code{spam-split-group} $B$rJV$5$J$1$l$P$J$j$^$;$s!#$"$J(B
 $B$?$K$G$-$k$3$H$NNc$O!"4{B8$N(B @code{spam-check-*} $B4X?t$r;2>H$7$F$/$@$5$$!#(B
