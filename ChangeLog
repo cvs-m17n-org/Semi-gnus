@@ -1,3 +1,8 @@
+2002-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Don't autoload "ssl".
+	(pop3-open-ssl-stream-1): Require `ssl' before binding ssl-* vars.
+
 2002-07-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): Remove

@@ -100,7 +100,6 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 (defvar pop3-debug nil)
 
 (eval-and-compile
-  (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls"))
 
@@ -224,6 +223,7 @@ Argument PORT specifies connecting port."
       process)))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
+  (require 'ssl)
   (let* ((ssl-program-name
 	  pop3-ssl-program-name)
 	 (ssl-program-arguments
