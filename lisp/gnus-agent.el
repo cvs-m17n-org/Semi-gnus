@@ -276,7 +276,7 @@ If nil, only read articles will be expired."
     (setq gnus-plugged plugged)
     (gnus-run-hooks 'gnus-agent-unplugged-hook)
     (setcar (cdr gnus-agent-mode-status) " Unplugged"))
-  (set-buffer-modified-p t))
+  (force-mode-line-update))
 
 (defun gnus-agent-close-connections ()
   "Close all methods covered by the Gnus agent."
