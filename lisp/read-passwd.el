@@ -90,16 +90,17 @@ Argument PROMPT ."
   (if (not mail-source-password-cache)
       (car (mapcar
 	    (lambda (x)
-	      (mail-source-bind (pop x)
-		(let ((from (format "%s:%s:%s" server user port))
-		      (mail-source-string
-		       (format "pop:%s@%s" user server)))
-		  (setq pw (read-pw-return-passwd-string user server))
-		  (unless (assoc user mail-source-password-cache)
-		    (set-alist 'mail-source-password-cache
-			       (format "%s:%s:%s" server user port)
-			       pw))
-		  (cdr (assoc from mail-source-password-cache)))))
+	      (when (eq 'pop (car x))
+		(mail-source-bind (pop x)
+		  (let ((from (format "%s:%s:%s" server user port))
+			(mail-source-string
+			 (format "pop:%s@%s" user server)))
+		    (setq pw (read-pw-return-passwd-string user server))
+		    (unless (assoc user mail-source-password-cache)
+		      (set-alist 'mail-source-password-cache
+				 (format "%s:%s:%s" server user port)
+				 pw))
+		    (cdr (assoc from mail-source-password-cache))))))
 	    mail-sources))))
 ;;
 ;;
