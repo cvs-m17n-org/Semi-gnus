@@ -1,3 +1,21 @@
+2000-02-06   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/gnus-ofsetup.el: Provide `gnus-ofsetup'.
+	(gnus-setup-for-offline): Add `starttls' to IMAP streams; add
+	`digest-md5' to IMAP authenticators.
+
+	* lisp/gnus-offline.el (gnus-group-get-new-news,
+	gnus-agent-toggle-plugged,gnus-agent-expire,
+	gnus-agent-mode): Check whether `gnus-ofsetup' is provided before
+	redefining.
+
+	* lisp/imap.el (imap-stream-alist): Remove redundant entry for TLS.
+
+	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Remove
+	confusing tabs from original header.
+
 2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
