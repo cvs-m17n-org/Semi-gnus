@@ -11895,19 +11895,19 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 
 @item nnspool-active-file
 @vindex nnspool-active-file
-$B%"%/%F%#%V%U%!%$%k$X$N%Q%9$G$9!#(B
+$B%"%/%F%#%V%U%!%$%k$NL>A0$G$9!#(B
 
 @item nnspool-newsgroups-file
 @vindex nnspool-newsgroups-file
-$B%0%k!<%W5-=R%U%!%$%k$X$N%Q%9$G$9!#(B
+$B%0%k!<%W5-=R%U%!%$%k$NL>A0$G$9!#(B
 
 @item nnspool-history-file
 @vindex nnspool-history-file
-$B%K%e!<%9MzNr%U%!%$%k$X$N%Q%9$G$9!#(B
+$B%K%e!<%9MzNr%U%!%$%k$NL>A0$G$9!#(B
 
 @item nnspool-active-times-file
 @vindex nnspool-active-times-file
-$B8=>uF|IU%U%!%$%k$X$N%Q%9$G$9!#(B
+$B8=>uF|IU%U%!%$%k$X$NL>A0$G$9!#(B
 
 @item nnspool-nov-is-evil
 @vindex nnspool-nov-is-evil
@@ -12200,7 +12200,7 @@ POP $B%a!<%k%5!<%P!<!"(Bprocmail $B%G%#%l%/%H%j!<!"(Bmaildir $B$J$I$,Nc$H$7
 
 @table @code
 @item :path
-$B%U%!%$%k$N%Q%9$G$9!#=i4|CM$O(B @code{MAIL} $B4D6-JQ?t$NCM(B
+$B%U%!%$%k$NL>A0$G$9!#=i4|CM$O(B @code{MAIL} $B4D6-JQ?t$NCM(B
 $B$+(B @code{rmail-spool-directory} $B$NCM(B ($BIaDL(B
 $B$O(B @file{usr-mail/spool/user-name} $B$N$h$&$J$b$N(B) $B$G$9!#(B
 @end table
@@ -12211,7 +12211,7 @@ POP $B%a!<%k%5!<%P!<!"(Bprocmail $B%G%#%l%/%H%j!<!"(Bmaildir $B$J$I$,Nc$H$7
 (file :path "/usr/spool/mail/user-name")
 @end lisp
 
-$B$b$7$/$O!"=i4|%Q%9$r;H$&$H(B:
+$B$b$7$/$O!"%G%#%U%)%k%H$N%U%!%$%kL>$r;H$&$H(B:
 
 @lisp
 (file)
@@ -12265,7 +12265,7 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 
 @table @code
 @item :path
-$B%U%!%$%k$N$"$k%G%#%l%/%H%j!<$N%Q%9$G$9!#$3$l$K$O=i4|CM$O$"$j$^$;$s!#(B
+$B%U%!%$%k$N$"$k%G%#%l%/%H%j!<$NL>A0$G$9!#$3$l$K$O=i4|CM$O$"$j$^$;$s!#(B
 
 @item :suffix
 $B$3$N@\Hx8l$G=*$o$k%U%!%$%k$@$1$,;HMQ$5$l$^$9!#=i4|CM$O(B @samp{.spool} $B$G(B
@@ -12411,7 +12411,7 @@ Maildir $B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $B$H(B postfix $B$G$N$
 
 @table @code
 @item :path
-$B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$N%Q%9$G$9!#=i4|CM$O4D6-JQ(B
+$B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$NL>A0$G$9!#=i4|CM$O4D6-JQ(B
 $B?t(B @code{MAILDIR} $B$+$i<hF@$7$?CM$+!"$^$?$O(B @samp{~/Maildir/} $B$G$9!#(B
 @item :subdirs
 Maildir $B$N%5%V%G%#%l%/%H%j$G$9!#=i4|CM$O(B @samp{("new" "cur")} $B$G$9!#(B
@@ -13111,19 +13111,19 @@ nnml:mail.others:
 $B%0%k!<%W%P%C%U%!$K9T$-$^$9!#(B
 
 @item
-`G f' $B$HBG$C$F!"(Bmbox $B%U%!%$%k$+$i(B @code{nndoc} $B%0%k!<%W$r:n@.$9$k$h$&$K(B
-$BB%?J$5$l$?$H$-$K(B mbox $B%U%!%$%k$X$N%Q%9$rM?$($^$9(B (@pxref{Foreign
+@kbd{G f} $B$HBG$C$F!"(Bmbox $B%U%!%$%k$+$i(B @code{nndoc} $B%0%k!<%W$r:n@.$9$k$h(B
+$B$&$KB%$5$l$?$H$-$K(B mbox $B$N%U%!%$%kL>A0$rM?$($^$9(B (@pxref{Foreign
 Groups})$B!#(B
 
 @item
-`SPACE' $B$rBG$C$F!"?7$7$/:n$i$l$?%0%k!<%W$KF~$j$^$9!#(B
+@kbd{SPACE} $B$rBG$C$F!"?7$7$/:n$i$l$?%0%k!<%W$KF~$j$^$9!#(B
 
 @item
-`M P b' $B$rBG$C$F!"%0%k!<%W%P%C%U%!$NA4$F$N5-;v$K<B9T0u$rIU$1$^(B
+@kbd{M P b} $B$rBG$C$F!"%0%k!<%W%P%C%U%!$NA4$F$N5-;v$K<B9T0u$rIU$1$^(B
 $B$9(B (@pxref{Setting Process Marks})$B!#(B
 
 @item
-`B r' $B$rBG$C$FA4$F$N%W%m%;%90u$NIU$$$?:F%9%W!<%k$7!"B%?J$5$l$?$H$-(B
+@kbd{B r} $B$rBG$C$FA4$F$N%W%m%;%90u$NIU$$$?:F%9%W!<%k$7!"B%$5$l$?$H$-(B
 $B$K(B @samp{nnml} $B$HEz$($^$9(B (@pxref{Mail Group Commands})$B!#(B
 @end enumerate
 
@@ -21735,14 +21735,14 @@ Save table: (spam-stat-save)
 
 @table @code
 @item gnus-home-directory
-$BA4$F$N(B gnus $B$N%Q%9JQ?t$O$3$NJQ?t$K$h$C$F=i4|2=$5$l$^$9!#$=$N=i4|@_DjCM(B
-$B$O(B @file{~/} $B$G$9!#(B
+$B$9$Y$F$N(B gnus $B$N%U%!%$%kL>$H%G%#%l%/%H%jL>$NJQ?t$O!"$3$l$K$h$C$F=i4|2=$5(B
+$B$l$^$9!#%G%#%U%)%k%HCM$O(B @file{~/} $B$G$9!#(B
 
 @item gnus-directory
 @vindex gnus-directory
-$B$?$/$5$s$N(B gnus $B3JG<%Q%9JQ?t$O$3$NJQ?t$K$h$C$F=i4|2=$5$l$^$9!#$=$N=i4|@_(B
-$BDjCM$O(B @samp{SAVEDIR} $B4D6-JQ?t$NCM$+!"$=$NJQ?t$,@_Dj$5$l$F$$$J$$>l9g(B
-$B$O(B @file{~/News/} $B$G$9!#(B
+gnus $B$,3JG<$9$k$?$/$5$s$N%U%!%$%kL>$H%G%#%l%/%H%jL>$NJQ?t$O!"$3$l$K$h$C(B
+$B$F=i4|2=$5$l$^$9!#%G%#%U%)%k%HCM$O(B @samp{SAVEDIR} $B4D6-JQ?t$NCM$+!"$=$NJQ(B
+$B?t$,@_Dj$5$l$F$$$J$$>l9g$O(B @file{~/News/} $B$G$9!#(B
 
 @file{.gnus.el} $B%U%!%$%k$,FI$^$l$?$H$-$O(B gnus $B$N$[$H$s$I$O$9$G$KFI$_9~$^(B
 $B$l$F$$$k$H$$$&$3$H$KCm0U$7$F$/$@$5$$!#$3$l$O$D$^$j!"$3$NJQ?t(B
