@@ -414,7 +414,8 @@ If NOW, use that time instead."
       ;; only retrieve messages matching our regexp or in the uidl list
       (when (and
 	     ;; remove elements not in the uidl, this assumes the uidl is short
-	     (or (not (eq pop3-uidl-support t))
+	     (or (not (and pop3-leave-mail-on-server
+			   (eq pop3-uidl-support t)))
 		 (memq (caar messages) uidl))
 	     (caar messages)
 	     ;; don't download messages that are too large
