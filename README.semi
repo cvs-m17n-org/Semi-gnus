@@ -19,7 +19,7 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 Required environment for SEMI is written in README.en of SEMI package.
 
   In addition, if you wish to use the web based backend `nnshimbun',
-you have to install the package Emacs-W3M and the external command W3M.
+you have to install the package emacs-w3m and the external command w3m.
 Visit the following pages for more information.
 
 http://emacs-w3m.namazu.org/

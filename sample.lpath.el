@@ -22,7 +22,7 @@
 	    ;; or WEMI if they are installed under the directory which is
 	    ;; same as the parent directory of APEL.
 
-	    ;; If you have installed Emacs W3 package,
+	    ;; If you have installed Emacs/W3 package,
 	    ;; uncomment and edit the following line appropriately.
 	    ;; "/usr/local/share/mule/site-lisp/w3/"
 	    )))
