@@ -1002,7 +1002,7 @@ See the manual for details."
      gnus-article-strip-multiple-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
-    (gnus-treat-display-smileys gnus-smiley-display)
+    (gnus-treat-display-smileys gnus-article-smiley-display)
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)))
@@ -3049,8 +3049,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			      (if (eq entity last-entity)
 				  1 2)
 			      type)
-	  (setq entity (get-text-property next 'mime-view-entity))
-	  (goto-char (point-max)))))))
+	  (goto-char (point-max)))
+	(setq entity (get-text-property next 'mime-view-entity))))))
 
 ;;;###autoload
 (defun gnus-article-prepare-display ()
@@ -4902,6 +4902,10 @@ forbidden in URL encoding."
 (defun gnus-button-embedded-url (address)
   "Browse ADDRESS."
   (browse-url (gnus-strip-whitespace address)))
+
+(defun gnus-article-smiley-display ()
+  "Display \"smileys\" as small graphical icons."
+  (smiley-toggle-buffer 1 (current-buffer) (point-min) (point-max)))
 
 ;;; Next/prev buttons in the article buffer.
 
