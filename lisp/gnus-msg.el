@@ -142,6 +142,9 @@ See Info node `(gnus)Posting Styles'."
 					(variable)
 					(sexp)))))))
 
+(defvar gnus-named-posting-styles nil
+  "Alist mapping names to the user-defined posting styles.")
+
 (defcustom gnus-gcc-mark-as-read nil
   "If non-nil, automatically mark Gcc articles as read."
   :version "21.1"
@@ -351,7 +354,8 @@ Thank you for your help in stamping out bugs.
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
   "Om" gnus-summary-digest-mail-forward
-  "Op" gnus-summary-digest-post-forward)
+  "Op" gnus-summary-digest-post-forward
+  "P" gnus-summary-execute-command-with-posting-style)
 
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
@@ -1930,6 +1934,16 @@ this is a reply."
 		 (t
 		  ;; This is a form to be evaled.
 		  (eval match)))))
+	  ;; Expand all the named elements in style.
+	  (setq style (apply (function nconc)
+			     (mapcar
+			      (lambda (attribute)
+				(if (stringp attribute)
+				    (copy-sequence
+				     (cdr (assoc attribute
+						 gnus-named-posting-styles)))
+				  (list attribute)))
+			      style)))
 	  ;; We have a match, so we set the variables.
 	  (dolist (attribute style)
 	    (setq element (pop attribute)
@@ -2027,6 +2041,18 @@ this is a reply."
 			 (message-goto-eoh)
 			 (insert "From: " (message-make-from) "\n"))))
 		  nil 'local)))))
+
+(defun gnus-summary-execute-command-with-posting-style (style command)
+  "Temporarily select a posting-style named STYLE and execute COMMAND."
+  (interactive
+   (let ((style (completing-read "Posting style: "
+				 gnus-named-posting-styles nil t)))
+     (list style
+	   (key-binding
+	    (read-key-sequence
+	     (format "Command to execute with %s:" style))))))
+  (let ((gnus-posting-styles (list (list ".*" style))))
+    (call-interactively command)))
 
 
 ;;; @ for MIME Edit mode

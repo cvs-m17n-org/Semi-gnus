@@ -1,3 +1,14 @@
+2002-09-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-msg.el (gnus-named-posting-styles): New variable.
+	(gnus-summary-send-map): Bind "P" to
+	gnus-summary-execute-command-with-posting-style.
+	(gnus-configure-posting-styles): Expand named entries in
+	gnus-posting-styles.
+	(gnus-summary-execute-command-with-posting-style): New command.
+	
 2002-09-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
