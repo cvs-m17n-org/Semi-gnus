@@ -111,6 +111,35 @@
 
 (require 'bytecomp)
 
+;; Load `byte-opt' or `byte-optimize'.
+(byte-optimize-form nil)
+
+(setq max-specpdl-size 3000)
+
+(defadvice byte-optimize-form-code-walker (around fix-bug-in-and/or-forms
+						  activate)
+  "Fix bug in and/or forms."
+  (if (and (ad-get-arg 1)
+	   (memq (car-safe (ad-get-arg 0)) '(and or)))
+      (let* ((form (ad-get-arg 0))
+	     (fn (car form)))
+	(let ((backwards (reverse (cdr form))))
+	  (while (and backwards
+		      (null (setcar backwards
+				    (byte-optimize-form (car backwards) t))))
+	    (setq backwards (cdr backwards)))
+	  (if (and (cdr form) (null backwards))
+	      (byte-compile-log
+	       "  all subforms of %s called for effect; deleted" form))
+	  (setq ad-return-value
+		(if backwards
+		    (let ((head backwards))
+		      (while (setq backwards (cdr backwards))
+			(setcar backwards (byte-optimize-form (car backwards)
+							      nil)))
+		      (cons fn (nreverse head)))))))
+    ad-do-it))
+
 (defvar srcdir (or (getenv "srcdir") "."))
 
 ;(push "/usr/share/emacs/site-lisp" load-path)
@@ -125,12 +154,12 @@
     (char-after)
   (wrong-number-of-arguments
    ;; Optimize byte code for `char-after'.
-;;;   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
-;;;   (defun byte-optimize-char-after (form)
-;;;     (if (null (cdr form))
-;;;	 '(char-after (point))
-;;;       form))
-   (byte-defop-compiler char-after 0-1)))
+   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
+   (defun byte-optimize-char-after (form)
+     (if (null (cdr form))
+	 '(char-after (point))
+       form))
+   ))
 
 (condition-case nil
     (char-before)
