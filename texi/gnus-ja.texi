@@ -21774,7 +21774,7 @@ Spam のために新着メールを検査するとき、およびグループを抜けるときです。
 機構が) 必要になるかもしれません。グループパラメー
 タ @code{spam-autodetect} と @code{spam-autodetect-methods} (普通 @kbd{G
 c} and @kbd{G p} で操作可)、そしてそれらに対応する変
-数 @code{gnus-spam-autodetect-methods} およ
+数 @code{gnus-spam-autodetect} およ
 び @code{gnus-spam-autodetect-methods} (@kbd{M-x customize-variable} で
 操作可) がそうです。
 
