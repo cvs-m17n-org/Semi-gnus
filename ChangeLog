@@ -1,3 +1,20 @@
+2001-05-29  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-headers-with-nov): Don't
+	use `last'.
+	(nnshimbun-make-shimbun-header): Use the following macros.
+	(nnshimbun-mail-header-from): New macro whose definition will be
+	changed statically for Gnus or gnus.
+	(nnshimbun-mail-header-subject): Ditto.
+	(TopLevel): Don't require `gnus-clfns'.
+
+	* lisp/gnus.el: Add autoload for `find-cl-run-time-functions'.
+
+	* lisp/gnus-clfns.el (find-cl-run-time-functions): New command for
+	the developers.
+	(cl-run-time-functions): New variable.
+	(TopLevel): Don't require `cl' at run-time.
+
 2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* texi/gnus-ja.texi (Web Newspaper): Updated.

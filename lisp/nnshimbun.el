@@ -27,14 +27,30 @@
 
 ;;; Commentary:
 
-;; Gnus backend to read newspapers on WEB.
+;; Gnus (or gnus) backend to read newspapers on the World Wide Web.
+;; This module requires the Emacs-W3M and the external command W3M.
+;; Visit the following pages for more information.
+;;
+;;	http://namazu.org/~tsuchiya/emacs-w3m/
+;;	http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
+
+;; If you would like to use this module in Gnus (not T-gnus), put this
+;; file into the lisp/ directory in the Gnus source tree and run
+;; `make install'.  And then, copy the function definition of
+;; `gnus-group-make-shimbun-group' from the file gnus-group.el of
+;; T-gnus to somewhere else, for example .gnus file as follows:
+;;
+;;(eval-after-load "gnus-group"
+;;  '(if (not (fboundp 'gnus-group-make-shimbun-group))
+;;       (defun gnus-group-make-shimbun-group ()
+;;         "Create a nnshimbun group."
+;;         [...a function definition...])))
 
 ;;; Definitions:
 
 (gnus-declare-backend "nnshimbun" 'address)
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'nnheader)
 (require 'nnmail)
@@ -149,33 +165,37 @@
     x))
 
 (eval-and-compile
-  (if (fboundp 'mime-entity-fetch-field)
-      ;; For Semi-Gnus.
-      (defun nnshimbun-make-shimbun-header (header)
-	(shimbun-make-header
-	 (mail-header-number header)
-	 (mime-entity-fetch-field header 'Subject)
-	 (mime-entity-fetch-field header 'From)
-	 (mail-header-date header)
-	 (or (cdr (assq 'X-Nnshimbun-Id (mail-header-extra header)))
-	     (mail-header-id header))
-	 (mail-header-references header)
-	 (mail-header-chars header)
-	 (mail-header-lines header)
-	 (nnshimbun-header-xref header)))
-    ;; For pure Gnus.
-    (defun nnshimbun-make-shimbun-header (header)
-      (shimbun-make-header
-       (mail-header-number header)
-       (mail-header-subject header)
-       (mail-header-from header)
-       (mail-header-date header)
-       (or (cdr (assq 'X-Nnshimbun-Id (mail-header-extra header)))
-	   (mail-header-id header))
-       (mail-header-references header)
-       (mail-header-chars header)
-       (mail-header-lines header)
-       (nnshimbun-header-xref header)))))
+  (let ((Gnus-p
+	 (eval-when-compile
+	   (let ((gnus (locate-library "gnus"))
+		 ;; Gnus has mailcap.el in the same directory of gnus.el.
+		 (mailcap (locate-library "mailcap")))
+	     (and gnus mailcap
+		  (string-equal (file-name-directory gnus)
+				(file-name-directory mailcap)))))))
+    (if Gnus-p
+	(progn
+	  (defmacro nnshimbun-mail-header-subject (header)
+	    `(mail-header-subject ,header))
+	  (defmacro nnshimbun-mail-header-from (header)
+	    `(mail-header-from ,header)))
+      (defmacro nnshimbun-mail-header-subject (header)
+	`(mime-entity-fetch-field ,header 'Subject))
+      (defmacro nnshimbun-mail-header-from (header)
+	`(mime-entity-fetch-field ,header 'From)))))
+
+(defun nnshimbun-make-shimbun-header (header)
+  (shimbun-make-header
+   (mail-header-number header)
+   (nnshimbun-mail-header-subject header)
+   (nnshimbun-mail-header-from header)
+   (mail-header-date header)
+   (or (cdr (assq 'X-Nnshimbun-Id (mail-header-extra header)))
+       (mail-header-id header))
+   (mail-header-references header)
+   (mail-header-chars header)
+   (mail-header-lines header)
+   (nnshimbun-header-xref header)))
 
 (defsubst nnshimbun-check-header (group header)
   (let (flag)
@@ -321,7 +341,7 @@
 	    (nnheader-nov-delete-outside-range
 	     (if fetch-old (max 1 (- (car articles) fetch-old))
 	       (car articles))
-	     (car (last articles)))
+	     (and articles (nth (1- (length articles)) articles)))
 	    t))))))
 
 

@@ -2123,6 +2123,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	     (subrp (symbol-function 'base64-encode-string)))
   (require 'base64))
 
+;; A tool for the developers.
+(autoload 'find-cl-run-time-functions "gnus-clfns" nil t)
+
 ;;; gnus-sum.el thingies
 
 
