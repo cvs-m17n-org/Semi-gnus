@@ -976,7 +976,8 @@ If you want to read directly from the local spool, say:
 @end lisp
 
 If you can use a local spool, you probably should, as it will almost
-certainly be much faster.
+certainly be much faster.  But do not use the local spool if your
+server is running Leafnode; in this case, use @code{(nntp "localhost")}.
 
 @vindex gnus-nntpserver-file
 @cindex NNTPSERVER
@@ -9791,7 +9792,7 @@ This is also the default value for this variable.
 
 
 @node Using MIME
-@section Using @sc{mime}
+@section Using MIME
 @cindex @sc{mime}
 
 Mime is a standard for waving your hands through the air, aimlessly,
@@ -11914,11 +11915,14 @@ Alter this script to fit find the @samp{movemail} you want to use.
 
 
 @item directory
-Get mail from several files in a directory.  This is typically used when
-you have procmail split the incoming mail into several files.  Setting
-@code{nnmail-scan-directory-mail-source-once} to non-nil forces Gnus to
-scan the mail source only once. This is particularly useful if you want
-to scan mail groups at a specified level.
+Get mail from several files in a directory.  This is typically used
+when you have procmail split the incoming mail into several files.
+That is, mail from the file @file{foo.bar.spool} will be put in the
+group @code{foo.bar}.  (You can change the suffix to be used instead
+of @code{.spool}.)  Setting
+@code{nnmail-scan-directory-mail-source-once} to non-nil forces Gnus
+to scan the mail source only once. This is particularly useful if you
+want to scan mail groups at a specified level.
 
 Keywords:
 

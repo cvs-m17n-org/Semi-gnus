@@ -1,3 +1,48 @@
+2001-10-21  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap): Defgroup
+	(nnimap-strict-function, nnimap-strict-function-match): New
+	widget, from Per Abrahamsen  <abraham@dina.kvl.dk>.
+	(nnimap-split-crosspost, nnimap-split-inbox)
+	(nnimap-split-rule, nnimap-split-predicate) 
+	(nnimap-split-predicate): Defcustom.
+	(nnimap-split-inbox, nnimap-expunge-search-string) 
+	(nnimap-importantize-dormant): Remove "*" from doc.
+
+2001-10-20  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-sum.el (gnus-summary-limit-to-score): Prompt for score if
+	not supplied via prefix arg.  From Lisp, make arg mandatory.
+	Suggested by Frank Schmitt.
+
+2001-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.el (message-do-auto-fill): Avoid calling
+	'rfc822-goto-eoh'. 
+
+2001-10-20  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Paul Jarc <prj@po.cwru.edu>.
+	
+	* message.el (message-get-reply-headers): Restructure the logic
+	and add comments.  From Paul Jarc <prj@po.cwru.edu>.
+
+2001-10-20  Simon Josefsson  <jas@extundo.com>
+
+	* message.el (message-cancel-news): Support cancel-locks.
+	Suggested by Per Abrahamsson.
+
+	* nnml.el (nnml-marks-changed-p): Use `equal' when comparing
+	conses.  From David Z Maze <dmaze@MIT.EDU>.
+
+	* nnfolder.el (nnfolder-marks-changed-p): Ditto.
+
+2001-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mm-decode.el (mm-default-directory): Fix customize type.
+
+	* message.el (message-setup-fill-variables): Kludge to use
+	normal-auto-fill-function even if auto fill is already activated.
+
 2001-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* message.el (message-do-auto-fill): New version that does not

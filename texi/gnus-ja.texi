@@ -1118,7 +1118,9 @@ Emacs for Heathens
 $B$N$h$&$K$G$-$^$9!#(B
 
 $B%m!<%+%k$N%9%W!<%k$r;H$($k$N$G$"$l$P!"$+$J$j$N3NN($G$=$NJ}$,$:$C$HB.$$$G(B
-$B$7$g$&$7!"$=$l$r;H$&$Y$-$G$7$g$&!#(B
+$B$7$g$&$7!"$=$l$r;H$&$Y$-$G$7$g$&!#$G$b!"$b$7$"$J$?$N%5!<%P!<(B
+$B$,(B Leafnode $B$G$"$k$J$i$P%m!<%+%k%9%W!<%k$r;H$C$F$O$$$1$^$;$s!#$3$N>l9g(B
+$B$O(B @code{(nntp "localhost")} $B$K$7$^$7$g$&!#(B
 
 @vindex gnus-nntpserver-file
 @cindex NNTPSERVER
@@ -9298,7 +9300,7 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T
 $B$3$l$O$3$NJQ?t$N%G%#%U%)%k%HCM$G$b$"$j$^$9!#(B
 
 @node Using MIME
-@section @sc{mime} $B$r;H$&(B
+@section MIME $B$r;H$&(B
 @cindex @sc{mime}
 
 $B%Q%s%H%^%$%`(B (mime) $B$H$O!"0UL#$bL5$/6uCf$G<j$r?6$k$b$N$H$7$F9-$/(B
@@ -11348,10 +11350,11 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 @item directory
 $B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL(B
 $B$O(B procmail $B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ(B
-$B$5$l$^$9!#(B@code{nnmail-scan-directory-mail-source-once} $B$r(B @code{nil} $B0J(B
-$B30$K$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#$3(B
-$B$l$O!";XDj$7$?%l%Y%k$N%a!<%k%0%k!<%W$@$1$rD4$Y$?$$$H$-$K!"$H$j$o$1JXMx$G(B
-$B$9!#(B
+$B$5$l$^$9!#$9$J$o$A%U%!%$%k(B @file{foo.bar.spool} $B$K$"$k%a!<%k$O!"%0%k!<(B
+$B%W(B @code{foo.bar} $B$KCV$+$l$^$9(B ($B%5%U%#%C%/%9(B @code{.spool} $B$OJQ992DG=$G(B
+$B$9(B)$B!#(B@code{nnmail-scan-directory-mail-source-once} $B$r(B @code{nil} $B0J30$K(B
+$B$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#$3$l$O!"(B
+$B;XDj$7$?%l%Y%k$N%a!<%k%0%k!<%W$@$1$rD4$Y$?$$$H$-$K!"$H$j$o$1JXMx$G$9!#(B
 
 $B%-!<%o!<%I(B:
 

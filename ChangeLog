@@ -1,3 +1,12 @@
+2001-10-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (rfc822-goto-eoh): Remove.
+
+2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Frank Schmitt <ich@Frank-Schmitt.net>.
+
+	* make-x.bat: Use correct directory structure for XEmacs on Windows.
+
 2001-10-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (rfc822-goto-eoh): Define it when void.
