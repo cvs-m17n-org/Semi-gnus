@@ -1968,14 +1968,16 @@ commands:
 	    default-mime-charset))
 	)
     (save-excursion
-      (mime-view-buffer gnus-original-article-buffer gnus-article-buffer
-			nil gnus-article-mode-map)
+      (mime-display-message mime-message-structure
+			    gnus-article-buffer nil gnus-article-mode-map)
+			    
       ))
   (run-hooks 'gnus-mime-article-prepare-hook)
   )
 
 (defun gnus-article-display-traditional-message ()
   "Article display method for traditional message."
+  (set-buffer gnus-article-buffer)
   (let (buffer-read-only)
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)
@@ -1985,13 +1987,14 @@ commands:
   "Article display method for message with encoded-words."
   (let ((charset (save-excursion
 		   (set-buffer gnus-summary-buffer)
-		   default-mime-charset))
-	buffer-read-only)
+		   default-mime-charset)))
     (gnus-article-display-traditional-message)
-    (eword-decode-header charset)
-    (goto-char (point-min))
-    (if (search-forward "\n\n" nil t)
-	(decode-mime-charset-region (match-end 0) (point-max) charset))
+    (let (buffer-read-only)
+      (eword-decode-header charset)
+      (goto-char (point-min))
+      (if (search-forward "\n\n" nil t)
+	  (decode-mime-charset-region (match-end 0) (point-max) charset))
+      )
     (mime-maybe-hide-echo-buffer)
     )
   (gnus-run-hooks 'gnus-mime-article-prepare-hook)
@@ -2089,17 +2092,20 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      ;; Hooks for getting information from the article.
-	      ;; This hook must be called before being narrowed.
-	      (let ((method (if gnus-show-mime
-				(if (or (not gnus-strict-mime)
-					(gnus-fetch-field "Mime-Version"))
-				    gnus-article-display-method-for-mime
-				  gnus-article-display-method-for-encoded-word)
-			      gnus-article-display-method-for-traditional)))
+	      (let ((method
+		     (if gnus-show-mime
+			 (progn
+			   (mime-parse-buffer)
+			   (if (or (not gnus-strict-mime)
+				   (mime-entity-fetch-field
+				    mime-message-structure "MIME-Version"))
+			       gnus-article-display-method-for-mime
+			     gnus-article-display-method-for-encoded-word))
+		       gnus-article-display-method-for-traditional)))
+		;; Hooks for getting information from the article.
+		;; This hook must be called before being narrowed.
 		(gnus-run-hooks 'internal-hook)
 		(gnus-run-hooks 'gnus-article-prepare-hook)
-		(set-buffer gnus-article-buffer)
 		;; Display message.
 		(funcall method)
 		;; Perform the article display hooks.
