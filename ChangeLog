@@ -1,4 +1,8 @@
 2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
+	
+	* lisp/message.el: Undo changes.
+
+2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
 
 	* lisp/message.el (message-send-mail-with-smtp): Change error
 	handling 'cause delete-process will return nil on most platform,
