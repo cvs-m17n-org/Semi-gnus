@@ -1,3 +1,8 @@
+1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-get-parameter-with-eval): Call
+	`message-get-parameter' with arg `key' first.
+
 1998-11-26  Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus.el: (gnus-version-number): Update to 6.9.1.
