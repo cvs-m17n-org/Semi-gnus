@@ -121,7 +121,7 @@ on your system, you could say something like:
 			    field-name)
 			  mode max-column))
 
-(defsubst make-full-mail-header
+(defun make-full-mail-header
   (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
   (luna-make-entity (mm-expand-class-name 'gnus)
@@ -140,7 +140,7 @@ on your system, you could say something like:
 					   (cons 'From from))
 		    :extra extra))
 
-(defsubst make-full-mail-header-from-decoded-header
+(defun make-full-mail-header-from-decoded-header
   (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
   (luna-make-entity (mm-expand-class-name 'gnus)
