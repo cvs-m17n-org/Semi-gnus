@@ -259,6 +259,16 @@ your main source of newsgroup names."
   :type 'string
   :group 'spam-bogofilter)
 
+(defcustom spam-bogofilter-spam-switch "-s"
+  "The switch that Bogofilter uses to register spam messages."
+  :type 'string
+  :group 'spam-bogofilter)
+
+(defcustom spam-bogofilter-ham-switch "-n"
+  "The switch that Bogofilter uses to register ham messages."
+  :type 'string
+  :group 'spam-bogofilter)
+
 (defcustom spam-bogofilter-bogosity-positive-spam-header "^\\(Yes\\|Spam\\)"
   "The regex on `spam-bogofilter-header' for positive spam identification."
   :type 'regexp
@@ -645,7 +655,8 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	      (if spam-use-dig
 		  (let ((query-result (query-dig query-string)))
 		    (when query-result
-		      (gnus-message 5 "(DIG): positive blackhole check '%s'" query-result)
+		      (gnus-message 5 "(DIG): positive blackhole check '%s'" 
+				    query-result)
 		      (push (list ip server query-result)
 			    matches)))
 		;; else, if not using dig.el
@@ -815,7 +826,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 
       ;; Add hooks for loading and saving the spam stats
       (add-hook 'gnus-save-newsrc-hook 'spam-maybe-spam-stat-save)
-      (add-hook 'gnus-get-new-news-hook 'spam-maybe-spam-stat-load)
+      (add-hook 'gnus-get-top-new-news-hook 'spam-maybe-spam-stat-load)
       (add-hook 'gnus-startup-hook 'spam-maybe-spam-stat-load))
 
   (file-error (progn
@@ -966,7 +977,8 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 (defun spam-bogofilter-register-with-bogofilter (article-string spam)
   "Register an article, given as a string, as spam or non-spam."
   (when (stringp article-string)
-    (let ((switch (if spam "-s" "-n")))
+    (let ((switch (if spam spam-bogofilter-spam-switch 
+		    spam-bogofilter-ham-switch)))
       (with-temp-buffer
 	(insert article-string)
 	(if spam-bogofilter-database-directory
