@@ -58,7 +58,7 @@
 (defcustom mm-url-program
   (cond
    ((exec-installed-p "wget") 'wget)
-   ((executable-find "w3m") 'w3m)
+   ((exec-installed-p "w3m") 'w3m)
    ((exec-installed-p "lynx") 'lynx)
    ((exec-installed-p "curl") 'curl)
    (t "GET"))
