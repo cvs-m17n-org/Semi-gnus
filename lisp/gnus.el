@@ -266,13 +266,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.13.1"
+(defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "07"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.96"
+(defconst gnus-original-version-number "0.97"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -1652,6 +1652,7 @@ use the article treating faculties instead.  Is is described in Info node
      ("browse-url" browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
+     ("babel" babel-as-string)
      ("nnmail" nnmail-split-fancy nnmail-article-group)
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
      ("rmailout" rmail-output rmail-output-to-rmail-file)
@@ -2638,32 +2639,32 @@ just the host name."
 			 (setq skip (match-end 0)
 			       depth (+ depth 1)))
 		       depth))))
-    ;; separate foreign select method from group name and collapse.
-    ;; if method contains a server, collapse to non-domain server name,
-    ;; otherwise collapse to select method
-    (let* ((colon  (string-match ":" group))
+    ;; Separate foreign select method from group name and collapse.
+    ;; If method contains a server, collapse to non-domain server name,
+    ;; otherwise collapse to select method.
+    (let* ((colon (string-match ":" group))
 	   (server (and colon (substring group 0 colon)))
-	   (plus   (and server (string-match "+" server))))
+	   (plus (and server (string-match "+" server))))
       (when server
-	(cond (plus
-	       (setq foreign (substring server (+ 1 plus)
-					(string-match "\\." server))
-		     group (substring group (+ 1 colon))))
-	       (t
-		(setq foreign server
-		      group (substring group (+ 1 colon)))))
-	(setq foreign (concat foreign ":"))))
-    ;; collapse group name leaving LEVELS uncollapsed elements
-    (while group
-      (if (and (string-match "\\." group) (> levels 0))
-	  (setq name (concat name (substring group 0 1))
-		group (substring group (match-end 0))
-		levels (- levels 1)
-		name (concat name "."))
-	(setq name (concat foreign name group)
-	      group nil)))
-    name))
-
+	(if plus
+	    (setq foreign (substring server (+ 1 plus)
+				     (string-match "\\." server))
+		  group (substring group (+ 1 colon)))
+	  (setq foreign server
+		group (substring group (+ 1 colon))))
+	(setq foreign (concat foreign ":")))
+      ;; Collapse group name leaving LEVELS uncollapsed elements
+      (let* ((glist (split-string group "\\."))
+	     (glen (length glist))
+	     res)
+	(setq levels (- glen levels))
+	(dolist (g glist)
+	  (push (if (>= (decf levels) 0)
+		    (substring g 0 1)
+		  g)
+		res))
+	(concat foreign (mapconcat 'identity (nreverse res) "."))))))
+      
 (defun gnus-narrow-to-body ()
   "Narrow to the body of an article."
   (narrow-to-region
