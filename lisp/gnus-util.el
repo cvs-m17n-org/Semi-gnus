@@ -1038,15 +1038,17 @@ Return the modified alist."
             (,buffer (make-string ,size 0))
             (,leng 0)
             (append nil)
-            (standard-output (lambda (c)
-                               (aset ,buffer ,leng c)
-                               (if (= ,size (setq ,leng (1+ ,leng)))
-                                   (progn (write-region ,buffer nil ,file append 'no-msg)
-                                          (setq ,leng 0
-                                                append t))))))
+            (standard-output
+	     (lambda (c)
+	       (aset ,buffer ,leng c)
+	       (if (= ,size (setq ,leng (1+ ,leng)))
+		   (progn (write-region ,buffer nil ,file append 'no-msg)
+			  (setq ,leng 0
+				append t))))))
        ,@body
-       (if (> ,leng 0)
-           (write-region (substring ,buffer 0 ,leng) nil ,file append 'no-msg)))))
+       (when (> ,leng 0)
+	 (write-region (substring ,buffer 0 ,leng) nil ,file
+		       append 'no-msg)))))
 
 (put 'gnus-with-output-to-file 'lisp-indent-function 1)
 (put 'gnus-with-output-to-file 'edebug-form-spec '(form body))
@@ -1115,8 +1117,11 @@ Setting it to nil has no effect after first time running
 	    (require 'byte-optimize)
 	  (error))
 	(require 'bytecomp)
-	(defalias 'gnus-byte-compile 'byte-compile)
-	(byte-compile form))
+	(defalias 'gnus-byte-compile
+	  (lambda (form)
+	    (let ((byte-compile-warnings '(unresolved callargs redefine)))
+	      (byte-compile form))))
+	(gnus-byte-compile form))
     form))
 
 (defun gnus-remassoc (key alist)

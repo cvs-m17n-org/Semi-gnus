@@ -1080,7 +1080,7 @@ Set it to non-nil, Gnus will treat some articles as MIME even if
 the MIME-Version header is missed."
   :version "21.3"
   :type 'boolean
-  :group 'gnus-article)
+  :group 'gnus-article-mime)
 
 (defcustom gnus-article-emulate-mime t
   "If non-nil, use MIME emulation for uuencode and the like.
@@ -1088,7 +1088,7 @@ This means that Gnus will search message bodies for text that look
 like uuencoded bits, yEncoded bits, and so on, and present that using
 the normal Gnus MIME machinery."
   :type 'boolean
-  :group 'gnus-article)
+  :group 'gnus-article-mime)
 
 ;;; Internal variables
 
@@ -1382,9 +1382,18 @@ buffers. For example:
 ")
 
 ;; Byte-compiler warning.
-;(eval-when-compile (defvar gnus-article-mode-map))
 (eval-when-compile
+  ;; Bind features so that require will believe that gnus-sum has
+  ;; already been loaded (avoids infinite recursion)
   (let ((features (cons 'gnus-sum features)))
+    ;; Several of the declarations in gnus-sum are needed to load the
+    ;; following files. Right now, these definitions have been
+    ;; compiled but not defined (evaluated).  We could either do a
+    ;; eval-and-compile about all of the declarations or evaluate the
+    ;; source file.
+    (if (boundp 'gnus-newsgroup-variables)
+        nil
+      (load "gnus-sum.el" t t t t))
     (require 'gnus)
     (require 'gnus-agent)
     (require 'gnus-art)))
@@ -4810,6 +4819,8 @@ or a straight list of headers."
 	       (substring gnus-tmp-from
 			  (1+ (match-beginning 0)) (1- (match-end 0))))
 	      (t gnus-tmp-from))
+
+	     ;; Do the %B string
 	     gnus-tmp-thread-tree-header-string
 	     (cond
 	      ((not gnus-show-threads) "")
@@ -6308,17 +6319,19 @@ With arg, turn line truncation on if arg is positive."
 	  (> (prefix-numeric-value arg) 0)))
   (redraw-display))
 
-(defun gnus-summary-find-uncancelled ()
-  "Return the number of an uncancelled article.
+(defun gnus-summary-find-for-reselect ()
+  "Return the number of an article to stay on across a reselect.
 The current article is considered, then following articles, then previous
-articles.  If all articles are cancelled then return a dummy 0."
+articles.  An article is sought which is not cancelled and isn't a temporary
+insertion from another group.  If there's no such then return a dummy 0."
   (let (found)
     (dolist (rev '(nil t))
       (unless found      ; don't demand the reverse list if we don't need it
         (let ((data (gnus-data-find-list
                      (gnus-summary-article-number) (gnus-data-list rev))))
           (while (and data (not found))
-            (if (not (eq gnus-canceled-mark (gnus-data-mark (car data))))
+            (if (and (< 0 (gnus-data-number (car data)))
+                     (not (eq gnus-canceled-mark (gnus-data-mark (car data)))))
                 (setq found (gnus-data-number (car data))))
             (setq data (cdr data))))))
     (or found 0)))
@@ -6329,7 +6342,7 @@ The prefix argument ALL means to select all articles."
   (interactive "P")
   (when (gnus-ephemeral-group-p gnus-newsgroup-name)
     (error "Ephemeral groups can't be reselected"))
-  (let ((current-subject (gnus-summary-find-uncancelled))
+  (let ((current-subject (gnus-summary-find-for-reselect))
 	(group gnus-newsgroup-name))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
@@ -11126,7 +11139,8 @@ If REVERSE, save parts that do not match TYPE."
                  (c cond)
                  (list gnus-summary-highlight))
             (while list
-              (setcdr c (cons (list (caar list) (list 'quote (cdar list))) nil))
+              (setcdr c (cons (list (caar list) (list 'quote (cdar list)))
+			      nil))
               (setq c (cdr c)
                     list (cdr list)))
             (gnus-byte-compile (list 'lambda nil cond))))))

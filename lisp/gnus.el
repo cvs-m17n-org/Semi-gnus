@@ -286,7 +286,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.16"
+(defconst gnus-version-number "0.17"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -1949,7 +1949,50 @@ mail groups, and only works in spam groups."
 		      (string :tag "Move to a group")
 		      (const :tag "Expire" nil))))
    :parameter-document
-   "Where ham articles will go at summary exit from a spam group."))
+   "Where ham articles will go at summary exit from a spam group.")
+
+  (gnus-define-group-parameter 
+   ham-marks
+   :type 'list
+   :parameter-type '(list :tag "Ham mark choices"
+			  (set 
+			   (variable-item gnus-del-mark)
+			   (variable-item gnus-read-mark)
+			   (variable-item gnus-killed-mark)
+			   (variable-item gnus-kill-file-mark)
+			   (variable-item gnus-low-score-mark)))
+
+   :parameter-document
+   "Marks considered ham (positively not spam).  Such articles will be
+processed as ham (non-spam) on group exit.  When nil, the global
+spam-ham-marks variable takes precedence."
+   :variable-default '((".*" ((gnus-del-mark 
+			       gnus-read-mark
+			       gnus-killed-mark 
+			       gnus-kill-file-mark
+			       gnus-low-score-mark))))
+   :variable-group spam
+   :variable-document
+   "*Groups in which to explicitly set the ham marks to some value.")
+
+  (gnus-define-group-parameter 
+   spam-marks
+   :type 'list
+   :parameter-type '(list :tag "Spam mark choices"
+			  (set 
+			   (variable-item gnus-spam-mark)
+			   (variable-item gnus-killed-mark)
+			   (variable-item gnus-kill-file-mark)
+			   (variable-item gnus-low-score-mark)))
+
+   :parameter-document
+   "Marks considered spam.
+Such articles will be processed as spam on group exit.  When nil, the global
+spam-spam-marks variable takes precedence."
+   :variable-default '((".*" ((gnus-spam-mark))))
+   :variable-group spam
+   :variable-document
+   "*Groups in which to explicitly set the spam marks to some value."))
 
 (defcustom gnus-group-uncollapsed-levels 1
   "Number of group name elements to leave alone when making a short group name."
@@ -2243,6 +2286,7 @@ such as a mark that says whether an article is stored in the cache
   '(gnus-newsrc-options gnus-newsrc-options-n
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
+			gnus-registry-alist
 			gnus-killed-list gnus-zombie-list
 			gnus-topic-topology gnus-topic-alist
 			gnus-agent-covered-methods gnus-format-specs)
@@ -2251,6 +2295,10 @@ such as a mark that says whether an article is stored in the cache
 (defvar gnus-newsrc-alist nil
   "Assoc list of read articles.
 gnus-newsrc-hashtb should be kept so that both hold the same information.")
+
+(defvar gnus-registry-alist nil
+  "Assoc list of registry data.
+gnus-registry.el will populate this if it's loaded.")
 
 (defvar gnus-newsrc-hashtb nil
   "Hashtable of gnus-newsrc-alist.")

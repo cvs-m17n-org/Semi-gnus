@@ -47,7 +47,7 @@
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
     (lynx  mm-inline-render-with-stdin nil
-	   "lynx" "-dump" "-force_html" "-stdin")
+	   "lynx" "-dump" "-force_html" "-stdin" "-nolist")
     (html2text  mm-inline-render-with-function html2text))
   "The attributes of renderer types for text/html.")
 
@@ -60,7 +60,7 @@
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
     (lynx  mm-inline-wash-with-stdin nil
-	   "lynx" "-dump" "-force_html" "-stdin")
+	   "lynx" "-dump" "-force_html" "-stdin" "-nolist")
     (html2text  html2text))
   "The attributes of washer types for text/html.")
 
@@ -194,7 +194,8 @@
     (unless (assq 'gnus-article-mode w3m-cid-retrieve-function-alist)
       (push (cons 'gnus-article-mode 'mm-w3m-cid-retrieve)
 	    w3m-cid-retrieve-function-alist))
-    (setq mm-w3m-setup t)))
+    (setq mm-w3m-setup t))
+  (setq w3m-display-inline-images mm-inline-text-html-with-images))
 
 (defun mm-w3m-cid-retrieve (url &rest args)
   "Insert a content pointed by URL if it has the cid: scheme."
@@ -248,7 +249,6 @@ map.")))
 	  (delete-region (point-min) (point-max))
 	  (insert (mm-decode-string text charset)))
 	(let ((w3m-safe-url-regexp mm-w3m-safe-url-regexp)
-	      (w3m-display-inline-images mm-inline-text-html-with-images)
 	      w3m-force-redisplay)
 	  (w3m-region (point-min) (point-max)))
 	(when mm-inline-text-html-with-w3m-keymap

@@ -404,6 +404,11 @@ This hook is called as the first thing when Gnus is started."
   :group 'gnus-group-new
   :type 'hook)
 
+(defcustom gnus-read-newsrc-el-hook nil
+  "A hook called after reading the newsrc.eld? file."
+  :group 'gnus-newsrc
+  :type 'hook)
+
 (defcustom gnus-save-newsrc-hook nil
   "A hook called before saving any of the newsrc files."
   :group 'gnus-newsrc
@@ -781,17 +786,6 @@ prompt the user for the name of an NNTP server to use."
       (gnus-subscribe-group "nndraft:drafts" nil '(nndraft "")))
     (gnus-group-set-parameter
      "nndraft:drafts" 'gnus-dummy '((gnus-draft-mode)))))
-
-;;;###autoload
-(defun gnus-unload ()
-  "Unload all Gnus features.
-\(For some value of `all' or `Gnus'.)  Currently, features whose names
-have prefixes `gnus-', `nn', `mm-' or `rfc' are unloaded.  Use
-cautiously -- unloading may cause trouble."
-  (interactive)
-  (dolist (feature features)
-    (if (string-match "^\\(gnus-\\|nn\\|mm-\\|rfc\\)" (symbol-name feature))
-	(unload-feature feature 'force))))
 
 
 ;;;
@@ -2231,7 +2225,8 @@ If FORCE is non-nil, the .newsrc file is read."
       (gnus-message 5 "Reading %s..." file)
       ;; The .el file is newer than the .eld file, so we read that one
       ;; as well.
-      (gnus-read-old-newsrc-el-file file))))
+      (gnus-read-old-newsrc-el-file file)))
+  (gnus-run-hooks 'gnus-read-newsrc-el-hook))
 
 ;; Parse the old-style quick startup file
 (defun gnus-read-old-newsrc-el-file (file)
@@ -2609,10 +2604,9 @@ If FORCE is non-nil, the .newsrc file is read."
 
               (unwind-protect
                   (progn
-                    (gnus-with-output-to-file
-                     working-file
-                     (gnus-gnus-to-quick-newsrc-format)
-                     (gnus-run-hooks 'gnus-save-quick-newsrc-hook))
+                    (gnus-with-output-to-file working-file
+		      (gnus-gnus-to-quick-newsrc-format)
+		      (gnus-run-hooks 'gnus-save-quick-newsrc-hook))
 
                     ;; These bindings will mislead the current buffer
                     ;; into thinking that it is visiting the startup
@@ -2647,7 +2641,8 @@ If FORCE is non-nil, the .newsrc file is read."
     (princ "(setq gnus-newsrc-file-version ")
     (princ (gnus-prin1-to-string gnus-version))
     (princ ")\n")
-    (let* ((gnus-killed-list
+    (let* ((print-length nil)
+	   (gnus-killed-list
 	    (if (and gnus-save-killed-list
 		     (stringp gnus-save-killed-list))
 		(gnus-strip-killed-list)

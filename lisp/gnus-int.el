@@ -49,7 +49,7 @@ server denied."
   :group 'gnus-start
   :type '(choice (const :tag "Ask" nil)
 		 (const :tag "Deny server" denied)
-		 (const :tag "Unplugg Agent" offline)))
+		 (const :tag "Unplug Agent" offline)))
 
 (defvar gnus-internal-registry-spool-current-method nil
   "The current method, for the registry.")
@@ -202,12 +202,17 @@ If it is down, start it up (again)."
 	  nil)
       ;; Open the server.
       (let ((result
-	     (condition-case ()
+	     (condition-case err
 		 (funcall (gnus-get-function gnus-command-method 'open-server)
 			  (nth 1 gnus-command-method)
 			  (nthcdr 2 gnus-command-method))
+               (error 
+                (gnus-message 1 (format 
+                                 "Unable to open server due to: %s"
+                                 (error-message-string err)))
+                nil)
 	       (quit
-		(message "Quit trying to open server")
+		(gnus-message 1 "Quit trying to open server")
 		nil))))
 	;; If this hasn't been opened before, we add it to the list.
 	(unless elem

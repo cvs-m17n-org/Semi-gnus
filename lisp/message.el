@@ -1288,6 +1288,17 @@ no, only reply back to the author."
   :link '(custom-manual "(message)News Headers")
   :type 'string)
 
+(defcustom message-use-idna (and (condition-case nil (require 'idna)
+				   (file-error))
+				 (fboundp 'coding-system-p)
+				 (coding-system-p 'utf-8)
+				 'ask)
+  "Whether to encode non-ASCII in domain names into ASCII according to IDNA."
+  :group 'message-headers
+  :type '(choice (const :tag "Ask" ask)
+		 (const :tag "Never" nil)
+		 (const :tag "Always" t)))
+
 ;;; Internal variables.
 
 (defvar message-sending-message "Sending...")
@@ -2080,6 +2091,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-z" 'message-kill-to-signature)
   (define-key message-mode-map "\M-\r" 'message-newline-and-reformat)
   ;;(define-key message-mode-map "\M-q" 'message-fill-paragraph)
+  (define-key message-mode-map [remap split-line]  'message-split-line)
 
   (define-key message-mode-map "\C-c\C-a" 'mml-attach-file)
 
@@ -2172,6 +2184,7 @@ Point is left at the beginning of the narrowed-to region."
     ["Reduce To: to Cc:" message-reduce-to-to-cc t]
     "----"
     ["Sort Headers" message-sort-headers t]
+    ["Encode non-ASCII domain names" message-idna-to-ascii-rhs t]
     ["Goto Body" message-goto-body t]
     ["Goto Signature" message-goto-signature t]))
 
@@ -3899,7 +3912,7 @@ Otherwise, generate and save a value for `canlock-password' first."
    ;; Check "Shoot me".
    (message-check 'shoot
      (if (re-search-forward
-	  "Message-ID.*.i-did-not-set--mail-host-address--so-shoot-me" nil t)
+	  "Message-ID.*.i-did-not-set--mail-host-address--so-tickle-me" nil t)
 	 (y-or-n-p "You appear to have a misconfigured system.  Really post? ")
        t))
    ;; Check for Approved.
@@ -4412,12 +4425,10 @@ If NOW, use that time instead."
 	  (date (mail-header-date message-reply-headers))
 	  (msg-id (mail-header-message-id message-reply-headers)))
       (when from
-	(let ((stop-pos
-	       (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
+	(let ((name (mail-extract-address-components from)))
 	  (concat msg-id (if msg-id " (")
-		  (if (and stop-pos
-			   (not (zerop stop-pos)))
-		      (substring from 0 stop-pos) from)
+		  (or (car name)
+		      (nth 1 name))
 		  "'s message of \""
 		  (if (or (not date) (string= date ""))
 		      "(unknown date)" date)
@@ -4629,6 +4640,70 @@ subscribed address (and not the additional To and Cc header contents)."
 	      list
 	    msg-recipients))))))
 
+(defun message-idna-inside-rhs-p ()
+  "Return t iff point is inside a RHS (heuristically).
+Only works properly if header contains mailbox-list or address-list.
+I.e., calling it on a Subject: header is useless."
+  (save-restriction
+    (narrow-to-region (save-excursion (or (re-search-backward "^[^ \t]" nil t)
+					  (point-min)))
+		      (save-excursion (or (re-search-forward "^[^ \t]" nil t)
+					  (point-max))))
+    (if (re-search-backward "[\\\n\r\t ]"
+			    (save-excursion (search-backward "@" nil t)) t)
+	;; whitespace between @ and point
+	nil
+      (let ((dquote 1) (paren 1))
+	(while (save-excursion (re-search-backward "[^\\]\"" nil t dquote))
+	  (incf dquote))
+	(while (save-excursion (re-search-backward "[^\\]\(" nil t paren))
+	  (incf paren))
+	(and (= (% dquote 2) 1) (= (% paren 2) 1))))))
+
+(autoload 'idna-to-ascii "idna")
+
+(defun message-idna-to-ascii-rhs-1 (header)
+  "Interactively potentially IDNA encode domain names in HEADER."
+  (let (rhs ace start startpos endpos ovl)
+    (goto-char (point-min))
+    (while (re-search-forward (concat "^" header) nil t)
+      (while (re-search-forward "@\\([^ \t\r\n>]+\\)"
+				(or (save-excursion
+				      (re-search-forward "^[^ \t]" nil t))
+				    (point-max))
+				t)
+	(setq rhs (match-string-no-properties 1)
+	      startpos (match-beginning 1)
+	      endpos (match-end 1))
+	(when (save-match-data
+		(and (message-idna-inside-rhs-p)
+		     (setq ace (idna-to-ascii rhs))
+		     (not (string= rhs ace))
+		     (if (eq message-use-idna 'ask)
+			 (unwind-protect
+			     (progn
+			       (setq ovl (message-make-overlay startpos
+							       endpos))
+			       (message-overlay-put ovl 'face 'highlight)
+			       (y-or-n-p
+				(format "Replace with `%s'? " ace)))
+			   (message "")
+			   (message-delete-overlay ovl))
+		       message-use-idna)))
+	  (replace-match (concat "@" ace)))))))
+
+(defun message-idna-to-ascii-rhs ()
+  "Possibly IDNA encode non-ASCII domain names in From:, To: and Cc: headers.
+See `message-idna-encode'."
+  (interactive)
+  (when message-use-idna
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-head)
+	(message-idna-to-ascii-rhs-1 "From")
+	(message-idna-to-ascii-rhs-1 "To")
+	(message-idna-to-ascii-rhs-1 "Cc")))))
+
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
@@ -4780,7 +4855,9 @@ Headers already prepared in the buffer are not modified."
 	    (beginning-of-line))
 	  (when (or (message-news-p)
 		    (string-match "@.+\\.." secure-sender))
-	    (insert "Sender: " secure-sender "\n")))))))
+	    (insert "Sender: " secure-sender "\n"))))
+      ;; Check for IDNA
+      (message-idna-to-ascii-rhs))))
 
 (defun message-insert-courtesy-copy ()
   "Insert a courtesy message in mail copies of combined messages."
@@ -4832,6 +4909,16 @@ Headers already prepared in the buffer are not modified."
     (goto-char (point-max))
     (widen)
     (forward-line 1)))
+
+(defun message-split-line ()
+  "Split current line, moving portion beyond point vertically down.
+If the current line has `message-yank-prefix', insert it on the new line."
+  (interactive "*")
+  (condition-case nil
+      (split-line message-yank-prefix) ;; Emacs 21.3.50+ supports arg.
+    (error
+     (split-line))))
+     
 
 (defun message-fill-header (header value)
   (let ((begin (point))
@@ -6066,6 +6153,9 @@ which specify the range to operate on."
 	    (delete-char -2))))))
 
 (defalias 'message-exchange-point-and-mark 'exchange-point-and-mark)
+(defalias 'message-make-overlay 'make-overlay)
+(defalias 'message-delete-overlay 'delete-overlay)
+(defalias 'message-overlay-put 'overlay-put)
 
 ;; Support for toolbar
 (eval-when-compile

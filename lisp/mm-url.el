@@ -279,17 +279,23 @@ This is taken from RFC 2396.")
 	(list url (buffer-size)))
     (mm-url-load-url)
     (let ((name buffer-file-name)
+	  (url-request-extra-headers (list (cons "Connection" "Close")))
 	  (url-package-name (or mm-url-package-name
 				url-package-name))
 	  (url-package-version (or mm-url-package-version
-				   url-package-version)))
-      (prog1
-	  (url-insert-file-contents url)
-	(save-excursion
-	  (goto-char (point-min))
-	  (while (re-search-forward "\r 1000\r ?" nil t)
-	    (replace-match "")))
-	(setq buffer-file-name name)))))
+				   url-package-version))
+	  result)
+      (setq result (url-insert-file-contents url))
+      (save-excursion
+	(goto-char (point-min))
+	(while (re-search-forward "\r 1000\r ?" nil t)
+	  (replace-match "")))
+      (setq buffer-file-name name)
+      (if (and (fboundp 'url-generic-parse-url)
+	       (listp result))
+	  (setq url-current-object (url-generic-parse-url
+				    (car result))))
+      result)))
 
 (defun mm-url-insert-file-contents-external (url)
   (let (program args)
