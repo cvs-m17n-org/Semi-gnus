@@ -5,11 +5,157 @@
 
 * 推奨環境
 ====================================================================
-APEL は 9.19 以上のもの   (最新のものを推奨します。)
-FLIM は 1.13 以上のもの
-SEMI は 1.13 以上のもの   (1.13 系列の最新のものを推奨します。)
+APEL は 9.20 以降のもの   (最新のものを推奨します。)
+FLIM は 1.13 以降のもの
+SEMI は 1.13.5 以降のもの (1.13 系列の最新のものを推奨します。)
 が必要です。
 ====================================================================
+
+* pop3-fma.el
+
+このファイルは削除しました。そのため、これまで pop3-fma.el を使用して
+複数 spool を使用していた方は、設定を変更する必要があります。以下に変
+更する必要がある変数群の一覧をあげておきます。
+
+** pop3-fma-spool-file-alist -> nnmail-spool-file
+
+次のようなものであれば...
+(setq pop3-fma-spool-file-alist
+      '(
+	    ("po:username0@mailhost0.your.domain0" pass)
+        ("po:username1@mailhost1.your.domain1" apop)
+                         :
+                         :
+        ))
+
+次のように変更してください。
+(setq nnmail-spool-file
+      '(
+	    ("po:username0@mailhost0.your.domain0" :auth-scheme pass)
+        ("po:username1@mailhost1.your.domain1" :auth-scheme apop)
+                         :
+                         :
+        ))
+
+** pop3-fma-local-spool-file-alist -> nnmail-spool-file
+
+これは、 Gnus 標準の形式で、指定してください。
+
+** pop3-fma-movemail-type -> nnmail-movemail-program
+
+これに、 `lisp' を指定している方は、
+(setq nnmail-movemail-program 'nnmail-pop3-movemail)
+
+`exe' を指定している方は、
+(setq nnmail-movemail-program "movemail")
+を指定してください。 Gnus の default 値はこちらです。
+
+また、 APOP に対応した、 `movemail' 外部コマンドを使用している方は、こ
+れに合わせて `nnmail-movemail-program-apop-option' を変更する必要があ
+るかも知れません、詳しくは別項を参照してください。
+
+** pop3-fma-movemail-argument -> (setenv "MOVEMAIL" ...)
+
+Meadow 付属の movemail.exe を使用している方で、これに、 "-pf" を指定し
+ている方は、(setenv "MOVEMAIL" "-pf") としてください。
+
+** pop3-fma-save-password-information 廃止
+
+今後とも Nana-gnus では password を保存する機能は積極的にはサポートし
+ません。しかし...
+(add-to-list 'gnus-variable-list 'nnmail-internal-password-cache)
+というのを .gnus 内に書いておくと実現できてしまうと思います。 ;-)
+
+;; ただし、これをやると、 .newsrc.eld 内に裸の状態で保存されますので、
+;; 注意してください。
+
+* nnmail.el
+
+メイルの取得先 spool に複数の local spool file / POP account / POP
+server を使用できます。
+
+** nnmail-spool-file
+
+ここに、取得先の spool を設定してください。これは、 Gnus 標準形式の上
+位互換になっています。
+
+*** Spool 毎の形式
+
+Spool の表現には文字列、またはリストを使用します。以下にその形式と意味
+をあげます。
+
+**** 文字列形式の場合
+
+"SpoolName"
+
+この形式は、 local spool ファイルを表します。詳しくは Info file をご覧
+ください。
+
+"po:AccountName"
+
+この形式は、 POP account を表します。 POP server の指定は、 
+`nnmail-default-mail-host' によって行います。 `AccountName' をご自分の 
+POP account 名に変更してください。
+
+"po:SpoolName@PopServerHostName"
+
+この形式は、POP server 指定つきで POP account を表します。
+`AccountName' をご自分の POP account 名に、 `PopServerHostName' を POP
+server の host name に変更してください。
+
+**** リスト形式の場合
+
+リスト形式の先頭のメンバーはすべて、上記 `文字列形式の場合' のいずれか
+で、以降のメンバーは option パラメータとなります。
+ただし、 local spool の場合、現状のところ使用可能な option パラメータ
+はありませんので、その場合にはすべて無視されます。
+Option パラメータの形式は次のようになります。
+
+:OptionName OptionParameter
+
+指定可能な option は次のとおりです。
+
+***** :auto-scheme
+
+POP account の認証方式を指定します。
+
+OptionParameter には現在、次の 2 つのシンボルが有効です。
+
+pass            USER / PASS による、認証を行います。
+apop            APOP による認証を行います。
+
+Default 値は `nnmail-pop3-movemail' を使用している場合は、
+`pop3-authentication-scheme' に設定されているものに、 `movemail' 外部
+プログラムを使用している場合は、 `pass' になります。
+
+標準の emacs に付属の `movemail' 外部プログラムは APOP に対応していま
+せんが、対応済のものを使用するのであれば、 APOP による認証を行う場合に
+必要な option パラメータを `nnmail-movemail-program-apop-option' に、
+設定してください。 Default は "-A" です。
+
+***** :port
+
+POP の port を指定します。現在、 `nnmail-movemail-program' に
+`nnmail-pop3-movemail' を指定している場合のみ有効です。
+
+OptionParameter には、 POP port 番号を指定してください。
+
+Default 値は、 `pop3-port' に指定されているものになります。
+
+** nnmail-default-mail-host
+
+`nnmail-spool-file' で POP server が指定されていない場合に、この変数で
+指定された host name が使用されます。
+Default 値は環境変数 MAILHOST の値です。
+
+* pop3-authentication-scheme-alist 廃止
+
+Nana-gnus 6.13.3 / 6.12.19 までは、これを使用して各 POP server 毎に
+APOP / PASS の認証方式を指定していましたが、 `nnmail-spool-file' でこ
+れを行うように変更しました。詳しくは別項 nnmail-spool-file を参照して
+ください。
+
+付属の nnmail.el は、
 
 * Cancel sending message from hooks.
 
