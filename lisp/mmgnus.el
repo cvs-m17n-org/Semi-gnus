@@ -25,12 +25,17 @@
 
 ;;; Code:
 
+(condition-case nil
+    (require 'mmgeneric)
+  (error nil))
 (require 'mime)
 (require 'eword-decode)
 
-(luna-define-class mmgnus-entity (mime-entity)
-		   (body
-		    header undisplayer content-description cache content-id))
+(eval-and-compile
+  (luna-define-class mmgnus-entity (mime-entity)
+		     (body
+		      header undisplayer content-description
+		      cache content-id)))
 
 (luna-define-internal-accessors 'mmgnus-entity)
 
@@ -138,9 +143,10 @@
     (insert (mmgnus-entity-body entity))
     (write-region-as-binary (point-min) (point-max) filename)))
 
-(luna-define-class mime-gnus-entity (mmgnus-entity)
-		   (number
-		    subject from date id references chars lines xref extra))
+(eval-and-compile
+  (luna-define-class mime-gnus-entity (mmgnus-entity)
+		     (number
+		      subject from date id references chars lines xref extra)))
 
 (luna-define-internal-accessors 'mime-gnus-entity)
 
