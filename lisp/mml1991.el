@@ -1,4 +1,4 @@
-;;; mml-gpg-old.el --- Old PGP message format (RFC 1991) support for MML -*- coding: iso-latin-1 -*-
+;;; mml-gpg-old.el --- Old PGP message format (RFC 1991) support for MML
 ;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Sascha Lüdecke <sascha@meta-x.de>,
@@ -207,5 +207,10 @@
       (error "Cannot find sign function"))))
 
 (provide 'mml1991)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; buffer-file-coding-system: iso-8859-1
+;; End:
 
 ;;; mml1991.el ends here

@@ -1,4 +1,4 @@
-;;; message.el --- composing mail and news messages  -*- coding: iso-latin-1 -*-
+;;; message.el --- composing mail and news messages
 ;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
@@ -6271,6 +6271,7 @@ regexp varstr."
 
 ;; Local Variables:
 ;; coding: iso-8859-1
+;; buffer-file-coding-system: iso-8859-1
 ;; End:
 
 ;;; message.el ends here

@@ -1,4 +1,4 @@
-\input texinfo                  @c -*- mode: texinfo; coding: iso-2022-7bit -*-
+\input texinfo
 
 @setfilename message-ja
 @settitle T-gnus 6.15 Message Manual
@@ -1637,4 +1637,8 @@ Message は事実上、それ自身の変数しか使いません---古い @code{mail-} 
 @contents
 @bye
 
+@c Local Variables:
+@c mode: texinfo
+@c coding: iso-2022-7bit
+@c buffer-file-coding-system: iso-2022-7bit
 @c End:

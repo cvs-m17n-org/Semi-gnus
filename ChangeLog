@@ -1,3 +1,17 @@
+2001-12-18  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Ensure nonempty variable value.  Reported by Frank
+	Haun <pille3000@gmx.net>.
+
+2001-12-18 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* ChangeLog, todo: Add `coding'.
+
+2001-12-17  Josh Huber  <huber@alum.wpi.edu>
+
+	* ChangeLog: changed coding to buffer-file-coding-system
+	* todo: same
+
 2001-12-10  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make-x.bat: Code cleanup.  Fix a bug with "/copy".  From Frank
@@ -1391,3 +1405,8 @@
 	* make.bat: set max-lisp-eval-depth.
 
 See ChangeLog.3 for earlier changes.
+
+;; Local Variables:
+;; coding: iso-2022-7bit
+;; buffer-file-coding-system: iso-2022-7bit
+;; End:
