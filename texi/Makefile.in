@@ -22,6 +22,18 @@ all: gnus message
 
 ja: gnus-ja message-ja
 
+# Rule for XEmacs package.
+add-info-suffix:
+	$(EMACS) -batch -q -no-site-file -l ../lisp/dgnushack.el \
+		-f dgnushack-add-info-suffix-maybe
+
+remove-info-suffix:
+	for file in gnus message gnus-ja message-ja; do \
+	  if test -f $$file.texi_; then \
+	    mv $$file.texi_ $$file.texi; \
+	  fi; \
+	done
+
 most: texi2latex.elc latex latexps
 
 .SUFFIXES: .texi .dvi .ps
@@ -30,7 +42,7 @@ most: texi2latex.elc latex latexps
 	if test $(MAKEINFO) = no; then \
 	  $(EMACSINFO) $< $(XINFOSWI); \
 	else \
-	  makeinfo -o $* $<; \
+	  makeinfo $<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi
