@@ -1,3 +1,9 @@
+2002-04-30  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/message.el (message-expand-name): Use lsdb-complete-name if
+	available.
+	* lisp/lpath.el: Bind lsdb-complete-name.
+
 2002-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Also examine
