@@ -234,7 +234,7 @@
 	  (setq description (car (last (nnweb-text (nth 1 row)))))
 	  (setq articles
 		(string-to-number
-		 (nnweb-replace-in-string
+		 (gnus-replace-in-string
 		  (car (last (nnweb-text (nth 3 row)))) "," "")))
 	  (when (and href
 		     (string-match "GroupId=\\([0-9]+\\)" href))
@@ -285,7 +285,7 @@
 	(while (re-search-forward "  wr(" nil t)
 	  (forward-char -1)
 	  (setq elem (message-tokenize-header
-		      (nnweb-replace-in-string
+		      (gnus-replace-in-string
 		       (buffer-substring
 			(1+ (point))
 			(progn
@@ -294,7 +294,7 @@
 		       "\\\\[\"\\\\]" "")))
 	  (push (list
 		 (string-to-number (nth 1 elem))
-		 (nnweb-replace-in-string (nth 2 elem) "\"" "")
+		 (gnus-replace-in-string (nth 2 elem) "\"" "")
 		 (string-to-number (nth 5 elem)))
 		forum-contents))
 	(when (re-search-forward "href=\"\\(Thread.*DateLast=\\([^\"]+\\)\\)"
