@@ -2165,10 +2165,12 @@ this is a reply."
       (when (and filep v)
 	(setq v (with-temp-buffer
 		  (insert-file-contents v)
-		  (goto-char (point-max))
-		  (skip-chars-backward "\n")
-		  (delete-region (+ (point) (if (bolp) 0 1)) (point-max))
-		  (buffer-string))))
+		  (buffer-substring (point-min)
+				    (progn
+				      (goto-char (point-max))
+				      (if (zerop (skip-chars-backward "\n"))
+					  (point)
+					(1+ (point))))))))
       (if (eq element 'import)
 	  (progn
 	    (if (member v stack)
