@@ -178,7 +178,12 @@ the list is tried until a successful connection is made."
   :group 'imap
   :type '(repeat string))
 
-(defcustom imap-gssapi-program '("imtest -m gssapi -u %l -p %p %s")
+(defcustom imap-gssapi-program (list
+				(concat "gsasl --client --connect %s:%p "
+					"--imap --application-data "
+					"--mechanism GSSAPI "
+					"--authentication-id %l")
+				"imtest -m gssapi -u %l -p %p %s")
   "List of strings containing commands for GSSAPI (krb5) authentication.
 %s is replaced with server hostname, %p with port to connect to, and
 %l with the value of `imap-default-user'.  The program should accept
@@ -245,6 +250,16 @@ encoded mailboxes which doesn't translate into ISO-8859-1."
   "Default username to use."
   :group 'imap
   :type 'string)
+
+(defcustom imap-read-timeout (if (string-match
+				  "windows-nt\\|os/2\\|emx\\|cygwin"
+				  (symbol-name system-type))
+				 1.0
+			       0.1)
+  "*How long to wait between checking for the end of output.
+Shorter values mean quicker response, but is more CPU intensive."
+  :type 'number
+  :group 'imap)
 
 ;; Various variables.
 
@@ -547,7 +562,10 @@ sure of changing the value of `foo'."
 			(not (and (imap-parse-greeting)
 				  ;; success in imtest 1.6:
 				  (re-search-forward
-				   "^\\(Authenticat.*\\)" nil t)
+				   (concat "^\\(\\(Authenticat.*\\)\\|\\("
+					   "Client authentication "
+					   "finished.*\\)\\)")
+				   nil t)
 				  (setq response (match-string 1)))))
 	      (accept-process-output process 1)
 	      (sit-for 1))
@@ -1706,7 +1724,11 @@ on failure."
 	  (unless (< len 10)
 	    (setq imap-have-messaged t)
 	    (message "imap read: %dk" len))
-	  (accept-process-output imap-process 1)))
+	  (accept-process-output imap-process
+				 (truncate imap-read-timeout)
+				 (truncate (* (- imap-read-timeout
+						 (truncate imap-read-timeout))
+					      1000)))))
       (when imap-have-messaged
 	(message ""))
       (and (memq (process-status imap-process) '(open run))

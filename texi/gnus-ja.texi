@@ -3517,12 +3517,6 @@ Gnus$B$r=*N;$9$k$H$-$O(B @code{gnus-exit-gnus-hook} $B$,8F$S=P$5$l!"$5$i(B
 $B$K(B gnus $B$r=*N;$9$k$H$-$N:G8e$H$7(B
 $B$F(B @code{gnus-after-exiting-gnus-hook} $B$,8F$S=P$5$l$^$9!#(B
 
-@findex gnus-unload
-@cindex unloading
-$B$b$7(B gnus $B$H$=$l$K4XO"$9$k$b$N$r40A4$K=hJ,$7$?$$$N$G$"$l$P!"(B
-@code{gnus-unload} $B%3%^%s%I$,;H$($^$9!#$3$N%3%^%s%I$O!"%a%?JQ?t$r%+%9%?(B
-$B%^%$%:$7$h$&$H$7$F$$$k$H$-$K$bJXMx$G$9!#(B
-
 Note:
 
 @quotation
@@ -15140,8 +15134,8 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 
 @itemize @bullet
 @item
-@dfn{gssapi:} GSSAPI ($BIaDL$O(B Kerberos 5) $B$r;H$$$^$9!#(B@samp{imtest} $B%W%m(B
-$B%0%i%`$,I,MW$G$9!#(B
+@dfn{gssapi:} GSSAPI ($BIaDL$O(B Kerberos 5) $B$r;H$$$^$9!#(B@samp{gsasl} $B$^$?(B
+$B$O(B @samp{imtest} $B%W%m%0%i%`$,I,MW$G$9!#(B
 @item
 @dfn{kerberos4:} Kerberos 4 $B$r;H$$$^$9!#(B@samp{imtest} $B%W%m%0%i%`$,I,MW$G(B
 $B$9!#(B
@@ -15176,6 +15170,14 @@ TLS $B@\B3$G$O(B GNUTLS $BM3Mh$N(B @code{gnutls-cli} $B%W%m%0%i%`$,I,MW$G$9
 $B$O(B @uref{http://www.gnu.org/software/gnutls/} $B$+$i<j$KF~$l$k$3$H$,$G$-$^(B
 $B$9!#(B
 
+@vindex imap-gssapi-program
+$B$3$N%Q%i%a!<%?$O!"I{%7%'%k$G(B GSSAPI $BG'>Z$K$h$k(B IMAP $B@\B3$r5/F0$9$k$?$a$N(B
+$B%3%^%s%I9T$N%j%9%H$r;XDj$7$^$9!#$3$l$i$O@\B3$,3NN)$9$k$^$G!"$^$?$O%j%9%H(B
+$B$,;H$$?T$/$5$l$k$^$G!"=g$0$j$K;n$5$l$^$9!#%G%#%U%)%k%H$G$O!"(B
+@uref{http://www.gnu.org/software/gsasl/} $B$K$"$k(B GNU SASL $B$K$h(B
+$B$k(B @samp{gsasl} $B$H!"(BCyrus IMAPD $B$K$h$k(B @samp{imtest} $B%W%m%0%i(B
+$B%`(B (@code{imap-kerberos4-program} $B;2>H(B) $B$,;n$5$l$^$9!#(B
+
 @vindex imap-ssl-program
 SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @uref{http://www.openssl.org/} $B$+(B
 $B$iF~<j$G$-$^$9!#(BOpenSSL $B$O0JA0$O(B SSLeay $B$H$7$FCN$i$l$F$$$?$b$N$G!"(B
@@ -15208,7 +15210,7 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 @itemize @bullet
 @item
 @dfn{gssapi:} GSSAPI ($BIaDL$O(B Kerberos 5) $BG'>Z$G$9!#30It%W%m%0%i(B
-$B%`(B @code{imtest} $B$,I,MW$G$9!#(B
+$B%`(B @code{gsasl} $B$^$?$O(B @code{imtest} $B$,I,MW$G$9!#(B
 @item
 @dfn{kerberos4:} Kerberos 4 $B$K$h$kG'>Z$G$9!#30It%W%m%0%i(B
 $B%`(B @code{imtest} $B$,I,MW$G$9!#(B

@@ -219,10 +219,10 @@ colors of the displayed X-Faces."
       (sleep-for 1))
     (setq file (car file))
     (shell-command
-     (format "pnmcut -left 110 -top 30 -width 144 -height 144 '%s' | ppmnorm 2>/dev/null | pnmscale -width 48 -height 48 | ppmtopgm > /tmp/gnus.face.ppm"
+     (format "pnmcut -left 110 -top 30 -width 144 -height 144 '%s' | pnmscale -width 48 -height 48 | ppmtopgm > /tmp/gnus.face.ppm"
 	     file))
     (let ((gnus-convert-image-to-face-command
-	   (format "cat '%%s' | ppmchange %s | ppmquant %%d | pnmtopng"
+	   (format "cat '%%s' | ppmquant %%d | ppmchange %s | pnmtopng"
 		   (gnus-fun-ppm-change-string))))
       (setq result (gnus-face-from-file "/tmp/gnus.face.ppm")))
     (delete-file file)

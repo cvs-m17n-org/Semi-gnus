@@ -1,3 +1,11 @@
+2003-03-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.18 (quimby) revision 00.
+
+2003-03-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.17 revision 00.
+
 2003-03-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-x-face-command): Don't examine
