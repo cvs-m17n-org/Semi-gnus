@@ -1,5 +1,5 @@
 ;;; nnrss.el --- interfacing with RSS
-;; Copyright (C) 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: RSS
@@ -284,6 +284,11 @@ The return value will be `html' or `text'."
 (deffoo nnrss-request-delete-group (group &optional force server)
   (setq group (nnrss-decode-group-name group))
   (nnrss-possibly-change-group group server)
+  (let (elem)
+    ;; There may be two or more entries in `nnrss-group-alist' since
+    ;; this function didn't delete them formerly.
+    (while (setq elem (assoc group nnrss-group-alist))
+      (setq nnrss-group-alist (delq elem nnrss-group-alist))))
   (setq nnrss-server-data
 	(delq (assoc group nnrss-server-data) nnrss-server-data))
   (nnrss-save-server-data server)
@@ -406,6 +411,7 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
       (insert (format ";; -*- coding: %s; -*-\n"
 		      nnrss-file-coding-system))
       (gnus-prin1 `(setq nnrss-group-alist ',nnrss-group-alist))
+      (insert "\n")
       (gnus-prin1 `(setq nnrss-server-data ',nnrss-server-data)))))
 
 (defun nnrss-read-group-data (group server)
