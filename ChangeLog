@@ -1,3 +1,17 @@
+1999-06-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-sum.el (gnus-summary-mark-article): Call
+	`gnus-cache-possibly-enter-article' with the arg `headers'.
+	(gnus-summary-mark-article-as-unread): Ditto.
+	(gnus-summary-move-article): Ditto.
+
+	* lisp/gnus-cache.el (gnus-cache-update-article): Call
+	`gnus-cache-possibly-enter-article' with the arg `headers'.
+	(gnus-cache-enter-article): Ditto.
+	(gnus-cache-possibly-enter-article): Accept parameter `headers'.
+
 1999-06-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
