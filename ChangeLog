@@ -1,3 +1,32 @@
+1999-10-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/message.el (message-mode): Make
+	`message-font-lock-last-position' as buffer local.
+	(message-font-lock-keywords-2): Use
+	`message-font-lock-cited-text-matcher' instead of regexp.
+	(message-font-lock-cited-text-matcher): New function.
+	(font-lock-after-change-function): Advice to the keep last cursor
+	position in `message-font-lock-last-position' before fontifying.
+	(message-font-lock-last-position): New variable.
+	(message-font-lock-citation-name-max-column): New variable.
+	(message-font-lock-cited-text-regexp): New variable.
+	(message-font-lock-fence-close-position): New variable.
+	(message-font-lock-fence-open-position): New variable.
+	(message-font-lock-fence-close-regexp): New variable.
+	(message-font-lock-fence-open-regexp): New variables.
+
+1999-10-04  Masatoshi Tsuchiya <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/message.el (message-mode): Rearrange `font-lock-defaults'
+	using `message-font-lock-keywords', `message-font-lock-keywords-1'
+	and `message-font-lock-keywords-2'.
+	(message-font-lock-keywords): Restruct.
+	(message-font-lock-keywords-1): New variable split from
+	`message-font-lock-keywords'.
+	(message-font-lock-keywords-2): Ditto.
+
 1999-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
