@@ -279,13 +279,6 @@ If t, use `message-user-organization-file'."
   :type 'file
   :group 'message-headers)
 
-(defcustom message-autosave-directory
-  (nnheader-concat message-directory "drafts/")
-  "*Directory where Message autosaves buffers.
-If nil, Message won't autosave."
-  :group 'message-buffers
-  :type 'directory)
-
 (defcustom message-forward-start-separator
   (concat (mime-make-tag "message" "rfc822") "\n")
   "*Delimiter inserted before forwarded messages."
@@ -638,6 +631,13 @@ the prefix.")
 The default is `abbrev', which uses mailabbrev.  nil switches
 mail aliases off.")
 
+(defcustom message-autosave-directory
+  (nnheader-concat message-directory "drafts/")
+  "*Directory where Message autosaves buffers if Gnus isn't running.
+If nil, Message won't autosave."
+  :group 'message-buffers
+  :type 'directory)
+
 ;;; Internal variables.
 ;;; Well, not really internal.
 
@@ -938,6 +938,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'nndraft-request-expire-articles "nndraft")
   (autoload 'gnus-open-server "gnus-int")
   (autoload 'gnus-request-post "gnus-int")
+  (autoload 'gnus-alive-p "gnus-util")
   (autoload 'rmail-output "rmail"))
 
 
@@ -1307,7 +1308,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
 	(concat (regexp-quote mail-header-separator)
 		"$\\|[ \t]*[-_][-_][-_]+$\\|"
 		"-- $\\|"
-		;;!!! Uhm... shurely this can't be right.
+		;;!!! Uhm... shurely this can't be right?
 		"[> " (regexp-quote message-yank-prefix) "]+$\\|"
 		paragraph-start))
   (setq paragraph-separate
@@ -1340,6 +1341,15 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (unless (string-match "XEmacs" emacs-version)
     (set (make-local-variable 'font-lock-defaults)
 	 '(message-font-lock-keywords t)))
+  (make-local-variable 'adaptive-fill-regexp)
+  (setq adaptive-fill-regexp
+	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|" adaptive-fill-regexp))
+  (unless (boundp 'adaptive-fill-first-line-regexp)
+    (setq adaptive-fill-first-line-regexp nil))
+  (make-local-variable 'adaptive-fill-first-line-regexp)
+  (setq adaptive-fill-first-line-regexp
+	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
+		adaptive-fill-first-line-regexp))
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -1632,11 +1642,7 @@ name, rather than giving an automatic name."
 	     (name-default (concat "*message* " mail-trimmed-to))
 	     (name (if enter-string
 		       (read-string "New buffer name: " name-default)
-		     name-default))
-	     (default-directory
-	       (if message-autosave-directory
-		   (file-name-as-directory message-autosave-directory)
-		 default-directory)))
+		     name-default)))
 	(rename-buffer name t)))))
 
 (defun message-fill-yanked-message (&optional justifyp)
@@ -2816,7 +2822,9 @@ to find out how to use this."
       (when from
 	(let ((stop-pos
 	       (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
-	  (concat (if stop-pos (substring from 0 stop-pos) from)
+	  (concat (if (and stop-pos
+			   (not (zerop stop-pos)))
+		      (substring from 0 stop-pos) from)
 		  "'s message of \""
 		  (if (or (not date) (string= date ""))
 		      "(unknown date)" date)
@@ -3309,7 +3317,12 @@ Headers already prepared in the buffer are not modified."
 (defun message-set-auto-save-file-name ()
   "Associate the message buffer with a file in the drafts directory."
   (when message-autosave-directory
-    (setq message-draft-article (nndraft-request-associate-buffer "drafts"))
+    (if (gnus-alive-p)
+	(setq message-draft-article
+	      (nndraft-request-associate-buffer "drafts"))
+      (setq buffer-file-name (expand-file-name "*message*"
+					       message-autosave-directory))
+      (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)))
 
 (defun message-disassociate-draft ()
