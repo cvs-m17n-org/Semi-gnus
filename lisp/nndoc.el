@@ -519,6 +519,7 @@ from the document.")
       (setq entry (assq 'mime-digest nndoc-type-alist))
       (setcdr entry
 	      (list
+	       (cons 'head-begin "^ ?\n")
 	       (cons 'head-end "^ ?$")
 	       (cons 'body-begin "^ ?\n")
 	       (cons 'article-begin b-delimiter)
