@@ -449,8 +449,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defconst dgnushack-dont-compile-files
   '("gnus-load.el"
     "mm-bodies.el" "mm-decode.el" "mm-encode.el" "mm-extern.el"
-    "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
-    "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
+    "mm-partial.el" "mm-uu.el" "mm-view.el" "mml-sec.el" "mml-smime.el"
+    "mml.el" "mml1991.el" "mml2015.el")
   "Files which should not be byte-compiled.")
 
 (defun dgnushack-compile-verbosely ()

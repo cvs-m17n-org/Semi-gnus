@@ -31,7 +31,7 @@
 
 (eval-when-compile (require 'cl))
 
-(require 'mm-util)
+(require 'nnheader) ;; for `mm-char-or-char-int-p'.
 (require 'gnus)
 
 (eval-and-compile

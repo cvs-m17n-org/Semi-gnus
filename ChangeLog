@@ -1,3 +1,11 @@
+2004-12-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-dont-compile-files): Exclude mm-url.el.
+
+	* lisp/mm-url.el: Require nnheader instead of mm-util.
+
+	* lisp/nnheader.el (mm-char-or-char-int-p): New function.
+
 2004-12-06  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Generated.

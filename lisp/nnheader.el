@@ -189,10 +189,10 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
   ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
-  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+    "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters)
-     (with-temp-buffer ,@forms)))
+    `(let (default-enable-multibyte-characters)
+       (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
   (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
@@ -239,29 +239,29 @@ nil, ."
 
   ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
   (defun nnheader-guess-mime-charset ()
-  "Guess the default MIME charset from the language environment."
-  (let ((language-info
-	 (and (boundp 'current-language-environment)
-	      (assoc current-language-environment
-		     language-info-alist)))
-	item)
-    (cond
-     ((null language-info)
-      'iso-8859-1)
-     ((setq item
-	    (cadr
-	     (or (assq 'coding-priority language-info)
-		 (assq 'coding-system language-info))))
-      (if (fboundp 'coding-system-get)
-	  (or (coding-system-get item 'mime-charset)
-	      item)
-	item))
-     ((setq item (car (last (assq 'charset language-info))))
-      (if (eq item 'ascii)
-	  'iso-8859-1
-	 (charsets-to-mime-charset (list item))))
-     (t
-      'iso-8859-1))))
+    "Guess the default MIME charset from the language environment."
+    (let ((language-info
+	   (and (boundp 'current-language-environment)
+		(assoc current-language-environment
+		       language-info-alist)))
+	  item)
+      (cond
+       ((null language-info)
+	'iso-8859-1)
+       ((setq item
+	      (cadr
+	       (or (assq 'coding-priority language-info)
+		   (assq 'coding-system language-info))))
+	(if (fboundp 'coding-system-get)
+	    (or (coding-system-get item 'mime-charset)
+		item)
+	  item))
+       ((setq item (car (last (assq 'charset language-info))))
+	(if (eq item 'ascii)
+	    'iso-8859-1
+	  (charsets-to-mime-charset (list item))))
+       (t
+	'iso-8859-1))))
   (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
 
   (defalias 'mm-char-int 'char-int)
@@ -311,7 +311,13 @@ nil, ."
   (defalias 'mm-string-make-unibyte
     (if (fboundp 'string-make-unibyte)
 	'string-make-unibyte
-      'identity)))
+      'identity))
+
+  (defalias 'mm-char-or-char-int-p
+    (cond
+     ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
+     ((fboundp 'char-valid-p) 'char-valid-p)
+     (t 'identity))))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
