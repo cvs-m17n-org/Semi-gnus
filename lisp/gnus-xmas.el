@@ -332,10 +332,6 @@ call it with the value of the `gnus-data' text property."
   (gnus-xmas-menu-add browse
     gnus-browse-menu))
 
-(defun gnus-xmas-grouplens-menu-add ()
-  (gnus-xmas-menu-add grouplens
-    gnus-grouplens-menu))
-
 (defun gnus-xmas-read-event-char (&optional prompt)
   "Get the next event."
   (when prompt
@@ -443,7 +439,6 @@ call it with the value of the `gnus-data' text property."
   ;; -- didier
   (add-hook 'gnus-score-mode-hook 'gnus-xmas-score-menu-add)
   (add-hook 'gnus-binary-mode-hook 'gnus-xmas-binary-menu-add)
-  (add-hook 'gnus-grouplens-mode-hook 'gnus-xmas-grouplens-menu-add)
   (add-hook 'gnus-server-mode-hook 'gnus-xmas-server-menu-add)
   (add-hook 'gnus-browse-mode-hook 'gnus-xmas-browse-menu-add)
   (add-hook 'gnus-draft-mode-hook 'gnus-xmas-draft-menu-add)
