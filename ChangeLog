@@ -1,3 +1,13 @@
+1999-07-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+1999-07-04  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Don't bind the
+	value of `mail-parse-ignored-charsets' if its local value in
+	`gnus-summary-buffer' is nil.
+
 1999-07-02  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
