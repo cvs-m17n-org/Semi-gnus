@@ -1,3 +1,13 @@
+2000-02-29  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-ems.el (gnus-tilde-cut-form, gnus-tilde-max-form): Copy
+	from gnus-xmas.el; share them with XEmacs-MULE.
+
+	* lisp/gnus-xmas.el (gnus-tilde-cut-form, gnus-tilde-max-form):
+	Move to gnus-ems.el.
+
 2000-02-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
