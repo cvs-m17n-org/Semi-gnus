@@ -47,21 +47,25 @@ most: texi2latex.elc latex latexps
 		-eval '(infohack-texi-format "$<" t)'
 
 %.info: %.texi
-	if test "x$(MAKEINFO)" != "xno"; then \
-	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
-	else \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
 	  $(EMACSINFO) -l $(srcdir)/infohack.el \
 		-eval '(infohack-texi-format "$<" t)'; \
+	else \
+	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf
 
 .texi:
-	if test "x$(MAKEINFO)" != "xno" ; then \
-	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
-	else \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
 	  $(EMACSINFO) -l $(srcdir)/infohack.el \
 		-eval '(infohack-texi-format "$<")'; \
+	else \
+	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
