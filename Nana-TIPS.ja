@@ -11,6 +11,17 @@ TODO.ja $B$N!V(B*1998/10/03-01 $BG$0U%a%C%;!<%8(B cite $B5!G=$N<BAuJ}K!JQ99
 ;; $BG=@-$,$"$j$^$9!#(B
 
 ---
+TODO.ja $B$N0J2<$N$b$N$OBP:v:Q$G$9!#(B
+
+*1998/10/02-11 message.el $B$NFHN)$7$?;HMQ;~$NLdBj(B
+*1998/10/03-01 $BG$0U%a%C%;!<%8(B cite $B5!G=$N<BAuJ}K!JQ99(B (keiichi branch)
+*1998/10/03-2 Info (gnus/gnus-ja) $B$NA*Br(B
+*1998/10/02-8 User-Agent $B%X%C%@!<!&%U%#!<%k%I:NMQ(B
+*1998/10/02-12 $B%X%C%@!<!&%U%#!<%k%I$KBP$9$kITMW$J(B decode $B$rGS=|(B
+*1998/10/02-9 In-Reply-To $B%X%C%@!<7A<0JQ99(B
+*1998/10/02-1 Draft $B$NJT=8!&Aw?.;~$N(B encode / decode $BLdBj(B
+
+---
 message-syntax-checks
 message-default-encoding (Default: "7bit")
 

@@ -1,5 +1,21 @@
 1998-11-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.4.
+
+	* TODO.ja: Update.
+
+	* Nana-TIPS.ja: Update.
+
+	* lisp/message.el (message-mime-setup): New function.
+	(format-alist): Append `mime-message' when loading.
+	(message-mime-encode): New function.
+	(message-setup-hook): Use `message-mime-setup' instead of
+	`turn-on-mime-edit'.
+	(message-save-drafts): Delete unused function.
+	(message-save-buffer): Delete unused valiable.
+	Use `format-alist' for saving message. Thank you for MORIOKA
+	Tomohiko's suggestion.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.3.
 
 	* Sync up with Semi-gnus 6.8.
