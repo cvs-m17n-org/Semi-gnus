@@ -216,7 +216,7 @@ use this option with care."
   "Variables that should not be reported in `gnus-bug'."
   :version "21.1"
   :group 'gnus-message
-  :type '(repeat (symbol :tab "Variable")))
+  :type '(repeat (symbol :tag "Variable")))
 
 (defcustom gnus-discouraged-post-methods
   '(nndraft nnml nnimap nnmaildir nnmh nnfolder nndir)
@@ -224,7 +224,7 @@ use this option with care."
 This variable is used only when `gnus-post-method' is `current'."
   :version "21.3"
   :group 'gnus-group-foreign
-  :type '(repeat (symbol :tab "Back end")))
+  :type '(repeat (symbol :tag "Back end")))
 
 (defcustom gnus-message-replysign
   nil
@@ -1125,7 +1125,7 @@ If VERY-WIDE, make a very wide reply."
 ;;      (when (or gnus-message-replysign gnus-message-replyencrypt)
 ;;	(let (signed encrypted)
 ;;	  (save-excursion
-;;	    (set-buffer (or gnus-article-buffer article-buffer))
+;;	    (set-buffer gnus-article-buffer)
 ;;	    (setq signed (memq 'signed gnus-article-wash-types))
 ;;	    (setq encrypted (memq 'encrypted gnus-article-wash-types)))
 ;;	  (cond ((and gnus-message-replysign signed)
@@ -1479,7 +1479,7 @@ If YANK is non-nil, include the original article."
 	  (save-excursion (re-search-backward "[ \t\n]" nil t) (1+ (point)))
 	  (save-excursion (re-search-forward "[ \t\n]" nil t) (1- (point))))))
     (when address
-      (message-reply address)
+      (gnus-msg-mail address)
       (when yank
 	(gnus-inews-yank-articles (list (cdr gnus-article-current)))))))
 

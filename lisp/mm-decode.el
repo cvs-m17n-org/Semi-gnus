@@ -111,12 +111,12 @@ The defined renderer types are:
 `lynx' : using lynx;
 `html2text' : using html2text;
 `nil'  : using external viewer."
-  :type '(choice (symbol w3)
-		 (symbol w3m)
-		 (symbol links)
-		 (symbol lynx)
-		 (symbol html2text)
-		 (symbol nil)
+  :type '(choice (const w3)
+		 (const w3m)
+		 (const links)
+		 (const lynx)
+		 (const html2text)
+		 (const nil)
 		 (function))
   :version "21.3"
   :group 'mime-display)
@@ -1019,9 +1019,8 @@ like underscores."
 					(file-name-nondirectory filename))))
     (setq file
 	  (read-file-name "Save MIME part to: "
-			  (expand-file-name
-			   (or filename name "")
-			   (or mm-default-directory default-directory))))
+			  (or mm-default-directory default-directory)
+			  nil nil (or filename name "")))
     (setq mm-default-directory (file-name-directory file))
     (and (or (not (file-exists-p file))
 	     (yes-or-no-p (format "File %s already exists; overwrite? "

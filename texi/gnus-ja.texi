@@ -8013,7 +8013,7 @@ CRLF $B$NAH(B ($B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $B$r(B LF $B$KJQ49$7$^
 @c @findex gnus-article-de-base64-unreadable
 @c Treat base64 (@code{gnus-article-de-base64-unreadable}).
 @c Base64 is one common @sc{mime} encoding employed when sending non-ASCII
-@c (i. e., 8-bit) articles.  Note that the this is usually done
+@c (i. e., 8-bit) articles.  Note that this is usually done
 @c automatically by Gnus if the message in question has a
 @c @code{Content-Transfer-Encoding} header that says that this encoding has
 @c been done.
@@ -8044,19 +8044,29 @@ URL $B$K4^$^$l$k2~9T$r:o=|$7$^$9!#$$$/$D$+$N%a%$%i!<$O!"9T$rC;$/$9$k$?$a$K(B
 $B@\F,<-$,M?$($i$l$k$H!"2?$NJ8;z=89g(B (charset) $B$H$7$F07$&$+$r?R$M$i$l$^$9!#(B
 
 @vindex gnus-article-wash-function
-$B%G%#%U%)%k%H$G$O(B @sc{html} $B$NJQ49$K(B w3 $B$r;H$$$^$9$,!"$3$l$OJQ(B
-$B?t(B @code{gnus-article-wash-function} $B$G@)8f$5$l$^$9!#;H$&$3$H$,$G$-$k!"(B
-$B$"$i$+$8$aMQ0U$5$l$?4X?t$O0J2<$NDL$j$G$9!#(B
+$B%G%#%U%)%k%H$G$O(B @sc{html} $B$NJQ49$K(B @code{mm-inline-text-html-renderer}
+(@pxref{Customization, , , emacs-mime}) $B$G@_Dj$5$l$?4X?t$r;H$$$^$9$,!"$3(B
+$B$l$OJQ?t(B @code{gnus-article-wash-function} $B$G@)8f$5$l$^$9!#;H$&$3$H$,$G(B
+$B$-$k!"$"$i$+$8$aMQ0U$5$l$?4X?t$O0J2<$NDL$j$G$9!#(B
 
 @table @code
-@item gnus-article-wash-html-with-w3
-@findex gnus-article-wash-html-with-w3
-w3 $B$r;H$$$^$9(B ($B$3$l$,%G%#%U%)%k%H$G$9(B)$B!#(B
+@item w3
+Emacs/w3 $B$r;H$$$^$9!#(B
 
-@item gnus-article-wash-html-with-w3m
-@findex gnus-article-wash-html-with-w3m
-emacs-w3m $B$r;H$$$^$9(B ($B$b$C$H>\$7$$$3$H(B
-$B$O(B @uref{http://emacs-w3m.namazu.org/} $B$r;2>H$7$F2<$5$$(B)$B!#(B
+@item w3m
+emacs-w3m $B$r;H$$$^$9(B ($B>\$7$/$O(B @uref{http://emacs-w3m.namazu.org/} $B$r;2(B
+$B>H$7$F2<$5$$(B)$B!#(B
+
+@item links
+Links $B$r;H$$$^(B
+$B$9(B (@uref{http://artax.karlin.mff.cuni.cz/~mikulas/links/} $B$r;2>H(B)$B!#(B
+
+@item lynx
+Lynx $B$r;H$$$^$9(B (@uref{http://lynx.browser.org/} $B$r;2>H(B)$B!#(B
+
+@item html2text
+html2text ($B%7%s%W%k$J(B @sc{html} $B%3%s%P!<%?!<!"(Bgnus $B$K4^$^$l$F$$$k(B) $B$r;H(B
+$B$$$^$9!#(B
 @end table
 
 @item W b

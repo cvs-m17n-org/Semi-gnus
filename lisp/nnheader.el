@@ -213,6 +213,18 @@ Equivalent to `progn' in XEmacs"
   (defalias 'mm-with-unibyte-current-buffer
     'nnheader-with-unibyte-current-buffer)
 
+  ;; Should keep track of `mm-with-unibyte' in mm-util.el.
+  (defmacro nnheader-with-unibyte (&rest forms)
+    "Eval the FORMS with the default value of `enable-multibyte-characters'
+nil, ."
+    `(let (default-enable-multibyte-characters)
+       ,@forms))
+  (put 'nnheader-with-unibyte 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte 'lisp-indent-function 0)
+  (put 'mm-with-unibyte 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte 'nnheader-with-unibyte)
+
   ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
   (defun nnheader-guess-mime-charset ()
   "Guess the default MIME charset from the language environment."

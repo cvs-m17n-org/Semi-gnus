@@ -1,3 +1,82 @@
+2002-04-29  Simon Josefsson  <jas@extundo.com>
+
+	* nnmail.el (nnmail-cache-insert): Accept optional group
+	parameter.
+
+	* nnimap.el (nnimap-retrieve-groups): Don't send STATUS when
+	n-r-g-a is disabled.
+
+2002-04-29  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-split-fancy): Fix doc.
+	(nnimap-split-fancy): Fix doc.
+
+	* nnimap.el (nnimap-retrieve-groups-asynchronous): New variable.
+	(nnimap-mailbox-info): New internal variable.
+	(nnimap-retrieve-groups): Implement faster new mail check.
+
+	* nnimap.el (nnimap-split-articles): Support
+	nnmail-cache-accepted-message-ids.
+	(nnimap-request-accept-article): Ditto.
+
+	* imap.el (imap-mailbox-status-asynch): New command.
+
+2002-04-29  Nevin Kapur  <nevin@jhu.edu>
+
+	* gnus.el (gnus-find-subscribed-addresses): Return nil when there
+	are no subscribed mail groups.
+        - Strip quoted names when comparing addresses
+
+2002-04-28  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-decode.el (mm-text-html-renderer): Change customize type to
+	const.
+
+	* gnus-msg.el (gnus-discouraged-post-methods): Fix typo.
+	(gnus-debug-exclude-variables): do.
+
+2002-04-27  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-article-mail): Use gnus-msg-mail instead.
+	Trivial change from Karl Pfl,Ad(Bsterer <sigurd@12move.de>.
+
+2002-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
+	
+	* dns.el (dns-make-network-process): New macro.
+	(query-dns): Use it.
+
+2002-04-27  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	
+	* gnus-msg.el (gnus-summary-reply): Remove unbound variable
+	article-buffer.
+
+	* mm-url.el (mm-url-package-name): New variable.
+	(mm-url-package-version): New variable.
+	(mm-url-insert-file-contents): Bind url-package-name and
+	url-package-version here.
+	* nnrss.el (nnrss-insert-w3): Move the bindings.
+
+	* nnrss.el (nnrss-insert-w3): Bind url-package-name and
+	url-package-version. Trivial change from Andrew J Cosgriff
+	<ajc@polydistortion.net>
+
+	* mm-decode.el (mm-save-part): Fill in file name when GUI saving
+	attachments. Trivial change from Peter 'Luna' Runestig
+	<peter@runestig.com>.
+
+2002-04-19  Jesper Harder  <harder@ifa.au.dk>
+
+	* nnkiboze.el (nnkiboze-request-scan): Call
+	nnkiboze-possibly-change-group.
+	(nnkiboze-generate-group): Use mm-with-unibyte to avoid encoding
+	problems.
+	(nnkiboze-generate-group): Set newsrc to the *highest* article
+	number kibozed, not the lowest.
+	
+2002-04-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (article-unsplit-urls): Allow trailing SPC.
+
 2002-04-24  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Dan Christensen <jdc+news@uwo.ca>.
 

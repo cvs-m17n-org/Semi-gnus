@@ -1003,7 +1003,7 @@ fi
 echo "configure:1004: checking where etc files should go" >&5
   if test -z "$etcdir"; then
         if test "$EMACS_FLAVOR" = "xemacs"; then
-      etcdir="\$(lispdir)/../etc/gnus"
+      etcdir="\$(lispdir)/../../etc"
     else
     etcdir="\$(lispdir)/../etc"
     fi
@@ -1012,8 +1012,23 @@ echo "configure:1004: checking where etc files should go" >&5
   
 
 
+  echo $ac_n "checking where the TeXinfo docs should go""... $ac_c" 1>&6
+echo "configure:1017: checking where the TeXinfo docs should go" >&5
+    if test "$infodir" = "\${prefix}/info"; then
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+      info_dir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-packages/info"
+    else
+      info_dir="\$(prefix)/info"
+    fi
+  else
+    info_dir=$infodir
+  fi
+  echo "$ac_t""$info_dir" 1>&6
+  
+
+
 echo $ac_n "checking for acceptable URL version""... $ac_c" 1>&6
-echo "configure:1017: checking for acceptable URL version" >&5
+echo "configure:1032: checking for acceptable URL version" >&5
 
 unset EMACS_cv_ACCEPTABLE_URL;
 unset EMACS_cv_SYS_url_dir;
@@ -1026,14 +1041,14 @@ else
 
 if test -z ""noecho""; then
 	echo $ac_n "checking for url-retrieve in url""... $ac_c" 1>&6
-echo "configure:1030: checking for url-retrieve in url" >&5
+echo "configure:1045: checking for url-retrieve in url" >&5
 fi
 library=`echo url | tr _ -`
 
 elisp="(progn (fmakunbound (quote url-retrieve)) (condition-case nil (progn (require (quote $library)) (fboundp (quote url-retrieve))) (error (prog1 nil (message \"$library not found\")))))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for url""... $ac_c" 1>&6
-echo "configure:1037: checking for url" >&5
+echo "configure:1052: checking for url" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_url+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1077,7 +1092,7 @@ if test "${EMACS_cv_ACCEPTABLE_URL}" = yes; then
 elisp="(file-name-directory (locate-library \"url\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for url_dir""... $ac_c" 1>&6
-echo "configure:1081: checking for url_dir" >&5
+echo "configure:1096: checking for url_dir" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_url_dir+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1119,7 +1134,7 @@ fi
 
 
 echo $ac_n "checking for acceptable W3 version""... $ac_c" 1>&6
-echo "configure:1123: checking for acceptable W3 version" >&5
+echo "configure:1138: checking for acceptable W3 version" >&5
 
 unset EMACS_cv_ACCEPTABLE_W3;
 unset EMACS_cv_SYS_w3_dir;
@@ -1132,14 +1147,14 @@ else
 
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3-form-encode-xwfu in w3_forms""... $ac_c" 1>&6
-echo "configure:1136: checking for w3-form-encode-xwfu in w3_forms" >&5
+echo "configure:1151: checking for w3-form-encode-xwfu in w3_forms" >&5
 fi
 library=`echo w3_forms | tr _ -`
 
 elisp="(progn (fmakunbound (quote w3-form-encode-xwfu)) (condition-case nil (progn (require (quote $library)) (fboundp (quote w3-form-encode-xwfu))) (error (prog1 nil (message \"$library not found\")))))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_forms""... $ac_c" 1>&6
-echo "configure:1143: checking for w3_forms" >&5
+echo "configure:1158: checking for w3_forms" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_w3_forms+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1183,7 +1198,7 @@ if test "${EMACS_cv_ACCEPTABLE_W3}" = yes; then
 elisp="(file-name-directory (locate-library \"w3-forms\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_dir""... $ac_c" 1>&6
-echo "configure:1187: checking for w3_dir" >&5
+echo "configure:1202: checking for w3_dir" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_w3_dir+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1230,7 +1245,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1234: checking for $ac_word" >&5
+echo "configure:1249: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_path_LATEX+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1267,7 +1282,7 @@ done
 test -n "$LATEX" || LATEX="no"
 
 echo $ac_n "checking for available fonts""... $ac_c" 1>&6
-echo "configure:1271: checking for available fonts" >&5
+echo "configure:1286: checking for available fonts" >&5
 # Check whether --with-fonts or --without-fonts was given.
 if test "${with_fonts+set}" = set; then
   withval="$with_fonts"
@@ -1355,7 +1370,7 @@ fi
 
   if test ${EMACS_FLAVOR} = xemacs; then
     echo $ac_n "checking where the XEmacs package is""... $ac_c" 1>&6
-echo "configure:1359: checking where the XEmacs package is" >&5
+echo "configure:1374: checking where the XEmacs package is" >&5
     # Check whether --with-packagedir or --without-packagedir was given.
 if test "${with_packagedir+set}" = set; then
   withval="$with_packagedir"
@@ -1378,7 +1393,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1382: checking for PACKAGEDIR" >&5
+echo "configure:1397: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1417,7 +1432,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1421: checking for PACKAGEDIR" >&5
+echo "configure:1436: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1454,7 +1469,7 @@ if test "${with_addpath+set}" = set; then
   withval="$with_addpath"
   if test "$withval" != yes -a -n "$withval"; then
       echo $ac_n "checking where to find the additional elisp libraries""... $ac_c" 1>&6
-echo "configure:1458: checking where to find the additional elisp libraries" >&5
+echo "configure:1473: checking where to find the additional elisp libraries" >&5
       ADDITIONAL_LOAD_PATH=$withval
       echo "$ac_t""$ADDITIONAL_LOAD_PATH" 1>&6
     fi
@@ -1619,6 +1634,7 @@ s%@EMACS@%$EMACS%g
 s%@XEMACS@%$XEMACS%g
 s%@lispdir@%$lispdir%g
 s%@etcdir@%$etcdir%g
+s%@info_dir@%$info_dir%g
 s%@HAVE_url@%$HAVE_url%g
 s%@URL@%$URL%g
 s%@HAVE_w3_forms@%$HAVE_w3_forms%g
