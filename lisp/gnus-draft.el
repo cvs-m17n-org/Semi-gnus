@@ -33,7 +33,6 @@
 (require 'message)
 (require 'gnus-msg)
 (require 'nndraft)
-(require 'gnus-agent)
 (eval-when-compile (require 'cl))
 
 ;;; Draft minor mode
