@@ -1,3 +1,19 @@
+1999-08-16  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-draft.el (gnus-group-send-drafts): Say which message
+	is being sent.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-completing-read-symbol): New
+	function from Nana-gnus.
+	(gnus-setup-for-offline): Rewrite. Bind all temporary variables.
+	(gnus-ofsetup-update-setting-file): Rename from
+	`gnus-ofsetup-write-setting-file'.
+	(gnus-ofsetup-find-parameters): Rename from
+	`gnus-ofsetup-parameters'.
+	(gnus-ofsetup-customize-done): Rewrite.
+
 1999-08-15  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* pop3.el: Sync up with pop3.el version 2.04.
