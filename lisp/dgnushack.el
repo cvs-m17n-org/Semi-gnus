@@ -246,10 +246,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (defalias 'update-autoloads-from-directory 'ignore))
 (autoload 'texinfo-parse-line-arg "texinfmt")
 
-(unless (fboundp 'with-temp-buffer)
-  ;; Pickup some macros.
-  (require 'emu))
-
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
 (defalias 'nndb-request-article 'ignore)
