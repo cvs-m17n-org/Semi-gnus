@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.8.3 Manual
+@settitle Semi-gnus 6.8.4 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.8.3 Manual
+@title Semi-gnus 6.8.4 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.8.3.
+This manual corresponds to Semi-gnus 6.8.4.
 
 @end ifinfo
 
@@ -2683,8 +2683,8 @@ Move all groups that match some regular expression to a topic
 Copy all groups that match some regular expression to a topic
 (@code{gnus-topic-copy-matching}).
 
-@item T h
-@kindex T h (Topic)
+@item T H
+@kindex T H (Topic)
 @findex gnus-topic-toggle-display-empty-topics
 Toggle hiding empty topics
 (@code{gnus-topic-toggle-display-empty-topics}).
@@ -3834,7 +3834,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung muﬂ sein!
+@code{postmaster}.  Ordnung mu(I_(B sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -9369,10 +9369,6 @@ insert sub-expressions from the matched text.  For instance:
 ("list.\\1" "From:.*\\(.*\\)-list@@majordomo.com")
 @end lisp
 
-If the first element is the special symbol @code{junk}, then messages
-that match the regexp will disappear into the aether.  Use with
-extreme caution.
-
 The second element can also be a function.  In that case, it will be
 called narrowed to the headers with the first element of the rule as the
 argument.  It should return a non-@code{nil} value if it thinks that the
@@ -9644,7 +9640,7 @@ be stored in one or more groups.
 
 @item
 @code{junk}: If the split is the symbol @code{junk}, then don't save
-this message.
+this message. Use with extreme caution.
 
 @item
 @var{(: function arg1 arg2 ...)}:  If the split is a list, and the first
@@ -10971,7 +10967,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'Ítre} is to
+providers if they were to do this---their @emph{raison d'$BsU(Bre} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -13379,7 +13375,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx ¨
+@itemx (I,(B
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -13509,12 +13505,12 @@ use them in any sensible way.
 
 @vindex gnus-decay-scores
 @findex gnus-decay-score
-@vindex gnus-score-decay-function
+@vindex gnus-decay-score-function
 Gnus provides a mechanism for decaying scores to help with this problem.
 When score files are loaded and @code{gnus-decay-scores} is
 non-@code{nil}, Gnus will run the score files through the decaying
 mechanism thereby lowering the scores of all non-permanent score rules.
-The decay itself if performed by the @code{gnus-score-decay-function}
+The decay itself if performed by the @code{gnus-decay-score-function}
 function, which is @code{gnus-decay-score} by default.  Here's the
 definition of that function:
 
@@ -15389,7 +15385,7 @@ On July 28th 1996 work on Red Gnus was begun, and it was released on
 January 25th 1997 (after 84 releases) as ``Gnus 5.4'' (67 releases).
 
 On September 13th 1997, Quassia Gnus was started and lasted 37
-releases.  If was released as ``Gnus 5.6.26' on March 8th 1998.
+releases.  If was released as ``Gnus 5.6.27' on March 8th 1998.
 
 If you happen upon a version of Gnus that has a prefixed name --
 ``(ding) Gnus'', ``September Gnus'', ``Red Gnus'', ``Quassia Gnus'' --
@@ -15665,7 +15661,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-FranÁois Pinard---many, many interesting and thorough bug reports, as
+Fran$BmP(Bis Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -15678,7 +15674,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David KÂgedal,
+David K$BiH(Bedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -15749,7 +15745,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-FranÁois Felix Ingrand,
+Fran$BmP(Bis Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -15866,7 +15862,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.26.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6.27.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16401,7 +16397,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.26:
+New features in Gnus 5.6.27:
 
 @itemize @bullet
 
@@ -17169,8 +17165,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at nÂr du bruker `gnus-startup-file' som prefix (FOO) til Â lete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den vÊre en
+ tanken var at n$BiS(B du bruker `gnus-startup-file' som prefix (FOO) til íÈÅlete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v$BkS(Be en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17243,8 +17239,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde vÊre en mÂte Â si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  SÂ kunne score-regler legges til den
+Ja, det burde v$BkS(Be en m$BiU(Be íÈÅsi slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  SíÈÅkunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -17577,7 +17573,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt Â slette den dersom teksten matcher
+Selv ville jeg nok ha valgt íÈÅslette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
