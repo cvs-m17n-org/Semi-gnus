@@ -4920,6 +4920,9 @@ For example:
 		   (when (string-match (pop list) type)
 		     (throw 'found t)))))))
 	(highlightp (gnus-visual-p 'article-highlight 'highlight))
+	(entity (static-unless (featurep 'xemacs)
+		  (when (eq 'head condition)
+		    (get-text-property (point-min) 'mime-view-entity))))
 	val elem)
     (gnus-run-hooks 'gnus-part-display-hook)
     (unless gnus-inhibit-treatment
@@ -4931,7 +4934,13 @@ For example:
 		   (or (not (get (car elem) 'highlight))
 		       highlightp))
 	  (save-restriction
-	    (funcall (cadr elem))))))))
+	    (funcall (cadr elem)))))
+      ;; FSF Emacsen does not inherit the existing text properties
+      ;; in the new text, so we should do it for `mime-view-entity'.
+      (static-unless (featurep 'xemacs)
+	(when entity
+	  (put-text-property (point-min) (point-max)
+			     'mime-view-entity entity))))))
 
 ;; Dynamic variables.
 (defvar part-number)
