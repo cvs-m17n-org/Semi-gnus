@@ -250,7 +250,7 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Quassia Gnus v0.26)" gnus-version-number)
+  (format "Semi-gnus %s (based on Quassia Gnus v0.27)" gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1373,6 +1373,7 @@ want."
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
 (defvar gnus-original-article-buffer " *Original Article*")
 (defvar gnus-newsgroup-name nil)
+(defvar gnus-ephemeral-servers nil)
 
 (defvar gnus-agent nil
   "Whether we want to use the Gnus agent or not.")
