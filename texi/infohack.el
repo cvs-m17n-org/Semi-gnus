@@ -25,10 +25,11 @@
 
 ;;; Code:
 
-(let ((default-directory (expand-file-name "../lisp/"))
-      (features (cons 'w3-forms (copy-sequence features))))
+(let ((default-directory (expand-file-name "../lisp/")))
   ;; Adjust `load-path' for APEL.
-  (load-file "dgnushack.el"))
+  (load-file "dgnushack.el")
+  ;; Replace "./" with "../lisp/" in `load-path'.
+  (setq load-path (mapcar 'expand-file-name load-path)))
 (load-file (expand-file-name "ptexinfmt.el" "./"))
 
 (defun infohack-remove-unsupported ()
