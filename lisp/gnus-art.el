@@ -938,13 +938,14 @@ See the manual for details."
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
-  '((gnus-treat-strip-banner gnus-article-strip-banner)
+  '((gnus-treat-decode-article-as-default-mime-charset
+     gnus-article-decode-article-as-default-mime-charset)
+    (gnus-treat-strip-banner gnus-article-strip-banner)
     (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
     (gnus-treat-buttonize gnus-article-add-buttons)
     (gnus-treat-fill-article gnus-article-fill-cited-article)
     (gnus-treat-fill-long-lines gnus-article-fill-long-lines)
     (gnus-treat-strip-cr gnus-article-remove-cr)
-    (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
@@ -954,6 +955,7 @@ See the manual for details."
     (gnus-treat-strip-pgp gnus-article-hide-pgp)
     (gnus-treat-strip-pem gnus-article-hide-pem)
     (gnus-treat-highlight-headers gnus-article-highlight-headers)
+    (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
     (gnus-treat-date-ut gnus-article-date-ut)
@@ -972,9 +974,7 @@ See the manual for details."
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
     (gnus-treat-display-smileys gnus-smiley-display)
     (gnus-treat-display-picons gnus-article-display-picons)
-    (gnus-treat-play-sounds gnus-earcon-display)
-    (gnus-treat-decode-article-as-default-mime-charset
-     gnus-article-decode-article-as-default-mime-charset)))
+    (gnus-treat-play-sounds gnus-earcon-display)))
 
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
@@ -2938,7 +2938,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (goto-char (point-max)))
     (while (and (not (eobp))
 		entity
-		(setq next 
+		(setq next
 		      (or (next-single-property-change (point)
 						       'mime-view-entity)
 			  (point-max))))
@@ -2951,32 +2951,31 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			     (mime-content-type-primary-type types)
 			     (mime-content-type-subtype types)))))
       (if (string-equal type "message/rfc822")
-	  (let ((start (point)) last-children)
-	    (setq last-children
-		  (nth (1- (length (mime-entity-children entity)))
-		       (mime-entity-children entity)))
-	    (while (and 
-		    (not (eq last-children
-			     (get-text-property (point) 'mime-view-entity)))
-		    (setq next
-			  (next-single-property-change (point)
-						       'mime-view-entity)))
-	      (goto-char next))
-	    (setq next 
-		  (1- (or (next-single-property-change (point)
-						       'mime-view-entity)
-			  (point-max))))
-	    (goto-char start)
+	  (progn
+	    (setq next (point))
+	    (let ((children (mime-entity-children entity))
+		  last-children)
+	      (when children
+		(setq last-children (nth (1- (length children)) children))
+		(while
+		    (and
+		     (not (eq last-children
+			      (get-text-property next 'mime-view-entity)))
+		     (setq next
+			   (next-single-property-change next
+							'mime-view-entity))))))
+	    (setq next (or (next-single-property-change next 'mime-view-entity)
+			   (point-max)))
 	    (save-restriction
-	      (narrow-to-region start next )
-	      (gnus-article-prepare-mime-display))
-	    (goto-char (1+ next))
+	      (narrow-to-region (point) next)
+	      (gnus-article-prepare-mime-display)
+	      (goto-char (point-max)))
 	    (setq entity (get-text-property (point) 'mime-view-entity)))
 	(save-restriction
 	  (narrow-to-region (point) next)
 	  ;; Kludge. We have to count true number, but for now,
 	  ;; part number is here only to achieve `last'.
-	  (gnus-treat-article nil 1 
+	  (gnus-treat-article nil 1
 			      (if (eq entity last-entity)
 				  1 2)
 			      type)
