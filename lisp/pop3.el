@@ -215,7 +215,9 @@ Return the response string if optional second argument is non-nil."
 	    (setq date (format-time-string
 			"%a %b %e %T %Y"
 			(if date
-			    (apply 'encode-time (parse-time-string date))
+			    (condition-case nil
+				(apply 'encode-time (parse-time-string date))
+			      (error (current-time)))
 			  (current-time))))
 	    (setq From_ (format "\nFrom %s  %s\n" from date))
 	    (while (string-match "," From_)

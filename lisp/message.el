@@ -2356,22 +2356,24 @@ the user from the mailer."
 				    (car elem))))
 			      (setq success (funcall (caddr elem) arg)))))
 	    (setq sent t))))
-      (when (and success sent)
-	(message-do-fcc)
-	;;(when (fboundp 'mail-hist-put-headers-into-history)
-	;; (mail-hist-put-headers-into-history))
-	(save-excursion
-	  (run-hooks 'message-sent-hook))
-	(message "Sending...done")
-	;; Mark the buffer as unmodified and delete autosave.
-	(set-buffer-modified-p nil)
-	(delete-auto-save-file-if-necessary t)
-	(message-disassociate-draft)
-	;; Delete other mail buffers and stuff.
-	(message-do-send-housekeeping)
-	(message-do-actions message-send-actions)
-	;; Return success.
-	t))))
+      (prog1
+	  (when (and success sent)
+	    (message-do-fcc)
+	    ;;(when (fboundp 'mail-hist-put-headers-into-history)
+	    ;; (mail-hist-put-headers-into-history))
+	    (save-excursion
+	      (run-hooks 'message-sent-hook))
+	    (message "Sending...done")
+	    ;; Mark the buffer as unmodified and delete autosave.
+	    (set-buffer-modified-p nil)
+	    (delete-auto-save-file-if-necessary t)
+	    (message-disassociate-draft)
+	    ;; Delete other mail buffers and stuff.
+	    (message-do-send-housekeeping)
+	    (message-do-actions message-send-actions)
+	    ;; Return success.
+	    t)
+	(kill-buffer message-encoding-buffer)))))
 
 (defun message-send-via-mail (arg)
   "Send the current message via mail."
@@ -4806,9 +4808,14 @@ regexp varstr."
 
 (defun message-maybe-encode ()
   (when message-mime-mode
+    ;; Inherit the buffer local variable `mime-edit-pgp-processing'.
+    (let ((pgp-processing (with-current-buffer message-edit-buffer
+			    mime-edit-pgp-processing)))
+      (setq mime-edit-pgp-processing pgp-processing))
     (run-hooks 'mime-edit-translate-hook)
     (if (catch 'mime-edit-error
 	  (save-excursion
+	    (mime-edit-pgp-enclose-buffer)
 	    (mime-edit-translate-body)
 	    ))
 	(error "Translation error!")
