@@ -2585,10 +2585,8 @@ marks of articles."
 	   (string-match gnus-ignored-from-addresses
 			 (mail-header-from header)))
       (concat "-> "
-	      (or (car (funcall gnus-extract-address-components
-				(funcall
-				 gnus-decode-encoded-word-function to)))
-		  (funcall gnus-decode-encoded-word-function to))))
+	      (or (car (funcall gnus-extract-address-components to))
+		  to)))
      ((and newsgroups
 	   gnus-ignored-from-addresses
 	   (string-match gnus-ignored-from-addresses
