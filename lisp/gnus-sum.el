@@ -1080,15 +1080,18 @@ gnus-simplify-subject-fuzzy-regexp."
 (defun gnus-simplify-subject-fuzzy (subject)
   "Simplify a subject string fuzzily.
 See `gnus-simplify-buffer-fuzzy' for details."
-  (save-excursion
-    (gnus-set-work-buffer)
-    (let ((case-fold-search t))
-      ;; Remove uninteresting prefixes.
-      (when (and gnus-simplify-ignored-prefixes
-		 (string-match gnus-simplify-ignored-prefixes subject))
-	(setq subject (substring subject (match-end 0))))
+  (let ((case-fold-search t)
+	;; Save group parameter.
+	(fuzzy-regexp gnus-simplify-subject-fuzzy-regexp))
+    ;; Remove uninteresting prefixes.
+    (when (and gnus-simplify-ignored-prefixes
+	       (string-match gnus-simplify-ignored-prefixes subject))
+      (setq subject (substring subject (match-end 0))))
+    (save-excursion
+      (gnus-set-work-buffer)
       (insert subject)
-      (inline (gnus-simplify-buffer-fuzzy))
+      (let ((gnus-simplify-subject-fuzzy-regexp fuzzy-regexp))
+	(inline (gnus-simplify-buffer-fuzzy)))
       (buffer-string))))
 
 (defsubst gnus-simplify-subject-fully (subject)
