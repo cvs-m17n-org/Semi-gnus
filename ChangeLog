@@ -1,3 +1,20 @@
+1999-05-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 14.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Narrow to
+	header with trailing newline instead of the use of
+	`std11-narrow-to-header'.
+	(article-date-ut): Use `text-property-any' instead of
+	`next-single-property-change'.
+	(article-toggle-headers): Use `text-property-any' and
+	`text-property-not-all' instead of `get-text-property' or
+	`next-single-property-change'; use `gnus-hidden-properties' instead
+	of the property `invisible' with the function `add-text-properties'
+	or `remove-text-properties'; use `article-hide-headers' instead of
+	`gnus-article-maybe-hide-headers'; re-display X-Face image under
+	XEmacs after sorting fields.
+
 1999-05-25  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
