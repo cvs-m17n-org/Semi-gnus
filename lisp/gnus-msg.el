@@ -513,14 +513,16 @@ If SILENT, don't prompt the user."
 		   (list gnus-post-method)))
 	       gnus-secondary-select-methods
 	       (mapcar 'cdr gnus-server-alist)
+	       gnus-opened-servers
 	       (list gnus-select-method)
 	       (list group-method)))
 	     method-alist post-methods method)
 	;; Weed out all mail methods.
 	(while methods
 	  (setq method (gnus-server-get-method "" (pop methods)))
-	  (when (or (gnus-method-option-p method 'post)
-		    (gnus-method-option-p method 'post-mail))
+	  (when (and (or (gnus-method-option-p method 'post)
+			 (gnus-method-option-p method 'post-mail))
+		     (not (member method post-methods)))
 	    (push method post-methods)))
 	;; Create a name-method alist.
 	(setq method-alist
