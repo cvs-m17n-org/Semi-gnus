@@ -68,16 +68,16 @@
 	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
     form))
 
-(when (< emacs-major-version 20)
-  ;; Bind functions defined by `defun-maybe'.
-  (put 'defun-maybe 'byte-hunk-handler 'byte-compile-file-form-defun-maybe)
-  (defun byte-compile-file-form-defun-maybe (form)
-    (if (memq 'unresolved byte-compile-warnings)
-	(setq byte-compile-function-environment
-	      (cons (cons (nth 1 form)
-			  (cons 'lambda (cdr (cdr form))))
-		    byte-compile-function-environment)))
-    form))
+;; Bind functions defined by `defun-maybe'.
+(put 'defun-maybe 'byte-hunk-handler 'byte-compile-file-form-defun-maybe)
+(defun byte-compile-file-form-defun-maybe (form)
+  (if (and (not (fboundp (nth 1 form)))
+	   (memq 'unresolved byte-compile-warnings))
+      (setq byte-compile-function-environment
+	    (cons (cons (nth 1 form)
+			(cons 'lambda (cdr (cdr form))))
+		  byte-compile-function-environment)))
+  form)
 
 (condition-case nil
     :symbol-for-testing-whether-colon-keyword-is-available-or-not
