@@ -461,9 +461,21 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
 	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
 	      "nnwfm.el" "nnrss.el"))
-	  (condition-case nil
+	  (condition-case code
+	      (progn (require 'mh-e) nil)
+	    (error
+	     (message "No mh-e: %s %s (ignored)" code (locate-library "mh-e"))
+	     '("gnus-mh.el")))
+	  (condition-case code
+	      (progn (require 'xml) nil)
+	    (error
+	     (message "No xml: %s %s (ignored)" code (locate-library "xml"))
+	     '("nnrss.el")))
+	  (condition-case code
 	      (progn (require 'bbdb) nil)
-	    (error '("gnus-bbdb.el")))
+	    (error
+	     (message "No bbdb: %s %s (ignored)" code (locate-library "bbdb"))
+	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
 	    '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
 	      "nnheaderxm.el" "smiley.el"))
