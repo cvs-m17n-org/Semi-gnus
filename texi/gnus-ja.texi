@@ -10670,14 +10670,14 @@ ISP $B$,(B @acronym{POP}-before-@acronym{SMTP} $B$NG'>Z$rMW5a$7$F$$$k>l9g$KM-
 @vindex gnus-user-agent
 @cindex User-Agent
 
-($BLuCm(B: T-gnus $B$G$O8=:_$3$NJQ?t$K$h$k@)8f$O5!G=$7$^$;$s!#(B) $B$3$NJQ?t$O!"$I(B
-$B$N>pJs$,(B User-Agent $B%X%C%@!<$KDDNs$5$l$k$+$r@)8f$7$^$9!#$=$l$O<!$N%7%s%\(B
-$B%k$^$?$OJ8;zNs$N$&$A$N$I$l$+$G$"$k$3$H$,$G$-$^$9(B: @code{gnus} (Gnus $B$N%P!<(B
-$B%8%g%s$N$_(B)$B!"(B@code{emacs-gnus} (Emacs $B$H(B Gnus $B$N%P!<%8%g%s$@$1(B)$B!"(B
-@code{emacs-gnus-config} (@code{emacs-gnus} $B$HF1$8!\%7%9%F%`9=@.(B)$B!"(B
-@code{emacs-gnus-type} (@code{emacs-gnus}) $B$HF1$8!\%7%9%F%`%?%$%W(B)$B!"$^$?(B
-$B$O9%$_$NJ8;zNs!#$3$l$rJ8;zNs$K$9$k$H$-$O!"@5$7$$%U%)!<%^%C%H$K$J$C$F$$$k(B
-$B$3$H$r3N$+$a$F2<$5$$(B (RFC2616 $B;2>H(B)$B!#(B
+$B$3$NJQ?t$O!"$I$N>pJs$,(B User-Agent $B%X%C%@!<$KDDNs$5$l$k$+$r@)8f$7$^$9!#(B
+$B$=$l$O<!$N%7%s%\%k$^$?$OJ8;zNs$N$&$A$N$I$l$+$G$"$k$3$H$,$G$-$^$9(B:
+@code{gnus} (Gnus $B$N%P!<%8%g%s$N$_(B)$B!"(B@code{emacs-gnus} (Emacs $B$H(B Gnus
+$B$N%P!<%8%g%s$@$1(B)$B!"(B@code{emacs-gnus-config} (@code{emacs-gnus} $B$HF1$8(B
+$B!\%7%9%F%`9=@.(B)$B!"(B@code{emacs-gnus-type} (@code{emacs-gnus}) $B$HF1$8!\%7(B
+$B%9%F%`%?%$%W(B)$B!"(B@code{gnus-mime-edit} (Gnus $B$H(B MIME Edit $B$J$I$N%P!<%8%g(B
+$B%s(B)$B!"$^$?$O9%$_$NJ8;zNs!#$3$l$rJ8;zNs$K$9$k$H$-$O!"@5$7$$%U%)!<%^%C%H(B
+$B$K$J$C$F$$$k$3$H$r3N$+$a$F2<$5$$(B (RFC2616 $B;2>H(B)$B!#(B
 @end table
 
 $B$"$J$?$O<+J,$,Aw$k%a%C%;!<%8$NDV$j$rD4$Y$?$$$H;W$&$+$bCN$l$^$;$s!#$b$7$/(B

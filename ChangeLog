@@ -1,3 +1,14 @@
+2003-05-14  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/gnus-msg.el (gnus-user-agent): Added `gnus-mime-edit'.
+	(gnus-inews-add-send-actions): Use `gnus-message-make-user-agent'
+	instead of `gnus-extended-version'.
+	(xemacs-codename): Defvar while compiling.
+	(gnus-message-make-user-agent): Use `gnus-user-agent'.
+
+	* lisp/message.el (message-make-user-agent): If the "User-Agent" field
+	has alread exist, remove it.
+
 2003-05-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.16.2 revision 00.

@@ -5280,26 +5280,14 @@ subscribed address (and not the additional To and Cc header contents)."
 
 (defun message-make-user-agent ()
   "Return user-agent info if the value `message-user-agent' is non-nil. If the
-\"User-Agent\" field has already exist, it's value will be added in the return
-string."
+\"User-Agent\" field has already exist, remove it."
   (when message-user-agent
     (save-excursion
       (goto-char (point-min))
-      (let ((case-fold-search t)
-	    user-agent start p end)
-	(if (re-search-forward
-	     (concat "^User-Agent:[\t ]*\\("
-		     (regexp-quote gnus-product-name)
-		     "/[0-9.]+\\([ \t\r\n]*([^)]+)\\)*\\)?[\t ]*")
-	     nil t)
-	    (progn
-	      (setq start (match-beginning 0)
-		    p (match-end 0)
-		    end (std11-field-end)
-		    user-agent (buffer-substring-no-properties p end))
-	      (delete-region start (1+ end))
-	      (concat message-user-agent " " user-agent))
-	  message-user-agent)))))
+      (let ((case-fold-search t))
+	(when (re-search-forward "^User-Agent:[\t ]*" nil t)
+	  (delete-region (match-beginning 0) (1+ (std11-field-end)))))))
+  message-user-agent)
 
 (defun message-idna-inside-rhs-p ()
   "Return t iff point is inside a RHS (heuristically).

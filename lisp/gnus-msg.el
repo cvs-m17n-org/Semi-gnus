@@ -308,16 +308,19 @@ If nil, the address field will always be empty after invoking
   :group 'gnus-message
   :type 'boolean)
 
-(defcustom gnus-user-agent 'emacs-gnus-type
+(defcustom gnus-user-agent 'gnus-mime-edit
   "Which information should be exposed in the User-Agent header.
 
 It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
 \(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
 `emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
-`emacs-gnus' plus system type\) or a custom string.  If you set it to a
-string, be sure to use a valid format, see RFC 2616."
+`emacs-gnus' plus system type\), `gnus-mime-edit' \(show Gnus version and
+MIME Edit User-Agent\) or a custom string.  If you set it to a string,
+be sure to use a valid format, see RFC 2616."
   :group 'gnus-message
   :type '(choice
+	  (item :tag "Show Gnus version and MIME Edit User-Agent"
+		gnus-mime-edit)
 	  (item :tag "Show Gnus and Emacs versions and system type"
 		emacs-gnus-type)
 	  (item :tag "Show Gnus and Emacs versions and system configuration"
@@ -559,7 +562,7 @@ Gcc: header for archiving purposes."
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-user-agent (gnus-extended-version))
+  (setq message-user-agent (gnus-message-make-user-agent))
   (unless message-use-multi-frames
     (message-add-action
      `(if (gnus-buffer-exists-p ,buffer)
@@ -1122,6 +1125,10 @@ If SILENT, don't prompt the user."
      (t gnus-select-method))))
 
 
+;; Dummies to avoid byte-compile warning.
+(eval-when-compile
+  (defvar xemacs-codename))
+
 (defun gnus-message-make-user-agent (&optional include-mime-info max-column
 						 newline-product)
   "Return a user-agent info.  If INCLUDE-MIME-INFO is non-nil and the
@@ -1145,12 +1152,56 @@ Here is an example of how to use this function:
 			(gnus-message-make-user-agent t 76 'soft)
 			\"\\n\")))))
 "
-  (let ((user-agent (if (and include-mime-info
-			     (boundp 'mime-edit-user-agent-value))
-			(concat (gnus-extended-version)
-				" "
-				mime-edit-user-agent-value)
-		      (gnus-extended-version))))
+  (let ((gnus-v (gnus-extended-version))
+	user-agent)
+    (cond ((and include-mime-info
+		(boundp 'mime-edit-user-agent-value))
+	   (setq user-agent (concat gnus-v " " mime-edit-user-agent-value)))
+	  ((eq gnus-user-agent 'gnus-mime-edit)
+	   (setq user-agent
+		 (if (boundp 'mime-edit-user-agent-value)
+		     (concat gnus-v " " mime-edit-user-agent-value)
+		   gnus-v)))
+	  (t
+	   (let* ((system-v
+		   (cond
+		    ((eq gnus-user-agent 'emacs-gnus-config)
+		     system-configuration)
+		    ((eq gnus-user-agent 'emacs-gnus-type)
+		     (symbol-name system-type))
+		    (t nil)))
+		  (emacs-v
+		   (cond
+		    ((eq gnus-user-agent 'gnus)
+		     nil)
+		    ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$"
+				   emacs-version)
+		     (concat "Emacs/" (match-string 1 emacs-version)
+			     (if system-v
+				 (concat " (" system-v ")")
+			       "")))
+		    ((string-match
+		      "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
+		      emacs-version)
+		     (concat
+		      (match-string 1 emacs-version)
+		      (format "/%d.%d" emacs-major-version emacs-minor-version)
+		      (if (match-beginning 3)
+			  (match-string 3 emacs-version)
+			"")
+		      (if (boundp 'xemacs-codename)
+			  (concat
+			   " (" xemacs-codename
+			   (if system-v
+			       (concat ", " system-v ")")
+			     ")"))
+			"")))
+		    (t emacs-version))))
+	     (setq user-agent (if (stringp gnus-user-agent)
+				  gnus-user-agent
+				(concat gnus-v
+					(when emacs-v
+					  (concat " " emacs-v))))))))
     (when max-column
       (unless (natnump max-column)
 	(setq max-column 76))
