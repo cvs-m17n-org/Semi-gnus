@@ -2209,39 +2209,33 @@ If SOLID (the prefix), create a solid group."
   "Create a nnshimbun group."
   (interactive)
   (require 'nnshimbun)
-  (let* ((default-type
-	   (or (car gnus-group-shimbun-type-history)
-	       (symbol-name (caar nnshimbun-type-definition))))
+  (let* ((minibuffer-setup-hook (append minibuffer-setup-hook
+					'(beginning-of-line)))
 	 (type
-	  (gnus-string-or
-	   (completing-read
-	    (format "Shimbun type (default %s): " default-type)
-	    (mapcar (lambda (elem) (list (symbol-name (car elem))))
-		    nnshimbun-type-definition)
-	    nil t nil 'gnus-group-shimbun-type-history)
-	   default-type))
-	 (default-address
-	   (cdr (assq 'address
-		      (assq (intern type) nnshimbun-type-definition))))
+	  (completing-read
+	   "Shimbun type: "
+	   (mapcar (lambda (elem) (list (symbol-name (car elem))))
+		   nnshimbun-type-definition)
+	   nil t
+	   (or (car gnus-group-shimbun-type-history)
+	       (symbol-name (caar nnshimbun-type-definition)))
+	   'gnus-group-shimbun-type-history))
 	 (address
-	  (gnus-string-or
-	   (read-string
-	    (if default-address
-		(format "Shimbun address (default %s): " default-address)
-	      "Shimbun address: ")
-	    nil 'gnus-group-shimbun-address-history)
-	   default-address))
+	  (read-string
+	   "Shimbun address: "
+	   (cdr (assq 'address
+		      (assq (intern type) nnshimbun-type-definition)))
+	   'gnus-group-shimbun-address-history))
 	 (group
 	  (completing-read
 	   "Group name: "
 	   (mapcar (lambda (elem) (list elem))
-		   (cdr (assq 'groups (cdr (assq (intern type) nnshimbun-type-definition)))))
+		   (cdr (assq 'groups (cdr (assq (intern type)
+						 nnshimbun-type-definition)))))
 	   nil t nil)))
-    (setq gnus-group-shimbun-type-history
-	  (delete "" gnus-group-shimbun-type-history)
-	  gnus-group-shimbun-address-history
-	  (delete "" gnus-group-shimbun-address-history))
-    (gnus-group-make-group group `(nnshimbun ,address (nnshimbun-type ,(intern type))))))
+    (gnus-group-make-group group
+			   `(nnshimbun ,address
+				       (nnshimbun-type ,(intern type))))))
 
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.
