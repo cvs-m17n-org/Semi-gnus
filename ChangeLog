@@ -1,5 +1,16 @@
 2001-12-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-namazu.el (gnus-namazu-search): Slightly modified for
+	Oort Gnus v0.03.
+
+	* lisp/gnus.el (top): Add autoload of `gnus-namazu-search'.
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Define "\C-c\C-n" as
+	`gnus-namazu-search'.
+
+	* lisp/gnus-group.el (gnus-group-mode-map): Define "\C-c\C-n" as
+	`gnus-namazu-search'.
+
 	* lisp/gnus-namazu.el: New file.
 
 2001-09-27  Katsumi Yamaoka  <yamaoka@jpl.org>

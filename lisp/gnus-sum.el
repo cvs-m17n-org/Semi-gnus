@@ -1512,6 +1512,7 @@ increase the score of each group you read."
     "\M-\C-e" gnus-summary-edit-parameters
     "\M-\C-a" gnus-summary-customize-parameters
     "\C-c\C-b" gnus-bug
+    "\C-c\C-n" gnus-namazu-search
     "*" gnus-cache-enter-article
     "\M-*" gnus-cache-remove-article
     "\M-&" gnus-summary-universal-argument

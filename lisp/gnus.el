@@ -2123,6 +2123,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	     (subrp (symbol-function 'base64-encode-string)))
   (require 'base64))
 
+;; To search articles with Namazu.
+(autoload 'gnus-namazu-search "gnus-namazu" nil t)
+
 ;; To make shimbun groups.
 (autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
 

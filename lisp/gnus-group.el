@@ -583,6 +583,7 @@ simple manner.")
     "<" beginning-of-buffer
     ">" end-of-buffer
     "\C-c\C-b" gnus-bug
+    "\C-c\C-n" gnus-namazu-search
     "\C-c\C-s" gnus-group-sort-groups
     "t" gnus-topic-mode
     "\C-c\M-g" gnus-activate-all-groups
