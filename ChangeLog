@@ -1,3 +1,7 @@
+2001-01-13  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
+
+	* Makefile.in (install-package-lisp): Specify EMACS=$(XEMACS).
+
 2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-copy-article-buffer): Remove smiley
