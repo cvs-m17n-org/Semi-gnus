@@ -5036,16 +5036,15 @@ If NOW, use that time instead."
     (let ((from (mail-header-from message-reply-headers))
 	  (date (mail-header-date message-reply-headers))
 	  (msg-id (mail-header-message-id message-reply-headers)))
-      (when msg-id
-	(concat msg-id
-		(when from
-		  (let ((pair (std11-extract-address-components from)))
-		    (concat "\n ("
-			    (or (car pair) (cadr pair))
-			    "'s message of \""
-			    (if (or (not date) (string= date ""))
-				"(unknown date)" date)
-			    "\")"))))))))
+      (when from
+	(let ((name (std11-extract-address-components from)))
+	  (concat msg-id (if msg-id " (")
+		  (or (car name)
+		      (nth 1 name))
+		  "'s message of \""
+		  (if (or (not date) (string= date ""))
+		      "(unknown date)" date)
+		  "\"" (if msg-id ")")))))))
 
 (defun message-make-distribution ()
   "Make a Distribution header."
