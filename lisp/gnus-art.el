@@ -1029,7 +1029,7 @@ See the manual for details."
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
-  '((gnus-treat-decode-article-as-default-mime-charset
+  `((gnus-treat-decode-article-as-default-mime-charset
      gnus-article-decode-article-as-default-mime-charset)
     (gnus-treat-strip-banner gnus-article-strip-banner)
     (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
