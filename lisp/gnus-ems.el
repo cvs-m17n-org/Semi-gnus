@@ -164,14 +164,7 @@
       (while funcs
 	(unless (fboundp (car funcs))
 	  (fset (car funcs) 'gnus-dummy-func))
-	(setq funcs (cdr funcs))))))
-  (unless (fboundp 'file-regular-p)
-    (defun file-regular-p (file)
-      (and (not (file-directory-p file))
-	   (not (file-symlink-p file))
-	   (file-exists-p file))))
-  (unless (fboundp 'face-list)
-    (defun face-list (&rest args))))
+	(setq funcs (cdr funcs)))))))
 
 (eval-and-compile
   (let ((case-fold-search t))

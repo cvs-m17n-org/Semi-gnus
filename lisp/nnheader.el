@@ -102,8 +102,18 @@ on your system, you could say something like:
 (defalias 'mail-header-xref 'mime-entity-xref-internal)
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
-(defsubst make-full-mail-header (&optional number subject from date id
-					   references chars lines xref)
+;;(defmacro mail-header-extra (entity)
+;;  "Return the extra headers in ENTITY."
+;;  `(aref ,entity 23))
+(defalias 'mail-header-extra 'ignore)
+
+;;(defmacro mail-header-set-extra (entity extra)
+;;  "Set the extra headers in ENTITY to EXTRA."
+;;  `(aset ,entity 23 ',extra))
+(defalias 'mail-header-set-extra 'ignore)
+
+(defsubst make-full-mail-header
+  (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
   (make-mime-entity-internal
    'gnus number
@@ -119,10 +129,12 @@ on your system, you could say something like:
    chars lines xref
    (list (cons 'Subject subject)
 	 (cons 'From from))
+   nil nil nil nil nil nil
+;;   extra
    ))
 
 (defsubst make-full-mail-header-from-decoded-header
-  (&optional number subject from date id references chars lines xref)
+  (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
   (make-mime-entity-internal
    'gnus number
@@ -131,12 +143,16 @@ on your system, you could say something like:
    subject
    from
    date id references
-   chars lines xref))
+   chars lines xref
+   nil
+   nil nil nil nil nil nil
+;;   extra
+   ))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
   (make-full-mail-header init init init init init
-			 init init init init))
+			 init init init init init))
 
 ;; fake message-ids: generation and detection
 
@@ -246,7 +262,20 @@ on your system, you could say something like:
 	   (progn
 	     (goto-char p)
 	     (and (search-forward "\nxref: " nil t)
-		  (nnheader-header-value)))))
+		  (nnheader-header-value)))
+	   
+	   ;; Extra.
+	   (when nnmail-extra-headers
+	     (let ((extra nnmail-extra-headers)
+		   out)
+	       (while extra
+		 (goto-char p)
+		 (when (search-forward
+			(concat "\n" (symbol-name (car extra)) ": ") nil t)
+		   (push (cons (car extra) (nnheader-header-value))
+			 out))
+		 (pop extra))
+	       out))))
       (when naked
 	(goto-char (point-min))
 	(delete-char 1)))))
@@ -259,13 +288,11 @@ on your system, you could say something like:
 
 (defmacro nnheader-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read (current-buffer)))))
 	   (if (numberp num) num 0)))
      (or (eobp) (forward-char 1))))
-
-;; (defvar nnheader-none-counter 0)
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -279,7 +306,7 @@ on your system, you could say something like:
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
-     (if (= (following-char) ?\n)
+     (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
      )))
@@ -299,8 +326,15 @@ on your system, you could say something like:
   (insert "\t")
   (princ (or (mail-header-lines header) 0) (current-buffer))
   (insert "\t")
-  (when (mail-header-xref header)
+  (when (or (mail-header-xref header)
+	    (mail-header-extra header))
     (insert "Xref: " (mail-header-xref header) "\t"))
+  (when (mail-header-extra header)
+    (let ((extra (mail-header-extra header)))
+      (while extra
+	(insert (symbol-name (caar extra))
+		": " (cdar extra) "\t")
+        (pop extra))))
   (insert "\n"))
 
 (defun nnheader-insert-article-line (article)
@@ -703,7 +737,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'raw-text
+(defvar nnheader-file-coding-system 'no-conversion
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)

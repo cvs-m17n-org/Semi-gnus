@@ -37,6 +37,12 @@
 (require 'gnus-util)
 (require 'mime-view)
 
+;; Avoid byte-compile warnings.
+(eval-when-compile
+  (defvar gnus-article-decoded-p)
+  (defvar gnus-decode-encoded-word-function)
+  )
+
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
@@ -779,6 +785,16 @@ mark:    The articles mark."
 The function is called with one parameter, the article header vector,
 which it may alter in any way.")
 
+(defcustom gnus-extra-headers nil
+  "*Extra headers to parse."
+  :group 'gnus-summary
+  :type '(repeat symbol))
+
+(defcustom gnus-ignored-from-addresses nil
+  "*Regexp of From headers that may be suppressed in favor of To headers."
+  :group 'gnus-summary
+  :type 'regexp)
+
 ;;; Internal variables
 
 (defvar gnus-scores-exclude-files nil)
@@ -838,6 +854,7 @@ which it may alter in any way.")
     (?l (bbb-grouplens-score gnus-tmp-header) ?s)
     (?V (gnus-thread-total-score (and (boundp 'thread) (car thread))) ?d)
     (?U gnus-tmp-unread ?c)
+    (?f (gnus-summary-from-or-to-or-newsgroups gnus-tmp-header) ?s)
     (?t (gnus-summary-number-of-articles-in-thread
 	 (and (boundp 'thread) (car thread)) gnus-tmp-level)
 	?d)
@@ -2229,7 +2246,7 @@ marks of articles."
     (while (setq point (pop config))
       (when (and (< point (point-max))
 		 (goto-char point)
-		 (= (following-char) ?\n))
+		 (eq (char-after) ?\n))
 	(subst-char-in-region point (1+ point) ?\n ?\r)))))
 
 ;; Various summary mode internalish functions.
@@ -2363,7 +2380,7 @@ marks of articles."
 	(let ((gnus-summary-line-format-spec spec)
 	      (gnus-newsgroup-downloadable '((0 . t))))
 	  (gnus-summary-insert-line
-	   (make-full-mail-header 0 "" "" "" "" "" 0 0 "")
+	   (make-full-mail-header 0 "" "" "" "" "" 0 0 "" nil)
 	   0 nil 128 t nil "" nil 1)
 	  (goto-char (point-min))
 	  (setq pos (list (cons 'unread (and (search-forward "\200" nil t)
@@ -2387,6 +2404,27 @@ marks of articles."
   (gnus-add-text-properties
    (point) (progn (eval gnus-summary-dummy-line-format-spec) (point))
    (list 'gnus-number gnus-tmp-number 'gnus-intangible gnus-tmp-number)))
+
+(defun gnus-summary-from-or-to-or-newsgroups (header)
+  (let ((to (cdr (assq 'To (mail-header-extra header))))
+	(newsgroups (cdr (assq 'Newsgroups (mail-header-extra header)))))
+    (cond
+     ((and to
+	   gnus-ignored-from-addresses
+	   (string-match gnus-ignored-from-addresses
+			 (mail-header-from header)))
+      (or (car (funcall gnus-extract-address-components
+			(funcall gnus-decode-encoded-word-function to)))
+	  (funcall gnus-decode-encoded-word-function to)))
+     ((and newsgroups
+	   gnus-ignored-from-addresses
+	   (string-match gnus-ignored-from-addresses
+			 (mail-header-from header)))
+      newsgroups)
+     (t
+      (or (car (funcall gnus-extract-address-components
+			(mail-header-from header)))
+	  (mail-header-from header))))))
 
 (defun gnus-summary-insert-line (gnus-tmp-header
 				 gnus-tmp-level gnus-tmp-current
@@ -3034,12 +3072,9 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
-;; The following macros and functions were written by Felix Lee
-;; <flee@cse.psu.edu>.
-
 (defmacro gnus-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read buffer))))
 	   (if (numberp num) num 0)))
@@ -3051,6 +3086,16 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 (defmacro gnus-nov-field ()
   '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
+
+(defmacro gnus-nov-parse-extra ()
+  '(let (out string)
+     (while (not (memq (char-after) '(?\n nil)))
+       (setq string (gnus-nov-field))
+       (when (string-match "^\\([^ :]\\): " string)
+	 (push (cons (intern (match-string 1))
+		     (substring string (match-end 0)))
+	       out)))
+     out))
 
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
@@ -3077,8 +3122,9 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		 (gnus-nov-field)	; refs
 		 (gnus-nov-read-integer) ; chars
 		 (gnus-nov-read-integer) ; lines
-		 (unless (= (following-char) ?\n)
-		   (gnus-nov-field)))))	; misc
+		 (unless (eq (char-after) ?\n)
+		   (gnus-nov-field))	; misc
+		 (gnus-nov-parse-extra)))) ; extra
 
       (widen))
 
@@ -3554,6 +3600,12 @@ Unscored articles will be counted as having a score of zero."
 (defvar gnus-tmp-false-parent nil)
 (defvar gnus-tmp-root-expunged nil)
 (defvar gnus-tmp-dummy-line nil)
+
+(defvar gnus-tmp-header)
+(defun gnus-extra-header (type &optional header)
+  "Return the extra header of TYPE."
+  (or (cdr (assq type (mail-header-extra (or header gnus-tmp-header))))
+      ""))
 
 (defun gnus-summary-prepare-threads (threads)
   "Prepare summary buffer from THREADS and indentation LEVEL.
@@ -4165,7 +4217,9 @@ If SELECT-ARTICLES, only select those articles from GROUP."
   "This function sets the mode line of the article or summary buffers.
 If WHERE is `summary', the summary mode line format will be used."
   ;; Is this mode line one we keep updated?
-  (when (memq where gnus-updated-mode-lines)
+  (when (and (memq where gnus-updated-mode-lines)
+	     (symbol-value
+	      (intern (format "gnus-%s-mode-line-format-spec" where))))
     (let (mode-string)
       (save-excursion
 	;; We evaluate this in the summary buffer since these
@@ -4491,7 +4545,19 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (and (search-forward "\nxref: " nil t)
-		   (nnheader-header-value)))))
+		   (nnheader-header-value)))
+	    ;; Extra.
+	    (when gnus-extra-headers
+	      (let ((extra gnus-extra-headers)
+		    out)
+		(while extra
+		  (goto-char p)
+		  (when (search-forward
+			 (concat "\n" (symbol-name (car extra)) ": ") nil t)
+		    (push (cons (car extra) (nnheader-header-value))
+			  out))
+		  (pop extra))
+		out))))
 	  (goto-char p)
 	  (if (and (search-forward "\ncontent-type: " nil t)
 		   (setq ctype (nnheader-header-value)))
@@ -4580,7 +4646,7 @@ This is meant to be called in `gnus-article-internal-prepare-hook'."
 	  (save-restriction
 	    (nnheader-narrow-to-headers)
 	    (goto-char (point-min))
-	    (when (or (and (eq (downcase (following-char)) ?x)
+	    (when (or (and (eq (downcase (char-after)) ?x)
 			   (looking-at "Xref:"))
 		      (search-forward "\nXref:" nil t))
 	      (goto-char (1+ (match-end 0)))
@@ -7637,6 +7703,7 @@ If N is negative, mark backwards instead.  Mark with MARK, ?r by default.
 The difference between N and the actual number of articles marked is
 returned."
   (interactive "p")
+  (gnus-summary-show-thread)
   (let ((backward (< n 0))
 	(gnus-summary-goto-unread
 	 (and gnus-summary-goto-unread
@@ -7799,19 +7866,19 @@ marked."
   (let ((forward (cdr (assq type gnus-summary-mark-positions)))
         (buffer-read-only nil))
     (re-search-backward "[\n\r]" (gnus-point-at-bol) 'move-to-limit)
-    (when (looking-at "\r")
-      (incf forward))
-    (when (and forward
-               (<= (+ forward (point)) (point-max)))
-      ;; Go to the right position on the line.
-      (goto-char (+ forward (point)))
-      ;; Replace the old mark with the new mark.
-      (subst-char-in-region (point) (1+ (point)) (following-char) mark)
-      ;; Optionally update the marks by some user rule.
-      (when (eq type 'unread)
-        (gnus-data-set-mark
-         (gnus-data-find (gnus-summary-article-number)) mark)
-        (gnus-summary-update-line (eq mark gnus-unread-mark))))))
+    (when forward
+      (when (looking-at "\r")
+	(incf forward))
+      (when (<= (+ forward (point)) (point-max))
+	;; Go to the right position on the line.
+	(goto-char (+ forward (point)))
+	;; Replace the old mark with the new mark.
+	(subst-char-in-region (point) (1+ (point)) (char-after) mark)
+	;; Optionally update the marks by some user rule.
+	(when (eq type 'unread)
+	  (gnus-data-set-mark
+	   (gnus-data-find (gnus-summary-article-number)) mark)
+	  (gnus-summary-update-line (eq mark gnus-unread-mark)))))))
 
 (defun gnus-mark-article-as-read (article &optional mark)
   "Enter ARTICLE in the pertinent lists and remove it from others."
@@ -8615,6 +8682,7 @@ save those articles instead."
 (defun gnus-valid-move-group-p (group)
   (and (boundp group)
        (symbol-name group)
+       (symbol-value group)
        (memq 'respool
 	     (assoc (symbol-name
 		     (car (gnus-find-method-for-group

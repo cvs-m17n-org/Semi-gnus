@@ -56,7 +56,7 @@
     ("text/plain" mm-inline-text t)
     ("text/enriched" mm-inline-text t)
     ("text/richtext" mm-inline-text t)
-    ("text/html" mm-inline-text (featurep 'w3))
+    ("text/html" mm-inline-text (locate-library "w3"))
     ("message/delivery-status" mm-inline-text t)
     ("audio/wav" mm-inline-audio
      (and (or (featurep 'nas-sound) (featurep 'native-sound))
@@ -200,8 +200,13 @@
 	  (when (or user-method
 		    method
 		    (not no-default))
-	    (mm-display-external
-	     handle (or user-method method 'mailcap-save-binary-file))))))))
+	    (if (and (not user-method)
+		     (not method)
+		     (equal "text" (car (split-string type))))
+		(mm-insert-inline handle (mm-get-part handle))
+	      (mm-display-external
+	       handle (or user-method method
+			  'mailcap-save-binary-file)))))))))
 
 (defun mm-display-external (handle method)
   "Display HANDLE using METHOD."
@@ -212,7 +217,9 @@
     (if (functionp method)
 	(let ((cur (current-buffer)))
 	  (if (eq method 'mailcap-save-binary-file)
-	      (set-buffer (generate-new-buffer "*mm*"))
+	      (progn
+		(set-buffer (generate-new-buffer "*mm*"))
+		(setq method nil))
 	    (let ((win (get-buffer-window cur t)))
 	      (when win
 		(select-window win)))
@@ -220,8 +227,13 @@
 	  (buffer-disable-undo)
 	  (mm-set-buffer-file-coding-system 'no-conversion)
 	  (insert-buffer-substring cur)
-	  (funcall method)
-	  (mm-handle-set-undisplayer handle (current-buffer)))
+	  (message "Viewing with %s" method)
+	  (let ((mm (current-buffer)))
+	    (unwind-protect
+		(if method
+		    (funcall method)
+		  (mm-save-part handle))
+	      (mm-handle-set-undisplayer handle mm))))
       (let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
 	     (filename (mail-content-type-get
 			(mm-handle-disposition handle) 'filename))
@@ -238,18 +250,20 @@
 	  (setq file (make-temp-name (expand-file-name "mm." dir))))
 	(write-region (point-min) (point-max)
 		      file nil 'nomesg nil 'no-conversion)
-	(setq process
-	      (if needsterm
-		  (start-process "*display*" nil
-				 "xterm"
-				 "-e" shell-file-name "-c"
-				 (format method
-					 (mm-quote-arg file)))
-		(start-process "*display*" (generate-new-buffer "*mm*")
-			       shell-file-name
-			       "-c" (format method
-					    (mm-quote-arg file)))))
-	(mm-handle-set-undisplayer handle (cons file process))
+	(message "Viewing with %s" method)
+	(unwind-protect
+	    (setq process
+		  (if needsterm
+		      (start-process "*display*" nil
+				     "xterm"
+				     "-e" shell-file-name "-c"
+				     (format method
+					     (mm-quote-arg file)))
+		    (start-process "*display*" (generate-new-buffer "*mm*")
+				   shell-file-name
+				   "-c" (format method
+						(mm-quote-arg file)))))
+	  (mm-handle-set-undisplayer handle (cons file process)))
 	(message "Displaying %s..." (format method file))))))
 
 (defun mm-remove-parts (handles)

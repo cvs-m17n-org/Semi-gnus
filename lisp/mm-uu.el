@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.1 $
+;; $Revision: 1.1.2.2 $
 ;; Keywords: news postscript uudecode binhex shar
   
 ;; This file is not part of GNU Emacs, but the same permissions
@@ -76,6 +76,7 @@
     (save-restriction
       (mail-narrow-to-head)
       (goto-char (point-max)))
+    (forward-line)
     (let ((text-start (point)) start-char end-char 
 	  type file-name end-line result)
       (while (re-search-forward mm-uu-begin-line nil t)
@@ -94,6 +95,7 @@
 			(intern (concat "mm-uu-" (symbol-name type) 
 				       "-end-line"))))
 	(when (re-search-forward end-line nil t)
+	  (forward-line)
 	  (setq end-char (point))
 	  (when (or (not (eq type 'binhex))
 		    (setq file-name 
@@ -137,13 +139,14 @@
 		     '("application/x-shar") nil nil nil nil))) 
 	     result)
 	    (setq text-start end-char))))
-      (if (and result
-	       (> start-char text-start))
-	  (push
-	   (list (mm-uu-copy-to-buffer text-start (point-max)) 
-		 '("text/plain") nil nil nil nil) 
-	   result))
-      (nreverse result))))
+      (when result
+	(if (> (point-max) (1+ text-start))
+	    (push
+	     (list (mm-uu-copy-to-buffer text-start (point-max)) 
+		   '("text/plain") nil nil nil nil) 
+	     result))
+	(setq result (cons "multipart/mixed" (nreverse result))))
+      result)))
 
 (provide 'mm-uu)
 

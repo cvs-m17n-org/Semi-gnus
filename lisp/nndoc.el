@@ -188,7 +188,7 @@ from the document.")
 		(insert-buffer-substring
 		 nndoc-current-buffer (car entry) (nth 1 entry)))
 	      (goto-char (point-max))
-	      (unless (= (char-after (1- (point))) ?\n)
+	      (unless (eq (char-after (1- (point))) ?\n)
 		(insert "\n"))
 	      (insert (format "Lines: %d\n" (nth 4 entry)))
 	      (insert ".\n")))
@@ -693,7 +693,7 @@ PARENT is the message-ID of the parent summary line, or nil for none."
       (when (string-match ";[ \t\n]*name=\\([^ \t\n;]+\\)" content-type)
 	(setq subject (match-string 1 content-type)))
       (when (string-match "boundary=\"?\\([^\"\n]*[^\" \t\n]\\)" content-type)
-	(setq boundary-regexp (concat "\n--"
+	(setq boundary-regexp (concat "^--"
 				      (regexp-quote
 				       (match-string 1 content-type))
 				      "\\(--\\)?[ \t]*\n"))))

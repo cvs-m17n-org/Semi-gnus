@@ -1103,8 +1103,7 @@ for new groups, and subscribe the new groups as zombies."
     got-new))
 
 (defun gnus-check-first-time-used ()
-  (if (or (> (length gnus-newsrc-alist) 1)
-	  (file-exists-p gnus-startup-file)
+  (if (or (file-exists-p gnus-startup-file)
 	  (file-exists-p (concat gnus-startup-file ".el"))
 	  (file-exists-p (concat gnus-startup-file ".eld")))
       nil
@@ -1705,7 +1704,6 @@ newsgroup."
 		(gnus-message 5 "%sdone" mesg))))))
 	(setq methods (cdr methods))))))
 
-
 (defun gnus-ignored-newsgroups-has-to-p ()
   "Non-nil iff gnus-ignored-newsgroups includes \"^to\\\\.\" as an element."
   ;; note this regexp is the same as:
@@ -1772,13 +1770,13 @@ newsgroup."
 		       (progn
 			 (skip-chars-forward " \t")
 			 (not
-			  (or (= (following-char) ?=)
-			      (= (following-char) ?x)
-			      (= (following-char) ?j)))))
+			  (or (eq (char-after) ?=)
+			      (eq (char-after) ?x)
+			      (eq (char-after) ?j)))))
 		  (progn
 		    (set group (cons min max))
 		    ;; if group is moderated, stick in moderation table
-		    (when (= (following-char) ?m)
+		    (when (eq (char-after) ?m)
 		      (unless gnus-moderated-hashtb
 			(setq gnus-moderated-hashtb (gnus-make-hashtable)))
 		      (gnus-sethash (symbol-name group) t
@@ -1836,7 +1834,7 @@ newsgroup."
       (let (min max group)
 	(while (not (eobp))
 	  (condition-case ()
-	      (when (= (following-char) ?2)
+	      (when (eq (char-after) ?2)
 		(read cur) (read cur)
 		(setq min (read cur)
 		      max (read cur))
@@ -2053,7 +2051,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	(unless (boundp symbol)
 	  (set symbol nil))
 	;; It was a group name.
-	(setq subscribed (= (following-char) ?:)
+	(setq subscribed (eq (char-after) ?:)
 	      group (symbol-name symbol)
 	      reads nil)
 	(if (eolp)
@@ -2077,7 +2075,7 @@ If FORCE is non-nil, the .newsrc file is read."
 			   (read buf)))
 	      (widen)
 	      ;; If the next character is a dash, then this is a range.
-	      (if (= (following-char) ?-)
+	      (if (eq (char-after) ?-)
 		  (progn
 		    ;; We read the upper bound of the range.
 		    (forward-char 1)
@@ -2099,8 +2097,8 @@ If FORCE is non-nil, the .newsrc file is read."
 		(push num1 reads))
 	      ;; If the next char in ?\n, then we have reached the end
 	      ;; of the line and return nil.
-	      (/= (following-char) ?\n))
-	     ((= (following-char) ?\n)
+	      (not (eq (char-after) ?\n)))
+	     ((eq (char-after) ?\n)
 	      ;; End of line, so we end.
 	      nil)
 	     (t
@@ -2226,7 +2224,7 @@ If FORCE is non-nil, the .newsrc file is read."
 		  (gnus-point-at-eol)))
 	;; Search for all "words"...
 	(while (re-search-forward "[^ \t,\n]+" eol t)
-	  (if (= (char-after (match-beginning 0)) ?!)
+	  (if (eq (char-after (match-beginning 0)) ?!)
 	      ;; If the word begins with a bang (!), this is a "not"
 	      ;; spec.  We put this spec (minus the bang) and the
 	      ;; symbol `ignore' into the list.

@@ -205,17 +205,7 @@ it's not cached."
 		    (beginning-of-line))
 		(forward-line 1))
 	      (beginning-of-line)
-	      ;; [number subject from date id references chars lines xref]
-	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
-			      (mail-header-number headers)
-			      (mime-fetch-field 'Subject headers)
-			      (mime-fetch-field 'From headers)
-			      (mail-header-date headers)
-			      (mail-header-id headers)
-			      (or (mail-header-references headers) "")
-			      (or (mail-header-chars headers) "")
-			      (or (mail-header-lines headers) "")
-			      (or (mail-header-xref headers) "")))
+	      (nnheader-insert-nov headers)
 	      ;; Update the active info.
 	      (set-buffer gnus-summary-buffer)
 	      (gnus-cache-update-active group number)
@@ -433,7 +423,7 @@ Returns the list of articles removed."
 (defun gnus-cache-update-article (group article)
   "If ARTICLE is in the cache, remove it and re-enter it."
   (gnus-cache-change-buffer group)
-  (when (gnus-cache-possibly-remove-article article nil nil nil t)    
+  (when (gnus-cache-possibly-remove-article article nil nil nil t)
     (let ((gnus-use-cache nil))
       (gnus-cache-possibly-enter-article
        gnus-newsgroup-name article (gnus-summary-article-header article)

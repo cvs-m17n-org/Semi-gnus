@@ -449,6 +449,11 @@ parameter.  It should return nil, `warn' or `delete'."
 		 (const warn)
 		 (const delete)))
 
+(defcustom nnmail-extra-headers nil
+  "*Extra headers to parse."
+  :group 'nnmail
+  :type '(repeat symbol))
+
 ;;; Internal variables.
 
 (defvar nnmail-split-history nil
@@ -803,7 +808,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -832,7 +837,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -1702,11 +1707,11 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(goto-char (point-min))
 	(while (re-search-forward "[^ \t=]+" nil t)
 	  (setq name (match-string 0))
-	  (if (not (= (following-char) ?=))
+	  (if (not (eq (char-after) ?=))
 	      ;; Implied "yes".
 	      (setq value "yes")
 	    (forward-char 1)
-	    (if (not (= (following-char) ?\"))
+	    (if (not (eq (char-after) ?\"))
 		(if (not (looking-at "[^ \t]"))
 		    ;; Implied "no".
 		    (setq value "no")

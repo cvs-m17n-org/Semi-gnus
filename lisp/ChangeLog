@@ -1,3 +1,230 @@
+Sun Oct 25 23:11:44 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v0.40 is released.
+
+1998-10-25 21:41:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-mark-forward): Show thread.
+
+	* gnus-start.el (gnus-check-first-time-used): Ignore dribble. 
+
+	* gnus-agent.el (gnus-agent-fetch-group-1): Bind name.
+
+	* nnml.el (nnml-possibly-create-directory): Check before making.
+
+1998-10-25 19:43:08  Kai Grossjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* nnheader.el (nnheader-insert-nov): Don't infloop.
+
+1998-10-25 19:26:11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-set-mode-line): Check that the spec has been
+	set up. 
+
+1998-10-25 19:22:03  Joerg Lenneis  <lenneis@statrix2.wu-wien.ac.at>
+
+	* nneething.el (nneething-file-name): New definition.
+
+1998-10-25 17:56:23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-treatment-function-alist): Fix.
+	(gnus-summary-save-in-rmail): Use gnus-output-to-rmail. 
+
+	* nndoc.el (nndoc-dissect-mime-parts-sub): Recognize first part. 
+
+Sun Oct 25 06:23:13 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v0.39 is released.
+
+1998-10-25 00:34:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-ignored-mime-types): New variable.
+	(gnus-mime-display-single): Use it.
+	(gnus-treatment-function-alist): New variable.
+
+	* gnus.el (gnus-mime): New group.
+
+	* gnus-art.el (gnus-mime-display-alternative): Don't destroy
+	things for other parts.
+	(gnus-mime-display-alternative): Place point.
+
+	* gnus.el: autoload gnus-uu-post-news.
+
+	* mailcap.el (mailcap-mailcap-entry-passes-test): Also check
+	needsterm/DISPLAY. 
+
+	* mm-decode.el (mm-display-part): Default to inline text/.*
+	parts. 
+
+	* mm-bodies.el (mm-decode-content-transfer-encoding): Default to
+	8bit. 
+
+	* gnus-art.el (gnus-mime-copy-part): Use normal-mode.
+	(gnus-mime-display-single): Inline all text parts.
+	(gnus-article-narrow-to-signature): Removed mime:: stubs.
+
+1998-10-24 21:38:37  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnml.el (nnml-possibly-create-directory): Rewrite.
+	(nnml-request-create-group): Change to right server.
+
+	* gnus-xmas.el (gnus-xmas-define): Use byte-code-function-p. 
+
+	* gnus-sum.el (gnus-set-mode-line): Use truncate-string-to-width. 
+
+	* gnus.el: rmail-output-to-rmail-file autoload.
+
+	* gnus-util.el (gnus-output-to-rmail): Didn't work if not in
+	Gnus. 
+
+	* nnheader.el (nnheader-parse-head): Checked wrong variable.
+
+	* gnus-sum.el (gnus-summary-update-mark): Ignore nil'd marks.
+
+Tue Oct 20 23:37:43 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-display-mixed): Multipart in
+	mixed part.
+
+Tue Oct 20 23:36:43 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-exit): Use mm-destroy-parts.
+	
+	* gnus-sum.el (gnus-summary-exit-no-update): Ditto.
+
+Tue Oct 20 16:22:51 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-dissect): Create pseudo multipart head.
+
+1998-10-24 20:51:53  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-valid-move-group-p): Make sure group has a
+	value. 
+
+	* gnus-art.el (gnus-article-hidden-text-p): Return nil when not
+	hidden. 
+
+	* gnus-spec.el (gnus-update-format-specifications): Use the
+	article mode line spec.
+
+	* gnus-art.el (gnus-insert-mime-button): Put right type.
+	(gnus-insert-prev-page-button): Ditto.
+	(gnus-insert-next-page-button): Dutti.
+
+	* pop3.el: New version installed.
+
+Sat Oct 24 16:48:51 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-dissect): Delete the begining spurious newline
+	and display last part.
+
+Sat Oct 24 20:31:55 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v0.38 is released.
+
+1998-10-24 07:54:58  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (article-mime-decode-quoted-printable-buffer):
+	Removed. 
+	(article-de-quoted-unreadable): Narrow to default.
+
+	* qp.el (quoted-printable-encode-region): Encode before QP-ing.
+
+	* gnus-art.el (article-decode-charset): Decode even when broken
+	MIME. 
+
+	* gnus-sum.el (gnus-summary-from-or-to-or-newsgroups): Return
+	name. 
+
+	* gnus-msg.el (gnus-copy-article-buffer): Delete headers.
+
+	* gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	nnheader. 
+
+	* nnmail.el (nnmail-extra-headers): New variable.
+
+	* nnheader.el (nnheader-insert-nov): Insert extra.
+
+	* gnus.el (gnus-summary-line-format): Doc fix.
+
+	* gnus-sum.el (gnus-get-newsgroup-headers): Parse extra.
+	(gnus-nov-parse-line): Ditto.
+	(gnus-nov-parse-extra): New macro.
+	(gnus-header): New function.
+	(gnus-update-summary-mark-positions): Change.
+	(gnus-ignored-from-addresses): New variable.
+	(gnus-summary-insert-from-or-to): New function.
+
+	* gnus.el (gnus-extra-headers): New variable.
+
+	* nnheader.el (make-mail-header): Expand.
+	(mail-header-extra): New macro.
+	(mail-header-set-extra): Ditto.
+	(make-full-mail-header): Expand.
+
+Sat Oct 24 07:41:42 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v0.37 is released.
+
+1998-10-24 07:29:11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-bodies.el (mm-decode-body): Check for multibyticity.
+
+	* mm-util.el (mm-enable-multibyte): Don't always switch multibyte
+	on. 
+
+1998-10-22  Didier Verna  <verna@inf.enst.fr>
+
+	* gnus-spec.el (gnus-balloon-face-function): new function
+	(gnus-parse-format): understand the %< %> specifiers
+	(gnus-parse-complex-format): ditto.
+
+1998-10-24 06:31:33  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el: Changed following-char to char-after throughout.
+
+1998-10-22 04:05:55  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-decode.el (mm-display-external): Protect more and message. 
+
+Wed Oct 21 03:26:30 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-xmas.el (gnus-xmas-article-push-button): Go to the
+	position.
+
+Tue Oct 20 23:37:43 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-display-mixed): Multipart in
+	mixed part.
+
+Tue Oct 20 23:36:43 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-exit): Use mm-destroy-parts.
+	
+	* gnus-sum.el (gnus-summary-exit-no-update): Ditto.
+
+Tue Oct 20 16:22:51 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-dissect): Create pseudo multipart head.
+
+1998-10-21  Hrvoje Niksic  <hniksic@srce.hr>
+
+	* mailcap.el (mailcap-save-binary-file): Use unwind-protect.
+
+	* mm-decode.el (mm-display-external): Set undisplayer to mm
+	buffer, not the current buffer; use unwind-protect.
+
+1998-10-21 00:07:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-exit): Destroy parts.
+	(gnus-summary-exit-no-update): Ditto.
+
+1998-10-20 22:02:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-decode.el (mm-inline-media-tests): Look for w3.
+
+	* mailcap.el (mailcap-mime-data): Inline html.
+
 Tue Oct 20 20:25:03 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Pterodactyl Gnus v0.36 is released.
@@ -31,6 +258,23 @@ Tue Oct 20 02:16:36 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* mm-decode.el (mm-display-external): Check before selecting.
 
+Sat Sep 26 02:03:00 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-multi-decode-encoded-word-string): Rewrite. 
+	
+	* gnus-sum.el (gnus-decode-encoded-word-methods): New variable.
+	
+	* gnus-sum.el (gnus-decode-encoded-word-methods-cache): New
+	variable.
+	
+	* gnus-sum.el (gnus-encoded-word-method-alist): Deleted.
+	
+	* gnus-art.el (gnus-decode-header-methods): New variable.
+
+	* gnus-art.el (gnus-decode-header-methods-cache): New variable.
+
+	* gnus-art.el (gnus-multi-decode-header): New function.
+	
 Tue Oct 20 00:24:16 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Pterodactyl Gnus v0.35 is released.
@@ -720,752 +964,22 @@ Sat Sep 12 09:17:30 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* message.el (message-send-news): Encode body after checking
 	syntax.
 
-	* gnus-art.el (gnus-mime-button-line-format): Allow descriptions.
+	* gnus-art.el (gnus-mime-button-line-formaer.edu>
 
-	* mm-decode.el (mm-save-part): Use Content-Disposition filename.
+	* mm-decode.el (mm-interactively-view-part): Typo.
 
-	* gnus-art.el (gnus-display-mime): Respect disposition.
+Thu Sep 24 01:37:30 1998  ZHU Shenghuo  <zsh@cs.rochester.edu>
 
-	* mm-decode.el (mm-preferred-alternative): Respect disposition.
+	* mm-decode.el (mm-dissect-multipart): Display last part when the
+	article has no close-delimiter
 
-	* gnus-art.el (article-strip-multiple-blank-lines): Don't delete
-	text with annotations.
+Thu Sep 24 01:28:54 1998  ZHU Shenghuo  <zsh@cs.rochester.edu>
 
-	* message.el (message-make-date): Fix sign for negative time
-	zones.
+	* mm-decode.el (mm-dissect-buffer): Display parts which have no
+	content-type.
 
-	* mm-view.el (mm-inline-image): Insert a space at the end of the
-	image.
+Thu Sep 24 01:23:57 1998  ZHU Shenghuo  <zsh@cs.rochester.edu>
 
-	* mail-parse.el: New file.
+	* gnus-art.el (gnus-display-mime): Typo.
 
-	* rfc2231.el: New file.
-
-	* drums.el (drums-content-type-get): Removed.
-	(drums-parse-content-type): Ditto.
-
-	* mailcap.el (mailcap-mime-data): Use symbols instead of strings.
-
-Fri Sep 11 18:23:34 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.27 is released.
-
-1998-09-11 12:42:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-decode.el (mm-alternative-precedence): New variable.
-	(mm-preferred-alternative): New function.
-
-	* gnus-art.el (gnus-mime-copy-part): New command.
-
-	* mm-decode.el (mm-get-part): New function.
-
-	* mm-view.el: New file.
-
-	* mm-decode.el (mm-dissect-buffer): Downcase cte.
-	(mm-display-part): Default to mailcap-save-binary-file.
-
-Fri Sep 11 12:32:50 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.26 is released.
-
-1998-09-11 08:25:33  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-decode.el (mm-interactively-view-part): New function.
-
-	* gnus-art.el (gnus-mime-view-part): New command.
-
-	* mm-decode.el (mm-last-shell-command): New variable.
-
-	* mailcap.el (mailcap-mime-info): Allow returning all matches.
-
-	* mm-decode.el (mm-save-part): New function.
-
-	* gnus-art.el (article-decode-charset): Protect against buggy
-	content-types.
-	(gnus-mime-pipe-part): New command.
-	(gnus-mime-save-part): New command.
-	(gnus-mime-button-map): New keymap.
-	(gnus-mime-button-line-format): New variable.
-	(gnus-insert-mime-button): New function.
-	(gnus-display-mime): Use it.
-
-	* gnus-util.el (gnus-dd-mmm): Removed length spec.
-
-	* mm-decode.el (mm-inline-text): Decode charsets.
-
-	* gnus-art.el (gnus-article-save): Comment fix.
-
-	* gnus-int.el (gnus-start-news-server): When in batch, don't
-	prompt.
-
-	* gnus-cache.el (gnus-cache-possibly-enter-article): Don't
-	decode.
-
-	* mm-decode.el (mm-inline-media-tests): Add audio.
-	(mm-inline-audio): New function.
-
-1998-09-11 08:19:22  Katsumi Yamaoka  <yamaoka@ga.sony.co.jp>
-
-	* gnus-art.el (article-make-date-line): Didn't work.
-
-	* parse-time.el (parse-time-string): One too many nils.
-
-Fri Sep 11 08:09:40 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.25 is released.
-
-1998-09-11 07:38:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (article-remove-trailing-blank-lines): Don't remove
-	annotations.
-
-	* gnus.el ((featurep 'gnus-xmas)): New
-	'gnus-annotation-in-region-p alias.
-
-1998-09-10 06:20:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-util.el (mm-with-unibyte-buffer): New function.
-
-	* gnus-uu.el (gnus-quote-arg-for-sh-or-csh): Renamed.
-
-	* mm-decode.el (mm-inline-media-tests): New variable.
-
-	* gnus-sum.el (gnus-summary-exit): Destroy handles.
-
-	* gnus-art.el (gnus-article-mime-handles): New variable.
-
-	* drums.el (drums-narrow-to-header): New function.
-
-	* gnus-art.el (article-decode-charset): Use it.
-
-	* drums.el (drums-content-type-get): New function.
-
-	* mm-util.el (mm-content-type-charset): Removed.
-
-	* drums.el (drums-syntax-table): @ is word.
-	(drums-parse-content-type): New function.
-
-	* parse-time.el (parse-time-rules): Parse "Wed, 29 Apr 98 0:26:01
-	EDT" times.
-
-	* gnus-util.el (gnus-date-get-time): Use safe date.
-
-	* gnus-sum.el (gnus-show-mime): Removed.
-	(gnus-summary-toggle-mime): Removed.
-
-	* gnus-art.el (gnus-strict-mime): Removed.
-	(gnus-article-prepare): Don't do MIME.
-	(gnus-decode-encoded-word-method): Removed.
-	(gnus-show-mime-method): Removed.
-
-Thu Sep 10 04:03:29 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.24 is released.
-
-1998-09-10 01:58:24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-sum.el (gnus-summary-show-article): Don't decode chars if
-	PREFIX.
-
-	* parse-time.el (parse-time-rules): Accept times that look like
-	"h:mm".
-
-	* message.el (message-make-date): Use zone properly.
-
-	* gnus.el: Autoload gnus-batch.
-
-	* gnus-art.el (article-de-quoted-unreadable): Do not do
-	gnus-article-decode-rfc1522.
-
-	* gnus-msg.el (gnus-inews-do-gcc): Use it.
-
-	* gnus-int.el (gnus-request-accept-article): Accept a no-encode
-	param.
-
-	* message.el (message-encode-message-body): Check for us-ascii.
-
-	* gnus-msg.el (gnus-extended-version): Move Gnus version comments
-	to the left.
-
-1998-09-09 13:18:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (article-decode-charset): Rename.
-
-Wed Sep  9 12:25:48 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.23 is released.
-
-1998-09-09 12:14:47  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-util.el (gnus-parent-id): Ditto.
-	(gnus-put-text-property-excluding-newlines): Ditto.
-
-	* gnus-sum.el (gnus-dependencies-add-header): Make into subst.
-
-1998-09-08  Karl Kleinpaste  <karl@jprc.com>
-
-	* message.el (message-generate-headers): Generate User-Agent
-	instead of X-Mailer & X-Newsreader.
-
-	* gnus-msg.el (gnus-extended-version): Reformat for USEFOR
-	User-Agent header format.
-
-Tue Sep  8 22:38:27 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.22 is released.
-
-1998-09-08 22:36:54  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-util.el (mm-multibyte-p): Typo.
-
-Tue Sep  8 22:25:53 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.21 is released.
-
-1998-09-08  Hrvoje Niksic  <hniksic@srce.hr>
-
-	* gnus-art.el (article-treat-dumbquotes): Handle \224 correctly.
-
-1998-09-08 22:18:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-util.el (mm-multibyte-p): New function.
-
-Tue Sep  8 21:43:03 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.20 is released.
-
-1998-09-08 11:40:45  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* rfc2047.el (rfc2047-decode-region): Only decode when in
-	multibyte.
-
-	* nnheader.el (nnheader-pathname-coding-system): Changed to binary.
-
-	* gnus-int.el (gnus-request-replace-article): Encode.
-	(gnus-request-accept-article): Encode.
-
-	* gnus-art.el (gnus-request-article-this-buffer): Decode charsets
-	here.
-
-	* gnus.el (gnus-article-display-hook): Take the charset functions
-	out.
-
-	* time-date.el (safe-date-to-time): New function.
-
-	* gnus-util.el (gnus-dd-mmm): Protect against bogus dates.
-
-Tue Sep  8 07:09:28 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.19 is released.
-
-1998-09-08 04:51:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* base64.el (base64-encode-region): Accept no-line-break.
-
-	* mm-util.el (mm-mime-charset): New function.
-
-	* gnus-draft.el (gnus-draft-edit-message): Delete article.
-
-Tue Sep  8 04:29:23 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.18 is released.
-
-1998-09-08 02:21:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* message.el (message-send-and-exit): Return t on success.
-	(message-make-date): Make a proper time zone.
-
-	* gnus-draft.el (gnus-draft-send): Only remove article if the
-	sending is successful.
-
-	* drums.el (drums-get-comment): Return the last comment.
-	(drums-parse-address): Parse old-style From headers.
-
-1998-09-07  SL Baur  <steve@altair.xemacs.org>
-
-	* gnus-sum.el (gnus-data-compute-positions): Move below
-	`gnus-save-hidden-threads' so the former is correctly detected as
-	a macro.
-
-1998-09-06  Dave Love  <fx@gnu.org>
-
-	* gnus/nnweb.el (require): Wrap requirement of w3 and url in
-	ignore-errors too, eval'd when compile.  Require w3 stuff at load
-	time for nicer failure if it's not available.
-
-1998-09-08 00:38:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* time-date.el (time-to-seconds): Renamed.
-
-	* parse-time.el (parse-time-string): Downcase before handling.
-	(parse-time-rules): Times without seconds have 0 seconds.
-
-	* rfc2047.el (rfc2047-encode-region): New version.
-	(rfc2047-dissect-region): New function.
-
-1998-09-07 01:08:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* message.el (message-make-date): Use symbolic zone.
-
-1998-09-06 23:23:06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* time-date.el (parse-time): Always use parse-time.
-
-	* parse-time.el (parse-time-syntax): Use vectors.
-
-Sun Sep  6 21:19:26 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.17 is released.
-
-1998-09-06 05:45:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* time-date.el: Renamed from "date".
-
-	* gnus.el: Removed all timezone dependencies.
-
-	* score-mode.el: Removed.
-	(gnus-score-edit-insert-date): Use date.
-
-	* date.el (float-to-time): New function.
-
-	* nnspool.el (nnspool-seconds-since-epoch): Removed.
-
-	* date.el (time-to-float): New function.
-
-	* message.el (message-make-date): Use format-time-string.
-	(message-make-expires): Use make-date.
-
-	* gnus-xmas.el (gnus-xmas-seconds-since-epoch): Removed.
-
-	* gnus-util.el (gnus-dd-mmm): Use date.
-	(gnus-sortable-date): Ditto.
-
-	* message.el (message-make-date): Take an optional time.
-
-	* gnus: Applied patches from 5.6.43.
-
-	* date.el (if): Use parse-time.
-
-	* gnus-score.el (gnus-summary-score-entry): Make into a command
-	again.
-
-	* gnus-group.el (gnus-group-get-new-news-this-group): Only call if
-	gnus-agent.
-
-	* gnus.el (gnus-agent-meta-information-header): Moved here.
-
-1998-09-05  Mike McEwan  <mike@lotusland.demon.co.uk>
-
-	* gnus-agent.el (gnus-agent-scoreable-headers): New variable.
-	(gnus-agent-fetch-group-1): Score article headers using normal
- 	group score files if the download score rule of a category/group
- 	is `file'.
-	(gnus-agent-fetch-group-1): Don't parse the entire .overview when
- 	deciding what articles to download.
-	(gnus-agent-fetch-group-1): Don't push headers through scoring and
- 	predicate processing if predicate is `true' or `false'.
-
-1998-09-06 01:56:02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-score.el (gnus-score-load-score-alist): Bind coding system.
-
-	* gnus-art.el (gnus-article-setup-buffer): Enable multibyte.
-
-	* score-mode.el (score-mode-coding-system): New variable.
-	(gnus-score-edit-exit): Use it.
-
-1998-09-04  Jason R Mastaler  <jason@4b.org>
-
-	* drums.el: Corrected typo.
-
-1998-09-05 23:24:43  Hallvard B. Furuseth  <h.b.furuseth@usit.uio.no>
-
-	* mm-bodies.el (mm-body-encoding): Faster version.
-
-1998-09-05 22:23:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (gnus-article-decode-charset): Only decode text
-	things.
-
-	* message.el (message-output): Use rmail.
-
-	* rfc2047.el (rfc2047-encoded-word-regexp): Allow spaces in the
-	word part.
-
-	* mm-util.el (mm-charset-to-coding-system): Use
-	rfc2047-default-charset.
-	(mm-known-charsets): New variable.
-
-	* message.el (message-caesar-region): Bugged out.
-
-1998-09-06  Mike McEwan  <mike@lotusland.demon.co.uk>
-
-	* gnus-agent.el (gnus-agent-fetch-group-1): Allow lists when
-	specifying `agent-predicate' in a group's parameters.
-
-Sat Sep  5 21:55:01 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.16 is released.
-
-1998-09-05 17:30:11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* nnmail.el (nnmail-expired-article-p): Use predicate.
-
-	* date.el (time-less-p): Renamed.
-
-	* gnus-art.el (gnus-article-decode-charset): Really fetch headers
-	from the headers.
-
-	* rfc2047.el (rfc2047-decode-region): Use the mm decoding
-	functions.
-
-	* gnus-group.el (gnus-group-sort-selected-flat): Didn't work at
-	all.
-	(gnus-group-sort-selected-groups-by-alphabet): Changed interface
-	to all functions.
-
-Sat Sep  5 01:45:52 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.15 is released.
-
-1998-09-05 00:21:22  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* date.el: New file.
-
-	* gnus-util.el (gnus-encode-date): Removed.
-	(gnus-time-less): Ditto.
-
-	* nnmail.el (nnmail-date-to-time): Removed.
-	(nnmail-time-less): Ditto.
-	(nnmail-days-to-time): Ditto.
-	(nnmail-time-since): Ditto.
-
-	* drums.el: New file.
-
-1998-09-04 00:25:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* message.el (message-encode-message-body): Encode headers with
-	body encoding.
-
-	* rfc2047.el (rfc2047-default-charset): Renamed.
-	(rfc2047-encodable-p): Use it.
-
-	* base64.el (mm-util): Required.
-
-1998-09-03 16:28:30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-msg.el (gnus-post-method): Peel off real info from opened
-	servers.
-
-	* gnus-util.el (gnus-output-to-rmail): Removed.
-
-	* gnus-art.el (gnus-summary-save-in-rmail): Use
-	gnus-output-to-rmailrmail-output-to-rmail-file.
-
-	* rfc2047.el (rfc2047-decode-region): Fold case.
-	(rfc2047-decode): Use decode-string.
-
-	* mm-util.el: Provide mm-char-int.
-
-Thu Sep  3 15:23:22 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.14 is released.
-
-1998-09-03 15:08:30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-bodies.el (mm-body-encoding): Go through the buffer to make
-	sure we have 7bit.
-
-1998-09-02 14:38:18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-msg.el (gnus-post-method): Use opened servers, and remove
-	ducplicates.
-	(gnus-inews-insert-mime-headers): Removed.
-
-	* message.el (message-caesar-region): Protect against MULE chars.
-
-1998-09-02 00:36:23  Hallvard B. Furuseth  <h.b.furuseth@usit.uio.no>
-
-	* mm-util.el (if): fset the right function.
-
-1998-09-02 00:31:53  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (gnus-article-decode-charset): Use real
-	read-coding-system.
-
-1998-09-01 17:58:40  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-bodies.el (mm-decode-body): Protect against malformed
-	base64.
-	(mm-decode-body): Check that buffer-file-coding-system is
-	non-nil.
-
-Tue Sep  1 10:29:33 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.13 is released.
-
-1998-09-01 09:14:33  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-util.el (gnus-strip-whitespace): Already defined.
-	Removed.
-
-	* gnus-art.el (gnus-article-decode-charset): Strip whitespace.
-
-	* gnus-util.el (gnus-strip-whitespace): New function.
-
-	* mm-util.el (mm-content-type-charset): Downcase.
-
-1998-08-31 23:04:29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (gnus-article-decode-charset): Accept a prefix.
-	(gnus-article-decode-charset): Don't fetch all headers.
-
-	* mm-util.el (mm-read-coding-system): New function.
-
-	* mm-bodies.el (mm-decode-body): Check the right charset.
-
-	* gnus-sum.el (gnus-summary-mode-line-format): Ditto.
-
-	* gnus-art.el (gnus-article-mode-line-format): Use short group
-	format.
-
-Mon Aug 31 23:03:13 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.12 is released.
-
-1998-08-31 22:39:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-bodies.el (mm-decode-body): Don't do charset unless MULE.
-
-	* gnus-art.el (gnus-article-decode-charset): Supply cte.
-	(gnus-article-decode-charset): Always run.
-
-	* mm-bodies.el (mm-decode-body): Decode cte.
-
-Mon Aug 31 22:14:50 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.11 is released.
-
-1998-08-31 14:27:25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* message.el (message-encode-message-body): Ditto.
-
-	* gnus-art.el (gnus-article-decode-mime-words): New command and
-	keystroke.
-	(gnus-article-decode-charset): Ditto.
-	(gnus-article-decode-charset): Only work under MULE.
-
-	* mm-util.el (mm-content-type-charset): New function.
-
-	* nnmail.el (nnmail-delete-incoming): Changed to nil.
-
-	* message.el (message-send-mail): Insert MIME headers.
-	(message-check-news-body-syntax): Don't warn for escape sequences.
-	(message-check-news-body-syntax): Insert MIME headers.
-
-	* mm-bodies.el (mm-body-encoding): New function.
-
-	* message.el (message-encode-message-body): New function.
-
-	* mm-bodies.el: New file.
-
-	* mm-util.el (mm-narrow-to-head): New function.
-
-	* rfc2047.el (rfc2047-encode): Use it.
-
-	* mm-util.el: Provide mm-encode-coding-region.
-
-	* gnus-sum.el (gnus-summary-mode): Enable multibyte.
-
-	* gnus-util.el (gnus-set-work-buffer): Enable multibyte.
-
-	* mm-util.el (mm-enable-multibyte): New function.
-
-	* message.el (message-set-work-buffer): Set multibyte.
-
-	* gnus.el (gnus-continuum-version): Be valid forever and ever.
-
-	* gnus-util.el (gnus-point-at-eol): Removed.
-	(gnus-point-at-bol): Ditto.
-
-	* base64.el (base64-decode-region): Commented out messaging.
-
-1998-08-31  Didier Verna  <verna@inf.enst.fr>
-
-	* gnus-msg.el (gnus-group-mail): make it behave like
-	gnus-group-post-news with regards to the prefix (this enables the
-	use of posting styles).
-
-1998-08-31 12:53:32  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus.el (gnus-article-display-hook): Added
-	gnus-article-decode-rfc1522 to hook.
-
-Mon Aug 31 12:43:46 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.10 is released.
-
-1998-08-31 11:45:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* nnfolder.el (nnfolder-delete-mail): Narrow to mail and allow
-	hook to be run.
-
-1998-08-30 17:59:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* rfc2047.el (rfc2047-encodable-p): Use find-charset-region.
-
-	* mm-util.el (mm-charsets-in-region): Removed.
-
-	* rfc2047.el: Renamed file.
-
-	* gnus-msg.el (gnus-copy-article-buffer): Multibyte.
-
-	* message.el (message-mode): Set multibyte.
-
-	* mm-util.el (mm-charsets-in-region): Copied here.
-
-	* gnus-util.el: Removed gnus-truncate-string.
-
-	* gnus-art.el (gnus-article-decode-mime-words): Use 1522.
-
-	* rfc1522.el (rfc1522-unencoded-charsets): New variable.
-	(rfc1522-encodable-p): New function.
-	(rfc1522-encode-message-header): Use it.
-
-Sun Aug 30 17:46:01 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.9 is released.
-
-1998-08-30 16:13:08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-util.el: Shadow encode-coding-string.
-
-	* base64.el (base64-encode-region): Don't add newline.
-
-	* rfc1522.el (rfc1522-narrow-to-field): Copied here.
-
-	* mm-util.el: New file.
-
-	* mm-decode.el: Somewhat depleted.
-	* mm-encode.el: Ditto.
-
-	* rfc1522.el: New file.
-
-	* mm-util.el (mm-replace-chars-in-string): Copied here.
-
-	* mm-encode.el (mm-q-encode-region): New function.
-
-	* qp.el (quoted-printable-encode-region): Take an optional CLASS
-	param.
-
-	* mm-encode.el (mm-encode-word-region): Downcase.
-
-Sun Aug 30 15:28:01 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.8 is released.
-
-1998-08-30 12:23:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* message.el (message-send-mail): Encode headers.
-
-	* qp.el (quoted-printable-encode-region): Encode 8-bit words.
-	(quoted-printable-encode-region): Upcase.
-
-	* message.el (message-default-charset): New variable.
-
-	* qp.el (quoted-printable-encode-region): Optional param FOLD.
-
-	* message.el (message-narrow-to-field): Changed name.
-
-	* mm-encode.el: New file.
-
-	* message.el (message-narrow-to-header): New function.
-
-	* gnus-art.el (gnus-article-decode-mime-words): Place point in the
-	right buffer.
-
-Sun Aug 30 12:15:54 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.7 is released.
-
-1998-08-30 01:26:12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus.el: Remove autoload for
-	gnus-article-mime-decode-quoted-printable.
-
-	* mm-decode.el (mm-charset-to-coding-system): Allow iso-8859-1 to
-	be decoded in non-MULE Emacsen.
-
-	* gnus-xmas.el (gnus-xmas-logo-color-alist): More brown.
-
-1998-08-29  SL Baur  <steve@altair.xemacs.org>
-
-	* gnus-xmas.el (gnus-xmas-logo-color-alist): Try shades of brown.
-
-1998-08-30 01:04:57  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* mm-decode.el: Check for coding-system-list.
-
-Sun Aug 30 00:59:15 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.6 is released.
-
-1998-08-30 00:36:28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* nnheader.el (fboundp): Protect code-coding-string.
-
-	* gnus-art.el (gnus-article-mode): Check that set-buffer-multibyte
-	is available.
-
-Sat Aug 29 23:24:31 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Pterodactyl Gnus v0.5 is released.
-
-1998-08-29 22:38:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (gnus-article-mode): Make article buffer multibyte.
-	(gnus-hack-decode-rfc1522): Removed.
-
-	* mm-decode.el (mm-charset-coding-system-alist): Check better.
-
-Sat Aug 29 22:20:39 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Gnus v0.4 is released.
-
-1998-08-29 20:53:29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
-
-	* gnus-art.el (gnus-article-decode-mime-words): New command and
-	keystroke.
-
-	* qp.el (quoted-printable-decode-region): Don't use hexl.
-
-	* gnus-xmas.el (gnus-xmas-logo-color-style): Changed to dino.
-
-	* gnus-sum.el (gnus-parse-headers-hook): Default to nil.
-	(gnus-structured-field-decoder): Removed.
-	(gnus-unstructured-field-decoder): Ditto.
-
-	* mm-decode.el: New file.
-
-	* qp.el: New file.
-
-	* gnus-art.el (article-mime-decode-quoted-printable): Removed.
-
-	* gnus-ems.el (fboundp): Removed gnus-split-string.
-
-	* gnus.el (gnus-splash-face): Doc fix.
-
-	* gnus-ems.el (fboundp): Don't bind mail-file-babyl-p.
-
-	* gnus-art.el (article-mime-decode-quoted-printable): Don't use
-	hexl.
-
-	* nnheader.el (nnheader-temp-write): Removed.
-
-Sat Aug 29 20:34:17 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Gnus v0.3 is released.
-
-Sat Aug 29 19:32:06 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Gnus v0.2 is released.
+Thu Sep 24 02:29:57 1998  Lars Mag                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

@@ -247,6 +247,7 @@ call it with the value of the `gnus-data' text property."
   (let* ((pos (event-closest-point event))
 	 (data (get-text-property pos 'gnus-data))
 	 (fun (get-text-property pos 'gnus-callback)))
+    (goto-char pos)
     (when fun
       (funcall fun data))))
 
@@ -434,7 +435,7 @@ call it with the value of the `gnus-data' text property."
   (defun gnus-byte-code (func)
     "Return a form that can be `eval'ed based on FUNC."
     (let ((fval (indirect-function func)))
-      (if (compiled-function-p fval)
+      (if (byte-code-function-p fval)
 	  (list 'funcall fval)
 	(cons 'progn (cdr (cdr fval))))))
 
@@ -909,7 +910,6 @@ XEmacs compatibility workaround."
     (set-buffer (event-buffer event))
     (goto-char (event-point event))
     (funcall (event-function response) (event-object response))))
-
 
 (provide 'gnus-xmas)
 

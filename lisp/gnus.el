@@ -247,6 +247,10 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Various Various")
   :group 'gnus)
 
+(defgroup gnus-mime nil
+  "Variables for controlling the Gnus MIME interface."
+  :group 'gnus)
+
 (defgroup gnus-exit nil
   "Exiting gnus."
   :link '(custom-manual "(gnus)Exiting Gnus")
@@ -255,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.026"
+(defconst gnus-version-number "6.10.027"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.36"
+(defconst gnus-original-version-number "0.40"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1578,7 +1582,6 @@ This variable can be nil, gnus or gnus-ja."
   '((gnus-group-mode "The Group Buffer")
     (gnus-summary-mode "The Summary Buffer")
     (gnus-article-mode "The Article Buffer")
-    (mime/viewer-mode "The Article Buffer")
     (gnus-server-mode "The Server Buffer")
     (gnus-browse-mode "Browse Foreign Server")
     (gnus-tree-mode "Tree Display"))
@@ -1671,9 +1674,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       message-send-and-exit message-yank-original)
      ("nnmail" nnmail-split-fancy nnmail-article-group)
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
-     ("rmailout" rmail-output)
+     ("rmailout" rmail-output rmail-output-to-rmail-file)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message rmail-output-to-rmail-file)
+      rmail-show-message)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t
@@ -1741,7 +1744,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-decode-uu-and-save-view gnus-uu-decode-unshar-view
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
       gnus-uu-decode-binhex-view gnus-uu-unmark-thread
-      gnus-uu-mark-over)
+      gnus-uu-mark-over gnus-uu-post-news)
      ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
       gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
@@ -1839,6 +1842,7 @@ with some simple extensions.
 %a   Extracted name of the poster (string)
 %A   Extracted address of the poster (string)
 %F   Contents of the From: header (string)
+%f   Contents of the From: or To: headers (string)
 %x   Contents of the Xref: header (string)
 %D   Date of the article (string)
 %d   Date of the article (string) in DD-MMM format
