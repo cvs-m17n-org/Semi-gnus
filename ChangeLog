@@ -1,3 +1,8 @@
+1998-11-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/message.el (message-mode-map): Add new command key
+ 	`C-x C-s' for `message-save-drafts'.
+
 1998-11-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-8bit-encoding-list): New variable.
