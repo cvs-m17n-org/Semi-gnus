@@ -1,3 +1,8 @@
+1999-01-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Fix, could not
+	respool article.
+
 1999-01-26  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el: Add security notice.
