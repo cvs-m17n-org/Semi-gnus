@@ -1655,11 +1655,13 @@ If ARGS, PROMPT is used as an argument to `format'."
 	     (apply 'format prompt args)
 	   prompt)))
     (unless nnmail-read-passwd
-      (if (load "passwd" t)
+      (if (functionp 'read-passwd)
 	  (setq nnmail-read-passwd 'read-passwd)
-	(unless (fboundp 'ange-ftp-read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp"))
-	(setq nnmail-read-passwd 'ange-ftp-read-passwd)))
+	(if (load "passwd" t)
+	    (setq nnmail-read-passwd 'read-passwd)
+	  (unless (fboundp 'ange-ftp-read-passwd)
+	    (autoload 'ange-ftp-read-passwd "ange-ftp"))
+	  (setq nnmail-read-passwd 'ange-ftp-read-passwd))))
     (funcall nnmail-read-passwd prompt)))
 
 (defun nnmail-check-syntax ()
