@@ -165,7 +165,7 @@ Returns the process associated with the connection.
 Argument PORT specifies connecting port."
   (let (process)
     (save-excursion
-      (set-buffer (get-buffer-create (concat " trace of POP session to %s"
+      (set-buffer (get-buffer-create (concat " trace of POP session to "
 					     mailhost)))
       (erase-buffer)
       (setq pop3-read-point (point-min))
