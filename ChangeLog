@@ -1,8 +1,8 @@
 2001-12-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
-	* lisp/gnus-namazu.el (gnus-namazu-search): Slightly modified for
-	Oort Gnus v0.03.
-
+	* lisp/gnus-namazu.el (gnus-namazu-summary-buffer-name): New
+	advice.
+	
 	* lisp/gnus.el (top): Add autoload of `gnus-namazu-search'.
 
 	* lisp/gnus-sum.el (gnus-summary-mode-map): Define "\C-c\C-n" as
