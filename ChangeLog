@@ -1,3 +1,25 @@
+1999-11-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-offline.el (TopLevel): Use `static-if', requiring
+	"static" at the compile time.
+	(gnus-offline-hangup-function): Abolish.
+	(gnus-offline-auto-ppp): New variable.
+	(gnus-offline-gnus-get-new-news): Refer to it.
+	(gnus-offline-set-unplugged-state): Ditto.
+	(gnus-offline-set-auto-ppp): New function. It replaces the
+	function `gnus-offline-toggle-auto-hangup'.
+	(gnus-offline-toggle-auto-hangup): Abolish.
+	(gnus-offline-define-menu-and-key): Use `static-if' and
+	`static-cond'.
+	(gnus-offline-popup-menu): Do not define this function under XEmacs.
+	(gnus-offline-popup): New function.
+
+	* gnus-ofsetup.el (gnus-ofsetup-update-setting-file): Typo.
+	(gnus-ofsetup-resource-en): Fix doc strings.
+	(gnus-ofsetup-resource-ja): Ditto.
+
 1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
