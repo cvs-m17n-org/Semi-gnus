@@ -1,3 +1,33 @@
+2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* make.bat: Make sure that gnus-load.el and sieve are writable to
+	avoid breakage.
+
+2004-03-01  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Fix directory test for Windows 9x/ME.  From Michael
+	Schierl <schierlm-public@gmx.de> (tiny change).
+
+2004-01-07  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>
+
+	* etc/gnus-tut.txt: `G m' instead of `G V' (tiny patch).
+
+2004-01-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* make.bat: Add missing parens.  From Robert Marshall
+	<spam@chezmarshall.freeserve.co.uk>.
+
+2004-01-05  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Mention SASL, and that sieve-manage uses it.
+	Mention password.el.
+	Mention NTLM.
+
+2004-01-04  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add IMAP ID (RFC 2971) support.
+	Mention `W e' for editing all.SCORE.
+
 2004-01-03  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Update copyright.

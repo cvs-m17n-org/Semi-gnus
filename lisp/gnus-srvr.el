@@ -51,7 +51,7 @@ with some simple extensions.
 
 The following specs are understood:
 
-%h backend
+%h back end
 %n name
 %w address
 %s status
@@ -342,13 +342,13 @@ The following commands are available:
   (gnus-server-position-point))
 
 (defun gnus-server-server-name ()
-  (let ((server (get-text-property (gnus-point-at-bol) 'gnus-server)))
+  (let ((server (get-text-property (point-at-bol) 'gnus-server)))
     (and server (symbol-name server))))
 
 (defun gnus-server-named-server ()
-  "Returns a server name that matches one of the names returned by
-gnus-method-to-server."
-  (let ((server (get-text-property (gnus-point-at-bol) 'gnus-named-server)))
+  "Return a server name that matches one of the names returned by
+`gnus-method-to-server'."
+  (let ((server (get-text-property (point-at-bol) 'gnus-named-server)))
     (and server (symbol-name server))))
 
 (defalias 'gnus-server-position-point 'gnus-goto-colon)
@@ -730,10 +730,10 @@ gnus-method-to-server."
 	  (if (eq (car method) 'nntp)
 	      (while (not (eobp))
 		(ignore-errors
-		  (push (cons 
-			 (buffer-substring 
+		  (push (cons
+			 (buffer-substring
 			  (point)
-			  (progn 
+			  (progn
 			    (skip-chars-forward "^ \t")
 			    (point)))
 			 (let ((last (read cur)))
@@ -797,18 +797,26 @@ gnus-method-to-server."
 	     (prog1 (1+ (point))
 	       (insert
 		(format "%c%7d: %s\n"
-			(let ((level (gnus-group-level
-				      (concat prefix (setq name (car group))))))
-			      (cond
-			       ((<= level gnus-level-subscribed) ? )
-			       ((<= level gnus-level-unsubscribed) ?U)
-			       ((= level gnus-level-zombie) ?Z)
-			       (t ?K)))
+			(let ((level
+			       (if (string= prefix "")
+				   (gnus-group-level (setq name (car group)))
+				 (gnus-group-level
+				  (concat prefix (setq name (car group)))))))
+			  (cond
+			   ((<= level gnus-level-subscribed) ? )
+			   ((<= level gnus-level-unsubscribed) ?U)
+			   ((= level gnus-level-zombie) ?Z)
+			   (t ?K)))
 			(max 0 (- (1+ (cddr group)) (cadr group)))
-			(mm-decode-coding-string
-			 name
-			 (inline (gnus-group-name-charset method name))))))
-	     (list 'gnus-group name))))
+			;; Don't decode if name is ASCII
+			(if (and (fboundp 'detect-coding-string)
+				 (eq (detect-coding-string name t) 'undecided))
+			    name
+			  (mm-decode-coding-string
+			   name
+			   (inline (gnus-group-name-charset method name)))))))
+	     (list 'gnus-group name)
+	     )))
 	(switch-to-buffer (current-buffer)))
       (goto-char (point-min))
       (gnus-group-position-point)
@@ -896,8 +904,8 @@ buffer.
   (save-excursion
     (beginning-of-line)
     (let ((name (get-text-property (point) 'gnus-group)))
-      (when (re-search-forward ": \\(.*\\)$" (gnus-point-at-eol) t)
-	(concat (gnus-method-to-server-name gnus-browse-current-method) ":" 
+      (when (re-search-forward ": \\(.*\\)$" (point-at-eol) t)
+	(concat (gnus-method-to-server-name gnus-browse-current-method) ":"
 		(or name
 		    (match-string-no-properties 1)))))))
 
@@ -933,8 +941,7 @@ buffer.
 			      gnus-browse-current-method)))
 	     gnus-level-default-subscribed (gnus-group-level group)
 	     (and (car (nth 1 gnus-newsrc-alist))
-		  (gnus-gethash (car (nth 1 gnus-newsrc-alist))
-				gnus-newsrc-hashtb))
+		  (gnus-group-entry (car (nth 1 gnus-newsrc-alist))))
 	     t)
 	    (delete-char 1)
 	    (insert ? ))
@@ -973,7 +980,7 @@ buffer.
 	(gnus-get-function (gnus-server-to-method server)
 			   'request-regenerate)
       (error
-	(error "This backend doesn't support regeneration")))
+	(error "This back end doesn't support regeneration")))
     (gnus-message 5 "Requesting regeneration of %s..." server)
     (unless (gnus-open-server server)
       (error "Couldn't open server"))

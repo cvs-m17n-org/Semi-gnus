@@ -26,8 +26,11 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl)
-  (require 'mm-util))
+  (require 'cl))
+
+(require 'mm-util)
+(require 'gnus-ems)
+(require 'gnus-util)
 
 (defcustom gnus-x-face-directory (expand-file-name "x-faces" gnus-directory)
   "*Directory where X-Face PBM files are stored."
@@ -52,6 +55,30 @@ By default it takes a JPEG filename and output the Face header data
 on stdout."
   :group 'gnus-fun
   :type 'string)
+
+(defcustom gnus-face-properties-alist (if (featurep 'xemacs)
+					  '((xface . (:face gnus-x-face)))
+					'((pbm . (:face gnus-x-face))
+					  (png . nil)))
+  "Alist of image types and properties applied to Face and X-Face images.
+Here are examples:
+
+;; Specify the altitude of Face images in the From header.
+\(setq gnus-face-properties-alist
+      '((pbm . (:face gnus-x-face :ascent 80))
+	(png . (:ascent 80))))
+
+;; Show Face images as pressed buttons.
+\(setq gnus-face-properties-alist
+      '((pbm . (:face gnus-x-face :relief -2))
+	(png . (:relief -2))))
+
+See the manual for the valid properties for various image types.
+Currently, `pbm' is used for X-Face images and `png' is used for Face
+images in Emacs.  Only the `:face' property is effective on the `xface'
+image type in XEmacs if it is built with the libcompface library."
+  :group 'gnus-fun
+  :type '(repeat (cons :format "%v" (symbol :tag "Image type") plist)))
 
 (defun gnus-shell-command-to-string (command)
   "Like `shell-command-to-string' except not mingling ERROR."
@@ -188,11 +215,11 @@ colors of the displayed X-Faces."
 	   'xface
 	   (gnus-put-image
 	    (if (gnus-image-type-available-p 'xface)
-		(gnus-create-image
-		 (concat "X-Face: " data)
-		 'xface t :face 'gnus-x-face)
-	      (gnus-create-image
-	       pbm 'pbm t :face 'gnus-x-face)) nil 'xface))
+		(apply 'gnus-create-image (concat "X-Face: " data) 'xface t
+		       (cdr (assq 'xface gnus-face-properties-alist)))
+	      (apply 'gnus-create-image pbm 'pbm t
+		     (cdr (assq 'pbm gnus-face-properties-alist))))
+	    nil 'xface))
 	  (gnus-add-wash-type 'xface))))))
 
 (defun gnus-grab-cam-x-face ()

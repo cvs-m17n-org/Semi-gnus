@@ -34,11 +34,12 @@
 (eval-and-compile
   (autoload 'message-make-message-id "message")
   (autoload 'gnus-setup-posting-charset "gnus-msg")
-  (autoload 'gnus-add-minor-mode "gnus-ems")
   (autoload 'gnus-make-local-hook "gnus-util")
   (autoload 'message-fetch-field "message")
+  (autoload 'message-mark-active-p "message")
   (autoload 'fill-flowed-encode "flow-fill")
-  (autoload 'message-posting-charset "message"))
+  (autoload 'message-posting-charset "message")
+  (autoload 'x-dnd-get-local-file-name "x-dnd"))
 
 (defcustom mml-content-type-parameters
   '(name access-type expiration size permission format)
@@ -131,19 +132,15 @@ one charsets.")
 
 (defun mml-destroy-buffers ()
   (let (kill-buffer-hook)
-    (mapcar 'kill-buffer mml-buffer-list)
+    (mapc 'kill-buffer mml-buffer-list)
     (setq mml-buffer-list nil)))
 
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
   (save-excursion
     (goto-char (point-min))
-    (let ((table (syntax-table)))
-      (unwind-protect
-	  (progn
-	    (set-syntax-table mml-syntax-table)
-	    (mml-parse-1))
-	(set-syntax-table table)))))
+    (with-syntax-table mml-syntax-table
+      (mml-parse-1))))
 
 (defun mml-parse-1 ()
   "Parse the current buffer as an MML document."
@@ -165,9 +162,8 @@ one charsets.")
 	       (method (cdr (assq 'method taginfo)))
 	       tags)
 	  (save-excursion
-	    (if
-		(re-search-forward
-		 "<#\\(/\\)?\\(multipart\\|part\\|external\\|mml\\)." nil t)
+	    (if (re-search-forward
+		 "<#/?\\(multipart\\|part\\|external\\|mml\\)." nil t)
 		(setq secure-mode "multipart")
 	      (setq secure-mode "part")))
 	  (save-excursion
@@ -447,6 +443,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 		    ;; actually are hard newlines in the text.
 		    (let (use-hard-newlines)
 		      (when (and (string= type "text/plain")
+				 (not (string= (cdr (assq 'sign cont)) "pgp"))
 				 (or (null (assq 'format cont))
 				     (string= (cdr (assq 'format cont))
 					      "flowed"))
@@ -554,7 +551,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	    (message-options-set 'message-sender sender))
 	  (if (setq recipients (cdr (assq 'recipients cont)))
 	      (message-options-set 'message-recipients recipients))
-	  (let ((style (mml-signencrypt-style (first (or sign-item encrypt-item)))))
+	  (let ((style (mml-signencrypt-style
+			(first (or sign-item encrypt-item)))))
 	    ;; check if: we're both signing & encrypting, both methods
 	    ;; are the same (why would they be different?!), and that
 	    ;; the signencrypt style allows for combined operation.
@@ -588,7 +586,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	  (insert-buffer-substring (cdr (assq 'buffer cont))))
 	 ((and (setq filename (cdr (assq 'filename cont)))
 	       (not (equal (cdr (assq 'nofile cont)) "yes")))
-	  (mm-insert-file-contents filename))
+	  (mm-insert-file-contents filename nil nil nil nil t))
 	 (t
 	  (insert (cdr (assq 'contents cont)))))
 	(goto-char (point-min))
@@ -598,7 +596,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 				      (incf mml-multipart-number)))
 	  (throw 'not-unique nil))))
      ((eq (car cont) 'multipart)
-      (mapcar 'mml-compute-boundary-1 (cddr cont))))
+      (mapc 'mml-compute-boundary-1 (cddr cont))))
     t))
 
 (defun mml-make-boundary (number)
@@ -875,7 +873,10 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
      ["S/MIME Encrypt Part" mml-secure-encrypt-smime t])
     ["Encrypt/Sign off" mml-unsecure-message t]
     ;;["Narrow" mml-narrow-to-part t]
-    ["Quote MML" mml-quote-region t]
+    ["Quote MML" mml-quote-region
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Quote MML tags in region"))]
     ["Validate MML" mml-validate t]
     ["Preview" mml-preview t]))
 
@@ -892,8 +893,13 @@ See Info node `(emacs-mime)Composing'.
   (when (set (make-local-variable 'mml-mode)
 	     (if (null arg) (not mml-mode)
 	       (> (prefix-numeric-value arg) 0)))
-    (gnus-add-minor-mode 'mml-mode " MML" mml-mode-map)
+    (add-minor-mode 'mml-mode " MML" mml-mode-map)
     (easy-menu-add mml-menu mml-mode-map)
+    (when (boundp 'x-dnd-protocol-alist)
+      (set (make-local-variable 'x-dnd-protocol-alist)
+	   '(("^file:///" . mml-x-dnd-attach-file)
+	     ("^file://"  . x-dnd-open-file)
+	     ("^file:"    . mml-x-dnd-attach-file))))
     (run-hooks 'mml-mode-hook)))
 
 ;;;
@@ -940,10 +946,11 @@ See Info node `(emacs-mime)Composing'.
 		      (if (string-match "^text/.*" type)
 			  "inline"
 			"attachment")))
-	 (disposition (completing-read "Disposition: "
-				       '(("attachment") ("inline") (""))
-				       nil
-				       nil)))
+        (disposition (completing-read 
+                      (format "Disposition: (default %s): " default)
+                      '(("attachment") ("inline") (""))
+                      nil
+                      nil)))
     (if (not (equal disposition ""))
 	disposition
       default)))
@@ -1009,6 +1016,15 @@ description of the attachment."
 			'filename file
 			'disposition (or disposition "attachment")
 			'description description))
+
+(defun mml-x-dnd-attach-file (uri action)
+  "Attach a drag and drop file."
+  (let ((file (x-dnd-get-local-file-name uri t)))
+    (when (and file (file-regular-p file))
+      (let* ((type (mml-minibuffer-read-type file))
+	    (description (mml-minibuffer-read-description))
+	    (disposition (mml-minibuffer-read-disposition type)))
+	(mml-attach-file file type description disposition)))))
 
 (defun mml-attach-buffer (buffer &optional type description)
   "Attach a buffer to the outgoing MIME message.

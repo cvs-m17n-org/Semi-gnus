@@ -1,5 +1,5 @@
 ;;; texi2latex.el --- convert a texi file into a LaTeX file.
-;; Copyright (C) 1996 Lars Magne Ingebrigtsen
+;; Copyright (C) 1996, 2004 Lars Magne Ingebrigtsen
 
 (require 'cl)
 
@@ -39,7 +39,9 @@
   (latexi-translate-file "message" t)
   (latexi-translate-file "emacs-mime" t)
   (latexi-translate-file "sieve" t)
-  (latexi-translate-file "pgg" t))
+  (latexi-translate-file "pgg" t)
+  (latexi-translate-file "sasl" t)
+  (latexi-translate-file "gnus-news" t))
 
 (defun latexi-translate-file (file &optional as-a-chapter)
   "Translate file a LaTeX file."
@@ -63,6 +65,11 @@
     (insert-buffer-substring cur)
     (goto-char (point-min))
     (latexi-strip-line)
+    (latexi-translate-string "@'e" "\\'{e}")
+    (latexi-translate-string "@`a" "\\`{a}")
+    (latexi-translate-string "@,{c}" "\\c{c}")
+    (latexi-translate-string "@aa{}" "{\\aa}")
+    (latexi-translate-string "@\"{@dotless{i}}" "ï")
     (latexi-translate-string "%@{" "\\gnuspercent{}\\gnusbraceleft{}")
     (latexi-translate-string "%@}" "\\gnuspercent{}\\gnusbraceright{}")
     (latexi-translate-string "%1@{" "\\gnuspercent{}1\\gnusbraceright{}")
@@ -101,7 +108,8 @@
 				  "summarycontents" "bye"
 				  "top" "iftex" "cartouche" 
 				  "iflatex" "finalout" "vskip"
-				  "dircategory" "group" "syncodeindex"))
+				  "dircategory" "group" "syncodeindex"
+				  "documentencoding"))
 		(latexi-strip-line))
 	       ((member command '("menu" "tex" "ifinfo" "ignore" 
 				  "ifnottex" "direntry"))
@@ -242,7 +250,7 @@
 		(latexi-begin-command "verse"))
 	       ((equal command "page")
 		(latexi-strip-line)
-		(insert (format "\\newpage\n" arg)))
+		(insert "\\newpage\n"))
 	       ((equal command "'s")
 		(goto-char (match-beginning 0))
 		(delete-char 1))

@@ -31,7 +31,6 @@
 (require 'gnus)				; for macro gnus-kill-buffer, at least
 (require 'nnheader)
 (require 'message)
-(require 'custom)
 (require 'gnus-util)
 (require 'mail-source)
 (require 'mm-util)
@@ -403,13 +402,13 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                             (const :format "" &)
                             (editable-list :inline t nnmail-split-fancy))
                       (list :tag "Function with fixed arguments (:)"
-                            :value (: nil)
+                            :value (:)
                             (const :format "" :value :)
                             function 
                             (editable-list :inline t (sexp :tag "Arg"))
                             )
                       (list :tag "Function with split arguments (!)"
-                            :value (! nil)
+                            :value (!)
                             (const :format "" !)
                             function
                             (editable-list :inline t nnmail-split-fancy))
@@ -467,7 +466,7 @@ FIELD must match a complete field name.  VALUE must match a complete
 word according to the `nnmail-split-fancy-syntax-table' syntax table.
 You can use \".*\" in the regexps to match partial field names or words.
 
-FIELD and VALUE can also be lisp symbols, in that case they are expanded
+FIELD and VALUE can also be Lisp symbols, in that case they are expanded
 as specified in `nnmail-split-abbrev-alist'.
 
 GROUP can contain \\& and \\N which will substitute from matching
@@ -667,7 +666,7 @@ nn*-request-list should have been called before calling this function."
     (while (not (eobp))
       (condition-case err
 	  (progn
-	    (narrow-to-region (point) (gnus-point-at-eol))
+	    (narrow-to-region (point) (point-at-eol))
 	    (setq group (read buffer))
 	    (unless (stringp group)
 	      (setq group (symbol-name group)))
@@ -1105,7 +1104,7 @@ FUNC will be called with the group name to determine the article number."
 	(while (not (eobp))
 	  (unless (< (move-to-column nnmail-split-header-length-limit)
 		     nnmail-split-header-length-limit)
-	    (delete-region (point) (gnus-point-at-eol)))
+	    (delete-region (point) (point-at-eol)))
 	  (forward-line 1))
 	;; Allow washing.
 	(goto-char (point-min))
@@ -1307,12 +1306,8 @@ to actually put the message in the right group."
 (defun nnmail-split-fancy ()
   "Fancy splitting method.
 See the documentation for the variable `nnmail-split-fancy' for details."
-  (let ((syntab (syntax-table)))
-    (unwind-protect
-	(progn
-	  (set-syntax-table nnmail-split-fancy-syntax-table)
-	  (nnmail-split-it nnmail-split-fancy))
-      (set-syntax-table syntab))))
+  (with-syntax-table nnmail-split-fancy-syntax-table
+    (nnmail-split-it nnmail-split-fancy)))
 
 (defvar nnmail-split-cache nil)
 ;; Alist of split expressions their equivalent regexps.
@@ -1614,7 +1609,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 	(skip-chars-forward "^\n\r\t")
 	(unless (looking-at "[\r\n]")
 	  (forward-char 1)
-	  (buffer-substring (point) (gnus-point-at-eol)))))))
+	  (buffer-substring (point) (point-at-eol)))))))
 
 ;; Function for nnmail-split-fancy: look up all references in the
 ;; cache and if a match is found, return that group.

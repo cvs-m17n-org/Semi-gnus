@@ -29,24 +29,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (defvar message-posting-charset)
-  (unless (fboundp 'with-syntax-table)	; not in Emacs 20
-    (defmacro with-syntax-table (table &rest body)
-      "Evaluate BODY with syntax table of current buffer set to TABLE.
-The syntax table of the current buffer is saved, BODY is evaluated, and the
-saved table is restored, even in case of an abnormal exit.
-Value is what BODY returns."
-      (let ((old-table (make-symbol "table"))
-	    (old-buffer (make-symbol "buffer")))
-	`(let ((,old-table (syntax-table))
-	       (,old-buffer (current-buffer)))
-	   (unwind-protect
-	       (progn
-		 (set-syntax-table ,table)
-		 ,@body)
-	     (save-current-buffer
-	       (set-buffer ,old-buffer)
-	       (set-syntax-table ,old-table))))))))
+  (defvar message-posting-charset))
 
 (require 'qp)
 (require 'mm-util)
@@ -54,18 +37,6 @@ Value is what BODY returns."
 (require 'mail-prsvr)
 (require 'base64)
 (autoload 'mm-body-7-or-8 "mm-bodies")
-
-(eval-and-compile
-  ;; Avoid gnus-util for mm- code.
-  (defalias 'rfc2047-point-at-bol
-    (if (fboundp 'point-at-bol)
-	'point-at-bol
-      'line-beginning-position))
-
-  (defalias 'rfc2047-point-at-eol
-    (if (fboundp 'point-at-eol)
-	'point-at-eol
-      'line-end-position)))
 
 (defvar rfc2047-header-encoding-alist
   '(("Newsgroups" . nil)
@@ -126,6 +97,25 @@ quoted-printable and base64 respectively.")
 ;;; Functions for encoding RFC2047 messages
 ;;;
 
+(defun rfc2047-qp-or-base64 ()
+  "Return the type with which to encode the buffer.
+This is either `base64' or `quoted-printable'."
+  (save-excursion
+    (let ((limit (min (point-max) (+ 2000 (point-min))))
+	  (n8bit 0))
+      (goto-char (point-min))
+      (skip-chars-forward "\x20-\x7f\r\n\t" limit)
+      (while (< (point) limit)
+	(incf n8bit)
+	(forward-char 1)
+	(skip-chars-forward "\x20-\x7f\r\n\t" limit))
+      (if (or (< (* 6 n8bit) (- limit (point-min)))
+	      ;; Don't base64, say, a short line with a single
+	      ;; non-ASCII char when splitting parts by charset.
+	      (= n8bit 1))
+	  'quoted-printable
+	'base64))))
+
 (defun rfc2047-narrow-to-field ()
   "Narrow the buffer to the header on the current line."
   (beginning-of-line)
@@ -134,7 +124,7 @@ quoted-printable and base64 respectively.")
    (progn
      (forward-line 1)
      (if (re-search-forward "^[^ \n\t]" nil t)
-	 (rfc2047-point-at-bol)
+	 (point-at-bol)
        (point-max))))
   (goto-char (point-min)))
 
@@ -411,7 +401,7 @@ By default, the region is treated as containing addresses (see
 		       ;; encoding, choose the one that's shorter.
 		       (save-restriction
 			 (narrow-to-region b e)
-			 (if (eq (mm-qp-or-base64) 'base64)
+			 (if (eq (rfc2047-qp-or-base64) 'base64)
 			     'B
 			   'Q))))
 	 (start (concat
@@ -424,7 +414,7 @@ By default, the region is treated as containing addresses (see
 		   (t 8)))
 	 (pre (- b (save-restriction
 		     (widen)
-		     (rfc2047-point-at-bol))))
+		     (point-at-bol))))
 	 ;; encoded-words must not be longer than 75 characters,
 	 ;; including charset, encoding etc.  This leaves us with
 	 ;; 75 - (length start) - 2 - 2 characters.  The last 2 is for
@@ -483,7 +473,7 @@ By default, the region is treated as containing addresses (see
 	  (first t)
 	  (bol (save-restriction
 		 (widen)
-		 (rfc2047-point-at-bol))))
+		 (point-at-bol))))
       (while (not (eobp))
 	(when (and (or break qword-break)
 		   (> (- (point) bol) 76))
@@ -554,18 +544,18 @@ By default, the region is treated as containing addresses (see
     (goto-char (point-min))
     (let ((bol (save-restriction
 		 (widen)
-		 (rfc2047-point-at-bol)))
-	  (eol (rfc2047-point-at-eol)))
+		 (point-at-bol)))
+	  (eol (point-at-eol)))
       (forward-line 1)
       (while (not (eobp))
 	(if (and (looking-at "[ \t]")
-		 (< (- (rfc2047-point-at-eol) bol) 76))
+		 (< (- (point-at-eol) bol) 76))
 	    (delete-region eol (progn
 				 (goto-char eol)
 				 (skip-chars-forward "\r\n")
 				 (point)))
-	  (setq bol (rfc2047-point-at-bol)))
-	(setq eol (rfc2047-point-at-eol))
+	  (setq bol (point-at-bol)))
+	(setq eol (point-at-eol))
 	(forward-line 1)))))
 
 (defun rfc2047-b-encode-region (b e)
@@ -585,7 +575,7 @@ By default, the region is treated as containing addresses (see
       (narrow-to-region (goto-char b) e)
       (let ((bol (save-restriction
 		   (widen)
-		   (rfc2047-point-at-bol))))
+		   (point-at-bol))))
 	(quoted-printable-encode-region
 	 b e nil
 	 ;; = (\075), _ (\137), ? (\077) are used in the encoded word.
@@ -617,8 +607,8 @@ By default, the region is treated as containing addresses (see
 
 (eval-and-compile
   (defconst rfc2047-encoded-word-regexp
-    "=\\?\\([^][\000-\040()<>@,\;:\\\"/?.=]+\\)\\?\\(B\\|Q\\)\
-\\?\\([!->@-~ +]*\\)\\?="))
+    "=\\?\\([^][\000-\040()<>@,\;:*\\\"/?.=]+\\)\\(?:\\*[^?]+\\)?\
+\\?\\(B\\|Q\\)\\?\\([!->@-~ ]*\\)\\?="))
 
 ;; Fixme: This should decode in place, not cons intermediate strings.
 ;; Also check whether it needs to worry about delimiting fields like
@@ -697,7 +687,20 @@ By default, the region is treated as containing addresses (see
 	       mail-parse-charset
 	       (not (eq mail-parse-charset 'us-ascii))
 	       (not (eq mail-parse-charset 'gnus-decoded)))
-	  (mm-decode-coding-string string mail-parse-charset)
+	  ;; `decode-coding-string' in Emacs offers a third optional
+	  ;; arg NOCOPY to avoid consing a new string if the decoding
+	  ;; is "trivial".  Unfortunately it currently doesn't
+	  ;; consider anything else than a `nil' coding system
+	  ;; trivial.
+	  ;; `rfc2047-decode-string' is called multiple times for each
+	  ;; article during summary buffer generation, and we really
+	  ;; want to avoid unnecessary consing.  So we bypass
+	  ;; `decode-coding-string' if the string is purely ASCII.
+	  (if (and (fboundp 'detect-coding-string)
+		   ;; string is purely ASCII
+		   (eq (detect-coding-string string t) 'undecided))
+	      string
+	    (mm-decode-coding-string string mail-parse-charset))
 	(mm-string-as-multibyte string)))))
 
 (defun rfc2047-parse-and-decode (word)
@@ -710,7 +713,7 @@ decodable."
      (condition-case nil
 	 (rfc2047-decode
 	  (match-string 1 word)
-	  (upcase (match-string 2 word))
+	  (string-to-char (match-string 2 word))
 	  (match-string 3 word))
        (error word))
      word)))				; un-decodable
@@ -720,15 +723,19 @@ decodable."
   ;; Be more liberal to accept buggy base64 strings. If
   ;; base64-decode-string accepts buggy strings, this function could
   ;; be aliased to identity.
-  (case (mod (length string) 4)
-    (0 string)
-    (1 string) ;; Error, don't pad it.
-    (2 (concat string "=="))
-    (3 (concat string "="))))
+  (if (= 0 (mod (length string) 4))
+      string
+    (when (string-match "=+$" string)
+      (setq string (substring string 0 (match-beginning 0))))
+    (case (mod (length string) 4)
+      (0 string)
+      (1 string) ;; Error, don't pad it.
+      (2 (concat string "=="))
+      (3 (concat string "=")))))
 
 (defun rfc2047-decode (charset encoding string)
   "Decode STRING from the given MIME CHARSET in the given ENCODING.
-Valid ENCODINGs are \"B\" and \"Q\".
+Valid ENCODINGs are the characters \"B\" and \"Q\".
 If your Emacs implementation can't decode CHARSET, return nil."
   (if (stringp charset)
       (setq charset (intern (downcase charset))))
@@ -748,13 +755,13 @@ If your Emacs implementation can't decode CHARSET, return nil."
 	(setq cs mail-parse-charset))
       (mm-decode-coding-string
        (cond
-	((equal "B" encoding)
+	((char-equal ?B encoding)
 	 (base64-decode-string
 	  (rfc2047-pad-base64 string)))
-	((equal "Q" encoding)
+	((char-equal ?Q encoding)
 	 (quoted-printable-decode-string
-	  (mm-replace-chars-in-string string ?_ ? )))
-	(t (error "Invalid encoding: %s" encoding)))
+	  (mm-subst-char-in-string ?_ ? string t)))
+	(t (error "Invalid encoding: %c" encoding)))
        cs))))
 
 (provide 'rfc2047)

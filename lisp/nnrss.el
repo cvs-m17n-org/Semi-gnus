@@ -1,5 +1,5 @@
 ;;; nnrss.el --- interfacing with RSS
-;; Copyright (C) 2001, 2002, 2003  Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: RSS
@@ -54,7 +54,7 @@
 (defvoo nnrss-group-max 0)
 (defvoo nnrss-group-min 1)
 (defvoo nnrss-group nil)
-(defvoo nnrss-group-hashtb nil)
+(defvoo nnrss-group-hashtb (make-hash-table :test 'equal))
 (defvoo nnrss-status-string "")
 
 (defconst nnrss-version "nnrss 1.0")
@@ -75,7 +75,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 (defvar nnrss-content-function nil
   "A function which is called in `nnrss-request-article'.
 The arguments are (ENTRY GROUP ARTICLE).
-ENTRY is the record of the current headline. GROUP is the group name.
+ENTRY is the record of the current headline.  GROUP is the group name.
 ARTICLE is the article number of the current headline.")
 
 (nnoo-define-basics nnrss)
@@ -167,28 +167,28 @@ ARTICLE is the article number of the current headline.")
 			  (nth 2 e))))
 	    (insert "\n\n--" boundary "\nContent-Type: text/plain\n\n")
 	    (let ((point (point)))
-	      (if text
-		  (progn (insert text)
-			 (goto-char point)
-			 (while (re-search-forward "\n" nil t)
-			   (replace-match " "))
-			 (goto-char (point-max))
-			 (insert "\n\n")))
-	      (if link
-		  (insert link)))
+	      (when text
+		(insert text)
+		(goto-char point)
+		(while (re-search-forward "\n" nil t)
+		  (replace-match " "))
+		(goto-char (point-max))
+		(insert "\n\n"))
+	      (when link
+		(insert link)))
 	    (insert "\n\n--" boundary "\nContent-Type: text/html\n\n")
 	    (let ((point (point)))
-	      (if text
-		  (progn (insert "<html><head></head><body>\n" text "\n</body></html>")
-			 (goto-char point)
-			 (while (re-search-forward "\n" nil t)
-			   (replace-match " "))
-			 (goto-char (point-max))
-			 (insert "\n\n")))
-	      (if link
-		  (insert "<p><a href=\"" link "\">link</a></p>\n"))))
-	  (if nnrss-content-function
-	      (funcall nnrss-content-function e group article)))))
+	      (when text
+		(insert "<html><head></head><body>\n" text "\n</body></html>")
+		(goto-char point)
+		(while (re-search-forward "\n" nil t)
+		  (replace-match " "))
+		(goto-char (point-max))
+		(insert "\n\n"))
+	      (when link
+		(insert "<p><a href=\"" link "\">link</a></p>\n"))))
+	  (when nnrss-content-function
+	    (funcall nnrss-content-function e group article)))))
     (cond
      (err
       (nnheader-report 'nnrss err))
@@ -232,14 +232,8 @@ ARTICLE is the article number of the current headline.")
   (setq nnrss-server-data
 	(delq (assoc group nnrss-server-data) nnrss-server-data))
   (nnrss-save-server-data server)
-  (let ((file (expand-file-name
-	       (nnrss-translate-file-chars
-		(concat group (and server
-				   (not (equal server ""))
-				   "-")
-			server ".el")) nnrss-directory)))
-    (ignore-errors
-      (delete-file file)))
+  (ignore-errors
+    (delete-file (nnrss-make-filename group server)))
   t)
 
 (deffoo nnrss-request-list-newsgroups (&optional server)
@@ -257,7 +251,7 @@ ARTICLE is the article number of the current headline.")
 ;;; Internal functions
 (eval-when-compile (defun xml-rpc-method-call (&rest args)))
 (defun nnrss-fetch (url &optional local)
-  "Fetch the url and put it in a the expected lisp structure."
+  "Fetch URL and put it in a the expected Lisp structure."
   (with-temp-buffer
   ;some CVS versions of url.el need this to close the connection quickly
     (let* (xmlform htmlform)
@@ -296,7 +290,7 @@ ARTICLE is the article number of the current headline.")
 (defvar nnrss-extra-categories '(nnrss-snarf-moreover-categories))
 
 (defun nnrss-generate-active ()
-  (if (y-or-n-p "fetch extra categories? ")
+  (if (y-or-n-p "Fetch extra categories? ")
       (dolist (func nnrss-extra-categories)
 	(funcall func)))
   (save-excursion
@@ -312,85 +306,62 @@ ARTICLE is the article number of the current headline.")
 
 (defun nnrss-read-server-data (server)
   (setq nnrss-server-data nil)
-  (let ((file (expand-file-name
-	       (nnrss-translate-file-chars
-		(concat "nnrss" (and server
-				     (not (equal server ""))
-				     "-")
-			server
-			".el"))
-	       nnrss-directory)))
+  (let ((file (nnrss-make-filename "nnrss" server)))
     (when (file-exists-p file)
-      (with-temp-buffer
-	(let ((coding-system-for-read 'binary)
-	      emacs-lisp-mode-hook)
-	  (insert-file-contents file)
-	  (emacs-lisp-mode)
-	  (goto-char (point-min))
-	  (eval-buffer))))))
+      (let ((coding-system-for-read 'binary))
+	(load file nil nil t)))))
 
 (defun nnrss-save-server-data (server)
   (gnus-make-directory nnrss-directory)
-  (let ((file (expand-file-name
-	       (nnrss-translate-file-chars
-		(concat "nnrss" (and server
-				     (not (equal server ""))
-				     "-")
-			server ".el"))
-	       nnrss-directory)))
-    (let ((coding-system-for-write 'binary)
-	  print-level print-length)
-      (with-temp-file file
-	(insert "(setq nnrss-group-alist '"
-		(prin1-to-string nnrss-group-alist)
-		")\n")
-	(insert "(setq nnrss-server-data '"
-		(prin1-to-string nnrss-server-data)
-		")\n")))))
+  (let ((coding-system-for-write 'binary))
+    (with-temp-file (nnrss-make-filename "nnrss" server)
+      (gnus-prin1 `(setq nnrss-group-alist ',nnrss-group-alist))
+      (gnus-prin1 `(setq nnrss-server-data ',nnrss-server-data)))))
 
 (defun nnrss-read-group-data (group server)
   (setq nnrss-group-data nil)
-  (setq nnrss-group-hashtb (gnus-make-hashtable))
+  (if (hash-table-p nnrss-group-hashtb)
+      (clrhash nnrss-group-hashtb)
+    (setq nnrss-group-hashtb (make-hash-table :test 'equal)))
   (let ((pair (assoc group nnrss-server-data)))
     (setq nnrss-group-max (or (cadr pair) 0))
     (setq nnrss-group-min (+ nnrss-group-max 1)))
-  (let ((file (expand-file-name
-	       (nnrss-translate-file-chars
-		(concat group (and server
-				   (not (equal server ""))
-				   "-")
-			server ".el"))
-	       nnrss-directory)))
+  (let ((file (nnrss-make-filename group server)))
     (when (file-exists-p file)
-      (with-temp-buffer
-	(let ((coding-system-for-read 'binary)
-	      emacs-lisp-mode-hook)
-	  (insert-file-contents file)
-	  (emacs-lisp-mode)
-	  (goto-char (point-min))
-	  (eval-buffer)))
+      (let ((coding-system-for-read 'binary))
+	(load file nil t t))
       (dolist (e nnrss-group-data)
-	(gnus-sethash (nth 2 e) e nnrss-group-hashtb)
-	(if (and (car e) (> nnrss-group-min (car e)))
-	    (setq nnrss-group-min (car e)))
-	(if (and (car e) (< nnrss-group-max (car e)))
-	    (setq nnrss-group-max (car e)))))))
+	(puthash (or (nth 2 e) (nth 3 e)) t nnrss-group-hashtb)
+	(when (and (car e) (> nnrss-group-min (car e)))
+	  (setq nnrss-group-min (car e)))
+	(when (and (car e) (< nnrss-group-max (car e)))
+	  (setq nnrss-group-max (car e)))))))
 
 (defun nnrss-save-group-data (group server)
   (gnus-make-directory nnrss-directory)
-  (let ((file (expand-file-name
-	       (nnrss-translate-file-chars
-		(concat group (and server
-				   (not (equal server ""))
-				   "-")
-			server ".el"))
-	       nnrss-directory)))
-    (let ((coding-system-for-write 'binary)
-	  print-level print-length)
-      (with-temp-file file
-	(insert "(setq nnrss-group-data '"
-		(prin1-to-string nnrss-group-data)
-		")\n")))))
+  (let ((coding-system-for-write 'binary))
+    (with-temp-file (nnrss-make-filename group server)
+      (gnus-prin1 `(setq nnrss-group-data ',nnrss-group-data)))))
+
+(defun nnrss-make-filename (name server)
+  (expand-file-name
+   (nnrss-translate-file-chars
+    (concat name
+	    (and server
+		 (not (equal server ""))
+		 "-")
+	    server
+	    ".el"))
+   nnrss-directory))
+
+(gnus-add-shutdown 'nnrss-close 'gnus)
+
+(defun nnrss-close ()
+  "Clear internal nnrss variables."
+  (setq nnrss-group-data nil
+	nnrss-server-data nil
+	nnrss-group-hashtb nil
+	nnrss-group-alist nil))
 
 ;;; URL interface
 
@@ -449,11 +420,13 @@ ARTICLE is the article number of the current headline.")
 	  content-ns (nnrss-get-namespace-prefix xml "http://purl.org/rss/1.0/modules/content/"))
     (dolist (item (nreverse (nnrss-find-el (intern (concat rss-ns "item")) xml)))
       (when (and (listp item)
-		 (eq (intern (concat rss-ns "item")) (car item))
-		 (setq url (nnrss-decode-entities-unibyte-string
-			    (nnrss-node-text rss-ns 'link (cddr item))))
-		 (not (gnus-gethash url nnrss-group-hashtb)))
-	(setq subject (nnrss-node-text rss-ns 'title item))
+		 (string= (concat rss-ns "item") (car item))
+		 (if (setq url (nnrss-decode-entities-unibyte-string
+				(nnrss-node-text rss-ns 'link (cddr item))))
+		     (not (gethash url nnrss-group-hashtb))
+		   (setq subject (nnrss-node-text rss-ns 'title item))
+		   (not (gethash subject nnrss-group-hashtb))))
+	(setq subject (or subject (nnrss-node-text rss-ns 'title item)))
 	(setq extra (or (nnrss-node-text content-ns 'encoded item)
 			(nnrss-node-text rss-ns 'description item)))
 	(setq author (or (nnrss-node-text rss-ns 'author item)
@@ -472,8 +445,9 @@ ARTICLE is the article number of the current headline.")
 	  date
 	  (and extra (nnrss-decode-entities-unibyte-string extra)))
 	 nnrss-group-data)
-	(gnus-sethash url (car nnrss-group-data) nnrss-group-hashtb)
-	(setq changed t)))
+	(puthash (or url subject) t nnrss-group-hashtb)
+	(setq changed t))
+      	(setq subject nil))
     (when changed
       (nnrss-save-group-data group server)
       (let ((pair (assoc group nnrss-server-data)))
@@ -481,6 +455,49 @@ ARTICLE is the article number of the current headline.")
 	    (setcar (cdr pair) nnrss-group-max)
 	  (push (list group nnrss-group-max) nnrss-server-data)))
       (nnrss-save-server-data server))))
+
+(defun nnrss-opml-import (opml-file)
+  "OPML subscriptions import.
+Read the file and attempt to subscribe to each Feed in the file."
+  (interactive "fImport file: ")
+  (mapcar
+   (lambda (node) (gnus-group-make-rss-group
+                   (cdr (assq 'xmlUrl (cadr node)))))
+   (nnrss-find-el 'outline
+                  (progn
+                    (find-file opml-file)
+                    (xml-parse-region (point-min)
+                                      (point-max))))))
+
+(defun nnrss-opml-export ()
+  "OPML subscription export.
+Export subscriptions to a buffer in OPML Format."
+  (interactive)
+  (with-current-buffer (get-buffer-create "*OPML Export*")
+    (mm-set-buffer-file-coding-system 'utf-8)
+    (insert (concat
+	     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+	     "<!-- OPML generated by Emacs Gnus' nnrss.el -->\n"
+	     "<opml version=\"1.1\">\n"
+	     "  <head>\n"
+	     "    <title>mySubscriptions</title>\n"
+	     "    <dateCreated>" (format-time-string "%a, %d %b %Y %T %z")
+	     "</dateCreated>\n"
+	     "    <ownerEmail>" user-mail-address "</ownerEmail>\n"
+	     "    <ownerName>" (user-full-name) "</ownerName>\n"
+	     "  </head>\n"
+	     "  <body>\n"))
+    (mapc (lambda (sub)
+	    (insert (concat
+		     "    <outline text=\"" (car sub) "\" xmlUrl=\""
+		     (cadr sub) "\"/>\n")))
+	  nnrss-group-alist)
+    (insert (concat
+	     "  </body>\n"
+           "</opml>\n")))
+  (pop-to-buffer "*OPML Export*")
+  (when (fboundp 'sgml-mode)
+    (sgml-mode)))
 
 (defun nnrss-generate-download-script ()
   "Generate a download script in the current buffer.
@@ -549,51 +566,52 @@ It is useful when `(setq nnrss-use-local t)'."
     node))
 
 (defun nnrss-find-el (tag data &optional found-list)
-  "Find the all matching elements in the data.  Careful with this on
-large documents!"
-  (if (listp data)
-      (mapcar (lambda (bit)
-		(if (car-safe bit)
-		    (progn (if (equal tag (car bit))
-			       (setq found-list
-				     (append found-list
-					     (list bit))))
-			   (if (and (listp (car-safe (caddr bit)))
-				    (not (stringp (caddr bit))))
-			       (setq found-list
-				     (append found-list
-					     (nnrss-find-el
-					      tag (caddr bit))))
-			     (setq found-list
-				   (append found-list
-					   (nnrss-find-el
-					    tag (cddr bit))))))))
-		data))
+  "Find the all matching elements in the data.
+Careful with this on large documents!"
+  (when (listp data)
+    (mapc (lambda (bit)
+	    (when (car-safe bit)
+	      (when (equal tag (car bit))
+		(setq found-list
+		      (append found-list
+			      (list bit))))
+	      (if (and (listp (car-safe (caddr bit)))
+		       (not (stringp (caddr bit))))
+		  (setq found-list
+			(append found-list
+				(nnrss-find-el
+				 tag (caddr bit))))
+		(setq found-list
+		      (append found-list
+			      (nnrss-find-el
+			       tag (cddr bit)))))))
+	  data))
   found-list)
 
 (defun nnrss-rsslink-p (el)
   "Test if the element we are handed is an RSS autodiscovery link."
   (and (eq (car-safe el) 'link)
        (string-equal (cdr (assoc 'rel (cadr el))) "alternate")
-       (or (string-equal (cdr (assoc 'type (cadr el))) 
+       (or (string-equal (cdr (assoc 'type (cadr el)))
 			 "application/rss+xml")
 	   (string-equal (cdr (assoc 'type (cadr el))) "text/xml"))))
 
 (defun nnrss-get-rsslinks (data)
   "Extract the <link> elements that are links to RSS from the parsed data."
-  (delq nil (mapcar 
+  (delq nil (mapcar
 	     (lambda (el)
 	       (if (nnrss-rsslink-p el) el))
 	     (nnrss-find-el 'link data))))
 
 (defun nnrss-extract-hrefs (data)
-  "Recursively extract hrefs from a page's source.  DATA should be
-the output of xml-parse-region or w3-parse-buffer."
+  "Recursively extract hrefs from a page's source.
+DATA should be the output of `xml-parse-region' or
+`w3-parse-buffer'."
   (mapcar (lambda (ahref)
 	    (cdr (assoc 'href (cadr ahref))))
 	  (nnrss-find-el 'a data)))
 
-(defmacro nnrss-match-macro (base-uri item 
+(defmacro nnrss-match-macro (base-uri item
 					   onsite-list offsite-list)
   `(cond ((or (string-match (concat "^" ,base-uri) ,item)
 	       (not (string-match "://" ,item)))
@@ -614,28 +632,28 @@ whether they are `offsite' or `onsite'."
 	rss-onsite-in   rdf-onsite-in   xml-onsite-in
 	rss-offsite-end rdf-offsite-end xml-offsite-end
 	rss-offsite-in rdf-offsite-in xml-offsite-in)
-    (mapcar (lambda (href)
-	      (if (not (null href))
-	      (cond ((string-match "\\.rss$" href)
-		     (nnrss-match-macro
-		      base-uri href rss-onsite-end rss-offsite-end))
-		    ((string-match "\\.rdf$" href)
-		     (nnrss-match-macro 
-		      base-uri href rdf-onsite-end rdf-offsite-end))
-		    ((string-match "\\.xml$" href)
-		     (nnrss-match-macro
-		      base-uri href xml-onsite-end xml-offsite-end))
-		    ((string-match "rss" href)
-		     (nnrss-match-macro
-		      base-uri href rss-onsite-in rss-offsite-in))
-		    ((string-match "rdf" href)
-		     (nnrss-match-macro
-		      base-uri href rdf-onsite-in rdf-offsite-in))
-		    ((string-match "xml" href)
-		     (nnrss-match-macro
-		      base-uri href xml-onsite-in xml-offsite-in)))))
-	    hrefs)
-    (append 
+    (mapc (lambda (href)
+	    (if (not (null href))
+		(cond ((string-match "\\.rss$" href)
+		       (nnrss-match-macro
+			base-uri href rss-onsite-end rss-offsite-end))
+		      ((string-match "\\.rdf$" href)
+		       (nnrss-match-macro
+			base-uri href rdf-onsite-end rdf-offsite-end))
+		      ((string-match "\\.xml$" href)
+		       (nnrss-match-macro
+			base-uri href xml-onsite-end xml-offsite-end))
+		      ((string-match "rss" href)
+		       (nnrss-match-macro
+			base-uri href rss-onsite-in rss-offsite-in))
+		      ((string-match "rdf" href)
+		       (nnrss-match-macro
+			base-uri href rdf-onsite-in rdf-offsite-in))
+		      ((string-match "xml" href)
+		       (nnrss-match-macro
+			base-uri href xml-onsite-in xml-offsite-in)))))
+	  hrefs)
+    (append
      rss-onsite-end  rdf-onsite-end  xml-onsite-end
      rss-onsite-in   rdf-onsite-in   xml-onsite-in
      rss-offsite-end rdf-offsite-end xml-offsite-end
@@ -668,7 +686,7 @@ whether they are `offsite' or `onsite'."
 ;;       - offsite links containing any of the above
 	  (let* ((base-uri (progn (string-match ".*://[^/]+/?" url)
 				  (match-string 0 url)))
-		 (hrefs (nnrss-order-hrefs 
+		 (hrefs (nnrss-order-hrefs
 			 base-uri (nnrss-extract-hrefs parsed-page)))
 		 (rss-link nil))
 	  (while (and (eq rss-link nil) (not (eq hrefs nil)))
@@ -684,7 +702,7 @@ whether they are `offsite' or `onsite'."
 	    (nnrss-find-rss-via-syndic8 url))))))))
 
 (defun nnrss-find-rss-via-syndic8 (url)
-  "query syndic8 for the rss feeds it has for the url."
+  "Query syndic8 for the rss feeds it has for URL."
   (if (not (locate-library "xml-rpc"))
       (progn
 	(message "XML-RPC is not available... not checking Syndic8.")
@@ -695,22 +713,22 @@ whether they are `offsite' or `onsite'."
 		   'syndic8.FindSites
 		   url)))
       (when feedid
-	(let* ((feedinfo (xml-rpc-method-call 
+	(let* ((feedinfo (xml-rpc-method-call
 			  "http://www.syndic8.com/xmlrpc.php"
 			  'syndic8.GetFeedInfo
 			  feedid))
 	       (urllist
-		(delq nil 
+		(delq nil
 		      (mapcar
 		       (lambda (listinfo)
-			 (if (string-equal 
+			 (if (string-equal
 			      (cdr (assoc "status" listinfo))
 			      "Syndicated")
 			     (cons
 			      (cdr (assoc "sitename" listinfo))
 			      (list
 			       (cons 'title
-				     (cdr (assoc 
+				     (cdr (assoc
 					   "sitename" listinfo)))
 			       (cons 'href
 				     (cdr (assoc
@@ -719,20 +737,20 @@ whether they are `offsite' or `onsite'."
 	  (if (not (> (length urllist) 1))
 	      (cdar urllist)
 	    (let ((completion-ignore-case t)
-		  (selection 
+		  (selection
 		   (mapcar (lambda (listinfo)
-			     (cons (cdr (assoc "sitename" listinfo)) 
-				   (string-to-int 
+			     (cons (cdr (assoc "sitename" listinfo))
+				   (string-to-int
 				    (cdr (assoc "feedid" listinfo)))))
 			   feedinfo)))
-	      (cdr (assoc 
+	      (cdr (assoc
 		    (completing-read
 		     "Multiple feeds found.  Select one: "
 		     selection nil t) urllist)))))))))
 
 (defun nnrss-rss-p (data)
-  "Test if data is an RSS feed.  Simply ensures that the first
-element is rss or rdf."
+  "Test if DATA is an RSS feed.
+Simply ensures that the first element is rss or rdf."
   (or (eq (caar data) 'rss)
       (eq (caar data) 'rdf:RDF)))
 
@@ -753,13 +771,13 @@ element is rss or rdf."
 that gives the URI for which you want to retrieve the namespace
 prefix), return the prefix."
   (let* ((prefix (car (rassoc uri (cadar el))))
-	 (nslist (if prefix 
+	 (nslist (if prefix
 		     (split-string (symbol-name prefix) ":")))
 	 (ns (cond ((eq (length nslist) 1) ; no prefix given
 		    "")
 		   ((eq (length nslist) 2) ; extract prefix
 		    (cadr nslist)))))
-    (if (and ns (not (eq ns "")))
+    (if (and ns (not (string= ns "")))
 	(concat ns ":")
       ns)))
 

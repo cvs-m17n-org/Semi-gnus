@@ -30,15 +30,18 @@
 ;; Gnus first.
 
 ;; [Unfortunately, it does depend on other parts of Gnus, e.g. the
-;; autoloads below...]
+;; autoloads and defvars below...]
 
 ;;; Code:
 
-(require 'custom)
 (eval-when-compile
   (require 'cl)
   ;; Fixme: this should be a gnus variable, not nnmail-.
-  (defvar nnmail-pathname-coding-system))
+  (defvar nnmail-pathname-coding-system)
+
+  ;; Inappropriate references to other parts of Gnus.
+  (defvar gnus-emphasize-whitespace-regexp)
+  )
 (require 'time-date)
 (require 'netrc)
 
@@ -57,15 +60,7 @@
     (defalias 'gnus-replace-in-string 'replace-in-string))
    ((fboundp 'replace-regexp-in-string)
     (defun gnus-replace-in-string  (string regexp newtext &optional literal)
-      (replace-regexp-in-string regexp newtext string nil literal)))
-   (t
-    (defun gnus-replace-in-string (string regexp newtext &optional literal)
-      (let ((start 0) tail)
-	(while (string-match regexp string start)
-	  (setq tail (- (length string) (match-end 0)))
-	  (setq string (replace-match newtext nil literal string))
-	  (setq start (- (length string) tail))))
-      string))))
+      (replace-regexp-in-string regexp newtext string nil literal)))))
 
 ;;; bring in the netrc functions as aliases
 (defalias 'gnus-netrc-get 'netrc-get)
@@ -123,16 +118,6 @@
        (funcall (if (stringp buffer) 'get-buffer 'buffer-name)
 		buffer))))
 
-(defalias 'gnus-point-at-bol
-  (if (fboundp 'point-at-bol)
-      'point-at-bol
-    'line-beginning-position))
-
-(defalias 'gnus-point-at-eol
-  (if (fboundp 'point-at-eol)
-      'point-at-eol
-    'line-end-position))
-
 ;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
 ;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
 ;; It's harmless, though, so the main purpose of this alias is to shut
@@ -157,7 +142,7 @@
 
 ;; Delete the current line (and the next N lines).
 (defmacro gnus-delete-line (&optional n)
-  `(delete-region (gnus-point-at-bol)
+  `(delete-region (point-at-bol)
 		  (progn (forward-line ,(or n 1)) (point))))
 
 (defun gnus-byte-code (func)
@@ -207,8 +192,7 @@ is slower."
   "Return the value of the header FIELD of current article."
   (save-excursion
     (save-restriction
-      (let ((case-fold-search t)
-	    (inhibit-point-motion-hooks t))
+      (let ((inhibit-point-motion-hooks t))
 	(nnheader-narrow-to-headers)
 	(message-fetch-field field)))))
 
@@ -220,7 +204,7 @@ is slower."
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (let ((eol (gnus-point-at-eol)))
+  (let ((eol (point-at-eol)))
     (goto-char (or (text-property-any (point) eol 'gnus-position t)
 		   (search-forward ":" eol t)
 		   (point)))))
@@ -1238,32 +1222,12 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
 	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
       (error "Invalid predicate specifier: %s" spec)))))
 
-(defun gnus-local-map-property (map)
-  "Return a list suitable for a text property list specifying keymap MAP."
-  (cond
-   ((featurep 'xemacs)
-    (list 'keymap map))
-   ((>= emacs-major-version 21)
-    (list 'keymap map))
-   (t
-    (list 'local-map map))))
-
-(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate
-					      require-match initial-contents
-					      history default)
-  "Like `completing-read', allowing for non-existent 7th arg in older XEmacsen."
-  `(completing-read ,prompt ,table ,predicate ,require-match
-                    ,initial-contents ,history
-                    ,@(if (and (featurep 'xemacs) (< emacs-minor-version 2))
-                          ()
-                        (list default))))
-
 (defun gnus-completing-read (prompt table &optional predicate require-match
 				    history)
   (when (and history
 	     (not (boundp history)))
     (set history nil))
-  (gnus-completing-read-maybe-default
+  (completing-read
    (if (symbol-value history)
        (concat prompt " (" (car (symbol-value history)) "): ")
      (concat prompt ": "))
@@ -1486,6 +1450,28 @@ predicate on the elements."
 	      ")"))
 	 "")))
      (t emacs-version))))
+
+(defun gnus-rename-file (old-path new-path &optional trim)
+  "Rename OLD-PATH as NEW-PATH.  If TRIM, recursively delete
+empty directories from OLD-PATH."
+  (when (file-exists-p old-path)
+    (let* ((old-dir (file-name-directory old-path))
+	   (old-name (file-name-nondirectory old-path))
+	   (new-dir (file-name-directory new-path))
+	   (new-name (file-name-nondirectory new-path))
+	   temp)
+      (gnus-make-directory new-dir)
+      (rename-file old-path new-path t)
+      (when trim
+	(while (progn (setq temp (directory-files old-dir))
+		      (while (member (car temp) '("." ".."))
+			(setq temp (cdr temp)))
+		      (= (length temp) 0))
+	  (delete-directory old-dir)
+	  (setq old-dir (file-name-as-directory 
+			 (file-truename 
+			  (concat old-dir "..")))))))))
+
 
 (provide 'gnus-util)
 

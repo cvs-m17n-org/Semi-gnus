@@ -43,8 +43,8 @@ the same function and variable names.  If you have been running GNUS
 in your Emacs, you should probably exit that Emacs and start a new one
 to fire up Gnus.
 
-Gnus does absolutely not work with anything older than Emacs 20.3 or
-XEmacs 20.0.  You definitely need a relatively current Emacs.
+Gnus does absolutely not work with anything older than Emacs 21.1 or
+XEmacs 21.4.  You definitely need a relatively current Emacs.
 
 To compile the Gnus manual, you either need a pretty new Emacs, or a
 pretty new version of the texinfo tools.

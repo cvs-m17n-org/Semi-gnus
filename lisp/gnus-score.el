@@ -1,5 +1,5 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
@@ -35,8 +35,6 @@
 (require 'gnus-win)
 (require 'message)
 (require 'score-mode)
-
-(autoload 'ffap-string-at-point "ffap")
 
 (defcustom gnus-global-score-files nil
   "List of global score files and directories.
@@ -627,7 +625,7 @@ file for the command instead of the current score file."
 	      (gnus-score-insert-help "Match permanence" char-to-perm 2)))
 
 	  (gnus-score-kill-help-buffer)
-	  (if mimic (message "%c %c %c" prefix hchar tchar pchar)
+	  (if mimic (message "%c %c %c %c" prefix hchar tchar pchar)
 	    (message ""))
 	  (unless (setq temporary (cadr (assq pchar char-to-perm)))
 	    ;; Deal with der(r)ided superannuated paradigms.
@@ -1088,6 +1086,12 @@ EXTRA is the possible non-standard header."
      4 (substitute-command-keys
 	"\\<gnus-score-mode-map>\\[gnus-score-edit-exit] to save edits"))))
 
+(defun gnus-score-edit-all-score ()
+  "Edit the all.SCORE file."
+  (interactive)
+  (find-file (gnus-score-file-name "all"))
+  (gnus-score-mode))
+
 (defun gnus-score-edit-file (file)
   "Edit a score file."
   (interactive
@@ -1117,9 +1121,9 @@ If FORMAT, also format the current score file."
 	 (reg " -> +")
 	 (file (save-excursion
 		 (end-of-line)
-		 (if (and (re-search-backward reg (gnus-point-at-bol) t)
-			  (re-search-forward  reg (gnus-point-at-eol) t))
-		     (buffer-substring (point) (gnus-point-at-eol))
+		 (if (and (re-search-backward reg (point-at-bol) t)
+			  (re-search-forward  reg (point-at-eol) t))
+		     (buffer-substring (point) (point-at-eol))
 		   nil))))
     (if (or (not file)
 	    (string-match "\\<\\(non-file rule\\|A file\\)\\>" file)
@@ -1208,8 +1212,7 @@ If FORMAT, also format the current score file."
       ;; files.
       (when (and files (not global))
 	(setq lists (apply 'append lists
-			   (mapcar (lambda (file)
-				     (gnus-score-load-file file))
+			   (mapcar 'gnus-score-load-file
 				   (if adapt-file (cons adapt-file files)
 				     files)))))
       (when (and eval (not global))
@@ -1849,7 +1852,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 	    (goto-char (point-min))
 	    (if (= dmt ?e)
 		(while (funcall search-func match nil t)
-		  (and (= (gnus-point-at-bol)
+		  (and (= (point-at-bol)
 			  (match-beginning 0))
 		       (= (progn (end-of-line) (point))
 			  (match-end 0))
@@ -2019,7 +2022,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 			(funcall search-func match nil t))
 	      ;; Is it really exact?
 	      (and (eolp)
-		   (= (gnus-point-at-bol) (match-beginning 0))
+		   (= (point-at-bol) (match-beginning 0))
 		   ;; Yup.
 		   (progn
 		     (setq found (setq arts (get-text-property
@@ -2109,7 +2112,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 	  (goto-char (point-min))
 	  (while (and (not (eobp))
 		      (search-forward match nil t))
-	    (when (and (= (gnus-point-at-bol) (match-beginning 0))
+	    (when (and (= (point-at-bol) (match-beginning 0))
 		       (eolp))
 	      (setq found (setq arts (get-text-property (point) 'articles)))
 	      (if trace
@@ -2183,23 +2186,19 @@ score in `gnus-newsgroup-scored' by SCORE."
 (defun gnus-enter-score-words-into-hashtb (hashtb)
   ;; Find all the words in the buffer and enter them into
   ;; the hashtable.
-  (let ((syntab (syntax-table))
-	word val)
+  (let (word val)
     (goto-char (point-min))
-    (unwind-protect
-	(progn
-	  (set-syntax-table gnus-adaptive-word-syntax-table)
-	  (while (re-search-forward "\\b\\w+\\b" nil t)
-	    (setq val
-		  (gnus-gethash
-		   (setq word (downcase (buffer-substring
-					 (match-beginning 0) (match-end 0))))
-		   hashtb))
-	    (gnus-sethash
-	     word
-	     (append (get-text-property (gnus-point-at-eol) 'articles) val)
-	     hashtb)))
-      (set-syntax-table syntab))
+    (with-syntax-table gnus-adaptive-word-syntax-table
+      (while (re-search-forward "\\b\\w+\\b" nil t)
+	(setq val
+	      (gnus-gethash
+	       (setq word (downcase (buffer-substring
+				     (match-beginning 0) (match-end 0))))
+	       hashtb))
+	(gnus-sethash
+	 word
+	 (append (get-text-property (point-at-eol) 'articles) val)
+	 hashtb)))
     ;; Make all the ignorable words ignored.
     (let ((ignored (append gnus-ignored-adaptive-words
 			   (if gnus-adaptive-word-no-group-words
@@ -2302,39 +2301,35 @@ score in `gnus-newsgroup-scored' by SCORE."
 	(let* ((hashtb (gnus-make-hashtable 1000))
 	       (date (date-to-day (current-time-string)))
 	       (data gnus-newsgroup-data)
-	       (syntab (syntax-table))
 	       word d score val)
-	  (unwind-protect
-	      (progn
-		(set-syntax-table gnus-adaptive-word-syntax-table)
-		;; Go through all articles.
-		(while (setq d (pop data))
-		  (when (and
-			 (not (gnus-data-pseudo-p d))
-			 (setq score
-			       (cdr (assq
-				     (gnus-data-mark d)
-				     gnus-adaptive-word-score-alist))))
-		    ;; This article has a mark that should lead to
-		    ;; adaptive word rules, so we insert the subject
-		    ;; and find all words in that string.
-		    (insert (mail-header-subject (gnus-data-header d)))
-		    (downcase-region (point-min) (point-max))
-		    (goto-char (point-min))
-		    (while (re-search-forward "\\b\\w+\\b" nil t)
-		      ;; Put the word and score into the hashtb.
-		      (setq val (gnus-gethash (setq word (match-string 0))
-					      hashtb))
-		      (when (or (not gnus-adaptive-word-length-limit)
-				(> (length word)
-				   gnus-adaptive-word-length-limit))
-			(setq val (+ score (or val 0)))
-			(if (and gnus-adaptive-word-minimum
-				 (< val gnus-adaptive-word-minimum))
-			    (setq val gnus-adaptive-word-minimum))
-			(gnus-sethash word val hashtb)))
-		    (erase-buffer))))
-	    (set-syntax-table syntab))
+	  (with-syntax-table gnus-adaptive-word-syntax-table
+	    ;; Go through all articles.
+	    (while (setq d (pop data))
+	      (when (and
+		     (not (gnus-data-pseudo-p d))
+		     (setq score
+			   (cdr (assq
+				 (gnus-data-mark d)
+				 gnus-adaptive-word-score-alist))))
+		;; This article has a mark that should lead to
+		;; adaptive word rules, so we insert the subject
+		;; and find all words in that string.
+		(insert (mail-header-subject (gnus-data-header d)))
+		(downcase-region (point-min) (point-max))
+		(goto-char (point-min))
+		(while (re-search-forward "\\b\\w+\\b" nil t)
+		  ;; Put the word and score into the hashtb.
+		  (setq val (gnus-gethash (setq word (match-string 0))
+					  hashtb))
+		  (when (or (not gnus-adaptive-word-length-limit)
+			    (> (length word)
+			       gnus-adaptive-word-length-limit))
+		    (setq val (+ score (or val 0)))
+		    (if (and gnus-adaptive-word-minimum
+			     (< val gnus-adaptive-word-minimum))
+			(setq val gnus-adaptive-word-minimum))
+		    (gnus-sethash word val hashtb)))
+		(erase-buffer))))
 	  ;; Make all the ignorable words ignored.
 	  (let ((ignored (append gnus-ignored-adaptive-words
 				 (if gnus-adaptive-word-no-group-words
@@ -2390,6 +2385,11 @@ score in `gnus-newsgroup-scored' by SCORE."
 			 (interactive)
 			 (bury-buffer nil)
 			 (gnus-summary-expand-window)))
+	(local-set-key "k"
+		       (lambda ()
+			 (interactive)
+			 (kill-buffer (current-buffer))
+			 (gnus-summary-expand-window)))
 	(local-set-key "e" (lambda ()
 			     "Run `gnus-score-edit-file-at-point'."
 			     (interactive)
@@ -2418,7 +2418,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 Type `e' to edit score file corresponding to the score rule on current line,
 `f' to format (pretty print) the score file and edit it,
 `t' toggle to truncate long lines in this buffer,
-`q' to quit.
+`q' to quit, `k' to kill score trace buffer.
 
 The first sexp on each line is the score rule, followed by the file name of
 the score file and its full name, including the directory.")
@@ -2764,9 +2764,7 @@ Destroys the current buffer."
 	    (lambda (file)
 	      (cons (inline (gnus-score-file-rank file)) file))
 	    files)))
-      (mapcar
-       (lambda (f) (cdr f))
-       (sort alist 'car-less-than-car)))))
+      (mapcar 'cdr (sort alist 'car-less-than-car)))))
 
 (defun gnus-score-find-alist (group)
   "Return list of score files for GROUP.

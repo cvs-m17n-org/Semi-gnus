@@ -1,6 +1,6 @@
 ;;; spam-stat.el --- detecting spam based on statistics
 
-;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Alex Schroeder <alex@gnu.org>
 ;; Keywords: network
@@ -122,6 +122,7 @@
 
 
 ;;; Code:
+(require 'mail-parse)
 
 (defgroup spam-stat nil
   "Statistical spam detection for Emacs.
@@ -160,16 +161,29 @@ This variable says how many characters this will be."
   :group 'spam-stat)
 
 (defcustom spam-stat-split-fancy-spam-group "mail.spam"
-  "Name of the group where spam should be stored, if
-`spam-stat-split-fancy' is used in fancy splitting rules.  Has no
-effect when spam-stat is invoked through spam.el."
+  "Name of the group where spam should be stored.
+If `spam-stat-split-fancy' is used in fancy splitting rules.  Has
+no effect when spam-stat is invoked through spam.el."
   :type 'string
   :group 'spam-stat)
 
 (defcustom spam-stat-split-fancy-spam-threshhold 0.9
-  "Spam score threshhold in spam-stat-split-fancy."
+  "Spam score threshold in spam-stat-split-fancy."
   :type 'number
   :group 'spam-stat)
+
+(defcustom spam-stat-washing-hook nil
+  "Hook applied to each message before analysis."
+  :type 'hook
+  :group 'spam-stat)
+
+(defcustom spam-stat-process-directory-age 90
+  "Max. age of files to be processed in directory, in days.
+When using `spam-stat-process-spam-directory' or
+`spam-stat-process-non-spam-directory', only files that have
+been touched in this many days will be considered.  Without
+this filter, re-training spam-stat with several thousand messages
+will start to take a very long time.")
 
 (defvar spam-stat-syntax-table
   (let ((table (copy-syntax-table text-mode-syntax-table)))
@@ -193,52 +207,24 @@ This is set by hooking into Gnus.")
 (defvar spam-stat-buffer-name " *spam stat buffer*"
   "Name of the `spam-stat-buffer'.")
 
-;; Functions missing in Emacs 20
-
-(when (memq nil (mapcar 'fboundp
-			'(gethash hash-table-count make-hash-table
-				  mapc puthash)))
-  (require 'cl)
-  (unless (fboundp 'puthash)
-    ;; alias puthash is missing from Emacs 20 cl-extra.el
-    (defalias 'puthash 'cl-puthash)))
-
-(eval-when-compile
-  (unless (fboundp 'with-syntax-table)
-    ;; Imported from Emacs 21.2
-    (defmacro with-syntax-table (table &rest body) "\
-Evaluate BODY with syntax table of current buffer set to a copy of TABLE.
-The syntax table of the current buffer is saved, BODY is evaluated, and the
-saved table is restored, even in case of an abnormal exit.
-Value is what BODY returns."
-      (let ((old-table (make-symbol "table"))
-	    (old-buffer (make-symbol "buffer")))
-	`(let ((,old-table (syntax-table))
-	       (,old-buffer (current-buffer)))
-	   (unwind-protect
-	       (progn
-		 (set-syntax-table (copy-syntax-table ,table))
-		 ,@body)
-	     (save-current-buffer
-	       (set-buffer ,old-buffer)
-	       (set-syntax-table ,old-table))))))))
+(defvar spam-stat-coding-system
+  (if (mm-coding-system-p 'emacs-mule) 'emacs-mule 'raw-text)
+  "Coding system used for `spam-stat-file'.")
 
 ;; Hooking into Gnus
 
 (defun spam-stat-store-current-buffer ()
   "Store a copy of the current buffer in `spam-stat-buffer'."
-  (save-excursion
-    (let ((str (buffer-string)))
-      (set-buffer (get-buffer-create spam-stat-buffer-name))
+  (let ((buf (current-buffer)))
+    (with-current-buffer (get-buffer-create spam-stat-buffer-name)
       (erase-buffer)
-      (insert str)
+      (insert-buffer-substring buf)
       (setq spam-stat-buffer (current-buffer)))))
 
 (defun spam-stat-store-gnus-article-buffer ()
   "Store a copy of the current article in `spam-stat-buffer'.
 This uses `gnus-article-buffer'."
-  (save-excursion
-    (set-buffer gnus-original-article-buffer)
+  (with-current-buffer gnus-original-article-buffer
     (spam-stat-store-current-buffer)))
 
 ;; Data -- not using defstruct in order to save space and time
@@ -310,7 +296,7 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
 ;; Parsing
 
 (defmacro with-spam-stat-max-buffer-size (&rest body)
-  "Narrows the buffer down to the first 4k characters, then evaluates BODY."
+  "Narrow the buffer down to the first 4k characters, then evaluate BODY."
   `(save-restriction
      (when (> (- (point-max)
 		 (point-min))
@@ -320,7 +306,8 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
      ,@body))
 
 (defun spam-stat-buffer-words ()
-  "Return a hash table of words and number of occurences in the buffer."
+  "Return a hash table of words and number of occurrences in the buffer."
+  (run-hooks 'spam-stat-washing-hook)
   (with-spam-stat-max-buffer-size
    (with-syntax-table spam-stat-syntax-table
      (goto-char (point-min))
@@ -369,7 +356,7 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
    (lambda (word count)
      (let ((entry (gethash word spam-stat)))
        (if (not entry)
-	   (error "This buffer has unknown words in it.")
+	   (gnus-message 8 "This buffer has unknown words in it")
 	 (spam-stat-set-good entry (- (spam-stat-good entry) count))
 	 (spam-stat-set-bad entry (+ (spam-stat-bad entry) count))
 	 (spam-stat-set-score entry (spam-stat-compute-score entry))
@@ -385,7 +372,7 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
    (lambda (word count)
      (let ((entry (gethash word spam-stat)))
        (if (not entry)
-	   (error "This buffer has unknown words in it.")
+	   (gnus-message 8 "This buffer has unknown words in it")
 	 (spam-stat-set-good entry (+ (spam-stat-good entry) count))
 	 (spam-stat-set-bad entry (- (spam-stat-bad entry) count))
 	 (spam-stat-set-score entry (spam-stat-compute-score entry))
@@ -396,30 +383,30 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
 ;; Saving and Loading
 
 (defun spam-stat-save (&optional force)
-  "Save the `spam-stat' hash table as lisp file."
-  (interactive)
+  "Save the `spam-stat' hash table as Lisp file.
+With a prefix argument save unconditionally."
+  (interactive "P")
   (when (or force spam-stat-dirty)
-    (with-temp-buffer
-      (let ((standard-output (current-buffer))
-	    (font-lock-maximum-size 0))
-	(insert "(setq spam-stat-ngood "
-		(number-to-string spam-stat-ngood)
-		" spam-stat-nbad "
-		(number-to-string spam-stat-nbad)
-		" spam-stat (spam-stat-to-hash-table '(")
-	(maphash (lambda (word entry)
-		   (prin1 (list word
-				(spam-stat-good entry)
-				(spam-stat-bad entry))))
-		 spam-stat)
-	(insert ")))")
-	(write-file spam-stat-file)))
-    (setq spam-stat-dirty nil)))
+    (let ((coding-system-for-write spam-stat-coding-system))
+      (with-temp-file spam-stat-file
+	(let ((standard-output (current-buffer))
+	      (font-lock-maximum-size 0))
+	  (insert (format ";-*- coding: %s; -*-\n" spam-stat-coding-system))
+	  (insert (format "(setq spam-stat-ngood %d spam-stat-nbad %d
+spam-stat (spam-stat-to-hash-table '(" spam-stat-ngood spam-stat-nbad))
+	  (maphash (lambda (word entry)
+		     (prin1 (list word
+				  (spam-stat-good entry)
+				  (spam-stat-bad entry))))
+		   spam-stat)
+	  (insert ")))"))))
+	(setq spam-stat-dirty nil)))
 
 (defun spam-stat-load ()
   "Read the `spam-stat' hash table from disk."
   ;; TODO: maybe we should warn the user if spam-stat-dirty is t?
-  (load-file spam-stat-file)
+  (let ((coding-system-for-read spam-stat-coding-system))
+    (load-file spam-stat-file))
   (setq spam-stat-dirty nil))
 
 (defun spam-stat-to-hash-table (entries)
@@ -429,7 +416,8 @@ the word string, NGOOD is the number of good mails it has appeared in,
 NBAD is the number of bad mails it has appeared in, GOOD is the number
 of times it appeared in good mails, and BAD is the number of times it
 has appeared in bad mails."
-  (let ((table (make-hash-table :test 'equal)))
+  (let ((table (make-hash-table :size (length entries)
+				:test 'equal)))
     (mapc (lambda (l)
 	    (puthash (car l)
 		     (spam-stat-make-entry (nth 1 l) (nth 2 l))
@@ -462,22 +450,20 @@ The default score for unknown words is stored in
 These are the words whose spam-stat differs the most from 0.5.
 The list returned contains elements of the form \(WORD SCORE DIFF),
 where DIFF is the difference between SCORE and 0.5."
-  (with-spam-stat-max-buffer-size
-   (with-syntax-table spam-stat-syntax-table
-     (let (result word score)
-       (maphash	(lambda (word ignore)
-		  (setq score (spam-stat-score-word word)
-			result (cons (list word score (abs (- score 0.5)))
-				     result)))
-		(spam-stat-buffer-words))
-       (setq result (sort result (lambda (a b) (< (nth 2 b) (nth 2 a)))))
-       (setcdr (nthcdr 14 result) nil)
-       result))))
+  (let (result word score)
+    (maphash (lambda (word ignore)
+	       (setq score (spam-stat-score-word word)
+		     result (cons (list word score (abs (- score 0.5)))
+				  result)))
+	     (spam-stat-buffer-words))
+    (setq result (sort result (lambda (a b) (< (nth 2 b) (nth 2 a)))))
+    (setcdr (nthcdr 14 result) nil)
+    result))
 
 (defun spam-stat-score-buffer ()
   "Return a score describing the spam-probability for this buffer."
   (setq spam-stat-score-data (spam-stat-buffer-words-with-scores))
-  (let* ((probs (mapcar (lambda (e) (cadr e)) spam-stat-score-data))
+  (let* ((probs (mapcar 'cadr spam-stat-score-data))
 	 (prod (apply #'* probs)))
     (/ prod (+ prod (apply #'* (mapcar #'(lambda (x) (- 1 x))
 				       probs))))))
@@ -502,6 +488,13 @@ check the variable `spam-stat-score-data'."
 
 ;; Testing
 
+(defun spam-stat-strip-xref ()
+  "Strip the the Xref header."
+  (save-restriction
+    (mail-narrow-to-head)
+    (when (re-search-forward "^Xref:.*\n" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))))
+
 (defun spam-stat-process-directory (dir func)
   "Process all the regular files in directory DIR using function FUNC."
   (let* ((files (directory-files dir t "^[^.]"))
@@ -511,10 +504,13 @@ check the variable `spam-stat-score-data'."
       (dolist (f files)
 	(when (and (file-readable-p f)
 		   (file-regular-p f)
-                   (> (nth 7 (file-attributes f)) 0))
+                   (> (nth 7 (file-attributes f)) 0)
+		   (< (time-to-number-of-days (time-since (nth 5 (file-attributes f))))
+		      spam-stat-process-directory-age))
 	  (setq count (1+ count))
 	  (message "Reading %s: %.2f%%" dir (/ count max))
-	  (insert-file-contents f)
+	  (insert-file-contents-literally f)
+	  (spam-stat-strip-xref)
 	  (funcall func)
 	  (erase-buffer))))))
 
@@ -533,13 +529,19 @@ check the variable `spam-stat-score-data'."
   (interactive)
   (hash-table-count spam-stat))
 
-(defun spam-stat-test-directory (dir)
+(defun spam-stat-test-directory (dir &optional verbose)
   "Test all the regular files in directory DIR for spam.
 If the result is 1.0, then all files are considered spam.
 If the result is 0.0, non of the files is considered spam.
-You can use this to determine error rates."
-  (interactive "D")
+You can use this to determine error rates.
+
+If VERBOSE is non-nil display names of files detected as spam or
+non-spam in a temporary buffer.  If it is the symbol `ham',
+display non-spam files; otherwise display spam files."
+  (interactive "DDirectory: ")
   (let* ((files (directory-files dir t "^[^.]"))
+	 display-files
+	 buffer-score
 	 (total (length files))
 	 (score 0.0); float
 	 (max (/ total 100.0)); float
@@ -550,12 +552,22 @@ You can use this to determine error rates."
 		   (file-regular-p f)
                    (> (nth 7 (file-attributes f)) 0))
 	  (setq count (1+ count))
-	  (message "Reading %.2f%%, score %.2f%%"
-		   (/ count max) (/ score count))
-	  (insert-file-contents f)
-	  (when (> (spam-stat-score-buffer) 0.9)
+	  (message "Reading %.2f%%, score %.2f"
+	  	   (/ count max) (/ score count))
+	  (insert-file-contents-literally f)
+	  (setq buffer-score (spam-stat-score-buffer))
+	  (when (> buffer-score 0.9)
 	    (setq score (1+ score)))
+	  (when verbose
+	    (if (> buffer-score 0.9)
+		(unless (eq verbose 'ham) (push f display-files))
+	      (when (eq verbose 'ham) (push f display-files))))
 	  (erase-buffer))))
+    (when display-files
+      (with-output-to-temp-buffer "*spam-stat results*"
+	(dolist (file display-files)
+	  (princ file)
+	  (terpri))))
     (message "Final score: %d / %d = %f" score total (/ score total))))
 
 ;; Shrinking the dictionary
@@ -571,10 +583,11 @@ COUNT defaults to 5"
 			 (spam-stat-bad entry))
 		      count)
 	       (remhash key spam-stat)))
-	   spam-stat))
+	   spam-stat)
+  (setq spam-stat-dirty t))
 
 (defun spam-stat-install-hooks-function ()
-  "Install the spam-stat function hooks"
+  "Install the spam-stat function hooks."
   (interactive)
   (add-hook 'nnmail-prepare-incoming-message-hook
 	    'spam-stat-store-current-buffer)
@@ -585,7 +598,7 @@ COUNT defaults to 5"
   (spam-stat-install-hooks-function))
 
 (defun spam-stat-unload-hook ()
-  "Uninstall the spam-stat function hooks"
+  "Uninstall the spam-stat function hooks."
   (interactive)
   (remove-hook 'nnmail-prepare-incoming-message-hook
 	       'spam-stat-store-current-buffer)

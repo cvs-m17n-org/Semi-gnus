@@ -312,15 +312,15 @@ has been stored locally for at least this many days."
               (const :format "Disable " DISABLE))
        "\nEnable, or disable, agent expiration in this group or topic."
        gnus-agent-cat-enable-expiration)
-      (agent-disable-undownloaded-faces
-       (boolean :tag "Disable Agent Faces")
-       "Have the summary buffer ignore the agent's undownloaded faces.
-These faces, when used, act as a warning that an article has not been
-fetched into either the agent nor the cache.  This is of most use to
-users who use the agent as a cache (i.e. they only operate on articles
-that have been downloaded).  Disable to display normal article faces
-even when the article hasn't been downloaded."
-       gnus-agent-cat-disable-undownloaded-faces))
+      (agent-enable-undownloaded-faces
+       (boolean :tag "Enable Agent Faces")
+       "Have the summary buffer use the agent's undownloaded faces.
+These faces, when enabled, act as a warning that an article has not
+been fetched into either the agent nor the cache.  This is of most use
+to users who use the agent as a cache (i.e. they only operate on
+articles that have been downloaded).  Leave disabled to display normal
+article faces even when the article hasn't been downloaded."
+gnus-agent-cat-enable-undownloaded-faces))
     "Alist of group parameters that are not also topic parameters.
 
 Each entry has the form (NAME TYPE DOC ACCESSOR), where NAME is the
@@ -897,7 +897,7 @@ articles in the thread.
   (defvar gnus-agent-cat-days-until-old)
   (defvar gnus-agent-cat-predicate)
   (defvar gnus-agent-cat-groups)
-  (defvar gnus-agent-cat-disable-undownloaded-faces)
+  (defvar gnus-agent-cat-enable-undownloaded-faces)
 )
 
 (defun gnus-trim-whitespace (s)
@@ -929,11 +929,11 @@ articles in the thread.
 
        (if deflt
            (let ((tag (cdr (memq :tag type))))
-             (if (string-match "\n" deflt)
-                 (progn (while (progn (setq deflt (replace-match "\n " t t
-                                                                 deflt))
-                                      (string-match "\n" deflt (match-end 0))))
-                        (setq deflt (concat "\n" deflt))))
+             (when (string-match "\n" deflt)
+	       (while (progn (setq deflt (replace-match "\n " t t
+							deflt))
+			     (string-match "\n" deflt (match-end 0))))
+	       (setq deflt (concat "\n" deflt)))
 
              (setcar tag (concat (car tag) deflt))))
 
@@ -984,7 +984,7 @@ articles in the thread.
                    (widgets category-fields))
               (while widgets
                 (let* ((widget (pop widgets))
-                       (value (ignore-errors (widget-value widget))))
+                       (value (condition-case nil (widget-value widget) (error))))
                   (eval `(setf (,(widget-get widget :accessor) ',info)
                                ',value)))))
             (gnus-category-write)
@@ -1047,7 +1047,7 @@ articles in the thread.
 
       (widget-insert "\nVisual Settings ")
 
-      (gnus-agent-cat-prepare-category-field agent-disable-undownloaded-faces)
+      (gnus-agent-cat-prepare-category-field agent-enable-undownloaded-faces)
 
       (use-local-map widget-keymap)
       (widget-setup)

@@ -13,7 +13,7 @@
 @ifinfo
 This file describes the PGG.
 
-Copyright (C) 2003 Free Software Foundation, Inc.
+Copyright (C) 2003, 2004 Free Software Foundation, Inc.
 Copyright (C) 2001 Daiki Ueno.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -141,8 +141,9 @@ would be asked about the recipients.
 If encryption is successful, it replaces the current region contents (in
 the accessible portion) with the resulting data.
 
-If optional argument @var{sign} is non-nil, the function is request to
-do a combined sign and encrypt.  This currently only work with GnuPG.
+If optional argument @var{sign} is non-@code{nil}, the function is
+request to do a combined sign and encrypt.  This currently only work
+with GnuPG.
 @end deffn
 
 @deffn Command pgg-decrypt-region start end
@@ -209,8 +210,8 @@ The value can be @code{gpg}, @code{pgp}, and @code{pgp5}.
 @node Caching passphrase
 @section Caching passphrase
 
-PGG provides a simple passphrase caching mechanism.  If you want to
-arrange the interaction, set the variable @code{pgg-read-passphrase}.
+PGG uses a simple passphrase caching mechanism, which is enabled by
+default.
 
 @defvar pgg-cache-passphrase
 If non-@code{nil}, store passphrases.  The default value of this
@@ -307,9 +308,9 @@ keyrings.
 
 @deffn Method pgg-scheme-encrypt-region scheme start end recipients &optional sign
 Encrypt the current region between @var{start} and @var{end} for
-@var{recipients}.  If @var{sign} is non-nil, do a combined sign and
-encrypt.  If encryption is successful, it returns @code{t}, otherwise
-@code{nil}.
+@var{recipients}.  If @var{sign} is non-@code{nil}, do a combined sign
+and encrypt.  If encryption is successful, it returns @code{t},
+otherwise @code{nil}.
 @end deffn
 
 @deffn Method pgg-scheme-decrypt-region scheme start end

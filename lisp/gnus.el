@@ -70,7 +70,7 @@
 ;; These belong to gnus-group.el.
 (defgroup gnus-group nil
   "Group buffers."
-  :link '(custom-manual "(gnus)The Group Buffer")
+  :link '(custom-manual "(gnus)Group Buffer")
   :group 'gnus)
 
 (defgroup gnus-group-foreign nil
@@ -111,7 +111,7 @@
 ;; These belong to gnus-sum.el.
 (defgroup gnus-summary nil
   "Summary buffers."
-  :link '(custom-manual "(gnus)The Summary Buffer")
+  :link '(custom-manual "(gnus)Summary Buffer")
   :group 'gnus)
 
 (defgroup gnus-summary-exit nil
@@ -155,7 +155,7 @@
 
 (defgroup gnus-summary-sort nil
   "Sorting the summary buffer."
-  :link '(custom-manual "(gnus)Sorting")
+  :link '(custom-manual "(gnus)Summary Sorting")
   :group 'gnus-summary)
 
 (defgroup gnus-summary-visual nil
@@ -282,7 +282,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.1"
+(defconst gnus-version-number "0.2"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "No Gnus v%s" gnus-version-number)
@@ -302,9 +302,6 @@ be set in `.emacs' instead."
 
 (unless (fboundp 'gnus-group-remove-excess-properties)
   (defalias 'gnus-group-remove-excess-properties 'ignore))
-
-(unless (fboundp 'gnus-set-text-properties)
-  (defalias 'gnus-set-text-properties 'set-text-properties))
 
 (unless (featurep 'gnus-xmas)
   (defalias 'gnus-make-overlay 'make-overlay)
@@ -851,12 +848,12 @@ be set in `.emacs' instead."
     (storm "#666699" "#99ccff")
     (pdino "#9999cc" "#99ccff")
     (purp "#9999cc" "#666699")
-    (no "#000000" "#ff0000")
+    (no "#ff0000" "#ffff00")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
-(defcustom gnus-logo-color-style 'oort
+(defcustom gnus-logo-color-style 'no
   "*Color styles used for the Gnus logo."
   :type `(choice ,@(mapcar (lambda (elem) (list 'const (car elem)))
 			   gnus-logo-color-alist))
@@ -940,10 +937,10 @@ be set in `.emacs' instead."
 
 (eval-when (load)
   (let ((command (format "%s" this-command)))
-    (if (and (string-match "gnus" command)
-	     (not (string-match "gnus-other-frame" command)))
-	(gnus-splash)
-      (gnus-get-buffer-create gnus-group-buffer))))
+    (when (string-match "gnus" command)
+      (if (string-match "gnus-other-frame" command)
+	  (gnus-get-buffer-create gnus-group-buffer)
+	(gnus-splash)))))
 
 ;;; Do the rest.
 
@@ -1103,9 +1100,8 @@ Check the NNTPSERVER environment variable and the
       (and (file-readable-p gnus-nntpserver-file)
 	   (with-temp-buffer
 	     (insert-file-contents gnus-nntpserver-file)
-	     (let ((name (buffer-string)))
-	       (unless (string-match "\\`[ \t\n]*$" name)
-		 name))))))
+	     (when (re-search-forward "[^ \t\n\r]+" nil t)
+	       (match-string 0))))))
 
 (defcustom gnus-select-method
   (condition-case nil
@@ -1411,11 +1407,6 @@ cache to the full extent of the law."
 
 (defcustom gnus-use-trees nil
   "*If non-nil, display a thread tree buffer."
-  :group 'gnus-meta
-  :type 'boolean)
-
-(defcustom gnus-use-grouplens nil
-  "*If non-nil, use GroupLens ratings."
   :group 'gnus-meta
   :type 'boolean)
 
@@ -1902,19 +1893,23 @@ Only applicable to non-spam (unclassified and ham) groups.")
 	    (variable-item gnus-group-ham-exit-processor-BBDB)
 	    (variable-item gnus-group-ham-exit-processor-spamoracle)
 	    (variable-item gnus-group-ham-exit-processor-copy)
-	    (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
 	    (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
 	    (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
-	    (const :tag "Spam: ifile"         (spam spam-use-ifile))
-	    (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+	    (const :tag "Spam: Bsfilter"      (spam spam-use-bsfilter))
+	    (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
+	    (const :tag "Spam: ifile"	      (spam spam-use-ifile))
 	    (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
-	    (const :tag "Ham: ifile"          (ham spam-use-ifile))
+	    (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+	    (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
+	    (const :tag "Ham: BBDB"	      (ham spam-use-BBDB))
 	    (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
+	    (const :tag "Ham: Bsfilter"       (ham spam-use-bsfilter))
+	    (const :tag "Ham: Copy"	      (ham spam-use-ham-copy))
+	    (const :tag "Ham: ifile"	      (ham spam-use-ifile))
+	    (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
 	    (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
-	    (const :tag "Ham: Whitelist"      (ham spam-use-whitelist))
-	    (const :tag "Ham: BBDB"           (ham spam-use-BBDB))
-	    (const :tag "Ham: Copy"           (ham spam-use-ham-copy))
-	    (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle)))))
+	    (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
+	    (const :tag "Ham: Whitelist"      (ham spam-use-whitelist)))))
    :function-document
    "Which spam or ham processors will be applied when the summary is exited."
    :variable gnus-spam-process-newsgroups
@@ -1944,19 +1939,23 @@ spam processing, associated with the appropriate processor."
 		   (variable-item gnus-group-ham-exit-processor-BBDB)
 		   (variable-item gnus-group-ham-exit-processor-spamoracle)
 		   (variable-item gnus-group-ham-exit-processor-copy)
-		   (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
 		   (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
 		   (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
-		   (const :tag "Spam: ifile"         (spam spam-use-ifile))
+		   (const :tag "Spam: Bsfilter"	     (spam spam-use-bsfilter))
+		   (const :tag "Spam: ifile"	     (spam spam-use-ifile))
+		   (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
 		   (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
 		   (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
-		   (const :tag "Ham: ifile"          (ham spam-use-ifile))
+		   (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
+		   (const :tag "Ham: BBDB"	     (ham spam-use-BBDB))
 		   (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
-		   (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
-		   (const :tag "Ham: Whitelist"      (ham spam-use-whitelist))
-		   (const :tag "Ham: BBDB"           (ham spam-use-BBDB))
-		   (const :tag "Ham: Copy"           (ham spam-use-ham-copy))
-		   (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle)))))
+		   (const :tag "Ham: Bsfilter"	     (ham spam-use-bsfilter))
+		   (const :tag "Ham: Copy"	     (ham spam-use-ham-copy))
+		   (const :tag "Ham: ifile"	     (ham spam-use-ifile))
+		   (const :tag "Ham: Spam-stat"	     (ham spam-use-stat))
+		   (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
+		   (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
+		   (const :tag "Ham: Whitelist"	     (ham spam-use-whitelist)))))
 
    :parameter-document
    "Which spam or ham processors will be applied when the summary is exited.")
@@ -1995,12 +1994,17 @@ spam-autodetect-recheck-messages is set.")
      (const default)
      (set :tag "Use specific methods"
 	  (variable-item spam-use-blacklist)
+	  (variable-item spam-use-gmane-xref)
 	  (variable-item spam-use-regex-headers)
 	  (variable-item spam-use-regex-body)
 	  (variable-item spam-use-whitelist)
 	  (variable-item spam-use-BBDB)
 	  (variable-item spam-use-ifile)
 	  (variable-item spam-use-spamoracle)
+	  (variable-item spam-use-spamassassin)
+	  (variable-item spam-use-spamassassin-headers)
+	  (variable-item spam-use-bsfilter)
+	  (variable-item spam-use-bsfilter-headers)
 	  (variable-item spam-use-stat)
 	  (variable-item spam-use-blackholes)
 	  (variable-item spam-use-hashcash)
@@ -2026,6 +2030,7 @@ set."
        (const default)
        (set :tag "Use specific methods"
 	(variable-item spam-use-blacklist)
+	(variable-item spam-use-gmane-xref)
 	(variable-item spam-use-regex-headers)
 	(variable-item spam-use-regex-body)
 	(variable-item spam-use-whitelist)
@@ -2035,6 +2040,10 @@ set."
 	(variable-item spam-use-stat)
 	(variable-item spam-use-blackholes)
 	(variable-item spam-use-hashcash)
+	(variable-item spam-use-spamassassin)
+	(variable-item spam-use-spamassassin-headers)
+	(variable-item spam-use-bsfilter)
+	(variable-item spam-use-bsfilter-headers)
 	(variable-item spam-use-bogofilter-headers)
 	(variable-item spam-use-bogofilter)))))
      :parameter-document
@@ -2212,8 +2221,7 @@ It is called with three parameters -- GROUP, LEVEL and OLDLEVEL."
 		      summary-menu group-menu article-menu
 		      tree-highlight menu highlight
 		      browse-menu server-menu
-		      page-marker tree-menu binary-menu pick-menu
-		      grouplens-menu)
+		      page-marker tree-menu binary-menu pick-menu)
   "*Enable visual features.
 If `visual' is disabled, there will be no menus and few faces.  Most of
 the visual customization options below will be ignored.  Gnus will use
@@ -2227,8 +2235,7 @@ instance, to switch off all visual things except menus, you can say:
 Valid elements include `summary-highlight', `group-highlight',
 `article-highlight', `mouse-face', `summary-menu', `group-menu',
 `article-menu', `tree-highlight', `menu', `highlight', `browse-menu',
-`server-menu', `page-marker', `tree-menu', `binary-menu', `pick-menu',
-and `grouplens-menu'."
+`server-menu', `page-marker', `tree-menu', `binary-menu', and`pick-menu'."
   :group 'gnus-meta
   :group 'gnus-visual
   :type '(set (const summary-highlight)
@@ -2246,8 +2253,7 @@ and `grouplens-menu'."
 	      (const page-marker)
 	      (const tree-menu)
 	      (const binary-menu)
-	      (const pick-menu)
-	      (const grouplens-menu)))
+	      (const pick-menu)))
 
 ;; Byte-compiler warning.
 (defvar gnus-visual)
@@ -2657,8 +2663,6 @@ gnus-registry.el will populate this if it's loaded.")
       gnus-summary-post-forward gnus-summary-wide-reply-with-original
       gnus-summary-post-forward)
      ("gnus-picon" :interactive t gnus-treat-from-picon)
-     ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
-      gnus-grouplens-mode)
      ("smiley" :interactive t smiley-region)
      ("gnus-win" gnus-configure-windows gnus-add-configuration)
      ("gnus-sum" gnus-summary-insert-line gnus-summary-read-group
@@ -2770,7 +2774,6 @@ with some simple extensions.
 %z   Article zcore (character)
 %t   Number of articles under the current thread (number).
 %e   Whether the thread is empty or not (character).
-%l   GroupLens score (string).
 %V   Total thread score (number).
 %P   The line number (number).
 %O   Download mark (character).
@@ -3219,7 +3222,7 @@ that that variable is buffer-local to the summary buffers."
 (defun gnus-generate-new-group-name (leaf)
   (let ((name leaf)
 	(num 0))
-    (while (gnus-gethash name gnus-newsrc-hashtb)
+    (while (gnus-group-entry name)
       (setq name (concat leaf "<" (int-to-string (setq num (1+ num))) ">")))
     name))
 
@@ -3255,6 +3258,38 @@ that that variable is buffer-local to the summary buffers."
 	(append method (list (list (intern (concat method-name "-address"))
 				   (nth 1 method))))
       method)))
+
+(defsubst gnus-method-to-server (method)
+  (catch 'server-name
+    (setq method (or method gnus-select-method))
+
+    ;; Perhaps it is already in the cache.
+    (mapc (lambda (name-method)
+            (if (equal (cdr name-method) method)
+                (throw 'server-name (car name-method))))
+          gnus-server-method-cache)
+
+    (mapc
+     (lambda (server-alist)
+       (mapc (lambda (name-method)
+               (when (gnus-methods-equal-p (cdr name-method) method)
+                 (unless (member name-method gnus-server-method-cache)
+                   (push name-method gnus-server-method-cache))
+                 (throw 'server-name (car name-method))))
+             server-alist))
+     (let ((alists (list gnus-server-alist
+                         gnus-predefined-server-alist)))
+       (if gnus-select-method
+           (push (list (cons "native" gnus-select-method)) alists))
+       alists))
+
+    (let* ((name (if (member (cadr method) '(nil ""))
+                     (format "%s" (car method))
+                   (format "%s:%s" (car method) (cadr method))))
+           (name-method (cons name method)))
+      (unless (member name-method gnus-server-method-cache)
+        (push name-method gnus-server-method-cache))
+      name)))
 
 (defsubst gnus-server-to-method (server)
   "Map virtual server names to select methods."
@@ -3302,38 +3337,6 @@ that that variable is buffer-local to the summary buffers."
         (when result
           (push (cons server result) gnus-server-method-cache))
 	result)))
-
-(defsubst gnus-method-to-server (method)
-  (catch 'server-name
-    (setq method (or method gnus-select-method))
-
-    ;; Perhaps it is already in the cache.
-    (mapc (lambda (name-method)
-            (if (equal (cdr name-method) method)
-                (throw 'server-name (car name-method))))
-          gnus-server-method-cache)
-
-    (mapc
-     (lambda (server-alist)
-       (mapc (lambda (name-method)
-               (when (gnus-methods-equal-p (cdr name-method) method)
-                 (unless (member name-method gnus-server-method-cache)
-                   (push name-method gnus-server-method-cache))
-                 (throw 'server-name (car name-method))))
-             server-alist))
-     (let ((alists (list gnus-server-alist
-                         gnus-predefined-server-alist)))
-       (if gnus-select-method
-           (push (list (cons "native" gnus-select-method)) alists))
-       alists))
-
-    (let* ((name (if (member (cadr method) '(nil ""))
-                     (format "%s" (car method))
-                   (format "%s:%s" (car method) (cadr method))))
-           (name-method (cons name method)))
-      (unless (member name-method gnus-server-method-cache)
-        (push name-method gnus-server-method-cache))
-      name)))
 
 (defsubst gnus-server-get-method (group method)
   ;; Input either a server name, and extended server name, or a
@@ -3911,6 +3914,9 @@ If NEWSGROUP is nil, return the global kill file name instead."
 	(push (car valids) outs))
       (setq valids (cdr valids)))
     outs))
+
+(eval-when-compile
+  (autoload 'message-y-or-n-p "message" nil nil 'macro))
 
 (defun gnus-read-group (prompt &optional default)
   "Prompt the user for a group name.

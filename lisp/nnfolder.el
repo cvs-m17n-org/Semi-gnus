@@ -202,7 +202,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 			(goto-char (match-end 0))
 			(setq num (string-to-int
 				   (buffer-substring
-				    (point) (gnus-point-at-eol))))
+				    (point) (point-at-eol))))
 			(goto-char start)
 			(< num article)))
 		      ;; Check that we are before an article with a
@@ -212,7 +212,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		      (progn
 			(setq num (string-to-int
 				   (buffer-substring
-				    (point) (gnus-point-at-eol))))
+				    (point) (point-at-eol))))
 			(> num article))
 		      ;; Discard any article numbers before the one we're
 		      ;; now looking at.
@@ -286,7 +286,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		  (if (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
 		      (string-to-int (buffer-substring
-				      (point) (gnus-point-at-eol)))
+				      (point) (point-at-eol)))
 		    -1))))))))
 
 (deffoo nnfolder-request-group (group &optional server dont-check)
@@ -1174,7 +1174,7 @@ This command does not work if you use short group names."
       (let ((range (nth 0 action))
 	    (what  (nth 1 action))
 	    (marks (nth 2 action)))
-	(assert (or (eq what 'add) (eq what 'del)) t
+	(assert (or (eq what 'add) (eq what 'del)) nil
 		"Unknown request-set-mark action: %s" what)
 	(dolist (mark marks)
 	  (setq nnfolder-marks (gnus-update-alist-soft
@@ -1195,16 +1195,16 @@ This command does not work if you use short group names."
     (nnheader-message 8 "Updating marks for %s..." group)
     (nnfolder-open-marks group server)
     ;; Update info using `nnfolder-marks'.
-    (mapcar (lambda (pred)
-	      (unless (memq (cdr pred) gnus-article-unpropagated-mark-lists)
-		(gnus-info-set-marks
-		 info
-		 (gnus-update-alist-soft
-		  (cdr pred)
-		  (cdr (assq (cdr pred) nnfolder-marks))
-		  (gnus-info-marks info))
-		 t)))
-	    gnus-article-mark-lists)
+    (mapc (lambda (pred)
+	    (unless (memq (cdr pred) gnus-article-unpropagated-mark-lists)
+	      (gnus-info-set-marks
+	       info
+	       (gnus-update-alist-soft
+		(cdr pred)
+		(cdr (assq (cdr pred) nnfolder-marks))
+		(gnus-info-marks info))
+	       t)))
+	  gnus-article-mark-lists)
     (let ((seen (cdr (assq 'read nnfolder-marks))))
       (gnus-info-set-read info
 			  (if (and (integerp (car seen))
@@ -1240,7 +1240,7 @@ This command does not work if you use short group names."
 			nnfolder-marks-modtime))
       (error (or (gnus-yes-or-no-p
 		  (format "Could not write to %s (%s).  Continue? " file err))
-		 (error "Cannot write to %s (%s)" err))))))
+		 (error "Cannot write to %s (%s)" file err))))))
 
 (defun nnfolder-open-marks (group server)
   (let ((file (nnfolder-group-marks-pathname group)))

@@ -32,7 +32,6 @@
 		   (require 'term))
 
 (eval-and-compile
-  (autoload 'executable-find "executable")
   (autoload 'mm-inline-partial "mm-partial")
   (autoload 'mm-inline-external-body "mm-extern")
   (autoload 'mm-insert-inline "mm-view"))
@@ -41,7 +40,7 @@
 
 (defgroup mime-display ()
   "Display of MIME in mail and news articles."
-  :link '(custom-manual "(emacs-mime)Customization")
+  :link '(custom-manual "(emacs-mime)Display Customization")
   :version "21.1"
   :group 'mail
   :group 'news
@@ -49,7 +48,7 @@
 
 (defgroup mime-security ()
   "MIME security in mail and news articles."
-  :link '(custom-manual "(emacs-mime)Customization")
+  :link '(custom-manual "(emacs-mime)Display Customization")
   :group 'mail
   :group 'news
   :group 'multimedia)
@@ -833,16 +832,16 @@ external if displayed external."
 	    (string= total "'%s'")
 	    (string= total "\"%s\""))
 	(setq uses-stdin nil)
-	(push (mm-quote-arg
+	(push (shell-quote-argument
 	       (gnus-map-function mm-path-name-rewrite-functions file)) out))
        ((string= total "%t")
-	(push (mm-quote-arg (car type-list)) out))
+	(push (shell-quote-argument (car type-list)) out))
        (t
-	(push (mm-quote-arg (or (cdr (assq (intern sub) ctl)) "")) out))))
+	(push (shell-quote-argument (or (cdr (assq (intern sub) ctl)) "")) out))))
     (push (substring method beg (length method)) out)
     (when uses-stdin
       (push "<" out)
-      (push (mm-quote-arg
+      (push (shell-quote-argument
 	     (gnus-map-function mm-path-name-rewrite-functions file))
 	    out))
     (mapconcat 'identity (nreverse out) "")))
@@ -1090,9 +1089,10 @@ string if you do not like underscores."
       (setq filename (gnus-map-function mm-file-name-rewrite-functions
 					(file-name-nondirectory filename))))
     (setq file
-	  (read-file-name "Save MIME part to: "
-			  (or mm-default-directory default-directory)
-			  nil nil (or filename name "")))
+	  (mm-with-multibyte
+	    (read-file-name "Save MIME part to: "
+			    (or mm-default-directory default-directory)
+			    nil nil (or filename name ""))))
     (setq mm-default-directory (file-name-directory file))
     (and (or (not (file-exists-p file))
 	     (yes-or-no-p (format "File %s already exists; overwrite? "
@@ -1451,6 +1451,12 @@ If RECURSIVE, search recursively."
     parts))
 
 (defun mm-multiple-handles (handles)
+  (and (listp handles)
+       (> (length handles) 1)
+       (or (listp (car handles))
+	   (stringp (car handles)))))
+
+(defun mm-complicated-handles (handles)
   (and (listp (car handles))
        (> (length handles) 1)))
 

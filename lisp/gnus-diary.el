@@ -204,7 +204,7 @@ There are currently two built-in format functions:
      (let ((head (cdr (assoc (intern (format "X-Diary-%s" (car elt)))
 			     headers))))
        (when head
-	 (nndiary-parse-schedule-value head (cadr elt) (caddr elt)))))
+	 (nndiary-parse-schedule-value head (cadr elt) (car (cddr elt))))))
    nndiary-headers))
 
 ;; #### NOTE: Gnus sometimes gives me a HEADER not corresponding to any
@@ -397,7 +397,7 @@ If ARG (or prefix) is non-nil, force prompting for all fields."
 	   (when (re-search-forward (concat "^" header ":") nil t)
 	     (unless (eq (char-after) ? )
 	       (insert " "))
-	     (setq value (buffer-substring (point) (gnus-point-at-eol)))
+	     (setq value (buffer-substring (point) (point-at-eol)))
 	     (and (string-match "[ \t]*\\([^ \t]+\\)[ \t]*" value)
 		  (setq value (match-string 1 value)))
 	     (condition-case ()

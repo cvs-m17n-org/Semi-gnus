@@ -32,6 +32,7 @@
 (require 'cl)
 
 (defvar srcdir (or (getenv "srcdir") "."))
+(defvar loaddir (and load-file-name (file-name-directory load-file-name)))
 
 (defun my-getenv (str)
   (let ((val (getenv str)))
@@ -40,62 +41,13 @@
 (if (my-getenv "lispdir")
     (push (my-getenv "lispdir") load-path))
 
-(push (or (my-getenv "URLDIR") (expand-file-name "../../url/lisp/" srcdir))
+(push (or (my-getenv "URLDIR") (expand-file-name "../../url/lisp/" loaddir))
       load-path)
 
-(push (or (my-getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))
+(push (or (my-getenv "W3DIR") (expand-file-name "../../w3/lisp/" loaddir))
       load-path)
 
 ;(push "/usr/share/emacs/site-lisp" load-path)
-
-;; Define compiler macros for the functions provided by cl in old Emacsen.
-(unless (featurep 'xemacs)
-  (define-compiler-macro butlast (&whole form x &optional n)
-    (if (>= emacs-major-version 21)
-	form
-      (if n
-	  `(let ((x ,x)
-		 (n ,n))
-	     (if (and n (<= n 0))
-		 x
-	       (let ((m (length x)))
-		 (or n (setq n 1))
-		 (and (< n m)
-		      (progn
-			(if (> n 0)
-			    (progn
-			      (setq x (copy-sequence x))
-			      (setcdr (nthcdr (- (1- m) n) x) nil)))
-			x)))))
-	`(let* ((x ,x)
-		(m (length x)))
-	   (and (< 1 m)
-		(progn
-		  (setq x (copy-sequence x))
-		  (setcdr (nthcdr (- m 2) x) nil)
-		  x))))))
-
-  (define-compiler-macro remove (&whole form item seq)
-    (if (>= emacs-major-version 21)
-	form
-      `(delete ,item (copy-sequence ,seq))))
-
-  (define-compiler-macro mapc (&whole form fn seq &rest rest)
-    (if (>= emacs-major-version 21)
-	form
-      (if rest
-	  `(let* ((fn ,fn)
-		  (seq ,seq)
-		  (args (list seq ,@rest))
-		  (m (apply (function min) (mapcar (function length) args)))
-		  (n 0))
-	     (while (< n m)
-	       (apply fn (mapcar (function (lambda (arg) (nth n arg))) args))
-	       (setq n (1+ n)))
-	     seq)
-	`(let ((seq ,seq))
-	   (mapcar ,fn seq)
-	   seq)))))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -162,8 +114,53 @@ than subr.el."
 	      (put 'car 'side-effect-free tmp)))
 	ad-do-it))))
 
+(when (and (not (featurep 'xemacs))
+	   (byte-optimize-form '(and (> 0 1) foo) t))
+  (defadvice byte-optimize-form-code-walker
+    (around fix-bug-in-and/or-forms (form for-effect) activate)
+    "Optimize the rest of the and/or forms.
+It has been fixed in XEmacs before releasing 21.4 and also has been
+fixed in Emacs after 21.3."
+    (if (and for-effect (memq (car-safe form) '(and or)))
+	(let ((fn (car form))
+	      (backwards (reverse (cdr form))))
+	  (while (and backwards
+		      (null (setcar backwards
+				    (byte-optimize-form (car backwards) t))))
+	    (setq backwards (cdr backwards)))
+	  (if (and (cdr form) (null backwards))
+	      (byte-compile-log
+	       "  all subforms of %s called for effect; deleted" form))
+	  (when backwards
+	    (setcdr backwards
+		    (mapcar 'byte-optimize-form (cdr backwards))))
+	  (setq ad-return-value (cons fn (nreverse backwards))))
+      ad-do-it)))
+
+(when (and (featurep 'xemacs)
+	   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
+	     (modify-syntax-entry ?= " " table)
+	     (with-temp-buffer
+	       (with-syntax-table table
+		 (insert "foo=bar")
+		 (goto-char (point-min))
+		 (forward-sexp 1)
+		 (eolp)))))
+  ;; The original `with-syntax-table' uses `copy-syntax-table' which
+  ;; doesn't seem to copy modified syntax entries in XEmacs 21.5.
+  (defmacro with-syntax-table (syntab &rest body)
+    "Evaluate BODY with the SYNTAB as the current syntax table."
+    `(let ((stab (syntax-table)))
+       (unwind-protect
+	   (progn
+	     ;;(set-syntax-table (copy-syntax-table ,syntab))
+	     (set-syntax-table ,syntab)
+	     ,@body)
+	 (set-syntax-table stab)))))
+
 (push srcdir load-path)
-(load (expand-file-name "lpath.el" srcdir) nil t)
+(push loaddir load-path)
+(load (expand-file-name "lpath.el" loaddir) nil t)
 
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
@@ -181,11 +178,6 @@ than subr.el."
 
 (eval-and-compile
   (when (featurep 'xemacs)
-    ;; XEmacs 21.1 needs some extra hand holding
-    (when (eq emacs-minor-version 1)
-      (autoload 'custom-declare-face "cus-face" nil t)
-      (autoload 'cl-compile-time-init "cl-macs" nil t)
-      (autoload 'defadvice "advice" nil nil 'macro))
     (unless (fboundp 'defadvice)
       (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
@@ -195,12 +187,15 @@ than subr.el."
     (autoload 'apropos-command "apropos" nil t)
     (autoload 'bbdb-complete-name "bbdb-com" nil t)
     (autoload 'browse-url "browse-url" nil t)
+    (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
     (autoload 'enriched-decode "enriched")
+    (autoload 'executable-find "executable")
+    (autoload 'font-lock-fontify-buffer "font-lock" nil t)
     (autoload 'info "info" nil t)
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
@@ -214,6 +209,7 @@ than subr.el."
     (if (emacs-version>= 21 5)
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
+    (autoload 'sgml-mode "psgml" nil t)
     (autoload 'smtpmail-send-it "smtpmail")
     (autoload 'sort-numeric-fields "sort" nil t)
     (autoload 'sort-subr "sort")
@@ -244,20 +240,9 @@ dgnushack-compile."
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
-  (when (and (not (featurep 'xemacs))
-	     (< emacs-major-version 21))
-    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
-  (unless (locate-library "cus-edit")
-    (error "You do not seem to have Custom installed.
-Fetch it from <URL:http://www.dina.kvl.dk/~abraham/custom/>.
-You also then need to add the following to the lisp/dgnushack.el file:
-
-     (push \"~/lisp/custom\" load-path)
-
-Modify to suit your needs."))
   (let ((files (directory-files srcdir nil "^[^=].*\\.el$"))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
@@ -288,7 +273,8 @@ Modify to suit your needs."))
     (dolist (file
 	     (if (featurep 'xemacs)
 		 '("md5.el")
-	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el")))
+	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
+		 "run-at-time.el")))
       (setq files (delete file files)))
 
     (dolist (file files)
