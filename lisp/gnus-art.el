@@ -2295,7 +2295,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-remove-cr
      article-display-x-face
      article-de-quoted-unreadable
-     article-mime-decode-quoted-printable
      article-hide-pgp
      article-strip-banner
      article-hide-pem
