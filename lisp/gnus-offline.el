@@ -428,6 +428,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(t
 	 ad-do-it)))
 
+(defadvice gnus-agent-mode (around gnus-offline-advice activate preactivate)
+  "Advice not to close PPP connection."
+  (let (gnus-offline-hangup-function)
+    ad-do-it))
+
 ;;
 ;; Setting up...
 ;;
