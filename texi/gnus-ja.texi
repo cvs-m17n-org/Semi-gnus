@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.071 Manual
+@settitle Semi-gnus 6.10.072 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.071 Manual
+@title Semi-gnus 6.10.072 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus は、大きな絵が入っていたりさまざまな形式を用いたりしているちょっ
 な言語圏を差別しません。ああ、クリンゴンの方は Unicode Next Generationを
 お待ちください。
 
-この説明書は Semi-gnus 6.10.071 に対応します。
+この説明書は Semi-gnus 6.10.072 に対応します。
 
 @end ifinfo
 
@@ -2713,6 +2713,11 @@ Gnus
 現在のグループを、どこか他のトピックに移動させます
 (@code{gnus-topic-move-group})。このコマンドはプロセスマーク・プ
 レフィックスルールに従います (@pxref{Process/Prefix})。
+
+@item T j
+@kindex T j (Topic)
+@findex gnus-topic-jump-to-topic
+トピックにジャンプします (@code{gnus-topic-jump-to-topic})。
 
 @item T c
 @kindex T c (Topic)

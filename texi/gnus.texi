@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.071 Manual
+@settitle Semi-gnus 6.10.072 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -319,7 +319,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.071 Manual
+@title Semi-gnus 6.10.072 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -362,7 +362,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.071.
+This manual corresponds to Semi-gnus 6.10.072.
 
 @end ifinfo
 
@@ -2727,6 +2727,11 @@ Prompt for a new topic name and create it
 Move the current group to some other topic
 (@code{gnus-topic-move-group}).  This command uses the process/prefix
 convention (@pxref{Process/Prefix}).
+
+@item T j
+@kindex T j (Topic)
+@findex gnus-topic-jump-to-topic
+Go to a topic (@code{gnus-topic-jump-to-topic}).  
 
 @item T c
 @kindex T c (Topic)

@@ -1987,8 +1987,8 @@ should replace the \"Date:\" one, or should be added below it."
      ;; buggy dates.
      ((eq type 'local)
       (let ((tz (car (current-time-zone))))
-	(format "Date: %s %s%04d" (current-time-string time)
-		(if (> tz 0) "+" "-") (abs (/ tz 36)))))
+	(format "Date: %s %s%02d%02d" (current-time-string time)
+		(if (> tz 0) "+" "-") (/ tz 3600) (/ (% tz 3600) 60))))
      ;; Convert to Universal Time.
      ((eq type 'ut)
       (concat "Date: "
@@ -3037,14 +3037,15 @@ Type any key: "
     (?e gnus-tmp-dots ?s)))
 
 (defvar gnus-mime-button-commands
-  '((gnus-article-press-button	"\r"	"Toggle Display")
-    (gnus-mime-view-part	"v"	"View Interactively...")
-    (gnus-mime-save-part	"o"	"Save...")
-    (gnus-mime-copy-part	"c"	"View As Text, In Other Buffer")
-    (gnus-mime-inline-part	"i"	"View As Text, In This Buffer")
-    (gnus-mime-internalize-part	"E"	"View Internally")
-    (gnus-mime-externalize-part	"e"	"View Externally")
-    (gnus-mime-pipe-part	"|"	"Pipe To Command...")))
+  '((gnus-article-press-button "\r" "Toggle Display")
+    (gnus-mime-view-part "v" "View Interactively...")
+    (gnus-mime-view-part-as-type "t" "View As Type...")
+    (gnus-mime-save-part "o" "Save...")
+    (gnus-mime-copy-part "c" "View As Text, In Other Buffer")
+    (gnus-mime-inline-part "i" "View As Text, In This Buffer")
+    (gnus-mime-internalize-part "E" "View Internally")
+    (gnus-mime-externalize-part "e" "View Externally")
+    (gnus-mime-pipe-part "|" "Pipe To Command...")))
 
 (defun gnus-article-mime-part-status ()
   (if gnus-article-mime-handle-alist-1
@@ -3111,6 +3112,14 @@ Type any key: "
   (gnus-article-check-buffer)
   (let ((data (get-text-property (point) 'gnus-data)))
     (mm-interactively-view-part data)))
+
+(defun gnus-mime-view-part-as-media ()
+  "Choose a MIME media type, and view the part as such."
+  (interactive
+   (list (completing-read "View as MIME type: " mailcap-mime-types)))
+  (gnus-article-check-buffer)
+  (let ((handle (get-text-property (point) 'gnus-data)))
+    (gnus-mm-display-part handle)))
 
 (defun gnus-mime-copy-part (&optional handle)
   "Put the the MIME part under point into a new buffer."

@@ -1749,7 +1749,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   "Move point to the end of the headers."
   (interactive)
   (message-goto-body)
-  (forward-line -2))
+  (forward-line -1))
 
 (defun message-goto-signature ()
   "Move point to the beginning of the message signature.
@@ -3213,7 +3213,7 @@ If NOW, use that time instead."
 				      parse-time-months))))
      (format-time-string "%Y %H:%M:%S " now)
      ;; We do all of this because XEmacs doesn't have the %z spec.
-     (format "%s%02d%02d" sign (/ zone 3600) (% zone 3600)))))
+     (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60)))))
 
 (defun message-make-followup-subject (subject)
   "Make a followup Subject."

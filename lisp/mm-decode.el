@@ -317,7 +317,7 @@ external if displayed external."
 	  (let ((mm (current-buffer))
 		(non-viewer (assoc "non-viewer"
 				   (mailcap-mime-info
-				    (mm-handle-media-type handle)) t)))
+				    (mm-handle-media-type handle) t))))
 	    (unwind-protect
 		(if method
 		    (funcall method)
@@ -330,9 +330,10 @@ external if displayed external."
       (let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
 	     (filename (mail-content-type-get
 			(mm-handle-disposition handle) 'filename))
-	     (needsterm (assoc "needsterm"
-			       (mailcap-mime-info
-				(mm-handle-media-type handle)) t))
+	     (mime-info (mailcap-mime-info
+			 (mm-handle-media-type handle) t))
+	     (needsterm (or (assoc "needsterm" mime-info)
+			    (assoc "needsterminal" mime-info)))
 	     process file buffer)
 	;; We create a private sub-directory where we store our files.
 	(make-directory dir)
@@ -349,16 +350,36 @@ external if displayed external."
 		      (start-process "*display*" nil
 				     "xterm"
 				     "-e" shell-file-name "-c"
-				     (format method
-					     (mm-quote-arg file)))
+				     (mm-mailcap-command
+				      method file (mm-handle-type handle)))
 		    (start-process "*display*"
 				   (setq buffer (generate-new-buffer "*mm*"))
 				   shell-file-name
-				   "-c" (format method
-						(mm-quote-arg file)))))
+				   "-c"
+				   (mm-mailcap-command
+				    method file (mm-handle-type handle)))))
 	  (mm-handle-set-undisplayer handle (cons file buffer)))
 	(message "Displaying %s..." (format method file))))))
 
+(defun mm-mailcap-command (method file type-list)
+  (let ((ctl (cdr type-list))
+	(beg 0)
+	out sub total)
+    (while (string-match "%{\\([^}]+\\)}\\|%s\\|%t" method beg)
+      (push (substring method beg (match-beginning 0)) out)
+      (setq beg (match-end 0)
+	    total (match-string 0 method)
+	    sub (match-string 1 method))
+      (cond
+       ((string= total "%s")
+	(push (mm-quote-arg file) out))
+       ((string= total "%t")
+	(push (mm-quote-arg (car type-list)) out))
+       (t
+	(push (mm-quote-arg (or (cdr (assq (intern sub) ctl)) "")) out))))
+    (push (substring method beg (length method)) out)
+    (mapconcat 'identity (nreverse out) "")))
+    
 (defun mm-remove-parts (handles)
   "Remove the displayed MIME parts represented by HANDLE."
   (if (and (listp handles)
