@@ -1,3 +1,7 @@
+2002-05-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.7 revision 00.
+
 2002-04-30  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/message.el (message-expand-name-function): New user option.

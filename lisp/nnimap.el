@@ -379,7 +379,7 @@ restrict visible folders.")
 
 ;; Internal variables:
 
-(defvoo nnimap-mailbox-info (gnus-make-hashtable 997))
+(defvar nnimap-mailbox-info (gnus-make-hashtable 997))
 (defvar nnimap-debug nil
   "Name of buffer to record debugging info.
 For example: (setq nnimap-debug \"*nnimap-debug*\")")
@@ -941,6 +941,23 @@ function is generally only called when Gnus is shutting down."
 
 ;; Optional backend functions
 
+(defun nnimap-string-lessp-numerical (s1 s2)
+  "Return t if first arg string is less than second in numerical order."
+  (cond ((string= s1 s2)
+	 nil)
+	((> (length s1) (length s2))
+	 nil)
+	((< (length s1) (length s2))
+	 t)
+	((< (string-to-number (substring s1 0 1))
+	    (string-to-number (substring s2 0 1)))
+	 t)
+	((> (string-to-number (substring s1 0 1))
+	    (string-to-number (substring s2 0 1)))
+	 nil)
+	(t
+	 (nnimap-string-lessp-numerical (substring s1 1) (substring s2 1)))))
+
 (deffoo nnimap-retrieve-groups (groups &optional server)
   (when (nnimap-possibly-change-server server)
     (gnus-message 5 "nnimap: Checking mailboxes...")
@@ -952,7 +969,8 @@ function is generally only called when Gnus is shutting down."
 	    (setq slowgroups groups)
 	  (dolist (group groups)
 	    (gnus-message 7 "nnimap: Checking mailbox %s" group)
-	    (add-to-list (if (gnus-gethash-safe group nnimap-mailbox-info)
+	    (add-to-list (if (gnus-gethash-safe (concat server group)
+						nnimap-mailbox-info)
 			     'asyncgroups
 			   'slowgroups)
 			 (list group (imap-mailbox-status-asynch
@@ -962,10 +980,13 @@ function is generally only called when Gnus is shutting down."
 		  (tag   (nth 1 asyncgroup))
 		  new old)
 	      (when (imap-ok-p (imap-wait-for-tag tag nnimap-server-buffer))
-		(if (< (car (gnus-gethash group nnimap-mailbox-info))
-		       (imap-mailbox-get 'uidnext group nnimap-server-buffer))
+		(if (nnimap-string-lessp-numerical
+		     (car (gnus-gethash
+			   (concat server group) nnimap-mailbox-info))
+		     (imap-mailbox-get 'uidnext group nnimap-server-buffer))
 		    (push (list group) slowgroups)
-		  (insert (cdr (gnus-gethash group nnimap-mailbox-info))))))))
+		  (insert (cdr (gnus-gethash (concat server group)
+					     nnimap-mailbox-info))))))))
 	(dolist (group slowgroups)
 	  (if nnimap-retrieve-groups-asynchronous
 	      (setq group (car group)))
@@ -984,7 +1005,7 @@ function is generally only called when Gnus is shutting down."
 		(insert str)
 		(when nnimap-retrieve-groups-asynchronous
 		  (gnus-sethash
-		   group
+		   (concat server group)
 		   (cons (or (imap-mailbox-get
 			      'uidnext group nnimap-server-buffer)
 			     (imap-mailbox-status

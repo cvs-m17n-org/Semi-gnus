@@ -1,3 +1,84 @@
+2002-05-06  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-topic.el (gnus-group-topic-parameters): Work when group
+	buffer doesn't show group.  From Matt Armstrong <matt@lickey.com>.
+
+2002-05-06  Josh Huber  <huber@alum.wpi.edu>
+
+	* mml2015.el (mml2015-gpg-encrypt): Changed name of optional
+	argument, and fixed compiler warning. (added autoload for
+	gpg-encrypt).
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* mml1991.el (mml1991-function-alist): Doc fix.
+
+	* mml.el (mml-preview): Bind gnus-newsrc-hashtb temporarily if it
+	doesn't exist (for previewing messages without having Gnus
+	started).
+
+	* mm-util.el (mm-coding-system-priorities): Defcustom.
+
+	* mm-encode.el (mm-content-transfer-encoding-defaults): Defcustom.
+
+2002-05-01  Josh Huber  <huber@alum.wpi.edu>
+
+	* gnus-msg.el (gnus-message-replysignencrypted): enabled by
+	default.
+	* mml-sec.el:
+	* mml-sec.el (mml-signencrypt-style): New.
+	* mml-sec.el (mml-pgpmime-encrypt-buffer): Accept optional
+	argument `sign'.
+	* mml-sec.el (mml-secure-message-encrypt-pgp): Changed default to
+	signencrypt.
+	* mml-sec.el (mml-secure-message-encrypt-pgpmime): Ditto.
+	* mml.el (mml-generate-mime-1): Changed logic so a part which is
+	both signed & encryped is processed in one operation. (rather than
+	two separate ops: sign, then encrypt)
+	* mml2015.el (mml2015-gpg-extract-signature-details): Give some
+	indication if a message is signed by an expired key.
+	* mml2015.el (mml2015-gpg-encrypt): Accept optional argument which
+	enables combined sign & encrypt operation. (this was always on
+	before).
+	* mml2015.el (mml2015-encrypt): Accept optional argument `sign'.
+
+2002-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-retrieve-groups): Use separate data for each
+	server.
+	(nnimap-mailbox-info): defvar instead of defvoo.
+
+2002-05-01 20:09:21 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.06 is released.
+
+2002-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lpath.el: Bind url-package-version.
+
+2002-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* nnfolder.el (nnfolder-request-delete-group): Figure out nov/mrk
+	filename before deleting the group itself, because the presence of
+	a group filename decides if long filenames are used or not.
+
+	* gnus-art.el (gnus-button-alist): Don't inline
+	gnus-button-url-regexp.  This makes it possible to change g-b-u-r
+	without also modifying g-button-alist.
+	(gnus-button-alist): Fix type to allow variable as well as regexp.
+	(gnus-article-add-buttons): Evaluate regexp.  Strings evaluate to
+	themselves, variables to its contents.
+	(gnus-button-entry): Ditto.
+
+2002-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* imap.el (imap-parse-resp-text-code, imap-parse-status): Treat
+	UIDNEXT as a string.
+
+	* nnimap.el (nnimap-string-lessp-numerical): New function.
+	(nnimap-retrieve-groups): Compare UIDNEXT as strings instead of
+	integers.
+
 2002-04-29  Simon Josefsson  <jas@extundo.com>
 
 	* nnmail.el (nnmail-cache-insert): Accept optional group

@@ -34,7 +34,7 @@
 	       mml1991-mailcrypt-encrypt)
     (gpg mml1991-gpg-sign
 	 mml1991-gpg-encrypt))
-  "Alist of PGP/MIME functions.")
+  "Alist of PGP functions.")
 
 ;;; mailcrypt wrapper
 

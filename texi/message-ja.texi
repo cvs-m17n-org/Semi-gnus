@@ -1148,9 +1148,9 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 
 @item message-subject-re-regexp
 @vindex message-subject-re-regexp
-@cindex Aw:
-@cindex Sv:
-@cindex Re:
+@cindex Aw
+@cindex Sv
+@cindex Re
 メッセージへの応答は @samp{Re: } で始まります。これは英語
 の ``response'' の略では @emph{ありません} が、ラテン語で、``それに応答
 して'' (in response to) と言う意味です。いくつかの無学の馬鹿はこの事実を
@@ -1165,7 +1165,7 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 
 @lisp
 (setq message-subject-re-regexp
-     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\))
+     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\)")
 @end lisp
 
 @item message-alternative-emails

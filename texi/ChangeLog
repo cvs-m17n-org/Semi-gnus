@@ -1,3 +1,38 @@
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (Encoding Customization): Fix.
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi: Move two chapters "Interface Functions" and
+	"Basic Functions" after the Decoding and Encoding chapters.  (No
+	text modified.)
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (Top): Change scope of manual to include users.
+	(Customization): Rename to Display Customization.
+	(MML Definition): Add cross references.
+	(Encoding Customization): New section.
+	(Charset Translation): More info and cross references.
+
+2002-05-01  Josh Huber  <huber@alum.wpi.edu>
+
+	* gnus.texi (Signing and encrypting): Fix doc.  Also, add a
+	paragraph about replysign/replyencrypt/replysignencryped use.
+
+2002-05-01  Lars Magne Ingebrigtsen  <larsi@quimbies.gnus.org>
+
+	* message.texi (Message Headers): Remove colon from index
+	entries. 
+
+2002-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Group Mail Splitting): Fix example.
+	(Article Buttons): Document that REGEXP can be a variable as well.
+
+	* message.texi (Message Headers): Fix example.
+
 2002-04-26  Steve Youngs  <youngs@xemacs.org>
 
 	* Makefile.in (infodir): Set to '@info_dir@' so we can separate
