@@ -687,7 +687,8 @@ by you.")
 		  handles
 		(list handles)))
 	  (mm-set-handle-multipart-parameter
-	   mm-security-handle 'gnus-info "Failed"))))))
+	   mm-security-handle 'gnus-info "Failed")
+	  (throw 'error handle))))))
 
 (defun mml2015-pgg-clear-decrypt ()
   (let ((pgg-errors-buffer mml2015-result-buffer))
@@ -756,7 +757,8 @@ by you.")
 		 (mml2015-gpg-extract-signature-details))))
 	  (delete-file signature-file)
 	  (mm-set-handle-multipart-parameter
-	   mm-security-handle 'gnus-info "Failed"))))))
+	   mm-security-handle 'gnus-info "Failed")))))
+  handle)
 
 (defun mml2015-pgg-clear-verify ()
   (let ((pgg-errors-buffer mml2015-result-buffer))
