@@ -1,3 +1,8 @@
+1999-07-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-goto-eoh): Move point to just the end
+	of the headers. (Sync up with gnus-6_10)
+
 1999-06-30  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
