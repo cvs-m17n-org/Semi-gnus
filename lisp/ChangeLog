@@ -1,3 +1,25 @@
+2003-03-20  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* message.el (message-make-overlay): Defalias it to make-overlay.
+	(message-delete-overlay): Defalias it to delete-overlay.
+	(message-overlay-put): Defalias it to overlay-put.
+	(message-idna-to-ascii-rhs-1): Use them.
+
+	* messagexmas.el (message-xmas-redefine): Defalias some overlay
+	functions to extent functions.
+
+2003-03-20  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el (message-check-news-header-syntax): Fixed regexp.
+
+2003-03-20  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-url.el (mm-url-insert): Move url-current-object stuff into
+	mm-url-insert-file-contents.
+
+	* nnrss.el (nnrss-fetch): Fetch the local stuff.
+	(nnrss-check-group): Use it.
+
 2003-03-20 Mark A. Hershberger  <mah@everybody.org> 
 
 	* nnrss.el: Primitive XML Name-space support.  This means that RSS
