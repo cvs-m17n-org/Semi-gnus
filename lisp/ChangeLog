@@ -1,3 +1,25 @@
+2000-10-13  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* mail-source.el (defvar mail-source-keyword-map): Use
+	`rmail-spool-directory' as a default directory for the `file'
+	source, if the variable is defined.  Fall back to hardcoded
+	"/usr/spool/mail/", as before.  Suggestion by Steven E. Harris
+	<seh@speakeasy.org>.
+
+2000-10-13 12:01:15  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially): Replace the header
+	 delimiter with a blank line.
+
+2000-10-13  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-sum.el (gnus-get-split-value): Use first match only (Ed L
+	Cashin <ecashin@coe.uga.edu>).
+
+2000-10-13 10:52:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ems.el (gnus-article-compface-xbm): Ignore errors.
+
 2000-10-11  John Wiegley  <johnw@gnu.org>
 
 	* gnus-topic.el (gnus-topic-mode): Use `setq' to clear

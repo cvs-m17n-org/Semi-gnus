@@ -16767,6 +16767,42 @@ The GNU Emacs Lisp Reference Manual}. XEmacs では、フレームプロパティリ
 ウィンドウで表示されるなら、ウィンドウの大きさが変更されることを避けるた
 めに @code{gnus-tree-minimize-window} をいじるのが良いでしょう。
 
+@subsection ウィンドウ設定の例
+
+@itemize @bullet
+@item 
+左側を狭めてグループバッファに。右側を分割して概略バッファ (上 1/6) と
+記事バッファ (下) に。
+
+@ifinfo
+@example
++---+---------+
+| G | Summary |
+| r +---------+
+| o |         |
+| u | Article |
+| p |         |
++---+---------+
+@end example
+@end ifinfo
+
+@lisp
+(gnus-add-configuration
+ '(article
+   (horizontal 1.0
+               (vertical 25 (group 1.0))
+               (vertical 1.0
+                         (summary 0.16 point)
+                         (article 1.0)))))
+
+(gnus-add-configuration
+ '(summary
+   (horizontal 1.0
+               (vertical 25 (group 1.0))
+               (vertical 1.0 (summary 1.0 point)))))
+@end lisp
+@end itemize
+
 @node Faces and Fonts
 @section フェイスとフォント
 @cindex faces

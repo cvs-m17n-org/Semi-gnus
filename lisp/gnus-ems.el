@@ -215,8 +215,10 @@
   "Length of the ring used for `gnus-article-xface-ring-internal'.")
 
 (defvar gnus-article-compface-xbm
-  (when (and (not (featurep 'xemacs)) (>= emacs-major-version 21))
-    (eq 0 (string-match "#define" (shell-command-to-string "uncompface -X"))))
+  (condition-case ()
+      (eq 0 (string-match "#define"
+			  (shell-command-to-string "uncompface -X")))
+    (error nil))
   "Non-nil means the compface program supports the -X option.
 That produces XBM output.")
 
