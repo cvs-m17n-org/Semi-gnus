@@ -2097,7 +2097,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (let ((method
 		     (if gnus-show-mime
 			 (progn
-			   (mime-parse-buffer)
+			   (setq mime-message-structure gnus-current-headers)
+			   (mime-entity-set-buffer-internal
+			    mime-message-structure (current-buffer))
 			   (if (or (not gnus-strict-mime)
 				   (mime-fetch-field "MIME-Version"))
 			       gnus-article-display-method-for-mime
