@@ -1,4 +1,4 @@
-2001-01-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+2001-01-15  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Save excursion
 	while `bbdb-annotate-message-sender' is being done.
