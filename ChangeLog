@@ -1,3 +1,8 @@
+2000-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-group-startup-message): Rewrite for Emacs 21.
+	* lisp/lpath.el: Fbind `propertize'.
+
 2000-10-22  Katsuhiro Hermit Endo <hermit@tomato.saino.ne.jp>
 
 	* texi/gnus-ja.texi (Changing Servers): Fix typo.

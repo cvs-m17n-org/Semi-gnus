@@ -774,34 +774,35 @@ be set in `.emacs' instead."
   (cond
    ((and (fboundp 'find-image)
 	 (display-graphic-p)
-	 (let ((image
-		(find-image
-		 `((:type xpm :file "gnus.xpm"
-			  :color-symbols
-			  (("thing" . "#724214")
-			   ("shadow" . "#1e3f03")
-			   ("background" . ,(face-background 'default))))
-		   (:type xbm :file "gnus.xbm"
-			  :foreground ,(face-foreground 'gnus-splash-face)
-			  :background ,(face-background 'default))))))
+	 (let* ((bg (face-background 'default))
+		(fg (face-foreground 'gnus-splash-face))
+		(image (find-image
+			`((:type xpm :file "gnus.xpm"
+				 :color-symbols (("thing" . "#724214")
+						 ("shadow" . "#1e3f03")
+						 ("background" . ,bg)))
+			  (:type xbm :file "gnus.xbm"
+				 :background ,bg :foreground ,fg)))))
 	   (when image
-	     (insert gnus-product-name " " gnus-version-number
-		     (if (zerop (string-to-number gnus-revision-number))
-			 ""
-		       (concat " (r" gnus-revision-number ")"))
-		     " based on " gnus-original-product-name " v"
-		     gnus-original-version-number "\n")
-	     (end-of-line 0)
-	     (put-text-property (point-min) (point) 'face 'gnus-splash-face)
-	     (insert-char ?\  (prog1
-				  (max 0 (/ (- (window-width) (point)) 2))
-				(goto-char (point-min))))
-	     (forward-line 1)
+	     (insert
+	      (propertize
+	       (concat gnus-product-name " " gnus-version-number
+		       (if (zerop (string-to-number gnus-revision-number))
+			   ""
+			 (concat " (r" gnus-revision-number ")"))
+		       " based on " gnus-original-product-name " v"
+		       gnus-original-version-number)
+	       'face `(variable-pitch :background ,bg :foreground ,fg)))
+	     (let ((fill-column (window-width)))
+	       (center-region (point-min) (point)))
 	     (let ((size (image-size image)))
-	       (insert-char ?\n (max 0 (round (- (window-height)
-						 (or y (cdr size)) 2) 2)))
-	       (insert-char ?\  (max 0 (round (- (window-width)
-						 (or x (car size))) 2)))
+	       (insert-char ?\n (max 1 (round (- (window-height)
+						 (or y (cdr size))) 2)))
+	       (insert
+		(propertize " " 'display
+			    `(space :align-to
+				    ,(max 0 (round (- (window-width)
+						      (or x (car size))) 2)))))
 	       (insert-image image))
 	     (setq gnus-simple-splash nil)
 	     t))))

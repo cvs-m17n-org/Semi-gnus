@@ -91,10 +91,12 @@
 
 ;; T-gnus.
 (if (featurep 'xemacs)
-    (maybe-bind '(mh-lib-progs))
+    (progn
+      (maybe-fbind '(propertize))
+      (maybe-bind '(mh-lib-progs)))
   ;; FSFmacs
   (maybe-fbind '(charsetp
-		 font-lock-set-defaults function-max-args
+		 font-lock-set-defaults function-max-args propertize
 		 smiley-encode-buffer))
   (if (boundp 'MULE)
       (progn

@@ -18324,9 +18324,9 @@ Gnus は二つの段階の循環で開発されています。最初の段階
 います。
 
 @cindex Incoming*
-@vindex nnmail-delete-incoming
+@vindex mail-source-delete-incoming
 アルファ Gnusae と リリースされた Gnusae では変数の初期値が違うものがあ
-ります。特に、@code{nnmail-delete-incoming} はアルファ gnusae で
+ります。特に、@code{mail-source-delete-incoming} はアルファ gnusae で
 は @code{nil} で、リリースされた gnusae では @code{t} です。これはメール
 を扱っている際に、アルファリリースの齟齬によりメールを失なうことを避ける
 ためです。
