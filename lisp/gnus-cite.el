@@ -26,6 +26,8 @@
 (require 'gnus-art)
 (require 'gnus-range)
 
+(eval-when-compile (require 'static))
+
 ;;; Customization:
 
 (defgroup gnus-cite nil
@@ -905,7 +907,11 @@ See also the documentation for `gnus-article-highlight-citation'."
 	  from to overlay)
       (goto-char (point-min))
       (when (zerop (forward-line (1- number)))
-	(forward-char (length prefix))
+	(static-if (or (featurep 'xemacs)
+		       (and (>= emacs-major-version 20)
+			    (>= emacs-minor-version 3)))
+	    (forward-char (length prefix))
+	  (move-to-column (string-width prefix)))
 	(skip-chars-forward " \t")
 	(setq from (point))
 	(end-of-line 1)
