@@ -1,4 +1,4 @@
-;;; -*- mode: Emacs-Lisp; coding: junet-unix -*-
+;;; -*- mode: Emacs-Lisp; coding: junet -*-
 
 ;;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: news
