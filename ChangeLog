@@ -1,3 +1,24 @@
+1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/{time-date.el,smiley.el,pop3.el,nnweb.el,nnvirtual.el,
+	nntp.el,nnspool.el,nnsoup.el,nnoo.el,nnml.el,nnmh.el,nnmbox.el,
+	nnmail.el,nnlistserv.el,nnimap.el,nnheader.el,nneething.el,
+	nndoc.el,nnbabyl.el,message.el,imap.el,gnus.el,gnus-win.el,
+	gnus-util.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
+	gnus-spec.el,gnus-score.el,gnus-salt.el,gnus-range.el,
+	gnus-picon.el,gnus-ofsetup.el,gnus-offline.el,gnus-mlspl.el,
+	gnus-mailcap.el,gnus-logic.el,gnus-kill.el,gnus-group.el,
+	gnus-cite.el,gnus-async.el,gnus-art.el,gnus-agent.el,earcon.el}:
+	Require `cl' at the top level.
+
+	* lisp/gnus.el (gnus-select-method): Undo last change.
+	* lisp/gnus-util.el (copy-list): Undo last change (remove it).
+	* lisp/gnus-start.el (gnus-site-init-file): Undo last change.
+
+	* lisp/gnus-ems.el (gnus-split-string): Remove.
+
 1999-11-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/pop3.el: Add description about STLS extension; add autoload
