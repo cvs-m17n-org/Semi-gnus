@@ -153,7 +153,7 @@ GNU Emacs
 @item
 XEmacs
 
-バージョン 20.2 以上の Mule 機能付き
+バージョン 21.1.1 以上の Mule 機能付き
 
 @item
 Meadow
