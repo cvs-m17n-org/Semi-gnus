@@ -129,7 +129,7 @@ If nil, only read articles will be expired."
   "Load FILE and do a `read' there."
   (nnheader-temp-write nil
     (ignore-errors
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       (goto-char (point-min))
       (read (current-buffer)))))
 
@@ -538,7 +538,7 @@ the actual number of articles toggled is returned."
       (gnus-make-directory (file-name-directory file))
       (nnheader-temp-write file
 	(when (file-exists-p file)
-	  (insert-file-contents file))
+	  (nnheader-insert-file-contents file))
 	(goto-char (point-min))
 	(if nntp-server-list-active-group
 	    (progn
