@@ -1,3 +1,19 @@
+1999-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 14.
+
+	* lisp/gnus-sum.el (gnus-summary-search-article): Treat and
+	recenter the article when touchdown; popup the article buffer if
+	it is disappeared.
+	(gnus-summary-search-article-highlight-matched-text): Treat the
+	article before highlighting; use old style backquote syntax.
+	(gnus-summary-search-article-position-point): Fix the beginning
+	position; use old style backquote syntax.
+	(gnus-summary-select-article): Undo the last change.
+	(gnus-summary-display-article): Bind
+	`gnus-summary-search-article-matched-data' in the article buffer
+	locally.  It is moved from `gnus-summary-select-article'.
+
 1999-08-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
 
 	* texi/Makefile.in (EMACS): Use @EMACS@, not emacs directly.
