@@ -1996,6 +1996,13 @@ gnus $B$,F0:n$7$F$$$J$$$H$-$K(B Message $B$,%P%C%U%!$r<+F0J]B8$9$k%G%#%l%/%H%
 @vindex message-mode-syntax-table
 $B%a%C%;!<%8%b!<%I%P%C%U%!$G;H$o$l$k9=J8%F!<%V%k$G$9!#(B
 
+@item message-cite-articles-with-x-no-archive
+@vindex message-cite-articles-with-x-no-archive
+$BHs(B-@code{nil} $B$@$C$?$i!"(B@samp{X-No-Archive} $B$r@_Dj$7$?5-;v$+$i0zMQ$5$l$?(B
+$B%F%-%9%H$r<h$j=|$-$^$;$s!#$3$NJQ?t$,%;%C%H$5$l$F$$$J$/$F$b!"(B
+@code{undo} $B$N%-!<A`:n$r9T$J$&$3$H$K$h$C$F<h$j=|$+$l$?0zMQ$5$l$?%F%-%9%H(B
+$B$r85$KLa$9$3$H$,$G$-$^$9!#(B
+
 @item message-strip-special-text-properties
 @vindex message-strip-special-text-properties
 Emacs $B$O%a%C%;!<%8:n@.$r$$$m$$$m$K2u$7$F$7$^$&$3$H$,$G$-$kB?$/$N%F%-%9%H(B

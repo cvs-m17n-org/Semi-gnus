@@ -1269,6 +1269,11 @@ starting with `not' and followed by regexps."
   :link '(custom-manual "(message)Message Headers")
   :type '(repeat regexp))
 
+(defcustom message-cite-articles-with-x-no-archive t
+  "If non-nil, cite text from articles that has X-No-Archive set."
+  :group 'message
+  :type 'boolean)
+
 ;;; Internal variables.
 ;;; Well, not really internal.
 
@@ -3602,6 +3607,7 @@ be added to the \"References\" field."
 	  (insert "\n"))
 	(funcall message-citation-line-function))
       (when (and x-no-archive
+		 message-cite-articles-with-x-no-archive
 		 (string-match "yes" x-no-archive))
 	(undo-boundary)
 	(delete-region (point) (mark t))
