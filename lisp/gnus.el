@@ -260,11 +260,23 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.8.2"
-  "Version number for this version of Gnus.")
+(defconst gnus-original-version-number "5.8.2"
+  "Version number for this version of original Gnus.")
 
-(defconst gnus-version (format "Gnus v%s" gnus-version-number)
+(defconst gnus-original-version
+  (format "Gnus v%s" gnus-original-version-number)
   "Version string for this version of Gnus.")
+
+(defconst gnus-product-name "Nana-gnus"
+  "Product name of this version of gnus.")
+
+(defconst gnus-version-number "7.1.0.0"
+  "Version number for this version of gnus.")
+
+(defconst gnus-version
+  (format "%s %s (based on %s; for SEMI 1.13, FLIM 1.13)"
+          gnus-product-name gnus-version-number gnus-original-version)
+  "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
@@ -1530,6 +1542,12 @@ If nil, no default charset is assumed when posting."
   "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
   "The mail address of the Gnus maintainers.")
 
+(defconst semi-gnus-developers
+  "Semi-gnus Developers:
+ semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
+ semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
+  "The mail address of the Semi-gnus developers.")
+
 (defvar gnus-info-nodes
   '((gnus-group-mode "(gnus)The Group Buffer")
     (gnus-summary-mode "(gnus)The Summary Buffer")
@@ -1704,7 +1722,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-mark-over gnus-uu-post-news)
      ("gnus-uu" gnus-uu-delete-work-dir gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
-      gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
+      gnus-article-mail gnus-copy-article-buffer)
      ("gnus-msg" :interactive t
       gnus-group-post-news gnus-group-mail gnus-summary-post-news
       gnus-summary-followup gnus-summary-followup-with-original
