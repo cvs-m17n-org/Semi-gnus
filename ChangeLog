@@ -1,3 +1,10 @@
+1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-compile): Add `gnus-bbdb.el'.
+
+	* lisp/gnus-bbdb.el: New file. By courtesy of Keiichi Suzuki.
+	* README-gnus-bbdb.ja: Ditto (A part of Nana-TIPS.ja).
+
 1998-10-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el: Add autoload setting for `gnus-offline' and

@@ -1,0 +1,27 @@
+-*- mode: text; fill-column: 70; -*-
+
+  ** 鈴木圭一さんのご厚意により keiichi branch から copy しました。**
+
+gnus-bbdb.el
+
+Chao-gnus 6.9 を取り込んだ Semi-gnus に特化した BBDB API モジュールで
+す。 
+このモジュールを使用することによって、 Semi-gnus で使用する場合には
+mime-bbdb が不要になります。
+
+1.11.3 以降の FLIM が必要です。
+
+bbdb-auto-notes-hook を使用していない方には不要ですが、使用している方
+は bbdb.el / bbdb-hooks.el にこのファイルの最後にある patch をあてる必
+要があります。
+
+設定例:
+
+;; mime-bbdb に関する設定は不要です。
+;(setq mime-bbdb/use-mail-extr nil)
+;(eval-after-load "mail-extr" '(require 'mime-bbdb))
+
+(require 'bbdb)
+(require 'gnus-bbdb)
+(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus ははずしてください。
+(add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
