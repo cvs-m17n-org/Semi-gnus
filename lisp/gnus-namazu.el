@@ -162,8 +162,6 @@ options make any sense in this context."
   :group 'gnus-namazu)
 
 ;;; Internal Variable:
-(defvar gnus-namazu/group-alist nil
-  "Associative list to map groups in lower case to official names.")
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
 ;; Multibyte group name:
@@ -207,21 +205,7 @@ options make any sense in this context."
 	     (setcdr pair gnus-namazu-coding-system)
 	   (push (cons gnus-namazu/group-name-regexp
 		       gnus-namazu-coding-system)
-		 gnus-group-name-charset-group-alist))))
-  (unless gnus-namazu-case-sensitive-filesystem
-    ;; FIXME: The alist to map group names in lower case to real names
-    ;; is reconstructed every when gnus-namazu/setup() is called.
-    ;; This reconstruction make gnus-namazu-search() slow.
-    (setq gnus-namazu/group-alist nil)
-    (dolist (server (gnus-namazu/indexed-servers))
-      (dolist (group (gnus-namazu/request-list server))
-	(let ((name (gnus-group-prefixed-name group server)))
-	  (unless (assoc name gnus-namazu/group-alist)
-	    (push (cons (downcase name) name) gnus-namazu/group-alist)))))))
-
-(defun gnus-namazu/shutdown ()
-  (setq gnus-namazu/group-alist nil))
-(add-hook 'gnus-exit-gnus-hook 'gnus-namazu/shutdown)
+		 gnus-group-name-charset-group-alist)))))
 
 (defun gnus-namazu/request-list (server)
   "Return groups of the server SERVER."
@@ -279,9 +263,14 @@ options make any sense in this context."
   "Return the whole name from GROUP and METHOD."
   (if gnus-namazu-case-sensitive-filesystem
       (gnus-group-prefixed-name group method)
-    (let ((name (gnus-group-prefixed-name group method)))
-      (or (cdr (assoc (downcase name) gnus-namazu/group-alist))
-	  name))))
+    (let* ((orig (gnus-group-prefixed-name group method))
+	   (name (downcase orig)))
+      (catch 'found-group
+	(mapatoms (lambda (sym)
+		    (when (string= name (downcase (symbol-name sym)))
+		      (throw 'found-group (symbol-name sym))))
+		  gnus-newsrc-hashtb)
+	orig))))
 
 (defun gnus-namazu/check-cache-group (str)
   "Get the news group from the partial path STR of the cached article."
@@ -454,7 +443,7 @@ generate possible group names from it."
   (interactive)
   (let ((pos (point)))
     (cond
-     ((and (re-search-backward "\\+\\([a-z]*\\)" nil t)
+     ((and (re-search-backward "\\+\\([-a-z]*\\)" nil t)
 	   (= pos (match-end 0)))
       (let* ((partial (match-string 1))
 	     (completions

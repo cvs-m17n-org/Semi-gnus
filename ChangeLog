@@ -1,3 +1,16 @@
+2002-02-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/group-alist): Abolished.
+	(gnus-namazu/setup): Not set it.
+	(gnus-namazu/shutdown): Removed.
+	(gnus-namazu/group-prefixed-name): Handle case-insensitive file
+	names by itself.
+
+2002-02-09  NISHIDA Masakazu  <m_nisida@ca2.so-net.ne.jp>
+
+	* lisp/gnus-namazu.el (gnus-namazu/complete-query): Relaxed the
+	regexp which matches field search keywords.
+
 2002-02-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* etc/gnus/gnus.xpm: Remove some garbages at the end of the file.
