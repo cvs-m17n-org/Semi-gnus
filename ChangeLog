@@ -1,5 +1,9 @@
 1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.3.
+
+1998-11-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/mmgnus.el (entity-buffer): Must move to (point-min) before
 	search boundary between header and body (to fix problem with
 	Emacs).
