@@ -1,6 +1,6 @@
 ;;; mm-bodies.el --- Functions for decoding MIME things
 
-;; Copyright (C) 1998, 1999, 2000, 2001
+;; Copyright (C) 1998, 1999, 2000, 2001, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -44,7 +44,12 @@
 
 (defcustom mm-body-charset-encoding-alist
   '((iso-2022-jp . 7bit)
-    (iso-2022-jp-2 . 7bit))
+    (iso-2022-jp-2 . 7bit)
+    ;; We MUST encode UTF-16 because it can contain \0's which is
+    ;; known to break servers.
+    (utf-16 . base64)
+    (utf-16be . base64)
+    (utf-16le . base64))
   "Alist of MIME charsets to encodings.
 Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'."
   :type '(repeat (cons (symbol :tag "charset")
@@ -85,8 +90,7 @@ If no encoding was done, nil is returned."
 	    charset)
 	(goto-char (point-min))
 	(let ((charsets (mm-find-mime-charset-region (point-min) (point-max)
-						     mm-hack-charsets))
-	      start)
+						     mm-hack-charsets)))
 	  (cond
 	   ;; No encoding.
 	   ((null charsets)
@@ -96,24 +100,11 @@ If no encoding was done, nil is returned."
 	    charsets)
 	   ;; We encode.
 	   (t
-	    (setq charset (car charsets))
-	    (while (not (eobp))
-	      (if (eq (mm-charset-after) 'ascii)
-		  (when start
-		    (save-restriction
-		      (narrow-to-region start (point))
-		      (mm-encode-coding-region
-		       start (point) (mm-charset-to-coding-system charset))
-		      (goto-char (point-max)))
-		    (setq start nil))
-		(unless start
-		  (setq start (point))))
-	      (forward-char 1))
-	    (when start
-	      (mm-encode-coding-region start (point)
-				       (mm-charset-to-coding-system charset))
-	      (setq start nil))
-	    charset)))))))
+	    (prog1
+		(setq charset (car charsets))
+	      (mm-encode-coding-region (point-min) (point-max)
+				       (mm-charset-to-coding-system charset))))
+	   ))))))
 
 (defun mm-long-lines-p (length)
   "Say whether any of the lines in the buffer is longer than LINES."
@@ -143,7 +134,7 @@ If no encoding was done, nil is returned."
       bits)
      ((and (not mm-use-ultra-safe-encoding)
 	   (not longp)
-	   (not (eq '7bit (cdr (assq charset mm-body-charset-encoding-alist))))
+	   (not (cdr (assq charset mm-body-charset-encoding-alist)))
 	   (or (eq t (cdr message-posting-charset))
 	       (memq charset (cdr message-posting-charset))
 	       (eq charset mail-parse-charset)))
@@ -247,36 +238,52 @@ If TYPE is `text/plain' CRLF->LF translation may occur."
   "Decode the current article that has been encoded with ENCODING.
 The characters in CHARSET should then be decoded.  If FORCE is non-nil
 use the supplied charset unconditionally."
-  (if (stringp charset)
+  (let ((charset-supplied charset))
+    (when (stringp charset)
       (setq charset (intern (downcase charset))))
-  (if (or (not charset)
-	  (eq 'gnus-all mail-parse-ignored-charsets)
-	  (memq 'gnus-all mail-parse-ignored-charsets)
-	  (memq charset mail-parse-ignored-charsets))
-      (setq charset mail-parse-charset))
-  (save-excursion
-    (when encoding
-      (mm-decode-content-transfer-encoding encoding type))
-    (when (featurep 'mule)
-      (let ((coding-system (mm-charset-to-coding-system charset)))
-	(if (and (not coding-system)
-		 (listp mail-parse-ignored-charsets)
-		 (memq 'gnus-unknown mail-parse-ignored-charsets))
-	    (setq coding-system
-		  (mm-charset-to-coding-system mail-parse-charset)))
-	(when (and charset coding-system
-		   ;; buffer-file-coding-system
-		   ;;Article buffer is nil coding system
-		   ;;in XEmacs
-		   (mm-multibyte-p)
-		   (or (not (eq coding-system 'ascii))
-		       (setq coding-system mail-parse-charset))
-		   (not (eq coding-system 'gnus-decoded)))
-	  (if force
-	      (mm-decode-coding-region (point-min) (point-max)
-					      coding-system)
-	    (mm-decode-coding-region-safely (point-min) (point-max)
-					    coding-system)))))))
+    (when (or (not charset)
+	      (eq 'gnus-all mail-parse-ignored-charsets)
+	      (memq 'gnus-all mail-parse-ignored-charsets)
+	      (memq charset mail-parse-ignored-charsets))
+      (setq charset mail-parse-charset
+	    charset-supplied nil))
+    (save-excursion
+      (when encoding
+	(mm-decode-content-transfer-encoding encoding type))
+      (when (featurep 'mule)
+	(let ((coding-system (mm-charset-to-coding-system charset)))
+	  (if (and (not coding-system)
+		   (listp mail-parse-ignored-charsets)
+		   (memq 'gnus-unknown mail-parse-ignored-charsets))
+	      (setq coding-system
+		    (mm-charset-to-coding-system mail-parse-charset)))
+	  (when (and charset coding-system
+		     ;; buffer-file-coding-system
+		     ;;Article buffer is nil coding system
+		     ;;in XEmacs
+		     (mm-multibyte-p)
+		     (or (not (eq coding-system 'ascii))
+			 (setq coding-system mail-parse-charset))
+		     (not (eq coding-system 'gnus-decoded)))
+	    (if (or force
+		    ;; If a charset was supplied and `code-pages'
+		    ;; hasn't been loaded, then use the supplied
+		    ;; charset unconditionally.
+		    (and (not (featurep 'code-pages))
+			 charset-supplied))
+		(mm-decode-coding-region (point-min) (point-max)
+					 coding-system)
+	      ;; Otherwise allow Emacs to auto-detect the charset.
+	      ;; Messages in windows-125x are frequently incorrectly
+	      ;; advertised as iso-8859-x -- if `code-pages' has been
+	      ;; loaded and configured, we're able to deal with them
+	      ;; properly.
+	      (mm-decode-coding-region-safely (point-min) (point-max)
+					      coding-system)))
+	  (setq buffer-file-coding-system
+		(if (boundp 'last-coding-system-used)
+		    (symbol-value 'last-coding-system-used)
+		  coding-system)))))))
 
 (defun mm-decode-coding-region-safely (start end coding-system)
   "Decode region between START and END with CODING-SYSTEM.

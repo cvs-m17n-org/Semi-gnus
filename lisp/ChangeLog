@@ -1,3 +1,291 @@
+2003-04-13 01:12:01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.18 is released.
+
+2003-04-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el (gnus-draft-send): Add message-hidden-headers. 
+
+2003-04-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-next-page): Use
+	gnus-article-over-scroll.
+	(gnus-article-over-scroll): New variable.
+
+	* message.el (message-newline-and-reformat): Place a boundary
+	before filling.
+	(message-make-forward-subject-function): Changed default to
+	message-forward-subject-name-subject. 
+	(message-forward-subject-name-subject): New function.
+
+	* nnimap.el (nnimap-split-fancy): Ditto.
+
+	* gnus-sum.el (gnus-summary-line-message-size): Ditto.
+
+	* gnus-cus.el (gnus-group-parameters): Removed "which see".
+
+	* mml.el (mml-minibuffer-read-file): Bind
+	completion-ignored-extensions to nil.
+
+	* message.el (message-fix-before-sending): Comment fix.
+	(message-fix-before-sending): Make hidden headers visible.
+	(message-hide-headers): Bind after-change-functions to nil.
+	(message-forbidden-properties): Put invisible and intangible
+	back. 
+	(message-strip-forbidden-properties): Ignore message-hidden text.
+
+	* gnus-msg.el: Hide headers.
+
+	* message.el (message-hidden-headers): New variable.
+	(message-hide-headers): New function.
+	(message-hide-header-p): New function.
+	(message-hide-header-p): Change logic.
+	(message-forbidden-properties): Remove intangible nil invisible
+	nil. 
+	(message-hide-headers): Narrow to headers.
+
+	* lpath.el (featurep): Bind Info-directory, Info-menu.
+
+2003-04-12  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-bodies.el (mm-body-charset-encoding-alist): UTF-16 *must* be
+	encoded.
+	(mm-encode-body): Don't corrupt UTF-16.
+	(mm-body-encoding): Pay attention to mm-body-charset-encoding-alist.
+
+2003-04-10  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-get-undownloaded-list): Articles in
+	the CACHE are now detected and handled the same as an article
+	downloaded into the agent.
+	(gnus-agent-group-path): Modified to match nnmail-group-pathname
+	so that the agent front-end and back-end (nnagent) always use the
+	same directory.
+	(gnus-agent-group-pathname): New function. Wrapper for
+	nnmail-group-pathname.
+	(gnus-agent-expire-unagentized-dirs): New variable.  May be
+	customized to disable gnus-agent-expire-unagentized-dirs.
+	(gnus-agent-expire-unagentized-dirs): Expand gnus-agent-directory
+	as the directories in gnus-agent-expire-current-dirs were
+	expanded.
+
+2003-04-10  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Disable "Encrypt
+	body" entry in read only groups.
+
+2003-04-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Disable "Import file"
+	and "Create article" items in non-editable groups.
+
+2003-04-09  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-write-active): Added option of
+	replacing, rather than updating, the agent's active file.  Do NOT
+	use the fully qualified group name as gnus-active-to-gnus-format
+	blindly prefixes group names with server names.
+	(gnus-agent-save-group-info): Merge BOTH min/max of current active
+	range, was just merging min, with specified active range.
+	(gnus-agent-expire): Save agent's active ranges after
+	expiring all groups.
+	(gnus-agent-expire-group-1): Update min of agent's active range to
+	min article currently fetched.
+	(gnus-agent-expire-unagentized-dirs): Avoid asking to delete the
+	same ancestor multiple times.
+
+	* gnus-async.el (gnus-asynchronous): Moved defcustom of
+	gnus-asynchronous away from defgroup of gnus-asynchronous.  This
+	seems to fix an intermittant error in which loading gnus-async
+	fails to define gnus-asynchronous (the variable).
+
+	* gnus-sum.el: Concur with Steve Young, 5th argument to 'load' is
+	non-essential.  Removed on all platforms.
+	(gnus-select-newsgroup): When the agent is active, expand the
+	group's active range to include fetched articles that are no
+	longer in the server's active range.
+
+	* gnus-util.el (gnus-with-output-to-file): Removed all of the
+	print-* bindings as they should be handled by the function doing
+	the printing.
+
+2003-04-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-uu.el (mm-uu-copy-to-buffer): buffer-file-coding-system
+	might be unbound in non-MULE XEmacsen.
+
+2003-04-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-uu.el (mm-uu-diff-groups-regexp, mm-uu-type-alist)
+	(mm-uu-diff-extract, mm-uu-diff-test): New functionality:
+	recognize diffs.
+
+	* mm-bodies.el (mm-decode-body): Use the supplied charset
+	unconditionally if `code-pages' hasn't been loaded.
+
+2003-04-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (article-verify-x-pgp-sig): Don't use
+	`insert-buffer', the docstring says "This function is meant for
+	the user to run interactively.  Don't call it from programs!"
+
+	* mm-extern.el (mm-extern-mail-server): do.
+
+	* mml1991.el (mml1991-mailcrypt-sign, mml1991-mailcrypt-sign)
+	(mml1991-gpg-sign, mml1991-gpg-encrypt, mml1991-pgg-sign)
+	(mml1991-pgg-encrypt): do.
+
+	* pgg.el (pgg-decrypt-region): do.
+
+	* mm-view.el (mm-view-pkcs7-decrypt): do.
+
+	* mml-smime.el (mml-smime-verify): do.
+
+	* mml.el (mml-insert-mime, mml-preview): do.
+
+	* mml2015.el (mml2015-gpg-decrypt-1, mml2015-gpg-sign)
+	(mml2015-gpg-encrypt, mml2015-pgg-clear-decrypt)
+	(mml2015-pgg-encrypt): do.
+
+2003-04-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* mm-bodies.el (mm-decode-body): Silence XEmacs when compiling.
+
+2003-04-06  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-uu.el (mm-uu-copy-to-buffer): Copy
+	`buffer-file-coding-system' to the new buffer.
+	(mm-uu-pgp-signed-extract-1): Don't copy
+	`buffer-file-coding-system' here.
+
+	* mm-bodies.el (mm-decode-body): last-coding-system-used doesn't
+	exist in XEmacs.
+	(mm-decode-body): Add missing quote.
+
+	* mm-uu.el (mm-uu-pgp-signed-extract-1): Set
+	buffer-file-coding-system.
+
+	* mm-bodies.el (mm-decode-body): Set buffer-file-coding-system to
+	last-coding-system-used.
+
+	* mml2015.el (mml2015-pgg-clear-verify): Encode the text
+	according to buffer-file-coding-system.
+
+	* pgg-gpg.el (pgg-gpg-process-region): Revert previous change.
+
+	* pgg-pgp.el (pgg-pgp-process-region, pgg-pgp-verify-region)
+	(pgg-pgp-snarf-keys-region): do.
+
+	* pgg-pgp5.el (pgg-pgp5-verify-region)
+	(pgg-pgp5-snarf-keys-region, pgg-pgp5-process-region): do.
+
+	* pgg.el (pgg-make-temp-file, pgg-temporary-file-directory): do.
+	
+2003-04-05  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-split): (save-excursion) around (widen)
+	(spam-ham-move-routine): Use spam-group-ham-mark-p, not
+	spam-group-spam-mark-p (from Michael Shields <shields@msrl.com>)
+
+2003-04-05  Steve Youngs  <youngs@xemacs.org>
+
+	* gnus-sum.el: XEmacs doesn't support the 5th arg to 'load', so
+	don't use it when loading gnus-sum.el if we're in XEmacs.
+
+2003-04-05  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-start.el (gnus-gnus-to-quick-newsrc-format): Bound
+	print-escape-nonascii to fix more characters in compiled format
+	specs.
+
+2003-04-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-audio.el (gnus-audio-au-player, gnus-audio-wav-player):
+	Fix customization type.
+
+2003-04-04  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-start.el (gnus-gnus-to-quick-newsrc-format): Bound
+	print-quoted, print-readably, print-escape-multibyte, and
+	print-level to match original behavior of gnus-prin1.  This should
+	repair the format of .newsrc.eld when using compiled format specs.
+
+2003-04-04  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-group.el (tool-bar-map): defvar it.
+
+	* gnus-art.el (tool-bar-map): do.
+
+	* gnus-sum.el (tool-bar-map): do.
+
+2003-04-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* earcon.el (earcon-regexp-alist): catmeow is a wav file.
+
+2003-04-03  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-ctan-directory-regexp): Changed meaning
+	and value.
+	(gnus-button-alist): Use it.
+
+2003-04-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* pgg-gpg.el (pgg-gpg-process-region): do.
+
+	* pgg-pgp.el (pgg-pgp-process-region, pgg-pgp-verify-region)
+	(pgg-pgp-snarf-keys-region): do.
+
+	* pgg-pgp5.el (pgg-pgp5-verify-region)
+	(pgg-pgp5-snarf-keys-region, pgg-pgp5-process-region): Use it.
+
+	* pgg.el (pgg-make-temp-file): New function. `make-temp-name' is
+	unsafe.
+	(pgg-temporary-file-directory): Remove.
+
+2003-04-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind Info-directory and Info-menu.
+
+2003-04-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-util.el (gnus-message): Added doc-string.
+
+	* gnus-score.el (gnus-score-find-trace): Changed behavior of `q'.
+	(gnus-score-edit-file-at-point): Goto first match when using `e'.
+
+2003-04-01  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-ctan-directory-regexp): New variable.
+	(gnus-button-alist): Use it.  Changed CTAN and "setq" entries.
+
+2003-04-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nntp.el (nntp-via-rlogin-command-switches): Doc fix.
+	(nntp-open-via-rlogin-and-telnet): Disable the telnet linemode.
+
+2003-03-31  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-start.el (gnus-gnus-to-quick-newsrc-format): Bound
+	print-escape-newlines to print escape sequences rather than
+	literal newline characters.
+
+2003-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-valid-fqdn-regexp): Use
+	`message-valid-fqdn-regexp' for initialization.
+	(gnus-button-handle-info-url): Renamed and extended version of
+	`gnus-button-handle-info'.
+	(gnus-button-message-level): Renamed from `gnus-button-mail-level'
+	(gnus-button-handle-symbol, gnus-button-handle-library)
+	(gnus-button-handle-info-keystrokes): New functions.
+	(gnus-button-browse-level): New variable.
+	(gnus-button-alist): Use them.  Added levels.
+	(gnus-header-button-alist): Added levels.
+
+2003-03-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
 2003-03-31 20:08:19 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.17 is released.
@@ -49,7 +337,7 @@
 2003-03-28  Vasily Korytov  <deskpot@myrealbox.com>
 
 	* message.el (message-make-in-reply-to): Use
-	mail-extract-address-components to dentermine sender's
+	mail-extract-address-components to determine sender's
 	name/address.
 
 2003-03-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
@@ -339,7 +627,7 @@
 2003-03-18  Jesper Harder  <harder@ifa.au.dk>
 
 	* mm-bodies.el (mm-decode-coding-region-safely): Don't use
-	find-charset-region which is slooow in XEmacs.
+	find-charset-string which is slooow in XEmacs.
 
 2003-03-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 

@@ -1,3 +1,13 @@
+2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.18 revision 00.
+
+	* lisp/message.el (message-forward-subject-name-subject): Rewrite.
+
+	* lisp/mail-source.el (mail-source-fetch-pop): Require `pop3'
+	explicitly.
+	(mail-source-check-pop): Ditto.
+
 2003-04-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnmail.el (nnmail-split-it): Revoke the change of 1999-08-19.

@@ -1014,7 +1014,7 @@ $ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
 The @file{key+cert.pem} file should be pointed to from the
 @code{smime-keys} variable.  You should now be able to send signed mail.
 
-@emph{Note!}  Your private key is store unencrypted in the file, so take
+@emph{Note!}  Your private key is stored unencrypted in the file, so take
 care in handling it.
 
 @subsection Using PGP/MIME
@@ -1352,6 +1352,17 @@ Message $B$,(B gnus $B>e$GAv$C$F$$$k>l9g!"%a%C%;!<%8%P%C%U%!$O%I%i%U%H%0%k!<%
 $BDj$7$^$9!#(B@code{always} $B$@$C$?$i$H$K$+$/Aw?.$7!"(B@code{never} $B$@$C$?$iAw(B
 $B?.$7$^$;$s!#(B@code{ask} ($B$=$l$,%G%#%U%)%k%H(B) $B$@$C$?$i!"$I$&$9$k$+?R$M$i$l(B
 $B$^$9!#(B
+
+@item message-hidden-headers
+@vindex message-hidden-headers
+$B@55,I=8=!"@55,I=8=$N%j%9%H!"$^$?$O:G=i$NMWAG$,(B @code{not} $B$G;D$j$,@55,I=(B
+$B8=$G$"$k%j%9%H!#%a%C%;!<%8$N:n@.Cf$K$I$N%X%C%@!<$r1#$7$?$^$^$K$7$F$*$/$+(B
+$B$r7h$a$^$9!#(B
+
+@lisp
+(setq message-hidden-headers
+      '(not "From" "Subject" "To" "Cc" "Newsgroups"))
+@end lisp
 @end table
 
 @node Mail Headers

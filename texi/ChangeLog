@@ -1,3 +1,48 @@
+2003-04-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Misc Article): Addition.
+
+2003-04-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Message Headers): Addition.
+
+2003-04-12  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Encoding Customization): Update default for
+	mm-body-charset-encoding-alist.
+
+2003-04-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Non-MIME): Add diff.
+
+2003-04-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi (Security): Fix typo.
+
+2003-04-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi: Changed ~/.gnus and .gnus.el to ~/.gnus.el
+
+2003-04-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Gnus Versions): Index.
+	(Summary Score Commands): Decribe keys in `*Score Trace*' buffer.
+
+2003-04-01  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Button Levels): Added
+	`gnus-button-ctan-directory-regexp'
+
+2003-04-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Indirect Functions): Fix examples for
+	nntp-via-rlogin-command-switches.
+
+2003-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Button Levels): New node.
+	(Article Buttons): Additions.
+
 2003-03-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Exiting Gnus): Removed gnus-unload.

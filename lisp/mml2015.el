@@ -1,5 +1,5 @@
 ;;; mml2015.el --- MIME Security with Pretty Good Privacy (PGP)
-;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: PGP MIME MML
@@ -382,7 +382,7 @@
 	       (buffer-string)))
 	    (set-buffer cipher)
 	    (erase-buffer)
-	    (insert-buffer plain)
+	    (insert-buffer-substring plain)
 	    (goto-char (point-min))
 	    (while (search-forward "\r\n" nil t)
 	      (replace-match "\n" t t))))
@@ -572,7 +572,7 @@
       (goto-char (point-max))
       (insert (format "\n--%s\n" boundary))
       (insert "Content-Type: application/pgp-signature\n\n")
-      (insert-buffer signature)
+      (insert-buffer-substring signature)
       (goto-char (point-max))
       (insert (format "--%s--\n" boundary))
       (goto-char (point-max)))))
@@ -626,7 +626,7 @@
 	(insert "Version: 1\n\n")
 	(insert (format "--%s\n" boundary))
 	(insert "Content-Type: application/octet-stream\n\n")
-	(insert-buffer cipher)
+	(insert-buffer-substring cipher)
 	(goto-char (point-max))
 	(insert (format "--%s--\n" boundary))
 	(goto-char (point-max))))))
@@ -703,7 +703,7 @@
 	     (buffer-string))))
 	(progn
 	  (erase-buffer)
-	  (insert-buffer pgg-output-buffer)
+	  (insert-buffer-substring pgg-output-buffer)
 	  (goto-char (point-min))
 	  (while (search-forward "\r\n" nil t)
 	    (replace-match "\n" t t))
@@ -774,11 +774,12 @@
 
 (defun mml2015-pgg-clear-verify ()
   (let ((pgg-errors-buffer mml2015-result-buffer)
-	(text (current-buffer)))
+	(text (buffer-string))
+	(coding-system buffer-file-coding-system))
     (if (condition-case err
 	    (prog1
 		(mm-with-unibyte-buffer
-		  (insert-buffer text)
+		  (insert (encode-coding-string text coding-system))
 		  (pgg-verify-region (point-min) (point-max) nil t))
 	      (goto-char (point-min))
 	      (while (search-forward "\r\n" nil t)
@@ -819,7 +820,7 @@
     (goto-char (point-max))
     (insert (format "\n--%s\n" boundary))
     (insert "Content-Type: application/pgp-signature\n\n")
-    (insert-buffer pgg-output-buffer)
+    (insert-buffer-substring pgg-output-buffer)
     (goto-char (point-max))
     (insert (format "--%s--\n" boundary))
     (goto-char (point-max))))
@@ -847,7 +848,7 @@
     (insert "Version: 1\n\n")
     (insert (format "--%s\n" boundary))
     (insert "Content-Type: application/octet-stream\n\n")
-    (insert-buffer pgg-output-buffer)
+    (insert-buffer-substring pgg-output-buffer)
     (goto-char (point-max))
     (insert (format "--%s--\n" boundary))
     (goto-char (point-max))))

@@ -738,7 +738,7 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
 	(mml-insert-mml-markup handle buffer textp)))
     (cond
      (mmlp
-      (insert-buffer buffer)
+      (insert-buffer-substring buffer)
       (goto-char (point-max))
       (insert "<#/mml>\n"))
      ((stringp (car handle))
@@ -881,7 +881,8 @@ See Info node `(emacs-mime)Composing'.
 ;;;
 
 (defun mml-minibuffer-read-file (prompt)
-  (let ((file (read-file-name prompt nil nil t)))
+  (let* ((completion-ignored-extensions nil)
+	 (file (read-file-name prompt nil nil t)))
     ;; Prevent some common errors.  This is inspired by similar code in
     ;; VM.
     (when (file-directory-p file)
@@ -1039,7 +1040,7 @@ If RAW, don't highlight the article."
 			 (concat (if raw "*Raw MIME preview of "
 				   "*MIME preview of ") (buffer-name))))
       (erase-buffer)
-      (insert-buffer buf)
+      (insert-buffer-substring buf)
       (mml-preview-insert-mail-followup-to)
       (let ((message-deletable-headers (if (message-news-p)
 					   nil

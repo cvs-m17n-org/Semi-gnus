@@ -9,10 +9,10 @@
 (defun maybe-bind (args)
   (mapcar (lambda (var) (unless (boundp var) (set var nil))) args))
 
-(maybe-fbind '(bbdb-create-internal bbdb-records
-	       create-image display-graphic-p
-	       display-time-event-handler find-image image-size
-	       image-type-available-p insert-image
+(maybe-fbind '(Info-directory
+	       Info-menu bbdb-create-internal bbdb-records create-image
+	       display-graphic-p display-time-event-handler find-image
+	       image-size image-type-available-p insert-image
 	       make-mode-line-mouse-map make-temp-file open-ssl-stream
 	       propertize put-image replace-regexp-in-string
 	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
@@ -31,6 +31,7 @@
 (if (featurep 'xemacs)
     (progn
       (maybe-fbind '(ccl-execute-on-string
+		     Info-directory Info-menu
 		     char-charset charsetp coding-system-get
 		     coding-system-list coding-system-p decode-coding-region
 		     decode-coding-string define-ccl-program delete-overlay
