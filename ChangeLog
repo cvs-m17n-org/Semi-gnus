@@ -1,3 +1,13 @@
+1998-04-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.4.
+
+	* texi/gnus.texi, lisp/ChangeLog: Sync up with Gnus 5.6.7.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+ 	lisp/gnus-msg.el, lisp/gnus-cache.el, lisp/gnus-art.el: Sync up
+ 	with Gnus 5.6.7.
+
 1998-04-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.2.3.
