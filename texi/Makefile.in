@@ -40,15 +40,18 @@ message-ja.info: message-ja.texi
 most: texi2latex.elc latex latexps
 
 %-ja: %-ja.texi
+	rm -f $@; \
 	$(EMACSINFO) $<
 
 %-ja.info: %-ja.texi
+	rm -f $@; \
 	$(EMACSINFO) $< t
 
 %.info: %.texi
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
+	  rm -f $@; \
 	  $(EMACSINFO) $< t; \
 	else \
 	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
@@ -60,6 +63,7 @@ most: texi2latex.elc latex latexps
 	if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
+	  rm -f $@; \
 	  $(EMACSINFO) $<; \
 	else \
 	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
@@ -73,13 +77,13 @@ pdf: tmps gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
 	$(TEXI2DVI) -I $(srcdir) gnustmp.texi
 	cp gnustmp.dvi $*.dvi
-	rm gnustmp.*
+	rm -f gnustmp.*
 
 .texi.pdf :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi
 	$(TEXI2PDF) -I $(srcdir) gnustmp.texi
 	cp gnustmp.pdf $*.pdf
-	rm gnustmp.*
+	rm -f gnustmp.*
 
 refcard.dvi: refcard.tex gnuslogo.refcard gnusref.tex
 	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) refcard.tex
