@@ -1,4 +1,4 @@
-;;; gnus-namazu.el --- Search mail with Namazu.
+;;; gnus-namazu.el --- Search mail with Namazu. -*- coding: iso-2022-7bit; -*-
 
 ;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
@@ -514,33 +514,34 @@ generate possible group names from it."
 			  'gnus-namazu/read-query-history)))
 
 (defun gnus-namazu/highlight-words (query)
-  (let ((strings)
-	(start 0))
-    (while (string-match
-	    "[ \t\r\f\n]*\\(\\(and\\|or\\|\\(not\\)\\)[ \t\r\f\n]+\\)?\
-\\(\\+[^ \t\r\f\n]+:\\)?\\(/\\([^/]+\\)/\\|\\(\"\\([^\"]+\\)\"\\|\
-{\\([^{}]+\\)}\\)\\|[^ \t\r\f\n]+\\)" query start)
-      (setq start (match-end 0))
-      (or (match-beginning 3)		; NOT search
-	  (match-beginning 4)		; Field search
-	  (match-beginning 6)		; Regular expression search
-	  (if (match-beginning 7)	; Phrase search
-	      (dolist (str (split-string
-			    (if (match-beginning 8)
-				(match-string 8 query)
-			      (match-string 9 query))))
-		(when (> (length str) 0)
-		  (push str strings)))
-	    (push (match-string 5 query) strings))))
-    (and strings
-	 (list
-	  (list
-	   (regexp-opt (mapcar
-			(lambda (str)
-			  (if (string-match "\\`\\*?\\([^\\*]*\\)\\*?\\'" str)
-			      (match-string 1 str) str))
-			strings))
-	   0 0 'gnus-namazu-query-highlight-face)))))
+  (with-temp-buffer
+    (insert " " query)
+    ;; Remove tokens for NOT search
+    (goto-char (point-min))
+    (while (re-search-forward "[　 \t\r\f\n]+not[　 \t\r\f\n]+\
+\\([^　 \t\r\f\n\"{(/]+\\|\"[^\"]+\"\\|{[^}]+}\\|([^)]+)\\|/[^/]+/\\)+" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove tokens for Field search
+    (goto-char (point-min))
+    (while (re-search-forward "[　 \t\r\f\n]+\\+[^　 \t\r\f\n:]+:\
+\\([^　 \t\r\f\n\"{(/]+\\|\"[^\"]+\"\\|{[^}]+}\\|([^)]+)\\|/[^/]+/\\)+" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove tokens for Regexp search
+    (goto-char (point-min))
+    (while (re-search-forward "/[^/]+/" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove brackets, double quote, asterisk and operators
+    (goto-char (point-min))
+    (while (re-search-forward "\\([(){}\"*]\\|\\b\\(and\\|or\\)\\b\\)" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Collect all keywords
+    (setq query nil)
+    (goto-char (point-min))
+    (while (re-search-forward "[^　 \t\r\f\n]+" nil t)
+      (push (match-string 0) query))
+    (when query
+      (list (list (regexp-opt query)
+		  0 0 'gnus-namazu-query-highlight-face)))))
 
 (defun gnus-namazu/truncate-article-list (articles)
   (let ((hit (length articles)))
