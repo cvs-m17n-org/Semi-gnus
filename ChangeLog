@@ -1,3 +1,11 @@
+1998-04-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.2.
+
+	* Sync up with Gnus 5.6.5.
+
+	* texi/custom.texi, texi/widget.texi: Removed from Semi-gnus.
+
 1998-04-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* README.semi (How to get? (via CVS)): Modify descriptions about
