@@ -45,6 +45,11 @@ automatically."
 		 directory)
   :group 'gnus-xmas)
 
+(unless gnus-xmas-glyph-directory
+  (unless (setq gnus-xmas-glyph-directory 
+		(message-xmas-find-glyph-directory "gnus"))
+    (gnus-error 1 "Can't find glyph directory. Possibly the `etc' directory is not installed.")))
+
 ;;(format "%02x%02x%02x" 114 66 20) "724214"
 
 (defvar gnus-xmas-logo-color-alist
@@ -583,7 +588,6 @@ the resulting string may be narrower than END-COLUMN.
 (defun gnus-xmas-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
-  (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory "gnus"))
   (erase-buffer)
   (cond
    ((and (console-on-window-system-p)
@@ -840,7 +844,6 @@ XEmacs compatibility workaround."
 
 (defvar gnus-xmas-modeline-glyph
   (progn
-    (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory "gnus"))
     (let* ((file-xpm (expand-file-name "gnus-pointer.xpm"
 				       gnus-xmas-glyph-directory))
 	   (file-xbm (expand-file-name "gnus-pointer.xbm"
