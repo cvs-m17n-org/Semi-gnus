@@ -1,9 +1,18 @@
+1999-02-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+1999-02-04  YOSHIZAWA Masahiro <manbou@ceres.dti.ne.jp>
+
+	* README-offline.en: New description.
+	* README-offline.ja: Ditto.
+
 1999-02-03  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-	
+
 	* lisp/gnus.el (gnus-revision-number): Change to 01
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Add default value.
-	
+
 1999-02-03  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): New constant.
