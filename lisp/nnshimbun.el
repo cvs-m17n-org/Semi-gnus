@@ -220,8 +220,9 @@
 	  (shimbun-article nnshimbun-shimbun header)
 	  ;; Kludge! replace a date string in `gnus-newsgroup-data'
 	  ;; based on the newly retrieved article.
-	  (mail-header-set-date (gnus-summary-article-header article)
-				(shimbun-header-date header))
+	  (let ((x (gnus-summary-article-header article)))
+	    (when x
+	      (mail-header-set-date x (shimbun-header-date header))))
 	  (when (> (buffer-size) 0)
 	    (nnshimbun-replace-nov-entry group article header original-id)
 	    (nnshimbun-backlog
