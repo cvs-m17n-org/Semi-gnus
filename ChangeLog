@@ -1,5 +1,10 @@
 2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* lisp/nnshimbun.el: Reconstructed to use `shimbun'.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group):
+	Reconstructed to use `shimbun'.
+
 	* lisp/dgnushack.el (toplevel): Add paths if and only if APEL and
 	FLIM can't be found.
 
