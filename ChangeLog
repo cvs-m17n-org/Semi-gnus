@@ -1,7 +1,7 @@
 1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' to
-	`pop3-fma-read-passwd'.
+	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' as a
+	symbol `pop3-fma-read-passwd'.
 
 1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
