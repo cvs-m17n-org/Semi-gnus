@@ -1,5 +1,24 @@
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
+	* gnus.el: Oort Gnus v0.24 is released.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dgnushack.el (when): Check whether defadvice is fbound.
+
+2003-05-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-unregistered-group-regex): new variable
+	(gnus-registry-register-message-ids): use it
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+	* gnus.el: Update copyright for several files.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
 	* gnus.el: Oort Gnus v0.23 is released.
 
 2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
@@ -103,7 +122,7 @@
 	Take care of some differences between XEmacs 21.1 and newer
 	versions of XEmacs.
 
-2003-04-30  Teodor Zlatanov  <tzz@bwh.harvard.edu>
+2003-04-30  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* gnus-registry.el (gnus-registry-split-fancy-with-parent): added
 	diagnostic message

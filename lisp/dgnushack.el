@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -473,7 +473,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
       (autoload 'custom-declare-face "cus-face" nil t)
       (autoload 'cl-compile-time-init "cl-macs" nil t)
       (autoload 'defadvice "advice" nil nil 'macro))
-    (when (eq emacs-minor-version 4)
+    (unless (fboundp 'defadvice)
       (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
     (autoload 'Info-menu "info" nil t)
