@@ -49,8 +49,9 @@
 		     find-coding-systems-for-charsets sc-cite-regexp
 		     vcard-pretty-print image-type-available-p
 		     put-image create-image  display-graphic-p
-		     find-image insert-image
-		     make-overlay overlay-put make-symbolic-link))
+		     find-image insert-image image-size
+		     make-overlay overlay-put make-symbolic-link
+		     subst-char-in-string))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -103,14 +104,13 @@
 		 url-generic-parse-url valid-image-instantiator-format-p
 		 babel-fetch babel-wash sc-cite-regexp
 		 put-image create-image display-graphic-p
-		 find-image insert-image
+		 find-image insert-image image-size
 		 vcard-pretty-print image-type-available-p
 		 coding-system-get find-coding-system
 		 find-coding-systems-for-charsets find-coding-systems-region
 		 font-lock-set-defaults function-max-args get-charset-property
 		 make-symbolic-link map-extents smiley-encode-buffer
-		 toolbar-gnus
-		 )))
+		 toolbar-gnus subst-char-in-string)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

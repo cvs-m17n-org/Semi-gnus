@@ -2820,6 +2820,11 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 $B%-%c%C%7%e5-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B
 (@code{gnus-group-list-cached})$B!#(B
 
+@item A ?
+@kindex A ? (Group)
+@findex gnus-group-list-dormant
+$BJ]N15-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B (@code{gnus-group-list-dormant})$B!#(B
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -3608,8 +3613,29 @@ Gnus
 $B$3$N@55,I=8=$K%^%C%A$9$k%0%k!<%W$O!"$=$l$,6u$G$"$k$+$I$&$+$K4X$o(B
 $B$i$:!">o$K%0%k!<%W%P%C%U%!$KI=<($5$l$^$9!#(B
 
-@end table
+@item gnus-group-name-charset-method-alist
+@vindex gnus-group-name-charset-method-alist
+$B%0%k!<%WL>MQ$NA*BrJ}K!$HJ8;z=89g$NO"A[%j%9%H$G$9!#$3$l$O1Q;z$G$O$J$$%0%k!<(B
+$B%WL>$rI=<($9$k$?$a$K;H$$$^$9!#(B
 
+$BNc(B:
+@lisp
+(setq gnus-group-name-charset-method-alist
+    '(((nntp "news.com.cn") . cn-gb-2312)))
+@end lisp
+
+@item gnus-group-name-charset-group-alist
+@vindex gnus-group-name-charset-group-alist
+$B%0%k!<%WL>MQ$N%0%k!<%WL>$N@55,I=8=$HJ8;z=89g$NO"A[%j%9%H$G$9!#$3$l$O1Q;z(B
+$B$G$O$J$$%0%k!<%WL>$rI=<($9$k$?$a$K;H$$$^$9!#(B
+
+$BNc(B:
+@lisp
+(setq gnus-group-name-charset-group-alist
+    '(("\\.com\\.cn:" . cn-gb-2312)))
+@end lisp
+
+@end table
 
 @node Scanning New Messages
 @subsection $B?7Ce%a%C%;!<%8$rC5$9(B
@@ -4518,7 +4544,9 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 $B=,47$r;H$$$^$9!#(B
 
 @item S o m
+@itemx C-c C-f
 @kindex S o m $B!J35N,!K(B
+@kindex C-c C-f ($B35N,(B)
 @findex gnus-summary-mail-forward
 @c @icon{gnus-summary-mail-forward}
 $BC/$+B>$N?M$K8=:_$N5-;v$rE>Aw$7$^$9(B (@code{gnus-summary-mail-forward})$B!#(B
@@ -7248,6 +7276,31 @@ CRLF $B$NAH(B ($B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $B$r(B LF $B$KJQ49$7$^
 DOS $B$N9TKv$N@$OC$r$7$^$9(B)$B!"$=$7$F$=$l$+$i;D$j$N(B CR $B$r(B LF $B$KJQ49$7$^$9(B
 ($B$3$l$O(B MAC $B$N9TKv$N@$OC$r$7$^$9(B) (@code{gnus-article-remove-cr})$B!#(B
 
+@c @item W 6
+@c @kindex W 6 (Summary)
+@c @findex gnus-article-de-base64-unreadable
+@c Treat base64 (@code{gnus-article-de-base64-unreadable}).
+@c Base64 is one common @sc{mime} encoding employed when sending non-ASCII
+@c (i. e., 8-bit) articles.  Note that the this is usually done
+@c automatically by Gnus if the message in question has a
+@c @code{Content-Transfer-Encoding} header that says that this encoding has
+@c been done.
+
+@item W Z
+@kindex W Z (Summary)
+@findex gnus-article-decode-HZ
+HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$rEAAw$9$k$H$-(B
+$B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $B$N(B
+$B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
+
+@c @item W h
+@c @kindex W h (Summary)
+@c @findex gnus-article-wash-html
+@c Treat HTML (@code{gnus-article-wash-html}).  
+@c Note that the this is usually done automatically by Gnus if the message
+@c in question has a @code{Content-Type} header that says that this type
+@c has been done.
+
 @item W f
 @kindex W f $B!J35N,!K(B
 @cindex x-face
@@ -9041,6 +9094,12 @@ Superseding} $B$r;2>H$7$F$/$@$5$$!#(B
 @code{nil} $B$G$J$1$l$P!"(B@kbd{a} $B$r$7$?$H$-$K!"(B@code{to-list} $B%0%k!<%W%Q%i(B
 $B%a!<%?$r$=$l$N$J$$%a!<%k%0%k!<%W$KIU$12C$($^$9!#(B
 
+@c @item message-send-mail-partially-limit
+@c @vindex message-send-mail-partially-limit
+@c The limitation of messages sent as message/partial.
+@c The lower bound of message size in characters, beyond which the message 
+@c should be sent in several parts. If it is nil, the size is unlimited.
+
 @end table
 
 
@@ -10547,7 +10606,8 @@ rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 @item directory
 $B%G%#%l%/%H%j!<Cf$NJ#?t$N%U%!%$%k$+$i%a!<%k$r<hF@$7$^$9!#$3$l$OIaDL$O(B
 procmail $B$K?7$7$$%a!<%k$r$$$/$D$+$N%U%!%$%k$KJ,3d$5$;$F$$$k$H$-$K;HMQ$5(B
-$B$l$^$9!#(B
+$B$l$^$9!#(B@code{nnmail-scan-directory-mail-source-once} $B$r(B @code{nil} $B0J30(B
+$B$K$9$k$H!"(Bgnus $B$O?7$7$$%a!<%k%=!<%9$r0l2s$@$1D4$Y$k$h$&$K$J$j$^$9!#(B
 
 $B%-!<%o!<%I(B:
 
@@ -10669,7 +10729,7 @@ POP $B%5!<%P!<$+$i%a!<%k$r<hF@$9$k$?$a$K;H$&4X?t$G$9!#$=$N4X?t$O0l$D$N%Q%i(B
 @end lisp
 
 @item maildir
-maildir $B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $B$H(B postfix $B$G$N$_$G%5%]!<(B
+Maildir $B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $B$H(B postfix $B$G$N$_$G%5%]!<(B
 $B%H$5$l$F$$$k(B mailbox $B7A<0$G!"FCJL$N%G%#%l%/%H%j!<$N$=$l$>$l$N%U%!%$%k$,(B
 $B@53N$K(B1$B%a!<%k$H$J$C$F$$$^$9!#(B
 
@@ -10677,26 +10737,28 @@ maildir $B$+$i%a!<%k$r<hF@$7$^$9!#$3$l$O8=:_(B qmail $B$H(B postfix $B$G$N$
 
 @table @code
 @item :path
-$B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$N%Q%9$G$9!#=i4|CM$O(B
-@samp{~/Maildir/new} $B$G$9!#(B
+$B%a!<%k$,J]B8$5$l$k%G%#%l%/%H%j!<$N%Q%9$G$9!#=i4|CM$O4D6-JQ?t(B
+@code{MAILDIR} $B$+$i<hF@$7$?CM$+!"$^$?$O(B @samp{~/Maildir/} $B$G$9!#(B
+@item :subdirs
+Maildir $B$N%5%V%G%#%l%/%H%j$G$9!#=i4|CM$O(B @samp{("new" "cur")} $B$G$9!#(B
 
-Gnus $B$G<hF@$9$kA0$K!"$H$-$I$-(B pop3 $B%G!<%b%s$G%a!<%k$rC5$9$J$i!"0J2<$N:G(B
-$B=i$NNc$N$h$&$K!"(Bmaildir $B$NCf$N(B @code{cur} $B%G%#%l%/%H%j!<$+$i$b%a!<%k$r<h(B
-$BF@$9$kI,MW$,$"$j$^$9!#(B
+@c Gnus $B$G<hF@$9$kA0$K!"$H$-$I$-(B pop3 $B%G!<%b%s$G%a!<%k$rC5$9$J$i!"0J2<$N:G(B
+@c $B=i$NNc$N$h$&$K!"(Bmaildir $B$NCf$N(B @code{cur} $B%G%#%l%/%H%j!<$+$i$b%a!<%k$r<h(B
+@c $BF@$9$kI,MW$,$"$j$^$9!#(B
 
 $B%j%b!<%H%^%7%s$+$i%a!<%k$r<h$j4s$;$k$3$H$b=PMh$^$9!#(B
 ($B$H$$$&$N$b!"(Bmaildir $B$O%m%C%/$NLdBj$r5$$K$;$:$K:Q$`$+$i!#(B)
 
 @end table
 
-maildir $B%a!<%k%=!<%9$NNc$r$U$?$D(B:
+Maildir $B%a!<%k%=!<%9$NNc$r$U$?$D(B:
 
 @lisp
-(maildir :path "/home/user-name/Maildir/cur")
+(maildir :path "/home/user-name/Maildir/" :subdirs ("cur" "new"))
 @end lisp
 
 @lisp
-(maildir :path "/user@@remotehost.org:~/Maildir/new")
+(maildir :path "/user@@remotehost.org:~/Maildir/" :subdirs ("new"))
 @end lisp
 
 @item imap
@@ -13210,7 +13272,29 @@ Nnmail $B$NMxMQ<T$O:G8e$N@55,I=8=$OA4$F$N5-;v$K9gCW$9$k$h$&$K6u$G$J$/$F$O(B
 $B;HMQ2DG=$K$J$C$F$$$J$$$+$.$j!":G=i$K9gCW$7$?5,B'$,(B "$B>!$A(B" $B$^$9!#Aj8_Ej9F(B
 $B$r$7$F$$$k>l9g$O!"A4$F$N9gCW$7$?5,B'$,(B "$B>!$A(B" $B$^$9!#(B
 
+$B$3$NJQ?t$O$=$NCM$H$7$F4X?t$r;}$D$3$H$b$G$-$^$9!#$=$N4X?t$O5-;v$N%X%C%@$N(B
+$BItJ,$KHO0O$,69$a$i$l$?>uBV$G8F$P$l!"5-;v$N0\F0@h$@$H;W$&%0%k!<%W$rJV$9$b(B
+$B$N$G$J$1$l$P$J$j$^$;$s!#(B@code{nnimap-split-fancy} $B$r;2>H$7$F2<$5$$!#(B
+
 $BJ,3d%3!<%I$OI,MW$J$i%a!<%k%\%C%/%9$r:n@.$7$^$9!#(B
+
+$B0[$J$k2>A[%5!<%P!<Kh$K0c$&J,3d$N5,B'$r;H$C$?$j!"$=$l$I$3$m$+F1$8%5!<%P!<(B
+$B$N0[$J$k(B inbox $BKh$K0c$&J,3d$N5,B'$r;H$&$3$H$,$G$-$k$h$&$K$9$k$?$a$K!"$3(B
+$B$NJQ?t$N9=J8$O0J2<$N$h$&$K3HD%$5$l$F$$$^$9!#(B
+
+@lisp
+(setq nnimap-split-rule
+      '(("my1server"    (".*"    (("ding"    "ding@@gnus.org")
+                                  ("junk"    "From:.*Simon")))
+        ("my2server"    ("INBOX" nnimap-split-fancy))
+        ("my[34]server" (".*"    (("private" "To:.*Simon")
+                                  ("junk"    my-junk-func)))))
+@end lisp
+
+$B2>A[%5!<%P!<L>$O<B:]$K$O@55,I=8=$J$N$G!"F1$85,B'$r$$$/$D$+$N%5!<%P!<$KE,(B
+$BMQ$G$-$k$G$7$g$&!#$3$NNc$G$O%5!<%P!<(B @code{my3server} $B$H(B @code{my4server}
+$B$,F1$85,B'$r;H$$$^$9!#F1MM$K(B inbox $BJ8;zNs$b@55,I=8=$G$9!#>e5-$NJ,3d$N5,(B
+$BB'$N<BNc$O!"4X?t!"$^$?$O%0%k!<%W$N@55,I=8=$+%0%k!<%W$N4X?t!"$NN>J}$G$9!#(B
 
 Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-methods}.
 

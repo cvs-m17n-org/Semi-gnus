@@ -43,7 +43,7 @@
   (let ((b (point-marker))
 	buffer-read-only)
     (insert "\n")
-    (put-image (mm-get-image handle) b "x")
+    (put-image (mm-get-image handle) b)
     (mm-handle-set-undisplayer
      handle
      `(lambda () (remove-images ,b (1+ ,b))))))
@@ -65,8 +65,8 @@
 
 (eval-and-compile
   (if (string-match "XEmacs" (emacs-version))
-      (fset 'mm-inline-image 'mm-inline-image-xemacs)
-    (fset 'mm-inline-image 'mm-inline-image-emacs)))
+      (defalias 'mm-inline-image 'mm-inline-image-xemacs)
+    (defalias 'mm-inline-image 'mm-inline-image-emacs)))
 
 (defvar mm-w3-setup nil)
 (defun mm-setup-w3 ()
@@ -103,10 +103,11 @@
 		    (and (boundp 'w3-meta-charset-content-type-regexp)
 			 (re-search-forward
 			  w3-meta-charset-content-type-regexp nil t)))
-		(setq charset (w3-coding-system-for-mime-charset 
-			       (buffer-substring-no-properties 
-				(match-beginning 2) 
-				(match-end 2)))))
+		(setq charset (or (w3-coding-system-for-mime-charset 
+				   (buffer-substring-no-properties 
+				    (match-beginning 2) 
+				    (match-end 2)))
+				  charset)))
 	    (delete-region (point-min) (point-max))
 	    (insert (mm-decode-string text charset))
 	    (save-window-excursion

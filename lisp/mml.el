@@ -72,6 +72,29 @@ unknown encoding; `use-ascii': always use ASCII for those characters
 with unknown encoding; `multipart': always send messages with more than
 one charsets.")
 
+(defvar mml-generate-mime-preprocess-function nil
+  "A function called before generating a mime part.
+The function is called with one parameter, which is the part to be 
+generated.")
+
+(defvar mml-generate-mime-postprocess-function nil
+  "A function called after generating a mime part.
+The function is called with one parameter, which is the generated part.")
+
+(defvar mml-generate-default-type "text/plain")
+
+(defvar mml-buffer-list nil)
+
+(defun mml-generate-new-buffer (name) 
+  (let ((buf (generate-new-buffer name)))
+    (push buf mml-buffer-list)
+    buf))
+
+(defun mml-destroy-buffers ()
+  (let (kill-buffer-hook)
+    (mapcar 'kill-buffer mml-buffer-list)
+    (setq mml-buffer-list nil)))
+
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
   (goto-char (point-min))
@@ -84,7 +107,7 @@ one charsets.")
 
 (defun mml-parse-1 ()
   "Parse the current buffer as an MML document."
-  (let (struct tag point contents charsets warn use-ascii no-markup-p)
+  (let (struct tag point contents charsets warn use-ascii no-markup-p raw)
     (while (and (not (eobp))
 		(not (looking-at "<#/multipart")))
       (cond
@@ -95,14 +118,21 @@ one charsets.")
 	      struct))
        (t
 	(if (or (looking-at "<#part") (looking-at "<#mml"))
-	    (setq tag (mml-read-tag))
+	    (setq tag (mml-read-tag)
+		  no-markup-p nil
+		  warn nil)
 	  (setq tag (list 'part '(type . "text/plain"))
 		no-markup-p t
 		warn t))
-	(setq point (point)
-	      contents (mml-read-part (eq 'mml (car tag)))
-	      charsets (mm-find-mime-charset-region point (point)))
-	(when (memq nil charsets)
+	(setq raw (cdr (assq 'raw tag))
+	      point (point)
+	      contents (if raw
+			   (mm-with-unibyte-current-buffer
+			     (mml-read-part (eq 'mml (car tag))))
+			 (mml-read-part (eq 'mml (car tag))))
+	      charsets (if raw nil 
+			 (mm-find-mime-charset-region point (point))))
+	(when (and (not raw) (memq nil charsets))
 	  (if (or (memq 'unknown-encoding mml-confirmation-set)
 		  (y-or-n-p
 		   "Warning: You message contains characters with unknown encoding. Really send?"))
@@ -112,7 +142,9 @@ one charsets.")
 		  (setq charsets (delq nil charsets))
 		(setq warn nil))
 	    (error "Edit your message to remove those characters")))
-	(if (< (length charsets) 2)
+	(if (or raw
+		(eq 'mml (car tag))
+		(< (length charsets) 2))
 	    (if (or (not no-markup-p)
 		    (string-match "[^ \t\r\n]" contents))
 		;; Don't create blank parts.
@@ -125,7 +157,7 @@ one charsets.")
 		       (not
 			(y-or-n-p
 			 (format
-			  "Warning: Your message contains %d parts.  Really send? "
+			  "Warning: Your message contains more than %d parts.  Really send? "
 			  (length nstruct)))))
 	      (error "Edit your message to use only one charset"))
 	    (setq struct (nconc nstruct struct)))))))
@@ -136,56 +168,60 @@ one charsets.")
 (defun mml-parse-singlepart-with-multiple-charsets 
   (orig-tag beg end &optional use-ascii)
   (save-excursion
-    (narrow-to-region beg end)
-    (goto-char (point-min))
-    (let ((current (or (mm-mime-charset (mm-charset-after))
-		       (and use-ascii 'us-ascii)))
-	  charset struct space newline paragraph)
-      (while (not (eobp))
-	(cond
-	 ;; The charset remains the same.
-	 ((or (eq (setq charset (mm-mime-charset (mm-charset-after))) 
-		  'us-ascii)
-	      (and use-ascii (not charset))
-	      (eq charset current)))
-	 ;; The initial charset was ascii.
-	 ((eq current 'us-ascii)
-	  (setq current charset
-		space nil
-		newline nil
-		paragraph nil))
-	 ;; We have a change in charsets.
-	 (t
-	  (push (append
-		 orig-tag
-		 (list (cons 'contents
-			     (buffer-substring-no-properties
-			      beg (or paragraph newline space (point))))))
-		struct)
-	  (setq beg (or paragraph newline space (point))
-		current charset
-		space nil
-		newline nil
-		paragraph nil)))
-	;; Compute places where it might be nice to break the part.
-	(cond
-	 ((memq (following-char) '(?  ?\t))
-	  (setq space (1+ (point))))
-	 ((eq (following-char) ?\n)
-	  (setq newline (1+ (point))))
-	 ((and (eq (following-char) ?\n)
-	       (not (bobp))
-	       (eq (char-after (1- (point))) ?\n))
-	  (setq paragraph (point))))
-	(forward-char 1))
-      ;; Do the final part.
-      (unless (= beg (point))
-	(push (append orig-tag
-		      (list (cons 'contents
-				  (buffer-substring-no-properties
-				   beg (point)))))
-	      struct))
-      struct)))
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (let ((current (or (mm-mime-charset (mm-charset-after))
+			 (and use-ascii 'us-ascii)))
+	    charset struct space newline paragraph)
+	(while (not (eobp))
+	  (setq charset (mm-mime-charset (mm-charset-after)))
+	  (cond
+	   ;; The charset remains the same.
+	   ((eq charset 'us-ascii))
+	   ((or (and use-ascii (not charset))
+		(eq charset current))
+	    (setq space nil
+		  newline nil
+		  paragraph nil))
+	   ;; The initial charset was ascii.
+	   ((eq current 'us-ascii)
+	    (setq current charset
+		  space nil
+		  newline nil
+		  paragraph nil))
+	   ;; We have a change in charsets.
+	   (t
+	    (push (append
+		   orig-tag
+		   (list (cons 'contents
+			       (buffer-substring-no-properties
+				beg (or paragraph newline space (point))))))
+		  struct)
+	    (setq beg (or paragraph newline space (point))
+		  current charset
+		  space nil
+		  newline nil
+		  paragraph nil)))
+	  ;; Compute places where it might be nice to break the part.
+	  (cond
+	   ((memq (following-char) '(?  ?\t))
+	    (setq space (1+ (point))))
+	   ((and (eq (following-char) ?\n)
+		 (not (bobp))
+		 (eq (char-after (1- (point))) ?\n))
+	    (setq paragraph (point)))
+	   ((eq (following-char) ?\n)
+	    (setq newline (1+ (point)))))
+	  (forward-char 1))
+	;; Do the final part.
+	(unless (= beg (point))
+	  (push (append orig-tag
+			(list (cons 'contents
+				    (buffer-substring-no-properties
+				     beg (point)))))
+		struct))
+	struct))))
 
 (defun mml-read-tag ()
   "Read a tag and return the contents."
@@ -254,111 +290,125 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	(buffer-string)))))
 
 (defun mml-generate-mime-1 (cont)
-  (cond
-   ((or (eq (car cont) 'part) (eq (car cont) 'mml))
-    (let (coded encoding charset filename type)
-      (setq type (or (cdr (assq 'type cont)) "text/plain"))
-      (if (member (car (split-string type "/")) '("text" "message"))
-	  (with-temp-buffer
+  (save-restriction
+    (narrow-to-region (point) (point))
+    (if mml-generate-mime-preprocess-function
+	(funcall mml-generate-mime-preprocess-function cont))
+    (cond
+     ((or (eq (car cont) 'part) (eq (car cont) 'mml))
+      (let ((raw (cdr (assq 'raw cont)))
+	    coded encoding charset filename type)
+	(setq type (or (cdr (assq 'type cont)) "text/plain"))
+	(if (and (not raw)
+		 (member (car (split-string type "/")) '("text" "message")))
+	    (with-temp-buffer
+	      (cond
+	       ((cdr (assq 'buffer cont))
+		(insert-buffer-substring (cdr (assq 'buffer cont))))
+	       ((and (setq filename (cdr (assq 'filename cont)))
+		     (not (equal (cdr (assq 'nofile cont)) "yes")))
+		(mm-insert-file-contents filename))
+	       ((eq 'mml (car cont))
+		(insert (cdr (assq 'contents cont))))
+	       (t
+		(save-restriction
+		  (narrow-to-region (point) (point))
+		  (insert (cdr (assq 'contents cont)))
+		  ;; Remove quotes from quoted tags.
+		  (goto-char (point-min))
+		  (while (re-search-forward
+			  "<#!+/?\\(part\\|multipart\\|external\\|mml\\)" nil t)
+		    (delete-region (+ (match-beginning 0) 2)
+				   (+ (match-beginning 0) 3))))))
+	      (cond 
+	       ((eq (car cont) 'mml)
+		(let ((mml-boundary (funcall mml-boundary-function
+					     (incf mml-multipart-number)))
+		      (mml-generate-default-type "text/plain"))
+		  (mml-to-mime))
+		(let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
+		  ;; ignore 0x1b, it is part of iso-2022-jp
+		  (setq encoding (mm-body-7-or-8))))
+	       ((string= (car (split-string type "/")) "message")
+		(let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
+		  ;; ignore 0x1b, it is part of iso-2022-jp
+		  (setq encoding (mm-body-7-or-8))))
+	       (t 
+		(setq charset (mm-encode-body))
+		(setq encoding (mm-body-encoding
+				charset (cdr (assq 'encoding cont))))))
+	      (setq coded (buffer-string)))
+	  (mm-with-unibyte-buffer
 	    (cond
 	     ((cdr (assq 'buffer cont))
 	      (insert-buffer-substring (cdr (assq 'buffer cont))))
 	     ((and (setq filename (cdr (assq 'filename cont)))
 		   (not (equal (cdr (assq 'nofile cont)) "yes")))
-	      (mm-insert-file-contents filename))
-	     ((eq 'mml (car cont))
-	      (insert (cdr (assq 'contents cont))))
+	      (let ((coding-system-for-read mm-binary-coding-system))
+		(mm-insert-file-contents filename nil nil nil nil t)))
 	     (t
-	      (save-restriction
-		(narrow-to-region (point) (point))
-		(insert (cdr (assq 'contents cont)))
-		;; Remove quotes from quoted tags.
-		(goto-char (point-min))
-		(while (re-search-forward
-			"<#!+/?\\(part\\|multipart\\|external\\|mml\\)" nil t)
-		  (delete-region (+ (match-beginning 0) 2)
-				 (+ (match-beginning 0) 3))))))
-	    (cond 
-	     ((eq (car cont) 'mml)
-	      (let ((mml-boundary (funcall mml-boundary-function
-					   (incf mml-multipart-number))))
-		(mml-to-mime))
-	      (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
-		;; ignore 0x1b, it is part of iso-2022-jp
-		(setq encoding (mm-body-7-or-8))))
-	     ((string= (car (split-string type "/")) "message")
-	      (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
-		;; ignore 0x1b, it is part of iso-2022-jp
-		(setq encoding (mm-body-7-or-8))))
-	     (t 
-	      (setq charset (mm-encode-body))
-	      (setq encoding (mm-body-encoding
-			      charset (cdr (assq 'encoding cont))))))
-	    (setq coded (buffer-string)))
-	(mm-with-unibyte-buffer
-	  (cond
-	   ((cdr (assq 'buffer cont))
-	    (insert-buffer-substring (cdr (assq 'buffer cont))))
-	   ((and (setq filename (cdr (assq 'filename cont)))
-		 (not (equal (cdr (assq 'nofile cont)) "yes")))
-	    (let ((coding-system-for-read mm-binary-coding-system))
-	      (mm-insert-file-contents filename nil nil nil nil t)))
-	   (t
-	    (insert (cdr (assq 'contents cont)))))
-	  (setq encoding (mm-encode-buffer type)
-		coded (buffer-string))))
-      (mml-insert-mime-headers cont type charset encoding)
-      (insert "\n")
-      (insert coded)))
-   ((eq (car cont) 'external)
-    (insert "Content-Type: message/external-body")
-    (let ((parameters (mml-parameter-string
-		       cont '(expiration size permission)))
-	  (name (cdr (assq 'name cont))))
-      (when name
-	(setq name (mml-parse-file-name name))
-	(if (stringp name)
+	      (insert (cdr (assq 'contents cont)))))
+	    (setq encoding (mm-encode-buffer type)
+		  coded (buffer-string))))
+	(mml-insert-mime-headers cont type charset encoding)
+	(insert "\n")
+	(mm-with-unibyte-current-buffer
+	  (insert coded))))
+     ((eq (car cont) 'external)
+      (insert "Content-Type: message/external-body")
+      (let ((parameters (mml-parameter-string
+			 cont '(expiration size permission)))
+	    (name (cdr (assq 'name cont))))
+	(when name
+	  (setq name (mml-parse-file-name name))
+	  (if (stringp name)
+	      (mml-insert-parameter
+	       (mail-header-encode-parameter "name" name)
+	       "access-type=local-file")
 	    (mml-insert-parameter
-	     (mail-header-encode-parameter "name" name)
-	     "access-type=local-file")
-	  (mml-insert-parameter
-	   (mail-header-encode-parameter
-	    "name" (file-name-nondirectory (nth 2 name)))
-	   (mail-header-encode-parameter "site" (nth 1 name))
-	   (mail-header-encode-parameter
-	    "directory" (file-name-directory (nth 2 name))))
-	  (mml-insert-parameter
-	   (concat "access-type="
-		   (if (member (nth 0 name) '("ftp@" "anonymous@"))
-		       "anon-ftp"
-		     "ftp")))))      
-      (when parameters
-	(mml-insert-parameter-string
-	 cont '(expiration size permission))))
-    (insert "\n\n")
-    (insert "Content-Type: " (cdr (assq 'type cont)) "\n")
-    (insert "Content-ID: " (message-make-message-id) "\n")
-    (insert "Content-Transfer-Encoding: "
-	    (or (cdr (assq 'encoding cont)) "binary"))
-    (insert "\n\n")
-    (insert (or (cdr (assq 'contents cont))))
-    (insert "\n"))
-   ((eq (car cont) 'multipart)
-    (let* ((type (or (cdr (assq 'type cont)) "mixed"))
-           (handler (assoc type mml-generate-multipart-alist)))
-      (if handler
-          (funcall (cdr handler) cont)
-        ;; No specific handler.  Use default one.
-        (let ((mml-boundary (mml-compute-boundary cont)))
-          (insert (format "Content-Type: multipart/%s; boundary=\"%s\"\n"
-                          type mml-boundary))
-          (setq cont (cddr cont))
-          (while cont
-            (insert "\n--" mml-boundary "\n")
-            (mml-generate-mime-1 (pop cont)))
-          (insert "\n--" mml-boundary "--\n")))))
-   (t
-    (error "Invalid element: %S" cont))))
+	     (mail-header-encode-parameter
+	      "name" (file-name-nondirectory (nth 2 name)))
+	     (mail-header-encode-parameter "site" (nth 1 name))
+	     (mail-header-encode-parameter
+	      "directory" (file-name-directory (nth 2 name))))
+	    (mml-insert-parameter
+	     (concat "access-type="
+		     (if (member (nth 0 name) '("ftp@" "anonymous@"))
+			 "anon-ftp"
+		       "ftp")))))      
+	(when parameters
+	  (mml-insert-parameter-string
+	   cont '(expiration size permission))))
+      (insert "\n\n")
+      (insert "Content-Type: " (cdr (assq 'type cont)) "\n")
+      (insert "Content-ID: " (message-make-message-id) "\n")
+      (insert "Content-Transfer-Encoding: "
+	      (or (cdr (assq 'encoding cont)) "binary"))
+      (insert "\n\n")
+      (insert (or (cdr (assq 'contents cont))))
+      (insert "\n"))
+     ((eq (car cont) 'multipart)
+      (let* ((type (or (cdr (assq 'type cont)) "mixed"))
+	     (mml-generate-default-type (if (equal type "digest")
+					    "message/rfc822"
+					  "text/plain"))
+	     (handler (assoc type mml-generate-multipart-alist)))
+	(if handler
+	    (funcall (cdr handler) cont)
+	  ;; No specific handler.  Use default one.
+	  (let ((mml-boundary (mml-compute-boundary cont)))
+	    (insert (format "Content-Type: multipart/%s; boundary=\"%s\"\n"
+			    type mml-boundary))
+	    ;; Skip `multipart' and `type' elements.
+	    (setq cont (cddr cont))
+	    (while cont
+	      (insert "\n--" mml-boundary "\n")
+	      (mml-generate-mime-1 (pop cont)))
+	    (insert "\n--" mml-boundary "--\n")))))
+     (t
+      (error "Invalid element: %S" cont)))
+    (if mml-generate-mime-postprocess-function
+	(funcall mml-generate-mime-postprocess-function cont))))
 
 (defun mml-compute-boundary (cont)
   "Return a unique boundary that does not exist in CONT."
@@ -413,7 +463,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	   cont '(name access-type expiration size permission)))
     (when (or charset
 	      parameters
-	      (not (equal type "text/plain")))
+	      (not (equal type mml-generate-default-type)))
       (when (consp charset)
 	(error
 	 "Can't encode a part with several charsets."))
@@ -466,13 +516,13 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	 (mail-header-encode-parameter
 	  (symbol-name type) value))))))
 
-(defvar ange-ftp-path-format)
+(defvar ange-ftp-name-format)
 (defvar efs-path-regexp)
 (defun mml-parse-file-name (path)
   (if (if (boundp 'efs-path-regexp)
 	  (string-match efs-path-regexp path)
-	(if (boundp 'ange-ftp-path-format)
-	    (string-match (car ange-ftp-path-format))))
+	(if (boundp 'ange-ftp-name-format)
+	    (string-match (car ange-ftp-name-format) path)))
       (list (match-string 1 path) (match-string 2 path)
 	    (substring path (1+ (match-end 2))))
     path))
@@ -515,7 +565,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
   (message-encode-message-body)
   (save-restriction
     (message-narrow-to-headers-or-head)
-    (mail-encode-encoded-word-buffer)))
+    (let ((mail-parse-charset message-default-charset))
+      (mail-encode-encoded-word-buffer))))
 
 (defun mml-insert-mime (handle &optional no-markup)
   (let (textp buffer mmlp)
@@ -523,7 +574,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     (unless (stringp (car handle))
       (unless (setq textp (equal (mm-handle-media-supertype handle) "text"))
 	(save-excursion
-	  (set-buffer (setq buffer (generate-new-buffer " *mml*")))
+	  (set-buffer (setq buffer (mml-generate-new-buffer " *mml*")))
 	  (mm-insert-part handle)
 	  (if (setq mmlp (equal (mm-handle-media-type handle) 
 				"message/rfc822"))
@@ -597,7 +648,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     (define-key map "p" 'mml-insert-part)
     (define-key map "v" 'mml-validate)
     (define-key map "P" 'mml-preview)
-    (define-key map "n" 'mml-narrow-to-part)
+    ;;(define-key map "n" 'mml-narrow-to-part)
     (define-key main "\M-m" map)
     main))
 
@@ -611,7 +662,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
    ("Insert"
     ["Multipart" mml-insert-multipart t]
     ["Part" mml-insert-part t])
-   ["Narrow" mml-narrow-to-part t]
+   ;;["Narrow" mml-narrow-to-part t]
    ["Quote" mml-quote-region t]
    ["Validate" mml-validate t]
    ["Preview" mml-preview t]))
@@ -702,7 +753,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
       (goto-char (point-min))
       ;; Quote parts.
       (while (re-search-forward
-	      "<#/?!*\\(multipart\\|part\\|external\\|mml\\)" nil t)
+	      "<#!*/?\\(multipart\\|part\\|external\\|mml\\)" nil t)
 	;; Insert ! after the #.
 	(goto-char (+ (match-beginning 0) 2))
 	(insert "!")))))
@@ -792,7 +843,9 @@ If RAW, don't highlight the article."
   (interactive "P")
   (let ((buf (current-buffer))
 	(message-posting-charset (or (gnus-setup-posting-charset 
-				      (message-fetch-field "Newsgroups"))
+				      (save-restriction
+					(message-narrow-to-headers-or-head)
+					(message-fetch-field "Newsgroups")))
 				     message-posting-charset)))
     (switch-to-buffer (get-buffer-create 
 		       (concat (if raw "*Raw MIME preview of "
@@ -803,7 +856,8 @@ If RAW, don't highlight the article."
 	 (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
 	(replace-match "\n"))
     (mml-to-mime)
-    (unless raw
+    (if raw
+	(mm-disable-multibyte)
       (let ((gnus-newsgroup-charset (car message-posting-charset)))
 	(run-hooks 'gnus-article-decode-hook)
 	(let ((gnus-newsgroup-name "dummy"))

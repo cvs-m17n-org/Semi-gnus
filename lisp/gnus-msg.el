@@ -121,7 +121,7 @@ BODY-LIST is a list of charsets which may be encoded using 8bit
 content-transfer encoding in the body, or one of the special values
 nil (always encode using quoted-printable) or t (always use 8bit).
 
-Note that any value other tha nil for HEADER infringes some RFCs, so
+Note that any value other than nil for HEADER infringes some RFCs, so
 use this option with care."
   :type '(repeat (list :tag "Permitted unencoded charsets"
 		  (choice :tag "Where"
@@ -209,8 +209,8 @@ Thank you for your help in stamping out bugs.
   "\M-c" gnus-summary-mail-crosspost-complaint
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
-  "Om" gnus-summary-mail-digest
-  "Op" gnus-summary-post-digest)
+  "Om" gnus-uu-digest-mail-forward
+  "Op" gnus-uu-digest-post-forward)
 
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
@@ -488,9 +488,8 @@ header line with the old Message-ID."
 	    (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
 	    (insert
 	     (prog1
-		 (format "%s" (buffer-string))
-	       (erase-buffer)))
-	    )
+		 (buffer-substring-no-properties (point-min) (point-max))
+	       (erase-buffer))))
 	  ;; Find the original headers.
 	  (set-buffer gnus-original-article-buffer)
 	  (goto-char (point-min))
@@ -521,6 +520,7 @@ header line with the old Message-ID."
 			      (article-buffer 'reply)
 			      (t 'message))
       (let* ((group (or group gnus-newsgroup-name))
+	     (charset (gnus-group-name-charset nil group))
 	     (pgroup group)
 	     to-address to-group mailing-list to-list
 	     newsgroup-p)
@@ -531,7 +531,8 @@ header line with the old Message-ID."
 		newsgroup-p (gnus-group-find-parameter group 'newsgroup)
 		mailing-list (when gnus-mailing-list-groups
 			       (string-match gnus-mailing-list-groups group))
-		group (gnus-group-real-name group)))
+		group (gnus-group-name-decode (gnus-group-real-name group)
+					      charset)))
 	(if (or (and to-group
 		     (gnus-news-group-p to-group))
 		newsgroup-p
@@ -750,36 +751,36 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
 
-;;; XXX: generate Subject and ``Topics''?
-(defun gnus-summary-mail-digest (&optional n post)
-  "Digests and forwards all articles in this series."
-  (interactive "P")
-  (let ((subject "Digested Articles")
-	(articles (gnus-summary-work-articles n))
-	article frame)
-    (gnus-setup-message 'forward
-      (gnus-summary-select-article)
-      (if post (message-news nil subject) (message-mail nil subject))
-      (when (and message-use-multi-frames (cdr articles))
-	(setq frame (window-frame (get-buffer-window (current-buffer)))))
-      (message-goto-body)
-      (while (setq article (pop articles))
-	(save-window-excursion
-	  (set-buffer gnus-summary-buffer)
-	  (gnus-summary-select-article nil nil nil article)
-	  (gnus-summary-remove-process-mark article))
-	(when frame
-	  (select-frame frame))
-	(insert (mime-make-tag "message" "rfc822") "\n")
-	(insert-buffer-substring gnus-original-article-buffer))
-      (push-mark)
-      (message-goto-body)
-      (mime-edit-enclose-digest-region (point)(mark t)))))
-
-(defun gnus-summary-post-digest (&optional n)
-  "Digest and forwards all articles in this series to a newsgroup."
-  (interactive "P")
-  (gnus-summary-mail-digest n t))
+;;;;; XXX: generate Subject and ``Topics''?
+;;(defun gnus-summary-mail-digest (&optional n post)
+;;  "Digests and forwards all articles in this series."
+;;  (interactive "P")
+;;  (let ((subject "Digested Articles")
+;;	(articles (gnus-summary-work-articles n))
+;;	article frame)
+;;    (gnus-setup-message 'forward
+;;      (gnus-summary-select-article)
+;;      (if post (message-news nil subject) (message-mail nil subject))
+;;      (when (and message-use-multi-frames (cdr articles))
+;;	(setq frame (window-frame (get-buffer-window (current-buffer)))))
+;;      (message-goto-body)
+;;      (while (setq article (pop articles))
+;;	(save-window-excursion
+;;	  (set-buffer gnus-summary-buffer)
+;;	  (gnus-summary-select-article nil nil nil article)
+;;	  (gnus-summary-remove-process-mark article))
+;;	(when frame
+;;	  (select-frame frame))
+;;	(insert (mime-make-tag "message" "rfc822") "\n")
+;;	(insert-buffer-substring gnus-original-article-buffer))
+;;      (push-mark)
+;;      (message-goto-body)
+;;      (mime-edit-enclose-digest-region (point)(mark t)))))
+;;
+;;(defun gnus-summary-post-digest (&optional n)
+;;  "Digest and forwards all articles in this series to a newsgroup."
+;;  (interactive "P")
+;;  (gnus-summary-mail-digest n t))
 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
@@ -1122,7 +1123,8 @@ this is a reply."
 	  (when gcc
 	    (message-remove-header "gcc")
 	    (widen)
-	    (setq groups (message-tokenize-header gcc " ,"))
+	    (setq groups (message-unquote-tokens
+                          (message-tokenize-header gcc " ,")))
 	    ;; Copy the article over to some group(s).
 	    (while (setq group (pop groups))
 	      (gnus-check-server

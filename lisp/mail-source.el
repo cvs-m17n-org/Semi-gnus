@@ -26,6 +26,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(require 'nnheader)
 (eval-and-compile
   (autoload 'pop3-movemail "pop3")
   (autoload 'pop3-get-message-count "pop3"))
@@ -115,7 +116,8 @@ Common keywords should be listed here.")
        (:connection)
        (:authentication password))
       (maildir
-       (:path "~/Maildir/new/")
+       (:path (or (getenv "MAILDIR") "~/Maildir/"))
+       (:subdirs ("new" "cur"))
        (:function))
       (imap
        (:server (getenv "MAILHOST"))
@@ -608,13 +610,36 @@ This only works when `display-time' is enabled."
   "Fetcher for maildir sources."
   (mail-source-bind (maildir source)
     (let ((found 0)
-	  (mail-source-string (format "maildir:%s" path)))
-      (dolist (file (directory-files path t))
-	(when (and (not (file-directory-p file))
-		   (not (if function
-			    (funcall function file mail-source-crash-box)
-			  (rename-file file mail-source-crash-box))))
-	  (incf found (mail-source-callback callback file))))
+	  mail-source-string)
+      (unless (string-match "/$" path)
+	(setq path (concat path "/")))
+      (dolist (subdir subdirs)
+	(when (file-directory-p (concat path subdir))
+	  (setq mail-source-string (format "maildir:%s%s" path subdir))
+	  (dolist (file (directory-files (concat path subdir) t))
+	    (when (and (not (file-directory-p file))
+		       (not (if function
+				(funcall function file mail-source-crash-box)
+			      (let ((coding-system-for-write
+				     nnheader-text-coding-system)
+				    (coding-system-for-read
+				     nnheader-text-coding-system)
+				    (output-coding-system
+				     nnheader-text-coding-system)
+				    (input-coding-system
+				     nnheader-text-coding-system))
+				(with-temp-file mail-source-crash-box
+				  (insert-file-contents file)
+				  (goto-char (point-min))
+				  (unless (looking-at "\n*From ")
+				    (insert "From maildir " 
+					    (current-time-string) "\n"))
+				  (while (re-search-forward "^From " nil t)
+				    (replace-match ">From "))
+				  (goto-char (point-max))
+				  (insert "\n\n"))
+				(delete-file file)))))
+	      (incf found (mail-source-callback callback file))))))
       found)))
 
 (eval-and-compile
@@ -628,8 +653,7 @@ This only works when `display-time' is enabled."
   (autoload 'imap-close "imap")
   (autoload 'imap-error-text "imap")
   (autoload 'imap-message-flags-add "imap")
-  (autoload 'imap-list-to-message-set "imap")
-  (autoload 'nnheader-ms-strip-cr "nnheader"))
+  (autoload 'imap-list-to-message-set "imap"))
 
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."

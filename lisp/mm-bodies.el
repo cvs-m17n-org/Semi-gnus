@@ -108,7 +108,7 @@ If no encoding was done, nil is returned."
   "Do Content-Transfer-Encoding and return the encoding of the current buffer."
   (let ((bits (mm-body-7-or-8)))
     (cond
-     ((eq bits '7bit)
+     ((and (not mm-use-ultra-safe-encoding) (eq bits '7bit))
       bits)
      ((and (not mm-use-ultra-safe-encoding)
 	   (or (eq t (cdr message-posting-charset))
@@ -170,6 +170,10 @@ If no encoding was done, nil is returned."
 	       (goto-char (point-min))
 	       (while (re-search-forward "^[\t ]*\r?\n" nil t)
 		 (delete-region (match-beginning 0) (match-end 0)))
+	       (goto-char (point-max))
+	       (when (re-search-backward "^[A-Za-z0-9+/]+=*[\t ]*$" nil t)
+		 (forward-line)
+		 (delete-region (point) (point-max)))
 	       (point-max))))
 	   ((memq encoding '(7bit 8bit binary))
 	    ;; Do nothing.

@@ -49,6 +49,17 @@ on your system, you could say something like:
 
 \(setq nnheader-file-name-translation-alist '((?: . ?_)))")
 
+(defvar nnheader-text-coding-system
+  (if (memq system-type '(windows-nt ms-dos ms-windows))
+      'raw-text-dos
+    'raw-text)
+  "Text-safe coding system (For removing ^M).
+This variable is a substitute for `mm-text-coding-system'.")
+
+(defvar nnheader-text-coding-system-for-write nil
+  "Text coding system for write.
+This variable is a substitute for `mm-text-coding-system-for-write'.")
+
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
@@ -455,6 +466,7 @@ the line could be found."
     (let* ((file nil)
 	   (number (length articles))
 	   (count 0)
+	   (file-name-coding-system 'binary)
 	   (pathname-coding-system 'binary)
 	   (case-fold-search t)
 	   (cur (current-buffer))
@@ -750,7 +762,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
     (erase-buffer))
   (current-buffer))
 
-(defvar jka-compr-compression-info-list)
+(eval-when-compile (defvar jka-compr-compression-info-list))
 (defvar nnheader-numerical-files
   (if (boundp 'jka-compr-compression-info-list)
       (concat "\\([0-9]+\\)\\("
@@ -1075,9 +1087,9 @@ find-file-hooks, etc.
   "Strip all \r's from the current buffer."
   (nnheader-skeleton-replace "\r"))
 
-(fset 'nnheader-run-at-time 'run-at-time)
-(fset 'nnheader-cancel-timer 'cancel-timer)
-(fset 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-run-at-time 'run-at-time)
+(defalias 'nnheader-cancel-timer 'cancel-timer)
+(defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
 
 (defun nnheader-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
@@ -1096,7 +1108,7 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
-(when (string-match "XEmacs\\|Lucid" emacs-version)
+(when (string-match "XEmacs" emacs-version)
   (require 'nnheaderxm))
 
 (run-hooks 'nnheader-load-hook)

@@ -111,7 +111,8 @@
 	   (newest (if (file-newer-than-file-p file auto) file auto))
 	   (nntp-server-buffer (or buffer nntp-server-buffer)))
       (when (and (file-exists-p newest)
-		 (nnmail-find-file newest))
+		 (let ((nnmail-file-coding-system nnheader-text-coding-system))
+		   (nnmail-find-file newest)))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
 	  (goto-char (point-min))
@@ -192,6 +193,12 @@
     (nnoo-parent-function 'nndraft 'nnmh-request-accept-article
 			  (list group server last noinsert))))
 
+(deffoo nndraft-request-replace-article (article group buffer)
+  (nndraft-possibly-change-group group)
+  (let ((nnmail-file-coding-system nnheader-text-coding-system))
+    (nnoo-parent-function 'nndraft 'nnmh-request-replace-article
+			  (list article group buffer))))
+
 (deffoo nndraft-request-create-group (group &optional server args)
   (nndraft-possibly-change-group group)
   (if (file-exists-p nndraft-current-directory)
@@ -245,8 +252,7 @@
    nnmh-close-group
    nnmh-request-list
    nnmh-request-newsgroups
-   nnmh-request-move-article
-   nnmh-request-replace-article))
+   nnmh-request-move-article))
 
 (provide 'nndraft)
 

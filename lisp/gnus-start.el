@@ -1545,8 +1545,8 @@ newsgroup."
 		       (setq method (gnus-server-get-method nil method)))))
 	       (not (gnus-secondary-method-p method)))
 	  ;; These groups are foreign.  Check the level.
-	  (when (<= (gnus-info-level info) foreign-level)
-	    (setq active (gnus-activate-group group 'scan))
+	  (when (and (<= (gnus-info-level info) foreign-level)
+                     (setq active (gnus-activate-group group 'scan)))
 	    ;; Let the Gnus agent save the active file.
 	    (when (and gnus-agent gnus-plugged active)
 	      (gnus-agent-save-group-info
@@ -1573,16 +1573,22 @@ newsgroup."
 	    ;; hack: `nnmail-get-new-mail' changes the mail-source depending
 	    ;; on the group, so we must perform a scan for every group
 	    ;; if the users has any directory mail sources.
-	    (if (and (null (assq 'directory
+	    ;; hack: if `nnmail-scan-directory-mail-source-once' is non-nil,
+	    ;; for it scan all spool files even when the groups are
+	    ;; not required.
+	    (if (and
+		 (or nnmail-scan-directory-mail-source-once
+		     (null (assq 'directory
 				 (or mail-sources
-				     (if (listp nnmail-spool-file) 
+				     (if (listp nnmail-spool-file)
 					 nnmail-spool-file
-				       (list nnmail-spool-file)))))
-		     (member method scanned-methods))
+				       (list nnmail-spool-file))))))
+		 (member method scanned-methods))
 		(setq active (gnus-activate-group group))
 	      (setq active (gnus-activate-group group 'scan))
 	      (push method scanned-methods))
-	    (inline (gnus-close-group group))))))
+            (when active
+              (gnus-close-group group))))))
 
       ;; Get the number of unread articles in the group.
       (cond
@@ -1604,23 +1610,23 @@ newsgroup."
       (let* ((mg (pop retrievegroups))
 	     (method (or (car mg) gnus-select-method))
 	     (groups (cdr mg)))
-	(gnus-check-server method)
-	;; Request that the backend scan its incoming messages.
-	(when (gnus-check-backend-function 'request-scan (car method))
-	  (gnus-request-scan nil method))
-	(gnus-read-active-file-2 (mapcar (lambda (group)
-					   (gnus-group-real-name group))
-					 groups) method)
-	(dolist (group groups)
-	  (cond
-	   ((setq active (gnus-active (gnus-info-group
-				       (setq info (gnus-get-info group)))))
-	    (inline (gnus-get-unread-articles-in-group info active t)))
-	   (t
-	    ;; The group couldn't be reached, so we nix out the number of
-	    ;; unread articles and stuff.
-	    (gnus-set-active group nil)
-	    (setcar (gnus-gethash group gnus-newsrc-hashtb) t))))))
+	(when (gnus-check-server method)
+          ;; Request that the backend scan its incoming messages.
+          (when (gnus-check-backend-function 'request-scan (car method))
+            (gnus-request-scan nil method))
+          (gnus-read-active-file-2 (mapcar (lambda (group)
+                                             (gnus-group-real-name group))
+                                           groups) method)
+          (dolist (group groups)
+            (cond
+             ((setq active (gnus-active (gnus-info-group
+                                         (setq info (gnus-get-info group)))))
+              (inline (gnus-get-unread-articles-in-group info active t)))
+             (t
+              ;; The group couldn't be reached, so we nix out the number of
+              ;; unread articles and stuff.
+              (gnus-set-active group nil)
+              (setcar (gnus-gethash group gnus-newsrc-hashtb) t)))))))
 
     (gnus-message 5 "Checking new news...done")))
 
@@ -1805,14 +1811,14 @@ newsgroup."
       (gnus-check-server method)
       (let ((list-type (gnus-retrieve-groups groups method)))
 	(cond ((not list-type)
-	       (gnus-error 
+	       (gnus-error
 		1.2 "Cannot read partial active file from %s server."
 		(car method)))
 	      ((eq list-type 'active)
 	       (gnus-active-to-gnus-format method gnus-active-hashtb nil t))
 	      (t
 	       (gnus-groups-to-gnus-format method gnus-active-hashtb t)))))))
-  
+
 ;; Read an active file and place the results in `gnus-active-hashtb'.
 (defun gnus-active-to-gnus-format (&optional method hashtb ignore-errors
 					     real-active)
@@ -2632,7 +2638,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
-      (gnus-write-buffer slave-name)
+      (gnus-write-buffer-as-coding-system
+       gnus-startup-file-coding-system slave-name)
       (when modes
 	(set-file-modes slave-name modes)))))
 
@@ -2662,7 +2669,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	(while slave-files
 	  (erase-buffer)
 	  (setq file (nth 1 (car slave-files)))
-	  (insert-file-contents file)
+	  (nnheader-insert-file-contents file)
 	  (when (condition-case ()
 		    (progn
 		      (eval-buffer (current-buffer))
@@ -2781,7 +2788,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
   "Declare backend NAME with ABILITIES as a Gnus backend."
   (setq gnus-valid-select-methods
 	(nconc gnus-valid-select-methods
-	       (list (apply 'list name abilities)))))
+	       (list (apply 'list name abilities))))
+  (gnus-redefine-select-method-widget))
 
 (defun gnus-set-default-directory ()
   "Set the default directory in the current buffer to `gnus-default-directory'.

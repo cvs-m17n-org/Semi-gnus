@@ -37,7 +37,6 @@
 ;; Todo, minor things:
 ;;
 ;;   o Don't require half of Gnus -- backends should be standalone
-;;   o Support escape characters in `message-tokenize-header'
 ;;   o Verify that we don't use IMAP4rev1 specific things (RFC2060 App B)
 ;;   o Dont uid fetch 1,* in nnimap-retrive-groups (slow)
 ;;   o Split up big fetches (1,* header especially) in smaller chunks
@@ -113,10 +112,6 @@ element in each \"rule\" is the name of the IMAP mailbox, and the
 second is a regexp that nnimap will try to match on the header to find
 a fit.
 
-The first element can also be a list.  In that case, the first element
-is the server the second element is the group on that server in which
-the matching article will be stored.
-
 The second element can also be a function.  In that case, it will be
 called narrowed to the headers with the first element of the rule as
 the argument.  It should return a non-nil value if it thinks that the
@@ -124,7 +119,25 @@ mail belongs in that group.
 
 This variable can also have a function as its value, the function will
 be called with the headers narrowed and should return a group where it
-thinks the article should be splitted to.")
+thinks the article should be splitted to.  See `nnimap-split-fancy'.
+
+To allow for different split rules on different virtual servers, and
+even different split rules in different inboxes on the same server,
+the syntax of this variable have been extended along the lines of:
+
+(setq nnimap-split-rule
+      '((\"my1server\"    (\".*\"    ((\"ding\"    \"ding@gnus.org\")
+                                  (\"junk\"    \"From:.*Simon\")))
+        (\"my2server\"    (\"INBOX\" nnimap-split-fancy))
+        (\"my[34]server\" (\".*\"    ((\"private\" \"To:.*Simon\")
+                                  (\"junk\"    my-junk-func)))))
+
+The virtual server name is in fact a regexp, so that the same rules
+may apply to several servers.  In the example, the servers
+\"my3server\" and \"my4server\" both use the same rules.  Similarly,
+the inbox string is also a regexp.  The actual splitting rules are as
+before, either a function, or a list with group/regexp or
+group/function elements.")
 
 (defvar nnimap-split-predicate "UNSEEN UNDELETED"
   "The predicate used to find articles to split.
@@ -526,15 +539,14 @@ If EXAMINE is non-nil the group is selected read-only."
 		(imap-capability 'IMAP4rev1 nnimap-server-buffer))
       (imap-close nnimap-server-buffer)
       (nnheader-report 'nnimap "Server %s is not IMAP4 compliant" server))
-    (let (list alist user passwd)
-      (and (fboundp 'gnus-parse-netrc)
-	   (setq list (gnus-parse-netrc nnimap-authinfo-file)
-		 alist (or (and (gnus-netrc-get
-				 (gnus-netrc-machine list server) "machine")
-				(gnus-netrc-machine list server))
-			   (gnus-netrc-machine list nnimap-address))
-		 user (gnus-netrc-get alist "login")
-		 passwd (gnus-netrc-get alist "password")))
+    (let* ((list (gnus-parse-netrc nnimap-authinfo-file))
+	   (port (if nnimap-server-port
+		     (int-to-string nnimap-server-port)
+		   "imap"))
+	   (alist (or (gnus-netrc-machine list server port "imap")
+		      (gnus-netrc-machine list nnimap-address port "imap")))
+	   (user (gnus-netrc-get alist "login"))
+	   (passwd (gnus-netrc-get alist "password")))
       (if (imap-authenticate user passwd nnimap-server-buffer)
 	  (prog1
 	      (push (list server nnimap-server-buffer)
@@ -612,7 +624,12 @@ function is generally only called when Gnus is shutting down."
   (with-current-buffer nnimap-callback-buffer
     (insert
      (with-current-buffer nnimap-server-buffer
-       (nnimap-demule (imap-message-get (imap-current-message) 'RFC822)))) ;xxx
+       (nnimap-demule
+        (if (imap-capability 'IMAP4rev1) 
+            ;; xxx don't just use car? alist doesn't contain
+            ;; anything else now, but it might...
+            (nth 2 (car (imap-message-get (imap-current-message) 'BODYDETAIL)))
+          (imap-message-get (imap-current-message) 'RFC822)))))
     (nnheader-ms-strip-cr)
     (funcall nnimap-callback-callback-function t)))
 
@@ -740,8 +757,9 @@ function is generally only called when Gnus is shutting down."
 
 (deffoo nnimap-request-post (&optional server)
   (let ((success t))
-    (dolist  (mbx (message-tokenize-header
-		   (message-fetch-field "Newsgroups")) success)
+    (dolist (mbx (message-unquote-tokens
+		  (message-tokenize-header
+		   (message-fetch-field "Newsgroups") ", ")) success)
       (let ((to-newsgroup (gnus-group-prefixed-name mbx gnus-command-method)))
 	(or (gnus-active to-newsgroup)
 	    (gnus-activate-group to-newsgroup)
@@ -899,8 +917,19 @@ function is generally only called when Gnus is shutting down."
 		(or nnimap-split-crosspost
 		    (throw 'split-done to-groups))))))))))
   
+(defun nnimap-assoc-match (key alist)
+  (let (element)
+    (while (and alist (not element))
+      (if (string-match (car (car alist)) key)
+	  (setq element (car alist)))
+      (setq alist (cdr alist)))
+    element))
+
 (defun nnimap-split-find-rule (server inbox)
-  nnimap-split-rule)
+  (if (listp (cadar nnimap-split-rule)) ;; extended format?
+      (cadr (nnimap-assoc-match inbox (cdr (nnimap-assoc-match 
+					    server nnimap-split-rule))))
+    nnimap-split-rule))
 
 (defun nnimap-split-find-inbox (server)
   (if (listp nnimap-split-inbox)
@@ -1065,8 +1094,9 @@ function is generally only called when Gnus is shutting down."
 		    (goto-char (point-min))
 		    (while (search-forward "\n" nil t)
 		      (replace-match "\r\n")))
-		  ;; next line for Cyrus server bug
-		  (imap-mailbox-unselect nnimap-server-buffer)
+                  ;; this 'or' is for Cyrus server bug
+                  (or (null (imap-current-mailbox nnimap-server-buffer))
+                      (imap-mailbox-unselect nnimap-server-buffer))
 		  (imap-message-append group (current-buffer) nil nil
 				       nnimap-server-buffer)))
 	  (cons group (nth 1 uid))

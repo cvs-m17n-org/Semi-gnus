@@ -1,3 +1,25 @@
+2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* lisp/{webmail.el,rfc2047.el,qp.el,pop3.el,nnwarchive.el,
+	nnsoup.el,nnslashdot.el,nnml.el,nnmh.el,nnmbox.el,nnmail.el,
+	nnimap.el,nnheader.el,nnfolder.el,nndraft.el,nndoc.el,mml.el,
+	mm-view.el,mm-uu.el,mm-util.el,mm-decode.el,mm-bodies.el,
+	message.el,mail-source.el,lpath.el,imap.el,gnus.el,gnus-uu.el,
+	gnus-util.el,gnus-topic.el,gnus-sum.el,gnus-start.el,gnus-srvr.el,
+	gnus-soup.el,gnus-score.el,gnus-msg.el,gnus-mailcap.el,
+	gnus-group.el,gnus-ems.el,gnus-demon.el,gnus-cus.el,gnus-art.el,
+	gnus-agent.el,ChangeLog}: Sync up with Gnus v5.8.7.
+
+	* texi/{message.texi,gnus.texi,gnus-ja.texi,ChangeLog}: Sync up
+	with Gnus v5.8.7.
+
+	* contrib/rfc2015.el: New file.
+
 2000-06-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
@@ -14,6 +36,7 @@
 
 	* lisp/gnus.el (gnus-news-group-p): Sync with Gnus.
 	(gnus-select-method): Remove "*" from doc string.
+	(gnus-group-startup-message): Use `dino' colors.
 
 2000-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -31,6 +54,33 @@
 2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-save-drafts): Rewrite.
+
+	* lisp/nnheader.el (nnheader-text-coding-system-for-write,
+	nnheader-text-coding-system): New variables, substitutes for
+	`mm-text-coding-system-for-write' or `mm-text-coding-system'.
+
+	* lisp/nnmbox.el (nnmbox-active-file-coding-system,
+	nnmbox-file-coding-system): Use `nnheader-text-coding-system'.
+	* lisp/nnmail.el (nnmail-incoming-coding-system): Ditto.
+	* lisp/nnfolder.el (nnfolder-file-coding-system): Ditto.
+	(nnfolder-active-file-coding-system): Ditto.
+
+	* lisp/mail-source.el (mail-source-text-coding-system): Remove.
+	(TopLevel): require `nnheader'.
+
+	* lisp/nndraft.el (nndraft-request-article): Bind coding system to
+	`nnheader-text-coding-system'.
+	(nndraft-request-replace-article): Ditto.
+	* lisp/mail-source.el (mail-source-fetch-maildir): Ditto.
+	* lisp/gnus-uu.el (gnus-uu-save-article): Ditto.
+	* lisp/gnus-util.el (gnus-output-to-mail, gnus-output-to-rmail):
+	Ditto.
+	* lisp/gnus-soup.el (gnus-soup-write-prefixes): Ditto.
+
+	* lisp/gnus-util.el (gnus-write-buffer): Bind
+	`file-name-coding-system' to `nnmail-pathname-coding-system'.
+	* lisp/gnus-start.el (gnus-slave-save-newsrc): Bind coding system
+	to `gnus-startup-file-coding-system'.
 
 2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -74,7 +124,7 @@
 
 2000-05-25  Tanaka Akira      <akr@m17n.org>
 
-        * README.semi, README.semi.ja: Update for CVS via SSH.
+	* README.semi, README.semi.ja: Update for CVS via SSH.
 
 2000-05-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
@@ -168,6 +218,15 @@
 	don't autoload "digest-md5".
 
 2000-05-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nndraft.el (nndraft-request-replace-article): Replace
+	`mm-text-coding-system' with `mail-source-text-coding-system';
+	Replace `mm-auto-save-coding-system' with
+	`message-draft-coding-system'.
+
+	* lisp/mail-source.el (mail-source-fetch-maildir): Replace
+	`mm-text-coding-system' with `mail-source-text-coding-system'.
+	(mail-source-text-coding-system): New variable.
 
 	* lisp/dgnushack.el (dgnushack-texi-format): Use
 	`output-coding-system' instead of `coding-system-for-write' when

@@ -930,6 +930,12 @@ For example: ((1 . cn-gb-2312) (2 . big5))."
   :type 'function
   :group 'gnus-summary)
 
+(defcustom gnus-orphan-score nil
+  "*All orphans get this score added.  Set in the score file."
+  :group 'gnus-score-default
+  :type '(choice (const nil)
+		 integer))
+
 ;;; Internal variables
 
 (defvar gnus-article-mime-handles nil)
@@ -1156,6 +1162,7 @@ end position and text.")
     gnus-score-alist gnus-current-score-file
     (gnus-summary-expunge-below . global)
     (gnus-summary-mark-below . global)
+    (gnus-orphan-score . global)
     gnus-newsgroup-active gnus-scores-exclude-files
     gnus-newsgroup-history gnus-newsgroup-ancient
     gnus-newsgroup-sparse gnus-newsgroup-process-stack
@@ -1554,6 +1561,7 @@ increase the score of each group you read."
     "Q" gnus-article-fill-long-lines
     "C" gnus-article-capitalize-sentences
     "c" gnus-article-remove-cr
+    "Z" gnus-article-decode-HZ
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1824,8 +1832,8 @@ increase the score of each group you read."
        ["Wide reply and yank" gnus-summary-wide-reply-with-original t]
        ["Mail forward" gnus-summary-mail-forward t]
        ["Post forward" gnus-summary-post-forward t]
-       ["Digest and mail" gnus-summary-mail-digest t]
-       ["Digest and post" gnus-summary-post-digest t]
+       ["Digest and mail" gnus-uu-digest-mail-forward t]
+       ["Digest and post" gnus-uu-digest-post-forward t]
        ["Resend message" gnus-summary-resend-message t]
        ["Send bounced mail" gnus-summary-resend-bounced-mail t]
        ["Send a mail" gnus-summary-mail-other-window t]
@@ -4099,13 +4107,17 @@ or a straight list of headers."
 		    gnus-list-identifiers
 		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
     (dolist (header gnus-newsgroup-headers)
-      (when (string-match (concat "\\(Re: +\\)?\\(" regexp " *\\)")
+      (when (string-match (concat "\\(\\(\\(Re: +\\)?\\(" regexp 
+				  " *\\)\\)+\\(Re: +\\)?\\)")
 			  (mail-header-subject header))
 	(mail-header-set-subject
 	 header (concat (substring (mail-header-subject header)
-				   0 (match-beginning 2))
+				   0 (match-beginning 1))
+			(or
+			 (match-string 3 (mail-header-subject header))
+			 (match-string 5 (mail-header-subject header)))
 			(substring (mail-header-subject header)
-				   (match-end 2))))))))
+				   (match-end 1))))))))
 
 (defun gnus-select-newsgroup (group &optional read-all select-articles)
   "Select newsgroup GROUP.
@@ -4482,7 +4494,11 @@ If WHERE is `summary', the summary mode line format will be used."
 	(let* ((mformat (symbol-value
 			 (intern
 			  (format "gnus-%s-mode-line-format-spec" where))))
-	       (gnus-tmp-group-name gnus-newsgroup-name)
+	       (gnus-tmp-group-name (gnus-group-name-decode 
+				     gnus-newsgroup-name
+				     (gnus-group-name-charset 
+				      nil
+				      gnus-newsgroup-name)))
 	       (gnus-tmp-article-number (or gnus-current-article 0))
 	       (gnus-tmp-unread gnus-newsgroup-unreads)
 	       (gnus-tmp-unread-and-unticked (length gnus-newsgroup-unreads))
@@ -8692,6 +8708,37 @@ read."
     (gnus-summary-catchup all))
   (gnus-summary-next-group))
 
+;;;
+;;; with article
+;;;
+
+(defmacro gnus-with-article (article &rest forms)
+  "Select ARTICLE and perform FORMS in the original article buffer.
+Then replace the article with the result."
+  `(progn
+     ;; We don't want the article to be marked as read.
+     (let (gnus-mark-article-hook)
+       (gnus-summary-select-article t t nil ,article))
+     (set-buffer gnus-original-article-buffer)
+     ,@forms
+     (if (not (gnus-check-backend-function
+	       'request-replace-article (car gnus-article-current)))
+	 (gnus-message 5 "Read-only group; not replacing")
+       (unless (gnus-request-replace-article
+		,article (car gnus-article-current)
+		(current-buffer) t)
+	 (error "Couldn't replace article")))
+     ;; The cache and backlog have to be flushed somewhat.
+     (when gnus-keep-backlog
+       (gnus-backlog-remove-article
+	(car gnus-article-current) (cdr gnus-article-current)))
+     (when gnus-use-cache
+       (gnus-cache-update-article
+	(car gnus-article-current) (cdr gnus-article-current)))))
+
+(put 'gnus-with-article 'lisp-indent-function 1)
+(put 'gnus-with-article 'edebug-form-spec '(form body))
+
 ;; Thread-based commands.
 
 (defun gnus-summary-articles-in-thread (&optional article)
@@ -9908,37 +9955,6 @@ groups."
     (re-search-forward "^-+END PGP" nil t)
     (beginning-of-line 2)
     (call-interactively (function pgg-verify-region))))
-
-;;;
-;;; with article
-;;;
-
-(defmacro gnus-with-article (article &rest forms)
-  "Select ARTICLE and perform FORMS in the original article buffer.
-Then replace the article with the result."
-  `(progn
-     ;; We don't want the article to be marked as read.
-     (let (gnus-mark-article-hook)
-       (gnus-summary-select-article t t nil ,article))
-     (set-buffer gnus-original-article-buffer)
-     ,@forms
-     (if (not (gnus-check-backend-function
-	       'request-replace-article (car gnus-article-current)))
-	 (gnus-message 5 "Read-only group; not replacing")
-       (unless (gnus-request-replace-article
-		,article (car gnus-article-current)
-		(current-buffer) t)
-	 (error "Couldn't replace article")))
-     ;; The cache and backlog have to be flushed somewhat.
-     (when gnus-keep-backlog
-       (gnus-backlog-remove-article
-	(car gnus-article-current) (cdr gnus-article-current)))
-     (when gnus-use-cache
-       (gnus-cache-update-article
-	(car gnus-article-current) (cdr gnus-article-current)))))
-
-(put 'gnus-with-article 'lisp-indent-function 1)
-(put 'gnus-with-article 'edebug-form-spec '(form body))
 
 ;;;
 ;;; Generic summary marking commands

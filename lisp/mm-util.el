@@ -33,7 +33,10 @@
     (iso-8859-3 latin-iso8859-3)
     (iso-8859-4 latin-iso8859-4)
     (iso-8859-5 cyrillic-iso8859-5)
-    (koi8-r cyrillic-iso8859-5)
+    ;; Non-mule (X)Emacs uses the last mule-charset for 8bit characters.
+    ;; The fake mule-charset, gnus-koi8-r, tells Gnus that the default 
+    ;; charset is koi8-r, not iso-8859-5.
+    (koi8-r cyrillic-iso8859-5 gnus-koi8-r)
     (iso-8859-6 arabic-iso8859-6)
     (iso-8859-7 greek-iso8859-7)
     (iso-8859-8 hebrew-iso8859-8)
@@ -331,7 +334,9 @@ See also `with-temp-file' and `with-output-to-string'."
 		   (coding-system-for-read mm-binary-coding-system)
 		   (coding-system-for-write mm-binary-coding-system))
 	       (set-buffer-multibyte nil)
+	       (setq-default enable-multibyte-characters nil)
 	       ,@forms)
+	   (setq-default enable-multibyte-characters ,multibyte)
 	   (set-buffer-multibyte ,multibyte))))))
 (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
 (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
