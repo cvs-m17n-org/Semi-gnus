@@ -4556,7 +4556,7 @@ groups."
     (setq gnus-prev-winconf winconf)
     (when gnus-article-edit-article-setup-function
       (funcall gnus-article-edit-article-setup-function))
-    (gnus-message 6 "C-c C-c to end edits")))
+    (gnus-message 6 "C-c C-c to end edits; C-c C-k to exit")))
 
 (defun gnus-article-edit-done (&optional arg)
   "Update the article edits and exit."
@@ -4627,12 +4627,12 @@ groups."
 (defun gnus-article-mime-edit-article-unwind ()
   "Unwind `gnus-article-buffer' if article editing was given up."
   (remove-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
-  (when mime-edit-mode-flag
-    (mime-edit-exit 'nomime 'no-error)
-    (message ""))
   (when (featurep 'font-lock)
     (setq font-lock-defaults nil)
-    (font-lock-mode 0)))
+    (font-lock-mode -1))
+  (when mime-edit-mode-flag
+    (mime-edit-exit 'nomime 'no-error)
+    (message "")))
 
 (defun gnus-article-mime-edit-article-setup ()
   "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
@@ -4641,7 +4641,8 @@ after replacing with the original article."
   (setq gnus-article-edit-done-function
 	`(lambda (&rest args)
 	   (when mime-edit-mode-flag
-	     (mime-edit-exit)
+	     (let (mime-edit-insert-user-agent-field)
+	       (mime-edit-exit))
 	     (message ""))
 	   (goto-char (point-min))
 	   (let (case-fold-search)
@@ -4649,18 +4650,18 @@ after replacing with the original article."
 		    (format "^%s$" (regexp-quote mail-header-separator))
 		    nil t)
 	       (replace-match "")))
-	   (when (featurep 'font-lock)
-	     (setq font-lock-defaults nil)
-	     (font-lock-mode 0))
 	   (apply ,gnus-article-edit-done-function args)
-	   (set-buffer gnus-original-article-buffer)
+	   (set-buffer (get-buffer-create gnus-original-article-buffer))
 	   (erase-buffer)
 	   (insert-buffer gnus-article-buffer)
 	   (setq gnus-current-headers (gnus-article-make-full-mail-header))
 	   (gnus-article-prepare-display)))
-  (substitute-key-definition
-   'gnus-article-edit-exit 'gnus-article-mime-edit-exit
-   gnus-article-edit-mode-map)
+  (substitute-key-definition 'gnus-article-edit-done
+			     'gnus-article-mime-edit-done
+			     gnus-article-edit-mode-map)
+  (substitute-key-definition 'gnus-article-edit-exit
+			     'gnus-article-mime-edit-exit
+			     gnus-article-edit-mode-map)
   (erase-buffer)
   (insert-buffer gnus-original-article-buffer)
   (mime-edit-again)
@@ -4669,33 +4670,44 @@ after replacing with the original article."
 	 '(message-font-lock-keywords t))
     (font-lock-set-defaults)
     (turn-on-font-lock))
+  (set-buffer-modified-p nil)
+  (delete-other-windows)
   (add-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
   (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
+
+(defun gnus-article-mime-edit-done (&optional arg)
+  "Update the article MIME edits and exit."
+  (interactive "P")
+  (when (featurep 'font-lock)
+    (setq font-lock-defaults nil)
+    (font-lock-mode -1))
+  (gnus-article-edit-done arg))
 
 (defun gnus-article-mime-edit-exit ()
   "Exit the article MIME editing without updating."
   (interactive)
-  (let ((winconf gnus-prev-winconf)
-	buf)
+  (when (or (not (buffer-modified-p))
+	    (yes-or-no-p "Article modified; kill anyway? "))
+    (when (featurep 'font-lock)
+      (setq font-lock-defaults nil)
+      (font-lock-mode -1))
     (when mime-edit-mode-flag
-      (mime-edit-exit)
+      (let (mime-edit-insert-user-agent-field)
+	(mime-edit-exit))
       (message ""))
     (goto-char (point-min))
     (let (case-fold-search)
       (when (re-search-forward
 	     (format "^%s$" (regexp-quote mail-header-separator)) nil t)
 	(replace-match "")))
-    (when (featurep 'font-lock)
-      (setq font-lock-defaults nil)
-      (font-lock-mode 0))
-    ;; We remove all text props from the article buffer.
-    (setq buf (buffer-substring-no-properties (point-min) (point-max)))
-    (set-buffer (get-buffer-create gnus-original-article-buffer))
-    (erase-buffer)
-    (insert buf)
-    (setq gnus-current-headers (gnus-article-make-full-mail-header))
-    (gnus-article-prepare-display)
-    (set-window-configuration winconf)))
+    (let ((winconf gnus-prev-winconf))
+      (insert (prog1
+		  (buffer-substring-no-properties (point-min) (point-max))
+		(set-buffer (get-buffer-create gnus-original-article-buffer))
+		(erase-buffer)))
+      (setq gnus-current-headers (gnus-article-make-full-mail-header))
+      (gnus-article-prepare-display)
+      (set-window-configuration winconf))))
 
 ;;;
 ;;; Article highlights
