@@ -1,5 +1,16 @@
 1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus-i18n.el: Synch up with `akr' branch.
+
+	* lisp/message.el: Imported features from `akr' branch.
+	(message-subject-encoded-re-regexp): New variable.
+	(message-use-subject-re): Ditto.
+	(message-make-followup-subject): New function.
+	(message-reply): Use it.
+	(message-followup): Ditto.
+
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/message.el (message-required-news-headers): `X-Newsreader'
 	was replaced by `User-Agent'.
 	(message-required-mail-headers): `X-Mailer' was replaced by
@@ -128,6 +139,12 @@
 	* lisp/gnus-util.el (gnus-output-to-rmail): Guard as binary.
 
 	* lisp/gnus-util.el (gnus-output-to-mail): Guard as binary.
+
+1998-04-28  Tanaka Akira  <akr@jaist.ac.jp>
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Delete
+	buffer-local binding of `default-mime-charset' when the
+	newsgroup doesn't match `gnus-newsgroup-default-charset-alist'.
 
 1998-04-24  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
