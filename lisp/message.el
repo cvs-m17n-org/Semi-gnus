@@ -3302,7 +3302,8 @@ This sub function is for exclusive use of `message-send-news'."
 		    (list (cons "Followup-To" followup-field-charset)))
 		  mime-field-encoding-method-alist))
 	 (message-syntax-checks
-	  (if arg
+	  (if (and arg
+		   (listp message-syntax-checks))
 	      (cons '(existing-newsgroups . disabled)
 		    message-syntax-checks)
 	    message-syntax-checks))
@@ -3316,7 +3317,8 @@ This sub function is for exclusive use of `message-send-news'."
       (run-hooks 'message-header-hook))
     ;; Note: This check will be disabled by the ".*" default value for
     ;; gnus-group-name-charset-group-alist. -- Pa 2001-10-07.
-    (when group-field-charset
+    (when (and group-field-charset
+	       (listp message-syntax-checks))
       (setq message-syntax-checks
 	    (cons '(valid-newsgroups . disabled)
 		  message-syntax-checks)))
