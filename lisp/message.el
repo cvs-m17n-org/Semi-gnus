@@ -661,6 +661,8 @@ If stringp, use this; if non-nil, use no host name (user name only)."
 (defvar message-postpone-actions nil
   "A list of actions to be performed after postponing a message.")
 (defvar message-original-frame nil)
+(defvar message-parameter-alist nil)
+(defvar message-startup-parameter-alist nil)
 
 (define-widget 'message-header-lines 'text
   "All header lines must be LFD terminated."
@@ -1174,11 +1176,12 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-fetch-reply-field (header)
   "Fetch FIELD from the message we're replying to."
-  (when (and message-reply-buffer
-	     (buffer-name message-reply-buffer))
-    (save-excursion
-      (set-buffer message-reply-buffer)
-      (message-fetch-field header))))
+  (let ((buffer (message-get-reply-buffer)))
+    (when (and buffer
+	       (buffer-name buffer))
+      (save-excursion
+	(set-buffer buffer)
+	(message-fetch-field header)))))
 
 (defun message-set-work-buffer ()
   (if (get-buffer " *message work*")
@@ -1333,6 +1336,22 @@ Point is left at the beginning of the narrowed-to region."
 	       (- max rank)
 	     (1+ max)))))
       (message-sort-headers-1))))
+
+(defun message-eval-parameter (parameter)
+  (condition-case ()
+      (if (symbolp parameter)
+	  (if (functionp parameter)
+	      (funcall parameter)
+	    (eval parameter))
+	parameter)
+    (error nil)))
+
+(defun message-get-reply-buffer ()
+  (message-eval-parameter message-reply-buffer))
+
+(defun message-get-original-reply-buffer ()
+  (message-eval-parameter
+   (cdr (assq 'original-buffer message-parameter-alist))))
 
 
 
@@ -1503,6 +1522,9 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq message-sent-message-via nil)
   (make-local-variable 'message-checksum)
   (setq message-checksum nil)
+  (make-local-variable 'message-parameter-alist)
+  (setq message-parameter-alist
+	(copy-sequence message-startup-parameter-alist))
   ;;(when (fboundp 'mail-hist-define-keys)
   ;;  (mail-hist-define-keys))
   (when (string-match "XEmacs\\|Lucid" emacs-version)
@@ -1916,13 +1938,12 @@ This function uses `message-cite-function' to do the actual citing.
 Just \\[universal-argument] as argument means don't indent, insert no
 prefix, and don't delete any headers."
   (interactive "P")
-  (let ((modified (buffer-modified-p)))
-    (when (and message-reply-buffer
+  (let ((modified (buffer-modified-p))
+	(buffer (message-get-reply-buffer)))
+    (when (and buffer
 	       message-cite-function)
-      (gnus-copy-article-buffer)
-      (setq message-reply-buffer gnus-article-copy)
-      (delete-windows-on message-reply-buffer t)
-      (insert-buffer message-reply-buffer)
+      (delete-windows-on buffer t)
+      (insert-buffer buffer)
       (funcall message-cite-function)
       (message-exchange-point-and-mark)
       (unless (bolp)
@@ -3492,6 +3513,7 @@ Headers already prepared in the buffer are not modified."
 	  (nconc message-buffer-list (list (current-buffer))))))
 
 (defvar mc-modes-alist)
+(defvar message-get-reply-buffer-function nil)
 (defun message-setup (headers &optional replybuffer actions)
   (when (and (boundp 'mc-modes-alist)
 	     (not (assq 'message-mode mc-modes-alist)))
@@ -3500,7 +3522,9 @@ Headers already prepared in the buffer are not modified."
 	  mc-modes-alist))
   (when actions
     (setq message-send-actions actions))
-  (setq message-reply-buffer replybuffer)
+  (setq message-reply-buffer
+	(or (cdr (assq 'reply-buffer message-parameter-alist))
+	    replybuffer))
   (goto-char (point-min))
   ;; Insert all the headers.
   (mail-header-format
@@ -4465,14 +4489,22 @@ regexp varstr."
     (run-hooks 'mime-edit-exit-hook)
     ))
 
-;;; XXX: currently broken; message-yank-original resets message-reply-buffer.
-(defun message-mime-insert-article (&optional message)
-  (interactive)
+(defun message-mime-insert-article (&optional full-headers)
+  (interactive "P")
   (let ((message-cite-function 'mime-edit-inserted-message-filter)
-        (message-reply-buffer gnus-original-article-buffer)
-	)
+	(message-reply-buffer (message-get-original-reply-buffer))
+	(start (point)))
     (message-yank-original nil)
-    ))
+    (save-excursion
+      (narrow-to-region (goto-char start)
+			(if (search-forward "\n\n" nil t)
+			    (1- (point))
+			  (point-max)))
+      (goto-char (point-min))
+      (let ((message-included-forward-headers
+	     (if full-headers "" message-included-forward-headers)))
+	(message-remove-header message-included-forward-headers t nil t))
+      (widen))))
 
 (set-alist 'mime-edit-message-inserter-alist
 	   'message-mode (function message-mime-insert-article))
