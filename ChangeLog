@@ -1,3 +1,11 @@
+1998-07-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-ems.el (gnus-mule-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix. (for Emacs 20.1 and 20.2)
+	(gnus-ems-redefine): for Emacs 20.1 and 20.2
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Abolish my last bogus change.
+
 1998-07-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-cite.el (gnus-cite-add-face): Fix problem when multi
