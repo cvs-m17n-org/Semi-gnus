@@ -340,7 +340,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 
 ;;; Functions
 
-(defun gnus-offline-get-message (symbol &optional lang)
+(defsubst gnus-offline-gettext (symbol &optional lang)
   (setq lang (or lang gnus-offline-lang))
   (or
    (cdr (assq symbol (symbol-value
@@ -377,14 +377,14 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 			(featurep 'nnagent))
 	     (set-buffer (gnus-get-buffer-create buffer))
 	     (erase-buffer)
-	     (insert (gnus-offline-get-message 'error-check-1))
+	     (insert (gnus-offline-gettext 'error-check-1))
 	     (pop-to-buffer buffer)))
 
 	  ((eq gnus-offline-news-fetch-method 'nnspool)
 	   (unless (featurep 'nnspool)
 	     (set-buffer (gnus-get-buffer-create buffer))
 	     (erase-buffer)
-	     (insert (gnus-offline-get-message 'error-check-2))
+	     (insert (gnus-offline-gettext 'error-check-2))
 	     (pop-to-buffer buffer)))
 	  (t
 	   nil))))
@@ -437,11 +437,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; Dialup if gnus-offline-dialup-program is specified
   (if (stringp gnus-offline-dialup-program)
       (progn
-	(message (gnus-offline-get-message 'connect-server-1))
+	(message (gnus-offline-gettext 'connect-server-1))
 	(apply 'call-process gnus-offline-dialup-program nil nil nil
 	       gnus-offline-dialup-program-arguments)
 	(sleep-for 1)
-	(message (gnus-offline-get-message 'connect-server-2)))))
+	(message (gnus-offline-gettext 'connect-server-2)))))
 
 ;;
 ;; Jobs before get new news , send mail and post news.
@@ -458,7 +458,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; Set send mail/news functions to online functions.
   (gnus-offline-set-online-sendmail-function)
   (gnus-offline-set-online-post-news-function)
-  (message (gnus-offline-get-message 'get-new-news-function-1))
+  (message (gnus-offline-gettext 'get-new-news-function-1))
 
   ;; fetch only news
   (if (eq gnus-offline-articles-to-fetch 'news)
@@ -646,11 +646,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defun gnus-offline-hangup-line ()
   "*Hangup line function."
-  (message (gnus-offline-get-message 'hangup-line-1))
+  (message (gnus-offline-gettext 'hangup-line-1))
   (if (stringp gnus-offline-hangup-program)
       (apply 'start-process "hup" nil gnus-offline-hangup-program
 	     gnus-offline-hangup-program-arguments))
-  (message (gnus-offline-get-message 'hangup-line-2)))
+  (message (gnus-offline-gettext 'hangup-line-2)))
 ;;
 ;; Hang Up line routine whe using nnspool
 ;;
@@ -673,7 +673,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (ding nil 'drum)
     (ding))
   (gnus-group-save-newsrc)
-  (message (gnus-offline-get-message 'after-jobs-done-1)))
+  (message (gnus-offline-gettext 'after-jobs-done-1)))
 
 
 ;;
@@ -687,7 +687,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
     (cond ((or (string= "misc-user" keys)
 	       (string-match "^menu-bar" keys)
 	       (string-match "^mouse" keys))
-	   (setq title (gnus-offline-get-message 'menu-3))
+	   (setq title (gnus-offline-gettext 'menu-3))
 	   (setq menu
 		 (cons
 		  title
@@ -695,32 +695,32 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 		   '((set-auto-ppp-menu-1
 		      (progn
 			(setq gnus-offline-auto-ppp '(connect disconnect))
-			(message (gnus-offline-get-message 'set-auto-ppp-1)))
+			(message (gnus-offline-gettext 'set-auto-ppp-1)))
 		      t)
 		     (set-auto-ppp-menu-2
 		      (progn
 			(setq gnus-offline-auto-ppp '(connect))
-			(message (gnus-offline-get-message 'set-auto-ppp-2)))
+			(message (gnus-offline-gettext 'set-auto-ppp-2)))
 		      t)
 		     (set-auto-ppp-menu-3
 		      (progn
 			(setq gnus-offline-auto-ppp nil)
-			(message (gnus-offline-get-message 'set-auto-ppp-3)))
+			(message (gnus-offline-gettext 'set-auto-ppp-3)))
 		      t)))))
 	   (gnus-offline-popup menu title))
 	  (t
 	   (cond ((eq gnus-offline-auto-ppp nil)
 		  (setq gnus-offline-auto-ppp '(connect disconnect))
-		  (setq str (gnus-offline-get-message 'set-auto-ppp-1)))
+		  (setq str (gnus-offline-gettext 'set-auto-ppp-1)))
 		 ((memq 'connect gnus-offline-auto-ppp)
 		  (cond ((memq 'disconnect gnus-offline-auto-ppp)
 			 (setq gnus-offline-auto-ppp '(connect))
 			 (setq str
-			       (gnus-offline-get-message 'set-auto-ppp-2)))
+			       (gnus-offline-gettext 'set-auto-ppp-2)))
 			(t
 			 (setq gnus-offline-auto-ppp nil)
 			 (setq str
-			       (gnus-offline-get-message 'set-auto-ppp-3))))))
+			       (gnus-offline-gettext 'set-auto-ppp-3))))))
 	   (message str)))))
 ;;
 ;; Toggle offline/online to send mail.
@@ -733,28 +733,28 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	;; Sending mail under online environ.
 	(gnus-offline-set-online-sendmail-function)
 	(setq gnus-offline-mail-treat-environ 'online)
-	(message (gnus-offline-get-message 'toggle-on/off-send-mail-1)))
+	(message (gnus-offline-gettext 'toggle-on/off-send-mail-1)))
     ;; Sending mail under offline environ.
     (gnus-offline-set-offline-sendmail-function)
     (setq gnus-offline-mail-treat-environ 'offline)
-    (message (gnus-offline-get-message 'toggle-on/off-send-mail-2))))
+    (message (gnus-offline-gettext 'toggle-on/off-send-mail-2))))
 ;;
 ;; Toggle articles to fetch ... both -> mail -> news -> both
 ;;
 (defun gnus-offline-toggle-articles-to-fetch ()
   "*Set articles to fetch... both(Mail/News) -> mail only -> News only -> both"
   (interactive)
-  (let ((string (gnus-offline-get-message 'toggle-articles-to-fetch-1))
+  (let ((string (gnus-offline-gettext 'toggle-articles-to-fetch-1))
 	str)
     (cond ((eq gnus-offline-articles-to-fetch 'both)
 	   (setq gnus-offline-articles-to-fetch 'mail
-		 str (gnus-offline-get-message 'toggle-articles-to-fetch-2)))
+		 str (gnus-offline-gettext 'toggle-articles-to-fetch-2)))
 	  ((eq gnus-offline-articles-to-fetch 'mail)
 	   (setq gnus-offline-articles-to-fetch 'news
-		 str (gnus-offline-get-message 'toggle-articles-to-fetch-3)))
+		 str (gnus-offline-gettext 'toggle-articles-to-fetch-3)))
 	  (t
 	   (setq gnus-offline-articles-to-fetch 'both
-		 str (gnus-offline-get-message 'toggle-articles-to-fetch-4))))
+		 str (gnus-offline-gettext 'toggle-articles-to-fetch-4))))
     (message (format "%s %s" string str))))
 ;;
 ;; Send mail and Post news using Miee or gnus-agent.
@@ -767,11 +767,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (progn
 	(if (eq gnus-offline-mail-treat-environ 'offline)
 	    (progn
-	      (message (gnus-offline-get-message 'empting-spool-1))
+	      (message (gnus-offline-gettext 'empting-spool-1))
 	      ;; Using miee to send mail.
 	      (mail-spool-send)
-	      (message (gnus-offline-get-message 'empting-spool-2))))
-	(message (gnus-offline-get-message 'empting-spool-3))
+	      (message (gnus-offline-gettext 'empting-spool-2))))
+	(message (gnus-offline-gettext 'empting-spool-3))
 	;; Using miee to post news.
 	(if (and (not (stringp msspool-news-server))
 		 (not msspool-news-service))
@@ -779,11 +779,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	      (setq msspool-news-server (nth 1 gnus-select-method))
 	      (setq msspool-news-service 119)))
 	(news-spool-post)
-	(message (gnus-offline-get-message 'empting-spool-4)))
+	(message (gnus-offline-gettext 'empting-spool-4)))
     ;; Send queued message by gnus-agent
-    (message (gnus-offline-get-message 'empting-spool-5))
+    (message (gnus-offline-gettext 'empting-spool-5))
     (gnus-group-send-drafts)
-    (message (gnus-offline-get-message 'empting-spool-6)))
+    (message (gnus-offline-gettext 'empting-spool-6)))
   ;;
   (run-hooks 'gnus-offline-after-empting-spool-hook))
 ;;
@@ -794,15 +794,15 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (interactive)
   (setq gnus-offline-interval-time
 	(string-to-int (read-from-minibuffer
-			(format (gnus-offline-get-message 'interval-time-1)
+			(format (gnus-offline-gettext 'interval-time-1)
 				gnus-offline-interval-time)
 			nil)))
   (if (< gnus-offline-interval-time 2)
       (progn
-	(message (gnus-offline-get-message 'interval-time-2))
+	(message (gnus-offline-gettext 'interval-time-2))
 	(setq gnus-offline-interval-time 0))
     (message
-     (format (gnus-offline-get-message 'interval-time-3)
+     (format (gnus-offline-gettext 'interval-time-3)
 	     gnus-offline-interval-time)))
   (gnus-offline-processed-by-timer))
 ;;
@@ -913,7 +913,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
    #'(lambda (el)
        (if (listp el)
 	   (apply 'vector
-		  (cons (gnus-offline-get-message (car el)) (cdr el)))
+		  (cons (gnus-offline-gettext (car el)) (cdr el)))
 	 el))
    list))
 
