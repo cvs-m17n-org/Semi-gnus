@@ -1,3 +1,8 @@
+2004-09-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-encrypt.el: Autoload password-read-and-add and
+	password-cache-remove.
+
 2004-09-11  Simon Josefsson  <jas@extundo.com>
 
 	* GNUS-NEWS: Generated.
