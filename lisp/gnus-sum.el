@@ -1590,6 +1590,7 @@ increase the score of each group you read."
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "H" gnus-article-strip-headers-in-body
+    "p" gnus-article-verify-x-pgp-sig
     "d" gnus-article-treat-dumbquotes
     "s" gnus-smiley-display)
 
@@ -1760,6 +1761,7 @@ increase the score of each group you read."
               ["Verbose header" gnus-summary-verbose-headers t]
               ["Toggle header" gnus-summary-toggle-header t]
 	      ["Toggle smileys" gnus-smiley-display t]
+	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
 	      ["HZ" gnus-article-decode-HZ t])
              ("Output"
               ["Save in default format" gnus-summary-save-article t]
@@ -4197,7 +4199,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	(progn				; Or we bug out.
 	  (when (equal major-mode 'gnus-summary-mode)
 	    (kill-buffer (current-buffer)))
-	  (error "Couldn't request group %s: %s"
+	  (error "Couldn't activate group %s: %s"
 		 group (gnus-status-message group))))
 
     (unless (gnus-request-group group t)
@@ -9986,17 +9988,17 @@ treated as multipart/mixed."
   (interactive (list (gnus-summary-article-number)))
   (gnus-with-article article
     (message-narrow-to-head)
+    (message-remove-header "Mime-Version")
     (goto-char (point-max))
+    (insert "Mime-Version: 1.0\n")
     (widen)
     (when (search-forward "\n--" nil t)
       (let ((separator (buffer-substring (point) (gnus-point-at-eol))))
 	(message-narrow-to-head)
-	(message-remove-header "Mime-Version")
 	(message-remove-header "Content-Type")
 	(goto-char (point-max))
 	(insert (format "Content-Type: multipart/mixed; boundary=\"%s\"\n"
 			separator))
-	(insert "Mime-Version: 1.0\n")
 	(widen))))
   (let (gnus-mark-article-hook)
     (gnus-summary-select-article t t nil article)))

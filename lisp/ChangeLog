@@ -1,9 +1,138 @@
+2000-11-13 16:09:09  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml2015.el (mml2015-mailcrypt-decrypt): Handle quit.
+	(mml2015-mailcrypt-clear-decrypt): Ditto.
+	(mml2015-mailcrypt-verify): Ditto.
+	(mml2015-mailcrypt-clear-verify): Ditto.
+	(mml2015-gpg-verify): Ditto.
+
+2000-11-13 15:29:58  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* smime.el (smime-openssl-program): Test the existence of openssl.
+	* mml-smime.el: Require mm-decode.
+	(mml-smime-verify-test): New function.
+	* mm-decode.el (mm-verify-function-alist): Use it.
+
+2000-11-13 09:50:29  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-repair-multipart): Fix Mime-Version
+	anyway.
+
+2000-11-13  Simon Josefsson  <sj@extundo.com>
+
+	* mm-uu.el (mm-uu-pgp-signed-extract): Explain why clear
+	verification doesn't work.
+
+2000-11-12 23:36:45  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-inews-mark-gcc-as-read): New variable.
+	(gnus-inews-do-gcc): Use it.
+
+2000-11-12 21:35:04  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2231.el (rfc2231-encode-string): Insert semi-colon and
+	leading space.
+	* mm-extern.el (mm-inline-external-body): Report error when no 
+	access-type.
+
+2000-11-12 19:48:30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-select-newsgroup): Change the error message.
+
+2000-11-12 11:53:18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-button-menu): Use select-window.
+
+2000-11-12 09:47:54  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-display-part): Display multipart/related
+	as multipart/mixed.
+
+2000-11-12  David Edmondson  <dme@dme.org>
+	
+	* message.el (message-cite-prefix-regexp): moved from gnus-cite.el
+	and replace `.' with `\w' to allow for different syntax tables
+	(from Vladimir Volovich).
+	* message.el (message-newline-and-reformat): use
+	`message-cite-prefix-regexp'.
+	* gnus-cite.el (gnus-supercite-regexp): use
+	`message-cite-prefix-regexp'.
+	* gnus-cite.el (gnus-cite-parse): use
+	`message-cite-prefix-regexp'.
+
+2000-11-12 08:52:46  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml2015.el (mml2015-mailcrypt-verify): Replace armors with
+	PGP SIGNATURE.  Escape leading "-"'s.
+	(mml2015-mailcrypt-sign): Replace armors with PGP MESSAGE.
+
+2000-11-11 15:55:35  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-type-alist): Stricter shar regexp.
+
+2000-11-11  Simon Josefsson  <sj@extundo.com>
+
+	* mml2015.el (mml2015-gpg-verify): Set "OK" security status.
+
+	* smime.el (smime-details-buffer): New variable.
+	(smime-sign-region): 
+	(smime-encrypt-region): 
+	(smime-verify-region): 
+	(smime-decrypt-region): Copy OpenSSL output to the buffer.
+
+	* mml-smime.el (mml-smime-verify): Support security info.
+
+2000-11-10 17:11:22  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-verify-option): Set default to nil.
+	(mm-decrypt-option): Ditto.
+	* gnus-art.el (article-verify-x-pgp-sig): New function.
+
+2000-11-10 09:01:25  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-display-alternative): Show button if no
+	preferred part.
+
 2000-11-07  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-sum.el (gnus-move-split-methods): Say that
 	`gnus-split-methods' uses file names, whereas this uses group
 	names.  (Report from Nevin Kapur)
 
+2000-11-10 01:23:20  ShengHuo ZHU  <zsh@cs.rochester.edu>
+  
+	* mm-partial.el (mm-inline-partial): Insert MIME-Version.
+
+2000-11-09 17:02:50  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnheader.el (nnheader-directory-files-is-safe): New variable.
+	(nnheader-directory-articles): Use it.
+	(nnheader-article-to-file-alist): Ditto.
+
+2000-11-09 16:20:37  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-pad-base64): New function.
+	(rfc2047-decode): Use it.
+
+2000-11-09 08:53:04  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-srvr.el (gnus-browse-foreign-server): Bind the original
+	select method.
+
+2000-11-08 19:58:58  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml2015.el (mml2015-gpg-decrypt-1): 
+	(mml2015-gpg-verify): buffer-string has no argument in Emacs.
+
+2000-11-08 16:37:02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-cache.el (gnus-cache-generate-nov-databases): Reopen cache.
+
+2000-11-08 08:38:30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* pop3.el (pop3-munge-message-separator): A message may have an
+	empty body.
+  
 2000-11-07 18:02:26  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* mm-uu.el (mm-uu-type-alist): Don't test pgp stuff.
@@ -152,8 +281,6 @@
 
 2000-09-29  David Edmondson  <dme@thus.net>
 
-	One-line patch.
-	
 	* message.el (message-newline-and-reformat): Typo.
 
 2000-11-04 10:11:05  ShengHuo ZHU  <zsh@cs.rochester.edu>

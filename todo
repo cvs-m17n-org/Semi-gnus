@@ -1,6 +1,8 @@
 ;; Also know as the "wish list".  Some are done. For the others, no
 ;; promise when to be implemented.
 
+* Emphasis delimiters show when `W W c'.
+
 * Parsing of the common list confirmation requests so that Gnus can
    prepare the response with a single command.  Including LISTSERV
    periodic ping messages and the like.
@@ -678,6 +680,8 @@ exceeding lisp nesting on huge groups.
  forward, next.
 
 *  a way to tick/mark as read Gcc'd articles.
+
+   [done, (setq gnus-inews-mark-gcc-as-read t)]
 
 *  a way to say that all groups within a specific topic comes from a
  particular server?  Hm.

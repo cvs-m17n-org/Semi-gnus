@@ -239,13 +239,16 @@ to:
 (autoload 'mml2015-verify "mml2015")
 (autoload 'mml2015-verify-test "mml2015")
 (autoload 'mml-smime-verify "mml-smime")
+(autoload 'mml-smime-verify-test "mml-smime")
 
 (defvar mm-verify-function-alist
   '(("application/pgp-signature" mml2015-verify "PGP" mml2015-verify-test)
-    ("application/pkcs7-signature" mml-smime-verify "S/MIME" nil)
-    ("application/x-pkcs7-signature" mml-smime-verify "S/MIME" nil)))
+    ("application/pkcs7-signature" mml-smime-verify "S/MIME" 
+     mml-smime-verify-test)
+    ("application/x-pkcs7-signature" mml-smime-verify "S/MIME" 
+     mml-smime-verify-test)))
 
-(defcustom mm-verify-option 'known
+(defcustom mm-verify-option nil
   "Option of verifying signed parts.
 `never', not verify; `always', always verify; 
 `known', only verify known protocols. Otherwise, ask user."
@@ -261,7 +264,7 @@ to:
 (defvar mm-decrypt-function-alist
   '(("application/pgp-encrypted" mml2015-decrypt "PGP" mml2015-decrypt-test)))
 
-(defcustom mm-decrypt-option 'known
+(defcustom mm-decrypt-option nil
   "Option of decrypting signed parts.
 `never', not decrypt; `always', always decrypt; 
 `known', only decrypt known protocols. Otherwise, ask user."

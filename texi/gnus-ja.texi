@@ -6870,10 +6870,6 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 $B5-;v$NBg$-$5$,$3$NJQ?t(B ($B%G%#%U%)%k%H$G$O(B 25000) $B$h$jBg$-$$5-;v$O!"0zMQ%O(B
 $B%$%i%$%H$O9T$o$l$^$;$s!#(B
 
-@item gnus-cite-prefix-regexp
-@vindex gnus-cite-prefix-regexp
-$B$"$k9T$,<h$jF@$k:GBg$N0zMQ@\F,8l$K9gCW$9$k@55,I=8=$G$9!#(B
-
 @item gnus-cite-max-prefix
 @vindex gnus-cite-max-prefix
 $B0zMQ@\F,8l$N:GBg$ND9$5$G$9(B ($B%G%#%U%)%k%H$G$O(B 20 $B$G$9(B)$B!#(B

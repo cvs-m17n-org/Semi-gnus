@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'smime)
+(require 'mm-decode)
 
 (defun mml-smime-verify (handle ctl)
   (with-current-buffer (mm-handle-multipart-original-buffer ctl)
@@ -40,8 +41,22 @@
 		    (mm-handle-multipart-ctl-parameter ctl 'micalg)))
     (insert (format "boundary=\"%s\"\n\n"
 		    (mm-handle-multipart-ctl-parameter ctl 'boundary)))
-    (smime-verify-buffer)
+    (when (get-buffer smime-details-buffer)
+      (kill-buffer smime-details-buffer))
+    (if (smime-verify-buffer)
+	(progn
+	  (mm-set-handle-multipart-parameter 
+	   mm-security-handle 'gnus-info "OK")
+	  (kill-buffer smime-details-buffer))
+      (mm-set-handle-multipart-parameter 
+       mm-security-handle 'gnus-info "Failed")
+      (mm-set-handle-multipart-parameter
+       mm-security-handle 'gnus-details (with-current-buffer smime-details-buffer 
+					  (buffer-string))))
     handle))
+
+(defun mml-smime-verify-test (handle ctl)
+  smime-openssl-program)
 
 (provide 'mml-smime)
 

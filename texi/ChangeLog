@@ -1,3 +1,21 @@
+2000-11-12  Florian Weimer  <fw@deneb.enyo.de>
+
+	* message.texi (Security): Fixed typo, change "PGP" to "OpenPGP".
+
+2000-11-12  David Edmondson  <dme@dme.org>
+
+	* gnus.texi: remove `gnus-cite-prefix-regexp'.
+
+	* message.texi (Insertion): move `gnus-cite-prefix-regexp' from
+	gnus.texi to here and rename to `message-cite-prefix-regexp'.
+
+2000-11-11  Simon Josefsson  <sj@extundo.com>
+
+	* message.texi (Security): Add.
+
+	* emacs-mime.texi (MML Definition): Add sign, encrypt, keyfile and
+	certfile.
+
 2000-11-07  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus.texi (Mail Group Commands): `gnus-move-split-methods' uses
