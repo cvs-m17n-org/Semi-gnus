@@ -43,15 +43,15 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 $B0J2<$O(B bbdb.el / bbdb-hooks.el $B$K$"$F$k(B patch $B$G$9!#(B
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
-+++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
-@@ -352,12 +352,23 @@
- 	(marker (bbdb-header-start))
- 	field pairs fieldval  ; do all bindings here for speed
- 	regexp string notes-field-name notes
--	 replace-p replace-or-add-msg)
-+	replace-p replace-or-add-msg
-+	extract-field-value-funtion)
+--- bbdb-2.2/lisp/bbdb-hooks.el~	Mon Jan  8 12:35:14 2001
++++ bbdb-2.2/lisp/bbdb-hooks.el	Tue Feb  6 04:35:00 2001
+@@ -411,12 +411,23 @@
+          (marker (bbdb-header-start))
+          field pairs fieldval  ; do all bindings here for speed
+          regexp string notes-field-name notes
+-         replace-p replace-or-add-msg)
++         replace-p replace-or-add-msg
++	 extract-field-value-funtion)
      (set-buffer (marker-buffer marker))
      (save-restriction
 -      (widen)
@@ -62,7 +62,7 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 +	(or (progn
 +	      (while (and (not extract-field-value-funtion)
 +			  (setq function (car function-list)))
-+		(setq extract-field-value-funtion (funcall function)))
++		(setq extract-field-value-funtion (funcall function)
 +		      function-list (cdr function-list)))
 +	      extract-field-value-funtion)
 +	    (progn
@@ -70,30 +70,31 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 +	      (goto-char marker)
 +	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
 +      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
- 	       (string-match (bbdb-user-mail-names) fieldval))
- 	  ;; Don't do anything if this message is from us.  Note that we have
- 	  ;; to look at the message instead of the record, because the record
-@@ -368,7 +378,7 @@
- 	  (goto-char marker)
- 	  (setq field (car (car ignore-all))
- 		regexp (cdr (car ignore-all))
--		fieldval (bbdb-extract-field-value field))
-+		fieldval (funcall extract-field-value-funtion field))
- 	  (if (and fieldval
- 		   (string-match regexp fieldval))
- 	      (setq ignore t)
-@@ -382,7 +392,7 @@
- 		pairs (cdr (car rest))	; (REGEXP . STRING) or
- 					; (REGEXP FIELD-NAME STRING) or
- 					; (REGEXP FIELD-NAME STRING REPLACE-P)
--		fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
-+		fieldval (funcall extract-field-value-funtion field)) ; e.g., Subject line
- 	  (if fieldval
- 	      (while pairs
- 		(setq regexp (car (car pairs))
---- bbdb.el~	Tue Oct 13 03:14:55 1998
-+++ bbdb.el	Fri Oct 30 17:05:53 1998
-@@ -620,6 +620,7 @@
+                (string-match (bbdb-user-mail-names) fieldval))
+           ;; Don't do anything if this message is from us.  Note that we have
+           ;; to look at the message instead of the record, because the record
+@@ -427,7 +438,7 @@
+           (goto-char marker)
+           (setq field (car (car ignore-all))
+                 regexp (cdr (car ignore-all))
+-                fieldval (bbdb-extract-field-value field))
++                fieldval (funcall extract-field-value-funtion field))
+           (if (and fieldval
+                    (string-match regexp fieldval))
+               (setq ignore t)
+@@ -440,7 +451,8 @@
+                 pairs (cdr (car rest))  ; (REGEXP . STRING) or
+                                         ; (REGEXP FIELD-NAME STRING) or
+                                         ; (REGEXP FIELD-NAME STRING REPLACE-P)
+-                fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
++                fieldval (funcall extract-field-value-funtion field))
++                                        ; e.g., Subject line
+           (when fieldval
+             (while pairs
+               (setq regexp (car (car pairs))
+--- bbdb-2.2/lisp/bbdb.el~	Wed Jan 24 23:14:00 2001
++++ bbdb-2.2/lisp/bbdb.el	Tue Feb  6 04:35:00 2001
+@@ -681,6 +681,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
  (defvar bbdb-elided-display nil)
