@@ -1,3 +1,16 @@
+2000-11-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Mule23@1934.en, Mule23@1934.ja, sample.lpath.el: Upgrade.
+
+	* configure: Regenerate.
+	* aclocal.m4 (AC_PATH_PACKAGEDIR): No need to quote a string for
+	`AC_MSG_RESULT'.
+	(AC_CHECK_W3): Ignore cache; no need to quote a string for
+	`AC_MSG_RESULT'.
+	(AC_CHECK_EMACS_FLAVOR): Ignore cache.
+	(AC_CHECK_EMACS): Ignore cache.
+	(AC_DEFINE_GNUS_PRODUCT_NAME): Cache.
+
 2000-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* configure: Regenerate.

@@ -1,6 +1,8 @@
 AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
- [dnl Defining gnus product name.
-  GNUS_PRODUCT_NAME=$1
+ [echo $ac_n "defining gnus product name... $ac_c"
+  AC_CACHE_VAL(EMACS_cv_GNUS_PRODUCT_NAME,[EMACS_cv_GNUS_PRODUCT_NAME=$1])
+  GNUS_PRODUCT_NAME=${EMACS_cv_GNUS_PRODUCT_NAME}
+  AC_MSG_RESULT(${GNUS_PRODUCT_NAME})
   AC_SUBST(GNUS_PRODUCT_NAME)])
 
 AC_DEFUN(AC_CHECK_EMACS,
@@ -9,6 +11,9 @@ AC_DEFUN(AC_CHECK_EMACS,
   dnl Apparently, if you run a shell window in Emacs, it sets the EMACS
   dnl environment variable to 't'.  Lets undo the damage.
   test x$EMACS = xt && EMACS=
+
+  dnl Ignore cache.
+  unset ac_cv_prog_EMACS; unset ac_cv_prog_XEMACS;
 
   AC_ARG_WITH(emacs,
    [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
@@ -53,6 +58,10 @@ fi
 
 AC_DEFUN(AC_CHECK_EMACS_FLAVOR,
  [AC_MSG_CHECKING([what a flavor does $EMACS have])
+
+  dnl Ignore cache.
+  unset EMACS_cv_SYS_flavor;
+
   AC_EMACS_LISP(flavor,
     (cond ((featurep (quote xemacs)) \"XEmacs\")\
           ((boundp (quote MULE)) \"MULE\")\
@@ -133,6 +142,12 @@ dnl Perform sanity checking and try to locate the W3 package
 dnl
 AC_DEFUN(AC_CHECK_W3, [
 AC_MSG_CHECKING(for acceptable W3 version)
+
+dnl Ignore cache.
+unset EMACS_cv_ACCEPTABLE_W3;
+unset EMACS_cv_SYS_w3_dir;
+unset EMACS_cv_SYS_w3_forms;
+
 AC_CACHE_VAL(EMACS_cv_ACCEPTABLE_W3,[
 AC_EMACS_CHECK_LIB(w3_forms, w3-form-encode-xwfu,"noecho")
 if test "${HAVE_w3_forms}" = "yes"; then
@@ -150,9 +165,9 @@ fi
    W3=${EMACS_cv_ACCEPTABLE_W3}
    AC_SUBST(W3)
    if test "x${EMACS_cv_ACCEPTABLE_W3}" = "x"; then
-	AC_MSG_RESULT("not found")
+	AC_MSG_RESULT(not found)
    else
-	AC_MSG_RESULT("${W3}")
+	AC_MSG_RESULT(${W3})
    fi
 ])
 
@@ -187,7 +202,7 @@ AC_DEFUN(AC_PATH_PACKAGEDIR,
       fi],
       AC_EXAMINE_PACKAGEDIR)
     if test x$PACKAGEDIR = x; then
-      AC_MSG_RESULT("not found")
+      AC_MSG_RESULT(not found)
     else
       AC_MSG_RESULT($PACKAGEDIR)
     fi
