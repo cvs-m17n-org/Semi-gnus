@@ -371,7 +371,10 @@ GROUP has a full name."
 	    ;; based on the newly retrieved article.
 	    (let ((x (gnus-summary-article-header article)))
 	      (when x
-		(mail-header-set-date x (shimbun-header-date header))))
+		;; Trick to suppress byte compile of mail-header-set-date(),
+		;; in order to keep compatibility between T-gnus and Oort Gnus.
+		(eval
+		 `(mail-header-set-date ,x ,(shimbun-header-date header)))))
 	    (nnshimbun-replace-nov-entry group article header original-id)
 	    (nnshimbun-backlog
 	      (gnus-backlog-enter-article group article (current-buffer)))
@@ -647,11 +650,11 @@ Notice that nnshimbun does not actually delete any articles, it just
 delete the corresponding entries in the NOV database locally.  The
 expiration will be performed only when the current SERVER is specified
 and the NOV is open.  The optional fourth argument FORCE is ignored."
-  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
+  (let ((buffer (get-buffer (nnshimbun-nov-buffer-name group))))
     (if (and server
 	     ;; Don't use 'string-equal' in the following.
 	     (equal server (nnoo-current-server 'nnshimbun))
-	     (buffer-live-p buffer))
+	     (gnus-buffer-live-p buffer))
 	(let* ((expirable (copy-sequence articles))
 	       (name (concat "nnshimbun+" server ":" group))
 	       ;; If the group's parameter `expiry-wait' is non-nil,
@@ -670,8 +673,7 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 						nil
 					      nnmail-expiry-wait-function))
 	       article end time)
-	  (save-excursion
-	    (set-buffer buffer)
+	  (with-current-buffer buffer
 	    (while expirable
 	      (setq article (pop expirable))
 	      (when (and (nnheader-find-nov-line article)
@@ -699,7 +701,7 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 		  (setq articles (delq article articles)))))
 	    (when (buffer-modified-p)
 	      (nnmail-write-region 1 (point-max)
-				   nnshimbun-nov-buffer-file-name
+				   (nnshimbun-nov-file-name group)
 				   nil 'nomesg)
 	      (set-buffer-modified-p nil))
 	    articles))

@@ -1,5 +1,15 @@
 2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/nnshimbun.el (nnshimbun-request-article-1): Install trick
+	to keep compatibility between T-gnus and Oort Gnus.
+
+2002-10-29  Tadashi Watanabe  <watanabe@sigmaitec.co.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Do not
+	use removed variables.
+
+2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
 	* lisp/nnshimbun.el: Clean up.
 	(nnshimbun-nov-last-check): Removed.
 	(nnshimbun-nov-buffer-alist): Removed.
