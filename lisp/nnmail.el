@@ -696,7 +696,9 @@ If this variable is `t', do not use password cache.")
 			 (setq result 255))))
 		  (let ((default-directory "/")
 			(inbox-info (nnmail-parse-spool-file-name inbox)))
-		    (setenv "MAILHOST" (nnmail-spool-mailhost inbox-info))
+		    (and popmail
+			 (setenv "MAILHOST"
+				 (nnmail-spool-mailhost inbox-info)))
 		    (setq result
 			  (apply
 			   'call-process
@@ -705,10 +707,12 @@ If this variable is `t', do not use password cache.")
 			     (expand-file-name
 			      nnmail-movemail-program exec-directory)
 			     nil errors nil 
-			     (concat "po:" (nnmail-spool-maildrop inbox-info))
+			     (concat (if popmail "po:" "")
+				     (nnmail-spool-maildrop inbox-info))
 			     tofile)
-			    (when nnmail-internal-password
-			      (list nnmail-internal-password)))))))
+			    (and popmail
+				 nnmail-internal-password
+				 (list nnmail-internal-password)))))))
 		(push inbox nnmail-moved-inboxes)
 		(if (and (not (buffer-modified-p errors))
 			 (zerop result))
@@ -740,7 +744,7 @@ If this variable is `t', do not use password cache.")
 		      (delete-region (point-min) (match-end 0)))
 		    (unless (yes-or-no-p
 			     (format "movemail: %s (%d return).  Continue? "
-				     (buffer-string)))
+				     (buffer-string) result))
 			     (error "%s" (buffer-string)))
 		    (setq tofile nil)))
 		))))
