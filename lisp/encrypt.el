@@ -98,6 +98,7 @@ Format example:
 (defvar encrypt-temp-prefix "encrypt"
   "Prefix for temporary filenames")
 
+;;;###autoload
 (defun encrypt-find-model (filename)
   "Given a filename, find a encrypt-file-alist entry"
   (dolist (entry encrypt-file-alist)
@@ -107,6 +108,7 @@ Format example:
 		(string-match match filename))
 	(return model)))))
 
+;;;###autoload
 (defun encrypt-insert-file-contents (file &optional model)
   "Decrypt FILE into the current buffer."
   (interactive "fFile to insert: ")
