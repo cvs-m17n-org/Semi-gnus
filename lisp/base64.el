@@ -25,8 +25,17 @@
 ;;; Boston, MA 02111-1307, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'poe)
+(eval-when-compile (require 'static))
 
+(require 'mel)
+
+(eval-and-compile
+  (mel-find-function 'mime-decode-string "base64")
+  (mel-find-function 'mime-decode-region "base64")
+  (mel-find-function 'mime-encode-string "base64")
+  (mel-find-function 'mime-encode-region "base64"))
+
+(static-when nil
 ;; For non-MULE
 (if (not (fboundp 'char-int))
     (fset 'char-int 'identity))
@@ -110,9 +119,9 @@ base64-encoder-program.")
 	(insert-char char count)
       (with-current-buffer buffer
 	(insert-char char count))))
-  (setq base64-binary-coding-system 'raw-text))
+  (setq base64-binary-coding-system 'no-conversion))
 
-(defun-maybe base64-decode-region (start end)
+(defun base64-decode-region (start end)
   (interactive "r")
   ;;(message "Decoding base64...")
   (let ((work-buffer nil)
@@ -180,7 +189,7 @@ base64-encoder-program.")
   ;;(message "Decoding base64... done")
   )
 
-(defun-maybe base64-encode-region (start end &optional no-line-break)
+(defun base64-encode-region (start end &optional no-line-break)
   (interactive "r")
   (message "Encoding base64...")
   (let ((work-buffer nil)
@@ -274,5 +283,7 @@ base64-encoder-program.")
 
 (fset 'base64-decode-string 'base64-decode)
 (fset 'base64-encode-string 'base64-encode)
+
+);; (static-when nil ...
 
 (provide 'base64)
