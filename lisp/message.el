@@ -3132,6 +3132,7 @@ give as trustworthy answer as possible."
 (defvar mule-version)
 (defvar emacs-beta-version)
 (defvar xemacs-codename)
+(defvar gnus-inviolable-extended-version)
 
 (defun message-make-user-agent ()
   "Return user-agent info."
@@ -3155,12 +3156,13 @@ give as trustworthy answer as possible."
 		      (when (string-match "[\n\t ]+$" value)
 			(setq value
 			      (substring value 0 (match-beginning 0))))
-		      (unless (string-match
-			       (concat
-				"^" (regexp-quote
-				     gnus-inviolable-extended-version))
-			       value)
-			(delete-region start (1+ (point))))
+		      (when (boundp 'gnus-inviolable-extended-version)
+			(unless (string-match
+				 (concat
+				  "^" (regexp-quote
+				       gnus-inviolable-extended-version))
+				 value)
+			  (delete-region start (1+ (point)))))
 		      (if (string-equal "" value)
 			  nil
 			value))))))
@@ -3228,8 +3230,12 @@ give as trustworthy answer as possible."
 		   "Meadow"))		; unknown format
 	     "")			; not Meadow
 	   ))))
-    (concat (or message-user-agent gnus-inviolable-extended-version)
-	    "\n " user-agent)))
+    (cond (message-user-agent
+	   (concat message-user-agent "\n " user-agent))
+	  ((boundp 'gnus-inviolable-extended-version)
+	   (concat gnus-inviolable-extended-version "\n " user-agent))
+	  (t
+	   user-agent))))
 
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
