@@ -13215,6 +13215,7 @@ rmail box のためのアクティブファイルの名前。既定値
 を読む事に関してはたぶん最速のバックエンドになります。
 
 @cindex self contained nnml servers
+@cindex marks
 印ファイル (訳注: marks file) が使われると (それがディフォルトですが)、
 @code{nnml} サーバーは @code{tar} などを使ってバックアップしたり、後であ
 なたが付けた印がすべて保たれた状態で gnus に戻す (本来の @code{nnml} サー
@@ -13334,6 +13335,7 @@ rmail box のためのアクティブファイルの名前。既定値
 えます。
 
 @cindex self contained nnfolder servers
+@cindex marks
 印ファイル (訳注: marks file) が使われると (それがディフォルトですが)、
 @code{nnfolder} サーバーは @code{tar} などを使ってバックアップしたり、後
 であなたが付けた印がすべて保たれた状態で gnus に戻す (本来
