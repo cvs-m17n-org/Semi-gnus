@@ -22273,11 +22273,13 @@ SpamOracle $B$O%a%C%;!<%8$,(B spam $B$+(B ham $B$+$r8+6K$a$k$?$a$KE}7WE*$J<
 
 @emph{$BNc(B:} $B$3$l$i$O(B ham $B%0%k!<%W$H$7$FJ,N`$5$l$?!"$D$^$j(B ham $B$N5-;v$7$+(B
 $B$J$$%0%k!<%W$N%0%k!<%W%Q%i%a!<%?$G$9!#(B
+
 @example
  ((spam-contents gnus-group-spam-classification-ham)
   (spam-process
    (gnus-group-spam-exit-processor-spamoracle)))
 @end example
+
 $B$3$N%0%k!<%W$G$O(B @code{gnus-group-spam-exit-processor-spamoracle} $B$,;E;v(B
 $B$r$7$^$9!#$3$N%0%k!<%W$K(B spam $B5-;v$,$"$C$F(B (SpamOracle $B$,==J,$J%5%s%W%k(B
 $B$r?)$Y$5$;$F$b$i$C$F$$$J$1$l$P!"$=$&$J$j$^$9$M(B)$B!"$+$D%f!<%6$,$$$/$D$+$N(B
