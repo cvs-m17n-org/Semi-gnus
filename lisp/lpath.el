@@ -39,8 +39,7 @@
 		     url-view-url w3-prepare-buffer
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
-		     find-charset-region base64-decode-string
-		     base64-encode-string
+		     find-charset-region
 		     find-coding-systems-region get-charset-property
 		     coding-system-get w3-region
 		     rmail-summary-exists rmail-select-summary
@@ -75,7 +74,7 @@
 		 url-view-url w3-prepare-buffer
 		 char-int
 		 annotationp delete-annotation make-image-specifier
- 		 make-annotation base64-decode-string base64-encode-region
+ 		 make-annotation
  		 w3-do-setup w3-region
  		 rmail-summary-exists rmail-select-summary rmail-update-summary
  		 )))

@@ -752,10 +752,10 @@ the prefix.")
 The default is `abbrev', which uses mailabbrev.  nil switches
 mail aliases off.")
 
-(defcustom message-autosave-directory
+(defcustom message-auto-save-directory
   (nnheader-concat message-directory "drafts/")
-  "*Directory where Message autosaves buffers if Gnus isn't running.
-If nil, Message won't autosave."
+  "*Directory where Message auto-saves buffers if Gnus isn't running.
+If nil, Message won't auto-save."
   :group 'message-buffers
   :type 'directory)
 
@@ -1366,7 +1366,8 @@ Point is left at the beginning of the narrowed-to region."
 (defvar message-mode-map nil)
 
 (unless message-mode-map
-  (setq message-mode-map (copy-keymap text-mode-map))
+  (setq message-mode-map (make-keymap))
+  (set-keymap-parent message-mode-map text-mode-map)
   (define-key message-mode-map "\C-c?" 'describe-mode)
 
   (define-key message-mode-map "\C-c\C-f\C-t" 'message-goto-to)
@@ -1475,6 +1476,7 @@ C-c C-w  message-insert-signature (insert `message-signature-file' file).
 C-c C-y  message-yank-original (insert current message, if any).
 C-c C-q  message-fill-yanked-message (fill what was yanked).
 C-c C-e  message-elide-region (elide the text between point and mark).
+C-c C-v  message-delete-not-region (remove the text outside the region).
 C-c C-z  message-kill-to-signature (kill the text up to the signature).
 C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (interactive)
@@ -1667,7 +1669,8 @@ With the prefix argument FORCE, insert the header anyway."
   (let ((co (message-fetch-reply-field "mail-copies-to")))
     (when (and (null force)
 	       co
-	       (equal (downcase co) "never"))
+	       (or (equal (downcase co) "never")
+		   (equal (downcase co) "nobody")))
       (error "The user has requested not to have copies sent via mail")))
   (when (and (message-position-on-field "To")
 	     (mail-fetch-field "to")
@@ -2202,6 +2205,15 @@ the user from the mailer."
   "Send the current message via news."
   (message-send-news arg))
 
+(defmacro message-check (type &rest forms)
+  "Eval FORMS if TYPE is to be checked."
+  `(or (message-check-element ,type)
+       (save-excursion
+	 ,@forms)))
+
+(put 'message-check 'lisp-indent-function 1)
+(put 'message-check 'edebug-form-spec '(form body))
+
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
   ;; Make sure there's a newline at the end of the message.
@@ -2525,15 +2537,6 @@ to find out how to use this."
 ;;;
 ;;; Header generation & syntax checking.
 ;;;
-
-(defmacro message-check (type &rest forms)
-  "Eval FORMS if TYPE is to be checked."
-  `(or (message-check-element ,type)
-       (save-excursion
-	 ,@forms)))
-
-(put 'message-check 'lisp-indent-function 1)
-(put 'message-check 'edebug-form-spec '(form body))
 
 (defun message-check-element (type)
   "Returns non-nil if this type is not to be checked."
@@ -2901,12 +2904,15 @@ If NOW, use that time instead."
 	 (sign "+"))
     (when (< zone 0)
       (setq sign ""))
-    ;; We do all of this because XEmacs doesn't have the %z spec.
-    (concat (format-time-string
-	     "%d %b %Y %H:%M:%S " (or now (current-time)))
-	    (format "%s%02d%02d"
-		    sign (/ zone 3600)
-		    (% zone 3600)))))
+    (concat
+     (format-time-string "%d" now)
+     ;; The month name of the %b spec is locale-specific.  Pfff.
+     (format " %s "
+	     (capitalize (car (rassoc (nth 4 (decode-time now))
+				      parse-time-months))))
+     (format-time-string "%Y %H:%M:%S " now)
+     ;; We do all of this because XEmacs doesn't have the %z spec.
+     (format "%s%02d%02d" sign (/ zone 3600) (% zone 3600)))))
 
 (defun message-make-followup-subject (subject)
   "Make a followup Subject."
@@ -3581,12 +3587,12 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-set-auto-save-file-name ()
   "Associate the message buffer with a file in the drafts directory."
-  (when message-autosave-directory
+  (when message-auto-save-directory
     (if (gnus-alive-p)
 	(setq message-draft-article
 	      (nndraft-request-associate-buffer "drafts"))
       (setq buffer-file-name (expand-file-name "*message*"
-					       message-autosave-directory))
+					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)))
 
@@ -3672,7 +3678,8 @@ OTHER-HEADERS is an alist of header/value pairs."
     ;; Handle special values of Mail-Copies-To.
     (when mct
       (cond
-       ((and (equal (downcase mct) "never")
+       ((and (or (equal (downcase mct) "never")
+		 (equal (downcase mct) "nobody"))
 	     (or (not (eq message-use-mail-copies-to 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Copies-To: never? ") t "\
@@ -3682,7 +3689,8 @@ You should normally obey the Mail-Copies-To: header.
 directs you not to send your response to the author.")))
 	(setq never-mct t)
 	(setq mct nil))
-       ((and (equal (downcase mct) "always")
+       ((and (or (equal (downcase mct) "always")
+		 (equal (downcase mct) "poster"))
 	     (or (not (eq message-use-mail-copies-to 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Copies-To: always? ") t "\
@@ -3835,7 +3843,8 @@ that further discussion should take place only in "
     ;; Handle special values of Mail-Copies-To.
     (when mct
       (cond
-       ((and (equal (downcase mct) "never")
+       ((and (or (equal (downcase mct) "never")
+		 (equal (downcase mct) "nobody"))
 	     (or (not (eq message-use-mail-copies-to 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Copies-To: never? ") t "\
@@ -3844,7 +3853,8 @@ You should normally obey the Mail-Copies-To: header.
 	`Mail-Copies-To: never'
 directs you not to send your response to the author.")))
 	(setq mct nil))
-       ((and (equal (downcase mct) "always")
+       ((and (or (equal (downcase mct) "always")
+		 (equal (downcase mct) "poster"))
 	     (or (not (eq message-use-mail-copies-to 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Copies-To: always? ") t "\

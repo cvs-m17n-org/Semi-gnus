@@ -4164,7 +4164,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
   (let ((types gnus-article-mark-lists)
 	(info (gnus-get-info gnus-newsgroup-name))
 	(uncompressed '(score bookmark killed))
-	type list newmarked symbol)
+       type list newmarked symbol delta-marks)
     (when info
       ;; Add all marks lists that are non-nil to the list of marks lists.
       (while (setq type (pop types))
@@ -5202,7 +5202,8 @@ gnus-exit-group-hook is called with no arguments if that value is non-nil."
 	      gnus-expert-user
 	      (gnus-y-or-n-p "Discard changes to this group and exit? "))
       (gnus-async-halt-prefetch)
-      (gnus-run-hooks 'gnus-summary-prepare-exit-hook)
+      (gnus-run-hooks (delq 'gnus-summary-expire-articles
+			    (copy-list gnus-summary-prepare-exit-hook)))
       ;; If we have several article buffers, we kill them at exit.
       (unless gnus-single-article-buffer
 	(gnus-kill-buffer gnus-article-buffer)
@@ -9006,8 +9007,9 @@ save those articles instead."
 	(setq unread (cdr unread)))
       (when (<= prev (cdr active))
 	(push (cons prev (cdr active)) read))
+      (setq read (if (> (length read) 1) (nreverse read) read))
       (if compute
-	  (if (> (length read) 1) (nreverse read) read)
+         read
 	(save-excursion
 	  (set-buffer gnus-group-buffer)
 	  (gnus-undo-register
@@ -9017,8 +9019,7 @@ save those articles instead."
 	       (gnus-get-unread-articles-in-group ',info (gnus-active ,group))
 	       (gnus-group-update-group ,group t))))
 	;; Enter this list into the group info.
-	(gnus-info-set-read
-	 info (if (> (length read) 1) (nreverse read) read))
+       (gnus-info-set-read info read)
 	;; Set the number of unread articles in gnus-newsrc-hashtb.
 	(gnus-get-unread-articles-in-group info (gnus-active group))
 	t))))

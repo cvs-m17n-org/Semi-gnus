@@ -1,10 +1,10 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996,1997 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3l
+;; Version: 1.3l+
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3l")
+(defconst pop3-version "1.3l+")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -59,6 +59,9 @@ values are 'apop.")
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
+
+(defvar pop3-movemail-file-coding-system 'binary
+  "Crashbox made by pop3-movemail with this coding system.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
@@ -91,7 +94,8 @@ Used for APOP authentication.")
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(append-to-file (point-min) (point-max) crashbox)
+	(let ((coding-system-for-write pop3-movemail-file-coding-system))
+	  (append-to-file (point-min) (point-max) crashbox))
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))
@@ -111,20 +115,18 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process))
+	(process)
+	(coding-system-for-read 'binary))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
-      (setq pop3-read-point (point-min))
-      )
-    (setq process
-	  (open-network-stream "POP" process-buffer mailhost port))
+      (setq process (open-network-stream "POP" process-buffer mailhost port))
+      (setq pop3-read-point (point-min)))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
