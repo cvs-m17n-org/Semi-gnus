@@ -1,3 +1,9 @@
+1999-01-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.053.
+
+	* Sync up with Pterodactyl Gnus v0.70.
+
 1999-01-13  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
 
 	* lisp/nnspool.el (nnspool-retrieve-headers): Protect against empty

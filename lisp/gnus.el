@@ -1,5 +1,5 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.052"
+(defconst gnus-version-number "6.10.053"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.69"
+(defconst gnus-original-version-number "0.70"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1161,11 +1161,6 @@ articles.  This is not a good idea."
 
 (defcustom gnus-suppress-duplicates nil
   "*If non-nil, Gnus will mark duplicate copies of the same article as read."
-  :group 'gnus-meta
-  :type 'boolean)
-
-(defcustom gnus-use-demon nil
-  "If non-nil, Gnus might use some demons."
   :group 'gnus-meta
   :type 'boolean)
 
