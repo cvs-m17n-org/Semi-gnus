@@ -1,3 +1,11 @@
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.0.
+	(gnus-version): Modify for FLIM 1.8.
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Modify for FLIM 1.8.
+
 1998-06-30  Keisuke Mori   <ksk@ntts.com>
 
 	* texi/gnus-ja.texi: Add "Scroing".
