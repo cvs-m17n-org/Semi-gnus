@@ -67,7 +67,7 @@ clean:
 	rm -f auto-autoloads.el custom-load.el
 
 distclean: clean
-	rm -f Makefile
+	rm -f Makefile paths.el
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \
