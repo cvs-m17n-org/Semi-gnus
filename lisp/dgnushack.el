@@ -58,7 +58,7 @@
     (if rest
 	`(let* ((fn ,fn)
 		(seq ,seq)
-		(args (cons seq ,rest))
+		(args (cons seq (list ,@rest)))
 		(m (apply (function min) (mapcar (function length) args)))
 		(n 0))
 	   (while (< n m)
@@ -90,6 +90,28 @@
 	 (while (consp (cdr x))
 	   (pop x))
 	 x))))
+
+(define-compiler-macro mapcon (&whole form fn seq &rest rest)
+  (if (and (fboundp 'mapcon)
+	   (subrp (symbol-function 'mapcon)))
+      form
+    (if rest
+	`(let (res
+	       (args (cons ,seq (list ,@rest)))
+	       p)
+	   (while (not (memq nil args))
+	     (push (apply ,fn args) res)
+	     (setq p args)
+	     (while p
+	       (setcar p (cdr (pop p)))
+	       ))
+	   (apply (function nconc) (nreverse res)))
+      `(let (res
+	     (arg ,seq))
+	 (while arg
+	   (push (funcall ,fn arg) res)
+	   (setq arg (cdr arg)))
+	 (apply (function nconc) (nreverse res))))))
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -389,7 +411,8 @@ You must specify the name of the package path as follows:
 		'string-lessp))
     (mapcar
      (lambda (file)
-       (unless (member file files)
+       (unless (or (member file files)
+		   (not (string-match "\\.elc?$" file)))
 	 (setq file (expand-file-name file lisp-dir))
 	 (message "Removing %s..." file)
 	 (condition-case nil
