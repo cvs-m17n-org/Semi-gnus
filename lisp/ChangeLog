@@ -1,7 +1,21 @@
+2003-05-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* rfc2231.el (rfc2231-parse-string): "=" should have whitespace
+	syntax here.
+
+	* ietf-drums.el (ietf-drums-syntax-table): "=" should not have
+	whitespace syntax class when parsing email addresses.
+
+	* message.el (message-forward-subject-name-subject): Don't use
+	mail-decode-encoded-word-string before parsing from.
+
 2003-05-07  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-setup-1): Setup alternative email before
 	generate-headers.
+	
+	(message-forward-subject-name-subject): Fix the case when the
+	field "from" doesn't exist.
 
 2003-05-07  Dave Love  <fx@gnu.org>
 
