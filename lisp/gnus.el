@@ -266,13 +266,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.13.2"
+(defconst gnus-version-number "6.13.3"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "14"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.97"
+(defconst gnus-original-version-number "0.98"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -1270,7 +1270,8 @@ slower."
     ("nngateway" post-mail address prompt-address physical-address)
     ("nnweb" none)
     ("nnlistserv" none)
-    ("nnagent" post-mail))
+    ("nnagent" post-mail)
+    ("nnimap" post-mail address prompt-address physical-address))
   "*An alist of valid select methods.
 The first element of each list lists should be a string with the name
 of the select method.  The other elements may be the category of
@@ -1735,7 +1736,8 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
       gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
-      gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
+      gnus-article-mail gnus-copy-article-buffer gnus-extended-version
+      gnus-following-method)
      ("gnus-msg" :interactive t
       gnus-group-post-news gnus-group-mail gnus-summary-post-news
       gnus-summary-followup gnus-summary-followup-with-original
