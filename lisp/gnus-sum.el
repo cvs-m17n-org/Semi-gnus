@@ -1416,6 +1416,7 @@ increase the score of each group you read."
     "o" gnus-article-treat-overstrike
     "e" gnus-article-emphasize
     "w" gnus-article-fill-cited-article
+    "Q" gnus-article-fill-long-lines
     "c" gnus-article-remove-cr
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
@@ -1573,6 +1574,7 @@ increase the score of each group you read."
               ["Dumb quotes" gnus-article-treat-dumbquotes t]
               ["Emphasis" gnus-article-emphasize t]
               ["Word wrap" gnus-article-fill-cited-article t]
+	      ["Fill long lines" gnus-article-fill-long-lines t]
               ["CR" gnus-article-remove-cr t]
               ["Show X-Face" gnus-article-display-x-face t]
               ["UnHTMLize" gnus-article-treat-html t]
@@ -1942,8 +1944,6 @@ The following commands are available:
   (make-local-variable 'gnus-summary-dummy-line-format)
   (make-local-variable 'gnus-summary-dummy-line-format-spec)
   (make-local-variable 'gnus-summary-mark-positions)
-  (make-local-hook 'post-command-hook)
-  (add-hook 'post-command-hook 'gnus-clear-inboxes-moved nil t)
   (make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
@@ -2396,7 +2396,8 @@ marks of articles."
 (defun gnus-summary-last-article-p (&optional article)
   "Return whether ARTICLE is the last article in the buffer."
   (if (not (setq article (or article (gnus-summary-article-number))))
-      t					; All non-existent numbers are the last article.  :-)
+      ;; All non-existent numbers are the last article.  :-)
+      t
     (not (cdr (gnus-data-find-list article)))))
 
 (defun gnus-make-thread-indent-array ()
@@ -4154,7 +4155,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
     out))
 
 (defun gnus-adjust-marked-articles (info)
-  "Set all article lists and remove all marks that are no longer legal."
+  "Set all article lists and remove all marks that are no longer valid."
   (let* ((marked-lists (gnus-info-marks info))
 	 (active (gnus-active (gnus-info-group info)))
 	 (min (car active))
@@ -4407,7 +4408,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	 (active (gnus-active group))
 	 ninfo)
     (when entry
-      ;; First peel off all illegal article numbers.
+      ;; First peel off all invalid article numbers.
       (when active
 	(let ((ids articles)
 	      id first)
@@ -5682,7 +5683,9 @@ be displayed."
 	      ;; The requested article is different from the current article.
 	      (prog1
 		  (gnus-summary-display-article article all-headers)
-		(setq did article))
+		(setq did article)
+		(when (or all-headers gnus-show-all-headers)
+		  (gnus-article-show-all-headers)))
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
 	    'old))
@@ -8044,7 +8047,8 @@ returned."
 The difference between N and the actual number of articles marked is
 returned."
   (interactive "p")
-  (gnus-summary-mark-forward (- n) gnus-del-mark gnus-inhibit-user-auto-expire))
+  (gnus-summary-mark-forward
+   (- n) gnus-del-mark gnus-inhibit-user-auto-expire))
 
 (defun gnus-summary-mark-as-read (&optional article mark)
   "Mark current article as read.

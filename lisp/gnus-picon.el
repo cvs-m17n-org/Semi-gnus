@@ -42,7 +42,7 @@ variable."
 
 (defcustom gnus-picons-display-where 'picons
   "Where to display the group and article icons.
-Legal values are `article' and `picons'."
+Valid values are `article' and `picons'."
   :type '(choice symbol string)
   :group 'picons)
 
@@ -375,9 +375,9 @@ To use:  (setq gnus-article-x-face-command 'gnus-picons-display-x-face)"
 		  (gnus-put-text-property
 		   (match-beginning 0) (match-end 0)
 		   'invisible t)
-		(goto-char (point-min))
-		(search-forward "\n\n")
-		(backward-char 1))))
+		(article-goto-body)
+		(unless (bobp)
+		  (backward-char 1)))))
 	  (if (null gnus-picons-piconsearch-url)
 	      (gnus-picons-display-pairs
 	       (gnus-picons-lookup-pairs
@@ -595,7 +595,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 	     ;; dbs
 	     "^\\(" (mapconcat 'identity dbs "\\|") "\\)/"
 	     ;; host
-	     "\\(\\(" (replace-in-string host "\\." "/\\|" t) "/\\|MISC/\\)*\\)"
+	     "\\(\\(" (replace-in-string host "\\." "/\\|" t)
+	     "/\\|MISC/\\)*\\)"
 	     ;; user
 	     "\\(" (regexp-quote user) "\\|unknown\\)/"
 	     "face\\."))
@@ -647,7 +648,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
     ;; only do the job if it has not been preempted.
     (if (equal gnus-picons-job-already-running
 	       (list sym-ann 'picon url part right-p marker))
-	(gnus-picons-network-display-internal sym-ann glyph part right-p marker)
+	(gnus-picons-network-display-internal
+	 sym-ann glyph part right-p marker)
       (gnus-picons-next-job-internal))))
 
 (defun gnus-picons-network-display (url part sym-ann right-p marker)

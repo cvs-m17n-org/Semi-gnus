@@ -1,5 +1,5 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -264,11 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.055"
+(defconst gnus-version-number "6.10.056"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.72"
+(defconst gnus-original-version-number "0.74"
     "Version number for this version of Gnus.")
+
+(provide 'running-pterodactyl-gnus-0_73-or-later)
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
   "Product name of the original version of Gnus.")
@@ -1556,7 +1558,7 @@ If nil, no default charset is assumed when posting."
       ,(nnheader-concat gnus-cache-directory "active"))))
   "List of predefined (convenience) servers.")
 
-(defvar gnus-topic-indentation "") ;; Obsolete variable.
+(defvar gnus-topic-indentation "");; Obsolete variable.
 
 (defconst gnus-article-mark-lists
   '((marked . tick) (replied . reply)
@@ -1799,8 +1801,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-group-set-mode-line gnus-group-set-info gnus-group-save-newsrc
       gnus-group-setup-buffer gnus-group-get-new-news
       gnus-group-make-help-group gnus-group-update-group
-      gnus-clear-inboxes-moved gnus-group-iterate
-      gnus-group-group-name)
+      gnus-group-iterate gnus-group-group-name)
      ("gnus-bcklg" gnus-backlog-request-article gnus-backlog-enter-article
       gnus-backlog-remove-article)
      ("gnus-art" gnus-article-read-summary-keys gnus-article-save
@@ -1914,7 +1915,7 @@ such area.
 The %U (status), %R (replied) and %z (zcore) specs have to be handled
 with care.  For reasons of efficiency, Gnus will compute what column
 these characters will end up in, and \"hard-code\" that.  This means that
-it is illegal to have these specs after a variable-length spec.	 Well,
+it is invalid to have these specs after a variable-length spec.	 Well,
 you might not be arrested, but your summary buffer will look strange,
 which is bad enough.
 
@@ -2833,7 +2834,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
 
 (defun gnus-read-group (prompt &optional default)
   "Prompt the user for a group name.
-Disallow illegal group names."
+Disallow invalid group names."
   (let ((prefix "")
 	group)
     (while (not group)
@@ -2842,7 +2843,7 @@ Disallow illegal group names."
 	     (setq group (read-string (concat prefix prompt)
 				      (cons (or default "") 0)
 				      'gnus-group-history)))
-	(setq prefix (format "Illegal group name: \"%s\".  " group)
+	(setq prefix (format "Invalid group name: \"%s\".  " group)
 	      group nil)))
     group))
 

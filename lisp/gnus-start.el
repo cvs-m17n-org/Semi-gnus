@@ -1446,7 +1446,7 @@ newsgroup."
 	;; Then we want to peel off any elements that are higher
 	;; than the upper active limit.
 	(let ((srange range))
-	  ;; Go past all legal elements.
+	  ;; Go past all valid elements.
 	  (while (and (cdr srange)
 		      (<= (or (and (atom (cadr srange))
 				   (cadr srange))
@@ -1454,7 +1454,7 @@ newsgroup."
 			  (cdr active)))
 	    (setq srange (cdr srange)))
 	  (when (cdr srange)
-	    ;; Nuke all remaining illegal elements.
+	    ;; Nuke all remaining invalid elements.
 	    (setcdr srange nil))
 
 	  ;; Adjust the final element.
@@ -1519,10 +1519,14 @@ newsgroup."
 					   "-request-update-info")))
 	      (inline (gnus-request-update-info info method))))
 	;; These groups are native or secondary.
-	(when (and (<= (gnus-info-level info) level)
-		   (not gnus-read-active-file))
+	(cond
+	 ;; We don't want these groups.
+	 ((> (gnus-info-level info) level)
+	  (setq active nil))
+	 ;; Activate groups.
+	 ((not gnus-read-active-file)
 	  (setq active (gnus-activate-group group 'scan))
-	  (inline (gnus-close-group group))))
+	  (inline (gnus-close-group group)))))
 
       ;; Get the number of unread articles in the group.
       (if active
@@ -1638,30 +1642,30 @@ newsgroup."
 (defun gnus-read-active-file (&optional force not-native)
   (gnus-group-set-mode-line)
   (let ((methods
-	 (append
-	  (if (and (not not-native)
-		   (gnus-check-server gnus-select-method))
-	      ;; The native server is available.
-	      (cons gnus-select-method gnus-secondary-select-methods)
-	    ;; The native server is down, so we just do the
-	    ;; secondary ones.
-	    gnus-secondary-select-methods)
-	  ;; Also read from the archive server.
-	  (when (gnus-archive-server-wanted-p)
-	    (list "archive"))))
-	list-type)
+	 (mapcar
+	  (lambda (m) (if (stringp m) (gnus-server-get-method nil m) m))
+	  (append
+	   (if (and (not not-native)
+		    (gnus-check-server gnus-select-method))
+	       ;; The native server is available.
+	       (cons gnus-select-method gnus-secondary-select-methods)
+	     ;; The native server is down, so we just do the
+	     ;; secondary ones.
+	     gnus-secondary-select-methods)
+	   ;; Also read from the archive server.
+	   (when (gnus-archive-server-wanted-p)
+	     (list "archive")))))
+	method where mesg list-type)
     (setq gnus-have-read-active-file nil)
     (save-excursion
       (set-buffer nntp-server-buffer)
-      (while methods
-	(let* ((method (if (stringp (car methods))
-			   (gnus-server-get-method nil (car methods))
-			 (car methods)))
-	       (where (nth 1 method))
-	       (mesg (format "Reading active file%s via %s..."
+      (while (setq method (pop methods))
+	(unless (member method methods)
+	  (setq where (nth 1 method)
+		mesg (format "Reading active file%s via %s..."
 			     (if (and where (not (zerop (length where))))
 				 (concat " from " where) "")
-			     (car method))))
+			     (car method)))
 	  (gnus-message 5 mesg)
 	  (when (gnus-check-server method)
 	    ;; Request that the backend scan its incoming messages.
@@ -1708,8 +1712,7 @@ newsgroup."
 		(gnus-active-to-gnus-format method gnus-active-hashtb nil t)
 		;; We mark this active file as read.
 		(push method gnus-have-read-active-file)
-		(gnus-message 5 "%sdone" mesg))))))
-	(setq methods (cdr methods))))))
+		(gnus-message 5 "%sdone" mesg))))))))))
 
 ;; Read an active file and place the results in `gnus-active-hashtb'.
 (defun gnus-active-to-gnus-format (&optional method hashtb ignore-errors
@@ -1786,7 +1789,7 @@ newsgroup."
 		(symbolp group)
 		(set group nil))
 	   (unless ignore-errors
-	     (gnus-message 3 "Warning - illegal active: %s"
+	     (gnus-message 3 "Warning - invalid active: %s"
 			   (buffer-substring
 			    (gnus-point-at-bol) (gnus-point-at-eol))))))
 	(widen)
@@ -2114,7 +2117,7 @@ If FORCE is non-nil, the .newsrc file is read."
 			    (buffer-substring (gnus-point-at-bol)
 					      (gnus-point-at-eol))))
 	      nil))
-	  ;; Skip past ", ".  Spaces are illegal in these ranges, but
+	  ;; Skip past ", ".  Spaces are invalid in these ranges, but
 	  ;; we allow them, because it's a common mistake to put a
 	  ;; space after the comma.
 	  (skip-chars-forward ", "))

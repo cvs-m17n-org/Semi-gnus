@@ -433,7 +433,7 @@ The provided functions are:
 The headers should be delimited by a line whose contents match the
 variable `mail-header-separator'.
 
-Legal values include `message-send-mail-with-sendmail' (the default),
+Valid values include `message-send-mail-with-sendmail' (the default),
 `message-send-mail-with-mh', `message-send-mail-with-qmail' and
 `message-send-mail-with-smtp'."
   :type '(radio (function-item message-send-mail-with-sendmail)
@@ -1522,6 +1522,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
    ["Spellcheck" ispell-message t]
+   ["Attach file as MIME" message-mime-attach-file t]
    "----"
    ["Send Message" message-send-and-exit t]
    ["Abort Message" message-dont-send t]
@@ -1574,7 +1575,8 @@ C-c C-q  message-fill-yanked-message (fill what was yanked).
 C-c C-e  message-elide-region (elide the text between point and mark).
 C-c C-v  message-delete-not-region (remove the text outside the region).
 C-c C-z  message-kill-to-signature (kill the text up to the signature).
-C-c C-r  message-caesar-buffer-body (rot13 the message body)."
+C-c C-r  message-caesar-buffer-body (rot13 the message body).
+C-c C-a  message-mime-attach-file (attach a file as MIME)."
   (interactive)
   (kill-all-local-variables)
   (set (make-local-variable 'message-reply-buffer) nil)
@@ -2127,7 +2129,7 @@ be added to \"References\" field."
 	(insert "\n"))
       (funcall message-citation-line-function))))
 
-(defvar mail-citation-hook) ;Compiler directive
+(defvar mail-citation-hook)		;Compiler directive
 (defun message-cite-original ()
   "Cite function in the standard Message manner."
   (if (and (boundp 'mail-citation-hook)
@@ -2387,7 +2389,8 @@ the user from the mailer."
   (message-check 'invisible-text
     (when (text-property-any (point-min) (point-max) 'invisible t)
       (put-text-property (point-min) (point-max) 'invisible nil)
-      (unless (yes-or-no-p "Invisible text found and made visible; continue posting? ")
+      (unless (yes-or-no-p
+	       "Invisible text found and made visible; continue posting? ")
 	(error "Invisible text found and made visible")))))
 
 (defun message-add-action (action &rest types)
@@ -2741,12 +2744,6 @@ This sub function is for exclusive use of `message-send-news'."
     (replace-match "\n")
     (backward-char 1)
     (run-hooks 'message-send-news-hook)
-    ;;(require (car method))
-    ;;(funcall (intern (format "%s-open-server" (car method)))
-    ;;(cadr method) (cddr method))
-    ;;(setq result
-    ;;	  (funcall (intern (format "%s-request-post" (car method)))
-    ;;		   (cadr method)))
     (gnus-open-server method)
     (gnus-request-post method)
     ))
@@ -4454,7 +4451,9 @@ Optional NEWS will use news to forward instead of mail."
   (let ((cur (current-buffer))
 	(subject (message-make-forward-subject))
 	art-beg)
-    (if news (message-news nil subject) (message-mail nil subject))
+    (if news
+	(message-news nil subject)
+      (message-mail nil subject))
     ;; Put point where we want it before inserting the forwarded
     ;; message.
     (if message-signature-before-forwarded-message
@@ -4897,8 +4896,9 @@ description of the attachment."
 	  (description (message-mime-query-description)))
      (list file type description)))
   (insert (format
-	   "<#part type=%s filename=%s%s disposition=attachment><#/part>\n"
-	   type (prin1-to-string file)
+	   "<#part type=%s name=%s filename=%s%s disposition=attachment><#/part>\n"
+	   type (prin1-to-string (file-name-nondirectory file))
+	   (prin1-to-string file)
 	   (if description
 	       (format " description=%s" (prin1-to-string description))
 	     ""))))

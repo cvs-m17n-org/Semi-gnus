@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.28 1999-01-31 23:06:20 yamaoka Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.29 1999-01-31 23:14:35 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
