@@ -19017,14 +19017,14 @@ gnus $B$O4X?t(B @code{gnus-user-format-function-}@samp{foo} $B$r8F$S=P$7$^$9!
 $B$9(B---@samp{hello} $B$,(B @code{gnus-mouse-face-3} $B$G%^%&%9!]%O%$%i%$%H$5$l$k(B
 $B$?$a$K$O!"(B@samp{%3(hello%)} $B$H$9$k;v$,$G$-$^$9!#(B
 
-@samp{%<} $B$H(B @samp{%>} $B;X<(;R$N4V$N%F%-%9%H$OFCJL(B
+@samp{%<<} $B$H(B @samp{%>>} $B;X<(;R$N4V$N%F%-%9%H$OFCJL(B
 $B$J(B @code{balloon-help} $B%W%m%Q%F%#$,(B @code{gnus-balloon-face-0} $B$K@_Dj$5(B
-$B$l$^$9!#(B@samp{%1<} $B$H$9$k$H!"(B@code{gnus-balloon-face-1} $B$rF@$F!"B>$bF1MM(B
-$B$G$9!#(B@code{gnus-balloon-face-*} $BJQ?t$OJ8;zNs$+J8;zNs$rJV$94X?t$r;X$9%7(B
-$B%s%\%k$N$I$A$i$+$G$"$kI,MW$,$"$j$^$9!#(B@code{balloon-help-mode} $B$G$O!"%^(B
-$B%&%9$,%W%m%Q%F%#$N@_Dj$5$l$F$$$k%F%-%9%H$N>e$rDL2a$9$k$H!"%P%k!<%s%&%#%s(B
-$B%I%&$,8=$l$F!"J8;zNs$rI=<($7$^$9!#$3$l$N>\$7$$>pJs(B
-$B$O(B @code{balloon-help-mode} $B$N@bL@J8;zNs$r;2>H$7$F$/$@$5$$!#(B
+$B$l$^$9!#(B@samp{%1<<} $B$H$9$k$H!"(B@code{gnus-balloon-face-1} $B$rF@$F!"B>$bF1(B
+$BMM$G$9!#(B@code{gnus-balloon-face-*} $BJQ?t$OJ8;zNs$+J8;zNs$rJV$94X?t$r;X$9(B
+$B%7%s%\%k$N$I$A$i$+$G$"$kI,MW$,$"$j$^$9!#%^%&%9$,%W%m%Q%F%#$N@_Dj$5$l$F$$(B
+$B$k%F%-%9%H$N>e$rDL2a$9$k$H!"%P%k!<%s%&%#%s%I%&$,8=$l$F!"J8;zNs$rI=<($7$^(B
+$B$9!#$3$l$N>\$7$$>pJs$O(B @ref{(emacs)Help Echo} (GNU Emacs) $B$^$?(B
+$B$O(B @code{balloon-help-mode} (XEmacs) $B$N@bL@J8;zNs$r;2>H$7$F$/$@$5$$!#(B
 
 $B$3$l$O%0%k!<%W%P%C%U%!$NBeBX<jK!$G$9(B:
 
