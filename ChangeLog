@@ -1,3 +1,9 @@
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Fix typos.
+
+	* texi/gnus.texi: Modify for Semi-gnus.
+
 1998-04-23  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Add "Auto Save".
