@@ -791,6 +791,7 @@ Browsing the Web
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B/$B5v2D$9$k(B
 * Expunging mailboxes::         ``$B%a!<%k%\%C%/%905=L(B'' $B%\%?%s$HEy2A$J$b$N(B
 * A note on namespaces::        gnus $B$G(B @acronym{IMAP} $BL>A06u4V$r;H$&(B($B;H$o$J$$(B)$BJ}K!(B
+* Debugging IMAP::              $B$b$N$4$H$,F/$+$J$$$H$-$K$9$k$Y$-$3$H(B
 
 Other Sources
 
@@ -15322,6 +15323,7 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B/$B5v2D$9$k(B
 * Expunging mailboxes::         ``$B%a!<%k%\%C%/%905=L(B'' $B%\%?%s$HEy2A$J$b$N(B
 * A note on namespaces::        gnus $B$G(B @acronym{IMAP} $BL>A06u4V$r;H$&(B($B;H$o$J$$(B)$BJ}K!(B
+* Debugging IMAP::              $B$b$N$4$H$,F/$+$J$$$H$-$K$9$k$Y$-$3$H(B
 @end menu
 
 @node Splitting in IMAP
@@ -15614,6 +15616,34 @@ ACL $B$O(B Access Control List ($B;HMQ@)8B0lMw(B) $B$NN,$G$9!#(B@acronym{I
 @code{#driver.*/} $B@\F,<-$K$D$$$F$N$5$i$J$k;H$$J}$N>pJs$O(B UoW IMAPD $B$NJ8(B
 $B=q$r8+$F2<$5$$!#$=$l$i$O6/NO$J9)6q$J$N$G!"$I$s$J8z2L$,$"$k$+$,3N$+$J>l9g(B
 $B$@$1;H$C$F2<$5$$!#(B
+
+@node Debugging IMAP
+@subsection IMAP $B$N%G%P%C%0(B
+@cindex IMAP debugging
+@cindex protocol dump (IMAP)
+
+@acronym{IMAP} $B$O>/$J$/$H$b(B @acronym{NNTP} $B$d(B @acronym{POP3} $B$HHf$Y$k$H(B
+$BJ#;($J%W%m%H%3%k$G$9!#$?$V$s$=$NM}M3$N$?$a$K!"<BAu>e$N%P%0$,L5$$$H$O8@$$(B
+$B@Z$l$^$;$s!#$"$J$?$,4qL/$J?6$kIq$$$K=P2q$C$?$H$7$?$i!"%5!<%P!<$+(B Gnus $B$N(B
+$B$I$A$i$+$K%P%0$,$"$k2DG=@-$,$"$j$^$9!#$"$J$?$,0lHLE*$J%M%C%H%o!<%/!&%W%m(B
+$B%H%3%k$K@:DL$7$F$$$k$J$i$P!"(BGnus $B$H%5!<%P!<$N4V$G$d$j$H$j$5$l$k%W%m%H%3(B
+$B%k!&%@%s%W$rFI$`$3$H$K$h$C$F!"$*$=$i$/$$$/$D$+$N<j3]$+$j$rCj=P$9$k$3$H$,(B
+$B$G$-$k$G$7$g$&!#@:DL$7$F$$$J$/$F$b!"%W%m%H%3%k$N$d$j$H$j$r(B IMAP $B$K4X$9$k(B
+$B%P%0Js9p$K4^$a$k$3$H$O!"$=$NLdBj$N2r7h$K$H$C$F=EMW$+$b$7$l$^$;$s!#(B
+
+@vindex imap-log
+$B$3$N%W%m%H%3%k!&%@%s%W$OBg$-$J%P%C%U%!$r:n$j$,$A$J$N$G!"%G%#%U%)%k%H$G$O(B
+$B:n$i$J$$$h$&$K$J$C$F$$$^$9!#:n$k$h$&$K$9$k$K$O!"(B@code{imap-log} $B$r0J2<$N(B
+$B$h$&$K@Z$j49$($F2<$5$$(B:
+
+@lisp
+(setq imap-log t)
+@end lisp
+
+$B$3$l$O(B @code{imap.el} $B%Q%C%1!<%8$K!"%5!<%P!<$KAw$i$l$k$b$N$H$9$Y$F$N<u$1(B
+$B<h$k$b$N$r%@%s%W$5$;$^$9!#$=$N=PNO$O(B @samp{*imap-log*} $B$H$$$&%P%C%U%!$K(B
+$B3JG<$5$l$^$9!#$H$-$K(B @code{BAD} $B$H$$$&;%$,IU$1$i$l$k!"%(%i!<%a%C%;!<%8$r(B
+$BC5$7$F2<$5$$!#(B
 
 @node Other Sources
 @section $B$=$NB>$N%0%k!<%W8;(B
