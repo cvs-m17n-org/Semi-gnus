@@ -1,3 +1,23 @@
+1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.5.
+
+1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+            Katsumi Yamaoka   <yamaoka@jpl.org>,
+            Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): If the number of
+	unread articles is more than `gnus-large-newsgroup', use it in
+	default instead of the maximum number.
+
+1999-02-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>,
+            Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-multipart): New function;
+	add it to the acting-condition for extracting mulitpart messages.
+	(gnus-mime-extract-message/rfc822): New function; add it to the
+	acting-condition for extracting message/rfc822 or message/news.
+
 1999-02-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* README-offline.ja: Change for current version.
