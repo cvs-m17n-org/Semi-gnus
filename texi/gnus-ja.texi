@@ -24928,6 +24928,12 @@ T-gnus $B$O(B @acronym{SEMI} $B$d(B @acronym{FLIM} $B$KMj$C$F$$$^$9!#$7$?$,
 @itemize @bullet
 
 @item
+$BNN0h$,3h@-2=$5$l$F$$$k>l9g!"(B
+@kbd{F} $B%-!<(B (@code{gnus-article-followup-with-original}) $B$*$h(B
+$B$S(B @kbd{R} $B%-!<(B (@code{gnus-article-reply-with-original}) $B$O!"$=$NNN0h$K(B
+$B$"$k%F%-%9%H$@$1$r(B yank $B$7$^$9!#(B
+
+@item
 @code{gnus-group-read-ephemeral-group} $B$r(B @kbd{G M} $B%-!<$GBPOCE*$K8F$V$3(B
 $B$H$,$G$-$^$9!#(B
 
