@@ -13045,7 +13045,35 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 $B$O%K%e!<%9%5!<%P!<$X$N@\B3$HHs>o$K;w$F$$$F!"$=$N%5!<%P!<$N%M%C%H%o!<%/%"(B
 $B%I%l%9$r;XDj$9$k$@$1$K$J$C$F$$$^$9!#(B
 
-$B0J2<$NJQ?t$O2>A[(B @code{nnimap} $B%5!<%P!<$r:n@.$9$k$?$a$K;H$&$3$,$G$-$^$9!#(B
+$B$$$/$D$+$N(B @sc{imap} $B%5!<%P!<$r(B @code{~/.gnus} $B$G@_Dj$9$k$H!"$?$V$s$3$N(B
+$B$h$&$J$b$N$K$J$k$G$7$g$&(B:
+
+@lisp
+(setq gnus-secondary-select-methods 
+      '((nnimap "simpleserver") ; $BIaDL$N@_Dj(B
+        ; SSH $B%]!<%H$r%U%)%o!<%I$7$?%5!<%P!<(B:
+        (nnimap "dolk"
+                (nnimap-address "localhost")
+                (nnimap-server-port 1430))
+        ; $B%m!<%+%k%[%9%H$G1?E>$7$F$$$k(B UW $B%5!<%P!<(B:
+        (nnimap "barbar"
+                (nnimap-server-port 143)
+                (nnimap-address "localhost")
+                (nnimap-list-pattern ("INBOX" "mail/*")))
+        ; $BF?L>$G;H$($k(B cyrus $B$N8x=0%5!<%P!<(B:
+        (nnimap "cyrus.andrew.cmu.edu"
+                (nnimap-authenticator anonymous)
+                (nnimap-list-pattern "archive.*")
+                (nnimap-stream network))
+        ; $BI8=`$G$O$J$$%]!<%H$N(B SSL $B%5!<%P!<(B:
+        (nnimap "vic20"
+                (nnimap-address "vic20.somewhere.com")
+                (nnimap-server-port 9930)
+                (nnimap-stream ssl))))
+@end lisp
+
+$B0J2<$NJQ?t$O2>A[(B @code{nnimap} $B%5!<%P!<$r:n@.$9$k$?$a$K;H$&$3$H$,$G$-$^(B
+$B$9!#(B
 
 @table @code
 

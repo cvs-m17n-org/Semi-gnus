@@ -4772,19 +4772,19 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (buffer-substring (match-end 0) (std11-field-end))
+		  (nnheader-header-value)
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
-	      (if (search-forward "\nfrom: " nil t)
-		  (buffer-substring (match-end 0) (std11-field-end))
+	      (if (search-forward "\nfrom:" nil t)
+		  (nnheader-header-value)
 		"(nobody)"))
 	    ;; Date.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\ndate: " nil t)
-		  (buffer-substring (match-end 0) (std11-field-end))
+		  (nnheader-header-value)
 		""))
 	    ;; Message-ID.
 	    (progn
@@ -4805,7 +4805,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		  (progn
 		    (setq end (point))
 		    (prog1
-			(buffer-substring (match-end 0) (std11-field-end))
+			(nnheader-header-value)
 		      (setq ref
 			    (buffer-substring
 			     (progn
@@ -4819,9 +4819,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		;; were no references and the in-reply-to header looks
 		;; promising.
 		(if (and (search-forward "\nin-reply-to: " nil t)
-			 (setq in-reply-to
-			       (buffer-substring (match-end 0)
-						 (std11-field-end)))
+			 (setq in-reply-to (nnheader-header-value))
 			 (string-match "<[^>]+>" in-reply-to))
 		    (let (ref2)
 		      (setq ref (substring in-reply-to (match-beginning 0)
@@ -4851,7 +4849,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (and (search-forward "\nxref: " nil t)
-		   (buffer-substring (match-end 0) (std11-field-end))))
+		   (nnheader-header-value)))
 	    ;; Extra.
 	    (when gnus-extra-headers
 	      (let ((extra gnus-extra-headers)
@@ -4860,16 +4858,12 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 		  (goto-char p)
 		  (when (search-forward
 			 (concat "\n" (symbol-name (car extra)) ": ") nil t)
-		    (push (cons (car extra)
-				(buffer-substring (match-end 0)
-						  (std11-field-end)))
-			  out))
+		    (push (cons (car extra) (nnheader-header-value)) out))
 		  (pop extra))
 		out))))
 	  (goto-char p)
 	  (if (and (search-forward "\ncontent-type: " nil t)
-		   (setq ctype
-			 (buffer-substring (match-end 0) (std11-field-end))))
+		   (setq ctype (nnheader-header-value)))
 	      (mime-entity-set-content-type-internal
 	       header (mime-parse-Content-Type ctype)))
 	  (when (equal id ref)

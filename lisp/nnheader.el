@@ -189,7 +189,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 ;; Parsing headers and NOV lines.
 
 (defsubst nnheader-header-value ()
-  (buffer-substring (match-end 0) (gnus-point-at-eol)))
+  (buffer-substring (match-end 0) (std11-field-end)))
 
 (defun nnheader-parse-head (&optional naked)
   (let ((case-fold-search t)
@@ -231,7 +231,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; From.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nfrom: " nil t)
+	     (if (search-forward "\nfrom:" nil t)
 		 (nnheader-header-value) "(nobody)"))
 	   ;; Date.
 	   (progn
