@@ -96,20 +96,23 @@
 		 window-pixel-height window-pixel-width)))
 
 ;; T-gnus.
-(if (featurep 'xemacs)
-    (progn
-      (maybe-fbind '(propertize))
-      (maybe-bind '(mh-lib-progs)))
-  ;; FSFmacs
-  (maybe-fbind '(charsetp
-		 function-max-args propertize smiley-encode-buffer))
-  (if (boundp 'MULE)
-      (progn
-	(maybe-fbind '(coding-system-get
-		       compose-mail
-		       file-name-extension find-coding-systems-region
-		       get-charset-property shell-command-to-string))
-	(maybe-bind '(mh-lib-progs)))))
+(let ((functions-variables
+       (cond
+	((featurep 'xemacs)
+	 '((propertize xml-parse-region)))
+	((>= emacs-major-version 21)
+	 '((function-max-args smiley-encode-buffer)))
+	((boundp 'MULE)
+	 '((charsetp
+	    coding-system-get compose-mail file-name-extension
+	    find-coding-systems-region function-max-args get-charset-property
+	    propertize shell-command-to-string smiley-encode-buffer
+	    xml-parse-region)))
+	(t
+	 '((function-max-args
+	    propertize smiley-encode-buffer xml-parse-region))))))
+  (maybe-fbind (car functions-variables))
+  (maybe-bind (car (cdr functions-variables))))
 
 (defun nnkiboze-score-file (a)
   )
