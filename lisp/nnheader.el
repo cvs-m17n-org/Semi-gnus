@@ -231,7 +231,8 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; From.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nfrom:" nil t)
+	     (if (or (search-forward "\nfrom: " nil t)
+		     (search-forward "\nfrom:" nil t))
 		 (nnheader-header-value) "(nobody)"))
 	   ;; Date.
 	   (progn
