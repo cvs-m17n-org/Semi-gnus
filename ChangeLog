@@ -1,3 +1,10 @@
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Don't
+	`save-excursion'.
+	(gnus-article-prepare): Use `mime-fetch-field' instead of
+	`mime-entity-fetch-field'.
+
 1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-display-mime-message): Use
