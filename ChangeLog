@@ -1,3 +1,8 @@
+2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Protect
+	against unexpected data structure.
+
 2002-10-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.

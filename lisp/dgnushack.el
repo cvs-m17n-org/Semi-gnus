@@ -347,7 +347,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 				     (error nil)))
 		   (when (listp form)
 		     (while form
-		       (setq elem (pop form))
+		       (setq elem (car-safe form)
+			     form (cdr-safe form))
 		       (unless (memq (car-safe elem)
 				     '(defcustom defface defgroup
 				       define-widget quote))
