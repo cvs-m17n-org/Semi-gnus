@@ -504,7 +504,7 @@ with some simple extensions.
   :group 'gnus-threading
   :type 'string)
 
-(defcustom gnus-summary-mode-line-format "Gnus: %g [%A] %Z"
+(defcustom gnus-summary-mode-line-format "Gnus: %%b [%A] %Z"
   "*The format specification for the summary mode line.
 It works along the same lines as a normal formatting string,
 with some simple extensions:
@@ -663,7 +663,18 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-parse-headers-hook nil
+(defcustom gnus-structured-field-decoder 'identity
+  "Function to decode non-ASCII characters in structured field for summary."
+  :group 'gnus-various
+  :type 'function)
+
+(defcustom gnus-unstructured-field-decoder 'identity
+  "Function to decode non-ASCII characters in unstructured field for summary."
+  :group 'gnus-various
+  :type 'function)
+
+(defcustom gnus-parse-headers-hook
+  (list 'gnus-hack-decode-rfc1522 'gnus-decode-rfc1522)
   "*A hook called before parsing the headers."
   :group 'gnus-various
   :type 'hook)
@@ -1384,10 +1395,6 @@ increase the score of each group you read."
     "c" gnus-article-highlight-citation
     "s" gnus-article-highlight-signature)
 
-  (gnus-define-keys (gnus-summary-wash-mime-map "M" gnus-summary-wash-map)
-    "w" gnus-article-decode-mime-words
-    "c" gnus-article-decode-charset)
-
   (gnus-define-keys (gnus-summary-wash-time-map "T" gnus-summary-wash-map)
     "z" gnus-article-date-ut
     "u" gnus-article-date-ut
@@ -1487,10 +1494,6 @@ increase the score of each group you read."
               ["Headers" gnus-article-highlight-headers t]
               ["Signature" gnus-article-highlight-signature t]
               ["Citation" gnus-article-highlight-citation t])
-	     ("MIME"
-	      ["Words" gnus-article-decode-mime-words t]
-	      ["Charset" gnus-article-decode-charset t]
-	      ["QP" gnus-article-de-quoted-unreadable t])
              ("Date"
               ["Local" gnus-article-date-local t]
               ["ISO8601" gnus-article-date-iso8601 t]
@@ -1883,7 +1886,6 @@ The following commands are available:
   (make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
-  (mm-enable-multibyte)
   (gnus-update-format-specifications nil 'summary 'summary-mode 'summary-dummy)
   (gnus-update-summary-mark-positions))
 
@@ -3061,8 +3063,10 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (rfc2047-decode-string (gnus-nov-field)) ; subject
-		 (rfc2047-decode-string (gnus-nov-field)) ; from
+		 (funcall
+		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
+		 (funcall
+		  gnus-structured-field-decoder (gnus-nov-field)) ; from
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -3485,7 +3489,7 @@ If LINE, insert the rebuilt thread starting on line LINE."
 
 (defsubst gnus-article-sort-by-date (h1 h2)
   "Sort articles by root article date."
-  (time-less-p
+  (gnus-time-less
    (gnus-date-get-time (mail-header-date h1))
    (gnus-date-get-time (mail-header-date h2))))
 
@@ -4205,7 +4209,7 @@ If WHERE is `summary', the summary mode line format will be used."
 	  ;; We might have to chop a bit of the string off...
 	  (when (> (length mode-string) max-len)
 	    (setq mode-string
-		  (concat (truncate-string mode-string (- max-len 3))
+		  (concat (gnus-truncate-string mode-string (- max-len 3))
 			  "...")))
 	  ;; Pad the mode string a bit.
 	  (setq mode-string (format (format "%%-%ds" max-len) mode-string))))
@@ -4405,13 +4409,15 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (rfc2047-decode-string (nnheader-header-value))
+		  (funcall
+		   gnus-unstructured-field-decoder (nnheader-header-value))
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (rfc2047-decode-string (nnheader-header-value))
+		  (funcall
+		   gnus-structured-field-decoder (nnheader-header-value))
 		"(nobody)"))
 	    ;; Date.
 	    (progn
@@ -4531,10 +4537,9 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 				     number dependencies force-new))))
 		   (push header headers))
 	      (forward-line 1))
-	  ;(error
-	  ; (gnus-error 4 "Strange nov line (%d)"
-	;	       (count-lines (point-min) (point))))
-	  )
+	  (error
+	   (gnus-error 4 "Strange nov line (%d)"
+		       (count-lines (point-min) (point)))))
 	(forward-line 1))
       ;; A common bug in inn is that if you have posted an article and
       ;; then retrieves the active file, it will answer correctly --
@@ -5931,13 +5936,13 @@ articles that are younger than AGE days."
   (interactive "nTime in days: \nP")
   (prog1
       (let ((data gnus-newsgroup-data)
-	    (cutoff (days-to-time age))
+	    (cutoff (nnmail-days-to-time age))
 	    articles d date is-younger)
 	(while (setq d (pop data))
 	  (when (and (vectorp (gnus-data-header d))
 		     (setq date (mail-header-date (gnus-data-header d))))
-	    (setq is-younger (time-less-p
-			      (time-since (date-to-time date))
+	    (setq is-younger (nnmail-time-less
+			      (nnmail-time-since (nnmail-date-to-time date))
 			      cutoff))
 	    (when (if younger-p
 		      is-younger
@@ -6510,7 +6515,7 @@ Obeys the standard process/prefix convention."
       (gnus-summary-remove-process-mark article)
       (when (gnus-summary-display-article article)
 	(save-excursion
-	  (with-temp-buffer
+	  (nnheader-temp-write nil
 	    (insert-buffer-substring gnus-original-article-buffer)
 	    ;; Remove some headers that may lead nndoc to make
 	    ;; the wrong guess.
@@ -7161,7 +7166,10 @@ latter case, they will be copied into the relevant groups."
 	      lines (count-lines (point-min) (point-max)))
 	(insert "From: " (read-string "From: ") "\n"
 		"Subject: " (read-string "Subject: ") "\n"
-		"Date: " (message-make-date (nth 5 atts))
+		"Date: " (timezone-make-date-arpa-standard
+			  (current-time-string (nth 5 atts))
+			  (current-time-zone now)
+			  (current-time-zone now))
 		"\n"
 		"Message-ID: " (message-make-message-id) "\n"
 		"Lines: " (int-to-string lines) "\n"
@@ -7312,7 +7320,7 @@ groups."
   (interactive)
   ;; Replace the article.
   (let ((buf (current-buffer)))
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert-buffer buf)
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
@@ -7330,7 +7338,7 @@ groups."
 		(message-narrow-to-head)
 		(let ((head (buffer-string))
 		      header)
-		  (with-temp-buffer
+		  (nnheader-temp-write nil
 		    (insert (format "211 %d Article retrieved.\n"
 				    (cdr gnus-article-current)))
 		    (insert head)
@@ -8150,7 +8158,7 @@ is non-nil or the Subject: of both articles are the same."
 	  (gnus-summary-select-article t t nil current-article))
 	(set-buffer gnus-original-article-buffer)
 	(let ((buf (format "%s" (buffer-string))))
-	  (with-temp-buffer
+	  (nnheader-temp-write nil
 	    (insert buf)
 	    (goto-char (point-min))
 	    (if (re-search-forward "^References: " nil t)
@@ -8493,7 +8501,7 @@ If N is a negative number, save the N previous articles.
 If N is nil and any articles have been marked with the process mark,
 save those articles instead."
   (interactive "P")
-  (let ((gnus-default-article-saver 'rmail-output-to-rmail-file))
+  (let ((gnus-default-article-saver 'gnus-summary-save-in-rmail))
     (gnus-summary-save-article arg)))
 
 (defun gnus-summary-save-article-file (&optional arg)

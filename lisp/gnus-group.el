@@ -35,7 +35,6 @@
 (require 'gnus-range)
 (require 'gnus-win)
 (require 'gnus-undo)
-(require 'time-date)
 
 (defcustom gnus-group-archive-directory
   "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
@@ -2156,7 +2155,7 @@ score file entries for articles to include in the group."
 	(push (cons header regexps) scores))
       scores)))
   (gnus-group-make-group group "nnkiboze" address)
-  (with-temp-file (gnus-score-file-name (concat "nnkiboze:" group))
+  (nnheader-temp-write (gnus-score-file-name (concat "nnkiboze:" group))
     (let (emacs-lisp-mode-hook)
       (pp scores (current-buffer)))))
 
@@ -2301,52 +2300,46 @@ If REVERSE, sort in reverse order."
     ;; Go through all the infos and replace the old entries
     ;; with the new infos.
     (while infos
-      (setcar (car entries) (pop infos))
+      (setcar entries (pop infos))
       (pop entries))
     ;; Update the hashtable.
     (gnus-make-hashtable-from-newsrc-alist)))
 
-(defun gnus-group-sort-selected-groups-by-alphabet (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-alphabet (&optional reverse)
   "Sort the group buffer alphabetically by group name.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-alphabet reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-alphabet reverse))
 
-(defun gnus-group-sort-selected-groups-by-unread (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-unread (&optional reverse)
   "Sort the group buffer by number of unread articles.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-unread reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-unread reverse))
 
-(defun gnus-group-sort-selected-groups-by-level (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-level (&optional reverse)
   "Sort the group buffer by group level.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-level reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-level reverse))
 
-(defun gnus-group-sort-selected-groups-by-score (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-score (&optional reverse)
   "Sort the group buffer by group score.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-score reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-score reverse))
 
-(defun gnus-group-sort-selected-groups-by-rank (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-rank (&optional reverse)
   "Sort the group buffer by group rank.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-rank reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-rank reverse))
 
-(defun gnus-group-sort-selected-groups-by-method (&optional n reverse)
+(defun gnus-group-sort-selected-groups-by-method (&optional reverse)
   "Sort the group buffer alphabetically by backend name.
-Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
-sort in reverse order."
-  (interactive (gnus-interactive "P\ny"))
-  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-method reverse))
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-selected-groups 'gnus-group-sort-by-method reverse))
 
 ;;; Sorting predicates.
 
@@ -2947,9 +2940,8 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	     (gnus-get-info group) (gnus-active group) t)
 	    (unless (gnus-virtual-group-p group)
 	      (gnus-close-group group))
-	    (when gnus-agent
-	      (gnus-agent-save-group-info
-	       method (gnus-group-real-name group) (gnus-active group)))
+	    (gnus-agent-save-group-info
+	     method (gnus-group-real-name group) (gnus-active group))
 	    (gnus-group-update-group group))
 	(if (eq (gnus-server-status (gnus-find-method-for-group group))
 		'denied)
@@ -3381,7 +3373,7 @@ or `gnus-group-catchup-group-hook'."
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."
   (let* ((time (or (gnus-group-timestamp group)
 		  (list 0 0)))
-         (delta (subtract-time (current-time) time)))
+         (delta (gnus-time-minus (current-time) time)))
     (+ (* (nth 0 delta) 65536.0)
        (nth 1 delta))))
 

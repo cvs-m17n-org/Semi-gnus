@@ -41,8 +41,6 @@ automatically."
 		 directory)
   :group 'gnus-xmas)
 
-;;(format "%02x%02x%02x" 114 66 20) "724214"
-
 (defvar gnus-xmas-logo-color-alist
   '((flame "#cc3300" "#ff2200")
     (pine "#c0cc93" "#f8ffb8")
@@ -54,18 +52,16 @@ automatically."
     (grape "#b264cc" "#cf7df")
     (labia "#cc64c2" "#fd7dff")
     (berry "#cc6485" "#ff7db5")
-    (dino "#724214" "#1e3f03")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
-(defcustom gnus-xmas-logo-color-style 'dino
+(defcustom gnus-xmas-logo-color-style 'moss
   "*Color styles used for the Gnus logo."
   :type '(choice (const flame) (const pine) (const moss)
 		 (const irish) (const sky) (const tin)
 		 (const velvet) (const grape) (const labia)
-		 (const berry) (const neutral) (const september)
-		 (const dino))
+		 (const berry) (const neutral) (const september))
   :group 'gnus-xmas)
 
 (defvar gnus-xmas-logo-colors
@@ -398,6 +394,24 @@ call it with the value of the `gnus-data' text property."
 	       (event-to-character event))
 	  event)))
 
+(defun gnus-xmas-seconds-since-epoch (date)
+  "Return a floating point number that says how many seconds have lapsed between Jan 1 12:00:00 1970 and DATE."
+  (let* ((tdate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date date)))
+	 (ttime (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-time
+			 (aref (timezone-parse-date date) 3))))
+	 (edate (mapcar (lambda (ti) (and ti (string-to-int ti)))
+			(timezone-parse-date "Jan 1 12:00:00 1970")))
+	 (tday (- (timezone-absolute-from-gregorian
+		   (nth 1 tdate) (nth 2 tdate) (nth 0 tdate))
+		  (timezone-absolute-from-gregorian
+		   (nth 1 edate) (nth 2 edate) (nth 0 edate)))))
+    (+ (nth 2 ttime)
+       (* (nth 1 ttime) 60)
+       (* (float (nth 0 ttime)) 60 60)
+       (* (float tday) 60 60 24))))
+
 (defun gnus-xmas-define ()
   (setq gnus-mouse-2 [button2])
 
@@ -441,6 +455,16 @@ call it with the value of the `gnus-data' text property."
     (setq standard-display-table nil))
 
   (defvar gnus-mouse-face-prop 'highlight)
+
+  (unless (fboundp 'encode-time)
+    (defun encode-time (sec minute hour day month year &optional zone)
+      (let ((seconds
+	     (gnus-xmas-seconds-since-epoch
+	      (timezone-make-arpa-date
+	       year month day (timezone-make-time-string hour minute sec)
+	       zone))))
+	(list (floor (/ seconds (expt 2 16)))
+	      (round (mod seconds (expt 2 16)))))))
 
   (defun gnus-byte-code (func)
     "Return a form that can be `eval'ed based on FUNC."

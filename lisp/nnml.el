@@ -249,8 +249,9 @@ all.  This may very well take some time.")
 (deffoo nnml-request-list (&optional server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (pathname-coding-system 'binary)) 
-      (nnmail-find-file nnml-active-file))
+	  (pathname-coding-system 'binary)) ; for XEmacs/mule
+      (nnmail-find-file nnml-active-file)
+      )
     (setq nnml-group-alist (nnmail-get-active))
     t))
 
@@ -468,7 +469,7 @@ all.  This may very well take some time.")
      ((not (file-exists-p file))
       (nnheader-report 'nnml "File %s does not exist" file))
      (t
-      (with-temp-file file
+      (nnheader-temp-write file
 	(nnheader-insert-file-contents file)
 	(nnmail-replace-status name value))
       t))))

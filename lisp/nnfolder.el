@@ -511,20 +511,17 @@ Returns t if successful, nil otherwise."
   "Delete the message that point is in.
 If optional argument LEAVE-DELIM is t, then mailbox delimiter is not
 deleted.  Point is left where the deleted region was."
-  (save-restriction
-    (narrow-to-region
-     (save-excursion
-       (forward-line 1)			; in case point is at beginning of message already
-       (nnmail-search-unix-mail-delim-backward)
-       (if leave-delim (progn (forward-line 1) (point))
-	 (point)))
-     (progn
-       (forward-line 1)
-       (if (nnmail-search-unix-mail-delim)
-	   (point)
-	 (point-max))))
-    (run-hooks 'nnfolder-delete-mail-hook)
-    (delete-region (point-min) (point-max))))
+  (delete-region
+   (save-excursion
+     (forward-line 1) ; in case point is at beginning of message already
+     (nnmail-search-unix-mail-delim-backward)
+     (if leave-delim (progn (forward-line 1) (point))
+       (point)))
+   (progn
+     (forward-line 1)
+     (if (nnmail-search-unix-mail-delim)
+	 (point)
+       (point-max)))))
 
 (defun nnfolder-possibly-change-group (group &optional server dont-check)
   ;; Change servers.
@@ -800,8 +797,7 @@ deleted.  Point is left where the deleted region was."
 
 (defun nnfolder-group-pathname (group)
   "Make pathname for GROUP."
-  (setq group
-	(nnheader-encode-coding-string group nnmail-pathname-coding-system))
+  (setq group (gnus-encode-coding-string group nnmail-pathname-coding-system))
   (let ((dir (file-name-as-directory (expand-file-name nnfolder-directory))))
     ;; If this file exists, we use it directly.
     (if (or nnmail-use-long-file-names

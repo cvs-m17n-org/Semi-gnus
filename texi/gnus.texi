@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Pterodactyl Gnus 0.17 Manual
+@settitle Gnus 5.6.43 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Pterodactyl Gnus 0.17 Manual
+@title Gnus 5.6.43 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -354,7 +354,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Pterodactyl Gnus 0.17.
+This manual corresponds to Gnus 5.6.43.
 
 @end ifinfo
 
@@ -2120,11 +2120,6 @@ are arbitrary comments on the group.  They are currently ignored by
 Gnus, but provide a place for you to store information on particular
 groups.
 
-@item charset
-Elements that look like @code{(charset . iso-8859-1)} will make
-@code{iso-8859-1} the default charset; that is, the charset that will be 
-used for all articles that do not specify a charset.
-
 @item @var{(variable form)}
 You can use the group parameters to set variables local to the group you
 are entering.  If you want to turn threading off in @samp{news.answers},
@@ -2340,11 +2335,7 @@ Sort the group buffer alphabetically by backend name
 
 @end table
 
-All the commands below obeys the process/prefix convention
-(@pxref{Process/Prefix}).
-
-When given a symbolic prefix (@pxref{Symbolic Prefixes}), all these
-commands will sort in reverse order.  
+When given a prefix, all these commands will sort in reverse order.
 
 You can also sort a subset of the groups:
 
@@ -2352,38 +2343,38 @@ You can also sort a subset of the groups:
 @item G P a
 @kindex G P a (Group)
 @findex gnus-group-sort-selected-groups-by-alphabet
-Sort the groups alphabetically by group name
-(@code{gnus-group-sort-selected-groups-by-alphabet}).
+Sort the process/prefixed groups in the group buffer alphabetically by
+group name (@code{gnus-group-sort-selected-groups-by-alphabet}).
 
 @item G P u
 @kindex G P u (Group)
 @findex gnus-group-sort-selected-groups-by-unread
-Sort the groups by the number of unread articles
-(@code{gnus-group-sort-selected-groups-by-unread}).
+Sort the process/prefixed groups in the group buffer by the number of
+unread articles (@code{gnus-group-sort-selected-groups-by-unread}).
 
 @item G P l
 @kindex G P l (Group)
 @findex gnus-group-sort-selected-groups-by-level
-Sort the groups by group level
+Sort the process/prefixed groups in the group buffer by group level
 (@code{gnus-group-sort-selected-groups-by-level}).
 
 @item G P v
 @kindex G P v (Group)
 @findex gnus-group-sort-selected-groups-by-score
-Sort the groups by group score
+Sort the process/prefixed groups in the group buffer by group score
 (@code{gnus-group-sort-selected-groups-by-score}).  @xref{Group Score}.
 
 @item G P r
 @kindex G P r (Group)
 @findex gnus-group-sort-selected-groups-by-rank
-Sort the groups by group rank
+Sort the process/prefixed groups in the group buffer by group rank
 (@code{gnus-group-sort-selected-groups-by-rank}).  @xref{Group Score}.
 
 @item G P m
 @kindex G P m (Group)
 @findex gnus-group-sort-selected-groups-by-method
-Sort the groups alphabetically by backend name
-(@code{gnus-group-sort-selected-groups-by-method}).
+Sort the process/prefixed groups in the group buffer alphabetically by
+backend name (@code{gnus-group-sort-selected-groups-by-method}).
 
 @end table
 
@@ -3202,7 +3193,6 @@ You can have as many summary buffers open as you wish.
 * Saving Articles::             Ways of customizing article saving.
 * Decoding Articles::           Gnus can treat series of (uu)encoded articles.
 * Article Treatment::           The article buffer can be mangled at will.
-* MIME Commands::               Doing MIMEy things with the articles.
 * Article Commands::            Doing various things with the article buffer.
 * Summary Sorting::             Sorting the summary buffer in various ways.
 * Finding the Parent::          No child support? Get the parent.
@@ -4924,7 +4914,10 @@ The default is 4.
 
 @item gnus-parse-headers-hook
 @vindex gnus-parse-headers-hook
-Hook run before parsing any headers.
+Hook run before parsing any headers.  The default value is
+@code{(gnus-decode-rfc1522)}, which means that QPized headers will be
+slightly decoded in a hackish way.  This is likely to change in the
+future when Gnus becomes @sc{MIME}ified.
 
 @item gnus-alter-header-function
 @vindex gnus-alter-header-function
@@ -6296,22 +6289,7 @@ Signature}.
 @vindex gnus-article-hide-pgp-hook
 Hide @sc{pgp} signatures (@code{gnus-article-hide-pgp}).  The
 @code{gnus-article-hide-pgp-hook} hook will be run after a @sc{pgp}
-signature has been hidden.  For example, to automatically verify
-articles that have signatures in them do:
-@lisp
-;;; Hide pgp cruft if any.
-
-(add-hook 'gnus-article-display-hook 'gnus-article-hide-pgp)
-
-;;; After hiding pgp, verify the message;
-;;; only happens if pgp signature is found.
-
-(add-hook 'gnus-article-hide-pgp-hook
-          (lambda ()
-            (save-excursion
-              (set-buffer gnus-original-article-buffer)
-              (mc-verify))))
-@end lisp
+signature has been hidden.
 
 @item W W P
 @kindex W W P (Summary)
@@ -6779,31 +6757,6 @@ This means that if there are more than 200 lines after the signature
 separator, or the text after the signature separator is matched by
 the regular expression @samp{^---*Forwarded article}, then it isn't a
 signature after all.
-
-
-@node MIME Commands
-@section MIME Commands
-@cindex MIME decoding
-
-@table @kbd
-@item W M w
-@kindex W M w (Summary)
-Decode RFC2047-encoded words in the article headers
-(@code{gnus-article-decode-mime-words}).
-
-@item W M c
-@kindex W M c (Summary)
-Decode encoded article bodies as well as charsets
-(@code{gnus-article-decode-charset}).
-
-This command looks in the @code{Content-Type} header to determine the
-charset.  If there is no such header in the article, you can give it a
-prefix, which will prompt for the charset to decode as.  In regional
-groups where people post using some common encoding (but do not include
-MIME headers), you can set the @code{charset} group/topic parameter to
-the required charset (@pxref{Group Parameters}).
-
-@end table
 
 
 @node Article Commands
@@ -7368,11 +7321,6 @@ have been set.
 It is called after the summary buffer has been generated.  You might use
 it to, for instance, highlight lines or modify the look of the buffer in
 some other ungodly manner.  I don't care.
-
-@vindex gnus-summary-prepared-hook
-@item gnus-summary-prepared-hook
-A hook called as the very last thing after the summary buffer has been
-generated.
 
 @vindex gnus-summary-ignore-duplicates
 @item gnus-summary-ignore-duplicates
@@ -10470,12 +10418,6 @@ your @file{.emacs} file:
 
 (add-hook 'nnfolder-save-buffer-hook 'turn-off-backup)
 @end lisp
-
-@item nnfolder-delete-mail-hook
-@vindex nnfolder-delete-mail-hook
-Hook run in a buffer narrowed to the message that is to be deleted.
-This function can be used to copy the message to somewhere else, or to
-extract some information from it before removing it.  
 
 @end table
 
@@ -14410,8 +14352,7 @@ Do highlights in the group buffer.
 @item summary-highlight
 Do highlights in the summary buffer.
 @item article-highlight
-Do highlights according to @code{gnus-article-display-hook} in the
-article buffer.
+Do highlights in the article buffer.
 @item highlight
 Turn on highlighting in all buffers.
 @item group-menu
@@ -15713,8 +15654,8 @@ We do have some breaches to this one.
 @table @emph
 
 @item MIME
-Gnus does not yet fully handle MIME, and this standard-to-be seems to
-think that MIME is the bees' knees, so we have major breakage here.
+Gnus does no MIME handling, and this standard-to-be seems to think that
+MIME is the bees' knees, so we have major breakage here.
 
 @item X-Newsreader
 This is considered to be a ``vanity header'', while I consider it to be
@@ -15723,13 +15664,6 @@ coming from @code{tin} and @code{Netscape} I know not to use either of
 those for posting articles.  I would not have known that if it wasn't
 for the @code{X-Newsreader} header.
 @end table
-
-@item USEFOR
-@cindex USEFOR
-USEFOR is an IETF working group writing a successor to RFC 1036, based
-on Son-of-RFC 1036.  They have produced a number of drafts proposing
-various changes to the format of news articles.  The Gnus towers will
-look into implementing the changes when the draft is accepted as an RFC.
 
 @end table
 
@@ -15750,10 +15684,13 @@ Gnus should work on :
 @itemize @bullet
 
 @item
-Emacs 20.2 and up.
+Emacs 19.32 and up.
 
 @item
-XEmacs 20.4 and up.
+XEmacs 19.14 and up.
+
+@item
+Mule versions based on Emacs 19.32 and up.
 
 @end itemize
 

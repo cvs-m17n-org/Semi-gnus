@@ -250,10 +250,10 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.17"
+(defconst gnus-version-number "5.6.43"
   "Version number for this version of Gnus.")
 
-(defconst gnus-version (format "Pterodactyl Gnus v%s" gnus-version-number)
+(defconst gnus-version (format "Gnus v%s" gnus-version-number)
   "Version string for this version of Gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -637,13 +637,13 @@ be set in `.emacs' instead."
 (defface gnus-splash-face
   '((((class color)
       (background dark))
-     (:foreground "Brown"))
+     (:foreground "ForestGreen"))
     (((class color)
       (background light))
-     (:foreground "Brown"))
+     (:foreground "ForestGreen"))
     (t
      ()))
-  "Face of the splash screen.")
+  "Level 1 newsgroup face.")
 
 (defun gnus-splash ()
   (save-excursion
@@ -1346,16 +1346,12 @@ face."
 (defcustom gnus-article-display-hook
   (if (and (string-match "XEmacs" emacs-version)
 	   (featurep 'xface))
-      '(gnus-article-decode-charset
-	gnus-article-decode-rfc1522
-	gnus-article-hide-headers-if-wanted
+      '(gnus-article-hide-headers-if-wanted
 	gnus-article-hide-boring-headers
 	gnus-article-treat-overstrike
 	gnus-article-maybe-highlight
 	gnus-article-display-x-face)
-    '(gnus-article-decode-charset
-      gnus-article-decode-rfc1522
-      gnus-article-hide-headers-if-wanted
+    '(gnus-article-hide-headers-if-wanted
       gnus-article-hide-boring-headers
       gnus-article-treat-overstrike
       gnus-article-maybe-highlight))
@@ -1412,7 +1408,6 @@ want."
 
 ;;; Internal variables
 
-(defvar gnus-agent-meta-information-header "X-Gnus-Agent-Meta-Information")
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
 (defvar gnus-original-article-buffer " *Original Article*")
 (defvar gnus-newsgroup-name nil)
@@ -1574,19 +1569,20 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	  (cdr package)))))
    '(("metamail" metamail-buffer)
      ("info" Info-goto-node)
+     ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
-     ("qp" quoted-printable-decode-region quoted-printable-decode-string)
-     ("rfc2047" rfc2047-decode-region rfc2047-decode-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
-     ("nnmail" nnmail-split-fancy nnmail-article-group)
+     ("nnmail" nnmail-split-fancy nnmail-article-group nnmail-date-to-time)
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
+     ("timezone" timezone-make-date-arpa-standard timezone-fix-time
+      timezone-make-sortable-date timezone-make-time-string)
      ("rmailout" rmail-output)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message rmail-output-to-rmail-file)
+      rmail-show-message)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t
@@ -1701,7 +1697,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face gnus-article-de-quoted-unreadable
-      gnus-article-hide-pgp
+      gnus-article-mime-decode-quoted-printable gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
@@ -2004,13 +2000,14 @@ If ARG, insert string at point."
       (string-to-number
        (if (zerop major)
 	   (format "%s00%02d%02d"
-		   (if (member alpha '("(ding)" "d"))
-		       "4.99"
-		     (+ 5 (* 0.02
-			     (abs
-			      (- (mm-char-int (aref (downcase alpha) 0))
-				 (mm-char-int ?t))))
-			-0.01))
+		   (cond
+		    ((member alpha '("(ding)" "d")) "4.99")
+		    ((member alpha '("September" "s")) "5.01")
+		    ((member alpha '("Red" "r")) "5.03")
+		    ((member alpha '("Quassia" "q")) "5.05")
+		    ((member alpha '("p")) "5.07")
+		    ((member alpha '("o")) "5.09")
+		    ((member alpha '("n")) "5.11"))
 		   minor least)
 	 (format "%d.%02d%02d" major minor least))))))
 

@@ -33,13 +33,12 @@
 
 (require 'mailheader)
 (require 'nnheader)
+(require 'timezone)
 (require 'easymenu)
 (require 'custom)
 (if (string-match "XEmacs\\|Lucid" emacs-version)
     (require 'mail-abbrevs)
   (require 'mailabbrev))
-(require 'rfc2047)
-(require 'mm-bodies)
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -849,7 +848,6 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 ;;; Internal variables.
 
-(defvar message-default-charset nil)
 (defvar message-buffer-list nil)
 (defvar message-this-is-news nil)
 (defvar message-this-is-mail nil)
@@ -950,6 +948,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-point-at-bol "gnus-util")
   (autoload 'gnus-output-to-mail "gnus-util")
+  (autoload 'gnus-output-to-rmail "gnus-util")
   (autoload 'mail-abbrev-in-expansion-header-p "mailabbrev")
   (autoload 'nndraft-request-associate-buffer "nndraft")
   (autoload 'nndraft-request-expire-articles "nndraft")
@@ -1012,7 +1011,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (when (and (file-exists-p file)
 	     (file-readable-p file)
 	     (file-regular-p file))
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (nnheader-insert-file-contents file)
       (goto-char (point-min))
       (looking-at message-unix-mail-delimiter))))
@@ -1023,20 +1022,6 @@ The cdr of ech entry is a function for applying the face to a region.")
 	 (value (mail-fetch-field header nil (not not-all))))
     (when value
       (nnheader-replace-chars-in-string value ?\n ? ))))
-
-(defun message-narrow-to-field ()
-  "Narrow the buffer to the header on the current line."
-  (beginning-of-line)
-  (narrow-to-region
-   (point)
-   (progn
-     (forward-line 1)
-     (if (re-search-forward "^[^ \n\t]" nil t)
-	 (progn
-	   (beginning-of-line)
-	   (point))
-       (point-max))))
-  (goto-char (point-min)))
 
 (defun message-add-header (&rest headers)
   "Add the HEADERS to the message header, skipping those already present."
@@ -1066,7 +1051,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 	(erase-buffer))
     (set-buffer (get-buffer-create " *message work*"))
     (kill-all-local-variables)
-    (mm-enable-multibyte)))
+    (buffer-disable-undo (current-buffer))))
 
 (defun message-functionp (form)
   "Return non-nil if FORM is funcallable."
@@ -1126,8 +1111,7 @@ Return the number of headers removed."
   (goto-char (point-min)))
 
 (defun message-narrow-to-head ()
-  "Narrow the buffer to the head of the message.
-Point is left at the beginning of the narrowed-to region."
+  "Narrow the buffer to the head of the message."
   (widen)
   (narrow-to-region
    (goto-char (point-min))
@@ -1385,7 +1369,6 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
-  (mm-enable-multibyte)
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -1621,10 +1604,9 @@ text was killed."
     ;; Then we translate the region.  Do it this way to retain
     ;; text properties.
     (while (< b e)
-      (when (< (char-after b) 255)
-	(subst-char-in-region
-	 b (1+ b) (char-after b)
-	 (aref message-caesar-translation-table (char-after b))))
+      (subst-char-in-region
+       b (1+ b) (char-after b)
+       (aref message-caesar-translation-table (char-after b)))
       (incf b))))
 
 (defun message-make-caesar-translation-table (n)
@@ -2021,10 +2003,8 @@ the user from the mailer."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
-      (rfc2047-encode-message-header)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
-    (message-encode-message-body)
     (unwind-protect
 	(save-excursion
 	  (set-buffer tembuf)
@@ -2193,10 +2173,8 @@ to find out how to use this."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
-      (rfc2047-encode-message-header)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
-    (message-encode-message-body)
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	(progn
@@ -2490,7 +2468,7 @@ to find out how to use this."
 	   (y-or-n-p "Empty article.  Really post? "))))
    ;; Check for control characters.
    (message-check 'control-chars
-     (if (re-search-forward "[\000-\007\013\015-\032\034-\037\200-\237]" nil t)
+     (if (re-search-forward "[\000-\007\013\015-\037\200-\237]" nil t)
 	 (y-or-n-p
 	  "The article contains control characters.  Really post? ")
        t))
@@ -2579,7 +2557,7 @@ to find out how to use this."
   "Append this article to Unix/babyl mail file.."
   (if (and (file-readable-p filename)
 	   (mail-file-babyl-p filename))
-      (rmail-output-to-rmail-file filename t)
+      (gnus-output-to-rmail filename t)
     (gnus-output-to-mail filename t)))
 
 (defun message-cleanup-headers ()
@@ -2614,10 +2592,11 @@ to find out how to use this."
 	(when (re-search-forward ",+$" nil t)
 	  (replace-match "" t t))))))
 
-(defun message-make-date (&optional now)
-  "Make a valid data header.
-If NOW, use that time instead."
-  (format-time-string "%d %b %Y %H:%M:%S %z" (or now (current-time))))
+(defun message-make-date ()
+  "Make a valid data header."
+  (let ((now (current-time)))
+    (timezone-make-date-arpa-standard
+     (current-time-string now) (current-time-zone now))))
 
 (defun message-make-message-id ()
   "Make a unique Message-ID."
@@ -2742,7 +2721,9 @@ If NOW, use that time instead."
     ;; Add the future to current.
     (setcar current (+ (car current) (round (/ future (expt 2 16)))))
     (setcar (cdr current) (+ (nth 1 current) (% (round future) (expt 2 16))))
-    (message-make-date current)))
+    ;; Return the date in the future in UT.
+    (timezone-make-date-arpa-standard
+     (current-time-string current) (current-time-zone current) '(0 "UT"))))
 
 (defun message-make-path ()
   "Return uucp path."
@@ -3074,7 +3055,7 @@ Headers already prepared in the buffer are not modified."
   (let ((max 988)
 	(cut 4)
 	refs)
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert references)
       (goto-char (point-min))
       (while (re-search-forward "<[^>]+>" nil t)
@@ -3602,7 +3583,7 @@ header line with the old Message-ID."
 
 (defun message-wash-subject (subject)
   "Remove junk like \"Re:\", \"(fwd)\", etc. that was added to the subject by previous forwarders, replyers, etc."
-  (with-temp-buffer
+  (nnheader-temp-write nil
     (insert-string subject)
     (goto-char (point-min))
     ;; strip Re/Fwd stuff off the beginning
@@ -4020,35 +4001,6 @@ regexp varstr."
 	(aset string idx to))
       (setq idx (1+ idx)))
     string))
-
-;;;
-;;; MIME functions
-;;;
-
-(defun message-encode-message-body ()
-  "Examine the message body, encode it, and add the requisite headers."
-  (when (featurep 'mule)
-    (save-excursion
-      (save-restriction
-	(message-narrow-to-headers)
-	(message-remove-header
-	 "^Content-Transfer-Encoding:\\|^Content-Type:\\|^Mime-Version:" t)
-	(goto-char (point-max))
-	(widen)
-	(narrow-to-region (point) (point-max))
-	(let* ((charset (mm-encode-body))
-	       (encoding (mm-body-encoding)))
-	  (when (consp charset)
-	    (error "Can't encode messages with multiple charsets (yet)"))
-	  (widen)
-	  (message-narrow-to-headers)
-	  (goto-char (point-max))
-	  (setq charset (or charset (mm-mule-charset-to-mime-charset 'ascii)))
-	  ;; We don't insert MIME headers if they only say the default.
-	  (unless (and (eq charset 'ascii)
-		       (eq encoding '7bit))
-	    (mm-insert-rfc822-headers charset encoding))
-	  (mm-encode-body))))))
 
 (run-hooks 'message-load-hook)
 

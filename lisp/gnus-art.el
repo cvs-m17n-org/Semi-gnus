@@ -33,7 +33,6 @@
 (require 'gnus-spec)
 (require 'gnus-int)
 (require 'browse-url)
-(require 'mm-bodies)
 
 (defgroup gnus-article nil
   "Article display."
@@ -273,6 +272,8 @@ be fed to `format-time-string'."
   :group 'gnus-article-washing)
 
 (eval-and-compile
+  (autoload 'hexl-hex-string-to-integer "hexl")
+  (autoload 'timezone-make-date-arpa-standard "timezone")
   (autoload 'mail-extract-address-components "mail-extr"))
 
 (defcustom gnus-save-all-headers t
@@ -398,7 +399,7 @@ beginning of a line."
   :type 'regexp
   :group 'gnus-article-various)
 
-(defcustom gnus-article-mode-line-format "Gnus: %g %S"
+(defcustom gnus-article-mode-line-format "Gnus: %%b %S"
   "*The format specification for the article mode line.
 See `gnus-summary-mode-line-format' for a closer description."
   :type 'string
@@ -768,7 +769,7 @@ always hide."
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
 		(when (and date
-			   (< (days-between (current-time-string) date)
+			   (< (gnus-days-between (current-time-string) date)
 			      4))
 		  (gnus-article-hide-header "date"))))
 	     ((eq elem 'long-to)
@@ -945,72 +946,84 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-(defun gnus-article-decode-mime-words ()
-  "Decode all MIME-encoded words in the article."
-  (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let ((inhibit-point-motion-hooks t)
-	  buffer-read-only)
-      (rfc2047-decode-region (point-min) (point-max)))))
-
-(defun gnus-article-decode-charset (&optional prompt)
-  "Decode charset-encoded text in the article.
-If PROMPT (the prefix), prompt for a coding system to use."
-  (interactive "P")
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (save-restriction
-      (message-narrow-to-head)
-      (let* ((inhibit-point-motion-hooks t)
-	     (ct (message-fetch-field "Content-Type" t))
-	     (cte (message-fetch-field "Content-Transfer-Encoding" t))
-	     (charset (cond
-		       (prompt
-			(mm-read-coding-system "Charset to decode: "))
-		       (ct
-			(mm-content-type-charset ct))
-		       (gnus-newsgroup-name
-			(gnus-group-find-parameter
-			 gnus-newsgroup-name 'charset))))
-	     buffer-read-only)
-	(goto-char (point-max))
-	(widen)
-	(narrow-to-region (point) (point-max))
-	(when (or (not ct)
-		  (string-match "text/plain" ct))
-	  (mm-decode-body
-	   charset (and cte (intern (downcase
-				     (gnus-strip-whitespace cte))))))))))
+(defun gnus-hack-decode-rfc1522 ()
+  "Emergency hack function for avoiding problems when decoding."
+  (let ((buffer-read-only nil))
+    (goto-char (point-min))
+    ;; Remove encoded TABs.
+    (while (search-forward "=09" nil t)
+      (replace-match " " t t))
+    ;; Remove encoded newlines.
+    (goto-char (point-min))
+    (while (search-forward "=10" nil t)
+      (replace-match " " t t))))
 
 (defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
 (defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
 (defun article-decode-rfc1522 ()
-  "Remove QP encoding from headers."
-  (let ((inhibit-point-motion-hooks t)
-	(buffer-read-only nil))
+  "Hack to remove QP encoding from headers."
+  (let ((case-fold-search t)
+	(inhibit-point-motion-hooks t)
+	(buffer-read-only nil)
+	string)
     (save-restriction
-      (message-narrow-to-head)
-      (rfc2047-decode-region (point-min) (point-max)))))
+      (narrow-to-region
+       (goto-char (point-min))
+       (or (search-forward "\n\n" nil t) (point-max)))
+      (goto-char (point-min))
+      (while (re-search-forward
+	      "=\\?iso-8859-1\\?q\\?\\([^?\t\n]*\\)\\?=" nil t)
+	(setq string (match-string 1))
+	(save-restriction
+	  (narrow-to-region (match-beginning 0) (match-end 0))
+	  (delete-region (point-min) (point-max))
+	  (insert string)
+	  (article-mime-decode-quoted-printable
+	   (goto-char (point-min)) (point-max))
+	  (subst-char-in-region (point-min) (point-max) ?_ ? )
+	  (goto-char (point-max)))
+	(goto-char (point-min))))))
 
 (defun article-de-quoted-unreadable (&optional force)
-  "Translate a quoted-printable-encoded article.
+  "Do a naive translation of a quoted-printable-encoded article.
+This is in no way, shape or form meant as a replacement for real MIME
+processing, but is simply a stop-gap measure until MIME support is
+written.
 If FORCE, decode the article whether it is marked as quoted-printable
 or not."
   (interactive (list 'force))
   (save-excursion
-    (let ((buffer-read-only nil)
+    (let ((case-fold-search t)
+	  (buffer-read-only nil)
 	  (type (gnus-fetch-field "content-transfer-encoding")))
       (gnus-article-decode-rfc1522)
       (when (or force
 		(and type (string-match "quoted-printable" (downcase type))))
 	(goto-char (point-min))
 	(search-forward "\n\n" nil 'move)
-	(quoted-printable-decode-region (point) (point-max))))))
+	(article-mime-decode-quoted-printable (point) (point-max))))))
 
 (defun article-mime-decode-quoted-printable-buffer ()
   "Decode Quoted-Printable in the current buffer."
-  (quoted-printable-decode-region (point-min) (point-max)))
+  (article-mime-decode-quoted-printable (point-min) (point-max)))
+
+(defun article-mime-decode-quoted-printable (from to)
+  "Decode Quoted-Printable in the region between FROM and TO."
+  (interactive "r")
+  (goto-char from)
+  (while (search-forward "=" to t)
+    (cond ((eq (following-char) ?\n)
+	   (delete-char -1)
+	   (delete-char 1))
+	  ((looking-at "[0-9A-F][0-9A-F]")
+	   (subst-char-in-region
+	    (1- (point)) (point) ?=
+	    (hexl-hex-string-to-integer
+	     (buffer-substring (point) (+ 2 (point)))))
+	   (delete-char 2))
+	  ((looking-at "=")
+	   (delete-char 1))
+	  ((gnus-message 3 "Malformed MIME quoted-printable message")))))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1218,7 +1231,7 @@ Put point at the beginning of the signature separator."
 	   (setq b (point))
 	 (point-max))
        (setq e (point-max)))
-      (with-temp-buffer
+      (nnheader-temp-write nil
 	(insert-buffer-substring gnus-article-buffer b e)
 	(require 'url)
 	(save-window-excursion
@@ -1346,35 +1359,58 @@ how much time has lapsed since DATE."
    ;; functions since they aren't particularly resistant to
    ;; buggy dates.
    ((eq type 'local)
-    (concat "Date: " (current-time-string (date-to-time date))))
+    (concat "Date: " (condition-case ()
+			 (timezone-make-date-arpa-standard date)
+		       (error date))))
    ;; Convert to Universal Time.
    ((eq type 'ut)
     (concat "Date: "
-	    (current-time-string
-	     (let ((e (parse-time-string date)))
-	       (setcar (last e) 0)
-	       (encode-time e)))))
+	    (condition-case ()
+		(timezone-make-date-arpa-standard date nil "UT")
+	      (error date))))
    ;; Get the original date from the article.
    ((eq type 'original)
     (concat "Date: " date))
    ;; Let the user define the format.
    ((eq type 'user)
     (if (gnus-functionp gnus-article-time-format)
-	(funcall gnus-article-time-format (date-to-time date))
+	(funcall
+	 gnus-article-time-format
+	 (ignore-errors
+	   (gnus-encode-date
+	    (timezone-make-date-arpa-standard
+	     date nil "UT"))))
       (concat
        "Date: "
-       (format-time-string gnus-article-time-format (date-to-time date)))))
+       (format-time-string gnus-article-time-format
+			   (ignore-errors
+			     (gnus-encode-date
+			      (timezone-make-date-arpa-standard
+			       date nil "UT")))))))
    ;; ISO 8601.
    ((eq type 'iso8601)
     (concat
      "Date: "
-     (format-time-string "%Y%M%DT%h%m%s" (date-to-time date))))
+     (format-time-string "%Y%M%DT%h%m%s"
+			 (ignore-errors
+			   (gnus-encode-date
+			    (timezone-make-date-arpa-standard
+			     date nil "UT"))))))
    ;; Do an X-Sent lapsed format.
    ((eq type 'lapsed)
     ;; If the date is seriously mangled, the timezone functions are
     ;; liable to bug out, so we ignore all errors.
     (let* ((now (current-time))
-	   (real-time (subtract-time now (date-to-time date)))
+	   (real-time
+	    (ignore-errors
+	      (gnus-time-minus
+	       (gnus-encode-date
+		(timezone-make-date-arpa-standard
+		 (current-time-string now)
+		 (current-time-zone now) "UT"))
+	       (gnus-encode-date
+		(timezone-make-date-arpa-standard
+		 date nil "UT")))))
 	   (real-sec (and real-time
 			  (+ (* (float (car real-time)) 65536)
 			     (cadr real-time))))
@@ -1644,7 +1680,7 @@ Directory to save to is default to `gnus-article-save-directory'."
     (save-excursion
       (save-restriction
 	(widen)
-	(rmail-output-to-rmail-file filename))))
+	(gnus-output-to-rmail filename))))
   filename)
 
 (defun gnus-summary-save-in-mail (&optional filename)
@@ -1661,7 +1697,7 @@ Directory to save to is default to `gnus-article-save-directory'."
 	(widen)
 	(if (and (file-readable-p filename)
 		 (mail-file-babyl-p filename))
-	    (rmail-output-to-rmail-file filename t)
+	    (gnus-output-to-rmail filename t)
 	  (gnus-output-to-mail filename)))))
   filename)
 
@@ -1942,7 +1978,6 @@ commands:
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (set-syntax-table gnus-article-mode-syntax-table)
-  (mm-enable-multibyte)
   (gnus-run-hooks 'gnus-article-mode-hook))
 
 (defun gnus-article-setup-buffer ()
@@ -1965,7 +2000,7 @@ commands:
     ;; Init original article buffer.
     (save-excursion
       (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
-      (mm-enable-multibyte)
+      (buffer-disable-undo (current-buffer))
       (setq major-mode 'gnus-original-article-mode)
       (make-local-variable 'gnus-original-article))
     (if (get-buffer name)
@@ -2154,7 +2189,7 @@ Provided for backwards compatibility."
 (defun gnus-output-to-file (file-name)
   "Append the current article to a file named FILE-NAME."
   (let ((artbuf (current-buffer)))
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert-buffer-substring artbuf)
       ;; Append newline at end of the buffer as separator, and then
       ;; save it to file.
@@ -3100,7 +3135,7 @@ specified by `gnus-button-alist'."
 
 (defun gnus-url-parse-query-string (query &optional downcase)
   (let (retval pairs cur key val)
-    (setq pairs (split-string query "&"))
+    (setq pairs (gnus-split-string query "&"))
     (while pairs
       (setq cur (car pairs)
             pairs (cdr pairs))
