@@ -18,7 +18,7 @@
 
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 
 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -1242,7 +1242,7 @@ controlled by the @code{ispell-message-dictionary-alist} variable:
 @lisp
 (setq ispell-message-dictionary-alist
       '(("^Newsgroups:.*\\bde\\." . "deutsch8")
-	(".*" . "default")))
+        (".*" . "default")))
 @end lisp
 
 @code{ispell} depends on having the external @samp{ispell} command
@@ -1430,6 +1430,13 @@ hidden when composing a message.
 (setq message-hidden-headers
       '(not "From" "Subject" "To" "Cc" "Newsgroups"))
 @end lisp
+
+@item message-header-synonyms
+@vindex message-header-synonyms
+A list of lists of header synonyms.  E.g., if this list contains a
+member list with elements @code{Cc} and @code{To}, then
+@code{message-carefully-insert-headers} will not insert a @code{To}
+header when the message is already @code{Cc}ed to the recipient.
 
 @end table
 

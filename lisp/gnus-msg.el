@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -307,27 +307,6 @@ If nil, the address field will always be empty after invoking
 `gnus-summary-resend-message'."
   :group 'gnus-message
   :type 'boolean)
-
-(defcustom gnus-user-agent 'gnus-mime-edit
-  "Which information should be exposed in the User-Agent header.
-
-It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
-\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
-`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
-`emacs-gnus' plus system type\), `gnus-mime-edit' \(show Gnus version and
-MIME Edit User-Agent\) or a custom string.  If you set it to a string,
-be sure to use a valid format, see RFC 2616."
-  :group 'gnus-message
-  :type '(choice
-	  (item :tag "Show Gnus version and MIME Edit User-Agent"
-		gnus-mime-edit)
-	  (item :tag "Show Gnus and Emacs versions and system type"
-		emacs-gnus-type)
-	  (item :tag "Show Gnus and Emacs versions and system configuration"
-		emacs-gnus-config)
-	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
-	  (item :tag "Show only Gnus version" gnus)
-	  (string :tag "Other")))
 
 ;;; Internal variables.
 

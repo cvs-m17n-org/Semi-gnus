@@ -1,7 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997,
-;; 1998, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; 1998, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -338,7 +338,9 @@ be set in `.emacs' instead."
 					 (:type xbm :file "gnus-pointer.xbm"
 						:ascent center))))
 			      gnus-mode-line-image-cache)
-			    'help-echo "This is Gnus")
+			    'help-echo (format
+					"This is %s, %s."
+					gnus-version (gnus-emacs-version)))
 		      str)
 		     (list str))
 	    line)))
@@ -2367,6 +2369,27 @@ This should be an alist for Emacs, or a plist for XEmacs."
 			 (symbol :tag "Parameter")
 			 (sexp :tag "Value")))))
 
+(defcustom gnus-user-agent 'gnus-mime-edit
+  "Which information should be exposed in the User-Agent header.
+
+It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
+\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
+`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
+`emacs-gnus' plus system type\), `gnus-mime-edit' \(show Gnus version and
+MIME Edit User-Agent\) or a custom string.  If you set it to a string,
+be sure to use a valid format, see RFC 2616."
+  :group 'gnus-message
+  :type '(choice
+	  (item :tag "Show Gnus version and MIME Edit User-Agent"
+		gnus-mime-edit)
+	  (item :tag "Show Gnus and Emacs versions and system type"
+		emacs-gnus-type)
+	  (item :tag "Show Gnus and Emacs versions and system configuration"
+		emacs-gnus-config)
+	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
+	  (item :tag "Show only Gnus version" gnus)
+	  (string :tag "Other")))
+
 
 ;;; Internal variables
 
@@ -3992,21 +4015,19 @@ Disallow invalid group names."
 				      (cons (or default "") 0)
 				      'gnus-group-history)))
 	(let ((match (match-string 0 group)))
-	  ;; `/' may be okay (e.g. for nnimap), so ask the user:
-	  (unless (and (string-match "/" match)
+	  ;; Might be okay (e.g. for nnimap), so ask the user:
+	  (unless (and (not (string-match "^$\\|:" match))
 		       (message-y-or-n-p
 			"Proceed and create group anyway? " t
 "The group name \"" group "\" contains a forbidden character: \"" match "\".
 
 Usually, it's dangerous to create a group with this name, because it's not
-supported by all back ends and servers.  On some IMAP servers, it's valid to
-use the character \"/\".
-
-If you are really sure, you can proceed anyway and create the group.
+supported by all back ends and servers.  On IMAP servers it should work,
+though.  If you are really sure, you can proceed anyway and create the group.
 
 You may customize the variable `gnus-invalid-group-regexp', which currently is
 set to \"" gnus-invalid-group-regexp
-"\", if you want to get rid of this query."))
+"\", if you want to get rid of this query permanently."))
 	    (setq prefix (format "Invalid group name: \"%s\".  " group)
 		  group nil)))))
     group))
@@ -4151,7 +4172,7 @@ current display is used."
 (defun gnus (&optional arg dont-connect slave)
   "Read network news.
 If ARG is non-nil and a positive number, Gnus will use that as the
-startup level.	If ARG is non-nil and not a positive number, Gnus will
+startup level.  If ARG is non-nil and not a positive number, Gnus will
 prompt the user for the name of an NNTP server to use."
   (interactive "P")
   (unless (byte-code-function-p (symbol-function 'gnus))

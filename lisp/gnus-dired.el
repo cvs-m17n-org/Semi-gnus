@@ -1,6 +1,6 @@
 ;;; gnus-dired.el --- utility functions where gnus and dired meet
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Authors: Benjamin Rutt <brutt@bloomington.in.us>,
@@ -58,9 +58,9 @@
   (setq gnus-dired-mode-map (make-sparse-keymap))
 
   (gnus-define-keys gnus-dired-mode-map
-    "\C-c\C-a" gnus-dired-attach
-    "\C-c\C-l" gnus-dired-find-file-mailcap
-    "\C-cP" gnus-dired-print))
+    "\C-c\C-m\C-a" gnus-dired-attach
+    "\C-c\C-m\C-l" gnus-dired-find-file-mailcap
+    "\C-c\C-m\C-p" gnus-dired-print))
 
 (defun gnus-dired-mode (&optional arg)
   "Minor mode for intersections of gnus and dired.

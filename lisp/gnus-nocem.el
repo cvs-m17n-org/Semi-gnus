@@ -1,6 +1,6 @@
 ;;; gnus-nocem.el --- NoCeM pseudo-cancellation treatment
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2002
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2004
 ;;        Free Software Foundation, Inc.
 
 
@@ -298,7 +298,8 @@ valid issuer, which is much faster if you are selective about the issuers."
       (while (search-forward "\t" nil t)
 	(cond
 	 ((not (ignore-errors
-		 (setq group (let ((obarray gnus-active-hashtb)) (read buf)))))
+		 (setq group (let ((obarray gnus-nocem-real-group-hashtb))
+			       (read buf)))))
 	  ;; An error.
 	  )
 	 ((not (symbolp group))
