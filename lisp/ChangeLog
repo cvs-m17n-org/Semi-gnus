@@ -1,6 +1,137 @@
+2000-05-07 17:24:01  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-prepare-flat-list-dead-predicate): New
+	function.
+	(gnus-group-prepare-flat-predicate): Use it.
+	(gnus-group-list-cached): List dead groups.
+
+2000-05-07 10:50:02  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-decode-charset): Don't decode message with
+	format.
+
+2000-05-07  Florian Weimer  <fw@deneb.cygnus.argh.org>
+
+	* mailcap.el (mailcap-maybe-eval): Honor user request not to
+	evaluate the Lisp code.
+
+2000-05-06 17:40:20  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-wash-html): New function.
+	(gnus-article-wash-html): Bind.
+	(gnus-article-make-menu-bar): Menu item.
+	* gnus-sum.el (gnus-summary-wash-map): Bind 'h'.
+	(gnus-summary-make-menu-bar): Menu item.
+	* gnus.el: Autoload.
+
+2000-05-06  Florian Weimer  <fw@deneb.cygnus.argh.org>
+
+	* gnus-uu.el (gnus-uu-unshar-warning): New variable.
+	(gnus-uu-unshar-article): Use it.
+
+	* mailcap.el (mailcap-maybe-eval-warning): New variable.
+	(mailcap-maybe-eval): Use it.
+
+	* gnus-msg.el (gnus-group-posting-charset-alist): Speling mistake
+	in docstring.
+
+	* mml.el (mml-generate-mime-1): Small comment.
+
+2000-05-05 12:27:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-de-base64-unreadable): New function.
+	(gnus-article-de-base64-unreadable): Bind.
+	(gnus-article-make-menu-bar): Menu item.
+	* gnus-sum.el (gnus-summary-wash-map): Bind '6' and 'Z'.
+	(gnus-summary-make-menu-bar): Menu item.
+	* gnus.el: Autoload.
+
+2000-05-05 10:32:27  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-show-article): Remove en/disable multibyte.
+	(gnus-summary-select-article): Add en/disable multibyte.
+
+2000-05-05 02:47:23  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-edit-article): Enable multibyte.
+	(gnus-summary-edit-article): New feature: editing raw articles.
+
+2000-05-05 00:30:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode-region): Insert a space before encoding.
+	Emacs MULE can not encode adjacent iso-2022-jp and cn-gb-2312.
+	* gnus-msg.el (gnus-summary-mail-forward): Use unibyte buffer.
+	Emacs MULE can not copy some 8bit characters in multibyte buffers.
+	* mm-decode.el (mm-insert-part): Ditto.
+
+2000-05-04 17:49:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndoc.el (nndoc-type-alist): Extend forward regexp.
+	(nndoc-forward-type-p): Ditto.
+
+2000-05-04 17:13:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-with-unibyte-current-buffer): Set the default
+	value of enable-multibyte-characters.
+
+2000-05-04 10:31:24  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-show-article): En/disable multibyte.
+
+2000-05-03  Dave Love  <fx@gnu.org>
+
+	* gnus-ems.el (gnus-article-xface-ring-internal)
+	(gnus-article-xface-ring-size): New variable.
+	(gnus-article-display-xface): Use them to cache data.  Don't try
+	to use XPM.  Set up binary coding for PBM's sake.
+
+2000-05-03 14:23:38  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-inews-do-gcc): Set mail-parse-charset.
+	* gnus-int.el (gnus-request-accept-article): Ditto.
+	(gnus-request-replace-article): Ditto.
+	* mm-util.el (mm-mime-mule-charset-alist): Add a fake mule-charset.
+
+2000-05-03 14:11:23  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode): Test the validity of coding-system.
+
+2000-05-03 11:35:15  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode-message-header): Encode field by
+	field.
+	* mml.el (mml-to-mime): Use message-default-charset.
+	(mml-preview): Narrow to headers.
+	* message.el (message-send-mail): Use message-default-charset.
+	(message-send-news): Narrow to headers; 
+	use message-default-charset.
+
+2000-05-03 08:09:14  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-bodies.el (mm-decode-content-transfer-encoding): A better junk
+	detect.
+	* mml.el (mml-parse-singlepart-with-multiple-charsets): Save 
+	restriction.
+	(mml-parse-1): Warning message.
+	(mml-preview): Disable multibyte.
+
+2000-05-03  Dave Love  <fx@gnu.org>
+
+	* gnus.el (gnus-group-startup-message): Add newline before image.
+
+2000-05-02 21:34:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-encode-message-header): Check the coding-system.
+	* message.el (message-send-mail): Use unibyte-buffer.
+	(message-send-mail): Ditto.
+
 Mon May  1 15:09:46 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
 
 	* gnus.el: Gnus v5.8.6 is released.
+
+2000-05-01 07:45:43  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-parse-1): Set no-markup-p and warn to nil.
 
 2000-04-28 21:14:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
 

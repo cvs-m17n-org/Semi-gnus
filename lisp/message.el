@@ -2823,7 +2823,8 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (goto-char (point-max))
 	      (insert "\n")
 	      (widen)
-	      (funcall message-send-mail-function))
+	      (mm-with-unibyte-current-buffer
+		(funcall message-send-mail-function)))
 	    (setq n (+ n 1))
 	    (setq p (pop plist))
 	    (erase-buffer)))

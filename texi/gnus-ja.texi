@@ -4518,7 +4518,9 @@ Gnus $(B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 $(B=,47$r;H$$$^$9!#(B
 
 @item S o m
+@itemx C-c C-f
 @kindex S o m $(B!J35N,!K(B
+@kindex C-c C-f ($(B35N,(B)
 @findex gnus-summary-mail-forward
 @c @icon{gnus-summary-mail-forward}
 $(BC/$+B>$N?M$K8=:_$N5-;v$rE>Aw$7$^$9(B (@code{gnus-summary-mail-forward})$(B!#(B

@@ -755,6 +755,8 @@ be set in `.emacs' instead."
 	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
 				    (:type xbm :file "gnus.xbm")))))
 	   (when image
+	     (newline)			; Have somewhere for cursor to
+					; go, not stretched over image.
 	     (insert-image image " ")
 	     (goto-char (point-min))
 	     (while (not (eobp))
@@ -1812,6 +1814,7 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face
       gnus-article-decode-HZ
+      gnus-article-wash-html
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local

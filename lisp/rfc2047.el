@@ -113,12 +113,15 @@ Should be called narrowed to the head of the message."
 	(save-restriction
 	  (rfc2047-narrow-to-field)
 	  (if (not (rfc2047-encodable-p))
-	      (if (mm-body-7-or-8)
-		  ;; 8 bit must be decoded.
-		  (if (car message-posting-charset)
-		      ;; Is message-posting-charset a coding system?
-		      (mm-encode-coding-region (point-min) (point-max)
-					       (car message-posting-charset))))
+	      (if (and (eq (mm-body-7-or-8) '8bit)
+		       (mm-multibyte-p)
+		       (mm-coding-system-p
+			(car message-posting-charset)))
+		       ;; 8 bit must be decoded.
+		       ;; Is message-posting-charset a coding system?
+		       (mm-encode-coding-region 
+			(point-min) (point-max) 
+			(car message-posting-charset)))
 	    ;; We found something that may perhaps be encoded.
 	    (while (setq elem (pop alist))
 	      (when (or (and (stringp (car elem))
@@ -132,10 +135,7 @@ Should be called narrowed to the head of the message."
 	      (rfc2047-fold-region (point-min) (point-max)))
 	     ;; Hm.
 	     (t)))
-	  (goto-char (point-max)))))
-    (when mail-parse-charset
-      (mm-encode-coding-region
-       (point-min) (point-max) mail-parse-charset))))
+	  (goto-char (point-max)))))))
 
 (defun rfc2047-encodable-p (&optional header)
   "Say whether the current (narrowed) buffer contains characters that need encoding in headers."
@@ -215,10 +215,14 @@ Should be called narrowed to the head of the message."
       (if (equal (nth 2 word) current)
 	  (setq beg (nth 0 word))
 	(when current
-	  (when (prog1 (and (eq beg (nth 1 word)) (nth 2 word))
-		  (rfc2047-encode beg end current))
-	    (goto-char beg)
-	    (insert " ")))
+	  (if (and (eq beg (nth 1 word)) (nth 2 word))
+	      (progn
+		;; There might be a bug in Emacs Mule.
+		;; A space must be inserted before encoding.
+		(goto-char beg)
+		(insert " ")
+		(rfc2047-encode (1+ beg) (1+ end) current))
+	    (rfc2047-encode beg end current)))
 	(setq current (nth 2 word)
 	      beg (nth 0 word)
 	      end (nth 1 word))))
@@ -251,7 +255,9 @@ Should be called narrowed to the head of the message."
 	  (goto-char (min (point-max) (+ 15 (point))))
 	  (unless (eobp)
 	    (insert "\n"))))
-      (mm-encode-coding-region (point-min) (point-max) mime-charset)
+      (if (and (mm-multibyte-p)
+	       (mm-coding-system-p mime-charset))
+	  (mm-encode-coding-region (point-min) (point-max) mime-charset))
       (funcall (cdr (assq encoding rfc2047-encoding-function-alist))
 	       (point-min) (point-max))
       (goto-char (point-min))

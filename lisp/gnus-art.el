@@ -1598,7 +1598,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
 			     (set-buffer gnus-summary-buffer)
 			   (error))
 			 gnus-newsgroup-ignored-charsets))
-	ct cte ctl charset)
+	ct cte ctl charset format)
   (save-excursion
     (save-restriction
       (article-narrow-to-head)
@@ -1610,7 +1610,8 @@ If PROMPT (the prefix), prompt for a coding system to use."
 		     (prompt
 		      (mm-read-coding-system "Charset to decode: "))
 		     (ctl
-		      (mail-content-type-get ctl 'charset))))
+		      (mail-content-type-get ctl 'charset)))
+	    format (and ctl (mail-content-type-get ctl 'format)))
       (when cte
 	(setq cte (mail-header-strip cte)))
       (if (and ctl (not (string-match "/" (car ctl)))) 
@@ -1620,7 +1621,8 @@ If PROMPT (the prefix), prompt for a coding system to use."
     (save-restriction
       (narrow-to-region (point) (point-max))
       (when (and (or (not ctl)
-		     (equal (car ctl) "text/plain")))
+		     (equal (car ctl) "text/plain"))
+		 (not format)) ;; article with format will decode later.
 	(mm-decode-body
 	 charset (and cte (intern (downcase
 				   (gnus-strip-whitespace cte))))
@@ -1649,6 +1651,23 @@ or not."
 	(article-goto-body)
 	(quoted-printable-decode-region (point) (point-max) charset)))))
 
+(defun article-de-base64-unreadable (&optional force)
+  "Translate a base64 article.
+If FORCE, decode the article whether it is marked as base64 not."
+  (interactive (list 'force))
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (type (gnus-fetch-field "content-transfer-encoding"))
+	  (charset gnus-newsgroup-charset))
+      (when (or force
+		(and type (string-match "quoted-printable" (downcase type))))
+	(article-goto-body)
+	(save-restriction
+	  (narrow-to-region (point) (point-max))
+	  (base64-decode-region (point-min) (point-max))
+	  (if (mm-coding-system-p charset)
+	      (mm-decode-coding-region (point-min) (point-max) charset)))))))
+
 (eval-when-compile
   (require 'rfc1843))
 
@@ -1659,6 +1678,23 @@ or not."
   (save-excursion
     (let ((buffer-read-only nil))
       (rfc1843-decode-region (point-min) (point-max)))))
+
+(defun article-wash-html ()
+  "Format an html article."
+  (interactive)
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (charset gnus-newsgroup-charset))
+      (article-goto-body)
+      (save-window-excursion
+	(save-restriction
+	  (narrow-to-region (point) (point-max))
+	  (mm-setup-w3)
+	  (let ((w3-strict-width (window-width))
+		(url-standalone-mode t))
+	    (condition-case var
+		(w3-region (point-min) (point-max))
+	      (error))))))))
 
 (defun article-hide-list-identifiers ()
   "Remove list identifies from the Subject header.
@@ -2636,7 +2672,9 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-remove-cr
      article-display-x-face
      article-de-quoted-unreadable
+     article-de-base64-unreadable
      article-decode-HZ
+     article-wash-html
      article-hide-list-identifiers
      article-hide-pgp
      article-strip-banner
