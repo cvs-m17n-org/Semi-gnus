@@ -5,7 +5,7 @@
 	(nntp-request-post): Run `nntp-prepare-post-hook'.
 	(nntp-wait-for): Save a response from the server in
 	`nntp-process-response' after sending a command.
-	(nntp-prepare-post-hook): New hook, run just before postting an
+	(nntp-prepare-post-hook): New hook, run just before posting an
 	article.
 
 	* lisp/nnheader.el (nnheader-init-server-buffer): Make
