@@ -22120,7 +22120,6 @@ Ham $B$,(B spam $B%0%k!<%W$+$i0\F0$5$l$kA0$K0u$r>C$7$?$$>l9g$O!"$3$NJQ?t$r%;%
 $B$3$H$,L5$$5-;v$@$1!"$^$?$O$9$Y$F$NL$FI5-;v$N(B spam $B8!::$r9T$J$&$+$I$&$+$r(B
 $B;X<($7$^$9!#$3$l$O$=$N$^$^$K$7$F$*$/$3$H$r4+$a$^$9!#(B
 
-@c TRANSLATEME
 @node Spam ELisp Package Sorting and Score Display in Summary Buffer
 @subsubsection Spam ELisp Package Sorting and Score Display in Summary Buffer
 @cindex spam scoring
@@ -22129,37 +22128,38 @@ Ham $B$,(B spam $B%0%k!<%W$+$i0\F0$5$l$kA0$K0u$r>C$7$?$$>l9g$O!"$3$NJQ?t$r%;%
 @cindex spam sort summary buffer
 @cindex spam
 
-You can display the spam score of articles in your summary buffer, and
-you can sort articles by their spam score.
+$B35N,%P%C%U%!$K(B spam $B$N%9%3%"$rI=<($9$k$3$H$,$G$-$^$9!#$^$?!"$=$l$i(B
+$B$N(B spam $B$N%9%3%"$K$h$C$F!"5-;v$r%=!<%H$9$k$3$H$b$G$-$^$9!#(B
 
-First you need to decide which backend you will be using.  If you use
-the @code{spam-use-spamassassin},
-@code{spam-use-spamassassin-headers}, or @code{spam-use-regex-headers}
-backend, the @code{X-Spam-Status} header will be used.  If you use
-@code{spam-use-bogofilter}, the @code{X-Bogosity} header will be used.
-If you use @code{spam-use-crm114}, any header that matches the CRM114
-score format will be used.  As long as you set the appropriate backend
-variable to t @emph{before} you load @code{spam.el}, you will be
-fine.  @code{spam.el} will automatically add the right header to the
-internal Gnus list of required headers.
+$B:G=i$K!"$I$N%P%C%/%(%s%I$r;H$&$+$r7h$a$kI,MW$,$"$j$^$9!#(B
+@code{spam-use-spamassassin}$B!"(B@code{spam-use-spamassassin-headers} $B$^$?(B
+$B$O(B @code{spam-use-regex-headers} $B%P%C%/%(%s%I$r;H$&>l9g!"(B
+@code{X-Spam-Status} $B%X%C%@!<$,;H$o$l$^$9!#(B@code{spam-use-bogofilter} $B$r(B
+$B;H$&>l9g$O!"(B@code{X-Bogosity} $B$,;H$o$l$^$9!#(B@code{spam-use-crm114} $B$r;H(B
+$B$&$N$J$i$P!"(BCRM114 $B%9%3%"!&%U%)!<%^%C%H$K9gCW$9$k!"$$$:$l$+$N%X%C%@$,;H(B
+$B$o$l$^$9!#(B@code{spam.el} $B$r%m!<%I$9$k(B @emph{$BA0(B} $B$K!"E,@Z$J%P%C%/%(%s%IJQ(B
+$B?t$r(B t $B$K@_Dj$9$k8B$j!"$&$^$/$$$/$G$7$g$&!#(B@code{spam.el} $B$O!"(BGnus $B$,Fb(B
+$BItE*$KI,MW$H$9$k%X%C%@!<$N%j%9%H$K!"@5$7$$%X%C%@!<$r<+F0E*$KDI2C$7$^$9!#(B
 
-To show the spam score in your summary buffer, add this line to your
-@code{gnus.el} file (note @code{spam.el} does not do that by default
-so it won't override any existing @code{S} formats you may have).
+$B35N,%P%C%U%!$K(B spam $B$N%9%3%"$rI=<($5$;$k$K$O!"$3$N9T$r(B @code{gnus.el} $B%U%!(B
+$B%$%k$K2C$($F2<$5$$(B ($BCm(B: @code{spam.el} $B$O%G%#%U%)%k%H$G$O$=$l$r9T$J$o$J(B
+$B$$$N$G!"$"$J$?$,;}$C$F$$$k$+$b$7$l$J$$!"B8:_$9$k$I$s$J(B @code{S} $B%U%)!<%^%C(B
+$B%H$r$b>e=q$-$7$^$;$s(B)$B!#(B
 
 @lisp
 (defalias 'gnus-user-format-function-S 'spam-user-format-function-S)
 @end lisp
 
-Now just set your summary line format to use @code{%uS}.  Here's an
-example that formats the spam score in a 5-character field:
+$B$G$O!"35N,%P%C%U%!$N9T=qK!;EMM(B (summary line format) $B$,(B @code{%uS} $B$r;H(B
+$B$&$h$&$K@_Dj$7$^$7$g$&!#0J2<$O(B spam $B$N%9%3%"$r(B 5$B7e$N%U%#!<%k%I$KI=<($9$k(B
+$BNc$G$9(B:
 
 @lisp
-(setq gnus-summary-line-format 
+(setq gnus-summary-line-format
  "%U%R %10&user-date; $%5uS %6k  %B %(%4L: %*%-25,25a%) %s \n")
 @end lisp
 
-Finally, to sort by spam status, either do it globally:
+$B:G8e$K!"(Bspam $B$N>uBV$K$h$k%=!<%H$rA4%0%k!<%W$G9T$J$o$;$k$h$&$K$7$^$7$g$&(B:
 
 @lisp
 (setq
@@ -22168,7 +22168,8 @@ Finally, to sort by spam status, either do it globally:
   '(spam-article-sort-by-spam-status))
 @end lisp
 
-or per group (@pxref{Sorting the Summary Buffer}).
+$B%0%k!<%WKh$K9T$J$o$;$?$$>l9g$O(B @ref{Sorting the Summary Buffer} $B$r;2>H$7(B
+$B$F2<$5$$!#(B
 
 @node Spam ELisp Package Configuration Examples
 @subsubsection Spam ELisp Package Configuration Examples
@@ -22449,12 +22450,10 @@ From Reiner Steib <reiner.steib@@gmx.de>.
 $B$r(B @code{t} $B$K$7$F2<$5$$!#Cm0U$7$F;H$C$F2<$5$$!#(BBBDB $B$K:\$C$F$$$kAw?.<T(B
 $B$@$1$,DL9T$r5v$5$l!"B>$N$9$Y$F$O(B spammers $B$H$7$FJ,N`$5$l$^$9!#(B
 
-@c TRANSLATEME
-While @code{spam-use-BBDB-exclusive} @emph{can} be used as an alias
-for @code{spam-use-BBDB} as far as @code{spam.el} is concerned, it is
-@emph{not} a separate backend.  If you set
-@code{spam-use-BBDB-exclusive} to t, @emph{all} your BBDB splitting
-will be exclusive.
+@code {spam.el} $B$K4X$9$k8B$j$O!"(B@code{spam-use-BBDB} $B$NJLL>$H$7(B
+$B$F(B @code{spam-use-BBDB-exclusive} $B$r;H$&$3$H$,$G$-$^$9$,!"$=$l$OJL$N%P%C(B
+$B%/%(%s%I$G$O$"$j$^$;$s!#(B@code{spam-use-BBDB-exclusive} $B$r(B @code{t} $B$K@_(B
+$BDj$9$l$P!"(BBBDB $B$K$h$kJ,3d$O$9$Y$FGSB>E*$K$J$j$^$9!#(B
 
 @end defvar
 
@@ -22974,14 +22973,14 @@ Package}.
   "Blackbox $B$r;H$&$H$-$O(B t $B$K$9$k!#(B")
 @end lisp
 
-@c TRANSLATEME
-Write @code{spam-check-blackbox} if Blackbox can check incoming mail.
+Blackbox $B$,F~$C$F$/$k%a!<%k$r8!::$G$-$k$N$G$"$l$P!"(B
+@code{spam-check-blackbox} $B$r=q$$$F2<$5$$!#(B
 
-Write @code{spam-blackbox-register-routine} and
-@code{spam-blackbox-unregister-routine} using the bogofilter
-register/unregister routines as a start, or other restister/unregister
-routines more appropriate to Blackbox, if Blackbox can
-register/unregister spam and ham.
+Blackbox $B$,(B spam $B$H(B ham $B$r(B register/unregister $B$G$-$k$N$G$"$l$P!"<j;O$a(B
+$B$K!"(Bbogofilter $B$N(B register/unregister $B%k!<%A%s$+!"$h$j(B Blackbox $B$K$U$5$o(B
+$B$7$$B>$N(B restister/unregister $B%k!<%A%s$r;H$C(B
+$B$F(B @code{spam-blackbox-register-routine} $B$*$h(B
+$B$S(B @code{spam-blackbox-unregister-routine} $B$r=q$$$F2<$5$$!#(B
 
 @item
 $B4X?t(B
@@ -23034,68 +23033,70 @@ Gnus $B$N%Q%i%a!<%?(B
 $B$r2C$($F2<$5$$!#$=$l$r%Q%i%a!<%?$HJQ?t$N%+%9%?%^%$%:$NFs2s$K$D$$$F9T$J$&(B
 $B$3$H$r3N$+$a$F2<$5$$!#(B
 
-@c TRANSLATEME
-Add
+Blackbox $B$,F~$C$F$/$k%a!<%k$,(B spam $B$+$I$&$+$r8!::$G$-$k$N$G$"$l$P!"(B
+
 @lisp
 (variable-item spam-use-blackbox)
 @end lisp
-to the @code{spam-autodetect-methods} group parameter in
-@code{gnus.el} if Blackbox can check incoming mail for spam contents.
 
-Finally, use the appropriate @code{spam-install-*-backend} function in
-@code{spam.el}.  Here are the available functions.
+$B$r(B @code{gnus.el} $B$N%0%k!<%W%Q%i%a!<%?(B @code{spam-autodetect-methods} $B$K(B
+$B2C$($F2<$5$$!#(B
+
+$B:G8e$K!"(B@code{spam.el} $B$K$"$kE,@Z$J(B @code{spam-install-*-backend} $B4X?t$r(B
+$B;H$C$F2<$5$$!#MxMQ$G$-$k4X?t$O<!$NDL$j$G$9!#(B
 
 @enumerate
 
 @item
 @code{spam-install-backend-alias}
 
-This function will simply install an alias for a backend that does
-everything like the original backend.  It is currently only used to
-make @code{spam-use-BBDB-exclusive} act like @code{spam-use-BBDB}.
+$B$3$N4X?t$O!"%*%j%8%J%k$N%P%C%/%(%s%I$H$9$Y$F$,;w$?%P%C%/%(%s%I$NJLL>$rMQ(B
+$B0U$7$^$9!#:#$N$H$3$m!"$3$l(B
+$B$O(B @code{spam-use-BBDB-exclusive} $B$r(B @code{spam-use-BBDB} $B$N$h$&$KF/$+$;(B
+$B$k$?$a$@$1$K;H$o$l$^$9!#(B
 
 @item
 @code{spam-install-nocheck-backend}
 
-This function installs a backend that has no check function, but can
-register/unregister ham or spam.  The @code{spam-use-gmane} backend is
-such a backend.
+$B$3$N4X?t$O!"8!::$9$k5!G=$OL5$$$,(B ham $B$^$?(B
+$B$O(B spam $B$r(B register/unregister $B$9$k$3$H$,$G$-$k%P%C%/%(%s%I$rMQ0U$7$^$9!#(B
+@code{spam-use-gmane} $B$,$=$N$h$&$J%P%C%/%(%s%I$G$9!#(B
 
 @item
 @code{spam-install-checkonly-backend}
 
-This function will install a backend that can only check incoming mail
-for spam contents.  It can't register or unregister messages.
-@code{spam-use-blackholes} and @code{spam-use-hashcash} are such
-backends.
+$B$3$N4X?t$O!"F~$C$F$/$k%a!<%k$,(B spam $B$+$I$&$+$N8!::$@$1$r9T$J$&$3$H$,$G$-(B
+$B$k%P%C%/%(%s%I$rMQ0U$7$^$9!#$=$l$O%a%C%;!<%8$r(B register $B$^$?(B
+$B$O(B unregister $B$9$k$3$H$,$G$-$^$;$s!#(B@code{spam-use-blackholes} $B$*$h(B
+$B$S(B @code{spam-use-hashcash} $B$,$=$N$h$&$J%P%C%/%(%s%I$G$9!#(B
 
 @item
 @code{spam-install-statistical-checkonly-backend}
 
-This function installs a statistical backend (one which requires the
-full body of a message to check it) that can only check incoming mail
-for contents.  @code{spam-use-regex-body} is such a filter.
+$B$3$N4X?t$O!"F~$C$F$/$k%a!<%k$N8!::$@$1$r9T$J$&$3$H$,$G$-$k!"E}7W=hM}$r9T(B
+$B$J$&%P%C%/%(%s%I(B ($B8!::$N$?$a$K%a%C%;!<%8$NK\J8A4BN$rI,MW$H$9$k(B) $B$rMQ0U$7(B
+$B$^$9!#(B@code{spam-use-regex-body} $B$,$=$N$h$&$J_I2a4o$G$9!#(B
 
 @item
 @code{spam-install-statistical-backend}
 
-This function install a statistical backend with incoming checks and
-registration/unregistration routines.  @code{spam-use-bogofilter} is
-set up this way.
+$B$3$N4X?t$O!"F~$C$F$/$k%a!<%k$N8!::$H(B registration/unregistration $B%k!<%A(B
+$B%s$r;}$D!"E}7W=hM}$r9T$J$&%P%C%/%(%s%I$rMQ0U$7$^$9!#(B
+@code{spam-use-bogofilter} $B$O!"$=$N$h$&$K;EN)$F$i$l$F$$$^$9!#(B
 
 @item
 @code{spam-install-backend}
 
-This is the most normal backend installation, where a backend that can
-check and register/unregister messages is set up without statistical
-abilities.  The @code{spam-use-BBDB} is such a backend.
+$B$3$l$O:G$bIaDL$J%P%C%/%(%s%I$rMQ0U$7$^$9!#$=$l$O8!::$H%a%C%;!<%8(B
+$B$N(B register/unregister $B$r9T$J$&$3$H$,$G$-!"E}7W=hM}$NG=NO$O$"$j$^$;$s!#(B
+@code{spam-use-BBDB} $B$,$=$N$h$&$J%P%C%/%(%s%I$G$9!#(B
 
 @item
 @code{spam-install-mover-backend}
 
-Mover backends are internal to @code{spam.el} and specifically move
-articles around when the summary is exited.  You will very probably
-never install such a backend.
+$B0\F0$5$;$k(B (Mover) $B%P%C%/%(%s%I$O!"35N,%P%C%U%!$r=P$k$H$-$K(B
+@code{spam.el} $B$NFbIt$G!"$"$k0lDj$N$d$jJ}$G5-;v$r0\F0$5$;$^$9!#$*$=$i$/!"(B
+$B$=$N$h$&$J%P%C%/%(%s%I$O!"$"$^$j%$%s%9%H!<%k$7$J$$$G$7$g$&!#(B
 @end enumerate
 
 @end enumerate
