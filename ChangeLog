@@ -1,3 +1,10 @@
+2002-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el: Require `mm-url' only when compiling.
+	(gnus-group-fetch-charter): Require `mm-url'.
+
+	* lisp/gnus.el (gnus-default-charset): Default to `iso-8859-1'.
+
 2002-09-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnheader.el (toplevel) [XEmacs]: Remove code to define
