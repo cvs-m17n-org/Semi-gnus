@@ -1522,7 +1522,6 @@ For example:
         nil
       (load "gnus-sum.el" t t t))
     (require 'gnus)
-    (require 'gnus-agent)
     (require 'gnus-art)))
 
 ;; Subject simplification.
