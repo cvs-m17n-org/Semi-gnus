@@ -1,3 +1,21 @@
+1998-11-02  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/canonicalize-full-name-methods):
+	New variable. (Merged from `mime-bbdb.el' in SEMI.)
+	(gnus-bbdb/extract-address-components): New function. (Merged from
+	`mime-bbdb.el' in SEMI.)
+	(gnus-bbdb/canonicalize-spaces): Ditto.
+	(gnus-bbdb/canonicalize-dots): Ditto.
+	(gnus-bbdb/update-record): Use
+	`gnus-bbdb/extract-address-components'.
+	(gnus-bbdb/lines-and-from): Ditto.
+	(gnus-bbdb/summary-get-author): Ditto.
+	(gnus-bbdb/summary-author-in-bbdb): Ditto.
+	(gnus-bbeb/decode-field-body-function): New variable.
+	(gnus-bbdb/decode-field-body): New macro.
+	(gnus-bbdb/update-record): Use `gnus-bbdb/decode-field-body'.
+	(gnus-bbdb/extract-field-value): Ditto.
+
 1998-10-31  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.2.
