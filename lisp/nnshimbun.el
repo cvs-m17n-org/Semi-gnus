@@ -322,6 +322,12 @@
       (nnheader-report 'nnml "Couldn't retrieve article: %s" (prin1-to-string article))
       nil)))
 
+(defsubst nnshimbun-header-xref (x)
+  (if (and (setq x (mail-header-xref x))
+	   (string-match "^Xref: " x))
+      (substring x 6)
+    x))
+
 (defun nnshimbun-request-article-1 (article &optional group server to-buffer)
   (if (nnshimbun-backlog
 	(gnus-backlog-request-article
@@ -332,7 +338,7 @@
 			   (set-buffer (nnshimbun-open-nov group))
 			   (and (nnheader-find-nov-line article)
 				(nnheader-parse-nov))))
-	(let* ((xref (substring (mail-header-xref header) 6))
+	(let* ((xref (nnshimbun-header-xref header))
 	       (x-faces (cdr (or (assoc (or server
 					    (nnoo-current-server 'nnshimbun))
 					nnshimbun-x-face-alist)
@@ -416,19 +422,18 @@
 	(insert "Subject: " (or (mime-entity-fetch-field header 'Subject) "(none)") "\n"
 		"From: " (or (mime-entity-fetch-field header 'From) "(nobody)") "\n"
 		"Date: " (or (mail-header-date header) "") "\n"
-		"Message-ID: " (or (mail-header-id header) (nnmail-message-id)) "\n"
-		"References: " (or (mail-header-references header) "") "\n"
-		"Lines: ")
-	(princ (or (mail-header-lines header) 0) (current-buffer))
-	(insert "\n")
-	(if (mail-header-xref header)
-	    (insert (mail-header-xref header) "\n")))
+		"Message-ID: " (or (mail-header-id header) (nnmail-message-id)) "\n")
+	(let ((refs (mail-header-references header)))
+	  (and refs
+	       (string< "" refs)
+	       (insert "References: " refs "\n")))
+	(insert "Lines: " (number-to-string (or (mail-header-lines header) 0)) "\n"
+		"Xref: " (nnshimbun-header-xref header) "\n"))
     ;; For pure Gnus.
     (defun nnshimbun-insert-header (header)
       (nnheader-insert-header header)
       (delete-char -1)
-      (if (mail-header-xref header)
-	  (insert (mail-header-xref header) "\n")))))
+      (insert "Xref: " (nnshimbun-header-xref header) "\n"))))
 
 (deffoo nnshimbun-retrieve-headers (articles &optional group server fetch-old)
   (when (nnshimbun-possibly-change-group group server)
@@ -562,9 +567,7 @@
 	      (mail-header-set-id header (cdr arg)))
 	  (let ((func (intern (concat "mail-header-set-" (symbol-name (car arg))))))
 	    (if (cdr arg) (eval (list func header (cdr arg)))))))
-      (let ((xref (mail-header-xref header)))
-	(when (string-match "^Xref: " xref)
-	  (mail-header-set-xref header (substring xref 6))))
+      (mail-header-set-xref header (nnshimbun-header-xref header))
       (delete-region (point) (progn (forward-line 1) (point)))
       (nnheader-insert-nov header))))
 
@@ -808,30 +811,33 @@ is enclosed by at least one regexp grouping construct."
 	  (narrow-to-region (point-min) (point))
 	  (nnweb-decode-entities)
 	  (goto-char (point-min))
-	  (while (search-forward "<!--X-" nil t)
-	    (replace-match ""))
+	  (while (search-forward "\n<!--X-" nil t)
+	    (replace-match "\n"))
 	  (goto-char (point-min))
-	  (while (search-forward " -->" nil t)
-	    (replace-match ""))
+	  (while (search-forward " -->\n" nil t)
+	    (replace-match "\n"))
+	  (goto-char (point-min))
+	  (while (search-forward "\t" nil t)
+	    (replace-match " "))
 	  (goto-char (point-min))
 	  (let (buf refs)
 	    (while (not (eobp))
 	      (cond
 	       ((looking-at "<!--")
 		(delete-region (point) (progn (forward-line 1) (point))))
-	       ((looking-at "Subject: ")
+	       ((looking-at "Subject: +")
 		(push (cons 'subject (nnheader-header-value)) buf)
 		(delete-region (point) (progn (forward-line 1) (point))))
-	       ((looking-at "From: ")
+	       ((looking-at "From: +")
 		(push (cons 'from (nnheader-header-value)) buf)
 		(delete-region (point) (progn (forward-line 1) (point))))
-	       ((looking-at "Date: ")
+	       ((looking-at "Date: +")
 		(push (cons 'date (nnheader-header-value)) buf)
 		(delete-region (point) (progn (forward-line 1) (point))))
-	       ((looking-at "Message-Id: ")
+	       ((looking-at "Message-Id: +")
 		(push (cons 'id (concat "<" (nnheader-header-value) ">")) buf)
 		(delete-region (point) (progn (forward-line 1) (point))))
-	       ((looking-at "Reference: ")
+	       ((looking-at "Reference: +")
 		(push (concat "<" (nnheader-header-value) ">") refs)
 		(delete-region (point) (progn (forward-line 1) (point))))
 	       ((looking-at "Content-Type: ")
@@ -844,8 +850,7 @@ is enclosed by at least one regexp grouping construct."
 	    (if refs (push (cons 'references (mapconcat 'identity refs " ")) buf))
 	    (nnshimbun-nov-fix-header nnshimbun-current-group header buf)
 	    (goto-char (point-min))
-	    (nnheader-insert-header header)
-	    (delete-char -1))
+	    (nnshimbun-insert-header header))
 	  (goto-char (point-max)))
 	;; Processing body.
 	(save-restriction
