@@ -28,7 +28,7 @@
 ;;; Commentary:
 
 ;; Gnus (or gnus) backend to read newspapers on the World Wide Web.
-;; This module requires the Emacs-W3M and the external command W3M.
+;; This module requires the emacs-w3m and the external command w3m.
 ;; Visit the following pages for more information.
 ;;
 ;;	http://emacs-w3m.namazu.org/

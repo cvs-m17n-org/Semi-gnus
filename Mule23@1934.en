@@ -140,19 +140,19 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
    % make install
 
 
-USING Emacs-W3M (and Emacs W3)
+USING emacs-w3m (and Emacs/W3)
 ==============================
 The web based backend `nnshimbun' uses the shimbun modules which are
-included in Emacs-W3M package (and the other web based backends of T-
-gnus requires Emacs W3).  Emacs-W3M is an interface program to the
-external command W3M, visit the following pages for more information.
+included in emacs-w3m package (and the other web based backends of T-
+gnus requires Emacs/W3).  emacs-w3m is an interface program to the
+external command w3m, visit the following pages for more information.
 
    http://emacs-w3m.namazu.org/
    http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
-If you wish to build T-gnus to be able to use Emacs-W3M and nnshimbun,
-you have to specify the path where Emacs-W3M is installed using the
-configure option `--with-addpath=' (for Emacs W3, use the configure
+If you wish to build T-gnus to be able to use emacs-w3m and nnshimbun,
+you have to specify the path where emacs-w3m is installed using the
+configure option `--with-addpath=' (for Emacs/W3, use the configure
 option `--with-w3=' or editing the file `~/.lpath.el').  Here is an
 example for that:
 
@@ -163,7 +163,7 @@ example for that:
 
 ;; Don't mind if configure says "W3... not found".  It is currently
 ;; malfunction when the configure option `--with-w3=' is not used even
-;; if the path of Emacs W3 is specified in the file `~/.lpath.el'.
+;; if the path of Emacs/W3 is specified in the file `~/.lpath.el'.
 
-;; By the way, does anyone know where do we find Emacs W3 package
+;; By the way, does anyone know where do we find Emacs/W3 package
 ;; which is suitable to Mule 2.3 based on Emacs 19.34?

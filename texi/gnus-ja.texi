@@ -805,7 +805,7 @@ Browsing the Web
 * Web Archive::                 $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::               $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
 * RSS::                         RDF Site Summary $B$rFI$`(B
-* Customizing w3::              Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
+* Customizing w3::              Gnus $B$+$i(B Emacs/W3 $B$rA`:n$9$k(B
 
 @sc{imap}
 
@@ -8124,7 +8124,7 @@ URL $B$K4^$^$l$k2~9T$r:o=|$7$^$9!#$$$/$D$+$N%a%$%i!<$O!"9T$rC;$/$9$k$?$a$K(B
 
 @table @code
 @item w3
-Emacs/w3 $B$r;H$$$^$9!#(B
+Emacs/W3 $B$r;H$$$^$9!#(B
 
 @item w3m
 emacs-w3m $B$r;H$$$^$9(B ($B>\$7$/$O(B @uref{http://emacs-w3m.namazu.org/} $B$r;2(B
@@ -13796,11 +13796,11 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 * Web Archive::                 $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::               $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
 * RSS::                         RDF Site Summary $B$rFI$`(B
-* Customizing w3::              Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
+* Customizing w3::              Gnus $B$+$i(B Emacs/W3 $B$rA`:n$9$k(B
 @end menu
 
 @samp{Web Newspaper} $B$r=|$/$9$Y$F$N%&%'%V%=!<%9$O!"F0:n$5$;$k$?$a(B
-$B$K(B Emacs/w3 $B$H(B url $B%i%$%V%i%j$,I,MW$G$9!#(B
+$B$K(B Emacs/W3 $B$H(B url $B%i%$%V%i%j$,I,MW$G$9!#(B
 
 $B$3$l$i$N%&%'%V%=!<%9$N0lHV$NLdBj$OD94|4V$OF0:n$7$J$$2DG=@-$,9b$$$3$H$G$9!#(B
 @sc{html} $B%G!<%?$+$i>pJs$r=8$a$k$N$O$;$$$<$$?dB,$G!"9=B$$,JQ2=$7$?$H$-$K(B
@@ -14083,7 +14083,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
 $B%9%]%K%A!"(BCNET Japan$B!"(BHOTWIRED Japan$B!"(BZDNet Japan $B$J$I$KBP1~$7$F$$$^$9!#(B
 
 @code{nnshimbun} $B$O(B @code{shimbun} $B%i%$%V%i%j$K0MB8$7$F$$$^$9$N$G!"$=$l(B
-$B$r4^$s$G$$$k(B Emacs-W3M $B%Q%C%1!<%8$H30It%3%^%s%I(B W3M $B$r@h$K%$%s%9%H!<%k$7(B
+$B$r4^$s$G$$$k(B emacs-w3m $B%Q%C%1!<%8$H30It%3%^%s%I(B w3m $B$r@h$K%$%s%9%H!<%k$7(B
 $B$F$*$$$F$/$@$5$$!#>\$7$$$3$H$O0J2<$N%Z!<%8$GCN$k$3$H$,$G$-$^$9!#(B
 
 @example
@@ -14376,11 +14376,11 @@ Web Newspaper $B$K4X$9$k0J2<$N(B @code{nnshimbun} $BJQ?t$rJQ$($k$3$H$,2DG=$G$
 @cindex Netscape
 
 Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<((B
-$B$9$k$?$a$K(B Emacs/w3 $B$r;H$$$^$9!#(BEmacs/w3 $B$N$3$H$O$=$N%^%K%e%"%k$K5-:\$5(B
+$B$9$k$?$a$K(B Emacs/W3 $B$r;H$$$^$9!#(BEmacs/W3 $B$N$3$H$O$=$N%^%K%e%"%k$K5-:\$5(B
 $B$l$F$$$^$9$,!"$3$3$G$O(B Gnus $B$N%f!<%6$K$H$C$F$h$jE,@Z$J$$$/$D$+$N;vJA$r=R(B
 $B$Y$k$3$H$K$7$^$9!#(B
 
-$BNc$($P!"$h$/$"$k<ALd$K(B Emacs/w3 $B$K(B @code{browse-url} $B$N5!G=(B (Netscape $B$N(B
+$BNc$($P!"$h$/$"$k<ALd$K(B Emacs/W3 $B$K(B @code{browse-url} $B$N5!G=(B (Netscape $B$N(B
 $B$h$&$J30It%W%i%&%6!<$r;H$&$h$&$K@_Dj$5$l$F$$$k(B) $B$r;H$C$F%j%s%/$r;2>H$5$;(B
 $B$k$K$O$I$&$7$?$i$h$$$+!"$H$$$&$N$,$"$j$^$9!#0J2<$O0l$D$NJ}K!$G$9!#(B
 
