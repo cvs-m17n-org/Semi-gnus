@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.8.7"
+(defconst gnus-version-number "6.8.8"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.29; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "Semi-gnus %s (based on Gnus 5.6.30; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -1422,11 +1422,11 @@ want."
 
 (defvar gnus-predefined-server-alist
   `(("cache"
-     (nnspool "cache"
-	      (nnspool-spool-directory gnus-cache-directory)
-	      (nnspool-nov-directory gnus-cache-directory)
-	      (nnspool-active-file
-	       (nnheader-concat gnus-cache-directory "active")))))
+     nnspool "cache"
+     (nnspool-spool-directory gnus-cache-directory)
+     (nnspool-nov-directory gnus-cache-directory)
+     (nnspool-active-file
+      (nnheader-concat gnus-cache-directory "active"))))
   "List of predefined (convenience) servers.")
 
 (defvar gnus-topic-indentation "") ;; Obsolete variable.
@@ -1977,13 +1977,15 @@ If ARG, insert string at point."
   "Return VERSION as a floating point number."
   (when (or (string-match "^\\([^ ]+\\)? ?Gnus v?\\([0-9.]+\\)$" version)
 	    (string-match "^\\(.?\\)gnus-\\([0-9.]+\\)$" version))
-    (let* ((alpha (and (match-beginning 1) (match-string 1 version)))
-	   (number (match-string 2 version))
-	   major minor least)
-      (string-match "\\([0-9]\\)\\.\\([0-9]+\\)\\.?\\([0-9]+\\)?" number)
-      (setq major (string-to-number (match-string 1 number)))
-      (setq minor (string-to-number (match-string 2 number)))
-      (setq least (if (match-beginning 3)
+    (let ((alpha (and (match-beginning 1) (match-string 1 version)))
+	  (number (match-string 2 version))
+	  major minor least)
+      (unless (string-match
+	       "\\([0-9]\\)\\.\\([0-9]+\\)\\.?\\([0-9]+\\)?" number)
+	(error "Invalid version string: %s" version))
+      (setq major (string-to-number (match-string 1 number))
+	    minor (string-to-number (match-string 2 number))
+	    least (if (match-beginning 3)
 		      (string-to-number (match-string 3 number))
 		    0))
       (string-to-number
@@ -1992,7 +1994,11 @@ If ARG, insert string at point."
 		   (cond
 		    ((member alpha '("(ding)" "d")) "4.99")
 		    ((member alpha '("September" "s")) "5.01")
-		    ((member alpha '("Red" "r")) "5.03"))
+		    ((member alpha '("Red" "r")) "5.03")
+		    ((member alpha '("Quassia" "q")) "5.05")
+		    ((member alpha '("p")) "5.07")
+		    ((member alpha '("o")) "5.09")
+		    ((member alpha '("n")) "5.11"))
 		   minor least)
 	 (format "%d.%02d%02d" major minor least))))))
 
@@ -2035,7 +2041,7 @@ g -- Group name."
 	(setq prompt (match-string 1 string)))
       (setq i (match-end 0))
       ;; We basically emulate just about everything that
-      ;; `interactive' does, but adds the "g" and "G" specs.
+      ;; `interactive' does, but add the specs listed above.
       (push
        (cond
 	((= c ?a)
