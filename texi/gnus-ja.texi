@@ -15159,3 +15159,55 @@ t)} で、これは不可視テキストを見えなくして触れなくします。
 
 
 
+@node The End
+@chapter 終わり
+
+はい、以上がマニュアルです---あなたはもう自分自身の人生を送る事ができま
+す。連絡をとって下さい。あなたの猫に今日は、といっておいて下さい。
+
+おお、@strong{神よ}---さよならを耐える事はできません。(すすり泣き。)
+
+Ol' Charles Reznikoff はそれを非常によく現していますので、ここは彼のため
+に譲ります:
+
+@quotation
+@strong{Te Deum}
+
+@sp 1
+Not because of victories @*
+I sing,@*
+having none,@*
+but for the common sunshine,@*
+the breeze,@*
+the largess of the spring.
+
+@sp 1
+Not for victory@*
+but for the day's work done@*
+as well as I was able;@*
+not for a seat upon the dais@*
+but at the common table.@*
+@end quotation
+
+試訳:
+
+@quotation
+@strong{Te Deum}
+
+@sp 1
+勝利したからではなく @*
+私は歌う @*
+何も無いけれど @*
+あの日光や @*
+息吹や @*
+春の大きさのために @*
+
+@sp 1
+勝利のためではなく @*
+一日の労働のために @*
+また、それを達成できたことに @*
+高座の上の席のためではなく @*
+普通のテーブルのところで @*
+@end quotation
+
+
