@@ -1,5 +1,8 @@
 2003-08-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (gnus-treat-display-x-face): Use `set-default'
+	instead of `custom-set-default' for old Emacsen.
+
 	* lisp/gnus-sum.el
 	(gnus-summary-search-article-highlight-matched-text): Replace
 	`gnus-treat-display-xface' with `gnus-treat-display-x-face'.
