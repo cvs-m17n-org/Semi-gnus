@@ -1,3 +1,84 @@
+Thu Sep 24 19:29:43 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.44 is released.
+
+1998-09-23 20:34:27  Markus Rost  <markus.rost@mathematik.uni-regensburg.de>
+
+	* gnus.el: Extend autoloads.
+
+1998-09-15 18:57:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el (gnus-draft-send): Bind required headers to nil. 
+	(gnus-draft-send): No.
+
+1998-09-14 15:16:42  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-fix-before-sending): Comment out invisible
+	text things.
+
+1998-09-14 14:30:09  Tatsuya Ichikawa  <ichikawa@hv.epson.co.jp>
+
+	* gnus-agent.el (gnus-agent-file-coding-system): Renamed.
+
+1998-09-13  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus-agent.el (gnus-agent-expire): Stop expiry barfing on killed 
+	groups.
+
+1998-09-13 07:02:04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-save-group-info): Create proper active
+	lines. 
+
+1998-09-10 02:40:28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el (gnus-draft-edit-message): Save the buffer. 
+
+Sun Sep  6 20:09:36 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.43 is released.
+
+1998-09-06 19:41:54  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-remove-thread): Unhide threads before
+	removing. 
+	(gnus-data-compute-positions): Ditto.
+
+1998-08-31 11:40:13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* nnmail.el (nnmail-date-to-time): Parse time locally if no
+	timezone. 
+
+1998-08-31 11:21:53  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-srvr.el (gnus-browse-foreign-server): Protect against
+	out-of-range articles.
+
+	* gnus-msg.el (gnus-summary-reply): Don't inhibit posting styles.
+
+1998-08-30 22:33:33  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-score.el (gnus-summary-increase-score): Temporary third
+	majuscle. 
+
+1998-08-30 22:32:31  Dan Christensen  <jdc@playmate.mat.jhu.edu>
+
+	* gnus-score.el (gnus-summary-increase-score): Score thread on
+	Message-ID. 
+
+1998-08-29 02:46:00  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus-sum.el (gnus-summary-mark-article-as-read): 
+	(gnus-summary-mark-article-as-unread): 
+	(gnus-summary-mark-article): Call gnus-request-update-mark.
+
+1998-08-29  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus-agent.el (gnus-agent-fetch-headers): Cater for when there's 
+	no .agentview, all articles have been expired, or everything bar a 
+	few downloaded arts have been expired.
+	(gnus-agent-expire): Mark *all* expired articles as read.
+
 Sat Aug 29 19:17:19 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.42 is released.

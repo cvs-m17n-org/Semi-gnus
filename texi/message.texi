@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle Message 5.6.42 Manual
+@settitle Message 5.6.44 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -42,7 +42,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Message 5.6.42 Manual
+@title Message 5.6.44 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -83,7 +83,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Message 5.6.42.  Message is distributed with
+This manual corresponds to Message 5.6.44.  Message is distributed with
 the Gnus distribution bearing the same version number as this manual
 has. 
 
@@ -434,9 +434,8 @@ Move to the signature of the message (@code{message-goto-signature}).
 @item C-c C-y
 @kindex C-c C-y 
 @findex message-yank-original
-Yank the message in the buffer @code{gnus-article-copy} into the message
-buffer. Normally @code{gnus-article-copy} is what you are replying to
-(@code{message-yank-original}).
+Yank the message that's being replied to into the message buffer
+(@code{message-yank-original}). 
 
 @item C-c C-q
 @kindex C-c C-q 
@@ -1159,18 +1158,6 @@ If non-@code{nil}, generate new buffers.  The default is @code{t}.  If
 this is a function, call that function with three parameters: The type,
 the to address and the group name.  (Any of these may be @code{nil}.)
 The function should return the new buffer name.
-
-@item message-use-multi-frames
-@vindex message-use-multi-frames
-If non-@code{nil}, generate new frames. The default is @code{nil}.
-
-@item message-delete-frame-on-exit
-@vindex message-delete-frame-on-exit
-The @code{message-delete-frame-on-exit} variable says whether to delete
-the frame after sending the message or killing the message buffer. If it
-is @code{nil} (which is the default), don't delete the frame. If it is
-@code{ask}, ask wheter to delete the frame. If it is @code{t}, always
-delete the frame.
 
 @item message-max-buffers
 @vindex message-max-buffers

@@ -1913,7 +1913,8 @@ The text will also be indented the normal way."
 	(when (eq buf (current-buffer))
 	  (message-bury buf)))
       (message-do-actions actions)
-      (message-delete-frame frame org-frame))))
+      (message-delete-frame frame org-frame)
+      t)))
 
 (defun message-dont-send ()
   "Don't send the message you have been editing."
@@ -2037,11 +2038,12 @@ the user from the mailer."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  ;; Delete all invisible text.
-  (when (text-property-any (point-min) (point-max) 'invisible t)
-    (put-text-property (point-min) (point-max) 'invisible nil)
-    (unless (yes-or-no-p "Invisible text found and made visible; continue posting?")
-      (error "Invisible text found and made visible"))))
+  ;; Make all invisible text visible.
+  ;;(when (text-property-any (point-min) (point-max) 'invisible t)
+  ;;  (put-text-property (point-min) (point-max) 'invisible nil)
+  ;;  (unless (yes-or-no-p "Invisible text found and made visible; continue posting?")
+  ;;    (error "Invisible text found and made visible")))
+  )
 
 (defun message-add-action (action &rest types)
   "Add ACTION to be performed when doing an exit of type TYPES."

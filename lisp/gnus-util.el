@@ -762,9 +762,12 @@ with potentially long computations."
 	    (when msg
 	      (goto-char (point-min))
 	      (widen)
-	      (search-backward "\^_")
-	      (narrow-to-region (point) (point-max))
-	      (goto-char (1+ (point-min)))
+ 	      (search-backward "\n\^_")
+ 	      (narrow-to-region (point) (point-max))
+ 	      (rmail-count-new-messages t)
+ 	      (when (rmail-summary-exists)
+		(rmail-select-summary
+		 (rmail-update-summary)))
 	      (rmail-count-new-messages t)
 	      (rmail-show-message msg))
 	    (save-buffer)))))
