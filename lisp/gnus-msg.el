@@ -524,32 +524,55 @@ If SILENT, don't prompt the user."
 ;; Dummy to avoid byte-compile warning.
 (defvar nnspool-rejected-article-hook)
 (defvar mule-version)
+(defvar xemacs-betaname)
 (defvar xemacs-codename)
 
 (defun gnus-extended-version ()
   "Stringified Gnus version and Emacs version."
-  (interactive)
+  (interactive) ; ???
   (concat
-   "Semi-gnus/" gnus-version-number " "
-   (cond
-    ((featurep 'xemacs)
-     (concat (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
-             ;; XXX: include beta version?
-             (if (featurep 'mule)
-                 "-mule")
-	     (if (boundp 'xemacs-codename)
-                 (concat " (" xemacs-codename ")"))
-             ))
-    (t
-     (concat (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
-             ;; XXX: include unibyte/multibyte env. info.
-             (if (boundp 'mule-version)
-                 (concat " Mule/" mule-version))
-	     ;; XXX: convert (Meadow-version) -> PRODUCT/VERSION.
-             (if (featurep 'meadow)
-                 (concat " " (Meadow-version)))
-             ))
-    )))
+   ;; Semi-gnus/VERSION
+   gnus-product-name "/" gnus-version-number
+   ;; EMACS/VERSION
+   (if (featurep 'xemacs)
+       ;; XEmacs
+       (concat
+	(format " XEmacs/%d.%d%s" emacs-major-version emacs-minor-version
+		(if (and (boundp 'xemacs-betaname) xemacs-betaname)
+		    (if (string-match "\\`(\\(.*\\))\\'" xemacs-betaname)
+			(match-string 1 xemacs-betaname)
+		      "")		; unknown format
+		  ""))			; not beta
+	(if (boundp 'xemacs-codename)
+	    (concat " (" xemacs-codename ")")
+	  "")				; no codename
+	)
+     ;; not XEmacs
+     (concat
+      (format " Emacs/%d.%d" emacs-major-version emacs-minor-version)
+      (if (and (boundp 'enable-multibyte-characters)
+	       enable-multibyte-characters)
+	  ;; Should return " (multibyte)" ?
+	  ""
+	" (unibyte)")
+      ))
+   ;; MULE[/VERSION]
+   (if (featurep 'mule)
+       (if (and (boundp 'mule-version) mule-version)
+	   (concat " MULE/" mule-version)
+	 " MULE")			; no mule-version
+     "")				; not Mule
+   ;; Meadow/VERSION
+   (if (featurep 'meadow)
+       (let ((version (Meadow-version)))
+	 (if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
+	     (concat " Meadow/"
+		     (match-string 1 version)
+		     (match-string 2 version)
+		     )
+	   "Meadow"))			; unknown format
+     "")				; not Meadow
+   ))
 
 
 ;;;
