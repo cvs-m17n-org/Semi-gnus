@@ -62,7 +62,8 @@
 (defalias 'mail-encode-encoded-word-region 'rfc2047-encode-region)
 (defalias 'mail-encode-encoded-word-buffer 'rfc2047-encode-message-header)
 (defalias 'mail-encode-encoded-word-string 'rfc2047-encode-string)
-(defalias 'mail-decode-encoded-word-region 'rfc2047-decode-region)
+(defun mail-decode-encoded-word-region (beg end)
+  (mime-decode-header-in-region beg end t))
 (defalias 'mail-decode-encoded-word-string 'rfc2047-decode-string)
 
 (provide 'mail-parse)
