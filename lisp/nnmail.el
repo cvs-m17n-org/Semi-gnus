@@ -35,8 +35,6 @@
 (require 'mail-source)
 
 (eval-and-compile
-  (autoload 'gnus-error "gnus-util")
-  (autoload 'gnus-buffer-live-p "gnus-util")
   (autoload 'gnus-add-buffer "gnus"))
 
 (defgroup nnmail nil
@@ -166,10 +164,10 @@ can also be `immediate' and `never'."
 
 (defcustom nnmail-expiry-wait-function nil
   "Variable that holds function to specify how old articles should be before they are expired.
-  The function will be called with the name of the group that the
-expiry is to be performed in, and it should return an integer that
-says how many days an article can be stored before it is considered
-\"old\".  It can also return the values `never' and `immediate'.
+The function will be called with the name of the group that the expiry
+is to be performed in, and it should return an integer that says how
+many days an article can be stored before it is considered \"old\".
+It can also return the values `never' and `immediate'.
 
 Eg.:
 

@@ -135,7 +135,7 @@
   `(let ((buf ,buffer))
      (when (gnus-buffer-exists-p buf)
        (when (boundp 'gnus-buffers)
-	 (setq gnus-buffers (delete buf gnus-buffers)))
+	 (setq gnus-buffers (delete (get-buffer buf) gnus-buffers)))
        (kill-buffer buf))))
 
 (static-cond
@@ -660,9 +660,13 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (prin1 form (current-buffer))))
 
 (defun gnus-prin1-to-string (form)
-  "The same as `prin1', but bind `print-quoted' and `print-readably' to t."
+  "The same as `prin1'.
+Bind `print-quoted' and `print-readably' to t, and `print-length'
+and `print-level' to nil."
   (let ((print-quoted t)
-	(print-readably t))
+	(print-readably t)
+	(print-length nil)
+	(print-level nil))
     (prin1-to-string form)))
 
 (defun gnus-make-directory (directory)

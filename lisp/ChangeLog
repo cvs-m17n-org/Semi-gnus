@@ -1,3 +1,30 @@
+2003-02-02  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-util.el (gnus-kill-buffer): Use get-buffer.
+
+2003-02-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-draft.el (gnus-group-send-queue): Bind gnus-posting-styles
+	to nil.
+
+	* nnmail.el: Removed gnus-util autoload.
+
+	* gnus.el: Use gnus-prin1-to-string throughout.
+
+	* gnus-util.el (gnus-prin1-to-string): Bind print-length and
+	print-level. 
+
+	* gnus-art.el (article-display-x-face): Removed grey x-face stuff.
+	(gnus-treat-display-grey-xface): Removed.
+
+	* gnus-fun.el (gnus-grab-cam-face): New.
+	(gnus-convert-image-to-gray-x-face): Removed.
+	(gnus-convert-gray-x-face-to-xpm): removed.
+	(gnus-convert-gray-x-face-region): Removed.
+	(gnus-grab-gray-x-face): Removed.
+
+	* nnmail.el (nnmail-expiry-wait-function): Doc indent.
+
 2003-01-31  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-util.el (gnus-kill-buffer): Functions in gnus-util
@@ -42,6 +69,9 @@
 	* gnus-srvr.el (gnus-server-exit, gnus-browse-exit): do.
 
 2003-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-fun.el (gnus-face-encode): New function.
+	(gnus-convert-png-to-face): Use it.
 
 	* gnus-sum.el (gnus-summary-make-menu-bar): Added M-& to marks. 
 
