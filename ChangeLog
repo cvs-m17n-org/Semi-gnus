@@ -1,5 +1,18 @@
 2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* Nana-gnus: Version 7.1.0.12 (This is alpha status.)
+	Fix a bug.
+
+	* lisp/message.el (message-send): Encode header fields, when did
+	not send message.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.12.
+
+	* lisp/gnus-spec.el (gnus-update-format-specifications): Fix bug
+	in latest changes.
+
+2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 7.1.0.11 (This is alpha status.)
 	Fix bugs.
 
