@@ -32,6 +32,8 @@
 
 (eval-when-compile (require 'cl))
 
+(require 'read-passwd)
+
 (eval-and-compile
   (defvar gnus-offline-lang
     (cond ((and (featurep 'meadow)
@@ -130,23 +132,7 @@
 	(insert "(setq gnus-offline-MTA-type '"
 		(prin1-to-string MTA-type) ")\n")
 
-	;; Offline setting for gnus-nntp-*
-	(insert "(setq gnus-nntp-service nil)\n")
-	(insert "(setq gnus-nntp-server nil)\n")
-
 	;; Write setting about hooks.
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'gnus-group-mode-hook"
-			"'gnus-offline-processed-by-timer t)"))
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'gnus-group-mode-hook"
-			"'gnus-offline-error-check t)"))
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'gnus-after-getting-new-news-hook"
-			"'gnus-offline-after-get-new-news)"))
 	(when (eq news-method 'nnspool)
 	  (insert (format "%s %s %s\n"
 			  "(add-hook"
@@ -157,21 +143,11 @@
 			  "'gnus-before-startup-hook"
 			  "(lambda () (setq nnmail-spool-file nil)
            (setq mail-sources nil)))")))
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'message-send-hook"
-			"'gnus-offline-message-add-header)"))
 
 	;; Write stting about mail-source.el
 	(insert "(setq gnus-offline-mail-source '"
 		(prin1-to-string mail-source) ")\n")
 	(insert "(setq mail-sources gnus-offline-mail-source)\n")
-	(insert "(require 'read-passwd)\n")
-	(insert "(setq mail-source-read-passwd 'read-pw-read-passwd)\n")
-	(insert (format "%s %s %s\n"
-			"(add-hook"
-			"'gnus-setup-news-hook"
-			"'read-pw-set-mail-source-passwd-cache)"))
 	(if save-passwd
 	    (insert "(add-hook 'gnus-setup-news-hook
 	  (lambda ()
@@ -199,14 +175,20 @@
     (setup-8 . "Use MIEE post/send message ")
     (setup-9 . "News spool directory for sending: ")
     (setup-10 . "Mail spool directory for sending: ")
-    (setup-11 . "How many e-mail address do you have: ")
+    (setup-11 . "How many mail sources will get mails from? : ")
     (setup-12 . "Mail Account name : ")
     (setup-13 . "Mail server : ")
-    (setup-14 . "Authentification Method (TAB to completion): ")
+    (setup-14 . "Authentification Method ")
     (setup-15 . "Do you use pop3.el to fetch mail? ")
     (setup-16 . "movemail program name: ")
     (setup-17 . "movemail options: ")
     (setup-18 . "Do you save password information to newsrc file? ")
+    (setup-19 . "What type of the mail source? ")
+    (setup-20 . "File: ")
+    (setup-21 . "Directory: ")
+    (setup-22 . "What network stream? ")
+    (setup-23 . "What authentication? ")
+
     (param-news-method-1 . "News Method")
     (param-news-method-2 . "Gnus Agent")
     (param-news-method-3 . "nnspool")
@@ -301,14 +283,19 @@ restarted.")
     (setup-8 . "メッセージの送信に MIEE を使いますか? ")
     (setup-9 . "ニュースのスプールディレクトリ: ")
     (setup-10 . "メールのスプールディレクトリ: ")
-    (setup-11 . "メールアカウントの数を答えてください: ")
+    (setup-11 . "設定するメール取得先の数は? (後で追加できます): ")
     (setup-12 . "メールのアカウント名: ")
     (setup-13 . "そのアカウントのあるメールサーバ名: ")
-    (setup-14 . "そのサーバでの認証方式は? (TAB で補完します): ")
+    (setup-14 . "そのサーバでの認証方式は? ")
     (setup-15 . "メールの受信には pop3.el を使いますか? ")
     (setup-16 . "movemail プログラムの名前: ")
     (setup-17 . "movemail プログラムに渡す引数: ")
     (setup-18 . "newsrc ファイルに POP パスワードを保存しますか? ")
+    (setup-19 . "メール取得先のタイプは? ")
+    (setup-20 . "ファイル: ")
+    (setup-21 . "ディレクトリ: ")
+    (setup-22 . "接続方式は? ")
+    (setup-23 . "認証方式は? ")
 
     (param-news-method-4 . "\
 ニュース記事を取得する方法です。")
@@ -425,7 +412,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	  mail-method agent-directory drafts-queue-type news-spool mail-spool
 	  use-miee MTA-type dialup-program dialup-program-arguments
 	  hangup-program hangup-program-arguments interval
-	  num-of-address i mail-source save-passwd)
+	  num-of-address i n mail-source save-passwd)
       (setq news-method
 	    (gnus-ofsetup-completing-read-symbol
 	     (gnus-ofsetup-gettext 'setup-1)
@@ -479,43 +466,75 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	    (gnus-ofsetup-prepare gnus-ofsetup-prepare-for-miee))
 	;; Set drafts type gnus-agent.
 	(setq drafts-queue-type 'agent))
-      ;; Set E-Mail Address and pop3 movemail type.
+      ;; Create a list of mail source specifiers.
       (setq num-of-address
 	    (read-from-minibuffer (gnus-ofsetup-gettext 'setup-11)))
-      (setq i (string-to-int num-of-address))
+      (setq i (setq n (string-to-int num-of-address)))
+      ;;
       (while (> i 0)
-	(let ((user (read-from-minibuffer (gnus-ofsetup-gettext 'setup-12)))
-	      (server (read-from-minibuffer
-		       (gnus-ofsetup-gettext 'setup-13)))
-	      (auth (completing-read
-		     (gnus-ofsetup-gettext 'setup-14)
-		     '(("password") ("apop")) nil t nil))
-	      (islisp (y-or-n-p (gnus-ofsetup-gettext 'setup-15)))
-	      source)
-	  (if (not islisp)
-	      (let ((prog (read-file-name (gnus-ofsetup-gettext 'setup-16)
-					  exec-directory "movemail"))
-		    (args (read-from-minibuffer
-			   (gnus-ofsetup-gettext 'setup-17)
-			   "-pf")))
-		(setq source `(pop
-			       :user ,user
-			       :server ,server
-			       :program ,(format "%s %s %s %s %s"
-						 prog
-						 args
-						 "po:%u"
-						 "%t"
-						 "%p"))))
-	    (setq source `(pop
-			   :user ,user
-			   :server ,server)))
-	  (setq mail-source
-		(nconc mail-source
-		       (list
-			(if (string-equal "apop" auth)
-			    (nconc source '(:authentication apop))
-			  source)))))
+	(let* ((j (- n (1- i)))
+	       (type (gnus-ofsetup-completing-read-symbol
+		      (format "<%d of %d> %s" j n
+			      (gnus-ofsetup-gettext 'setup-19))
+		      'pop 'imap 'file 'directory 'maildir))
+	       user server authentication stream islisp source
+	       prog args program path)
+	  ;; Prepare.
+	  (when (or (string= type "pop") (string= type "imap"))
+	    (setq user (read-from-minibuffer
+			(format "<%d of %d> %s" j n
+				(gnus-ofsetup-gettext 'setup-12))))
+	    (setq server (read-from-minibuffer
+			  (format "<%d of %d> %s" j n
+				  (gnus-ofsetup-gettext 'setup-13)))))
+	  (when (string= type "pop")
+	    (setq authentication (gnus-ofsetup-completing-read-symbol
+				  (format "<%d of %d> %s" j n
+					  (gnus-ofsetup-gettext 'setup-14))
+				  'password 'apop))
+	    (setq islisp (y-or-n-p
+			  (format "<%d of %d> %s" j n
+				  (gnus-ofsetup-gettext 'setup-15))))
+	    (unless islisp
+	      (setq prog (read-file-name
+			  (format "<%d of %d> %s" j n
+				  (gnus-ofsetup-gettext 'setup-16))
+			  exec-directory "movemail"))
+	      (setq args (read-from-minibuffer
+			  (format "<%d of %d> %s" j n
+				  (gnus-ofsetup-gettext 'setup-17) "-pf")))
+	      (setq program (format "%s %s %s %s %s"
+				    prog args "po:%u" "%t" "%p"))))
+	  (when (string= type "imap")
+	    (setq stream (gnus-ofsetup-completing-read-symbol
+			  (format "<%d of %d> %s" j n
+				  (gnus-ofsetup-gettext 'setup-22))
+			  'kerberos4 'ssl 'network))
+	    (setq authentication (gnus-ofsetup-completing-read-symbol
+				  (format "<%d of %d> %s" j n
+					  (gnus-ofsetup-gettext 'setup-23))
+				  'kerberos4 'cram-md5 'anonymous 'login)))
+	  (when (string= type "file")
+	    (setq path (read-file-name
+			(format "<%d of %d> %s" j n
+				(gnus-ofsetup-gettext 'setup-20)))))
+	  (when (or (string= type "directory") (string= type "maildir"))
+	    (setq path (read-directory-name
+			(format "<%d of %d> %s" j n
+				(gnus-ofsetup-gettext 'setup-21)))))
+	  ;; Now set a mail source specifier.
+	  (setq source `(,type))
+	  (mapc
+	   #'(lambda (sym)
+	       (unless (not (symbol-value sym))
+		 (setq source
+		       (nconc source
+			      (list
+			       (make-symbol
+				(format ":%s" (prin1-to-string sym)))
+			       (symbol-value sym))))))
+	   '(path user server authentication stream program))
+	  (setq mail-source (nconc mail-source (list source))))
 	(setq i (1- i)))
       (setq save-passwd
 	    (y-or-n-p (gnus-ofsetup-gettext 'setup-18)))
@@ -724,9 +743,20 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 
 ;;; Code for making Gnus and Gnus Offline cooperate with each other.
 
-;; advice.
+;; Advice.
 (defadvice gnus (around gnus-ofsetup-advice activate preactivate)
   "Setup offline environment when Gnus is invoked."
   (require 'gnus-offline) ad-do-it (gnus-offline-setup))
+
+;; Miscellaneous settings.
+
+(setq gnus-nntp-service nil)
+(setq gnus-nntp-server nil)
+(eval-after-load "gnus-start"
+  '(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news))
+(eval-after-load "message"
+  '(add-hook 'message-send-hook 'gnus-offline-message-add-header))
+(setq mail-source-read-passwd 'read-pw-read-passwd)
+(add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)
 
 ;; gnus-ofsetup.el Ends here.
