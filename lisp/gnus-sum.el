@@ -319,6 +319,7 @@ and non-`vertical', do both horizontal and vertical recentering."
   :group 'gnus-summary-maneuvering
   :type '(choice (const :tag "none" nil)
 		 (const vertical)
+		 (integer :tag "height")
 		 (sexp :menu-tag "both" t)))
 
 (defcustom gnus-show-all-headers nil
@@ -790,7 +791,7 @@ which it may alter in any way.")
   :group 'gnus-summary
   :type '(repeat symbol))
 
-(defcustom gnus-ignored-from-addresses nil
+(defcustom gnus-ignored-from-addresses (regexp-quote user-mail-address)
   "*Regexp of From headers that may be suppressed in favor of To headers."
   :group 'gnus-summary
   :type 'regexp)
@@ -2413,14 +2414,16 @@ marks of articles."
 	   gnus-ignored-from-addresses
 	   (string-match gnus-ignored-from-addresses
 			 (mail-header-from header)))
-      (or (car (funcall gnus-extract-address-components
-			(funcall gnus-decode-encoded-word-function to)))
-	  (funcall gnus-decode-encoded-word-function to)))
+      (concat "-> "
+	      (or (car (funcall gnus-extract-address-components
+				(funcall
+				 gnus-decode-encoded-word-function to)))
+		  (funcall gnus-decode-encoded-word-function to))))
      ((and newsgroups
 	   gnus-ignored-from-addresses
 	   (string-match gnus-ignored-from-addresses
 			 (mail-header-from header)))
-      newsgroups)
+      (concat "=> " newsgroups))
      (t
       (or (car (funcall gnus-extract-address-components
 			(mail-header-from header)))
@@ -3091,8 +3094,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
   '(let (out string)
      (while (not (memq (char-after) '(?\n nil)))
        (setq string (gnus-nov-field))
-       (when (string-match "^\\([^ :]\\): " string)
-	 (push (cons (intern (match-string 1))
+       (when (string-match "^\\([^ :]+\\): " string)
+	 (push (cons (intern (match-string 1 string))
 		     (substring string (match-end 0)))
 	       out)))
      out))
@@ -4916,7 +4919,9 @@ displayed, no centering will be performed."
   ;; Recenter only when requested.  Suggested by popovich@park.cs.columbia.edu.
   (let* ((top (cond ((< (window-height) 4) 0)
 		    ((< (window-height) 7) 1)
-		    (t 2)))
+		    (t (if (numberp gnus-auto-center-summary)
+			   gnus-auto-center-summary
+			 2))))
 	 (height (1- (window-height)))
 	 (bottom (save-excursion (goto-char (point-max))
 				 (forward-line (- height))
