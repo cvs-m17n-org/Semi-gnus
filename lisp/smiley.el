@@ -1,5 +1,5 @@
 ;;; smiley.el --- displaying smiley faces
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
 ;; Keywords: fun
@@ -31,7 +31,7 @@
 
 ;; To use:
 ;; (require 'smiley)
-;; (setq gnus-treat-display-smileys t)
+;; (add-hook 'gnus-article-display-hook 'gnus-smiley-display t)
 
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
@@ -63,7 +63,7 @@
     ("\\(:-+\\]+\\)\\W" 1 "FaceGoofy.xpm")
     ("\\(:-*D\\)\\W" 1 "FaceGrinning.xpm")
     ("\\(:-*[)>}»]+\\)\\W" 1 "FaceHappy.xpm")
-    ("\\(=[)»]+\\)\\W" 1 "FaceHappy.xpm")
+    ("\\(=[)>»]+\\)\\W" 1 "FaceHappy.xpm")
     ("\\(:-*[/\\\"]\\)[^/]\\W" 1 "FaceIronic.xpm")
     ("\\([8|]-*[|Oo%]\\)\\W" 1 "FaceKOed.xpm")
     ("\\([:|]-*#+\\)\\W" 1 "FaceNyah.xpm")
@@ -88,7 +88,7 @@
     ("\\(:-+D\\)\\W" 1 "FaceGrinning.xpm")
     ("\\(:-+[}»]+\\)\\W" 1 "FaceHappy.xpm")
     ("\\(:-*)+\\)\\W" 1 "FaceHappy.xpm")
-    ("\\(=[)]+\\)\\W" 1 "FaceHappy.xpm")
+    ("\\(=[)>]+\\)\\W" 1 "FaceHappy.xpm")
     ("\\(:-+[/\\\"]+\\)\\W" 1 "FaceIronic.xpm")
     ("\\([8|]-+[|Oo%]\\)\\W" 1 "FaceKOed.xpm")
     ("\\([:|]-+#+\\)\\W" 1 "FaceNyah.xpm")
@@ -162,7 +162,7 @@ above them."
 (defun smiley-popup-menu (e)
   (interactive "e")
   (popup-menu
-   `("Smilies"
+   `("Smilies" 
      ["Toggle This Smiley" (smiley-toggle-extent ,e) t]
      ["Toggle All Smilies" (smiley-toggle-extents ,e) t])))
 
@@ -255,8 +255,13 @@ above them."
 	  (while (re-search-forward regexp nd t)
 	    (let* ((start (match-beginning group))
 		   (end (match-end group))
-		   (glyph (smiley-create-glyph (buffer-substring start end)
-					       file)))
+		   (glyph
+		    (and (or (eq start 1)
+			     (not (string-match "\\(\\^\\|;\\|_\\);)" 
+						(buffer-substring 
+						 (1- start) (+ start 2)))))
+			 (smiley-create-glyph (buffer-substring start end)
+					      file))))
 	      (when glyph
 		(mapcar 'delete-annotation (annotations-at end))
 		(let ((ext (make-extent start end))
@@ -275,12 +280,10 @@ above them."
 		  (set-extent-property ant 'smiley-extent ext)
 		  (set-extent-property ext 'smiley-annotation ant)
 		  ;; Help
-		  (set-extent-property
-		   ext 'help-echo
-		   "button2 toggles smiley, button3 pops up menu")
-		  (set-extent-property
-		   ant 'help-echo
-		   "button2 toggles smiley, button3 pops up menu")
+		  (set-extent-property ext 'help-echo
+				       "button2 toggles smiley, button3 pops up menu")
+		  (set-extent-property ant 'help-echo
+				       "button2 toggles smiley, button3 pops up menu")
 		  (set-extent-property ext 'balloon-help
 				       "Mouse button2 - toggle smiley
 Mouse button3 - menu")
@@ -299,7 +302,7 @@ Mouse button3 - menu"))
 	       (eq (char-after) ?\()
 	       (goto-char end)
 	       (or (not (re-search-forward "[()]" nil t))
-		   (eq (char-after (1- (point))) ?\()))
+		   (= (char-after (1- (point))) ?\()))
       t)))
 
 (defvar gnus-article-buffer)
@@ -309,8 +312,11 @@ Mouse button3 - menu"))
   (interactive)
   (save-excursion
     (set-buffer gnus-article-buffer)
-    (article-goto-body)
-    (smiley-buffer (current-buffer) (point-min) (point-max))))
+    (goto-char (point-min))
+    ;; We skip the headers.
+    (unless (search-forward "\n\n" nil t)
+      (goto-char (point-max)))
+    (smiley-buffer (current-buffer) (point))))
 
 (provide 'smiley)
 
