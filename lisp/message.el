@@ -4284,8 +4284,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	    (when (eval message-mailer-swallows-blank-line)
 	      (newline))
 	    (when message-interactive
-	      (save-excursion
-		(set-buffer errbuf)
+	      (with-current-buffer errbuf
 		(erase-buffer))))
 	  (let* ((default-directory "/")
 		 (cpr (as-binary-process
