@@ -1,9 +1,7 @@
 ;;; gnus-agent.el --- unplugged support for Gnus
-;; Copyright (C) 1997 Free Software Foundation, Inc.
+;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
-
 ;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -46,6 +44,11 @@
   :group 'gnus-agent
   :type 'hook)
 
+(defcustom gnus-agent-handle-level gnus-level-subscribed
+  "Groups on levels higher than this variable will be ignored by the Agent."
+  :group 'gnus-agent
+  :type 'integer)
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -61,9 +64,7 @@
 (defvar gnus-agent-spam-hashtb nil)
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
-
-(defvar gnus-plugged t
-  "Whether Gnus is plugged or not.")
+(defvar gnus-agent-article-file-coding-system 'no-conversion)
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -112,11 +113,39 @@
 
 (defsubst gnus-agent-directory ()
   "Path of the Gnus agent directory."
-  (nnheader-concat gnus-agent-directory (gnus-agent-method) "/"))
+  (nnheader-concat gnus-agent-directory
+		   (nnheader-translate-file-chars (gnus-agent-method)) "/"))
 
 (defun gnus-agent-lib-file (file)
   "The full path of the Gnus agent library FILE."
   (concat (gnus-agent-directory) "agent.lib/" file))
+
+;;; Fetching setup functions.
+
+(defun gnus-agent-start-fetch ()
+  "Initialize data structures for efficient fetching."
+  (gnus-agent-open-history)
+  (setq gnus-agent-current-history (gnus-agent-history-buffer)))
+
+(defun gnus-agent-stop-fetch ()
+  "Save all data structures and clean up."
+  (gnus-agent-save-history)
+  (gnus-agent-close-history)
+  (setq gnus-agent-spam-hashtb nil)
+  (save-excursion
+    (set-buffer nntp-server-buffer)
+    (widen)))
+
+(defmacro gnus-agent-with-fetch (&rest forms)
+  "Do FORMS safely."
+  `(unwind-protect
+       (progn
+	 (gnus-agent-start-fetch)
+	 ,@forms)
+     (gnus-agent-stop-fetch)))
+
+(put 'gnus-agent-with-fetch 'lisp-indent-function 0)
+(put 'gnus-agent-with-fetch 'edebug-form-spec '(body))
 
 ;;;
 ;;; Mode infestation
@@ -147,11 +176,11 @@
 						     buffer))))
 	    minor-mode-map-alist))
     (gnus-agent-toggle-plugged gnus-plugged)
-    (run-hooks 'gnus-agent-mode-hook)))
+    (gnus-run-hooks 'gnus-agent-mode-hook)))
 
 (defvar gnus-agent-group-mode-map (make-sparse-keymap))
 (gnus-define-keys gnus-agent-group-mode-map
-  "Ju" gnus-agent-fetch-group
+  "Ju" gnus-agent-fetch-groups
   "Jc" gnus-enter-category-buffer
   "Jj" gnus-agent-toggle-plugged
   "Js" gnus-agent-fetch-session
@@ -209,12 +238,13 @@
   (interactive (list (not gnus-plugged)))
   (if plugged
       (progn
-	(run-hooks 'gnus-agent-plugged-hook)
+	(setq gnus-plugged plugged)
+	(gnus-run-hooks 'gnus-agent-plugged-hook)
 	(setcar (cdr gnus-agent-mode-status) " Plugged"))
     (gnus-agent-close-connections)
-    (run-hooks 'gnus-agent-unplugged-hook)
+    (setq gnus-plugged plugged)
+    (gnus-run-hooks 'gnus-agent-unplugged-hook)
     (setcar (cdr gnus-agent-mode-status) " Unplugged"))
-  (setq gnus-plugged plugged)
   (set-buffer-modified-p t))
 
 (defun gnus-agent-close-connections ()
@@ -272,6 +302,11 @@ agent minor mode in all Gnus buffers."
 ;;; Group mode commands
 ;;;
 
+(defun gnus-agent-fetch-groups (n)
+  "Put all new articles in the current groups into the agent."
+  (interactive "P")
+  (gnus-group-iterate n 'gnus-agent-fetch-group))
+
 (defun gnus-agent-fetch-group (group)
   "Put all new articles in GROUP into the agent."
   (interactive (list (gnus-group-group-name)))
@@ -279,7 +314,8 @@ agent minor mode in all Gnus buffers."
     (error "No group on the current line"))
   (let ((gnus-command-method (gnus-find-method-for-group group)))
     (gnus-agent-with-fetch
-      (gnus-agent-fetch-group-1 group gnus-command-method))))
+      (gnus-agent-fetch-group-1 group gnus-command-method)
+      (gnus-message 5 "Fetching %s...done" group))))
 
 (defun gnus-agent-add-group (category arg)
   "Add the current group to an agent category."
@@ -352,7 +388,6 @@ If N is negative, mark backward instead.  If UNMARK is non-nil, remove
 the mark instead.  The difference between N and the actual number of
 articles marked is returned."
   (interactive "p")
-  (gnus-set-global-variables)
   (let ((backward (< n 0))
 	(n (abs n)))
     (while (and
@@ -373,7 +408,6 @@ articles marked is returned."
 If N is negative, unmark backward instead.  The difference between N and
 the actual number of articles unmarked is returned."
   (interactive "p")
-  (gnus-set-global-variables)
   (gnus-agent-mark-article n t))
 
 (defun gnus-agent-toggle-mark (n)
@@ -381,7 +415,6 @@ the actual number of articles unmarked is returned."
 If N is negative, toggle backward instead.  The difference between N and
 the actual number of articles toggled is returned."
   (interactive "p")
-  (gnus-set-global-variables)
   (gnus-agent-mark-article n 'toggle))
 
 (defun gnus-summary-set-agent-mark (article &optional unmark)
@@ -389,9 +422,13 @@ the actual number of articles toggled is returned."
   (let ((unmark (if (and (not (null unmark)) (not (eq t unmark)))
 		    (memq article gnus-newsgroup-downloadable)
 		  unmark)))
-    (setq gnus-newsgroup-downloadable
-	  (delq article gnus-newsgroup-downloadable))
-    (unless unmark
+    (if unmark
+	(progn
+	  (setq gnus-newsgroup-downloadable
+		(delq article gnus-newsgroup-downloadable))
+	  (push article gnus-newsgroup-undownloaded))
+      (setq gnus-newsgroup-undownloaded
+	    (delq article gnus-newsgroup-undownloaded))
       (push article gnus-newsgroup-downloadable))
     (gnus-summary-update-mark
      (if unmark gnus-undownloaded-mark gnus-downloadable-mark)
@@ -428,7 +465,8 @@ the actual number of articles toggled is returned."
     (let* ((gnus-command-method method)
 	   (file (gnus-agent-lib-file "active")))
       (gnus-make-directory (file-name-directory file))
-      (write-region (point-min) (point-max) file nil 'silent)
+      (let ((coding-system-for-write gnus-agent-article-file-coding-system))
+	(write-region (point-min) (point-max) file nil 'silent))
       (when (file-exists-p (gnus-agent-lib-file "groups"))
 	(delete-file (gnus-agent-lib-file "groups"))))))
 
@@ -442,7 +480,11 @@ the actual number of articles toggled is returned."
 
 (defun gnus-agent-group-path (group)
   "Translate GROUP into a path."
-  (nnheader-replace-chars-in-string group ?. ?/))
+  (if nnmail-use-long-file-names
+      group
+    (nnheader-replace-chars-in-string
+     (nnheader-translate-file-chars group)
+     ?. ?/)))
 
 
 
@@ -522,31 +564,6 @@ the actual number of articles toggled is returned."
 ;;; Fetching
 ;;;
 
-(defun gnus-agent-start-fetch ()
-  "Initialize data structures for efficient fetching."
-  (gnus-agent-open-history)
-  (setq gnus-agent-current-history (gnus-agent-history-buffer)))
-
-(defun gnus-agent-stop-fetch ()
-  "Save all data structures and clean up."
-  (gnus-agent-save-history)
-  (gnus-agent-close-history)
-  (setq gnus-agent-spam-hashtb nil)
-  (save-excursion
-    (set-buffer nntp-server-buffer)
-    (widen)))
-
-(defmacro gnus-agent-with-fetch (&rest forms)
-  "Do FORMS safely."
-  `(unwind-protect
-       (progn
-	 (gnus-agent-start-fetch)
-	 ,@forms)
-     (gnus-agent-stop-fetch)))
-
-(put 'gnus-agent-with-fetch 'lisp-indent-function 0)
-(put 'gnus-agent-with-fetch 'edebug-form-spec '(body))
-
 (defun gnus-agent-fetch-articles (group articles)
   "Fetch ARTICLES from GROUP and put them into the agent."
   (when articles
@@ -605,9 +622,11 @@ the actual number of articles toggled is returned."
 	    (if (not (re-search-forward "^Message-ID: *<\\([^>\n]+\\)>" nil t))
 		(setq id "No-Message-ID-in-article")
 	      (setq id (buffer-substring (match-beginning 1) (match-end 1))))
-	    (write-region (point-min) (point-max)
-			  (concat dir (number-to-string (caar pos)))
-			  nil 'silent)
+	    (let ((coding-system-for-write
+		   gnus-agent-article-file-coding-system))
+	      (write-region (point-min) (point-max)
+			    (concat dir (number-to-string (caar pos)))
+			    nil 'silent))
 	    (when (setq elem (assq (caar pos) gnus-agent-article-alist))
 	      (setcdr elem t))
 	    (gnus-agent-enter-history
@@ -677,13 +696,25 @@ the actual number of articles toggled is returned."
 	(set-buffer nntp-server-buffer)
 	(unless (eq 'nov (gnus-retrieve-headers articles group))
 	  (nnvirtual-convert-headers))
+	;;
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (goto-char (point-at-eol))
+	  (insert "\t")
+	  (forward-line 1))
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;;
 	;; Save these headers for later processing.
 	(copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
 	(let (file)
 	  (when (file-exists-p
 		 (setq file (gnus-agent-article-name ".overview" group)))
 	    (gnus-agent-braid-nov group articles file))
-	  (gnus-make-directory (file-name-directory file))
+	  (gnus-make-directory (nnheader-translate-file-chars
+				(file-name-directory file)))
 	  (write-region (point-min) (point-max) file nil 'silent)
 	  (gnus-agent-save-alist group articles nil))
 	t))))
@@ -760,6 +791,14 @@ the actual number of articles toggled is returned."
   (concat (gnus-agent-directory) (gnus-agent-group-path group) "/"
 	  (if (stringp article) article (string-to-number article))))
 
+;;;###autoload
+(defun gnus-agent-batch-fetch ()
+  "Start Gnus and fetch session."
+  (interactive)
+  (gnus)
+  (gnus-agent-fetch-session)
+  (gnus-group-exit))
+
 (defun gnus-agent-fetch-session ()
   "Fetch all articles and headers that are eligible for fetching."
   (interactive)
@@ -775,7 +814,8 @@ the actual number of articles toggled is returned."
 	      groups (gnus-groups-from-server (pop methods)))
 	(gnus-agent-with-fetch
 	  (while (setq group (pop groups))
-	    (gnus-agent-fetch-group-1 group gnus-command-method))))
+	    (when (<= (gnus-group-level group) gnus-agent-handle-level)
+	      (gnus-agent-fetch-group-1 group gnus-command-method)))))
       (gnus-message 6 "Finished fetching articles into the Gnus agent"))))
 
 (defun gnus-agent-fetch-group-1 (group method)
@@ -901,7 +941,7 @@ the actual number of articles toggled is returned."
        ["Edit groups" gnus-category-edit-groups t]
        ["Exit" gnus-category-exit t]))
 
-    (run-hooks 'gnus-category-menu-hook)))
+    (gnus-run-hooks 'gnus-category-menu-hook)))
 
 (defun gnus-category-mode ()
   "Major mode for listing and editing agent categories.
@@ -927,7 +967,7 @@ The following commands are available:
   (buffer-disable-undo (current-buffer))
   (setq truncate-lines t)
   (setq buffer-read-only t)
-  (run-hooks 'gnus-category-mode-hook))
+  (gnus-run-hooks 'gnus-category-mode-hook))
 
 (defalias 'gnus-category-position-point 'gnus-goto-colon)
 
@@ -976,7 +1016,7 @@ The following commands are available:
   (setq gnus-category-alist
 	(or (gnus-agent-read-file
 	     (nnheader-concat gnus-agent-directory "lib/categories"))
-	    (list (list 'default 'true nil nil)))))
+	    (list (list 'default 'short nil nil)))))
     
 (defun gnus-category-write ()
   "Write the category alist."
@@ -1223,7 +1263,8 @@ The following commands are available:
 	   (gnus-delete-line)
 	   (setq headers nil)))
 	(when headers
-	  (unless (memq (setq article (mail-header-number headers)) unreads)
+	  (if (memq (setq article (mail-header-number headers)) unreads)
+	      (forward-line 1)
 	    (if (not (< (inline
 			  (gnus-time-to-day
 			   (inline (nnmail-date-to-time
@@ -1238,6 +1279,15 @@ The following commands are available:
 		     (setq file (concat dir (number-to-string article))))
 		(delete-file file))))))
       (gnus-agent-save-alist nil nil nil dir))))
+
+;;;###autoload
+(defun gnus-agent-batch ()
+  (interactive)
+  (let ((init-file-user "")
+	(gnus-always-read-dribble-file t))
+    (gnus))
+  (gnus-group-send-drafts)
+  (gnus-agent-fetch-session))
 
 (provide 'gnus-agent)
 

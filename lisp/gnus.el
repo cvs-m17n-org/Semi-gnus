@@ -641,12 +641,20 @@ be set in `.emacs' instead."
 
 (defvar gnus-simple-splash nil)
 
+(defvar gnus-bdf-image-file nil)
 (defun gnus-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
   (erase-buffer)
   (insert
-   (format "              %s
+   (if (featurep 'bitmap)
+     (format "              %s
+
+"
+	     "" (if (and (stringp gnus-bdf-image-file)
+			 (file-exists-p gnus-bdf-image-file))
+		    (insert-file gnus-image-file)))
+     (format "              %s
           _    ___ _             _
           _ ___ __ ___  __    _ ___
           __   _     ___    __  ___
@@ -666,7 +674,7 @@ be set in `.emacs' instead."
           __
 
 "
-           ""))
+	     "")))
   ;; And then hack it.
   (gnus-indent-rigidly (point-min) (point-max)
 		       (/ (max (- (window-width) (or x 46)) 0) 2))
