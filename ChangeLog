@@ -1,5 +1,8 @@
 2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nntp.el (nntp-send-buffer): Don't use
+	`mm-with-unibyte-current-buffer'.  Use expanded form instead.
+
 	* lisp/gnus-art.el (gnus-treatment-function-alist): Move X-Face
 	stuff down after unfolding stuff.
 

@@ -490,10 +490,16 @@ noticing asynchronous data.")
       (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
       (erase-buffer)))
   (nntp-encode-text)
-  (mm-with-unibyte-current-buffer
-    ;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
-    (process-send-region (nntp-find-connection nntp-server-buffer)
-			 (point-min) (point-max)))
+  (let ((multibyte (and (boundp 'enable-multibyte-characters)
+			(symbol-value 'enable-multibyte-characters))))
+    (unwind-protect
+	;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
+	(progn
+	  ;; `set-buffer-multibyte' will be provided by APEL for all Emacsen.
+	  (set-buffer-multibyte nil)
+	  (process-send-region (nntp-find-connection nntp-server-buffer)
+			       (point-min) (point-max))))
+    (set-buffer-multibyte multibyte))
   (nntp-retrieve-data
    nil nntp-address nntp-port-number nntp-server-buffer
    wait-for nnheader-callback-function))
