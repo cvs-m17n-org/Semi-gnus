@@ -1,3 +1,16 @@
+2001-12-03 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* pop3.el (pop3-munge-message-separator): Only use valid date.
+	From Michael Welsh Duggan <md5i@cs.cmu.edu>.
+
+	* Makefile.in: gnus-load.elc may not be generated.
+
+2001-12-03 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-url.el: New.
+	* nnslashdot.el: Use it.
+	* mm-extern.el (mm-extern-url): Use it.
+
 2001-12-01 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-sum.el (gnus-summary-save-article): Nix

@@ -22,18 +22,18 @@ EXPORTING_FILES = $(EMACS_COMP) -f dgnushack-exporting-files 2>/dev/null
 # form instead.  Because, as far as we know, FreeBSD's native make will
 # be discontinued if COMMAND returns a non-zero exit status.
 
-all total: clean-some gnus-load.elc
+all total: clean-some gnus-load.el
 	$(EMACS_COMP) -f dgnushack-compile
 
 clean-some:
 	rm -f *.elc gnus-load.el
 
-warn: clean-some gnus-load.elc
+warn: clean-some gnus-load.el
 	$(EMACS_COMP) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
 
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
-clever some: gnus-load.elc
+clever some: gnus-load.el
 	@if test -f $(srcdir)/gnus.elc; then \
 	  echo \
 	    "checking whether the all elc files should be recompiled..."; \
@@ -73,7 +73,7 @@ install-package-manifest:
 	$(EMACS_COMP) -f dgnushack-install-package-manifest \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
-compose-package: gnus-load.elc
+compose-package: gnus-load.el
 	$(EMACS_COMP) -f dgnushack-compose-package
 
 remove-extra-files-in-package:
@@ -98,7 +98,7 @@ separately:
 pot:
 	xpot -drgnus -r`cat ./version` *.el > rgnus.pot
 
-gnus-load.el gnus-load.elc:
+gnus-load.el:
 	$(EMACS_COMP) -f dgnushack-make-cus-load $(srcdir)
 	$(EMACS_COMP) -f dgnushack-make-auto-load $(srcdir)
 	$(EMACS_COMP) -f dgnushack-make-load
