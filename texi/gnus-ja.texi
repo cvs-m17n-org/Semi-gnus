@@ -21813,10 +21813,21 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 
 $B%0%k!<%W%Q%i%a!<%?$+JQ?t(B @code{gnus-spam-process-newsgroups} $B$r%+%9%?%^(B
 $B%$%:$7$F!"$3$N%7%s%\%k$r%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$((B
-$B$F2<$5$$!#$3$l$,2C$($i$l$k$H!"(Bspam $B0u$,IU$$$?5-;v$N%0%k!<%W$,(B Gmane $B$N4I(B
-$BM}<T$KJs9p$5$l$^$9!#(B($BLuCm(B: gmane $B%K%e!<%9%0%k!<%W$rFI$s$G$$$k$H$-$K8+$D(B
-$B$+$C$?(B spam $B$N5-;vHV9f$H%0%k!<%WL>$r(B http $B7PM3$GEA$($^$9!#(B
-@file{spam-report.el} $B;2>H!#(B)
+$B$F2<$5$$!#$3$l$,2C$($i$l$k$H!"(Bspam $B0u$,IU$$$?5-;v$N%0%k!<%W$,(B HTTP $B7PM3(B
+$B$G(B Gmane $B$N4IM}<T$KJs9p$5$l$^$9!#(B
+
+Gmane $B$O(B @uref{http://gmane.org} $B$G8+$D$1$k$3$H$,$G$-$^$9!#(B
+
+@end defvar
+
+@defvar spam-report-gmane-use-article-number
+
+$B$3$NJQ?t$O%G%#%U%)%k%H$G(B @code{t} $B$G$9!#$"$J$?<+?H$,%K%e!<%9%5!<%P!<$r1?(B
+$B1D$7$F$$$k!"$9$J$o$A%m!<%+%k$J5-;vHV9f$,(B Gmane $B$N5-;vHV9f$H9g$o$J$$>l9g(B
+$B$O!"(B@code{nil} $B$K@_Dj$7$F2<$5$$!#(B
+@code{spam-report-gmane-use-article-number} $B$,(B @code{nil} $B$G$"$k$H!"(B
+@file{spam-report.el} $B$O(B Gmane $B$,Ds6!$9$k(B @code{X-Report-Spam} $B%X%C%@!<(B
+$B$r;H$$$^$9!#(B
 
 @end defvar
 
