@@ -1,3 +1,22 @@
+2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 17.
+
+	* lisp/gnus-spec.el (gnus-format-specs-compiled): Fix doc string.
+
+2000-04-11  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/gnus-start.el (gnus-product-variable-touch): Support multiple
+	arguments.
+
+	* lisp/gnus-spec.el (gnus-search-or-regist-spec): New utility macro.
+	(gnus-update-format-specifications): Support new data structure of
+	`gnus-format-specs-compiled'.
+	(gnus-update-format-specification-1): Likewise.
+	(gnus-update-format): Support new data structure of
+	`gnus-format-specs'.
+	(gnus-format-specs): Modify data structure.
+
 2000-04-10   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/imap.el (imap-body-lines): Check Content-Type: of the
