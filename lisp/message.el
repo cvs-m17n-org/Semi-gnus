@@ -247,14 +247,14 @@ included.  Organization, Lines and User-Agent are optional."
   :type 'sexp)
 
 (defcustom message-ignored-news-headers
-  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:"
+  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:\\|^X-Gnus-Agent-Meta-Information:"
   "*Regexp of headers to be removed unconditionally before posting."
   :group 'message-news
   :group 'message-headers
   :type 'regexp)
 
 (defcustom message-ignored-mail-headers
-  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:"
+  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:\\|^X-Gnus-Agent-Meta-Information:"
   "*Regexp of headers to be removed unconditionally before mailing."
   :group 'message-mail
   :group 'message-headers
@@ -2340,10 +2340,14 @@ Prefix arg means justify as well."
       (if not-break
 	  (setq point nil)
 	(if bolp
-	    (insert "\n")
-	  (insert "\n\n"))
+	    (newline)
+	  (newline)
+	  (newline))
 	(setq point (point))
-	(insert "\n\n")
+	;; (newline 2) doesn't mark both newline's as hard, so call
+	;; newline twice. -jas
+	(newline)
+	(newline)
 	(delete-region (point) (re-search-forward "[ \t]*"))
 	(when (and quoted (not bolp))
 	  (insert quoted leading-space)))
@@ -3003,7 +3007,7 @@ It should typically alter the sending method in some way or other."
       (save-excursion
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
-	;; ;; Avoid copying text props.
+	;; ;; Avoid copying text props (except hard newlines).
 	;; T-gnus change: copy all text props from the editing buffer
 	;; into the encoding buffer.
 	(insert-buffer message-edit-buffer)
@@ -3313,6 +3317,9 @@ This sub function is for exclusive use of `message-send-mail'."
 	  (save-excursion
 	    (set-buffer tembuf)
 	    (erase-buffer)
+	    ;; ;; Avoid copying text props (except hard newlines).
+	    ;; T-gnus change: copy all text props from the editing buffer
+	    ;; into the encoding buffer.
 	    (insert-buffer message-encoding-buffer)
 	    ;; Remove some headers.
 	    (save-restriction
@@ -3321,7 +3328,6 @@ This sub function is for exclusive use of `message-send-mail'."
 ;;	      ;; We (re)generate the Lines header.
 ;;	      (when (memq 'Lines message-required-mail-headers)
 ;;		(message-generate-headers '(Lines)))
-	      ;; Remove some headers.
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.

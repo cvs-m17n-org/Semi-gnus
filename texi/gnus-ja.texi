@@ -287,7 +287,7 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 Free Software Foundation, Inc.
 
 
@@ -335,7 +335,7 @@ This file documents gnus, the GNU Emacs newsreader.
 
 $B$3$N%U%!%$%k$O(B GNU Emacs $B$N%K%e!<%9%j!<%@$G$"$k(B gnus $B$K4X$9$k@bL@=q$G$9!#(B
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -383,7 +383,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -2779,6 +2779,17 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$K(B @code{gnus-mailing-list-mode} $B$,M-8z$K$J$j$^$9!#(B
 
 @code{gnus-parameter-to-list-alist} $B$b;2>H$7$F2<$5$$!#(B
+
+@item subscribed
+@cindex subscribed
+$B$b$7$3$N%Q%i%a!<%?$,(B @code{t} $B$K@_Dj$5$l$F$$$k$H!"(Bgnus $B$O$"$J$?$,$3$N%0(B
+$B%k!<%W$r(B to-address $B$H(B to-list $B%Q%i%a!<%?$N%"%I%l%9$G9XFI$7$F$$$k%a!<%j(B
+$B%s%0%j%9%H$G$"$k$H2r<a$7$^$9!#$3$N>pJs$r(B gnus $B$KM?$($k$3$H$O!"$"$J$?$,$=(B
+$B$l$i$N%a!<%j%s%0%j%9%H$KEj9F$9$k$H$-$K!"@5$7$$(B Mail-Followup-To $B%X%C%@!<(B
+$B$r@8@.$9$kLr$KN)$A$^$9!#(B
+
+@code{gnus-find-subscribed-addresses} $B$b;2>H$7$F2<$5$$!#$3$N4X?t$O$3$N%0(B
+$B%k!<%W%Q%i%a!<%?$rD>@\$K;H$$$^$9!#(B
 
 @item visible
 @cindex visible
@@ -15136,6 +15147,10 @@ nnvirtual $B%0%k!<%W(B (@dfn{nnvirtual group}) $B$O<B$OB>$N%0%k!<%W$N=89g0J>e
 $B$l$^$9!#$D$^$j!"$b$72>A[%0%k!<%WFb$G5-;v$K2D;k5-;v$N0u$r$D$1$k$H!"$=$N5-(B
 $B;v$O$b$H$b$H$N9=@.%0%k!<%W$NCf$G$b2D;k5-;v$K$J$j$^$9!#(B($B$=$7$F5U$b@.$jN)(B
 $B$A$^$9(B --- $B9=@.%0%k!<%WFb$GIU$1$?0u$O2>A[%0%k!<%WFb$G$bI=<($5$l$^$9!#(B)
+$B6u$N2>A[%0%k!<%W$r:n$k$K$O!"%0%k!<%W%P%C%U%!$G(B @kbd{G V}
+(@code{gnus-group-make-empty-virtual}) $B$r<B9T$7!"(B@kbd{M-e}
+(@code{gnus-group-edit-group-method}) $B$G%a%=%C%I$N@55,I=8=$rJT=8$7$F2<$5(B
+$B$$!#(B
 
 $B$3$l$,!"(BAndrea Dworkin $B$K4X$9$kA4$F$N%K%e!<%9%0%k!<%W$r!"0l$D$N5pBg$G%7(B
 $B%"%o%;$J%K%e!<%9%0%k!<%W$K$^$H$a$k(B @code{nnvirtual} $BJ}K!$NNc$G$9!#(B
@@ -16081,6 +16096,19 @@ Gnus $B%(!<%8%'%s%H$,%U%!%$%k$r3JG<$9$k>l=j!#=i4|@_DjCM(B
 @item gnus-agent-fetched-hook
 @vindex gnus-agent-fetched-hook
 $B5-;v$r<h$j9~$_=*$o$C$?$H$-$K<B9T$5$l$k%U%C%/!#(B
+
+@item gnus-agent-cache
+@vindex gnus-agent-cache
+plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B NOV $B$H5-;v$r;H$&$+$I$&$+$r@)8f$9(B
+$B$kJQ?t!#(B
+
+@item gnus-agent-go-online
+@vindex gnus-agent-go-online
+@code{gnus-agent-go-online} $B$,(B @code{nil} $B$@$C$?$i!"%(!<%8%'%s%H$O%*%U%i(B
+$B%$%s>uBV$N%5!<%P!<$r%*%s%i%$%s>uBV$K$7$^$;$s!#(B@code{ask} $B$@$C$?$i!"$=$l(B
+$B$,%G%#%U%)%k%H$G$9$,!"%(!<%8%'%s%H$O:F@\B3$9$k$H$-$K%*%U%i%$%s>uBV$N%5!<(B
+$B%P!<$r%*%s%i%$%s>uBV$K$9$k$+$I$&$+$r?R$M$^$9!#$=$l0J30$NCM$@$C$?$i!"%*%U(B
+$B%i%$%s>uBV$N%5!<%P!<$O<+F0E*$K%*%s%i%$%s>uBV$K$J$j$^$9!#(B
 @end table
 
 @node Example Setup
@@ -16235,16 +16263,18 @@ Gnus Agent $B$O$h$/$"$kB>$N%*%U%i%$%s%K%e!<%9%j!<%@!<$N$h$&$K$OF0:n$7$^$;(B
 @table @dfn
 @item $B@\B3$5$l$F$$$k$H$-$K5-;v$rFI$s$@$i!"$=$l$O(B Agent $B$KF~$k$N$G$9$+(B?
 
-@strong{$B$$$$$(!#(B}
+@strong{$B$$$$$((B}$B!#(B
 
 @item $B@\B3$5$l$F$$$k$H$-$K5-;v$rFI$s$G!"(BAgent $B$K5-;v$,B8:_$7$F$$$k>l9g!"(B
 $B$b$&0l2s%@%&%s%m!<%I$5$l$k$N$G$9$+(B?
 
-@strong{$B$O$$!#(B}
+@strong{$B$$$$$((B}$B!"$?$@$7(B @code{gnus-agent-cache} $B$,(B `nil' $B$G$J$+$C$?$i!"(B
+$B$G$9$,!#(B
 @end table
 
-$BMWLs$9$k$H!"(Bgnus $B$,@Z$jN%$5$l$F$$$k$H$-$O!"%m!<%+%k$KJ]B8$5$l$?5-;v$r8+(B
-$B$k$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O!"(BISP $B$HOC$9$@$1$G$9!#(B
+$BMWLs$9$k$H!"(Bgnus $B$,@Z$jN%$5$l$F$$$k$H$-$O%m!<%+%k$KJ]B8$5$l$?5-;v$r8+$k(B
+$B$@$1$G$9!#@\B3$5$l$F$$$k$H$-$O(B ISP $B$HOC$9$@$1$G!"$+$D%m!<%+%k$K;}$C$F$$(B
+$B$k5-;v$r;H$$$^$9!#(B
 
 @node Scoring
 @chapter $B%9%3%"(B
@@ -20262,7 +20292,7 @@ RFC 1036 $B$N8e7Q$H$7$F=q$$$F$$$k$b$N$G$9!#%K%e!<%95-;v$NMM<0$KBP$7$F!"$$(B
 @cindex MIME
 MIME $B4XO"$N$9$Y$F$N(B RFC $B$,%5%]!<%H$5$l$F$$$^$9!#(B
 
-@item Disposition Notifications - RFC 2289
+@item Disposition Notifications - RFC 2298
 Message Mode $B$O<u?.<T$K3+Iu3NG'$rMW5a$9$k$3$H$,$G$-$^$9!#(B
 
 @ignore

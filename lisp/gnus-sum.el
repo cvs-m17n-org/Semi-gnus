@@ -2825,7 +2825,12 @@ display only a single character."
 
 (defun gnus-summary-setup-buffer (group)
   "Initialize summary buffer."
-  (let ((buffer (gnus-summary-buffer-name group)))
+  (let ((buffer (gnus-summary-buffer-name group))
+	(dead-name (concat "*Dead Summary "
+			   (gnus-group-decoded-name group) "*")))
+    ;; If a dead summary buffer exists, we kill it.
+    (when (gnus-buffer-live-p dead-name)
+      (gnus-kill-buffer dead-name))
     (if (get-buffer buffer)
 	(progn
 	  (set-buffer buffer)
@@ -3314,7 +3319,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	    (progn
 	      (gnus-configure-windows 'summary)
 	      (let ((art (gnus-summary-article-number)))
-		(unless (memq art gnus-newsgroup-undownloaded)
+		(unless (or (memq art gnus-newsgroup-undownloaded)
+			    (memq art gnus-newsgroup-downloadable))
 		  (gnus-summary-goto-article art))))
 	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
@@ -6281,17 +6287,20 @@ The state which existed when entering the ephemeral is reset."
 	(set-buffer buffer)
 	(gnus-kill-buffer gnus-article-buffer)
 	(gnus-kill-buffer gnus-original-article-buffer)))
-    (cond (gnus-kill-summary-on-exit
-	   (when (and gnus-use-trees
-		      (gnus-buffer-exists-p buffer))
-	     (save-excursion
-	       (set-buffer buffer)
-	       (gnus-tree-close gnus-newsgroup-name)))
-	   (gnus-kill-buffer buffer))
-	  ((gnus-buffer-exists-p buffer)
-	   (save-excursion
-	     (set-buffer buffer)
-	     (gnus-deaden-summary))))))
+    (cond
+     ;; Kill the buffer.
+     (gnus-kill-summary-on-exit
+      (when (and gnus-use-trees
+		 (gnus-buffer-exists-p buffer))
+	(save-excursion
+	  (set-buffer buffer)
+	  (gnus-tree-close gnus-newsgroup-name)))
+      (gnus-kill-buffer buffer))
+     ;; Deaden the buffer.
+     ((gnus-buffer-exists-p buffer)
+      (save-excursion
+	(set-buffer buffer)
+	(gnus-deaden-summary))))))
 
 (defun gnus-summary-wake-up-the-dead (&rest args)
   "Wake up the dead summary buffer."
@@ -6567,13 +6576,14 @@ be displayed."
 	  ;; The requested article is different from the current article.
 	  (progn
 	    (gnus-summary-display-article article all-headers)
-	    (when (or all-headers gnus-show-all-headers)
-	      (gnus-article-show-all-headers))
+;;; Hidden headers are not hidden text any more.
+;;	    (when (or all-headers gnus-show-all-headers)
+;;	      (gnus-article-show-all-headers))
 	    (gnus-article-set-window-start
 	     (cdr (assq article gnus-newsgroup-bookmarks)))
 	    article)
-	(when (or all-headers gnus-show-all-headers)
-	  (gnus-article-show-all-headers))
+;;	(when (or all-headers gnus-show-all-headers)
+;;	  (gnus-article-show-all-headers))
 	'old))))
 
 (defun gnus-summary-force-verify-and-decrypt ()
@@ -8365,7 +8375,9 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
     ;; `gnus-read-move-group-name' an opportunity to suggest an
     ;; appropriate default.
     (unless (gnus-buffer-live-p gnus-original-article-buffer)
-      (gnus-summary-select-article nil nil nil (car articles)))
+      (let ((gnus-display-mime-function nil)
+	    (gnus-article-prepare-hook nil))
+	(gnus-summary-select-article nil nil nil (car articles))))
     ;; Read the newsgroup name.
     (when (and (not to-newsgroup)
 	       (not select-method))

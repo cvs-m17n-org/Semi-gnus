@@ -432,9 +432,9 @@ noticing asynchronous data.")
 	  (set-buffer buffer)
 	  (goto-char pos)
 	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn (forward-line 1) (gnus-point-at-bol))))
-	  )))
-    ))
+	      (delete-region pos (progn
+				   (forward-line 1)
+				   (gnus-point-at-bol)))))))))
 
 (defun nntp-send-command-nodelete (wait-for &rest strings)
   "Send STRINGS to server and wait until WAIT-FOR returns."
@@ -452,9 +452,9 @@ noticing asynchronous data.")
 	  (set-buffer buffer)
 	  (goto-char pos)
 	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn (forward-line 1) (gnus-point-at-bol))))
-	  )))
-    ))
+	      (delete-region pos (progn
+				   (forward-line 1)
+				   (gnus-point-at-bol)))))))))
 
 (defun nntp-send-command-and-decode (wait-for &rest strings)
   "Send STRINGS to server and wait until WAIT-FOR returns."
@@ -477,10 +477,9 @@ noticing asynchronous data.")
 	  (set-buffer buffer)
 	  (goto-char pos)
 	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn (forward-line 1) (gnus-point-at-bol))))
-	  )))
-    ))
-
+	      (delete-region pos (progn
+				   (forward-line 1)
+				   (gnus-point-at-bol)))))))))
 
 (defun nntp-send-buffer (wait-for)
   "Send the current buffer to server and wait until WAIT-FOR returns."
@@ -494,7 +493,7 @@ noticing asynchronous data.")
 			(symbol-value 'enable-multibyte-characters))))
     (unwind-protect
 	;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
-	(let (default-enable-multibyte-characters)
+	(let (default-enable-multibyte-characters mc-flag)
 	  ;; `set-buffer-multibyte' will be provided by APEL for all Emacsen.
 	  (set-buffer-multibyte nil)
 	  (process-send-region (nntp-find-connection nntp-server-buffer)

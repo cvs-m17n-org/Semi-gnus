@@ -1,3 +1,11 @@
+2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nntp.el (nntp-send-buffer): Bind `mc-flag' to nil.
+
+	* lisp/nnheader.el (mm-with-unibyte-buffer): Alias to
+	`nnheader-with-unibyte-buffer'.
+	(nnheader-with-unibyte-buffer): New macro.
+
 2002-01-12  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* texi/gnus-ja.texi (Article Date): Update Japanese translation.

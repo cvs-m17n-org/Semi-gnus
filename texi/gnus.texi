@@ -287,7 +287,7 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 Free Software Foundation, Inc.
 
 
@@ -316,7 +316,7 @@ license to the document, as described in section 6 of the license.
 
 This file documents gnus, the GNU Emacs newsreader.
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -346,7 +346,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001
+Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -2679,6 +2679,17 @@ If this variable is set, @code{gnus-mailing-list-mode} is turned on when
 entering summary buffer.
 
 See also @code{gnus-parameter-to-list-alist}.
+
+@item subscribed
+@cindex subscribed
+If this parameter is set to @code{t}, Gnus will consider the
+to-address and to-list parameters for this group as addresses of
+mailing lists you are subscribed to.  Giving Gnus this information
+will help it to generate correct Mail-Followup-To headers for your
+posts to these lists.  
+
+See also @code{gnus-find-subscribed-addresses}, the function that
+directly uses this group parameter.
 
 @item visible
 @cindex visible
@@ -15567,9 +15578,12 @@ regexp to match component groups.
 
 All marks in the virtual group will stick to the articles in the
 component groups.  So if you tick an article in a virtual group, the
-article will also be ticked in the component group from whence it came.
-(And vice versa---marks from the component groups will also be shown in
-the virtual group.)
+article will also be ticked in the component group from whence it
+came.  (And vice versa---marks from the component groups will also be
+shown in the virtual group.). To create an empty virtual group, run
+@kbd{G V} (@code{gnus-group-make-empty-virtual}) in the group buffer
+and edit the method regexp with @kbd{M-e}
+(@code{gnus-group-edit-group-method})
 
 Here's an example @code{nnvirtual} method that collects all Andrea Dworkin
 newsgroups into one, big, happy newsgroup:
@@ -16469,6 +16483,20 @@ Hook run when disconnecting from the network.
 @vindex gnus-agent-fetched-hook
 Hook run when after finishing fetching articles.
 
+@item gnus-agent-cache
+@vindex gnus-agent-cache
+Variable to control whether use the locally stored NOV and articles when
+plugged.
+
+@item gnus-agent-go-online
+@vindex gnus-agent-go-online
+If @code{gnus-agent-go-online} is @code{nil}, the Agent will never
+automatically switch offline servers into online status.  If it is
+@code{ask}, the default, the Agent will ask if you wish to switch
+offline servers into online status when you re-connect.  If it has any
+other value, all offline servers will be automatically switched into
+online status.
+
 @end table
 
 
@@ -16538,20 +16566,19 @@ newsreaders.  Here are some common questions that some imaginary people
 may ask:
 
 @table @dfn
-@item If I read an article while plugged, do they get entered into the
-Agent?
+@item If I read an article while plugged, do they get entered into the Agent?
 
-@strong{No.}
+@strong{No}.
 
-@item If I read an article while plugged, and the article already exists
-in the Agent, will it get downloaded once more?
+@item If I read an article while plugged, and the article already exists in the Agent, will it get downloaded once more?
 
-@strong{Yes.}
+@strong{No}, unless @code{gnus-agent-cache} is `nil'.
 
 @end table
 
 In short, when Gnus is unplugged, it only looks into the locally stored
-articles; when it's plugged, it only talks to your ISP.
+articles; when it's plugged, it only talks to your ISP and also uses the
+locally stored articles.
 
 
 @node Scoring
@@ -20705,7 +20732,7 @@ look into implementing the changes when the draft is accepted as an RFC.
 @cindex MIME
 All the various MIME RFCs are supported.
 
-@item Disposition Notifications - RFC 2289
+@item Disposition Notifications - RFC 2298
 Message Mode is able to request notifications from the receiver.
 
 @item PGP - RFC 1991 and RFC 2440

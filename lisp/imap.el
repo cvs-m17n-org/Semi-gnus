@@ -1017,7 +1017,9 @@ password is remembered in the buffer."
 If BUFFER is nil, the current buffer is used."
   (with-current-buffer (or buffer (current-buffer))
     (when (imap-opened)
-      (imap-send-command-wait "LOGOUT"))
+      (condition-case nil
+	  (imap-send-command-wait "LOGOUT")
+	(quit nil)))
     (when (and imap-process
 	       (memq (process-status imap-process) '(open run)))
       (delete-process imap-process))

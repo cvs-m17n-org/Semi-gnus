@@ -703,7 +703,7 @@ If SOURCE is a directory spec, try to return the group name component."
 
 (defsubst nnmail-search-unix-mail-delim ()
   "Put point at the beginning of the next Unix mbox message."
-  ;; Algorithm used to find the the next article in the
+  ;; Algorithm used to find the next article in the
   ;; brain-dead Unix mbox format:
   ;;
   ;; 1) Search for "^From ".
@@ -732,7 +732,7 @@ If SOURCE is a directory spec, try to return the group name component."
 
 (defun nnmail-search-unix-mail-delim-backward ()
   "Put point at the beginning of the current Unix mbox message."
-  ;; Algorithm used to find the the next article in the
+  ;; Algorithm used to find the next article in the
   ;; brain-dead Unix mbox format:
   ;;
   ;; 1) Search for "^From ".

@@ -753,6 +753,21 @@ be controlled by `gnus-treat-body-boundary'."
   :type '(choice (item :tag "None" :value nil)
 		 string))
 
+(defcustom gnus-picon-databases '("/usr/lib/picon" "/usr/local/faces")
+  "*Defines the location of the faces database.
+For information on obtaining this database of pretty pictures, please
+see http://www.cs.indiana.edu/picons/ftp/index.html"
+  :type 'directory
+  :group 'gnus-picon)
+
+(defun gnus-picons-installed-p ()
+  "Say whether picons are installed on your machine."
+  (let ((installed nil))
+    (dolist (database gnus-picon-databases)
+      (when (file-exists-p database)
+	(setq installed t)))
+    installed))
+
 (defcustom gnus-article-mime-part-function nil
   "Function called with a MIME handle as the argument.
 This is meant for people who want to do something automatic based
@@ -1160,7 +1175,8 @@ See Info node `(gnus)Customizing Articles' and Info node
 (put 'gnus-treat-display-smileys 'highlight t)
 
 (defcustom gnus-treat-from-picon
-  (if (gnus-image-type-available-p 'xpm)
+  (if (and (gnus-image-type-available-p 'xpm)
+	   (gnus-picons-installed-p))
       'head nil)
   "Display picons in the From header.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -1171,7 +1187,8 @@ See Info node `(gnus)Customizing Articles' and Info node
 (put 'gnus-treat-from-picon 'highlight t)
 
 (defcustom gnus-treat-mail-picon
-  (if (gnus-image-type-available-p 'xpm)
+  (if (and (gnus-image-type-available-p 'xpm)
+	   (gnus-picons-installed-p))
       'head nil)
   "Display picons in To and Cc headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -1182,7 +1199,8 @@ See Info node `(gnus)Customizing Articles' and Info node
 (put 'gnus-treat-mail-picon 'highlight t)
 
 (defcustom gnus-treat-newsgroups-picon
-  (if (gnus-image-type-available-p 'xpm)
+  (if (and (gnus-image-type-available-p 'xpm)
+	   (gnus-picons-installed-p))
       'head nil)
   "Display picons in the Newsgroups and Followup-To headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -2021,6 +2039,9 @@ unfolded."
 		(when xpm
 		  (setq image (gnus-create-image xpm 'xpm t))
 		  (gnus-article-goto-header "from")
+		  (when (bobp)
+		    (insert "From: [no `from' set]\n")
+		    (forward-char -17))
 		  (gnus-add-wash-type 'xface)
 		  (gnus-add-image 'xface image)
 		  (gnus-put-image image)))
@@ -2869,15 +2890,15 @@ This format is defined by the `gnus-article-time-format' variable."
   (interactive (list t))
   (article-date-ut 'iso8601 highlight))
 
-(defun article-show-all ()
-  "Show all hidden text in the article buffer."
-  (interactive)
-  (save-excursion
-    (widen)
-    (let ((buffer-read-only nil))
-      (gnus-article-unhide-text (point-min) (point-max))
-      (gnus-remove-text-with-property 'gnus-prev)
-      (gnus-remove-text-with-property 'gnus-next))))
+;; (defun article-show-all ()
+;;   "Show all hidden text in the article buffer."
+;;   (interactive)
+;;   (save-excursion
+;;     (widen)
+;;     (let ((buffer-read-only nil))
+;;       (gnus-article-unhide-text (point-min) (point-max))
+;;       (gnus-remove-text-with-property 'gnus-prev)
+;;       (gnus-remove-text-with-property 'gnus-next))))
 
 (defun article-show-all-headers ()
   "Show all hidden headers in the article buffer."
@@ -3396,7 +3417,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-treat-dumbquotes
      article-normalize-headers
      (article-show-all-headers . gnus-article-show-all-headers)
-     (article-show-all . gnus-article-show-all))))
+;;      (article-show-all . gnus-article-show-all)
+     )))
 
 ;;;
 ;;; Gnus article mode
@@ -5115,30 +5137,33 @@ Argument LINES specifies lines to be scrolled down."
 The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive "P")
-  (let ((article (cdr gnus-article-current)))
-    (if (not mark-active)
+  (let ((article (cdr gnus-article-current)) cont)
+    (if (not (mark))
 	(gnus-summary-reply (list (list article)) wide)
+      (setq cont (buffer-substring (point) (mark)))
       ;; Deactivate active regions.
       (when (and (boundp 'transient-mark-mode)
 		 transient-mark-mode)
 	(setq mark-active nil))
       (gnus-summary-reply
-       (list (list article (buffer-substring (point) (mark)))) wide))))
+       (list (list article cont)) wide))))
 
 (defun gnus-article-followup-with-original ()
   "Compose a followup to the current article.
 The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive)
-  (let ((article (cdr gnus-article-current)))
-    (if (not mark-active)
+  (let ((article (cdr gnus-article-current))
+	cont)
+    (if (not (gnus-region-active-p))
 	(gnus-summary-followup (list (list article)))
+      (setq cont (buffer-substring (point) (mark)))
       ;; Deactivate active regions.
       (when (and (boundp 'transient-mark-mode)
 		 transient-mark-mode)
 	(setq mark-active nil))
       (gnus-summary-followup
-       (list (list article (buffer-substring (point) (mark))))))))
+       (list (list article cont))))))
 
 (defun gnus-article-hide (&optional arg force)
   "Hide all the gruft in the current article.

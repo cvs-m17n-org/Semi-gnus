@@ -144,6 +144,10 @@
   :link '(custom-manual "(gnus)Summary Maneuvering")
   :group 'gnus-summary)
 
+(defgroup gnus-picon nil
+  "Show pictures of people, domains, and newsgroups."
+  :group 'gnus-visual)
+
 (defgroup gnus-summary-mail nil
   "Mail group commands."
   :link '(custom-manual "(gnus)Mail Group Commands")
@@ -2182,7 +2186,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
-      gnus-article-show-all-headers gnus-article-show-all
+      gnus-article-show-all-headers
+      ;; gnus-article-show-all
       gnus-article-edit-mode gnus-article-edit-article
       gnus-article-edit-done article-decode-encoded-words
       gnus-start-date-timer gnus-stop-date-timer
@@ -2360,6 +2365,12 @@ See (gnus)Formatting Variables."
 (defmacro gnus-gethash (string hashtable)
   "Get hash value of STRING in HASHTABLE."
   `(symbol-value (intern-soft ,string ,hashtable)))
+
+(defmacro gnus-gethash-safe (string hashtable)
+  "Get hash value of STRING in HASHTABLE.
+Return nil if not defined."
+  `(let ((sym (intern-soft ,string ,hashtable)))
+     (and (boundp sym) (symbol-value sym))))
 
 (defmacro gnus-sethash (string value hashtable)
   "Set hash value.  Arguments are STRING, VALUE, and HASHTABLE."

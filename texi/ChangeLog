@@ -1,3 +1,26 @@
+2002-01-15 Tue  Jari Aalto  <jari.aalto@poboxes.com>
+
+	* gnus.texi (Really Various Summary Commands): Added commands how
+	to create nnvirtual group and and how to modify the nnvirtual
+	regexp
+
+2002-01-12  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Agent Caveats): Add agent cache.
+	(Agent Variables): Addition.
+
+2002-01-12  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Fix typo.
+
+	* emacs-mime.texi (Flowed text, Standards): Add.
+
+2002-01-11  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Mailing Lists): Addition.
+	* gnus.texi (Group Parameters): Addition. 
+	From Sriram Karra <karra@cs.utah.edu>.
+
 2002-01-10  Colin Marquardt  <c.marquardt@alcatel.de>
 
 	* gnus.texi (Changing Servers): Addition.
