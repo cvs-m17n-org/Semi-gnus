@@ -111,19 +111,16 @@
 
 (require 'bytecomp)
 
-;; Load `byte-opt' or `byte-optimize'.
-(byte-optimize-form nil)
-
-(setq max-specpdl-size 3000)
-
-(defadvice byte-optimize-form-code-walker (around fix-bug-in-and/or-forms
-						  activate)
-  "Fix bug in and/or forms."
-  (if (and (ad-get-arg 1)
-	   (memq (car-safe (ad-get-arg 0)) '(and or)))
-      (let* ((form (ad-get-arg 0))
-	     (fn (car form)))
-	(let ((backwards (reverse (cdr form))))
+(unless (fboundp 'si:byte-optimize-form-code-walker)
+  (byte-optimize-form nil);; Load `byte-opt' or `byte-optimize'.
+  (setq max-specpdl-size 3000)
+  (fset 'si:byte-optimize-form-code-walker
+	(symbol-function 'byte-optimize-form-code-walker))
+  (defun byte-optimize-form-code-walker (form for-effect)
+    (if (and for-effect (memq (car-safe form) '(and or)))
+	;; Fix bug in and/or forms.
+	(let ((fn (car form))
+	      (backwards (reverse (cdr form))))
 	  (while (and backwards
 		      (null (setcar backwards
 				    (byte-optimize-form (car backwards) t))))
@@ -131,14 +128,14 @@
 	  (if (and (cdr form) (null backwards))
 	      (byte-compile-log
 	       "  all subforms of %s called for effect; deleted" form))
-	  (setq ad-return-value
-		(if backwards
-		    (let ((head backwards))
-		      (while (setq backwards (cdr backwards))
-			(setcar backwards (byte-optimize-form (car backwards)
-							      nil)))
-		      (cons fn (nreverse head)))))))
-    ad-do-it))
+	  (if backwards
+	      (let ((head backwards))
+		(while (setq backwards (cdr backwards))
+		  (setcar backwards (byte-optimize-form (car backwards)
+							nil)))
+		(cons fn (nreverse head)))))
+      (si:byte-optimize-form-code-walker form for-effect)))
+  (byte-compile 'byte-optimize-form-code-walker))
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
