@@ -1,6 +1,6 @@
 2001-05-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-clfns.el (find-cl-run-time-functions): Remove an
+	* lisp/gnus-clfns.el (find-cl-run-time-functions): Remove a
 	useless non-global var; scroll the output window automatically.
 
 2001-05-31  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
