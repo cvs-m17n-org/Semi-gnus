@@ -46,11 +46,7 @@ the user confirms the creation."
 				       (error "message unexists"))
 				   (- (point) 2)))
 	  (let ((to (mail-fetch-field "to")))
-	    (when to
-	      (let ((decoder (mime-find-field-decoder 'To 'unfolding)))
-		(and (functionp decoder)
-		     (setq to (funcall decoder to))
-		     (setq from to)))))))
+	     (setq from (mime-decode-field-body to 'To 'unfolding)))))
       (when from
 	(bbdb-annotate-message-sender from t
 				      (or (bbdb-invoke-hook-for-value
@@ -440,14 +436,11 @@ beginning of the message headers."
   ;; we can't special-case VM here to use its cache, because the cache has
   ;; divided real-names from addresses; the actual From: and Subject: fields
   ;; exist only in the message.
-  (let (value decoder)
+  (let (value)
     (when (setq value (mail-fetch-field field-name))
-      (or (and (setq decoder
-		     (mime-find-field-decoder
-		      (intern (capitalize field-name)) 'unfolding))
-	       (fboundp decoder)
-	       (funcall decoder value))
-	  value))))
+      (mime-decode-field-body value
+			      (intern (capitalize field-name))
+			      'unfolding))))
 
 ;;
 ;; Insinuation
