@@ -452,11 +452,11 @@ from the document.")
 	(limit (search-forward "\n\n" nil t)))
     (goto-char (point-min))
     (when (and limit
-		(re-search-forward
-		 (concat "\
-^Content-Type:[ \t]*multipart/[a-z]+ *;\\(.*;\\)*"
-			 "[ \t\n]*[ \t]boundary=\"?[^\"\n]*[^\" \t\n]")
-	   limit t))
+ 	       (re-search-forward
+ 		(concat "\
+ ^Content-Type:[ \t]*multipart/[a-z]+ *;\\(\\(\n[ \t]\\)?.*;\\)*"
+ 			"\\(\n[ \t]\\)?[ \t]*boundary=\"?[^\"\n]*[^\" \t\n]")
+ 		limit t))
       t)))
 
 (defun nndoc-transform-mime-parts (article)

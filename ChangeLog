@@ -1,3 +1,11 @@
+1998-12-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/smtp.el: Abolished - Use smtp.el in FLIM.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.045.
+
+	* Sync up with Pterodactyl Gnus 0.59.
+
 1998-12-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.044.

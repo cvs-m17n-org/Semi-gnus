@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.044 Manual
+@settitle Semi-gnus 6.10.045 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.044 Manual
+@title Semi-gnus 6.10.045 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.044.
+This manual corresponds to Semi-gnus 6.10.045.
 
 @end ifinfo
 
@@ -16195,15 +16195,16 @@ Gnus should work on :
 @itemize @bullet
 
 @item
-Emacs 20.2 and up.
+Emacs 20.3 and up.
 
 @item
 XEmacs 20.4 and up.
 
 @end itemize
 
-Gnus will absolutely not work on any Emacsen older than that.  Not
-reliably, at least.
+This Gnus version will absolutely not work on any Emacsen older than
+that.  Not reliably, at least.  Older versions of Gnus may work on older 
+Emacs versions.
 
 There are some vague differences between Gnus on the various
 platforms---XEmacs features more graphics (a logo and a toolbar)---but
