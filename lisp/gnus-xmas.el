@@ -572,34 +572,6 @@ the resulting string may be narrower than END-COLUMN.
 	       (concat (make-string
 			(max 0 (- ,pad (string-width val))) ?\ )
 		       val))))))
-
-    (defun gnus-tilde-max-form (el max-width)
-      "Return a form that limits EL to MAX-WIDTH."
-      (let ((max (abs max-width)))
-	(if (symbolp el)
-	    (if (< max-width 0)
-		`(let ((width (string-width ,el)))
-		   (gnus-truncate-string ,el width (- width ,max)))
-	      `(gnus-truncate-string ,el ,max))
-	  (if (< max-width 0)
-	      `(let* ((val (eval ,el))
-		      (width (string-width val)))
-		 (gnus-truncate-string val width (- width ,max)))
-	    `(let ((val (eval ,el)))
-	       (gnus-truncate-string val ,max))))))
-
-    (defun gnus-tilde-cut-form (el cut-width)
-      "Return a form that cuts CUT-WIDTH off of EL."
-      (let ((cut (abs cut-width)))
-	(if (symbolp el)
-	    (if (< cut-width 0)
-		`(gnus-truncate-string ,el (- (string-width ,el) ,cut))
-	      `(gnus-truncate-string ,el (string-width ,el) ,cut))
-	  (if (< cut-width 0)
-	      `(let ((val (eval ,el)))
-		 (gnus-truncate-string val (- (string-width val) ,cut)))
-	    `(let ((val (eval ,el)))
-	       (gnus-truncate-string val (string-width val) ,cut))))))
     ))
 
 ;;; XEmacs logo and toolbar.
