@@ -35,6 +35,12 @@
 (eval-when-compile (require 'static))
 
 (require 'mail-utils)
+
+;; Reduce the required value of `recursive-load-depth-limit' for Emacs 21.
+(require 'pces)
+(require 'poem)
+(require 'std11)
+
 (require 'mime)
 (eval-and-compile
   (autoload 'gnus-sorted-intersection "gnus-range")
