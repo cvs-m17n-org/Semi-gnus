@@ -1,3 +1,97 @@
+1999-01-25  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-mime-charset-detect-method): New
+	user optional variable.
+	(message-mime-charset-specify-method): Ditto.
+	(message-mime-charset-detect-args): New variable.
+	(message-maybe-encode-with-specified-charset): New function.
+	(message-mime-charset-detect-by-ask): Ditto.
+	(message-mime-charset-specify-none): Ditto.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.0.
+	(gnus-version): Change required version of SEMI/FLIM.
+
+	* Sync up with gnus-6_10.
+
+* 1999-01-23  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Use
+	`message-list-references' for gathering IDs from yanked articles.
+
+	* lisp/message.el (message-list-references): New function.
+	(message-yank-original): Use it for gathering IDs from a yanked
+	article.
+
+* 1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-reply): Get the references from
+	`In-Reply-To' field if there were no references and `In-Reply-To'
+	field looks promising.
+	(message-yank-original): Try to fetch ID from `In-Reply-To' field
+	if `References' field does not exist.
+	(message-yank-original): Use `std11-narrow-to-header' instead of
+	`message-narrow-to-head'.
+
+* 1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Fetch IDs from
+	`gnus-current-headers' instead of article header.
+
+* 1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Save the beginning
+	position of the yanked articles -- apologize to SUTO-san, it has
+	been supported in his original code, but I didn't.
+
+* 1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.2.
+
+	* lisp/gnus-draft.el: Add Ichikawa-san to authors.
+	* lisp/message.el: Likewise.
+
+	* lisp/message.el (message-yank-original): If
+	`message-yank-add-new-references' is non-nil and this command is
+	called interactively, new IDs from the yanked article will be added
+	to `References' field.
+	(message-yank-add-new-references): New user option.
+	(message-ignored-resent-headers): Default to "^Return-Receipt".
+
+* 1999-01-20  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>,
+              Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Replace `References'
+	field with the gathered Message-IDs and References if more than one
+	articles are given.
+
+* 1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Reselect the message
+	frame after selecting a new article if the value of
+	`message-use-multi-frames' is non-nil and more than one articles
+	are given.
+
+1999-01-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Sync up with gnus-6_10.
+
+* 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* README.semi.ja: Delete "ichikawa" from the branches info, and
+	add "keiichi" and "nana-gnus" to there.  Modify the directory name
+	for the daily snapshots.
+	* README.semi: Likewise.
+
+* 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-reply): Cancel the last change.
+	(message-followup): Cancel the last change.
+	(message-wide-reply): Cancel the last change.
+
+	* lisp/gnus-msg.el (gnus-summary-gather-references): Abolished.
+	(gnus-summary-reply): Cancel the last change.
+	(gnus-post-news): Cancel the last change.
+
 1999-01-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.5.
@@ -27,7 +121,7 @@
 	(message-wide-reply): Likewise.
 
 	* lisp/gnus-msg.el (gnus-summary-gather-references): New function.
-	(gnus-summary-reply): Use it
+	(gnus-summary-reply): Use it.
 	(gnus-post-news): Use it.
 
 * 1999-01-13  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
