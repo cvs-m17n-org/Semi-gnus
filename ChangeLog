@@ -1,5 +1,10 @@
 1998-10-21  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-xmas.el (gnus-tilde-pad-form): Guard for non string
+	symbol.
+
+1998-10-21  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.025.
 	Fix supported version for FLIM and SEMI.
 
