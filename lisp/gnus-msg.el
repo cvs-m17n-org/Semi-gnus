@@ -196,7 +196,7 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-newsreader (setq message-mailer (gnus-extended-version)))
+  (setq message-user-agent (gnus-extended-version))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action
@@ -511,15 +511,32 @@ If SILENT, don't prompt the user."
 
 ;; Dummy to avoid byte-compile warning.
 (defvar nnspool-rejected-article-hook)
+(defvar mule-version)
 (defvar xemacs-codename)
 
-;;; Since the X-Newsreader/X-Mailer are ``vanity'' headers, they might
-;;; as well include the Emacs version as well.
-;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified gnus version."
+  "Stringified Gnus version and Emacs version."
   (interactive)
-  gnus-version)
+  (concat
+   "Semi-gnus/" gnus-version-number " "
+   (cond
+    ((featurep 'xemacs)
+     (concat (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+             ;; XXX: beta?
+             (if (featurep 'mule)
+                 "-mule")
+	     (if (boundp 'xemacs-codename)
+                 (concat " (" xemacs-codename ")"))
+             ))
+    (t
+     (concat (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+             ;; XXX: unibyte or multibyte
+             (if (boundp 'mule-version)
+                 (concat " Mule/" mule-version))
+             (if (featurep 'meadow)
+                 (concat " " (Meadow-version)))
+             ))
+    )))
 
 
 ;;;

@@ -107,7 +107,7 @@ If `gnus-visible-headers' is non-nil, this variable will be ignored."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-visible-headers
-  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
+  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^\\(Mail-\\)?Followup-To:\\|^\\(Mail-\\)?Reply-To:\\|^Mail-Copies-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
   "*All headers that do not match this regexp will be hidden.
 This variable can also be a list of regexp of headers to remain visible.
 If this variable is non-nil, `gnus-ignored-headers' will be ignored."
@@ -760,8 +760,8 @@ always hide."
 		       from reply-to
 		       (ignore-errors
 			 (equal
-			  (nth 1 (mail-extract-address-components from))
-			  (nth 1 (mail-extract-address-components reply-to)))))
+			  (nth 1 (funcall gnus-extract-address-components from))
+			  (nth 1 (funcall gnus-extract-address-components reply-to)))))
 		  (gnus-article-hide-header "reply-to"))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
@@ -3233,20 +3233,22 @@ forbidden in URL encoding."
 	   'gnus-original-article-mode
 	   #'gnus-article-header-presentation-method)
 
-(defun gnus-mime-preview-quitting-method ()
-  (if gnus-show-mime
-      (gnus-article-show-summary)
-    (mime-preview-kill-buffer)
-    (delete-other-windows)
-    (gnus-article-show-summary)
-    (gnus-summary-select-article nil t)
+(defun mime-preview-quitting-method-for-gnus ()
+  (if (not gnus-show-mime)
+      (mime-preview-kill-buffer))
+  (delete-other-windows)
+  (gnus-article-show-summary)
+  (if (or (not gnus-show-mime)
+	  (null gnus-have-all-headers))
+      (gnus-summary-select-article nil t)
     ))
 
 (set-alist 'mime-raw-representation-type-alist
 	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
-	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
+	   'gnus-original-article-mode
+	   #'mime-preview-quitting-method-for-gnus)
 
 (defun gnus-following-method (buf)
   (set-buffer buf)

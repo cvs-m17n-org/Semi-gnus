@@ -3036,7 +3036,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
   (let ((eol (gnus-point-at-eol))
 	(buffer (current-buffer))
-	header)
+	header rawtext decoded)
 
     ;; overview: [num subject from date id refs chars lines misc]
     (unwind-protect
@@ -3048,10 +3048,22 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (funcall
-		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
-		 (funcall
-		  gnus-structured-field-decoder (gnus-nov-field)) ; from
+		 (progn
+		   (setq rawtext (gnus-nov-field) ; subject
+			 decoded (funcall
+				  gnus-unstructured-field-decoder rawtext))
+		   (if (string= rawtext decoded)
+		       rawtext
+		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		     decoded))
+		 (progn
+		   (setq rawtext (gnus-nov-field) ; from
+			 decoded (funcall
+				  gnus-structured-field-decoder rawtext))
+		   (if (string= rawtext decoded)
+		       rawtext
+		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		     decoded))
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -4361,6 +4373,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
+	    rawtext decoded
 	    in-reply-to header p lines chars)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
@@ -4390,15 +4403,27 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (funcall
-		   gnus-unstructured-field-decoder (nnheader-header-value))
+		  (progn
+		    (setq rawtext (nnheader-header-value)
+			  decoded (funcall
+				   gnus-unstructured-field-decoder rawtext))
+		    (if (string-equal rawtext decoded)
+			rawtext
+		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		      decoded))
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (funcall
-		   gnus-structured-field-decoder (nnheader-header-value))
+		  (progn
+		    (setq rawtext (nnheader-header-value)
+			  decoded (funcall
+				   gnus-structured-field-decoder rawtext))
+		    (if (string-equal rawtext decoded)
+			rawtext
+		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		      decoded))
 		"(nobody)"))
 	    ;; Date.
 	    (progn
@@ -5167,12 +5192,17 @@ The state which existed when entering the ephemeral is reset."
 (defun gnus-summary-preview-mime-message (arg)
   "MIME decode and play this message."
   (interactive "P")
-  (or gnus-show-mime
-      (let ((gnus-break-pages nil)
-	    (gnus-show-mime t))
-	(gnus-summary-select-article t t)
-	))
-  (select-window (get-buffer-window gnus-article-buffer))
+  (let ((gnus-break-pages nil))
+    (gnus-summary-select-article t t)
+    )
+  (pop-to-buffer gnus-original-article-buffer t)
+  (let (buffer-read-only)
+    (if (text-property-any (point-min) (point-max) 'invisible t)
+	(remove-text-properties (point-min) (point-max)
+				gnus-hidden-properties)
+      ))
+  (mime-view-mode nil nil nil gnus-original-article-buffer
+		  gnus-article-buffer)
   )
 
 (defun gnus-summary-scroll-down ()
