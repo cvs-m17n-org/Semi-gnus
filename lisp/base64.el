@@ -1,5 +1,5 @@
 ;;; base64.el --- Base64 encoding functions using MEL
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: T-gnus development team
 ;; Keywords: extensions

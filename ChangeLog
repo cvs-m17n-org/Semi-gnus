@@ -1,3 +1,33 @@
+2001-03-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Simplified.
+
+	* lisp/dgnushack.el: Load cl-macs to ensure that the macro `dolist'
+	is defined properly.
+
+	* lisp/nnwfm.el: Require `gnus-clfns' when compiling.
+	* lisp/nnshimbun.el: Ditto.
+	* lisp/mm-util.el: Ditto.
+	* lisp/gnus-vers.el: Ditto.
+	* lisp/gnus-score.el: Ditto.
+	* lisp/gnus-nocem.el: Ditto.
+
+	* lisp/gnus-ofsetup.el: Don't require `gnus-clfns'.
+	(gnus-ofsetup-customize-done): Use `dolist' instead of `mapc'.
+	(gnus-setup-for-offline): Ditto.
+
+	* lisp/gnus-offline.el: Don't use `mapc' for binding some vars;
+	don't require `gnus-clfns'.
+	(gnus-offline-get-menu-items): Rewrite using `dolist'.
+
+	* lisp/gnus-clfns.el (butlast): New compiler macro.
+	(mapc): Remove.
+
+	* lisp/gnus-art.el: Use `dolist' instead of `mapcar' for defining
+	`gnus-article-read-summary-keys'.
+
 2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Leave

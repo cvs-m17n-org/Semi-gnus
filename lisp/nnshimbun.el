@@ -33,6 +33,7 @@
 (gnus-declare-backend "nnshimbun" 'address)
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
 (eval-when-compile (require 'static))
 
 (require 'nnheader)

@@ -1,5 +1,5 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -2302,22 +2302,20 @@ If SOLID (the prefix), create a solid group."
   (require 'nnshimbun)
   (let* ((minibuffer-setup-hook (append minibuffer-setup-hook
 					'(beginning-of-line)))
-	 (server (completing-read
-		  "Shimbun address: "
-		  (mapcar (lambda (elem) (list (car elem)))
-			  nnshimbun-type-definition)
-		  nil t
-		  (or (car gnus-group-shimbun-server-history)
-		      (caar nnshimbun-type-definition))
-		  'gnus-group-shimbun-server-history))
+	 (server (completing-read "Shimbun address: "
+				  nnshimbun-type-definition nil t
+				  (or (car gnus-group-shimbun-server-history)
+				      (caar nnshimbun-type-definition))
+				  'gnus-group-shimbun-server-history))
 	 (group (completing-read
 		 "Group name: "
-		 (mapcar (lambda (elem) (list elem))
-			 (cdr (assq 'groups
-				    (cdr (assoc server nnshimbun-type-definition)))))
+		 (mapcar
+		  'list
+		  (cdr (assq 'groups
+			     (cdr (assoc server nnshimbun-type-definition)))))
 		 nil t nil))
 	 (nnshimbun-pre-fetch-article nil))
-    (gnus-group-make-group group `(nnshimbun ,server))))
+    (gnus-group-make-group group (list 'nnshimbun server))))
 
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.

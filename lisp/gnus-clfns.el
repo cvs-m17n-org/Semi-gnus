@@ -1,5 +1,5 @@
 ;;; gnus-clfns.el --- compiler macros for emulating cl functions
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Kastsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: cl, compile
@@ -31,6 +31,28 @@
     nil
   (require 'cl)
 
+  (define-compiler-macro butlast (&whole form x &optional n)
+    (if (and (fboundp 'butlast)
+	     (subrp (symbol-function 'butlast)))
+	form
+      (if n
+	  `(let ((x ,x)
+		 (n ,n))
+	     (if (and n (<= n 0))
+		 x
+	       (let ((m (length x)))
+		 (or n (setq n 1))
+		 (and (< n m)
+		      (progn
+			(if (> n 0) (setcdr (nthcdr (- (1- m) n) x) nil))
+			x)))))
+	`(let* ((x ,x)
+		(m (length x)))
+	   (and (< 1 m)
+		(progn
+		  (setcdr (nthcdr (- m 2) x) nil)
+		  x))))))
+
   (define-compiler-macro last (&whole form x &optional n)
     (if (and (fboundp 'last)
 	     (subrp (symbol-function 'last)))
@@ -52,24 +74,6 @@
 	   (while (consp (cdr x))
 	     (pop x))
 	   x))))
-
-  (define-compiler-macro mapc (&whole form fn seq &rest rest)
-    (if (and (fboundp 'mapc)
-	     (subrp (symbol-function 'mapc)))
-	form
-      (if rest
-	  `(let* ((fn ,fn)
-		  (seq ,seq)
-		  (args (list seq ,@rest))
-		  (m (apply (function min) (mapcar (function length) args)))
-		  (n 0))
-	     (while (< n m)
-	       (apply fn (mapcar (function (lambda (arg) (nth n arg))) args))
-	       (setq n (1+ n)))
-	     seq)
-	`(let ((seq ,seq))
-	   (mapcar ,fn seq)
-	   seq))))
   )
 
 (provide 'gnus-clfns)

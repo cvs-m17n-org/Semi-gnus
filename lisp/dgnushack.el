@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -49,6 +49,9 @@
 (defalias 'facep 'ignore)
 
 (require 'cl)
+(unless (dolist (var nil t))
+  ;; Override the macro `dolist' which might be defined in egg.el.
+  (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
 

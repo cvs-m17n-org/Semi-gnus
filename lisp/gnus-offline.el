@@ -1,7 +1,7 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
 
-;;; Copyright (C) 1998 Tatsuya Ichikawa
-;;;                    Yukihiro Ito
+;;; Copyright (C) 1998, 2001 Tatsuya Ichikawa
+;;; Copyright (C) 1998, 2001 Yukihiro Ito
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
@@ -78,7 +78,6 @@
 (eval '(run-hooks 'gnus-offline-load-hook))
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (eval-when-compile
   (require 'static)
@@ -110,17 +109,11 @@
 				       gnus-offline-version-number))
 
 (eval-when-compile
-  (mapc
-   (lambda (symbol)
-     (unless (boundp symbol)
-       (make-local-variable symbol)
-       (eval (list 'setq symbol nil))))
-   '(nnagent-version
-     nnspool-version
-     msspool-news-server
-     msspool-news-service
-     miee-popup-menu
-     gnus-group-toolbar)))
+  (defvar nnagent-version)
+  (defvar nnspool-version)
+  (defvar msspool-news-server)
+  (defvar msspool-news-service)
+  (defvar miee-popup-menu))
 
 (if (featurep 'meadow)
     (define-process-argument-editing "/hang\\.exe\\'"
@@ -889,13 +882,16 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	  (funcall func))))))
 
 (defun gnus-offline-get-menu-items (list)
-  (mapcar
-   #'(lambda (el)
-       (if (listp el)
-	   (apply 'vector
-		  (cons (gnus-offline-gettext (car el)) (cdr el)))
-	 el))
-   list))
+  (let (result)
+    (dolist (elem list)
+      (setq result
+	    (nconc result
+		   (list (if (listp elem)
+			     (progn
+			       (setcar elem (gnus-offline-gettext (car elem)))
+			       (vconcat elem))
+			   elem)))))
+    result))
 
 (defvar gnus-offline-menu
   (gnus-offline-get-menu-items
