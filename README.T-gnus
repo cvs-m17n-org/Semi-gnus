@@ -27,6 +27,6 @@ NEWS:
 
 * T-gnus 6.11 - this is based on Pterodactyl Gnus.
 
-  The latest T-gnus is T-gnus 6.11.0 (Based on pgnus-0.84).
+  The latest T-gnus is T-gnus 6.11.01 (Based on pgnus-0.86).
   It requires SEMI/WEMI-1.13, the latest FLIM-1.13, and the latest
   APEL (9.20 or later).
