@@ -1,5 +1,13 @@
 1998-10-29  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-summary-edit-article-done): Abolish
+	`gnus-article-decoded-p'.
+
+	* lisp/nnheader.el (mail-header-extra): Fix typo in comment.
+
+	* lisp/mm-uu.el: Restore the original revision number.
+	* lisp/rfc1843.el: Ditto.
+
 	* lisp/gnus-art.el: (gnus-article-edit-article): Call
 	`gnus-article-edit-article-setup-function' if it is non nil.
 	(gnus-article-mime-edit-article-setup): New function.
