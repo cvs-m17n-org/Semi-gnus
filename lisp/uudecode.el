@@ -106,21 +106,13 @@ If FILE-NAME is non-nil, save the result to FILE-NAME."
 	(error))
       )))
 
-(defun uudecode-insert-char (char &optional count ignored buffer)
-  (condition-case nil
-      (progn
-	(insert-char char count ignored buffer)
-	(fset 'uudecode-insert-char 'insert-char))
-    (wrong-number-of-arguments
-     (fset 'uudecode-insert-char 'uudecode-xemacs-insert-char)
-     (uudecode-insert-char char count ignored buffer))))
-
-(defun uudecode-xemacs-insert-char (char &optional count ignored buffer)
-  (if (or (null buffer) (eq buffer (current-buffer)))
-      (insert-char char count)
-    (save-excursion
-      (set-buffer buffer)
-      (insert-char char count))))
+(if (string-match "XEmacs" emacs-version)
+    (defalias 'uudecode-insert-char 'insert-char)
+  (defun uudecode-insert-char (char &optional count ignored buffer)
+    (if (or (null buffer) (eq buffer (current-buffer)))
+	(insert-char char count)
+      (with-current-buffer buffer
+	(insert-char char count)))))
 
 ;;;###autoload
 

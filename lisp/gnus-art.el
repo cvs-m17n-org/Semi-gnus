@@ -1947,6 +1947,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      (article-fill . gnus-article-word-wrap)
      article-remove-cr
      article-display-x-face
+     article-de-quoted-unreadable
+     article-mime-decode-quoted-printable
      article-hide-pgp
      article-hide-pem
      article-hide-signature
@@ -1961,6 +1963,9 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-date-iso8601
      article-date-original
      article-date-ut
+     article-decode-mime-words
+     article-decode-charset
+     article-decode-encoded-words
      article-date-user
      article-date-lapsed
      article-emphasize
@@ -2061,6 +2066,9 @@ commands:
   (make-local-variable 'gnus-page-broken)
   (make-local-variable 'gnus-button-marker-list)
   (make-local-variable 'gnus-article-current-summary)
+  (make-local-variable 'gnus-article-mime-handles)
+  (make-local-variable 'gnus-article-decoded-p)
+  (make-local-variable 'gnus-article-mime-handle-alist)
   (gnus-set-default-directory)
   (buffer-disable-undo)
   (setq buffer-read-only t)
@@ -2077,6 +2085,7 @@ commands:
 			 (substring name (match-end 0))))))
     (setq gnus-article-buffer name)
     (setq gnus-original-article-buffer original)
+    (setq gnus-article-mime-handle-alist nil)
     ;; This might be a variable local to the summary buffer.
     (unless gnus-single-article-buffer
       (save-excursion
@@ -2332,8 +2341,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     ;(gnus-mime-view-part	"\M-\r"	"View Interactively...")
     (gnus-mime-view-part	"v"	"View Interactively...")
     (gnus-mime-save-part	"o"	"Save...")
-    (gnus-mime-copy-part	"c"	"View In Buffer")
-    (gnus-mime-inline-part	"i"	"View Inline")
+    (gnus-mime-copy-part	"c"	"View As Text, In Other Buffer")
+    (gnus-mime-inline-part	"i"	"View As Text, In This Buffer")
     (gnus-mime-externalize-part	"e"	"View Externally")
     (gnus-mime-pipe-part	"|"	"Pipe To Command...")))
 
@@ -2569,34 +2578,48 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 
 (defun gnus-display-mime (&optional ihandles)
   "Insert MIME buttons in the buffer."
-  (save-selected-window
-    (let ((window (get-buffer-window gnus-article-buffer)))
-      (when window
-	(select-window window)))
-    (let* ((handles (or ihandles (mm-dissect-buffer) (mm-uu-dissect)))
-	   handle name type b e display)
-      (unless ihandles
-	;; Top-level call; we clean up.
-	(mm-destroy-parts gnus-article-mime-handles)
-	(setq gnus-article-mime-handles handles
-	      gnus-article-mime-handle-alist nil)
-	;; We allow users to glean info from the handles.
-	(when gnus-article-mime-part-function
-	  (gnus-mime-part-function handles)))
-      (when (and handles
-		 (or (not (stringp (car handles)))
-		     (cdr handles)))
+  (save-excursion
+    (save-selected-window
+      (let ((window (get-buffer-window gnus-article-buffer)))
+	(when window
+	  (select-window window)))
+      (let* ((handles (or ihandles (mm-dissect-buffer) (mm-uu-dissect)))
+	     handle name type b e display)
 	(unless ihandles
-	  ;; Clean up for mime parts.
-	  (article-goto-body)
-	  (delete-region (point) (point-max)))
-	(if (stringp (car handles))
-	    (if (equal (car handles) "multipart/alternative")
-		(let ((id (1+ (length gnus-article-mime-handle-alist))))
-		  (push (cons id handles) gnus-article-mime-handle-alist)
-		  (gnus-mime-display-alternative (cdr handles) nil nil id))
-	      (gnus-mime-display-mixed (cdr handles)))
-	  (gnus-mime-display-single handles))))))
+	  ;; Top-level call; we clean up.
+	  (mm-destroy-parts gnus-article-mime-handles)
+	  (setq gnus-article-mime-handles handles
+		gnus-article-mime-handle-alist nil)
+	  ;; We allow users to glean info from the handles.
+	  (when gnus-article-mime-part-function
+	    (gnus-mime-part-function handles)))
+	(when (and handles
+		   (or (not (stringp (car handles)))
+		       (cdr handles)))
+	  (unless ihandles
+	    ;; Clean up for mime parts.
+	    (article-goto-body)
+	    (delete-region (point) (point-max)))
+	  (gnus-mime-display-part handles))))))
+
+(defun gnus-mime-display-part (handle)
+  (cond
+   ;; Single part.
+   ((not (stringp (car handle)))
+    (gnus-mime-display-single handle))
+   ;; multipart/alternative
+   ((equal (car handle) "multipart/alternative")
+    (let ((id (1+ (length gnus-article-mime-handle-alist))))
+      (push (cons id handle) gnus-article-mime-handle-alist)
+      (gnus-mime-display-alternative (cdr handle) nil nil id)))
+   ;; multipart/related
+   ((equal (car handle) "multipart/related")
+    ;;;!!!We should find the start part, but we just default
+    ;;;!!!to the first part.
+    (gnus-mime-display-part (cadr handle)))
+   ;; Other multiparts are handled like multipart/mixed.
+   (t
+    (gnus-mime-display-mixed (cdr handle)))))
 
 (defun gnus-mime-part-function (handles)
   (if (stringp (car handles))
@@ -2606,13 +2629,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 (defun gnus-mime-display-mixed (handles)
   (let (handle)
     (while (setq handle (pop handles))
-      (if (stringp (car handle))
-	  (if (equal (car handle) "multipart/alternative")
-	      (let ((id (1+ (length gnus-article-mime-handle-alist))))
-		(push (cons id handle) gnus-article-mime-handle-alist)
-		(gnus-mime-display-alternative (cdr handle) nil nil id))
-	    (gnus-mime-display-mixed (cdr handle)))
-	(gnus-mime-display-single handle)))))
+      (gnus-mime-display-part handle))))
 
 (defun gnus-mime-display-single (handle)
   (let ((type (car (mm-handle-type handle)))
@@ -3995,7 +4012,7 @@ forbidden in URL encoding."
     (select-window win)))
 
 (defvar gnus-decode-header-methods
-  '(mail-decode-encoded-word-region)
+  '(gnus-decode-with-mail-decode-encoded-word-region)
   "List of methods used to decode headers
 
 This variable is a list of FUNCTION or (REGEXP . FUNCTION). If item is
@@ -4010,6 +4027,10 @@ For example:
 ")
 
 (defvar gnus-decode-header-methods-cache nil)
+
+(defun gnus-decode-with-mail-decode-encoded-word-region (start end)
+  (let ((rfc2047-default-charset gnus-default-charset))
+    (mail-decode-encoded-word-region start end)))
 
 (defun gnus-multi-decode-header (start end)
   "Apply the functions from `gnus-encoded-word-methods' that match."

@@ -25,6 +25,8 @@
 ;;; Boston, MA 02111-1307, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require 'poe)
+
 ;; For non-MULE
 (if (not (fboundp 'char-int))
     (fset 'char-int 'identity))
@@ -98,23 +100,15 @@ base64-encoder-program.")
 	  (delete-file tempfile)
 	(error nil)))))
 
-(defun base64-insert-char (char &optional count ignored buffer)
-  (condition-case nil
-      (progn
-	(insert-char char count ignored buffer)
-	(fset 'base64-insert-char 'insert-char))
-    (wrong-number-of-arguments
-     (fset 'base64-insert-char 'base64-xemacs-insert-char)
-     (base64-insert-char char count ignored buffer))))
+(if (string-match "XEmacs" emacs-version)
+    (defalias 'base64-insert-char 'insert-char)
+  (defun base64-insert-char (char &optional count ignored buffer)
+    (if (or (null buffer) (eq buffer (current-buffer)))
+	(insert-char char count)
+      (with-current-buffer buffer
+	(insert-char char count)))))
 
-(defun base64-xemacs-insert-char (char &optional count ignored buffer)
-  (if (or (null buffer) (eq buffer (current-buffer)))
-      (insert-char char count)
-    (save-excursion
-      (set-buffer buffer)
-      (insert-char char count))))
-
-(defun base64-decode-region (start end)
+(defun-maybe base64-decode-region (start end)
   (interactive "r")
   ;;(message "Decoding base64...")
   (let ((work-buffer nil)
@@ -182,7 +176,7 @@ base64-encoder-program.")
   ;;(message "Decoding base64... done")
   )
 
-(defun base64-encode-region (start end &optional no-line-break)
+(defun-maybe base64-encode-region (start end &optional no-line-break)
   (interactive "r")
   (message "Encoding base64...")
   (let ((work-buffer nil)
