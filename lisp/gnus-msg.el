@@ -308,10 +308,10 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
 (defun gnus-inews-yank-articles (articles)
-  (let* ((more-than-one (> (length articles) 1))
+  (let* ((more-than-one (cdr articles))
 	 (frame (when (and message-use-multi-frames more-than-one)
 		  (window-frame (get-buffer-window (current-buffer)))))
-	 refs beg article references)
+	 refs beg article)
     (message-goto-body)
     (while (setq article (pop articles))
       (save-window-excursion
@@ -323,11 +323,10 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 
       ;; Gathering references.
       (when more-than-one
-	(setq refs
-	      (append
-	       refs
-	       (split-string (mail-header-references gnus-current-headers))
-	       (list (mail-header-message-id gnus-current-headers)))))
+	(setq refs (message-list-references
+		    refs
+		    (mail-header-references gnus-current-headers)
+		    (mail-header-message-id gnus-current-headers))))
 
       (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
@@ -338,17 +337,8 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 	(insert "\n")))
     (push-mark)
 
-    ;; Eliminate duplicated references.
-    (when refs
-      (mapcar
-       (lambda (ref)
-	 (or (zerop (length ref))
-	     (member ref references)
-	     (setq references (append references (list ref)))))
-       refs))
-
     ;; Replace with the gathered references.
-    (when references
+    (when refs
       (push-mark beg)
       (save-restriction
 	(message-narrow-to-headers)
@@ -360,7 +350,7 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 	 (list (or (assq 'References message-header-format-alist)
 		   '(References . message-fill-references)))
 	 (list (cons 'References
-		     (mapconcat 'identity references " "))))
+		     (mapconcat 'identity (nreverse refs) " "))))
 	(backward-delete-char 1))
       (setq beg (mark t))
       (pop-mark))
