@@ -1,3 +1,13 @@
+1999-03-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.062.
+	(gnus-revision-number): Fresh start from 00.
+
+	* Sync up with Pterodactyl Gnus v0.80.
+
+	* lisp/gnus-sum.el (gnus-summary-edit-article): Don't use
+	`mime-to-mml' nor `mml-to-mime'.
+
 1999-03-02  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
