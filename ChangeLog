@@ -1,3 +1,9 @@
+1999-01-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* README-offline.ja: New file - Variable and command description
+	for gnus-offline(Japanese edition).
+	* README-offline.en: New file - Ditto (English edition).
+
 1999-01-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 	
 	* lisp/gnus-offline.el (gnus-offline-pop-password-file): New

@@ -1,0 +1,104 @@
+
+User definable variables in gnus-offline
+
+o gnus-offline-dialup-program  
+    Program name to dialup.
+
+o gnus-offline-dialup-program-arguments
+    List of dialup program arguments.
+
+o gnus-offline-hangup-program
+    Program name to hangup.
+
+o gnus-offline-hangup-program-arguments
+    List of hangup program arguments.
+
+o gnus-offline-mail-spool-directory
+    Spool directory for sending mail.
+    This variable is available only using MIEE.
+
+o gnus-offline-news-spool-directory
+    Spool directory for sending news.
+    This variable is available only using MIEE.
+
+o gnus-offline-mail-treat-environ
+    If t , gnus-offline sends mail to spool first.
+    If nil , gnus-offline sends mail immediatry.
+
+o gnus-offline-articles-to-fetch
+    Article type you want to fetch.
+
+       'both ... Fetch both Mail/News.
+       'Mail ... Fetch only Mail.
+       'News ... Fetch only News.
+
+    Default value is both.
+
+o gnus-offline-popup-menu
+    Whether use menu.
+
+o gnus-offline-load-hook
+    Hook before gnus-offline load.
+
+o gnus-offline-before-online-hook
+    Hook before all online jobs.
+
+o gnus-offline-after-online-hook
+    Hook after all online jobs.
+
+o gnus-offline-interval-time
+    Interval time to do all online jobs.(minutes)
+
+o gnus-offline-MTA-type
+    MTA type to sending mail.
+
+   'smtp     ... Use smtp.el.
+   'sendmail ... Use sendmail.el.
+
+o gnus-offline-drafts-queue-type
+   Message queue type when spooling message.
+   
+   'miee  ... Use miee.el.
+   'agent ... Use gnus-agent.el.
+
+o gnus-offline-after-empting-spool-hook
+   Hook before empting spool.
+
+o gnus-offline-before-empting-spool-hook
+   Hook after emoting spool.
+
+o gnus-offline-dialup-function
+   Function to dialup.
+
+o gnus-offline-hangup-function
+   Function to hangup.
+
+o gnus-offline-pop-password-file 
+   File name to save username , mailserver and password.
+
+o gnus-offline-pop-password-decoding-function 
+   Function to decode password.
+
+Commands in gnus-offline.
+
+o M-x gnus-offline-toggle-plugged
+   Toggle offline/online state.
+
+o M-x gnus-offline-toggle-auto-hangup
+   Change current state to offline.
+
+o M-x gnus-offline-toggle-on/off-send-mail
+   Toggle method to sending mail.
+
+o M-x gnus-offline-toggle-articles-to-fetch
+   Toggle articles you want to fetch.
+
+o M-x gnus-offline-toggle-movemail-program
+   Toggle movemail program.
+
+o M-x gnus-offline-set-interval-time
+   Set interval time(minute) to fetch article.
+
+o M-x gnus-offline-agent-expire
+   Expire articles.
+
