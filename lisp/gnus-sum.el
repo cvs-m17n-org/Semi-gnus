@@ -41,7 +41,6 @@
 (require 'gnus-undo)
 (require 'gnus-util)
 (require 'nnoo)
-(require 'mime-view)
 
 (eval-when-compile
   (require 'mime-play)

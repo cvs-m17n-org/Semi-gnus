@@ -1,3 +1,10 @@
+2003-12-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el: Require `mime-image' when Emacs is running on
+	the window system.
+
+	* lisp/gnus-sum.el: Don't require `mime-view'.
+
 2003-12-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnmail.el (nnmail-lazy): Replace `widget-default-get' with
