@@ -260,6 +260,12 @@ The default is \"-A\"."
   :group 'nnmail-retrieve
   :type 'string)
 
+(defcustom nnmail-movemail-program-pop-password-required t
+  "*Non-nil if a password is required when reading mail using POP
+with `movemail' external program."
+  :group 'nnmail-retrieve
+  :type 'boolean)
+
 (defcustom nnmail-pop-password-required nil
   "*Non-nil if a password is required when reading mail using POP."
   :group 'nnmail-retrieve
@@ -1874,10 +1880,15 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(inbox-info (nnmail-parse-spool-file-name inbox))
 	args)
     (if popmail
-	(let ((auth-scheme (car (cdr (memq :auth-scheme inbox-options)))))
+	(let ((auth-scheme (car (cdr (memq :auth-scheme inbox-options))))
+	      (password
+	       (or nnmail-internal-password
+		   (and nnmail-movemail-program-pop-password-required
+			(nnmail-read-passwd
+			 (format "Password for %s: " inbox))))))
 	  (setenv "MAILHOST" (nnmail-spool-mailhost inbox-info))
-	  (when nnmail-internal-password
-	    (push nnmail-internal-password args))
+	  (when password
+	    (push password args))
 	  (push tofile args)
 	  (push (concat "po:" (nnmail-spool-maildrop inbox-info)) args)
 	  (cond
@@ -1893,13 +1904,12 @@ If ARGS, PROMPT is used as an argument to `format'."
      nil err-buf nil
      args)))
 
-(eval-and-compile
-  (autoload 'pop3-movemail "pop3"))
 (eval-when-compile
   (require 'pop3))
 
 (defun nnmail-pop3-movemail (inbox crashbox options)
   "Function to move mail from INBOX on a pop3 server to file CRASHBOX."
+  (require 'pop3)
   (let* ((inbox-info (nnmail-parse-spool-file-name inbox))
 	 (pop3-maildrop (or (nnmail-spool-maildrop inbox-info)
 			    pop3-maildrop))
