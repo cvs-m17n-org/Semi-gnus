@@ -360,6 +360,7 @@ to:
       (search-forward-regexp "^\n" nil t)
       (setq beg (point))
       (set-buffer (generate-new-buffer " *mm*"))
+      (mm-disable-multibyte)
       (insert-buffer-substring obuf beg)
       (current-buffer))))
 
