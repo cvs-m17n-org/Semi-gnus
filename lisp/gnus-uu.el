@@ -1351,9 +1351,12 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   (when gnus-uu-default-dir
     (let ((to-file (concat (file-name-as-directory gnus-uu-default-dir)
 			   (file-name-nondirectory file))))
-      (rename-file file to-file)
-      (unless (file-exists-p file)
-	(make-symbolic-link to-file file)))))
+      (cond ((fboundp 'make-symbolic-link)
+	     (rename-file file to-file)
+	     (unless (file-exists-p file)
+	       (make-symbolic-link to-file file)))
+	    (t
+	     (copy-file file to-file))))))
 
 (defun gnus-uu-part-number (article)
   (let* ((header (gnus-summary-article-header article))
