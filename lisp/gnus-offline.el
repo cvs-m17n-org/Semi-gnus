@@ -384,9 +384,9 @@ If value is nil , dialup line is disconnected status.")
   (add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)
   (if (eq gnus-offline-news-fetch-method 'nnspool)
       (add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line))
-  (add-hook 'message-send-hook 'gnus-offline-message-add-header)
+  (add-hook 'mime-edit-translate-hook 'gnus-offline-message-add-header)
   (if (featurep 'pop3-fma)
-      (add-hook 'message-send-hook 'pop3-fma-message-add-header)))
+      (add-hook 'mime-edit-translate-hook 'pop3-fma-message-add-header)))
 ;;
 ;; Get new news jobs. (gnus-agent and nnspool)
 ;;
