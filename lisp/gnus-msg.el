@@ -565,6 +565,47 @@ If SILENT, don't prompt the user."
   (interactive)
   (concat gnus-product-name "/" gnus-version-number))
 
+(defun gnus-message-make-user-agent (&optional include-mime-info max-column)
+  "Return user-agent info.
+INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable
+  `mime-edit-user-agent-value' exists, the return value will include it.
+MAX-COLUMN the optional second argument if it is specified, the return value
+  will be folded up in the proper way."
+  (let ((user-agent (if (and include-mime-info
+			     (boundp 'mime-edit-user-agent-value))
+			(concat (gnus-extended-version)
+				" "
+				mime-edit-user-agent-value)
+		      (gnus-extended-version))))
+    (if max-column
+	(let (boundary)
+	  (unless (natnump max-column) (setq max-column 76))
+	  (with-temp-buffer
+	    (insert "            " user-agent)
+	    (goto-char 13)
+	    (while (re-search-forward "[\n\t ]+" nil t)
+	      (replace-match " "))
+	    (goto-char 13)
+	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
+	      (while (eq ?\( (char-after (point)))
+		(forward-list)
+		(skip-chars-forward " "))
+	      (skip-chars-backward " ")
+	      (if (> (current-column) max-column)
+		  (progn
+		    (if (or (not boundary) (eq ?\n (char-after boundary)))
+			(progn
+			  (setq boundary (point))
+			  (unless (eobp)
+			    (delete-char 1)
+			    (insert "\n ")))
+		      (goto-char boundary)
+		      (delete-char 1)
+		      (insert "\n ")))
+		(setq boundary (point))))
+	    (buffer-substring 13 (point-max))))
+      user-agent)))
+
 
 ;;;
 ;;; Gnus Mail Functions

@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.12
+;; Version: 1.14
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -80,9 +80,11 @@
 
 (unless (and (fboundp 'pop3-fma-encode-string)
 	     (fboundp 'pop3-fma-decode-string))
-  (require 'mel-b)
-  (fset 'pop3-fma-encode-string 'base64-encode-string)
-  (fset 'pop3-fma-decode-string 'base64-decode-string))
+  (require 'mel)
+  (fset 'pop3-fma-encode-string
+	(mel-find-function 'mime-encode-string "base64"))
+  (fset 'pop3-fma-decode-string
+	(mel-find-function 'mime-decode-string "base64")))
 
 (defgroup pop3-fma nil
   "Multile POP3 account utility for Gnus."
@@ -90,7 +92,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.12")
+(defconst pop3-fma-version-number "1.14")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -101,7 +103,9 @@
 ;;  "J boy"          		; 1.00
 ;;  "Blood line"		; 1.10
 ;;  "Star ring"			; 1.11
-  "Goodbye Game"		; 1.12
+;;  "Goodbye Game"		; 1.12
+;;  "Love is Gamble"		; 1.13
+  "Lonely"			; 1.14
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -153,8 +157,30 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar movemail-output-buffer " *movemail-out*")
 (defvar pop3-fma-commandline-arguments nil)
 
+;;; To silence byte compiler
+(and
+ (fboundp 'eval-when-compile)
+ (eval-when-compile
+   (save-excursion
+     (beginning-of-defun)
+     (eval-region (point-min) (point)))
+   (let (case-fold-search)
+     (mapcar
+      (function
+       (lambda (symbol)
+	 (unless (boundp symbol)
+	   (make-local-variable symbol)
+	   (eval (list 'setq symbol nil)))))
+      '(:group
+	:prefix :type
+	pop3-maildrop
+	pop3-mailhost
+	))
+     (make-local-variable 'byte-compile-warnings)
+     (setq byte-compile-warnings nil))))
+
 (defun pop3-fma-init-message-hook ()
-  (add-hook 'message-send-hook 'pop3-fma-message-add-header))
+  (add-hook 'mime-edit-translate-hook 'pop3-fma-message-add-header))
 
 (eval-after-load "message"
   '(pop3-fma-init-message-hook))
