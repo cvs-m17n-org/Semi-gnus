@@ -1,3 +1,13 @@
+1999-12-14   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/imap.el: Require `digest-md5' when compiling; add autoload
+	settings for `digest-md5-parse-digest-challenge' and
+	`digest-md5-digest-response'.
+	(imap-authenticators): Add `digest-md5'.
+	(imap-authenticator-alist): Setup for `digest-md5'.
+	(imap-digest-md5-p): New function.
+	(imap-digest-md5-auth): New function.
+
 1999-12-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/mail-source.el (mail-source-fetch-imap): Each temporary
