@@ -519,13 +519,15 @@ variable `mail-header-separator'.
 
 Valid values include `message-send-mail-with-sendmail' (the default),
 `message-send-mail-with-mh', `message-send-mail-with-qmail',
-`message-send-mail-with-smtp', `smtpmail-send-it' and `feedmail-send-it'.
+`message-send-mail-with-smtp', `message-smtpmail-send-it',
+`smtpmail-send-it' and `feedmail-send-it'.
 
 See also `send-mail-function'."
   :type '(radio (function-item message-send-mail-with-sendmail)
 		(function-item message-send-mail-with-mh)
 		(function-item message-send-mail-with-qmail)
 		(function-item message-send-mail-with-smtp)
+		(function-item message-smtpmail-send-it)
 		(function-item smtpmail-send-it)
 		(function-item feedmail-send-it)
 		(function :tag "Other"))
@@ -3677,6 +3679,15 @@ This sub function is for exclusive use of `message-send-news'."
 	     (throw 'message-sending-news-failure t)))))
        nil)
      (not (funcall message-send-news-function method)))))
+
+(defun message-smtpmail-send-it ()
+  "Send the prepared message buffer with `smtpmail-send-it'.
+This only differs from `smtpmail-send-it' that this command evaluates
+`message-send-mail-hook' just before sending a message.  It is useful
+if your ISP requires the POP-before-SMTP authentication.  See the
+documentation for the function `mail-source-touch-pop'."
+  (run-hooks 'message-send-mail-hook)
+  (smtpmail-send-it))
 
 (defun message-canlock-generate ()
   "Return a string that is non-trival to guess.
