@@ -1665,13 +1665,18 @@ if given a positive prefix, always hide."
 				       'invisible t)))
 	    ;; If the invisible text is not terminated with newline, we
 	    ;; won't expose it.  Because it may be created by x-face-mule.
-	    ;; BTW, XEmacs sometimes fail in putting a invisible text
+	    ;; BTW, XEmacs sometimes fail in putting an invisible text
 	    ;; property with `gnus-article-hide-text' (really?).  In that
 	    ;; case, the invisible text might be started from the middle of
-	    ;; a line so we will expose the sort of thing.
+	    ;; a line, so we will expose the sort of thing.
 	    (when (or (not (or (eq header-start field-start)
 			       (eq ?\n (char-before field-start))))
-		      (eq ?\n (char-before field-end)))
+		      (eq ?\n (char-before field-end))
+		      ;; Expose a boundary line anyway.
+		      (string-equal
+		       "\nX-Boundary: "
+		       (buffer-substring (max (- field-end 13) header-start)
+					 field-end)))
 	      (remove-text-properties field-start field-end
 				      gnus-hidden-properties)
 	      (put-text-property field-start field-end
