@@ -1,3 +1,15 @@
+1998-11-24  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-version-number): Update to
+	2.00.
+
+	* lisp/pop3-fma.el (pop3-fma-save-password-information): New
+	variable. Do not save password information when
+	`pop3-fma-save-password-information' set to nil (in default).
+	(pop3-fma-encode-string): abolished - because of difference of
+	FLIM API.
+	(pop3-fma-decode-string): Ditto.
+
 1998-11-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.039.
