@@ -1,3 +1,38 @@
+1999-10-19  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 10.
+	(TopLevel): Autoload "x-face-mule" and "smiley-mule" for the
+	functions `x-face-mule-gnus-article-display-x-face' and
+	`smiley-buffer'.
+
+	* lisp/lpath.el (smiley-encode-buffer): Bind it for FSF Emacsen.
+
+	* lisp/gnus-ems.el (gnus-group-startup-message): Don't replace with
+	`gnus-mule-group-startup-message'.
+	(gnus-mule-group-startup-message): Remove.
+	(gnus-mule-bitmap-image-file): Remove.
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Encode smileys to
+	ordinary text if the feature `smiley-mule' is provided and FSF
+	Emacs is used.
+	(TopLevel): Require `static' at the compile time.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Bind
+	`mime-display-text/plain-hook' to nil.
+	(gnus-article-prepare-mime-display): Use `let' instead of `let*';
+	treat the next entity position as a marker.
+	(gnus-treatment-function-alist): Use `smiley-buffer' instead of
+	`gnus-smiley-display' under FSF Emacsen.
+	(gnus-treat-display-smileys): Default to t if the module
+	`smiley-mule' is installed.
+	(gnus-treat-display-xface): Default to `head' if the value of
+	`gnus-article-x-face-command' is
+	`x-face-mule-gnus-article-display-x-face'.
+	(gnus-article-x-face-command): Default to
+	`x-face-mule-gnus-article-display-x-face' if the module
+	`x-face-mule' is installed.
+	(TopLevel): Require `static' first; require `path-util'.
+
 1999-10-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
