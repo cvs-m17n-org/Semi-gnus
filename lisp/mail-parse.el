@@ -42,9 +42,11 @@
 (require 'rfc2047)
 (require 'rfc2045)
 
-(defalias 'mail-header-parse-content-type 'rfc2231-parse-string)
-(defalias 'mail-header-parse-content-disposition 'rfc2231-parse-string)
-(defalias 'mail-content-type-get 'rfc2231-get-value)
+(defalias 'mail-header-parse-content-type 'mime-parse-Content-Type)
+(defalias 'mail-header-parse-content-disposition
+  'mime-parse-Content-Disposition)
+(defmacro mail-content-type-get (ctl parameter)
+  `(mime-content-type-parameter ,ctl (symbol-name ,parameter)))
 (defalias 'mail-header-encode-parameter 'rfc2045-encode-string)
 
 (defalias 'mail-header-remove-comments 'ietf-drums-remove-comments)
