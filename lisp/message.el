@@ -1219,11 +1219,11 @@ candidates:
 	    `((,(concat "^\\(" (regexp-quote mail-header-separator) "\\)$")
 	       1 'message-separator-face))
 	  nil)
-      (,(lambda (limit)
-	  (re-search-forward (concat "^\\("
-				     message-cite-prefix-regexp
-				     "\\).*")
-			     limit t))
+      ((lambda (limit)
+	 (re-search-forward (concat "^\\("
+				    message-cite-prefix-regexp
+				    "\\).*")
+			    limit t))
        (0 'message-cited-text-face))
       (,mime-edit-tag-regexp
        (0 'message-mml-face))))
