@@ -8132,8 +8132,9 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 @kindex W Y f ($B35N,(B)
 @findex gnus-article-outlook-deuglify-article
 @cindex Outlook Express
-$B2u$l$?(B Outlook (Express) $B$N5-;v$r40A4$K(B deuglify (sm*rtq**t*s $B$r=hM}!"9T(B
-$B$N@^$jJV$7$r2r=|!"B0@-9T$N=$I|$H0zMQ9T$NJB$YBX$((B) $B$7$^$9!#(B
+$B$$$+$l$?(B Outlook (Express) $B$N5-;v$r40A4$K=9$/$J$/$9$k$3$H(B ($BLu(B
+$BCm(B: de-ugly-fy) (sm*rtq**t*s $B$r=hM}!"9T$N@^$jJV$7$r2r=|!"B0@-9T$N=$I|$H(B
+$B0zMQ9T$NJB$YBX$((B) $B$r$7$^$9!#(B
 (@code{gnus-article-outlook-deuglify-article})$B!#(B
 
 @item W Y u
@@ -24109,6 +24110,11 @@ Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B @acronym{IMAP} $B%a!<%k$rFI$`$3$H$,$
 
 Gnus 5.10 $B$N?7$7$$5!G=(B:
 
+$BLuCm(B: Gnus $B$OFH<+$K(B @acronym{MIME} $B$N5!G=$r;}$C$F$$$k$N$KBP$7$F!"(B
+T-gnus $B$O(B @acronym{SEMI} $B$d(B @acronym{FLIM} $B$KMj$C$F$$$^$9!#$7$?$,$C$F!"(B
+$B0J2<$G@bL@$5$l$F$$$k$$$/$D$+$N5!G=$O(B T-gnus $B$G$O;H$($J$$$3$H$KCm0U$7$F2<(B
+$B$5$$!#(B
+
 @itemize @bullet
 
 @item
@@ -24426,247 +24432,253 @@ Gnus $B%(!<%8%'%s%H$OBg5,LO$J99?7$r7P$F!":#$d%G%#%U%)%k%H$G3h@-2=$5$l$^$9!#(B
 $B%(!<%8%'%s%H$N%-%c%C%7%e$+$i%X%C%@!<$,<h$j4s$;$i$l$^$9!#=i4|$K$O!"$3$l$O(B
 $B%*%U%i%$%s(B (unplugged) $B$N>uBV$G$N$_9T$J$o$l$F$$$^$7$?!#%5!<%P!<%P%C%U%!(B
 $B$G(B @kbd{J a} $B$H(B @kbd{J r} $B$r;H$&$3$H$K$h$C$F!"%5!<%P!<$NEPO?$H:o=|$r9T$J(B
-$B$&$3$H$,$G$-$^$9!#(B
-@c TRANSLATEME ($B$3$NItJ,$O2~9T$;$:$K$D$J$0$Y$7(B)
-Gnus will not download articles into
-the Agent cache, unless you instruct it to do so, though, by using
-@kbd{J u} or @kbd{J s} from the Group buffer.  You revert to the old
-behaviour of having the Agent disabled with @code{(setq gnus-agent
-nil)}.  Note that putting @code{(gnus-agentize)} in @file{~/.gnus.el}
-is not needed any more.
+$B$&$3$H$,$G$-$^$9!#%0%k!<%W%P%C%U%!$+$i(B @kbd{J u} $B$+(B @kbd{J s} $B$r;H$C$FL?(B
+$BNa$7$J$$8B$j!"(BGnus $B$O5-;v$r%(!<%8%'%s%H$N%-%c%C%7%e$K%@%&%s%m!<%I$7$^$;(B
+$B$s!#(B@code{(setq gnus-agent nil)} $B$G$b$C$F!"%(!<%8%'%s%H$,IT3h@-2=$5$l$F(B
+$B$$$?@N$N?6$kIq$$$KLa$9$3$H$,$G$-$^$9!#:#8e(B
+$B$O(B @file{~/.gnus.el} $B$K(B @code{(gnus-agentize)} $B$rCV$$$F$*$/I,MW$,L5$$$3(B
+$B$H$KCm0U$7$F2<$5$$!#(B
 
 @item
 @code{gnus-summary-line-format}
 
-The default value changed to @samp{%U%R%z%I%(%[%4L: %-23,23f%]%)
-%s\n}.  Moreover @code{gnus-extra-headers},
-@code{nnmail-extra-headers} and @code{gnus-ignored-from-addresses}
-changed their default so that the users name will be replaced by the
-recipient's name or the group name posting to for @acronym{NNTP}
-groups.
+$B%G%#%U%)%k%HCM$,(B @samp{%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n} $B$KJQ$o$j$^$7(B
+$B$?!#$5$i$K!"<u?.<T$NL>A0$+(B @acronym{NNTP} $B%0%k!<%W$KEj9F$7$?%0%k!<%WL>$G(B
+$B%f!<%6L>$rCV$-49$($k$?$a$K!"(B@code{gnus-extra-headers}$B!"(B
+@code{nnmail-extra-headers} $B$*$h$S(B @code{gnus-ignored-from-addresses} $B$N(B
+$B%G%U%)%k%HCM$,JQ$o$j$^$7$?!#(B
 
 @item
 @file{deuglify.el} (@code{gnus-article-outlook-deuglify-article})
 
-A new file from Raymond Scholz @email{rscholz@@zonix.de} for deuglifying
-broken Outlook (Express) articles.
+$B$$$+$l$?(B Outlook (Express) $B$N5-;v$r=9$/$J$/$9$k$?$a$N!"(BRaymond Scholz
+@email{rscholz@@zonix.de} $B$K$h$C$F?7@_$5$l$?%U%!%$%k$G$9!#(B
 
 @item
 @code{(require 'gnus-load)}
 
-If you use a stand-alone Gnus distribution, you'd better add
-@code{(require 'gnus-load)} into your @file{~/.emacs} after adding the Gnus
-lisp directory into load-path.
+$BC1FH$GG[I[$5$l$F$$$k(B Gnus $B$r;H$&>l9g$K$O!"(B
+@code{load-path} $B$K(B Gnus $B$N(B lisp $B%G%#%l%/%H%j$rDI2C$7$F$+$i!"(B
+@file{~/.emacs} $B$K(B @code{(require 'gnus-load)} $B$r2C$($k$N$,NI$$$G$9!#(B
 
-File @file{gnus-load.el} contains autoload commands, functions and variables,
-some of which may not be included in distributions of Emacsen.
+$B%U%!%$%k(B @file{gnus-load.el} $B$O!"$=$N$&$A$N$$$/$D$+$O(B Emacsen $B$NG[I[$KF~$C(B
+$B$F$$$J$$$+$b$7$l$J$$<+F0FI$_9~$_(B (autoload) $B%3%^%s%I!"4X?t$*$h$SJQ?t$r4^(B
+$B$s$G$$$^$9!#(B
 
 @item
 @code{gnus-slave-unplugged}
 
-A new command which starts Gnus offline in slave mode.
+$B%*%U%i%$%s$N(B Gnus $B$r%9%l!<%V%b!<%I$G5/F0$9$k?7$7$$%3%^%s%I$G$9!#(B
 
 @item
 @code{message-insinuate-rmail}
 
-Adding @code{(message-insinuate-rmail)} and @code{(setq
-mail-user-agent 'gnus-user-agent)} in @file{.emacs} convinces Rmail to
-compose, reply and forward messages in message-mode, where you can
-enjoy the power of @acronym{MML}.
+@code{(message-insinuate-rmail)} $B$H(B @code{(setq mail-user-agent
+'gnus-user-agent)} $B$r(B @file{.emacs} $B$K2C$($k$3$H$G!"(B
+@code{message-mode} $B$G%a%C%;!<%8$N:n@.!"JV?.$*$h$SE>Aw$r9T$J$&$h$&(B
+$B$K(B Rmail $B$r@bF@$9$k$3$H$,$G$-$^$9!#$=$3$G$O(B @acronym{MML} $B$N0RNO$r4.G=$G(B
+$B$-$^$9!#(B
 
 @item
 @code{message-minibuffer-local-map}
 
-The line below enables BBDB in resending a message:
+$B2<$N9T$G!"%a%C%;!<%8$r:FAw$9$k$H$-$K(B BBDB $B$,;H$($^$9(B:
 @lisp
 (define-key message-minibuffer-local-map [(tab)]
   'bbdb-complete-name)
 @end lisp
 
 @item
-Externalizing and deleting of attachments.
+$BE:IU%U%!%$%k(B (attachments) $B$N@Z$jN%$7(B (externalizing) $B$H>C5n!#(B
 
-If @code{gnus-gcc-externalize-attachments} or
-@code{message-fcc-externalize-attachments} is non-@code{nil}, attach
-local files as external parts.
+@code{gnus-gcc-externalize-attachments} $B$^$?(B
+$B$O(B @code{message-fcc-externalize-attachments} $B$,Hs(B-@code{nil} $B$K$J$C$F$$(B
+$B$k$H!"%m!<%+%k%U%!%$%k$r30It%Q!<%H$H$7$FE:IU$7$^$9!#(B
 
-The command @code{gnus-mime-save-part-and-strip} (bound to @kbd{C-o}
-on @acronym{MIME} buttons) saves a part and replaces the part with an
-external one.  @code{gnus-mime-delete-part} (bound to @kbd{d} on
-@acronym{MIME} buttons) removes a part. It works only on back ends
-that support editing.
+@code{gnus-mime-save-part-and-strip} $B%3%^%s%I(B (@acronym{MIME} $B%\%?%s>e(B
+$B$G(B @kbd{C-o} $B$K3d$jEv$F$i$l$F$$$k(B) $B$O!"%Q!<%H$r%;!<%V$7$F$+$i30It$N$=$l(B
+$B$HCV$-49$($^$9!#(B@code{gnus-mime-delete-part} (@acronym{MIME} $B%\%?%s>e(B
+$B$G(B @kbd{d} $B$K3d$jEv$F$i$l$F$$$k(B) $B$O!"%Q!<%H$r:o=|$7$^$9!#$3$l$OJT=8$r%5(B
+$B%]!<%H$7$F$$$k%P%C%/%(%s%I$G$@$1F0:n$7$^$9!#(B
 
 @item
 @code{gnus-default-charset}
 
-The default value is determined from the
-@code{current-language-environment} variable, instead of
-@code{iso-8859-1}.  Also the @samp{.*} item in
-@code{gnus-group-charset-alist} is removed.
+$B%G%U%)%k%HCM$O(B @code{iso-8859-1} $B$KBe$o$C(B
+$B$F(B @code{current-language-environment} $BJQ?t$K$h$C$F7hDj$5$l$kCM$K$J$j$^(B
+$B$9!#$^$?!"(B@code{gnus-group-charset-alist} $B$K$"$C$?(B @samp{.*} $B$N9`L\$O:o(B
+$B=|$5$l$^$7$?!#(B
 
 @item
 @code{gnus-posting-styles}
 
-Add a new format of match like
+$B$3$N$h$&$J9gCW$NMM<0$,2C$o$j$^$7$?!#(B
 @lisp
 ((header "to" "larsi.*org")
  (Organization "Somewhere, Inc."))
 @end lisp
-The old format like the lines below is obsolete, but still accepted.
+$B2<5-$N$h$&$J8E$$MM<0$O;~BeCY$l$K$J$j$^$7$?$,!"$^$@<u$1F~$l$i$l$^$9!#(B
 @lisp
 (header "to" "larsi.*org"
 	(Organization "Somewhere, Inc."))
 @end lisp
 
 @item
-@code{message-ignored-news-headers} and @code{message-ignored-mail-headers}
+@code{message-ignored-news-headers} $B$H(B @code{message-ignored-mail-headers}
 
-@samp{X-Draft-From} and @samp{X-Gnus-Agent-Meta-Information} have been
-added into these two variables. If you customized those, perhaps you
-need add those two headers too.
-
-@item
-Gnus reads the @acronym{NOV} and articles in the Agent if plugged.
-
-If one reads an article while plugged, and the article already exists
-in the Agent, it won't get downloaded once more.  @code{(setq
-gnus-agent-cache nil)} reverts to the old behavior.
+@samp{X-Draft-From} $B$H(B @samp{X-Gnus-Agent-Meta-Information} $B$,!"$3$l$iFs(B
+$B$D$NJQ?t$K2C$($i$l$F$$$^$9!#$=$l$i$r%+%9%?%^%$%:$9$k>l9g$K!"$b$7$+$9$k$H(B
+$B$=$l$iFs$D$N%X%C%@!<$r2C$($kI,MW$,$"$j$^$9!#(B
 
 @item
-Gnus supports the ``format=flowed'' (RFC 2646) parameter.  On
-composing messages, it is enabled by @code{use-hard-newlines}.
-Decoding format=flowed was present but not documented in earlier
-versions.
+Gnus $B$O:9$79~$^$l$F$$$k(B (@dfn{plugged}) $B$H$-$K!"%(!<%8%'%s%H$+(B
+$B$i(B @acronym{NOV} $B$H5-;v$rFI$_9~$_$^$9!#(B
+
+$B:9$79~$^$l$F$$$k$H$-$K5-;v$rFI$`>l9g$K!"$=$N5-;v$,$9$G$K%(!<%8%'%s%H$K$"(B
+$B$k$J$i$P!"$b$&0lEY%@%&%s%m!<%I$9$k$3$H$O$"$j$^$;$s!#(B@code{(setq
+gnus-agent-cache nil)} $B$O5l<0$NF0:n$KLa$7$^$9!#(B
 
 @item
-Gnus supports the generation of RFC 2298 Disposition Notification requests.
-
-This is invoked with the @kbd{C-c M-n} key binding from message mode.
-
-@item
-Gnus supports Maildir groups.
-
-Gnus includes a new back end @file{nnmaildir.el}.  @xref{Maildir}.
+Gnus $B$O(B ``format=flowed'' (RFC 2646) $B%Q%i%a!<%?$r%5%]!<%H$7$^$9!#%a%C%;!<(B
+$B%8$r:n@.$9$k$H$-$K!"$=$l$O(B @code{use-hard-newlines} $B$G3h@-2=$5$l$^$9!#(B
+format=flowed $B$N%G%3!<%I$O0JA0$+$i$G$-$^$7$?$,!"=i4|$NHG$G$O@bL@$NJ8=q$,(B
+$B$"$j$^$;$s$G$7$?!#(B
 
 @item
-Printing capabilities are enhanced.
+Gnus $B$O(B RFC 2298 $B$N3+Iu3NG'MW5a$N@8@.$r%5%]!<%H$7$^$9!#(B
 
-Gnus supports Muttprint natively with @kbd{O P} from the Summary and
-Article buffers.  Also, each individual @acronym{MIME} part can be
-printed using @kbd{p} on the @acronym{MIME} button.
+$B$3$l$O%a%C%;!<%8%b!<%I$N(B @kbd{C-c M-n} $B%-!<$G5/F0$5$l$^$9!#(B
 
 @item
-Message supports the Importance: (RFC 2156) header.
+Gnus $B$O(B Maildir $B%0%k!<%W$r%5%]!<%H$7$^$9!#(B
 
-In the message buffer, @kbd{C-c C-f C-i} or @kbd{C-c C-u} cycles through
-the valid values.
-
-@item
-Gnus supports Cancel Locks in News.
-
-This means a header @samp{Cancel-Lock} is inserted in news posting.  It is
-used to determine if you wrote an article or not (for cancelling and
-superseding).  Gnus generates a random password string the first time
-you post a message, and saves it in your @file{~/.emacs} using the Custom
-system.  While the variable is called @code{canlock-password}, it is not
-security sensitive data.  Publishing your canlock string on the web
-will not allow anyone to be able to anything she could not already do.
-The behaviour can be changed by customizing @code{message-insert-canlock}.
+Gnus $B$O?7%P%C%/%(%s%I$G$"$k(B @file{nnmaildir.el} $B$r4^$s$G$$$^$9!#(B
+@xref{Maildir}$B!#(B
 
 @item
-Gnus supports server-side mail filtering using Sieve.
+$B0u:~$N@-G=$,8~>e$7$^$7$?!#(B
 
-Sieve rules can be added as Group Parameters for groups, and the
-complete Sieve script is generated using @kbd{D g} from the Group
-buffer, and then uploaded to the server using @kbd{C-c C-l} in the
-generated Sieve buffer.  @xref{Sieve Commands}, and the new Sieve
-manual @ref{Top, , Top, sieve, Emacs Sieve}.
+Gnus $B$O$=$l<+?H$,!"35N,$H5-;v%P%C%U%!$K$*$1$k(B @kbd{O P} $B$G(B Muttprint $B$r(B
+$B%5%]!<%H$7$^$9!#$5$i$K(B @acronym{MIME} $B%\%?%s>e$G(B @kbd{p} $B$r;H$&$3$H$K$h$C(B
+$B$F!"8D!9$N(B @acronym{MIME} $B%Q!<%H$N$=$l$>$l$r0u:~$9$k$3$H$,$G$-$^$9!#(B
 
 @item
-Extended format specs.
+Message $B$O(B Importance: $B%X%C%@!<(B (RFC 2156) $B$r%5%]!<%H$9$k$h$&$K$J$j$^$7(B
+$B$?!#(B
 
-Format spec @samp{%&user-date;} is added into
-@code{gnus-summary-line-format-alist}.  Also, user defined extended
-format specs are supported.  The extended format specs look like
-@samp{%u&foo;}, which invokes function
-@code{gnus-user-format-function-@var{foo}}.  Because @samp{&} is used as the
-escape character, old user defined format @samp{%u&} is no longer supported.
+$B%a%C%;!<%8%P%C%U%!$G(B @kbd{C-c C-f C-i} $B$+(B @kbd{C-c C-u} $B$r;H$&$H!"2DG=$J(B
+$BCM$,=[4D$7$^$9!#(B
 
 @item
-@kbd{/ *} (@code{gnus-summary-limit-include-cached}) is rewritten.
+Gnus $B$O%K%e!<%9$N(B Cancel Locks $B$r%5%]!<%H$7$^$9!#(B
 
-It was aliased to @kbd{Y c}
-(@code{gnus-summary-insert-cached-articles}). The new function filters
-out other articles.
-
-@item Some limiting commands accept a @kbd{C-u} prefix to negate the match.
-
-If @kbd{C-u} is used on subject, author or extra headers, i.e., @kbd{/
-s}, @kbd{/ a}, and @kbd{/ x}
-(@code{gnus-summary-limit-to-@{subject,author,extra@}}) respectively, the
-result will be to display all articles that do not match the expression.
-
-@item
-Group names are treated as UTF-8 by default.
-
-This is supposedly what USEFOR wanted to migrate to.  See
-@code{gnus-group-name-charset-group-alist} and
-@code{gnus-group-name-charset-method-alist} for customization.
+$BEj9F$9$k%K%e!<%95-;v$K(B @samp{Cancel-Lock} $B%X%C%@!<$,A^F~$5$l$k$3$H$G$9!#(B
+$B$3$l$O!"5-;v$r$"$J$?$,=q$$$?$N$+$I$&$+$r3N$+$a$k$?$a$K;H$$$^$9(B ($B%-%c%s%;(B
+$B%k$HCV$-49$($N$H$-(B)$B!#:G=i$K5-;v$rEj9F$9$k$H$-$K!"(BGnus $B$O%i%s%@%`$J%Q%9%o!<(B
+$B%IJ8;zNs$r@8@.$7!"%+%9%?%`$N5!9=$r;H$C$F(B @file{~/.emacs} $B$K%;!<%V$7$^$9!#(B
+$B$=$NJQ?t$O(B @code{canlock-password} $B$H8F$P$l$^$9$,!"5!L)$r5$$K$9$k%G!<%?(B
+$B$G$O$"$j$^$;$s!#%&%'%V>e$G(B canlock $B$r8x3+$7$F$b!"0JA0$+$iH`=w$,$G$-$J$+$C(B
+$B$?2?$+$r!"C/$+$,$G$-$k$h$&$K$9$k$b$N$G$O$"$j$^$;$s!#(B
+@code{message-insert-canlock} $B$r%+%9%?%^%$%:$9$k$3$H$K$h$C$F!"?6$kIq$$$r(B
+$BJQ99$9$k$,$G$-$^$9!#(B
 
 @item
-The nnml and nnfolder back ends store marks for each groups.
+Gnus $B$O(B Sieve $B$r;H$C$?%5!<%P!<B&$G$N%a!<%k$N_I2a$r%5%]!<%H$7$^$9!#(B
 
-This makes it possible to take backup of nnml/nnfolder servers/groups
-separately of @file{~/.newsrc.eld}, while preserving marks.  It also
-makes it possible to share articles and marks between users (without
-sharing the @file{~/.newsrc.eld} file) within e.g. a department.  It
-works by storing the marks stored in @file{~/.newsrc.eld} in a per-group
-file @file{.marks} (for nnml) and @file{@var{groupname}.mrk} (for
-nnfolder, named @var{groupname}).  If the nnml/nnfolder is moved to
-another machine, Gnus will automatically use the @file{.marks} or
-@file{.mrk} file instead of the information in @file{~/.newsrc.eld}.
-The new server variables @code{nnml-marks-is-evil} and
-@code{nnfolder-marks-is-evil} can be used to disable this feature.
+Sieve $B$N5,B'$O%0%k!<%W%Q%i%a!<%?$H$7$F2C$($k$3$H$,$G$-!"%0%k!<%W%P%C%U%!(B
+$B$G(B @kbd{D g} $B$r;H$&$H40A4$J(B Sieve $B%9%/%j%W%H$,@8@.$5$l$^$9!#$=$&$7$?$i!"(B
+$B@8@.$5$l$?(B Sieve $B%P%C%U%!$G(B @kbd{C-c C-l} $B$r;H$C$F!"%5!<%P!<$K%"%C%W%m!<(B
+$B%I$7$F2<$5$$!#(B@xref{Sieve Commands}$B!"$=$l$K?7$7$$(B Sieve $B$N%^%K%e%"(B
+$B%k(B @ref{Top, , Top, sieve, Emacs Sieve} $B$r;2>H$7$F2<$5$$!#(B
 
 @item
-The menu bar item (in Group and Summary buffer) named ``Misc'' has
-been renamed to ``Gnus''.
+$B3HD%$5$l$?%U%)!<%^%C%H$N;EMM(B (format specs)$B!#(B
+
+$B%U%)!<%^%C%H$N;E(B
+$BMM(B @samp{%&user-date;} $B$,(B @code{gnus-summary-line-format-alist} $B$KDI2C$5(B
+$B$l$^$7$?!#$=$l$K!"%f!<%6Dj5A$K$h$k3HD%$5$l$?%U%)!<%^%C%H$N;EMM$b%5%]!<%H(B
+$B$5$l$F$$$^$9!#3HD%$5$l$?%U%)!<%^%C%H$N;EMM$O(B @samp{%u&foo;} $B$N$h$&$J$b$N(B
+$B$G!"4X?t(B @code{gnus-user-format-function-@var{foo}} $B$r5/F0$7$^$9!#(B
+@samp{&} $B$,%(%9%1!<%WJ8;z$K;H$o$l$F$$$k$N$G!"8E$$%f!<%6Dj5A%U%)!<%^%C%H(B
+$B$G$"$k(B @samp{%u&} $B$O:#$d%5%]!<%H$5$l$F$$$^$;$s!#(B
 
 @item
-The menu bar item (in Message mode) named ``@acronym{MML}'' has been
-renamed to ``Attachments''.  Note that this menu also contains security
-related stuff, like signing and encryption (@pxref{Security, Security,,
-message, Message Manual}).
+@kbd{/ *} (@code{gnus-summary-limit-include-cached}) $B$,=q$-D>$5$l$^$7$?!#(B
+
+$B$3$l$O(B @kbd{Y c} (@code{gnus-summary-insert-cached-articles}) $B$NJLL>$G$7(B
+$B$?(B ($BLuCm(B: $B0JA0$O(B)$B!#?7$7$$4X?t$OB>$N5-;v$r_I2a$7$F=|5n$7$^$9!#(B
 
 @item
-@code{gnus-group-charset-alist} and
-@code{gnus-group-ignored-charsets-alist}.
+$B$$$/$D$+$N%3%^%s%I$O(B @kbd{C-u} $B@\F,<-$G9gCW$NH]Dj$r07$&$3$H$,$G$-$^$9!#(B
 
-The regexps in these variables are compared with full group names
-instead of real group names in 5.8.  Users who customize these
-variables should change those regexps accordingly. For example:
+@kbd{C-u} $B$r(B subject$B!"(Bauthor $B$^$?$O(B extra $B%X%C%@!<$r$3$N=g$K;H$&(B -- $B$9$J(B
+$B$o$A(B @kbd{/ s}$B!"(B@kbd{/ a} $B$*$h(B
+$B$S(B @kbd{/ x} (@code{gnus-summary-limit-to-@{subject,author,extra@}})
+-- $B$H!"7k2L$H$7$F$=$NI=8=$K9gCW$7$J$$$9$Y$F$N5-;v$,I=<($5$l$^$9!#(B
+
+@item
+$B%0%k!<%WL>$O!"%G%#%U%)%k%H$G(B UTF-8 $B$G$"$k$b$N$H$7$F<h$j07$o$l$^$9!#(B
+
+$B$3$l$O(B USEFOR $B$,0\9T$7$h$&$H$7$F$$$k$HA[Dj$5$l$k$b$N$G$9!#%+%9%?%^%$%:$9(B
+$B$k$K$O(B @code{gnus-group-name-charset-group-alist} $B$*$h(B
+$B$S(B @code{gnus-group-name-charset-method-alist} $B$r;2>H$7$F2<$5$$!#(B
+
+@item
+nnml $B$H(B nnfolder $B%P%C%/%(%s%I$O!"%0%k!<%WKh$K0u(B (marks) $B$r3JG<$9$k$h$&$K(B
+$B$J$j$^$7$?!#(B
+
+$B$3$l$O(B nnml/nnfolder $B%5!<%P!<(B/$B%0%k!<%W(B $B$r(B @file{~/.newsrc.eld} $B$H@Z$jN%(B
+$B$7$F!"$7$+$70u$O<i$j$D$D!"%P%C%/%"%C%W$9$k$3$H$r2DG=$K$7$^$9!#$5$i$K!"Nc(B
+$B$($P8&5f<<$d?&>l$J$I$NAH?%Fb$G!"(B(@file{~/.newsrc.eld} $B%U%!%$%k$r6&M-$9$k(B
+$B$3$HL5$7$K(B) $B%f!<%64V$G5-;v$H0u$r6&M-$9$k$3$H$r$b2DG=$K$7$^$9!#$3$l$O!"(B
+@file{~/.newsrc.eld} $B$K3JG<$5$l$k0u$r!"%0%k!<%WKh$N(B @file{.marks} $B%U%!%$(B
+$B%k(B (nnml $BMQ(B) $B$H(B @file{@var{groupname}.mrk} $B%U%!%$%k(B (@var{groupname} $B$N(B
+$BL>A0$r;}$D(B nnfolder $BMQ(B) $B$K3JG<$9$k$3$H$K$h$C$FF0:n$7$^$9!#(B
+nnml/nnfolder $B$rB>$N%^%7%s$K0z$C1[$7$F$b!"(B
+Gnus $B$O(B @file{~/.newsrc.eld} $B$K$"$k>pJs$NBe$o$j$K!"<+F0E*(B
+$B$K(B @file{.marks} $B$+(B @file{.mrk} $B%U%!%$%k$r;H$$$^$9!#?7$7$$%5!<%P!<JQ?t$G(B
+$B$"$k(B @code{nnml-marks-is-evil} $B$H(B @code{nnfolder-marks-is-evil} $B$,!"$3$N(B
+$B5!G=$rM^@)$9$k$?$a$K;H$&$3$H$,$G$-$^$9!#(B
+
+@item
+$B%0%k!<%W$H35N,%P%C%U%!$N%a%K%e!<9`L\$NL>A0(B ``Misc'' $B$O(B ``Gnus'' $B$K2~L>$5(B
+$B$l$^$7$?!#(B
+
+@item
+Message mode $B$G(B ``@acronym{MML}'' $B$HL>IU$1$i$l$?%a%K%e!<9`L\$O!"(B
+``Attachments'' $B$K2~L>$5$l$^$7$?!#$3$N%a%K%e!<$O!"=pL>$H0E9f(B
+$B2=(B (@pxref{Security, Security,, message, Message Manual}) $B$N$h$&$J!"J]0B(B
+$B$K4XO"$7$?$b$N$b4^$s$G$$$k$3$H$KCeL\$7$F2<$5$$!#(B
+
+@item
+@code{gnus-group-charset-alist} $B$H(B @code{gnus-group-ignored-charsets-alist}$B!#(B
+
+$B$3$l$i$NJQ?t$K@_Dj$5$l$?@55,I=8=$O!"40A4$J(B (full) $B%0%k!<%WL>$HHf3S$5$l$^(B
+$B$9!#(BGnus 5.8 $B$G$O<B:]$N(B (real) $B%0%k!<%WL>$,Hf3S$NBP>]$G$7$?!#$7$?$,$C$F!"(B
+$B$3$l$i$NJQ?t$r%+%9%?%^%$%:$7$F$$$k%f!<%6$O!"@55,I=8=$rJQ99$7$J$1$l$P$J$j(B
+$B$^$;$s!#Nc$G$9(B:
 @lisp
 ("^han\\>" euc-kr) -> ("\\(^\\|:\\)han\\>" euc-kr)
 @end lisp
 
 @item
-Gnus supports @acronym{PGP} (RFC 1991/2440), @acronym{PGP/MIME} (RFC
-2015/3156) and @acronym{S/MIME} (RFC 2630-2633).
+Gnus $B$O(B @acronym{PGP} (RFC 1991/2440)$B!"(B@acronym{PGP/MIME} (RFC
+2015/3156) $B$*$h$S(B @acronym{S/MIME} (RFC 2630-2633) $B$r%5%]!<%H$7$^$9!#(B
 
-It needs an external @acronym{S/MIME} and OpenPGP implementation, but no
-additional Lisp libraries.  This add several menu items to the
-Attachments menu, and @kbd{C-c RET} key bindings, when composing
-messages.  This also obsoletes @code{gnus-article-hide-pgp-hook}.
-
-@item
-Gnus inlines external parts (message/external).
+$B$3$l$K$O(B @acronym{S/MIME} $B$H(B OpenPGP $B$,<BAu$5$l$F$$$kI,MW$,$"$j$^$9!#$G(B
+$B$bDI2C$N(B Lisp $B%i%$%V%i%j$OMW$j$^$;$s!#%a%C%;!<%8$N:n@.;~$K!"$$$/$D$+$N%a(B
+$B%K%e!<$H(B @kbd{C-c RET} $B%-!<$N3d$jEv$F$,(B Attachments $B%a%K%e!<$KDI2C$5$l$^(B
+$B$9!#$3$l$O$^$?!"(B@code{gnus-article-hide-pgp-hook} $B$r;~BeCY$l$K$7$^$7$?!#(B
 
 @item
-@acronym{MML} (Mime compose) prefix changed from @kbd{M-m} to @kbd{C-c
-C-m}.
+Gnus $B$O30It%Q!<%H(B (message/external) $B$r%$%s%i%$%sI=<($7$^$9!#(B
 
-This change was made to avoid conflict with the standard binding of
-@code{back-to-indentation}, which is also useful in message mode.
+@item
+@acronym{MML} (Mime $B:n@.(B) $B%3%^%s%I$N@\F,%-!<$,!"(B@kbd{M-m} $B$+$i(B @kbd{C-c
+C-m} $B$KJQ$o$j$^$7$?!#(B
+
+$B$3$NJQ99$K$h$C$F!"I8=`%-!<3d$jEv$F$N(B @code{back-to-indentation} $B$H$N>WFM(B
+$B$,2sHr$5$l$^$7$?!#$3$N%3%^%s%I$b$^$?!"%a%C%;!<%8%b!<%I$G$OLr$KN)$D$N$G$9!#(B
 @end itemize
 
 @iftex
