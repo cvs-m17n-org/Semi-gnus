@@ -1,3 +1,14 @@
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Sync up with latest gnus.texi.
+
+	* texi/gnus.texi: Modify for Semi-gnus 6.4.0.
+
+1998-06-06  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-extract-address-components): Add
+	`std11-extract-address-components' as a choice.
+
 1998-06-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Add "Composing Messages".
