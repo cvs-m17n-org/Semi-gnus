@@ -1,3 +1,21 @@
+1999-06-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.11.04.
+	(gnus-revision-number): Fresh start from 00.
+
+	* configure: Regenerate.
+
+	* lisp/mm-view.el (TopLevel): Define `gnus-article-mime-handles'
+	for avoiding byte compile warning.
+
+	* lisp/{rfc2047.el,nnmail.el,mml.el,mm-view.el,mm-util.el,
+	mm-bodies.el,message.el,mail-prsvr.el,gnus-xmas.el,gnus-sum.el,
+	gnus-start.el,gnus-draft.el,gnus-cus.el,gnus-cache.el,gnus-art.el,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.89.
+	* aclocal.m4: Ditto.
+
+	* README.T-gnus: Update for T-gnus 6.11.04.
+
 1999-06-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* Mule23@1934: New file.
