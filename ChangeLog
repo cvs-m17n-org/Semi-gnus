@@ -1,5 +1,14 @@
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/message.el: Suppress some byte-compile warnings.
+	(message-make-forward-subject): Failed to sync.
+	(message-setup): Ditto.
+	(message-clone-locals): Modify regexp.
+	
+	* lisp/message.el (message-fill-references): Reverted.
+
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus-agent.el (gnus-agent-braid-nov): Use
 	`nnheader-insert-file-contents'.
 
