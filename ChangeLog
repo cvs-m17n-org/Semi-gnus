@@ -1,5 +1,7 @@
 1999-06-01  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* Nana-TIPS.ja: Change required version of SEMI/FLIM.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.0.
 	(gnus-version): Change required version of SEMI/FLIM.
 
