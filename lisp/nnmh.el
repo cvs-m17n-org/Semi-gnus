@@ -1,8 +1,9 @@
-;;; nnmh.el --- mhspool access for Gnus
-;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
+;;; nnmh.el --- mhspool access for Chaos
+;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;         Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -131,124 +132,10 @@
 	   headers header id end ref lines chars ctype)
       (nnmh-possibly-change-directory newsgroup server)
       ;; We don't support fetching by Message-ID.
-      (if (stringp (car articles))
-	  'headers
-	(while articles
-	  (when (and (file-exists-p
-		      (setq file (concat (file-name-as-directory
-					  nnmh-current-directory)
-					 (int-to-string
-					  (setq article (pop articles))))))
-		     (not (file-directory-p file)))
-	    ;;(insert (format "221 %d Article retrieved.\n" article))
-	    ;;(setq beg (point))
-	    (erase-buffer)
-	    (nnheader-insert-head file)
-	    (save-restriction
-	      (std11-narrow-to-header)
-	      (setq
-	       header
-	       (make-full-mail-header
-		;; Number.
-		article
-		;; Subject.
-		(or (std11-fetch-field "Subject")
-		    "(none)")
-		;; From.
-		(or (std11-fetch-field "From")
-		    "(nobody)")
-		;; Date.
-		(or (std11-fetch-field "Date")
-		    "")
-		;; Message-ID.
-		(progn
-		  (goto-char (point-min))
-		  (setq id (if (re-search-forward
-				"^Message-ID: *\\(<[^\n\t> ]+>\\)" nil t)
-			       ;; We do it this way to make sure the Message-ID
-			       ;; is (somewhat) syntactically valid.
-			       (buffer-substring (match-beginning 1)
-						 (match-end 1))
-			     ;; If there was no message-id, we just fake one
-			     ;; to make subsequent routines simpler.
-			     (nnheader-generate-fake-message-id))))
-		;; References.
-		(progn
-		  (goto-char (point-min))
-		  (if (search-forward "\nReferences: " nil t)
-		      (progn
-			(setq end (point))
-			(prog1
-			    (buffer-substring (match-end 0) (std11-field-end))
-			  (setq ref
-				(buffer-substring
-				 (progn
-				   ;; (end-of-line)
-				   (search-backward ">" end t)
-				   (1+ (point)))
-				 (progn
-				   (search-backward "<" end t)
-				   (point))))))
-		    ;; Get the references from the in-reply-to header if there
-		    ;; were no references and the in-reply-to header looks
-		    ;; promising.
-		    (if (and (search-forward "\nIn-Reply-To: " nil t)
-			     (setq in-reply-to
-				   (buffer-substring (match-end 0)
-						     (std11-field-end)))
-			     (string-match "<[^>]+>" in-reply-to))
-			(let (ref2)
-			  (setq ref (substring in-reply-to (match-beginning 0)
-					       (match-end 0)))
-			  (while (string-match "<[^>]+>"
-					       in-reply-to (match-end 0))
-			    (setq ref2
-				  (substring in-reply-to (match-beginning 0)
-					     (match-end 0)))
-			    (when (> (length ref2) (length ref))
-			      (setq ref ref2)))
-			  ref)
-		      (setq ref nil))))
-		;; Chars.
-		(progn
-		  (goto-char (point-min))
-		  (if (search-forward "\nChars: " nil t)
-		      (if (numberp (setq chars (ignore-errors (read cur))))
-			  chars 0)
-		    0))
-		;; Lines.
-		(progn
-		  (goto-char (point-min))
-		  (if (search-forward "\nLines: " nil t)
-		      (if (numberp (setq lines (ignore-errors (read cur))))
-			  lines 0)
-		    0))
-		;; Xref.
-		(std11-fetch-field "Xref")
-		))
-	      (goto-char (point-min))
-	      (if (setq ctype (std11-fetch-field "Content-Type"))
-		  (mime-entity-set-content-type-internal
-		   header (mime-parse-Content-Type ctype)))
-	      )
-	    (when (setq header
-			(gnus-dependencies-add-header
-			 header dependencies force-new))
-	      (push header headers))
-	    )
-	  (setq count (1+ count))
-
-	  (and large
-	       (zerop (% count 20))
-	       (nnheader-message 5 "nnmh: Receiving headers... %d%%"
-				 (/ (* count 100) number))))
-
-	(when large
-	  (nnheader-message 5 "nnmh: Receiving headers...done"))
-
-        ;; (nnheader-fold-continuation-lines)
-	(cons 'header (nreverse headers))
-	))))
+      (nnheader-retrieve-headers-from-directory
+       articles nnmh-current-directory dependencies
+       fetch-old force-new large "nnmh")
+      )))
 
 (deffoo nnmh-open-server (server &optional defs)
   (nnoo-change-server 'nnmh server defs)
