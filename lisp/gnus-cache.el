@@ -152,8 +152,8 @@ it's not cached."
   (group article headers ticked dormant unread &optional force)
   (when (and (or force (not (eq gnus-use-cache 'passive)))
 	     (numberp article)
-	     (> article 0)
-	     (vectorp headers))		; This might be a dummy article.
+	     (> article 0)		; This might be a dummy article.
+	     (vectorp headers))
     (let ((number article) file)
       ;; If this is a virtual group, we find the real group.
       (when (gnus-virtual-group-p group)
@@ -325,65 +325,6 @@ it's not cached."
 	    (gnus-cache-braid-heads group (gnus-sorted-intersection
 					   cached articles))
 	    type)))))))
-
-(defun gnus-cache-retrieve-parsed-headers (articles group &optional fetch-old
-						    dependencies force-new)
-  "Retrieve the parsed-headers for ARTICLES in GROUP."
-  (let ((cached
-	 (setq gnus-newsgroup-cached (gnus-cache-articles-in-group group))))
-    (if (not cached)
-	;; No cached articles here, so we just retrieve them
-	;; the normal way.
-	(let ((gnus-use-cache nil))
-	  (gnus-retrieve-parsed-headers articles group fetch-old
-					dependencies force-new))
-      (let ((uncached-articles (gnus-sorted-intersection
-				(gnus-sorted-complement articles cached)
-				articles))
-	    (cache-file (gnus-cache-file-name group ".overview")))
-	(gnus-cache-braid-headers
-	 ;; We first retrieve all the headers that we don't have in
-	 ;; the cache.
-	 (prog1
-	     (let ((gnus-use-cache nil))
-	       (when uncached-articles
-		 (and articles
-		      (gnus-retrieve-parsed-headers
-		       uncached-articles group fetch-old
-		       dependencies))
-		 ))
-	   (gnus-cache-save-buffers))
-	 ;; Then we insert the cached headers.
-	 (cond ((not (file-exists-p cache-file))
-		;; There are no cached headers.
-		)
-	       ((eq gnus-headers-retrieved-by 'nov)
-		(with-current-buffer nntp-server-buffer
-		  (erase-buffer)
-		  (nnheader-insert-file-contents cache-file)
-		  (nnheader-get-newsgroup-headers-xover*
-		   articles nil dependencies group)
-		  ))
-	       (t
-		;; We braid HEADs.
-		(nnheader-retrieve-headers-from-directory*
-		 cached
-		 (expand-file-name
-		  (file-name-as-directory
-		   (nnheader-translate-file-chars
-		    (if (gnus-use-long-file-name 'not-cache)
-			group
-		      (let ((group
-			     (nnheader-replace-chars-in-string group ?/ ?_)))
-			;; Translate the first colon into a slash.
-			(when (string-match ":" group)
-			  (aset group (match-beginning 0) ?/))
-			(nnheader-replace-chars-in-string group ?. ?/)))
-		    t))
-		  gnus-cache-directory)
-		 dependencies)
-		)))
-	))))
 
 (defun gnus-cache-enter-article (&optional n)
   "Enter the next N articles into the cache.
@@ -612,36 +553,6 @@ Returns the list of articles removed."
       (insert-buffer-substring cache-buf)
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
-
-(defun gnus-cache-braid-headers (headers cached-headers)
-  (if cached-headers
-      (if headers
-	  (let (cached-header hrest nhrest)
-	    (nconc (catch 'tag
-		     (while cached-headers
-		       (setq cached-header (car cached-headers))
-		       (if (< (mail-header-number cached-header)
-			      (mail-header-number (car headers)))
-			   (throw 'tag (nreverse cached-headers))
-			 (setq hrest headers
-			       nhrest (cdr hrest))
-			 (while (and nhrest
-				     (> (mail-header-number cached-header)
-					(mail-header-number (car nhrest))))
-			   (setq hrest nhrest
-				 nhrest (cdr nhrest))
-			   )
-			 ;;(if nhrest
-			 (setcdr hrest (cons cached-header nhrest))
-			 ;; (setq headers
-			 ;;         (nconc headers (list cached-header)))
-			 ;; (throw 'tag nil)
-			 ;;)
-			 )
-		       (setq cached-headers (cdr cached-headers))))
-		   headers))
-	(nreverse cached-headers))
-    headers))
 
 ;;;###autoload
 (defun gnus-jog-cache ()

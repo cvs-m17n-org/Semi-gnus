@@ -403,7 +403,7 @@ this variable specifies group names."
 			 (cons :value ("" "") regexp (repeat string))
 			 (sexp :value nil))))
 
-(defcustom gnus-unread-mark ?  ;Whitespace
+(defcustom gnus-unread-mark ?\ ;;;Whitespace
   "*Mark used for unread articles."
   :group 'gnus-summary-marks
   :type 'character)
@@ -478,7 +478,7 @@ this variable specifies group names."
   :group 'gnus-summary-marks
   :type 'character)
 
-(defcustom gnus-no-mark ?  ;Whitespace
+(defcustom gnus-no-mark ?\ ;;;Whitespace
   "*Mark used for articles that have no other secondary mark."
   :group 'gnus-summary-marks
   :type 'character)
@@ -528,7 +528,7 @@ this variable specifies group names."
   :group 'gnus-summary-marks
   :type 'character)
 
-(defcustom gnus-empty-thread-mark ?  ;Whitespace
+(defcustom gnus-empty-thread-mark ?\ ;;;Whitespace
   "*There is no thread under the article."
   :group 'gnus-summary-marks
   :type 'character)
@@ -2920,7 +2920,7 @@ buffer that was in action when the last article was fetched."
 	  (if (or (null gnus-summary-default-score)
 		  (<= (abs (- gnus-tmp-score gnus-summary-default-score))
 		      gnus-summary-zcore-fuzz))
-	      ?  ;Whitespace
+	      ?\ ;;;Whitespace
 	    (if (< gnus-tmp-score gnus-summary-default-score)
 		gnus-score-below-mark gnus-score-over-mark)))
 	 (gnus-tmp-replied
@@ -2986,7 +2986,7 @@ buffer that was in action when the last article was fetched."
 	 (if (or (null gnus-summary-default-score)
 		 (<= (abs (- score gnus-summary-default-score))
 		     gnus-summary-zcore-fuzz))
-	     ?  ;Whitespace
+	     ?\ ;;;Whitespace
 	   (if (< score gnus-summary-default-score)
 	       gnus-score-below-mark gnus-score-over-mark))
 	 'score))
@@ -3027,7 +3027,7 @@ the thread are to be displayed."
 (defun gnus-summary-set-local-parameters (group)
   "Go through the local params of GROUP and set all variable specs in that list."
   (let ((params (gnus-group-find-parameter group))
-	(vars '(quit-config)) ; Ignore quit-config.
+	(vars '(quit-config))		; Ignore quit-config.
 	elem)
     (while params
       (setq elem (car params)
@@ -4332,7 +4332,7 @@ or a straight list of headers."
 	     (if (or (null gnus-summary-default-score)
 		     (<= (abs (- gnus-tmp-score gnus-summary-default-score))
 			 gnus-summary-zcore-fuzz))
-		 ?  ;Whitespace
+		 ?\ ;;;Whitespace
 	       (if (< gnus-tmp-score gnus-summary-default-score)
 		   gnus-score-below-mark gnus-score-over-mark))
 	     gnus-tmp-replied
@@ -4471,30 +4471,20 @@ or a straight list of headers."
   (let ((name (gnus-group-decoded-name gnus-newsgroup-name)))
     (gnus-message 5 "Fetching headers for %s..." name)
     (prog1
-	;;;!!! FIXME: temporary fix for an infloop on nnimap.
-	(if (eq 'nnimap (car (gnus-find-method-for-group name)))
-	    (if (eq 'nov
-		    (setq gnus-headers-retrieved-by
-			  (gnus-retrieve-headers
-			   articles gnus-newsgroup-name
-			   ;; We might want to fetch old headers, but
-			   ;; not if there is only 1 article.
-			   (and (or (and
-				     (not (eq gnus-fetch-old-headers 'some))
-				     (not (numberp gnus-fetch-old-headers)))
-				    (> (length articles) 1))
-				gnus-fetch-old-headers))))
-		(gnus-get-newsgroup-headers-xover
-		 articles nil nil gnus-newsgroup-name t)
-	      (gnus-get-newsgroup-headers))
-	  (gnus-retrieve-parsed-headers
-	   articles gnus-newsgroup-name
-	   ;; We might want to fetch old headers, but
-	   ;; not if there is only 1 article.
-	   (and (or (and (not (eq gnus-fetch-old-headers 'some))
-			 (not (numberp gnus-fetch-old-headers)))
-		    (> (length articles) 1))
-		gnus-fetch-old-headers)))
+	(if (eq 'nov
+		(setq gnus-headers-retrieved-by
+		      (gnus-retrieve-headers
+		       articles gnus-newsgroup-name
+		       ;; We might want to fetch old headers, but
+		       ;; not if there is only 1 article.
+		       (and (or (and
+				 (not (eq gnus-fetch-old-headers 'some))
+				 (not (numberp gnus-fetch-old-headers)))
+				(> (length articles) 1))
+			    gnus-fetch-old-headers))))
+	    (gnus-get-newsgroup-headers-xover
+	     articles nil nil gnus-newsgroup-name t)
+	  (gnus-get-newsgroup-headers))
       (gnus-message 5 "Fetching headers for %s...done" name))))
 
 (defun gnus-select-newsgroup (group &optional read-all select-articles)
@@ -5284,11 +5274,8 @@ Return a list of headers that match SEQUENCE (see
 	(let ((gnus-nov-is-evil t))
 	  (nconc
 	   (nreverse headers)
-	   ;;;!!! FIXME: temporary fix for an infloop on nnimap.
-	   (if (eq 'nnimap (car (gnus-find-method-for-group group)))
-	       (when (eq (gnus-retrieve-headers sequence group) 'headers)
-		 (gnus-get-newsgroup-headers))
-	     (gnus-retrieve-parsed-headers sequence group))))))))
+	   (when (eq (gnus-retrieve-headers sequence group) 'headers)
+	     (gnus-get-newsgroup-headers))))))))
 
 (defun gnus-article-get-xrefs ()
   "Fill in the Xref value in `gnus-current-headers', if necessary.
