@@ -6240,6 +6240,10 @@ Gnus は実際にはどの記事も親にはせず、単に最初の孤児を除いてすべての孤児
 @item gnus-simplify-whitespace
 @findex gnus-simplify-whitespace
 余分な空白 (whitespace) を取り除きます。
+
+@item gnus-simplify-all-whitespace
+@findex gnus-simplify-all-whitespace
+すべての空白 (whitespace) を取り除きます。
 @end table
 
 もちろん、あなた自身の関数を書くこともできます。
