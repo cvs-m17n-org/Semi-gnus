@@ -1,3 +1,18 @@
+2000-05-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.4.
+
+	* README.T-gnus: Update.
+
+	* lisp/{webmail.el,rfc2047.el,nnmbox.el,nndoc.el,mml.el,mm-view.el,
+	mm-partial.el,mm-decode.el,mm-bodies.el,message.el,lpath.el,
+	gnus.el,gnus-vers.el,gnus-util.el,gnus-start.el,gnus-score.el,
+	gnus-msg.el,gnus-mailcap.el,gnus-ems.el,gnus-draft.el,gnus-art.el,
+	ChangeLog}: Sync up with Gnus v5.8.6.
+	* texi/{postamble.tex,message.texi,message-ja.texi,gnusref.tex,
+	gnus.texi,gnus-ja.texi,emacs-mime.texi,Makefile.in,ChangeLog}: Sync
+	up with Gnus v5.8.6.
+
 2000-04-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/gnus.texi, texi/gnus-ja.texi, texi/gnus-faq-ja.texi, README:

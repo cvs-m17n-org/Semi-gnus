@@ -1,3 +1,53 @@
+Mon May  1 15:09:46 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
+
+	* gnus.el: Gnus v5.8.6 is released.
+
+2000-04-28 21:14:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-q-encoding-alist): Encode HTAB.
+
+2000-04-28 16:37:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially): Use forward-line.
+
+2000-04-28 16:01:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-button-menu): Use call-interactively.
+
+2000-04-28 15:30:17  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-generate-mime-1): Ignore 0x1b.
+	(mml-insert-mime): No markup only for text/plain.
+	(mime-to-mml): Remove MIME headers.
+
+2000-04-28 14:23:14  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-preview): Set gnus-newsgroup-charset.
+	* rfc2047.el (rfc2047-encode-message-header): Encode non-ascii 
+	as 8-bit.
+	* lpath.el: Fbind image functions.
+
+2000-04-28  Dave Love  <fx@gnu.org>
+
+	* gnus.el (gnus-group-startup-message): Maybe use image in Emacs
+	21.
+
+	* mailcap.el (mailcap-parse-mailcaps): Revert last change to
+	search order.  Use parse-colon-path and remove some redundancy.
+	Doc fix.
+	(mailcap-parse-mimetypes): Code consistently with
+	mailcap-parse-mailcaps.  Doc fix.
+
+	* gnus-start.el (gnus-unload): Iterate over `features', not
+	`load-history'.
+
+2000-04-28 09:52:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-parse-1): Don't create blank parts.
+	(mml-read-part): Fix mml tag.
+	(mml-insert-mime): Convert message/rfc822.
+	(mml-insert-mml-markup): Add mmlp parameter.
+
 2000-04-28 01:16:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-send-mail-partially): Remove CTE.

@@ -3199,7 +3199,7 @@ value of the variable `gnus-show-mime' is non-nil."
 					   (cons (caddr c) (car c)))
 					 gnus-mime-button-commands))))))
 	(if response
-	    (funcall response))))))
+	    (call-interactively response))))))
 
 (defun gnus-mime-view-all-parts (&optional handles)
   "View all the MIME parts."

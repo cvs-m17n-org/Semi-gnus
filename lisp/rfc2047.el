@@ -80,7 +80,7 @@ Valid encodings are nil, `Q' and `B'.")
 
 (defvar rfc2047-q-encoding-alist
   '(("\\(From\\|Cc\\|To\\|Bcc\||Reply-To\\):" . "-A-Za-z0-9!*+/=_")
-    ("." . "^\000-\007\013\015-\037\200-\377=_?"))
+    ("." . "^\000-\007\011\013\015-\037\200-\377=_?"))
   "Alist of header regexps and valid Q characters.")
 
 ;;;
@@ -112,7 +112,13 @@ Should be called narrowed to the head of the message."
       (while (not (eobp))
 	(save-restriction
 	  (rfc2047-narrow-to-field)
-	  (when (rfc2047-encodable-p)
+	  (if (not (rfc2047-encodable-p))
+	      (if (mm-body-7-or-8)
+		  ;; 8 bit must be decoded.
+		  (if (car message-posting-charset)
+		      ;; Is message-posting-charset a coding system?
+		      (mm-encode-coding-region (point-min) (point-max)
+					       (car message-posting-charset))))
 	    ;; We found something that may perhaps be encoded.
 	    (while (setq elem (pop alist))
 	      (when (or (and (stringp (car elem))

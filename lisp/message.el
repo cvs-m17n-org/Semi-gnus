@@ -2776,7 +2776,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	  (goto-char (point-max))
 	(goto-char (+ p message-send-mail-partially-limit))
 	(beginning-of-line)
-	(if (<= (point) p) (end-of-line))) ;; In case of bad message.
+	(if (<= (point) p) (forward-line 1))) ;; In case of bad message.
       (push p plist)
       (setq p (point)))
     (setq total (length plist))
