@@ -694,6 +694,7 @@ used."
     ("view the part" . gnus-mime-view-part)
     ("pipe to command" . gnus-mime-pipe-part)
     ("toggle display" . gnus-article-press-button)
+    ("toggle display" . gnus-article-view-part-as-charset)
     ("view as type" . gnus-mime-view-part-as-type)
     ("internalize type" . gnus-mime-internalize-part)
     ("externalize type" . gnus-mime-externalize-part))
@@ -3290,6 +3291,7 @@ value of the variable `gnus-show-mime' is non-nil."
   '((gnus-article-press-button "\r" "Toggle Display")
     (gnus-mime-view-part "v" "View Interactively...")
     (gnus-mime-view-part-as-type "t" "View As Type...")
+    (gnus-mime-view-part-as-charset "C" "View As charset...")
     (gnus-mime-save-part "o" "Save...")
     (gnus-mime-save-part-and-strip "\C-o" "Save and Strip")
     (gnus-mime-copy-part "c" "View As Text, In Other Buffer")
@@ -3377,21 +3379,9 @@ value of the variable `gnus-show-mime' is non-nil."
 		  (or gnus-article-ignored-charsets
 		      ',gnus-newsgroup-ignored-charsets))
 		 (mbl mml-buffer-list))
-	     (insert-buffer gnus-original-article-buffer)
-	     (save-restriction
-	       (message-narrow-to-head)
-	       (message-remove-header "Content-Type")
-	       (message-remove-header "MIME-Version")
-	       (message-remove-header "Content-Transfer-Encoding")
-	       (mail-decode-encoded-word-region (point-min) (point-max))
-	       (goto-char (point-max)))
-	     (forward-char 1)
-	     (delete-region (point) (point-max))
 	     (setq mml-buffer-list nil)
-	     (if (stringp (car gnus-article-mime-handles))
-		 (mml-insert-mime gnus-article-mime-handles)
-	       (mml-insert-mime gnus-article-mime-handles t))
-	     (mm-destroy-parts gnus-article-mime-handles)
+	     (insert-buffer gnus-original-article-buffer)
+	     (mime-to-mml gnus-article-mime-handles)
 	     (setq gnus-article-mime-handles nil)
 	     (make-local-hook 'kill-buffer-hook)
 	     (let ((mbl1 mml-buffer-list))
@@ -3496,7 +3486,7 @@ value of the variable `gnus-show-mime' is non-nil."
 	 contents charset
 	 (b (point))
 	 buffer-read-only)
-    (if (mm-handle-undisplayer handle)
+    (if (and (not arg) (mm-handle-undisplayer handle))
 	(mm-remove-part handle)
       (setq contents (mm-get-part handle))
       (cond
@@ -3505,6 +3495,8 @@ value of the variable `gnus-show-mime' is non-nil."
 			   (mm-handle-type handle) 'charset)
 			  gnus-newsgroup-charset)))
        ((numberp arg)
+	(if (mm-handle-undisplayer handle)
+	    (mm-remove-part handle))
 	(setq charset
 	      (or (cdr (assq arg 
 			     gnus-summary-show-article-charset-alist))
@@ -3518,6 +3510,23 @@ value of the variable `gnus-show-mime' is non-nil."
 			    (mm-decode-coding-string contents charset)
 			  contents))
       (goto-char b))))
+
+(defun gnus-mime-view-part-as-charset (&optional handle arg)
+  "Insert the MIME part under point into the current buffer."
+  (interactive (list nil current-prefix-arg))
+  (gnus-article-check-buffer)
+  (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
+	 contents charset
+	 (b (point))
+	 buffer-read-only)
+    (if (mm-handle-undisplayer handle)
+	(mm-remove-part handle))
+    (let ((gnus-newsgroup-charset
+	   (or (cdr (assq arg 
+			  gnus-summary-show-article-charset-alist))
+	       (read-coding-system "Charset: ")))
+	  (gnus-newsgroup-ignored-charsets 'gnus-all))
+      (gnus-article-press-button))))
 
 (defun gnus-mime-externalize-part (&optional handle)
   "View the MIME part under point with an external viewer."
@@ -3588,6 +3597,11 @@ In no internal viewer is available, use an external viewer."
   "Copy MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'gnus-mime-copy-part))
+
+(defun gnus-article-view-part-as-charset (n)
+  "Copy MIME part N, which is the numerical prefix."
+  (interactive "p")
+  (gnus-article-part-wrapper n 'gnus-mime-view-part-as-charset))
 
 (defun gnus-article-externalize-part (n)
   "View MIME part N externally, which is the numerical prefix."
