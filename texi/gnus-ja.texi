@@ -20315,9 +20315,9 @@ gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX
 $B<0$KJQ49$7$^$9!#(B@samp{pbm} $B%U%!%$%k$O(B 48$B!_(B48 $B2hAG$NBg$-$5$G$J$1$l$P$J$j(B
 $B$^$;$s!#(B
 
-@code{gnus-x-face-from-file} $B$O%Q%i%a!<%?$H$7$F%U%!%$%k$r<u$1<h$j!"%7%'(B
-$B%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N%U%!(B
-$B%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
+@code{gnus-x-face-from-file} $B$O%Q%i%a!<%?$H$7$F(B GIF $B%U%!%$%k$r<u$1<h$j!"(B
+$B%7%'%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N(B
+$B%U%!%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
 
 $BA0<T$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
 $B$r(B @file{.gnus.el} $B%U%!%$%k$K=q$$$F2<$5$$(B:
