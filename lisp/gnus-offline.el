@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.6.1 1999-01-18 10:29:35 keiichi Exp $
+;;; $Id: gnus-offline.el,v 1.1.6.2 1999-02-05 02:59:06 keiichi Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -8,7 +8,7 @@
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 ;;;         Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>
 
-;;; Version: 2.02
+;;; Version: 2.10
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -59,6 +59,27 @@
 ;;; In Gnus group buffer , type g to get all news and mail.
 ;;; Then send mail and news in spool directory.
 ;;;
+;;; Security Notice. (This is available before version 2.02)
+;;;
+;;; You can set the variable gnus-offline-pop-password-file to save your POP
+;;; passwords. But TAKE CARE. Use it at your own risk.
+;;; If you decide to use it, then write in .emacs or .gnus-offline.el 
+;;; something like:
+;;;
+;;;  (setq gnus-offline-pop-password-file "~/.pop.passwd")
+;;;
+;;; and write in this file something like:
+;;;
+;;;  (setq pop3-fma-password
+;;;	 '(("SERVER1" "ACCOUNT1" "PASSWORD1")
+;;;	   ("SERVER2" "ACCOUNT2" "PASSWORD2")
+;;;        ............................
+;;;        ))
+;;;
+;;; If you want to encode the file with base64, try:
+;;;
+;;;    M-: (base64-encode-region (point-min) (point-max))
+;;;
 ;;; Variables.
 ;;;  gnus-offline-dialup-program-arguments
 ;;;                                   ... List of dialup program arguments.
@@ -74,6 +95,9 @@
 ;;;                                        (minutes)
 ;;;  gnus-offline-dialup-function     ... Function to diualup.
 ;;;  gnus-offline-hangup-function     ... Function to hangup.
+;;;  gnus-offline-pop-password-file   ... File to keep the POP password info.
+;;;  gnus-offline-pop-password-decoding-function
+;;;                                   ... Function to decode the password info.
 
 ;;; Code:
 
@@ -81,7 +105,6 @@
 
 (require 'cl)
 (require 'custom)
-(require 'pop3-fma)
 (require 'easymenu)
 
 (unless (and (condition-case ()
@@ -100,12 +123,13 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.02")
+(defconst gnus-offline-version-number "2.10b1")
 (defconst gnus-offline-codename
 ;;  "Beta5"			; Beta
 ;;  "This is the time"		; 2.00
 ;;  "A matter of trust"
-  "Modern Woman"
+;;  "Modern Woman"
+  "Ahhhhhhh!!"			; 2.10b1
 ;;  "Code of silence"
   )
 
@@ -189,6 +213,23 @@ If set to 0 , timer call is disabled."
   :group 'gnus-offline
   :type 'function)
 
+(defcustom gnus-offline-pop-password-file nil
+  "*File name for saving one's POP password information.
+This variable should be nil if there's some possibility that
+your passwords be stolen."
+  :group 'gnus-offline
+  :type '(choice (file :tag "File")
+		 (const nil)))
+
+(defcustom gnus-offline-pop-password-decoding-function 
+  (function (lambda () (base64-decode-region (point-min) (point-max))))
+  "*Function for decoding one's password information.
+The value has no effect when `gnus-offline-pop-password-file'
+is nil.
+This variable might be nil if you don't need to encode your passwords."
+  :group 'gnus-offline
+  :type 'function)
+
 ;;; Internal variables.
 (defvar gnus-offline-connected nil
   "*If value is t , dialup line is connected status.
@@ -211,6 +252,9 @@ If value is nil , dialup line is disconnected status.")
 
 (defvar gnus-offline-movemail-arguments nil
   "*All command line arguments of exec-directory/movemail.")
+
+(defvar gnus-offline-mail-source nil
+  "*nnmail-spool-file save variable.")
 
 ;;; Temporary variable:
 (defvar string)
@@ -340,7 +384,26 @@ If value is nil , dialup line is disconnected status.")
   (if (functionp gnus-offline-dialup-function)
       (funcall gnus-offline-dialup-function))
   (gnus-offline-get-new-news-function)
-  (gnus-group-get-new-news arg))
+  (if (null gnus-offline-pop-password-file)
+      (gnus-group-get-new-news arg)
+    (let ((buffer (get-buffer-create "*offline-temp*")))
+      (unwind-protect
+	  (progn
+	    (if (boundp 'pop3-fma-password)
+		(setq pop3-fma-save-password-information t))
+	    (save-excursion
+	      (set-buffer buffer)
+	      (erase-buffer)
+	      (insert-file-contents-as-binary gnus-offline-pop-password-file)
+	      (and gnus-offline-pop-password-decoding-function
+		   (funcall gnus-offline-pop-password-decoding-function))
+	      (eval-buffer))
+	    (gnus-group-get-new-news arg))
+	(if (boundp 'pop3-fma-password)
+	    (setq pop3-fma-password nil
+		  pop3-fma-save-password-information nil)
+	  (setq mail-source-password-cache nil))
+	(kill-buffer buffer)))))
 
 ;;
 ;; dialup...
@@ -477,13 +540,16 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-enable-fetch-mail ()
   "*Set to fetch mail."
   (setq gnus-offline-mail-fetch-method 'nnmail)
-  (setq nnmail-movemail-program 'pop3-fma-movemail)
-  (setq nnmail-spool-file (append
-			   pop3-fma-local-spool-file-alist
-			   (mapcar
-			    (lambda (spool)
-			      (car spool))
-			    pop3-fma-spool-file-alist))))
+  (if (not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+      (progn
+	(setq nnmail-movemail-program 'pop3-fma-movemail)
+	(setq nnmail-spool-file (append
+				 pop3-fma-local-spool-file-alist
+				 (mapcar
+				  (lambda (spool)
+				    (car spool))
+				  pop3-fma-spool-file-alist))))
+    (setq nnmail-spool-file gnus-offline-mail-source)))
 ;;
 ;; Enable fetch news
 ;;
@@ -727,7 +793,8 @@ If value is nil , dialup line is disconnected status.")
   (add-hook 'gnus-group-mode-hook
 	    '(lambda ()
 	       (local-set-key "\C-coh" 'gnus-offline-set-unplugged-state)
-	       (local-set-key "\C-com" 'gnus-offline-toggle-movemail-program)
+	       (if (not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+		   (local-set-key "\C-com" 'gnus-offline-toggle-movemail-program))
 	       (local-set-key "\C-cof" 'gnus-offline-toggle-articles-to-fetch)
 	       (local-set-key "\C-coo" 'gnus-offline-toggle-on/off-send-mail)
 	       (local-set-key "\C-cox" 'gnus-offline-toggle-auto-hangup)
@@ -778,7 +845,8 @@ If value is nil , dialup line is disconnected status.")
 	 ["Online 状態へ" message-online-state message-offline-state]
 	 "----"
 	 ("Gnus Offline"
-	  ["movemail の切替え" gnus-offline-toggle-movemail-program t]
+	  ["movemail の切替え" gnus-offline-toggle-movemail-program
+	   (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	  ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
 	  ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
 	  ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
@@ -799,7 +867,8 @@ If value is nil , dialup line is disconnected status.")
        ["Message Online" message-online-state message-offline-state]
        "----"
        ("Gnus Offline"
-	["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+	["Toggle movemail program" gnus-offline-toggle-movemail-program
+	 (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
 	["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
 	["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
@@ -822,7 +891,8 @@ If value is nil , dialup line is disconnected status.")
    "Gnus offline Menu"
    (if (featurep 'meadow)
        '("Offline"
-	 ["movemail の切替え" gnus-offline-toggle-movemail-program t]
+	 ["movemail の切替え" gnus-offline-toggle-movemail-program
+	  (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
 	 ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
 	 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
@@ -832,7 +902,8 @@ If value is nil , dialup line is disconnected status.")
 	 "----"
 	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
      '("Offline"
-       ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+       ["Toggle movemail program" gnus-offline-toggle-movemail-program
+	(not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
        ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
        ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
        ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]

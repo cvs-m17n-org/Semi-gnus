@@ -1,5 +1,5 @@
 ;;; gnus-sum.el --- summary mode commands for Semi-gnus
-;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -3454,11 +3454,11 @@ If LINE, insert the rebuilt thread starting on line LINE."
 (defsubst gnus-article-sort-by-author (h1 h2)
   "Sort articles by root author."
   (string-lessp
-   (let ((addr (mime-read-field 'From h1)))
+   (let ((addr (car (mime-read-field 'From h1))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
-   (let ((addr (mime-read-field 'From h2)))
+   (let ((addr (car (mime-read-field 'From h2))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
