@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.11
+;; Version: 1.12
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -90,7 +90,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.11")
+(defconst pop3-fma-version-number "1.12")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -100,8 +100,8 @@
 ;;  "Still 19"       		; 0.21
 ;;  "J boy"          		; 1.00
 ;;  "Blood line"		; 1.10
-  "Star ring"			; 0.xx
-;;  "Goodbye Game"		; 0.xx
+;;  "Star ring"			; 1.11
+  "Goodbye Game"		; 1.12
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -149,9 +149,9 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar hdr nil)
 (defvar passwd nil)
 (defvar str nil)
-(defvar pop3-fma-movemail-options pop3-fma-movemail-arguments)
 (defvar spool nil)
 (defvar movemail-output-buffer " *movemail-out*")
+(defvar pop3-fma-commandline-arguments nil)
 
 (defun pop3-fma-init-message-hook ()
   (add-hook 'message-send-hook 'pop3-fma-message-add-header))
@@ -188,12 +188,12 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 		   (eq pop3-fma-movemail-type 'exe))
 	      (progn
 		(setenv "MAILHOST" pop3-mailhost)
-		(if (and (not (memq pop3-password pop3-fma-movemail-arguments))
-			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
+		(if (and (not (memq pop3-password pop3-fma-commandline-arguments))
+			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-commandline-arguments)))
 		    (progn
-		      (setq pop3-fma-movemail-arguments nil)
-		      (setq pop3-fma-movemail-arguments
-			    (append pop3-fma-movemail-options
+		      (setq pop3-fma-commandline-arguments
+			    (append
+			     pop3-fma-movemail-arguments
 				    (list
 				     (concat "po:" pop3-maildrop)
 				     crashbox
@@ -206,7 +206,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 				      exec-directory
 				      pop3-fma-movemail-program)
 		       nil movemail-output-buffer nil
-		       pop3-fma-movemail-arguments)
+		       pop3-fma-commandline-arguments)
 		(let ((string (buffer-string)))
 		  (if (> (length string) 0)
 		      (progn
@@ -343,4 +343,5 @@ Argument PROMPT ."
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
+
 
