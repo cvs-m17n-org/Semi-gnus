@@ -3250,7 +3250,7 @@ forbidden in URL encoding."
 It is registered to variable `mime-view-content-header-filter-alist'."
   (eword-decode-header default-mime-charset))
 
-(defun mime-view-quitting-method-for-gnus ()
+(defun mime-preview-quitting-method-for-gnus ()
   (if (not gnus-show-mime)
       (mime-preview-kill-buffer))
   (delete-other-windows)
@@ -3269,11 +3269,12 @@ It is registered to variable `mime-view-content-header-filter-alist'."
 	   (function mime-text-decode-buffer))
 
 (set-alist 'mime-preview-quitting-method-alist
-	   'gnus-original-article-mode #'mime-view-quitting-method-for-gnus)
+	   'gnus-original-article-mode
+	   #'mime-preview-quitting-method-for-gnus)
 
 (set-alist 'mime-view-show-summary-method
 	   'gnus-original-article-mode
-	   (function mime-view-quitting-method-for-gnus))
+	   #'mime-preview-quitting-method-for-gnus)
 
 
 ;;; @ end
