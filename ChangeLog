@@ -1,3 +1,82 @@
+1998-07-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Change version No 1.00.
+
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* Sync up with Semi-gnus 6.8.1.
+
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.1.
+
+	* Sync up with Gnus 5.6.24.
+
+1998-07-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-ems.el (gnus-mule-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix. (for Emacs 20.1 and 20.2)
+	(gnus-ems-redefine): for Emacs 20.1 and 20.2
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Abolish my last bogus change.
+
+1998-07-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix.
+
+1998-07-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The End".
+
+1998-07-06  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Various".
+
+1998-07-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Various".
+	* texi/gnus-ja.texi: Sync up with Gnus 5.6.22
+
+1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-extended-version): Add comments.
+
+1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): Require 'smtp.
+
+1998-07-02  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* Sync up with Semi-gnus 6.8.0 and Gnus 5.6.23.
+	
+1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-header-format-alist): Repair to use
+	`message-fill-references' for References.
+
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Delete nil optional arguments.
+	- Delete setting for `mime-raw-representation-type-alist'.
+
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.0.
+	(gnus-version): Modify for FLIM 1.8.
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Modify for FLIM 1.8.
+
+1998-06-30  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Scroing".
+
+1998-06-30  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Scoring".
+
 1998-06-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* Sync up with Gnus 5.6.22
@@ -60,6 +139,13 @@
 	`gnus-request-original-article'; abolish conventional
 	implementation.
 	- Abolish unused setting for `mime-view-show-summary-method'.
+
+1998-06-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/messge.el (message-use-followup-to): Change menu tag.
+	(message-use-mail-copies-to): Ditto.
+	(message-use-mail-followup-to): Ditto.
+	(message-use-mail-reply-to): Ditto. Also change default.
 
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
@@ -152,6 +238,39 @@
 	`gnus-content-header-filter'.
 	Modify for SEMI 1.7.
 
+1998-06-19  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-art.el (article-hide-boring-headers): Funcall
+	`gnus-extract-address-components'.
+
+	* lisp/gnus-picon.el (gnus-article-display-picons): Funcall
+	`gnus-extract-address-components'.
+
+	* lisp/gnus.el (gnus-extract-address-components): Modify
+	doc-string.
+
+	* lisp/message.el (message-check-news-header-syntax): Funcall
+	`gnus-extract-address-components'.
+	(message-user-mail-address): Ditto.
+	(message-generate-headers): Ditto.
+	(message-buffer-name): Ditto.
+	(message-cancel-news): Ditto.
+	(message-supersede): Ditto.
+
+1998-06-18  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): New
+	implementation.
+
+	* lisp/smtp.el (smtp-use-8bitmime): New variable.
+	(smtp-debug-info): Internal variable, now.
+	(smtp-make-fqdn): Renamed from `smtp-fqdn'.
+	(smtp-via-smtp): New implementation.
+	(smtp-send-command): Treat "PASS" as usual.
+	(smtp-do-bcc): Removed.
+
+	* lisp/smtpmail.el: Removed; Semi-gnus no longer use it.
+
 1998-06-18  Keisuke Mori   <ksk@ntts.com>
 
 	* texi/gnus-ja.texi: Add "Select Methods".
@@ -168,10 +287,75 @@
 	Use base64-encode-string , base64-decode-string instead. 
 	Both change by Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
 
+1998-06-13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-subject-encoded-re-regexp): Add
+	comment. Modify doc-string.
+
 1998-06-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el: New function pop3-fma-cypher-string
 	 New variable pop3-fma-cypher-key
+
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-i18n.el: Synch up with `akr' branch.
+
+	* lisp/message.el: Imported features from `akr' branch.
+	(message-subject-encoded-re-regexp): New variable.
+	(message-use-subject-re): Ditto.
+	(message-make-followup-subject): New function.
+	(message-reply): Use it.
+	(message-followup): Ditto.
+
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-required-news-headers): `X-Newsreader'
+	was replaced by `User-Agent'.
+	(message-required-mail-headers): `X-Mailer' was replaced by
+	`User-Agent'.
+	(message-header-format-alist): `X-Mailer' and `X-Newsreader' were
+	replaced by `User-Agent'.
+	(message-generate-headers): Ditto.
+
+	(message-user-agent): New variable.
+	(message-newsreader): Replaced by `message-user-agent'.
+	(message-mailer): Ditto.
+	(message-mode): `message-mailer' and `message-newsreader' were
+	replaced by `message-user-agent'.
+
+	(message-fill-address): Use SPACE instead of HTAB.
+	(message-fill-header): Ditto.
+	(message-fill-references): Removed.
+
+	(message-use-mail-copies-to): New variable.
+	(message-use-mail-followup-to): Modify doc-string.
+	(message-use-mail-reply-to): Ditto.
+	(message-goto-mail-copies-to): New function.
+
+	(message-reply): New implementation.
+	(message-followup): Ditto.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): `message-mailer'
+	and `message-newsreader' were replaced by `message-user-agent'.
+	(gnus-extended-version): Generate "PRODUCT/VERSION" style strings.
+
+	* lisp/gnus-soup.el (gnus-soup-send-packet): `message-mailer' and
+	`message-newsreader' were replaced by `message-user-agent'.
+
+	* lisp/gnus-art.el (gnus-visible-headers): Add Mail-Followup-To
+	and Mail-Reply-To headers.
+
+1998-06-07  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-reply): Fix typo.
+
+1998-06-07  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-make-in-reply-to): New format.
+	(message-use-mail-followup-to): Add doc string.
+	(message-reply): Use `message-use-mail-followup-to'.
+	(message-followup): Ditto.
 
 1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
@@ -232,6 +416,37 @@
 
 	* Sync up with Gnus 5.6.10.
 
+1998-05-31  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* (message-followup): Would not use "Mail-Followup-To:" properly.
+
+1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* README.semi: Add description of `shuhei-k' branch.
+
+	* lisp/gnus-art.el (gnus-visible-headers): Add "Mail-Followup-To:"
+	and "Mail-Reply-To:" fields.
+
+	* lisp/message.el (message-included-forward-headers): Add
+	"Mail-Followup-To:" and "Mail-Reply-To:" fields.
+	(message-font-lock-keywords): Ditto.
+
+	(message-use-mail-followup-to): New variable. (not fully implemented)
+	(message-use-mail-reply-to): New variable. (not fully implemented)
+	(message-goto-mail-followup-to): New function.
+	(message-goto-mail-reply-to): New function.
+
+	(message-reply): Use "Mail-Followup-To:" and "Mail-Reply-To:" if
+	present.
+	(message-followup): Ditto.
+	
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Save original
+	value of "From:" and "Subject:" fields to `raw-text' property.
+	(gnus-nov-field): Ditto.
+	
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`raw-text' property for saving cache file.
+
 1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* README.semi: Add description of `shuhei-k' branch.
@@ -245,6 +460,12 @@
 	* lisp/gnus-util.el (gnus-output-to-rmail): Guard as binary.
 
 	* lisp/gnus-util.el (gnus-output-to-mail): Guard as binary.
+
+1998-04-28  Tanaka Akira  <akr@jaist.ac.jp>
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Delete
+	buffer-local binding of `default-mime-charset' when the
+	newsgroup doesn't match `gnus-newsgroup-default-charset-alist'.
 
 1998-04-24  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 

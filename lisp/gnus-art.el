@@ -1497,7 +1497,6 @@ This format is defined by the `gnus-article-time-format' variable."
 	     (gnus-number-of-articles-to-be-saved
 	      (when (eq gnus-prompt-before-saving t)
 		num)))			; Magic
-	(set-buffer gnus-original-article-buffer)
 	(set-buffer gnus-article-current-summary)
 	(funcall gnus-default-article-saver filename)))))
 
@@ -2101,6 +2100,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(gnus-run-hooks 'gnus-article-prepare-hook)
 		;; Display message.
 		(funcall method)
+		;; Associate this article with the current summary buffer.
+		(setq gnus-article-current-summary summary-buffer)
 		;; Perform the article display hooks.
 		(gnus-run-hooks 'gnus-article-display-hook))
 	      ;; Do page break.
@@ -2496,9 +2497,6 @@ If given a prefix, show the hidden text instead."
 		'article)))
 	   ;; It was a pseudo.
 	   (t article)))
-
-      ;; Associate this article with the current summary buffer.
-      (setq gnus-article-current-summary gnus-summary-buffer)
 
       ;; Update sparse articles.
       (when (and do-update-line
@@ -3227,29 +3225,24 @@ forbidden in URL encoding."
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity nil nil default-mime-charset)
+  (mime-insert-decoded-header entity)
   )
 
 (set-alist 'mime-header-presentation-method-alist
 	   'gnus-original-article-mode
 	   #'gnus-article-header-presentation-method)
 
-(defun mime-preview-quitting-method-for-gnus ()
-  (if (not gnus-show-mime)
-      (mime-preview-kill-buffer))
-  (delete-other-windows)
-  (gnus-article-show-summary)
-  (if (or (not gnus-show-mime)
-	  (null gnus-have-all-headers))
-      (gnus-summary-select-article nil t)
+(defun gnus-mime-preview-quitting-method ()
+  (if gnus-show-mime
+      (gnus-article-show-summary)
+    (mime-preview-kill-buffer)
+    (delete-other-windows)
+    (gnus-article-show-summary)
+    (gnus-summary-select-article nil t)
     ))
 
-(set-alist 'mime-raw-representation-type-alist
-	   'gnus-original-article-mode 'binary)
-
 (set-alist 'mime-preview-quitting-method-alist
-	   'gnus-original-article-mode
-	   #'mime-preview-quitting-method-for-gnus)
+	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
 
 (defun gnus-following-method (buf)
   (set-buffer buf)

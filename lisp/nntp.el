@@ -45,13 +45,11 @@
 (defvoo nntp-server-opened-hook '(nntp-send-mode-reader)
   "*Hook used for sending commands to the server at startup.
 The default value is `nntp-send-mode-reader', which makes an innd
-server spawn an nnrpd server.  Another useful function to put in this
-hook might be `nntp-send-authinfo', which will prompt for a password
-to allow posting from the server.  Note that this is only necessary to
-do on servers that use strict access control.")
+server spawn an nnrpd server.")
 
 (defvoo nntp-authinfo-function 'nntp-send-authinfo
-  "Function used to send AUTHINFO to the server.")
+  "Function used to send AUTHINFO to the server.
+It is called with no parameters.")
 
 (defvoo nntp-server-action-alist
   '(("nntpd 1\\.5\\.11t"
@@ -197,6 +195,7 @@ server there that you can connect to.  See also
 (defvoo nntp-last-command-time nil)
 (defvoo nntp-last-command nil)
 (defvoo nntp-authinfo-password nil)
+(defvoo nntp-authinfo-user nil)
 
 (defvar nntp-connection-list nil)
 
@@ -234,8 +233,10 @@ server there that you can connect to.  See also
   (save-excursion
     (set-buffer (get-buffer-create "*nntp-log*"))
     (goto-char (point-max))
-    (insert (format-time-string "%Y%m%dT%H%M%S" (current-time))
-	    " " nntp-address " " string "\n")))
+    (let ((time (current-time)))
+      (insert (format-time-string "%Y%m%dT%H%M%S" time)
+	      "." (format "%03d" (/ (nth 2 time) 1000))
+	      " " nntp-address " " string "\n"))))
 
 (defsubst nntp-wait-for (process wait-for buffer &optional decode discard)
   "Wait for WAIT-FOR to arrive from PROCESS."
@@ -392,18 +393,22 @@ server there that you can connect to.  See also
 (nnoo-define-basics nntp)
 
 (defsubst nntp-next-result-arrived-p ()
-  (let ((point (point)))
-    (cond
-     ((eq (following-char) ?2)
-      (if (re-search-forward "\n\\.\r?\n" nil t)
-	  t
-	(goto-char point)
-	nil))
-     ((looking-at "[34]")
-      (forward-line 1)
-      t)
-     (t
-      nil))))
+  (cond
+   ;; A result that starts with a 2xx code is terminated by
+   ;; a line with only a "." on it.
+   ((eq (following-char) ?2)
+    (if (re-search-forward "\n\\.\r?\n" nil t)
+	t
+      nil))
+   ;; A result that startx with a 3xx or 4xx code is terminated
+   ;; by a newline.
+   ((looking-at "[34]")
+    (if (search-forward "\n" nil t)
+	t
+      nil))
+   ;; No result here.
+   (t
+    nil)))
 
 (deffoo nntp-retrieve-headers (articles &optional group server fetch-old)
   "Retrieve the headers of ARTICLES."
@@ -742,7 +747,10 @@ reading."
   "Send the AUTHINFO to the nntp server.
 It will look in the \"~/.authinfo\" file for matching entries.  If
 nothing suitable is found there, it will prompt for a user name
-and a password."
+and a password.
+
+If SEND-IF-FORCE, only send authinfo to the server if the
+.authinfo file has the FORCE token."
   (let* ((list (gnus-parse-netrc nntp-authinfo-file))
 	 (alist (gnus-netrc-machine list nntp-address))
 	 (force (gnus-netrc-get alist "force"))
@@ -752,7 +760,10 @@ and a password."
 	      force)
       (nntp-send-command
        "^3.*\r?\n" "AUTHINFO USER"
-       (or user (read-string (format "NNTP (%s) user name: " nntp-address))))
+       (or user
+	   nntp-authinfo-user
+	   (setq nntp-authinfo-user
+		 (read-string (format "NNTP (%s) user name: " nntp-address)))))
       (nntp-send-command
        "^2.*\r?\n" "AUTHINFO PASS"
        (or passwd

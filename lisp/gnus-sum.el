@@ -34,6 +34,7 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
+(require 'gnus-util)
 (require 'mime-view)
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
@@ -1435,6 +1436,7 @@ increase the score of each group you read."
     "c" gnus-summary-copy-article
     "B" gnus-summary-crosspost-article
     "q" gnus-summary-respool-query
+    "t" gnus-summary-respool-trace
     "i" gnus-summary-import-article
     "p" gnus-summary-article-posted-p)
 
@@ -1556,6 +1558,7 @@ increase the score of each group you read."
                (gnus-check-backend-function
                 'request-expire-articles gnus-newsgroup-name)]
               ["Query respool" gnus-summary-respool-query t]
+	      ["Trace respool" gnus-summary-respool-trace t]
               ["Delete expirable articles" gnus-summary-expire-articles-now
                (gnus-check-backend-function
                 'request-expire-articles gnus-newsgroup-name)])
@@ -2948,6 +2951,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 (defun gnus-build-sparse-threads ()
   (let ((headers gnus-newsgroup-headers)
+	(gnus-summary-ignore-duplicates t)
 	header references generation relations
 	cthread subject child end pthread relation new-child date)
     ;; First we create an alist of generations/relations, where
@@ -2966,12 +2970,14 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		generation 0)
 	  (while (search-backward ">" nil t)
 	    (setq end (1+ (point)))
-	    (if (search-backward "<" nil t)
-		(push (list (incf generation)
-			    child (setq child new-child)
-			    subject date)
-		      relations)))
-	  (push (list (1+ generation) child nil subject) relations)
+	    (when (search-backward "<" nil t)
+	      (setq new-child (buffer-substring (point) end))
+	      (push (list (incf generation)
+			  child (setq child new-child)
+			  subject date)
+		    relations)))
+	  (when child
+	    (push (list (1+ generation) child nil subject) relations))
 	  (erase-buffer)))
       (kill-buffer (current-buffer)))
     ;; Sort over trustworthiness.
@@ -2980,7 +2986,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
        (when (gnus-dependencies-add-header
 	      (make-full-mail-header
 	       gnus-reffed-article-number
-	       (nth 3 relation) "" (nth 4 relation)
+	       (nth 3 relation) "" (or (nth 4 relation) "")
 	       (nth 1 relation)
 	       (or (nth 2 relation) "") 0 0 "")
 	      gnus-newsgroup-dependencies nil)
@@ -3035,7 +3041,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
   (let ((eol (gnus-point-at-eol))
 	(buffer (current-buffer))
-	header)
+	header rawtext decoded)
 
     ;; overview: [num subject from date id refs chars lines misc]
     (unwind-protect
@@ -3047,10 +3053,22 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (funcall
-		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
-		 (funcall
-		  gnus-structured-field-decoder (gnus-nov-field)) ; from
+		 (progn
+		   (setq rawtext (gnus-nov-field) ; subject
+			 decoded (funcall
+				  gnus-unstructured-field-decoder rawtext))
+		   (if (string= rawtext decoded)
+		       rawtext
+		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		     decoded))
+		 (progn
+		   (setq rawtext (gnus-nov-field) ; from
+			 decoded (funcall
+				  gnus-structured-field-decoder rawtext))
+		   (if (string= rawtext decoded)
+		       rawtext
+		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		     decoded))
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -4360,6 +4378,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
+	    rawtext decoded
 	    in-reply-to header p lines chars)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
@@ -4389,15 +4408,27 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (funcall
-		   gnus-unstructured-field-decoder (nnheader-header-value))
+		  (progn
+		    (setq rawtext (nnheader-header-value)
+			  decoded (funcall
+				   gnus-unstructured-field-decoder rawtext))
+		    (if (string-equal rawtext decoded)
+			rawtext
+		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		      decoded))
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (funcall
-		   gnus-structured-field-decoder (nnheader-header-value))
+		  (progn
+		    (setq rawtext (nnheader-header-value)
+			  decoded (funcall
+				   gnus-structured-field-decoder rawtext))
+		    (if (string-equal rawtext decoded)
+			rawtext
+		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
+		      decoded))
 		"(nobody)"))
 	    ;; Date.
 	    (progn
@@ -4658,6 +4689,19 @@ current article will be taken into consideration."
      (t
       ;; Just return the current article.
       (list (gnus-summary-article-number))))))
+
+(defmacro gnus-summary-iterate (arg &rest forms)
+  "Iterate over the process/prefixed articles and do FORMS.
+ARG is the interactive prefix given to the command.  FORMS will be
+executed with point over the summary line of the articles."
+  (let ((articles (make-symbol "gnus-summary-iterate-articles")))
+    `(let ((,articles (gnus-summary-work-articles ,arg)))
+       (while ,articles
+	 (gnus-summary-goto-subject (car ,articles))
+	 ,@forms))))
+
+(put 'gnus-summary-iterate 'lisp-indent-function 1)
+(put 'gnus-summary-iterate 'edebug-form-spec '(form body))
 
 (defun gnus-summary-save-process-mark ()
   "Push the current set of process marked articles on the stack."
@@ -6059,7 +6103,8 @@ If ALL, mark even excluded ticked and dormants as read."
 		    '<)
 		   (sort gnus-newsgroup-limit '<)))
 	article)
-    (setq gnus-newsgroup-unreads gnus-newsgroup-limit)
+    (setq gnus-newsgroup-unreads
+	  (gnus-intersection gnus-newsgroup-unreads gnus-newsgroup-limit))
     (if all
 	(setq gnus-newsgroup-dormant nil
 	      gnus-newsgroup-marked nil
@@ -7368,7 +7413,7 @@ groups."
 
 ;;; Respooling
 
-(defun gnus-summary-respool-query (&optional silent)
+(defun gnus-summary-respool-query (&optional silent trace)
   "Query where the respool algorithm would put this article."
   (interactive)
   (let (gnus-mark-article-hook)
@@ -7377,13 +7422,19 @@ groups."
       (set-buffer gnus-original-article-buffer)
       (save-restriction
 	(message-narrow-to-head)
-	(let ((groups (nnmail-article-group 'identity)))
+	(let ((groups (nnmail-article-group 'identity trace)))
 	  (unless silent
 	    (if groups
 		(message "This message would go to %s"
 			 (mapconcat 'car groups ", "))
 	      (message "This message would go to no groups"))
 	    groups))))))
+
+(defun gnus-summary-respool-trace ()
+  "Trace where the respool algorithm would put this article.
+Display a buffer showing all fancy splitting patterns which matched."
+  (interactive)
+  (gnus-summary-respool-query nil t))
 
 ;; Summary marking commands.
 

@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.7.8"
+(defconst gnus-version-number "6.8.1"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.22; for SEMI 1.8)"
+  (format "Semi-gnus %s (based on Gnus 5.6.24; for SEMI 1.8/FLIM 1.8)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -1102,10 +1102,10 @@ commands will still require prompting."
 
 (defcustom gnus-extract-address-components 'gnus-extract-address-components
   "*Function for extracting address components from a From header.
-Two pre-defined function exist: `gnus-extract-address-components',
-which is the default, quite fast, and too simplistic solution, and
-`mail-extract-address-components', which works much better, but is
-slower."
+
+`gnus-extract-address-components' is a quite fast, and too simplistic.
+`mail-extract-address-components' works much better, but is slower.
+`std11-extract-address-components' also works better, and less slower."
   :group 'gnus-summary-format
   :type '(radio (function-item gnus-extract-address-components)
 		(function-item mail-extract-address-components)
@@ -1624,8 +1624,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-decode-binhex gnus-uu-decode-uu-view
       gnus-uu-decode-uu-and-save-view gnus-uu-decode-unshar-view
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
-      gnus-uu-decode-binhex-view)
-     ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh)
+      gnus-uu-decode-binhex-view gnus-uu-unmark-thread)
+     ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
+      gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
       gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
      ("gnus-msg" :interactive t

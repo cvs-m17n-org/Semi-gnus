@@ -181,8 +181,12 @@ variable to \"^nnml\"."
 	      ;; [number subject from date id references chars lines xref]
 	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
 			      (mail-header-number headers)
-			      (mail-header-subject headers)
-			      (mail-header-from headers)
+			      (let ((subject (mail-header-subject headers)))
+				(or (get-text-property 0 'raw-text subject)
+				    subject))
+			      (let ((from (mail-header-from headers)))
+				(or (get-text-property 0 'raw-text from)
+				    from))
 			      (mail-header-date headers)
 			      (mail-header-id headers)
 			      (or (mail-header-references headers) "")
