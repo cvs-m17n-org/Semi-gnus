@@ -1,3 +1,33 @@
+2000-01-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.3 (This is alpha status.)
+	I tested only `nntp',`nnml (with pop3)' backend and `Message'
+	mode.
+
+	You can use ``extruct current entity''.  But can not use ``follow
+	current entity''.
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method): New
+	function.
+	(mime-header-presentation-method-alist): Add
+	`gnus-article-header-presentation-method'.
+	(gnus-mime-preview-quitting-method): New function.
+	(mime-preview-quitting-method-alist): Add
+	`gnus-mime-preview-quitting-method'.
+	(gnus-following-method): New function.
+	(mime-preview-following-method-alist): Add
+	`gnus-following-method'.
+
+	* lisp/mmgnus.el (mmgnus-entity-body): New function.
+	(mime-entity-content): Use `mmgnus-entity-body'.
+	(mime-insert-entity-content): New method.
+	(mime-write-entity-content): Likewise.
+	(mime-insert-entity): Likewise.
+	(mime-write-entity): Likewise.
+	(mime-write-entity-body): Likewise.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.3.
+
 1999-12-26  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-art.el (gnus-mime-display-part-with-mime-view): Bind
