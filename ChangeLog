@@ -1,3 +1,15 @@
+1998-08-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): comment.
+	(gnus-get-summary-default-charset): New function; not used yet.
+
+	* lisp/gnus-msg.el (gnus-summary-mail-forward): No need to set
+	`default-mime-charset'.
+
+	* lisp/gnus-spec.el (gnus-tilde-pad-form): New function.
+
+	* lisp/message.el (message-make-user-agent): Fold more.
+
 1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-make-user-agent): Include SEMI and
