@@ -5216,9 +5216,13 @@ The form is: [Source] Subject, where if the original message was mail,
 Source is the sender, and if the original message was news, Source is
 the list of newsgroups is was posted to."
   (concat "["
-	  (or (message-fetch-field
-	       (if (message-news-p) "newsgroups" "from"))
-	      "(nowhere)")
+	  (if (message-news-p)
+	      (or (message-fetch-field "newsgroups")
+		  "(nowhere)")
+	    (let ((from (message-fetch-field "from")))
+	      (if from
+		  (nnheader-decode-from from)
+		"(nobody)")))
 	  "] " subject))
 
 (defun message-forward-subject-fwd (subject)
