@@ -1,3 +1,9 @@
+2003-04-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-clfns.el (coerce, copy-list, merge, string, subseq):
+	Comment out those compiler macros.
+	(mapc): Make it comeback.
+
 2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* make.bat: Flag as binary to ensure DOS line terminators.  Delete
