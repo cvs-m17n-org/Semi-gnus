@@ -191,7 +191,7 @@ Return the response string if optional second argument is non-nil."
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)
   (if (not pop3-read-passwd)
-      (if (load "passwd" t)
+      (if (or (fboundp 'read-passwd) (load "passwd" t))
 	  (setq pop3-read-passwd 'read-passwd)
 	(autoload 'ange-ftp-read-passwd "ange-ftp")
 	(setq pop3-read-passwd 'ange-ftp-read-passwd)))
