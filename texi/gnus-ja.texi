@@ -24570,7 +24570,7 @@ the valid values.
 Gnus supports Cancel Locks in News.
 
 This means a header @samp{Cancel-Lock} is inserted in news posting.  It is
-used to determine if you wrote a article or not (for cancelling and
+used to determine if you wrote an article or not (for cancelling and
 superseding).  Gnus generates a random password string the first time
 you post a message, and saves it in your @file{~/.emacs} using the Custom
 system.  While the variable is called @code{canlock-password}, it is not
@@ -24619,7 +24619,7 @@ This is supposedly what USEFOR wanted to migrate to.  See
 @code{gnus-group-name-charset-method-alist} for customization.
 
 @item
-The nnml and nnfolder backends store marks for each groups.
+The nnml and nnfolder back ends store marks for each groups.
 
 This makes it possible to take backup of nnml/nnfolder servers/groups
 separately of @file{~/.newsrc.eld}, while preserving marks.  It also
