@@ -203,8 +203,8 @@ it's not cached."
 	      ;; [number subject from date id references chars lines xref]
 	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
 			      (mail-header-number headers)
-			      (mail-header-subject headers)
-			      (mail-header-from headers)
+			      (mime-fetch-field 'Subject headers)
+			      (mime-fetch-field 'From headers)
 			      (mail-header-date headers)
 			      (mail-header-id headers)
 			      (or (mail-header-references headers) "")

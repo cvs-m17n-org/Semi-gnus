@@ -435,20 +435,20 @@ of the last successful match.")
 
 (defconst gnus-header-index
   ;; Name to index alist.
-  '(("number" 0 gnus-score-integer)
-    ("subject" 1 gnus-score-string)
-    ("from" 2 gnus-score-string)
-    ("date" 3 gnus-score-date)
-    ("message-id" 4 gnus-score-string)
-    ("references" 5 gnus-score-string)
-    ("chars" 6 gnus-score-integer)
-    ("lines" 7 gnus-score-integer)
-    ("xref" 8 gnus-score-string)
+  '(("number" 1 gnus-score-integer)
+    ("subject" 8 gnus-score-string)
+    ("from" 9 gnus-score-string)
+    ("date" 10 gnus-score-date)
+    ("message-id" 11 gnus-score-string)
+    ("references" 12 gnus-score-string)
+    ("chars" 13 gnus-score-integer)
+    ("lines" 14 gnus-score-integer)
+    ("xref" 15 gnus-score-string)
     ("head" -1 gnus-score-body)
     ("body" -1 gnus-score-body)
     ("all" -1 gnus-score-body)
-    ("followup" 2 gnus-score-followup)
-    ("thread" 5 gnus-score-thread)))
+    ("followup" 9 gnus-score-followup)
+    ("thread" 12 gnus-score-thread)))
 
 ;;; Summary mode score maps.
 

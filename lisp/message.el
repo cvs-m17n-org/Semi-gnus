@@ -579,8 +579,7 @@ If stringp, use this; if non-nil, use no host name (user name only)."
 
 (defvar message-reply-buffer nil)
 (defvar message-reply-headers nil)
-(defvar message-newsreader nil)
-(defvar message-mailer nil)
+(defvar message-user-agent nil) ; XXX: This symbol is overloaded!  See below.
 (defvar message-sent-message-via nil)
 (defvar message-checksum nil)
 (defvar message-send-actions nil
@@ -896,9 +895,6 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defvar message-send-coding-system 'binary
   "Coding system to encode outgoing mail.")
-
-(defvar message-file-coding-system 'None
-  "Coding system for saving message.")
 
 ;;; Internal variables.
 
@@ -1443,12 +1439,6 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
-  (cond ((coding-system-p message-file-coding-system)
-	 (set-buffer-file-coding-system message-file-coding-system))
-	((fboundp message-file-coding-system)
-	 (let ((codesys (funcall message-file-coding-system)))
-	   (if (coding-system-p codesys)
-	       (set-buffer-file-coding-system codesys)))))
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -3680,7 +3670,8 @@ OTHER-HEADERS is an alist of header/value pairs."
 			    (if wide to-address nil)))
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
      `((Subject . ,subject)
@@ -3805,7 +3796,8 @@ responses here are directed to other newsgroups."))
      cur)
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))))
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))))
 
 
 ;;;###autoload

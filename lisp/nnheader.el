@@ -1,9 +1,10 @@
-;;; nnheader.el --- header access macros for Gnus and its backends
+;;; nnheader.el --- header access macros for Semi-gnus and its backends
 ;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -40,6 +41,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'mail-utils)
+(require 'mime)
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -68,86 +70,73 @@ on your system, you could say something like:
 
 (defmacro mail-header-number (header)
   "Return article number in HEADER."
-  `(aref ,header 0))
+  `(mime-entity-location-internal ,header))
 
 (defmacro mail-header-set-number (header number)
   "Set article number of HEADER to NUMBER."
-  `(aset ,header 0 ,number))
+  `(mime-entity-set-location-internal ,header ,number))
 
-(defmacro mail-header-subject (header)
-  "Return subject string in HEADER."
-  `(aref ,header 1))
+(defalias 'mail-header-subject 'mime-entity-decoded-subject-internal)
+(defalias 'mail-header-set-subject 'mime-entity-set-decoded-subject-internal)
 
-(defmacro mail-header-set-subject (header subject)
-  "Set article subject of HEADER to SUBJECT."
-  `(aset ,header 1 ,subject))
+(defalias 'mail-header-from 'mime-entity-decoded-from-internal)
+(defalias 'mail-header-set-from 'mime-entity-set-decoded-from-internal)
 
-(defmacro mail-header-from (header)
-  "Return author string in HEADER."
-  `(aref ,header 2))
+(defalias 'mail-header-date 'mime-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-entity-set-date-internal)
 
-(defmacro mail-header-set-from (header from)
-  "Set article author of HEADER to FROM."
-  `(aset ,header 2 ,from))
+(defalias 'mail-header-message-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-set-message-id 'mime-entity-set-message-id-internal)
+(defalias 'mail-header-set-id 'mime-entity-set-message-id-internal)
 
-(defmacro mail-header-date (header)
-  "Return date in HEADER."
-  `(aref ,header 3))
+(defalias 'mail-header-references 'mime-entity-references-internal)
+(defalias 'mail-header-set-references 'mime-entity-set-references-internal)
 
-(defmacro mail-header-set-date (header date)
-  "Set article date of HEADER to DATE."
-  `(aset ,header 3 ,date))
+(defalias 'mail-header-chars 'mime-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-entity-set-chars-internal)
 
-(defalias 'mail-header-message-id 'mail-header-id)
-(defmacro mail-header-id (header)
-  "Return Id in HEADER."
-  `(aref ,header 4))
+(defalias 'mail-header-lines 'mime-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-entity-set-lines-internal)
 
-(defalias 'mail-header-set-message-id 'mail-header-set-id)
-(defmacro mail-header-set-id (header id)
-  "Set article Id of HEADER to ID."
-  `(aset ,header 4 ,id))
+(defalias 'mail-header-xref 'mime-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
-(defmacro mail-header-references (header)
-  "Return references in HEADER."
-  `(aref ,header 5))
+(defsubst make-full-mail-header (&optional number subject from date id
+					   references chars lines xref)
+  "Create a new mail header structure initialized with the parameters given."
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   (if subject
+       (eword-decode-and-unfold-unstructured-field subject)
+     )
+   (if from
+       (eword-decode-and-unfold-structured-field from)
+     )
+   date id references
+   chars lines xref
+   (list (cons 'Subject subject)
+	 (cons 'From from))
+   ))
 
-(defmacro mail-header-set-references (header ref)
-  "Set article references of HEADER to REF."
-  `(aset ,header 5 ,ref))
-
-(defmacro mail-header-chars (header)
-  "Return number of chars of article in HEADER."
-  `(aref ,header 6))
-
-(defmacro mail-header-set-chars (header chars)
-  "Set number of chars in article of HEADER to CHARS."
-  `(aset ,header 6 ,chars))
-
-(defmacro mail-header-lines (header)
-  "Return lines in HEADER."
-  `(aref ,header 7))
-
-(defmacro mail-header-set-lines (header lines)
-  "Set article lines of HEADER to LINES."
-  `(aset ,header 7 ,lines))
-
-(defmacro mail-header-xref (header)
-  "Return xref string in HEADER."
-  `(aref ,header 8))
-
-(defmacro mail-header-set-xref (header xref)
-  "Set article xref of HEADER to xref."
-  `(aset ,header 8 ,xref))
+(defsubst make-full-mail-header-from-decoded-header
+  (&optional number subject from date id references chars lines xref)
+  "Create a new mail header structure initialized with the parameters given."
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   subject
+   from
+   date id references
+   chars lines xref))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
-  (make-vector 9 init))
-
-(defun make-full-mail-header (&optional number subject from date id
-					references chars lines xref)
-  "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref))
+  (make-full-mail-header init init init init init
+			 init init init init))
 
 ;; fake message-ids: generation and detection
 
@@ -183,7 +172,7 @@ on your system, you could say something like:
 	  ;; about twice as fast, even though it looks messier.	 You
 	  ;; can't have everything, I guess.  Speed and elegance
 	  ;; don't always go hand in hand.
-	  (vector
+	  (make-full-mail-header
 	   ;; Number.
 	   (if naked
 	       (progn
@@ -280,7 +269,7 @@ on your system, you could say something like:
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
-    (vector
+    (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
@@ -299,8 +288,8 @@ on your system, you could say something like:
   (princ (mail-header-number header) (current-buffer))
   (insert
    "\t"
-   (or (mail-header-subject header) "(none)") "\t"
-   (or (mail-header-from header) "(nobody)") "\t"
+   (or (mime-fetch-field 'Subject header) "(none)") "\t"
+   (or (mime-fetch-field 'From header) "(nobody)") "\t"
    (or (mail-header-date header) "") "\t"
    (or (mail-header-id header)
        (nnmail-message-id))

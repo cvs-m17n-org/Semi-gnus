@@ -93,7 +93,7 @@ Thank you.
 The first %s will be replaced by the Newsgroups header;
 the second with the current group name.")
 
-(defvar gnus-message-setup-hook nil
+(defvar gnus-message-setup-hook '(gnus-maybe-setup-default-charset)
   "Hook run after setting up a message buffer.")
 
 (defvar gnus-bug-create-help-buffer t
@@ -145,7 +145,6 @@ Please describe the bug in annoying, painstaking detail.
 
 Thank you for your help in stamping out bugs.
 "
-
 	  gnus-product-name
 	  (if (string= gnus-product-name "Semi-gnus")
 	      ""
@@ -557,9 +556,10 @@ If SILENT, don't prompt the user."
 
 
 ;; Dummy to avoid byte-compile warning.
-(defvar nnspool-rejected-article-hook)
-(defvar xemacs-codename)
+;;(defvar nnspool-rejected-article-hook)
+;;(defvar xemacs-codename)
 
+;;; Since the User-Agent is ``vanity'' headers.
 (defun gnus-extended-version ()
   "Stringified gnus version."
   (interactive)
@@ -1158,6 +1158,24 @@ this is a reply."
 	(when (cdr val)
 	  (insert (car val) ": " (cdr val) "\n"))
 	(gnus-pull (car val) gnus-message-style-insertions)))))
+
+
+;;; @ for MIME Edit mode
+;;;
+
+(defun gnus-maybe-setup-default-charset ()
+  (let ((charset
+	 (and (boundp 'gnus-summary-buffer)
+              (buffer-live-p gnus-summary-buffer)
+	      (save-excursion
+		(set-buffer gnus-summary-buffer)
+		default-mime-charset))))
+    (if charset
+	(progn
+	  (make-local-variable 'default-mime-charset)
+	  (setq default-mime-charset charset)
+	  ))))
+
 
 ;;; Allow redefinition of functions.
 
