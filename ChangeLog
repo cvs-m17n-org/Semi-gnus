@@ -15,6 +15,10 @@
 	(gnus-bbdb/decode-field-body): New macro.
 	(gnus-bbdb/update-record): Use `gnus-bbdb/decode-field-body'.
 	(gnus-bbdb/extract-field-value): Ditto.
+	(gnus-bbdb/decode-field-body-function): Fix typo.
+	(gnus-bbdb/decode-field-body): Ditto.
+	(gnus-bbdb/update-record): Use `save-excursion' and change timing
+	of `save-restriction'.
 
 1998-10-31  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 

@@ -82,7 +82,7 @@ bbdb-auto-notes-hook を使用していない方には不要ですが、使用している方
 FLIM では quote された eword encoded word は decode されませんが、それ
 を強制的に decode したい場合には、次の設定を加えてください。
 
-(setq gnus-bbeb/decode-field-body-function
+(setq gnus-bbdb/decode-field-body-function
       (function
        (lambda (field-body field-name)
          (eword-decode-string field-body))))
