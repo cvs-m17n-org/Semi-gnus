@@ -1,3 +1,19 @@
+1999-07-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.11.08.
+	(gnus-revision-number): Fresh start from 00.
+
+	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Update for T-gnus
+	6.11.08.
+
+	* lisp{pop3.el,nnmh.el,nnfolder.el,mm-util.el,mm-encode.el,
+	mm-decode.el,message.el,mail-source.el,gnus-util.el,gnus-topic.el,
+	gnus-sum.el,gnus-mlspl.el,gnus-mailcap.el,gnus-group.el,
+	gnus-cus.el,gnus-art.el,ChangeLog}: Sync up with Pterodactyl Gnus
+	v0.95.
+
+	* README.T-gnus: Update for T-gnus 6.11.08.
+
 1999-07-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.

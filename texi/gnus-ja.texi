@@ -2714,6 +2714,11 @@ Gnus
 (@code{gnus-topic-move-group})。このコマンドはプロセスマーク・プ
 レフィックスルールに従います (@pxref{Process/Prefix})。
 
+@item T j
+@kindex T j (Topic)
+@findex gnus-topic-jump-to-topic
+トピックにジャンプします (@code{gnus-topic-jump-to-topic})。
+
 @item T c
 @kindex T c (Topic)
 @findex gnus-topic-copy-group

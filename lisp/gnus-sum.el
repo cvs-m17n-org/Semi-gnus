@@ -2786,6 +2786,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
       (gnus-summary-set-local-parameters gnus-newsgroup-name)
       (gnus-update-format-specifications
        nil 'summary 'summary-mode 'summary-dummy)
+      (gnus-update-summary-mark-positions)
       ;; Do score processing.
       (when gnus-use-scoring
 	(gnus-possibly-score-headers))
@@ -4559,11 +4560,11 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 			     gnus-newsgroup-dependencies)))
 	headers id end ref
 	(mail-parse-charset gnus-newsgroup-charset)
-	(mail-parse-ignored-charsets 
-	 (or (and (gnus-buffer-live-p gnus-summary-buffer)
-		  (save-excursion (set-buffer gnus-summary-buffer)
-				  gnus-newsgroup-ignored-charsets))
-	     gnus-newsgroup-ignored-charsets)))
+	(mail-parse-ignored-charsets
+	 (save-excursion (condition-case nil
+			     (set-buffer gnus-summary-buffer)
+			   (error))
+			 gnus-newsgroup-ignored-charsets)))
     (save-excursion
       (set-buffer nntp-server-buffer)
       ;; Translate all TAB characters into SPACE characters.

@@ -2728,6 +2728,11 @@ Move the current group to some other topic
 (@code{gnus-topic-move-group}).  This command uses the process/prefix
 convention (@pxref{Process/Prefix}).
 
+@item T j
+@kindex T j (Topic)
+@findex gnus-topic-jump-to-topic
+Go to a topic (@code{gnus-topic-jump-to-topic}).  
+
 @item T c
 @kindex T c (Topic)
 @findex gnus-topic-copy-group
