@@ -963,6 +963,7 @@ find-file-hooks, etc.
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
         (after-insert-file-functions nil)
+	(enable-local-eval nil)
 	(find-file-hooks nil))
     (insert-file-contents-as-coding-system
      nnheader-file-coding-system filename visit beg end replace)))
@@ -973,6 +974,7 @@ find-file-hooks, etc.
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
 	(after-insert-file-functions nil)
+	(enable-local-eval nil)
 	(find-file-hooks nil))
     (apply 'find-file-noselect-as-coding-system
 	   nnheader-file-coding-system args)))

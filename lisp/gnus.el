@@ -31,7 +31,6 @@
 (eval '(run-hooks 'gnus-load-hook))
 
 (eval-when-compile (require 'cl))
-(require 'mm-util)
 
 (require 'custom)
 (eval-and-compile
@@ -265,13 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.062"
+(defconst gnus-version-number "6.10.063"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "09"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.80"
+(defconst gnus-original-version-number "0.83"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -1814,7 +1813,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-delete-invisible-text gnus-treat-article)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
-      gnus-article-treat-overstrike gnus-article-word-wrap
+      gnus-article-treat-overstrike 
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face
       gnus-article-hide-pgp
@@ -2659,7 +2658,6 @@ If SCORE is nil, add 1 to the score of GROUP."
     (when info
       (gnus-info-set-score info (+ (gnus-info-score info) (or score 1))))))
 
-;; Function written by Stainless Steel Rat <ratinox@peorth.gweep.net>
 (defun gnus-short-group-name (group &optional levels)
   "Collapse GROUP name LEVELS.
 Select methods are stripped and any remote host name is stripped down to
@@ -2669,6 +2667,7 @@ just the host name."
 	 (depth 0)
 	 (skip 1)
 	 (levels (or levels
+		     gnus-group-uncollapsed-levels
 		     (progn
 		       (while (string-match "\\." group skip)
 			 (setq skip (match-end 0)

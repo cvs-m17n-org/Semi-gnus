@@ -1525,6 +1525,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
    ["Spellcheck" ispell-message t]
+   ["Attach file as MIME" mime-edit-insert-file t]
    "----"
    ["Send Message" message-send-and-exit t]
    ["Abort Message" message-dont-send t]
@@ -3526,7 +3527,7 @@ Headers already prepared in the buffer are not modified."
 		    ;; colon, if there is none.
 		    (if (/= (char-after) ? ) (insert " ") (forward-char 1))
 		    ;; Find out whether the header is empty...
-		    (looking-at "[ \t]*$")))
+		    (looking-at "[ \t]*\n[^ \t]")))
 	  ;; So we find out what value we should insert.
 	  (setq value
 		(cond
@@ -4864,10 +4865,10 @@ regexp varstr."
 ;;; MIME functions
 ;;;
 
-(defvar messgage-inhibit-body-encoding t)
+(defvar message-inhibit-body-encoding t)
 
 (defun message-encode-message-body ()
-  (unless messgage-inhibit-body-encoding
+  (unless message-inhibit-body-encoding
     (let ((mail-parse-charset (or mail-parse-charset
 				  message-default-charset
 				  message-posting-charset))

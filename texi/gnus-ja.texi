@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.062 Manual
+@settitle Semi-gnus 6.10.063 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.062 Manual
+@title Semi-gnus 6.10.063 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B$J8@8l7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation$B$r(B
 $B$*BT$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B Semi-gnus 6.10.062 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B Semi-gnus 6.10.063 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -904,11 +904,15 @@ gnus-group-clear-data-on-native-groups} $B$r;H$C$F!"4pK\%0%k!<%W$K4X$9$k%G!<(B
 
 
 @vindex gnus-save-newsrc-file
+@vindex gnus-read-newsrc-file
 @code{gnus-save-newsrc-file} $B$r(B @code{nil} $B$K$9$k$3$H$K$h$C$F%U%!%$%k(B
 @file{.newsrc} $B$K=q$-9~$`$N$r;_$a$k$3$H$,$G$-$^$9!#$=$&$9$l$P!"$=$N%U%!(B
 $B%$%k$r:o=|$9$k$3$H$,$G$-!"%G%#%9%/MFNL$r@aLs$9$k$3$H$,$G$-!"(Bgnus $B$N=*N;(B
 $B$,B.$/$J$j$^$9!#$7$+$7!"$=$&$9$k$HB>$N%K%e!<%9%j!<%@!<$r;H$($J$/$J$j$^$9!#(B
-$B$G$b!"$A$g$C$H!"C/$+$=$&$7$?$$?M$,$$$k$G$7$g$&$+!#(B 
+$B$G$b!"$A$g$C$H!"C/$+$=$&$7$?$$?M$,$$$k$G$7$g$&$+!#(B
+$BF1$8$h$&$K(B @code{gnus-read-newsrc-file} $B$r(B @code{nil} $B$K$9$k$3$H$K$h$C$F(B
+@file{.newsrc} $B$H$9$Y$F$N(B @file{.newsrc-SERVER} $B$r:n$i$J$$$h$&$K$J$j$^$9!#(B
+$B$b$7$"$J$?$,;~!9(B Netscape $B$r;H$&$N$J$i$P!"$3$&$9$k$N$,ET9g$,NI$$$G$7$g$&!#(B
 
 @vindex gnus-save-killed-list
 @code{gnus-save-killed-list} ($B=i4|@_Dj$G$O(B @code{t}) $B$,(B @code{nil} $B$G$"(B
@@ -18219,7 +18223,7 @@ Gnus $B$OH"$+$i=P$7$F$9$0$K(B @emph{$BHs>o$K(B} $B$h$/F0:n$7$^$9(B---$B2?
 
 @item
 @kbd{M-x gnus-version} $B$r;n$7$F2<$5$$!#$b$7!"(B
-@samp{T-gnus 6.10.062 (based on Pterodactyl Gnus v0.80; for SEMI 
+@samp{T-gnus 6.10.063 (based on Pterodactyl Gnus v0.83; for SEMI 
 1.12/1.13, FLIM 1.12)} $B$N$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,(B
 $BFI$_9~$^$l$F$$$^$9!#(B
 $B$b$7!"(B@samp{NNTP 3.x} $B$d(B @samp{nntp flee} $B$N$h$&$J$b$N$,=P$F$-$?$H$-$O!"(B

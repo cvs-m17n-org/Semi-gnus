@@ -1,3 +1,10 @@
+1999-04-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.063.
+	(gnus-revision-number): Fresh start from 00.
+
+	* Sync up with Pterodactyl Gnus v0.83.
+
 1999-04-15  NAKAGAWA Tsuneo <yaemon@alles.or.jp>
 
 	* REDME.semi.ja: Fix where the required packages are.

@@ -81,11 +81,11 @@
 		 url-view-url w3-prepare-buffer
 		 char-int
 		 annotationp delete-annotation make-image-specifier
- 		 make-annotation
- 		 w3-do-setup w3-region
- 		 rmail-summary-exists rmail-select-summary rmail-update-summary
- 		 url-generic-parse-url
- 		 )))
+		 make-annotation
+		 w3-do-setup w3-region
+		 rmail-summary-exists rmail-select-summary rmail-update-summary
+		 url-generic-parse-url valid-image-instantiator-format-p
+		 )))
 (setq load-path (cons "." load-path))
 (require 'custom)
 

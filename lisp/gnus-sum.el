@@ -820,7 +820,7 @@ which it may alter in any way.")
     ("^cn\\>\\|\\<chinese\\>" cn-gb-2312)
     ("^fj\\>\\|^japan\\>" iso-2022-jp-2)
     ("^relcom\\>" koi8-r)
-    ("^\\(cz\\|hun\\|pl\\|sk\\)\\>" iso-8859-2)
+    ("^\\(cz\\|hun\\|pl\\|sk\\|hr\\)\\>" iso-8859-2)
     ("^israel\\>" iso-8859-1)
     ("^han\\>" euc-kr)
     ("^\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
@@ -1046,7 +1046,8 @@ variable (string, integer, character, etc).")
     gnus-newsgroup-dependencies gnus-newsgroup-selected-overlay
     gnus-newsgroup-scored gnus-newsgroup-kill-headers
     gnus-thread-expunge-below
-    gnus-score-alist gnus-current-score-file gnus-summary-expunge-below
+    gnus-score-alist gnus-current-score-file
+    (gnus-summary-expunge-below . global)
     (gnus-summary-mark-below . global)
     gnus-newsgroup-active gnus-scores-exclude-files
     gnus-newsgroup-history gnus-newsgroup-ancient
@@ -1444,6 +1445,7 @@ increase the score of each group you read."
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "h" gnus-article-treat-html
+    "H" gnus-article-strip-headers-in-body
     "d" gnus-article-treat-dumbquotes)
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
@@ -4247,28 +4249,31 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		(setq arts (cdr arts)))
 	      (setq list (cdr all))))
 
-         (when (gnus-check-backend-function 'request-set-mark
-                                            gnus-newsgroup-name)
-           ;; score & bookmark are not proper flags (they are cons cells)
-           ;; cache is a internal gnus flag
-           (unless (memq (cdr type) '(cache score bookmark))
-             (let* ((old (cdr (assq (cdr type) (gnus-info-marks info))))
-                    (del (gnus-remove-from-range old list))
-                    (add (gnus-remove-from-range list old)))
-               (if add
-                   (push (list add 'add (list (cdr type))) delta-marks))
-               (if del
-                   (push (list del 'del (list (cdr type))) delta-marks)))))
-
+	  (when (gnus-check-backend-function 'request-set-mark
+					     gnus-newsgroup-name)
+	    ;; uncompressed:s are not proper flags (they are cons cells)
+	    ;; cache is a internal gnus flag
+	    (unless (memq (cdr type) (cons 'cache uncompressed))
+	      (let* ((old (cdr (assq (cdr type) (gnus-info-marks info))))
+		     (list (gnus-compress-sequence (sort list '<)))
+		     (del (gnus-remove-from-range old list))
+		     (add (gnus-remove-from-range list old)))
+		(if add
+		    (push (list add 'add (list (cdr type))) delta-marks))
+		(if del
+		    (push (list del 'del (list (cdr type))) delta-marks)))))
+	  
 	  (push (cons (cdr type)
 		      (if (memq (cdr type) uncompressed) list
 			(gnus-compress-sequence
 			 (set symbol (sort list '<)) t)))
 		newmarked)))
 
-      (if delta-marks
-         (gnus-request-set-mark gnus-newsgroup-name delta-marks))
-
+      (when delta-marks
+	(unless (gnus-check-group gnus-newsgroup-name)
+	  (error "Can't open server for %s" gnus-newsgroup-name))
+	(gnus-request-set-mark gnus-newsgroup-name delta-marks))
+	  
       ;; Enter these new marks into the info of the group.
       (if (nthcdr 3 info)
 	  (setcar (nthcdr 3 info) newmarked)
@@ -7002,6 +7007,7 @@ If ARG is a negative number, hide the unwanted header lines."
 	(insert-buffer-substring gnus-original-article-buffer 1 e)
 	(save-restriction
 	  (narrow-to-region (point-min) (point))
+	  (article-decode-encoded-words)
 	  (if (or hidden
 		  (and (numberp arg) (< arg 0)))
 	      (let ((gnus-treat-hide-headers nil)
@@ -7404,6 +7410,8 @@ This will be the case if the article has both been mailed and posted."
 	;; There are expirable articles in this group, so we run them
 	;; through the expiry process.
 	(gnus-message 6 "Expiring articles...")
+	(unless (gnus-check-group gnus-newsgroup-name)
+	  (error "Can't open server for %s" gnus-newsgroup-name))
 	;; The list of articles that weren't expired is returned.
 	(save-excursion
 	  (if expiry-wait
@@ -8756,7 +8764,7 @@ save those articles instead."
 			   split-name))
 		    ((consp result)
 		     (setq split-name (append result split-name)))))))))
-    split-name))
+    (nreverse split-name)))
 
 (defun gnus-valid-move-group-p (group)
   (and (boundp group)
@@ -9112,6 +9120,8 @@ save those articles instead."
            (let ((del (gnus-remove-from-range (gnus-info-read info) read))
                  (add (gnus-remove-from-range read (gnus-info-read info))))
              (when (or add del)
+	       (unless (gnus-check-group group)
+		 (error "Can't open server for %s" group))
                (gnus-request-set-mark
                 group (delq nil (list (if add (list add 'add '(read)))
                                       (if del (list del 'del '(read)))))))))
@@ -9368,6 +9378,83 @@ Then replace the article with the result."
 (put 'gnus-with-article 'lisp-indent-function 1)
 (put 'gnus-with-article 'edebug-form-spec '(form body))
 
+;;;
+;;; Generic summary marking commands
+;;;
+
+(defvar gnus-summary-marking-alist
+  '((read gnus-del-mark "d")
+    (unread gnus-unread-mark "u")
+    (ticked gnus-ticked-mark "!")
+    (dormant gnus-dormant-mark "?")
+    (expirable gnus-expirable-mark "e"))
+  "An alist of names/marks/keystrokes.")
+
+(defvar gnus-summary-generic-mark-map (make-sparse-keymap))
+(defvar gnus-summary-mark-map)
+
+(defun gnus-summary-make-all-marking-commands ()
+  (define-key gnus-summary-mark-map "M" gnus-summary-generic-mark-map)
+  (dolist (elem gnus-summary-marking-alist)
+    (apply 'gnus-summary-make-marking-command elem)))
+
+(defun gnus-summary-make-marking-command (name mark keystroke)
+  (let ((map (make-sparse-keymap)))
+    (define-key gnus-summary-generic-mark-map keystroke map)
+    (dolist (lway `((next "next" next nil "n")
+		    (next-unread "next unread" next t "N")
+		    (prev "previous" prev nil "p")
+		    (prev-unread "previous unread" prev t "P")
+		    (nomove "" nil nil ,keystroke)))
+      (let ((func (gnus-summary-make-marking-command-1
+		   mark (car lway) lway name)))
+	(setq func (eval func))
+	(define-key map (nth 4 lway) func)))))
+      
+(defun gnus-summary-make-marking-command-1 (mark way lway name)      
+  `(defun ,(intern
+	    (format "gnus-summary-put-mark-as-%s%s"
+		    name (if (eq way 'nomove)
+			     ""
+			   (concat "-" (symbol-name way)))))
+     (n)
+     ,(format
+       "Mark the current article as %s%s.
+If N, the prefix, then repeat N times.
+If N is negative, move in reverse order.
+The difference between N and the actual number of articles marked is
+returned."
+       name (cadr lway))
+     (interactive "p")
+     (gnus-summary-generic-mark n ,mark ',(nth 2 lway) ,(nth 3 lway))))
+    
+(defun gnus-summary-generic-mark (n mark move unread)
+  "Mark N articles with MARK."
+  (unless (eq major-mode 'gnus-summary-mode)
+    (error "This command can only be used in the summary buffer"))
+  (gnus-summary-show-thread)
+  (let ((nummove
+	 (cond
+	  ((eq move 'next) 1)
+	  ((eq move 'prev) -1)
+	  (t 0))))
+    (if (zerop nummove)
+	(setq n 1)
+      (when (< n 0)
+	(setq n (abs n)
+	      nummove (* -1 nummove))))
+    (while (and (> n 0)
+		(gnus-summary-mark-article nil mark)
+		(zerop (gnus-summary-next-subject nummove unread t)))
+      (setq n (1- n)))
+    (when (/= 0 n)
+      (gnus-message 7 "No more %sarticles" (if mark "" "unread ")))
+    (gnus-summary-recenter)
+    (gnus-summary-position-point)
+    (gnus-set-mode-line 'summary)
+    n))
+
+(gnus-summary-make-all-marking-commands)
 
 (gnus-ems-redefine)
 

@@ -34,6 +34,12 @@
   "The mail-fetching library."
   :group 'gnus)
 
+(defcustom mail-sources nil
+  "*Where the mail backends will look for incoming mail.
+This variable is a list of mail source specifiers."
+  :group 'mail-source
+  :type 'sexp)
+
 (defcustom mail-source-crash-box "~/.emacs-mail-crash-box"
   "File where mail will be stored while processing it."
   :group 'mail-source
@@ -62,6 +68,8 @@
 (eval-and-compile
   (defvar mail-source-keyword-map
     '((file
+       (:prescript)
+       (:postscript)
        (:path (or (getenv "MAIL")
 		  (concat "/usr/spool/mail/" (user-login-name)))))
       (directory
@@ -167,8 +175,15 @@ Return the number of files that were found."
       (when (file-exists-p mail-source-crash-box)
 	(message "Processing mail from %s..." mail-source-crash-box)
 	(setq found (mail-source-callback
-		     callback mail-source-crash-box)))
-      (+ found (funcall function source callback)))))
+                     callback mail-source-crash-box)))
+      (+ found
+         (condition-case err
+             (funcall function source callback)
+           (error
+            (unless (yes-or-no-p
+		     (format "Mail source error.  Continue? "))
+              (error "Cannot get new mail."))
+            0))))))
 
 (defun mail-source-make-complex-temp-name (prefix)
   (let ((newname (make-temp-name prefix))
@@ -294,9 +309,26 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defun mail-source-fetch-file (source callback)
   "Fetcher for single-file sources."
   (mail-source-bind (file source)
+    (when prescript
+      (if (and (symbolp prescript) (fboundp prescript))
+	  (funcall prescript)
+	(call-process shell-file-name nil nil nil
+		      shell-command-switch 
+		      (format-spec
+		       prescript
+		       (format-spec-make ?t mail-source-crash-box)))))
     (let ((mail-source-string (format "file:%s" path)))
       (if (mail-source-movemail path mail-source-crash-box)
-	  (mail-source-callback callback path)
+	  (prog1
+	      (mail-source-callback callback path)
+	    (when prescript
+	      (if (and (symbolp prescript) (fboundp prescript))
+		  (funcall prescript)
+		(call-process shell-file-name nil nil nil
+			      shell-command-switch 
+			      (format-spec
+			       postscript
+			       (format-spec-make ?t mail-source-crash-box))))))
 	0))))
 
 (defun mail-source-fetch-directory (source callback)
@@ -316,7 +348,8 @@ If ARGS, PROMPT is used as an argument to `format'."
   "Fetcher for single-file sources."
   (mail-source-bind (pop source)
     (when prescript
-      (if (fboundp prescript)
+      (if (and (symbolp prescript)
+	       (fboundp prescript))
 	  (funcall prescript)
 	(call-process shell-file-name nil nil nil
 		      shell-command-switch
@@ -359,7 +392,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	  (prog1
 	      (mail-source-callback callback server)
 	    (when prescript
-	      (if (fboundp prescript)
+	      (if (and (symbolp postscript)
+		       (fboundp postscript))
 		  (funcall prescript)
 		(call-process shell-file-name nil nil nil
 			      shell-command-switch

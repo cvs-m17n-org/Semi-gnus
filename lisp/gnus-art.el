@@ -130,7 +130,7 @@
     "^X-Pgp-Public-Key-Url:" "^X-Auth:" "^X-From-Line:"
     "^X-Gnus-Article-Number:" "^X-Majordomo:" "^X-Url:" "^X-Sender:"
     "^X-Mailing-List:" "^MBOX-Line" "^Priority:" "^X-Pgp" "^X400-[-A-Za-z]+:"
-    "^Status:" "^X-Gnus-Mail-Source:")
+    "^Status:" "^X-Gnus-Mail-Source:" "^Cancel-Lock:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -616,6 +616,9 @@ on parts -- for instance, adding Vcard info to a database."
   :group 'gnus-article-mime
   :type 'function)
 
+(defcustom gnus-mime-multipart-functions nil
+  "An alist of MIME types to functions to display them.")
+
 ;;;
 ;;; The treatment variables
 ;;;
@@ -796,6 +799,13 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
+(defcustom gnus-treat-strip-headers-in-body t
+  "Strip the X-No-Archive header line from the beginning of the body.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See the manual for details."
+  :group 'gnus-article-treat
+  :type gnus-article-treat-custom)
+
 (defcustom gnus-treat-strip-trailing-blank-lines nil
   "Strip trailing blank lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -888,12 +898,14 @@ See the manual for details."
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
   '((gnus-treat-strip-banner gnus-article-strip-banner)
+    (gnus-treat-strip-headers-in-body gnus-article-strip-headers-in-body)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
     (gnus-treat-buttonize gnus-article-add-buttons)
     (gnus-treat-fill-article gnus-article-fill-cited-article)
     (gnus-treat-fill-long-lines gnus-article-fill-long-lines)
     (gnus-treat-strip-cr gnus-article-remove-cr)
-    (gnus-treat-hide-headers gnus-article-hide-headers)
+    (gnus-treat-emphasize gnus-article-emphasize)
+    (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-hide-citation gnus-article-hide-citation)
@@ -902,7 +914,6 @@ See the manual for details."
     (gnus-treat-highlight-headers gnus-article-highlight-headers)
     (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
-    (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-date-ut gnus-article-date-ut)
     (gnus-treat-date-local gnus-article-date-local)
     (gnus-treat-date-lapsed gnus-article-date-lapsed)
@@ -1115,7 +1126,7 @@ always hide."
 	    (cond
 	     ;; Hide empty headers.
 	     ((eq elem 'empty)
-	      (while (re-search-forward "^[^:]+:[ \t]*\n[^ \t]" nil t)
+	      (while (re-search-forward "^[^: \t]+:[ \t]*\n[^ \t]" nil t)
 		(forward-line -1)
 		(gnus-article-hide-text-type
 		 (progn (beginning-of-line) (point))
@@ -1308,12 +1319,12 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 	(forward-sentence)))))
 
 (defun article-remove-cr ()
-  "Translate CRLF pairs into LF, and then CR into LF.."
+  "Remove trailing CRs and then translate remaining CRs into LFs."
   (interactive)
   (save-excursion
     (let ((buffer-read-only nil))
       (goto-char (point-min))
-      (while (search-forward "\r$" nil t)
+      (while (re-search-forward "\r+$" nil t)
 	(replace-match "" t t))
       (goto-char (point-min))
       (while (search-forward "\r" nil t)
@@ -1554,6 +1565,15 @@ always hide."
 	  (when (gnus-article-narrow-to-signature)
 	    (gnus-article-hide-text-type
 	     (point-min) (point-max) 'signature)))))))
+
+(defun article-strip-headers-in-body ()
+  "Strip offensive headers from bodies."
+  (interactive)
+  (save-excursion
+    (article-goto-body)
+    (let ((case-fold-search t))
+      (when (looking-at "x-no-archive:")
+	(gnus-delete-line)))))
 
 (defun article-strip-leading-blank-lines ()
   "Remove all blank lines from the beginning of the article."
@@ -2299,6 +2319,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-strip-banner
      article-hide-pem
      article-hide-signature
+     article-strip-headers-in-body
      article-remove-trailing-blank-lines
      article-strip-leading-blank-lines
      article-strip-multiple-blank-lines
@@ -2651,8 +2672,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(when (gnus-visual-p 'article-highlight 'highlight)
 		  (gnus-run-hooks 'gnus-visual-mark-article-hook))
 		;; Set the global newsgroup variables here.
-		;; Suggested by Jim Sisolak
-		;; <sisolak@trans4.neep.wisc.edu>.
 		(gnus-set-global-variables)
 		(setq gnus-have-all-headers
 		      (or all-headers gnus-show-all-headers))))
@@ -2810,23 +2829,19 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (setq buffer-file-name nil))
     (goto-char (point-min))))
 
-(defun gnus-mime-inline-part (&optional charset)
+(defun gnus-mime-inline-part (&optional handle)
   "Insert the MIME part under point into the current buffer."
-  (interactive "P") ; For compatibility reasons we are not using "z".
+  (interactive)
   (gnus-article-check-buffer)
-  (let* ((data (get-text-property (point) 'gnus-data))
+  (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 contents
 	 (b (point))
 	 buffer-read-only)
-    (if (mm-handle-undisplayer data)
-	(mm-remove-part data)
-      (setq contents (mm-get-part data))
+    (if (mm-handle-undisplayer handle)
+	(mm-remove-part handle)
+      (setq contents (mm-get-part handle))
       (forward-line 2)
-      (when charset
-	(unless (symbolp charset)
-	  (setq charset (mm-read-coding-system "Charset: ")))
-	(setq contents (mm-decode-coding-string contents charset)))
-      (mm-insert-inline data contents)
+      (mm-insert-inline handle contents)
       (goto-char b))))
 
 (defun gnus-mime-externalize-part (&optional handle)
@@ -3061,6 +3076,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
    ;; Single part.
    ((not (stringp (car handle)))
     (gnus-mime-display-single handle))
+   ;; User-defined multipart
+   ((cdr (assoc (car handle) gnus-mime-multipart-functions))
+    (funcall (cdr (assoc (car handle) gnus-mime-multipart-functions))
+	     handle))
    ;; multipart/alternative
    ((and (equal (car handle) "multipart/alternative")
 	 (not gnus-mime-display-multipart-as-mixed))

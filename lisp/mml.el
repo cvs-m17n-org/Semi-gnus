@@ -221,7 +221,7 @@
 	    (setq charset (mm-encode-body))
 	    (setq encoding (mm-body-encoding charset))
 	    (setq coded (buffer-string)))
-	(with-temp-buffer
+	(mm-with-unibyte-buffer
 	  (cond
 	   ((cdr (assq 'buffer cont))
 	    (insert-buffer-substring (cdr (assq 'buffer cont))))
@@ -242,21 +242,23 @@
       (when name
 	(setq name (mml-parse-file-name name))
 	(if (stringp name)
-	    (insert ";\n " (mail-header-encode-parameter "name" name)
-		    "\";\n access-type=local-file")
-	  (insert
-	   (format ";\n "
-		   (mail-header-encode-parameter
-		    "name" (file-name-nondirectory (nth 2 name)))
-		   (mail-header-encode-parameter "site" (nth 1 name))
-		   (mail-header-encode-parameter
-		    "directory" (file-name-directory (nth 2 name)))))
-	  (insert ";\n access-type="
-		  (if (member (nth 0 name) '("ftp@" "anonymous@"))
-		      "anon-ftp"
-		    "ftp"))))
+	    (mml-insert-parameter
+	     (mail-header-encode-parameter "name" name)
+	     "access-type=local-file")
+	  (mml-insert-parameter
+	   (mail-header-encode-parameter
+	    "name" (file-name-nondirectory (nth 2 name)))
+	   (mail-header-encode-parameter "site" (nth 1 name))
+	   (mail-header-encode-parameter
+	    "directory" (file-name-directory (nth 2 name))))
+	  (mml-insert-parameter
+	   (concat "access-type="
+		   (if (member (nth 0 name) '("ftp@" "anonymous@"))
+		       "anon-ftp"
+		     "ftp")))))      
       (when parameters
-	(insert parameters)))
+	(mml-insert-parameter-string
+	 cont '(expiration size permission))))
     (insert "\n\n")
     (insert "Content-Type: " (cdr (assq 'type cont)) "\n")
     (insert "Content-ID: " (message-make-message-id) "\n")
@@ -338,7 +340,8 @@
 	(insert "; " (mail-header-encode-parameter
 		      "charset" (symbol-name charset))))
       (when parameters
-	(insert parameters))
+	(mml-insert-parameter-string
+	 cont '(name access-type expiration size permission)))
       (insert "\n"))
     (setq parameters
 	  (mml-parameter-string
@@ -347,7 +350,8 @@
 	      parameters)
       (insert "Content-Disposition: " (or disposition "inline"))
       (when parameters
-	(insert parameters))
+	(mml-insert-parameter-string
+	 cont '(filename creation-date modification-date read-date)))
       (insert "\n"))
     (unless (eq encoding '7bit)
       (insert (format "Content-Transfer-Encoding: %s\n" encoding)))
@@ -363,11 +367,22 @@
 	;; Strip directory component from the filename parameter.
 	(when (eq type 'filename)
 	  (setq value (file-name-nondirectory value)))
-	(setq string (concat string ";\n "
+	(setq string (concat string "; "
 			     (mail-header-encode-parameter
 			      (symbol-name type) value)))))
     (when (not (zerop (length string)))
       string)))
+
+(defun mml-insert-parameter-string (cont types)
+  (let (value type)
+    (while (setq type (pop types))
+      (when (setq value (cdr (assq type cont)))
+	;; Strip directory component from the filename parameter.
+	(when (eq type 'filename)
+	  (setq value (file-name-nondirectory value)))
+	(mml-insert-parameter
+	 (mail-header-encode-parameter
+	  (symbol-name type) value))))))
 
 (defvar ange-ftp-path-format)
 (defvar efs-path-regexp)
@@ -455,6 +470,17 @@
     (equal (split-string (car (mm-handle-type handle)) "/") "text")
     (insert ">\n")))
 
+(defun mml-insert-parameter (&rest parameters)
+  "Insert PARAMETERS in a nice way."
+  (dolist (param parameters)
+    (insert ";")
+    (let ((point (point)))
+      (insert " " param)
+      (when (> (current-column) 71)
+	(goto-char point)
+	(insert "\n ")
+	(end-of-line)))))
+
 ;;;
 ;;; Mode for inserting and editing MML forms
 ;;;
@@ -464,6 +490,7 @@
 	(main (make-sparse-keymap)))
     (define-key map "f" 'mml-attach-file)
     (define-key map "b" 'mml-attach-buffer)
+    (define-key map "e" 'mml-attach-external)
     (define-key map "q" 'mml-quote-region)
     (define-key map "m" 'mml-insert-multipart)
     (define-key map "p" 'mml-insert-part)
@@ -477,7 +504,8 @@
  '("MML"
    ("Attach"
     ["File" mml-attach-file t]
-    ["Buffer" mml-attach-buffer t])
+    ["Buffer" mml-attach-buffer t]
+    ["External" mml-attach-external t])
    ("Insert"
     ["Multipart" mml-insert-multipart t]
     ["Part" mml-insert-part t])
@@ -504,7 +532,12 @@
 	    minor-mode-map-alist)))
   (run-hooks 'mml-mode-hook))
 
-(defun mml-read-file (prompt)
+;;;
+;;; Helper functions for reading MIME stuff from the minibuffer and
+;;; inserting stuff to the buffer.
+;;;
+
+(defun mml-minibuffer-read-file (prompt)
   (let ((file (read-file-name prompt nil nil t)))
     ;; Prevent some common errors.  This is inspired by similar code in
     ;; VM.
@@ -516,22 +549,41 @@
       (error "Permission denied: %s" file))
     file))
 
-(defun mml-read-type (file)
-  (let* ((default (or (mm-default-file-encoding file)
+(defun mml-minibuffer-read-type (name &optional default)
+  (let* ((default (or default
+		      (mm-default-file-encoding name)
 		      ;; Perhaps here we should check what the file
 		      ;; looks like, and offer text/plain if it looks
 		      ;; like text/plain.
 		      "application/octet-stream"))
 	 (string (completing-read
 		  (format "Content type (default %s): " default)
-		  (delete-duplicates
-		   (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
-		   :test 'equal))))
+		  (mapcar
+		   'list
+		   (delete-duplicates
+		    (nconc
+		     (mapcar (lambda (m) (cdr m))
+			     mailcap-mime-extensions)
+		     (apply
+		      'nconc
+		      (mapcar
+		       (lambda (l)
+			 (delq nil
+			       (mapcar
+				(lambda (m)
+				  (let ((type (cdr (assq 'type (cdr m)))))
+				    (if (equal (cadr (split-string type "/"))
+					       "*")
+					nil
+				      type)))
+				(cdr l))))
+		       mailcap-mime-data)))
+		    :test 'equal)))))
     (if (not (equal string ""))
 	string
       default)))
 
-(defun mml-read-description ()
+(defun mml-minibuffer-read-description ()
   (let ((description (read-string "One line description: ")))
     (when (string-match "\\`[ \t]*\\'" description)
       (setq description nil))
@@ -541,12 +593,33 @@
   "Quote the MML tags in the region."
   (interactive "r")
   (save-excursion
-    (goto-char beg)
-    ;; Quote parts.
-    (while (re-search-forward
-	    "<#/?!*\\(multipart\\|part\\|external\\)" end t)
-      (goto-char (match-beginning 1))
-      (insert "!"))))
+    (save-restriction
+      ;; Temporarily narrow the region to defend from changes
+      ;; invalidating END.
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      ;; Quote parts.
+      (while (re-search-forward
+	      "<#/?!*\\(multipart\\|part\\|external\\)" nil t)
+	(goto-char (match-beginning 1))
+	(insert "!")))))
+
+(defun mml-insert-tag (name &rest plist)
+  "Insert an MML tag described by NAME and PLIST."
+  (when (symbolp name)
+    (setq name (symbol-name name)))
+  (insert "<#" name)
+  (while plist
+    (let ((key (pop plist))
+	  (value (pop plist)))
+      (when value
+	;; Quote VALUE if it contains suspicious characters.
+	(when (string-match "[\"\\~/* \t\n]" value)
+	  (setq value (prin1-to-string value)))
+	(insert (format " %s=%s" key value)))))
+  (insert ">\n<#/part>\n"))
+
+;;; Attachment functions.
 
 (defun mml-attach-file (file &optional type description)
   "Attach a file to the outgoing MIME message.
@@ -557,33 +630,66 @@ FILE is the name of the file to attach.  TYPE is its content-type, a
 string of the form \"type/subtype\".  DESCRIPTION is a one-line
 description of the attachment."
   (interactive
-   (let* ((file (mml-read-file "Attach file: "))
-	  (type (mml-read-type file))
-	  (description (mml-read-description)))
+   (let* ((file (mml-minibuffer-read-file "Attach file: "))
+	  (type (mml-minibuffer-read-type file))
+	  (description (mml-minibuffer-read-description)))
      (list file type description)))
-  (insert
-   (format
-    "<#part type=%s name=%s filename=%s%s disposition=attachment><#/part>\n"
-    type (prin1-to-string (file-name-nondirectory file))
-    (prin1-to-string file)
-    (if description
-	(format " description=%s" (prin1-to-string description))
-      ""))))
+  (mml-insert-tag 'part 'type type 'filename file 'disposition "attachment"
+		  'description description))
+
+(defun mml-attach-buffer (buffer &optional type description)
+  "Attach a buffer to the outgoing MIME message.
+See `mml-attach-file' for details of operation."
+  (interactive
+   (let* ((buffer (read-buffer "Attach buffer: "))
+	  (type (mml-minibuffer-read-type buffer "text/plain"))
+	  (description (mml-minibuffer-read-description)))
+     (list buffer type description)))
+  (mml-insert-tag 'part 'type type 'buffer buffer 'disposition "attachment"
+		  'description description))
 
 (defun mml-attach-external (file &optional type description)
   "Attach an external file into the buffer.
 FILE is an ange-ftp/efs specification of the part location.
 TYPE is the MIME type to use."
   (interactive
-   (let* ((file (mml-read-file "Attach external file: "))
-	  (type (mml-read-type file))
-	  (description (mml-read-description)))
+   (let* ((file (mml-minibuffer-read-file "Attach external file: "))
+	  (type (mml-minibuffer-read-type file))
+	  (description (mml-minibuffer-read-description)))
      (list file type description)))
-  (insert (format
-	   "<#external type=%s name=%s disposition=attachment><#/external>\n"
-	   type (prin1-to-string file))))
+  (mml-insert-tag 'external 'type type 'name file 'disposition "attachment"
+		  'description description))
 
+(defun mml-insert-multipart (&optional type)
+  (interactive (list (completing-read "Multipart type (default mixed): ")
+		     "mixed"
+		     '(("mixed") ("alternative") ("digest") ("parallel")
+		       ("signed") ("encrypted"))))
+  (or type
+      (setq type "mixed"))
+  (mml-insert-tag "multipart" 'type type)
+  (insert "<#/!multipart>\n")
+  (forward-line -1))
 
+(defun mml-preview (&optional raw)
+ "Display current buffer with Gnus, in a new buffer.
+If RAW, don't highlight the article."
+ (interactive "P")
+ (let ((buf (current-buffer)))
+   (switch-to-buffer (get-buffer-create 
+                     (concat (if raw "*Raw MIME preview of "
+                               "*MIME preview of ") (buffer-name))))
+   (erase-buffer)
+   (insert-buffer buf)
+   (mml-to-mime)
+   (unless raw
+     (run-hooks 'gnus-article-decode-hook)
+     (let ((gnus-newsgroup-name "dummy"))
+      (gnus-article-prepare-display)))
+   (fundamental-mode)
+   (setq buffer-read-only t)
+   (goto-char (point-min))))
+ 
 (provide 'mml)
 
 ;;; mml.el ends here
