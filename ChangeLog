@@ -1,3 +1,12 @@
+1998-11-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/base64.el (base64-decode-region): Use `defun-maybe'.
+	(base64-encode-region): Ditto.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.042.
+
+	* Sync up with Pterodactyl Gnus 0.56.
+
 1998-11-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: Fix typo of DOC string.
@@ -21,7 +30,7 @@
 	(message-supersede-setup-function): New user option. Use
 	`message-supersede-setup-for-mime-edit' in default.
 	(message-supersede): Call `message-supersede-setup-function' if it
- 	is non-nil.
+	is non-nil.
 	(message-supersede-setup-hook): New user option.
 
 	* lisp/message.el (message-bounce-setup-for-mime-edit): Don't
