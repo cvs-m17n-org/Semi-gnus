@@ -250,10 +250,10 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.6.42"
+(defconst gnus-version-number "0.6"
   "Version number for this version of Gnus.")
 
-(defconst gnus-version (format "Gnus v%s" gnus-version-number)
+(defconst gnus-version (format "Pterodactyl Gnus v%s" gnus-version-number)
   "Version string for this version of Gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -637,13 +637,13 @@ be set in `.emacs' instead."
 (defface gnus-splash-face
   '((((class color)
       (background dark))
-     (:foreground "ForestGreen"))
+     (:foreground "Brown"))
     (((class color)
       (background light))
-     (:foreground "ForestGreen"))
+     (:foreground "Brown"))
     (t
      ()))
-  "Level 1 newsgroup face.")
+  "Face of the splash screen.")
 
 (defun gnus-splash ()
   (save-excursion
@@ -1569,8 +1569,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	  (cdr package)))))
    '(("metamail" metamail-buffer)
      ("info" Info-goto-node)
-     ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
+     ("qp" quoted-printable-decode-region quoted-printable-decode-string)
+     ("mm-decode" mm-decode-words-region mm-decode-words-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
@@ -2005,7 +2006,7 @@ If ARG, insert string at point."
 		    ((member alpha '("September" "s")) "5.01")
 		    ((member alpha '("Red" "r")) "5.03")
 		    ((member alpha '("Quassia" "q")) "5.05")
-		    ((member alpha '("p")) "5.07")
+		    ((member alpha '("Pterodactyl" "p")) "5.07")
 		    ((member alpha '("o")) "5.09")
 		    ((member alpha '("n")) "5.11"))
 		   minor least)
