@@ -767,19 +767,12 @@ is enclosed by at least one regexp grouping construct."
 (defvar nnshimbun-fill-column (min 80 (- (frame-width) 4)))
 
 (defconst nnshimbun-kinsoku-bol-list
-  (funcall
-   (if (fboundp 'string-to-char-list)
-       'string-to-char-list
-     'string-to-list) "\
-!)-_~}]:;',.?、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃仝々〆〇ー―‐／＼〜\
-‖｜…‥’”）〕］｝〉》」』】°′″℃ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ"))
+  (append "!)-_~}]:;',.?、。，．・：；？！゛゜´｀¨＾￣＿ヽヾゝゞ〃\
+仝々〆〇ー―‐／＼〜‖｜…‥’”）〕］｝〉》」』】°′″℃ぁぃぅぇぉ\
+っゃゅょゎァィゥェォッャュョヮヵヶ" nil))
 
 (defconst nnshimbun-kinsoku-eol-list
-  (funcall
-   (if (fboundp 'string-to-char-list)
-       'string-to-char-list
-     'string-to-list)
-   "({[`‘“（〔［｛〈《「『【°′″§"))
+  (append "({[`‘“（〔［｛〈《「『【°′″§" nil))
 
 (defun nnshimbun-fill-line ()
   (forward-line 0)
