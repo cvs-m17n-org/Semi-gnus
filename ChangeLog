@@ -1,3 +1,24 @@
+2002-07-31  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el: Support automatically updating index.
+	(gnus-namazu-default-index-directory): New constant.
+	(gnus-namazu-make-index-interval, gnus-namazu-make-index-command,
+	gnus-namazu-make-index-arguments): New options.
+	(gnus-namazu/setup): Call `gnus-namazu-make-index'.
+	(gnus-namazu/real-group-name): Renamed from
+	`gnus-namazu/check-cache-group'.
+	(gnus-namazu/cache-group-candidates): Renamed from
+	`gnus-namazu/cache-group-candidates'.
+	(gnus-namazu/search): Experimental support of articles covered by
+	agent.
+	(gnus-namazu/default-index-directory, gnus-namazu/lapse-seconds,
+	gnus-namazu/mknmz-sentinel): New internal functions.
+	(gnus-namazu/mknmz-process): New internal variable.
+	(gnus-namazu/lock-file-name, gnus-namazu/index-file-name): New
+	macros.
+	(gnus-namazu-make-index, gnus-namazu-make-index-stop): New
+	commands.
+
 2002-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/request-list): Removed.
