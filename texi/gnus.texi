@@ -10643,6 +10643,12 @@ headers will be included in the sequence they are matched.
 If non-@code{nil}, add a @code{to-list} group parameter to mail groups
 that have none when you do a @kbd{a}.
 
+@item gnus-confirm-mail-reply-to-news
+@vindex gnus-confirm-mail-reply-to-news
+If non-@code{nil}, Gnus requests confirmation when replying to news.
+If you find yourself never wanting to reply to mail, but occasionally
+press R anyway, this variable might be for you.
+
 @end table
 
 
@@ -14337,6 +14343,7 @@ is unnecessary in that case.
 @node Web Searches
 @subsection Web Searches
 @cindex nnweb
+@cindex Google
 @cindex DejaNews
 @cindex Alta Vista
 @cindex InReference
@@ -14383,7 +14390,7 @@ Virtual server variables:
 @item nnweb-type
 @vindex nnweb-type
 What search engine type is being used.  The currently supported types
-are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
+are @code{google}, @code{dejanews}, @code{altavista} and
 @code{reference}.
 
 @item nnweb-search

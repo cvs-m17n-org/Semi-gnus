@@ -10149,6 +10149,12 @@ Superseding} を参照してください。
 @vindex gnus-add-to-list
 @code{nil} でなければ、@kbd{a} をしたときに、@code{to-list} グループパラ
 メータをそれのないメールグループに付け加えます。
+
+@item gnus-confirm-mail-reply-to-news
+@vindex gnus-confirm-mail-reply-to-news
+非-@code{nil}だったら、ニュース記事に返信するときに gnus は確認を求めま
+す。メールで返信する気は無いのに時たまぞんざいに R を押してしまう癖があ
+るならば、この変数はそんなあなたのためにあります。
 @end table
 
 @node Posting Server
@@ -13713,6 +13719,7 @@ gnus を終了したいかもしれません。
 @node Web Searches
 @subsection ウェブ検索
 @cindex nnweb
+@cindex Google
 @cindex DejaNews
 @cindex Alta Vista
 @cindex InReference
@@ -13758,8 +13765,8 @@ gnus を終了したいかもしれません。
 @item nnweb-type
 @vindex nnweb-type
 どの検索エンジンを使っているか。現在サポートされている種類は、
-@code{dejanews}, @code{dejanewsold}, @code{altavista}, @code{reference} で
-す。
+@code{google}, @code{dejanews}, @code{altavista} そし
+て @code{reference} です。
 
 @item nnweb-search
 @vindex nnweb-search

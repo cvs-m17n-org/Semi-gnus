@@ -1925,6 +1925,30 @@ increase the score of each group you read."
 
 (defvar gnus-article-post-menu nil)
 
+(defconst gnus-summary-menu-maxlen 20)
+
+(defun gnus-summary-menu-split (menu)
+  ;; If we have lots of elements, divide them into groups of 20
+  ;; and make a pane (or submenu) for each one.
+  (if (> (length menu) (/ (* gnus-summary-menu-maxlen 3) 2))
+      (let ((menu menu) sublists next
+	    (i 1))
+	(while menu
+	  ;; Pull off the next gnus-summary-menu-maxlen elements
+	  ;; and make them the next element of sublist.
+	  (setq next (nthcdr gnus-summary-menu-maxlen menu))
+	  (if next
+	      (setcdr (nthcdr (1- gnus-summary-menu-maxlen) menu)
+		      nil))
+	  (setq sublists (cons (cons (format "%s ... %s" (aref (car menu) 0)
+					     (aref (car (last menu)) 0)) menu)
+			       sublists))
+	  (setq i (1+ i))
+	  (setq menu next))
+	(nreverse sublists))
+    ;; Few elements--put them all in one pane.
+    menu))
+
 (defun gnus-summary-make-menu-bar ()
   (gnus-turn-off-edit-menu 'summary)
 
@@ -1990,27 +2014,28 @@ increase the score of each group you read."
 	      ["Show picons in mail headers" gnus-treat-mail-picon t]
 	      ["Show picons in news headers" gnus-treat-newsgroups-picon t]
 	      ("View as different encoding"
-	       ,@(mapcar
-		  (lambda (cs)
-		    ;; Since easymenu under FSF Emacs doesn't allow lambda
-		    ;; forms for menu commands, we should provide intern'ed
-		    ;; function symbols.
-		    (let ((command (intern (format "\
+	       ,@(gnus-summary-menu-split
+		  (mapcar
+		   (lambda (cs)
+		     ;; Since easymenu under FSF Emacs doesn't allow lambda
+		     ;; forms for menu commands, we should provide intern'ed
+		     ;; function symbols.
+		     (let ((command (intern (format "\
 gnus-summary-show-article-from-menu-as-charset-%s" cs))))
-		      (fset command
-			    `(lambda ()
-			       (interactive)
-			       (let ((gnus-summary-show-article-charset-alist
-				      '((1 . ,cs))))
-				 (gnus-summary-show-article 1))))
-		      `[,(symbol-name cs) ,command t]))
-		  (sort (if (fboundp 'coding-system-list)
-			    (coding-system-list)
-			  ;;(mapcar 'car mm-mime-mule-charset-alist)
-			  )
-			(lambda (a b)
-			  (string< (symbol-name a)
-				   (symbol-name b)))))))
+		       (fset command
+			     `(lambda ()
+				(interactive)
+				(let ((gnus-summary-show-article-charset-alist
+				       '((1 . ,cs))))
+				  (gnus-summary-show-article 1))))
+		       `[,(symbol-name cs) ,command t]))
+		   (sort (if (fboundp 'coding-system-list)
+			     (coding-system-list)
+			   ;;(mapcar 'car mm-mime-mule-charset-alist)
+			   )
+			 (lambda (a b)
+			   (string< (symbol-name a)
+				    (symbol-name b))))))))
 	     ("Washing"
 	      ("Remove Blanks"
 	       ["Leading" gnus-article-strip-leading-blank-lines t]
@@ -3656,7 +3681,7 @@ entered.
 Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
   (let* ((id (mail-header-id header))
 	 (id-dep (and id (intern id dependencies)))
-	 ref ref-dep ref-header replaced)
+	 parent-id ref ref-dep ref-header replaced)
     ;; Enter this `header' in the `dependencies' table.
     (cond
      ((not id-dep)
@@ -3699,7 +3724,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
     (when (and header (not replaced))
       ;; First check that we are not creating a References loop.
-      (setq ref (gnus-parent-id (mail-header-references header)))
+      (setq parent-id (gnus-parent-id (mail-header-references header)))
+      (setq ref parent-id)
       (while (and ref
 		  (setq ref-dep (intern-soft ref dependencies))
 		  (boundp ref-dep)
@@ -3709,10 +3735,10 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	    ;; root article.
 	    (progn
 	      (mail-header-set-references (car (symbol-value id-dep)) "none")
-	      (setq ref nil))
+	      (setq ref nil)
+	      (setq parent-id nil))
 	  (setq ref (gnus-parent-id (mail-header-references ref-header)))))
-      (setq ref (gnus-parent-id (mail-header-references header)))
-      (setq ref-dep (intern (or ref "none") dependencies))
+      (setq ref-dep (intern (or parent-id "none") dependencies))
       (if (boundp ref-dep)
 	  (setcdr (symbol-value ref-dep)
 		  (nconc (cdr (symbol-value ref-dep))
@@ -4412,7 +4438,7 @@ or a straight list of headers."
 	(default-score (or gnus-summary-default-score 0))
 	(gnus-visual-p (gnus-visual-p 'summary-highlight 'highlight))
 	thread number subject stack state gnus-tmp-gathered beg-match
-	new-roots gnus-tmp-new-adopts thread-end
+	new-roots gnus-tmp-new-adopts thread-end simp-subject
 	gnus-tmp-header gnus-tmp-unread
 	gnus-tmp-replied gnus-tmp-subject-or-nil
 	gnus-tmp-dummy gnus-tmp-indentation gnus-tmp-lines gnus-tmp-score
@@ -4501,7 +4527,8 @@ or a straight list of headers."
 	      (setq gnus-tmp-level -1)))
 
 	  (setq number (mail-header-number gnus-tmp-header)
-		subject (mail-header-subject gnus-tmp-header))
+		subject (mail-header-subject gnus-tmp-header)
+		simp-subject (gnus-simplify-subject-fully subject))
 
 	  (cond
 	   ;; If the thread has changed subject, we might want to make
@@ -4509,8 +4536,7 @@ or a straight list of headers."
 	   ((and (null gnus-thread-ignore-subject)
 		 (not (zerop gnus-tmp-level))
 		 gnus-tmp-prev-subject
-		 (not (inline
-			(gnus-subject-equal gnus-tmp-prev-subject subject))))
+		 (not (string= gnus-tmp-prev-subject simp-subject)))
 	    (setq new-roots (nconc new-roots (list (car thread)))
 		  thread-end t
 		  gnus-tmp-header nil))
@@ -4571,15 +4597,13 @@ or a straight list of headers."
 	     (cond
 	      ((and gnus-thread-ignore-subject
 		    gnus-tmp-prev-subject
-		    (not (inline (gnus-subject-equal
-				  gnus-tmp-prev-subject subject))))
+		    (not (string= gnus-tmp-prev-subject simp-subject)))
 	       subject)
 	      ((zerop gnus-tmp-level)
 	       (if (and (eq gnus-summary-make-false-root 'empty)
 			(memq number gnus-tmp-gathered)
 			gnus-tmp-prev-subject
-			(inline (gnus-subject-equal
-				 gnus-tmp-prev-subject subject)))
+			(string= gnus-tmp-prev-subject simp-subject))
 		   gnus-summary-same-subject
 		 subject))
 	      (t gnus-summary-same-subject)))
@@ -4664,7 +4688,7 @@ or a straight list of headers."
 	      (gnus-run-hooks 'gnus-summary-update-hook)
 	      (forward-line 1))
 
-	    (setq gnus-tmp-prev-subject subject)))
+	    (setq gnus-tmp-prev-subject simp-subject)))
 
 	(when (nth 1 thread)
 	  (push (list (max 0 gnus-tmp-level)
