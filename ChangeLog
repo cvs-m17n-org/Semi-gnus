@@ -1,5 +1,13 @@
 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* texi/Makefile.in (.texi:): Don't escape double quote.
+
+1998-11-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* texi/gnus-ja.texi: Add infos about `pop3-fma' and `gnus-offline'.
+
+1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-maybe-split-and-send-mail): Use
 	`defsubst' instead of `defun'.
 	(message-maybe-split-and-send-news): Ditto.
