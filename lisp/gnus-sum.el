@@ -771,6 +771,9 @@ automatically when it is selected."
      . gnus-summary-high-unread-face)
     ((and (< score default) (= mark gnus-unread-mark))
      . gnus-summary-low-unread-face)
+    ((and (memq article gnus-newsgroup-incorporated) 
+	  (= mark gnus-unread-mark))
+     . gnus-summary-incorporated-face)
     ((= mark gnus-unread-mark)
      . gnus-summary-normal-unread-face)
     ((and (> score default) (memq mark (list gnus-downloadable-mark
@@ -1053,6 +1056,9 @@ variable (string, integer, character, etc).")
 (defvar gnus-newsgroup-scored nil
   "List of scored articles in the current newsgroup.")
 
+(defvar gnus-newsgroup-incorporated nil
+  "List of incorporated articles in the current newsgroup.")
+
 (defvar gnus-newsgroup-headers nil
   "List of article headers in the current newsgroup.")
 
@@ -1108,7 +1114,8 @@ variable (string, integer, character, etc).")
     gnus-cache-removable-articles gnus-newsgroup-cached
     gnus-newsgroup-data gnus-newsgroup-data-reverse
     gnus-newsgroup-limit gnus-newsgroup-limits
-    gnus-newsgroup-charset)
+    gnus-newsgroup-charset
+    gnus-newsgroup-incorporated)
   "Variables that are buffer-local to the summary buffers.")
 
 ;; Byte-compiler warning.
@@ -2021,6 +2028,9 @@ The following commands are available:
   (gnus-summary-set-display-table)
   (gnus-set-default-directory)
   (setq gnus-newsgroup-name group)
+  (setq gnus-newsgroup-incorporated
+	(unless (gnus-news-group-p group)
+	  (nnmail-new-mail-numbers (gnus-group-real-name group))))
   (make-local-variable 'gnus-summary-line-format)
   (make-local-variable 'gnus-summary-line-format-spec)
   (make-local-variable 'gnus-summary-dummy-line-format)
