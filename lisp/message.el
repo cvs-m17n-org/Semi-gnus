@@ -1543,7 +1543,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   "Move point to the end of the headers."
   (interactive)
   (message-goto-body)
-  (forward-line -2))
+  (forward-line -1))
 
 (defun message-goto-signature ()
   "Move point to the beginning of the message signature.
