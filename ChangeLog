@@ -1,3 +1,7 @@
+1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el: Replace line endings from `CRLF' to `LF'.
+
 1999-01-21  Hiroaki Matsui <matu@uxd.fc.nec.co.jp>
 
 	* lisp/message.el : Fix typo.
