@@ -1858,6 +1858,18 @@ Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
   :group 'gnus-agent
   :type 'boolean)
 
+(defcustom gnus-other-frame-parameters nil
+  "Frame parameters used by `gnus-other-frame' to create a Gnus frame.
+This should be an alist for FSF Emacs, or a plist for XEmacs."
+  :group 'gnus-start
+  :type (if (featurep 'xemacs)
+	    '(repeat (list :inline t :format "%v"
+			   (symbol :tag "Property")
+			   (sexp :tag "Value")))
+	  '(repeat (cons :format "%v"
+			 (symbol :tag "Parameter")
+			 (sexp :tag "Value")))))
+
 
 ;;; Internal variables
 
@@ -2071,6 +2083,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-invalid-group-regexp "[: `'\"/]\\|^$"
   "Regexp matching invalid groups.")
+
+(defvar gnus-other-frame-object nil
+  "A frame object which will be created by `gnus-other-frame'.")
 
 ;;; End of variables.
 
@@ -3462,27 +3477,31 @@ the variable `toolbar-news-frame-plist' will be refered instead."
 (defun gnus-other-frame (&optional arg)
   "Pop up a frame to read news."
   (interactive "P")
-  (static-if (featurep 'xemacs)
-      (let ((toolbar-news-use-separate-frame t))
-	(toolbar-gnus))
-    (if (frame-live-p gnus-frame)
-	(raise-frame gnus-frame)
-      (setq gnus-frame (make-frame gnus-frame-properties))
-      (if (and (gnus-buffer-live-p gnus-group-buffer)
-	       (save-current-buffer
-		 (set-buffer gnus-group-buffer)
-		 (eq 'gnus-group-mode major-mode)))
-	  (progn
-	    (select-frame gnus-frame)
-	    (switch-to-buffer gnus-group-buffer))
-	(add-hook 'gnus-exit-gnus-hook
-		  (lambda ()
-		    (when (and (frame-live-p gnus-frame)
-			       (cdr (frame-list)))
-		      (delete-frame gnus-frame))
-		    (setq gnus-frame nil)))
-	(select-frame gnus-frame)
-	(gnus arg)))))
+  (let ((alive (gnus-alive-p)))
+    (or (and alive
+	     (catch 'found
+	       (walk-windows
+		(lambda (window)
+		  (when (with-current-buffer (window-buffer window)
+			  (string-match "\\`gnus-.+-mode\\'"
+					(symbol-name major-mode)))
+		    (gnus-select-frame-set-input-focus
+		     (setq gnus-other-frame-object (window-frame window)))
+		    (select-window window)
+		    (throw 'found t)))
+		'ignore t)))
+	(gnus-select-frame-set-input-focus
+	 (setq gnus-other-frame-object
+	       (make-frame gnus-other-frame-parameters)))
+	(if alive
+	    (switch-to-buffer gnus-group-buffer)
+	  (gnus arg)
+	  (add-hook 'gnus-exit-gnus-hook
+		    (lambda nil
+		      (when (and (frame-live-p gnus-other-frame-object)
+				 (cdr (frame-list)))
+			(delete-frame gnus-other-frame-object))
+		      (setq gnus-other-frame-object nil)))))))
 
 ;;;###autoload
 (defun gnus (&optional arg dont-connect slave)
