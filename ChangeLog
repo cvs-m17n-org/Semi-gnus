@@ -1,5 +1,12 @@
 2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* lisp/nnshimbun.el: Add `CNET Japan' support.
+	(nnshimbun-make-date-string): New function.
+	(nnshimbun-asahi-get-headers): Use nnshimbun-make-date-string.
+	(nnshimbun-sponichi-get-headers): Ditto.
+
+2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
 	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Add argument to
 	ignore w3's cache.
 

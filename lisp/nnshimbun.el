@@ -63,6 +63,13 @@
      (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov  . nnshimbun-sponichi-generate-nov-database)
      (make-contents . nnshimbun-sponichi-make-contents))
+    (cnet
+     (address . "cnet")
+     (url . "http://cnet.sphere.ne.jp/")
+     (groups "comp")
+     (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (generate-nov  . nnshimbun-cnet-generate-nov-database)
+     (make-contents . nnshimbun-cnet-make-contents))
     ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
@@ -473,6 +480,15 @@
     (+ (* (- (car now) (car time)) 65536)
        (- (nth 1 now) (nth 1 time)))))
 
+(defun nnshimbun-make-date-string (year month day &optional time)
+  (format "%02d %s %04d %s +0900"
+	  day
+	  (aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
+		     "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
+		month)
+	  year
+	  (or time "00:00")))
+
 
 ;; Fast fill-region function
 
@@ -557,20 +573,16 @@
 			(re-search-forward
 			 "^\\[\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\)\\]"
 			 nil t))
-	      (let ((month (string-to-number (match-string 1)))
-		    (date (decode-time (current-time))))
+	      (let ((date (decode-time (current-time))))
 		(mail-header-set-date
 		 (nth i headers)
-		 (format "%02d %s %d %s +0900"
-			 (string-to-number (match-string 2));; day
-			 (aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
-				    "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
-			       month)
-			 (if (and (eq 12 month) (eq 1 (nth 4 date)))
-			     (1- (nth 5 date))
-			   (nth 5 date))
-			 (match-string 3);; MM:SS
-			 )))
+		 (nnshimbun-make-date-string
+		  (if (and (eq 12 month) (eq 1 (nth 4 date)))
+		      (1- (nth 5 date))
+		    (nth 5 date))
+		  (string-to-number (match-string 1))
+		  (string-to-number (match-string 2))
+		  (match-string 3))))
 	      (setq i (1+ i))))
 	  (nreverse headers))))))
 
@@ -641,12 +653,10 @@
 			      (match-string 5)
 			      (match-string 6)
 			      group))
-		  (date (format "%02d %s %s 00:00 +0900"
-				(string-to-number (match-string 5));; day
-				(aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
-					   "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
-				      (string-to-number (match-string 4)));; month
-				(match-string 3))));; year
+		  (date (nnshimbun-make-date-string
+			 (string-to-number (match-string 3))
+			 (string-to-number (match-string 4))
+			 (string-to-number (match-string 5)))))
 	      (push (make-full-mail-header
 		     0
 		     (nnshimbun-mime-encode-string
@@ -699,6 +709,65 @@
     (nnshimbun-insert-header header)
     (insert "Content-Type: " (if html "text/html" "text/plain")
 	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (encode-coding-string (buffer-string)
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+
+
+
+;;; CNET Japan
+
+(defun nnshimbun-cnet-get-headers (group)
+  (save-excursion
+    (set-buffer nnshimbun-buffer)
+    (erase-buffer)
+    (nnshimbun-retrieve-url (format "%s/News/Oneweek/" nnshimbun-url) t)
+    (goto-char (point-min))
+    (let (headers)
+      (while (search-forward "\n<!--*****見出し*****-->\n" nil t)
+	(let ((subject (buffer-substring (point) (gnus-point-at-eol)))
+	      (point (point)))
+	  (forward-line -2)
+	  (when (looking-at "<a href=\"/\\(News/\\([0-9][0-9][0-9][0-9]\\)/Item/\\([0-9][0-9]\\([0-9][0-9]\\)\\([0-9][0-9]\\)-[0-9]+\\).html\\)\">")
+	    (let ((url (match-string 1))
+		  (id  (format "<%s%s%%%s>" (match-string 2) (match-string 3) group))
+		  (date (nnshimbun-make-date-string
+			 (string-to-number (match-string 2))
+			 (string-to-number (match-string 4))
+			 (string-to-number (match-string 5)))))
+	      (push (make-full-mail-header
+		     0
+		     (nnshimbun-mime-encode-string subject)
+		     "cnet@sphere.ad.jp"
+		     date id "" 0 0 (concat nnshimbun-url url))
+		    headers)))
+	  (goto-char point)))
+      headers)))
+
+(defun nnshimbun-cnet-generate-nov-database (group)
+  (save-excursion
+    (set-buffer (nnshimbun-open-nov group))
+    (let (i)
+      (goto-char (point-max))
+      (forward-line -1)
+      (setq i (or (ignore-errors (read (current-buffer))) 0))
+      (goto-char (point-max))
+      (dolist (header (nnshimbun-cnet-get-headers group))
+	(unless (nnshimbun-search-id group (mail-header-id header))
+	  (mail-header-set-number header (setq i (1+ i)))
+	  (nnheader-insert-nov header))))))
+
+(defun nnshimbun-cnet-make-contents (header)
+  (goto-char (point-min))
+  (let (start)
+    (when (and (search-forward "\n<!--KIJI-->\n" nil t)
+	       (setq start (point))
+	       (search-forward "\n<!--/KIJI-->\n" nil t))
+      (delete-region (point-min) start)
+      (forward-line -2)
+      (delete-region (point) (point-max)))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
