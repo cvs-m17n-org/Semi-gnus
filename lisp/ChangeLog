@@ -1,3 +1,31 @@
+2002-09-23  Kai Gro,b_(Bjohann  <grossjoh@ls6.informatik.uni-dortmund.de>
+
+	* gnus-art.el (gnus-button-guessed-mid-regexp): Improved regexp.
+	(gnus-button-alist): Improved regexp for
+	gnus-button-handle-mid-or-mail (false positives), fixed
+	gnus-button-handle-man entries.
+	From Reiner Steib.
+
+2002-09-23  Paul Jarc  <prj@po.cwru.edu>
+	From Josh Huber.
+
+	* nnmaildir.el (nnmaildir--update-nov): fix wrong-type error when
+	nnmail-extra-headers is non-nil.
+
+2002-09-23  Paul Jarc  <prj@po.cwru.edu>
+
+	* nnmaildir.el: Store article numbers persistently.  General
+	revision.
+	(nnmaildir-request-expire-articles): handle 'immediate and 'never
+	for nnmail-expiry-wait; delete instead of moving if 'force is
+	given.
+
+2002-09-23  Simon Josefsson  <jas@extundo.com>
+	Trivial fix from beaker@iavmb.pl (Krzysztof J,Bj(Bdruczyk).
+
+	* smime.el (smime-sign-buffer): Get key and extra certs.
+	(smime-get-key-with-certs-by-email): Utility function.  
+
 2002-09-21  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	Trivial patch from Micha Wiedenmann <mw-u1@gmx.de>
 
