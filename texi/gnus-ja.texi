@@ -9942,13 +9942,15 @@ Gnus がどれかのサーバーから接続拒否を受けたかどうかの全ての印を消去しま
 ファイルは一つ以上の行を含み、それぞれは一つのサーバーを定義します。
 
 @item
-それぞれの行は任意の数の 区切り印/値 の対を含む事ができます。有効な区切
-り印は @samp{machine}, @samp{login}, @samp{password}, @samp{default}, @samp{port}, @samp{force} で
-す。(最後のものは有効な @code{.netrc}/@code{ftp} の区切り印ではありませ
-ん。これがファイル @file{.authinfo} が @file{.netrc} ファイル様式から逸
-れるほとんど唯一の方法です。)
-
+それぞれの行は任意の数の 区切り印/値 の対を含む事ができます。
 @end enumerate
+
+有効な区切り印は @samp{machine}, @samp{login}, @samp{password},
+@samp{default} です。gnus は @file{.netrc}/@code{ftp} の構文の原型には現
+れない二つの新しい区切り印、名付けて @samp{port} と @samp{force} を導入
+します。(これが @file{.authinfo} ファイルの様式が @file{.netrc} ファイル
+の様式から逸れる唯一の方法です。) @samp{port} はサーバーのどのポートを認
+証に用いるかを示し、@samp{force} は以下で説明します。
 
 これがそのファイルの例です:
 
