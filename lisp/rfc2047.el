@@ -1,5 +1,5 @@
 ;;; rfc2047.el --- Functions for encoding and decoding rfc2047 messages
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -46,7 +46,7 @@ The values can be:
 
 1) nil, in which case no encoding is done;
 2) `mime', in which case the header will be encoded according to RFC2047;
-3) a charset, in which case it will be encoded as that charse;
+3) a charset, in which case it will be encoded as that charset;
 4) `default', in which case the field will be encoded as the rest
    of the article.")
 
@@ -105,33 +105,31 @@ Valid encodings are nil, `Q' and `B'.")
   "Encode the message header according to `rfc2047-header-encoding-alist'.
 Should be called narrowed to the head of the message."
   (interactive "*")
-  (when (featurep 'mule)
-    (save-excursion
-      (goto-char (point-min))
-      (let ((alist rfc2047-header-encoding-alist)
-	    elem method)
-	(while (not (eobp))
-	  (save-restriction
-	    (rfc2047-narrow-to-field)
-	    (when (rfc2047-encodable-p)
-	      ;; We found something that may perhaps be encoded.
-	      (while (setq elem (pop alist))
-		(when (or (and (stringp (car elem))
-			       (looking-at (car elem)))
-			  (eq (car elem) t))
-		  (setq alist nil
-			method (cdr elem))))
-	      (when method
-		(cond
-		 ((eq method 'mime)
-		  (rfc2047-encode-region (point-min) (point-max))
-		  (rfc2047-fold-region (point-min) (point-max)))
-		 ;; Hm.
-		 (t))))
-	    (goto-char (point-max)))))
-      (when mail-parse-charset
-	(encode-coding-region (point-min) (point-max)
-			      mail-parse-charset)))))
+  (save-excursion
+    (goto-char (point-min))
+    (let ((alist rfc2047-header-encoding-alist)
+	  elem method)
+      (while (not (eobp))
+	(save-restriction
+	  (rfc2047-narrow-to-field)
+	  (when (rfc2047-encodable-p)
+	    ;; We found something that may perhaps be encoded.
+	    (while (setq elem (pop alist))
+	      (when (or (and (stringp (car elem))
+			     (looking-at (car elem)))
+			(eq (car elem) t))
+		(setq alist nil
+		      method (cdr elem))))
+	    (cond
+	     ((eq method 'mime)
+	      (rfc2047-encode-region (point-min) (point-max))
+	      (rfc2047-fold-region (point-min) (point-max)))
+	     ;; Hm.
+	     (t)))
+	  (goto-char (point-max)))))
+    (when mail-parse-charset
+      (encode-coding-region
+       (point-min) (point-max) mail-parse-charset))))
 
 (defun rfc2047-encodable-p (&optional header)
   "Say whether the current (narrowed) buffer contains characters that need encoding in headers."
@@ -268,7 +266,8 @@ Should be called narrowed to the head of the message."
 	 ((and (not break)
 	       (looking-at "=\\?"))
 	  (setq break (point)))
-	 ((and (looking-at "\\?=")
+	 ((and break
+	       (looking-at "\\?=")
 	       (> (- (point) (save-excursion (beginning-of-line) (point))) 76))
 	  (goto-char break)
 	  (setq break nil)

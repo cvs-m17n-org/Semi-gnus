@@ -1,5 +1,6 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -165,6 +166,13 @@ Eg.:
   :group 'nnmail-expire
   :type '(choice (const :tag "nnmail-expiry-wait" nil)
 		 (function :format "%v" nnmail-)))
+
+(defcustom nnmail-expiry-target 'delete
+  "*Variable that says where expired messages should end up."
+    :group 'nnmail-expire
+    :type '(choice (const delete)
+		   (function :format "%v" nnmail-)
+		   string))
 
 (defcustom nnmail-cache-accepted-message-ids nil
   "If non-nil, put Message-IDs of Gcc'd articles into the duplicate cache."
@@ -469,32 +477,50 @@ Symbols must be catitalized."
 		  ?. ?_))
      (setq group (nnheader-translate-file-chars group))
      ;; If this directory exists, we use it directly.
-     (if (or nnmail-use-long-file-names
-	     (file-directory-p (concat dir group)))
-	 (concat dir group "/")
-       ;; If not, we translate dots into slashes.
-       (concat dir
-	       (mm-encode-coding-string
-		(nnheader-replace-chars-in-string group ?. ?/)
-		nnmail-pathname-coding-system)
-	       "/")))
+     (file-name-as-directory
+      (if (or nnmail-use-long-file-names
+	      (file-directory-p (concat dir group)))
+	  (expand-file-name group dir)
+	;; If not, we translate dots into slashes.
+	(expand-file-name
+	 (mm-encode-coding-string
+	  (nnheader-replace-chars-in-string group ?. ?/)
+	  nnmail-pathname-coding-system)
+	 dir))))
    (or file "")))
 
 (defun nnmail-get-active ()
   "Returns an assoc of group names and active ranges.
 nn*-request-list should have been called before calling this function."
-  (let (group-assoc)
-    ;; Go through all groups from the active list.
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (goto-char (point-min))
-      (while (re-search-forward
-	      "^\\([^ \t]+\\)[ \t]+\\([0-9]+\\)[ \t]+\\([0-9]+\\)" nil t)
-	;; We create an alist with `(GROUP (LOW . HIGH))' elements.
-	(push (list (match-string 1)
-		    (cons (string-to-int (match-string 3))
-			  (string-to-int (match-string 2))))
-	      group-assoc)))
+  ;; Go through all groups from the active list.
+  (save-excursion
+    (set-buffer nntp-server-buffer)
+    (nnmail-parse-active)))
+
+(defun nnmail-parse-active ()
+  "Parse the active file in the current buffer and return an alist."
+  (goto-char (point-min))
+  (unless (re-search-forward "[\\\"]" nil t)
+    (goto-char (point-max))
+    (while (re-search-backward "[][';?()#]" nil t)
+      (insert ?\\)))
+  (goto-char (point-min))
+  (let ((buffer (current-buffer))
+	group-assoc group max min)
+    (while (not (eobp))
+      (condition-case err
+	  (progn
+	    (narrow-to-region (point) (gnus-point-at-eol))
+	    (setq group (read buffer))
+	    (unless (stringp group)
+	      (setq group (symbol-name group)))
+	    (if (and (numberp (setq max (read nntp-server-buffer)))
+		     (numberp (setq min (read nntp-server-buffer))))
+		(push (list group (cons min max))
+		      group-assoc)))
+	(error nil))
+      (widen)
+      (forward-line 1))
     group-assoc))
 
 (defvar nnmail-active-file-coding-system 'raw-text
@@ -512,8 +538,11 @@ nn*-request-list should have been called before calling this function."
   (erase-buffer)
   (let (group)
     (while (setq group (pop alist))
-      (insert (format "%s %d %d y\n" (car group) (cdadr group)
-		      (caadr group))))))
+      (insert (format "%S %d %d y\n" (intern (car group)) (cdadr group)
+		      (caadr group))))
+    (goto-char (point-max))
+    (while (search-backward "\\." nil t)
+      (delete-char 1))))
 
 (defun nnmail-get-split-group (file source)
   "Find out whether this FILE is to be split into GROUP only.
@@ -1067,7 +1096,10 @@ Return the number of characters in the body."
     (goto-char (point-min))
     (when (re-search-forward "^References:" nil t)
       (beginning-of-line)
-      (insert "X-Gnus-Broken-Eudora-"))))
+      (insert "X-Gnus-Broken-Eudora-"))
+    (goto-char (point-min))
+    (when (re-search-forward "^In-Reply-To:[^\n]+\\(\n[ \t]+\\)" nil t)
+      (replace-match "" t t nil 1))))
 
 (custom-add-option 'nnmail-prepare-incoming-header-hook
 		   'nnmail-fix-eudora-headers)
@@ -1310,14 +1342,84 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       (setq nnmail-cache-buffer nil)
       (kill-buffer (current-buffer)))))
 
+;; Compiler directives.
+(defvar group)
+(defvar group-art-list)
+(defvar group-art)
 (defun nnmail-cache-insert (id)
   (when nnmail-treat-duplicates
-    (unless (gnus-buffer-live-p nnmail-cache-buffer)
-      (nnmail-cache-open))
+    ;; Store some information about the group this message is written
+    ;; to.  This function might have been called from various places.
+    ;; Sometimes, a function up in the calling sequence has an
+    ;; argument GROUP which is bound to a string, the group name.  At
+    ;; other times, there is a function up in the calling sequence
+    ;; which has an argument GROUP-ART which is a list of pairs, and
+    ;; the car of a pair is a group name.  Should we check that the
+    ;; length of the list is equal to 1? -- kai
+    (let ((g nil))
+      (cond ((and (boundp 'group) group)
+             (setq g group))
+            ((and (boundp 'group-art-list) group-art-list
+                  (listp group-art-list))
+             (setq g (caar group-art-list)))
+            ((and (boundp 'group-art) group-art (listp group-art))
+             (setq g (caar group-art)))
+            (t (setq g "")))
+      (unless (gnus-buffer-live-p nnmail-cache-buffer)
+        (nnmail-cache-open))
+      (save-excursion
+        (set-buffer nnmail-cache-buffer)
+        (goto-char (point-max))
+        (if (and g (not (string= "" g))
+                 (gnus-methods-equal-p gnus-command-method
+                                       (nnmail-cache-primary-mail-backend)))
+            (insert id "\t" g "\n")
+          (insert id "\n"))))))
+
+(defun nnmail-cache-primary-mail-backend ()
+  (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
+        (be nil)
+        (res nil))
+    (while (and (null res) be-list)
+      (setq be (car be-list))
+      (setq be-list (cdr be-list))
+      (when (and (gnus-method-option-p be 'respool)
+                 (eval (intern (format "%s-get-new-mail" (car be)))))
+        (setq res be)))
+    res))
+
+;; Fetch the group name corresponding to the message id stored in the
+;; cache.
+(defun nnmail-cache-fetch-group (id)
+  (when (and nnmail-treat-duplicates nnmail-cache-buffer)
     (save-excursion
       (set-buffer nnmail-cache-buffer)
       (goto-char (point-max))
-      (insert id "\n"))))
+      (when (search-backward id nil t)
+        (beginning-of-line)
+        (skip-chars-forward "^\n\r\t")
+        (unless (eolp)
+          (forward-char 1)
+          (buffer-substring (point)
+                            (progn (end-of-line) (point))))))))
+
+;; Function for nnmail-split-fancy: look up all references in the
+;; cache and if a match is found, return that group.
+(defun nnmail-split-fancy-with-parent ()
+  (let* ((refstr (or (message-fetch-field "references")
+                     (message-fetch-field "in-reply-to")))
+         (references nil)
+         (res nil))
+    (when refstr
+      (setq references (nreverse (gnus-split-references refstr)))
+      (unless (gnus-buffer-live-p nnmail-cache-buffer)
+        (nnmail-cache-open))
+      (mapcar (lambda (x)
+                (setq res (or (nnmail-cache-fetch-group x) res))
+                (when (string= "drafts" res)
+                  (setq res nil)))
+              references)
+      res)))
 
 (defun nnmail-cache-id-exists-p (id)
   (when nnmail-treat-duplicates
@@ -1498,6 +1600,12 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	     ;; Compare the time with the current time.
 	     (ignore-errors (time-less-p days (time-since time))))))))
 
+(defun nnmail-expiry-target-group (target group)
+  (when (nnheader-functionp target)
+    (setq target (funcall target group)))
+  (unless (eq target 'delete)
+    (gnus-request-accept-article target)))
+
 (defun nnmail-check-syntax ()
   "Check (and modify) the syntax of the message in the current buffer."
   (save-restriction
@@ -1578,6 +1686,8 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
   (unless nnmail-split-history
     (error "No current split history"))
   (with-output-to-temp-buffer "*nnmail split history*"
+    (with-current-buffer standard-output
+      (fundamental-mode))		; for Emacs 20.4+
     (let ((history nnmail-split-history)
 	  elem)
       (while (setq elem (pop history))

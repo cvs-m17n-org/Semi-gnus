@@ -1,6 +1,75 @@
+2000-04-24 17:09:17  Felix Natter  <f.natter@ndh.net>
+
+	* gnusref.tex: New version.
+
+	* refcard.tex: New version.
+
+2000-04-23 00:32:23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Thread Commands): Add keystrokes.
+	(Various Summary Stuff): Addition.
+
+2000-04-22 21:12:25  Alan Shutko  <ats@acm.org>
+
+	* Makefile.in: Add pdf support.
+
+2000-04-21 12:07:20  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Listing Groups): Addition.
+
+2000-04-21 13:45:52  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi (Mail Source Specifiers): Example for :plugged.
+
+2000-04-20 20:37:48  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi (Limiting): Fix.
+
+2000-04-20 20:32:40  Dmitry Yaitskov  <dimas@home.com>
+
+	* gnus.texi (Charsets): Typo fix.
+
+2000-03-19  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (IMAP): Addition.
+
+2000-03-13 17:44:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Process/Prefix): Addition.
+
+2000-02-04  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (IMAP): Fix.
+
+2000-01-27 18:06:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Remember): Addition.
+
+2000-01-21  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (Splitting in IMAP): Addition.
+	(Mail Source Specifiers): Add fetchflag setting in example.
+
+2000-01-08 08:10:04  Martin Bialasinski  <agr30+news@uni-koeln.de>
+
+	* gnus.texi (Mail and Post): Example.
+
+2000-01-08 07:46:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Customizing w3): New.
+
+2000-01-08 07:46:06  Hamish Macdonald  <hamishm@lucent.com>
+
+	* gnus.texi (Customizing w3): Example.
+
+2000-01-06 17:55:28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Charsets): Addition.
+
 2000-01-05 15:58:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Mail Group Commands): Addition.
+	(Top): Added detailmenu.
 
 2000-01-03 01:31:02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 

@@ -1,5 +1,5 @@
 ;;; mm-bodies.el --- Functions for decoding MIME things
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -39,9 +39,18 @@
 ;; BS, vertical TAB, form feed, and ^_
 (defvar mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f")
 
-(defvar mm-body-charset-encoding-alist nil
+(defcustom mm-body-charset-encoding-alist
+  '((iso-2022-jp . 7bit)
+    (iso-2022-jp-2 . 7bit))
   "Alist of MIME charsets to encodings.
-Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'.")
+Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'."
+  :type '(repeat (cons (symbol :tag "charset")
+		       (choice :tag "encoding"
+			       (const 7bit)
+			       (const 8bit)
+			       (const quoted-printable)
+			       (const base64))))
+  :group 'mime)
 
 (defun mm-encode-body ()
   "Encode a body.
@@ -151,15 +160,21 @@ If no encoding was done, nil is returned."
 	   ((eq encoding 'quoted-printable)
 	    (quoted-printable-decode-region (point-min) (point-max)))
 	   ((eq encoding 'base64)
-	    (base64-decode-region (point-min)
-				  ;; Some mailers insert whitespace
-				  ;; junk at the end which
-				  ;; base64-decode-region dislikes.
-				  (save-excursion
-				    (goto-char (point-max))
-				    (skip-chars-backward "\n\t ")
-				    (delete-region (point) (point-max))
-				    (point))))
+	    (base64-decode-region
+	     (point-min)
+	     ;; Some mailers insert whitespace
+	     ;; junk at the end which
+	     ;; base64-decode-region dislikes.
+	     ;; Also remove possible junk which could
+	     ;; have been added by mailing list software.
+	     (save-excursion
+	       (goto-char (point-min))
+	       (if (re-search-forward "^[\t ]*$" nil t)
+		   (delete-region (point) (point-max))
+		 (goto-char (point-max)))
+	       (skip-chars-backward "\n\t ")
+	       (delete-region (point) (point-max))
+	       (point))))
 	   ((memq encoding '(7bit 8bit binary))
 	    ;; Do nothing.
 	    )

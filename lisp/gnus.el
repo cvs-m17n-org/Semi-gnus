@@ -1,5 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
+;;        1997, 1998, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -261,7 +263,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-original-version-number "5.8.3"
+(defconst gnus-original-version-number "5.8.5"
   "Version number for this version of original Gnus.")
 
 (defconst gnus-original-version
@@ -1644,17 +1646,16 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	    (when (consp function)
 	      (setq keymap (car (memq 'keymap function)))
 	      (setq function (car function)))
-	    (autoload function (car package) nil interactive keymap)))
+	    (unless (fboundp function)
+	      (autoload function (car package) nil interactive keymap))))
 	(if (eq (nth 1 package) ':interactive)
-	    (cdddr package)
+	    (nthcdr 3 package)
 	  (cdr package)))))
-   '(("metamail" metamail-buffer)
-     ("info" Info-goto-node)
+   '(("info" :interactive t Info-goto-node)
      ("pp" pp pp-to-string pp-eval-expression)
      ("qp" quoted-printable-decode-region quoted-printable-decode-string)
      ("ps-print" ps-print-preprint)
-     ("mail-extr" mail-extract-address-components)
-     ("browse-url" browse-url)
+     ("browse-url" :interactive t browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
      ("babel" babel-as-string)
@@ -1698,7 +1699,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-cache-possibly-remove-articles gnus-cache-request-article
       gnus-cache-retrieve-headers gnus-cache-possibly-alter-active
       gnus-cache-enter-remove-article gnus-cached-article-p
-      gnus-cache-open gnus-cache-close gnus-cache-update-article)
+      gnus-cache-open gnus-cache-close gnus-cache-update-article
+      gnus-cache-articles-in-group)
      ("gnus-cache" :interactive t gnus-jog-cache gnus-cache-enter-article
       gnus-cache-remove-article gnus-summary-insert-cached-articles)
      ("gnus-score" :interactive t
@@ -2891,10 +2893,13 @@ As opposed to `gnus', this command will not connect to the local server."
   (let ((window (get-buffer-window gnus-group-buffer)))
     (cond (window
 	   (select-frame (window-frame window)))
-	  (t
-	   (other-frame 1))))
+ 	  (t
+ 	   (select-frame (make-frame)))))
   (gnus arg))
 
+;;(setq thing ?				; this is a comment
+;;      more 'yes)
+    
 ;;;###autoload
 (defun gnus (&optional arg dont-connect slave)
   "Read network news.

@@ -1,5 +1,6 @@
 ;;; nnfolder.el --- mail folder access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Scott Byer <byer@mv.us.adobe.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -746,7 +747,7 @@ deleted.  Point is left where the deleted region was."
 	    buffer
 	  (push (list group buffer) nnfolder-buffer-alist)
 	  (set-buffer-modified-p t)
-	  (save-buffer))
+	  (nnfolder-save-buffer))
       ;; Parse the damn thing.
       (save-excursion
 	(goto-char (point-min))

@@ -1,6 +1,6 @@
 ;;; parse-time.el --- Parsing time strings
 
-;; Copyright (C) 1996 by Free Software Foundation, Inc.
+;; Copyright (C) 1996,2000 by Free Software Foundation, Inc.
 
 ;; Author: Erik Naggum <erik@arcana.naggum.no>
 ;; Keywords: util
@@ -167,7 +167,7 @@
 			(= (length elt) 7)
 			(= (aref elt 1) ?:)))
      [0 1] [2 4] [5 7])
-    ((5) (50 99) ,#'(lambda () (+ 1900 elt)))
+    ((5) (50 110) ,#'(lambda () (+ 1900 elt)))
     ((5) (0 49) ,#'(lambda () (+ 2000 elt))))
   "(slots predicate extractor...)")
 

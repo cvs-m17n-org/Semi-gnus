@@ -1,5 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
-;; Copyright (C) 198,995,86,87,93,94,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -369,12 +370,11 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   "k" gnus-summary-kill-process-mark
   "y" gnus-summary-yank-process-mark
   "w" gnus-summary-save-process-mark
-  "i" gnus-uu-invert-processable
-  "m" gnus-summary-save-parts)
+  "i" gnus-uu-invert-processable)
 
 (gnus-define-keys (gnus-uu-extract-map "X" gnus-summary-mode-map)
   ;;"x" gnus-uu-extract-any
-  ;;"m" gnus-uu-extract-mime
+  "m" gnus-summary-save-parts
   "u" gnus-uu-decode-uu
   "U" gnus-uu-decode-uu-and-save
   "s" gnus-uu-decode-unshar

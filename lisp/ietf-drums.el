@@ -1,5 +1,6 @@
 ;;; ietf-drums.el --- Functions for parsing RFC822bis headers
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -115,7 +116,7 @@
       (buffer-string))))
 
 (defun ietf-drums-remove-whitespace (string)
-  "Remove comments from STRING."
+  "Remove whitespace from STRING."
   (with-temp-buffer
     (ietf-drums-init string)
     (let (c)
@@ -150,6 +151,10 @@
 	 (t
 	  (forward-char 1))))
       result)))
+
+(defun ietf-drums-strip (string)
+  "Remove comments and whitespace from STRING."
+  (ietf-drums-remove-whitespace (ietf-drums-remove-comments string)))
 
 (defun ietf-drums-parse-address (string)
   "Parse STRING and return a MAILBOX / DISPLAY-NAME pair."

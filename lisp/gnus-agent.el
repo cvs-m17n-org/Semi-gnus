@@ -1,5 +1,5 @@
 ;;; gnus-agent.el --- unplugged support for Gnus
-;; Copyright (C) 1997,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -611,7 +611,9 @@ the actual number of articles toggled is returned."
        new))
     (gnus-make-directory (file-name-directory file))
     (let ((coding-system-for-write gnus-agent-file-coding-system))
-      (gnus-write-active-file file orig))))
+      ;; The hashtable contains real names of groups,  no more prefix
+      ;; removing, so set `full' to `t'.
+      (gnus-write-active-file file orig t))))
 
 (defun gnus-agent-save-groups (method)
   (gnus-agent-save-active-1 method 'gnus-groups-to-gnus-format))
@@ -619,7 +621,8 @@ the actual number of articles toggled is returned."
 (defun gnus-agent-save-group-info (method group active)
   (when (gnus-agent-method-p method)
     (let* ((gnus-command-method method)
-	   (file (gnus-agent-lib-file "active")))
+	   (file (gnus-agent-lib-file "active"))
+	   oactive)
       (gnus-make-directory (file-name-directory file))
       (with-temp-file file
 	(when (file-exists-p file)
@@ -627,9 +630,17 @@ the actual number of articles toggled is returned."
 	(goto-char (point-min))
 	(when (re-search-forward
 	       (concat "^" (regexp-quote group) " ") nil t)
+	  (save-excursion
+	    (save-restriction
+	      (narrow-to-region (match-beginning 0)
+				(progn
+				  (forward-line 1)
+				  (point)))
+	      (setq oactive (car (nnmail-parse-active)))))
 	  (gnus-delete-line))
-	(insert (format "%S %d %d y\n" (intern group) (cdr active)
-			(car active)))
+	(insert (format "%S %d %d y\n" (intern group)
+			(cdr active)
+			(or (car oactive) (car active))))
 	(goto-char (point-max))
 	(while (search-backward "\\." nil t)
 	  (delete-char 1))))))
@@ -851,12 +862,12 @@ the actual number of articles toggled is returned."
   (let ((articles (gnus-list-of-unread-articles group))
 	(gnus-decode-encoded-word-function 'identity)
 	(file (gnus-agent-article-name ".overview" group)))
-    ;; add article with marks to list of article headers we want to fetch
+    ;; Add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
       (setq articles (union (gnus-uncompress-sequence (cdr arts))
 			    articles)))
     (setq articles (sort articles '<))
-    ;; remove known articles
+    ;; Remove known articles.
     (when (gnus-agent-load-alist group)
       (setq articles (gnus-sorted-intersection
 		      articles
@@ -865,7 +876,7 @@ the actual number of articles toggled is returned."
 			     (cdr (gnus-active group)))))))
     ;; Fetch them.
     (gnus-make-directory (nnheader-translate-file-chars
-			  (file-name-directory file)))
+			  (file-name-directory file) t))
     (when articles
       (gnus-message 7 "Fetching headers for %s..." group)
       (save-excursion
@@ -1297,8 +1308,8 @@ The following commands are available:
   (let ((info (assq category gnus-category-alist))
 	(buffer-read-only nil))
     (gnus-delete-line)
-    (gnus-category-write)
-    (setq gnus-category-alist (delq info gnus-category-alist))))
+    (setq gnus-category-alist (delq info gnus-category-alist))
+    (gnus-category-write)))
 
 (defun gnus-category-copy (category to)
   "Copy the current category."

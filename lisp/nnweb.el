@@ -1,5 +1,6 @@
 ;;; nnweb.el --- retrieving articles via web search engines
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -121,7 +122,6 @@ and `altavista'.")
 
 (deffoo nnweb-request-scan (&optional group server)
   (nnweb-possibly-change-server group server)
-  (setq nnweb-hashtb (gnus-make-hashtable 4095))
   (funcall (nnweb-definition 'map))
   (unless nnweb-ephemeral-p
     (nnweb-write-active)
@@ -139,8 +139,6 @@ and `altavista'.")
 	(setq nnweb-search (nth 3 info))
 	(unless dont-check
 	  (nnweb-read-overview group)))))
-  (unless dont-check
-    (nnweb-request-scan group))
   (cond
    ((not nnweb-articles)
     (nnheader-report 'nnweb "No matching articles"))
@@ -293,6 +291,7 @@ and `altavista'.")
   (when group
     (when (and (not nnweb-ephemeral-p)
 	       (not (equal group nnweb-group)))
+      (setq nnweb-hashtb (gnus-make-hashtable 4095))
       (nnweb-request-group group nil t))))
 
 (defun nnweb-init (server)
@@ -393,6 +392,8 @@ and `altavista'.")
 		(setq date "Jan 1 00:00:00 0000"))
 	      (incf i)
 	      (setq url (concat url "&fmt=text"))
+	      (when (string-match "&context=[^&]+" url)
+		(setq url (replace-match "" t t url)))
 	      (unless (nnweb-get-hashtb url)
 		(push
 		 (list
@@ -722,7 +723,10 @@ and `altavista'.")
   (while (re-search-forward "&\\(#[0-9]+\\|[a-z]+\\);" nil t)
     (replace-match (char-to-string 
 		    (if (eq (aref (match-string 1) 0) ?\#)
-			(string-to-number (substring (match-string 1) 1))
+			(let ((c
+			       (string-to-number (substring 
+						  (match-string 1) 1))))
+			  (if (mm-char-or-char-int-p c) c 32))
 		      (or (cdr (assq (intern (match-string 1))
 				     w3-html-entities))
 			  ?#)))
@@ -754,14 +758,11 @@ If FOLLOW-REFRESH is non-nil, redirect refresh url in META."
 	  (narrow-to-region (point) (point))
 	  (url-insert-file-contents url)
 	  (goto-char (point-min))
-	  (while (re-search-forward 
-		  "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\""
-		  nil t)
+	  (when (re-search-forward 
+		 "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\"" nil t)
 	    (let ((url (match-string 1)))
 	      (delete-region (point-min) (point-max))
-	      (nnweb-insert url))
-	    (goto-char (point-min)))
-	  (goto-char (point-max)))
+	      (nnweb-insert url t))))
       (url-insert-file-contents url))
     (setq buffer-file-name name)))
 

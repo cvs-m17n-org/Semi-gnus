@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for MIME things
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -64,7 +64,8 @@
 		    chinese-cns11643-1 chinese-cns11643-2
 		    chinese-cns11643-3 chinese-cns11643-4
 		    chinese-cns11643-5 chinese-cns11643-6
-		    chinese-cns11643-7))
+		    chinese-cns11643-7)
+    (utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e))
   "Alist of MIME-charset/MULE-charsets.")
 
 (eval-and-compile
@@ -93,6 +94,13 @@
 	  (completing-read
 	   prompt (mapcar (lambda (s) (list (symbol-name (car s))))
 			  mm-mime-mule-charset-alist)))))))
+
+(eval-and-compile
+  (defalias 'mm-char-or-char-int-p
+    (cond 
+     ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
+     ((fboundp 'char-valid-p) 'char-valid-p) 
+     (t 'identity))))
 
 (defvar mm-coding-system-list nil)
 (defun mm-get-coding-system-list ()
@@ -241,7 +249,7 @@ If the charset is `composition', return the actual one."
 
 (defun mm-mime-charset (charset)
   "Return the MIME charset corresponding to the MULE CHARSET."
-  (if (fboundp 'coding-system-get)
+  (if (and (fboundp 'coding-system-get) (fboundp 'get-charset-property))
       ;; This exists in Emacs 20.
       (or
        (and (mm-preferred-coding-system charset)

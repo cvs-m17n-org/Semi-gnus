@@ -1,5 +1,5 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -62,7 +62,7 @@ If non-nil, this maildrop will be checked periodically for new mail."
   :group 'mail-source
   :type 'integer)
 
-(defcustom mail-source-delete-incoming t
+(defcustom mail-source-delete-incoming nil
   "*If non-nil, delete incoming files after handling."
   :group 'mail-source
   :type 'boolean)
@@ -634,15 +634,23 @@ This only works when `display-time' is enabled."
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."
   (mail-source-bind (imap source)
-    (let ((found 0)
+    (let ((from (format "%s:%s:%s" server user port))
+	  (found 0)
 	  (buf (get-buffer-create (generate-new-buffer-name " *imap source*")))
 	  (mail-source-string (format "imap:%s:%s" server mailbox))
 	  remove)
       (if (and (imap-open server port stream authentication buf)
-	       (imap-authenticate user password buf)
+	       (imap-authenticate
+		user (or (cdr (assoc from mail-source-password-cache))
+			 password) buf)
 	       (imap-mailbox-select mailbox nil buf))
 	  (let (str (coding-system-for-write 'binary))
 	    (with-temp-file mail-source-crash-box
+	      ;; remember password
+	      (with-current-buffer buf
+		(when (or imap-password
+			  (assoc from mail-source-password-cache))
+		  (push (cons from imap-password) mail-source-password-cache)))
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
 		(when (setq str (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf))
@@ -663,6 +671,11 @@ This only works when `display-time' is enabled."
 	      (imap-mailbox-close buf))
 	    (imap-close buf))
 	(imap-close buf)
+	;; We nix out the password in case the error
+	;; was because of a wrong password being given.
+	(setq mail-source-password-cache
+	      (delq (assoc from mail-source-password-cache)
+		    mail-source-password-cache))
 	(error (imap-error-text buf)))
       (kill-buffer buf)
       found)))
@@ -679,8 +692,15 @@ This only works when `display-time' is enabled."
       (when (eq authentication 'password)
 	(setq password
 	      (or password
+		  (cdr (assoc (format "webmail:%s:%s" subtype user) 
+			      mail-source-password-cache))
 		  (mail-source-read-passwd
-		   (format "Password for %s at %s: " user subtype)))))
+		   (format "Password for %s at %s: " user subtype))))
+	(when (and password
+		   (not (assoc (format "webmail:%s:%s" subtype user) 
+			       mail-source-password-cache)))
+	  (push (cons (format "webmail:%s:%s" subtype user) password) 
+		mail-source-password-cache)))
       (webmail-fetch mail-source-crash-box subtype user password)
       (mail-source-callback callback (symbol-name subtype)))))
 

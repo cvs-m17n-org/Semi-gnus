@@ -1,10 +1,12 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996-1999 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
-;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-;; Keywords: mail, pop3
+;;	Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+;; Maintainer: FSF
+;; Keywords: mail
 ;; Version: 1.3s
 
 ;; This file is part of GNU Emacs.
@@ -150,8 +152,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	    (dolist (n retrieved-messages)
 	      (message "Deleting message %d of %d from %s..."
 		       n message-count pop3-mailhost)
-	      (pop3-dele process n)))
-	  )
+	      (pop3-dele process n))))
       (pop3-quit process))
     (kill-buffer crashbuf)
     message-count))
@@ -263,15 +264,15 @@ Args are NAME BUFFER HOST SERVICE."
     (insert output)))
 
 (defun pop3-send-command (process command)
-  (set-buffer (process-buffer process))
-  (goto-char (point-max))
-  ;;    (if (= (aref command 0) ?P)
-  ;;	(insert "PASS <omitted>\r\n")
-  ;;      (insert command "\r\n"))
-  (setq pop3-read-point (point))
-  (goto-char (point-max))
-  (process-send-string process (concat command "\r\n"))
-  )
+    (set-buffer (process-buffer process))
+    (goto-char (point-max))
+;;    (if (= (aref command 0) ?P)
+;;	(insert "PASS <omitted>\r\n")
+;;      (insert command "\r\n"))
+    (setq pop3-read-point (point))
+    (goto-char (point-max))
+    (process-send-string process (concat command "\r\n"))
+    )
 
 (defun pop3-read-response (process &optional return)
   "Read the response from the server PROCESS.
@@ -287,7 +288,7 @@ Return the response string if optional second argument RETURN is non-nil."
       (setq match-end (point))
       (goto-char pop3-read-point)
       (if (looking-at "-ERR")
-	  (signal 'error (list (buffer-substring (point) (- match-end 2))))
+	  (error (buffer-substring (point) (- match-end 2)))
 	(if (not (looking-at "+OK"))
 	    (progn (setq pop3-read-point match-end) nil)
 	  (setq pop3-read-point match-end)
@@ -301,8 +302,10 @@ Return the response string if optional second argument RETURN is non-nil."
   (if (not pop3-read-passwd)
       (if (or (fboundp 'read-passwd) (load "passwd" t))
 	  (setq pop3-read-passwd 'read-passwd)
-	(autoload 'ange-ftp-read-passwd "ange-ftp")
-	(setq pop3-read-passwd 'ange-ftp-read-passwd)))
+	(if (load "passwd" t)
+	    (setq pop3-read-passwd 'read-passwd)
+	  (autoload 'ange-ftp-read-passwd "ange-ftp")
+	  (setq pop3-read-passwd 'ange-ftp-read-passwd))))
   (funcall pop3-read-passwd prompt))
 
 (defun pop3-clean-region (start end)
@@ -333,7 +336,9 @@ Return the response string if optional second argument RETURN is non-nil."
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (mail-fetch-field "Date"))
+		(date (split-string (or (mail-fetch-field "Date")
+					(message-make-date))
+				    " "))
 		(From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
@@ -460,11 +465,16 @@ Return the response string if optional second argument RETURN is non-nil."
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
-  (let ((hash (md5 (concat pop3-timestamp pop3-password))))
-    (pop3-send-command process (format "APOP %s %s" user hash))
-    (let ((response (pop3-read-response process t)))
-      (if (not (and response (string-match "+OK" response)))
-	  (pop3-quit process)))))
+  (let ((pass pop3-password))
+    (if (and pop3-password-required (not pass))
+	(setq pass
+	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+    (if pass
+	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
+	  (pop3-send-command process (format "APOP %s %s" user hash))
+	  (let ((response (pop3-read-response process t)))
+	    (if (not (and response (string-match "+OK" response)))
+		(pop3-quit process)))))))
 
 (defun pop3-stls (process)
   "Query whether TLS extension is supported"
@@ -475,23 +485,66 @@ Return the response string if optional second argument RETURN is non-nil."
 
 ;; TRANSACTION STATE
 
+(defvar pop3-md5-program "md5"
+  "*Program to encode its input in MD5.")
+
+(defun pop3-md5 (string)
+  (with-temp-buffer
+    (insert string)
+    (call-process-region (point-min) (point-max)
+			 (or shell-file-name "/bin/sh")
+			 t (current-buffer) nil
+			 "-c" pop3-md5-program)
+    ;; The meaningful output is the first 32 characters.
+    ;; Don't return the newline that follows them!
+    (buffer-substring (point-min) (+ (point-min) 32))))
+
 (defun pop3-stat (process)
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (split-string response)))
-	  (string-to-int (nth 2 (split-string response))))
-    ))
+    (list (string-to-int (nth 1 (split-string response " ")))
+	  (string-to-int (nth 2 (split-string response " "))))))
 
 (defun pop3-retr (process msg crashbuf)
   "Retrieve message-id MSG to buffer CRASHBUF."
   (pop3-send-command process (format "RETR %s" msg))
   (pop3-read-response process)
-  (save-excursion
-    (let ((region (pop3-get-extended-response process)))
-      (pop3-munge-message-separator (car region) (cadr region))
-      (append-to-buffer crashbuf (car region) (cadr region))
-      (delete-region (car region) (cadr region))
+  (let ((start pop3-read-point) end)
+    (save-excursion
+      (set-buffer (process-buffer process))
+      (while (not (re-search-forward "^\\.\r\n" nil t))
+	(accept-process-output process 3)
+	;; bill@att.com ... to save wear and tear on the heap
+	;; uncommented because the condensed version below is a problem for
+	;; some.
+	(if (> (buffer-size)  20000) (sleep-for 1))
+	(if (> (buffer-size)  50000) (sleep-for 1))
+	(if (> (buffer-size) 100000) (sleep-for 1))
+	(if (> (buffer-size) 200000) (sleep-for 1))
+	(if (> (buffer-size) 500000) (sleep-for 1))
+	;; bill@att.com
+	;; condensed into:
+	;; (sometimes causes problems for really large messages.)
+;	(if (> (buffer-size) 20000) (sleep-for (/ (buffer-size) 20000)))
+	(goto-char start))
+      (setq pop3-read-point (point-marker))
+;; this code does not seem to work for some POP servers...
+;; and I cannot figure out why not.
+;      (goto-char (match-beginning 0))
+;      (backward-char 2)
+;      (if (not (looking-at "\r\n"))
+;	  (insert "\r\n"))
+;      (re-search-forward "\\.\r\n")
+      (goto-char (match-beginning 0))
+      (setq end (point-marker))
+      (pop3-clean-region start end)
+      (pop3-munge-message-separator start end)
+      (save-excursion
+	(set-buffer crashbuf)
+	(erase-buffer))
+      (copy-to-buffer crashbuf start end)
+      (delete-region start end)
       )))
 
 (defun pop3-dele (process msg)
@@ -508,7 +561,7 @@ Return the response string if optional second argument RETURN is non-nil."
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (split-string response)))
+    (string-to-int (nth 1 (split-string response " ")))
     ))
 
 (defun pop3-rset (process)

@@ -1,5 +1,5 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -28,6 +28,8 @@
 (require 'mm-mailcap)
 (require 'mm-bodies)
 (require 'mmgnus)
+
+(defvar mm-xemacs-p (string-match "XEmacs" (emacs-version)))
 
 (defgroup mime-display ()
   "Display of MIME in mail and news articles."
@@ -490,14 +492,18 @@ external if displayed external."
 (defun mm-mailcap-command (method file type-list)
   (let ((ctl (cdr type-list))
 	(beg 0)
+	(uses-stdin t)
 	out sub total)
-    (while (string-match "%{\\([^}]+\\)}\\|%s\\|%t" method beg)
+    (while (string-match "%{\\([^}]+\\)}\\|%s\\|%t\\|%%" method beg)
       (push (substring method beg (match-beginning 0)) out)
       (setq beg (match-end 0)
 	    total (match-string 0 method)
 	    sub (match-string 1 method))
       (cond
+       ((string= total "%%")
+	(push "%" out))
        ((string= total "%s")
+	(setq uses-stdin nil)
 	(push (mm-quote-arg file) out))
        ((string= total "%t")
 	(push (mm-quote-arg (car type-list)) out))
@@ -505,6 +511,10 @@ external if displayed external."
 	(push (mm-quote-arg (or (mime-content-type-parameter sub ctl) ""))
 	      out))))
     (push (substring method beg (length method)) out)
+    (if uses-stdin
+	(progn
+	  (push "<" out)
+	  (push (mm-quote-arg file) out)))
     (mapconcat 'identity (nreverse out) "")))
     
 (defun mm-remove-parts (handles)
@@ -769,7 +779,37 @@ external if displayed external."
   "Return the handle(s) referred to by ID."
   (cdr (assoc id mm-content-id-alist)))
 
-(defun mm-get-image (handle)
+(defun mm-get-image-emacs (handle)
+  "Return an image instance based on HANDLE."
+  (let ((type (mm-handle-media-subtype handle))
+	spec)
+    ;; Allow some common translations.
+    (setq type
+	  (cond
+	   ((equal type "x-pixmap")
+	    "xpm")
+	   ((equal type "x-xbitmap")
+	    "xbm")
+	   (t type)))
+    (or (mm-handle-cache handle)
+	(mm-with-unibyte-buffer
+	  (mm-insert-part handle)
+	  (prog1
+	      (setq spec
+		    (ignore-errors
+		      (cond
+		       ((equal type "xbm")
+			;; xbm images require special handling, since
+			;; the only way to create glyphs from these
+			;; (without a ton of work) is to write them
+			;; out to a file, and then create a file
+			;; specifier.
+			(error "Don't know what to do for XBMs right now."))
+		       (t
+			(list 'image :type (intern type) :data (buffer-string))))))
+	    (mm-handle-set-cache handle spec))))))
+
+(defun mm-get-image-xemacs (handle)
   "Return an image instance based on HANDLE."
   (let ((type (mm-handle-media-subtype handle))
 	spec)
@@ -808,17 +848,37 @@ external if displayed external."
 			 (vector (intern type) :data (buffer-string)))))))
 	    (mm-handle-set-cache handle spec))))))
 
+(defun mm-get-image (handle)
+  (if mm-xemacs-p
+      (mm-get-image-xemacs handle)
+    (mm-get-image-emacs handle)))
+
 (defun mm-image-fit-p (handle)
   "Say whether the image in HANDLE will fit the current window."
   (let ((image (mm-get-image handle)))
-    (or mm-inline-large-images
-	(and (< (glyph-width image) (window-pixel-width))
-	     (< (glyph-height image) (window-pixel-height))))))
+    (if (fboundp 'glyph-width)
+	;; XEmacs' glyphs can actually tell us about their width, so
+	;; lets be nice and smart about them.
+	(or mm-inline-large-images
+	    (and (< (glyph-width image) (window-pixel-width))
+		 (< (glyph-height image) (window-pixel-height))))
+      ;; Let's just inline everything under Emacs 21, since the image
+      ;; specification there doesn't actually get the width/height
+      ;; until you render the image.
+      t)))
 
 (defun mm-valid-image-format-p (format)
   "Say whether FORMAT can be displayed natively by Emacs."
-  (and (fboundp 'valid-image-instantiator-format-p)
-       (valid-image-instantiator-format-p format)))
+  (cond
+   ;; Handle XEmacs
+   ((fboundp 'valid-image-instantiator-format-p)
+    (valid-image-instantiator-format-p format))
+   ;; Handle Emacs 21
+   ((fboundp 'image-type-available-p)
+    (image-type-available-p format))
+   ;; Nobody else can do images yet.
+   (t
+    nil)))
 
 (defun mm-valid-and-fit-image-p (format handle)
   "Say whether FORMAT can be displayed natively and HANDLE fits the window."

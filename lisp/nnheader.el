@@ -1,5 +1,8 @@
 ;;; nnheader.el --- header access macros for Gnus and its backends
-;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
+
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
+;;        1997, 1998, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -48,7 +51,6 @@ on your system, you could say something like:
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
-  (autoload 'cancel-function-timers "timers")
   (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-delete-line "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
@@ -734,14 +736,14 @@ without formatting."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
      ;; If this directory exists, we use it directly.
-     (if (file-directory-p (concat dir group))
-	 (concat dir group "/")
-       ;; If not, we translate dots into slashes.
-       (concat dir
-	       (mm-encode-coding-string
-		(nnheader-replace-chars-in-string group ?. ?/)
-		nnheader-pathname-coding-system)
-	       "/")))
+     (file-name-as-directory
+      (if (file-directory-p (concat dir group))
+	  (expand-file-name group dir)
+	;; If not, we translate dots into slashes.
+	(expand-file-name (mm-encode-coding-string
+			   (nnheader-replace-chars-in-string group ?. ?/)
+			  nnheader-pathname-coding-system)
+			  dir))))
    (cond ((null file) "")
 	 ((numberp file) (int-to-string file))
 	 (t file))))

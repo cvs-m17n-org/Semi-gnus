@@ -1,5 +1,6 @@
 ;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -365,7 +366,7 @@ Returns the list of articles removed."
 (defun gnus-summary-insert-cached-articles ()
   "Insert all the articles cached for this group into the current buffer."
   (interactive)
-  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '<))
+  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '>))
 	(gnus-verbose (max 6 gnus-verbose)))
     (unless cached
       (gnus-message 3 "No cached articles for this group"))

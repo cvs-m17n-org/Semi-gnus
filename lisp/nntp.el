@@ -1,5 +1,7 @@
 ;;; nntp.el --- nntp access for Gnus
-;;; Copyright (C) 1987-90,92-99 Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
+;;        1997, 1998, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -334,17 +336,23 @@ noticing asynchronous data.")
 	(save-excursion
 	  (set-buffer (process-buffer process))
 	  (erase-buffer)))
-      (when command
-	(nntp-send-string process command))
-      (cond
-       ((eq callback 'ignore)
-	t)
-       ((and callback wait-for)
-	(nntp-async-wait process wait-for buffer decode callback)
-	t)
-       (wait-for
-	(nntp-wait-for process wait-for buffer decode))
-       (t t)))))
+      (condition-case err
+	  (progn
+	    (when command
+	      (nntp-send-string process command))
+	    (cond
+	     ((eq callback 'ignore)
+	      t)
+	     ((and callback wait-for)
+	      (nntp-async-wait process wait-for buffer decode callback)
+	      t)
+	     (wait-for
+	      (nntp-wait-for process wait-for buffer decode))
+	     (t t)))
+	(error 
+	 (nnheader-report 'nntp "Couldn't open connection to %s: %s" 
+			  address err))
+	(quit nil)))))
 
 (defsubst nntp-send-command (wait-for &rest strings)
   "Send STRINGS to server and wait until WAIT-FOR returns."
@@ -775,7 +783,7 @@ and a password.
 If SEND-IF-FORCE, only send authinfo to the server if the
 .authinfo file has the FORCE token."
   (let* ((list (gnus-parse-netrc nntp-authinfo-file))
-	 (alist (gnus-netrc-machine list nntp-address))
+	 (alist (gnus-netrc-machine list nntp-address "nntp"))
 	 (force (gnus-netrc-get alist "force"))
 	 (user (or (gnus-netrc-get alist "login") nntp-authinfo-user))
 	 (passwd (gnus-netrc-get alist "password")))

@@ -1,5 +1,6 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -1917,7 +1918,10 @@ newsgroup."
 		     (gnus-group-prefixed-name "" method))))
 
     ;; Let the Gnus agent save the active file.
-    (if (and gnus-agent real-active gnus-plugged (gnus-agent-method-p method))
+    (if (and gnus-agent
+	     real-active
+	     gnus-plugged
+	     (gnus-agent-method-p method))
 	(progn
 	  (gnus-agent-save-groups method)
 	  (gnus-active-to-gnus-format method hashtb nil real-active))
