@@ -9384,6 +9384,53 @@ gnus $B$,<+J,<+?H$G(B POP $B%a!<%kJ8;zNs$rH/8+$7$h$&$H$7$^$9!#$I$N$h$&$J>l9g$
 $B@8$1lS$H$7$FJ{$2=*$($?8e$G!"(Bgnus $B$,$"$J$?$N%a!<%k$r0\F0$7$F$bK\Ev$K$"$^(B
 $B$j6C$$$F$O$$$1$^$;$s!#(B
 
+@vindex pop3-fma-spool-file-alist
+@item pop3-fma-spool-file-alist
+$B$b$7!"$"$J$?$,J#?t$N(B Mail address $B$r;}$A!"$=$l$r(B Gnus $B$N>e$GFI$_$?$$$H(B
+$B;W$&$J$i$P(B pop3-fma(POP3 for Multi Account) $B$r;HMQ$7$^$7$g$&!#(B
+$B$3$N(B pop3-fma $B$r;HMQ$9$k>l9g!"A0=R$N(B @code{nnmail-pop-password-required}
+$B$d(B @code{nnmail-pop-password} , @code{nnmail-spool-file} $B$N@_Dj$O9T$o$J(B
+$B$/$F$+$^$$$^$;$s!#(B($B$?$@$7!"(Bbackend $B$O$-$A$s$H@_Dj$7$^$7$g$&(B)
+$B0J2<$N@_Dj$r(B @file{~/.emacs} $B$K$$$l$^$7$g$&!#(B
+
+@lisp
+(require 'pop3-fma)
+(setq pop3-fma-spool-file-alist 
+        '(
+        "po:user1@@mailhost1" method
+        "po:user@@mailhost" method
+        ))
+@end lisp
+
+$B:GDc8B$3$l$@$1$G$G$-$^$9!#>e$N(B method $B$O$"$J$?$N(B POP Mail Server $B$N%f!<(B
+$B%6!<G'>ZJ}<0$r$$$l$^$9!#(B
+USER/PASS $B$GG'>Z$9$k>l9g$O(B @code{pass} , APOP $BJ}<0$GG'>Z$9$k>l9g$O(B
+@code{apop} $B$H$7$^$9!#(B
+$BCm0U$9$k;v$O!"(Buser@@mailhost $B$N7A<0$OI,$:$7$b(B E-mail address $B$H$O0lCW$7$^(B
+$B$;$s!#(B
+$B$J$*!"$3$N%Q%C%1!<%8$r;HMQ$7$?>l9g$O(B procmail $B$N;HMQ$O$G$-$^$;$s!#(B
+
+
+@vindex pop3-fma-local-spool-file-alist
+@item pop3-fma-local-spool-file-alist
+$B$3$NJQ?t$O!"(BPOP $B%5!<%P!<$H(B local mail spool $B$NN>J}$r;HMQ$9$k>l9g$K@_Dj$7(B
+$B$^$9!#Nc$($P!"(B/var/spool/mail/user $B$+$iFI$_$@$7$?$$>l9g$O(B
+@lisp
+  (setq pop3-fma-local-spool-file-alist '("/var/spool/mail/user"))
+@end lisp
+$B$H$7$^$9!#(B
+
+@vindex pop3-fma-movemail-type
+@item pop3-fma-movemail-type
+$B$3$NJQ?t$O!"(BPOP mail server $B$+$i(B Mail $B$r<hF@$9$k:]$N5/F0$9$k%W%m%0%i%`$N(B
+$B<oN`$r5-=R$7$^$9!#(B@code{'exe} $B$J$i$P!"(Bmovemail $B$,5/F0$5$l!"(B@code{'lisp}
+$B$J$i$P(B pop3-movemail(@file{pop3.el}) $B$,5/F0$5$l$^$9!#(B
+
+@vindex pop3-fma-movemail-arguments
+@item pop3-fma-movemail-arguments
+$B$3$NJQ?t$O30It%W%m%0%i%`$N(B movemail $B$N%*%W%7%g%s$r@_Dj$7$^$9!#$?$@$7!"(B
+inbox $BEy$O@_Dj$7$J$$;v(B ("-" $B$G;O$^$k%*%W%7%g%s$@$1$r5-=R$N;v(B)
+
 @vindex nnmail-use-procmail
 @vindex nnmail-procmail-suffix
 @item nnmail-use-procmail
@@ -11242,6 +11289,7 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;H$&$N$O6K$a$F4J(
 * Agent Variables::        $B%+%9%?%^%$%:$O3Z$7!#(B
 * Example Setup::          $B%*%U%i%$%s?M4V$N$?$a$N(B @file{.gnus.el} $B$NNc!#(B
 * Batching Agents::        @code{cron} $B%8%g%V$K$h$k%K%e!<%9<hF@J}K!!#(B
+* Control Agents::         Offline $B$r%3%s%H%m!<%k$9$k(B gnus-offline
 @end menu
 
 
@@ -11758,6 +11806,93 @@ Gnus $B%(!<%8%'%s%H$K5-;v$r<hF@$5$;$k$N$O(B ($B$=$7$F$"$J$?$N=q$$$?2?(B
 emacs -batch -l ~/.emacs -f gnus-agent-batch >/dev/null
 @end example
 
+@node Control Agents
+@subsection gnus-agent $B4D6-$r(B Control $B$9$k(B
+$B$3$3$^$GFI$s$GMh$i$l$F!"%(!<%8%'%s%H$,Hs>o$KJXMx$J5!G=$G$"$k;v$,J,$+$C$?(B
+$B$H;W$$$^$9!#$?$@!"ITK~$JE@$,$"$k$H$9$k$H!"Kh2s(B @kbd{J j} $B$d(B @kbd{J S} $BEy(B
+$B$r%-!<$G:n6H$7$J$1$l$P$J$i$J$$$3$H$G$7$g$&!#%*%s%i%$%s$HF1$8$h$&$JA`:n$G(B
+$B$d$j$H$j$G$-$?$i!"$H9M$($?;v$O$"$j$^$;$s$+(B?
+gnus-offline $B$O$=$N5!G=$rDs6!$7$^$9!#(B($BI.<T$N<qL#$G(B gnus-agent $B$r;HMQ$9$k(B
+$B;v$r?d>)$7$^$9!#(B@code{MIEE} $B$K$D$$$F$O8e=R;2>H(B)
+
+*Group* $B%P%C%U%!$G(B @kbd{g} $B$r2!$9;v$G(B
+
+@lisp
+ (Dialup $B$NI,MW$J4D6-$G$O(B Dialup) ->
+  Mail $B$N<hF@(B -> 
+  Spool $B$KN/$C$?(B message $B$NAw?.(B -> 
+  News $B$NAw?.(B -> 
+  $BITMW$J5-;v$N(B expire
+@end lisp
+
+$B$^$G$r9T$$$^$9!#(B
+
+$B%$%s%9%H!<%k$O$$$?$C$F4JC1!#(B($B$3$3$^$G$G(B gnus-agent $B$N@_Dj$O=*$C$F$$$k$H(B
+$B2>Dj$7$^$9(B)
+@file{~/.emacs} $B$N(B gnus-agent $B$N@_Dj$N$A$g$$$HA0$K(B
+
+@lisp
+(load "gnus-ofsetup")
+(gnus-setup-for-offline)
+(load gnus-offline-setting-file)
+@end lisp
+
+$B$H$$$l!"(BEmacs $B$r:F5/F0$7$F$/$@$5$$!#$9$k$H!"$5$^$6$^$J<ALd$r$5$l$k$H;W$$(B
+$B$^$9!#$=$3$G$O!"$"$J$?$N4D6-$K$"$C$?Ez$($r$7$F$/$@$5$$!#(B
+$B<ALd$,=*$k$H!"@_DjMQ$N%U%!%$%k(B @file{~/.gnus-offline.el} $B$,:n@.$5$l$^$9!#(B
+$B$3$3$K!"I,MW$J@_DjA4$F$,=q$+$l$F$$$^$9!#(B
+Gnus $B$N5/F0$,=*$j!"(B($BB?J,(B POP $B%5!<%P!<$N(B password $B$rJ9$+$l$k$H;W$$$^$9$,(B)
+*Group* $B%P%C%U%!$K$J$C$?$i!"(B@kbd{J j} $B$d(B @kbd{J S} $BEy$NA`:n$OI,MW$"$j$^$;$s!#(B
+News/Mail $B$r?75,$G<hF@$7$?$1$l$P!"(B*Group* $B%P%C%U%!$G(B @kbd{g} $B$r2!$9$@$1(B
+$B$G$9!#(B
+
+@code{MIEE} = Message Intercepting and Entrusting Emacs library.
+Message $B$r2#<h$j$7$F!"(Boffline $B$G(B post/send $B$9$k$?$a$NHFMQ%i%$%V%i%j$G$9!#(B
+
+$B$3$N(B @code{MIEE} $B$r;H$&$H(B @code{gnus-offline} $B$rMQ$$$F(B@code{nnspool} $B$b(B
+$B%3%s%H%m!<%k$9$k;v$,$G$-$^$9(B($B$3$3$G$O=R$Y$^$;$s$,!D(B)$B!#(B
+($B$b$A$m$s(B @code{gnus-agent} + @code{MIEE} $B$H$$$&AH9g$;$b2DG=$G$9(B)
+@code{MIEE} $B$O(B @file{http://www.shiojiri.ne.jp/%7Et-ichi/lisp/miee.el}
+$B$+$i<h$C$FMh$k;v$,$G$-$^$9!#(B
+@code{gnus-setup-for-offline} $B$G@_Dj$7$?>l9g$K$O!"(B@code{MIEE} $B$N@_Dj$O(B
+$B$$$C$5$$$7$J$/$F$b$+$^$$$^$;$s!#(B
+
+@table @code
+@vindex gnus-offline-articles-to-fetch
+@item gnus-offline-articles-to-fetch
+$B$3$NJQ?t$O<hF@$9$k5-;v$N<oN`$r;XDj$7$^$9!#(B
+'mail $B$N>l9g$O!"(BMail $B$@$1$r<hF@$7$^$9!#(B
+'news $B$N>l9g$O!"(BNews $B$@$1$r<hF@$7$^$9!#(B
+'both $B$N>l9g$O!"(BMail/News $BN>J}$r<hF@$7$^$9!#(B
+
+@vindex gnus-offline-load-hook
+@item gnus-offline-load-hook
+$B$3$NJQ?t$O(B @code{gnus-offline} $B$,(B load $B$5$l$kA0$KI>2A$5$l$k(B hook $B$G$9!#(B
+
+@vindex gnus-offline-before-online-hook
+@item gnus-offline-before-online-hook
+$B$3$NJQ?t$O(B Gnus $B$,(B Online(Plugged) $B>uBV$K$J$kD>A0$KI>2A$5$l$k(B hook $B$G$9!#(B
+
+@vindex gnus-offline-after-online-hook
+@item gnus-offline-after-online-hook
+$B$3$NJQ?t$O(B Gnus $B$,(B Offline(UnPlugged) $B>uBV$K$J$C$?8e$KI>2A$5$l$k(B hook $B$G$9!#(B
+
+@vindex gnus-offline-interval-time
+@item gnus-offline-interval-time
+$B$3$NJQ?t$G;XDj$5$l$?4V3V(B($BIC?t(B)$B$G(B@code{gnus-offline-articles-to-fetch} $B$G(B
+$B;XDj$5$l$?(B article $B$r<hF@$7$^$9!#(B
+$BF0:n$K$O(B@code{gnus-daemon} $B$r;HMQ$7$F$$$^$9!#(B
+
+@vindex gnus-offline-dialup-function
+@item gnus-offline-dialup-function
+$B$3$NJQ?t$G;XDj$5$l$?4X?t$,(B dialup $B;~$K<B9T$5$l!"(BDialup $B$7%5!<%P!<$K@\B3(B
+$B$7$^$9!#(B
+
+@vindex gnus-offline-hangup-function
+@item gnus-offline-hangup-function
+$B$3$NJQ?t$G;XDj$5$l$?4X?t$,(B hangup $B;~$K<B9T$5$l!"%5!<%P!<$H$N2s@~$r@ZCG$7(B
+$B$^$9!#(B
+@end table
 
 @node Scoring
 @chapter $B%9%3%"(B
@@ -15749,6 +15884,7 @@ Karl Kleinpaste,
 Peter Skov Knudsen,
 Shuhei Kobayashi, @c Kobayashi
 Koseki Yoshinori, @c Koseki
+Tatsuya Ichikawa, @c Ichikawa
 Thor Kristoffersen,
 Jens Lautenbacher,
 Martin Larose,
