@@ -9742,6 +9742,9 @@ Buffer})。
       (nnmh-get-new-mail nil))
 @end lisp
 
+@cindex proxy
+@cindex firewall
+
 防壁 (firewall) の中にいて、防壁マシンからの @sc{nntp} サーバーへの接続
 しかないのであれば、gnus に防壁マシンに @code{rlogin} して、そこから
 @sc{nntp} サーバーに telnet をするように指示する事ができます。

@@ -45,7 +45,7 @@
 	  ("/tmp/"))
   "*Where nnsoup will store temporary files.")
 
-(defvoo nnsoup-replies-directory (concat nnsoup-directory "replies/")
+(defvoo nnsoup-replies-directory (expand-file-name "replies/" nnsoup-directory)
   "*Directory where outgoing packets will be composed.")
 
 (defvoo nnsoup-replies-format-type ?u  ;; u is USENET news format.
@@ -54,7 +54,7 @@
 (defvoo nnsoup-replies-index-type ?n
   "*Index type of the replies packages.")
 
-(defvoo nnsoup-active-file (concat nnsoup-directory "active")
+(defvoo nnsoup-active-file (expand-file-name "active" nnsoup-directory)
   "Active file.")
 
 (defvoo nnsoup-packer "tar cf - %s | gzip > $HOME/Soupin%d.tgz"
@@ -423,12 +423,15 @@ backend for the messages.")
 	    (setq cur-prefix (nnsoup-next-prefix))
 	    (nnheader-message 5 "Incorporating file %s..." cur-prefix)
 	    (when (file-exists-p
-		   (setq file (concat nnsoup-tmp-directory
-				      (gnus-soup-area-prefix area) ".IDX")))
+		   (setq file
+			 (expand-file-name
+			  (concat (gnus-soup-area-prefix area) ".IDX")
+			  nnsoup-tmp-directory)))
 	      (rename-file file (nnsoup-file cur-prefix)))
 	    (when (file-exists-p
-		   (setq file (concat nnsoup-tmp-directory
-				      (gnus-soup-area-prefix area) ".MSG")))
+		   (setq file (expand-file-name
+			       (concat (gnus-soup-area-prefix area) ".MSG")
+			       nnsoup-tmp-directory)))
 	      (rename-file file (nnsoup-file cur-prefix t))
 	      (gnus-soup-set-area-prefix area cur-prefix)
 	      ;; Find the number of new articles in this area.
@@ -532,17 +535,19 @@ backend for the messages.")
   (let* ((file (concat prefix (if message ".MSG" ".IDX")))
 	 (buffer-name (concat " *nnsoup " file "*")))
     (or (get-buffer buffer-name)	; File already loaded.
-	(when (file-exists-p (concat nnsoup-directory file))
+	(when (file-exists-p (expand-file-name file nnsoup-directory))
 	  (save-excursion		; Load the file.
 	    (set-buffer (get-buffer-create buffer-name))
 	    (buffer-disable-undo)
 	    (push (cons nnsoup-current-group (current-buffer)) nnsoup-buffers)
-	    (nnheader-insert-file-contents (concat nnsoup-directory file))
+	    (nnheader-insert-file-contents
+	     (expand-file-name file nnsoup-directory))
 	    (current-buffer))))))
 
 (defun nnsoup-file (prefix &optional message)
   (expand-file-name
-   (concat nnsoup-directory prefix (if message ".MSG" ".IDX"))))
+   (concat prefix (if message ".MSG" ".IDX"))
+   nnsoup-directory))
 
 (defun nnsoup-message-buffer (prefix)
   (nnsoup-index-buffer prefix 'msg))
@@ -723,7 +728,7 @@ backend for the messages.")
   (unless nnsoup-replies-list
     (setq nnsoup-replies-list
 	  (gnus-soup-parse-replies
-	   (concat nnsoup-replies-directory "REPLIES"))))
+	   (expand-file-name "REPLIES" nnsoup-replies-directory))))
   (let ((replies nnsoup-replies-list))
     (while (and replies
 		(not (string= kind (gnus-soup-reply-kind (car replies)))))
@@ -802,7 +807,8 @@ backend for the messages.")
     ;; Sort and delete the files.
     (setq non-files (sort non-files 'string<))
     (map-y-or-n-p "Delete file %s? "
-		  (lambda (file) (delete-file (concat nnsoup-directory file)))
+		  (lambda (file) (delete-file
+				  (expand-file-name file nnsoup-directory)))
 		  non-files)))
 
 (provide 'nnsoup)
