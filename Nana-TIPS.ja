@@ -155,8 +155,6 @@ APOP / PASS $B$NG'>ZJ}<0$r;XDj$7$F$$$^$7$?$,!"(B `nnmail-spool-file' $B$G$3(
 $B$l$r9T$&$h$&$KJQ99$7$^$7$?!#>\$7$/$OJL9`(B nnmail-spool-file $B$r;2>H$7$F(B
 $B$/$@$5$$!#(B
 
-$BIUB0$N(B nnmail.el $B$O!"(B
-
 * Cancel sending message from hooks.
 
 `mesage-send-hook' $B$K@_Dj$5$l$?4X?tFb$G!"(B
