@@ -376,6 +376,7 @@ non @acronym{MIME}-savvy versions of Gnus would do.
 @node Mailing Lists
 @section メーリングリスト
 
+@cindex Mail-Followup-To
 メーリングリストに投稿するとき、投稿する人がその記事に対するフォローアッ
 プ記事の宛先を指定したいことがあります。Mail-Followup-To (MFT) はまさに
 これを可能にするために作られました。これが役に立つ場合の例を二つ:
