@@ -1716,6 +1716,7 @@ increase the score of each group you read."
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
     "t" gnus-article-toggle-headers
+    "g" gnus-summary-toggle-smiley
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
@@ -1897,7 +1898,7 @@ increase the score of each group you read."
 	      ["Toggle MIME" gnus-summary-toggle-mime t]
 	      ["Verbose header" gnus-summary-verbose-headers t]
 	      ["Toggle header" gnus-summary-toggle-header t]
-	      ["Toggle smileys" gnus-smiley-display t]
+	      ["Toggle smiley" gnus-summary-toggle-smiley t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
 	      ["HZ" gnus-article-decode-HZ t])
 	     ("Output"
@@ -8715,6 +8716,13 @@ groups."
   (gnus-summary-edit-article)
   (execute-kbd-macro (concat (this-command-keys) key))
   (gnus-article-edit-done))
+
+(defun gnus-summary-toggle-smiley (&optional arg)
+  "Toggle the display of smilies as small graphical icons."
+  (interactive "P")
+  (save-excursion
+    (set-buffer gnus-article-buffer)
+    (gnus-smiley-display arg)))
 
 ;;; Respooling
 

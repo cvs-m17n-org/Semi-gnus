@@ -86,6 +86,13 @@ marks file will be regenerated properly by Gnus.
 
 This variable is a virtual server slot.  See the Gnus manual for details.")
 
+(defvoo nnml-filenames-are-evil t
+  "If non-nil, Gnus will not assume that the articles file name 
+is the same as the article number listed in the nov database.  This 
+variable should be set if any of the files are compressed.
+
+This variable is a virtual server slot.  See the Gnus manual for details.")
+
 (defvoo nnml-prepare-save-mail-hook nil
   "Hook run narrowed to an article before saving.
 
@@ -204,7 +211,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 	(when (and (setq group-num (nnml-find-group-number id))
 		   (cdr
 		    (assq (cdr group-num)
-			  (nnml-article-to-file-alist
+			  (nnheader-article-to-file-alist
 			   (setq gpath
 				 (nnmail-group-pathname
 				  (car group-num)
@@ -484,7 +491,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
       ;; We move the articles file by file instead of renaming
       ;; the directory -- there may be subgroups in this group.
       ;; One might be more clever, I guess.
-      (let ((files (nnml-article-to-file-alist old-dir)))
+      (let ((files (nnheader-article-to-file-alist old-dir)))
 	(while files
 	  (rename-file
 	   (concat old-dir (cdar files))
@@ -679,7 +686,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
       (unless nnml-article-file-alist
 	(setq nnml-article-file-alist
 	      (sort
-	       (nnml-article-to-file-alist nnml-current-directory)
+	       (nnml-current-group-article-to-file-alist)
 	       'car-less-than-car)))
       (setq active
 	    (if nnml-article-file-alist
@@ -874,7 +881,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
   (when (or (not nnml-article-file-alist)
 	    force)
     (setq nnml-article-file-alist
-	  (nnml-article-to-file-alist nnml-current-directory))))
+	  (nnml-current-group-article-to-file-alist))))
 
 (defun nnml-directory-articles (dir)
   "Return a list of all article files in a directory.
@@ -898,10 +905,12 @@ Use the nov database for that directory if available."
 	  (forward-line 1))
 	list))))
 
-(defun nnml-article-to-file-alist (dir)
-  "Return an alist of article/file pairs in DIR.
-Use the nov database for that directory if available."
-  (if (or gnus-nov-is-evil nnml-nov-is-evil
+(defun nnml-current-group-article-to-file-alist ()
+  "Return an alist of article/file pairs in the current group.
+Use the nov database for the current group if available."
+  (if (or gnus-nov-is-evil 
+	  nnml-nov-is-evil
+	  nnml-filenames-are-evil
 	  (not (file-exists-p
 		(expand-file-name nnml-nov-file-name
 				  nnml-current-directory))))
