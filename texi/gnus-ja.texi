@@ -23457,28 +23457,28 @@ Lisp $B%P%C%U%!!<$G$O!"(B@kbd{SPC} $B$G%7%s%0%k%9%F%C%WF0:n!"(B@kbd{M-:} $B
 $BI>2A!"(B@kbd{C-h v} $B$GJQ?t$r8!::!"(B@kbd{q} $B$G<B9T$rCfCG!"$"$k$$(B
 $B$O(B @kbd{c} $B$+(B @kbd{g} $B$G<B9T$r:F3+$9$k$3$H$,$G$-$^$9!#(B
 
-@c TRANSLATEME!
 @cindex elp
 @cindex profile
 @cindex slow
-Sometimes, a problem do not directly generate a elisp error but
-manifests itself by causing Gnus to be very slow.  In these cases, you
-can use @kbd{M-x toggle-debug-on-quit} and press C-j when things are
-slow, and then try to analyze the backtrace (repeating the procedure
-helps isolating the real problem areas).  A fancier approach is to use
-the elisp profiler, ELP.  The profiler is (or should be) fully
-documented elsewhere, but to get you started there are a few steps
-that need to be followed.  First, instrument the part of Gnus you are
-interested in for profiling, e.g. @kbd{M-x elp-instrument-package RET
-gnus} or @kbd{M-x elp-instrument-packagre RET message}.  Then perform
-the operation that is slow and press @kbd{M-x elp-results}.  You will
-then see which operations that takes time, and can debug them further.
-If the entire operation takes much longer than the time spent in the
-slowest function in the profiler output, you probably profiled the
-wrong part of Gnus.  To reset profiling statistics, use @kbd{M-x
-elp-reset-all}.  @kbd{M-x elp-restore-all} is supposed to remove
-profiling, but given the complexities and dynamic code generation in
-Gnus, it might not always work perfectly.
+$B$H$-$I$-!"D>@\$K(B elisp $B$N%(%i!<$r5/$3$5$J$$$b$N$N!"(Bgnus $B$,Hs>o$KCY$/$J$k(B
+$B$?$a$KL@$i$+$K$J$kLdBj$,$"$j$^$9!#$=$s$J>l9g$K$O(B @kbd{M-x
+toggle-debug-on-quit} $B$r;H$C$F!"CY$/$J$C$?$H$-$K(B C-g $B$r2!$7!"$7$+$k8e$K(B
+$B%P%C%/%H%l!<%9$r2r@O$7$F2<$5$$(B ($B$=$N<jB3$-$r7+$jJV$9$3$H$O!"??$NLdBjNN0h(B
+$B$NJ,N%$KLrN)$A$^$9(B)$B!#$h$j>eEy$J<h$jAH$_$O(B elisp $B%W%m%U%!%$%i!<(B ($BLuCm(B: $B%W(B
+$B%m%0%i%`$N<B9T;~$NF0$-$rJ,@O$9$kF;6q(B) ELP $B$r;HMQ$9$k$3$H$G$9!#%W%m%U%!%$(B
+$B%i!<$K$D$$$F$O$I$3$+B>$N>l=j$G40A4$KJ8=q2=$5$l$F$$$k$O$:$G$9$,!"$=$l$r;O(B
+$B$a$k$?$a$KI,MW$J<j=g$r>/!9=q$$$F$*$-$^$7$g$&!#Bh0l$K!"%W%m%U%!%$%k$7$F$_(B
+$B$?$$(B gnus $B$NItJ,$r7WB,$9$k$?$a$N@_Dj$r!"Nc$($P(B @kbd{M-x
+elp-instrument-package RET gnus} $B$d(B @kbd{M-x elp-instrument-package RET
+message} $B$G9T$J$C$F2<$5$$!#$=$7$F!"CY$$F0:n$r9T$J$o$;$F$+$i(B @kbd{M-x
+elp-results} $B$r2!$7$^$7$g$&!#$9$k$H!"$I$NF0:n$,;~4V$r?)$C$F$$$k$+$r8+$F!"(B
+$B8e$G$=$l$i$r%G%P%C%0$9$k$3$H$,$G$-$^$9!#F0:nA4BN$,!"%W%m%U%!%$%i!<$N=PNO(B
+$B$NCf$G$G:G$bCY$$4X?t$GHq$d$5$l$?;~4V$h$j$O$k$+$KD9$/$+$+$k$N$O!"$?$V(B
+$B$s(B gnus $B$N4V0c$C$F$$$kItJ,$r%W%m%U%!%$%k$7$?$;$$$G$7$g$&!#%W%m%U%!%$%k$N(B
+$BE}7W$r%j%;%C%H$9$k$K$O(B @kbd{M-x elp-reset-all} $B$r;H$C$F2<$5$$!#(B@kbd{M-x
+elp-restore-all} $B$O%W%m%U%!%$%k$9$kF0:n$r<h$j=|$/$3$H$K$J$C$F$$$^$9$,!"(B
+gnus $B$K$h$C$FJ#;($K$5$l$+$DF0E*$J%3!<%I@8@.$N1F6A$r<u$1$k$?$a!"$=$l$OI,(B
+$B$:$7$b40A4$KF0:n$9$k$H$O8B$i$J$$$+$b$7$l$^$;$s!#(B
 
 $B$b$71g=u$,M_$7$$$@$1$G$"$l$P!"(B@samp{gnu.emacs.gnus} $B$G?R$M$k$N$,NI$$$G$7$g(B
 $B$&!#;d$O$"$^$jLr$KN)$A$^$;$s!#(B
