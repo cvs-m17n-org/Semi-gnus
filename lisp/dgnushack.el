@@ -207,7 +207,8 @@ Modify to suit your needs."))
 	      (condition-case nil
 		  (progn (require 'w3-forms) nil)
 		(error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-			 "nnslashdot.el" "nnwarchive.el" "webmail.el")))
+			 "nnslashdot.el" "nnwarchive.el" "webmail.el"
+			 "nnwfm.el")))
 	      (condition-case nil
 		  (progn (require 'bbdb) nil)
 		(error '("gnus-bbdb.el")))

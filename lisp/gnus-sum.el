@@ -1190,6 +1190,9 @@ end position and text.")
     gnus-newsgroup-incorporated)
   "Variables that are buffer-local to the summary buffers.")
 
+(defvar gnus-newsgroup-variables nil
+  "Variables that have separate values in the newsgroups.")
+
 ;; Byte-compiler warning.
 (defvar gnus-article-mode-map)
 
@@ -2095,6 +2098,8 @@ The following commands are available:
     (gnus-summary-make-menu-bar))
   (kill-all-local-variables)
   (gnus-summary-make-local-variables)
+  (let ((gnus-summary-local-variables gnus-newsgroup-variables))
+    (gnus-summary-make-local-variables))
   (gnus-make-thread-indent-array)
   (gnus-simplify-mode-line)
   (setq major-mode 'gnus-summary-mode)
@@ -2535,7 +2540,15 @@ buffer that was in action when the last article was fetched."
 	  (gac gnus-article-current)
 	  (reffed gnus-reffed-article-number)
 	  (score-file gnus-current-score-file)
-	  (default-charset gnus-newsgroup-charset))
+	  (default-charset gnus-newsgroup-charset)
+	  vlist)
+      (let ((locals gnus-newsgroup-variables))
+	(while locals
+	  (if (consp (car locals))
+	      (push (eval (caar locals)) vlist)
+	    (push (eval (car locals)) vlist))
+	  (setq locals (cdr locals)))
+	(setq vlist (nreverse vlist)))
       (save-excursion
 	(set-buffer gnus-group-buffer)
 	(setq gnus-newsgroup-name name
@@ -2550,6 +2563,12 @@ buffer that was in action when the last article was fetched."
 	      gnus-reffed-article-number reffed
 	      gnus-current-score-file score-file
 	      gnus-newsgroup-charset default-charset)
+	(let ((locals gnus-newsgroup-variables))
+	  (while locals
+	    (if (consp (car locals))
+		(set (caar locals) (pop vlist))
+	      (set (car locals) (pop vlist)))
+	    (setq locals (cdr locals))))
 	;; The article buffer also has local variables.
 	(when (gnus-buffer-live-p gnus-article-buffer)
 	  (set-buffer gnus-article-buffer)
@@ -5502,12 +5521,16 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	;; not garbage-collected, it seems.  This would the lead to en
 	;; ever-growing Emacs.
 	(gnus-summary-clear-local-variables)
+	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
+	  (gnus-summary-clear-local-variables))
 	(when (get-buffer gnus-article-buffer)
 	  (bury-buffer gnus-article-buffer))
 	;; We clear the global counterparts of the buffer-local
 	;; variables as well, just to be on the safe side.
 	(set-buffer gnus-group-buffer)
 	(gnus-summary-clear-local-variables)
+	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
+	  (gnus-summary-clear-local-variables))
 	;; Return to group mode buffer.
 	(when (eq mode 'gnus-summary-mode)
 	  (gnus-kill-buffer buf)))
@@ -5551,8 +5574,12 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	  (gnus-deaden-summary)
 	(gnus-close-group group)
 	(gnus-summary-clear-local-variables)
+	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
+	  (gnus-summary-clear-local-variables))
 	(set-buffer gnus-group-buffer)
 	(gnus-summary-clear-local-variables)
+	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
+	  (gnus-summary-clear-local-variables))
 	(when (get-buffer gnus-summary-buffer)
 	  (kill-buffer gnus-summary-buffer)))
       (unless gnus-single-article-buffer
@@ -8026,10 +8053,31 @@ groups."
 						 no-highlight)
   "Make edits to the current article permanent."
   (interactive)
+  (save-excursion
+    ;; The buffer restriction contains the entire article if it exists.
+    (when (article-goto-body)
+      (let ((lines (count-lines (point) (point-max)))
+	    (length (- (point-max) (point)))
+	    (case-fold-search t)
+	    (body (copy-marker (point))))
+	(goto-char (point-min))
+	(when (re-search-forward "^content-length:[ \t]\\([0-9]+\\)" body t)
+	  (delete-region (match-beginning 1) (match-end 1))
+	  (insert (number-to-string length)))
+	(goto-char (point-min))
+	(when (re-search-forward
+	       "^x-content-length:[ \t]\\([0-9]+\\)" body t)
+	  (delete-region (match-beginning 1) (match-end 1))
+	  (insert (number-to-string length)))
+	(goto-char (point-min))
+	(when (re-search-forward "^lines:[ \t]\\([0-9]+\\)" body t)
+	  (delete-region (match-beginning 1) (match-end 1))
+	  (insert (number-to-string lines))))))
   ;; Replace the article.
   (let ((buf (current-buffer)))
     (with-temp-buffer
       (insert-buffer-substring buf)
+      
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
 		     (cdr gnus-article-current) (car gnus-article-current)

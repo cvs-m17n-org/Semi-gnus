@@ -4539,15 +4539,17 @@ that further discussion should take place only in "
       (let (ccalist)
 	(save-excursion
 	  (message-set-work-buffer)
-	  (if (and mft
-		   message-use-followup-to
-		   (or (not (eq message-use-followup-to 'ask))
-		       (message-y-or-n-p
-			(concat "Obey Mail-Followup-To: " mft "? ") t "\
-You should normally obey the Mail-Followup-To: header.
+          (if (and mft
+                   message-use-followup-to
+                   (or (not (eq message-use-followup-to 'ask))
+                       (message-y-or-n-p
+		        (concat "Obey Mail-Followup-To? ") t "\
+You should normally obey the Mail-Followup-To: header.  In this
+article, it has the value of
 
-	`Mail-Followup-To: " mft "'
-directs your response to " (if (string-match "," mft)
+" mft "
+
+which directs your response to " (if (string-match "," mft)
 			       "the specified addresses"
 			     "that address only") ".
 

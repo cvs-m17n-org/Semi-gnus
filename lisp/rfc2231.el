@@ -28,10 +28,16 @@
 
 (eval-when-compile (require 'cl))
 (require 'ietf-drums)
+(require 'rfc2047)
 
 (defun rfc2231-get-value (ct attribute)
   "Return the value of ATTRIBUTE from CT."
   (cdr (assq attribute (cdr ct))))
+
+(defun rfc2231-parse-qp-string (string)
+  "Parse QP-encoded string using `rfc2231-parse-string'.
+N.B.  This is in violation with RFC2047, but it seem to be in common use."
+  (rfc2231-parse-string (rfc2047-decode-string string)))
 
 (defun rfc2231-parse-string (string)
   "Parse STRING and return a list.
@@ -81,7 +87,9 @@ The list will be on the form
 	    (when (eq c ?*)
 	      (forward-char 1)
 	      (setq c (char-after))
-	      (when (memq c ntoken)
+	      (if (not (memq c ntoken))
+		  (setq encoded t
+			number nil)
 		(setq number
 		      (string-to-number
 		       (buffer-substring
@@ -142,7 +150,7 @@ These look like \"us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A\"."
 	     (string-to-number (buffer-substring (point) (+ (point) 2)) 16)
 	   (delete-region (1- (point)) (+ (point) 2)))))
       ;; Encode using the charset, if any.
-      (when (and (< (length elems) 1)
+      (when (and (> (length elems) 1)
 		 (not (equal (intern (car elems)) 'us-ascii)))
 	(mm-decode-coding-region (point-min) (point-max)
 				 (intern (car elems))))
@@ -189,7 +197,7 @@ These look like \"us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A\"."
 		(delete-char 1))
 	    (forward-char 1)))
 	(goto-char (point-min))
-	(insert (or charset "ascii") "''")
+	(insert (or (symbol-name charset) "ascii") "''")
 	(goto-char (point-min))
 	(if (not broken)
 	    (insert param "*=")
