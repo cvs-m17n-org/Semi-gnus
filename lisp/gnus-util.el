@@ -1004,6 +1004,25 @@ ARG is passed to the first function."
 	  re
 	  (unless (string-match "\\$$" re) ".*$")))
 
+(defun gnus-write-active-file (file hashtb &optional full-names)
+  (with-temp-file file
+    (mapatoms
+     (lambda (sym)
+       (when (and sym
+		  (boundp sym)
+		  (symbol-value sym))
+	 (insert (format "%S %d %d y\n"
+			 (if full-names
+			     sym
+			   (intern (gnus-group-real-name (symbol-name sym))))
+			 (or (cdr (symbol-value sym))
+			     (car (symbol-value sym)))
+			 (car (symbol-value sym))))))
+     hashtb)
+    (goto-char (point-max))
+    (while (search-backward "\\." nil t)
+      (delete-char 1))))
+
 (provide 'gnus-util)
 
 ;;; gnus-util.el ends here
