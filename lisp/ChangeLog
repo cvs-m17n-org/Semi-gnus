@@ -1,7 +1,3 @@
-2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* lpath.el: Fbind compare-strings for XEmacs.
-
 2003-04-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus-srvr.el (gnus-browse-make-menu-bar): Fix typo.
@@ -15,6 +11,11 @@
 	* gnus-art.el (article-hide-boring-headers): Hide Reply-To: if
 	the broken-reply-to group parameter is set.  Idea from Vasily
 	Korytov <deskpot@myrealbox.com>.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: 'setenv' is in env.el for XEmacsen <= 21.4, but in
+	process.el in XEmacsen >= 21.5.
 
 2003-04-17  Steve Youngs  <youngs@xemacs.org>
 

@@ -33,7 +33,7 @@
       (maybe-fbind '(Info-directory
 		     Info-menu ccl-execute-on-string char-charset charsetp
 		     coding-system-get coding-system-list coding-system-p
-		     compare-strings decode-coding-region decode-coding-string
+		     decode-coding-region decode-coding-string
 		     define-ccl-program delete-overlay detect-coding-region
 		     encode-coding-region encode-coding-string
 		     event-click-count event-end event-start
@@ -81,7 +81,7 @@
 	((boundp 'MULE)
 	 '(charsetp
 	   coding-system-base coding-system-get coding-system-list
-	   coding-system-to-mime-charset compare-strings compose-mail
+	   coding-system-to-mime-charset compose-mail
 	   file-name-extension find-coding-systems-for-charsets
 	   find-coding-systems-region function-max-args get-charset-property
 	   smiley-encode-buffer smtpmail-send-it))
