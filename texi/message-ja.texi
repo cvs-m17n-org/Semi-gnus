@@ -236,7 +236,13 @@ Message がニュース記事をポストするとき、ディフォルト
 証する、すぐれものです。欠点は、@file{.emacs} ファイル (gnus が秘密
 の cancel lock パスワード (最初のこの機能を使うときに自動的に生成され
 る) を格納する場所) をなくしてしまうと、メッセージを取り消すことができな
-いであろうことです。
+いであろうことです。自分でパスワードを管理したいならば、以下のようなもの
+を @file{~/.gnus.el} ファイルに入れて下さい:
+
+@lisp
+(setq canlock-password "Salam Shalom"
+      canlock-password-for-verify canlock-password)
+@end lisp
 
 そのヘッダーを挿入するかどうかは、@code{message-insert-canlock} 変数によっ
 て制御されます。
