@@ -565,6 +565,7 @@ The Summary Buffer
 * Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
+@c * Security::                    Decrypt and Verify.
 
 Summary Buffer Format
 
@@ -2844,6 +2845,23 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @findex gnus-group-list-dormant
 $BJ]N15-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B (@code{gnus-group-list-dormant})$B!#(B
 
+@item A /
+@kindex A / (Group)
+@findex gnus-group-list-limit
+$B8=:_$NA*Br$5$l$?HO0O$K8BDj$7$?%0%k!<%W$rI=<($9(B
+$B$k(B (@code{gnus-group-list-limit})$B!#(B
+
+@item A f
+@kindex A f (Group)
+@findex gnus-group-list-flush
+$B8=:_$NA*Br$5$l$?%0%k!<%W$r=q$-=P$9(B (@code{gnus-group-list-flush})$B!#(B
+
+@item A p
+@kindex A p (Group)
+@findex gnus-group-list-plus
+$B8=:_$NA*Br$5$l$?%0%k!<%W$r2C$($?%0%k!<%W$rI=<($9(B
+$B$k(B (@code{gnus-group-list-plus})$B!#(B
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -3872,6 +3890,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 * Exiting the Summary Buffer:: $B%0%k!<%W%P%C%U%!$KLa$k(B
 * Crosspost Handling::         $B%/%m%9%]%9%H$5$l$?5-;v$,$I$N$h$&$K07$o$l$k$+(B
 * Duplicate Suppression::      $B%/%m%9%]%9%H$N07$$$K<:GT$7$?$H$-$NBeBX<jCJ(B
+@c * Security::                    Decrypt and Verify.
 @end menu
 
 @node Summary Buffer Format
@@ -8603,6 +8622,36 @@ Gnus $B$K$$$D$G$b@5$7$$(B @code{Xref} $B$r<hF@$9$k$h$&$K$5$;$?$$$N$G$"$l$P!"
 @code{gnus-save-duplicate-list} $B$r(B @code{nil} $B$K@_Dj$9$k$Y$-$G$"$k$H$$$&(B
 $B;v$K$J$j$^$9!#$&!<$`!#;d$O$"$J$?$,$I$&$9$k$+$KG$$;$?$$!"$H;W$$$^$9!#(B
 
+@ignore
+@node Security
+@section Security
+
+Gnus is able to verify PGP or S/MIME signed messages or decrypt PGP
+encrypted messages.
+
+@enumerate
+@item 
+To verify or decrypt PGP messages, you have to install mailcrypt or
+gpg.el.
+
+@end enumerate
+
+@table @code
+@item mm-verify-option
+@vindex mm-verify-option
+Option of verifying signed parts.  @code{never}, not verify;
+@code{always}, always verify; @code{known}, only verify known
+protocols. Otherwise, ask user.
+
+@item mm-decrypt-option
+@vindex mm-decrypt-option
+Option of decrypting encrypted parts.  @code{never}, not verify;
+@code{always}, always verify; @code{known}, only verify known
+protocols. Otherwise, ask user.
+
+@end table
+@end ignore
+
 @node The Article Buffer
 @chapter $B5-;v%P%C%U%!(B
 @cindex article buffer
@@ -11972,6 +12021,10 @@ rmail box $B$N$?$a$N%"%/%F%#%V%U%!%$%k$NL>A0!#(B
 $B$3$l$+$i>C5n$5$l$k%a%C%;!<%8$KHO0O$r69$a$i$l$F<B9T$5$l$k%U%C%/$G$9!#$3$N(B
 $B4X?t$OJL$N$H$3$m$K%a%C%;!<%8$r%3%T!<$7$?$j!">C5n$9$k$^$($K2?$i$+$N>pJs$r(B
 $B<h$j=P$9$?$a$K;H$C$?$j$9$k$3$H$,$G$-$^$9!#(B
+
+@item nnfolder-nov-is-evil
+@vindex nnfolder-nov-is-evil
+$B$b$7Hs(B@code{nil}$B$J$i!"$3$N%P%C%/%(%s%I$O(B @sc{nov} $B%U%!%$%k$rL5;k$7$^$9!#(B
 
 @end table
 
