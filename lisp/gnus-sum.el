@@ -678,6 +678,13 @@ This hook is run before any variables are set in the summary buffer."
   :group 'gnus-summary-various
   :type 'hook)
 
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-summary-mode-hook 'gnus-xmas-summary-menu-add)
+  (add-hook 'gnus-summary-mode-hook 'gnus-xmas-setup-summary-toolbar)
+  (add-hook 'gnus-summary-mode-hook
+	    'gnus-xmas-switch-horizontal-scrollbar-off))
+
 (defcustom gnus-summary-menu-hook nil
   "*Hook run after the creation of the summary mode menu."
   :group 'gnus-summary-visual
@@ -3840,8 +3847,8 @@ If LINE, insert the rebuilt thread starting on line LINE."
       threads
     (gnus-message 8 "Sorting threads...")
     (prog1
-	(gnus-sort-threads-1 
-	 threads 
+	(gnus-sort-threads-1
+	 threads
 	 (gnus-make-sort-function gnus-thread-sort-functions))
       (gnus-message 8 "Sorting threads...done"))))
 
@@ -7144,8 +7151,8 @@ to guess what the document format is."
 	;; the parent article.
 	(when (setq to-address (or (message-fetch-field "reply-to")
 				   (message-fetch-field "from")))
-	  (setq params (append 
-			(list (cons 'to-address 
+	  (setq params (append
+			(list (cons 'to-address
 				    (funcall gnus-decode-encoded-word-function
 					     to-address))))))
 	(setq dig (nnheader-set-temp-buffer " *gnus digest buffer*"))
@@ -8219,7 +8226,7 @@ groups."
   (let ((buf (current-buffer)))
     (with-temp-buffer
       (insert-buffer-substring buf)
-      
+
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
 		     (cdr gnus-article-current) (car gnus-article-current)
@@ -8427,7 +8434,7 @@ the actual number of articles unmarked is returned."
 	;;; !!! This is bobus.  We should find out what primary
 	;;; !!! mark we want to set.
 	(gnus-summary-update-mark gnus-del-mark 'unread)))))
-	
+
 (defun gnus-summary-mark-as-expirable (n)
   "Mark N articles forward as expirable.
 If N is negative, mark backward instead.  The difference between N and
@@ -9588,12 +9595,12 @@ save those articles instead."
   "Save parts matching TYPE to DIR.
 If REVERSE, save parts that do not match TYPE."
   (interactive
-   (list (read-string "Save parts of type: " 
+   (list (read-string "Save parts of type: "
 		      (or (car gnus-summary-save-parts-type-history)
 			  gnus-summary-save-parts-default-mime)
 		      'gnus-summary-save-parts-type-history)
 	 (setq gnus-summary-save-parts-last-directory
-	       (read-file-name "Save to directory: " 
+	       (read-file-name "Save to directory: "
 			       gnus-summary-save-parts-last-directory
 			       nil t))
 	 current-prefix-arg))
@@ -9936,7 +9943,7 @@ If REVERSE, save parts that do not match TYPE."
 	      `(progn
 		 (gnus-info-set-marks ',info ',(gnus-info-marks info) t)
 		 (gnus-info-set-read ',info ',(gnus-info-read info))
-		 (gnus-get-unread-articles-in-group ',info 
+		 (gnus-get-unread-articles-in-group ',info
 						    (gnus-active ,group))
 		 (gnus-group-update-group ,group t)
 		 ,setmarkundo))))

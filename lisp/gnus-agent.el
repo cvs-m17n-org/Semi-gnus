@@ -74,15 +74,27 @@ If nil, only read articles will be expired."
   :group 'gnus-agent
   :type 'hook)
 
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-group-mode-hook 'gnus-xmas-agent-group-menu-add))
+
 (defcustom gnus-agent-summary-mode-hook nil
   "Hook run in Agent summary minor modes."
   :group 'gnus-agent
   :type 'hook)
 
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-summary-mode-hook 'gnus-xmas-agent-summary-menu-add))
+
 (defcustom gnus-agent-server-mode-hook nil
   "Hook run in Agent summary minor modes."
   :group 'gnus-agent
   :type 'hook)
+
+;; Extracted from gnus-xmas-redefine in order to preserve user settings
+(when (featurep 'xemacs)
+  (add-hook 'gnus-agent-server-mode-hook 'gnus-xmas-agent-server-menu-add))
 
 (defcustom gnus-agent-confirmation-function 'y-or-n-p
   "Function to confirm when error happens."
@@ -1107,7 +1119,7 @@ the actual number of articles toggled is returned."
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Error (%s).  Continue? " err))
 	     (error "Cannot fetch articles into the Gnus agent.")))
-	  (quit 
+	  (quit
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Quit fetching session (%s).  Continue? "
 				    err))
@@ -1552,8 +1564,8 @@ The following commands are available:
 		      (if (numberp fetch-date)
 			  (>  fetch-date day)
 			;; History file is corrupted.
-			(gnus-message 
-			 5 
+			(gnus-message
+			 5
 			 (format "File %s is corrupted!"
 				 (gnus-agent-lib-file "history")))
 			(sit-for 1)

@@ -335,9 +335,13 @@ Modify to suit your needs."))
 	       (file-newer-than-file-p file elc))
       (delete-file elc)))
 
-  (let (;;(byte-compile-generate-call-tree t)
-	(files dgnushack-exporting-files)
+  (let ((files dgnushack-exporting-files)
+	;;(byte-compile-generate-call-tree t)
 	file elc)
+    ;; Avoid barfing (from gnus-xmas) because the etc directory is not yet
+    ;; installed.
+    (when (featurep 'xemacs)
+      (setq gnus-xmas-glyph-directory "dummy"))
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
       (when (or (not (file-exists-p
