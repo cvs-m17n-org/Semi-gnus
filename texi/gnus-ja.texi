@@ -349,7 +349,7 @@ This file documents gnus, the GNU Emacs newsreader.
 
 $B$3$N%U%!%$%k$O(B GNU Emacs $B$N%K%e!<%9%j!<%@$G$"$k(B gnus $B$K4X$9$k@bL@=q$G$9!#(B
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -398,7 +398,7 @@ license to the document, as described in section 6 of the license.
 
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003
+2002, 2003, 2004
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -989,6 +989,7 @@ New Features
 * Quassia Gnus::                2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
 * Pterodactyl Gnus::            $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$FCN$i$l$F$$$k$b$N(B
 * Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10$B!#(B
+* No Gnus::                     Lars $B$5$s!"D>$7$F(B!
 
 Customization
 
@@ -6203,6 +6204,13 @@ gnus $B%(!<%8%'%s%H(B (@pxref{Agent Basics}) $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&
 $B@)8B$7$^$9(B (@code{gnus-summary-limit-to-display-predicate})$B!#$3$N=R8l$K(B
 $B4X$9$k>\:Y$O(B @ref{Group Parameters} $B$r;2>H$7$F2<$5$$!#(B
 
+@item / r
+@kindex / r ($B35N,(B)
+@findex gnus-summary-limit-to-replied
+$B35N,%P%C%U%!$rJV?.$7$?5-;v$@$1$K@)8B$7$^(B
+$B$9(B (@code{gnus-summary-limit-to-replied})$B!#@\F,<-$,M?$($i$l$?>l9g$O!"JV(B
+$B?.$7$?5-;v0J30$N5-;v$K@)8B$7$^$9!#(B
+
 @item / E
 @itemx M S
 @kindex M S ($B35N,(B)
@@ -8302,6 +8310,13 @@ has been done.  If a prefix is given, a charset will be asked for.
 HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$rEAAw$9$k$H$-(B
 $B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $B$N(B
 $B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
+
+@item W A
+@kindex W A ($B35N,(B)
+@findex gnus-article-treat-ansi-sequences
+ANSI SGR $B%7!<%1%s%9$r(B overlay $B$^$?$O(B extent $B$KJQ49$7$^(B
+$B$9(B (@code{gnus-article-treat-ansi-sequences})$B!#(BANSI $B%7!<%1%s%9$OCf9q8l$N(B
+$B%K%e!<%9%0%k!<%W$G6/D4I=<($K;H$o$l$F$$$^$9!#(B
 
 @item W u
 @kindex W u ($B35N,(B)
@@ -24073,6 +24088,7 @@ Lloyd Zusman.
 * Quassia Gnus::                2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
 * Pterodactyl Gnus::            $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$FCN$i$l$F$$$k$b$N(B
 * Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10$B!#(B
+* No Gnus::                     Lars $B$5$s!"D>$7$F(B!
 @end menu
 
 $B$3$N%j%9%H$O!"$b$A$m$s!"(B@emph{$B$?$$$F$$$N(B} $B=EMW$J?7$7$$5!G=$K4X$9(B
@@ -25375,6 +25391,15 @@ C-m} $B$KJQ$o$j$^$7$?!#(B
 $B$rL58z$K$7$F$7$^$&$N$G!"=pL>$5$l$?!"$^$?$O0E9f2=$5$l$?%a%C%;!<%8$rE>Aw$9(B
 $B$k$H$-$O(B @acronym{MML} $B$O;H$o$l$^$;$s!#(B
 @end itemize
+
+@node No Gnus
+@subsubsection No Gnus
+@cindex No Gnus
+
+No Gnus $B$N?7$7$$5!G=(B:
+@c FIXME: Gnus 5.12?
+
+@include gnus-news.texi
 
 @iftex
 

@@ -1,3 +1,32 @@
+2004-01-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-limit-to-replied): New command.
+	(gnus-summary-limit-map): Add it.
+	(gnus-summary-make-menu-bar): do.
+
+2004-01-06  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-cache-lookups, spam-caches, spam-clear-cache):
+	first attempt at some caching support (done for BBDB only now)
+	(spam-find-spam): set spam-cache-lookups if there are more than 2
+	addresses to be checked
+	(spam-clear-cache-BBDB): new function, to be invoked by
+	bbdb-change-hook, and triggering spam-clear-cache of 'spam-use-BBDB
+	(spam-check-BBDB): check and use the caches, if
+	spam-cache-lookups is on
+	remove superfluous (provide)
+
+2004-01-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-treat-ansi-sequences): Changed default.
+
+2004-01-07  Steve Youngs  <sryoungs@bigpond.net.au>
+
+	* run-at-time.el (run-at-time-saved): Move to after the definition
+	of `run-at-time'.
+
+	* dgnushack.el: Autoload `font-lock-fontify-buffer' in XEmacs.
+
 2004-01-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-art.el (gnus-article-wash-html-with-w3m): Don't use

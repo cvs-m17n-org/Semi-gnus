@@ -330,7 +330,7 @@ license to the document, as described in section 6 of the license.
 
 This file documents gnus, the GNU Emacs newsreader.
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -361,7 +361,7 @@ license to the document, as described in section 6 of the license.
 
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003
+2002, 2003, 2004
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -934,6 +934,7 @@ New Features
 * Quassia Gnus::                Two times two is four, or Gnus 5.6/5.7.
 * Pterodactyl Gnus::            Pentad also starts with P, AKA Gnus 5.8/5.9.
 * Oort Gnus::                   It's big.  It's far out.  Gnus 5.10.
+* No Gnus::                     Lars, FIXME!
 
 Customization
 
@@ -6346,6 +6347,13 @@ group parameter predicate
 (@code{gnus-summary-limit-to-display-predicate}).  @xref{Group
 Parameters}, for more on this predicate.
 
+@item / r
+@kindex / r (Summary)
+@findex gnus-summary-limit-to-replied
+Limit the summary buffer to replied articles
+(@code{gnus-summary-limit-to-replied}).  If given a prefix, exclude
+replied articles.
+
 @item / E
 @itemx M S
 @kindex M S (Summary)
@@ -8567,6 +8575,13 @@ has been done.  If a prefix is given, a charset will be asked for.
 Treat HZ or HZP (@code{gnus-article-decode-HZ}).  HZ (or HZP) is one
 common encoding employed when sending Chinese articles.  It typically
 makes strings look like @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}}.
+
+@item W A
+@kindex W A (Summary)
+@findex gnus-article-treat-ansi-sequences
+Translate ANSI SGR control sequences into overlays or extents
+(@code{gnus-article-treat-ansi-sequences}).  ANSI sequences are used in
+some Chinese hierarchies for highlighting.
 
 @item W u
 @kindex W u (Summary)
@@ -23669,7 +23684,7 @@ the same way, we promise.
 Add this symbol to a group's @code{spam-process} parameter by
 customizing the group parameter or the
 @code{gnus-spam-process-newsgroups} variable.  When this symbol is added
-to a grup's @code{spam-process} parameter, the ham-marked articles in
+to a group's @code{spam-process} parameter, the ham-marked articles in
 @emph{ham} groups will be sent to the SpamOracle as samples of ham
 messages.  Note that this ham processor has no effect in @emph{spam} or
 @emph{unclassified} groups.
@@ -24960,6 +24975,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * Quassia Gnus::                Two times two is four, or Gnus 5.6/5.7.
 * Pterodactyl Gnus::            Pentad also starts with P, AKA Gnus 5.8/5.9.
 * Oort Gnus::                   It's big.  It's far out.  Gnus 5.10.
+* No Gnus::                     Lars, FIXME!
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -26235,6 +26251,15 @@ convert to @acronym{MIME}) when appropriate.  @acronym{MML} will not be
 used when forwarding signed or encrypted messages, as the conversion
 invalidate the digital signature.
 @end itemize
+
+@node No Gnus
+@subsubsection No Gnus
+@cindex No Gnus
+
+New features in No Gnus:
+@c FIXME: Gnus 5.12?
+
+@include gnus-news.texi
 
 @iftex
 
