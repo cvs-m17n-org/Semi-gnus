@@ -1418,23 +1418,29 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
       (let ((buffer-read-only nil))
 	(while (search-forward "\b" nil t)
 	  (let ((next (char-after))
-		(previous (char-after (- (point) 2))))
+		start end previous)
+	    (backward-char 2)
+	    (setq start (point)
+		  previous (char-after))
+	    (forward-char 3)
+	    (setq end (point))
+	    (backward-char)
 	    ;; We do the boldification/underlining by hiding the
 	    ;; overstrikes and putting the proper text property
 	    ;; on the letters.
 	    (cond
 	     ((eq next previous)
-	      (gnus-article-hide-text-type (- (point) 2) (point) 'overstrike)
-	      (put-text-property (point) (1+ (point)) 'face 'bold))
+	      (gnus-article-hide-text-type start (point) 'overstrike)
+	      (put-text-property (point) end 'face 'bold))
 	     ((eq next ?_)
 	      (gnus-article-hide-text-type
 	       (1- (point)) (1+ (point)) 'overstrike)
 	      (put-text-property
-	       (- (point) 2) (1- (point)) 'face 'underline))
+	       start (1- (point)) 'face 'underline))
 	     ((eq previous ?_)
-	      (gnus-article-hide-text-type (- (point) 2) (point) 'overstrike)
+	      (gnus-article-hide-text-type start (point) 'overstrike)
 	      (put-text-property
-	       (point) (1+ (point)) 'face 'underline)))))))))
+	       (point) end 'face 'underline)))))))))
 
 (defun article-fill-long-lines ()
   "Fill lines that are wider than the window width."
