@@ -63,6 +63,7 @@
 (autoload 'gnus-msg-mail "gnus-msg" nil t)
 (autoload 'gnus-button-mailto "gnus-msg")
 (autoload 'gnus-button-reply "gnus-msg" nil t)
+(autoload 'parse-time-string "parse-time" nil nil)
 (autoload 'ansi-color-apply-on-region "ansi-color")
 
 (defgroup gnus-article nil
