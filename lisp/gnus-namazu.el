@@ -127,8 +127,6 @@
 	    (symbol-value 'gnus-namazu-index-directory))
        (and (boundp 'nnir-namazu-index-directory)
 	    (symbol-value 'nnir-namazu-index-directory))
-       (and (boundp 'gnus-namazu-index-directory)
-	    (symbol-value 'gnus-namazu-index-directory))
        gnus-namazu-default-index-directory))
   "*Places of Namazu index files."
   :type '(repeat directory)
