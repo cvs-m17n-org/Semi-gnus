@@ -1988,6 +1988,7 @@ C-c C-r  `message-caesar-buffer-body' (rot13 the message body).
 C-c C-u  `message-insert-or-toggle-importance'  (insert or cycle importance).
 C-c M-n  `message-insert-disposition-notification-to'  (request receipt).
 M-RET    `message-newline-and-reformat' (break the line and reformat)."
+  (setq local-abbrev-table text-mode-abbrev-table)
   (set (make-local-variable 'message-reply-buffer) nil)
   (make-local-variable 'message-send-actions)
   (make-local-variable 'message-exit-actions)

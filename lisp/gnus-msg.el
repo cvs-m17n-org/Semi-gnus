@@ -777,6 +777,7 @@ header line with the old Message-ID."
 	      (gnus-article-delete-text-of-type 'annotation)
 	      (gnus-remove-text-with-property 'gnus-prev)
 	      (gnus-remove-text-with-property 'gnus-next)
+	      (gnus-remove-text-with-property 'gnus-decoration)
 	      (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
 	      (insert
 	       (prog1

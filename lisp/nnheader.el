@@ -106,6 +106,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 ;; mm- stuff.
 (unless (featurep 'mm-util)
+  ;; Should keep track of `mm-image-load-path' in mm-util.el.
   (defun nnheader-image-load-path (&optional package)
     (let (dir result)
       (dolist (path load-path (nreverse result))
@@ -117,6 +118,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	(push path result))))
   (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
+  ;; Should keep track of `mm-read-coding-system' in mm-util.el.
   (defalias 'mm-read-coding-system
     (if (or (and (featurep 'xemacs)
 		 (<= (string-to-number emacs-version) 21.1))
@@ -125,14 +127,15 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	  (read-coding-system prompt))
       'read-coding-system))
 
+  ;; Should keep track of `mm-%s' in mm-util.el.
   (defalias 'mm-multibyte-string-p
     (if (fboundp 'multibyte-string-p)
 	'multibyte-string-p
       'ignore))
-
   (defalias 'mm-encode-coding-string 'encode-coding-string)
   (defalias 'mm-decode-coding-string 'decode-coding-string)
 
+  ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
     "Like 'detect-coding-region' except returning the best one."
     (let ((coding-systems
@@ -143,6 +146,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	  coding-systems)))
   (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
 
+  ;; Should keep track of `mm-detect-mime-charset-region' in mm-util.el.
   (defun nnheader-detect-mime-charset-region (start end)
     "Detect MIME charset of the text in the region between START and END."
     (coding-system-to-mime-charset
@@ -150,6 +154,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-detect-mime-charset-region
     'nnheader-detect-mime-charset-region)
 
+  ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
@@ -163,6 +168,7 @@ Use unibyte mode for this."
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
+  ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
   (defun-maybe std11-narrow-to-field ()
     "Narrow the buffer to the header on the current line."
     (forward-line 0)
@@ -172,9 +178,9 @@ Use unibyte mode for this."
 			(when (eolp) (forward-line 1))
 			(point)))
     (goto-char (point-min)))
-
   (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
 
+  ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
   (defun mail-narrow-to-head ()
     "Narrow to the header section in the current buffer."
     (narrow-to-region
@@ -184,6 +190,7 @@ Use unibyte mode for this."
        (point-max)))
     (goto-char (point-min)))
 
+  ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
   (defun-maybe std11-fold-region (b e)
     "Fold long lines in region B to E."
     (save-restriction
@@ -249,6 +256,7 @@ Use unibyte mode for this."
 	  (unless (eobp)
 	    (forward-char 1))))))
 
+  ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
   (defun-maybe std11-fold-field ()
     "Fold the current line."
     (save-excursion
@@ -258,6 +266,7 @@ Use unibyte mode for this."
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
+  ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
   (defun-maybe std11-unfold-region (b e)
     "Unfold lines in region B to E."
     (save-restriction
@@ -266,22 +275,20 @@ Use unibyte mode for this."
       (let ((bol (save-restriction
 		   (widen)
 		   (gnus-point-at-bol)))
-	    (eol (gnus-point-at-eol))
-	    leading)
+	    (eol (gnus-point-at-eol)))
 	(forward-line 1)
 	(while (not (eobp))
-	  (looking-at "[ \t]*")
-	  (setq leading (- (match-end 0) (match-beginning 0)))
-	  (if (< (- (gnus-point-at-eol) bol leading) 76)
-	      (progn
-		(goto-char eol)
-		(delete-region eol (progn
-				     (skip-chars-forward " \t\n\r")
-				     (1- (point)))))
+	  (if (and (looking-at "[ \t]")
+		   (< (- (gnus-point-at-eol) bol) 76))
+	      (delete-region eol (progn
+				   (goto-char eol)
+				   (skip-chars-forward "\r\n")
+				   (point)))
 	    (setq bol (gnus-point-at-bol)))
 	  (setq eol (gnus-point-at-eol))
 	  (forward-line 1)))))
 
+  ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
   (defun-maybe std11-unfold-field ()
     "Fold the current line."
     (save-excursion
@@ -291,17 +298,22 @@ Use unibyte mode for this."
 
   (defalias 'mail-header-unfold-field 'std11-unfold-field)
 
+  ;; This is the original function in T-gnus.
   (defun-maybe std11-extract-addresses-components (string)
     "Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
 If no name can be extracted, FULL-NAME will be nil."
     (when string
-      (mapcar (function
-	       (lambda (structure)
-		 (list (std11-full-name-string structure)
-		       (std11-address-string structure))))
-	      (std11-parse-addresses-string (std11-unfold-string string)))))
+      (let (addresses)
+	(dolist (structure (std11-parse-addresses-string
+			    (std11-unfold-string string))
+			   addresses)
+	  (push (list (std11-full-name-string structure)
+		      (std11-address-string structure))
+		addresses))
+	(nreverse addresses))))
 
+  ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
   (defun mail-header-parse-addresses (string)
     "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
     (mapcar (function
@@ -309,6 +321,7 @@ If no name can be extracted, FULL-NAME will be nil."
 	       (cons (nth 1 components) (car components))))
 	    (std11-extract-addresses-components string)))
 
+  ;; Should keep track of `rfc2047-field-value' in rfc2047.el.
   (defun-maybe std11-field-value (&optional dont-include-last-newline)
     "Return the value of the field at point.  If the optional argument is
 given, the return value will not contain the last newline."

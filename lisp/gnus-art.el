@@ -1875,11 +1875,11 @@ unfolded."
 	    (with-temp-buffer
 	      (insert header)
 	      (goto-char (point-min))
-	      (while (re-search-forward "[\t ]*\n[\t ]+" nil t)
+	      (while (re-search-forward "\n[\t ]" nil t)
 		(replace-match " " t t)))
 	    (setq length (- (point-max) (point-min) 1)))
 	  (when (< length (window-width))
-	    (while (re-search-forward "[\t ]*\n[\t ]+" nil t)
+	    (while (re-search-forward "\n[\t ]" nil t)
 	      (replace-match " " t t)))
 	  (goto-char (point-max)))))))
 
@@ -1951,7 +1951,8 @@ unfolded."
 		  (while (>= (1- (window-width)) (length str))
 		    (setq str (concat str gnus-body-boundary-delimiter)))
 		  (substring str 0 (1- (window-width))))
-		"\n")))))
+		"\n")
+	(gnus-add-text-properties start (point) '(gnus-decoration 'header))))))
 
 (defun article-fill-long-lines ()
   "Fill lines that are wider than the window width."
