@@ -1,9 +1,26 @@
 1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus-msg.el (gnus-inews-yank-articles): Reselect the
-	message frame after selecting a new article if the value of
-	`message-use-multi-frames' is non-nil and plural articles are
-	given.
+	* lisp/message.el (message-yank-original): If
+	`message-yank-add-new-references' is non-nil and this command is
+	called interactively, new IDs from the yanked article will be added
+	to `References' field.
+	(message-yank-add-new-references): New user option.
+	(message-header-format-alist): Use `message-shorten-reference' for
+	`References' in default.
+
+1999-01-20  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>,
+            Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Replace `References'
+	field with the gathered Message-IDs and References if more than one
+	articles are given.
+
+1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Reselect the message
+	frame after selecting a new article if the value of
+	`message-use-multi-frames' is non-nil and more than one articles
+	are given.
 
 1999-01-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
@@ -15,10 +32,10 @@
 
 	* README.semi.ja: Add keiichi and nana-gnus to the branches info.
 	Modify the directory name for the daily snapshots.
-	* README.semi: Likewise.
+	* README.semi: Ditto.
 
 	* README.branch.ja: Modified for Semi-gnus 6.10, etc.
-	* README.branch: Likewise.
+	* README.branch: Ditto.
 
 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
