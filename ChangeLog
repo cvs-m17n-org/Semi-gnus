@@ -1,3 +1,7 @@
+2004-01-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Accidentaly revivaled.  Remove again.
+
 2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.17.1 revision 00.
