@@ -454,8 +454,8 @@ terminology section (@pxref{Terminology}).
 The @code{gnus-select-method} variable says where gnus should look for
 news.  This variable should be a list where the first element says
 @dfn{how} and the second element says @dfn{where}.  This method is your
-native method.  All groups not fetched with this method are foreign
-groups.
+native method.  All groups not fetched with this method are
+foreign groups.
 
 For instance, if the @samp{news.somewhere.edu} @sc{nntp} server is where
 you want to get your daily dosage of news from, you'd say:
@@ -480,8 +480,7 @@ If this variable is not set, gnus will take a look at the
 @code{NNTPSERVER} environment variable.  If that variable isn't set,
 gnus will see whether @code{gnus-nntpserver-file}
 (@file{/etc/nntpserver} by default) has any opinions on the matter.  If
-that fails as well, gnus will try to use the machine running Emacs as an
-@sc{nntp} server.  That's a long shot, though.
+that fails as well, gnus will try to use the machine running Emacs as an @sc{nntp} server.  That's a long shot, though.
 
 @vindex gnus-nntp-server
 If @code{gnus-nntp-server} is set, this variable will override
@@ -584,20 +583,20 @@ levels.)
 @cindex slave
 
 You might want to run more than one Emacs with more than one gnus at the
-same time.  If you are using different @file{.newsrc} files (e.g., if
-you are using the two different gnusae to read from two different
-servers), that is no problem whatsoever.  You just do it.
+same time.  If you are using different @file{.newsrc} files (e.g., if you
+are using the two different gnusae to read from two different servers),
+that is no problem whatsoever.  You just do it.
 
 The problem appears when you want to run two Gnusae that use the same
 @code{.newsrc} file.
 
 To work around that problem some, we here at the Think-Tank at the gnus
-Towers have come up with a new concept: @dfn{Masters} and @dfn{slaves}.
-(We have applied for a patent on this concept, and have taken out a
-copyright on those words.  If you wish to use those words in conjunction
-with each other, you have to send $1 per usage instance to me.  Usage of
-the patent (@dfn{Master/Slave Relationships In Computer Applications})
-will be much more expensive, of course.)
+Towers have come up with a new concept: @dfn{Masters} and
+@dfn{slaves}.  (We have applied for a patent on this concept, and have
+taken out a copyright on those words.  If you wish to use those words in
+conjunction with each other, you have to send $1 per usage instance to
+me.  Usage of the patent (@dfn{Master/Slave Relationships In Computer
+Applications}) will be much more expensive, of course.)
 
 Anyways, you start one gnus up the normal way with @kbd{M-x gnus} (or
 however you do it).  Each subsequent slave gnusae should be started with
@@ -664,13 +663,13 @@ I bet I know what you're thinking now: How do I find out whether my
 server supports @code{ask-server}?  No?  Good, because I don't have a
 fail-safe answer.  I would suggest just setting this variable to
 @code{ask-server} and see whether any new groups appear within the next
-few days.  If any do, then it works.  If none do, then it doesn't work.
-I could write a function to make gnus guess whether the server supports
-@code{ask-server}, but it would just be a guess.  So I won't.  You could
-@code{telnet} to the server and say @code{HELP} and see whether it lists
-@samp{NEWGROUPS} among the commands it understands.  If it does, then it
-might work.  (But there are servers that lists @samp{NEWGROUPS} without
-supporting the function properly.)
+few days.  If any do, then it works.  If none do, then it doesn't
+work.  I could write a function to make gnus guess whether the server
+supports @code{ask-server}, but it would just be a guess.  So I won't.
+You could @code{telnet} to the server and say @code{HELP} and see
+whether it lists @samp{NEWGROUPS} among the commands it understands.  If
+it does, then it might work.  (But there are servers that lists
+@samp{NEWGROUPS} without supporting the function properly.)
 
 This variable can also be a list of select methods.  If so, gnus will
 issue an @code{ask-server} command to each of the select methods, and
@@ -721,9 +720,9 @@ up.  Or something like that.
 
 @item gnus-subscribe-interactively
 @vindex gnus-subscribe-interactively
-Subscribe new groups interactively.  This means that gnus will ask you
-about @strong{all} new groups.  The groups you choose to subscribe to
-will be subscribed hierarchically.
+Subscribe new groups interactively.  This means that gnus will ask
+you about @strong{all} new groups.  The groups you choose to subscribe
+to will be subscribed hierarchically.
 
 @item gnus-subscribe-killed
 @vindex gnus-subscribe-killed
@@ -865,8 +864,6 @@ recent, but it will never write a @file{.newsrc.el} file.  You should
 never delete the @file{.newsrc.eld} file---it contains much information
 not stored in the @file{.newsrc} file.
 
-In addition, gnus does not change anything.  Hail comrade Lars!
-
 @vindex gnus-save-newsrc-file
 You can turn off writing the @file{.newsrc} file by setting
 @code{gnus-save-newsrc-file} to @code{nil}, which means you can delete
@@ -937,8 +934,8 @@ Emacs way.  If your Emacs should crash before you have saved the
 this file.
 
 If gnus detects this file at startup, it will ask the user whether to
-read it.  The auto save file is deleted whenever the real startup file
-is saved.
+read it.  The auto save file is deleted whenever the real startup file is
+saved.
 
 @vindex gnus-use-dribble-file
 If @code{gnus-use-dribble-file} is @code{nil}, gnus won't create and
@@ -1625,8 +1622,8 @@ Also @pxref{Group Levels}.
 @c @icon{gnus-group-catchup-current}
 Mark all unticked articles in this group as read
 (@code{gnus-group-catchup-current}).
-@code{gnus-group-catchup-group-hook} is called when catching up a group
-from the group buffer.
+@code{gnus-group-catchup-group-hook} is called when catching up a group from
+the group buffer.
 
 @item C
 @kindex C (Group)
@@ -2009,10 +2006,10 @@ Here's an example group parameter list:
  (auto-expire . t))
 @end example
 
-We see that each element consists of a ``dotted pair''---the thing
-before the dot is the key, while the thing after the dot is the value.
-All the parameters have this form @emph{except} local variable specs,
-which are not dotted pairs, but proper lists.
+We see that each element consists of a "dotted pair"---the thing before
+the dot is the key, while the thing after the dot is the value.  All the
+parameters have this form @emph{except} local variable specs, which are
+not dotted pairs, but proper lists.
 
 The following group parameters can be used:
 
@@ -2151,9 +2148,10 @@ ticked articles.
 @end table
 
 @item comment
-Elements that look like @code{(comment . "This is a comment")} are
-arbitrary comments on the group.  They are currently ignored by gnus,
-but provide a place for you to store information on particular groups.
+Elements that look like @code{(comment . "This is a comment")}
+are arbitrary comments on the group.  They are currently ignored by
+gnus, but provide a place for you to store information on particular
+groups.
 
 @item charset
 Elements that look like @code{(charset . iso-8859-1)} will make
@@ -2550,9 +2548,9 @@ Yes, gnus is ex(c)iting.
 @item z
 @kindex z (Group)
 @findex gnus-group-suspend
-Suspend gnus (@code{gnus-group-suspend}).  This doesn't really exit
-gnus, but it kills all buffers except the Group buffer.  I'm not sure
-why this is a gain, but then who am I to judge?
+Suspend gnus (@code{gnus-group-suspend}).  This doesn't really exit gnus,
+but it kills all buffers except the Group buffer.  I'm not sure why this
+is a gain, but then who am I to judge?
 
 @item q
 @kindex q (Group)
@@ -2563,9 +2561,8 @@ Quit gnus (@code{gnus-group-exit}).
 @item Q
 @kindex Q (Group)
 @findex gnus-group-quit
-Quit gnus without saving the @file{.newsrc} files
-(@code{gnus-group-quit}).  The dribble file will be saved, though
-(@pxref{Auto Save}).
+Quit gnus without saving the @file{.newsrc} files (@code{gnus-group-quit}).
+The dribble file will be saved, though (@pxref{Auto Save}).
 @end table
 
 @vindex gnus-exit-gnus-hook
@@ -3308,12 +3305,12 @@ slower; and @code{std11-extract-address-components}, which works very
 nicely, but is slower.  The default function will return the wrong
 answer in 5% of the cases.  If this is unacceptable to you, use the
 other function instead:
- 
+
 @lisp
 (setq gnus-extract-address-components
       'mail-extract-address-components)
 @end lisp
-  
+
 @vindex gnus-summary-same-subject
 @code{gnus-summary-same-subject} is a string indicating that the current
 article has the same subject as the previous.  This string will be used
@@ -4003,7 +4000,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung mu,A_(B sein!
+@code{postmaster}.  Ordnung muß sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -4164,7 +4161,7 @@ header by substituting one of those words for the word
 you would do normally.  The previous article will be
 canceled/superseded.
 
-Just remember, kids: There is no `c' in `supersede'.
+Just remember, kids: There is no 'c' in 'supersede'.
 
 
 @node Marking Articles
@@ -4302,7 +4299,8 @@ Marked as expirable (@code{gnus-expirable-mark}).
 Marking articles as @dfn{expirable} (or have them marked as such
 automatically) doesn't make much sense in normal groups---a user doesn't
 control expiring of news articles, but in mail groups, for instance,
-articles marked as @dfn{expirable} can be deleted by gnus at any time.
+articles marked as @dfn{expirable} can be deleted by gnus at
+any time.
 @end table
 
 
@@ -4321,7 +4319,7 @@ You can set a bookmark in the current article.  Say you are reading a
 long thesis on cats' urinary tracts, and have to go home for dinner
 before you've finished reading the thesis.  You can then set a bookmark
 in the article, and gnus will jump to this bookmark the next time it
-encounters the article.  @xref{Setting Marks}
+encounters the article.  @xref{Setting Marks}.
 
 @item
 @vindex gnus-replied-mark
@@ -4988,13 +4986,13 @@ something like:
 @item gnus-fetch-old-headers
 @vindex gnus-fetch-old-headers
 If non-@code{nil}, gnus will attempt to build old threads by fetching
-more old headers---headers to articles marked as read.  If you would
-like to display as few summary lines as possible, but still connect as
-many loose threads as possible, you should set this variable to
-@code{some} or a number.  If you set it to a number, no more than that
-number of extra old headers will be fetched.  In either case, fetching
-old headers only works if the backend you are using carries overview
-files---this would normally be @code{nntp}, @code{nnspool} and
+more old headers---headers to articles marked as read.  If you
+would like to display as few summary lines as possible, but still
+connect as many loose threads as possible, you should set this variable
+to @code{some} or a number.  If you set it to a number, no more than
+that number of extra old headers will be fetched.  In either case,
+fetching old headers only works if the backend you are using carries
+overview files---this would normally be @code{nntp}, @code{nnspool} and
 @code{nnml}.  Also remember that if the root of the thread has been
 expired by the server, there's not much gnus can do about that.
 
@@ -5374,8 +5372,7 @@ pre-fetched.  The default is @code{gnus-async-read-p}, which returns
 @code{nil} on read articles.  The function is called with an article
 data structure as the only parameter.
 
-If, for instance, you wish to pre-fetch only unread articles shorter
-than 100 lines, you could say something like:
+If, for instance, you wish to pre-fetch only unread articles shorter than 100 lines, you could say something like:
 
 @lisp
 (defun my-async-short-unread-p (data)
@@ -5388,8 +5385,8 @@ than 100 lines, you could say something like:
 @end lisp
 
 These functions will be called many, many times, so they should
-preferably be short and sweet to avoid slowing down gnus too much.  It's
-probably a good idea to byte-compile things like this.
+preferably be short and sweet to avoid slowing down gnus too much.
+It's probably a good idea to byte-compile things like this.
 
 @vindex gnus-prefetched-article-deletion-strategy
 Articles have to be removed from the asynch buffer sooner or later.  The
@@ -5738,11 +5735,11 @@ File names like @file{~/News/alt.andrea-dworkin}.
 @end table
 
 @vindex gnus-split-methods
-You can have gnus suggest where to save articles by plonking a regexp
-into the @code{gnus-split-methods} alist.  For instance, if you would
-like to save articles related to gnus in the file @file{gnus-stuff}, and
-articles related to VM in @code{vm-stuff}, you could set this variable
-to something like:
+You can have gnus suggest where to save articles by plonking a regexp into
+the @code{gnus-split-methods} alist.  For instance, if you would like to
+save articles related to gnus in the file @file{gnus-stuff}, and articles
+related to VM in @code{vm-stuff}, you could set this variable to something
+like:
 
 @lisp
 (("^Subject:.*gnus\\|^Newsgroups:.*gnus" "gnus-stuff")
@@ -5768,7 +5765,8 @@ name completion over the results from applying this variable.
 
 This variable is @code{((gnus-article-archive-name))} by default, which
 means that gnus will look at the articles it saves for an
-@code{Archive-name} line and use that as a suggestion for the file name.
+@code{Archive-name} line and use that as a suggestion for the file
+name.
 
 Here's an example function to clean up file names somewhat.  If you have
 lots of mail groups called things like
@@ -7931,7 +7929,8 @@ For an alternative approach, @pxref{Duplicate Suppression}.
 By default, gnus tries to make sure that you don't have to read the same
 article more than once by utilizing the crossposting mechanism
 (@pxref{Crosspost Handling}).  However, that simple and efficient
-approach may not work satisfactory for some users for various reasons.
+approach may not work satisfactory for some users for various
+reasons.
 
 @enumerate
 @item
@@ -8092,8 +8091,7 @@ and then the subject, you might say something like:
 @end lisp
 
 Any headers that are to remain visible, but are not listed in this
-variable, will be displayed in random order after all the headers listed
-in this variable.
+variable, will be displayed in random order after all the headers listed in this variable.
 
 @findex gnus-article-hide-boring-headers
 @vindex gnus-article-display-hook
@@ -11366,7 +11364,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d',Aj(Btre} is to
+providers if they were to do this---their @emph{raison d'être} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -14000,7 +13998,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx ,A,(B
+@itemx ¬
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -16325,7 +16323,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-Fran,Ag(Bois Pinard---many, many interesting and thorough bug reports, as
+François Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -16338,7 +16336,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K,Ae(Bgedal,
+David Kågedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -16410,7 +16408,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-Fran,Ag(Bois Felix Ingrand,
+François Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -17835,8 +17833,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at n,Ae(Br du bruker `gnus-startup-file' som prefix (FOO) til ilete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v,Af(Bre en
+ tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til å lete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den være en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17909,8 +17907,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde v,Af(Bre en m,Ae(Bte ,Ae(B si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  S,Ae(B kunne score-regler legges til den
+Ja, det burde være en måte å si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  Så kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -18240,7 +18238,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt islette den dersom teksten matcher
+Selv ville jeg nok ha valgt å slette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
