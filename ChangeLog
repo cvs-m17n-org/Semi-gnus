@@ -1,3 +1,8 @@
+1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Change to "6.8.19.1"
+	(gnus-version): Change to "Nana-gnus".
+
 1998-10-06  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-parameter-alist): New variable.
