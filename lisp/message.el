@@ -205,11 +205,6 @@ shorten-followup-to existing-newsgroups buffer-file-name unchanged
 newsgroups."
   :group 'message-news)
 
-(defcustom message-check-ignore-invisible-x-face-field t
-  "Non-nil means don't check for invisible X-Face fields before sending."
-  :type 'boolean
-  :group 'message-sending)
-
 (defcustom message-required-news-headers
   '(From Newsgroups Subject Date Message-ID
 	 (optional . Organization) Lines
@@ -2619,8 +2614,8 @@ It should typically alter the sending method in some way or other."
     (undo-boundary)
     (let ((inhibit-read-only t))
       (put-text-property (point-min) (point-max) 'read-only nil))
-    (message-fix-before-sending)
     (run-hooks 'message-send-hook)
+    (message-fix-before-sending)
     (message "Sending...")
     (let ((message-encoding-buffer
 	   (message-generate-new-buffer-clone-locals " message encoding"))
@@ -2681,27 +2676,41 @@ It should typically alter the sending method in some way or other."
 (put 'message-check 'lisp-indent-function 1)
 (put 'message-check 'edebug-form-spec '(form body))
 
+;; This function will be used by MIME-Edit when inserting invisible parts.
+(defun message-invisible-region (start end)
+  (if (featurep 'xemacs)
+      (if (save-excursion
+	    (goto-char start)
+	    (eq (following-char) ?\n))
+	  (setq start (1+ start)))
+    (if (save-excursion
+	  (goto-char (1- end))
+	  (eq (following-char) ?\n))
+	(setq end (1- end))))
+  (put-text-property start end 'invisible t)
+  (if (eq 'message-mode major-mode)
+      (put-text-property start end 'message-invisible t)))
+
+(eval-after-load "invisible"
+  '(defalias 'invisible-region 'message-invisible-region))
+
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
   ;; Make sure there's a newline at the end of the message.
+  (widen)
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  ;; Expose all invisible X-Face fields.
-  (when message-check-ignore-invisible-x-face-field
-    (message-narrow-to-headers)
-    (let ((inhibit-point-motion-hooks t)
-	  (case-fold-search t))
-      (while (not (eobp))
-	(if (looking-at "X-Face:")
-	    (put-text-property (point)
-			       (progn
-				 (while (progn (forward-line 1)
-					       (looking-at "[\t ]")))
-				 (point))
-			       'invisible nil)
-	  (forward-line 1))))
-    (widen))
+  ;; Expose all invisible text with the property `message-invisible'.
+  ;; We should believe that the things might be created by MIME-Edit.
+  (let (start)
+    (while (setq start (text-property-any (point-min) (point-max)
+					  'message-invisible t))
+      (remove-text-properties start
+			      (or (text-property-not-all start (point-max)
+							 'message-invisible t)
+				  (point-max))
+			      '(invisible nil message-invisible nil))))
   ;; Expose all invisible text.
   (message-check 'invisible-text
     (when (text-property-any (point-min) (point-max) 'invisible t)
