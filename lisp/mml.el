@@ -36,6 +36,7 @@
   (autoload 'gnus-setup-posting-charset "gnus-msg")
   (autoload 'gnus-make-local-hook "gnus-util")
   (autoload 'message-fetch-field "message")
+  (autoload 'message-mark-active-p "message")
   (autoload 'fill-flowed-encode "flow-fill")
   (autoload 'message-posting-charset "message")
   (autoload 'x-dnd-get-local-file-name "x-dnd"))
@@ -848,33 +849,36 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
     main))
 
 (easy-menu-define
- mml-menu mml-mode-map ""
- `("Attachments"
-   ["Attach File..." mml-attach-file
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Attach a file at point"))]
-   ["Attach Buffer..." mml-attach-buffer t]
-   ["Attach External..." mml-attach-external t]
-   ["Insert Part..." mml-insert-part t]
-   ["Insert Multipart..." mml-insert-multipart t]
-   ["PGP/MIME Sign" mml-secure-message-sign-pgpmime t]
-   ["PGP/MIME Encrypt" mml-secure-message-encrypt-pgpmime t]
-   ["PGP Sign" mml-secure-message-sign-pgp t]
-   ["PGP Encrypt" mml-secure-message-encrypt-pgp t]
-   ["S/MIME Sign" mml-secure-message-sign-smime t]
-   ["S/MIME Encrypt" mml-secure-message-encrypt-smime t]
-   ("Secure MIME part"
-    ["PGP/MIME Sign Part" mml-secure-sign-pgpmime t]
-    ["PGP/MIME Encrypt Part" mml-secure-encrypt-pgpmime t]
-    ["PGP Sign Part" mml-secure-sign-pgp t]
-    ["PGP Encrypt Part" mml-secure-encrypt-pgp t]
-    ["S/MIME Sign Part" mml-secure-sign-smime t]
-    ["S/MIME Encrypt Part" mml-secure-encrypt-smime t])
-   ["Encrypt/Sign off" mml-unsecure-message t]
-   ;;["Narrow" mml-narrow-to-part t]
-   ["Quote MML" mml-quote-region t]
-   ["Validate MML" mml-validate t]
-   ["Preview" mml-preview t]))
+  mml-menu mml-mode-map ""
+  `("Attachments"
+    ["Attach File..." mml-attach-file
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Attach a file at point"))]
+    ["Attach Buffer..." mml-attach-buffer t]
+    ["Attach External..." mml-attach-external t]
+    ["Insert Part..." mml-insert-part t]
+    ["Insert Multipart..." mml-insert-multipart t]
+    ["PGP/MIME Sign" mml-secure-message-sign-pgpmime t]
+    ["PGP/MIME Encrypt" mml-secure-message-encrypt-pgpmime t]
+    ["PGP Sign" mml-secure-message-sign-pgp t]
+    ["PGP Encrypt" mml-secure-message-encrypt-pgp t]
+    ["S/MIME Sign" mml-secure-message-sign-smime t]
+    ["S/MIME Encrypt" mml-secure-message-encrypt-smime t]
+    ("Secure MIME part"
+     ["PGP/MIME Sign Part" mml-secure-sign-pgpmime t]
+     ["PGP/MIME Encrypt Part" mml-secure-encrypt-pgpmime t]
+     ["PGP Sign Part" mml-secure-sign-pgp t]
+     ["PGP Encrypt Part" mml-secure-encrypt-pgp t]
+     ["S/MIME Sign Part" mml-secure-sign-smime t]
+     ["S/MIME Encrypt Part" mml-secure-encrypt-smime t])
+    ["Encrypt/Sign off" mml-unsecure-message t]
+    ;;["Narrow" mml-narrow-to-part t]
+    ["Quote MML" mml-quote-region
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Quote MML tags in region"))]
+    ["Validate MML" mml-validate t]
+    ["Preview" mml-preview t]))
 
 (defvar mml-mode nil
   "Minor mode for editing MML.")
