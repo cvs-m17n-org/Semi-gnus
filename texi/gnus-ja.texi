@@ -21725,7 +21725,7 @@ Gnus $B$O(B hashcash $B%/%C%-!<$rG'>Z$9$k$3$H$,$G$-$^$9$,!"<j$G%+%9%?%^%$%:$7
 @ref{Spam ELisp Package Sequence of Events} $B$r;2>H$7$F2<$5$$!#(B
 
 @cindex spam-initialize
-@code{spam.el} $B$r;H$&$K$O!"(B@code{spam.el} $B$r<+F0FI$_9~$_(B (autoload) $B$7(B
+@code{spam.el} $B$r;H$&$K$O!"(B@file{spam.el} $B$r<+F0FI$_9~$_(B (autoload) $B$7(B
 $B$F(B @code{spam.el} $B$N3F%U%C%/$r%$%s%9%H!<%k$9$k$?$a$K!"4X(B
 $B?t(B @code{spam-initialize} $B$r(B @strong{$B<B9T$7$J$1$l$P$J$j$^$;$s(B}$B!#0l$DNc30(B
 $B$,$"$j$^$9(B: $B$b$7(B @code{spam-use-stat} $B$N@_Dj$r;H$&(B (@pxref{spam-stat
@@ -21737,7 +21737,7 @@ spam filtering}) $B$N$G$"$l$P!"$=$l$r(B @code{spam-initialize} $B$h$jA0(B
 (spam-initialize)
 @end example
 
-$B$G$O(B @code{spam.el} $B$rFI$_9~$`$H2?$,5/$-$k$G$7$g$&$+(B?
+$B$G$O(B @file{spam.el} $B$rFI$_9~$`$H2?$,5/$-$k$G$7$g$&$+(B?
 
 $BBh0l$K(B @code{spam-initialize} $B$K$h$C$F$$$/$D$+$N%U%C%/$,F0:n$9$k$h$&$K$J(B
 $B$j$^$9!#(B@code{spam-stat} $B$,$=$l$i$N%G!<%?%Y!<%9$r%;!<%V$G$-$k$h$&$K$9$k(B
@@ -21776,7 +21776,7 @@ Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$
 
 @end table
 
-$B$^$?!"(B@code{spam.el} $B$rFI$_9~$`$H!"$=$NJQ?t72$r%+%9%?%^%$%:$9$k$3$H$,$G(B
+$B$^$?!"(B@file{spam.el} $B$rFI$_9~$`$H!"$=$NJQ?t72$r%+%9%?%^%$%:$9$k$3$H$,$G(B
 $B$-$k$h$&$K$J$j$^$9!#(B@samp{spam} $BJQ?t%0%k!<%W$K$D$$(B
 $B$F(B @code{customize-group} $B$r;n$7$F$_$F2<$5$$!#(B
 
@@ -21988,7 +21988,7 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 
 $B8!::$HF1;~$KL@$i$+$K(B @code{spam-split} $B$r<B9T$9$k$H$7$F$b!":#$^$G$H$*(B
 $B$j(B @code{spam-use-regex-headers} $B$r(B @code{t} $B$K@_Dj$9$k$h$&$J8!::$r9T$C(B
-$B$F$$$J$1$l$P$J$j$^$;$s!#$J$<$J$i(B @code{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?(B
+$B$F$$$J$1$l$P$J$j$^$;$s!#$J$<$J$i(B @file{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?(B
 $B$,2?$N(B @code{spam-use-xyz} $BJQ?t$r@_Dj$7$F$$$k$+$K1~$8$?!"$$$/$D$+$N>r7o(B
 $BIU$-$NFI$_9~$_$,9T$o$l$k$+$i$G$9!#(B
 
@@ -22196,7 +22196,7 @@ Ham $B$,(B spam $B%0%k!<%W$+$i0\F0$5$l$kA0$K0u$r>C$7$?$$>l9g$O!"$3$NJQ?t$r%;%
 @code{X-Spam-Status} $B%X%C%@!<$,;H$o$l$^$9!#(B@code{spam-use-bogofilter} $B$r(B
 $B;H$&>l9g$O!"(B@code{X-Bogosity} $B$,;H$o$l$^$9!#(B@code{spam-use-crm114} $B$r;H(B
 $B$&$N$J$i$P!"(BCRM114 $B%9%3%"!&%U%)!<%^%C%H$K9gCW$9$k!"$$$:$l$+$N%X%C%@$,;H(B
-$B$o$l$^$9!#(B@code{spam.el} $B$r%m!<%I$9$k(B @emph{$BA0(B} $B$K!"E,@Z$J%P%C%/%(%s%IJQ(B
+$B$o$l$^$9!#(B@file{spam.el} $B$r%m!<%I$9$k(B @emph{$BA0(B} $B$K!"E,@Z$J%P%C%/%(%s%IJQ(B
 $B?t$r(B t $B$K@_Dj$9$k8B$j!"$&$^$/$$$/$G$7$g$&!#(B@code{spam.el} $B$O!"(BGnus $B$,Fb(B
 $BItE*$KI,MW$H$9$k%X%C%@!<$N%j%9%H$K!"@5$7$$%X%C%@!<$r<+F0E*$KDI2C$7$^$9!#(B
 
