@@ -1597,10 +1597,11 @@ qmail-inject プログラムに渡す引数です。これは文字列のリストで、それぞれ
 @findex system-name
 @cindex Sun
 @cindex i-did-not-set--mail-host-address--so-tickle-me
-この必要なヘッダーは Message により作成されます。日付、時間、利用者名、
-システム名に基づいた他に無い ID が作成されます。ドメインの項については、
-有効な FQDN (完全に条件を満たしたドメイン名) らしいものが見つからない場
-合、message は @code{message-user-fqdn}, @code{system-name},
+この必要なヘッダーは Message により作成されます。日付、時刻、ユーザ
+名 (ローカルパート) およびドメインパートに基づいたユニークな ID が作成さ
+れます。ドメインパートについては、有効な FQDN (完全に条件を満たしたドメ
+イン名) らしいものが見つからない場合、
+message は @code{message-user-fqdn}, @code{system-name},
 @code{mail-host-address} および @code{message-user-mail-address} (すなわ
 ち @code{user-mail-address}) を (この順で) 探します。
 
