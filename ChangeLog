@@ -1,3 +1,10 @@
+2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01 in
+	order to force update cached format specs.
+
+	* lisp/gnus-spec.el (gnus-use-correct-string-widths): Default to t.
+
 2002-01-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el: Adopt for old Gnusae.
