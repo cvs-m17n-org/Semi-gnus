@@ -1,3 +1,8 @@
+2001-07-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/mml2015.el: Require `gnus-clfns' when compiling.
+	* lisp/gnus-clfns.el (string-to-list): New compiler macro.
+
 2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-select-newsgroup): Don't examine cached
