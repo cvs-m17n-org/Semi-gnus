@@ -1074,10 +1074,10 @@ gnus $B$O(B @code{gnus-secondary-servers} $B%j%9%H(B ($B$b$7B8:_$9$k$J$i$P
 @noindent
 $B$H@_Dj$7$^$9!#(B
 
-$BCm(B: @acronym{NNTP} $B$O0u%U%!%$%k(B (@pxref{NNTP marks}) $B$K0u$rJ]B8$7$^$9!#(B
-$B$3$N5!G=$O(B Gnus $B$,%$%s%9%H!<%k$5$l$F$$$kJ#?t$N%[%9%H4V$G0u$r6&M-$9$k$3$H(B
-$B$rMF0W$K$7$^$9$,!"?7Ce5-;v$N<hF@$r$A$g$C$HCY$/$9$k$+$b$7$l$^$;$s!#>\:Y$K(B
-$B$D$$$F$O(B @ref{NNTP marks} $B$r;2>H$7$F2<$5$$!#(B
+$BCm(B: @acronym{NNTP} $B%P%C%/%(%s%I$O0u%U%!%$%k(B (@pxref{NNTP marks}) $B$K0u$r(B
+$BJ]B8$7$^$9!#$3$N5!G=$O(B Gnus $B$,%$%s%9%H!<%k$5$l$F$$$kJ#?t$N%[%9%H4V$G0u$r(B
+$B6&M-$9$k$3$H$rMF0W$K$7$^$9$,!"?7Ce5-;v$N<hF@$r$A$g$C$HCY$/$9$k$+$b$7$l$^(B
+$B$;$s!#>\:Y$K$D$$$F$O(B @ref{NNTP marks} $B$r;2>H$7$F2<$5$$!#(B
 
 @node The First Time
 @section $B0lHV=i$a(B
