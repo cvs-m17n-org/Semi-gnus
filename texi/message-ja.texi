@@ -1600,6 +1600,11 @@ follows this line--} です。
 が @code{nil} であれば、そのような親切メッセージは加えられません。初期値
 は @samp{"The following message is a courtesy copy of an article\nthat has
 been posted to %s as well.\n\n"} です。
+
+@c @item message-fcc-externalize-attachments
+@c @vindex message-gcc-externalize-attachments
+@c If @code{nil}, attach files as normal parts in Fcc copies; if it is
+@c non-@code{nil}, attach local files as external parts.
 @end table
 
 @node Message Buffers

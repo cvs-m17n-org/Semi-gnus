@@ -1,3 +1,15 @@
+2002-02-12  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mailcap.el (mailcap-mime-data): Use enriched-decode.
+
+	* gnus-cite.el (gnus-article-fill-cited-article): Bind
+	use-hard-newlines to nil.
+
+	* gnus-xmas.el (gnus-xmas-image-type-available-p): Assume that
+	image is not available if window-system is not available.
+
+	* gnus-sum.el (gnus-summary-display-make-predicate): Add unread.
+
 2002-02-11  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.el (gnus-article-unpropagated-mark-lists): Don't propagate

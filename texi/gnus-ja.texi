@@ -2828,7 +2828,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$7(B @code{(gcc-self . none)} $B$,$"$l$P!"(B@code{Gcc:} $BMs$O@8@.$5$l$:!"(B
 @code{(gcc-self . "string")} $B$,$"$l$P$3$NJ8;zNs$O$=$N$^$^(B @code{gcc} $BMs(B
 $B$KA^F~$5$l$^$9!#$3$N%Q%i%a!<%?$O0J2<$G@bL@$9$kA4$F$N(B @code{Gcc} $B$N=i4|5,(B
-$BB'$h$j$bM%@h$5$l$^$9(B (@pxref{Archived Messages})$B!#(B
+$BB'$h$j$bM%@h$5$l$^$9(B (@pxref{Archived Messages})$B!#7Y9p(B:: @code{nntp} $B%5!<(B
+$B%P!<$J$I$N%0%k!<%W$G(B @code{(gcc-self . t)} $B$r@_Dj$9$k$H%(%i!<$r0z$-5/$3(B
+$B$7$^$9!#$J$<$J$i(B @code{nntp} $B%5!<%P!<$O5-;v$r<u$1F~$l$^$;$s$+$i!#(B
 
 @item auto-expire
 @cindex auto-expire
@@ -2896,8 +2898,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$$$/$D$+Nc$r5s$2$^$9(B:
 
 @table @code
-@item [read]
-$B4{FI$N5-;v$@$1$rI=<($7$^$9!#(B
+@item [unread]
+$BL$FI$N5-;v$@$1$rI=<($7$^$9!#(B
 
 @item [not expire]
 $B4|8B@Z$l>C5n2DG=$J5-;v0J30$N$9$Y$F$rI=<($7$^$9!#(B
@@ -2907,9 +2909,10 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @end table
 
 $BMxMQ$G$-$k1i;;;R$O(B @code{not}$B!"(B@code{and} $B$*$h$S(B @code{or} $B$G$9!#=R8l(B
-$B$O(B @code{read}$B!"(B@code{dormant}$B!"(B@code{expire}$B!"(B@code{reply}$B!"(B
-@code{killed}$B!"(B@code{bookmark}$B!"(B@code{score}$B!"(B@code{save}$B!"(B@code{cache}$B!"(B
-@code{forward}$B!"(B@code{seen} $B$*$h$S(B @code{recent} $B$r4^$_$^$9!#(B
+$B$O(B @code{tick}$B!"(B@code{unsend}$B!"(B@code{undownload}$B!"(B@code{unread}$B!"(B
+@code{dormant}$B!"(B@code{expire}$B!"(B@code{reply}$B!"(B@code{killed}$B!"(B
+@code{bookmark}$B!"(B@code{score}$B!"(B@code{save}$B!"(B@code{cache}$B!"(B@code{forward}$B!"(B
+@code{unseen} $B$*$h$S(B @code{recent} $B$r4^$_$^$9!#(B
 @end table
 
 @code{display} $B%Q%i%a!<%?$O!"35N,%P%C%U%!$r;XDj$7$?0lIt$NAH$@$1$K@)8B$9(B
@@ -10302,6 +10305,14 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 @item gnus-gcc-mark-as-read
 @vindex gnus-gcc-mark-as-read
 $B$b$7Hs(B@code{nil}$B$J$i!"(B@code{Gcc} $B$N5-;v$K4{FI$N0u$rIU$1$^$9!#(B
+
+@c @item gnus-gcc-externalize-attachments
+@c @vindex gnus-gcc-externalize-attachments
+@c If @code{nil}, attach files as normal parts in Gcc copies; if a regexp
+@c and matches the Gcc group name, attach files as external parts; if it is
+@c @code{all}, attach local files as external parts; if it is other
+@c non-@code{nil}, the behavior is the same as @code{all}, but it may be
+@c changed in the future.
 @end table
 
 @node Posting Styles
