@@ -1,3 +1,9 @@
+2003-08-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el
+	(gnus-summary-search-article-highlight-matched-text): Replace
+	`gnus-treat-display-xface' with `gnus-treat-display-x-face'.
+
 2003-08-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/search): Small modified to

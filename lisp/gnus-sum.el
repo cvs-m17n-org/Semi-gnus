@@ -8395,7 +8395,7 @@ If BACKWARD, search backward instead."
 		       gnus-treat-highlight-citation
 		       gnus-treat-highlight-signature
 		       gnus-treat-overstrike
-		       gnus-treat-display-xface
+		       gnus-treat-display-x-face
 		       gnus-treat-buttonize-head
 		       gnus-treat-decode-article-as-default-mime-charset))
 		    (static-if (featurep 'xemacs)
@@ -8403,8 +8403,8 @@ If BACKWARD, search backward instead."
 		      (cons '(x-face-mule-delete-x-face-field
 			      (quote never))
 			    items))))
-		 (gnus-treat-display-xface
-		  (when (, x-face) gnus-treat-display-xface)))
+		 (gnus-treat-display-x-face
+		  (when (, x-face) gnus-treat-display-x-face)))
 	     (gnus-article-prepare-mime-display)))
 	 (goto-char (if (, backward) start end))
 	 (when (, x-face)
