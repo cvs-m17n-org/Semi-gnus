@@ -1,3 +1,11 @@
+2000-09-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el: Add `netbsd' support.
+	(nnshimbun-nov-fix-header): Change a form storing Message-Id.
+	(nnshimbun-search-id): Ditto.
+	(nnshimbun-make-mhonarc-contents): Use optional header
+	information.
+
 2000-09-05   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/pop3.el (pop3-quit): Don't clear `pop3-uidl-obarray'.

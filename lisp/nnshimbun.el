@@ -142,6 +142,17 @@
      (get-headers   . nnshimbun-xemacs-get-headers)
      (index-url     . (nnshimbun-xemacs-concat-url nil))
      (make-contents . nnshimbun-make-mhonarc-contents))
+    ("netbsd"
+     (url . "http://www.jp.netbsd.org/ja/JP/ml/")
+     (groups "announce-ja" "junk-ja" "tech-misc-ja" "tech-pkg-ja"
+	     "port-arm32-ja" "port-hpcmips-ja" "port-mac68k-ja"
+	     "port-mips-ja" "port-powerpc-ja" "hpcmips-changes-ja"
+	     "members-ja" "admin-ja" "www-changes-ja")
+     (coding-system  . ,(if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
+     (generate-nov   . nnshimbun-generate-nov-for-each-group)
+     (get-headers    . nnshimbun-netbsd-get-headers)
+     (index-url      . (format "%s%s/index.html" nnshimbun-url nnshimbun-current-group))
+     (make-contents  . nnshimbun-make-mhonarc-contents))
     ))
 
 (defvar nnshimbun-x-face-alist
@@ -527,7 +538,7 @@
 	  (setq found t)))
       (unless found
 	(goto-char (point-min))
-	(when (search-forward (concat "X-Nnshimbun-Original-Id: " id) nil t)
+	(when (search-forward (concat "X-Nnshimbun-Id: " id) nil t)
 	  (forward-line 0)
 	  (setq found t)))
       (if found
@@ -542,12 +553,13 @@
     (when (nnheader-find-nov-line (mail-header-number header))
       (dolist (arg args)
 	(if (eq (car arg) 'id)
-	    (let ((extra (mail-header-extra header)) x)
-	      (when (setq x (assq 'X-Nnshimbun-Original-Id extra))
-		(setq extra (delq x extra)))
-	      (mail-header-set-extra
-	       header
-	       (cons (cons 'X-Nnshimbun-Original-Id (cdr arg)) extra)))
+	    (let ((extra (mail-header-extra header)))
+	      (unless (assq 'X-Nnshimbun-Id extra)
+		(mail-header-set-extra
+		 header
+		 (cons (cons 'X-Nnshimbun-Id (mail-header-id header))
+		       extra)))
+	      (mail-header-set-id header (cdr arg)))
 	  (let ((func (intern (concat "mail-header-set-" (symbol-name (car arg))))))
 	    (if (cdr arg) (eval (list func header (cdr arg)))))))
       (let ((xref (mail-header-xref header)))
@@ -802,14 +814,23 @@ is enclosed by at least one regexp grouping construct."
 	  (while (search-forward " -->" nil t)
 	    (replace-match ""))
 	  (goto-char (point-min))
-	  (let (refs id)
+	  (let (buf refs)
 	    (while (not (eobp))
 	      (cond
 	       ((looking-at "<!--")
 		(delete-region (point) (progn (forward-line 1) (point))))
+	       ((looking-at "Subject: ")
+		(push (cons 'subject (nnheader-header-value)) buf)
+		(delete-region (point) (progn (forward-line 1) (point))))
+	       ((looking-at "From: ")
+		(push (cons 'from (nnheader-header-value)) buf)
+		(delete-region (point) (progn (forward-line 1) (point))))
+	       ((looking-at "Date: ")
+		(push (cons 'date (nnheader-header-value)) buf)
+		(delete-region (point) (progn (forward-line 1) (point))))
 	       ((looking-at "Message-Id: ")
-		(setq id (concat "<" (nnheader-header-value) ">"))
-		(forward-line 1))
+		(push (cons 'id (concat "<" (nnheader-header-value) ">")) buf)
+		(delete-region (point) (progn (forward-line 1) (point))))
 	       ((looking-at "Reference: ")
 		(push (concat "<" (nnheader-header-value) ">") refs)
 		(delete-region (point) (progn (forward-line 1) (point))))
@@ -819,19 +840,12 @@ is enclosed by at least one regexp grouping construct."
 		  (insert "; charset=ISO-2022-JP"))
 		(forward-line 1))
 	       (t (forward-line 1))))
-	    (let (buf)
-	      (dolist (ref refs)
-		(and
-		 (setq ref (nnshimbun-search-id nnshimbun-current-group ref 'nov))
-		 (push (mail-header-id ref) buf)))
-	      (setq refs buf))
-	    (insert "References: "
-		    (setq refs (mapconcat #'identity refs " "))
-		    "\nMIME-Version: 1.0\n")
-	    (nnshimbun-nov-fix-header nnshimbun-current-group
-				      header
-				      `((id . ,id)
-					(references . ,refs))))
+	    (insert "MIME-Version: 1.0\n")
+	    (if refs (push (cons 'references (mapconcat 'identity refs " ")) buf))
+	    (nnshimbun-nov-fix-header nnshimbun-current-group header buf)
+	    (goto-char (point-min))
+	    (nnheader-insert-header header)
+	    (delete-char -1))
 	  (goto-char (point-max)))
 	;; Processing body.
 	(save-restriction
@@ -1115,6 +1129,8 @@ is enclosed by at least one regexp grouping construct."
 	      headers)))
     (nreverse headers)))
 
+
+
 ;;; MLs on www.mew.org
 
 (defmacro nnshimbun-mew-concat-url (url)
@@ -1212,6 +1228,8 @@ is enclosed by at least one regexp grouping construct."
 		  (forward-line -2)))))
 	  headers)))))
 
+
+
 ;;; MLs on www.xemacs.org
 
 (defmacro nnshimbun-xemacs-concat-url (url)
@@ -1257,6 +1275,45 @@ is enclosed by at least one regexp grouping construct."
 	(setq auxs (cdr auxs))))
     headers))
 
+;;; MLs on www.jp.netbsd.org
+
+(defun nnshimbun-netbsd-get-headers ()
+  (let ((case-fold-search t) headers months)
+    (goto-char (point-min))
+    (while (re-search-forward "<A HREF=\"\\([0-9]+\\)/threads.html\">" nil t)
+      (push (match-string 1) months))
+    (setq months (nreverse months))
+    (catch 'exit
+      (dolist (month months)
+	(erase-buffer)
+	(nnshimbun-retrieve-url
+	 (format "%s%s/%s/maillist.html" nnshimbun-url nnshimbun-current-group month)
+	 t)
+	(let (id url subject)
+	  (while (re-search-forward
+		  "<A[^>]*HREF=\"\\(msg\\([0-9]+\\)\\.html\\)\">\\([^<]+\\)</A>"
+		  nil t)
+	    (setq url (format "%s%s/%s/%s"
+			      nnshimbun-url
+			      nnshimbun-current-group
+			      month
+			      (match-string 1))
+		  id (format "<%s%05d%%%s>"
+			     month
+			     (string-to-number (match-string 2))
+			     nnshimbun-current-group)
+		  subject (match-string 3))
+	    (if (nnshimbun-search-id nnshimbun-current-group id)
+		(throw 'exit headers)
+	      (push (make-full-mail-header
+		     0
+		     (nnshimbun-mime-encode-string subject)
+		     (if (looking-at "</STRONG> *<EM>\\([^<]+\\)<")
+			 (nnshimbun-mime-encode-string (match-string 1))
+		       "")
+		     "" id "" 0 0 url)
+		    headers)))))
+      headers)))
 
 (provide 'nnshimbun)
 ;;; nnshimbun.el ends here.
