@@ -1124,7 +1124,8 @@ this is a reply."
 	  (when gcc
 	    (message-remove-header "gcc")
 	    (widen)
-	    (setq groups (message-tokenize-header gcc " ,"))
+	    (setq groups (message-unquote-tokens
+                          (message-tokenize-header gcc " ,")))
 	    ;; Copy the article over to some group(s).
 	    (while (setq group (pop groups))
 	      (gnus-check-server
