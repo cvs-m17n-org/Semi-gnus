@@ -4280,30 +4280,80 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (Subject . ,(or subject ""))))))
 
 (defun message-get-reply-headers (wide &optional to-address)
-  (let (follow-to mct never-mct from to cc reply-to ccalist)
+  (let (follow-to mct never-mct from to cc reply-to mft)
     ;; Find all relevant headers we need.
     (setq from (message-fetch-field "from")
 	  to (message-fetch-field "to")
 	  cc (message-fetch-field "cc")
-	  mct (message-fetch-field "mail-copies-to")
+	  mct (when message-use-mail-copies-to
+		(message-fetch-field "mail-copies-to"))
 	  reply-to (when message-use-mail-reply-to
 		     (or (message-fetch-field "mail-reply-to")
-			 (message-fetch-field "reply-to"))))
+			 (message-fetch-field "reply-to")))
+	  mft (when (and (not to-address)
+			 (not reply-to)
+			 message-use-mail-followup-to)
+		(message-fetch-field "mail-followup-to")))
 
     ;; Handle special values of Mail-Copies-To.
     (when mct
-      (cond ((or (equal (downcase mct) "never")
+      (cond
+       ((and (or (equal (downcase mct) "never")
 		 (equal (downcase mct) "nobody"))
-	     (setq never-mct t)
-	     (setq mct nil))
-	    ((or (equal (downcase mct) "always")
+	     (or (not (eq message-use-mail-copies-to 'ask))
+		 (message-y-or-n-p
+		  (concat "Obey Mail-Copies-To: never? ") t "\
+You should normally obey the Mail-Copies-To: header.
+
+	`Mail-Copies-To: never'
+directs you not to send your response to the author.")))
+	(setq never-mct t)
+	(setq mct nil))
+       ((and (or (equal (downcase mct) "always")
 		 (equal (downcase mct) "poster"))
-	     (setq mct (or reply-to from)))))
+	     (or (not (eq message-use-mail-copies-to 'ask))
+		 (message-y-or-n-p
+		  (concat "Obey Mail-Copies-To: always? ") t "\
+You should normally obey the Mail-Copies-To: header.
+
+	`Mail-Copies-To: always'
+sends a copy of your response to the author.")))
+	(setq mct (or reply-to from)))
+       ((and (eq message-use-mail-copies-to 'ask)
+	     (not
+	      (message-y-or-n-p
+	       (concat "Obey Mail-Copies-To: " mct " ? ") t "\
+You should normally obey the Mail-Copies-To: header.
+
+	`Mail-Copies-To: " mct "'
+sends a copy of your response to " (if (string-match "," mct)
+				       "the specified addresses"
+				     "that address") ".")))
+	(setq mct nil))))
+
+    ;; Handle Mail-Followup-To.
+    (when (and mft
+	       (eq message-use-mail-followup-to 'ask)
+	       (not (message-y-or-n-p
+		     (concat "Obey Mail-Followup-To: " mft "? ") t "\
+You should normally obey the Mail-Followup-To: header.
+
+	`Mail-Followup-To: " mft "'
+directs your response to " (if (string-match "," mft)
+			       "the specified addresses"
+			     "that address only") ".
+
+A typical situation where Mail-Followup-To is used is when the author thinks
+that further discussion should take place only in "
+			     (if (string-match "," mft)
+				 "the specified mailing lists"
+			       "that mailing list") ".")))
+      (setq mft nil))
 
     (if (or (not wide)
 	    to-address)
 	(progn
-	  (setq follow-to (list (cons 'To (or to-address reply-to from))))
+	  (setq follow-to (list (cons 'To (or to-address reply-to mft from))))
 	  (when (and wide mct)
 	    (push (cons 'Cc mct) follow-to)))
       (let (ccalist)
@@ -4311,6 +4361,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	  (message-set-work-buffer)
 	  (unless never-mct
 	    (insert (or reply-to from "")))
+	  (insert (if mft (concat (if (bolp) "" ", ") mft "") ""))
 	  (insert (if to (concat (if (bolp) "" ", ") to "") ""))
 	  (insert (if mct (concat (if (bolp) "" ", ") mct) ""))
 	  (insert (if cc (concat (if (bolp) "" ", ") cc) ""))
@@ -4347,7 +4398,7 @@ OTHER-HEADERS is an alist of header/value pairs."
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
-	from subject date reply-to to cc
+	from subject date
 	references message-id follow-to
 	(inhibit-point-motion-hooks t)
 	(message-this-is-mail t)
@@ -4369,25 +4420,25 @@ OTHER-HEADERS is an alist of header/value pairs."
 	    date (message-fetch-field "date")
 	    from (message-fetch-field "from")
 	    subject (or (message-fetch-field "subject") "none"))
-    ;; Remove any (buggy) Re:'s that are present and make a
-    ;; proper one.
-    (when (string-match message-subject-re-regexp subject)
-      (setq subject (substring subject (match-end 0))))
-    (setq subject (message-make-followup-subject subject))
+      ;; Remove any (buggy) Re:'s that are present and make a
+      ;; proper one.
+      (when (string-match message-subject-re-regexp subject)
+	(setq subject (substring subject (match-end 0))))
+      (setq subject (message-make-followup-subject subject))
 
-    (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
-	       (string-match "<[^>]+>" gnus-warning))
-      (setq message-id (match-string 0 gnus-warning)))
+      (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
+		 (string-match "<[^>]+>" gnus-warning))
+	(setq message-id (match-string 0 gnus-warning)))
 
-    (unless follow-to
-      (setq follow-to (message-get-reply-headers wide to-address)))
+      (unless follow-to
+	(setq follow-to (message-get-reply-headers wide to-address)))
 
-    ;; Get the references from "In-Reply-To" field if there were
-    ;; no references and "In-Reply-To" field looks promising.
-    (unless references
-      (when (and (setq in-reply-to (message-fetch-field "in-reply-to"))
-		 (string-match "<[^>]+>" in-reply-to))
-	(setq references (match-string 0 in-reply-to)))))
+      ;; Get the references from "In-Reply-To" field if there were
+      ;; no references and "In-Reply-To" field looks promising.
+      (unless references
+	(when (and (setq in-reply-to (message-fetch-field "in-reply-to"))
+		   (string-match "<[^>]+>" in-reply-to))
+	  (setq references (match-string 0 in-reply-to)))))
 
     (message-pop-to-buffer
      (message-buffer-name
