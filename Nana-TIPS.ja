@@ -58,3 +58,39 @@ message-setup-hook (Default: message-mime-setup)
 Semi-gnus では turn-on-mime-edit を呼び出しますが、 Nana-gnus では
 message-mime-setup を呼び出します。
 この関数は message.el で定義されています。
+
+---
+message-mail-follow-up-address-checker (Default: nil)
+
+メイルで応答する際に送信先のメイル・アドレスを変更するための任意の関数
+を設定できます。
+引数としては送信先のメイル・アドレスの alist が渡されます。この alist
+の内容は (address1 . address2) となっており、 address1 はコメントなし
+のメイル・アドレス、 adress2 はコメントも含むメイル・アドレスという形
+式になっています。
+この関数は nil または、引数と同じ形式の alist を返す必要があります。
+
+このための message.el で定義済の関数としては次のものがあります。
+
+`message-check-mailing-list-with-address-list' は、
+`message-mailing-list-address-list' に設定された正規表現、またはそのリ
+ストに一致するアドレスをメイリング・リストのアドレスとして認識し、送信
+先のアドレスにメイリング・リストとそれ以外のアドレスが混在している場合
+には、ユーザーに対して確認後、メイリング・リスト以外のアドレスを削除し
+ます。
+
+`message-check-mailing-list-with-function' は、
+`message-mailing-list-address-p' に設定された関数にアドレスを渡し、そ
+の返り値が non-nil だった場合、メイリング・リストのアドレスと認識する
+他は、上記の `message-check-mailing-list-with-address-list' と同様の処
+理を行います。
+
+`message-mailing-list-address-p' 用の関数として
+`message-bbdb/mailing-address-p' が mess-bbdb.el に定義されています。
+これは、 BBDB に登録済のアドレスで、 `ml-name' フィールドをもつものを
+メイリング・リストとします。
+
+これらは Reply-to をつけないメイリング・リストに参加しているときなどに
+便利かも知れません。
+
+;; Nana-TIPS.ja ends here.
