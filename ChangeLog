@@ -8,7 +8,7 @@
 
 1999-01-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/read-password.el: New file.
+	* lisp/read-passwd.el: New file.
 
 1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
