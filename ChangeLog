@@ -1,3 +1,17 @@
+1998-06-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.3.
+
+	* Sync up with Gnus 5.6.11.
+
+1998-06-03  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "The Article Buffer".
+
+1998-06-03  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Summary Buffer".
+
 1998-06-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.2.
