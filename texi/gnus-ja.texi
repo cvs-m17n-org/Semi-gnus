@@ -5128,8 +5128,14 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @item M H
 @kindex M H ($B35N,(B)
 @findex gnus-summary-catchup-to-here
-$B8=:_$N%0%k!<%W$N%]%$%s%H$^$G$r4{FI$H$7$F0u$rIU$1$^(B
+$B8=:_$N%0%k!<%W$N!"8=:_0LCV$H$=$l0JA0$N5-;v$r4{FI$H$7$F0u$rIU$1$^(B
 $B$9(B (@code{gnus-summary-catchup-to-here})$B!#(B
+
+@item M h
+@kindex M h ($B35N,(B)
+@findex gnus-summary-catchup-from-here
+$B8=:_$N%0%k!<%W$N!"8=:_0LCV$H$=$l0J9_$N5-;v$r4{FI$H$7$F0u$rIU$1$^(B
+$B$9(B (@code{gnus-summary-catchup-from-here})$B!#(B
 
 @item C-w
 @kindex C-w ($B35N,(B)
