@@ -375,9 +375,9 @@ OBJECT is either a string or a buffer.
 Optional arguments START and END denote buffer positions for computing the
 hash of a portion of OBJECT.
 
-The optional CODING and NOERROR arguments are ignored.  They are only
-placeholders to ensure the compatibility with XEmacsen with file-coding or
-Mule support."
+The optional CODING and NOERROR arguments are ignored.  They are no
+more than placeholders to ensure the compatibility with XEmacsen with
+file-coding or Mule support."
   (let ((buffer nil))
     (unwind-protect
 	(save-excursion
@@ -410,4 +410,4 @@ Mule support."
 
 (provide 'md5)
 
-;;; md5.el ends here ----------------------------------------------------------
+;;; md5.el ends here

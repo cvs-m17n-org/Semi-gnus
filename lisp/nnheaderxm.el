@@ -63,4 +63,4 @@
 
 (provide 'nnheaderxm)
 
-;;; nnheaderxm.el ends here.
+;;; nnheaderxm.el ends here

@@ -801,4 +801,5 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 
 
 (provide 'nnshimbun)
-;;; nnshimbun.el ends here.
+
+;;; nnshimbun.el ends here
