@@ -1,8 +1,9 @@
-;;; gnus-sum.el --- summary mode commands for Gnus
+;;; gnus-sum.el --- summary mode commands for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -33,8 +34,10 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
-(require 'gnus-util)
+(require 'mime-view)
+
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
+(autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
 (defcustom gnus-kill-summary-on-exit t
   "*If non-nil, kill the summary buffer when you exit from it.
@@ -326,7 +329,7 @@ variable."
   :group 'gnus-article-various
   :type 'boolean)
 
-(defcustom gnus-show-mime nil
+(defcustom gnus-show-mime t
   "*If non-nil, do mime processing of articles.
 The articles will simply be fed to the function given by
 `gnus-show-mime-method'."
@@ -661,18 +664,24 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-structured-field-decoder 'identity
+(defcustom gnus-structured-field-decoder
+  #'eword-decode-and-unfold-structured-field
   "Function to decode non-ASCII characters in structured field for summary."
   :group 'gnus-various
   :type 'function)
 
-(defcustom gnus-unstructured-field-decoder 'identity
+(defcustom gnus-unstructured-field-decoder
+  (function
+   (lambda (string)
+     (eword-decode-unstructured-field-body
+      (std11-unfold-string string) 'must-unfold)
+     ))
   "Function to decode non-ASCII characters in unstructured field for summary."
   :group 'gnus-various
   :type 'function)
 
 (defcustom gnus-parse-headers-hook
-  (list 'gnus-hack-decode-rfc1522 'gnus-decode-rfc1522)
+  '(gnus-set-summary-default-charset)
   "*A hook called before parsing the headers."
   :group 'gnus-various
   :type 'hook)
@@ -1140,6 +1149,7 @@ increase the score of each group you read."
     [delete] gnus-summary-prev-page
     [backspace] gnus-summary-prev-page
     "\r" gnus-summary-scroll-up
+    "\e\r" gnus-summary-scroll-down
     "n" gnus-summary-next-unread-article
     "p" gnus-summary-prev-unread-article
     "N" gnus-summary-next-article
@@ -1221,6 +1231,7 @@ increase the score of each group you read."
     "t" gnus-article-hide-headers
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
+    "v" gnus-summary-preview-mime-message
     "\C-c\C-v\C-v" gnus-uu-decode-uu-view
     "\C-d" gnus-summary-enter-digest-group
     "\M-\C-d" gnus-summary-read-document
@@ -1364,7 +1375,6 @@ increase the score of each group you read."
     "e" gnus-article-emphasize
     "w" gnus-article-fill-cited-article
     "c" gnus-article-remove-cr
-    "q" gnus-article-de-quoted-unreadable
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1425,6 +1435,7 @@ increase the score of each group you read."
     "c" gnus-summary-copy-article
     "B" gnus-summary-crosspost-article
     "q" gnus-summary-respool-query
+    "t" gnus-summary-respool-trace
     "i" gnus-summary-import-article
     "p" gnus-summary-article-posted-p)
 
@@ -1509,7 +1520,6 @@ increase the score of each group you read."
               ["Word wrap" gnus-article-fill-cited-article t]
               ["CR" gnus-article-remove-cr t]
               ["Show X-Face" gnus-article-display-x-face t]
-              ["Quoted-Printable" gnus-article-de-quoted-unreadable t]
               ["UnHTMLize" gnus-article-treat-html t]
               ["Rot 13" gnus-summary-caesar-message t]
               ["Unix pipe" gnus-summary-pipe-message t]
@@ -1547,6 +1557,7 @@ increase the score of each group you read."
                (gnus-check-backend-function
                 'request-expire-articles gnus-newsgroup-name)]
               ["Query respool" gnus-summary-respool-query t]
+	      ["Trace respool" gnus-summary-respool-trace t]
               ["Delete expirable articles" gnus-summary-expire-articles-now
                (gnus-check-backend-function
                 'request-expire-articles gnus-newsgroup-name)])
@@ -2974,7 +2985,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
        (when (gnus-dependencies-add-header
 	      (make-full-mail-header
 	       gnus-reffed-article-number
-	       (nth 3 relation) "" (nth 4 relation)
+	       (nth 3 relation) "" (or (nth 4 relation) "")
 	       (nth 1 relation)
 	       (or (nth 2 relation) "") 0 0 "")
 	      gnus-newsgroup-dependencies nil)
@@ -4636,7 +4647,7 @@ current article will be taken into consideration."
       (let ((max (max (point) (mark)))
 	    articles article)
 	(save-excursion
-	  (goto-char (min (min (point) (mark))))
+	  (goto-char (min (point) (mark)))
 	  (while
 	      (and
 	       (push (setq article (gnus-summary-article-number)) articles)
@@ -4652,6 +4663,19 @@ current article will be taken into consideration."
      (t
       ;; Just return the current article.
       (list (gnus-summary-article-number))))))
+
+(defmacro gnus-summary-iterate (arg &rest forms)
+  "Iterate over the process/prefixed articles and do FORMS.
+ARG is the interactive prefix given to the command.  FORMS will be
+executed with point over the summary line of the articles."
+  (let ((articles (make-symbol "gnus-summary-iterate-articles")))
+    `(let ((,articles (gnus-summary-work-articles ,arg)))
+       (while ,articles
+	 (gnus-summary-goto-subject (car ,articles))
+	 ,@forms))))
+
+(put 'gnus-summary-iterate 'lisp-indent-function 1)
+(put 'gnus-summary-iterate 'edebug-form-spec '(form body))
 
 (defun gnus-summary-save-process-mark ()
   "Push the current set of process marked articles on the stack."
@@ -5156,6 +5180,23 @@ The state which existed when entering the ephemeral is reset."
       (gnus-summary-next-subject 1 nil t)
       (gnus-summary-recenter)
       (gnus-summary-position-point))))
+
+(defun gnus-summary-preview-mime-message (arg)
+  "MIME decode and play this message."
+  (interactive "P")
+  (or gnus-show-mime
+      (let ((gnus-break-pages nil)
+	    (gnus-show-mime t))
+	(gnus-summary-select-article t t)
+	))
+  (select-window (get-buffer-window gnus-article-buffer))
+  )
+
+(defun gnus-summary-scroll-down ()
+  "Scroll down one line current article."
+  (interactive)
+  (gnus-summary-scroll-up -1)
+  )
 
 ;;; Dead summaries.
 
@@ -6037,8 +6078,7 @@ If ALL, mark even excluded ticked and dormants as read."
 		   (sort gnus-newsgroup-limit '<)))
 	article)
     (setq gnus-newsgroup-unreads
-	  (delete-duplicates (append gnus-newsgroup-unreads
-				     gnus-newsgroup-limit)))
+	  (gnus-intersection gnus-newsgroup-unreads gnus-newsgroup-limit))
     (if all
 	(setq gnus-newsgroup-dormant nil
 	      gnus-newsgroup-marked nil
@@ -7119,7 +7159,7 @@ latter case, they will be copied into the relevant groups."
       (set-buffer (get-buffer-create " *import file*"))
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       (goto-char (point-min))
       (unless (nnheader-article-p)
 	;; This doesn't look like an article, so we fudge some headers.
@@ -7347,7 +7387,7 @@ groups."
 
 ;;; Respooling
 
-(defun gnus-summary-respool-query (&optional silent)
+(defun gnus-summary-respool-query (&optional silent trace)
   "Query where the respool algorithm would put this article."
   (interactive)
   (let (gnus-mark-article-hook)
@@ -7356,13 +7396,19 @@ groups."
       (set-buffer gnus-original-article-buffer)
       (save-restriction
 	(message-narrow-to-head)
-	(let ((groups (nnmail-article-group 'identity)))
+	(let ((groups (nnmail-article-group 'identity trace)))
 	  (unless silent
 	    (if groups
 		(message "This message would go to %s"
 			 (mapconcat 'car groups ", "))
 	      (message "This message would go to no groups"))
 	    groups))))))
+
+(defun gnus-summary-respool-trace ()
+  "Trace where the respool algorithm would put this article.
+Display a buffer showing all fancy splitting patterns which matched."
+  (interactive)
+  (gnus-summary-respool-query nil t))
 
 ;; Summary marking commands.
 
@@ -8912,6 +8958,38 @@ save those articles instead."
 	   (switch-to-buffer buf)
 	   (gnus-summary-exit))
 	 buffers)))))
+
+
+;;; @ for mime-partial
+;;;
+
+(defun gnus-request-partial-message ()
+  (save-excursion
+    (let ((number (gnus-summary-article-number))
+	  (group gnus-newsgroup-name)
+	  (mother gnus-article-buffer))
+      (set-buffer (get-buffer-create " *Partial Article*"))
+      (erase-buffer)
+      (setq mime-preview-buffer mother)
+      (gnus-request-article-this-buffer number group)
+      (mime-parse-buffer)
+      )))
+
+(autoload 'mime-combine-message/partial-pieces-automatically
+  "mime-partial"
+  "Internal method to combine message/partial messages automatically.")
+
+(mime-add-condition
+ 'action '((type . message)(subtype . partial)
+	   (major-mode . gnus-original-article-mode)
+	   (method . mime-combine-message/partial-pieces-automatically)
+	   (summary-buffer-exp . gnus-summary-buffer)
+	   (request-partial-message-method . gnus-request-partial-message)
+	   ))
+
+
+;;; @ end
+;;;
 
 (gnus-ems-redefine)
 

@@ -1,4 +1,4 @@
-;;; gnus-agent.el --- unplugged support for Gnus
+;;; gnus-agent.el --- unplugged support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -719,7 +719,7 @@ the actual number of articles toggled is returned."
 	(when (= (point-max) (point-min))
 	  (push (cons group (current-buffer)) gnus-agent-buffer-alist)
 	  (ignore-errors
-	    (insert-file-contents
+	    (nnheader-insert-file-contents
 	     (gnus-agent-article-name ".overview" group))))
 	(nnheader-find-nov-line (string-to-number (cdar crosses)))
 	(insert (string-to-number (cdar crosses)))
@@ -760,6 +760,17 @@ the actual number of articles toggled is returned."
 	(set-buffer nntp-server-buffer)
 	(unless (eq 'nov (gnus-retrieve-headers articles group))
 	  (nnvirtual-convert-headers))
+	;;
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (goto-char (point-at-eol))
+	  (insert "\t")
+	  (forward-line 1))
+	;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
+	;; To gnus-agent-expire work fine with no Xref field in .overview 
+	;;
 	;; Save these headers for later processing.
 	(copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
 	(let (file)
@@ -788,7 +799,7 @@ the actual number of articles toggled is returned."
     (goto-char (point-min))
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (insert-file-contents file)
+    (nnheader-insert-file-contents file)
     (goto-char (point-min))
     (if (or (= (point-min) (point-max))
 	    (progn
@@ -1297,14 +1308,14 @@ The following commands are available:
 				  (cdr (assq 'dormant
 					     (gnus-info-marks info)))))
 		   nov-file (gnus-agent-article-name ".overview" group))
-	     (gnus-agent-load-alist group)
+ 	     (gnus-agent-load-alist group)
 	     (gnus-message 5 "Expiring articles in %s" group)
 	     (set-buffer overview)
 	     (erase-buffer)
 	     (when (file-exists-p nov-file)
-	       (insert-file-contents nov-file))
+	       (nnheader-insert-file-contents nov-file))
 	     (goto-char (point-min))
-	     (setq article 0)
+ 	     (setq article 0)
 	     (while (setq elem (pop articles))
 	       (setq article (car elem))
 	       (when (or (null low)
