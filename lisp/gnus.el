@@ -253,11 +253,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Shoe-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.6"
+(defconst gnus-version-number "6.8.7"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.36; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "%s %s (based on Gnus 5.6.39; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -1653,7 +1653,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-decode-binhex gnus-uu-decode-uu-view
       gnus-uu-decode-uu-and-save-view gnus-uu-decode-unshar-view
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
-      gnus-uu-decode-binhex-view gnus-uu-unmark-thread)
+      gnus-uu-decode-binhex-view gnus-uu-unmark-thread
+      gnus-uu-mark-over)
      ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
       gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
@@ -1665,6 +1666,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-post-news gnus-summary-reply gnus-summary-reply-with-original
       gnus-summary-mail-forward gnus-summary-mail-other-window
       gnus-summary-resend-message gnus-summary-resend-bounced-mail
+      gnus-summary-wide-reply
       gnus-bug)
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons gnus-picons-article-display-x-face
@@ -2272,9 +2274,11 @@ that that variable is buffer-local to the summary buffers."
 	 (gnus-server-to-method method))
 	((equal method gnus-select-method)
 	 gnus-select-method)
-	((and (stringp (car method)) group)
+	((and (stringp (car method))
+	      group)
 	 (gnus-server-extend-method group method))
-	((and method (not group)
+	((and method
+	      (not group)
 	      (equal (cadr method) ""))
 	 method)
 	(t

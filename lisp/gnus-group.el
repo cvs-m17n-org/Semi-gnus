@@ -773,6 +773,8 @@ The following commands are available:
   (add-hook 'post-command-hook 'gnus-clear-inboxes-moved nil t)
   (when gnus-use-undo
     (gnus-undo-mode 1))
+  (when gnus-slave
+    (gnus-slave-mode))
   (gnus-run-hooks 'gnus-group-mode-hook))
 
 (defun gnus-update-group-mark-positions ()
@@ -1980,6 +1982,7 @@ and NEW-NAME will be prompted for."
     (gnus-group-position-point)))
 
 (defun gnus-group-make-useful-group (group method)
+  "Create one of the groups described in `gnus-useful-groups'."
   (interactive
    (let ((entry (assoc (completing-read "Create group: " gnus-useful-groups
 					nil t)
@@ -3161,12 +3164,12 @@ In fact, cleanup buffers except for group mode buffer.
 The hook gnus-suspend-gnus-hook is called before actually suspending."
   (interactive)
   (gnus-run-hooks 'gnus-suspend-gnus-hook)
-  ;; Kill Gnus buffers except for group buffer and dribble buffer.
+  ;; Kill Gnus buffers except for group mode buffer.
   (let ((group-buf (get-buffer gnus-group-buffer)))
-    (mapcar (function kill-buffer)
-	    (delete group-buf
-		    (delete gnus-dribble-buffer
-			    (append (gnus-buffers) nil))))
+    (mapcar (lambda (buf)
+	      (unless (member buf (list group-buf gnus-dribble-buffer))
+		(kill-buffer buf)))
+	    (gnus-buffers))
     (gnus-kill-gnus-frames)
     (when group-buf
       (bury-buffer group-buf)

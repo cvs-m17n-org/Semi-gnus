@@ -94,10 +94,19 @@
   :group 'gnus-article)
 
 (defcustom gnus-ignored-headers
-  '("^Path:" "^Posting-Version:" "^Article-I.D.:" "^Expires:"
-    "^Date-Received:" "^References:" "^Control:" "^Xref:" "^Lines:"
-    "^Posted:" "^Relay-Version:" "^Message-ID:" "^Nf-ID:" "^Nf-From:"
-    "^Approved:" "^Sender:" "^Received:" "^Mail-from:")
+  '("^Path:" "^Expires:" "^Date-Received:" "^References:" "^Xref:" "^Lines:"
+    "^Relay-Version:" "^Message-ID:" "^Approved:" "^Sender:" "^Received:" 
+    "^X-UIDL:" "^MIME-Version:" "^Return-Path:" "^In-Reply-To:"
+    "^Content-Type:" "^Content-Transfer-Encoding:" "^X-WebTV-Signature:"
+    "^X-MimeOLE:" "^X-MSMail-Priority:" "^X-Priority:" "^X-Loop:"
+    "^X-Authentication-Warning:" "^X-MIME-Autoconverted:" "^X-Face:"
+    "^X-Attribution:" "^X-Originating-IP:" "^Delivered-To:"
+    "^NNTP-[-A-Za-z]*:" "^Distribution:" "^X-no-archive:" "^X-Trace:"
+    "^X-Complaints-To:" "^X-NNTP-Posting-Host:" "^X-Orig.*:"
+    "^Abuse-Reports-To:" "^Cache-Post-Path:" "^X-Article-Creation-Date:"
+    "^X-Poster:" "^X-Mail2News-Path:" "^X-Server-Date:" "^X-Cache:"
+    "^Originator:" "^X-Problems-To:" "^X-Auth-User:" "^X-Post-Time:" 
+    "^X-Admin:" "^X-UID:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -2040,7 +2049,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		  (unless (memq article gnus-newsgroup-sparse)
 		    (gnus-error 1
 		     "No such article (may have expired or been canceled)")))))
-	  (if (or (eq result 'pseudo) (eq result 'nneething))
+	  (if (or (eq result 'pseudo)
+		  (eq result 'nneething))
 	      (progn
 		(save-excursion
 		  (set-buffer summary-buffer)
@@ -2458,8 +2468,11 @@ If given a prefix, show the hidden text instead."
 			       gnus-newsgroup-name)))
 		  (when (and (eq (car method) 'nneething)
 			     (vectorp header))
-		    (let ((dir (concat (file-name-as-directory (nth 1 method))
-				       (mail-header-subject header))))
+		    (let ((dir (concat
+				(file-name-as-directory
+				 (or (cadr (assq 'nneething-address method))
+				     (nth 1 method)))
+				(mail-header-subject header))))
 		      (when (file-directory-p dir)
 			(setq article 'nneething)
 			(gnus-group-enter-directory dir))))))))
@@ -2786,6 +2799,7 @@ call it with the value of the `gnus-data' text property."
   (let* ((pos (posn-point (event-start event)))
          (data (get-text-property pos 'gnus-data))
 	 (fun (get-text-property pos 'gnus-callback)))
+    (goto-char pos)
     (when fun
       (funcall fun data))))
 

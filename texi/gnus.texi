@@ -7,7 +7,6 @@
 @synindex pg cp
 @c @direntry
 @c * Gnus: (gnus).         The news reader gnus.
-@c @end direntry
 @iftex
 @finalout
 @end iftex
@@ -1910,6 +1909,13 @@ Currently supported types are @code{babyl}, @code{mbox}, @code{digest},
 @code{rfc934}, @code{rfc822-forward}, and @code{forward}.  If you run
 this command without a prefix, gnus will guess at the file type.
 @xref{Document Groups}.
+
+@item G u
+@kindex G u (Group)
+@vindex gnus-useful-groups
+@findex gnus-group-make-useful-group
+Create one of the groups mentioned in @code{gnus-useful-groups}
+(@code{gnus-group-make-useful-group}).
 
 @item G w
 @kindex G w (Group)
@@ -5250,9 +5256,9 @@ Remove articles when exiting the group.
 
 The default value is @code{(read exit)}.
 
-@vindex gnus-use-header-prefetch
-If @code{gnus-use-header-prefetch} is non-@code{nil}, prefetch articles
-from the next group.
+@c @vindex gnus-use-header-prefetch
+@c If @code{gnus-use-header-prefetch} is non-@code{nil}, prefetch articles
+@c from the next group.
 
 
 @node Article Caching
@@ -6320,11 +6326,13 @@ specs are valid:
 
 @table @samp
 @item b
-Start point of the hidden text.
+Starting point of the hidden text.
 @item e
-End point of the hidden text.
+Ending point of the hidden text.
 @item l
-Length of the hidden text.
+Number of characters in the hidden region.
+@item n
+Number of lines of hidden text.
 @end table
 
 @item gnus-cited-lines-visible
@@ -9062,17 +9070,17 @@ waiting for reply, and then reads all the replies.  This is controlled
 by the @code{nntp-maximum-request} variable, and is 400 by default.  If
 your network is buggy, you should set this to 1.
 
-@c @item nntp-connection-timeout
-@c @vindex nntp-connection-timeout
-@c If you have lots of foreign @code{nntp} groups that you connect to
-@c regularly, you're sure to have problems with @sc{nntp} servers not
-@c responding properly, or being too loaded to reply within reasonable
-@c time.  This is can lead to awkward problems, which can be helped
-@c somewhat by setting @code{nntp-connection-timeout}.  This is an integer
-@c that says how many seconds the @code{nntp} backend should wait for a
-@c connection before giving up.  If it is @code{nil}, which is the default,
-@c no timeouts are done.
-@c 
+@item nntp-connection-timeout
+@vindex nntp-connection-timeout
+If you have lots of foreign @code{nntp} groups that you connect to
+regularly, you're sure to have problems with @sc{nntp} servers not
+responding properly, or being too loaded to reply within reasonable
+time.  This is can lead to awkward problems, which can be helped
+somewhat by setting @code{nntp-connection-timeout}.  This is an integer
+that says how many seconds the @code{nntp} backend should wait for a
+connection before giving up.  If it is @code{nil}, which is the default,
+no timeouts are done.
+
 @c @item nntp-command-timeout
 @c @vindex nntp-command-timeout
 @c @cindex PPP connections
@@ -12039,8 +12047,8 @@ Score on the subject line.
 @item x
 Score on the Xref line---i.e., the cross-posting line.
 
-@item t
-Score on thread---the References line.
+@item r
+Score on the References line.
 
 @item d
 Score on the date.
@@ -12059,6 +12067,10 @@ Score on the body.
 
 @item h
 Score on the head.
+
+@item t
+Score on thead.
+
 @end table
 
 @item
@@ -15827,13 +15839,16 @@ Rajappa Iyer,
 Andreas Jaeger,
 Randell Jesup,
 Fred Johansen,
+Gareth Jones,
 Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
 Peter Skov Knudsen,
 Shuhei Kobayashi, @c Kobayashi
+Koseki Yoshinori, @c Koseki
 Thor Kristoffersen,
 Jens Lautenbacher,
+Martin Larose,
 Seokchan Lee, @c Lee
 Carsten Leonhardt,
 James LewisMoss,
@@ -15865,7 +15880,9 @@ William Perry,
 Stephen Peters,
 Jens-Ulrik Holger Petersen,
 Ulrich Pfeifer,
+Matt Pharr,
 John McClary Prevost,
+Bill Pringlemeir,
 Mike Pullen,
 Jim Radford,
 Colin Rafferty,
@@ -15904,6 +15921,7 @@ Teddy,
 Chuck Thompson,
 Philippe Troin,
 James Troup,
+Trung Tran-Duc,
 Aaron M. Ucko,
 Aki Vehtari,
 Didier Verna,

@@ -1,3 +1,139 @@
+Sat Aug 22 10:28:25 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.39 is released.
+
+1998-08-22 10:06:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-ignored-headers): Added more headers.
+
+1998-08-21 02:49:56  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnweb.el (nnweb-type): Doc fix.
+
+	* gnus-sum.el (gnus-summary-set-process-mark): Move to the right
+	article. 
+
+1998-08-20 23:10:01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnmail.el (nnmail-spool-file): Allow lists of files.
+
+1998-08-20  Per Starback  <starback@update.uu.se>
+
+	* gnus/gnus-start.el (gnus-check-first-time-used): Change current
+	buffer before creating help group.
+
+1998-08-20 01:33:08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-message-style-insertions): New variable.
+	(gnus-message-insert-stylings): New function.
+	(gnus-configure-posting-styles): Use them.
+
+	* gnus-topic.el (gnus-topic-mode): Don't alter summary-exit-hook. 
+
+	* gnus-sum.el (gnus-select-newsgroup): Don't update group.
+
+	* gnus-msg.el (gnus-setup-message): Bind message-mode-hook.
+	(gnus-inhibit-posting-styles): New variable.
+	(gnus-summary-reply): Use it.
+	(gnus-configure-posting-styles): Ditto.
+
+	* gnus-group.el (gnus-group-suspend): Don't kill dribble buffer. 
+
+Thu Aug 20 00:28:35 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.38 is released.
+
+1998-08-20 00:02:50  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-mail): Doc fix.
+
+1998-08-19 23:22:02  Bill Pringlemeir  <bpringle@my-dejanews.com>
+
+	* messcompat.el (message-send-mail-function): Initialized from
+	send-mail-function. 
+
+1998-08-19 23:20:42  Martin Larose  <larosem@IRO.UMontreal.CA>
+
+	* message.el (message-send-coding-system): New variable.
+
+1998-08-19 19:00:37  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-configure-posting-styles): Reinstated most of
+	old code.
+
+	* gnus-start.el (gnus-save-newsrc-file): Use coding system.
+
+1980-06-08 03:53:56  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus-agent.el (gnus-agent-braid-nov): Go to right place. 
+
+1980-06-08 03:01:48  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* gnus-group.el (gnus-group-suspend): Fix.
+
+1998-08-18 00:25:11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-cite.el (gnus-cited-opened-text-button-line-format-alist):
+	New n spec.
+
+	* gnus-group.el (gnus-group-suspend): Use mapcar.
+
+1998-08-17 14:35:33  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-ems.el (gnus-add-minor-mode): Set mode var.
+
+	* gnus-start.el (gnus-slave-mode): New function.
+
+	* gnus-msg.el (gnus-post-method): Work with current in nndraft. 
+
+1998-08-16 23:30:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-request-article-this-buffer): Allow recursive
+	selection of nneething groups.
+
+	* nneething.el (nneething-address): Renamed from directory.
+
+Sun Aug 16 18:59:41 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.37 is released.
+
+1998-08-16 14:52:43  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el: Autoload gnus-summary-wide-reply.
+
+	* gnus-sum.el (gnus-get-newsgroup-headers): Return the value of
+	In-Reply-To. 
+
+	* gnus-msg.el (gnus-setup-message): Posting styles have to be
+	configured in message-mode-hook.
+
+	* nntp.el (nntp-connection-timeout): Restored.
+	(nntp-open-connection): Use it.
+
+1998-08-15 22:46:49  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-make-useful-group): Doc fix.
+
+	* gnus-art.el (gnus-article-push-button): Place point where you
+	click.
+
+1998-08-15  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus-agent.el (gnus-agent-save-group-info): Update "groups" file 
+	if `nntp-server-list-active-group' is nil.
+
+1998-08-15 00:35:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-score.el (gnus-summary-increase-score): Swap t and r.
+
+	* gnus-sum.el (gnus-remove-thread): Didn't work with sparse
+	threads. 
+
+1998-08-14  François Pinard  <pinard@iro.umontreal.ca>
+
+	* nndoc.el (nndoc-generate-mime-parts-head): Use original Subject,
+	Message-ID, and References in fully blown articles.
+
 Fri Aug 14 23:03:51 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.36 is released.

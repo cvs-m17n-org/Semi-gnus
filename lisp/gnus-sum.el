@@ -3358,9 +3358,8 @@ If LINE, insert the rebuilt thread starting on line LINE."
   "Remove the thread that has ID in it."
   (let (headers thread last-id)
     ;; First go up in this thread until we find the root.
-    (setq last-id (gnus-root-id id))
-    (setq headers (list (car (gnus-id-to-thread last-id))
-			(caadr (gnus-id-to-thread last-id))))
+    (setq last-id (gnus-root-id id)
+	  headers (message-flatten-list (gnus-id-to-thread last-id)))
     ;; We have now found the real root of this thread.	It might have
     ;; been gathered into some loose thread, so we have to search
     ;; through the threads to find the thread we wanted.
@@ -3856,7 +3855,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
   (let* ((entry (gnus-gethash group gnus-newsrc-hashtb))
 	 ;;!!! Dirty hack; should be removed.
 	 (gnus-summary-ignore-duplicates
-	  (if (eq (car (gnus-find-method-for-group group)) 'nnvirtual)
+ 	  (if (eq (car (gnus-find-method-for-group group)) 'nnvirtual)
 	      t
 	    gnus-summary-ignore-duplicates))
 	 (info (nth 2 entry))
@@ -3901,8 +3900,6 @@ If SELECT-ARTICLES, only select those articles from GROUP."
     (setq gnus-newsgroup-processable nil)
 
     (gnus-update-read-articles group gnus-newsgroup-unreads)
-    (unless (gnus-ephemeral-group-p gnus-newsgroup-name)
-      (gnus-group-update-group group))
 
     (if (setq articles select-articles)
 	(setq gnus-newsgroup-unselected
@@ -4499,7 +4496,8 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 			(setq ref2 (substring in-reply-to (match-beginning 0)
 					      (match-end 0)))
 			(when (> (length ref2) (length ref))
-			  (setq ref ref2))))
+			  (setq ref ref2)))
+		      ref)
 		  (setq ref nil))))
 	    ;; Chars.
 	    (progn
@@ -7635,6 +7633,7 @@ the actual number of articles marked is returned."
 	      (delq article gnus-newsgroup-processable)))
   (when (gnus-summary-goto-subject article)
     (gnus-summary-show-thread)
+    (gnus-summary-goto-subject article)
     (gnus-summary-update-secondary-mark article)))
 
 (defun gnus-summary-remove-process-mark (article)
@@ -7642,6 +7641,7 @@ the actual number of articles marked is returned."
   (setq gnus-newsgroup-processable (delq article gnus-newsgroup-processable))
   (when (gnus-summary-goto-subject article)
     (gnus-summary-show-thread)
+    (gnus-summary-goto-subject article)
     (gnus-summary-update-secondary-mark article)))
 
 (defun gnus-summary-set-saved-mark (article)
