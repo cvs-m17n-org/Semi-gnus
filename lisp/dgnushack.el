@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -127,6 +127,13 @@
 
 (eval-and-compile
   (when (featurep 'xemacs)
+    ;; XEmacs 21.1 needs some extra hand holding
+    (when (eq emacs-minor-version 1)
+      (autoload 'custom-declare-face "cus-face" nil t)
+      (autoload 'cl-compile-time-init "cl-macs" nil t)
+      (autoload 'defadvice "advice" nil nil 'macro))
+    (unless (fboundp 'defadvice)
+      (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
     (autoload 'Info-menu "info" nil t)
     (autoload 'annotations-at "annotations")
@@ -173,6 +180,13 @@
     (defalias 'replace-highlight 'ignore)
     (defalias 'run-with-idle-timer 'ignore)
     (defalias 'w3-coding-system-for-mime-charset 'ignore)))
+
+(defun dgnushack-compile-verbosely ()
+  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
+patches to gnus, you should consider modifying make.bat to call
+dgnushack-compile-verbosely.  All other users should continue to use
+dgnushack-compile."
+  (dgnushack-compile t))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)

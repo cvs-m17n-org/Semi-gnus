@@ -1,3 +1,30 @@
+2003-05-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* etc/gnus-tut.txt (http): Update.
+
+2003-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add prefix limit feature.
+
+2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Added Article Buttons.  Added Upgrading (from Simon
+	Josefsson).  Add gnus-mime-delete-part, markup fixes and some
+	other corrections.  Mention Gnus FAQ.
+	
+
+2003-04-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* GNUS-NEWS: Additions.
+
+2003-04-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Fixed X-Draft-Headers entry.
+
+2003-04-27  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Fix PGP entry.  Doc GCC variable change.
+
 2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* make.bat: Flag as binary to ensure DOS line terminators.  Delete

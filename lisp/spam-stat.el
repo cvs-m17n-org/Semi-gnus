@@ -398,7 +398,8 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
   "Save the `spam-stat' hash table as lisp file."
   (interactive)
   (with-temp-buffer
-    (let ((standard-output (current-buffer)))
+    (let ((standard-output (current-buffer))
+	  (font-lock-maximum-size 0))
       (insert "(setq spam-stat-ngood "
               (number-to-string spam-stat-ngood)
               " spam-stat-nbad "
@@ -409,8 +410,8 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
 			      (spam-stat-good entry)
 			      (spam-stat-bad entry))))
 	       spam-stat)
-      (insert ")))"))
-    (write-file spam-stat-file)))
+      (insert ")))")
+    (write-file spam-stat-file))))
 
 (defun spam-stat-load ()
   "Read the `spam-stat' hash table from disk."
@@ -503,7 +504,8 @@ check the variable `spam-stat-score-data'."
     (with-temp-buffer
       (dolist (f files)
 	(when (and (file-readable-p f)
-		   (file-regular-p f))
+		   (file-regular-p f)
+                   (> (nth 7 (file-attributes f)) 0))
 	  (setq count (1+ count))
 	  (message "Reading %s: %.2f%%" dir (/ count max))
 	  (insert-file-contents f)
@@ -539,7 +541,8 @@ You can use this to determine error rates."
     (with-temp-buffer
       (dolist (f files)
 	(when (and (file-readable-p f)
-		   (file-regular-p f))
+		   (file-regular-p f)
+                   (> (nth 7 (file-attributes f)) 0))
 	  (setq count (1+ count))
 	  (message "Reading %.2f%%, score %.2f%%"
 		   (/ count max) (/ score count))

@@ -37,6 +37,9 @@
 (eval-and-compile
   (autoload 'executable-find "executable"))
 
+(eval-when-compile
+  (require 'timer))
+
 (defgroup mm-url nil
   "A wrapper of url package and external url command for Gnus."
   :group 'gnus)
@@ -45,7 +48,7 @@
 				(condition-case nil
 				    (require 'url)
 				  (error nil)))
-  "*If not-nil, use external grab program `mm-url-program'."
+  "*If non-nil, use external grab program `mm-url-program'."
   :type 'boolean
   :group 'mm-url)
 
@@ -276,6 +279,9 @@ This is taken from RFC 2396.")
 	    (insert-file-contents (substring url (1- (match-end 0))))
 	  (mm-url-insert-file-contents-external url))
 	(goto-char (point-min))
+	(if (fboundp 'url-generic-parse-url)
+	    (setq url-current-object 
+		  (url-generic-parse-url url)))
 	(list url (buffer-size)))
     (mm-url-load-url)
     (let ((name buffer-file-name)

@@ -1,5 +1,5 @@
 ;;; mm-view.el --- functions for viewing MIME objects
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -558,6 +558,8 @@ map.")))
   (sit-for 1)
   t)
 
+(autoload 'gnus-completing-read-maybe-default "gnus-util" nil nil 'macro)
+
 (defun mm-view-pkcs7-decrypt (handle)
   (insert-buffer-substring (mm-handle-buffer handle))
   (goto-char (point-min))
@@ -568,7 +570,7 @@ map.")))
    (if (= (length smime-keys) 1)
        (cadar smime-keys)
      (smime-get-key-by-email
-      (completing-read
+      (gnus-completing-read-maybe-default
        (concat "Decipher using which key? "
 	       (if smime-keys (concat "(default " (caar smime-keys) ") ")
 		 ""))

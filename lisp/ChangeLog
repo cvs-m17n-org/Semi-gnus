@@ -1,3 +1,271 @@
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.24 is released.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dgnushack.el (when): Check whether defadvice is fbound.
+
+2003-05-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-unregistered-group-regex): new variable
+	(gnus-registry-register-message-ids): use it
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+	* gnus.el: Update copyright for several files.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.23 is released.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* spam-stat.el (spam-stat-test-directory): Compare against zero. 
+
+2003-05-01  Trey Jackson <tjackson@ichips.intel.com>  (tiny change)
+
+	* spam-stat.el (spam-stat-test-directory): Skip 0 length files.
+	
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-forward-subject-name-subject): Decode
+	string when forwarding.
+
+2003-05-01  Oystein Viggen  <oysteivi@tihlde.org>
+
+	* dgnushack.el (when): Add defadvice.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.22 is released.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.21 is released.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.20 is released.
+
+2003-05-01  Vasily Korytov  <deskpot@despammed.com>
+
+	* gnus-dired.el (gnus-dired-mode-map): Move to C-c C-l.
+
+2003-04-30  Mark A. Hershberger  <mah@everybody.org>
+
+	* mm-url.el (mm-url-insert-file-contents): set url-current-object
+	in the case where mm-url-use-external is set.
+
+	* nnrss.el (nnrss-request-article): Change the messages created to
+	multipart/alternative.  Hopefully fixes a problem interaction with
+	w3m.
+	(nnrss-find-rss-via-syndic8): Better handling if xml-rpc.el isn't
+	around.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-check-news-header-syntax): Alter "posting"
+	message. 
+
+	* nnrss.el (nnrss-node-text): Don't use char classes.
+
+2003-05-01  David Z. Maze  <dmaze@mit.edu>
+
+	* nnrss.el (nnrss-find-rss-via-syndic8): Have an `error' branch
+	in condition-case.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-required-headers): Remove In-Reply-To.
+
+	* gnus-int.el (gnus-open-server): Revert changes.
+
+2003-04-30  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus-int.el (gnus-open-server): Try to open unagentized servers
+	even when unplugged.
+
+2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-prefer-mid-or-mail): Fixed typo in
+	doc-string.
+
+2003-05-01  Steve Youngs  <youngs@xemacs.org>
+
+	* lpath.el: Add a section for non-Mule XEmacsen.
+	fbind `find-charset-string' and `coding-system-base' in that
+	section.
+
+	* gnus-util.el (gnus-completing-read-maybe-default): New.
+	(gnus-completing-read): Use it.
+
+	* mm-view.el (mm-view-pkcs7-decrypt): Ditto.
+
+	* gnus-art.el (gnus-read-string): New.
+	(gnus-summary-pipe-to-muttprint): Use it.
+
+	* gnus-xmas.el (gnus-xmas-open-network-stream): New.
+
+	* dns.el (dns-make-network-process): Use it.
+
+	Take care of some differences between XEmacs 21.1 and newer
+	versions of XEmacs.
+
+2003-04-30  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-split-fancy-with-parent): added
+	diagnostic message
+	(gnus-registry-grep-in-list): don't run when word is nil
+	(gnus-registry-fetch-message-id-fast): new function
+	(gnus-registry-delete-group, gnus-registry-add-group): make sure
+	the id and group are not nil
+	(gnus-registry-register-message-ids): new function
+	(gnus-register-action): optimized logical flow
+	(gnus-summary-prepare-hook): added gnus-registry-register-message-ids
+
+2003-04-30  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus-delay.el (gnus-delay-article): Call
+	`gnus-agent-queue-setup' to create the delay group.
+
+	* gnus-agent.el (gnus-agent-queue-setup): Support optional arg
+	for the (queue) group name.
+
+2003-04-30  Simon Josefsson  <jas@extundo.com>
+
+	* mm-util.el (mm-charset-to-coding-system): Use user specified
+	charset unless coding-system-get is fboundp.
+
+2003-04-30  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-cat-defaccessor, gnus-agent-cat-name):
+	Wrapped in eval-when-compile.
+	(gnus-agent-mode): Bind gnus-agent-go-online to nil as you
+	shouldn't be asked twice to go online with each server.
+	(gnus-agent-get-undownloaded-list, gnus-agent-fetch-articles,
+	gnus-agent-crosspost, gnus-agent-flush-cache,
+	gnus-agent-fetch-session, gnus-agent-unread-articles,
+	gnus-agent-uncached-articles, gnus-agent-regenerate-group,
+	gnus-agent-group-covered-p): Expanded pop macros used for
+	effect. Avoids compilation warning in emacs 21.3.
+
+	* gnus-int.el (gnus-open-server): Restructured to only open
+	nnagent when gnus-plugged is nil.
+
+2003-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind string-to-multibyte.
+
+2003-04-30  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: Add some missing autoloads for XEmacs 21.1.
+
+2003-04-29  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-fetch-group): faster
+	(gnus-registry-delete-group): new function
+	(gnus-registry-add-group): new function
+	(gnus-register-spool-action): use it
+	(gnus-register-action): use it
+	(gnus-registry-translate-from-alist) 
+	(gnus-registry-translate-to-alist): remove the headers registry
+	for now
+
+2003-04-29  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-alist): Fixed CTAN regexp.
+
+2003-04-29  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam-report.el (spam-report-gmane): gnus-summary-article-number
+	is not necessary, just use the function parameter
+
+2003-04-29  Karl Pflysterer  <sigurd@12move.de>
+
+	* spam-stat.el (spam-stat-save): No longer font-locks the file
+	when saving
+
+2003-04-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* canlock.el: Bind mail-header-separator when compiling (XEmacs
+	provides it in mail-lib/auto-autoloads.el).
+
+2003-04-29  Simon Josefsson  <jas@extundo.com>
+
+	* mml2015.el (mml2015-pgg-sign): Use mml-sender instead of
+	message-sender.
+
+	* mml.el (mml-generate-mime-1): Set mml-sender too.
+
+2003-04-29  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-display-while-building): Docstring fix.
+
+	* mm-url.el (mm-url-use-external): do.
+
+2003-04-29  Simon Josefsson  <jas@extundo.com>
+
+	* canlock.el (mail-fetch-field): Autoload it (fix xemacs compile
+	warnings).
+
+	* sieve-mode.el (c-mode): Ditto.
+
+	* pgg.el (run-at-time): Ditto.
+
+	* mm-url.el (require): Require timer when compiling for
+	with-timeout macro (fix xemacs compile warnings).
+
+2003-04-28  Dave Love  <fx@gnu.org>
+
+	* gnus-util.el (nnheader): Don't require.
+	(Nnheader-narrow-to-headers, nnheader-replace-chars-in-string):
+	Autoload.
+
+	* spam.el: Require cl when compiling.
+
+	* dns.el: Require cl when compiling.
+
+2003-04-28  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-goto-next-page)
+	(gnus-article-goto-prev-page): Revert 2003-02-12 change to make
+	gnus-pick-mode work.
+
+2003-04-28  Steve Youngs  <youngs@xemacs.org>
+
+	* Makefile.in (FLAGS): Use @FLAGS@.
+
+2003-04-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-mime-display-multipart-as-mixed) 
+	(gnus-mime-display-multipart-alternative-as-mixed) 
+	(gnus-mime-display-multipart-related-as-mixed): Added doc-strings,
+	allow customization.
+
+2003-04-27  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* dgnushack.el (dgnushack-compile-verbosely): New function.  Not
+	currently called (See source for explanation).
+
+2003-04-27  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-catchup): Don't mark ticked messages. 
+	(gnus-summary-mark-read-and-unread-as-read): Take an optional
+	mark.
+
+	* gnus.el (gnus-version-number): Bump.
+
 2003-04-27 06:47:31 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.19 is released.
@@ -55,6 +323,10 @@
 	(nnrss-node-text): Use g-r-i-s, not g-r-r-i-s which doesn't exist.
 
 2003-04-24  Dave Love  <fx@gnu.org>
+
+	* mm-encode.el (mm-long-lines-p): Autoload.
+	(mm-encode-content-transfer-encoding): Don't try to make buffer
+	unibyte before decoding.  Don't ignore errors for base64 encoding.
 
 	* qp.el (quoted-printable-decode-region): Use mm-insert-byte.
 	Signal error on malformed text, as for base64.

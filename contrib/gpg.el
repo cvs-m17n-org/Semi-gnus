@@ -7,7 +7,7 @@
 ;; Keywords: crypto
 ;; Created: 2000-04-15
 
-;; $Id: gpg.el,v 1.1.1.3 2002-05-06 23:49:18 yamaoka Exp $
+;; $Id: gpg.el,v 1.1.1.4 2003-05-03 11:32:18 yamaoka Exp $
 
 ;; This file is NOT (yet?) part of GNU Emacs.
 
@@ -800,10 +800,11 @@ evaluates BODY, like `progn'.  If BODY evaluates to `nil' (or
 (defun gpg-passphrase-forget ()
   "Forget stored passphrase."
   (interactive)
-  (cancel-timer gpg-passphrase-timer)
-  (setq gpg-passphrase-timer nil)
-  (gpg-passphrase-clear-string gpg-passphrase)
-  (setq gpg-passphrase nil))
+  (when gpg-passphrase
+    (cancel-timer gpg-passphrase-timer)
+    (setq gpg-passphrase-timer nil)
+    (gpg-passphrase-clear-string gpg-passphrase)
+    (setq gpg-passphrase nil)))
 
 (defun gpg-passphrase-store (passphrase)
   "Store PASSPHRASE in cache.

@@ -142,6 +142,7 @@ ARTICLE is the article number of the current headline.")
 (deffoo nnrss-request-article (article &optional group server buffer)
   (nnrss-possibly-change-group group server)
   (let ((e (assq article nnrss-group-data))
+	(boundary "=-=-=-=-=-=-=-=-=-")
 	(nntp-server-buffer (or buffer nntp-server-buffer))
 	post err)
     (when e
@@ -149,7 +150,7 @@ ARTICLE is the article number of the current headline.")
 	(with-current-buffer nntp-server-buffer
 	  (erase-buffer)
 	  (goto-char (point-min))
-	  (insert "Mime-Version: 1.0\nContent-Type: text/html\n")
+	  (insert "Mime-Version: 1.0\nContent-Type: multipart/alternative; boundary=\"" boundary "\"\n")
 	  (if group
 	      (insert "Newsgroups: " group "\n"))
 	  (if (nth 3 e)
@@ -160,17 +161,32 @@ ARTICLE is the article number of the current headline.")
 	      (insert "Date: " (nnrss-format-string (nth 5 e)) "\n"))
 	  (insert "Message-ID: " (format "<%d@%s.nnrss>" (car e) group) "\n")
 	  (insert "\n")
-	  (if (nth 6 e)
-	      (let ((point (point)))
-		(insert (nnrss-string-as-multibyte (nth 6 e)))
-		(goto-char point)
-		(while (re-search-forward "\n" nil t)
-		  (replace-match " "))
-		(goto-char (point-max))
-		(insert "\n\n")
-		(fill-region point (point))))
-	  (if (nth 2 e)
-	      (insert "<p><a href='" (nth 2 e) "'>link</a></p>\n"))
+	  (let ((text (if (nth 6 e)
+			  (nnrss-string-as-multibyte (nth 6 e))))
+		(link (if (nth 2 e)
+			  (nth 2 e))))
+	    (insert "\n\n--" boundary "\nContent-Type: text/plain\n\n")
+	    (let ((point (point)))
+	      (if text
+		  (progn (insert text)
+			 (goto-char point)
+			 (while (re-search-forward "\n" nil t)
+			   (replace-match " "))
+			 (goto-char (point-max))
+			 (insert "\n\n")))
+	      (if link
+		  (insert link)))
+	    (insert "\n\n--" boundary "\nContent-Type: text/html\n\n")
+	    (let ((point (point)))
+	      (if text
+		  (progn (insert "<html><head></head><body>\n" text "\n</body></html>")
+			 (goto-char point)
+			 (while (re-search-forward "\n" nil t)
+			   (replace-match " "))
+			 (goto-char (point-max))
+			 (insert "\n\n")))
+	      (if link
+		  (insert "<p><a href=\"" link "\">link</a></p>\n"))))
 	  (if nnrss-content-function
 	      (funcall nnrss-content-function e group article)))))
     (cond
@@ -413,9 +429,11 @@ ARTICLE is the article number of the current headline.")
 		    (second (assoc group nnrss-group-alist))))
       (unless url
 	(setq url
-	      (nnrss-discover-feed
-	       (read-string
-		(format "URL to search for %s: " group) "http://")))
+             (cdr
+              (assoc 'href
+                     (nnrss-discover-feed
+                      (read-string
+                       (format "URL to search for %s: " group) "http://")))))
 	(let ((pair (assoc group nnrss-server-data)))
 	  (if pair
 	      (setcdr (cdr pair) (list url))
@@ -519,7 +537,7 @@ It is useful when `(setq nnrss-use-local t)'."
 		   (nnrss-node-just-text node)
 		 node))
 	 (cleaned-text (if text (gnus-replace-in-string
-				 text "^[[:cntrl:]]+\\|^ +\\| +$" ""))))
+				 text "^[\000-\037\177]+\\|^ +\\| +$" ""))))
     (if (string-equal "" cleaned-text)
 	nil
       cleaned-text)))
@@ -666,7 +684,7 @@ whether they are `offsite' or `onsite'."
 
 (defun nnrss-find-rss-via-syndic8 (url)
   "query syndic8 for the rss feeds it has for the url."
-  (condition-case nil
+  (if (locate-library "xml-rpc")
       (progn (require 'xml-rpc)
 	     (let ((feedid (xml-rpc-method-call
 			    "http://www.syndic8.com/xmlrpc.php"
@@ -707,7 +725,7 @@ whether they are `offsite' or `onsite'."
 				  "Multiple feeds found.  Select one: "
 				  selection nil t) urllist)))
 		       (cdar urllist))))))
-    (message "XML-RPC is not available... not checking Syndic8.")))
+    (error (message "XML-RPC is not available... not checking Syndic8."))))
 
 (defun nnrss-rss-p (data)
   "Test if data is an RSS feed.  Simply ensures that the first
