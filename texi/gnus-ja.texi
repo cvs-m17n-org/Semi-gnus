@@ -12774,11 +12774,11 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 @item nnshimbun-keep-unparsable-dated-articles
 @vindex nnshimbun-keep-unparsable-dated-articles
-この値が @code{nil} でない場合は、作成されたり送信された時刻が時刻がよく
-わからない記事を期限切れ消去しません。なにしろ期限がわからないんですから。
-初期値は @code{t} ですが、@code{nil} にすると期限切れ消去の処理が行なわ
-れるときに、期限がわからない記事でも有無を言わず消してしまいます。まあ、
-年の暮れの大掃除のときにでも使って下さい。
+この値が @code{nil} でない場合は、作成されたり送信された時刻がよくわから
+ない記事を期限切れ消去しません。なにしろ期限がわからないんですから。初期
+値は @code{t} ですが、@code{nil} にすると期限切れ消去の処理が行なわれる
+ときに、期限がわからない記事でも有無を言わず消してしまいます。まあ、年の
+暮れの大掃除のときにでも使って下さい。
 @end table
 
 @node RSS
