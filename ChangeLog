@@ -1,3 +1,10 @@
+1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-mail-digest): Reselect the message
+	frame after selecting a new article if the value of
+	`message-use-multi-frames' is non-nil and more than one articles
+	are given.
+
 1999-01-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-sum.el (gnus-summary-move-article): Fix, could not
