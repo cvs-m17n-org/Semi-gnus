@@ -1798,6 +1798,10 @@ Gnus の起動に成功した後に、一番最後に実行されるフックです。
 そのグループに最近新着メールが届いている場合
 は @samp{%} (@code{gnus-new-mail-mark})。
 
+@item p
+@samp{#} (@code{gnus-process-mark}) で、そのグループにプロセスマークが付
+いていることを示します。
+
 @item d
 最後にいつこのグループを読んだかを示す文字列 (@pxref{Group Timestamp})。
 

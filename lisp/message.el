@@ -3940,11 +3940,11 @@ If NOW, use that time instead."
 (defun message-make-in-reply-to ()
   "Return the In-Reply-To header for this message."
   (when message-reply-headers
-    (let ((mid (mail-header-message-id message-reply-headers))
-	  (from (mail-header-from message-reply-headers))
-	  (date (mail-header-date message-reply-headers)))
-      (when mid
-	(concat mid
+    (let ((from (mail-header-from message-reply-headers))
+	  (date (mail-header-date message-reply-headers))
+	  (msg-id (mail-header-message-id message-reply-headers)))
+      (when msg-id
+	(concat msg-id
 		(when from
 		  (let ((pair (std11-extract-address-components from)))
 		    (concat "\n ("

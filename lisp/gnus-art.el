@@ -48,6 +48,10 @@
   (require 'mm-uu)
   )
 
+(autoload 'gnus-msg-mail "gnus-msg" nil t)
+(autoload 'gnus-button-mailto "gnus-msg")
+(autoload 'gnus-button-reply "gnus-msg" nil t)
+
 (defgroup gnus-article nil
   "Article display."
   :link '(custom-manual "(gnus)The Article Buffer")
@@ -1703,13 +1707,26 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
       (delete-process "article-x-face"))
     (let ((inhibit-point-motion-hooks t)
 	  (case-fold-search t)
+	  (x-faces "")
 	  from last)
-;;      (if (gnus-buffer-live-p gnus-original-article-buffer)
-;;	  (set-buffer gnus-original-article-buffer))
+      (when (gnus-buffer-live-p gnus-original-article-buffer)
+	(with-current-buffer gnus-original-article-buffer
+	  (save-restriction
+	    (article-narrow-to-head)
+	    (while (re-search-forward "^X-Face:" nil t)
+	      (setq x-faces
+		    (concat
+		     x-faces
+		     (buffer-substring (match-beginning 0)
+				       (1- (re-search-forward
+					    "^\\($\\|[^ \t]\\)" nil t)))))))))
       (save-restriction
 	(article-narrow-to-head)
-	(goto-char (point-min))
 	(setq from (message-fetch-field "from"))
+	(when (gnus-buffer-live-p gnus-original-article-buffer)
+	  (message-remove-header "X-Face")
+	  (goto-char (point-min))
+	  (insert x-faces))
 	(goto-char (point-min))
 	(while (and gnus-article-x-face-command
 		    (not last)
@@ -1720,7 +1737,7 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 			     (not (string-match gnus-article-x-face-too-ugly
 						from))))
 		    ;; Has to be present.
-		    (re-search-forward "^X-Face:[ \t]*" nil t))
+		    (re-search-forward "^X-Face:[\t ]*" nil t))
 	  ;; This used to try to do multiple faces (`while' instead of
 	  ;; `when' above), but (a) sending multiple EOFs to xv doesn't
 	  ;; work (b) it can crash some versions of Emacs (c) are
@@ -5502,25 +5519,17 @@ forbidden in URL encoding."
       (setq to (gnus-url-unhex-string url)))
     (setq args (cons (list "to" to) args)
           subject (cdr-safe (assoc "subject" args)))
-    (gnus-setup-message 'reply
-      (message-mail)
-      (while args
-	(setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
-	(if (fboundp func)
-	    (funcall func)
-	  (message-position-on-field (caar args)))
-	(insert (mapconcat 'identity (cdar args) ", "))
-	(setq args (cdr args)))
-      (if subject
-	  (message-goto-body)
-	(message-goto-subject)))))
-
-(defun gnus-button-mailto (address)
-  "Mail to ADDRESS."
-  (set-buffer (gnus-copy-article-buffer))
-  (message-reply address))
-
-(defalias 'gnus-button-reply 'message-reply)
+    (gnus-msg-mail)
+    (while args
+      (setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
+      (if (fboundp func)
+          (funcall func)
+        (message-position-on-field (caar args)))
+      (insert (mapconcat 'identity (cdar args) ", "))
+      (setq args (cdr args)))
+    (if subject
+        (message-goto-body)
+      (message-goto-subject))))
 
 (defun gnus-button-embedded-url (address)
   "Activate ADDRESS with `browse-url'."
