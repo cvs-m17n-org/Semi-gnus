@@ -1,5 +1,19 @@
 1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.066.
+
+	* lisp/{mail-source.el,gnus-sum.el,gnus-art.el}: Sync up with
+	Pterodactyl Gnus v0.87.
+
+	* text/gnus-ja.text (Troubleshooting): Make the return value of
+	`gnus-version' ambiguous.
+
+	* lisp/message.el (message-send-news): Make `tembuf' as unmodified
+	after inserting a text from `message-encoding-buffer'.
+	(message-send-mail): Ditto.
+
+1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.065.
 	(gnus-revision-number): Fresh start from 00.
 
