@@ -697,16 +697,20 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
   (interactive "P")
   (let ((subject "Digested Articles")
 	(articles (gnus-summary-work-articles n))
-	article)
+	article frame)
     (gnus-setup-message 'forward
       (gnus-summary-select-article)
       (if post (message-news nil subject) (message-mail nil subject))
+      (when (and message-use-multi-frames (cdr articles))
+	(setq frame (window-frame (get-buffer-window (current-buffer)))))
       (message-goto-body)
       (while (setq article (pop articles))
 	(save-window-excursion
 	  (set-buffer gnus-summary-buffer)
 	  (gnus-summary-select-article nil nil nil article)
 	  (gnus-summary-remove-process-mark article))
+	(when frame
+	  (select-frame frame))
 	(insert (mime-make-tag "message" "rfc822") "\n")
 	(insert-buffer-substring gnus-original-article-buffer))
       (push-mark)
