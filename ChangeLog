@@ -1,3 +1,9 @@
+1999-05-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+	(TopLevel): Remove autoloads for `gnus-picons-display-x-face' and
+	`gnus-picons-article-display-x-face'.
+
 1999-05-16  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
 
 	* texi/gnusref-ja.tex (subsec Notes): Complete words.
