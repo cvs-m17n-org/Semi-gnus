@@ -1,5 +1,10 @@
 2000-01-15  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus-art.el (gnus-article-next-page): Scroll up LINES if
+	`pos-visible-in-window-p' returns nil.
+
+2000-01-15  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus-offline.el (gnus-agent-mode): New advice.
 
 2000-01-12  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
