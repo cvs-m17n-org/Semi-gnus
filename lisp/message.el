@@ -3925,7 +3925,10 @@ OTHER-HEADERS is an alist of header/value pairs."
 		 (message-tokenize-header (buffer-string))))
 	  (let ((s ccalist))
 	    (while s
-	      (setq ccalist (delq (assoc (car (pop s)) s) ccalist)))))
+	      (setq ccalist (delq (assoc (car (pop s)) s) ccalist))))
+	  (when (functionp message-mail-follow-up-address-checker)
+	    (setq ccalist (funcall message-mail-follow-up-address-checker
+				   ccalist))))
 	(setq follow-to (list (cons 'To (cdr (pop ccalist)))))
 	(when ccalist
 	  (let ((ccs (cons 'Cc (mapconcat
