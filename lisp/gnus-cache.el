@@ -419,8 +419,7 @@ Returns the list of articles removed."
 		;; Translate the first colon into a slash.
 		(when (string-match ":" group)
 		  (aset group (match-beginning 0) ?/))
-		(nnheader-replace-chars-in-string group ?. ?/)))
-	    t))
+		(nnheader-replace-chars-in-string group ?. ?/)))))
 	  (if (stringp article) article (int-to-string article))))
 
 (defun gnus-cache-update-article (group article)
