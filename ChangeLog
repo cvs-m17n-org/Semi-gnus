@@ -1,3 +1,8 @@
+1998-03-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ems.el: Change variable name
+	  gnus-bdf-image-file to gnus-mule-bitmap-image-file.
+
 1998-02-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.8.

@@ -79,7 +79,7 @@
 	   (truncate-string valstr (, max-width))
 	 valstr))))
 
-(defvar gnus-bdf-image-file nil)
+(defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
@@ -89,9 +89,9 @@
      (format "              %s
 
 "
-	     "" (if (and (stringp gnus-bdf-image-file)
-			 (file-exists-p gnus-bdf-image-file))
-		    (insert-file gnus-image-file)))
+	     "" (if (and (stringp gnus-mule-bitmap-image-file)
+			 (file-exists-p gnus-mule-bitmap-image-file))
+		    (insert-file gnus-mule-bitmap-image-file)))
      (format "              %s
           _    ___ _             _
           _ ___ __ ___  __    _ ___
