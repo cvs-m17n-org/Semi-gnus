@@ -1,3 +1,10 @@
+2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Remove useless function bindings for XEmacs.
+	(dgnushack-install-package-manifest): Create the pkginfo directory.
+
+	* lisp/lpath.el: Fbind `compare-strings' for Mule 2.
+
 2003-04-17  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* make.bat: Cleaned up end-of-line characters.
