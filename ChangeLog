@@ -1,5 +1,12 @@
 2003-05-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/nnheader.el: Don't use `defun-maybe' for the extra std11-
+	stuff.
+
+2003-05-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.16.1 revision 00.
 
 See ChangeLog.4 for earlier changes.
