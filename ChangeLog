@@ -1,5 +1,9 @@
 1999-02-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/mail-source.el (mail-source-fetch-pop): Comment out
+	postscript block - I don't know why it does not work.
+	There is no Bug report from ding ML.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.059.
 	(gnus-revision-number): Fresh start from 00.
 
