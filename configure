@@ -1197,7 +1197,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-echo $ac_n "defining gnus product name... $ac_c"
+echo $ECHO_N "defining gnus product name... $ECHO_C"
   if test "${EMACS_cv_GNUS_PRODUCT_NAME+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else

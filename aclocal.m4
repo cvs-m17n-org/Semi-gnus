@@ -1,5 +1,5 @@
 AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
- [echo $ac_n "defining gnus product name... $ac_c"
+ [echo $ECHO_N "defining gnus product name... $ECHO_C"
   AC_CACHE_VAL(EMACS_cv_GNUS_PRODUCT_NAME,[EMACS_cv_GNUS_PRODUCT_NAME=$1])
   GNUS_PRODUCT_NAME=${EMACS_cv_GNUS_PRODUCT_NAME}
   AC_MSG_RESULT(${GNUS_PRODUCT_NAME})
