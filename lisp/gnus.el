@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.8.5"
+(defconst gnus-version-number "6.8.6"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.28; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "Semi-gnus %s (based on Gnus 5.6.29; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -2686,11 +2686,14 @@ Disallow illegal group names."
 (defun gnus-read-method (prompt)
   "Prompt the user for a method.
 Allow completion over sensible values."
-  (let ((method
-	 (completing-read
-	  prompt (append gnus-valid-select-methods gnus-predefined-server-alist
-			 gnus-server-alist)
-	  nil t nil 'gnus-method-history)))
+  (let* ((servers
+	  (append gnus-valid-select-methods
+		  gnus-predefined-server-alist
+		  gnus-server-alist))
+	 (method
+	  (completing-read
+	   prompt servers
+	   nil t nil 'gnus-method-history)))
     (cond
      ((equal method "")
       (setq method gnus-select-method))
@@ -2700,7 +2703,7 @@ Allow completion over sensible values."
 		      (assoc method gnus-valid-select-methods))
 		(read-string "Address: ")
 	      "")))
-     ((assoc method gnus-server-alist)
+     ((assoc method servers)
       method)
      (t
       (list (intern method) "")))))
