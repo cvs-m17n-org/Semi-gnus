@@ -904,7 +904,7 @@ See the manual for details."
   (if (or (and gnus-xemacs (featurep 'xpm))
 	  (and (not gnus-xemacs)
 	       window-system
-	       (module-installed-p 'smiley-mule)))
+	       (module-installed-p 'gnus-bitmap)))
       t
     nil)
   "Display smileys.
