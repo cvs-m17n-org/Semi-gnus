@@ -1,3 +1,9 @@
+2000-09-19  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Encode bitmap
+	smileys to ordinary text before removing any text properties.  It
+	is synchronized with the latest smiley-mule.el.
+
 2000-09-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-type-definition): Follow URL change
