@@ -1,4 +1,9 @@
 1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* README-offline.ja: Add description written by YOSHIZAWA Masahiro
+	<manbou@ceres.dti.ne.jp>
+
+1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
             Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-gnus-get-new-news): Modify for
