@@ -1,3 +1,17 @@
+2003-04-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* mm-util.el (mm-sort-coding-systems-predicate): Convert elements
+	of `mm-coding-system-priorities' to base coding system.
+
+	* gnus-sum.el: Added coding cookie ("middle dot" in
+	gnus-summary-morse-message).
+
+2003-04-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-art.el (article-fill-long-lines)
+	(article-verify-x-pgp-sig, article-decode-group-name)
+	(gnus-mime-button-menu): Split >80 character lines.
+
 2003-04-13  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-sum.el (gnus-summary-local-variables): Use defvar since

@@ -11872,4 +11872,8 @@ If ALL is a number, fetch this number of articles."
 
 (run-hooks 'gnus-sum-load-hook)
 
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
+
 ;;; gnus-sum.el ends here
