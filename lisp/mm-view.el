@@ -207,7 +207,8 @@
 	  (insert "\n"))
 	(insert "----------\n\n")
 	(when handles
-	  (mm-handle-set-child handle handles))
+	  (mm-handle-set-parent handles handle)
+	  (mm-handle-set-child handle (cons handles (mm-handle-child handle))))
 	(mm-handle-set-undisplayer
 	 handle
 	 `(lambda ()
