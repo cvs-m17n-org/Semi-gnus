@@ -1,3 +1,33 @@
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnrss.el (nnrss-find-rss-via-syndic8): Indent.
+
+2003-05-01  Mark A. Hershberger  <mah@everybody.org>
+
+	* nnrss.el (nnrss-find-rss-via-syndic8): Don't error out.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-05-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam-report.el (spam-report-gmane-regex): docstring fix.  From
+	Jon Ericson <Jon.Ericson@jpl.nasa.gov>
+
+	* gnus.el (gnus-install-group-spam-parameters): docstring fix.
+	From Jon Ericson <Jon.Ericson@jpl.nasa.gov>
+
+	* gnus-registry.el (gnus-registry-fetch-extra) 
+	(gnus-registry-store-extra, gnus-registry-group-count): new functions
+	(gnus-registry-fetch-group, gnus-registry-delete-group) 
+	(gnus-registry-add-group): changed to work with extra data element
+	if present
+
+2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Gnus v5.10.1 is released.
+
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.24 is released.
