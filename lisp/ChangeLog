@@ -1,3 +1,50 @@
+2000-10-02 20:14:27  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el (dgnushack-compile): Don't compile dgnushack.el,
+	lpath.el. Don't compile base64.el if there is builtin base64.
+
+2000-10-02  Bj,Av(Brn Torkelsson  <torkel@hpc2n.umu.se>
+
+	* base64.el (Repository): Use featurep for XEmacs test.
+
+2000-10-02 17:38:12  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-retrieve-data): Don't ignore quit.
+
+2000-10-02 14:43:13  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-banner-alist): New variable.
+	(article-strip-banner): Use it.
+	* gnus-cus.el (gnus-group-parameters): Allow symbol.
+
+2000-10-02  Dave Love  <fx@gnu.org>
+
+	* smiley-ems.el: New file.
+
+	* gnus-ems.el (gnus-smiley-display): Autoload.
+	(mouse-set-point, set-face-foreground, set-face-background)
+	(x-popup-menu): Don't clobber these.
+	(gnus-article-compface-xbm): New variable.
+	(gnus-article-display-xface): Move graphic test.  Use unibyte.
+	Obey gnus-article-compface-xbm.  Use pbm, not xbm.
+
+	* mml.el (require): Fix typo.
+	(mml-parse-1): Modify unknown encoding prompt.
+
+	* mail-source.el (mail-sources): Revert to nil.
+
+	* nnmail.el (nnmail-spool-file): Revert previous change.
+
+	* gnus.el: Don't require custom, message.
+	(gnus-message-archive-method): Wrap initializer in progn and
+	require message here.
+
+2000-10-02  Gerd Moellmann  <gerd@gnu.org>
+
+	* gnus.el (gnus-mode-line-buffer-identification) [Emacs]: Change
+	image's :ascent to 80.  That gives a mode-line which is approx.
+	as tall as the normal one.
+
 2000-10-02 08:04:48  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* webmail.el (webmail-hotmail-list): Fix.
@@ -133,9 +180,10 @@
 
 2000-09-28  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
-	* gnus-art.el (article-strip-banner): elkin@tverd.astro.spbu.ru:
-	use gnus-group-find-parameter rather than
-	gnus-group-get-parameter, to allow inheritance on the banner.
+	* gnus-art.el (article-strip-banner): Use
+	gnus-group-find-parameter rather than gnus-group-get-parameter, to
+	allow inheritance on the banner.
+	From elkin@tverd.astro.spbu.ru.
 
 2000-09-26  Richard M. Alderson III <alderson@netcom2.netcom.com> 
 

@@ -184,7 +184,7 @@
 (defalias 'define-mail-user-agent 'ignore)
 
 (defconst dgnushack-tool-files
-  '("dgnushack.el" "dgnuspath.el" "ptexinfmt.el"))
+  '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el"))
 (defconst dgnushack-unexported-files
   '("dgnuspath.el" "ptexinfmt.el"))
 
@@ -215,10 +215,11 @@ Modify to suit your needs."))
       (condition-case nil
 	  (progn (require 'bbdb) nil)
 	(error '("gnus-bbdb.el")))
-      (if (featurep 'xemacs)
-	  '("smiley-ems.el")
+      (unless (featurep 'xemacs)
 	'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
 	  "nnheaderxm.el" "smiley.el"))
+      (when (or (featurep 'xemacs) (<= emacs-major-version 20))
+	'("smiley-ems.el"))
       (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	'("md5.el"))))
     (while (setq file (pop files))

@@ -236,6 +236,13 @@ asynchronously.	 The compressed face will be piped to this command."
   :type '(choice regexp (const nil))
   :group 'gnus-article-washing)
 
+(defcustom gnus-article-banner-alist nil
+  "Banner alist for stripping.
+For example, 
+     ((egroups . \"^[ \\t\\n]*-------------------+\\\\( eGroups Sponsor -+\\\\)?....\\n\\\\(.+\\n\\\\)+\"))"
+  :type '(repeat (cons symbol regexp))
+  :group 'gnus-article-washing)
+
 (defcustom gnus-emphasis-alist
   (let ((format
 	 "\\(\\s-\\|^\\|[-\"]\\|\\s(\\)\\(%s\\(\\w+\\(\\s-+\\w+\\)*[.,]?\\)%s\\)\\(\\s-\\|[-,;:\"]\\s-\\|[?!.]+\\s-\\|\\s)\\)")
@@ -1850,6 +1857,10 @@ always hide."
 	      (widen)
 	      (forward-line -1)
 	      (delete-region (point) (point-max))))
+	   ((symbolp banner)
+	    (if (setq banner (cdr (assq banner gnus-article-banner-alist)))
+		(while (re-search-forward banner nil t)
+		  (delete-region (match-beginning 0) (match-end 0)))))
 	   ((stringp banner)
 	    (while (re-search-forward banner nil t)
 	      (delete-region (match-beginning 0) (match-end 0))))))))))
@@ -4896,7 +4907,9 @@ specified by `gnus-button-alist'."
 	  (list 'gnus-callback fun)
 	  (and data (list 'gnus-data data))))
   (widget-convert-button 'link from to :action 'gnus-widget-press-button
-			 :button-keymap gnus-widget-button-keymap))
+			 ;; Quote `:button-keymap' for Mule 2.3
+			 ;; but it won't work.
+			 ':button-keymap gnus-widget-button-keymap))
 
 ;;; Internal functions:
 
