@@ -4788,8 +4788,8 @@ regexp varstr."
     (set-buffer buffer)
     (set-buffer-modified-p nil)))
 
-(run-hooks 'message-load-hook)
-
 (provide 'message)
+
+(run-hooks 'message-load-hook)
 
 ;;; message.el ends here

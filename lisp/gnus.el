@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.037"
+(defconst gnus-version-number "6.10.038"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.51"
+(defconst gnus-original-version-number "0.52"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -2500,15 +2500,29 @@ You should probably use `gnus-find-method-for-group' instead."
 	    possible
 	    (list backend server))))))
 
+(defsubst gnus-native-method-p (method)
+  "Return whether METHOD is the native select method."
+  (gnus-method-equal method gnus-select-method))
+
 (defsubst gnus-secondary-method-p (method)
   "Return whether METHOD is a secondary select method."
   (let ((methods gnus-secondary-select-methods)
 	(gmethod (gnus-server-get-method nil method)))
     (while (and methods
-		(not (equal (gnus-server-get-method nil (car methods))
-			    gmethod)))
+               (not (gnus-method-equal 
+                     (gnus-server-get-method nil (car methods))
+                     gmethod)))
       (setq methods (cdr methods)))
     methods))
+
+(defun gnus-method-simplify (method)
+  "Return the shortest uniquely identifying string or method for METHOD."
+  (cond ((gnus-native-method-p method)
+        nil)
+       ((gnus-secondary-method-p method)
+        (format "%s:%s" (nth 0 method) (nth 1 method)))
+       (t
+        method)))
 
 (defun gnus-groups-from-server (server)
   "Return a list of all groups that are fetched from SERVER."
