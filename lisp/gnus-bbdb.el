@@ -3,9 +3,9 @@
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
 ;; Copyright (C) 1997,1998 MORIOKA Tomohiko
-;; Copyright (C) 1998 Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Copyright (C) 1998 Keiichi Suzuki <keiichi@nanap.org>
 
-;; Author: Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;; Keywords: BBDB, MIME, multimedia, multilingual, mail, news
 
@@ -52,8 +52,8 @@ the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
     (save-excursion
-      (save-restriction
-	(let (from)
+      (let (from)
+	(save-restriction
 	  (set-buffer gnus-original-article-buffer)
 	  (widen)
 	  (narrow-to-region (point-min)
