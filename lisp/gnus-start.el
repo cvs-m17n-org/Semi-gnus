@@ -1915,17 +1915,18 @@ If FORCE is non-nil, the .newsrc file is read."
   (let ((ding-file (concat file "d")))
     ;; We always, always read the .eld file.
     (gnus-message 5 "Reading %s..." ding-file)
-    (let (gnus-newsrc-assoc)
-      (condition-case nil
-	  (with-temp-buffer
-	    (insert-file-contents-as-coding-system
-	     gnus-startup-file-coding-system ding-file)
-	    (eval-region (point-min) (point-max)))
-	(error
-	 (ding)
-	 (unless (gnus-yes-or-no-p
-		  (format "Error in %s; continue? " ding-file))
-	   (error "Error in %s" ding-file))))
+    (when (file-exists-p ding-file)
+      (let (gnus-newsrc-assoc)
+	(condition-case nil
+	    (with-temp-buffer
+	      (insert-file-contents-as-coding-system
+	       gnus-startup-file-coding-system ding-file)
+	      (eval-region (point-min) (point-max)))
+	  (error
+	   (ding)
+	   (unless (gnus-yes-or-no-p
+		    (format "Error in %s; continue? " ding-file))
+	     (error "Error in %s" ding-file)))))
       (when gnus-newsrc-assoc
 	(setq gnus-newsrc-alist gnus-newsrc-assoc)))
     (gnus-make-hashtable-from-newsrc-alist)
