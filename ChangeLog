@@ -1,3 +1,10 @@
+2002-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-dont-compile-files): New constant
+	containing almost all mm*.el.
+	(dgnushack-compile): Don't byte-compile the file in
+	`dgnushack-dont-compile-files'.
+
 2002-10-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
