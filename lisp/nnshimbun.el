@@ -122,8 +122,8 @@
      (index-url      . nnshimbun-url)
      (from-address   . "zdnn@softbank.co.jp")
      (make-contents  . nnshimbun-make-html-contents)
-     (contents-start . "\\(<!--BODY-->\\|[0-9]+年[0-9]+月[0-9]+日[^<]*</font></td>[ \t\r\f\n]*</tr>[ \t\r\f\n]*</table>[ \t\r\f\n]*\\(</p>\\)?\\)")
-     (contents-end   . "\\(<!--BODYEND-->\\|<div align=\"right\">\\|<\\(b\\|strong\\)>\\[</\\2>[^<]*<\\2>ZDNet/\\(JAPAN\\|USA\\)\\]\\(<[^>]+>\\)?</\\2>\\)"))
+     (contents-start . "\\(<!--BODY-->\\|<!--DATE-->\\)")
+     (contents-end   . "\\(<!--BODYEND-->\\|<!--BYLINEEND-->\\)"))
     ("mew"
      (url . "http://www.mew.org/archive/")
      (groups ,@(mapcar #'car nnshimbun-mew-groups))
