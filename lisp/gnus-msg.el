@@ -1006,8 +1006,6 @@ If YANK is non-nil, include the original article."
 	       (stringp nntp-server-type))
       (insert nntp-server-type))
     (insert "\n\n\n\n\n")
-    (let (mime-content-types)
-      (mime-edit-insert-tag "text" "plain" "; type=emacs-lisp"))
     (insert (with-temp-buffer
 	      (gnus-debug)
 	      (buffer-string)))

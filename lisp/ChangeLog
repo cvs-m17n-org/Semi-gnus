@@ -1,3 +1,34 @@
+2000-12-21 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-bug): Revert to save-excursion.
+
+	* mml.el (gnus-add-minor-mode): Autoload.
+
+	* message.el (message-forward): Save-restriction.
+
+2000-12-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-art.el (article-treat-dumbquotes): More doc, provided by
+	Paul Stevenson <p.stevenson@surrey.ac.uk>
+
+2000-12-21 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ml.el (gnus-mailing-list-mode-map): Use C-c C-n prefix.
+
+	* mml.el (gnus-ems): Don't require.
+
+	* gnus.el (gnus-decode-rfc1522): Removed.
+	(gnus-set-text-properties): Define.
+
+2000-12-21 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-*): handle may be nil.
+
+	* gnus-sum.el (gnus-summary-mode): Turn on gnus-mailing-list-mode.
+
+	* gnus.el (gnus-group-remove-excess-properties): Not defined
+	in gnus-xmas.
+
 2000-12-20 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-mail-user-agent): Add :version.
@@ -1073,6 +1104,7 @@
 	* gnus-group.el (gnus-group-jump-to-group-prompt): New variable by
 	Stein Arild Str,Ax(Bmme.
 	(gnus-group-jump-to-group): Use it.
+	(gnus-group-jump-to-group-prompt): Customize.
 
 2000-11-14 10:32:42  ShengHuo ZHU  <zsh@cs.rochester.edu>
 

@@ -55,6 +55,7 @@
 (autoload 'gnus-cache-write-active "gnus-cache")
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 (autoload 'gnus-mailing-list-insinuate "gnus-ml" nil t)
+(autoload 'turn-on-gnus-mailing-list-mode "gnus-ml" nil t)
 (autoload 'mm-uu-dissect "mm-uu")
 
 (defcustom gnus-kill-summary-on-exit t
@@ -2233,6 +2234,7 @@ The following commands are available:
   (make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
+  (turn-on-gnus-mailing-list-mode)
   (gnus-update-format-specifications nil 'summary 'summary-mode 'summary-dummy)
   (gnus-update-summary-mark-positions))
 

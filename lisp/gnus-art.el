@@ -1521,9 +1521,14 @@ if given a positive prefix, always hide."
 	  (forward-line 1))))))
 
 (defun article-treat-dumbquotes ()
-  "Translate M******** sm*rtq**t*s into proper text.
+  "Translate M****s*** sm*rtq**t*s into proper text.
 Note that this function guesses whether a character is a sm*rtq**t* or
-not, so it should only be used interactively."
+not, so it should only be used interactively.
+
+Sm*rtq**t*s are M****s***'s unilateral extension to the character map
+in an attempt to provide more quoting characters.  If you see
+something like \222 or \264 where you're expecting some kind of
+apostrophe or quotation mark, then try this wash."
   (interactive)
   (article-translate-strings gnus-article-dumbquotes-map))
 
@@ -3498,19 +3503,20 @@ value of the variable `gnus-show-mime' is non-nil."
 	  (mail-parse-ignored-charsets 
 	   (with-current-buffer gnus-summary-buffer
 	     gnus-newsgroup-ignored-charsets)))
-      (mm-remove-parts handles)
-      (goto-char (point-min))
-      (or (search-forward "\n\n") (goto-char (point-max)))
-      (let (buffer-read-only)
-	(delete-region (point) (point-max)))
-      (mm-display-parts handles))))
+      (when handles
+	(mm-remove-parts handles)
+	(goto-char (point-min))
+	(or (search-forward "\n\n") (goto-char (point-max)))
+	(let (buffer-read-only)
+	  (delete-region (point) (point-max)))
+	(mm-display-parts handles)))))
 
 (defun gnus-mime-save-part-and-strip ()
   "Save the MIME part under point then replace it with an external body."
   (interactive)
   (gnus-article-check-buffer)
   (let* ((data (get-text-property (point) 'gnus-data)) 
-	 (file (mm-save-part data))
+	 (file (and data (mm-save-part data)))
 	 param)
     (when file
       (with-current-buffer (mm-handle-buffer data)
@@ -3569,21 +3575,24 @@ value of the variable `gnus-show-mime' is non-nil."
   (interactive)
   (gnus-article-check-buffer)
   (let ((data (get-text-property (point) 'gnus-data)))
-    (mm-save-part data)))
+    (when data
+      (mm-save-part data))))
 
 (defun gnus-mime-pipe-part ()
   "Pipe the MIME part under point to a process."
   (interactive)
   (gnus-article-check-buffer)
   (let ((data (get-text-property (point) 'gnus-data)))
-    (mm-pipe-part data)))
+    (when data
+      (mm-pipe-part data))))
 
 (defun gnus-mime-view-part ()
   "Interactively choose a viewing method for the MIME part under point."
   (interactive)
   (gnus-article-check-buffer)
   (let ((data (get-text-property (point) 'gnus-data)))
-    (mm-interactively-view-part data)))
+    (when data
+      (mm-interactively-view-part data))))
 
 (defun gnus-mime-view-part-as-type-internal ()
   (gnus-article-check-buffer)
@@ -3603,38 +3612,41 @@ value of the variable `gnus-show-mime' is non-nil."
 	  (gnus-mime-view-part-as-type-internal))))
   (gnus-article-check-buffer)
   (let ((handle (get-text-property (point) 'gnus-data)))
-    (gnus-mm-display-part
-     (mm-make-handle (mm-handle-buffer handle)
-		     (cons mime-type (cdr (mm-handle-type handle)))
-		     (mm-handle-encoding handle)
-		     (mm-handle-undisplayer handle)
-		     (mm-handle-disposition handle)
-		     (mm-handle-description handle)
-		     (mm-handle-cache handle)
-		     (mm-handle-id handle)))))
-
+    (when handle
+      (gnus-mm-display-part
+       (mm-make-handle (mm-handle-buffer handle)
+		       (cons mime-type (cdr (mm-handle-type handle)))
+		       (mm-handle-encoding handle)
+		       (mm-handle-undisplayer handle)
+		       (mm-handle-disposition handle)
+		       (mm-handle-description handle)
+		       (mm-handle-cache handle)
+		       (mm-handle-id handle))))))
+  
 (defun gnus-mime-copy-part (&optional handle)
   "Put the the MIME part under point into a new buffer."
   (interactive)
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
-	 (contents (mm-get-part handle))|
-	 (base (file-name-nondirectory
-		(or
-		 (mail-content-type-get (mm-handle-type handle) 'name)
-		 (mail-content-type-get (mm-handle-type handle)
-					'filename)
-		 "*decoded*")))
-	 (buffer (generate-new-buffer base)))
-    (switch-to-buffer buffer)
-    (insert contents)
-    ;; We do it this way to make `normal-mode' set the appropriate mode.
-    (unwind-protect
-	(progn
-	  (setq buffer-file-name (expand-file-name base))
-	  (normal-mode))
-      (setq buffer-file-name nil))
-    (goto-char (point-min))))
+	 (contents (and handle (mm-get-part handle)))
+	 (base (and handle 
+		    (file-name-nondirectory
+		     (or
+		      (mail-content-type-get (mm-handle-type handle) 'name)
+		      (mail-content-type-get (mm-handle-type handle)
+					     'filename)
+		      "*decoded*"))))
+	 (buffer (and base (generate-new-buffer base))))
+    (when contents
+      (switch-to-buffer buffer)
+      (insert contents)
+      ;; We do it this way to make `normal-mode' set the appropriate mode.
+      (unwind-protect
+	  (progn
+	    (setq buffer-file-name (expand-file-name base))
+	    (normal-mode))
+	(setq buffer-file-name nil))
+      (goto-char (point-min)))))
 
 (defun gnus-mime-inline-part (&optional handle arg)
   "Insert the MIME part under point into the current buffer."
@@ -3644,30 +3656,31 @@ value of the variable `gnus-show-mime' is non-nil."
 	 contents charset
 	 (b (point))
 	 buffer-read-only)
-    (if (and (not arg) (mm-handle-undisplayer handle))
-	(mm-remove-part handle)
-      (setq contents (mm-get-part handle))
-      (cond
-       ((not arg)
-	(setq charset (or (mail-content-type-get
-			   (mm-handle-type handle) 'charset)
-			  gnus-newsgroup-charset)))
-       ((numberp arg)
-	(if (mm-handle-undisplayer handle)
-	    (mm-remove-part handle))
-	(setq charset
-	      (or (cdr (assq arg 
-			     gnus-summary-show-article-charset-alist))
-		  (read-coding-system "Charset: ")))))
-      (forward-line 2)
-      (mm-insert-inline handle
-			(if (and charset 
-				 (setq charset (mm-charset-to-coding-system 
-						charset))
-				 (not (eq charset 'ascii)))
-			    (mm-decode-coding-string contents charset)
-			  contents))
-      (goto-char b))))
+    (when handle
+      (if (and (not arg) (mm-handle-undisplayer handle))
+	  (mm-remove-part handle)
+	(setq contents (mm-get-part handle))
+	(cond
+	 ((not arg)
+	  (setq charset (or (mail-content-type-get
+			     (mm-handle-type handle) 'charset)
+			    gnus-newsgroup-charset)))
+	 ((numberp arg)
+	  (if (mm-handle-undisplayer handle)
+	      (mm-remove-part handle))
+	  (setq charset
+		(or (cdr (assq arg 
+			       gnus-summary-show-article-charset-alist))
+		    (read-coding-system "Charset: ")))))
+	(forward-line 2)
+	(mm-insert-inline handle
+			  (if (and charset 
+				   (setq charset (mm-charset-to-coding-system 
+						  charset))
+				   (not (eq charset 'ascii)))
+			      (mm-decode-coding-string contents charset)
+			    contents))
+	(goto-char b)))))
 
 (defun gnus-mime-view-part-as-charset (&optional handle arg)
   "Insert the MIME part under point into the current buffer."
@@ -3677,14 +3690,15 @@ value of the variable `gnus-show-mime' is non-nil."
 	 contents charset
 	 (b (point))
 	 buffer-read-only)
-    (if (mm-handle-undisplayer handle)
-	(mm-remove-part handle))
-    (let ((gnus-newsgroup-charset
-	   (or (cdr (assq arg 
-			  gnus-summary-show-article-charset-alist))
-	       (read-coding-system "Charset: ")))
+    (when handle
+      (if (mm-handle-undisplayer handle)
+	  (mm-remove-part handle))
+      (let ((gnus-newsgroup-charset
+	     (or (cdr (assq arg 
+			    gnus-summary-show-article-charset-alist))
+		 (read-coding-system "Charset: ")))
 	  (gnus-newsgroup-ignored-charsets 'gnus-all))
-      (gnus-article-press-button))))
+	(gnus-article-press-button)))))
 
 (defun gnus-mime-externalize-part (&optional handle)
   "View the MIME part under point with an external viewer."
@@ -3697,9 +3711,10 @@ value of the variable `gnus-show-mime' is non-nil."
 	 (mail-parse-ignored-charsets 
 	  (save-excursion (set-buffer gnus-summary-buffer)
 			  gnus-newsgroup-ignored-charsets)))
-    (if (mm-handle-undisplayer handle)
-	(mm-remove-part handle)
-      (mm-display-part handle))))
+    (when handle
+      (if (mm-handle-undisplayer handle)
+	  (mm-remove-part handle)
+	(mm-display-part handle)))))
 
 (defun gnus-mime-internalize-part (&optional handle)
   "View the MIME part under point with an internal viewer.
@@ -3713,9 +3728,10 @@ In no internal viewer is available, use an external viewer."
 	 (mail-parse-ignored-charsets 
 	  (save-excursion (set-buffer gnus-summary-buffer)
 			  gnus-newsgroup-ignored-charsets)))
-    (if (mm-handle-undisplayer handle)
-	(mm-remove-part handle)
-      (mm-display-part handle))))
+    (when handle
+      (if (mm-handle-undisplayer handle)
+	  (mm-remove-part handle)
+	(mm-display-part handle)))))
 
 (defun gnus-mime-action-on-part (&optional action)
   "Do something with the MIME attachment at \(point\)."
