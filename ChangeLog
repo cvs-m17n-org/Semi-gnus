@@ -1,6 +1,8 @@
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/dgnushack.el: Make sure `dolist' is available.
+	* lisp/dgnushack.el: Make sure `dolist' is available; require
+	`advice' before `path-util'; revoke the bogus change of 2003-04-17
+	(removing function bindings for XEmacs).
 
 	* texi/infohack.el: Load dgnushack.el and ptexinfmt.el first.
 

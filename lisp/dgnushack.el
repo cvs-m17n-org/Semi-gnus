@@ -50,10 +50,6 @@
 
 (require 'cl)
 
-(and (fboundp 'dolist)
-     (dolist (var nil t)))
-
-
 (unless (and
 	 ;; `dolist' might not be available because of ``-no-autoloads''.
 	 (fboundp 'dolist)
@@ -218,6 +214,7 @@ It has already been fixed in XEmacs since 1999-12-06."
 	  (unless (or (member parent load-path)
 		      (member (file-name-as-directory parent) load-path))
 	    (push parent (cdr load-path))))
+	(require 'advice)
 	(require 'path-util))
     (error "
 APEL modules are not found in %s.
@@ -468,6 +465,57 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defalias 'efs-re-read-dir 'ignore)
 (defalias 'ange-ftp-re-read-dir 'ignore)
 (defalias 'define-mail-user-agent 'ignore)
+
+(eval-and-compile
+  (when (featurep 'xemacs)
+    (autoload 'Info-directory "info" nil t)
+    (autoload 'Info-menu "info" nil t)
+    (autoload 'annotations-at "annotations")
+    (autoload 'apropos "apropos" nil t)
+    (autoload 'apropos-command "apropos" nil t)
+    (autoload 'bbdb-complete-name "bbdb-com" nil t)
+    (autoload 'browse-url "browse-url" nil t)
+    (autoload 'c-mode "cc-mode" nil t)
+    (autoload 'customize-apropos "cus-edit" nil t)
+    (autoload 'customize-save-variable "cus-edit" nil t)
+    (autoload 'customize-variable "cus-edit" nil t)
+    (autoload 'delete-annotation "annotations")
+    (autoload 'dolist "cl-macs" nil nil 'macro)
+    (autoload 'enriched-decode "enriched")
+    (autoload 'info "info" nil t)
+    (autoload 'make-annotation "annotations")
+    (autoload 'make-display-table "disp-table")
+    (autoload 'pp "pp")
+    (autoload 'ps-despool "ps-print" nil t)
+    (autoload 'ps-spool-buffer "ps-print" nil t)
+    (autoload 'ps-spool-buffer-with-faces "ps-print" nil t)
+    (autoload 'read-kbd-macro "edmacro" nil t)
+    (autoload 'read-passwd "passwd")
+    (autoload 'regexp-opt "regexp-opt")
+    (autoload 'reporter-submit-bug-report "reporter")
+    (if (emacs-version>= 21 5)
+	(autoload 'setenv "process" nil t)
+      (autoload 'setenv "env" nil t))
+    (autoload 'smtpmail-send-it "smtpmail")
+    (autoload 'sort-numeric-fields "sort" nil t)
+    (autoload 'sort-subr "sort")
+    (autoload 'trace-function-background "trace" nil t)
+    (autoload 'w3-do-setup "w3")
+    (autoload 'w3-prepare-buffer "w3-display")
+    (autoload 'w3-region "w3-display" nil t)
+    (defalias 'frame-char-height 'frame-height)
+    (defalias 'frame-char-width 'frame-width)
+    (defalias 'frame-parameter 'frame-property)
+    (defalias 'make-overlay 'ignore)
+    (defalias 'overlay-end 'ignore)
+    (defalias 'overlay-get 'ignore)
+    (defalias 'overlay-put 'ignore)
+    (defalias 'overlay-start 'ignore)
+    (defalias 'overlays-in 'ignore)
+    (defalias 'replace-dehighlight 'ignore)
+    (defalias 'replace-highlight 'ignore)
+    (defalias 'run-with-idle-timer 'ignore)
+    (defalias 'w3-coding-system-for-mime-charset 'ignore)))
 
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
