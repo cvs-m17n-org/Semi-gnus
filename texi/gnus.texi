@@ -5540,6 +5540,10 @@ Gnus will use the ``current'' select method when canceling.  If you
 want to use the standard posting method, use the @samp{a} symbolic
 prefix (@pxref{Symbolic Prefixes}).
 
+Gnus ensures that only you can cancel your own messages using a
+@code{Cancel-Lock} header (@pxref{Canceling News, Canceling News, ,
+message, Message Manual}).
+
 If you discover that you have made some mistakes and want to do some
 corrections, you can post a @dfn{superseding} article that will replace
 your original article.
@@ -18660,9 +18664,9 @@ Display the score of the current article
 @findex gnus-score-find-trace
 Display all score rules that have been used on the current article
 (@code{gnus-score-find-trace}).  In the @code{*Score Trace*} buffer, you
-can use @kbd{q} to quit.  @kbd{e} edits the corresponding score file.
-When point is on a string within the match element, @kbd{e} will try to
-bring you to this string in the score file.
+may type @kbd{e} to edit score file corresponding to the score rule on
+current line and @kbd{f} to format (@code{gnus-score-pretty-print}) the
+score file and edit it.
 
 @item V w
 @kindex V w (Summary)
@@ -19402,8 +19406,8 @@ Type @kbd{M-x gnus-score-mode} to use this mode.
 @vindex gnus-score-mode-hook
 @code{gnus-score-menu-hook} is run in score mode buffers.
 
-In the summary buffer you can use commands like @kbd{V f} and @kbd{V
-e} to begin editing score files.
+In the summary buffer you can use commands like @kbd{V f}, @kbd{V e} and
+@kbd{V t} to begin editing score files.
 
 
 @node Adaptive Scoring
@@ -23761,10 +23765,10 @@ but at the common table.@*
 
 XEmacs is distributed as a collection of packages.  You should install
 whatever packages the Gnus XEmacs package requires.  The current
-requirements are @samp{gnus}, @samp{w3}, @samp{mh-e},
-@samp{mailcrypt}, @samp{rmail}, @samp{eterm}, @samp{mail-lib},
-@samp{xemacs-base}, @samp{sh-script} and @samp{fsf-compat}.  The
-@samp{misc-games} package is required for Morse decoding.
+requirements are @samp{gnus}, @samp{mail-lib}, @samp{xemacs-base},
+@samp{eterm}, @samp{sh-script}, @samp{net-utils}, @samp{os-utils},
+@samp{dired}, @samp{mh-e}, @samp{sieve}, @samp{ps-print}, @samp{w3},
+@samp{pgg}, @samp{mailcrypt}, @samp{ecrypto}, and @samp{sasl}.
 
 
 @node History

@@ -5448,6 +5448,10 @@ Gnus は、取り消すときに『現在』の選択方法を使います。標準の投稿方法を使
 いたいのであれば、文字接頭引数 @samp{a} を使ってくださ
 い (@pxref{Symbolic Prefixes})。
 
+Gnus は @code{Cancel-Lock} ヘッダー (@pxref{Canceling News, Canceling
+News, , message, Message Manual}) を使って、あなただけがあなたのメッセー
+ジをキャンセルできることを保証します。
+
 もし何か間違いをしたのに気付いて、訂正をしたいのであれば、
 @dfn{代替} (@dfn{superseding}) 記事を投稿して本記事を置き換えることがで
 きます。
@@ -17941,10 +17945,10 @@ Gnus は概略バッファを作成する前に、現在のグループに適用されるどん
 @kindex V t (概略)
 @findex gnus-score-find-trace
 現在の記事に使われている全てのスコア法則 (score rule) を表示しま
-す (@code{gnus-score-find-trace})。@code{*Score Trace*} バッファで
-は @kbd{q} で終了することができます。@kbd{e} で対応するスコアファイルを
-編集します。ポイントが合致した素子の中の文字列上にあるとき、@kbd{e} はス
-コアファイルの中のこの文字列の場所へ移動しようとします。
+す (@code{gnus-score-find-trace})。@code{*Score Trace*} バッファ
+で、@kbd{e} をタイプして現在行のスコア法則に対応するスコアファイルを編集
+することができ、@kbd{f} ではスコアファイルのフォーマッ
+ト (@code{gnus-score-pretty-print}) と編集を行なうことができます。
 
 @item V w
 @kindex V w (概略)
@@ -18657,8 +18661,8 @@ ignore)} を適応スコアをしたくないグループに挿入するでしょう。少しのグルー
 @vindex gnus-score-mode-hook
 @code{gnus-score-menu-hook} がスコアモードバッファで実行されます。
 
-概略バッファでは、@kbd{V f} や @kbd{V e} のような命令でスコアファイルの
-編集を始める事ができます。
+概略バッファでは、@kbd{V f}、@kbd{V e} および @kbd{V t} のような命令でス
+コアファイルの編集を始める事ができます。
 
 @node Adaptive Scoring
 @section 適応性スコア
@@ -22893,10 +22897,10 @@ but at the common table.@*
 
 XEmacs はパッケージの蒐集として配布されています。gnus の XEmacs パッケー
 ジが必要とするものは何であれ、あなたはインストールすべきです。今のところ
-必要なのは @samp{gnus}, @samp{w3}, @samp{mh-e}, @samp{mailcrypt},
-@samp{rmail}, @samp{eterm}, @samp{mail-lib}, @samp{xemacs-base},
-@samp{sh-script} および @samp{fsf-compat} です。モールス復号のために
-は @samp{misc-games} パッケージが必要です。
+必要なのは @samp{gnus}, @samp{mail-lib}, @samp{xemacs-base},
+@samp{eterm}, @samp{sh-script}, @samp{net-utils}, @samp{os-utils},
+@samp{dired}, @samp{mh-e}, @samp{sieve}, @samp{ps-print}, @samp{w3},
+@samp{pgg}, @samp{mailcrypt}, @samp{ecrypto} および @samp{sasl} です。
 
 @node History
 @section 歴史
