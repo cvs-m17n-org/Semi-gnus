@@ -3896,20 +3896,14 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Retrieve the headers and read them in.
       (gnus-message 5 "Fetching headers for %s..." gnus-newsgroup-name)
       (setq gnus-newsgroup-headers
-	    (if (eq 'nov
-		    (setq gnus-headers-retrieved-by
-			  (gnus-retrieve-headers
-			   articles gnus-newsgroup-name
-			   ;; We might want to fetch old headers, but
-			   ;; not if there is only 1 article.
-			   (and (or (and
-				     (not (eq gnus-fetch-old-headers 'some))
-				     (not (numberp gnus-fetch-old-headers)))
-				    (> (length articles) 1))
-				gnus-fetch-old-headers))))
-		(gnus-get-newsgroup-headers-xover
-		 articles nil nil gnus-newsgroup-name t)
-	      (gnus-get-newsgroup-headers)))
+	    (gnus-retrieve-parsed-headers
+	     articles gnus-newsgroup-name
+	     ;; We might want to fetch old headers, but
+	     ;; not if there is only 1 article.
+	     (and (or (and (not (eq gnus-fetch-old-headers 'some))
+			   (not (numberp gnus-fetch-old-headers)))
+		      (> (length articles) 1))
+		  gnus-fetch-old-headers)))
       (gnus-message 5 "Fetching headers for %s...done" gnus-newsgroup-name)
 
       ;; Kludge to avoid having cached articles nixed out in virtual groups.
