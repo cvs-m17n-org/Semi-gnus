@@ -752,8 +752,16 @@ be set in `.emacs' instead."
   (cond
    ((and (fboundp 'find-image)
 	 (display-graphic-p)
-	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
-				    (:type xbm :file "gnus.xbm")))))
+	 (let ((image
+		(find-image
+		 `((:type xpm :file "gnus.xpm"
+			  :color-symbols
+			  (("thing" . "#724214")
+			   ("shadow" . "#1e3f03")
+			   ("background" . ,(face-background 'default))))
+		   (:type xbm :file "gnus.xbm"
+			  :foreground ,(face-foreground 'gnus-splash-face)
+			  :background ,(face-background 'default))))))
 	   (when image
 	     (insert-image image)
 	     (goto-char (point-min))
@@ -769,6 +777,8 @@ be set in `.emacs' instead."
 		     " based on " gnus-original-product-name " v"
 		     gnus-original-version-number "\n")
 	     (goto-char (point-min))
+	     (put-text-property (point) (gnus-point-at-eol)
+				'face 'gnus-splash-face)
 	     (insert-char ?\ ;; space
 			  (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
 	     (forward-line 1)
@@ -919,7 +929,7 @@ used to 899, you would say something along these lines:
 	   nil
 	 (list gnus-nntp-service)))
     (error nil))
-  "*Default method for selecting a newsgroup.
+  "Default method for selecting a newsgroup.
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.
 
@@ -2322,7 +2332,14 @@ that that variable is buffer-local to the summary buffers."
   "Return non-nil if GROUP (and ARTICLE) come from a news server."
   (or (gnus-member-of-valid 'post group) ; Ordinary news group.
       (and (gnus-member-of-valid 'post-mail group) ; Combined group.
-	   (eq (gnus-request-type group article) 'news))))
+	   (if (or (null article)
+		   (not (< article 0)))
+	       (eq (gnus-request-type group article) 'news)
+	     (if (not (vectorp article))
+		 nil
+	       ;; It's a real article.
+	       (eq (gnus-request-type group (mail-header-id article))
+		   'news))))))
 
 ;; Returns a list of writable groups.
 (defun gnus-writable-groups ()
