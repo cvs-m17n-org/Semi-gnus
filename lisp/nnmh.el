@@ -77,7 +77,7 @@
 	   (large (and (numberp nnmail-large-newsgroup)
 		       (> number nnmail-large-newsgroup)))
 	   (count 0)
-	   (pathname-coding-system 'binary)
+	   (pathname-coding-system nnheader-pathname-coding-system)
 	   beg article)
       (nnmh-possibly-change-directory newsgroup server)
       ;; We don't support fetching by Message-ID.
@@ -135,7 +135,7 @@
   (let ((file (if (stringp id)
 		  nil
 		(concat nnmh-current-directory (int-to-string id))))
-	(pathname-coding-system 'binary)
+	(pathname-coding-system nnheader-pathname-coding-system)
 	(nntp-server-buffer (or buffer nntp-server-buffer)))
     (and (stringp file)
 	 (file-exists-p file)
@@ -147,7 +147,7 @@
   (nnheader-init-server-buffer)
   (nnmh-possibly-change-directory group server)
   (let ((pathname (nnmail-group-pathname group nnmh-directory))
-	(pathname-coding-system 'binary)
+	(pathname-coding-system nnheader-pathname-coding-system)
 	dir)
     (cond
      ((not (file-directory-p pathname))
@@ -187,7 +187,7 @@
 (deffoo nnmh-request-list (&optional server dir)
   (nnheader-insert "")
   (nnmh-possibly-change-directory nil server)
-  (let ((pathname-coding-system 'binary)
+  (let ((pathname-coding-system nnheader-pathname-coding-system)
 	(nnmh-toplev
 	 (file-truename (or dir (file-name-as-directory nnmh-directory)))))
     (nnmh-request-list-1 nnmh-toplev))
@@ -229,7 +229,7 @@
 	       dir)
 	      (nnheader-replace-chars-in-string
 	       (gnus-decode-coding-string (substring dir (match-end 0))
-					  nnmail-pathname-coding-system)
+					  nnheader-pathname-coding-system)
 	       ?/ ?.))
 	    (apply 'max files)
 	    (apply 'min files)))))))
@@ -402,7 +402,7 @@
     (nnmh-open-server server))
   (when newsgroup
     (let ((pathname (nnmail-group-pathname newsgroup nnmh-directory))
-	  (pathname-coding-system 'binary))
+	  (pathname-coding-system nnheader-pathname-coding-system))
       (if (file-directory-p pathname)
 	  (setq nnmh-current-directory pathname)
 	(error "No such newsgroup: %s" newsgroup)))))
@@ -451,7 +451,7 @@
   "Compute the next article number in GROUP."
   (let ((active (cadr (assoc group nnmh-group-alist)))
 	(dir (nnmail-group-pathname group nnmh-directory))
-	(pathname-coding-system 'binary))
+	(pathname-coding-system nnheader-pathname-coding-system))
     (unless active
       ;; The group wasn't known to nnmh, so we just create an active
       ;; entry for it.
