@@ -1,3 +1,8 @@
+2002-07-03  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-logic.el (gnus-advanced-index): Use luna based index
+	numbers.
+
 2002-06-26  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* lisp/imap.el (imap-ssl-open-2): Do away with w32-related
