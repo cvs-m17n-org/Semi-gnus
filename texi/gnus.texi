@@ -3852,11 +3852,12 @@ Enter the server buffer (@code{gnus-group-enter-server-mode}).
 @findex gnus-group-post-news
 Post an article to a group (@code{gnus-group-post-news}).  If given a
 prefix, the current group name will be used as the default.
+@xref{Composing Messages}.
 
 @item m
 @kindex m (Group)
 @findex gnus-group-mail
-Mail a message somewhere (@code{gnus-group-mail}).
+Mail a message somewhere (@code{gnus-group-mail}).  @xref{Composing Messages}.
 
 @end table
 
@@ -6928,6 +6929,13 @@ article in.  The default is @code{gnus-plain-save-name}.
 @findex gnus-numeric-save-name
 Append the article straight to an ordinary file.  Uses the function in
 the @code{gnus-file-save-name} variable to get a file name to save the
+article in.  The default is @code{gnus-numeric-save-name}.
+
+@item gnus-summary-write-to-file
+@findex gnus-summary-write-to-file
+Write the article straight to an ordinary file.  The file is
+overwritten if it exists.  Uses the function in the
+@code{gnus-file-save-name} variable to get a file name to save the
 article in.  The default is @code{gnus-numeric-save-name}.
 
 @item gnus-summary-save-body-in-file

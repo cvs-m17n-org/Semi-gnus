@@ -3905,11 +3905,12 @@ Gnus
 @findex gnus-group-post-news
 あるグループに記事を投稿する (@code{gnus-group-post-news})。プレフィック
 スを与えると、現在のグループ名が初期値として使用されます。
+@xref{Composing Messages}。
 
 @item m
 @kindex m (Group)
 @findex gnus-group-mail
-メールをどこかに送る (@code{gnus-group-mail})。
+メールをどこかに送る (@code{gnus-group-mail})。@xref{Composing Messages}。
 @end table
 
 以下はグループバッファのための変数です:
@@ -6821,6 +6822,13 @@ Unix メール (mbox) ファイルに保存します。変
 記事を通常のファイルの後に追加します。変数 @code{gnus-file-save-name} に
 入っている関数を、記事を保存するためのファイル名を取得するために使用しま
 す。ディフォルトは @code{gnus-numeric-save-name} です。
+
+@item gnus-summary-write-to-file
+@findex gnus-summary-write-to-file
+記事をストレートに通常のファイルに保存します。そのファイルが存在していた
+ら上書きされます。変数 @code{gnus-file-save-name} に入っている関数を、記
+事を保存するためのファイル名を取得するために使用します。ディフォルト
+は @code{gnus-numeric-save-name} です。
 
 @item gnus-summary-save-body-in-file
 @findex gnus-summary-save-body-in-file
