@@ -1967,11 +1967,9 @@ commands:
 	    (set-buffer gnus-summary-buffer)
 	    default-mime-charset))
 	)
-    (save-excursion
-      (mime-display-message mime-message-structure
-			    gnus-article-buffer nil gnus-article-mode-map)
-			    
-      ))
+    (mime-display-message mime-message-structure
+			  gnus-article-buffer nil gnus-article-mode-map)
+    )
   (run-hooks 'gnus-mime-article-prepare-hook)
   )
 
@@ -2097,8 +2095,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			 (progn
 			   (mime-parse-buffer)
 			   (if (or (not gnus-strict-mime)
-				   (mime-entity-fetch-field
-				    mime-message-structure "MIME-Version"))
+				   (mime-fetch-field "MIME-Version"))
 			       gnus-article-display-method-for-mime
 			     gnus-article-display-method-for-encoded-word))
 		       gnus-article-display-method-for-traditional)))
