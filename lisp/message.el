@@ -1346,6 +1346,8 @@ no, only reply back to the author."
   (autoload 'gnus-alive-p "gnus-util")
   (autoload 'gnus-server-string "gnus")
   (autoload 'gnus-group-name-charset "gnus-group")
+  (autoload 'gnus-group-name-decode "gnus-group")
+  (autoload 'gnus-groups-from-server "gnus")
   (autoload 'rmail-output "rmailout")
   (autoload 'mu-cite-original "mu-cite"))
 
@@ -1893,7 +1895,9 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
     (setq adaptive-fill-first-line-regexp
 	  (concat quote-prefix-regexp "\\|"
 		  adaptive-fill-first-line-regexp))
-    (setq auto-fill-inhibit-regexp "^[A-Z][^: \n\t]+:")))
+    ;;(setq auto-fill-inhibit-regexp "^[A-Z][^: \n\t]+:")
+    (setq auto-fill-inhibit-regexp nil)
+    (setq auto-fill-function 'message-do-auto-fill)))
 
 
 
@@ -2195,6 +2199,11 @@ Prefix arg means justify as well."
     (message-newline-and-reformat arg t)
     t))
 
+(defun message-do-auto-fill ()
+  "Like `do-auto-fill', but don't fill in message header."
+  (unless (text-property-any (gnus-point-at-bol) (point) 'field 'header)
+    (do-auto-fill)))
+
 (defun message-insert-signature (&optional force)
   "Insert a signature.  See documentation for variable `message-signature'."
   (interactive (list 0))
@@ -2376,31 +2385,11 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 	(indent-rigidly start (mark t) message-indentation-spaces)
       (save-excursion
 	(goto-char start)
-	(let (last-line)
-	  ;; `last-line' describes the contents of the last line
-	  ;; encountered in the loop below. nil means "empty line",
-	  ;; spaces "line consisting entirely of whitespace",
-	  ;; right-angle "line starts with >", quoted "quote character
-	  ;; at the beginning of the line", text "the remaining cases".
-	  (while (< (point) (mark t))
-	    (cond
-	     ((eolp)
+	(while (< (point) (mark t))
+	  (if (looking-at ">")
 	      (insert message-yank-cited-prefix)
-	      (setq last-line nil))
-	     ((looking-at ">")
-	      (if (memq last-line '(nil spaces right-angle quoted))
-		  (progn
-		    (insert message-yank-cited-prefix)
-		    (setq last-line 'quoted))
-		(insert message-yank-prefix)
-		(setq last-line 'right-angle)))
-	     ((looking-at "\\s-+$")
-	      (insert message-yank-prefix)
-	      (setq last-line 'spaces))
-	     (t
-	      (insert message-yank-prefix)
-	      (setq last-line 'text)))
-	    (forward-line 1)))))
+	    (insert message-yank-prefix))
+	  (forward-line 1))))
     (goto-char start)))
 
 (defun message-list-references (refs-list &rest refs-strs)
@@ -4636,6 +4625,7 @@ than 988 characters long, and if they are not, trim them until they are."
   (when message-default-headers
     (insert message-default-headers)
     (or (bolp) (insert ?\n)))
+  (put-text-property (point-min) (point) 'field 'header)
   (put-text-property
    (point)
    (progn

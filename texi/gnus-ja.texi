@@ -3733,6 +3733,12 @@ Gnus $B$,CN$C$F$$$k%H%T%C%/2=$5$l$?%0%k!<%W$rA4$FI=<($7$^(B
 @findex gnus-topic-sort-groups-by-method
 $B8=:_$N%H%T%C%/$r%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-method})$B!#(B
+
+@item T S e
+@kindex T S e (Topic)
+@findex gnus-topic-sort-groups-by-server
+$B8=:_$N%H%T%C%/$r%5!<%P!<$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
+$B$9(B (@code{gnus-topic-sort-groups-by-server})$B!#(B
 @end table
 
 $B%0%k!<%W$N%=!<%H$K$D$$$F$N$5$i$J$k>pJs$O(B @xref{Sorting Groups} $B$r;2>H$7(B
@@ -3911,9 +3917,11 @@ Gnus
 @end lisp
 
 @item gnus-group-name-charset-group-alist
+@cindex UTF-8 group names
 @vindex gnus-group-name-charset-group-alist
 $B%0%k!<%WL>MQ$N%0%k!<%WL>$N@55,I=8=$HJ8;z=89g$NO"A[%j%9%H$G$9!#$3$l$O1Q;z(B
-$B$G$O$J$$%0%k!<%WL>$rI=<($9$k$?$a$K;H$$$^$9!#(B
+$B$G$O$J$$%0%k!<%WL>$rI=<($9$k$?$a$K;H$$$^$9!#%G%#%U%)%k%HCM$O!"(BUTF-8 $B$,%5(B
+$B%]!<%H$5$l$F$$$k>l9g$O(B @code{((".*" utf-8))}$B!"$=$l0J30$N>l9g$O(B nil $B$G$9!#(B
 
 $BNc(B:
 @lisp
@@ -9550,8 +9558,32 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 @table @samp
 @item w
-$B5-;v$N!V@vBu>uBV!W(B@dfn{wash status}$B!#$3$l$O5-;v$KBP$7$F9T$o$l$?(B
-$B$G$"$m$&@vBuA`:n$r<($90lJ8;z$+$i$J$kC;$$J8;zNs$K$J$j$^$9!#(B
+$B5-;v$N!V@vBu>uBV!W(B@dfn{wash status}$B!#$3$l$O5-;v$KBP$7$F9T$o$l$?$G$"$m$&(B
+$B@vBuA`:n$r<($90lJ8;z$+$i$J$kC;$$J8;zNs$K$J$j$^$9!#J8;z$H$=$l$i$N0UL#$O(B:
+
+@table @samp
+@item c
+$B5-;v%P%C%U%!$K$*$$$F!"0zMQ$5$l$?J8$,1#$5$l$F$$$k$+$b$7$l$J$$>l9g$KI=<($5(B
+$B$l$^$9!#(B
+
+@item h
+$B5-;v%P%C%U%!$K$*$$$F!"%X%C%@!<$,1#$5$l$F$$$k>l9g$KI=<($5$l$^$9!#(B
+
+@c @item p 
+@c Displayed when article is digitally signed or encrypted, and Gnus has
+@c hidden the security headers.  (N.B. does not tell anything about
+@c security status, i.e. good or bad signature.)
+
+@item s
+$B5-;v%P%C%U%!$K$*$$$F!"=pL>$,1#$5$l$F$$$k>l9g$KI=<($5$l$^$9!#(B
+
+@item o
+$B5-;v%P%C%U%!$K=E$MBG$AJ8;z$,$"$k>l9g$KI=<($5$l$^$9!#(B
+
+@item e
+$B5-;v%P%C%U%!$K6/D4$5$l$?J8;zNs$,$"$k>l9g$KI=<($5$l$^$9!#(B
+@end table
+
 @c FIXMETGNUS Does this work?
 @item m
 $B5-;v$N(B @sc{mime} $BItJ,$N?t$G$9!#(B

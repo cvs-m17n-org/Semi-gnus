@@ -931,13 +931,6 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-hide-citation-maybe nil
-  "Hide cited text.
-Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
-  :group 'gnus-article-treat
-  :type gnus-article-treat-custom)
-
 (defcustom gnus-treat-strip-list-identifiers 'head
   "Strip list identifiers from `gnus-list-identifiers`.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -2717,13 +2710,13 @@ This format is defined by the `gnus-article-time-format' variable."
 		face (nth 3 elem))
 	  (while (re-search-forward regexp nil t)
 	    (when (and (match-beginning visible) (match-beginning invisible))
-	      (push 'emphasis gnus-article-wash-types)
 	      (gnus-article-hide-text
 	       (match-beginning invisible) (match-end invisible) props)
 	      (gnus-article-unhide-text-type
 	       (match-beginning visible) (match-end visible) 'emphasis)
 	      (gnus-put-text-property-excluding-newlines
 	       (match-beginning visible) (match-end visible) 'face face)
+	      (push 'emphasis gnus-article-wash-types)
 	      (goto-char (match-end invisible)))))))))
 
 (defun gnus-article-setup-highlight-words (&optional highlight-words)
@@ -5610,14 +5603,21 @@ specified by `gnus-button-alist'."
 	  (limit (next-single-property-change end 'mime-view-entity
 					      nil (point-max))))
       (if (text-property-any end limit 'article-type 'signature)
-	  (gnus-remove-text-properties-when
-	   'article-type 'signature end limit
-	   (cons 'article-type (cons 'signature
-				     gnus-hidden-properties)))
+	  (progn
+	    (setq gnus-article-wash-types
+		  (delq 'signature gnus-article-wash-types))
+	    (gnus-remove-text-properties-when
+	     'article-type 'signature end limit
+	     (cons 'article-type (cons 'signature
+				       gnus-hidden-properties))))
+	(or (memq 'signature gnus-article-wash-types)
+	    (push 'signature gnus-article-wash-types))
 	(gnus-add-text-properties-when
 	 'article-type nil end limit
 	 (cons 'article-type (cons 'signature
-				   gnus-hidden-properties)))))))
+				   gnus-hidden-properties)))))
+    (let ((gnus-article-mime-handle-alist-1 gnus-article-mime-handle-alist))
+      (gnus-set-mode-line 'article))))
 
 (defun gnus-button-entry ()
   ;; Return the first entry in `gnus-button-alist' matching this place.
