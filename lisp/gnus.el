@@ -268,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.14.1"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "13"
+(defconst gnus-revision-number "14"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "5.8.3"
@@ -1606,6 +1606,13 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-topic-topology gnus-topic-alist
 			gnus-format-specs)
   "Gnus variables saved in the quick startup file.")
+
+(defcustom gnus-compile-user-specs t
+  "If non-nil, the user-defined format specs will be byte-compiled
+automatically.
+It has an effect on the values of `gnus-*-line-format-spec'."
+  :group 'gnus
+  :type 'boolean)
 
 (defvar gnus-newsrc-alist nil
   "Assoc list of read articles.
