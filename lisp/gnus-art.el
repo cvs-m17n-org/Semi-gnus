@@ -121,7 +121,7 @@
     "^X-UIDL:" "^MIME-Version:" "^Return-Path:" "^In-Reply-To:"
     "^Content-Type:" "^Content-Transfer-Encoding:" "^X-WebTV-Signature:"
     "^X-MimeOLE:" "^X-MSMail-Priority:" "^X-Priority:" "^X-Loop:"
-    "^X-Authentication-Warning:" "^X-MIME-Autoconverted:" "^X-Face:"
+    "^X-Authentication-Warning:" "^X-MIME-Autoconverted:" "^X-Face"
     "^X-Attribution:" "^X-Originating-IP:" "^Delivered-To:"
     "^NNTP-[-A-Za-z]+:" "^Distribution:" "^X-no-archive:" "^X-Trace:"
     "^X-Complaints-To:" "^X-NNTP-Posting-Host:" "^X-Orig.*:"
@@ -151,7 +151,8 @@
      "^X-Content-length:" "^X-Posting-Agent:" "^Original-Received:"
      "^X-Request-PGP:" "^X-Fingerprint:" "^X-WRIEnvto:" "^X-WRIEnvfrom:"
      "^X-Virus-Scanned:" "^X-Delivery-Agent:" "^Posted-Date:" "^X-Gateway:"
-     "^X-Local-Origin:" "^X-Local-Destination:" "^X-UserInfo1:")
+     "^X-Local-Origin:" "^X-Local-Destination:" "^X-UserInfo1:"
+     "^X-Received-Date:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -238,19 +239,17 @@ regexp.  If it matches, the text in question is not a signature."
   (cond
    ((featurep 'xemacs)
     (if (or (gnus-image-type-available-p 'xface)
-	    (gnus-image-type-available-p 'xpm))
-	'gnus-xmas-article-display-xface
+	    (gnus-image-type-available-p 'pbm))
+	'gnus-display-x-face-in-from
       "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | ee -"))
    ((and (fboundp 'image-type-available-p)
 	 (module-installed-p 'x-face-e21))
     'x-face-decode-message-header)
-   ((gnus-image-type-available-p 'xbm)
-    'gnus-article-display-xface)
+   ((gnus-image-type-available-p 'pbm)
+    'gnus-display-x-face-in-from)
    ((and window-system
 	 (module-installed-p 'x-face-mule))
     'x-face-mule-gnus-article-display-x-face)
-   (gnus-article-compface-xbm
-    "{ echo '/* Width=48, Height=48 */'; uncompface; } | display -")
    (t
     "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | \
 display -"))
@@ -266,10 +265,9 @@ asynchronously.	 The compressed face will be piped to this command."
 	      (delq nil
 		    (list
 		     'string
-		     (if (and (featurep 'xemacs)
-			      (or (featurep 'xface)
-				  (featurep 'xpm)))
-			 '(function-item gnus-xmas-article-display-xface))
+		     (if (or (gnus-image-type-available-p 'xface)
+			     (gnus-image-type-available-p 'pbm))
+			 '(function-item gnus-display-x-face-in-from))
 		     (if (and x-face-e21
 			      (fboundp 'image-type-available-p))
 			 '(function-item
@@ -747,6 +745,14 @@ To see e.g. security buttons you could set this to
   :group 'gnus-article-mime
   :type '(repeat regexp))
 
+(defcustom gnus-body-boundary-delimiter "_"
+  "String used to delimit header and body.
+This variable is used by `gnus-article-treat-body-boundary' which can
+be controlled by `gnus-treat-body-boundary'."
+  :group 'gnus-article-various
+  :type '(choice (item :tag "None" :value nil)
+		 string))
+
 (defcustom gnus-article-mime-part-function nil
   "Function called with a MIME handle as the argument.
 This is meant for people who want to do something automatic based
@@ -855,7 +861,7 @@ See Info node `(gnus)Customizing Articles'."
 (defcustom gnus-treat-buttonize 100000
   "Add buttons.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles'."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 (put 'gnus-treat-buttonize 'highlight t)
@@ -863,7 +869,7 @@ See the manual for details."
 (defcustom gnus-treat-buttonize-head 'head
   "Add buttons to the head.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-buttonize-head 'highlight t)
@@ -875,7 +881,7 @@ See the manual for details."
        50000)
   "Emphasize text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 (put 'gnus-treat-emphasize 'highlight t)
@@ -883,63 +889,63 @@ See the manual for details."
 (defcustom gnus-treat-strip-cr nil
   "Remove carriage returns.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-leading-whitespace nil
   "Remove leading whitespace in headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-hide-headers 'head
   "Hide headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-hide-boring-headers nil
   "Hide boring headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-hide-signature nil
   "Hide the signature.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-fill-article nil
   "Fill the article.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-hide-citation nil
   "Hide cited text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-hide-citation-maybe nil
   "Hide cited text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-strip-list-identifiers 'head
   "Strip list identifiers from `gnus-list-identifiers`.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -947,14 +953,14 @@ See the manual for details."
 (defcustom gnus-treat-strip-pgp t
   "Strip PGP signatures.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-strip-pem nil
   "Strip PEM signatures.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
@@ -962,14 +968,14 @@ See the manual for details."
   "Strip banners from articles.
 The banner to be stripped is specified in the `banner' group parameter.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-highlight-headers 'head
   "Highlight the headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-highlight-headers 'highlight t)
@@ -977,7 +983,7 @@ See the manual for details."
 (defcustom gnus-treat-highlight-citation t
   "Highlight cited text.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 (put 'gnus-treat-highlight-citation 'highlight t)
@@ -985,42 +991,42 @@ See the manual for details."
 (defcustom gnus-treat-date-ut nil
   "Display the Date in UT (GMT).
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-date-local nil
   "Display the Date in the local timezone.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-date-english nil
   "Display the Date in a format that can be read aloud in English.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-date-lapsed nil
   "Display the Date header in a way that says how much time has elapsed.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-date-original nil
   "Display the date in the original timezone.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-date-iso8601 nil
   "Display the date in the ISO8601 format.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
@@ -1029,14 +1035,14 @@ See the manual for details."
   "Display the date in a user-defined format.
 The format is defined by the `gnus-article-time-format' variable.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 
 (defcustom gnus-treat-strip-headers-in-body t
   "Strip the X-No-Archive header line from the beginning of the body.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -1044,42 +1050,49 @@ See the manual for details."
 (defcustom gnus-treat-strip-trailing-blank-lines nil
   "Strip trailing blank lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-strip-leading-blank-lines nil
   "Strip leading blank lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-strip-multiple-blank-lines nil
   "Strip multiple blank lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-unfold-headers 'head
   "Unfold folded header lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
+  :group 'gnus-article-treat
+  :type gnus-article-treat-custom)
+
+(defcustom gnus-treat-fold-headers nil
+  "Fold headers.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-fold-newsgroups 'head
   "Fold the Newsgroups and Followup-To headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-overstrike t
   "Treat overstrike highlighting.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 (put 'gnus-treat-overstrike 'highlight t)
@@ -1095,7 +1108,8 @@ See the manual for details."
        'head)
   "Display X-Face headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)X-Face' for details."
   :group 'gnus-article-treat
   ;;:version "21.1"
   :type gnus-article-treat-head-custom)
@@ -1113,7 +1127,8 @@ See the manual for details."
     nil)
   "Display smileys.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)Smileys' for details."
   :group 'gnus-article-treat
   ;;:version "21.1"
   :type gnus-article-treat-custom)
@@ -1124,7 +1139,8 @@ See the manual for details."
       'head nil)
   "Display picons in the From header.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)Picons' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-from-picon 'highlight t)
@@ -1134,7 +1150,8 @@ See the manual for details."
       'head nil)
   "Display picons in To and Cc headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)Picons' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-mail-picon 'highlight t)
@@ -1144,7 +1161,8 @@ See the manual for details."
       'head nil)
   "Display picons in the Newsgroups and Followup-To headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)Picons' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-newsgroups-picon 'highlight t)
@@ -1156,7 +1174,7 @@ See the manual for details."
       'head nil)
   "Draw a boundary at the end of the headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -1164,7 +1182,7 @@ See the manual for details."
 (defcustom gnus-treat-capitalize-sentences nil
   "Capitalize sentence-starting words.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -1172,14 +1190,14 @@ See the manual for details."
 (defcustom gnus-treat-fill-long-lines nil
   "Fill long lines.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
 (defcustom gnus-treat-play-sounds nil
   "Play sounds.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -1197,7 +1215,7 @@ decode the body, '(or header t) for the whole article, etc."
 (defcustom gnus-treat-translate nil
   "Translate articles from one language to another.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :version "21.1"
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -1206,7 +1224,7 @@ See the manual for details."
   "Verify X-PGP-Sig.
 To automatically treat X-PGP-Sig, set it to head.
 Valid values are nil, t, `head', `last', an integer or a predicate.
-See the manual for details."
+See Info node `(gnus)Customizing Articles' for details."
   :group 'gnus-article-treat
   :group 'mime-security
   :type gnus-article-treat-custom)
@@ -1251,6 +1269,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-date-original gnus-article-date-original)
     (gnus-treat-date-user-defined gnus-article-date-user)
     (gnus-treat-date-iso8601 gnus-article-date-iso8601)
+    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
@@ -1274,15 +1293,12 @@ It is a string, such as \"PGP\". If nil, ask user."
      gnus-article-strip-multiple-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-unfold-headers gnus-article-treat-unfold-headers)
+    (gnus-treat-fold-headers gnus-article-treat-fold-headers)
     (gnus-treat-fold-newsgroups gnus-article-treat-fold-newsgroups)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
-    (gnus-treat-display-smileys ,(if (or (featurep 'xemacs)
-					 (>= emacs-major-version 21))
-				     'gnus-smiley-display
-				   'gnus-article-smiley-display))
+    (gnus-treat-display-smileys gnus-treat-smiley)
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
     (gnus-treat-emphasize gnus-article-emphasize)
-    (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-body-boundary gnus-article-treat-body-boundary)
     (gnus-treat-play-sounds gnus-earcon-display)))
 
@@ -1807,6 +1823,36 @@ unfolded."
 	      (replace-match " " t t)))
 	  (goto-char (point-max)))))))
 
+(defun gnus-article-treat-fold-headers ()
+  "Fold message headers."
+  (interactive)
+  (gnus-with-article-headers
+    (while (not (eobp))
+      (save-restriction
+	(mail-header-narrow-to-field)
+	(mail-header-fold-field)
+	(goto-char (point-max))))))
+
+(defun gnus-treat-smiley ()
+  "Display textual emoticons (\"smileys\") as small graphical icons."
+  (interactive)
+  (gnus-with-article-buffer
+    (if (memq 'smiley gnus-article-wash-types)
+	(gnus-delete-images 'smiley)
+      (article-goto-body)
+      (let ((images (smiley-region (point) (point-max))))
+	(when images
+	  (gnus-add-wash-type 'smiley)
+	  (dolist (image images)
+	    (gnus-add-image 'smiley image)))))))
+
+(defun gnus-article-remove-images ()
+  "Remove all images from the article buffer."
+  (interactive)
+  (gnus-with-article-buffer
+    (dolist (elem gnus-article-image-alist)
+      (gnus-delete-images (car elem)))))
+
 (defun gnus-article-treat-fold-newsgroups ()
   "Unfold folded message headers.
 Only the headers that fit into the current window width will be
@@ -1816,7 +1862,7 @@ unfolded."
     (while (gnus-article-goto-header "newsgroups\\|followup-to")
       (save-restriction
 	(mail-header-narrow-to-field)
-	(while (search-forward "," nil t)
+	(while (re-search-forward ", *" nil t)
 	  (replace-match ", " t t))
 	(mail-header-fold-field)
 	(goto-char (point-max))))))
@@ -1824,13 +1870,18 @@ unfolded."
 (defun gnus-article-treat-body-boundary ()
   "Place a boundary line at the end of the headers."
   (interactive)
-  (gnus-with-article-headers
-    (goto-char (point-max))
-    (let ((start (point)))
-    (insert "X-Boundary: ")
-    (gnus-add-text-properties start (point) '(invisible t intangible t))
-    (insert (make-string (1- (window-width)) ?-)
-	    "\n"))))
+  (when (and gnus-body-boundary-delimiter 
+	     (> (length gnus-body-boundary-delimiter) 0))
+    (gnus-with-article-headers
+      (goto-char (point-max))
+      (let ((start (point)))
+	(insert "X-Boundary: ")
+	(gnus-add-text-properties start (point) '(invisible t intangible t))
+	(insert (let (str)
+		  (while (>= (1- (window-width)) (length str))
+		    (setq str (concat str gnus-body-boundary-delimiter)))
+		  (substring str 0 (1- (window-width))))
+		"\n")))))
 
 (defun article-fill-long-lines ()
   "Fill lines that are wider than the window width."
@@ -1893,52 +1944,74 @@ unfolded."
 (defun article-display-x-face (&optional force)
   "Look for an X-Face header and display it if present."
   (interactive (list 'force))
-  (gnus-with-article-headers
-   ;; Delete the old process, if any.
-   (when (process-status "article-x-face")
-     (delete-process "article-x-face"))
-   (if (memq 'xface gnus-article-wash-types)
-       ;; We have already displayed X-Faces, so we remove them
-       ;; instead.
-       (gnus-delete-images 'xface)
-     ;; Display X-Faces.
-     (let (x-faces from face)
-       (save-excursion
-	 (set-buffer gnus-original-article-buffer)
-	 (save-restriction
-	   (mail-narrow-to-head)
-	   (while (gnus-article-goto-header "x-face")
-	     (push (mail-header-field-value) x-faces))
-	   (setq from (message-fetch-field "from"))))
-       ;; Sending multiple EOFs to xv doesn't work, so we only do a
-       ;; single external face.
-       (when (stringp gnus-article-x-face-command)
-	 (setq x-faces (list (car x-faces))))
-       (while (and (setq face (pop x-faces))
-		   gnus-article-x-face-command
-		   (or force
-		       ;; Check whether this face is censored.
-		       (not gnus-article-x-face-too-ugly)
-		       (and gnus-article-x-face-too-ugly from
-			    (not (string-match gnus-article-x-face-too-ugly
-					       from)))))
-	 ;; We display the face.
-	 (if (symbolp gnus-article-x-face-command)
-	     ;; The command is a lisp function, so we call it.
-	     (if (gnus-functionp gnus-article-x-face-command)
-		 (funcall gnus-article-x-face-command face)
-	       (error "%s is not a function" gnus-article-x-face-command))
-	   ;; The command is a string, so we interpret the command
-	   ;; as a, well, command, and fork it off.
-	   (let ((process-connection-type nil))
-	     (process-kill-without-query
-	      (start-process
-	       "article-x-face" nil shell-file-name shell-command-switch
-	       gnus-article-x-face-command))
-	     (with-temp-buffer
-	       (insert face)
-	       (process-send-region "article-x-face" (point-min) (point-max)))
-	     (process-send-eof "article-x-face"))))))))
+  (let ((wash-face-p buffer-read-only))	;; When type `W f'
+    (gnus-with-article-headers
+      ;; Delete the old process, if any.
+      (when (process-status "article-x-face")
+	(delete-process "article-x-face"))
+      (if (memq 'xface gnus-article-wash-types)
+	  ;; We have already displayed X-Faces, so we remove them
+	  ;; instead.
+	  (gnus-delete-images 'xface)
+	;; Display X-Faces.
+	(let (x-faces from face grey)
+	  (save-excursion
+	    (when (and wash-face-p
+		       (progn
+			 (goto-char (point-min))
+			 (not (re-search-forward
+			       "^X-Face\\(-[0-9]+\\)?:[\t ]*" nil t)))
+		       (gnus-buffer-live-p gnus-original-article-buffer))
+	      ;; If type `W f', use gnus-original-article-buffer,
+	      ;; otherwise use the current buffer because displaying
+	      ;; RFC822 parts calls this function too.
+	      (set-buffer gnus-original-article-buffer))
+	    (save-restriction
+	      (mail-narrow-to-head)
+	      (while (gnus-article-goto-header "x-face\\(-[0-9]+\\)?")
+		(when (match-beginning 2)
+		  (setq grey t))
+		(push (mail-header-field-value) x-faces))
+	      (setq from (message-fetch-field "from"))))
+	  (if grey
+	      (let ((xpm (gnus-convert-gray-x-face-to-xpm x-faces))
+		    image)
+		(when xpm
+		  (setq image (gnus-create-image xpm 'xpm t))
+		  (gnus-article-goto-header "from")
+		  (gnus-add-wash-type 'xface)
+		  (gnus-add-image 'xface image)
+		  (gnus-put-image image)))
+	    ;; Sending multiple EOFs to xv doesn't work, so we only do a
+	    ;; single external face.
+	    (when (stringp gnus-article-x-face-command)
+	      (setq x-faces (list (car x-faces))))
+	    (while (and (setq face (pop x-faces))
+			gnus-article-x-face-command
+			(or force
+			    ;; Check whether this face is censored.
+			    (not gnus-article-x-face-too-ugly)
+			    (and gnus-article-x-face-too-ugly from
+				 (not (string-match gnus-article-x-face-too-ugly
+						    from)))))
+	      ;; We display the face.
+	      (if (symbolp gnus-article-x-face-command)
+		  ;; The command is a lisp function, so we call it.
+		  (if (gnus-functionp gnus-article-x-face-command)
+		      (funcall gnus-article-x-face-command face)
+		    (error "%s is not a function" gnus-article-x-face-command))
+		;; The command is a string, so we interpret the command
+		;; as a, well, command, and fork it off.
+		(let ((process-connection-type nil))
+		  (process-kill-without-query
+		   (start-process
+		    "article-x-face" nil shell-file-name shell-command-switch
+		    gnus-article-x-face-command))
+		  (with-temp-buffer
+		    (insert face)
+		    (process-send-region "article-x-face"
+					 (point-min) (point-max)))
+		  (process-send-eof "article-x-face"))))))))))
 
 (defun article-decode-mime-words ()
   "Decode all MIME-encoded words in the article."
@@ -3304,6 +3377,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   ">" end-of-buffer
   "\C-c\C-i" gnus-info-find-node
   "\C-c\C-b" gnus-bug
+  "R" gnus-article-reply-with-original
+  "F" gnus-article-followup-with-original
   "\C-hk" gnus-article-describe-key
   "\C-hc" gnus-article-describe-key-briefly
 
@@ -3765,14 +3840,19 @@ value of the variable `gnus-show-mime' is non-nil."
 ;;;
 
 (defvar gnus-mime-button-line-format "%{%([%p. %d%T]%)%}%e\n"
-  "The following specs can be used:
+  "Format of the MIME buttons.
+
+Valid specifiers include:
 %t  The MIME type
 %T  MIME type, along with additional info
 %n  The `name' parameter
 %d  The description, if any
 %l  The length of the encoded part
 %p  The part identifier number
-%e  Dots if the part isn't displayed")
+%e  Dots if the part isn't displayed
+
+General format specifiers can also be used.  See
+(gnus)Formatting Variables.")
 
 (defvar gnus-mime-button-line-format-alist
   '((?t gnus-tmp-type ?s)
@@ -4288,14 +4368,11 @@ If no internal viewer is available, use an external viewer."
     (setq b (point))
     (gnus-eval-format
      gnus-mime-button-line-format gnus-mime-button-line-format-alist
-     `(keymap ,gnus-mime-button-map
-	      ,@(if (>= (string-to-number emacs-version) 21)
-		    nil
-		  (list 'local-map gnus-mime-button-map))
-	      gnus-callback gnus-mm-display-part
-	      gnus-part ,gnus-tmp-id
-	      article-type annotation
-	      gnus-data ,handle))
+     `(,@(gnus-local-map-property gnus-mime-button-map)
+	 gnus-callback gnus-mm-display-part
+	 gnus-part ,gnus-tmp-id
+	 article-type annotation
+	 gnus-data ,handle))
     (setq e (point))
     (widget-convert-button
      'link b e
@@ -4548,12 +4625,9 @@ If no internal viewer is available, use an external viewer."
 		       ',gnus-article-mime-handle-alist))
 	       (gnus-mime-display-alternative
 		',ihandles ',not-pref ',begend ,id))
-	     ,@(if (>= (string-to-number emacs-version) 21)
-		   nil ;; XEmacs doesn't care
-		 (list 'local-map gnus-mime-button-map))
+	     ,@(gnus-local-map-property gnus-mime-button-map)
 	     ,gnus-mouse-face-prop ,gnus-article-mouse-face
 	     face ,gnus-article-button-face
-	     keymap ,gnus-mime-button-map
 	     gnus-part ,id
 	     gnus-data ,handle))
 	  (widget-convert-button 'link from (point)
@@ -4575,12 +4649,9 @@ If no internal viewer is available, use an external viewer."
 			 ',gnus-article-mime-handle-alist))
 		 (gnus-mime-display-alternative
 		  ',ihandles ',handle ',begend ,id))
-	       ,@(if (>= (string-to-number emacs-version) 21)
-		     nil ;; XEmacs doesn't care
-		   (list 'local-map gnus-mime-button-map))
+	       ,@(gnus-local-map-property gnus-mime-button-map)
 	       ,gnus-mouse-face-prop ,gnus-article-mouse-face
 	       face ,gnus-article-button-face
-	       keymap ,gnus-mime-button-map
 	       gnus-part ,id
 	       gnus-data ,handle))
 	    (widget-convert-button 'link from (point)
@@ -4884,7 +4955,7 @@ Argument LINES specifies lines to be scrolled down."
   (interactive "P")
   (gnus-article-check-buffer)
   (let ((nosaves
-	 '("q" "Q"  "c" "r" "R" "\C-c\C-f" "m"  "a" "f" "F"
+	 '("q" "Q"  "c" "r" "\C-c\C-f" "m"  "a" "f"
 	   "Zc" "ZC" "ZE" "ZJ" "ZQ" "ZZ" "Zn" "ZR" "ZG" "ZN" "ZP"
 	   "=" "^" "\M-^" "|"))
 	(nosave-but-article
@@ -4996,6 +5067,36 @@ Argument LINES specifies lines to be scrolled down."
 	    (setq key (read-key-sequence "Describe key: "))))
 	(describe-key-briefly key insert))
     (describe-key-briefly key insert)))
+
+(defun gnus-article-reply-with-original (&optional wide)
+  "Start composing a reply mail to the current message.
+The text in the region will be yanked.  If the region isn't active,
+the entire article will be yanked."
+  (interactive "P")
+  (let ((article (cdr gnus-article-current)))
+    (if (not mark-active)
+	(gnus-summary-reply (list (list article)) wide)
+      ;; Deactivate active regions.
+      (when (and (boundp 'transient-mark-mode)
+		 transient-mark-mode)
+	(setq mark-active nil))
+      (gnus-summary-reply
+       (list (list article (buffer-substring (point) (mark)))) wide))))
+
+(defun gnus-article-followup-with-original ()
+  "Compose a followup to the current article.
+The text in the region will be yanked.  If the region isn't active,
+the entire article will be yanked."
+  (interactive)
+  (let ((article (cdr gnus-article-current)))
+    (if (not mark-active)
+	(gnus-summary-followup (list (list article)))
+      ;; Deactivate active regions.
+      (when (and (boundp 'transient-mark-mode)
+		 transient-mark-mode)
+	(setq mark-active nil))
+      (gnus-summary-followup
+       (list (list article (buffer-substring (point) (mark))))))))
 
 (defun gnus-article-hide (&optional arg force)
   "Hide all the gruft in the current article.
@@ -5503,6 +5604,7 @@ variable it the real callback function."
     ("^X-[Uu][Rr][Ll]:" ,gnus-button-url-regexp 0 t browse-url 0)
     ("^Subject:" ,gnus-button-url-regexp 0 t browse-url 0)
     ("^[^:]+:" ,gnus-button-url-regexp 0 t browse-url 0)
+    ("^[^:]+:" "\\bmailto:\\([-a-zA-Z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
     ("^[^:]+:" "\\(<\\(url: \\)?news:\\([^>\n ]*\\)>\\)" 1 t
      gnus-button-message-id 3))
   "*Alist of headers and regexps to match buttons in article heads.
@@ -5985,39 +6087,41 @@ specified by `gnus-button-alist'."
 (defvar gnus-next-page-line-format "%{%(Next page...%)%}\n")
 (defvar gnus-prev-page-line-format "%{%(Previous page...%)%}\n")
 
-(defvar gnus-prev-page-map nil)
-(unless gnus-prev-page-map
-  (setq gnus-prev-page-map (make-sparse-keymap))
-  (define-key gnus-prev-page-map gnus-mouse-2 'gnus-button-prev-page)
-  (define-key gnus-prev-page-map "\r" 'gnus-button-prev-page))
+(defvar gnus-prev-page-map
+  (let ((map (make-sparse-keymap)))
+    (unless (>= emacs-major-version 21)
+      ;; XEmacs doesn't care.
+      (set-keymap-parent map gnus-article-mode-map))
+    (define-key map gnus-mouse-2 'gnus-button-prev-page)
+    (define-key map "\r" 'gnus-button-prev-page)
+    map))
 
-(static-if (featurep 'xemacs)
-    (defun gnus-insert-prev-page-button ()
-      (let ((buffer-read-only nil))
-	(gnus-eval-format
-	 gnus-prev-page-line-format nil
-	 `(gnus-prev t local-map ,gnus-prev-page-map
-		     gnus-callback gnus-article-button-prev-page
-		     article-type annotation))))
-  (defun gnus-insert-prev-page-button ()
-    (let ((buffer-read-only nil)
-	  (situation (get-text-property (point-min) 'mime-view-situation)))
-      (set-keymap-parent gnus-prev-page-map (current-local-map))
-      (gnus-eval-format
-       gnus-prev-page-line-format nil
-       `(gnus-prev t local-map ,gnus-prev-page-map
-		   gnus-callback gnus-article-button-prev-page
-		   article-type annotation
-		   mime-view-situation ,situation))))
-  )
+(defun gnus-insert-prev-page-button ()
+  (let ((b (point))
+	(buffer-read-only nil)
+	(situation (get-text-property (point-min) 'mime-view-situation)))
+    (gnus-eval-format
+     gnus-prev-page-line-format nil
+     `(,@(gnus-local-map-property gnus-prev-page-map)
+	 gnus-prev t
+	 gnus-callback gnus-article-button-prev-page
+	 article-type annotation
+	 mime-view-situation ,situation))
+    (widget-convert-button
+     'link b (point)
+     :action 'gnus-button-prev-page
+     :button-keymap gnus-prev-page-map)))
 
-(defvar gnus-next-page-map nil)
-(unless gnus-next-page-map
-  (setq gnus-next-page-map (make-sparse-keymap))
-  (define-key gnus-next-page-map gnus-mouse-2 'gnus-button-next-page)
-  (define-key gnus-next-page-map "\r" 'gnus-button-next-page))
+(defvar gnus-next-page-map
+  (let ((map (make-sparse-keymap)))
+    (unless (>= emacs-major-version 21)
+      ;; XEmacs doesn't care.
+      (set-keymap-parent map gnus-article-mode-map))
+    (define-key map gnus-mouse-2 'gnus-button-next-page)
+    (define-key map "\r" 'gnus-button-next-page)
+    map))
 
-(defun gnus-button-next-page ()
+(defun gnus-button-next-page (&optional args more-args)
   "Go to the next page."
   (interactive)
   (let ((win (selected-window)))
@@ -6025,7 +6129,7 @@ specified by `gnus-button-alist'."
     (gnus-article-next-page)
     (select-window win)))
 
-(defun gnus-button-prev-page ()
+(defun gnus-button-prev-page (&optional args more-args)
   "Go to the prev page."
   (interactive)
   (let ((win (selected-window)))
@@ -6033,25 +6137,20 @@ specified by `gnus-button-alist'."
     (gnus-article-prev-page)
     (select-window win)))
 
-(static-if (featurep 'xemacs)
-    (defun gnus-insert-next-page-button ()
-      (let ((buffer-read-only nil))
-	(gnus-eval-format gnus-next-page-line-format nil
-			  `(gnus-next
-			    t local-map ,gnus-next-page-map
-			    gnus-callback gnus-article-button-next-page
-			    article-type annotation))))
-  (defun gnus-insert-next-page-button ()
-    (let ((buffer-read-only nil)
-	  (situation (get-text-property (point-min) 'mime-view-situation)))
-      (set-keymap-parent gnus-next-page-map (current-local-map))
-      (gnus-eval-format gnus-next-page-line-format nil
-			`(gnus-next
-			  t local-map ,gnus-next-page-map
+(defun gnus-insert-next-page-button ()
+  (let ((b (point))
+	(buffer-read-only nil)
+	(situation (get-text-property (point-min) 'mime-view-situation)))
+    (gnus-eval-format gnus-next-page-line-format nil
+		      `(,@(gnus-local-map-property gnus-next-page-map)
+			  gnus-next t
 			  gnus-callback gnus-article-button-next-page
 			  article-type annotation
-			  mime-view-situation ,situation))))
-  )
+			  mime-view-situation ,situation))
+    (widget-convert-button
+     'link b (point)
+     :action 'gnus-button-next-page
+     :button-keymap gnus-next-page-map)))
 
 (defun gnus-article-button-next-page (arg)
   "Go to the next page."
@@ -6398,14 +6497,11 @@ For example:
     (gnus-eval-format
      gnus-mime-security-button-line-format
      gnus-mime-security-button-line-format-alist
-     `(keymap ,gnus-mime-security-button-map
-	      ,@(if (>= (string-to-number emacs-version) 21)
-		    nil ;; XEmacs doesn't care
-		  (list 'local-map gnus-mime-security-button-map))
-	      gnus-callback gnus-mime-security-press-button
-	      gnus-line-format ,gnus-mime-security-button-line-format
-	      article-type annotation
-	      gnus-data ,handle))
+     `(,@(gnus-local-map-property gnus-mime-security-button-map)
+	 gnus-callback gnus-mime-security-press-button
+	 gnus-line-format ,gnus-mime-security-button-line-format
+	 article-type annotation
+	 gnus-data ,handle))
     (setq e (point))
     (widget-convert-button
      'link b e

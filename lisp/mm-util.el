@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for Mule and low level things
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -284,6 +284,10 @@ prefer iso-2022-jp to japanese-shift-jis:
   '(iso-2022-jp iso-2022-jp-2 japanese-shift-jis utf-8))
 ")
 
+(defvar mm-use-find-coding-systems-region
+  (fboundp 'find-coding-systems-region)
+  "Use `find-coding-systems-region' to find proper coding systems.")
+
 ;;; Internal variables:
 
 ;;; Functions:
@@ -334,10 +338,8 @@ used as the line break code type of the coding system."
 	 )
     charset)
    ;; Translate invalid charsets.
-   ((mm-coding-system-p (setq charset
-			   (cdr (assq charset
-				      mm-charset-synonym-alist))))
-    charset)
+   ((let ((cs (cdr (assq charset mm-charset-synonym-alist))))
+      (and cs (mm-coding-system-p charset) cs)))
    ;; Last resort: search the coding system list for entries which
    ;; have the right mime-charset in case the canonical name isn't
    ;; defined (though it should be).
@@ -399,6 +401,26 @@ Only used in Emacs Mule 4."
   (or (get-charset-property charset 'preferred-coding-system)
       (get-charset-property charset 'prefered-coding-system)))
 
+(defsubst mm-guess-charset ()
+  "Guess Mule charset from the language environment."
+  (or
+   mail-parse-mule-charset ;; cached mule-charset
+   (progn
+     (setq mail-parse-mule-charset
+	   (and (boundp 'current-language-environment)
+		(car (last
+		      (assq 'charset
+			    (assoc current-language-environment
+				   language-info-alist))))))
+     (if (or (not mail-parse-mule-charset)
+	     (eq mail-parse-mule-charset 'ascii))
+	 (setq mail-parse-mule-charset
+	       (or (car (last (assq mail-parse-charset
+				    mm-mime-mule-charset-alist)))
+		   ;; default
+		   'latin-iso8859-1)))
+     mail-parse-mule-charset)))
+
 (defun mm-charset-after (&optional pos)
   "Return charset of a character in current buffer at position POS.
 If POS is nil, it defauls to the current point.
@@ -415,23 +437,7 @@ If the charset is `composition', return the actual one."
 	(if (and charset (not (memq charset '(ascii eight-bit-control
 						    eight-bit-graphic))))
 	    charset
-	  (or
-	   mail-parse-mule-charset ;; cached mule-charset
-	   (progn
-	     (setq mail-parse-mule-charset
-		   (and (boundp 'current-language-environment)
-			(car (last
-			      (assq 'charset
-				    (assoc current-language-environment
-					   language-info-alist))))))
-	     (if (or (not mail-parse-mule-charset)
-		     (eq mail-parse-mule-charset 'ascii))
-		 (setq mail-parse-mule-charset
-		       (or (car (last (assq mail-parse-charset
-					    mm-mime-mule-charset-alist)))
-			   ;; Fixme: don't fix that!
-			   'latin-iso8859-1)))
-	     mail-parse-mule-charset)))))))
+	  (mm-guess-charset))))))
 
 (defun mm-mime-charset (charset)
   "Return the MIME charset corresponding to the given Mule CHARSET."
@@ -459,14 +465,13 @@ If the charset is `composition', return the actual one."
       (setq result (cons head result)))
     (nreverse result)))
 
-;; It's not clear whether this is supposed to mean the global or local
-;; setting.  I think it's used inconsistently.  -- fx
-(defsubst mm-multibyte-p ()
-  "Say whether multibyte is enabled."
-  (if (and (not (featurep 'xemacs))
-	   (boundp 'enable-multibyte-characters))
-      enable-multibyte-characters
-    (featurep 'mule)))
+(if (and (not (featurep 'xemacs))
+	 (boundp 'enable-multibyte-characters))
+    (defalias 'mm-multibyte-p
+      (lambda ()
+	"Say whether multibyte is enabled in the current buffer."
+	enable-multibyte-characters))
+  (defalias 'mm-multibyte-p (lambda () (featurep 'mule))))
 
 (defun mm-iso-8859-x-to-15-region (&optional b e)
   (if (fboundp 'char-charset)
@@ -500,7 +505,7 @@ charset, and a longer list means no appropriate charset."
   (let (charsets)
     ;; The return possibilities of this function are a mess...
     (or (and (mm-multibyte-p)
-	     (fboundp 'find-coding-systems-region)
+	     mm-use-find-coding-systems-region
 	     ;; Find the mime-charset of the most preferred coding
 	     ;; system that has one.
 	     (let ((systems (find-coding-systems-region b e)))
@@ -724,6 +729,31 @@ If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers."
 			     "etc/" (or package "gnus/"))))
 	  (push dir result))
       (push path result))))
+
+(if (fboundp 'detect-coding-region)
+    (defun mm-detect-coding-region (start end)
+      "Like 'detect-coding-region' except returning the best one."
+      (let ((coding-systems
+	     (detect-coding-region (point) (point-max))))
+	(or (car-safe coding-systems)
+	    coding-systems)))
+  (defun mm-detect-coding-region (start end)
+    (let ((point (point)))
+      (goto-char start)
+      (skip-chars-forward "\0-\177" end)
+      (prog1
+	  (if (eq (point) end) 'ascii (mm-guess-charset))
+	(goto-char point)))))
+
+(if (fboundp 'coding-system-get)
+    (defun mm-detect-mime-charset-region (start end)
+      "Detect MIME charset of the text in the region between START and END."
+      (let ((cs (mm-detect-coding-region start end)))
+	(coding-system-get cs 'mime-charset)))
+  (defun mm-detect-mime-charset-region (start end)
+    "Detect MIME charset of the text in the region between START and END."
+    (let ((cs (mm-detect-coding-region start end)))
+      cs)))
 
 (provide 'mm-util)
 

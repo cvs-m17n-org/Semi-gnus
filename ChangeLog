@@ -29,6 +29,15 @@
 
 2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.15.5 revision 00.
+
+2002-01-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* etc/gnus/describe-group.xpm: Set pixels of first line to
+	background color. A bug in Emacs?
+
+2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 10.
 
 	* lisp/gnus-picon.el: Require `mail-parse'.

@@ -57,13 +57,20 @@
   :group 'gnus-agent
   :type 'hook)
 
+(defcustom gnus-agent-fetched-hook nil
+  "Hook run after finishing fetching articles."
+  :group 'gnus-agent
+  :type 'hook)
+
 (defcustom gnus-agent-handle-level gnus-level-subscribed
   "Groups on levels higher than this variable will be ignored by the Agent."
   :group 'gnus-agent
   :type 'integer)
 
 (defcustom gnus-agent-expire-days 7
-  "Read articles older than this will be expired."
+  "Read articles older than this will be expired.
+This can also be a list of regexp/day pairs.  The regexps will
+be matched against group names."
   :group 'gnus-agent
   :type 'integer)
 
@@ -1172,6 +1179,7 @@ the actual number of articles toggled is returned."
 				    err))
 	     (signal 'quit "Cannot fetch articles into the Gnus agent"))))
 	(pop methods))
+      (run-hooks 'gnus-agent-fetch-hook)
       (gnus-message 6 "Finished fetching articles into the Gnus agent"))))
 
 (defun gnus-agent-fetch-group-1 (group method)
@@ -1259,7 +1267,14 @@ the actual number of articles toggled is returned."
   "Hook run in `gnus-category-mode' buffers.")
 
 (defvar gnus-category-line-format "     %(%20c%): %g\n"
-  "Format of category lines.")
+  "Format of category lines.
+
+Valid specifiers include:
+%c  Topic name (string)
+%g  The number of groups in the topic (integer)
+
+General format specifiers can also be used.  See
+(gnus)Formatting Variables.")
 
 (defvar gnus-category-mode-line-format "Gnus: %%b"
   "The format specification for the category mode line.")
@@ -1587,10 +1602,13 @@ The following commands are available:
   "Expire all old articles."
   (interactive)
   (let ((methods gnus-agent-covered-methods)
-	(day (- (time-to-days (current-time)) gnus-agent-expire-days))
+	(day (if (numberp gnus-agent-expire-days)
+		 (- (time-to-days (current-time)) gnus-agent-expire-days)
+	       nil))
+	(current-day (time-to-days (current-time)))
 	gnus-command-method sym group articles
 	history overview file histories elem art nov-file low info
-	unreads marked article orig lowest highest)
+	unreads marked article orig lowest highest found days)
     (save-excursion
       (setq overview (gnus-get-buffer-create " *expire overview*"))
       (while (setq gnus-command-method (pop methods))
@@ -1614,7 +1632,19 @@ The following commands are available:
 		(skip-chars-forward "^\t")
 		(if (let ((fetch-date (read (current-buffer))))
 		      (if (numberp fetch-date)
-			  (>  fetch-date day)
+			  ;; We now have the arrival day, so we see
+			  ;; whether it's old enough to be expired.
+			  (if (numberp day)
+			      (> fetch-date day)
+			    (skip-chars-forward "\t")
+			    (setq found nil
+				  days gnus-agent-expire-days)
+			    (while (and (not found)
+					days)
+			      (when (looking-at (caar days))
+				(setq found (cadar days)))
+			      (pop days))
+			    (> fetch-date (- current-day found)))
 			;; History file is corrupted.
 			(gnus-message
 			 5

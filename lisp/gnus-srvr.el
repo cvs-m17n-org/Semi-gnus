@@ -1,5 +1,5 @@
 ;;; gnus-srvr.el --- virtual server support for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -55,7 +55,11 @@ The following specs are understood:
 %n name
 %w address
 %s status
-%a agent covered"
+%a agent covered
+
+General format specifiers can also be used.  
+See (gnus)Formatting Variables."
+  :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-server-visual
   :type 'string)
 

@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -246,17 +246,6 @@
       (while (get-text-property (point) prop)
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
-
-(defun gnus-text-with-property (prop)
-  "Return a list of all points where the text has PROP."
-  (let ((points nil)
-	(point (point-min)))
-    (save-excursion
-      (while (< point (point-max))
-	(when (get-text-property point prop)
-	  (push point points))
-	(incf point)))
-    (nreverse points)))
 
 (require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
@@ -1263,6 +1252,31 @@ forbidden in URL encoding."
 	      str (substring str (match-end 0)))))
     (setq tmp (concat tmp str))
     tmp))
+
+(defun gnus-make-predicate (spec)
+  "Transform SPEC into a function that can be called.
+SPEC is a predicate specifier that contains stuff like `or', `and',
+`not', lists and functions.  The functions all take one parameter."
+  `(lambda (elem) ,(gnus-make-predicate-1 spec)))
+
+(defun gnus-make-predicate-1 (spec)
+  (cond
+   ((symbolp spec)
+    `(,spec elem))
+   ((listp spec)
+    (if (memq (car spec) '(or and not))
+	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
+      (error "Invalid predicate specifier: %s" spec)))))
+
+(defun gnus-local-map-property (map)
+  "Return a list suitable for a text property list specifying keymap MAP."
+  (cond
+   ((featurep 'xemacs)
+    (list 'keymap map))
+   ((>= emacs-major-version 21)
+    (list 'keymap map))
+   (t
+    (list 'local-map map))))
 
 (provide 'gnus-util)
 

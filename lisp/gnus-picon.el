@@ -1,6 +1,6 @@
 ;;; gnus-picon.el --- displaying pretty icons in Gnus
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;      Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
@@ -98,6 +98,7 @@ Some people may want to add \"unknown\" to this list."
 (defvar gnus-picon-glyph-alist nil
   "Picon glyphs cache.
 List of pairs (KEY . GLYPH) where KEY is either a filename or an URL.")
+(defvar gnus-picon-cache nil)
 
 ;;; Functions:
 
@@ -109,29 +110,30 @@ List of pairs (KEY . GLYPH) where KEY is either a filename or an URL.")
 	(split-string (car address) "\\."))))
 
 (defun gnus-picon-find-face (address directories &optional exact)
-  (let* ((databases gnus-picon-databases)
-	 (address (gnus-picon-split-address address))
+  (let* ((address (gnus-picon-split-address address))
 	 (user (pop address))
-	 database directory found instance base)
-    (while (and (not found)
-		(setq database (pop databases)))
-      (while (and (not found)
-		  (setq directory (pop directories)))
-	(setq base (expand-file-name directory database))
-	;; Kludge to search misc/MISC for users.
-	(when (string= directory "misc")
-	  (setq address '("MISC")))
-	(while (and (not found)
-		    address)
-	  (setq found (gnus-picon-find-image
-		       (concat base "/" (mapconcat 'identity
-						   (reverse address)
-						   "/")
-			       "/" user "/")))
-	  (if exact
-	      (setq address nil)
-	    (pop address)))))
-    found))
+	 (faddress address)
+	 database directory result instance base)
+    (catch 'found
+      (dolist (database gnus-picon-databases)
+	(dolist (directory directories)
+	  (setq address faddress
+		base (expand-file-name directory database))
+	  (while address
+	    (when (setq result (gnus-picon-find-image
+				(concat base "/" (mapconcat 'identity
+							    (reverse address)
+							    "/")
+					"/" user "/")))
+	      (throw 'found result))
+	    (if exact
+		(setq address nil)
+	      (pop address)))
+	  ;; Kludge to search MISC as well.  But not in "news".
+	  (unless (string= directory "news")
+	    (when (setq result (gnus-picon-find-image
+				(concat base "/MISC/" user "/")))
+	      (throw 'found result))))))))
 
 (defun gnus-picon-find-image (directory)
   (let ((types gnus-picon-file-types)
@@ -163,67 +165,78 @@ GLYPH can be either a glyph or a string."
   (gnus-with-article-headers
     (let ((addresses
 	   (mail-header-parse-addresses (mail-fetch-field header)))
-	  first spec file)
+	  spec file point cache)
       (dolist (address addresses)
-	(setq address (car address)
-	      first t)
+	(setq address (car address))
 	(when (and (stringp address)
 		   (setq spec (gnus-picon-split-address address)))
-	  (when (setq file (gnus-picon-find-face
-			    address gnus-picon-user-directories))
-	    (setcar spec (cons (gnus-picon-create-glyph file)
-			       (car spec))))
-	  (dotimes (i (1- (length spec)))
-	    (when (setq file (gnus-picon-find-face
-			      (concat "unknown@"
-				      (mapconcat
-				       'identity (nthcdr (1+ i) spec) "."))
-			      gnus-picon-domain-directories t))
-	      (setcar (nthcdr (1+ i) spec)
-		      (cons (gnus-picon-create-glyph file)
-			    (nth (1+ i) spec)))))
+	  (if (setq cache (cdr (assoc address gnus-picon-cache)))
+	      (setq spec cache)
+	    (when (setq file (or (gnus-picon-find-face
+				  address gnus-picon-user-directories)
+				 (gnus-picon-find-face
+				  (concat "unknown@"
+					  (mapconcat
+					   'identity (cdr spec) "."))
+				  gnus-picon-user-directories)))
+	      (setcar spec (cons (gnus-picon-create-glyph file)
+				 (car spec))))
+	      
+	    (dotimes (i (1- (length spec)))
+	      (when (setq file (gnus-picon-find-face
+				(concat "unknown@"
+					(mapconcat
+					 'identity (nthcdr (1+ i) spec) "."))
+				gnus-picon-domain-directories t))
+		(setcar (nthcdr (1+ i) spec)
+			(cons (gnus-picon-create-glyph file)
+			      (nth (1+ i) spec)))))
+	    (setq spec (nreverse spec))
+	    (push (cons address spec) gnus-picon-cache))
 	  
 	  (gnus-article-goto-header header)
 	  (mail-header-narrow-to-field)
 	  (when (search-forward address nil t)
 	    (delete-region (match-beginning 0) (match-end 0))
+	    (setq point (point))
 	    (while spec
-	      (gnus-picon-insert-glyph (pop spec) category)
-	      (when spec
-		(if (not first)
-		    (insert ".")
-		  (insert "@")
-		  (setq first nil))))))))))
+	      (goto-char point)
+	      (if (> (length spec) 2)
+		  (insert ".")
+		(if (= (length spec) 2)
+		  (insert "@")))
+	      (gnus-picon-insert-glyph (pop spec) category))))))))
 
 (defun gnus-picon-transform-newsgroups (header)
   (interactive)
   (gnus-with-article-headers
-    (let ((groups
-	   (sort
-	    (message-tokenize-header (mail-fetch-field header))
-	    (lambda (g1 g2) (> (length g1) (length g2)))))
-	  spec file)
+    (gnus-article-goto-header header)
+    (mail-header-narrow-to-field)
+    (let ((groups (message-tokenize-header (mail-fetch-field header)))
+	  spec file point)
       (dolist (group groups)
-	(setq spec (nreverse (split-string group "[.]")))
-	(dotimes (i (length spec))
-	  (when (setq file (gnus-picon-find-face
-			    (concat "unknown@"
-				    (mapconcat
-				     'identity (nthcdr i spec) "."))
-			    gnus-picon-news-directories t))
-	    (setcar (nthcdr i spec)
-		    (cons (gnus-picon-create-glyph file)
-			  (nth i spec)))))
-	
-	(gnus-article-goto-header header)
-	(mail-header-narrow-to-field)
+	(unless (setq spec (cdr (assoc group gnus-picon-cache)))
+	  (setq spec (nreverse (split-string group "[.]")))
+	  (dotimes (i (length spec))
+	    (when (setq file (gnus-picon-find-face
+			      (concat "unknown@"
+				      (mapconcat
+				       'identity (nthcdr i spec) "."))
+			      gnus-picon-news-directories t))
+	      (setcar (nthcdr i spec)
+		      (cons (gnus-picon-create-glyph file)
+			    (nth i spec)))))
+	    (push (cons group spec) gnus-picon-cache))
 	(when (search-forward group nil t)
 	  (delete-region (match-beginning 0) (match-end 0))
-	  (setq spec (nreverse spec))
-	  (while spec
-	    (gnus-picon-insert-glyph (pop spec) 'newsgroups-picon)
-	    (when spec
-	      (insert "."))))))))
+	  (save-restriction
+	    (narrow-to-region (point) (point))
+	    (while spec
+	      (goto-char (point-min))
+	      (if (> (length spec) 1)
+		  (insert "."))
+	      (gnus-picon-insert-glyph (pop spec) 'newsgroups-picon))
+	    (goto-char (point-max))))))))
 
 ;;; Commands:
 

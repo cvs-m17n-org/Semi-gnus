@@ -1,6 +1,6 @@
 ;;; nntp.el --- nntp access for Gnus
-;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001
+;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996, 
+;;        1997, 1998, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -490,8 +490,10 @@ noticing asynchronous data.")
       (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
       (erase-buffer)))
   (nntp-encode-text)
-  (process-send-region (nntp-find-connection nntp-server-buffer)
-		       (point-min) (point-max))
+  (mm-with-unibyte-current-buffer
+    ;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
+    (process-send-region (nntp-find-connection nntp-server-buffer)
+			 (point-min) (point-max)))
   (nntp-retrieve-data
    nil nntp-address nntp-port-number nntp-server-buffer
    wait-for nnheader-callback-function))
@@ -602,7 +604,8 @@ noticing asynchronous data.")
 	      (last-point (point-min))
 	      (nntp-inhibit-erase t)
 	      (buf (nntp-find-connection-buffer nntp-server-buffer))
-	      (command (if nntp-server-list-active-group "LIST ACTIVE" "GROUP")))
+	      (command (if nntp-server-list-active-group
+			   "LIST ACTIVE" "GROUP")))
 	  (while groups
 	    ;; Send the command to the server.
 	    (nntp-send-command nil command (pop groups))
@@ -1231,7 +1234,10 @@ password contained in '~/.nntp-authinfo'."
 	  (erase-buffer)
 	  (nntp-send-command "^[245].*\n" "GROUP" group)
 	  (setcar (cddr entry) group)
-	  (erase-buffer))))))
+	  (erase-buffer)
+	  (save-excursion
+	    (set-buffer nntp-server-buffer)
+	    (erase-buffer)))))))
 
 (defun nntp-decode-text (&optional cr-only)
   "Decode the text in the current buffer."

@@ -8,9 +8,24 @@ For older news, see Gnus info node "New Features".
 
 * Changes in Oort Gnus
 
+** Gnus supports the generation of RFC 2298 Disposition Notification requests.
+
+This is invoked with the C-c M-n key binding from message mode.
+
+** Gnus supports Maildir groups.
+
+Gnus includes a new backend nnmaildir.el, by Paul Jarc.
+
+** Printing capabilities are enhanced.
+
+Gnus supports Muttprint natively with O P from the Summary and Article
+buffers.  Also, each individual MIME part can be printed using p on
+the MIME button.
+
 ** Message supports the Importance: header.
 
-In the message buffer, C-c C-p cycles through the valid values.
+In the message buffer, C-c C-f C-i or C-c C-u cycles through the valid
+values.
 
 ** Gnus supports Cancel Locks in News.
 

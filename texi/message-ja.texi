@@ -344,13 +344,19 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 
 @item C-c ?
 @kindex C-c ?
-@findex message-goto-to
+@findex describe-mode
 メッセージモードの記述です。
 
 @item C-c C-r C-t
 @kindex C-c C-f C-t
 @findex message-goto-to
 @code{To} ヘッダーに行きます (@code{message-goto-to})。
+
+@item C-c C-f C-o
+@kindex C-c C-f C-o
+@findex message-goto-from
+@code{From} ヘッダーに行きます (@code{message-goto-from})。(キーバインド
+中の ``o'' は創作者 (Originator) に由来しています。)
 
 @item C-c C-f C-b
 @kindex C-c C-f C-b
@@ -481,6 +487,14 @@ message buffer (@code{message-yank-buffer}).
 @kindex C-c M-h
 @findex message-insert-headers
 メッセージのヘッダーを挿入します (@code{message-insert-headers})。
+
+@item C-c M-n
+@kindex C-c M-n
+@findex message-insert-disposition-notification-to
+開封確認要求を挿入します。
+(@code{message-insert-disposition-notification-to})。これは、もし受信者
+が RFC 2298 をサポートしていたら、彼女にそのメッセージを受け取ったことを
+知らせて欲しいことを意味します。
 @end table
 
 @c FIXTGNUS We should provide MIME manual.
@@ -646,6 +660,10 @@ Guard (@uref{http://www.gnupg.org/}).  It also requires an Emacs interface
 to it, such as Mailcrypt (available from
 @uref{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
 Florian Weimer's @code{gpg.el}.
+
+@vindex gpg-temp-directory
+Note, if you are using the @code{gpg.el} you must make sure that the
+path specified by @code{gpg-temp-directory} have permissions 0700.
 
 Creating your own OpenPGP key is described in detail in the
 documentation of your OpenPGP implementation, so we refer to it.

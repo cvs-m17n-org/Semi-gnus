@@ -1,6 +1,6 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -721,41 +721,6 @@ XEmacs compatibility workaround."
    'call-process-region (point-min) (point-max) command t '(t nil) nil
    args))
 
-(defface gnus-x-face '((t (:foreground "black" :background "white")))
-  "Face to show X face"
-  :group 'gnus-xmas)
-
-(defun gnus-xmas-article-display-xface (data)
-  "Display the XFace in DATA."
-  (save-excursion
-    (let ((xface-glyph
-	   (cond
-	    ((featurep 'xface)
-	     (make-glyph (vector 'xface :data
-				 (concat "X-Face: " data))))
-	    ((featurep 'xpm)
-	     (let ((cur (current-buffer)))
-	       (save-excursion
-		 (gnus-set-work-buffer)
-		 (insert data)
-		 (let ((coding-system-for-read 'binary)
-		       (coding-system-for-write 'binary))
-		   (gnus-xmas-call-region "uncompface")
-		   (goto-char (point-min))
-		   (insert "/* Width=48, Height=48 */\n")
-		   (gnus-xmas-call-region "icontopbm")
-		   (gnus-xmas-call-region "ppmtoxpm")
-		   (make-glyph
-		    (vector 'xpm :data (buffer-string)))))))
-	    (t
-	     (make-glyph [nothing])))))
-      ;;(set-glyph-face xface-glyph 'gnus-x-face)
-
-      (gnus-article-goto-header "from")
-      (gnus-put-image xface-glyph " ")
-      (gnus-add-wash-type 'xface)
-      (gnus-add-image 'xface xface-glyph))))
-
 (defvar gnus-xmas-modeline-left-extent
   (let ((ext (copy-extent modeline-buffer-id-left-extent)))
     ext))
@@ -935,6 +900,8 @@ XEmacs compatibility workaround."
 Warning: Don't insert text immediately after the image."
   (let ((begin (point))
 	extent)
+    (if (and (bobp) (not string))
+	(setq string " "))
     (if string
 	(insert string)
       (setq begin (1- begin)))

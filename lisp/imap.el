@@ -589,7 +589,9 @@ If ARGS, PROMPT is used as an argument to `format'."
   (let ((cmds (if (listp imap-ssl-program) imap-ssl-program
 		(list imap-ssl-program)))
 	cmd done)
-    (ignore-errors (require 'ssl))
+    (condition-case ()
+	(require 'ssl)
+      (error))
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening SSL connection with `%s'..." cmd)
       (let* ((port (or port imap-default-ssl-port))
@@ -601,17 +603,18 @@ If ARGS, PROMPT is used as an argument to `format'."
 				      ?p (number-to-string port)))))
 	     process)
 	(when (setq process
-		    (ignore-errors
-		      (cond ((eq system-type 'windows-nt)
-			     (let (selective-display
-				   (coding-system-for-write 'binary)
-				   (coding-system-for-read 'raw-text-dos)
-				   (output-coding-system 'binary)
-				   (input-coding-system 'raw-text-dos))
-			       (open-ssl-stream name buffer server port)))
-			    (t
-			     (as-binary-process
-			      (open-ssl-stream name buffer server port))))))
+		    (condition-case nil
+			(cond ((eq system-type 'windows-nt)
+			       (let (selective-display
+				     (coding-system-for-write 'binary)
+				     (coding-system-for-read 'raw-text-dos)
+				     (output-coding-system 'binary)
+				     (input-coding-system 'raw-text-dos))
+				 (open-ssl-stream name buffer server port)))
+			      (t
+			       (as-binary-process
+				(open-ssl-stream name buffer server port))))
+		      (error nil)))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
 	    (while (and (memq (process-status process) '(open run))
@@ -2193,7 +2196,9 @@ Return nil if no complete line has arrived."
 	(let ((token (read (current-buffer))))
 	  (imap-forward)
 	  (cond ((eq token 'UID)
-		 (setq uid (ignore-errors (read (current-buffer)))))
+		 (setq uid (condition-case ()
+			       (read (current-buffer))
+			     (error))))
 		((eq token 'FLAGS)
 		 (setq flags (imap-parse-flag-list))
 		 (if (not flags)

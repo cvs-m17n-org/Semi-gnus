@@ -1,6 +1,85 @@
+2002-01-06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Archived Messages): Rename
+	gnus-inews-mark-gcc-as-read to gnus-gcc-mark-as-read.
+
+	* Makefile.in (clean): Clean thumb*.
+
+2002-01-05  Harry Putnam  <reader@newsguy.com>
+
+	* gnus.texi (Score Variables): Clarify.
+
+2002-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Agent Expiry): Addition.
+	(Sorting the Summary Buffer): Addition.
+
+2002-01-05  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Add MIME and Disposition Notifications.
+
+	* message.texi (Header Commands): Fix.  Add m-goto-from.
+	(Insertion): Add m-i-disposition-notification-to.
+
+2002-01-05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (.latexi.pdf-x): Use thumbpdf.
+
+	* gnus.texi (Advanced Formatting): Double @'s. Use thumbpdf.
+	colorlinks=true.
+
+2002-01-05  Norman Walsh  <ndw@nwalsh.com>
+
+	* gnus-faq.texi: Fix typo.
+
+2002-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Sorting the Summary Buffer): Addition.
+
+2002-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Virtual Groups): Addition.
+
+2002-01-03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Keymap): Addition.
+	(Summary Mail Commands): Fix.
+
+2002-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Timestamp): Addition.  Example from Andras
+	BALI. 
+	(X-Face): Addition.
+	(Advanced Formatting): Add example.
+
+2002-01-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Conformity): Add and fix.
+
+	* message.texi (Security): Mention gpg-temp-directory.
+
+	* gnus.texi (Article Washing): Link to Security section.
+	(Security): Fix.
+	(Signing and Encrypting): Renamed from Using GPG.
+	(IMAP): Fixes.
+
+2002-01-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Customizing Articles): Add crossreference links.  Add
+	gnus-body-boundary-delimiter.
+
 2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Choosing Commands): Addition.
+	(Article Display): Update.
+	(Article Display): Addition.
+	(Article Header): New.
+	(Slow Terminal Connection): Addition.
+	(Predicate Specifiers): New.
+	(To From Newsgroups): Addition.
+	(Topic Commands): Addition.
+	Update the menus.
+	Fix some references b0rked up by the menu fixing.
 
 2001-12-31  Rui Zhu  <sprache@iname.com>
 

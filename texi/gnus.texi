@@ -25,14 +25,15 @@
 
 \ifx\pdfoutput\undefined
 \else
-\usepackage[pdftex,bookmarks]{hyperref}
+\usepackage[pdftex,bookmarks,colorlinks=true]{hyperref}
+\usepackage{thumbpdf}
 \pdfcompresslevel=9
 \fi
 
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v.}
+\newcommand{\gnusversionname}{Oort Gnus v0.05}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -484,8 +485,8 @@ Group Buffer Format
 
 Group Topics
 
-* Topic Variables::             How to customize the topics the Lisp Way.
 * Topic Commands::              Interactive E-Z commands.
+* Topic Variables::             How to customize the topics the Lisp Way.
 * Topic Sorting::               Sorting each topic individually.
 * Topic Topology::              A map of the world.
 * Topic Parameters::            Parameters that apply to all groups in a topic.
@@ -505,7 +506,7 @@ Summary Buffer
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
-* Delayed Articles::
+* Delayed Articles::            
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -550,16 +551,16 @@ Reply, Followup and Post
 * Summary Mail Commands::       Sending mail.
 * Summary Post Commands::       Sending news.
 * Summary Message Commands::    Other Message-related commands.
-* Canceling and Superseding::
+* Canceling and Superseding::   
 
 Marking Articles
 
 * Unread Articles::             Marks for unread articles.
 * Read Articles::               Marks for read articles.
 * Other Marks::                 Marks that do not affect readedness.
-* Setting Marks::
-* Generic Marking Commands::
-* Setting Process Marks::
+* Setting Marks::               
+* Generic Marking Commands::    
+* Setting Process Marks::       
 
 Marking Articles
 
@@ -600,8 +601,10 @@ Article Treatment
 * Article Fontisizing::         Making emphasized text look nice.
 * Article Hiding::              You also want to make certain info go away.
 * Article Washing::             Lots of way-neat functions to make life better.
+* Article Header::              Doing various header transformations.
 * Article Buttons::             Click on URLs, Message-IDs, addresses and the like.
 * Article Date::                Grumble, UT!
+* Article Display::             Display various stuff---X-Face, Picons, Smileys
 * Article Signature::           What is a signature?
 * Article Miscellania::         Various other stuff.
 
@@ -614,7 +617,7 @@ Various Summary Stuff
 
 * Summary Group Information::   Information oriented commands.
 * Searching for Articles::      Multiple article commands.
-* Summary Generation Commands::
+* Summary Generation Commands::  
 * Really Various Summary Commands::  Those pesky non-conformant commands.
 
 Article Buffer
@@ -634,7 +637,7 @@ Composing Messages
 * Posting Styles::              An easier way to specify who you are.
 * Drafts::                      Postponing messages and rejected messages.
 * Rejected Articles::           What happens if the server doesn't like your article?
-* Using GPG::                   How to use GPG and MML to sign and encrypt messages
+* Signing and encrypting::      How to compose secure messages.
 
 Select Methods
 
@@ -683,7 +686,6 @@ Getting Mail
 * Duplicates::                  Dealing with duplicated mail.
 * Not Reading Mail::            Using mail back ends for reading other files.
 * Choosing a Mail Back End::    Gnus can read a variety of mail formats.
-* Archiving Mail::              How to backup your mail.
 
 Mail Sources
 
@@ -702,6 +704,7 @@ Choosing a Mail Back End
 
 Browsing the Web
 
+* Archiving Mail::              
 * Web Searches::                Creating groups from articles that match a string.
 * Slashdot::                    Reading the Slashdot comments.
 * Ultimate::                    The Ultimate Bulletin Board systems.
@@ -759,9 +762,9 @@ Agent Categories
 
 Agent Commands
 
-* Group Agent Commands::
-* Summary Agent Commands::
-* Server Agent Commands::
+* Group Agent Commands::        
+* Summary Agent Commands::      
+* Server Agent Commands::       
 
 Scoring
 
@@ -811,8 +814,9 @@ Various
 * Daemons::                     Gnus can do things behind your back.
 * NoCeM::                       How to avoid spam and other fatty foods.
 * Undo::                        Some actions can be undone.
+* Predicate Specifiers::        Specifying predicates.
 * Moderation::                  What to do if you're a moderator.
-* Image Enhancements::          There are more pictures and stuff under XEmacs.
+* Image Enhancements::          Modern versions of Emacs/XEmacs can display images.
 * Fuzzy Matching::              What's the big fuzz?
 * Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
 * Various Various::             Things that are really various.
@@ -828,10 +832,11 @@ Formatting Variables
 * Tabulation::                  Tabulating your output.
 * Wide Characters::             Dealing with wide characters.
 
-XEmacs Enhancements
+Image Enhancements
 
-* Picons::                      How to display pictures of what your reading.
+* Picons::                      How to display pictures of what you're reading.
 * Smileys::                     Show all those happy faces the way they were meant to be shown.
+* X-Face::                      Display a funky, teensy black-and-white image.
 * Toolbar::                     Click'n'drool.
 * XVarious::                    Other XEmacsy Gnusey variables.
 
@@ -845,6 +850,7 @@ Picons
 
 Appendices
 
+* XEmacs::                      Requirements for installing under XEmacs.
 * History::                     How Gnus got where it is today.
 * On Writing Manuals::          Why this is not a beginner's guide.
 * Terminology::                 We use really difficult, like, words here.
@@ -852,6 +858,7 @@ Appendices
 * Troubleshooting::             What you might try if things do not work.
 * Gnus Reference Guide::        Rilly, rilly technical stuff.
 * Emacs for Heathens::          A short introduction to Emacsian terms.
+* Frequently Asked Questions::
 
 History
 
@@ -894,8 +901,8 @@ Gnus Reference Guide
 
 Back End Interface
 
-* Required Back End Functions:: Functions that must be implemented.
-* Optional Back End Functions:: Functions that need not be implemented.
+* Required Back End Functions::  Functions that must be implemented.
+* Optional Back End Functions::  Functions that need not be implemented.
 * Error Messaging::             How to get messages and report errors.
 * Writing New Back Ends::       Extending old back ends.
 * Hooking New Back Ends Into Gnus::  What has to be done on the Gnus end.
@@ -3602,6 +3609,16 @@ Delete an empty topic (@code{gnus-topic-delete}).
 List all groups that gnus knows about in a topics-ified way
 (@code{gnus-topic-list-active}).
 
+@item T M-n
+@kindex T M-n (Topic)
+@findex gnus-topic-goto-next-topic
+Go to the next topic (@code{gnus-topic-goto-next-topic}).
+
+@item T M-p
+@kindex T M-p (Topic)
+@findex gnus-topic-goto-previous-topic
+Go to the next topic (@code{gnus-topic-goto-previous-topic}).
+
 @item G p
 @kindex G p (Topic)
 @findex gnus-topic-edit-parameters
@@ -4081,6 +4098,18 @@ something like:
       "%M\%S\%p\%P\%5y: %(%-40,40g%) %6,6~(cut 2)d\n")
 @end lisp
 
+If you would like greater control of the time format, you can use a
+user-defined format spec.  Something like the following should do the
+trick: 
+
+@lisp
+(setq gnus-group-line-format
+      "%M\%S\%p\%P\%5y: %(%-40,40g%) %Ud\n")
+(defun gnus-user-format-function-d (headers)
+  (let ((time (gnus-group-timestamp gnus-tmp-group)))
+    (format-time-string "%b %d  %H:%M" time)))
+@end lisp
+            
 
 @node File Commands
 @subsection File Commands
@@ -4192,7 +4221,7 @@ You can have as many summary buffers open as you wish.
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
-* Delayed Articles::
+* Delayed Articles::            
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -4474,6 +4503,9 @@ In summary, you'd typically put something like the following in
 (setq gnus-ignored-from-addresses
       "Your Name Here")
 @end lisp
+
+(The values listed above are the default values in Gnus.  Alter them
+to fit your needs.)
 
 Now, this is mostly useful for mail groups, where you have control over
 the @sc{nov} files that are created.  However, if you can persuade your
@@ -4905,7 +4937,7 @@ Select the article buffer (@code{gnus-summary-select-article-buffer}).
 * Summary Mail Commands::       Sending mail.
 * Summary Post Commands::       Sending news.
 * Summary Message Commands::    Other Message-related commands.
-* Canceling and Superseding::
+* Canceling and Superseding::   
 @end menu
 
 
@@ -6523,6 +6555,7 @@ Matching}).
 @findex gnus-thread-sort-by-author
 @findex gnus-thread-sort-by-number
 @vindex gnus-thread-sort-functions
+@findex gnus-thread-sort-by-most-recent-thread
 If you are using a threaded summary display, you can sort the threads by
 setting @code{gnus-thread-sort-functions}, which can be either a single
 function, a list of functions, or a list containing functions and
@@ -6531,7 +6564,9 @@ function, a list of functions, or a list containing functions and
 By default, sorting is done on article numbers.  Ready-made sorting
 predicate functions include @code{gnus-thread-sort-by-number},
 @code{gnus-thread-sort-by-author}, @code{gnus-thread-sort-by-subject},
-@code{gnus-thread-sort-by-date}, @code{gnus-thread-sort-by-score}, and
+@code{gnus-thread-sort-by-date}, @code{gnus-thread-sort-by-score},
+@code{gnus-thread-sort-by-most-recent-number},
+@code{gnus-thread-sort-by-most-recent-date} and
 @code{gnus-thread-sort-by-total-score}.
 
 Each function takes two threads and returns non-@code{nil} if the first
@@ -7545,15 +7580,16 @@ writing, so there are tons of functions and variables to make reading
 these articles easier.
 
 @menu
-* Article Highlighting::    You want to make the article look like fruit salad.
-* Article Fontisizing::     Making emphasized text look nice.
-* Article Hiding::          You also want to make certain info go away.
-* Article Washing::         Lots of way-neat functions to make life better.
-* Article Buttons::         Click on URLs, Message-IDs, addresses and the like.
-* Article Date::            Grumble, UT!
-* Article Display::         Display various stuff---X-Face, Picons, Smileys
-* Article Signature::       What is a signature?
-* Article Miscellania::     Various other stuff.
+* Article Highlighting::        You want to make the article look like fruit salad.
+* Article Fontisizing::         Making emphasized text look nice.
+* Article Hiding::              You also want to make certain info go away.
+* Article Washing::             Lots of way-neat functions to make life better.
+* Article Header::              Doing various header transformations.
+* Article Buttons::             Click on URLs, Message-IDs, addresses and the like.
+* Article Date::                Grumble, UT!
+* Article Display::             Display various stuff---X-Face, Picons, Smileys
+* Article Signature::           What is a signature?
+* Article Miscellania::         Various other stuff.
 @end menu
 
 
@@ -8068,18 +8104,7 @@ message.@footnote{PGP keys for many hierarchies are available at
 @kindex W s (Summary)
 @findex gnus-summary-force-verify-and-decrypt
 Verify a signed (PGP, PGP/MIME or S/MIME) message
-(@code{gnus-summary-force-verify-and-decrypt}).
-
-@item W u
-@kindex W u (Summary)
-@findex gnus-article-treat-unfold-headers
-Unfold folded header lines (@code{gnus-article-treat-unfold-headers}).
-
-@item W n
-@kindex W n (Summary)
-@findex gnus-article-treat-fold-newsgroups
-Fold the @code{Newsgroups} and @code{Followup-To} headers
-(@code{gnus-article-treat-fold-newsgroups}).
+(@code{gnus-summary-force-verify-and-decrypt}). @xref{Security}.
 
 @item W W H
 @kindex W W H (Summary)
@@ -8133,6 +8158,33 @@ body (@code{gnus-article-strip-trailing-space}).
 @end table
 
 @xref{Customizing Articles}, for how to wash articles automatically.
+
+
+@node Article Header
+@subsection Article Header
+
+These commands perform various transformations of article header.
+
+@table @kbd
+
+@item W G u
+@kindex W G u (Summary)
+@findex gnus-article-treat-unfold-headers
+Unfold folded header lines (@code{gnus-article-treat-unfold-headers}).
+
+@item W G n
+@kindex W G n (Summary)
+@findex gnus-article-treat-fold-newsgroups
+Fold the @code{Newsgroups} and @code{Followup-To} headers
+(@code{gnus-article-treat-fold-newsgroups}).
+
+@item W G f
+@kindex W G f (Summary)
+@findex gnus-article-treat-fold-header
+Fold all the message headers
+(@code{gnus-article-treat-fold-headers}).
+
+@end table
 
 
 @node Article Buttons
@@ -8339,9 +8391,8 @@ Display an @code{X-Face} in the @code{From} header.
 
 @item W D s
 @kindex W D s (Summary)
-@findex gnus-article-toggle-smiley
-Toggle whether to display smileys
-(@code{gnus-article-toggle-smiley}).
+@findex gnus-treat-smiley
+Display smileys (@code{gnus-treat-smiley}).
 
 @item W D f
 @kindex W D f (Summary)
@@ -8359,6 +8410,12 @@ Piconify all mail headers (i. e., @code{Cc}, @code{To})
 @findex gnus-treat-newsgroups-picon
 Piconify all news headers (i. e., @code{Newsgroups} and
 @code{Followup-To}) (@code{gnus-treat-from-picon}).
+
+@item W D D
+@kindex W D D (Summary)
+@findex gnus-article-remove-images
+Remove all images from the article buffer
+(@code{gnus-article-remove-images}).
 
 @end table
 
@@ -9300,7 +9357,7 @@ suggestions you find reasonable.  (Note that
 @menu
 * Summary Group Information::   Information oriented commands.
 * Searching for Articles::      Multiple article commands.
-* Summary Generation Commands::
+* Summary Generation Commands::  
 * Really Various Summary Commands::  Those pesky non-conformant commands.
 @end menu
 
@@ -9782,23 +9839,22 @@ to you to figure out, I think.
 @section Security
 
 Gnus is able to verify signed messages or decrypt encrypted messages.
-The formats that are supported are PGP (plain text, RFC 1991 format),
-PGP/MIME (RFC 2015/3156) and S/MIME, however you need some external
-programs to get things to work:
+The formats that are supported are PGP, PGP/MIME and S/MIME, however
+you need some external programs to get things to work:
 
 @enumerate
 @item
-To verify or decrypt PGP messages, you have to install mailcrypt or
-gpg.el as well as a OpenPGP implementation (such as GnuPG). @xref{Using GPG}.
+To handle PGP messages, you have to install mailcrypt or gpg.el as
+well as a OpenPGP implementation (such as GnuPG).
 
 @item
-To verify or decrypt S/MIME message, you need to install OpenSSL.
-OpenSSL 0.9.6 or newer is recommended.
+To handle S/MIME message, you need to install OpenSSL.  OpenSSL 0.9.6
+or newer is recommended.
 
 @end enumerate
 
 More information on how to set things up can be found in the message
-manual. @xref{Security, ,Security, message, The Message Manual}.
+manual (@pxref{Security, ,Security, message, Message Manual}).
 
 @table @code
 @item mm-verify-option
@@ -9810,7 +9866,7 @@ protocols. Otherwise, ask user.
 @item mm-decrypt-option
 @vindex mm-decrypt-option
 Option of decrypting encrypted parts.  @code{never}, no decryption;
-@code{always}, always decrypt @code{known}, only decrypt known
+@code{always}, always decrypt; @code{known}, only decrypt known
 protocols. Otherwise, ask user.
 
 @end table
@@ -10130,7 +10186,21 @@ possible but those listed are probably sufficient for most people.
 @table @code
 @item gnus-treat-buttonize (t, integer)
 @item gnus-treat-buttonize-head (head)
+
+@xref{Article Buttons}.
+
 @item gnus-treat-capitalize-sentences (t, integer)
+@item gnus-treat-overstrike (t, integer)
+@item gnus-treat-strip-cr (t, integer)
+@item gnus-treat-strip-headers-in-body (t, integer)
+@item gnus-treat-strip-leading-blank-lines (t, integer)
+@item gnus-treat-strip-multiple-blank-lines (t, integer)
+@item gnus-treat-strip-pem (t, last, integer)
+@item gnus-treat-strip-pgp (t, last, integer)
+@item gnus-treat-strip-trailing-blank-lines (t, last, integer)
+
+@xref{Article Washing}.
+
 @item gnus-treat-date-english (head)
 @item gnus-treat-date-iso8601 (head)
 @item gnus-treat-date-lapsed (head)
@@ -10138,9 +10208,29 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-date-original (head)
 @item gnus-treat-date-user-defined (head)
 @item gnus-treat-date-ut (head)
-@item gnus-treat-display-picons (head)
+
+@xref{Article Date}.
+
+@item gnus-treat-from-picon (head)
+@item gnus-treat-mail-picon (head)
+@item gnus-treat-newsgroups-picon (head)
+
+@xref{Picons}.
+
 @item gnus-treat-display-smileys (t, integer)
+
+@item gnus-treat-body-boundary (head)
+
+@vindex gnus-body-boundary-delimiter
+Adds a delimiter between header and body, the string used as delimiter
+is controlled by @code{gnus-body-boundary-delimiter}.
+
+@xref{Smileys}.
+
 @item gnus-treat-display-xface (head)
+
+@xref{X-Face}.
+
 @item gnus-treat-emphasize (t, head, integer)
 @item gnus-treat-fill-article (t, integer)
 @item gnus-treat-fill-long-lines (t, integer)
@@ -10149,26 +10239,23 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-hide-citation-maybe (t, integer)
 @item gnus-treat-hide-headers (head)
 @item gnus-treat-hide-signature (t, last)
+
+@xref{Article Hiding}.
+
 @item gnus-treat-highlight-citation (t, integer)
 @item gnus-treat-highlight-headers (head)
 @item gnus-treat-highlight-signature (t, last, integer)
-@item gnus-treat-overstrike (t, integer)
+
+@xref{Article Highlighting}.
+
 @item gnus-treat-play-sounds
-@item gnus-treat-strip-cr (t, integer)
-@item gnus-treat-strip-headers-in-body (t, integer)
-@item gnus-treat-strip-leading-blank-lines (t, integer)
-@item gnus-treat-strip-multiple-blank-lines (t, integer)
-@item gnus-treat-strip-pem (t, last, integer)
-@item gnus-treat-strip-pgp (t, last, integer)
-@item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-translate
 @item gnus-treat-x-pgp-sig (head)
-@item gnus-treat-from-picon (head)
-@item gnus-treat-mail-picon (head)
-@item gnus-treat-newsgroups-picon (head)
+
 @item gnus-treat-unfold-headers (head)
+@item gnus-treat-fold-headers (head)
 @item gnus-treat-fold-newsgroups (head)
-@item gnus-treat-body-boundary (head)
+
 @item gnus-treat-decode-article-as-default-mime-charset
 @end table
 
@@ -10238,6 +10325,23 @@ only makes sense if you have buttonizing turned on.
 @kindex M-TAB (Article)
 @findex gnus-article-prev-button
 Go to the previous button, if any (@code{gnus-article-prev-button}).
+
+@item R
+@kindex R (Article)
+@findex gnus-article-reply-with-original
+Send a reply to the current article and yank the current article
+(@code{gnus-article-reply-with-original}).  If given a prefix, make a
+wide reply.  If the region is active, only yank the text in the
+region.
+
+@item F
+@kindex F (Article)
+@findex gnus-article-followup-with-original
+Send a followup to the current article and yank the current article
+(@code{gnus-article-followup-with-original}).  If given a prefix, make
+a wide reply.  If the region is active, only yank the text in the
+region.
+
 
 @end table
 
@@ -10343,11 +10447,13 @@ This is the delimiter mentioned above.  By default, it is @samp{^L}
 @cindex followup
 @cindex post
 @cindex using gpg
+@cindex using s/mime
+@cindex using smime
 
 @kindex C-c C-c (Post)
 All commands for posting and mailing will put you in a message buffer
 where you can edit the article all you like, before you send the
-article by pressing @kbd{C-c C-c}.  @xref{Top, , Top, message, The
+article by pressing @kbd{C-c C-c}.  @xref{Top, , Overview, message,
 Message Manual}.  Where the message will be posted/mailed to depends
 on your setup (@pxref{Posting Server}).
 
@@ -10359,7 +10465,7 @@ on your setup (@pxref{Posting Server}).
 * Posting Styles::              An easier way to specify who you are.
 * Drafts::                      Postponing messages and rejected messages.
 * Rejected Articles::           What happens if the server doesn't like your article?
-* Using GPG::                   How to use GPG and MML to sign and encrypt messages
+* Signing and encrypting::      How to compose secure messages.
 @end menu
 
 Also see @pxref{Canceling and Superseding} for information on how to
@@ -10615,8 +10721,8 @@ of names).
 This variable can be used instead of @code{gnus-message-archive-group},
 but the latter is the preferred method.
 
-@item gnus-inews-mark-gcc-as-read
-@vindex gnus-inews-mark-gcc-as-read
+@item gnus-gcc-mark-as-read
+@vindex gnus-gcc-mark-as-read
 If non-@code{nil}, automatically mark @code{Gcc} articles as read.
 
 @end table
@@ -10820,36 +10926,66 @@ The rejected articles will automatically be put in a special draft group
 (@pxref{Drafts}).  When the server comes back up again, you'd then
 typically enter that group and send all the articles off.
 
-@node Using GPG
-@section Using GPG
+@node Signing and encrypting
+@section Signing and encrypting
 @cindex using gpg
+@cindex using s/mime
+@cindex using smime
 
-Gnus has an ALPHA support to GPG that's provided by @file{gpg.el}. See
-@code{mm-verify-option} and @code{mm-decrypt-option} to enable Gnus to
-verify or decrypt messages accordingly.
+Gnus can digitally sign and encrypt your messages, using vanilla PGP
+format or PGP/MIME or S/MIME.  For decoding such messages, see the
+@code{mm-verify-option} and @code{mm-decrypt-option} options
+(@pxref{Security}).
 
-To use this correctly with GPG, you'll need the following lisp code in your
-@file{~/.emacs} or @file{~/.gnus}:
+For PGP, Gnus supports two external libraries, @sc{gpg.el} and
+@sc{Mailcrypt}, you need to install at least one of them.  The S/MIME
+support in Gnus requires the external program OpenSSL.
 
-@lisp
-(require 'gpg)
-(setq mml2015-use 'gpg)
-(setq mml1991-use 'gpg)
-(setq gpg-temp-directory (expand-file-name "~/.gnupg/tmp"))
-@end lisp
+Instructing MML to perform security operations on a MIME part is done
+using the @code{C-c C-m s} key map for signing and the @code{C-c C-m
+c} key map for encryption, as follows.
 
-The @code{gpg-temp-directory} need to point to a directory with permissions set
-to 700, for your own safety.
+@table @kbd
 
-To sign or encrypt your message you may choose to use the MML Security
-menu or @kbd{C-c C-m s p} to sign your message using PGP/MIME,
-@kbd{C-c C-m s s} to sign your message using S/MIME.  There's also
-@kbd{C-c C-m c p} to encrypt your message with PGP/MIME and @kbd{C-c
-C-m c s} to encrypt using S/MIME. @xref{Security, ,Security, message,
-The Message Manual}.
+@item C-c C-m s s
+@kindex C-c C-m s s
+@findex mml-secure-sign-smime
 
-Gnus will ask for your passphrase and then it will send your message, if
-you've typed it correctly.
+Digitally sign current MIME part using S/MIME.
+
+@item C-c C-m s o
+@kindex C-c C-m s o
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP.
+
+@item C-c C-m s p
+@kindex C-c C-m s p
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP/MIME.
+
+@item C-c C-m c s
+@kindex C-c C-m c s
+@findex mml-secure-encrypt-smime
+
+Digitally encrypt current MIME part using S/MIME.
+
+@item C-c C-m c o
+@kindex C-c C-m c o
+@findex mml-secure-encrypt-pgp
+
+Digitally encrypt current MIME part using PGP.
+
+@item C-c C-m c p
+@kindex C-c C-m c p
+@findex mml-secure-encrypt-pgpmime
+
+Digitally encrypt current MIME part using PGP/MIME.
+
+@end table
+
+Also @xref{Security, ,Security, message, Message Manual}.
 
 @node Select Methods
 @chapter Select Methods
@@ -11847,7 +11983,6 @@ course.
 * Duplicates::                  Dealing with duplicated mail.
 * Not Reading Mail::            Using mail back ends for reading other files.
 * Choosing a Mail Back End::    Gnus can read a variety of mail formats.
-* Archiving Mail::              How to backup your mail.
 @end menu
 
 
@@ -13832,6 +13967,7 @@ Gnus has been getting a bit of a collection of back ends for providing
 interfaces to these sources.
 
 @menu
+* Archiving Mail::              
 * Web Searches::                Creating groups from articles that match a string.
 * Slashdot::                    Reading the Slashdot comments.
 * Ultimate::                    The Ultimate Bulletin Board systems.
@@ -14216,6 +14352,7 @@ Put that in your @file{.emacs} file, and hitting links in w3-rendered
 @sc{html} in the Gnus article buffers will use @code{browse-url} to
 follow the link.
 
+
 @node IMAP
 @section @sc{imap}
 @cindex nnimap
@@ -14227,23 +14364,24 @@ server is much similar to connecting to a news server, you just
 specify the network address of the server.
 
 @sc{imap} has two properties.  First, @sc{imap} can do everything that
-POP can, it can hence be viewed as POP++.  Secondly, @sc{imap} is a
+POP can, it can hence be viewed as a POP++.  Secondly, @sc{imap} is a
 mail storage protocol, similar to @sc{nntp} being a news storage
-protocol.  (@sc{imap} offers more features than @sc{nntp} because news
-is more or less read-only whereas mail is read-write.)
+protocol -- however, @sc{imap} offers more features than @sc{nntp}
+because news is more or less read-only whereas mail is read-write.
 
-If you want to use @sc{imap} as POP++, use an imap entry in
-mail-sources.  With this, Gnus will fetch mails from the @sc{imap}
-server and store them on the local disk.  This is not the usage
-described in this section.  @xref{Mail Sources}.
+If you want to use @sc{imap} as a POP++, use an imap entry in
+@code{mail-sources}.  With this, Gnus will fetch mails from the
+@sc{imap} server and store them on the local disk.  This is not the
+usage described in this section--@xref{Mail Sources}.
 
 If you want to use @sc{imap} as a mail storage protocol, use an nnimap
-entry in gnus-secondary-select-methods.  With this, Gnus will
+entry in @code{gnus-secondary-select-methods}.  With this, Gnus will
 manipulate mails stored on the @sc{imap} server.  This is the kind of
 usage explained in this section.
 
 A server configuration in @code{~/.gnus} with a few @sc{imap} servers
-might look something like this:
+might look something like the following. (Note that for SSL/TLS, you
+need external programs and libraries, see below.)
 
 @lisp
 (setq gnus-secondary-select-methods
@@ -14268,9 +14406,6 @@ might look something like this:
                 (nnimap-server-port 9930)
                 (nnimap-stream ssl))))
 @end lisp
-
-(Note that for SSL/TLS to work, you need the external library
-@samp{ssl.el}, see below.)
 
 The following variables can be used to create a virtual @code{nnimap}
 server:
@@ -14333,10 +14468,10 @@ Please note that the value of @code{nnimap-stream} is a symbol!
 
 @itemize @bullet
 @item
-@dfn{gssapi:} Connect with GSSAPI (usually kerberos 5). Requires the
+@dfn{gssapi:} Connect with GSSAPI (usually Kerberos 5). Requires the
 @samp{imtest} program.
 @item
-@dfn{kerberos4:} Connect with kerberos 4. Requires the @samp{imtest} program.
+@dfn{kerberos4:} Connect with Kerberos 4. Requires the @samp{imtest} program.
 @item
 @dfn{starttls:} Connect via the STARTTLS extension (similar to
 SSL). Requires the external library @samp{starttls.el} and program
@@ -14394,13 +14529,13 @@ Please note that the value of @code{nnimap-authenticator} is a symbol!
 
 @itemize @bullet
 @item
-@dfn{gssapi:} GSSAPI (usually kerberos 5) authentication. Require
+@dfn{gssapi:} GSSAPI (usually kerberos 5) authentication. Requires
 external program @code{imtest}.
 @item
-@dfn{kerberos4:} Kerberos authentication. Require external program
+@dfn{kerberos4:} Kerberos 4 authentication. Requires external program
 @code{imtest}.
 @item
-@dfn{digest-md5:} Encrypted username/password via DIGEST-MD5. Require
+@dfn{digest-md5:} Encrypted username/password via DIGEST-MD5. Requires
 external library @code{digest-md5.el}.
 @item
 @dfn{cram-md5:} Encrypted username/password via CRAM-MD5.
@@ -15479,6 +15614,9 @@ not-news back end.  (Just to be on the safe side.)
 @kbd{C-c C-n} in the message buffer will insert the @code{Newsgroups}
 line from the article you respond to in these cases.
 
+@code{nnvirtual} groups do not inherit anything but articles and marks
+from component groups---group parameters, for instance, are not
+inherited. 
 
 
 @node Kibozed Groups
@@ -16066,9 +16204,9 @@ toggles the plugged/unplugged state of the Gnus Agent.
 
 
 @menu
-* Group Agent Commands::
-* Summary Agent Commands::
-* Server Agent Commands::
+* Group Agent Commands::        
+* Summary Agent Commands::      
+* Server Agent Commands::       
 @end menu
 
 You can run a complete batch fetch from the command line with the
@@ -16201,6 +16339,20 @@ whenever you feel that you're running out of space.  It's not
 particularly fast or efficient, and it's not a particularly good idea to
 interrupt it (with @kbd{C-g} or anything else) once you've started it.
 
+@code{gnus-agent-expire-days} can also be a list of regexp/day pairs.
+The regexps will be matched against group names to allow differing
+expiry in different groups.
+
+@lisp
+(setq gnus-agent-expire-days
+      '(("alt\\." 7)
+        (".*binary" 1)
+        ("." 21)))
+@end lisp
+
+If you use the list form, the last element must always be the default
+method---it must always match all groups.
+
 @vindex gnus-agent-expire-all
 if @code{gnus-agent-expire-all} is non-@code{nil}, this command will
 expire all articles---unread, read, ticked and dormant.  If @code{nil}
@@ -16299,6 +16451,10 @@ Hook run when connecting to the network.
 @item gnus-agent-unplugged-hook
 @vindex gnus-agent-unplugged-hook
 Hook run when disconnecting from the network.
+
+@item gnus-agent-fetched-hook
+@vindex gnus-agent-fetched-hook
+Hook run when after finishing fetching articles.
 
 @end table
 
@@ -16840,12 +16996,12 @@ are expired.  It's 7 by default.
 
 @item gnus-update-score-entry-dates
 @vindex gnus-update-score-entry-dates
-If this variable is non-@code{nil}, matching score entries will have
-their dates updated.  (This is how Gnus controls expiry---all
-non-matching entries will become too old while matching entries will
-stay fresh and young.)  However, if you set this variable to @code{nil},
-even matching entries will grow old and will have to face that oh-so
-grim reaper.
+If this variable is non-@code{nil}, temporary score entries that have
+been triggered (matched) will have their dates updated.  (This is how Gnus
+controls expiry---all non-matched-entries will become too old while
+matched entries will stay fresh and young.)  However, if you set this
+variable to @code{nil}, even matched entries will grow old and will
+have to face that oh-so grim reaper.
 
 @item gnus-score-after-write-file-function
 @vindex gnus-score-after-write-file-function
@@ -18232,24 +18388,25 @@ four days, Gnus will decay the scores four times, for instance.
 @chapter Various
 
 @menu
-* Process/Prefix::          A convention used by many treatment commands.
-* Interactive::             Making Gnus ask you many questions.
-* Symbolic Prefixes::       How to supply some Gnus functions with options.
-* Formatting Variables::    You can specify what buffers should look like.
-* Window Layout::           Configuring the Gnus buffer windows.
-* Faces and Fonts::         How to change how faces look.
-* Compilation::             How to speed Gnus up.
-* Mode Lines::              Displaying information in the mode lines.
-* Highlighting and Menus::  Making buffers look all nice and cozy.
-* Buttons::                 Get tendinitis in ten easy steps!
-* Daemons::                 Gnus can do things behind your back.
-* NoCeM::                   How to avoid spam and other fatty foods.
-* Undo::                    Some actions can be undone.
-* Moderation::              What to do if you're a moderator.
-* Image Enhancements::      Modern versions of Emacs/XEmacs can display images.
-* Fuzzy Matching::          What's the big fuzz?
-* Thwarting Email Spam::    A how-to on avoiding unsolicited commercial email.
-* Various Various::         Things that are really various.
+* Process/Prefix::              A convention used by many treatment commands.
+* Interactive::                 Making Gnus ask you many questions.
+* Symbolic Prefixes::           How to supply some Gnus functions with options.
+* Formatting Variables::        You can specify what buffers should look like.
+* Window Layout::               Configuring the Gnus buffer windows.
+* Faces and Fonts::             How to change how faces look.
+* Compilation::                 How to speed Gnus up.
+* Mode Lines::                  Displaying information in the mode lines.
+* Highlighting and Menus::      Making buffers look all nice and cozy.
+* Buttons::                     Get tendinitis in ten easy steps!
+* Daemons::                     Gnus can do things behind your back.
+* NoCeM::                       How to avoid spam and other fatty foods.
+* Undo::                        Some actions can be undone.
+* Predicate Specifiers::        Specifying predicates.
+* Moderation::                  What to do if you're a moderator.
+* Image Enhancements::          Modern versions of Emacs/XEmacs can display images.
+* Fuzzy Matching::              What's the big fuzz?
+* Thwarting Email Spam::        A how-to on avoiding unsolicited commercial email.
+* Various Various::             Things that are really various.
 @end menu
 
 
@@ -18441,6 +18598,7 @@ less than 4 characters wide.
 Also Gnus supports some extended format specifications, such as
 @samp{%&user-date;}.
 
+
 @node Mode Line Formatting
 @subsection Mode Line Formatting
 
@@ -18507,6 +18665,13 @@ Return an empty string if the field is equal to the specified value.
 @item form
 Use the specified form as the field value when the @samp{@@} spec is
 used.
+
+Here's an example:
+
+@lisp
+"~(form (current-time-string))@@"
+@end lisp
+
 @end table
 
 Let's take an example.  The @samp{%o} spec in the summary mode lines
@@ -19435,6 +19600,33 @@ command, which should feel kinda like the normal Emacs @code{undo}
 command.
 
 
+@node Predicate Specifiers
+@section Predicate Specifiers
+@cindex predicate specifiers
+
+Some Gnus variables are @dfn{predicate specifiers}.  This is a special
+form that allows flexible specification of predicates without having
+to type all that much.
+
+These specifiers are lists consisting of functions, symbols and lists.
+
+Here's an example:
+
+@lisp
+(or gnus-article-unseen-p
+    gnus-article-unread-p)
+@end lisp
+
+The available symbols are @code{or}, @code{and} and @code{not}.  The
+functions all take one parameter.
+
+@findex gnus-make-predicate
+Internally, Gnus calls @code{gnus-make-predicate} on these specifiers
+to create a function that can be called.  This input parameter to this
+function will be passed along to all the functions in the predicate
+specifier. 
+
+
 @node Moderation
 @section Moderation
 @cindex moderation
@@ -19487,11 +19679,11 @@ XEmacs, as well as Emacs 21, is able to display pictures and stuff, so
 Gnus has taken advantage of that.
 
 @menu
-* Picons::     How to display pictures of what you're reading.
-* Smileys::    Show all those happy faces the way they were meant to be shown.
-* X-Face::     Display a funky, teensy black-and-white image.
-* Toolbar::    Click'n'drool.
-* XVarious::   Other XEmacsy Gnusey variables.
+* Picons::                      How to display pictures of what you're reading.
+* Smileys::                     Show all those happy faces the way they were meant to be shown.
+* X-Face::                      Display a funky, teensy black-and-white image.
+* Toolbar::                     Click'n'drool.
+* XVarious::                    Other XEmacsy Gnusey variables.
 @end menu
 
 
@@ -19839,9 +20031,10 @@ Face used for mouse highlighting over the smiley face.
 @subsection X-Face
 @cindex x-face
 
-@code{X-Face} headers describe a 48x48 pixel black-and-white image
-that's supposed to represent the author of the message.  It seems to
-be supported by an ever-growing number of mail and news readers.
+@code{X-Face} headers describe a 48x48 pixel black-and-white (1 bit
+depth) image that's supposed to represent the author of the message.
+It seems to be supported by an ever-growing number of mail and news
+readers.
 
 @cindex x-face
 @findex gnus-article-display-x-face
@@ -19884,6 +20077,39 @@ like @code{netpbm}, @code{libgr-progs} and @code{compface}.})
 
 (NOTE: @code{x-face} is used in the variable/function names, not
 @code{xface}).
+
+Gnus provides a few convenience functions and variables to allow
+easier insertion of X-Face headers in outgoing messages.
+
+@findex gnus-random-x-face
+@code{gnus-random-x-face} goes through all the @samp{pbm} files
+in @code{gnus-x-face-directory} and picks one at random, and then
+converts it to the X-Face format by using the
+@code{gnus-convert-pbm-to-x-face-command} shell command.  The
+@samp{pbm} files should be 48x48 pixels big.
+
+@code{gnus-x-face-from-file} takes a file as the parameter, and then
+converts the file to X-Face format by using the
+@code{gnus-convert-image-to-x-face-command} shell command.
+
+Here's how you would typically use the former function.  Put something
+like the folllowing in your @file{.gnus.el} file:
+
+@lisp
+(setq message-required-news-headers
+      (nconc message-required-news-headers
+             (list '(X-Face . gnus-random-x-face))))
+@end lisp
+
+Using the latter function would be something like this:
+
+@lisp
+(setq message-required-news-headers
+      (nconc message-required-news-headers
+             (list '(X-Face . (lambda ()
+                                (gnus-x-face-from-file
+                                 "~/My-face.gif"))))))
+@end lisp
 
 
 @node Toolbar
@@ -20271,10 +20497,13 @@ renamed it back again to ``Gnus''.  But in mixed case.  ``Gnus'' vs.
 
 @node Gnus Versions
 @subsection Gnus Versions
-@cindex Pterodactyl Gnus
 @cindex ding Gnus
 @cindex September Gnus
+@cindex Red Gnus
 @cindex Quassia Gnus
+@cindex Pterodactyl Gnus
+@cindex Oort Gnus
+@cindex No Gnus
 
 The first ``proper'' release of Gnus 5 was done in November 1995 when it
 was included in the Emacs 19.30 distribution (132 (ding) Gnus releases
@@ -20428,8 +20657,9 @@ with, of course.
 
 @table @strong
 
-@item RFC 822
+@item RFC (2)822
 @cindex RFC 822
+@cindex RFC 2822
 There are no known breaches of this standard.
 
 @item RFC 1036
@@ -20457,6 +20687,38 @@ USEFOR is an IETF working group writing a successor to RFC 1036, based
 on Son-of-RFC 1036.  They have produced a number of drafts proposing
 various changes to the format of news articles.  The Gnus towers will
 look into implementing the changes when the draft is accepted as an RFC.
+
+@item MIME - RFC 2045-2049 etc
+@cindex MIME
+All the various MIME RFCs are supported.
+
+@item Disposition Notifications - RFC 2289
+Message Mode is able to request notifications from the receiver.
+
+@item PGP - RFC 1991 and RFC 2440
+@cindex RFC 1991
+@cindex RFC 2440
+RFC 1991 is the original PGP message specification, published as a
+Information RFC.  RFC 2440 was the follow-up, now called Open PGP, and
+put on the Standards Track.  Both document a non-MIME aware PGP
+format.  Gnus supports both encoding (signing and encryption) and
+decoding (verification and decryption).
+
+@item PGP/MIME - RFC 2015/3156
+RFC 2015 (superceded by 3156 which references RFC 2440 instead of RFC
+1991) describes the MIME-wrapping around the RF 1991/2440 format.
+Gnus supports both encoding and decoding.
+
+@item S/MIME - RFC 2633
+RFC 2633 describes the S/MIME format.
+
+@item IMAP - RFC 1730/2060, RFC 2195, RFC 2086, RFC 2359, RFC 2595, RFC 1731
+RFC 1730 is IMAP version 4, updated somewhat by RFC 2060 (IMAP 4
+revision 1).  RFC 2195 describes CRAM-MD5 authentication for IMAP. RFC
+2086 describes access control lists (ACLs) for IMAP. RFC 2359
+describes a IMAP protocol enhancement.  RFC 2595 describes the proper
+TLS integration (STARTTLS) with IMAP.  RFC 1731 describes the
+GSSAPI/Kerberos4 mechanisms for IMAP.
 
 @end table
 
@@ -21932,6 +22194,22 @@ want to read them anyway.
 If this is non-@code{nil}, all threads in the summary buffer will be
 hidden initially.
 
+This can also be a predicate specifier (@pxref{Predicate Specifiers}).
+Avaliable predicates are @code{gnus-article-unread-p} and
+@code{gnus-article-unseen-p}.
+
+Here's an example:
+
+@lisp
+(setq gnus-thread-hide-subtree
+      '(or gnus-article-unread-p
+           gnus-article-unseen-p))
+@end lisp
+
+(It's a pretty nonsensical example, since all unseen articles are also
+unread, but you get my drift.)
+
+
 @item gnus-updated-mode-lines
 If this is @code{nil}, Gnus will not put information in the buffer mode
 lines, which might save some time.
@@ -22291,8 +22569,8 @@ In the examples and definitions I will refer to the imaginary back end
 @cindex @code{nnchoke}
 
 @menu
-* Required Back End Functions:: Functions that must be implemented.
-* Optional Back End Functions:: Functions that need not be implemented.
+* Required Back End Functions::  Functions that must be implemented.
+* Optional Back End Functions::  Functions that need not be implemented.
 * Error Messaging::             How to get messages and report errors.
 * Writing New Back Ends::       Extending old back ends.
 * Hooking New Back Ends Into Gnus::  What has to be done on the Gnus end.
