@@ -1,5 +1,19 @@
 2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-namazu.el: Bug fix of updating multiple indices.
+	(gnus-namazu/setup): Call `gnus-namazu-update-all-indices' without
+	arguments.
+	(gnus-namazu-create-index): Clean temporary files even if an
+	indexer is killed.
+	(gnus-namazu/update-p): New function.
+	(gnus-namazu-update-all-indices): Reimplemented.
+	(gnus-namazu-update-index): Call `gnus-namazu/update-p' to decide
+	whether the specified index will be updated.
+	(gnus-namazu/update-sentinel): Follow the change of
+	`gnus-namazu-update-all-indices'.
+
+2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
 	* lisp/gnus.el (toplevel): Add autoloads for
 	`gnus-namazu-create-index', and `gnus-namazu-update-all-indices'
 	and `gnus-namazu-update-index'.
