@@ -2857,6 +2857,7 @@ article number."
 This is all marks except unread, ticked, dormant, and expirable."
   (not (or (= mark gnus-unread-mark)
 	   (= mark gnus-ticked-mark)
+	   (= mark gnus-spam-mark)
 	   (= mark gnus-dormant-mark)
 	   (= mark gnus-expirable-mark))))
 
@@ -9584,7 +9585,7 @@ If NO-EXPIRE, auto-expiry will be inhibited."
 	(gnus-summary-goto-unread
 	 (and gnus-summary-goto-unread
 	      (not (eq gnus-summary-goto-unread 'never))
-	      (not (memq mark (list gnus-unread-mark
+	      (not (memq mark (list gnus-unread-mark gnus-spam-mark
 				    gnus-ticked-mark gnus-dormant-mark)))))
 	(n (abs n))
 	(mark (or mark gnus-del-mark)))

@@ -288,7 +288,8 @@
 
 \thispagestyle{empty}
 
-Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+Copyright \copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
+2002, 2003
 Free Software Foundation, Inc.
 
 
@@ -336,7 +337,7 @@ This file documents gnus, the GNU Emacs newsreader.
 
 このファイルは GNU Emacs のニュースリーダである gnus に関する説明書です。
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -384,7 +385,8 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001,
+2002, 2003
         Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -8213,10 +8215,10 @@ URL に含まれる改行を削除します。いくつかのメイラーは、行を短くするために
 接頭辞が与えられると、何の文字集合 (charset) として扱うかを尋ねられます。
 
 @vindex gnus-article-wash-function
-ディフォルトでは @sc{html} の変換に @code{mm-inline-text-html-renderer}
-(@pxref{Customization, , , emacs-mime}) で設定された関数を使いますが、こ
-れは変数 @code{gnus-article-wash-function} で制御されます。使うことがで
-きる、あらかじめ用意された関数は以下の通りです。
+ディフォルトでは @sc{html} の変換に @code{mm-text-html-renderer}
+(@pxref{(emacs-mime)Display Customization}) で設定された関数を使いますが、
+これは変数 @code{gnus-article-wash-function} で制御されます。使うことが
+できる、あらかじめ用意された関数は以下の通りです。
 
 @table @code
 @item w3
@@ -21597,9 +21599,9 @@ but at the common table.@*
 XEmacs はパッケージの蒐集として配布されています。gnus の XEmacs パッケー
 ジが必要とするものは何であれ、あなたはインストールすべきです。今のところ
 必要なのは @samp{gnus}, @samp{w3}, @samp{mh-e}, @samp{mailcrypt},
-@samp{rmail}, @samp{eterm}, @samp{mail-lib}, @samp{xemacs-base} および
-@samp{fsf-compat} です。モールス復号のためには @samp{misc-games} パッケー
-ジが必要です。
+@samp{rmail}, @samp{eterm}, @samp{mail-lib}, @samp{xemacs-base},
+@samp{sh-script} および @samp{fsf-compat} です。モールス復号のために
+は @samp{misc-games} パッケージが必要です。
 
 @node History
 @section 歴史
