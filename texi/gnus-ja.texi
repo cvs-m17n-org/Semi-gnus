@@ -12758,10 +12758,10 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 まとめられていますが、それが各グループ毎に持つことができる値はプロパティ
 リストで、例えば次のような値です。
 
-@example
-  '(index-range all prefetch-articles off encapsulate-images on
-		expiry-wait 6)
-@end example
+@lisp
+'(index-range all prefetch-articles off encapsulate-images on
+              expiry-wait 6)
+@end lisp
 
 実際にはこのようなリストの先頭に @code{nnshimbun-group-parameters} とい
 うシンボルが付加されたものが、``~/.newsrc.eld'' ファイルに記録されます。
@@ -12897,7 +12897,6 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 プ名だけが与えられるのに、です。一つ例を挙げましょう。
 
 @lisp
-@c We should untabify the following to keep the correct indentations.
 (setq nnmail-expiry-wait-function
       (lambda (group)
         (cond ((string-equal group "wl") 7)
