@@ -559,7 +559,13 @@ If N, return the Nth ancestor instead."
 
 (defun gnus-read-event-char (&optional prompt)
   "Get the next event."
-  (let ((event (read-event prompt)))
+  (let ((event (condition-case nil
+		   (read-event prompt)
+		 ;; `read-event' doesn't allow arguments in Mule 2.3
+		 (wrong-number-of-arguments
+		  (when prompt
+		    (message "%s" prompt))
+		  (read-event)))))
     ;; should be gnus-characterp, but this can't be called in XEmacs anyway
     (cons (and (numberp event) event) event)))
 
