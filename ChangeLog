@@ -1,5 +1,14 @@
 1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): Use maximum number in
+	default instead of `gnus-large-newsgroup'.
+
+1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
 
 1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>,
