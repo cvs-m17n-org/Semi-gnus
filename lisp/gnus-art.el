@@ -151,7 +151,7 @@
      "^X-Request-PGP:" "^X-Fingerprint:" "^X-WRIEnvto:" "^X-WRIEnvfrom:"
      "^X-Virus-Scanned:" "^X-Delivery-Agent:" "^Posted-Date:" "^X-Gateway:"
      "^X-Local-Origin:" "^X-Local-Destination:" "^X-UserInfo1:"
-     "^X-Received-Date:" "^X-Hashcash:")
+     "^X-Received-Date:" "^X-Hashcash:" "^Face:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -1224,6 +1224,24 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
   "Internal variable used to say whether `smiley-mule' is loaded (whether
 smiley functions are not overridden by `smiley').")
 
+(defcustom gnus-treat-display-face
+  (and (not noninteractive)
+       (or (and (fboundp 'image-type-available-p)
+		(image-type-available-p 'png))
+	   (and (featurep 'xemacs)
+		(featurep 'png)))
+       'head)
+  "Display Face headers.
+Valid values are nil, t, `head', `last', an integer or a predicate.
+See Info node `(gnus)Customizing Articles' and Info node
+`(gnus)X-Face' for details."
+  :group 'gnus-article-treat
+  :version "21.1"
+  :link '(custom-manual "(gnus)Customizing Articles")
+  :link '(custom-manual "(gnus)X-Face")
+  :type gnus-article-treat-head-custom)
+(put 'gnus-treat-display-xface 'highlight t)
+
 (defcustom gnus-treat-display-grey-xface
   (and (not noninteractive)
        (or (featurep 'xemacs)
@@ -1433,6 +1451,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-date-original gnus-article-date-original)
     (gnus-treat-date-user-defined gnus-article-date-user)
     (gnus-treat-date-iso8601 gnus-article-date-iso8601)
+    (gnus-treat-display-face gnus-article-display-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
     (gnus-treat-hide-signature gnus-article-hide-signature)
@@ -2043,6 +2062,28 @@ unfolded."
 	   (forward-line -1))
 	 (forward-line 1)
 	 (point))))))
+
+(defun article-display-face ()
+  "Display any Face headers in the header."
+  (interactive)
+  (gnus-with-article-headers
+    (let ((face nil))
+      (save-excursion
+	(when (gnus-buffer-live-p gnus-original-article-buffer)
+	  (set-buffer gnus-original-article-buffer)
+	  (setq face (message-fetch-field "face"))))
+      (when face
+	(let ((png (gnus-convert-face-to-png face))
+	      image)
+	  (when png
+	    (setq image (gnus-create-image png 'png t))
+	    (gnus-article-goto-header "from")
+	    (when (bobp)
+	      (insert "From: [no `from' set]\n")
+	      (forward-char -17))
+	    (gnus-add-wash-type 'face)
+	    (gnus-add-image 'face image)
+	    (gnus-put-image image)))))))
 
 (defun article-display-x-face (&optional force)
   "Look for an X-Face header and display it if present."
@@ -3527,6 +3568,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-remove-cr
      article-remove-leading-whitespace
      article-display-x-face
+     article-display-face
      article-de-quoted-unreadable
      article-de-base64-unreadable
      article-decode-HZ

@@ -21468,6 +21468,12 @@ nnml バックエンドは一通のメールにつき一つのファイルで、すべてのメールを
 常 @samp{nnml:mail.misc} グループに対応) に対し
 て @code{spam-stat-process-non-spam-directory} を呼ぶでしょう。
 
+あなたが IMAP を使っているならメールをローカルには持っていないので、それ
+は動かないでしょう。一つの解決策は、gnus エージェントで記事をキャッシュ
+することです。そうすれば @code{spam-stat-process-spam-directory} とし
+て @file{"~/News/agent/nnimap/mail.yourisp.com/personal_spam"} のような
+ものが使えます。@xref{Agent as Cache}。
+
 @defvar spam-stat
 この変数はすべての統計のハッシュテーブル -- 我々が辞書と言っているも
 の -- を持ちます。このハッシュテーブルは、双方のコレクションのすべての単
@@ -21515,9 +21521,13 @@ nnml バックエンドは一通のメールにつき一つのファイルで、すべてのメールを
 これは必要な gnus のコードとあなたが作った辞書を load します。
 
 次に、特級分割の規則を適合させる必要があります: どうやっ
-て @code{spam-stat} を使うかを決めて下さい。で
-は @samp{mail.misc} と @samp{mail.spam} の二つのグループだけがある最も単
-純な事例ではどうなるか。以下の式はメールが spam であるか、またはそれ
+て @code{spam-stat} を使うかを決めて下さい。以下の例は nnml バックエンド
+用です。nnimap バックエンドでもまったく同様に動作します。単
+に @code{nnmail-split-fancy} の代わりに @code{nnimap-split-fancy} を使っ
+て下さい。
+
+では @samp{mail.misc} と @samp{mail.spam} の二つのグループだけがある最も
+単純な事例ではどうなるか。以下の式はメールが spam であるか、またはそれ
 が @samp{mail.misc} に行くべきだと言っています。もし spam だった
 ら @code{spam-stat-split-fancy} は @samp{mail.spam} を返します。
 
