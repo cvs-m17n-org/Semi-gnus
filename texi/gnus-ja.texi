@@ -4600,10 +4600,10 @@ gnus はそのメールを取得して、それのヘッダーの精密調査ができるように画面
 
 @item S O m
 @kindex S O m (概略)
-@findex gnus-uu-digest-mail-forward
+@findex gnus-summary-digest-mail-forward
 現在の一連の記事 (@pxref{Decoding Articles}) の要約を作り、メールでその
-結果を送ります (@code{gnus-uu-digest-mail-forward})。この命令はプロセ
-ス/接頭引数の習慣に従います (@pxref{Process/Prefix})。
+結果を送ります (@code{gnus-summary-digest-mail-forward})。この命令はプロ
+セス/接頭引数の習慣に従います (@pxref{Process/Prefix})。
 
 @item S M-c
 @kindex S M-c (概略)
@@ -4683,12 +4683,12 @@ gnus はそのメールを取得して、それのヘッダーの精密調査ができるように画面
 
 @item S O p
 @kindex S O p (概略)
-@findex gnus-uu-digest-summary-post-forward
+@findex gnus-summary-digest-post-forward
 @cindex digests
 @cindex making digests
 現在の一連の記事を要約して、その結果をニュースグループに送りま
-す (@code{gnus-uu-digest-mail-forward})。この命令はプロセス/接頭引数の習
-慣を用います。
+す (@code{gnus-summary-digest-post-forward})。この命令はプロセス/接頭引
+数の習慣を用います。
 
 @item S u
 @kindex S u (概略)

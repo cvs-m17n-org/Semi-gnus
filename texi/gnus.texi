@@ -4622,10 +4622,10 @@ This command understands the process/prefix convention
 
 @item S O m
 @kindex S O m (Summary)
-@findex gnus-uu-digest-mail-forward
+@findex gnus-summary-digest-mail-forward
 Digest the current series (@pxref{Decoding Articles}) and forward the
-result using mail (@code{gnus-uu-digest-mail-forward}).  This command
-uses the process/prefix convention (@pxref{Process/Prefix}).
+result using mail (@code{gnus-summary-digest-mail-forward}).  This
+command uses the process/prefix convention (@pxref{Process/Prefix}).
 
 @item S M-c
 @kindex S M-c (Summary)
@@ -4705,11 +4705,11 @@ headers of the forwarded article.
 
 @item S O p
 @kindex S O p (Summary)
-@findex gnus-uu-digest-post-forward
+@findex gnus-summary-digest-post-forward
 @cindex digests
 @cindex making digests
 Digest the current series and forward the result to a newsgroup
-(@code{gnus-uu-digest-mail-forward}).  This command uses the
+(@code{gnus-summary-digest-post-forward}).  This command uses the
 process/prefix convention.
 
 @item S u
