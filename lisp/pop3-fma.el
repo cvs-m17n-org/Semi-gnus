@@ -224,7 +224,7 @@ If there is any problem , please set this variable to nil(default).
 		(if (and (not (memq pop3-password pop3-fma-commandline-arguments))
 			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-commandline-arguments)))
 		    (progn
-		      (if (eq pop3-fma-authentication-scheme 'apop)
+		      (if (eq pop3-authentication-scheme 'apop)
 			  (setq pop3-fma-commandline-arguments
 				(append
 				 pop3-fma-movemail-arguments
