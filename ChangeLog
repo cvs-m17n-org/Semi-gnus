@@ -1,5 +1,12 @@
 2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-sum.el (gnus-summary-exit): Don't recenter the group
+	buffer if it is called non-interactively.
+
+2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
 	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
