@@ -3233,7 +3233,7 @@ forbidden in URL encoding."
 	   'gnus-original-article-mode
 	   #'gnus-article-header-presentation-method)
 
-(defun mime-preview-quitting-method-for-gnus ()
+(defun gnus-mime-preview-quitting-method ()
   (if gnus-show-mime
       (gnus-article-show-summary)
     (mime-preview-kill-buffer)
@@ -3246,8 +3246,7 @@ forbidden in URL encoding."
 	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
-	   'gnus-original-article-mode
-	   #'mime-preview-quitting-method-for-gnus)
+	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
 
 (defun gnus-following-method (buf)
   (set-buffer buf)
