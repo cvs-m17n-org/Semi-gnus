@@ -47,7 +47,7 @@ the user confirms the creation."
 				   (- (point) 2)))
 	  (let ((to (mail-fetch-field "to")))
 	    (when to
-	      (setq from (mime-decode-field-body to 'To 'unfolding))))))
+	     (setq from (nnheader-decode-field-body to 'To 'unfolding))))))
       (when from
 	(bbdb-annotate-message-sender from t
 				      (or (bbdb-invoke-hook-for-value
@@ -439,9 +439,7 @@ beginning of the message headers."
   ;; exist only in the message.
   (let (value)
     (when (setq value (mail-fetch-field field-name))
-      (mime-decode-field-body value
-			      (intern (capitalize field-name))
-			      'unfolding))))
+      (nnheader-decode-field-body value field-name 'unfolding))))
 
 ;;
 ;; Insinuation

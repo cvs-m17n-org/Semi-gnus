@@ -2,8 +2,8 @@
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;; Keywords: mail, news, MIME, offline
 
 ;; This file is part of GNU Emacs.
@@ -184,7 +184,10 @@
 ;;; Utility functions
 
 (defcustom gnus-draft-decoding-function
-  #'mime-edit-decode-buffer
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (mime-decode-header-in-buffer)))
   "*Function called to decode the message from network representation."
   :group 'gnus-agent
   :type 'function)
@@ -194,6 +197,7 @@
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
+(progn
 (defun gnus-draft-setup-for-editing (narticle group)
   (gnus-setup-message 'forward
     (let ((article narticle))
@@ -208,9 +212,10 @@
 	(forward-char -1)
 	(insert mail-header-separator)
 	(forward-line 1)
-	(message-set-auto-save-file-name)))))
-
+	(message-set-auto-save-file-name))))))
+;;
 (defvar gnus-draft-send-draft-buffer " *send draft*")
+(progn
 (defun gnus-draft-setup-for-sending (narticle group)
   (let ((article narticle))
     (if (not (get-buffer gnus-draft-send-draft-buffer))
@@ -219,7 +224,8 @@
     (erase-buffer)
     (if (not (gnus-request-restore-buffer article group))
 	(error "Couldn't restore the article")
-      )))
+      ))))
+;; For draft TEST
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."
