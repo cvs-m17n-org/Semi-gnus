@@ -95,12 +95,12 @@
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
 		 babel-fetch babel-wash babel-as-string sc-cite-regexp
-		 smiley-encode-buffer)))
+		 smiley-encode-buffer function-max-args)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)
 
-(defun md5 (a &optional b c)
+(defun md5 (object &optional start end coding noerror)
   )
 
 (provide 'lpath)
