@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "02"
+(defconst gnus-revision-number "03"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -775,8 +775,7 @@ be set in `.emacs' instead."
   "Insert startup message in current buffer."
   ;; Insert the message.
   (erase-buffer)
-  (insert
-   (format "              %s
+  (insert "
           _    ___ _             _
           _ ___ __ ___  __    _ ___
           __   _     ___    __  ___
@@ -796,9 +795,20 @@ be set in `.emacs' instead."
           __
 
 "
-           ""))
+	  )
+  (goto-char (point-min))
+  (insert gnus-product-name " " gnus-version-number
+	  (if (zerop (string-to-number gnus-revision-number))
+	      ""
+	    (concat " (r" gnus-revision-number ") "))
+	  "based on " gnus-original-product-name " v"
+	  gnus-original-version-number)
+  (goto-char (point-min))
+  (insert-char ?\ ; space
+	       (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+  (forward-line 1)
   ;; And then hack it.
-  (gnus-indent-rigidly (point-min) (point-max)
+  (gnus-indent-rigidly (point) (point-max)
 		       (/ (max (- (window-width) (or x 46)) 0) 2))
   (goto-char (point-min))
   (forward-line 1)
@@ -1534,14 +1544,8 @@ If nil, no default charset is assumed when posting."
 (defvar gnus-have-read-active-file nil)
 
 (defconst gnus-maintainer
-  "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
-  "The mail address of the Gnus maintainers.")
-
-(defconst semi-gnus-developers
-  "Semi-gnus Developers:
- semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
- semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
-  "The mail address of the Semi-gnus developers.")
+  "semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (T-gnus Bugfixing Girls + Boys)"
+  "The mail address of the T-gnus maintainers.")
 
 (defcustom gnus-info-filename nil
   "*Controls language of gnus Info.
