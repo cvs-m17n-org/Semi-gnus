@@ -1,3 +1,8 @@
+2003-01-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Make sure that
+	the newsrc-alist is initialized properly.
+
 2003-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.art.el (gnus-treat-predicate): Don't follow the Change
