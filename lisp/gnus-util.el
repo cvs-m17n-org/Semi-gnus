@@ -35,7 +35,9 @@
 (require 'nnheader)
 (require 'timezone)
 (require 'message)
-(eval-when-compile (require 'rmail))
+(eval-when-compile
+  (when (locate-library "rmail")
+    (require 'rmail)))
 
 (eval-and-compile
   (autoload 'nnmail-date-to-time "nnmail")
