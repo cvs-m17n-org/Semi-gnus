@@ -1,6 +1,11 @@
+2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* make.bat: Make sure that gnus-load.el and sieve are writable to
+	avoid breakage.
+
 2004-03-04  KOSEKI Yoshinori  <kose@meadowy.org>
 
-	* gnus-namazu.el (gnus-namazu-command-prefix): New variable.
+	* lisp/gnus-namazu.el (gnus-namazu-command-prefix): New variable.
 	(gnus-namazu-imap-group-prefix): Ditto.
 	(gnus-namazu/directory-table-use): Ditto.
 	(gnus-namazu/call-namazu): Use gnus-namazu-imap-group-prefix.

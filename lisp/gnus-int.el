@@ -34,6 +34,7 @@
 (require 'gnus-range)
 
 (autoload 'gnus-agent-expire "gnus-agent")
+(autoload 'gnus-agent-regenerate-group "gnus-agent")
 (autoload 'gnus-agent-read-servers-validate-native "gnus-agent")
 
 (defcustom gnus-open-server-hook nil
@@ -586,10 +587,12 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
     (insert "\n"))
   (let ((gnus-command-method (or gnus-command-method
 				 (gnus-find-method-for-group group)))
-    (result (funcall (gnus-get-function gnus-command-method 'request-accept-article)
-	     (if (stringp group) (gnus-group-real-name group) group)
-	     (cadr gnus-command-method)
-	     last)))
+	(result 
+	 (funcall 
+	  (gnus-get-function gnus-command-method 'request-accept-article)
+	  (if (stringp group) (gnus-group-real-name group) group)
+	  (cadr gnus-command-method)
+	  last)))
     (when (and gnus-agent (gnus-agent-method-p gnus-command-method))
       (gnus-agent-regenerate-group group (list (cdr result))))
     result))
