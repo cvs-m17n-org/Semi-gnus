@@ -769,9 +769,9 @@ find-file-hooks, etc.
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
         (after-insert-file-functions nil)
-	(find-file-hooks nil)
-	(coding-system-for-read nnheader-file-coding-system))
-    (insert-file-contents filename visit beg end replace)))
+	(find-file-hooks nil))
+    (insert-file-contents-as-specified-coding-system
+     filename visit beg end replace nnheader-file-coding-system)))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
@@ -779,9 +779,9 @@ find-file-hooks, etc.
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
         (after-insert-file-functions nil)
-	(find-file-hooks nil)
-	(coding-system-for-read nnheader-file-coding-system))
-    (apply 'find-file-noselect args)))
+	(find-file-hooks nil))
+    (apply 'find-file-noselect-as-specified-coding-system
+	   (append args (list nnheader-file-coding-system)))))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."

@@ -1236,8 +1236,8 @@ EXTRA is the possible non-standard header."
 	(setq gnus-score-alist nil)
       ;; Read file.
       (with-temp-buffer
-	(let ((coding-system-for-write score-mode-coding-system))
-	  (insert-file-contents file))
+	(insert-file-contents-as-specified-coding-system
+	 file score-mode-coding-system)
 	(goto-char (point-min))
 	;; Only do the loading if the score file isn't empty.
 	(when (save-excursion (re-search-forward "[()0-9a-zA-Z]" nil t))
@@ -1370,8 +1370,8 @@ EXTRA is the possible non-standard header."
 	      (delete-file file)
 	    ;; There are scores, so we write the file.
 	    (when (file-writable-p file)
-	      (let ((coding-system-for-write score-mode-coding-system))
-		(gnus-write-buffer file))
+	      (gnus-write-buffer-as-specified-coding-system
+	       file score-mode-coding-system)
 	      (when gnus-score-after-write-file-function
 		(funcall gnus-score-after-write-file-function file)))))
 	(and gnus-score-uncacheable-files
