@@ -1,6 +1,8 @@
 1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-util.el (gnus-ems-redefine): Call it.
+	* lisp/gnus-util.el: Require `gnus-ems'.
+	(gnus-ems-redefine): Call it for redefine functions
+	`gnus-truncate-string', etc.
 	(gnus-union): Fix doc string.
 
 	* lisp/dgnushack.el (mapcon, mapc): Eliminate the redundant code.
