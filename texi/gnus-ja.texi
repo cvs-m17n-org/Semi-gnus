@@ -15517,11 +15517,11 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;H$&$N$O6K$a$F4JC1
 gnus $B$r@_Dj$7$^$9!#$^$:$d$C$F$*$$$G!#KM$O$3$3$GBT$C$F$k$+$i!#(B
 
 @item
-$B$=$7$?$i!"0J2<$NKbK!$N<vJ8$r$"$J$?$N(B @file{.gnus.el} $B%U%!%$%k$N:G8e$K=q(B
-$B$$$F$/$@$5$$!#(B
+$B$=$7$?$i!"0J2<$NKbK!$N<vJ8$r$"$J$?$N(B @file{.gnus.el} $B%U%!%$%k$K=q$$$F$/(B
+$B$@$5$$!#(B
 
 @lisp
-(gnus-agentize)
+(setq gnus-agent t)
 @end lisp
 @end itemize
 
@@ -15750,10 +15750,10 @@ gnus $B%(!<%8%'%s%H$,$=$N5-;v$r(B SPAM $B$@$H8+Pv$7$?$i??!#$3$NH/8+E*<jK!$O!"
 
 $B$b$7$/$O!"(B@file{~/.gnus.el} $B$d2?$+B>$N$b$N$G$b!"4{Dj(B
 $B$N(B @code{gnus-category-predicate-list} $B$K<+J,$N=R8l$rDI2C$9$k$3$H$b$G$-(B
-$B$^$9!#(B($BCm0U(B: $B$3$l$O!"(B@code{gnus-agent} $B$G(B @code{(gnus-agentize)} $B$,FI$_(B
-$B9~$^$l$?8e$G$"$kI,MW$,$"$k$G$7$g$&(B)
+$B$^$9!#(B
 
 @lisp
+(require 'gnus-agent)
 (setq gnus-category-predicate-alist
       (append gnus-category-predicate-alist
 	      '((old . my-article-old-p))))
@@ -16279,7 +16279,8 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B NOV $B$H5-;v$r;H$&$+$I$&$+$r@)8f$9
 (setq gnus-secondary-select-methods '((nnml "")))
 
 ;;; Gnus $B$r%*%U%i%$%s%K%e!<%9%j!<%@!<$K$9$k!#(B
-(gnus-agentize)
+;;; (gnus-agentize) ; $B5l<0$N@_Dj!#(B
+(setq gnus-agent t)
 @end lisp
 
 $B4pK\E*$K$O$3$l$@$1$GNI$$$O$:$G$9!#$3$l$r$"$J$?$N(B @file{~/.gnus.el} $B%U%!(B
