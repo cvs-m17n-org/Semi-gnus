@@ -134,11 +134,15 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+(eval-when-compile 
+  (ignore-errors (require 'digest-md5)))
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
+  (autoload 'digest-md5-parse-digest-challenge "digest-md5")
+  (autoload 'digest-md5-digest-response "digest-md5")
   (autoload 'rfc2104-hash "rfc2104")
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
@@ -223,15 +227,16 @@ NAME names the stream, CHECK is a function returning non-nil if the
 server support the stream and OPEN is a function for opening the
 stream.")
 
-(defvar imap-authenticators '(kerberos4 cram-md5 login anonymous)
+(defvar imap-authenticators '(kerberos4 cram-md5 digest-md5 login anonymous)
   "Priority of authenticators to consider when authenticating to
 server.")
 
 (defvar imap-authenticator-alist 
-  '((kerberos4 imap-kerberos4a-p imap-kerberos4-auth)
-    (cram-md5  imap-cram-md5-p   imap-cram-md5-auth)
-    (login     imap-login-p      imap-login-auth)
-    (anonymous imap-anonymous-p  imap-anonymous-auth))
+  '((kerberos4   imap-kerberos4a-p imap-kerberos4-auth)
+    (cram-md5    imap-cram-md5-p   imap-cram-md5-auth)
+    (digest-md5  imap-digest-md5-p imap-digest-md5-auth)
+    (login       imap-login-p      imap-login-auth)
+    (anonymous   imap-anonymous-p  imap-anonymous-auth))
   "Definition of authenticators.
 
 (NAME CHECK AUTHENTICATE)
@@ -604,6 +609,35 @@ successful, nil otherwise."
 		 (response (concat user " " hash))
 		 (encoded (imap-base64-encode-string response)))
 	    encoded))))))))
+
+(defun imap-digest-md5-p (buffer)
+  (imap-capability 'AUTH=DIGEST-MD5 buffer))
+
+(defun imap-digest-md5-auth (buffer)
+  "Login to server using the AUTH DIGEST-MD5 method."
+  (imap-interactive-login
+   buffer
+   (lambda (user passwd)
+     (let ((tag 
+	    (imap-send-command
+	     (list
+	      "AUTHENTICATE DIGEST-MD5"
+	      (lambda (challenge)
+		(digest-md5-parse-digest-challenge
+		 (imap-base64-decode-string challenge))
+		(let* ((digest-uri
+			(digest-md5-digest-uri 
+			 "imap" (digest-md5-challenge 'realm)))
+		       (response
+			(digest-md5-digest-response 
+			 user passwd digest-uri)))
+		  (imap-base64-encode-string response 'no-line-break))))
+	     )))
+       (if (not (eq (imap-wait-for-tag tag) 'INCOMPLETE))
+	   nil
+	 (setq imap-continuation nil)
+	 (imap-send-command-1 "")
+	 (imap-ok-p (imap-wait-for-tag tag)))))))
 
 (defun imap-login-p (buffer)
   (not (imap-capability 'X-LOGIN-CMD-DISABLED buffer)))
