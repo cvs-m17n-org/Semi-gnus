@@ -333,6 +333,9 @@ your main source of newsgroup names."
 (defun spam-group-ham-processor-BBDB-p (group)
   (spam-group-processor-p group 'gnus-group-ham-exit-processor-BBDB))
 
+(defun spam-group-ham-processor-copy-p (group)
+  (spam-group-processor-p group 'gnus-group-ham-exit-processor-copy))
+
 ;;; Summary entry and exit processing.
 
 (defun spam-summary-prepare ()
@@ -340,62 +343,68 @@ your main source of newsgroup names."
 
 (add-hook 'gnus-summary-prepare-hook 'spam-summary-prepare)
 
+;; The spam processors are invoked for any group, spam or ham or neither
 (defun spam-summary-prepare-exit ()
-  ;; The spam processors are invoked for any group, spam or ham or neither
-  (gnus-message 6 "Exiting summary buffer and applying spam rules")
-  (when (and spam-bogofilter-path
-	     (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name))
-    (gnus-message 5 "Registering spam with bogofilter")
-    (spam-bogofilter-register-spam-routine))
+  (unless gnus-group-is-exiting-without-update-p
+    (gnus-message 6 "Exiting summary buffer and applying spam rules")
+    (when (and spam-bogofilter-path
+	       (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name))
+      (gnus-message 5 "Registering spam with bogofilter")
+      (spam-bogofilter-register-spam-routine))
   
-  (when (and spam-ifile-path
-	     (spam-group-spam-processor-ifile-p gnus-newsgroup-name))
-    (gnus-message 5 "Registering spam with ifile")
-    (spam-ifile-register-spam-routine))
+    (when (and spam-ifile-path
+	       (spam-group-spam-processor-ifile-p gnus-newsgroup-name))
+      (gnus-message 5 "Registering spam with ifile")
+      (spam-ifile-register-spam-routine))
   
-  (when (spam-group-spam-processor-stat-p gnus-newsgroup-name)
-    (gnus-message 5 "Registering spam with spam-stat")
-    (spam-stat-register-spam-routine))
+    (when (spam-group-spam-processor-stat-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering spam with spam-stat")
+      (spam-stat-register-spam-routine))
 
-  (when (spam-group-spam-processor-blacklist-p gnus-newsgroup-name)
-    (gnus-message 5 "Registering spam with the blacklist")
-    (spam-blacklist-register-routine))
+    (when (spam-group-spam-processor-blacklist-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering spam with the blacklist")
+      (spam-blacklist-register-routine))
 
-  (if spam-move-spam-nonspam-groups-only      
-      (when (not (spam-group-spam-contents-p gnus-newsgroup-name))
-	(spam-mark-spam-as-expired-and-move-routine
-	 (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
-    (gnus-message 5 "Marking spam as expired and moving it to %s" gnus-newsgroup-name)
-    (spam-mark-spam-as-expired-and-move-routine 
-     (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+    (if spam-move-spam-nonspam-groups-only      
+	(when (not (spam-group-spam-contents-p gnus-newsgroup-name))
+	  (spam-mark-spam-as-expired-and-move-routine
+	   (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+      (gnus-message 5 "Marking spam as expired and moving it to %s" gnus-newsgroup-name)
+      (spam-mark-spam-as-expired-and-move-routine 
+       (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
 
-  ;; now we redo spam-mark-spam-as-expired-and-move-routine to only
-  ;; expire spam, in case the above did not expire them
-  (gnus-message 5 "Marking spam as expired without moving it")
-  (spam-mark-spam-as-expired-and-move-routine nil)
+    ;; now we redo spam-mark-spam-as-expired-and-move-routine to only
+    ;; expire spam, in case the above did not expire them
+    (gnus-message 5 "Marking spam as expired without moving it")
+    (spam-mark-spam-as-expired-and-move-routine nil)
 
-  (when (spam-group-ham-contents-p gnus-newsgroup-name)
-    (when (spam-group-ham-processor-whitelist-p gnus-newsgroup-name)
-      (gnus-message 5 "Registering ham with the whitelist")
-      (spam-whitelist-register-routine))
-    (when (spam-group-ham-processor-ifile-p gnus-newsgroup-name)
-      (gnus-message 5 "Registering ham with ifile")
-      (spam-ifile-register-ham-routine))
-    (when (spam-group-ham-processor-bogofilter-p gnus-newsgroup-name)
-      (gnus-message 5 "Registering ham with Bogofilter")
-      (spam-bogofilter-register-ham-routine))
-    (when (spam-group-ham-processor-stat-p gnus-newsgroup-name)
-      (gnus-message 5 "Registering ham with spam-stat")
-      (spam-stat-register-ham-routine))
-    (when (spam-group-ham-processor-BBDB-p gnus-newsgroup-name)
-      (gnus-message 5 "Registering ham with the BBDB")
-      (spam-BBDB-register-routine)))
+    (when (spam-group-ham-contents-p gnus-newsgroup-name)
+      (when (spam-group-ham-processor-whitelist-p gnus-newsgroup-name)
+	(gnus-message 5 "Registering ham with the whitelist")
+	(spam-whitelist-register-routine))
+      (when (spam-group-ham-processor-ifile-p gnus-newsgroup-name)
+	(gnus-message 5 "Registering ham with ifile")
+	(spam-ifile-register-ham-routine))
+      (when (spam-group-ham-processor-bogofilter-p gnus-newsgroup-name)
+	(gnus-message 5 "Registering ham with Bogofilter")
+	(spam-bogofilter-register-ham-routine))
+      (when (spam-group-ham-processor-stat-p gnus-newsgroup-name)
+	(gnus-message 5 "Registering ham with spam-stat")
+	(spam-stat-register-ham-routine))
+      (when (spam-group-ham-processor-BBDB-p gnus-newsgroup-name)
+	(gnus-message 5 "Registering ham with the BBDB")
+	(spam-BBDB-register-routine)))
 
-  ;; now move all ham articles out of spam groups
-  (when (spam-group-spam-contents-p gnus-newsgroup-name)
-    (gnus-message 5 "Moving ham messages from spam group")
-    (spam-ham-move-routine
-     (gnus-parameter-ham-process-destination gnus-newsgroup-name))))
+    (when (spam-group-ham-processor-copy-p gnus-newsgroup-name)
+      (gnus-message 5 "Copying ham")
+      (spam-ham-move-routine
+       (gnus-parameter-ham-process-destination gnus-newsgroup-name) t))
+
+    ;; now move all ham articles out of spam groups
+    (when (spam-group-spam-contents-p gnus-newsgroup-name)
+      (gnus-message 5 "Moving ham messages from spam group")
+      (spam-ham-move-routine
+       (gnus-parameter-ham-process-destination gnus-newsgroup-name)))))
 
 (add-hook 'gnus-summary-prepare-exit-hook 'spam-summary-prepare-exit)
 
@@ -421,13 +430,14 @@ your main source of newsgroup names."
 	(push article tomove)))
 
     ;; now do the actual move
-    (when (stringp group)
+    (when (and tomove
+	       (stringp group))
       (dolist (article tomove)
 	(gnus-summary-set-process-mark article))
       (when tomove (gnus-summary-move-article nil group))))
   (gnus-summary-yank-process-mark))
  
-(defun spam-ham-move-routine (&optional group)
+(defun spam-ham-move-routine (&optional group copy)
   (gnus-summary-kill-process-mark)
   (let ((articles gnus-newsgroup-articles)
 	article ham-mark-values mark tomove)
@@ -440,9 +450,12 @@ your main source of newsgroup names."
 	  (push article tomove)))
 
       ;; now do the actual move
-      (dolist (article tomove)
-	(gnus-summary-set-process-mark article))
-      (when tomove (gnus-summary-move-article nil group))))
+      (when tomove
+	(dolist (article tomove)
+	  (gnus-summary-set-process-mark article))
+	(if copy
+	    (gnus-summary-copy-article nil group)
+	  (gnus-summary-move-article nil group)))))
   (gnus-summary-yank-process-mark))
  
 (defun spam-generic-register-routine (spam-func ham-func)
@@ -497,14 +510,15 @@ your main source of newsgroup names."
 	(setq article-buffer (get-buffer gnus-article-buffer))))
     article-buffer))
 
-(defun spam-get-article-as-filename (article)
-  (let ((article-filename))
-    (when (numberp article)
-      (nnml-possibly-change-directory (gnus-group-real-name gnus-newsgroup-name))
-      (setq article-filename (expand-file-name (int-to-string article) nnml-current-directory)))
-    (if (file-exists-p article-filename)
-	article-filename
-      nil)))
+;; disabled for now
+;; (defun spam-get-article-as-filename (article)
+;;   (let ((article-filename))
+;;     (when (numberp article)
+;;       (nnml-possibly-change-directory (gnus-group-real-name gnus-newsgroup-name))
+;;       (setq article-filename (expand-file-name (int-to-string article) nnml-current-directory)))
+;;     (if (file-exists-p article-filename)
+;; 	article-filename
+;;       nil)))
 
 (defun spam-fetch-field-from-fast (article)
   "Fetch the `from' field quickly, using the internal gnus-data-list function"
@@ -764,8 +778,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	     (with-temp-buffer
 	       (insert article-string)
 	       (spam-stat-buffer-is-spam))))
-	 nil)
-	(spam-stat-save))
+	 nil))
 
       (defun spam-stat-register-ham-routine ()
 	(spam-generic-register-routine 
@@ -774,8 +787,10 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	   (let ((article-string (spam-get-article-as-string article)))
 	     (with-temp-buffer
 	       (insert article-string)
-	       (spam-stat-buffer-is-non-spam)))))
-	(spam-stat-save)))
+	       (spam-stat-buffer-is-non-spam))))))
+
+      (when spam-use-stat
+	(add-hook 'gnus-save-newsrc-hook 'spam-stat-save)))
 
   (file-error (progn
 		(defalias 'spam-stat-register-ham-routine 'ignore)

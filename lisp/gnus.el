@@ -1879,6 +1879,10 @@ Only applicable to non-spam (unclassified and ham) groups.")
     "The BBDB summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
+  (defvar gnus-group-ham-exit-processor-copy "copy"
+    "The ham copy exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
+
   (gnus-define-group-parameter
    spam-process
    :type list
@@ -1894,7 +1898,8 @@ Only applicable to non-spam (unclassified and ham) groups.")
 				   (variable-item gnus-group-ham-exit-processor-ifile)
 				   (variable-item gnus-group-ham-exit-processor-stat)
 				   (variable-item gnus-group-ham-exit-processor-whitelist)
-				   (variable-item gnus-group-ham-exit-processor-BBDB))))
+				   (variable-item gnus-group-ham-exit-processor-BBDB)
+				   (variable-item gnus-group-ham-exit-processor-copy))))
    :function-document
    "Which spam or ham processors will be applied to the GROUP articles at summary exit."
    :variable gnus-spam-process-newsgroups
@@ -1918,7 +1923,8 @@ for mail groups."
 				      (variable-item gnus-group-ham-exit-processor-ifile)
 				      (variable-item gnus-group-ham-exit-processor-stat)
 				      (variable-item gnus-group-ham-exit-processor-whitelist)
-				      (variable-item gnus-group-ham-exit-processor-BBDB))))
+				      (variable-item gnus-group-ham-exit-processor-BBDB)
+				      (variable-item gnus-group-ham-exit-processor-copy))))
    :parameter-document
    "Which spam processors will be applied to the spam or ham GROUP articles at summary exit.")
 

@@ -446,6 +446,7 @@ simple manner.")
 ;;; Internal variables
 
 (defvar gnus-group-is-exiting-p nil)
+(defvar gnus-group-is-exiting-without-update-p nil)
 (defvar gnus-group-sort-alist-function 'gnus-group-sort-flat
   "Function for sorting the group buffer.")
 
@@ -740,7 +741,7 @@ simple manner.")
 (defun gnus-topic-mode-p ()
   "Return non-nil in `gnus-topic-mode'."
   (and (boundp 'gnus-topic-mode) 
-       gnus-topic-mode))
+       (symbol-value 'gnus-topic-mode)))
 
 (defun gnus-group-make-menu-bar ()
   (gnus-turn-off-edit-menu 'group)
@@ -1917,6 +1918,8 @@ If the group is opened, just switch the summary buffer.
 If ALL is non-nil, already read articles become readable.
 If ALL is a number, fetch this number of articles."
   (interactive "P")
+  (when (and (eobp) (not (gnus-group-group-name)))
+    (forward-line -1))
   (gnus-group-read-group all t))
 
 (defun gnus-group-quick-select-group (&optional all)
