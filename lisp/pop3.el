@@ -124,7 +124,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (message (format "Retrieving message list...%d of %d unread" 
 		     message-count (pop messages)))
     (unwind-protect
-	(unless (stringp crashbox)
+	(unless (not (stringp crashbox))
 	  (while messages
 	    (message 
 	     (format "Retrieving message %d of %d (%d octets) from %s..."
