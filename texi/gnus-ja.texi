@@ -12463,6 +12463,15 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @code{nil} でないと、バックエンドに入って来た記事 (例えば、@code{Gcc} に
 よって) の @code{Message-ID} をメール重複発見ファイルに入れます。ディフォ
 ルトは @code{nil} です。
+
+@item nnmail-cache-ignore-groups
+@vindex nnmail-cache-ignore-groups
+正規表現か正規表現のリストです。正規表現にグループ名がマッチする
+と @code{Message-ID} キャッシュに記録されません。
+
+例えば特級分割 (@pxref{Fancy Mail Splitting}) を関
+数 @code{nnmail-split-fancy-with-parent} とともに使っている場合に役立つ
+でしょう。
 @end table
 
 @node Fancy Mail Splitting
@@ -12610,7 +12619,7 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 
 この機能を利用するためには、まず変
 数 @code{nnmail-treat-duplicates} と @code{nnmail-cache-accepted-message-ids} の
-値を非 nil に設定する必要があります。それができた
+値を非-nil に設定する必要があります。それができた
 ら @code{nnmail-split-fancy-with-parent} を使ってみてください。コロンを
 使ってこんな風に書きます:
 @lisp
@@ -12623,7 +12632,7 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 @end lisp
 
 この機能は実際、次の様に働いています: 変数
-@code{nnmail-treat-duplicates} の値が非 nil の場合、Gnus は見つけた全記
+@code{nnmail-treat-duplicates} の値が非-nil の場合、Gnus は見つけた全記
 事のメッセージ ID を 変数 @code{nnmail-message-id-cache-file} が指定する
 ファイルに記録します。このとき、それぞれの記事が存在するグループの名前を
 併記します (ただしメールの場合だけ、さもなければグループ名は調べません)。
@@ -12640,9 +12649,16 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 イルの大きさはだいたい 300 キロバイトぐらいになるみたいです)。
 @vindex nnmail-cache-accepted-message-ids
 さらに、変数 @code{nnmail-cache-accepted-message-ids} の値を
-非 @code{nil} に設定すれば、gnus は移動された記事のメッセージ ID をも記
+非-@code{nil} に設定すれば、gnus は移動された記事のメッセージ ID をも記
 録するので、フォローアップ記事は親記事の移動先と同じグループに入るように
 なります。
+
+あるグループをキャッシュに記録したくない場合は、変
+数 @code{nnmail-cache-ignore-groups} も参照して下さい。例えば、外に出す
+すべてのメッセージが `outgoing' グループで書かれているならば、
+@code{nnmail-cache-ignore-groups} をそのグループ名にマッチするように設定
+するのが良いです。さもないとあなたのすべてのメッセージに対する返事が、最
+後は `outgoing' グループに入ってしまうでしょう。
 
 @node Group Mail Splitting
 @subsection グループメール分割
@@ -14521,7 +14537,7 @@ nnimap はそれもサポートします。しかし、SSLeay の最新版である 0.9.x 
 @item nnimap-importantize-dormant
 @vindex nnimap-importantize-dormant
 
-非 nil だったら、他の @sc{imap} クライアントのために保留記事を印付きとし
+非-nil だったら、他の @sc{imap} クライアントのために保留記事を印付きとし
 ても印を付けます。gnus の内部では、保留記事は元々すでに印付きとしてのみ
 印が付けられています。これは、他の @sc{imap} クライアントにおける保留記
 事を、あたかも印付きのようにきわ立たせます。(別の言い方をすると、gnus は
