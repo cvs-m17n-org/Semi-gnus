@@ -1,3 +1,8 @@
+2003-04-03  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-get-message-numbers): Don't check uidls when
+	`pop3-leave-mail-on-server' is nil.
+
 2003-03-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.18 (quimby) revision 00.
