@@ -566,6 +566,7 @@ displayed by the first non-nil matching CONTENT face."
 
 ;;; Internal variables
 
+(defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
 (defvar gnus-article-current-summary nil)
 
@@ -1465,12 +1466,13 @@ function and want to see what the date was before converting."
   (let (deactivate-mark)
     (save-excursion
       (ignore-errors
-        (when (and (gnus-buffer-live-p gnus-article-buffer)
-		   (get-buffer-window gnus-article-buffer))
-          (set-buffer gnus-article-buffer)
-          (goto-char (point-min))
-          (when (re-search-forward "^X-Sent:" nil t)
-            (article-date-lapsed t)))))))
+	(walk-windows
+	 (lambda (w)
+	   (set-buffer (window-buffer w))
+	   (when (eq major-mode 'gnus-article-mode)
+	     (goto-char (point-min))
+	     (when (re-search-forward "^X-Sent:" nil t)
+	       (article-date-lapsed t)))))))))
 
 (defun gnus-start-date-timer (&optional n)
   "Start a timer to update the X-Sent header in the article buffers.
@@ -1895,8 +1897,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   "\C-c\C-i" gnus-info-find-node
   "\C-c\C-b" gnus-bug
 
-  gnus-mouse-2 'widget-button-click
-  
   "\C-d" gnus-article-read-summary-keys
   "\M-*" gnus-article-read-summary-keys
   "\M-#" gnus-article-read-summary-keys
@@ -1982,6 +1982,7 @@ commands:
 			 (substring name (match-end 0))))))
     (setq gnus-article-buffer name)
     (setq gnus-original-article-buffer original)
+    (setq gnus-article-mime-handle-alist nil)
     ;; This might be a variable local to the summary buffer.
     (unless gnus-single-article-buffer
       (save-excursion
@@ -2190,17 +2191,19 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 ;;; Gnus MIME viewing functions
 ;;;
 
-(defvar gnus-mime-button-line-format "%{%([%t%d%n]%)%}\n"
+(defvar gnus-mime-button-line-format "%{%([%p. %t%d%n]%)%}\n"
   "The following specs can be used:
 %t  The MIME type
 %n  The `name' parameter
 %d  The description, if any
-%l  The length of the encoded part")
+%l  The length of the encoded part
+%p  The part identifier")
 
 (defvar gnus-mime-button-line-format-alist
   '((?t gnus-tmp-type ?s)
     (?n gnus-tmp-name ?s)
     (?d gnus-tmp-description ?s)
+    (?p gnus-tmp-id ?s)
     (?l gnus-tmp-length ?d)))
 
 (defvar gnus-mime-button-map nil)
@@ -2214,6 +2217,13 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (define-key gnus-mime-button-map "c" 'gnus-mime-copy-part)
   (define-key gnus-mime-button-map "i" 'gnus-mime-inline-part)
   (define-key gnus-mime-button-map "|" 'gnus-mime-pipe-part))
+
+(defun gnus-mime-view-all-parts ()
+  "View all the MIME parts."
+  (interactive)
+  (let ((handles gnus-article-mime-handles))
+    (while handles
+      (mm-display-part (pop handles)))))
 
 (defun gnus-mime-save-part ()
   "Save the MIME part under point."
@@ -2257,6 +2267,21 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (mm-insert-inline data contents)
       (goto-char b))))
 
+(defun gnus-article-view-part (n)
+  "View MIME part N, which is the numerical prefix."
+  (interactive "p")
+  (save-current-buffer
+    (set-buffer gnus-article-buffer)
+    (when (> n (length gnus-article-mime-handle-alist))
+      (error "No such part"))
+    (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
+      (gnus-article-goto-part n)
+      (mm-display-part handle))))
+
+(defun gnus-article-goto-part (n)
+  "Go to MIME part N."
+  (goto-char (text-property-any (point-min) (point-max) 'gnus-part n)))
+
 (defun gnus-insert-mime-button (handle)
   (let ((gnus-tmp-name (mail-content-type-get (mm-handle-type handle) 'name))
 	(gnus-tmp-type (car (mm-handle-type handle)))
@@ -2264,7 +2289,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(gnus-tmp-length (save-excursion
 			   (set-buffer (mm-handle-buffer handle))
 			   (buffer-size)))
+	(gnus-tmp-id (1+ (length gnus-article-mime-handle-alist)))
 	b e)
+    (push (cons gnus-tmp-id handle) gnus-article-mime-handle-alist)
     (setq gnus-tmp-name
 	  (if gnus-tmp-name
 	      (concat " (" gnus-tmp-name ")")
@@ -2279,6 +2306,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
      `(local-map ,gnus-mime-button-map
 		 keymap ,gnus-mime-button-map
 		 gnus-callback mm-display-part
+		 gnus-part ,gnus-tmp-id
+		 gnus-type annotation
 		 gnus-data ,handle))
     (setq e (point))
     (widget-convert-button 'link from to :action 'gnus-widget-press-button
@@ -2300,7 +2329,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (let* ((handles (mm-dissect-buffer))
 	   handle name type b e)
       (mapcar 'mm-destroy-part gnus-article-mime-handles)
-      (setq gnus-article-mime-handles handles)
+      (setq gnus-article-mime-handles handles
+	    gnus-article-mime-handle-alist nil)
       (when handles
 	(goto-char (point-min))
 	(search-forward "\n\n" nil t)
@@ -2311,6 +2341,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (insert "\n\n")
 	      (when (and (mm-automatic-display-p
 			  (car (mm-handle-type handle)))
+			 (mm-inlinable-part-p (car (mm-handle-type handle)))
 			 (or (not (mm-handle-disposition handle))
 			     (equal (car (mm-handle-disposition handle))
 				    "inline")))
@@ -2338,6 +2369,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			 (car (mm-handle-type handle))))
 	 (point))
        `(local-map ,gnus-mime-button-map
+		   ,gnus-mouse-face-prop ,gnus-article-mouse-face
+		   face ,gnus-article-button-face
 		   keymap ,gnus-mime-button-map
 		   gnus-callback
 		   (lambda (handles)
@@ -2905,11 +2938,10 @@ groups."
 	  (setq gnus-original-article nil)))
       (set-window-configuration winconf)
       ;; Tippy-toe some to make sure that point remains where it was.
-      (let ((buf (current-buffer)))
+      (save-current-buffer
 	(set-buffer curbuf)
 	(set-window-start (get-buffer-window (current-buffer)) window-start)
-	(goto-char p)
-	(set-buffer buf)))))
+	(goto-char p)))))
 
 (defun gnus-article-edit-full-stops ()
   "Interactively repair spacing at end of sentences."

@@ -21,9 +21,14 @@ NEWS:
   Enable to get Multiple Pop server in POP and APOP using pop3-fma.el
   (pop3 For Multi Account).
 
+  And added many other features by "ELIPS"
+
 * TODO
 
-* T-gnus 6.8.17 is the last version Gnus 5.6 base.
-  After this , T-gnus 6.9 - this is based on pgnus.
+  See TODO.ja
 
-     T-gnus 6.9.0 - Based on pgnus-0.6
+* T-gnus 6.8.17 is the last version Gnus 5.6 base.
+  After this , T-gnus 6.10 - this is based on pgnus.
+
+  Latest T-gnus is T-gnus 6.10.023 (Based on pgnus-0.34).
+

@@ -1,3 +1,10 @@
+1998-10-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.023.
+	Add version information for SEMI-1.9/FLIM-1.10.
+
+	* Sync up with Pterodactyl Gnus 0.34.
+
 1998-10-10  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-message-make-user-agent): Fix typo in doc

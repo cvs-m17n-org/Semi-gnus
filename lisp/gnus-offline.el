@@ -177,6 +177,7 @@ If nil , use auto-dialup if required to connect the Internet."
   "*Hook to be run after the gnus-offline package has been loaded."
   :group 'gnus-offline
   :type 'hook)
+
 (defcustom gnus-offline-before-online-hook nil
   "*Hook to be run before all online jobs."
   :group 'gnus-offline

@@ -426,7 +426,7 @@
     (save-excursion
       (set-buffer (setq nnmbox-mbox-buffer
 			(nnheader-find-file-noselect
-			 nnmbox-mbox-file nil 'raw)))
+ 			 nnmbox-mbox-file nil t)))
       (buffer-disable-undo)))
   (when (not nnmbox-group-alist)
     (nnmail-activate 'nnmbox))
@@ -513,7 +513,7 @@
 	    start end number)
 	(set-buffer (setq nnmbox-mbox-buffer
 			  (nnheader-find-file-noselect
-			   nnmbox-mbox-file nil 'raw)))
+ 			   nnmbox-mbox-file nil t)))
  	(buffer-disable-undo)
 
 	;; Go through the group alist and compare against
