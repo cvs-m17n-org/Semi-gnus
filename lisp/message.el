@@ -6949,32 +6949,36 @@ contains some mail you have written which has been bounced back to
 you."
   (interactive)
   (let ((cur (current-buffer))
-	boundary)
+	mime-boundary boundary)
     (message-pop-to-buffer (message-buffer-name "bounce"))
     (insert-buffer-substring cur)
     (undo-boundary)
     (message-narrow-to-head)
     (if (and (message-fetch-field "MIME-Version")
-	     (setq boundary (message-fetch-field "Content-Type")))
-	(if (string-match "boundary=\"\\([^\"]+\\)\"" boundary)
-	    (setq boundary (concat (match-string 1 boundary) " *\n"
-				   "Content-Type: message/rfc822"))
-	  (setq boundary nil)))
+	     (setq mime-boundary (message-fetch-field "Content-Type")))
+	(if (string-match "boundary=\"\\([^\"]+\\)\"" mime-boundary)
+	    (setq mime-boundary (concat (regexp-quote
+					 (match-string 1 mime-boundary))
+					" *\nContent-Type: message/rfc822"))
+	  (setq mime-boundary nil)))
     (widen)
     (goto-char (point-min))
-    (search-forward "\n\n" nil t)
-    (if (or (and boundary
-		 (re-search-forward boundary nil t)
-		 (forward-line 2))
-	    (and (re-search-forward message-unsent-separator nil t)
+    (re-search-forward "\n\n+" nil t)
+    (setq boundary (point))
+    ;; We remove everything before the bounced mail.
+    (if (or (and mime-boundary
+		 (re-search-forward mime-boundary nil t)
 		 (forward-line 1))
-	    (re-search-forward "^Return-Path:.*\n" nil t))
-	;; We remove everything before the bounced mail.
-	(delete-region
-	 (point-min)
-	 (if (re-search-forward "^[^ \n\t]+:" nil t)
-	     (match-beginning 0)
-	   (point)))
+	    (re-search-forward message-unsent-separator nil t)
+	    (progn
+	      (search-forward "\n\n" nil 'move)
+	      (re-search-backward "^Return-Path:.*\n" boundary t)))
+	(progn
+	  (forward-line 1)
+	  (delete-region (point-min)
+			 (if (re-search-forward "^[^ \n\t]+:" nil t)
+			     (match-beginning 0)
+			   (point))))
       (when (re-search-backward "^.?From .*\n" nil t)
 	(delete-region (match-beginning 0) (match-end 0))))
     (save-restriction
