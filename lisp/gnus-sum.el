@@ -3282,7 +3282,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
     (mapcar
      (lambda (relation)
        (when (gnus-dependencies-add-header
-	      (make-full-mail-header
+	      (make-full-mail-header-from-decoded-header
 	       gnus-reffed-article-number
 	       (nth 3 relation) "" (or (nth 4 relation) "")
 	       (nth 1 relation)
