@@ -1,3 +1,23 @@
+1999-03-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.9 released.
+
+	* lisp/gnus.el (gnus-version-number): Up date to 6.12.9.
+
+	* Nana-TIPS.ja (none): Update.
+
+	* lisp/message.el (message-mime-charset-recover-by-ask): Use
+	`message-highlight-illegal-chars'.
+	(message-illegal-charset-face): New face.
+	(message-warning-charset-face): New face.
+	(message-highlight-illegal-chars): New function.
+	(message-set-charsets-face): New function.
+
+	* lisp/gnus-sum.el (gnus-simplify-subject-fuzzy): Enable group
+	parameters; `gnus-simplify-subject-fuzzy-regexp' and
+	`gnus-simplify-ignored-prefixes'.
+
+
 1999-03-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.8 released.
@@ -33,6 +53,7 @@
 	(message-mime-setup): Set buffer file coding system. Make local
 	hook `after-save-hook'.
 
+
 1999-03-01  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.7 released.
@@ -51,6 +72,7 @@
 	(nnspool-retrieve-headers-with-nov): Ditto.
 	(nnspool-find-file): Ditto.
 
+
 1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-locale-detect): Fix, when no locale
@@ -210,6 +232,7 @@
 	(nnheader-nov-field): New implementation.
 	(nnheader-nov-next-field): New macro.
 
+
 1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.5 released.
@@ -222,6 +245,7 @@
 	(nnheader-find-file-noselect): Use
 	`find-file-noselect-raw-text-CRLF'.
 
+
 1999-02-24  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.4 released.
@@ -233,6 +257,7 @@
 
 	* lisp/message.el (message-locale-detect): Fix, save restriction.
 
+
 1999-02-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.3 released.
@@ -264,6 +289,7 @@
 	(message-mime-charset-recover-ask-charset): Ditto.
 	(message-mime-charset-setup): Ditto.
 
+
 1999-02-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.2 released.

@@ -3,6 +3,12 @@
 この文書では、 Semi-gnus との違いおよび、使用する上で注意する必要のあ
 る項目を説明しています。
 
+====================================================================
+APEL は 9.13 以上のもの   (最新のものを推奨します。)
+FLIM は 1.12.4 以上のもの (1.13 系列の最新のものを推奨します。)
+SEMI は 1.12.1 以上のもの (1.13 系列の最新のものを推奨します。)
+が必要です。
+====================================================================
 ---
 message-syntax-checks
 message-default-encoding (Default: "7bit")
@@ -37,10 +43,6 @@ message-header-hook の内容を変更している方は、注意が必要です。
 X-PGP-Sig パッケージを使用しており、 message-header-hook に
 x-pgp-sig-sign を設定されている方は、 設定先を
 message-header-encoded-hook に移動してください。
-
----
-apel は 9.12 以降のもの、 FLIM は 1.12.2 以降のもの SEMI は 1.12.0 以降
-のものが必要です。
 
 -- 
 BBDB を使用されている方は、 bbdb-gnus.elc を Semi-gnus 6.8.X 以前のも
@@ -182,9 +184,9 @@ iso-2022-jp-2 はまずいんじゃないのという方は次のようにしてください。
 (modify-alist '((fj . (us-ascii iso-2022-jp)))
            message-locale-mime-charsets-alist)
 
-一つのメッセージ中に複数の送信先が存在し、複数の locale がしていされて
-いる場合には、すべての locale に共通の MIME charset のみが使用可能と見
-なします。
+一つのメッセージ中に複数の送信先が存在し、複数の locale が指定されてい
+る場合には、すべての locale に共通の MIME charset のみが使用可能と見な
+します。
 
 ---
 message-mime-charset-recover-*
@@ -197,7 +199,8 @@ message-mime-charset-recover-function (Default: 下記参照)
 
 message-mime-charset-recover-by-ask() (Default)
 
-Decode 対象の範囲に narrowing した buffer を表示し、
+Decode 対象の範囲に narrowing し、許可された MIME charset では表現でき
+ない文字を highlight した buffer を表示し、
 message-mime-charset-recover-ask-function に設定された関数を呼び出しま
 す。実際の recover 処理は呼び出される関数で定義します。このための関数
 としては、次のものが定義済です。
