@@ -48,6 +48,7 @@
     (require 'mail-abbrevs)
   (require 'mailabbrev))
 (require 'mime-edit)
+(eval-when-compile (require 'static))
 
 ;; Avoid byte-compile warnings.
 (eval-when-compile
@@ -1046,6 +1047,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defvar message-draft-coding-system
   (cond
+   ((boundp 'MULE) '*junet*)
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule) 'emacs-mule)
    ((find-coding-system 'escape-quoted) 'escape-quoted)
@@ -3098,6 +3100,7 @@ This sub function is for exclusive use of `message-send-news'."
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
 	(coding-system-for-write 'raw-text)
+	(output-coding-system 'raw-text)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
@@ -3881,7 +3884,9 @@ Headers already prepared in the buffer are not modified."
 					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)
-    (setq buffer-file-coding-system message-draft-coding-system)))
+    (static-if (boundp 'MULE)
+	(set-file-coding-system message-draft-coding-system)
+      (setq buffer-file-coding-system message-draft-coding-system))))
 
 (defun message-disassociate-draft ()
   "Disassociate the message buffer from the drafts directory."
