@@ -1,3 +1,7 @@
+2000-11-17  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnheader.el (nnheader-header-value): Save point.
+
 2000-11-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* texi/gnus-ja.texi (Drafts): Fix typo.
