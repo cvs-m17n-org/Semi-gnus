@@ -1,3 +1,9 @@
+1999-12-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 14.
+
+	* lisp/dgnushack.el (mapcon): Bind the 1st arg `fn' as a temp var.
+
 1999-12-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/pop3.el (pop3-ssl-program-arguments): Add "s_client".
