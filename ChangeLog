@@ -1,5 +1,7 @@
 2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
 	* configure: Regenerate.
 	* configure.in: Add `AC_PATH_ETCDIR'.
 	* Makefile.in (install-etc): New target.
