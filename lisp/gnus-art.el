@@ -257,7 +257,7 @@ asynchronously.	 The compressed face will be piped to this command."
 (defcustom gnus-article-banner-alist nil
   "Banner alist for stripping.
 For example,
-     ((egroups . \"^[ \\t\\n]*-------------------+\\\\( eGroups Sponsor -+\\\\)?....\\n\\\\(.+\\n\\\\)+\"))"
+     ((egroups . \"^[ \\t\\n]*-------------------+\\\\( \\\\(e\\\\|Yahoo! \\\\)Groups Sponsor -+\\\\)?....\\n\\\\(.+\\n\\\\)+\"))"
   :version "21.1"
   :type '(repeat (cons symbol regexp))
   :group 'gnus-article-washing)
@@ -2861,7 +2861,8 @@ The directory to save in defaults to `gnus-article-save-directory'."
 	(cond ((and (eq command 'default)
 		    gnus-last-shell-command)
 	       gnus-last-shell-command)
-	      (command command)
+	      ((stringp command)
+	       command)
 	      (t (read-string
 		  (format
 		   "Shell command on %s: "
@@ -2872,7 +2873,9 @@ The directory to save in defaults to `gnus-article-save-directory'."
 		     "this article"))
 		  gnus-last-shell-command))))
   (when (string-equal command "")
-    (setq command gnus-last-shell-command))
+    (if gnus-last-shell-command
+	(setq command gnus-last-shell-command)
+      (error "A command is required.")))
   (gnus-eval-in-buffer-window gnus-article-buffer
     (save-restriction
       (widen)
