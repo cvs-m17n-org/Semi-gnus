@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.3 1999-08-25 14:29:18 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.4 1999-08-27 16:56:16 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -194,7 +194,7 @@ If mail , gnus-offline only fetch mail articles.
   :type 'function)
 
 (defcustom gnus-offline-agent-automatic-expire t
-  "*Non-nil means expire articles pn every session."
+  "*Non-nil means expire articles on every session."
   :group 'gnus-offline
   :type 'boolean)
 
