@@ -3402,7 +3402,8 @@ Gnus $B$OJQ?t(B @code{gnus-extract-address-components} $B$NCM$r(B @code{From
 @item N
 $B5-;v?t!#(B
 @item S
-$BI=Bj$NJ8;zNs!#(B
+$BI=Bj$NJ8;zNs!#(B@code{gnus-list-identifiers} $B$N@_Dj$K$h$C$F%a!<%j%s%0%j%9%H(B
+$B$NI8<1$,:o=|$5$l$^$9!#(B(@xref{Article Hiding})$B!#(B
 @item s
 $B%9%l%C%I(B (thread) $B$N4p5-;v$G$"$k$H$-$+D>A0$N5-;v$,0c$&I=Bj$N$H$-$O$=$NBj(B
 $BL>$G!"$=$l0J30$O(B @code{gnus-summary-same-subject}$B!#(B
@@ -5108,6 +5109,19 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B$3$N?t;z$OItJ,%9%l%C%I$,$I$l$/$i$$;z2<$2(B (indent) $B$5$l$k$Y$-$+$r7h$a$^$9!#(B
 $B%G%#%U%)%k%H$O(B 4 $B$G$9!#(B
 
+@item gnus-sort-gathered-threads-function
+@vindex gnus-sort-gathered-threads-function
+@c TRANSLATEME
+Sometimes, particularly with mailing lists, the order in which mails
+arrive locally is not necessarily the same as the order in which they
+arrived on the mailing list. Consequently, when sorting sub-threads
+using the default @code{gnus-thread-sort-by-number}, responses can end
+up appearing before the article to which they are responding to. Setting
+this variable to an alternate value
+(e.g. @code{gnus-thread-sort-by-date}), in a group's parameters or in an
+appropriate hook (e.g. @code{gnus-summary-generate-hook}) can produce a
+more logical sub-thread ordering in such instances.
+
 @end table
 
 
@@ -6450,6 +6464,25 @@ Headers}.
 $B=pL>$r1#$7$^$9(B (@code{gnus-article-hide-signature})$B!#(B @xref{Article
 Signature}.
 
+@item W W l
+@kindex W W l (Summary)
+@findex gnus-article-hide-list-identifiers
+@vindex gnus-list-identifiers
+@c TRANSLATEME
+Hide list identifiers specified in @code{gnus-list-identifiers}. Theese
+are strings some list servers add to the beginning of all @code{Subject}
+headers---for example, @samp{[zebra 4711]}.
+
+@table @code
+
+@item gnus-list-identifiers
+@vindex gnus-list-identifiers
+@c TRANSLATEME
+A regular expression that matches list identifiers to be removed from
+subject. This can also be a list of regular expressions.
+
+@end table
+
 @item W W p
 @kindex W W p $B!J35N,!K(B
 @findex gnus-article-hide-pgp
@@ -6647,7 +6680,7 @@ Highlighting} $B$b;2>H$7$F$/$@$5$$!#(B
 
 @item W C
 @kindex W C ($B35N,(B)
-@findex gnus-article-capitalize-sentense
+@findex gnus-article-capitalize-sentences
 $B$=$l$>$l$NJ,$N:G=i$N8l$rBgJ8;z$K$7$^$9(B
 (@code{gnus-article-capitalize-sentences})$B!#(B
 
@@ -8142,6 +8175,10 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B@_Dj$7$^$9!#0J2<$O@_Dj$G$-$kJQ?t$N0lMw$G$9$,!"$^$:$3$l$i$NJQ?t$N<h$jF@$k(B
 $BCM$r5DO@$7$^$9!#(B
 
+@c TRANSLATEME
+Note: Some values, while valid, make little sense.  Check the list below
+for sensible values.
+
 @enumerate
 @item
 @code{nil}: $B$3$N07$$$r$7$^$;$s!#(B
@@ -8195,8 +8232,11 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 $B0J2<$N07$$$N%*%W%7%g%s$,;HMQ2DG=$G$9!#$3$l$r%+%9%?%^%$%:$9$k$?$a$N:G$b4J(B
 $BC1$JJ}K!$O(B @code{gnus-article-treat} $B%+%9%?%^%$%:%0%k!<%W$rD4::$9$k$3$H(B
-$B$G$9!#(BValues in brackets are suggested sensible values. Others are possible
+$B$G$9!#(B
+@c TRANSLATEME
+Values in brackets are suggested sensible values. Others are possible
 but those listed are probably sufficient for most people.
+
 
 @table @code
 @item gnus-treat-highlight-signature (t, last)
@@ -9617,6 +9657,8 @@ W3 $B$NG[I[$+$i(B) $B$,I,MW$K$J$j$^$9(B)$B!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5
 * Mail Sources::                 Gnus $B$K$I$3$+$i%a!<%k$r<h$C$F$/$k$+$rCN$i$;$k!#(B
 * Mail Backend Variables::       $B%a!<%k$N07$$$r%+%9%?%^%$%:$9$k$?$a$NJQ?t!#(B
 * Fancy Mail Splitting::         Gnus $B$OF~$C$FMh$?%a!<%k$NLS$N$h$&$JJ,N%$r$9$k$3$H$,$G$-$k!#(B
+@c TRANSLATEME
+* Group Mail Splitting::         Use group customize to drive mail splitting.
 * Incorporating Old Mail::       $B$"$J$?$,;}$C$F$$$k8E$$%a!<%k$r$I$&$9$k$+(B?
 * Expiring Mail::                $BM_$7$/$J$$%a!<%k$r<h$j=|$/!#(B
 * Washing Mail::                 $B<hF@$7$?%a!<%k$+$i7y$J$b$N$r<h$j=|$/!#(B
@@ -10265,6 +10307,133 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $B$+$i(B 9 $B$^$G$G9gCW$7$?J8;zJ8$GBeBX$5$l$^$9!#(B
 
 
+@node Group Mail Splitting
+@c TRANSLATEME
+@subsection Group Mail Splitting
+@cindex mail splitting
+@cindex group mail splitting
+
+@findex gnus-group-split
+@c TRANSLATEME
+If you subscribe to dozens of mailing lists but you don't want to
+maintain mail splitting rules manually, group mail splitting is for you.
+You just have to set @var{to-list} and/or @var{to-address} in group
+parameters or group customization and set @code{nnmail-split-methods} to
+@code{gnus-group-split}.  This splitting function will scan all groups
+for those parameters and split mail accordingly, i.e., messages posted
+from or to the addresses specified in the parameters @var{to-list} or
+@var{to-address} of a mail group will be stored in that group.
+
+Sometimes, mailing lists have multiple addresses, and you may want mail
+splitting to recognize them all: just set the @var{extra-aliases} group
+parameter to the list of additional addresses and it's done.  If you'd
+rather use a regular expression, set @var{split-regexp}.
+
+All these parameters in a group will be used to create an
+@code{nnmail-split-fancy} split, in which the @var{FIELD} is @samp{any},
+the @var{VALUE} is a single regular expression that matches
+@var{to-list}, @var{to-address}, all of @var{extra-aliases} and all
+matches of @var{split-regexp}, and the @var{SPLIT} is the name of the
+group.  @var{RESTRICT}s are also supported: just set the
+@var{split-exclude} parameter to a list of regular expressions.
+
+If you can't get the right split to be generated using all these
+parameters, or you just need something fancier, you can set the
+parameter @var{split-spec} to an @code{nnmail-split-fancy} split.  In
+this case, all other aforementioned parameters will be ignored by
+@code{gnus-group-split}.  In particular, @var{split-spec} may be set to
+@code{nil}, in which case the group will be ignored by
+@code{gnus-group-split}.
+
+@vindex gnus-group-split-default-catch-all-group
+@code{gnus-group-split} will do cross-posting on all groups that match,
+by defining a single @code{&} fancy split containing one split for each
+group.  If a message doesn't match any split, it will be stored in the
+group named in @code{gnus-group-split-default-catch-all-group}, unless
+some group has @var{split-spec} set to @code{catch-all}, in which case
+that group is used as the catch-all group.  Note that, in this case,
+there's no cross-posting, as a @code{|} fancy split encloses the
+@code{&} split and the catch-all group.
+
+It's time for an example.  Assume the following group parameters have
+been defined:
+
+@example
+nnml:mail.bar:
+((to-address . "bar@@femail.com")
+ (split-regexp . ".*@@femail\\.com"))
+nnml:mail.foo:
+((to-list . "foo@@nowhere.gov")
+ (extra-aliases "foo@@localhost" "foo-redist@@home")
+ (split-exclude "bugs-foo" "rambling-foo")
+ (admin-address . "foo-request@@nowhere.gov"))
+nnml:mail.others:
+((split-spec . catch-all))
+@end example
+
+Setting @code{nnmail-split-methods} to @code{gnus-group-split} will
+behave as if @code{nnmail-split-fancy} had been selected and variable
+@code{nnmail-split-fancy} had been set as follows:
+
+@lisp
+(| (& (any "\\(bar@@femail\\.com\\|.*@@femail\\.com\\)" "mail.bar")
+      (any "\\(foo@@nowhere\\.gov\\|foo@@localhost\\|foo-redist@@home\\)"
+           - "bugs-foo" - "rambling-foo" "mail.foo"))
+   "mail.others")
+@end lisp
+
+@findex gnus-group-split-fancy
+If you'd rather not use group splitting for all your mail groups, you
+may use it for only some of them, by using @code{nnmail-split-fancy}
+splits like this:
+
+@lisp
+(: gnus-mlsplt-fancy GROUPS NO-CROSSPOST CATCH-ALL)
+@end lisp
+
+@var{GROUPS} may be a regular expression or a list of group names whose
+parameters will be scanned to generate the output split.
+@var{NO-CROSSPOST} can be used to disable cross-posting; in this case, a
+single @code{|} split will be output.  @var{CATCH-ALL} may be the name
+of a group to be used as the default catch-all group.  If
+@var{CATCH-ALL} is @code{nil}, or if @var{SPLIT-REGEXP} matches the
+empty string in any selected group, no catch-all split will be issued.
+Otherwise, if some group has @var{SPLIT-SPEC} set to @code{catch-all},
+this group will override the value of the @var{CATCH-ALL} argument.
+
+@findex gnus-group-split-setup
+Unfortunately, scanning all groups and their parameters can be quite
+slow, especially considering that it has to be done for every message.
+But don't despair!  The function @code{gnus-group-split-setup} can be
+used to select @code{gnus-group-split} in a much more efficient way.  It
+sets @code{nnmail-split-methods} to @code{nnmail-split-fancy} and sets
+@code{nnmail-split-fancy} to the split produced by
+@code{gnus-group-split-fancy}.  Thus, the group parameters are only
+scanned once, no matter how many messages are split.
+
+@findex gnus-group-split-update
+However, if you change group parameters, you have to update
+@code{nnmail-split-fancy} manually.  You can do it by running
+@code{gnus-group-split-update}.  If you'd rather have it updated
+automatically, just tell @code{gnus-group-split-setup} to do it for
+you.  For example, add to your @file{.gnus}:
+
+@lisp
+(gnus-group-split-setup AUTO-UPDATE CATCH-ALL)
+@end lisp
+
+If @var{AUTO-UPDATE} is non-@code{nil}, @code{gnus-group-split-update}
+will be added to @code{nnmail-pre-get-new-mail-hook}, so you won't ever
+have to worry about updating @code{nnmail-split-fancy} again.  If you
+don't omit @var{CATCH-ALL} (it's optional),
+@code{gnus-group-split-default-catch-all-group} will be set to its
+value.
+
+@vindex gnus-group-split-updated-hook
+Because you may want to change @code{nnmail-split-fancy} after it is set
+by @code{gnus-group-split-update}, this function will run
+@code{gnus-group-split-updated-hook} just before finishing.
+
 @node Incorporating Old Mail
 @subsection $B8E$$%a!<%k$r<h$j9~$`(B
 
@@ -10496,6 +10665,10 @@ Gnus $B$O5-;v$rI=<($9$k$H$-$K$=$l$r@vBu$9$k$?$a$K2aEY$N4X?t$rDs6!$7$F$$$^(B
 (setq nnmail-list-identifiers
       '("(idm)" "nagnagnag"))
 @end lisp
+
+@c TRANSLATEME
+This can also be done non-destructively with
+@code{gnus-list-identifiers}, @xref{Article Hiding}.
 
 @item nnmail-remove-tabs
 @findex nnmail-remove-tabs
