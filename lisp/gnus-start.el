@@ -354,7 +354,7 @@ This hook is called as the first thing when Gnus is started."
   :group 'gnus-start
   :type 'hook)
 
-(defcustom gnus-setup-news-hook '(gnus-compile)
+(defcustom gnus-setup-news-hook nil
   "A hook after reading the .newsrc file, but before generating the buffer."
   :group 'gnus-start
   :type 'hook)
@@ -914,12 +914,7 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
     (when (and init gnus-slave)
       (gnus-dribble-clear))
 
-    (gnus-update-format-specifications nil
-				       'article-mode
-				       'group
-				       'group-mode
-				       'summary
-				       'summary-mode)
+    (gnus-update-format-specifications)
 
     ;; See whether we need to read the description file.
     (when (and (boundp 'gnus-group-line-format)
