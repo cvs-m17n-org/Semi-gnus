@@ -2672,7 +2672,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @item G R
 @kindex G R ($B%0%k!<%W(B)
 @findex gnus-group-make-rss-group
-@acronym{RSS} $B$N>pJs6!5k$K4p$E$/%0%k!<%W$r:n$j$^(B
+@acronym{RSS} feed $B$K4p$E$/%0%k!<%W$r:n$j$^(B
 $B$9(B (@code{gnus-group-make-rss-group})$B!#(BURL $B$NF~NO$rB%$5$l$^$9!#(B
 @xref{RSS}.
 
@@ -14933,22 +14933,21 @@ http://w3m.sourceforge.net/
 @cindex nnrss
 @cindex RSS
 
-@c TRANSLATEME!
-Some web sites have an RDF Site Summary (@acronym{RSS}).
-@acronym{RSS} is a format for summarizing headlines from news related
-sites (such as BBC or CNN).  But basically anything list-like can be
-presented as an @acronym{RSS} feed: weblogs, changelogs or recent
-changes to a wiki (e.g. @url{http://cliki.net/recent-changes.rdf}).
+$B$$$/$D$+$N%5%$%H$O(B RDF site summary (@acronym{RSS}) $B$r;}$C$F$$$^$9!#(B
+@acronym{RSS} $B$O!"%K%e!<%9$K4XO"$9$k%5%$%H(B (BBC $B$d(B CNN $B$N$h$&$J(B) $B$N<gMW(B
+$B9`L\$rMWLs$9$k$?$a$N%U%)!<%^%C%H$G$9!#$7$+$74pK\E*$K!"%j%9%H$N$h$&$J$b$N(B
+$B$J$i2?$G$b!"(B@acronym{RSS} feed $B$H$7$FDs6!$9$k$3$H$,$G$-$^(B
+$B$9(B: weblogs$B!"(Bchangelogs $B$"$k$$$O(B wiki ($BNc$((B
+$B$P(B @url{http://cliki.net/recent-changes.rdf}) $B$X$N:G6a$NJQ99!#(B
 
-@acronym{RSS} has a quite regular and nice interface, and it's
-possible to get the information Gnus needs to keep groups updated.
+@acronym{RSS} $B$O$H$F$b5,B'E*$+$DNI<A$J%$%s%?!<%U%'!<%9$G!"(Bgnus $B$,%0%k!<(B
+$B%W$r>o$K?7$7$/$7$F$*$/$?$a$N>pJs$rF@$k$3$H$,$G$-$^$9!#(B
 
-Use @kbd{G R} from the summary buffer to subscribe to a feed---you
-will be prompted for the location of the feed.
+Feed $B$r9VFI$9$k$K$O!"35N,%P%C%U%!$+$i(B @kbd{G R} $B$r;H$C$F2<$5$$(B---feed $B$N(B
+$B=j:_$NF~NO$r5a$a$i$l$k$G$7$g$&!#(B
 
-An easy way to get started with @code{nnrss} is to say something like
-the following in the group buffer: @kbd{B nnrss RET y}, then
-subscribe to groups.
+$B4JC1$K(B @code{nnrss} $B$r$O$8$a$kJ}K!$O!"%0%k!<%W%P%C%U%!$G(B @kbd{B nnrss
+RET y} $B$N$h$&$J$3$H$r>'$(!"$=$7$F%0%k!<%W$r9VFI$9$k$3$H$G$9!#(B
 
 $B0J2<$N(B @code{nnrss} $BJQ?t$,JQ992DG=$G$9(B:
 
@@ -14958,14 +14957,13 @@ subscribe to groups.
 @code{nnrss} $B$,%U%!%$%k$r=q$-9~$`%G%#%l%/%H%j!<$G!"%G%#%U%)%k%H(B
 $B$O(B @file{~/News/rss/} $B$G$9!#(B
 
-@c TRANSLATEME!
 @item nnrss-use-local
 @vindex nnrss-use-local
 @findex nnrss-generate-download-script
-If you set @code{nnrss-use-local} to @code{t}, @code{nnrss} will read
-the feeds from local files in @code{nnrss-directory}.  You can use
-the command @code{nnrss-generate-download-script} to generate a
-download script using @command{wget}.
+@code{nnrss-use-local} $B$r(B @code{t} $B$K@_Dj$9$k$H!"(B
+@code{nnrss} $B$O(B @code{nnrss-directory} $B$K$"$k%m!<%+%k%U%!%$%k$+$i(B feed
+$B$rFI$_$^$9!#(B@code{nnrss-generate-download-script}$B%3%^%s%I$r;H$&$3$H$K$h$C(B
+$B$F!"(B@command{wget} $B$r;H$C$?%@%&%s%m!<%I!&%9%/%j%W%H$r:n$k$3$H$,$G$-$^$9!#(B
 @end table
 
 $B35N,%P%C%U%!$K@bL@$rI=<($5$;$?$$$J$i$P!"0J2<$N%3!<%I$,Lr$KN)$D$G$7$g$&!#(B
