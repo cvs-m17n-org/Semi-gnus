@@ -611,14 +611,18 @@ function is generally only called when Gnus is shutting down."
 		       (car-safe (imap-search
 				  (format "HEADER Message-Id %s" article)
 				  nnimap-server-buffer))
-		     article)))
+		     article))
+	  fetch-data)
       (when article
 	(gnus-message 9 "nnimap: Fetching (part of) article %d..." article)
 	(if (not nnheader-callback-function)
 	    (with-current-buffer (or to-buffer nntp-server-buffer)
 	      (erase-buffer)
-	      (insert (nnimap-demule (imap-fetch article part prop nil
-						 nnimap-server-buffer)))
+	      (setq fetch-data (imap-fetch article part
+					   prop nil nnimap-server-buffer))
+	      (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
+		  (insert (nth 2 (car fetch-data)))
+		(insert fetch-data))
 	      (nnheader-ms-strip-cr)
 	      (gnus-message 9 "nnimap: Fetching (part of) article %d...done"
 			    article)
@@ -636,16 +640,22 @@ function is generally only called when Gnus is shutting down."
   t)
 
 (deffoo nnimap-request-article (article &optional group server to-buffer)
-  (nnimap-request-article-part
-   article "RFC822.PEEK" 'RFC822 group server to-buffer))
+  (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
+      (nnimap-request-article-part
+       article "BODY.PEEK[]" 'BODYDETAIL group server to-buffer)
+    (nnimap-request-article-part
+     article "RFC822.PEEK" 'RFC822 group server to-buffer)))
 
 (deffoo nnimap-request-head (article &optional group server to-buffer)
   (nnimap-request-article-part
    article "RFC822.HEADER" 'RFC822.HEADER group server to-buffer))
 
 (deffoo nnimap-request-body (article &optional group server to-buffer)
-  (nnimap-request-article-part
-   article "RFC822.TEXT.PEEK" 'RFC822.TEXT group server to-buffer))
+  (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
+      (nnimap-request-article-part
+       article "BODY.PEEK[TEXT]" 'BODYDETAIL group server to-buffer)
+    (nnimap-request-article-part
+     article "RFC822.TEXT.PEEK" 'RFC822.TEXT group server to-buffer)))
 
 (deffoo nnimap-request-group (group &optional server fast)
   (nnimap-request-update-info-internal
