@@ -338,7 +338,18 @@ Return the response string if optional second argument RETURN is non-nil."
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
-	    (insert From_))))))
+	    (insert From_)
+	    (if (search-forward "\n\n" nil t)
+		nil
+	      (goto-char (point-max))
+	      (insert "\n"))
+	    (narrow-to-region (point) (point-max))
+	    (let ((size (- (point-max) (point-min))))
+	      (goto-char (point-min))
+	      (widen)
+	      (forward-line -1)
+	      (insert (format "Content-Length: %s\n" size)))
+	    )))))
 
 ;; UIDL support
 
