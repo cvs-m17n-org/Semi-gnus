@@ -1583,6 +1583,7 @@ no, only reply back to the author."
   (autoload 'gnus-group-name-decode "gnus-group")
   (autoload 'gnus-groups-from-server "gnus")
   (autoload 'rmail-output "rmailout")
+  (autoload 'gnus-delay-article "gnus-delay")
   (autoload 'mu-cite-original "mu-cite"))
 
 
