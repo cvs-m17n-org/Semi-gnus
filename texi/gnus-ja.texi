@@ -15640,10 +15640,10 @@ ACL は Access Control List (使用制限一覧) の略です。@acronym{I
 (setq imap-log t)
 @end lisp
 
-これは @code{imap.el} パッケージに、サーバーに送られるものとすべての受け
-取るものをダンプさせます。その出力は @samp{*imap-log*} というバッファに
-格納されます。ときに @code{BAD} という札が付けられる、エラーメッセージを
-探して下さい。
+これは @code{imap.el} パッケージに、サーバーに送られるすべてのものと、す
+べての受け取るものをダンプさせます。その出力は @samp{*imap-log*} という
+バッファに格納されます。ときに @code{BAD} という札が付けられる、エラーメッ
+セージを探して下さい。
 
 @node Other Sources
 @section その他のグループ源
