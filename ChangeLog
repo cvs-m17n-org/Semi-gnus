@@ -1,3 +1,32 @@
+1999-07-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* texi/Makefile.in (prefix): Define it first.
+
+	* lisp/dgnuspath.el.in: Rename from paths.el.
+
+	* lisp/dgnushack.el (dgnushack-install-package): Don't install
+	dgnuspath.el nor dgnuspath.elc.
+	(dgnushack-make-package): Don't enter dgnuspath.el nor
+	dgnuspath.elc to MANIFEST file.
+	(dgnushack-compile): Don't compile dgnuspath.el.
+	(TopLevel): Use `expand-file-name' for the file "./dgnuspath.el";
+	use dgnuspath.el instead of paths.el.
+
+	* lisp/Makefile.in (PACKAGEDIR): Default to @PACKAGEDIR@.
+
+	* configure.in (AC_OUTPUT): Use dgnuspath.el instead of paths.el.
+	(TopLevel): Add options `--with-xemacs' and `--with-packagedir'.
+	(ADDITIONAL_LOAD_PATH): Default to empty string.
+
+	* configure: Regenerate.
+
+	* README.T-gnus: Update for the new features.
+
+	* Makefile.in (PACKAGEDIR): Default to @PACKAGEDIR@.
+	(XEMACS): Default to @XEMACS@.
+
 1999-07-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
