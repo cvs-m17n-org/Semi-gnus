@@ -456,11 +456,6 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (mail-encode-encoded-word-buffer))
-    (message-encode-message-body))
   (let ((func (car (or gnus-command-method
 		       (gnus-find-method-for-group group)))))
     (funcall (intern (format "%s-request-accept-article" func))
@@ -469,11 +464,6 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	     last)))
 
 (defun gnus-request-replace-article (article group buffer &optional no-encode)
-  (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (mail-encode-encoded-word-buffer))
-    (message-encode-message-body))
   (let ((func (car (gnus-group-name-to-method group))))
     (funcall (intern (format "%s-request-replace-article" func))
 	     article (gnus-group-real-name group) buffer)))
