@@ -1,3 +1,8 @@
+2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Setup MIME
+	entity even if `gnus-show-mime' is nil.
+
 2001-03-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Check if
