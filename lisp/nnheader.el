@@ -1362,7 +1362,7 @@ given, the return value will not contain the last newline."
       (unless (eobp)
 	(while (and (memq (char-after) '(?\t ?\ ))
 		    (zerop (forward-line -1))))
-	(when (looking-at ".+:[\t\n ]+")
+	(when (looking-at "[^\t\n ]+:[\t\n ]+")
 	  (goto-char (setq start (match-end 0)))
 	  (forward-line 1)
 	  (while (and (memq (char-after) '(?\t ?\ ))
