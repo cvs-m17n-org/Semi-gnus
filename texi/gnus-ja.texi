@@ -2947,10 +2947,24 @@ Sieve の @samp{IF} 制御構造体が作られます。
 Commands}) ときに、以下の Sieve コードが作られます:
 
 @example
-if address \"sender\" \"sieve-admin@@extundo.com\" @{
-        fileinto \"INBOX.list.sieve\";
+if address "sender" "sieve-admin@@extundo.com" @{
+        fileinto "INBOX.list.sieve";
 @}
 @end example
+
+複数の電子メールアドレスのためのテストを生成するには、@code{(sieve
+address "sender" ("name@@one.org" else@@two.org"))} のようなグループパラ
+メータを使って下さい。Sieve スクリプト (@pxref{Sieve Commands}) を生成す
+ると、以下のような Sieve コードが作られます:
+
+@example
+if address "sender" ["name@@one.org", "else@@two.org"] @{
+        fileinto "INBOX.list.sieve";
+@}
+@end example
+
+Sieve パラメータに関連する重要なコマンドと変数については、@pxref{Sieve
+Commands} を参照して下さい。
 
 Sieve 言語は RFC 3028 で述べられていま
 す (@pxref{Top, Emacs Sieve, Top, sieve, Emacs Sieve})。
