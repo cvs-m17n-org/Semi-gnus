@@ -200,12 +200,10 @@ This is relative to `smtpmail-queue-dir'.")
 	  ;;
 	  ;;
 	  ;;
-	  (setq smtp-address-buffer (generate-new-buffer "*smtp-mail*"))
 	  (setq smtp-recipient-address-list
 		(or resend-to-addresses
 		    (smtp-deduce-address-list tembuf (point-min) delimline)))
-	  (kill-buffer smtp-address-buffer)
-	  
+
 	  (smtp-do-bcc delimline)
 	  ; Send or queue
 	  (if (not smtpmail-queue-mail)
