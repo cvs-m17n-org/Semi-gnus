@@ -1,5 +1,14 @@
 1999-03-27  MORIOKA Tomohiko  <tomo@etl.go.jp>
 
+	* lisp/gnus-art.el (gnus-following-method): Use
+	`gnus-group-find-parameter' to detect the current message is news
+	or not.
+
+	* lisp/gnus-art.el (gnus-following-method): Use
+	`message-wide-reply' for mail.
+
+1999-03-27  MORIOKA Tomohiko  <tomo@etl.go.jp>
+
 	* lisp/message.el (message-yank-original): Don't call
 	`gnus-copy-article-buffer' to avoid problem to yank assembled
 	(FULL) message of message/partial pieces.
