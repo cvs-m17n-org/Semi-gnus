@@ -619,8 +619,6 @@ sure of changing the value of `foo'."
 
 (defun imap-tls-open (name buffer server port)
   (let* ((port (or port imap-default-tls-port))
-	 (coding-system-for-read imap-coding-system-for-read)
-	 (coding-system-for-write imap-coding-system-for-write)
 	 (process (open-tls-stream name buffer server port)))
     (when process
       (while (and (memq (process-status process) '(open run))
@@ -632,7 +630,7 @@ sure of changing the value of `foo'."
 	(sit-for 1))
       (and imap-log
 	   (with-current-buffer (get-buffer-create imap-log-buffer)
-	     (imap-disable-multibyte)
+	     (set-buffer-multibyte nil)
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))

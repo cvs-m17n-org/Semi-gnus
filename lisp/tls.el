@@ -46,6 +46,8 @@
 
 ;;; Code:
 
+(require 'pces)
+
 (eval-and-compile
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec"))
@@ -95,15 +97,16 @@ specifying a port number to connect to."
     (while (and (not done) (setq cmd (pop cmds)))
       (message "Opening TLS connection with `%s'..." cmd)
       (let* ((process-connection-type tls-process-connection-type)
-	     (process (start-process
-		       name buffer shell-file-name shell-command-switch
-		       (format-spec
-			cmd
-			(format-spec-make
-			 ?h host
-			 ?p (if (integerp service)
-				(int-to-string service)
-			      service)))))
+	     (process (as-binary-process
+		       (start-process
+			name buffer shell-file-name shell-command-switch
+			(format-spec
+			 cmd
+			 (format-spec-make
+			  ?h host
+			  ?p (if (integerp service)
+				 (int-to-string service)
+			       service))))))
 	     response)
 	(while (and process
 		    (memq (process-status process) '(open run))
