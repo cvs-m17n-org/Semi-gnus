@@ -763,13 +763,6 @@ be set in `.emacs' instead."
 			  :foreground ,(face-foreground 'gnus-splash-face)
 			  :background ,(face-background 'default))))))
 	   (when image
-	     (insert-image image)
-	     (goto-char (point-min))
-	     (insert-char
-	      ?\ ;; space
-	      (max 0 (let ((cw (frame-char-width)))
-		       (/ (+ (- (* (window-width) cw) 271) cw) 2 cw))))
-	     (goto-char (point-min))
 	     (insert gnus-product-name " " gnus-version-number
 		     (if (zerop (string-to-number gnus-revision-number))
 			 ""
@@ -777,15 +770,17 @@ be set in `.emacs' instead."
 		     " based on " gnus-original-product-name " v"
 		     gnus-original-version-number "\n")
 	     (goto-char (point-min))
+	     (insert-char ?\  (max 0 (/ (- (window-width)
+					   (gnus-point-at-eol)) 2)))
 	     (put-text-property (point) (gnus-point-at-eol)
 				'face 'gnus-splash-face)
-	     (insert-char ?\ ;; space
-			  (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
 	     (forward-line 1)
-	     (insert-char
-	      ?\n (max 0
-		       (let ((ch (frame-char-height)))
-			 (/ (+ (- (* (1- (window-height)) ch) 273) ch) 2 ch))))
+	     (let ((size (image-size image)))
+	       (insert-char ?\n (max 0 (round (- (window-height)
+						 (or y (cdr size)) 2) 2)))
+	       (insert-char ?\  (max 0 (round (- (window-width)
+						 (or x (car size))) 2)))
+	       (insert-image image))
 	     (setq gnus-simple-splash nil)
 	     t))))
    (t
@@ -818,8 +813,7 @@ be set in `.emacs' instead."
 	    " based on " gnus-original-product-name " v"
 	    gnus-original-version-number)
     (goto-char (point-min))
-    (insert-char ?\ ; space
-		 (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+    (insert-char ?\  (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
     (forward-line 1)
     ;; And then hack it.
     (gnus-indent-rigidly (point) (point-max)
