@@ -268,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.10.062"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "00"
+(defconst gnus-revision-number "01"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.80"
@@ -2908,16 +2908,42 @@ As opposed to `gnus', this command will not connect to the local server."
   (interactive "P")
   (gnus arg nil 'slave))
 
+(defcustom gnus-frame-properties nil
+  "The properties of the frame in which gnus is displayed. Under XEmacs,
+the variable `toolbar-news-frame-plist' will be refered instead."
+  :type '(repeat (cons :format "%v"
+		       (symbol :tag "Parameter")
+		       (sexp :tag "Value")))
+  :group 'gnus)
+
+(defvar gnus-frame nil
+  "The frame in which gnus is displayed. It is not used under XEmacs.")
+
 ;;;###autoload
 (defun gnus-other-frame (&optional arg)
   "Pop up a frame to read news."
   (interactive "P")
-  (let ((window (get-buffer-window gnus-group-buffer)))
-    (cond (window
-	   (select-frame (window-frame window)))
-	  (t
-	   (other-frame 1))))
-  (gnus arg))
+  (if (featurep 'xemacs)
+      (let ((toolbar-news-use-separate-frame t))
+	(toolbar-gnus))
+    (if (frame-live-p gnus-frame)
+	(raise-frame gnus-frame)
+      (setq gnus-frame (make-frame gnus-frame-properties))
+      (if (and (gnus-buffer-live-p gnus-group-buffer)
+	       (save-current-buffer
+		 (set-buffer gnus-group-buffer)
+		 (eq 'gnus-group-mode major-mode)))
+	  (progn
+	    (select-frame gnus-frame)
+	    (switch-to-buffer gnus-group-buffer))
+	(add-hook 'gnus-exit-gnus-hook
+		  (lambda ()
+		    (when (and (frame-live-p gnus-frame)
+			       (cdr (frame-list)))
+		      (delete-frame gnus-frame))
+		    (setq gnus-frame nil)))
+	(select-frame gnus-frame)
+	(gnus arg)))))
 
 ;;;###autoload
 (defun gnus (&optional arg dont-connect slave)
