@@ -61,7 +61,9 @@ clean:
 	*.tp *.toc *.pg gnus.latexi *.aux *.[cgk]idx \
 	gnus.ilg gnus.ind gnus.[cgk]ind gnus.idx \
 	gnus.tmptexi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
-	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi
+	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi \
+	gnus.info* gnus-ja.info* message.info* message-ja.info* \
+	*.texi_ emacs-mime.info
 
 makeinfo:
 	makeinfo -o gnus gnus.texi
