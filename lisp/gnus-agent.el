@@ -320,6 +320,10 @@ fetched will be limited to it. If not a positive integer, never consider it."
   (setq gnus-plugged t)
   (gnus))
 
+(defadvice gnus (after gnus-agent-advice activate preactivate)
+  "Update modeline."
+  (gnus-agent-toggle-plugged gnus-plugged))
+
 ;;;###autoload
 (defun gnus-agentize ()
   "Allow Gnus to be an offline newsreader.
