@@ -424,6 +424,8 @@ your main source of newsgroup names."
 		 (const :tag "Bogofilter is not installed"))
   :group 'spam-bogofilter)
 
+(defvar spam-bogofilter-valid 'unknown "Is the bogofilter version valid?")
+
 (defcustom spam-bogofilter-header "X-Bogosity"
   "The header that Bogofilter inserts in messages."
   :type 'string
@@ -966,7 +968,6 @@ backends)."
 (spam-install-checkonly-backend 'spam-use-blackholes
 				'spam-check-blackholes)
 
-;; TODO: does anyone use hashcash?  We should remove it if not.
 (spam-install-checkonly-backend 'spam-use-hashcash
 				'spam-check-hashcash)
 
@@ -2354,46 +2355,59 @@ REMOVE not nil, remove the ADDRESSES."
       (message "Spamicity score %s" score)
       (or score "0"))))
 
+(defun spam-verify-bogofilter ()
+  "Verify the Bogofilter version is sufficient."
+  (when (eq spam-bogofilter-valid 'never)
+    (setq spam-bogofilter-valid
+	  (not (string-match "^bogofilter version 0\\.\\([0-9]\\|1[01]\\)\\."
+			     (shell-command-to-string 
+			      (format "%s -sV" spam-bogofilter-path))))))
+  spam-bogofilter-valid)
+  
 (defun spam-check-bogofilter (&optional score)
-  "Check the Bogofilter backend for the classification of this message"
-  (let ((article-buffer-name (buffer-name))
-	(db spam-bogofilter-database-directory)
+  "Check the Bogofilter backend for the classification of this message."
+  (if (spam-verify-bogofilter)
+      (let ((article-buffer-name (buffer-name))
+	    (db spam-bogofilter-database-directory)
+	    return)
+	(with-temp-buffer
+	  (let ((temp-buffer-name (buffer-name)))
+	    (save-excursion
+	      (set-buffer article-buffer-name)
+	      (apply 'call-process-region
+		     (point-min) (point-max)
+		     spam-bogofilter-path
+		     nil temp-buffer-name nil
+		     (if db `("-d" ,db "-v") `("-v"))))
+	    (setq return (spam-check-bogofilter-headers score))))
 	return)
-    (with-temp-buffer
-      (let ((temp-buffer-name (buffer-name)))
-	(save-excursion
-	  (set-buffer article-buffer-name)
-	  (apply 'call-process-region
-		 (point-min) (point-max)
-		 spam-bogofilter-path
-		 nil temp-buffer-name nil
-		 (if db `("-d" ,db "-v") `("-v"))))
-	(setq return (spam-check-bogofilter-headers score))))
-    return))
+    (gnus-error "`spam.el' doesnt support obsolete bogofilter versions")))
 
 (defun spam-bogofilter-register-with-bogofilter (articles
 						 spam
 						 &optional unregister)
   "Register an article, given as a string, as spam or non-spam."
-  (dolist (article articles)
-    (let ((article-string (spam-get-article-as-string article))
-	  (db spam-bogofilter-database-directory)
-	  (switch (if unregister
-		      (if spam
-			  spam-bogofilter-spam-strong-switch
-			spam-bogofilter-ham-strong-switch)
-		    (if spam
-			spam-bogofilter-spam-switch
-		      spam-bogofilter-ham-switch))))
-      (when (stringp article-string)
-	(with-temp-buffer
-	  (insert article-string)
-
-	  (apply 'call-process-region
-		 (point-min) (point-max)
-		 spam-bogofilter-path
-		 nil nil nil switch
-		 (if db `("-d" ,db "-v") `("-v"))))))))
+  (if (spam-verify-bogofilter)
+      (dolist (article articles)
+	(let ((article-string (spam-get-article-as-string article))
+	      (db spam-bogofilter-database-directory)
+	      (switch (if unregister
+			  (if spam
+			      spam-bogofilter-spam-strong-switch
+			    spam-bogofilter-ham-strong-switch)
+			(if spam
+			    spam-bogofilter-spam-switch
+			  spam-bogofilter-ham-switch))))
+	  (when (stringp article-string)
+	    (with-temp-buffer
+	      (insert article-string)
+	      
+	      (apply 'call-process-region
+		     (point-min) (point-max)
+		     spam-bogofilter-path
+		     nil nil nil switch
+		     (if db `("-d" ,db "-v") `("-v")))))))
+    (gnus-error "`spam.el' doesnt support obsolete bogofilter versions")))
 
 (defun spam-bogofilter-register-spam-routine (articles &optional unregister)
   (spam-bogofilter-register-with-bogofilter articles t unregister))
