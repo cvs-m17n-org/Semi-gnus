@@ -626,9 +626,6 @@ Marking Articles
 * Unread Articles::             未読記事への印
 * Read Articles::               既読記事への印
 * Other Marks::                 購読度に影響しない印
-
-Marking Articles
-
 * Setting Marks::               印の付け方と消し方
 * Generic Mark Commands::       印をどのようにカスタマイズするか
 * Setting Process Marks::       後の実行のための記事の印の付け方
@@ -908,9 +905,10 @@ Formatting Variables
 
 Image Enhancements
 
-* Picons::                      あなたが読んでいるものの絵を表示する方法
-* Smileys::                     表示されるべく生まれた幸せそうな顔を表示する方法
 * X-Face::                      ファンキーなちっちゃな白黒の絵を表示する
+* Face::                        よりファンキーでちっちゃなカラーの絵を表示する
+* Smileys::                     表示されるべく生まれた幸せそうな顔を表示する方法
+* Picons::                      あなたが読んでいるものの絵を表示する方法
 * XVarious::                    その他の XEmacs で Gnus な変数
 
 Thwarting Email Spam
@@ -921,6 +919,26 @@ Thwarting Email Spam
 * Hashcash::                    CPU 時間を費やして spam 退治する
 * Filtering Spam Using The Spam ELisp Package::
 * Filtering Spam Using Statistics with spam-stat::
+
+Filtering Spam Using The Spam ELisp Package
+
+* Blacklists and Whitelists::
+* BBDB Whitelists::
+* Gmane Spam Reporting::
+* Anti-spam Hashcash Payments::
+* Blackholes::
+* Regular Expressions Header Matching::
+* Bogofilter::
+* ifile spam filtering::
+* spam-stat spam filtering::
+* SpamOracle::
+* Extending the spam elisp package::
+
+Filtering Spam Using Statistics with spam-stat
+
+* Creating a spam-stat dictionary::
+* Splitting mail using spam-stat::
+* Low-level interface to the spam-stat dictionary::
 
 Appendices
 
