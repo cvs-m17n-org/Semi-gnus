@@ -886,7 +886,7 @@ function is generally only called when Gnus is shutting down."
   "Update the unseen count in `nnimap-mailbox-info'."
   (gnus-sethash
    (gnus-group-prefixed-name group server)
-   (let ((old (gnus-gethash-safe (gnus-group-prefixed-name group server) 
+   (let ((old (gnus-gethash-safe (gnus-group-prefixed-name group server)
 				 nnimap-mailbox-info)))
      (list (nth 0 old) (nth 1 old)
 	   (imap-mailbox-status group 'unseen nnimap-server-buffer)
@@ -999,7 +999,7 @@ function is generally only called when Gnus is shutting down."
 			     'asyncgroups
 			   'slowgroups)
 			 (list group (imap-mailbox-status-asynch
-				      group '(uidvalidity uidnext unseen) 
+				      group '(uidvalidity uidnext unseen)
 				      nnimap-server-buffer))))
 	  (dolist (asyncgroup asyncgroups)
 	    (let ((group (nth 0 asyncgroup))
@@ -1010,7 +1010,7 @@ function is generally only called when Gnus is shutting down."
 			      (nth 0 (gnus-gethash (gnus-group-prefixed-name
 						    group server)
 						   nnimap-mailbox-info))
-			      (imap-mailbox-get 'uidvalidity group 
+			      (imap-mailbox-get 'uidvalidity group
 						nnimap-server-buffer)))
 			(not (string=
 			      (nth 1 (gnus-gethash (gnus-group-prefixed-name
@@ -1361,7 +1361,7 @@ function is generally only called when Gnus is shutting down."
 			nnmail-expiry-wait)))
 	  (cond ((or force (eq days 'immediate))
 		 (let ((oldarts (imap-search
-				 (concat "UID " 
+				 (concat "UID "
 					 (imap-range-to-message-set artseq)))))
 		   (when oldarts
 		     (nnimap-expiry-target oldarts group server)
@@ -1380,7 +1380,7 @@ function is generally only called when Gnus is shutting down."
 		     (nnimap-expiry-target oldarts group server)
 		     (when (imap-message-flags-add
 			    (imap-range-to-message-set oldarts) "\\Deleted")
-		       (setq articles (gnus-set-difference 
+		       (setq articles (gnus-set-difference
 				       articles oldarts)))))))))))
   ;; return articles not deleted
   articles)

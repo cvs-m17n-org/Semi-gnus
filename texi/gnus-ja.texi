@@ -811,6 +811,7 @@ Browsing the Web
 @sc{imap}
 
 * Splitting in IMAP::           nnimap $B$G%a!<%k$rJ,3d$9$k(B
+* Expiring in IMAP::            nnimap $B$K$h$k%a!<%k$N4|8B@Z$l>C5n(B
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B
                                 /$B5v2D$9$k(B
 * Expunging mailboxes::         "$B%a!<%k%\%C%/%905=L(B" $B%\%?%s$HEy2A$J$b$N(B
@@ -2876,8 +2877,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%0%k!<%W%Q%i%a!<%?$K(B @code{(expiry-wait . 10)} $B$N$h$&$JMWAG$,$"$l$P!"$3(B
 $B$NCM$O5-;v$r;~8B>C5n$9$k$H$-(B
 $B$K(B @code{nnmail-expiry-wait} $B$H(B @code{nnmail-expiry-wait-function} $B$N@_(B
-$BDj$h$j$bM%@h$5$l$^$9!#$3$NCM$O;~8B>C5n$NF|?t(B ($B@0?t$G$"$kI,MW$O$J$$(B) $B$+$b(B
-$B$7$/$O(B @code{never} $B$+(B @code{immediate} $B$N%7%s%\%k$r;XDj$G$-$^$9!#(B
+$BDj(B (@pxref{Expiring Mail}) $B$h$j$bM%@h$5$l$^$9!#$3$NCM$O;~8B>C5n$NF|(B
+$B?t(B ($B@0?t$G$"$kI,MW$O$J$$(B) $B$+$b$7$/$O(B @code{never} $B$+(B @code{immediate} $B$N(B
+$B%7%s%\%k$r;XDj$G$-$^$9!#(B
 
 @item score-file
 @cindex score file group parameter
@@ -14774,6 +14776,7 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 
 @menu
 * Splitting in IMAP::           nnimap $B$G%a!<%k$rJ,3d$9$k(B
+* Expiring in IMAP::            nnimap $B$K$h$k%a!<%k$N4|8B@Z$l>C5n(B
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B
                                 /$B5v2D$9$k(B
 * Expunging mailboxes::         "$B%a!<%k%\%C%/%905=L(B" $B%\%?%s$HEy2A$J$b$N(B
@@ -14930,6 +14933,41 @@ nnimap $BFCM-$NFC5iJ,3dJ}<0$r(B @code{nnimap-split-fancy} $B$KDj5A$7$F2<$5$$!
 @end lisp
 
 Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-fancy}.
+@end table
+
+@node Expiring in IMAP
+@subsection IMAP $B$G$N4|8B@Z$l>C5n(B
+@cindex expiring imap mail
+
+@sc{nnimap} $B$O40A4$J(B @sc{nnmail} $BM3Mh$N%P%C%/%(%s%I$G$O$"$j$^$;$s$,!"$?(B
+$B$$$F$$$N4|8B@Z$l>C5n(B (@pxref{Expiring Mail}) $B$NI8=`5!G=$r%5%]!<%H$7$^$9!#(B
+IMAP $B$NJ,3d(B (@pxref{Splitting in IMAP}) $B$G$O(B @sc{nnmail} $B$NJQ?t$rJ#@=$7(B
+$B$J$$(B ($BNc$($P(B @var{nnimap-expiry-wait} $B$r@8@.$7$J$$(B) $BE@$,0c$&$N$G$9$,!"(B
+@sc{nnmail} $B$NJQ?t$rN.MQ$7$^$9!#0J2<$O(B @sc{nnimap} $B$N4|8B@Z$l>C5n=hM}$G(B
+$B;H$o$l$kJQ?t$H!";HMQJ}K!$K4XO"$7$?Cm<a$G$9!#(B
+
+$B4|8B@Z$l>C5n$N0u$,$I$N$h$&$KE,@Z$K(B @sc{imap} $B%5!<%P!<$K5-O?$5$l$k$+$K$D(B
+$B$$$F$b$3$3$G8@5Z$7$F$*$-$^$7$g$&!#4|8B@Z$l>C5n$N0u$O(B @sc{imap} $B%/%i%$%"(B
+$B%s%HFCM-$N0u$G$"$k(B @code{gnus-expire} $B$KJQ49$5$l!"%a%C%;!<%8$K5-O?$5$l$^(B
+$B$9!#$3$l$O!"B>$N%/%i%$%"%s%H$O%a%C%;!<%8$N%/%i%$%"%s%HFCM-$N%U%i%0$r8+$k(B
+$B$+$b$7$l$J$$$N$KBP$7$F!"(BGnus $B$O$?$V$s(B @code{gnus-expire} $B$N0u$rE,@Z$K07(B
+$B$$M}2r$9$k$@$1$G$"$k$3$H$r0UL#$7$^$9!#$^$?$3$l$O%5!<%P!<$,!"%/%i%$%"%s%H(B
+$BFCM-$N%U%i%0$N%a%C%;!<%8$X$N915WE*$JJ]B8$r%5%]!<%H$7$J$1$l$P$J$i$J$$$3$H(B
+$B$b0UL#$7$^$9!#9,$$$K!"$?$$$F$$$O%5%]!<%H$7$^$9!#(B
+
+@table @code
+@item nnmail-expiry-wait
+@item nnmail-expiry-wait-function
+
+$B$3$l$i$NJQ?t$O40A4$K%5%]!<%H$5$l$F$$$^$9!#4|8B@Z$l>C5n$NCM$O!"?t!"%7%s%\(B
+$B%k$N(B @var{immediate} $B$^$?$O(B @var{never} $B$G$9!#(B
+
+@item nnmail-expiry-target
+
+$B$3$NJQ?t$O%5%]!<%H$5$l$F$$$F!"FbItE*$K$O$3$l$r07$&(B @sc{nnmail} $B4X?t$r8F(B
+$B$V$3$H$K$h$C$F<BAu$5$l$F$$$^$9!#$b$79T$-@h$,F1$8%5!<%P!<$N(B IMAP $B%0%k!<%W(B
+$B$@$C$?$i!"5-;v$ODI2C$5$l$kBe$o$j$K%3%T!<$5$l$k(B ($B%"%C%W%m!<%I$7D>$5$l(B
+$B$k(B) $B$H$$$&:GE,2=$b4^$_$^$9!#(B
 @end table
 
 @node Editing IMAP ACLs
