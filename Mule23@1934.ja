@@ -129,24 +129,32 @@ Emacs 19.34 $B$r%Y!<%9$K$7$?(B Mule 2.3 $B$G(B gnus $B$r:n$k$K$O;0$D$NJ}K!$
    % ./configure --with-emacs=mule
    % make install
 
-USING Emacs W3
-==============
 
-;; $B$H$3$m$G!"4N?4$J$3$H$J$s$G$9$,!"C/$+(B Emacs 19.34 $B$r%Y!<%9$K$7$?(B
-;; Mule 2.3 $B$KE,9g$9$k(B Emacs W3 $B$,$I$3$K$"$k$+CN$j$^$;$s$+(B? :-p
+USING Emacs-W3M (and Emacs W3)
+==============================
+$B%&%'%V$K4p$E$$$?%P%C%/%(%s%I$G$"$k(B `nnshimbun' $B$O!"(BEmacs-W3M $B%Q%C%1!<(B
+$B%8$K4^$^$l$F$$$k(B shimbun $B%b%8%e!<%k$r;H$$$^$9(B ($BB>$N(B T-gnus $B$N%&%'%V$K(B
+$B4p$E$$$?%P%C%/%(%s%I$O(B Emacs W3 $B$rI,MW$H$7$^$9(B)$B!#(BEmacs-W3M $B$O30It%3%^(B
+$B%s%I(B W3M $B$X$N%$%s%?!<%U%'!<%9$r9T$J$&%W%m%0%i%`$G!">\:Y>pJs$K$D$$$F$O(B
+$B0J2<$N%Z!<%8$rK,$M$F$_$F2<$5$$!#(B
 
-$B$$$/$D$+$N(B T-gnus $B$N%b%8%e!<%k(B ($BNc$($P(B nnshimbun) $B$O(B Emacs W3 $B$rI,MW$H(B
-$B$7$^$9!#$b$7$"$J$?$,$9$G$K(B Emacs W3 $B$r%$%s%9%H!<%k$7$F$"$k$N$J$i$P!"$"(B
-$B$J$?$O$=$l$i$r;H$($k$h$&$K(B T-gnus $B$r:n$k$3$H$,$G$-$^$9!#$=$N$?$a$K$O!"(B
-configure $B%*%W%7%g%s$N(B `--with-w3=' $B$r;H$&$+(B `~/.lpath.el' $B%U%!%$%k$r(B
-$BJT=8$7$F!"(BEmacs W3 $B$,%$%s%9%H!<%k$5$l$F$$$k(B path $B$r;XDj$7$J$1$l$P$J$j(B
-$B$^$;$s!#0J2<$O(B configure $B%*%W%7%g%s$r;H$&Nc$G$9!#(B
+   http://namazu.org/~tsuchiya/emacs-w3m/
+   http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
+
+Emacs-W3M $B$H(B nnshimbun $B$,;H$($k$h$&$K(B T-gnus $B$r:n$k$K$O!"(BEmacs-W3M $B$,(B
+$B%$%s%9%H!<%k$5$l$F$$$k%Q%9$r(B configure $B%*%W%7%g%s$N(B `--with-addpath='
+$B$G;XDj$7$J$1$l$P$J$j$^$;$s(B (Emacs W3 $BMQ$K$O(B `--with-w3=' $B$r;H$&$+!"$^(B
+$B$?$O(B `~/.lpath.el' $B%U%!%$%k$rJT=8$7$F2<$5$$(B)$B!#0J2<$ONc$G$9!#(B
 
    % ./configure --with-emacs=mule\
+     --with-addpath=~/elisp/emu/:~/elisp/apel/: ... :~/elisp/w3m/\
      --with-w3=/usr/local/share/mule/site-lisp/w3/
    % make install
 
-$B$b$7(B configure $B$,!V(BW3... not found$B!W$H8@$C$F$b5$$K$7$J$$$G2<$5$$!#$?$H(B
-$B$((B `~/.lpath.el' $B%U%!%$%k$G(B Emacs W3 $B$N(B path $B$,;XDj$5$l$F$$$F$b!"(B
-configure $B%*%W%7%g%s$N(B `--with-w3=' $B$r;H$o$J$$$H!"8=:_$=$l$O@5>o$KF/$-(B
-$B$^$;$s$N$G!#(B
+;; $B$b$7(B configure $B$,!V(BW3... not found$B!W$H8@$C$F$b5$$K$7$J$$$G2<$5$$!#(B
+;; $B$?$H$((B `~/.lpath.el' $B%U%!%$%k$G(B Emacs W3 $B$N(B path $B$,;XDj$5$l$F$$$F$b!"(B
+;; configure $B%*%W%7%g%s$N(B `--with-w3=' $B$r;H$o$J$$$H!"8=:_$=$l$O@5>o$K(B
+;; $BF/$-$^$;$s$N$G!#(B
+
+;; $B$H$3$m$G!"C/$+(B Emacs 19.34 $B$r%Y!<%9$K$7$?(B Mule 2.3 $B$KE,9g$9$k(B Emacs
+;; W3 $B$,$I$3$K$"$k$+CN$j$^$;$s$+(B?

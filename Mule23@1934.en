@@ -126,22 +126,30 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
    % make install
 
 
-USING Emacs W3
-==============
+USING Emacs-W3M (and Emacs W3)
+==============================
+The web based backend `nnshimbun' uses the shimbun modules which are
+included in Emacs-W3M package (and the other web based backends of T-
+gnus requires Emacs W3).  Emacs-W3M is an interface program to the
+external command W3M, visit the following pages for more information.
 
-;; By the way, it is the point, does anyone know where do we find
-;; Emacs W3 package fitting with Mule 2.3 based on Emacs 19.34? :-p
+   http://namazu.org/~tsuchiya/emacs-w3m/
+   http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
-Some modules of T-gnus (e.g. nnshimbun) requires Emacs W3.  You can
-build T-gnus to be abel to use them, if you already have Emacs W3
-installed.  For that, you should specify the path where Emacs W3 is
-installed using the configure option `--with-w3=' or editing the file
-`~/.lpath.el'.  Here is an example for using the configure option:
+If you wish to build T-gnus to be abel to use Emacs-W3M and nnshimbun,
+you have to specify the path where Emacs-W3M is installed using the
+configure option `--with-addpath=' (for Emacs W3, use the configure
+option `--with-w3=' or editing the file `~/.lpath.el').  Here is an
+example for that:
 
    % ./configure --with-emacs=mule\
+     --with-addpath=~/elisp/emu/:~/elisp/apel/: ... :~/elisp/w3m/\
      --with-w3=/usr/local/share/mule/site-lisp/w3/
    % make install
 
-Don't mind if configure says "W3... not found".  It is currently
-malfunction when the configure option `--with-w3=' is not used even if
-the path of Emacs W3 is specified in the file `~/.lpath.el'.
+;; Don't mind if configure says "W3... not found".  It is currently
+;; malfunction when the configure option `--with-w3=' is not used even
+;; if the path of Emacs W3 is specified in the file `~/.lpath.el'.
+
+;; By the way, does anyone know where do we find Emacs W3 package
+;; which is suitable to Mule 2.3 based on Emacs 19.34?

@@ -85,6 +85,35 @@
 
 (require 'bytecomp)
 
+(when (boundp 'MULE)
+  (let (current-load-list)
+    ;; Make the function to be silent at compile-time.
+    (defun locate-library (library &optional nosuffix)
+      "Show the full path name of Emacs library LIBRARY.
+This command searches the directories in `load-path' like `M-x load-library'
+to find the file that `M-x load-library RET LIBRARY RET' would load.
+Optional second arg NOSUFFIX non-nil means don't add suffixes `.elc' or `.el'
+to the specified name LIBRARY (a la calling `load' instead of `load-library')."
+      (interactive "sLocate library: ")
+      (catch 'answer
+	(mapcar
+	 '(lambda (dir)
+	    (mapcar
+	     '(lambda (suf)
+		(let ((try (expand-file-name (concat library suf) dir)))
+		  (and (file-readable-p try)
+		       (null (file-directory-p try))
+		       (progn
+			 (or noninteractive
+			     (message "Library is file %s" try))
+			 (throw 'answer try)))))
+	     (if nosuffix '("") '(".elc" ".el" ""))))
+	 load-path)
+	(or noninteractive
+	    (message "No library %s in search path" library))
+	nil))
+    (byte-compile 'locate-library)))
+
 (unless (fboundp 'si:byte-optimize-form-code-walker)
   (byte-optimize-form nil);; Load `byte-opt' or `byte-optimize'.
   (setq max-specpdl-size 3000)
@@ -139,12 +168,32 @@
 
 ;; Don't load path-util until `char-after' and `char-before' have been
 ;; optimized because it requires `poe' and then modify the functions.
-(or (featurep 'path-util)
-    (load "apel/path-util"))
-(or (locate-library "poe")
-    (add-path "apel"))
-(or (locate-library "mel")
-    (add-path "flim"))
+
+;; If the APEL modules have been installed under the directory
+;; "/usr/local/share/mule/site-lisp/apel/", the parent directory
+;; "/usr/local/share/mule/site-lisp/" should be included in the
+;; standard `load-path' or added by the configure option
+;; "--with-addpath=".  And also the directory where the EMU modules
+;; have been installed (e.g. "/usr/local/share/mule/19.34/site-lisp/")
+;; should be included in the standard `load-path' or added by the
+;; configure option "--with-addpath=".
+(unless (featurep 'path-util)
+  (let ((path (locate-library "apel/path-util")))
+    (if path
+	(progn
+	  (when (string-match "/$" (setq path (file-name-directory path)))
+	    (setq path (substring path 0 (match-beginning 0))))
+	  (unless (or (member path load-path)
+		      (member (file-name-as-directory path) load-path))
+	    (push path load-path))
+	  (require 'path-util))
+      (error "
+APEL modules does not found in %s.
+Try to re-configure with --with-addpath=APEL_PATH and run make again.
+"
+	     load-path))))
+(unless (locate-library "mel")
+  (add-path "flim"))
 (unless (module-installed-p 'mel)
   ;; FLIM 1.14 may have installed in two "flim" subdirectories.
   (push (expand-file-name "flim"
@@ -152,12 +201,10 @@
 	load-path)
   (unless (module-installed-p 'mel)
     (error "
-FLIM package does not found in %s.
+FLIM modules does not found in %s.
 Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 "
-	   (progn
-	     (add-path "semi")
-	     load-path))))
+	   load-path)))
 (add-path "semi")
 
 (push srcdir load-path)
@@ -177,35 +224,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			(cons 'lambda (cdr (cdr form))))
 		  byte-compile-function-environment)))
   form)
-
-(when (boundp 'MULE)
-  (let (current-load-list)
-    ;; Make the function to be silent at compile-time.
-    (defun locate-library (library &optional nosuffix)
-      "Show the full path name of Emacs library LIBRARY.
-This command searches the directories in `load-path' like `M-x load-library'
-to find the file that `M-x load-library RET LIBRARY RET' would load.
-Optional second arg NOSUFFIX non-nil means don't add suffixes `.elc' or `.el'
-to the specified name LIBRARY (a la calling `load' instead of `load-library')."
-      (interactive "sLocate library: ")
-      (catch 'answer
-	(mapcar
-	 '(lambda (dir)
-	    (mapcar
-	     '(lambda (suf)
-		(let ((try (expand-file-name (concat library suf) dir)))
-		  (and (file-readable-p try)
-		       (null (file-directory-p try))
-		       (progn
-			 (or noninteractive
-			     (message "Library is file %s" try))
-			 (throw 'answer try)))))
-	     (if nosuffix '("") '(".elc" ".el" ""))))
-	 load-path)
-	(or noninteractive
-	    (message "No library %s in search path" library))
-	nil))
-    (byte-compile 'locate-library)))
 
 (condition-case nil
     :symbol-for-testing-whether-colon-keyword-is-available-or-not
@@ -401,6 +419,9 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
+	  (condition-case nil
+	      (progn (require 'shimbun) nil)
+	    (error '("nnshimbun.el")))
 	  (unless (or (condition-case code
 			  (require 'w3-forms)
 			(error

@@ -20,6 +20,12 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 から取得することができます。必要な環境は SEMI の README.ja を参照して
 ください。
 
+  加えて、`nnshimbun' を使いたい場合には、Emacs-W3M パッケージと外部
+コマンドの W3M が必要です。詳しいことは以下のページをご覧下さい。
+
+http://namazu.org/~tsuchiya/emacs-w3m/
+http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
+
 
 取得方法 (CVS)
 ==============

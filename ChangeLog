@@ -1,3 +1,15 @@
+2001-05-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	"nnshimbun.el" if the library "shimbun" is not found.
+	(TopLevel): Add "/somewhere/apel/" to `load-path' if it is needed.
+	(locate-library): Redefine it for Mule before it is called.
+
+	* README.semi.ja: Update for the use of Emacs-W3M.
+	* README.semi: Ditto.
+	* Mule23@1934.ja: Ditto.
+	* Mule23@1934.en: Ditto.
+
 2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el: Reconstructed to use `shimbun'.
