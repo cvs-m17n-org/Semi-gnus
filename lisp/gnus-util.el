@@ -1117,6 +1117,7 @@ sure of changing the value of `foo'."
 (defun gnus-create-info-command (node)
   "Create a command that will go to info NODE."
   `(lambda ()
+     (interactive)
      ,(concat "Enter the info system at node " node)
      (Info-goto-node ,node)
      (setq gnus-info-buffer (current-buffer))
