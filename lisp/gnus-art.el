@@ -3140,27 +3140,47 @@ In no internal viewer is available, use an external viewer."
 		  (gnus-treat-article 'head)))))))))
 
 (eval-when-compile
-  (defvar mime-display-header-hook))
+  (defvar mime-display-header-hook)
+  (defvar mime-display-text/plain-hook))
 (defun gnus-mime-display-part-with-mime-view (ihandles handles)
-  (let ((charset (with-current-buffer gnus-summary-buffer
-		  gnus-newsgroup-charset))
-	(mime-display-header-hook (and (boundp 'mime-display-header-hook)
-				       mime-display-header-hook)))
-    (unless ihandles
-      (add-hook 'mime-display-header-hook
-		(function (lambda ()
-			    (save-excursion
-			      (save-restriction
-				(article-goto-body)
-				(narrow-to-region (point-min) (point))
-				(gnus-treat-article 'head)))))))
+  (let* ((charset (with-current-buffer gnus-summary-buffer
+		    gnus-newsgroup-charset))
+	 entity
+	 (mime-display-header-hook (and (boundp 'mime-display-header-hook)
+					mime-display-header-hook))
+	 (mime-display-text/plain-hook
+	  (and (boundp 'mime-display-text/plain-hook) 
+	       mime-display-text/plain-hook)))
+    (add-hook 'mime-display-header-hook
+	      (function (lambda ()
+			  (save-excursion
+			    (save-restriction
+			      (article-goto-body)
+			      (narrow-to-region (point-min) (point))
+			      (gnus-treat-article 'head))))))
+    (add-hook 'mime-display-text/plain-hook
+	      (function (lambda ()
+			  (let ((parent (mime-entity-parent entity)))
+			    (when (and parent
+				       (and (eq (mime-entity-media-type
+						 parent)
+						'message)
+					    (eq (mime-entity-media-subtype
+						 parent)
+						'rfc822)))
+			      (save-excursion
+				(save-restriction
+				  (gnus-treat-article nil 1 1))))))))
     (set (make-local-variable 'default-mime-charset) charset)
     (mime-display-message handles
 			  gnus-article-buffer nil
 			  gnus-article-mode-map 'gnus-article-mode)
     (make-local-variable 'mime-button-mother-dispatcher)
     (setq mime-button-mother-dispatcher
-	  (function gnus-article-push-button))))
+	  (function gnus-article-push-button))
+    (save-excursion
+      (save-restriction
+	(gnus-treat-article nil 1 1)))))
 
 (defun gnus-mime-display-part-with-Gnus (ihandles handles)
   (let ((gnus-displaying-mime t))
