@@ -7720,7 +7720,8 @@ without any article massaging functions being run."
 	  gnus-article-prepare-hook
 	  gnus-article-decode-hook
 	  gnus-break-pages
-	  gnus-show-mime)
+	  gnus-show-mime
+	  (gnus-inhibit-treatment t))
       (gnus-summary-select-article nil 'force))))
   (gnus-summary-goto-subject gnus-current-article)
   (gnus-summary-position-point))
