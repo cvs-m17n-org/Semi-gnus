@@ -869,6 +869,20 @@ A value of nil means exclude your own name only."
   :type '(choice (const :tag "Yourself" nil)
 		 regexp))
 
+(defvar message-shoot-gnksa-feet nil
+  "*A list of GNKSA feet you are allowed to shoot.  
+Gnus gives you all the opportunity you could possibly want for
+shooting yourself in the foot.  Also, Gnus allows you to shoot the
+feet of Good Net-Keeping Seal of Approval. The following are foot
+candidates:
+`empty-article'     Allow you to post an empty article;
+`quoted-text-only'  Allow you to post quoted text only;
+`multiple-copies'   Allow you to post multiple copies.")
+
+(defsubst message-gnksa-enable-p (feature)
+  (or (not (listp message-shoot-gnksa-feet))
+      (memq feature message-shoot-gnksa-feet)))
+
 ;;; Internal variables.
 ;;; Well, not really internal.
 
@@ -2754,10 +2768,13 @@ It should typically alter the sending method in some way or other."
 	  (when (funcall (cadr elem))
 	    (when (and (or (not (memq (car elem)
 				      message-sent-message-via))
-			   (y-or-n-p
-			    (format
-			     "Already sent message via %s; resend? "
-			     (car elem))))
+			   (if (or (message-gnksa-enable-p 'multiple-copies)
+				   (not (eq (car elem) 'news)))
+			       (y-or-n-p
+				(format
+				 "Already sent message via %s; resend? "
+				 (car elem)))
+			     (error "Denied posting -- multiple copies.")))
 		       (setq success (funcall (caddr elem) arg)))
 	      (setq sent t)))))
       (unless (or sent (not success))
@@ -3537,7 +3554,10 @@ This sub function is for exclusive use of `message-send-news'."
        (re-search-backward message-signature-separator nil t)
        (beginning-of-line)
        (or (re-search-backward "[^ \n\t]" b t)
-	   (y-or-n-p "Empty article.  Really post? "))))
+	   (if (message-gnksa-enable-p 'empty-article)
+	       (y-or-n-p "Empty article.  Really post? ")
+	     (message "Denied posting -- Empty article.")
+	     nil))))
    ;; Check for control characters.
    (message-check 'control-chars
      (if (re-search-forward "[\000-\007\013\015-\032\034-\037\200-\237]" nil t)
@@ -3559,8 +3579,11 @@ This sub function is for exclusive use of `message-send-news'."
      (or
       (not message-checksum)
       (not (eq (message-checksum) message-checksum))
-      (y-or-n-p
-       "It looks like no new text has been added.  Really post? ")))
+      (if (message-gnksa-enable-p 'quoted-text-only)
+	  (y-or-n-p
+	   "It looks like no new text has been added.  Really post? ")
+	(message "Denied posting -- no new text has been added.")
+	nil)))
    ;; Check the length of the signature.
    (message-check 'signature
      (goto-char (point-max))
@@ -3574,15 +3597,20 @@ This sub function is for exclusive use of `message-send-news'."
    (message-check 'quoting-style
      (goto-char (point-max))
      (let ((no-problem t))
-       (when (search-backward-regexp "^>[^\n]*\n>" nil t)
-	 (setq no-problem nil)
-	 (while (not (eobp))
-	   (when (and (not (eolp)) (looking-at "[^> \t]"))
-	     (setq no-problem t))
-	   (forward-line)))
+       (when (search-backward-regexp "^>[^\n]*\n" nil t)
+	 (setq no-problem (search-forward-regexp "^[ \t]*[^>\n]" nil t)))
        (if no-problem
 	   t
-	 (y-or-n-p "Your text should follow quoted text.  Really post? "))))))
+	 (if (message-gnksa-enable-p 'quoted-text-only)
+	     (y-or-n-p "Your text should follow quoted text.  Really post? ")
+	   ;; Ensure that
+	   (goto-char (point-min))
+	   (re-search-forward
+	    (concat "^" (regexp-quote mail-header-separator) "$"))
+	   (if (search-forward-regexp "^[ \t]*[^>\n]" nil t)
+	       (y-or-n-p "Your text should follow quoted text.  Really post? ")
+	     (message "Denied posting -- only quoted text.")
+	     nil)))))))
 
 (defun message-check-mail-syntax ()
   "Check the syntax of the message."
@@ -3764,7 +3792,6 @@ If NOW, use that time instead."
 		      (mail-header-references message-reply-headers)
 		      (mail-header-subject message-reply-headers)
 		      psubject
-		      (mail-header-subject message-reply-headers)
 		      (not (string=
 			    (message-strip-subject-re
 			     (mail-header-subject message-reply-headers))
