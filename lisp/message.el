@@ -1817,7 +1817,7 @@ is used by default."
   (if (not header)
       nil
     (let ((regexp (format "[%s]+" (or separator ",")))
-	  (beg 1)
+	  (beg (point-min))
 	  (first t)
 	  quoted elems paren)
       (with-temp-buffer
@@ -4344,8 +4344,8 @@ to find out how to use this."
   (case
       (as-binary-process
        (apply
-	'call-process-region 1 (point-max) message-qmail-inject-program
-	nil nil nil
+	'call-process-region (point-min) (point-max)
+	message-qmail-inject-program nil nil nil
 	;; qmail-inject's default behaviour is to look for addresses on the
 	;; command line; if there're none, it scans the headers.
 	;; yes, it does The Right Thing w.r.t. Resent-To and it's kin.
