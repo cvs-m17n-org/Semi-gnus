@@ -1,3 +1,7 @@
+2002-08-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: Fix T-gnus version number.
+
 2002-08-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.8 revision 00.

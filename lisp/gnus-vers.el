@@ -40,7 +40,7 @@
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
   (product-define "T-gnus" nil
-		  (list 6 15 7
+		  (list 6 15 8
 			(string-to-number gnus-revision-number))))
 
 (defconst gnus-original-version-number "0.08"
