@@ -17597,25 +17597,25 @@ Emacs $B$,(B @samp{%b} $B$r<u$1<h$k$H!"(BEmacs $B$N%b!<%I9TI=<($NItJ,$,$=$l
 @samp{%(} $B;XDj(B ($B$d$=$NN`$N$b$N(B) $B$O%b!<%I9TJQ?t$G$OA4$/0UL#$r$J$5$J$$;v$K(B
 $BCm0U$7$F$/$@$5$$!#(B
 
-@c TRANSLATEME
 @node Positioning Point
-@subsection Positioning Point
+@subsection $B%]%$%s%H$N0\F0(B
 
-Gnus usually moves point to a pre-defined place on each line in most
-buffers.  By default, point move to the first colon character on the
-line.  You can customize this behaviour in three different ways.
+gnus $B$ODL>o$[$H$s$I$N%P%C%U%!$G!"%]%$%s%H$r3F9T$N$"$i$+$8$a7h$a$i$l$?>l(B
+$B=j$K0\F0$7$^$9!#%G%#%U%)%k%H$G$O!"%]%$%s%H$O9T$N:G=i$N%3%m%s$K0\F0$7$^$9!#(B
+$B$"$J$?$O$3$N?6$k$^$$$r!";0$D$N0c$&J}K!$G%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9!#(B
 
-You can move the colon character to somewhere else on the line.
+$B$^$?!"$"$J$?$O%3%m%s$r9T$N$I$N>l=j$K$G$b0\F0$9$k$3$H$,$G$-$^$9!#(B
 
 @findex gnus-goto-colon
-You can redefine the function that moves the point to the colon.  The
-function is called @code{gnus-goto-colon}.
+$B$"$J$?$O%3%m%s$N0LCV$K%]%$%s%H$r0\F0$5$;$k$?$a$N4X?t$rDj5A$7D>$9$3$H$,$G(B
+$B$-$^$9!#$=$N4X?t$O(B @code{gnus-goto-colon} $B$H8F$P$l$F$$$^$9!#(B
 
-But perhaps the most convenient way to deal with this, if you don't want
-to have a colon in your line, is to use the @samp{%C} specifier.  If you
-put a @samp{%C} somewhere in your format line definition, Gnus will
-place point there.
+$B$G$b!"$b$7$"$J$?$,9T$K%3%m%s$r4^$a$?$/$J$$$J$i$P!"$3$l$r07$&$?$a$N$*$=$i(B
+$B$/:G$b<j$4$m$JJ}K!$O!"(B@samp{%C} $B;X<(;R$r;H$&$3$H$G$9!#$"$J$?$N9T$NMM(B
+$B<0(B (line format) $B$NDj5A$K(B @samp{%C} $B$rF~$l$F$*$1$P!"(Bgnus $B$O$=$3$K%]%$%s(B
+$B%H$rCV$-$^$9!#(B
 
+@c TRANSLATEME
 @node Tabulation
 @subsection Tabulation
 
