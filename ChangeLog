@@ -1,3 +1,7 @@
+1998-07-04  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): Require 'smtp.
+
 1998-07-02  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* Sync up with Semi-gnus 6.8.0 and Gnus 5.6.23.
