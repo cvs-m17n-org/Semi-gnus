@@ -28,8 +28,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'static))
+(eval-when-compile
+  (require 'cl)
+  (require 'static)
+  (defvar tool-bar-map))
 
 (require 'path-util)
 (require 'gnus)
