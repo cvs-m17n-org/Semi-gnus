@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "13"
+(defconst gnus-revision-number "14"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -1832,7 +1832,7 @@ use the article treating faculties instead.  Is is described in Info node
 
 (eval-and-compile
   (unless (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "smiley-mule")
+    (autoload 'gnus-smiley-display "gnus-bitmap")
     (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
 
 ;;; gnus-sum.el thingies
