@@ -136,7 +136,7 @@ external command W3M, visit the following pages for more information.
    http://namazu.org/~tsuchiya/emacs-w3m/
    http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
-If you wish to build T-gnus to be abel to use Emacs-W3M and nnshimbun,
+If you wish to build T-gnus to be able to use Emacs-W3M and nnshimbun,
 you have to specify the path where Emacs-W3M is installed using the
 configure option `--with-addpath=' (for Emacs W3, use the configure
 option `--with-w3=' or editing the file `~/.lpath.el').  Here is an
