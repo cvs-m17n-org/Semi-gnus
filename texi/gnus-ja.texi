@@ -17634,22 +17634,22 @@ gnus は通常ほとんどのバッファで、ポイントを各行のあらかじめ決められた場
 ですが、もし 50桁より後ろにすでにテキストがある場合、50桁より後ろにある
 過剰なテキストは削除されます。これは厳密 (hard) な整列子です。
 
-@c TRANSLATEME
 @node Wide Characters
 @subsection Wide Characters
 
-Proportional fonts in most countries have characters of the same width.
-Some countries, however, use Latin characters mixed with wider
-characters---most notable East Asian countries.
+多くの地域において、プロポーショナルなフォントは同じ幅の文字を持っていま
+す。しかしいくつかの地域、よく知られている東アジアの国々では、ラテン文字
+と幅の広い文字が混在して使われています。
 
-The problem is that when formatting, Gnus assumes that if a string is 10
-characters wide, it'll be 10 Latin characters wide on the screen.  In
-these coutries, that's not true.
+整形において、gnus は文字列が 10個の文字の幅だとしたら、スクリーンで
+も 10個分のラテン文字の幅になると仮定しますが、それは問題です。かの国々
+では、それは正しくありません。
 
 @vindex gnus-use-correct-string-widths
-To help fix this, you can set @code{gnus-use-correct-string-widths} to
-@code{t}.  This makes buffer generation slower, but the results will be
-prettieer.  The default value is @code{nil}.
+それを救済するために、あなた
+は @code{gnus-use-correct-string-widths} を @code{t} に設定することがで
+きます。これはバッファの生成を遅くしますが、より美しい結果を得ることがで
+きるでしょう。既定値は @code{t} です。
 
 @node Window Layout
 @section ウィンドウの配置
