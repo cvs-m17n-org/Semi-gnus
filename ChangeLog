@@ -1,3 +1,8 @@
+2003-01-15  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add.  Fix from Reiner Steib
+	<4uce.02.r.steib@gmx.net>.
+
 2003-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/binhex.el: Require `path-util'.
