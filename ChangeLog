@@ -1,3 +1,11 @@
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-read-field', `std11-address-string' and
+	`std11-full-name-string' instead of
+	`gnus-extract-address-components'.
+	(gnus-article-sort-by-author): Likewise.
+
 1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
