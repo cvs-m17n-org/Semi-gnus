@@ -329,22 +329,23 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		 (while (setq form (condition-case nil
 				       (read buffer)
 				     (error nil)))
-		   (while form
-		     (setq elem (pop form))
-		     (unless (memq (car-safe elem)
-				   '(\` backquote
-				     defcustom defface defgroup
-				     define-widget quote))
-		       (while (consp elem)
-			 (push (car elem) form)
-			 (setq elem (cdr elem)))
-		       (when (and elem
-				  (symbolp elem)
-				  (not (eq ': elem))
-				  (eq ?: (aref (symbol-name elem) 0))
-				  (not (memq elem ignores))
-				  (not (memq elem keywords)))
-			 (push elem keywords)))))))
+		   (when (listp form)
+		     (while form
+		       (setq elem (pop form))
+		       (unless (memq (car-safe elem)
+				     '(\` backquote
+				       defcustom defface defgroup
+				       define-widget quote))
+			 (while (consp elem)
+			   (push (car elem) form)
+			   (setq elem (cdr elem)))
+			 (when (and elem
+				    (symbolp elem)
+				    (not (eq ': elem))
+				    (eq ?: (aref (symbol-name elem) 0))
+				    (not (memq elem ignores))
+				    (not (memq elem keywords)))
+			   (push elem keywords))))))))
 	     (setq keywords (sort keywords
 				  (lambda (a b)
 				    (string-lessp (symbol-name a)

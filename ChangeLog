@@ -1,3 +1,8 @@
+2001-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Ignore
+	non-list forms in the top level.
+
 2001-12-18  Josh Huber  <huber@alum.wpi.edu>
 
 	* ChangeLog, todo: (oops) changed buffer-file-coding-system back
