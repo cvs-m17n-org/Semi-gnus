@@ -1109,6 +1109,7 @@ slower."
   :group 'gnus-summary-format
   :type '(radio (function-item gnus-extract-address-components)
 		(function-item mail-extract-address-components)
+		(function-item std11-extract-address-components)
 		(function :tag "Other")))
 
 (defcustom gnus-carpal nil
