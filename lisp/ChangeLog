@@ -1,3 +1,21 @@
+2001-09-27  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-topic.el (gnus-topic-mode-map): Add catchup.
+	(gnus-topic-catchup-articles): New function. Suggested by Robin
+	S. Socha <robin-dated-1001857693.185e29@socha.net>.
+
+2001-09-27 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Gerd M,Av(Bllmann <gerd@gnu.org>.
+
+	* gnus-ems.el (gnus-article-display-xface): Insert xface after
+	previous ones.
+
+2001-09-27 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Daiki Ueno  <ueno@unixuser.org>
+
+	* gnus-sum.el (gnus-summary-show-article): The arglist of
+	detect-coding-region is incompatible.
+
 2001-09-26 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	From Katsuhiro Hermit Endo <hermit@koka-in.org>
 

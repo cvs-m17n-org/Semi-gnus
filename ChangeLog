@@ -1,3 +1,15 @@
+2001-09-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
+
+2001-09-27 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4 (GNUS_CHECK_FONTS): Typo. Use /dev/null as latex input.
+
+2001-09-27 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4, configure.in: Check commercial fonts.
+
 2001-09-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-find-invisible-regions): Look for the

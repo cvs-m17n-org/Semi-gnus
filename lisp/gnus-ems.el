@@ -297,6 +297,8 @@ for XEmacs."
 	(when image
 	  (goto-char (point-min))
 	  (re-search-forward "^From:" nil 'move)
+	  (while (get-text-property (point) 'display)
+	    (goto-char (next-single-property-change (point) 'display)))
 	  (insert-image image))))))
 
 (defun-maybe assoc-ignore-case (key alist)
