@@ -149,20 +149,18 @@ options make any sense in this context."
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
 ;; Multibyte group name:
-(add-to-list 'gnus-group-name-charset-group-alist
-	     (cons gnus-namazu/group-name-regexp gnus-namazu-coding-system))
 (and
  (fboundp 'gnus-group-decoded-name)
- (let ((group
-	(concat "nnvirtual:namazu-search?query="
-		(decode-coding-string
-		 (string 27 36 66 52 65 59 122 27 40 66)
-		 (if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-7bit)))))
-   (/= (length (string-to-char-list (concat "*Summary " group "*")))
-       (length
-	(string-to-char-list
-	 (gnus-summary-buffer-name
-	  (encode-coding-string group gnus-namazu-coding-system))))))
+ (let ((gnus-group-name-charset-group-alist
+	(list (cons gnus-namazu/group-name-regexp gnus-namazu-coding-system)))
+       (query (decode-coding-string
+	       (string 27 36 66 52 65 59 122 27 40 66)
+	       (if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-7bit))))
+   (not (string-match query
+		      (gnus-summary-buffer-name
+		       (encode-coding-string
+			(concat "nnvirtual:namazu-search?query=" query)
+			gnus-namazu-coding-system)))))
  (let (current-load-list)
    (defadvice gnus-summary-buffer-name
      (before gnus-namazu-summary-buffer-name activate compile)
@@ -181,6 +179,17 @@ options make any sense in this context."
    (gnus-servers-using-backend 'nnmh)))
 
 (defun gnus-namazu/setup ()
+  (and (boundp 'gnus-group-name-charset-group-alist)
+       (not (member (cons gnus-namazu/group-name-regexp
+			  gnus-namazu-coding-system)
+		    gnus-group-name-charset-group-alist))
+       (let ((pair (assoc gnus-namazu/group-name-regexp
+			  gnus-group-name-charset-group-alist)))
+	 (if pair
+	     (setcdr pair gnus-namazu-coding-system)
+	   (push (cons gnus-namazu/group-name-regexp
+		       gnus-namazu-coding-system)
+		 gnus-group-name-charset-group-alist))))
   (unless gnus-namazu-case-sensitive-filesystem
     ;; FIXME: The alist to map group names in lower case to real names
     ;; is reconstructed every when gnus-namazu/setup() is called.

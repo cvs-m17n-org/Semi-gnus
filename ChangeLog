@@ -1,8 +1,16 @@
+2001-12-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-summary-buffer-name): Changed
+	the expression to decide whether `gnus-summary-buffer-name' should
+	be advised.
+	(gnus-namazu/setup): Strict checking the other Gnus variants than
+	Oort-Gnus before handling `gnus-group-name-charset-group-alist'.
+
 2001-12-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu-summary-buffer-name): New
 	advice.
-	
+
 	* lisp/gnus.el (top): Add autoload of `gnus-namazu-search'.
 
 	* lisp/gnus-sum.el (gnus-summary-mode-map): Define "\C-c\C-n" as
