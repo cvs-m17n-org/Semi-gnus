@@ -37,11 +37,6 @@ To do list.
     SEMI / FLIM / APEL / Semi-gnus のバージョン不一致による混乱を避け
     るためにこれらを一つのパッケージとして、配布するようにする。
 
-*1998/11/05-1 Cancel-Lock
-
-    ニュース送信時 Cancel-Lock フィールドを付加する。
-    Cancel/Replaces/Supersedes のときは Cancel-Key フィールドを付加する。
-
 ----------- 対策済 -----------
 
 *1998/10/02-3 message/partial 使用時の Message-Id 問題
@@ -104,3 +99,10 @@ To do list.
     のになってしまうが、現状では Message-ID を付けない事で対策。
 
     1998/09/28 - 完了
+
+*1998/11/05-1 Cancel-Lock
+
+    ニュース送信時 Cancel-Lock フィールドを付加する。
+    Cancel/Replaces/Supersedes のときは Cancel-Key フィールドを付加する。
+
+    1999/01/12 - 完了
