@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19 1999-07-20 14:53:48 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.1 1999-08-04 08:19:12 yamaoka Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>

@@ -5,8 +5,8 @@ srcdir = @srcdir@
 
 @SET_MAKE@
 EMACS = @EMACS@
-XEMACS = xemacs
-PACKAGEDIR =
+XEMACS = @XEMACS@
+PACKAGEDIR = @PACKAGEDIR@
 
 all: lick info
 
@@ -63,24 +63,25 @@ info-ja:
 
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
+	rm -f MANIFEST.*
+	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
 xsome:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
 
 elclean:
-	rm lisp/*.elc
+	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
 
 x:
-	make EMACS="$(XEMACS)"
+	$(MAKE) EMACS="$(XEMACS)"
 
-distclean:
-	make clean
+distclean: clean
 	rm -rf *~
-	for i in lisp texi; do (cd $$i; make distclean); done
+	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
 
 osome:
-	make EMACS="$(XEMACS)" some
+	$(MAKE) EMACS="$(XEMACS)" some
 
 config.status: $(srcdir)/configure
 	$(SHELL) ./config.status --recheck

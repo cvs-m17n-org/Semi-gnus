@@ -40,10 +40,7 @@
 
 (eval-when-compile
   (require 'mime-play)
-  ;; Avoid byte-compile warnings.
-  (defvar gnus-article-decoded-p)
-  (defvar gnus-decode-encoded-word-function)
-  )
+  (require 'static))
 
 (eval-and-compile
   (autoload 'gnus-cache-articles-in-group "gnus-cache"))
@@ -284,6 +281,14 @@ in some newsgroups, set the variable to nil in
 		 (function-item gnus-summary-first-unread-subject)
 		 (function-item gnus-summary-first-unread-article)
 		 (function-item gnus-summary-best-unread-article)))
+
+(defcustom gnus-dont-select-after-jump-to-other-group nil
+  "If non-nil, don't select the first unread article after entering the
+other group by the command `gnus-summary-jump-to-other-group'.  If nil,
+it is depend on the value of `gnus-auto-select-first' whether to select
+or not."
+  :group 'gnus-group-select
+  :type 'boolean)
 
 (defcustom gnus-auto-select-next t
   "*If non-nil, offer to go to the next group from the end of the previous.
@@ -803,6 +808,10 @@ mark:    The articles mark."
   "Function called to allow alteration of article header structures.
 The function is called with one parameter, the article header vector,
 which it may alter in any way.")
+
+(defvar gnus-decode-encoded-word-function
+  (mime-find-field-decoder 'From 'nov)
+  "Variable that says which function should be used to decode a string with encoded words.")
 
 (defcustom gnus-extra-headers nil
   "*Extra headers to parse."
@@ -1423,6 +1432,7 @@ increase the score of each group you read."
     "c" gnus-summary-catchup-and-exit
     "C" gnus-summary-catchup-all-and-exit
     "E" gnus-summary-exit-no-update
+    "J" gnus-summary-jump-to-other-group
     "Q" gnus-summary-exit
     "Z" gnus-summary-exit
     "n" gnus-summary-catchup-and-goto-next-group
@@ -2505,10 +2515,8 @@ marks of articles."
 (defun gnus-summary-from-or-to-or-newsgroups (header)
   (let ((to (cdr (assq 'To (mail-header-extra header))))
 	(newsgroups (cdr (assq 'Newsgroups (mail-header-extra header))))
-	(mail-parse-charset gnus-newsgroup-charset)
-	(mail-parse-ignored-charsets 
-	 (save-excursion (set-buffer gnus-summary-buffer)
-			 gnus-newsgroup-ignored-charsets)))
+	(default-mime-charset (with-current-buffer gnus-summary-buffer
+				default-mime-charset)))
     (cond
      ((and to
 	   gnus-ignored-from-addresses
@@ -2688,6 +2696,26 @@ If NO-DISPLAY, don't generate a summary buffer."
 	  (setq group (gnus-group-group-name))
 	(setq group nil)))
     result))
+
+(defun gnus-summary-jump-to-other-group (group &optional show-all)
+  "Directly jump to the other GROUP from summary buffer.
+If SHOW-ALL is non-nil, already read articles are also listed."
+  (interactive
+   (if (eq gnus-summary-buffer (current-buffer))
+       (list (completing-read
+	      "Group: " gnus-active-hashtb nil t
+	      (when (and gnus-newsgroup-name
+			 (string-match "[.:][^.:]+$" gnus-newsgroup-name))
+		(substring gnus-newsgroup-name 0 (1+ (match-beginning 0))))
+	      'gnus-group-history)
+	     current-prefix-arg)
+     (error "%s must be invoked from a gnus summary buffer." this-command)))
+  (unless (or (zerop (length group))
+	      (and gnus-newsgroup-name
+		   (string-equal gnus-newsgroup-name group)))
+    (gnus-summary-exit)
+    (gnus-summary-read-group group show-all
+			     gnus-dont-select-after-jump-to-other-group)))
 
 (defun gnus-summary-read-group-1 (group show-all no-article
 					kill-buffer no-display
@@ -4132,15 +4160,16 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		 ((and (or (<= scored marked) (= scored number))
 		       (natnump gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let* ((minibuffer-setup-hook (append
-						 minibuffer-setup-hook
-						 '(beginning-of-line)))
-			 (input (read-string
-				 (format
-				  "How many articles from %s (max %d): "
-				  (gnus-limit-string gnus-newsgroup-name 35)
-				  number)
-				 (number-to-string gnus-large-newsgroup))))
+		  (let ((input (read-from-minibuffer
+				(format
+				 "How many articles from %s (max %d): "
+				 (gnus-limit-string gnus-newsgroup-name 35)
+				 number)
+				(static-if (< emacs-major-version 20)
+				    (number-to-string gnus-large-newsgroup)
+				  (cons
+				   (number-to-string gnus-large-newsgroup)
+				   0)))))
 		    (if (string-match "^[ \t]*$" input)
 			number
 		      input)))
@@ -5159,22 +5188,24 @@ With arg, turn line truncation on iff arg is positive."
   (redraw-display))
 
 (defun gnus-summary-reselect-current-group (&optional all rescan)
-  "Exit and then reselect the current newsgroup.
+  "Rescan the current newsgroup, exit and then reselect it.
 The prefix argument ALL means to select all articles."
   (interactive "P")
   (when (gnus-ephemeral-group-p gnus-newsgroup-name)
     (error "Ephemeral groups can't be reselected"))
   (let ((current-subject (gnus-summary-article-number))
 	(group gnus-newsgroup-name))
+    (save-excursion
+      (set-buffer gnus-group-buffer)
+      ;; We have to adjust the point of group mode buffer because
+      ;; point was moved to the next unread newsgroup by exiting.
+      (gnus-summary-jump-to-group group)
+      (when rescan
+	(save-excursion
+	  (gnus-group-get-new-news-this-group 1))))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
-    ;; We have to adjust the point of group mode buffer because
-    ;; point was moved to the next unread newsgroup by exiting.
-    (gnus-summary-jump-to-group group)
-    (when rescan
-      (save-excursion
-	(gnus-group-get-new-news-this-group 1)))
-    (gnus-group-read-group all t)
+    (gnus-group-read-group all t group)
     (gnus-summary-goto-subject current-subject nil t)))
 
 (defun gnus-summary-rescan-group (&optional all)

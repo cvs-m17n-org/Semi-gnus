@@ -38,8 +38,9 @@
 (require 'alist)
 (require 'mime-view)
 
-;; Avoid byte-compile warnings.
 (eval-when-compile
+  (require 'static)
+  ;; Avoid byte-compile warnings.
   (defvar gnus-article-decoded-p)
   (defvar gnus-article-mime-handles)
   (require 'mm-bodies)
@@ -2942,6 +2943,14 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (funcall (if gnus-show-mime
 		 (progn
 		   (setq mime-message-structure gnus-current-headers)
+		   (mime-buffer-entity-set-buffer-internal
+		    mime-message-structure
+		    gnus-original-article-buffer)
+		   (mime-entity-set-representation-type-internal
+		    mime-message-structure 'mime-buffer-entity)
+		   (luna-send mime-message-structure
+			      'initialize-instance
+			      mime-message-structure)
 		   gnus-article-display-method-for-mime)
 	       gnus-article-display-method-for-traditional)))
   ;; Associate this article with the current summary buffer.
@@ -2975,43 +2984,6 @@ value of the variable `gnus-show-mime' is non-nil."
     (decode-mime-charset-region (point-min) (point-max)
 				(with-current-buffer gnus-summary-buffer
 				  default-mime-charset))))
-
-;; The following procedures will be abolished in the future.
-(autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
-(defvar x-face-mule-version-number)
-(defun gnus-article-display-x-face-with-x-face-mule (&rest args)
-  "Decode and show X-Face with the function
-`x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
-narrowed to just the headers of the article."
-  (when gnus-xemacs
-    (error "`%s' won't work under XEmacs."
-	   'gnus-article-display-x-face-with-x-face-mule))
-  (when window-system
-    (when (and (boundp 'x-face-mule-version-number)
-	       (> (string-to-number x-face-mule-version-number) 0.24)
-	       (not (gnus-buffer-live-p "*X-Face-Mule WARNING*")))
-      (let ((buffer (generate-new-buffer "*X-Face-Mule WARNING*")))
-	(save-window-excursion
-	  (pop-to-buffer buffer)
-	  (insert (format
-		   "WARNING:
-`%s' is an obsolete function.
-You have no use for setting the variable `%s',
-however, it will be set suitably by X-Face-Mule %s.
-Type any key: "
-		   'gnus-article-display-x-face-with-x-face-mule
-		   'gnus-article-x-face-command
-		   x-face-mule-version-number))
-	  (let ((inhibit-quit t) (echo-keystrokes 0) cursor-in-echo-area)
-	    (read-char-exclusive))
-	  (beginning-of-line)
-	  (delete-region (point) (point-max)))))
-    (condition-case err
-	(x-face-mule-x-face-decode-message-header)
-      (error (error "%s"
-		    (if (featurep 'x-face-mule)
-			"Please install x-face-mule 0.25 or later."
-		      err))))))
 
 ;;;
 ;;; Gnus MIME viewing functions
@@ -3801,7 +3773,7 @@ Argument LINES specifies lines to be scrolled down."
   (gnus-article-check-buffer)
   (let ((nosaves
          '("q" "Q"  "c" "r" "R" "\C-c\C-f" "m"  "a" "f" "F"
-           "Zc" "ZC" "ZE" "ZQ" "ZZ" "Zn" "ZR" "ZG" "ZN" "ZP"
+           "Zc" "ZC" "ZE" "ZJ" "ZQ" "ZZ" "Zn" "ZR" "ZG" "ZN" "ZP"
            "=" "^" "\M-^" "|"))
         (nosave-but-article
          '("A\r"))
@@ -3814,10 +3786,9 @@ Argument LINES specifies lines to be scrolled down."
       (set-buffer gnus-article-current-summary)
       (let (gnus-pick-mode)
         (push (or key last-command-event) unread-command-events)
-        (setq keys (if gnus-xemacs
+	(setq keys (static-if (featurep 'xemacs)
 		       (events-to-keys (read-key-sequence nil))
 		     (read-key-sequence nil)))))
-		     
     (message "")
 
     (if (or (member keys nosaves)

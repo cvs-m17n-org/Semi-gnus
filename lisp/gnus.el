@@ -30,7 +30,9 @@
 
 (eval '(run-hooks 'gnus-load-hook))
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (require 'custom)
 (eval-and-compile
@@ -264,10 +266,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.072"
+(defconst gnus-version-number "6.13.0"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "03"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.95"
@@ -279,7 +281,7 @@ is restarted, and sometimes reloaded."
   "Product name of the original version of Gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on %s v%s ; for SEMI 1.12/1.13, FLIM 1.12)"
+  (format "%s %s (based on %s v%s ; for SEMI 1.13, FLIM 1.13)"
 	  gnus-product-name gnus-version-number
 	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")
@@ -1747,7 +1749,8 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-offer-save-summaries gnus-make-thread-indent-array
       gnus-summary-exit gnus-update-read-articles gnus-summary-last-subject
       gnus-summary-skip-intangible gnus-summary-article-number
-      gnus-data-header gnus-data-find)
+      gnus-data-header gnus-data-find
+      gnus-summary-jump-to-other-group)
      ("gnus-group" gnus-group-insert-group-line gnus-group-quit
       gnus-group-list-groups gnus-group-first-unread-group
       gnus-group-set-mode-line gnus-group-set-info gnus-group-save-newsrc
@@ -2879,7 +2882,7 @@ the variable `toolbar-news-frame-plist' will be refered instead."
 (defun gnus-other-frame (&optional arg)
   "Pop up a frame to read news."
   (interactive "P")
-  (if (featurep 'xemacs)
+  (static-if (featurep 'xemacs)
       (let ((toolbar-news-use-separate-frame t))
 	(toolbar-gnus))
     (if (frame-live-p gnus-frame)

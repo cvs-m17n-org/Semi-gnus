@@ -32,7 +32,9 @@
 (require 'gnus-range)
 (require 'gnus-util)
 (require 'message)
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (defcustom gnus-startup-file (nnheader-concat gnus-home-directory ".newsrc")
   "Your `.newsrc' file.
@@ -395,7 +397,9 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system 'ctext
+(defvar gnus-startup-file-coding-system (static-if (boundp 'MULE)
+					    '*ctext*
+					  'ctext)
   "*Coding system for startup file.")
 
 ;;; Internal variables

@@ -134,7 +134,7 @@ Returns the process associated with the connection."
       ((eq pop3-connection-type 'ssl)
        (pop3-open-ssl-stream "POP" process-buffer mailhost port))
       (t
-       (open-network-stream-as-binary "POP"process-buffer mailhost port))))
+       (open-network-stream-as-binary "POP" process-buffer mailhost port))))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
@@ -206,22 +206,6 @@ Return the response string if optional second argument is non-nil."
 	      (buffer-substring (point) match-end)
 	    t)
 	  )))))
-
-(defun pop3-string-to-list (string &optional regexp)
-  "Chop up a string into a list."
-  (let ((list)
-	(regexp (or regexp " "))
-	(string (if (string-match "\r" string)
-		    (substring string 0 (match-beginning 0))
-		  string)))
-    (store-match-data nil)
-    (while string
-      (if (string-match regexp string)
-	  (setq list (cons (substring string 0 (- (match-end 0) 1)) list)
-		string (substring string (match-end 0)))
-	(setq list (cons string list)
-	      string nil)))
-    (nreverse list)))
 
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)

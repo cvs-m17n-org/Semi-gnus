@@ -1,24 +1,28 @@
-このパッケージには T-gnus 6.10 が入っています。
+このパッケージには T-gnus 6.13 が入っています。
 
-Semi-gnus とは？
-==================
+T-gnus とは？
+=============
 
-  Semi-gnus は SEMI のための gnus-mime と Gnus の組合せを置き換えるも
-のです。Gnus と gnus-mime の全ての機能を持っていますので、これを使用す
-るために Gnus をインストールする必要はなく、SEMI のための gnus-mime は
-使用してはいけません。
+  T-gnus は SEMI のための gnus-mime と Gnus の組合せを置き換えるもので
+す。Gnus と gnus-mime の全ての機能を持っていますので、これを使用するた
+めに Gnus をインストールする必要はなく、SEMI のための gnus-mime は使用
+してはいけません。
 
   APEL, FLIM および SEMI パッケージが必要ですので、インストールする前
-にそれらをインストールしてください。T-gnus 6.10 は APEL 9.13 以上、最
-新の FLIM 1.12 および SEMI 1.12 を必要とします。
-それらのパッケージは
-ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
+にそれらをインストールしてください。T-gnus 6.13 は APEL 9.20 以上、
+FLIM (1.13.1 以上) および SEMI/WEMI (1.13.5 以上) を必要とします。それ
+らのパッケージは
+
+ftp://ftp.etl.go.jp/pub/mule/apel/
+ftp://ftp.etl.go.jp/pub/mule/flim/flim-1.13/
+ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.13/
+
 から取得することができます。必要な環境は SEMI の README.ja を参照して
 ください。
 
 
 取得方法 (CVS)
-=====================
+==============
 
 (0) cvs login (初回のみ)
 
@@ -30,21 +34,28 @@ ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 (1) checkout
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout [-r TAG] gnus
+	checkout -r t-gnus-6_13 gnus
 
 (2) compile
 
     % cd gnus
-    % make EMACS=<file name of your emacs>
+    % configure [options]
+    % make [options]
 
 (3) update
 
-    % cvs update [-r TAG]
+    % cvs update -r t-gnus-6_13 gnus
 
 主なタグは以下のようになっています:
 
+    t-gnus-6_12		最新の T-gnus の安定版に割り当てられます。
+
+    t-gnus-6_13		最新の T-gnus の開発版に割り当てられます。
+
+    pgnus-ichikawa	T-gnus の幹です。
+
     semi-gnus		最新の安定版に割り当てられます。非常に保守的で
-			す。(現在は使用されていません。)
+			す。現在は使用されていません。
 
     for-semi-N1_N2	SEMI API N1.N2 (N1 と N2 は自然数) に対応して
 			最新の安定版に割り当てられます。(例
@@ -58,50 +69,51 @@ ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 
     himi		himi branch
 
-    ichikawa		ichikawa branch
-			Based on pGnus.
-
     akr			akr branch
 
     shuhei-k		shuhei-k branch
 			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
 
-    keiichi             keiichi branch
-    nana-gnus-N1_N2     Stable version of `keiichi branch'.
+    keiichi		keiichi branch
+    nana-gnus-N1_N2	Stable version of `keiichi branch'.
 
 詳しくは、README.branch.ja を参照してください。
 
 
 取得方法 (ftp)
-=====================
+==============
 
-  ほぼ毎日の snapshot が
+  リリース版は
 
-    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/chamonix/gnus/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/
+
+  から取得可能です。そしてほぼ毎日の snapshot が
+
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/snapshots/
 
   から取得可能です。
 
-  注意: これらの snapshot はその日の間に repository に何か変更があった
-  ときに自動的に作成され、普通はテストされていません。
+  注意: これらの snapshot は a-ftp site の管理者の気が向いたときに手動
+  で作成され、普通はテストされていません。
 
 
 開発への参加方法
-=======================
+================
 
   Gnus のバグを見つけたときは、`M-x gnus-bug' として、Gnus の維持者に
   バグ報告を送ってください。
 
-  Semi-gnus のバグを見つけたか、Gnus のバグであるかどうかが分からない
-  ときは、バグ報告を Semi-gnus メーリングリストに送ってください:
+  T-gnus のバグを見つけたか、Gnus のバグであるかどうかが分からないとき
+  は、バグ報告を Semi-gnus メーリングリストに送ってください:
 
     semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(英語)
     semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(日本語)
 
-Semi-gnus の改善のための提案も歓迎されます。
+  T-gnus の改善のための提案も歓迎されます。
 
-  Semi-gnus ML では、Semi-gnus 関連のバグを報告したり、最新の
-  Semi-gnus のリリースを取得したり、Semi-gnus の将来の拡張を議論したり
-  することができます。Semi-gnus ML に参加するためには
+  Semi-gnus ML では、T-gnus 関連のバグを報告したり、最新の T-gnus のリ
+  リースを取得したり、T-gnus の将来の拡張を議論したりすることができま
+  す。Semi-gnus ML に参加するためには
 
     semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(英語)
     semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(日本語)
@@ -109,5 +121,12 @@ Semi-gnus の改善のための提案も歓迎されます。
   に空のメールを送ってください。
 
   加えて、開発者を必要としています。開発に参加したい場合は、
-cvs@chamonix.jaist.ac.jp にアカウント名と UNIX の /etc/passwd の様式で
-暗号化されたパスワードをメールを送ってください。
+  cvs@chamonix.jaist.ac.jp にアカウント名と UNIX の /etc/passwd の様式
+  で暗号化されたパスワードをメールを送ってください。
+  chamonix open CVS server で行なわれた変更をメールで通知してもらうこ
+  とも可能です。これには gnus 以外の module に関する情報も含まれます。
+  必要な方は
+
+    cvs-info-help@chamonix.jaist.ac.jp
+
+  に空のメールを送って案内に従って下さい。

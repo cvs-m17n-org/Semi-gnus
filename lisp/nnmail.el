@@ -496,7 +496,8 @@ nn*-request-list should have been called before calling this function."
 
 (defun nnmail-save-active (group-assoc file-name)
   "Save GROUP-ASSOC in ACTIVE-FILE."
-  (let ((coding-system-for-write nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system)
+	(output-coding-system nnmail-active-file-coding-system))
     (when file-name
       (with-temp-file file-name
 	(nnmail-generate-active group-assoc)))))

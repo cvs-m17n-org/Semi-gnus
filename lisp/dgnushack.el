@@ -27,12 +27,104 @@
 
 ;;; Code:
 
+;; Set coding priority of Shift-JIS to the bottom.
+(defvar *predefined-category*)
+(defvar coding-category-list)
+(if (featurep 'xemacs)
+    (fset 'set-coding-priority 'ignore)
+  (fset 'coding-priority-list 'ignore)
+  (fset 'set-coding-priority-list 'ignore))
+(cond ((and (featurep 'xemacs) (featurep 'mule))
+       (if (memq 'shift-jis (coding-priority-list))
+	   (set-coding-priority-list
+	    (nconc (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
+      ((boundp 'MULE)
+       (put '*coding-category-sjis* 'priority (length *predefined-category*)))
+      ((featurep 'mule)
+       (if (memq 'coding-category-sjis coding-category-list)
+	   (set-coding-priority
+	    (nconc (delq 'coding-category-sjis coding-category-list)
+		   '(coding-category-sjis))))))
+
 (fset 'facep 'ignore)
 
 (require 'cl)
 (require 'bytecomp)
+
+;; Attempt to pickup the additional load-path(s).
+(load (expand-file-name "./dgnuspath.el") nil nil t)
+(condition-case err
+    (load "~/.lpath.el" t nil t)
+  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
+
 (push "." load-path)
 (load "./lpath.el" nil t)
+
+(condition-case nil
+    (char-after)
+  (wrong-number-of-arguments
+   ;; Optimize byte code for `char-after',
+   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
+   (defun byte-optimize-char-after (form)
+     (if (null (cdr form))
+	 '(char-after (point))
+       form))))
+
+(condition-case nil
+    (char-before)
+  (wrong-number-of-arguments
+   ;; Optimize byte code for `char-before',
+   (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
+   (defun byte-optimize-char-before (form)
+     (if (null (cdr form))
+	 '(char-before (point))
+       form))))
+
+(unless (fboundp 'byte-compile-file-form-custom-declare-variable)
+  ;; Bind defcustom'ed variables.
+  (put 'custom-declare-variable 'byte-hunk-handler
+       'byte-compile-file-form-custom-declare-variable)
+  (defun byte-compile-file-form-custom-declare-variable (form)
+    (if (memq 'free-vars byte-compile-warnings)
+	(setq byte-compile-bound-variables
+	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
+    form))
+
+;; Bind functions defined by `defun-maybe'.
+(put 'defun-maybe 'byte-hunk-handler 'byte-compile-file-form-defun-maybe)
+(defun byte-compile-file-form-defun-maybe (form)
+  (if (and (not (fboundp (nth 1 form)))
+	   (memq 'unresolved byte-compile-warnings))
+      (setq byte-compile-function-environment
+	    (cons (cons (nth 1 form)
+			(cons 'lambda (cdr (cdr form))))
+		  byte-compile-function-environment)))
+  form)
+
+(condition-case nil
+    :symbol-for-testing-whether-colon-keyword-is-available-or-not
+  (void-variable
+   ;; Bind keywords.
+   (mapcar (lambda (keyword) (set keyword keyword))
+	   '(:button-keymap
+	     :data :file :mime-handle :path :predicate :user))))
+
+;; Unknown variables and functions.
+(unless (boundp 'buffer-file-coding-system)
+  (defvar buffer-file-coding-system (symbol-value 'file-coding-system)))
+(autoload 'font-lock-set-defaults "font-lock")
+(defalias 'coding-system-get 'ignore)
+(when (boundp 'MULE)
+  (defalias 'find-coding-system 'ignore))
+(defalias 'get-charset-property 'ignore)
+(unless (featurep 'xemacs)
+  (defalias 'Custom-make-dependencies 'ignore)
+  (defalias 'toolbar-gnus 'ignore)
+  (defalias 'update-autoloads-from-directory 'ignore))
+
+(unless (fboundp 'with-temp-buffer)
+  ;; Pickup some macros.
+  (require 'emu))
 
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
@@ -61,7 +153,8 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (directory-files "." nil "^[^=].*\\.el$"))
+  (let ((files (delete "dgnuspath.el"
+		       (directory-files "." nil "^[^=].*\\.el$")))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
@@ -112,8 +205,18 @@ Modify to suit your needs."))
 
     (message "Updating autoloads for directory %s..." default-directory)
     (let ((generated-autoload-file "auto-autoloads.el")
-	  noninteractive)
-      (update-autoloads-from-directory default-directory))
+	  noninteractive
+	  (omsg (symbol-function 'message)))
+      (defun message (fmt &rest args)
+	(cond ((and (string-equal "Generating autoloads for %s..." fmt)
+		    (file-exists-p (file-name-nondirectory (car args))))
+	       (funcall omsg fmt (file-name-nondirectory (car args))))
+	      ((string-equal "No autoloads found in %s" fmt))
+	      ((string-equal "Generating autoloads for %s...done" fmt))
+	      (t (apply omsg fmt args))))
+      (unwind-protect
+	  (update-autoloads-from-directory default-directory)
+	(fset 'message omsg)))
     (byte-compile-file "auto-autoloads.el")
 
     (with-temp-buffer
@@ -129,7 +232,9 @@ Modify to suit your needs."))
 	      lisp-dir
 	      (mapconcat
 	       'identity
-	       (sort (directory-files "." nil "\\.elc?$")
+	       (sort (delete "dgnuspath.el"
+			     (delete "patchs.elc"
+				     (directory-files "." nil "\\.elc?$")))
 		     'string-lessp)
 	       (concat "\n" lisp-dir))
 	      "\ninfo/"
@@ -179,7 +284,11 @@ You must specify the name of the package path as follows:
     (unless (file-directory-p pkginfo-dir)
       (make-directory pkginfo-dir))
 
-    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+    (setq files
+	  (sort (delete "dgnuspath.el"
+			(delete "dgnuspath.elc"
+				(directory-files "." nil "\\.elc?$")))
+		'string-lessp))
     (mapcar
      (lambda (file)
        (unless (member file files)

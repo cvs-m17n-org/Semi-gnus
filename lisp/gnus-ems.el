@@ -53,24 +53,6 @@
 
 ;;; Mule functions.
 
-(defun gnus-mule-cite-add-face (number prefix face)
-  ;; At line NUMBER, ignore PREFIX and add FACE to the rest of the line.
-  (when face
-    (let ((inhibit-point-motion-hooks t)
-	  from to overlay)
-      (goto-char (point-min))
-      (when (zerop (forward-line (1- number)))
-	(move-to-column (string-width prefix))
-	(skip-chars-forward " \t")
-	(setq from (point))
-	(end-of-line 1)
-	(skip-chars-backward " \t")
-	(setq to (point))
-	(when (< from to)
-	  (push (setq overlay (gnus-make-overlay from to))
-		gnus-cite-overlay-list)
-	  (gnus-overlay-put overlay 'face face))))))
-
 (defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
@@ -262,9 +244,6 @@
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (when (fboundp 'chars-in-string)
-      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
-
     )))
 
 (defun gnus-region-active-p ()
@@ -327,6 +306,49 @@
 	(setq parts (cons (substring string start (match-beginning 0)) parts)
 	      start (match-end 0)))
       (nreverse (cons (substring string start) parts)))))
+
+(defun-maybe assoc-ignore-case (key alist)
+  "Like `assoc', but assumes KEY is a string and ignores case when comparing."
+  (setq key (downcase key))
+  (let (element)
+    (while (and alist (not element))
+      (if (equal key (downcase (car (car alist))))
+	  (setq element (car alist)))
+      (setq alist (cdr alist)))
+    element))
+
+
+;;; Language support staffs.
+
+(defvar-maybe current-language-environment "English"
+  "The language environment.")
+
+(defvar-maybe language-info-alist nil
+  "Alist of language environment definitions.")
+
+(defun-maybe get-language-info (lang-env key)
+  "Return information listed under KEY for language environment LANG-ENV."
+  (if (symbolp lang-env)
+      (setq lang-env (symbol-name lang-env)))
+  (let ((lang-slot (assoc-ignore-case lang-env language-info-alist)))
+    (if lang-slot
+	(cdr (assq key (cdr lang-slot))))))
+
+(defun-maybe set-language-info (lang-env key info)
+  "Modify part of the definition of language environment LANG-ENV."
+  (if (symbolp lang-env)
+      (setq lang-env (symbol-name lang-env)))
+  (let (lang-slot key-slot)
+    (setq lang-slot (assoc lang-env language-info-alist))
+    (if (null lang-slot)		; If no slot for the language, add it.
+	(setq lang-slot (list lang-env)
+	      language-info-alist (cons lang-slot language-info-alist)))
+    (setq key-slot (assq key lang-slot))
+    (if (null key-slot)			; If no slot for the key, add it.
+	(progn
+	  (setq key-slot (list key))
+	  (setcdr lang-slot (cons key-slot (cdr lang-slot)))))
+    (setcdr key-slot info)))
 
 (provide 'gnus-ems)
 

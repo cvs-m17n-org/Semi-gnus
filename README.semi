@@ -1,16 +1,21 @@
-This package contains T-gnus 6.10.
+This package contains T-gnus 6.13.
 
-What is Semi-gnus?
-==================
+What is T-gnus?
+===============
 
-  Semi-gnus is a replacement of Gnus with gnus-mime for SEMI.  It has
-all features of Gnus and gnus-mime, so there are no need to install
-Gnus to use it, and you must not use gnus-mime for SEMI.
+  T-gnus is a replacement of Gnus with gnus-mime for SEMI.  It has all
+features of Gnus and gnus-mime, so there are no need to install Gnus
+to use it, and you must not use gnus-mime for SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
-them before to install it. T-gnus 6.10 requires APEL 9.13 or later, the
-latest FLIM 1.12 and SEMI 1.12. You can get these packages from
-ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
+them before to install it.  T-gnus 6.13 requires APEL 9.20 or later,
+FLIM (1.13.1 or later) and SEMI/WEMI (1.13.5 or later).  You can get
+these packages from:
+
+ftp://ftp.etl.go.jp/pub/mule/apel/
+ftp://ftp.etl.go.jp/pub/mule/flim/flim-1.13/
+ftp://ftp.etl.go.jp/pub/mule/semi/semi-1.13-for-flim-1.13/
+
 Required environment for SEMI is written in README.en of SEMI package.
 
 
@@ -27,21 +32,29 @@ How to get? (via CVS)
 (1) checkout
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout [-r TAG] gnus
+	checkout -r t-gnus-6_13 gnus
 
 (2) compile
 
     % cd gnus
-    % make EMACS=<file name of your emacs>
+    % configure [options]
+    % make [options]
 
 (3) update
 
-    % cvs update [-r TAG]
+    % cvs update -r t-gnus-6_13 gnus
 
 Major tags are following:
 
-    semi-gnus		assigned to the latest stable version.  It is
-			very conservative.
+    t-gnus-6_12		Assigned to the latest stable version of T-gnus.
+
+    t-gnus-6_13		Assigned to the latest development version of
+			T-gnus.
+
+    pgnus-ichikawa	The main trunk of T-gnus.
+
+    semi-gnus		Assigned to the latest stable version.	It is
+			very conservative. Currently it is not used.
 
     for-semi-N1_N2	assigned to the latest stable version for SEMI
 			API N1.N2 (N1 and N2 are natural number).
@@ -54,16 +67,13 @@ Major tags are following:
 
     himi		himi branch
 
-    pgnus-ichikawa	ichikawa branch
-			Based on pGnus.
-
     akr			akr branch
 
     shuhei-k		shuhei-k branch
 			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
 
-    keiichi             keiichi branch
-    nana-gnus-N1_N2     Stable version of `keiichi branch'.
+    keiichi		keiichi branch
+    nana-gnus-N1_N2	Stable version of `keiichi branch'.
 
 For more detailed information, please read README.branch.
 
@@ -71,12 +81,16 @@ For more detailed information, please read README.branch.
 How to get? (via ftp)
 =====================
 
-  Semi-daily snapshots are also available from
+  The released version of T-gnus is available from
 
-    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/chamonix/gnus/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
 
-  NOTE: These snapshots are automatically created from our repository
-if something was changed within a day, and will usually not be tested.
+  In addition, semi-daily snapshots are also available from
+
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
+
+  NOTE: These snapshots are manually created when the urge takes the
+  administrator of the a-ftp site, and will usually not be tested.
 
 
 How to join development
@@ -85,21 +99,27 @@ How to join development
   If you have found a bug in Gnus proper, please do `M-x gnus-bug' and
 send a bug report to the Gnus maintainers.
 
-  If you have found a bug in Semi-gnus, or if you're not sure whether it
-is a Gnus proper, please send a bug report to the Semi-gnus mailing list:
+  If you have found a bug in T-gnus, or if you're not sure whether it
+is a Gnus proper, please send a bug report to the Semi-gnus mailing
+list:
 
     semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
     semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
-Suggestions for Semi-gnus improvements are also welcome.
+Suggestions for T-gnus improvements are also welcome.
 
-  Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
-the latest release of Semi-gnus, and discuss future enhancements to
-Semi-gnus.  To join the Semi-gnus ML, send an empty e-mail to
+  Via the Semi-gnus ML, you can report T-gnus related bugs, obtain the
+latest release of T-gnus, and discuss future enhancements to T-gnus.
+To join the Semi-gnus ML, send an empty e-mail to
 
     semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(English)
     semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
 please send mail to cvs@chamonix.jaist.ac.jp with your account name
-and UNIX /etc/passwd style crypted password.
+and UNIX /etc/passwd style crypted password.  You can get the notice
+of modifications in chamonix open CVS server via the mail which also
+contains informations on the other modules.  To subscribe it, send an
+empty e-mail to
+
+    cvs-info-help@chamonix.jaist.ac.jp

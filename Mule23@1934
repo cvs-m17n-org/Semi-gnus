@@ -1,0 +1,24 @@
+There are two ways of making gnus with Mule 2.3 based on Emacs 19.34.
+
+ 1. Use the configure option `--with-addpath=' to specify the colon
+    separated directory names where EMU, APEL or CUSTOM packages have
+    already installed.  For example:
+
+    configure --with-emacs=mule\
+    --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
+
+ 2. Copy `sample.lpath.el' to `~/.lpath.el' and modify it suitably for
+    your environment.
+
+
+Mule 2.3 based on Emacs 19.34 で gnus を作るには二つの方法があります。
+
+ 1. configure オプションの `--with-addpath=' を使って EMU, APEL および
+    CUSTOM の各パッケージがインストールされている場所を指定して下さい。
+    例えば
+
+    configure --with-emacs=mule\
+    --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
+
+ 2. `sample.lpath.el' を `~/.lpath.el' にコピーして、あなたの環境に
+    合うように書き換えて下さい。

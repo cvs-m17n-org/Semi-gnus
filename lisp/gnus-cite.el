@@ -26,6 +26,8 @@
 (require 'gnus-art)
 (require 'gnus-range)
 
+(eval-when-compile (require 'static))
+
 ;;; Customization:
 
 (defgroup gnus-cite nil
@@ -660,7 +662,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (goto-char (point-max))
 	       (gnus-article-search-signature)
 	       (point)))
-	alist entry start begin end numbers prefix)
+	alist entry start begin end numbers prefix mc-flag)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)
       ;; Each line.
@@ -905,7 +907,12 @@ See also the documentation for `gnus-article-highlight-citation'."
 	  from to overlay)
       (goto-char (point-min))
       (when (zerop (forward-line (1- number)))
-	(forward-char (length prefix))
+	(static-if (or (featurep 'xemacs)
+		       (and (eq emacs-major-version 20)
+			    (>= emacs-minor-version 3))
+		       (> emacs-major-version 20));-)
+	    (forward-char (length prefix))
+	  (move-to-column (string-width prefix)))
 	(skip-chars-forward " \t")
 	(setq from (point))
 	(end-of-line 1)

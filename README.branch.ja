@@ -1,7 +1,7 @@
 README.branch.ja --- branch と tag の説明 (草稿)
 ========================================================================
 
-Semi-gnus revision tree (1999-01-19)
+Semi-gnus revision tree (1999-08-04)
 
     vendor      personal    main trunk      public
     branch      branches                    branches
@@ -9,11 +9,23 @@ Semi-gnus revision tree (1999-01-19)
 qGnus 0.??  ------> Semi-gnus 6.0.0
        :                        :
        :        himi     <--  6.0.7
-       :        ichikawa <--  6.0.8
-       :        akr      <--  6.2.3
-       :        shuhei-k <--  6.3.1
-Gnus 5.6.11 ------>           6.3.3
-       :                      6.4.0 (for SEMI 1.5)
+       :    ichikawa <------  6.0.8
+       :       |                |
+       :     6.8.17 ---+        :
+       :       :       :        :
+       :               V        :
+       :         pgnus-ichikawa :
+       :               |        :
+       :             6.9.01     :
+       :               :        :              (1999.07.02: 公的枝に衣更え)
+       :               +-------->---------------+
+       :                        :               :
+       :                        :               V
+       :                        :            6.10.072 ----> t-gnus-6_12
+       :        akr      <--  6.2.3             :     \     (for FLIM 1.12)
+       :        shuhei-k <--  6.3.1                    \
+Gnus 5.6.11 ------>           6.3.3                     --> t-gnus-6_13
+       :                      6.4.0 (for SEMI 1.5)          (for FLIM 1.13)
        :                     (6.4.?)------> for SEMI 1.5
        :                        |    \
        :                        |     \
@@ -98,6 +110,9 @@ Public Branches
 	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API (stable)
 	gnus-6_9	Semi-gnus for SEMI 1.11, FLIM 1.12 API (stable)
 	gnus-6_10	Semi-gnus for SEMI 1.12, FLIM 1.12 API (develop)
+	pgnus-ichikawa	(Main trunk of T-gnus)
+	t-gnus-6_12	T-gnus for SEMI 1.12/1.13, FLIM 1.12 API (stable)
+	t-gnus-6_13	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 
 Personal Branches
 
@@ -112,8 +127,7 @@ Personal Branches
 	ichikawa	Owner: Tatsuya Ichikawa
 	akr		Owner: Tanaka Akira
 	shuhei-k	Owner: Shuhei KOBAYASHI
-	pgnus-ichikawa	Owner: Tatsuya Ichikawa
-	keiichi	        Owner: Keiichi Suzuki
+	keiichi		Owner: Keiichi Suzuki
 
 "semi-gnus" Tag
 

@@ -36,6 +36,7 @@
 (require 'nnheader)
 (require 'message)
 (require 'time-date)
+(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'rmail-insert-rmail-file-header "rmail")
@@ -109,15 +110,34 @@
      (when (gnus-buffer-exists-p buf)
        (kill-buffer buf))))
 
-(fset 'gnus-point-at-bol
-      (if (fboundp 'point-at-bol)
-	  'point-at-bol
-	'line-beginning-position))
-
-(fset 'gnus-point-at-eol
-      (if (fboundp 'point-at-eol)
-	  'point-at-eol
-	'line-end-position))
+(static-cond
+ ((fboundp 'point-at-bol)
+  (fset 'gnus-point-at-bol 'point-at-bol))
+ ((fboundp 'line-beginning-position)
+  (fset 'gnus-point-at-bol 'line-beginning-position))
+ (t
+  (defun gnus-point-at-bol ()
+    "Return point at the beginning of the line."
+    (let ((p (point)))
+      (beginning-of-line)
+      (prog1
+	  (point)
+	(goto-char p))))
+  ))
+(static-cond
+ ((fboundp 'point-at-eol)
+  (fset 'gnus-point-at-eol 'point-at-eol))
+ ((fboundp 'line-end-position)
+  (fset 'gnus-point-at-eol 'line-end-position))
+ (t
+  (defun gnus-point-at-eol ()
+    "Return point at the end of the line."
+    (let ((p (point)))
+      (end-of-line)
+      (prog1
+	  (point)
+	(goto-char p))))
+  ))
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -961,19 +981,34 @@ ARG is passed to the first function."
 	(throw 'found nil)))
     t))
 
-(defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
-  (let ((coding-system-for-write coding-system))
-    (with-temp-file file
-      (mapatoms
-       (lambda (sym)
-	 (when (and sym
-		    (boundp sym)
-		    (symbol-value sym))
-	   (insert (format "%s %d %d y\n"
-			   (gnus-group-real-name (symbol-name sym))
-			   (cdr (symbol-value sym))
-			   (car (symbol-value sym))))))
-       hashtb))))
+(static-if (boundp 'MULE)
+    (defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
+      (let ((output-coding-system coding-system))
+	(with-temp-file file
+	  (mapatoms
+	   (lambda (sym)
+	     (when (and sym
+			(boundp sym)
+			(symbol-value sym))
+	       (insert (format "%s %d %d y\n"
+			       (gnus-group-real-name (symbol-name sym))
+			       (cdr (symbol-value sym))
+			       (car (symbol-value sym))))))
+	   hashtb))))
+  (defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
+    (let ((coding-system-for-write coding-system))
+      (with-temp-file file
+	(mapatoms
+	 (lambda (sym)
+	   (when (and sym
+		      (boundp sym)
+		      (symbol-value sym))
+	     (insert (format "%s %d %d y\n"
+			     (gnus-group-real-name (symbol-name sym))
+			     (cdr (symbol-value sym))
+			     (car (symbol-value sym))))))
+	 hashtb))))
+  )
 
 (provide 'gnus-util)
 
