@@ -360,18 +360,20 @@ AC_SUBST(USE_FONTS)
 AC_DEFUN(AC_EXAMINE_PACKAGEDIR,
  [dnl Examine PACKAGEDIR.
   AC_EMACS_LISP(PACKAGEDIR,
-    (let (package-dir)\
-      (if (boundp (quote early-packages))\
-	  (let ((dirs (delq nil (append (if early-package-load-path\
-					    early-packages)\
-					(if late-package-load-path\
-					    late-packages)\
-					(if last-package-load-path\
-					    last-packages)))))\
-	    (while (and dirs (not package-dir))\
-	      (if (file-directory-p (car dirs))\
-		  (setq package-dir (car dirs)\
-			dirs (cdr dirs))))))\
+    (let ((dirs (append\
+		 (if (and (boundp (quote configure-package-path))\
+			  (listp configure-package-path))\
+		     (delete \"\" configure-package-path))\
+		 (if (boundp (quote early-packages))\
+		     (append\
+		      (if early-package-load-path early-packages)\
+		      (if late-package-load-path late-packages)\
+		      (if last-package-load-path last-packages)))))\
+	  package-dir)\
+      (while (and dirs (not package-dir))\
+	(if (file-directory-p (car dirs))\
+	    (setq package-dir (car dirs)\
+		  dirs (cdr dirs))))\
       (or package-dir \"\")),
     "noecho")])
 
