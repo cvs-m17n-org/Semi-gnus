@@ -30,7 +30,14 @@ in your Emacs, you should probably exit that Emacs and start a new one
 to fire up Gnus.
 
 Gnus does absolutely not work with anything older than Emacs 20.3 or
-XEmacs 21.1.1.  So you definitely need a new Emacs.
+XEmacs 21.1.1.  So you definitely need a new Emacs.  However, T-gnus
+does support `Mule 2.3 based on Emacs 19.34' (it is commonly called
+"Mule 2.3@19.34").  See the file `Mule23@1934.{en,ja}' for details.
+Furthermore, you might be able to use the versions of XEmacs prior to
+21.1.1, e.g. 20.4, with a little work.  For that, copy the file
+`timer.el' in the `contrib' directory to the `site-lisp' directory and
+do a `M-x byte-compile-file'.  This file is imported from one of the
+XEmacs package `fsf-compat-1.07-pkg.tar.gz'.
 
 Then you do a `M-x gnus', and everything should... uhm... it should
 work, but it might not. Set `debug-on-error' to t, and mail me the
@@ -49,4 +56,4 @@ There are four main things I want your help and input on:
    bit, and features you would like to see.
 
 Send any comments and all your bug fixes/complaints to
-`bugs@gnus.org'. 
+`semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp' (or `bugs@gnus.org'). 
