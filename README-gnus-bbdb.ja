@@ -29,6 +29,7 @@ bbdb-auto-notes-hook $B$r;HMQ$7$F$$$J$$J}$K$OITMW$G$9$,!";HMQ$7$F$$$kJ}(B
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'gnus / 'Gnus $B$O$O$:$7$F$/$@$5$$!#(B
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
 FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$;$s$,!"$=$l(B
 $B$r6/@)E*$K(B decode $B$7$?$$>l9g$K$O!"<!$N@_Dj$r2C$($F$/$@$5$$!#(B
@@ -44,7 +45,7 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
 +++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
-@@ -352,12 +352,22 @@
+@@ -352,12 +352,23 @@
  	(marker (bbdb-header-start))
  	field pairs fieldval  ; do all bindings here for speed
  	regexp string notes-field-name notes
@@ -60,8 +61,9 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 +	    function)
 +	(or (progn
 +	      (while (and (not extract-field-value-funtion)
-+			  (setq function (pop function-list)))
++			  (setq function (car function-list)))
 +		(setq extract-field-value-funtion (funcall function)))
++		      function-list (cdr function-list)))
 +	      extract-field-value-funtion)
 +	    (progn
 +	      (widen)
