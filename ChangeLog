@@ -1,3 +1,8 @@
+1998-09-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/nnmh.el (nnmh-request-accept-article): Insert `Message-ID'
+	only if `group' name is neither "queue" nor "draft".
+
 1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-munge-message-separator): Use
