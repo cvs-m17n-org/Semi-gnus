@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.054 Manual
+@settitle Semi-gnus 6.10.055 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.054 Manual
+@title Semi-gnus 6.10.055 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B$J8@8l7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation$B$r(B
 $B$*BT$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B Semi-gnus 6.10.054 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B Semi-gnus 6.10.055 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -7726,16 +7726,14 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9!J$3$l$O%G%#%U%)%k%H$G9T$o$l$^
 $B<($5$l$k$G$7$g$&!#(B
 
 @findex gnus-article-hide-boring-headers
-@vindex gnus-article-display-hook
 @vindex gnus-boring-article-headers
-@code{gnus-article-hide-boring-headers} $B$r(B
-@code{gnus-article-display-hook} $B$KF~$l$k$3$H$K$h$C$F!"$b$C$H$D(B
-$B$^$i$J$$%X%C%@!<$r1#$9$3$H$,$G$-$^$9!#$3$N4X?t$,2?$r$9$k$+$O(B
-@code{gnus-boring-article-headers} $BJQ?t$K0MB8$7$^$9!#$3$NJQ?t$O(B
-$B%j%9%H$G$9$,!"$3$N%j%9%H$K$O<B:]$N%X%C%@!<$NL>A0$,F~$k$N$G$O$"$j(B
-$B$^$;$s!#Be$o$j$K(B gnus $B$,%A%'%C%/$7$F;k3&$+$i>C$75n$k$?$a$N$5$^$6(B
-$B$^$J!V$D$^$i$J$$>r7o!W(B@dfn{boring conditions} $B$N%j%9%H$r;XDj$7$^(B
-$B$9!#(B
+@code{gnus-treat-hide-boring-headers} $B$r(B @code{head} $B$K%;%C%H$9(B
+$B$k$3$H$K$h$C$F!"$b$C$H$D$^$i$J$$%X%C%@!<$r1#$9$3$H$,$G$-$^$9!#$3(B
+$B$N4X?t$,2?$r$9$k$+$O(B@code{gnus-boring-article-headers} $BJQ?t$K0M(B
+$BB8$7$^$9!#$3$NJQ?t$O%j%9%H$G$9$,!"$3$N%j%9%H$K$O<B:]$N%X%C%@!<$N(B
+$BL>A0$,F~$k$N$G$O$"$j$^$;$s!#Be$o$j$K(B gnus $B$,%A%'%C%/$7$F;k3&$+$i(B
+$B>C$75n$k$?$a$N$5$^$6$^$J!V$D$^$i$J$$>r7o!W(B
+@dfn{boring conditions} $B$N%j%9%H$r;XDj$7$^$9!#(B
 
 $B$3$N>r7o$K$O0J2<$N$h$&$J$b$N$,$"$j$^$9!#(B
 @table @code
