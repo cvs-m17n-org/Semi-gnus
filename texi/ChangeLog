@@ -1,3 +1,8 @@
+2000-09-19  Kai Grossjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (IMAP): Add pointer to description of ~/.authinfo file
+	format.
+
 2000-09-17 Felix Natter  <f.natter@ndh.net>
 
 	* gnusref.tex: New version.

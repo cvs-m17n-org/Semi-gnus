@@ -348,7 +348,9 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
      (nnheader-nov-read-integer)	; lines
      (if (eq (char-after) ?\n)
 	 nil
-       (nnheader-nov-field))		; misc
+       (if (looking-at "Xref: ")
+	   (goto-char (match-end 0)))
+       (nnheader-nov-field))		; Xref
      (nnheader-nov-parse-extra))))	; extra
 
 (defun nnheader-insert-nov (header)

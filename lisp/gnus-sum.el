@@ -3325,22 +3325,29 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	header)
 
     ;; overview: [num subject from date id refs chars lines misc]
-    (unless (eobp)
-      (forward-char))
+    (unwind-protect
+	(progn
+	  (narrow-to-region (point) eol)
+	  (unless (eobp)
+	    (forward-char))
 
-    (setq header
-	  (make-full-mail-header
-	   number				; number
-	   (nnheader-nov-field)			; subject
-	   (nnheader-nov-field)			; from
-	   (nnheader-nov-field)			; date
-	   (nnheader-nov-read-message-id)	; id
-	   (nnheader-nov-field)			; refs
-	   (nnheader-nov-read-integer)		; chars
-	   (nnheader-nov-read-integer)		; lines
-	   (unless (eobp)
-	     (nnheader-nov-field))		; misc
-	   (nnheader-nov-parse-extra)))		; extra
+	  (setq header
+		(make-full-mail-header
+		 number				; number
+		 (nnheader-nov-field)		; subject
+		 (nnheader-nov-field)		; from
+		 (nnheader-nov-field)		; date
+		 (nnheader-nov-read-message-id)	; id
+		 (nnheader-nov-field)		; refs
+		 (nnheader-nov-read-integer)	; chars
+		 (nnheader-nov-read-integer)	; lines
+		 (unless (eobp)
+		   (if (looking-at "Xref: ")
+		       (goto-char (match-end 0)))
+		   (nnheader-nov-field))	; Xref
+		 (nnheader-nov-parse-extra))))	; extra
+
+      (widen))
 
     (when gnus-alter-header-function
       (funcall gnus-alter-header-function header))

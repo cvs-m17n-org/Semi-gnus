@@ -13151,14 +13151,15 @@ IMAP 接続に @code{shell} ストリームを使う場合、変
 メールボックスを閉じるときに、nnimap が消去された記事を削除するかどうか
 を尋ねます。
 
+@end table
+
 @item nnimap-authinfo-file
 @vindex nnimap-authinfo-file
 
 サーバにログインするために使う認証情報 (authinfo) を含むファイルです。そ
 の形式は (ほとんど) @code{ftp} の @file{~/.netrc} ファイルと同じです。厳
-密た定義は `nntp-authinfo-file'を見て下さい。
-
-@end table
+密な定義は、変数 @code{nntp-authinfo-file} および @xref{NNTP} を見て下さ
+い。
 
 @end table
 
