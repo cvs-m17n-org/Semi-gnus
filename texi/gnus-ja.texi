@@ -1611,11 +1611,11 @@ Gnus が起動すると、@code{gnus-site-init-file} (初期設定で
 は @file{~/.gnus}) のファイルを読み込みます。これらは普通
 の Emacs Lisp ファイルで、@file{~/.emacs} や @file{site-init} ファイル
 を gnus 関係のもので乱雑にしないようにするために使うことができます。
-Gnus はこれらと同じ名前のファイルを調べますが、接尾
-語 @file{.elc} と @file{.el} がついているものも調べます。言い換えれば、
-@code{gnus-init-file} を @file{~/.gnus} に設定すると、gnus は (この順番
-に) @file{~/.gnus.elc}, @file{~/.gnus.el} を探し、最後
-に @file{~/.gnus} を探します。
+Gnus はこれらと同じ名前のファイルに、接尾語 @file{.elc} と @file{.el} が
+付いているものも調べます。言い換えれば、
+@code{gnus-init-file} を @file{~/.gnus} に設定すると、
+gnus は @file{~/.gnus.elc}, @file{~/.gnus.el} を探し、最後
+に @file{~/.gnus} を (この順番に) 探します。
 
 @node Auto Save
 @section 自動保存
