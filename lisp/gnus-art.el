@@ -2805,9 +2805,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (mail-parse-ignored-charsets 
 	   (save-excursion (set-buffer gnus-summary-buffer)
 			   gnus-newsgroup-ignored-charsets)))
-      (if (stringp (car handles))
-	  (gnus-mime-view-all-parts (cdr handles))
-	(mapcar 'mm-display-part handles)))))
+      (if (listp handles)
+	  (mapcar 'mm-display-part handles)
+	(gnus-mime-view-all-parts (mm-handle-child handles))))))
 
 (defun gnus-mime-save-part ()
   "Save the MIME part under point."
