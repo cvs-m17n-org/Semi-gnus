@@ -1,3 +1,9 @@
+2002-01-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/canlock.el (canlock-string-as-unibyte): New macro.
+	(canlock-sha1-with-openssl): Return a unibyte string.
+	(canlock-make-cancel-key): Treat Message-ID as a unibyte string.
+
 2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (std11-fold-region): New function copied from
