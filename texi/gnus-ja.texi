@@ -19036,7 +19036,7 @@ The GNU Emacs Lisp Reference Manual}. XEmacs では、フレームプロパティリ
                      (vertical 0.24
                                (if (buffer-live-p gnus-summary-buffer)
                                    '(summary 0.5))
-                               (group 1.0)))))
+                               (group 1.0))))
 @end lisp
 
 複数のフレームへの良くある要望は、メールとニュースの作成には別のフレーム
@@ -20260,68 +20260,65 @@ Gnus は、スコア付け、スレッドの形成、スレッド比較などを行うときに、
 これで私のところでは動いています。これでみんなは簡単な方法で私に連絡を取
 ることができ (普通に @kbd{r} を押すだけでできる)、私は spam に煩わされる
 ことは全くありません。得々状態です。私の意見としては、@code{From} ヘッダー
-に偽造して存在しないドメインに送らせるのはキタナイです。
+を偽造して存在しないドメインに送らせるのはキタナイです。
 
 @node Pay Hashcash
 @section Pay Hashcash
 @cindex hashcash
 @cindex spam
 
-A novel technique to fight spam is to require senders to do something
-costly for each message they send.  This has the obvious drawback that
-you cannot rely on that everyone uses this technique, since it is
-optional, but it may be useful in smaller communities.
+Spam と戦うための新しい技法は、メッセージを送信する際にいくばくかの負担
+を送信者に強います。これは任意なので、すべての人がこの技法を使うことは当
+てにできないという明らかな欠点がありますが、小規模な共同体では役に立つで
+しょう。
 
 @cindex X-Hashcash
-The ``something costly'' is to burn CPU time, more specifically to
-compute a hash collision up to a certain number of bits.  The
-resulting hashcash cookie is inserted in a @samp{X-Hashcash:}
-header. For more details, and for the external application
-@code{hashcash} you need to install to use this feature, see
-@uref{http://www.cypherspace.org/~adam/hashcash/}.  Even more
-information can be found at @uref{http://www.camram.org/}.
+「いくばくかの負担」とは CPU 時間を消費することで、具体的には一定数のビッ
+トまでハッシュの衝突 (hash collision) を計算することです。その結果として
+の hashcash クッキーは @samp{X-Hashcash:} ヘッダーに挿入されます。もっと
+詳しいこと、そしてこの機能を使うためにインストールする必要がある外部アプ
+リケーションの @code{hashcash} について
+は @uref{http://www.cypherspace.org/~adam/hashcash/} を参照して下さい。
+さらなる情報が @uref{http://www.camram.org/} で見つかるでしょう。
 
-If you wish to call hashcash for each message you send, say something
-like:
+送信するメッセージのそれぞれについて hashcash を呼ぼうと思うなら、こんな
+ふうにして下さい:
 
 @lisp
 (require 'hashcash)
 (add-hook 'message-send-hook 'mail-add-payment)
 @end lisp
 
-The @code{hashcash.el} library can be found at
-@uref{http://users.actrix.gen.nz/mycroft/hashcash.el}, or in the Gnus
-development contrib directory.
+@code{hashcash.el} ライブラリ
+は @uref{http://users.actrix.gen.nz/mycroft/hashcash.el} か開発版
+の gnus の contrib ディレクトリにあります。
 
-You will need to set up some additional variables as well:
+いくつかの追加の変数の設定もしなければなりません:
 
 @table @code
-
 @item hashcash-default-payment
 @vindex hashcash-default-payment
-This variable indicates the default number of bits the hash collision
-should consist of.  By default this is 0, meaning nothing will be
-done.  Suggested useful values include 17 to 29.
+この変数はハッシュの衝突を成すディフォルトのビット数を示します。規定値
+は 0 で、何も行なわれないことを意味します。提案されている有効な値
+は 17 から 29 までの数です。
 
 @item hashcash-payment-alist
 @vindex hashcash-payment-alist
-Some receivers may require you to spend burn more CPU time than the
-default.  This variable contains a list of @samp{(ADDR AMOUNT)} cells,
-where ADDR is the receiver (email address or newsgroup) and AMOUNT is
-the number of bits in the collision that is needed.  It can also
-contain @samp{(ADDR STRING AMOUNT)} cells, where the STRING is the
-string to use (normally the email address or newsgroup name is used).
+何人かの受取人は、あなたにディフォルトより多くの CPU 時間を費やすことを
+要求するかもしれません。この変数は @samp{(ADDR AMOUNT)} の形式の要素のリ
+ストで、ADDR は受取人 (メールアドレスかニュースグループ)、AMOUNT は必要
+とされる衝突のビット数です。これはまた @samp{(ADDR STRING AMOUNT)} の要
+素を持つことも可能で、STRING は文字列 (通常はメールアドレスかニュースグ
+ループ名) として使われます。
 
 @item hashcash
 @vindex hashcash
-Where the @code{hashcash} binary is installed.
-
+@code{hashcash} バイナリがインストールされている場所を示します。
 @end table
 
-Currently there is no built in functionality in Gnus to verify
-hashcash cookies, it is expected that this is performed by your hand
-customized mail filtering scripts.  Improvements in this area would be
-a useful contribution, however.
+今のところ gnus に hashcash クッキーを認証する手段はありません。あなたが
+手作業でメールをふるいにかけるスクリプトをカスタマイズすることが求められ
+ています。しかし、この分野における改良は有用な貢献になるでしょう。
 
 @node Various Various
 @section いろいろのいろいろ
