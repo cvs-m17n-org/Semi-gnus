@@ -530,34 +530,34 @@ If SILENT, don't prompt the user."
   gnus-version)
 
 ;; Written by "Mr. Per Persson" <pp@gnu.ai.mit.edu>.
-(defun gnus-inews-insert-mime-headers ()
-  "Insert MIME headers.  
-Assumes ISO-Latin-1 is used iff 8-bit characters are present."
-  (goto-char (point-min))
-  (let ((mail-header-separator
-	 (progn
-	   (goto-char (point-min))
-	   (if (and (search-forward (concat "\n" mail-header-separator "\n")
-				    nil t)
-		    (not (search-backward "\n\n" nil t)))
-	       mail-header-separator
-	     ""))))
-    (or (mail-position-on-field "Mime-Version")
-	(insert "1.0")
-	(cond ((save-restriction
-		 (widen)
-		 (goto-char (point-min))
-		 (re-search-forward "[^\000-\177]" nil t))
-	       (or (mail-position-on-field "Content-Type")
-		   (insert "text/plain; charset=ISO-8859-1"))
-	       (or (mail-position-on-field "Content-Transfer-Encoding")
-		   (insert "8bit")))
-	      (t (or (mail-position-on-field "Content-Type")
-		     (insert "text/plain; charset=US-ASCII"))
-		 (or (mail-position-on-field "Content-Transfer-Encoding")
-		     (insert "7bit")))))))
+;; (defun gnus-inews-insert-mime-headers ()
+;;   "Insert MIME headers.  
+;; Assumes ISO-Latin-1 is used iff 8-bit characters are present."
+;;   (goto-char (point-min))
+;;   (let ((mail-header-separator
+;;          (progn
+;;            (goto-char (point-min))
+;;            (if (and (search-forward (concat "\n" mail-header-separator "\n")
+;;                                     nil t)
+;;                     (not (search-backward "\n\n" nil t)))
+;;                mail-header-separator
+;;              ""))))
+;;     (or (mail-position-on-field "Mime-Version")
+;;         (insert "1.0")
+;;         (cond ((save-restriction
+;;                  (widen)
+;;                  (goto-char (point-min))
+;;                  (re-search-forward "[^\000-\177]" nil t))
+;;                (or (mail-position-on-field "Content-Type")
+;;                    (insert "text/plain; charset=ISO-8859-1"))
+;;                (or (mail-position-on-field "Content-Transfer-Encoding")
+;;                    (insert "8bit")))
+;;               (t (or (mail-position-on-field "Content-Type")
+;;                      (insert "text/plain; charset=US-ASCII"))
+;;                  (or (mail-position-on-field "Content-Transfer-Encoding")
+;;                      (insert "7bit")))))))
 
-(custom-add-option 'message-header-hook 'gnus-inews-insert-mime-headers)
+;; (custom-add-option 'message-header-hook 'gnus-inews-insert-mime-headers)
 
 
 ;;;
