@@ -488,8 +488,21 @@ the signature is inserted."
   :group 'message-various
   :type 'hook)
 
-(defcustom message-header-hook '(eword-encode-header)
-  "Hook run in a message mode buffer narrowed to the headers."
+(defcustom message-header-hook nil
+  "Hook run in a message mode before header encode. Buffer narrowed 
+to the headers."
+  :group 'message-various
+  :type 'hook)
+
+(defcustom message-encode-header-function
+  'eword-encode-header
+  "A function called to after header encode."
+  :group 'message-various
+  :type 'function)
+
+(defcustom message-after-header-encode-hook nil
+  "Hook run in a message mode after header encoded. Buffer narrowed 
+to the headers."
   :group 'message-various
   :type 'hook)
 
@@ -2119,7 +2132,10 @@ the user from the mailer."
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
       ;; Let the user do all of the above.
-      (run-hooks 'message-header-hook))
+      (run-hooks 'message-header-hook)
+      (when (functionp message-encode-header-function)
+	(funcall message-encode-header-function))
+      (run-hooks 'message-after-header-encode-hook))
     (unwind-protect
 	(save-excursion
 	  (set-buffer tembuf)
@@ -2429,7 +2445,10 @@ to find out how to use this."
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
       ;; Let the user do all of the above.
-      (run-hooks 'message-header-hook))
+      (run-hooks 'message-header-hook)
+      (when (functionp message-encode-header-function)
+	(funcall message-encode-header-function))
+      (run-hooks 'message-after-header-encode-hook))
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	(progn
@@ -2798,8 +2817,12 @@ to find out how to use this."
 	(message-narrow-to-headers)
 	(while (setq file (message-fetch-field "fcc"))
 	  (push file list)
-	  (message-remove-header "fcc" nil t)))
-      (run-hooks 'message-header-hook 'message-before-do-fcc-hook)
+	  (message-remove-header "fcc" nil t))
+	(run-hooks 'message-header-hook)
+	(when (functionp message-encode-header-function)
+	  (funcall message-encode-header-function))
+	(run-hooks 'message-after-header-encode-hook))
+      (run-hooks 'message-before-do-fcc-hook)
       (goto-char (point-min))
       (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
       (replace-match "" t t)
