@@ -722,15 +722,15 @@ deleted.  Point is left where the deleted region was."
 	  (setq nnfolder-current-group group
 		nnfolder-current-buffer nil)
 	(let (inf file)
-	  ;; If we have to change groups, see if we don't already have the
-	  ;; folder in memory.  If we do, verify the modtime and destroy
-	  ;; the folder if needed so we can rescan it.
+	  ;; If we have to change groups, see if we don't already have
+	  ;; the folder in memory.  If we do, verify the modtime and
+	  ;; destroy the folder if needed so we can rescan it.
 	  (setq nnfolder-current-buffer
 		(nth 1 (assoc group nnfolder-buffer-alist)))
 
-	  ;; If the buffer is not live, make sure it isn't in the alist.  If it
-	  ;; is live, verify that nobody else has touched the file since last
-	  ;; time.
+	  ;; If the buffer is not live, make sure it isn't in the
+	  ;; alist.  If it is live, verify that nobody else has
+	  ;; touched the file since last time.
 	  (when (and nnfolder-current-buffer
 		     (not (gnus-buffer-live-p nnfolder-current-buffer)))
 	    (setq nnfolder-buffer-alist (delq inf nnfolder-buffer-alist)
@@ -873,6 +873,7 @@ deleted.  Point is left where the deleted region was."
 		  (let ((nnheader-file-coding-system
 			 nnfolder-file-coding-system))
 		    (nnheader-find-file-noselect file)))))
+    (set-buffer-multibyte t) ;; Use multibyte buffer for future copying.
     (if (equal (cadr (assoc group nnfolder-scantime-alist))
 	       (nth 5 (file-attributes file)))
 	;; This looks up-to-date, so we don't do any scanning.
@@ -916,12 +917,12 @@ deleted.  Point is left where the deleted region was."
 	      (setq articles (nreverse articles))))
 	  (goto-char (point-min))
 
-	  ;; Anytime the active number is 1 or 0, it is suspect.  In that
-	  ;; case, search the file manually to find the active number.  Or,
-	  ;; of course, if we're being paranoid.  (This would also be the
-	  ;; place to build other lists from the header markers, such as
-	  ;; expunge lists, etc., if we ever desired to abandon the active
-	  ;; file entirely for mboxes.)
+	  ;; Anytime the active number is 1 or 0, it is suspect.  In
+	  ;; that case, search the file manually to find the active
+	  ;; number.  Or, of course, if we're being paranoid.  (This
+	  ;; would also be the place to build other lists from the
+	  ;; header markers, such as expunge lists, etc., if we ever
+	  ;; desired to abandon the active file entirely for mboxes.)
 	  (when (or nnfolder-ignore-active-file
 		    novbuf
 		    (< maxid 2))
@@ -948,10 +949,11 @@ deleted.  Point is left where the deleted region was."
 	    (setcdr active (max maxid (cdr active)))
 	    (goto-char (point-min)))
 
-	  ;; As long as we trust that the user will only insert unmarked mail
-	  ;; at the end, go to the end and search backwards for the last
-	  ;; marker.  Find the start of that message, and begin to search for
-	  ;; unmarked messages from there.
+	  ;; As long as we trust that the user will only insert
+	  ;; unmarked mail at the end, go to the end and search
+	  ;; backwards for the last marker.  Find the start of that
+	  ;; message, and begin to search for unmarked messages from
+	  ;; there.
 	  (when (not (or nnfolder-distrust-mbox
 			 (< maxid 2)))
 	    (goto-char (point-max))
@@ -961,9 +963,9 @@ deleted.  Point is left where the deleted region was."
 	    ;;  (goto-char (point-min)))
 	    )
 
-	  ;; Keep track of the active number on our own, and insert it back
-	  ;; into the active list when we're done.  Also, prime the pump to
-	  ;; cut down on the number of searches we do.
+	  ;; Keep track of the active number on our own, and insert it
+	  ;; back into the active list when we're done.  Also, prime
+	  ;; the pump to cut down on the number of searches we do.
 	  (unless (nnmail-search-unix-mail-delim)
 	    (goto-char (point-max)))
 	  (setq end (point-marker))
@@ -994,7 +996,8 @@ deleted.  Point is left where the deleted region was."
 	      (widen)))
 
 	  (set-marker end nil)
-	  ;; Make absolutely sure that the active list reflects reality!
+	  ;; Make absolutely sure that the active list reflects
+	  ;; reality!
 	  (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
 
 	  ;; Set the scantime for this group.
