@@ -3042,7 +3042,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	(prin1-to-string failure)))))
 
 (defun message-send-mail-partially ()
-  "Sendmail as message/partial."
+  "Send mail as message/partial."
   ;; replace the header delimiter with a blank line
   (goto-char (point-min))
   (re-search-forward
@@ -5872,8 +5872,11 @@ regexp varstr."
 			 (mail-strip-quoted-names
 			  (message-fetch-field "from")))
     (message-options-set 'message-recipients
-			  (mail-strip-quoted-names
-			   (message-fetch-field "to")))))
+			 (mail-strip-quoted-names
+			  (concat
+			   (or (message-fetch-field "to") "") ", "
+			   (or (message-fetch-field "cc") "") ", "
+			   (or (message-fetch-field "bcc") ""))))))
 
 (when (featurep 'xemacs)
   (require 'messagexmas)
