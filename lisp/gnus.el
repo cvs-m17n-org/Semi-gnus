@@ -37,6 +37,7 @@
 
 (require 'wid-edit)
 (require 'nnheader)
+(autoload 'message-y-or-n-p "message" nil nil 'macro)
 
 (require 'gnus-vers)
 
