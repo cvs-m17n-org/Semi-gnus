@@ -2202,14 +2202,15 @@ to find out how to use this."
 	  ;;
 	  ;;
 	  ;;
-	  (let ((smtp-recipient-address-list
+	  (let ((recipient-address-list
 		 (or resend-to-addresses
 		     (smtp-deduce-address-list (current-buffer)
 					       (point-min) delimline))))
 	    (smtp-do-bcc delimline)
 	    
-	    (if smtp-recipient-address-list
-		(if (not (smtp-via-smtp smtp-recipient-address-list tembuf))
+	    (if recipient-address-list
+		(if (not (smtp-via-smtp recipient-address-list
+					(current-buffer)))
 		    (error "Sending failed; SMTP protocol error"))
 	      (error "Sending failed; no recipients"))
 	    ))
