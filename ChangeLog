@@ -1,3 +1,14 @@
+2001-03-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-compose-package): New function.
+	(dgnushack-make-load): Add autoload for cus-load if it is missing.
+
+	* lisp/Makefile.in (compose-package): Use
+	`dgnushack-compose-package'.
+	(clean, clever): Remove custom-load.el.
+
+	* Makefile.in (elclean): Remove custom-load.el.
+
 2001-03-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-prepare-display): Setup MIME

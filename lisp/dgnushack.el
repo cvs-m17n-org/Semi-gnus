@@ -412,6 +412,10 @@ Modify to suit your needs."))
 	  (search-forward ";;; Code:")
 	  (forward-line)
 	  (delete-region (point-min) (point))
+	  (unless (re-search-forward
+		   "^[\t ]*(autoload[\t\n ]+\\('\\|(quote[\t\n ]+\\)custom-add-loads[\t\n ]" nil t)
+	    (insert "\n(autoload 'custom-add-loads \"cus-load\")\n")
+	    (goto-char (point-min)))
 	  (insert "\
 ;;; gnus-load.el --- automatically extracted custom dependencies and autoload
 ;;
@@ -457,6 +461,58 @@ Modify to suit your needs."))
 ;;; gnus-load.el ends here\n"))
   (message (format "Compiling %s..." dgnushack-gnus-load-file))
   (byte-compile-file dgnushack-gnus-load-file))
+
+
+(defun dgnushack-compose-package ()
+  "Re-split the file gnus-load.el into custom-load.el and
+auto-autoloads.el.  It is silly, should be improved!"
+  (message "\
+Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...")
+  (let ((customload (expand-file-name "custom-load.el" srcdir))
+	(autoloads (expand-file-name "auto-autoloads.el" srcdir)))
+    (with-temp-buffer
+      (insert-file-contents dgnushack-gnus-load-file)
+      (delete-file dgnushack-gnus-load-file)
+      (when (file-exists-p (concat dgnushack-gnus-load-file "c"))
+	(delete-file (concat dgnushack-gnus-load-file "c")))
+      (while (prog1
+		 (looking-at "[\t ;]")
+	       (forward-line 1)))
+      (delete-region (point-min) (point))
+      (insert "\
+;;; custom-load.el --- automatically extracted custom dependencies\n
+;;; Code:\n\n")
+      (goto-char (point-max))
+      (while (progn
+	       (forward-line -1)
+	       (not (looking-at "[\t ]*(custom-add-loads[\t\n ]"))))
+      (forward-list 1)
+      (forward-line 1)
+      (insert "\n;;; custom-load.el ends here\n")
+      (write-region (point-min) (point) customload)
+      (while (looking-at "[\t ]*$")
+	(forward-line 1))
+      (delete-region (point-min) (point))
+      (if (re-search-forward "^[\t\n ]*(if[\t\n ]+(featurep[\t\n ]" nil t)
+	  (let ((from (goto-char (match-beginning 0))))
+	    (delete-region from (progn
+				  (forward-list 1)
+				  (forward-line 1)
+				  (point))))
+	(while (looking-at "[\t ;]")
+	  (forward-line 1)))
+      (insert "(if (featurep 'gnus-autoloads) (error \"Already loaded\"))\n")
+      (goto-char (point-max))
+      (while (progn
+	       (forward-line -1)
+	       (not (looking-at "[\t ]*(provide[\t\n ]"))))
+      (delete-region (point) (point-max))
+      (insert "(provide 'gnus-autoloads)\n")
+      (write-region (point-min) (point) autoloads))
+    (byte-compile-file customload)
+    (byte-compile-file autoloads))
+  (message "\
+Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done"))
 
 
 (defconst dgnushack-info-file-regexp-en
