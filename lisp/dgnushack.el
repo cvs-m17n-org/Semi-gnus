@@ -91,7 +91,12 @@ Modify to suit your needs."))
 
 ;; Avoid byte-compile warnings.
 (defvar gnus-product-name)
-(defvar configure-package-path)
+(defvar early-package-load-path)
+(defvar early-packages)
+(defvar last-package-load-path)
+(defvar last-packages)
+(defvar late-package-load-path)
+(defvar late-packages)
 
 (defconst dgnushack-info-file-regexp
   "^\\(gnus\\|message\\|gnus-ja\\|message-ja\\)\\.info\\(-[0-9]+\\)?$")
@@ -138,21 +143,29 @@ Modify to suit your needs."))
       (write-file (concat "../MANIFEST." product-name)))))
 
 (defun dgnushack-install-package ()
-  (let* ((package-dir
-	  (file-name-as-directory
-	   (or (car command-line-args-left)
-	       (car configure-package-path)
-	       (error "%s" "
+  (let ((package-dir (car command-line-args-left))
+	dirs info-dir pkginfo-dir product-name lisp-dir manifest files)
+    (unless package-dir
+      (when (boundp 'early-packages)
+	(setq dirs (delq nil (append (when early-package-load-path
+				       early-packages)
+				     (when late-package-load-path
+				       late-packages)
+				     (when last-package-load-path
+				       last-packages))))
+	(while (and dirs (not package-dir))
+	  (when (file-exists-p (car dirs))
+	    (setq package-dir (car dirs)
+		  dirs (cdr dirs))))))
+    (unless package-dir
+      (error "%s" "
 You must specify the name of the package path as follows:
 
 % make install-package PACKAGEDIR=/usr/local/lib/xemacs/xemacs-packages
-
-                        - GAME OVER -
 "
-		      ))))
-	 (info-dir (expand-file-name "info/" package-dir))
-	 (pkginfo-dir (expand-file-name "pkginfo/" package-dir))
-	 product-name lisp-dir manifest files)
+	     ))
+    (setq info-dir (expand-file-name "info/" package-dir)
+	  pkginfo-dir (expand-file-name "pkginfo/" package-dir))
     (require 'gnus)
     (setq product-name (downcase gnus-product-name)
 	  lisp-dir (expand-file-name (concat "lisp/" product-name "/")
