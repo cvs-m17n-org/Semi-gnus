@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.4.2 1999-02-01 06:45:23 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.4.3 1999-02-03 06:45:06 yamaoka Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -213,16 +213,32 @@
 	    ;; Use mail-source.el
 	    (setq mail-source nil)
 	    (while (> i 0)
-	      (setq user (read-from-minibuffer "Mail Account name : "))
-	      (setq server (read-from-minibuffer "Mail server : "))
-	      (setq auth (completing-read
+	      (let ((user (read-from-minibuffer "Mail Account name : "))
+		    (server (read-from-minibuffer "Mail server : "))
+		    (auth (completing-read
 			  "Authentification Method (TAB to completion): "
 			  '(("pop" 1) ("apop" 2)) nil t nil))
-	      (setq mail-source
-		    (append mail-source
-			    (list
-			     (list
-			      auth :user user :server server))))
+		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? ")))
+		(if (not islisp)
+		    (let ((prog (read-file-name "movemail program name: "))
+			  (args (read-from-minibuffer "movemail options: ")))
+		      (setq mail-source
+			    (append mail-source
+				    (list
+				     (list
+				      auth
+				      :user user
+				      :server server
+				      :program prog
+				      :args (format "%s %s" args
+						    (concat "po:" user)))))))
+		  (setq mail-source
+			(append mail-source
+				(list
+				 (list
+				  auth
+				  :user user
+				  :server server))))))
 	      (setq i (- i 1)))
 	    ;; Replace "hoge" -> 'hoge
 	    (mapcar
@@ -232,6 +248,10 @@
 		 (setcar x 'apop)))
 	     mail-source)
 	    (setq gnus-offline-mail-source mail-source)))
+
+	(setq save-passwd
+	      (y-or-n-p "Do you save password information to newsrc file? "))
+	
 	;; Write to setting file.
 	(setq tmp-buffer (get-buffer-create "* Setting"))
 	(set-buffer "* Setting")
@@ -330,6 +350,8 @@
 	      (insert "(setq pop3-fma-movemail-type '")
 	      (insert (prin1-to-string pop3-fma-movemail-type))
 	      (insert ")\n")
+	      (if save-passwd
+		  (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'pop3-fma-password)))\n"))
 	      (if (eq pop3-fma-movemail-type 'exe)
 		  (progn
 		    (insert "(setq pop3-fma-movemail-arguments '")
@@ -342,7 +364,9 @@
 	  (insert "(setq nnmail-spool-file gnus-offline-mail-source)\n")
 	  (insert "(require 'read-passwd)\n")
 	  (insert "(setq mail-source-read-passwd 'read-pw-read-passwd)\n")
-	  (insert "(add-hook 'gnus-before-startup-hook 'read-pw-set-mail-source-passwd-cache)\n");
+	  (insert "(add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)\n")
+	  (if save-passwd
+	      (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'mail-source-password-cache)))\n"))
 	  )
 	(write-region (point-min) (point-max) gnus-offline-setting-file)
 	(kill-buffer "* Setting"))
