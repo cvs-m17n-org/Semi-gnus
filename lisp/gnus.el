@@ -1,5 +1,5 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 2001,
 ;;        1997, 1998, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -923,11 +923,11 @@ defaults to a proper value only if this file is byte-compiled by make.")
 REST is a plist of following:
 :type               One of `bool', `list' or `nil'.
 :function           The name of the function.
-:function-document  The document of the function.
+:function-document  The documentation of the function.
 :parameter-type     The type for customizing the parameter.
-:parameter-document The document for the parameter.
+:parameter-document The documentation for the parameter.
 :variable           The name of the variable.
-:variable-document  The document for the variable.
+:variable-document  The documentation for the variable.
 :variable-group     The group for customizing the variable.
 :variable-type      The type for customizing the variable.
 :variable-default   The default value of the variable."
@@ -1631,9 +1631,8 @@ posting an article."
  :variable-group gnus-group-foreign
  :parameter-type
  '(choice :tag "Posting Method"
-	  (const nil)
-	  (const current)
-	  (const native)
+	  (const :tag "Use native server" native)
+	  (const :tag "Use current server" current)
 	  (list :convert-widget
 		(lambda (widget)
 		  (list 'sexp :tag "Methods"
@@ -2595,16 +2594,18 @@ that that variable is buffer-local to the summary buffers."
 
 (defun gnus-news-group-p (group &optional article)
   "Return non-nil if GROUP (and ARTICLE) come from a news server."
-  (or (gnus-member-of-valid 'post group) ; Ordinary news group.
-      (and (gnus-member-of-valid 'post-mail group) ; Combined group.
-	   (if (or (null article)
-		   (not (< article 0)))
-	       (eq (gnus-request-type group article) 'news)
-	     (if (not (vectorp article))
-		 nil
-	       ;; It's a real article.
-	       (eq (gnus-request-type group (mail-header-id article))
-		   'news))))))
+  (cond ((gnus-member-of-valid 'post group) ;Ordinary news group
+	 t)				;is news of course.
+	((not (gnus-member-of-valid 'post-mail group)) ;Non-combined.
+	 nil)				;must be mail then.
+	((vectorp article)		;Has header info.
+	 (eq (gnus-request-type group (mail-header-id article)) 'news))
+	((null article)			;Hasn't header info
+	 (eq (gnus-request-type group) 'news)) ;(unknown ==> mail)
+	((< article 0)			;Virtual message
+	 nil)				;we don't know, guess mail.
+	(t				;Has positive number
+	 (eq (gnus-request-type group article) 'news)))) ;use it.
 
 ;; Returns a list of writable groups.
 (defun gnus-writable-groups ()
