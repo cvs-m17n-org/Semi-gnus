@@ -2936,10 +2936,14 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		entity
 		(setq next (next-single-property-change (point)
 							'mime-view-entity)))
-      (setq type (mime-entity-content-type entity)
-	    type (format "%s/%s"
-			 (mime-content-type-primary-type type)
-			 (mime-content-type-subtype type)))
+      (let ((types (mime-entity-content-type entity)))
+	(while (eq 'multipart (mime-content-type-primary-type types))
+	  (setq entity (car (mime-entity-children entity))
+		types (mime-entity-content-type entity)))
+	(when types
+	  (setq type (format "%s/%s"
+			     (mime-content-type-primary-type types)
+			     (mime-content-type-subtype types)))))
       (if (string-equal type "message/rfc822")
 	  (save-restriction
 	    (narrow-to-region (point) (point-max))
@@ -4986,10 +4990,10 @@ For example:
 	(equal (cadr val) type))
        (t
 	(gnus-treat-predicate pred)))))
-   (condition
-    (eq condition val))
    ((eq val t)
     t)
+   (condition
+    (eq condition val))
    ((eq val 'head)
     nil)
    ((eq val 'last)
