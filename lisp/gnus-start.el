@@ -720,7 +720,6 @@ prompt the user for the name of an NNTP server to use."
   (unless (gnus-gethash "nndraft:drafts" gnus-newsrc-hashtb)
     (let ((gnus-level-default-subscribed 1))
       (gnus-subscribe-group "nndraft:drafts" nil '(nndraft "")))
-    (gnus-group-set-parameter "nndraft:drafts" 'charset nil)
     (gnus-group-set-parameter
      "nndraft:drafts" 'gnus-dummy '((gnus-draft-mode)))))
 
@@ -855,7 +854,10 @@ prompt the user for the name of an NNTP server to use."
   "Setup news information.
 If RAWFILE is non-nil, the .newsrc file will also be read.
 If LEVEL is non-nil, the news will be set up at level LEVEL."
-  (let ((init (not (and gnus-newsrc-alist gnus-active-hashtb (not rawfile)))))
+  (let ((init (not (and gnus-newsrc-alist gnus-active-hashtb (not rawfile))))
+	;; Binding this variable will inhibit multiple fetchings
+	;; of the same mail source.
+	(nnmail-fetched-sources (list t)))
 
     (when init
       ;; Clear some variables to re-initialize news information.
@@ -1521,19 +1523,24 @@ newsgroup."
 	(cond
 	 ;; We don't want these groups.
 	 ((> (gnus-info-level info) level)
-	  (setq active nil))
+	  (setq active 'ignore))
 	 ;; Activate groups.
 	 ((not gnus-read-active-file)
 	  (setq active (gnus-activate-group group 'scan))
 	  (inline (gnus-close-group group)))))
 
       ;; Get the number of unread articles in the group.
-      (if active
-	  (inline (gnus-get-unread-articles-in-group info active t))
+      (cond
+       ((eq active 'ignore)
+	;; Don't do anything.
+	)
+       (active
+	(inline (gnus-get-unread-articles-in-group info active t)))
+       (t
 	;; The group couldn't be reached, so we nix out the number of
 	;; unread articles and stuff.
 	(gnus-set-active group nil)
-	(setcar (gnus-gethash group gnus-newsrc-hashtb) t)))
+	(setcar (gnus-gethash group gnus-newsrc-hashtb) t))))
 
     (gnus-message 5 "Checking new news...done")))
 

@@ -264,13 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.057"
+(defconst gnus-version-number "6.10.058"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "08"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.75"
+(defconst gnus-original-version-number "0.76"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -878,7 +878,7 @@ used to 899, you would say something along these lines:
 	     (insert-file-contents gnus-nntpserver-file)
 	     (let ((name (buffer-string)))
 	       (prog1
-		   (if (string-match "^[ \t\n]*$" name)
+		   (if (string-match "\\'[ \t\n]*$" name)
 		       nil
 		     name)
 		 (kill-buffer (current-buffer))))))))
@@ -1178,7 +1178,7 @@ articles.  This is not a good idea."
   :type 'boolean)
 
 (defcustom gnus-use-picons nil
-  "*If non-nil, display picons."
+  "*If non-nil, display picons in a frame of their own."
   :group 'gnus-meta
   :type 'boolean)
 
@@ -1368,7 +1368,7 @@ following hook:
 (defcustom gnus-group-change-level-function nil
   "Function run when a group level is changed.
 It is called with three parameters -- GROUP, LEVEL and OLDLEVEL."
-  :group 'gnus-group-level
+  :group 'gnus-group-levels
   :type 'function)
 
 ;;; Face thingies.
@@ -2905,8 +2905,6 @@ As opposed to `gnus', this command will not connect to the local server."
   (let ((window (get-buffer-window gnus-group-buffer)))
     (cond (window
 	   (select-frame (window-frame window)))
-	  ((= (length (frame-list)) 1)
-	   (select-frame (make-frame)))
 	  (t
 	   (other-frame 1))))
   (gnus arg))

@@ -624,7 +624,7 @@ See `gnus-thread-score-function' for en explanation of what a
 \"thread score\" is.
 
 This variable is local to the summary buffers."
-  :group 'gnus-treading
+  :group 'gnus-threading
   :group 'gnus-score-default
   :type '(choice (const :tag "off" nil)
 		 integer))
@@ -817,10 +817,20 @@ which it may alter in any way.")
     ("^cn\\>\\|\\<chinese\\>" cn-gb-2312)
     ("^fj\\>\\|^japan\\>" iso-2022-jp-2)
     ("^relcom\\>" koi8-r)
+    ("^\\(cz\\|hun\\|pl\\|sk\\)\\>" iso-8859-2)
+    ("^israel\\>" iso-8859-1)
+    ("^\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
     (".*" iso-8859-1))
-  "Alist of regexps (to match group names) and default charsets to be used."
+  "Alist of regexps (to match group names) and default charsets to be used when reading."
   :type '(repeat (list (regexp :tag "Group")
 		       (symbol :tag "Charset")))
+  :group 'gnus-charset)
+
+(defcustom gnus-newsgroup-ignored-charsets '(unknown-8bit)
+  "List of charsets that should be ignored.
+When these charsets are used in the \"charset\" parameter, the
+default charset will be used instead."
+  :type '(repeat symbol)
   :group 'gnus-charset)
 
 ;;; Internal variables
@@ -1270,7 +1280,7 @@ increase the score of each group you read."
     "a" gnus-summary-post-news
     "x" gnus-summary-limit-to-unread
     "s" gnus-summary-isearch-article
-    "t" gnus-article-hide-headers
+    "t" gnus-summary-toggle-header
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
     "v" gnus-summary-preview-mime-message
@@ -1507,6 +1517,7 @@ increase the score of each group you read."
     "o" gnus-article-save-part
     "c" gnus-article-copy-part
     "e" gnus-article-externalize-part
+    "i" gnus-article-inline-part
     "|" gnus-article-pipe-part)
   )
 
@@ -6964,9 +6975,7 @@ If ARG is a negative number, hide the unwanted header lines."
     (set-buffer gnus-article-buffer)
     (let* ((buffer-read-only nil)
 	   (inhibit-point-motion-hooks t)
-	   (hidden (text-property-any
-		    (goto-char (point-min)) (search-forward "\n\n")
-		    'invisible t))
+	   (hidden (gnus-article-hidden-text-p 'headers))
 	   e)
       (goto-char (point-min))
       (when (search-forward "\n\n" nil t)
@@ -6979,7 +6988,8 @@ If ARG is a negative number, hide the unwanted header lines."
       (insert-buffer-substring gnus-original-article-buffer 1 e)
       (let ((article-inhibit-hiding t))
 	(gnus-run-hooks 'gnus-article-display-hook))
-      (if (or (not hidden) (and (numberp arg) (< arg 0)))
+      (if (or hidden
+	      (and (numberp arg) (< arg 0)))
 	  (let ((gnus-treat-hide-headers nil)
 		(gnus-treat-hide-boring-headers nil))
 	    (gnus-treat-article 'head))
@@ -7456,22 +7466,22 @@ This will have permanent effect only in mail groups.
 If FORCE is non-nil, allow editing of articles even in read-only
 groups."
   (interactive "P")
-  (save-excursion
-    (set-buffer gnus-summary-buffer)
-    (gnus-set-global-variables)
-    (when (and (not force)
-	       (gnus-group-read-only-p))
-      (error "The current newsgroup does not support article editing"))
-    ;; Select article if needed.
-    (unless (eq (gnus-summary-article-number)
-		gnus-current-article)
-      (gnus-summary-select-article t))
-    (gnus-article-date-original)
-    (gnus-article-edit-article
-     `(lambda (no-highlight)
-	(gnus-summary-edit-article-done
-	 ,(or (mail-header-references gnus-current-headers) "")
-	 ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight)))))
+  (let ((mail-parse-charset gnus-newsgroup-charset))
+    (save-excursion
+      (set-buffer gnus-summary-buffer)
+      (gnus-set-global-variables)
+      (when (and (not force)
+		 (gnus-group-read-only-p))
+	(error "The current newsgroup does not support article editing"))
+      (gnus-summary-show-article t)
+      (gnus-article-edit-article
+       'mime-to-mml
+       `(lambda (no-highlight)
+	  (let ((mail-parse-charset ',gnus-newsgroup-charset))
+	    (mml-to-mime)
+	    (gnus-summary-edit-article-done
+	     ,(or (mail-header-references gnus-current-headers) "")
+	     ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight)))))))
 
 (defalias 'gnus-summary-edit-article-postpone 'gnus-article-edit-exit)
 
@@ -7486,7 +7496,7 @@ groups."
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
 		     (cdr gnus-article-current) (car gnus-article-current)
-		     (current-buffer))))
+ 		     (current-buffer) t)))
 	  (error "Couldn't replace article")
 	;; Update the summary buffer.
 	(if (and references
@@ -9249,7 +9259,8 @@ save those articles instead."
 		   (gnus-group-real-name gnus-newsgroup-name))))
     (setq gnus-newsgroup-charset
 	  (or (and gnus-newsgroup-name
-		   (or (gnus-group-find-parameter gnus-newsgroup-name 'charset)
+		   (or (gnus-group-find-parameter gnus-newsgroup-name
+						  'charset)
 		       (let ((alist gnus-group-charset-alist)
 			     elem (charset nil))
 			 (while (setq elem (pop alist))

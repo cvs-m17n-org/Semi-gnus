@@ -1,3 +1,27 @@
+1999-02-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.058.
+	(gnus-revision-number): Fresh start from 00.
+
+	* lisp/message.el (message-forward): Get back to the previous
+	design.
+	* lisp/gnus-msg.el (gnus-summary-mail-forward): Ditto.
+
+	* lisp/mail-source.el (mail-source-fetch-pop): Ignore program and
+	authentication scheme..
+
+	* lisp/message.el (message-forward-start-separator): Restored.
+	(message-forward-end-separator): Restored.
+	(message-signature-before-forwarded-message): Restored.
+	(message-included-forward-headers): Restored.
+
+	* lisp/message.el (message-make-forward-subject): Use "(none)" if
+	the original article has no subject.
+
+	* Sync up with Pterodactyl Gnus v0.76.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Change for pGnus 0.76.
+
 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.

@@ -1735,7 +1735,8 @@ C-c C-a  message-mime-attach-file (attach a file as MIME)."
   (interactive)
   (if (looking-at "[ \t]*\n") (expand-abbrev))
   (goto-char (point-min))
-  (search-forward (concat "\n" mail-header-separator "\n") nil t))
+  (or (search-forward (concat "\n" mail-header-separator "\n") nil t)
+      (search-forward "\n\n" nil t)))
 
 (defun message-goto-eoh ()
   "Move point to the end of the headers."
@@ -2471,6 +2472,7 @@ This sub function is for exclusive use of `message-send-mail'."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
+      (untabify (point-min) (point-max))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (if (not (message-check-mail-syntax))
@@ -2705,6 +2707,7 @@ This sub function is for exclusive use of `message-send-news'."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
+      (untabify (point-min) (point-max))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (message-cleanup-headers)
@@ -3011,15 +3014,12 @@ This sub function is for exclusive use of `message-send-news'."
    ;; Check the length of the signature.
    (message-check 'signature
      (goto-char (point-max))
-     (if (or (not (re-search-backward message-signature-separator nil t))
-	     (search-forward message-forward-end-separator nil t))
-	 t
-       (if (> (count-lines (point) (point-max)) 5)
-	   (y-or-n-p
-	    (format
-	     "Your .sig is %d lines; it should be max 4.  Really post? "
-	     (1- (count-lines (point) (point-max)))))
-	 t)))))
+     (if (> (count-lines (point) (point-max)) 5)
+ 	 (y-or-n-p
+ 	  (format
+ 	   "Your .sig is %d lines; it should be max 4.  Really post? "
+ 	   (1- (count-lines (point) (point-max)))))
+       t))))
 
 (defun message-check-mail-syntax ()
   "Check the syntax of the message."
@@ -4424,14 +4424,14 @@ the message."
       (current-buffer)
       (message-narrow-to-head)
       (let ((funcs message-make-forward-subject-function)
-	    (subject (if message-wash-forwarded-subjects
-			 (message-wash-subject
-			  (or (nnheader-decode-subject
-			       (message-fetch-field "Subject"))
-			      ""))
-		       (or (nnheader-decode-subject
-			    (message-fetch-field "Subject"))
-			   ""))))
+	    (subject (message-fetch-field "Subject")))
+	(setq subject
+	      (if subject
+		  (if message-wash-forwarded-subjects
+		      (message-wash-subject
+		       (nnheader-decode-subject subject))
+		    (nnheader-decode-subject subject))
+		"(none)"))
 	;; Make sure funcs is a list.
 	(and funcs
 	     (not (listp funcs))
@@ -4918,7 +4918,9 @@ TYPE is the MIME type to use."
 	   type (prin1-to-string file))))
 
 (defun message-encode-message-body ()
-  (let ((mail-parse-charset message-default-charset)
+  (let ((mail-parse-charset (or mail-parse-charset
+ 				message-default-charset
+ 				message-posting-charset))
 	(case-fold-search t)
 	lines multipart-p content-type-p)
     (message-goto-body)

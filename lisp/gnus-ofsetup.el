@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.12 1999-02-03 13:09:33 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.13 1999-02-12 01:45:31 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -230,9 +230,13 @@
 				      auth
 				      :user user
 				      :server server
-				      :program prog
-				      :args (format "%s %s" args
-						    (concat "po:" user)))))))
+				      :program
+				      (format "%s %s %s %s %s"
+					      prog
+					      args
+					      "po:%u"
+					      "%t"
+					      "%p"))))))
 		  (setq mail-source
 			(append mail-source
 				(list
