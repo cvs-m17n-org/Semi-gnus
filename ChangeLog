@@ -1,6 +1,11 @@
 1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-make-user-agent): Replace with the
+	new code again. It is based on MORIOKA-san's code.
+
+1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-user-agent): Replace with the
 	new code.
 
 	* lisp/gnus-msg.el (gnus-message-make-user-agent): New function.
@@ -14,7 +19,7 @@
 	* lisp/message.el (message-kill-buffer): Change the prompt string.
 
 	* lisp/message.el (message-mode-map): Substitute key definition
-	`kill-buffer' to `message-kill-buffer'.
+	from `kill-buffer' to `message-kill-buffer'.
 
 1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
 
@@ -62,7 +67,7 @@
 	only if `group' name is neither "queue" nor "draft".
 	Fix typo (at 23:25).
 
-	*lisp/message.el (message-send-mail): Add different Message-ID in 
+	*lisp/message.el (message-send-mail): Add different Message-ID in
 	each message/partial
 
 1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
