@@ -1,3 +1,24 @@
+2001-07-25  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.25 (This is alpha status.)
+	Set unibyte mode to `gnus-original-article-buffer'.
+	Fix bugs. (Thanks to Yamaoka-san.)
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.25.
+
+	* lisp/nntp.el (nntp-possibly-change-group): Clean up trash string
+	when connect to the server.
+
+	* lisp/message.el (message-make-date): `format-time-string' does
+	not depend `system-time-locale' on Eamcs 21.
+
+	* lisp/gnus-sum.el (gnus-build-sparse-threads): Use
+	`make-full-mail-header-from-decoded-header' instead of
+	`make-full-mail-header'.
+
+	* lisp/gnus-art.el, lisp/gnus-bbeb.el: Set unibyte mode to
+	`gnus-original-article-buffer'.
+
 2001-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nntp.el (nntp-request-newgroups): Use UTC date for
