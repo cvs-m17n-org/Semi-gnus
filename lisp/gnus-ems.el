@@ -246,23 +246,23 @@
       (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
       (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
 
-      (defun gnus-summary-line-format-spec ()
-	(insert gnus-tmp-unread gnus-tmp-replied
-		gnus-tmp-score-char gnus-tmp-indentation)
-	(put-text-property
-	 (point)
-	 (progn
-	   (insert
-	    gnus-tmp-opening-bracket
-	    (format "%4d: %-20s"
-		    gnus-tmp-lines
-		    (if (> (length gnus-tmp-name) 20)
-			(truncate-string gnus-tmp-name 20)
-		      gnus-tmp-name))
-	    gnus-tmp-closing-bracket)
-	   (point))
-	 gnus-mouse-face-prop gnus-mouse-face)
-	(insert " " gnus-tmp-subject-or-nil "\n"))
+      (defun gnus-tilde-max-form (el max-width)
+	"Return a form that limits EL to MAX-WIDTH."
+	(let ((max (abs max-width)))
+	  (if (symbolp el)
+	      `(if (> (length ,el) ,max)
+		   ,(if (< max-width 0)
+			`(truncate-string
+			  ,el (string-width ,el) (- (string-width ,el) ,max))
+		      `(truncate-string ,el ,max))
+		 ,el)
+	    `(let ((val (eval ,el)))
+	       (if (> (length val) ,max)
+		   ,(if (< max-width 0)
+			`(truncate-string
+			  val (string-width val) (- (string-width val) ,max))
+		      `(truncate-string val ,max))
+		 val)))))
       )
     )))
 

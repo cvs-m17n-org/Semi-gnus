@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 0.21
+;; Version: 1.00
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -84,15 +84,15 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.21")
+(defconst pop3-fma-version-number "1.00")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
 ;;  "On the road"		; 0.12
 ;;  "Rock'n Roll city"		; 0.13
 ;;  "Money"			; 0.20
-  "Still 19"       		; 0.21
-;;  "J boy"          		; 0.xx
+;;  "Still 19"       		; 0.21
+  "J boy"          		; 1.00
 ;;  "Blood line"		; 0.xx
 ;;  "Star ring"			; 0.xx
 ;;  "Goodbye Game"		; 0.xx
@@ -134,7 +134,7 @@ Lisp means `nnmail-movemail-program' is lisp function.
 (defvar pop3-fma-password nil
   "*POP3 password , user , mailhost information for Gnus.")
 
-(defvar pop3-fma-movemail-program "movemail.exe"
+(defvar pop3-fma-movemail-program "movemail"
   "*External program name your movemail.
 Please do not set this valiable non-nil if you do not use Meadow.")
 

@@ -1,5 +1,22 @@
 1998-08-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/message.el: Suppress some byte-compile warnings.
+	(message-check-news-header-syntax): Call
+	`std11-extract-address-components' directly.
+	(message-user-mail-address): Ditto.
+	(message-generate-headers): Ditto.
+	(message-buffer-name): Ditto.
+	(message-cancel-news): Ditto.
+	(message-supersede): Ditto.
+
+1998-08-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.6.
+
+	* Sync up with Semi-gnus 6.8.12.
+
+1998-08-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.5.
 
 	* Sync up with Gnus 5.6.36.
@@ -10,11 +27,38 @@
 
 	* Sync up with Gnus 5.6.30.
 
+1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Update.
+
+1998-08-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system):
+	Change to `ctext'.
+	(gnus-save-newsrc-file): Use it.
+
+1998-08-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-yank-original): Cite current message.
+
+1998-08-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	*lisp/smtp.el: Do not insert empty line at the end of message.
+	
+1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Redefine
+	`gnus-tilde-max-form' instead of `gnus-summary-line-format-spec'.
+
 1998-07-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.3.
 
 	* Sync up with Gnus 5.6.27.
+
+1998-07-27  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/message-ja.texi: Japanese translation of "message.texi".
 
 1998-07-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 

@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Shoe-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.5"
+(defconst gnus-version-number "6.8.6"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
