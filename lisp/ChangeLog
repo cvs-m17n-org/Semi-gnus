@@ -1,3 +1,16 @@
+2003-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mml.el (mml-generate-mime-1): Remove extra ).
+
+	* gnus-group.el (gnus-group-set-current-level): Signal errors on
+	topic lines.
+	(gnus-group-set-current-level): Fix fix.
+
+2003-12-31  Jeremy Maitin-Shepard  <jbms@attbi.com>
+
+	* mml.el (mml-generate-mime-1): Use mml-compute-boundary (tiny
+	change). 
+
 2003-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* gnus-group.el: Removed `(when t ...)' around `gnus-define-keys'.

@@ -5767,7 +5767,6 @@ If the current line has `message-yank-prefix', insert it on the new line."
     (error
      (split-line))))
      
-
 (defun message-fill-header (header value)
   (let ((begin (point))
 	(fill-column 78)
