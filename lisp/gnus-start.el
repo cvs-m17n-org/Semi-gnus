@@ -1,5 +1,5 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -1755,9 +1755,12 @@ newsgroup."
        ((eq active 'ignore)
 	;; Don't do anything.
 	)
+       ((and active ignore)
+	;; The level of the foreign group is higher than the specified
+	;; value.
+	)
        (active
-	(unless ignore
-	  (inline (gnus-get-unread-articles-in-group info active t))))
+	(inline (gnus-get-unread-articles-in-group info active t)))
        (t
 	;; The group couldn't be reached, so we nix out the number of
 	;; unread articles and stuff.
