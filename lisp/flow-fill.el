@@ -109,7 +109,8 @@ RFC 2646 suggests 66 characters for readability."
       (when (save-excursion
 	      (beginning-of-line)
 	      (looking-at "^\\(>*\\)\\( ?\\)"))
-	(let ((quote (match-string 1)) sig)
+	(let ((quote (match-string 1))
+	      sig)
 	  (if (string= quote "")
 	      (setq quote nil))
 	  (when (and quote (string= (match-string 2) ""))
@@ -139,9 +140,12 @@ RFC 2646 suggests 66 characters for readability."
 		      (fill-column (eval fill-flowed-display-column))
 		      filladapt-mode)
 		  (fill-region (fill-flowed-point-at-bol)
-			       (min (1+ (fill-flowed-point-at-eol)) (point-max))
+			       (min (1+ (fill-flowed-point-at-eol))
+				    (point-max))
 			       'left 'nosqueeze))
-	      (error nil))))))))
+	      (error
+	       (forward-line 1)
+	       nil))))))))
 
 (provide 'flow-fill)
 

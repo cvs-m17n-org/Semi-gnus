@@ -1137,8 +1137,11 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 @code{nil} でなければ、メッセージの作成を始める前に全ての必要なヘッダー
 を作成します。
 
-変数 @code{message-required-mail-headers} と @code{message-required-news-headers} で、
-どのヘッダーが必要かを指定します。
+@vindex message-required-headers
+変数 @code{message-required-headers}、
+@code{message-required-mail-headers} およ
+び @code{message-required-news-headers} で、どのヘッダーが必要かを指定し
+ます。
 
 いくつかのヘッダーは、送信する前に消されたり作り直されたりします。これに
 は変数 @code{message-deletable-headers} (後述) が関係します。

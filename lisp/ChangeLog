@@ -1,4 +1,80 @@
+2002-12-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-start.el (gnus-load): Replace `ding-file' with `file'.
+
 2002-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-start.el (gnus-load): New function.
+	(gnus-read-newsrc-el-file): Use it.
+
+2002-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-valid-fqdn-regexp): New variable.
+	(gnus-button-handle-apropos-documentation): New function.
+	(gnus-button-handle-ctan): New function.
+	(gnus-button-alist): Use them.  Improve some regexps.
+	(gnus-button-prefer-mid-or-mail): Addition to doc-string.
+
+2002-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el (message-subscribed-p): New function.
+	(message-send-mail): Use it.
+	* mml.el (mml-preview-insert-mft): New function.
+	(mml-preview): Use it.
+
+2002-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-thread-latest-date): Protect against errors
+	when sorting by date.
+
+	* gnus-art.el (gnus-article-edit-mode): New variable.
+	(gnus-article-setup-buffer): Warn user about discarding edits. 
+
+	* gnus-sum.el (gnus-summary-pipe-output): Clean up.
+	(gnus-summary-pipe-output): Take a symbolic prefix to save all
+	headers. 
+
+	* mm-uu.el (mm-uu-configure-list): Default to (shar . disabled). 
+
+2002-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el (message-completion-alist): Added "Mail-Followup-To"
+	and "Mail-Copies-To".
+
+2002-07-21  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus-group.el: Add key bindings for
+	gnus-group-sort-groups-by-real-name and
+	gnus-group-sort-selected-groups-by-real-name.
+
+2002-07-21  Jesper harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Sorting Groups): Add key bindings for
+	gnus-group-sort-groups-by-real-name and
+	gnus-group-sort-selected-groups-by-real-name.
+
+2002-12-30  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-use-dig): new variable for blackhole checking
+	through dig.el
+	(spam-check-blackholes): added dig.el checking functionality and
+	more verbose reporting; query-dig is autoloaded from dig.el
+	(spam-use-blackholes): disabled by default
+	(spam-blackhole-servers): removed rbl.maps.vix.com from the
+	blackhole servers list
+
+2002-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-required-headers): New variable.
+
+2002-12-30  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* dig.el (query-dig): new function
+
+2002-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* flow-fill.el (fill-flowed): Don't infloop on too long fill
+	prefixes. 
 
 	* dns.el (query-dns): Protect against errors.
 

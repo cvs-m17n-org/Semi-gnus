@@ -4429,19 +4429,19 @@ Unscored articles will be counted as having a score of zero."
 (defun gnus-thread-latest-date (thread)
   "Return the highest article date in THREAD."
   (let ((previous-time 0))
-    (apply 'max (mapcar
-		 (lambda (header)
-		   (setq previous-time
-			 (time-to-seconds
-			  (mail-header-parse-date
-			   (condition-case ()
-			       (mail-header-date header)
-			     (error previous-time))))))
-		 (sort
-		  (message-flatten-list thread)
-		  (lambda (h1 h2)
-		    (< (mail-header-number h1)
-		       (mail-header-number h2))))))))
+    (apply 'max
+	   (mapcar
+	    (lambda (header)
+	      (setq previous-time
+		    (time-to-seconds
+		     (condition-case ()
+			 (mail-header-parse-date (mail-header-date header))
+		       (error previous-time)))))
+	    (sort
+	     (message-flatten-list thread)
+	     (lambda (h1 h2)
+	       (< (mail-header-number h1)
+		  (mail-header-number h2))))))))
 
 (defun gnus-thread-total-score-1 (root)
   ;; This function find the total score of the thread below ROOT.
@@ -6988,14 +6988,16 @@ If UNREAD is non-nil, only unread articles are selected."
    (and gnus-auto-select-same
 	(gnus-summary-article-subject))))
 
-(defun gnus-summary-next-page (&optional lines circular)
+(defun gnus-summary-next-page (&optional lines circular stop)
   "Show next page of the selected article.
 If at the end of the current article, select the next article.
 LINES says how many lines should be scrolled up.
 
 If CIRCULAR is non-nil, go to the start of the article instead of
 selecting the next article when reaching the end of the current
-article."
+article.
+
+If STOP is non-nil, just stop when reaching the end of the message."
   (interactive "P")
   (setq gnus-summary-buffer (current-buffer))
   (gnus-set-global-variables)
@@ -7021,7 +7023,9 @@ article."
 	  (gnus-eval-in-buffer-window gnus-article-buffer
 	    (setq endp (gnus-article-next-page lines)))
 	  (when endp
-	    (cond (circular
+	    (cond (stop
+		   (gnus-message 3 "End of message"))
+		  (circular
 		   (gnus-summary-beginning-of-article))
 		  (lines
 		   (gnus-message 3 "End of message"))
@@ -10545,20 +10549,22 @@ The variable `gnus-default-article-saver' specifies the saver function."
     (gnus-set-mode-line 'summary)
     n))
 
-(defun gnus-summary-pipe-output (&optional arg)
+(defun gnus-summary-pipe-output (&optional arg headers)
   "Pipe the current article to a subprocess.
 If N is a positive number, pipe the N next articles.
 If N is a negative number, pipe the N previous articles.
 If N is nil and any articles have been marked with the process mark,
-pipe those articles instead."
-  (interactive "P")
+pipe those articles instead.
+If HEADERS (the symbolic prefix), include the headers, too."
+  (interactive (gnus-interactive "P\ny"))
   (require 'gnus-art)
-  (let ((gnus-default-article-saver 'gnus-summary-save-in-pipe))
+  (let ((gnus-default-article-saver 'gnus-summary-save-in-pipe)
+	(gnus-save-all-headers (or headers gnus-save-all-headers)))
     (gnus-summary-save-article arg t))
   (let ((buffer (get-buffer "*Shell Command Output*")))
-    (if (and buffer
-	     (with-current-buffer buffer (> (point-max) (point-min))))
-	(gnus-configure-windows 'pipe))))
+    (when (and buffer
+	       (not (zerop (buffer-size buffer))))
+      (gnus-configure-windows 'pipe))))
 
 (defun gnus-summary-save-article-mail (&optional arg)
   "Append the current article to an mail file.

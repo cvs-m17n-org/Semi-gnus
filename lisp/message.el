@@ -345,10 +345,17 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
   :group 'message-news
   :type '(repeat sexp))			; Fixme: improve this
 
+(defcustom message-required-headers '((optional . References))
+  "*Headers to be generated or promted for when sending a message.
+Also see `message-required-news-headers' and
+1message-required-mail-headers'."
+  :group 'message-news
+  :group 'message-headers
+  :type '(repeat sexp))
+
 (defcustom message-required-news-headers
   '(From Newsgroups Subject Date Message-ID
 	 (optional . Organization)
-	 (optional . References)
 	 (optional . User-Agent))
   "*Headers to be generated or prompted for when posting an article.
 RFC977 and RFC1036 require From, Date, Newsgroups, Subject,
@@ -361,8 +368,7 @@ header, remove it from this list."
 
 (defcustom message-required-mail-headers
   '(From Subject Date (optional . In-Reply-To) Message-ID
-	 (optional . User-Agent)
-	 (optional . References))
+	 (optional . User-Agent))
   "*Headers to be generated or prompted for when mailing a message.
 It is recommended that From, Date, To, Subject and Message-ID be
 included.  Organization and User-Agent are optional."
@@ -2124,6 +2130,13 @@ Point is left at the beginning of the narrowed-to region."
 		   (message-fetch-field "cc")
 		   (message-fetch-field "bcc")))))))
 
+(defun message-subscribed-p ()
+  "Say whether we need to insert a MFT header."
+  (or message-subscribed-regexps
+      message-subscribed-addresses
+      message-subscribed-address-file
+      message-subscribed-address-functions))
+
 (defun message-next-header ()
   "Go to the beginning of the next header."
   (beginning-of-line)
@@ -3851,10 +3864,7 @@ This sub function is for exclusive use of `message-send-mail'."
     (save-restriction
       (message-narrow-to-headers)
       ;; Generate the Mail-Followup-To header if the header is not there...
-      (if (and (or message-subscribed-regexps
-		   message-subscribed-addresses
-		   message-subscribed-address-file
-		   message-subscribed-address-functions)
+      (if (and (message-subscribed-p)
 	       (not (mail-fetch-field "mail-followup-to")))
 	  (setq headers
 		(cons
@@ -5116,6 +5126,7 @@ string."
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
+  (setq headers (append headers message-required-headers))
   (save-restriction
     (message-narrow-to-headers)
     (let* ((Date (message-make-date))
@@ -6645,7 +6656,9 @@ which specify the range to operate on."
 (defcustom message-completion-alist
   (list (cons message-newgroups-header-regexp 'message-expand-group)
 	'("^\\(Resent-\\)?\\(To\\|B?Cc\\):" . message-expand-name)
-	'("^\\(Reply-To\\|From\\|Disposition-Notification-To\\|Return-Receipt-To\\):" 
+	'("^\\(Reply-To\\|From\\|Mail-Followup-To\\|Mail-Copies-To\\):" 
+	  . message-expand-name)
+	'("^\\(Disposition-Notification-To\\|Return-Receipt-To\\):" 
 	  . message-expand-name))
   "Alist of (RE . FUN).  Use FUN for completion on header lines matching RE."
   :group 'message
