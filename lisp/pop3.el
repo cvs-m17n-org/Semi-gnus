@@ -98,9 +98,6 @@
 Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
 values are 'apop.")
 
-(defvar pop3-leave-mail-on-server nil
-  "*Non-nil if the mail is to be left on the POP server after fetching.")
-
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
