@@ -1,5 +1,15 @@
 2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 16.
+
+	* lisp/nnweb.el (nnweb-fetch-url): Bind `input-coding-system' and
+	`output-coding-system' for Mule 2.3.
+	* lisp/mail-source.el (mail-source-fetch-imap): Ditto.
+	* lisp/imap.el (imap-ssl-open): Ditto.
+	* lisp/gnus-start.el (gnus-product-read-variable-file-1): Ditto.
+
+2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): New function.
 	(gnus-read-newsrc-el-file): If it fails, attempt to re-read the
 	file using `gnus-re-read-newsrc-el-file'.  In that case, the
