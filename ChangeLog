@@ -1,3 +1,26 @@
+2000-04-20  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.2.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* lisp/{webmail.el,utf7.el,time-date.el,rfc2047.el,qp.el,pop3.el,
+	parse-time.el,nnweb.el,nnwarchive.el,nnultimate.el,nntp.el,
+	nnslashdot.el,nnml.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,
+	mm-view.el,mm-util.el,mm-decode.el,mm-bodies.el,message.el,
+	mail-source.el,mail-parse.el,lpath.el,imap.el,ietf-drums.el,
+	gnus.el,gnus-win.el,gnus-vers.el,gnus-uu.el,gnus-topic.el,
+	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-mailcap.el,
+	gnus-group.el,gnus-cus.el,gnus-art.el,gnus-agent.el,base64.el,
+	ChangeLog}: Sync up with Gnus v5.8.4.
+
+	* lisp/fill-flowed.el: New file.
+
+	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Sync up with Gnus v5.8.4.
+
+	* contrib/{vcard.el,one-line-cookie.diff,README}: New files.
+
 2000-04-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-yank-message): Rewrite for the use
@@ -325,6 +348,12 @@
 
 	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Remove
 	confusing tabs from original header.
+
+2000-02-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-md5): Fset to `md5' if the module `md5' is
+	installed.
+	(pop3-apop): Use built-in `md5' if it exists.
 
 2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
 

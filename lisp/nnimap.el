@@ -126,6 +126,13 @@ This variable can also have a function as its value, the function will
 be called with the headers narrowed and should return a group where it
 thinks the article should be splitted to.")
 
+(defvar nnimap-split-predicate "UNSEEN UNDELETED"
+  "The predicate used to find articles to split.
+If you use another IMAP client to peek on articles but always would
+like nnimap to split them once it's started, you could change this to
+\"UNDELETED\". Other available predicates are available in
+RFC2060 section 6.4.4.")
+
 (defvar nnimap-split-fancy nil
   "Like `nnmail-split-fancy', which see.")
 
@@ -361,9 +368,10 @@ If EXAMINE is non-nil the group is selected read-only."
 				 nnimap-progress-how-often)
 			      nnimap-progress-chars)))
   (with-current-buffer nntp-server-buffer
-    (let (headers lines chars uid)
+    (let (headers lines chars uid mbx)
       (with-current-buffer nnimap-server-buffer
 	(setq uid imap-current-message
+	      mbx imap-current-mailbox
 	      headers (if (imap-capability 'IMAP4rev1)
 			  ;; xxx don't just use car? alist doesn't contain
 			  ;; anything else now, but it might...
@@ -378,10 +386,14 @@ If EXAMINE is non-nil the group is selected read-only."
 	 (nnheader-fold-continuation-lines)
 	 (subst-char-in-region (point-min) (point-max) ?\t ? )
 	 (nnheader-ms-strip-cr)
+	 (nnheader-fold-continuation-lines)
+	 (subst-char-in-region (point-min) (point-max) ?\t ? )
 	 (let ((head (nnheader-parse-head 'naked)))
 	   (mail-header-set-number head uid)
 	   (mail-header-set-chars head chars)
 	   (mail-header-set-lines head lines)
+	   (mail-header-set-xref
+	    head (format "%s %s:%d" (system-name) mbx uid))
 	   head))))))
 
 (defun nnimap-retrieve-which-headers (articles fetch-old)
@@ -494,8 +506,8 @@ If EXAMINE is non-nil the group is selected read-only."
 		    ;; remove nov's for articles which has expired on server
 		    (goto-char (point-min))
 		    (dolist (uid (gnus-set-difference articles uids))
-		      (when (re-search-forward (format "^%d\t" uid) nil t)
-			(gnus-delete-line)))))
+                      (when (re-search-forward (format "^%d\t" uid) nil t)
+                        (gnus-delete-line)))))
 	      ;; nothing cached, fetch whole range from server
 	      (nnimap-retrieve-headers-from-server
 	       (cons low high) group server))
@@ -604,33 +616,33 @@ function is generally only called when Gnus is shutting down."
     (nnheader-ms-strip-cr)
     (funcall nnimap-callback-callback-function t)))
 
-(defun nnimap-request-article-part (article part prop
-					    &optional group server to-buffer)
+(defun nnimap-request-article-part (article part prop &optional
+					    group server to-buffer detail)
   (when (nnimap-possibly-change-group group server)
     (let ((article (if (stringp article)
 		       (car-safe (imap-search
 				  (format "HEADER Message-Id %s" article)
 				  nnimap-server-buffer))
-		     article))
-	  fetch-data)
+		     article)))
       (when article
 	(gnus-message 9 "nnimap: Fetching (part of) article %d..." article)
 	(if (not nnheader-callback-function)
 	    (with-current-buffer (or to-buffer nntp-server-buffer)
 	      (erase-buffer)
-	      (setq fetch-data (imap-fetch article part
-					   prop nil nnimap-server-buffer))
-	      (when fetch-data
-		(if (eq prop 'BODYDETAIL)
-		    (insert (nth 2 (car fetch-data)))
-		  (insert fetch-data))
-		(nnheader-ms-strip-cr)
-		(gnus-message 9 "nnimap: Fetching (part of) article %d...done"
-			      article)
-		(if (bobp)
-		    (nnheader-report 'nnimap "No such article: %s"
-				     (imap-error-text nnimap-server-buffer))
-		  (cons group article))))
+	      (let ((data (imap-fetch article part prop nil
+				      nnimap-server-buffer)))
+		(when data
+		  (insert (nnimap-demule (if detail
+					     (nth 2 (car data))
+					   data)))
+		  (nnheader-ms-strip-cr)
+		  (gnus-message 9
+				"nnimap: Fetching (part of) article %d...done"
+				article)
+		  (if (bobp)
+		      (nnheader-report 'nnimap "No such article: %s"
+				       (imap-error-text nnimap-server-buffer))
+		    (cons group article)))))
 	  (add-hook 'imap-fetch-data-hook 'nnimap-callback)
 	  (setq nnimap-callback-callback-function nnheader-callback-function
 		nnimap-callback-buffer nntp-server-buffer)
@@ -643,18 +655,21 @@ function is generally only called when Gnus is shutting down."
 (deffoo nnimap-request-article (article &optional group server to-buffer)
   (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
       (nnimap-request-article-part
-       article "BODY.PEEK[]" 'BODYDETAIL group server to-buffer)
+       article "BODY.PEEK[]" 'BODYDETAIL group server to-buffer 'detail)
     (nnimap-request-article-part
      article "RFC822.PEEK" 'RFC822 group server to-buffer)))
 
 (deffoo nnimap-request-head (article &optional group server to-buffer)
-  (nnimap-request-article-part
-   article "RFC822.HEADER" 'RFC822.HEADER group server to-buffer))
+  (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
+      (nnimap-request-article-part
+       article "BODY.PEEK[HEADER]" 'BODYDETAIL group server to-buffer 'detail)
+    (nnimap-request-article-part
+     article "RFC822.HEADER" 'RFC822.HEADER group server to-buffer)))
 
 (deffoo nnimap-request-body (article &optional group server to-buffer)
   (if (imap-capability 'IMAP4rev1 nnimap-server-buffer)
       (nnimap-request-article-part
-       article "BODY.PEEK[TEXT]" 'BODYDETAIL group server to-buffer)
+       article "BODY.PEEK[TEXT]" 'BODYDETAIL group server to-buffer 'detail)
     (nnimap-request-article-part
      article "RFC822.TEXT.PEEK" 'RFC822.TEXT group server to-buffer)))
 
@@ -902,7 +917,7 @@ function is generally only called when Gnus is shutting down."
 	  ;; find split rule for this server / inbox
 	  (when (setq rule (nnimap-split-find-rule server inbox))
 	    ;; iterate over articles
-	    (dolist (article (imap-search "UNSEEN UNDELETED"))
+	    (dolist (article (imap-search nnimap-split-predicate))
 	      (when (nnimap-request-head article)
 		;; copy article to right group(s)
 		(setq removeorig nil)
@@ -938,7 +953,7 @@ function is generally only called when Gnus is shutting down."
       (erase-buffer)
       (dolist (pattern (nnimap-pattern-to-list-arguments
 			nnimap-list-pattern))
-	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil
+	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil 
 					nnimap-server-buffer))
 	  (or (member-if (lambda (mailbox)
 			   (string= (downcase mailbox) "\\noselect"))

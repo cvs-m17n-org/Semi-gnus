@@ -724,7 +724,10 @@ and `altavista'.")
   (while (re-search-forward "&\\(#[0-9]+\\|[a-z]+\\);" nil t)
     (replace-match (char-to-string 
 		    (if (eq (aref (match-string 1) 0) ?\#)
-			(string-to-number (substring (match-string 1) 1))
+			(let ((c
+			       (string-to-number (substring 
+						  (match-string 1) 1))))
+			  (if (mm-char-or-char-int-p c) c 32))
 		      (or (cdr (assq (intern (match-string 1))
 				     w3-html-entities))
 			  ?#)))
@@ -756,14 +759,11 @@ If FOLLOW-REFRESH is non-nil, redirect refresh url in META."
 	  (narrow-to-region (point) (point))
 	  (url-insert-file-contents url)
 	  (goto-char (point-min))
-	  (while (re-search-forward 
-		  "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\""
-		  nil t)
+	  (when (re-search-forward 
+		 "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\"" nil t)
 	    (let ((url (match-string 1)))
 	      (delete-region (point-min) (point-max))
-	      (nnweb-insert url))
-	    (goto-char (point-min)))
-	  (goto-char (point-max)))
+	      (nnweb-insert url t))))
       (url-insert-file-contents url))
     (setq buffer-file-name name)))
 
