@@ -1,3 +1,7 @@
+2004-12-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Bind undo-outer-limit.
+
 2004-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (mm-emacs-mule): New variable.

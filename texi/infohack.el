@@ -131,7 +131,8 @@ Both characters must have the same length of multi-byte form."
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
 	coding-system-for-write
-	(error 0))
+	(error 0)
+	(undo-outer-limit (eval '(lsh -1 -1))))
     (condition-case err
 	(progn
 	  (find-file file)
