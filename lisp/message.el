@@ -356,13 +356,20 @@ should return the new buffer name."
   :type 'boolean)
 
 (defcustom message-kill-buffer-query-function 'yes-or-no-p
-  "*A function called to query the user whether to kill buffer anyway or not.
-If it is t, the buffer will be killed peremptorily."
+  "*Function used to prompt user whether to kill the message buffer.  If
+it is t, the buffer will be killed unconditionally."
   :type '(radio (function-item yes-or-no-p)
 		(function-item y-or-n-p)
 		(function-item nnheader-Y-or-n-p)
 		(function :tag "Other" t))
   :group 'message-buffers)
+
+(defcustom message-kill-buffer-and-remove-file t
+  "*Non-nil means that the associated file will be removed before
+removing the message buffer.  However, it is treated as nil when the
+command `message-mimic-kill-buffer' is used."
+  :group 'message-buffers
+  :type 'boolean)
 
 (eval-when-compile
   (defvar gnus-local-organization))
@@ -2875,7 +2882,8 @@ The text will also be indented the normal way."
 	  (org-frame message-original-frame))
       (setq buffer-file-name nil)
       (kill-buffer (current-buffer))
-      (when (and (or (and auto-save-file-name
+      (when (and message-kill-buffer-and-remove-file
+		 (or (and auto-save-file-name
 			  (file-exists-p auto-save-file-name))
 		     (and file-name
 			  (file-exists-p file-name)))
@@ -2890,18 +2898,16 @@ The text will also be indented the normal way."
   (message ""))
 
 (defun message-mimic-kill-buffer ()
-  "Kill the current buffer with query."
+  "Kill the current buffer with query.  This is an imitation for
+`kill-buffer', but it will delete a message frame."
   (interactive)
-  (unless (eq 'message-mode major-mode)
-    (error "%s must be invoked from a message buffer." this-command))
-  (let ((command this-command)
-	(bufname (read-buffer (format "Kill buffer: (default %s) "
-				      (buffer-name)))))
-    (if (or (not bufname)
-	    (string-equal bufname "")
-	    (string-equal bufname (buffer-name)))
-	(message-kill-buffer)
-      (message "%s must be invoked only for the current buffer." command))))
+  (let ((bufname (read-buffer (format "Kill buffer: (default %s) "
+				      (buffer-name))))
+	message-kill-buffer-and-remove-file)
+    (when (or (not bufname)
+	      (string-equal bufname "")
+	      (string-equal bufname (buffer-name)))
+      (message-kill-buffer))))
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."

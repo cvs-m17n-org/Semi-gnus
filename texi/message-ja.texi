@@ -751,7 +751,20 @@ documentation of your OpenPGP implementation, so we refer to it.
 @item C-c C-k
 @kindex C-c C-k
 @findex message-kill-buffer
-メッセージバッファを切って終了します (@code{message-kill-buffer})。
+@vindex message-kill-buffer-and-remove-file
+メッセージバッファを切って終了します (@code{message-kill-buffer})。その
+フレームがメッセージ専用に作られたものだった場合は、フレームを削除します。
+@code{message-kill-buffer-and-remove-file} が非-@code{nil} で、かつバッ
+クアップファイルができていたら、ユーザに確認してからそれも削除します。
+
+@item C-x k
+@kindex C-x k
+@findex message-mimic-kill-buffer
+@vindex message-kill-buffer-and-remove-file
+@code{kill-buffer} のイミテーションで
+す (@code{message-mimic-kill-buffer})。
+@code{message-kill-buffer-and-remove-file} を一時的に @code{nil} に束縛
+して @code{message-kill-buffer} を呼びます。
 @end table
 
 @node Mail Aliases
@@ -1474,8 +1487,29 @@ Message はあなたがメッセージバッファを要求したときに、他に無い唯一のバッ
 @end lisp
 
 @item message-kill-buffer-on-exit
-@findex message-kill-buffer-on-exit
+@vindex message-kill-buffer-on-exit
 @code{nil} でなければ、終了時にすぐにバッファを削除します。
+
+@item message-kill-buffer-query-function
+@vindex message-kill-buffer-query-function
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+コマン
+ド @code{message-kill-buffer} や @code{message-mimic-kill-buffer} で、バッ
+ファを削除するかどうかをユーザに尋ねるときに使う関数の指定です。ディフォ
+ルトは @code{yes-or-no-p} ですが、
+@code{y-or-n-p} や @code{nnheader-Y-or-n-p} などを使うこともできます。
+@code{t} にすると無条件にバッファを削除します。
+
+@item message-kill-buffer-and-remove-file
+@vindex message-kill-buffer-and-remove-file
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+非-@code{nil} だったら、バッファを削除した後でもしバックアップファイルが
+あったら、ユーザに確認してからそれも削除します。@code{nil} ではファイル
+を削除しません。ディフォルトは @code{t} です。ただし、コマン
+ド @code{message-mimic-kill-buffer} はこれが @code{nil} であるものとして
+動作します。
 @end table
 
 @node Message Actions

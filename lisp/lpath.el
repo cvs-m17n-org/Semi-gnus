@@ -114,15 +114,15 @@
 (let ((functions-variables
        (cond
 	((featurep 'xemacs)
-	 nil)
+	 '((replace-regexp-in-string)))
 	((>= emacs-major-version 21)
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
 	 '((coding-system-get
-	    coding-system-list compose-mail file-name-extension
+	    compose-mail file-name-extension
 	    find-coding-systems-for-charsets find-coding-systems-region
-	    function-max-args get-charset-property shell-command-to-string
-	    smiley-encode-buffer)))
+	    function-max-args get-charset-property replace-regexp-in-string
+	    shell-command-to-string smiley-encode-buffer)))
 	(t
 	 '((function-max-args smiley-encode-buffer))))))
   (maybe-fbind (car functions-variables))

@@ -1,3 +1,22 @@
+2001-12-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-mimic-kill-buffer): Bind
+	`message-kill-buffer-and-remove-file' to nil while calling the
+	function `message-kill-buffer'.
+
+	* texi/message-ja.texi, texi/message-ja.texi: Update.
+
+	* lisp/lpath.el: Fbind `replace-regexp-in-string' for XEmacs and
+	Mule; don't fbind coding-system-list for Mule.
+
+2001-12-03  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+	(cf. news://news.gnus.org/gnus.gnus-bug #48523)
+
+	* lisp/message.el (message-kill-buffer-and-remove-file): New user
+	option.
+	(message-kill-buffer): Don't remove the backup file if
+	`message-kill-buffer-and-remove-file' is nil.
+
 2001-12-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu-case-sensitive-filesystem): New

@@ -776,7 +776,21 @@ Bury the message buffer and exit (@code{message-dont-send}).
 @item C-c C-k
 @kindex C-c C-k
 @findex message-kill-buffer
-Kill the message buffer and exit (@code{message-kill-buffer}).
+Kill the message buffer and exit (@code{message-kill-buffer}).  It will
+delete the message frame if it has been created exclusively for the
+message buffer.  If the option
+@code{message-kill-buffer-and-remove-file} is non-@code{nil} and the
+backup file has been created for the message buffer, it will also remove
+the file after prompting to the user.
+
+@item C-x k
+@kindex C-x k
+@findex message-mimic-kill-buffer
+@vindex message-kill-buffer-and-remove-file
+This is an imitation for @code{kill-buffer}
+(@code{message-mimic-kill-buffer}).  It dynamically binds the variable
+@code{message-kill-buffer-and-remove-file} to @code{nil} and calls the
+function @code{message-kill-buffer}.
 
 @end table
 
@@ -1534,8 +1548,27 @@ say:
 @end lisp
 
 @item message-kill-buffer-on-exit
-@findex message-kill-buffer-on-exit
+@vindex message-kill-buffer-on-exit
 If non-@code{nil}, kill the buffer immediately on exit.
+
+@item message-kill-buffer-query-function
+@vindex message-kill-buffer-query-function
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+Function used to prompt user whether to kill the message buffer when the
+command @code{message-kill-buffer} or @code{message-mimic-kill-buffer}
+is used.  It defaults to @code{yes-or-no-p}.  You may alter the value to
+@code{y-or-n-p}, @code{nnheader-Y-or-n-p}, etc.  If it is @code{t}, the
+buffer will be killed without query.
+
+@item message-kill-buffer-and-remove-file
+@vindex message-kill-buffer-and-remove-file
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+If it is non-@code{nil}, remove the backup file if it exists with a
+query to the user, after the message buffer is killed.  Otherwise the
+file won't be removed.  It defaults to @code{t}.  However, it is treated
+as @code{nil} when the command `message-mimic-kill-buffer' is used.
 
 @end table
 
