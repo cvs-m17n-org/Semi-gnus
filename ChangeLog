@@ -1,3 +1,45 @@
+2000-03-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.14 (This is alpha status.)
+	Require `product' in APEL 10.0 or later.
+	Will be created ``~/News/.Nana-gnus/'' directory automatically by
+	default.   You can customize location by `gnus-product-directory'.
+	``cache'' and  ``strict-cache'' files will be created under the
+	directory.
+
+	* lisp/gnus.el (TopLevel): Require `gnus-vers'.
+	(gnus-product-name): Abolished.
+	(gnus-version-number): Ditto.
+	(gnus-version): Use `product-string'. (Format changed)
+	(gnus-variable-list): Delete `gnus-format-specs'.
+	(gnus-product-variable-file-list): New variable.
+	(TopLevel): Use `product-provide'.
+
+	* lisp/gnus-vers.el: New file.  Nana-gnus version 7.1.0.14.
+
+	* lisp/gnus-start.el (gnus-product-directory): New user option.
+	(gnus-clear-quick-file-variables): New function.
+	(gnus-clear-system): Use `gnus-clear-quick-file-variables'.
+	(gnus-read-newsrc-file): Likewise.
+	(gnus-read-newsrc-el-file): Read product's variable files.
+	(gnus-product-read-variable-file-1): New function.
+	(gnus-save-newsrc-file): Save product's variable files.
+	(gnus-product-variable-touch): New function.
+	(gnus-product-variables-dirty-p): Ditto.
+	(gnus-product-save-variable-file): Ditto.
+	(gnus-product-save-variable-file-1): Ditto.
+	(gnus-product-quick-file-format): Ditto.
+
+	* lisp/gnus-spec.el (gnus-update-format): Use
+	`gnus-product-variable-touch'.
+	(gnus-update-format-specification-1): Likewise.
+	(gnus-update-format-specifications): Do not check `emacs-version'
+	and `gnus-newsrc-file-version'.  Use
+	`gnus-product-variable-touch'.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Use
+	`product-string'.
+
 2000-03-10  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.13 (This is alpha status.)
