@@ -1238,7 +1238,8 @@ This variable is used only in non-Mule Emacsen.")
     (when value
       (while (string-match "\n[\t ]+" value)
 	(setq value (replace-match " " t t value)))
-      value)))
+      ;; We remove all text props.delete-region
+      (format "%s" value))))
 
 (defun message-narrow-to-field ()
   "Narrow the buffer to the header on the current line."
