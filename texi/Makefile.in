@@ -56,8 +56,8 @@ most: texi2latex.elc latex latexps
 	  rm -f $@; \
 	  $(EMACSINFO) $< t; \
 	else \
-	  echo "$(MAKEINFO) -I $(srcdir) -o $@ $<"; \
-	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
+	  echo "$(MAKEINFO) -I $(srcdir) --enable-encoding -o $@ $<"; \
+	  $(MAKEINFO) -I $(srcdir) --enable-encoding -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf .latexi .dvi-x .pdf-x
@@ -70,8 +70,8 @@ most: texi2latex.elc latex latexps
 	  rm -f $@; \
 	  $(EMACSINFO) $<; \
 	else \
-	  echo "$(MAKEINFO) -I $(srcdir) -o $* $<"; \
-	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
+	  echo "$(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<"; \
+	  $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
 	fi
 
 # Files included in gnus.texi
@@ -136,8 +136,8 @@ clean:
 	thumbdta.tex xface.tex *.tpt gnus-manual-*.pdf gnus-manual-*.ps.gz
 
 makeinfo:
-	makeinfo -o gnus gnus.texi
-	makeinfo -o message message.texi
+	makeinfo --enable-encoding -o gnus gnus.texi
+	makeinfo --enable-encoding -o message message.texi
 
 texi2latex.elc: texi2latex.el
 	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
