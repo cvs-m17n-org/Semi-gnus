@@ -44,8 +44,6 @@
 	      mc-pgp-always-sign
 	      gpg-unabbrev-trust-alist
 	      nnoo-definition-alist
-	      current-language-environment
-	      language-info-alist
 	      url-current-callback-func url-be-asynchronous
 	      url-current-callback-data url-working-buffer
 	      url-current-mime-headers w3-meta-charset-content-type-regexp
