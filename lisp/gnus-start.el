@@ -2088,7 +2088,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	    (error
 	     (ding)
 	     (or (not (or (zerop (buffer-size))
-			  (eq 'binary gnus-startup-file-coding-system)
+			  (eq 'binary gnus-ding-file-coding-system)
 			  (gnus-re-read-newsrc-el-file ding-file)))
 		 (gnus-yes-or-no-p
 		  (format "Error in %s; continue? " ding-file))
@@ -2122,11 +2122,12 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	 (error nil))
        (progn
 	 (insert-file-contents-as-binary file nil nil nil 'replace)
+	 (goto-char (point-min))
 	 (when (re-search-forward
 		"^[\t ]*([\t\n\r ]*setq[\t\n\r ]+gnus-format-specs" nil t)
 	   (delete-region (goto-char (match-beginning 0)) (forward-list 1))
 	   (decode-coding-region (point-min) (point-max)
-				 gnus-startup-file-coding-system)
+				 gnus-ding-file-coding-system)
 	   (condition-case nil
 	       (progn
 		 (eval-region (point-min) (point-max))

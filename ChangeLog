@@ -1,3 +1,12 @@
+2001-10-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): Use
+	`gnus-ding-file-coding-system' instead of
+	`gnus-startup-file-coding-system'; go to the beginning of the
+	buffer before searching.
+	(gnus-read-newsrc-el-file): Use `gnus-ding-file-coding-system'
+	instead of `gnus-startup-file-coding-system'.
+
 2001-10-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send-news): Modify the value of
