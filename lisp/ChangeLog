@@ -1,3 +1,32 @@
+2005-02-14  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.el (spam-contents): improve docs for spam-contents
+	parameter in its variable incarnation
+
+2005-02-14  Simon Josefsson  <jas@extundo.com>
+
+	* smime-ldap.el: Use require instead of load-library for ldap.
+	(smime-ldap-search): Indent.
+	(smime-ldap-search-internal): Shorten line.
+
+	* smime.el (smime-cert-by-dns): Add doc-string.
+	(smime-cert-by-ldap-1): Indent.
+
+	* mml-smime.el (mml-smime-get-ldap-cert): Renamed from
+	mml-smime-get-dns-ldap.
+	(mml-smime-encrypt-query): Use new function.  Default to ldap.
+
+2005-02-14  Arne J,Ax(Brgensen <arne@arnested.dk>
+
+	* smime.el: Require smime-ldap.
+	(smime-ldap-host-list): New variable.
+	(smime-cert-by-ldap, smime-cert-by-ldap-1): Likewise.
+
+	* mml-smime.el (mml-smime-encrypt-query): New function.
+	(mml-smime-encrypt-query): Use it.
+
+	* smime-ldap.el: New file.
+
 2005-02-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-agent.el: Remove garbage made while merging the Emacs trunk.
