@@ -1,0 +1,214 @@
+1998-12-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el: (gnus-version-number): Update to 6.10.1.
+
+1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (mime-preview-over-to-next-method-alist): Use
+	`gnus-summary-next-article' in `gnus-original-article-mode'.
+	(mime-preview-over-to-previous-method-alist): Use
+	`gnus-summary-prev-article' in `gnus-original-article-mode'.
+	(gnus-article-mode-map): Define almost undefined keys to
+	`gnus-article-read-summary-keys'.
+	(gnus-article-prepare-display): Set `gnus-article-current-summary'
+	to `gnus-summary-buffer'.
+
+1998-12-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Work with movemail.exe
+	with APOP extention.
+
+1998-12-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Show version.
+	(gnus-xmas-logo-color-style): Default to `sky'.
+
+	* lisp/gnus.el (gnus-group-startup-message): Show version.
+	(gnus-splash-face): Shorten a wavelength.
+
+	* lisp/gnus-bbdb.el (toplevel): Define `bbdb-pop-up-elided-display'
+	for avoiding byte-compile warning.
+
+	* lisp/gnus-agent.el (gnus-agent-file-coding-system): Default to
+	`raw-text'.
+
+1998-12-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/*.el: Ebola eradication.
+
+1998-12-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* Abolish smtp.el and smtpmail.el (moved to FLIM).
+
+1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-mode-map): Use
+	`message-mimic-kill-buffer' for `C-x k'.
+
+1998-11-17  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/message.el (message-dont-send): Use `message-save-drafts'
+	instead of `save-buffer'.
+
+1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-send-mail): Protect against errors.
+	(message-send-news): Likewise.
+	(message-maybe-split-and-send-mail): New function.
+	(message-maybe-split-and-send-news): New function.
+
+1998-11-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method): Use
+	`mime-insert-header' instead of `mime-insert-decoded-header'.
+
+1998-11-09  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el: New file - setting function for
+	gnus-offline.
+
+1998-11-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmh.el (nnmh-retrieve-headers): Don't use
+	`nnheader-fold-continuation-lines'.
+
+1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Use
+	`mime-decode-header-in-buffer' instead of `eword-decode-header'.
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Likewise.
+
+1998-10-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
+	`mime-edit-decode-buffer' simply as initial value.
+
+	* lisp/message.el (message-make-forward-subject): Use
+	`nnheader-decode-subject' instead of
+	`eword-decode-unstructured-field-body'.
+
+	* lisp/nnheader.el (nnheader-decode-subject): New alias.
+	(nnheader-decode-from): New alias.
+	(make-full-mail-header): Use `nnheader-decode-subject' and
+	`nnheader-decode-from' instead of
+	`eword-decode-and-unfold-unstructured-field' and
+	`eword-decode-and-unfold-structured-field'.
+
+1998-10-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`mime-fetch-field' for getting Subject and From field.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
+	for Subject and From field.
+
+1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-parse-nov): Use
+	`make-full-mail-header'.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-parse-head): Use
+	`make-full-mail-header'.
+
+1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (make-full-mail-header): Sync up with
+	"chao-gnus-6_12" branch.
+	(mail-header-set-xref): Use `mime-entity-set-xref-internal'.
+	(mail-header-xref): Use `mime-entity-xref-internal'
+	(mail-header-set-lines): mime-entity-set-lines-internal'.
+	(mail-header-lines): Use `mime-entity-lines-internal'
+	(mail-header-set-chars): Use `mime-entity-set-chars-internal'.
+	(mail-header-chars): Use `mime-entity-chars-internal'.
+	(mail-header-set-references): Use
+	`mime-entity-set-references-internal'.
+	(mail-header-references): Use `mime-entity-references-internal'.
+	(mail-header-set-message-id): Use
+	`mime-entity-set-message-id-internal'.
+	(mail-header-message-id): Use `mime-entity-message-id-internal'.
+	(mail-header-set-date): Use `mime-entity-set-date-internal'.
+	(mail-header-date): Use `mime-entity-date-internal'.
+	(mail-header-set-from): Use
+	`mime-entity-set-decoded-from-internal'.
+	(mail-header-from): Use `mime-entity-decoded-from-internal'.
+	(mail-header-set-subject): Use
+	`mime-entity-set-decoded-subject-internal'.
+	(mail-header-subject): Use `mime-entity-decoded-subject-internal'.
+	All changes are imported from "chao-gnus-6_12" branch.
+
+	* lisp/message.el (message-reply): Use
+	`make-full-mail-header-from-decoded-header`.
+	(message-followup): Likewise.
+
+	* lisp/gnus-art.el (gnus-article-display-method-for-encoded-word):
+	Abolished.
+	(gnus-article-display-message-with-encoded-word): Abolished.
+
+1998-10-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Replace the default
+	value to `gnus-maybe-setup-default-charset'.
+	(gnus-maybe-setup-default-charset): New function. It is called
+	`message-maybe-setup-default-charset' at one time.
+
+	* lisp/message.el (message-maybe-setup-default-charset): Abolished.
+
+1998-10-15  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-spec.el (gnus-update-format-specifications): Force
+	update `gnus-format-specs' when `gnus-version' is differ from
+	saved version.
+
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-read-field', `std11-address-string' and
+	`std11-full-name-string' instead of
+	`gnus-extract-address-components'.
+	(gnus-article-sort-by-author): Likewise.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header):
+	New function.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up
+	buffer local variable `default-mime-charset' of
+	`gnus-original-article-buffer' and `gnus-article-buffer'.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el: Use `mime-entity' as gnus-header structure.
+	(mail-header-number): Use `mime-entity-location-internal'.
+	(mail-header-set-number): Use `mime-entity-set-location-internal'.
+	- Change other `mail-header-*' and `mail-header-set-*' to alias of
+	reference and set functions for mime-entity-internal.
+
+	* lisp/mmgnus.el: New module.
+
+	* lisp/gnus-sum.el: Abolish variable
+	`gnus-structured-field-decoder' and
+	`gnus-unstructured-field-decoder'.
+	(gnus-nov-parse-line): Don't decode from and subject.
+	(gnus-get-newsgroup-headers): Likewise.
+
+	* lisp/gnus-score.el (gnus-header-index): Modify to use
+	mime-entity structure as gnus-header structure.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Use content of
+	`gnus-current-headers' as mime-message-structure.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Use
+	`make-full-mail-header'.
+
+1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el : New file.

@@ -169,7 +169,10 @@
   ;; See whether all the stored info needs to be flushed.
   (when (or force
 	    (not (equal emacs-version
-			(cdr (assq 'version gnus-format-specs)))))
+			(cdr (assq 'version gnus-format-specs))))
+	    (not (equal gnus-version
+			(cdr (assq 'gnus-version gnus-format-specs)))))
+    (message "%s" "Force update format specs.")
     (setq gnus-format-specs nil))
 
   ;; Go through all the formats and see whether they need updating.
@@ -201,7 +204,9 @@
 		  (gnus-parse-format
 		   new-format
 		   (symbol-value
-		    (intern (format "gnus-%s-line-format-alist" type)))
+		    (intern (format "gnus-%s-line-format-alist"
+				    (if (eq type 'article-mode)
+					'summary-mode type))))
 		   (not (string-match "mode$" (symbol-name type))))))
 	  ;; Enter the new format spec into the list.
 	  (if entry
@@ -212,7 +217,9 @@
 	  (set (intern (format "gnus-%s-line-format-spec" type)) val)))))
 
   (unless (assq 'version gnus-format-specs)
-    (push (cons 'version emacs-version) gnus-format-specs)))
+    (push (cons 'version emacs-version) gnus-format-specs))
+  (unless (assq 'gnus-version gnus-format-specs)
+    (push (cons 'gnus-version gnus-version) gnus-format-specs)))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
@@ -238,12 +245,6 @@
   `(gnus-add-text-properties
     (point) (progn ,@form (point))
     '(gnus-face t face ,(symbol-value (intern (format "gnus-face-%d" type))))))
-
-(defun gnus-balloon-face-function (form type)
-  `(gnus-put-text-property 
-    (point) (progn ,@form (point))
-    'balloon-help
-    ,(intern (format "gnus-balloon-face-%d" type))))
 
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
@@ -291,10 +292,8 @@
   ;; SPEC-ALIST and returns a list that can be eval'ed to return the
   ;; string.  If the FORMAT string contains the specifiers %( and %)
   ;; the text between them will have the mouse-face text property.
-  ;; If the FORMAT string contains the specifiers %< and %>, the text between
-  ;; them will have the balloon-help text property.
   (if (string-match
-       "\\`\\(.*\\)%[0-9]?[{(<]\\(.*\\)%[0-9]?[})>]\\(.*\n?\\)\\'"
+       "\\`\\(.*\\)%[0-9]?[{(]\\(.*\\)%[0-9]?[})]\\(.*\n?\\)\\'"
        format)
       (gnus-parse-complex-format format spec-alist)
     ;; This is a simple format.
@@ -309,17 +308,13 @@
       (replace-match "\\\"" nil t))
     (goto-char (point-min))
     (insert "(\"")
-    (while (re-search-forward "%\\([0-9]+\\)?\\([{}()<>]\\)" nil t)
+    (while (re-search-forward "%\\([0-9]+\\)?\\([{}()]\\)" nil t)
       (let ((number (if (match-beginning 1)
 			(match-string 1) "0"))
 	    (delim (aref (match-string 2) 0)))
 	(if (or (= delim ?\()
-		(= delim ?\{)
-		(= delim ?\<))
-	    (replace-match (concat "\"(" 
-				   (cond ((= delim ?\() "mouse")
-					 ((= delim ?\{) "face")
-					 (t "balloon"))
+		(= delim ?\{))
+	    (replace-match (concat "\"(" (if (= delim ?\() "mouse" "face")
 				   " " number " \""))
 	  (replace-match "\")\""))))
     (goto-char (point-max))
@@ -343,15 +338,16 @@
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let ((max-width 0)
+  (let (max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
-	tilde-form tilde elem-type)
+	tilde-form tilde elem-type
+	(xemacs-mule-p (and gnus-xemacs (featurep 'mule))))
     (save-excursion
       (gnus-set-work-buffer)
       (insert format)
       (goto-char (point-min))
-      (while (re-search-forward "%" nil t)
+      (while (search-forward "%" nil t)
 	(setq user-defined nil
 	      spec-beg nil
 	      pad-width nil
@@ -430,10 +426,11 @@
 	    (setq elem '("*" ?s))))
 	  (setq elem-type (cadr elem))
 	  ;; Insert the new format elements.
-	  (when pad-width
-	    (insert (number-to-string pad-width)))
+	  (and pad-width (not xemacs-mule-p)
+	       (insert (number-to-string pad-width)))
 	  ;; Create the form to be evaled.
-	  (if (or max-width cut-width ignore-value)
+	  (if (or max-width cut-width ignore-value
+		  (and pad-width xemacs-mule-p))
 	      (progn
 		(insert ?s)
 		(let ((el (car elem)))
@@ -447,6 +444,8 @@
 		    (setq el (gnus-tilde-cut-form el cut-width)))
 		  (when max-width
 		    (setq el (gnus-tilde-max-form el max-width)))
+		  (and pad-width xemacs-mule-p
+		       (setq el (gnus-tilde-pad-form el pad-width)))
 		  (push el flist)))
 	    (insert elem-type)
 	    (push (car elem) flist))))
@@ -529,7 +528,7 @@ If PROPS, insert the result."
 		       (not (eq 'byte-code (car form)))
 		       ;; Under XEmacs, it's (funcall #<compiled-function ...>)
 		       (not (and (eq 'funcall (car form))
-				 (byte-code-function-p (cadr form)))))
+				 (compiled-function-p (cadr form)))))
 	      (fset 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
 	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))

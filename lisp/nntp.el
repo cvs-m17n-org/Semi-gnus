@@ -1,5 +1,5 @@
 ;;; nntp.el --- nntp access for Gnus
-;;; Copyright (C) 1987-90,92-98 Free Software Foundation, Inc.
+;;; Copyright (C) 1987-90,92-97 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -150,12 +150,6 @@ server there that you can connect to.  See also
 (defvoo nntp-warn-about-losing-connection t
   "*If non-nil, beep when a server closes connection.")
 
-(defvoo nntp-coding-system-for-read 'binary
-  "*Coding system to read from NNTP.")
-
-(defvoo nntp-coding-system-for-write 'binary
-  "*Coding system to write to NNTP.")
-
 (defcustom nntp-authinfo-file "~/.authinfo"
   ".netrc-like file that holds nntp authinfo passwords."
   :type
@@ -208,16 +202,6 @@ If this variable is nil, which is the default, no timers are set.")
 
 (defvoo nntp-server-xover 'try)
 (defvoo nntp-server-list-active-group 'try)
-
-(defvar nntp-async-needs-kluge
-  (string-match "^GNU Emacs 20\\.3\\." (emacs-version))
-  "*When non-nil, nntp will poll asynchronous connections
-once a second.  By default, this is turned on only for Emacs
-20.3, which has a bug that breaks nntp's normal method of
-noticing asynchronous data.")
-
-(defvar nntp-async-timer nil)
-(defvar nntp-async-process-list nil)
 
 (eval-and-compile
   (autoload 'nnmail-read-passwd "nnmail")
@@ -280,9 +264,9 @@ noticing asynchronous data.")
 	  (nntp-decode-text (not decode))
 	  (unless discard
 	    (save-excursion
- 	      (set-buffer buffer)
- 	      (goto-char (point-max))
- 	      (insert-buffer-substring (process-buffer process))
+	      (set-buffer buffer)
+	      (goto-char (point-max))
+	      (insert-buffer-substring (process-buffer process))
 	      ;; Nix out "nntp reading...." message.
 	      (when nntp-have-messaged
 		(setq nntp-have-messaged nil)
@@ -335,7 +319,17 @@ noticing asynchronous data.")
        ((eq callback 'ignore)
 	t)
        ((and callback wait-for)
-	(nntp-async-wait process wait-for buffer decode callback)
+	(save-excursion
+	  (set-buffer (process-buffer process))
+	  (unless nntp-inside-change-function
+	    (erase-buffer))
+	  (setq nntp-process-decode decode
+		nntp-process-to-buffer buffer
+		nntp-process-wait-for wait-for
+		nntp-process-callback callback
+		nntp-process-start-point (point-max)
+		after-change-functions
+		(list 'nntp-after-change-function-callback)))
 	t)
        (wait-for
 	(nntp-wait-for process wait-for buffer decode))
@@ -614,14 +608,9 @@ noticing asynchronous data.")
 	   (setq nntp-server-list-active-group t)))))
 
 (deffoo nntp-list-active-group (group &optional server)
-  "Return the active info on GROUP (which can be a regexp)."
+  "Return the active info on GROUP (which can be a regexp."
   (nntp-possibly-change-group nil server)
-  (nntp-send-command "^\\.*\r?\n" "LIST ACTIVE" group))
-
-(deffoo nntp-request-group-articles (group &optional server)
-  "Return the list of existing articles in GROUP."
-  (nntp-possibly-change-group nil server)
-  (nntp-send-command "^\\.*\r?\n" "LISTGROUP" group))
+  (nntp-send-command "^.*\r?\n" "LIST ACTIVE" group))
 
 (deffoo nntp-request-article (article &optional group server buffer command)
   (nntp-possibly-change-group group server)
@@ -729,7 +718,7 @@ noticing asynchronous data.")
     (prog1
 	(nntp-send-command
 	 "^\\.\r?\n" "NEWGROUPS"
-	 (format-time-string "%y%m%d %H%M%S" (date-to-time date)))
+	 (format-time-string "%y%m%d %H%M%S" (nnmail-date-to-time date)))
       (nntp-decode-text))))
 
 (deffoo nntp-request-post (&optional server)
@@ -750,7 +739,7 @@ noticing asynchronous data.")
 This function is supposed to be called from `nntp-server-opened-hook'.
 It will make innd servers spawn an nnrpd process to allow actual article
 reading."
-  (nntp-send-command "^.*\n" "MODE READER"))
+  (nntp-send-command "^.*\r?\n" "MODE READER"))
 
 (defun nntp-send-authinfo (&optional send-if-force)
   "Send the AUTHINFO to the nntp server.
@@ -797,7 +786,7 @@ If SEND-IF-FORCE, only send authinfo to the server if the
 The authinfo login name is taken from the user's login name and the
 password contained in '~/.nntp-authinfo'."
   (when (file-exists-p "~/.nntp-authinfo")
-    (with-temp-buffer
+    (nnheader-temp-write nil
       (insert-file-contents "~/.nntp-authinfo")
       (goto-char (point-min))
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" (user-login-name))
@@ -826,7 +815,7 @@ password contained in '~/.nntp-authinfo'."
       (format " *server %s %s %s*"
 	      nntp-address nntp-port-number
 	      (gnus-buffer-exists-p buffer))))
-    (mm-enable-multibyte)
+    (buffer-disable-undo (current-buffer))
     (set (make-local-variable 'after-change-functions) nil)
     (set (make-local-variable 'nntp-process-wait-for) nil)
     (set (make-local-variable 'nntp-process-callback) nil)
@@ -848,9 +837,7 @@ password contained in '~/.nntp-authinfo'."
 		     (kill-buffer ,pbuffer))))))
 	 (process
 	  (condition-case ()
-	      (let ((coding-system-for-read nntp-coding-system-for-read)
-                    (coding-system-for-write nntp-coding-system-for-write))
-		(funcall nntp-open-connection-function pbuffer))
+	      (funcall nntp-open-connection-function pbuffer)
 	    (error nil)
 	    (quit nil))))
     (when timer 
@@ -876,7 +863,8 @@ password contained in '~/.nntp-authinfo'."
 	nil))))
 
 (defun nntp-open-network-stream (buffer)
-  (open-network-stream "nntpd" buffer nntp-address nntp-port-number))
+  (open-network-stream-as-binary
+   "nntpd" buffer nntp-address nntp-port-number))
 
 (defun nntp-open-ssl-stream (buffer)
   (let* ((ssl-program-arguments '("-connect" (concat host ":" service)))
@@ -904,97 +892,40 @@ password contained in '~/.nntp-authinfo'."
 	    (eval (cadr entry))
 	  (funcall (cadr entry)))))))
 
-(defun nntp-async-wait (process wait-for buffer decode callback)
-  (save-excursion
-    (set-buffer (process-buffer process))
-    (unless nntp-inside-change-function
-      (erase-buffer))
-    (setq nntp-process-wait-for wait-for
-	  nntp-process-to-buffer buffer
-	  nntp-process-decode decode
-	  nntp-process-callback callback
-	  nntp-process-start-point (point-max))
-    (setq after-change-functions '(nntp-after-change-function))
-    (if nntp-async-needs-kluge
-	(nntp-async-kluge process))))
-
-(defun nntp-async-kluge (process)
-  ;; emacs 20.3 bug: process output with encoding 'binary
-  ;; doesn't trigger after-change-functions.
-  (unless nntp-async-timer
-    (setq nntp-async-timer
-	  (nnheader-run-at-time 1 1 'nntp-async-timer-handler)))
-  (add-to-list 'nntp-async-process-list process))
-
-(defun nntp-async-timer-handler ()
-  (mapcar
-   (lambda (proc)
-     (if (memq (process-status proc) '(open run))
-	 (nntp-async-trigger proc)
-       (nntp-async-stop proc)))
-   nntp-async-process-list))
-
-(defun nntp-async-stop (proc)
-  (setq nntp-async-process-list (delq proc nntp-async-process-list))
-  (when (and nntp-async-timer (not nntp-async-process-list))
-    (nnheader-cancel-timer nntp-async-timer)
-    (setq nntp-async-timer nil)))
-
-(defun nntp-after-change-function (beg end len)
-  (unwind-protect
-      ;; we only care about insertions at eob
-      (when (and (eq 0 len) (eq (point-max) end))
-	(save-match-data
-	  (let ((proc (get-buffer-process (current-buffer))))
-	    (when proc
-	      (nntp-async-trigger proc)))))
-    ;; any throw from after-change-functions will leave it
-    ;; set to nil.  so we reset it here, if necessary.
-    (when quit-flag
-      (setq after-change-functions '(nntp-after-change-function)))))
-
-(defun nntp-async-trigger (process)
-  (save-excursion
-    (set-buffer (process-buffer process))
-    (when nntp-process-callback
-      ;; do we have an error message?
-      (goto-char nntp-process-start-point)
-      (if (memq (following-char) '(?4 ?5))
-	  ;; wants credentials?
-	  (if (looking-at "480")
-	      (nntp-handle-authinfo nntp-process-to-buffer)
-	    ;; report error message.
-	    (nntp-snarf-error-message)
-	    (nntp-do-callback nil))
-
-	;; got what we expect?
-	(goto-char (point-max))
-	(when (re-search-backward
-	       nntp-process-wait-for nntp-process-start-point t)
-	  (nntp-async-stop process)
-	  ;; convert it.
+(defun nntp-after-change-function-callback (beg end len)
+  (when nntp-process-callback
+    (save-match-data
+      (if (and (= beg (point-min))
+	       (memq (char-after beg) '(?4 ?5)))
+	  ;; Report back error messages.
+	  (save-excursion
+	    (goto-char beg)
+	    (if (looking-at "480")
+		(nntp-handle-authinfo nntp-process-to-buffer)
+	      (nntp-snarf-error-message)
+	      (funcall nntp-process-callback nil)))
+	(goto-char end)
+	(when (and (> (point) nntp-process-start-point)
+		   (re-search-backward nntp-process-wait-for
+				       nntp-process-start-point t))
 	  (when (gnus-buffer-exists-p nntp-process-to-buffer)
-	    (let ((buf (current-buffer))
-		  (start nntp-process-start-point)
-		  (decode nntp-process-decode))
+	    (let ((cur (current-buffer))
+		  (start nntp-process-start-point))
 	      (save-excursion
 		(set-buffer nntp-process-to-buffer)
 		(goto-char (point-max))
-		(save-restriction
-		  (narrow-to-region (point) (point))
-		  (insert-buffer-substring buf start)
-		  (when decode
-		    (nntp-decode-text))))))
-	  ;; report it.
-	  (goto-char (point-max))
-	  (nntp-do-callback
-	   (buffer-name (get-buffer nntp-process-to-buffer))))))))
-
-(defun nntp-do-callback (arg)
-  (let ((callback nntp-process-callback)
-	(nntp-inside-change-function t))
-    (setq nntp-process-callback nil)
-    (funcall callback arg)))
+		(let ((b (point)))
+		  (insert-buffer-substring cur start)
+		  (narrow-to-region b (point-max))
+		  (nntp-decode-text)
+		  (widen)))))
+	  (goto-char end)
+	  (let ((callback nntp-process-callback)
+		(nntp-inside-change-function t))
+	    (setq nntp-process-callback nil)
+	    (save-excursion
+	      (funcall callback (buffer-name
+				 (get-buffer nntp-process-to-buffer))))))))))
 
 (defun nntp-snarf-error-message ()
   "Save the error message in the current buffer."
@@ -1004,7 +935,7 @@ password contained in '~/.nntp-authinfo'."
     (nnheader-report 'nntp message)
     message))
 
-(defun nntp-accept-process-output (process &optional timeout)
+(defun nntp-accept-process-output (process)
   "Wait for output from PROCESS and message some dots."
   (save-excursion
     (set-buffer (or (nntp-find-connection-buffer nntp-server-buffer)
@@ -1014,7 +945,7 @@ password contained in '~/.nntp-authinfo'."
       (unless (< len 10)
 	(setq nntp-have-messaged t)
 	(nnheader-message 7 "nntp read: %dk" len)))
-    (accept-process-output process (or timeout 1))))
+    (accept-process-output process 1)))
 
 (defun nntp-accept-response ()
   "Wait for output from the process that outputs to BUFFER."
@@ -1036,7 +967,10 @@ password contained in '~/.nntp-authinfo'."
 	(save-excursion
 	  (set-buffer (process-buffer (car entry)))
 	  (erase-buffer)
-	  (nntp-send-command "^[245].*\n" "GROUP" group)
+	  (nntp-send-string (car entry) (concat "GROUP " group))
+	  ;; allow for unexpected responses, since this can be called
+	  ;; from a timer with quit inhibited
+	  (nntp-wait-for-string "^[245].*\n")
 	  (setcar (cddr entry) group)
 	  (erase-buffer))))))
 
@@ -1172,6 +1106,7 @@ password contained in '~/.nntp-authinfo'."
 	  (delete-char -1))
 	(goto-char (point-min))
 	(delete-matching-lines "^\\.$\\|^[1-5][0-9][0-9] ")
+	;;(copy-to-buffer nntp-server-buffer (point-min) (point-max))
 	t))))
 
   nntp-server-xover)
@@ -1228,9 +1163,10 @@ password contained in '~/.nntp-authinfo'."
   (save-excursion
     (set-buffer buffer)
     (erase-buffer)
-    (let ((proc (apply
-		 'start-process
-		 "nntpd" buffer nntp-telnet-command nntp-telnet-switches))
+    (let ((proc (as-binary-process
+		 (apply
+		  'start-process
+		  "nntpd" buffer nntp-telnet-command nntp-telnet-switches)))
 	  (case-fold-search t))
       (when (memq (process-status proc) '(open run))
 	(process-send-string proc "set escape \^X\n")
@@ -1275,13 +1211,15 @@ password contained in '~/.nntp-authinfo'."
 (defun nntp-open-rlogin (buffer)
   "Open a connection to SERVER using rsh."
   (let ((proc (if nntp-rlogin-user-name
-		  (apply 'start-process
-			 "nntpd" buffer nntp-rlogin-program
-			 nntp-address "-l" nntp-rlogin-user-name
-			 nntp-rlogin-parameters)
-		(apply 'start-process
-		       "nntpd" buffer nntp-rlogin-program nntp-address
-		       nntp-rlogin-parameters))))
+		  (as-binary-process
+		   (apply 'start-process
+			  "nntpd" buffer nntp-rlogin-program
+			  nntp-address "-l" nntp-rlogin-user-name
+			  nntp-rlogin-parameters))
+		(as-binary-process
+		 (apply 'start-process
+			"nntpd" buffer nntp-rlogin-program nntp-address
+			nntp-rlogin-parameters)))))
     (save-excursion
       (set-buffer buffer)
       (nntp-wait-for-string "^\r*20[01]")

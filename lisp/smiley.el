@@ -297,7 +297,7 @@ Mouse button3 - menu"))
 	       (eq (char-after) ?\()
 	       (goto-char end)
 	       (or (not (re-search-forward "[()]" nil t))
-		   (eq (char-after (1- (point))) ?\()))
+		   (= (char-after (1- (point))) ?\()))
       t)))
 
 (defvar gnus-article-buffer)

@@ -1,9 +1,11 @@
-;;; nnheader.el --- header access macros for Gnus and its backends
+;;; nnheader.el --- header access macros for Semi-gnus and its backends
 ;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -40,7 +42,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'mail-utils)
-(require 'mm-util)
+(require 'mime)
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -62,101 +64,85 @@ on your system, you could say something like:
  (autoload 'cancel-function-timers "timers")
  (autoload 'gnus-point-at-eol "gnus-util")
  (autoload 'gnus-delete-line "gnus-util")
- (autoload 'gnus-buffer-live-p "gnus-util"))
+ (autoload 'gnus-buffer-live-p "gnus-util")
+ (autoload 'gnus-encode-coding-string "gnus-ems"))
 
 ;;; Header access macros.
 
 (defmacro mail-header-number (header)
   "Return article number in HEADER."
-  `(aref ,header 0))
+  `(mime-entity-location-internal ,header))
 
 (defmacro mail-header-set-number (header number)
   "Set article number of HEADER to NUMBER."
-  `(aset ,header 0 ,number))
+  `(mime-entity-set-location-internal ,header ,number))
 
-(defmacro mail-header-subject (header)
-  "Return subject string in HEADER."
-  `(aref ,header 1))
+(defalias 'mail-header-subject 'mime-entity-decoded-subject-internal)
+(defalias 'mail-header-set-subject 'mime-entity-set-decoded-subject-internal)
 
-(defmacro mail-header-set-subject (header subject)
-  "Set article subject of HEADER to SUBJECT."
-  `(aset ,header 1 ,subject))
+(defalias 'mail-header-from 'mime-entity-decoded-from-internal)
+(defalias 'mail-header-set-from 'mime-entity-set-decoded-from-internal)
 
-(defmacro mail-header-from (header)
-  "Return author string in HEADER."
-  `(aref ,header 2))
+(defalias 'mail-header-date 'mime-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-entity-set-date-internal)
 
-(defmacro mail-header-set-from (header from)
-  "Set article author of HEADER to FROM."
-  `(aset ,header 2 ,from))
+(defalias 'mail-header-message-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-set-message-id 'mime-entity-set-message-id-internal)
+(defalias 'mail-header-set-id 'mime-entity-set-message-id-internal)
 
-(defmacro mail-header-date (header)
-  "Return date in HEADER."
-  `(aref ,header 3))
+(defalias 'mail-header-references 'mime-entity-references-internal)
+(defalias 'mail-header-set-references 'mime-entity-set-references-internal)
 
-(defmacro mail-header-set-date (header date)
-  "Set article date of HEADER to DATE."
-  `(aset ,header 3 ,date))
+(defalias 'mail-header-chars 'mime-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-entity-set-chars-internal)
 
-(defalias 'mail-header-message-id 'mail-header-id)
-(defmacro mail-header-id (header)
-  "Return Id in HEADER."
-  `(aref ,header 4))
+(defalias 'mail-header-lines 'mime-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-entity-set-lines-internal)
 
-(defalias 'mail-header-set-message-id 'mail-header-set-id)
-(defmacro mail-header-set-id (header id)
-  "Set article Id of HEADER to ID."
-  `(aset ,header 4 ,id))
+(defalias 'mail-header-xref 'mime-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
-(defmacro mail-header-references (header)
-  "Return references in HEADER."
-  `(aref ,header 5))
+(defalias 'nnheader-decode-subject
+  (mime-find-field-decoder 'Subject 'nov))
+(defalias 'nnheader-decode-from
+  (mime-find-field-decoder 'From 'nov))
 
-(defmacro mail-header-set-references (header ref)
-  "Set article references of HEADER to REF."
-  `(aset ,header 5 ,ref))
+(defsubst make-full-mail-header (&optional number subject from date id
+					   references chars lines xref)
+  "Create a new mail header structure initialized with the parameters given."
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   (if subject
+       (nnheader-decode-subject subject)
+     )
+   (if from
+       (nnheader-decode-from from)
+     )
+   date id references
+   chars lines xref
+   (list (cons 'Subject subject)
+	 (cons 'From from))
+   ))
 
-(defmacro mail-header-chars (header)
-  "Return number of chars of article in HEADER."
-  `(aref ,header 6))
-
-(defmacro mail-header-set-chars (header chars)
-  "Set number of chars in article of HEADER to CHARS."
-  `(aset ,header 6 ,chars))
-
-(defmacro mail-header-lines (header)
-  "Return lines in HEADER."
-  `(aref ,header 7))
-
-(defmacro mail-header-set-lines (header lines)
-  "Set article lines of HEADER to LINES."
-  `(aset ,header 7 ,lines))
-
-(defmacro mail-header-xref (header)
-  "Return xref string in HEADER."
-  `(aref ,header 8))
-
-(defmacro mail-header-set-xref (header xref)
-  "Set article xref of HEADER to xref."
-  `(aset ,header 8 ,xref))
-
-(defmacro mail-header-extra (header)
-  "Return the extra headers in HEADER."
-  `(aref ,header 9))
-
-(defmacro mail-header-set-extra (header extra)
-  "Set the extra headers in HEADER to EXTRA."
-  `(aset ,header 9 ',extra))
+(defsubst make-full-mail-header-from-decoded-header
+  (&optional number subject from date id references chars lines xref)
+  "Create a new mail header structure initialized with the parameters given."
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   subject
+   from
+   date id references
+   chars lines xref))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
-  (make-vector 10 init))
-
-(defun make-full-mail-header (&optional number subject from date id
-					references chars lines xref
-					extra)
-  "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref extra))
+  (make-full-mail-header init init init init init
+			 init init init init))
 
 ;; fake message-ids: generation and detection
 
@@ -192,7 +178,7 @@ on your system, you could say something like:
 	  ;; about twice as fast, even though it looks messier.	 You
 	  ;; can't have everything, I guess.  Speed and elegance
 	  ;; don't always go hand in hand.
-	  (vector
+	  (make-full-mail-header
 	   ;; Number.
 	   (if naked
 	       (progn
@@ -266,20 +252,7 @@ on your system, you could say something like:
 	   (progn
 	     (goto-char p)
 	     (and (search-forward "\nxref: " nil t)
-		  (nnheader-header-value)))
-	   
-	   ;; Extra.
-	   (when nnmail-extra-headers
-	     (let ((extra nnmail-extra-headers)
-		   out)
-	       (while extra
-		 (goto-char p)
-		 (when (search-forward
-			(concat "\n" (symbol-name (car extra)) ": ") nil t)
-		   (push (cons (car extra) (nnheader-header-value))
-			 out))
-		 (pop extra))
-	       out))))
+		  (nnheader-header-value)))))
       (when naked
 	(goto-char (point-min))
 	(delete-char 1)))))
@@ -298,19 +271,9 @@ on your system, you could say something like:
 	   (if (numberp num) num 0)))
      (or (eobp) (forward-char 1))))
 
-(defmacro nnheader-nov-parse-extra ()
-  '(let (out string)
-     (while (not (memq (char-after) '(?\n nil)))
-       (setq string (nnheader-nov-field))
-       (when (string-match "^\\([^ :]+\\): " string)
-	 (push (cons (intern (match-string 1 string))
-		     (substring string (match-end 0)))
-	       out)))
-     out))
-
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
-    (vector
+    (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
@@ -323,14 +286,14 @@ on your system, you could say something like:
      (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
-     (nnheader-nov-parse-extra))))	; extra
+     )))
 
 (defun nnheader-insert-nov (header)
   (princ (mail-header-number header) (current-buffer))
   (insert
    "\t"
-   (or (mail-header-subject header) "(none)") "\t"
-   (or (mail-header-from header) "(nobody)") "\t"
+   (or (mime-fetch-field 'Subject header) "(none)") "\t"
+   (or (mime-fetch-field 'From header) "(nobody)") "\t"
    (or (mail-header-date header) "") "\t"
    (or (mail-header-id header)
        (nnmail-message-id))
@@ -341,16 +304,7 @@ on your system, you could say something like:
   (princ (or (mail-header-lines header) 0) (current-buffer))
   (insert "\t")
   (when (mail-header-xref header)
-    (insert "Xref: " (mail-header-xref header)))
-  (when (or (mail-header-xref header)
-	    (mail-header-extra header))
-    (insert "\t"))
-  (when (mail-header-extra header)
-    (let ((extra (mail-header-extra header)))
-      (while extra
-	(insert (symbol-name (caar extra))
-		": " (cdar extra) "\t")
-        (pop extra))))
+    (insert "Xref: " (mail-header-xref header) "\t"))
   (insert "\n"))
 
 (defun nnheader-insert-article-line (article)
@@ -438,7 +392,6 @@ the line could be found."
   (save-excursion
     (unless (gnus-buffer-live-p nntp-server-buffer)
       (setq nntp-server-buffer (get-buffer-create " *nntpd*")))
-    (mm-enable-multibyte)
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (kill-all-local-variables)
@@ -485,7 +438,7 @@ the line could be found."
       nil
     (narrow-to-region (point-min) (1- (point)))
     (goto-char (point-min))
-    (while (looking-at "[a-zA-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
+    (while (looking-at "[A-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
       (goto-char (match-end 0)))
     (prog1
 	(eobp)
@@ -533,10 +486,56 @@ the line could be found."
 (defun nnheader-set-temp-buffer (name &optional noerase)
   "Set-buffer to an empty (possibly new) buffer called NAME with undo disabled."
   (set-buffer (get-buffer-create name))
-  (buffer-disable-undo)
+  (buffer-disable-undo (current-buffer))
   (unless noerase
     (erase-buffer))
   (current-buffer))
+
+(defmacro nnheader-temp-write (file &rest forms)
+  "Create a new buffer, evaluate FORMS there, and write the buffer to FILE.
+Return the value of FORMS.
+If FILE is nil, just evaluate FORMS and don't save anything.
+If FILE is t, return the buffer contents as a string."
+  (let ((temp-file (make-symbol "temp-file"))
+	(temp-buffer (make-symbol "temp-buffer"))
+	(temp-results (make-symbol "temp-results")))
+    `(save-excursion
+       (let* ((,temp-file ,file)
+	      (default-major-mode 'fundamental-mode)
+	      (,temp-buffer
+	       (set-buffer
+		(get-buffer-create
+		 (generate-new-buffer-name " *nnheader temp*"))))
+	      ,temp-results)
+	 (unwind-protect
+	     (progn
+	       (setq ,temp-results (progn ,@forms))
+	       (cond
+		;; Don't save anything.
+		((null ,temp-file)
+		 ,temp-results)
+		;; Return the buffer contents.
+		((eq ,temp-file t)
+		 (set-buffer ,temp-buffer)
+		 (buffer-string))
+		;; Save a file.
+		(t
+		 (set-buffer ,temp-buffer)
+		 ;; Make sure the directory where this file is
+		 ;; to be saved exists.
+		 (when (not (file-directory-p
+			     (file-name-directory ,temp-file)))
+		   (make-directory (file-name-directory ,temp-file) t))
+		 ;; Save the file.
+		 (write-region (point-min) (point-max)
+			       ,temp-file nil 'nomesg)
+		 ,temp-results)))
+	   ;; Kill the buffer.
+	   (when (buffer-name ,temp-buffer)
+	     (kill-buffer ,temp-buffer)))))))
+
+(put 'nnheader-temp-write 'lisp-indent-function 1)
+(put 'nnheader-temp-write 'edebug-form-spec '(form body))
 
 (defvar jka-compr-compression-info-list)
 (defvar nnheader-numerical-files
@@ -682,7 +681,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'binary
+(defvar nnheader-pathname-coding-system 'iso-8859-1
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)
@@ -694,7 +693,7 @@ without formatting."
 	 (concat dir group "/")
        ;; If not, we translate dots into slashes.
        (concat dir
-	       (mm-encode-coding-string
+	       (gnus-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
 		nnheader-pathname-coding-system)
 	       "/")))
@@ -754,7 +753,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'binary
+(defvar nnheader-file-coding-system 'raw-text
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)
@@ -767,20 +766,20 @@ find-file-hooks, etc.
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
-	(find-file-hooks nil)
-	(coding-system-for-read nnheader-file-coding-system))
-    (insert-file-contents filename visit beg end replace)))
+	(after-insert-file-functions nil)
+	(find-file-hooks nil))
+    (insert-file-contents-as-coding-system
+     nnheader-file-coding-system filename visit beg end replace)))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
-	(find-file-hooks nil)
-	(coding-system-for-read nnheader-file-coding-system))
-    (apply 'find-file-noselect args)))
+	(after-insert-file-functions nil)
+	(find-file-hooks nil))
+    (apply 'find-file-noselect-as-coding-system
+	   nnheader-file-coding-system args)))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."
@@ -816,6 +815,8 @@ find-file-hooks, etc.
   `(let ((new (generate-new-buffer " *nnheader replace*"))
 	 (cur (current-buffer))
 	 (start (point-min)))
+     (set-buffer new)
+     (buffer-disable-undo (current-buffer))
      (set-buffer cur)
      (goto-char (point-min))
      (while (,(if regexp 're-search-forward 'search-forward)
@@ -847,6 +848,23 @@ find-file-hooks, etc.
 (fset 'nnheader-run-at-time 'run-at-time)
 (fset 'nnheader-cancel-timer 'cancel-timer)
 (fset 'nnheader-cancel-function-timers 'cancel-function-timers)
+
+(defun nnheader-Y-or-n-p (prompt)
+  "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
+  (let ((cursor-in-echo-area t)
+	(echo-keystrokes 0)
+	(inhibit-quit t)
+	ans)
+    (let (message-log-max)
+      (while (not (memq ans '(?\  ?N ?Y ?\C-g ?\e ?\n ?\r ?n ?y)))
+	(message "%s(Y/n) " prompt)
+	(setq ans (read-char-exclusive))))
+    (if (memq ans '(?\C-g ?N ?n))
+	(progn
+	  (message "%s(Y/n) No" prompt)
+	  nil)
+      (message "%s(Y/n) Yes" prompt)
+      t)))
 
 (when (string-match "XEmacs\\|Lucid" emacs-version)
   (require 'nnheaderxm))
