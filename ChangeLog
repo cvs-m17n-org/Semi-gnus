@@ -1,3 +1,9 @@
+1999-12-20  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/imap.el (mel-find-function): Always require `mel' instead of
+	the use of autoloading.  Because the function `mel-find-function'
+	is defined by `defsubst'.
+
 1999-12-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-after-get-new-news): Refer to
