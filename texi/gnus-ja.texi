@@ -13837,241 +13837,226 @@ rmail box のためのアクティブファイルの名前。既定値
 る必要はありません。既定値は @code{nil} です。
 @end table
 
-@c TRANSLATEME!
 @node Maildir
 @subsubsection Maildir
 @cindex nnmaildir
 @cindex maildir
 
-@code{nnmaildir} stores mail in the maildir format, with each maildir
-corresponding to a group in Gnus.  This format is documented here:
-@uref{http://cr.yp.to/proto/maildir.html} and here:
-@uref{http://www.qmail.org/man/man5/maildir.html}.  nnmaildir also
-stores extra information in the @file{.nnmaildir/} directory within a
-maildir.
+@code{nnmaildir} は Gnus のグループに対応した各々
+の maildir に maildir フォーマットでメールを格納します。このフォーマッ
+トは @uref{http://cr.yp.to/proto/maildir.html} およ
+び @uref{http://www.qmail.org/man/man5/maildir.html} で文書化されていま
+す。また nnmaildir は maildir の中の @file{.nnmaildir/} ディレクトリに特
+別な情報を格納します。
 
-Maildir format was designed to allow concurrent deliveries and
-reading, without needing locks.  With other backends, you would have
-your mail delivered to a spool of some kind, and then you would
-configure Gnus to split mail from that spool into your groups.  You
-can still do that with nnmaildir, but the more common configuration is
-to have your mail delivered directly to the maildirs that appear as
-group in Gnus.
+Maildir フォーマットはロックを必要としない同時配送と講読を可能にするため
+に設計されました。他のバックエンドでは、メールを何らかのスプールに渡して
+そのスプールからグループに分割するために Gnus を設定しなければならないで
+しょう。それは今まで通り nnmaildir で行なうことができますが、もっと一般
+的な設定は Gnus のグループとして現われる maildir にメールを直接配送する
+ことです。
 
-nnmaildir is designed to be perfectly reliable: @kbd{C-g} will never
-corrupt its data in memory, and @code{SIGKILL} will never corrupt its
-data in the filesystem.
+nnmaildir は完全に信頼できることを目指しています: @kbd{C-g} はメモリー中
+のデータを壊しませんし、@code{SIGKILL} がファイルの中のデータを壊すこと
+はありません。
 
-nnmaildir stores article marks and NOV data in each maildir.  So you
-can copy a whole maildir from one Gnus setup to another, and you will
-keep your marks.
+nnmaildir は記事の印と NOV データをそれぞれの maildir に格納します。それ
+によって、ある Gnus の環境から別の場所に maildir 全体をコピーすることが
+でき、印は保存されます。
 
-Virtual server settings:
+仮想サーバーの設定:
 
 @table @code
 @item directory
-For each of your nnmaildir servers (it's very unlikely that you'd need
-more than one), you need to create a directory and populate it with
-symlinks to maildirs (and nothing else; do not choose a directory
-already used for other purposes).  You could also put maildirs
-themselves (instead of symlinks to them) directly in the server
-directory, but that would break @code{nnmaildir-request-delete-group},
-so you wouldn't be able to delete those groups from within Gnus.  (You
-could still delete them from your shell with @code{rm -r foo}.)  Each
-maildir will be represented in Gnus as a newsgroup on that server; the
-filename of the symlink will be the name of the group.  Any filenames
-in the directory starting with `.' are ignored.  The directory is
-scanned when you first start Gnus, and each time you type @kbd{g} in
-the group buffer; if any maildirs have been removed or added,
-nnmaildir notices at these times.
+それぞれの nnmaildir サーバー (一つを越えるサーバーが必要だとはとても思
+えませんが) に対して、ディレクトリを作って maildir へのシンボリックリン
+クを張る必要があります (他の目的のためにすでに使われているディレクトリを
+選んではいけません)。サーバーのディレクトリに直接 (シンボリックリンクの
+代わりに) nnmaildir を置くこともできるのですが、それ
+は @code{nnmaildir-request-delete-group} を破綻させ、Gnus でそれらのグルー
+プを消すことができなくなってしまいます (それらを shell から @code{rm -r
+foo} で消すことはできます)。それぞれの maildir は、そのサーバーのニュー
+スグループとして Gnus に現れ、シンボリックリンクのファイル名がそのグルー
+プの名前になります。ディレクトリにある `.' で始まるどんなファイル名も無
+視されます。ディレクトリは最初に Gnus を起動したときとグループバッファ
+で @kbd{g} をタイプしたときはいつでも走査され、どれかの maildir が削除ま
+たは追加されたときに通知します。
 
-The value of the @code{directory} parameter should be a Lisp form
-which is processed by @code{eval} and @code{expand-file-name} to get
-the path of the directory for this server.  The form is @code{eval}ed
-only when the server is opened; the resulting string is used until the
-server is closed.  (If you don't know about forms and @code{eval},
-don't worry - a simple string will work.)  This parameter is not
-optional; you must specify it.  I don't recommend using @file{~/Mail}
-or a subdirectory of it; several other parts of Gnus use that
-directory by default for various things, and may get confused if
-nnmaildir uses it too.  @file{~/.nnmaildir} is a typical value.
+@code{directory} パラメータの値は Lisp 式でなければなりません。
+@code{eval} で処理された後で、@code{expand-file-name} によってこのサーバー
+のためのディレクトリのパスを獲得します。その結果得られた文字列が、サーバー
+が閉じられるまで使われます (もし、式や @code{eval} を知らなくでも心配ご
+無用; 単なる文字列で動作します)。このパラメータは任意ではなく、設定しな
+ければなりません。@file{~/Mail} やサブディレクトリを使うことは推奨できま
+せん。いくつかの Gnus の他の部分がそれをディフォルトでいろんなものに使う
+ので、nnmaildir でもそれを使うと混乱するかもしれません。
+@file{~/.nnmaildir} が一般的な値です。
 
 @item create-directory
-This should be a Lisp form which is processed by @code{eval} and
-@code{expand-file-name} to get the name of the directory where new
-maildirs are created.  The form is @code{eval}ed only when the server
-is opened; the resulting string is used until the server is closed.
-This parameter is optional, but if you do not supply it, you cannot
-create new groups from within Gnus.  (You could still create them from
-your shell with @code{mkdir -m 0700 foo foo/tmp foo/new foo/cur}.)  A
-relative path is interpreted as relative to the @code{directory} path.
-@code{create-directory} and @code{directory} must be different;
-otherwise, group creation and deletion will break.  (If you don't need
-those features, you can omit @code{create-directory} entirely.)
+これは Lisp 式でなければなりません。@code{eval} で処理された後で、
+@code{expand-file-name} によって新しい maildir が生成されるディレクトリ
+の名前を獲得します。式はサーバーが開通したときだけ評価され、その結果得ら
+れた文字列が、サーバーが閉じられるまで使われます。このパラメータは任意で
+すが、それを与えないと Gnus で新しいグループを作ることができません (それ
+らを shell から @code{mkdir -m 0700 foo foo/tmp foo/new foo/cur} で作る
+ことはできます)。相対的なパスは @code{directory} パスへの相対値であるも
+のと解釈されます。@code{create-directory} と @code{directory} は違ってい
+なければなりません。さもないと生成と消去が破綻してしまいます (それらの機
+能が要らないのであれば、@code{create-directory} を完璧に省略しても構いま
+せん)。
 
 @item directory-files
-This should be a function with the same interface as
-@code{directory-files} (such as @code{directory-files} itself).  It is
-used to scan the server's @code{directory} for maildirs.  This
-parameter is optional; the default is
-@code{nnheader-directory-files-safe} if
-@code{nnheader-directory-files-is-safe} is @code{nil}, and
-@code{directory-files} otherwise.
-(@code{nnheader-directory-files-is-safe} is checked only once when the
-server is opened; if you want to check it each time the directory is
-scanned, you'll have to provide your own function that does that.)
+これは @code{directory-files} と同じインターフェースの関
+数 (または @code{directory-files} そのもの) でなければなりません。これ
+は maildir 用のサーバーの @code{directory} を走査するために使われます。
+このパラメータは任意です。ディフォルト値は、
+@code{nnheader-directory-files-is-safe} が @code{nil} だった
+ら @code{nnheader-directory-files-safe} で、それ以外の場合
+は @code{directory-files} で
+す (@code{nnheader-directory-files-is-safe} はサーバーが開通したときに一
+回だけ検査されますが、ディレクトリが走査されるときに毎回チェックさせたい
+のならば、それを行なう関数をあなたが自前で用意する必要があります)。
 
 @item get-new-mail
-If non-@code{nil}, then after scanning for new mail in the group
-maildirs themselves as usual, this server will also incorporate mail
-the conventional Gnus way, from @code{mail-sources} according to
-@code{nnmail-split-methods} or @code{nnmail-split-fancy}.  The default
-value is @code{nil}.
+非-@code{nil} にしておくと、いつもの通りにグループの maildir 自体におい
+て新着メールを走査した後で、このサーバー
+は @code{nnmail-split-methods} か @code{nnmail-split-fancy} によ
+る @code{mail-sources} から、従来の Gnus の方法でメールを取り込みます。
+ディフォルト値は @code{nil} です。
 
-Do @emph{not} use the same maildir both in @code{mail-sources} and as
-an nnmaildir group.  The results might happen to be useful, but that
-would be by chance, not by design, and the results might be different
-in the future.  If your split rules create new groups, remember to
-supply a @code{create-directory} server parameter.
+@code{mail-sources} と nnmaildir グループの両方で同じ maildir を使って
+は @emph{いけません}。その結果は運良く有益になるかもしれませんが、そんな
+意図では設計されていません。将来は違う結果をもたらす可能性があります。あ
+なたの分割規則が新しいグループを作るようになっている場合は、
+@code{create-directory} サーバーパラメータを与えることを忘れないで下さい。
 @end table
 
-@subsubsection Group parameters
+@subsubsection グループパラメータ
 
-nnmaildir uses several group parameters.  It's safe to ignore all
-this; the default behavior for nnmaildir is the same as the default
-behavior for other mail backends: articles are deleted after one week,
-etc.  Except for the expiry parameters, all this functionality is
-unique to nnmaildir, so you can ignore it if you're just trying to
-duplicate the behavior you already have with another backend.
+nnmaildir はいくつかのグループパラメータを使います。これらのすべてを無視
+しても安全です。ディフォルトの nnmaildir の動作は、他のメールバックエン
+ドのディフォルト (記事が一週間後に消去される、など) と同じです。期限切れ
+消去のパラメータを除いて、この機能はすべて nnmaildir に特有です。したがっ
+て、別のバックエンドですでに行っている動作を単に踏襲させようというのであ
+れば、これを無視することができます。
 
-If the value of any of these parameters is a vector, the first element
-is evaluated as a Lisp form and the result is used, rather than the
-original value.  If the value is not a vector, the value itself is
-evaluated as a Lisp form.  (This is why these parameters use names
-different from those of other, similar parameters supported by other
-backends: they have different, though similar, meanings.)  (For
-numbers, strings, @code{nil}, and @code{t}, you can ignore the
-@code{eval} business again; for other values, remember to use an extra
-quote and wrap the value in a vector when appropriate.)
+これらのパラメータのうちのどれでも、その値がベクトルである場合は、オリジ
+ナルの値に代わって、第一の要素が Lisp 式として評価された結果が使われます。
+値がベクトルでない場合は、その値そのものが Lisp 式として評価されます。
+(そのため、これらのパラメータは他とは違う名前、違うけれども似た意味を持
+つ他のバックエンドでサポートされている同様のパラメータ、を使います。)
+(数、文字列、@code{nil}、および @code{t} については、@code{eval} の関与
+を再び無視することができます。他の値について、それが適切な場合には、余分
+なクオートを使い、かつベクトルで値を包むことを忘れないで下さい。)
 
 @table @code
 @item expire-age
-An integer specifying the minimum age, in seconds, of an article before
-it will be expired, or the symbol @code{never} to specify that
-articles should never be expired.  If this parameter is not set,
-nnmaildir falls back to the usual
-@code{nnmail-expiry-wait}(@code{-function}) variables (overridable by
-the @code{expiry-wait}(@code{-function}) group parameters.  If you
-wanted a value of 3 days, you could use something like @code{[(* 3 24
-60 60)]}; nnmaildir will evaluate the form and use the result.  An
-article's age is measured starting from the article file's
-modification time.  Normally, this is the same as the article's
-delivery time, but editing an article makes it younger.  Moving an
-article (other than via expiry) may also make an article younger.
+記事が消去されるまでの寿命の秒数を整数で、またはシンボル @code{never} で
+記事が期限切れ消去されてはならないことを指定します。このパラメータが設定
+されていないと、いつもの @code{nnmail-expiry-wait}(@code{-function}) 変
+数 (@code{expiry-wait}(@code{-function}) グループパラメータで上書きされ
+る) を最後のよりどころにします。3日の値が欲しいならば、@code{[(* 3 24 60
+60)]} のようなものを使って下さい。nnmaildir は式を評価して、その結果を使
+います。記事の寿命は記事ファイルの変更時刻を基点に計測されます。通常これ
+は記事が配送された時刻と同じですが、記事の編集はそれを若くします。(期限
+切れ消去以外の) 記事の移動もまた、記事を若くしてしまうでしょう。
 
 @item expire-group
-If this is set to a string (a full Gnus group name, like
-@code{"backend+server.address.string:group.name"}), and if it is not
-the name of the same group that the parameter belongs to, then
-articles will be moved to the specified group during expiry before
-being deleted.  @emph{If this is set to an nnmaildir group, the
-article will be just as old in the destination group as it was in the
-source group.} So be careful with @code{expire-age} in the destination
-group.
+これが文字列 (@code{"backend+server.address.string:group.name"} のような
+完全な Gnus のグループ名) で、かつそのパラメータが同じ名前のグループに属
+さない場合、期限切れ消去が行なわれる際に、記事は消去される前に指定された
+グループに移動させられます。@emph{これが nnmaildir グループに設定される
+と、移動先のグループにおいて、記事が元のグループにあったときとちょうど同
+じだけ古くなります。} したがって、移動先のグループにおけ
+る @code{expire-age} には注意して下さい。
 
 @item read-only
-If this is set to @code{t}, nnmaildir will treat the articles in this
-maildir as read-only.  This means: articles are not renamed from
-@file{new/} into @file{cur/}; articles are only found in @file{new/},
-not @file{cur/}; articles are never deleted; articles cannot be
-edited.  @file{new/} is expected to be a symlink to the @file{new/}
-directory of another maildir - e.g., a system-wide mailbox containing
-a mailing list of common interest.  Everything in the maildir outside
-@file{new/} is @emph{not} treated as read-only, so for a shared
-mailbox, you do still need to set up your own maildir (or have write
-permission to the shared mailbox); your maildir just won't contain
-extra copies of the articles.
+これが @code{t} に設定されていると、nnmaildir はその記事をこのグループで
+読み出し専用として扱います。この意味は、記事は @file{new/} か
+ら @file{cur/} に改名されない、記事は @file{cur/} ではな
+く @file{new/} でのみ見つかる、記事は消去されない、記事は編集できない、
+ということです。@file{new/} は他の maildir の @file{new/} ディレクトリ、
+例えばみんなが興味があるメーリングリストを含んでいるシステムで共通のメー
+ルボックス、へのシンボリックリンクであると想定されます。@file{new/} 以外
+の maildir にあるすべてのものは、読み出し専用として扱われ @emph{ません}。
+したがって共有のメールボックスに対しては、あなた自身の maildir を設定す
+る (または 共有のメールボックスに書き込み権限を持つ) 必要が依然としてあ
+ります。あなたの maildir は記事の余分なコピーをまったく含まないでしょう。
 
 @item directory-files
-A function with the same interface as @code{directory-files}.  It is
-used to scan the directories in the maildir corresponding to this
-group to find articles.  The default is the function specified by the
-server's @code{directory-files} parameter.
+@code{directory-files} と同じインターフェースの関数です。記事を見つける
+ために、このグループに対応する maildir のディレクトリを走査するために使
+われます。ディフォルトはサーバーの @code{directory-files} パラメータで設
+定されている関数です。
 
 @item always-marks
-A list of mark symbols, such as
-@code{['(read expire)]}.  Whenever Gnus asks nnmaildir for
-article marks, nnmaildir will say that all articles have these
-marks, regardless of whether the marks stored in the filesystem
-say so.  This is a proof-of-concept feature that will probably be
-removed eventually; it ought to be done in Gnus proper, or
-abandoned if it's not worthwhile.
+@code{['(read expire)]} のような印シンボルのリストです。Gnus が記事の印
+を nnmaildir に尋ねるときはいつでも、ファイルシステムに格納されている印
+が何であるかとは無関係に、nnmaildir はすべての記事がこれらの印を持ってい
+ると答えます。これは構想を試すための機能で、おそらく結局は削除されるでしょ
+う。それは Gnus 本体で行われるか、あるいは有益でなければ放棄されるべきで
+す。
 
 @item never-marks
-A list of mark symbols, such as @code{['(tick expire)]}.  Whenever
-Gnus asks nnmaildir for article marks, nnmaildir will say that no
-articles have these marks, regardless of whether the marks stored in
-the filesystem say so.  @code{never-marks} overrides
-@code{always-marks}.  This is a proof-of-concept feature that will
-probably be removed eventually; it ought to be done in Gnus proper, or
-abandoned if it's not worthwhile.
+@code{['(tick expire)]} のような印シンボルのリストです。Gnus が記事の印
+を nnmaildir に尋ねるときはいつでも、ファイルシステムに格納されている印
+が何であるかとは無関係に、nnmaildir はこれらの印を持っている記事は無いと
+答えます。@code{never-marks} は @code{always-marks} を上書きします。これ
+は構想を試すための機能で、おそらく結局は削除されるでしょう。それは Gnus
+本体で行われるか、あるいは有益でなければ放棄されるべきです。
 
 @item nov-cache-size
-An integer specifying the size of the NOV memory cache.  To speed
-things up, nnmaildir keeps NOV data in memory for a limited number of
-articles in each group.  (This is probably not worthwhile, and will
-probably be removed in the future.)  This parameter's value is noticed
-only the first time a group is seen after the server is opened - i.e.,
-when you first start Gnus, typically.  The NOV cache is never resized
-until the server is closed and reopened.  The default is an estimate
-of the number of articles that would be displayed in the summary
-buffer: a count of articles that are either marked with @code{tick} or
-not marked with @code{read}, plus a little extra.
+NOV メモリーキャッシュのサイズを指定する整数です。スピードアップのために、
+nnmaildir はそれぞれのグループの限定された数の記事に対して、メモリー上
+に NOV データを保持します。(これはたぶん有用ではなく、将来はおそらく削除
+されるでしょう)。このパラメータの値は、サーバーが開通した後で最初にグルー
+プが見られたとき、すなわち一般には最初に Gnus を起動したとき、だけ注目さ
+れます。サーバーが閉じられて再び開通されるまでは、NOV キャッシュのサイズ
+は変更されません。ディフォルトは概略バッファに表示される記事の数の見積
+り (@code{tick} 印があって @code{read} が無い記事の数に少々の余分を加え
+たもの) です。
 @end table
 
-@subsubsection Article identification
-Articles are stored in the @file{cur/} subdirectory of each maildir.
-Each article file is named like @code{uniq:info}, where @code{uniq}
-contains no colons.  nnmaildir ignores, but preserves, the
-@code{:info} part.  (Other maildir readers typically use this part of
-the filename to store marks.)  The @code{uniq} part uniquely
-identifies the article, and is used in various places in the
-@file{.nnmaildir/} subdirectory of the maildir to store information
-about the corresponding article.  The full pathname of an article is
-available in the variable @code{nnmaildir-article-file-name} after you
-request the article in the summary buffer.
+@subsubsection 記事の識別
+記事はそれぞれの maildir の @file{cur/} ディレクトリに格納されます。各々
+の記事には @code{uniq:info} のような名前が付けられます。ここ
+で @code{uniq} はコロンを含みません。nnmaildir は @code{:info} の部分を
+保持しますが無視します。(他の maildir リーダーは一般に印を格納するために
+この部分を使います。) @code{uniq} の部分は記事をユニークに識別し、
+maildir の @file{.nnmaildir/} サブディレクトリの色々な場所に記事に関連し
+た情報を格納するために使われます。概略バッファで記事を要求した後で、記事
+の完全なパス名が @code{nnmaildir-article-file-name} 変数から得られます。
 
-@subsubsection NOV data
-An article identified by @code{uniq} has its NOV data (used to
-generate lines in the summary buffer) stored in
-@code{.nnmaildir/nov/uniq}.  There is no
-@code{nnmaildir-generate-nov-databases} function.  (There isn't much
-need for it - an article's NOV data is updated automatically when the
-article or @code{nnmail-extra-headers} has changed.)  You can force
-nnmaildir to regenerate the NOV data for a single article simply by
-deleting the corresponding NOV file, but @emph{beware}: this will also
-cause nnmaildir to assign a new article number for this article, which
-may cause trouble with @code{seen} marks, the Agent, and the cache.
+@subsubsection NOV データ
+@code{uniq} によって識別される記事は、その NOV データ (概略バッファの行
+を生成するために使われる) を @code{.nnmaildir/nov/uniq} に格納します。
+@code{nnmaildir-generate-nov-databases} 関数はありません。(その必要はあ
+まりありません。記事の NOV データは記事か @code{nnmail-extra-headers} が
+変化したときに自動的に更新されます。) 対応する NOV ファイルをただ消すこ
+とによって単一の記事の NOV データの生成を nnmaildir に強制することはでき
+ます。しかし @emph{ご用心}。これは nnmaildir がこの記事に新しい記事番号
+を割り振らせ、@code{seen} 印、エージェント、およびキャッシュにとって面倒
+なことになります。
 
-@subsubsection Article marks
-An article identified by @code{uniq} is considered to have the mark
-@code{flag} when the file @file{.nnmaildir/marks/flag/uniq} exists.
-When Gnus asks nnmaildir for a group's marks, nnmaildir looks for such
-files and reports the set of marks it finds.  When Gnus asks nnmaildir
-to store a new set of marks, nnmaildir creates and deletes the
-corresponding files as needed.  (Actually, rather than create a new
-file for each mark, it just creates hard links to
-@file{.nnmaildir/markfile}, to save inodes.)
+@subsubsection 記事の印
+@file{.nnmaildir/marks/flag/uniq} ファイルがある場合に、@code{uniq} によっ
+て識別される記事は、@code{flag} 印を持つものと考えられます。
+Gnus が nnmaildir にグループの印を尋ねると、nnmaildir はそのようなファイ
+ルを探して、見つけた印のセットを報告します。Gnus が nnmaildir に印のセッ
+トの格納を要求すると、nnmaildir は必要な対応するファイルを生成し、または
+消去します。(実際は、それぞれの印のために新しいファイルを作るのではなく、
+iノード を節約するために単に @file{.nnmaildir/markfile} へのハードリンク
+を張ります。)
 
-You can invent new marks by creating a new directory in
-@file{.nnmaildir/marks/}.  You can tar up a maildir and remove it from
-your server, untar it later, and keep your marks.  You can add and
-remove marks yourself by creating and deleting mark files.  If you do
-this while Gnus is running and your nnmaildir server is open, it's
-best to exit all summary buffers for nnmaildir groups and type @kbd{s}
-in the group buffer first, and to type @kbd{g} or @kbd{M-g} in the
-group buffer afterwards.  Otherwise, Gnus might not pick up the
-changes, and might undo them.
+@file{.nnmaildir/marks/} に新しいディレクトリを作ることによって、新しい
+印を創造することができます。印を保持しつつ maildir を tar でまとめてサー
+バーからそれを削除し、後で tar をほどくことができます。印ファイルを作成
+または消去することによって、あなた自身が印を追加または削除することができ
+ます。Gnus が動作していて nnmaildir サーバーが開通しているときにこれを行
+なう場合は、最初にすべての nnmaildir グループの概略バッファから退出して
+グループバッファで @kbd{s} をタイプし、その後グループバッファ
+で @kbd{g} か @kbd{M-g} をタイプするのが最良です。そうしないと Gnus は変
+更を捉えてくれずに、それらを元に戻してしまうかもしれません。
 
 @node Mail Folders
 @subsubsection メールフォルダー
