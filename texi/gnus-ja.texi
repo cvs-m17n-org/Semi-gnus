@@ -800,7 +800,7 @@ Mail Sources
 Choosing a Mail Back End
 
 * Unix Mail Box::               (とても) 標準的な Un*x mbox を使う
-* Rmail Babyl::                 Emacs のプログラムは rmail の babyl フォー
+* Rmail Babyl::                 Emacs のプログラムは Rmail の Babyl フォー
                                 マットを使う
 * Mail Spool::                  あなたのメールを私的なスプールに溜める?
 * MH Spool::                    mhspool のようなバックエンド
@@ -7143,7 +7143,7 @@ Gnus はたくさんの方法で記事を保存する事ができます。以下のものは非常に率
 @item O r
 @kindex O r (概略)
 @findex gnus-summary-save-article-rmail
-現在の記事を rmail の様式で保存しま
+現在の記事を Rmail の様式で保存しま
 す (@code{gnus-summary-save-article-rmail})。
 
 @item O f
@@ -7221,7 +7221,7 @@ Gnus があなたの望むとおりになるように、変
 @findex gnus-summary-save-in-rmail
 @vindex gnus-rmail-save-name
 @findex gnus-plain-save-name
-これはディフォルトの様式、@dfn{babyl} です。変
+これはディフォルトの様式、@dfn{Babyl} です。変
 数 @code{gnus-ramil-save-name} に入っている関数を、記事を保存するための
 ファイル名を取得するために使用します。ディフォルト
 は @code{gnus-plain-save-name} です。
@@ -13822,8 +13822,8 @@ Quoted Readable 符号化を復号化します。
 @vindex nnmh-get-new-mail
 @vindex nnfolder-get-new-mail
 例えば、@code{nnml} でメールを読む事に非常に満足していて、古
-い @sc{rmail} ファイルが @code{nnbabyl} で隠されているのをさっと見たいだ
-けなら、これは余分でしょう。すべてのバックエンドは バックエンド-
+い Rmail ファイルが @code{nnbabyl} で隠されているのをさっと見たいだけな
+ら、これは余分でしょう。すべてのバックエンドは バックエンド-
 @code{get-new-mail} という変数を持っています。もし @code{nnbabyl} のメー
 ル読み込みを使用不可にしたいのであれば、グループの事実上のサーバー
 を @code{nnbabyl-get-new-mail} を @code{nil} に設定するように編集します。
@@ -13844,7 +13844,7 @@ Gnus はメールグループを動作するようにするとメールスプールを読み込みます。
 
 @menu
 * Unix Mail Box::               (とても) 標準的な Un*x mbox を使う
-* Rmail Babyl::                 Emacs のプログラムは rmail の babyl フォー
+* Rmail Babyl::                 Emacs のプログラムは Rmail の Babyl フォー
                                 マットを使う
 * Mail Spool::                  あなたのメールを私的なスプールに溜める?
 * MH Spool::                    mhspool のようなバックエンド
@@ -13887,12 +13887,12 @@ Gnus はメールグループを動作するようにするとメールスプールを読み込みます。
 @node Rmail Babyl
 @subsubsection Rmail Babyl
 @cindex nnbabyl
-@cindex rmail mbox
+@cindex Rmail mbox
 
 @vindex nnbabyl-active-file
 @vindex nnbabyl-mbox-file
-@dfn{nnbabyl} バックエンドはメールを蓄蔵するために babyl メールボック
-ス (別名 @dfn{rmail mbox}) を使います。@code{nnbabyl} はそれぞれの記事に
+@dfn{nnbabyl} バックエンドはメールを蓄蔵するために Babyl メールボック
+ス (別名 @dfn{Rmail mbox}) を使います。@code{nnbabyl} はそれぞれの記事に
 それがどのグループに属しているかを示す追加のヘッダーを加えます。
 
 事実上のサーバーの設定:
@@ -13900,7 +13900,7 @@ Gnus はメールグループを動作するようにするとメールスプールを読み込みます。
 @table @code
 @item nnbabyl-mbox-file
 @vindex nnbabyl-mbox-file
-rmail mbox ファイルの名前。既定値は @file{~/RMAIL} です。
+Rmail mbox ファイルの名前。既定値は @file{~/RMAIL} です。
 
 @item nnbabyl-active-file
 @vindex nnbabyl-active-file
@@ -14447,12 +14447,12 @@ UNIX システムは歴史的に単一の、非常に一般的な、上手く定義された形式を持っ
 どのような形式になっていたかは知りませんが、Babyl はメールが変換される、
 それ用の内部形式を持っており、主に、Babyl 特有のヘッダーと状態ビットをファ
 イルのそれぞれのメッセージの先頭に加えることをしていました。
-RMAIL は Emacs の最初のメールリーダーで、Richard Stallman によって書かれ、
-Stallman はその TOPS/Babyl 環境の出身であるため、RMAIL を既に存在してい
+Rmail は Emacs の最初のメールリーダーで、Richard Stallman によって書かれ、
+Stallman はその TOPS/Babyl 環境の出身であるため、Rmail を既に存在してい
 たメールファイルの一族を理解する様に書きました。Gnus (この問題に関して
 は VM も) この形式をサポートし続けています。それは、そのメーラー特有のヘッ
 ダー/ビットというものがなかなか質が良いと考えられているからです。
-RMAIL 自身ももちろんまだ存在していて、まだ Stallman によって維持されてい
+Rmail 自身ももちろんまだ存在していて、まだ Stallman によって維持されてい
 ます。
 
 上の形式の両方はメールをファイルシステムの単独のファイルに入れ、メールを
@@ -15909,11 +15909,11 @@ Gnus はただ単にニュースやメールを読む以上のことができます。以下
 れています。
 
 @table @code
-@cindex babyl
-@cindex rmail mbox
+@cindex Babyl
+@cindex Rmail mbox
 
 @item babyl
-babyl (rmail) 形式のメールボックス。
+Babyl (Rmail) 形式のメールボックス。
 @cindex mbox
 @cindex Unix mbox
 
