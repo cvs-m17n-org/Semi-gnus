@@ -120,14 +120,10 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
    (t nil))
   "Coding system of auto save file.")
 
-(defvar nnheader-directory-separator-character 
-  (let ((case-fold-search t))
-    (cond
-     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin"
-		    (symbol-name system-type))
-      ?\\)
-     (t ?/))))
-  
+(defvar nnheader-directory-separator-character
+  (string-to-char (substring (file-name-as-directory ".") -1))
+  "*A character used to a directory separator.")
+
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
