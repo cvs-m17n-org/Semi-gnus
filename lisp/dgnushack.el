@@ -97,7 +97,8 @@
 	     (subrp (symbol-function 'mapcon)))
 	form
       (if rest
-	  `(let (res
+	  `(let ((fn ,fn)
+		 res
 		 (args (list ,seq ,@rest))
 		 p)
 	     (while (not (memq nil args))
@@ -107,7 +108,8 @@
 		 (setcar p (cdr (pop p)))
 		 ))
 	     (apply (function nconc) (nreverse res)))
-	`(let (res
+	`(let ((fn ,fn)
+	       res
 	       (arg ,seq))
 	   (while arg
 	     (push (funcall ,fn arg) res)
