@@ -78,6 +78,8 @@
 (eval '(run-hooks 'gnus-offline-load-hook))
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (eval-when-compile
   (require 'static)
   (require 'gnus-agent)

@@ -59,6 +59,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
 (eval-and-compile (require 'imap))
 
 (require 'nnoo)

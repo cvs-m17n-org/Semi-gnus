@@ -29,12 +29,14 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
+
 (require 'nntp)
 (require 'nnheader)
 (require 'gnus)
 (require 'gnus-score)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnkiboze)
 (defvoo nnkiboze-directory (nnheader-concat gnus-directory "kiboze/")
