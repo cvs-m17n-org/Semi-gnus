@@ -16710,11 +16710,13 @@ file
 @findex gnus-agent-unmark-article
 記事からダウンロードする印を消去する (@code{gnus-agent-unmark-article})。
 
+@cindex %
 @item @@
 @kindex @@ (エージェント 概略)
 @findex gnus-agent-toggle-mark
 記事をダウンロードするかどうかを切り替え
-る (@code{gnus-agent-toggle-mark})。
+る (@code{gnus-agent-toggle-mark})。ディフォルトではダウンロードの印
+は @samp{%}。
 
 @item J c
 @kindex J c (エージェント 概略)
