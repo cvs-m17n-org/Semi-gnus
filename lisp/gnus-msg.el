@@ -6,6 +6,7 @@
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;	Katsumi Yamaoka  <yamaoka@jpl.org>
+;;	Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -349,6 +350,42 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (interactive "P")
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
+(defun gnus-summary-gather-references (articles)
+  (and articles
+  (let ((tbuf (gnus-get-buffer-create " *gnus-summary-gather-references*"))
+	refs ref article i)
+    (save-excursion
+      (set-buffer tbuf)
+      (erase-buffer)
+      (while (setq article (pop articles))
+	(save-window-excursion
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-select-article nil nil nil article)
+	  (gnus-summary-remove-process-mark article))
+	(gnus-copy-article-buffer)
+	(set-buffer gnus-article-copy)
+	(save-restriction
+	  (message-narrow-to-head)
+	  (setq refs (if articles
+			 (concat (message-fetch-field "references")
+				 (message-fetch-field "message-id"))
+		       (message-fetch-field "references"))
+		i 0)
+	  (widen)
+	  (if refs
+	      (progn (set-buffer tbuf)
+		     (while (string-match "<[^>]+>" refs i)
+		       (setq i (match-end 0)
+			     ref (substring refs (match-beginning 0) i))
+		       (goto-char (point-max))
+		       (unless (search-backward ref (point-min) t)
+			 (insert " " ref)))))))
+      (set-buffer tbuf)
+      (goto-char (point-min))
+      (if (looking-at "\\s +")
+	(goto-char (match-end 0)))
+	   (buffer-substring (point) (point-max))))))
+
 (defun gnus-inews-yank-articles (articles)
   (let (beg article)
     (message-goto-body)
@@ -490,7 +527,8 @@ header line with the old Message-ID."
 		(message-news (or to-group group))
 	      (set-buffer gnus-article-copy)
 	      (gnus-msg-treat-broken-reply-to)
-	      (message-followup (if (or newsgroup-p force-news) nil to-group)))
+	      (message-followup (if (or newsgroup-p force-news) nil to-group)
+				(gnus-summary-gather-references yank)))
 	  ;; The is mail.
 	  (if post
 	      (progn
@@ -504,7 +542,7 @@ header line with the old Message-ID."
 			message-send-actions)))
 	    (set-buffer gnus-article-copy)
 	    (gnus-msg-treat-broken-reply-to)
-	    (message-wide-reply to-address)))
+	    (message-wide-reply to-address (gnus-summary-gather-references yank))))
 	(when yank
 	  (gnus-inews-yank-articles yank))))))
 
@@ -656,7 +694,7 @@ automatically."
       (gnus-summary-select-article)
       (set-buffer (gnus-copy-article-buffer))
       (gnus-msg-treat-broken-reply-to)
-      (message-reply nil wide)
+      (message-reply nil wide (gnus-summary-gather-references yank))
       (when yank
 	(gnus-inews-yank-articles yank)))))
 
