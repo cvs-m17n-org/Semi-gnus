@@ -40,6 +40,13 @@
   :group 'gnus-start
   :type 'file)
 
+(defcustom gnus-product-directory
+  (nnheader-concat gnus-directory
+		   (concat "." (product-name (product-find 'gnus))))
+  "Product depend data files directory."
+  :group 'gnus-start
+  :type '(choice directory (const nil)))
+
 (defcustom gnus-init-file (nnheader-concat gnus-home-directory ".gnus")
   "Your Gnus Emacs-Lisp startup file name.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
@@ -590,13 +597,25 @@ the first newsgroup."
 (defvar nnoo-state-alist)
 (defvar gnus-current-select-method)
 
-(defun gnus-clear-system ()
-  "Clear all variables and buffers."
-  ;; Clear Gnus variables.
+(defun gnus-clear-quick-file-variables ()
+  "Clear all variables in quick startup files."
   (let ((variables gnus-variable-list))
+    ;; Clear Gnus variables.
     (while variables
       (set (car variables) nil)
       (setq variables (cdr variables))))
+  (let ((files gnus-product-variable-file-list))
+    (while files
+      (let ((variables (nthcdr 3 (car files))))
+	(while variables
+	  (set (car variables) nil)
+	  (setq variables (cdr variables))))
+      (setq files (cdr files)))))
+
+(defun gnus-clear-system ()
+  "Clear all variables and buffers."
+  ;; Clear gnus variables.
+  (gnus-clear-quick-file-variables)
   ;; Clear other internal variables.
   (setq gnus-list-of-killed-groups nil
 	gnus-have-read-active-file nil
@@ -1939,10 +1958,7 @@ newsgroup."
   "Read startup file.
 If FORCE is non-nil, the .newsrc file is read."
   ;; Reset variables that might be defined in the .newsrc.eld file.
-  (let ((variables gnus-variable-list))
-    (while variables
-      (set (car variables) nil)
-      (setq variables (cdr variables))))
+  (gnus-clear-quick-file-variables)
   (let* ((newsrc-file gnus-current-startup-file)
 	 (quick-file (concat newsrc-file ".el")))
     (save-excursion
@@ -2023,7 +2039,35 @@ If FORCE is non-nil, the .newsrc file is read."
       (gnus-message 5 "Reading %s..." file)
       ;; The .el file is newer than the .eld file, so we read that one
       ;; as well.
-      (gnus-read-old-newsrc-el-file file))))
+      (gnus-read-old-newsrc-el-file file)))
+  (when (and gnus-product-directory
+	     (file-directory-p gnus-product-directory))
+    (let ((list gnus-product-variable-file-list))
+      (while list
+	(apply 'gnus-product-read-variable-file-1 (car list))
+	(setq list (cdr list))))))
+
+(defun gnus-product-read-variable-file-1 (file checking-methods coding
+					       &rest variables)
+  (let (gnus-product-file-version method file-ver)
+    (if (or (condition-case err
+		(let ((coding-system-for-read coding))
+		  (load (expand-file-name file gnus-product-directory) t t t)
+		  nil)
+	      (error (message "%s" err)))
+	    (and (assq 'emacs-version checking-methods)
+		 (not (string= emacs-version
+			       (cdr (assq 'emacs-version
+					  gnus-product-file-version)))))
+	    (and (setq method (assq 'product-version checking-methods))
+		 (or (not (setq file-ver
+				(cdr (assq 'product-version
+					   gnus-product-file-version))))
+		     (< (product-version-compare file-ver (cadr method)) 0))))
+	(while variables
+	  (set (car variables) nil)
+	  (gnus-product-variable-touch (car variables))
+	  (setq variables (cdr variables))))))
 
 ;; Parse the old-style quick startup file
 (defun gnus-read-old-newsrc-el-file (file)
@@ -2376,7 +2420,9 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
 	(gnus-dribble-delete-file)
-	(gnus-group-set-mode-line)))))
+	(gnus-group-set-mode-line))))
+  (when gnus-product-directory
+    (gnus-product-save-variable-file)))
 
 (defun gnus-gnus-to-quick-newsrc-format ()
   "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
@@ -2410,6 +2456,76 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (insert "(setq " (symbol-name variable) " '")
 	  (gnus-prin1 (symbol-value variable))
 	  (insert ")\n"))))))
+
+(defun gnus-product-variable-touch (variable)
+  (put variable 'gnus-product-variable 'dirty))
+
+(defun gnus-product-variables-dirty-p (variables)
+  (catch 'done
+    (while variables
+      (when (eq (get (car variables) 'gnus-product-variable) 'dirty)
+	(throw 'done t))
+      (setq variables (cdr variables)))))
+
+(defun gnus-product-save-variable-file (&optional force)
+  "Save all product variables to files, when need to be saved."
+  (let ((list gnus-product-variable-file-list))
+    (gnus-make-directory gnus-product-directory)
+    (while list
+      (apply 'gnus-product-save-variable-file-1 force (car list))
+      (setq list (cdr list)))))
+
+(defun gnus-product-save-variable-file-1 (force file checking-methods coding
+						&rest variables)
+  "Save a product variable file, when need to be saved."
+  (when (or force
+	    (gnus-product-variables-dirty-p variables))
+    (let ((product (product-find 'gnus)))
+      (set-buffer (gnus-get-buffer-create " *gnus-product*"))
+      (make-local-variable 'version-control)
+      (setq version-control 'never)
+      (setq buffer-file-name
+	    (expand-file-name file gnus-product-directory))
+      (setq default-directory (file-name-directory buffer-file-name))
+      (buffer-disable-undo)
+      (erase-buffer)
+      (gnus-message 5 "Saving %s..." file)
+      (apply 'gnus-product-quick-file-format product checking-methods coding
+	     variables)
+      (let ((coding-system-for-write coding))
+	(save-buffer))
+      (kill-buffer (current-buffer))
+      (while variables
+	(put (car variables) 'gnus-product-variable nil)
+	(setq variables (cdr variables)))
+      (gnus-message
+       5 "Saving %s...done" file))))
+
+(defun gnus-product-quick-file-format (product checking-methods
+					       coding &rest variables)
+  "Insert gnus product depend variables in lisp format."
+  (let ((print-quoted t)
+	(print-escape-newlines t)
+	variable param)
+    (insert (format ";; -*- Mode: emacs-lisp; coding: %s -*-\n" coding))
+    (insert (format ";; %s startup file.\n" (product-name product)))
+    (when (setq param (cdr (assq 'product-version checking-methods)))
+      (insert "(or (>= (product-version-compare "
+	      "(product-version (product-find 'gnus))\n"
+	      "\t\t\t\t '" (apply 'prin1-to-string param) ")\n"
+	      "\t0)\n"
+	      "    (error \"This file was created by later version of "
+	      "gnus.\"))\n"))
+    (insert "(setq gnus-product-file-version \n"
+	    "      '((product-version . "
+	    (prin1-to-string (product-version product)) ")\n"
+	    "\t(emacs-version . " (prin1-to-string emacs-version) ")))\n")
+    (while variables
+      (when (and (boundp (setq variable (pop variables)))
+		 (symbol-value variable))
+	  (insert "(setq " (symbol-name variable) " '")
+	  (gnus-prin1 (symbol-value variable))
+	  (insert ")\n")))))
 
 (defun gnus-strip-killed-list ()
   "Return the killed list minus the groups that match `gnus-save-killed-list'."
