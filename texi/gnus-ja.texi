@@ -13684,7 +13684,7 @@ line)} に設定してください。
 さくなることはありません。初期設定値は @code{nil} です。
 
 @vindex gnus-adaptive-word-no-group-words
-@code}gnus-acaptive-word-no-group-words} が @code{t} に設定されていると、
+@code{gnus-acaptive-word-no-group-words} が @code{t} に設定されていると、
 gnus はグループ名の全ての語について、単語適応性スコアをしません。ほとん
 どの表題が @samp{emacs} という語を含んでいる @samp{comp.editor.emacs} の
 ようなグループで便利です。
