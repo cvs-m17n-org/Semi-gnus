@@ -1,5 +1,14 @@
 1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/message.el (message-make-forward-subject): Use
+ 	`eword-decode-unstructured-field-body' for subject.
+
+	* lisp/gnus-msg.el (gnus-summary-mail-forward): Make local
+ 	variable `default-mime-charset' of `gnus-original-article-buffer'
+ 	and set up by `default-mime-charset' of `gnus-summary-buffer'.
+
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* texi/gnus-ja.texi: Fix typos.
 
 	* texi/gnus.texi: Modify for Semi-gnus.
