@@ -1,3 +1,8 @@
+1998-07-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.2.
+	(gnus-version): Change to "Semi-gnus". Change comment format.
+
 1998-07-21  Keisuke Mori   <ksk@ntts.com>
 
 	* texi/gnus-ja.texi: Add "Appendices".
