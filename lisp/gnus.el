@@ -3470,9 +3470,6 @@ the variable `toolbar-news-frame-plist' will be refered instead."
 		       (sexp :tag "Value")))
   :group 'gnus)
 
-(defvar gnus-frame nil
-  "The frame in which gnus is displayed. It is not used under XEmacs.")
-
 ;;;###autoload
 (defun gnus-other-frame (&optional arg)
   "Pop up a frame to read news."
