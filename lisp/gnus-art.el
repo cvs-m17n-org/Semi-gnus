@@ -2373,7 +2373,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     ;; Display message.
     (funcall method)
     ;; Associate this article with the current summary buffer.
-    (setq gnus-article-current-summary (current-buffer))
+    (setq gnus-article-current-summary gnus-summary-buffer)
     ;; Perform the article display hooks.
     (gnus-run-hooks 'gnus-article-display-hook)))
 
@@ -3079,7 +3079,11 @@ Argument LINES specifies lines to be scrolled down."
 
 (defun gnus-article-check-buffer ()
   "Beep if not in an article buffer."
-  (unless (equal major-mode 'gnus-article-mode)
+  (unless (or (equal major-mode 'gnus-article-mode)
+	      (equal (save-current-buffer
+		       (set-buffer gnus-original-article-buffer)
+		       major-mode)
+		     'gnus-original-article-mode))
     (error "Command invoked outside of a Gnus article buffer")))
 
 (defun gnus-article-read-summary-keys (&optional arg key not-restore-window)
