@@ -288,8 +288,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
     (gnus-agent-close-connections)
     (setq gnus-plugged plugged)
     (gnus-run-hooks 'gnus-agent-unplugged-hook)
-    (setcar (cdr gnus-agent-mode-status) " Unplugged"))
-  (set-buffer-modified-p t))
+    (setcar (cdr gnus-agent-mode-status) " Unplugged")))
 
 (defun gnus-agent-close-connections ()
   "Close all methods covered by the Gnus agent."
