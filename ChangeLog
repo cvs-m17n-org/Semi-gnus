@@ -1,5 +1,21 @@
 1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-sum.el: Abolish variable
+	`gnus-structured-field-decoder' and
+	`gnus-unstructured-field-decoder'.
+	(gnus-nov-parse-line): Don't decode from and subject.
+	(gnus-get-newsgroup-headers): Likewise.
+
+	* lisp/nnheader.el (make-full-mail-header): Decode subject and
+	from; changed to inline function.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Store
+	content-type.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
 
 	* lisp/mmgnus.el: New module.
