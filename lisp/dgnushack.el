@@ -272,15 +272,19 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		      ;; configured for FSFmacs but XEmacs is running).
 		      (let ((lp (delete dgnushack-w3-dir
 					(copy-sequence load-path))))
-			(when (let ((load-path lp))
-				(condition-case code
-				    (require 'w3-forms)
-				  (error
-				   (message "No w3: %s %s" code
-					    (locate-library "w3-forms"))
-				   nil)))
-			  ;; If success, fix `load-path' for compiling.
-			  (setq load-path lp))))
+			(if (let ((load-path lp))
+			      (condition-case nil
+				  (require 'w3-forms)
+				(error nil)))
+			    ;; If success, fix `load-path' for compiling.
+			    (progn
+			      (setq load-path lp)
+			      (message " => fixed; W3DIR=%s"
+				       (file-name-directory
+					(locate-library "w3-forms")))
+			      t)
+			  (message " => ignored")
+			  nil)))
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
 	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
 	      "nnwfm.el"))
@@ -485,28 +489,39 @@ Modify to suit your needs."))
 
 (defun dgnushack-make-autoloads ()
   "Make auto-autoloads.el, custom-load.el and then compile them."
-  (let (make-backup-files)
-    (message "Updating autoloads for directory %s..." default-directory)
-    (let ((generated-autoload-file "auto-autoloads.el")
-	  (si:message (symbol-function 'message))
-	  noninteractive)
-      (defun message (fmt &rest args)
-	(cond ((and (string-equal "Generating autoloads for %s..." fmt)
-		    (file-exists-p (file-name-nondirectory (car args))))
-	       (funcall si:message fmt (file-name-nondirectory (car args))))
-	      ((string-equal "No autoloads found in %s" fmt))
-	      ((string-equal "Generating autoloads for %s...done" fmt))
-	      (t (apply si:message fmt args))))
-      (unwind-protect
-	  (update-autoloads-from-directory default-directory)
-	(fset 'message si:message)))
-    (byte-compile-file "auto-autoloads.el")
-    (with-temp-buffer
-      (let ((standard-output (current-buffer)))
-	(Custom-make-dependencies "."))
-      (message "%s" (buffer-string)))
-    (require 'cus-load)
-    (byte-compile-file "custom-load.el")))
+  (let ((auto-autoloads (expand-file-name "auto-autoloads.el" srcdir))
+	(custom-load (expand-file-name "custom-load.el" srcdir)))
+    (unless (and (file-exists-p auto-autoloads)
+		 (file-exists-p (concat auto-autoloads "c"))
+		 (file-newer-than-file-p (concat auto-autoloads "c")
+					 auto-autoloads)
+		 (file-exists-p custom-load)
+		 (file-exists-p (concat custom-load "c"))
+		 (file-newer-than-file-p (concat custom-load "c")
+					 custom-load))
+      (let (make-backup-files)
+	(message "Updating autoloads for directory %s..." default-directory)
+	(let ((generated-autoload-file auto-autoloads)
+	      (si:message (symbol-function 'message))
+	      noninteractive)
+	  (defun message (fmt &rest args)
+	    (cond ((and (string-equal "Generating autoloads for %s..." fmt)
+			(file-exists-p (file-name-nondirectory (car args))))
+		   (funcall si:message
+			    fmt (file-name-nondirectory (car args))))
+		  ((string-equal "No autoloads found in %s" fmt))
+		  ((string-equal "Generating autoloads for %s...done" fmt))
+		  (t (apply si:message fmt args))))
+	  (unwind-protect
+	      (update-autoloads-from-directory default-directory)
+	    (fset 'message si:message)))
+	(byte-compile-file auto-autoloads)
+	(with-temp-buffer
+	  (let ((standard-output (current-buffer)))
+	    (Custom-make-dependencies "."))
+	  (message "%s" (buffer-string)))
+	(require 'cus-load)
+	(byte-compile-file custom-load)))))
 
 (defun dgnushack-remove-extra-files-in-package ()
   "Remove extra files in the lisp directory of the XEmacs package."
