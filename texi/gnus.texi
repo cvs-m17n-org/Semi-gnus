@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v0.12}
+\newcommand{\gnusversionname}{T-gnus v6.15}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -18373,13 +18373,6 @@ The headers you can score on are @code{from}, @code{subject},
 @code{followup}, which will create an adaptive score entry that matches
 on the @code{References} header using the @code{Message-ID} of the
 current article, thereby matching the following thread.
-
-You can also score on @code{thread}, which will try to score all
-articles that appear in a thread.  @code{thread} matches uses a
-@code{Message-ID} to match on the @code{References} header of the
-article.  If the match is made, the @code{Message-ID} of the article is
-added to the @code{thread} rule.  (Think about it.  I'd recommend two
-aspirins afterwards.)
 
 If you use this scheme, you should set the score file atom @code{mark}
 to something small---like -300, perhaps, to avoid having small random

@@ -1,5 +1,15 @@
 2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
+	* gnus.el (gnus-version-number): Bumped version number.
+
+2003-01-21 07:15:41 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.13 is released.
+
+2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-button-url-regexp): Removed |.
+
 	* message.el (message-send-hook): Doc fix.
 
 	* gnus-win.el (gnus-buffer-configuration): Display article
