@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.1.2 Manual
+@settitle Semi-gnus 6.2.4 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.1.2 Manual
+@title Semi-gnus 6.2.4 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.1.2.
+This manual corresponds to Semi-gnus 6.2.4.
 
 @end ifinfo
 
@@ -1286,10 +1286,10 @@ background is dark:
 
 (setq gnus-group-highlight
       '(((> unread 200) . my-group-face-1)
-	((and (< level 3) (zerop unread)) . my-group-face-2)
-	((< level 3) . my-group-face-3)
-	((zerop unread) . my-group-face-4)
-	(t . my-group-face-5)))
+        ((and (< level 3) (zerop unread)) . my-group-face-2)
+        ((< level 3) . my-group-face-3)
+        ((zerop unread) . my-group-face-4)
+        (t . my-group-face-5)))
 @end lisp
 
 Also @pxref{Faces and Fonts}.
@@ -2074,8 +2074,8 @@ the symbols @code{never} or @code{immediate}.
 @item score-file
 @cindex score file group parameter
 Elements that look like @code{(score-file . "file")} will make
-@file{file} into the current adaptive score file for the group in
-question.  All adaptive score entries will be put into this file.
+@file{file} into the current score file for the group in question.  All
+interactive score entries will be put into this file.
 
 @item adapt-file
 @cindex adapt file group parameter
@@ -12714,9 +12714,9 @@ their own home score files:
 @lisp
 (setq gnus-home-score-file
       ;; All groups that match the regexp "\\.emacs"
-      '("\\.emacs" "emacs.SCORE")
-      ;; All the comp groups in one score file
-       ("^comp" "comp.SCORE"))
+      '(("\\.emacs" "emacs.SCORE")
+        ;; All the comp groups in one score file
+        ("^comp" "comp.SCORE")))
 @end lisp
 
 @vindex gnus-home-adapt-file
@@ -15106,6 +15106,11 @@ Most Gnus storage path variables will be initialized from this variable,
 which defaults to the @samp{SAVEDIR} environment variable, or
 @file{~/News/} if that variable isn't set.
 
+Note that gnus is mostly loaded when the @file{.gnus.el} file is read.
+This means that other directory variables that are initialized from this
+variable won't be set properly if you set this variable in
+@file{.gnus.el}.  Set this variable in @file{.emacs} instead.
+
 @item gnus-default-directory
 @vindex gnus-default-directory
 Not related to the above variable at all---this variable says what the
@@ -15714,7 +15719,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.6.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6.7.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16249,7 +16254,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.6:
+New features in Gnus 5.6.7:
 
 @itemize @bullet
 
@@ -17040,7 +17045,7 @@ They could be used like this:
 
 <expr> would be a boolean expression on the labels, e.g.
 
-	`/ l bug & !fixed RET'
+`/ l bug & !fixed RET'
 @end example
 
 would show all the messages which are labeled `bug' but not labeled
@@ -17102,14 +17107,14 @@ as a single spoiler warning and hide it all, replacing it with a "Next Page"
 button:
 
 
-	^L's
+^L's
 
-	more than n blank lines
+more than n blank lines
 
-	more than m identical lines
-	(which should be replaced with button to show them)
+more than m identical lines
+(which should be replaced with button to show them)
 
-	any whitespace surrounding any of the above
+any whitespace surrounding any of the above
 
 
 @item
@@ -17139,30 +17144,30 @@ Yes. I think the algorithm is as follows:
 Group-mode
 
    show-list-of-articles-in-group
-	if (key-pressed == SPACE)
-		if (no-more-articles-in-group-to-select)
-			if (articles-selected)
-				start-reading-selected-articles;
-			junk-unread-articles;
-			next-group;
-		 else
-			show-next-page;
+        if (key-pressed == SPACE)
+                if (no-more-articles-in-group-to-select)
+                        if (articles-selected)
+                                start-reading-selected-articles;
+                        junk-unread-articles;
+                        next-group;
+                 else
+                        show-next-page;
 
-	 else if (key-pressed = '.')
-		if (consolidated-menus)		# same as hide-thread in Gnus
-			select-thread-under-cursor;
-		else
-			select-article-under-cursor;
+         else if (key-pressed = '.')
+                if (consolidated-menus)         # same as hide-thread in Gnus
+                        select-thread-under-cursor;
+                else
+                        select-article-under-cursor;
 
 
 Article-mode
-	if (key-pressed == SPACE)
-		if (more-pages-in-article)
-			next-page;
-		else if (more-selected-articles-to-read)
-			next-article;
-		else
-			next-group;
+        if (key-pressed == SPACE)
+                if (more-pages-in-article)
+                        next-page;
+                else if (more-selected-articles-to-read)
+                        next-article;
+                else
+                        next-group;
 @end example
 
 @item
@@ -17179,7 +17184,7 @@ the wildcard expression).
 @item
 It would be nice if it also handled
 
-	<URL:news://sunsite.auc.dk/>
+        <URL:news://sunsite.auc.dk/>
 
 which should correspond to `B nntp RET sunsite.auc.dk' in *Group*.
 
@@ -17373,16 +17378,16 @@ Mac, MS (etc) characters into ISO 8859-1.
     (let ((buffer-read-only nil))
       (goto-char (point-min))
       (while (search-forward "\221" nil t)
-	(replace-match "`" t t))
+        (replace-match "`" t t))
       (goto-char (point-min))
       (while (search-forward "\222" nil t)
-	(replace-match "'" t t))
+        (replace-match "'" t t))
       (goto-char (point-min))
       (while (search-forward "\223" nil t)
-	(replace-match "\"" t t))
+        (replace-match "\"" t t))
       (goto-char (point-min))
       (while (search-forward "\224" nil t)
-	(replace-match "\"" t t)))))
+        (replace-match "\"" t t)))))
 @end example
 
 @item
@@ -17390,7 +17395,7 @@ Mac, MS (etc) characters into ISO 8859-1.
  (add-hook 'gnus-exit-query-functions
 '(lambda ()
    (if (and (file-exists-p nnmail-spool-file)
-	    (> (nnheader-file-size nnmail-spool-file) 0))
+            (> (nnheader-file-size nnmail-spool-file) 0))
        (yes-or-no-p "New mail has arrived.  Quit Gnus anyways? ")
        (y-or-n-p "Are you sure you want to quit Gnus? "))))
 @end example
