@@ -4,6 +4,10 @@
 
 	* Sync up with Gnus 5.6.37.
 	
+1998-08-16  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-scroll-down): Failed to sync.
+
 1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.12.
