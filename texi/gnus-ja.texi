@@ -10540,13 +10540,19 @@ ISP が POP-before-SMTP の認証を要求している場合に有用です。関
 これらのグループに投稿する事は (@kbd{a}) それでも苦痛を引き起こすでしょ
 うけど。
 
-@item gnus-version-expose-system
-@vindex gnus-version-expose-system
+@item gnus-user-agent
+@vindex gnus-user-agent
+@cindex User-Agent
 
-ディフォルトでシステムタイプ (@samp{i686-pc-linux} のよう
-な @code{system-configuration} 変数の値) が自動的に生成され
-る User-Agent ヘッダーに現れます。それは (主に美的感覚によって) 消すこと
-が望まれるかもしれません。そういう場合は、これを @code{nil} にして下さい。
+(訳注: T-gnus では現在この変数による制御は機能しません。) この変数は、ど
+の情報が User-Agent ヘッダーに陳列されるかを制御します。それは次のシンボ
+ルまたは文字列のうちのどれかであることができます: @code{full} (全情報を
+見せる、すなわち Emacs と Gnus のバージョンとシステム構成)、
+@code{emacs-gnus} (Emacs と Gnus のバージョンだけを見せる)、
+@code{emacs-gnus-type} (@code{emacs-gnus} と同じ＋システムタイプ)、
+@code{gnus} (Gnus のバージョンだけを見せる)、または好みの文字列。これを
+文字列にするときは、正しいフォーマットを使っていることを確認して下さ
+い (RFC2616 参照)。
 @end table
 
 あなたは自分が送るメッセージの綴りを調べたいと思うかも知れません。もしく
