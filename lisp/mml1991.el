@@ -33,7 +33,9 @@
   '((mailcrypt mml1991-mailcrypt-sign
 	       mml1991-mailcrypt-encrypt)
     (gpg mml1991-gpg-sign
-	 mml1991-gpg-encrypt))
+	 mml1991-gpg-encrypt)
+    (pgg mml1991-pgg-sign
+	 mml1991-pgg-encrypt))
   "Alist of PGP functions.")
 
 ;;; mailcrypt wrapper
@@ -191,6 +193,57 @@
 	(insert "\n")
 	(insert-buffer cipher)
 	(goto-char (point-max))))))
+
+;; pgg wrapper
+
+(defvar pgg-output-buffer)
+(defvar pgg-errors-buffer)
+
+(defun mml1991-pgg-sign (cont)
+  (let (headers)
+    ;; Don't sign headers.
+    (goto-char (point-min))
+    (while (not (looking-at "^$"))
+      (forward-line))
+    (unless (eobp) ;; no headers?
+      (setq headers (buffer-substring (point-min) (point)))
+      (forward-line) ;; skip header/body separator
+      (kill-region (point-min) (point)))
+    (unless (let ((pgg-gpg-user-id (message-options-get 'message-sender)))
+	      (pgg-sign-region (point-min) (point-max) t))
+      (pop-to-buffer pgg-errors-buffer)
+      (error "Encrypt error"))
+    (kill-region (point-min) (point-max))
+    (if headers (insert headers))
+    (insert "\n")
+    (insert-buffer pgg-output-buffer)
+    t))
+
+(defun mml1991-pgg-encrypt (cont)
+  (let (headers)
+    ;; Don't sign headers.
+    (goto-char (point-min))
+    (while (not (looking-at "^$"))
+      (forward-line))
+    (unless (eobp) ;; no headers?
+      (setq headers (buffer-substring (point-min) (point)))
+      (forward-line) ;; skip header/body separator
+      (kill-region (point-min) (point)))
+    (unless (pgg-encrypt-region
+	     (point-min) (point-max) 
+	     (split-string
+	      (or
+	       (message-options-get 'message-recipients)
+	       (message-options-set 'message-recipients
+				    (read-string "Recipients: ")))
+	      "[ \f\t\n\r\v,]+"))
+      (pop-to-buffer pgg-errors-buffer)
+      (error "Encrypt error"))
+    (kill-region (point-min) (point-max))
+    (if headers (insert headers))
+    (insert "\n")
+    (insert-buffer pgg-output-buffer)
+    t))
 
 ;;;###autoload
 (defun mml1991-encrypt (cont)
