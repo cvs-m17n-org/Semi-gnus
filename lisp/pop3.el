@@ -36,7 +36,6 @@
 ;;; Code:
 
 (require 'mail-utils)
-(provide 'pop3)
 
 (defconst pop3-version "1.3s")
 
@@ -64,8 +63,7 @@ values are 'apop.")
 Used for APOP authentication.")
 
 (defvar pop3-leave-mail-on-server nil
-  "Non-nil if mail is to be left on the server and UIDL used for 
-message retrieval.")
+  "Non-nil if mail is to be left on the server and UIDL used for message retrieval.")
 
 (defvar pop3-maximum-message-size nil
   "If non-nil only download messages smaller than this.")
@@ -87,7 +85,9 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 (defvar pop3-debug nil)
 
 (eval-and-compile
-  (autoload 'open-ssl-stream "ssl"))
+  (autoload 'open-ssl-stream "ssl")
+  (autoload 'starttls-open-stream "starttls")
+  (autoload 'starttls-negotiate "starttls"))
 
 (defvar pop3-ssl-program-arguments
   '("-quiet")
@@ -103,8 +103,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
 	 (pop3-password pop3-password)
-	 (pop3-uidl-file-name 
-	  (convert-standard-filename 
+	 (pop3-uidl-file-name
+	  (convert-standard-filename
 	   (concat pop3-uidl-file-name "-" pop3-mailhost)))
 	 (retrieved-messages nil)
 	 messages message-count)
@@ -119,12 +119,12 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	  ((equal 'pass pop3-authentication-scheme)
 	   (pop3-user process pop3-maildrop)
 	   (pop3-pass process))
-	  (t (error "Invalid POP3 authentication scheme.")))
+	  (t (error "Invalid POP3 authentication scheme")))
     ;; get messages that are suitable for download
     (message "Retrieving message list...")
     (setq messages (pop3-get-message-numbers process)
 	  message-count (length (cdr messages)))
-    (message (format "Retrieving message list...%d of %d unread" 
+    (message (format "Retrieving message list...%d of %d unread"
 		     message-count (pop messages)))
     (unwind-protect
 	(unless (not (stringp crashbox))
@@ -156,7 +156,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST.
-Returns the process associated with the connection."
+Returns the process associated with the connection.
+Argument PORT specifies connecting port."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
 	(process))
@@ -168,6 +169,8 @@ Returns the process associated with the connection."
      (cond
       ((eq pop3-connection-type 'ssl)
        (pop3-open-ssl-stream "POP" process-buffer mailhost port))
+      ((eq pop3-connection-type 'tls)
+       (pop3-open-tls-stream "POP" process-buffer mailhost port))
       (t
        (open-network-stream-as-binary "POP" process-buffer mailhost port))))
     (setq pop3-read-point (point-min))
@@ -178,7 +181,7 @@ Returns the process associated with the connection."
     process))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
-  (let* ((ssl-program-arguments 
+  (let* ((ssl-program-arguments
 	  `(,@pop3-ssl-program-arguments ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
          (process (open-ssl-stream name buffer host service)))
@@ -196,10 +199,23 @@ Returns the process associated with the connection."
 	   process))))
 
 (defun pop3-open-ssl-stream (name buffer host service)
-  "Open a SSL connection for a service to a host."
+  "Open a SSL connection for a service to a host.
+Returns a subprocess-object to represent the connection.
+Args are NAME BUFFER HOST SERVICE."
   (as-binary-process
    (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
        (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+
+(defun pop3-open-tls-stream (name buffer host service)
+  "Open a TLSv1 connection for a service to a host.
+Returns a subprocess-object to represent the connection.
+Args are NAME BUFFER HOST SERVICE."
+  (let ((process
+	 (as-binary-process (starttls-open-stream
+			     name buffer host service))))
+    (pop3-stls process)
+    (starttls-negotiate process)
+    process))
 
 ;; Support functions
 
@@ -221,8 +237,8 @@ Returns the process associated with the connection."
     )
 
 (defun pop3-read-response (process &optional return)
-  "Read the response from the server.
-Return the response string if optional second argument is non-nil."
+  "Read the response from the server PROCESS.
+Return the response string if optional second argument RETURN is non-nil."
   (let ((case-fold-search nil)
 	match-end)
     (save-excursion
@@ -367,7 +383,7 @@ Return the response string if optional second argument is non-nil."
 
 (defun pop3-save-uidls ()
   "Save the updated UIDLs to disk for use next time."
-  (when (and pop3-leave-mail-on-server 
+  (when (and pop3-leave-mail-on-server
 	     ;; UIDL hash table is non-empty
 	     (let ((len (length pop3-uidl-obarray)))
 	       (while (< 0 len)
@@ -380,7 +396,7 @@ Return the response string if optional second argument is non-nil."
 		 'overwrite 'keeptime))
     (save-excursion
       (with-temp-file pop3-uidl-file-name
-	(mapatoms 
+	(mapatoms
 	 (lambda (atom)
 	   (when (car (symbol-value atom))
 	     (insert (format "%s\n" atom))))
@@ -414,6 +430,13 @@ Return the response string if optional second argument is non-nil."
     (let ((response (pop3-read-response process t)))
       (if (not (and response (string-match "+OK" response)))
 	  (pop3-quit process)))))
+
+(defun pop3-stls (process)
+  "Query whether TLS extension is supported"
+  (pop3-send-command process "STLS")
+  (let ((response (pop3-read-response process t)))
+    (if (not (and response (string-match "+OK" response)))
+	(pop3-quit process))))
 
 ;; TRANSACTION STATE
 
@@ -472,8 +495,8 @@ and close the connection."
       (goto-char (point-max))
       (delete-process process)
       ))
-  (when pop3-leave-mail-on-server 
-    (mapatoms 
+  (when pop3-leave-mail-on-server
+    (mapatoms
      (lambda (atom)
        (when (car (symbol-value atom))
 	 (unintern atom pop3-uidl-obarray)))
@@ -592,6 +615,13 @@ If msgno is invalid, return nil.  Otherwise, return a string."
 ;;  -ERR [invalid password]
 ;;  -ERR [unable to lock maildrop]
 
+;; STLS
+;; Arguments: none
+;; Restrictions: authorization state
+;; Possible responses:
+;;  +OK [negotiation is ready]
+;;  -ERR [security layer is already active]
+
 ;;; TRANSACTION STATE
 
 ;; STAT
@@ -660,3 +690,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
 ;; Restrictions: none
 ;; Possible responses:
 ;;  +OK [TCP connection closed]
+
+(provide 'pop3)
+
+;;; pop3.el ends here
