@@ -4443,9 +4443,14 @@ If SELECT-ARTICLES, only select those articles from GROUP."
        
 	(when (gnus-check-backend-function
 	       'request-set-mark gnus-newsgroup-name)
+	  ;; propagate flags to server, with the following exceptions:
 	  ;; uncompressed:s are not proper flags (they are cons cells)
 	  ;; cache is a internal gnus flag
-	  (unless (memq (cdr type) (cons 'cache uncompressed))
+	  ;; download are local to one gnus installation (well)
+	  ;; unsend are for nndraft groups only
+	  ;; xxx: generality of this?  this suits nnimap anyway
+	  (unless (memq (cdr type) (append '(cache download unsend)
+					   uncompressed))
 	    (let* ((old (cdr (assq (cdr type) (gnus-info-marks info))))
 		   (del (gnus-remove-from-range (gnus-copy-sequence old) list))
 		   (add (gnus-remove-from-range
@@ -5174,8 +5179,7 @@ articles with that subject.  If BACKWARD, search backward instead."
   "Center point in window and redisplay frame.
 Also do horizontal recentering."
   (interactive "P")
-  (when (and nil
-	     gnus-auto-center-summary
+  (when (and gnus-auto-center-summary
 	     (not (eq gnus-auto-center-summary 'vertical)))
     (gnus-horizontal-recenter))
   (recenter n))

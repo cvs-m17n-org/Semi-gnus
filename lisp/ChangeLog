@@ -1,9 +1,19 @@
+2000-07-03  Stainless Steel Rat <ratinox@peorth.gweep.net>
+
+	* gnus-sum.el (gnus-recenter): Fix horizontal recenter.
+
+2000-07-03  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus-sum.el (gnus-update-marks): Don't propagate download and
+	unsend flags.
+
 2000-07-03  Simon Josefsson  <jas@pdc.kth.se>
 
 	* nnimap.el (nnimap-open-connection): Don't look up virtual server
 	name in authinfo (.authinfo now support ports, no need for the
 	hack).
 	(nnimap-split-find-rule): Fix.
+	(nnimap-open-connection): Look for nnimap-server-address in authinfo.
 
 2000-07-03  Paul Stodghill <stodghil@CS.Cornell.EDU>
 
