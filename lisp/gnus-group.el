@@ -156,7 +156,8 @@ with some simple extensions.
 %p    Process mark (char)
 %O    Moderated group (string, \"(m)\" or \"\")
 %P    Topic indentation (string)
-%m    Whether there is new(ish) mail in the group (char, \"%\")
+%m    Whether there is new(ish) mails in the group (char, \"%\")
+%w    Number of new(ish) mail in the group (integer)
 %l    Whether there are GroupLens predictions for this group (string)
 %n    Select from where (string)
 %z    A string that look like `<%s:%n>' if a foreign select method is used
@@ -407,6 +408,13 @@ ticked: The number of ticked articles."
     (?l gnus-tmp-grouplens ?s)
     (?z gnus-tmp-news-method-string ?s)
     (?m (gnus-group-new-mail gnus-tmp-group) ?c)
+    (?w (if (gnus-news-group-p gnus-tmp-group) 
+	    ""
+	  (int-to-string 
+	   (length 
+	    (nnmail-new-mail-numbers (gnus-group-real-name gnus-tmp-group))
+	    )))
+	?s)
     (?d (gnus-group-timestamp-string gnus-tmp-group) ?s)
     (?u gnus-tmp-user-defined ?s)))
 
