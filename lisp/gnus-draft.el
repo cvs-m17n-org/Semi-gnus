@@ -103,7 +103,8 @@
     (save-excursion
       (save-restriction
 	(message-narrow-to-headers)
-	(message-remove-header "date")))
+	(message-remove-header "date")
+	(put-text-property (point-min) (point-max) 'field 'header)))
     (message-save-drafts)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) group t))
