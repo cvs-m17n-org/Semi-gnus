@@ -214,7 +214,9 @@ regexp.  If it matches, the text in question is not a signature."
    ;; non-graphical frames in a session.
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
-    'gnus-article-display-xface)
+    (if (module-installed-p 'x-face-e21)
+	'x-face-decode-message-header
+      'gnus-article-display-xface))
    ((and (not gnus-xemacs)
 	 window-system
 	 (module-installed-p 'x-face-mule))
@@ -225,6 +227,9 @@ regexp.  If it matches, the text in question is not a signature."
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
   :type '(choice string
+		 (function-item
+		  :tag "x-face-decode-message-header (x-face-e21)"
+		  x-face-decode-message-header)
 		 (function-item gnus-article-display-xface)
 		 (function-item x-face-mule-gnus-article-display-x-face)
 		 function)
@@ -901,7 +906,10 @@ See the manual for details."
 (put 'gnus-treat-overstrike 'highlight t)
 
 (defcustom gnus-treat-display-xface
-  (if (or (and gnus-xemacs (featurep 'xface))
+  (if (or (and (fboundp 'image-type-available-p)
+	       (image-type-available-p 'xbm)
+	       (string-match "^0x" (shell-command-to-string "uncompface")))
+	  (and gnus-xemacs (featurep 'xface))
 	  (eq 'x-face-mule-gnus-article-display-x-face
 	      gnus-article-x-face-command))
       'head

@@ -1889,7 +1889,9 @@ use the article treating faculties instead.  Is is described in Info node
   (unless (featurep 'xemacs)
     (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
     (autoload 'smiley-toggle-buffer "gnus-bitmap")
-    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
+    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")
+    (when (>= emacs-major-version 21)
+      (autoload 'x-face-decode-message-header "x-face-e21"))))
 
 ;;; gnus-sum.el thingies
 

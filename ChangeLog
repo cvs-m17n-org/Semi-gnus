@@ -1,3 +1,21 @@
+2000-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus.el: Add autoloads for x-face-e21.
+
+	* lisp/gnus-sum.el (gnus-summary-search-article-position-point):
+	Search for `x-face-image' as well as `x-face-mule-bitmap-image'.
+
+	* lisp/gnus-art.el (gnus-article-x-face-command): Default to
+	`x-face-decode-message-header' when Emacs 21 is running and
+	x-face-e21 is installed.
+
+2000-11-21  KANEMATSU Daiji <kanematu@sra.co.jp>
+
+	* lisp/gnus-art.el (gnus-treat-display-xface): Default to `head'
+	when Emacs 21 is running and compface command is available.
+
 2000-11-21  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send-mail-with-smtp): Use
