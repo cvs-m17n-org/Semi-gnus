@@ -3607,12 +3607,16 @@ Headers already prepared in the buffer are not modified."
 		    ;; This header didn't exist, so we insert it.
 		    (goto-char (point-max))
 		    (insert (if (stringp header) header (symbol-name header))
-			    ": " value "\n")
+			    ": " value)
+		    (unless (bolp)
+		      (insert "\n"))
 		    (forward-line -1))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
 		(delete-region (point) (gnus-point-at-eol))
-		(insert value))
+		(insert value)
+		(when (bolp)
+		  (delete-char -1)))
 	      ;; Add the deletable property to the headers that require it.
 	      (and (memq header message-deletable-headers)
 		   (progn (beginning-of-line) (looking-at "[^:]+: "))
