@@ -2135,7 +2135,8 @@ return only unread articles."
   (or (gnus-gethash group gnus-category-group-cache)
       (assq 'default gnus-category-alist)))
 
-(defun gnus-agent-expire-2 (expiring-group active articles overview day force)
+(defun gnus-agent-expire-2 (expiring-group active articles overview day force
+					   dir)
   (gnus-agent-load-alist expiring-group)
   (gnus-message 5 "Expiring articles in %s" expiring-group)
   (let* ((info (gnus-get-info expiring-group))
@@ -2452,7 +2453,8 @@ See `gnus-agent-expire'."
 
 		      (when active
 			(gnus-agent-expire-2 expiring-group active
-					     articles overview day force)))))))
+					     articles overview day force
+					     dir)))))))
 	(kill-buffer overview)))))
 
 (defun gnus-agent-expire (&optional articles group force)
