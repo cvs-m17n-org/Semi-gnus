@@ -2,6 +2,14 @@
 
 	* Sync up with gnus-6_10.
 
+*1999-05-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/*.el: Undo all of the last changes.
+
+1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Sync up with gnus-6_10.
+
 *1999-05-13  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnsoup.el (nnsoup-store-reply): Use `forward-char' instead
