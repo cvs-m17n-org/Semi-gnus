@@ -2139,8 +2139,7 @@ a string \"never\" is inserted in default."
     (expand-abbrev))
   (goto-char (point-min))
   (or (search-forward (concat "\n" mail-header-separator "\n") nil t)
-      (search-forward-regexp "[^:]+:\\([^\n]\\|\n[ \t]\\)+\n\n" nil t)
-      (point-min)))
+      (search-forward-regexp "[^:]+:\\([^\n]\\|\n[ \t]\\)+\n\n" nil t)))
 
 (defun message-goto-eoh ()
   "Move point to the end of the headers."
