@@ -1,9 +1,10 @@
-;;; gnus-msg.el --- mail and post interface for Gnus
+;;; gnus-msg.el --- mail and post interface for Open gnus
 ;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
+;;         Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -298,8 +299,10 @@ post using the current select method."
 	article)
     (while (setq article (pop articles))
       (when (gnus-summary-select-article t nil nil article)
-	(when (gnus-eval-in-buffer-window gnus-original-article-buffer
-		(message-cancel-news))
+	(when (gnus-eval-in-buffer-window gnus-article-buffer
+		(save-excursion
+		  (set-buffer gnus-original-article-buffer)
+		  (message-cancel-news)))
 	  (gnus-summary-mark-as-read article gnus-canceled-mark)
 	  (gnus-cache-remove-article 1))
 	(gnus-article-hide-headers-if-wanted))
@@ -523,30 +526,9 @@ If SILENT, don't prompt the user."
 ;;; as well include the Emacs version as well.
 ;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified Gnus version and Emacs version"
+  "Stringified Gnus version"
   (interactive)
-  (concat
-   gnus-version
-   "/"
-   (cond
-    ((string-match "^\\([0-9]+\\.[0-9]+\\)\\.[.0-9]+$" emacs-version)
-     (concat "Emacs " (substring emacs-version
-				 (match-beginning 1)
-				 (match-end 1))))
-    ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-		   emacs-version)
-     (concat (substring emacs-version
-			(match-beginning 1)
-			(match-end 1))
-	     (format " %d.%d" emacs-major-version emacs-minor-version)
-	     (if (match-beginning 3)
-		 (substring emacs-version
-			    (match-beginning 3)
-			    (match-end 3))
-	       "")
-	     (if (boundp 'xemacs-codename)
-		 (concat " - \"" xemacs-codename "\""))))
-    (t emacs-version))))
+  gnus-version)
 
 ;; Written by "Mr. Per Persson" <pp@gnu.ai.mit.edu>.
 (defun gnus-inews-insert-mime-headers ()
@@ -919,7 +901,6 @@ this is a reply."
       (save-restriction
 	(message-narrow-to-headers)
 	(let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
-	      (cur (current-buffer))
 	      (coding-system-for-write 'raw-text)
 	      groups group method)
 	  (when gcc
@@ -948,7 +929,7 @@ this is a reply."
 		(gnus-request-create-group group method))
 	      (save-excursion
 		(nnheader-set-temp-buffer " *acc*")
-		(insert-buffer-substring cur)
+		(insert-buffer-substring message-encoding-buffer)
 		(run-hooks 'gnus-before-do-gcc-hook)
 		(goto-char (point-min))
 		(when (re-search-forward
