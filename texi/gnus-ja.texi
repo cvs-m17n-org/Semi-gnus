@@ -20941,7 +20941,8 @@ Bogofilter か ifile (@code{spam-use-bogofilter} と @code{spam-use-if
 を変数 @code{spam-split-group} で与えられる名前のグループに送ります。通
 常そのグループ名は @samp{spam} です。
 
-以下は @code{spam-split} の動作を制御するために使うことができる方法です。
+以下は @code{spam-split} の動作を制御するために使うことができる各種の方
+法です。
 
 @menu
 * Blacklists and Whitelists::   
@@ -20953,38 +20954,39 @@ Bogofilter か ifile (@code{spam-use-bogofilter} と @code{spam-use-if
 @end menu
 
 @node Blacklists and Whitelists
-@subsubsection Blacklists and Whitelists
+@subsubsection ブラックリストとホワイトリスト
 @cindex spam filtering
 @cindex whitelists, spam filtering
 @cindex blacklists, spam filtering
 @cindex spam.el
 
 @defvar spam-use-blacklist
-Set this variables to t (the default) if you want to use blacklists.
+ブラックリストを使いたいならば、この変数を t (ディフォルト) に設定して下
+さい。
 @end defvar
 
 @defvar spam-use-whitelist
-Set this variables to t if you want to use whitelists.
+ホワイトリスト使いたい場合は、この変数を t に設定して下さい。
 @end defvar
 
-Blacklists are lists of regular expressions matching addresses you
-consider to be spam senders.  For instance, to block mail from any
-sender at @samp{vmadmin.com}, you can put @samp{vmadmin.com} in your
-blacklist.  Since you start out with an empty blacklist, no harm is
-done by having the @code{spam-use-blacklist} variable set, so it is
-set by default.  Blacklist entries use the Emacs regular expression
-syntax.
+ブラックリストは、あなたが spam の送信者だと考えるアドレスに合致する正規
+表現のリストです。例えば @samp{vmadmin.com} の誰からでも来るメールを阻止
+するには、あなたのブラックリストに @samp{vmadmin.com} を入れて下さい。空
+のブラックリストで始めると、@code{spam-use-blacklist} 変数をセットするこ
+とによって害を生じないので、それはディフォルトでセットされています。ブラッ
+クリストの各項目は Emacs の正規表現シンタックスを使います。
 
-Conversely, whitelists tell Gnus what addresses are considered
-legitimate.  All non-whitelisted addresses are considered spammers.
-This option is probably not useful for most Gnus users unless the
-whitelists is very comprehensive.  Also see @ref{BBDB Whitelists}.
-Whitelist entries use the Emacs regular expression syntax.
+逆に、ホワイトリストは何のアドレスが正当だと考えられるかを告げます。ホワ
+イトリストに無いすべてのアドレスは spammers だと見なされます。ホワイトリ
+ストが非常に広い範囲を有効と認めるようになっていないと、たぶんこのオプショ
+ンはほとんどの gnus のユーザーにとって有益ではありません。
+@ref{BBDB Whitelists} も見て下さい。ホワイトリストの各項目は Emacs の正
+規表現シンタックスを使います。
 
-The Blacklist and whitelist location can be customized with the
-@code{spam-directory} variable (@file{~/News/spam} by default).  The whitelist
-and blacklist files will be in that directory, named @file{whitelist} and
-@file{blacklist} respectively.
+ブラックリストとホワイトリストの所在は @code{spam-directory} 変数 (ディ
+フォルトは @file{~/News/spam}) でカスタマイズできます。ブラックリストと
+ホワイトリストのファイルはそのディレクトリにあり、それぞ
+れ @file{whitelist} と @file{blacklist} という名前が付けられます。
 
 @node BBDB Whitelists
 @subsubsection BBDB Whitelists
@@ -21071,7 +21073,7 @@ Say you want to add a new backend called blackbox.  Provide the following:
 @enumerate
 @item documentation
 
-@item code
+@item
 
 @example
 (defvar spam-use-blackbox nil
@@ -21084,7 +21086,7 @@ Add
 @end example
 to @code{spam-list-of-checks}.
 
-@item functionality
+@item
 Write the @code{spam-check-blackbox} function.  It should return
 @samp{nil} or @code{spam-split-group}.  See the existing
 @code{spam-check-*} functions for examples of what you can do.
