@@ -1,3 +1,7 @@
+2003-12-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Mention change of `e' in draft groups.
+
 2003-12-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-group.el (gnus-group-edit-group): Let the `C-c C-i' command

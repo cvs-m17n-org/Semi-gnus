@@ -24292,6 +24292,11 @@ T-gnus $B$O(B @acronym{SEMI} $B$d(B @acronym{FLIM} $B$KMj$C$F$$$^$9!#$7$?$,
 @itemize @bullet
 
 @item
+$B%I%i%U%H!&%0%k!<%W$G(B @kbd{e} $B%-!<$,(B @code{gnus-draft-edit-message} $B%3%^(B
+$B%s%I$K3d$jEv$F$i$l$^$7$?!#(B@code{gnus-summary-edit-article} $B%3%^%s%I$K$O!"(B
+$BBe$o$j$K(B @kbd{B w} $B%-!<$r;H$C$F2<$5$$!#(B
+
+@item
 $B2~Dj$5$l$?(B Gnus @acronym{FAQ} $B$,%^%K%e%"%k$K4^$^$l$F$$$^$9!#(B
 @xref{Frequently Asked Questions}. ($BLuCm(B: T-gnus $B$N$?$a(B
 $B$N(B @acronym{FAQ} $B$O1J$i$/2~Dj$5$l$F$$$^$;$s!#(B)
