@@ -21381,13 +21381,6 @@ Spam に対処する一つの方法は、gnus に全ての spam を @samp{spam}
 ると思っているなら、それぞれの押し付け宣伝メールの関係当局に苦情を送り付
 けることさえもできます --- 暇なときにでもね。
 
-また、あなたが怠け者のネットワーク市民でもあるなら、
-@file{gnus-junk.el} パッケージによって自動的に苦情をいう方が良いと思うか
-もしれません。これ
-は @* @uref{http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html} か
-ら「無料で」利用できます。ほとんどの spam メールは自動的に送られているの
-で、ちょっとだけ宇宙のバランスがとれるかもしれません。
-
 これで私のところでは動いています。これでみんなは簡単な方法で私に連絡を取
 ることができ (普通に @kbd{r} を押すだけでできる)、私は spam に煩わされる
 ことは全くありません。得々状態です。私の意見としては、@code{From} ヘッダー
@@ -22964,7 +22957,7 @@ Message Mode は受信者に開封確認を要求することができます。
 @cindex RFC 1991
 @cindex RFC 2440
 RFC 1991 is the original @acronym{PGP} message specification,
-published as a Information RFC.  RFC 2440 was the follow-up, now
+published as an informational RFC.  RFC 2440 was the follow-up, now
 called Open PGP, and put on the Standards Track.  Both document a
 non-@acronym{MIME} aware @acronym{PGP} format.  Gnus supports both
 encoding (signing and encryption) and decoding (verification and

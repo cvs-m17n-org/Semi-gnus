@@ -1,3 +1,50 @@
+2003-05-14 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Gnus v5.10.2 is released.
+
+2003-05-14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-delete-incoming): Changed to t. 
+
+	* rfc2047.el (rfc2047-syntax-table): Funcall.
+
+	* lpath.el ((featurep 'xemacs)): Added set-char-table-range. 
+	((featurep 'xemacs)): No, don't.
+
+	* rfc2047.el (rfc2047-encodable-p): Use the header charset. 
+
+	* gnus-sum.el (gnus-summary-reselect-current-group): Supply
+	leave-hidden. 
+
+2003-05-14  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* gnus-sum.el (gnus-summary-exit): Added `leave-hidden'.  (Tiny
+	patch.) 
+
+2003-05-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-registry.el (gnus-registry-store-extra-entry): Use
+	gnus-assq-delete-all. 
+
+	* gnus-xmas.el (gnus-xmas-assq-delete-all): New function.
+
+	* message.el (message-ignored-bounced-headers): Add Delivered-To. 
+
+	* gnus-sum.el (gnus-summary-find-next): Indent.
+	(gnus-summary-find-prev): Ditto.
+	(gnus-summary-catchup): Doc fix.
+	(gnus-summary-mark-current-read-and-unread-as-read): New function.
+	(gnus-summary-catchup): Really mark after point.
+
+	* gnus-util.el (gnus-user-date): Use %d instead of %m.
+	(gnus-user-date): Use floating point time so that we don't get
+	overflows. 
+
+	* gnus-sum.el (gnus-summary-local-variables): Clean up.
+
+	* gnus-fun.el (gnus-display-x-face-in-from): Don't use centering
+	since none of the other image things do.
+
 2003-05-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* dgnushack.el (assq-delete-all): New compiler macro for Emacs 20.

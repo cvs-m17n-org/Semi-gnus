@@ -255,7 +255,8 @@ The buffer may be narrowed."
   (require 'message)			; for message-posting-charset
   (let ((charsets
 	 (mm-find-mime-charset-region (point-min) (point-max))))
-    (and charsets (not (equal charsets (list message-posting-charset))))))
+    (and charsets
+	 (not (equal charsets (list (car message-posting-charset)))))))
 
 ;; Use this syntax table when parsing into regions that may need
 ;; encoding.  Double quotes are string delimiters, backslash is
@@ -271,7 +272,8 @@ The buffer may be narrowed."
     ;; Play safe and don't assume the form of the word syntax entry --
     ;; copy it from ?a.
     (if (fboundp 'set-char-table-range)	; Emacs
-	(set-char-table-range table t (aref (standard-syntax-table) ?a))
+	(funcall (intern "set-char-table-range")
+		 table t (aref (standard-syntax-table) ?a))
       (if (fboundp 'put-char-table)
 	  (if (fboundp 'get-char-table)	; warning avoidance
 	      (put-char-table t (get-char-table ?a (standard-syntax-table))
