@@ -420,12 +420,6 @@ given, the return value will not contain the last newline."
 
   (defalias 'mail-header-field-value 'std11-field-value))
 
-;; Should keep track of the same variable in mm-bodies.el.
-;; Don't use `defvar-maybe', it won't create a byte-code!!!
-;; 8bit treatment gets any char except: 0x32 - 0x7f, CR, LF, TAB, BEL,
-;; BS, vertical TAB, form feed, and ^_
-(defvar mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f")
-
 ;;; Header access macros.
 
 ;; These macros may look very much like the ones in GNUS 4.1.  They

@@ -3184,7 +3184,8 @@ used to distinguish whether the invisible text is a MIME part or not."
 		 "Invisible text found and made visible; continue posting? ")
 	  (error "Invisible text found and made visible")))))
   (message-check 'illegible-text
-    (let (found choice)
+    (let ((mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f\x1b")
+	  found choice)
       (message-goto-body)
       (skip-chars-forward mm-7bit-chars)
       (while (not (eobp))
