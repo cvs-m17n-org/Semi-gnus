@@ -12011,7 +12011,7 @@ Quoted Readable 符号化を復号化します。
 @lisp
 (setq nnmail-split-fancy
       '(| ;; 重複メッセージは分離されたグループへ行きます。
-        ("gnus-warning" "duplication of message" "duplicate")
+        ("gnus-warning" "duplicat\\(e\\|ion\\) of message" "duplicate")
         ;; デーモンやポストマスターや似たようなものからの
         ;; メッセージは他のところへ。
         (any mail "mail.misc")
@@ -15359,7 +15359,8 @@ File Editing})。
 
 @item f
 フォローアップ (followup) にスコアを付けます---これは著者名との合致をし、
-この著者へのフォローアップにスコアを加えます。
+この著者へのフォローアップにスコアを加えます。(このキーを使うことによっ
+て @file{ADAPT} ファイルが生成されます。)
 
 @item b
 本体 (body) にスコアを付けます。
@@ -15368,7 +15369,8 @@ File Editing})。
 ヘッダー (head) にスコアを付けます。
 
 @item t
-スレッドにスコアを付けます。
+スレッドにスコアを付けます。(このキーを使うことによって @file{ADAPT} ファ
+イルが生成されます。)
 
 @end table
 
