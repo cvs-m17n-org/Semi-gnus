@@ -2326,7 +2326,7 @@ Point is left at the beginning of the narrowed-to region."
 
 (easy-menu-define
  message-mode-field-menu message-mode-map ""
- '("Field"
+ `("Field"
    ["Fetch To" message-insert-to t]
    ["Fetch Newsgroups" message-insert-newsgroups t]
    "----"

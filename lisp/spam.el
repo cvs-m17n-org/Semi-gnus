@@ -63,6 +63,14 @@
   :type 'directory
   :group 'spam)
 
+(defcustom spam-move-spam-nonspam-groups-only t
+  "Whether spam should be moved in non-spam groups only.
+When nil, only ham and unclassified groups will have their spam moved
+to the spam-process-destination.  When t, spam will also be moved from
+spam groups."
+  :type 'boolean
+  :group 'spam-ifile)
+
 (defcustom spam-whitelist (expand-file-name "whitelist" spam-directory)
   "The location of the whitelist.
 The file format is one regular expression per line.
@@ -165,6 +173,12 @@ Such articles will be transmitted to `bogofilter -s' on group exit."
   "File path of the ifile executable program."
   :type '(choice (file :tag "Location of ifile")
 		 (const :tag "ifile is not installed"))
+  :group 'spam-ifile)
+
+(defcustom spam-ifile-database-path nil
+  "File path of the ifile database."
+  :type '(choice (file :tag "Location of the ifile database")
+		 (const :tag "Use the default"))
   :group 'spam-ifile)
 
 (defcustom spam-ifile-spam-category "spam"
@@ -291,10 +305,16 @@ articles before they get registered by Bogofilter."
   (when (spam-group-spam-processor-bogofilter-p gnus-newsgroup-name)
     (spam-blacklist-register-routine))
 
-  ;; Only for spam groups, we expire and maybe move articles
-  (when (spam-group-spam-contents-p gnus-newsgroup-name)
+  (if spam-move-spam-nonspam-groups-only      
+      (when (not (spam-group-spam-contents-p gnus-newsgroup-name))
+	(spam-mark-spam-as-expired-and-move-routine
+	 (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
     (spam-mark-spam-as-expired-and-move-routine 
      (gnus-parameter-spam-process-destination gnus-newsgroup-name)))
+
+  ;; now we redo spam-mark-spam-as-expired-and-move-routine to only
+  ;; expire spam, in case the above did not expire them
+  (spam-mark-spam-as-expired-and-move-routine nil)
 
   (when (spam-group-ham-contents-p gnus-newsgroup-name)
     (when (spam-group-ham-processor-whitelist-p gnus-newsgroup-name)
@@ -302,7 +322,12 @@ articles before they get registered by Bogofilter."
     (when (spam-group-ham-processor-ifile-p gnus-newsgroup-name)
       (spam-ifile-register-ham-routine))
     (when (spam-group-ham-processor-BBDB-p gnus-newsgroup-name)
-      (spam-BBDB-register-routine))))
+      (spam-BBDB-register-routine)))
+
+  ;; now move all ham articles out of spam groups
+  (when (spam-group-spam-contents-p gnus-newsgroup-name)
+    (spam-ham-move-routine
+     (gnus-parameter-ham-process-destination gnus-newsgroup-name))))
 
 (add-hook 'gnus-summary-prepare-exit-hook 'spam-summary-prepare-exit)
 
@@ -328,13 +353,26 @@ articles before they get registered by Bogofilter."
 	  (let ((gnus-current-article article))
 	    (gnus-summary-move-article nil group)))))))
  
+(defun spam-ham-move-routine (&optional group)
+  (let ((articles gnus-newsgroup-articles)
+	article ham-mark-values mark)
+    (dolist (mark spam-ham-marks)
+      (push (symbol-value mark) ham-mark-values))
+
+    (while articles
+      (setq article (pop articles))
+      (when (and (memq mark ham-mark-values)
+		 (stringp group))
+	  (let ((gnus-current-article article))
+	    (gnus-summary-move-article nil group))))))
+ 
 (defun spam-generic-register-routine (spam-func ham-func)
   (let ((articles gnus-newsgroup-articles)
 	article mark ham-articles spam-articles spam-mark-values 
 	ham-mark-values)
 
     ;; marks are stored as symbolic values, so we have to dereference
-    ;; them for memq to work we wouldn't have to do this if
+    ;; them for memq to work.  we wouldn't have to do this if
     ;; gnus-summary-article-mark returned a symbol.
     (dolist (mark spam-ham-marks)
       (push (symbol-value mark) ham-mark-values))
@@ -459,48 +497,54 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
     (when matches
       spam-split-group)))
 
-;;;; BBDB original idea for spam-check-BBDB from Alexander Kotelnikov
+;;;; BBDB 
+
+;;; original idea for spam-check-BBDB from Alexander Kotelnikov
 ;;; <sacha@giotto.sj.ru>
 
 ;; all this is done inside a condition-case to trap errors
+
 (condition-case nil
     (progn
-
+      (require 'bbdb)
       (require 'bbdb-com)
+      
+  (defun spam-enter-ham-BBDB (from)
+    "Enter an address into the BBDB; implies ham (non-spam) sender"
+    (when (stringp from)
+      (let* ((parsed-address (gnus-extract-address-components from))
+	     (name (or (car parsed-address) "Ham Sender"))
+	     (net-address (car (cdr parsed-address))))
+	(message "Adding address %s to BBDB" from)
+	(when (and net-address
+		   (not (bbdb-search-simple nil net-address)))
+	  (bbdb-create-internal name nil net-address nil nil 
+				"ham sender added by spam.el")))))
 
-      (defun spam-enter-ham-BBDB (from)
-	"Enter an address into the BBDB; implies ham (non-spam) sender"
-	(when (stringp from)
-	  (let* ((parsed-address (gnus-extract-address-components from))
-		 (name (or (car parsed-address) "Ham Sender"))
-		 (net-address (car (cdr parsed-address))))
-	    (message "Adding address %s to BBDB" from)
-	    (when (and net-address
-		       (not (bbdb-search (bbdb-records) nil nil net-address)))
-	      (bbdb-create-internal name nil net-address nil nil 
-				    "ham sender added by spam.el")))))
+  (defun spam-BBDB-register-routine ()
+    (spam-generic-register-routine 
+     ;; spam function
+     nil
+     ;; ham function
+     (lambda (article)
+       (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
 
-      (defun spam-BBDB-register-routine ()
-	(spam-generic-register-routine 
-	 ;; spam function
-	 nil
-	 ;; ham function
-	 (lambda (article)
-	   (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
-
-      (defun spam-check-BBDB ()
-	"Mail from people in the BBDB is never considered spam"
-	(let ((who (message-fetch-field "from")))
-	  (when who
-	    (setq who (regexp-quote (cadr 
-				     (gnus-extract-address-components who))))
-	    (if (bbdb-search (bbdb-records) nil nil who) 
-		nil spam-split-group)))))
+  (defun spam-check-BBDB ()
+    "Mail from people in the BBDB is never considered spam"
+    (let ((who (message-fetch-field "from")))
+      (when who
+	(setq who (regexp-quote (cadr
+				 (gnus-extract-address-components who))))
+	(if (bbdb-search-simple nil who)
+	    nil spam-split-group)))))
 
   (file-error (progn
-		(setq spam-list-of-checks
-		      (delete (assoc 'spam-use-BBDB spam-list-of-checks)
-			      spam-list-of-checks)))))
+		(defalias 'bbdb-search-simple 'ignore)
+		(defalias 'spam-check-BBDB 'ignore)
+		(defalias 'spam-BBDB-register-routine 'ignore)
+		(defalias 'spam-enter-ham-BBDB 'ignore)
+		(defalias 'bbdb-create-internal 'ignore)
+		(defalias 'bbdb-records 'ignore))))
 
 
 ;;;; ifile
@@ -508,6 +552,12 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 ;;; check the ifile backend; return nil if the mail was NOT classified
 ;;; as spam
 
+(defun spam-get-ifile-database-parameter ()
+  "Get the command-line parameter for ifile's database from spam-ifile-database-path."
+  (if spam-ifile-database-path
+      (format "--db-file=%s" spam-ifile-database-path)
+    ""))
+    
 (defun spam-check-ifile ()
   "Check the ifile backend for the classification of this message"
   (let ((article-buffer-name (buffer-name)) 
@@ -517,7 +567,8 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(save-excursion
 	  (set-buffer article-buffer-name)
 	  (call-process-region (point-min) (point-max) spam-ifile-path 
-			       nil temp-buffer-name nil "-q" "-c"))
+			       nil temp-buffer-name nil 
+			       "-q" "-c" (spam-get-ifile-database-parameter)))
 	(goto-char (point-min))
 	(if (not (eobp))
 	    (setq category (buffer-substring (point) (spam-point-at-eol))))
@@ -526,7 +577,8 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	      (setq return category)
 	    ;; else, if spam-ifile-all-categories is not set...
 	    (when (string-equal spam-ifile-spam-category category)
-	      (setq return spam-split-group))))))	; always accept the ifile category
+	      ;; always accept the ifile category
+	      (setq return spam-split-group))))))	
     return))
 
 (defun spam-ifile-register-with-ifile (article-string category)
@@ -537,7 +589,9 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (with-temp-buffer
 	(insert-string article-string)
 	(call-process-region (point-min) (point-max) spam-ifile-path 
-			     nil nil nil "-h" "-i" category)))))
+			     nil nil nil 
+			     "-h" "-i" category 
+			     (spam-get-ifile-database-parameter))))))
 
 (defun spam-ifile-register-spam-routine ()
   (spam-generic-register-routine 

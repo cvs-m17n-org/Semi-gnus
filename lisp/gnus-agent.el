@@ -847,8 +847,11 @@ This can be added to `gnus-select-article-hook' or
       (when (gnus-agent-fetch-articles
              gnus-newsgroup-name
 	     (list gnus-current-article))
-	(setq gnus-newsgroup-undownloaded (delq gnus-current-article gnus-newsgroup-undownloaded))
-	(gnus-summary-update-line gnus-current-article)))))
+	(setq gnus-newsgroup-undownloaded
+	      (delq gnus-current-article gnus-newsgroup-undownloaded))
+	(gnus-summary-update-article-line
+	 gnus-current-article
+	 (gnus-summary-article-header gnus-current-article))))))
 
 ;;;
 ;;; Internal functions
