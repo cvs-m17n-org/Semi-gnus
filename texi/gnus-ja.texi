@@ -3061,6 +3061,9 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @end table
 
+$B:G8e$K!"(B@kbd{C-k} $B$H(B @kbd{C-y} $B$r;H$C$F!"<jF0$G%0%k!<%W$r$"$A$3$A$K0\F0(B
+$B$G$-$k$3$H$b$*K:$l$J$/!#(B
+
 @node Group Maintenance
 @section $B%0%k!<%W$N4IM}(B
 @cindex bogus groups
