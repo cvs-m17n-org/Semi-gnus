@@ -1,3 +1,12 @@
+1999-11-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/pop3.el: Add description about STLS extension; add autoload
+	setting for `starttls-open-stream' and `starttls-negotiate'.
+	(pop3-stls): New function.
+	(pop3-open-tls-stream): New function.
+	(pop3-open-server): Use `pop3-open-tls-stream' if
+	'pop3-connection-type' is bound to `tls'.
+
 1999-11-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/imap.el: Add autoload setting for `starttls-open-stream'
@@ -5,6 +14,8 @@
 	(imap-stream-alist): Add TLS entry.
 	(imap-tls-p): New function.
 	(imap-tls-open): New function.
+	(imap-ssl-open): Enclose `open-ssl-stream' with
+	`as-binary-process'.
 
 1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
