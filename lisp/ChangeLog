@@ -1,3 +1,35 @@
+2003-12-07  Simon Josefsson  <jas@extundo.com>
+
+	* pgg-gpg.el (pgg-gpg-recipient-arg): Add.
+	(pgg-gpg-encrypt-region): Use it.  Tiny patch from Lloyd Zusman
+	<ljz@asfast.com>.
+	(pgg-gpg-recipient-argument): Doc fix.  Renamed fro p-g-r-a.
+	(pgg-gpg-encrypt-region): Update.
+
+2003-12-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* spam.el (spam-check-spamoracle, spam-spamoracle-learn): Don't
+	use = or zerop to test the return value of call-process, because
+	it can be a string.
+
+	* mail-source.el (mail-source-fetch-with-program): do.
+
+	* mailcap.el (mailcap-viewer-passes-test): do.
+
+	* gnus-uu.el (gnus-uu-treat-archive, gnus-uu-post-encode-mime)
+	(gnus-uu-post-encode-file): do.
+
+	* gnus-soup.el (gnus-soup-pack, gnus-soup-unpack-packet): do.
+
+	* message.el (message-fix-before-sending): Fix detection of
+	non-printables.  Don't replace unencodable utf-8.
+
+2003-12-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-url.el (mm-url-predefined-programs): Add user-agent for wget.
+	(mm-url-insert-file-contents-external): Signal an error if program
+	fails.
+
 2003-12-04  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* spam-report.el (spam-report-gmane): iterate over articles

@@ -3950,17 +3950,18 @@ used to distinguish whether the invisible text is a MIME part or not."
 ;; a MIME charset forcibly (even if it cannot be determined properly,
 ;; the value of the `default-mime-charset-for-write' variable is used).
 ;;  (message-check 'illegible-text
-;;    (let ((mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f\x1b")
-;;	  found choice)
+;;    (let (found choice)
 ;;      (message-goto-body)
 ;;      (skip-chars-forward mm-7bit-chars)
 ;;      (while (not (eobp))
 ;;	(when (let ((char (char-after)))
 ;;		(or (< (mm-char-int char) 128)
 ;;		    (and (mm-multibyte-p)
-;;			 (> (length (mm-find-mime-charset-region
-;;				     (point) (point-max)))
-;;			    1))))
+;;			 (memq (char-charset char)
+;;			       '(eight-bit-control eight-bit-graphic
+;;						   control-1))
+;;			 (not (get-text-property
+;;			       (point) 'untranslated-utf-8)))))
 ;;	  (message-overlay-put (message-make-overlay (point) (1+ (point)))
 ;;			       'face 'highlight)
 ;;	  (setq found t))
@@ -3975,7 +3976,7 @@ used to distinguish whether the invisible text is a MIME part or not."
 ;;		 (?i "Ignore non-printable characters and send")
 ;;		 (?e "Continue editing"))))
 ;;	(if (eq choice ?e)
-;;	  (error "Non-printable characters"))
+;;	    (error "Non-printable characters"))
 ;;	(message-goto-body)
 ;;	(skip-chars-forward mm-7bit-chars)
 ;;	(while (not (eobp))
@@ -3987,7 +3988,9 @@ used to distinguish whether the invisible text is a MIME part or not."
 ;;			   ;; use find-coding-systems-region.
 ;;			   (memq (char-charset char)
 ;;				 '(eight-bit-control eight-bit-graphic
-;;						     control-1)))))
+;;						     control-1))
+;;			   (not (get-text-property
+;;				 (point) 'untranslated-utf-8)))))
 ;;	    (if (eq choice ?i)
 ;;		(message-kill-all-overlays)
 ;;	      (delete-char 1)
