@@ -26,12 +26,12 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
 (require 'nnoo)
 (require 'gnus-util)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nndoc)
 

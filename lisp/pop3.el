@@ -35,6 +35,7 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'mail-utils)
 
 (defconst pop3-version "1.3s")

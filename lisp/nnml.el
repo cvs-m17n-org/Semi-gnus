@@ -30,10 +30,10 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnml)
 

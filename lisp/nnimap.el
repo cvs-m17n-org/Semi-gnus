@@ -59,8 +59,8 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (require 'imap))
+(require 'cl)
+(eval-and-compile (require 'imap))
 
 (require 'nnoo)
 (require 'nnmail)

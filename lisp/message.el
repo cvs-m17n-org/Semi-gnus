@@ -35,11 +35,8 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl)
-  (require 'smtp)
-  )
-
+(require 'cl)
+(eval-when-compile (require 'smtp))
 (require 'mailheader)
 (require 'nnheader)
 (require 'easymenu)

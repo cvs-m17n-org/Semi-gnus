@@ -27,9 +27,8 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl)
-  (require 'static))
+(require 'cl)
+(eval-when-compile (require 'static))
 
 (require 'path-util)
 (require 'custom)
@@ -2267,8 +2266,8 @@ This format is defined by the `gnus-article-time-format' variable."
     (let ((name (and gnus-newsgroup-name
 		     (gnus-group-real-name gnus-newsgroup-name))))
       (make-local-variable 'gnus-article-emphasis-alist)
-      (setq gnus-article-emphasis-alist 
-	    (nconc 
+      (setq gnus-article-emphasis-alist
+	    (nconc
 	     (let ((alist gnus-group-highlight-words-alist) elem highlight)
 	       (while (setq elem (pop alist))
 		 (when (and name (string-match (car elem) name))
@@ -2277,7 +2276,7 @@ This format is defined by the `gnus-article-time-format' variable."
 	       highlight)
 	     (copy-list highlight-words)
 	     (if gnus-newsgroup-name
-		 (copy-list (gnus-group-find-parameter 
+		 (copy-list (gnus-group-find-parameter
 			     gnus-newsgroup-name 'highlight-words t)))
 	     gnus-emphasis-alist)))))
 

@@ -132,7 +132,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")

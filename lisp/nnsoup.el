@@ -26,12 +26,12 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-soup)
 (require 'gnus-msg)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnsoup)
 

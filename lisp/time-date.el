@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'parse-time)
 
 (defun date-to-time (date)

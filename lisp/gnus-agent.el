@@ -24,13 +24,12 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'gnus)
 (require 'gnus-cache)
 (require 'nnvirtual)
 (require 'gnus-sum)
-(eval-when-compile
-  (require 'cl)
-  (require 'gnus-score))
+(eval-when-compile (require 'gnus-score))
 
 (defcustom gnus-agent-directory (nnheader-concat gnus-directory "agent/")
   "Where the Gnus agent will store its files."

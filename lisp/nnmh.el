@@ -31,11 +31,11 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-start)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnmh)
 

@@ -26,8 +26,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl))
+(require 'cl)
 (require 'mail-parse)
 
 (defvar mailcap-parse-args-syntax-table

@@ -25,13 +25,12 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'nnoo)
 (require 'gnus-util)
 
 (nnoo-declare nntp)
-
-(eval-when-compile (require 'cl))
 
 (defvoo nntp-address nil
   "Address of the physical nntp server.")

@@ -24,12 +24,12 @@
 
 ;;; Code:
 
+(require 'cl)
+(eval-when-compile (require 'static))
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'static))
 
 (nnoo-declare nnmbox)
 

@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'gnus)
 ;; (require 'xpm)
 (require 'annotations)

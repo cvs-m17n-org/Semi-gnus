@@ -26,10 +26,10 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'nnheader)
 (require 'nntp)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnspool)
 
