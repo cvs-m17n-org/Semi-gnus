@@ -113,7 +113,7 @@
 		 (let ((nnmail-file-coding-system
 			(if (file-newer-than-file-p file auto)
 			    (if (equal group "drafts")
-				message-draft-coding-system
+				nnheader-file-coding-system
 			      mm-text-coding-system)
 			  mm-auto-save-coding-system)))
 		   (nnmail-find-file newest)))
