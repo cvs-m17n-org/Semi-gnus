@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.30 1999-02-01 05:39:42 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.31 1999-02-01 11:02:59 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -384,7 +384,7 @@ If value is nil , dialup line is disconnected status.")
   (if (functionp gnus-offline-dialup-function)
       (funcall gnus-offline-dialup-function))
   (gnus-offline-get-new-news-function)
-  (if (featurep 'running-pterodactyl-gnus-0_73-or-later)
+  (if (null gnus-offline-pop-password-file)
       (gnus-group-get-new-news arg)
     (let ((buffer (get-buffer-create "*offline-temp*")))
       (unwind-protect
@@ -846,7 +846,7 @@ If value is nil , dialup line is disconnected status.")
 	 "----"
 	 ("Gnus Offline"
 	  ["movemail の切替え" gnus-offline-toggle-movemail-program
-	   (not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+	   (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	  ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
 	  ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
 	  ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
@@ -868,7 +868,7 @@ If value is nil , dialup line is disconnected status.")
        "----"
        ("Gnus Offline"
 	["Toggle movemail program" gnus-offline-toggle-movemail-program
-	 (not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+	 (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
 	["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
 	["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
@@ -892,7 +892,7 @@ If value is nil , dialup line is disconnected status.")
    (if (featurep 'meadow)
        '("Offline"
 	 ["movemail の切替え" gnus-offline-toggle-movemail-program
-	  (not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+	  (not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
 	 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
 	 ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail t]
 	 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
@@ -903,7 +903,7 @@ If value is nil , dialup line is disconnected status.")
 	 ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected])
      '("Offline"
        ["Toggle movemail program" gnus-offline-toggle-movemail-program
-	(not (featurep 'running-pterodactyl-gnus-0_73-or-later))
+	(not (featurep 'running-pterodactyl-gnus-0_73-or-later))]
        ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
        ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
        ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
