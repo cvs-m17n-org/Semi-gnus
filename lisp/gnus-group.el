@@ -2201,6 +2201,36 @@ If SOLID (the prefix), create a solid group."
 		       (nnwarchive-login ,login))))
     (gnus-group-make-group group method)))
 
+(defvar nnshimbun-type-definition)
+(defvar gnus-group-shimbun-type-history nil)
+(defvar gnus-group-shimbun-address-history nil)
+
+(defun gnus-group-make-shimbun-group ()
+  "Create a nnshimbun group."
+  (interactive)
+  (require 'nnshimbun)
+  (let* ((default-type
+	   (or (car gnus-group-shimbun-type-history)
+	       (symbol-name (caar nnshimbun-type-definition))))
+	 (type
+	  (gnus-string-or
+	   (completing-read
+	    (format "Shimbun type (default %s): " default-type)
+	    (mapcar (lambda (elem) (list (symbol-name (car elem))))
+		    nnshimbun-type-definition)
+	    nil t nil 'gnus-group-shimbun-type-history)
+	   default-type))
+	 (address
+	  (read-string "Shimbun address: "
+		       nil 'gnus-group-shimbun-address-history))
+	 (group
+	  (completing-read
+	   "Group name: "
+	   (mapcar (lambda (elem) (list elem))
+		   (cdr (assq 'groups (cdr (assq (intern type) nnshimbun-type-definition)))))
+	   nil t nil)))
+    (gnus-group-make-group group `(nnshimbun ,address (nnshimbun-type ,(intern type))))))
+
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.
 Given a prefix, create a full group."
