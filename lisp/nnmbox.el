@@ -628,7 +628,7 @@
 			  (let ((nnheader-file-coding-system
 				 nnmbox-file-coding-system))
 			    (nnheader-find-file-noselect
-			     nnmbox-mbox-file nil t))))
+			     nnmbox-mbox-file t t))))
 	(buffer-disable-undo)
 
 	;; Go through the group alist and compare against the mbox file.

@@ -467,6 +467,11 @@ this variable specifies group names."
   :group 'gnus-summary-marks
   :type 'character)
 
+(defcustom gnus-recent-mark ?N
+  "*Mark used for articles that are recent."
+  :group 'gnus-summary-marks
+  :type 'character)
+
 (defcustom gnus-cached-mark ?*
   "*Mark used for articles that are in the cache."
   :group 'gnus-summary-marks
@@ -1201,6 +1206,9 @@ end position and text.")
 (defvar gnus-newsgroup-forwarded nil
   "List of articles that have been forwarded in the current newsgroup.")
 
+(defvar gnus-newsgroup-recent nil
+  "List of articles that have are recent in the current newsgroup.")
+
 (defvar gnus-newsgroup-expirable nil
   "List of articles in the current newsgroup that can be expired.")
 
@@ -1262,6 +1270,7 @@ end position and text.")
     gnus-newsgroup-unselected gnus-newsgroup-marked
     gnus-newsgroup-reads gnus-newsgroup-saved
     gnus-newsgroup-replied gnus-newsgroup-forwarded
+    gnus-newsgroup-recent
     gnus-newsgroup-expirable
     gnus-newsgroup-processable gnus-newsgroup-killed
     gnus-newsgroup-downloadable gnus-newsgroup-undownloaded
@@ -4345,6 +4354,8 @@ or a straight list of headers."
 		    gnus-forwarded-mark)
 		   ((memq number gnus-newsgroup-saved)
 		    gnus-saved-mark)
+		   ((memq number gnus-newsgroup-recent)
+		    gnus-recent-mark)
 		   (t gnus-no-mark))
 	     gnus-tmp-from (mail-header-from gnus-tmp-header)
 	     gnus-tmp-name
@@ -8708,9 +8719,9 @@ the actual number of articles unmarked is returned."
 	(error "No such mark type: %s" type)
       (setq var (intern (format "gnus-newsgroup-%s" type)))
       (set var (cons article (symbol-value var)))
-      (if (memq type '(processable cached replied forwarded saved))
+      (if (memq type '(processable cached replied forwarded recent saved))
 	  (gnus-summary-update-secondary-mark article)
-	;;; !!! This is bobus.  We should find out what primary
+	;;; !!! This is bogus.  We should find out what primary
 	;;; !!! mark we want to set.
 	(gnus-summary-update-mark gnus-del-mark 'unread)))))
 
@@ -8970,6 +8981,8 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	  gnus-forwarded-mark)
 	 ((memq article gnus-newsgroup-saved)
 	  gnus-saved-mark)
+	 ((memq article gnus-newsgroup-recent)
+	  gnus-recent-mark)
 	 (t gnus-no-mark))
    'replied)
   (when (gnus-visual-p 'summary-highlight 'highlight)

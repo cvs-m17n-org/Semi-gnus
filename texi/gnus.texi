@@ -771,7 +771,7 @@ Various
 * Interactive::                Making Gnus ask you many questions.
 * Symbolic Prefixes::          How to supply some Gnus functions with options.
 * Formatting Variables::       You can specify what buffers should look like.
-* Windows Configuration::      Configuring the Gnus buffer windows.
+* Window Layout::              Configuring the Gnus buffer windows.
 * Faces and Fonts::            How to change how faces look.
 * Compilation::                How to speed Gnus up.
 * Mode Lines::                 Displaying information in the mode lines.
@@ -4688,13 +4688,6 @@ that goes out to all people listed in the @code{To}, @code{From} (or
 @code{Reply-to}) and @code{Cc} headers in all the process/prefixed
 articles.  This command uses the process/prefix convention.
 
-@item S W
-@kindex S W (Summary)
-@findex gnus-summary-wide-reply-with-original
-Mail a very wide reply to the current article and include the original
-message (@code{gnus-summary-wide-reply-with-original}).  This command uses
-the process/prefix convention.
-
 @item S o m
 @itemx C-c C-f
 @kindex S o m (Summary)
@@ -5092,6 +5085,11 @@ answered) will be marked with an @samp{A} in the second column
 @vindex gnus-forwarded-mark
 All articles that you have forwarded will be marked with an @samp{O} in
 the second column (@code{gnus-forwarded-mark}).
+
+@vindex gnus-recent-mark
+Articles that are ``recently'' arrived in the group will be marked
+with an @samp{N} in the second column (@code{gnus-recent-mark}).  Most
+backend doesn't support the mark, in which case it's not shown.
 
 @item
 @vindex gnus-cached-mark
@@ -8651,7 +8649,7 @@ following to your @file{.gnus.el} file:
              (article 1.0))))
 @end lisp
 
-@xref{Windows Configuration}.
+@xref{Window Layout}.
 
 
 @node Mail Group Commands
@@ -17482,7 +17480,7 @@ four days, Gnus will decay the scores four times, for instance.
 * Interactive::                Making Gnus ask you many questions.
 * Symbolic Prefixes::          How to supply some Gnus functions with options.
 * Formatting Variables::       You can specify what buffers should look like.
-* Windows Configuration::      Configuring the Gnus buffer windows.
+* Window Layout::              Configuring the Gnus buffer windows.
 * Faces and Fonts::            How to change how faces look.
 * Compilation::                How to speed Gnus up.
 * Mode Lines::                 Displaying information in the mode lines.
@@ -17842,9 +17840,9 @@ Note that the @samp{%(} specs (and friends) do not make any sense on the
 mode-line variables.
 
 
-@node Windows Configuration
-@section Windows Configuration
-@cindex windows configuration
+@node Window Layout
+@section Window Layout
+@cindex window layout
 
 No, there's nothing here about X, so be quiet.
 
@@ -18815,7 +18813,7 @@ default (which by default maps to the buffer @samp{*Picons*}).  Other
 valid places could be @code{article}, @code{summary}, or
 @samp{*scratch*} for all I care.  Just make sure that you've made the
 buffer visible using the standard Gnus window configuration
-routines---@pxref{Windows Configuration}.
+routines---@pxref{Window Layout}.
 
 @item gnus-picons-group-excluded-groups
 @vindex gnus-picons-group-excluded-groups
@@ -20096,7 +20094,7 @@ Buttons}).
 
 @item
 You can do lots of strange stuff with the Gnus window & frame
-configuration (@pxref{Windows Configuration}).
+configuration (@pxref{Window Layout}).
 
 @item
 You can click on buttons instead of using the keyboard
@@ -20245,8 +20243,8 @@ All summary mode commands are available directly from the article
 buffer (@pxref{Article Keymap}).
 
 @item
-Frames can be part of @code{gnus-buffer-configuration} (@pxref{Windows
-Configuration}).
+Frames can be part of @code{gnus-buffer-configuration} (@pxref{Window
+Layout}).
 
 @item
 Mail can be re-scanned by a daemonic process (@pxref{Daemons}).
@@ -21691,8 +21689,8 @@ marks not mentioned) mark and removing (preserving the marks not
 mentioned) marks.  MARK is a list of marks; where each mark is a symbol.
 Currently used marks are @code{read}, @code{tick}, @code{reply},
 @code{expire}, @code{killed}, @code{dormant}, @code{save},
-@code{download} and @code{unsend}, but your backend should, if possible,
-not limit itself to these.
+@code{download}, @code{unsend}, @code{forward} and @code{recent}, 
+but your backend should, if possible, not limit itself to these.
 
 Given contradictory actions, the last action in the list should be the
 effective one.  That is, if your action contains a request to add the

@@ -1317,6 +1317,9 @@ no, only reply back to the author."
 (defvar message-send-mail-real-function nil
   "Internal send mail function.")
 
+(defvar message-bogus-system-names "^localhost\\."
+  "The regexp of bogus system names.")
+
 (eval-and-compile
   (autoload 'message-setup-toolbar "messagexmas")
   (autoload 'mh-new-draft-name "mh-comp")
@@ -4080,7 +4083,8 @@ give as trustworthy answer as possible."
   (let ((system-name (system-name))
 	(user-mail (message-user-mail-address)))
     (cond
-     ((string-match "[^.]\\.[^.]" system-name)
+     ((and (string-match "[^.]\\.[^.]" system-name)
+	   (not (string-match message-bogus-system-names system-name)))
       ;; `system-name' returned the right result.
       system-name)
      ;; Try `mail-host-address'.

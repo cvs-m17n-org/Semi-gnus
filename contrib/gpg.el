@@ -799,6 +799,7 @@ evaluates BODY, like `progn'.  If BODY evaluates to `nil' (or
   "Forget stored passphrase."
   (interactive)
   (cancel-timer gpg-passphrase-timer)
+  (setq gpg-passphrase-timer nil)
   (gpg-passphrase-clear-string gpg-passphrase)
   (setq gpg-passphrase nil))
 
@@ -806,6 +807,8 @@ evaluates BODY, like `progn'.  If BODY evaluates to `nil' (or
   "Store PASSPHRASE in cache.
 Updates the timeout for clearing the cache to `gpg-passphrase-timeout'."
   (unless (equal gpg-passphrase-timeout 0)
+    (if (null gpg-passphrase-timer)
+	(setq gpg-passphrase-timer (timer-create)))
     (timer-set-time gpg-passphrase-timer 
 		    (timer-relative-time (current-time) 
 					 gpg-passphrase-timeout))

@@ -1,3 +1,25 @@
+2001-08-11 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Nevin Kapur <nevin@jhu.edu>
+
+	* gnus.texi (September Gnus): Typo.
+
+2001-08-12  Simon Josefsson  <jas@extundo.com>
+	Suggested by Kai.Grossjohann@CS.Uni-Dortmund.DE
+
+	* gnus.texi (Other Marks): Add recent.
+	(Optional Backend Functions): Add forward and recent.
+
+2001-08-12  Kai Grossjohann  <grossjoh@ls6.informatik.uni-dortmund.de>
+
+	* gnus.texi (Window Layout): Renamed from `Windows
+	Configuration'.  After all, we're not talking about Microsoft.
+	Suggested by Barry Fishman.
+
+2001-08-11  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Summary Mail Commands): Remove duplicate explanation
+	of `S W'.  Reported by Norbert Koch.
+
 2001-08-09 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	From Benjamin Rutt <brutt@bloomington.in.us>
 

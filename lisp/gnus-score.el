@@ -1987,7 +1987,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	  ;; Evil hackery to make match usable in non-standard headers.
 	  (when extra
 	    (setq match (concat "[ (](" extra " \\. \"[^)]*"
-				match "[^(]*\")[ )]")
+				match "[^\"]*\")[ )]")
 		  search-func 're-search-forward)) ; XXX danger?!?
 
 	  (cond

@@ -841,7 +841,7 @@ Various
 * Symbolic Prefixes::      $B$$$/$D$+$N(B gnus $B$N4X?t$KA*Br8"$rDs6!$9$kJ}K!(B
 * Formatting Variables::   $B%P%C%U%!$,$I$N$h$&$K8+$($k$Y$-$+$r;XDj$9$k;v(B
                            $B$,$G$-$k(B
-* Windows Configuration::  Gnus $B%P%C%U%!%&%#%s%I%&$r@_Dj$9$k(B
+* Window Layout::          Gnus $B%P%C%U%!%&%#%s%I%&$r@_Dj$9$k(B
 * Faces and Fonts::        $B%U%'%$%9$,$I$N$h$&$K8+$($k$+$rJQ99$9$k(B
 * Compilation::            $B$I$N$h$&$K$7$F(B gnus $B$NB.EY$r>e$2$k$+(B
 * Mode Lines::             $B%b!<%I9T$K>pJs$rI=<($9$k(B
@@ -4614,7 +4614,7 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 $BF,0z?t$N=,47$r;H$$$^$9!#(B
 
 @item S v
-@kindex S v (Summary)
+@kindex S v ($B35N,(B)
 @findex gnus-summary-very-wide-reply
 $B8=:_$N5-;v$r=q$$$??M$KBP$7$F!"Hs>o$K9-$$JVEz(B (very wide reply) $B$r$7$^(B
 $B$9(B (@code{gnus-summary-very-wide-reply})$B!#(B@dfn{$BHs>o$K9-$$JVEz(B} $B$H$O!"%W(B
@@ -4623,7 +4623,7 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 $B$r$9$k$3$H$G$9!#$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
 
 @item S V
-@kindex S V (Summary)
+@kindex S V ($B35N,(B)
 @findex gnus-summary-very-wide-reply-with-original
 $B8=:_$N5-;v$KK\5-;v$r4^$s$@Hs>o$K9-$$JVEz$N%a!<%k$rAw$j$^(B
 $B$9(B (@code{gnus-summary-very-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;(B
@@ -5011,6 +5011,11 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @vindex gnus-forwarded-mark
 $BE>Aw$7$?5-;v$O$9$Y$FFs7eL\$K(B @samp{O} $B$N0u$,$D$-$^(B
 $B$9(B (@code{gnus-forwarded-mark})$B!#(B
+
+@vindex gnus-recent-mark
+$B$=$N%0%k!<%W$G(B ``$B:G6a(B'' (``recently'') $BFO$$$?5-;v$OFs7eL\$K(B @samp{N} $B$N(B
+$B$N0u$,$D$-$^$9(B (@code{gnus-recent-mark})$B!#$?$$$F$$$N%P%C%/%(%s%I$O$3$N0u(B
+$B$r%5%]!<%H$;$:!"$=$N>l9g$OI=<($5$l$^$;$s!#(B
 
 @item
 @vindex gnus-cached-mark
@@ -8132,7 +8137,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
              (article 1.0))))
 @end lisp
 
-@xref{Windows Configuration}$B!#(B
+@xref{Window Layout}$B!#(B
 
 @node Mail Group Commands
 @section $B%a!<%k%0%k!<%WL?Na(B
@@ -16956,7 +16961,7 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * Symbolic Prefixes::      $B$$$/$D$+$N(B gnus $B$N4X?t$KA*Br8"$rDs6!$9$kJ}K!(B
 * Formatting Variables::   $B%P%C%U%!$,$I$N$h$&$K8+$($k$Y$-$+$r;XDj$9$k;v(B
                            $B$,$G$-$k(B
-* Windows Configuration::  Gnus $B%P%C%U%!%&%#%s%I%&$r@_Dj$9$k(B
+* Window Layout::          Gnus $B%P%C%U%!%&%#%s%I%&$r@_Dj$9$k(B
 * Faces and Fonts::        $B%U%'%$%9$,$I$N$h$&$K8+$($k$+$rJQ99$9$k(B
 * Compilation::            $B$I$N$h$&$K$7$F(B gnus $B$NB.EY$r>e$2$k$+(B
 * Mode Lines::             $B%b!<%I9T$K>pJs$rI=<($9$k(B
@@ -17284,9 +17289,9 @@ Emacs $B$,(B @samp{%b} $B$r<u$1<h$k$H!"(BEmacs $B$N%b!<%I9TI=<($NItJ,$,$=$l
 @samp{%(} $B;XDj(B ($B$d$=$NN`$N$b$N(B) $B$O%b!<%I9TJQ?t$G$OA4$/0UL#$r$J$5$J$$;v$K(B
 $BCm0U$7$F$/$@$5$$!#(B
 
-@node Windows Configuration
-@section $B%&%#%s%I%&$N@_Dj(B
-@cindex windows configuration
+@node Window Layout
+@section $B%&%#%s%I%&$NG[CV(B
+@cindex window layout
 
 $B$$$(!"(BX $B$K4X$9$k;v$O$"$j$^$;$s$N$G!"$*$H$J$7$/$7$F2<$5$$!#(B
 
@@ -18221,8 +18226,8 @@ picon $B2hA|$,I=<($5$l$k>l=j!#$3$l$O=i4|@_Dj$G$O(B @code{picons} $B$G$9(B (
 $B$O=i4|@_Dj$G(B @samp{*Picons*} $B%P%C%U%!$K0LCV$7$^$9(B)$B!#B>$NM-8z$J>l=j$H$7$F(B
 $B$O(B @code{article}, @code{summary} $B$"$k$$$O(B @samp{*scratch*} $B$@$m$&$HCN$C(B
 $B$?$3$H$G$O$"$j$^$;$s!#$?$@$=$N%P%C%U%!$rI8=`$N(B gnus $BAkG[CV=h(B
-$BM}(B --- @pxref{Windows Configuration} $B$K$h$C$F8+$($k$h$&$K$7$F$*$/$3$H$r(B
-$B3NG'$7$F$/$@$5$$!#(B
+$BM}(B --- @pxref{Window Layout} $B$K$h$C$F8+$($k$h$&$K$7$F$*$/$3$H$r3NG'$7$F(B
+$B$/$@$5$$!#(B
 
 @item gnus-picons-group-excluded-groups
 @vindex gnus-picons-group-excluded-groups
@@ -19491,7 +19496,7 @@ Buttons})$B!#(B
 
 @item
 Gnus $B$N%&%#%s%I%&$H%U%l!<%`$N@_Dj$G$?$/$5$s$NJQ$J;v$r$G$-$k$h$&$K$J$j$^(B
-$B$7$?(B (@pxref{Windows Configuration})$B!#(B
+$B$7$?(B (@pxref{Window Layout})$B!#(B
 
 @item
 $B%-!<%\!<%I$r;H$&Be$o$j$K!"%\%?%s$r%/%j%C%/$G$-$k$h$&$K$J$j$^$7(B
@@ -19645,7 +19650,7 @@ Washing})$B!#(B
 
 @item
 $B%U%l!<%`$,(B @code{gnus-buffer-configuration} $B$NItJ,$K$J$k;v$,$G$-$^(B
-$B$9(B (@pxref{Windows Configuration})$B!#(B
+$B$9(B (@pxref{Window Layout})$B!#(B
 
 @item
 $B%G!<%b%s$N%W%m%;%9$G%a!<%k$r:FAv::$9$k$3$H$,$G$-$k$h$&$K$J$j$^$7(B
@@ -21042,9 +21047,10 @@ ACTION $B$O(B @code{set}, @code{add}, @code{del} $B$N$I$l$+$G!"$=$l$>$lA4$F$N
 $BB8:_$9$k0u$r>C5n$7$F!";XDj$5$l$?$h$&$K@_Dj!"0u$NDI2C(B ($B8@5Z$5$l$F$$$J$$0u(B
 $B$OJ]B8$7$^$9(B)$B!"0u$N>C5n(B ($B8@5Z$5$l$F$$$J$$0u$OJ]B8$7$^$9(B) $B$G$9!#(BMARK $B$O0u(B
 $B$N%j%9%H$G$9!#$=$l$>$l$N0u$O%7%s%\%k$G$9!#8=:_;H$o$l$F$$$k0u(B
-$B$O(B @code{read}, @code{tick}, @code{reply}, @code{expire}, @code{killed}, @code{dormant}, @code{save}, @code{download}, @code{unsend} $B$G(B
-$B$9$,!"$b$72DG=$J$i!"$"$J$?$N%P%C%/%(%s%I$O$3$l$i$K@)8B$r$9$k$Y$-$G$O$"$j(B
-$B$^$;$s!#(B
+$B$O(B @code{read}, @code{tick}, @code{reply}, @code{expire}, @code{killed},
+@code{dormant}, @code{save}, @code{download},  @code{unsend},
+@code{forward} $B$*$h$S(B @code{recent} $B$G$9$,!"$b$72DG=$J$i!"$"$J$?$N%P%C%/(B
+$B%(%s%I$O$3$l$i$K@)8B$r$9$k$Y$-$G$O$"$j$^$;$s!#(B
 
 $BL7=b$9$kF0:n$,;XDj$5$l$?$H$-!"%j%9%H$N:G8e$NF0:n$,8zNO$r;}$D$b$N$K$J$j$^(B
 $B$9!#$9$J$o$A!"F0:n$K5-;v(B 1 $B$K(B @code{$B2D;k(B} $B0u$rDI2C$9$kMW5a$,$"$j!"%j%9%H(B
