@@ -1,3 +1,43 @@
+1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+	(gnus-select-method): Use `condition-case' instead of
+	`ignore-errors'.
+
+	* lisp/pop3.el (pop3-apop): Move the autoload seting to the top
+	level.
+
+	* lisp/md5.el (md5): Allow the optional 4th and 5th arguments
+	`coding' and `noerror' for the stopgaps.
+
+	* lisp/lpath.el (md5): Allow the optional 4th and 5th arguments
+	`coding' and `noerror'.
+	(function-max-args): Maybe-fbind for FSF Emacsen.
+
+	* lisp/imap.el (imap-cram-md5-auth): Specify the 4th arg to `md5'
+	as `binary' if possible.
+	(imap-log): Default to nil (synched with pgnus 0.99).
+	(base64-decode-string): Autoload "mel" instead of "base64".
+	(md5): Autoload "md5" without `eval-and-compile'.
+
+	* lisp/gnus-util.el (copy-list): New function defined by
+	`defun-maybe'.
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Specify
+	the 3rd arg of `make-full-mail-header' to "nobody" instead of "".
+
+	* lisp/gnus-start.el (gnus-site-init-file): Use `condition-case'
+	instead of `ignore-errors'.
+
+	* lisp/gnus-picon.el: Require `cl'.
+
+	* lisp/{smiley.el,rfc2104.el,nnvirtual.el,mailheader.el,
+	gnus-offline.el} (cl): Enclose the requiring procedure with
+	`eval-when-compile'.
+
+	* lisp/{imap.el,gnus-mailcap.el} (cl): Enclose the requiring
+	procedure with `eval-when-compile' instead of `eval-and-compile'.
+
 1999-11-09  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
 
 	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
