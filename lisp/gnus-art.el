@@ -3402,9 +3402,17 @@ The directory to save in defaults to `gnus-article-save-directory'."
       (shell-command-on-region (point-min) (point-max) command nil)))
   (setq gnus-last-shell-command command))
 
+(defmacro gnus-read-string (prompt &optional initial-contents history 
+			    default-value)
+  "Like `read-string' but allow for older XEmacsen that don't have the 5th arg."
+  (if (and (featurep 'xemacs)
+	   (< emacs-minor-version 2))
+      `(read-string ,prompt ,initial-contents ,history)
+    `(read-string ,prompt ,initial-contents ,history ,default-value)))
+
 (defun gnus-summary-pipe-to-muttprint (&optional command)
   "Pipe this article to muttprint."
-  (setq command (read-string
+  (setq command (gnus-read-string
 		 "Print using command: " gnus-summary-muttprint-program
 		 nil gnus-summary-muttprint-program))
   (gnus-summary-save-in-pipe command))
@@ -6184,7 +6192,7 @@ It should match all directories in the top level of `gnus-ctan-url'."
   "What to do when the button on a string as \"foo123@bar.invalid\" is pushed.
 Strings like this can be either a message ID or a mail address.  If it is one
 of the symbols `mid' or `mail', Gnus will always assume that the string is a
-message ID or a mail address, respectivly.  If this variable is set to the
+message ID or a mail address, respectively.  If this variable is set to the
 symbol `ask', always query the user what do do.  If it is a function, this
 function will be called with the string as it's only argument.  The function
 must return `mid', `mail', `invalid' or `ask'."

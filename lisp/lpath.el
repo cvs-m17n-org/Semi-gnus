@@ -107,6 +107,12 @@
   (maybe-bind variables)
   (maybe-bind common-vars))
 
+(when (and (featurep 'xemacs)
+	   (not (featurep 'mule)))
+  (progn
+    (maybe-fbind '(coding-system-base find-charset-string))))
+
+
 (defun nnkiboze-score-file (a)
   )
 
