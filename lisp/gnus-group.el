@@ -2434,13 +2434,16 @@ and NEW-NAME will be prompted for."
     (local-set-key
      "\C-c\C-i"
      (gnus-create-info-command
-      (cond
-       ((eq part 'method)
-	"(gnus)Select Methods")
-       ((eq part 'params)
-	"(gnus)Group Parameters")
-       (t
-	"(gnus)Group Info"))))))
+      (format "(%s)%s"
+	      (or gnus-info-filename
+		  (get-language-info current-language-environment 'gnus-info)
+		  "gnus")
+	      (cond ((eq part 'method)
+		     "Select Methods")
+		    ((eq part 'params)
+		     "Group Parameters")
+		    (t
+		     "Group Info")))))))
 
 (defun gnus-group-edit-group-method (group)
   "Edit the select method of GROUP."
