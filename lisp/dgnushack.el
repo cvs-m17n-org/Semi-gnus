@@ -53,11 +53,9 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(push (or (getenv "lispdir")
-	  "/usr/share/emacs/site-lisp")
-      load-path)
 (push (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))
       load-path)
+(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -107,10 +105,6 @@
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
-;(push "/usr/share/emacs/site-lisp" load-path)
-
-;; Attempt to pickup the additional load-path(s).
-(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
 (condition-case err
     (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))

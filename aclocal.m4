@@ -1,122 +1,29 @@
-dnl aclocal.m4 generated automatically by aclocal 1.4
+AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
+ [dnl Defining gnus product name.
+  GNUS_PRODUCT_NAME=$1])
 
-dnl Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
-dnl This file is free software; the Free Software Foundation
-dnl gives unlimited permission to copy and/or distribute it,
-dnl with or without modifications, as long as this notice is preserved.
-
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-dnl even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-dnl PARTICULAR PURPOSE.
-
-dnl Copyright (C) 1999 NISHIDA Keisuke <knishida@ring.aist.go.jp>
-dnl
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2, or (at your option)
-dnl any later version.
-dnl
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-dnl GNU General Public License for more details.
-dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software
-dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-dnl 02111-1307, USA.
-
-AC_DEFUN(AM_PATH_LISPDIR,
- [dnl #
-  dnl # Check Emacs
-  dnl #
+AC_DEFUN(AC_CHECK_EMACS,
+ [dnl Check for Emacsen.
   AC_ARG_WITH(emacs,
-    [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, xemacs...]],
-    [case "${withval}" in
-       yes)	EMACS= ;;
-       no)	AC_MSG_ERROR([emacs is not available]) ;;
-       *)	EMACS=${withval} ;;
-     esac], EMACS=)
-  if test "x$EMACS" = "xt" -o "x$EMACS" = x; then
-    AC_PATH_PROGS(EMACS, emacs xemacs mule, no)
-    if test $EMACS = no; then
-      AC_MSG_ERROR(you should install Emacs first)
+   [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
+   [if test x$withval = xyes -o x$withval = xt -o x$withval = x; then
+      AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)
+    else
+      AC_CHECK_PROG(EMACS, $withval, $withval, emacs)
+    fi])
+  AC_ARG_WITH(xemacs,
+   [  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]],
+   [if test x$withval = xyes -o x$withval = x; then
+      AC_CHECK_PROG(XEMACS, xemacs, xemacs, xemacs)
+    else
+      AC_CHECK_PROG(XEMACS, $withval, $withval, xemacs)
     fi
-  fi
-  dnl #
-  dnl # Check Emacs directories
-  dnl #
-  AC_MSG_CHECKING([where emacs files are in])
-  EMACS_BASENAME="`echo x$EMACS | sed -e 's/x//' -e 's/^.*\///'`"
-  if test "x$emacsdir" = x; then
-    if test "x$prefix" = "xNONE"; then
-      prefix=$ac_default_prefix
-    fi
-    emacsdir="\$(datadir)/emacs"
-    case "$EMACS_BASENAME" in
-    emacs|emacs-*)
-      if test -d $prefix/lib/emacs; then
-	emacsdir="$prefix/lib/emacs"
-      fi
-      if test -d $prefix/share/emacs; then
-	emacsdir="$prefix/share/emacs"
-      fi
-      ;;
-    xemacs|xemacs-*)
-      if test -d $prefix/lib/xemacs; then
-	emacsdir="$prefix/lib/xemacs"
-      fi
-      if test -d $prefix/share/xemacs; then
-	emacsdir="$prefix/share/xemacs"
-      fi
-      ;;
-    mule|mule-*)
-      if test -d $prefix/lib/emacs; then
-	emacsdir="$prefix/lib/emacs"
-      fi
-      if test -d $prefix/share/emacs; then
-	emacsdir="$prefix/share/emacs"
-      fi
-      if test -d $prefix/lib/mule; then
-	emacsdir="$prefix/lib/mule"
-      fi
-      if test -d $prefix/share/mule; then
-	emacsdir="$prefix/share/mule"
-      fi
-      ;;
-    esac
-  fi
-  AC_MSG_RESULT($emacsdir)
-  AC_SUBST(emacsdir)
-  dnl #
-  dnl # Check Emacs site-lisp directories
-  dnl #
-  AC_ARG_WITH(lispdir,
-    [  --with-lispdir=DIR      emacs lisp files go to DIR [guessed]],
-    [case "${withval}" in
-       yes)	lispdir= ;;
-       no)	AC_MSG_ERROR(lispdir is not available) ;;
-       *)	lispdir=${withval} ;;
-     esac], lispdir=)
-  AC_MSG_CHECKING([where .elc files should go])
-  if test "x$lispdir" = x; then
-    lispdir="$emacsdir/site-lisp"
-    if test -d $emacsdir/lisp; then
-      lispdir="$emacsdir/lisp"
-    fi
-    case "$EMACS_BASENAME" in
-    xemacs|xemacs-*)
-      lispdir="$lispdir/lookup"
-      ;;
-    esac
-  fi
-  AC_MSG_RESULT($lispdir)
-  AC_SUBST(lispdir)])
-
-dnl AC_EMACS_LIST AC_XEMACS_P AC_PATH_LISPDIR and AC_EMACS_CHECK_LIB
-dnl are stolen from w3.
-dnl AC_PATH_LISPDIR obsoletes AM_PATH_LISPDIR.
+    EMACS=$XEMACS],
+   [XEMACS=xemacs
+    test x$EMACS = xt -o x$EMACS = x &&\
+      AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)])
+  AC_SUBST(EMACS)
+  AC_SUBST(XEMACS)])
 
 AC_DEFUN(AC_EMACS_LISP, [
 elisp="$2"
@@ -138,44 +45,53 @@ if test -z "$3"; then
 fi
 ])
 
-AC_DEFUN(AC_XEMACS_P, [
-  AC_MSG_CHECKING([if $EMACS is really XEmacs])
-  AC_EMACS_LISP(xemacsp,(if (string-match \"XEmacs\" emacs-version) \"yes\" \"no\") ,"noecho")
-  XEMACSP=${EMACS_cv_SYS_xemacsp}
-  EMACS_FLAVOR=emacs
-  if test "$XEMACSP" = "yes"; then
-     EMACS_FLAVOR=xemacs
-  fi
-  AC_MSG_RESULT($XEMACSP)
-  AC_SUBST(EMACS_FLAVOR)
-])
-ye
+AC_DEFUN(AC_CHECK_EMACS_FLAVOR,
+ [AC_MSG_CHECKING([what a flavor does $EMACS have])
+  AC_EMACS_LISP(flavor,
+    (cond ((featurep (quote xemacs)) \"XEmacs\")\
+          ((boundp (quote MULE)) \"MULE\")\
+          (t \"FSF Emacs\")),
+    "noecho")
+  case $EMACS_cv_SYS_flavor in
+  XEmacs)
+    EMACS_FLAVOR=xemacs;;
+  MULE)
+    EMACS_FLAVOR=mule;;
+  *)
+    EMACS_FLAVOR=emacs;;
+  esac
+  AC_MSG_RESULT($EMACS_cv_SYS_flavor)])
+
 AC_DEFUN(AC_PATH_LISPDIR, [
-  AC_XEMACS_P
+  AC_CHECK_EMACS_FLAVOR
   if test "$prefix" = "NONE"; then
 	AC_MSG_CHECKING([prefix for your Emacs])
 	AC_EMACS_LISP(prefix,(expand-file-name \"..\" invocation-directory),"noecho")
 	prefix=${EMACS_cv_SYS_prefix}
 	AC_MSG_RESULT($prefix)
   fi
-  AC_ARG_WITH(lispdir,[  --with-lispdir=DIR      Where to install lisp files], lispdir=${withval})
-  AC_MSG_CHECKING([where .elc files should go])
+  AC_ARG_WITH(lispdir,
+    [  --with-lispdir=DIR      Where to install lisp files
+                          (for XEmacs package, use --with-packagedir instead)],
+    lispdir=${withval})
+  AC_MSG_CHECKING([where lisp files should go])
   if test -z "$lispdir"; then
     dnl Set default value
     theprefix=$prefix
     if test "x$theprefix" = "xNONE"; then
 	theprefix=$ac_default_prefix
     fi
-    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp"
+    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
     for thedir in share lib; do
 	potential=
 	if test -d ${theprefix}/${thedir}/${EMACS_FLAVOR}/site-lisp; then
-	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp"
+	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
 	   break
 	fi
     done
   fi
-  AC_MSG_RESULT($lispdir)
+  AC_MSG_RESULT([$lispdir
+         (it will be ignored when \"make install-package[[-ja]]\" is done)])
   AC_SUBST(lispdir)
 ])
 
@@ -226,3 +142,27 @@ fi
    AC_MSG_RESULT("${W3}")
 ])
 
+AC_DEFUN(AC_PATH_PACKAGEDIR,
+ [dnl Check for PACKAGEDIR.
+  AC_ARG_WITH(packagedir,
+   [  --with-packagedir=DIR   package DIR for XEmacs],
+   [if test x$withval != xyes -a x$withval != x; then
+      AC_MSG_CHECKING([where the package should go])
+      PACKAGEDIR=$withval
+      AC_MSG_RESULT($PACKAGEDIR)
+    fi],
+    PACKAGEDIR=)
+  AC_SUBST(PACKAGEDIR)])
+
+AC_DEFUN(AC_ADD_LOAD_PATH,
+ [dnl Check for additional load path.
+  AC_ARG_WITH(addpath,
+   [  --with-addpath=PATH     search Emacs-Lisp libraries with PATH
+                          use colons to separate directory names],
+   [if test x$withval != xyes -a x$withval != x; then
+      AC_MSG_CHECKING([where to find the additional elisp libraries])
+      ADDITIONAL_LOAD_PATH=$withval
+      AC_MSG_RESULT($ADDITIONAL_LOAD_PATH)
+    fi],
+    ADDITIONAL_LOAD_PATH=)
+  AC_SUBST(ADDITIONAL_LOAD_PATH)])
