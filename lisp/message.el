@@ -1360,6 +1360,9 @@ The first matched address (not primary one) is used in the From field."
     (User-Agent))
   "Alist used for formatting headers.")
 
+(defvar	message-options nil
+  "Some saved answers when sending message.")
+
 (eval-and-compile
   (autoload 'message-setup-toolbar "messagexmas")
   (autoload 'mh-new-draft-name "mh-comp")
@@ -2051,7 +2054,8 @@ With the prefix argument FORCE, insert the header anyway."
 	     (mail-fetch-field "to")
 	     (not (string-match "\\` *\\'" (mail-fetch-field "to"))))
     (insert ", "))
-  (insert (or (message-fetch-reply-field "reply-to")
+  (insert (or (message-fetch-reply-field "mail-reply-to")
+	      (message-fetch-reply-field "reply-to")
 	      (message-fetch-reply-field "from") "")))
 
 (defun message-widen-reply ()
@@ -2666,7 +2670,9 @@ It should typically alter the sending method in some way or other."
 	  (message-mime-mode mime-edit-mode-flag)
 	  (alist message-send-method-alist)
 	  (success t)
-	  elem sent)
+	  elem sent
+	  (message-options message-options))
+      (message-options-set-recipient)
       (save-excursion
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
@@ -2691,7 +2697,7 @@ It should typically alter the sending method in some way or other."
 	    (save-excursion
 	      (run-hooks 'message-sent-hook))
 	    (message "Sending...done")
-	    ;; Mark the buffer as unmodified and delete autosave.
+	    ;; Mark the buffer as unmodified and delete auto-save.
 	    (set-buffer-modified-p nil)
 	    (delete-auto-save-file-if-necessary t)
 	    (message-disassociate-draft)
@@ -4454,18 +4460,17 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (Subject . ,(or subject ""))))))
 
 (defun message-get-reply-headers (wide &optional to-address)
-  (let (follow-to mct never-mct from to cc reply-to mft)
+  (let (follow-to mct never-mct from to cc reply-to mrt mft)
     ;; Find all relevant headers we need.
     (setq from (message-fetch-field "from")
 	  to (message-fetch-field "to")
 	  cc (message-fetch-field "cc")
 	  mct (when message-use-mail-copies-to
 		(message-fetch-field "mail-copies-to"))
-	  reply-to (when message-use-mail-reply-to
-		     (or (message-fetch-field "mail-reply-to")
-			 (message-fetch-field "reply-to")))
-	  mft (when (and (not to-address)
-			 (not reply-to)
+	  reply-to (message-fetch-field "reply-to")
+	  mrt (when message-use-mail-reply-to
+		(message-fetch-field "mail-reply-to"))
+	  mft (when (and (not (or to-address mrt reply-to))
 			 message-use-mail-followup-to)
 		(message-fetch-field "mail-followup-to")))
 
@@ -4492,7 +4497,7 @@ You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: always'
 sends a copy of your response to the author.")))
-	(setq mct (or reply-to from)))
+	(setq mct (or mrt reply-to from)))
        ((and (eq message-use-mail-copies-to 'ask)
 	     (not
 	      (message-y-or-n-p
@@ -4527,18 +4532,38 @@ that further discussion should take place only in "
     (if (or (not wide)
 	    to-address)
 	(progn
-	  (setq follow-to (list (cons 'To (or to-address reply-to mft from))))
+	  (setq follow-to (list (cons 'To
+				      (or to-address mrt reply-to mft from))))
 	  (when (and wide mct)
 	    (push (cons 'Cc mct) follow-to)))
       (let (ccalist)
 	(save-excursion
 	  (message-set-work-buffer)
-	  (unless never-mct
-	    (insert (or reply-to from "")))
-	  (insert (if mft (concat (if (bolp) "" ", ") mft "") ""))
-	  (insert (if to (concat (if (bolp) "" ", ") to "") ""))
-	  (insert (if mct (concat (if (bolp) "" ", ") mct) ""))
-	  (insert (if cc (concat (if (bolp) "" ", ") cc) ""))
+	  (if (and mft
+		   message-use-followup-to
+		   (or (not (eq message-use-followup-to 'ask))
+		       (message-y-or-n-p
+			(concat "Obey Mail-Followup-To: " mft "? ") t "\
+You should normally obey the Mail-Followup-To: header.
+
+	`Mail-Followup-To: " mft "'
+directs your response to " (if (string-match "," mft)
+			       "the specified addresses"
+			     "that address only") ".
+
+If a message is posted to several mailing lists, Mail-Followup-To is
+often used to direct the following discussion to one list only,
+because discussions that are spread over several lists tend to be
+fragmented and very difficult to follow.
+
+Also, some source/announcement lists are not indented for discussion;
+responses here are directed to other addresses.")))
+	      (insert mft)
+	    (unless never-mct
+	      (insert (or mrt reply-to from "")))
+	    (insert (if to (concat (if (bolp) "" ", ") to "") ""))
+	    (insert (if mct (concat (if (bolp) "" ", ") mct) ""))
+	    (insert (if cc (concat (if (bolp) "" ", ") cc) "")))
 	  (goto-char (point-min))
 	  (while (re-search-forward "[ \t]+" nil t)
 	    (replace-match " " t t))
@@ -4549,7 +4574,7 @@ that further discussion should take place only in "
 	  (goto-char (point-min))
 	  ;; Perhaps "Mail-Copies-To: never" removed the only address?
 	  (when (eobp)
-	    (insert (or reply-to from "")))
+	    (insert (or mrt reply-to from "")))
 	  (setq ccalist
 		(mapcar
 		 (lambda (addr)
@@ -4642,36 +4667,36 @@ that further discussion should take place only in "
   "Follow up to the message in the current buffer.
 If TO-NEWSGROUPS, use that as the new Newsgroups line."
   (interactive)
+  (require 'gnus-sum)			; for gnus-list-identifiers
   (let ((cur (current-buffer))
-	from subject date mct
+	from subject date reply-to mrt mct mft
 	references message-id follow-to
 	(inhibit-point-motion-hooks t)
 	(message-this-is-news t)
-	followup-to distribution newsgroups gnus-warning posted-to mft mrt)
+	followup-to distribution newsgroups gnus-warning posted-to)
     (save-restriction
       (message-narrow-to-head)
       (when (message-functionp message-followup-to-function)
 	(setq follow-to
 	      (funcall message-followup-to-function)))
       (setq from (message-fetch-field "from")
-	    date (message-fetch-field "date" t)
+	    date (message-fetch-field "date")
 	    subject (or (message-fetch-field "subject") "none")
 	    references (message-fetch-field "references")
 	    message-id (message-fetch-field "message-id" t)
-	    followup-to (when message-use-followup-to
-			  (message-fetch-field "followup-to"))
-	    distribution (message-fetch-field "distribution")
+	    followup-to (message-fetch-field "followup-to")
 	    newsgroups (message-fetch-field "newsgroups")
 	    posted-to (message-fetch-field "posted-to")
+	    reply-to (message-fetch-field "reply-to")
+	    mrt (when message-use-mail-reply-to
+		  (message-fetch-field "mail-reply-to"))
+	    distribution (message-fetch-field "distribution")
 	    mct (when message-use-mail-copies-to
 		  (message-fetch-field "mail-copies-to"))
 	    mft (when message-use-mail-followup-to
-		  (message-fetch-field "mail-followup-to"))
-	    mrt (when message-use-mail-reply-to
-		  (or (message-fetch-field "mail-reply-to")
-		      (message-fetch-field "reply-to")))
-	    gnus-warning (message-fetch-field "gnus-warning"))
-      (when (and gnus-warning (string-match "<[^>]+>" gnus-warning))
+		  (message-fetch-field "mail-followup-to")))
+      (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
+		 (string-match "<[^>]+>" gnus-warning))
 	(setq message-id (match-string 0 gnus-warning)))
       ;; Remove bogus distribution.
       (when (and (stringp distribution)
@@ -4705,7 +4730,7 @@ You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: always'
 sends a copy of your response to the author.")))
-	(setq mct (or mrt from)))
+	(setq mct (or mrt reply-to from)))
        ((and (eq message-use-mail-copies-to 'ask)
 	     (not
 	      (message-y-or-n-p
@@ -4726,7 +4751,7 @@ sends a copy of your response to " (if (string-match "," mct)
        (followup-to
 	(cond
 	 ((equal (downcase followup-to) "poster")
-	  (if (or (eq message-use-followup-to 'use)
+	  (if (or (and followup-to (eq message-use-followup-to 'use))
 		  (message-y-or-n-p "Obey Followup-To: poster? " t "\
 You should normally obey the Followup-To: header.
 
@@ -4737,11 +4762,11 @@ A typical situation where `Followup-To: poster' is used is when the author
 does not read the newsgroup, so he wouldn't see any replies sent to it."))
 	      (setq message-this-is-news nil
 		    distribution nil
-		    follow-to (list (cons 'To (or mrt from ""))))
+		    follow-to (list (cons 'To (or mrt reply-to from ""))))
 	    (setq follow-to (list (cons 'Newsgroups newsgroups)))))
 	 (t
 	  (if (or (equal followup-to newsgroups)
-		  (not (eq message-use-followup-to 'ask))
+		  (not (and followup-to (eq message-use-followup-to 'ask)))
 		  (message-y-or-n-p
 		   (concat "Obey Followup-To: " followup-to "? ") t "\
 You should normally obey the Followup-To: header.
@@ -4786,10 +4811,6 @@ that further discussion should take place only in "
 
     (message-pop-to-buffer (message-buffer-name "followup" from newsgroups))
 
-    (setq message-reply-headers
-	  (make-full-mail-header-from-decoded-header
-	   0 subject from date message-id references 0 0 ""))
-
     (message-setup
      `((Subject . ,subject)
        ,@follow-to
@@ -4798,7 +4819,11 @@ that further discussion should take place only in "
        ,@(if (or references message-id)
 	     `((References . ,(concat (or references "") (and references " ")
 				      (or message-id ""))))))
-     cur)))
+     cur)
+
+    (setq message-reply-headers
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))))
 
 ;;;###autoload
 (defun message-cancel-news (&optional arg)
@@ -5483,6 +5508,29 @@ regexp varstr."
     (unless (or (not email) (equal email user-mail-address))
       (goto-char (point-max))
       (insert "From: " email "\n"))))
+
+(defun message-options-get (symbol)
+  (cdr (assq symbol message-options)))
+
+(defun message-options-set (symbol value)
+  (let ((the-cons (assq symbol message-options)))
+    (if the-cons
+	(if value 
+	    (setcdr the-cons value)
+	  (setq message-options (delq the-cons message-options)))
+      (and value
+	   (push (cons symbol value) message-options))))
+  value)
+
+(defun message-options-set-recipient ()
+  (save-restriction
+    (message-narrow-to-headers-or-head)
+    (message-options-set 'message-sender
+			 (mail-strip-quoted-names 
+			  (message-fetch-field "from")))
+    (message-options-set 'message-recipients
+			  (mail-strip-quoted-names 
+			   (message-fetch-field "to")))))
 
 (defun message-save-drafts ()
   "Postponing the message."

@@ -27,6 +27,7 @@
 (require 'mm-bodies)
 (require 'mm-encode)
 (require 'mm-decode)
+(require 'mml-sec)
 (eval-when-compile (require 'cl))
 
 (eval-and-compile
@@ -77,9 +78,21 @@ one charsets.")
 The function is called with one parameter, which is the part to be 
 generated.")
 
-(defvar mml-generate-mime-postprocess-function nil
+(defvar mml-generate-mime-postprocess-function 'mml-postprocess
   "A function called after generating a mime part.
 The function is called with one parameter, which is the generated part.")
+
+(autoload 'mml2015-sign "mml2015")
+(autoload 'mml2015-encrypt "mml2015")
+(autoload 'mml-smime-encrypt "mml-smime")
+(autoload 'mml-smime-sign "mml-smime")
+
+(defvar mml-postprocess-alist
+  '(("pgp-sign" . mml2015-sign)
+    ("pgp-encrypt" . mml2015-encrypt)
+    ("smime-sign" . mml-smime-sign)
+    ("smime-encrypt" . mml-smime-encrypt))
+  "Alist of postprocess functions.")
 
 (defvar mml-generate-default-type "text/plain")
 
@@ -404,7 +417,13 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
      (t
       (error "Invalid element: %S" cont)))
     (if mml-generate-mime-postprocess-function
-	(funcall mml-generate-mime-postprocess-function cont))))
+	(funcall mml-generate-mime-postprocess-function cont))
+    (let ((item (assoc (cdr (assq 'sign cont)) mml-sign-alist)))
+      (when item
+	(funcall (nth 1 item) cont)))
+    (let ((item (assoc (cdr (assq 'encrypt cont)) mml-encrypt-alist)))
+      (when item
+	(funcall (nth 1 item) cont)))))
 
 (defun mml-compute-boundary (cont)
   "Return a unique boundary that does not exist in CONT."
@@ -628,8 +647,14 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 ;;;
 
 (defvar mml-mode-map
-  (let ((map (make-sparse-keymap))
+  (let ((sign (make-sparse-keymap))
+	(encrypt (make-sparse-keymap))
+	(map (make-sparse-keymap))
 	(main (make-sparse-keymap)))
+    (define-key sign "p" 'mml-secure-sign-pgpmime)
+    (define-key sign "s" 'mml-secure-sign-smime)
+    (define-key encrypt "p" 'mml-secure-encrypt-pgpmime)
+    (define-key encrypt "s" 'mml-secure-encrypt-smime)
     (define-key map "f" 'mml-attach-file)
     (define-key map "b" 'mml-attach-buffer)
     (define-key map "e" 'mml-attach-external)
@@ -638,6 +663,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     (define-key map "p" 'mml-insert-part)
     (define-key map "v" 'mml-validate)
     (define-key map "P" 'mml-preview)
+    (define-key map "s" sign)
+    (define-key map "c" encrypt)
     ;;(define-key map "n" 'mml-narrow-to-part)
     (define-key main "\M-m" map)
     main))
@@ -652,6 +679,13 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
    ("Insert"
     ["Multipart" mml-insert-multipart t]
     ["Part" mml-insert-part t])
+   ("Security"
+    ("Sign"
+     ["PGP/MIME" mml-secure-sign-pgpmime t]
+     ["S/MIME" mml-secure-sign-smime t])
+    ("Encrypt"
+     ["PGP/MIME" mml-secure-encrypt-pgpmime t]
+     ["S/MIME" mml-secure-encrypt-smime t]))
    ;;["Narrow" mml-narrow-to-part t]
    ["Quote" mml-quote-region t]
    ["Validate" mml-validate t]
@@ -815,12 +849,14 @@ TYPE is the MIME type to use."
 If RAW, don't highlight the article."
   (interactive "P")
   (let ((buf (current-buffer))
+	(message-options message-options)
 	(message-posting-charset (or (gnus-setup-posting-charset 
 				      (save-restriction
 					(message-narrow-to-headers-or-head)
 					(message-fetch-field "Newsgroups")))
 				     message-posting-charset)))
-    (switch-to-buffer (get-buffer-create 
+    (message-options-set-recipient)
+    (switch-to-buffer (generate-new-buffer
 		       (concat (if raw "*Raw MIME preview of "
 				 "*MIME preview of ") (buffer-name))))
     (erase-buffer)
@@ -848,6 +884,13 @@ If RAW, don't highlight the article."
   "Validate the current MML document."
   (interactive)
   (mml-parse))
+
+(defun mml-postprocess (cont)
+  (let ((pp (cdr (or (assq 'postprocess cont)
+		     (assq 'pp cont))))
+	item)
+    (if (and pp (setq item (assoc pp mml-postprocess-alist)))
+	(funcall (cdr item) cont))))
 
 (provide 'mml)
 

@@ -26,6 +26,7 @@
 
 (eval-when-compile (require 'static))
 
+(eval-when-compile (require 'cl))
 (require 'mail-prsvr)
 
 (defvar mm-mime-mule-charset-alist

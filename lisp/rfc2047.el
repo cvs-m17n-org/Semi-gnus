@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (eval-and-compile
   (eval
    '(unless (fboundp 'base64-decode-string)
@@ -143,6 +144,18 @@ Should be called narrowed to the head of the message."
 		       mail-parse-charset)
 		  (mm-encode-coding-region (point-min) (point-max) 
 					   mail-parse-charset)))
+	     ((null method)
+	      (and (delq 'ascii 
+			 (mm-find-charset-region (point-min) 
+						 (point-max)))
+		   (if (or (message-options-get
+			    'rfc2047-encode-message-header-encode-any) 
+			   (message-options-set
+			    'rfc2047-encode-message-header-encode-any
+			    (y-or-n-p 
+			     "Some texts are not encoded. Encode anyway?")))
+		       (rfc2047-encode-region (point-min) (point-max))
+		     (error "Cannot send unencoded text."))))
 	     ((mm-coding-system-p method)
 	      (if (featurep 'mule)
 		  (mm-encode-coding-region (point-min) (point-max) method)))

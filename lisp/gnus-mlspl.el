@@ -21,7 +21,6 @@
 ;; Boston, MA 02111-1307, USA.
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 (require 'gnus-sum)
 (require 'gnus-group)
