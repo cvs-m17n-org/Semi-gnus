@@ -12924,7 +12924,7 @@ REFERENCE $(B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<$G(B
 
 @item nnimap-stream
 @vindex nnimap-stream
-$(B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H!<%j%`$N7?$G$9!#=i4|@_Dj$G$O(B nnimap
+$(B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H%j!<%`$N7?$G$9!#=i4|@_Dj$G$O(B nnimap
 $(B$O(B SSL $(B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
 (SSL $(B$O(B STARTTLS $(B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F08!=P$G$-$^$9$,!"$^$@(B
 $(B9-HO0O$KG[Hw$5$l$F$$$^$;$s!#(B)
@@ -12951,8 +12951,9 @@ REFERENCE $(B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<$G(B
 
 SSL $(B@\B3$N$?$a$N(B OpenSSL $(B%W%m%0%i%`$O(B @file{http://www.openssl.org/} $(B$+(B
 $(B$iF~<j$G$-$^$9!#(BOpenSSL $(B$O0JA0$O(B SSLeay $(B$H$7$FCN$i$l$F$$$?$b$N$G!"(Bnnimap
-$(B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!":G?7HG$N(B 0.9.x $(B$K$O=EBg$J%P%0$,$"$k$?$a(B
-$(B;H$($^$;$s!#0JA0$NHG!"FC$K(B SSLeay 0.8.x $(B$O;H$($k$3$H$,$o$+$C$F$$$^$9!#(B
+$(B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $(B$N:G?7HG$G$"$k(B 0.9.x $(B$K$O=EBg$J%P(B
+$(B%0$,$"$k$?$a;H$($^$;$s!#0JA0$NHG!"FC$K(B SSLeay 0.8.x $(B$O;H$($k$3$H$,$o$+$C(B
+$(B$F$$$^$9!#(B
 
 @item nnimap-authenticator
 @vindex nnimap-authenticator
