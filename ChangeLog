@@ -1,3 +1,9 @@
+2002-09-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnheader.el (toplevel) [XEmacs]: Remove code to define
+	`emacs-mule' coding-system, because the generated coding system is
+	not compatible to the original coding system of FSF Emacs.
+
 2002-09-12  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnheader.el (toplevel) [XEmacs]: Define `emacs-mule' coding
