@@ -1,3 +1,34 @@
+1999-09-03  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-offline.el (gnus-offline-resource-en,
+	gnus-offline-resource-ja,
+	gnus-offline-resource-ja_complete): New variables.
+	(gnus-offline-get-message): News function.
+	(gnus-offline-error-check): Use it.
+	(gnus-offline-connect-server): Ditto.
+	(gnus-offline-get-new-news-function): Ditto.
+	(gnus-offline-set-mail-group-level): Ditto.
+	(gnus-offline-hangup-line): Ditto.
+	(gnus-offline-after-jobs-done): Ditto.
+	(gnus-offline-toggle-auto-hangup): Ditto.
+	(gnus-offline-toggle-on/off-send-mail): Ditto.
+	(gnus-offline-toggle-articles-to-fetch): Ditto.
+	(gnus-offline-empting-spool): Ditto.
+	(gnus-offline-set-interval-time): Ditto.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-lang,
+	gnus-ofsetup-resource-en, gnus-ofsetup-resource-ja): New
+	variables.
+	(gnus-ofsetup-get-message): New function.
+	(gnus-setup-for-offline): Use it.
+	(gnus-ofsetup-find-parameters): Ditto.
+	(gnus-ofsetup-prepapre-for-miee): Ditto.
+	(gnus-ofsetup-completing-read-symbol): Ditto.
+	(gnus-ofsetup-customize): Ditto.
+	(gnus-ofsetup-customize-done): Ditto.
+
 1999-09-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-isearch-article): Don't bind
