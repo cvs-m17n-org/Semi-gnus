@@ -1,3 +1,8 @@
+2001-09-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnir.el (nnir-run-namazu): Fix a side effect when handling
+	of process environments.
+
 2001-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnir.el (top): Added code to avoid byte-compile warning

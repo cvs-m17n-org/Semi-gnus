@@ -1217,8 +1217,8 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
                  ,nnir-namazu-index-directory ; index directory
                  ))
              (exitstatus
-	      (let ((process-environment process-environment))
-		;; Disable locale of Namazu.
+	      (let ((process-environment (copy-sequence process-environment)))
+		;; Disable locale.
 		(dolist (env process-environment)
 		  (when (string-match "\
 \\`\\(L\\(ANG\\|C_\\(ALL\\|CTYPE\\|COLLATE\\|TIME\\|NUMERIC\\|MONETARY\\|MESSAGES\\)\\)\\)=" env)
