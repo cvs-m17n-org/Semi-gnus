@@ -147,44 +147,41 @@
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
-  (autoload 'format-spec-make "format-spec"))
+  (autoload 'format-spec-make "format-spec")
+  (autoload 'mel-find-function "mel"))
 
-(static-if (and (fboundp 'base64-decode-string)
-		(subrp (symbol-function 'base64-decode-string)))
-    (eval-and-compile (fset 'imap-base64-decode-string 'base64-decode-string))
-  (require 'mel)
-  (defun imap-base64-decode-string (string)
-    (fset 'imap-base64-decode-string
-	  (symbol-function (mel-find-function 'mime-decode-string "base64")))
-    (imap-base64-decode-string string))
-  )
+(defun-maybe base64-decode-string (string)
+  "Base64-decode STRING and return the result."
+  (fset 'base64-decode-string
+	(symbol-function (mel-find-function 'mime-decode-string "base64")))
+  (base64-decode-string string))
 
-(static-if (and (fboundp 'base64-encode-string)
-		(subrp (symbol-function 'base64-encode-string)))
-    (eval-and-compile (fset 'imap-base64-encode-string 'base64-encode-string))
-  (static-if (progn
-	       (require 'mel)
-	       (condition-case nil
-		   (funcall (mel-find-function 'mime-encode-string "base64")
-			    "" 'no-line-break)
-		 (wrong-number-of-arguments nil)))
-      (defun imap-base64-encode-string (string &optional no-line-break)
-	(fset 'imap-base64-encode-string
-	      (symbol-function (mel-find-function
-				'mime-encode-string "base64")))
-	(imap-base64-encode-string string))
-    (eval-and-compile
-      (fset 'imap-base64-encode-string-1
-	    (symbol-function (mel-find-function
-			      'mime-encode-string "base64"))))
-    (defun imap-base64-encode-string (string &optional no-line-break)
-      (if no-line-break
-	  (mapconcat (function identity)
-		     (split-string (imap-base64-encode-string-1 string)
-				   "[\n\r]")
-		     "")
-	(imap-base64-encode-string-1 string)))
-    ))
+(eval-and-compile
+  (condition-case nil
+      (base64-encode-string "" 'no-line-break)
+    (error
+     (defun base64-encode-string (string &optional no-line-break)
+       "Base64-encode STRING and return the result.
+Optional second argument NO-LINE-BREAK means do not break long lines
+into shorter lines."
+       (fmakunbound 'base64-encode-string)
+       (condition-case nil
+	   (let ((fn (mel-find-function 'mime-encode-string "base64")))
+	     (funcall fn "" 'no-line-break)
+	     (fset 'base64-encode-string (symbol-function fn)))
+	 (wrong-number-of-arguments
+	  (defun base64-encode-string (string &optional no-line-break)
+	    "Base64-encode STRING and return the result.
+Optional second argument NO-LINE-BREAK means do not break long lines
+into shorter lines."
+	    (let ((fn (mel-find-function 'mime-encode-string "base64")))
+	      (if no-line-break
+		  (mapconcat 'identity
+			     (split-string (funcall fn string) "\n")
+			     "")
+		(funcall fn string))))))
+       (base64-encode-string string no-line-break))
+     )))
 
 (autoload 'md5 "md5")
 
@@ -617,7 +614,7 @@ successful, nil otherwise."
        (list
 	"AUTHENTICATE CRAM-MD5"
 	(lambda (challenge)
-	  (let* ((decoded (imap-base64-decode-string challenge))
+	  (let* ((decoded (base64-decode-string challenge))
 		 (hash-function (if (and (featurep 'xemacs)
 					 (>= (function-max-args 'md5) 4))
 				    (lambda (object &optional start end)
@@ -625,7 +622,7 @@ successful, nil otherwise."
 				  'md5))
 		 (hash (rfc2104-hash hash-function 64 16 passwd decoded))
 		 (response (concat user " " hash))
-		 (encoded (imap-base64-encode-string response)))
+		 (encoded (base64-encode-string response)))
 	    encoded))))))))
 
 (defun imap-digest-md5-p (buffer)
@@ -636,20 +633,20 @@ successful, nil otherwise."
   (imap-interactive-login
    buffer
    (lambda (user passwd)
-     (let ((tag 
+     (let ((tag
 	    (imap-send-command
 	     (list
 	      "AUTHENTICATE DIGEST-MD5"
 	      (lambda (challenge)
 		(digest-md5-parse-digest-challenge
-		 (imap-base64-decode-string challenge))
+		 (base64-decode-string challenge))
 		(let* ((digest-uri
-			(digest-md5-digest-uri 
+			(digest-md5-digest-uri
 			 "imap" (digest-md5-challenge 'realm)))
 		       (response
-			(digest-md5-digest-response 
+			(digest-md5-digest-response
 			 user passwd digest-uri)))
-		  (imap-base64-encode-string response 'no-line-break))))
+		  (base64-encode-string response 'no-line-break))))
 	     )))
        (if (not (eq (imap-wait-for-tag tag) 'INCOMPLETE))
 	   nil
