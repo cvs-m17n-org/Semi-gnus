@@ -1,3 +1,8 @@
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* texi/gnus-ja.texi (Web Newspaper): Add documents about
+	`nnshimbun-index-range'.
+
 2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Don't

@@ -12697,7 +12697,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 @code{nnshimbun} は @code{shimbun} ライブラリに依存していますので、先に
 インストールしておいてくださ
-い (@uref{http://namazu.org/~tsuchiya/emacs-w3m})。
+い (@uref{http://namazu.org/~tsuchiya/emacs-w3m/})。
 
 @code{nnshimbun} を始めるための一番簡単な方法はグループバッファで以下の
 ようなものをすることです:
@@ -12721,6 +12721,23 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 この変数が @code{nil} 以外の値にセットされていると @code{nnshimbun} は新
 着記事を検索と同時に記事のダウンロードも行います。これによって新着記事の
 検索は遅くなりますが、記事の閲覧時に待たされることは少なくなります。
+
+@item nnshimbun-index-range
+@vindex nnshimbun-index-range
+@code{nnshimbun} は、サーバー上に存在する目次ページを使って新着記事の有
+無を調べますが、サーバーによってはそのような目次ページが複数存在する場合
+があります。例えば、メーリングリストの記事を提供しているサーバーの場合は、
+その記事が投稿された日付によって分類された目次になっていることが一般的で
+す。特に遅い回線を利用している時に、このように複数・大量の目次を調べるこ
+とになると、大変時間がかかることになります。
+
+@code{nnshimbun} は前回の接続時に調べた目次については、なるべく調べずに
+済ませるようになっていますが、更に時間を節約したい場合は、この変数に 
+@code{last} という値をセットしてください。こうすると最新の目次のみを参照
+して新着記事の検査を行うようになります。セットすることの出来る具体的な値
+については @code{shimbun-headers} 関数の説明文を参照してください。
+
+初期値は @code{nil} になっています。
 @end table
 
 @noindent
