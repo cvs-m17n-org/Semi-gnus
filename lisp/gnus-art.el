@@ -566,8 +566,7 @@ displayed by the first non-nil matching CONTENT face."
   :group 'gnus-article-mime
   :type 'function)
 
-(defvar gnus-decode-header-function 'mime-decode-header-in-region
-					;'mail-decode-encoded-word-region
+(defvar gnus-decode-header-function 'mail-decode-encoded-word-region
   "Function used to decode headers.")
 
 (defvar gnus-article-dumbquotes-map
@@ -1455,7 +1454,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
 (defun article-decode-encoded-words ()
   "Remove encoded-word encoding from headers."
   (let ((inhibit-point-motion-hooks t)
-	(mail-parse-charset gnus-newsgroup-charset)
+	(default-mime-charset gnus-newsgroup-charset)
 	(mail-parse-ignored-charsets 
 	 (save-excursion (condition-case nil
 			     (set-buffer gnus-summary-buffer)
