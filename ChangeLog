@@ -1,5 +1,10 @@
 2001-05-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/message.el (message-maybe-encode): Don't use
+	`end-of-invisible'.
+
+2001-05-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.15.3 revision 00.
 
 2001-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
