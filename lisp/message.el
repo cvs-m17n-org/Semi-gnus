@@ -347,7 +347,8 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
 
 (defcustom message-required-news-headers
   '(From Newsgroups Subject Date Message-ID
-	 (optional . Organization) Lines
+	 (optional . Organization)
+	 (optional . References)
 	 (optional . User-Agent))
   "*Headers to be generated or prompted for when posting an article.
 RFC977 and RFC1036 require From, Date, Newsgroups, Subject,
@@ -360,7 +361,8 @@ header, remove it from this list."
 
 (defcustom message-required-mail-headers
   '(From Subject Date (optional . In-Reply-To) Message-ID
-	 (optional . User-Agent))
+	 (optional . User-Agent)
+	 (optional . References))
   "*Headers to be generated or prompted for when mailing a message.
 It is recommended that From, Date, To, Subject and Message-ID be
 included.  Organization and User-Agent are optional."
@@ -1715,15 +1717,22 @@ is used by default."
 	    (insert (car headers) ?\n)))))
     (setq headers (cdr headers))))
 
+(defmacro message-with-reply-buffer (&rest forms)
+  "Evaluate FORMS in the reply buffer, if it exists."
+  `(let ((buffer (message-eval-parameter message-reply-buffer)))
+     (when (and buffer
+		(buffer-name buffer))
+       (save-excursion
+	 (set-buffer buffer)
+	 ,@forms))))
+
+(put 'message-with-reply-buffer 'lisp-indent-function 0)
+(put 'message-with-reply-buffer 'edebug-form-spec '(body))
 
 (defun message-fetch-reply-field (header)
   "Fetch field HEADER from the message we're replying to."
-  (let ((buffer (message-eval-parameter message-reply-buffer)))
-    (when (and buffer
-	       (buffer-name buffer))
-      (save-excursion
-	(set-buffer buffer)
-	(message-fetch-field header)))))
+  (message-with-reply-buffer
+   (message-fetch-field header)))
 
 (defun message-set-work-buffer ()
   (if (get-buffer " *message work*")
@@ -2207,6 +2216,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-fc" 'message-goto-mail-copies-to)
 
   (define-key message-mode-map "\C-c\C-t" 'message-insert-to)
+  (define-key message-mode-map "\C-c\C-p" 'message-insert-wide-reply)
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
   (define-key message-mode-map "\C-c\C-l" 'message-to-list-only)
 
@@ -2678,13 +2688,29 @@ With the prefix argument FORCE, insert the header anyway."
 	       (or (equal (downcase co) "never")
 		   (equal (downcase co) "nobody")))
       (error "The user has requested not to have copies sent via mail")))
-  (when (and (message-position-on-field "To")
-	     (mail-fetch-field "to")
-	     (not (string-match "\\` *\\'" (mail-fetch-field "to"))))
-    (insert ", "))
-  (insert (or (message-fetch-reply-field "mail-reply-to")
-	      (message-fetch-reply-field "reply-to")
-	      (message-fetch-reply-field "from") "")))
+  (message-carefully-insert-headers
+   (list (cons 'To
+	       (or (message-fetch-reply-field "mail-reply-to")
+		   (message-fetch-reply-field "reply-to")
+		   (message-fetch-reply-field "from")
+		   "")))))
+
+(defun message-insert-wide-reply ()
+  "Insert To and Cc headers as if you were doing a wide reply."
+  (interactive)
+  (let ((headers (message-with-reply-buffer
+		   (message-get-reply-headers t))))
+    (message-carefully-insert-headers headers)))
+
+(defun message-carefully-insert-headers (headers)
+  (dolist (header headers)
+    (let ((header-name (symbol-name (car header))))
+      (when (and (message-position-on-field header-name)
+		 (mail-fetch-field header-name)
+		 (not (string-match "\\` *\\'"
+				    (mail-fetch-field header-name))))
+	(insert ", "))
+      (insert (cdr header)))))
 
 (defun message-widen-reply ()
   "Widen the reply to include maximum recipients."
@@ -4847,6 +4873,17 @@ If NOW, use that time instead."
       (message-goto-body)
       (int-to-string (count-lines (point) (point-max))))))
 
+(defun message-make-references ()
+  "Return the References header for this message."
+  (when message-reply-headers
+    (let ((message-id (mail-header-message-id message-reply-headers))
+	  (references (mail-header-references message-reply-headers))
+	  new-references)
+      (if (or references message-id)
+	  (concat (or references "") (and references " ")
+		  (or message-id ""))
+	nil))))
+
 (defun message-make-in-reply-to ()
   "Return the In-Reply-To header for this message."
   (when message-reply-headers
@@ -5089,6 +5126,7 @@ Headers already prepared in the buffer are not modified."
 	   (Subject nil)
 	   (Newsgroups nil)
 	   (In-Reply-To (message-make-in-reply-to))
+	   (References (message-make-references))
 	   (To nil)
 	   (Distribution (message-make-distribution))
 	   (Lines (message-make-lines))
@@ -5887,11 +5925,7 @@ responses here are directed to other addresses.")))
 
     (message-setup
      `((Subject . ,subject)
-       ,@follow-to
-       ,@(if (or references message-id)
-	     `((References . ,(concat (or references "") (and references " ")
-				      (or message-id ""))))
-	   nil))
+       ,@follow-to)
      cur)))
 
 ;;;###autoload
@@ -6044,19 +6078,16 @@ that further discussion should take place only in "
 
     (message-pop-to-buffer (message-buffer-name "followup" from newsgroups))
 
+    (setq message-reply-headers
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))
+
     (message-setup
      `((Subject . ,subject)
        ,@follow-to
        ,@(and mct (list (cons 'Cc mct)))
        ,@(and distribution (list (cons 'Distribution distribution)))
-       ,@(if (or references message-id)
-	     `((References . ,(concat (or references "") (and references " ")
-				      (or message-id ""))))))
-     cur)
-
-    (setq message-reply-headers
-	  (make-full-mail-header-from-decoded-header
-	   0 subject from date message-id references 0 0 ""))))
+     cur)))
 
 ;;;###autoload
 (defun message-cancel-news (&optional arg)

@@ -8772,7 +8772,7 @@ gnus でメールを読むことの有利な点は、単純なバグを素晴らしい不条理に置き
 @lisp
 (setq gnus-refer-article-method
       '(current
-        (nnweb "refer" (nnweb-type google))))
+        (nnweb "google" (nnweb-type google))))
 @end lisp
 
 ほとんどのメールバックエンドは @code{Message-ID} での取得が可能ですが、
