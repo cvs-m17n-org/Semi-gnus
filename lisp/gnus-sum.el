@@ -40,10 +40,10 @@
 
 (eval-when-compile
   (require 'mime-play)
-  ;; Avoid byte-compile warnings.
-  (defvar gnus-article-decoded-p)
-  (defvar gnus-decode-encoded-word-function)
-  )
+  (require 'static))
+
+;; Avoid byte-compile warnings.
+(defvar gnus-decode-encoded-word-function)
 
 (eval-and-compile
   (autoload 'gnus-cache-articles-in-group "gnus-cache"))
@@ -4147,15 +4147,16 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 		 ((and (or (<= scored marked) (= scored number))
 		       (natnump gnus-large-newsgroup)
 		       (> number gnus-large-newsgroup))
-		  (let* ((minibuffer-setup-hook (append
-						 minibuffer-setup-hook
-						 '(beginning-of-line)))
-			 (input (read-string
-				 (format
-				  "How many articles from %s (max %d): "
-				  (gnus-limit-string gnus-newsgroup-name 35)
-				  number)
-				 (number-to-string gnus-large-newsgroup))))
+		  (let ((input (read-from-minibuffer
+				(format
+				 "How many articles from %s (max %d): "
+				 (gnus-limit-string gnus-newsgroup-name 35)
+				 number)
+				(static-if (< emacs-major-version 20)
+				    (number-to-string gnus-large-newsgroup)
+				  (cons
+				   (number-to-string gnus-large-newsgroup)
+				   0)))))
 		    (if (string-match "^[ \t]*$" input)
 			number
 		      input)))
