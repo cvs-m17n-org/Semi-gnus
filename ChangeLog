@@ -1,7 +1,8 @@
 1998-10-29  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Turn off
-	`font-lock' after editing article.
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Force
+	`font-lock' to turn on at the beginning. Turn off `font-lock'
+	after editing article.
 
 1998-10-29  Katsumi Yamaoka   <yamaoka@jpl.org>
 
