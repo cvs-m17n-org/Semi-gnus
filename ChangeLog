@@ -1,5 +1,17 @@
 1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/message.el (message-send-mail-with-smtp): Don't generate
+ 	temporary buffer for message; don't generate and kill
+ 	`smtp-address-buffer' for `smtp-deduce-address-list'.
+
+	* lisp/smtpmail.el (smtpmail-send-it): Don't generate and kill
+ 	`smtp-address-buffer' for `smtp-deduce-address-list'.
+
+	* lisp/smtp.el (smtp-deduce-address-list): Bind and generate
+ 	`smtp-address-buffer' in itself.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to version 6.0.3.
 
 1998-01-11  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
