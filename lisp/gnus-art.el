@@ -1115,11 +1115,36 @@ See Info node `(gnus)Customizing Articles' and Info node
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-display-xface 'highlight t)
 
+(defcustom gnus-article-should-use-smiley-mule
+  (not (or (featurep 'xemacs)
+	   (gnus-image-type-available-p 'xpm)
+	   (gnus-image-type-available-p 'pbm)))
+  "If non-nil, gnus uses `smiley-mule' for displaying smileys rather than
+`smiley-ems'.  It defaults to t when Emacs 20 or earlier is running.
+`smiley-mule' is boundled in BITMAP-MULE package.  You can set it to t
+even if you are using Emacs 21+.  It has no effect on XEmacs."
+  :group 'gnus-article-various
+  :type 'boolean
+  :get (lambda (symbol)
+	 (and (default-value symbol)
+	      (not (featurep 'xemacs))
+	      (module-installed-p 'smiley-mule)
+	      t))
+  :set (lambda (symbol value)
+	 (set-default symbol (and value
+				  (not (featurep 'xemacs))
+				  (module-installed-p 'smiley-mule)
+				  t))))
+
+(defvar gnus-article-smiley-mule-loaded-p nil
+  "Internal variable used to say whether `smiley-mule' is loaded (whether
+smiley functions are not overridden by `smiley-ems').")
+
 (defcustom gnus-treat-display-smileys
   (if (or (and (featurep 'xemacs)
 	       (featurep 'xpm))
-	  (and (fboundp 'image-type-available-p)
-	       (image-type-available-p 'pbm))
+	  (gnus-image-type-available-p 'xpm)
+	  (gnus-image-type-available-p 'pbm)
 	  (and (not (featurep 'xemacs))
 	       window-system
 	       (module-installed-p 'smiley-mule)))
@@ -1843,6 +1868,16 @@ unfolded."
 (defun gnus-treat-smiley ()
   "Display textual emoticons (\"smileys\") as small graphical icons."
   (interactive)
+  (unless (featurep 'xemacs)
+    (when (and (>= emacs-major-version 21)
+	       (not gnus-article-should-use-smiley-mule)
+	       gnus-article-smiley-mule-loaded-p)
+      (load "smiley-ems" nil t)
+      (setq gnus-article-smiley-mule-loaded-p nil))
+    (when (and gnus-article-should-use-smiley-mule
+	       (not gnus-article-smiley-mule-loaded-p))
+      (load "smiley-mule" nil t)
+      (setq gnus-article-smiley-mule-loaded-p t)))
   (gnus-with-article-buffer
     (if (memq 'smiley gnus-article-wash-types)
 	(gnus-delete-images 'smiley)
@@ -6081,13 +6116,6 @@ specified by `gnus-button-alist'."
 (defun gnus-button-embedded-url (address)
   "Activate ADDRESS with `browse-url'."
   (browse-url (gnus-strip-whitespace address)))
-
-(eval-when-compile
-  ;; Silence the byte-compiler.
-  (autoload 'smiley-toggle-buffer "gnus-bitmap"))
-(defun gnus-article-smiley-display ()
-  "Display \"smileys\" as small graphical icons."
-  (smiley-toggle-buffer 1 (current-buffer) (point-min) (point-max)))
 
 ;;; Next/prev buttons in the article buffer.
 

@@ -48,9 +48,13 @@
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
 
-(if (featurep 'xemacs)
-    (autoload 'smiley-region "smiley")
-  (autoload 'smiley-region "smiley-ems")) ; override XEmacs version
+(cond ((featurep 'xemacs)
+       (autoload 'smiley-region "smiley"))
+      ;; override XEmacs version
+      ((>= emacs-major-version 21)
+       (autoload 'smiley-region "smiley-ems"))
+      (t
+       (autoload 'smiley-region "smiley-mule")))
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."

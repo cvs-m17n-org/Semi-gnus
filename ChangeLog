@@ -1,3 +1,17 @@
+2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Don't autoload "gnus-bitmap".
+
+	* lisp/gnus-ems.el: Autoload "smiley-mule" if running Emacs
+	version is less than 21.
+
+	* lisp/gnus-art.el (gnus-article-smiley-display): Remove.
+	(gnus-treat-smiley): Reload "smiley-ems" or "smiley-mule" if
+	needed.
+	(gnus-treat-display-smileys): Use `gnus-image-type-available-p'.
+	(gnus-article-smiley-mule-loaded-p): New internal variable.
+	(gnus-article-should-use-smiley-mule): New user option.
+
 2002-01-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nneething.el (nneething-mime-extensions): New variable.
