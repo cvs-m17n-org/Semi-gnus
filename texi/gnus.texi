@@ -1,7 +1,7 @@
 @c \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.072 Manual
+@settitle T-gnus 6.12 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -319,7 +319,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.072 Manual
+@title T-gnus 6.12 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -355,14 +355,14 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
-supports your right to read strange messages including big images or
-other various kinds of formats.  Semi-gnus also supports
+T-gnus provides MIME features based on SEMI API.  So T-gnus supports
+your right to read strange messages including big images or other
+various kinds of formats.  T-gnus also supports
 internationalization/localization and multiscript features based on MULE
-API.  So Semi-gnus does not discriminate various language communities.
-Oh, if you are a Klingon, please wait Unicode Next Generation.
+API.  So T-gnus does not discriminate various language communities.  Oh,
+if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.072.
+This manual corresponds to T-gnus 6.12.
 
 @end ifinfo
 
@@ -1012,7 +1012,7 @@ performance, but if the server does not support the aforementioned
 @code{LIST ACTIVE group} command, this isn't very nice to the server.
 
 If you think that starting up Gnus takes too long, try all the three
-different values for this variable and see what works best for you. 
+different values for this variable and see what works best for you.
 
 In any case, if you use @code{some} or @code{nil}, you should definitely
 kill all groups that you aren't interested in to speed things up.
@@ -2731,7 +2731,7 @@ convention (@pxref{Process/Prefix}).
 @item T j
 @kindex T j (Topic)
 @findex gnus-topic-jump-to-topic
-Go to a topic (@code{gnus-topic-jump-to-topic}).  
+Go to a topic (@code{gnus-topic-jump-to-topic}).
 
 @item T c
 @kindex T c (Topic)
@@ -7067,7 +7067,7 @@ signature after all.
 @kindex A t (Summary)
 @findex gnus-article-babel
 Translate the article from one language to another
-(@code{gnus-article-babel}). 
+(@code{gnus-article-babel}).
 
 @end table
 
@@ -9905,7 +9905,7 @@ Reading mail with a newsreader---isn't that just plain WeIrD? But of
 course.
 
 @menu
-* Mail in a Newsreader::         Important introductory notes.  
+* Mail in a Newsreader::         Important introductory notes.
 * Getting Started Reading Mail:: A simple cookbook example.
 * Splitting Mail::               How to create mail groups.
 * Mail Sources::                 How to tell Gnus where to get mail from.
@@ -9923,11 +9923,11 @@ course.
 @node Mail in a Newsreader
 @subsection Mail in a Newsreader
 
-If you are used to traditional mail readers, but have decided to switch 
+If you are used to traditional mail readers, but have decided to switch
 to reading mail with Gnus, you may find yourself experiencing something
 of a culture shock.
 
-Gnus does not behave like traditional mail readers.  If you want to make 
+Gnus does not behave like traditional mail readers.  If you want to make
 it behave that way, you can, but it's an uphill battle.
 
 Gnus, by default, handles all its groups using the same approach.  This
@@ -9941,7 +9941,7 @@ Does this mean that all the messages that have been marked as read are
 deleted?  How awful!
 
 But, no, it means that old messages are @dfn{expired} according to some
-scheme or other.  For news messages, the expire process is controlled by 
+scheme or other.  For news messages, the expire process is controlled by
 the news administrator; for mail, the expire process is controlled by
 you.  The expire process for mail is covered in depth in @pxref{Expiring
 Mail}.
@@ -10494,7 +10494,7 @@ Let's look at an example value of this variable first:
       (any "procmail@@informatik\\.rwth-aachen\\.de" "procmail.list")
       (any "SmartList@@informatik\\.rwth-aachen\\.de" "SmartList.list")
       ;; Both lists below have the same suffix, so prevent
-      ;; cross-posting to mkpkg.list of messages posted only to 
+      ;; cross-posting to mkpkg.list of messages posted only to
       ;; the bugs- list, but allow cross-posting when the
       ;; message was really cross-posted.
       (any "bugs-mypackage@@somewhere" "mypkg.bugs")
@@ -11303,8 +11303,8 @@ itself puts *all* one's mail in one file; @code{nnfolder} provides a
 little bit of optimization to this so that each of one's mail groups has
 a Unix mail box file.  It's faster than @code{nnmbox} because each group
 can be parsed separately, and still provides the simple Unix mail box
-format requiring minimal effort in moving the mail around.  In addition, 
-it maintains an ``active'' file making it much faster for Gnus to figure 
+format requiring minimal effort in moving the mail around.  In addition,
+it maintains an ``active'' file making it much faster for Gnus to figure
 out how many messages there are in each separate group.
 
 If you have groups that are expected to have a massive amount of
@@ -19098,7 +19098,7 @@ Allow "orphan" scores in the Agent scoring.
 
 @item
 @example
-    - Edit article's summary line. 
+    - Edit article's summary line.
     - End edit
     - Sort lines in buffer by subject
 
@@ -19518,9 +19518,10 @@ Gnus will work.
 
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
-like @samp{Gnus v5.46; nntp 4.0} you have the right files loaded.  If,
-on the other hand, you get something like @samp{NNTP 3.x} or @samp{nntp
-flee}, you have some old @file{.el} files lying around.  Delete these.
+like @samp{T-gnus 6.12.* (based on Pterodactyl Gnus v0.*; for SEMI
+1.1*, FLIM 1.1*)} you have the right files loaded.  If, on the other
+hand, you get something like @samp{NNTP 3.x} or @samp{nntp flee}, you
+have some old @file{.el} files lying around.  Delete these.
 
 @item
 Read the help group (@kbd{G h} in the group buffer) for a FAQ and a

@@ -33,6 +33,9 @@
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard"))
 
+;; Avoid byte compile warning.
+(defvar gnus-article-mime-handles)
+
 ;;;
 ;;; Functions for displaying various formats inline
 ;;;

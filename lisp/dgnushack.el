@@ -34,6 +34,12 @@
 (push "." load-path)
 (load "./lpath.el" nil t)
 
+(autoload 'font-lock-set-defaults "font-lock")
+(unless (featurep 'xemacs)
+  (defalias 'Custom-make-dependencies 'ignore)
+  (defalias 'toolbar-gnus 'ignore)
+  (defalias 'update-autoloads-from-directory 'ignore))
+
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
 (defalias 'nndb-request-article 'ignore)

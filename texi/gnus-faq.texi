@@ -221,7 +221,7 @@ a two-step process unlike most other packages, so you should
 be prepared to move the byte-compiled code somewhere.  There
 are currently two versions of this package available.  It can
 be obtained from@*
-@file{ftp://ftp.jaist.ac.jp/pub/GNU/elisp/}.
+@file{ftp://ftp.etl.go.jp/pub/mule/}.
 Be sure to apply the supplied patch.  It works with Gnus through
 version 5.0.9.  In order for all dependencies to work correctly
 the load sequence is as follows:

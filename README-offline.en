@@ -1,7 +1,7 @@
 1) What's "gnus-offline (Gnus Offline Backend Utility)" ?
 =========================================================
 
-This program is a utility for Semi-gnus that handles messages
+This program is a utility for T-gnus that handles messages
 (i.e. mail and news) in the "offline" state in a more simple way.
 
 It is basically designed for "gnus-agent". (See info about gnus-agent.)
@@ -23,7 +23,7 @@ but "gnus-offline" provides a simple way for setup and operation.
 o Simple configuration -- An "INTERACTIVE" configuration to set
          the variables.
 
-o Simple operation -- Type "g" in the *Group* buffer, and gnus-offline 
+o Simple operation -- Type "g" in the *Group* buffer, and gnus-offline
          will:
            o Dial (*)
            o Send mails & post news articles
@@ -49,20 +49,20 @@ gnus-offline.el bundled in T-gnus 6.10.056 or later, and Semi-gnus
 2) Installation
 ===============
 
-As you are reading this document, this version of Semi-gnus includes
+As you are reading this document, this version of T-gnus includes
 gnus-offline. Installation is simple. "make install" will
 automatically install "gnus-offline".
 
 If the Semi-gnus comes without gnus-offline, or you want to install
 the latest version of gnus-offline, you may manually byte-compile
 "gnus-offline.el" and "gnus-ofsetup.el". Make sure they are in one of
-the `load-path' directories. 
+the `load-path' directories.
 
 3) How to use
 =============
 
-o First, you must do a general setup for Semi-gnus (See info about the 
- setup).
+o First, you must do a general setup for T-gnus (See info about the
+  setup).
 
 o Add the following code to ~/.emacs
 
@@ -96,40 +96,40 @@ That's all. Restart Gnus and try typing "g" in the *Group* buffer.
 ***Note***
 
 Most versions of Semi-gnus have pop3-fma.el to operate multiple POP
-accounts. T-gnus 6.10.56 or later does not because it can handle
+accounts. T-gnus 6.10.056 or later does not because it can handle
 multiple POP accounts itself.
 
 <<<<<ATTENTION!!>>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
-updating to T-gnus 6.10.56 or later, remove the setting for
+T-gnus 6.10.056 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.056 or later, remove the setting for
 pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
 [Semi-gnus with pop3-fma.el]
-o pop3-fma-spool-file-alist 
+o pop3-fma-spool-file-alist
 　　　　'(
-	("po:account1@pop-server1" pass) 
-	("po:account2@pop-server2" pass) 
+	("po:account1@pop-server1" pass)
+	("po:account2@pop-server2" pass)
 	:
 	:
 	))
-o pop3-fma-movemail-type 
-      use movemail.exe ('exe) or pop3.el('lisp) 
+o pop3-fma-movemail-type
+      use movemail.exe ('exe) or pop3.el('lisp)
 
-[T-gnus 6.10.56 or later]
+[T-gnus 6.10.056 or later]
 
-o gnus-offline-mail-source 
+o gnus-offline-mail-source
 	'(
 	(pop :user "manbou" :server "pop.ceres.dti.ne.jp")
 	(pop :user "imp9397" :server "mvb.biglobe.ne.jp")
         :
         :
-	) 
+	)
 
 
 4) User customizable variables in gnus-offline
 ==============================================
 
-o gnus-offline-dialup-program  
+o gnus-offline-dialup-program
     Program name to dialup.
 
 o gnus-offline-dialup-program-arguments
@@ -182,7 +182,7 @@ o gnus-offline-MTA-type
 
 o gnus-offline-drafts-queue-type
    Message queue type when spooling message.
-   
+
    'miee  ... Use miee.el.
    'agent ... Use gnus-agent.el.
 
@@ -198,10 +198,10 @@ o gnus-offline-dialup-function
 o gnus-offline-hangup-function
    Function to hangup.
 
-o gnus-offline-pop-password-file 
+o gnus-offline-pop-password-file
    File name to save username , mailserver and password.
 
-o gnus-offline-pop-password-decoding-function 
+o gnus-offline-pop-password-decoding-function
    Function to decode password.
 
 5) Commands in gnus-offline
@@ -232,8 +232,8 @@ o M-x gnus-offline-agent-expire
 ===========================================
 
 <<<<<ATTENTION!!>>>>>
-T-gnus 6.10.56 or later doesn't contain "pop3-fma.el". If you are
-updating to T-gnus 6.10.56 or later, remove the setting for
+T-gnus 6.10.056 or later doesn't contain "pop3-fma.el". If you are
+updating to T-gnus 6.10.056 or later, remove the setting for
 pop3-fma.el (or simply, delete the old ~/.gnus-offline.el).
 
 Under Semi-gnus with pop3-fma.el, you must enter the password for the
@@ -254,16 +254,18 @@ password will be saved in ~/.newsrc.eld. (*)
 
            [Semi-gnus with pop3-fma.el]
 
-            (add-hook 'gnus-setup-news-hook 
-             (lambda ()
-              (setq pop3-fma-save-password-information t)
-              (add-to-list 'gnus-variable-list 'pop3-fma-password)))
+	    (add-hook
+	     'gnus-setup-news-hook
+	     (lambda ()
+	       (setq pop3-fma-save-password-information t)
+	       (add-to-list 'gnus-variable-list 'pop3-fma-password)))
 
-           [T-gnus 6.10.56 or later]
+           [T-gnus 6.10.056 or later]
 
-            (add-hook 'gnus-setup-news-hook 
-             (lambda ()
-              (add-to-list 'gnus-variable-list 'mail-source-password-cache)))
+	    (add-hook
+	     'gnus-setup-news-hook
+	     (lambda ()
+	       (add-to-list 'gnus-variable-list 'mail-source-password-cache)))
 
 Answer this question carefully, because the password will NOT be
 encoded!
@@ -281,5 +283,5 @@ For Semi-gnus with pop3-fma.el, add the following code in
 In this way, once you enter the password at the startup of Gnus, it
 will be kept as a variable `pop3-fma-password' until you quit Gnus.
 
-Under T-gnus 6.10.56 or later, the password will be kept as a variable
+Under T-gnus 6.10.056 or later, the password will be kept as a variable
 `mail-source-password-cache' by default.
