@@ -223,7 +223,8 @@ This variable is used as the alternative of `mailcap-mime-extensions'.")
 	 (file-exists-p file)		; The file exists.
 	 (not (file-directory-p file))	; It's not a dir.
 	 (save-excursion
-	   (nnmail-find-file file)	; Insert the file in the nntp buf.
+	   (let ((nnmail-file-coding-system 'binary))
+	     (nnmail-find-file file))	; Insert the file in the nntp buf.
 	   (unless (nnheader-article-p)	; Either it's a real article...
 	     (let ((type
 		    (unless (file-directory-p file)
