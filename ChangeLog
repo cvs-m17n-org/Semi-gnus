@@ -1,3 +1,19 @@
+1999-02-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in (add-info-suffix, remove-info-suffix): New targets.
+	(package, install-package, package-ja, install-package-ja): Use
+	them.
+	(xinfo, xinfo-ja): Only build infos.
+
+	* texi/Makefile.in (add-info-suffix): Chdir ../lisp first.
+
+	* lisp/dgnushack.el (dgnushack-add-info-suffix-maybe): Chdir
+	../texi first.
+	(dgnushack-install-package): Don't refer to `package-path'; error
+	if the package path does not found.
+	(TopLevel): Don't define `gnus-revision-number',
+	`gnus-version-number' and `package-path'.
+
 1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* Makefile.in (xinfo, xinfo-ja): Make add-info-suffix, formatting,
