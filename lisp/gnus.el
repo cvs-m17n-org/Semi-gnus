@@ -253,11 +253,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.4"
+(defconst gnus-version-number "6.10.5"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.44; for SEMI 1.11, FLIM 1.12)"
+  (format "%s %s (based on Gnus 5.6.45; for SEMI 1.11, FLIM 1.12)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -1602,7 +1602,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       timezone-make-sortable-date timezone-make-time-string)
      ("rmailout" rmail-output)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message)
+      rmail-show-message rmail-summary-exists
+      rmail-select-summary rmail-update-summary)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t
