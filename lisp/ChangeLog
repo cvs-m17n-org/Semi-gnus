@@ -1,3 +1,27 @@
+2000-04-24 18:14:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-draft.el (gnus-draft-setup): Restore mml only when
+	required.
+	(gnus-draft-edit-message): Require restoration.
+
+2000-04-24 16:51:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-score.el (gnus-score-headers): Copy gnus-newsgrou-scored
+	back.
+
+2000-04-24 16:01:15  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-treat-article): Make sure that the summary
+	buffer is live.
+
+2000-04-24 15:42:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mailcap.el (mailcap-parse-mailcaps): Reorder.
+	(mailcap-parse-mailcap): Backwards parsing.
+	(mailcap-possible-viewers): Remove nreverse.
+	(mailcap-mime-info): Ditto.
+	(mailcap-add-mailcap-entry): Keep alternative viewer.
+
 Mon Apr 24 21:12:06 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
 
 	* gnus.el: Gnus v5.8.5 is released.

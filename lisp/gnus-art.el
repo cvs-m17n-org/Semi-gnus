@@ -5123,8 +5123,11 @@ For example:
     (gnus-run-hooks 'gnus-part-display-hook)
     (unless gnus-inhibit-treatment
       (while (setq elem (pop alist))
-	(with-current-buffer gnus-summary-buffer
-	  (setq val (symbol-value (car elem))))
+	(setq val
+	      (save-excursion
+		(if (gnus-buffer-live-p gnus-summary-buffer)
+		    (set-buffer gnus-summary-buffer))
+		(symbol-value (car elem))))
 	(when (and (or (consp val)
 		       treated-type)
 		   (gnus-treat-predicate val)
