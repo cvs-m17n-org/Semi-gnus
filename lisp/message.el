@@ -2310,12 +2310,16 @@ This sub function is for exclusive use of `message-send-mail'."
 		     (delete-region (match-end 0) (std11-field-end))
 		     (insert " " (message-make-message-id))))
 		 (condition-case err
-		     (funcall message-send-mail-function)
+		     (progn
+		       (funcall message-send-mail-function)
+		       nil)
 		   (error
 		    (throw 'message-sending-mail-failure err))))))
 	     nil)
 	   (condition-case err
-	       (funcall message-send-mail-function)
+	       (progn
+		 (funcall message-send-mail-function)
+		 nil)
 	     (error err))))
     (when failure
       (if (eq 'error (car failure))
