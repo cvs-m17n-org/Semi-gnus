@@ -1525,7 +1525,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
    ["Spellcheck" ispell-message t]
-   ["Attach file as MIME" message-mime-attach-file t]
+   ["Attach file as MIME" mml-attach-file t]
    "----"
    ["Send Message" message-send-and-exit t]
    ["Abort Message" message-dont-send t]
@@ -1579,7 +1579,7 @@ C-c C-e  message-elide-region (elide the text between point and mark).
 C-c C-v  message-delete-not-region (remove the text outside the region).
 C-c C-z  message-kill-to-signature (kill the text up to the signature).
 C-c C-r  message-caesar-buffer-body (rot13 the message body).
-C-c C-a  message-mime-attach-file (attach a file as MIME)."
+C-c C-a  mml-attach-file (attach a file as MIME)."
   (interactive)
   (kill-all-local-variables)
   (set (make-local-variable 'message-reply-buffer) nil)
@@ -4851,127 +4851,51 @@ regexp varstr."
 ;;;
 ;;; MIME functions
 ;;;
-
-(defun message-mime-query-file (prompt)
-  (let ((file (read-file-name prompt nil nil t)))
-    ;; Prevent some common errors.  This is inspired by similar code in
-    ;; VM.
-    (when (file-directory-p file)
-      (error "%s is a directory, cannot attach" file))
-    (unless (file-exists-p file)
-      (error "No such file: %s" file))
-    (unless (file-readable-p file)
-      (error "Permission denied: %s" file))
-    file))
-
-(defun message-mime-query-type (file)
-  (let* ((default (or (mm-default-file-encoding file)
-		      ;; Perhaps here we should check what the file
-		      ;; looks like, and offer text/plain if it looks
-		      ;; like text/plain.
-		      "application/octet-stream"))
-	 (string (completing-read
-		  (format "Content type (default %s): " default)
-		  (delete-duplicates
-		   (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
-		   :test 'equal))))
-    (if (not (equal string ""))
-	string
-      default)))
-
-(defun message-mime-query-description ()
-  (let ((description (read-string "One line description: ")))
-    (when (string-match "\\`[ \t]*\\'" description)
-      (setq description nil))
-    description))
-
-(defun message-mime-attach-file (file &optional type description)
-  "Attach a file to the outgoing MIME message.
-The file is not inserted or encoded until you send the message with
-`\\[message-send-and-exit]' or `\\[message-send]'.
-
-FILE is the name of the file to attach.  TYPE is its content-type, a
-string of the form \"type/subtype\".  DESCRIPTION is a one-line
-description of the attachment."
-  (interactive
-   (let* ((file (message-mime-query-file "Attach file: "))
-	  (type (message-mime-query-type file))
-	  (description (message-mime-query-description)))
-     (list file type description)))
-  (insert (format
-	   "<#part type=%s name=%s filename=%s%s disposition=attachment><#/part>\n"
-	   type (prin1-to-string (file-name-nondirectory file))
-	   (prin1-to-string file)
-	   (if description
-	       (format " description=%s" (prin1-to-string description))
-	     ""))))
-
-(defun message-mime-attach-external (file &optional type description)
-  "Attach an external file into the buffer.
-FILE is an ange-ftp/efs specification of the part location.
-TYPE is the MIME type to use."
-  (interactive
-   (let* ((file (message-mime-query-file "Attach external file: "))
-	  (type (message-mime-query-type file))
-	  (description (message-mime-query-description)))
-     (list file type description)))
-  (insert (format
-	   "<#external type=%s name=%s disposition=attachment><#/external>\n"
-	   type (prin1-to-string file))))
+(defvar messgage-inhibit-body-encoding nil)
 
 (defun message-encode-message-body ()
-  (let ((mail-parse-charset (or mail-parse-charset
- 				message-default-charset
- 				message-posting-charset))
-	(case-fold-search t)
-	lines multipart-p content-type-p)
-    (message-goto-body)
-    (save-restriction
-      (narrow-to-region (point) (point-max))
-      (let ((new (mml-generate-mime)))
-	(when new
-	  (delete-region (point-min) (point-max))
-	  (insert new)
-	  (goto-char (point-min))
-	  (if (eq (aref new 0) ?\n)
-	      (delete-char 1)
-	    (search-forward "\n\n")
-	    (setq lines (buffer-substring (point-min) (1- (point))))
-	    (delete-region (point-min)  (point))))))
-    (save-restriction
-      (message-narrow-to-headers-or-head)
-      (message-remove-header "Mime-Version")
-      (goto-char (point-max))
-      (insert "Mime-Version: 1.0\n")
-      (when lines
-	(insert lines))
-      (setq multipart-p
- 	    (re-search-backward "^Content-Type: multipart/" nil t))
-      (goto-char (point-max))
-      (setq content-type-p
-	    (re-search-backward "^Content-Type:" nil t)))
-    (save-restriction
-      (message-narrow-to-headers-or-head)
-      (message-remove-first-header "Content-Type")
-      (message-remove-first-header "Content-Transfer-Encoding"))
-    (when multipart-p
-      (save-restriction
-	(message-narrow-to-headers-or-head)
-	(message-remove-first-header "Content-Type")
-	(message-remove-first-header "Content-Transfer-Encoding"))
+  (unless messgage-inhibit-body-encoding 
+    (let ((mail-parse-charset (or mail-parse-charset
+ 				  message-default-charset
+ 				  message-posting-charset))
+ 	  (case-fold-search t)
+ 	  lines content-type-p)
       (message-goto-body)
-      (insert "This is a MIME multipart message.  If you are reading\n")
-      (insert "this, you shouldn't.\n"))
-    ;; We always make sure that the message has a Content-Type header.
-    ;; This is because some broken MTAs and MUAs get awfully confused
-    ;; when confronted with a message with a MIME-Version header and
-    ;; without a Content-Type header.  For instance, Solaris'
-    ;; /usr/bin/mail.
-    (unless content-type-p
-      (goto-char (point-min))
-      (re-search-forward "^MIME-Version:")
-      (forward-line 1)
-      (insert "Content-Type: text/plain; charset=us-ascii\n"))))
+      (save-restriction
+ 	(narrow-to-region (point) (point-max))
+ 	(let ((new (mml-generate-mime)))
+ 	  (when new
+ 	    (delete-region (point-min) (point-max))
+ 	    (insert new)
+ 	    (goto-char (point-min))
+ 	    (if (eq (aref new 0) ?\n)
+ 		(delete-char 1)
+ 	      (search-forward "\n\n")
+ 	      (setq lines (buffer-substring (point-min) (1- (point))))
+ 	      (delete-region (point-min)  (point))))))
+      (save-restriction
+ 	(message-narrow-to-headers-or-head)
+ 	(message-remove-header "Mime-Version")
+ 	(goto-char (point-max))
+ 	(insert "MIME-Version: 1.0\n")
+ 	(when lines
+ 	  (insert lines))
+ 	(setq content-type-p
+ 	      (re-search-backward "^Content-Type:" nil t)))
+      (save-restriction
+ 	(message-narrow-to-headers-or-head)
+ 	(message-remove-first-header "Content-Type")
+ 	(message-remove-first-header "Content-Transfer-Encoding"))
+      ;; We always make sure that the message has a Content-Type header.
+      ;; This is because some broken MTAs and MUAs get awfully confused
+      ;; when confronted with a message with a MIME-Version header and
+      ;; without a Content-Type header.  For instance, Solaris'
+      ;; /usr/bin/mail.
+      (unless content-type-p
+ 	(goto-char (point-min))
+ 	(re-search-forward "^MIME-Version:")
+ 	(forward-line 1)
+ 	(insert "Content-Type: text/plain; charset=us-ascii\n")))))
 
 (defvar message-save-buffer " *encoding")
 (defun message-save-drafts ()

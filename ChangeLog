@@ -1,3 +1,17 @@
+1999-02-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.061.
+	(gnus-revision-number): Fresh start from 00.
+
+	* Sync up with Pterodactyl Gnus v0.79.
+
+1999-02-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.060.
+	(gnus-revision-number): Fresh start from 00.
+
+	* Sync up with Pterodactyl Gnus v0.78.
+
 1999-02-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.

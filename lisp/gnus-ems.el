@@ -53,24 +53,6 @@
 
 ;;; Mule functions.
 
-(defun gnus-mule-cite-add-face (number prefix face)
-  ;; At line NUMBER, ignore PREFIX and add FACE to the rest of the line.
-  (when face
-    (let ((inhibit-point-motion-hooks t)
-	  from to)
-      (goto-line number)
-      (unless (eobp)            ; Sometimes things become confused (broken).
-	(forward-char (chars-in-string prefix))
-        (skip-chars-forward " \t")
-        (setq from (point))
-        (end-of-line 1)
-        (skip-chars-backward " \t")
-        (setq to (point))
-        (when (< from to)
-          (push (setq overlay (gnus-make-overlay from to))
-                gnus-cite-overlay-list)
-          (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
-
 (defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
@@ -269,10 +251,6 @@
       (setq gnus-check-before-posting
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
-
-    (when (fboundp 'chars-in-string)
-      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
-
     )))
 
 (defun gnus-region-active-p ()
