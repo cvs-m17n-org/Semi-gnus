@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.11 1999-02-03 02:06:20 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.12 1999-02-03 13:09:33 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -220,8 +220,9 @@
 			  '(("pop" 1) ("apop" 2)) nil t nil))
 		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? ")))
 		(if (not islisp)
-		    (let ((prog (read-file-name "movemail program name: "))
-			  (args (read-from-minibuffer "movemail options: ")))
+		    (let ((prog (read-file-name "movemail program name: "
+						exec-directory "movemail"))
+			  (args (read-from-minibuffer "movemail options: " "-pf")))
 		      (setq mail-source
 			    (append mail-source
 				    (list

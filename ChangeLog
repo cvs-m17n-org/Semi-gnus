@@ -1,4 +1,10 @@
 1999-02-03  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* lisp/gnus.el (gnus-revision-number): Change to 01
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Add default value.
+	
+1999-02-03  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): New constant.
 
