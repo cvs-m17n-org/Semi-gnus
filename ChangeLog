@@ -1,5 +1,19 @@
 1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+1999-08-16  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus-sum.el: Add `gnus-wheel-install' to
+	`gnus-summary-mode-hook'.
+	(gnus-use-wheel): New variable.
+	(gnus-wheel-scroll-amount): New variable.
+	(gnus-wheel-edge-resistance): New variable.
+	(gnus-wheel-summary-scroll): New function.
+	(gnus-wheel-install): New function.
+
+1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
 	* lisp/nnheader.el (make-full-mail-header-from-decoded-header): Use
