@@ -2115,7 +2115,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 				      'initialize-instance
 				      mime-message-structure)
                            (if (or (not gnus-strict-mime)
-				   (mime-fetch-field "MIME-Version"))
+				   (mime-entity-fetch-field
+				    mime-message-structure "MIME-Version"))
 			       gnus-article-display-method-for-mime
 			     gnus-article-display-method-for-encoded-word))
 		       gnus-article-display-method-for-traditional)))
