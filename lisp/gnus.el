@@ -264,10 +264,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.056"
+(defconst gnus-version-number "6.10.057"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.74"
+(defconst gnus-original-version-number "0.75"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -881,11 +881,10 @@ used to 899, you would say something along these lines:
 		 (kill-buffer (current-buffer))))))))
 
 (defcustom gnus-select-method
-  (condition-case nil
+  (ignore-errors
     (nconc
-     (list 'nntp (or (condition-case nil
-			 (gnus-getenv-nntpserver)
-		       (error nil))
+     (list 'nntp (or (ignore-errors
+		       (gnus-getenv-nntpserver))
 		     (when (and gnus-default-nntp-server
 				(not (string= gnus-default-nntp-server "")))
 		       gnus-default-nntp-server)
@@ -893,8 +892,7 @@ used to 899, you would say something along these lines:
      (if (or (null gnus-nntp-service)
 	     (equal gnus-nntp-service "nntp"))
 	 nil
-       (list gnus-nntp-service)))
-    (error nil))
+       (list gnus-nntp-service))))
   "*Default method for selecting a newsgroup.
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.

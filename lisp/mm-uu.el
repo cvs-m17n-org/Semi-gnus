@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.10 $
+;; $Revision: 1.1.2.11 $
 ;; Keywords: news postscript uudecode binhex shar
 
 ;; This file is not part of GNU Emacs, but the same permissions
@@ -86,8 +86,7 @@ This can be either \"inline\" or \"attachment\".")
 	(when (and (mail-fetch-field "mime-version")
 		   (setq ct (mail-fetch-field "content-type")))
 	  (setq cte (message-fetch-field "content-transfer-encoding" t)
-		ctl (condition-case () (mail-header-parse-content-type ct)
-		      (error nil))
+		ctl (ignore-errors (mail-header-parse-content-type ct))
 		charset (and ctl (mail-content-type-get ctl 'charset)))
 	  (if (stringp cte)
 	      (setq cte (intern (downcase (mail-header-remove-whitespace
@@ -119,9 +118,8 @@ This can be either \"inline\" or \"attachment\".")
 	  (setq end-char (point))
 	  (when (or (not (eq type 'binhex))
 		    (setq file-name
-			  (condition-case nil
-			      (binhex-decode-region start-char end-char t)
-			    (error nil))))
+			  (ignore-errors
+			    (binhex-decode-region start-char end-char t))))
 	    (if (> start-char text-start)
 		(push
 		 (mm-make-handle (mm-uu-copy-to-buffer text-start start-char)

@@ -774,11 +774,10 @@ actually occur."
 ;; Ignore errors in case this is used in Emacs 19.
 ;; Don't use ignore-errors because this is copied into loaddefs.el.
 ;;;###autoload
-(condition-case nil
-    (define-mail-user-agent 'message-user-agent
-      'message-mail 'message-send-and-exit
-      'message-kill-buffer 'message-send-hook)
-  (error nil))
+(ignore-errors
+  (define-mail-user-agent 'message-user-agent
+    'message-mail 'message-send-and-exit
+    'message-kill-buffer 'message-send-hook))
 
 (defvar message-mh-deletable-headers '(Message-ID Date Lines Sender)
   "If non-nil, delete the deletable headers before feeding to mh.")
@@ -817,7 +816,9 @@ Valid valued are `unique' and `unsent'."
 		 (const :tag "unsent" unsent)))
 
 (defcustom message-default-charset nil
-  "Default charset used in non-MULE XEmacsen.")
+  "Default charset used in non-MULE XEmacsen."
+  :group 'message
+  :type 'symbol)
 
 ;;; Internal variables.
 ;;; Well, not really internal.
