@@ -2,7 +2,7 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -373,7 +373,7 @@ be used as possible file names."
 			 (sexp :value nil))))
 
 (defcustom gnus-strict-mime t
-  "*If nil, MIME-decode even if there is no Mime-Version header."
+  "*If nil, MIME-decode even if there is no MIME-Version header."
   :group 'gnus-article-mime
   :type 'boolean)
 
@@ -1092,21 +1092,10 @@ always hide."
       (while (re-search-forward "^[ \t]*\n" nil t)
 	(replace-match "" t t)))))
 
-(defvar mime::preview/content-list)
-(defvar mime::preview-content-info/point-min)
 (defun gnus-article-narrow-to-signature ()
   "Narrow to the signature; return t if a signature is found, else nil."
   (widen)
   (let ((inhibit-point-motion-hooks t))
-    (when (and (boundp 'mime::preview/content-list)
-	       mime::preview/content-list)
-      ;; We have a MIMEish article, so we use the MIME data to narrow.
-      (let ((pcinfo (car (last mime::preview/content-list))))
-	(ignore-errors
-	  (narrow-to-region
-	   (funcall (intern "mime::preview-content-info/point-min") pcinfo)
-	   (point-max)))))
-
     (when (gnus-article-search-signature)
       (forward-line 1)
       ;; Check whether we have some limits to what we consider
@@ -1969,27 +1958,24 @@ commands:
 
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
+  ;; called from `gnus-original-article-buffer'.
+  (let ((default-mime-charset (save-excursion
+				(set-buffer gnus-summary-buffer)
+				default-mime-charset)))
+    (mime-display-message mime-message-structure
+			  gnus-article-buffer nil gnus-article-mode-map))
+  ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
 	(function gnus-article-push-button))
-  (let ((default-mime-charset
-	  (save-excursion
-	    (set-buffer gnus-summary-buffer)
-	    default-mime-charset))
-	)
-    (mime-display-message mime-message-structure
-			  gnus-article-buffer nil gnus-article-mode-map)
-    )
-  (run-hooks 'gnus-mime-article-prepare-hook)
-  )
+  (run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-display-traditional-message ()
   "Article display method for traditional message."
   (set-buffer gnus-article-buffer)
   (let (buffer-read-only)
     (erase-buffer)
-    (insert-buffer-substring gnus-original-article-buffer)
-    ))
+    (insert-buffer-substring gnus-original-article-buffer)))
 
 (defun gnus-article-display-message-with-encoded-word ()
   "Article display method for message with encoded-words."
@@ -2001,12 +1987,9 @@ commands:
       (eword-decode-header charset)
       (goto-char (point-min))
       (if (search-forward "\n\n" nil t)
-	  (decode-mime-charset-region (match-end 0) (point-max) charset))
-      )
-    (mime-maybe-hide-echo-buffer)
-    )
-  (gnus-run-hooks 'gnus-mime-article-prepare-hook)
-  )
+	  (decode-mime-charset-region (match-end 0) (point-max) charset)))
+    (mime-maybe-hide-echo-buffer))
+  (gnus-run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
@@ -3166,26 +3149,29 @@ forbidden in URL encoding."
       (setq to (gnus-url-unhex-string url)))
     (setq args (cons (list "to" to) args)
           subject (cdr-safe (assoc "subject" args)))
-    (message-mail)
-    (while args
-      (setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
-      (if (fboundp func)
-          (funcall func)
-        (message-position-on-field (caar args)))
-      (insert (mapconcat 'identity (cdar args) ", "))
-      (setq args (cdr args)))
-    (if subject
-        (message-goto-body)
-      (message-goto-subject))))
+    (gnus-setup-message 'reply
+      (message-mail)
+      (while args
+	(setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
+	(if (fboundp func)
+	    (funcall func)
+	  (message-position-on-field (caar args)))
+	(insert (mapconcat 'identity (cdar args) ", "))
+	(setq args (cdr args)))
+      (if subject
+	  (message-goto-body)
+	(message-goto-subject)))))
 
 (defun gnus-button-mailto (address)
   ;; Mail to ADDRESS.
   (set-buffer (gnus-copy-article-buffer))
-  (message-reply address))
+  (gnus-setup-message 'reply
+    (message-reply address)))
 
 (defun gnus-button-reply (address)
   ;; Reply to ADDRESS.
-  (message-reply address))
+  (gnus-setup-message 'reply
+    (message-reply address)))
 
 (defun gnus-button-url (address)
   "Browse ADDRESS."
