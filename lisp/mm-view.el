@@ -236,6 +236,8 @@
 	(narrow-to-region b b)
 	(mm-insert-part handle)
 	(let (gnus-article-mime-handles
+	      ;; disable prepare hook 
+	      gnus-article-prepare-hook  
 	      (gnus-newsgroup-charset
 	       (or charset gnus-newsgroup-charset)))
 	  (run-hooks 'gnus-article-decode-hook)
