@@ -43,6 +43,9 @@
 
 (require 'mailheader)
 (require 'nnheader)
+;; This is apparently necessary even though things are autoloaded:
+(if (featurep 'xemacs)
+    (require 'mail-abbrevs))
 (require 'mime-edit)
 (eval-when-compile (require 'static))
 
