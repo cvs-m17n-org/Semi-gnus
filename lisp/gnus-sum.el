@@ -34,7 +34,6 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
-(require 'std11)
 (require 'mime-view)
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
@@ -2949,7 +2948,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defun gnus-build-sparse-threads ()
   (let ((headers gnus-newsgroup-headers)
 	header references generation relations
-	cthread subject child end pthread relation new-child)
+	cthread subject child end pthread relation new-child date)
     ;; First we create an alist of generations/relations, where
     ;; generations is how much we trust the relation, and the relation
     ;; is parent/child.
@@ -2961,14 +2960,15 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		   (not (string= references "")))
 	  (insert references)
 	  (setq child (mail-header-id header)
-		subject (mail-header-subject header))
-	  (setq generation 0)
+		subject (mail-header-subject header)
+		date (mail-header-date header)
+		generation 0)
 	  (while (search-backward ">" nil t)
 	    (setq end (1+ (point)))
 	    (if (search-backward "<" nil t)
 		(push (list (incf generation)
 			    child (setq child new-child)
-			    subject)
+			    subject date)
 		      relations)))
 	  (push (list (1+ generation) child nil subject) relations)
 	  (erase-buffer)))
@@ -2979,9 +2979,9 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
        (when (gnus-dependencies-add-header
 	      (make-full-mail-header
 	       gnus-reffed-article-number
-	       (cadddr relation) "" (mail-header-date header)
-	       (cadr relation)
-	       (or (caddr relation) "") 0 0 "")
+	       (nth 3 relation) "" (nth 4 relation)
+	       (nth 1 relation)
+	       (or (nth 2 relation) "") 0 0 "")
 	      gnus-newsgroup-dependencies nil)
 	 (push gnus-reffed-article-number gnus-newsgroup-limit)
 	 (push gnus-reffed-article-number gnus-newsgroup-sparse)
@@ -3198,8 +3198,9 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	(setcar thread old)
 	nil))))
 
-(defun gnus-rebuild-thread (id)
-  "Rebuild the thread containing ID."
+(defun gnus-rebuild-thread (id &optional line)
+  "Rebuild the thread containing ID.
+If LINE, insert the rebuilt thread starting on line LINE."
   (let ((buffer-read-only nil)
 	old-pos current thread data)
     (if (not gnus-show-threads)
@@ -3229,6 +3230,9 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq thread (cons subject (gnus-sort-threads roots))))))
     (let (threads)
       ;; We then insert this thread into the summary buffer.
+      (when line
+	(goto-char (point-min))
+	(forward-line (1- line)))
       (let (gnus-newsgroup-data gnus-newsgroup-threads)
 	(if gnus-show-threads
 	    (gnus-summary-prepare-threads (gnus-cut-threads (list thread)))
@@ -3236,8 +3240,14 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	(setq data (nreverse gnus-newsgroup-data))
 	(setq threads gnus-newsgroup-threads))
       ;; We splice the new data into the data structure.
-      (gnus-data-enter-list current data (- (point) old-pos))
-      (setq gnus-newsgroup-threads (nconc threads gnus-newsgroup-threads)))))
+      ;;!!! This is kinda bogus.  We assume that in LINE is non-nil,
+      ;;!!! then we want to insert at the beginning of the buffer.
+      ;;!!! That happens to be true with Gnus now, but that may
+      ;;!!! change in the future.  Perhaps.
+      (gnus-data-enter-list (if line nil current) data (- (point) old-pos))
+      (setq gnus-newsgroup-threads (nconc threads gnus-newsgroup-threads))
+      (when line
+	(gnus-data-compute-positions)))))
 
 (defun gnus-number-to-header (number)
   "Return the header for article NUMBER."
@@ -4543,8 +4553,12 @@ This is meant to be called in `gnus-article-internal-prepare-hook'."
 	      (mail-header-set-xref headers xref)))))))
 
 (defun gnus-summary-insert-subject (id &optional old-header use-old-header)
-  "Find article ID and insert the summary line for that article."
-  (let ((header (cond ((and old-header use-old-header)
+  "Find article ID and insert the summary line for that article.
+OLD-HEADER can either be a header or a line number to insert
+the subject line on."
+  (let* ((line (and (numberp old-header) old-header))
+	 (old-header (and (vectorp old-header) old-header))
+	 (header (cond ((and old-header use-old-header)
 		       old-header)
 		      ((and (numberp id)
 			    (gnus-number-to-header id))
@@ -4574,7 +4588,7 @@ This is meant to be called in `gnus-article-internal-prepare-hook'."
 		  gnus-newsgroup-sparse))
       (setq gnus-newsgroup-ancient (delq number gnus-newsgroup-ancient))
       (push number gnus-newsgroup-limit)
-      (gnus-rebuild-thread (mail-header-id header))
+      (gnus-rebuild-thread (mail-header-id header) line)
       (gnus-summary-goto-subject number nil t))
     (when (and (numberp number)
 	       (> number 0))
@@ -5414,7 +5428,10 @@ If FORCE, also allow jumping to articles not currently shown."
     ;; We read in the article if we have to.
     (and (not data)
 	 force
-	 (gnus-summary-insert-subject article (and (vectorp force) force) t)
+	 (gnus-summary-insert-subject
+	  article
+	  (if (or (numberp force) (vectorp force)) force)
+	  t)
 	 (setq data (gnus-data-find article)))
     (goto-char b)
     (if (not data)
@@ -5524,7 +5541,7 @@ If BACKWARD, the previous article is selected instead of the next."
 	 (not unread) (not subject))
     (gnus-summary-goto-article
      (if backward (1- gnus-newsgroup-begin) (1+ gnus-newsgroup-end))
-     nil t))
+     nil (count-lines (point-min) (point))))
    ;; Go to next/previous group.
    (t
     (unless (gnus-ephemeral-group-p gnus-newsgroup-name)
@@ -5800,7 +5817,9 @@ Return nil if there are no articles."
 
 (defun gnus-summary-goto-article (article &optional all-headers force)
   "Fetch ARTICLE (article number or Message-ID) and display it if it exists.
-If ALL-HEADERS is non-nil, no header lines are hidden."
+If ALL-HEADERS is non-nil, no header lines are hidden.
+If FORCE, go to the article even if it isn't displayed.  If FORCE
+is a number, it is the line the article is to be displayed on."
   (interactive
    (list
     (completing-read
@@ -5901,8 +5920,8 @@ articles that are younger than AGE days."
 			      (nnmail-time-since (nnmail-date-to-time date))
 			      cutoff))
 	    (when (if younger-p
-		      (not is-younger)
-		    is-younger)
+		      is-younger
+		    (not is-younger))
 	      (push (gnus-data-number d) articles))))
 	(gnus-summary-limit (nreverse articles)))
     (gnus-summary-position-point)))
@@ -7225,7 +7244,7 @@ delete these instead."
 				       gnus-newsgroup-name)
     (error "The current newsgroup does not support article deletion"))
   ;; Compute the list of articles to delete.
-  (let ((articles (gnus-summary-work-articles n))
+  (let ((articles (sort (copy-sequence (gnus-summary-work-articles n)) '<))
 	not-deleted)
     (if (and gnus-novice-user
 	     (not (gnus-yes-or-no-p

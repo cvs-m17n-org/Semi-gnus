@@ -2008,11 +2008,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (unless (eq major-mode 'gnus-summary-mode)
       (set-buffer gnus-summary-buffer))
     (setq gnus-summary-buffer (current-buffer))
-    ;; Make sure the connection to the server is alive.
-    (unless (gnus-server-opened
-	     (gnus-find-method-for-group gnus-newsgroup-name))
-      (gnus-check-server (gnus-find-method-for-group gnus-newsgroup-name))
-      (gnus-request-group gnus-newsgroup-name t))
     (let* ((gnus-article (if header (mail-header-number header) article))
 	   (summary-buffer (current-buffer))
 	   (internal-hook gnus-article-internal-prepare-hook)
@@ -2280,7 +2275,8 @@ Argument LINES specifies lines to be scrolled down."
       (error "There is no summary buffer for this article buffer")
     (gnus-article-set-globals)
     (gnus-configure-windows 'article)
-    (gnus-summary-goto-subject gnus-current-article)))
+    (gnus-summary-goto-subject gnus-current-article)
+    (gnus-summary-position-point)))
 
 (defun gnus-article-describe-briefly ()
   "Describe article mode commands briefly."
@@ -2392,6 +2388,13 @@ If given a prefix, show the hidden text instead."
   (when (gnus-visual-p 'article-highlight 'highlight)
     (gnus-article-highlight-some)))
 
+(defun gnus-check-group-server ()
+  ;; Make sure the connection to the server is alive.
+  (unless (gnus-server-opened
+	   (gnus-find-method-for-group gnus-newsgroup-name))
+    (gnus-check-server (gnus-find-method-for-group gnus-newsgroup-name))
+    (gnus-request-group gnus-newsgroup-name t)))
+
 (defun gnus-request-article-this-buffer (article group)
   "Get an article and insert it into this buffer."
   (let (do-update-line)
@@ -2400,9 +2403,6 @@ If given a prefix, show the hidden text instead."
 	  (erase-buffer)
 	  (gnus-kill-all-overlays)
 	  (setq group (or group gnus-newsgroup-name))
-
-	  ;; Open server if it has closed.
-	  (gnus-check-server (gnus-find-method-for-group group))
 
 	  ;; Using `gnus-request-article' directly will insert the article into
 	  ;; `nntp-server-buffer' - so we'll save some time by not having to
@@ -2494,6 +2494,7 @@ If given a prefix, show the hidden text instead."
 		  (buffer-read-only nil))
 	      (erase-buffer)
 	      (gnus-kill-all-overlays)
+	      (gnus-check-group-server)
 	      (when (gnus-request-article article group (current-buffer))
 		(when (numberp article)
 		  (gnus-async-prefetch-next group article gnus-summary-buffer)
@@ -2545,9 +2546,6 @@ If given a prefix, show the hidden text instead."
 	  (erase-buffer)
 	  (gnus-kill-all-overlays)
 	  (setq group (or group gnus-newsgroup-name))
-
-	  ;; Open server if it has closed.
-	  (gnus-check-server (gnus-find-method-for-group group))
 
 	  ;; Using `gnus-request-article' directly will insert the article into
 	  ;; `nntp-server-buffer' - so we'll save some time by not having to
@@ -2630,6 +2628,7 @@ If given a prefix, show the hidden text instead."
 		  (buffer-read-only nil))
 	      (erase-buffer)
 	      (gnus-kill-all-overlays)
+	      (gnus-check-group-server)
 	      (when (gnus-request-article article group (current-buffer))
 		(when (numberp article)
 		  (gnus-async-prefetch-next group article gnus-summary-buffer)
