@@ -5238,7 +5238,7 @@ Prefixes})$(B!#(B
 @kindex / x ($(B35N,(B)
 @findex gnus-summary-limit-to-extra
 ``$(BDI2C(B'' $(B$N%X%C%@!<$N0l$D$K9gCW$9$k5-;v$K35N,%P%C%U%!$r@)8B$7$^$9(B
-(@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-author}).
+(@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-extra}).
 
 @item / u
 @itemx x
@@ -5260,7 +5260,7 @@ Prefixes})$(B!#(B
 @kindex / t $(B!J35N,!K(B
 @findex gnus-summary-limit-to-age
 $(B?t;z$r?R$M$F!"35N,%P%C%U%!$r$=$N?t;z$NF|$h$j8E$$!J$b$7$/$OF1$8!K5-;v$K@)8B(B
-$(B$7$^$9(B (@code{gnus-summary-limit-to-marks})$(B!#$b$7@\F,0z?t$,M?$($i$l$l$P!"(B
+$(B$7$^$9(B (@code{gnus-summary-limit-to-age})$(B!#$b$7@\F,0z?t$,M?$($i$l$l$P!"(B
 $(B$=$N?t;z$NF|$h$j$b?7$7$$5-;v$K@)8B$7$^$9!#(B
 
 @item / n
@@ -11294,6 +11294,16 @@ Gnus $(B$O5-;v$,$I$N%0%k!<%W$KB0$7$F$$$k$+$K4p$E$$$F!"$=$l$,$I$N$/$i$$@8B8(B
 
 $(B4|8B@Z$l4|4V$rA*BrE*$KJQ99$9$k$?$a$K%0%k!<%W%Q%i%a!<%?(B
 @code{expiry-wait} $(B$r;H$&;v$b$G$-$^$9(B (@pxref{Group Parameters})$(B!#(B
+
+@vindex nnmail-expiry-target
+$(B5-;v$N4|8B@Z$l>C5n$NIaDL$NF0:n$O$=$l$i$r>C5n$9$k$3$H$G$9!#$7$+$7!">l9g$K(B
+$(B$h$C$F$O$=$l$i$r>C5n$9$k$h$j$bJL$N%0%k!<%W$K0\F0$7$?J}$,M-0U5A$+$b$7$l$^(B
+$(B$;$s!#(B@code{nnmail-expiry-target} ($(B$H%0%k!<%W%Q%i%a!<%?(B
+@code{expiry-target}) $(B$O$3$l$r@)8f$7$^$9!#%G%#%U%)%k%H$NCM$O(B
+@code{delete} $(B$G$9$,!"J8;zNs(B ($(B5-;v$r0\F0$9$k@h$N%0%k!<%WL>(B) $(B$^$?$O0\F0@h(B
+$(B$N%0%k!<%WL>$+(B @code{delete} $(B$rJV$94X?t(B ($(B5-;v$KHO0O$r69$a$?%P%C%U%!$G!"(B
+$(B$=$N5-;v$,B8:_$7$F$$$k%0%k!<%WL>$,0z?t$H$7$FM?$($i$l$^$9(B) $(B$K$9$k$3$H$,$G(B
+$(B$-$^$9!#(B
 
 @vindex nnmail-keep-last-article
 @code{nnmail-keep-last-article} $(B$,(B @code{nil} $(B$G$J$$$H!"(Bgnus $(B$O%a!<%k%K%e!<(B

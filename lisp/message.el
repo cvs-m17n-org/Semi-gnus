@@ -431,7 +431,7 @@ The provided functions are:
   :group 'message-insertion
   :type 'regexp)
 
-(defcustom message-cancel-message "I am canceling my own article."
+(defcustom message-cancel-message "I am canceling my own article.\n"
   "Message to be inserted in the cancel message."
   :group 'message-interface
   :type 'string)
@@ -2377,6 +2377,8 @@ be added to \"References\" field.
 	   (if (listp message-indent-citation-function)
 	       message-indent-citation-function
 	     (list message-indent-citation-function)))))
+    ;; Allow undoing.
+    (undo-boundary)
     (goto-char end)
     (when (re-search-backward message-signature-separator start t)
       ;; Also peel off any blank lines before the signature.
@@ -3838,7 +3840,7 @@ Headers already prepared in the buffer are not modified."
 		  ;; The element is a symbol.  We insert the value
 		  ;; of this symbol, if any.
 		  (symbol-value header))
-		 (t
+		 ((not (message-check-element header))
 		  ;; We couldn't generate a value for this header,
 		  ;; so we just ask the user.
 		  (read-from-minibuffer
@@ -4596,9 +4598,10 @@ that further discussion should take place only in "
      cur)))
 
 ;;;###autoload
-(defun message-cancel-news ()
-  "Cancel an article you posted."
-  (interactive)
+(defun message-cancel-news (&optional arg)
+  "Cancel an article you posted.
+If ARG, allow editing of the cancellation message."
+  (interactive "P")
   (unless (message-news-p)
     (error "This is not a news article; canceling is impossible"))
   (when (yes-or-no-p "Do you really want to cancel this article? ")
@@ -4624,7 +4627,9 @@ that further discussion should take place only in "
 				      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
-	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
+	(if arg
+	    (message-news)
+	  (setq buf (set-buffer (get-buffer-create " *message cancel*"))))
 	(erase-buffer)
 	(insert "Newsgroups: " newsgroups "\n"
 		"From: " (message-make-from) "\n"
@@ -4637,13 +4642,14 @@ that further discussion should take place only in "
 		message-cancel-message)
 	(run-hooks 'message-cancel-hook)
 	(message "Canceling your article...")
-	(if (let ((message-syntax-checks
-		   'dont-check-for-anything-just-trust-me)
-		  (message-encoding-buffer (current-buffer))
-		  (message-edit-buffer (current-buffer)))
-	      (message-send-news))
-	    (message "Canceling your article...done"))
-	(kill-buffer buf)))))
+	(unless arg
+	  (if (let ((message-syntax-checks
+		     'dont-check-for-anything-just-trust-me)
+		    (message-encoding-buffer (current-buffer))
+		    (message-edit-buffer (current-buffer)))
+		(message-send-news))
+	      (message "Canceling your article...done"))
+	  (kill-buffer buf))))))
 
 (defun message-supersede-setup-for-mime-edit ()
   (set (make-local-variable 'message-setup-hook) nil)
