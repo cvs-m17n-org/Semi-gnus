@@ -538,8 +538,6 @@ Return whether the unpacking was successful."
 	      (search-forward "\n\n")
 	      (forward-char -1)
 	      (insert mail-header-separator)
-	      (setq message-newsreader (setq message-mailer
-					     (gnus-extended-version)))
 	      (cond
 	       ((string= (gnus-soup-reply-kind (car replies)) "news")
 		(gnus-message 5 "Sending news message to %s..."
