@@ -502,45 +502,32 @@ If SILENT, don't prompt the user."
 
 ;; Dummy to avoid byte-compile warning.
 (defvar nnspool-rejected-article-hook)
+(defvar mule-version)
 (defvar xemacs-codename)
 
-;;; Since the X-Newsreader/X-Mailer are ``vanity'' headers, they might
-;;; as well include the Emacs version as well.
-;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
   "Stringified Gnus version and Emacs version."
   (interactive)
   (concat
    "Semi-gnus/" gnus-version-number " "
    (cond
-    ((string-match "^\\([0-9]+\\.[0-9]+\\)\\.[.0-9]+$" emacs-version)
-     (concat "Emacs/" (substring emacs-version
-				 (match-beginning 1)
-				 (match-end 1))
-             (if (boundp 'mule-version)
-                 (concat " Mule/" mule-version)
-               "")
-             (if (featurep 'meadow)
-                 ;; XXX: (Meadow-version) -> Meadow-1.0x (CODENAME)
-                 (concat " " (Meadow-version))
-               "")))
-    ;; XXX: rewrite to use "(featurep 'xemacs)"?
-    ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-		   emacs-version)
-     (concat (substring emacs-version
-			(match-beginning 1)
-			(match-end 1))
-	     (format "/%d.%d" emacs-major-version emacs-minor-version)
-	     (if (match-beginning 3)
-		 (substring emacs-version
-			    (match-beginning 3)
-			    (match-end 3))
-	       "")
-             ;; XXX: Insert `with-mule' or `without-mule'?
+    ((featurep 'xemacs)
+     (concat (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+             ;; XXX: beta?
+             (if (featurep 'mule)
+                 "-mule")
 	     (if (boundp 'xemacs-codename)
-		 (concat " (" xemacs-codename ")")
-               "")))
-    (t emacs-version))))
+                 (concat " (" xemacs-codename ")"))
+             ))
+    (t
+     (concat (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+             ;; XXX: unibyte or multibyte
+             (if (boundp 'mule-version)
+                 (concat " Mule/" mule-version))
+             (if (featurep 'meadow)
+                 (concat " " (Meadow-version)))
+             ))
+    )))
 
 
 ;;;
