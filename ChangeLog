@@ -1,3 +1,13 @@
+2002-03-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/message.el (message-save-drafts, message-check-8bit,
+	message-send-news, message-send-mail, message-send): Replace
+	`insert-buffer' with `insert-buffer-substring'.
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup,
+	gnus-article-edit-exit, article-verify-x-pgp-sig): Ditto.
+
 2002-03-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Don't provide

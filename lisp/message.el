@@ -3071,7 +3071,7 @@ It should typically alter the sending method in some way or other."
 	;; ;; Avoid copying text props (except hard newlines).
 	;; T-gnus change: copy all text props from the editing buffer
 	;; into the encoding buffer.
-	(insert-buffer message-edit-buffer)
+	(insert-buffer-substring message-edit-buffer)
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
@@ -3429,7 +3429,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	    ;; ;; Avoid copying text props (except hard newlines).
 	    ;; T-gnus change: copy all text props from the editing buffer
 	    ;; into the encoding buffer.
-	    (insert-buffer message-encoding-buffer)
+	    (insert-buffer-substring message-encoding-buffer)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
@@ -3730,7 +3730,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 	    (set-buffer tembuf)
 	    (buffer-disable-undo)
 	    (erase-buffer)
-	    (insert-buffer message-encoding-buffer)
+	    (insert-buffer-substring message-encoding-buffer)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
@@ -4184,7 +4184,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 	(erase-buffer)
 	(goto-char (point-min))
 	(set-buffer-multibyte nil)
-	(insert-buffer message-encoding-buffer)
+	(insert-buffer-substring message-encoding-buffer)
 	(goto-char (point-min))
 	(if (re-search-forward "[^\x00-\x7f]" nil t)
 	    (y-or-n-p
@@ -6439,7 +6439,7 @@ regexp varstr."
   (let ((reply-headers message-reply-headers)
 	(buffer (current-buffer)))
     (with-temp-file buffer-file-name
-      (insert-buffer buffer)
+      (insert-buffer-substring buffer)
       (setq message-reply-headers reply-headers)
       (message-generate-headers '((optional . In-Reply-To)))
       (let ((mime-header-encode-method-alist

@@ -3361,7 +3361,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		   mml2015-use
 		   (mml2015-clear-verify-function))
 	  (with-temp-buffer
-	    (insert-buffer gnus-original-article-buffer)
+	    (insert-buffer-substring gnus-original-article-buffer)
 	    (setq items (split-string sig))
 	    (message-narrow-to-head)
 	    (let ((inhibit-point-motion-hooks t)
@@ -5637,7 +5637,7 @@ groups."
 	  (window-start (window-start)))
       (erase-buffer)
       (if (gnus-buffer-live-p gnus-original-article-buffer)
-	  (insert-buffer gnus-original-article-buffer))
+	  (insert-buffer-substring gnus-original-article-buffer))
       (let ((winconf gnus-prev-winconf))
 	(gnus-article-mode)
 	(set-window-configuration winconf)
@@ -5707,7 +5707,7 @@ after replacing with the original article."
 			     'gnus-article-mime-edit-exit
 			     gnus-article-edit-mode-map)
   (erase-buffer)
-  (insert-buffer gnus-original-article-buffer)
+  (insert-buffer-substring gnus-original-article-buffer)
   (let ((ofn (symbol-function 'mime-edit-decode-single-part-in-buffer)))
     (fset 'mime-edit-decode-single-part-in-buffer
 	  (lambda (&rest args)
