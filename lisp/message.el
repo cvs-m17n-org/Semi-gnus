@@ -346,7 +346,8 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
   :group 'message-news
   :type '(repeat sexp))			; Fixme: improve this
 
-(defcustom message-required-headers '((optional . References) From)
+(defcustom message-required-headers '((optional . References)
+				      From (optional . In-Reply-To))
   "*Headers to be generated or prompted for when sending a message.
 Also see `message-required-news-headers' and
 `message-required-mail-headers'."
@@ -846,7 +847,11 @@ variable isn't used."
   ;; create a dependence to `gnus.el'.
   :type 'sexp)
 
-(defcustom message-generate-headers-first nil
+;; FIXME: This should be a temporary workaround until someone implements a
+;; proper solution.  If a crash happens while replying, the auto-save file
+;; will *not* have a `References:' header if `message-generate-headers-first'
+;; is nil.  See: http://article.gmane.org/gmane.emacs.gnus.general/51138
+(defcustom message-generate-headers-first '(references)
   "*If non-nil, generate all required headers before composing.
 The variables `message-required-news-headers' and
 `message-required-mail-headers' specify which headers to generate.
@@ -858,6 +863,7 @@ are to be deleted and then re-generated before sending, so this variable
 will not have a visible effect for those headers."
   :group 'message-headers
   :type '(choice (const :tag "None" nil)
+                 (const :tag "References" '(references))
                  (const :tag "All" t)
                  (repeat (sexp :tag "Header"))))
 
@@ -1665,6 +1671,7 @@ no, only reply back to the author."
   (autoload 'gnus-groups-from-server "gnus")
   (autoload 'rmail-output "rmailout")
   (autoload 'gnus-delay-article "gnus-delay")
+  (autoload 'gnus-make-local-hook "gnus-util")
   (autoload 'mu-cite-original "mu-cite"))
 
 
@@ -2583,9 +2590,7 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
 	(set (make-local-variable 'tool-bar-map) (message-tool-bar-map))))
   (easy-menu-add message-mode-menu message-mode-map)
   (easy-menu-add message-mode-field-menu message-mode-map)
-  ;; make-local-hook is harmless though obsolete in Emacs 21.
-  ;; Emacs 20 and XEmacs need make-local-hook.
-  (make-local-hook 'after-change-functions)
+  (gnus-make-local-hook 'after-change-functions)
   ;; Mmmm... Forbidden properties...
   (add-hook 'after-change-functions 'message-strip-forbidden-properties
 	    nil 'local)
@@ -4997,9 +5002,9 @@ If NOW, use that time instead."
 			       (lsh (% message-unique-id-char 25) 16)) 4)
      (message-number-base36 (+ (nth 1 tm)
 			       (lsh (/ message-unique-id-char 25) 16)) 4)
-     ;; Append the newsreader name, because while the generated
-     ;; ID is unique to this newsreader, other newsreaders might
-     ;; otherwise generate the same ID via another algorithm.
+     ;; Append a given name, because while the generated ID is unique
+     ;; to this newsreader, other newsreaders might otherwise generate
+     ;; the same ID via another algorithm.
      ".fsf")))
 
 (defun message-number-base36 (num len)
@@ -7307,9 +7312,9 @@ regexp varstr."
 		(message-next-header)
 	      (let ((begin (point)))
 		(message-next-header)
-		(add-text-properties begin (point)
-				     '(intangible t invisible t
-						  message-hidden t))))))))))
+		(add-text-properties
+		 begin (point)
+		 '(invisible t message-hidden t))))))))))
 
 (defun message-hide-header-p (regexps)
   (let ((result nil)

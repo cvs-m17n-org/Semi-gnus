@@ -1,4 +1,4 @@
-;;; gnus-fun.el --- various frivoluos extension functions to Gnus
+;;; gnus-fun.el --- various frivolous extension functions to Gnus
 ;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -24,6 +24,10 @@
 ;;; Commentary:
 
 ;;; Code:
+
+(eval-when-compile
+  (require 'cl)
+  (require 'mm-util))
 
 (defcustom gnus-x-face-directory (expand-file-name "x-faces" gnus-directory)
   "*Directory where X-Face PBM files are stored."
@@ -107,18 +111,19 @@ Output to the current buffer, replace text, and don't mingle error."
       (while (and (not done)
 		  (> quant 1))
 	(setq attempt
-	      (gnus-shell-command-to-string
-	       (format gnus-convert-image-to-face-command
-		       (shell-quote-argument (expand-file-name file))
-		       quant)))
-	(if (> (length attempt) 740)
+	      (let ((coding-system-for-read 'binary))
+		(gnus-shell-command-to-string
+		 (format gnus-convert-image-to-face-command
+			 (shell-quote-argument (expand-file-name file))
+			 quant))))
+	(if (> (length attempt) 726)
 	    (progn
 	      (setq quant (- quant 2))
 	      (message "Length %d; trying quant %d"
 		       (length attempt) quant))
 	  (setq done t)))
       (if done
-	  (mm-with-unibyte-buffer	
+	  (mm-with-unibyte-buffer
 	    (insert attempt)
 	    (gnus-face-encode))
 	nil))))
@@ -147,14 +152,14 @@ The PNG is returned as a string."
       (base64-decode-region (point-min) (point-max)))
     (buffer-string)))
 
-;;;#autoload
+;;;###autoload
 (defun gnus-convert-png-to-face (file)
   "Convert FILE to a Face.
 FILE should be a PNG file that's 48x48 and smaller than or equal to
-740 bytes."
+726 bytes."
   (mm-with-unibyte-buffer
     (insert-file-contents file)
-    (when (> (buffer-size) 740)
+    (when (> (buffer-size) 726)
       (error "The file is %d bytes long, which is too long"
 	     (buffer-size)))
     (gnus-face-encode)))

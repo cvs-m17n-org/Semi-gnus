@@ -1,3 +1,71 @@
+2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.19 revision 00.
+
+2003-04-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-coding-system-p): New function.
+	(mm-coding-system-p): Alias to `nnheader-coding-system-p'.
+
+2003-04-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-clfns.el (coerce, copy-list, merge, string, subseq):
+	Comment out those compiler macros.
+	(mapc): Make it comeback.
+
+2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Flag as binary to ensure DOS line terminators.  Delete
+	trailing whitespace.
+
+2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Frank Schmitt  <ich@frank-schmitt.net>
+
+	* etc/gnus-tut.txt: Update Gnus FAQ, delete trailing whitespace.
+
+2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (xclever-package, xlick-package): New rules.
+	(install-package, install-package-ja, package, package-ja): Use
+	them.
+	(install-package-manifest, remove-extra-files-in-package,
+	compose-package): Specify the lisp directory for XEmacs package.
+
+	* aclocal.m4 (AC_PATH_INFO_DIR): Say a note for XEmacs package.
+
+	* lisp/dgnushack.el: Remove useless function bindings for XEmacs.
+	(dgnushack-install-package-manifest): Create the pkginfo directory.
+
+	* lisp/lpath.el: Fbind `compare-strings' for Mule 2.
+
+2003-04-17  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* make.bat: Cleaned up end-of-line characters.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* Makefile.in (XEMACS): Use @EMACS@.
+
+	* aclocal.m4 (AC_PATH_LISPDIR): Set $datadir to $prefix/lib if
+	building with XEmacs.
+
+	* aclocal.m4 (AC_SET_BUILD_FLAGS): New.  So we can set XEmacs
+	command line options to '-batch -no-autoloads...' for a cleaner
+	build environment.
+
+	* configure.in: Use it.
+
+	* configure: Regenerate.
+
+2003-04-16  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Frank Schmitt  <ich@frank-schmitt.net>
+
+	* make.bat: New variable EMACS_ARGS.  Changed XEmacs args.
+
+2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind `coding-system-base' for Mule 2.
+
 2003-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.18 revision 00.

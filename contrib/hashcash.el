@@ -61,15 +61,13 @@ is used instead.")
 
 (require 'mail-utils)
 
-(defalias 'hashcash-point-at-bol
-    (if (fboundp 'point-at-bol)
-	'point-at-bol
-	'line-beginning-position))
+(if (fboundp 'point-at-bol)
+    (defalias 'hashcash-point-at-bol 'point-at-bol)
+  (defalias 'hashcash-point-at-bol 'line-beginning-position))
 
-(defalias 'hashcash-point-at-eol
-    (if (fboundp 'point-at-eol)
-	'point-at-eol
-	'line-end-position))
+(if (fboundp 'point-at-eol)
+    (defalias 'hashcash-point-at-eol 'point-at-eol)
+  (defalias 'hashcash-point-at-eol 'line-end-position))
 
 (defun hashcash-strip-quoted-names (addr)
   (setq addr (mail-strip-quoted-names addr))

@@ -1,5 +1,5 @@
 AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
- [echo $ac_n "defining gnus product name... $ac_c"
+ [echo $ECHO_N "defining gnus product name... $ECHO_C"
   AC_CACHE_VAL(EMACS_cv_GNUS_PRODUCT_NAME,[EMACS_cv_GNUS_PRODUCT_NAME=$1])
   GNUS_PRODUCT_NAME=${EMACS_cv_GNUS_PRODUCT_NAME}
   AC_MSG_RESULT(${GNUS_PRODUCT_NAME})
@@ -16,14 +16,14 @@ AC_DEFUN(AC_CHECK_EMACS,
   unset ac_cv_prog_EMACS; unset ac_cv_prog_XEMACS;
 
   AC_ARG_WITH(emacs,
-   [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
+   [  --with-emacs=EMACS      compile with EMACS [[EMACS=emacs, mule...]]],
    [if test "$withval" = yes -o -z "$withval"; then
       AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)
     else
       AC_CHECK_PROG(EMACS, $withval, $withval, emacs)
     fi])
   AC_ARG_WITH(xemacs,
-   [  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]],
+   [  --with-xemacs=XEMACS    compile with XEMACS [[XEMACS=xemacs]]],
    [if test "$withval" = yes -o -z "$withval"; then
       AC_CHECK_PROG(XEMACS, xemacs, xemacs, xemacs)
     else
@@ -96,6 +96,7 @@ AC_DEFUN(AC_PATH_LISPDIR, [
 	theprefix=$ac_default_prefix
     fi
     if test "$EMACS_FLAVOR" = "xemacs"; then
+	datadir="\$(prefix)/lib"
 	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-packages/lisp/${GNUS_PRODUCT_NAME}"
     else
 	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
@@ -153,8 +154,29 @@ AC_DEFUN(AC_PATH_INFO_DIR, [
   else
     info_dir=$infodir
   fi
-  AC_MSG_RESULT($info_dir)
+  AC_MSG_RESULT([$info_dir
+         (it will be ignored when \"make install-package[[-ja]]\" is done)])
   AC_SUBST(info_dir)
+])
+
+dnl
+dnl This will set the XEmacs command line options to be slightly different
+dnl from the Emacs ones.  If building with XEmacs the options will be
+dnl "-batch -no-autoloads..." to give a much cleaner build environment.
+dnl
+AC_DEFUN(AC_SET_BUILD_FLAGS, [
+  AC_MSG_CHECKING([which options to pass on to (X)Emacs])
+  if test "x$FLAGS" = "x"; then
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+      FLAGS="-batch -no-autoloads -l \$(srcdir)/dgnushack.el"
+    else
+      FLAGS="-batch -q -no-site-file -l \$(srcdir)/dgnushack.el"
+    fi
+  else
+    FLAGS=$FLAGS
+  fi
+  AC_MSG_RESULT($FLAGS)
+  AC_SUBST(FLAGS)
 ])
 
 dnl
@@ -244,7 +266,7 @@ fi
    if test -z "${EMACS_cv_ACCEPTABLE_URL}"; then
 	AC_MSG_RESULT(not found)
    else
-	AC_MSG_RESULT("${URL}")
+	AC_MSG_RESULT(${URL})
    fi
 ])
 
@@ -327,7 +349,7 @@ if test -z "${USE_FONTS}" ; then
   USE_FONTS=no
 fi
 USE_FONTS=`echo "${USE_FONTS}" | sed 's/,\([[^,]]*\)$/ and\1/'`
-AC_MSG_RESULT("${USE_FONTS}")
+AC_MSG_RESULT(${USE_FONTS})
 if test "${USE_FONTS}" = yes ; then
   USE_FONTS='Set in Adobe Bembo, Adobe Futura and Bitstream Courier.'
 elif test "${USE_FONTS}" = no ; then

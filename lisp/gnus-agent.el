@@ -296,6 +296,8 @@ node `(gnus)Server Buffer'.")
                     (setq category (cdr category)))))))
   category)
 
+;; Fixme: These two can probably be in eval-when-compile.
+
 (defmacro gnus-agent-cat-defaccessor (name prop-name)
   "Define accessor and setter methods for manipulating a list of the form
 \(NAME (PROPERTY1 VALUE1) ... (PROPERTY_N VALUE_N)).
@@ -308,8 +310,8 @@ manipulated as follows:
                                     (quote (quote ,prop-name)) category)))
 
           (define-setf-method ,name (category)
-            (let* ((--category--temp-- (gensym "--category--"))
-                   (--value--temp-- (gensym "--value--")))
+            (let* ((--category--temp-- (make-symbol "--category--"))
+                   (--value--temp-- (make-symbol "--value--")))
               (list (list --category--temp--) ; temporary-variables
                     (list category)     ; value-forms
                     (list --value--temp--) ; store-variables
@@ -344,8 +346,9 @@ manipulated as follows:
 (gnus-agent-cat-defaccessor
  gnus-agent-cat-score-file        agent-score-file)
 
-(defsetf gnus-agent-cat-groups (category) (groups)
-  (list 'gnus-agent-set-cat-groups category groups))
+(eval-when-compile
+  (defsetf gnus-agent-cat-groups (category) (groups)
+    (list 'gnus-agent-set-cat-groups category groups)))
 
 (defun gnus-agent-set-cat-groups (category groups)
   (unless (eq groups 'ignore)
@@ -380,8 +383,8 @@ manipulated as follows:
                            (setcdr category (cons cell (cdr category)))
                            cell)) groups))))))
 
-(defsubst gnus-agent-cat-make (name)
-  (list name '(agent-predicate . false)))
+(defsubst gnus-agent-cat-make (name &optional default-agent-predicate)
+  (list name `(agent-predicate . ,(or default-agent-predicate 'false))))
 
 ;;; Fetching setup functions.
 
@@ -1173,7 +1176,9 @@ This can be added to `gnus-select-article-hook' or
   ;; nnagent uses nnmail-group-pathname to read articles while
   ;; unplugged.  The agent must, therefore, use the same directory
   ;; while plugged.
-  (nnmail-group-pathname (gnus-group-real-name group) (gnus-agent-directory)))
+  (let ((gnus-command-method (or gnus-command-method
+                                 (gnus-find-method-for-group group))))
+    (nnmail-group-pathname (gnus-group-real-name group) (gnus-agent-directory))))
 
 (defun gnus-agent-get-function (method)
   (if (gnus-online method)
@@ -2204,7 +2209,7 @@ The following commands are available:
                                   '(agent-predicate agent-score-file agent-groups))))
                    c)
                  old-list)))))
-         (list (gnus-agent-cat-make 'default)))))
+         (list (gnus-agent-cat-make 'default 'short)))))
 
 (defun gnus-category-write ()
   "Write the category alist."
@@ -2387,7 +2392,7 @@ The following commands are available:
   (cond
    ;; Functions are just returned as is.
    ((or (symbolp predicate)
-	(gnus-functionp predicate))
+	(functionp predicate))
     `(,(or (cdr (assq predicate gnus-category-predicate-alist))
 	   predicate)))
    ;; More complex predicate.
@@ -2424,7 +2429,7 @@ return only unread articles."
          nil)
         ((not function)
          nil)
-        ((gnus-functionp function)
+        ((functionp function)
          'ignore)
         ((memq (car function) '(or and not))
          (apply (car function)

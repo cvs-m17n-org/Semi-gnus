@@ -172,9 +172,6 @@ See Info node `(gnus)Posting Styles'."
   :group 'gnus-message
   :type 'boolean)
 
-(defvar gnus-inews-mark-gcc-as-read nil
-  "Obsolete variable. Use `gnus-gcc-mark-as-read' instead.")
-
 (make-obsolete-variable 'gnus-inews-mark-gcc-as-read
 			'gnus-gcc-mark-as-read)
 
@@ -545,7 +542,7 @@ Gcc: header for archiving purposes."
 	(while (setq elem (pop alist))
 	  (when (or (and (stringp (car elem))
 			 (string-match (car elem) group))
-		    (and (gnus-functionp (car elem))
+		    (and (functionp (car elem))
 			 (funcall (car elem) group))
 		    (and (symbolp (car elem))
 			 (symbol-value (car elem))))
@@ -553,11 +550,11 @@ Gcc: header for archiving purposes."
 
 (defun gnus-inews-add-send-actions (winconf buffer article
 					    &optional config yanked)
-  (make-local-hook 'message-sent-hook)
+  (gnus-make-local-hook 'message-sent-hook)
   (add-hook 'message-sent-hook (if gnus-agent 'gnus-agent-possibly-do-gcc
 				 'gnus-inews-do-gcc) nil t)
   (when gnus-agent
-    (make-local-hook 'message-header-hook)
+    (gnus-make-local-hook 'message-header-hook)
     (add-hook 'message-header-hook 'gnus-agent-possibly-save-gcc nil t))
   (setq message-post-method
 	`(lambda (arg)
@@ -720,7 +717,12 @@ network.  The corresponding backend must have a 'request-post method."
 		  gnus-newsgroup-name))
 	  ;; #### see comment in gnus-setup-message -- drv
 	  (gnus-setup-message 'message
-	    (message-news (gnus-group-real-name gnus-newsgroup-name))))
+	    (progn
+	      (message-news (gnus-group-real-name gnus-newsgroup-name))
+	      (set (make-local-variable 'gnus-discouraged-post-methods)
+		   (delq
+		    (car (gnus-find-method-for-group gnus-newsgroup-name))
+		    (copy-sequence gnus-discouraged-post-methods))))))
       (save-excursion
 	(set-buffer buffer)
 	(setq gnus-newsgroup-name group)))))
@@ -1319,7 +1321,8 @@ automatically."
 
 (defun gnus-summary-wide-reply-with-original (n)
   "Start composing a wide reply mail to the current message.
-The original article will be yanked."
+The original article will be yanked.
+Uses the process/prefix convention."
   (interactive "P")
   (gnus-summary-reply-with-original n t))
 
@@ -1866,7 +1869,9 @@ this is a reply."
 			 ;; Gnus is not running?
 			 (gnus-alive-p)
 			 (or gnus-gcc-mark-as-read
-			     gnus-inews-mark-gcc-as-read))
+			     (and
+			      (boundp 'gnus-inews-mark-gcc-as-read)
+			      (symbol-value 'gnus-inews-mark-gcc-as-read))))
 		(gnus-group-mark-article-read group (cdr group-art)))
 	      (kill-buffer (current-buffer)))))))))
 
@@ -1877,7 +1882,7 @@ this is a reply."
       (message-narrow-to-headers)
       (let* ((group gnus-outgoing-message-group)
 	     (gcc (cond
-		   ((gnus-functionp group)
+		   ((functionp group)
 		    (funcall group))
 		   ((or (stringp group) (list group))
 		    group))))
@@ -1918,7 +1923,7 @@ this is a reply."
 	   ((and (listp var) (stringp (car var)))
 	    ;; A list of groups.
 	    var)
-	   ((gnus-functionp var)
+	   ((functionp var)
 	    ;; A function.
 	    (funcall var group))
 	   (t
@@ -1931,7 +1936,7 @@ this is a reply."
 				 ;; Regexp.
 				 (when (string-match (caar var) group)
 				   (cdar var)))
-				((gnus-functionp (car var))
+				((functionp (car var))
 				 ;; Function.
 				 (funcall (car var) group))
 				(t
@@ -2016,9 +2021,9 @@ this is a reply."
 			 (and header
 			      (string-match (pop style) header))))))
 	       ((or (symbolp match)
-		    (gnus-functionp match))
+		    (functionp match))
 		(cond
-		 ((gnus-functionp match)
+		 ((functionp match)
 		  ;; Function to be called.
 		  (funcall match))
 		 ((boundp match)
@@ -2045,8 +2050,7 @@ this is a reply."
       (setq name (assq 'name results)
 	    address (assq 'address results))
       (setq results (delq name (delq address results)))
-      ;; make-local-hook is not obsolete in Emacs 20 or XEmacs.
-      (make-local-hook 'message-setup-hook)
+      (gnus-make-local-hook 'message-setup-hook)
       (setq results (sort results (lambda (x y)
 				    (string-lessp (car x) (car y)))))
       (dolist (result results)
@@ -2121,8 +2125,8 @@ this is a reply."
 	     ((stringp value)
 	      value)
 	     ((or (symbolp value)
-		  (gnus-functionp value))
-	      (cond ((gnus-functionp value)
+		  (functionp value))
+	      (cond ((functionp value)
 		     (funcall value))
 		    ((boundp value)
 		     (symbol-value value))))

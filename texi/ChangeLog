@@ -1,3 +1,74 @@
+2003-04-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi, gnus.texi: Use the second arg to @uref where it
+	makes sense to make HTML and PDF output look nicer.
+
+2003-04-26  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-faq.texi: Make it compile in the LaTeX version.  Remove
+	redundant entries in @urefs.
+	(FAQ - Glossary): Remove the final @bye since it breaks the Gnus
+	manual.
+	([1.2]): @subsection -> @subheading.
+
+	* texi2latex.el (latexi-translate-file): Support @r, @env,
+	@heading, @subheading, @TeX.
+
+	* gnus.texi, message.texi, emacs-mime.texi: Markup improvements
+	and fixes.
+
+2003-04-24  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Selecting a Group): Add gnus-large-ephemeral-newsgroup.
+	(Filling In Threads): Add gnus-fetch-old-ephemeral-headers.
+	(Terminology): Index.
+
+2003-04-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: nil -> @code{nil}.  Capitalize "Rmail" and "Babyl"
+	consistently.
+
+2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-faq.texi: Allow inclusion in `gnus.texi' again.
+
+2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
+		
+	* gnus-faq.texi: New, the Gnus FAQ from http://my.gnus.org/FAQ.
+	From Frank Schmitt <ich@frank-schmitt.net>.
+
+	* gnus.texi (Server Variables): Added server parameters and index.
+
+2003-04-21  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus.texi (Group Parameters): Pointer to
+	gnus-newsgroup-variables.
+
+2003-04-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Buffer Lines): Add
+	gnus-sum-thread-tree-false-root.
+
+2003-04-15  Michael Shields  <shields@msrl.com>
+
+	* gnus.texi (Group Parameters, Hiding Headers): Document that
+	the broken-reply-to group parameter now also affects header
+	hiding.
+	* gnus.texi (Summary Mail Commands): Suggest setting the
+	broken-reply-to parameter if you find yourself using `B r'.
+
+2003-04-16  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (MML Definition): Add sender tag.
+
+2003-04-16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Line Specification): Add.
+
+2003-04-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Security): Add text about PGP key snarf.
+
 2003-04-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Misc Article): Addition.

@@ -1,3 +1,405 @@
+2003-04-27 06:47:31 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.19 is released.
+
+2003-04-27  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-registry.el (gnus-register-spool-action): Replaced literal
+	carriage-return character with its escape sequence.
+
+2003-04-27  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-catchup-from-here): Doc fix.
+
+	* nnrss.el (nnrss-node-text): Use only one
+	gnus-replace-in-string. 
+
+	* gnus.el: Remove gnus-functionp throughout.
+
+	* gnus-util.el (gnus-functionp): Removed.
+
+	* gnus-msg.el (gnus-summary-wide-reply-with-original): Doc fix. 
+
+	* message.el (message-required-headers): Add In-Reply-To.
+
+2003-04-27  Marshall T. Vandegrift  <vandem2@rpi.edu>
+
+	* gnus-fun.el (gnus-face-from-file): Bind coding-system-for-read
+	to binary.
+
+2003-04-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* mml.el (mml-preview): do.
+
+	* message.el (message-mode): do.
+
+	* gnus-undo.el (gnus-undo-mode): do.
+
+	* gnus-topic.el (gnus-topic-mode): do.
+
+	* gnus-sum.el (gnus-summary-mode, gnus-summary-edit-article): do.
+
+	* gnus-msg.el (gnus-setup-message)
+	(gnus-inews-add-send-actions, gnus-configure-posting-styles): do.
+
+	* gnus-gl.el (gnus-grouplens-mode): do.
+
+	* gnus-art.el (gnus-mime-save-part-and-strip)
+	(gnus-mime-delete-part): Use it.
+
+	* gnus-util.el (gnus-make-local-hook): New function.
+
+2003-04-25  Simon Josefsson  <jas@extundo.com>
+
+	* nnrss.el (nnrss-node-text): Don't use a star.
+	(nnrss-node-text): Use g-r-i-s, not g-r-r-i-s which doesn't exist.
+
+2003-04-24  Dave Love  <fx@gnu.org>
+
+	* qp.el (quoted-printable-decode-region): Use mm-insert-byte.
+	Signal error on malformed text, as for base64.
+	(quoted-printable-encode-region): DTRT in Emacs 22.
+
+	* mm-util.el (mm-make-temp-file, mm-insert-byte): New.
+	(mm-auto-save-coding-system): Consider utf-8-emacs.
+	(mm-mime-mule-charset-alist, mm-mule-charset-to-mime-charset)
+	(mm-charset-to-coding-system, mm-mime-charset)
+	(mm-find-mime-charset-region): Check for :mime-charset coding
+	systems property.
+
+	* mml-sec.el (mml2015, mml1991): Don't require.
+	(mml2015-sign, mml2015-encrypt, mml1991-sign, mml1991-encrypt) 
+	(message-goto-body, mml-insert-tag): Autoload.
+
+	* mm-decode.el (mm-tmp-directory): Re-write to help avoid warnings.
+
+	* gnus-start.el (message-make-date): Autoload rather than
+	requiring message.
+
+	* gnus-group.el (gnus-group-name-charset-group-alist): Use
+	mm-coding-system-p.
+	(gnus-cache-active-altered): Defvar when compiling.
+	(gnus-group-delete-group): Re-write to help avoid warnings.
+
+	* gnus-art.el (gnus-use-idna): Use mm-coding-system-p.
+
+	* pgg.el: Split eval-when-compile forms.
+
+2003-04-24  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-group.el (gnus-large-ephemeral-newsgroup) 
+	(gnus-fetch-old-ephemeral-headers): News variables.
+	(gnus-group-read-ephemeral-group): Use them.
+
+2003-04-24  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.el (sieve-upload): Don't use replace-regexp-in-string.
+
+	* nnrss.el (nnrss-node-text): Ditto.
+
+2003-04-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-msg.el (gnus-inews-do-gcc): Make sure the obsolete variable
+	gnus-inews-mark-gcc-as-read exists.
+
+2003-04-23  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sieve.el (gnus-sieve-generate): Rewrite regexp search so it
+	doesn't exceed the regexp stack space.
+
+2003-04-23  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-msg.el (gnus-inews-mark-gcc-as-read): Don't defvar it.
+
+	* gnus-art.el (gnus-article-hide-pgp-hook): do.
+
+2003-04-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* mml.el (mml-preview): Bind `=', RET, and mouse-2.
+
+2003-04-23  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-bodies.el (mm-decode-body): Don't override supplied charset.
+
+2003-04-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* dgnushack.el (merge, copy-list): Remove compiler macros.
+	(butlast): Add a compiler macro.
+
+2003-04-22  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus-util.el (gnus-merge): Added "type" argument to match CL
+	merge and gnus-sum.el's expectations.
+
+2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-url-regexp): Added nntp.
+
+	* message.el (message-generate-headers-first): Default to
+	'(references).
+
+	* gnus-art.el (gnus-mime-delete-part): Require confirmation.
+
+2003-04-21  Jesper Harder  <harder@ifa.au.dk>
+
+	* smime.el (smime-decrypt-region): Insert From header.
+
+2003-04-21  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus-fun.el (gnus-face-from-file, gnus-convert-png-to-face):
+	Max length of header is 726, not 740.  From Gaute B Strokkenes
+	<gs234@cam.ac.uk>.
+
+2003-04-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* nndb.el, mml1991.el: Fix license template.
+
+2003-04-20  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-split-articles): Don't download body unless
+	required.
+
+	* imap.el (imap-gssapi-open, imap-ssl-open): Erase buffer before
+	starting process, like imap-kerberos4-open does.
+
+	* mml-smime.el, rfc1843.el, dig.el, smime.el, uudecode.el: Fix
+	license template.
+
+	* mml-sec.el: Fix license template.
+
+	* gnus-sieve.el, sieve.el, sieve-manage.el, sieve-mode.el: Fix
+	license template.
+
+	* pgg-def.el, pgg.el, pgg-gpg.el, pgg-parse.el, pgg-pgp5.el,
+	pgg-pgp.el: Fix license template.
+
+2003-04-19  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-delete-article): Improve docstring.
+
+2003-04-19  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-move-spam-nonspam-groups-only): dumb typo fix
+
+2003-04-18  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-split): allow a particular check as a parameter,
+	e.g. (: spam-split 'spam-use-bogofilter)
+	(spam-mark-only-unseen-as-spam): new parameter, see doc
+	(spam-mark-junk-as-spam-routine): use
+	spam-mark-only-unseen-as-spam, simplify routine to take advantage
+	of gnus-newsgroup-unread as well as gnus-newsgroup-unseen
+
+2003-04-17  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.el (gnus-group-short-name, gnus-group-prefixed-p): new functions
+	(gnus-group-guess-full-name): don't prefix the group twice
+
+	* nnmail.el (nnmail-split-fancy-with-parent): docstring fix
+
+	* gnus-registry.el (gnus-registry-clear)
+	(gnus-registry-fetch-group, gnus-registry-grep-in-list)
+	(gnus-registry-split-fancy-with-parent): new functions
+	(gnus-register-spool-action, gnus-register-action): simplified the format
+	(gnus-registry): new customization group
+	(gnus-registry-unfollowed-groups): new variable
+
+2003-04-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-button-alist): Add nntp: urls.
+	(gnus-header-button-alist): Ditto.
+
+2003-04-17  Dave Love  <fx@gnu.org>
+
+	* gnus-util.el (gnus-string-equal): Revert last change.
+
+2003-04-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-srvr.el (gnus-browse-make-menu-bar): Fix typo.
+
+2003-04-17  Mike Woolley  <mike@ariel.co.uk>
+
+	* gnus-sum.el (gnus-sum-thread-tree-false-root): New variable.
+
+2003-04-15  Michael Shields  <shields@msrl.com>
+
+	* gnus-art.el (article-hide-boring-headers): Hide Reply-To: if
+	the broken-reply-to group parameter is set.  Idea from Vasily
+	Korytov <deskpot@myrealbox.com>.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: 'setenv' is in env.el for XEmacsen <= 21.4, but in
+	process.el in XEmacsen >= 21.5.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: Add a whole swag of autoloads and defaliases to
+	satisfy the byte-compiler when building with XEmacs.
+
+	* lpath.el (maybe-bind): Add 'w3-meta-content-type-charset-regexp'
+	and 'w3-meta-charset-content-type-regexp' in XEmacs.  The upstream
+	W3 doesn't have these.
+
+	* mailcap.el: Maybe require 'lpr in XEmacs.
+
+2003-04-16  Simon Josefsson  <jas@extundo.com>
+
+	* mml2015.el (mml2015-pgg-sign): Bind pgg-default-user-id to MML
+	sender tag, if available.
+
+2003-04-16  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-register-action)
+	(gnus-register-spool-action, hashtable-to-alist)
+	(gnus-registry-translate-from-alist, alist-to-hashtable)
+	(gnus-registry-translate-to-alist, gnus-registry-headers-hashtb):
+	new variables and function fixes
+
+	* gnus.el (gnus-registry-headers-alist): new variable to hold
+	article header data
+	(gnus-variable-list): save gnus-registry-headers-alist
+
+	* spam-report.el (Module): new module for spam reporting
+
+	* gnus.el (spam-process): added
+	gnus-group-spam-exit-processor-report-gmane to the list of choices
+	(gnus-install-group-spam-parameters): defined new spam exit processor
+
+	* spam.el (autoload): autoload spam-report-gmane when needed
+	(spam-report-gmane-register-routine): glue for spam-report.el
+	(spam-group-spam-processor-report-gmane-p): glue for the
+	gnus-group-spam-exit-processor-report-gmane spam processor
+	(spam-summary-prepare-exit): check the report-gmane spam processor
+	and run spam-report-gmane-register-routine if it's active
+
+	From John Wiegley <johnw@gnu.org>
+
+	* spam.el (spam-bogofilter-score): check bogofilter headers before
+	checking bogofilter itself
+
+2003-04-16  Dave Love  <fx@gnu.org>
+
+	* gnus-agent.el: Wrap defsetf in eval-when-compile.
+	(gnus-agent-cat-defaccessor): Don't use gensym.
+
+	* mml1991.el: Require cl, mm-util when compiling.
+	(quoted-printable-decode-region, quoted-printable-encode-region):
+	Autoload.
+
+	* pgg.el: Require cl when compiling.
+
+	* nnmail.el (gnus): Require.
+
+	* gnus-util.el: Move provide to end.
+	(gnus-string-equal): Maybe use compare-strings.
+	(gnus-merge): New.
+
+	* gnus-sum.el (gnus-summary-prepare-threads): Don't use copy-list.
+	(gnus-summary-insert-articles): Use gnus-merge.
+
+	* gnus-fun.el: Require cl and mm-util when compiling.
+
+	* gnus-diary.el (gnus-diary-delay-format-french)
+	(gnus-diary-delay-format-english): Don't use setf with nthcdr.
+
+	* nndiary.el (nndiary-compute-reminders): Don't use setf with
+	nthcdr.
+
+2003-04-16  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-make-cat): Added optional parameter to
+	specify a predicate other than false.
+	(gnus-category-read): Use the new feature to create a 'default'
+	category with a 'short' predicate.
+
+2003-04-16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-unique-id): Comment change.
+
+	* gnus-art.el (gnus-article-next-page-1): New function.
+	(gnus-article-next-page): Use it.
+
+2003-04-15  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-split): added save-restriction to save-excursion
+
+2003-04-15  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Julien Avarre <julien@avarre.com>
+
+	* gnus-fun.el: Fixed autoload cookie.
+
+2003-04-15  Paul Jarc  <prj@po.cwru.edu>
+	From Remi Letot  <remi.letot@easynet.be>
+
+	* nnmaildir.el (nnmaildir-request-scan): Use gnus-remove-if
+	instead of remove-if.
+
+2003-04-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-msg.el (gnus-summary-news-other-window): Use delq and
+	copy-sequence instead of remove which is a cl run-time function in
+	Emacs 20.
+
+2003-04-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-msg.el (gnus-summary-news-other-window): Make a buffer
+	local copy of gnus-discouraged-post-methods with the current
+	method removed.
+
+2003-04-14  Simon Josefsson  <jas@extundo.com>
+
+	* mailcap.el (mailcap-mime-data): Add application/pgp-keys.
+
+2003-04-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* mm-util.el (mm-sort-coding-systems-predicate): Convert elements
+	of `mm-coding-system-priorities' to base coding system.
+
+	* gnus-sum.el: Added coding cookie ("middle dot" in
+	gnus-summary-morse-message).
+
+2003-04-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-art.el (article-fill-long-lines)
+	(article-verify-x-pgp-sig, article-decode-group-name)
+	(gnus-mime-button-menu): Split >80 character lines.
+
+2003-04-13  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-local-variables): Use defvar since
+	we're let-binding it.
+
+	* nnmbox.el (nnmbox-mbox-buffer): It's not a constant.
+
+2003-04-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-hide-headers): Don't do intangible.
+
+	* gnus.el (gnus-group-prefixed-name): Comment out the test for
+	colon. 
+
+	* gnus-srvr.el (gnus-browse-read-group): Don't give the real name
+	to the ephemeral entry, but the prefixed name.
+
+	* gnus.el (gnus-group-prefixed-name): Clean up.
+
+2003-04-13  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-group-pathname): Bind
+	gnus-command-method so that gnus-agent-directory will always
+	return a valid directory.
+	* gnus-cache.el (gnus-cache-enter-article): Remove article from
+	gnus-newsgroup-undownloaded so that the summary will display the
+	article as downloaded.
+	(gnus-cache-remove-article): If the article isn't in the agent,
+	remove it from gnus-newsgroup-undownloaded so that the summary
+	will display the article as undownloaded.
+
+2003-04-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
 2003-04-13 01:12:01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.18 is released.
@@ -358,13 +760,14 @@
 
 2003-03-28  Paul Jarc  <prj@po.cwru.edu>
 
-	* nnmaildir.el (nnmaildir-request-set-mark,
-	nnmaildir-close-group): Allow each mark directory in a group to
+	* nnmaildir.el (nnmaildir-request-set-mark)
+	(nnmaildir-close-group): Allow each mark directory in a group to
 	have its own inode for mark files, to accommodate AFS.
 
 2003-03-28  Teodor Zlatanov  <tzz@lifelogs.com>
 
-	* gnus-start.el (gnus-read-newsrc-el-hook): new hook called by gnus-read-newsrc-el-file
+	* gnus-start.el (gnus-read-newsrc-el-hook): new hook called by
+	gnus-read-newsrc-el-file
 	(gnus-read-newsrc-el-file): call the gnus-read-newsrc-el-hook
 
 	* gnus-registry.el (gnus-registry-translate-to-alist)
@@ -383,7 +786,7 @@
 
 2003-03-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lpath.el: Bind url-current-object for FSF Emacs; bind
+	* lpath.el: Bind url-current-object for Emacs; bind
 	gnus-agent-expire-current-dirs for XEmacs; fbind open-ssl-stream
 	for both Emacsen.
 
@@ -618,11 +1021,9 @@
 
 2003-03-18  Paul Jarc  <prj@po.cwru.edu>
 
-	* nnmaildir.el (nnmaildir-open-server,
-	nnmaildir-request-scan,
-	nnmaildir-request-create-group,
-	nnmaildir-request-delete-group): Replace create-directory with
-	target-prefix.
+	* nnmaildir.el (nnmaildir-open-server, nnmaildir-request-scan)
+	(nnmaildir-request-create-group, nnmaildir-request-delete-group):
+	Replace create-directory with target-prefix.
 
 2003-03-18  Jesper Harder  <harder@ifa.au.dk>
 

@@ -1844,20 +1844,20 @@ This only makes sense for mail groups."
 When a spam group is entered, all unread articles are marked as spam.")
 
   (defvar gnus-group-spam-exit-processor-ifile "ifile"
-    "The ifile summary exit spam processor.
-Only applicable to spam groups.")
+    "The ifile summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-stat "stat"
-    "The spam-stat summary exit spam processor.
-Only applicable to spam groups.")
+    "The spam-stat summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-bogofilter "bogofilter"
-    "The Bogofilter summary exit spam processor.
-Only applicable to spam groups.")
+    "The Bogofilter summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-blacklist "blacklist"
-    "The Blacklist summary exit spam processor.
-Only applicable to spam groups.")
+    "The Blacklist summary exit spam processor.")
+
+  (defvar gnus-group-spam-exit-processor-report-gmane "report-gmane"
+    "The Gmane reporting summary exit spam processor.
+Only applicable to NNTP groups with articles from Gmane.  See spam-report.el")
 
   (defvar gnus-group-ham-exit-processor-ifile "ifile-ham"
     "The ifile summary exit ham processor.
@@ -1894,6 +1894,7 @@ Only applicable to non-spam (unclassified and ham) groups.")
 				   (variable-item gnus-group-spam-exit-processor-stat)
 				   (variable-item gnus-group-spam-exit-processor-bogofilter)
 				   (variable-item gnus-group-spam-exit-processor-blacklist)
+				   (variable-item gnus-group-spam-exit-processor-report-gmane)
 				   (variable-item gnus-group-ham-exit-processor-bogofilter)
 				   (variable-item gnus-group-ham-exit-processor-ifile)
 				   (variable-item gnus-group-ham-exit-processor-stat)
@@ -1919,6 +1920,7 @@ for mail groups."
 				      (variable-item gnus-group-spam-exit-processor-stat)
 				      (variable-item gnus-group-spam-exit-processor-bogofilter)
 				      (variable-item gnus-group-spam-exit-processor-blacklist)
+				      (variable-item gnus-group-spam-exit-processor-report-gmane)
 				      (variable-item gnus-group-ham-exit-processor-bogofilter)
 				      (variable-item gnus-group-ham-exit-processor-ifile)
 				      (variable-item gnus-group-ham-exit-processor-stat)
@@ -2331,6 +2333,7 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-registry-alist
+			gnus-registry-headers-alist
 			gnus-killed-list gnus-zombie-list
 			gnus-topic-topology gnus-topic-alist
 			gnus-agent-covered-methods)
@@ -2376,6 +2379,10 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-registry-alist nil
   "Assoc list of registry data.
+gnus-registry.el will populate this if it's loaded.")
+
+(defvar gnus-registry-headers-alist nil
+  "Assoc list of registry header data.
 gnus-registry.el will populate this if it's loaded.")
 
 (defvar gnus-newsrc-hashtb nil
@@ -3264,12 +3271,16 @@ that that variable is buffer-local to the summary buffers."
   (format "%s+%s" (car method) (nth 1 method)))
 
 (defun gnus-group-prefixed-name (group method &optional full)
-  "Return the whole name from GROUP and METHOD.  Call with full set to
-get the fully qualified group name (even if the server is native)."
-  (and (stringp method) (setq method (gnus-server-to-method method)))
+  "Return the whole name from GROUP and METHOD.
+Call with full set to get the fully qualified group name (even if the
+server is native)."
+  (when (stringp method)
+    (setq method (gnus-server-to-method method)))
   (if (or (not method)
 	  (and (not full) (gnus-server-equal method "native"))
-	  (string-match ":" group))
+	  ;;;!!! This might not be right.  We'll see...
+	  ;(string-match ":" group)
+	  )
       group
     (concat (gnus-method-to-server-name method) ":" group)))
 
@@ -3285,13 +3296,26 @@ native."
 
 (defun gnus-group-guess-full-name (group)
   "Guess the full name from GROUP, even if the method is native."
-  (gnus-group-full-name group (gnus-find-method-for-group group)))
+  (if (gnus-group-prefixed-p group)
+      group
+    (gnus-group-full-name group (gnus-find-method-for-group group))))
 
 (defun gnus-group-real-prefix (group)
   "Return the prefix of the current group name."
   (if (string-match "^[^:]+:" group)
       (substring group 0 (match-end 0))
     ""))
+
+(defun gnus-group-short-name (group)
+  "Return the short group name."
+  (let ((prefix (gnus-group-real-prefix group)))
+    (if (< 0 (length prefix))
+	(substring group (length prefix) nil)
+      group)))
+
+(defun gnus-group-prefixed-p (group)
+  "Return the prefix of the current group name."
+  (< 0 (length (gnus-group-real-prefix group))))
 
 (defun gnus-summary-buffer-name (group)
   "Return the summary buffer name of GROUP."

@@ -111,16 +111,11 @@
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
 ;; to limit the length of a string.  This function is necessary since
 ;; `(substr "abc" 0 30)' pukes with "Args out of range".
+;; Fixme: Why not `truncate-string-to-width'?
 (defsubst gnus-limit-string (str width)
   (if (> (length str) width)
       (substring str 0 width)
     str))
-
-(defsubst gnus-functionp (form)
-  "Return non-nil if FORM is funcallable."
-  (or (and (symbolp form) (fboundp form))
-      (and (listp form) (eq (car form) 'lambda))
-      (byte-code-function-p form)))
 
 (defsubst gnus-goto-char (point)
   (and point (goto-char point)))
@@ -159,6 +154,16 @@
 	  (point)
 	(goto-char p))))
   ))
+
+;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
+;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
+;; It's harmless, though, so the main purpose of this alias is to shut
+;; up the byte compiler.
+(defalias 'gnus-make-local-hook
+  (if (eq (get 'make-local-hook 'byte-compile) 
+	  'byte-compile-obsolete)
+      'ignore				; Emacs
+    'make-local-hook))			; XEmacs
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -609,7 +614,7 @@ If N, return the Nth ancestor instead."
   "Return a composite sort condition based on the functions in FUNC."
   (cond
    ;; Just a simple function.
-   ((gnus-functionp funs) funs)
+   ((functionp funs) funs)
    ;; No functions at all.
    ((null funs) funs)
    ;; A list of functions.
@@ -634,7 +639,7 @@ If N, return the Nth ancestor instead."
 	(setq function (cadr function)
 	      first 't2
 	      last 't1))
-       ((gnus-functionp function)
+       ((functionp function)
 	;; Do nothing.
 	)
        (t
@@ -1079,6 +1084,7 @@ Return the modified alist."
       (while (search-backward "\\." nil t)
 	(delete-char 1)))))
 
+;; Fixme: Why not use `with-output-to-temp-buffer'?
 (defmacro gnus-with-output-to-file (file &rest body)
   (let ((buffer (make-symbol "output-buffer"))
         (size (make-symbol "output-buffer-size"))
@@ -1146,6 +1152,9 @@ Return the modified alist."
 	(remove-text-properties start end properties object))
     t))
 
+;; This might use `compare-strings' to reduce consing in the
+;; case-insensitive case, but it has to cope with null args.
+;; (`string-equal' uses symbol print names.)
 (defun gnus-string-equal (x y)
   "Like `string-equal', except it compares case-insensitively."
   (and (= (length x) (length y))
@@ -1153,9 +1162,9 @@ Return the modified alist."
 	   (string-equal (downcase x) (downcase y)))))
 
 (defcustom gnus-use-byte-compile t
-  "If non-nil, byte-compile crucial run-time codes.
-Setting it to nil has no effect after first time running
-`gnus-byte-compile'."
+  "If non-nil, byte-compile crucial run-time code.
+Setting it to nil has no effect after the first time `gnus-byte-compile'
+is run."
   :type 'boolean
   :version "21.1"
   :group 'gnus-various)
@@ -1218,7 +1227,7 @@ If you find some problem with the directory separator character, try
     (- x ?0)))
 
 (defun gnus-url-unhex-string (str &optional allow-newlines)
-  "Remove %XXX embedded spaces, etc in a url.
+  "Remove %XX, embedded spaces, etc in a url.
 If optional second argument ALLOW-NEWLINES is non-nil, then allow the
 decoding of carriage returns and line feeds in the string, which is normally
 forbidden in URL encoding."
@@ -1415,8 +1424,7 @@ Return nil otherwise."
 				 display))
 	      display)))))
 
-(provide 'gnus-util)
-
+;; Fixme: This has only one use (in gnus-agent), which isn't worthwhile.
 (defmacro gnus-mapcar (function seq1 &rest seqs2_n)
   "Apply FUNCTION to each element of the sequences, and make a list of the results.
 If there are several sequences, FUNCTION is called with that many arguments,
@@ -1450,5 +1458,22 @@ sequence, this is like `mapcar'.  With several, it is like the Common Lisp
 		   ,@(apply 'nconc (mapcar (lambda (h) (list h (list 'cdr h))) heads))))
 	   (cdr ,result)))
     `(mapcar ,function ,seq1)))
+
+(if (fboundp 'merge)
+    (defalias 'gnus-merge 'merge)
+  ;; Adapted from cl-seq.el
+  (defun gnus-merge (type list1 list2 pred)
+    "Destructively merge lists LIST1 and LIST2 to produce a new list.
+Argument TYPE is for compatibility and ignored.
+Ordering of the elements is preserved according to PRED, a `less-than'
+predicate on the elements."
+    (let ((res nil))
+      (while (and list1 list2)
+	(if (funcall pred (car list2) (car list1))
+	    (push (pop list2) res)
+	  (push (pop list1) res)))
+      (nconc (nreverse res) list1 list2))))
+
+(provide 'gnus-util)
 
 ;;; gnus-util.el ends here

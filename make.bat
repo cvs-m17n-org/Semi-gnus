@@ -21,7 +21,7 @@ goto noemacs
 set EMACS=emacs.bat
 echo.
 echo ***************************************************************************
-echo * Using emacs.bat (If you've got en Emacs >= 20.3 please remove Emacs.bat, 
+echo * Using emacs.bat (If you've got en Emacs >= 20.3 please remove Emacs.bat,
 echo * it isn't needed anymore.
 echo ***************************************************************************
 echo.
@@ -42,12 +42,13 @@ if not exist %1\..\site-lisp mkdir %1\..\site-lisp
 if not exist %1\..\site-lisp\gnus mkdir %1\..\site-lisp\gnus
 if not exist %1\..\site-lisp\subdirs.el set subdirwarning=yes
 :emacsnocopy
+set EMACS_ARGS=-batch -q -no-site-file
 set GNUS_INFO_DIR=%1\..\info
 set GNUS_LISP_DIR=%1\..\site-lisp\gnus\lisp
 set GNUS_ETC_DIR=%1\..\site-lisp\gnus\etc
 goto lisp
-      
-:xemacs      
+
+:xemacs
 set EMACS=xemacs.exe
 if not "%2" == "/copy" goto xemacsnocopy
 if not exist %1\..\..\site-packages\ mkdir %1\..\..\site-packages\
@@ -55,6 +56,7 @@ if not exist %1\..\..\site-packages\info mkdir %1\..\..\site-packages\info
 if not exist %1\..\..\site-packages\lisp mkdir %1\..\..\site-packages\lisp
 if not exist %1\..\..\site-packages\etc mkdir %1\..\..\site-packages\etc
 :xemacsnocopy
+set EMACS_ARGS=-batch -no-autoloads
 set GNUS_INFO_DIR=%1\..\..\site-packages\info
 set GNUS_LISP_DIR=%1\..\..\site-packages\lisp\gnus
 set GNUS_ETC_DIR=%1\..\..\site-packages\etc
@@ -66,7 +68,7 @@ echo.
 goto lisp
 
 :lisp
-set EMACSBATCH=call %1\%EMACS% -no-site-file -batch -q
+set EMACSBATCH=call %1\%EMACS% %EMACS_ARGS%
 cd lisp
 if exist gnus-load.el del gnus-load.el
 echo.
@@ -97,7 +99,7 @@ goto infotest
 cd ..\texi
 if exist sieve del sieve
 makeinfo sieve.texi
-if exist sieve goto minfo 
+if exist sieve goto minfo
 REM It seems that makeinfo isn't available
 set EMACSINFO=%EMACSBATCH% -l infohack.el -f batch-makeinfo
 echo.
@@ -108,7 +110,7 @@ echo.
 goto info
 
 :minfo
-set EMACSINFO=makeinfo  
+set EMACSINFO=makeinfo
 echo.
 echo ***************************************************************************
 echo * Using makeinfo
@@ -156,8 +158,8 @@ if ErrorLevel 1 set ERROR=%ERROR%,copy-pgg-info
 
 echo.
 echo ***************************************************************************
-echo * You should add the following lines to 
-echo * %GNUS_INFO_DIR%\dir 
+echo * You should add the following lines to
+echo * %GNUS_INFO_DIR%\dir
 echo * if they aren't already there:
 echo *
 echo * * PGG: (pgg).	Emacs interface to various PGP implementations.
@@ -184,7 +186,7 @@ goto warnings
 :nocopy
 echo.
 echo ***************************************************************************
-echo * You chose not to copy the files, therefore you should add the 
+echo * You chose not to copy the files, therefore you should add the
 echo * following lines to the TOP of your [X]emacs customization file:
 echo *
 echo * (add-to-list 'load-path "/Path/to/gnus/lisp")
@@ -258,14 +260,14 @@ echo.
 echo ***************************************************************************
 echo * Usage: make.bat :[X]Emacs-exe-dir: [/copy]
 echo *
-echo * where: :[X]Emacs-exe-dir: is the directory your 
-echo *           emacs.exe respectively xemacs.exe resides in, 
+echo * where: :[X]Emacs-exe-dir: is the directory your
+echo *           emacs.exe respectively xemacs.exe resides in,
 echo *           e.g. G:\Programme\XEmacs\XEmacs-21.4.11\i586-pc-win32\
 echo *           or G:\Emacs\bin
 echo *        /copy indicates that the compiled files should be copied to your
 echo *           emacs lisp, info, and etc site directories.
 echo *
-echo * Note: If you have Emacs/w3 you should set the environment variable 
+echo * Note: If you have Emacs/w3 you should set the environment variable
 echo *       W3DIR to the directory where w3 is installed eg.
 echo *                set W3DIR=d:\lisp\w3-4.0pre46\lisp
 echo ***************************************************************************

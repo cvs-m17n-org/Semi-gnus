@@ -822,9 +822,13 @@ Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done
   "Install MANIFEST file as an XEmacs package."
   (let* ((package-dir (car command-line-args-left))
 	 (product-name (cadr command-line-args-left))
-	 (name (expand-file-name (concat "pkginfo/MANIFEST." product-name)
-				 package-dir))
+	 (pkginfo-dir (expand-file-name "pkginfo" package-dir))
+	 (name (expand-file-name (concat "MANIFEST." product-name)
+				 pkginfo-dir))
 	 make-backup-files)
+    (unless (file-directory-p pkginfo-dir)
+      (message "Creating directory %s/..." pkginfo-dir)
+      (make-directory pkginfo-dir))
     (message "Generating %s..." name)
     (with-temp-file name
       (insert "pkginfo/MANIFEST." product-name "\n")

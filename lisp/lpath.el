@@ -30,15 +30,14 @@
 
 (if (featurep 'xemacs)
     (progn
-      (maybe-fbind '(ccl-execute-on-string
-		     Info-directory Info-menu
-		     char-charset charsetp coding-system-get
-		     coding-system-list coding-system-p decode-coding-region
-		     decode-coding-string define-ccl-program delete-overlay
-		     detect-coding-region encode-coding-region
-		     encode-coding-string event-click-count event-end
-		     event-start find-charset-region
-		     find-coding-systems-for-charsets
+      (maybe-fbind '(Info-directory
+		     Info-menu ccl-execute-on-string char-charset charsetp
+		     coding-system-get coding-system-list coding-system-p
+		     decode-coding-region decode-coding-string
+		     define-ccl-program delete-overlay detect-coding-region
+		     encode-coding-region encode-coding-string
+		     event-click-count event-end event-start
+		     find-charset-region find-coding-systems-for-charsets
 		     find-coding-systems-region find-coding-systems-string
 		     get-charset-property mail-abbrevs-setup
 		     mouse-minibuffer-check mouse-movement-p mouse-scroll-subr
@@ -52,7 +51,9 @@
 		    enable-multibyte-characters gnus-agent-expire-current-dirs
 		    language-info-alist mark-active mouse-selection-click-count
 		    mouse-selection-click-count-buffer pgg-parse-crc24
-		    temporary-file-directory transient-mark-mode)))
+		    temporary-file-directory transient-mark-mode
+		    w3-meta-content-type-charset-regexp
+		    w3-meta-charset-content-type-regexp)))
   (maybe-fbind '(bbdb-complete-name
 		 delete-annotation device-connection dfw-device
 		 events-to-keys font-lock-set-defaults frame-device
@@ -79,8 +80,9 @@
 	 '(function-max-args smiley-encode-buffer))
 	((boundp 'MULE)
 	 '(charsetp
-	   coding-system-get coding-system-list coding-system-to-mime-charset
-	   compose-mail file-name-extension find-coding-systems-for-charsets
+	   coding-system-base coding-system-get coding-system-list
+	   coding-system-to-mime-charset compose-mail
+	   file-name-extension find-coding-systems-for-charsets
 	   find-coding-systems-region function-max-args get-charset-property
 	   smiley-encode-buffer smtpmail-send-it))
 	(t

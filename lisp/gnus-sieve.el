@@ -4,7 +4,7 @@
 ;; Author: NAGY Andras <nagya@inf.elte.hu>,
 ;;	Simon Josefsson <simon@josefsson.org>
 
-;; This file is not part of GNU Emacs, but the same permissions apply.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -105,10 +105,11 @@ See the documentation for these variables and functions for details."
   (require 'sieve)
   (find-file gnus-sieve-file)
   (goto-char (point-min))
-  (if (re-search-forward
-       (concat (regexp-quote gnus-sieve-region-start) "\\(.\\|\n\\)*"
-	       (regexp-quote gnus-sieve-region-end)) nil t)
-      (delete-region (match-beginning 0) (match-end 0))
+  (if (re-search-forward (regexp-quote gnus-sieve-region-start) nil t)
+      (delete-region (match-end 0)
+		     (or (re-search-forward (regexp-quote
+					     gnus-sieve-region-end) nil t)
+			 (point)))
     (insert sieve-template))
   (insert gnus-sieve-region-start
 	  (gnus-sieve-script gnus-sieve-select-method gnus-sieve-crosspost)
