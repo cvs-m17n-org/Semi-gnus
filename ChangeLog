@@ -68,7 +68,7 @@
 
 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.8.
+	* lisp/gnus.el: Semi-gnus 6.10.8 is released.
 
 	* Makefile.in (install-package-ja, package-ja, install-package,
 	package): New targets.
@@ -109,7 +109,7 @@
 
 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.6.
+	* lisp/gnus.el: Semi-gnus 6.10.6 is released.
 
 	* lisp/gnus-start.el (gnus-save-newsrc-file): Use
 	`save-buffer-as-coding-system' instead of
@@ -131,7 +131,7 @@
 
 1999-02-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.5.
+	* lisp/gnus.el: Semi-gnus 6.10.5 is released.
 
 1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
             Katsumi Yamaoka   <yamaoka@jpl.org>,
@@ -156,7 +156,7 @@
 
 1999-02-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.4.
+	* lisp/gnus.el Semi-gnus 6.10.4 is released.
 
 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `nnheader-nov-field',
 	`nnheader-nov-read-integer' and `nnheader-nov-read-message-id'
@@ -213,8 +213,11 @@
 
 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.3.
-	(gnus-version): Modify for SEMI 1.13.
+	* lisp/gnus.el: Semi-gnus 6.10.3 is released.
+
+1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version): Modify for SEMI 1.13.
 
 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `char-after' instead
 	of `following-char'.
