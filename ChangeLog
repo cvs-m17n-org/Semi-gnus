@@ -1,3 +1,10 @@
+1999-04-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/pop3.el (pop3-munge-message-separator): Don't put the
+	Content-Length field break into the other fields.
+
 1999-04-18  Sin'ya Kanematsu <ksinya@quartz.ocn.ne.jp>
 
 	* texi/gnus-ja.texi: Fix typo - `gnus-auto-expirable-newgroups' ->
