@@ -102,3 +102,37 @@ FLIM $B$G$O(B quote $B$5$l$?(B eword encoded word $B$O(B decode $B$5$l$^$
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 
 ---
+gnus-bbdb/split-mail()
+
+nnmail-split-fancy $B$G;HMQ$9$k$?$a$N4X?t$G$9!#<!$N$h$&$K;HMQ$7$F$/$@$5$$!#(B
+
+(setq nnmail-split-methods 'nnmail-split-fancy
+      nnmail-split-fancy
+      '(|
+        .....
+*1      (: gnus-bbdb/split-mail "from\\|to\\|cc"
+           'company "foo" "foo-group") 
+        .....
+*2      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'company "^bar")
+        .....
+*3      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'group)
+        .....
+*4      (: gnus-bbdb/split-mail "from\\|to\\|cc" 'note "my friend"
+          '(|
+             .....
+        .....
+        ))
+
+*1 : From, To, Cc $B$$$:$l$+$N%X%C%@!<!&%U%#!<%k%I$K4^$^$l$k%a%$%k!&%"%I(B
+     $B%l%9$N$&$A(B BBDB $B$N(B `company' $B%U%#!<%k%I$K(B `foo' $B$,4^$^$l$k>l9g!"(B
+     `foo-group' $B$K?6$jJ,$1$^$9!#(B
+
+*2 : `company' $B%U%#!<%k%I$,(B `bar' $B$G;O$^$C$F$$$k>l9g!"(B`company' $B%U%#!<(B
+     $B%k%I$NFbMF$r$=$N$^$^%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+
+*3 : `group' $B%U%#!<%k%I$,$"$k>l9g!"(B`group' $B%U%#!<%k%I$NFbMF$r$=$N$^$^(B
+     $B%0%k!<%WL>$H$7$F;HMQ$7!"?6$jJ,$1$^$9!#(B
+
+*4 : `note' $B%U%#!<%k%I$K(B `my friend' $B$,4^$^$l$k>l9g!"$=$N8e$m$K;XDj$5(B
+     $B$l$?5,B'$G?6$jJ,$1$^$9!#$3$N5,B'$N5-=RJ}K!$O!"DL>o$N(B
+     `nnmail-split-fancy' $B$G$N5-=RJ}K!$HF1$8$b$N$G$9!#(B
