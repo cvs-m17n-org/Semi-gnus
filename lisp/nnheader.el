@@ -795,8 +795,8 @@ given, the return value will not contain the last newline."
        (nnheader-generate-fake-message-id ,number))))
 
 (defun nnheader-parse-nov ()
-  (let ((eol (point-at-eol))
-	(number (nnheader-nov-read-integer)))
+  (let* ((eol (point-at-eol))
+	 (number (nnheader-nov-read-integer)))
     (make-full-mail-header
      number				; number
      (nnheader-nov-field)		; subject

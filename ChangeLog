@@ -1,3 +1,8 @@
+2004-06-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-parse-nov): Pass the eol value to
+	nnheader-nov-read-integer.
+
 2004-06-16  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* make.bat: Fix line endings around arch-tag.
