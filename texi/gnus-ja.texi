@@ -3921,7 +3921,8 @@ From Newsgroups})$(B!#(B
 @item L
 $(B5-;v$N9T?t!#(B
 @item c
-$(B5-;v$NJ8;z?t!#(B
+$(B5-;v$NJ8;z?t!#$3$NL>A0;XDj;R$O(B (nnfolder $(B$N$h$&$J(B) $(B$$$/$D$+$NA*BrJ}K!$r(B
+$(B%5%]!<%H$7$^$;$s!#(B
 @item I
 $(B%9%l%C%I$N%l%Y%k$K$h$k;z2<$2(B (@pxref{Customizing Threading})$(B!#(B
 @item T
@@ -10775,7 +10776,18 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 @item :plugged
 
 @code{nil} $(B$G$J$+$C$?$i!"(Bgnus $(B$,(B @dfn{unplugged} $(B$G$"$C$F$b%a!<%k$r<hF@(B
-$(B$7$^$9!#(B
+$(B$7$^$9!#$b$7$"$J$?$,%G%#%l%/%H%j$r%a!<%k%=!<%9$K;H$C$F$$$k$J$i$P!"$3$NNc(B
+$(B$N$h$&$K;XDj$9$k$3$H$,$G$-$^$9(B:
+
+@lisp
+(setq mail-sources
+      '((directory :path "/home/pavel/.Spool/" 
+                   :suffix ""
+                   :plugged t)))
+@end lisp
+
+$(B$"$J$?$,(B @dfn{unplugged} $(B$G$"$C$F$b(B gnus $(B$O%a!<%k$r<hF@$7$^$9!#$3$l$O!"(B
+$(B%m!<%+%k$N%a!<%k$H%K%e!<%9$r;H$&>l9g$KJXMx$G$9!#(B
 
 @end table
 @end table
