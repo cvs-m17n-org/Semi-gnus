@@ -10187,7 +10187,7 @@ IMAP $(B%5!<%P!<$KEO$9%Q%9%o!<%I$G$9!#;XDj$5$l$F$$$J$$$H$-$O!"MxMQ<T$OF~NO(B
 
 @item :stream
 $(B%5!<%P!<$K@\B3$9$k$H$-$K;H$&%9%H%j!<%`!#(B@code{imap-stream-alist} $(B$K$"$k(B
-$(B%7%s%\%k$NCf$N$R$H$D$r@_Dj$7$^$9!#8=>u$G$O!"(B@samp{kerberos} $(B$+(B 
+$(B%7%s%\%k$NCf$N$R$H$D$r@_Dj$7$^$9!#8=>u$G$O!"(B@samp{kerberos4} $(B$+(B 
 @samp{ssl} $(B$+=i4|CM$N(B @samp{network} $(B$K$J$j$^$9!#(B
 
 @item :authenticator
@@ -12386,13 +12386,13 @@ REFERENCE $(B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<$G(B
 @item nnimap-expunge-on-close
 @cindex Expunging
 @vindex nnimap-expunge-on-close
-@c What does Parmenides mean?
 
-Parmenides $(B$H0c$C$F!"(BIMAP $(B$N@_7W<TC#$O!"B8:_$7$F$$$J$$$b$N$,<B:]$K$OB8:_(B
-$(B$7$F$$$k$H7h$a$^$7$?!#$b$C$H>\$7$/@bL@$9$k$H!"(BIMAP $(B$O<B:]$K$O5-;v$r>C5n(B
-$(B$7$J$$!"5-;v$K(B @code{Deleted} $(B$H$$$&0u$rIU$1$k35G0$,$"$j!"$3$l(B ($(B$($C$H!"(B
-@code{Deleted} $(B$H$$$&0u$rIU$1$k$3$H$G$9(B) $(B$,(B nnimap $(B$,(B Gnus $(B$G5-;v$r>C5n(B
-$(B$9$k$H$-$K$9$k$3$H$G$9(B (@kbd{G DEL} $(B$J$I$G(B)$(B!#(B
+$(B%Q%k%a%K%G%9$H0c$C$F!"(BIMAP $(B$N@_7W<TC#$O!"B8:_$7$F$$$J$$$b$N$,<B:]$K$OB8(B
+$(B:_$7$F$$$k$H7h$a$^$7$?!#$b$C$H>\$7$/@bL@$9$k$H!"(BIMAP $(B$O<B:]$K$O5-;v$r>C(B
+$(B5n$7$J$$!"5-;v$K(B @code{Deleted} $(B$H$$$&0u$rIU$1$k35G0$,$"$j!"$3$l(B ($(B$($C(B
+$(B$H!"(B@code{Deleted} $(B$H$$$&0u$rIU$1$k$3$H$G$9(B) $(B$,(B nnimap $(B$,(B Gnus $(B$G5-;v$r(B
+$(B>C5n$9$k$H$-$K$9$k$3$H$G$9(B (@kbd{G DEL} $(B$J$I$G(B)$(B!#(B
+($(BLuCm(B: $(B%Q%k%a%K%G%9$O5*85A0(B 5 $(B@$5*$N%.%j%7%"$N(B Elea $(BGI$NE/3X<T(B)
 
 $(B5-;v$r(B @code{Deleted} $(B%U%i%0$G0u$rIU$1$?$H$-$K$OK\Ev$O>C5n$5$l$F$$$J$$$N(B
 $(B$G!"<B:]$K>C5n$9$k$?$a$NJ}K!$,I,MW$H$J$j$^$9!#=[4D$7$F$$$k$h$&$K46$8$^$9(B
