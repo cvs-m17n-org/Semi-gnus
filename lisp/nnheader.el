@@ -76,11 +76,14 @@ on your system, you could say something like:
 
 (defmacro mail-header-subject (header)
   "Return subject string in HEADER."
-  `(aref ,header 1))
+  `(mime-read-field 'Subject (aref ,header 1)))
 
 (defmacro mail-header-set-subject (header subject)
   "Set article subject of HEADER to SUBJECT."
-  `(aset ,header 1 ,subject))
+  `(mime-entity-set-parsed-header-internal
+    (aref ,header 1)
+    (put-alist 'Subject ,subject
+	       (mime-entity-parsed-header-internal (aref ,header 10)))))
 
 (defmacro mail-header-from (header)
   "Return author string in HEADER."
@@ -147,7 +150,11 @@ on your system, you could say something like:
 (defun make-full-mail-header (&optional number subject from date id
 					references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref))
+  (let ((entity (make-mime-entity-internal nil nil)))
+    (mime-entity-set-parsed-header-internal entity
+					    (list (cons 'Subject subject)))
+    (vector number entity from date id references chars lines xref)
+    ))
 
 ;; fake message-ids: generation and detection
 
