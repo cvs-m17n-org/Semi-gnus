@@ -604,14 +604,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	     process)
 	(when (setq process
 		    (condition-case nil
-			(cond ((eq system-type 'windows-nt)
-			       (let (selective-display
-				     (coding-system-for-write 'binary)
-				     (coding-system-for-read 'raw-text-dos))
-				 (open-ssl-stream name buffer server port)))
-			      (t
-			       (as-binary-process
-				(open-ssl-stream name buffer server port))))
+			(as-binary-process
+			 (open-ssl-stream name buffer server port))
 		      (error nil)))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
