@@ -6242,12 +6242,15 @@ Gnus $B$O:G=i$N8I;y$r?F$K$7$^$9!#$3$N?F$O$9$Y$F$NB>$N5-;v$rM\;R$K$7$^$9!#(B
 
 @item $B$_$;$+$1(B (dummy)
 @vindex gnus-summary-dummy-line-format
+@vindex gnus-summary-make-false-root-always
 Gnus $B$O?F$N$U$j$r$9$k$_$;$+$1$N35N,9T$r$D$/$j$^$9!#$_$;$+$1$N9T$O$I$NK\(B
 $BEv$N5-;v$K$bBP1~$7$^$;$s$N$G!"$=$l$rA*Br$9$k$3$H$O!"$_$;$+$1$N5-;v$N8e$N(B
 $B:G=i$NK\Ev$N5-;v$rA*Br$r$9$k$@$1$K$J$j$^$9!#$_$;$+$1$N:,K\$NMM<0$r;XDj(B
 $B$9$k$?$a$K!"(B@code{gnus-summary-dummy-line-format} $B$,;H$o$l$^$9!#$3$l$O$?$C(B
 $B$?0l$D$@$1$N%U%)!<%^%C%H$N;EMM$r<u$1IU$1$^$9(B: @samp{S} $B$G!"$3$l$O5-;v$N(B
-$BI=Bj$G$9!#(B@xref{Formatting Variables}.
+$BI=Bj$G$9!#(B@xref{Formatting Variables}$B!#$?$H$(=8$a$k$b$N$,L5$/$F$b!"$9$Y(B
+$B$F$N%9%l%C%I$K$_$;$+$1$N:,K\$r;}$?$;$?$$>l9g$O!"(B
+@code{gnus-summary-make-false-root-always} $B$r(B t $B$K@_Dj$7$F2<$5$$!#(B
 
 @item $B6u(B (empty)
 Gnus $B$O<B:]$K$O$I$N5-;v$b?F$K$O$;$:!"C1$K:G=i$N8I;y$r=|$$$F$9$Y$F$N8I;y(B
@@ -20870,7 +20873,7 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 @kindex S x
 @kindex M s x
 @findex gnus-summary-mark-as-spam
-(@code{gnus-summary-mark-as-spam})
+@code{gnus-summary-mark-as-spam}$B!#(B
 
 $B8=:_$N5-;v$K(B spam $B$H$7$F0u$rIU$1!"$=$l$r(B @samp{H} $B0u$GI=<($7$^$9!#(B
 Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$N(B
@@ -20881,7 +20884,7 @@ Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$
 @kindex M s t
 @kindex S t
 @findex spam-bogofilter-score
-(@code{spam-bogofilter-score}
+@code{spam-bogofilter-score}$B!#(B
 
 $B$3$N%3%^%s%I$,$A$c$s$HF/$/$?$a$K$O(B bogofilter $B$N=hM}$rM-8z$K$7$J$1$l$P$J(B
 $B$j$^$;$s!#(B

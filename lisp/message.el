@@ -2274,7 +2274,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Insert Region Marked" message-mark-inserted-region
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Mark region with enclosing tags"))]
-   ["Insert File Marked" message-mark-insert-file
+   ["Insert File Marked..." message-mark-insert-file
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Insert file at point marked with enclosing tags"))]
    "----"
@@ -2284,7 +2284,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Postpone Message" message-dont-send
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "File this draft message and exit"))]
-   ["Send at Specific Time" gnus-delay-article
+   ["Send at Specific Time..." gnus-delay-article
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Ask, then arrange to send message at that time"))]
    ["Kill Message" message-kill-buffer
@@ -2300,7 +2300,7 @@ Point is left at the beginning of the narrowed-to region."
    ["To" message-goto-to t]
    ["From" message-goto-from t]
    ["Subject" message-goto-subject t]
-   ["Change subject" message-change-subject t]
+   ["Change subject..." message-change-subject t]
    ["Cc" message-goto-cc t]
    ["Bcc" message-goto-bcc t]
    ["Fcc" message-goto-fcc t]
@@ -2312,7 +2312,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Newsgroups" message-goto-newsgroups t]
    ["Followup-To" message-goto-followup-to t]
    ;; ["Followup-To (with note in body)" message-xpost-fup2 t]
-   ["Crosspost / Followup-To" message-xpost-fup2 t]
+   ["Crosspost / Followup-To..." message-xpost-fup2 t]
    ["Distribution" message-goto-distribution t]
    ["X-No-Archive:" message-add-archive-header t ]
    "----"
@@ -5676,7 +5676,7 @@ OTHER-HEADERS is an alist of header/value pairs."
     (message-setup `((Newsgroups . ,(or newsgroups ""))
 		     (Subject . ,(or subject ""))))))
 
-(defun message-get-reply-headers (wide &optional to-address)
+(defun message-get-reply-headers (wide &optional to-address address-headers)
   (let (follow-to mct never-mct to cc author mft recipients)
     ;; Find all relevant headers we need.
     (let ((mrt (when message-use-mail-reply-to
@@ -5734,6 +5734,11 @@ sends a copy of your response to " (if (string-match "," mct)
       (cond
        ((not wide)
 	(setq recipients (concat ", " author)))
+       (address-headers
+	(dolist (header address-headers)
+	  (let ((value (message-fetch-field header)))
+	    (when value
+	      (setq recipients (concat recipients ", " value))))))
        ((and mft
 	     (string-match "[^ \t,]" mft)
 	     (or (not (eq message-use-mail-followup-to 'ask))

@@ -1,3 +1,44 @@
+2002-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-dummy-line-format): Update format to
+	fit with newer standard format.
+	(gnus-summary-make-false-root-always): New variable.
+	(gnus-gather-threads-by-subject): Use it.
+
+	* message.el (message-get-reply-headers): Take an address list
+	optional argument.
+
+2002-12-28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-keep-backlog): Change default to 20.
+
+	* gnus-agent.el (gnus-agent-check-overview-buffer): Start from
+	start. 
+	(gnus-agent-check-overview-buffer): Remove negative article
+	numbers. 
+
+	* nnmail.el (nnmail-split-fancy-with-parent-ignore-groups): Doc fix.
+	(nnmail-cache-ignore-groups): Doc fix.
+
+	* nnimap.el (nnimap-debug): Made into a flag and defcustomed.
+	(nnimap-debug-buffer): New variable.
+	(nnimap-debug): Use it.
+
+2002-12-28  Lars Magne Ingebrigtsen  <kgreiner@xpediantsolutions.com>
+
+	* gnus.el (gnus-summary-high-uncached-face): New color scheme. 
+
+2002-12-28  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-check-overview-buffer): Sort lines if
+	they aren't already sorted.
+
+2002-12-28  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.el (message-mode-menu): Add ellipses to menu items
+	expecting user interaction.
+	(message-mode-field-menu): do.
+
 2002-12-26  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-sum.el (gnus-summary-highlight-line): Don't bind `list' --
