@@ -300,8 +300,8 @@ that) from the headers before splitting and saving the messages."
 This can also be a list of regexps."
   :group 'nnmail-prepare
   :type '(choice (const :tag "none" nil)
-		 regexp
-		 (repeat regexp)))
+		 (regexp :value ".*")
+		 (repeat :value (".*") regexp)))
 
 (defcustom nnmail-pre-get-new-mail-hook nil
   "Hook called just before starting to handle new incoming mail."
@@ -1348,7 +1348,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 		     nnmail-use-procmail)
 		 (directory-files
 		  nnmail-procmail-directory
-		  t (concat (if group (concat "^" group) "")
+		  t (concat (if group (concat "^" (regexp-quote group)) "")
 			    nnmail-procmail-suffix "$"))))
 	   (p procmails)
 	   (crash (when (and (file-exists-p nnmail-crash-box)
@@ -1592,6 +1592,8 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 			 (file-name-nondirectory
 			  (concat (file-name-as-directory temp) "Incoming")))
 		      (concat (file-name-as-directory temp) "Incoming")))))
+	    (unless (file-exists-p (file-name-directory incoming))
+	      (make-directory (file-name-directory incoming) t))
 	    (rename-file nnmail-crash-box incoming t)
 	    (push incoming incomings))))
       ;; If we did indeed read any incoming spools, we save all info.
