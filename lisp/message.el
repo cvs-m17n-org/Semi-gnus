@@ -3052,36 +3052,41 @@ It should typically alter the sending method in some way or other."
 	  (success t)
 	  elem sent dont-barf-on-no-method
 	  (message-options message-options))
-      (message-options-set-recipient)
-      (save-excursion
-	(set-buffer message-encoding-buffer)
-	(erase-buffer)
-	;; ;; Avoid copying text props (except hard newlines).
-	;; T-gnus change: copy all text props from the editing buffer
-	;; into the encoding buffer.
-	(insert-buffer-substring message-edit-buffer)
-	(funcall message-encode-function)
-	(while (and success
-		    (setq elem (pop alist)))
-	  (when (funcall (cadr elem))
-	    (when (and (or (not (memq (car elem)
-				      message-sent-message-via))
-			   (if (or (message-gnksa-enable-p 'multiple-copies)
-				   (not (eq (car elem) 'news)))
-			       (y-or-n-p
-				(format
-				 "Already sent message via %s; resend? "
-				 (car elem)))
-			     (error "Denied posting -- multiple copies")))
-		       (setq success (funcall (caddr elem) arg)))
-	      (setq sent t)))))
-      (unless
-	  (or sent
-	      (not success)
-	      (let ((fcc (message-fetch-field "Fcc"))
-		    (gcc (message-fetch-field "Gcc")))
-		(when (or fcc gcc)
-		  (or (eq message-allow-no-recipients 'always)
+      (unwind-protect
+	  (progn
+	    (message-options-set-recipient)
+	    (save-excursion
+	      (set-buffer message-encoding-buffer)
+	      (erase-buffer)
+	      ;; ;; Avoid copying text props (except hard newlines).
+	      ;; T-gnus change: copy all text props from the editing buffer
+	      ;; into the encoding buffer.
+	      (insert-buffer-substring message-edit-buffer)
+	      (funcall message-encode-function)
+	      (while (and success
+			  (setq elem (pop alist)))
+		(when (funcall (cadr elem))
+		  (when (and
+			 (or (not (memq (car elem)
+					message-sent-message-via))
+			     (if (or (message-gnksa-enable-p 'multiple-copies)
+				     (not (eq (car elem) 'news)))
+				 (y-or-n-p
+				  (format
+				   "Already sent message via %s; resend? "
+				   (car elem)))
+			       (error "Denied posting -- multiple copies")))
+			 (setq success (funcall (caddr elem) arg)))
+		    (setq sent t)))))
+	    (unless
+		(or
+		 sent
+		 (not success)
+		 (let ((fcc (message-fetch-field "Fcc"))
+		       (gcc (message-fetch-field "Gcc")))
+		   (when (or fcc gcc)
+		     (or
+		      (eq message-allow-no-recipients 'always)
 		      (and (not (eq message-allow-no-recipients 'never))
 			   (setq dont-barf-on-no-method
 				 (gnus-y-or-n-p
@@ -3089,23 +3094,22 @@ It should typically alter the sending method in some way or other."
 					  (cond ((and fcc gcc) "Fcc and Gcc")
 						(fcc "Fcc")
 						(t "Gcc"))))))))))
-	(error "No methods specified to send by"))
-      (prog1
-	  (when (or dont-barf-on-no-method
-		    (and success sent))
-	    (message-do-fcc)
-	    (save-excursion
-	      (run-hooks 'message-sent-hook))
-	    (message "Sending...done")
-	    ;; Mark the buffer as unmodified and delete auto-save.
-	    (set-buffer-modified-p nil)
-	    (delete-auto-save-file-if-necessary t)
-	    (message-disassociate-draft)
-	    ;; Delete other mail buffers and stuff.
-	    (message-do-send-housekeeping)
-	    (message-do-actions message-send-actions)
-	    ;; Return success.
-	    t)
+	      (error "No methods specified to send by"))
+	    (when (or dont-barf-on-no-method
+		      (and success sent))
+	      (message-do-fcc)
+	      (save-excursion
+		(run-hooks 'message-sent-hook))
+	      (message "Sending...done")
+	      ;; Mark the buffer as unmodified and delete auto-save.
+	      (set-buffer-modified-p nil)
+	      (delete-auto-save-file-if-necessary t)
+	      (message-disassociate-draft)
+	      ;; Delete other mail buffers and stuff.
+	      (message-do-send-housekeeping)
+	      (message-do-actions message-send-actions)
+	      ;; Return success.
+	      t))
 	(kill-buffer message-encoding-buffer)))))
 
 (defun message-send-via-mail (arg)
@@ -3457,64 +3461,67 @@ This sub function is for exclusive use of `message-send-mail'."
 		     " sendmail errors")
 		  0))
 	resend-to-addresses delimline)
-    (let ((case-fold-search t))
-      (save-restriction
-	(message-narrow-to-headers)
-	(setq resend-to-addresses (message-fetch-field "resent-to")))
-      ;; Change header-delimiter to be what sendmail expects.
-      (goto-char (point-min))
-      (re-search-forward
-       (concat "^" (regexp-quote mail-header-separator) "\n"))
-      (replace-match "\n")
-      (backward-char 1)
-      (setq delimline (point-marker))
-      (run-hooks 'message-send-mail-hook)
-      ;; Insert an extra newline if we need it to work around
-      ;; Sun's bug that swallows newlines.
-      (goto-char (1+ delimline))
-      (when (eval message-mailer-swallows-blank-line)
-	(newline))
-      (when message-interactive
-	(save-excursion
-	  (set-buffer errbuf)
-	  (erase-buffer))))
-    (let* ((default-directory "/")
-	   (cpr
-	    (as-binary-process
-	     (apply 'call-process-region
-		    (append (list (point-min) (point-max)
-				  (if (boundp 'sendmail-program)
-				      sendmail-program
-				    "/usr/lib/sendmail")
-				  nil errbuf nil "-oi")
-			    ;; Always specify who from,
-			    ;; since some systems have broken sendmails.
-			    ;; But some systems are more broken with -f, so
-			    ;; we'll let users override this.
-			    (if (null message-sendmail-f-is-evil)
-				(list "-f" (message-make-address)))
-			    ;; These mean "report errors by mail"
-			    ;; and "deliver in background".
-			    (if (null message-interactive) '("-oem" "-odb"))
-			    ;; Get the addresses from the message
-			    ;; unless this is a resend.
-			    ;; We must not do that for a resend
-			    ;; because we would find the original addresses.
-			    ;; For a resend, include the specific addresses.
-			    (if resend-to-addresses
-				(list resend-to-addresses)
-			      '("-t")))))))
-      (unless (or (null cpr) (zerop cpr))
-	(error "Sending...failed with exit value %d" cpr)))
-    (when message-interactive
-      (save-excursion
-	(set-buffer errbuf)
-	(goto-char (point-min))
-	(while (re-search-forward "\n\n* *" nil t)
-	  (replace-match "; "))
-	(if (not (zerop (buffer-size)))
-	    (error "Sending...failed to %s"
-		   (buffer-substring (point-min) (point-max)))))
+    (unwind-protect
+	(progn
+	  (let ((case-fold-search t))
+	    (save-restriction
+	      (message-narrow-to-headers)
+	      (setq resend-to-addresses (message-fetch-field "resent-to")))
+	    ;; Change header-delimiter to be what sendmail expects.
+	    (goto-char (point-min))
+	    (re-search-forward
+	     (concat "^" (regexp-quote mail-header-separator) "\n"))
+	    (replace-match "\n")
+	    (backward-char 1)
+	    (setq delimline (point-marker))
+	    (run-hooks 'message-send-mail-hook)
+	    ;; Insert an extra newline if we need it to work around
+	    ;; Sun's bug that swallows newlines.
+	    (goto-char (1+ delimline))
+	    (when (eval message-mailer-swallows-blank-line)
+	      (newline))
+	    (when message-interactive
+	      (save-excursion
+		(set-buffer errbuf)
+		(erase-buffer))))
+	  (let* ((default-directory "/")
+		 (cpr (as-binary-process
+		       (apply
+			'call-process-region
+			(append
+			 (list (point-min) (point-max)
+			       (if (boundp 'sendmail-program)
+				   sendmail-program
+				 "/usr/lib/sendmail")
+			       nil errbuf nil "-oi")
+			 ;; Always specify who from,
+			 ;; since some systems have broken sendmails.
+			 ;; But some systems are more broken with -f, so
+			 ;; we'll let users override this.
+			 (if (null message-sendmail-f-is-evil)
+			     (list "-f" (message-make-address)))
+			 ;; These mean "report errors by mail"
+			 ;; and "deliver in background".
+			 (if (null message-interactive) '("-oem" "-odb"))
+			 ;; Get the addresses from the message
+			 ;; unless this is a resend.
+			 ;; We must not do that for a resend
+			 ;; because we would find the original addresses.
+			 ;; For a resend, include the specific addresses.
+			 (if resend-to-addresses
+			     (list resend-to-addresses)
+			   '("-t")))))))
+	    (unless (or (null cpr) (zerop cpr))
+	      (error "Sending...failed with exit value %d" cpr)))
+	  (when message-interactive
+	    (save-excursion
+	      (set-buffer errbuf)
+	      (goto-char (point-min))
+	      (while (re-search-forward "\n\n* *" nil t)
+		(replace-match "; "))
+	      (if (not (zerop (buffer-size)))
+		  (error "Sending...failed to %s"
+			 (buffer-substring (point-min) (point-max)))))))
       (when (bufferp errbuf)
 	(kill-buffer errbuf)))))
 

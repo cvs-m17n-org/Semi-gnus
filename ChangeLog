@@ -1,3 +1,8 @@
+2002-06-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-send): Kill `message-encoding-buffer'
+	even if sending failed.
+
 2002-06-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
