@@ -745,8 +745,8 @@ function is generally only called when Gnus is shutting down."
 (deffoo nnimap-request-post (&optional server)
   (let ((success t))
     (dolist (mbx (message-unquote-tokens
-                  (message-tokenize-header
-                   (message-fetch-field "Newsgroups") ", ")) success))
+		  (message-tokenize-header
+		   (message-fetch-field "Newsgroups") ", ")) success)
       (let ((to-newsgroup (gnus-group-prefixed-name mbx gnus-command-method)))
 	(or (gnus-active to-newsgroup)
 	    (gnus-activate-group to-newsgroup)
