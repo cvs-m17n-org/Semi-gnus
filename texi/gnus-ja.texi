@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.022 Manual
+@settitle Semi-gnus 6.10.024 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.022 Manual
+@title Semi-gnus 6.10.024 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus は、大きな絵が入っていたりさまざまな形式を用いたりしているちょっ
 な言語圏を差別しません。ああ、クリンゴンの方は Unicode Next Generationを
 お待ちください。
 
-この説明書は Semi-gnus 6.10.022 に対応します。
+この説明書は Semi-gnus 6.10.024 に対応します。
 
 @end ifinfo
 
