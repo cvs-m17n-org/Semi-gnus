@@ -1,3 +1,36 @@
+1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* ChangeLog: sync with Quassia Gnus v0.22.
+
+	* smtpmail.el (smtpmail-coding-system): New variable; abolish
+	`smtpmail-code-conv-from'.
+	(smtpmail-via-smtp): Guard `coding-system-for-write' by
+	`smtpmail-coding-system'.
+
+	* smtpmail.el: Imported from Emacs 20.2.
+
+	* pop3.el (pop3-movemail-file-coding-system): Change default value
+	to `binary'.
+	(pop3-open-server): Guard `coding-system-for-read' by `binary'.
+
+1998-01-06  shuhei-k  <shuhei-k@mousai.jaist.ac.jp>
+
+	* nnoo.el, nnml.el, message.el, gnus.el, gnus-sum.el,
+	gnus-start.el, gnus-ems.el, gnus-draft.el, gnus-agent.el,
+	ChangeLog: Importing qgnus-0.22
+
+	* gnus.el, ChangeLog: Importing qgnus-0.21
+
+	* nnvirtual.el, nnsoup.el, nnoo.el, nnmh.el, nnmail.el,
+	nndraft.el, gnus.el, gnus-xmas.el, gnus-sum.el, gnus-start.el,
+	gnus-score.el, gnus-msg.el, gnus-group.el, gnus-draft.el,
+	gnus-art.el, ChangeLog: Importing qgnus-0.20
+
+	* pop3.el, nntp.el, nnml.el, nnmail.el, nndoc.el, message.el,
+	gnus.el, gnus-uu.el, gnus-topic.el, gnus-sum.el, gnus-start.el,
+	gnus-score.el, gnus-group.el, gnus-cache.el, gnus-agent.el,
+	ChangeLog: Importing qgnus-0.19
+
 Tue Jan  6 07:45:39 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Quassia Gnus v0.22 is released.
