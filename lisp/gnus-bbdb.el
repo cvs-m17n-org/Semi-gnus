@@ -50,7 +50,7 @@
   'gnus-bbdb/extract-message-sender)
 
 (defun gnus-bbdb/extract-message-sender ()
-  (let ((from (mail-header-from gnus-current-headers))
+  (let ((from (mime-entity-fetch-field gnus-current-headers "from"))
 	to)
     (when from
       (setq from (gnus-bbdb/extract-address-components
