@@ -14832,8 +14832,9 @@ Emacs-w3m $B$O30It%3%^%s%I(B w3m $B$X$N(B Emacs $B$N%$%s%?!<%U%'!<%9$G$9!#>
 $B$K$D$$$F$O0J2<$N%Z!<%8$rK,$M$F$_$F2<$5$$!#(B
 
 @example
-@uref{http://emacs-w3m.namazu.org/, emacs-w3m}
-@uref{http://w3m.sourceforge.net/, w3m}
+@c Don't use @uref{} here, or old texinfmt will neglect @example. :-(
+http://emacs-w3m.namazu.org/
+http://w3m.sourceforge.net/
 @end example
 
 @c This comment line is needed to prevent texinfmt bug. :-(
