@@ -1,4 +1,4 @@
-;;; gnus-msg.el --- mail and post interface for Open gnus
+;;; gnus-msg.el --- mail and post interface for Semi-gnus
 ;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
