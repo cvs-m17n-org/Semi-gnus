@@ -6,7 +6,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 1.53
+;;; Version: 1.54
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -114,7 +114,7 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "1.53")
+(defconst gnus-offline-version-number "1.54")
 (defconst gnus-offline-codename
 ;;  "You may be right"		; 1.40
 ;;  "Chilstie Lee"		; 1.45
@@ -124,9 +124,8 @@
 ;;  "Tell her about it"		; 1.50
 ;;  "This night"		; 1.51
 ;;  "Movin'out"			; 1.52
-  "Longest night"		; 1.53
-;;  "Leave a tender moment alone"
-;;  "Back in the U.S.S.R"
+;;  "Longest night"		; 1.53
+  "Back in the U.S.S.R"		; 1.54
 ;;  "Running on ice"
 ;;  "This is the time"
 ;;  "A matter of trust"
@@ -281,10 +280,41 @@ If value is nil , dialup line is disconnected status.")
 (defvar string)
 (defvar hdr)
 (defvar str)
+(defvar ver)
 (defvar passwd)
 (defvar num)
 (defvar gnus-offline-map (make-sparse-keymap))
 
+;;; To silence byte compiler
+(and
+ (fboundp 'eval-when-compile)
+ (eval-when-compile
+   (save-excursion
+     (beginning-of-defun)
+     (eval-region (point-min) (point)))
+   (let (case-fold-search)
+     (mapcar
+      (function
+       (lambda (symbol)
+	 (unless (boundp symbol)
+	   (make-local-variable symbol)
+	   (eval (list 'setq symbol nil)))))
+      '(:group
+	:prefix :type
+	sendmail-to-spool-directory
+	news-spool-request-post-directory
+	nnspool-version
+	nnagent-version
+	msspool-news-server
+	msspool-news-service
+	gnspool-get-news
+	mail-spool-send
+	news-spool-post
+	gnus-agent-handle-level
+	))
+     (make-local-variable 'byte-compile-warnings)
+     (setq byte-compile-warnings nil))))
+       
 (autoload 'message-offline-state "miee"
   "Set current status to offline state" t)
 ;;
@@ -445,9 +475,9 @@ If value is nil , dialup line is disconnected status.")
       (gnus-offline-enable-fetch-mail))
 
   ;; fetch only mail for gnus-agent
-  (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (if (eq gnus-offline-articles-to-fetch 'mail)
-	  (setq gnus-agent-handle-level gnus-offline-mail-group-level))))
+  (if (and (eq gnus-offline-news-fetch-method 'nnagent)
+	   (eq gnus-offline-articles-to-fetch 'mail))
+	  (setq gnus-agent-handle-level gnus-offline-mail-group-level)))
 
 ;;
 ;; Change mail group level to handle only mail.
@@ -509,25 +539,24 @@ If value is nil , dialup line is disconnected status.")
   (if (memq gnus-offline-articles-to-fetch '(both news))
       (progn
 	(if gnus-offline-connected
-	    (progn
-	      (if (eq gnus-offline-news-fetch-method 'nnagent)
-		  (progn
-		    ;; Get New News (gnus-agent)
-		    (gnus-agent-toggle-plugged t)
-
-		    ;; fetch articles
-		    (gnus-agent-fetch-session)
-
-		    ;; Hang Up line. then set to offline status.
-		    (if (and gnus-offline-connected
-			     gnus-offline-auto-hangup)
-			(gnus-offline-set-unplugged-state))
-
-		    ;; All online jobs has done.
-		    (gnus-offline-after-jobs-done)))
-	      (if (eq gnus-offline-news-fetch-method 'nnspool)
-		  ;; Get New News (nnspool)
-		  (gnspool-get-news)))))))
+	    (cond ((eq gnus-offline-news-fetch-method 'nnagent)
+		   ;; Get New News (gnus-agent)
+		   (gnus-agent-toggle-plugged t)
+		  
+		   ;; fetch articles
+		   (gnus-agent-fetch-session)
+		  
+		   ;; Hang Up line. then set to offline status.
+		   (if (and gnus-offline-connected
+			    gnus-offline-auto-hangup)
+		       (gnus-offline-set-unplugged-state))
+		   
+		   ;; All online jobs has done.
+		   (gnus-offline-after-jobs-done))
+		  (t
+		   (if (eq gnus-offline-news-fetch-method 'nnspool)
+		       ;; Get New News (nnspool)
+		       (gnspool-get-news))))))))
 ;;
 ;; Disable fetch mail
 ;;
@@ -588,10 +617,10 @@ If value is nil , dialup line is disconnected status.")
   (if (eq gnus-offline-mail-treat-environ 'offline)
       (progn
 	(if (eq gnus-offline-news-fetch-method 'nnagent)
-	    (setq str (format "\n                        with %s" nnagent-version)
-		  string (concat gnus-offline-header-string str))
-	  (setq str (format "\n                        with %s" nnspool-version)
-		string (concat gnus-offline-header-string str)))
+	    (setq ver nnagent-version)
+	  (setq ver nnspool-version))
+	(setq str (format "\n                        with %s" ver)
+	      string (concat gnus-offline-header-string str))
 	(gnus-offline-add-custom-header "X-Gnus-Offline-Backend:" string))))
   
 
@@ -620,7 +649,8 @@ If value is nil , dialup line is disconnected status.")
   (if (functionp gnus-offline-hangup-function)
       (funcall gnus-offline-hangup-function))
   (setq gnus-offline-connected nil)
-  (gnus-agent-toggle-plugged nil)
+  (if (eq gnus-offline-news-fetch-method 'nnagent)
+      (gnus-agent-toggle-plugged nil))
 
   ;; Set send mail/news function to offline functions.
   (gnus-offline-set-offline-sendmail-function)

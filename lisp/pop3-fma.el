@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.12
+;; Version: 1.13
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -90,7 +90,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.12")
+(defconst pop3-fma-version-number "1.13")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -101,7 +101,8 @@
 ;;  "J boy"          		; 1.00
 ;;  "Blood line"		; 1.10
 ;;  "Star ring"			; 1.11
-  "Goodbye Game"		; 1.12
+;;  "Goodbye Game"		; 1.12
+  "Love is Gamble"		; 1.13
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
 				       pop3-fma-version-number
@@ -152,6 +153,28 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar spool nil)
 (defvar movemail-output-buffer " *movemail-out*")
 (defvar pop3-fma-commandline-arguments nil)
+
+;;; To silence byte compiler
+(and
+ (fboundp 'eval-when-compile)
+ (eval-when-compile
+   (save-excursion
+     (beginning-of-defun)
+     (eval-region (point-min) (point)))
+   (let (case-fold-search)
+     (mapcar
+      (function
+       (lambda (symbol)
+	 (unless (boundp symbol)
+	   (make-local-variable symbol)
+	   (eval (list 'setq symbol nil)))))
+      '(:group
+	:prefix :type
+	pop3-maildrop
+	pop3-mailhost
+	))
+     (make-local-variable 'byte-compile-warnings)
+     (setq byte-compile-warnings nil))))
 
 (defun pop3-fma-init-message-hook ()
   (add-hook 'mime-edit-translate-hook 'pop3-fma-message-add-header))
