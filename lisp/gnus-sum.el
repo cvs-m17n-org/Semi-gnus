@@ -879,6 +879,12 @@ For example: ((1 . cn-gb-2312) (2 . big5))."
   :type 'function
   :group 'gnus-summary)
 
+(defcustom gnus-orphan-score nil
+  "*All orphans get this score added.  Set in the score file."
+  :group 'gnus-score-default
+  :type '(choice (const nil)
+		 integer))
+
 ;;; Internal variables
 
 (defvar gnus-article-mime-handles nil)
@@ -1096,6 +1102,7 @@ variable (string, integer, character, etc).")
     gnus-score-alist gnus-current-score-file
     (gnus-summary-expunge-below . global)
     (gnus-summary-mark-below . global)
+    (gnus-orphan-score . global)
     gnus-newsgroup-active gnus-scores-exclude-files
     gnus-newsgroup-history gnus-newsgroup-ancient
     gnus-newsgroup-sparse gnus-newsgroup-process-stack
@@ -1531,6 +1538,9 @@ increase the score of each group you read."
     "C" gnus-article-capitalize-sentences
     "c" gnus-article-remove-cr
     "q" gnus-article-de-quoted-unreadable
+    "6" gnus-article-de-base64-unreadable
+    "Z" gnus-article-decode-HZ
+    "h" gnus-article-wash-html
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1681,6 +1691,7 @@ increase the score of each group you read."
 	      ["Words" gnus-article-decode-mime-words t]
 	      ["Charset" gnus-article-decode-charset t]
 	      ["QP" gnus-article-de-quoted-unreadable t]
+	      ["Base64" gnus-article-de-base64-unreadable t]
 	      ["View all" gnus-mime-view-all-parts t])
              ("Date"
               ["Local" gnus-article-date-local t]
@@ -1707,6 +1718,7 @@ increase the score of each group you read."
               ["CR" gnus-article-remove-cr t]
               ["Show X-Face" gnus-article-display-x-face t]
               ["Quoted-Printable" gnus-article-de-quoted-unreadable t]
+              ["Base64" gnus-article-de-base64-unreadable t]
               ["Rot 13" gnus-summary-caesar-message t]
               ["Unix pipe" gnus-summary-pipe-message t]
               ["Add buttons" gnus-article-add-buttons t]
@@ -1714,6 +1726,7 @@ increase the score of each group you read."
               ["Stop page breaking" gnus-summary-stop-page-breaking t]
               ["Verbose header" gnus-summary-verbose-headers t]
               ["Toggle header" gnus-summary-toggle-header t]
+	      ["Html" gnus-article-wash-html t]
 	      ["HZ" gnus-article-decode-HZ t])
              ("Output"
               ["Save in default format" gnus-summary-save-article t]
@@ -4068,13 +4081,17 @@ or a straight list of headers."
 		    gnus-list-identifiers
 		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
     (dolist (header gnus-newsgroup-headers)
-      (when (string-match (concat "\\(Re: +\\)?\\(" regexp " *\\)")
+      (when (string-match (concat "\\(\\(\\(Re: +\\)?\\(" regexp 
+				  " *\\)\\)+\\(Re: +\\)?\\)")
 			  (mail-header-subject header))
 	(mail-header-set-subject
 	 header (concat (substring (mail-header-subject header)
-				   0 (match-beginning 2))
+				   0 (match-beginning 1))
+			(or
+			 (match-string 3 (mail-header-subject header))
+			 (match-string 5 (mail-header-subject header)))
 			(substring (mail-header-subject header)
-				   (match-end 2))))))))
+				   (match-end 1))))))))
 
 (defun gnus-select-newsgroup (group &optional read-all select-articles)
   "Select newsgroup GROUP.
@@ -4450,7 +4467,11 @@ If WHERE is `summary', the summary mode line format will be used."
 	(let* ((mformat (symbol-value
 			 (intern
 			  (format "gnus-%s-mode-line-format-spec" where))))
-	       (gnus-tmp-group-name gnus-newsgroup-name)
+	       (gnus-tmp-group-name (gnus-group-name-decode 
+				     gnus-newsgroup-name
+				     (gnus-group-name-charset 
+				      nil
+				      gnus-newsgroup-name)))
 	       (gnus-tmp-article-number (or gnus-current-article 0))
 	       (gnus-tmp-unread gnus-newsgroup-unreads)
 	       (gnus-tmp-unread-and-unticked (length gnus-newsgroup-unreads))
@@ -5837,7 +5858,14 @@ be displayed."
 	      force)
 	  ;; The requested article is different from the current article.
 	  (progn
+	    (when (gnus-buffer-live-p gnus-article-buffer)
+	      (with-current-buffer gnus-article-buffer
+		(mm-enable-multibyte)))
 	    (gnus-summary-display-article article all-headers)
+	    (when (gnus-buffer-live-p gnus-article-buffer)
+	      (with-current-buffer gnus-article-buffer
+		(if (not gnus-article-decoded-p) ;; a local variable
+		    (mm-disable-multibyte))))
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
 	    (gnus-article-set-window-start
@@ -7600,7 +7628,7 @@ latter case, they will be copied into the relevant groups."
     (save-excursion
       (set-buffer (gnus-get-buffer-create " *import file*"))
       (erase-buffer)
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       (goto-char (point-min))
       (unless (nnheader-article-p)
 	;; This doesn't look like an article, so we fudge some headers.
@@ -7729,31 +7757,63 @@ delete these instead."
     (gnus-set-mode-line 'summary)
     not-deleted))
 
-(defun gnus-summary-edit-article (&optional force)
+(defun gnus-summary-edit-article (&optional arg)
   "Edit the current article.
 This will have permanent effect only in mail groups.
-If FORCE is non-nil, allow editing of articles even in read-only
+If ARG is nil, edit the decoded articles.
+If ARG is 1, edit the raw articles. 
+If ARG is 2, edit the raw articles even in read-only groups.
+Otherwise, allow editing of articles even in read-only
 groups."
   (interactive "P")
-  (save-excursion
-    (set-buffer gnus-summary-buffer)
-    (let ((mail-parse-charset gnus-newsgroup-charset)
-	  (mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets))
-      (gnus-set-global-variables)
-      (when (and (not force)
-		 (gnus-group-read-only-p))
-	(error "The current newsgroup does not support article editing"))
-      (gnus-summary-show-article t)
-      (gnus-article-edit-article
-       'mime-to-mml
-       `(lambda (no-highlight)
-	  (let ((mail-parse-charset ',gnus-newsgroup-charset)
-		(mail-parse-ignored-charsets 
-		 ',gnus-newsgroup-ignored-charsets))
-	    (mml-to-mime)
-	    (gnus-summary-edit-article-done
-	     ,(or (mail-header-references gnus-current-headers) "")
-	     ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight)))))))
+  (let (force raw)
+    (cond 
+     ((null arg))
+     ((eq arg 1) (setq raw t))
+     ((eq arg 2) (setq raw t
+		       force t))
+     (t (setq force t)))
+    (if (and raw (not force) (equal gnus-newsgroup-name "nndraft:drafts"))
+	(error "Can't edit the raw article in group nndraft:drafts."))
+    (save-excursion
+      (set-buffer gnus-summary-buffer)
+      (let ((mail-parse-charset gnus-newsgroup-charset)
+	    (mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets))
+	(gnus-set-global-variables)
+	(when (and (not force)
+		   (gnus-group-read-only-p))
+	  (error "The current newsgroup does not support article editing"))
+	(gnus-summary-show-article t)
+	(when (and (not raw) (gnus-buffer-live-p gnus-article-buffer))
+	  (with-current-buffer gnus-article-buffer
+	    (mm-enable-multibyte)))
+	(if (equal gnus-newsgroup-name "nndraft:drafts")
+	    (setq raw t))
+	(gnus-article-edit-article
+	 (if raw 'ignore 
+	   #'(lambda () 
+	       (let ((mbl mml-buffer-list))
+		 (setq mml-buffer-list nil)
+		 (mime-to-mml)
+		 (make-local-hook 'kill-buffer-hook)
+		 (let ((mml-buffer-list mml-buffer-list))
+		   (setq mml-buffer-list mbl)
+		   (make-local-variable 'mml-buffer-list))
+		 (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t))))
+	 `(lambda (no-highlight)
+	    (let ((mail-parse-charset ',gnus-newsgroup-charset)
+		  (mail-parse-ignored-charsets 
+		   ',gnus-newsgroup-ignored-charsets))
+	      ,(if (not raw) '(progn 
+				(mml-to-mime)
+				(mml-destroy-buffers)
+				(remove-hook 'kill-buffer-hook 
+					     'mml-destroy-buffers t)
+				(kill-local-variable 'mml-buffer-list)))
+	      (gnus-summary-edit-article-done
+	       ,(or (mail-header-references gnus-current-headers) "")
+	       ,(gnus-group-read-only-p) 
+	       ,gnus-summary-buffer no-highlight))))))))
 
 (defalias 'gnus-summary-edit-article-postpone 'gnus-article-edit-exit)
 
@@ -8513,6 +8573,37 @@ read."
     (gnus-summary-catchup all))
   (gnus-summary-next-group))
 
+;;;
+;;; with article
+;;;
+
+(defmacro gnus-with-article (article &rest forms)
+  "Select ARTICLE and perform FORMS in the original article buffer.
+Then replace the article with the result."
+  `(progn
+     ;; We don't want the article to be marked as read.
+     (let (gnus-mark-article-hook)
+       (gnus-summary-select-article t t nil ,article))
+     (set-buffer gnus-original-article-buffer)
+     ,@forms
+     (if (not (gnus-check-backend-function
+	       'request-replace-article (car gnus-article-current)))
+	 (gnus-message 5 "Read-only group; not replacing")
+       (unless (gnus-request-replace-article
+		,article (car gnus-article-current)
+		(current-buffer) t)
+	 (error "Couldn't replace article")))
+     ;; The cache and backlog have to be flushed somewhat.
+     (when gnus-keep-backlog
+       (gnus-backlog-remove-article
+	(car gnus-article-current) (cdr gnus-article-current)))
+     (when gnus-use-cache
+       (gnus-cache-update-article
+	(car gnus-article-current) (cdr gnus-article-current)))))
+
+(put 'gnus-with-article 'lisp-indent-function 1)
+(put 'gnus-with-article 'edebug-form-spec '(form body))
+
 ;; Thread-based commands.
 
 (defun gnus-summary-articles-in-thread (&optional article)
@@ -8929,7 +9020,7 @@ If N is a negative number, save the N previous articles.
 If N is nil and any articles have been marked with the process mark,
 save those articles instead."
   (interactive "P")
-  (let ((gnus-default-article-saver 'rmail-output-to-rmail-file))
+  (let ((gnus-default-article-saver 'gnus-summary-save-in-rmail))
     (gnus-summary-save-article arg)))
 
 (defun gnus-summary-save-article-file (&optional arg)
@@ -9518,37 +9609,6 @@ treated as multipart/mixed."
       (let ((gnus-unbuttonized-mime-types nil))
 	(gnus-summary-show-article))
     (gnus-summary-show-article)))
-
-;;;
-;;; with article
-;;;
-
-(defmacro gnus-with-article (article &rest forms)
-  "Select ARTICLE and perform FORMS in the original article buffer.
-Then replace the article with the result."
-  `(progn
-     ;; We don't want the article to be marked as read.
-     (let (gnus-mark-article-hook)
-       (gnus-summary-select-article t t nil ,article))
-     (set-buffer gnus-original-article-buffer)
-     ,@forms
-     (if (not (gnus-check-backend-function
-	       'request-replace-article (car gnus-article-current)))
-	 (gnus-message 5 "Read-only group; not replacing")
-       (unless (gnus-request-replace-article
-		,article (car gnus-article-current)
-		(current-buffer) t)
-	 (error "Couldn't replace article")))
-     ;; The cache and backlog have to be flushed somewhat.
-     (when gnus-keep-backlog
-       (gnus-backlog-remove-article
-	(car gnus-article-current) (cdr gnus-article-current)))
-     (when gnus-use-cache
-       (gnus-cache-update-article
-	(car gnus-article-current) (cdr gnus-article-current)))))
-
-(put 'gnus-with-article 'lisp-indent-function 1)
-(put 'gnus-with-article 'edebug-form-spec '(form body))
 
 ;;;
 ;;; Generic summary marking commands

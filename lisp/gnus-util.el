@@ -539,17 +539,19 @@ Bind `print-quoted' and `print-readably' to t while printing."
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
-  (when (and directory
-	     (not (file-exists-p directory)))
-    (make-directory directory t))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
+    (when (and directory
+	       (not (file-exists-p directory)))
+      (make-directory directory t)))
   t)
 
 (defun gnus-write-buffer (file)
   "Write the current buffer's contents to FILE."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
-  ;; Write the buffer.
-  (write-region (point-min) (point-max) file nil 'quietly))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
+    ;; Write the buffer.
+    (write-region (point-min) (point-max) file nil 'quietly)))
 
 (defun gnus-delete-file (file)
   "Delete FILE if it exists."
@@ -568,7 +570,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (save-excursion
       (save-restriction
 	(goto-char beg)
-	(while (re-search-forward "[ \t]*\n" end 'move)
+	(while (re-search-forward gnus-emphasize-whitespace-regexp end 'move)
 	  (gnus-put-text-property beg (match-beginning 0) prop val)
 	  (setq beg (point)))
 	(gnus-put-text-property beg (point) prop val)))))
@@ -681,7 +683,8 @@ with potentially long computations."
 		(save-excursion
 		  (set-buffer file-buffer)
 		  (rmail-insert-rmail-file-header)
-		  (let ((require-final-newline nil))
+		  (let ((require-final-newline nil)
+			(coding-system-for-write mm-text-coding-system))
 		    (gnus-write-buffer filename)))
 		(kill-buffer file-buffer))
 	    (error "Output file does not exist")))
@@ -732,7 +735,8 @@ with potentially long computations."
 	    (let ((file-buffer (create-file-buffer filename)))
 	      (save-excursion
 		(set-buffer file-buffer)
-		(let ((require-final-newline nil))
+		(let ((require-final-newline nil)
+		      (coding-system-for-write mm-text-coding-system))
 		  (gnus-write-buffer filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
@@ -855,8 +859,10 @@ ARG is passed to the first function."
 	  (forward-line 1))
 	(nreverse result)))))
 
-(defun gnus-netrc-machine (list machine &optional port)
-  "Return the netrc values from LIST for MACHINE or for the default entry."
+(defun gnus-netrc-machine (list machine &optional port defaultport)
+  "Return the netrc values from LIST for MACHINE or for the default entry.
+If PORT specified, only return entries with matching port tokens.
+Entries without port tokens default to DEFAULTPORT."
   (let ((rest list)
 	result)
     (while list
@@ -872,9 +878,9 @@ ARG is passed to the first function."
     (when result
       (setq result (nreverse result))
       (while (and result
-		  (not (equal (or port "nntp")
+		  (not (equal (or port defaultport "nntp")
 			      (or (gnus-netrc-get (car result) "port")
-				  "nntp"))))
+				  defaultport "nntp"))))
 	(pop result))
       (car result))))
 

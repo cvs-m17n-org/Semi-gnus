@@ -198,10 +198,11 @@ regexp.  If it matches, the text in question is not a signature."
   :type 'sexp
   :group 'gnus-article-hiding)
 
+;; Fixme: This isn't the right thing for mixed graphical and and
+;; non-graphical frames in a session.
 (defcustom gnus-article-x-face-command
   (if (and (fboundp 'image-type-available-p)
-	   (or (image-type-available-p 'xpm)
-	       (image-type-available-p 'xbm)))
+	   (image-type-available-p 'xbm))
       'gnus-article-display-xface
     "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -")
   "*String or function to be executed to display an X-Face header.
@@ -252,6 +253,14 @@ is the face used for highlighting."
 		       (integer :tag "Emphasize group")
 		       face))
   :group 'gnus-article-emphasis)
+
+(defcustom gnus-emphasize-whitespace-regexp "^[ \t]+\\|[ \t]*\n"
+  "A regexp to describe whitespace which should not be emphasized.
+Typical values are \"^[ \\t]+\\\\|[ \\t]*\\n\" and \"[ \\t]+\\\\|[ \\t]*\\n\".
+The former avoids underlining of leading and trailing whitespace,
+and the latter avoids underlining any whitespace at all."
+  :group 'gnus-article-emphasis
+  :type 'regexp)
 
 (defface gnus-emphasis-bold '((t (:bold t)))
   "Face used for displaying strong emphasized text (*word*)."
@@ -1446,7 +1455,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
 			     (set-buffer gnus-summary-buffer)
 			   (error))
 			 gnus-newsgroup-ignored-charsets))
-	ct cte ctl charset)
+	ct cte ctl charset format)
   (save-excursion
     (save-restriction
       (article-narrow-to-head)
@@ -1458,7 +1467,8 @@ If PROMPT (the prefix), prompt for a coding system to use."
 		     (prompt
 		      (mm-read-coding-system "Charset to decode: "))
 		     (ctl
-		      (mail-content-type-get ctl 'charset))))
+		      (mail-content-type-get ctl 'charset)))
+	    format (and ctl (mail-content-type-get ctl 'format)))
       (when cte
 	(setq cte (mail-header-strip cte)))
       (if (and ctl (not (string-match "/" (car ctl)))) 
@@ -1467,8 +1477,13 @@ If PROMPT (the prefix), prompt for a coding system to use."
     (forward-line 1)
     (save-restriction
       (narrow-to-region (point) (point-max))
+      (if (and (eq mail-parse-charset 'gnus-decoded)
+	       (eq (mm-body-7-or-8) '8bit))
+	  ;; The text code could have been decoded.
+	  (setq charset mail-parse-charset))
       (when (and (or (not ctl)
-		     (equal (car ctl) "text/plain")))
+		     (equal (car ctl) "text/plain"))
+		 (not format)) ;; article with format will decode later.
 	(mm-decode-body
 	 charset (and cte (intern (downcase
 				   (gnus-strip-whitespace cte))))
@@ -1502,6 +1517,23 @@ or not."
 	(article-goto-body)
 	(quoted-printable-decode-region (point) (point-max) charset)))))
 
+(defun article-de-base64-unreadable (&optional force)
+  "Translate a base64 article.
+If FORCE, decode the article whether it is marked as base64 not."
+  (interactive (list 'force))
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (type (gnus-fetch-field "content-transfer-encoding"))
+	  (charset gnus-newsgroup-charset))
+      (when (or force
+		(and type (string-match "quoted-printable" (downcase type))))
+	(article-goto-body)
+	(save-restriction
+	  (narrow-to-region (point) (point-max))
+	  (base64-decode-region (point-min) (point-max))
+	  (if (mm-coding-system-p charset)
+	      (mm-decode-coding-region (point-min) (point-max) charset)))))))
+
 (eval-when-compile
   (require 'rfc1843))
 
@@ -1512,6 +1544,23 @@ or not."
   (save-excursion
     (let ((buffer-read-only nil))
       (rfc1843-decode-region (point-min) (point-max)))))
+
+(defun article-wash-html ()
+  "Format an html article."
+  (interactive)
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (charset gnus-newsgroup-charset))
+      (article-goto-body)
+      (save-window-excursion
+	(save-restriction
+	  (narrow-to-region (point) (point-max))
+	  (mm-setup-w3)
+	  (let ((w3-strict-width (window-width))
+		(url-standalone-mode t))
+	    (condition-case var
+		(w3-region (point-min) (point-max))
+	      (error))))))))
 
 (defun article-hide-list-identifiers ()
   "Remove list identifies from the Subject header.
@@ -1527,9 +1576,14 @@ The `gnus-list-identifiers' variable specifies what to do."
 	  (when regexp
 	    (goto-char (point-min))
 	    (when (re-search-forward
-		   (concat "^Subject: +\\(Re: +\\)?\\(" regexp " *\\)")
+		   (concat "^Subject: +\\(\\(\\(Re: +\\)?\\(" regexp 
+			   " *\\)\\)+\\(Re: +\\)?\\)")
 		   nil t)
-	      (delete-region (match-beginning 2) (match-end 0)))))))))
+	      (let ((s (or (match-string 3) (match-string 5))))
+		(delete-region (match-beginning 1) (match-end 1))
+		(when s
+		  (goto-char (match-beginning 1))
+		  (insert s))))))))))
 
 (defun article-hide-pgp ()
   "Remove any PGP headers and signatures in the current article."
@@ -2425,17 +2479,16 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		 gfunc (cdr func))
 	 (setq afunc func
 	       gfunc (intern (format "gnus-%s" func))))
-       (fset gfunc
-	     (if (not (fboundp afunc))
-		 nil
-	       `(lambda (&optional interactive &rest args)
-		  ,(documentation afunc t)
-		  (interactive (list t))
-		  (save-excursion
-		    (set-buffer gnus-article-buffer)
-		    (if interactive
-			(call-interactively ',afunc)
-		      (apply ',afunc args))))))))
+       (defalias gfunc
+	 (if (fboundp afunc)
+	   `(lambda (&optional interactive &rest args)
+	      ,(documentation afunc t)
+	      (interactive (list t))
+	      (save-excursion
+		(set-buffer gnus-article-buffer)
+		(if interactive
+		    (call-interactively ',afunc)
+		  (apply ',afunc args))))))))
    '(article-hide-headers
      article-hide-boring-headers
      article-treat-overstrike
@@ -2444,7 +2497,9 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-remove-cr
      article-display-x-face
      article-de-quoted-unreadable
+     article-de-base64-unreadable
      article-decode-HZ
+     article-wash-html
      article-mime-decode-quoted-printable
      article-hide-list-identifiers
      article-hide-pgp
@@ -2529,6 +2584,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Treat overstrike" gnus-article-treat-overstrike t]
        ["Remove carriage return" gnus-article-remove-cr t]
        ["Remove quoted-unreadable" gnus-article-de-quoted-unreadable t]
+       ["Remove base64" gnus-article-de-base64-unreadable t]
+       ["Treat html" gnus-article-wash-html t]
        ["Decode HZ" gnus-article-decode-HZ t]))
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency
@@ -2930,7 +2987,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (mm-user-display-methods nil)
-	 (mm-inline-large-images nil)
+	 (mm-inlined-types nil)
 	 (mail-parse-charset gnus-newsgroup-charset)
 	 (mail-parse-ignored-charsets 
 	  (save-excursion (set-buffer gnus-summary-buffer)
@@ -3408,7 +3465,7 @@ In no internal viewer is available, use an external viewer."
 	      (if overstrike ?o ? )
 	      (if emphasis ?e ? )))))
 
-(fset 'gnus-article-hide-headers-if-wanted 'gnus-article-maybe-hide-headers)
+(defalias 'gnus-article-hide-headers-if-wanted 'gnus-article-maybe-hide-headers)
 
 (defun gnus-article-maybe-hide-headers ()
   "Hide unwanted headers if `gnus-have-all-headers' is nil.
@@ -3976,7 +4033,7 @@ groups."
   "Exit the article editing without updating."
   (interactive)
   ;; We remove all text props from the article buffer.
-  (let ((buf (format "%s" (buffer-string)))
+  (let ((buf (buffer-substring-no-properties (point-min) (point-max)))
 	(curbuf (current-buffer))
 	(p (point))
 	(window-start (window-start)))
@@ -4008,7 +4065,7 @@ groups."
 
 ;;; Internal Variables:
 
-(defcustom gnus-button-url-regexp "\\b\\(\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)\\|[-a-zA-Z0-9_]+\\.[-a-zA-Z0-9_]+\\(\\.[-a-zA-Z0-9_]+[-a-zA-Z0-9_/]+\\)+"
+(defcustom gnus-button-url-regexp "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\)\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)"
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)

@@ -210,6 +210,11 @@ to:
 (defvar mm-last-shell-command "")
 (defvar mm-content-id-alist nil)
 
+;; According to RFC2046, in particular, in a digest, the default
+;; Content-Type value for a body part is changed from "text/plain" to
+;; "message/rfc822".
+(defvar mm-dissect-default-type "text/plain")
+
 ;;; The functions.
 
 (defun mm-dissect-buffer (&optional no-strict-mime)
@@ -231,7 +236,7 @@ to:
       (if (or (not ctl)
 	      (not (string-match "/" (car ctl))))
 	  (mm-dissect-singlepart
-	   '("text/plain")
+	   (list mm-dissect-default-type)
 	   (and cte (intern (downcase (mail-header-remove-whitespace
 				       (mail-header-remove-comments
 					cte)))))
@@ -245,7 +250,10 @@ to:
 	 result
 	 (cond
 	  ((equal type "multipart")
-	   (cons (car ctl) (mm-dissect-multipart ctl)))
+	   (let ((mm-dissect-default-type (if (equal subtype "digest")
+					      "message/rfc822"
+					    "text/plain")))
+	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
 	   (mm-dissect-singlepart
 	    ctl
@@ -632,7 +640,7 @@ external if displayed external."
     (save-excursion
       (if (member (mm-handle-media-supertype handle) '("text" "message"))
 	  (with-temp-buffer
-	    (insert-buffer-substring (mm-handle-buffer handle))
+ 	    (insert-buffer-substring (mm-handle-buffer handle))
 	    (mm-decode-content-transfer-encoding
 	     (mm-handle-encoding handle)
 	     (mm-handle-media-type handle))
@@ -699,6 +707,8 @@ external if displayed external."
 	 (method (completing-read "Viewer: " methods)))
     (when (string= method "")
       (error "No method given"))
+    (if (string-match "^[^% \t]+$" method) 
+	(setq method (concat method " %s")))
     (mm-display-external (copy-sequence handle) method)))
 
 (defun mm-preferred-alternative (handles &optional preferred)
@@ -787,10 +797,12 @@ external if displayed external."
 	(or mm-inline-large-images
 	    (and (< (glyph-width image) (window-pixel-width))
 		 (< (glyph-height image) (window-pixel-height))))
-      ;; Let's just inline everything under Emacs 21, since the image
-      ;; specification there doesn't actually get the width/height
-      ;; until you render the image.
-      t)))
+      (let* ((size (image-size image))
+	     (w (car size))
+	     (h (cdr size)))
+	(or mm-inline-large-images
+	    (and (< h (1- (window-height))) ; Don't include mode line.
+		 (< w (window-width))))))))
 
 (defun mm-valid-image-format-p (format)
   "Say whether FORMAT can be displayed natively by Emacs."

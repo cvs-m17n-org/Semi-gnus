@@ -505,7 +505,7 @@ articles in the topic and its subtopics."
       (let ((data (cadr (gnus-topic-find-topology topic))))
 	(setcdr data
 		(list (if insert 'visible 'invisible)
-		      (if hide 'hide nil)
+		      hide
 		      (cadddr data))))
       (if total-remove
 	  (setq gnus-topic-alist
@@ -544,15 +544,16 @@ articles in the topic and its subtopics."
     (gnus-topic-update-unreads name unread)
     (beginning-of-line)
     ;; Insert the text.
-    (gnus-add-text-properties
-     (point)
-     (prog1 (1+ (point))
-       (eval gnus-topic-line-format-spec))
-     (list 'gnus-topic (intern name)
-	   'gnus-topic-level level
-	   'gnus-topic-unread unread
-	   'gnus-active active-topic
-	   'gnus-topic-visible visiblep))))
+    (if shownp
+	(gnus-add-text-properties
+	 (point)
+	 (prog1 (1+ (point))
+	   (eval gnus-topic-line-format-spec))
+	 (list 'gnus-topic (intern name)
+	       'gnus-topic-level level
+	       'gnus-topic-unread unread
+	       'gnus-active active-topic
+	       'gnus-topic-visible visiblep)))))
 
 (defun gnus-topic-update-unreads (topic unreads)
   (setq gnus-topic-unreads (delq (assoc topic gnus-topic-unreads)
@@ -1130,13 +1131,21 @@ When used interactively, PARENT will be the topic under point."
   (gnus-group-list-groups)
   (gnus-topic-goto-topic topic))
 
+;; FIXME: 
+;;  1. When the marked groups are overlapped with the process 
+;;     region, the behavior of move or remove is not right.
+;;  2. Can't process on several marked groups with a same name, 
+;;     because gnus-group-marked only keeps one copy.
+
 (defun gnus-topic-move-group (n topic &optional copyp)
   "Move the next N groups to TOPIC.
 If COPYP, copy the groups instead."
   (interactive
    (list current-prefix-arg
 	 (completing-read "Move to topic: " gnus-topic-alist nil t)))
-  (let ((groups (gnus-group-process-prefix n))
+  (let ((use-marked (and (not n) (not (gnus-region-active-p)) 
+			 gnus-group-marked t))
+	(groups (gnus-group-process-prefix n))
 	(topicl (assoc topic gnus-topic-alist))
 	(start-topic (gnus-group-topic-name))
 	(start-group (progn (forward-line 1) (gnus-group-group-name)))
@@ -1145,7 +1154,7 @@ If COPYP, copy the groups instead."
 	(gnus-topic-move start-topic topic)
       (mapcar
        (lambda (g)
-	 (gnus-group-remove-mark g)
+	 (gnus-group-remove-mark g use-marked)
 	 (when (and
 		(setq entry (assoc (gnus-current-topic) gnus-topic-alist))
 		(not copyp))
@@ -1158,18 +1167,24 @@ If COPYP, copy the groups instead."
 	(gnus-topic-goto-topic start-topic))
       (gnus-group-list-groups))))
 
-(defun gnus-topic-remove-group (&optional arg)
+(defun gnus-topic-remove-group (&optional n)
   "Remove the current group from the topic."
   (interactive "P")
-  (gnus-group-iterate arg
-    (lambda (group)
-      (let ((topicl (assoc (gnus-current-topic) gnus-topic-alist))
-	    (buffer-read-only nil))
-	(when (and topicl group)
-	  (gnus-delete-line)
-	  (gnus-delete-first group topicl))
-	(gnus-topic-update-topic)
-	(gnus-group-position-point)))))
+  (let ((use-marked (and (not n) (not (gnus-region-active-p)) 
+			 gnus-group-marked t))
+	(groups (gnus-group-process-prefix n)))
+    (mapcar
+     (lambda (group)
+       (gnus-group-remove-mark group use-marked)
+       (let ((topicl (assoc (gnus-current-topic) gnus-topic-alist))
+	     (buffer-read-only nil))
+	 (when (and topicl group)
+	   (gnus-delete-line)
+	   (gnus-delete-first group topicl))
+	 (gnus-topic-update-topic)))
+     groups)
+    (gnus-topic-enter-dribble)
+    (gnus-group-position-point)))
 
 (defun gnus-topic-copy-group (n topic)
   "Copy the current group to a topic."
@@ -1246,13 +1261,13 @@ If COPYP, copy the groups instead."
   (interactive)
   (when (gnus-current-topic)
     (gnus-topic-goto-topic (gnus-current-topic))
-    (gnus-topic-remove-topic nil nil 'hidden)))
+    (gnus-topic-remove-topic nil nil)))
 
 (defun gnus-topic-show-topic ()
   "Show the hidden topic."
   (interactive)
   (when (gnus-group-topic-p)
-    (gnus-topic-remove-topic t nil 'shown)))
+    (gnus-topic-remove-topic t nil)))
 
 (defun gnus-topic-mark-topic (topic &optional unmark)
   "Mark all groups in the topic with the process mark."

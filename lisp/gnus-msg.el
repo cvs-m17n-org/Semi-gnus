@@ -116,7 +116,7 @@ BODY-LIST is a list of charsets which may be encoded using 8bit
 content-transfer encoding in the body, or one of the special values
 nil (always encode using quoted-printable) or t (always use 8bit).
 
-Note that any value other tha nil for HEADER infringes some RFCs, so
+Note that any value other than nil for HEADER infringes some RFCs, so
 use this option with care."
   :type '(repeat (list :tag "Permitted unencoded charsets"
 		  (choice :tag "Where"
@@ -216,7 +216,9 @@ Thank you for your help in stamping out bugs.
 	   (,group gnus-newsgroup-name)
 	   (message-header-setup-hook
 	    (copy-sequence message-header-setup-hook))
+	   (mbl mml-buffer-list)
 	   (message-mode-hook (copy-sequence message-mode-hook)))
+       (setq mml-buffer-list nil)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-gcc)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-archive-gcc)
        (add-hook 'message-mode-hook 'gnus-configure-posting-styles)
@@ -228,7 +230,17 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,group ,article))
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
-	 (gnus-run-hooks 'gnus-message-setup-hook))
+	 (gnus-run-hooks 'gnus-message-setup-hook)
+	 (if (eq major-mode 'message-mode)
+	     ;; Make mml-buffer-list local.
+	     ;; Restore global mml-buffer-list value as mbl.
+	     ;; What a hack! -- Shenghuo
+	     (let ((mml-buffer-list mml-buffer-list))
+	       (setq mml-buffer-list mbl)
+	       (make-local-variable 'mml-buffer-list)
+	       (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t))
+	   (mml-destroy-buffers)
+	   (setq mml-buffer-list mbl)))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
@@ -434,7 +446,7 @@ header line with the old Message-ID."
 	  (gnus-remove-text-with-property 'gnus-next)
 	  (insert
 	   (prog1
-	       (format "%s" (buffer-string))
+	       (buffer-substring-no-properties (point-min) (point-max))
 	     (erase-buffer)))
 	  ;; Find the original headers.
 	  (set-buffer gnus-original-article-buffer)
@@ -462,6 +474,7 @@ header line with the old Message-ID."
 			      (article-buffer 'reply)
 			      (t 'message))
       (let* ((group (or group gnus-newsgroup-name))
+	     (charset (gnus-group-name-charset nil group))
 	     (pgroup group)
 	     to-address to-group mailing-list to-list
 	     newsgroup-p)
@@ -472,7 +485,8 @@ header line with the old Message-ID."
 		newsgroup-p (gnus-group-find-parameter group 'newsgroup)
 		mailing-list (when gnus-mailing-list-groups
 			       (string-match gnus-mailing-list-groups group))
-		group (gnus-group-real-name group)))
+		group (gnus-group-name-decode (gnus-group-real-name group)
+					      charset)))
 	(if (or (and to-group
 		     (gnus-news-group-p to-group))
 		newsgroup-p
@@ -636,6 +650,10 @@ automatically."
       (gnus-summary-select-article)
       (set-buffer (gnus-copy-article-buffer))
       (gnus-msg-treat-broken-reply-to)
+      (save-restriction
+	(message-narrow-to-head)
+	(goto-char (point-max)))
+      (mml-quote-region (point) (point-max))
       (message-reply nil wide)
       (when yank
 	(gnus-inews-yank-articles yank)))))
@@ -691,22 +709,20 @@ If POST, post instead of mail."
 	    text)
 	(save-excursion
 	  (set-buffer gnus-original-article-buffer)
-	  (setq text (buffer-string)))
+	  (mm-with-unibyte-current-buffer
+	    (setq text (buffer-string))))
 	(set-buffer 
-	 (if message-forward-show-mml
-	     (gnus-get-buffer-create
-	      (generate-new-buffer-name " *Gnus forward*"))
-	   (mm-with-unibyte-current-buffer
-	     ;; create an unibyte buffer
-	     (gnus-get-buffer-create
-	      (generate-new-buffer-name " *Gnus forward*")))))
+	 (gnus-get-buffer-create
+	  (generate-new-buffer-name " *Gnus forward*")))
 	(erase-buffer)
+	(mm-disable-multibyte)
 	(insert text)
 	(goto-char (point-min))
 	(when (looking-at "From ")
 	  (replace-match "X-From-Line: ") )
-	(if message-forward-show-mml
-	    (mime-to-mml))
+	(when message-forward-show-mml
+	  (mm-enable-multibyte)
+	  (mime-to-mml))
 	(message-forward post)))))
 
 (defun gnus-summary-resend-message (address n)
@@ -1021,7 +1037,8 @@ this is a reply."
 	  (when gcc
 	    (message-remove-header "gcc")
 	    (widen)
-	    (setq groups (message-tokenize-header gcc " ,"))
+	    (setq groups (message-unquote-tokens
+                          (message-tokenize-header gcc " ,")))
 	    ;; Copy the article over to some group(s).
 	    (while (setq group (pop groups))
 	      (gnus-check-server
@@ -1048,7 +1065,11 @@ this is a reply."
 		(message-encode-message-body)
 		(save-restriction
 		  (message-narrow-to-headers)
-		  (mail-encode-encoded-word-buffer))
+		  (let ((mail-parse-charset message-default-charset)
+			(rfc2047-header-encoding-alist
+			 (cons '("Newsgroups" . default)
+			       rfc2047-header-encoding-alist)))
+		    (mail-encode-encoded-word-buffer)))
 		(goto-char (point-min))
 		(when (re-search-forward
 		       (concat "^" (regexp-quote mail-header-separator) "$")

@@ -181,7 +181,8 @@ it's not cached."
 		  (gnus-article-decode-hook nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
-	      (gnus-write-buffer file)
+	      (let ((coding-system-for-write gnus-cache-coding-system))
+		(gnus-write-buffer file))
 	      (setq headers (nnheader-parse-head t))
 	      (mail-header-set-number headers number)
 	      (gnus-cache-change-buffer group)
@@ -584,7 +585,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
     ;; We simply read the active file.
     (save-excursion
       (gnus-set-work-buffer)
-      (insert-file-contents gnus-cache-active-file)
+      (nnheader-insert-file-contents gnus-cache-active-file)
       (gnus-active-to-gnus-format
        nil (setq gnus-cache-active-hashtb
 		 (gnus-make-hashtable

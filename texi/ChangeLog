@@ -1,3 +1,33 @@
+2000-06-28  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus.texi (Splitting in IMAP): Update.
+
+2000-05-19 15:18:32  Dmitry Yaitskov <dimas@home.com>
+
+	* message.texi (Reply): Doc fix.
+
+2000-05-17 00:50:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Listing Groups): Addition.
+
+2000-05-16 21:46:40  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Misc Group Stuff): Addition.
+	(Article Washing): Ditto.
+
+2000-05-15 10:16:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Mail Source Specifiers): Update maildir.
+
+2000-05-02  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi (MIME comands): Spelling fix.
+
+2000-05-03 21:12:05  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Summary Mail Commands): Addition.
+	(Summary Post Commands): Ditto.
+
 2000-04-27  Dave Love  <fx@gnu.org>
 
 	* gnus.texi (Article Washing): Update x-face bit.

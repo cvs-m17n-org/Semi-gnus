@@ -257,7 +257,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.8.6"
+(defconst gnus-version-number "5.8.7"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Gnus v%s" gnus-version-number)
@@ -753,7 +753,9 @@ be set in `.emacs' instead."
 	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
 				    (:type xbm :file "gnus.xbm")))))
 	   (when image
-	     (insert-image image " ")
+	     (newline)			; Have somewhere for cursor to
+					; go, not stretched over image.
+	     (insert-image image)
 	     (goto-char (point-min))
 	     (while (not (eobp))
 	       (insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
@@ -1019,12 +1021,12 @@ list, Gnus will try all the methods in the list until it finds a match."
   :type '(choice (const :tag "default" nil)
 		 (const :tag "DejaNews" (nnweb "refer" (nnweb-type dejanews)))
 		 gnus-select-method
-		 (repeat :menu-tag "Try multiple" 
+		 (repeat :menu-tag "Try multiple"
 			 :tag "Multiple"
 			 :value (current (nnweb "refer" (nnweb-type dejanews)))
 			 (choice :tag "Method"
 				 (const current)
-				 (const :tag "DejaNews" 
+				 (const :tag "DejaNews"
 					(nnweb "refer" (nnweb-type dejanews)))
 				 gnus-select-method))))
 
@@ -1084,11 +1086,6 @@ newsgroups."
   :group 'gnus-group-visual
   :group 'gnus-summary-marks
   :type 'character)
-
-(defcustom gnus-asynchronous nil
-  "*If non-nil, Gnus will supply backends with data needed for async article fetching."
-  :group 'gnus-asynchronous
-  :type 'boolean)
 
 (defcustom gnus-large-newsgroup 200
   "*The number of articles which indicates a large newsgroup.
@@ -1286,21 +1283,28 @@ this variable.	I think."
 				   (const :format "%v " virtual)
 				   (const respool)))))
 
-(define-widget 'gnus-select-method 'list
-  "Widget for entering a select method."
-  :value '(nntp "")
-  :tag "Select Method"
-  :args `((choice :tag "Method"
-		  ,@(mapcar (lambda (entry)
-			      (list 'const :format "%v\n"
-				    (intern (car entry))))
-			    gnus-valid-select-methods))
-	  (string :tag "Address")
-	  (repeat :tag "Options"
-		  :inline t
-		  (list :format "%v"
-			variable
-			(sexp :tag "Value")))))
+(defun gnus-redefine-select-method-widget ()
+  "Recomputes the select-method widget based on the value of
+`gnus-valid-select-methods'."
+  (define-widget 'gnus-select-method 'list
+    "Widget for entering a select method."
+    :value '(nntp "")
+    :tag "Select Method"
+    :args `((choice :tag "Method"
+		    ,@(mapcar (lambda (entry)
+				(list 'const :format "%v\n"
+				      (intern (car entry))))
+			      gnus-valid-select-methods)
+		    (symbol :tag "other"))
+	    (string :tag "Address")
+	    (repeat :tag "Options"
+		    :inline t
+		    (list :format "%v"
+			  variable
+			  (sexp :tag "Value"))))
+    ))
+
+(gnus-redefine-select-method-widget)
 
 (defcustom gnus-updated-mode-lines '(group article summary tree)
   "List of buffers that should update their mode lines.
@@ -1762,10 +1766,12 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-delete-invisible-text gnus-treat-article)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
-      gnus-article-treat-overstrike 
+      gnus-article-treat-overstrike
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-de-base64-unreadable
       gnus-article-decode-HZ
+      gnus-article-wash-html
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
@@ -2831,7 +2837,7 @@ Allow completion over sensible values."
 	(or (let ((opened gnus-opened-servers))
 	      (while (and opened
 			  (not (equal (format "%s:%s" method address)
-				      (format "%s:%s" (caaar opened) 
+				      (format "%s:%s" (caaar opened)
 					      (cadaar opened)))))
 		(pop opened))
 	      (caar opened))
@@ -2879,7 +2885,7 @@ As opposed to `gnus', this command will not connect to the local server."
 
 ;;(setq thing ?				; this is a comment
 ;;      more 'yes)
-    
+
 ;;;###autoload
 (defun gnus (&optional arg dont-connect slave)
   "Read network news.

@@ -355,7 +355,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Gnus 5.8.6.
+This manual corresponds to Gnus 5.8.7.
 
 @end ifinfo
 
@@ -2771,6 +2771,11 @@ List all groups that have names or descriptions that match a regexp
 @findex gnus-group-list-cached
 List all groups with cached articles (@code{gnus-group-list-cached}).
 
+@item A ?
+@kindex A ? (Group)
+@findex gnus-group-list-dormant
+List all groups with dormant articles (@code{gnus-group-list-dormant}).
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -3547,8 +3552,29 @@ generated.  It may be used to move point around, for instance.
 Groups matching this regexp will always be listed in the group buffer,
 whether they are empty or not.
 
-@end table
+@item gnus-group-name-charset-method-alist
+@vindex gnus-group-name-charset-method-alist
+An alist of method and the charset for group names. It is used to show
+non-ASCII group names.
 
+For example:
+@lisp
+(setq gnus-group-name-charset-method-alist
+    '(((nntp "news.com.cn") . cn-gb-2312)))
+@end lisp
+
+@item gnus-group-name-charset-group-alist
+@vindex gnus-group-name-charset-group-alist
+An alist of regexp of group name and the charset for group names. 
+It is used to show non-ASCII group names.
+
+For example:
+@lisp
+(setq gnus-group-name-charset-group-alist
+    '(("\\.com\\.cn:" . cn-gb-2312)))
+@end lisp
+
+@end table
 
 @node Scanning New Messages
 @subsection Scanning New Messages
@@ -4485,12 +4511,21 @@ message (@code{gnus-summary-wide-reply-with-original}).  This command uses
 the process/prefix convention.
 
 @item S o m
+@itemx C-c C-f
 @kindex S o m (Summary)
+@kindex C-c C-f (Summary)
 @findex gnus-summary-mail-forward
 @c @icon{gnus-summary-mail-forward}
 Forward the current article to some other person
-(@code{gnus-summary-mail-forward}).  If given a prefix, include the full
-headers of the forwarded article.
+(@code{gnus-summary-mail-forward}).  If no prefix is given, the message
+is forwarded according to the value of (@code{message-forward-as-mime})
+and (@code{message-forward-show-mml}); if the prefix is 1, decode the
+message and forward directly inline; if the prefix is 2, foward message
+as an rfc822 MIME section; if the prefix is 3, decode message and
+forward as an rfc822 MIME section; if the prefix is 4, foward message
+directly inline; otherwise, the message is forwarded as no prefix given
+but use the flipped value of (@code{message-forward-as-mime}).  By
+default, the message is decoded and forwarded as an rfc822 MIME section.
 
 @item S m
 @itemx m
@@ -4615,8 +4650,16 @@ the process/prefix convention.
 @kindex S o p (Summary)
 @findex gnus-summary-post-forward
 Forward the current article to a newsgroup
-(@code{gnus-summary-post-forward}).  If given a prefix, include the full
-headers of the forwarded article.
+(@code{gnus-summary-post-forward}).  
+ If no prefix is given, the message is forwarded according to the value
+of (@code{message-forward-as-mime}) and
+(@code{message-forward-show-mml}); if the prefix is 1, decode the
+message and forward directly inline; if the prefix is 2, foward message
+as an rfc822 MIME section; if the prefix is 3, decode message and
+forward as an rfc822 MIME section; if the prefix is 4, foward message
+directly inline; otherwise, the message is forwarded as no prefix given
+but use the flipped value of (@code{message-forward-as-mime}).  By
+default, the message is decoded and forwarded as an rfc822 MIME section.
 
 @item S O p
 @kindex S O p (Summary)
@@ -7313,6 +7356,31 @@ readable to me.  Note that the this is usually done automatically by
 Gnus if the message in question has a @code{Content-Transfer-Encoding}
 header that says that this encoding has been done.
 
+@item W 6
+@kindex W 6 (Summary)
+@findex gnus-article-de-base64-unreadable
+Treat base64 (@code{gnus-article-de-base64-unreadable}).
+Base64 is one common @sc{mime} encoding employed when sending non-ASCII
+(i. e., 8-bit) articles.  Note that the this is usually done
+automatically by Gnus if the message in question has a
+@code{Content-Transfer-Encoding} header that says that this encoding has
+been done.
+
+@item W Z
+@kindex W Z (Summary)
+@findex gnus-article-decode-HZ
+Treat HZ or HZP (@code{gnus-article-decode-HZ}).  HZ (or HZP) is one
+common encoding employed when sending Chinese articles.  It typically
+makes strings look like @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}}.
+
+@item W h
+@kindex W h (Summary)
+@findex gnus-article-wash-html
+Treat HTML (@code{gnus-article-wash-html}).  
+Note that the this is usually done automatically by Gnus if the message
+in question has a @code{Content-Type} header that says that this type
+has been done.
+
 @item W f
 @kindex W f (Summary)
 @cindex x-face
@@ -7697,7 +7765,7 @@ the same manner:
 @table @kbd
 @item K b
 @kindex K b (Summary)
-Make all the @sc{mime} parts have buttons in from of them.  This is
+Make all the @sc{mime} parts have buttons in front of them.  This is
 mostly useful if you wish to save (or perform other actions) on inlined
 parts.
 
@@ -9407,6 +9475,12 @@ headers will be included in the sequence they are matched.
 If non-@code{nil}, add a @code{to-list} group parameter to mail groups
 that have none when you do a @kbd{a}.
 
+@item message-send-mail-partially-limit
+@vindex message-send-mail-partially-limit
+The limitation of messages sent as message/partial.
+The lower bound of message size in characters, beyond which the message 
+should be sent in several parts. If it is nil, the size is unlimited.
+
 @end table
 
 
@@ -10974,7 +11048,9 @@ Alter this script to fit find the @samp{movemail} you want to use.
 
 @item directory
 Get mail from several files in a directory.  This is typically used when
-you have procmail split the incoming mail into several files.
+you have procmail split the incoming mail into several files.  Setting
+@code{nnmail-scan-directory-mail-source-once} to non-nil force Gnus to
+scan the mail source only once.
 
 Keywords:
 
@@ -11111,12 +11187,16 @@ Keywords:
 @table @code
 @item :path
 The path of the directory where the mails are stored.  The default is
-@samp{~/Maildir/new}.
+taken from the @code{MAILDIR} environment variable or
+@samp{~/Maildir/}.
+@item :subdirs
+The subdirectories of the Maildir.  The default is
+@samp{("new" "cur")}.
 
-If you sometimes look at your mail through a pop3 daemon before fetching
-them with Gnus, you may also have to fetch your mails from the
-@code{cur} directory inside the maildir, like in the first example
-below.
+@c If you sometimes look at your mail through a pop3 daemon before fetching
+@c them with Gnus, you may also have to fetch your mails from the
+@c @code{cur} directory inside the maildir, like in the first example
+@c below.
 
 You can also get mails from remote hosts (because maildirs don't suffer
 from locking problems).
@@ -11126,11 +11206,11 @@ from locking problems).
 Two example maildir mail sources:
 
 @lisp
-(maildir :path "/home/user-name/Maildir/cur")
+(maildir :path "/home/user-name/Maildir/" :subdirs ("cur" "new"))
 @end lisp
 
 @lisp
-(maildir :path "/user@@remotehost.org:~/Maildir/new")
+(maildir :path "/user@@remotehost.org:~/Maildir/" :subdirs ("new"))
 @end lisp
 
 @item imap
@@ -13642,9 +13722,29 @@ crossposting enabled.  In that case, all matching rules will "win".
 
 This variable can also have a function as its value, the function will
 be called with the headers narrowed and should return a group where it
-thinks the article should be splitted to.
+thinks the article should be splitted to.  See @code{nnimap-split-fancy}.
 
 The splitting code tries to create mailboxes if it need too.
+
+To allow for different split rules on different virtual servers, and
+even different split rules in different inboxes on the same server,
+the syntax of this variable have been extended along the lines of:
+
+@lisp
+(setq nnimap-split-rule
+      '(("my1server"    (".*"    (("ding"    "ding@@gnus.org")
+                                  ("junk"    "From:.*Simon")))
+        ("my2server"    ("INBOX" nnimap-split-fancy))
+        ("my[34]server" (".*"    (("private" "To:.*Simon")
+                                  ("junk"    my-junk-func)))))
+@end lisp
+
+The virtual server name is in fact a regexp, so that the same rules
+may apply to several servers.  In the example, the servers
+@code{my3server} and @code{my4server} both use the same rules.
+Similarly, the inbox string is also a regexp.  The actual splitting
+rules are as before, either a function, or a list with group/regexp or
+group/function elements.
 
 Nnmail equivalent: @code{nnmail-split-methods}.
 

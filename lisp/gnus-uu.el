@@ -295,7 +295,9 @@ so I simply dropped them."
 
 (defcustom gnus-uu-digest-headers
   '("^Date:" "^From:" "^To:" "^Cc:" "^Subject:" "^Message-ID:" "^Keywords:"
-    "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:")
+    "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:"
+    "^MIME-Version:" "^Content-Disposition:" "^Content-Description:"
+    "^Content-ID:")
   "*List of regexps to match headers included in digested messages.
 The headers will be included in the sequence they are matched."
   :group 'gnus-extract
@@ -349,6 +351,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defvar gnus-uu-default-dir gnus-article-save-directory)
 (defvar gnus-uu-digest-from-subject nil)
+(defvar gnus-uu-digest-buffer nil)
 
 ;; Keymaps
 
@@ -519,15 +522,19 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   (interactive "P")
   (let ((gnus-uu-save-in-digest t)
 	(file (make-temp-name (nnheader-concat gnus-uu-tmp-dir "forward")))
-	buf subject from)
+	(message-forward-as-mime message-forward-as-mime)
+	(mail-parse-charset gnus-newsgroup-charset)
+	(mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets)
+	gnus-uu-digest-buffer subject from)
+    (if (and n (not (numberp n)))
+	(setq message-forward-as-mime (not message-forward-as-mime)
+	      n nil))
     (gnus-setup-message 'forward
       (setq gnus-uu-digest-from-subject nil)
+      (setq gnus-uu-digest-buffer 
+	    (gnus-get-buffer-create " *gnus-uu-forward*"))
       (gnus-uu-decode-save n file)
-      (setq buf (switch-to-buffer
-		 (gnus-get-buffer-create " *gnus-uu-forward*")))
-      (erase-buffer)
-      (insert-file file)
-      (delete-file file)
+      (switch-to-buffer gnus-uu-digest-buffer)
       (let ((fs gnus-uu-digest-from-subject))
 	(when fs
 	  (setq from (caar fs)
@@ -557,7 +564,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
       (when (re-search-forward "^From: ")
 	(delete-region (point) (gnus-point-at-eol))
 	(insert from))
-      (message-forward post))
+      (message-forward post t))
     (setq gnus-uu-digest-from-subject nil)))
 
 (defun gnus-uu-digest-post-forward (&optional n)
@@ -816,8 +823,9 @@ When called interactively, prompt for REGEXP."
    (gnus-uu-save-separate-articles
     (save-excursion
       (set-buffer buffer)
-      (gnus-write-buffer
-       (concat gnus-uu-saved-article-name gnus-current-article))
+      (let ((coding-system-for-write mm-text-coding-system))
+	(gnus-write-buffer
+	 (concat gnus-uu-saved-article-name gnus-current-article)))
       (cond ((eq in-state 'first) (list gnus-uu-saved-article-name 'begin))
 	    ((eq in-state 'first-and-last) (list gnus-uu-saved-article-name
 						 'begin 'end))
@@ -850,8 +858,13 @@ When called interactively, prompt for REGEXP."
 	      (set-buffer (gnus-get-buffer-create "*gnus-uu-pre*"))
 	      (erase-buffer)
 	      (insert (format
-		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\nTopics:\n"
-		       (current-time-string) name name))))
+		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
+		       (current-time-string) name name))
+	      (when (and message-forward-as-mime gnus-uu-digest-buffer)
+		;; The default part in multipart/digest is message/rfc822.
+		;; Subject is a fake head.
+		(insert "<#part type=text/plain>\nSubject: Topics\n\n"))
+	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
       (save-excursion
@@ -865,14 +878,20 @@ When called interactively, prompt for REGEXP."
 	      ;; These two are necessary for XEmacs 19.12 fascism.
 	      (put-text-property (point-min) (point-max) 'invisible nil)
 	      (put-text-property (point-min) (point-max) 'intangible nil))
+	    (when (and message-forward-as-mime 
+		       message-forward-show-mml
+		       gnus-uu-digest-buffer)
+	      (mm-enable-multibyte)
+	      (mime-to-mml))
 	    (goto-char (point-min))
 	    (re-search-forward "\n\n")
-	    ;; Quote all 30-dash lines.
-	    (save-excursion
-	      (while (re-search-forward "^-" nil t)
-		(beginning-of-line)
-		(delete-char 1)
-		(insert "- ")))
+	    (unless (and message-forward-as-mime gnus-uu-digest-buffer)
+	      ;; Quote all 30-dash lines.
+	      (save-excursion
+		(while (re-search-forward "^-" nil t)
+		  (beginning-of-line)
+		  (delete-char 1)
+		  (insert "- "))))
 	    (setq body (buffer-substring (1- (point)) (point-max)))
 	    (narrow-to-region (point-min) (point))
 	    (if (not (setq headers gnus-uu-digest-headers))
@@ -890,30 +909,66 @@ When called interactively, prompt for REGEXP."
 					  (1- (point)))
 				     (progn (forward-line 1) (point)))))))))
 	    (widen)))
-	(insert sorthead) (goto-char (point-max))
-	(insert body) (goto-char (point-max))
-	(insert (concat "\n" (make-string 30 ?-) "\n\n"))
+	(if (and message-forward-as-mime gnus-uu-digest-buffer)
+	  (if message-forward-show-mml
+	      (progn
+		(insert "\n<#mml type=message/rfc822>\n")
+		(insert sorthead) (goto-char (point-max))
+		(insert body) (goto-char (point-max))
+		(insert "\n<#/mml>\n"))
+	    (let ((buf (mml-generate-new-buffer " *mml*")))
+	      (with-current-buffer buf
+		(insert sorthead)
+		(goto-char (point-min))
+		(when (re-search-forward "^Subject: \\(.*\\)$" nil t)
+		  (setq subj (buffer-substring (match-beginning 1) 
+					       (match-end 1))))
+		(goto-char (point-max))
+		(insert body))
+	      (insert "\n<#part type=message/rfc822"
+		      " buffer=\"" (buffer-name buf) "\">\n")))
+	  (insert sorthead) (goto-char (point-max))
+	  (insert body) (goto-char (point-max))
+	  (insert (concat "\n" (make-string 30 ?-) "\n\n")))
 	(goto-char beg)
 	(when (re-search-forward "^Subject: \\(.*\\)$" nil t)
-	  (setq subj (buffer-substring (match-beginning 1) (match-end 1)))
+	  (setq subj (buffer-substring (match-beginning 1) (match-end 1))))
+	(when subj
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "   %s\n" subj)))))
       (when (or (eq in-state 'last)
 		(eq in-state 'first-and-last))
-	(save-excursion
-	  (set-buffer "*gnus-uu-pre*")
-	  (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
-	  (gnus-write-buffer gnus-uu-saved-article-name))
-	(save-excursion
-	  (set-buffer "*gnus-uu-body*")
-	  (goto-char (point-max))
-	  (insert
-	   (concat (setq end-string (format "End of %s Digest" name))
-		   "\n"))
-	  (insert (concat (make-string (length end-string) ?*) "\n"))
-	  (write-region
-	   (point-min) (point-max) gnus-uu-saved-article-name t))
+	(if (and message-forward-as-mime gnus-uu-digest-buffer)
+	    (with-current-buffer gnus-uu-digest-buffer
+	      (erase-buffer)
+	      (insert-buffer "*gnus-uu-pre*")
+	      (goto-char (point-max))
+	      (insert-buffer "*gnus-uu-body*"))
+	  (save-excursion
+	    (set-buffer "*gnus-uu-pre*")
+	    (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
+	    (if gnus-uu-digest-buffer
+		(with-current-buffer gnus-uu-digest-buffer
+		  (erase-buffer)
+		  (insert-buffer "*gnus-uu-pre*"))
+	      (let ((coding-system-for-write mm-text-coding-system))
+		(gnus-write-buffer gnus-uu-saved-article-name))))
+	  (save-excursion
+	    (set-buffer "*gnus-uu-body*")
+	    (goto-char (point-max))
+	    (insert
+	     (concat (setq end-string (format "End of %s Digest" name))
+		     "\n"))
+	    (insert (concat (make-string (length end-string) ?*) "\n"))
+	    (if gnus-uu-digest-buffer
+		(with-current-buffer gnus-uu-digest-buffer
+		  (goto-char (point-max))
+		  (insert-buffer "*gnus-uu-body*"))
+	      (let ((coding-system-for-write mm-text-coding-system) 
+		    (file-name-coding-system nnmail-pathname-coding-system))
+		(write-region
+		 (point-min) (point-max) gnus-uu-saved-article-name t)))))
 	(gnus-kill-buffer "*gnus-uu-pre*")
 	(gnus-kill-buffer "*gnus-uu-body*")
 	(push 'end state))
@@ -1481,6 +1536,21 @@ When called interactively, prompt for REGEXP."
 	  (cons (if (= (length files) 1) (car files) files) state)
 	state))))
 
+(defvar gnus-uu-unshar-warning
+  "*** WARNING ***
+
+Shell archives are an archaic method of bundling files for distribution
+across computer networks.  During the unpacking process, arbitrary commands
+are executed on your system, and all kinds of nasty things can happen.
+Please examine the archive very carefully before you instruct Emacs to
+unpack it.  You can browse the archive buffer using \\[scroll-other-window].
+
+If you are unsure what to do, please answer \"no\"."
+  "Text of warning message displayed by `gnus-uu-unshar-article'.
+Make sure that this text consists only of few text lines.  Otherwise,
+Gnus might fail to display all of it.")
+
+
 ;; This function is used by `gnus-uu-grab-articles' to treat
 ;; a shared article.
 (defun gnus-uu-unshar-article (process-buffer in-state)
@@ -1491,14 +1561,31 @@ When called interactively, prompt for REGEXP."
       (goto-char (point-min))
       (if (not (re-search-forward gnus-uu-shar-begin-string nil t))
 	  (setq state (list 'wrong-type))
-	(beginning-of-line)
-	(setq start-char (point))
-	(call-process-region
-	 start-char (point-max) shell-file-name nil
-	 (gnus-get-buffer-create gnus-uu-output-buffer-name) nil
-	 shell-command-switch
-	 (concat "cd " gnus-uu-work-dir " "
-		 gnus-shell-command-separator  " sh"))))
+	(save-window-excursion
+	  (save-excursion
+	    (switch-to-buffer (current-buffer))
+	    (delete-other-windows)
+	    (let ((buffer (get-buffer-create (generate-new-buffer-name
+					      "*Warning*"))))
+	      (unless
+		  (unwind-protect
+		      (with-current-buffer buffer
+			(insert (substitute-command-keys 
+				 gnus-uu-unshar-warning))
+			(goto-char (point-min))
+			(display-buffer buffer)
+			(yes-or-no-p "This is a shell archive, unshar it? "))
+		    (kill-buffer buffer))
+		(setq state (list 'error))))))
+	(unless (memq 'error state)
+	  (beginning-of-line)
+	  (setq start-char (point))
+	  (call-process-region
+	   start-char (point-max) shell-file-name nil
+	   (gnus-get-buffer-create gnus-uu-output-buffer-name) nil
+	   shell-command-switch
+	   (concat "cd " gnus-uu-work-dir " "
+		   gnus-shell-command-separator  " sh")))))
     state))
 
 ;; Returns the name of what the shar file is going to unpack.
