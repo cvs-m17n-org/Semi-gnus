@@ -10,6 +10,8 @@
 	(shimbun-mua-use-entire-index): Removed.
 	(nnshimbun-request-article-1): Replace a date string in
 	`gnus-newsgroup-data' only when article header has non-nil value.
+	(nnshimbun-insert-nov): Fixed condition to decide whether
+	`X-Nnshimbun-Id' should be inseted or not.
 
 2001-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
 

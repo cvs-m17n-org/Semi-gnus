@@ -372,10 +372,10 @@ also be nil."
 	(standard-output (current-buffer))
 	(xref (nnshimbun-string-or (shimbun-header-xref header)))
 	(start (point)))
-    (unless (and (stringp id)
-		 header-id
-		 (string-equal id header-id))
-      (setq id nil))
+    (and (stringp id)
+	 header-id
+	 (string-equal id header-id)
+	 (setq id nil))
     (princ number)
     (insert
      "\t"
