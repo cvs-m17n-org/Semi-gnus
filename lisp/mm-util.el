@@ -111,28 +111,29 @@
 (defvar mm-charset-synonym-alist
   `(
     ;; Perfectly fine?  A valid MIME name, anyhow.
-    ,(unless (mm-coding-system-p 'big5)
-       '(big5 . cn-big5))
+    ,@(unless (mm-coding-system-p 'big5)
+       '((big5 . cn-big5)))
     ;; Not in XEmacs, but it's not a proper MIME charset anyhow.
-    ,(unless (mm-coding-system-p 'x-ctext)
-       '(x-ctext . ctext))
+    ,@(unless (mm-coding-system-p 'x-ctext)
+       '((x-ctext . ctext)))
     ;; Apparently not defined in Emacs 20, but is a valid MIME name.
-    ,(unless (mm-coding-system-p 'gb2312)
-       '(gb2312 . cn-gb-2312))
+    ,@(unless (mm-coding-system-p 'gb2312)
+       '((gb2312 . cn-gb-2312)))
+    ;; ISO-8859-15 is very similar to ISO-8859-1.
+    ,@(unless (mm-coding-system-p 'iso-8859-15) ; Emacs 21 defines it.
+       '((iso-8859-15 . iso-8859-1)))
     ;; Windows-1252 is actually a superset of Latin-1.  See also
     ;; `gnus-article-dumbquotes-map'.
-    ;;,(unless (mm-coding-system-p 'windows-1252)	
-					; should be defined eventually
-    ;;  '(windows-1252 . iso-8859-1))
-    ;; ISO-8859-15 is very similar to ISO-8859-1.
-    ;;,(unless (mm-coding-system-p 'iso-8859-15) ; Emacs 21 defines it.
-    ;;   '(iso-8859-15 . iso-8859-1))
+    ,@(unless (mm-coding-system-p 'windows-1252)	
+       (if (mm-coding-system-p 'cp1252)
+	   '((windows-1252 . cp1252))
+	 '((windows-1252 . iso-8859-1))))
     ;; Windows-1250 is a variant of Latin-2 heavily used by Microsoft
     ;; Outlook users in Czech republic. Use this to allow reading of their
     ;; e-mails. cp1250 should be defined by M-x codepage-setup.
-    ;;,(unless (mm-coding-system-p 'windows-1250)	
-					; should be defined eventually
-    ;;  '(windows-1250 . cp1250))
+    ,@(if (and (not (mm-coding-system-p 'windows-1250))
+	       (mm-coding-system-p 'cp1250))
+	  '((windows-1250 . cp1250)))
     )
   "A mapping from invalid charset names to the real charset names.")
 
@@ -165,7 +166,7 @@
   "Coding system of auto save file.")
 
 (defvar mm-universal-coding-system mm-auto-save-coding-system
-  "The universal Coding system.")
+  "The universal coding system.")
 
 ;; Fixme: some of the cars here aren't valid MIME charsets.  That
 ;; should only matter with XEmacs, though.
@@ -240,6 +241,36 @@
 				(coding-system-get cs 'safe-charsets))))))
 	  (sort-coding-systems (coding-system-list 'base-only))))))
 
+(defvar mm-hack-charsets '(iso-8859-15 iso-2022-jp-2)
+  "A list of special charsets.
+Valid elements include:
+`iso-8859-15'    convert ISO-8859-1, -9 to ISO-8859-15 if ISO-8859-15 exists.
+`iso-2022-jp-2'  convert ISO-2022-jp to ISO-2022-jp-2 if ISO-2022-jp-2 exists."
+)
+
+(defvar mm-iso-8859-15-compatible 
+  '((iso-8859-1 "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE")
+    (iso-8859-9 "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE\xD0\xDD\xDE\xF0\xFD\xFE"))
+  "ISO-8859-15 exchangeable coding systems and inconvertible characters.")
+
+(defvar mm-iso-8859-x-to-15-table
+  (and (fboundp 'coding-system-p)
+       (mm-coding-system-p 'iso-8859-15)
+       (mapcar 
+	(lambda (cs)
+	  (if (mm-coding-system-p (car cs))
+	      (let ((c (string-to-char 
+			(decode-coding-string "\341" (car cs)))))
+		(cons (char-charset c)
+		      (cons
+		       (- (string-to-char 
+			   (decode-coding-string "\341" 'iso-8859-15)) c)
+		       (string-to-list (decode-coding-string (car (cdr cs)) 
+							     (car cs))))))
+	    '(gnus-charset 0)))
+	mm-iso-8859-15-compatible))
+  "A table of the difference character between ISO-8859-X and ISO-8859-15.")
+
 ;;; Internal variables:
 
 ;;; Functions:
@@ -272,6 +303,8 @@ used as the line break code type of the coding system."
   (when lbt
     (setq charset (intern (format "%s-%s" charset lbt))))
   (cond
+   ((null charset)
+    charset)
    ;; Running in a non-MULE environment.
    ((null (mm-get-coding-system-list))
     charset)
@@ -422,38 +455,63 @@ If the charset is `composition', return the actual one."
       enable-multibyte-characters
     (featurep 'mule)))
 
-(defun mm-find-mime-charset-region (b e)
+(defun mm-iso-8859-x-to-15-region (&optional b e)
+  (if (fboundp 'char-charset)
+      (let (charset item c inconvertible)
+	(save-restriction
+	  (if e (narrow-to-region b e))
+	  (goto-char (point-min))
+	  (skip-chars-forward "\0-\177")
+	  (while (not (eobp))
+	    (cond 
+	     ((not (setq item (assq (char-charset (setq c (char-after))) 
+				    mm-iso-8859-x-to-15-table)))
+	      (forward-char))
+	     ((memq c (cdr (cdr item)))
+	      (setq inconvertible t)
+	      (forward-char))
+	     (t
+	      (insert (prog1 (+ c (car (cdr item))) (delete-char 1))))
+	    (skip-chars-forward "\0-\177"))))
+	(not inconvertible))))
+
+(defun mm-find-mime-charset-region (b e &optional hack-charsets)
   "Return the MIME charsets needed to encode the region between B and E.
 Nil means ASCII, a single-element list represents an appropriate MIME
 charset, and a longer list means no appropriate charset."
-  ;; The return possibilities of this function are a mess...
-  (or (and
-       (mm-multibyte-p)
-       (fboundp 'find-coding-systems-region)
-       ;; Find the mime-charset of the most preferred coding
-       ;; system that has one.
-       (let ((systems (find-coding-systems-region b e))
-	     result)
-	 ;; Fixme: The `mime-charset' (`x-ctext') of `compound-text'
-	 ;; is not in the IANA list.
-	 (setq systems (delq 'compound-text systems))
-	 (unless (equal systems '(undecided))
-	   (while systems
-	     (let ((cs (coding-system-get (pop systems) 'mime-charset)))
-	       (if cs
-		   (setq systems nil
-			 result (list cs))))))
-	 result))
-      ;; Otherwise we're not multibyte, XEmacs or a single coding
-      ;; system won't cover it.
-      (let ((charsets 
-	     (mm-delete-duplicates
-	      (mapcar 'mm-mime-charset
-		      (delq 'ascii
-			    (mm-find-charset-region b e))))))
-	(if (memq 'iso-2022-jp-2 charsets)
-	    (delq 'iso-2022-jp charsets)
-	  charsets))))
+  (let (charsets)
+    ;; The return possibilities of this function are a mess...
+    (or (and (mm-multibyte-p)
+	     (fboundp 'find-coding-systems-region)
+	     ;; Find the mime-charset of the most preferred coding
+	     ;; system that has one.
+	     (let ((systems (find-coding-systems-region b e)))
+	       ;; Fixme: The `mime-charset' (`x-ctext') of `compound-text'
+	       ;; is not in the IANA list.
+	       (setq systems (delq 'compound-text systems))
+	       (unless (equal systems '(undecided))
+		 (while systems
+		   (let ((cs (coding-system-get (pop systems) 'mime-charset)))
+		     (if cs
+			 (setq systems nil
+			       charsets (list cs))))))
+	       charsets))
+	;; Otherwise we're not multibyte, XEmacs or a single coding
+	;; system won't cover it.
+	(setq charsets 
+	      (mm-delete-duplicates
+	       (mapcar 'mm-mime-charset
+		       (delq 'ascii
+			     (mm-find-charset-region b e))))))
+    (if (and (memq 'iso-8859-15 charsets)
+	     (memq 'iso-8859-15 hack-charsets)
+	     (save-excursion (mm-iso-8859-x-to-15-region b e)))
+	(mapcar (lambda (x) (setq charsets (delq (car x) charsets)))
+		mm-iso-8859-15-compatible))
+    (if (and (memq 'iso-2022-jp-2 charsets)
+	     (memq 'iso-2022-jp-2 hack-charsets))
+	(setq charsets (delq 'iso-2022-jp charsets)))
+    charsets))
 
 (defmacro mm-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.

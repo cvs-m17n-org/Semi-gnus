@@ -1,3 +1,113 @@
+2001-11-04 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-kill-buffer): Remove auto-save file after
+	confirm.
+
+	* message.el (message-send-mail): Call message-generate-headers
+	once.  Suggested by Matt Armstrong <matt@lickey.com>.
+
+	* gnus-topic.el (gnus-topic-rename): Initial-input.
+	Suggested by Katsuhiro Hermit Endo <hermit@koka-in.org>.
+
+2001-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.el (message-forbidden-properties): New constant.
+	(message-strip-forbidden-properties): New function.
+	(message-mode): Activate it.
+
+2001-11-02 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-iso-8859-15-compatible): Fix doc.
+	(mm-hack-charsets): Fix doc.
+
+2001-11-02  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-int.el (gnus-check-server): Message "...done" when done.
+
+	* imap.el (imap-close): Don't message (imap-send-command-wait
+	returns if the connection is dropped).
+	(imap-wait-for-tag): Nix out message only when necessary.
+
+	* gnus-sieve.el (gnus-sieve-script): Use "stop" instead of "elsif"
+	for non-crossposting.
+	(gnus-sieve-crosspost): Default to t to be consistent with other
+	parts of Gnus.
+
+2001-11-01 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-iso-8859-15-compatible): Add inconvertible chars.
+	(mm-iso-8859-x-to-15-table): Ditto.
+	(mm-iso-8859-x-to-15-region): Ditto.
+	(mm-find-mime-charset-region): Ditto.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-close-asynchronous): New variable.
+	(nnimap-close-group): Use it.
+	(nnimap-expunge): Don't use it.
+
+	* imap.el (imap-callbacks): New variable.
+	(imap-remassoc): Copied from `gnus-remassoc'.
+	(imap-add-callback): New function.
+	(imap-mailbox-expunge, imap-mailbox-close): Support asynchronous
+	behaviour.
+	(imap-parse-response): Call the callback.
+
+	* message.el (message-insert-canlock): New variable.
+	(message-canlock-generate, message-canlock-password) 
+	(message-insert-canlock): New functions.
+	(message-send-news): Call `message-insert-canlock'.
+	(top-level): Require canlock when compiling.
+	(message-insert-canlock): Require canlock before we need it.
+
+2001-11-01 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-copy-article-buffer): Copy sequence.
+
+2001-11-01 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el (dgnushack-make-load): A workaround for
+	custom-add-loads bug in some versions of XEmacs.
+
+2001-11-01 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-charset-synonym-alist): Revert (some).
+
+2001-11-01 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-iso-8859-x-to-15-region): New.
+	(mm-hack-charsets): New.
+	(mm-iso-8859-15-compatible): New.
+	(mm-iso-8859-x-to-15-table): New.
+	(mm-find-mime-charset-region): Add parameter hack-charsets.
+
+	* mm-bodies.el (mm-encode-body): Use it.
+	* mml.el (mml-parse-1): Ditto.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-group.el (gnus-group-make-menu-bar): Add Sieve.
+
+2001-11-01 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-charset-to-coding-system): Return nil, if charset
+	is nil.
+
+2001-11-01 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* smiley-ems.el (smiley-update-cache): Auto detect file type.
+
+	* message.el (message-forward-rmail-make-body):
+	save-window-excursion.
+	(message-encode-message-body): no error.
+	(message-setup-1): compose-mail send-actions are different from
+	message-send-actions.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.el: Don't require easy-mmode. Suggested by Katsumi Yamaoka
+	<yamaoka@jpl.org>.
+
 2001-10-31 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* sieve-manage.el (sieve-string-bytes): No complain.

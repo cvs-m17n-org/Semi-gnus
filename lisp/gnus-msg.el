@@ -634,7 +634,8 @@ header line with the old Message-ID."
 	    (insert-buffer-substring gnus-original-article-buffer beg end)
 	    ;; Decode charsets.
 	    (let ((gnus-article-decode-hook
-		   (delq 'article-decode-charset gnus-article-decode-hook)))
+		   (delq 'article-decode-charset
+			 (copy-sequence gnus-article-decode-hook))))
 	      ;; Needed for T-gnus.
 	      (add-hook 'gnus-article-decode-hook
 			'article-decode-encoded-words)

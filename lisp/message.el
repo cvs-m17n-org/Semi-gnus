@@ -37,6 +37,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'canlock)
   (require 'cl)
   (require 'smtp)
   (defvar gnus-list-identifiers))	; gnus-sum is required where necessary
@@ -1247,6 +1248,11 @@ no, only reply back to the author."
   :group 'message-headers
   :type 'boolean)
 
+(defcustom message-insert-canlock t
+  "Whether to insert a Cancel-Lock header in news postings."
+  :group 'message-headers
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar message-sending-message "Sending...")
@@ -1824,6 +1830,33 @@ Point is left at the beginning of the narrowed-to region."
   (defvar facemenu-add-face-function)
   (defvar facemenu-remove-face-function))
 
+;;; Forbidden properties
+;;
+;; We use `after-change-functions' to keep special text properties
+;; that interfer with the normal function of message mode out of the
+;; buffer. 
+
+(defconst message-forbidden-properties 
+  ;; No reason this should be clutter up customize.  We make it a
+  ;; property list (rather than a list of property symbols), to be
+  ;; directly useful for `remove-text-properties'.
+  '(field nil read-only nil intangible nil invisible nil 
+	  mouse-face nil modification-hooks nil insert-in-front-hooks nil
+	  insert-behind-hooks nil point-entered nil point-left nil) 
+  ;; Other special properties:
+  ;; category, face, display: probably doesn't do any harm.
+  ;; fontified: is used by font-lock.
+  ;; syntax-table, local-map: I dunno.
+  ;; We need to add XEmacs names to the list.
+  "Property list of with properties.forbidden in message buffers.
+The values of the properties are ignored, only the property names are used.")
+
+(defun message-strip-forbidden-properties (begin end &optional old-length)
+  "Strip forbidden properties between BEGIN and END, ignoring the third arg.
+This function is intended to be called from `after-change-functions'.
+See also `message-forbidden-properties'."
+  (remove-text-properties begin end message-forbidden-properties))
+
 ;;;###autoload
 (define-derived-mode message-mode text-mode "Message"
   "Major mode for editing mail and news to be sent.
@@ -1885,6 +1918,8 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
 	(set (make-local-variable 'tool-bar-map) (message-tool-bar-map))))
   (easy-menu-add message-mode-menu message-mode-map)
   (easy-menu-add message-mode-field-menu message-mode-map)
+  ;; Mmmm... Forbidden properties...
+  (add-hook 'after-change-functions 'message-strip-forbidden-properties nil t)
   ;; Allow mail alias things.
   (when (eq message-mail-alias-type 'abbrev)
     (if (fboundp 'mail-abbrevs-setup)
@@ -2728,10 +2763,24 @@ The text will also be indented the normal way."
 	    (funcall message-kill-buffer-query-function
 		     "The buffer modified; kill anyway? "))
     (let ((actions message-kill-actions)
+	  (draft-article message-draft-article)
+	  (auto-save-file-name buffer-auto-save-file-name)
+	  (file-name buffer-file-name)
+	  (modified (buffer-modified-p))
 	  (frame (selected-frame))
 	  (org-frame message-original-frame))
       (setq buffer-file-name nil)
       (kill-buffer (current-buffer))
+      (when (and (or (and auto-save-file-name
+			  (file-exists-p auto-save-file-name))
+		     (and file-name
+			  (file-exists-p file-name)))
+		 (yes-or-no-p (format "Remove the backup file%s? "
+				      (if modified " too" ""))))
+	(ignore-errors
+	  (delete-file auto-save-file-name))
+	(let ((message-draft-article draft-article))
+	  (message-disassociate-draft)))
       (message-do-actions actions)
       (message-delete-frame frame org-frame)))
   (message ""))
@@ -3065,23 +3114,26 @@ This sub function is for exclusive use of `message-send-mail'."
 	 (case-fold-search nil)
 	 (news (message-news-p))
 	 (message-this-is-mail t)
+	 (headers message-required-mail-headers)
 	 failure)
     (save-restriction
       (message-narrow-to-headers)
-      ;; Insert some headers.
-      (let ((message-deletable-headers
-	     (if news nil message-deletable-headers)))
-	(message-generate-headers message-required-mail-headers))
       ;; Generate the Mail-Followup-To header if the header is not there...
       (if (and (or message-subscribed-regexps
 		   message-subscribed-addresses
 		   message-subscribed-address-functions)
 	       (not (mail-fetch-field "mail-followup-to")))
-	  (message-generate-headers
-	   `(("Mail-Followup-To" . ,(message-make-mft))))
+	  (setq headers
+		(cons
+		 (cons "Mail-Followup-To" (message-make-mft))
+		 message-required-mail-headers))
 	;; otherwise, delete the MFT header if the field is empty
 	(when (equal "" (mail-fetch-field "mail-followup-to"))
-	  (message-remove-header "Mail-Followup-To")))
+	  (message-remove-header "^Mail-Followup-To:")))
+      ;; Insert some headers.
+      (let ((message-deletable-headers
+	     (if news nil message-deletable-headers)))
+	(message-generate-headers headers))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (if (not (message-check-mail-syntax))
@@ -3314,6 +3366,28 @@ This sub function is for exclusive use of `message-send-news'."
        nil)
      (not (funcall message-send-news-function method)))))
 
+(defun message-canlock-generate ()
+  "Return a string that is non-trival to guess.
+Do not use this for anything important, it is cryptographically weak."
+  (md5 (concat (message-unique-id)
+	       (format "%x%x%x" (random) (random t) (random))
+	       (prin1-to-string (recent-keys))
+	       (prin1-to-string (garbage-collect)))))
+
+(defun message-canlock-password ()
+  "The password used by message for cancel locks.
+This is the value of `canlock-password', if that option is non-nil.
+Otherwise, generate and save a value for `canlock-password' first."
+  (unless canlock-password
+    (customize-save-variable 'canlock-password (message-canlock-generate)))
+  canlock-password)
+
+(defun message-insert-canlock ()
+  (when message-insert-canlock
+    (require 'canlock)
+    (message-canlock-password)
+    (canlock-insert-header)))
+
 (defun message-send-news (&optional arg)
   (let* ((tembuf (message-generate-new-buffer-clone-locals " *message temp*"))
 	 (case-fold-search nil)
@@ -3352,6 +3426,7 @@ This sub function is for exclusive use of `message-send-news'."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
+      (message-insert-canlock)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     ;; Note: This check will be disabled by the ".*" default value for
@@ -4691,8 +4766,10 @@ than 988 characters long, and if they are not, trim them until they are."
 ;;;     (push '(message-mode (encrypt . mc-encrypt-message)
 ;;;			 (sign . mc-sign-message))
 ;;;	  mc-modes-alist))
-  (when actions
-    (setq message-send-actions actions))
+  (dolist (action actions)
+    (condition-case nil
+	(add-to-list 'message-send-actions
+		     `(apply ',(car action) ',(cdr action)))))
   (setq message-reply-buffer
 	(or (message-get-parameter 'reply-buffer)
 	    replybuffer))
@@ -5432,7 +5509,8 @@ Optional NEWS will use news to forward instead of mail."
 
 ;;;###autoload
 (defun message-forward-rmail-make-body (forward-buffer)
-  (with-current-buffer forward-buffer
+  (save-window-excursion
+    (set-buffer forward-buffer)
     (let (rmail-enable-mime)
       (rmail-toggle-header 0)))
   (message-forward-make-body forward-buffer))
@@ -5909,9 +5987,10 @@ regexp varstr."
       ;; /usr/bin/mail.
       (unless content-type-p
 	(goto-char (point-min))
-	(re-search-forward "^MIME-Version:")
-	(forward-line 1)
-	(insert "Content-Type: text/plain; charset=us-ascii\n")))))
+	;; For unknown reason, MIME-Version doesn't exist.
+	(when (re-search-forward "^MIME-Version:" nil t)
+	  (forward-line 1)
+	  (insert "Content-Type: text/plain; charset=us-ascii\n"))))))
 
 (defun message-read-from-minibuffer (prompt)
   "Read from the minibuffer while providing abbrev expansion."

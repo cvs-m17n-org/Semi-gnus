@@ -450,8 +450,8 @@ Yank the message in the buffer @code{gnus-article-copy} into the message
 buffer. Normally @code{gnus-article-copy} is what you are replying to
 (@code{message-yank-original}).
 
-@item C-c M-C-y
-@kindex C-c M-C-y
+@item C-c C-M-y
+@kindex C-c C-M-y
 @findex message-yank-buffer
 Prompt for a buffer name and yank the contents of that buffer into the
 message buffer (@code{message-yank-buffer}).

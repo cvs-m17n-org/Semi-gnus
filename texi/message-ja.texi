@@ -434,8 +434,8 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 貼り付けます。普通は @code{gnus-article-copy} はあなたが返答しようとして
 いるメッセージです (@code{messsage-yank-original})。
 
-@item C-c M-C-y
-@kindex C-c M-C-y
+@item C-c C-M-y
+@kindex C-c C-M-y
 @findex message-yank-buffer
 Prompt for a buffer name and yank the contents of that buffer into the
 message buffer (@code{message-yank-buffer}).

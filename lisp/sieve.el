@@ -34,8 +34,6 @@
 ;;
 ;; 2001-10-31 Committed to Oort Gnus.
 ;;
-;; $Id: sieve.el,v 1.1.2.1 2001-11-01 08:25:40 yamaoka Exp $
-;;
 ;; Todo:
 ;;
 ;; * Namespace?  This file contains `sieve-manage' and

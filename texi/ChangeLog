@@ -1,3 +1,32 @@
+2001-11-04 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Use C-M- instead of M-C-.
+	* message.texi (Insertion): Ditto.
+	* sieve.texi (Managing Sieve): Ditto.
+	Suggested by Eli Zaretskii <eliz@is.elta.co.il>.
+
+2001-11-02  Simon Josefsson  <jas@extundo.com>
+
+	* dir (File): Add Sieve.
+
+	* gnus.texi (Sieve Commands): Add crossposting.
+
+2001-11-01 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* texi2latex.el (latexi-translate): Typo.
+	(latexi-translate-file): Nine in a herd is enough.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.texi (Installation): Workaround texi2latex bug (replacing
+	inside verbatim needs a \end{verbatim} earlier in the file).
+
+	* texi2latex.el (latexi-translate): Add sieve.
+
+2001-11-01 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Article Washing): Add a note.
+
 2001-11-01  Simon Josefsson  <jas@extundo.com>
 
 	* Makefile.in: Add sieve.

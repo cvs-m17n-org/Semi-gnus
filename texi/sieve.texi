@@ -106,6 +106,8 @@ commands in your @code{~/.emacs}:
 
 @lisp
 (autoload 'sieve-mode "sieve-mode")
+@end lisp
+@lisp
 (setq auto-mode-alist (cons '("\\.si\\(v\\|eve\\)\\'" . sieve-mode)
                             auto-mode-alist))
 @end lisp
@@ -188,8 +190,8 @@ Activates the currently highlighted script.
 @findex sieve-deactivate
 Deactivates the currently highlighted script.
 
-@item M-C-?
-@kindex M-C-?
+@item C-M-?
+@kindex C-M-?
 @findex sieve-deactivate-all
 Deactivates all scripts.
 

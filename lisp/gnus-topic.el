@@ -1451,7 +1451,7 @@ If RECURSIVE is t, unmark its subtopics too."
   (interactive
    (let ((topic (gnus-current-topic)))
      (list topic
-	   (read-string "Rename topic to: " topic))))
+	   (read-string (format "Rename %s to: " topic) topic))))
   ;; Check whether the new name exists.
   (when (gnus-topic-find-topology new-name)
     (error "Topic '%s' already exists" new-name))
