@@ -1386,8 +1386,7 @@ Point is left at the beginning of the narrowed-to region."
 
   (define-key message-mode-map "\t" 'message-tab)
 
-  (substitute-key-definition 'kill-buffer 'message-kill-buffer
-			     message-mode-map))
+  (define-key message-mode-map "\C-xk" 'message-kill-buffer))
 
 (easy-menu-define
  message-mode-menu message-mode-map "Message Menu."
