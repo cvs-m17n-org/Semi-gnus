@@ -1,9 +1,50 @@
+1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-coding-system' (renamed from
+	`find-file-noselect-as-specified-coding-system').
+
+	* lisp/gnus-score.el (gnus-score-load-score-alist): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+	* lisp/nnmail.el (nnmail-find-file): Ditto.
+	* lisp/nnheader.el (nnheader-insert-file-contents): Ditto.
+
+	* lisp/score-mode.el (gnus-score-edit-exit): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Ditto.
+
+	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+
+	* lisp/gnus-score.el (gnus-score-save): Use
+	`gnus-write-buffer-as-coding-system' (renamed from
+	`gnus-write-buffer-as-specified-coding-system').
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Ditto.
+	(gnus-cache-save-buffers): Ditto.
+
+	* lisp/gnus-util.el (gnus-write-buffer-as-coding-system): Renamed
+	from 'gnus-write-buffer-as-specified-coding-system'.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	* lisp/gnus-agent.el (gnus-agent-expire): Ditto.
+	(gnus-agent-fetch-headers): Ditto.
+	(gnus-agent-flush-cache): Ditto.
+	(gnus-agent-fetch-articles): Ditto.
+	(gnus-agent-save-history): Ditto.
+	(gnus-agent-save-groups): Ditto.
+	(gnus-agent-save-active): Ditto.
+
 1998-12-14  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
 	fix.
 	(gnus-offline-set-offline-sendmail-function): Bug fix.
-	
+
 1998-12-12  Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix.
@@ -13,23 +54,23 @@
 	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
 	fix.
 	(gnus-offline-set-offline-sendmail-function): Bug fix.
-	
+
 1998-12-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Change 
+	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Change
 	easy-menu-define to easy-menu-change to override miee menu.
-	
+
 1998-12-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Call
 	`find-file-noselect-as-specified-coding-system' directly.
 
 1998-12-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-	
+
 	* lisp/gnus-offline.el (gnus-offline-setup): Add
 	gnus-offline-setup to gnus-group-mode-hook.
 	(gnus-offline-set-offline-sendmail-function): Bug fix.
-	
+
 1998-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
