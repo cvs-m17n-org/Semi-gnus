@@ -6920,7 +6920,6 @@ If REGEXP-P (the prefix) is non-nil, do regexp isearch."
 	 (old (gnus-summary-select-article)))
     (gnus-configure-windows 'article)
     (gnus-eval-in-buffer-window gnus-article-buffer
-      (set (make-local-variable 'isearch-lazy-highlight) t)
       (save-restriction
 	(widen)
 	(when (eq 'old old)
