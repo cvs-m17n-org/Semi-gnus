@@ -25,6 +25,8 @@
 
 ;;; Code:
 
+(require 'cl)
+(eval-when-compile (require 'static))
 (require 'gnus)
 (require 'gnus-win)
 (require 'gnus-int)
@@ -32,9 +34,6 @@
 (require 'gnus-range)
 (require 'gnus-util)
 (require 'message)
-(eval-when-compile
-  (require 'cl)
-  (require 'static))
 
 (defcustom gnus-startup-file (nnheader-concat gnus-home-directory ".newsrc")
   "Your `.newsrc' file.
@@ -49,11 +48,10 @@ If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
   :type 'file)
 
 (defcustom gnus-site-init-file
-  (condition-case nil
-      (concat (file-name-directory
-	       (directory-file-name installation-directory))
-	      "site-lisp/gnus-init")
-    (error nil))
+  (ignore-errors
+    (concat (file-name-directory
+	     (directory-file-name installation-directory))
+	    "site-lisp/gnus-init"))
   "*The site-wide Gnus Emacs-Lisp startup file name, or nil if none.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
   :group 'gnus-start
