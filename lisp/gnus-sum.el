@@ -1671,7 +1671,7 @@ increase the score of each group you read."
     "c" gnus-article-copy-part
     "C" gnus-article-view-part-as-charset
     "e" gnus-article-externalize-part
-    "E" gnus-article-encrypt
+    "E" gnus-article-encrypt-body
     "i" gnus-article-inline-part
     "|" gnus-article-pipe-part))
 
