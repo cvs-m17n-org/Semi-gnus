@@ -1,3 +1,9 @@
+1998-09-29  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-user-agent): Make a user-agent
+	string without MUA info, if the value of `message-user-agent' is
+	nil nor `gnus-inviolable-extended-version' is not exists.
+
 1998-09-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/nnmh.el (nnmh-request-accept-article): Insert `Message-ID'
