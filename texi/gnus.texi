@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.017 Manual
+@settitle Semi-gnus 6.10.018 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.017 Manual
+@title Semi-gnus 6.10.018 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.017.
+This manual corresponds to Semi-gnus 6.10.018.
 
 @end ifinfo
 
@@ -12041,16 +12041,16 @@ Agent (@code{gnus-agent-remove-server}).
 @node Agent Expiry
 @subsection Agent Expiry
 
-@vindex gnus-agent-expiry-days
-@findex gnus-agent-expiry
-@kindex M-x gnus-agent-expiry
+@vindex gnus-agent-expire-days
+@findex gnus-agent-expire
+@kindex M-x gnus-agent-expire
 @cindex Agent expiry
 @cindex Gnus Agent expiry
 @cindex expiry
 
 @code{nnagent} doesn't handle expiry.  Instead, there's a special
-@code{gnus-agent-expiry} command that will expire all read articles that
-are older than @code{gnus-agent-expiry-days} days.  It can be run
+@code{gnus-agent-expire} command that will expire all read articles that
+are older than @code{gnus-agent-expire-days} days.  It can be run
 whenever you feel that you're running out of space.  It's not
 particularly fast or efficient, and it's not a particularly good idea to
 interrupt it (with @kbd{C-g} or anything else) once you've started it.
@@ -12468,7 +12468,7 @@ You can do scoring from the command line by saying something like:
 @findex gnus-batch-score
 @cindex batch scoring
 @example
-$ emacs -batch -l ~/.emacs -l gnus -f gnus-batch-score
+$ emacs -batch -l ~/.emacs -l ~/.gnus.el -f gnus-batch-score
 @end example
 
 

@@ -1,5 +1,11 @@
 1998-09-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.018.
+
+	* Sync up with Pterodactyl Gnus 0.26.
+
+1998-09-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.017.
 
 	* lisp/gnus-art.el (gnus-show-mime) (gnus-summary-toggle-mime):

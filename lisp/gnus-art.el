@@ -1485,7 +1485,7 @@ This format is defined by the `gnus-article-time-format' variable."
     (if (not gnus-default-article-saver)
 	(error "No default saver is defined")
       ;; !!! Magic!  The saving functions all save
-      ;; `gnus-original-article-buffer' (or so they think), but we
+      ;; `gnus-save-article-buffer' (or so they think), but we
       ;; bind that variable to our save-buffer.
       (set-buffer gnus-article-buffer)
       (let* ((gnus-save-article-buffer save-buffer)

@@ -1,4 +1,3 @@
-
 ;;; message.el --- composing mail and news messages
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
@@ -2158,10 +2157,11 @@ the user from the mailer."
   (unless (bolp)
     (insert "\n"))
   ;; Delete all invisible text.
-  (when (text-property-any (point-min) (point-max) 'invisible t)
-    (put-text-property (point-min) (point-max) 'invisible nil)
-    (unless (yes-or-no-p "Invisible text found and made visible; continue posting?")
-      (error "Invisible text found and made visible"))))
+  (message-check 'invisible-text
+    (when (text-property-any (point-min) (point-max) 'invisible t)
+      (put-text-property (point-min) (point-max) 'invisible nil)
+      (unless (yes-or-no-p "Invisible text found and made visible; continue posting?")
+	(error "Invisible text found and made visible")))))
 
 (defun message-add-action (action &rest types)
   "Add ACTION to be performed when doing an exit of type TYPES."
@@ -2400,9 +2400,7 @@ to find out how to use this."
       (run-hooks 'message-header-hook))
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
-	(progn
-	  ;;(message "Posting not performed")
-	  nil)
+	nil
       (unwind-protect
 	  (save-excursion
 	    (set-buffer tembuf)
