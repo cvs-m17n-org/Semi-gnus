@@ -6856,8 +6856,10 @@ If REGEXP-P (the prefix) is non-nil, do regexp isearch."
     (gnus-summary-select-article nil t))
   (gnus-configure-windows 'article)
   (gnus-eval-in-buffer-window gnus-article-buffer
+    (set (make-local-variable 'isearch-lazy-highlight) t)
     (save-restriction
       (widen)
+      (goto-char (point-min))
       (isearch-forward regexp-p))))
 
 (defun gnus-summary-search-article-forward (regexp &optional backward)
