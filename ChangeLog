@@ -1,3 +1,13 @@
+1999-01-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* Chaos: Version 1.12.1 was released.
+
+1999-01-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 1.12.1.
+
+	* lisp/gnus-sum.el (gnus-article-sort-by-author): fixed.
+
 1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Add new
