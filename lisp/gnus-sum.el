@@ -666,22 +666,6 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-structured-field-decoder
-  #'eword-decode-and-unfold-structured-field
-  "Function to decode non-ASCII characters in structured field for summary."
-  :group 'gnus-various
-  :type 'function)
-
-(defcustom gnus-unstructured-field-decoder
-  (function
-   (lambda (string)
-     (eword-decode-unstructured-field-body
-      (std11-unfold-string string) 'must-unfold)
-     ))
-  "Function to decode non-ASCII characters in unstructured field for summary."
-  :group 'gnus-various
-  :type 'function)
-
 (defcustom gnus-parse-headers-hook
   '(gnus-set-summary-default-charset)
   "*A hook called before parsing the headers."
@@ -3072,10 +3056,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (funcall
-		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
-		 (funcall
-		  gnus-structured-field-decoder (gnus-nov-field)) ; from
+		 (gnus-nov-field)	; subject
+		 (gnus-nov-field)	; from
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -4418,15 +4400,13 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (funcall
-		   gnus-unstructured-field-decoder (nnheader-header-value))
+		  (nnheader-header-value)
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (funcall
-		   gnus-structured-field-decoder (nnheader-header-value))
+		  (nnheader-header-value)
 		"(nobody)"))
 	    ;; Date.
 	    (progn
