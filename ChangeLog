@@ -1,4 +1,8 @@
-1998-07-04  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-extended-version): Add comments.
+
+1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-send-mail-with-smtp): Require 'smtp.
 
