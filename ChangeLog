@@ -1,5 +1,24 @@
 1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnimap.el (nnimap-request-newgroups): Don't use `member-if'.
+
+	* lisp/gnus.el (gnus-select-method): Use `if' instead of `when'.
+
+	* lisp/gnus-sum.el (gnus-summary-make-marking-command-1): Use
+	`car' and `cdr' instead of `cadr'.
+
+	* lisp/gnus-picon.el (gnus-picons-file-suffixes): Use `cons'
+	instead of `push'; use `if' instead of `when'.
+
+	* lisp/gnus-group.el (gnus-group-iterate): Use `car' and `cdr'
+	instead of `pop'.
+	(gnus-useful-groups): Use `or' instead of `unless'.
+
+	* lisp/gnus-art.el (gnus-emphasis-alist): Use `car' and `cdr'
+	instead of `cadr'.
+
+1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-start.el (save-buffers-kill-emacs): Don't use the macro
 	`when' in the body of `defadvice'.  Use `if' instead.
 
