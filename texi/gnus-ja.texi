@@ -1950,6 +1950,13 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$J$7$G$3$N%3%^%s%I$r<B9T$9$k$H!"(Bgnus $B$O%U%!%$%k%?%$%W$r?dB,$7$^$9!#(B
 @xref{Document Groups}$B!#(B
 
+@item G u
+@kindex G u (Group)
+@vindex gnus-useful-groups
+@findex gnus-group-make-useful-group
+@code{gnus-useful-groups} $B$K$"$k%0%k!<%W$N0l$D$r$D$/$j$^$9(B 
+(@code{gnus-group-make-useful-group})$B!#(B
+
 @item G w
 @kindex G w (Group)
 @findex gnus-group-make-web-group
@@ -5217,9 +5224,9 @@ Gnus $B$O$"$J$?$,FI$`$G$"$m$&5-;v$h$j$b$?$/$5$s$N5-;v$r<hF@$7$^$9!#$3$l$O(B
 
 $B%G%#%U%)%k%H$NCM$O(B @code{(read exit)} $B$G$9!#(B
 
-@vindex gnus-use-header-prefetch
-@code{gnus-use-header-prefetch} $B$,(B @code{nil} $B$G$J$$$H!"<!$N%0%k!<%W$+$i(B
-$B5-;v$r@h$K<hF@$7$^$9!#(B
+@c @vindex gnus-use-header-prefetch
+@c @code{gnus-use-header-prefetch} $B$,(B @code{nil} $B$G$J$$$H!"<!$N%0%k!<%W$+$i(B
+@c $B5-;v$r@h$K<hF@$7$^$9!#(B
 
 
 @node Article Caching
@@ -8260,16 +8267,16 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$=$l$>$l$NMM<0$N:G=i$NMWAG$O(B @code{$B9gCW(B} (match) $B$H8F$P$l$^$9!#$b$7$=$l(B
 $B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=8=$H$7$F9gCWA`:n$r9T$$(B
 $B$^$9!#$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#(B
-$B$=$l$,JQ?t$N$7$&$\$k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l(B
+$B$=$l$,JQ?t$N%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l(B
 $B$P!"$=$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil} 
 $B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
 $B$O(B @var{(name . value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
 @code{signature}, @code{signature-file}, @code{organization},
-@code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$b$G$-$^$9!#(B
-$BB0@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o(B
-$B$l!"$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#(B
+@code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
+$B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
+$B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#(B
 
 $BB0@-CM$OJ8;zNs(B ($B$=$N$^$^;H$o$l$^$9(B)$B!"4X?t(B ($BJV$jCM$,;H$o$l$^$9(B)$B!"JQ?t(B ($B$=(B
 $B$NCM$,;H$o$l$^$9(B)$B!"%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$jCM$,;H$o$l$^$9(B) 
@@ -8913,7 +8920,7 @@ default force yes
 $B$?LdBj$K$J$k$3$H$,$"$j$^$9$,!"(B@code{nntp-connection-timeout} $B$r@_Dj$9$k(B
 $B;v$K$h$j$"$kDxEY2r>C$9$k;v$,$G$-$^$9!#$3$l$O@\B3$r$"$-$i$a$k$^$($K!"(B
 @code{nntp} $B%P%C%/%(%s%I$,2?ICBT$D$+$r<($9@0?t$G$9!#$b$7$3$l$,(B 
-@code{nil} $B$G$"$k$H!"$3$l$,%G%#%U%)%k%H$G$9$,!";~4V@Z$l@ZCG$O$J$5$l$^$;(B
+@code{nil} $B$G$"$k$H!"$3$l$,=i4|@_Dj$G$9$,!";~4V@Z$l@ZCG$O$J$5$l$^$;(B
 $B$s!#(B
 
 @c @item nntp-command-timeout
@@ -11875,8 +11882,8 @@ File Editing})$B!#(B
 @item x
 Xref $B9T$K%9%3%"$rIU$1$^$9(B---$B$9$J$o$A!"Aj8_Ej9F9T$G$9!#(B
 
-@item t
-$B%9%l%C%I(B (thread) $B$K%9%3%"$rIU$1$^$9(B---References $B9T$G$9!#(B
+@item r
+References $B9T$K%9%3%"$r$D$1$^$9!#(B
 
 @item d
 $BF|IU(B (date) $B$K%9%3%"$rIU$1$^$9!#(B
@@ -11895,6 +11902,10 @@ Messsage-ID $B$K%9%3%"$rIU$1$^$9!#(B
 
 @item h
 $B%X%C%@!<(B (head) $B$K%9%3%"$rIU$1$^$9!#(B
+
+@item t
+$B%9%l%C%I$K%9%3%"$rIU$1$^$9!#(B
+
 @end table
 
 @item

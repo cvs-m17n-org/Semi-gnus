@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message-ja
-@settitle Message 5.6.22 Manual
+@settitle Message 5.6.33 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -431,8 +431,8 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 @item C-c C-y
 @kindex C-c C-y
 @findex message-yank-original
-返答するメッセージをメッセージバッファに貼り付けます 
-(@code{messsage-yank-original})。
+バッファ @code{gnus-article-copy} にあるメッセージをメッセージバッファに
+貼り付けます (@code{messsage-yank-original})。
 
 @item C-c C-q
 @kindex C-c C-q
