@@ -1,3 +1,8 @@
+1999-11-08   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/pop3.el (pop3-progress-message): New function.
+	(pop3-movemail): Use it.
+
 1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
