@@ -1,5 +1,9 @@
 2002-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/mm-url.el (mm-url-form-encode-xwfu): Use
+	`file-coding-system' instead of `buffer-file-coding-system' when
+	Mule 2 is running.
+
 	* lisp/gnus.el (gnus-default-charset): Default to `iso-8859-1'.
 
 2002-09-06  Katsumi Yamaoka  <yamaoka@jpl.org>
