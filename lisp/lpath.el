@@ -48,8 +48,8 @@
 	      url-current-callback-func url-be-asynchronous
 	      url-current-callback-data url-working-buffer
 	      url-current-mime-headers w3-meta-charset-content-type-regexp
-	      rmail-enable-mime-composing 
-	      rmail-insert-mime-forwarded-message-function 
+	      rmail-enable-mime-composing
+	      rmail-insert-mime-forwarded-message-function
 	      w3-meta-content-type-charset-regexp))
 
 (if (featurep 'xemacs)
@@ -117,7 +117,8 @@
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
 	 '((coding-system-get
-	    compose-mail file-name-extension find-coding-systems-region
+	    coding-system-list compose-mail file-name-extension
+	    find-coding-systems-for-charsets find-coding-systems-region
 	    function-max-args get-charset-property shell-command-to-string
 	    smiley-encode-buffer)))
 	(t
