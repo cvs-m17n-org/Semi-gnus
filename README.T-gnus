@@ -19,6 +19,12 @@ NEWS:
   T-gnus have also features that have "shuhei-k" branch, "chao-6_9" branch
   , "keiichi" branch and the MainTrunk.
 
+  If you would like to make T-gnus with Mule 2.3 based on Emacs 19.34,
+  see Mule23@1934 file for more information.
+
+  You can use some convenient configure options, e.g. `--with-addpath=',
+  to build T-gnus easier.  Try `./configure --help'.
+
   And added many other features by "ELIPS"
 
 * TODO
@@ -27,6 +33,6 @@ NEWS:
 
 * T-gnus 6.11 - this is based on Pterodactyl Gnus.
 
-  The latest T-gnus is T-gnus 6.11.07 (Based on pgnus-0.95).
+  The latest T-gnus is T-gnus 6.11.08 (Based on pgnus-0.95).
   It requires SEMI/WEMI-1.13, the latest FLIM-1.13, and the latest
   APEL (9.20 or later).
