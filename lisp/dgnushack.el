@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1994,95,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Version: 4.19
@@ -30,6 +30,7 @@
 
 (require 'cl)
 (require 'bytecomp)
+(push "~/lisp/custom" load-path)
 (push "." load-path)
 (load "./lpath.el" nil t)
 
@@ -60,13 +61,16 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (directory-files "." nil "^[^=].*\\.el$"))
+  (let ((files (delete "_pkg.el" (directory-files "." nil "^[^=].*\\.el$")))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
     (condition-case ()
 	(require 'w3-forms)
       (error (setq files (delete "nnweb.el" (delete "nnlistserv.el" files)))))
+    (condition-case ()
+	(require 'bbdb)
+      (error (setq files (delete "gnus-bbdb.el" files))))
     (while (setq file (pop files))
       (when (or (and (not xemacs)
 		     (not (member file '("gnus-xmas.el" "gnus-picon.el"
@@ -83,5 +87,118 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-;;; dgnushack.el ends here
+
+;; Avoid byte-compile warnings.
+(defvar gnus-revision-number)
+(defvar gnus-version-number)
+(defvar gnus-product-name)
+(defvar configure-package-path)
+(defvar package-path)
 
+(defconst dgnushack-info-file-regexp
+  "^\\(gnus\\|message\\|gnus-ja\\|message-ja\\)\\(-[0-9]+\\)?$")
+
+(defun dgnushack-make-package ()
+  (mapcar
+   (lambda (file)
+     (condition-case nil
+	 (delete-file file)
+       (error nil)))
+   '("auto-autoloads.el" "auto-autoloads.elc"))
+
+  (require 'gnus)
+  (let ((version
+	 (split-string
+	  (if (boundp 'gnus-revision-number)
+	      (concat gnus-version-number "." gnus-revision-number)
+	    gnus-version-number)
+	  "\\."))
+	(product-name (downcase gnus-product-name))
+	lisp-dir make-backup-files)
+    (setq version (apply 'concat (car version) "." (cdr version))
+	  lisp-dir (concat "lisp/" product-name "/"))
+
+    (with-temp-buffer
+      (insert ";;;###autoload
+;(package-provide '" product-name "
+		 :version " version "
+		 :type 'regular)
+")
+      (write-file "_pkg.el"))
+
+    (message "Updating autoloads for directory %s..." default-directory)
+    (let ((generated-autoload-file "auto-autoloads.el")
+	  noninteractive)
+      (update-autoloads-from-directory default-directory))
+    (byte-compile-file "auto-autoloads.el")
+
+    (with-temp-buffer
+      (let ((standard-output (current-buffer)))
+	(Custom-make-dependencies "."))
+      (message (buffer-string)))
+    (require 'cus-load)
+    (byte-compile-file "custom-load.el")
+
+    (message "Generating MANIFEST.%s for the package..." product-name)
+    (with-temp-buffer
+      (insert "pkginfo/MANIFEST." product-name "\n"
+	      lisp-dir
+	      (mapconcat
+	       'identity
+	       (sort (directory-files "." nil "\\.elc?$")
+		     'string-lessp)
+	       (concat "\n" lisp-dir))
+	      "\ninfo/"
+	      (mapconcat
+	       'identity
+	       (sort (directory-files "../texi/"
+				      nil dgnushack-info-file-regexp)
+		     'string-lessp)
+	       "\ninfo/")
+	      "\n")
+      (write-file (concat "../MANIFEST." product-name)))))
+
+(defun dgnushack-install-package ()
+  (let* ((package-dir (file-name-as-directory
+		       (or (car command-line-args-left)
+			   (if (boundp 'configure-package-path)
+			       (car configure-package-path)
+			     (car package-path)))))
+	 (info-dir (expand-file-name "info/" package-dir))
+	 (pkginfo-dir (expand-file-name "pkginfo/" package-dir))
+	 product-name lisp-dir manifest)
+    (require 'gnus)
+    (setq product-name (downcase gnus-product-name)
+	  lisp-dir (expand-file-name (concat "lisp/" product-name "/")
+				     package-dir)
+	  manifest (concat "MANIFEST." product-name))
+
+    (unless (file-directory-p lisp-dir)
+      (make-directory lisp-dir t))
+    (unless (file-directory-p info-dir)
+      (make-directory info-dir))
+    (unless (file-directory-p pkginfo-dir)
+      (make-directory pkginfo-dir))
+
+    (mapcar
+     (lambda (file)
+       (message "Copying %s to %s..." file lisp-dir)
+       (copy-file file (expand-file-name file lisp-dir) t t))
+     (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+
+    (mapcar
+     (lambda (file)
+       (message "Copying ../texi/%s to %s..." file info-dir)
+       (copy-file (expand-file-name file "../texi/")
+		  (expand-file-name file info-dir)
+		  t t))
+     (sort (directory-files "../texi/" nil dgnushack-info-file-regexp)
+	   'string-lessp))
+
+    (message "Copying ../%s to %s..." manifest pkginfo-dir)
+    (copy-file (expand-file-name manifest "../")
+	       (expand-file-name manifest pkginfo-dir) t t)
+
+    (message "Done")))
+
+;;; dgnushack.el ends here
