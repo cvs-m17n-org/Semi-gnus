@@ -1,3 +1,19 @@
+2002-10-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-agent.el (gnus-agent-load-alist): Fix parenthesis.
+
+2002-10-24  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-agent.el (gnus-agent-save-alist, gnus-agent-load-alist):
+	Remove unused optional arg DIR and corresponding code.
+
+	* nnimap.el (nnimap-request-article-part): Include group name in
+	debugging output.
+
+2002-10-24  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus-agent.el (gnus-agent-fetch-headers): Add some comments.
+
 2002-10-23  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
 
 	* gnus-agent.el (gnus-agent-fetched-headers): New variable,
@@ -9,7 +25,7 @@
 	seen/recent logic.
 	Remember which headers have been fetched before and don't fetch
 	them again the next time round.
-	(gnus-agent-load-fetched-headers) 
+	(gnus-agent-load-fetched-headers)
 	(gnus-agent-save-fetched-headers): New functions, for remembering
 	which headers have been fetched before.
 

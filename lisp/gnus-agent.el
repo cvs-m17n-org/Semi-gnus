@@ -1128,9 +1128,11 @@ This can be added to `gnus-select-article-hook' or
 				     gnus-agent-large-newsgroup)
 				  0)
 			     articles)))
-    ;; Add article with marks to list of article headers we want to
-    ;; fetch.  We don't want to fetch all the seen articles, and we
-    ;; don't want do fetch the recent ones, though.
+    ;; Add articles with marks to the list of article headers we want to
+    ;; fetch.  Don't fetch articles solely on the basis of a recent or seen
+    ;; mark, but do fetch recent or seen articles if they have other, more
+    ;; interesting marks.  (We have to fetch articles with boring marks
+    ;; because otherwise the agent will remove their marks.)
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
       (unless (memq (car arts) '(seen recent))
 	(setq articles (gnus-range-add articles (cdr arts)))))
@@ -1237,18 +1239,15 @@ This can be added to `gnus-select-article-hook' or
 	(set-buffer nntp-server-buffer))
       (insert-buffer-substring gnus-agent-overview-buffer start))))
 
-(defun gnus-agent-load-alist (group &optional dir)
+(defun gnus-agent-load-alist (group)
   "Load the article-state alist for GROUP."
-  (let ((file))
-    (setq gnus-agent-article-alist
-	  (gnus-cache-file-contents
-	   (if dir
-	       (expand-file-name ".agentview" dir)
-	     (gnus-agent-article-name ".agentview" group))
-	   'gnus-agent-file-loading-cache
-	   'gnus-agent-read-file))))
+  (setq gnus-agent-article-alist
+	(gnus-cache-file-contents
+	 (gnus-agent-article-name ".agentview" group)
+	 'gnus-agent-file-loading-cache
+	 'gnus-agent-read-file)))
 
-(defun gnus-agent-save-alist (group &optional articles state dir)
+(defun gnus-agent-save-alist (group &optional articles state)
   "Save the article-state alist for GROUP."
   (let* ((file-name-coding-system nnmail-pathname-coding-system)
 	 (pathname-coding-system nnmail-pathname-coding-system)
@@ -1268,9 +1267,7 @@ This can be added to `gnus-select-article-hook' or
 	(setcdr (cadr prev) state)))
       (setq prev (cdr prev)))
     (setq gnus-agent-article-alist (cdr all))
-    (with-temp-file (if dir
-			(expand-file-name ".agentview" dir)
-		      (gnus-agent-article-name ".agentview" group))
+    (with-temp-file (gnus-agent-article-name ".agentview" group)
       (princ gnus-agent-article-alist (current-buffer))
       (insert "\n"))))
 
