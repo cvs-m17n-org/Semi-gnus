@@ -323,6 +323,57 @@ it's not cached."
 					   cached articles))
 	    type)))))))
 
+(defun gnus-cache-retrieve-parsed-headers (articles group &optional fetch-old
+						    dependencies force-new)
+  "Retrieve the parsed-headers for ARTICLES in GROUP."
+  (let ((cached
+	 (setq gnus-newsgroup-cached (gnus-cache-articles-in-group group))))
+    (if (not cached)
+	;; No cached articles here, so we just retrieve them
+	;; the normal way.
+	(let ((gnus-use-cache nil))
+	  (gnus-retrieve-parsed-headers articles group fetch-old
+					dependencies force-new))
+      (let ((uncached-articles (gnus-sorted-intersection
+				(gnus-sorted-complement articles cached)
+				articles))
+	    (cache-file (gnus-cache-file-name group ".overview"))
+	    type)
+	;; We first retrieve all the headers that we don't have in
+	;; the cache.
+	(let ((gnus-use-cache nil))
+	  (when uncached-articles
+	    (setq type (and articles
+			    (gnus-retrieve-headers
+			     uncached-articles group fetch-old)))))
+	(gnus-cache-save-buffers)
+	;; Then we insert the cached headers.
+	(save-excursion
+	  (cond
+	   ((not (file-exists-p cache-file))
+	    ;; There are no cached headers.
+	    type)
+	   ((null type)
+	    ;; There were no uncached headers (or retrieval was
+	    ;; unsuccessful), so we use the cached headers exclusively.
+	    (set-buffer nntp-server-buffer)
+	    (erase-buffer)
+	    (nnheader-insert-file-contents cache-file)
+	    (gnus-get-newsgroup-headers-xover articles nil
+					      dependencies group t)
+	    )
+	   ((eq type 'nov)
+	    ;; We have both cached and uncached NOV headers, so we
+	    ;; braid them.
+	    (gnus-cache-braid-parsed-nov group cached articles
+					 dependencies)
+	    )
+	   (t
+	    ;; We braid HEADs.
+	    (gnus-cache-braid-parsed-heads group cached articles
+					   dependencies)
+	    )))))))
+
 (defun gnus-cache-enter-article (&optional n)
   "Enter the next N articles into the cache.
 If not given a prefix, use the process marked articles instead.
@@ -513,6 +564,12 @@ Returns the list of articles removed."
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
 
+(defun gnus-cache-braid-parsed-nov (group cached articles dependencies
+					  &optional file)
+  (gnus-cache-braid-nov group cached file)
+  (gnus-get-newsgroup-headers-xover articles nil dependencies group t)
+  )
+
 (defun gnus-cache-braid-heads (group cached)
   (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
@@ -544,6 +601,11 @@ Returns the list of articles removed."
       (insert-buffer-substring cache-buf)
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
+
+(defun gnus-cache-braid-parsed-heads (group cached articles dependencies)
+  (gnus-cache-braid-heads group (gnus-sorted-intersection cached articles))
+  (gnus-get-newsgroup-headers dependencies)
+  )
 
 ;;;###autoload
 (defun gnus-jog-cache ()
