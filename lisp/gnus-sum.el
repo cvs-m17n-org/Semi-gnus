@@ -1126,7 +1126,7 @@ Set it to non-nil, Gnus will treat some articles as MIME even if
 the MIME-Version header is missed."
   :version "21.3"
   :type 'boolean
-  :group 'gnus-article)
+  :group 'gnus-article-mime)
 
 (defcustom gnus-article-emulate-mime t
   "If non-nil, use MIME emulation for uuencode and the like.
@@ -1134,7 +1134,7 @@ This means that Gnus will search message bodies for text that look
 like uuencoded bits, yEncoded bits, and so on, and present that using
 the normal Gnus MIME machinery."
   :type 'boolean
-  :group 'gnus-article)
+  :group 'gnus-article-mime)
 
 ;;; Internal variables
 
