@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.11.4"
+(defconst gnus-version-number "6.11.5"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -642,10 +642,10 @@ be set in `.emacs' instead."
 (defface gnus-splash-face
   '((((class color)
       (background dark))
-     (:foreground "ForestGreen"))
+     (:foreground "#05deff"))
     (((class color)
       (background light))
-     (:foreground "ForestGreen"))
+     (:foreground "#049acc"))
     (t
      ()))
   "Level 1 newsgroup face.")
@@ -701,7 +701,7 @@ be set in `.emacs' instead."
           __
 
 "
-           ""))
+	   ""))
   ;; And then hack it.
   (gnus-indent-rigidly (point-min) (point-max)
 		       (/ (max (- (window-width) (or x 46)) 0) 2))
@@ -709,8 +709,13 @@ be set in `.emacs' instead."
   (forward-line 1)
   (let* ((pheight (count-lines (point-min) (point-max)))
 	 (wheight (window-height))
-	 (rest (- wheight pheight)))
+	 (rest (1- (- wheight pheight))))
     (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+  (save-excursion
+    (goto-char (point-min))
+    (insert-char ?\ ;;;
+		 (max 0 (/ (- (window-width) (length gnus-version)) 2)))
+    (insert gnus-version "\n"))
   ;; Fontify some.
   (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
   (goto-char (point-min))
