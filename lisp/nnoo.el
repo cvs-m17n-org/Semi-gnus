@@ -1,6 +1,6 @@
 ;;; nnoo.el --- OO Gnus Backends
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -38,7 +38,7 @@
   "The same as `defvar', only takes list of variables to MAP to."
   `(prog1
        ,(if doc
-	    `(defvar ,var ,init ,doc)
+	    `(defvar ,var ,init ,(concat doc "\n\nThis is a Gnus server variable.  See Info node `(gnus)Select Methods'."))
 	  `(defvar ,var ,init))
      (nnoo-define ',var ',map)))
 (put 'defvoo 'lisp-indent-function 2)
@@ -201,8 +201,8 @@
 	(while (setq def (pop defs))
 	  (unless (assq (car def) bvariables)
 	    (nconc bvariables
- 		   (list (cons (car def) (and (boundp (car def))
- 					      (symbol-value (car def)))))))
+		   (list (cons (car def) (and (boundp (car def))
+					      (symbol-value (car def)))))))
 	  (if (equal server "*internal-non-initialized-backend*")
 	      (set (car def) (symbol-value (cadr def)))
 	    (set (car def) (cadr def)))))
@@ -320,4 +320,4 @@ All functions will return nil and report an error."
 
 (provide 'nnoo)
 
-;;; nnoo.el ends here.
+;;; nnoo.el ends here

@@ -1,4 +1,4 @@
-\input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit; -*-
+\input texinfo
 
 @setfilename message-ja
 @settitle T-gnus 6.15 Message Manual
@@ -22,7 +22,7 @@ This file documents Message, the Emacs message composition mode.
 $B$3$N%U%!%$%k$O(B Emacs $B$N%a%C%;!<%8:n@.%b!<%I$G$"$k(B Message $B$K4X$9$k@bL@J8(B
 $B=q$G$9!#(B
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -107,7 +107,6 @@ license to the document, as described in section 6 of the license.
 $B$K$h$C$F!"9T$J$&$3$H$,$G$-$^$9!#(B
 @end titlepage
 @page
-
 @end tex
 
 @node Top
@@ -279,7 +278,6 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @vindex message-forward-ignored-headers
 $B$3$N@55,I=8=$K9gCW$9$k$9$Y$F$N%X%C%@!<$,!"E>Aw$5$l$k%a%C%;!<%8$+$i:o=|$5(B
 $B$l$^$9!#(B
-
 @end table
 
 @node Resending
@@ -339,8 +337,8 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @node Header Commands
 @section $B%X%C%@!<L?Na(B
 
-$B$3$l$i$NA4$F$NL?Na$OEv$N%X%C%@!<$K0\F0$7$^$9!#$b$7$=$l$,B8:_$7$J$$$H!"$=(B
-$B$l$OA^F~$5$l$^$9!#(B
+$B$3$l$i$NA4$F$NL?Na$OEv$N%X%C%@!<$K0\F0$7$^$9(B (@samp{Importance:} $B7O$N%3(B
+$B%^%s%I$ONc30(B)$B!#$b$7$=$l$,B8:_$7$J$$$H!"$=$l$OA^F~$5$l$^$9!#(B
 
 @table @kbd
 
@@ -404,6 +402,25 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @findex message-goto-summary
 @code{Summary} $B%X%C%@!<$K9T$-$^$9(B (@code{message-goto-summary})$B!#(B
 
+@item C-c C-f C-i
+@kindex C-c C-f C-i
+@findex message-insert-or-toggle-importance
+$BCM(B @samp{high} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#$3$N%X%C(B
+$B%@!<$O<u?.<T$K$=$N%a%C%;!<%8$N=EMW@-$rCN$i$;$k$?$a$K;H$o$l$k$b$N$G$9!#$b(B
+$B$7%P%C%U%!$K$9$G$K$3$N%X%C%@!<$,$"$k>l9g$O!"(BRFC 1376 $B$K=`$8$?;0$D$N(B
+$BCM(B @samp{low}$B!"(B@samp{normal} $B$*$h$S(B @samp{high} $B$r=[4D$5$;$^$9!#(B
+
+@item M-x message-insert-importance-high
+@kindex M-x message-insert-importance-high
+@findex message-insert-importance-high
+$BCM(B @samp{high} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
+$B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
+
+@item M-x message-insert-importance-low
+@kindex M-x message-insert-importance-low
+@findex message-insert-importance-low
+$BCM(B @samp{low} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
+$B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
 @end table
 
 @node Movement
@@ -420,6 +437,11 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @findex message-goto-signature
 $B%a%C%;!<%8$N=pL>$K0\F0$7$^$9(B (@code{message-goto-signature})$B!#(B
 
+@item C-a
+@kindex C-a
+@findex message-beginning-of-line
+$B%X%C%@!<$NCM$N$H$3$m$K$$$k$H$-$O9T$N@hF,$K0\F0$7!"$=$&$G$J$$$H$-$O%X%C%@!<(B
+$B$NCM$N@hF,$K0\F0$7$^$9!#(B($B%X%C%@!<$NCM$O%X%C%@!<L>$H%3%m%s$N8e$KMh$^$9!#(B)
 @end table
 
 @node Insertion
@@ -434,8 +456,8 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 $BE=$jIU$1$^$9!#IaDL$O(B @code{gnus-article-copy} $B$O$"$J$?$,JVEz$7$h$&$H$7$F(B
 $B$$$k%a%C%;!<%8$G$9(B (@code{messsage-yank-original})$B!#(B
 
-@item C-c M-C-y
-@kindex C-c M-C-y
+@item C-c C-M-y
+@kindex C-c C-M-y
 @findex message-yank-buffer
 Prompt for a buffer name and yank the contents of that buffer into the
 message buffer (@code{message-yank-buffer}).
@@ -459,114 +481,7 @@ message buffer (@code{message-yank-buffer}).
 @kindex C-c M-h
 @findex message-insert-headers
 $B%a%C%;!<%8$N%X%C%@!<$rA^F~$7$^$9(B (@code{message-insert-headers})$B!#(B
-
 @end table
-
-@table @code
-@item message-ignored-cited-headers
-$B$3$N@55,I=8=$K9gCW$9$kA4$F$N%X%C%@!<$OE=$jIU$1$i$l$?%a%C%;!<%8$+$i<h$j=|(B
-$B$+$l$^$9!#=i4|CM$O(B @samp{.} $B$G!"$3$l$OA4$F$N%X%C%@!<$,<h$j=|$+$l$k$H8@$&(B
-$B;v$G$9!#(B
-
-@item message-cite-prefix-regexp
-@vindex message-cite-prefix-regexp
-$B$"$k9T$,<h$jF@$k:GBg$N0zMQ@\F,8l$K9gCW$9$k@55,I=8=$G$9!#(B
-
-@item message-citation-line-function
-@vindex message-citation-line-function
-$B0zMQ9T$rA^F~$9$k$?$a$K8F$P$l$k4X?t$G$9!#=i4|CM(B
-$B$O(B @code{message-insert-citation-line} $B$G!"$3$l$O0zMQ9T$r<!$N$h$&$K$7$^(B
-$B$9(B:
-
-@example
-Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
-@end example
-
-$B$3$N4X?t$,8F$P$l$?$H$-!"%]%$%s%H$O%a%C%;!<%8$NK\BN$N@hF,$K$"$k$G$7$g$&!#(B
-
-@item message-yank-prefix
-@vindex message-yank-prefix
-@cindex yanking
-@cindex quoting
-$B$"$J$?$,5-;v$KJVEz$+%U%)%m!<%"%C%W$r$7$F$$$k$H$-$O!"IaDL$O$"$J$?$,1~Ez$7(B
-$B$F$$$k?M$N$b$N$K0zMQId$rIU$1$?$$$G$7$g$&!#0zMQJ8$NA^F~$O(B @dfn{$BE=$jIU$1(B}
-$B$K$h$C$F$J$5$l!"$=$l$>$l$NE=$jIU$1$i$l$?0zMQ9T$O$=$NA0(B
-$B$K(B @code{message-yank-prefix} $B$rIU$1$i$l$^$9!#=i4|CM$O(B @samp{> } $B$G$9!#(B
-
-@item message-yank-add-new-references
-@vindex message-yank-add-new-references
-@cindex yanking
-$B%3%^%s%I(B @code{message-yank-original} $B$rBPOCE*$K;H$C$?$H$-$K!"$3$NCM(B
-$B$,(B @code{nil} $B$G$J$+$C$?$i!"(BReferences $B%U%#!<%k%I$K(B ID $B$,DI2C$5$l$^$9!#(B
-$B$b$7CM$,%7%s%\%k(B @code{message-id-only} $B$@$C$?$i(B Message-ID $B%U%#!<%k%I(B
-$B$N(B ID $B$@$1$,;H$o$l$^$9$,!"$=$&$G$J$1$l$P(B References$B!"(BIn-Reply-To $B$*$h(B
-$B$S(B Message-ID $B%U%#!<%k%I$+$iCj=P$5$l$?(B ID $B$,;H$o$l$^$9!#(B
-
-@item message-list-references-add-position
-@vindex message-list-references-add-position
-@cindex yanking
-$B%3%^%s%I(B @code{message-yank-original} $B$rBPOCE*$K;H$C$?$H$-$K!"$3$NCM$,(B
-$B@5$N@0?t$@$C$?$i!"$9$G$K$"$k(B References $B%U%#!<%k%I$N:G8e$+$i$=$N8D?t(B
-$B$N(B ID $B$@$1N%$l$?>l=j$K?7$7$$(B ID $B$,A^F~$5$l$^$9!#$=$l0J30$N>l9g$O:G8e$KA^(B
-$BF~$5$l$^$9!#(B
-
-@item message-indentation-spaces
-@vindex message-indentation-spaces
-$BE=$jIU$1$i$l$?%a%C%;!<%8$r;z2<$2$9$k$?$a$N6uGr$N?t$G$9!#(B
-
-@item message-cite-function
-@vindex message-cite-function
-@findex message-cite-original
-@findex sc-cite-original
-@findex message-cite-original-without-signature
-@cindex Supercite
-$BK\5-;v$r0zMQ$9$k$?$a$N4X?t$G$9!#=i4|CM$O(B @code{message-cite-original} $B$G!"(B
-$B$3$l$OC1=c$K$b$H$N%a%C%;!<%8$rA^F~$7!"$=$l$>$l$N9T$NF,$K(B @samp{> } $B$r$/$C(B
-$B$D$1$^$9!#(B@code{message-cite-original-without-signature} $B$OF1MM$N;v$r$7(B
-$B$^$9$,!"=pL>$O>J$-$^$9!#(BSupercite $B$r;H$&$?$a$K!"$=$l(B
-$B$r(B @code{sc-cite-original} $B$K@_Dj$9$k;v$b$G$-$^$9!#(B
-
-@item message-suspend-font-lock-when-citing
-@vindex message-suspend-font-lock-when-citing
-@code{nil} $B$G$J$1$l$P!"K\5-;v$r0zMQ$7$F$$$k4V(B font-lock $B$NF0:n$r;_$a$^$9!#(B
-$B$$$/$D$+$N!"(BEmacs $B$,2K$J$H$-$KCY$l$FF0:n$9$k(B font-lock $B$N$?$a$N%D!<(B
-$B%k(B ($B$^$?$O(B Emacs $B<+?H(B) $B$K$O%P%0$,$"$j!"$=$l$i$O$7$P$7$P(B font-lock $B$NF0:n(B
-$B$r9T$J$&BP>]$H$J$k%P%C%U%!$r<h$j0c$($^$9!#$=$l$O$?$$$F$$(B Emacs $B$,%_%K%P%C(B
-$B%U%!$G%f!<%6$K2?$+$NF~NO$rB%$9$H$-$K5/$3$j$^$9!#$3$l$O$=$N>l$7$N$.$NBP:v(B
-$B$G$O$"$k$N$G$9$,!"$3$N%*%W%7%g%s$rHs(B-@code{nil} $B$K$9$k$3$H$K$h$C$F!"$"$J(B
-$B$?$OITL{2w$J%(%i!<$r2sHr$G$-$k$+$b$7$l$^$;$s!#(B
-
-@item message-indent-citation-function
-@vindex message-indent-citation-function
-$B$A$g$&$I%a!<%k%P%C%U%!$KA^F~$5$l$?0zMQJ8$r=$@5$9$k$?$a$N4X?t$G$9!#$3$l$O(B
-$B4X?t$N%j%9%H$G$"$k;v$b$G$-$^$9!#$=$l$>$l$N4X?t(B
-$B$O(B @code{(point)} $B$H(B @code{(mark t)} $B$N4V$G0zMQ$rH/8+$9$k;v$,$G$-$^$9!#(B
-$B$=$7$F!"$=$l$>$l$N4X?t$O0zMQJ8$,=$@5$5$l$k$H!"$=$N<~$j$K%]%$%s%H$H%^!<%/(B
-$B$r;D$5$J$1$l$P$J$j$^$;$s!#(B
-
-@item message-signature
-@vindex message-signature
-$B%a%C%;!<%8%P%C%U%!$N:G8e$KA^F~$5$l$kJ8;zNs$G$9!#$b$7(B @code{t} ($B$3$l$,=i(B
-$B4|@_Dj$G$9(B) $B$G$"$l$P!"%U%!%$%k(B @code{message-signature-file} $B$,Be$o$j$K(B
-$BA^F~$5$l$^$9!#$b$74X?t$G$"$l$P!"4X?t$N7k2L$,Be$o$j$K;H$o$l$^$9!#$b$7<0$G(B
-$B$"$l$P!"<0$N7k2L$,JQ$o$j$K;H$o$l$^$9!#$3$NJQ?t$,(B @code{nil} $B$G$"$l$P!"=p(B
-$BL>$OA4$/A^F~$5$l$^$;$s!#(B
-
-@item messsage-signature-file
-@vindex message-signature-file
-$B%P%C%U%!$N:G8e$KA^F~$5$l$k=pL>$NF~$C$F$$$k%U%!%$%k$G$9!#=i4|CM(B
-$B$O(B @samp{~/.signature} $B$G$9!#(B
-
-@end table
-
-RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$-$G$"$k(B
-$B$H8@$C$F$$$k;v$KCm0U$7$F2<$5$$!#$3$l$O<u$1<j$,<+F0E*$K=pL>$rG'<1$7$F!"=h(B
-$BM}$r$9$k;v$r4JC1$K$9$k$?$a$G$9!#$G$9$+$i!"$"$J$?$NH~$7$$%G%6%$%s$r$=$l$,!"(B
-$B$"$N!"40A4$KGK2u$7$F$$$k$H46$8$F$b$=$l$i$NJ8;z$r<h$j=|$+$J$$$G$/$@$5$$!#(B
-
-$B=pL>$O(B4$B9T$h$jB?$/$J$k$Y$-$G$OL5$$$H8@$&;v$bCm0U$7$F2<$5$$!#(BASCII $B$N3($r(B
-$BF~$l$k;v$O!"3'$K$"$J$?$,GO</$G2?$b=EMW$J;v$O8@$o$J$$$H8@$&;v$r?.$8$5$;$k(B
-$B$?$a$N8z2LE*$JJ}K!$G$9!#(B
 
 @c FIXTGNUS We should provide MIME manual.
 @ignore
@@ -595,15 +510,17 @@ Manual}).
 @section Security
 @cindex Security
 @cindex S/MIME
+@cindex PGP
 @cindex PGP/MIME
 @cindex sign
 @cindex encrypt
 
 Using the MML language, Message is able to create digitally signed and
-digitally encrypted messages.  Message (or rather MML) currently support
-PGP/MIME and S/MIME.  Instructing MML to perform security operations on
-a MIME part is done using the @code{C-c C-m s} key map for signing and the
-@code{C-c C-m c} key map for encryption, as follows.
+digitally encrypted messages.  Message (or rather MML) currently
+support PGP (RFC 1991), PGP/MIME (RFC 2015/3156) and S/MIME.
+Instructing MML to perform security operations on a MIME part is done
+using the @code{C-c C-m s} key map for signing and the @code{C-c C-m
+c} key map for encryption, as follows.
 
 @table @kbd
 
@@ -612,6 +529,12 @@ a MIME part is done using the @code{C-c C-m s} key map for signing and the
 @findex mml-secure-sign-smime
 
 Digitally sign current MIME part using S/MIME.
+
+@item C-c C-m s o
+@kindex C-c C-m s o
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP.
 
 @item C-c C-m s p
 @kindex C-c C-m s p
@@ -625,12 +548,17 @@ Digitally sign current MIME part using PGP/MIME.
 
 Digitally encrypt current MIME part using S/MIME.
 
+@item C-c C-m c o
+@kindex C-c C-m c o
+@findex mml-secure-encrypt-pgp
+
+Digitally encrypt current MIME part using PGP.
+
 @item C-c C-m c p
 @kindex C-c C-m c p
 @findex mml-secure-encrypt-pgpmime
 
 Digitally encrypt current MIME part using PGP/MIME.
-
 @end table
 
 These commands do not immediately sign or encrypt the message, they
@@ -664,7 +592,7 @@ modern cryptography, S/MIME, various PKCS standards, OpenSSL and so on.
 
 The S/MIME support in Message (and MML) require OpenSSL.  OpenSSL
 perform the actual S/MIME sign/encrypt operations.  OpenSSL can be found
-at @code{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
+at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
 Version 0.9.5a cannot extract mail addresses from certificates, and it
 insert a spurious CR character into MIME separators so you may wish to
 avoid it if you would like to avoid being regarded as someone who send
@@ -714,14 +642,13 @@ care in handling it.
 @subsection Using PGP/MIME
 
 PGP/MIME requires an external OpenPGP implementation, such as GNU Privacy
-Guard (@code{http://www.gnupg.org/}).  It also requires an Emacs interface
+Guard (@uref{http://www.gnupg.org/}).  It also requires an Emacs interface
 to it, such as Mailcrypt (available from
-@code{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
+@uref{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
 Florian Weimer's @code{gpg.el}.
 
 Creating your own OpenPGP key is described in detail in the
 documentation of your OpenPGP implementation, so we refer to it.
-
 @end ignore
 @node Various Commands
 @section $B$$$m$$$m$JL?Na(B
@@ -757,7 +684,7 @@ documentation of your OpenPGP implementation, so we refer to it.
 
 @item M-RET
 @kindex M-RET
-@kindex message-newline-and-format
+@findex message-newline-and-reformat
 4$B$D$N?7$7$$9T$rA^F~$7!"$b$7%]%$%s%H$,0zMQJ8$N4V$K$"$k$J$i$P!":F@07A$7$^(B
 $B$9!#(B
 
@@ -799,7 +726,6 @@ documentation of your OpenPGP implementation, so we refer to it.
 @findex message-rename-buffer
 $B%P%C%U%!$NL>A0$rJQ99$7$^$9(B (@code{message-rename-buffer})$B!#@\F,0z?t$rM?(B
 $B$($i$l$l$P!"?7$7$$%P%C%U%!L>$NF~NO$rB%?J$7$^$9!#(B
-
 @end table
 
 @node Sending
@@ -825,8 +751,20 @@ documentation of your OpenPGP implementation, so we refer to it.
 @item C-c C-k
 @kindex C-c C-k
 @findex message-kill-buffer
-$B%a%C%;!<%8%P%C%U%!$r@Z$C$F=*N;$7$^$9(B (@code{message-kill-buffer})$B!#(B
+@vindex message-kill-buffer-and-remove-file
+$B%a%C%;!<%8%P%C%U%!$r@Z$C$F=*N;$7$^$9(B (@code{message-kill-buffer})$B!#$=$N(B
+$B%U%l!<%`$,%a%C%;!<%8@lMQ$K:n$i$l$?$b$N$@$C$?>l9g$O!"%U%l!<%`$r:o=|$7$^$9!#(B
+@code{message-kill-buffer-and-remove-file} $B$,Hs(B-@code{nil} $B$G!"$+$D%P%C(B
+$B%/%"%C%W%U%!%$%k$,$G$-$F$$$?$i!"%f!<%6$K3NG'$7$F$+$i$=$l$b:o=|$7$^$9!#(B
 
+@item C-x k
+@kindex C-x k
+@findex message-mimic-kill-buffer
+@vindex message-kill-buffer-and-remove-file
+@code{kill-buffer} $B$N%$%_%F!<%7%g%s$G(B
+$B$9(B (@code{message-mimic-kill-buffer})$B!#(B
+@code{message-kill-buffer-and-remove-file} $B$r0l;~E*$K(B @code{nil} $B$KB+G{(B
+$B$7$F(B @code{message-kill-buffer} $B$r8F$S$^$9!#(B
 @end table
 
 @node Mail Aliases
@@ -909,6 +847,7 @@ Emacs $B$G%9%Z%k%A%'%C%/$9$k$?$a$KIa5Z$7$F$$$kFs$D$NJ}K!!"(B
 * Mail Variables::              $BB>$N%a!<%kJQ?t(B
 * News Headers::                $B%K%e!<%9%X%C%@!<$r%+%9%?%^%$%:$9$k(B
 * News Variables::              $BB>$N%K%e!<%9JQ?t(B
+* Insertion Variables::         $BA^F~$N$5$lJ}$r%+%9%?%^%$%:$9$k(B
 * Various Message Variables::   $BB>$N%a%C%;!<%8JQ?t(B
 * Sending Variables::           $BAw?.$9$k$?$a$NJQ?t(B
 * Message Buffers::             Message $B$,$=$N%P%C%U%!$NL>A0$rIU$1$kJ}K!(B
@@ -938,8 +877,8 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-from-style
 @vindex message-from-style
-@code{From} $B%X%C%@!<$,$I$N$h$&$K8+$($k$+$r;XDj$7$^$9!#(B4$B$D$N9gK!E*CM$,$"(B
-$B$j$^$9(B:
+@code{From} $B%X%C%@!<$,$I$N$h$&$K8+$($k$+$r;XDj$7$^$9!#0J2<$N#4$D$NCM$,;H(B
+$B$($^$9(B:
 
 @table @code
 @item nil
@@ -955,7 +894,6 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 $B$=$l$,0zMQId9f$rMW5a$7$J$1$l$P(B @code{angles} $B$N$h$&$K8+$(!"$b$70zMQId9f(B
 $B$,MW5a$5$l$k>l9g$O(B @code{parens} $B$N$h$&$K8+$($^$9!#(B@code{parens} $B$,0zMQ(B
 $BId9f$rMW5a$7$?$H$7$F$b!"$H$K$+$/(B @code{angles} $B$r;H$$$^$9!#(B
-
 @end table
 
 @item message-deletable-headers
@@ -975,6 +913,9 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-subject-re-regexp
 @vindex message-subject-re-regexp
+@cindex Aw:
+@cindex Sv:
+@cindex Re:
 $B%a%C%;!<%8$X$N1~Ez$O(B @samp{Re: } $B$G;O$^$j$^$9!#$3$l$O1Q8l(B
 $B$N(B ``response'' $B$NN,$G$O(B @emph{$B$"$j$^$;$s(B} $B$,!"%i%F%s8l$G!"(B``$B$=$l$K1~Ez(B
 $B$7$F(B'' (in response to) $B$H8@$&0UL#$G$9!#$$$/$D$+$NL53X$NGO</$O$3$N;v<B$r(B
@@ -985,6 +926,13 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 $B$J>l9g$O$3$NJQ?t$r$3$l$i$N@\F,8l$K9g$&$h$&$J@55,I=8=$K@_Dj$9$k$G$7$g$&!#(B
 $B;d<+?H$O!"$=$N$h$&$J5,3J$K=>$o$J$$%a!<%k$O$?$@<N$F5n$C$F$$$k$@$1$G$9!#(B
 
+$B$3$l$O!"JV;v$r$9$k$H$-$K$3$l$i$N%X%C%@!<$r=hM}$9$kCM$NNc$G$9(B:
+
+@lisp
+(setq message-subject-re-regexp
+     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\))
+@end lisp
+
 @item message-alternative-emails
 @vindex message-alternative-emails
 $BBe$o$j$N%a!<%k%"%I%l%9$K9gCW$9$k@55,I=8=$G$9!#:G=i$K%^%C%A$7$?(B ($BBh0l5A$G(B
@@ -992,7 +940,6 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 ($BLuCm(B: To $B$+(B Cc $B$K$"$k%"%I%l%9$G!":G=i$K$3$N@55,I=8=$K9gCW$7!"(B
 $B$+$D(B @code{user-mail-address} $B$H$O0c$&$b$N$,!"(B@code{From} $B%U%#!<%k%I$N%a!<(B
 $B%k%"%I%l%9$H$7$F;H$o$l$^$9!#(B)
-
 @end table
 
 @node Mail Headers
@@ -1014,7 +961,6 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @vindex message-default-mail-headers
 $B$3$NJ8;zNs$O%a!<%k$H$7$F=i4|2=$5$l$?A4$F$N%a%C%;!<%8%P%C%U%!$N%X%C%@!<$N(B
 $B:G8e$NA^F~$5$l$^$9!#(B
-
 @end table
 
 @node Mail Variables
@@ -1023,10 +969,17 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @table @code
 @item message-send-mail-function
 @vindex message-send-mail-function
+@findex message-send-mail-with-sendmail
+@findex message-send-mail-with-mh
+@findex message-send-mail-with-qmail
+@findex message-send-mail-with-smtp
+@findex smtpmail-send-it
+@findex feedmail-send-it
 $B8=:_$N%P%C%U%!$r%a!<%k$H$7$FAw$k$?$a$K;H$o$l$k4X?t$G$9!#=i4|CM(B
-$B$O(B @code{message-send-mail-with-sendmail} $B$G$9!#$b$7Be$o$j$K(B MH $B$GAw$k$N(B
-$B$r9%$`$N$G$"$l$P!"$3$NJQ?t$r(B @code{message-send-mail-with-mh} $B$K@_Dj$7$F(B
-$B2<$5$$!#(B
+$B$O(B @code{message-send-mail-with-sendmail} $B$G$9!#B>(B
+$B$K(B @code{message-send-mail-with-mh},
+@code{message-send-mail-with-qmail}, @code{message-send-mail-with-smtp},
+@code{smtpmail-send-it} $B$*$h$S(B @code{feedmail-send-it} $B$,;H$($^$9!#(B
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1041,7 +994,6 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @c The limitation of messages sent as message/partial.
 @c The lower bound of message size in characters, beyond which the message 
 @c should be sent in several parts. If it is nil, the size is unlimited.
-
 @end table
 
 @node News Headers
@@ -1050,7 +1002,7 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @vindex message-required-news-headers
 @code{message-required-news-headers} $B$O%X%C%@!<%7%s%\%k$N%j%9%H$G$9!#$3(B
 $B$l$i$N%X%C%@!<$O<+F0E*$K:n@.$5$l$k$+!"$b$7$/$O$=$l$,IT2DG=$G$"$l$P!"F~NO(B
-$B$rB%?J$7$^$9!#0J2<$N%7%s%\%k$O9gK!E*$G$9(B:
+$B$rB%?J$7$^$9!#0J2<$N%7%s%\%k$,;H$($^$9(B:
 
 @table @code
 
@@ -1148,7 +1100,7 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-syntax-checks
 @code{nil} $B$G$J$1$l$P!"(BMessage $B$OEj9F$NA0$K!"%X%C%@!<$HB>$N$b$N$N9gK!@-(B
 $B$rD4$Y$^$9!#$3$N%j%9%H$KMWAG$rIU$12C$($?$j<h$j=|$$$?$j$9$k;v$G!"D4$Y$kN3(B
-$B$NBg$-$5$r@)8f$9$k;v$,$G$-$^$9!#9gK!E*$JMWAG$O(B:
+$B$NBg$-$5$r@)8f$9$k;v$,$G$-$^$9!#;H$($kMWAG$O(B:
 
 @table @code
 @item subject-cmsg
@@ -1169,7 +1121,7 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @item long-lines
 $B$"$^$j$KD9$$9T$rD4$Y$^$9!#(B
 @item control-chars
-$BHs9gK!J8;z$rD4$Y$^$9!#(B
+$B;H$C$F$O$$$1$J$$J8;z$rD4$Y$^$9!#(B
 @item size
 $B2a>j$JBg$-$5$rD4$Y$^$9!#(B
 @item new-text
@@ -1212,7 +1164,6 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-default-news-headers
 $B$3$NJ8;zNs$O%K%e!<%9$H$7$F=i4|2=$5$l$?$9$Y$F$N%a%C%;!<%8%P%C%U%!$N%X%C%@!<(B
 $B$N:G8e$KA^F~$5$l$^$9!#(B
-
 @end table
 
 @node News Variables
@@ -1228,8 +1179,133 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-post-method
 $B=`Hw$5$l$?%K%e!<%9%a%C%;!<%8$rEj9F$9$k$N$K;H$o$l$k(B gnus $B$N(B @dfn{$BA*BrJ}K!(B}
 ($B>\:Y$O(B gnus $B%^%K%e%"%k$r8+$F2<$5$$(B) $B$G$9!#(B
-
 @end table
+
+@node Insertion Variables
+@section $BA^F~$9$k$?$a$NJQ?t(B
+
+@table @code
+@item message-ignored-cited-headers
+$B$3$N@55,I=8=$K9gCW$9$kA4$F$N%X%C%@!<$OE=$jIU$1$i$l$?%a%C%;!<%8$+$i<h$j=|(B
+$B$+$l$^$9!#=i4|CM$O(B @samp{.} $B$G!"$3$l$OA4$F$N%X%C%@!<$,<h$j=|$+$l$k$H8@$&(B
+$B;v$G$9!#(B
+
+@item message-cite-prefix-regexp
+@vindex message-cite-prefix-regexp
+$B$"$k9T$,<h$jF@$k:GBg$N0zMQ@\F,8l$K9gCW$9$k@55,I=8=$G$9!#(B
+
+@item message-citation-line-function
+@vindex message-citation-line-function
+@cindex attribution line
+$B0zMQ9T$rA^F~$9$k$?$a$K8F$P$l$k4X?t$G$9!#=i4|CM(B
+$B$O(B @code{message-insert-citation-line} $B$G!"$3$l$O0zMQ9T$r<!$N$h$&$K$7$^(B
+$B$9(B:
+
+@example
+Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
+@end example
+
+$B$3$N4X?t$,8F$P$l$?$H$-!"%]%$%s%H$O%a%C%;!<%8$NK\BN$N@hF,$K$"$k$G$7$g$&!#(B
+
+$B$J$*(B gnus $B$K$O!"(B`writes:' $B$N>e$G%/%j%C%/$9$k$H0zMQ$5$l$?%F%-%9%H$r1#$95!(B
+$BG=$,$"$j$^$9!#$b$7$"$J$?$,EY$r1[$7$F0zMQ9T$rJQ99$7$F$7$^$&$H!"$=$l$rFI$`(B
+$B?M$?$A$bH`$i$N(B gnus $B$rBP1~$5$;$J$1$l$P$J$i$J$/$J$k$G$7$g$&!#JQ(B
+$B?t(B @code{gnus-cite-attribution-suffix} $B$r;2>H$7$F2<$5$$!#>\:Y(B
+$B$O(B @xref{Article Highlighting, , $B5-;v$N%O%$%i%$%H(B, gnus-ja}, $B$K$"$j$^$9!#(B
+
+@item message-yank-prefix
+@vindex message-yank-prefix
+@cindex yanking
+@cindex quoting
+$B$"$J$?$,5-;v$KJVEz$+%U%)%m!<%"%C%W$r$7$F$$$k$H$-$O!"IaDL$O$"$J$?$,1~Ez$7(B
+$B$F$$$k?M$N$b$N$K0zMQId$rIU$1$?$$$G$7$g$&!#0zMQJ8$NA^F~$O(B @dfn{$BE=$jIU$1(B}
+$B$K$h$C$F$J$5$l(B ($B$9$G$K0zMQId$,IU$$$F$$$k$b$N$H6u9T$OBP>]30!"(B
+@code{message-yank-cited-prefix} $B$r;2>H$N$3$H(B)$B!"$=$l$>$l$NE=$jIU$1$i$l$?(B
+$B9T$O$=$NA0$K(B @code{message-yank-prefix} $B$rIU$1$i$l$^$9!#=i4|CM(B
+$B$O(B @samp{> } $B$G$9!#(B
+
+@item message-yank-cited-prefix
+@vindex message-yank-cited-prefix
+@cindex yanking
+@cindex cited
+@cindex quoting
+$B5-;v$+$i0zMQ$5$l$?%F%-%9%H$,$9$G$K0zMQ$5$l$?$b$N$@$C$?$j6u$@$C$?>l9g!"$=(B
+$B$l$>$l$N9T$K$O$3$NJQ?t$NCM$,A0CV$5$l$^$9!#=i4|CM$O(B @samp{>} $B$G$9!#(B
+@code{message-yank-prefix} $B$b;2>H$7$F2<$5$$!#(B
+
+@item message-yank-add-new-references
+@vindex message-yank-add-new-references
+@cindex yanking
+$B%3%^%s%I(B @code{message-yank-original} $B$rBPOCE*$K;H$C$?$H$-$K!"$3$NCM(B
+$B$,(B @code{nil} $B$G$J$+$C$?$i!"(BReferences $B%U%#!<%k%I$K(B ID $B$,DI2C$5$l$^$9!#(B
+$B$b$7CM$,%7%s%\%k(B @code{message-id-only} $B$@$C$?$i(B Message-ID $B%U%#!<%k%I(B
+$B$N(B ID $B$@$1$,;H$o$l$^$9$,!"$=$&$G$J$1$l$P(B References$B!"(BIn-Reply-To $B$*$h(B
+$B$S(B Message-ID $B%U%#!<%k%I$+$iCj=P$5$l$?(B ID $B$,;H$o$l$^$9!#(B
+
+@item message-list-references-add-position
+@vindex message-list-references-add-position
+@cindex yanking
+$B%3%^%s%I(B @code{message-yank-original} $B$rBPOCE*$K;H$C$?$H$-$K!"$3$NCM$,(B
+$B@5$N@0?t$@$C$?$i!"$9$G$K$"$k(B References $B%U%#!<%k%I$N:G8e$+$i$=$N8D?t(B
+$B$N(B ID $B$@$1N%$l$?>l=j$K?7$7$$(B ID $B$,A^F~$5$l$^$9!#$=$l0J30$N>l9g$O:G8e$KA^(B
+$BF~$5$l$^$9!#(B
+
+@item message-indentation-spaces
+@vindex message-indentation-spaces
+$BE=$jIU$1$i$l$?%a%C%;!<%8$r;z2<$2$9$k$?$a$N6uGr$N?t$G$9!#(B
+
+@item message-cite-function
+@vindex message-cite-function
+@findex message-cite-original
+@findex sc-cite-original
+@findex message-cite-original-without-signature
+@cindex Supercite
+$BK\5-;v$r0zMQ$9$k$?$a$N4X?t$G$9!#=i4|CM$O(B @code{message-cite-original} $B$G!"(B
+$B$3$l$OC1=c$K$b$H$N%a%C%;!<%8$rA^F~$7!"$=$l$>$l$N9T$NF,$K(B @samp{> } $B$r$/$C(B
+$B$D$1$^$9!#(B@code{message-cite-original-without-signature} $B$OF1MM$N;v$r$7(B
+$B$^$9$,!"=pL>$O>J$-$^$9!#(BSupercite $B$r;H$&$?$a$K!"$=$l(B
+$B$r(B @code{sc-cite-original} $B$K@_Dj$9$k;v$b$G$-$^$9!#(B
+
+@item message-suspend-font-lock-when-citing
+@vindex message-suspend-font-lock-when-citing
+@code{nil} $B$G$J$1$l$P!"K\5-;v$r0zMQ$7$F$$$k4V(B font-lock $B$NF0:n$r;_$a$^$9!#(B
+$B$$$/$D$+$N!"(BEmacs $B$,2K$J$H$-$KCY$l$FF0:n$9$k(B font-lock $B$N$?$a$N%D!<(B
+$B%k(B ($B$^$?$O(B Emacs $B<+?H(B) $B$K$O%P%0$,$"$j!"$=$l$i$O$7$P$7$P(B font-lock $B$NF0:n(B
+$B$r9T$J$&BP>]$H$J$k%P%C%U%!$r<h$j0c$($^$9!#$=$l$O$?$$$F$$(B Emacs $B$,%_%K%P%C(B
+$B%U%!$G%f!<%6$K2?$+$NF~NO$rB%$9$H$-$K5/$3$j$^$9!#$3$l$O$=$N>l$7$N$.$NBP:v(B
+$B$G$O$"$k$N$G$9$,!"$3$N%*%W%7%g%s$rHs(B-@code{nil} $B$K$9$k$3$H$K$h$C$F!"$"$J(B
+$B$?$OITL{2w$J%(%i!<$r2sHr$G$-$k$+$b$7$l$^$;$s!#(B
+
+@item message-indent-citation-function
+@vindex message-indent-citation-function
+$B$A$g$&$I%a!<%k%P%C%U%!$KA^F~$5$l$?0zMQJ8$r=$@5$9$k$?$a$N4X?t$G$9!#$3$l$O(B
+$B4X?t$N%j%9%H$G$"$k;v$b$G$-$^$9!#$=$l$>$l$N4X?t(B
+$B$O(B @code{(point)} $B$H(B @code{(mark t)} $B$N4V$G0zMQ$rH/8+$9$k;v$,$G$-$^$9!#(B
+$B$=$7$F!"$=$l$>$l$N4X?t$O0zMQJ8$,=$@5$5$l$k$H!"$=$N<~$j$K%]%$%s%H$H%^!<%/(B
+$B$r;D$5$J$1$l$P$J$j$^$;$s!#(B
+
+@item message-signature
+@vindex message-signature
+$B%a%C%;!<%8%P%C%U%!$N:G8e$KA^F~$5$l$kJ8;zNs$G$9!#$b$7(B @code{t} ($B$3$l$,=i(B
+$B4|@_Dj$G$9(B) $B$G$"$l$P!"%U%!%$%k(B @code{message-signature-file} $B$,Be$o$j$K(B
+$BA^F~$5$l$^$9!#$b$74X?t$G$"$l$P!"4X?t$N7k2L$,Be$o$j$K;H$o$l$^$9!#$b$7<0$G(B
+$B$"$l$P!"<0$N7k2L$,JQ$o$j$K;H$o$l$^$9!#$3$NJQ?t$,(B @code{nil} $B$G$"$l$P!"=p(B
+$BL>$OA4$/A^F~$5$l$^$;$s!#(B
+
+@item messsage-signature-file
+@vindex message-signature-file
+$B%P%C%U%!$N:G8e$KA^F~$5$l$k=pL>$NF~$C$F$$$k%U%!%$%k$G$9!#=i4|CM(B
+$B$O(B @samp{~/.signature} $B$G$9!#(B
+@end table
+
+RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$-$G$"$k(B
+$B$H8@$C$F$$$k;v$KCm0U$7$F2<$5$$!#$3$l$O<u$1<j$,<+F0E*$K=pL>$rG'<1$7$F!"=h(B
+$BM}$r$9$k;v$r4JC1$K$9$k$?$a$G$9!#$G$9$+$i!"$"$J$?$NH~$7$$%G%6%$%s$r$=$l$,!"(B
+$B$"$N!"40A4$KGK2u$7$F$$$k$H46$8$F$b$=$l$i$NJ8;z$r<h$j=|$+$J$$$G$/$@$5$$!#(B
+
+$B=pL>$O(B4$B9T$h$jB?$/$J$k$Y$-$G$OL5$$$H8@$&;v$bCm0U$7$F2<$5$$!#(BASCII $B$N3($r(B
+$BF~$l$k;v$O!"3'$K$"$J$?$,GO</$G2?$b=EMW$J;v$O8@$o$J$$$H$$$&;v$r?.$8$5$;$k(B
+$B$?$a$N8z2LE*$JJ}K!$G$9!#(B
 
 @node Various Message Variables
 @section $B$$$m$$$m$J%a%C%;!<%8JQ?t(B
@@ -1350,7 +1426,6 @@ follows this line--} $B$G$9!#(B
 ((news message-news-p message-send-via-news)
  (mail message-mail-p message-send-via-mail))
 @end lisp
-
 @end table
 
 @node Sending Variables
@@ -1372,7 +1447,6 @@ follows this line--} $B$G$9!#(B
 $B$,(B @code{nil} $B$G$"$l$P!"$=$N$h$&$J?F@Z%a%C%;!<%8$O2C$($i$l$^$;$s!#=i4|CM(B
 $B$O(B @samp{"The following message is a courtesy copy of an article\nthat has
 been posted to %s as well.\n\n"} $B$G$9!#(B
-
 @end table
 
 @node Message Buffers
@@ -1423,9 +1497,29 @@ Message $B$O$"$J$?$,%a%C%;!<%8%P%C%U%!$rMW5a$7$?$H$-$K!"B>$KL5$$M#0l$N%P%C(B
 @end lisp
 
 @item message-kill-buffer-on-exit
-@findex message-kill-buffer-on-exit
+@vindex message-kill-buffer-on-exit
 @code{nil} $B$G$J$1$l$P!"=*N;;~$K$9$0$K%P%C%U%!$r:o=|$7$^$9!#(B
 
+@item message-kill-buffer-query-function
+@vindex message-kill-buffer-query-function
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+$B%3%^%s(B
+$B%I(B @code{message-kill-buffer} $B$d(B @code{message-mimic-kill-buffer} $B$G!"%P%C(B
+$B%U%!$r:o=|$9$k$+$I$&$+$r%f!<%6$K?R$M$k$H$-$K;H$&4X?t$N;XDj$G$9!#%G%#%U%)(B
+$B%k%H$O(B @code{yes-or-no-p} $B$G$9$,!"(B
+@code{y-or-n-p} $B$d(B @code{nnheader-Y-or-n-p} $B$J$I$r;H$&$3$H$b$G$-$^$9!#(B
+@code{t} $B$K$9$k$HL5>r7o$K%P%C%U%!$r:o=|$7$^$9!#(B
+
+@item message-kill-buffer-and-remove-file
+@vindex message-kill-buffer-and-remove-file
+@findex message-kill-buffer
+@findex message-mimic-kill-buffer
+$BHs(B-@code{nil} $B$@$C$?$i!"%P%C%U%!$r:o=|$7$?8e$G$b$7%P%C%/%"%C%W%U%!%$%k$,(B
+$B$"$C$?$i!"%f!<%6$K3NG'$7$F$+$i$=$l$b:o=|$7$^$9!#(B@code{nil} $B$G$O%U%!%$%k(B
+$B$r:o=|$7$^$;$s!#%G%#%U%)%k%H$O(B @code{t} $B$G$9!#$?$@$7!"%3%^%s(B
+$B%I(B @code{message-mimic-kill-buffer} $B$O$3$l$,(B @code{nil} $B$G$"$k$b$N$H$7$F(B
+$BF0:n$7$^$9!#(B
 @end table
 
 @node Message Actions
@@ -1535,12 +1629,10 @@ Message $B$O;v<B>e!"$=$l<+?H$NJQ?t$7$+;H$$$^$;$s(B---$B8E$$(B @code{mail-} 
 @item Followup-To
 
 @item Newsgroups
-
 @end table
 
 $B$b$7(B @code{Mail-Copies-To} $B%X%C%@!<$,B8:_$9$k$H!"$=$l$,(B @samp{never} $B$G(B
-$B$J$1$l$P!"?7$7$$(B @code{Cc} $B%X%C%@!<$N4p$H$7$F;H$o$l!"$^$9!#(B
-
+$B$J$1$l$P!"?7$7$$(B @code{Cc} $B%X%C%@!<$N4p$H$7$F;H$o$l$^$9!#(B
 @end table
 
 @node Index
@@ -1555,4 +1647,7 @@ Message $B$O;v<B>e!"$=$l<+?H$NJQ?t$7$+;H$$$^$;$s(B---$B8E$$(B @code{mail-} 
 @contents
 @bye
 
+@c Local Variables:
+@c mode: texinfo
+@c coding: iso-2022-7bit
 @c End:

@@ -63,6 +63,12 @@
 ;;; Mule functions.
 
 (eval-and-compile
+  (defalias 'gnus-char-width
+    (if (fboundp 'char-width)
+	'char-width
+      (lambda (ch) 1)))) ;; A simple hack.
+
+(eval-and-compile
   (if (featurep 'xemacs)
       (gnus-xmas-define)
     (defvar gnus-mouse-face-prop 'mouse-face
@@ -77,7 +83,10 @@
 	    (append nnheader-file-name-translation-alist
 		    (mapcar (lambda (c) (cons c ?_))
 			    '(?: ?* ?\" ?< ?> ??))
-		    '((?+ . ?-))))))))
+		    (if (string-match "windows-nt\\|cygwin32"
+				      (symbol-name system-type))
+			nil
+		      '((?+ . ?-)))))))))
 
 (defvar gnus-tmp-unread)
 (defvar gnus-tmp-replied)
@@ -225,8 +234,8 @@
   "Non-nil means the compface program supports the -X option.
 That produces XBM output.")
 
-(defun gnus-article-display-xface (beg end &optional buffer)
-  "Display an XFace header from between BEG and END in BUFFER.
+(defun gnus-article-display-xface (data)
+  "Display the XFace header FACE in the current buffer.
 Requires support for images in your Emacs and the external programs
 `uncompface', and `icontopbm'.  On a GNU/Linux system these
 might be in packages with names like `compface' or `faces-xface' and
@@ -244,10 +253,6 @@ for XEmacs."
 	    (make-ring gnus-article-xface-ring-size)))
     (save-excursion
       (let* ((cur (current-buffer))
-	     (data (if buffer
-		       (with-current-buffer buffer
-			 (buffer-substring beg end))
-		     (buffer-substring beg end)))
 	     (image (cdr-safe (assoc data (ring-elements
 					   gnus-article-xface-ring-internal))))
 	     default-enable-multibyte-characters)
@@ -288,7 +293,32 @@ for XEmacs."
 	(when image
 	  (goto-char (point-min))
 	  (re-search-forward "^From:" nil 'move)
+	  (while (get-text-property (point) 'display)
+	    (goto-char (next-single-property-change (point) 'display)))
+	  (gnus-add-wash-type 'xface)
+	  (gnus-add-image 'xface image)
 	  (insert-image image))))))
+
+;;; Image functions.
+
+(defun gnus-image-type-available-p (type)
+  (and (fboundp 'image-type-available-p)
+       (image-type-available-p type)))
+
+(defun gnus-create-image (file &optional type data-p &rest props)
+  (let ((face (plist-get props :face)))
+    (when face
+      (setq props (plist-put props :foreground (face-foreground face)))
+      (setq props (plist-put props :background (face-background face))))
+    (apply 'create-image file type data-p props)))
+
+(defun gnus-put-image (glyph &optional string)
+  (insert-image glyph string))
+
+(defun gnus-remove-image (image)
+  (dolist (position (gnus-text-with-property 'display))
+    (when (equal (get-text-property position 'display) image)
+      (put-text-property position (1+ position) 'display nil))))
 
 (defun-maybe assoc-ignore-case (key alist)
   "Like `assoc', but assumes KEY is a string and ignores case when comparing."

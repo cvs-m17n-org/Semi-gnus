@@ -60,7 +60,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'gnus-clfns))
-(eval-and-compile (require 'imap))
+(require 'imap)
 
 (require 'nnoo)
 (require 'nnmail)
@@ -72,7 +72,11 @@
 
 (nnoo-declare nnimap)
 
-(defconst nnimap-version "nnimap 0.131")
+(defconst nnimap-version "nnimap 1.0")
+
+(defgroup nnimap nil
+  "Reading IMAP mail with Gnus."
+  :group 'gnus)
 
 (defvoo nnimap-address nil
   "Address of physical IMAP server.  If nil, use the virtual server's name.")
@@ -83,20 +87,36 @@ If nil, defaults to 993 for SSL connections and 143 otherwise.")
 
 ;; Splitting variables
 
-(defvar nnimap-split-crosspost t
+(defcustom nnimap-split-crosspost t
   "If non-nil, do crossposting if several split methods match the mail.
-If nil, the first match found will be used.")
+If nil, the first match found will be used."
+  :group 'nnimap
+  :type 'boolean)
 
-(defvar nnimap-split-inbox nil
-  "*Name of mailbox to split mail from.
+(defcustom nnimap-split-inbox nil
+  "Name of mailbox to split mail from.
 
 Mail is read from this mailbox and split according to rules in
 `nnimap-split-rule'.
 
-This can be a string or a list of strings.")
+This can be a string or a list of strings."
+  :group 'nnimap
+  :type '(choice (string)
+		 (repeat string)))
 
-(defvar nnimap-split-rule nil
-  "*Mail will be split according to theese rules.
+(define-widget 'nnimap-strict-function 'function
+  "This widget only matches values that are functionp.
+
+Warning: This means that a value that is the symbol of a not yet
+loaded function will not match.  Use with care."
+  :match 'nnimap-strict-function-match)
+
+(defun nnimap-strict-function-match (widget value)
+  "Ignoring WIDGET, match if VALUE is a function."
+  (functionp value))
+
+(defcustom nnimap-split-rule nil
+  "Mail will be split according to theese rules.
 
 Mail is read from mailbox(es) specified in `nnimap-split-inbox'.
 
@@ -105,7 +125,7 @@ If you'd like, for instance, one mail group for mail from the
 everything else in the incoming mailbox, you could do something like
 this:
 
-(setq nnimap-split-rule '((\"INBOX.gnus-imap\"   \"From:.*gnus-imap\")
+\(setq nnimap-split-rule '((\"INBOX.gnus-imap\"   \"From:.*gnus-imap\")
 			  (\"INBOX.junk\"        \"Subject:.*buy\")))
 
 As you can see, `nnimap-split-rule' is a list of lists, where the first
@@ -126,29 +146,63 @@ To allow for different split rules on different virtual servers, and
 even different split rules in different inboxes on the same server,
 the syntax of this variable have been extended along the lines of:
 
-(setq nnimap-split-rule
+\(setq nnimap-split-rule
       '((\"my1server\"    (\".*\"    ((\"ding\"    \"ding@gnus.org\")
-                                  (\"junk\"    \"From:.*Simon\")))
-        (\"my2server\"    (\"INBOX\" nnimap-split-fancy))
-        (\"my[34]server\" (\".*\"    ((\"private\" \"To:.*Simon\")
-                                  (\"junk\"    my-junk-func)))))
+				  (\"junk\"    \"From:.*Simon\")))
+	(\"my2server\"    (\"INBOX\" nnimap-split-fancy))
+	(\"my[34]server\" (\".*\"    ((\"private\" \"To:.*Simon\")
+				  (\"junk\"    my-junk-func)))))
 
 The virtual server name is in fact a regexp, so that the same rules
 may apply to several servers.  In the example, the servers
 \"my3server\" and \"my4server\" both use the same rules.  Similarly,
 the inbox string is also a regexp.  The actual splitting rules are as
 before, either a function, or a list with group/regexp or
-group/function elements.")
+group/function elements."
+  :group 'nnimap
+  :type '(choice :tag "Rule type"
+		 (repeat :menu-tag "Single-server"
+			 :tag "Single-server list"
+			 (list (string :tag "Mailbox")
+			       (choice :tag "Predicate"
+				       (regexp :tag "A regexp")
+				       (nnimap-strict-function :tag "A function"))))
+		 (choice :menu-tag "A function"
+			 :tag "A function"
+			 (function-item nnimap-split-fancy)
+			 (function-item nnmail-split-fancy)
+			 (nnimap-strict-function :tag "User-defined function"))
+		 (repeat :menu-tag "Multi-server (extended)"
+			 :tag "Multi-server list"
+			 (list (regexp :tag "Server regexp")
+			       (list (regexp :tag "Incoming Mailbox regexp")
+				     (repeat :tag "Rules for matching server(s) and mailbox(es)"
+					     (list (string :tag "Destination mailbox")
+						   (choice :tag "Predicate"
+							   (regexp :tag "A Regexp")
+							   (nnimap-strict-function :tag "A Function")))))))))
 
-(defvar nnimap-split-predicate "UNSEEN UNDELETED"
+(defcustom nnimap-split-predicate "UNSEEN UNDELETED"
   "The predicate used to find articles to split.
 If you use another IMAP client to peek on articles but always would
 like nnimap to split them once it's started, you could change this to
 \"UNDELETED\". Other available predicates are available in
-RFC2060 section 6.4.4.")
+RFC2060 section 6.4.4."
+  :group 'nnimap
+  :type 'string)
 
-(defvar nnimap-split-fancy nil
-  "Like `nnmail-split-fancy', which see.")
+(defcustom nnimap-split-fancy nil
+  "Like `nnmail-split-fancy', which see."
+  :group 'nnimap
+  :type 'sexp)
+
+(defcustom nnimap-close-asynchronous nil
+  "Close mailboxes asynchronously in `nnimap-close-group'.
+This means that errors cought by nnimap when closing the mailbox will
+not prevent Gnus from updating the group status, which may be harmful.
+However, it increases speed."
+  :type 'boolean
+  :group 'nnimap)
 
 ;; Authorization / Privacy variables
 
@@ -236,7 +290,8 @@ There are two wildcards * and %. * matches everything, % matches
 everything in the current hierarchy.")
 
 (defvoo nnimap-news-groups nil
-  "IMAP support a news-like mode, also known as bulletin board mode, where replies is sent via IMAP instead of SMTP.
+  "IMAP support a news-like mode, also known as bulletin board mode,
+where replies is sent via IMAP instead of SMTP.
 
 This variable should contain a regexp matching groups where you wish
 replies to be stored to the mailbox directly.
@@ -250,6 +305,22 @@ Note that there is nothing technically different between mail-like and
 news-like mailboxes.  If you wish to have a group with todo items or
 similar which you wouldn't want to set up a mailing list for, you can
 use this to make replies go directly to the group.")
+
+(defvoo nnimap-expunge-search-string "UID %s NOT SINCE %s"
+  "IMAP search command to use for articles that are to be expired.
+The first %s is replaced by a UID set of articles to search on,
+and the second %s is replaced by a date criterium.
+
+One useful (and perhaps the only useful) value to change this to would
+be `UID %s NOT SENTSINCE %s' to make nnimap use the Date: header
+instead of the internal date of messages.  See section 6.4.4 of RFC
+2060 for more information on valid strings.")
+
+(defvoo nnimap-importantize-dormant t
+  "If non-nil, mark \"dormant\" articles as \"ticked\" for other IMAP clients.
+Note that within Gnus, dormant articles will still (only) be
+marked as ticked.  This is to make \"dormant\" articles stand out,
+just like \"ticked\" articles, in other IMAP clients.")
 
 (defvoo nnimap-server-address nil
   "Obsolete.  Use `nnimap-address'.")
@@ -324,13 +395,13 @@ If SERVER is nil, uses the current server."
 	 (new-uidvalidity (imap-mailbox-get 'uidvalidity))
 	 (old-uidvalidity (gnus-group-get-parameter gnusgroup 'uidvalidity))
 	 (dir (file-name-as-directory (expand-file-name nnimap-directory)))
-         (nameuid (nnheader-translate-file-chars
-                   (concat nnimap-nov-file-name
-                           (if (equal server "")
-                               "unnamed"
-                             server) "." group "." old-uidvalidity
-                             nnimap-nov-file-name-suffix) t))
-         (file (if (or nnmail-use-long-file-names
+	 (nameuid (nnheader-translate-file-chars
+		   (concat nnimap-nov-file-name
+			   (if (equal server "")
+			       "unnamed"
+			     server) "." group "." old-uidvalidity
+			     nnimap-nov-file-name-suffix) t))
+	 (file (if (or nnmail-use-long-file-names
 		       (file-exists-p (expand-file-name nameuid dir)))
 		   (expand-file-name nameuid dir)
 		 (expand-file-name
@@ -368,7 +439,7 @@ If EXAMINE is non-nil the group is selected read-only."
 				    maxuid (if maxuid (max maxuid uid) uid)))
 			    'UID))
 	(list (imap-mailbox-get 'exists) minuid maxuid)))))
-  
+
 (defun nnimap-possibly-change-group (group &optional server)
   "Make GROUP the current group, and SERVER the current server."
   (when (nnimap-possibly-change-server server)
@@ -379,12 +450,14 @@ If EXAMINE is non-nil the group is selected read-only."
 	    (if (or (nnimap-verify-uidvalidity
 		     group (or server nnimap-current-server))
 		    (zerop (imap-mailbox-get 'exists group))
+		    t ;; for OGnus to see if ignoring uidvalidity
+		      ;; changes has any bad effects.
 		    (yes-or-no-p
 		     (format
 		      "nnimap: Group %s is not uidvalid.  Continue? " group)))
 		imap-current-mailbox
 	      (imap-mailbox-unselect)
-	      (error "nnimap: Group %s is not uid-valid." group))
+	      (error "nnimap: Group %s is not uid-valid" group))
 	  (nnheader-report 'nnimap (imap-error-text)))))))
 
 (defun nnimap-replace-whitespace (string)
@@ -575,8 +648,8 @@ If EXAMINE is non-nil the group is selected read-only."
 		    ;; remove nov's for articles which has expired on server
 		    (goto-char (point-min))
 		    (dolist (uid (gnus-set-difference articles uids))
-                      (when (re-search-forward (format "^%d\t" uid) nil t)
-                        (gnus-delete-line)))))
+		      (when (re-search-forward (format "^%d\t" uid) nil t)
+			(gnus-delete-line)))))
 	      ;; nothing cached, fetch whole range from server
 	      (nnimap-retrieve-headers-from-server
 	       (cons low high) group server))
@@ -599,9 +672,9 @@ If EXAMINE is non-nil the group is selected read-only."
 	   (port (if nnimap-server-port
 		     (int-to-string nnimap-server-port)
 		   "imap"))
-	   (alist (gnus-netrc-machine list (or nnimap-server-address 
-                                               nnimap-address server)
-                                      port "imap"))
+	   (alist (gnus-netrc-machine list (or nnimap-server-address
+					       nnimap-address server)
+				      port "imap"))
 	   (user (gnus-netrc-get alist "login"))
 	   (passwd (gnus-netrc-get alist "password")))
       (if (imap-authenticate user passwd nnimap-server-buffer)
@@ -627,6 +700,8 @@ If EXAMINE is non-nil the group is selected read-only."
 		      (cadr (assq 'nnimap-server-address defs))) defs)
 	(push (list 'nnimap-address server) defs)))
     (nnoo-change-server 'nnimap server defs)
+    (or nnimap-server-buffer
+	(setq nnimap-server-buffer (cadr (assq 'nnimap-server-buffer defs))))
     (with-current-buffer (get-buffer-create nnimap-server-buffer)
       (nnoo-change-server 'nnimap server defs))
     (or (and nnimap-server-buffer
@@ -683,7 +758,7 @@ function is generally only called when Gnus is shutting down."
   (with-current-buffer nnimap-callback-buffer
     (insert
      (with-current-buffer nnimap-server-buffer
-       (if (imap-capability 'IMAP4rev1) 
+       (if (imap-capability 'IMAP4rev1)
 	   ;; xxx don't just use car? alist doesn't contain
 	   ;; anything else now, but it might...
 	   (nth 2 (car (imap-message-get (imap-current-message) 'BODYDETAIL)))
@@ -771,14 +846,14 @@ function is generally only called when Gnus is shutting down."
     (when (and (imap-opened)
 	       (nnimap-possibly-change-group group server))
       (case nnimap-expunge-on-close
-	('always (imap-mailbox-expunge)
-		 (imap-mailbox-close))
-	('ask (if (and (imap-search "DELETED")
+	(always (imap-mailbox-expunge nnimap-close-asynchronous)
+		 (imap-mailbox-close nnimap-close-asynchronous))
+	(ask (if (and (imap-search "DELETED")
 		       (gnus-y-or-n-p (format
 				       "Expunge articles in group `%s'? "
 				       imap-current-mailbox)))
-		  (progn (imap-mailbox-expunge)
-			 (imap-mailbox-close))
+		  (progn (imap-mailbox-expunge nnimap-close-asynchronous)
+			 (imap-mailbox-close nnimap-close-asynchronous))
 		(imap-mailbox-unselect)))
 	(t (imap-mailbox-unselect)))
       (not imap-current-mailbox))))
@@ -806,9 +881,9 @@ function is generally only called when Gnus is shutting down."
 	      (let ((info (nnimap-find-minmax-uid mbx 'examine)))
 		(when info
 		  (with-current-buffer nntp-server-buffer
-                   (insert (format "\"%s\" %d %d y\n"
-                                   mbx (or (nth 2 info) 0)
-                                   (max 1 (or (nth 1 info) 1)))))))))))
+		    (insert (format "\"%s\" %d %d y\n"
+				    mbx (or (nth 2 info) 0)
+				    (max 1 (or (nth 1 info) 1)))))))))))
     (gnus-message 5 "nnimap: Generating active list%s...done"
 		  (if (> (length server) 0) (concat " for " server) ""))
     t))
@@ -845,6 +920,10 @@ function is generally only called when Gnus is shutting down."
 	(or (member "\\NoSelect"
 		    (imap-mailbox-get 'list-flags group nnimap-server-buffer))
 	    (let ((info (nnimap-find-minmax-uid group 'examine)))
+	      (when (> (or (imap-mailbox-get 'recent group
+					     nnimap-server-buffer) 0)
+		       0)
+		(push (list (cons group 0)) nnmail-split-history))
 	      (insert (format "\"%s\" %d %d y\n" group
 			      (or (nth 2 info) 0)
 			      (max 1 (or (nth 1 info) 1))))))))
@@ -857,7 +936,7 @@ function is generally only called when Gnus is shutting down."
       (with-current-buffer nnimap-server-buffer
 	(gnus-message 5 "nnimap: Updating info for %s..."
 		      (gnus-info-group info))
-	
+
 	(when (nnimap-mark-permanent-p 'read)
 	  (let (seen unseen)
 	    ;; read info could contain articles marked unread by other
@@ -881,12 +960,13 @@ function is generally only called when Gnus is shutting down."
 	    (gnus-info-set-read info seen)))
 
 	(mapcar (lambda (pred)
-		  (when (and (nnimap-mark-permanent-p (cdr pred))
-			     (member (nnimap-mark-to-flag (cdr pred))
-				     (imap-mailbox-get 'flags)))
+		  (when (or (eq (cdr pred) 'recent)
+			    (and (nnimap-mark-permanent-p (cdr pred))
+				 (member (nnimap-mark-to-flag (cdr pred))
+					 (imap-mailbox-get 'flags))))
 		    (gnus-info-set-marks
 		     info
-		     (nnimap-update-alist-soft
+		     (gnus-update-alist-soft
 		      (cdr pred)
 		      (gnus-compress-sequence
 		       (imap-search (nnimap-mark-to-predicate (cdr pred))))
@@ -894,18 +974,19 @@ function is generally only called when Gnus is shutting down."
 		     t)))
 		gnus-article-mark-lists)
 
-	;; nnimap mark dormant article as ticked too (for other clients)
-	;; so we remove that mark for gnus since we support dormant
-	(gnus-info-set-marks
-	 info 
-	 (nnimap-update-alist-soft
-	  'tick
-	  (gnus-remove-from-range
-	   (cdr-safe (assoc 'tick (gnus-info-marks info)))
-	   (cdr-safe (assoc 'dormant (gnus-info-marks info))))
-	  (gnus-info-marks info))
-	 t)
-	
+	(when nnimap-importantize-dormant
+	  ;; nnimap mark dormant article as ticked too (for other clients)
+	  ;; so we remove that mark for gnus since we support dormant
+	  (gnus-info-set-marks
+	   info
+	   (gnus-update-alist-soft
+	    'tick
+	    (gnus-remove-from-range
+	     (cdr-safe (assoc 'tick (gnus-info-marks info)))
+	     (cdr-safe (assoc 'dormant (gnus-info-marks info))))
+	    (gnus-info-marks info))
+	   t))
+
 	(gnus-message 5 "nnimap: Updating info for %s...done"
 		      (gnus-info-group info))
 
@@ -926,11 +1007,22 @@ function is generally only called when Gnus is shutting down."
 		(what  (nth 1 action))
 		(cmdmarks (nth 2 action))
 		marks)
+	    ;; bookmark can't be stored (not list/range
+	    (setq cmdmarks (delq 'bookmark cmdmarks))
+	    ;; killed can't be stored (not list/range
+	    (setq cmdmarks (delq 'killed cmdmarks))
+	    ;; unsent are for nndraft groups only
+	    (setq cmdmarks (delq 'unsent cmdmarks))
 	    ;; cache flags are pointless on the server
 	    (setq cmdmarks (delq 'cache cmdmarks))
-	    ;; flag dormant articles as ticked
-	    (if (memq 'dormant cmdmarks)
-		(setq cmdmarks (cons 'tick cmdmarks)))
+	    ;; seen flags are local to each gnus
+	    (setq cmdmarks (delq 'seen cmdmarks))
+	    ;; recent marks can't be set
+	    (setq cmdmarks (delq 'recent cmdmarks))
+	    (when nnimap-importantize-dormant
+	      ;; flag dormant articles as ticked
+	      (if (memq 'dormant cmdmarks)
+		  (setq cmdmarks (cons 'tick cmdmarks))))
 	    ;; remove stuff we are forbidden to store
 	    (mapcar (lambda (mark)
 		      (if (imap-message-flag-permanent-p
@@ -987,7 +1079,7 @@ function is generally only called when Gnus is shutting down."
 		      to-groups)
 		(or nnimap-split-crosspost
 		    (throw 'split-done to-groups))))))))))
-  
+
 (defun nnimap-assoc-match (key alist)
   (let (element)
     (while (and alist (not element))
@@ -998,9 +1090,9 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-split-find-rule (server inbox)
   (if (and (listp nnimap-split-rule) (listp (car nnimap-split-rule))
-           (list (cdar nnimap-split-rule)) (listp (cadar nnimap-split-rule)))
+	   (list (cdar nnimap-split-rule)) (listp (cadar nnimap-split-rule)))
       ;; extended format
-      (cadr (nnimap-assoc-match inbox (cdr (nnimap-assoc-match 
+      (cadr (nnimap-assoc-match inbox (cdr (nnimap-assoc-match
 					    server nnimap-split-rule))))
     nnimap-split-rule))
 
@@ -1024,16 +1116,20 @@ function is generally only called when Gnus is shutting down."
 		;; copy article to right group(s)
 		(setq removeorig nil)
 		(dolist (to-group (nnimap-split-to-groups rule))
-		  (if (imap-message-copy (number-to-string article)
-					 to-group nil 'nocopyuid)
-		      (progn
-			(message "IMAP split moved %s:%s:%d to %s" server inbox
-				 article to-group)
-			(setq removeorig t)
-			;; Add the group-art list to the history list.
-			(push (list (cons to-group 0)) nnmail-split-history))
-		    (message "IMAP split failed to move %s:%s:%d to %s" server
-			     inbox article to-group)))
+		  (cond ((eq to-group 'junk)
+			 (message "IMAP split removed %s:%s:%d" server inbox
+				  article)
+			 (setq removeorig t))
+			((imap-message-copy (number-to-string article)
+					    to-group nil 'nocopyuid)
+			 (message "IMAP split moved %s:%s:%d to %s" server
+				  inbox article to-group)
+			 (setq removeorig t)
+			 ;; Add the group-art list to the history list.
+			 (push (list (cons to-group 0)) nnmail-split-history))
+			(t
+			 (message "IMAP split failed to move %s:%s:%d to %s"
+				  server inbox article to-group))))
 		;; remove article if it was successfully copied somewhere
 		(and removeorig
 		     (imap-message-flags-add (format "%d" article)
@@ -1056,7 +1152,7 @@ function is generally only called when Gnus is shutting down."
       (nnimap-before-find-minmax-bugworkaround)
       (dolist (pattern (nnimap-pattern-to-list-arguments
 			nnimap-list-pattern))
-	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil 
+	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil
 					nnimap-server-buffer))
 	  (or (catch 'found
 		(dolist (mailbox (imap-mailbox-get 'list-flags mbx
@@ -1072,7 +1168,7 @@ function is generally only called when Gnus is shutting down."
       (gnus-message 5 "nnimap: Listing subscribed mailboxes%s%s...done"
 		    (if (> (length server) 0) " on " "") server))
     t))
-      
+
 (deffoo nnimap-request-create-group (group &optional server args)
   (when (nnimap-possibly-change-server server)
     (or (imap-mailbox-status group 'uidvalidity nnimap-server-buffer)
@@ -1088,10 +1184,12 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-date-days-ago (daysago)
   "Return date, in format \"3-Aug-1998\", for DAYSAGO days ago."
-  (let ((date (format-time-string "%d-%b-%Y"
-				  (nnimap-time-substract
-				   (current-time)
-				   (days-to-time daysago)))))
+  (let* ((time (nnimap-time-substract (current-time) (days-to-time daysago)))
+	 (date (format-time-string
+		(format "%%d-%s-%%Y"
+			(capitalize (car (rassoc (nth 4 (decode-time time))
+						 parse-time-months))))
+		time)))
     (if (eq ?0 (string-to-char date))
 	(substring date 1)
       date)))
@@ -1103,14 +1201,17 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-expiry-target (arts group server)
   (unless (eq nnmail-expiry-target 'delete)
-    (with-current-buffer nntp-server-buffer
+    (with-temp-buffer
       (dolist (art (gnus-uncompress-sequence arts))
-	(nnimap-request-article art group server)
+	(nnimap-request-article art group server (current-buffer))
 	;; hints for optimization in `nnimap-request-accept-article'
 	(let ((nnimap-current-move-article art)
 	      (nnimap-current-move-group group)
 	      (nnimap-current-move-server server))
-	  (nnmail-expiry-target-group nnmail-expiry-target group))))))
+	  (nnmail-expiry-target-group nnmail-expiry-target group))))
+    ;; It is not clear if `nnmail-expiry-target' somehow cause the
+    ;; current group to be changed or not, so we make sure here.
+    (nnimap-possibly-change-group group server)))
 
 ;; Notice that we don't actually delete anything, we just mark them deleted.
 (deffoo nnimap-request-expire-articles (articles group &optional server force)
@@ -1133,7 +1234,7 @@ function is generally only called when Gnus is shutting down."
 		     (setq articles nil)))
 		  ((numberp days)
 		   (let ((oldarts (imap-search
-				   (format "UID %s NOT SINCE %s"
+				   (format nnimap-expunge-search-string
 					   (imap-range-to-message-set artseq)
 					   (nnimap-date-days-ago days))))
 			 (imap-fetch-data-hook
@@ -1166,9 +1267,11 @@ function is generally only called when Gnus is shutting down."
 	       (setq result (eval accept-form))
 	       (kill-buffer buf)
 	       result)
-	     (nnimap-request-expire-articles (list article) group server t))
+	     (imap-message-flags-add
+	      (imap-range-to-message-set (list article))
+	      "\\Deleted" 'silent nnimap-server-buffer))
 	result))))
-  
+
 (deffoo nnimap-request-accept-article (group &optional server last)
   (when (nnimap-possibly-change-server server)
     (let (uid)
@@ -1190,9 +1293,9 @@ function is generally only called when Gnus is shutting down."
 		    ;; turn into rfc822 format (\r\n eol's)
 		    (while (search-forward "\n" nil t)
 		      (replace-match "\r\n")))
-                  ;; this 'or' is for Cyrus server bug
-                  (or (null (imap-current-mailbox nnimap-server-buffer))
-                      (imap-mailbox-unselect nnimap-server-buffer))
+		  ;; this 'or' is for Cyrus server bug
+		  (or (null (imap-current-mailbox nnimap-server-buffer))
+		      (imap-mailbox-unselect nnimap-server-buffer))
 		  (imap-message-append group (current-buffer) nil nil
 				       nnimap-server-buffer)))
 	  (cons group (nth 1 uid))
@@ -1213,7 +1316,7 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-expunge (mailbox server)
   (when (nnimap-possibly-change-group mailbox server)
-    (imap-mailbox-expunge nnimap-server-buffer)))
+    (imap-mailbox-expunge nil nnimap-server-buffer)))
 
 (defun nnimap-acl-get (mailbox server)
   (when (nnimap-possibly-change-server server)
@@ -1261,12 +1364,13 @@ function is generally only called when Gnus is shutting down."
   (mapcar
    (lambda (pair)			; cdr is the mark
      (or (assoc (cdr pair)
-                '((read . "SEEN")
-                  (tick . "FLAGGED")
-                  (draft . "DRAFT")
-                  (reply . "ANSWERED")))
-         (cons (cdr pair)
-               (format "KEYWORD gnus-%s" (symbol-name (cdr pair))))))
+		'((read . "SEEN")
+		  (tick . "FLAGGED")
+		  (draft . "DRAFT")
+		  (recent . "RECENT")
+		  (reply . "ANSWERED")))
+	 (cons (cdr pair)
+	       (format "KEYWORD gnus-%s" (symbol-name (cdr pair))))))
    (cons '(read . read) gnus-article-mark-lists)))
 
 (defun nnimap-mark-to-predicate (pred)
@@ -1279,12 +1383,13 @@ to be used within a IMAP SEARCH query."
   (mapcar
    (lambda (pair)
      (or (assoc (cdr pair)
-                '((read . "\\Seen")
-                  (tick . "\\Flagged")
-                  (draft . "\\Draft")
-                  (reply . "\\Answered")))
-         (cons (cdr pair)
-               (format "gnus-%s" (symbol-name (cdr pair))))))
+		'((read . "\\Seen")
+		  (tick . "\\Flagged")
+		  (draft . "\\Draft")
+		  (recent . "\\Recent")
+		  (reply . "\\Answered")))
+	 (cons (cdr pair)
+	       (format "gnus-%s" (symbol-name (cdr pair))))))
    (cons '(read . read) gnus-article-mark-lists)))
 
 (defun nnimap-mark-to-flag-1 (preds)
@@ -1314,86 +1419,67 @@ be used in a STORE FLAGS command."
   "Return t iff MARK can be permanently (between IMAP sessions) saved on articles, in GROUP."
   (imap-message-flag-permanent-p (nnimap-mark-to-flag mark)))
 
-(defun nnimap-remassoc (key alist)
-  "Delete by side effect any elements of LIST whose car is `equal' to KEY.
-The modified LIST is returned.  If the first member
-of LIST has a car that is `equal' to KEY, there is no way to remove it
-by side effect; therefore, write `(setq foo (remassoc key foo))' to be
-sure of changing the value of `foo'."
-  (when alist
-    (if (equal key (caar alist))
-	(cdr alist)
-      (setcdr alist (nnimap-remassoc key (cdr alist)))
-      alist)))
-  
-(defun nnimap-update-alist-soft (key value alist)
-  (if value
-      (cons (cons key value) (nnimap-remassoc key alist))
-    (nnimap-remassoc key alist)))
-
 (when nnimap-debug
   (require 'trace)
   (buffer-disable-undo (get-buffer-create nnimap-debug))
   (mapcar (lambda (f) (trace-function-background f nnimap-debug))
-        '(
-	  nnimap-possibly-change-server
-	  nnimap-verify-uidvalidity
-	  nnimap-find-minmax-uid
-	  nnimap-before-find-minmax-bugworkaround
-	  nnimap-possibly-change-group
-	  ;;nnimap-replace-whitespace
-	  nnimap-retrieve-headers-progress
-	  nnimap-retrieve-which-headers
-	  nnimap-group-overview-filename
-	  nnimap-retrieve-headers-from-file
-	  nnimap-retrieve-headers-from-server
-	  nnimap-retrieve-headers
-	  nnimap-open-connection
-	  nnimap-open-server
-	  nnimap-server-opened
-	  nnimap-close-server
-	  nnimap-request-close
-	  nnimap-status-message
-	  ;;nnimap-demule
-	  nnimap-request-article-part
-	  nnimap-request-article
-	  nnimap-request-head
-	  nnimap-request-body
-	  nnimap-request-group
-	  nnimap-close-group
-	  nnimap-pattern-to-list-arguments
-	  nnimap-request-list
-	  nnimap-request-post
-	  nnimap-retrieve-groups
-	  nnimap-request-update-info-internal
-	  nnimap-request-type
-	  nnimap-request-set-mark
-	  nnimap-split-to-groups
-	  nnimap-split-find-rule
-	  nnimap-split-find-inbox
-	  nnimap-split-articles
-	  nnimap-request-scan
-	  nnimap-request-newgroups
-	  nnimap-request-create-group
-	  nnimap-time-substract
-	  nnimap-date-days-ago
-	  nnimap-request-expire-articles-progress
-	  nnimap-request-expire-articles
-	  nnimap-request-move-article
-	  nnimap-request-accept-article
-	  nnimap-request-delete-group
-	  nnimap-request-rename-group
-	  gnus-group-nnimap-expunge
-	  gnus-group-nnimap-edit-acl
-	  gnus-group-nnimap-edit-acl-done
-	  nnimap-group-mode-hook
-	  nnimap-mark-to-predicate
-	  nnimap-mark-to-flag-1
-	  nnimap-mark-to-flag
-	  nnimap-mark-permanent-p
-	  nnimap-remassoc
-	  nnimap-update-alist-soft
-          )))
+	  '(
+	    nnimap-possibly-change-server
+	    nnimap-verify-uidvalidity
+	    nnimap-find-minmax-uid
+	    nnimap-before-find-minmax-bugworkaround
+	    nnimap-possibly-change-group
+	    ;;nnimap-replace-whitespace
+	    nnimap-retrieve-headers-progress
+	    nnimap-retrieve-which-headers
+	    nnimap-group-overview-filename
+	    nnimap-retrieve-headers-from-file
+	    nnimap-retrieve-headers-from-server
+	    nnimap-retrieve-headers
+	    nnimap-open-connection
+	    nnimap-open-server
+	    nnimap-server-opened
+	    nnimap-close-server
+	    nnimap-request-close
+	    nnimap-status-message
+	    ;;nnimap-demule
+	    nnimap-request-article-part
+	    nnimap-request-article
+	    nnimap-request-head
+	    nnimap-request-body
+	    nnimap-request-group
+	    nnimap-close-group
+	    nnimap-pattern-to-list-arguments
+	    nnimap-request-list
+	    nnimap-request-post
+	    nnimap-retrieve-groups
+	    nnimap-request-update-info-internal
+	    nnimap-request-type
+	    nnimap-request-set-mark
+	    nnimap-split-to-groups
+	    nnimap-split-find-rule
+	    nnimap-split-find-inbox
+	    nnimap-split-articles
+	    nnimap-request-scan
+	    nnimap-request-newgroups
+	    nnimap-request-create-group
+	    nnimap-time-substract
+	    nnimap-date-days-ago
+	    nnimap-request-expire-articles-progress
+	    nnimap-request-expire-articles
+	    nnimap-request-move-article
+	    nnimap-request-accept-article
+	    nnimap-request-delete-group
+	    nnimap-request-rename-group
+	    gnus-group-nnimap-expunge
+	    gnus-group-nnimap-edit-acl
+	    gnus-group-nnimap-edit-acl-done
+	    nnimap-group-mode-hook
+	    nnimap-mark-to-predicate
+	    nnimap-mark-to-flag-1
+	    nnimap-mark-to-flag
+	    nnimap-mark-permanent-p
+	    )))
 
 (provide 'nnimap)
 

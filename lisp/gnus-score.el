@@ -33,6 +33,7 @@
 (require 'gnus)
 (require 'gnus-sum)
 (require 'gnus-range)
+(require 'gnus-win)
 (require 'message)
 (require 'score-mode)
 
@@ -48,7 +49,7 @@ score files in the \"/ftp.some-where:/pub/score\" directory.
 
  (setq gnus-global-score-files
        '(\"/ftp.gnus.org:/pub/larsi/ding/score/soc.motss.SCORE\"
-         \"/ftp.some-where:/pub/score\"))"
+	 \"/ftp.some-where:/pub/score\"))"
   :group 'gnus-score-files
   :type '(repeat file))
 
@@ -60,10 +61,10 @@ Each element of this alist should be of the form
 If the name of a group is matched by REGEXP, the corresponding scorefiles
 will be used for that group.
 The first match found is used, subsequent matching entries are ignored (to
-use multiple matches, see gnus-score-file-multiple-match-alist).
+use multiple matches, see `gnus-score-file-multiple-match-alist').
 
 These score files are loaded in addition to any files returned by
-gnus-score-find-score-files-function (which see)."
+`gnus-score-find-score-files-function'."
   :group 'gnus-score-files
   :type '(repeat (cons regexp (repeat file))))
 
@@ -76,10 +77,10 @@ If the name of a group is matched by REGEXP, the corresponding scorefiles
 will be used for that group.
 If multiple REGEXPs match a group, the score files corresponding to each
 match will be used (for only one match to be used, see
-gnus-score-file-single-match-alist).
+`gnus-score-file-single-match-alist').
 
 These score files are loaded in addition to any files returned by
-gnus-score-find-score-files-function (which see)."
+`gnus-score-find-score-files-function'."
   :group 'gnus-score-files
   :type '(repeat (cons regexp (repeat file))))
 
@@ -102,9 +103,9 @@ files do not actually have to exist.
 
 Predefined values are:
 
-gnus-score-find-single: Only apply the group's own score file.
-gnus-score-find-hierarchical: Also apply score files from parent groups.
-gnus-score-find-bnews: Apply score files whose names matches.
+`gnus-score-find-single': Only apply the group's own score file.
+`gnus-score-find-hierarchical': Also apply score files from parent groups.
+`gnus-score-find-bnews': Apply score files whose names matches.
 
 See the documentation to these functions for more information.
 
@@ -775,7 +776,7 @@ used as score."
     (pop-to-buffer "*Score Help*")
     (let ((window-min-height 1))
       (shrink-window-if-larger-than-buffer))
-    (select-window (get-buffer-window gnus-summary-buffer t))))
+    (select-window (gnus-get-buffer-window gnus-summary-buffer t))))
 
 (defun gnus-summary-header (header &optional no-err extra)
   ;; Return HEADER for current articles, or error.
@@ -1183,7 +1184,7 @@ EXTRA is the possible non-standard header."
 	  (mark-and-expunge (car (gnus-score-get 'mark-and-expunge alist)))
 	  (files (gnus-score-get 'files alist))
 	  (exclude-files (gnus-score-get 'exclude-files alist))
-          (orphan (car (gnus-score-get 'orphan alist)))
+	  (orphan (car (gnus-score-get 'orphan alist)))
 	  (adapt (gnus-score-get 'adapt alist))
 	  (thread-mark-and-expunge
 	   (car (gnus-score-get 'thread-mark-and-expunge alist)))
@@ -1468,7 +1469,7 @@ EXTRA is the possible non-standard header."
 	       (headers gnus-newsgroup-headers)
 	       (current-score-file gnus-current-score-file)
 	       entry header new)
-	  (gnus-message 5 "Scoring...")
+	  (gnus-message 7 "Scoring...")
 	  ;; Create articles, an alist of the form `(HEADER . SCORE)'.
 	  (while (setq header (pop headers))
 	    ;; WARNING: The assq makes the function O(N*S) while it could
@@ -1529,7 +1530,7 @@ EXTRA is the possible non-standard header."
 		  (gnus-score-advanced (car score) trace))
 		(pop score))))
 
-	  (gnus-message 5 "Scoring...done"))))))
+	  (gnus-message 7 "Scoring...done"))))))
 
 (defun gnus-score-lower-thread (thread score-adjust)
   "Lower the score on THREAD with SCORE-ADJUST.
@@ -1537,7 +1538,7 @@ THREAD is expected to contain a list of the form `(PARENT [CHILD1
 CHILD2 ...])' where PARENT is a header array and each CHILD is a list
 of the same form as THREAD.  The empty list `nil' is valid.  For each
 article in the tree, the score of the corresponding entry in
-GNUS-NEWSGROUP-SCORED is adjusted by SCORE-ADJUST."
+`gnus-newsgroup-scored' is adjusted by SCORE-ADJUST."
   (while thread
     (let ((head (car thread)))
       (if (listp head)
@@ -1555,7 +1556,7 @@ GNUS-NEWSGROUP-SCORED is adjusted by SCORE-ADJUST."
 A root is an article with no references.  An orphan is an article
 which has references, but is not connected via its references to a
 root article.  This function finds all the orphans, and adjusts their
-score in GNUS-NEWSGROUP-SCORED by SCORE."
+score in `gnus-newsgroup-scored' by SCORE."
   ;; gnus-make-threads produces a list, where each entry is a "thread"
   ;; as described in the gnus-score-lower-thread docs.  This function
   ;; will be called again (after limiting has been done) if the display
@@ -1697,7 +1698,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	       entries alist ofunc article last)
 	  (when articles
 	    (setq last (mail-header-number (caar (last articles))))
-	  ;; Not all backends support partial fetching.  In that case,
+	    ;; Not all backends support partial fetching.  In that case,
 	    ;; we just fetch the entire article.
 	    (unless (gnus-check-backend-function
 		     (and (string-match "^gnus-" (symbol-name request-func))
@@ -1712,8 +1713,8 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	      (widen)
 	      (when (funcall request-func article gnus-newsgroup-name)
 		(goto-char (point-min))
-	    ;; If just parts of the article is to be searched, but the
-	    ;; backend didn't support partial fetching, we just narrow
+		;; If just parts of the article is to be searched, but the
+		;; backend didn't support partial fetching, we just narrow
 		;; to the relevant parts.
 		(when ofunc
 		  (if (eq ofunc 'gnus-request-head)
@@ -1868,7 +1869,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	    ;; Update expire date
 	    (cond ((null date))		;Permanent entry.
 		  ((and found gnus-update-score-entry-dates)
-					;Match, update date.
+		   ;Match, update date.
 		   (gnus-score-set 'touched '(t) alist)
 		   (setcar (nthcdr 2 kill) now))
 		  ((and expire (< date expire))	;Old entry, remove.
@@ -1909,8 +1910,8 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
   ;; Insert the unique article headers in the buffer.
   (let ((gnus-score-index (nth 1 (assoc header gnus-header-index)))
 	;; gnus-score-index is used as a free variable.
-        (simplify (and gnus-score-thread-simplify
-                       (string= "subject" header)))
+	(simplify (and gnus-score-thread-simplify
+		       (string= "subject" header)))
 	alike last this art entries alist articles
 	fuzzies arts words kill)
 
@@ -1974,10 +1975,10 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	       (dmt (downcase mt))
 	       ;; Assume user already simplified regexp and fuzzies
 	       (match (if (and simplify (not (memq dmt '(?f ?r))))
-                          (gnus-map-function
-                           gnus-simplify-subject-functions
-                           (nth 0 kill))
-                        (nth 0 kill)))
+			  (gnus-map-function
+			   gnus-simplify-subject-functions
+			   (nth 0 kill))
+			(nth 0 kill)))
 	       (search-func
 		(cond ((= dmt ?r) 're-search-forward)
 		      ((or (= dmt ?e) (= dmt ?s) (= dmt ?f)) 'search-forward)
@@ -1987,7 +1988,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	  ;; Evil hackery to make match usable in non-standard headers.
 	  (when extra
 	    (setq match (concat "[ (](" extra " \\. \"[^)]*"
-				match "[^(]*\")[ )]")
+				match "[^\"]*\")[ )]")
 		  search-func 're-search-forward)) ; XXX danger?!?
 
 	  (cond
@@ -2602,7 +2603,7 @@ GROUP using BNews sys file syntax."
 	      ;; too much.
 	      (delete-char (min (1- (point-max)) klen))
 	    (goto-char (point-max))
-	    (if (search-backward (string directory-sep-char) nil t)
+	    (if (re-search-backward gnus-directory-sep-char-regexp nil t)
 		(delete-region (1+ (point)) (point-min))
 	      (gnus-message 1 "Can't find directory separator in %s"
 			    (car sfiles))))
@@ -2639,10 +2640,10 @@ GROUP using BNews sys file syntax."
 	  ;; we add this score file to the list of score files
 	  ;; applicable to this group.
 	  (when (or (and not-match
- 			 (ignore-errors
+			 (ignore-errors
 			   (not (string-match regexp group-trans))))
-  		    (and (not not-match)
- 			 (ignore-errors (string-match regexp group-trans))))
+		    (and (not not-match)
+			 (ignore-errors (string-match regexp group-trans))))
 	    (push (car sfiles) ofiles)))
 	(setq sfiles (cdr sfiles)))
       (kill-buffer (current-buffer))
@@ -2722,7 +2723,7 @@ Destroys the current buffer."
 
 (defun gnus-score-find-alist (group)
   "Return list of score files for GROUP.
-The list is determined from the variable gnus-score-file-alist."
+The list is determined from the variable `gnus-score-file-alist'."
   (let ((alist gnus-score-file-multiple-match-alist)
 	score-files)
     ;; if this group has been seen before, return the cached entry
@@ -2779,7 +2780,8 @@ The list is determined from the variable gnus-score-file-alist."
       (while funcs
 	(when (gnus-functionp (car funcs))
 	  (setq score-files
-		(nconc score-files (nreverse (funcall (car funcs) group)))))
+		(append score-files
+			(nreverse (funcall (car funcs) group)))))
 	(setq funcs (cdr funcs)))
       (when gnus-score-use-all-scores
 	;; Add any home score files.
@@ -2886,9 +2888,10 @@ If ADAPT, return the home adaptive file instead."
 	      (when (string-match (gnus-globalify-regexp (car elem)) group)
 		(replace-match (cadr elem) t nil group))))))
     (when found
+      (setq found (nnheader-translate-file-chars found))
       (if (file-name-absolute-p found)
-          found
-        (nnheader-concat gnus-kill-files-directory found)))))
+	  found
+	(nnheader-concat gnus-kill-files-directory found)))))
 
 (defun gnus-hierarchial-home-score-file (group)
   "Return the score file of the top-level hierarchy of GROUP."

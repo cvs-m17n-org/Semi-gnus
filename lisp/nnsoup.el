@@ -1,10 +1,10 @@
 ;;; nnsoup.el --- SOUP access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -258,7 +258,7 @@ backend for the messages.")
 		  (nth 1 (nnsoup-article-to-area
 			  article nnsoup-current-group))))))
       (cond ((= kind ?m) 'mail)
-	    ((= kind ?n) 'news) 
+	    ((= kind ?n) 'news)
 	    (t 'unknown)))))
 
 (deffoo nnsoup-close-group (group &optional server)
@@ -657,20 +657,20 @@ backend for the messages.")
     (and areas (car areas))))
 
 (defvar nnsoup-old-functions
-  (list message-send-mail-function message-send-news-function))
+  (list message-send-mail-real-function message-send-news-function))
 
 ;;;###autoload
 (defun nnsoup-set-variables ()
   "Use the SOUP methods for posting news and mailing mail."
   (interactive)
   (setq message-send-news-function 'nnsoup-request-post)
-  (setq message-send-mail-function 'nnsoup-request-mail))
+  (setq message-send-mail-real-function 'nnsoup-request-mail))
 
 ;;;###autoload
 (defun nnsoup-revert-variables ()
   "Revert posting and mailing methods to the standard Emacs methods."
   (interactive)
-  (setq message-send-mail-function (car nnsoup-old-functions))
+  (setq message-send-mail-real-function (car nnsoup-old-functions))
   (setq message-send-news-function (cadr nnsoup-old-functions)))
 
 (defun nnsoup-store-reply (kind)

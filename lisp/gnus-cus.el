@@ -1,6 +1,6 @@
 ;;; gnus-cus.el --- customization commands for Gnus
 ;;
-;; Copyright (C) 1996,1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <abraham@dina.kvl.dk>
 ;; Keywords: news
@@ -33,10 +33,6 @@
 (require 'gnus-art)
 
 ;;; Widgets:
-
-;; There should be special validation for this.
-(define-widget 'gnus-email-address 'string
-  "An email address")
 
 (defun gnus-custom-mode ()
   "Major mode for editing Gnus customization buffers.
@@ -155,10 +151,10 @@ days (not necessarily an integer) or the symbols `never' or
 `immediate'.")
 
     (expiry-target (choice :tag "Expiry Target"
-                           :value delete
-                           (const delete)
-                           (function :format "%v" nnmail-)
-                           string) "\
+			   :value delete
+			   (const delete)
+			   (function :format "%v" nnmail-)
+			   string) "\
 Where expired messages end up.
 
 Overrides `nnmail-expiry-target', which see.")
@@ -182,15 +178,25 @@ you to put the admin address somewhere convenient.")
     (display (choice :tag "Display"
 		     :value default
 		     (const all)
-		     (const default)) "\
+		     (integer)
+		     (const default)
+		     (sexp  :tag "Other")) "\
 Which articles to display on entering the group.
 
 `all'
      Display all articles, both read and unread.
 
+`integer'
+     Display the last NUMBER articles in the group.  This is the same as
+     entering the group with C-u NUMBER.
+
 `default'
      Display the default visible articles, which normally includes
-     unread and ticked articles.")
+     unread and ticked articles.
+
+`Other'
+     Display the articles that satisfy the S-expression. The S-expression
+     should be in an array form.")
 
     (comment (string :tag  "Comment") "\
 An arbitrary comment on the group.")
@@ -199,13 +205,13 @@ An arbitrary comment on the group.")
 Always display this group, even when there are no unread articles
 in it..")
 
-    (highlight-words 
+    (highlight-words
      (choice :tag "Highlight words"
 	     :value nil
 	     (repeat (list (regexp :tag "Highlight regexp")
 			   (number :tag "Group for entire word" 0)
 			   (number :tag "Group for displayed part" 0)
-			   (symbol :tag "Face" 
+			   (symbol :tag "Face"
 				   gnus-emphasis-highlight-words))))
      "highlight regexps.
 See gnus-emphasis-alist.")
@@ -214,14 +220,14 @@ See gnus-emphasis-alist.")
      (choice :tag "Posting style"
 	     :value nil
 	     (repeat (list
- 		      (choice :tag "Type"
+		      (choice :tag "Type"
 			      :value nil
 			      (const signature)
- 			      (const signature-file) 
- 			      (const organization) 
- 			      (const address)
- 			      (const name)
- 			      (const body))
+			      (const signature-file)
+			      (const organization)
+			      (const address)
+			      (const name)
+			      (const body))
 		      (string :format "%v"))))
      "post style.
 See gnus-posting-styles."))
@@ -233,10 +239,15 @@ DOC is a documentation string for the parameter.")
 
 (defconst gnus-extra-topic-parameters
   '((subscribe (regexp :tag "Subscribe") "\
-If `gnus-subscribe-newsgroup-method' or 
+If `gnus-subscribe-newsgroup-method' or
 `gnus-subscribe-options-newsgroup-method' is set to
 `gnus-subscribe-topics', new groups that matches this regexp will
-automatically be subscribed to this topic")) 
+automatically be subscribed to this topic")
+    (subscribe-level (integer :tag "Subscribe Level" :value 1) "\
+If this topic parameter is set, when new groups are subscribed
+automatically under this topic (via the `subscribe' topic parameter)
+assign this level to the group, rather than the default level
+set in `gnus-level-default-subscribed'"))
   "Alist of topic parameters that are not also group parameters.
 
 Each entry has the form (NAME TYPE DOC), where NAME is the parameter
@@ -266,7 +277,7 @@ DOC is a documentation string for the parameter.")
 				(const :format "" ,(nth 0 entry))
 				,(nth 1 entry)))
 		       (append (reverse gnus-group-parameters-more)
-			       gnus-group-parameters 
+			       gnus-group-parameters
 			       (if group
 				   gnus-extra-group-parameters
 				 gnus-extra-topic-parameters)))))
@@ -646,7 +657,7 @@ When called interactively, FILE defaults to the current score file.
 This can be changed using the `\\[gnus-score-change-score-file]' command."
   (interactive (list gnus-current-score-file))
   (unless file
-    (error (format "No score file for %s." 
+    (error (format "No score file for %s"
 		   (gnus-group-decoded-name gnus-newsgroup-name))))
   (let ((scores (gnus-score-load file))
 	(types (mapcar (lambda (entry)

@@ -169,7 +169,7 @@ article was posted to nndb")
       (nntp-send-command "^\\([23]\\|^423\\).*\n" "X-DATE" art)
       (setq msg (nndb-status-message))
       (if (string-match "^423" msg)
-          ()
+	  ()
 	(or (string-match "'\\(.+\\)'" msg)
 	    (error "Not a valid response for X-DATE command: %s"
 		   msg))
@@ -320,3 +320,5 @@ Optional LAST is ignored."
   (nntp))
 
 (provide 'nndb)
+
+;;; nndb.el ends here

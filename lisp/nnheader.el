@@ -5,7 +5,7 @@
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
@@ -51,8 +51,29 @@
   (autoload 'gnus-intersection "gnus-range")
   (autoload 'gnus-sorted-complement "gnus-range"))
 
+(defcustom gnus-verbose-backends 7
+  "Integer that says how verbose the Gnus backends should be.
+The higher the number, the more messages the Gnus backends will flash
+to say what it's doing.  At zero, the Gnus backends will be totally
+mute; at five, they will display most important messages; and at ten,
+they will keep on jabbering all the time."
+  :group 'gnus-start
+  :type 'integer)
+
+(defcustom gnus-nov-is-evil nil
+  "If non-nil, Gnus backends will never output headers in the NOV format."
+  :group 'gnus-server
+  :type 'boolean)
+
 (defvar nnheader-max-head-length 4096
-  "*Max length of the head of articles.")
+  "*Max length of the head of articles.
+
+Value is an integer, nil, or t.  nil means read in chunks of a file
+indefinitely until a complete head is found\; t means always read the
+entire file immediately, disregarding `nnheader-head-chop-length'.
+
+Integer values will in effect be rounded up to the nearest multiple of
+`nnheader-head-chop-length'.")
 
 (defvar nnheader-head-chop-length 2048
   "*Length of each read operation when trying to fetch HEAD headers.")
@@ -80,7 +101,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
   (autoload 'gnus-point-at-eol "gnus-util")
-  (autoload 'gnus-delete-line "gnus-util" nil nil 'macro)
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
@@ -204,8 +224,9 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 (defsubst nnheader-header-value ()
   (let ((pt (point)))
-    (prog1
-	(buffer-substring (match-end 0) (std11-field-end))
+    (prog2
+	(skip-chars-forward " \t")
+	(buffer-substring (point) (std11-field-end))
       (goto-char pt))))
 
 (defun nnheader-parse-head (&optional naked)
@@ -243,18 +264,17 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; Subject.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nsubject: " nil t)
+	     (if (search-forward "\nsubject:" nil t)
 		 (nnheader-header-value) "(none)"))
 	   ;; From.
 	   (progn
 	     (goto-char p)
-	     (if (or (search-forward "\nfrom: " nil t)
-		     (search-forward "\nfrom:" nil t))
+	     (if (search-forward "\nfrom:" nil t)
 		 (nnheader-header-value) "(nobody)"))
 	   ;; Date.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\ndate: " nil t)
+	     (if (search-forward "\ndate:" nil t)
 		 (nnheader-header-value) ""))
 	   ;; Message-ID.
 	   (progn
@@ -270,12 +290,12 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; References.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nreferences: " nil t)
+	     (if (search-forward "\nreferences:" nil t)
 		 (nnheader-header-value)
 	       ;; Get the references from the in-reply-to header if there
 	       ;; were no references and the in-reply-to header looks
 	       ;; promising.
-	       (if (and (search-forward "\nin-reply-to: " nil t)
+	       (if (and (search-forward "\nin-reply-to:" nil t)
 			(setq in-reply-to (nnheader-header-value))
 			(string-match "<[^\n>]+>" in-reply-to))
 		   (let (ref2)
@@ -287,7 +307,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 					     (match-end 0)))
 		       (when (> (length ref2) (length ref))
 			 (setq ref ref2)))
-                     ref)
+		     ref)
 		 nil)))
 	   ;; Chars.
 	   0
@@ -301,7 +321,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; Xref.
 	   (progn
 	     (goto-char p)
-	     (and (search-forward "\nxref: " nil t)
+	     (and (search-forward "\nxref:" nil t)
 		  (nnheader-header-value)))
 
 	   ;; Extra.
@@ -311,7 +331,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	       (while extra
 		 (goto-char p)
 		 (when (search-forward
-			(concat "\n" (symbol-name (car extra)) ": ") nil t)
+			(concat "\n" (symbol-name (car extra)) ":") nil t)
 		   (push (cons (car extra) (nnheader-header-value))
 			 out))
 		 (pop extra))
@@ -455,7 +475,8 @@ the line could be found."
 	(setq prev (point))
 	(while (and (not (numberp (setq num (read cur))))
 		    (not (eobp)))
-	  (gnus-delete-line))
+	  (delete-region (progn (beginning-of-line) (point))
+			 (progn (forward-line 1) (point))))
 	(cond ((> num article)
 	       (setq max (point)))
 	      ((< num article)
@@ -673,10 +694,6 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 
 (defvar nntp-server-buffer nil)
 (defvar nntp-process-response nil)
-(defvar gnus-verbose-backends 7
-  "*A number that says how talkative the Gnus backends should be.")
-(defvar gnus-nov-is-evil nil
-  "If non-nil, Gnus backends will never output headers in the NOV format.")
 (defvar news-reply-yank-from nil)
 (defvar news-reply-yank-message-id nil)
 
@@ -811,7 +828,10 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
     (string-match nnheader-numerical-short-files file)
     (string-to-int (match-string 0 file))))
 
-(defvar nnheader-directory-files-is-safe nil
+(defvar nnheader-directory-files-is-safe
+  (or (eq system-type 'windows-nt)
+      (and (not (featurep 'xemacs))
+	   (> emacs-major-version 20)))
   "If non-nil, Gnus believes `directory-files' is safe.
 It has been reported numerous times that `directory-files' fails with
 an alarming frequency on NFS mounted file systems. If it is nil,
@@ -828,7 +848,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-directory-articles (dir)
   "Return a list of all article files in directory DIR."
   (mapcar 'nnheader-file-to-number
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -837,7 +857,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-article-to-file-alist (dir)
   "Return an alist of article/file pairs in DIR."
   (mapcar (lambda (file) (cons (nnheader-file-to-number file) file))
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -864,12 +884,12 @@ If FULL, translate everything."
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
 	(if (and (featurep 'xemacs)
-		 (memq system-type '(win32 w32 mswindows windows-nt)))
+		 (memq system-type '(cygwin32 win32 w32 mswindows windows-nt)))
 	    ;; This is needed on NT and stuff, because
 	    ;; file-name-nondirectory is not enough to split
 	    ;; file names, containing ':', e.g.
 	    ;; "d:\\Work\\News\\nntp+news.fido7.ru:fido7.ru.gnu.SCORE"
-	    ;; 
+	    ;;
 	    ;; we are trying to correctly split such names:
 	    ;; "d:file.name" -> "a:" "file.name"
 	    ;; "aaa:bbb.ccc" -> "" "aaa:bbb.ccc"
@@ -1062,7 +1082,7 @@ find-file-hooks, etc.
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
+	(after-insert-file-functions nil)
 	(enable-local-eval nil)
 	(find-file-hooks nil))
     (insert-file-contents-as-coding-system
@@ -1163,16 +1183,100 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
-(defun nnheader-image-load-path (&optional package)
-  (let (dir result)
-    (dolist (path load-path (nreverse result))
-      (if (file-directory-p
-	   (setq dir (concat (file-name-directory
-			      (directory-file-name path))
-			     "etc/" (or package "gnus/"))))
-	  (push dir result))
-      (push path result))))
-(defalias 'mm-image-load-path 'nnheader-image-load-path)
+;; mm- stuff.
+(unless (featurep 'mm-util)
+  (defun nnheader-image-load-path (&optional package)
+    (let (dir result)
+      (dolist (path load-path (nreverse result))
+	(if (file-directory-p
+	     (setq dir (concat (file-name-directory
+				(directory-file-name path))
+			       "etc/" (or package "gnus/"))))
+	    (push dir result))
+	(push path result))))
+  (defalias 'mm-image-load-path 'nnheader-image-load-path)
+
+  (defalias 'mm-read-coding-system
+    (if (or (and (featurep 'xemacs)
+		 (<= (string-to-number emacs-version) 21.1))
+	    (boundp 'MULE))
+	(lambda (prompt &optional default-coding-system)
+	  (read-coding-system prompt))
+      'read-coding-system))
+
+  (defalias 'mm-multibyte-string-p
+    (if (fboundp 'multibyte-string-p)
+	'multibyte-string-p
+      'ignore)))
+
+;; mail-parse stuff.
+(unless (featurep 'mail-parse)
+  (defun-maybe std11-narrow-to-field ()
+    "Narrow the buffer to the header on the current line."
+    (forward-line 0)
+    (narrow-to-region (point)
+		      (progn
+			(std11-field-end)
+			(when (eolp) (forward-line 1))
+			(point)))
+    (goto-char (point-min)))
+
+  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+
+  (defalias 'mail-narrow-to-head 'std11-narrow-to-header)
+
+  (defun-maybe std11-fold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(let ((str (std11-unfold-string
+		    (buffer-substring (point-min) (point-max)))))
+	  (delete-region (point-min) (point-max))
+	  (insert str)))))
+
+  (defalias 'mail-header-fold-field 'std11-fold-field)
+
+  (defun-maybe std11-extract-addresses-components (string)
+    "Extract a list of full name and canonical address from STRING.  Each
+element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
+If no name can be extracted, FULL-NAME will be nil."
+    (when string
+      (mapcar (function
+	       (lambda (structure)
+		 (list (std11-full-name-string structure)
+		       (std11-address-string structure))))
+	      (std11-parse-addresses-string (std11-unfold-string string)))))
+
+  (defun mail-header-parse-addresses (string)
+    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
+    (mapcar (function
+	     (lambda (components)
+	       (cons (nth 1 components) (car components))))
+	    (std11-extract-addresses-components string)))
+
+  (defun-maybe std11-field-value (&optional dont-include-last-newline)
+    "Return the value of the field at point.  If the optional argument is
+given, the return value will not contain the last newline."
+    (let ((begin (point))
+	  (inhibit-point-motion-hooks t)
+	  start value)
+      (beginning-of-line)
+      (unless (eobp)
+	(while (and (memq (char-after) '(?\t ?\ ))
+		    (zerop (forward-line -1))))
+	(when (looking-at ".+:[\t\n ]+")
+	  (goto-char (setq start (match-end 0)))
+	  (forward-line 1)
+	  (while (and (memq (char-after) '(?\t ?\ ))
+		      (zerop (forward-line 1))))
+	  (when dont-include-last-newline
+	    (skip-chars-backward "\t\n " start))
+	  (setq value (buffer-substring start (point)))))
+      (goto-char begin)
+      value))
+
+  (defalias 'mail-header-field-value 'std11-field-value))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

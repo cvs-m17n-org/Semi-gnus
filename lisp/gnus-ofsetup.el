@@ -145,7 +145,7 @@
 			  "(add-hook"
 			  "'gnus-before-startup-hook"
 			  "(lambda () (setq nnmail-spool-file nil)
-           (setq mail-sources nil)))")))
+	   (setq mail-sources nil)))")))
 
 	;; Write stting about mail-source.el
 	(insert "(setq gnus-offline-mail-source '"
@@ -251,7 +251,7 @@ if you want to use movemail instead of pop3.el which comes with
 Gnus, you can set a specifier using the kerword :program as shown
 below:
 
-          (pop :program \"movemail -pf po:%u %t %p\")
+	  (pop :program \"movemail -pf po:%u %t %p\")
 
 If you want to know more about mail source specifiers and keywords,
 click the button below.")
@@ -334,7 +334,7 @@ POP パスワードを .newsrc.eld に保存するか否かを指定します。")
 (movemail など) を使いたい、という場合には、:program をいうキーワー
 ドを指定して以下の様に記述します。
 
-        (pop :program \"movemail -pf po:%u %t %p\")
+	(pop :program \"movemail -pf po:%u %t %p\")
 
 mail source specifier とか上記のようなキーワードについてもっとよく
 知りたい場合は、以下のボタンをクリックしてください。(Info の該当箇所
@@ -629,7 +629,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
      (choice :tag ,(gnus-ofsetup-gettext 'param-save-passwd-1)
 	     :value ,(if (memq 'mail-source-password-cache gnus-variable-list)
 			 t
-			 nil)
+		       nil)
 	     (const :tag ,(gnus-ofsetup-gettext 'param-save-passwd-2) t)
 	     (const :tag ,(gnus-ofsetup-gettext 'param-save-passwd-3) nil))
      ,(gnus-ofsetup-gettext 'param-save-passwd-4))
@@ -651,36 +651,36 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 				   (const :format "" ,(nth 0 entry))
 				   ,(nth 1 entry)))
 			params)))
-  (kill-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
-  (switch-to-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
-  (gnus-custom-mode)
-  (widget-insert (gnus-ofsetup-gettext 'customize-1))
-  (widget-create 'push-button
+    (kill-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
+    (switch-to-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
+    (gnus-custom-mode)
+    (widget-insert (gnus-ofsetup-gettext 'customize-1))
+    (widget-create 'push-button
 		   :tag (gnus-ofsetup-gettext 'customize-2)
 		   :help-echo (gnus-ofsetup-gettext 'customize-3)
 		   :action 'gnus-ofsetup-customize-done)
-  (widget-insert "\n\n")
-  (make-local-variable 'gnus-ofsetup-params)
-  (setq gnus-ofsetup-params
-	(widget-create 'group
-		       `(set :inline t
-			     :greedy t
-			     :tag ,(gnus-ofsetup-gettext 'customize-4)
-			     :format "%t:\n%h%v"
-			     :doc ,(gnus-ofsetup-gettext 'customize-5)
-			     ,@types)))
+    (widget-insert "\n\n")
+    (make-local-variable 'gnus-ofsetup-params)
+    (setq gnus-ofsetup-params
+	  (widget-create 'group
+			 `(set :inline t
+			       :greedy t
+			       :tag ,(gnus-ofsetup-gettext 'customize-4)
+			       :format "%t:\n%h%v"
+			       :doc ,(gnus-ofsetup-gettext 'customize-5)
+			       ,@types)))
 
-  (widget-create 'info-link
-		 :help-echo (gnus-ofsetup-gettext 'customize-6)
-		 :tag "<Info> mail sources"
-		 (if (string-match "^ja" gnus-offline-lang)
-		     "(gnus-ja)Mail Sources"
-		   "(gnus)Mail Sources"))
+    (widget-create 'info-link
+		   :help-echo (gnus-ofsetup-gettext 'customize-6)
+		   :tag "<Info> mail sources"
+		   (if (string-match "^ja" gnus-offline-lang)
+		       "(gnus-ja)Mail Sources"
+		     "(gnus)Mail Sources"))
 
-  (use-local-map widget-keymap)
-  (local-set-key "q" 'bury-buffer)
-  (widget-setup)
-  (goto-char (point-min))))
+    (use-local-map widget-keymap)
+    (local-set-key "q" 'bury-buffer)
+    (widget-setup)
+    (goto-char (point-min))))
 
 (defun gnus-ofsetup-customize-done (&rest ignore)
   "Apply changes and bury the buffer."

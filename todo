@@ -1,6 +1,42 @@
 ;; Also know as the "wish list".  Some are done. For the others, no
 ;; promise when to be implemented.
 
+* Speed up sorting in summary buffer if there is a limit.
+  
+  Suggested by Daniel Ortmann <ortmann@isl.net>.
+
+* Investigate the memory usage of Gnus. 
+
+  But it does seem strange that Gnus would use some 15meg for this.  I
+  think that is worth investigating.  I suspect that bugs or bad
+  design are causing waste; they could be in Gnus, or in Emacs. -- RMS
+
+* Google group digest
+  
+  The result of Google group search return a thread. Is it a digest
+  format?
+
+* NOV caching.
+  
+  Implement NOV caching with Gnus Agent.
+
+* Multiple charsets for topic names.
+  
+  [Done]
+
+* Allow specification of server in Newsgroups header
+  
+  [Kai wrote]
+
+  WIBNI I could put `Newsgroups: nntp+quimby:bla' into a message and
+  Gnus would know to post this message on my server `nntp:quimby' into
+  the group bla?  I think this would be way cool.
+
+  But Gnus would have to rewrite the Newsgroups header before actually
+  sending the posting.
+
+  Thanks for Micha Wiedenmann for this suggestion.
+
 * Understand mail-user-agent. Maybe gnus-mail-user-agent.
   
   [Done]
@@ -1460,6 +1496,8 @@ exceeding lisp nesting on huge groups.
 	(body "whatever.text")
 
 * Be able to run `J u' from summary buffers.
+
+  [Done]
 
 * Solve the halting problem.
 

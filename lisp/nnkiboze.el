@@ -151,7 +151,7 @@
     (let ((coding-system-for-write nnkiboze-file-coding-system)
 	  (output-coding-system nnkiboze-file-coding-system))
       (with-temp-file (nnkiboze-nov-file-name)
-	(let ((cur (current-buffer)) 
+	(let ((cur (current-buffer))
 	      (nnheader-file-coding-system nnkiboze-file-coding-system))
 	  (nnheader-insert-file-contents (nnkiboze-nov-file-name))
 	  (goto-char (point-min))
@@ -229,11 +229,11 @@ Finds out what articles are to be part of the nnkiboze groups."
 (defun nnkiboze-generate-group (group &optional inhibit-list-groups)
   (let* ((info (nth 2 (gnus-gethash group gnus-newsrc-hashtb)))
 	 (newsrc-file (concat nnkiboze-directory
-                              (nnheader-translate-file-chars
-                               (concat group ".newsrc"))))
+			      (nnheader-translate-file-chars
+			       (concat group ".newsrc"))))
 	 (nov-file (concat nnkiboze-directory
-                           (nnheader-translate-file-chars
-                            (concat group ".nov"))))
+			   (nnheader-translate-file-chars
+			    (concat group ".nov"))))
 	 method nnkiboze-newsrc gname newsrc active
 	 ginfo lowest glevel orig-info nov-buffer
 	 ;; Bind various things to nil to make group entry faster.
@@ -244,7 +244,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	 (gnus-score-use-all-scores nil)
 	 (gnus-use-scoring t)
 	 (gnus-verbose (min gnus-verbose 3))
- 	 gnus-select-group-hook gnus-summary-prepare-hook
+	 gnus-select-group-hook gnus-summary-prepare-hook
 	 gnus-thread-sort-functions gnus-show-threads
 	 gnus-visual gnus-suppress-duplicates num-unread)
     (unless info

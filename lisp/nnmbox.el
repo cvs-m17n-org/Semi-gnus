@@ -4,7 +4,7 @@
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -271,12 +271,13 @@
 	      (progn
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnmbox-request-article (car articles) 
-					     newsgroup server 
-					     (current-buffer))
+		    (nnmbox-request-article (car articles)
+					    newsgroup server
+					    (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group
-		       nnmail-expiry-target newsgroup))))
+		       nnmail-expiry-target newsgroup)))
+		  (nnmbox-possibly-change-newsgroup newsgroup server))
 		(nnheader-message 5 "Deleting article %d in %s..."
 				  (car articles) newsgroup)
 		(nnmbox-delete-mail))
@@ -511,9 +512,9 @@
 	       (nnmbox-in-header-p (point)))
 	  (progn
 	    (goto-char (point-min))
-	    (while (not found)
-	      (setq found (and (search-forward art-string nil t)
-			       (nnmbox-in-header-p (point)))))
+	    (while (and (not found)
+			(search-forward art-string nil t))
+	      (setq found (nnmbox-in-header-p (point))))
 	    found)))))
 
 (defun nnmbox-record-active-article (group-art)
@@ -607,7 +608,9 @@
   (when (not (file-exists-p nnmbox-mbox-file))
     (let ((nnmail-file-coding-system
 	   (or nnmbox-file-coding-system-for-write
-	       nnmbox-file-coding-system)))
+	       nnmbox-file-coding-system))
+	  (dir (file-name-directory nnmbox-mbox-file)))
+      (and dir (gnus-make-directory dir))
       (nnmail-write-region 1 1 nnmbox-mbox-file t 'nomesg))))
 
 (defun nnmbox-read-mbox ()
@@ -628,8 +631,8 @@
 			  (let ((nnheader-file-coding-system
 				 nnmbox-file-coding-system))
 			    (nnheader-find-file-noselect
-			     nnmbox-mbox-file nil t))))
- 	(buffer-disable-undo)
+			     nnmbox-mbox-file t t))))
+	(buffer-disable-undo)
 
 	;; Go through the group alist and compare against the mbox file.
 	(while alist

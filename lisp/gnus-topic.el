@@ -165,6 +165,7 @@ with some simple extensions.
 			  (mapcar 'list (gnus-topic-list))
 			  nil t)))
   (dolist (topic (gnus-current-topics topic))
+    (gnus-topic-goto-topic topic)
     (gnus-topic-fold t))
   (gnus-topic-goto-topic topic))
 
@@ -200,7 +201,7 @@ If TOPIC, start with that topic."
   "Return entries for all visible groups in TOPIC.
 If RECURSIVE is t, return groups in its subtopics too."
   (let ((groups (cdr (assoc topic gnus-topic-alist)))
-        info clevel unread group params visible-groups entry active)
+	info clevel unread group params visible-groups entry active)
     (setq lowest (or lowest 1))
     (setq level (or level gnus-level-unsubscribed))
     ;; We go through the newsrc to look for matches.
@@ -397,7 +398,7 @@ if it is t, list groups that have no unread articles.
 If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
   (set-buffer gnus-group-buffer)
   (let ((buffer-read-only nil)
-        (lowest (or lowest 1))
+	(lowest (or lowest 1))
 	(not-in-list
 	 (and gnus-group-listed-groups
 	      (copy-sequence gnus-group-listed-groups))))
@@ -419,8 +420,8 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
        regexp))
 
     (when (or gnus-group-listed-groups
-	       (and (>= level gnus-level-killed)
-		    (<= lowest gnus-level-killed)))
+	      (and (>= level gnus-level-killed)
+		   (<= lowest gnus-level-killed)))
       (gnus-group-prepare-flat-list-dead
        (setq gnus-killed-list (sort gnus-killed-list 'string<))
        gnus-level-killed ?K regexp)
@@ -645,7 +646,7 @@ articles in the topic and its subtopics."
   (when (and (eq major-mode 'gnus-group-mode)
 	     gnus-topic-mode)
     (let ((group (gnus-group-group-name))
-          (m (point-marker))
+	  (m (point-marker))
 	  (buffer-read-only nil))
       (when (and group
 		 (gnus-get-info group)
@@ -1001,6 +1002,7 @@ articles in the topic and its subtopics."
     "\r" gnus-topic-select-group
     " " gnus-topic-read-group
     "\C-c\C-x" gnus-topic-expire-articles
+    "c" gnus-topic-catchup-articles
     "\C-k" gnus-topic-kill-group
     "\C-y" gnus-topic-yank-group
     "\M-g" gnus-topic-get-new-news-this-topic
@@ -1039,6 +1041,7 @@ articles in the topic and its subtopics."
     "a" gnus-topic-sort-groups-by-alphabet
     "u" gnus-topic-sort-groups-by-unread
     "l" gnus-topic-sort-groups-by-level
+    "e" gnus-topic-sort-groups-by-server
     "v" gnus-topic-sort-groups-by-score
     "r" gnus-topic-sort-groups-by-rank
     "m" gnus-topic-sort-groups-by-method))
@@ -1079,7 +1082,7 @@ articles in the topic and its subtopics."
 	    (> (prefix-numeric-value arg) 0)))
     ;; Infest Gnus with topics.
     (if (not gnus-topic-mode)
- 	(setq gnus-goto-missing-group-function nil)
+	(setq gnus-goto-missing-group-function nil)
       (when (gnus-visual-p 'topic-menu 'menu)
 	(gnus-topic-make-menu-bar))
       (gnus-set-format 'topic t)
@@ -1103,7 +1106,8 @@ articles in the topic and its subtopics."
       (setq gnus-group-change-level-function 'gnus-topic-change-level)
       (setq gnus-goto-missing-group-function 'gnus-topic-goto-missing-group)
       (make-local-hook 'gnus-check-bogus-groups-hook)
-      (add-hook 'gnus-check-bogus-groups-hook 'gnus-topic-clean-alist)
+      (add-hook 'gnus-check-bogus-groups-hook 'gnus-topic-clean-alist
+		nil 'local)
       (setq gnus-topology-checked-p nil)
       ;; We check the topology.
       (when gnus-newsrc-alist
@@ -1122,6 +1126,7 @@ articles in the topic and its subtopics."
 (defun gnus-topic-select-group (&optional all)
   "Select this newsgroup.
 No article is selected automatically.
+If the group is opened, just switch the summary buffer.
 If ALL is non-nil, already read articles become readable.
 If ALL is a number, fetch this number of articles.
 
@@ -1152,6 +1157,18 @@ If performed over a topic line, toggle folding the topic."
 		     (gnus-topic-find-groups topic gnus-level-killed t))))
 	(gnus-group-expire-articles nil))
       (gnus-message 5 "Expiring groups in %s...done" topic))))
+
+(defun gnus-topic-catchup-articles (topic)
+  "Catchup this topic or group.
+Also see `gnus-group-catchup'."
+  (interactive (list (gnus-group-topic-name)))
+  (if (not topic)
+      (call-interactively 'gnus-group-catchup-current)
+    (save-excursion
+      (let ((gnus-group-marked
+	     (mapcar (lambda (entry) (car (nth 2 entry)))
+		     (gnus-topic-find-groups topic gnus-level-killed t))))
+	(gnus-group-catchup-current)))))
 
 (defun gnus-topic-read-group (&optional all no-article group)
   "Read news in this newsgroup.
@@ -1436,7 +1453,7 @@ If RECURSIVE is t, unmark its subtopics too."
   (interactive
    (let ((topic (gnus-current-topic)))
      (list topic
-	   (read-string "Rename topic to: " topic))))
+	   (read-string (format "Rename %s to: " topic) topic))))
   ;; Check whether the new name exists.
   (when (gnus-topic-find-topology new-name)
     (error "Topic '%s' already exists" new-name))
@@ -1608,14 +1625,21 @@ If REVERSE, sort in reverse order."
   (interactive "P")
   (gnus-topic-sort-groups 'gnus-group-sort-by-method reverse))
 
+(defun gnus-topic-sort-groups-by-server (&optional reverse)
+  "Sort the current topic alphabetically by server name.
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-topic-sort-groups 'gnus-group-sort-by-server reverse))
+
 (defun gnus-topic-sort-topics-1 (top reverse)
   (if (cdr top)
       (let ((subtop
-	     (mapcar `(lambda (top)
-			(gnus-topic-sort-topics-1 top ,reverse))
+	     (mapcar (gnus-byte-compile
+		      `(lambda (top)
+			 (gnus-topic-sort-topics-1 top ,reverse)))
 		     (sort (cdr top)
-			   '(lambda (t1 t2)
-			      (string-lessp (caar t1) (caar t2)))))))
+			   (lambda (t1 t2)
+			     (string-lessp (caar t1) (caar t2)))))))
 	(setcdr top (if reverse (reverse subtop) subtop))))
   top)
 
@@ -1668,6 +1692,12 @@ If REVERSE, reverse the sorting order."
 	  (gnus-subscribe-alphabetically newsgroup)
 	  ;; Add the group to the topic.
 	  (nconc (assoc topic gnus-topic-alist) (list newsgroup))
+	  ;; if this topic specifies a default level, use it
+	  (let ((subscribe-level (cdr (assq 'subscribe-level
+					    (gnus-topic-parameters topic)))))
+	    (when subscribe-level
+		(gnus-group-change-level newsgroup subscribe-level
+					 gnus-level-default-subscribed)))
 	  (throw 'end t)))
       nil)))
 

@@ -1,4 +1,4 @@
-;;; mm-view.el --- Functions for viewing MIME objects
+;;; mm-view.el --- functions for viewing MIME objects
 ;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -34,11 +34,13 @@
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard")
   (autoload 'fill-flowed "flow-fill")
-  (autoload 'diff-mode "diff-mode"))
+  (unless (fboundp 'diff-mode)
+    (autoload 'diff-mode "diff-mode" "" t nil)))
 
 ;;;
 ;;; Functions for displaying various formats inline
 ;;;
+
 (defun mm-inline-image-emacs (handle)
   (let ((b (point-marker))
 	buffer-read-only)
@@ -49,10 +51,11 @@
      `(lambda () (remove-images ,b (1+ ,b))))))
 
 (defun mm-inline-image-xemacs (handle)
+  (insert "\n")
+  (forward-char -1)
   (let ((b (point))
 	(annot (make-annotation (mm-get-image handle) nil 'text))
 	buffer-read-only)
-    (insert "\n")
     (mm-handle-set-undisplayer
      handle
      `(lambda ()
@@ -87,6 +90,8 @@
       (setq text (mm-get-part handle))
       (let ((b (point))
 	    (url-standalone-mode t)
+	    (w3-honor-stylesheets nil)
+	    (w3-delay-image-loads t)
 	    (url-current-object
 	     (url-generic-parse-url (format "cid:%s" (mm-handle-id handle))))
 	    (width (window-width))
@@ -103,11 +108,14 @@
 		    (and (boundp 'w3-meta-charset-content-type-regexp)
 			 (re-search-forward
 			  w3-meta-charset-content-type-regexp nil t)))
-		(setq charset (or (w3-coding-system-for-mime-charset
-				   (buffer-substring-no-properties
-				    (match-beginning 2)
-				    (match-end 2)))
-				  charset)))
+		(setq charset
+		      (or (let ((bsubstr (buffer-substring-no-properties
+					  (match-beginning 2)
+					  (match-end 2))))
+			    (if (fboundp 'w3-coding-system-for-mime-charset)
+				(w3-coding-system-for-mime-charset bsubstr)
+			      (mm-charset-to-coding-system bsubstr)))
+			  charset)))
 	    (delete-region (point-min) (point-max))
 	    (insert (mm-decode-string text charset))
 	    (save-window-excursion
@@ -116,10 +124,24 @@
 		      ;; Don't let w3 set the global version of
 		      ;; this variable.
 		      (fill-column fill-column)
+		      (w3-honor-stylesheets nil)
+		      (w3-delay-image-loads t)
 		      (url-standalone-mode t))
 		  (condition-case var
 		      (w3-region (point-min) (point-max))
 		    (error
+		     (delete-region (point-min) (point-max))
+		     (let ((b (point))
+			   (charset (mail-content-type-get
+				     (mm-handle-type handle) 'charset)))
+		       (if (or (eq charset 'gnus-decoded)
+			       (eq mail-parse-charset 'gnus-decoded))
+			   (save-restriction
+			     (narrow-to-region (point) (point))
+			     (mm-insert-part handle)
+			     (goto-char (point-max)))
+			 (insert (mm-decode-string (mm-get-part handle)
+						   charset))))
 		     (message
 		      "Error while rendering html; showing as text/plain"))))))
 	    (mm-handle-set-undisplayer
@@ -134,24 +156,16 @@
 			      '(background background-pixmap foreground)))
 		  (delete-region ,(point-min-marker)
 				 ,(point-max-marker)))))))))
-     ((or (equal type "enriched")
-	  (equal type "richtext"))
-      (save-excursion
-	(mm-with-unibyte-buffer
-	  (mm-insert-part handle)
-	  (save-window-excursion
-	    (enriched-decode (point-min) (point-max))
-	    (setq text (buffer-string)))))
-      (mm-insert-inline handle text))
      ((equal type "x-vcard")
       (mm-insert-inline
        handle
        (concat "\n-- \n"
-	       (if (fboundp 'vcard-pretty-print)
-		   (vcard-pretty-print (mm-get-part handle))
-		 (vcard-format-string
-		  (vcard-parse-string (mm-get-part handle)
-				      'vcard-standard-filter))))))
+	       (ignore-errors
+		 (if (fboundp 'vcard-pretty-print)
+		     (vcard-pretty-print (mm-get-part handle))
+		   (vcard-format-string
+		    (vcard-parse-string (mm-get-part handle)
+					'vcard-standard-filter)))))))
      (t
       (let ((b (point))
 	    (charset (mail-content-type-get
@@ -176,6 +190,9 @@
 	(save-restriction
 	  (narrow-to-region b (point))
 	  (set-text-properties (point-min) (point-max) nil)
+	  (when (or (equal type "enriched")
+		    (equal type "richtext"))
+	    (enriched-decode (point-min) (point-max)))
 	  (mm-handle-set-undisplayer
 	   handle
 	   `(lambda ()
@@ -202,7 +219,9 @@
 
 (defun mm-w3-prepare-buffer ()
   (require 'w3)
-  (let ((url-standalone-mode t))
+  (let ((url-standalone-mode t)
+	(w3-honor-stylesheets nil)
+	(w3-delay-image-loads t))
     (w3-prepare-buffer)))
 
 (defun mm-view-message ()
@@ -303,6 +322,58 @@
 (defun mm-display-elisp-inline (handle)
   (mm-display-inline-fontify handle 'emacs-lisp-mode))
 
+;;      id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
+;;          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 }
+(defvar mm-pkcs7-signed-magic
+  (mm-string-as-unibyte
+   (apply 'concat
+	  (mapcar 'char-to-string
+		  (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
+			?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
+			?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
+			?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x02)))))
+
+;;      id-envelopedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
+;;          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 3 }
+(defvar mm-pkcs7-enveloped-magic
+  (mm-string-as-unibyte
+   (apply 'concat
+	  (mapcar 'char-to-string
+		  (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
+			?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
+			?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
+			?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x03)))))
+
+(defun mm-view-pkcs7-get-type (handle)
+  (mm-with-unibyte-buffer
+   (mm-insert-part handle)
+   (cond ((looking-at mm-pkcs7-enveloped-magic)
+	  'enveloped)
+	 ((looking-at mm-pkcs7-signed-magic)
+	  'signed)
+	 (t
+	  (error "Could not identify PKCS#7 type")))))
+
+(defun mm-view-pkcs7 (handle)
+  (case (mm-view-pkcs7-get-type handle)
+    (enveloped (mm-view-pkcs7-decrypt handle))
+    (otherwise (error "Unknown or unimplemented PKCS#7 type"))))
+
+(defun mm-view-pkcs7-decrypt (handle)
+  (insert-buffer (mm-handle-buffer handle))
+  (goto-char (point-min))
+  (insert "MIME-Version: 1.0\n")
+  (mm-insert-headers "application/pkcs7-mime" "base64" "smime.p7m")
+  (smime-decrypt-region
+   (point-min) (point-max)
+   (if (= (length smime-keys) 1)
+       (cadar smime-keys)
+     (smime-get-key-by-email
+      (completing-read "Decrypt this part with which key? "
+		       smime-keys nil nil
+		       (and (listp (car-safe smime-keys))
+			    (caar smime-keys)))))))
+
 (provide 'mm-view)
 
-;; mm-view.el ends here
+;;; mm-view.el ends here

@@ -25,11 +25,11 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 (require 'mm-util)
 (require 'mm-decode)
+(require 'mm-url)
 
 (defvar mm-extern-function-alist
   '((local-file . mm-extern-local-file)
@@ -48,22 +48,21 @@
   (let ((name (cdr (assq 'name (cdr (mm-handle-type handle)))))
 	(coding-system-for-read mm-binary-coding-system))
     (unless name
-      (error "The filename is not specified."))
+      (error "The filename is not specified"))
     (mm-disable-multibyte-mule4)
     (if (file-exists-p name)
 	(mm-insert-file-contents name nil nil nil nil t)
-      (error (format "File %s is gone." name)))))
+      (error (format "File %s is gone" name)))))
 
 (defun mm-extern-url (handle)
   (erase-buffer)
-  (require 'url)
   (let ((url (cdr (assq 'url (cdr (mm-handle-type handle)))))
 	(name buffer-file-name)
 	(coding-system-for-read mm-binary-coding-system))
     (unless url
-      (error "URL is not specified."))
+      (error "URL is not specified"))
     (mm-with-unibyte-current-buffer-mule4
-      (url-insert-file-contents url))
+      (mm-url-insert-file-contents url))
     (mm-disable-multibyte-mule4)
     (setq buffer-file-name name)))
 
@@ -79,7 +78,7 @@
 		       "@" site ":" directory "/" name))
 	 (coding-system-for-read mm-binary-coding-system))
     (unless name
-      (error "The filename is not specified."))
+      (error "The filename is not specified"))
     (mm-disable-multibyte-mule4)
     (mm-insert-file-contents path nil nil nil nil t)))
 
@@ -119,13 +118,13 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	 (func (cdr (assq (intern
 			   (downcase
 			    (or access-type
-				(error "Couldn't find access type."))))
+				(error "Couldn't find access type"))))
 			  mm-extern-function-alist)))
 	 gnus-displaying-mime buf
 	 handles)
     (unless (mm-handle-cache handle)
       (unless func
-	(error (format "Access type (%s) is not supported." access-type)))
+	(error (format "Access type (%s) is not supported" access-type)))
       (with-temp-buffer
 	(mm-insert-part handle)
 	(goto-char (point-max))
@@ -133,7 +132,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	(setq handles (mm-dissect-buffer t)))
       (unless (bufferp (car handles))
 	(mm-destroy-parts handles)
-	(error "Multipart external body is not supported."))
+	(error "Multipart external body is not supported"))
       (save-excursion ;; single part
 	(set-buffer (setq buf (mm-handle-buffer handles)))
 	(let (good)
@@ -158,10 +157,12 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 		(condition-case nil
 		    ;; This is only valid on XEmacs.
 		    (mapcar (lambda (prop)
-			    (remove-specifier
-			     (face-property 'default prop) (current-buffer)))
+			      (remove-specifier
+			       (face-property 'default prop) (current-buffer)))
 			    '(background background-pixmap foreground))
 		  (error nil))
 		(delete-region ,(point-min-marker) ,(point-max-marker))))))))))
 
-;; mm-extern.el ends here
+(provide 'mm-extern)
+
+;;; mm-extern.el ends here

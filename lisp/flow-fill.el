@@ -1,6 +1,6 @@
 ;;; flow-fill.el --- interprete RFC2646 "flowed" text
 
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
 ;; Keywords: mail
@@ -38,7 +38,7 @@
 ;; Todo: encoding, implement basic `fill-region' (Emacs and XEmacs
 ;;       implementations differ..)
 
-;; History:
+;;; History:
 
 ;; 2000-02-17  posted on ding mailing list
 ;; 2000-02-19  use `point-at-{b,e}ol' in XEmacs
@@ -53,14 +53,14 @@
 
 (eval-and-compile
   (defalias 'fill-flowed-point-at-bol
-	(if (fboundp 'point-at-bol)
-	    'point-at-bol
-	  'line-beginning-position))
+    (if (fboundp 'point-at-bol)
+	'point-at-bol
+      'line-beginning-position))
 
-   (defalias 'fill-flowed-point-at-eol
-	(if (fboundp 'point-at-eol)
-	    'point-at-eol
-	  'line-end-position)))
+  (defalias 'fill-flowed-point-at-eol
+    (if (fboundp 'point-at-eol)
+	'point-at-eol
+      'line-end-position)))
 
 (defun fill-flowed (&optional buffer)
   (save-excursion
@@ -86,7 +86,8 @@
 		      (save-excursion
 			(unless (eobp)
 			  (forward-char 1)
-			  (looking-at (format "^\\(%s\\)\\([^>]\\)" (or quote " ?"))))))
+			  (looking-at (format "^\\(%s\\)\\([^>]\\)"
+					      (or quote " ?"))))))
 	    (save-excursion
 	      (replace-match (if (string= (match-string 2) " ")
 				 "" "\\2")))
@@ -95,7 +96,7 @@
 	  (unless sig
 	    (let ((fill-prefix (when quote (concat quote " "))))
 	      (fill-region (fill-flowed-point-at-bol)
-			   (fill-flowed-point-at-eol)
+			   (min (1+ (fill-flowed-point-at-eol)) (point-max))
 			   'left 'nosqueeze))))))))
 
 (provide 'flow-fill)

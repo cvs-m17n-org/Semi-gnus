@@ -1,3 +1,801 @@
+2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Choosing Commands): Addition.
+
+2001-12-31  Rui Zhu  <sprache@iname.com>
+
+	* emacs-mime.texi (Customization): Typo fix.
+
+2001-12-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Display): Addition.
+
+	* emacs-mime.texi (Interface Functions): Addition.
+
+	* gnus.texi (Using MIME): Addition.
+
+2001-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (X-Face): Made into own node.
+	(Article Display): New.
+
+	* emacs-mime.texi (Interface Functions): Addition.
+
+	* message.texi (Message Headers): Addition.
+
+2001-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* emacs-mime.texi (Customization): Added example.
+
+	* gnus.texi (Selecting a Group): Addition.
+	(Tree Display): Addition.
+
+2001-12-26  Florian Weimer  <fw@deneb.enyo.de>
+
+	* gnus.texi (Using GPG): Remove obsolete reference to gpg-2comp.
+
+2001-12-26  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Summary Buffer Lines): Add xrefs.  Suggested by
+	Arcady Genkin <agenkin-dated-1010249095.131f22@thpoon.com>.
+
+2001-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NNTP): Add a note for `nntp-prepare-post-hook'.
+
+2001-12-18  Josh Huber  <huber@alum.wpi.edu>
+
+	* ChangeLog, gnus.texi, emacs-mime.texi: (oops) removed
+	buffer-file-coding-system
+
+2001-12-18 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* ChangeLog, gnus.texi, emacs-mime.texi: Local Variables `coding'
+	MUST be added!
+
+2001-12-17  Josh Huber  <huber@alum.wpi.edu>
+
+	* ChangeLog: changed coding to buffer-file-coding-system
+	* emacs-mime.texi: changed -*- magic cookie -*- to Local Variables
+	* gnus.texi: same
+	* gnus-ref.tex: same
+	* refcard.tex: same
+
+2001-12-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Saving Articles): Add muttprint.
+	(Article Commands): Mention muttprint.
+
+2001-12-15  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Virtual Groups): Fix.  From Raymond Scholz
+	<ray-2001@zonix.de>.
+
+2001-12-15 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi, emacs-mime.texi: Fix the header.
+
+2001-12-12  Didier Verna  <didier@lrde.epita.fr>
+
+	* gnus.texi (Misc Group Stuff): advertise `gnus-group-news'.
+	* gnus.texi (Summary Mail Commands): advertise
+	`gnus-summary-news-other-window'.
+
+2001-12-10  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Advanced Scoring Examples): Clarify that the
+	examples are rules, not complete score files.
+
+2001-12-09  Nevin Kapur  <nevin@jhu.edu>
+
+	* gnus.texi (Expiring Mail): Add.
+
+2001-12-05  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Splitting in IMAP): Typo.  From Colin Marquardt
+	<c.marquardt@alcatel.de>.
+
+2001-12-03 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* infohack.el (infohack): To process write-protected files safely,
+      	make this buffer be writable after `find-file'.
+	From TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+2001-12-03 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in: Dependence.
+
+	* emacs-mime.texi: Add coding header.
+
+2001-12-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Group Line Specification, Summary Buffer Lines):
+	Cross reference Positioning Point.
+
+2001-11-25 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Limiting): Addition.
+
+2001-11-19  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Header Commands, Insertion): Use C-c C-f C-i for
+	Importance: instead of C-c C-u.  Move to Header Commands from
+	Insertion. Suggested by Per Abrahamsen <abraham@dina.kvl.dk>.
+
+2001-11-17  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Insertion): Use C-c C-u for Importance: instead of
+	C-c C-p (used by SC).
+
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Insertion): Add C-c C-p,
+	message-insert-importance-{low,high}.
+	(Various Commands): Fix typo.
+	(Insertion Variables): New section, all variables moved from
+	Commands->Insertion into this node, Variables->Insertion
+	Variables.
+
+2001-11-15 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Various Summary Stuff): Add gnus-newsgroup-variables.
+
+2001-11-15 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Security): @uref not @url.
+
+2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sieve.texi (Standards): Changed @samp to @uref.
+
+	* message.texi (Security): Changed @code to @uref.
+
+	* gnus-faq.texi: Changed a lot of @file to @uref.
+
+	* emacs-mime.texi (Standards): Changed @samp to @uref.
+
+2001-11-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Article Washing): Add `W s'.
+
+2001-11-12  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Security, Using GPG):
+	* message.texi (Security):
+	* emacs-mime.texi (MML Definition): Add PGP.
+
+2001-11-09  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.texi (Movement): message-beginning-of-line.
+
+2001-11-07  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.texi (Examples): Add.
+	(Top): Add.
+
+	* gnus.texi (Saving Articles): Add gnus-summary-write-to-file.
+
+2001-11-07  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Misc Group Stuff): Add cross reference to Composing
+	Messages.  Suggested by "Golubev I. N." <gin@mo.msk.ru>.
+
+2001-11-04 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Use C-M- instead of M-C-.
+	* message.texi (Insertion): Ditto.
+	* sieve.texi (Managing Sieve): Ditto.
+	Suggested by Eli Zaretskii <eliz@is.elta.co.il>.
+
+2001-11-02  Simon Josefsson  <jas@extundo.com>
+
+	* dir (File): Add Sieve.
+
+	* gnus.texi (Sieve Commands): Add crossposting.
+
+2001-11-01 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* texi2latex.el (latexi-translate): Typo.
+	(latexi-translate-file): Nine in a herd is enough.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.texi (Installation): Workaround texi2latex bug (replacing
+	inside verbatim needs a \end{verbatim} earlier in the file).
+
+	* texi2latex.el (latexi-translate): Add sieve.
+
+2001-11-01 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Article Washing): Add a note.
+
+2001-11-01  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in: Add sieve.
+
+	* gnus.texi (Misc Group Stuff):
+	(Group Parameters): Add Sieve Commands.
+	(top-level): Include Sieve manual after Emacs MIME.
+
+2001-10-31  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Group Parameters): Add integer `display'.
+	(IMAP): Fix.
+
+2001-10-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NNTP): Added documentation for
+	`nntp-prepare-post-hook'.
+
+2001-10-29  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Customizing Articles): Sort list. Remove
+	duplicate. Suggested by Henrik Holm <henrik@tele.ntnu.no>.
+
+2001-10-27  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Insertion): Fix message-yank*-prefix.
+
+2001-10-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Source Specifiers): More info on SSL, kerberos etc.
+	(IMAP): Ditto.  Suggested by Martin Blais <blais@discreet.com>.
+
+2001-10-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus.texi (Posting Server): Use `native' instead of `nil' for
+	posting to native server.
+
+2001-10-22  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* dir (File): Add standard explanation header.
+
+2001-10-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Mail Source Specifiers): Explain more explicitly what
+	happens for the `directory' entries.  Say that mail from foo.spool
+	goes in the group foo.
+
+2001-10-19  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (clean): rm gnus.out.
+	(distclean): rm gnusconfig.tex (moved from "clean").
+
+	* gnus.texi (Using MIME): s/mime/MIME/ for PDF version.
+
+2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Finding the News): Disrecommend nnspool for Leafnode
+	users.
+
+2001-10-17 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Archived Messages): Add new line after @item.
+	From: Jesper Harder <harder@ifa.au.dk>
+
+2001-10-17 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Formatting Basics): Extended format specs.
+
+2001-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus.texi (Summary Buffer Lines): Documment %( and %).
+
+2001-09-04 21:43:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Topic Sorting): Addition.
+
+2001-10-13 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* refcard.tex, gnusref.tex: Merge with the version
+	from Felix Natter <f.natter@ndh.net>
+
+2001-10-13 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* refcard.tex: Set version to Oort.
+
+	* gnusref.tex: New key bindings in Oort Gnus.
+
+2001-10-12 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (.dvi.ps): Use TEXPICTS.
+	(.latexi.dvi-x): Remove gnus.toc as well.
+
+	* gnuslogo-refcard.eps: Remove BeginProcSet.
+
+2001-10-12  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Misc Group Stuff): Add UTF-8.
+	(Misc Article): Document wash status characters.  Suggested by
+	david.goldberg6@verizon.net (David S. Goldberg).
+
+2001-10-10 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnusref.tex, refcard.tex: Use epsfig.
+
+	* gnuslogo-refcard.eps: Rename from gnuslog.refcard, and set a
+	suitable bounding box.
+
+	* Makefile.in (.dvi.ps): New rule.
+	(refcard.pdf): Use gnuslogo-refcard.eps.
+
+2001-10-09 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Add href and bookmarks for pdf version.
+
+2001-10-06 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (uninstall): Add uninstall.
+
+2001-10-05  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (clean): Add gnusconfig.tex.  Suggested by Henrik
+	Enberg <henrik@enberg.org>.
+
+2001-10-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Source Customization): Add.
+
+2001-10-04 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (dvi): Don't depend on tmps.
+
+2001-10-03 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* emacs-mime.texi (mailcap): rvplayer -> wavplayer.  Thanks to
+	Martin Kretzschmar <Martin.Kretzschmar@inf.tu-dresden.de>.
+
+2001-09-29  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Foreign Groups): Fix.  Add "mailman".
+	(Document Groups): Ditto.
+
+2001-09-28 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (.texi): Remove $@ first.
+
+	* infohack.el (infohack-remove-unsupported): Remove @iflatex lines.
+	(infohack): Specify a coding-system to save info files.
+	From Katsumi Yamaoka  <yamaoka@jpl.org>
+
+2001-09-28 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnusconfig.tex.in: Use cmss if pfu is not found.
+
+2001-09-27 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in: Illustrated manual.
+	* gnus.texi: Put message.texi and emacs-mime.texi in the
+	illustrated manual.
+	* texi2latex.el: Ditto.
+
+2001-09-27 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Remove the extra white-space.
+
+2001-09-27 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnusconfig.tex.in: New.
+	* gnus.texi: Use it.
+	* pagestyle.sty: Don't set verbatim font.
+	* postamble.tex: Set in ...
+	* bembo.sty: Removed.
+	* Makefile.in (gnusconfig.tex): Check gnusconfig.tex.in.
+	(LATEX): Use configure.
+
+2001-09-26 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Limiting): Addition.
+
+2001-09-25 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Pterodactyl Gnus): Put @item in one line.
+
+2001-09-24 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: eps path fix.
+	* postamble.tex: Ditto.
+	* texi2latex.el: Ditto.
+
+	* Makefile.in: Move some to ps/Makefile.in.
+
+2001-09-24  Simon Josefsson  <jas@extundo.com>
+
+	* etc/*, herds/*, misc/*, picons/*, screen/*, smilies/*, xface/*:
+	New files, from pspackage.tar.gz.
+
+	* Makefile.in (distclean): Make veryclean.
+
+	* gnus.texi (Summary Mail Commands): Fix.
+	(Summary Post Commands): Fix.
+	(The Manual): Fix.
+
+2001-09-23 02:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Use "back end".
+
+2001-09-23  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Top): Move IMAP up from "Other Sources" to "Select
+	Methods".
+	(Charsets): Update default value.
+	(Finding the Parent): Add nnimap.
+	(Security): Add.
+	(Mailing List): Add.
+	(Archived Messages): Comment out XEmacs 19 stuff.
+	(Using GPG): Add reference to message manual.
+	(Direct Functions): Mention OpenSSL as well as SSLeay.
+	(Mail Source Specifiers): Add recent IMAP :stream and
+	:authentication.
+	(Agent Commands): Fix.
+	(GroupLens): Add URL and note about this being historical.
+	(Wide Characters): Update default value.
+	(Picon Requirements): Remove old XEmacs 19 stuff.
+
+2001-09-22  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Other Marks): Add Recent.
+
+2001-09-14  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Folders): Add.
+
+2001-09-11  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Delayed Articles): Fix.  Suggested by Paul Jarc
+	<prj@po.cwru.edu>.
+
+2001-09-08  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (MIME Commands): Add gnus-buttonized-mime-types.
+
+2001-09-08  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Topic Commands): Make this the first subsection of
+	`Group Topics'.  Rearrange keys to mention the most important keys
+	first and to have subsections.  Add some more explanation for
+	C-k/C-y.
+	(Group Buffer): Add comment from Alex Schroeder as todo item.
+
+2001-09-06  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Fancy Mail Splitting): Mention `delete' near the
+	explanation of `junk'.
+
+2001-09-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Optional Backend Functions): The default function to
+	make a date format is `message-make-date', which should produce a
+	time zone.
+
+2001-09-04  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Optional Backend Functions): More detail about the
+	DATE arg for nnchoke-request-newgroups.  Reported by Paul Jarc.
+
+2001-09-01  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Hooking New Backends Into Gnus): Say where to put the
+	call for gnus-declare-backend.  Add an index entry for
+	gnus-declare-backend.  Suggested by Paul Jarc.
+
+2001-08-29  Simon Josefsson  <jas@extundo.com>
+	From Anders Jackson <jackson@hig.se>
+
+	* gnus.texi (Group Parameters): Fix.
+
+2001-08-27  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Archiving Mail): Add.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Spool): Add marks.
+	(MH Spool): Doesn't use marks file.
+	(Mail Folders): Add marks.
+
+2001-08-25  Simon Josefsson  <jas@extundo.com>
+	From Henrik Enberg <henrik@enberg.org>
+
+	* gnus.texi (Group Parameters): Fix.
+
+2001-08-24 16:03:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Fix.
+
+2001-08-24  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (latexps): Make tmps.
+
+2001-08-24  Simon Josefsson  <jas@extundo.com>
+	From Jesper Harder <harder@ifa.au.dk>
+
+	* Makefile.in (latexps): Escape {.
+
+	* splitindex: Ditto.
+
+2001-08-23 19:22:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Fix.
+	(Group Parameters): Addition.
+	(Limiting): Addition.
+
+2001-08-21 23:55:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Score Variables): Fix.
+
+2001-08-20  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Delayed Articles): New section.  Documents
+	gnus-delay.el.
+	(Fancy Mail Splitting): Say that nnmail-cache-accepted-message-ids
+	must be non-nil for splitting with parents to work.
+
+2001-08-19 17:31:15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Other Marks): Addition.
+	(Positioning Point): New.
+	(Tabulation): New.
+
+2001-08-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Getting Started Reading Mail): Use (nnml "") rather
+	than (nnml "private") as the example server specification.  This
+	way, the example group names a few paragraphs further down are
+	correct, and I expect that most people are going to use the empty
+	string as name, anyway.  Please holler if that is wrong.
+
+2001-08-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Optional Backend Functions): Remove `set'
+	request-set-mark action.
+
+2001-08-18 00:40:10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Wide Characters): New section.
+
+2001-08-17  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi: Replace 20,20 with 23,23 for
+	gnus-summary-line-format.
+
+2001-08-17 14:24:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Document regexp substitution.
+	(Group Parameters): Addition.
+
+2001-08-11 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Nevin Kapur <nevin@jhu.edu>
+
+	* gnus.texi (September Gnus): Typo.
+
+2001-08-12  Simon Josefsson  <jas@extundo.com>
+	Suggested by Kai.Grossjohann@CS.Uni-Dortmund.DE
+
+	* gnus.texi (Other Marks): Add recent.
+	(Optional Backend Functions): Add forward and recent.
+
+2001-08-12  Kai Grossjohann  <grossjoh@ls6.informatik.uni-dortmund.de>
+
+	* gnus.texi (Window Layout): Renamed from `Windows
+	Configuration'.  After all, we're not talking about Microsoft.
+	Suggested by Barry Fishman.
+
+2001-08-11  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Summary Mail Commands): Remove duplicate explanation
+	of `S W'.  Reported by Norbert Koch.
+
+2001-08-09 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Benjamin Rutt <brutt@bloomington.in.us>
+
+	* gnus.texi (Troubleshooting): Addition.
+
+2001-08-09  Simon Josefsson  <jas@extundo.com>
+	From Benjamin Rutt <brutt@bloomington.in.us>
+
+	* gnus.texi (Mail Backend Variables): Fix.
+
+2001-08-04  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Summary Buffer Lines): Mention `gnus-goto-colon'.
+
+2001-08-03  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Backend Interface): Explain about article numbers.
+	Suggested by Paul Jarc.
+
+2001-08-02 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* emacs-mime.texi (Non-MIME): Addition.
+
+	* gnus.texi (Group Parameters): Addition.
+	(Mailing List): Addition.
+
+2001-08-01  Simon Josefsson  <jas@extundo.com>
+
+	* texi2latex.el (latexi-translate-file): Don't use point-at-bol.
+	(latexi-translate-file): Translate some more things, including
+	some hardcoded things that cause problems for LaTeX.  From Jesper
+	Harder <harder@ifa.au.dk>.
+
+2001-07-31  Simon Josefsson  <jas@extundo.com>
+
+	* bembo.sty: New file.
+
+	* texi2latex.el (latexi-translate-file): Support @noindent.
+
+	* gnus-faq.texi (Reading News FAQ): Fix (@email -> @samp).
+
+2001-07-28 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Janne Rinta-Manty <rintaman@cs.helsinki.fi>
+
+	* gnus.texi (Read Articles): Typo.
+
+2001-07-25 22:22:22  Raymond Scholz  <rscholz@zonix.de>
+
+	* gnus.texi (Fancy Mail Splitting): New variable
+        nnmail-split-fancy-with-parent-ignore-groups
+
+2001-07-24  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Duplicates): Make split method regexp more specific,
+	in case other `Gnus-Warning' headers are added in the future.
+	Suggested by Karl Kleinpaste.
+
+2001-07-23 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Karl Kleinpaste <karl@charcoal.com>
+
+	* gnus.texi (Summary Buffer Lines): Add %B.
+
+2001-07-20 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Jesper Harder <harder@myrealbox.com>
+
+	* message.texi (Insertion): Addition.
+
+2001-07-19 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Charsets): Addition.
+
+2001-07-17 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Searching for Articles): Raw articles.
+
+2001-07-16  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.texi (Insertion): Refer to gnus-cite-attribution-suffix.
+
+2001-07-13 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (RSS): Add.
+	From Christoph Conrad <cc@cli.de>.
+
+2001-07-13 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Incorporating Old Mail): Add index.
+
+2001-07-13 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Group Parameters): Add.
+
+2001-07-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (IMAP): Add.
+
+2001-07-04  Didier Verna  <didier@lrde.epita.fr>
+
+	* gnus.texi (Example Methods): use the new nntp-open-connection
+	methods in the examples.
+	* gnus.texi (NNTP): update for the new nntp-open-connection methods.
+	* gnus.texi (Direct Functions): new node.
+	* gnus.texi (Indirect Functions): new node.
+	* gnus.texi (Common Variables): new node.
+
+2001-06-27  Simon Josefsson  <jas@extundo.com>
+	From Ralph Schleicher <rs@nunatak.allgaeu.org>
+
+	* gnus.texi (MIME Commands): Add.
+
+2001-06-24  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Summary Score Commands): Say that some commands
+	create ADAPT files.
+
+2001-06-23  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Duplicates): Contents of Gnus-Warning header have
+	changed.  Reported by Peter J Acklam.
+
+2001-06-19  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (IMAP): Fix `imtest' discussion.
+
+	* gnus-faq.texi (Frequently Asked Questions): Fix URL.
+
+2001-06-17  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Group Line Specification): Explain why %t is only an
+	estimate.
+
+2001-06-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (IMAP): Add.
+
+2001-06-13 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Article Washing): Add.
+
+2001-06-11 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: behaviour -> behavior. Suggested by Eli Zaretskii
+	<eliz@is.elta.co.il>.
+
+2001-06-09 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Apply "overfull hbox" patch from Eli Zaretskii
+	<eliz@is.elta.co.il>.
+
+2001-06-07 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (RSS): Add.
+
+2001-05-31 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Setting Marks): Add.
+
+2001-05-27  Simon Josefsson  <simon@josefsson.org>
+
+	* message.texi (Insertion): Add message-yank-cited-prefix.
+
+2001-05-22  Simon Josefsson  <simon@josefsson.org>
+	From Jesper Harder <harder@ifa.au.dk>
+
+	* gnus.texi (Article Washing): Add.
+
+2001-05-16  Simon Josefsson  <simon@josefsson.org>
+	From Jesper Harder <harder@ifa.au.dk>
+
+	* texi2latex.el (latexi-translate-file): Also exchange ref.
+
+	* gnus.texi: Add \gnusref and \gnusuref.
+
+2001-05-16  Simon Josefsson  <simon@josefsson.org>
+	From Raymond Scholz <ray-2001@zonix.de>
+
+	* gnus.texi (Using MIME): Add and fix.
+
+2001-05-05  Florian Weimer  <fw@deneb.enyo.de>
+
+	* gnus.texi (IMAP): Remove double paragraph (suggest by Norbert
+	Koch), fix NNTP reference.
+
+2001-05-04 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	Suggested by Dan Christensen <jdc@uwo.ca>
+
+	* gnus.texi (Mail Group Commands): Add pxref.
+	(Group Maintenance): Ditto.
+	(Topic Commands): Ditto.
+	(Expiring Mail): Typo.
+
+2001-05-04 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Raymond Scholz <ray-2001@zonix.de>
+
+	* gnus.texi (Summary Buffer Lines): Mention the meaning of a
+	colon.
+
+2001-05-03 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Sriram Karra <karra@cs.utah.edu>.
+
+	* gnus.texi: Add default value.
+
+2001-05-03 06:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Using GPG): Use example environment.
+
+2001-05-02 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Expunging mailboxes): Typo.
+
 2001-04-15 19:38:54  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Mail and Post): Fix.
@@ -52,7 +850,7 @@
 2001-03-11  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* message.texi (Message Headers): Update doc for
-	`message-generate-headers-first'. 
+	`message-generate-headers-first'.
 
 2001-03-14 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 	From Nevin Kapur <nevin@jhu.edu>
@@ -78,13 +876,13 @@
 
 	* gnus.texi (Posting Server): Fix, due to change of default value
 	of `gnus-post-method' to `current'.
-	
+
 2001-02-23 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi: Remove double words. From Gerd Moellmann.
 
 	* infohack.el (batch-makeinfo): New.
-	
+
 	* Makefile.in (EMACSINFO): Use it.
 
 2001-02-17 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
@@ -137,7 +935,7 @@
 2001-02-06 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Using GPG): Key binding.
-	
+
 	* message.texi (Security): Ditto.
 
 2001-02-06 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
@@ -162,7 +960,7 @@
 
 	* message.texi (message-ignored-news-headers): Add "X-Draft-From:".
 	(message-ignored-mail-headers): Ditto.
-	
+
 2001-01-21  Raymond Scholz <ray-2001@zonix.de>
 
 	* message.texi: Rename X-Mailer and X-Newsreader to User-Agent.
@@ -200,7 +998,7 @@
 
 2001-01-10 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
-	* gnus.texi (Article Washing): makeinfo 1.69 doesn't grok `anchor'. 
+	* gnus.texi (Article Washing): makeinfo 1.69 doesn't grok `anchor'.
 
 2001-01-07 18:18:53  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
@@ -234,7 +1032,7 @@
 2001-01-03  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus.texi (Article Washing): Mention `C-u g' as a sort of
-	anti-washing. 
+	anti-washing.
 
 2001-01-01 11:40:34  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
@@ -373,7 +1171,7 @@
 
 	* gnus.texi (Archived Messages): Explain what happens when group
 	names mentioned in `gnus-message-archive-group' contain a select
-	method. 
+	method.
 
 2000-10-28  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
@@ -523,7 +1321,7 @@
 
 2000-07-03 00:24:55  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
-	* gnus.texi (Splitting Mail): Mention gnus-summary-respool-trace. 
+	* gnus.texi (Splitting Mail): Mention gnus-summary-respool-trace.
 	(Searching for Articles): Fix.
 	(Newest Features): Fix.
 
@@ -578,7 +1376,7 @@
 
 2000-04-26 02:30:06  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
-	* gnus.texi (Posting Styles): Addition. 
+	* gnus.texi (Posting Styles): Addition.
 
 2000-04-24 17:09:17  Felix Natter  <f.natter@ndh.net>
 
@@ -1198,7 +1996,7 @@ Thu Feb 25 00:28:49 1999  Shenghuo ZHU  <zsh@cs.rochester.edu>
 1998-08-27 07:29:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Mail Folders): Addition.
-	
+
 ;; Local Variables:
 ;; coding: iso-2022-7bit
 ;; End:

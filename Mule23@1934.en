@@ -62,6 +62,20 @@ By the way, the latest CUSTOM package for Emacs v19 is available from:
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 
 
+INSTALL regexp-opt.el
+=====================
+
+Some T-gnus modules use the functions `regexp-opt', etc.  That
+functions are defined in regexp-opt.el(c) in the recent Emacsen,
+however, Mule 2.3 does not contain it in the standard Lisp libraries.
+Copy the file contrib/regexp-opt.el to site-lisp directory (or any
+other directory), and byte-compile it as follows:
+
+   % cp -p contrib/regexp-opt.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile regexp-opt.el
+
+
 INSTALL T-gnus
 ==============
 

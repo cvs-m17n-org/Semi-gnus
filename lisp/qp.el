@@ -36,7 +36,9 @@
   "Decode quoted-printable in the region between FROM and TO, per RFC 2045.
 If CODING-SYSTEM is non-nil, decode bytes into characters with that
 coding-system."
-  (interactive "r")
+  (interactive
+   ;; Let the user determine the coding system with "C-x RET c".
+   (list (region-beginning) (region-end) coding-system-for-read))
   (unless (mm-coding-system-p coding-system) ; e.g. `ascii' from Gnus
     (setq coding-system nil))
   (save-excursion
@@ -63,7 +65,7 @@ coding-system."
 					    16)))
 		   (insert byte)
 		   (delete-char 3)
-		   ;; Why backward-char??? 
+		   ;; Why backward-char???
 		   ;;(unless (eq byte 61) ;; 61 is not ?= in XEmacs
 		   ;;  (backward-char))
 		   ))
@@ -135,7 +137,7 @@ encode lines starting with \"From\"."
 		(if (looking-at "From ")
 		    (replace-match "From=20" nil t)
 		  (if (looking-at "-")
-			(replace-match "=2D" nil t))))
+		      (replace-match "=2D" nil t))))
 	      (end-of-line)
 	      ;; Fold long lines.
 	      (while (> (current-column) 76) ; tab-width must be 1.

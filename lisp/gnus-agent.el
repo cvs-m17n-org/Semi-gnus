@@ -1,5 +1,5 @@
 ;;; gnus-agent.el --- unplugged support for Semi-gnus
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -272,7 +272,7 @@ If this is `ask' the hook will query the user."
   "Jj" gnus-agent-toggle-plugged
   "Js" gnus-agent-fetch-session
   "JY" gnus-agent-synchronize-flags
-  "JS" gnus-group-send-drafts
+  "JS" gnus-group-send-queue
   "Ja" gnus-agent-add-group
   "Jr" gnus-agent-remove-group)
 
@@ -283,7 +283,7 @@ If this is `ask' the hook will query the user."
      '("Agent"
        ["Toggle plugged" gnus-agent-toggle-plugged t]
        ["List categories" gnus-enter-category-buffer t]
-       ["Send drafts" gnus-group-send-drafts gnus-plugged]
+       ["Send queue" gnus-group-send-queue gnus-plugged]
        ("Fetch"
 	["All" gnus-agent-fetch-session gnus-plugged]
 	["Group" gnus-agent-fetch-group gnus-plugged])))))
@@ -291,6 +291,7 @@ If this is `ask' the hook will query the user."
 (defvar gnus-agent-summary-mode-map (make-sparse-keymap))
 (gnus-define-keys gnus-agent-summary-mode-map
   "Jj" gnus-agent-toggle-plugged
+  "Ju" gnus-agent-summary-fetch-group
   "J#" gnus-agent-mark-article
   "J\M-#" gnus-agent-unmark-article
   "@" gnus-agent-toggle-mark
@@ -305,6 +306,7 @@ If this is `ask' the hook will query the user."
        ["Mark as downloadable" gnus-agent-mark-article t]
        ["Unmark as downloadable" gnus-agent-unmark-article t]
        ["Toggle mark" gnus-agent-toggle-mark t]
+       ["Fetch downloadable" gnus-agent-summary-fetch-group t]
        ["Catchup undownloaded" gnus-agent-catchup t]))))
 
 (defvar gnus-agent-server-mode-map (make-sparse-keymap))
@@ -322,6 +324,13 @@ If this is `ask' the hook will query the user."
        ["Add" gnus-agent-add-server t]
        ["Remove" gnus-agent-remove-server t]))))
 
+(defun gnus-agent-make-mode-line-string (string mouse-button mouse-func)
+  (if (and (fboundp 'propertize)
+	   (fboundp 'make-mode-line-mouse-map))
+      (propertize string 'local-map
+		  (make-mode-line-mouse-map mouse-button mouse-func))
+    string))
+
 (defun gnus-agent-toggle-plugged (plugged)
   "Toggle whether Gnus is unplugged or not."
   (interactive (list (not gnus-plugged)))
@@ -330,11 +339,17 @@ If this is `ask' the hook will query the user."
 	(setq gnus-plugged plugged)
 	(gnus-agent-possibly-synchronize-flags)
 	(gnus-run-hooks 'gnus-agent-plugged-hook)
-	(setcar (cdr gnus-agent-mode-status) " Plugged"))
+	(setcar (cdr gnus-agent-mode-status)
+		(gnus-agent-make-mode-line-string " Plugged"
+						  'mouse-2
+						  'gnus-agent-toggle-plugged)))
     (gnus-agent-close-connections)
     (setq gnus-plugged plugged)
     (gnus-run-hooks 'gnus-agent-unplugged-hook)
-    (setcar (cdr gnus-agent-mode-status) " Unplugged"))
+    (setcar (cdr gnus-agent-mode-status)
+	    (gnus-agent-make-mode-line-string " Unplugged"
+					      'mouse-2
+					      'gnus-agent-toggle-plugged)))
   (force-mode-line-update))
 
 (defun gnus-agent-close-connections ()
@@ -366,14 +381,16 @@ last form in your `.gnus.el' file:
 \(gnus-agentize)
 
 This will modify the `gnus-setup-news-hook', and
-`message-send-mail-function' variables, and install the Gnus agent
+`message-send-mail-real-function' variables, and install the Gnus agent
 minor mode in all Gnus buffers."
   (interactive)
   (gnus-open-agent)
   (add-hook 'gnus-setup-news-hook 'gnus-agent-queue-setup)
   (unless gnus-agent-send-mail-function
-    (setq gnus-agent-send-mail-function message-send-mail-function
-	  message-send-mail-function 'gnus-agent-send-mail))
+    (setq gnus-agent-send-mail-function (or
+					 message-send-mail-real-function
+					 message-send-mail-function)
+	  message-send-mail-real-function 'gnus-agent-send-mail))
   (unless gnus-agent-covered-methods
     (setq gnus-agent-covered-methods (list gnus-select-method))))
 
@@ -428,8 +445,7 @@ be a select method."
 				   gcc " ,")))))
 	   covered)
       (while (and (not covered) methods)
-	(setq covered
-	      (member (car methods) gnus-agent-covered-methods)
+	(setq covered (gnus-agent-method-p (car methods))
 	      methods (cdr methods)))
       covered)))
 
@@ -461,14 +477,20 @@ be a select method."
 (defun gnus-agent-fetch-group (group)
   "Put all new articles in GROUP into the Agent."
   (interactive (list (gnus-group-group-name)))
-  (unless gnus-plugged
-    (error "Groups can't be fetched when Gnus is unplugged"))
-  (unless group
-    (error "No group on the current line"))
-  (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (gnus-agent-with-fetch
-      (gnus-agent-fetch-group-1 group gnus-command-method)
-      (gnus-message 5 "Fetching %s...done" group))))
+  (let ((state gnus-plugged))
+    (unwind-protect
+	(progn
+	  (unless group
+	    (error "No group on the current line"))
+	  (unless state
+	    (gnus-agent-toggle-plugged gnus-plugged))
+	  (let ((gnus-command-method (gnus-find-method-for-group group)))
+	    (gnus-agent-with-fetch
+	      (gnus-agent-fetch-group-1 group gnus-command-method)
+	      (gnus-message 5 "Fetching %s...done" group))))
+      (when (and (not state)
+		 gnus-plugged)
+	(gnus-agent-toggle-plugged gnus-plugged)))))
 
 (defun gnus-agent-add-group (category arg)
   "Add the current group to an agent category."
@@ -555,7 +577,7 @@ be a select method."
   (unless server
     (error "No server on the current line"))
   (let ((method (gnus-server-get-method nil (gnus-server-server-name))))
-    (when (member method gnus-agent-covered-methods)
+    (when (gnus-agent-method-p method)
       (error "Server already in the agent program"))
     (push method gnus-agent-covered-methods)
     (gnus-server-update-server server)
@@ -568,7 +590,7 @@ be a select method."
   (unless server
     (error "No server on the current line"))
   (let ((method (gnus-server-get-method nil (gnus-server-server-name))))
-    (unless (member method gnus-agent-covered-methods)
+    (unless (gnus-agent-method-p method)
       (error "Server not in the agent program"))
     (setq gnus-agent-covered-methods
 	  (delete method gnus-agent-covered-methods))
@@ -677,6 +699,29 @@ the actual number of articles toggled is returned."
        (pop gnus-newsgroup-undownloaded) gnus-catchup-mark)))
   (gnus-summary-position-point))
 
+(defun gnus-agent-summary-fetch-group ()
+  "Fetch the downloadable articles in the group."
+  (interactive)
+  (let ((articles gnus-newsgroup-downloadable)
+	(gnus-command-method (gnus-find-method-for-group gnus-newsgroup-name))
+	(state gnus-plugged))
+    (unwind-protect
+	(progn
+	  (unless state
+	    (gnus-agent-toggle-plugged t))
+	  (unless articles
+	    (error "No articles to download"))
+	  (gnus-agent-with-fetch
+	    (gnus-agent-fetch-articles gnus-newsgroup-name articles))
+	  (save-excursion
+	    (dolist (article articles)
+	      (setq gnus-newsgroup-downloadable
+		    (delq article gnus-newsgroup-downloadable))
+	      (gnus-summary-mark-article article gnus-unread-mark))))
+      (when (and (not state)
+		 gnus-plugged)
+	(gnus-agent-toggle-plugged nil)))))
+
 ;;;
 ;;; Internal functions
 ;;;
@@ -709,7 +754,12 @@ the actual number of articles toggled is returned."
 	 (when (and sym (boundp sym))
 	   (if (and (boundp (setq osym (intern (symbol-name sym) orig)))
 		    (setq elem (symbol-value osym)))
-	       (setcdr elem (cdr (symbol-value sym)))
+	       (progn
+		 (if (and (integerp (car (symbol-value sym)))
+			  (> (car elem) (car (symbol-value sym))))
+		     (setcar elem (car (symbol-value sym))))
+		 (if (integerp (cdr (symbol-value sym)))
+		     (setcdr elem (cdr (symbol-value sym)))))
 	     (set (intern (symbol-name sym) orig) (symbol-value sym)))))
        new))
     (gnus-make-directory (file-name-directory file))
@@ -728,7 +778,7 @@ the actual number of articles toggled is returned."
 	   (file-name-coding-system nnmail-pathname-coding-system)
 	   (pathname-coding-system nnmail-pathname-coding-system)
 	   (file (gnus-agent-lib-file "active"))
-	   oactive)
+	   oactive-min)
       (gnus-make-directory (file-name-directory file))
       (with-temp-file file
 	(when (file-exists-p file)
@@ -737,16 +787,12 @@ the actual number of articles toggled is returned."
 	(when (re-search-forward
 	       (concat "^" (regexp-quote group) " ") nil t)
 	  (save-excursion
-	    (save-restriction
-	      (narrow-to-region (match-beginning 0)
-				(progn
-				  (forward-line 1)
-				  (point)))
-	      (setq oactive (car (nnmail-parse-active)))))
+	    (read (current-buffer))			 ;; max
+	    (setq oactive-min (read (current-buffer))))  ;; min
 	  (gnus-delete-line))
 	(insert (format "%S %d %d y\n" (intern group)
 			(cdr active)
-			(or (car oactive) (car active))))
+			(or oactive-min (car active))))
 	(goto-char (point-max))
 	(while (search-backward "\\." nil t)
 	  (delete-char 1))))))
@@ -976,9 +1022,8 @@ the actual number of articles toggled is returned."
 	   (setq articles (nthcdr i articles))))
     ;; add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
-      (setq articles (gnus-union (gnus-uncompress-sequence (cdr arts))
-				 articles)))
-    (setq articles (sort articles '<))
+      (setq articles (gnus-range-add articles (cdr arts))))
+    (setq articles (sort (gnus-uncompress-sequence articles) '<))
     ;; Remove known articles.
     (when (gnus-agent-load-alist group)
       (setq articles (gnus-sorted-intersection
@@ -1069,7 +1114,8 @@ the actual number of articles toggled is returned."
 (defun gnus-agent-save-alist (group &optional articles state dir)
   "Save the article-state alist for GROUP."
   (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+	(pathname-coding-system nnmail-pathname-coding-system)
+	print-level print-length)
     (with-temp-file (if dir
 			(expand-file-name ".agentview" dir)
 		      (gnus-agent-article-name ".agentview" group))
@@ -1119,12 +1165,12 @@ the actual number of articles toggled is returned."
 	  (error
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Error (%s).  Continue? " err))
-	     (error "Cannot fetch articles into the Gnus agent.")))
+	     (error "Cannot fetch articles into the Gnus agent")))
 	  (quit
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Quit fetching session (%s).  Continue? "
 				    err))
-	     (signal 'quit "Cannot fetch articles into the Gnus agent."))))
+	     (signal 'quit "Cannot fetch articles into the Gnus agent"))))
 	(pop methods))
       (gnus-message 6 "Finished fetching articles into the Gnus agent"))))
 
@@ -1145,7 +1191,8 @@ the actual number of articles toggled is returned."
     (unless (gnus-check-group group)
       (error "Can't open server for %s" group))
     ;; Fetch headers.
-    (when (and (or (gnus-active group) (gnus-activate-group group))
+    (when (and (or (gnus-active group)
+		   (gnus-activate-group group))
 	       (setq articles (gnus-agent-fetch-headers group))
 	       (let ((nntp-server-buffer gnus-agent-overview-buffer))
 		 ;; Parse them and see which articles we want to fetch.
@@ -1162,10 +1209,9 @@ the actual number of articles toggled is returned."
 	    (gnus-get-predicate
 	     (or (gnus-group-find-parameter group 'agent-predicate t)
 		 (cadr category))))
-      (if (memq (caaddr predicate) '(gnus-agent-true gnus-agent-false))
+      (if (memq predicate '(gnus-agent-true gnus-agent-false))
 	  ;; Simple implementation
-	  (setq arts
-		(and (eq (caaddr predicate) 'gnus-agent-true) articles))
+	  (setq arts (and (eq predicate 'gnus-agent-true) articles))
 	(setq arts nil)
 	(setq score-param
 	      (or (gnus-group-get-parameter group 'agent-score t)
@@ -1195,6 +1241,7 @@ the actual number of articles toggled is returned."
     (setq arts (assq 'download (gnus-info-marks
 				(setq info (gnus-get-info group)))))
     (when (cdr arts)
+      (gnus-message 8 "Agent is downloading marked articles...")
       (gnus-agent-fetch-articles
        group (gnus-uncompress-range (cdr arts)))
       (setq marks (delq arts (gnus-info-marks info)))
@@ -1312,7 +1359,7 @@ The following commands are available:
 (defalias 'gnus-category-position-point 'gnus-goto-colon)
 
 (defun gnus-category-insert-line (category)
-  (let* ((gnus-tmp-name (car category))
+  (let* ((gnus-tmp-name (format "%s" (car category)))
 	 (gnus-tmp-groups (length (cadddr category))))
     (beginning-of-line)
     (gnus-add-text-properties
@@ -1481,7 +1528,11 @@ The following commands are available:
 
 (defun gnus-category-make-function (cat)
   "Make a function from category CAT."
-  `(lambda () ,(gnus-category-make-function-1 cat)))
+  (let ((func (gnus-category-make-function-1 cat)))
+    (if (and (= (length func) 1)
+	     (symbolp (car func)))
+	(car func)
+      (gnus-byte-compile `(lambda () ,func)))))
 
 (defun gnus-agent-true ()
   "Return t."
@@ -1719,7 +1770,7 @@ The following commands are available:
   (let ((init-file-user "")
 	(gnus-always-read-dribble-file t))
     (gnus))
-  (gnus-group-send-drafts)
+  (gnus-group-send-queue)
   (gnus-agent-fetch-session))
 
 (provide 'gnus-agent)

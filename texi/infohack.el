@@ -29,20 +29,31 @@
 
 (defun infohack-remove-unsupported ()
   (goto-char (point-min))
-  (while (re-search-forward "@\\(end \\)?ifnottex" nil t) 
-    (replace-match "")))
+  (while (re-search-forward "@\\(end \\)?ifnottex" nil t)
+    (replace-match ""))
+  (goto-char (point-min))
+  (while (search-forward "\n@iflatex\n" nil t)
+    (delete-region (1+ (match-beginning 0))
+		   (search-forward "\n@end iflatex\n"))))
 
 (defun infohack (file)
   (let ((dest-directory default-directory)
-	(max-lisp-eval-depth (max max-lisp-eval-depth 600)))
+	(max-lisp-eval-depth (max max-lisp-eval-depth 600))
+	coding-system)
     (find-file file)
+    (setq buffer-read-only nil)
+    (setq coding-system (if (boundp 'buffer-file-coding-system)
+			    buffer-file-coding-system
+			  file-coding-system))
     (infohack-remove-unsupported)
-    (texinfo-every-node-update) 
+    (texinfo-every-node-update)
     (texinfo-format-buffer t) ;; Don't save any file.
     (setq default-directory dest-directory)
-    (setq buffer-file-name 
+    (setq buffer-file-name
 	  (expand-file-name (file-name-nondirectory buffer-file-name)
 			    default-directory))
+    (setq buffer-file-coding-system coding-system
+	  file-coding-system coding-system)
     (if (> (buffer-size) 100000)
 	(Info-split))
     (save-buffer)))
@@ -69,6 +80,7 @@
     (condition-case err
 	(progn
 	  (find-file file)
+	  (setq buffer-read-only nil)
 	  (buffer-disable-undo (current-buffer))
 	  (if (boundp 'MULE)
 	      (setq output-coding-system file-coding-system)

@@ -23,9 +23,13 @@
 
 ;;; Commentary:
 
+;; RFC 2015 is updated by RFC 3156, this file should be compatible
+;; with both.
+
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'gnus-clfns))
 (require 'mm-decode)
 
 (defvar mml2015-use (or
@@ -60,6 +64,18 @@
 
 (defvar mml2015-result-buffer nil)
 
+(defvar mml2015-trust-boundaries-alist
+  '((trust-undefined . nil)
+    (trust-none      . nil)
+    (trust-marginal  . t)
+    (trust-full      . t)
+    (trust-ultimate  . t))
+  "Trust boundaries for a signer's GnuPG key.
+This alist contains pairs of the form (trust-symbol . boolean), with
+symbols that are contained in `gpg-unabbrev-trust-alist'. The boolean
+specifies whether the given trust value is good enough to be trusted
+by you.")
+
 ;;; mailcrypt wrapper
 
 (eval-and-compile
@@ -77,6 +93,11 @@
 (defvar mml2015-decrypt-function 'mailcrypt-decrypt)
 (defvar mml2015-verify-function 'mailcrypt-verify)
 
+(defun mml2015-format-error (err)
+  (if (stringp (cadr err))
+      (cadr err)
+    (format "%S" (cdr err))))
+
 (defun mml2015-mailcrypt-decrypt (handle ctl)
   (catch 'error
     (let (child handles result)
@@ -93,7 +114,7 @@
 		  (funcall mml2015-decrypt-function)
 		(error
 		 (mm-set-handle-multipart-parameter
-		  mm-security-handle 'gnus-details (cadr err))
+		  mm-security-handle 'gnus-details (mml2015-format-error err))
 		 nil)
 		(quit
 		 (mm-set-handle-multipart-parameter
@@ -118,7 +139,7 @@
 	      (funcall mml2015-decrypt-function)
 	    (error
 	     (mm-set-handle-multipart-parameter
-	      mm-security-handle 'gnus-details (cadr err))
+	      mm-security-handle 'gnus-details (mml2015-format-error err))
 	     nil)
 	    (quit
 	     (mm-set-handle-multipart-parameter
@@ -132,7 +153,8 @@
 
 (defun mml2015-fix-micalg (alg)
   (and alg
-       (upcase (if (string-match "^pgp-" alg)
+       ;; Mutt/1.2.5i has seen sending micalg=php-sha1
+       (upcase (if (string-match "^p[gh]p-" alg)
 		   (substring alg (match-end 0))
 		 alg))))
 
@@ -175,38 +197,68 @@
 	      (replace-match "-----BEGIN PGP SIGNATURE-----" t t))
 	  (if (re-search-forward "^-----END PGP [^-]+-----\r?$" nil t)
 	      (replace-match "-----END PGP SIGNATURE-----" t t)))
-	(unless (condition-case err
-		    (funcall mml2015-verify-function)
-		  (error
-		   (mm-set-handle-multipart-parameter
-		    mm-security-handle 'gnus-details (cadr err))
-		   nil)
-		  (quit
-		   (mm-set-handle-multipart-parameter
-		    mm-security-handle 'gnus-details "Quit.")
-		   nil))
-	  (mm-set-handle-multipart-parameter
-	   mm-security-handle 'gnus-info "Failed")
-	  (throw 'error handle)))
+	(let ((mc-gpg-debug-buffer (get-buffer-create " *gnus gpg debug*")))
+	  (unless (condition-case err
+		      (prog1
+			  (funcall mml2015-verify-function)
+			(if (get-buffer " *mailcrypt stderr temp")
+			    (mm-set-handle-multipart-parameter
+			     mm-security-handle 'gnus-details
+			     (with-current-buffer " *mailcrypt stderr temp"
+			       (buffer-string))))
+			(if (get-buffer " *mailcrypt stdout temp")
+			    (kill-buffer " *mailcrypt stdout temp"))
+			(if (get-buffer " *mailcrypt stderr temp")
+			    (kill-buffer " *mailcrypt stderr temp"))
+			(if (get-buffer " *mailcrypt status temp")
+			    (kill-buffer " *mailcrypt status temp"))
+			(if (get-buffer mc-gpg-debug-buffer)
+			    (kill-buffer mc-gpg-debug-buffer)))
+		    (error
+		     (mm-set-handle-multipart-parameter
+		      mm-security-handle 'gnus-details (mml2015-format-error err))
+		     nil)
+		    (quit
+		     (mm-set-handle-multipart-parameter
+		      mm-security-handle 'gnus-details "Quit.")
+		     nil))
+	    (mm-set-handle-multipart-parameter
+	     mm-security-handle 'gnus-info "Failed")
+	    (throw 'error handle))))
       (mm-set-handle-multipart-parameter
        mm-security-handle 'gnus-info "OK")
       handle)))
 
 (defun mml2015-mailcrypt-clear-verify ()
-  (if (condition-case err
-	  (funcall mml2015-verify-function)
-	(error
-	 (mm-set-handle-multipart-parameter
-	  mm-security-handle 'gnus-details (cadr err))
-	 nil)
-	(quit
-	 (mm-set-handle-multipart-parameter
-	  mm-security-handle 'gnus-details "Quit.")
-	 nil))
+  (let ((mc-gpg-debug-buffer (get-buffer-create " *gnus gpg debug*")))
+    (if (condition-case err
+	    (prog1
+		(funcall mml2015-verify-function)
+	      (if (get-buffer " *mailcrypt stderr temp")
+		  (mm-set-handle-multipart-parameter
+		   mm-security-handle 'gnus-details
+		   (with-current-buffer " *mailcrypt stderr temp"
+		     (buffer-string))))
+	      (if (get-buffer " *mailcrypt stdout temp")
+		  (kill-buffer " *mailcrypt stdout temp"))
+	      (if (get-buffer " *mailcrypt stderr temp")
+		  (kill-buffer " *mailcrypt stderr temp"))
+	      (if (get-buffer " *mailcrypt status temp")
+		  (kill-buffer " *mailcrypt status temp"))
+	      (if (get-buffer mc-gpg-debug-buffer)
+		  (kill-buffer mc-gpg-debug-buffer)))
+	  (error
+	   (mm-set-handle-multipart-parameter
+	    mm-security-handle 'gnus-details (mml2015-format-error err))
+	   nil)
+	  (quit
+	   (mm-set-handle-multipart-parameter
+	    mm-security-handle 'gnus-details "Quit.")
+	   nil))
+	(mm-set-handle-multipart-parameter
+	 mm-security-handle 'gnus-info "OK")
       (mm-set-handle-multipart-parameter
-       mm-security-handle 'gnus-info "OK")
-    (mm-set-handle-multipart-parameter
-     mm-security-handle 'gnus-info "Failed")))
+       mm-security-handle 'gnus-info "Failed"))))
 
 (defun mml2015-mailcrypt-sign (cont)
   (mc-sign-generic (message-options-get 'message-sender)
@@ -216,14 +268,14 @@
 	hash point)
     (goto-char (point-min))
     (unless (re-search-forward "^-----BEGIN PGP SIGNED MESSAGE-----\r?$" nil t)
-      (error "Cannot find signed begin line." ))
+      (error "Cannot find signed begin line"))
     (goto-char (match-beginning 0))
     (forward-line 1)
     (unless (looking-at "Hash:[ \t]*\\([a-zA-Z0-9]+\\)")
-      (error "Cannot not find PGP hash." ))
+      (error "Cannot not find PGP hash"))
     (setq hash (match-string 1))
     (unless (re-search-forward "^$" nil t)
-      (error "Cannot not find PGP message." ))
+      (error "Cannot not find PGP message"))
     (forward-line 1)
     (delete-region (point-min) (point))
     (insert (format "Content-Type: multipart/signed; boundary=\"%s\";\n"
@@ -234,12 +286,12 @@
     (setq point (point))
     (goto-char (point-max))
     (unless (re-search-backward "^-----END PGP SIGNATURE-----\r?$" nil t)
-      (error "Cannot find signature part." ))
+      (error "Cannot find signature part"))
     (replace-match "-----END PGP MESSAGE-----" t t)
     (goto-char (match-beginning 0))
     (unless (re-search-backward "^-----BEGIN PGP SIGNATURE-----\r?$"
 				nil t)
-      (error "Cannot find signature part." ))
+      (error "Cannot find signature part"))
     (replace-match "-----BEGIN PGP MESSAGE-----" t t)
     (goto-char (match-beginning 0))
     (save-restriction
@@ -267,13 +319,13 @@
       (mc-encrypt-generic
        (or (message-options-get 'message-recipients)
 	   (message-options-set 'message-recipients
-			      (mc-cleanup-recipient-headers
-			       (read-string "Recipients: "))))
+				(mc-cleanup-recipient-headers
+				 (read-string "Recipients: "))))
        nil nil nil
        (message-options-get 'message-sender))))
   (goto-char (point-min))
   (unless (looking-at "-----BEGIN PGP MESSAGE-----")
-    (error "Fail to encrypt the message."))
+    (error "Fail to encrypt the message"))
   (let ((boundary
 	 (funcall mml-boundary-function (incf mml-multipart-number))))
     (insert (format "Content-Type: multipart/encrypted; boundary=\"%s\";\n"
@@ -314,7 +366,10 @@
 	       (buffer-string)))
 	    (set-buffer cipher)
 	    (erase-buffer)
-	    (insert-buffer plain)))
+	    (insert-buffer plain)
+	    (goto-char (point-min))
+	    (while (search-forward "\r\n" nil t)
+	      (replace-match "\n" t t))))
 	'(t)
       ;; Some wrong with the return value, check plain text buffer.
       (if (> (point-max) (point-min))
@@ -334,15 +389,55 @@
       (mm-set-handle-multipart-parameter
        mm-security-handle 'gnus-info "Failed"))))
 
-(defun mml2015-gpg-extract-from ()
+(defun mml2015-gpg-pretty-print-fpr (fingerprint)
+  (let* ((result "")
+	 (fpr-length (string-width fingerprint))
+	 (n-slice 0)
+	 slice)
+    (setq fingerprint (string-to-list fingerprint))
+    (while fingerprint
+      (setq fpr-length (- fpr-length 4))
+      (setq slice (butlast fingerprint fpr-length))
+      (setq fingerprint (nthcdr 4 fingerprint))
+      (setq n-slice (1+ n-slice))
+      (setq result
+	    (concat
+	     result
+	     (case n-slice
+	       (1  slice)
+	       (otherwise (concat " " slice))))))
+    result))
+
+(defun mml2015-gpg-extract-signature-details ()
   (goto-char (point-min))
-  (if (re-search-forward "^gpg: Good signature from \"\\(.*\\)\"$" nil t)
-      (match-string 1)
-    "From unknown user"))
+  (if (boundp 'gpg-unabbrev-trust-alist)
+      (let* ((signer (and (re-search-forward
+			   "^\\[GNUPG:\\] GOODSIG [0-9A-Za-z]* \\(.*\\)$"
+			   nil t)
+			  (match-string 1)))
+	     (fprint (and (re-search-forward
+			   "^\\[GNUPG:\\] VALIDSIG \\([0-9a-zA-Z]*\\) "
+			   nil t)
+			  (match-string 1)))
+	     (trust  (and (re-search-forward "^\\[GNUPG:\\] \\(TRUST_.*\\)$"
+					     nil t)
+			  (match-string 1)))
+	     (trust-good-enough-p
+	      (cdr (assoc (cdr (assoc trust gpg-unabbrev-trust-alist))
+			  mml2015-trust-boundaries-alist))))
+	(if (and signer trust fprint)
+	    (concat signer
+		    (unless trust-good-enough-p
+		      (concat "\nUntrusted, Fingerprint: "
+			      (mml2015-gpg-pretty-print-fpr fprint))))
+	  "From unknown user"))
+    (if (re-search-forward "^gpg: Good signature from \"\\(.*\\)\"$" nil t)
+	(match-string 1)
+      "From unknown user")))
 
 (defun mml2015-gpg-verify (handle ctl)
   (catch 'error
-    (let (part message signature)
+    (let (part message signature info-is-set-p)
       (unless (setq part (mm-find-raw-part-by-type
 			  ctl (or (mm-handle-multipart-ctl-parameter
 				   ctl 'protocol)
@@ -354,6 +449,16 @@
       (with-temp-buffer
 	(setq message (current-buffer))
 	(insert part)
+	;; Convert <LF> to <CR><LF> in verify mode.  Sign and
+	;; clearsign use --textmode. The conversion is not necessary.
+	;; In clearverify, the conversion is not necessary either.
+	(goto-char (point-min))
+	(end-of-line)
+	(while (not (eobp))
+	  (unless (eq (char-before) ?\r)
+	    (insert "\r"))
+	  (forward-line)
+	  (end-of-line))
 	(with-temp-buffer
 	  (setq signature (current-buffer))
 	  (unless (setq part (mm-find-part-by-type
@@ -371,19 +476,26 @@
 			   (buffer-string))))
 		    (error
 		     (mm-set-handle-multipart-parameter
-		      mm-security-handle 'gnus-details (cadr err))
+		      mm-security-handle 'gnus-details (mml2015-format-error err))
+		     (mm-set-handle-multipart-parameter
+		      mm-security-handle 'gnus-info "Error.")
+		     (setq info-is-set-p t)
 		     nil)
 		    (quit
 		     (mm-set-handle-multipart-parameter
 		      mm-security-handle 'gnus-details "Quit.")
+		     (mm-set-handle-multipart-parameter
+		      mm-security-handle 'gnus-info "Quit.")
+		     (setq info-is-set-p t)
 		     nil))
-	    (mm-set-handle-multipart-parameter
-	     mm-security-handle 'gnus-info "Failed")
+	    (unless info-is-set-p
+	      (mm-set-handle-multipart-parameter
+	       mm-security-handle 'gnus-info "Failed"))
 	    (throw 'error handle)))
 	(mm-set-handle-multipart-parameter
-	 mm-security-handle 'gnus-info 
-	 (with-current-buffer mml2015-result-buffer 
-	   (mml2015-gpg-extract-from))))
+	 mm-security-handle 'gnus-info
+	 (with-current-buffer mml2015-result-buffer
+	   (mml2015-gpg-extract-signature-details))))
       handle)))
 
 (defun mml2015-gpg-clear-verify ()
@@ -396,16 +508,16 @@
 	       (buffer-string))))
 	(error
 	 (mm-set-handle-multipart-parameter
-	  mm-security-handle 'gnus-details (cadr err))
+	  mm-security-handle 'gnus-details (mml2015-format-error err))
 	 nil)
 	(quit
 	 (mm-set-handle-multipart-parameter
 	  mm-security-handle 'gnus-details "Quit.")
 	 nil))
       (mm-set-handle-multipart-parameter
-       mm-security-handle 'gnus-info 
-       (with-current-buffer mml2015-result-buffer 
-	 (mml2015-gpg-extract-from)))
+       mm-security-handle 'gnus-info
+       (with-current-buffer mml2015-result-buffer
+	 (mml2015-gpg-extract-signature-details)))
     (mm-set-handle-multipart-parameter
      mm-security-handle 'gnus-info "Failed")))
 
@@ -424,7 +536,7 @@
 				 t t) ; armor & textmode
 	(unless (> (point-max) (point-min))
 	  (pop-to-buffer mml2015-result-buffer)
-	  (error "Sign error.")))
+	  (error "Sign error")))
       (goto-char (point-min))
       (while (re-search-forward "\r+$" nil t)
 	(replace-match "" t t))
@@ -464,7 +576,7 @@
 		 t t) ; armor & textmode
 	  (unless (> (point-max) (point-min))
 	    (pop-to-buffer mml2015-result-buffer)
-	    (error "Encrypt error.")))
+	    (error "Encrypt error")))
 	(goto-char (point-min))
 	(while (re-search-forward "\r+$" nil t)
 	  (replace-match "" t t))
@@ -530,7 +642,7 @@
   (let ((func (nth 2 (assq mml2015-use mml2015-function-alist))))
     (if func
 	(funcall func cont)
-      (error "Cannot find encrypt function."))))
+      (error "Cannot find encrypt function"))))
 
 ;;;###autoload
 (defun mml2015-sign (cont)
@@ -538,7 +650,7 @@
   (let ((func (nth 1 (assq mml2015-use mml2015-function-alist))))
     (if func
 	(funcall func cont)
-      (error "Cannot find sign function."))))
+      (error "Cannot find sign function"))))
 
 ;;;###autoload
 (defun mml2015-self-encrypt ()

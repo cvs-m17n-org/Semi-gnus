@@ -63,6 +63,20 @@ T-gnus $B$O:G?7HG$N(B CUSTOM, APEL, FLIM $B$*$h$S(B SEMI $B$+(B WEMI $B$r
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 
 
+INSTALL regexp-opt.el
+=====================
+
+T-gnus $B$N$$$/$D$+$N%b%8%e!<%k$O(B `regexp-opt' $B$J$I$N4X?t$r;H$$$^$9!#$=(B
+$B$l$i$N4X?t$O!":G6a$N(B Emacsen $B$G$O(B regexp-opt.el(c) $B$GDj5A$5$l$F$$$k$N(B
+$B$G$9$,!"(BMule 2.3 $B$O$=$l$rI8=`$N(B Lisp $B%i%$%V%i%j$NCf$K4^$s$G$$$^$;$s!#(B
+$B0J2<$N$h$&$K(B contrib/regexp-opt.el $B$r(B site-lisp $B%G%#%l%/%H%j(B ($B$^$?$OB>(B
+$B$N%G%#%l%/%H%j(B) $B$K%3%T!<$7$F!"(Bbyte-compile $B$7$F2<$5$$!#(B
+
+   % cp -p contrib/regexp-opt.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile regexp-opt.el
+
+
 INSTALL T-gnus
 ==============
 

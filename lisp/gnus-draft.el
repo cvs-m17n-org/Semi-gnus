@@ -1,5 +1,5 @@
 ;;; gnus-draft.el --- draft message support for Semi-gnus
-;; Copyright (C) 1997, 1998, 1999, 2000
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -95,12 +95,18 @@
 (defun gnus-draft-edit-message ()
   "Enter a mail/post buffer to edit and send the draft."
   (interactive)
-  (let ((article (gnus-summary-article-number)))
+  (let ((article (gnus-summary-article-number))
+	(group gnus-newsgroup-name))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup-for-editing article gnus-newsgroup-name)
+    (gnus-draft-setup-for-editing article group)
+    (set-buffer-modified-p t)
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers)
+	(message-remove-header "date")))
     (message-save-drafts)
     (let ((gnus-verbose-backends nil))
-      (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
+      (gnus-request-expire-articles (list article) group t))
     (push
      `((lambda ()
 	 (when (gnus-buffer-exists-p ,gnus-summary-buffer)
@@ -118,8 +124,8 @@
     (while (setq article (pop articles))
       (gnus-summary-remove-process-mark article)
       (unless (memq article gnus-newsgroup-unsendable)
-	(let ((message-sending-message 
-	       (format "Sending message %d of %d..." 
+	(let ((message-sending-message
+	       (format "Sending message %d of %d..."
 		       (- total (length articles)) total)))
 	  (gnus-draft-send article gnus-newsgroup-name t))
 	(gnus-summary-mark-article article gnus-canceled-mark)))))
@@ -128,7 +134,7 @@
   "Send message ARTICLE."
   (let ((message-syntax-checks (if interactive nil
 				 'dont-check-for-anything-just-trust-me))
-	(message-inhibit-body-encoding (or (not group) 
+	(message-inhibit-body-encoding (or (not group)
 					   (equal group "nndraft:queue")
 					   message-inhibit-body-encoding))
 	(message-send-hook (and group (not (equal group "nndraft:queue"))
@@ -157,17 +163,14 @@
 		    (function
 		     (lambda ()
 		       (interactive)
-		       (funcall message-send-news-function method)
-		       )))
-		   (funcall message-send-news-function method)
-		   )
+		       (funcall message-send-news-function method))))
+		   (funcall message-send-news-function method))
 		  ((eq type 'mail)
 		   (mime-edit-maybe-split-and-send
 		    (function
 		     (lambda ()
 		       (interactive)
-		       (funcall message-send-mail-function)
-		       )))
+		       (funcall message-send-mail-function))))
 		   (funcall message-send-mail-function)
 		   t)))
       (let ((gnus-verbose-backends nil))
@@ -180,7 +183,7 @@
   (gnus-uu-mark-buffer)
   (gnus-draft-send-message))
 
-(defun gnus-group-send-drafts ()
+(defun gnus-group-send-queue ()
   "Send all sendable articles from the queue group."
   (interactive)
   (gnus-activate-group "nndraft:queue")
@@ -243,14 +246,21 @@
 	  (forward-line 1)
 	  (setq ga (message-fetch-field gnus-draft-meta-information-header))
 	  (message-set-auto-save-file-name))))
+    (gnus-backlog-remove-article group narticle)
     (when (and ga
 	       (ignore-errors (setq ga (car (read-from-string ga)))))
+      (setq gnus-newsgroup-name
+	    (if (equal (car ga) "") nil (car ga)))
       (setq message-post-method
 	    `(lambda (arg)
 	       (gnus-post-method arg ,(car ga))))
-      (message-add-action
-       `(gnus-add-mark ,(car ga) 'replied ,(cadr ga))
-       'send))))
+      (unless (equal (cadr ga) "")
+	(message-add-action
+	 `(progn
+	    (gnus-add-mark ,(car ga) 'replied ,(cadr ga))
+	    (gnus-request-set-mark ,(car ga) (list (list (list ,(cadr ga))
+							 'add '(reply)))))
+	 'send)))))
 
 (defvar gnus-draft-send-draft-buffer " *send draft*")
 (defun gnus-draft-setup-for-sending (narticle group)
@@ -260,8 +270,7 @@
     (set-buffer gnus-draft-send-draft-buffer)
     (erase-buffer)
     (if (not (gnus-request-restore-buffer article group))
-	(error "Couldn't restore the article")
-      )))
+	(error "Couldn't restore the article"))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."

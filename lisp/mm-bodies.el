@@ -1,5 +1,7 @@
 ;;; mm-bodies.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -70,7 +72,7 @@ If no encoding was done, nil is returned."
 	    (if (re-search-forward "[^\x0-\x7f]" nil t)
 		(or mail-parse-charset
 		    (message-options-get 'mm-encody-body-charset)
-		    (message-options-set 
+		    (message-options-set
 		     'mm-encody-body-charset
 		     (mm-read-charset "Charset used in the article: ")))
 	      ;; The logic in `mml-generate-mime-1' confirms that it's OK
@@ -82,7 +84,8 @@ If no encoding was done, nil is returned."
 	    (mm-encode-coding-region (point-min) (point-max) charset)
 	    charset)
 	(goto-char (point-min))
-	(let ((charsets (mm-find-mime-charset-region (point-min) (point-max)))
+	(let ((charsets (mm-find-mime-charset-region (point-min) (point-max)
+						     mm-hack-charsets))
 	      start)
 	  (cond
 	   ;; No encoding.
@@ -128,6 +131,8 @@ If no encoding was done, nil is returned."
 
 (defun mm-body-encoding (charset &optional encoding)
   "Do Content-Transfer-Encoding and return the encoding of the current buffer."
+  (when (stringp encoding)
+    (setq encoding (intern (downcase encoding))))
   (let ((bits (mm-body-7-or-8))
 	(longp (mm-long-lines-p 1000)))
     (require 'message)
@@ -180,11 +185,14 @@ If no encoding was done, nil is returned."
 ;;;
 
 (defun mm-decode-content-transfer-encoding (encoding &optional type)
+  "Decodes buffer encoded with ENCODING, returning success status.
+If TYPE is `text/plain' CRLF->LF translation may occur."
   (prog1
       (condition-case error
 	  (cond
 	   ((eq encoding 'quoted-printable)
-	    (quoted-printable-decode-region (point-min) (point-max)))
+	    (quoted-printable-decode-region (point-min) (point-max))
+	    t)
 	   ((eq encoding 'base64)
 	    (base64-decode-region
 	     (point-min)
@@ -203,18 +211,21 @@ If no encoding was done, nil is returned."
 	       (point))))
 	   ((memq encoding '(7bit 8bit binary))
 	    ;; Do nothing.
-	    )
+	    t)
 	   ((null encoding)
 	    ;; Do nothing.
-	    )
+	    t)
 	   ((memq encoding '(x-uuencode x-uue))
 	    (require 'mm-uu)
-	    (funcall mm-uu-decode-function (point-min) (point-max)))
+	    (funcall mm-uu-decode-function (point-min) (point-max))
+	    t)
 	   ((eq encoding 'x-binhex)
 	    (require 'mm-uu)
-	    (funcall mm-uu-binhex-decode-function (point-min) (point-max)))
+	    (funcall mm-uu-binhex-decode-function (point-min) (point-max))
+	    t)
 	   ((functionp encoding)
-	    (funcall encoding (point-min) (point-max)))
+	    (funcall encoding (point-min) (point-max))
+	    t)
 	   (t
 	    (message "Unknown encoding %s; defaulting to 8bit" encoding)))
 	(error
@@ -232,7 +243,7 @@ If no encoding was done, nil is returned."
 The characters in CHARSET should then be decoded."
   (if (stringp charset)
       (setq charset (intern (downcase charset))))
-  (if (or (not charset) 
+  (if (or (not charset)
 	  (eq 'gnus-all mail-parse-ignored-charsets)
 	  (memq 'gnus-all mail-parse-ignored-charsets)
 	  (memq charset mail-parse-ignored-charsets))
@@ -245,7 +256,7 @@ The characters in CHARSET should then be decoded."
 	(if (and (not coding-system)
 		 (listp mail-parse-ignored-charsets)
 		 (memq 'gnus-unknown mail-parse-ignored-charsets))
-	    (setq coding-system 
+	    (setq coding-system
 		  (mm-charset-to-coding-system mail-parse-charset)))
 	(when (and charset coding-system
 		   ;; buffer-file-coding-system
@@ -261,7 +272,7 @@ The characters in CHARSET should then be decoded."
   "Decode STRING with CHARSET."
   (when (stringp charset)
     (setq charset (intern (downcase charset))))
-  (when (or (not charset) 
+  (when (or (not charset)
 	    (eq 'gnus-all mail-parse-ignored-charsets)
 	    (memq 'gnus-all mail-parse-ignored-charsets)
 	    (memq charset mail-parse-ignored-charsets))
@@ -272,7 +283,7 @@ The characters in CHARSET should then be decoded."
        (if (and (not coding-system)
 		(listp mail-parse-ignored-charsets)
 		(memq 'gnus-unknown mail-parse-ignored-charsets))
-	   (setq coding-system 
+	   (setq coding-system
 		 (mm-charset-to-coding-system mail-parse-charset)))
        (when (and charset coding-system
 		  (mm-multibyte-p)
@@ -283,4 +294,4 @@ The characters in CHARSET should then be decoded."
 
 (provide 'mm-bodies)
 
-;; mm-bodies.el ends here
+;;; mm-bodies.el ends here

@@ -225,6 +225,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
+(when (boundp 'MULE)
+  ;; Load special macros for compiling canlock.el.
+  (load (expand-file-name "canlock-om.el" srcdir) nil t t))
+
 (require 'custom)
 
 ;; Bind functions defined by `defun-maybe'.
@@ -325,22 +329,23 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		 (while (setq form (condition-case nil
 				       (read buffer)
 				     (error nil)))
-		   (while form
-		     (setq elem (pop form))
-		     (unless (memq (car-safe elem)
-				   '(\` backquote
-				     defcustom defface defgroup
-				     define-widget quote))
-		       (while (consp elem)
-			 (push (car elem) form)
-			 (setq elem (cdr elem)))
-		       (when (and elem
-				  (symbolp elem)
-				  (not (eq ': elem))
-				  (eq ?: (aref (symbol-name elem) 0))
-				  (not (memq elem ignores))
-				  (not (memq elem keywords)))
-			 (push elem keywords)))))))
+		   (when (listp form)
+		     (while form
+		       (setq elem (pop form))
+		       (unless (memq (car-safe elem)
+				     '(\` backquote
+				       defcustom defface defgroup
+				       define-widget quote))
+			 (while (consp elem)
+			   (push (car elem) form)
+			   (setq elem (cdr elem)))
+			 (when (and elem
+				    (symbolp elem)
+				    (not (eq ': elem))
+				    (eq ?: (aref (symbol-name elem) 0))
+				    (not (memq elem ignores))
+				    (not (memq elem keywords)))
+			   (push elem keywords))))))))
 	     (setq keywords (sort keywords
 				  (lambda (a b)
 				    (string-lessp (symbol-name a)
@@ -436,10 +441,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	      (progn (require 'shimbun) nil)
 	    (error '("nnshimbun.el")))
 	  (unless (or (condition-case code
-			  (require 'w3-forms)
+			  (require 'w3-parse)
 			(error
 			 (message "No w3: %s %s retrying..." code
-				  (locate-library "w3-forms"))
+				  (locate-library "w3-parse"))
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
@@ -447,33 +452,44 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 					(copy-sequence load-path))))
 			(if (let ((load-path lp))
 			      (condition-case nil
-				  (require 'w3-forms)
+				  (require 'w3-parse)
 				(error nil)))
 			    ;; If success, fix `load-path' for compiling.
 			    (progn
 			      (setq load-path lp)
 			      (message " => fixed; W3DIR=%s"
 				       (file-name-directory
-					(locate-library "w3-forms")))
+					(locate-library "w3-parse")))
 			      t)
 			  (message " => ignored")
 			  nil)))
-	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
-	      "nnwfm.el" "nnrss.el"))
-	  (condition-case nil
+	    '("nnultimate.el" "webmail.el" "nnwfm.el"))
+	  (condition-case code
+	      (progn (require 'mh-e) nil)
+	    (error
+	     (message "No mh-e: %s %s (ignored)" code (locate-library "mh-e"))
+	     '("gnus-mh.el")))
+	  (condition-case code
+	      (progn (require 'xml) nil)
+	    (error
+	     (message "No xml: %s %s (ignored)" code (locate-library "xml"))
+	     '("nnrss.el")))
+	  (condition-case code
 	      (progn (require 'bbdb) nil)
-	    (error '("gnus-bbdb.el")))
+	    (error
+	     (message "No bbdb: %s %s (ignored)" code (locate-library "bbdb"))
+	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-	      "nnheaderxm.el" "smiley.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el" "smiley.el"))
 	  (when (or (featurep 'xemacs) (<= emacs-major-version 20))
 	    '("smiley-ems.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-	    '("md5.el")))
+	    '("md5.el"))
+	  (unless (boundp 'MULE)
+	    '("canlock-om.el")))
   "Files which will not be installed.")
 
 (defconst dgnushack-exporting-files
@@ -546,6 +562,20 @@ Modify to suit your needs."))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)
+  (unless (make-autoload '(define-derived-mode child parent name
+			    "docstring" body)
+			 "file")
+    (defadvice make-autoload (around handle-define-derived-mode activate)
+      "Handle `define-derived-mode'."
+      (if (eq (car-safe (ad-get-arg 0)) 'define-derived-mode)
+	  (setq ad-return-value
+		(list 'autoload
+		      (list 'quote (nth 1 (ad-get-arg 0)))
+		      (ad-get-arg 1)
+		      (nth 4 (ad-get-arg 0))
+		      t nil))
+	ad-do-it))
+    (put 'define-derived-mode 'doc-string-elt 3))
   (let ((generated-autoload-file dgnushack-gnus-load-file)
 	(make-backup-files nil)
 	(autoload-package-name "gnus"))
@@ -630,7 +660,19 @@ Modify to suit your needs."))
 ;;; no-byte-compile: t
 ;;; no-update-autoloads: t
 ;;; End:
-;;; gnus-load.el ends here\n"))
+;;; gnus-load.el ends here
+")
+    ;; Workaround the bug in some version of XEmacs.
+    (when (featurep 'xemacs)
+      (condition-case nil
+	  (require 'cus-load)
+	(error nil))
+      (goto-char (point-min))
+      (when (and (fboundp 'custom-add-loads)
+		 (not (search-forward "\n(autoload 'custom-add-loads " nil t)))
+	(search-forward "\n;;; Code:" nil t)
+	(forward-line 1)
+	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
   (message (format "Compiling %s..." dgnushack-gnus-load-file))
   (byte-compile-file dgnushack-gnus-load-file))
 

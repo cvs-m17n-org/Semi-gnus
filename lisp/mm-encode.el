@@ -1,4 +1,4 @@
-;;; mm-encode.el --- Functions for encoding MIME things 
+;;; mm-encode.el --- Functions for encoding MIME things
 ;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -36,7 +36,7 @@
     ("message/rfc822" 8bit)
     ("application/emacs-lisp" 8bit)
     ("application/x-patch" 8bit)
-    (".*" qp-or-base64))
+    (".*" base64))
   "Alist of regexps that match MIME types and their encodings.
 If the encoding is `qp-or-base64', then either quoted-printable
 or base64 will be used, depending on what is more efficient.")
@@ -106,7 +106,7 @@ This variable should never be set directly, but bound before a call to
    ((functionp encoding)
     (ignore-errors (funcall encoding (point-min) (point-max))))
    (t
-    (message "Unknown encoding %s; defaulting to 8bit" encoding))))
+    (message "Unknown encoding %s; treating it as 8bit" encoding))))
 
 (defun mm-encode-buffer (type)
   "Encode the buffer which contains data of TYPE.
@@ -119,7 +119,8 @@ The encoding used is returned."
 	 (bits (mm-body-7-or-8)))
     ;; We force buffers that are 7bit to be unencoded, no matter
     ;; what the preferred encoding is.
-    (when (eq bits '7bit)
+    ;; Only if the buffers don't contain lone lines.
+    (when (and (eq bits '7bit) (not (mm-long-lines-p 76)))
       (setq encoding bits))
     (mm-encode-content-transfer-encoding encoding mime-type)
     encoding))
@@ -144,7 +145,7 @@ The encoding used is returned."
       (while rules
 	(when (string-match (caar rules) type)
 	  (throw 'found
-		 (let ((encoding 
+		 (let ((encoding
 			(if (eq (cadr (car rules)) 'qp-or-base64)
 			    (mm-qp-or-base64)
 			  (cadr (car rules)))))

@@ -1,5 +1,6 @@
 ;;; nndraft.el --- draft article access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -126,7 +127,9 @@
   (when (nndraft-request-article article group server (current-buffer))
     (message-remove-header "xref")
     (message-remove-header "lines")
-    (message-remove-header "date")
+    ;; Articles in nndraft:queue are considered as sent messages.  The
+    ;; Date field should be the time when they are sent.
+    ;;(message-remove-header "date")
     t))
 
 (deffoo nndraft-request-update-info (group info &optional server)
@@ -174,8 +177,7 @@
       (dolist (n dir)
 	(unless (file-exists-p
 		 (setq file (expand-file-name (int-to-string n) pathname)))
-	  (rename-file (let ((buffer-file-name file))
-			 (make-auto-save-file-name)) file)))))
+	  (rename-file (nndraft-auto-save-file-name file) file)))))
   (nnoo-parent-function 'nndraft
 			'nnmh-request-group
 			(list group server dont-check)))

@@ -8,7 +8,65 @@ For older news, see Gnus info node "New Features".
 
 * Changes in Oort Gnus
 
-** gnus-group-charset-alist and gnus-group-ignored-charsets-alist
+** Message supports the Importance: header.
+
+In the message buffer, C-c C-p cycles through the valid values.
+
+** Gnus supports Cancel Locks in News.
+
+This means a header "Cancel-Lock" is inserted in news posting. It is
+used to determine if you wrote a article or not (for
+cancelling/superseding).  The behaviour can be changed by customizing
+`message-insert-canlock'.
+
+** Gnus supports server-side mail filtering using Sieve.
+
+Sieve rules can be added as Group Parameters for groups, and the
+complete Sieve script is generated using `D g' from the Group buffer,
+and then uploaded to the server using `C-c C-l' in the generated Sieve
+buffer.  Search the online Gnus manual for "sieve", and see the new
+Sieve manual, for more information.
+
+** Extended format specs.
+
+Format spec "%&user-date;" is added into
+gnus-summary-line-format-alist.  Also, user defined extended format
+specs are supported.  The extended format specs look like "%u&foo;",
+which invokes function gnus-user-format-function-foo.  Because "&" is
+used as the escape character, old user defined format "%u&" is no
+longer supported.
+
+** `/ *' (gnus-summary-limit-include-cached) is rewritten.
+
+It was aliased to `Y c' (gnus-summary-insert-cached-articles). The new
+function filters out other articles.
+
+** Group names are treated as UTF-8 by default.
+
+This is supposedly what USEFOR wants to migrate to.  See
+`gnus-group-name-charset-group-alist' and
+`gnus-group-name-charset-method-alist' for customization.
+
+** The nnml and nnfolder backends store marks for each groups.
+
+This makes it possible to take backup of nnml/nnfolder servers/groups
+separately of .newsrc.eld, while preserving marks.  It also makes it
+possible to share articles and marks between users (without sharing
+the .newsrc.eld file) within e.g. a department.  It works by storing
+the marks stored in .newsrc.eld in a per-group file ".marks" (for
+nnml) and "groupname.mrk" (for nnfolder, named "groupname").  If the
+nnml/nnfolder is moved to another machine, Gnus will automatically use
+the .marks or .mrk file instead of the information in .newsrc.eld.
+The new server variables `nnml-marks-is-evil' and
+`nnfolder-marks-is-evil' can be used to disable this feature.
+
+** The menu bar (in Group and Summary buffer) named "Misc" has been
+renamed to "Gnus".
+
+** The menu bar (in Message mode) named "MML" has been renamed to
+"Attachments".
+
+** gnus-group-charset-alist and gnus-group-ignored-charsets-alist.
 
 The regexps in these variables are compared with full group names
 instead of real group names in 5.8.  Users who customize these
@@ -16,7 +74,8 @@ variables should change those regexps accordingly. For example:
 
    ("^han\\>" euc-kr) -> ("\\(^\\|:\\)han\\>" euc-kr)
 
-** Gnus now supports PGP-MIME (RFC2015) and SMIME.
+** Gnus supports PGP (RFC 1991/2440), PGP-MIME (RFC 2015/3156) and
+SMIME.
 
 ** Gnus inlines external parts (message/external).
 

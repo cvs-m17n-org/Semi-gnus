@@ -25,8 +25,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 (require 'gnus-sum)
 (require 'mm-util)
@@ -66,7 +65,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	gnus-displaying-mime handles buffer)
     (unless (mm-handle-cache handle)
       (unless id
-	(error "Can not find message/partial id."))
+	(error "Can not find message/partial id"))
       (setq phandles
 	    (sort (cons handle
 			(mm-partial-find-parts
@@ -96,7 +95,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	  (if ntotal
 	      (if total
 		  (unless (eq total ntotal)
-		  (error "The numbers of total are different."))
+		    (error "The numbers of total are different"))
 		(setq total ntotal)))
 	  (unless (< nn n)
 	    (unless (eq nn n)
@@ -143,10 +142,12 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 		(condition-case nil
 		    ;; This is only valid on XEmacs.
 		    (mapcar (lambda (prop)
-			    (remove-specifier
-			     (face-property 'default prop) (current-buffer)))
+			      (remove-specifier
+			       (face-property 'default prop) (current-buffer)))
 			    '(background background-pixmap foreground))
 		  (error nil))
 		(delete-region ,(point-min-marker) ,(point-max-marker))))))))))
 
-;; mm-partial.el ends here
+(provide 'mm-partial)
+
+;;; mm-partial.el ends here

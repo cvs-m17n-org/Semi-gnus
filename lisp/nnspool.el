@@ -4,7 +4,7 @@
 ;;	2000 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -51,7 +51,7 @@ If you are using Cnews, you probably should set this variable to nil.")
 (defvoo nnspool-nov-directory (concat nnspool-spool-directory "over.view/")
   "Local news nov directory.")
 
-(defvoo nnspool-lib-dir 
+(defvoo nnspool-lib-dir
     (if (file-exists-p "/usr/lib/news/active")
 	"/usr/lib/news/"
       "/var/lib/news/")
@@ -363,7 +363,7 @@ there.")
     (let ((nov (nnheader-group-pathname
 		nnspool-current-group nnspool-nov-directory ".overview"))
 	  (arts articles)
-      	  (nnheader-file-coding-system nnspool-file-coding-system)
+	  (nnheader-file-coding-system nnspool-file-coding-system)
 	  last)
       (if (not (file-exists-p nov))
 	  ()

@@ -1,6 +1,6 @@
 ;;; gnus-gl.el --- an interface to GroupLens for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Brad Miller <bmiller@cs.umn.edu>
@@ -131,7 +131,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defvar gnus-summary-grouplens-line-format
-  "%U\%R\%z%l%I\%(%[%4L: %-20,20n%]%) %s\n"
+  "%U\%R\%z%l%I\%(%[%4L: %-23,23n%]%) %s\n"
   "*The line format spec in summary GroupLens mode buffers.")
 
 (defvar grouplens-pseudonym ""
@@ -511,11 +511,11 @@ recommend using both scores and grouplens predictions together."
       ;; Return an empty string
       ""
     (let* ((rate-string (make-string 12 ?\ ))
-           (mid (mail-header-id header))
-           (hashent (gnus-gethash mid grouplens-current-hashtable))
-           (pred (or (nth 0 hashent) 0))
-           (low (nth 1 hashent))
-           (high (nth 2 hashent)))
+	   (mid (mail-header-id header))
+	   (hashent (gnus-gethash mid grouplens-current-hashtable))
+	   (pred (or (nth 0 hashent) 0))
+	   (low (nth 1 hashent))
+	   (high (nth 2 hashent)))
       ;; Init rate-string
       (aset rate-string 0 ?|)
       (aset rate-string 11 ?|)
@@ -633,10 +633,10 @@ recommend using both scores and grouplens predictions together."
 
 (defun bbb-build-rate-command (rate-alist)
   (concat "putratings " grouplens-bbb-token " " grouplens-current-group " \r\n"
-	  (mapconcat '(lambda (this)	; form (mid . (score . time))
-			(concat (car this)
-				" :rating=" (cadr this) ".00"
-				" :time=" (cddr this)))
+	  (mapconcat (lambda (this)	; form (mid . (score . time))
+		       (concat (car this)
+			       " :rating=" (cadr this) ".00"
+			       " :time=" (cddr this)))
 		     rate-alist "\r\n")
 	  "\r\n.\r\n"))
 

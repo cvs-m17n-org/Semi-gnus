@@ -35,17 +35,17 @@ if exist %1\bin\emacs.bat set emacs=emacs.bat
 
 cd lisp
 call %1\bin\%emacs% -batch -q -no-site-file -l ./dgnushack.el -f dgnushack-compile
-if not "%2" == "copy" goto info
+if not "%2" == "/copy" goto info
 attrib -r %1\lisp\gnus\*
 copy *.el* %1\lisp\gnus
 
 :info
-set EMACSINFOHACK="(while (re-search-forward \"@\\(end \\)?ifnottex\" nil t) (replace-match \"\"))"
+set EMACSINFO=call %1\bin\%emacs% -no-site-file -no-init-file -batch -q -l infohack.el -f batch-makeinfo
 cd ..\texi
-call %1\bin\%emacs% -batch -q -no-site-file message.texi -eval %EMACSINFOHACK% -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-call %1\bin\%emacs% -batch -q -no-site-file emacs-mime.texi -eval %EMACSINFOHACK% -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-call %1\bin\%emacs% -batch -q -no-site-file gnus.texi -eval %EMACSINFOHACK% -eval "(setq max-lisp-eval-depth 600)" -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-if not "%2" == "copy" goto done
+%EMACSINFO% message.texi
+%EMACSINFO% emacs-mime.texi
+%EMACSINFO% gnus.texi
+if not "%2" == "/copy" goto done
 copy gnus %1\info
 copy gnus-?? %1\info
 copy message %1\info
@@ -60,11 +60,11 @@ cd ..
 goto end
 
 :usage
-echo Usage: make :emacs-dir: [copy]
+echo Usage: make :emacs-dir: [/copy]
 echo.
 echo where: :emacs-dir: is the directory you installed emacs in
 echo                    eg. d:\emacs\20.4
-echo        copy indicates that the compiled files should be copied to your
+echo        /copy indicates that the compiled files should be copied to your
 echo             emacs lisp, info, and etc directories
 echo.
 echo Note: If you have Emacs/w3 you should set the environment variable 

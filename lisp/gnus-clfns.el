@@ -75,6 +75,17 @@
 	       ((typep x type) x)
 	       (t (error "Can't coerce %s to type %s" x type))))))
 
+  (define-compiler-macro copy-list (&whole form list)
+    (if (and (fboundp 'copy-list)
+	     (subrp (symbol-function 'copy-list)))
+	form
+      `(let ((list ,list))
+	 (if (consp list)
+	     (let ((res nil))
+	       (while (consp list) (push (pop list) res))
+	       (prog1 (nreverse res) (setcdr res list)))
+	   (car list)))))
+
   (define-compiler-macro last (&whole form x &optional n)
     (if (and (fboundp 'last)
 	     (subrp (symbol-function 'last)))
@@ -123,6 +134,33 @@
   (defun-maybe string (&rest args)
     "Concatenate all the argument characters and make the result a string."
     (concat args))
+
+  (define-compiler-macro string-to-list (&whole form string)
+    (cond ((fboundp 'string-to-list)
+	   form)
+	  ((fboundp 'string-to-char-list)
+	   (list 'string-to-char-list string))
+	  (t
+	   `(let* ((str ,string)
+		   (len (length str))
+		   (idx 0)
+		   c l)
+	      (while (< idx len)
+		(setq c (sref str idx))
+		(setq idx (+ idx (char-bytes c)))
+		(setq l (cons c l)))
+	      (nreverse l)))))
+
+  ;; 92.7.2 by K.Handa (imported from Mule 2.3)
+  (defun-maybe string-to-list (str)
+    (let ((len (length str))
+	  (idx 0)
+	  c l)
+      (while (< idx len)
+	(setq c (sref str idx))
+	(setq idx (+ idx (char-bytes c)))
+	(setq l (cons c l)))
+      (nreverse l)))
 
   (define-compiler-macro subseq (&whole form seq start &optional end)
     (if (and (fboundp 'subseq)

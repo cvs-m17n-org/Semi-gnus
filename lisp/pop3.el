@@ -179,7 +179,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	  ((equal 'pass pop3-authentication-scheme)
 	   (pop3-user process pop3-maildrop)
 	   (pop3-pass process))
-	  (t (error "Invalid POP3 authentication scheme.")))
+	  (t (error "Invalid POP3 authentication scheme")))
     (setq message-count (car (pop3-stat process)))
     (pop3-quit process)
     message-count))
@@ -215,18 +215,19 @@ Argument PORT specifies connecting port."
   (let* ((ssl-program-name
 	  pop3-ssl-program-name)
 	 (ssl-program-arguments
-	  `(,@pop3-ssl-program-arguments ,extra-arg
+	  `(,@pop3-ssl-program-arguments
+	    ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
-         (process (open-ssl-stream name buffer host service)))
+	 (process (open-ssl-stream name buffer host service)))
     (when process
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(while (and (memq (process-status process) '(open run))
-                    (goto-char (point-max))
-                    (forward-line -1)
-                    (not (looking-at "+OK")))
-          (accept-process-output process 1)
-          (sit-for 1))
+		    (goto-char (point-max))
+		    (forward-line -1)
+		    (not (looking-at "+OK")))
+	  (accept-process-output process 1)
+	  (sit-for 1))
 	(delete-region (point-min) (point)))
       (and process (memq (process-status process) '(open run))
 	   process))))
@@ -243,8 +244,8 @@ Args are NAME BUFFER HOST SERVICE."
 	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 	(t
 	 (as-binary-process
-	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
+	  (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	      (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
@@ -266,15 +267,15 @@ Args are NAME BUFFER HOST SERVICE."
     (insert output)))
 
 (defun pop3-send-command (process command)
-    (set-buffer (process-buffer process))
-    (goto-char (point-max))
-;;    (if (= (aref command 0) ?P)
-;;	(insert "PASS <omitted>\r\n")
-;;      (insert command "\r\n"))
-    (setq pop3-read-point (point))
-    (goto-char (point-max))
-    (process-send-string process (concat command "\r\n"))
-    )
+  (set-buffer (process-buffer process))
+  (goto-char (point-max))
+;;  (if (= (aref command 0) ?P)
+;;      (insert "PASS <omitted>\r\n")
+;;    (insert command "\r\n"))
+  (setq pop3-read-point (point))
+  (goto-char (point-max))
+  (process-send-string process (concat command "\r\n"))
+  )
 
 (defun pop3-read-response (process &optional return)
   "Read the response from the server PROCESS.
@@ -358,11 +359,14 @@ If NOW, use that time instead."
 		   (looking-at "\001\001\001\001\n") ; MMDF
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
-	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (split-string (or (mail-fetch-field "Date")
-					(pop3-make-date))
-				    " "))
-		(From_))
+	  (let* ((from (mail-strip-quoted-names (mail-fetch-field "From")))
+		 (tdate (mail-fetch-field "Date"))
+		 (date (split-string (or (and tdate
+					      (not (string= "" tdate))
+					      tdate)
+					 (pop3-make-date))
+				     " "))
+		 (From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
@@ -492,7 +496,7 @@ If NOW, use that time instead."
   (pop3-send-command process (format "USER %s" user))
   (let ((response (pop3-read-response process t)))
     (if (not (and response (string-match "+OK" response)))
-	(error (format "USER %s not valid." user)))))
+	(error (format "USER %s not valid" user)))))
 
 (defun pop3-pass (process)
   "Send authentication information to the server."
@@ -620,7 +624,7 @@ where
   (if msgno
       (pop3-send-command process (format "UIDL %d" msgno))
     (pop3-send-command process "UIDL"))
-  
+
   (if (null (pop3-read-response process t))
       nil ;; UIDL is not supported on this server
     (let (pairs uidl)

@@ -8,6 +8,8 @@ AC_PATH_LISPDIR
 AC_PATH_ETCDIR
 AC_CHECK_URL
 AC_CHECK_W3
+GNUS_CHECK_FONTS
 AC_PATH_PACKAGEDIR
 AC_ADD_LOAD_PATH
-AC_OUTPUT(Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile etc/Makefile)
+AC_OUTPUT(Makefile etc/Makefile lisp/Makefile texi/Makefile \
+ texi/gnusconfig.tex texi/ps/Makefile lisp/dgnuspath.el)

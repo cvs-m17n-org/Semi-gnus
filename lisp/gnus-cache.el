@@ -1,5 +1,5 @@
 ;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -164,11 +164,7 @@ it's not cached."
       (when (and number
 		 (> number 0)		; Reffed article.
 		 (or force
-                     (and (or (not gnus-cacheable-groups)
-                              (string-match gnus-cacheable-groups group))
-                          (or (not gnus-uncacheable-groups)
-			      (not (string-match
-				    gnus-uncacheable-groups group)))
+		     (and (gnus-cache-fully-p group)
 			  (gnus-cache-member-of-class
 			   gnus-cache-enter-articles ticked dormant unread)))
 		 (not (file-exists-p (setq file (gnus-cache-file-name
@@ -213,7 +209,7 @@ it's not cached."
 	      (nnheader-insert-nov headers)
 	      ;; Update the active info.
 	      (set-buffer gnus-summary-buffer)
-	      (gnus-cache-update-active group number)
+	      (gnus-cache-possibly-update-active group (cons number number))
 	      (push article gnus-newsgroup-cached)
 	      (gnus-summary-update-secondary-mark article))
 	    t))))))
@@ -239,7 +235,7 @@ it's not cached."
 
 (defun gnus-cache-possibly-remove-articles-1 ()
   "Possibly remove some of the removable articles."
-  (unless (eq gnus-use-cache 'passive)
+  (when (gnus-cache-fully-p gnus-newsgroup-name)
     (let ((articles gnus-cache-removable-articles)
 	  (cache-articles gnus-newsgroup-cached)
 	  article)
@@ -379,8 +375,16 @@ Returns the list of articles removed."
     (while cached
       (gnus-summary-goto-subject (pop cached) t))))
 
-(defalias 'gnus-summary-limit-include-cached
-  'gnus-summary-insert-cached-articles)
+(defun gnus-summary-limit-include-cached ()
+  "Limit the summary buffer to articles that are cached."
+  (interactive)
+  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '>))
+	(gnus-verbose (max 6 gnus-verbose)))
+    (if cached
+	(progn
+	  (gnus-summary-limit cached)
+	  (gnus-summary-position-point))
+      (gnus-message 3 "No cached articles for this group"))))
 
 ;;; Internal functions.
 
@@ -427,8 +431,8 @@ Returns the list of articles removed."
 		      ?. ?_)))
 	  ;; Translate the first colon into a slash.
 	  (when (string-match ":" group)
-		  (setq group (concat (substring group 0 (match-beginning 0))
-				      "/" (substring group (match-end 0)))))
+	    (setq group (concat (substring group 0 (match-beginning 0))
+				"/" (substring group (match-end 0)))))
 	  (nnheader-replace-chars-in-string group ?. ?/)))
       t)
      gnus-cache-directory))))
@@ -609,6 +613,24 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 
+(defun gnus-cache-possibly-update-active (group active)
+  "Update active info bounds of GROUP with ACTIVE if necessary.
+The update is performed if ACTIVE contains a higher or lower bound
+than the current."
+  (let ((lower t) (higher t))
+    (if gnus-cache-active-hashtb
+	(let ((cache-active (gnus-gethash group gnus-cache-active-hashtb)))
+	  (when cache-active
+	    (unless (< (car active) (car cache-active))
+	      (setq lower nil))
+	    (unless (> (cdr active) (cdr cache-active))
+	      (setq higher nil))))
+      (gnus-cache-read-active))
+    (when lower
+      (gnus-cache-update-active group (car active) t))
+    (when higher
+      (gnus-cache-update-active group (cdr active)))))
+
 (defun gnus-cache-update-active (group number &optional low)
   "Update the upper bound of the active info of GROUP to NUMBER.
 If LOW, update the lower bound instead."
@@ -682,6 +704,19 @@ If LOW, update the lower bound instead."
   "Move the cache tree to somewhere else."
   (interactive "FMove the cache tree to: ")
   (rename-file gnus-cache-directory dir))
+
+(defun gnus-cache-fully-p (&optional group)
+  "Returns non-nil if the cache should be fully used.
+If GROUP is non-nil, also cater to `gnus-cacheable-groups' and
+`gnus-uncacheable-groups'."
+  (and gnus-use-cache
+       (not (eq gnus-use-cache 'passive))
+       (if (null group)
+	   t
+	 (and (or (not gnus-cacheable-groups)
+		  (string-match gnus-cacheable-groups group))
+	      (or (not gnus-uncacheable-groups)
+		  (not (string-match gnus-uncacheable-groups group)))))))
 
 (provide 'gnus-cache)
 

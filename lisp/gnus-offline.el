@@ -36,7 +36,7 @@
 ;;; Note.
 ;;;   This file works only with after version of Emacs 19.30.
 ;;;   This file needs miee.el and SEMI.
-;;;   If you set gnus-offline-drafts-queue-type to 'agent , you don't need 
+;;;   If you set gnus-offline-drafts-queue-type to 'agent , you don't need
 ;;;   miee.el
 ;;;   You must use T-gnus 6.12.0 or later.
 ;;;
@@ -101,7 +101,7 @@
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Ahhhhhhh!!"		; 2.10b1
-  "Cup of life"                 ; 2.20
+  "Cup of life"			; 2.20
 ;;  "Code of silence"
   )
 
@@ -515,7 +515,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; fetch only mail for gnus-agent
   (if (and (eq gnus-offline-news-fetch-method 'nnagent)
 	   (eq gnus-offline-articles-to-fetch 'mail))
-	  (setq gnus-agent-handle-level gnus-offline-mail-group-level)))
+      (setq gnus-agent-handle-level gnus-offline-mail-group-level)))
 
 ;;
 ;; Change mail group level to handle only mail.
@@ -618,8 +618,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 		    nnagent-version
 		  nnspool-version))
 	   (str (format "\n                        with %s" ver)))
-    (gnus-offline-add-custom-header
-     "X-Gnus-Offline-Backend:" (concat gnus-offline-header-string str)))))
+      (gnus-offline-add-custom-header
+       "X-Gnus-Offline-Backend:" (concat gnus-offline-header-string str)))))
 
 
 ;;
@@ -642,7 +642,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;;
   (setenv "MAILHOST" nil))
 ;;
-;; Hangup line function 
+;; Hangup line function
 ;;
 (defun gnus-offline-hangup-line ()
   "*Hangup line function."
@@ -787,7 +787,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(message "%s" (gnus-offline-gettext 'empting-spool-4)))
     ;; Send queued message by gnus-agent
     (message "%s" (gnus-offline-gettext 'empting-spool-5))
-    (gnus-group-send-drafts)
+    (gnus-group-send-queue)
     (message "%s" (gnus-offline-gettext 'empting-spool-6)))
   ;;
   (run-hooks 'gnus-offline-after-empting-spool-hook))
