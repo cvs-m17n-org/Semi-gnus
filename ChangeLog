@@ -1,3 +1,7 @@
+2004-07-20  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: Support @s.
+
 2004-06-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-parse-nov): Pass the eol value to
