@@ -805,6 +805,9 @@ header line with the old Message-ID."
   ;; if ARTICLE-BUFFER is nil, gnus-article-buffer is used
   ;; this buffer should be passed to all mail/news reply/post routines.
   (setq gnus-article-copy (gnus-get-buffer-create " *gnus article copy*"))
+  (save-excursion
+    (set-buffer gnus-article-copy)
+    (set-buffer-multibyte t))
   (let ((article-buffer (or article-buffer gnus-article-buffer))
 	end beg)
     (if (not (and (get-buffer article-buffer)
@@ -821,32 +824,36 @@ header line with the old Message-ID."
 	    ;; Copy over the (displayed) article buffer, delete
 	    ;; hidden text and remove text properties.
 	    (widen)
-	    (let ((inhibit-read-only t))
-	      (copy-to-buffer gnus-article-copy (point-min) (point-max))
-	      (set-buffer gnus-article-copy)
-	      (when yank-string
-		(message-goto-body)
-		(delete-region (point) (point-max))
-		(insert yank-string))
-	      ;; Encode bitmap smileys to ordinary text.
-	      ;; Possibly, the original text might be restored.
-	      (static-unless (featurep 'xemacs)
-		(when (featurep 'smiley-mule)
-		  (smiley-encode-buffer)))
-	      (gnus-article-delete-text-of-type 'annotation)
-	      (gnus-remove-text-with-property 'gnus-prev)
-	      (gnus-remove-text-with-property 'gnus-next)
-	      (gnus-remove-text-with-property 'gnus-decoration)
-	      (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
-	      (insert
-	       (prog1
-		   (static-if (featurep 'xemacs)
-		       ;; Revome smiley extents for (possibly) XEmacs 21.1.
-		       (format "%s"
-			       (buffer-substring-no-properties (point-min)
-							       (point-max)))
-		     (buffer-substring-no-properties (point-min) (point-max)))
-		 (erase-buffer))))
+	    (copy-to-buffer gnus-article-copy (point-min) (point-max))
+	    (set-buffer gnus-article-copy)
+	    ;; There's invisible and intangible text in T-gnus.  Especially,
+	    ;; if there is a boundary line (X-Boundary: ------------------),
+	    ;; in the end of a header, it will cause a serious problem.
+	    (add-text-properties (point-min) (point-max)
+				 '(invisible nil intangible nil))
+	    (when yank-string
+	      (message-goto-body)
+	      (delete-region (point) (point-max))
+	      (insert yank-string))
+	    ;; Encode bitmap smileys to ordinary text.
+	    ;; Possibly, the original text might be restored.
+	    (static-unless (featurep 'xemacs)
+	      (when (featurep 'smiley-mule)
+		(smiley-encode-buffer)))
+	    (gnus-article-delete-text-of-type 'annotation)
+	    (gnus-remove-text-with-property 'gnus-prev)
+	    (gnus-remove-text-with-property 'gnus-next)
+	    (gnus-remove-text-with-property 'gnus-decoration)
+	    (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
+	    (insert
+	     (prog1
+		 (static-if (featurep 'xemacs)
+		     ;; Revome smiley extents for (possibly) XEmacs 21.1.
+		     (format "%s"
+			     (buffer-substring-no-properties (point-min)
+							     (point-max)))
+		   (buffer-substring-no-properties (point-min) (point-max)))
+	       (erase-buffer)))
 	    ;; Find the original headers.
 	    (set-buffer gnus-original-article-buffer)
 	    (goto-char (point-min))

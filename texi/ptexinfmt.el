@@ -115,19 +115,11 @@ This is NO-NOTICE argument in `broken-facility'.")
   ptexinfmt-disable-broken-notice-flag)
 
 
-;;; Obsolete
-;; Removed Texinfo 3.8
-(put 'overfullrule 'texinfo-format 'texinfo-discard-line)
-(put 'smallbreak 'texinfo-format 'texinfo-discard-line)
-(put 'medbreak 'texinfo-format 'texinfo-discard-line)
-(put 'bigbreak 'texinfo-format 'texinfo-discard-line)
-;; Removed Texinfo 3.9
-(put 'setchapterstyle 'texinfo-format 'texinfo-discard-line-with-args)
-
 ;;; Hardcopy and HTML (discard)
-;; I18N
+;; html
 (put 'documentlanguage 'texinfo-format 'texinfo-discard-line-with-args)
 (put 'documentencoding 'texinfo-format 'texinfo-discard-line-with-args)
+(put 'documentdescription 'texinfo-format 'texinfo-discard-line-with-args)
 
 ;; size
 (put 'smallbook 'texinfo-format 'texinfo-discard-line)
@@ -158,6 +150,7 @@ This is NO-NOTICE argument in `broken-facility'.")
 
 ;; misc
 (put 'page 'texinfo-format 'texinfo-discard-line)
+(put 'hyphenation 'texinfo-format 'texinfo-discard-command-and-arg)
 
 
 
@@ -186,7 +179,7 @@ This is NO-NOTICE argument in `broken-facility'.")
   (texinfo-pop-stack 'direntry))
 
 
-;;; Block Enclosing and Conditional
+;;; Block Enclosing
 ;; @detailmenu ... @end detailmenu
 (put 'detailmenu 'texinfo-format 'texinfo-discard-line)
 (put 'detailmenu 'texinfo-end 'texinfo-discard-command)
@@ -199,33 +192,52 @@ This is NO-NOTICE argument in `broken-facility'.")
 (put 'smallformat 'texinfo-format 'texinfo-format-flushleft)
 (put 'smallformat 'texinfo-end 'texinfo-end-flushleft)
 
-;; @ifnottex ... @end ifnottex
+;; @cartouche  ... @end cartouche
+(put 'cartouche 'texinfo-format 'texinfo-discard-line)
+(put 'cartouche 'texinfo-end 'texinfo-discard-command)
+
+
+;;; Conditional
+;; @ifnottex ... @end ifnottex (makeinfo 3.11 or later)
 (put 'ifnottex 'texinfo-format 'texinfo-discard-line)
 (put 'ifnottex 'texinfo-end 'texinfo-discard-command)
 
-;; @ifnothtml ... @end ifnothtml
+;; @ifnothtml ... @end ifnothtml (makeinfo 3.11 or later)
 (put 'ifnothtml 'texinfo-format 'texinfo-discard-line)
 (put 'ifnothtml 'texinfo-end 'texinfo-discard-command)
 
-;; @ifnotinfo ... @end ifnotinfo
+;; @ifnotplaintext ... @end ifnotplaintext (makeinfo 4.2 or later)
+(put 'ifnotplaintext 'texinfo-format 'texinfo-discard-line)
+(put 'ifnotplaintext 'texinfo-end 'texinfo-discard-command)
+
+
+;; @ifnotinfo ... @end ifnotinfo (makeinfo 3.11 or later)
 (put 'ifnotinfo 'texinfo-format 'texinfo-format-ifnotinfo)
-(put 'endifnotinfo 'texinfo-format 'texinfo-discard-line)
 (defun-maybe texinfo-format-ifnotinfo ()
   (delete-region texinfo-command-start
 		 (progn (re-search-forward "@end ifnotinfo[ \t]*\n")
 			(point))))
 
-;; @html ... @end html
+;; @html ... @end html (makeinfo 3.11 or later)
 (put 'html 'texinfo-format 'texinfo-format-html)
-(put 'endhtml 'texinfo-format 'texinfo-discard-line)
 (defun-maybe texinfo-format-html ()
   (delete-region texinfo-command-start
 		 (progn (re-search-forward "@end html[ \t]*\n")
 			(point))))
 
-;; @cartouche  ... @end cartouche
-(put 'cartouche 'texinfo-format 'texinfo-discard-line)
-(put 'cartouche 'texinfo-end 'texinfo-discard-command)
+;; @ifhtml ... @end ifhtml (makeinfo 3.8 or later)
+(put 'ifhtml 'texinfo-format 'texinfo-format-ifhtml)
+(defun texinfo-format-ifhtml ()
+  (delete-region texinfo-command-start
+		 (progn (re-search-forward "@end ifhtml[ \t]*\n")
+			(point))))
+
+;; @ifplaintext ... @end ifplaintext (makeinfo 4.2 or later)
+(put 'ifplaintext 'texinfo-format 'texinfo-format-ifplaintext)
+(defun-maybe texinfo-format-ifplaintext ()
+  (delete-region texinfo-command-start
+		 (progn (re-search-forward "@end ifplaintext[ \t]*\n")
+			(point))))
 
 
 
@@ -512,9 +524,6 @@ otherwise, insert URL-TITLE followed by URL in parentheses."
 	      (buffer-substring (match-beginning 2) (match-end 2)))
 	     texinfo-alias-list))
       (texinfo-discard-command))))
-
-;; @definfoenclose NEWCMD, BEFORE, AFTER
-
 
 
 ;;; Special
