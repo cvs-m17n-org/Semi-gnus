@@ -114,7 +114,12 @@ displaying the record corresponding to the sender of the current message."
 	 (record
 	  (let (bbdb-use-pop-up)
 	    (gnus-bbdb/update-record offer-to-create)))
-	 (bbdb-elided-display (bbdb-pop-up-elided-display)))
+	 (bbdb-display-layout
+	  (cond ((boundp 'bbdb-pop-up-display-layout)
+		 (symbol-value 'bbdb-pop-up-display-layout))
+		((boundp 'bbdb-pop-up-elided-display)
+		 (symbol-value 'bbdb-pop-up-elided-display))))
+	 (bbdb-elided-display bbdb-display-layout))
     (save-current-buffer
       ;; display the bbdb buffer iff there is a record for this article.
       (cond

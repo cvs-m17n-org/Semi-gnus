@@ -1,3 +1,17 @@
+2001-09-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-namazu.el: Autoload "regexp-opt" for Mule 2.3.
+
+	* Mule23@1934.en, Mule23@1934.ja: To install contrib/regexp-opt.el
+	is required.
+
+	* contrib/regexp-opt.el: Imported from Emacs 20.2.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Use
+	`bbdb-display-layout' or `bbdb-pop-up-display-layout' instead of
+	`bbdb-elided-display' or `bbdb-pop-up-elided-display' when BBDB
+	v2.33 or later is running.
+
 2001-09-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (top): Not require `std11'.

@@ -69,6 +69,9 @@
 (require 'nnmail)
 (require 'gnus-sum)
 
+;; It is required for Mule 2.3.  See the file Mule23@1934.en.
+(eval-and-compile
+  (autoload 'regexp-opt "regexp-opt"))
 
 (defgroup gnus-namazu nil
   "Search nnmh and nnml groups in Gnus with Namazu."
