@@ -1,3 +1,10 @@
+2002-06-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Make it can be byte-compiled in the Gnus source
+	tree with neither errors nor warnings.
+	(pop3-md5): Fix the logic to check whether the built-in `md5'
+	allows the 4th argument CODING-SYSTEM.
+
 2002-06-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
