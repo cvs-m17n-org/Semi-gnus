@@ -1047,6 +1047,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'nndraft-request-expire-articles "nndraft")
   (autoload 'gnus-open-server "gnus-int")
   (autoload 'gnus-request-post "gnus-int")
+  (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
   (autoload 'rmail-output "rmail"))
 
@@ -1843,6 +1844,7 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 	  (forward-line 1))))
     (goto-char start)))
 
+(defvar gnus-article-copy)
 (defun message-yank-original (&optional arg)
   "Insert the message being replied to, if any.
 Puts point before the text and mark after.
@@ -1857,6 +1859,8 @@ prefix, and don't delete any headers."
   (let ((modified (buffer-modified-p)))
     (when (and message-reply-buffer
 	       message-cite-function)
+      (gnus-copy-article-buffer)
+      (setq message-reply-buffer gnus-article-copy)
       (delete-windows-on message-reply-buffer t)
       (insert-buffer message-reply-buffer)
       (funcall message-cite-function)
@@ -1970,6 +1974,11 @@ The text will also be indented the normal way."
 ;;;
 ;;; Sending messages
 ;;;
+
+;; Avoid byte-compile warning.
+(defvar message-encoding-buffer nil)
+(defvar message-edit-buffer nil)
+(defvar message-mime-mode nil)
 
 (defun message-send-and-exit (&optional arg)
   "Send message like `message-send', then, if no errors, exit from mail buffer."
@@ -2589,7 +2598,7 @@ to find out how to use this."
    (message-check 'from
      (let* ((case-fold-search t)
 	    (from (message-fetch-field "from"))
-	    (ad (nth 1 (funcall gnus-extract-address-components from))))
+	    (ad (nth 1 (std11-extract-address-components from))))
        (cond
 	((not from)
 	 (message "There is no From line.  Posting is denied.")
@@ -2989,7 +2998,7 @@ give as trustworthy answer as possible."
   "Return the pertinent part of `user-mail-address'."
   (when user-mail-address
     (if (string-match " " user-mail-address)
-	(nth 1 (funcall gnus-extract-address-components user-mail-address))
+	(nth 1 (std11-extract-address-components user-mail-address))
       user-mail-address)))
 
 (defun message-make-fqdn ()
@@ -3138,15 +3147,13 @@ Headers already prepared in the buffer are not modified."
 		   (not (message-check-element 'sender))
 		   (not (string=
 			 (downcase
-			  (cadr (funcall gnus-extract-address-components
-					 from)))
+			  (cadr (std11-extract-address-components from)))
 			 (downcase secure-sender)))
 		   (or (null sender)
 		       (not
 			(string=
 			 (downcase
-			  (cadr (funcall gnus-extract-address-components
-					 sender)))
+			  (cadr (std11-extract-address-components sender)))
 			 (downcase secure-sender)))))
 	  (goto-char (point-min))
 	  ;; Rename any old Sender headers to Original-Sender.
@@ -3278,7 +3285,7 @@ Headers already prepared in the buffer are not modified."
      (concat "*" type
 	     (if to
 		 (concat " to "
-			 (or (car (funcall gnus-extract-address-components to))
+			 (or (car (std11-extract-address-components to))
 			     to) "")
 	       "")
 	     (if (and group (not (string= group ""))) (concat " on " group) "")
@@ -3777,10 +3784,10 @@ that further discussion should take place only in "
  			  (downcase sender)
  			  (downcase (message-make-sender))))
  		    (string-equal
- 		     (downcase (cadr (funcall gnus-extract-address-components
-					      from)))
- 		     (downcase (cadr (funcall gnus-extract-address-components
-					      (message-make-from))))))
+ 		     (downcase (cadr (std11-extract-address-components
+				      from)))
+ 		     (downcase (cadr (std11-extract-address-components
+				      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
@@ -3814,8 +3821,8 @@ header line with the old Message-ID."
     ;; Check whether the user owns the article that is to be superseded.
     (unless (string-equal
 	     (downcase (or (message-fetch-field "sender")
-			   (cadr (funcall gnus-extract-address-components
-					  (message-fetch-field "from")))))
+			   (cadr (std11-extract-address-components
+				  (message-fetch-field "from")))))
 	     (downcase (message-make-sender)))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
