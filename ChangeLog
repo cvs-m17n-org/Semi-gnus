@@ -1,3 +1,13 @@
+2003-01-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-tool-bar-map): Fix keymap for MIME-Edit.
+
+2003-01-09  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
+
+	* README.semi.ja: "What's T-gnus?" is revised.
+
+	* README.semi: Ditto.
+
 2003-01-07  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/message.el (message-setup-1): Don't call
