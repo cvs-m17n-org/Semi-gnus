@@ -1,5 +1,25 @@
 1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for this branch.
+
+	* lisp/gnus-art.el (gnus-article-display-method-for-mime): New
+	variable; abolish `gnus-show-mime-method'.
+	(gnus-article-display-method-for-encoded-word): New variable;
+	abolish `gnus-decode-encoded-word-method'.
+	(gnus-article-display-method-for-traditional): New variable.
+	(gnus-article-display-mime-message): New function; abolish
+	`gnus-article-preview-mime-message'.
+	(gnus-article-display-traditional-message): New function.
+	(gnus-article-display-message-with-encoded-word): New function;
+	abolish `gnus-article-decode-encoded-word'.
+	(gnus-article-prepare): Change display mechanism; use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+	(gnus-request-original-article): New function.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.5.0.
 	(gnus-version): Modify for SEMI 1.7.
 
