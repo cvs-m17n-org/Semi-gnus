@@ -4312,7 +4312,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 @}
 @end example
 
-@xref{Top, ,Top, sieve, Emacs Sieve}.
+@xref{Top, Emacs Sieve, Top, sieve, Emacs Sieve}.
 
 @table @kbd
 @item D g
@@ -16618,7 +16618,7 @@ Commands}) $B$+!"$^$?$O%(!<%8%'%s%H$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l(B
 $B%@%&%s%m!<%IJ}?K$r7hDj$7$^$9!#$"$J$?$NJ}?K$r<BAu$9$k$?$a$K%(!<%8%'%s%HJ,(B
 $BN`!"%H%T%C%/%Q%i%a!<%?!"%0%k!<%W%Q%i%a!<%?$N$I$l$r;H$&$+$r$$$C$?$s7h$a$F(B
 $B$7$^$($P!"$3$l$O$+$J$j4JC1$G$9!#$"$J$?$,(B gnus $B$N=i?4<T$J$i$P!"$?$V$sJ,N`(B
-$B$G;O$a$k$N$,:GNI$G$7$g$&(B @xref{Agent Categories}$B!#(B
+$B$G;O$a$k$N$,:GNI$G$7$g$&!"(B@xref{Agent Categories}$B!#(B
 
 $B%H%T%C%/%Q%i%a!<%?(B (@pxref{Topic Parameters}) $B$H%(!<%8%'%s%HJ,(B
 $BN`(B (@pxref{Agent Categories}) $B$NN>J}$O!"B??t$N%0%k!<%W$KE,MQ$9$kJ}?K$N@_(B
@@ -21592,10 +21592,10 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 $B$k(B spam $B8!::$r;XDj$9$k$3$H$b$G$-$^$9!#5$$,68$&!<!#(B
 
 $B8!::$HF1;~$KL@$i$+$K(B @code{spam-split} $B$r<B9T$9$k$H$7$F$b!":#$^$G$H$*(B
-$B$j(B @code{spam-use-regex-headers} $B$r(B t $B$K@_Dj$9$k$h$&$J8!::$r9T$C$F$$$J$1(B
-$B$l$P$J$j$^$;$s!#$J$<$J$i(B @file{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?$,2?(B
-$B$N(B @code{spam-use-xyz} $BJQ?t$r@_Dj$7$F$$$k$+$K1~$8$?!"$$$/$D$+$N>r7oIU$-(B
-$B$NFI$_9~$_$,9T$o$l$k$+$i$G$9!#(B
+$B$j(B @code{spam-use-regex-headers} $B$r(B @code{t} $B$K@_Dj$9$k$h$&$J8!::$r9T$C(B
+$B$F$$$J$1$l$P$J$j$^$;$s!#$J$<$J$i(B @file{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?(B
+$B$,2?$N(B @code{spam-use-xyz} $BJQ?t$r@_Dj$7$F$$$k$+$K1~$8$?!"$$$/$D$+$N>r7o(B
+$BIU$-$NFI$_9~$_$,9T$o$l$k$+$i$G$9!#(B
 
 @emph{@acronym{IMAP} $BMxMQ<T$X$NCm0U(B}
 
@@ -22091,8 +22091,7 @@ SpamOracle $B$O%a%C%;!<%8$,(B spam $B$+(B ham $B$+$r8+6K$a$k$?$a$KE}7WE*$J<
 $B$J$1$l$P$J$j$^$;$s!#$3$l$O!"35N,%P%C%U%!$G(B @kbd{|} $B$r2!$9$3$H$K$h$C$F%a!<(B
 $B%k$r(B SpamOracle $B$N%W%m%;%9$K%Q%$%W$9$k$+!"$^$?(B
 $B$O(B @file{spam.el} $B$N(B spam $B$*$h$S(B ham $B%W%m%;%C%5!<$r;H$&$3$H$K$h$C$F9T$J(B
-$B$&$3$H$,$G$-$^$9!#(B@xref{Filtering Spam Using The Spam ELisp Package} $B$r(B
-$B;2>H$7$F2<$5$$!#(B
+$B$&$3$H$,$G$-$^$9!"(B@xref{Filtering Spam Using The Spam ELisp Package}$B!#(B
 
 @defvar gnus-group-spam-exit-processor-spamoracle
 $B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
@@ -23056,7 +23055,7 @@ Luis Fernandes---$B%G%6%$%s$H%0%i%U%#%C%/!#(B
 Joe Reiss---$B%9%^%$%j!<$N4i$N:n<T!#(B
 
 @item
-Justin Sheehy--@acronym{FAQ} $B$N%a%$%s%F%$%J!<!#(B
+Justin Sheehy---@acronym{FAQ} $B$N%a%$%s%F%$%J!<!#(B
 
 @item
 Erik Naggum---$B1g=u!"9M$(!"%5%]!<%H!"%3!<%I$H$=$NB>!#(B
