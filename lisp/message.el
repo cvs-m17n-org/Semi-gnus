@@ -4533,82 +4533,194 @@ This variable is used by \`message-check-mailing-list-with-function\'."
       alist)
     ))
 
-;;; @ for MIME Edit mode
+;;; @ for locale specification.
 ;;;
+
+(defcustom message-mime-charset-recover-function
+  'message-mime-charset-recover-by-ask
+  "A function called to recover \
+when could not found legal MIME charset for sending message."
+  :type '(radio (function-item message-mime-charset-recover-by-ask)
+		(function :tag "Other"))
+  :group 'message-sending)
+
+(defvar message-mime-charset-recover-args nil)
+(defvar message-charsets-mime-charset-alist nil)
 
 (defun message-maybe-encode ()
   (when message-mime-mode
-    (run-hooks 'mime-edit-translate-hook)
-    (if (catch 'mime-edit-error
-	  (save-excursion
-	    (mime-edit-translate-body)
-	    ))
-	(error "Translation error!")
-      )
-    (end-of-invisible)
-    (run-hooks 'mime-edit-exit-hook)
-    ))
+    (run-hooks 'mime-edit-translate-hook))
+  (let ((locale-list (message-locale-detect)))
+    (when message-mime-mode
+      (let* ((default-mime-charset-detect-method-for-write
+	       (or message-mime-charset-recover-function
+		   default-mime-charset-detect-method-for-write))
+	     message-mime-charset-recover-args
+	     (charsets-mime-charset-alist charsets-mime-charset-alist)
+	     (message-charsets-mime-charset-alist charsets-mime-charset-alist))
+	(message-mime-charset-setup locale-list)
+	(if (catch 'mime-edit-error
+	      (save-excursion
+		(mime-edit-translate-body)
+		))
+	    (error "Translation error!")
+	  ))
+      (end-of-invisible)
+      (run-hooks 'mime-edit-exit-hook)
+      )))
 
-(defcustom message-mime-charset-detect-method
-  'message-mime-charset-detect-by-ask
-  "*A function called to detect MIME charset for sending message."
+(defcustom message-locale-default nil
+  "Default locale for sending message."
+  :group 'message-sending
+  :type 'symbol)
+
+(defcustom message-locale-detect-for-mail nil
+  "*A function called to detect locale from recipient mail address."
   :group 'message-sending
   :type 'function)
 
-(defcustom message-mime-charset-specify-method
-  'message-mime-charset-specify-none
-  "*A function called to detect MIME charset for sending message."
+(defcustom message-locale-detect-for-news
+  'message-locale-detect-with-newsgroup-alist
+  "*A function called to detect locale from newsgroup."
   :group 'message-sending
   :type 'function)
 
-(defvar message-mime-charset-detect-args nil)
+(defun message-locale-detect ()
+  (when (or message-locale-detect-for-news
+	    message-locale-detect-for-mail)
+    (save-excursion
+      (message-narrow-to-head)
+      (let (lc dest)
+	(when message-locale-detect-for-news
+	  (setq lc (mapcar
+		    (lambda (newsgroup)
+		      (funcall message-locale-detect-for-news
+			       (and (string-match "[^ \t]+" newsgroup)
+				    (match-string 0 newsgroup))))
+		    (message-tokenize-header
+		     (message-fetch-field "newsgroups")))))
+	(when message-locale-detect-for-mail
+	  (let ((field-list '("to" "cc" "bcc")))
+	    (while (car field-list)
+	      (setq lc (append
+			lc
+			(mapcar
+			 (lambda (address)
+			   (funcall message-locale-detect-for-mail
+				    (car (cdr (std11-extract-address-components
+					       address)))))
+			 (message-tokenize-header
+			  (message-fetch-field (pop field-list)))))))))
+	(setq lc (delq nil lc))
+	(while lc
+	  (setq dest (cons (car lc) dest)
+		lc (delq (car lc) lc)))
+	(or dest
+	    (list message-locale-default))
+      ))))
 
-(defun message-maybe-encode-with-specified-charset ()
-  (when message-mime-mode
-    (let ((default-mime-charset-detect-method-for-write
-	    message-mime-charset-detect-method)
-	  (charsets-mime-charset-alist charsets-mime-charset-alist)
-	  message-mime-charset-detect-args)
-      (run-hooks 'mime-edit-translate-hook)
-      (when message-mime-charset-specify-method
-	(funcall message-mime-charset-specify-method))
-      (if (catch 'mime-edit-error
-	    (save-excursion
-	      (mime-edit-translate-body)
-	      ))
-	  (error "Translation error!")
-	))
-    (end-of-invisible)
-    (run-hooks 'mime-edit-exit-hook)
+(defvar message-locale-newsgroup-alist
+  '(("^fj\\." . fj)
     ))
 
-(defun message-mime-charset-detect-by-ask (type charsets &rest region)
-  (let* ((charsets-mime-charset-alist
-	  (cdr (assq 'charsets-mime-charset-alist
-		     message-mime-charset-detect-args)))
+(defun message-locale-detect-with-newsgroup-alist (newsgroup)
+  (let ((rest message-locale-newsgroup-alist)
+	done)
+    (while (and (not done)
+		rest)
+      (when (string-match (car (car rest)) newsgroup)
+	(setq done (car rest)))
+      (setq rest (cdr rest)))
+    (cdr done)
+    ))
+
+(defvar message-locale-mail-address-alist nil)
+
+(defun message-locale-detect-with-mail-address-alist (address)
+  (let ((rest message-locale-mail-address-alist)
+	done)
+    (while (and (not done)
+		rest)
+      (when (string-match (car (car rest)) address)
+	(setq done (car rest)))
+      (setq rest (cdr rest)))
+    (cdr done)
+    ))
+
+(defcustom message-mime-charset-recover-ask-function
+  'message-mime-charset-recover-ask-y-or-n
+  "A function called to ask MIME charset.
+This funtion will by called from \`message-mime-charset-recover-by-ask\'."
+  :type '(radio (function-item message-mime-charset-recover-ask-y-or-n)
+		(function-item message-mime-charset-recover-ask-charset)
+		(function :tag "Other"))
+  :group 'message-sending)
+
+(defun message-mime-charset-recover-by-ask (type charsets &rest args)
+  (let* ((charsets-mime-charset-alist message-charsets-mime-charset-alist)
 	 (default-charset 
 	   (upcase (symbol-name
 		    (or (charsets-to-mime-charset charsets)
 			default-mime-charset-for-write))))
-	 (mime-charset-list
-	  (mapcar
-	   (lambda (X)
-	     (list (upcase (symbol-name (car X)))))
-	   mime-charset-type-list))
 	 charset)
+    (save-excursion
+      (save-restriction
+	(save-window-excursion
+	  (when (eq type 'region)
+	    (narrow-to-region (car args) (car (cdr args)))
+	    (pop-to-buffer (current-buffer) nil t))
+	  (if (setq charset (funcall message-mime-charset-recover-ask-function
+				     default-charset charsets))
+		   (intern (downcase charset))
+	    (error "Canceled.")))))))
+
+(defun message-mime-charset-recover-ask-y-or-n (default-charset charsets)
+  (or (y-or-n-p (format "MIME charset %s is selected. OK? "
+			default-charset))
+      (error "Canceled."))
+  default-charset)
+
+(defun message-mime-charset-recover-ask-charset (default-charset charsets)
+  (let ((alist (mapcar
+		(lambda (cs)
+		  (list (upcase (symbol-name cs))))
+		(mime-charset-list)))
+	charset)
     (while (not charset)
       (setq charset
 	    (completing-read "What MIME charset: "
-			     mime-charset-list nil t default-charset))
+			     alist nil t default-charset))
       (when (string= charset "")
 	(setq charset nil)))
-    (intern (downcase charset))
-  ))
+    charset))
 
-(defun message-mime-charset-specify-none ()
-  (add-to-list 'message-mime-charset-detect-args
-	       (cons 'charsets-mime-charset-alist charsets-mime-charset-alist))
-  (setq charsets-mime-charset-alist nil))
+(defvar message-locale-mime-charsets-alist
+  '((fj . (us-ascii iso-2022-jp iso-2022-jp-2))
+    (none . nil)
+    ))
+
+(defun message-mime-charset-setup (locale-list)
+  (let (locale-cs)
+    (while (and charsets-mime-charset-alist
+		locale-list)
+      (unless (setq locale-cs
+		    (assq (car locale-list)
+			  message-locale-mime-charsets-alist))
+	(error "Unknown locale \`%s\'. Add locale to \`%s\'."
+	       (car locale-list)
+	       'message-locale-mime-charsets-alist))
+      (setq locale-cs (cdr locale-cs)
+	    charsets-mime-charset-alist (delq nil
+					   (mapcar
+					    (lambda (cs)
+					      (and (memq (cdr cs) locale-cs)
+						   cs))
+					    charsets-mime-charset-alist))
+	    locale-list (cdr locale-list))
+      )))
+
+;;; @ for MIME Edit mode
+;;;
 
 (defun message-mime-insert-article (&optional message)
   (interactive)
