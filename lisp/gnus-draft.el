@@ -97,7 +97,8 @@
     (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup-for-editing article gnus-newsgroup-name)
     (set-buffer-modified-p t)
-    (save-buffer)
+    (let ((gnus-verbose-backends nil))
+      (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
      `((lambda ()
 	 (when (gnus-buffer-exists-p ,gnus-summary-buffer)
@@ -195,7 +196,6 @@
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
-(progn
 (defun gnus-draft-setup-for-editing (narticle group)
   (gnus-setup-message 'forward
     (let ((article narticle))
@@ -210,7 +210,7 @@
 	(forward-char -1)
 	(insert mail-header-separator)
 	(forward-line 1)
-	(message-set-auto-save-file-name))))))
+	(message-set-auto-save-file-name)))))
 ;;
 (defvar gnus-draft-send-draft-buffer " *send draft*")
 (defun gnus-draft-setup-for-sending (narticle group)
