@@ -9403,7 +9403,7 @@ default force yes
 @findex nntp-open-rlogin
 @findex nntp-open-telnet
 @findex nntp-open-network-stream
-@item nntp-open-connetcion-function
+@item nntp-open-connection-function
 @vindex nntp-open-connection-function
 この関数は遠隔システムに接続するために使われます。4つの既製関数が提供さ
 れています:
