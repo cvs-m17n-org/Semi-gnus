@@ -800,8 +800,8 @@ be set in `.emacs' instead."
   (insert gnus-product-name " " gnus-version-number
 	  (if (zerop (string-to-number gnus-revision-number))
 	      ""
-	    (concat " (r" gnus-revision-number ") "))
-	  "based on " gnus-original-product-name " v"
+	    (concat " (r" gnus-revision-number ")"))
+	  " based on " gnus-original-product-name " v"
 	  gnus-original-version-number)
   (goto-char (point-min))
   (insert-char ?\ ; space
