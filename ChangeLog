@@ -1,3 +1,7 @@
+2001-09-18 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* make-x.bat: New.
+
 2001-09-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: If W3DIR is identical to URLDIR, don't add it
