@@ -1,5 +1,11 @@
 2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-select-newsgroup): Don't examine cached
+	articles with `gnus-cache-articles-in-group' even if the current
+	group is not a virtual group (see ChangeLog.1 1999-03-02).
+
+2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
 
 	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Abolished.

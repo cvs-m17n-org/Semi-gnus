@@ -48,7 +48,6 @@
   (require 'static))
 
 (eval-and-compile
-  (autoload 'gnus-cache-articles-in-group "gnus-cache")
   (autoload 'pgg-decrypt-region "pgg" nil t)
   (autoload 'pgg-verify-region "pgg" nil t))
 
@@ -4529,10 +4528,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       (gnus-adjust-marked-articles info))
 
     ;; Kludge to avoid having cached articles nixed out in virtual groups.
-    (setq cached
-	  (if (gnus-virtual-group-p group)
-	      gnus-newsgroup-cached
-	    (gnus-cache-articles-in-group group)))
+    (when (gnus-virtual-group-p group)
+      (setq cached gnus-newsgroup-cached))
 
     (setq gnus-newsgroup-unreads
 	  (gnus-set-difference
@@ -4563,6 +4560,10 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Retrieve the headers and read them in.
       (setq gnus-newsgroup-headers (gnus-fetch-headers articles))
 
+      ;; Kludge to avoid having cached articles nixed out in virtual groups.
+      (when cached
+	(setq gnus-newsgroup-cached cached))
+
       ;; Suppress duplicates?
       (when gnus-suppress-duplicates
 	(gnus-dup-suppress-articles))
@@ -4579,11 +4580,6 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Removed marked articles that do not exist.
       (gnus-update-missing-marks
        (gnus-sorted-complement fetched-articles articles))
-
-      ;; Kludge to avoid having cached articles nixed out in virtual groups.
-      (when cached
-	(setq gnus-newsgroup-cached cached))
-
       ;; We might want to build some more threads first.
       (when (and gnus-fetch-old-headers
 		 (eq gnus-headers-retrieved-by 'nov))
