@@ -2015,22 +2015,22 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 (cond (window-system
        (setq custom-background-mode 'light)
        (defface my-group-face-1
-	 '((t (:foreground "Red" :bold t))) "First group face")
+         '((t (:foreground "Red" :bold t))) "First group face")
        (defface my-group-face-2
-	 '((t (:foreground "DarkSeaGreen4" :bold t))) "Second group face")
+         '((t (:foreground "DarkSeaGreen4" :bold t))) "Second group face")
        (defface my-group-face-3
-	 '((t (:foreground "Green4" :bold t))) "Third group face")
+         '((t (:foreground "Green4" :bold t))) "Third group face")
        (defface my-group-face-4
-	 '((t (:foreground "SteelBlue" :bold t))) "Fourth group face")
+         '((t (:foreground "SteelBlue" :bold t))) "Fourth group face")
        (defface my-group-face-5
-	 '((t (:foreground "Blue" :bold t))) "Fifth group face")))
+         '((t (:foreground "Blue" :bold t))) "Fifth group face")))
 
 (setq gnus-group-highlight
       '(((> unread 200) . my-group-face-1)
-	((and (< level 3) (zerop unread)) . my-group-face-2)
-	((< level 3) . my-group-face-3)
-	((zerop unread) . my-group-face-4)
-	(t . my-group-face-5)))
+        ((and (< level 3) (zerop unread)) . my-group-face-2)
+        ((< level 3) . my-group-face-3)
+        ((zerop unread) . my-group-face-4)
+        (t . my-group-face-5)))
 @end lisp
 
 @pxref{Faces and Fonts} $B$b;2>H$7$F$/$@$5$$!#(B
@@ -4290,8 +4290,8 @@ address "sender" "owner-ding@@hpc.uh.edu")} $B$O!"(B
 
 @example
 if address "sender" "owner-ding@@hpc.uh.edu" @{
-	fileinto "INBOX.ding";
-	stop;
+        fileinto "INBOX.ding";
+        stop;
 @}
 @end example
 
@@ -9124,9 +9124,9 @@ Gnus $B$,F1$8(B @code{Message-ID} $B$r;}$DFs$D$N5-;v$rH/8+$7$?$H$-$O!"2?$+;W$
 
 @lisp
 (setq gnus-newsgroup-variables
-      '(message-use-followup-to
-        (gnus-visible-headers
-         . "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^To:")))
+     '(message-use-followup-to
+       (gnus-visible-headers .
+         "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^To:")))
 @end lisp
 @end table
 
@@ -10260,13 +10260,13 @@ gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 
 @lisp
 (add-hook 'gnus-select-group-hook
-	  (lambda ()
-	    (cond
-	     ((string-match
-	       "^de\\." (gnus-group-real-name gnus-newsgroup-name))
-	      (ispell-change-dictionary "deutsch"))
-	     (t
-	      (ispell-change-dictionary "english")))))
+          (lambda ()
+            (cond
+             ((string-match
+               "^de\\." (gnus-group-real-name gnus-newsgroup-name))
+              (ispell-change-dictionary "deutsch"))
+             (t
+              (ispell-change-dictionary "english")))))
 @end lisp
 
 $B$"$J$?$NI,MW$K1~$8$FJQ99$7$F2<$5$$!#(B
@@ -10382,7 +10382,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
       '((if (message-news-p)
             "misc-news"
           (concat "mail." (format-time-string
-			   "%Y-%m" (current-time))))))
+                           "%Y-%m" (current-time))))))
 @end lisp
 
 @c (XEmacs 19.13 $B$K$O(B @code{format-time-string} $B$O$"$j$^$;$s$N$G!"$=(B
@@ -11374,7 +11374,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @lisp
 (setq gnus-select-method
       '(nntp "news.somewhere.edu"
-	     (nntp-list-options ("fj.*" "japan.*"))))
+             (nntp-list-options ("fj.*" "japan.*"))))
 @end lisp
 
 @item nntp-options-subscribe
@@ -11388,7 +11388,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @lisp
 (setq gnus-select-method
       '(nntp "news.somewhere.edu"
-	     (nntp-options-subscribe "^fj\\.\\|^japan\\.")))
+             (nntp-options-subscribe "^fj\\.\\|^japan\\.")))
 @end lisp
 
 @item nntp-options-not-subscribe
@@ -11402,7 +11402,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @lisp
 (setq gnus-select-method
       '(nntp "news.somewhere.edu"
-	     (nntp-options-not-subscribe "\\.binaries\\.")))
+             (nntp-options-not-subscribe "\\.binaries\\.")))
 @end lisp
 @end table
 
@@ -14268,7 +14268,7 @@ Web Newspaper $B$K4X$9$k0J2<$N(B @code{nnshimbun} $BJQ?t$rJQ$($k$3$H$,2DG=$G$
 
 (defun gnus-user-format-function-X (header)
   (let ((descr
-	 (assq nnrss-description-field (mail-header-extra header))))
+         (assq nnrss-description-field (mail-header-extra header))))
     (if descr (concat "\n\t" (cdr descr)) "")))
 @end lisp
 
@@ -16003,7 +16003,7 @@ gnus $B%(!<%8%'%s%H$,$=$N5-;v$r(B SPAM $B$@$H8+Pv$7$?$i??!#$3$NH/8+E*<jK!$O!"
 (require 'gnus-agent)
 (setq gnus-category-predicate-alist
       (append gnus-category-predicate-alist
-	      '((old . my-article-old-p))))
+              '((old . my-article-old-p))))
 @end lisp
 
 $B$=$7$F!"C1$K<!$N$h$&$K=R8l$r;XDj$7$^$9(B:
@@ -17495,16 +17495,16 @@ gnus $B$K$O$3$l$i$rA4$F<+F0E*$K(B --- $B$^$k$GKbK!$G$b;H$C$?$h$&$K:n@.(B
 @lisp
 (setq gnus-default-adaptive-score-alist
       '((gnus-unread-mark)
-	(gnus-ticked-mark (from 4))
-	(gnus-dormant-mark (from 5))
-	(gnus-del-mark (from -4) (subject -1))
-	(gnus-read-mark (from 4) (subject 2))
-	(gnus-expirable-mark (from -1) (subject -1))
-	(gnus-killed-mark (from -1) (subject -3))
-	(gnus-kill-file-mark)
-	(gnus-ancient-mark)
-	(gnus-low-score-mark)
-	(gnus-catchup-mark (from -1) (subject -1))))
+        (gnus-ticked-mark (from 4))
+        (gnus-dormant-mark (from 5))
+        (gnus-del-mark (from -4) (subject -1))
+        (gnus-read-mark (from 4) (subject 2))
+        (gnus-expirable-mark (from -1) (subject -1))
+        (gnus-killed-mark (from -1) (subject -3))
+        (gnus-kill-file-mark)
+        (gnus-ancient-mark)
+        (gnus-low-score-mark)
+        (gnus-catchup-mark (from -1) (subject -1))))
 @end lisp
 
 $B8+$F$*J,$+$j$N$h$&$K!"$3$NO"A[%j%9%H$N3FMWAG$O!"%-!<$H$7$F0u(B ($BJQ?tL>$+$b(B
@@ -20367,13 +20367,13 @@ Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
 (defun kevin-spamassassin ()
   (save-excursion
     (let ((buf (or (get-buffer " *nnmail incoming*")
-		   (get-buffer " *nnml move*"))))
+                   (get-buffer " *nnml move*"))))
       (if (not buf)
-	  (progn (message "Oops, cannot find message buffer") nil)
-	(set-buffer buf)
-	(if (eq 1 (call-process-region (point-min) (point-max)
-				       "spamc" nil nil nil "-c"))
-	    "spam")))))
+          (progn (message "Oops, cannot find message buffer") nil)
+        (set-buffer buf)
+        (if (eq 1 (call-process-region (point-min) (point-max)
+                                       "spamc" nil nil nil "-c"))
+            "spam")))))
 @end lisp
 
 $B0J>e$,$3$l$K4X$9$k$3$H$G$9!#$$$/$D$+$N(B spam $B$O$I$&$7$F$bAGDL$j$7$F$7$^$&(B
@@ -21976,7 +21976,7 @@ Gnus 5.8 $B$N?7$7$$5!G=(B:
 @lisp
 (setq mail-sources
       '((directory :path "~/mail/incoming/"
-		   :suffix ".in")))
+                   :suffix ".in")))
 @end lisp
 
 $B$b$C$H>\$7$$>pJs$O(B info $B$N(B Select Methods -> Getting Mail -> Mail
