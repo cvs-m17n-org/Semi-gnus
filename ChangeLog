@@ -1,3 +1,10 @@
+2001-09-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Use
+	`bbdb-display-layout' or `bbdb-pop-up-display-layout' instead of
+	`bbdb-elided-display' or `bbdb-pop-up-elided-display' when BBDB
+	v2.33 or later is running.
+
 2001-08-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-util.el (gnus-truncate-string): Abolished.
