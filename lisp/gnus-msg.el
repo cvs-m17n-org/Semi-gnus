@@ -196,7 +196,7 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-newsreader (setq message-mailer (gnus-extended-version)))
+  (setq message-user-agent (gnus-extended-version))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action
@@ -508,9 +508,39 @@ If SILENT, don't prompt the user."
 ;;; as well include the Emacs version as well.
 ;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified Gnus version."
+  "Stringified Gnus version and Emacs version."
   (interactive)
-  gnus-version)
+  (concat
+   "Semi-gnus/" gnus-version-number " "
+   (cond
+    ((string-match "^\\([0-9]+\\.[0-9]+\\)\\.[.0-9]+$" emacs-version)
+     (concat "Emacs/" (substring emacs-version
+				 (match-beginning 1)
+				 (match-end 1))
+             (if (boundp 'mule-version)
+                 (concat " Mule/" mule-version)
+               "")
+             (if (featurep 'meadow)
+                 ;; XXX: (Meadow-version) -> Meadow-1.0x (CODENAME)
+                 (concat " " (Meadow-version))
+               "")))
+    ;; XXX: rewrite to use "(featurep 'xemacs)"?
+    ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
+		   emacs-version)
+     (concat (substring emacs-version
+			(match-beginning 1)
+			(match-end 1))
+	     (format "/%d.%d" emacs-major-version emacs-minor-version)
+	     (if (match-beginning 3)
+		 (substring emacs-version
+			    (match-beginning 3)
+			    (match-end 3))
+	       "")
+             ;; XXX: Insert `with-mule' or `without-mule'?
+	     (if (boundp 'xemacs-codename)
+		 (concat " (" xemacs-codename ")")
+               "")))
+    (t emacs-version))))
 
 
 ;;;
