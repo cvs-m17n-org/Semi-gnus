@@ -165,12 +165,19 @@ If nil, attach files as normal parts."
 		 (const all :tag "Any")
 		 (string :tag "Regexp")))
 
-(defcustom gnus-group-posting-charset-alist
-  '(("^\\(no\\|fr\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
-    ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
-    (message-this-is-mail nil nil)
-    (message-this-is-news nil t))
-  "Alist of regexps and permitted unencoded charsets for posting.
+(gnus-define-group-parameter
+ posting-charset-alist
+ :type list
+ :function-document
+ "Return the permitted unencoded charsets for posting of GROUP."
+ :variable gnus-group-posting-charset-alist
+ :variable-default
+ '(("^\\(no\\|fr\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+   ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
+   (message-this-is-mail nil nil)
+   (message-this-is-news nil t))
+ :variable-document
+ "Alist of regexps and permitted unencoded charsets for posting.
 Each element of the alist has the form (TEST HEADER BODY-LIST), where
 TEST is either a regular expression matching the newsgroup header or a
 variable to query,
@@ -182,22 +189,26 @@ nil (always encode using quoted-printable) or t (always use 8bit).
 
 Note that any value other than nil for HEADER infringes some RFCs, so
 use this option with care."
-  :type '(repeat (list :tag "Permitted unencoded charsets"
-		       (choice :tag "Where"
-			       (regexp :tag "Group")
-			       (const :tag "Mail message"
-				      :value message-this-is-mail)
-			       (const :tag "News article"
-				      :value message-this-is-news))
-		       (choice :tag "Header"
-			       (const :tag "None" nil)
-			       (symbol :tag "Charset"))
-		       (choice :tag "Body"
-			       (const :tag "Any" :value t)
-			       (const :tag "None" :value nil)
-			       (repeat :tag "Charsets"
-				       (symbol :tag "Charset")))))
-  :group 'gnus-charset)
+ :variable-group gnus-charset
+ :variable-type
+ '(repeat (list :tag "Permitted unencoded charsets"
+		(choice :tag "Where"
+			(regexp :tag "Group")
+			(const :tag "Mail message" :value message-this-is-mail)
+			(const :tag "News article" :value message-this-is-news))
+		(choice :tag "Header"
+			(const :tag "None" nil)
+			(symbol :tag "Charset"))
+		(choice :tag "Body"
+			(const :tag "Any" :value t)
+			(const :tag "None" :value nil)
+			(repeat :tag "Charsets"
+				(symbol :tag "Charset")))))
+ :parameter-type '(choice :tag "Permitted unencoded charsets"
+			  :value nil
+			  (repeat (symbol)))
+ :parameter-document       "\
+List of charsets that are permitted to be unencoded.")
 
 (defcustom gnus-debug-files
   '("gnus.el" "gnus-sum.el" "gnus-group.el"
@@ -1498,7 +1509,9 @@ The current group name will be inserted at \"%s\".")
 	       message-required-news-headers
 	     message-required-mail-headers)))
 	(goto-char (point-max))
-	(insert "Gcc: " group "\n")
+	(if (string-match " " group)
+	    (insert "Gcc: \"" group "\"\n")
+	  (insert "Gcc: " group "\n"))
 	(widen)))
     (gnus-inews-do-gcc)
     (when (and (get-buffer gnus-group-buffer)
@@ -1765,8 +1778,15 @@ this is a reply."
 		    group))))
 	(when gcc
 	  (insert "Gcc: "
-		  (if (stringp gcc) gcc
-		    (mapconcat 'identity gcc " "))
+		  (if (stringp gcc) 
+		      (if (string-match " " gcc)
+			  (concat "\"" gcc "\"")
+			gcc)
+		    (mapconcat (lambda (group)
+				 (if (string-match " " group)
+				     (concat "\"" group "\"")
+				   group))
+			       gcc " "))
 		  "\n"))))))
 
 (defun gnus-inews-insert-archive-gcc (&optional group)
@@ -1827,8 +1847,12 @@ this is a reply."
 	      (progn
 		(insert
 		 (if (stringp gcc-self-val)
-		     gcc-self-val
-		   group))
+		     (if (string-match " " gcc-self-val)
+			 (concat "\"" gcc-self-val "\"")
+		       gcc-self-val)
+		   (if (string-match " " group)
+		       (concat "\"" group "\"")
+		     group)))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
 		  (progn
@@ -1836,10 +1860,13 @@ this is a reply."
 		    (kill-line))))
 	    ;; Use the list of groups.
 	    (while (setq name (pop groups))
-	      (insert (if (string-match ":" name)
-			  name
-			(gnus-group-prefixed-name
-			 name gnus-message-archive-method)))
+	      (let ((str (if (string-match ":" name)
+			     name
+			   (gnus-group-prefixed-name
+			    name gnus-message-archive-method))))
+		(insert (if (string-match " " str)
+			    (concat "\"" str "\"")
+			  str)))
 	      (when groups
 		(insert " ")))
 	    (insert "\n")))))))

@@ -11966,8 +11966,9 @@ POP $B%a!<%k%5!<%P!<!"(Bprocmail $B%G%#%l%/%H%j!<!"(Bmaildir $B$J$I$,Nc$H$7
 
 @table @code
 @item :path
-$B%U%!%$%k$N%Q%9$G$9!#=i4|CM$O(B @code{MAIL} $B4D6-JQ?t$NCM$+!"(B
-@file{usr-mail/spool/user-name} $B$G$9!#(B
+$B%U%!%$%k$N%Q%9$G$9!#=i4|CM$O(B @code{MAIL} $B4D6-JQ?t$NCM(B
+$B$+(B @code{rmail-spool-directory} $B$NCM(B ($BIaDL(B
+$B$O(B @file{usr-mail/spool/user-name} $B$N$h$&$J$b$N(B) $B$G$9!#(B
 @end table
 
 $B%U%!%$%k%a!<%k%=!<%9$NNc(B:
