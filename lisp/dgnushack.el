@@ -70,7 +70,8 @@ Modify to suit your needs."))
       (error (setq files (delete "nnweb.el" (delete "nnlistserv.el" files)))))
     (condition-case ()
 	(require 'bbdb)
-      (error (setq files (delete "gnus-bbdb.el" files))))
+      (error (setq files (delete "gnus-bbdb.el"
+				 (delete "mess-bbdb.el" files)))))
     (while (setq file (pop files))
       (when (or (and (not xemacs)
 		     (not (member file '("gnus-xmas.el" "gnus-picon.el"
