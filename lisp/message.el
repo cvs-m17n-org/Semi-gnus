@@ -2245,7 +2245,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-fc" 'message-goto-mail-copies-to)
 
   (define-key message-mode-map "\C-c\C-t" 'message-insert-to)
-  (define-key message-mode-map "\C-c\C-p" 'message-insert-wide-reply)
+  (define-key message-mode-map "\C-c\M-t" 'message-insert-wide-reply)
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
   (define-key message-mode-map "\C-c\C-l" 'message-to-list-only)
 

@@ -966,6 +966,15 @@ documentation of your OpenPGP implementation, so we refer to it.
 は @code{From} ヘッダーを含む @code{To} ヘッダーを挿入しま
 す (@code{message-insert-to})。
 
+@item C-c M-t
+@kindex C-c M-t
+@findex message-insert-wide-reply
+本記事に対して広い返答をしたときのようなアドレスを含
+む @code{To} と @code{Cc} ヘッダーを挿入しま
+す (@code{message-insert-wide-reply})。これは、普通は @code{To},
+@code{From}/@code{Reply-To} および @code{Cc} から、すべてのアドレスが拾
+い上げられることを意味します。
+
 @item C-c C-n
 @kindex C-c C-n
 @findex message-insert-newsgroups
