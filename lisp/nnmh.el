@@ -125,31 +125,6 @@ as unread by Gnus.")
         ;; (nnheader-fold-continuation-lines)
 	'headers))))
 
-(deffoo nnmh-retrieve-parsed-headers (articles
-				      dependencies
-				      &optional newsgroup server fetch-old
-				      force-new)
-  (save-excursion
-    (set-buffer nntp-server-buffer)
-    (let* ((file nil)
-	   (number (length articles))
-	   (large (and (numberp nnmail-large-newsgroup)
-		       (> number nnmail-large-newsgroup)))
-	   (count 0)
-	   (file-name-coding-system 'binary)
-	   (pathname-coding-system 'binary)
-	   (case-fold-search t)
-	   ;;beg
-	   article
-	   headers header id end ref lines chars ctype in-reply-to
-	   (cur (current-buffer)))
-      (nnmh-possibly-change-directory newsgroup server)
-      ;; We don't support fetching by Message-ID.
-      (nnheader-retrieve-headers-from-directory
-       articles nnmh-current-directory dependencies
-       fetch-old force-new large "nnmh")
-      )))
-
 (deffoo nnmh-open-server (server &optional defs)
   (nnoo-change-server 'nnmh server defs)
   (when (not (file-exists-p nnmh-directory))

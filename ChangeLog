@@ -1,5 +1,20 @@
 2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Abolished.
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers-xover): Don't use
+	`gnus-retrieve-parsed-headers'.
+	(gnus-fetch-headers): Ditto.
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Abolished.
+
+	* lisp/gnus-cache.el (gnus-cache-braid-headers): Abolished.
+	(gnus-cache-retrieve-parsed-headers): Abolished.
+
+2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Bind
 	`nnmail-expiry-wait-function' to nil if the group's parameter
 	`expiry-wait' is specified by the user or the shimbun's default
