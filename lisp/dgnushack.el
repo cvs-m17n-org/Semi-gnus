@@ -134,20 +134,13 @@ than subr.el."
 	      (put 'car 'side-effect-free tmp)))
 	ad-do-it))))
 
-(setq max-specpdl-size 3000)
-
-(when (equal
-       (cadr
-	(byte-optimize-form
-	 '(and
-	   (< 0 1)
-	   (message "The subform `(< 0 1)' should be optimized to t"))
-	 'for-effect))
-       '(< 0 1))
+(when (and (not (featurep 'xemacs))
+	   (byte-optimize-form '(and (> 0 1) foo) t))
   (defadvice byte-optimize-form-code-walker
     (around fix-bug-in-and/or-forms (form for-effect) activate)
-    "Fix a bug in the optimizing and/or forms.
-It has already been fixed in XEmacs since 1999-12-06."
+    "Optimize the rest of the and/or forms.
+It has been fixed in XEmacs before releasing 21.4 and also has been
+fixed in Emacs after 21.3."
     (if (and for-effect (memq (car-safe form) '(and or)))
 	(let ((fn (car form))
 	      (backwards (reverse (cdr form))))
@@ -163,26 +156,6 @@ It has already been fixed in XEmacs since 1999-12-06."
 		    (mapcar 'byte-optimize-form (cdr backwards))))
 	  (setq ad-return-value (cons fn (nreverse backwards))))
       ad-do-it)))
-
-(condition-case nil
-    (char-after)
-  (wrong-number-of-arguments
-   ;; Optimize byte code for `char-after'.
-   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
-   (defun byte-optimize-char-after (form)
-     (if (null (cdr form))
-	 '(char-after (point))
-       form))))
-
-(condition-case nil
-    (char-before)
-  (wrong-number-of-arguments
-   ;; Optimize byte code for `char-before'.
-   (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
-   (defun byte-optimize-char-before (form)
-     (if (null (cdr form))
-	 '(char-before (point))
-       form))))
 
 ;; Add `early-package-load-path' to `load-path' for XEmacs.  Those paths
 ;; won't appear in `load-path' when XEmacs starts with the `-no-autoloads'
@@ -287,123 +260,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			(cons 'lambda (cdr (cdr form))))
 		  byte-compile-function-environment)))
   form)
-
-(condition-case nil
-    :symbol-for-testing-whether-colon-keyword-is-available-or-not
-  (void-variable
-   (defun dgnushack-bind-colon-keywords ()
-     "Bind all the colon keywords for old Emacsen."
-     (let ((cache (expand-file-name "dgnuskwds.el" srcdir))
-	   (makefile (expand-file-name "Makefile" srcdir))
-	   (buffer (get-buffer-create " *colon keywords*"))
-	   keywords ignores files file dirs dir form elem make-backup-files)
-       (save-excursion
-	 (set-buffer buffer)
-	 (let (buffer-file-format
-	       format-alist
-	       insert-file-contents-post-hook
-	       insert-file-contents-pre-hook
-	       jam-zcat-filename-list
-	       jka-compr-compression-info-list)
-	   (if (and (file-exists-p cache)
-		    (file-exists-p makefile)
-		    (file-newer-than-file-p cache makefile))
-	       (progn
-		 (insert-file-contents cache nil nil nil t)
-		 (setq keywords (read buffer)))
-	     (setq
-	      ignores
-	      '(:symbol-for-testing-whether-colon-keyword-is-available-or-not
-		;; The following keywords will be bound by CUSTOM.
-		:get :group :initialize :link :load :options :prefix
-		:require :set :tag :type)
-	      files (list (locate-library "semi-def")
-			  (locate-library "mailcap")
-			  (locate-library "mime-def")
-			  (locate-library "path-util")
-			  (locate-library "poem"))
-	      dirs (list (file-name-as-directory (expand-file-name srcdir))))
-	     (while files
-	       (when (setq file (pop files))
-		 (setq dir (file-name-directory file))
-		 (unless (member dir dirs)
-		   (push dir dirs))))
-	     (message "Searching for all the colon keywords in:")
-	     (while dirs
-	       (setq dir (pop dirs))
-	       (message " %s..." dir)
-	       (setq files (directory-files dir t
-					    "\\.el\\(\\.gz\\|\\.bz2\\)?$"))
-	       (while files
-		 (setq file (pop files))
-		 (if (string-match "\\(\\.gz$\\)\\|\\.bz2$" file)
-		     (let ((temp (expand-file-name "dgnustemp.el" srcdir)))
-		       (when
-			   (let ((coding-system-for-read 'binary)
-				 (coding-system-for-write 'binary)
-				 (default-process-coding-system
-				   '(binary . binary))
-				 call-process-hook)
-			     (insert-file-contents file nil nil nil t)
-			     (when
-				 (condition-case code
-				     (progn
-				       (if (match-beginning 1)
-					   (call-process-region
-					    (point-min) (point-max)
-					    "gzip" t buffer nil "-cd")
-					 (call-process-region
-					  (point-min) (point-max)
-					  "bzip2" t buffer nil "-d"))
-				       t)
-				   (error
-				    (erase-buffer)
-				    (message "In file %s: %s" file code)
-				    nil))
-			       (write-region (point-min) (point-max) temp
-					     nil 'silent)
-			       t))
-			 (unwind-protect
-			     (insert-file-contents temp nil nil nil t)
-			   (delete-file temp))))
-		   (insert-file-contents file nil nil nil t))
-		 (while (setq form (condition-case nil
-				       (read buffer)
-				     (error nil)))
-		   (when (listp form)
-		     (while form
-		       (setq elem (car-safe form)
-			     form (cdr-safe form))
-		       (unless (memq (car-safe elem)
-				     '(defcustom defface defgroup
-				       define-widget quote))
-			 (while (consp elem)
-			   (push (car elem) form)
-			   (setq elem (cdr elem)))
-			 (when (and elem
-				    (symbolp elem)
-				    (not (eq ': elem))
-				    (eq ?: (aref (symbol-name elem) 0))
-				    (not (memq elem ignores))
-				    (not (memq elem keywords)))
-			   (push elem keywords))))))))
-	     (setq keywords (sort keywords
-				  (lambda (a b)
-				    (string-lessp (symbol-name a)
-						  (symbol-name b)))))
-	     (erase-buffer)
-	     (insert (format "%s" keywords))
-	     (write-region (point-min) (point) cache nil 'silent)
-	     (message
-	      "The following colon keywords will be bound at run-time:\n %s"
-	      keywords))))
-       (kill-buffer buffer)
-       (defconst dgnushack-colon-keywords keywords)
-       (while keywords
-	 (set (car keywords) (car keywords))
-	 (setq keywords (cdr keywords)))))
-   (byte-compile 'dgnushack-bind-colon-keywords)
-   (dgnushack-bind-colon-keywords)))
 
 ;; Unknown variables and functions.
 (unless (featurep 'xemacs)
