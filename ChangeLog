@@ -15,7 +15,7 @@
 	`gnus-message-get-reply-buffer' exists.
 
 	* lisp/gnus-msg.el (gnus-setup-message): Bind
-	`message-get-reply-buffer' as the function
+	`gnus-message-get-reply-buffer' as the function
 	`gnus-copy-article-buffer'.
 
 1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
