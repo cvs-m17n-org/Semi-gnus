@@ -1209,6 +1209,9 @@ find-file-hooks, etc.
 	'multibyte-string-p
       'ignore))
 
+  (defalias 'mm-encode-coding-string 'encode-coding-string)
+  (defalias 'mm-decode-coding-string 'decode-coding-string)
+
   (defun nnheader-detect-coding-region (start end)
     "Like 'detect-coding-region' except returning the best one."
     (let ((coding-systems
