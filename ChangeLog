@@ -1,3 +1,42 @@
+2000-02-08  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.5 (This is alpha status.)
+	See announcement of 7.1.0.3.
+
+	Only sync up with Gnus 5.6.3.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.5.
+
+	* lisp/ChangeLog, lisp/base64.el, lisp/binhex.el,
+	lisp/dgnushack.el, lisp/gnus-agent.el, lisp/gnus-art.el,
+	lisp/gnus-async.el, lisp/gnus-audio.el, lisp/gnus-bcklg.el,
+	lisp/gnus-cache.el, lisp/gnus-cite.el, lisp/gnus-cus.el,
+	lisp/gnus-demon.el, lisp/gnus-draft.el, lisp/gnus-ems.el,
+	lisp/gnus-gl.el, lisp/gnus-group.el, lisp/gnus-kill.el,
+	lisp/gnus-load.el, lisp/gnus-mh.el, lisp/gnus-mlspl.el,
+	lisp/gnus-msg.el, lisp/gnus-nocem.el, lisp/gnus-picon.el,
+	lisp/gnus-range.el, lisp/gnus-salt.el, lisp/gnus-score.el,
+	lisp/gnus-setup.el, lisp/gnus-soup.el, lisp/gnus-spec.el,
+	lisp/gnus-srvr.el, lisp/gnus-start.el, lisp/gnus-sum.el,
+	lisp/gnus-topic.el, lisp/gnus-undo.el, lisp/gnus-util.el,
+	lisp/gnus-uu.el, lisp/gnus-win.el, lisp/gnus-xmas.el,
+	lisp/gnus.el, lisp/ietf-drums.el, lisp/imap.el, lisp/lpath.el,
+	lisp/mail-prsvr.el, lisp/mail-source.el, lisp/md5.el,
+	lisp/message.el, lisp/messcompat.el, lisp/mm-bodies.el,
+	lisp/mm-decode.el, lisp/mm-encode.el, lisp/mm-mailcap.el,
+	lisp/mm-util.el, lisp/mm-uu.el, lisp/mm-view.el, lisp/nnagent.el,
+	lisp/nnbabyl.el, lisp/nndb.el, lisp/nndoc.el, lisp/nndraft.el,
+	lisp/nneething.el, lisp/nnfolder.el, lisp/nnheader.el,
+	lisp/nnimap.el, lisp/nnkiboze.el, lisp/nnlistserv.el,
+	lisp/nnmail.el, lisp/nnmbox.el, lisp/nnmh.el, lisp/nnml.el,
+	lisp/nnslashdot.el, lisp/nnsoup.el, lisp/nnspool.el, lisp/nntp.el,
+	lisp/nnultimate.el, lisp/nnvirtual.el, lisp/nnwarchive.el,
+	lisp/nnweb.el, lisp/parse-time.el, lisp/pop3.el, lisp/qp.el,
+	lisp/rfc1843.el, lisp/rfc2047.el, lisp/rfc2104.el, lisp/smiley.el,
+	lisp/uudecode.el, lisp/webmail.el, , texi/ChangeLog,
+	texi/emacs-mime.texi, texi/gnus.texi, texi/message.texi: Sync up
+	with gnus-5_8_3.
+
 2000-01-12  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.4 (This is alpha status.)
