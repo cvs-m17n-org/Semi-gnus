@@ -645,6 +645,7 @@ be added below it (otherwise)."
 	   (const :tag "On" t)
 	   (const :tag "Header" head)
 	   (const :tag "Last" last)
+	   (const :tag "Mime" mime)
 	   (integer :tag "Less")
 	   (repeat :tag "Groups" regexp)
 	   (sexp :tag "Predicate")))
@@ -1286,7 +1287,8 @@ if given a positive prefix, always hide."
 	    (let ((func (cadr (assq 'gnus-treat-display-xface
 				    gnus-treatment-function-alist)))
 		  (condition 'head))
-	      (when (and func
+	      (when (and (not gnus-inhibit-treatment)
+			 func
 			 (gnus-treat-predicate gnus-treat-display-xface))
 		(funcall func)
 		(put-text-property header-start header-end 'read-only nil))))
@@ -4890,15 +4892,16 @@ For example:
 	(highlightp (gnus-visual-p 'article-highlight 'highlight))
 	val elem)
     (gnus-run-hooks 'gnus-part-display-hook)
-    (while (setq elem (pop alist))
-      (setq val (symbol-value (car elem)))
-      (when (and (or (consp val)
-		     treated-type)
-		 (gnus-treat-predicate val)
-		 (or (not (get (car elem) 'highlight))
-		     highlightp))
-	(save-restriction
-	  (funcall (cadr elem)))))))
+    (unless gnus-inhibit-treatment
+      (while (setq elem (pop alist))
+	(setq val (symbol-value (car elem)))
+	(when (and (or (consp val)
+		       treated-type)
+		   (gnus-treat-predicate val)
+		   (or (not (get (car elem) 'highlight))
+		       highlightp))
+	  (save-restriction
+	    (funcall (cadr elem))))))))
 
 ;; Dynamic variables.
 (defvar part-number)
