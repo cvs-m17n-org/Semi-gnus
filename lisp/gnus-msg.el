@@ -1059,6 +1059,7 @@ this is a reply."
 	(message-narrow-to-headers)
 	(let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	      (coding-system-for-write 'raw-text)
+	      (output-coding-system 'raw-text)
 	      groups group method)
 	  (when gcc
 	    (message-remove-header "gcc")
