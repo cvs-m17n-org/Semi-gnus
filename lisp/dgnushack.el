@@ -581,14 +581,6 @@ dgnushack-compile."
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
-  (unless (locate-library "cus-edit")
-    (error "You do not seem to have Custom installed.
-Fetch it from <URL:http://www.dina.kvl.dk/~abraham/custom/>.
-You also then need to add the following to the lisp/dgnushack.el file:
-
-     (push \"~/lisp/custom\" load-path)
-
-Modify to suit your needs."))
 
   ;; Show `load-path'.
   (message "load-path=(\"%s\")"
