@@ -8923,9 +8923,17 @@ save those articles instead."
 ;;; @ for mime-partial
 ;;;
 
-(defun gnus-mime-partial-preview-function ()
-  (gnus-summary-preview-mime-message (gnus-summary-article-number))
-  )
+(defun gnus-request-partial-message ()
+  (save-excursion
+    (let ((number (gnus-summary-article-number))
+	  (group gnus-newsgroup-name)
+	  (mother gnus-article-buffer))
+      (set-buffer (get-buffer-create " *Partial Article*"))
+      (erase-buffer)
+      (setq mime-preview-buffer mother)
+      (gnus-request-original-article number group)
+      (mime-parse-buffer)
+      )))
 
 (autoload 'mime-combine-message/partial-pieces-automatically
   "mime-partial"
@@ -8936,11 +8944,8 @@ save those articles instead."
 	   (major-mode . gnus-original-article-mode)
 	   (method . mime-combine-message/partial-pieces-automatically)
 	   (summary-buffer-exp . gnus-summary-buffer)
+	   (request-partial-message-method . gnus-request-partial-message)
 	   ))
-
-(set-alist 'mime-view-partial-message-method-alist
-	   'gnus-original-article-mode
-	   'gnus-mime-partial-preview-function)
 
 
 ;;; @ end
