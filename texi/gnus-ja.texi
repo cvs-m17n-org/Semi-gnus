@@ -414,26 +414,26 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 @end iftex
 
 @menu
-* Starting Up::                 $B%K%e!<%9$r8+$D$1$k$N$K$O6lO+$,H<$&$+$bCN$l$J$$(B
-* Group Buffer::                $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
-* Summary Buffer::              $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
-* Article Buffer::              $B5-;v$rI=<($7!"07$&(B
-* Composing Messages::          $B%a!<%k$H%K%e!<%9$rAw$k$?$a$N>pJs(B
-* Select Methods::              Gnus $B$OA4$F$N%a%C%;!<%8$r$$$m$$$m$JA*BrJ}K!$GFI$`(B
-* Scoring::                     $B5-;v$KCM$r$D$1$k(B
-* Various::                     $B0lHLE*$J@_Dj(B
-* The End::                     $B$5$i$P!"$=$7$F$5$h$&$J$i(B
-* Appendices::                  $BMQ8l!"(BEmacs $BF~Lg!"(B@acronym{FAQ}$B!"Nr;K!"FbIt9=B$(B
-* Index::                       $BJQ?t!"4X?t!"35G0$N:w0z(B
-* Key Index::                   $B%-!<:w0z(B
+* Starting Up::              $B%K%e!<%9$r8+$D$1$k$N$K$O6lO+$,H<$&$+$bCN$l$J$$(B
+* Group Buffer::             $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
+* Summary Buffer::           $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
+* Article Buffer::           $B5-;v$rI=<($7!"07$&(B
+* Composing Messages::       $B%a!<%k$H%K%e!<%9$rAw$k$?$a$N>pJs(B
+* Select Methods::           Gnus $B$OA4$F$N%a%C%;!<%8$r$$$m$$$m$JA*BrJ}K!$GFI$`(B
+* Scoring::                  $B5-;v$KCM$r$D$1$k(B
+* Various::                  $B0lHLE*$J@_Dj(B
+* The End::                  $B$5$i$P!"$=$7$F$5$h$&$J$i(B
+* Appendices::               $BMQ8l!"(BEmacs $BF~Lg!"(B@acronym{FAQ}$B!"Nr;K!"FbIt9=B$(B
+* Index::                    $BJQ?t!"4X?t!"35G0$N:w0z(B
+* Key Index::                $B%-!<:w0z(B
 
 Other related manuals
 
-* Message:(message).            $B%a%C%;!<%8$N:n@.(B
-* Emacs-MIME:(emacs-mime).      Composing messages; @acronym{MIME}-specific parts.
-* Sieve:(sieve).                Managing Sieve scripts in Emacs.
-* PGG:(pgg).                    @acronym{PGP/MIME} with Gnus.
-* SASL:(sasl).                  @acronym{SASL} authentication in Emacs.
+* Message:(message).         $B%a%C%;!<%8$N:n@.(B
+* Emacs-MIME:(emacs-mime).   Composing messages; @acronym{MIME}-specific parts.
+* Sieve:(sieve).             Managing Sieve scripts in Emacs.
+* PGG:(pgg).                 @acronym{PGP/MIME} with Gnus.
+* SASL:(sasl).               @acronym{SASL} authentication in Emacs.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -971,17 +971,17 @@ Emacs for Heathens
 $B9`(B (@pxref{Terminology}) $B$r;2>H$7$F$/$@$5$$!#(B
 
 @menu
-* Finding the News::            $B%K%e!<%9$r<hF@$9$kJ}K!$rA*$V(B
-* The First Time::              $B:G=i$K5/F0$7$?$H$-$K(B gnus $B$O2?$r$9$k$+(B
-* The Server is Down::          $B$I$&$9$l$P$=$N$h$&$J$H$-$K%a!<%k$r<j$KF~$l$k$3$H$,$G$-$k$+(B
-* Slave Gnusae::                $BF1;~$K0l$D0J>e$N(B gnus $B$r:nF0$5$;$k$3$H$,$G$-$k(B
-* Fetching a Group::            $B%0%k!<%W$rFI$`$?$a$@$1$K(B gnus $B$r5/F0$9$k(B
-* New Groups::                  Gnus $B$,?7$7$$%0%k!<%W$KBP$7$F2?$r$9$k$+(B
-* Changing Servers::            $B$"$k%5!<%P$+$iJL$N%5!<%P$X0\$j$?$$$+$b$7$l$J$$(B
-* Startup Files::               $B$d$C$+$$$J%9%?!<%H%"%C%W%U%!%$%k(B -- @file{.newsrc}
-* Auto Save::                   $B%/%i%C%7%e$+$i$N2sI|(B
-* The Active File::             $BCY$$2s@~$+$i$N%U%!%$%k$N<hF@$K$O;~4V$,$+$+$k(B
-* Startup Variables::           $BJQ99$7$?$$$H;W$&$+$b$7$l$J$$JQ?t(B
+* Finding the News::      $B%K%e!<%9$r<hF@$9$kJ}K!$rA*$V(B
+* The First Time::        $B:G=i$K5/F0$7$?$H$-$K(B gnus $B$O2?$r$9$k$+(B
+* The Server is Down::    $B$I$&$9$l$P$=$N$h$&$J$H$-$K%a!<%k$r<j$KF~$l$k$3$H$,$G$-$k$+(B
+* Slave Gnusae::          $BF1;~$K0l$D0J>e$N(B gnus $B$r:nF0$5$;$k$3$H$,$G$-$k(B
+* Fetching a Group::      $B%0%k!<%W$rFI$`$?$a$@$1$K(B gnus $B$r5/F0$9$k(B
+* New Groups::            Gnus $B$,?7$7$$%0%k!<%W$KBP$7$F2?$r$9$k$+(B
+* Changing Servers::      $B$"$k%5!<%P$+$iJL$N%5!<%P$X0\$j$?$$$+$b$7$l$J$$(B
+* Startup Files::         $B$d$C$+$$$J%9%?!<%H%"%C%W%U%!%$%k(B -- @file{.newsrc}
+* Auto Save::             $B%/%i%C%7%e$+$i$N2sI|(B
+* The Active File::       $BCY$$2s@~$+$i$N%U%!%$%k$N<hF@$K$O;~4V$,$+$+$k(B
+* Startup Variables::     $BJQ99$7$?$$$H;W$&$+$b$7$l$J$$JQ?t(B
 @end menu
 
 @node Finding the News
@@ -1017,7 +1017,8 @@ Emacs for Heathens
 
 $B%m!<%+%k$N%9%W!<%k$r;H$($k$N$G$"$l$P!"$+$J$j$N3NN($G$=$NJ}$,$:$C$HB.$$$G(B
 $B$7$g$&$7!"$=$l$r;H$&$Y$-$G$7$g$&!#$G$b!"$b$7$"$J$?$N%5!<%P!<(B
-$B$,(B Leafnode $B$G$"$k$J$i$P%m!<%+%k%9%W!<%k$r;H$C$F$O$$$1$^$;$s!#$3$N>l9g(B
+$B$,(B Leafnode ($B$=$l$O4JC1$J8D?MMQ$N%K%e!<%9%5!<%P!<$G$9(B) $B$G$"$k$J$i$P%m!<(B
+$B%+%k%9%W!<%k$r;H$C$F$O$$$1$^$;$s!#$3$N>l9g(B
 $B$O(B @code{(nntp "localhost")} $B$K$7$^$7$g$&!#(B
 
 @vindex gnus-nntpserver-file
@@ -1083,8 +1084,8 @@ gnus $B$O(B @code{gnus-secondary-servers} $B%j%9%H(B ($B$b$7B8:_$9$k$J$i$P
 @section $B0lHV=i$a(B
 @cindex first time usage
 
-$B5/F0MQ%U%!%$%k$,B8:_$7$J$$$H$-$O!"(Bgnus $B$O%G%#%U%)%k%H$G$I$N%0%k!<%W$,9X(B
-$BFI$5$l$F$$$k$Y$-$+$r7hDj$7$h$&$H$7$^$9!#(B
+$B5/F0MQ%U%!%$%k$,B8:_$7$J$$$H$-$O(B (@pxref{Startup Files})$B!"(Bgnus $B$O%G%#%U%)(B
+$B%k%H$G$I$N%0%k!<%W$,9XFI$5$l$F$$$k$Y$-$+$r7hDj$7$h$&$H$7$^$9!#(B
 
 @vindex gnus-default-subscribed-newsgroups
 $BJQ?t(B @code{gnus-default-subscribed-newsgroups} $B$,@_Dj$5$l$F$$$k$H!"(B
@@ -1164,17 +1165,6 @@ Gnus $B$O!"?.Mj$G$-$k%W%m%0%i%`$N0l$D$H$7$F!"%5!<%P!<$H@\B3$G$-$J$$$H$-$O(B
 $B$b$7$l$^$;$s!#(B``yes'' $B$HEz$($k$H!"%^%9%?!<$K%;!<%V$5$l$F$$$J$$JQ99$O%9%l!<(B
 $B%V$KH?1G$5$l$^$;$s!#(B``no'' $B$HEz$($k$H!"%^%9%?!<$GFI$^$l$?$$$/$D$+$N5-;v(B
 $B$,!"%9%l!<%V$G$OL$FI$G$"$k$H8+$J$5$l$k$+$b$7$l$^$;$s!#(B
-
-@node Fetching a Group
-@section $B%0%k!<%W$r<hF@$9$k(B
-@cindex fetching a group
-
-@findex gnus-fetch-group
-$B;~!9!"!H$3$N%0%k!<%W$rFI$_$?$$$N$G$"$C$F!"(Bgnus $B$,5/F0$7$F$$$k$+$I$&$+$r(B
-$B5$$K$7$?$/$J$$!#!I$H$$$&$3$H$,$G$-$l$PJXMx$J$3$H$,$"$j$^$9!#$3$l$O!"MxMQ(B
-$B<T$h$j$b%W%m%0%i%`$N%3!<%I$r=q$/?M$KJXMx$J5!G=$G$9$,!"$I$A$i$K$7$m!"%3%^(B
-$B%s%I(B @code{gnus-fetch-group} $B$O$3$N5!G=$rDs6!$7$^$9!#$=$N%3%^%s%I$O!"%0(B
-$B%k!<%W$NL>A0$r0z?t$H$7$F$H$j$^$9!#(B
 
 @node New Groups
 @section $B?7$7$$%0%k!<%W(B
@@ -1420,8 +1410,9 @@ gnus-group-clear-data-on-native-groups} $B$r;H$C$F!"4pK\%0%k!<%W$K4X$9$k%G!<(B
 @cindex .newsrc.el
 @cindex .newsrc.eld
 
-$B:#$d!"$"$J$?$O%U%!%$%k(B @file{.newsrc} $B$K$D$$$F$9$Y$FCN$C$F$$$^$9!#$9$Y$F(B
-$B$N9XFI>pJs$OEAE}E*$K$3$N%U%!%$%k$KC_@Q$5$l$^$9!#(B
+$B:G$b$"$j$U$l$?(B Unix $B$N%K%e!<%9%j!<%@!<$O!"(B@file{.newsrc} $B$H8F$P$l$k6&MQ(B
+$B$N5/F0%U%!%$%k$r;H$$$^$9!#$3$N%U%!%$%k$O!"9VFI$7$F$$$k%0%k!<%W$H!"$=$l$i(B
+$B$N%0%k!<%W$K$*$$$F$I$N5-;v$,FI$^$l$?$+$N!"$9$Y$F$N>pJs$r;}$C$F$$$^$9!#(B
 
 @sc{gnus} $B$G$OJ*;v$,>/!9J#;($K$J$C$F$$$^$9!#%U%!%$%k(B @file{.newsrc} $B$r:G(B
 $B?7$N$b$N$K$9$k$@$1$G$O$J$/!"%U%!%$%k(B @file{.newsrc} $B$K$O9g$o$J$$>pJs$rJ](B
@@ -1446,10 +1437,11 @@ gnus $B$O(B @file{.newsrc.eld} $B$H8F$P$l$k%U%!%$%k$b;}$C$F$$$^$9!#(BGnus $
 $B%$%k$r:o=|$9$k$3$H$,$G$-!"%G%#%9%/MFNL$r@aLs$9$k$3$H$,$G$-!"(Bgnus $B$N=*N;(B
 $B$,B.$/$J$j$^$9!#$7$+$7!"$=$&$9$k$HB>$N%K%e!<%9%j!<%@!<$r;H$($J$/$J$j$^$9!#(B
 $B$G$b!"$A$g$C$H!"C/$+$=$&$7$?$$?M$,$$$k$G$7$g$&$+!#F1$8$h$&(B
-$B$K(B @code{gnus-read-newsrc-file} $B$r(B @code{nil} $B$K$9$k$3$H$K$h$C(B
-$B$F(B @file{.newsrc} $B$H$9$Y$F$N(B @file{.newsrc-SERVER} $B$r:n$i$J$$$h$&$K$J$j(B
-$B$^$9!#$b$7$"$J$?$,;~!9(B Netscape $B$r;H$&$N$J$i$P!"$3$&$9$k$N$,ET9g$,NI$$$G(B
-$B$7$g$&!#(B
+$B$K(B @code{gnus-read-newsrc-file} $B$r(B @code{nil} $B$K$9$k$3$H$K$h$C$F!"(B
+gnus $B$O(B @file{.newsrc} $B%U%!%$%k$H$9$Y$F$N(B @file{.newsrc-SERVER} $B%U%!%$%k(B
+$B$rL5;k$9$k$h$&$K$J$j$^$9!#$=$N$3$H$O!"$"$J$?$,;~!90c$&%K%e!<%9%j!<%@!<$r(B
+$B;H$C$?$j!"MxMQ2DG=$J%0%k!<%W$N0[$J$k%5%V%;%C%H$r$=$l$i$N%K%e!<%9%j!<%@!<(B
+$B$GFI$_$?$$>l9g$K!"JXMx$J$3$H$,$"$j$^$9!#(B
 
 @vindex gnus-save-killed-list
 @code{gnus-save-killed-list} ($B=i4|@_Dj$G$O(B @code{t}) $B$,(B @code{nil} $B$G$"(B
@@ -19828,6 +19820,7 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * Undo::                        $B$$$/$D$+$NF0:n$O85$KLa$9;v$,$G$-$k(B
 * Predicate Specifiers::        $B=R8l$r@_Dj$9$k(B
 * Moderation::                  $B$"$J$?$,%b%G%l!<%?!<$@$C$?$i$I$&$9$k$+(B
+* Fetching a Group::            $B%0%k!<%W$rFI$`$?$a$@$1$K(B gnus $B$r5/F0$9$k(B
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
@@ -21041,6 +21034,17 @@ Gnus $B$O!"MxMQ<T$,2?$r$9$k$+$r21$($F$*$-!"$=$NMxMQ<T$NF0:n$N5U$r9T$J$&F0(B
 (setq gnus-moderated-list
       "^nnml:rec.zoofle$\\|^rec.zoofle$")
 @end lisp
+
+@node Fetching a Group
+@section $B%0%k!<%W$r<hF@$9$k(B
+@cindex fetching a group
+
+@findex gnus-fetch-group
+$B;~!9!"!H$3$N%0%k!<%W$rFI$_$?$$$N$G$"$C$F!"(Bgnus $B$,5/F0$7$F$$$k$+$I$&$+$r(B
+$B5$$K$7$?$/$J$$!#!I$H$$$&$3$H$,$G$-$l$PJXMx$J$3$H$,$"$j$^$9!#$3$l$O!"MxMQ(B
+$B<T$h$j$b%W%m%0%i%`$N%3!<%I$r=q$/?M$KJXMx$J5!G=$G$9$,!"$I$A$i$K$7$m!"%3%^(B
+$B%s%I(B @code{gnus-fetch-group} $B$O$3$N5!G=$rDs6!$7$^$9!#$=$N%3%^%s%I$O!"%0(B
+$B%k!<%W$NL>A0$r0z?t$H$7$F$H$j$^$9!#(B
 
 @node Image Enhancements
 @section $B2hA|$N3HD%(B
@@ -25921,6 +25925,12 @@ Gnus $B$,%0%k!<%W$KF~$k$H!"%0%k!<%W$NA4$F$NL$FI5-;v$N%X%C%@!<$r%P%C%/%(%s(B
 $B%5!<%P!<$K%0%k!<%W$N>pJs$r?R$M!"L$FI5-;v$N?t$r1i;;$9$k9T0Y$O(B @dfn{$B%0%k!<(B
 $B%W$r3hF02=$9$k(B} $B$H8F$P$l$F$$$^$9!#Hs3hF0%0%k!<%W$O%0%k!<%W%P%C%U%!(B
 $B$K(B @samp{*} $B$H$H$b$K0lMwI=<($5$l$^$9!#(B
+
+@item $B%9%W!<%k(B (spool)
+@cindex spool
+$B%K%e!<%9%5!<%P!<$O!"$"$k$d$jJ}!"$^$?$OB>$NN.57$G5-;v$r%m!<%+%k$KJ]B8$7$^(B
+$B$9!#$"$k8E$$N.57$NJ]B8J}K!$O!"5-;vKh$K$?$C$?0l$D$N%U%!%$%k$r;}$D$3$H$G$9!#(B
+$B$=$l$OEAE}E*$J%9%W!<%k(B (traditional spool) $B$H8F$P$l$^$9!#(B
 
 @item $B%5!<%P!<(B (server)
 @cindex server
