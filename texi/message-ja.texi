@@ -1116,6 +1116,11 @@ information about the problem.)
 切られて (killed) 変数 @code{message-elide-ellipsis} の値で置き換えられ
 ます。ディフォルトの省略符号として使われる値は (@samp{[...]}) です。
 
+@item C-c M-k
+@kindex C-c M-k
+@findex message-kill-address
+現在位置のアドレスを削除します。
+
 @item C-c C-z
 @kindex C-c C-x
 @findex message-kill-to-signature

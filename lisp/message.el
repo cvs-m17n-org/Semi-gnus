@@ -1687,6 +1687,12 @@ no, only reply back to the author."
 	  "^|? *---+ +Message text follows: +---+ *|?$")
   "A regexp that matches the separator before the text of a failed message.")
 
+(defvar message-field-fillers
+  '((To message-fill-address)
+    (Cc message-fill-address)
+    (From message-fill-address))
+  "Alist of header names/filler functions.")
+
 (defvar message-header-format-alist
   `((Newsgroups)
     (To . message-fill-address)
@@ -1869,6 +1875,8 @@ see `message-narrow-to-headers-or-head'."
 (defun message-narrow-to-field ()
   "Narrow the buffer to the header on the current line."
   (beginning-of-line)
+  (while (looking-at "[ \t]")
+    (forward-line -1))
   (narrow-to-region
    (point)
    (progn
@@ -2351,28 +2359,12 @@ Point is left at the beginning of the narrowed-to region."
 	     (1+ max)))))
       (message-sort-headers-1))))
 
-(defun message-delete-address ()
-  "Delete the address under point."
+(defun message-kill-address ()
+  "Kill the address under point."
   (interactive)
-  (let ((first t)
-	current-header addresses)
-    (save-restriction
-      (message-narrow-to-field)
-      (re-search-backward "[\t\n ,]" nil t)
-      (when (re-search-forward "[^\t\n ,]@[^\t\n ,]" nil t)
-	(setq current-header (match-string 0)
-	      addresses (replace-regexp-in-string
-			 "[\n\t]" " " (mail-header-field-value)))
-	(goto-char (point-min))
-	(re-search-forward ": ?")
-	(delete-region (point) (point-max))
-	(dolist (address (mail-header-parse-addresses addresses))
-	  (unless first
-	    (insert ", "))
-	  (setq first nil)
-	  (unless (string-match (regexp-quote current-header) (car address))
-	    (insert (mail-header-make-address
-		     (cdr address) (car address)))))))))
+  (let ((start (point)))
+    (message-skip-to-next-address)
+    (kill-region start (point))))
 
 
 
@@ -2448,11 +2440,11 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-d" 'message-dont-send)
   (define-key message-mode-map "\C-c\n" 'gnus-delay-article)
 
+  (define-key message-mode-map "\C-c\M-k" 'message-kill-address)
   (define-key message-mode-map "\C-c\C-e" 'message-elide-region)
   (define-key message-mode-map "\C-c\C-v" 'message-delete-not-region)
   (define-key message-mode-map "\C-c\C-z" 'message-kill-to-signature)
   (define-key message-mode-map "\M-\r" 'message-newline-and-reformat)
-  ;;(define-key message-mode-map "\M-q" 'message-fill-paragraph)
   (define-key message-mode-map [remap split-line]  'message-split-line)
 
   (define-key message-mode-map "\C-a" 'message-beginning-of-line)
@@ -3143,7 +3135,9 @@ Prefix arg means justify as well."
   (interactive (list (if current-prefix-arg 'full)))
   (if (if (boundp 'filladapt-mode) filladapt-mode)
       nil
-    (message-newline-and-reformat arg t)
+    (if (message-point-in-header-p)
+	(message-fill-field)
+      (message-newline-and-reformat arg t))
     t))
 
 ;; Is it better to use `mail-header-end'?
@@ -5702,34 +5696,29 @@ Headers already prepared in the buffer are not modified."
 ;;; Setting up a message buffer
 ;;;
 
+(defun message-skip-to-next-address ()
+  (let ((end (save-excursion
+	       (message-next-header)
+	       (point)))
+	quoted char)
+    (when (looking-at ",")
+      (forward-char 1))
+    (while (and (not (= (point) end))
+		(or (not (eq char ?,))
+		    quoted))
+      (skip-chars-forward "^,\"" (point-max))
+      (when (eq (setq char (following-char)) ?\")
+	(setq quoted (not quoted)))
+      (unless (= (point) end)
+	(forward-char 1)))
+    (skip-chars-forward " \t\n")))
+
 (defun message-fill-address (header value)
-  (save-restriction
-    (narrow-to-region (point) (point))
-    (insert (capitalize (symbol-name header))
-	    ": "
-	    (if (consp value) (car value) value)
-	    "\n")
-    (narrow-to-region (point-min) (1- (point-max)))
-    (let (quoted last)
-      (goto-char (point-min))
-      (while (not (eobp))
-	(skip-chars-forward "^,\"" (point-max))
-	(if (or (eq (char-after) ?,)
-		(eobp))
-	    (when (not quoted)
-	      (if (and (> (current-column) 78)
-		       last)
-		  (save-excursion
-		    (goto-char last)
-		    (looking-at "[ \t]*")
-		    (replace-match "\n " t t)))
-	      (setq last (1+ (point))))
-	  (setq quoted (not quoted)))
-	(unless (eobp)
-	  (forward-char 1))))
-    (goto-char (point-max))
-    (widen)
-    (forward-line 1)))
+  (insert (capitalize (symbol-name header))
+	  ": "
+	  (if (consp value) (car value) value)
+	  "\n")
+  (message-fill-field-address))
 
 (defun message-fill-references (header value)
   (insert (capitalize (symbol-name header))
@@ -5746,27 +5735,58 @@ If the current line has `message-yank-prefix', insert it on the new line."
       (split-line message-yank-prefix) ;; Emacs 21.3.50+ supports arg.
     (error
      (split-line))))
-     
+
 (defun message-fill-header (header value)
+  (insert (capitalize (symbol-name header))
+	  ": "
+	  (if (consp value) (car value) value)
+	  "\n")
+  (message-fill-field))
+
+(defun message-field-name ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (looking-at "\\([^:]+\\):")
+      (intern (capitalize (match-string 1))))))
+
+(defun message-fill-field ()
+  (save-excursion
+    (save-restriction
+      (message-narrow-to-field)
+      (let ((field-name (message-field-name)))
+	(funcall (or (cadr (assq field-name message-field-fillers))
+		     'message-fill-field-general))))))
+
+(defun message-fill-field-address ()
+  (while (not (eobp))
+    (message-skip-to-next-address)
+    (let (last)
+      (if (and (> (current-column) 78)
+	       last)
+	  (progn
+	    (save-excursion
+	      (goto-char last)
+	      (insert "\n\t"))
+	    (setq last (1+ (point))))
+	(setq last (1+ (point)))))))
+
+(defun message-fill-field-general ()
   (let ((begin (point))
 	(fill-column 78)
 	(fill-prefix " "))
-    (insert (capitalize (symbol-name header))
-	    ": "
-	    (if (consp value) (car value) value)
-	    "\n")
-    (save-restriction
-      (narrow-to-region begin (point))
-      (fill-region-as-paragraph begin (point))
-      ;; Tapdance around looong Message-IDs.
-      (forward-line -1)
-      (when (looking-at "[ \t]*$")
-	(message-delete-line))
-      (goto-char begin)
-      (re-search-forward ":" nil t)
-      (when (looking-at "\n[ \t]+")
-	(replace-match " " t t))
-      (goto-char (point-max)))))
+    (while (and (search-forward "\n" nil t)
+		(not (eobp)))
+      (replace-match " " t t))
+    (fill-region-as-paragraph begin (point-max))
+    ;; Tapdance around looong Message-IDs.
+    (forward-line -1)
+    (when (looking-at "[ \t]*$")
+      (message-delete-line))
+    (goto-char begin)
+    (re-search-forward ":" nil t)
+    (when (looking-at "\n[ \t]+")
+      (replace-match " " t t))
+    (goto-char (point-max))))
 
 (defun message-shorten-1 (list cut surplus)
   "Cut SURPLUS elements out of LIST, beginning with CUTth one."
