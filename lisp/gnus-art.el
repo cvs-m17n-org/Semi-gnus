@@ -304,7 +304,7 @@ asynchronously.	 The compressed face will be piped to this command."
 			 '(function-item
 			   x-face-mule-gnus-article-display-x-face))
 		     'function))))
-  ;;:version "21.1"
+  :version "21.1"
   :group 'gnus-picon
   :group 'gnus-article-washing)
 
@@ -1232,7 +1232,7 @@ Valid values are nil, t, `head', `last', an integer or a predicate.
 See Info node `(gnus)Customizing Articles' and Info node
 `(gnus)X-Face' for details."
   :group 'gnus-article-treat
-  ;;:version "21.1"
+  :version "21.1"
   :link '(custom-manual "(gnus)Customizing Articles")
   :link '(custom-manual "(gnus)X-Face")
   :type gnus-article-treat-head-custom
@@ -1318,7 +1318,7 @@ Valid values are nil, t, `head', `last', an integer or a predicate.
 See Info node `(gnus)Customizing Articles' and Info node
 `(gnus)Smileys' for details."
   :group 'gnus-article-treat
-  ;;:version "21.1"
+  :version "21.1"
   :link '(custom-manual "(gnus)Customizing Articles")
   :link '(custom-manual "(gnus)Smileys")
   :type gnus-article-treat-custom)
