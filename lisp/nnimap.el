@@ -55,6 +55,7 @@
 ;;   o What about Gnus's article editing, can we support it?  NO!
 ;;   o Use \Draft to support the draft group??
 ;;   o Duplicate suppression
+;;   o Rewrite UID SEARCH UID X as UID FETCH X (UID) for those with slow servers
 
 ;;; Code:
 
@@ -279,9 +280,12 @@ typical complete file name would be
 (defvoo nnimap-nov-file-name-suffix ".novcache"
   "Suffix for NOV cache base filename.")
 
-(defvoo nnimap-nov-is-evil nil
-  "If non-nil, nnimap will never generate or use a local nov database for this backend.
-Using nov databases will speed up header fetching considerably.
+(defvoo nnimap-nov-is-evil gnus-agent
+  "If non-nil, never generate or use a local nov database for this backend.
+Using nov databases should speed up header fetching considerably.
+However, it will invoke a UID SEARCH UID command on the server, and
+some servers implement this command inefficiently by opening each and
+every message in the group, thus making it quite slow.
 Unlike other backends, you do not need to take special care if you
 flip this variable.")
 
@@ -377,7 +381,7 @@ restrict visible folders.")
 
 ;; Internal variables:
 
-(defvoo nnimap-mailbox-info (gnus-make-hashtable 997))
+(defvar nnimap-mailbox-info (gnus-make-hashtable 997))
 (defvar nnimap-debug nil
   "Name of buffer to record debugging info.
 For example: (setq nnimap-debug \"*nnimap-debug*\")")
@@ -966,7 +970,8 @@ function is generally only called when Gnus is shutting down."
 	    (setq slowgroups groups)
 	  (dolist (group groups)
 	    (gnus-message 7 "nnimap: Checking mailbox %s" group)
-	    (add-to-list (if (gnus-gethash-safe group nnimap-mailbox-info)
+	    (add-to-list (if (gnus-gethash-safe (concat server group)
+						nnimap-mailbox-info)
 			     'asyncgroups
 			   'slowgroups)
 			 (list group (imap-mailbox-status-asynch
@@ -977,10 +982,12 @@ function is generally only called when Gnus is shutting down."
 		  new old)
 	      (when (imap-ok-p (imap-wait-for-tag tag nnimap-server-buffer))
 		(if (nnimap-string-lessp-numerical
-		     (car (gnus-gethash group nnimap-mailbox-info))
+		     (car (gnus-gethash
+			   (concat server group) nnimap-mailbox-info))
 		     (imap-mailbox-get 'uidnext group nnimap-server-buffer))
 		    (push (list group) slowgroups)
-		  (insert (cdr (gnus-gethash group nnimap-mailbox-info))))))))
+		  (insert (cdr (gnus-gethash (concat server group)
+					     nnimap-mailbox-info))))))))
 	(dolist (group slowgroups)
 	  (if nnimap-retrieve-groups-asynchronous
 	      (setq group (car group)))
@@ -999,7 +1006,7 @@ function is generally only called when Gnus is shutting down."
 		(insert str)
 		(when nnimap-retrieve-groups-asynchronous
 		  (gnus-sethash
-		   group
+		   (concat server group)
 		   (cons (or (imap-mailbox-get
 			      'uidnext group nnimap-server-buffer)
 			     (imap-mailbox-status
@@ -1147,7 +1154,10 @@ function is generally only called when Gnus is shutting down."
 	      (goto-char (point-min))
 	      (when (and (if (stringp regexp)
 			     (progn
-			       (setq regrepp (string-match "\\\\[0-9&]" group))
+			       (if (not (stringp group))
+				   (setq group (eval group))
+				 (setq regrepp
+				       (string-match "\\\\[0-9&]" group)))
 			       (re-search-forward regexp nil t))
 			   (funcall regexp group))
 			 ;; Don't enter the article into the same group twice.
@@ -1206,8 +1216,10 @@ function is generally only called when Gnus is shutting down."
 			 (setq removeorig t)
 			 (when nnmail-cache-accepted-message-ids
 			   (with-current-buffer nntp-server-buffer
-			     (nnmail-cache-insert (nnmail-fetch-field
-						   "message-id") to-group)))
+                             (let (msgid)
+                               (and (setq msgid 
+					  (nnmail-fetch-field "message-id"))
+                                    (nnmail-cache-insert msgid to-group)))))
 			 ;; Add the group-art list to the history list.
 			 (push (list (cons to-group 0)) nnmail-split-history))
 			(t
@@ -1378,7 +1390,8 @@ function is generally only called when Gnus is shutting down."
 		    (while (search-forward "\n" nil t)
 		      (replace-match "\r\n"))
 		    (when nnmail-cache-accepted-message-ids
-		      (nnmail-cache-insert (nnmail-fetch-field "message-id"))))
+		      (nnmail-cache-insert (nnmail-fetch-field "message-id")
+					   group)))
 		  (when (and last nnmail-cache-accepted-message-ids)
 		    (nnmail-cache-close))
 		  ;; this 'or' is for Cyrus server bug

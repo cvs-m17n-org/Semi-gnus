@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v0.06}
+\newcommand{\gnusversionname}{Oort Gnus v0.07}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -382,7 +382,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Oort Gnus v0.06.
+This manual corresponds to Oort Gnus v0.07.
 
 @end ifinfo
 
@@ -840,6 +840,12 @@ Picons
 * Easy Picons::                 Displaying Picons---the easy way.
 * Hard Picons::                 The way you should do it.  You'll learn something.
 * Picon Useless Configuration::  Other variables you can trash/tweak/munge/play with.
+
+Thwarting Email Spam
+
+* Anti-Spam Basics::            Simple steps to reduce the amount of spam.
+* SpamAssassin::                How to use external anti-spam tools.
+* Hashcash::                    Reduce spam by burning CPU time.
 
 Appendices
 
@@ -1876,15 +1882,15 @@ background is dark:
 (cond (window-system
        (setq custom-background-mode 'light)
        (defface my-group-face-1
-	 '((t (:foreground "Red" :bold t))) "First group face")
+         '((t (:foreground "Red" :bold t))) "First group face")
        (defface my-group-face-2
-	 '((t (:foreground "DarkSeaGreen4" :bold t))) "Second group face")
+         '((t (:foreground "DarkSeaGreen4" :bold t))) "Second group face")
        (defface my-group-face-3
-	 '((t (:foreground "Green4" :bold t))) "Third group face")
+         '((t (:foreground "Green4" :bold t))) "Third group face")
        (defface my-group-face-4
-	 '((t (:foreground "SteelBlue" :bold t))) "Fourth group face")
+         '((t (:foreground "SteelBlue" :bold t))) "Fourth group face")
        (defface my-group-face-5
-	 '((t (:foreground "Blue" :bold t))) "Fifth group face")))
+         '((t (:foreground "Blue" :bold t))) "Fifth group face")))
 
 (setq gnus-group-highlight
       '(((> unread 200) . my-group-face-1)
@@ -2559,20 +2565,19 @@ Create one of the groups mentioned in @code{gnus-useful-groups}
 @item G w
 @kindex G w (Group)
 @findex gnus-group-make-web-group
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
+@cindex Google
 @cindex nnweb
+@cindex gmane
 Make an ephemeral group based on a web search
 (@code{gnus-group-make-web-group}).  If you give a prefix to this
 command, make a solid group instead.  You will be prompted for the
 search engine type and the search string.  Valid search engine types
-include @code{dejanews}, @code{altavista} and @code{reference}.
+include @code{google}, @code{dejanews}, and @code{gmane}.
 @xref{Web Searches}.
 
-If you use the @code{dejanews} search engine, you can limit the search
+If you use the @code{google} search engine, you can limit the search
 to a particular group by using a match string like
-@samp{~g alt.sysadmin.recovery shaving}.
+@samp{shaving group:alt.sysadmin.recovery}.
 
 @item G DEL
 @kindex G DEL (Group)
@@ -4228,8 +4233,8 @@ the line containing the call to @code{stop} is removed.)
 
 @example
 if address "sender" "owner-ding@@hpc.uh.edu" @{
-	fileinto "INBOX.ding";
-	stop;
+        fileinto "INBOX.ding";
+        stop;
 @}
 @end example
 
@@ -4384,8 +4389,8 @@ Full @code{From} header.
 @item n
 The name (from the @code{From} header).
 @item f
-The name, code @code{To} header or the @code{Newsgroups} header
-(@pxref{To From Newsgroups}).
+The name, @code{To} header or the @code{Newsgroups} header (@pxref{To
+From Newsgroups}).
 @item a
 The name (from the @code{From} header).  This differs from the @code{n}
 spec in that it uses the function designated by the
@@ -4536,7 +4541,8 @@ headers are used instead.
 A related variable is @code{nnmail-extra-headers}, which controls when
 to include extra headers when generating overview (@sc{nov}) files.  If
 you have old overview files, you should regenerate them after changing
-this variable.
+this variable, by entering the server buffer using `^', and then `g' on
+the appropriate mail server (e.g. nnml) to cause regeneration.
 
 @vindex gnus-summary-line-format
 You also have to instruct Gnus to display the data by changing the
@@ -4559,9 +4565,13 @@ In summary, you'd typically put something like the following in
 (The values listed above are the default values in Gnus.  Alter them
 to fit your needs.)
 
-Now, this is mostly useful for mail groups, where you have control over
+A note for news server administrators, or for users who wish to try to
+convince their news server administrator to provide some additional
+support:
+
+The above is mostly useful for mail groups, where you have control over
 the @sc{nov} files that are created.  However, if you can persuade your
-nntp admin to add:
+nntp admin to add (in the usual implementation, notably INN):
 
 @example
 Newsgroups:full
@@ -5030,8 +5040,8 @@ Mail a wide reply to the author of the current article
 goes out to all people listed in the @code{To}, @code{From} (or
 @code{Reply-to}) and @code{Cc} headers.
 
-@item S V
-@kindex S V (Summary)
+@item S W
+@kindex S W (Summary)
 @findex gnus-summary-wide-reply-with-original
 Mail a wide reply to the current article and include the original
 message (@code{gnus-summary-wide-reply-with-original}).  This command uses
@@ -5045,6 +5055,13 @@ Mail a very wide reply to the author of the current article
 that goes out to all people listed in the @code{To}, @code{From} (or
 @code{Reply-to}) and @code{Cc} headers in all the process/prefixed
 articles.  This command uses the process/prefix convention.
+
+@item S V
+@kindex S V (Summary)
+@findex gnus-summary-very-wide-reply-with-original
+Mail a very wide reply to the author of the current article and include the
+original message (@code{gnus-summary-very-wide-reply-with-original}).  This
+command uses the process/prefix convention.
 
 @item S o m
 @itemx C-c C-f
@@ -6282,6 +6299,10 @@ Simplify fuzzily.
 @item gnus-simplify-whitespace
 @findex gnus-simplify-whitespace
 Remove excessive whitespace.
+
+@item gnus-simplify-all-whitespace
+@findex gnus-simplify-all-whitespace
+Remove all whitespace.
 @end table
 
 You may also write your own functions, of course.
@@ -6632,6 +6653,7 @@ Matching}).
 @findex gnus-thread-sort-by-subject
 @findex gnus-thread-sort-by-author
 @findex gnus-thread-sort-by-number
+@findex gnus-thread-sort-by-random
 @vindex gnus-thread-sort-functions
 @findex gnus-thread-sort-by-most-recent-thread
 If you are using a threaded summary display, you can sort the threads by
@@ -6644,7 +6666,8 @@ predicate functions include @code{gnus-thread-sort-by-number},
 @code{gnus-thread-sort-by-author}, @code{gnus-thread-sort-by-subject},
 @code{gnus-thread-sort-by-date}, @code{gnus-thread-sort-by-score},
 @code{gnus-thread-sort-by-most-recent-number},
-@code{gnus-thread-sort-by-most-recent-date} and
+@code{gnus-thread-sort-by-most-recent-date},
+@code{gnus-thread-sort-by-random} and
 @code{gnus-thread-sort-by-total-score}.
 
 Each function takes two threads and returns non-@code{nil} if the first
@@ -6695,14 +6718,18 @@ tickles your fancy.
 @findex gnus-article-sort-by-score
 @findex gnus-article-sort-by-subject
 @findex gnus-article-sort-by-author
+@findex gnus-article-sort-by-random
 @findex gnus-article-sort-by-number
-If you are using an unthreaded display for some strange reason or other,
-you have to fiddle with the @code{gnus-article-sort-functions} variable.
-It is very similar to the @code{gnus-thread-sort-functions}, except that
-it uses slightly different functions for article comparison.  Available
-sorting predicate functions are @code{gnus-article-sort-by-number},
-@code{gnus-article-sort-by-author}, @code{gnus-article-sort-by-subject},
-@code{gnus-article-sort-by-date}, and @code{gnus-article-sort-by-score}.
+If you are using an unthreaded display for some strange reason or
+other, you have to fiddle with the @code{gnus-article-sort-functions}
+variable.  It is very similar to the
+@code{gnus-thread-sort-functions}, except that it uses slightly
+different functions for article comparison.  Available sorting
+predicate functions are @code{gnus-article-sort-by-number},
+@code{gnus-article-sort-by-author},
+@code{gnus-article-sort-by-subject}, @code{gnus-article-sort-by-date},
+@code{gnus-article-sort-by-random}, and
+@code{gnus-article-sort-by-score}.
 
 If you want to sort an unthreaded summary display by subject, you could
 say something like:
@@ -8976,6 +9003,11 @@ Sort by article length (@code{gnus-summary-sort-by-chars}).
 @findex gnus-summary-sort-by-score
 Sort by score (@code{gnus-summary-sort-by-score}).
 
+@item C-c C-s C-r
+@kindex C-c C-s C-r (Summary)
+@findex gnus-summary-sort-by-random
+Randomize (@code{gnus-summary-sort-by-random}).
+
 @item C-c C-s C-o
 @kindex C-c C-s C-o (Summary)
 @findex gnus-summary-sort-by-original
@@ -9071,12 +9103,12 @@ is a list, Gnus will try all the methods in the list until it finds a
 match.
 
 Here's an example setting that will first try the current method, and
-then ask Deja if that fails:
+then ask Google if that fails:
 
 @lisp
 (setq gnus-refer-article-method
       '(current
-        (nnweb "refer" (nnweb-type dejanews))))
+        (nnweb "refer" (nnweb-type google))))
 @end lisp
 
 Most of the mail back ends support fetching by @code{Message-ID}, but
@@ -9581,7 +9613,7 @@ buffers. For example:
 (setq gnus-newsgroup-variables
      '(message-use-followup-to
        (gnus-visible-headers .
-	 "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^To:")))
+         "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^To:")))
 @end lisp
 
 @end table
@@ -10732,6 +10764,12 @@ headers will be included in the sequence they are matched.
 If non-@code{nil}, add a @code{to-list} group parameter to mail groups
 that have none when you do a @kbd{a}.
 
+@item gnus-confirm-mail-reply-to-news
+@vindex gnus-confirm-mail-reply-to-news
+If non-@code{nil}, Gnus requests confirmation when replying to news.
+If you find yourself never wanting to reply to mail, but occasionally
+press R anyway, this variable might be for you.
+
 @end table
 
 
@@ -11100,7 +11138,7 @@ So here's a new example:
         (window-system         ;; A value symbol
          ("X-Window-System" (format "%s" window-system)))
         ;; If I'm replying to Larsi, set the Organization header.
-        ((header "to" "larsi.*org")
+        ((header "from" "larsi.*org")
          (Organization "Somewhere, Inc."))
         ((posting-from-work-p) ;; A user defined function
          (signature-file "~/.work-signature")
@@ -11226,6 +11264,14 @@ For PGP, Gnus supports two external libraries, @sc{gpg.el} and
 @sc{Mailcrypt}, you need to install at least one of them.  The
 @sc{s/mime} support in Gnus requires the external program OpenSSL.
 
+Often, you would like to sign replies to people who send you signed
+messages.  Even more often, you might want to encrypt messages which
+are in reply to encrypted messages.  Gnus offers
+@code{gnus-message-replysign} to enable the former, and
+@code{gnus-message-replyencrypt} for the latter.  In addition, setting
+@code{gnus-message-replysignencrypted} (on by default) will sign
+automatically encrypted messages.
+
 Instructing MML to perform security operations on a @sc{mime} part is
 done using the @kbd{C-c C-m s} key map for signing and the @kbd{C-c
 C-m c} key map for encryption, as follows.
@@ -11234,39 +11280,39 @@ C-m c} key map for encryption, as follows.
 
 @item C-c C-m s s
 @kindex C-c C-m s s
-@findex mml-secure-sign-smime
+@findex mml-secure-message-sign-smime
 
-Digitally sign current @sc{mime} part using @sc{s/mime}.
+Digitally sign current message using @sc{s/mime}.
 
 @item C-c C-m s o
 @kindex C-c C-m s o
-@findex mml-secure-sign-pgp
+@findex mml-secure-message-sign-pgp
 
-Digitally sign current @sc{mime} part using PGP.
+Digitally sign current message using PGP.
 
 @item C-c C-m s p
 @kindex C-c C-m s p
-@findex mml-secure-sign-pgp
+@findex mml-secure-message-sign-pgp
 
-Digitally sign current @sc{mime} part using @sc{pgp/mime}.
+Digitally sign current message using @sc{pgp/mime}.
 
 @item C-c C-m c s
 @kindex C-c C-m c s
-@findex mml-secure-encrypt-smime
+@findex mml-secure-message-encrypt-smime
 
-Digitally encrypt current @sc{mime} part using @sc{s/mime}.
+Digitally encrypt current message using @sc{s/mime}.
 
 @item C-c C-m c o
 @kindex C-c C-m c o
-@findex mml-secure-encrypt-pgp
+@findex mml-secure-message-encrypt-pgp
 
-Digitally encrypt current @sc{mime} part using PGP.
+Digitally encrypt current message using PGP.
 
 @item C-c C-m c p
 @kindex C-c C-m c p
-@findex mml-secure-encrypt-pgpmime
+@findex mml-secure-message-encrypt-pgpmime
 
-Digitally encrypt current @sc{mime} part using @sc{pgp/mime}.
+Digitally encrypt current message using @sc{pgp/mime}.
 
 @item C-c C-m C-n
 @kindex C-c C-m C-n
@@ -11540,6 +11586,8 @@ configuration to the example above:
 @lisp
       (nntp-via-rlogin-command "ssh")
 @end lisp
+
+See also @code{nntp-via-rlogin-command-switches}.
 
 If you're behind a firewall, but have direct access to the outside world
 through a wrapper command like "runsocks", you could open a socksified
@@ -12040,6 +12088,15 @@ you need to connect to a firewall machine first.
 @vindex nntp-via-rlogin-command
 Command used to log in on the intermediate host.  The default is
 @samp{rsh}, but @samp{ssh} is a popular alternative.
+
+@item nntp-via-rlogin-command-switches
+@vindex nntp-via-rlogin-command-switches
+List of strings to be used as the switches to
+@code{nntp-via-rlogin-command}.  The default is @code{nil}.  If you use
+@samp{ssh} for `nntp-via-rlogin-command', you may set this to
+@samp{("-C")} in order to compress all data connections, otherwise set
+this to @samp{("-t")} or @samp{("-C" "-t")} if the telnet command
+requires a pseudo-tty allocation on an intermediate host.
 @end table
 
 @item nntp-open-via-telnet-and-telnet
@@ -12421,6 +12478,15 @@ Header lines longer than the value of
 @code{nnmail-split-header-length-limit} are excluded from the split
 function.
 
+@vindex nnmail-mail-splitting-charset
+@vindex nnmail-mail-splitting-decodes
+By default the splitting codes MIME decodes headers so you can match
+on non-ASCII strings.  The @code{nnmail-mail-splitting-charset}
+variable specifies the default charset for decoding.  The behaviour
+can be turned off completely by binding
+@code{nnmail-mail-splitting-decodes} to nil, which is useful if you
+want to match articles based on the raw header data.
+
 Gnus gives you all the opportunity you could possibly want for shooting
 yourself in the foot.  Let's say you create a group that will contain
 all the mail you get from your boss.  And then you accidentally
@@ -12799,15 +12865,12 @@ An example @sc{imap} mail source:
 @item webmail
 Get mail from a webmail server, such as @uref{www.hotmail.com},
 @uref{webmail.netscape.com}, @uref{www.netaddress.com},
-@uref{www.my-deja.com}.
-
-NOTE: Now @uref{mail.yahoo.com} provides POP3 service, so @sc{pop} mail source
-is suggested.
+@uref{mail.yahoo..com}.
 
 NOTE: Webmail largely depends cookies. A "one-line-cookie" patch is
 required for url "4.0pre.46".
 
-WARNING: Mails may lost.  NO WARRANTY.
+WARNING: Mails may be lost.  NO WARRANTY.
 
 Keywords:
 
@@ -13034,6 +13097,16 @@ If non-@code{nil}, put the @code{Message-ID}s of articles imported into
 the back end (via @code{Gcc}, for instance) into the mail duplication
 discovery cache.  The default is @code{nil}.
 
+@item nnmail-cache-ignore-groups
+@vindex nnmail-cache-ignore-groups
+This can be a regular expression or a list of regular expressions.
+Group names that match any of the regular expressions will never be
+recorded in the @code{Message-ID} cache.
+
+This can be useful, for example, when using Fancy Splitting
+(@pxref{Fancy Mail Splitting}) together with the function
+@code{nnmail-split-fancy-with-parent}.
+
 @end table
 
 
@@ -13193,7 +13266,9 @@ To use this feature, you have to set @code{nnmail-treat-duplicates} and
 you can include @code{nnmail-split-fancy-with-parent} using the colon
 feature, like so:
 @lisp
-(setq nnmail-split-fancy
+(setq nnmail-treat-duplicates 'warn     ; or 'delete
+      nnmail-cache-accepted-message-ids t
+      nnmail-split-fancy
       '(| (: nnmail-split-fancy-with-parent)
           ;; other splits go here
         ))
@@ -13217,6 +13292,13 @@ number than the default so that the message ids are still in the cache.
 When @code{nnmail-cache-accepted-message-ids} is non-@code{nil}, Gnus
 also records the message ids of moved articles, so that the followup
 messages goes into the new group.
+
+Also see the variable @code{nnmail-cache-ignore-groups} if you don't
+want certain groups to be recorded in the cache.  For example, if all
+outgoing messages are written to an `outgoing' group, you could set
+@code{nnmail-cache-ignore-groups} to match that group name.
+Otherwise, answers to all your messages would end up in the
+`outgoing' group.
 
 
 @node Group Mail Splitting
@@ -13531,7 +13613,7 @@ expire mail to groups according to the variable
  (setq nnmail-expiry-target 'nnmail-fancy-expiry-target
        nnmail-fancy-expiry-targets
        '((to-from "boss" "nnfolder:Work")
-    	 ("subject" "IMPORTANT" "nnfolder:IMPORTANT.%Y.%b")
+         ("subject" "IMPORTANT" "nnfolder:IMPORTANT.%Y.%b")
          ("from" ".*" "nnfolder:Archive-%Y")))
 @end lisp
 
@@ -13618,6 +13700,12 @@ cleaning up the headers.  Functions that can be used include:
 @findex nnmail-remove-leading-whitespace
 Clear leading white space that ``helpful'' listservs have added to the
 headers to make them look nice.  Aaah.
+
+(Note that this function works on both the header on the body of all
+messages, so it is a potentially dangerous function to use (if a body
+of a message contains something that looks like a header line).  So
+rather than fix the bug, it is of course the right solution to make it
+into a feature by documenting it.)
 
 @item nnmail-remove-list-identifiers
 @findex nnmail-remove-list-identifiers
@@ -14354,9 +14442,9 @@ is unnecessary in that case.
 @node Web Searches
 @subsection Web Searches
 @cindex nnweb
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
+@cindex Google
+@cindex dejanews
+@cindex gmane
 @cindex Usenet searches
 @cindex searching the Usenet
 
@@ -14379,7 +14467,7 @@ pattern), you are likely to get the articles ordered in a different
 manner.  Not even using duplicate suppression (@pxref{Duplicate
 Suppression}) will help, since @code{nnweb} doesn't even know the
 @code{Message-ID} of the articles before reading them using some search
-engines (DejaNews, for instance).  The only possible way to keep track
+engines (Google, for instance).  The only possible way to keep track
 of which articles you've read is by scoring on the @code{Date}
 header---mark all articles posted before the last date you read the
 group as read.
@@ -14400,8 +14488,8 @@ Virtual server variables:
 @item nnweb-type
 @vindex nnweb-type
 What search engine type is being used.  The currently supported types
-are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
-@code{reference}.
+are @code{google}, @code{dejanews}, and @code{gmane}. Note that
+@code{dejanews} is an alias to @code{google}.
 
 @item nnweb-search
 @vindex nnweb-search
@@ -14410,7 +14498,7 @@ The search string to feed to the search engine.
 @item nnweb-max-hits
 @vindex nnweb-max-hits
 Advisory maximum number of hits per search to display.  The default is
-100.
+999.
 
 @item nnweb-type-definition
 @vindex nnweb-type-definition
@@ -14627,7 +14715,7 @@ the summary buffer.
 
 (defun gnus-user-format-function-X (header)
   (let ((descr
-	 (assq nnrss-description-field (mail-header-extra header))))
+         (assq nnrss-description-field (mail-header-extra header))))
     (if descr (concat "\n\t" (cdr descr)) "")))
 @end lisp
 
@@ -14883,7 +14971,7 @@ Unlike Parmenides the @sc{imap} designers has decided that things that
 doesn't exist actually does exist.  More specifically, @sc{imap} has
 this concept of marking articles @code{Deleted} which doesn't actually
 delete them, and this (marking them @code{Deleted}, that is) is what
-nnimap does when you delete a article in Gnus (with @kbd{G DEL} or
+nnimap does when you delete a article in Gnus (with @kbd{B DEL} or
 similar).
 
 Since the articles aren't really removed when we mark them with the
@@ -14915,11 +15003,12 @@ articles or not.
 @item nnimap-importantize-dormant
 @vindex nnimap-importantize-dormant
 
-If non-nil, marks dormant articles as ticked (as well), for other
-@sc{imap} clients. Within Gnus, dormant articles will naturally still
-(only) be marked as ticked.  This is to make dormant articles stand
-out, just like ticked articles, in other @sc{imap} clients. (In other
-words, Gnus has two ``Tick'' marks and @sc{imap} has only one.)
+If non-nil (the default), marks dormant articles as ticked (as well),
+for other @sc{imap} clients. Within Gnus, dormant articles will
+naturally still (only) be marked as dormant.  This is to make dormant
+articles stand out, just like ticked articles, in other @sc{imap}
+clients. (In other words, Gnus has two ``Tick'' marks and @sc{imap}
+has only one.)
 
 Probably the only reason for frobing this would be if you're trying
 enable per-user persistant dormant flags, using something like:
@@ -15844,7 +15933,7 @@ For instance, an article with this @code{Newsgroups} header:
 Newsgroups: alt.religion.emacs
 @end example
 
-will get this @code{From} header inserted:
+will get this @code{To} header inserted:
 
 @example
 To: alt-religion-emacs@@GATEWAY
@@ -16311,7 +16400,7 @@ wherever.
 (require 'gnus-agent)
 (setq  gnus-category-predicate-alist
   (append gnus-category-predicate-alist
-	 '((old . my-article-old-p))))
+         '((old . my-article-old-p))))
 @end lisp
 
 and simply specify your predicate as:
@@ -20627,7 +20716,20 @@ and one mail asking me to repent and find some god.
 
 This is annoying.
 
-The way to deal with this is having Gnus split out all spam into a
+@menu
+* Anti-Spam Basics::            Simple steps to reduce the amount of spam.
+* SpamAssassin::                How to use external anti-spam tools.
+* Hashcash::                    Reduce spam by burning CPU time.
+@end menu
+
+@node Anti-Spam Basics
+@subsection Anti-Spam Basics
+@cindex email spam
+@cindex spam
+@cindex UCE
+@cindex unsolicited commercial email
+
+One way of dealing with spam is having Gnus split out all spam into a
 @samp{spam} mail group (@pxref{Splitting Mail}).
 
 First, pick one (1) valid mail address that you can be reached at, and
@@ -20692,6 +20794,156 @@ just press @kbd{r} in the usual way), and I'm not bothered at all with
 spam.  It's a win-win situation.  Forging @code{From} headers to point
 to non-existent domains is yucky, in my opinion.
 
+
+
+@node SpamAssassin
+@subsection SpamAssassin, Vipul's Razor, DCC, etc
+@cindex SpamAssassin
+@cindex Vipul's Razor
+@cindex DCC
+
+The days where the hints in the previous section was sufficient in
+avoiding spam is coming to an end.  There are many tools out there
+that claim to reduce the amount of spam you get.  This section could
+easily become outdated fast, as new products replace old, but
+fortunately most of these tools seem to have similar interfaces.  Even
+though this section will use SpamAssassin as an example, it should be
+easy to adapt it to most other tools.
+
+If the tool you are using is not installed on the mail server, you
+need to invoke it yourself.  Ideas on how to use the
+@code{:postscript} mail source parameter (@pxref{Mail Source
+Specifiers}) follows.
+
+@lisp
+(setq mail-sources
+      '((file :prescript "formail -bs spamassassin < /var/mail/%u")
+        (pop :user "jrl"
+             :server "pophost" 
+             :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
+@end lisp
+
+Once you managed to process your incoming spool somehow, thus making
+the mail contain e.g. a header indicating it is spam, you are ready to
+filter it out.  Using normal split methods (@pxref{Splitting Mail}):
+
+@lisp
+(setq nnmail-split-methods '(("spam"  "^X-Spam-Flag: YES")
+                             ...))
+@end lisp
+
+Or using fancy split methods (@pxref{Fancy Mail Splitting}):
+
+@lisp
+(setq nnmail-split-methods 'nnmail-split-fancy
+      nnmail-split-fancy '(| ("X-Spam-Flag" "YES" "spam")
+                             ...))
+@end lisp
+
+Some people might not like the idea of piping the mail through various
+programs using a @code{:prescript} (if some program is buggy, you
+might lose all mail).  If you are one of them, another solution is to
+call the external tools during splitting.  Example fancy split method:
+
+@lisp
+(setq nnmail-split-fancy '(| (: kevin-spamassassin)
+                             ...))
+(defun kevin-spamassassin ()
+  (save-excursion
+    (let ((buf (or (get-buffer " *nnmail incoming*")
+                   (get-buffer " *nnml move*"))))
+      (if (not buf)
+          (progn (message "Oops, cannot find message buffer") nil)
+        (set-buffer buf)
+        (if (eq 1 (call-process-region (point-min) (point-max)
+                                       "spamc" nil nil nil "-c"))
+            "spam")))))
+@end lisp
+
+That is about it.  As some spam is likely to get through anyway, you
+might want to have a nifty function to call when you happen to read
+spam.  And here is the nifty function:
+
+@lisp
+ (defun my-gnus-raze-spam ()
+  "Submit SPAM to Vipul's Razor, then mark it as expirable."
+  (interactive)
+  (gnus-summary-show-raw-article)
+  (gnus-summary-save-in-pipe "razor-report -f -d")
+  (gnus-summary-mark-as-expirable 1))
+@end lisp
+
+@node Hashcash
+@subsection Hashcash
+@cindex hashcash
+
+A novel technique to fight spam is to require senders to do something
+costly for each message they send.  This has the obvious drawback that
+you cannot rely on that everyone in the world uses this technique,
+since it is not part of the internet standards, but it may be useful
+in smaller communities.
+
+While the tools in the previous section work well in practice, they
+work only because the tools are constantly maintained and updated as
+new form of spam appears.  This means that a small percentage of spam
+will always get through.  It also means that somewhere, someone needs
+to read lots of spam to update these tools.  Hashcash avoids that, but
+instead requires that everyone you communicate with supports the
+scheme.  You can view the two approaches as pragmatic vs dogmatic.
+The approaches have their own advantages and disadvantages, but as
+often in the real world, a combination of them is stronger than either
+one of them separately.
+
+@cindex X-Hashcash
+The ``something costly'' is to burn CPU time, more specifically to
+compute a hash collision up to a certain number of bits.  The
+resulting hashcash cookie is inserted in a @samp{X-Hashcash:}
+header. For more details, and for the external application
+@code{hashcash} you need to install to use this feature, see
+@uref{http://www.cypherspace.org/~adam/hashcash/}.  Even more
+information can be found at @uref{http://www.camram.org/}.
+
+If you wish to call hashcash for each message you send, say something
+like:
+
+@lisp
+(require 'hashcash)
+(add-hook 'message-send-hook 'mail-add-payment)
+@end lisp
+
+The @code{hashcash.el} library can be found at
+@uref{http://users.actrix.gen.nz/mycroft/hashcash.el}, or in the Gnus
+development contrib directory.
+
+You will need to set up some additional variables as well:
+
+@table @code
+
+@item hashcash-default-payment
+@vindex hashcash-default-payment
+This variable indicates the default number of bits the hash collision
+should consist of.  By default this is 0, meaning nothing will be
+done.  Suggested useful values include 17 to 29.
+
+@item hashcash-payment-alist
+@vindex hashcash-payment-alist
+Some receivers may require you to spend burn more CPU time than the
+default.  This variable contains a list of @samp{(ADDR AMOUNT)} cells,
+where ADDR is the receiver (email address or newsgroup) and AMOUNT is
+the number of bits in the collision that is needed.  It can also
+contain @samp{(ADDR STRING AMOUNT)} cells, where the STRING is the
+string to use (normally the email address or newsgroup name is used).
+
+@item hashcash
+@vindex hashcash
+Where the @code{hashcash} binary is installed.
+
+@end table
+
+Currently there is no built in functionality in Gnus to verify
+hashcash cookies, it is expected that this is performed by your hand
+customized mail filtering scripts.  Improvements in this area would be
+a useful contribution, however.
 
 @node Various Various
 @section Various Various
@@ -22200,7 +22452,7 @@ this now has changed to
 @lisp
 (setq mail-sources
       '((directory :path "~/mail/incoming/"
-		   :suffix ".in")))
+                   :suffix ".in")))
 @end lisp
 
 More information is available in the info doc at Select Methods ->

@@ -35,25 +35,29 @@
     "relays.visi.com" "rbl.maps.vix.com")
   "List of blackhole servers.")
 
+(defvar spam-split-group "spam" "Default group name for spam-split.")
+
 (defun spam-check-blackholes ()
-  "Check the Recevieved headers for blackholed relays."
+  "Check the Receieved headers for blackholed relays."
   (let ((headers (message-fetch-field "received"))
 	ips matches)
-    (with-temp-buffer
-      (insert headers)
-      (goto-char (point-min))
-      (while (re-search-forward
-	      "\\[\\([0-9]+.[0-9]+.[0-9]+.[0-9]+\\)\\]" nil t)
-	(push (mapconcat 'identity
-			 (nreverse (split-string (match-string 1) "\\."))
-			 ".")
-	      ips)))
-    (dolist (server spam-blackhole-servers)
-      (dolist (ip ips)
-	(when (query-dns (concat ip "." server))
-	  (push (list ip server (query-dns (concat ip "." server) 'TXT))
-		matches))))
-    matches))
+    (when headers
+      (with-temp-buffer
+	(insert headers)
+	(goto-char (point-min))
+	(while (re-search-forward
+		"\\[\\([0-9]+.[0-9]+.[0-9]+.[0-9]+\\)\\]" nil t)
+	  (message "blackhole search found host IP %s" (match-string 1))
+	  (push (mapconcat 'identity
+			   (nreverse (split-string (match-string 1) "\\."))
+			   ".")
+		ips)))
+      (dolist (server spam-blackhole-servers)
+	(dolist (ip ips)
+	  (when (query-dns (concat ip "." server))
+	    (push (list ip server (query-dns (concat ip "." server) 'TXT))
+		  matches))))
+      matches)))
 
 ;;; Black- and white-lists
 
@@ -64,7 +68,7 @@
   "The location of the whitelist.
 The file format is one regular expression per line.
 The regular expression is matched against the address.")
-					 
+
 (defvar spam-blacklist (expand-file-name "blacklist" spam-directory)
   "The location of the blacklist.
 The file format is one regular expression per line.
@@ -87,12 +91,18 @@ Optional arg BLACKLIST, if non-nil, means to enter in the blacklist instead."
       (unless (bobp)
 	(insert "\n"))
       (insert address "\n")
-      (save-buffer))))
+      (save-buffer)
+      (spam-refresh-list-cache))))
 
 (defun spam-enter-blacklist (address)
   "Enter ADDRESS into the blacklist."
   (interactive "sAddress: ")
   (spam-enter-whitelist address t))
+
+(eval-and-compile
+  (defalias 'spam-point-at-eol (if (fboundp 'point-at-eol)
+				   'point-at-eol
+				 'line-end-position)))
 
 (defun spam-parse-whitelist (&optional blacklist)
   (let ((file (if blacklist spam-blacklist spam-whitelist))
@@ -101,7 +111,7 @@ Optional arg BLACKLIST, if non-nil, means to enter in the blacklist instead."
       (with-temp-buffer
 	(insert-file-contents file)
 	(while (not (eobp))
-	  (setq address (buffer-substring (point) (point-at-eol)))
+	  (setq address (buffer-substring (point) (spam-point-at-eol)))
 	  (forward-line 1)
 	  (unless (zerop (length address))
 	    (setq address (regexp-quote address))
@@ -122,6 +132,33 @@ Optional arg BLACKLIST, if non-nil, means to enter in the blacklist instead."
       (when (string-match (pop cache) address)
 	(setq found t)))
     found))
+
+(defun spam-address-blacklisted-p (address &optional blacklist)
+  (if address
+      (spam-address-whitelisted-p address t)
+    nil))
+
+;; Function for nnmail-split-fancy: returns 'spam' if an article is deemed to be spam
+(defun spam-split ()
+  "Split this message into the `spam' group if it is spam.
+This function can be used as an entry in `nnmail-split-fancy', for
+example like this: (: spam-split)
+
+See the Info node `(gnus)Fancy Mail Splitting' for more details."
+  (interactive)
+
+  ;; refresh the cache if it's necessary
+  (unless spam-whitelist-cache (spam-refresh-list-cache))
+  (unless spam-blacklist-cache (spam-refresh-list-cache))
+
+  (let* ((from (message-fetch-field "from"))
+	 (group nil))
+    (when (spam-check-blackholes)
+      (setq group spam-split-group))
+    (unless (spam-address-whitelisted-p from)	; unless the address is whitelisted,
+      (when (spam-address-blacklisted-p from) ; check if it's blacklisted,
+	(setq group spam-split-group))	; and if so, set the group to spam-split-group
+      group)))
 
 (provide 'spam)
 

@@ -277,7 +277,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.06"
+(defconst gnus-version-number "0.07"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -1269,7 +1269,8 @@ If the number of articles in a newsgroup is greater than this value,
 confirmation is required for selecting the newsgroup.
 If it is `nil', no confirmation is required."
   :group 'gnus-group-select
-  :type 'integer)
+  :type '(choice (const :tag "No limit" nil)
+		 integer))
 
 (defcustom gnus-use-long-file-name (not (memq system-type '(usg-unix-v xenix)))
   "*Non-nil means that the default name of a file to save articles in is the group name.
@@ -1552,6 +1553,21 @@ The gnus-group-split mail splitting mechanism will behave as if this
 address was listed in gnus-group-split Addresses (see below).")
 
 (gnus-define-group-parameter
+ subscribed
+ :type bool
+ :function-document
+ "Return GROUP's subscription status."
+ :variable-document
+ "*Groups which are automatically considered subscribed."
+ :parameter-type '(const :tag "Subscribed" t)
+ :parameter-document "\
+Gnus assumed that you are subscribed to the To/List address.
+
+When constructing a list of subscribed groups using
+`gnus-find-subscribed-addresses', Gnus includes the To address given
+above, or the list address (if the To address has not been set).")
+
+(gnus-define-group-parameter
  auto-expire
  :type bool
  :function gnus-group-auto-expirable-p
@@ -1783,7 +1799,8 @@ face."
   "Whether Gnus is plugged or not.")
 
 (defcustom gnus-agent-cache t
-  "Whether Gnus use agent cache."
+  "Whether Gnus use agent cache.
+You also need to enable `gnus-agent'."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -1796,7 +1813,7 @@ covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
 
-(defcustom gnus-agent nil
+(defcustom gnus-agent t
   "Whether we want to use the Gnus agent or not.
 Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
   :version "21.3"
@@ -2403,12 +2420,12 @@ with a `subscribed' parameter."
   (let (group address addresses)
     (dolist (entry (cdr gnus-newsrc-alist))
       (setq group (car entry))
-      (when (gnus-group-find-parameter group 'subscribed)
+      (when (gnus-parameter-subscribed group)
 	(setq address (mail-strip-quoted-names
 		       (or (gnus-group-fast-parameter group 'to-address)
 			   (gnus-group-fast-parameter group 'to-list))))
 	(when address
-	  (push address addresses))))
+	  (add-to-list 'addresses address))))
     (when addresses
       (list (mapconcat 'regexp-quote addresses "\\|")))))
 

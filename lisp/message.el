@@ -258,7 +258,7 @@ any confusion."
   :type 'string
   :group 'message-various)
 
-(defcustom message-interactive nil
+(defcustom message-interactive t
   "Non-nil means when sending a message wait for and display errors.
 nil means let mailer mail back a message to report errors."
   :group 'message-sending
@@ -963,24 +963,48 @@ candidates:
   "Face used for displaying MML."
   :group 'message-faces)
 
+(defun message-font-lock-make-header-matcher (regexp)
+  (let ((form
+	 `(lambda (limit)
+	    (let ((start (point)))
+	      (save-restriction
+		(widen)
+		(goto-char (point-min))
+		(if (re-search-forward
+		     (concat "^" (regexp-quote mail-header-separator) "$")
+		     nil t)
+		    (setq limit (min limit (match-beginning 0))))
+		(goto-char start))
+	      (and (< start limit)
+		   (re-search-forward ,regexp limit t))))))
+    (if (featurep 'bytecomp)
+	(byte-compile form)
+      form)))
+
 (defvar message-font-lock-keywords
   (let ((content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)\n?"))
-    `((,(concat "^\\([Tt]o:\\)" content)
+    `((,(message-font-lock-make-header-matcher
+	 (concat "^\\([Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-to-face nil t))
-      (,(concat "^\\(^[GBF]?[Cc][Cc]:\\|^[Rr]eply-[Tt]o:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\(^[GBF]?[Cc][Cc]:\\|^[Rr]eply-[Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-cc-face nil t))
-      (,(concat "^\\([Ss]ubject:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([Ss]ubject:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-subject-face nil t))
-      (,(concat "^\\([Nn]ewsgroups:\\|Followup-[Tt]o:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([Nn]ewsgroups:\\|Followup-[Tt]o:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-newsgroups-face nil t))
-      (,(concat "^\\([A-Z][^: \n\t]+:\\)" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\([A-Z][^: \n\t]+:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-other-face nil t))
-      (,(concat "^\\(X-[A-Za-z0-9-]+\\|In-Reply-To\\):" content)
+      (,(message-font-lock-make-header-matcher
+	 (concat "^\\(X-[A-Za-z0-9-]+:\\|In-Reply-To:\\)" content))
        (1 'message-header-name-face)
        (2 'message-header-name-face))
       ,@(if (and mail-header-separator
@@ -993,6 +1017,7 @@ candidates:
       ("<#/?\\(multipart\\|part\\|external\\|mml\\|secure\\)[^>]*>"
        (0 'message-mml-face))))
   "Additional expressions to highlight in Message mode.")
+
 
 ;; XEmacs does it like this.  For Emacs, we have to set the
 ;; `font-lock-defaults' buffer-local variable.
@@ -1527,6 +1552,7 @@ Point is left at the beginning of the narrowed-to region."
 	       (- max rank)
 	     (1+ max)))))
       (message-sort-headers-1))))
+
 
 
 
@@ -2970,61 +2996,67 @@ If you always want Gnus to send messages in one piece, set
 		     " sendmail errors")
 		  0))
 	resend-to-addresses delimline)
-    (let ((case-fold-search t))
-      (save-restriction
-	(message-narrow-to-headers)
-	(setq resend-to-addresses (message-fetch-field "resent-to")))
-      ;; Change header-delimiter to be what sendmail expects.
-      (goto-char (point-min))
-      (re-search-forward
-       (concat "^" (regexp-quote mail-header-separator) "\n"))
-      (replace-match "\n")
-      (backward-char 1)
-      (setq delimline (point-marker))
-      (run-hooks 'message-send-mail-hook)
-      ;; Insert an extra newline if we need it to work around
-      ;; Sun's bug that swallows newlines.
-      (goto-char (1+ delimline))
-      (when (eval message-mailer-swallows-blank-line)
-	(newline))
-      (when message-interactive
-	(save-excursion
-	  (set-buffer errbuf)
-	  (erase-buffer))))
-    (let ((default-directory "/")
-	  (coding-system-for-write message-send-coding-system))
-      (apply 'call-process-region
-	     (append (list (point-min) (point-max)
-			   (if (boundp 'sendmail-program)
-			       sendmail-program
-			     "/usr/lib/sendmail")
-			   nil errbuf nil "-oi")
-		     ;; Always specify who from,
-		     ;; since some systems have broken sendmails.
-		     ;; But some systems are more broken with -f, so
-		     ;; we'll let users override this.
-		     (if (null message-sendmail-f-is-evil)
-			 (list "-f" (message-make-address)))
-		     ;; These mean "report errors by mail"
-		     ;; and "deliver in background".
-		     (if (null message-interactive) '("-oem" "-odb"))
-		     ;; Get the addresses from the message
-		     ;; unless this is a resend.
-		     ;; We must not do that for a resend
-		     ;; because we would find the original addresses.
-		     ;; For a resend, include the specific addresses.
-		     (if resend-to-addresses
-			 (list resend-to-addresses)
-		       '("-t")))))
-    (when message-interactive
-      (save-excursion
-	(set-buffer errbuf)
-	(goto-char (point-min))
-	(while (re-search-forward "\n\n* *" nil t)
-	  (replace-match "; "))
-	(if (not (zerop (buffer-size)))
-	    (error "Sending...failed to %s"
-		   (buffer-substring (point-min) (point-max)))))
+    (unwind-protect
+	(progn
+	  (let ((case-fold-search t))
+	    (save-restriction
+	      (message-narrow-to-headers)
+	      (setq resend-to-addresses (message-fetch-field "resent-to")))
+	    ;; Change header-delimiter to be what sendmail expects.
+	    (goto-char (point-min))
+	    (re-search-forward
+	     (concat "^" (regexp-quote mail-header-separator) "\n"))
+	    (replace-match "\n")
+	    (backward-char 1)
+	    (setq delimline (point-marker))
+	    (run-hooks 'message-send-mail-hook)
+	    ;; Insert an extra newline if we need it to work around
+	    ;; Sun's bug that swallows newlines.
+	    (goto-char (1+ delimline))
+	    (when (eval message-mailer-swallows-blank-line)
+	      (newline))
+	    (when message-interactive
+	      (save-excursion
+		(set-buffer errbuf)
+		(erase-buffer))))
+	  (let* ((default-directory "/")
+		 (coding-system-for-write message-send-coding-system)
+		 (cpr (apply
+		       'call-process-region
+		       (append
+			(list (point-min) (point-max)
+			      (if (boundp 'sendmail-program)
+				  sendmail-program
+				"/usr/lib/sendmail")
+			      nil errbuf nil "-oi")
+			;; Always specify who from,
+			;; since some systems have broken sendmails.
+			;; But some systems are more broken with -f, so
+			;; we'll let users override this.
+			(if (null message-sendmail-f-is-evil)
+			    (list "-f" (message-make-address)))
+			;; These mean "report errors by mail"
+			;; and "deliver in background".
+			(if (null message-interactive) '("-oem" "-odb"))
+			;; Get the addresses from the message
+			;; unless this is a resend.
+			;; We must not do that for a resend
+			;; because we would find the original addresses.
+			;; For a resend, include the specific addresses.
+			(if resend-to-addresses
+			    (list resend-to-addresses)
+			  '("-t"))))))
+	    (unless (or (null cpr) (zerop cpr))
+	      (error "Sending...failed with exit value %d" cpr)))
+	  (when message-interactive
+	    (save-excursion
+	      (set-buffer errbuf)
+	      (goto-char (point-min))
+	      (while (re-search-forward "\n\n* *" nil t)
+		(replace-match "; "))
+	      (if (not (zerop (buffer-size)))
+		  (error "Sending...failed to %s"
+			 (buffer-substring (point-min) (point-max)))))))
       (when (bufferp errbuf)
 	(kill-buffer errbuf)))))
 
@@ -4280,6 +4312,9 @@ than 988 characters long, and if they are not, trim them until they are."
 (defun message-beginning-of-line (&optional n)
   "Move point to beginning of header value or to beginning of line."
   (interactive "p")
+  (let ((zrs 'zmacs-region-stays))
+    (when (and (interactive-p) (boundp zrs))
+      (set zrs t)))
   (if (message-point-in-header-p)
       (let* ((here (point))
 	     (bol (progn (beginning-of-line n) (point)))
@@ -5155,7 +5190,9 @@ Optional DIGEST will use digest to forward."
 			    (or (search-forward "\n\n" nil t) (point)))
 	  (delete-region (point-min) (point-max)))
       (when (and (not current-prefix-arg)
-		 message-forward-ignored-headers)
+		 message-forward-ignored-headers
+		 ;; don't remove CTE, X-Gnus etc when doing "raw" forward:
+		 message-forward-show-mml)
 	(save-restriction
 	  (narrow-to-region b e)
 	  (goto-char b)

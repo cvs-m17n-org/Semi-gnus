@@ -1,3 +1,129 @@
+2002-08-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Summary Sorting): Document randomization.
+
+2002-07-28  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Web Searches): Added gmane and removed old
+	non-functioning search engines.  From Niklas Morberg
+	<niklas.morberg@axis.com>.
+
+2002-05-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Buffer Lines): Fix typo.
+
+2002-07-27  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Summary Mail Commands): Trivial fix from Reiner Steib
+	<4uce.02.r.steib@gmx.net>.
+
+2002-07-18  Karl Kleinpaste  <karl@charcoal.com>
+
+	* gnus.texi (To From Newsgroups): Additional text regarding how to
+	regenerate overviews via server buffer, and note to news admins
+	about overview.fmt.
+
+2002-07-14  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Posting Styles): Fix example (it was using the To
+	header instead of the From header).  From Christopher Splinter
+	<cs@splinter.inka.de>.
+
+2002-07-07  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Top): Move hashcash down into spam chapter.
+	(Top): New spam menu.
+	(Various): Remove hashcash.
+	(Thwarting Email Spam): Split into introduction and "Anti-Spam
+	Basics" node.
+	(SpamAssassin): Add.
+	(Hashcash): Add.
+
+2002-06-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NNTP): Doc fix.
+
+2002-07-02  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Washing Mail): Document the shortcoming of
+	nnmail-remove-leading-whitespace.
+
+2002-06-30  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.texi (News Headers): Include example for removing an
+	entry from message-required-news-headers.
+
+2002-06-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NNTP): Add nntp-via-rlogin-command-switches.
+
+2002-06-27  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Mail Back End Variables): Document
+	nnmail-cache-ignore-groups.  Xref Fancy Mail Splitting.
+	(Fancy Mail Splitting): Mention nnmail-cache-ignore-groups and
+	why it is useful.
+
+2002-06-25  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Fancy Mail Splitting): Include all necessary
+	variables in the Lisp example.
+
+2002-06-22  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Pay Hashcash): Add.
+
+2002-06-03  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Splitting Mail): Add.
+
+2002-05-23  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Web Searches): Fix.  Trivial change from Niklas
+	Morberg <niklas.morberg@axis.com>.
+
+2002-05-22  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail): Add variable.
+
+2002-05-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Loose Threads): Add gnus-simplify-all-whitespace.
+
+2002-05-08  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Mail-To-News Gateways): The default
+	nngateway-header-transformation function inserts a "To" header,
+	not a "From" header.  From Jesper Harder <harder@ifa.au.dk>.
+
+2002-05-08  Josh Huber  <huber@alum.wpi.edu>
+
+	* message.texi (Security): Added a note about the signencrypt
+	style, and how to change it using `mml-signencrypt-style.'
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (Encoding Customization): Fix.
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi: Move two chapters "Interface Functions" and
+	"Basic Functions" after the Decoding and Encoding chapters.  (No
+	text modified.)
+
+2002-05-04  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (Top): Change scope of manual to include users.
+	(Customization): Rename to Display Customization.
+	(MML Definition): Add cross references.
+	(Encoding Customization): New section.
+	(Charset Translation): More info and cross references.
+
+2002-05-01  Josh Huber  <huber@alum.wpi.edu>
+
+	* gnus.texi (Signing and encrypting): Fix doc.  Also, add a
+	paragraph about replysign/replyencrypt/replysignencryped use.
+
 2002-05-01  Lars Magne Ingebrigtsen  <larsi@quimbies.gnus.org>
 
 	* message.texi (Message Headers): Remove colon from index

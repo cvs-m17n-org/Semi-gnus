@@ -611,7 +611,7 @@ the first newsgroup."
 (defun gnus-clear-system ()
   "Clear all variables and buffers."
   ;; Clear Gnus variables.
-  (let ((variables (delete 'gnus-format-specs gnus-variable-list)))
+  (let ((variables (remove 'gnus-format-specs gnus-variable-list)))
     (while variables
       (set (car variables) nil)
       (setq variables (cdr variables))))
@@ -787,7 +787,11 @@ cautiously -- unloading may cause trouble."
       (set-buffer gnus-dribble-buffer)
       (goto-char (point-max))
       (insert string "\n")
-      (set-window-point (get-buffer-window (current-buffer)) (point-max))
+      ;; This has been commented by Josh Huber <huber@alum.wpi.edu>
+      ;; It causes problems with both XEmacs and Emacs 21, and doesn't
+      ;; seem to be of much value. (FIXME: remove this after we make sure
+      ;; it's not needed).
+      ;; (set-window-point (get-buffer-window (current-buffer)) (point-max))
       (bury-buffer gnus-dribble-buffer)
       (save-excursion
 	(set-buffer gnus-group-buffer)
@@ -2017,7 +2021,7 @@ newsgroup."
   "Read startup file.
 If FORCE is non-nil, the .newsrc file is read."
   ;; Reset variables that might be defined in the .newsrc.eld file.
-  (let ((variables (delete 'gnus-format-specs gnus-variable-list)))
+  (let ((variables (remove 'gnus-format-specs gnus-variable-list)))
     (while variables
       (set (car variables) nil)
       (setq variables (cdr variables))))

@@ -286,6 +286,7 @@ directly.")
 	 '(("\\*" "\\*" bold)
 	   ("_" "_" underline)
 	   ("/" "/" italic)
+	   ("-" "-" strikethru)
 	   ("_/" "/_" underline-italic)
 	   ("_\\*" "\\*_" underline-bold)
 	   ("\\*/" "/\\*" bold-italic)
@@ -351,7 +352,11 @@ and the latter avoids underlining any whitespace at all."
 (defface gnus-emphasis-underline-bold-italic
   '((t (:bold t :italic t :underline t)))
   "Face used for displaying underlined bold italic emphasized text.
-Esample: (_/*word*/_)."
+Example: (_/*word*/_)."
+  :group 'gnus-article-emphasis)
+
+(defface gnus-emphasis-strikethru '((t (:strikethru t)))
+  "Face used for displaying strike-through text (-word-)."
   :group 'gnus-article-emphasis)
 
 (defface gnus-emphasis-highlight-words
@@ -1282,8 +1287,8 @@ It is a string, such as \"PGP\". If nil, ask user."
   (let ((table (copy-syntax-table text-mode-syntax-table)))
     ;; This causes the citation match run O(2^n).
     ;; (modify-syntax-entry ?- "w" table)
-    (modify-syntax-entry ?> ")" table)
-    (modify-syntax-entry ?< "(" table)
+    (modify-syntax-entry ?> ")<" table)
+    (modify-syntax-entry ?< "(>" table)
     table)
   "Syntax table used in article mode buffers.
 Initialized from `text-mode-syntax-table.")
@@ -2082,7 +2087,10 @@ If READ-CHARSET, ask for a coding system."
       (goto-char (point-min))
       (while (re-search-forward
 	      "^\\(\\(https?\\|ftp\\)://\\S-+\\) *\n\\(\\S-+\\)" nil t)
-	(replace-match "\\1\\3" t)))))
+	(replace-match "\\1\\3" t)))
+    (when (and gnus-display-mime-function (interactive-p))
+      (funcall gnus-display-mime-function))))
+
 
 (defun article-wash-html (&optional read-charset)
   "Format an html article.
@@ -2664,7 +2672,7 @@ should replace the \"Date:\" one, or should be added below it."
 	     ":"
 	     (format "%02d" (nth 1 dtime)))))))
 	(error
-	 (format "Date: %s (from Oort)" date))))
+	 (format "Date: %s (from Gnus)" date))))
 
 (defun article-date-local (&optional highlight)
   "Convert the current article date to the local timezone."
@@ -4940,6 +4948,8 @@ If given a prefix, show the hidden text instead."
 	    (let ((gnus-override-method gnus-override-method)
 		  (methods (and (stringp article)
 				gnus-refer-article-method))
+		  (backend (car (gnus-find-method-for-group
+				 gnus-newsgroup-name)))
 		  result
 		  (buffer-read-only nil))
 	      (if (or (not (listp methods))
@@ -4958,7 +4968,8 @@ If given a prefix, show the hidden text instead."
 		(gnus-kill-all-overlays)
 		(let ((gnus-newsgroup-name group))
 		  (gnus-check-group-server))
-		(when (gnus-request-article article group (current-buffer))
+		(cond
+		 ((gnus-request-article article group (current-buffer))
 		  (when (numberp article)
 		    (gnus-async-prefetch-next group article
 					      gnus-summary-buffer)
@@ -4966,10 +4977,13 @@ If given a prefix, show the hidden text instead."
 		      (gnus-backlog-enter-article
 		       group article (current-buffer))))
 		  (setq result 'article))
-		(if (not result)
-		    (if methods
-			(setq gnus-override-method (pop methods))
-		      (setq result 'done))))
+		 (methods
+		  (setq gnus-override-method (pop methods)))
+		 ((not (string-match "^400 "
+				     (nnheader-get-report backend)))
+		  ;; If we get 400 server disconnect, reconnect and
+		  ;; retry; otherwise, assume the article has expired.
+		  (setq result 'done))))
 	      (and (eq result 'article) 'article)))
 	   ;; It was a pseudo.
 	   (t article)))

@@ -104,7 +104,8 @@ The last element should always have \"\" as the regexp.
 
 This variable can also have a function as its value."
   :group 'nnmail-split
-  :type '(choice (repeat :tag "Alist" (group (string :tag "Name") regexp))
+  :type '(choice (repeat :tag "Alist" (group (string :tag "Name")
+					     (choice regexp function)))
 		 (function-item nnmail-split-fancy)
 		 (function :tag "Other")))
 
@@ -118,6 +119,15 @@ If nil, the first match found will be used."
 (defcustom nnmail-split-fancy-with-parent-ignore-groups nil
   "Regexp that matches group names to be ignored when applying
 `nnmail-split-fancy-with-parent'.  This can also be a list of regexps."
+  :group 'nnmail-split
+  :type '(choice (const :tag "none" nil)
+		 (regexp :value ".*")
+		 (repeat :value (".*") regexp)))
+
+(defcustom nnmail-cache-ignore-groups nil
+  "Regexp that matches group names to be ignored when inserting message
+ids into the cache (`nnmail-cache-insert').  This can also be a list
+of regexps."
   :group 'nnmail-split
   :type '(choice (const :tag "none" nil)
 		 (regexp :value ".*")
@@ -484,6 +494,11 @@ parameter.  It should return nil, `warn' or `delete'."
   :group 'nnmail
   :type 'symbol)
 
+(defcustom nnmail-mail-splitting-decodes nil
+  "Whether the nnmail splitting functionality should MIME decode headers."
+  :group 'nnmail
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar nnmail-article-buffer " *nnmail incoming*"
@@ -782,8 +797,8 @@ If SOURCE is a directory spec, try to return the group name component."
 	 start
 	 (if (search-forward "\n\n" nil t)
 	     (1- (point))
-	 ;; This will never happen, but just to be on the safe side --
-      ;; if there is no head-body delimiter, we search a bit manually.
+	   ;; This will never happen, but just to be on the safe side --
+	   ;; if there is no head-body delimiter, we search a bit manually.
 	   (while (and (looking-at "From \\|[^ \t]+:")
 		       (not (eobp)))
 	     (forward-line 1))
@@ -815,12 +830,12 @@ If SOURCE is a directory spec, try to return the group name component."
 	(goto-char (point-max))
 	(widen)
 	(setq head-end (point))
-   ;; We try the Content-Length value.  The idea: skip over the header
-   ;; separator, then check what happens content-length bytes into the
-    ;; message body.  This should be either the end ot the buffer, the
-       ;; message separator or a blank line followed by the separator.
-      ;; The blank line should probably be deleted.  If neither of the
-       ;; three is met, the content-length header is probably invalid.
+	;; We try the Content-Length value.  The idea: skip over the header
+	;; separator, then check what happens content-length bytes into the
+	;; message body.  This should be either the end ot the buffer, the
+	;; message separator or a blank line followed by the separator.
+	;; The blank line should probably be deleted.  If neither of the
+	;; three is met, the content-length header is probably invalid.
 	(when content-length
 	  (forward-line 1)
 	  (setq skip (+ (point) content-length))
@@ -1000,8 +1015,9 @@ FUNC will be called with the group name to determine the article number."
 	;; Copy the headers into the work buffer.
 	(insert-buffer-substring obuf beg end)
 	;; Decode MIME headers and charsets.
-	(let ((mail-parse-charset nnmail-mail-splitting-charset))
-	  (mail-decode-encoded-word-region (point-min) (point-max)))
+	(when nnmail-mail-splitting-decodes
+	  (let ((mail-parse-charset nnmail-mail-splitting-charset))
+	    (mail-decode-encoded-word-region (point-min) (point-max))))
 	;; Fold continuation lines.
 	(goto-char (point-min))
 	(while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)
@@ -1456,37 +1472,28 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 (defvar group)
 (defvar group-art-list)
 (defvar group-art)
-(defun nnmail-cache-insert (id &optional grp)
+(defun nnmail-cache-insert (id grp)
   (when nnmail-treat-duplicates
     ;; Store some information about the group this message is written
-    ;; to.  This function might have been called from various places.
-    ;; Sometimes, a function up in the calling sequence has an
-    ;; argument GROUP which is bound to a string, the group name.  At
-    ;; other times, there is a function up in the calling sequence
-    ;; which has an argument GROUP-ART which is a list of pairs, and
-    ;; the car of a pair is a group name.  Should we check that the
-    ;; length of the list is equal to 1? -- kai
-    (let ((g nil))
-      (cond (grp
-	     (setq g grp))
-	    ((and (boundp 'group) group)
-	     (setq g group))
-	    ((and (boundp 'group-art-list) group-art-list
-		  (listp group-art-list))
-	     (setq g (caar group-art-list)))
-	    ((and (boundp 'group-art) group-art (listp group-art))
-	     (setq g (caar group-art)))
-	    (t (setq g "")))
-      (unless (gnus-buffer-live-p nnmail-cache-buffer)
-	(nnmail-cache-open))
-      (save-excursion
-	(set-buffer nnmail-cache-buffer)
-	(goto-char (point-max))
-	(if (and g (not (string= "" g))
-		 (gnus-methods-equal-p gnus-command-method
-				       (nnmail-cache-primary-mail-backend)))
-	    (insert id "\t" g "\n")
-	  (insert id "\n"))))))
+    ;; to.  This is passed in as the grp argument -- all locations this
+    ;; has been called from have been checked and the group is available.
+    ;; The only ambiguous case is nnmail-check-duplication which will only
+    ;; pass the first (of possibly >1) group which matches. -Josh
+    (unless (gnus-buffer-live-p nnmail-cache-buffer)
+      (nnmail-cache-open))
+    (save-excursion
+      (set-buffer nnmail-cache-buffer)
+      (goto-char (point-max))
+      (if (and grp (not (string= "" grp))
+	       (gnus-methods-equal-p gnus-command-method
+				     (nnmail-cache-primary-mail-backend)))
+	  (let ((regexp (if (consp nnmail-cache-ignore-groups)
+			    (mapconcat 'identity nnmail-cache-ignore-groups
+				       "\\|")
+			  nnmail-cache-ignore-groups)))
+	    (unless (and regexp (string-match regexp grp))
+	      (insert id "\t" grp "\n")))
+	(insert id "\n")))))
 
 (defun nnmail-cache-primary-mail-backend ()
   (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
@@ -1588,7 +1595,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
      ((not duplication)
       (funcall func (setq group-art
 			  (nreverse (nnmail-article-group artnum-func))))
-      (nnmail-cache-insert message-id))
+      (nnmail-cache-insert message-id (caar group-art)))
      ((eq action 'delete)
       (setq group-art nil))
      ((eq action 'warn)
@@ -1763,7 +1770,9 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(setq target (format-time-string (caddr regexp-target-pair) date)))
        ((and (not (equal header 'to-from))
 	     (string-match (cadr regexp-target-pair)
-			   (message-fetch-field header)))
+			   (or
+			    (message-fetch-field header)
+			    "")))
 	(setq target
 	      (format-time-string (caddr regexp-target-pair) date)))))))
 
