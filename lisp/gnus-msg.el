@@ -307,13 +307,18 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
 (defun gnus-inews-yank-articles (articles)
-  (let (beg article)
+  (let ((frame (when (and message-use-multi-frames
+			  (> (length articles) 1))
+		 (window-frame (get-buffer-window (current-buffer)))))
+	beg article)
     (message-goto-body)
     (while (setq article (pop articles))
       (save-window-excursion
 	(set-buffer gnus-summary-buffer)
 	(gnus-summary-select-article nil nil nil article)
 	(gnus-summary-remove-process-mark article))
+      (when frame
+	(select-frame frame))
       (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
 	    (message-reply-headers gnus-current-headers))
