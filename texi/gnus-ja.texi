@@ -20852,9 +20852,10 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 @cindex spam filtering
 @cindex spam.el
 
-@code{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)=j$r(B gnus $B$NCf$K(B
-$B;}$D$3$H$G$9!#$=$N$?$a$K(B @code{spam.el} $B$OFs$D$N$3$H$r9T$J$$$^$9(B: $BF~$C$F(B
-$B$/$k%a!<%k$r_I2a$7!"(Bspam $B$H$7$FCN$i$l$k%a!<%k$rJ,@O$9$k$3$H$G$9!#(B
+@code{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)%;%s%?!<(B
+$B$r(B gnus $B$NCf$K;}$D$3$H$G$9!#$=$N$?$a$K(B @code{spam.el} $B$OFs$D$N$3$H$r9T$J(B
+$B$$$^$9(B: $BF~$C$F$/$k%a!<%k$r_I2a$7!"(Bspam $B$H$7$FCN$i$l$k%a!<%k$rJ,@O$9$k$3(B
+$B$H$G$9!#(B
 
 $B$G$O(B @code{spam.el} $B$r(B load $B$9$k$H2?$,5/$-$k$G$7$g$&$+(B?  $BBh0l$K!"0J2<$N(B
 $B%-!<%\!<%IL?Na$,;H$($k$h$&$K$J$j$^$9(B:
@@ -21112,22 +21113,22 @@ Paul Graham $B$O!"E}7W$r;H$C$?(B spam $B$N_I2a$K4X$9$kM%$l$?%(%C%;%$$r=q$-$^$
 $B$O(B SpamAssassin $B$K$h$C$F;H$o$l$F$$$k$h$&$J%k!<%k%Y!<%9$N_I2a$K8GM-$J7g4Y(B
 $B$K$D$$$F=R$Y$F$$$^$9!#Nc$($P(B: $BC/$+$,%k!<%k$r=q$+$J$1$l$P$J$i$J$$$7!"B>$N(B
 $B$9$Y$F$N?M$O$3$l$i$N%k!<%k$r%$%s%9%H!<%k$7$J$1$l$P$J$j$^$;$s!#$"$J$?$O$$(B
-$B$D$bCY$l$^$9!#$=$l$,2?$d$i(B spam $B$^$?$OHs(B spam $B;w$F$$$k$+$I$&$+$K4p$E$$$F(B
+$B$D$bCY$l$^$9!#$=$l$,2?$d$i(B spam $B$^$?$OHs(B-spam $B;w$F$$$k$+$I$&$+$K4p$E$$$F(B
 $B%a!<%k$r_I2a$9$k$[$&$,!"$O$k$+$KNI$$$@$m$&$HH`$O<gD%$7$^$9!#$3$l$rB,Dj$9(B
 $B$k0l$D$N<jCJ$OC18l$NJ,I[$G$9!#$=$N8eH`$O!"?7Ce%a!<%k$,$"$J$?$NB>(B
 $B$N(B spam $B%a!<%k$K;w$F$$$k$+$I$&$+$r%A%'%C%/$9$kJ}K!$N5-=R$K?J$_$^$9!#(B
 
 $B4pK\E*$J0F$O$3$l$G$9(B: $B$"$J$?$N%a!<%k$NFs$D$N%3%l%/%7%g%s$r:n$j$^$9!#0l$D(B
-$B$O(B spam$B!"$b$&0l$D$OHs(B spam $B$G!#N>J}$N%3%l%/%7%g%s$K$*$1$k3FC18l$N=P8=IQ(B
+$B$O(B spam$B!"$b$&0l$D$OHs(B-spam $B$G!#N>J}$N%3%l%/%7%g%s$K$*$1$k3FC18l$N=P8=IQ(B
 $BEY$r?t$($F!"%3%l%/%7%g%s$N%a!<%k$NAm?t$G=E$_IU$1$r9T$J$$!"$3$N>pJs$r<-=q(B
-$B$K3JG<$7$^$9!#?7Ce%a!<%k$N$9$Y$F$NC18l$K$D$$$F!"(Bspam $B$+Hs(B spam $B%a!<%k$K(B
+$B$K3JG<$7$^$9!#?7Ce%a!<%k$N$9$Y$F$NC18l$K$D$$$F!"(Bspam $B$+Hs(B-spam $B%a!<%k$K(B
 $BB0$9$k3NN($r7hDj$7$^$9!#(B15$B$N:G$b82Cx$JC18l$r;H$C$F!"$=$N%a!<%k(B
 $B$,(B spam $B$G$"$k$3$H$N3NN($NAm7W$r7W;;$7$^$9!#$3$N3NN($,$"$kogCM$h$j9b$+$C(B
 $B$?$i!"$=$N%a!<%k$O(B spam $B$G$"$k$H9M$($i$l$^$9!#(B
 
 gnus $B$O$3$N<o$N_I2a$r%5%]!<%H$7$^$9!#$7$+$7$=$l$K$O$$$/$D$+$N@_Dj$,I,MW(B
 $B$G$9!#Bh0l$K!"$"$J$?$N%a!<%k$NFs$D$N%3%l%/%7%g%s$,MW$j$^$9!#0l$D$O(B spam$B!"(B
-$B$b$&0l$D$OHs(B spam $B$G!#$=$7$F!"$=$l$i$NFs$D$N%3%l%/%7%g%s$r;H$C$F<-=q$r:n(B
+$B$b$&0l$D$OHs(B-spam $B$G!#$=$7$F!"$=$l$i$NFs$D$N%3%l%/%7%g%s$r;H$C$F<-=q$r:n(B
 $B$j!"$=$l$r%;!<%V$7$F2<$5$$!#$=$7$FFC$K:G8e$K!"$"$J$?$NFC5iJ,3d$N5,B'$G$3(B
 $B$N<-=q$r;H$C$F2<$5$$!#(B
 
@@ -21138,69 +21139,67 @@ gnus $B$O$3$N<o$N_I2a$r%5%]!<%H$7$^$9!#$7$+$7$=$l$K$O$$$/$D$+$N@_Dj$,I,MW(B
 @end menu
 
 @node Creating a spam-stat dictionary
-@subsubsection Creating a spam-stat dictionary
+@subsubsection spam-stat $B%G%#%l%/%H%j$r:n$k(B
 
-Before you can begin to filter spam based on statistics, you must
-create these statistics based on two mail collections, one with spam,
-one with non-spam.  These statistics are then stored in a dictionary
-for later use.  In order for these statistics to be meaningfull, you
-need several hundred emails in both collections.
+$BE}7W$K4p$E$$$?(B spam $B_I2a$r;O$a$k$K!"$"$J$?$OFs$D$N%a!<%k$N%3%l%/%7%g%s$K(B
+$B4p$E$$$?E}7W$r:n$i$J$1$l$P$J$j$^$;$s!#0l$D$O(B spam$B!"$b$&0l$D$OHs(B-spam $B$G!#(B
+$B$=$7$F$=$l$i$NE}7W$O!"8e$GMxMQ$9$k$?$a$K<-=q$K3JG<$5$l$^$9!#$=$l$i$NE}7W(B
+$B$r0UL#$N$"$k$b$N$K$9$k$?$a$K!"N>J}$N%3%l%/%7%g%s$K$D$-?tI4DL$N%a!<%k$,I,(B
+$BMW$G$9!#(B
 
-Gnus currently supports only the nnml backend for automated dictionary
-creation.  The nnml backend stores all mails in a directory, one file
-per mail.  Use the following 
+$B:#$N$H$3$m(B gnus $B$O(B nnml $B%P%C%/%(%s%I$G$@$1<-=q$N<+F0@8@.$r%5%]!<%H$7$^$9!#(B
+nnml $B%P%C%/%(%s%I$O0lDL$N%a!<%k$K$D$-0l$D$N%U%!%$%k$G!"$9$Y$F$N%a!<%k$r(B
+$B%G%#%l%/%H%j$K3JG<$7$^$9!#0J2<$r;H$C$F2<$5$$!#(B
 
 @defun spam-stat-process-spam-directory
-Create spam statistics for every file in this directory.  Every file
-is treated as one spam mail.
+$B$3$N%G%#%l%/%H%j$K$"$k$9$Y$F$N%U%!%$%k$K$D$$$F(B spam $B$NE}7W$r@8@.$7$^$9!#(B
+$B$9$Y$F$N%U%!%$%k$O0l$D$N(B spam $B%a!<%k$H$7$F07$o$l$^$9!#(B
 @end defun
 
 @defun spam-stat-process-non-spam-directory
-Create non-spam statistics for every file in this directory.  Every
-file is treated as one non-spam mail.
+$B$3$N%G%#%l%/%H%j$K$"$k$9$Y$F$N%U%!%$%k$K$D$$$FHs(B-spam $B$NE}7W$r@8@.$7$^$9!#(B
+$B$9$Y$F$N%U%!%$%k$O0l$D$N(B spam $B$G$O$J$$%a!<%k$H$7$F07$o$l$^$9!#(B
 @end defun
 
-Usually you would call @code{spam-stat-process-spam-directory} on a
-directory such as @file{~/Mail/mail/spam} (this usually corresponds
-the the group @samp{nnml:mail.spam}), and you would call
-@code{spam-stat-process-non-spam-directory} on a directory such as
-@file{~/Mail/mail/misc} (this usually corresponds the the group
-@samp{nnml:mail.misc}).
+$BIaDL$O(B @file{~/Mail/mail/spam} $B$N$h$&$J%G%#%l%/%H%j(B ($BDL(B
+$B>o(B @samp{nnml:mail.spam} $B%0%k!<%W$KBP1~(B) $B$KBP$7(B
+$B$F(B @code{spam-stat-process-spam-directory} $B$r8F$V$G$7$g$&!#$^(B
+$B$?(B @file{~/Mail/mail/misc} $B$N$h$&$J%G%#%l%/%H%j(B ($BDL(B
+$B>o(B @samp{nnml:mail.misc} $B%0%k!<%W$KBP1~(B) $B$KBP$7(B
+$B$F(B @code{spam-stat-process-non-spam-directory} $B$r8F$V$G$7$g$&!#(B
 
 @defvar spam-stat
-This variable holds the hash-table with all the statistics -- the
-dictionary we have been talking about.  For every word in either
-collection, this hash-table stores a vector describing how often the
-word appeared in spam and often it appeared in non-spam mails.
+$B$3$NJQ?t$O$9$Y$F$NE}7W$N%O%C%7%e%F!<%V%k(B -- $B2f!9$,<-=q$H8@$C$F$$$k$b(B
+$B$N(B -- $B$r;}$A$^$9!#$3$N%O%C%7%e%F!<%V%k$O!"APJ}$N%3%l%/%7%g%s$N$9$Y$F$NC1(B
+$B8l$K$D$$$F(B spam $B$*$h$SHs(B-spam $B%a!<%k$K$*$1$k=P8=IQEY$rI=$9%Y%/%H%k$r3JG<(B
+$B$7$^$9!#(B
 
-If you want to regenerate the statistics from scratch, you need to
-reset the dictionary.
+$BE}7W$r:G=i$+$i:n$jD>$7$?$$$H$-$O!"<-=q$r%j%;%C%H$9$kI,MW$,$"$j$^$9!#(B
 
 @end defvar
 
 @defun spam-stat-reset
-Reset the @code{spam-stat} hash-table, deleting all the statistics.
+@code{spam-stat} $B%O%C%7%e%F!<%V%k$r%j%;%C%H$7!"$9$Y$F$NE}7W$r:o=|$7$^$9!#(B
 
-When you are done, you must save the dictionary.  The dictionary may
-be rather large.  If you will not update the dictionary incrementally
-(instead, you will recreate it once a month, for example), then you
-can reduce the size of the dictionary by deleting all words that did
-not appear often enough or that do not clearly belong to only spam or
-only non-spam mails.
+$B9T$J$C$?$i<-=q$r%;!<%V$7$J$1$l$P$J$j$^$;$s!#<-=q$O$+$J$jBg$-$/$J$k$+$b$7(B
+$B$l$^$;$s!#<-=q$rDI2C99?7$7$J$$>l9g(B ($B8@$$49$($k$H!"Nc$($PKh7n0l2s:n$jD>$9(B
+$B>l9g(B)$B!"IQHK$K8=$l$J$$$+!"$^$?$O(B spam $B$+Hs(B-spam $B$N$I$A$i$KB0$9$k$+$,$O$C(B
+$B$-$j$7$J$$$9$Y$F$NC18l$r:o=|$9$k$3$H$K$h$C$F!"<-=q$N%5%$%:$r>.$5$/$9$k$3(B
+$B$H$,$G$-$^$9!#(B
 @end defun
 
 @defun spam-stat-reduce-size
-Reduce the size of the dictionary.  Use this only if you do not want
-to update the dictionary incrementally.
+$B<-=q$N%5%$%:$r>.$5$/$7$^$9!#$3$l$O<-=q$rDI2C99?7$7$?$/$J$$>l9g$@$1;H$C$F(B
+$B2<$5$$!#(B
 @end defun
 
 @defun spam-stat-save
-Save the dictionary.
+$B<-=q$r%;!<%V$7$^$9!#(B
 @end defun
 
 @defvar spam-stat-file
-The filename used to store the dictionary.  This defaults to
-@file{~/.spam-stat.el}.
+$B<-=q$N3JG<$K;H$&%U%!%$%kL>$G$9!#%G%#%U%)%k%H$O(B @file{~/.spam-stat.el} $B$G(B
+$B$9!#(B
 @end defvar
 
 @node Splitting mail using spam-stat
