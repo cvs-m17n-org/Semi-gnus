@@ -1,3 +1,13 @@
+1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Must require 'path-util
+	before call `module-installed-p'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.4.0.
+	(gnus-version): Modify for SEMI 1.5.
+
+	* lisp/gnus-art.el: Modify for SEMI 1.5 API.
+
 1998-06-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el: New file. To handle multiple POP account.
