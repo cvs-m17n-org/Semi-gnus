@@ -2982,9 +2982,9 @@ Sieve $B$N(B @samp{IF} $B@)8f9=B$BN$,:n$i$l$^$9!#(B
 $B$k(B (@pxref{Sieve Commands}) $B$H$-$K!"0J2<$N(B Sieve $B%3!<%I$,:n$i$l$^$9(B:
 
 @example
-  if address \"sender\" \"sieve-admin@@extundo.com\" @{
-          fileinto \"INBOX.list.sieve\";
-  @}
+if address \"sender\" \"sieve-admin@@extundo.com\" @{
+        fileinto \"INBOX.list.sieve\";
+@}
 @end example
 
 Sieve $B8@8l$O(B RFC 3028 $B$G=R$Y$i$l$F$$$^$9!#(B@xref{Top, , Top, sieve, Emacs
@@ -7980,14 +7980,29 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 $B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $B$N(B
 $B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
 
-@c @item W h
-@c @kindex W h (Summary)
-@c @findex gnus-article-wash-html
-@c Treat HTML (@code{gnus-article-wash-html}).
-@c Note that the this is usually done automatically by Gnus if the message
-@c in question has a @code{Content-Type} header that says that this type
-@c has been done.
-@c If a prefix is given, a charset will be asked for.
+@item W h
+@kindex W h ($B35N,(B)
+@findex gnus-article-wash-html
+HTML $B$r=hM}$7$^$9!#Ev3:%a%C%;!<%8$,(B HTML $B$G$"$k$3$H$r<((B
+$B$9(B @code{Content-Type} $B%X%C%@!<$r;}$C$F$$$?$J$i$P!"$=$l$O(B gnus $B$K$h$C$F(B
+$B<+F0E*$K9T$J$o$l$k$3$H$KCm0U$7$F2<$5$$!#(B
+
+$B@\F,<-$,M?$($i$l$k$H!"2?$NJ8;z=89g(B (charset) $B$H$7$F07$&$+$r?R$M$i$l$^$9!#(B
+
+@vindex gnus-article-wash-function
+$B%G%#%U%)%k%H$G$O(B HTML $B$NJQ49$K(B w3 $B$r;H$$$^$9$,!"$3$l$OJQ(B
+$B?t(B @code{gnus-article-wash-function} $B$G@)8f$5$l$^$9!#;H$&$3$H$,$G$-$k!"(B
+$B$"$i$+$8$aMQ0U$5$l$?4X?t$O0J2<$NDL$j$G$9!#(B
+
+@table @code
+@item gnus-article-wash-html-with-w3
+@findex gnus-article-wash-html-with-w3
+w3 $B$r;H$$$^$9(B ($B$3$l$,%G%#%U%)%k%H$G$9(B)$B!#(B
+
+@item gnus-article-wash-html-with-w3m
+@findex gnus-article-wash-html-with-w3m
+$B30It%W%m%0%i%`(B @samp{w3m} $B$r;H$$$^$9!#(B
+@end table
 
 @item W b
 @kindex W b ($B35N,(B)
@@ -9637,7 +9652,6 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T
 
 @vindex gnus-show-mime
 @vindex gnus-article-display-method-for-mime
-@vindex gnus-strict-mime
 @findex gnus-article-display-mime-message
 Gnus $B$O(B @code{gnus-article-display-method-for-mime} $B$K5-;v$r2!$7IU$1$k$3(B
 $B$H$G(B @sc{mime} $B$r07$$$^$9!#$3$N=i4|CM(B
@@ -9647,9 +9661,7 @@ SEMI MIME-View $B$K4X$9$k>\$7$$>pJs$O!"%^%K%e%"%k$r;2>H$7$F$/$@$5$$(B ($B$^$@
 $B$J$$$1$I(B (;_;))$B!#(B
 
 @sc{mime} $B$r>o$K;HMQ$7$?$1$l$P!"(B
-@code{gnus-show-mime} $B$r(B @code{t} $B$K@_Dj$7$F$/$@$5$$!#$7$+$7!"(B
-@code{gnus-strict-mime} $B$,(B @code{nil} $B0J30$G$"$l$P!"(B@sc{mime} $B=hM}$O5-;v(B
-$BCf$K(B @sc{mime} $B%X%C%@!<$,$"$k$H$-$N$_;HMQ$5$l$^$9!#(B
+@code{gnus-show-mime} $B$r(B @code{t} $B$K@_Dj$7$F$/$@$5$$!#(B
 @code{gnus-show-mime} $B$r@_Dj$7$F$$$k$H!"1?$,0-$$$H5-;v%P%C%U%!$K$O8N>c$7(B
 $B$?$h$&$J2hLL$,8+$($k$3$H$b$"$k$G$7$g$&!#$3$l$OHr$1$h$&$,$"$j$^$;$s!#(B
 

@@ -103,6 +103,234 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
+;; mm- stuff.
+(unless (featurep 'mm-util)
+  (defun nnheader-image-load-path (&optional package)
+    (let (dir result)
+      (dolist (path load-path (nreverse result))
+	(if (file-directory-p
+	     (setq dir (concat (file-name-directory
+				(directory-file-name path))
+			       "etc/" (or package "gnus/"))))
+	    (push dir result))
+	(push path result))))
+  (defalias 'mm-image-load-path 'nnheader-image-load-path)
+
+  (defalias 'mm-read-coding-system
+    (if (or (and (featurep 'xemacs)
+		 (<= (string-to-number emacs-version) 21.1))
+	    (boundp 'MULE))
+	(lambda (prompt &optional default-coding-system)
+	  (read-coding-system prompt))
+      'read-coding-system))
+
+  (defalias 'mm-multibyte-string-p
+    (if (fboundp 'multibyte-string-p)
+	'multibyte-string-p
+      'ignore))
+
+  (defalias 'mm-encode-coding-string 'encode-coding-string)
+  (defalias 'mm-decode-coding-string 'decode-coding-string)
+
+  (defun nnheader-detect-coding-region (start end)
+    "Like 'detect-coding-region' except returning the best one."
+    (let ((coding-systems
+	   (static-if (boundp 'MULE)
+	       (code-detect-region (point) (point-max))
+	     (detect-coding-region (point) (point-max)))))
+      (or (car-safe coding-systems)
+	  coding-systems)))
+  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+
+  (defun nnheader-detect-mime-charset-region (start end)
+    "Detect MIME charset of the text in the region between START and END."
+    (coding-system-to-mime-charset
+     (nnheader-detect-coding-region start end)))
+  (defalias 'mm-detect-mime-charset-region
+    'nnheader-detect-mime-charset-region)
+
+  (defmacro nnheader-with-unibyte-buffer (&rest forms)
+  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+Use unibyte mode for this."
+  `(let (default-enable-multibyte-characters mc-flag)
+     (with-temp-buffer ,@forms)))
+  (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer))
+
+;; mail-parse stuff.
+(unless (featurep 'mail-parse)
+  (defun-maybe std11-narrow-to-field ()
+    "Narrow the buffer to the header on the current line."
+    (forward-line 0)
+    (narrow-to-region (point)
+		      (progn
+			(std11-field-end)
+			(when (eolp) (forward-line 1))
+			(point)))
+    (goto-char (point-min)))
+
+  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+
+  (defun mail-narrow-to-head ()
+    "Narrow to the header section in the current buffer."
+    (narrow-to-region
+     (goto-char (point-min))
+     (if (re-search-forward "^\r?$" nil 1)
+	 (match-beginning 0)
+       (point-max)))
+    (goto-char (point-min)))
+
+  (defun-maybe std11-fold-region (b e)
+    "Fold long lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((break nil)
+	    (qword-break nil)
+	    (first t)
+	    (bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol))))
+	(while (not (eobp))
+	  (when (and (or break qword-break)
+		     (> (- (point) bol) 76))
+	    (goto-char (or break qword-break))
+	    (setq break nil
+		  qword-break nil)
+	    (if (looking-at "[ \t]")
+		(insert "\n")
+	      (insert "\n "))
+	    (setq bol (1- (point)))
+	    ;; Don't break before the first non-LWSP characters.
+	    (skip-chars-forward " \t")
+	    (unless (eobp)
+	      (forward-char 1)))
+	  (cond
+	   ((eq (char-after) ?\n)
+	    (forward-char 1)
+	    (setq bol (point)
+		  break nil
+		  qword-break nil)
+	    (skip-chars-forward " \t")
+	    (unless (or (eobp) (eq (char-after) ?\n))
+	      (forward-char 1)))
+	   ((eq (char-after) ?\r)
+	    (forward-char 1))
+	   ((memq (char-after) '(?  ?\t))
+	    (skip-chars-forward " \t")
+	    (if first
+		;; Don't break just after the header name.
+		(setq first nil)
+	      (setq break (1- (point)))))
+	   ((not break)
+	    (if (not (looking-at "=\\?[^=]"))
+		(if (eq (char-after) ?=)
+		    (forward-char 1)
+		  (skip-chars-forward "^ \t\n\r="))
+	      (setq qword-break (point))
+	      (skip-chars-forward "^ \t\n\r")))
+	   (t
+	    (skip-chars-forward "^ \t\n\r"))))
+	(when (and (or break qword-break)
+		   (> (- (point) bol) 76))
+	  (goto-char (or break qword-break))
+	  (setq break nil
+		qword-break nil)
+	  (if (looking-at "[ \t]")
+	      (insert "\n")
+	    (insert "\n "))
+	  (setq bol (1- (point)))
+	  ;; Don't break before the first non-LWSP characters.
+	  (skip-chars-forward " \t")
+	  (unless (eobp)
+	    (forward-char 1))))))
+
+  (defun-maybe std11-fold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(std11-fold-region (point-min) (point-max)))))
+
+  (defalias 'mail-header-fold-field 'std11-fold-field)
+
+  (defun-maybe std11-unfold-region (b e)
+    "Unfold lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol)))
+	    (eol (gnus-point-at-eol))
+	    leading)
+	(forward-line 1)
+	(while (not (eobp))
+	  (looking-at "[ \t]*")
+	  (setq leading (- (match-end 0) (match-beginning 0)))
+	  (if (< (- (gnus-point-at-eol) bol leading) 76)
+	      (progn
+		(goto-char eol)
+		(delete-region eol (progn
+				     (skip-chars-forward " \t\n\r")
+				     (1- (point)))))
+	    (setq bol (gnus-point-at-bol)))
+	  (setq eol (gnus-point-at-eol))
+	  (forward-line 1)))))
+
+  (defun-maybe std11-unfold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(std11-unfold-region (point-min) (point-max)))))
+
+  (defalias 'mail-header-unfold-field 'std11-unfold-field)
+
+  (defun-maybe std11-extract-addresses-components (string)
+    "Extract a list of full name and canonical address from STRING.  Each
+element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
+If no name can be extracted, FULL-NAME will be nil."
+    (when string
+      (mapcar (function
+	       (lambda (structure)
+		 (list (std11-full-name-string structure)
+		       (std11-address-string structure))))
+	      (std11-parse-addresses-string (std11-unfold-string string)))))
+
+  (defun mail-header-parse-addresses (string)
+    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
+    (mapcar (function
+	     (lambda (components)
+	       (cons (nth 1 components) (car components))))
+	    (std11-extract-addresses-components string)))
+
+  (defun-maybe std11-field-value (&optional dont-include-last-newline)
+    "Return the value of the field at point.  If the optional argument is
+given, the return value will not contain the last newline."
+    (let ((begin (point))
+	  (inhibit-point-motion-hooks t)
+	  start value)
+      (beginning-of-line)
+      (unless (eobp)
+	(while (and (memq (char-after) '(?\t ?\ ))
+		    (zerop (forward-line -1))))
+	(when (looking-at ".+:[\t\n ]+")
+	  (goto-char (setq start (match-end 0)))
+	  (forward-line 1)
+	  (while (and (memq (char-after) '(?\t ?\ ))
+		      (zerop (forward-line 1))))
+	  (when dont-include-last-newline
+	    (skip-chars-backward "\t\n " start))
+	  (setq value (buffer-substring start (point)))))
+      (goto-char begin)
+      value))
+
+  (defalias 'mail-header-field-value 'std11-field-value))
+
 ;;; Header access macros.
 
 ;; These macros may look very much like the ones in GNUS 4.1.  They
@@ -423,6 +651,22 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
     (while (search-backward "\n" p t)
       (delete-char 1))
     (forward-line 1)))
+
+(defun nnheader-parse-overview-file (file)
+  "Parse FILE and return a list of headers."
+  (mm-with-unibyte-buffer
+    (nnheader-insert-file-contents file)
+    (goto-char (point-min))
+    (let (headers)
+      (while (not (eobp))
+	(push (nnheader-parse-nov) headers)
+	(forward-line 1))
+      (nreverse headers))))
+
+(defun nnheader-write-overview-file (file headers)
+  "Write HEADERS to FILE."
+  (with-temp-file file
+    (mapcar 'nnheader-insert-nov headers)))
 
 (defun nnheader-insert-header (header)
   (insert
@@ -1182,234 +1426,6 @@ find-file-hooks, etc.
 	  nil)
       (message "%s(Y/n) Yes" prompt)
       t)))
-
-;; mm- stuff.
-(unless (featurep 'mm-util)
-  (defun nnheader-image-load-path (&optional package)
-    (let (dir result)
-      (dolist (path load-path (nreverse result))
-	(if (file-directory-p
-	     (setq dir (concat (file-name-directory
-				(directory-file-name path))
-			       "etc/" (or package "gnus/"))))
-	    (push dir result))
-	(push path result))))
-  (defalias 'mm-image-load-path 'nnheader-image-load-path)
-
-  (defalias 'mm-read-coding-system
-    (if (or (and (featurep 'xemacs)
-		 (<= (string-to-number emacs-version) 21.1))
-	    (boundp 'MULE))
-	(lambda (prompt &optional default-coding-system)
-	  (read-coding-system prompt))
-      'read-coding-system))
-
-  (defalias 'mm-multibyte-string-p
-    (if (fboundp 'multibyte-string-p)
-	'multibyte-string-p
-      'ignore))
-
-  (defalias 'mm-encode-coding-string 'encode-coding-string)
-  (defalias 'mm-decode-coding-string 'decode-coding-string)
-
-  (defun nnheader-detect-coding-region (start end)
-    "Like 'detect-coding-region' except returning the best one."
-    (let ((coding-systems
-	   (static-if (boundp 'MULE)
-	       (code-detect-region (point) (point-max))
-	     (detect-coding-region (point) (point-max)))))
-      (or (car-safe coding-systems)
-	  coding-systems)))
-  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
-
-  (defun nnheader-detect-mime-charset-region (start end)
-    "Detect MIME charset of the text in the region between START and END."
-    (coding-system-to-mime-charset
-     (nnheader-detect-coding-region start end)))
-  (defalias 'mm-detect-mime-charset-region
-    'nnheader-detect-mime-charset-region)
-
-  (defmacro nnheader-with-unibyte-buffer (&rest forms)
-  "Create a temporary buffer, and evaluate FORMS there like `progn'.
-Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters mc-flag)
-     (with-temp-buffer ,@forms)))
-  (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
-  (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
-  (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
-  (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
-  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer))
-
-;; mail-parse stuff.
-(unless (featurep 'mail-parse)
-  (defun-maybe std11-narrow-to-field ()
-    "Narrow the buffer to the header on the current line."
-    (forward-line 0)
-    (narrow-to-region (point)
-		      (progn
-			(std11-field-end)
-			(when (eolp) (forward-line 1))
-			(point)))
-    (goto-char (point-min)))
-
-  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
-
-  (defun mail-narrow-to-head ()
-    "Narrow to the header section in the current buffer."
-    (narrow-to-region
-     (goto-char (point-min))
-     (if (re-search-forward "^\r?$" nil 1)
-	 (match-beginning 0)
-       (point-max)))
-    (goto-char (point-min)))
-
-  (defun-maybe std11-fold-region (b e)
-    "Fold long lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((break nil)
-	    (qword-break nil)
-	    (first t)
-	    (bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol))))
-	(while (not (eobp))
-	  (when (and (or break qword-break)
-		     (> (- (point) bol) 76))
-	    (goto-char (or break qword-break))
-	    (setq break nil
-		  qword-break nil)
-	    (if (looking-at "[ \t]")
-		(insert "\n")
-	      (insert "\n "))
-	    (setq bol (1- (point)))
-	    ;; Don't break before the first non-LWSP characters.
-	    (skip-chars-forward " \t")
-	    (unless (eobp)
-	      (forward-char 1)))
-	  (cond
-	   ((eq (char-after) ?\n)
-	    (forward-char 1)
-	    (setq bol (point)
-		  break nil
-		  qword-break nil)
-	    (skip-chars-forward " \t")
-	    (unless (or (eobp) (eq (char-after) ?\n))
-	      (forward-char 1)))
-	   ((eq (char-after) ?\r)
-	    (forward-char 1))
-	   ((memq (char-after) '(?  ?\t))
-	    (skip-chars-forward " \t")
-	    (if first
-		;; Don't break just after the header name.
-		(setq first nil)
-	      (setq break (1- (point)))))
-	   ((not break)
-	    (if (not (looking-at "=\\?[^=]"))
-		(if (eq (char-after) ?=)
-		    (forward-char 1)
-		  (skip-chars-forward "^ \t\n\r="))
-	      (setq qword-break (point))
-	      (skip-chars-forward "^ \t\n\r")))
-	   (t
-	    (skip-chars-forward "^ \t\n\r"))))
-	(when (and (or break qword-break)
-		   (> (- (point) bol) 76))
-	  (goto-char (or break qword-break))
-	  (setq break nil
-		qword-break nil)
-	  (if (looking-at "[ \t]")
-	      (insert "\n")
-	    (insert "\n "))
-	  (setq bol (1- (point)))
-	  ;; Don't break before the first non-LWSP characters.
-	  (skip-chars-forward " \t")
-	  (unless (eobp)
-	    (forward-char 1))))))
-
-  (defun-maybe std11-fold-field ()
-    "Fold the current line."
-    (save-excursion
-      (save-restriction
-	(std11-narrow-to-field)
-	(std11-fold-region (point-min) (point-max)))))
-
-  (defalias 'mail-header-fold-field 'std11-fold-field)
-
-  (defun-maybe std11-unfold-region (b e)
-    "Unfold lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol)))
-	    (eol (gnus-point-at-eol))
-	    leading)
-	(forward-line 1)
-	(while (not (eobp))
-	  (looking-at "[ \t]*")
-	  (setq leading (- (match-end 0) (match-beginning 0)))
-	  (if (< (- (gnus-point-at-eol) bol leading) 76)
-	      (progn
-		(goto-char eol)
-		(delete-region eol (progn
-				     (skip-chars-forward " \t\n\r")
-				     (1- (point)))))
-	    (setq bol (gnus-point-at-bol)))
-	  (setq eol (gnus-point-at-eol))
-	  (forward-line 1)))))
-
-  (defun-maybe std11-unfold-field ()
-    "Fold the current line."
-    (save-excursion
-      (save-restriction
-	(std11-narrow-to-field)
-	(std11-unfold-region (point-min) (point-max)))))
-
-  (defalias 'mail-header-unfold-field 'std11-unfold-field)
-
-  (defun-maybe std11-extract-addresses-components (string)
-    "Extract a list of full name and canonical address from STRING.  Each
-element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
-If no name can be extracted, FULL-NAME will be nil."
-    (when string
-      (mapcar (function
-	       (lambda (structure)
-		 (list (std11-full-name-string structure)
-		       (std11-address-string structure))))
-	      (std11-parse-addresses-string (std11-unfold-string string)))))
-
-  (defun mail-header-parse-addresses (string)
-    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
-    (mapcar (function
-	     (lambda (components)
-	       (cons (nth 1 components) (car components))))
-	    (std11-extract-addresses-components string)))
-
-  (defun-maybe std11-field-value (&optional dont-include-last-newline)
-    "Return the value of the field at point.  If the optional argument is
-given, the return value will not contain the last newline."
-    (let ((begin (point))
-	  (inhibit-point-motion-hooks t)
-	  start value)
-      (beginning-of-line)
-      (unless (eobp)
-	(while (and (memq (char-after) '(?\t ?\ ))
-		    (zerop (forward-line -1))))
-	(when (looking-at ".+:[\t\n ]+")
-	  (goto-char (setq start (match-end 0)))
-	  (forward-line 1)
-	  (while (and (memq (char-after) '(?\t ?\ ))
-		      (zerop (forward-line 1))))
-	  (when dont-include-last-newline
-	    (skip-chars-backward "\t\n " start))
-	  (setq value (buffer-substring start (point)))))
-      (goto-char begin)
-      value))
-
-  (defalias 'mail-header-field-value 'std11-field-value))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

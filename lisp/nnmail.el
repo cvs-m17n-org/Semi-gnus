@@ -1023,8 +1023,8 @@ FUNC will be called with the group name to determine the article number."
 		       (or (funcall nnmail-split-methods)
 			   '("bogus"))
 		     (error
-		      (nnheader-message 5
-					"Error in `nnmail-split-methods'; using `bogus' mail group")
+		      (nnheader-message
+		       5 "Error in `nnmail-split-methods'; using `bogus' mail group")
 		      (sit-for 1)
 		      '("bogus")))))
 	      (setq split (gnus-remove-duplicates split))

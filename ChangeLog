@@ -1,3 +1,17 @@
+2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-article-commands-menu): Bind "Html" to
+	the command `gnus-article-wash-html'.
+	(gnus-summary-article-menu): Ditto.
+	(gnus-summary-wash-map): Bind "h" to the command
+	`gnus-article-wash-html'.
+
+	* lisp/gnus-art.el (gnus-article-treatment-menu): Bind
+	"Treat html" to the command `gnus-article-wash-html'.
+
+	* lisp/nnheader.el: Place mm- stuff and mail-parse stuff in front
+	of the codes which use (or may use) them.
+
 2002-01-21  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
 
 	* lisp/gnus-art.el (gnus-article-display-traditional-message): Use

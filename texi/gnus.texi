@@ -2891,9 +2891,9 @@ translating the group parameter into a Sieve script (@pxref{Sieve
 Commands}) the following Sieve code is generated:
 
 @example
-  if address \"sender\" \"sieve-admin@@extundo.com\" @{
-          fileinto \"INBOX.list.sieve\";
-  @}
+if address \"sender\" \"sieve-admin@@extundo.com\" @{
+        fileinto \"INBOX.list.sieve\";
+@}
 @end example
 
 The Sieve language is described in RFC 3028.  @xref{Top, , Top, sieve,
@@ -8119,11 +8119,26 @@ makes strings look like @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}}.
 @item W h
 @kindex W h (Summary)
 @findex gnus-article-wash-html
-Treat HTML (@code{gnus-article-wash-html}).
-Note that the this is usually done automatically by Gnus if the message
-in question has a @code{Content-Type} header that says that this type
-has been done.
+Treat HTML (@code{gnus-article-wash-html}).  Note that the this is
+usually done automatically by Gnus if the message in question has a
+@code{Content-Type} header that says that the message is HTML.
+
 If a prefix is given, a charset will be asked for.
+
+@vindex gnus-article-wash-function
+The default is to use w3 to convert the HTML, but this is controlled
+by the @code{gnus-article-wash-function} variable.  Pre-defined
+functions you can use include:
+
+@table @code
+@item gnus-article-wash-html-with-w3
+@findex gnus-article-wash-html-with-w3
+Use w3 (this is the default).
+
+@item gnus-article-wash-html-with-w3m
+@findex gnus-article-wash-html-with-w3m
+Use the external @samp{w3m} program.
+@end table
 
 @item W b
 @kindex W b (Summary)
@@ -10119,7 +10134,6 @@ other naughty stuff in innocent-looking articles.
 
 @vindex gnus-show-mime
 @vindex gnus-article-display-method-for-mime
-@vindex gnus-strict-mime
 @findex gnus-article-display-mime-message
 Gnus handles @sc{mime} by pushing the articles through
 @code{gnus-article-display-method-for-mime}, which is
@@ -10129,11 +10143,9 @@ information on SEMI MIME-View, see its manual page (however it is not
 existed yet, sorry).
 
 Set @code{gnus-show-mime} to @code{t} if you want to use
-@sc{mime} all the time.  However, if @code{gnus-strict-mime} is
-non-@code{nil}, the @sc{mime} method will only be used if there are
-@sc{mime} headers in the article.  If you have @code{gnus-show-mime}
-set, then you'll see some unfortunate display glitches in the article
-buffer.  These can't be avoided.
+@sc{mime} all the time.  If you have @code{gnus-show-mime} set, then
+you'll see some unfortunate display glitches in the article buffer.
+These can't be avoided.
 
 In GNUS or Gnus, it might be best to just use the toggling functions
 from the summary buffer to avoid getting nasty surprises. (For instance,

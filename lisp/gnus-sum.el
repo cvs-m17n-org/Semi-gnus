@@ -1746,6 +1746,7 @@ increase the score of each group you read."
     "C" gnus-article-capitalize-sentences
     "c" gnus-article-remove-cr
     "Z" gnus-article-decode-HZ
+    "h" gnus-article-wash-html
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1954,6 +1955,7 @@ increase the score of each group you read."
 	      ["Toggle header" gnus-summary-toggle-header t]
 	      ["Unfold headers" gnus-article-treat-unfold-headers t]
 	      ["Fold newsgroups" gnus-article-treat-fold-newsgroups t]
+	      ["Html" gnus-article-wash-html t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
 	      ["HZ" gnus-article-decode-HZ t])
 	     ("Output"
