@@ -1,3 +1,28 @@
+1999-06-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+	(TopLevel): Autoload "gnus-sum" for the command
+	`gnus-summary-jump-to-other-group'.
+
+	* lisp/gnus-art.el (gnus-article-read-summary-keys): Add key "ZJ"
+	to the list `nosaves'; convert key events to string statically
+	under XEmacs.
+	(gnus-article-display-x-face-with-x-face-mule): Use `gnus-xemacs'
+	instead of `featurep' with an arg `xemacs'.
+	(article-toggle-headers): Ditto.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-sum.el (gnus-summary-exit-map): New keystroke "ZJ" for
+	the command `gnus-summary-jump-to-other-group'.
+
+1999-06-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+	    Daiji KANEMATSU   <kanematu@sra.co.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-read-group): Allow it to be an
+	user command.
+	(gnus-summary-jump-to-other-group): Defalias to
+	`gnus-summary-read-group'.
+
 1999-06-15  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.03.
