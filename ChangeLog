@@ -1,3 +1,8 @@
+1999-09-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-isearch-article): Don't bind
+	`isearch-lazy-highlight'.
+
 1999-08-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
