@@ -1,9 +1,11 @@
-;;; gnus-msg.el --- mail and post interface for Gnus
+;;; gnus-msg.el --- mail and post interface for Semi-gnus
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -167,8 +169,8 @@ Thank you for your help in stamping out bugs.
   "\M-c" gnus-summary-mail-crosspost-complaint
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
-  "Om" gnus-uu-digest-mail-forward
-  "Op" gnus-uu-digest-post-forward)
+  "Om" gnus-summary-mail-digest
+  "Op" gnus-summary-post-digest)
 
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
@@ -319,8 +321,10 @@ post using the current select method."
 	article)
     (while (setq article (pop articles))
       (when (gnus-summary-select-article t nil nil article)
-	(when (gnus-eval-in-buffer-window gnus-original-article-buffer
-		(message-cancel-news))
+	(when (gnus-eval-in-buffer-window gnus-article-buffer
+		(save-excursion
+		  (set-buffer gnus-original-article-buffer)
+		  (message-cancel-news)))
 	  (gnus-summary-mark-as-read article gnus-canceled-mark)
 	  (gnus-cache-remove-article 1))
 	(gnus-article-hide-headers-if-wanted))
@@ -531,60 +535,9 @@ If SILENT, don't prompt the user."
 ;;; as well include the Emacs version as well.
 ;;; The following function works with later GNU Emacs, and XEmacs.
 (defun gnus-extended-version ()
-  "Stringified Gnus version and Emacs version."
+  "Stringified gnus version."
   (interactive)
-  (concat
-   gnus-version
-   "/"
-   (cond
-    ((string-match "^\\([0-9]+\\.[0-9]+\\)\\.[.0-9]+$" emacs-version)
-     (concat "Emacs " (substring emacs-version
-				 (match-beginning 1)
-				 (match-end 1))))
-    ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-		   emacs-version)
-     (concat (substring emacs-version
-			(match-beginning 1)
-			(match-end 1))
-	     (format " %d.%d" emacs-major-version emacs-minor-version)
-	     (if (match-beginning 3)
-		 (substring emacs-version
-			    (match-beginning 3)
-			    (match-end 3))
-	       "")
-	     (if (boundp 'xemacs-codename)
-		 (concat " - \"" xemacs-codename "\""))))
-    (t emacs-version))))
-
-;; Written by "Mr. Per Persson" <pp@gnu.ai.mit.edu>.
-(defun gnus-inews-insert-mime-headers ()
-  "Insert MIME headers.
-Assumes ISO-Latin-1 is used iff 8-bit characters are present."
-  (goto-char (point-min))
-  (let ((mail-header-separator
-	 (progn
-	   (goto-char (point-min))
-	   (if (and (search-forward (concat "\n" mail-header-separator "\n")
-				    nil t)
-		    (not (search-backward "\n\n" nil t)))
-	       mail-header-separator
-	     ""))))
-    (or (mail-position-on-field "Mime-Version")
-	(insert "1.0")
-	(cond ((save-restriction
-		 (widen)
-		 (goto-char (point-min))
-		 (re-search-forward "[^\000-\177]" nil t))
-	       (or (mail-position-on-field "Content-Type")
-		   (insert "text/plain; charset=ISO-8859-1"))
-	       (or (mail-position-on-field "Content-Transfer-Encoding")
-		   (insert "8bit")))
-	      (t (or (mail-position-on-field "Content-Type")
-		     (insert "text/plain; charset=US-ASCII"))
-		 (or (mail-position-on-field "Content-Transfer-Encoding")
-		     (insert "7bit")))))))
-
-(custom-add-option 'message-header-hook 'gnus-inews-insert-mime-headers)
+  gnus-version)
 
 
 ;;;
@@ -639,11 +592,48 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
   (interactive "P")
   (gnus-setup-message 'forward
     (gnus-summary-select-article)
-    (set-buffer gnus-original-article-buffer)
+    (let ((charset default-mime-charset))
+      (set-buffer gnus-original-article-buffer)
+      (make-local-variable 'default-mime-charset)
+      (setq default-mime-charset charset)
+      )
     (let ((message-included-forward-headers
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
 
+(defun gnus-summary-post-forward (&optional full-headers)
+  "Forward the current article to a newsgroup.
+If FULL-HEADERS (the prefix), include full headers when forwarding."
+  (interactive "P")
+  (gnus-summary-mail-forward full-headers t))
+
+;;; XXX: generate Subject and ``Topics''?
+(defun gnus-summary-mail-digest (&optional n post)
+  "Digests and forwards all articles in this series."
+  (interactive "P")
+  (let ((subject "Digested Articles")
+	(articles (gnus-summary-work-articles n))
+	article)
+    (gnus-setup-message 'forward
+      (gnus-summary-select-article)
+      (if post (message-news nil subject) (message-mail nil subject))
+      (message-goto-body)
+      (while (setq article (pop articles))
+	(save-window-excursion
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-select-article nil nil nil article)
+	  (gnus-summary-remove-process-mark article))
+	(insert (mime-make-tag "message" "rfc822") "\n")
+	(insert-buffer-substring gnus-original-article-buffer))
+      (push-mark)
+      (message-goto-body)
+      (mime-edit-enclose-digest-region (point)(mark t)))))
+
+(defun gnus-summary-post-digest (&optional n)
+  "Digest and forwards all articles in this series to a newsgroup."
+  (interactive "P")
+  (gnus-summary-mail-digest n t))
+ 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive "sResend message(s) to: \nP")
@@ -654,12 +644,6 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
       (save-excursion
 	(set-buffer gnus-original-article-buffer)
 	(message-resend address)))))
-
-(defun gnus-summary-post-forward (&optional full-headers)
-  "Forward the current article to a newsgroup.
-If FULL-HEADERS (the prefix), include full headers when forwarding."
-  (interactive "P")
-  (gnus-summary-mail-forward full-headers t))
 
 (defvar gnus-nastygram-message
   "The following article was inappropriately posted to %s.\n\n"
@@ -933,7 +917,7 @@ this is a reply."
       (save-restriction
 	(message-narrow-to-headers)
 	(let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
-	      (cur (current-buffer))
+	      (coding-system-for-write 'raw-text)
 	      groups group method)
 	  (when gcc
 	    (message-remove-header "gcc")
@@ -961,7 +945,8 @@ this is a reply."
 		(gnus-request-create-group group method))
 	      (save-excursion
 		(nnheader-set-temp-buffer " *acc*")
-		(insert-buffer-substring cur)
+		(insert-buffer-substring message-encoding-buffer)
+		(gnus-run-hooks 'gnus-before-do-gcc-hook)
 		(goto-char (point-min))
 		(when (re-search-forward
 		       (concat "^" (regexp-quote mail-header-separator) "$")

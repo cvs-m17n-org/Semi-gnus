@@ -264,7 +264,7 @@ it's not cached."
     (when (file-exists-p file)
       (erase-buffer)
       (gnus-kill-all-overlays)
-      (insert-file-contents file)
+      (nnheader-insert-file-contents file)
       t)))
 
 (defun gnus-cache-possibly-alter-active (group active)
@@ -310,7 +310,7 @@ it's not cached."
 	    ;; unsuccessful), so we use the cached headers exclusively.
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer)
-	    (insert-file-contents cache-file)
+	    (nnheader-insert-file-contents cache-file)
 	    'nov)
 	   ((eq type 'nov)
 	    ;; We have both cached and uncached NOV headers, so we
@@ -489,7 +489,7 @@ Returns the list of articles removed."
       (set-buffer cache-buf)
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (insert-file-contents (or file (gnus-cache-file-name group ".overview")))
+      (nnheader-insert-file-contents (or file (gnus-cache-file-name group ".overview")))
       (goto-char (point-min))
       (insert "\n")
       (goto-char (point-min)))
@@ -532,7 +532,7 @@ Returns the list of articles removed."
       (save-excursion
 	(set-buffer cache-buf)
 	(erase-buffer)
-	(insert-file-contents (gnus-cache-file-name group (car cached)))
+	(nnheader-insert-file-contents (gnus-cache-file-name group (car cached)))
 	(goto-char (point-min))
 	(insert "220 ")
 	(princ (car cached) (current-buffer))
@@ -583,7 +583,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
     ;; We simply read the active file.
     (save-excursion
       (gnus-set-work-buffer)
-      (insert-file-contents gnus-cache-active-file)
+      (nnheader-insert-file-contents gnus-cache-active-file)
       (gnus-active-to-gnus-format
        nil (setq gnus-cache-active-hashtb
 		 (gnus-make-hashtable

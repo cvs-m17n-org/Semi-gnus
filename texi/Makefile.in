@@ -18,7 +18,9 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 PAPERTYPE=a4
 
-all: gnus message
+all: gnus message gnus-ja
+
+ja: gnus-ja message-ja
 
 most: texi2latex.elc latex latexps
 
@@ -26,7 +28,7 @@ most: texi2latex.elc latex latexps
 
 .texi:
 	if test $(MAKEINFO) = no; then \
-	  $(EMACSINFO) -eval '(find-file "$<")' $(XINFOSWI); \
+	  $(EMACSINFO) -eval '(find-file \"$<\")' $(XINFOSWI); \
 	else \
 	  makeinfo -o $* $<; \
 	fi
@@ -54,7 +56,7 @@ makeinfo:
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	$(EMACS) -batch -l bytecomp --eval '(byte-compile-file "texi2latex.el")'
+	$(EMACS) -batch -l bytecomp --eval '(byte-compile-file \"texi2latex.el\")'
 
 latex: gnus.texi texi2latex.elc
 	$(EMACS) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
@@ -115,7 +117,7 @@ distclean:
 
 install:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
-	@for file in gnus message; do \
+	@for file in gnus message gnus-ja message-ja; do \
 	  for ifile in `echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
 	    if test -f $$ifile; then \
 	      echo " $(INSTALL_DATA) $$ifile $(infodir)/$$ifile"; \

@@ -1,4 +1,4 @@
-;;; gnus-agent.el --- unplugged support for Gnus
+;;; gnus-agent.el --- unplugged support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -646,7 +646,7 @@ the actual number of articles toggled is returned."
     ;; Prune off articles that we have already fetched.
     (while (and articles
 		(cdr (assq (car articles) gnus-agent-article-alist)))
-     (pop articles))
+      (pop articles))
     (let ((arts articles))
       (while (cdr arts)
 	(if (cdr (assq (cadr arts) gnus-agent-article-alist))
@@ -1311,14 +1311,14 @@ The following commands are available:
 				  (cdr (assq 'dormant
 					     (gnus-info-marks info)))))
 		   nov-file (gnus-agent-article-name ".overview" group))
-	     (gnus-agent-load-alist group)
+ 	     (gnus-agent-load-alist group)
 	     (gnus-message 5 "Expiring articles in %s" group)
 	     (set-buffer overview)
 	     (erase-buffer)
 	     (when (file-exists-p nov-file)
 	       (nnheader-insert-file-contents nov-file))
 	     (goto-char (point-min))
-	     (setq article 0)
+ 	     (setq article 0)
 	     (while (setq elem (pop articles))
 	       (setq article (car elem))
 	       (when (or (null low)
@@ -1373,9 +1373,8 @@ The following commands are available:
 		   (setq prev alist
 			 alist (cdr alist))))
 	       (setq gnus-agent-article-alist (cdr first))
-	       (gnus-agent-save-alist group)
-               ;; Mark all articles up to the first article
-	       ;; in `gnus-article-alist' as read.
+	       ;;; Mark all articles up to the first article
+	       ;;; in `gnus-article-alist' as read.
 	       (when (and info (caar gnus-agent-article-alist))
 		 (setcar (nthcdr 2 info)
 			 (gnus-range-add

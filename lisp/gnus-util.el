@@ -1,8 +1,8 @@
-;;; gnus-util.el --- utility functions for Gnus
+;;; gnus-util.el --- utility functions for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -75,7 +75,10 @@
 	 (set symbol nil))
      symbol))
 
-(defun gnus-truncate-string (str width)
+;; Avoid byte-compile warning.
+;; In Mule, this function will be redefined to `truncate-string',
+;; which takes 3 or 4 args.
+(defun gnus-truncate-string (str width &rest ignore)
   (substring str 0 width))
 
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
@@ -785,7 +788,8 @@ with potentially long computations."
 	    (let ((file-buffer (create-file-buffer filename)))
 	      (save-excursion
 		(set-buffer file-buffer)
-		(let ((require-final-newline nil))
+		(let ((require-final-newline nil)
+		      (coding-system-for-write 'binary))
 		  (gnus-write-buffer filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
@@ -803,7 +807,8 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((buffer-read-only nil))
+	    (let ((buffer-read-only nil)
+		  (coding-system-for-write 'binary))
 	      (save-excursion
 		(goto-char (point-max))
 		(forward-char -2)

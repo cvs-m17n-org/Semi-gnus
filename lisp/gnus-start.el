@@ -386,7 +386,7 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system 'binary
+(defvar gnus-startup-file-coding-system 'ctext
   "*Coding system for startup file.")
 
 ;;; Internal variables
@@ -427,9 +427,7 @@ Can be used to turn version control on or off."
 		   (file-exists-p (concat file ".el"))
 		   (file-exists-p (concat file ".elc")))
 	       (condition-case var
-		   (let ((coding-system-for-read
-			  gnus-startup-file-coding-system))
-		     (load file nil t))
+		   (load file nil t)
 		 (error
 		  (error "Error in %s: %s" file var)))))))))
 
