@@ -1,9 +1,34 @@
+1999-05-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* texi/gnus-ja.texi: (gnus-summary-enter-digest-group): Change the
+	key assignment "C-d" into "A D".
+	(Article treatment): Document the new variable
+	`gnus-article-date-lapsed-new-header'.
+
+	* lisp/mail-source.el: Use the original source without any changes.
+
+	* lisp/gnus-art.el (article-hide-headers): To work toggle hiding.
+
+	* README.T-gnus: Update what is the latest T-gnus.
+
 1999-05-04  Tatsuya Ichikawa   <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.064.
 	(gnus-revision-number): Fresh start from 00.
 
 	* Sync up with Pterodactyl Gnus v0.84.
+
+1999-04-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-vm.el (gnus-summary-save-in-vm): Use
+	`vm-read-file-name' instead of `read-file-name'. This allows to use
+	the optional sixth argument HISTORY for the various environments.
+	(gnus-summary-save-article-vm): Ditto.
+	(TopLevel): Autoload "vm" for the function `vm-read-file-name'.
 
 1999-04-27  Katsumi Yamaoka   <yamaoka@jpl.org>
 
