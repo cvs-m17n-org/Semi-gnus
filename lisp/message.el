@@ -1174,11 +1174,14 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-fetch-reply-field (header)
   "Fetch FIELD from the message we're replying to."
-  (when (and message-reply-buffer
-	     (buffer-name message-reply-buffer))
-    (save-excursion
-      (set-buffer message-reply-buffer)
-      (message-fetch-field header))))
+  (let ((buffer (if (functionp message-reply-buffer)
+		    (funcall message-reply-buffer)
+		  message-reply-buffer)))
+    (when (and buffer
+	       (buffer-name buffer))
+      (save-excursion
+	(set-buffer buffer)
+	(message-fetch-field header)))))
 
 (defun message-set-work-buffer ()
   (if (get-buffer " *message work*")
@@ -1916,13 +1919,16 @@ This function uses `message-cite-function' to do the actual citing.
 Just \\[universal-argument] as argument means don't indent, insert no
 prefix, and don't delete any headers."
   (interactive "P")
-  (let ((modified (buffer-modified-p)))
+  (let ((modified (buffer-modified-p))
+	buffer)
     (when (and message-reply-buffer
 	       message-cite-function)
-      (gnus-copy-article-buffer)
-      (setq message-reply-buffer gnus-article-copy)
-      (delete-windows-on message-reply-buffer t)
-      (insert-buffer message-reply-buffer)
+      (setq buffer
+	    (if (functionp message-reply-buffer)
+		(funcall message-reply-buffer)
+	      message-reply-buffer))
+      (delete-windows-on buffer t)
+      (insert-buffer buffer)
       (funcall message-cite-function)
       (message-exchange-point-and-mark)
       (unless (bolp)
@@ -3493,6 +3499,7 @@ Headers already prepared in the buffer are not modified."
 	  (nconc message-buffer-list (list (current-buffer))))))
 
 (defvar mc-modes-alist)
+(defvar gnus-message-get-reply-buffer)
 (defun message-setup (headers &optional replybuffer actions)
   (when (and (boundp 'mc-modes-alist)
 	     (not (assq 'message-mode mc-modes-alist)))
@@ -3501,7 +3508,11 @@ Headers already prepared in the buffer are not modified."
 	  mc-modes-alist))
   (when actions
     (setq message-send-actions actions))
-  (setq message-reply-buffer replybuffer)
+  (setq message-reply-buffer
+	(if (and (boundp 'gnus-message-get-reply-buffer)
+		 gnus-message-get-reply-buffer)
+	    gnus-message-get-reply-buffer
+	  replybuffer))
   (goto-char (point-min))
   ;; Insert all the headers.
   (mail-header-format
