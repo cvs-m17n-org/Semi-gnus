@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.7.4 Manual
+@settitle Semi-gnus 6.7.8 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.7.4 Manual
+@title Semi-gnus 6.7.8 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.7.4.
+This manual corresponds to Semi-Gnus 6.7.8
 
 @end ifinfo
 
@@ -2661,7 +2661,9 @@ convention (@pxref{Process/Prefix}).
 @kindex T D (Topic)
 @findex gnus-topic-remove-group
 Remove a group from the current topic (@code{gnus-topic-remove-group}).
-This command uses the process/prefix convention
+This command is mainly useful if you have the same group in several
+topics and wish to remove it from one of the topics.
+The command uses the process/prefix convention
 (@pxref{Process/Prefix}).
 
 @item T M
@@ -3819,7 +3821,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung muﬂ sein!
+@code{postmaster}.  Ordnung mu(I_(B sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -7915,7 +7917,7 @@ Scroll backwards one page (@code{gnus-article-prev-page}).
 @kindex C-c ^ (Article)
 @findex gnus-article-refer-article
 If point is in the neighborhood of a @code{Message-ID} and you press
-@kbd{r}, gnus will try to get that article from the server
+@kbd{C-c ^}, Gnus will try to get that article from the server
 (@code{gnus-article-refer-article}).
 
 @item C-c C-m
@@ -9622,7 +9624,9 @@ the five possible split syntaxes:
 @enumerate
 
 @item
-@samp{group}: If the split is a string, that will be taken as a group name.
+@samp{group}: If the split is a string, that will be taken as a group
+name.  Normal regexp match expansion will be done.  See below for
+examples. 
 
 @item
 @var{(FIELD VALUE SPLIT)}: If the split is a list, the first element of
@@ -9675,6 +9679,12 @@ substitutions in the group names), you can say things like:
 @example
 (any "debian-\\(\\w*\\)@@lists.debian.org" "mail.debian.\\1")
 @end example
+
+If the string contains the element @samp{\&}, then the previously
+matched string will be substituted.  Similarly, the elements @samp{\1}
+up to @samp{\9} will be substituted with the text matched by the
+groupings 1 through 9.
+
 
 @node Mail and Procmail
 @subsection Mail and Procmail
@@ -10962,7 +10972,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'Ítre} is to
+providers if they were to do this---their @emph{raison d'$BsU(Bre} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -13107,7 +13117,7 @@ by hand.
 
 The kill to score conversion package isn't included in Gnus by default.
 You can fetch it from
-@file{http://www.ifi.uio.no/~larsi/ding-other/gnus-kill-to-score}.
+@file{http://www.stud.ifi.uio.no/~larsi/ding-other/gnus-kill-to-score}.
 
 If your old kill files are very complex---if they contain more
 non-@code{gnus-kill} forms than not, you'll have to convert them by
@@ -13359,7 +13369,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx ¨
+@itemx (I,(B
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -13851,9 +13861,9 @@ the special @code{mouse-face} property set, which means that it will be
 highlighted (with @code{gnus-mouse-face}) when you put the mouse pointer
 over it.
 
-Text inside the @samp{%[} and @samp{%]} specifiers will have their
+Text inside the @samp{%@{} and @samp{%@}} specifiers will have their
 normal faces set using @code{gnus-face-0}, which is @code{bold} by
-default.  If you say @samp{%1[}, you'll get @code{gnus-face-1} instead,
+default.  If you say @samp{%1@{}, you'll get @code{gnus-face-1} instead,
 and so on.  Create as many faces as you wish.  The same goes for the
 @code{mouse-face} specs---you can say @samp{%3(hello%)} to have
 @samp{hello} mouse-highlighted with @code{gnus-mouse-face-3}.
@@ -15342,7 +15352,7 @@ but at the common table.@*
 
 If you want to investigate the person responsible for this outrage, you
 can point your (feh!) web browser to
-@file{http://www.ifi.uio.no/~larsi/}.  This is also the primary
+@file{http://www.stud.ifi.uio.no/~larsi/}.  This is also the primary
 distribution point for the new and spiffy versions of Gnus, and is known
 as The Site That Destroys Newsrcs And Drives People Mad.
 
@@ -15642,7 +15652,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-FranÁois Pinard---many, many interesting and thorough bug reports, as
+Fran$BmP(Bis Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -15655,7 +15665,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David KÂgedal,
+David K$BiH(Bedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -15725,7 +15735,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-FranÁois Felix Ingrand,
+Fran$BmP(Bis Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -15842,7 +15852,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.21.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6.22.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16377,7 +16387,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.21:
+New features in Gnus 5.6.22:
 
 @itemize @bullet
 
@@ -17145,8 +17155,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at nÂr du bruker `gnus-startup-file' som prefix (FOO) til Â lete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den vÊre en
+ tanken var at n$BiS(B du bruker `gnus-startup-file' som prefix (FOO) til íÈÅlete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v$BkS(Be en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17219,8 +17229,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde vÊre en mÂte Â si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  SÂ kunne score-regler legges til den
+Ja, det burde v$BkS(Be en m$BiU(Be íÈÅsi slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  SíÈÅkunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -17553,7 +17563,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt Â slette den dersom teksten matcher
+Selv ville jeg nok ha valgt íÈÅslette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
@@ -17680,6 +17690,14 @@ file, for instance.
 With dummy roots, `^' and then selecing the first article
 in any other dummy thread will make gnus highlight the
 dummy root instead of the first article.
+
+@item
+Propagate all group properties (marks, article numbers, etc) up to the
+topics for displaying.
+
+@item
+`n' in the group buffer with topics should go to the next group
+with unread articles, even if that group is hidden in a topic.
 
 @item
 Solve the halting problem.

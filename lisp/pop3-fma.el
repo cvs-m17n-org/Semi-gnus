@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 0.20
+;; Version: 0.21
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -84,15 +84,14 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.20")
+(defconst pop3-fma-version-number "0.21")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
 ;;  "On the road"		; 0.12
 ;;  "Rock'n Roll city"		; 0.13
-  "Money"			; 0.20
-;;  "Midnight blue train" 	; 0.xx
-;;  "Still 19"       		; 0.xx
+;;  "Money"			; 0.20
+  "Still 19"       		; 0.21
 ;;  "J boy"          		; 0.xx
 ;;  "Blood line"		; 0.xx
 ;;  "Star ring"			; 0.xx
@@ -103,12 +102,17 @@
 				       pop3-fma-codename))
 
 (defcustom pop3-fma-spool-file-alist nil
-  "*Spoolfile to get mail using pop3 protocol.
+  "*Spool file to get mail using pop3 protocol.
 You should specify this variable like
  '(
    \"po:user1@mailhost1\"
    \"po:user2@mailhost2\"
   )"
+  :group 'pop3-fma
+  :type 'alist)
+
+(defcustom pop3-fma-local-spool-file-alist nil
+  "*List of Local spool file to get mail."
   :group 'pop3-fma
   :type 'alist)
 
@@ -139,6 +143,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar passwd nil)
 (defvar str nil)
 (defvar pop3-fma-movemail-options pop3-fma-movemail-arguments)
+(defvar spool nil)
 
 (defun pop3-fma-init-message-hook ()
   (add-hook 'message-send-hook 'pop3-fma-message-add-header))
@@ -156,34 +161,44 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 ;;
 (defun pop3-fma-movemail (inbox crashbox)
   "Function to move mail from INBOX on a pop3 server to file CRASHBOX."
-  (let ((pop3-maildrop
-	 (substring inbox (match-end (string-match "^po:" inbox))
-		    (- (match-end (string-match "^.*@" inbox)) 1)))
-	(pop3-mailhost
-	 (substring inbox (match-end (string-match "^.*@" inbox)))))
-    (let ((pop3-password
-	   (pop3-fma-read-passwd pop3-mailhost)))
-      (message "Checking new mail user %s at %s..." pop3-maildrop pop3-mailhost)
-      (if (and (eq system-type 'windows-nt)
-	       (eq pop3-fma-movemail-type 'exe))
-	  (progn
-	    (setenv "MAILHOST" pop3-mailhost)
-	    (if (and (not (memq pop3-password pop3-fma-movemail-arguments))
-		     (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
+  (if (string-match "^po:" inbox)
+      (progn
+	(let ((pop3-maildrop
+	       (substring inbox (match-end (string-match "^po:" inbox))
+			  (- (match-end (string-match "^.*@" inbox)) 1)))
+	      (pop3-mailhost
+	       (substring inbox (match-end (string-match "^.*@" inbox)))))
+	  (let ((pop3-password
+		 (pop3-fma-read-passwd pop3-mailhost)))
+	    (message "Checking new mail user %s at %s..." pop3-maildrop pop3-mailhost)
+	    (if (and (eq system-type 'windows-nt)
+		     (eq pop3-fma-movemail-type 'exe))
 		(progn
-		  (setq pop3-fma-movemail-arguments nil)
-		  (setq pop3-fma-movemail-arguments
-		      (append pop3-fma-movemail-options
-			      (list
-			       (concat "po:" pop3-maildrop)
-			       crashbox
-			       pop3-password)))))
-	    (apply 'call-process (concat
-				  exec-directory
-				  pop3-fma-movemail-program)
-		   nil nil nil
-		   pop3-fma-movemail-arguments))
-	(pop3-movemail crashbox)))))
+		  (setenv "MAILHOST" pop3-mailhost)
+		  (if (and (not (memq pop3-password pop3-fma-movemail-arguments))
+			   (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
+		      (progn
+			(setq pop3-fma-movemail-arguments nil)
+			(setq pop3-fma-movemail-arguments
+			      (append pop3-fma-movemail-options
+				      (list
+				       (concat "po:" pop3-maildrop)
+				       crashbox
+				       pop3-password)))))
+		  (apply 'call-process (concat
+					exec-directory
+					pop3-fma-movemail-program)
+			 nil nil nil
+			 pop3-fma-movemail-arguments))
+	      (pop3-movemail crashbox)))))
+    (message "Checking new mail at %s ... " inbox)
+    (call-process (concat exec-directory pop3-fma-movemail-program)
+		  nil
+		  nil
+		  nil
+		  inbox
+		  crashbox)
+    (message "Checking new mail at %s ... done." inbox)))
 ;;
 ;;
 (defun pop3-fma-read-passwd (mailhost)
@@ -223,7 +238,10 @@ Please do not set this valiable non-nil if you do not use Meadow.")
        (call-interactively 'pop3-fma-store-password)))
    pop3-fma-spool-file-alist)
   (setq nnmail-movemail-program 'pop3-fma-movemail)
-  (setq nnmail-spool-file pop3-fma-spool-file-alist))
+;;  (setq nnmail-spool-file pop3-fma-spool-file-alist))
+  (setq nnmail-spool-file (append
+			   pop3-fma-local-spool-file-alist
+			   pop3-fma-spool-file-alist)))
 ;;
 (defun pop3-fma-read-noecho (prompt &optional stars)
   "Read a single line of text from user without echoing, and return it.
