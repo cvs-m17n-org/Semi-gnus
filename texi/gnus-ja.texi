@@ -22994,13 +22994,21 @@ Borges $B$K$h$C$F9;@5$5$l!"(BJost Krieger $B$K$h$C$F0lItJ,$r9;@5$5$l$^$7$?!#
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
+Kevin Greiner,
+Jesper Harder,
+Paul Jarc,
+Simon Josefsson,
 David K,Ae(Bgedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
+Michael Shields,
+Reiner Steib,
 Jason L. Tibbitts, III,
+Jack Vinson,
+$B;32,(B $B9nH~(B,
 and
-Jack Vinson.
+Teodor Zlatanov.
 
 $B$=$l$H!"0J2<$N?M$K$b%Q%C%A$d$=$NB>$N$b$N$r46<U$7$^$9(B:
 
@@ -23051,7 +23059,7 @@ Dave Edmondson,
 Paul Eggert,
 Mark W. Eichin,
 Karl Eichwalder,
-Enami Tsugutomo, @c Enami
+$B1]JB!!;LCR(B,
 Michael Ernst,
 Luc Van Eycken,
 Sam Falkner,
@@ -23069,11 +23077,11 @@ Michelangelo Grigni,
 Dale Hagglund,
 D. Hall,
 Magnus Hammerin,
-Kenichi Handa, @c Handa
+$BH>ED(B $B7u0l(B,
 Raja R. Harinath,
-Yoshiki Hayashi, @c ?
+$BNS(B $BK'<y(B,
 P. E. Jareth Hein,
-Hisashige Kenji, @c Hisashige
+$B5W=E(B Kenji,
 Scott Hofmann,
 Marc Horowitz,
 Gunnar Horrigmo,
@@ -23081,24 +23089,23 @@ Richard Hoskins,
 Brad Howes,
 Miguel de Icaza,
 Fran,Ag(Bois Felix Ingrand,
-Tatsuya Ichikawa, @c ?
-Ishikawa Ichiro, @c Ishikawa
+$B;T@n(B $BC#:H(B,
+$B@P@n(B $B0lO:(B,
 Lee Iverson,
-Iwamuro Motonori, @c Iwamuro
+$B4d<<(B $B85E5(B,
 Rajappa Iyer,
 Andreas Jaeger,
 Adam P. Jenkins,
 Randell Jesup,
 Fred Johansen,
 Gareth Jones,
-Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
 Michael Klingbeil,
 Peter Skov Knudsen,
-Shuhei Kobayashi, @c Kobayashi
+$B>.NS(B $B=$J?(B,
 Petr Konecny,
-Koseki Yoshinori, @c Koseki
+$B>.4X(B $B5HB'(B,
 Thor Kristoffersen,
 Jens Lautenbacher,
 Martin Larose,
@@ -23120,7 +23127,7 @@ Gordon Matzigkeit,
 Timo Metzemakers,
 Richard Mlynarik,
 Lantz Moore,
-Morioka Tomohiko, @c Morioka
+$B<i2,(B $BCNI'(B,
 Erik Toubro Nielsen,
 Hrvoje Niksic,
 Andy Norman,
@@ -23128,8 +23135,8 @@ Fred Oberhauser,
 C. R. Oldham,
 Alexandre Oliva,
 Ken Olstad,
-Masaharu Onishi, @c Onishi
-Hideki Ono, @c Ono
+$BBg@>(B $B2m@2(B,
+$B>.Ln(B $B=(5.(B,
 Ettore Perazzoli,
 William Perry,
 Stephen Peters,
@@ -23175,11 +23182,11 @@ Sam Steingold,
 Paul Stevenson,
 Jonas Steverud,
 Paul Stodghill,
-Kiyokazu Suto, @c Suto
+$B?\F#(B $B@60l(B,
 Kurt Swanson,
 Samuel Tardieu,
 Teddy,
-Tozawa Akihiko, @c Tozawa
+$B8MBt(B $B>=I'(B,
 Chuck Thompson,
 Philippe Troin,
 James Troup,
@@ -23196,7 +23203,6 @@ Barry A. Warsaw,
 Christoph Wedler,
 Joe Wells,
 Lee Willis,
-Katsumi Yamaoka @c Yamaoka
 and
 Lloyd Zusman.
 

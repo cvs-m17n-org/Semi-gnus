@@ -23503,13 +23503,21 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
+Kevin Greiner,
+Jesper Harder,
+Paul Jarc,
+Simon Josefsson,
 David Kågedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
+Michael Shields,
+Reiner Steib,
 Jason L. Tibbitts, III,
+Jack Vinson,
+Katsumi Yamaoka, @c Yamaoka
 and
-Jack Vinson.
+Teodor Zlatanov.
 
 Also thanks to the following for patches and stuff:
 
@@ -23580,7 +23588,7 @@ D. Hall,
 Magnus Hammerin,
 Kenichi Handa, @c Handa
 Raja R. Harinath,
-Yoshiki Hayashi, @c ?
+Yoshiki Hayashi, @c Hayashi
 P. E. Jareth Hein,
 Hisashige Kenji, @c Hisashige
 Scott Hofmann,
@@ -23590,7 +23598,7 @@ Richard Hoskins,
 Brad Howes,
 Miguel de Icaza,
 François Felix Ingrand,
-Tatsuya Ichikawa, @c ?
+Tatsuya Ichikawa, @c Ichikawa
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -23600,7 +23608,6 @@ Adam P. Jenkins,
 Randell Jesup,
 Fred Johansen,
 Gareth Jones,
-Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
 Michael Klingbeil,
@@ -23704,7 +23711,6 @@ Barry A. Warsaw,
 Christoph Wedler,
 Joe Wells,
 Lee Willis,
-Katsumi Yamaoka @c Yamaoka
 and
 Lloyd Zusman.
 
