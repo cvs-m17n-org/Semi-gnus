@@ -93,6 +93,9 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   '("-quiet")
   "Arguments to be passed to the program `pop3-ssl-program-name'.")
 
+(defun pop3-progress-message (format percent &rest args)
+  (apply (function message) format args))
+
 (defun pop3-movemail (&optional crashbox)
   "Transfer contents of a maildrop to the specified CRASHBOX."
   (or crashbox (setq crashbox (expand-file-name "~/.crashbox")))
@@ -126,9 +129,10 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (unwind-protect
 	(unless (not (stringp crashbox))
 	  (while messages
-	    (message 
-	     (format "Retrieving message %d of %d (%d octets) from %s..."
-		     n message-count (cdar messages) pop3-mailhost))
+	    (pop3-progress-message
+	     "Retrieving message %d of %d (%d octets) from %s..."
+	     (floor (* (/ (float n) message-count) 100))
+	     n message-count (cdar messages) pop3-mailhost)
 	    (pop3-retr process (caar messages) crashbuf)
 	    (push (caar messages) retrieved-messages)
 	    (setq messages (cdr messages)
