@@ -1,3 +1,12 @@
+1999-08-23  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-ems.el (gnus-x-splash): Change the foreground color of
+	`gnus-splash' to "Brown"; use `with-temp-buffer' instead of
+	`with-temp-file'; use `insert-file-contents-as-binary' instead of
+	`insert-file-contents'.
+
 1999-08-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
