@@ -381,12 +381,8 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                   (widget-apply (car (widget-get widget :children))
                                 :value-inline))
   :default-get (lambda (widget)
-                 ;;(widget-default-get
-                 ;; (widget-convert (widget-get widget :type))))
-		 ;; `widget-default-get' isn't available in Mule 2.
-		 (let ((w (widget-convert (widget-get widget :type))))
-		   (or (widget-get w :value)
-		       (widget-apply w :default-get))))
+                 (widget-default-get
+                  (widget-convert (widget-get widget :type))))
   :match (lambda (widget value)
            (widget-apply (widget-convert (widget-get widget :type))
                          :match value))
