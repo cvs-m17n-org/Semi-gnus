@@ -1,5 +1,10 @@
 1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* README-gnus-bbdb.en: New file, translated by courtesy of
+	Hiroshi Kawaguchi <taicho@shiba.sony.co.jp>.
+
+1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/dgnushack.el (dgnushack-compile): Add `gnus-bbdb.el'.
 
 	* lisp/gnus-bbdb.el: New file. By courtesy of Keiichi Suzuki.

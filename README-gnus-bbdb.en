@@ -1,0 +1,99 @@
+-*- mode: text; fill-column: 70; -*-
+
+  **  This document is copied from keiichi branch. **
+  **  We thank Keiichi Suzuki a lot.               **
+
+---
+ If BBDB is used then, bbdb-gnus.elc can't be shared with them before
+Semi-gnus 6.8.X. It is necessary to byte-compile it again.
+
+;; It is a simple way that only bbdb-gnus.el is byte-compiled after
+;; gnus starts.
+
+---
+gnus-bbdb.el
+
+ This is the BBDB API module for Semi-gnus, which includes Chao-gnus
+6.9. `mime-bbdb' should not be necessary for Semi-gnus, if that module
+were used.
+
+ You need FLIM after 1.11.3.
+
+ If you are using bbdb-auto-notes-hook, the patch listed at the end
+of this file should be applied. If not, it might not.
+
+ EXAMPLE:
+
+;; You need to set nothing for `mime-bbdb'.
+;(setq mime-bbdb/use-mail-extr nil)
+;(eval-after-load "mail-extr" '(require 'mime-bbdb))
+
+(require 'bbdb)
+(require 'gnus-bbdb)
+(bbdb-initialize 'sc)  ;; 'Gnus of 'gnus should be deleted.
+(add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
+
+---
+ This is a patch for bbdb.el / bbdb-hooks.el.
+
+------ cut here ------ cut here ------ cut here ------ cut here ------
+--- bbdb-hooks.el~	Tue Oct 13 03:13:50 1998
++++ bbdb-hooks.el	Fri Oct 30 17:05:53 1998
+@@ -352,12 +352,22 @@
+ 	(marker (bbdb-header-start))
+ 	field pairs fieldval  ; do all bindings here for speed
+ 	regexp string notes-field-name notes
+-	 replace-p replace-or-add-msg)
++	replace-p replace-or-add-msg
++	extract-field-value-funtion)
+     (set-buffer (marker-buffer marker))
+     (save-restriction
+-      (widen)
+-      (goto-char marker)
+-      (if (and (setq fieldval (bbdb-extract-field-value "From"))
++      (let ((function-list bbdb-extract-field-value-function-list)
++	    function)
++	(or (progn
++	      (while (and (not extract-field-value-funtion)
++			  (setq function (pop function-list)))
++		(setq extract-field-value-funtion (funcall function)))
++	      extract-field-value-funtion)
++	    (progn
++	      (widen)
++	      (goto-char marker)
++	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
++      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
+ 	       (string-match (bbdb-user-mail-names) fieldval))
+ 	  ;; Don't do anything if this message is from us.  Note that we have
+ 	  ;; to look at the message instead of the record, because the record
+@@ -368,7 +378,7 @@
+ 	  (goto-char marker)
+ 	  (setq field (car (car ignore-all))
+ 		regexp (cdr (car ignore-all))
+-		fieldval (bbdb-extract-field-value field))
++		fieldval (funcall extract-field-value-funtion field))
+ 	  (if (and fieldval
+ 		   (string-match regexp fieldval))
+ 	      (setq ignore t)
+@@ -382,7 +392,7 @@
+ 		pairs (cdr (car rest))	; (REGEXP . STRING) or
+ 					; (REGEXP FIELD-NAME STRING) or
+ 					; (REGEXP FIELD-NAME STRING REPLACE-P)
+-		fieldval (bbdb-extract-field-value field)) ; e.g., Subject line
++		fieldval (funcall extract-field-value-funtion field)) ; e.g., Subject line
+ 	  (if fieldval
+ 	      (while pairs
+ 		(setq regexp (car (car pairs))
+--- bbdb.el~	Tue Oct 13 03:14:55 1998
++++ bbdb.el	Fri Oct 30 17:05:53 1998
+@@ -620,6 +620,7 @@
+ (defvar bbdb-showing-changed-ones nil)
+ (defvar bbdb-modified-p nil)
+ (defvar bbdb-elided-display nil)
++(defvar bbdb-extract-field-value-function-list nil)
+ 
+ (defvar bbdb-debug t)
+ (defmacro bbdb-debug (&rest body)
+------ cut here ------ cut here ------ cut here ------ cut here ------
+
+---
