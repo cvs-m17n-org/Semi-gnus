@@ -1,7 +1,7 @@
 ;;; nnkiboze.el --- select virtual news access for Gnus
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -234,7 +234,7 @@ Finds out what articles are to be part of the nnkiboze groups."
       (load newsrc-file))
     (nnheader-temp-write nov-file
       (when (file-exists-p nov-file)
-	(insert-file-contents nov-file))
+	(nnheader-insert-file-contents nov-file))
       (setq nov-buffer (current-buffer))
       ;; Go through the active hashtb and add new all groups that match the
       ;; kiboze regexp.

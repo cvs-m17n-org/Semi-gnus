@@ -1,3 +1,9 @@
+1998-06-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.2.
+
+	* Sync up with Gnus 5.6.10.
+
 1998-05-31  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* (message-followup): Would not use "Mail-Followup-To:" properly.
@@ -28,6 +34,10 @@
 	
 	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
 	`raw-text' property for saving cache file.
+
+1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* README.semi: Add description of `shuhei-k' branch.
 
 1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 

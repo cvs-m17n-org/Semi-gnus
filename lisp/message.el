@@ -1,7 +1,7 @@
 ;;; message.el --- composing mail and news messages
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: mail, news, MIME
 
@@ -3645,10 +3645,14 @@ responses here are directed to other newsgroups."))
 		message-id (message-fetch-field "message-id" t)
 		distribution (message-fetch-field "distribution")))
 	;; Make sure that this article was written by the user.
-	(unless (string-equal
-		 (downcase
-		  (or sender (cadr (std11-extract-address-components from))))
-		 (downcase (message-make-address)))
+ 	(unless (or (and sender
+ 			 (string-equal
+ 			  (downcase sender)
+ 			  (downcase (message-make-sender))))
+ 		    (string-equal
+ 		     (downcase (cadr (mail-extract-address-components from)))
+ 		     (downcase (cadr (mail-extract-address-components
+ 				      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))

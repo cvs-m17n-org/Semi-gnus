@@ -1,8 +1,8 @@
-;;; gnus-util.el --- utility functions for Gnus
+;;; gnus-util.el --- utility functions for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -340,25 +340,22 @@
       (yes-or-no-p prompt)
     (message "")))
 
-;; I suspect there's a better way, but I haven't taken the time to do
-;; it yet.  -erik selberg@cs.washington.edu
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string"
-  (if (equal messy-date "")
-      "??-???"
-    (let ((datevec (ignore-errors (timezone-parse-date messy-date))))
-      (if (not datevec)
-	  "??-???"
-	(format "%2s-%s"
-		(condition-case ()
-		    ;; Make sure leading zeroes are stripped.
-		    (number-to-string (string-to-number (aref datevec 2)))
-		  (error "??"))
-		(capitalize
-		 (or (car
-		      (nth (1- (string-to-number (aref datevec 1)))
-			   timezone-months-assoc))
-		     "???")))))))
+  (let ((datevec (ignore-errors (timezone-parse-date messy-date))))
+    (if (or (not datevec)
+	    (string-equal "0" (aref datevec 1)))
+	"??-???"
+      (format "%2s-%s"
+	      (condition-case ()
+		  ;; Make sure leading zeroes are stripped.
+		  (number-to-string (string-to-number (aref datevec 2)))
+		(error "??"))
+	      (capitalize
+	       (or (car
+		    (nth (1- (string-to-number (aref datevec 1)))
+			 timezone-months-assoc))
+		   "???"))))))
 
 (defmacro gnus-date-get-time (date)
   "Convert DATE string to Emacs time.
@@ -721,7 +718,8 @@ with potentially long computations."
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
   (let ((artbuf (current-buffer))
-	(tmpbuf (get-buffer-create " *Gnus-output*")))
+	(tmpbuf (get-buffer-create " *Gnus-output*"))
+	(coding-system-for-write 'binary))
     (save-excursion
       (or (get-file-buffer filename)
 	  (file-exists-p filename)
@@ -780,7 +778,8 @@ with potentially long computations."
 	    (let ((file-buffer (create-file-buffer filename)))
 	      (save-excursion
 		(set-buffer file-buffer)
-		(let ((require-final-newline nil))
+		(let ((require-final-newline nil)
+		      (coding-system-for-write 'binary))
 		  (gnus-write-buffer filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
@@ -798,7 +797,8 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((buffer-read-only nil))
+	    (let ((buffer-read-only nil)
+		  (coding-system-for-write 'binary))
 	      (save-excursion
 		(goto-char (point-max))
 		(forward-char -2)

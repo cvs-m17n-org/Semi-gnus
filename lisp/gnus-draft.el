@@ -1,8 +1,9 @@
-;;; gnus-draft.el --- draft message support for Gnus
+;;; gnus-draft.el --- draft message support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtgnus-run-hooks
-;; Keywords: news
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME, offline
 
 ;; This file is part of GNU Emacs.
 
@@ -162,6 +163,16 @@
 
 ;;; Utility functions
 
+(defcustom gnus-draft-decoding-function
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (eword-decode-header)
+     ))
+  "*Function called to decode the message from network representation."
+  :group 'gnus-agent
+  :type 'function)
+
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!This is because `gnus-setup-message' uses uninterned symbols.
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
@@ -176,6 +187,7 @@
       (if (not (gnus-request-restore-buffer article group))
 	  (error "Couldn't restore the article")
 	;; Insert the separator.
+	(funcall gnus-draft-decoding-function)
 	(goto-char (point-min))
 	(search-forward "\n\n")
 	(forward-char -1)
