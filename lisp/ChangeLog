@@ -1,4 +1,30 @@
+2004-02-03  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* spam.el (spam-directory): Derive from `gnus-directory'.
+
+	* spam-report.el (spam-report-url-to-file)
+	(spam-report-requests-file): New function and variable for offline
+	reporting.
+	(spam-report-url-ping-function): Add `spam-report-url-to-file'
+	and user defined function.
+	(spam-report-url-ping-mm-url): Remove doubled slash.
+
+2004-02-03  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-list-of-processors): fixed spamassassin variable names
+
 2004-02-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* spam.el (spam-check-spamoracle, spam-spamoracle-learn): Fix
+	format string mismatch.
+
+	* sieve.el (sieve-deactivate-all): do.
+
+	* nnfolder.el (nnfolder-request-set-mark, nnfolder-save-marks): do.
+
+	* nnlistserv.el (nnlistserv-kk-wash-article): do.
+
+	* nnml.el (nnml-request-set-mark, nnml-save-marks): do.	
 
 	* mm-bodies.el (mm-7bit-chars): Don't include \r.
 

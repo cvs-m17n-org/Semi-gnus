@@ -73,7 +73,7 @@
 (defgroup spam nil
   "Spam configuration.")
 
-(defcustom spam-directory "~/News/spam/"
+(defcustom spam-directory (nnheader-concat gnus-directory "spam/")
   "Directory for spam whitelists and blacklists."
   :type 'directory
   :group 'spam)
@@ -585,14 +585,14 @@ finds ham or spam.")
     (gnus-group-spam-exit-processor-ifile        spam spam-use-ifile)
     (gnus-group-spam-exit-processor-stat         spam spam-use-stat)
     (gnus-group-spam-exit-processor-spamoracle   spam spam-use-spamoracle)
-    (gnus-group-spam-exit-processor-spamassassin spam spam-use-spam-spamassassin)
+    (gnus-group-spam-exit-processor-spamassassin spam spam-use-spamassassin)
     (gnus-group-ham-exit-processor-ifile         ham spam-use-ifile)
     (gnus-group-ham-exit-processor-bogofilter    ham spam-use-bogofilter)
     (gnus-group-ham-exit-processor-stat          ham spam-use-stat)
     (gnus-group-ham-exit-processor-whitelist     ham spam-use-whitelist)
     (gnus-group-ham-exit-processor-BBDB          ham spam-use-BBDB)
     (gnus-group-ham-exit-processor-copy          ham spam-use-ham-copy)
-    (gnus-group-ham-exit-processor-spamassassin  ham spam-use-ham-spamassassin)
+    (gnus-group-ham-exit-processor-spamassassin  ham spam-use-spamassassin)
     (gnus-group-ham-exit-processor-spamoracle    ham spam-use-spamoracle))
   "The `spam-list-of-processors' list.
 This list contains pairs associating a ham/spam exit processor
@@ -1977,7 +1977,7 @@ REMOVE not nil, remove the ADDRESSES."
 		  (goto-char (point-min))
 		  (when (re-search-forward "^X-Spam: yes;" nil t)
 		    spam-split-group))
-	      (error "Error running spamoracle" status))))))))
+	      (error "Error running spamoracle: %s" status))))))))
 
 (defun spam-spamoracle-learn (articles article-is-spam-p &optional unregister)
   "Run spamoracle in training mode."
@@ -1999,8 +1999,8 @@ REMOVE not nil, remove the ADDRESSES."
 			   `("-f" ,spam-spamoracle-database
 			     "add" ,arg)
 			 `("add" ,arg)))))
-	  (when (not (eq 0 status))
-	    (error "Error running spamoracle" status)))))))
+	  (unless (eq 0 status)
+	    (error "Error running spamoracle: %s" status)))))))
 
 (defun spam-spamoracle-learn-ham (articles &optional unregister)
   (spam-spamoracle-learn articles nil unregister))
