@@ -1,5 +1,10 @@
 1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' to
+	`pop3-fma-read-passwd'.
+
+1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.029.
 
 	* Sync up with Pterodactyl Gnus 0.42.
