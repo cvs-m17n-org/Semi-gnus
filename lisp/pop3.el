@@ -60,7 +60,7 @@ values are 'apop.")
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
 
-(defvar pop3-movemail-file-coding-system nil
+(defvar pop3-movemail-file-coding-system 'binary
   "Crashbox made by pop3-movemail with this coding system.")
 
 (defvar pop3-read-point nil)
@@ -115,7 +115,8 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process))
+	(process)
+	(coding-system-for-read 'binary))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
@@ -127,8 +128,7 @@ Returns the process associated with the connection."
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
