@@ -2638,7 +2638,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
-      (gnus-write-buffer slave-name)
+      (gnus-write-buffer-as-coding-system
+       gnus-startup-file-coding-system slave-name)
       (when modes
 	(set-file-modes slave-name modes)))))
 

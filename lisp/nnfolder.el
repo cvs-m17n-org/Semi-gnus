@@ -93,12 +93,10 @@ message, a huge time saver for large mailboxes.")
 (defvoo nnfolder-buffer-alist nil)
 (defvoo nnfolder-scantime-alist nil)
 (defvoo nnfolder-active-timestamp nil)
-(defvoo nnfolder-active-file-coding-system
-    (if (memq system-type '(windows-nt ms-dos ms-windows))
-	'raw-text-dos 'raw-text))
+(defvoo nnfolder-active-file-coding-system nnheader-text-coding-system)
 (defvoo nnfolder-active-file-coding-system-for-write 
     nnmail-active-file-coding-system)
-(defvoo nnfolder-file-coding-system nnfolder-active-file-coding-system)
+(defvoo nnfolder-file-coding-system nnheader-text-coding-system)
 (defvoo nnfolder-file-coding-system-for-write nnheader-file-coding-system
   "Coding system for save nnfolder file.
 If NIL, NNFOLDER-FILE-CODING-SYSTEM is used.")

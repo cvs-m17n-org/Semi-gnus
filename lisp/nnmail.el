@@ -460,7 +460,8 @@ parameter.  It should return nil, `warn' or `delete'."
 (defvar nnmail-file-coding-system 'raw-text
   "Coding system used in nnmail.")
 
-(defvar nnmail-incoming-coding-system 'raw-text
+(defvar nnmail-incoming-coding-system
+  nnheader-text-coding-system
   "Coding system used in reading inbox")
 
 (defvar nnmail-pathname-coding-system 'binary

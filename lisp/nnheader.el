@@ -49,6 +49,17 @@ on your system, you could say something like:
 
 \(setq nnheader-file-name-translation-alist '((?: . ?_)))")
 
+(defvar nnheader-text-coding-system
+  (if (memq system-type '(windows-nt ms-dos ms-windows))
+      'raw-text-dos
+    'raw-text)
+  "Text-safe coding system (For removing ^M).
+This variable is a substitute for `mm-text-coding-system'.")
+
+(defvar nnheader-text-coding-system-for-write nil
+  "Text coding system for write.
+This variable is a substitute for `mm-text-coding-system-for-write'.")
+
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")

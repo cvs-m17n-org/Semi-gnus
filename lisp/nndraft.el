@@ -111,7 +111,8 @@
 	   (newest (if (file-newer-than-file-p file auto) file auto))
 	   (nntp-server-buffer (or buffer nntp-server-buffer)))
       (when (and (file-exists-p newest)
-		 (nnmail-find-file newest))
+		 (let ((nnmail-file-coding-system nnheader-text-coding-system))
+		   (nnmail-find-file newest)))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
 	  (goto-char (point-min))
@@ -194,10 +195,7 @@
 
 (deffoo nndraft-request-replace-article (article group buffer)
   (nndraft-possibly-change-group group)
-  (let ((nnmail-file-coding-system
-	 (if (equal group "drafts")
-	     message-draft-coding-system
-	   mail-source-text-coding-system)))
+  (let ((nnmail-file-coding-system nnheader-text-coding-system))
     (nnoo-parent-function 'nndraft 'nnmh-request-replace-article
 			  (list article group buffer))))
 

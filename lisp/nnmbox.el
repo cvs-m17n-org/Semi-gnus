@@ -61,11 +61,9 @@
 (defvoo nnmbox-group-alist nil)
 (defvoo nnmbox-active-timestamp nil)
 
-(defvoo nnmbox-file-coding-system
-    (if (memq system-type '(windows-nt ms-dos ms-windows))
-	'raw-text-dos 'raw-text))
+(defvoo nnmbox-file-coding-system nnheader-text-coding-system)
 (defvoo nnmbox-file-coding-system-for-write nil)
-(defvoo nnmbox-active-file-coding-system nnmbox-file-coding-system)
+(defvoo nnmbox-active-file-coding-system nnheader-text-coding-system)
 (defvoo nnmbox-active-file-coding-system-for-write nil)
 
 

@@ -581,8 +581,10 @@ Bind `print-quoted' and `print-readably' to t while printing."
   "Write the current buffer's contents to FILE."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
-  ;; Write the buffer.
-  (write-region (point-min) (point-max) file nil 'quietly))
+  (let ((file-name-coding-system nnmail-pathname-coding-system)
+	(pathname-coding-system nnmail-pathname-coding-system))
+    ;; Write the buffer.
+    (write-region (point-min) (point-max) file nil 'quietly)))
 
 (defun gnus-write-buffer-as-binary (file)
   "Write the current buffer's contents to FILE without code conversion."
@@ -730,7 +732,8 @@ with potentially long computations."
 		  (set-buffer file-buffer)
 		  (rmail-insert-rmail-file-header)
 		  (let ((require-final-newline nil))
-		    (gnus-write-buffer filename)))
+		    (gnus-write-buffer-as-coding-system
+		     nnheader-text-coding-system filename)))
 		(kill-buffer file-buffer))
 	    (error "Output file does not exist")))
       (set-buffer tmpbuf)
@@ -781,7 +784,8 @@ with potentially long computations."
 	      (save-excursion
 		(set-buffer file-buffer)
 		(let ((require-final-newline nil))
-		  (gnus-write-buffer-as-binary filename)))
+		  (gnus-write-buffer-as-coding-system
+		   nnheader-text-coding-system filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
       (set-buffer tmpbuf)

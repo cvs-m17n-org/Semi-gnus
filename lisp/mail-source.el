@@ -26,6 +26,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(require 'nnheader)
 (eval-and-compile
   (autoload 'pop3-movemail "pop3")
   (autoload 'pop3-get-message-count "pop3"))
@@ -76,12 +77,6 @@ If non-nil, this maildrop will be checked periodically for new mail."
   "Number of idle seconds to wait before checking for new mail."
   :group 'mail-source
   :type 'number)
-
-(defvar mail-source-text-coding-system
-  (if (memq system-type '(windows-nt ms-dos ms-windows))
-      'raw-text-dos
-    'raw-text)
-  "Text-safe coding system (For removing ^M).")
 
 ;;; Internal variables.
 
@@ -626,13 +621,13 @@ This only works when `display-time' is enabled."
 		       (not (if function
 				(funcall function file mail-source-crash-box)
 			      (let ((coding-system-for-write
-				     mail-source-text-coding-system)
+				     nnheader-text-coding-system)
 				    (coding-system-for-read
-				     mail-source-text-coding-system)
+				     nnheader-text-coding-system)
 				    (output-coding-system
-				     mail-source-text-coding-system)
+				     nnheader-text-coding-system)
 				    (input-coding-system
-				     mail-source-text-coding-system))
+				     nnheader-text-coding-system))
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
 				  (goto-char (point-min))
@@ -658,8 +653,7 @@ This only works when `display-time' is enabled."
   (autoload 'imap-close "imap")
   (autoload 'imap-error-text "imap")
   (autoload 'imap-message-flags-add "imap")
-  (autoload 'imap-list-to-message-set "imap")
-  (autoload 'nnheader-ms-strip-cr "nnheader"))
+  (autoload 'imap-list-to-message-set "imap"))
 
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."
