@@ -1,5 +1,20 @@
 1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Use `gnus-union'
+	instead of `union'.
+
+	* lisp/gnus-util.el (gnus-union): New function.
+
+	* lisp/gnus-sum.el (gnus-summary-exit-no-update):  Use
+	`copy-sequence' instead of `copy-list'.
+	* lisp/gnus-art.el (gnus-article-setup-highlight-words): Ditto.
+
+	* lisp/dgnushack.el (union, copy-list): Remove compiler macros.
+
+1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
 
 	* lisp/dgnushack.el (union, copy-list): New compiler macros for
