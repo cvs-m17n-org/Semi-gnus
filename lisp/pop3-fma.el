@@ -1,4 +1,4 @@
-;; pop3-fma.el.el --- POP3 for Multiple Account for Gnus.
+;; pop3-fma.el --- POP3 for Multiple Account for Gnus.
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc. , Tatsuya Ichikawa
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -80,7 +80,12 @@
 
 (unless (and (fboundp 'pop3-fma-encode-string)
 	     (fboundp 'pop3-fma-decode-string))
-  (require 'mel-b)
+  (unless (condition-case nil
+	      (require 'mel-b-ccl)
+	    (error nil))
+    (condition-case nil
+	(require 'mel-b-el)
+      (error (require 'mel-b))))
   (fset 'pop3-fma-encode-string 'base64-encode-string)
   (fset 'pop3-fma-decode-string 'base64-decode-string))
 
@@ -382,5 +387,3 @@ Argument PROMPT ."
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
-
-
