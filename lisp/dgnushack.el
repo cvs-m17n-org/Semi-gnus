@@ -806,6 +806,7 @@ Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done
 					    "/")
 				    ;; PACKAGEDIR
 				    (car command-line-args-left))))
+    (setq command-line-args-left nil)
     (when (file-directory-p lisp-dir)
       (let (files)
 	(dolist (file dgnushack-exporting-files)
@@ -820,8 +821,8 @@ Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done
 
 (defun dgnushack-install-package-manifest ()
   "Install MANIFEST file as an XEmacs package."
-  (let* ((package-dir (car command-line-args-left))
-	 (product-name (cadr command-line-args-left))
+  (let* ((package-dir (pop command-line-args-left))
+	 (product-name (pop command-line-args-left))
 	 (pkginfo-dir (expand-file-name "pkginfo" package-dir))
 	 (name (expand-file-name (concat "MANIFEST." product-name)
 				 pkginfo-dir))

@@ -1,5 +1,9 @@
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-remove-extra-files-in-package):
+	Clear the value for `command-line-args-left'.
+	(dgnushack-install-package-manifest): Ditto.
+
 	* texi/infohack.el: Load dgnushack.el and ptexinfmt.el first.
 
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
