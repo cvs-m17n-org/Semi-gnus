@@ -5316,6 +5316,12 @@ gnus はそのメールを取得して、それのヘッダーの精密調査ができるように画面
 
 この命令はプロセス/接頭引数の習慣に従います (@pxref{Process/Prefix})。
 
+@item S D e
+@kindex S D e (概略)
+@findex gnus-summary-resend-message-edit
+一つ前のコマンドに似ていますが、再送する前にあたかも新しいメッセージのよ
+うに編集することができます。
+
 @item S O m
 @kindex S O m (概略)
 @findex gnus-summary-digest-mail-forward
