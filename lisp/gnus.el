@@ -789,11 +789,11 @@ be set in `.emacs' instead."
 		       (concat " (r" gnus-revision-number ")"))
 		     " based on " gnus-original-product-name " v"
 		     gnus-original-version-number "\n")
-	     (goto-char (point-min))
-	     (insert-char ?\  (max 0 (/ (- (window-width)
-					   (gnus-point-at-eol)) 2)))
-	     (put-text-property (point) (gnus-point-at-eol)
-				'face 'gnus-splash-face)
+	     (end-of-line 0)
+	     (put-text-property (point-min) (point) 'face 'gnus-splash-face)
+	     (insert-char ?\  (prog1
+				  (max 0 (/ (- (window-width) (point)) 2))
+				(goto-char (point-min))))
 	     (forward-line 1)
 	     (let ((size (image-size image)))
 	       (insert-char ?\n (max 0 (round (- (window-height)
@@ -832,8 +832,9 @@ be set in `.emacs' instead."
 	      (concat " (r" gnus-revision-number ")"))
 	    " based on " gnus-original-product-name " v"
 	    gnus-original-version-number)
-    (goto-char (point-min))
-    (insert-char ?\  (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+    (insert-char ?\  (prog1
+			 (max 0 (/ (- (window-width) (point)) 2))
+		       (goto-char (point-min))))
     (forward-line 1)
     ;; And then hack it.
     (gnus-indent-rigidly (point) (point-max)

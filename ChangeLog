@@ -1,6 +1,15 @@
+2000-10-05  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Don't use
+	`gnus-point-at-eol'.
+	* lisp/gnus.el (gnus-group-startup-message): Ditto.
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Revive annulling of
+	`gnus-summary-set-display-table'.
+
 2000-10-04  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
 
-	* gnus-sum.el (gnus-build-sparse-threads): Use
+	* lisp/gnus-sum.el (gnus-build-sparse-threads): Use
 	`make-full-mail-header-from-decoded-header' instead of
 	`make-full-mail-header'.
 
