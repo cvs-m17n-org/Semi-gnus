@@ -3027,7 +3027,8 @@ after replacing with the original article."
   (when (featurep 'font-lock)
     (set (make-local-variable 'font-lock-defaults)
 	 '(message-font-lock-keywords t))
-    (font-lock-set-defaults))
+    (font-lock-set-defaults)
+    (turn-on-font-lock))
   (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
 
 (defun gnus-article-edit-article (exit-func)
