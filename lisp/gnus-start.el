@@ -2246,6 +2246,12 @@ If FORCE is non-nil, the .newsrc file is read."
 
       (setq gnus-newsrc-options-n out))))
 
+;; The following four lines will be deleted in the future.
+(require 'poe)
+(defun-maybe save-buffer-as-coding-system (coding-system &optional args)
+  (let ((coding-system-for-write coding-system))
+    (save-buffer args)))
+
 (defun gnus-save-newsrc-file (&optional force)
   "Save .newsrc file."
   ;; Note: We cannot save .newsrc file if all newsgroups are removed
@@ -2281,10 +2287,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (write-region-as-coding-system
-	   gnus-startup-file-coding-system
-	   (point-min) (point-max) (buffer-file-name))
-	  (set-buffer-modified-p nil)
+	  (save-buffer-as-coding-system gnus-startup-file-coding-system)
 	  (kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))

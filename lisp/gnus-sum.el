@@ -3,6 +3,7 @@
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -37,8 +38,9 @@
 (require 'gnus-util)
 (require 'mime-view)
 
-;; Avoid byte-compile warnings.
 (eval-when-compile
+  (require 'mime-play)
+  ;; Avoid byte-compile warnings.
   (defvar gnus-article-decoded-p)
   (defvar gnus-decode-encoded-word-function)
   )

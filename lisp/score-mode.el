@@ -100,9 +100,7 @@ This mode is an extended emacs-lisp mode.
   (interactive)
   (unless (file-exists-p (file-name-directory (buffer-file-name)))
     (make-directory (file-name-directory (buffer-file-name)) t))
-  (write-region-as-coding-system
-   score-mode-coding-system (point-min) (point-max) (buffer-file-name))
-  (set-buffer-modified-p nil)
+  (save-buffer-as-coding-system score-mode-coding-system)
   (bury-buffer (current-buffer))
   (let ((buf (current-buffer)))
     (when gnus-score-edit-exit-function
