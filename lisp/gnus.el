@@ -245,12 +245,16 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Various Various")
   :group 'gnus)
 
+(defgroup gnus-mime nil
+  "Variables for controlling the Gnus MIME interface."
+  :group 'gnus)
+
 (defgroup gnus-exit nil
   "Exiting gnus."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.34"
+(defconst gnus-version-number "0.39"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Pterodactyl Gnus v%s" gnus-version-number)
@@ -359,6 +363,72 @@ be set in `.emacs' instead."
     (t
      ()))
   "Level 3 empty newsgroup face.")
+
+(defface gnus-group-news-4-face
+  '((((class color)
+      (background dark))
+     (:bold t))
+    (((class color)
+      (background light))
+     (:bold t))
+    (t
+     ()))
+  "Level 4 newsgroup face.")
+
+(defface gnus-group-news-4-empty-face
+  '((((class color)
+      (background dark))
+     ())
+    (((class color)
+      (background light))
+     ())
+    (t
+     ()))
+  "Level 4 empty newsgroup face.")
+
+(defface gnus-group-news-5-face
+  '((((class color)
+      (background dark))
+     (:bold t))
+    (((class color)
+      (background light))
+     (:bold t))
+    (t
+     ()))
+  "Level 5 newsgroup face.")
+
+(defface gnus-group-news-5-empty-face
+  '((((class color)
+      (background dark))
+     ())
+    (((class color)
+      (background light))
+     ())
+    (t
+     ()))
+  "Level 5 empty newsgroup face.")
+
+(defface gnus-group-news-6-face
+  '((((class color)
+      (background dark))
+     (:bold t))
+    (((class color)
+      (background light))
+     (:bold t))
+    (t
+     ()))
+  "Level 6 newsgroup face.")
+
+(defface gnus-group-news-6-empty-face
+  '((((class color)
+      (background dark))
+     ())
+    (((class color)
+      (background light))
+     ())
+    (t
+     ()))
+  "Level 6 empty newsgroup face.")
 
 (defface gnus-group-news-low-face
   '((((class color)
@@ -1482,7 +1552,6 @@ want."
   '((gnus-group-mode "(gnus)The Group Buffer")
     (gnus-summary-mode "(gnus)The Summary Buffer")
     (gnus-article-mode "(gnus)The Article Buffer")
-    (mime/viewer-mode "(gnus)The Article Buffer")
     (gnus-server-mode "(gnus)The Server Buffer")
     (gnus-browse-mode "(gnus)Browse Foreign Server")
     (gnus-tree-mode "(gnus)Tree Display"))
@@ -1577,9 +1646,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       message-send-and-exit message-yank-original)
      ("nnmail" nnmail-split-fancy nnmail-article-group)
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
-     ("rmailout" rmail-output)
+     ("rmailout" rmail-output rmail-output-to-rmail-file)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message rmail-output-to-rmail-file)
+      rmail-show-message)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t
@@ -1647,7 +1716,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-decode-uu-and-save-view gnus-uu-decode-unshar-view
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
       gnus-uu-decode-binhex-view gnus-uu-unmark-thread
-      gnus-uu-mark-over)
+      gnus-uu-mark-over gnus-uu-post-news)
      ("gnus-uu" gnus-uu-delete-work-dir gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
       gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
@@ -1745,6 +1814,7 @@ with some simple extensions.
 %a   Extracted name of the poster (string)
 %A   Extracted address of the poster (string)
 %F   Contents of the From: header (string)
+%f   Contents of the From: or To: headers (string)
 %x   Contents of the Xref: header (string)
 %D   Date of the article (string)
 %d   Date of the article (string) in DD-MMM format

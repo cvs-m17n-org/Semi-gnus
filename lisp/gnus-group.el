@@ -299,6 +299,18 @@ variable."
      gnus-group-news-3-empty-face)
     ((and (not mailp) (eq level 3)) .
      gnus-group-news-3-face)
+    ((and (= unread 0) (not mailp) (eq level 4)) .
+     gnus-group-news-4-empty-face)
+    ((and (not mailp) (eq level 4)) .
+     gnus-group-news-4-face)
+    ((and (= unread 0) (not mailp) (eq level 5)) .
+     gnus-group-news-5-empty-face)
+    ((and (not mailp) (eq level 5)) .
+     gnus-group-news-5-face)
+    ((and (= unread 0) (not mailp) (eq level 6)) .
+     gnus-group-news-6-empty-face)
+    ((and (not mailp) (eq level 6)) .
+     gnus-group-news-6-face)
     ((and (= unread 0) (not mailp)) .
      gnus-group-news-low-empty-face)
     ((and (not mailp)) .
@@ -1328,7 +1340,7 @@ If FIRST-TOO, the current line is also eligible as a target."
 	(beginning-of-line)
 	(forward-char (or (cdr (assq 'process gnus-group-mark-positions)) 2))
 	(subst-char-in-region
-	 (point) (1+ (point)) (following-char)
+	 (point) (1+ (point)) (char-after)
 	 (if unmark
 	     (progn
 	       (setq gnus-group-marked (delete group gnus-group-marked))
@@ -3336,26 +3348,26 @@ and the second element is the address."
 
 (defun gnus-add-marked-articles (group type articles &optional info force)
   ;; Add ARTICLES of TYPE to the info of GROUP.
-  ;; If INFO is non-nil, use that info.	 If FORCE is non-nil, don't
+  ;; If INFO is non-nil, use that info.         If FORCE is non-nil, don't
   ;; add, but replace marked articles of TYPE with ARTICLES.
   (let ((info (or info (gnus-get-info group)))
 	marked m)
     (or (not info)
 	(and (not (setq marked (nthcdr 3 info)))
 	     (or (null articles)
-		 (setcdr (nthcdr 2 info)
-			 (list (list (cons type (gnus-compress-sequence
-						 articles t)))))))
+                (setcdr (nthcdr 2 info)
+                        (list (list (cons type (gnus-compress-sequence
+                                                articles t)))))))
 	(and (not (setq m (assq type (car marked))))
 	     (or (null articles)
-		 (setcar marked
-			 (cons (cons type (gnus-compress-sequence articles t) )
-			       (car marked)))))
+                (setcar marked
+                        (cons (cons type (gnus-compress-sequence articles t) )
+                              (car marked)))))
 	(if force
 	    (if (null articles)
-		(setcar (nthcdr 3 info)
-			(gnus-delete-alist type (car marked)))
-	      (setcdr m (gnus-compress-sequence articles t)))
+               (setcar (nthcdr 3 info)
+                       (gnus-delete-alist type (car marked)))
+             (setcdr m (gnus-compress-sequence articles t)))
 	  (setcdr m (gnus-compress-sequence
 		     (sort (nconc (gnus-uncompress-range (cdr m))
 				  (copy-sequence articles)) '<) t))))))

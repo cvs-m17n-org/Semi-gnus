@@ -647,7 +647,7 @@ with potentially long computations."
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
   (let ((artbuf (current-buffer))
-	(tmpbuf (gnus-get-buffer-create " *Gnus-output*")))
+	(tmpbuf (get-buffer-create " *Gnus-output*")))
     (save-excursion
       (or (get-file-buffer filename)
 	  (file-exists-p filename)
@@ -698,7 +698,7 @@ with potentially long computations."
   "Append the current article to a mail file named FILENAME."
   (setq filename (expand-file-name filename))
   (let ((artbuf (current-buffer))
-	(tmpbuf (gnus-get-buffer-create " *Gnus-output*")))
+	(tmpbuf (get-buffer-create " *Gnus-output*")))
     (save-excursion
       ;; Create the file, if it doesn't exist.
       (when (and (not (get-file-buffer filename))
@@ -907,6 +907,12 @@ ARG is passed to the first function."
   (concat (unless (string-match "^\\^" re) "^.*")
 	  re
 	  (unless (string-match "\\$$" re) ".*$")))
+
+(defun gnus-set-window-start (&optional point)
+  "Set the window start to POINT, or (point) if nil."
+  (let ((win (get-buffer-window (current-buffer) t)))
+    (when win
+      (set-window-start win (or point (point))))))
 
 (provide 'gnus-util)
 

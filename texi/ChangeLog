@@ -1,3 +1,29 @@
+1998-10-25 01:51:56  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Headers): Addition.
+
+1998-10-24 08:37:12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Summary Buffer Lines): Addition.
+	(To): New.
+	(To): Addition.
+
+1998-10-15 18:15:34  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (Group Info): Must be list of ranges.
+
+1998-10-19 01:27:26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Washing): Addition.
+
+1998-10-18 00:20:58  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Changing Servers): Addition.
+
+1998-10-17 21:34:57  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Windows Configuration): Addition.
+
 1998-10-01 07:55:35  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Splitting Mail): Fix.

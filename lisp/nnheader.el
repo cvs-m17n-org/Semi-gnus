@@ -140,14 +140,23 @@ on your system, you could say something like:
   "Set article xref of HEADER to xref."
   `(aset ,header 8 ,xref))
 
+(defmacro mail-header-extra (header)
+  "Return the extra headers in HEADER."
+  `(aref ,header 9))
+
+(defmacro mail-header-set-extra (header extra)
+  "Set the extra headers in HEADER to EXTRA."
+  `(aset ,header 9 ',extra))
+
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
-  (make-vector 9 init))
+  (make-vector 10 init))
 
 (defun make-full-mail-header (&optional number subject from date id
-					references chars lines xref)
+					references chars lines xref
+					extra)
   "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref))
+  (vector number subject from date id references chars lines xref extra))
 
 ;; fake message-ids: generation and detection
 
@@ -257,7 +266,20 @@ on your system, you could say something like:
 	   (progn
 	     (goto-char p)
 	     (and (search-forward "\nxref: " nil t)
-		  (nnheader-header-value)))))
+		  (nnheader-header-value)))
+	   
+	   ;; Extra.
+	   (when nnmail-extra-headers
+	     (let ((extra nnmail-extra-headers)
+		   out)
+	       (while extra
+		 (goto-char p)
+		 (when (search-forward
+			(concat "\n" (symbol-name (car extra)) ": ") nil t)
+		   (push (cons (car extra) (nnheader-header-value))
+			 out))
+		 (pop extra))
+	       out))))
       (when naked
 	(goto-char (point-min))
 	(delete-char 1)))))
@@ -270,13 +292,11 @@ on your system, you could say something like:
 
 (defmacro nnheader-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read (current-buffer)))))
 	   (if (numberp num) num 0)))
      (or (eobp) (forward-char 1))))
-
-;; (defvar nnheader-none-counter 0)
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -290,7 +310,7 @@ on your system, you could say something like:
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
-     (if (= (following-char) ?\n)
+     (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
      )))
@@ -310,8 +330,14 @@ on your system, you could say something like:
   (insert "\t")
   (princ (or (mail-header-lines header) 0) (current-buffer))
   (insert "\t")
-  (when (mail-header-xref header)
+  (when (or (mail-header-xref header)
+	    (mail-header-extra header))
     (insert "Xref: " (mail-header-xref header) "\t"))
+  (when (mail-header-extra header)
+    (let ((extra (mail-header-extra header)))
+      (while extra
+	(insert (symbol-name (caar extra))
+		": " (cdar extra) "\t"))))
   (insert "\n"))
 
 (defun nnheader-insert-article-line (article)
@@ -446,7 +472,7 @@ the line could be found."
       nil
     (narrow-to-region (point-min) (1- (point)))
     (goto-char (point-min))
-    (while (looking-at "[A-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
+    (while (looking-at "[a-zA-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
       (goto-char (match-end 0)))
     (prog1
 	(eobp)
@@ -715,7 +741,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'raw-text
+(defvar nnheader-file-coding-system 'no-conversion
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)

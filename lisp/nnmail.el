@@ -241,6 +241,13 @@ to be moved to."
   :group 'nnmail-retrieve
   :type 'string)
 
+(defcustom nnmail-movemail-args nil
+  "*Extra arguments to give to `nnmail-movemail-program'  to move mail from the inbox.
+The default is nil"
+  :group 'nnmail-files
+  :group 'nnmail-retrieve
+  :type 'string)
+
 (defcustom nnmail-pop-password-required nil
   "*Non-nil if a password is required when reading mail using POP."
   :group 'nnmail-retrieve
@@ -442,6 +449,11 @@ parameter.  It should return nil, `warn' or `delete'."
 		 (const warn)
 		 (const delete)))
 
+(defcustom nnmail-extra-headers nil
+  "*Extra headers to parse."
+  :group 'nnmail
+  :type '(repeat symbol))
+
 ;;; Internal variables.
 
 (defvar nnmail-split-history nil
@@ -597,7 +609,9 @@ parameter.  It should return nil, `warn' or `delete'."
 			      nnmail-movemail-program exec-directory)
 			     nil errors nil inbox tofile)
 			    (when nnmail-internal-password
-			      (list nnmail-internal-password)))))))
+			      (list nnmail-internal-password))
+			    (when nnmail-movemail-args
+			      nnmail-movemail-args))))))
 		(push inbox nnmail-moved-inboxes)
 		(if (and (not (buffer-modified-p errors))
 			 (zerop result))
@@ -794,7 +808,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -823,7 +837,7 @@ is a spool.  If not using procmail, return GROUP."
 	  (when (and (or (bobp)
 			 (save-excursion
 			   (forward-line -1)
-			   (= (following-char) ?\n)))
+			   (eq (char-after) ?\n)))
 		     (save-excursion
 		       (forward-line 1)
 		       (while (looking-at ">From \\|From ")
@@ -1693,11 +1707,11 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(goto-char (point-min))
 	(while (re-search-forward "[^ \t=]+" nil t)
 	  (setq name (match-string 0))
-	  (if (not (= (following-char) ?=))
+	  (if (not (eq (char-after) ?=))
 	      ;; Implied "yes".
 	      (setq value "yes")
 	    (forward-char 1)
-	    (if (not (= (following-char) ?\"))
+	    (if (not (eq (char-after) ?\"))
 		(if (not (looking-at "[^ \t]"))
 		    ;; Implied "no".
 		    (setq value "no")

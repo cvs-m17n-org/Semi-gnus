@@ -32,11 +32,11 @@
   (save-excursion
     (goto-char from)
     (while (search-forward "=" to t)
-      (cond ((eq (following-char) ?\n)
+      (cond ((eq (char-after) ?\n)
 	     (delete-char -1)
 	     (delete-char 1))
 	    ((and
-	      (memq (following-char) quoted-printable-encoding-characters)
+	      (memq (char-after) quoted-printable-encoding-characters)
 	      (memq (char-after (1+ (point)))
 		    quoted-printable-encoding-characters))
 	     (subst-char-in-region
@@ -64,13 +64,14 @@ matched by that regexp."
   (save-excursion
     (save-restriction
       (narrow-to-region from to)
+      (mm-encode-body)
       (goto-char (point-min))
       (while (and (skip-chars-forward
 		   (or class "^\000-\007\013\015-\037\200-\377="))
 		  (not (eobp)))
 	(insert
 	 (prog1
-	     (upcase (format "=%x" (char-after (point))))
+	     (upcase (format "=%x" (char-after)))
 	   (delete-char 1))))
       (when fold
 	;; Fold long lines.
@@ -85,7 +86,7 @@ matched by that regexp."
 
 (defun quoted-printable-encode-string (string)
  "QP-encode STRING and return the results."
- (with-temp-buffer
+ (mm-with-unibyte-buffer
    (insert string)
    (quoted-printable-encode-region (point-min) (point-max))
    (buffer-string)))

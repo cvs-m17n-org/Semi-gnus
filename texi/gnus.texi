@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Pterodactyl Gnus 0.34 Manual
+@settitle Pterodactyl Gnus 0.39 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Pterodactyl Gnus 0.34 Manual
+@title Pterodactyl Gnus 0.39 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -354,7 +354,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Pterodactyl Gnus 0.34.
+This manual corresponds to Pterodactyl Gnus 0.39.
 
 @end ifinfo
 
@@ -822,6 +822,10 @@ If you don't have access to both the old and new server, all your marks
 and read ranges have become worthless.  You can use the @kbd{M-x
 gnus-group-clear-data-on-native-groups} command to clear out all data
 that you have on your native groups.  Use with caution.
+
+After changing servers, you @strong{must} move the cache hierarchy away,
+since the cached articles will have wrong article numbers, which will
+affect which articles Gnus thinks are read.
 
 
 @node Startup Files
@@ -3249,6 +3253,7 @@ You can have as many summary buffers open as you wish.
 
 @menu
 * Summary Buffer Lines::     You can specify how summary lines should look.
+* To From Newsgroups::       How to not display your own name.
 * Summary Buffer Mode Line:: You can say how the mode line should look.
 * Summary Highlighting::     Making the summary buffer all pretty and nice.
 @end menu
@@ -3302,6 +3307,9 @@ had a different subject, @code{gnus-summary-same-subject} otherwise.
 Full @code{From} header.
 @item n
 The name (from the @code{From} header).
+@item f
+The name, code @code{To} header or the @code{Newsgroups} header
+(@pxref{To From Newsgroups}).
 @item a
 The name (from the @code{From} header).  This differs from the @code{n}
 spec in that it uses the function designated by the
@@ -3389,6 +3397,69 @@ The smart choice is to have these specs as far to the left as possible.
 (Isn't that the case with everything, though?  But I digress.)
 
 This restriction may disappear in later versions of Gnus.
+
+
+@node To From Newsgroups
+@subsection To From Newsgroups
+@cindex To
+@cindex Newsgroups
+
+In some groups (particularly in archive groups), the @code{From} header
+isn't very interesting, since all the articles there are written by
+you.  To display the information in the @code{To} or @code{Newsgroups}
+headers instead, you need to decide three things: What information to
+gather; where to display it; and when to display it.
+
+@enumerate
+@item
+@vindex gnus-extra-headers
+The reading of extra header information is controlled by the
+@code{gnus-extra-headers}.  This is a list of header symbols.  For
+instance:
+
+@lisp
+(setq gnus-extra-headers
+      '(To Newsgroups X-Newsreader))
+@end lisp
+
+This will result in Gnus trying to obtain these three headers, and
+storing it in header structures for later easy retrieval.
+
+@item
+@findex gnus-extra-header
+The value of these extra headers can be accessed via the
+@code{gnus-extra-header} function.  Here's a format line spec that will
+access the @code{X-Newsreader} header:
+
+@example
+"%~(form (gnus-extra-header 'X-Newsreader))@@"
+@end example
+
+@item
+@vindex gnus-ignored-from-addresses
+The @code{gnus-ignored-from-addresses} variable says when the @samp{%f}
+summary line spec returns the @code{To}, @code{Newsreader} or
+@code{From} header.  If this regexp matches the contents of the
+@code{From} header, the value of the @code{To} or @code{Newsreader}
+headers are used instead.
+
+@end enumerate
+
+@vindex nnmail-extra-headers
+A related variable is @code{nnmail-extra-headers}, which controls when
+to include extra headers when generating active files.
+
+In summary, you'd typically do something like the following:
+
+@lisp
+(setq gnus-extra-headers
+      '(To Newsgroups))
+(setq nnmail-extra-headers gnus-extra-headers)
+(setq gnus-summary-line-format
+      "%U%R%z%I%(%[%4L: %-20,20f%]%) %s\n")
+(setq gnus-ignored-from-addresses
+      "Your Name Here")
+@end lisp
 
 
 @node Summary Buffer Mode Line
@@ -6477,7 +6548,13 @@ Treat overstrike (@code{gnus-article-treat-overstrike}).
 @item W d
 @kindex W d (Summary)
 @findex gnus-article-treat-dumbquotes
-Treat M******** sm*rtq**t*s (@code{gnus-article-treat-dumbquotes}).
+@vindex gnus-article-dumbquotes-map
+@cindex Smartquotes
+@cindex M******** sm*rtq**t*s
+@cindex Latin 1
+Treat M******** sm*rtq**t*s according to
+@code{gnus-article-dumbquotes-map}
+(@code{gnus-article-treat-dumbquotes}).
 
 @item W w
 @kindex W w (Summary)
@@ -6830,6 +6907,17 @@ the required charset (@pxref{Group Parameters}).
 @kindex W M v (Summary)
 View all the @sc{mime} parts in the current article
 (@code{gnus-mime-view-all-parts}). 
+
+@end table
+
+Relevant variables:
+
+@table @code
+@item gnus-ignored-mime-types
+@vindex gnus-ignored-mime-types
+This is a list of regexps.  @sc{mime} types that match a regexp from
+this list will be completely ignored by Gnus.  The default value is
+@code{("text/x-vcard")}.
 
 @end table
 
@@ -14572,6 +14660,11 @@ won't change the window configuration.  If you always want to force the
 ``right'' window configuration, you can set
 @code{gnus-always-force-window-configuration} to non-@code{nil}.
 
+If you're using tree displays (@pxref{Tree Display}), and the tree
+window is displayed vertically next to another window, you may also want
+to fiddle with @code{gnus-tree-minimize-window} to avoid having the
+windows resized.
+
 
 @node Faces and Fonts
 @section Faces and Fonts
@@ -16062,6 +16155,10 @@ Luis Fernandes---design and graphics.
 Erik Naggum---help, ideas, support, code and stuff.
 
 @item
+Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el and many other things
+connected with @sc{mime} and other types of en/decoding.
+
+@item
 Wes Hardaker---@file{gnus-picon.el} and the manual section on
 @dfn{picons} (@pxref{Picons}).
 
@@ -16296,10 +16393,9 @@ Stefan Waldherr,
 Pete Ware,
 Barry A. Warsaw,
 Christoph Wedler,
-Joe Wells,
-Katsumi Yamaoka, @c Yamaoka
+Joe Wells
 and
-Shenghuo Zhu. @c Zhu
+Katsumi Yamaoka, @c Yamaoka.
 
 For a full overview of what each person has done, the ChangeLogs
 included in the Gnus alpha distributions should give ample reading
@@ -17576,7 +17672,7 @@ mail-copies-to: never.
  new group parameter -- `post-to-server' that says to post
 using the current server.  Also a variable to do the same.
 @item
- the slave dribble files should autosave to the slave file names.
+ the slave dribble files should auto-save to the slave file names.
 @item
  a group parameter that says what articles to display on group entry, based
 on article marks.
@@ -18050,7 +18146,7 @@ home-brewed stuff for better reliability.
  add a way to select which NoCeM type to apply -- spam, troll, etc.
 
 @item
- nndraft-request-group should tally autosave files.
+ nndraft-request-group should tally auto-save files.
 
 @item
  implement nntp-retry-on-break and nntp-command-timeout.
@@ -18189,15 +18285,14 @@ exits the group.
 The jingle is only played on the second invocation of Gnus.
 
 @item
-gnus-ignored-mime-types to avoid seeing buttons for Vcards and the
-like.
-
-@item
 Bouncing articles should do MIME.
 
 @item
 Crossposted articles should "inherit" the % or @ mark from the other
 groups it has been crossposted to, or something.  (Agent.)
+
+@item
+`S D r' should allow expansion of aliases.
 
 @item
 Solve the halting problem.
@@ -18805,7 +18900,7 @@ Takes two parameters, @var{function} and @var{group}.  If the backend
 
 @lisp
 (gnus-check-backend-function "request-scan" "nnml:misc")
-=> t
+@result{} t
 @end lisp
 
 @item gnus-read-method
@@ -19146,6 +19241,48 @@ and @var{article} may be @code{nil}.
 
 There should be no result data from this function.
 
+
+@item (nnchoke-request-set-mark GROUP ACTION &optional SERVER)
+
+Set/remove/add marks on articles. Normally Gnus handles the article
+marks (such as read, ticked, expired etc) internally, and store them in
+@code{~/.newsrc.eld}. Some backends (such as IMAP) however carry all
+information about the articles on the server, so Gnus need to propagate
+the mark information to the server.
+
+ACTION is a list of mark setting requests, having this format:
+
+@example
+(RANGE ACTION MARK)
+@end example
+
+Range is a range of articles you wish to update marks on. Action is
+@code{set}, @code{add} or @code{del}, respectively used for removing all
+existing marks and setting them as specified, adding (preserving the
+marks not mentioned) mark and removing (preserving the marks not
+mentioned) marks. Mark is a list of marks; where each mark is a
+symbol. Currently used marks are @code{read}, @code{tick}, @code{reply},
+@code{expire}, @code{killed}, @code{dormant}, @code{save},
+@code{download} and @code{unsend}, but your backend should, if possible,
+not limit itself to theese.
+
+Given contradictory actions, the last action in the list should be the
+effective one. That is, if your action contains a request to add the
+@code{tick} mark on article 1 and, later in the list, a request to
+remove the mark on the same article, the mark should in fact be removed.
+
+An example action list:
+
+@example
+(((5 12 30) 'del '(tick))
+ ((10 . 90) 'add '(read expire))
+ ((92 94) 'del '(read)))
+@end example
+
+The function should return a range of articles it wasn't able to set the
+mark on (currently not used for anything).
+
+There should be no result data from this function.
 
 @item (nnchoke-request-update-mark GROUP ARTICLE MARK)
 
@@ -19673,12 +19810,12 @@ basically, with each header (ouch) having one slot.
 
 These slots are, in order: @code{number}, @code{subject}, @code{from},
 @code{date}, @code{id}, @code{references}, @code{chars}, @code{lines},
-@code{xref}.  There are macros for accessing and setting these
-slots---they all have predictable names beginning with
+@code{xref}, and @code{extra}.  There are macros for accessing and
+setting these slots---they all have predictable names beginning with
 @code{mail-header-} and @code{mail-header-set-}, respectively.
 
-The @code{xref} slot is really a @code{misc} slot.  Any extra info will
-be put in there.
+All these slots contain strings, except the @code{extra} slot, which
+contains an alist of header/value pairs (@pxref{To From Newsgroups}).
 
 
 @node Ranges
@@ -19772,7 +19909,7 @@ Here are two example group infos; one is a very simple group while the
 second is a more complex one:
 
 @example
-("no.group" 5 (1 . 54324))
+("no.group" 5 ((1 . 54324)))
 
 ("nnml:my.mail" 3 ((1 . 5) 9 (20 . 55))
                 ((tick (15 . 19)) (replied 3 6 (19 . 3)))

@@ -395,7 +395,7 @@ header line with the old Message-ID."
 	  ;; Delete the headers from the displayed articles.
 	  (set-buffer gnus-article-copy)
 	  (delete-region (goto-char (point-min))
-			 (or (search-forward "\n\n" nil t) (point)))
+			 (or (search-forward "\n\n" nil t) (point-max)))
 	  ;; Insert the original article headers.
 	  (insert-buffer-substring gnus-original-article-buffer beg end)
 	  (article-decode-encoded-words)))
@@ -620,6 +620,7 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 	(set-buffer gnus-original-article-buffer)
 	(setq text (buffer-string)))
       (set-buffer (gnus-get-buffer-create " *Gnus forward*"))
+      (erase-buffer)
       (insert text)
       (run-hooks 'gnus-article-decode-hook)
       (let ((message-included-forward-headers

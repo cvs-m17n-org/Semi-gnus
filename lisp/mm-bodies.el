@@ -26,7 +26,8 @@
 
 (eval-and-compile
   (or (fboundp  'base64-decode-region)
-      (autoload 'base64-decode-region "base64" nil t)))
+      (require 'base64)))
+
 (require 'mm-util)
 (require 'rfc2047)
 (require 'qp)
@@ -61,7 +62,7 @@ If no encoding was done, nil is returned."
 		    (not (mm-coding-system-equal
 			  mime-charset buffer-file-coding-system)))
 	    (while (not (eobp))
-	      (if (eq (char-charset (following-char)) 'ascii)
+	      (if (eq (char-charset (char-after)) 'ascii)
 		  (when start
 		    (save-restriction
 		      (narrow-to-region start (point))
@@ -113,12 +114,17 @@ If no encoding was done, nil is returned."
     )
    ((eq encoding 'x-uuencode)
     (condition-case ()
-	(uu-decode-region (point-min) (point-max))
+	(uudecode-decode-region (point-min) (point-max))
+      (error nil)))
+   ((functionp encoding)
+    (condition-case ()
+	(funcall encoding (point-min) (point-max))
       (error nil)))
    (t
-    (error "Can't decode encoding %s" encoding))))
+    (message "Unknown encoding %s; defaulting to 8bit" encoding)
+    )))
 
-(defun mm-decode-body (charset encoding)
+(defun mm-decode-body (charset &optional encoding)
   "Decode the current article that has been encoded with ENCODING.
 The characters in CHARSET should then be decoded."
   (setq charset (or charset rfc2047-default-charset))
@@ -130,6 +136,7 @@ The characters in CHARSET should then be decoded."
 	(when (and charset
 		   (setq mule-charset (mm-charset-to-coding-system charset))
 		   buffer-file-coding-system
+		   enable-multibyte-characters
 		   (or (not (eq mule-charset 'ascii))
 		       (setq mule-charset rfc2047-default-charset)))
 	  (mm-decode-coding-region (point-min) (point-max) mule-charset))))))
