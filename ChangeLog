@@ -1,5 +1,11 @@
 2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* Makefile.in (EXAMINE_PACKAGEDIR): Use configure-package-path.
+
+	* aclocal.m4 (AC_EXAMINE_PACKAGEDIR): Ditto.
+
+2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* Makefile.in (install): Run install-etc.
 	(install-ja): Ditto.
 	(install-package): Run install-package-etc.
