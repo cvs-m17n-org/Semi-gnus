@@ -1,3 +1,24 @@
+1999-03-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-munge-message-separator): If a retrieved
+	message has a illegal date field, use `(current-time)' instead.
+
+1999-03-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-send): Kill `message-encoding-buffer'
+	after sending.
+
+1999-03-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-maybe-encode): Inherit the buffer local
+	variable `mime-edit-pgp-processing' and call
+	`mime-edit-pgp-enclose-buffer'.
+
+1999-02-26 20:35:57  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* pop3.el (pop3-movemail): Use write-region instead of
+	append-to-file to avoid excessive messaging.
+
 1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up the
