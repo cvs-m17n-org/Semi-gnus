@@ -247,8 +247,7 @@ MAX-COLUMN the optional second argument if it is specified, the return value
 	   (,group gnus-newsgroup-name)
 	   (message-header-setup-hook
 	    (copy-sequence message-header-setup-hook))
-	   (message-mode-hook (copy-sequence message-mode-hook))
-	   (gnus-message-get-reply-buffer 'gnus-copy-article-buffer))
+	   (message-mode-hook (copy-sequence message-mode-hook)))
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-gcc)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-archive-gcc)
        (add-hook 'message-mode-hook 'gnus-configure-posting-styles)
