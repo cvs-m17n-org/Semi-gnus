@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 1.10
+;; Version: 1.11
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -90,7 +90,7 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "1.10")
+(defconst pop3-fma-version-number "1.11")
 (defconst pop3-fma-codename
 ;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
@@ -99,8 +99,8 @@
 ;;  "Money"			; 0.20
 ;;  "Still 19"       		; 0.21
 ;;  "J boy"          		; 1.00
-  "Blood line"			; 1.10
-;;  "Star ring"			; 0.xx
+;;  "Blood line"		; 1.10
+  "Star ring"			; 0.xx
 ;;  "Goodbye Game"		; 0.xx
   )
 (defconst pop3-fma-version (format "Multiple POP3 account utiliy for Gnus v%s - \"%s\""
@@ -151,6 +151,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar str nil)
 (defvar pop3-fma-movemail-options pop3-fma-movemail-arguments)
 (defvar spool nil)
+(defvar movemail-output-buffer " *movemail-out*")
 
 (defun pop3-fma-init-message-hook ()
   (add-hook 'message-send-hook 'pop3-fma-message-add-header))
@@ -197,11 +198,24 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 				     (concat "po:" pop3-maildrop)
 				     crashbox
 				     pop3-password)))))
+		(if (not (get-buffer movemail-output-buffer))
+		    (get-buffer-create movemail-output-buffer))
+		(set-buffer movemail-output-buffer)
+		(erase-buffer)
 		(apply 'call-process (concat
 				      exec-directory
 				      pop3-fma-movemail-program)
-		       nil nil nil
-		       pop3-fma-movemail-arguments))
+		       nil movemail-output-buffer nil
+		       pop3-fma-movemail-arguments)
+		(let ((string (buffer-string)))
+		  (if (> (length string) 0)
+		      (progn
+			(if (y-or-n-p
+			     (concat (substring string 0
+						(- (length string) 1))
+						" continue ??"))
+			    nil
+			  nil)))))
 	    (pop3-movemail crashbox))))
     (message "Checking new mail at %s ... " inbox)
     (call-process (concat exec-directory pop3-fma-movemail-program)
@@ -323,9 +337,10 @@ Argument PROMPT ."
 ;;
 (defun pop3-fma-get-movemail-type (inbox)
   (if (eq (nth 1 (assoc inbox pop3-fma-spool-file-alist)) 'apop)
-      lisp
+      'lisp
     pop3-fma-movemail-type))
 ;;
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
+

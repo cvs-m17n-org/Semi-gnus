@@ -1,3 +1,7 @@
+1998-09-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Add error handle and fix typo.
+	
 1998-08-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el: Repair `multi frame control'.
