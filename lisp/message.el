@@ -4027,6 +4027,9 @@ This sub function is for exclusive use of `message-send-mail'."
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
 	    (message-cleanup-headers)
+	    ;; FIXME: we're inserting the courtesy copy after encoding.
+	    ;; This is wrong if the courtesy copy string contains
+	    ;; non-ASCII characters. -- jh
 	    (when
 		(save-restriction
 		  (message-narrow-to-headers)
@@ -4034,10 +4037,16 @@ This sub function is for exclusive use of `message-send-mail'."
 		       (or (message-fetch-field "cc")
 			   (message-fetch-field "bcc")
 			   (message-fetch-field "to"))
-		       (let ((ct (mime-read-Content-Type)))
-			 (or (not ct)
-			     (and (eq 'text (cdr (assq 'type ct)))
-				  (eq 'plain (cdr (assq 'subtype ct))))))))
+		       (let ((content-type (mime-read-Content-Type)))
+			 (and
+			  (or
+			   (not content-type)
+			   (and
+			    (eq 'text (cdr (assq 'type content-type)))
+			    (eq 'plain (cdr (assq 'subtype content-type)))))
+			  (not
+			   (string= "base64"
+				    (mime-read-Content-Transfer-Encoding)))))))
 	      (message-insert-courtesy-copy))
 	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
