@@ -1022,6 +1022,15 @@ ARG is passed to the first function."
 	 hashtb))))
   )
 
+(defun-maybe copy-list (list)
+  "Return a copy of a list, which may be a dotted list.
+The elements of the list are not copied, just the list structure itself."
+  (if (consp list)
+      (let ((res nil))
+	(while (consp list) (push (pop list) res))
+	(prog1 (nreverse res) (setcdr res list)))
+    (car list)))
+
 (provide 'gnus-util)
 
 ;;; gnus-util.el ends here
