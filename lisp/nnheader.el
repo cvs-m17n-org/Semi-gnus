@@ -1223,7 +1223,14 @@ find-file-hooks, etc.
 
   (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
 
-  (defalias 'mail-narrow-to-head 'std11-narrow-to-header)
+  (defun mail-narrow-to-head ()
+    "Narrow to the header section in the current buffer."
+    (narrow-to-region
+     (goto-char (point-min))
+     (if (re-search-forward "^\r?$" nil 1)
+	 (match-beginning 0)
+       (point-max)))
+    (goto-char (point-min)))
 
   (defun-maybe std11-fold-field ()
     "Fold the current line."
