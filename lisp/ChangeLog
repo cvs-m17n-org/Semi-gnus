@@ -1,3 +1,33 @@
+2001-07-09 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text): w3-coding-system-for-mime-charset
+	may not defined. From: Raja R Harinath <harinath@cs.umn.edu>.
+
+	* message.el (message-send-mail-real-function): New variable.
+	(message-send-mail-partially, message-send-mail): 
+
+	* nngateway.el (nngateway-request-post): Use it.
+
+	* gnus-agent.el (gnus-agentize): Use it. 
+
+	* nnsoup.el (nnsoup-old-functions, nnsoup-set-variables) 
+	(nnsoup-revert-variables): Use it.
+
+2001-07-09  Colin Walters  <walters@cis.ohio-state.edu>
+
+	* mm-decode.el (mm-inline-media-tests): Default to displaying as
+	text/plain if the type doesn't match any other media types.
+	(mm-inlined-types): Doc fix.
+	(mm-display-inline): Revert previous change (now handled by a
+	default type in `mm-inline-media-tests'.
+	(mm-inlinable-p): Revive.
+	(mm-display-part): Call `mm-inlinable-p'.
+	(mm-attachment-override-p): Ditto.
+	(mm-inlined-p): Doc fix.
+	
+	* gnus-art.el (gnus-mime-display-single): Call `mm-inlinable-p' as
+	well as `mm-inlined-p'.
+
 2001-07-09 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* nntp.el (nntp-send-command, nntp-send-command-nodelete):

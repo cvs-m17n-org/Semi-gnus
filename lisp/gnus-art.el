@@ -4247,7 +4247,9 @@ If no internal viewer is available, use an external viewer."
 				       "inline")
 				(mm-attachment-override-p handle))))
 		 (mm-automatic-display-p handle)
-		 (or (mm-inlined-p handle)
+		 (or (and
+		      (mm-inlinable-p handle)
+		      (mm-inlined-p handle))
 		     (mm-automatic-external-display-p type)))
 	    (setq display t)
 	  (when (equal (mm-handle-media-supertype handle) "text")

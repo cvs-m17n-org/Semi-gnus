@@ -1470,6 +1470,9 @@ no, only reply back to the author."
 (defvar	message-options nil
   "Some saved answers when sending message.")
 
+(defvar message-send-mail-real-function nil
+  "Internal send mail function.")
+
 (eval-and-compile
   (autoload 'message-setup-toolbar "messagexmas")
   (autoload 'mh-new-draft-name "mh-comp")
@@ -3077,13 +3080,15 @@ This sub function is for exclusive use of `message-send-mail'."
 		     (delete-region (match-end 0) (std11-field-end))
 		     (insert " " (message-make-message-id))))
 		 (condition-case err
-		     (funcall message-send-mail-function)
+		     (funcall (or message-send-mail-real-function
+				  message-send-mail-function))
 		   (error
 		    (throw 'message-sending-mail-failure err))))))
 	     nil)
 	   (condition-case err
 	       (progn
-		 (funcall message-send-mail-function)
+		 (funcall (or message-send-mail-real-function
+			      message-send-mail-function))
 		 nil)
 	     (error err))))
     (when failure
@@ -3157,7 +3162,8 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (insert "\n")
 	      (widen)
 	      (mm-with-unibyte-current-buffer
-		(funcall message-send-mail-function)))
+		(funcall (or message-send-mail-real-function
+                             message-send-mail-function))))
 	    (setq n (+ n 1))
 	    (setq p (pop plist))
 	    (erase-buffer)))
