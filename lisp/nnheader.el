@@ -109,7 +109,7 @@ on your system, you could say something like:
 
 ;;(defmacro mail-header-set-extra (entity extra)
 ;;  "Set the extra headers in ENTITY to EXTRA."
-;;  `(aset ,entity 23 ',extra))
+;;  `(aset ,entity 23 ,extra))
 (defalias 'mail-header-set-extra 'ignore)
 
 (defsubst make-full-mail-header
@@ -737,7 +737,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'no-conversion
+(defvar nnheader-file-coding-system 'raw-text
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)
