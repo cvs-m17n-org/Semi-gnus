@@ -1,4 +1,4 @@
-1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+1999-02-23  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
