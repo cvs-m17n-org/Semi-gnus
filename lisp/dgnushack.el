@@ -169,31 +169,36 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 ;; Don't load path-util until `char-after' and `char-before' have been
 ;; optimized because it requires `poe' and then modify the functions.
 
-;; If the APEL modules are installed under the directory
-;; "/usr/local/share/mule/site-lisp/apel/", the parent directory
-;; "/usr/local/share/mule/site-lisp/" should be included in the
-;; standard `load-path' or added by the configure option
-;; "--with-addpath=".  And also the directory where the EMU modules
-;; are installed (e.g. "/usr/local/share/mule/19.34/site-lisp/")
-;; should be included in the standard `load-path' or added by the
-;; configure option "--with-addpath=".
-(condition-case nil
-    (require 'path-util)
-  (error
-   (let ((path (locate-library "apel/path-util")))
-     (if path
-	 (progn
-	   (when (string-match "/$" (setq path (file-name-directory path)))
-	     (setq path (substring path 0 (match-beginning 0))))
-	   (unless (or (member path load-path)
-		       (member (file-name-as-directory path) load-path))
-	     (push path load-path))
-	   (require 'path-util))
-       (error "
-APEL modules does not found in %s.
+;; If the APEL modules are installed under the non-standard directory,
+;; for example "/var/home/john/lisp/apel-VERSION/", you should add that
+;; name using the configure option "--with-addpath=".
+;; And also the directory where the EMU modules are installed, for
+;; example "/usr/local/share/mule/19.34/site-lisp/", it should be
+;; included in the standard `load-path' or added by the configure
+;; option "--with-addpath=".
+(let ((path (or (locate-library "path-util")
+		(locate-library "apel/path-util"))));; backward compat.
+  (if path
+      (progn
+	(when (string-match "/$" (setq path (file-name-directory path)))
+	  (setq path (substring path 0 (match-beginning 0))))
+	;; path == "/var/home/john/lisp/apel-VERSION"
+	(unless (or (member path load-path)
+		    (member (file-name-as-directory path) load-path))
+	  (push path load-path))
+	(when (string-match "/$" (setq path (file-name-directory path)))
+	  (setq path (substring path 0 (match-beginning 0))))
+	;; path == "/var/home/john/lisp"
+	(unless (or (member path load-path)
+		    (member (file-name-as-directory path) load-path))
+	  (push path (cdr load-path)))
+	(require 'path-util))
+    (error "
+APEL modules are not found in %s.
 Try to re-configure with --with-addpath=APEL_PATH and run make again.
 "
-	      load-path)))))
+	   load-path)))
+
 (unless (locate-library "mel")
   (add-path "flim"))
 (unless (module-installed-p 'mel)

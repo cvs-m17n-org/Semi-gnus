@@ -1,3 +1,9 @@
+2001-07-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Add the parent directory of the directory
+	where the APEL modules are installed to `load-path' according to
+	the description of the file Mule23@1934.
+
 2001-07-04  Yair Friedman  <yairfr@Amdocs.com>
 
 	* make.bat: Use infohack.el to create info files.
