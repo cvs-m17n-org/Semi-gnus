@@ -9322,8 +9322,9 @@ Gnus $(B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<
 $(B$O!"(B@code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $(B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $(B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
-$(B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7B0@-L>$,(B @code{eval} $(B$@$C$?$i(B
-$(B$=$NMM<0$,I>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B
+$(B$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7B0@-L>$,(B @code{nil} $(B$@$C$?$i$=(B
+$(B$N%X%C%@!<L>$O:o=|$5$l$^$9!#$b$7B0@-L>$,(B @code{eval} $(B$@$C$?$i$=$NMM<0$,(B
+$(BI>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B
 
 $(BB0@-CM$OJ8;zNs(B ($(B$=$N$^$^;H$o$l$^$9(B)$(B!"0z?t$NL5$$4X?t(B ($(BJV$jCM$,;H$o$l$^$9(B)$(B!"(B
 $(BJQ?t(B ($(B$=$NCM$,;H$o$l$^$9(B) $(B$^$?$O%j%9%H(B ($(B$=$l$O(B @code{$(BI>2A(B} $(B$5$l$F!"JV$j(B
