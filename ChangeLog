@@ -1,3 +1,8 @@
+1998-11-17  Hiroaki Matsui  <matu@uxd.fc.nec.co.jp>
+
+	* lisp/message.el (message-clone-locals): Add
+	"user-mail-address" and "user-full-name" to macthing pattern.
+
 1998-11-14  Kenji Itoh  <keit@tpj.co.jp>
 
 	* lisp/nnmail.el (nnmail-read-passwd): Use `read-passwd' if it
