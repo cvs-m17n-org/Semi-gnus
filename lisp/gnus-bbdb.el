@@ -1,4 +1,4 @@
-;; gnus-bbdb.el --- Interface to Nana-gnus version 6.10.2.
+;; gnus-bbdb.el --- Interface to Semi-gnus
 
 ;; Copyright (c) 1991,1992,1993 Jamie Zawinski <jwz@netscape.com>.
 ;; Copyright (C) 1995,1996,1997 Shuhei KOBAYASHI
@@ -9,7 +9,7 @@
 ;; Author: Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;; Keywords: BBDB, MIME, multimedia, multilingual, mail, news
 
-;; This file is part of Nana-gnus.
+;; This file is part of Semi-gnus.
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as

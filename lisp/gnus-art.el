@@ -2112,6 +2112,38 @@ commands:
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)))
 
+(defun gnus-article-make-full-mail-header (&optional number charset)
+  "Create a new mail header structure in a raw article buffer."
+  (unless (and number charset)
+    (save-current-buffer
+      (set-buffer gnus-summary-buffer)
+      (unless number
+	(setq number (or (cdr gnus-article-current) 0)))
+      (unless charset
+	(setq charset (or default-mime-charset 'x-ctext)))))
+  (goto-char (point-min))
+  (let ((header-end (if (search-forward "\n\n" nil t)
+			(1- (point))
+		      (goto-char (point-max))))
+	(chars (- (point-max) (point)))
+	(lines (count-lines (point) (point-max)))
+	(default-mime-charset charset)
+	xref)
+    (narrow-to-region (point-min) header-end)
+    (setq xref (std11-fetch-field "xref"))
+    (prog1
+	(make-full-mail-header
+	 number
+	 (std11-fetch-field "subject")
+	 (std11-fetch-field "from")
+	 (std11-fetch-field "date")
+	 (std11-fetch-field "message-id")
+	 (std11-fetch-field "references")
+	 chars
+	 lines
+	 (when xref (concat "Xref: " xref)))
+      (widen))))
+
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
 ARTICLE should either be an article number or a Message-ID.
@@ -3115,6 +3147,7 @@ groups."
 (defun gnus-article-mime-edit-article-setup ()
   "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
 after replacing with the original article."
+  (setq gnus-show-mime t)
   (setq gnus-article-edit-done-function
 	`(lambda (&rest args)
 	   (when mime-edit-mode-flag
@@ -3133,14 +3166,7 @@ after replacing with the original article."
 	   (set-buffer gnus-original-article-buffer)
 	   (erase-buffer)
 	   (insert-buffer gnus-article-buffer)
-	   (setq gnus-current-headers
-		 (mime-open-entity 'buffer (current-buffer)))
-	   (mime-entity-set-representation-type-internal
-	    gnus-current-headers 'gnus)
-	   (mail-header-set-number gnus-current-headers
-				   (save-excursion
-				     (set-buffer gnus-summary-buffer)
-				     gnus-current-article))
+	   (setq gnus-current-headers (gnus-article-make-full-mail-header))
 	   (gnus-article-prepare-display)))
   (substitute-key-definition
    'gnus-article-edit-exit 'gnus-article-mime-edit-exit
@@ -3177,12 +3203,7 @@ after replacing with the original article."
     (set-buffer (get-buffer-create gnus-original-article-buffer))
     (erase-buffer)
     (insert buf)
-    (setq gnus-current-headers (mime-open-entity 'buffer (current-buffer)))
-    (mime-entity-set-representation-type-internal gnus-current-headers 'gnus)
-    (mail-header-set-number gnus-current-headers
-			    (save-excursion
-			      (set-buffer gnus-summary-buffer)
-			      gnus-current-article))
+    (setq gnus-current-headers (gnus-article-make-full-mail-header))
     (gnus-article-prepare-display)
     (set-window-configuration winconf)))
 
