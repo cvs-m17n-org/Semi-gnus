@@ -988,13 +988,33 @@ If YANK is non-nil, include the original article."
   (interactive
    (list (completing-read "Buffer: " (mapcar 'list (message-buffers)) nil t)
 	 current-prefix-arg))
-  (gnus-summary-iterate n
-    (let ((gnus-display-mime-function nil)
-	  (gnus-inhibit-treatment t))
-      (gnus-summary-select-article))
-    (save-excursion
-      (set-buffer buffer)
-      (message-yank-buffer gnus-article-buffer))))
+  (when (gnus-buffer-live-p buffer)
+    (let ((summary-frame (selected-frame))
+	  (message-frame (when (static-if (featurep 'xemacs)
+				   (device-on-window-system-p)
+				 window-system)
+			   (let ((window (get-buffer-window buffer t)))
+			     (when window
+			       (window-frame window)))))
+	  (separator (concat "^" (regexp-quote mail-header-separator)
+			     "\n")))
+      (gnus-summary-iterate n
+	(gnus-summary-select-article)
+	(gnus-copy-article-buffer)
+	(when (frame-live-p message-frame)
+	  (raise-frame message-frame)
+	  (select-frame message-frame))
+	(with-current-buffer buffer
+	  (when (save-excursion
+		  (beginning-of-line)
+		  (let (case-fold-search)
+		    (and (not (re-search-backward separator nil t))
+			 (re-search-forward separator nil t))))
+	    (goto-char (match-end 0)))
+	  (message-yank-buffer gnus-article-copy))
+	(select-frame summary-frame))
+      (when (frame-live-p message-frame)
+	(select-frame message-frame)))))
 
 (defun gnus-debug ()
   "Attempts to go through the Gnus source file and report what variables have been changed.
