@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.18 1998-12-13 01:12:16 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.19 1998-12-14 04:41:24 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -99,7 +99,7 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.00")
+(defconst gnus-offline-version-number "2.00 pl01")
 (defconst gnus-offline-codename
 ;;  "Beta5"			; Beta
   "This is the time"		; 2.00
@@ -719,7 +719,9 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-define-menu-and-key ()
   "*Set key and menu."
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (gnus-offline-define-menu-on-miee)
+      (if (featurep 'xemacs)
+	  (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-miee)
+	(gnus-offline-define-menu-on-miee))
     (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-agent))
   (add-hook 'gnus-group-mode-hook
 	    '(lambda ()
@@ -743,7 +745,17 @@ If value is nil , dialup line is disconnected status.")
 		'(lambda ()
 		   (substitute-key-definition
 		    'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
-		    gnus-agent-summary-mode-map)))))
+		    gnus-agent-summary-mode-map))))
+  (if (featurep 'xemacs)
+      ;; Overwrite the toolbar spec for gnus-group-mode.
+      (add-hook 'gnus-startup-hook
+		(lambda ()
+		  (let ((i 0) (stat t) but)
+		    (while (and stat (setq but (nth i gnus-group-toolbar)))
+		      (and (equal 'gnus-group-get-new-news (aref but 1))
+			   (aset but 1 'gnus-offline-gnus-get-new-news)
+			   (setq stat nil))
+		      (setq i (1+ i))))))))
 ;;
 ;;
 (defun gnus-offline-define-menu-on-miee ()

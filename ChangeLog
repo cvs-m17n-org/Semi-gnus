@@ -1,3 +1,9 @@
+1998-12-14  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-and-key): Bug
+	fix.
+	Overwrite the toolbar spec for gnus-group-mode, under XEmacs.
+	
 1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Use
