@@ -1,3 +1,13 @@
+2000-11-04  Hermit  <hermit@koka-in.org>
+
+	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
+	command in `gnus-topic-mode-map' instead of `gnus-group-mode-map'.
+
+2000-10-25  Hermit  <hermit@tomato.saino.ne.jp>
+
+	* lisp/gnus-topic.el (gnus-topic-rename): Shrink the length of the
+	prompt string.
+
 2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/Makefile.in (install): Use the lisp function

@@ -1009,7 +1009,7 @@ articles in the topic and its subtopics."
     gnus-mouse-2 gnus-mouse-pick-topic)
 
   ;; Define a new submap.
-  (gnus-define-keys (gnus-group-topic-map "T" gnus-group-mode-map)
+  (gnus-define-keys (gnus-group-topic-map "T" gnus-topic-mode-map)
     "#" gnus-topic-mark-topic
     "\M-#" gnus-topic-unmark-topic
     "n" gnus-topic-create-topic
@@ -1426,7 +1426,7 @@ If RECURSIVE is t, unmark its subtopics too."
   (interactive
    (let ((topic (gnus-current-topic)))
      (list topic
-	   (read-string (format "Rename %s to: " topic)))))
+	   (read-string "Rename topic to: " topic))))
   ;; Check whether the new name exists.
   (when (gnus-topic-find-topology new-name)
     (error "Topic '%s' already exists" new-name))
