@@ -1479,10 +1479,11 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 		'nconc
 		(mapcar
 		 (lambda (file)
-		   (if (and (not (string-match "^po:" file))
-			    (file-directory-p file))
-		       (nnheader-directory-regular-files file)
-		     (list file)))
+		   (let ((file-name (if (listp file) (car file) file)))
+		     (if (and (not (string-match "^po:" file-name))
+			      (file-directory-p file-name))
+			 (nnheader-directory-regular-files file-name)
+		       (list file))))
 		 nnmail-spool-file))
 	       procmails))
 	     ((stringp nnmail-spool-file)
@@ -1905,11 +1906,11 @@ If ARGS, PROMPT is used as an argument to `format'."
 	 (pop3-password (or nnmail-internal-password
 			    pop3-password))
 	 (pop3-authentication-scheme
-	  (or (car (cdr (assq :auth-scheme options)))
+	  (or (car (cdr (memq :auth-scheme options)))
 	      pop3-authentication-scheme))
 	 (pop3-mailhost (or (nnmail-spool-mailhost inbox-info)
 			    pop3-mailhost))
-	 (pop3-port (or (car (cdr (assq :port options)))
+	 (pop3-port (or (car (cdr (memq :port options)))
 			pop3-port)))
     (pop3-movemail crashbox)))
 
