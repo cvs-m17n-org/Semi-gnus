@@ -3,4 +3,14 @@ AC_SET_MAKE
 AC_PROG_INSTALL
 AM_PATH_LISPDIR
 AC_PATH_PROG(MAKEINFO, makeinfo, no)
-AC_OUTPUT(Makefile lisp/Makefile texi/Makefile)
+
+ADDITIONAL_LOAD_PATH="NONE"
+AC_ARG_WITH(
+	addpath,
+	[  --with-addpath=PATH     search Emacs-Lisp libraries with PATH
+                          use colons to separate directory names],
+	ADDITIONAL_LOAD_PATH=$with_addpath,
+)
+AC_SUBST(ADDITIONAL_LOAD_PATH)
+
+AC_OUTPUT(Makefile lisp/Makefile lisp/paths.el texi/Makefile)
