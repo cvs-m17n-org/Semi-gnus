@@ -1,5 +1,15 @@
 1998-09-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-continuum-version): Use `char-int' instead of
+	`mm-char-int'.
+	* lisp/messagexmas.el (message-xmas-make-caesar-translation-table):
+	Ditto.
+
+	* lisp/gnus-art.el (gnus-article-setup-buffer): Don't use
+	`mm-enable-multibyte'.
+
+1998-09-07  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.011.
 
 	* Sync up with Pterodactyl Gnus 0.17.
