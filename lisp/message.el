@@ -697,6 +697,12 @@ an article is yanked by the command `message-yank-original' interactively."
 		(integer :tag "Position from last ID"))
   :group 'message-insertion)
 
+(defcustom message-yank-cited-prefix ">"
+  "*Prefix inserted on cited lines of yanked messages.
+Fix `message-cite-prefix-regexp' if it is set to an abnormal value."
+  :type 'string
+  :group 'message-insertion)
+
 (defcustom message-indentation-spaces 3
   "*Number of spaces to insert at the beginning of each cited line.
 Used by `message-yank-original' via `message-yank-cite'."
@@ -2490,7 +2496,9 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
       (save-excursion
 	(goto-char start)
 	(while (< (point) (mark t))
-	  (insert message-yank-prefix)
+	  (if (looking-at message-cite-prefix-regexp)
+	      (insert message-yank-cited-prefix)
+	    (insert message-yank-prefix))
 	  (forward-line 1))))
     (goto-char start)))
 

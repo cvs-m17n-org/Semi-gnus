@@ -490,8 +490,18 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 @cindex quoting
 あなたが記事に返答かフォローアップをしているときは、普通はあなたが応答し
 ている人のものに引用符を付けたいでしょう。引用文の挿入は @dfn{貼り付け}
-によってなされ、それぞれの貼り付けられた引用行はその前
-に @code{message-yank-prefix} を付けられます。初期値は @samp{> } です。
+によってなされ (すでに引用符が付いているものは対象外、
+@code{message-yank-cited-prefix} を参照のこと)、それぞれの貼り付けられた
+引用行はその前に @code{message-yank-prefix} を付けられます。初期値
+は @samp{> } です。
+
+@item message-yank-cited-prefix
+@vindex message-yank-cited-prefix
+@cindex yanking
+@cindex cited
+@cindex quoting
+すでに引用された行には @code{message-yank-prefix} の代わりにこの変数の内
+容が引用符として使われます。初期値は @samp{>} です。
 
 @item message-yank-add-new-references
 @vindex message-yank-add-new-references
