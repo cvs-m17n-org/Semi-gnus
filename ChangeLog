@@ -1,4 +1,8 @@
-2000-03-02  MORIOKA Tomohiko  <tomo@m17n.org>
+2000-03-02  MORIOKA Tomohiko  <tomo@etl.go.jp>
+
+	* Chaos: Version 1.13.1 released.
+
+2000-03-01  MORIOKA Tomohiko  <tomo@m17n.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 1.13.1.
 
