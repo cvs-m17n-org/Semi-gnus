@@ -39,8 +39,8 @@
 ;; * Customization for all flavors of PGP is possible.
 ;; * The main operations (verify, decrypt, sign, encrypt, sign &
 ;;   encrypt) are implemented.
-;; * Gero Treuner's gpg-2comp script is supported, and data which is is
-;;   compatible with PGP 2.6.3 is generated.
+;; * Optionally, Gero Treuner's gpg-2comp script is supported, 
+;;   to generate data which is compatible with PGP 2.6.3.
 
 ;; Customizing external programs 
 ;; =============================
@@ -225,12 +225,12 @@ If you are running Emacs 20, this directory must have mode 0700."
 
 (defcustom gpg-command-default-alist 
   '((gpg . "gpg")
-    (gpg-2comp . "gpg-2comp"))
+    (gpg-2comp . "gpg"))
   "Default paths for some GnuPG-related programs.
 Modify this variable if you have to change the paths to the
-executables required by the GnuPG interface.  You can enter \"gpg\"
-for `gpg-2comp' if you don't have this script, but you'll lose PGP
-2.6.x compatibility."
+executables required by the GnuPG interface.  You can enter \"gpg-2comp\"
+for `gpg-2comp' if you have obtained this script, in order to gain
+PGP 2.6.x compatibility."
   :tag "GnuPG programs"
   :type 'gpg-command-alist
   :group 'gpg-options)

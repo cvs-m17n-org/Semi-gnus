@@ -4346,12 +4346,12 @@ One space for each thread level.
 @item <
 Twenty minus thread level spaces.
 @item U
-Unread.
+Unread. @xref{Read Articles}.
 
 @item R
 This misleadingly named specifier is the @dfn{secondary mark}.  This
 mark will say whether the article has been replied to, has been cached,
-or has been saved.
+or has been saved.  @xref{Other Marks}.
 
 @item i
 Score as a number (@pxref{Scoring}).
@@ -10802,21 +10802,6 @@ To use this correctly with GPG, you'll need the following lisp code in your
 
 The @code{gpg-temp-directory} need to point to a directory with permissions set
 to 700, for your own safety.
-
-If you want to benefit of PGP2.6 compatibility, you might create a script named
-@file{gpg-2comp} with these instructions:
-
-@example
-#!/bin/sh
-exec gpg --rfc1991 "$@@"
-@end example
-
-If you don't want to use such compatibility, you can add the following line to
-your @file{~/.emacs} or @file{~/.gnus}:
-
-@lisp
-(setq gpg-command-default-alist (quote ((gpg . "gpg") (gpg-2comp . "gpg"))))
-@end lisp
 
 To sign or encrypt your message you may choose to use the MML Security
 menu or @kbd{C-c C-m s p} to sign your message using PGP/MIME,

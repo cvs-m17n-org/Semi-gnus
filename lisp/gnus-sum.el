@@ -4679,11 +4679,12 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 
       (let ((marks (assq 'seen (gnus-info-marks info))))
 	;; The `seen' marks are treated specially.
-	(when (setq gnus-newsgroup-seen (cdr marks))
-	  (dolist (article gnus-newsgroup-articles)
-	    (unless (gnus-member-of-range
-		     article gnus-newsgroup-seen)
-	      (push article gnus-newsgroup-unseen)))))
+	(if (setq gnus-newsgroup-seen (cdr marks))
+	    (dolist (article gnus-newsgroup-articles)
+	      (unless (gnus-member-of-range article gnus-newsgroup-seen)
+		(setq gnus-newsgroup-unseen
+		      (append gnus-newsgroup-unseen (list article)))))
+	  (setq gnus-newsgroup-unseen gnus-newsgroup-articles)))
 
       ;; Removed marked articles that do not exist.
       (gnus-update-missing-marks
@@ -4977,7 +4978,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	(when (eq (cdr type) 'seen)
 	  (setq list
 		(if list
-		    (gnus-add-to-range list gnus-newsgroup-unseen)
+		    (gnus-range-add (gnus-uncompress-sequence list) 
+				    gnus-newsgroup-unseen)
 		  (gnus-compress-sequence gnus-newsgroup-articles))))
 
 	(when (eq (gnus-article-mark-to-type (cdr type)) 'list)
