@@ -2071,26 +2071,32 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 
 (defun gnus-product-read-variable-file-1 (file checking-methods coding
 					       &rest variables)
-  (let (gnus-product-file-version method file-ver)
-    (if (or (condition-case err
-		(let ((coding-system-for-read coding)
-		      (input-coding-system coding))
-		  (load (expand-file-name file gnus-product-directory) t t t)
-		  nil)
-	      (error (message "%s" err)))
-	    (and (assq 'emacs-version checking-methods)
-		 (not (string= emacs-version
-			       (cdr (assq 'emacs-version
-					  gnus-product-file-version)))))
-	    (and (setq method (assq 'product-version checking-methods))
-		 (or (not (setq file-ver
-				(cdr (assq 'product-version
-					   gnus-product-file-version))))
-		     (< (product-version-compare file-ver (cadr method)) 0))))
-	(while variables
-	  (set (car variables) nil)
-	  (gnus-product-variable-touch (car variables))
-	  (setq variables (cdr variables))))))
+  (let (error gnus-product-file-version method file-ver)
+    (when (or
+	   (condition-case err
+	       (let ((coding-system-for-read coding)
+		     (input-coding-system coding))
+		 (load (expand-file-name file gnus-product-directory) t nil t)
+		 nil)
+	     (error
+	      (message "%s" err)
+	      (setq error t)))
+	   (and (assq 'emacs-version checking-methods)
+		(not (string= emacs-version
+			      (cdr (assq 'emacs-version
+					 gnus-product-file-version)))))
+	   (and (setq method (assq 'product-version checking-methods))
+		(or (not (setq file-ver
+			       (cdr (assq 'product-version
+					  gnus-product-file-version))))
+		    (< (product-version-compare file-ver (cadr method)) 0))))
+      (unless error
+	(message "\"%s\" seems to have mismatched contents, updating..."
+		 file))
+      (while variables
+	(set (car variables) nil)
+	(gnus-product-variable-touch (car variables))
+	(setq variables (cdr variables))))))
 
 ;; Parse the old-style quick startup file
 (defun gnus-read-old-newsrc-el-file (file)
