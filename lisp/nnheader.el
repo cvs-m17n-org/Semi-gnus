@@ -108,9 +108,27 @@ This variable is a substitute for `mm-text-coding-system'.")
   "Text coding system for write.
 This variable is a substitute for `mm-text-coding-system-for-write'.")
 
+;; Define `emacs-mule' coding system for XEmacs.
+(and
+ (featurep 'xemacs)
+ (featurep 'mule)
+ (not (find-coding-system 'emacs-mule))
+ (let ((ccl (if (fboundp 'ccl-compile-write-multibyte-character)
+		'(1
+		  (loop
+		   (read-multibyte-character r0 r1)
+		   (write-multibyte-character r0 r1)
+		   (repeat)))
+	      '(1 (loop (read r0) (write-repeat r0))))))
+   (define-ccl-program emacs-mule-codec ccl)
+   (make-coding-system 'emacs-mule 'ccl
+		       "FSF Emacs internal format used in buffer and string."
+		       '(decode emacs-mule-codec
+			 encode emacs-mule-codec))))
+
 (defvar nnheader-auto-save-coding-system
   (cond
-   ((boundp 'MULE) '*junet*)
+   ((boundp 'MULE) '*internal*)
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule)
     (if (memq system-type '(windows-nt ms-dos ms-windows))
