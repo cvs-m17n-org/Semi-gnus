@@ -888,7 +888,7 @@ New Features
 * Red Gnus::                    Third time best---Gnus 5.4/5.5.
 * Quassia Gnus::                Two times two is four, or Gnus 5.6/5.7.
 * Pterodactyl Gnus::            Pentad also starts with P, AKA Gnus 5.8/5.9.
-* Oort Gnus::                   It's big.  It's far out.  Gnus 5.10.
+* Oort Gnus::                   It's big.  It's far out.  Gnus 5.10/5.11.
 * No Gnus::                     Lars, FIXME!
 
 Customization
@@ -13593,10 +13593,16 @@ message retrieval.  The default is @code{nil}.
 
 @end table
 
+@vindex pop3-movemail
+@vindex pop3-leave-mail-on-server
 If the @code{:program} and @code{:function} keywords aren't specified,
 @code{pop3-movemail} will be used.  If the
 @code{pop3-leave-mail-on-server} is non-@code{nil} the mail is to be
-left on the POP server after fetching.
+left on the @acronym{POP} server after fetching when using
+@code{pop3-movemail}.  Note that POP servers maintain no state
+information between sessions, so what the client believes is there and
+what is actually there may not match up.  If they do not, then the whole
+thing can fall apart and leave you with a corrupt mailbox.
 
 Here are some examples.  Fetch from the default @acronym{POP} server,
 using the default user name, and default fetcher:
@@ -22492,11 +22498,11 @@ one of them separately.
 @cindex X-Hashcash
 The ``something costly'' is to burn CPU time, more specifically to
 compute a hash collision up to a certain number of bits.  The
-resulting hashcash cookie is inserted in a @samp{X-Hashcash:}
-header.  For more details, and for the external application
-@code{hashcash} you need to install to use this feature, see
-@uref{http://www.cypherspace.org/~adam/hashcash/}.  Even more
-information can be found at @uref{http://www.camram.org/}.
+resulting hashcash cookie is inserted in a @samp{X-Hashcash:} header.
+For more details, and for the external application @code{hashcash} you
+need to install to use this feature, see
+@uref{http://www.hashcash.org/}.  Even more information can be found
+at @uref{http://www.camram.org/}.
 
 If you wish to generate hashcash for each message you send, you can
 customize @code{message-generate-hashcash} (@pxref{Mail Headers, ,Mail
@@ -22541,7 +22547,8 @@ hand customized mail filtering scripts.  To verify a hashcash cookie
 in a message, use the @code{mail-check-payment} function in the
 @code{hashcash.el} library.  You can also use the @code{spam.el}
 package with the @code{spam-use-hashcash} backend to validate hashcash
-cookies in incoming mail and filter mail accordingly.
+cookies in incoming mail and filter mail accordingly (@pxref{Anti-spam
+Hashcash Payments}).
 
 @node Filtering Spam Using The Spam ELisp Package
 @subsection Filtering Spam Using The Spam ELisp Package
@@ -23356,12 +23363,10 @@ Gmane provides.
 
 Similar to @code{spam-use-whitelist} (@pxref{Blacklists and
 Whitelists}), but uses hashcash tokens for whitelisting messages
-instead of the sender address.  You must have the @code{hashcash.el}
-package loaded for @code{spam-use-hashcash} to work properly.
-Messages without a hashcash payment token will be sent to the next
-spam-split rule.  This is an explicit filter, meaning that unless a
-hashcash token is found, the messages are not assumed to be spam or
-ham.
+instead of the sender address.  Messages without a hashcash payment
+token will be sent to the next spam-split rule.  This is an explicit
+filter, meaning that unless a hashcash token is found, the messages
+are not assumed to be spam or ham.
 
 @end defvar
 
@@ -25061,7 +25066,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * Red Gnus::                    Third time best---Gnus 5.4/5.5.
 * Quassia Gnus::                Two times two is four, or Gnus 5.6/5.7.
 * Pterodactyl Gnus::            Pentad also starts with P, AKA Gnus 5.8/5.9.
-* Oort Gnus::                   It's big.  It's far out.  Gnus 5.10.
+* Oort Gnus::                   It's big.  It's far out.  Gnus 5.10/5.11.
 * No Gnus::                     Lars, FIXME!
 @end menu
 

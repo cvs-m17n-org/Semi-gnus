@@ -1,3 +1,18 @@
+2004-10-26  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Hashcash): Fix URL.  Add pref to spam section.
+	(Anti-spam Hashcash Payments): No need to load hashcash.el now.
+
+2004-10-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (New Features): Add 5.11.
+
+	* message.texi (Resending): Remove wrong default value.
+
+	* gnus.texi (Mail Source Specifiers): Describe possible problems
+	of `pop3-leave-mail-on-server'.  Add `pop3-movemail' and
+	`pop3-leave-mail-on-server' to the index.
+
 2004-10-15  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* gnus.texi (Adaptive Scoring): Added gnus-adaptive-pretty-print.

@@ -903,7 +903,7 @@ New Features
 * Red Gnus::                    $B;0HVL\$N:G>e$N$b$N(B---Gnus 5.4/5.5
 * Quassia Gnus::                2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
 * Pterodactyl Gnus::            $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$FCN$i$l$F$$$k$b$N(B
-* Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10$B!#(B
+* Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10/5.11$B!#(B
 * No Gnus::                     Lars $B$5$s!"D>$7$F(B!
 
 Customization
@@ -12795,10 +12795,16 @@ fetchmail %u@@%s -P %p %t
 $B$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
 @end table
 
+@vindex pop3-movemail
+@vindex pop3-leave-mail-on-server
 @code{:program} $B$H(B @code{:function} $B%-!<%o!<%I$,;XDj$5$l$F$$$J$$$H!"(B
-@code{pop3-movemail} $B$,;HMQ$5$l$^$9!#(B
+@code{pop3-movemail} $B$,;HMQ$5$l$^$9!#(B@code{pop3-movemail} $B$r;H$&>l9g!"(B
 @code{pop3-leave-mail-on-server} $B$,Hs(B-@code{nil} $B$@$C$?$i!"%a!<%k$O<hF@(B
-$B8e$G$b(B POP $B%5!<%P!<$K;D$5$l$^$9!#(B
+$B8e$G$b(B @acronym{POP} $B%5!<%P!<$K;D$5$l$^$9!#(B@acronym{POP} $B%5!<%P!<$O%;%C(B
+$B%7%g%sCf$N>uBV$N>pJs$r0];}$7$^$;$s!#%/%i%$%"%s%H$,?.Mj$G$-$k>pJs$O%/%i%$(B
+$B%"%s%H$=$N$b$N$K$"$j$^$9$,!"<B:]$K$=$3$K$"$k$b$N$O@5$7$/$J$$$+$b$7$l$J$$(B
+$B$3$H$KCm0U$7$F2<$5$$!#$=$l$i$,@5$7$/>pJs$r0];}$7$J$$>l9g$O!"$9$Y$F$,Jx2u(B
+$B$7$F!"$"$J$?$O2u$l$?%a!<%k%\%C%/%9$H$H$b$KCV$-5n$j$K$J$k2DG=@-$,$"$j$^$9!#(B
 
 $B$3$l$O$$$/$D$+$NNc$G$9!#=i4|MxMQ<TL>$G!"=i4|(B @acronym{POP} $B%5!<%P!<$+$i(B
 $B<hF@$7!"=i4|<hF@J}K!$r;HMQ$7$^$9(B:
@@ -21591,8 +21597,8 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"$$$/$P$/$+$NIiC4$K$O$J$k$,L@$i$+$KFHFC$J(B
 $B$N(B hashcash $B%/%C%-!<$O(B @samp{X-Hashcash:} $B%X%C%@!<$KA^F~$5$l$^$9!#$b$C$H(B
 $B>\$7$$$3$H!"$=$7$F$3$N5!G=$r;H$&$?$a$K%$%s%9%H!<%k$9$kI,MW$,$"$k30It%"%W(B
 $B%j%1!<%7%g%s$N(B @code{hashcash} $B$K$D$$$F(B
-$B$O(B @uref{http://www.cypherspace.org/~adam/hashcash/} $B$r;2>H$7$F2<$5$$!#(B
-$B$5$i$J$k>pJs$,(B @uref{http://www.camram.org/} $B$G8+$D$+$k$G$7$g$&!#(B
+$B$O(B @uref{http://www.hashcash.org/} $B$r;2>H$7$F2<$5$$!#$5$i$J$k>pJs(B
+$B$,(B @uref{http://www.camram.org/} $B$G8+$D$+$k$G$7$g$&!#(B
 
 $BAw?.$9$k%a%C%;!<%8$N$=$l$>$l$K$D$$$F(B hashcash $B$r@8@.$5$;$h$&$H;W$&$J$i!"(B
 $B0J2<$N$h$&$K(B @code{message-generate-hashcash} (@pxref{Mail Headers,,Mail
@@ -21636,7 +21642,7 @@ Gnus $B$O(B hashcash $B%/%C%-!<$rG'>Z$9$k$3$H$,$G$-$^$9$,!"<j$G%+%9%?%^%$%:$7
 $B$N(B @code{mail-check-payment} $B4X?t$r;H$C$F2<$5$$!#F~$C$F$-$?%a!<%k(B
 $B$N(B hashcash $B%/%C%-!<$r3NG'$7!"$=$l$K$h$C$F%a!<%k$r_I2a$9$k$?$a$K!"(B
 @code{spam-use-hashcash} $B%P%C%/%(%s%I$G(B @code{spam.el} $B$r;H$&$3$H$b$G$-(B
-$B$^$9!#(B
+$B$^$9(B (@pxref{Anti-spam Hashcash Payments})$B!#(B
 
 @node Filtering Spam Using The Spam ELisp Package
 @subsection Spam ELisp $B%Q%C%1!<%8$r;H$C$?(B Spam $B$N_I2a(B
@@ -22447,11 +22453,9 @@ Gmane $B$O(B @uref{http://gmane.org} $B$G8+$D$1$k$3$H$,$G$-$^$9!#(B
 
 @code{spam-use-whitelist} (@pxref{Blacklists and Whitelists}) $B$K;w$F$$$^(B
 $B$9$,!"Aw?.<T$N%"%I%l%9$NBe$o$j$K!"7iGr$J%a%C%;!<%8$N$?$a$N(B hashcash $B$N(B
-$B0u(B (tokens) $B$r;H$$$^$9!#(B@code{spam-use-hashcash} $B$,@5$7$/F/$/$h$&$K$9$k(B
-$B$?$a$K!"(B@file{hashcash.el} $B$rFI$_9~$s$G$*$+$J$1$l$P$J$j$^$;$s!#(B
-Hashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,3d(B (spam-split) $B5,B'$KAw$i$l$^(B
-$B$9!#$3$l$O(B hashcash $B0u$,8+Ev$?$i$J$$%a%C%;!<%8$O(B spam $B$H$b(B ham $B$H$b8+$J(B
-$B$5$l$J$$$3$H$r0UL#$9$k!"L@<(E*$J_I2a4o$G$9!#(B
+$B0u(B (tokens) $B$r;H$$$^$9!#(BHashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,(B
+$B3d(B (spam-split) $B5,B'$KAw$i$l$^$9!#$3$l$O(B hashcash $B0u$,8+Ev$?$i$J$$%a%C%;!<(B
+$B%8$O(B spam $B$H$b(B ham $B$H$b8+$J$5$l$J$$$3$H$r0UL#$9$k!"L@<(E*$J_I2a4o$G$9!#(B
 
 @end defvar
 
@@ -24156,7 +24160,7 @@ Lloyd Zusman.
 * Red Gnus::                    $B;0HVL\$N:G>e$N$b$N(B---Gnus 5.4/5.5
 * Quassia Gnus::                2 $B$+$1$k(B 2 $B$O(B 4$B!"$b$7$/$O(B Gnus 5.6/5.7
 * Pterodactyl Gnus::            $B8^HVL\!"(BP $B$G;O$^$k!"$b$7$/$O(B Gnus 5.8/5.9 $B$H$7$FCN$i$l$F$$$k$b$N(B
-* Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10$B!#(B
+* Oort Gnus::                   $B5pBg$J!#1s$/MZ$+$J!#(BGnus 5.10/5.11$B!#(B
 * No Gnus::                     Lars $B$5$s!"D>$7$F(B!
 @end menu
 

@@ -326,7 +326,7 @@ non @acronym{MIME}-savvy versions of Gnus would do.
 
 @vindex message-ignored-resent-headers
 正規表現 @code{message-ignored-resent-headers} に合致するヘッダーはメッ
-セージを送る前に取り除かれます。初期値は @code{^Return-receipt} です。
+セージを送る前に取り除かれます。
 
 @node Bouncing
 @section 失敗

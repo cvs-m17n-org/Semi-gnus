@@ -605,6 +605,8 @@ COUNT defaults to 5"
   (remove-hook 'gnus-select-article-hook
 	       'spam-stat-store-gnus-article-buffer))
 
+(add-hook 'spam-stat-unload-hook 'spam-stat-unload-hook)
+
 (provide 'spam-stat)
 
 ;;; spam-stat.el ends here

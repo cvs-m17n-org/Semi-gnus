@@ -1,3 +1,26 @@
+2004-10-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nnspool.el (nnspool-spool-directory): Use news-path if the
+	news-directory variable is not bound.
+
+	* gnus-start.el (gnus-check-reasonable-setup): Use an alternative
+	function instead of display-warning if it is not available.
+
+2004-10-26  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-agent.el (gnus-agent-expire-group-1): Fix last merge from
+	v5-10: Use `point-at-bol'.
+
+2004-10-26  Simon Josefsson  <jas@extundo.com>
+
+	* hashcash.el: Fix URL in comment, reported by Cheng Gao
+	<chenggao@gmail.com>.
+
+2004-10-25  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* html2text.el (html2text-buffer-head): Removed.  Use `goto-char'
+	instead.
+
 2004-10-25  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* nnimap.el (nnimap-remove-server-from-buffer-alist): new function
@@ -92,6 +115,29 @@
 
 	* nnimap.el (nnimap-open-connection): use
 	netrc-machine-user-or-password
+
+2004-10-17  Richard M. Stallman  <rms@gnu.org>
+
+	* gnus-registry.el (gnus-registry-unload-hook): 
+	Set as a variable with add-hook.
+
+	* nnspool.el (nnspool-spool-directory): Use news-directory instead
+	of news-path.
+
+	* spam-stat.el (spam-stat-unload-hook): Set as a variable w/ add-hook.
+
+	* spam.el: Delete duplicate `provide'.
+	(spam-unload-hook): Set as a variable with add-hook.
+
+2004-10-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* pop3.el (pop3-leave-mail-on-server): Describe possible problems
+	in the doc string.
+
+	* message.el (message-ignored-news-headers)
+	(message-ignored-supersedes-headers)
+	(message-ignored-resent-headers)
+	(message-forward-ignored-headers): Improve custom type.
 
 2004-10-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -2505,7 +2551,7 @@
 
 2004-03-04  Kevin Greiner <kgreiner@xpediantsolutions.com>
 
-        * gnus-agent.el (gnus-agent-file-header-cache): Removed.
+	* gnus-agent.el (gnus-agent-file-header-cache): Removed.
 	(gnus-agent-possibly-alter-active): Avoid null in numeric
 	comparison.
 	(gnus-agent-set-local): Refuse to save null in local object table.
