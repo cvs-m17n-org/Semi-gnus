@@ -134,7 +134,8 @@
 (defmacro gnus-kill-buffer (buffer)
   `(let ((buf ,buffer))
      (when (gnus-buffer-exists-p buf)
-       (setq gnus-buffers (delete buf gnus-buffers))
+       (when (boundp 'gnus-buffers)
+	 (setq gnus-buffers (delete buf gnus-buffers)))
        (kill-buffer buf))))
 
 (static-cond
