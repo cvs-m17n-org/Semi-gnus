@@ -328,6 +328,7 @@ This is relative to `smtpmail-queue-dir'.")
 	greeting
 	process-buffer
 	(supported-extensions '())
+	(coding-system-for-read smtpmail-coding-system)
 	(coding-system-for-write smtpmail-coding-system))
     (unwind-protect
 	(catch 'done
