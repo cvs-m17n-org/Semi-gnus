@@ -205,18 +205,17 @@
 
 ;;;###autoload
 (defun find-cl-run-time-functions (file-or-directory in-this-emacs)
-  "Find CL run-time functions in the FILE-OR-DIRECTORY.  If the optional
-IN-THIS-EMACS is non-nil, the built-in functions in this emacs will
-not be reported."
+  "Find CL run-time functions in the FILE-OR-DIRECTORY.  If the prefix
+argument IN-THIS-EMACS is non-nil, the built-in functions in this
+Emacs will not be reported."
   (interactive (list (read-file-name "Find CL run-time functions in: "
 				     nil default-directory t)
 		     current-prefix-arg))
   (unless (interactive-p)
     (error "You should invoke `M-x find-cl-run-time-functions' interactively"))
-  (let (files clfns working file forms fns pt lines form fn buffer
+  (let (files clfns working giveup file lines forms fns pt form fn buffer
 	      buffer-file-format format-alist
-	      insert-file-contents-post-hook insert-file-contents-pre-hook
-	      jam-zcat-filename-list jka-compr-compression-info-list)
+	      insert-file-contents-post-hook insert-file-contents-pre-hook)
     (cond ((file-directory-p file-or-directory)
 	   (prog1
 	       (setq files (directory-files file-or-directory t "\\.el$"))
@@ -226,6 +225,9 @@ not be reported."
 	   (setq files (list file-or-directory)))
 	  (t
 	   (message "No such file or directory: %s" file-or-directory)))
+    (dolist (file files)
+      (unless (file-exists-p file)
+	(setq files (delete file files))))
     (if files
 	(progn
 	  (if in-this-emacs
@@ -240,7 +242,8 @@ not be reported."
 	  (let (emacs-lisp-mode-hook)
 	    (emacs-lisp-mode))
 	  (while files
-	    (setq file (pop files)
+	    (setq giveup nil
+		  file (pop files)
 		  lines (list nil 1))
 	    (message "Searching for CL run-time functions in: %s..."
 		     (file-name-nondirectory file))
@@ -250,10 +253,11 @@ not be reported."
 	    ;;
 	    (while (setq forms (condition-case nil
 				   (list (read working))
-				 (error)))
+				 (error nil)))
 	      (setq fns nil
 		    pt (point)
-		    lines (list (cadr lines) (count-lines (point-min) pt)))
+		    lines (list (cadr lines)
+				(count-lines (point-min) pt)))
 	      (condition-case nil
 		  (progn
 		    (forward-list -1)
@@ -262,46 +266,57 @@ not be reported."
 		(error))
 	      (goto-char pt)
 	      (while forms
-		(setq form (pop forms)
-		      fn (pop form))
-		(cond ((eq fn 'define-compiler-macro)
-		       (setq form nil))
-		      ((memq fn '(let let*))
-		       (setq form (append
-				   (delq nil
-					 (mapcar
-					  (lambda (element)
-					    (when (and (consp element)
-						       (consp (cadr element)))
-					      (cadr element)))
-					  (car form)))
-				   (cdr form))))
-		      ((memq fn '(defadvice
-				   defmacro defsubst defun defmacro-maybe
-				   defmacro-maybe-cond defsubst-maybe
-				   defun-maybe defun-maybe-cond))
-		       (setq form (cddr form)))
-		      ((eq fn 'lambda)
-		       (setq form (cdr form)))
-		      ((memq fn '(\` backquote quote))
-		       (setq form (when (consp (car form))
-				    (car form))))
-		      ((and (memq fn clfns)
-			    (listp form))
-		       (push fn fns)))
-		(when (and (consp form)
-			   (condition-case nil
-			       ;; Ignore a case `(a b . c)'.
-			       (length form)
-			     (error nil)))
-		  (setq forms (append (delq nil
-					    (mapcar
-					     (lambda (element)
-					       (when (consp element)
-						 element))
-					     form))
-				      forms))))
-	      (when fns
+		(setq form (pop forms))
+		(if (consp form)
+		    (progn
+		      (setq fn (pop form))
+		      (cond ((eq fn 'define-compiler-macro)
+			     (setq form nil))
+			    ((memq fn '(let let*))
+			     (setq form
+				   (append
+				    (delq nil
+					  (mapcar
+					   (lambda (element)
+					     (when (and (consp element)
+							(consp (cadr element)))
+					       (cadr element)))
+					   (car form)))
+				    (cdr form))))
+			    ((memq fn '(defadvice
+					 defmacro defsubst defun
+					 defmacro-maybe defmacro-maybe-cond
+					 defsubst-maybe defun-maybe
+					 defun-maybe-cond))
+			     (setq form (cddr form)))
+			    ((eq fn 'lambda)
+			     (setq form (cdr form)))
+			    ((memq fn '(\` backquote quote))
+			     (setq form (when (consp (car form))
+					  (car form))))
+			    ((eq fn 'dolist)
+			     (setcar form (cadar form)))
+			    ((and (memq fn clfns)
+				  (listp form))
+			     (push fn fns)))
+		      (when (and (consp form)
+				 (condition-case nil
+				     ;; Ignore a case `(a b . c)'.
+				     (length form)
+				   (error nil)))
+			(setq forms (append (delq nil
+						  (mapcar
+						   (lambda (element)
+						     (when (consp element)
+						       element))
+						   form))
+					    forms))))
+		  (goto-char (point-max))
+		  (setq giveup t
+			lines (list (cadr lines)
+				    (count-lines (point-min) (point)))
+			fns '("Couldn't parse, check this file manually."))))
+	      (when (or fns giveup)
 		(if buffer
 		    (set-buffer buffer)
 		  (display-buffer
@@ -315,7 +330,7 @@ not be reported."
 		  (setq file nil))
 		(insert (format "%5d - %5d: %s"
 				(car lines) (cadr lines)
-				(mapconcat 'symbol-name
+				(mapconcat (lambda (fn) (format "%s" fn))
 					   (nreverse fns) " ")))
 		(while (> (current-column) 78)
 		  (skip-chars-backward "^ ")

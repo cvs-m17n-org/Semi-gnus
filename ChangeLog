@@ -1,5 +1,10 @@
 2001-05-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-clfns.el (find-cl-run-time-functions): Add a parser for
+	`dolist'; protect against errors.
+
+2001-05-29  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnshimbun.el (nnshimbun-retrieve-headers-with-nov): Don't
 	use `last'.
 	(nnshimbun-make-shimbun-header): Use the following macros.
