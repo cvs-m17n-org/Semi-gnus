@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -174,7 +174,7 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-message-group-art)
 	      (cons ,gnus-newsgroup-name ,article))
 	 (make-local-variable 'gnus-newsgroup-name)
-	 (run-hooks 'gnus-message-setup-hook))
+	 (gnus-run-hooks 'gnus-message-setup-hook))
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
 
@@ -896,7 +896,7 @@ this is a reply."
 	      (save-excursion
 		(nnheader-set-temp-buffer " *acc*")
 		(insert-buffer-substring message-encoding-buffer)
-		(run-hooks 'gnus-before-do-gcc-hook)
+		(gnus-run-hooks 'gnus-before-do-gcc-hook)
 		(goto-char (point-min))
 		(when (re-search-forward
 		       (concat "^" (regexp-quote mail-header-separator) "$")
