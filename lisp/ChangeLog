@@ -1,3 +1,24 @@
+2002-10-10  Simon Josefsson  <jas@extundo.com>
+
+	* mml-sec.el (mml-smime-encrypt-buffer): Warn about combined signing.
+	(mml-pgp-encrypt-buffer): Support combined signing.
+
+	* mml1991.el (mml1991-mailcrypt-encrypt): Support combined signing.
+	(mml1991-gpg-encrypt): Ditto.
+	(mml1991-pgg-encrypt): Ditto.
+	(mml1991-encrypt): Pass sign parameter.
+
+	* mml-sec.el (mml-signencrypt-style-alist): Defcustom.
+	(mml-signencrypt-style): Mention the variable.
+
+2002-10-09  Simon Josefsson  <jas@extundo.com>
+
+	* mml1991.el (mml1991-pgg-sign): Bind pgg-default-user-id, not
+	pgg-gpg-user-id.
+
+	* pgg.el (pgg-insert-url-with-w3): Ignore errors.
+	(pgg-fetch-key-function): Nil if w3 is not installed.
+
 2002-10-08  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-agent.el (gnus-agent-fetch-selected-article): Bind
