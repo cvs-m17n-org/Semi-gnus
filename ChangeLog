@@ -1,3 +1,18 @@
+1999-06-15  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-TIPS.ja: New section `Cancel sending message from hooks'.
+
+	* lisp/message.el (message-send): Catch `message-sending-cancel'.
+
+	* lisp/mess-lcl.el (message-mime-charset-recover-by-ask): Don't
+	use `error'.
+	(message-mime-charset-recover-ask-y-or-n): Ditto.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.2.
+
+	* lisp/gnus-sum.el (gnus-simplify-buffer-fuzzy): New
+	implementation for MIME en/decoding.
+
 1999-06-02  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Fix typo.
