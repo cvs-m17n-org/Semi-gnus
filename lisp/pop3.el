@@ -77,7 +77,6 @@
   (require 'cl))
 
 (require 'mail-utils)
-(require 'nnheader)
 
 (defgroup pop3 nil
   "Post Office Protocol"
@@ -188,6 +187,32 @@ Users don't have to set this value.")
 
 (defun pop3-progress-message (format percent &rest args)
   (apply (function message) format args))
+
+;; Borrowed from nnheader-accept-process-output in nnheader.el.
+(defvar pop3-read-timeout
+  (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
+		    (symbol-name system-type))
+      ;; http://thread.gmane.org/v9655t3pjo.fsf@marauder.physik.uni-ulm.de
+      ;;
+      ;; IIRC, values lower than 1.0 didn't/don't work on Windows/DOS.
+      ;;
+      ;; There should probably be a runtime test to determine the timing
+      ;; resolution, or a primitive to report it.  I don't know off-hand
+      ;; what's possible.  Perhaps better, maybe the Windows/DOS primitive
+      ;; could round up non-zero timeouts to a minimum of 1.0?
+      1.0
+    0.1)
+  "How long pop3 should wait between checking for the end of output.
+Shorter values mean quicker response, but are more CPU intensive.")
+
+;; Borrowed from nnheader-accept-process-output in nnheader.el.
+(defun pop3-accept-process-output (process)
+  (accept-process-output
+   process
+   (truncate pop3-read-timeout)
+   (truncate (* (- pop3-read-timeout
+		   (truncate pop3-read-timeout))
+		1000))))
 
 (defun pop3-movemail (&optional crashbox)
   "Transfer contents of a maildrop to the specified CRASHBOX."
@@ -315,7 +340,7 @@ Argument PORT specifies connecting port."
 		    (goto-char (point-max))
 		    (forward-line -1)
 		    (not (looking-at "+OK")))
-	  (nnheader-accept-process-output process)
+	  (pop3-accept-process-output process)
 	  (sit-for 1))
 	(delete-region (point-min) (point)))
       (and process (memq (process-status process) '(open run))
@@ -371,7 +396,7 @@ Return the response string if optional second argument RETURN is non-nil."
       (goto-char pop3-read-point)
       (while (and (memq (process-status process) '(open run))
 		  (not (search-forward "\r\n" nil t)))
-	(nnheader-accept-process-output process)
+	(pop3-accept-process-output process)
 	(goto-char pop3-read-point))
       (setq match-end (point))
       (goto-char pop3-read-point)
@@ -732,8 +757,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (set-buffer (process-buffer process))
     (goto-char start)
     (while (not (re-search-forward "^\\.\r\n" nil t))
-      ;; Fixme: Shouldn't depend on nnheader.
-      (nnheader-accept-process-output process)
+      (pop3-accept-process-output process)
       (goto-char start))
     (setq pop3-read-point (point-marker))
     (goto-char (match-beginning 0))
