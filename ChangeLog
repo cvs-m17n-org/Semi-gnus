@@ -1,3 +1,7 @@
+1998-11-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-dont-send): Use `message-delete-frame'.
+
 1998-11-14  Kenji Itoh  <keit@tpj.co.jp>
 
 	* lisp/nnmail.el (nnmail-read-passwd): Use `read-passwd' if it
