@@ -2,7 +2,8 @@
 ;; Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
-;; This file is not part of GNU Emacs, but the same permissions apply.
+
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,10 +24,14 @@
 
 ;;; Code:
 
-(require 'mml2015)
-(require 'mml1991)
 (require 'mml-smime)
 (eval-when-compile (require 'cl))
+(autoload 'mml2015-sign "mml2015")
+(autoload 'mml2015-encrypt "mml2015")
+(autoload 'mml1991-sign "mml1991")
+(autoload 'mml1991-encrypt "mml1991")
+(autoload 'message-goto-body "message")
+(autoload 'mml-insert-tag "mml")
 
 (defvar mml-sign-alist
   '(("smime"     mml-smime-sign-buffer     mml-smime-sign-query)

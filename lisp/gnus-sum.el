@@ -1327,7 +1327,7 @@ This list will always be a subset of gnus-newsgroup-undownloaded.")
 
 (defvar gnus-article-before-search nil)
 
-(defconst gnus-summary-local-variables
+(defvar gnus-summary-local-variables
   '(gnus-newsgroup-name
     gnus-newsgroup-begin gnus-newsgroup-end
     gnus-newsgroup-last-rmail gnus-newsgroup-last-mail
@@ -2134,9 +2134,9 @@ increase the score of each group you read."
 	       ,@(gnus-summary-menu-split
 		  (mapcar
 		   (lambda (cs)
-		     ;; Since easymenu under FSF Emacs doesn't allow lambda
-		     ;; forms for menu commands, we should provide intern'ed
-		     ;; function symbols.
+		     ;; Since easymenu under Emacs doesn't allow
+		     ;; lambda forms for menu commands, we should
+		     ;; provide intern'ed function symbols.
 		     (let ((command (intern (format "\
 gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 		       (fset command
@@ -2678,7 +2678,7 @@ The following commands are available:
   (make-local-variable 'gnus-summary-dummy-line-format)
   (make-local-variable 'gnus-summary-dummy-line-format-spec)
   (make-local-variable 'gnus-summary-mark-positions)
-  (make-local-hook 'pre-command-hook)
+  (gnus-make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
   (turn-on-gnus-mailing-list-mode)
@@ -3616,7 +3616,7 @@ If NO-DISPLAY, don't generate a summary buffer."
    ((eq gnus-auto-select-subject 'first)
     ;; Do nothing.
     )
-   ((gnus-functionp gnus-auto-select-subject)
+   ((functionp gnus-auto-select-subject)
     (funcall gnus-auto-select-subject))))
 
 (defun gnus-summary-prepare ()
@@ -4567,6 +4567,11 @@ Unscored articles will be counted as having a score of zero."
 If nil, use subject instead."
   :type 'string
   :group 'gnus-thread)
+(defcustom gnus-sum-thread-tree-false-root "> "
+  "With %B spec, used for a false root of a thread.
+If nil, use subject instead."
+  :type 'string
+  :group 'gnus-thread)
 (defcustom gnus-sum-thread-tree-single-indent ""
   "With %B spec, used for a thread with just one message.
 If nil, use subject instead."
@@ -4837,9 +4842,12 @@ or a straight list of headers."
 	     (cond
 	      ((not gnus-show-threads) "")
 	      ((zerop gnus-tmp-level)
-	       (if (cdar thread)
-		   (or gnus-sum-thread-tree-root subject)
-		 (or gnus-sum-thread-tree-single-indent subject)))
+	       (cond ((cdar thread)
+		      (or gnus-sum-thread-tree-root subject))
+		     (gnus-tmp-new-adopts
+		      (or gnus-sum-thread-tree-false-root subject))
+		     (t
+		      (or gnus-sum-thread-tree-single-indent subject))))
 	      (t
 	       (concat (apply 'concat
 			      (mapcar (lambda (item)
@@ -4870,7 +4878,7 @@ or a straight list of headers."
 
 	(when (nth 1 thread)
 	  (push (list (max 0 gnus-tmp-level)
-		      (copy-list tree-stack)
+		      (copy-sequence tree-stack)
 		      (nthcdr 1 thread))
 		stack))
 	(push (if (nth 1 thread) 1 0) tree-stack)
@@ -8533,8 +8541,8 @@ If ARG (the prefix) is a number, show the article with the charset
 defined in `gnus-summary-show-article-charset-alist', or the charset
 input.
 If ARG (the prefix) is non-nil and not a number, show the raw article
-without any article massaging functions being run.  Normally, the key strokes
-are `C-u g'."
+without any article massaging functions being run.  Normally, the key
+strokes are `C-u g'."
   (interactive "P")
   (cond
    ((numberp arg)
@@ -9200,9 +9208,13 @@ deleted forever, right now."
 This command actually deletes articles.	 This is not a marking
 command.  The article will disappear forever from your life, never to
 return.
+
 If N is negative, delete backwards.
 If N is nil and articles have been marked with the process mark,
-delete these instead."
+delete these instead.
+
+If `gnus-novice-user' is non-nil you will be asked for
+confirmation before the articles are deleted."
   (interactive "P")
   (unless (gnus-check-backend-function 'request-expire-articles
 				       gnus-newsgroup-name)
@@ -9298,7 +9310,7 @@ groups."
 		(let ((mbl1 mml-buffer-list))
 		  (setq mml-buffer-list mbl)
 		  (set (make-local-variable 'mml-buffer-list) mbl1))
-		(make-local-hook 'kill-buffer-hook)
+		(gnus-make-local-hook 'kill-buffer-hook)
 		(add-hook 'kill-buffer-hook 'mml-destroy-buffers t t))))
 	 `(lambda (no-highlight)
 	    (let ((mail-parse-charset ',gnus-newsgroup-charset)
@@ -10168,7 +10180,7 @@ If ALL is non-nil, also mark ticked and dormant articles as read."
   (gnus-summary-position-point))
 
 (defun gnus-summary-catchup-from-here (&optional all)
-  "Mark all unticked articles after the current one as read.
+  "Mark all unticked articles after (and including) the current one as read.
 If ALL is non-nil, also mark ticked and dormant articles as read."
   (interactive "P")
   (save-excursion
@@ -10385,7 +10397,7 @@ Returns nil if no thread was there to be shown."
 	     gnus-thread-hide-subtree)
     (gnus-summary-hide-all-threads
      (if (or (consp gnus-thread-hide-subtree)
-	     (gnus-functionp gnus-thread-hide-subtree))
+	     (functionp gnus-thread-hide-subtree))
 	 (gnus-make-predicate gnus-thread-hide-subtree)
        nil))))
 
@@ -10801,7 +10813,7 @@ save those articles instead."
 		    ;; Regular expression.
 		    (ignore-errors
 		      (re-search-forward match nil t)))
-		   ((gnus-functionp match)
+		   ((functionp match)
 		    ;; Function.
 		    (save-restriction
 		      (widen)
@@ -11431,10 +11443,10 @@ returned."
 						(mail-header-number h))
 					      gnus-newsgroup-headers)))
     (setq gnus-newsgroup-headers
-	  (merge 'list
-		 gnus-newsgroup-headers
-		 (gnus-fetch-headers articles)
-		 'gnus-article-sort-by-number))
+	  (gnus-merge 'list
+		      gnus-newsgroup-headers
+		      (gnus-fetch-headers articles)
+		      'gnus-article-sort-by-number))
     ;; Suppress duplicates?
     (when gnus-suppress-duplicates
       (gnus-dup-suppress-articles))
@@ -11562,5 +11574,9 @@ If ALL is a number, fetch this number of articles."
 (provide 'gnus-sum)
 
 (run-hooks 'gnus-sum-load-hook)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; gnus-sum.el ends here

@@ -1,10 +1,10 @@
 ;;; smime.el --- S/MIME support library
-;; Copyright (c) 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (c) 2000, 2001, 2003 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Keywords: SMIME X.509 PEM OpenSSL
 
-;; This file is not a part of GNU Emacs, but the same permissions apply.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published
@@ -366,6 +366,9 @@ Any details (stdout and stderr) are left in the buffer specified by
     (insert-buffer-substring smime-details-buffer)
     nil))
 
+(eval-when-compile
+  (defvar from))
+
 (defun smime-decrypt-region (b e keyfile)
   "Decrypt S/MIME message in region between B and E with key in KEYFILE.
 On success, replaces region with decrypted data and return non-nil.
@@ -390,6 +393,9 @@ in the buffer specified by `smime-details-buffer'."
 	    (delete-file tmpfile)))
 	(progn
 	  (delete-region b e)
+	  (when (boundp 'from)
+	    ;; `from' is dynamically bound in mm-dissect.
+	    (insert "From: " from "\n"))
 	  (insert-buffer-substring buffer)
 	  (kill-buffer buffer)
 	  t)

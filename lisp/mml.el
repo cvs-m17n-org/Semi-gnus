@@ -35,6 +35,7 @@
   (autoload 'message-make-message-id "message")
   (autoload 'gnus-setup-posting-charset "gnus-msg")
   (autoload 'gnus-add-minor-mode "gnus-ems")
+  (autoload 'gnus-make-local-hook "gnus-util")
   (autoload 'message-fetch-field "message")
   (autoload 'fill-flowed-encode "flow-fill")
   (autoload 'message-posting-charset "message"))
@@ -1070,12 +1071,21 @@ If RAW, don't highlight the article."
 	    (gnus-article-prepare-display))))
       ;; Disable article-mode-map.
       (use-local-map nil)
-      (make-local-hook 'kill-buffer-hook)
+      (gnus-make-local-hook 'kill-buffer-hook)
       (add-hook 'kill-buffer-hook
 		(lambda ()
 		  (mm-destroy-parts gnus-article-mime-handles)) nil t)
       (setq buffer-read-only t)
       (local-set-key "q" (lambda () (interactive) (kill-buffer nil)))
+      (local-set-key "=" (lambda () (interactive) (delete-other-windows)))
+      (local-set-key "\r"
+		     (lambda ()
+		       (interactive)
+		       (widget-button-press (point))))
+      (local-set-key gnus-mouse-2
+		     (lambda (event)
+		       (interactive "@e")
+		       (widget-button-press (widget-event-point event) event)))
       (goto-char (point-min)))))
 
 (defun mml-validate ()

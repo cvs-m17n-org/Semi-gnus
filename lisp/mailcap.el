@@ -49,6 +49,12 @@
     table)
   "A syntax table for parsing sgml attributes.")
 
+(eval-and-compile
+  (when (featurep 'xemacs)
+    (condition-case nil
+	(require 'lpr)
+      (error nil))))
+
 (defvar mailcap-print-command
   (mapconcat 'identity
 	     (cons (if (boundp 'lpr-command)
@@ -172,7 +178,11 @@
      ("sieve"
       (viewer . sieve-mode)
       (test   . (fboundp 'sieve-mode))
-      (type   . "application/sieve")))
+      (type   . "application/sieve"))
+     ("pgp-keys"
+      (viewer . "gpg --import --interactive --verbose")
+      (type   . "application/pgp-keys")
+      ("needsterminal")))
     ("audio"
      ("x-mpeg"
       (viewer . "maplay %s")

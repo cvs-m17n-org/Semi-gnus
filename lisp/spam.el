@@ -52,6 +52,10 @@
 (eval-and-compile
   (autoload 'query-dig "dig"))
 
+;; autoload spam-report
+(eval-and-compile
+  (autoload 'spam-report-gmane "spam-report"))
+
 ;; autoload query-dns
 (eval-and-compile
   (autoload 'query-dns "dns"))
@@ -71,6 +75,14 @@
 When nil, only ham and unclassified groups will have their spam moved
 to the spam-process-destination.  When t, spam will also be moved from
 spam groups."
+  :type 'boolean
+  :group 'spam)
+
+(defcustom spam-mark-only-unseen-as-spam t
+  "Whether only unseen articles should be marked as spam in spam
+groups.  When nil, all unread articles in a spam group are marked as
+spam.  Set this if you want to leave an article unread in a spam group
+without losing it to the automatic spam-marking process."
   :type 'boolean
   :group 'spam)
 
@@ -335,6 +347,9 @@ your main source of newsgroup names."
       (member processor (car (gnus-parameter-spam-process group)))
     nil))
 
+(defun spam-group-spam-processor-report-gmane-p (group)
+  (spam-group-processor-p group 'gnus-group-spam-exit-processor-report-gmane))
+
 (defun spam-group-spam-processor-bogofilter-p (group)
   (spam-group-processor-p group 'gnus-group-spam-exit-processor-bogofilter))
 
@@ -394,6 +409,10 @@ your main source of newsgroup names."
       (gnus-message 5 "Registering spam with the blacklist")
       (spam-blacklist-register-routine))
 
+    (when (spam-group-spam-processor-report-gmane-p gnus-newsgroup-name)
+      (gnus-message 5 "Registering spam with the Gmane report")
+      (spam-report-gmane-register-routine))
+
     (if spam-move-spam-nonspam-groups-only      
 	(when (not (spam-group-spam-contents-p gnus-newsgroup-name))
 	  (spam-mark-spam-as-expired-and-move-routine
@@ -441,13 +460,15 @@ your main source of newsgroup names."
   ;; check the global list of group names spam-junk-mailgroups and the
   ;; group parameters
   (when (spam-group-spam-contents-p gnus-newsgroup-name)
-    (gnus-message 5 "Marking unread articles as spam")
-    (let ((articles gnus-newsgroup-articles)
-	  article)
-      (while articles
-	(setq article (pop articles))
-	(when (eq (gnus-summary-article-mark article) gnus-unread-mark)
-	  (gnus-summary-mark-article article gnus-spam-mark))))))
+    (gnus-message 5 "Marking %s articles as spam"
+		  (if spam-mark-only-unseen-as-spam 
+		      "unseen"
+		    "unread"))
+    (let ((articles (if spam-mark-only-unseen-as-spam 
+			gnus-newsgroup-unseen
+		      gnus-newsgroup-unreads)))
+      (dolist (article articles)
+	(gnus-summary-mark-article article gnus-spam-mark)))))
 
 (defun spam-mark-spam-as-expired-and-move-routine (&optional group)
   (gnus-summary-kill-process-mark)
@@ -588,32 +609,35 @@ definitely a spam.")
 "The spam-list-of-statistical-checks list contains all the mail
 splitters that need to have the full message body available.")
 
-(defun spam-split ()
+(defun spam-split (&rest specific-checks)
   "Split this message into the `spam' group if it is spam.
 This function can be used as an entry in `nnmail-split-fancy', for
-example like this: (: spam-split)
+example like this: (: spam-split).  It can take checks as parameters.
 
 See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (interactive)
   (save-excursion
-  (dolist (check spam-list-of-statistical-checks)
-    (when (symbol-value check)
-      (widen)
-      (gnus-message 8 "spam-split: widening the buffer (%s requires it)"
-		    (symbol-name check))
-      (return)))
-;;   (progn (widen) (debug (buffer-string)))
-  (let ((list-of-checks spam-list-of-checks)
-	decision)
-    (while (and list-of-checks (not decision))
-      (let ((pair (pop list-of-checks)))
-	(when (symbol-value (car pair))
-	  (gnus-message 5 "spam-split: calling the %s function" (symbol-name (cdr pair)))
-	  (setq decision (funcall (cdr pair))))))
-    (if (eq decision t)
-	nil
-	decision))))
-
+    (save-restriction
+      (dolist (check spam-list-of-statistical-checks)
+	(when (symbol-value check)
+	  (widen)
+	  (gnus-message 8 "spam-split: widening the buffer (%s requires it)"
+			(symbol-name check))
+	  (return)))
+      ;;   (progn (widen) (debug (buffer-string)))
+      (let ((list-of-checks spam-list-of-checks)
+	    decision)
+	(while (and list-of-checks (not decision))
+	  (let ((pair (pop list-of-checks)))
+	    (when (and (symbol-value (car pair))
+		       (or (null specific-checks)
+			   (memq (car pair) specific-checks)))
+	      (gnus-message 5 "spam-split: calling the %s function" (symbol-name (cdr pair)))
+	      (setq decision (funcall (cdr pair))))))
+	(if (eq decision t)
+	    nil
+	  decision)))))
+  
 (defun spam-setup-widening ()
   (dolist (check spam-list-of-statistical-checks)
     (when (symbol-value check)
@@ -960,8 +984,14 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	   (spam-enter-whitelist from))))))
 
 
-;;;; Bogofilter
+;;;; Spam-report glue
+(defun spam-report-gmane-register-routine ()
+  (spam-generic-register-routine
+   'spam-report-gmane
+   nil))
 
+
+;;;; Bogofilter
 (defun spam-check-bogofilter-headers (&optional score)
   (let ((header (message-fetch-field spam-bogofilter-header)))
       (when (and header
@@ -979,7 +1009,8 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
   (save-window-excursion
     (gnus-summary-show-article t)
     (set-buffer gnus-article-buffer)
-    (let ((score (spam-check-bogofilter t)))
+    (let ((score (or (spam-check-bogofilter-headers t)
+		     (spam-check-bogofilter t))))
       (message "Spamicity score %s" score)
       (or score "0"))))
 

@@ -5,7 +5,7 @@
 ;;	Simon Josefsson <simon@josefsson.org> (Mailcrypt interface, Gnus glue)
 ;; Keywords PGP
 
-;; This file is (not yet) part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,6 +25,13 @@
 ;;; Commentary:
 
 ;;; Code:
+
+(eval-when-compile
+  (require 'cl)
+  (require 'mm-util))
+
+(autoload 'quoted-printable-decode-region "qp")
+(autoload 'quoted-printable-encode-region "qp")
 
 (defvar mml1991-use mml2015-use
   "The package used for PGP.")

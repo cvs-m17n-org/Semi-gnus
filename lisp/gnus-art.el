@@ -560,8 +560,7 @@ The following additional specs are available:
   :type 'hook
   :group 'gnus-article-various)
 
-(defvar gnus-article-hide-pgp-hook nil)
-(make-obsolete-variable 'gnus-article-hide-pgp-hook 
+(make-obsolete-variable 'gnus-article-hide-pgp-hook
 			"This variable is obsolete in Gnus 5.10.")
 
 (defcustom gnus-article-button-face 'bold
@@ -1325,8 +1324,7 @@ It is a string, such as \"PGP\". If nil, ask user."
   "Function used for converting HTML into text.")
 
 (defcustom gnus-use-idna (and (condition-case nil (require 'idna) (file-error))
-			      (fboundp 'coding-system-p)
-			      (coding-system-p 'utf-8))
+			      (mm-coding-system-p 'utf-8))
   "Whether IDNA decoding of headers is used when viewing messages.
 This requires GNU Libidn, and by default only enabled if it is found."
   :group 'gnus-article-headers
@@ -1667,15 +1665,18 @@ always hide."
 		     (message-fetch-field "newsgroups"))
 		(gnus-article-hide-header "followup-to")))
 	     ((eq elem 'reply-to)
-	      (let ((from (message-fetch-field "from"))
-		    (reply-to (message-fetch-field "reply-to")))
-		(when (and
-		       from reply-to
-		       (ignore-errors
-			 (gnus-string-equal
-			  (nth 1 (mail-extract-address-components from))
-			  (nth 1 (mail-extract-address-components reply-to)))))
-		  (gnus-article-hide-header "reply-to"))))
+	      (if (gnus-group-find-parameter
+		   gnus-newsgroup-name 'broken-reply-to)
+		  (gnus-article-hide-header "reply-to")
+		(let ((from (message-fetch-field "from"))
+		      (reply-to (message-fetch-field "reply-to")))
+		  (when (and
+			 from reply-to
+			 (ignore-errors
+			   (gnus-string-equal
+			    (nth 1 (mail-extract-address-components from))
+			    (nth 1 (mail-extract-address-components reply-to)))))
+		    (gnus-article-hide-header "reply-to")))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
 		(when (and date
@@ -1923,7 +1924,8 @@ unfolded."
 	  (while (not (eobp))
 	    (end-of-line)
 	    (when (>= (current-column) (min fill-column width))
-	      (narrow-to-region (min (1+ (point)) (point-max)) (gnus-point-at-bol))
+	      (narrow-to-region (min (1+ (point)) (point-max))
+				(gnus-point-at-bol))
               (let ((goback (point-marker)))
                 (fill-paragraph nil)
                 (goto-char (marker-position goback)))
@@ -2033,7 +2035,7 @@ unfolded."
 	    ;; We display the face.
 	    (if (symbolp gnus-article-x-face-command)
 		;; The command is a lisp function, so we call it.
-		(if (gnus-functionp gnus-article-x-face-command)
+		(if (functionp gnus-article-x-face-command)
 		    (funcall gnus-article-x-face-command face)
 		  (error "%s is not a function" gnus-article-x-face-command))
 	      ;; The command is a string, so we interpret the command
@@ -2134,23 +2136,23 @@ If PROMPT (the prefix), prompt for a coding system to use."
 	(article-narrow-to-head)
 	(with-current-buffer gnus-original-article-buffer
 	  (goto-char (point-min)))
-	(while (re-search-forward "^Newsgroups:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]"
-				  nil t)
+	(while (re-search-forward
+		"^Newsgroups:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]" nil t)
 	  (replace-match (save-match-data
-			     (gnus-decode-newsgroups
-			      ;; XXX how to use data in article buffer?
-			      (with-current-buffer gnus-original-article-buffer
-				(re-search-forward
-				 "^Newsgroups:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]"
-				 nil t)
-				(match-string 1))
-			      gnus-newsgroup-name method))
+			   (gnus-decode-newsgroups
+			    ;; XXX how to use data in article buffer?
+			    (with-current-buffer gnus-original-article-buffer
+			      (re-search-forward
+			       "^Newsgroups:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]"
+			       nil t)
+			      (match-string 1))
+			    gnus-newsgroup-name method))
 			 t t nil 1))
 	(goto-char (point-min))
 	(with-current-buffer gnus-original-article-buffer
 	  (goto-char (point-min)))
-	(while (re-search-forward "^Followup-To:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]"
-				  nil t)
+	(while (re-search-forward
+		"^Followup-To:\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]" nil t)
 	  (replace-match (save-match-data
 			   (gnus-decode-newsgroups
 			    ;; XXX how to use data in article buffer?
@@ -2303,7 +2305,7 @@ If READ-CHARSET, ask for a coding system."
 	    (when entry
 	      (setq func (cdr entry)))
 	    (cond
-	     ((gnus-functionp func)
+	     ((functionp func)
 	      (funcall func))
 	     (t
 	      (apply (car func) (cdr func))))))))))
@@ -2577,7 +2579,7 @@ Point is left at the beginning of the narrowed-to region."
 		       (< (- (point-max) (point)) limit))
 		  (and (floatp limit)
 		       (< (count-lines (point) (point-max)) limit))
-		  (and (gnus-functionp limit)
+		  (and (functionp limit)
 		       (funcall limit))
 		  (and (stringp limit)
 		       (not (re-search-forward limit nil t))))
@@ -2779,7 +2781,7 @@ should replace the \"Date:\" one, or should be added below it."
 				  gnus-article-time-format)
 			      (error nil))
 			    gnus-article-time-format)))
-	    (if (gnus-functionp format)
+	    (if (functionp format)
 		(funcall format time)
 	      (concat "Date: " (format-time-string format time)))))
 	 ;; ISO 8601.
@@ -3316,7 +3318,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 	      ;; Don't verify multiple headers.
 	      (setq headers (mapconcat (lambda (header)
 					 (concat header ": "
-						 (mail-fetch-field header) "\n"))
+						 (mail-fetch-field header)
+						 "\n"))
 				       (split-string (nth 1 items) ",") "")))
 	    (delete-region (point-min) (point-max))
 	    (insert "-----BEGIN PGP SIGNED MESSAGE-----\n\n")
@@ -3818,10 +3821,12 @@ General format specifiers can also be used.  See Info node
       (define-key map (cadr c) (car c)))
     map))
 
-(easy-menu-define gnus-mime-button-menu gnus-mime-button-map "MIME button menu."
+(easy-menu-define
+  gnus-mime-button-menu gnus-mime-button-map "MIME button menu."
   `("MIME Part"
     ,@(mapcar (lambda (c)
-		(vector (caddr c) (car c) :enable t)) gnus-mime-button-commands)))
+		(vector (caddr c) (car c) :enable t))
+	      gnus-mime-button-commands)))
 
 (eval-when-compile
   (define-compiler-macro popup-menu (&whole form
@@ -3909,9 +3914,7 @@ General format specifiers can also be used.  See Info node
 	     (let ((mbl1 mml-buffer-list))
 	       (setq mml-buffer-list mbl)
 	       (set (make-local-variable 'mml-buffer-list) mbl1))
-	     ;; LOCAL argument of add-hook differs between GNU Emacs
-	     ;; and XEmacs. make-local-hook makes sure they are local.
-	     (make-local-hook 'kill-buffer-hook)
+	     (gnus-make-local-hook 'kill-buffer-hook)
 	     (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
        `(lambda (no-highlight)
 	  (let ((mail-parse-charset (or gnus-article-charset
@@ -3936,77 +3939,78 @@ General format specifiers can also be used.  See Info node
 Replace it with some information about the removed part."
   (interactive)
   (gnus-article-check-buffer)
-  (let* ((data (get-text-property (point) 'gnus-data))
-	 (handles gnus-article-mime-handles)
-	 (none "(none)")
-	 (description
-	  (or
-	   (mail-decode-encoded-word-string (or (mm-handle-description data)
-						none))))
-	 (filename
-	  (or (mail-content-type-get (mm-handle-disposition data) 'filename)
-	      none))
-	 (type (mm-handle-media-type data)))
-    (if (mm-multiple-handles gnus-article-mime-handles)
-	(error "This function is not implemented"))
-    (with-current-buffer (mm-handle-buffer data)
-      (let ((bsize (format "%s" (buffer-size))))
-	(erase-buffer)
-	(insert
-	 (concat
-	  "<#part type=text/plain nofile=yes disposition=attachment"
-	  " description=\"Deleted attachment (" bsize " Byte)\">"
-	  ",----\n"
-	  "| The following attachment has been deleted:\n"
-	  "|\n"
-	  "| Type:           " type "\n"
-	  "| Filename:       " filename "\n"
-	  "| Size (encoded): " bsize " Byte\n"
-	  "| Description:    " description "\n"
-	  "`----\n"
-	  "<#/part>"))
-	(setcdr data
-		(cdr (mm-make-handle nil `("text/plain"))))))
-    (set-buffer gnus-summary-buffer)
-    ;; FIXME: maybe some of the following code (borrowed from
-    ;; `gnus-mime-save-part-and-strip') isn't necessary?
-    (gnus-article-edit-article
-     `(lambda ()
-	(erase-buffer)
-	(let ((mail-parse-charset (or gnus-article-charset
-				      ',gnus-newsgroup-charset))
-	      (mail-parse-ignored-charsets
-	       (or gnus-article-ignored-charsets
-		   ',gnus-newsgroup-ignored-charsets))
-	      (mbl mml-buffer-list))
-	  (setq mml-buffer-list nil)
-	  (insert-buffer gnus-original-article-buffer)
-	  (mime-to-mml ',handles)
-	  (setq gnus-article-mime-handles nil)
-	  (let ((mbl1 mml-buffer-list))
-	    (setq mml-buffer-list mbl)
-	    (set (make-local-variable 'mml-buffer-list) mbl1))
-	  ;; LOCAL argument of add-hook differs between GNU Emacs
-	  ;; and XEmacs. make-local-hook makes sure they are local.
-	  (make-local-hook 'kill-buffer-hook)
-	  (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
-     `(lambda (no-highlight)
-	(let ((mail-parse-charset (or gnus-article-charset
-				      ',gnus-newsgroup-charset))
-	      (message-options message-options)
-	      (message-options-set-recipient)
-	      (mail-parse-ignored-charsets
-	       (or gnus-article-ignored-charsets
-		   ',gnus-newsgroup-ignored-charsets)))
-	  (mml-to-mime)
-	  (mml-destroy-buffers)
-	  (remove-hook 'kill-buffer-hook
-		       'mml-destroy-buffers t)
-	  (kill-local-variable 'mml-buffer-list))
-	(gnus-summary-edit-article-done
-	 ,(or (mail-header-references gnus-current-headers) "")
-	 ,(gnus-group-read-only-p)
-	 ,gnus-summary-buffer no-highlight))))
+  (unless (and gnus-novice-user
+	       (not (gnus-yes-or-no-p
+		     "Really delete attachment forever? ")))
+    (let* ((data (get-text-property (point) 'gnus-data))
+	   (handles gnus-article-mime-handles)
+	   (none "(none)")
+	   (description
+	    (or
+	     (mail-decode-encoded-word-string (or (mm-handle-description data)
+						  none))))
+	   (filename
+	    (or (mail-content-type-get (mm-handle-disposition data) 'filename)
+		none))
+	   (type (mm-handle-media-type data)))
+      (if (mm-multiple-handles gnus-article-mime-handles)
+	  (error "This function is not implemented"))
+      (with-current-buffer (mm-handle-buffer data)
+	(let ((bsize (format "%s" (buffer-size))))
+	  (erase-buffer)
+	  (insert
+	   (concat
+	    "<#part type=text/plain nofile=yes disposition=attachment"
+	    " description=\"Deleted attachment (" bsize " Byte)\">"
+	    ",----\n"
+	    "| The following attachment has been deleted:\n"
+	    "|\n"
+	    "| Type:           " type "\n"
+	    "| Filename:       " filename "\n"
+	    "| Size (encoded): " bsize " Byte\n"
+	    "| Description:    " description "\n"
+	    "`----\n"
+	    "<#/part>"))
+	  (setcdr data
+		  (cdr (mm-make-handle nil `("text/plain"))))))
+      (set-buffer gnus-summary-buffer)
+      ;; FIXME: maybe some of the following code (borrowed from
+      ;; `gnus-mime-save-part-and-strip') isn't necessary?
+      (gnus-article-edit-article
+       `(lambda ()
+	  (erase-buffer)
+	  (let ((mail-parse-charset (or gnus-article-charset
+					',gnus-newsgroup-charset))
+		(mail-parse-ignored-charsets
+		 (or gnus-article-ignored-charsets
+		     ',gnus-newsgroup-ignored-charsets))
+		(mbl mml-buffer-list))
+	    (setq mml-buffer-list nil)
+	    (insert-buffer gnus-original-article-buffer)
+	    (mime-to-mml ',handles)
+	    (setq gnus-article-mime-handles nil)
+	    (let ((mbl1 mml-buffer-list))
+	      (setq mml-buffer-list mbl)
+	      (set (make-local-variable 'mml-buffer-list) mbl1))
+	    (gnus-make-local-hook 'kill-buffer-hook)
+	    (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
+       `(lambda (no-highlight)
+	  (let ((mail-parse-charset (or gnus-article-charset
+					',gnus-newsgroup-charset))
+		(message-options message-options)
+		(message-options-set-recipient)
+		(mail-parse-ignored-charsets
+		 (or gnus-article-ignored-charsets
+		     ',gnus-newsgroup-ignored-charsets)))
+	    (mml-to-mime)
+	    (mml-destroy-buffers)
+	    (remove-hook 'kill-buffer-hook
+			 'mml-destroy-buffers t)
+	    (kill-local-variable 'mml-buffer-list))
+	  (gnus-summary-edit-article-done
+	   ,(or (mail-header-references gnus-current-headers) "")
+	   ,(gnus-group-read-only-p)
+	   ,gnus-summary-buffer no-highlight)))))
   ;; Not in `gnus-mime-save-part-and-strip':
   (gnus-article-edit-done)
   (gnus-summary-expand-window)
@@ -4895,28 +4899,33 @@ If end of article, return non-nil.  Otherwise return nil.
 Argument LINES specifies lines to be scrolled up."
   (interactive "p")
   (move-to-window-line -1)
-  (if (and (not gnus-article-over-scroll)
-	   (save-excursion
-	     (end-of-line)
-	     (and (pos-visible-in-window-p)	;Not continuation line.
-		  (>= (1+ (point)) (point-max))))) ;Allow for trailing newline.
+  (if (save-excursion
+	(end-of-line)
+	(and (pos-visible-in-window-p)	;Not continuation line.
+	     (>= (1+ (point)) (point-max)))) ;Allow for trailing newline.
       ;; Nothing in this page.
       (if (or (not gnus-page-broken)
 	      (save-excursion
 		(save-restriction
 		  (widen) (forward-line 1) (eobp)))) ;Real end-of-buffer?
-	  t				;Nothing more.
+	  (progn
+	    (when gnus-article-over-scroll
+	      (gnus-article-next-page-1 lines))
+	    t)			;Nothing more.
 	(gnus-narrow-to-page 1)		;Go to next page.
 	nil)
     ;; More in this page.
-    (let ((scroll-in-place nil))
-      (condition-case ()
-	  (scroll-up lines)
-	(end-of-buffer
-	 ;; Long lines may cause an end-of-buffer error.
-	 (goto-char (point-max)))))
-    (move-to-window-line 0)
+    (gnus-article-next-page-1 lines)
     nil))
+
+(defun gnus-article-next-page-1 (lines)
+  (let ((scroll-in-place nil))
+    (condition-case ()
+	(scroll-up lines)
+      (end-of-buffer
+       ;; Long lines may cause an end-of-buffer error.
+       (goto-char (point-max)))))
+  (move-to-window-line 0))
 
 (defun gnus-article-prev-page (&optional lines)
   "Show previous page of current article.
@@ -5564,8 +5573,8 @@ groups."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|nntp\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|nntp\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -5929,10 +5938,10 @@ positives are possible."
      0 (>= gnus-button-message-level 0) gnus-button-handle-news 3)
     ("\\b\\(nntp\\|news\\):\\([^>\n\t ]*@[^>)!;:,\n\t ]*\\)" 0 t
      gnus-button-handle-news 2)
-    ("\\(\\b<\\(url:[>\n\t ]*\\)?news:[>\n\t ]*\\(//\\)?\\([^>\n\t ]*\\)>\\)"
-     1 (>= gnus-button-message-level 0) gnus-button-fetch-group 4)
-    ("\\bnews:\\(//\\)?\\([^'\">\n\t ]+\\)"
-     0 (>= gnus-button-message-level 0) gnus-button-fetch-group 2)
+    ("\\(\\b<\\(url:[>\n\t ]*\\)?\\(nntp\\|news\\):[>\n\t ]*\\(//\\)?\\([^>\n\t ]*\\)>\\)"
+     1 (>= gnus-button-message-level 0) gnus-button-fetch-group 5)
+    ("\\b\\(nntp\\|news\\):\\(//\\)?\\([^'\">\n\t ]+\\)"
+     0 (>= gnus-button-message-level 0) gnus-button-fetch-group 3)
     ("\\bin\\( +article\\| +message\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)"
      2 (>= gnus-button-message-level 0) gnus-button-message-id 3)
     ("\\(<URL: *\\)mailto: *\\([^> \n\t]+\\)>"
@@ -6058,8 +6067,8 @@ variable it the real callback function."
      0 (>= gnus-button-browse-level 0) browse-url 0)
     ("^[^:]+:" "\\bmailto:\\([-a-z.@_+0-9%=?]+\\)"
      0 (>= gnus-button-message-level 0) gnus-url-mailto 1)
-    ("^[^:]+:" "\\(<\\(url: \\)?news:\\([^>\n ]*\\)>\\)"
-     1 (>= gnus-button-message-level 0) gnus-button-message-id 3))
+    ("^[^:]+:" "\\(<\\(url: \\)?\\(nntp\\|news\\):\\([^>\n ]*\\)>\\)"
+     1 (>= gnus-button-message-level 0) gnus-button-message-id 4))
   "*Alist of headers and regexps to match buttons in article heads.
 
 This alist is very similar to `gnus-button-alist', except that each

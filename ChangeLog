@@ -1,3 +1,37 @@
+2003-04-22  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Flag as binary to ensure DOS line terminators.  Delete
+	trailing whitespace.
+
+2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Frank Schmitt  <ich@frank-schmitt.net>
+
+	* etc/gnus-tut.txt: Update Gnus FAQ, delete trailing whitespace.
+
+2003-04-17  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* make.bat: Cleaned up end-of-line characters.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* Makefile.in (XEMACS): Use @EMACS@.
+
+	* aclocal.m4 (AC_PATH_LISPDIR): Set $datadir to $prefix/lib if
+	building with XEmacs.
+
+	* aclocal.m4 (AC_SET_BUILD_FLAGS): New.  So we can set XEmacs
+	command line options to '-batch -no-autoloads...' for a cleaner
+	build environment.
+
+	* configure.in: Use it.
+
+	* configure: Regenerate.
+
+2003-04-16  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Frank Schmitt  <ich@frank-schmitt.net>
+
+	* make.bat: New variable EMACS_ARGS.  Changed XEmacs args.
+
 2003-03-23  Simon Josefsson  <jas@extundo.com>
 
 	* GNUS-NEWS: Add IDNA.  Add TLS.  Fix USEFOR reference.

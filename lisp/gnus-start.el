@@ -32,7 +32,7 @@
 (require 'gnus-spec)
 (require 'gnus-range)
 (require 'gnus-util)
-(require 'message)
+(autoload 'message-make-date "message")
 (eval-when-compile (require 'cl))
 
 (defcustom gnus-startup-file (nnheader-concat gnus-home-directory ".newsrc")
@@ -1013,7 +1013,7 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
   "Call METHOD to subscribe GROUP.
 If no function returns `non-nil', call `gnus-subscribe-zombies'."
   (unless (cond
-	   ((gnus-functionp method)
+	   ((functionp method)
 	    (funcall method group))
 	   ((listp method)
 	    (catch 'found
@@ -2884,6 +2884,7 @@ If FORCE is non-nil, the .newsrc file is read."
 		      (or (gnus-group-name-charset method name)
 			  (gnus-parameter-charset name)
 			  gnus-default-charset)))
+		;; Fixme: Don't decode in unibyte mode.
 		(when (and str charset (featurep 'mule))
 		  (setq str (mm-decode-coding-string str charset)))
 		(set group str)))

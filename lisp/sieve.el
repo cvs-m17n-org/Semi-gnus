@@ -3,7 +3,7 @@
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 
-;; This file is not part of GNU Emacs, but the same permissions apply.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -370,8 +370,7 @@ Server  : " server ":" (or port "2000") "
 	(if (sieve-manage-ok-p err)
 	    (message (concat
 		      "Sieve upload done.  Use `C-c RET' to manage scripts."))
-	  (message "Sieve upload failed: %s"
-		   (replace-regexp-in-string "[\n\r\t]+" " " (nth 2 err))))))))
+	  (message "Sieve upload failed: %s" (nth 2 err)))))))
 
 ;;;###autoload
 (defun sieve-upload-and-bury (&optional name)
