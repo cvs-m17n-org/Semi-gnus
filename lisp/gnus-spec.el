@@ -191,26 +191,33 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
     (lisp-interaction-mode)
     (insert (gnus-pp-to-string spec))))
 
-(put 'gnus-search-or-regist-spec 'lisp-indent-function 1)
-(defmacro gnus-search-or-regist-spec (mspec &rest body)
-  (let ((specs (nth 0 mspec)) (type (nth 1 mspec)) (format (nth 2 mspec))
-	(spec (nth 3 mspec)) (entry (nth 4 mspec)) (elem (nth 5 mspec)))
-    `(let* ((,entry (assq ,type ,specs))
-	    (,elem (assoc ,format (cdr ,entry))))
-       (or (cdr ,elem)
-	   (when (progn ,@body)
-	     (if ,entry
-		 (if ,elem
-		     (setcdr ,elem ,spec)
-		   (setcdr ,entry (cons (cons ,format ,spec) (cdr ,entry))))
-	       (push (list ,type (cons ,format ,spec)) ,specs))
-	     (gnus-product-variable-touch (quote ,specs)))
-	   ,spec))))
+(eval-when-compile (defvar unchanged))
+
+(put 'gnus-search-or-regist-spec 'lisp-indent-function 4)
+(defmacro gnus-search-or-regist-spec (specs type format val &rest body)
+  `(let* ((entry (assq ,type ,specs))
+	  (elem (assoc ,format (cdr entry))))
+     ;; That `(cdr elem)' returns non-nil means the spec for `type'
+     ;; doesn't need to be updated.
+     (or (cdr elem)
+	 ;; This variable is set beforehand.
+	 (setq unchanged nil)
+	 ;; Update the spec.  Where `body' will modify `val'.  This
+	 ;; section will be skipped if compiling the spec is disabled.
+	 (when (progn ,@body)
+	   (if entry
+	       (if elem
+		   (setcdr elem ,val)
+		 (setcdr entry (cons (cons ,format ,val) (cdr entry))))
+	     (push (list ,type (cons ,format ,val)) ,specs))
+	   (gnus-product-variable-touch (quote ,specs)))
+	 ;; Return the new spec without compiling.
+	 ,val)))
 
 (defun gnus-update-format-specification-1 (type format val)
   (set (intern (format "gnus-%s-line-format-spec" type))
-       (gnus-search-or-regist-spec (gnus-format-specs-compiled
-				    type format val entry elem)
+       (gnus-search-or-regist-spec
+	   gnus-format-specs-compiled type format val
 	 (when (and gnus-compile-user-specs val)
 	   (setq val (prog1
 			 (progn
@@ -245,39 +252,38 @@ Return a list of updated types."
 	    gnus-format-specs-compiled (delq spec gnus-format-specs-compiled))))
 
   ;; Go through all the formats and see whether they need updating.
-  (let (type val updated)
+  (let (new-format type val unchanged updated)
     (save-excursion
       (while (setq type (pop types))
 	;; Jump to the proper buffer to find out the value of the
 	;; variable, if possible.  (It may be buffer-local.)
-	(let ((new-format
-	       (let ((buffer (intern (format "gnus-%s-buffer" type))))
-		 (when (and (boundp buffer)
-			    (setq val (symbol-value buffer))
-			    (gnus-buffer-exists-p val))
-		   (set-buffer val))
-		 (symbol-value
-		  (intern (format "gnus-%s-line-format" type))))))
-	  (when
-	      (or (gnus-update-format-specification-1 type new-format nil)
-		  ;; This is a new format.
-		  (gnus-update-format-specification-1
-		   type new-format
-		   (gnus-search-or-regist-spec (gnus-format-specs
-						type new-format val entry elem)
-		     (setq val
-			   (if (stringp new-format)
-			       ;; This is a "real" format.
-			       (gnus-parse-format
-				new-format
-				(symbol-value
-				 (intern (format "gnus-%s-line-format-alist"
-						 type)))
-				(not (string-match "mode$"
-						   (symbol-name type))))
-			     ;; This is a function call or something.
-			     new-format)))))
-	    (push type updated)))))
+	(let ((buffer (intern (format "gnus-%s-buffer" type))))
+	  (when (and (boundp buffer)
+		     (setq val (symbol-value buffer))
+		     (gnus-buffer-exists-p val))
+	    (set-buffer val))
+	  (setq new-format (symbol-value
+			    (intern (format "gnus-%s-line-format" type)))))
+	(setq unchanged t)
+	(or (gnus-update-format-specification-1 type new-format nil)
+	    ;; This is a new format.
+	    (gnus-update-format-specification-1
+	     type new-format
+	     (gnus-search-or-regist-spec
+		 gnus-format-specs type new-format val
+	       (setq val (if (stringp new-format)
+			     ;; This is a "real" format.
+			     (gnus-parse-format
+			      new-format
+			      (symbol-value
+			       (intern (format "gnus-%s-line-format-alist"
+					       type)))
+			      (not (string-match "mode$"
+						 (symbol-name type))))
+			   ;; This is a function call or something.
+			   new-format)))))
+	(unless unchanged
+	  (push type updated))))
     updated))
 
 (defvar gnus-mouse-face-0 'highlight)

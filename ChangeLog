@@ -1,3 +1,10 @@
+2004-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-spec.el (gnus-search-or-regist-spec): Manage the flag
+	which indicates whether the spec is updated; simplify the form.
+	(gnus-update-format-specifications): Correct the way to detect
+	whether specs are updated.
+
 2004-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/encrypt.el: Autoload password-read-and-add and
