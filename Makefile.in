@@ -64,6 +64,7 @@ info-ja:
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
 	rm -f MANIFEST.*
+	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
 xsome:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
@@ -76,7 +77,7 @@ x:
 
 distclean: clean
 	rm -rf *~
-	for i in lisp texi; do (cd $$i; make distclean); done
+	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
 
 osome:
