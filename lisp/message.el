@@ -1247,7 +1247,7 @@ See also the documentations for the following variables:
 	  nil)
       (,(concat "^\\(" message-cite-prefix-regexp "\\).*")
        (0 'message-cited-text-face))
-      ("<#/?\\(multipart\\|part\\|external\\|mml\\).*>"
+      (,mime-edit-tag-regexp
        (0 'message-mml-face))))
   "Additional expressions to highlight in Message mode.")
 
