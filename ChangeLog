@@ -1,3 +1,15 @@
+1998-08-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-frames): New custom group.
+	(message-original-frame): New variable.
+	(message-use-multi-frames): New variable.
+	(message-delete-frame-on-exit): New variable.
+	(message-send-and-exit): Delete frame which made for editing
+	message.
+	(message-kill-buffer): Ditto.
+	(message-delete-frame): New function.
+	(message-pop-to-buffer): Make new frame when edit message.
+
 1998-08-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.13.
