@@ -1,3 +1,10 @@
+1999-08-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.4b5.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-read-pop-account): Add prefix
+	"po:" to POP file name.
+
 1999-08-09  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/nnmail.el (nnmail-movemail-program-pop-password-required):
