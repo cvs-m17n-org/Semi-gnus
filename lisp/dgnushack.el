@@ -49,6 +49,48 @@
 (fset 'facep 'ignore)
 
 (require 'cl)
+
+;; cl functions.
+(define-compiler-macro mapc (&whole form fn seq &rest rest)
+  (if (and (fboundp 'mapc)
+	   (subrp (symbol-function 'mapc)))
+      form
+    (if rest
+	`(let* ((fn ,fn)
+		(seq ,seq)
+		(args (cons seq ,rest))
+		(m (apply (function min) (mapcar (function length) args)))
+		(n 0))
+	   (while (< n m)
+	     (apply fn (mapcar (function (lambda (arg) (nth n arg))) args))
+	     (setq n (1+ n)))
+	   seq)
+      `(let ((seq ,seq))
+	 (mapcar ,fn seq)
+	 seq))))
+
+(define-compiler-macro last (&whole form x &optional n)
+  (if (and (fboundp 'last)
+	   (subrp (symbol-function 'last)))
+      form
+    (if n
+	`(let* ((x ,x)
+		(n ,n)
+		(m 0)
+		(p x))
+	   (while (consp p)
+	     (incf m)
+	     (pop p))
+	   (if (<= n 0)
+	       p
+	     (if (< n m)
+		 (nthcdr (- m n) x)
+	       x)))
+      `(let ((x ,x))
+	 (while (consp (cdr x))
+	   (pop x))
+	 x))))
+
 (require 'bytecomp)
 
 ;; Attempt to pickup the additional load-path(s).
