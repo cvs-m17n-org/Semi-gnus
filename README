@@ -39,7 +39,10 @@ in your Emacs, you should probably exit that Emacs and start a new one
 to fire up Gnus.
 
 Gnus does absolutely not work with anything older than Emacs 20.3 or
-XEmacs 20.0.  So you definitely need a new Emacs.
+XEmacs 20.0.  So you definitely need a new Emacs.  
+
+To compile the Gnus manual, you either need a pretty new Emacs, or a
+pretty new version of the texinfo tools.
 
 Then you do a `M-x gnus', and everything should... uhm... it should
 work, but it might not. Set `debug-on-error' to t, and mail me the

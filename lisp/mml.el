@@ -1009,15 +1009,15 @@ TYPE is the MIME type to use."
   (mml-insert-tag 'part 'type type 'disposition "inline")
   (forward-line -1))
 
-(defun mml-preview-insert-mft ()
+(defun mml-preview-insert-mail-followup-to ()
   "Insert a Mail-Followup-To header before previewing an article.
 Should be adopted if code in `message-send-mail' is changed."
   (when (and (message-mail-p)
 	     (message-subscribed-p)
 	     (not (mail-fetch-field "mail-followup-to"))
-	     (message-make-mft))
+	     (message-make-mail-followup-to))
     (message-position-on-field "Mail-Followup-To" "X-Draft-From")
-    (insert (message-make-mft))))
+    (insert (message-make-mail-followup-to))))
 
 (defun mml-preview (&optional raw)
   "Display current buffer with Gnus, in a new buffer.
@@ -1039,7 +1039,7 @@ If RAW, don't highlight the article."
 				   "*MIME preview of ") (buffer-name))))
       (erase-buffer)
       (insert-buffer buf)
-      (mml-preview-insert-mft)
+      (mml-preview-insert-mail-followup-to)
       (let ((message-deletable-headers (if (message-news-p)
 					   nil
 					 message-deletable-headers)))
@@ -1068,6 +1068,10 @@ If RAW, don't highlight the article."
 	    (gnus-article-prepare-display))))
       ;; Disable article-mode-map.
       (use-local-map nil)
+      (make-local-hook 'kill-buffer-hook)
+      (add-hook 'kill-buffer-hook
+		(lambda ()
+		  (mm-destroy-parts gnus-article-mime-handles)) nil t)
       (setq buffer-read-only t)
       (local-set-key "q" (lambda () (interactive) (kill-buffer nil)))
       (goto-char (point-min)))))

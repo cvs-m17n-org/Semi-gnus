@@ -156,6 +156,7 @@ with some simple extensions.
 %i    Number of ticked and dormant (integer)
 %T    Number of ticked articles (integer)
 %R    Number of read articles (integer)
+%U    Number of unseen articles (integer)
 %t    Estimated total number of articles (integer)
 %y    Number of unread, unticked articles (integer)
 %G    Group name (string)
@@ -470,6 +471,7 @@ simple manner.")
 		   (gnus-range-length (cdr (assq 'tick gnus-tmp-marked))))))
 	      (t number)) ?s)
     (?R gnus-tmp-number-of-read ?s)
+    (?U (gnus-number-of-unseen-articles-in-group gnus-tmp-group) ?d)
     (?t gnus-tmp-number-total ?d)
     (?y gnus-tmp-number-of-unread ?s)
     (?I (gnus-range-length (cdr (assq 'dormant gnus-tmp-marked))) ?d)
@@ -1306,6 +1308,18 @@ if it is a string, only list groups matching REGEXP."
 	     (- (1+ (cdr active)) (car active)))
 	 nil)
        (gnus-method-simplify (gnus-find-method-for-group group))))))
+
+(defun gnus-number-of-unseen-articles-in-group (group)
+  (let* ((info (nth 2 (gnus-group-entry group)))
+	 (marked (gnus-info-marks info))
+	 (seen (cdr (assq 'seen marked)))
+	 (active (gnus-active group)))
+    (if (not active)
+	0
+      (length (gnus-uncompress-range
+	       (gnus-range-difference
+		(gnus-range-difference (list active) (gnus-info-read info))
+		seen))))))
 
 (defun gnus-group-insert-group-line (gnus-tmp-group gnus-tmp-level
 						    gnus-tmp-marked number
@@ -2464,7 +2478,9 @@ If SOLID (the prefix), create a solid group."
 		  (nnweb-type ,(intern type))
 		  (nnweb-ephemeral-p t))))
     (if solid
-	(gnus-group-make-group group "nnweb" "" `(,(intern type) ,search))
+	(progn
+	  (gnus-pull 'nnweb-ephemeral-p method)
+	  (gnus-group-make-group group method))
       (gnus-group-read-ephemeral-group
        group method t
        (cons (current-buffer)
@@ -3031,7 +3047,8 @@ or nil if no action could be taken."
       num)))
 
 (defun gnus-group-expire-articles (&optional n)
-  "Expire all expirable articles in the current newsgroup."
+  "Expire all expirable articles in the current newsgroup.
+Uses the process/prefix convention."
   (interactive "P")
   (let ((groups (gnus-group-process-prefix n))
 	group)

@@ -282,7 +282,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.10"
+(defconst gnus-version-number "0.11"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -672,7 +672,7 @@ be set in `.emacs' instead."
      ()))
   "Face used for normal interest ancient articles.")
 
-(defface gnus-summary-high-uncached-face
+(defface gnus-summary-high-undownloaded-face
    '((((class color)
        (background light))
       (:bold t :foreground "cyan4" :bold nil))
@@ -681,7 +681,7 @@ be set in `.emacs' instead."
      (t (:inverse-video t :bold t)))
   "Face used for high interest uncached articles.")
 
-(defface gnus-summary-low-uncached-face
+(defface gnus-summary-low-undownloaded-face
    '((((class color)
        (background light))
       (:italic t :foreground "cyan4" :bold nil))
@@ -690,7 +690,7 @@ be set in `.emacs' instead."
      (t (:inverse-video t :italic t)))
   "Face used for low interest uncached articles.")
 
-(defface gnus-summary-normal-uncached-face
+(defface gnus-summary-normal-undownloaded-face
    '((((class color)
        (background light))
       (:foreground "cyan4" :bold nil))
@@ -1795,6 +1795,10 @@ When a spam group is entered, all unread articles are marked as spam.")
   "The ifile summary exit spam processor.
 Only applicable to spam groups.")
 
+(defvar gnus-group-spam-exit-processor-stat "stat"
+  "The spam-stat summary exit spam processor.
+Only applicable to spam groups.")
+
 (defvar gnus-group-spam-exit-processor-bogofilter "bogofilter"
   "The Bogofilter summary exit spam processor.
 Only applicable to spam groups.")
@@ -1802,6 +1806,14 @@ Only applicable to spam groups.")
 (defvar gnus-group-spam-exit-processor-blacklist "blacklist"
   "The Blacklist summary exit spam processor.
 Only applicable to spam groups.")
+
+(defvar gnus-group-ham-exit-processor-ifile "ifile-ham"
+  "The ifile summary exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
+
+(defvar gnus-group-ham-exit-processor-stat "stat-ham"
+  "The spam-stat summary exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
 
 (defvar gnus-group-ham-exit-processor-whitelist "whitelist"
   "The whitelist summary exit ham processor.
@@ -1819,8 +1831,11 @@ Only applicable to non-spam (unclassified and ham) groups.")
 			  (list :tag "Spam Summary Exit Processor Choices"
 			   (set 
 			    (variable-item gnus-group-spam-exit-processor-ifile)
+			    (variable-item gnus-group-spam-exit-processor-stat)
 			    (variable-item gnus-group-spam-exit-processor-bogofilter)
 			    (variable-item gnus-group-spam-exit-processor-blacklist)
+			    (variable-item gnus-group-ham-exit-processor-ifile)
+			    (variable-item gnus-group-ham-exit-processor-stat)
 			    (variable-item gnus-group-ham-exit-processor-whitelist)
 			    (variable-item gnus-group-ham-exit-processor-BBDB))))
  :function-document
@@ -1839,8 +1854,11 @@ for mail groups."
 			  (regexp :tag "Group Regexp") 
 			  (set :tag "Spam/Ham Summary Exit Processor"
 			       (variable-item gnus-group-spam-exit-processor-ifile)
+			       (variable-item gnus-group-spam-exit-processor-stat)
 			       (variable-item gnus-group-spam-exit-processor-bogofilter)
 			       (variable-item gnus-group-spam-exit-processor-blacklist)
+			       (variable-item gnus-group-ham-exit-processor-ifile)
+			       (variable-item gnus-group-ham-exit-processor-stat)
 			       (variable-item gnus-group-ham-exit-processor-whitelist)
 			       (variable-item gnus-group-ham-exit-processor-BBDB))))
  :parameter-document
@@ -1863,14 +1881,45 @@ to do spam-processed article moving, associated with the destination
 group or `nil' for explicit expiration.  This only makes sense for
 mail groups."
  :variable-group spam
- :variable-type '(repeat :tag "Spam-processed articles destination" 
-			 (list
-			  (regexp :tag "Group Regexp") 
-			  (choice :tag "Destination for spam-processed articles at summary exit"
-				  (string :tag "Move to a group")
-				  (other :tag "Expire" nil))))
+ :variable-type '(repeat 
+		  :tag "Spam-processed articles destination" 
+		  (list
+		   (regexp :tag "Group Regexp") 
+		   (choice 
+		    :tag "Destination for spam-processed articles at summary exit"
+		    (string :tag "Move to a group")
+		    (other :tag "Expire" nil))))
  :parameter-document
  "Where spam-processed articles will go at summary exit.")
+
+(gnus-define-group-parameter
+ ham-process-destination
+ :parameter-type '(choice 
+		   :tag "Destination for ham articles at summary exit from a spam group"
+			  (string :tag "Move to a group")
+			  (other :tag "Do nothing" nil))
+ :function-document
+ "Where ham articles will go at summary exit from a spam group."
+ :variable gnus-ham-process-destinations
+ :variable-default nil
+ :variable-document
+ "*Groups in which to explicitly send ham articles to
+another group, or do nothing (the default).  If non-nil, this should
+be a list of group name regexps that should match all groups in which
+to do ham article moving, associated with the destination
+group or `nil' for explicit ignoring.  This only makes sense for
+mail groups, and only works in spam groups."
+ :variable-group spam
+ :variable-type '(repeat 
+		  :tag "Ham articles destination" 
+		  (list
+		   (regexp :tag "Group Regexp") 
+		   (choice 
+		    :tag "Destination for ham articles at summary exit from spam group"
+		    (string :tag "Move to a group")
+		    (other :tag "Expire" nil))))
+ :parameter-document
+ "Where ham articles will go at summary exit from a spam group.")
 
 (defcustom gnus-group-uncollapsed-levels 1
   "Number of group name elements to leave alone when making a short group name."
@@ -2262,7 +2311,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-demon" :interactive t
       gnus-demon-init gnus-demon-cancel)
      ("gnus-fun" gnus-convert-gray-x-face-to-xpm gnus-display-x-face-in-from
-      gnus-convert-image-to-gray-x-face)
+      gnus-convert-image-to-gray-x-face gnus-convert-face-to-png
+      gnus-face-from-file)
      ("gnus-salt" gnus-highlight-selected-tree gnus-possibly-generate-tree
       gnus-tree-open gnus-tree-close gnus-carpal-setup-buffer)
      ("gnus-nocem" gnus-nocem-scan-groups gnus-nocem-close

@@ -2181,21 +2181,22 @@ If FORCE is non-nil, the .newsrc file is read."
 
 (defun gnus-read-newsrc-el-file (file)
   (let ((ding-file (concat file "d")))
-    ;; We always, always read the .eld file.
-    (gnus-message 5 "Reading %s..." ding-file)
-    (let (gnus-newsrc-assoc)
-      (let ((coding-system-for-read gnus-ding-file-coding-system))
-	(gnus-load ding-file))
-      ;; Older versions of `gnus-format-specs' are no longer valid
-      ;; in Oort Gnus 0.01.
-      (let ((version
-	     (and gnus-newsrc-file-version
-		  (gnus-continuum-version gnus-newsrc-file-version))))
-	(when (or (not version)
-		  (< version 5.090009))
-	  (setq gnus-format-specs gnus-default-format-specs)))
-      (when gnus-newsrc-assoc
-	(setq gnus-newsrc-alist gnus-newsrc-assoc)))
+    (when (file-exists-p ding-file)
+      ;; We always, always read the .eld file.
+      (gnus-message 5 "Reading %s..." ding-file)
+      (let (gnus-newsrc-assoc)
+	(let ((coding-system-for-read gnus-ding-file-coding-system))
+	  (gnus-load ding-file))
+	;; Older versions of `gnus-format-specs' are no longer valid
+	;; in Oort Gnus 0.01.
+	(let ((version
+	       (and gnus-newsrc-file-version
+		    (gnus-continuum-version gnus-newsrc-file-version))))
+	  (when (or (not version)
+		    (< version 5.090009))
+	    (setq gnus-format-specs gnus-default-format-specs)))
+	(when gnus-newsrc-assoc
+	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
     (gnus-make-hashtable-from-newsrc-alist)
     (when (file-newer-than-file-p file ding-file)
       ;; Old format quick file

@@ -1,14 +1,12 @@
 ;;; spam-stat.el --- detecting spam based on statistics
 
-;; Copyright (C) 2002  Alex Schroeder
+;; Copyright (C) 2002  Free Software Foundation, Inc.
 
 ;; Author: Alex Schroeder <alex@gnu.org>
-;; Maintainer: Alex Schroeder <alex@gnu.org>
-;; Version: 0.3.5
-;; Keywords: spam filtering gnus
+;; Keywords: network
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki.pl?SpamStat
 
-;; This file is NOT part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;; This is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -41,7 +39,7 @@
 ;; considered to be a new spam mail; use this for new mail that has
 ;; not been processed before
 ;;
-;; `spam-stat-buffer-is-no-spam' -- called in a buffer, that buffer
+;; `spam-stat-buffer-is-non-spam' -- called in a buffer, that buffer
 ;; is considered to be a new non-spam mail; use this for new mail that
 ;; has not been processed before
 ;;
@@ -77,7 +75,7 @@
 
 ;; Typical test will involve calls to the following functions:
 ;;
-;; Reset: (setq spam-stat (make-hash-table :test 'equal))
+;; Reset: (spam-stat-reset)
 ;; Learn spam: (spam-stat-process-spam-directory "~/Mail/mail/spam")
 ;; Learn non-spam: (spam-stat-process-non-spam-directory "~/Mail/mail/misc")
 ;; Save table: (spam-stat-save)
@@ -98,7 +96,7 @@
 ;; rules in `nnmail-split-fancy'.  Somewhere among these rules, you
 ;; will filter spam.  Here is how you would create your dictionary:
 
-;; Reset: (setq spam-stat (make-hash-table :test 'equal))
+;; Reset: (spam-stat-reset)
 ;; Learn spam: (spam-stat-process-spam-directory "~/Mail/mail/spam")
 ;; Learn non-spam: (spam-stat-process-non-spam-directory "~/Mail/mail/misc")
 ;; Repeat for any other non-spam group you need...
@@ -118,6 +116,8 @@
 ;; Ted Zlatanov <tzz@lifelogs.com>
 ;; Jesper Harder <harder@myrealbox.com>
 ;; Dan Schmidt <dfan@dfan.org>
+;; Lasse Rasinen <lrasinen@iki.fi>
+;; Milan Zamazal <pdm@zamazal.org>
 
 
 
@@ -127,13 +127,19 @@
   "Statistical spam detection for Emacs.
 Use the functions to build a dictionary of words and their statistical
 distribution in spam and non-spam mails.  Then use a function to determine
-wether a buffer contains spam or not."
+whether a buffer contains spam or not."
   :group 'gnus)
 
 (defcustom spam-stat-file "~/.spam-stat.el"
   "File used to save and load the dictionary.
 See `spam-stat-to-hash-table' for the format of the file."
   :type 'file
+  :group 'spam-stat)
+
+(defcustom spam-stat-install-hooks t
+  "Whether spam-stat should install its hooks in Gnus.
+This is set to nil if you use spam-stat through spam.el."
+  :type 'boolean
   :group 'spam-stat)
 
 (defcustom spam-stat-unknown-word-score 0.2
@@ -155,8 +161,14 @@ This variable says how many characters this will be."
 
 (defcustom spam-stat-split-fancy-spam-group "mail.spam"
   "Name of the group where spam should be stored, if
-`spam-stat-split-fancy' is used in fancy splitting rules."
+`spam-stat-split-fancy' is used in fancy splitting rules.  Has no
+effect when spam-stat is invoked through spam.el."
   :type 'string
+  :group 'spam-stat)
+
+(defcustom spam-stat-split-fancy-spam-threshhold 0.9
+  "Spam score threshhold in spam-stat-split-fancy."
+  :type 'number
   :group 'spam-stat)
 
 (defvar spam-stat-syntax-table
@@ -226,10 +238,11 @@ This uses `gnus-article-buffer'."
     (set-buffer gnus-original-article-buffer)
     (spam-stat-store-current-buffer)))
 
-(add-hook 'nnmail-prepare-incoming-message-hook
-	  'spam-stat-store-current-buffer)
-(add-hook 'gnus-select-article-hook
-	  'spam-stat-store-gnus-article-buffer)
+(when spam-stat-install-hooks
+  (add-hook 'nnmail-prepare-incoming-message-hook
+	    'spam-stat-store-current-buffer)
+  (add-hook 'gnus-select-article-hook
+	    'spam-stat-store-gnus-article-buffer))
 
 ;; Data -- not using defstruct in order to save space and time
 
@@ -386,17 +399,17 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
   (interactive)
   (with-temp-buffer
     (let ((standard-output (current-buffer)))
-      (insert "(setq spam-stat (spam-stat-to-hash-table '(")
+      (insert "(setq spam-stat-ngood "
+              (number-to-string spam-stat-ngood)
+              " spam-stat-nbad "
+              (number-to-string spam-stat-nbad)
+              " spam-stat (spam-stat-to-hash-table '(")
       (maphash (lambda (word entry)
 		 (prin1 (list word
 			      (spam-stat-good entry)
 			      (spam-stat-bad entry))))
 	       spam-stat)
-      (insert ")) spam-stat-ngood "
-	      (number-to-string spam-stat-ngood)
-	      " spam-stat-nbad "
-	      (number-to-string spam-stat-nbad)
-	      ")"))
+      (insert ")))"))
     (write-file spam-stat-file)))
 
 (defun spam-stat-load ()
@@ -422,7 +435,9 @@ has appeared in bad mails."
   "Reset `spam-stat' to an empty hash-table.
 This deletes all the statistics."
   (interactive)
-  (setq spam-stat (make-hash-table :test 'equal)))
+  (setq spam-stat (make-hash-table :test 'equal)
+	spam-stat-ngood 0
+	spam-stat-nbad 0))
 
 ;; Scoring buffers
 
@@ -469,7 +484,7 @@ check the variable `spam-stat-score-data'."
       (progn
 	(set-buffer spam-stat-buffer)
 	(goto-char (point-min))
-	(when (> (spam-stat-score-buffer) 0.9)
+	(when (> (spam-stat-score-buffer) spam-stat-split-fancy-spam-threshhold)
 	  (when (boundp 'nnmail-split-trace)
 	    (mapc (lambda (entry)
 		    (push entry nnmail-split-trace))
