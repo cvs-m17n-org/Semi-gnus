@@ -518,8 +518,21 @@ If this variable is `t', do not use password cache.")
 (defun nnmail-request-post (&optional server)
   (mail-send-and-exit nil))
 
-(defvar nnmail-file-coding-system 'raw-text
-  "Coding system used in nnmail.")
+(defvar nnmail-file-coding-system-for-write
+  nnheader-message-coding-system-for-write
+  "Wriring file coding system used in nnmail.")
+
+(defvar nnmail-file-coding-system-for-read
+  nnheader-message-coding-system-for-read
+  "Reading file coding system used in nnmail.")
+
+(defvar nnmail-active-coding-system-for-read
+  nnheader-pathname-coding-system
+  "Coding system for reading active file.")
+
+(defvar nnmail-active-coding-system-for-write
+  nnheader-pathname-coding-system
+  "Coding system for wrinting active file.")
 
 (defun nnmail-find-file (file)
   "Insert FILE in server buffer safely."
@@ -528,14 +541,17 @@ If this variable is `t', do not use password cache.")
   (let ((format-alist nil)
         (after-insert-file-functions nil))
     (condition-case ()
-	(let ((pathname-coding-system 'binary))
+	(let ((pathname-coding-system nnheader-pathname-coding-system))
 	  (insert-file-contents-as-coding-system
-	   nnmail-file-coding-system file)
+	   nnmail-file-coding-system-for-read file)
 	  t)
       (file-error nil))))
 
-(defvar nnmail-pathname-coding-system 'binary
-  "*Coding system for pathname.")
+(defun nnmail-find-active-file (file)
+  "Insert active FILE in server buffer safely."
+  (let ((nnmail-file-coding-system-for-read
+	 nnmail-active-coding-system-for-read))
+    (nnmail-find-file file)))
 
 (defun nnmail-group-pathname (group dir &optional file)
   "Make pathname for GROUP."
@@ -550,7 +566,7 @@ If this variable is `t', do not use password cache.")
        (concat dir
 	       (gnus-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
-		nnmail-pathname-coding-system)
+		nnheader-pathname-coding-system)
 	       "/")))
    (or file "")))
 
@@ -752,12 +768,9 @@ nn*-request-list should have been called before calling this function."
 	      group-assoc)))
     group-assoc))
 
-(defvar nnmail-active-file-coding-system 'binary
-  "*Coding system for active file.")
-
 (defun nnmail-save-active (group-assoc file-name)
   "Save GROUP-ASSOC in ACTIVE-FILE."
-  (let ((coding-system-for-write nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-coding-system-for-write))
     (when file-name
       (nnheader-temp-write file-name
 	(nnmail-generate-active group-assoc)))))
@@ -1254,10 +1267,11 @@ Return the number of characters in the body."
 		       (progn (forward-line 1) (point))))
       (insert (format "Xref: %s" (system-name)))
       (while group-alist
-	(insert (format " %s:%d"
-			(gnus-encode-coding-string (caar group-alist)
-					      nnmail-pathname-coding-system)
-			(cdar group-alist)))
+	(insert
+	 (format " %s:%d"
+		 (gnus-encode-coding-string (caar group-alist)
+					    nnheader-pathname-coding-system)
+		 (cdar group-alist)))
 	(setq group-alist (cdr group-alist)))
       (insert "\n"))))
 
@@ -1756,9 +1770,10 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((pathname-coding-system 'binary))
+  (let ((pathname-coding-system nnheader-pathname-coding-system))
     (write-region-as-coding-system
-     nnmail-file-coding-system start end filename append visit lockname)
+     nnmail-file-coding-system-for-write
+     start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
 
 ;;;
