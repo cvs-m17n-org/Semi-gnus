@@ -395,7 +395,9 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system 'ctext
+(defvar gnus-startup-file-coding-system (if (boundp 'MULE)
+					    '*ctext*
+					  'ctext)
   "*Coding system for startup file.")
 
 ;;; Internal variables
