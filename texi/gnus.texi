@@ -8356,6 +8356,14 @@ predicate.  The following predicates are recognized: @code{or},
     (typep "text/x-vcard"))
 @end lisp
 
+@item
+@code{mime}: Do this treatment if the value of @code{gnus-show-mime}' is
+non-nil.
+
+@item
+@code{nomime}: Do this treatment if the value of @code{gnus-show-mime}'
+is nil.
+
 @end enumerate
 
 You may have noticed that the word @dfn{part} is used here.  This refers
