@@ -100,7 +100,8 @@
   (cond ((locate-library "w3") 'w3)
 	((locate-library "w3m") 'w3m)
 	((executable-find "links") 'links)
-	((executable-find "lynx") 'lynx))
+	((executable-find "lynx") 'lynx)
+	(t 'html2text))
   "Render of HTML contents.
 It is one of defined renderer types, or a rendering function.
 The defined renderer types are:
@@ -108,11 +109,13 @@ The defined renderer types are:
 `w3m'  : using emacs-w3m;
 `links': using links;
 `lynx' : using lynx;
+`html2text' : using html2text;
 `nil'  : using external viewer."
   :type '(choice (symbol w3)
 		 (symbol w3m)
 		 (symbol links)
 		 (symbol lynx)
+		 (symbol html2text)
 		 (symbol nil)
 		 (function))
   :version "21.3"
@@ -683,8 +686,10 @@ external if displayed external."
 	  (make-directory dir)
 	  (set-file-modes dir 448)
 	  (if filename
-	      (setq file (expand-file-name (file-name-nondirectory filename)
-					   dir))
+	      (setq file (expand-file-name 
+			  (gnus-map-function mm-file-name-rewrite-functions
+                                             (file-name-nondirectory filename))
+			  dir))
 	    (setq file (make-temp-name (expand-file-name "mm." dir))))
 	  (let ((coding-system-for-write mm-binary-coding-system))
 	    (write-region (point-min) (point-max) file nil 'nomesg))

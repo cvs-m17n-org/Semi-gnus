@@ -55,6 +55,9 @@
 (autoload 'gnus-mailing-list-insinuate "gnus-ml" nil t)
 (autoload 'turn-on-gnus-mailing-list-mode "gnus-ml" nil t)
 (autoload 'mm-uu-dissect "mm-uu")
+(autoload 'gnus-article-outlook-deuglify-article "deuglify" 
+  "Deuglify broken Outlook (Express) articles and redisplay."
+  t)
 
 (defcustom gnus-kill-summary-on-exit t
   "*If non-nil, kill the summary buffer when you exit from it.
@@ -1768,7 +1771,8 @@ increase the score of each group you read."
     "m" gnus-summary-toggle-mime
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
     "p" gnus-article-verify-x-pgp-sig
-    "d" gnus-article-treat-dumbquotes)
+    "d" gnus-article-treat-dumbquotes
+    "k" gnus-article-outlook-deuglify-article)
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide
@@ -2017,7 +2021,9 @@ increase the score of each group you read."
 	      ["Html" gnus-article-wash-html t]
 	      ["URLs" gnus-article-unsplit-urls t]
 	      ["Verify X-PGP-Sig" gnus-article-verify-x-pgp-sig t]
-	      ["HZ" gnus-article-decode-HZ t])
+	      ["HZ" gnus-article-decode-HZ t]
+	      ["OutlooK deuglify" gnus-article-outlook-deuglify-article t]
+	      )
 	     ("Output"
 	      ["Save in default format" gnus-summary-save-article
 	       ,@(if (featurep 'xemacs) '(t)
