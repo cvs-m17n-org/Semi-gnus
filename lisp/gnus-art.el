@@ -2891,6 +2891,8 @@ commands:
 ;;; @@ article filters
 ;;;
 
+(defvar mime-button-mother-dispatcher)
+
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.

@@ -632,8 +632,7 @@ the actual number of articles toggled is returned."
     (gnus-make-directory (file-name-directory file))
     ;; The hashtable contains real names of groups,  no more prefix
     ;; removing, so set `full' to `t'.
-    (gnus-write-active-file-as-coding-system gnus-agent-file-coding-system
-					     file orig t)))
+    (gnus-write-active-file file orig t)))
 
 (defun gnus-agent-save-groups (method)
   (gnus-agent-save-active-1 method 'gnus-groups-to-gnus-format))
@@ -1650,9 +1649,7 @@ The following commands are available:
 		(gnus-delete-line))
 	      (gnus-agent-save-history)
 	      (gnus-agent-close-history)
-	      (gnus-write-active-file-as-coding-system
-	       gnus-agent-file-coding-system
-	       (gnus-agent-lib-file "active") orig))
+	      (gnus-write-active-file (gnus-agent-lib-file "active") orig))
 	    (gnus-message 4 "Expiry...done")))))))
 
 ;;;###autoload

@@ -650,6 +650,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (let ((gnus-mark-article-hook nil)
 	(gnus-expert-user t)
 	(nnmail-spool-file nil)
+	(mail-sources nil)
 	(gnus-use-dribble-file nil)
 	(gnus-novice-user nil)
 	(gnus-large-newsgroup nil))
@@ -690,9 +691,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (gnus-write-active-file-as-coding-system
-     gnus-cache-write-file-coding-system
-     gnus-cache-active-file gnus-cache-active-hashtb t)
+    (gnus-write-active-file gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 

@@ -1,3 +1,47 @@
+2000-09-13 16:59:33  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-sort): Sort loose threads too.
+	(gnus-sort-threads-1): New function. Sort threads recursively.
+	(gnus-sort-threads): Use it.
+	(gnus-sort-gathered-threads): Doc fix.
+
+2000-09-13  Dave Love  <fx@gnu.org>
+
+	* gnus-salt.el (gnus-binary-mode): Fix call to gnus-add-minor-mode.
+
+	* gnus-ems.el (gnus-ems-redefine): Don't alias
+	gnus-summary-set-display-table.
+
+	* message.el (message-user-agent): Don't wrap ignore-errors around
+	it.
+
+	* mm-encode.el (mm-insert-multipart-headers): Avoid redundant
+	`format'.
+	(mm-content-transfer-encoding): Don't use cadar.
+
+	* uudecode.el (uudecode-decoder-program) 
+	(uudecode-decoder-switches): Customize.
+
+	* gnus-score.el (gnus-home-score-file): Improve custom type.
+
+	* gnus-cus.el (gnus-custom-mode): Conditionally set local
+	variables for Emacs 21.
+	(gnus-group-customize): Disable undo while laying out the buffer.
+
+2000-09-13 09:38:26  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-write-active-file): Bind
+	coding-system-for-write.
+
+2000-09-13 09:14:57  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnmail.el (nnmail-get-new-mail): Don't test nnmail-spool-file.
+	
+	* gnus-cache.el (gnus-jog-cache): Temporarily disable mail-sources.
+	* gnus-kill.el (gnus-batch-score): Ditto.
+	* gnus-move.el (gnus-change-server): Ditto.
+	* nnkiboze.el (nnkiboze-generate-groups): Ditto.
+
 2000-09-12  Simon Josefsson  <simon@josefsson.org>
 
 	* gnus-sum.el (gnus-update-read-articles): Undo

@@ -3097,7 +3097,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
     result))
 
 (defun gnus-sort-gathered-threads (threads)
-  "Sort subtreads inside each gathered thread by article number."
+  "Sort subtreads inside each gathered thread by `gnus-sort-gathered-threads-function'."
   (let ((result threads))
     (while threads
       (when (stringp (caar threads))
@@ -3665,13 +3665,22 @@ If LINE, insert the rebuilt thread starting on line LINE."
 	      (1+ (gnus-point-at-eol))
 	    (gnus-delete-line)))))))
 
+(defun gnus-sort-threads-1 (threads func)
+  (sort (mapcar (lambda (thread)
+		  (cons (car thread)
+			(and (cdr thread)
+			     (gnus-sort-threads-1 (cdr thread) func))))
+		threads) func))
+
 (defun gnus-sort-threads (threads)
   "Sort THREADS."
   (if (not gnus-thread-sort-functions)
       threads
     (gnus-message 8 "Sorting threads...")
     (prog1
-	(sort threads (gnus-make-sort-function gnus-thread-sort-functions))
+	(gnus-sort-threads-1 
+	 threads 
+	 (gnus-make-sort-function gnus-thread-sort-functions))
       (gnus-message 8 "Sorting threads...done"))))
 
 (defun gnus-sort-articles (articles)
@@ -9090,6 +9099,8 @@ Argument REVERSE means reverse order."
 	      thread
 	    `(lambda (t1 t2)
 	       (,thread t2 t1))))
+	 (gnus-sort-gathered-threads-function
+	  gnus-thread-sort-functions)
 	 (gnus-article-sort-functions
 	  (if (not reverse)
 	      article

@@ -1523,8 +1523,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	 (new 0)
 	 (total 0)
 	 incoming incomings source)
-    (when (and (nnmail-get-value "%s-get-new-mail" method)
-	       sources)
+    (when (nnmail-get-value "%s-get-new-mail" method)
       (while (setq source (pop sources))
 	;; Be compatible with old values.
 	(cond

@@ -1011,11 +1011,9 @@ Entries without port tokens default to DEFAULTPORT."
 	(throw 'found nil)))
     t))
 
-(defun gnus-write-active-file-as-coding-system (coding-system file hashtb
-							      &optional
-							      full-names)
-  (let ((output-coding-system coding-system)
-	(coding-system-for-write coding-system))
+(defun gnus-write-active-file (file hashtb &optional full-names)
+  (let ((output-coding-system nnmail-active-file-coding-system)
+	(coding-system-for-write nnmail-active-file-coding-system))
     (with-temp-file file
       (mapatoms
        (lambda (sym)
