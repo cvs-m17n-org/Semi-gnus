@@ -1,5 +1,17 @@
 2004-01-04 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
+	* gnus.el: Gnus v5.10.6 is released.
+
+2004-01-04  Kai Grossjohann  <kai@emptydomain.de>
+
+	* gnus-sum.el (gnus-summary-print-article): Doc fix.
+
+2004-01-04  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2004-01-04 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
 	* gnus.el: Gnus v5.10.5 is released.
 
 2004-01-03  Lars Magne Ingebrigtsen  <larsi@gnus.org>

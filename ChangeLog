@@ -1,5 +1,9 @@
 2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.16.6 revision 00.
+
+2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.16.5 revision 00.
 
 2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
