@@ -58,7 +58,7 @@
   :group 'gnus-summary-pick)
 
 (defcustom gnus-summary-pick-line-format
-  "-5P %U\%R\%z\%I\%(%[%4L: %-20,20n%]%) %s\n"
+  "%-5P %U\%R\%z\%I\%(%[%4L: %-20,20n%]%) %s\n"
   "*The format specification of the lines in pick buffers.
 It accepts the same format specs that `gnus-summary-line-format' does."
   :type 'string
@@ -87,7 +87,6 @@ It accepts the same format specs that `gnus-summary-line-format' does."
     "E" gnus-uu-mark-by-regexp
     "b" gnus-uu-mark-buffer
     "B" gnus-uu-unmark-buffer
-    gnus-mouse-2 gnus-pick-mouse-pick
     "X" gnus-pick-start-reading
     ))
 
@@ -638,7 +637,7 @@ Two predefined functions are available:
 		    (not (eval (caar list))))
 	  (setq list (cdr list)))))
     (unless (eq (setq face (cdar list)) (get-text-property beg 'face))
-      (gnus-put-text-property
+      (gnus-put-text-property-excluding-characters-with-faces
        beg end 'face
        (if (boundp face) (symbol-value face) face)))))
 
