@@ -116,7 +116,10 @@ on your system, you could say something like:
        (eword-decode-and-unfold-structured-field from)
      )
    date id references
-   chars lines xref))
+   chars lines xref
+   (list (cons 'Subject subject)
+	 (cons 'From from))
+   ))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
