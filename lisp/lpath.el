@@ -23,7 +23,7 @@
       (maybe-fbind '(posn-point
 		     event-start x-popup-menu
 		     facemenu-get-face window-at coordinates-in-window-p
-		     compute-motion x-defined-colors easy-menu-create-keymaps
+		     easy-menu-create-keymaps
 		     read-event internal-find-face internal-next-face-id
 		     make-face-internal set-frame-face-alist frame-face-alist
 		     facemenu-add-new-face make-face-x-resource-internal
@@ -76,7 +76,7 @@
 		 window-pixel-height map-extents
 		 make-color-instance color-instance-name specifier-instance
 		 device-type device-class get-popup-menu-response event-object
-		 x-defined-colors read-color add-submenu set-font-family
+		 add-submenu set-font-family
 		 font-create-object set-font-size frame-device find-face
 		 set-extent-property make-extent characterp display-error
 		 set-face-doc-string frame-property face-doc-string
@@ -95,9 +95,12 @@
 		 w3-coding-system-for-mime-charset
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
-		 babel-fetch babel-wash find-coding-systems-for-charsets
-		 sc-cite-regexp smiley-encode-buffer function-max-args
-		 map-extents make-symbolic-link)))
+		 babel-fetch babel-wash sc-cite-regexp
+		 coding-system-get find-coding-system
+		 find-coding-systems-for-charsets font-lock-set-defaults
+		 function-max-args get-charset-property toolbar-gnus
+		 make-symbolic-link map-extents smiley-encode-buffer
+		 )))
 
 (setq load-path (cons "." load-path))
 (require 'custom)
