@@ -70,123 +70,47 @@ on your system, you could say something like:
 
 (defmacro mail-header-number (header)
   "Return article number in HEADER."
-  `(aref ,header 0))
+  `(mime-entity-location-internal ,header))
 
 (defmacro mail-header-set-number (header number)
   "Set article number of HEADER to NUMBER."
-  `(aset ,header 0 ,number))
+  `(mime-entity-set-location-internal ,header ,number))
 
-(defmacro mail-header-entity (header)
-  "Return mime-entity in HEADER."
-  `(aref ,header 1))
+(defalias 'mail-header-subject 'mime-entity-decoded-subject-internal)
+(defalias 'mail-header-set-subject 'mime-entity-set-decoded-subject-internal)
 
-(defmacro mail-header-set-entity (header entity)
-  "Set mime-entity of HEADER to ENTITY."
-  `(aset ,header 1 entity))
+(defalias 'mail-header-from 'mime-entity-decoded-from-internal)
+(defalias 'mail-header-set-from 'mime-entity-set-decoded-from-internal)
 
-(defmacro mail-header-set-field (header field body)
-  `(mime-entity-set-original-header-internal
-    (mail-header-entity ,header)
-    (put-alist ,field ,body
-	       (mime-entity-original-header-internal
-		(mail-header-entity ,header)))
-    ))
+(defalias 'mail-header-date 'mime-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-entity-set-date-internal)
 
-(defmacro mail-header-set-parsed-field (header field body)
-  `(mime-entity-set-parsed-header-internal
-    (mail-header-entity ,header)
-    (put-alist ,field ,body
-	       (mime-entity-parsed-header-internal
-		(mail-header-entity ,header)))
-    ))
+(defalias 'mail-header-message-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-id 'mime-entity-message-id-internal)
+(defalias 'mail-header-set-message-id 'mime-entity-set-message-id-internal)
+(defalias 'mail-header-set-id 'mime-entity-set-message-id-internal)
 
-(defmacro mail-header-subject (header)
-  "Return subject string in HEADER."
-  `(mime-read-field 'Subject (mail-header-entity ,header)))
+(defalias 'mail-header-references 'mime-entity-references-internal)
+(defalias 'mail-header-set-references 'mime-entity-set-references-internal)
 
-(defmacro mail-header-set-subject (header subject)
-  "Set article subject of HEADER to SUBJECT."
-  `(mail-header-set-parsed-field ,header 'Subject ,subject))
+(defalias 'mail-header-chars 'mime-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-entity-set-chars-internal)
 
-(defmacro mail-header-from (header)
-  "Return author string in HEADER."
-  `(mime-read-field 'From (mail-header-entity ,header)))
+(defalias 'mail-header-lines 'mime-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-entity-set-lines-internal)
 
-(defmacro mail-header-set-from (header from)
-  "Set article author of HEADER to FROM."
-  `(mail-header-set-parsed-field ,header 'From ,from))
-
-(defmacro mail-header-date (header)
-  "Return date in HEADER."
-  `(mime-fetch-field 'Date (mail-header-entity ,header)))
-
-(defmacro mail-header-set-date (header date)
-  "Set article date of HEADER to DATE."
-  `(mail-header-set-field ,header 'Date ,date))
-
-(defalias 'mail-header-message-id 'mail-header-id)
-(defmacro mail-header-id (header)
-  "Return Id in HEADER."
-  `(mime-fetch-field 'Message-Id (mail-header-entity ,header)))
-
-(defalias 'mail-header-set-message-id 'mail-header-set-id)
-(defmacro mail-header-set-id (header id)
-  "Set article Id of HEADER to ID."
-  `(mail-header-set-field ,header 'Message-Id ,id))
-
-(defmacro mail-header-references (header)
-  "Return references in HEADER."
-  `(mime-fetch-field 'References (mail-header-entity ,header)))
-
-(defmacro mail-header-set-references (header ref)
-  "Set article references of HEADER to REF."
-  `(mail-header-set-field ,header 'References ,ref))
-
-(defmacro mail-header-chars (header)
-  "Return number of chars of article in HEADER."
-  `(aref ,header 6))
-
-(defmacro mail-header-set-chars (header chars)
-  "Set number of chars in article of HEADER to CHARS."
-  `(aset ,header 6 ,chars))
-
-(defmacro mail-header-lines (header)
-  "Return lines in HEADER."
-  `(aref ,header 7))
-
-(defmacro mail-header-set-lines (header lines)
-  "Set article lines of HEADER to LINES."
-  `(aset ,header 7 ,lines))
-
-(defmacro mail-header-xref (header)
-  "Return xref string in HEADER."
-  `(aref ,header 8))
-
-(defmacro mail-header-set-xref (header xref)
-  "Set article xref of HEADER to xref."
-  `(aset ,header 8 ,xref))
-
-(mm-define-backend nil)
-
-(mm-define-method fetch-field ((entity nil) field-name))
+(defalias 'mail-header-xref 'mime-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
 (defun make-full-mail-header (&optional number subject from date id
 					references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
-  (let ((entity (make-mime-entity-internal nil nil)))
-    (mime-entity-set-original-header-internal
-     entity
-     (list (cons 'Date date)
-	   (cons 'Message-Id id)
-	   (cons 'References references)
-	   ))
-    (mime-entity-set-parsed-header-internal
-     entity
-     (list (cons 'Subject subject)
-	   (cons 'From from)
-	   ))
-    (vector number entity from date id references chars lines xref)
-    ))
+  (make-mime-entity-internal 'gnus-header number
+			     nil
+			     nil nil nil
+			     subject from
+			     date id references
+			     chars lines xref))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
