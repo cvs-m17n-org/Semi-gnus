@@ -1,5 +1,17 @@
 1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Bound the command
+	`gnus-article-hide-headers' to "t".
+
+	* lisp/gnus-art.el (article-hide-headers): Show all headers when
+	unhiding.
+
+	* texi/gnus.texi: Fix latin chars.
+
+1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
 	* texi/emacs-mime.texi: Fix latin chars.
