@@ -338,42 +338,50 @@ it's not cached."
       (let ((uncached-articles (gnus-sorted-intersection
 				(gnus-sorted-complement articles cached)
 				articles))
-	    (cache-file (gnus-cache-file-name group ".overview"))
-	    type)
-	;; We first retrieve all the headers that we don't have in
-	;; the cache.
-	(let ((gnus-use-cache nil))
-	  (when uncached-articles
-	    (setq type (and articles
-			    (gnus-retrieve-headers
-			     uncached-articles group fetch-old)))))
-	(gnus-cache-save-buffers)
-	;; Then we insert the cached headers.
-	(save-excursion
-	  (cond
-	   ((not (file-exists-p cache-file))
-	    ;; There are no cached headers.
-	    type)
-	   ((null type)
-	    ;; There were no uncached headers (or retrieval was
-	    ;; unsuccessful), so we use the cached headers exclusively.
-	    (set-buffer nntp-server-buffer)
-	    (erase-buffer)
-	    (nnheader-insert-file-contents cache-file)
-	    (gnus-get-newsgroup-headers-xover articles nil
-					      dependencies group t)
-	    )
-	   ((eq type 'nov)
-	    ;; We have both cached and uncached NOV headers, so we
-	    ;; braid them.
-	    (gnus-cache-braid-parsed-nov group cached articles
-					 dependencies)
-	    )
-	   (t
-	    ;; We braid HEADs.
-	    (gnus-cache-braid-parsed-heads group cached articles
-					   dependencies)
-	    )))))))
+	    (cache-file (gnus-cache-file-name group ".overview")))
+	(gnus-cache-braid-headers
+	 ;; We first retrieve all the headers that we don't have in
+	 ;; the cache.
+	 (prog1
+	     (let ((gnus-use-cache nil))
+	       (when uncached-articles
+		 (and articles
+		      (gnus-retrieve-parsed-headers
+		       uncached-articles group fetch-old
+		       dependencies))
+		 ))
+	   (gnus-cache-save-buffers))
+	 ;; Then we insert the cached headers.
+	 (cond ((not (file-exists-p cache-file))
+		;; There are no cached headers.
+		)
+	       ((eq gnus-headers-retrieved-by 'nov)
+		(with-current-buffer nntp-server-buffer
+		  (erase-buffer)
+		  (nnheader-insert-file-contents cache-file)
+		  (nnheader-get-newsgroup-headers-xover*
+		   articles nil dependencies group)
+		  ))
+	       (t
+		;; We braid HEADs.
+		(nnheader-retrieve-headers-from-directory*
+		 cached
+		 (expand-file-name
+		  (file-name-as-directory
+		   (nnheader-translate-file-chars
+		    (if (gnus-use-long-file-name 'not-cache)
+			group
+		      (let ((group
+			     (nnheader-replace-chars-in-string group ?/ ?_)))
+			;; Translate the first colon into a slash.
+			(when (string-match ":" group)
+			  (aset group (match-beginning 0) ?/))
+			(nnheader-replace-chars-in-string group ?. ?/)))
+		    t))
+		  gnus-cache-directory)
+		 dependencies)
+		)))
+	))))
 
 (defun gnus-cache-enter-article (&optional n)
   "Enter the next N articles into the cache.
@@ -565,12 +573,6 @@ Returns the list of articles removed."
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
 
-(defun gnus-cache-braid-parsed-nov (group cached articles dependencies
-					  &optional file)
-  (gnus-cache-braid-nov group cached file)
-  (gnus-get-newsgroup-headers-xover articles nil dependencies group t)
-  )
-
 (defun gnus-cache-braid-heads (group cached)
   (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
@@ -603,10 +605,35 @@ Returns the list of articles removed."
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
 
-(defun gnus-cache-braid-parsed-heads (group cached articles dependencies)
-  (gnus-cache-braid-heads group (gnus-sorted-intersection cached articles))
-  (gnus-get-newsgroup-headers dependencies)
-  )
+(defun gnus-cache-braid-headers (headers cached-headers)
+  (if cached-headers
+      (if headers
+	  (let (cached-header hrest nhrest)
+	    (nconc (catch 'tag
+		     (while cached-headers
+		       (setq cached-header (car cached-headers))
+		       (if (< (mail-header-number cached-header)
+			      (mail-header-number (car headers)))
+			   (throw 'tag (nreverse cached-headers))
+			 (setq hrest headers
+			       nhrest (cdr hrest))
+			 (while (and nhrest
+				     (> (mail-header-number cached-header)
+					(mail-header-number (car nhrest))))
+			   (setq hrest nhrest
+				 nhrest (cdr nhrest))
+			   )
+			 ;;(if nhrest
+			 (setcdr hrest (cons cached-header nhrest))
+                         ;; (setq headers
+                         ;;         (nconc headers (list cached-header)))
+			 ;; (throw 'tag nil)
+			 ;;)
+			 )
+		       (setq cached-headers (cdr cached-headers))))
+		   headers))
+	(nreverse cached-headers))
+    headers))
 
 ;;;###autoload
 (defun gnus-jog-cache ()
