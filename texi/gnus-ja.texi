@@ -13175,7 +13175,7 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
    ;; @r{エラーでないメッセージは全ての関連したグループに相互投稿されま}
    ;; @r{すが、(ding) リストと他の (ding) 関連のメールのためのグループに}
    ;; @r{は相互投稿しません。}
-   (& (| (any "ding@@ifi\\.uio\\.no" "ding.list" "ding.list")
+   (& (| (any "ding@@ifi\\.uio\\.no" "ding.list")
          ("subject "ding" "ding.misc"))
       ;; @r{他のメーリングリスト@dots{}}
       (any "procmail@@informatik\\.rwth-aachen\\.de" "procmail.list")
