@@ -1,3 +1,37 @@
+1999-05-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 13.
+	(TopLevel): Autoload "gnus-art" for `gnus-article-toggle-headers'.
+
+	* texi/gnus.texi, texi/gnus-ja.texi (Article Hiding): Replace
+	`gnus-article-hide-headers' with `gnus-article-toggle-headers'.
+
+	* lisp/gnus-sum.el (gnus-summary-article-menu,
+	gnus-summary-wash-hide-map, gnus-summary-wash-map,
+	gnus-summary-mode-map): Use `gnus-article-toggle-headers' instead
+	of `gnus-article-hide-headers'.
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Remove bitmap images
+	with text property `x-face-mule-bitmap-image';
+	don't bind `inhibit-read-only'.
+
+	* lisp/gnus-art.el (gnus-article-display-x-face-with-x-face-mule):
+	Do nothing if `window-system' is nil.
+	(gnus-article-decode-message-body-as-default-mime-charset): Don't
+	bind `buffer-read-only'; decode from (point-min) instead of (point).
+	(gnus-article-prepare-display): Bind `inhibit-read-only' to t; bind
+	`buffer-read-only' to nil; don't bind
+	`mime-preview-over-to-next-method-alist';
+	strip read-only properties after preparing.
+	(gnus-article-prepare-mime-display): Put text property
+	`article-treated-header' to the header; don't use
+	`mime-preview-move-to-next'; reduce a number of bound variables.
+	(gnus-article-display-traditional-message): Don't bind
+	`inhibit-read-only'.
+	(gnus-article-make-menu-bar): Use `gnus-article-toggle-headers'
+	instead of `gnus-article-hide-headers'.
+	(article-toggle-headers): New function.
+
 1999-05-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 12.
