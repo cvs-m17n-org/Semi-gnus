@@ -1,4 +1,4 @@
-* 1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Use
 	`find-file-noselect-as-coding-system' (renamed from
