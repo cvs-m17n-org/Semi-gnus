@@ -1,3 +1,8 @@
+2005-01-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Delete newlines
+	only if they are excessive.
+
 2005-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (invisible-region): Don't advise it when

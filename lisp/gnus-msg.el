@@ -1,6 +1,6 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
 ;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+;;        2005 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -838,7 +838,10 @@ active, the entire article will be yanked."
 		   '(References . message-shorten-references)))
 	 (list (cons 'References
 		     (mapconcat 'identity (nreverse refs) " "))))
-	(backward-delete-char 1))
+	(delete-region (point)
+		       (progn
+			 (skip-chars-backward "\n")
+			 (1+ (point)))))
       (setq beg (mark t))
       (pop-mark))
 
