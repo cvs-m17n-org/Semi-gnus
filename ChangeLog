@@ -1,3 +1,15 @@
+1999-06-15  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.067.
+	(gnus-revision-number): Fresh start from 00.
+
+	* lisp/{gnus-sum.el,nnmail.el,ChangeLog}: Sync up with Pterodactyl
+	Gnus v0.88.
+
+	* text/{gnus-ja.texi,gnus.texi,message-ja.texi,message.texi}:
+	Update for T-gnus 6.10.067.
+	* README.T-gnus: Ditto.
+
 1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
