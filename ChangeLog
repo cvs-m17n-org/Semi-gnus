@@ -1,5 +1,9 @@
 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-make-package): Fix typo.
+
+1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.8.
 
 	* Makefile.in (install-package-ja, package-ja, install-package,
