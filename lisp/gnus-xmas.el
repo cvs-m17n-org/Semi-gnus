@@ -532,6 +532,7 @@ the resulting string may be narrower than END-COLUMN.
 			    :color-symbols
 			    (("thing" . ,(car gnus-logo-colors))
 			     ("shadow" . ,(cadr gnus-logo-colors))
+			     ("oort" . "#eeeeee")
 			     ("background" . ,(face-background 'default)))])
 			 ((featurep 'xbm)
 			  `[xbm :file ,logo-xbm])

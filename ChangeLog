@@ -1,3 +1,8 @@
+2003-01-03  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Bind the
+	color for the symbol `oort' as `gnus-group-startup-message' does.
+
 2002-12-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): Commented out.
