@@ -1,5 +1,9 @@
 2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/smiley.el (smiley-regexp-alist): Fix the order of faces.
+
+2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/smiley.el (smiley-regexp-alist): Use faces which originate
 	in etc-0.27.tar.gz if exist.
 	(gnus-smiley-file-types): Add xbm if available.

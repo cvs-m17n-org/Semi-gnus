@@ -54,20 +54,22 @@
   (if (file-exists-p (expand-file-name "WideFaceSmile.xbm"
 				       smiley-data-directory))
       ;; Use faces in ftp://ftp.gnus.org/pub/gnus/etc-0.27.tar.gz
-      '(;; ^_^;;; ^^;;;
-	("\\(\\^_?\\^;;;\\)\\W" 1 "WideFaceAse3")
-	;; ^_^;; ^^;;
-	("\\(\\^_?\\^;;\\)\\W" 1 "WideFaceAse2")
+      '(;; ^_^ ^^
+	("\\(\\^_?\\^\\)\\W" 1 "WideFaceSmile")
+	;; ;-> ;-) ;-} ;> ;) :}
+	("\\(;-?[>)}]+\\)\\W" 1 "FaceWinking")
 	;; ^_^; ^^;
 	("\\(\\^_?\\^;\\)\\W" 1 "WideFaceAse1")
+	;; ^_^;; ^^;;
+	("\\(\\^_?\\^;;\\)\\W" 1 "WideFaceAse2")
+	;; ^_^;;; ^^;;;
+	("\\(\\^_?\\^;;;\\)\\W" 1 "WideFaceAse3")
 	;; ;_;
 	("\\(;_;\\)\\W" 1 "WideFaceWeep")
 	;; T_T
 	("\\(T_T\\)\\W" 1 "WideFaceWeep")
 	;; >_<
 	("\\(>_<\\)\\W" 1 "WideFaceWeep")
-	;; ^_^ ^^
-	("\\(\\^_?\\^\\)\\W" 1 "WideFaceSmile")
 	;; :-< :<
 	("\\(:-?<\\)\\W" 1 "FaceAngry")
 	;; :-] :]
@@ -99,8 +101,6 @@
 	("\\(:-?p\\)\\W" 1 "FaceTalking")
 	;; :-d
 	("\\(:-d\\)\\W" 1 "FaceTasty")
-	;; ;-> ;-) ;-} ;> ;) :}
-	("\\(;-?[>)}]+\\)\\W" 1 "FaceWinking")
 	;; :-V :-v :V :v
 	("\\(:-?[Vv]\\)\\W" 1 "FaceWry")
 	;; :-P :P
