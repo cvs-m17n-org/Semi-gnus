@@ -1,3 +1,9 @@
+1998-12-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.043.
+
+	* Sync up with Pterodactyl Gnus 0.57.
+
 1998-11-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/base64.el (base64-decode-region): Use `defun-maybe'.
