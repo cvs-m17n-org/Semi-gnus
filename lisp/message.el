@@ -5261,7 +5261,8 @@ give as trustworthy answer as possible."
 	 (user-domain
 	  (if (and user-mail
 		   (string-match "@\\(.*\\)\\'" user-mail))
-	      (match-string 1 user-mail))))
+	      (match-string 1 user-mail)))
+	 (case-fold-search t))
     (cond
      ((and message-user-fqdn
 	   (stringp message-user-fqdn)
