@@ -1,8 +1,21 @@
+2004-03-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Don't require `advice', `pces' and `path-util'.
+	(pop3-ssl-program-name): Use `executable-find' instead of
+	`exec-installed-p'.
+	(pop3-movemail): Don't use `write-region-as-binary'.
+	(pop3-open-server): Don't use `open-network-stream-as-binary'.
+	(pop3-open-ssl-stream): Don't use `as-binary-process'.
+	(pop3-open-tls-stream): Ditto.
+	(mail-source-fetch-pop): In Gnus, advise it to bind
+	`pop3-connection-type' and `pop3-leave-mail-on-server' while
+	fetching mails, according to `mail-sources'.
+
 2004-03-24  KOSEKI Yoshinori  <kose@meadowy.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/directory-table-use): Remove.
 	(gnus-namazu-imap-maildir): New variable.
-	
+
 2004-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
