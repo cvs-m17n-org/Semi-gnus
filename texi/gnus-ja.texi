@@ -10630,10 +10630,13 @@ from date id references chars lines xref extra の各ヘッダーから成るベク
 さんのメーリングリストに参加している場合に便利でしょう。
 
 変数 @code{gnus-named-posting-styles} を設定することで、よく利用する投稿
-様式に名前をつけることができます。それは名前と任意の量の属性からなる連想
-リストです。@code{gnus-posting-styles} に含まれる属性名が @code{import} 
-だったら、その属性値から @code{gnus-named-posting-styles} を引いて得られ
-た定型の属性を取り込みます。
+様式に名前をつけられます。概略バッファで @kbd{S P} とすることで、投稿時
+に任意の様式を選択します。@code{gnus-named-posting-styles} は名前と様式
+からなる連想リストです。@code{gnus-posting-styles} に含まれる属性名が 
+@code{import} だったら、その値で @code{gnus-named-posting-styles} を引い
+て、属性値をそこに展開します。
+
+これは例です:
 
 @lisp
 (setq gnus-named-posting-styles
@@ -10642,14 +10645,13 @@ from date id references chars lines xref extra の各ヘッダーから成るベク
          (name "User Name")
          ("X-Home-Page" (getenv "WWW_HOME"))
          (organization "People's Front Against MWM"))
-	("Emacs"
-	 (import "Default")
-	 (organization "The Church of Emacs"))))
+        ("Emacs"
+         (import "Default")
+         (organization "The Church of Emacs"))))
 @end lisp
 
 "Emacs" と名付けられた様式は、@code{organization} 以外の属性を "Default" 
-から引き継ぎます。概略バッファで @kbd{S P} とすることで、投稿の際に任意
-の様式を選択することもできます。
+から引き継ぎます。
 
 
 @node Drafts

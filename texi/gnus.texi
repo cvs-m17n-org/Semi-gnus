@@ -11137,11 +11137,12 @@ The @samp{nnml:.*} rule means that you use the @code{To} address as the
 if you fill many roles.
 
 Setting the @code{gnus-named-posting-styles} variable will make
-posting-styles allow to have distinctive names.
-@code{gnus-named-posting-styles} is an alist which maps the names to
-styles.  Once a posting-style is added to the alist, we can import it
-from @code{gnus-posting-styles}.  If an attribute whose name is
-@code{import} is found, Gnus will look for the attribute value in
+posting-styles allow to have distinctive names.  You can specify an
+arbitrary posting-style when article posting with @kbd{S P} in the
+summary buffer.  @code{gnus-named-posting-styles} is an alist which maps
+the names to styles.  Once a posting-style is added to the alist, we can
+import it from @code{gnus-posting-styles}.  If an attribute whose name
+is @code{import} is found, Gnus will look for the attribute value in
 @code{gnus-named-posting-styles} and expand it in place.
 
 Here's an example:
@@ -11159,8 +11160,7 @@ Here's an example:
 @end lisp
 
 The posting-style named "Emacs" will inherit all the attributes from
-"Default" except @code{organization}.  You can specify an arbitrary
-posting-style when article posting with @kbd{S P} in the summary buffer.
+"Default" except @code{organization}.
 
 
 @node Drafts
