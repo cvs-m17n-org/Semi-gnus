@@ -8360,10 +8360,6 @@ predicate.  The following predicates are recognized: @code{or},
 @code{mime}: Do this treatment if the value of @code{gnus-show-mime}' is
 non-nil.
 
-@item
-@code{nomime}: Do this treatment if the value of @code{gnus-show-mime}'
-is nil.
-
 @end enumerate
 
 You may have noticed that the word @dfn{part} is used here.  This refers
@@ -8411,7 +8407,7 @@ group.
 @item gnus-treat-display-xface
 @item gnus-treat-display-smileys
 @item gnus-treat-display-picons
-@item gnus-treat-decode-message-body-as-default-mime-charset
+@item gnus-treat-decode-article-as-default-mime-charset
 @end table
 
 @vindex gnus-part-display-hook
