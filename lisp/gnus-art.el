@@ -555,7 +555,7 @@ displayed by the first non-nil matching CONTENT face."
 			       (item :tag "skip" nil)
 			       (face :value default)))))
 
-(defcustom gnus-article-decode-hook '(article-decode-encoded-words)
+(defcustom gnus-article-decode-hook nil
   "*Hook run to decode charsets in articles."
   :group 'gnus-article-headers
   :type 'hook)
@@ -3050,7 +3050,7 @@ In no internal viewer is available, use an external viewer."
 	 (if (if displayed (car displayed)
 	       (mm-handle-displayed-p handle))
 	     "" "..."))
-	(gnus-tmp-length (with-current-buffer (mm-handle-buffer handle)
+	(gnus-tmp-length (with-current-buffer (mm-handle-body handle)
 			   (buffer-size)))
 	gnus-tmp-type-long b e)
     (when (string-match ".*/" gnus-tmp-name)
@@ -3093,6 +3093,8 @@ In no internal viewer is available, use an external viewer."
   (gnus-article-press-button))
 
 (defvar gnus-displaying-mime nil)
+(defvar gnus-mime-display-part-function
+  #'gnus-mime-display-part-with-mime-view)
 
 (defun gnus-display-mime (parent &optional ihandles)
   "Display the MIME parts."
@@ -3122,22 +3124,56 @@ In no internal viewer is available, use an external viewer."
 	      (when (and (not ihandles)
 			 (not gnus-displaying-mime))
 		;; Clean up for mime parts.
-		(article-goto-body)
-		(delete-region (point) (point-max)))
-	      (let ((gnus-displaying-mime t))
-		(gnus-mime-display-part handles)))
+		(delete-region (point-min) (point-max)))
+	      (funcall gnus-mime-display-part-function ihandles handles))
 	  (save-restriction
 	    (article-goto-body)
 	    (narrow-to-region (point) (point-max))
 	    (gnus-treat-article nil 1 1)
-	    (widen)))
-	(if (not ihandles)
-	    ;; Highlight the headers.
-	    (save-excursion
-	      (save-restriction
-		(article-goto-body)
-		(narrow-to-region (point-min) (point))
-		(gnus-treat-article 'head))))))))
+	    (widen))
+	  (if (not ihandles)
+	      ;; Highlight the headers.
+	      (save-excursion
+		(save-restriction
+		  (article-goto-body)
+		  (narrow-to-region (point-min) (point))
+		  (gnus-treat-article 'head)))))))))
+
+(eval-when-compile
+  (defvar mime-display-header-hook))
+(defun gnus-mime-display-part-with-mime-view (ihandles handles)
+  (let ((charset (with-current-buffer gnus-summary-buffer
+		  gnus-newsgroup-charset))
+	(mime-display-header-hook (and (boundp 'mime-display-header-hook)
+				       mime-display-header-hook)))
+    (unless ihandles
+      (add-hook 'mime-display-header-hook
+		(function (lambda ()
+			    (save-excursion
+			      (save-restriction
+				(article-goto-body)
+				(narrow-to-region (point-min) (point))
+				(gnus-treat-article 'head)))))))
+    (set (make-local-variable 'default-mime-charset) charset)
+    (mime-display-message handles
+			  gnus-article-buffer nil
+			  gnus-article-mode-map 'gnus-article-mode)
+    (make-local-variable 'mime-button-mother-dispatcher)
+    (setq mime-button-mother-dispatcher
+	  (function gnus-article-push-button))))
+
+(defun gnus-mime-display-part-with-Gnus (ihandles handles)
+  (let ((gnus-displaying-mime t))
+    (mime-insert-header handles)
+    (insert "\n")
+    (gnus-mime-display-part handles)
+    (if (not ihandles)
+	;; Highlight the headers.
+	(save-excursion
+	  (save-restriction
+	    (article-goto-body)
+	    (narrow-to-region (point-min) (point))
+	    (gnus-treat-article 'head))))))
 
 (defvar gnus-mime-display-multipart-as-mixed nil)
 
