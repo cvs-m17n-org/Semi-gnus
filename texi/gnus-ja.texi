@@ -16956,10 +16956,10 @@ Commands}) か、またはエージェントに扱って欲しくないのに自動的に追加され
 @code{gnus-agent-long-article} を上書きする整数。
 
 @item agent-enable-undownloaded-faces
-ダウンロードされていない記事を gnus-summary-*-undownloaded-face を使って
-概略バッファに表示すべきかどうかを示すシンボル。@code{nil} 以外ならどん
-なシンボルでも、ダウンロードされていない記事用のフェースを使うようになり
-ます。
+ダウンロードされていない記事
+を @code{gnus-summary-*-undownloaded-face} を使って概略バッファに表示す
+べきかどうかを示すシンボル。@code{nil} 以外ならどんなシンボルでも、ダウ
+ンロードされていない記事用のフェースを使うようになります。
 @end table
 
 いったん分類が作られたら、分類の名前を変えることはできません。
