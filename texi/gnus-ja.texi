@@ -6608,8 +6608,15 @@ UT ($BJLL>(B GMT, ZULU) $B$GF|IU$rI=<($7$^$9(B (@code{gnus-article-date-ut})
 @findex gnus-start-date-timer
 @findex gnus-stop-date-timer
 $B5-;v$,Ej9F$5$l$F$+$i:#$^$G$I$l$/$i$$$N;~4V$,7P2a$7$?$+$rI=<($7$^$9(B
-(@code{gnus-article-date-lapsed})$B!#$3$N9T$,O"B3$7$F99?7$5$l$k$h$&$K$7$?(B
-$B$$$N$G$"$l$P!"(B
+(@code{gnus-article-date-lapsed})$B!#$3$s$J$U$&$K!#(B
+
+@example
+X-Sent: 9 years, 6 weeks, 4 days, 9 hours, 3 minutes, 28 seconds ago
+@end example
+
+@code{gnus-article-date-lapsed-new-header} $B$NCM$G$3$N%X%C%@!<$r4{B8$N(B
+Date $B$N2<$KDI2C$9$k$+!"CV$-BX$($k$+$r;XDj$7$^$9!#$3$N9T$,O"B3$7$F99?7(B
+$B$5$l$k$h$&$K$7$?$$$N$G$"$l$P!"(B
 
 @lisp
 (gnus-start-date-timer)
@@ -7346,8 +7353,10 @@ Gnus $B$N(B info $B$N@a(B (node) $B$K0\F0$7$^$9(B (@code{gnus-info-find-no
 
 @table @kbd
 
-@item C-d
+@item A D
+@itemx C-d
 @kindex C-d $B!J35N,!K(B
+@kindex A D $B!J35N,!K(B
 @findex gnus-summary-enter-digest-group
 $B$b$78=:_$N%0%k!<%W$,B>$N5-;v$N=8$^$j$G$"$k$J$i$P!JNc$($P!"E&MW(B (digest)$B!K!"(B
 $B$=$N$h$&$J5-;v$G$G$-$F$$$k%0%k!<%W$KF~$k$?$a$K$3$NL?Na$r;H$&$+$b$7$l$^$;$s(B 
@@ -8283,7 +8292,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
-$B$O(B @var{(name . value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
+$B$O(B @var{(name value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
 @code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
