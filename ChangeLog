@@ -1,3 +1,13 @@
+1999-09-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/nnmail.el (TopLevel): Bind keywords `:user', `:path' and
+	`:predicate' for old Emacsen; require `static'.
+
+	* lisp/dgnushack.el (TopLevel): Don't bind keywords `:user',
+	`:path' and `:predicate'.
+
 1999-09-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* gnus-agent.el (gnus-agent-toggle-plugged): Mark the current
