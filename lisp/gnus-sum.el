@@ -43,7 +43,9 @@
   (require 'static))
 
 (eval-and-compile
-  (autoload 'gnus-cache-articles-in-group "gnus-cache"))
+  (autoload 'gnus-cache-articles-in-group "gnus-cache")
+  (autoload 'pgg-decrypt-region "pgg" nil t)
+  (autoload 'pgg-verify-region "pgg" nil t))
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
@@ -1526,7 +1528,9 @@ increase the score of each group you read."
     "g" gnus-summary-show-article
     "s" gnus-summary-isearch-article
     "P" gnus-summary-print-article
-    "t" gnus-article-babel)
+    "t" gnus-article-babel
+    "d" gnus-summary-decrypt-article
+    "v" gnus-summary-verify-article)
 
   (gnus-define-keys (gnus-summary-wash-map "W" gnus-summary-mode-map)
     "b" gnus-article-add-buttons
@@ -9837,10 +9841,8 @@ treated as multipart/mixed."
 					    'gnus-wheel-edge
 					    (* (1+ edge) direction))
 			 nil))
-		   (eq last-command 'gnus-wheel-summary-scroll))
-	      ))
-      (gnus-summary-next-article nil nil (minusp direction)))
-    ))
+		   (eq last-command 'gnus-wheel-summary-scroll))))
+      (gnus-summary-next-article nil nil (minusp direction)))))
 
 (defun gnus-wheel-install ()
   "Enable mouse wheel support on summary window."
@@ -9852,6 +9854,48 @@ treated as multipart/mixed."
 	  'gnus-wheel-summary-scroll)))))
 
 (add-hook 'gnus-summary-mode-hook 'gnus-wheel-install)
+
+;;;
+;;; Traditional PGP commmands
+;;;
+
+(defun gnus-summary-decrypt-article (&optional force)
+  "Decrypt the current article in traditional PGP way.
+This will have permanent effect only in mail groups.
+If FORCE is non-nil, allow editing of articles even in read-only
+groups."
+  (interactive "P")
+  (gnus-summary-select-article t)
+  (gnus-eval-in-buffer-window gnus-article-buffer
+    (save-excursion
+      (save-restriction
+	(widen)
+	(goto-char (point-min))
+	(unless (re-search-forward (car pgg-armor-header-lines) nil t)
+	  (error "Not a traditional PGP message!"))
+	(let ((armor-start (match-beginning 0)))
+	  (if (and (pgg-decrypt-region armor-start (point-max))
+		   (or force (not (gnus-group-read-only-p))))
+	      (let ((inhibit-read-only t) 
+		    buffer-read-only)
+		(delete-region armor-start
+			       (progn 
+				 (re-search-forward "^-+END PGP" nil t)
+				 (beginning-of-line 2)
+				 (point)))
+		(insert-buffer-substring pgg-output-buffer))))))))
+
+(defun gnus-summary-verify-article ()
+  "Verify the current article in traditional PGP way."
+  (interactive)
+  (save-excursion
+    (set-buffer gnus-original-article-buffer)
+    (goto-char (point-min))
+    (unless (re-search-forward "^-+BEGIN PGP SIGNED MESSAGE" nil t)
+      (error "Not a traditional PGP message!"))
+    (re-search-forward "^-+END PGP" nil t)
+    (beginning-of-line 2)
+    (call-interactively (function pgg-verify-region))))
 
 ;;;
 ;;; with article
