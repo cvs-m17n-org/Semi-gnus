@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.25 1999-01-13 06:53:38 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.26 1999-01-25 07:09:51 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -189,6 +189,23 @@ If set to 0 , timer call is disabled."
   :group 'gnus-offline
   :type 'function)
 
+(defcustom gnus-offline-pop-password-file nil
+  "*File name for saving one's POP password information.
+This variable should be nil if there's some possibility that
+your passwords be stolen."
+  :group 'gnus-offline
+  :type '(choice (file :tag "File")
+		 (const nil)))
+
+(defcustom gnus-offline-pop-password-decoding-function 
+  (function (lambda () (base64-decode-region (point-min) (point-max))))
+  "*Function for decoding one's password information.
+The value has no effect when `gnus-offline-pop-password-file'
+is nil.
+This variable might be nil if you don't need to encode your passwords."
+  :group 'gnus-offline
+  :type 'function)
+
 ;;; Internal variables.
 (defvar gnus-offline-connected nil
   "*If value is t , dialup line is connected status.
@@ -340,7 +357,25 @@ If value is nil , dialup line is disconnected status.")
   (if (functionp gnus-offline-dialup-function)
       (funcall gnus-offline-dialup-function))
   (gnus-offline-get-new-news-function)
-  (gnus-group-get-new-news arg))
+  (let (buffer)
+    (unwind-protect
+	(progn
+	  (save-excursion
+	    (or pop3-fma-password
+		(when gnus-offline-pop-password-file
+		  (setq pop3-fma-save-password-information t)
+		  (setq buffer (get-buffer-create "*offline-temp*"))
+		  (set-buffer buffer)
+		  (erase-buffer)
+		  (insert-file-contents-as-binary gnus-offline-pop-password-file)
+		  (and gnus-offline-pop-password-decoding-function
+		       (funcall gnus-offline-pop-password-decoding-function))
+		  (eval-buffer))))
+	  (gnus-group-get-new-news arg))
+      (when gnus-offline-pop-password-file
+	(setq pop3-fma-password nil)
+	(setq pop3-fma-save-password-information nil)
+	(kill-buffer buffer)))))
 
 ;;
 ;; dialup...

@@ -255,8 +255,13 @@ above them."
 	  (while (re-search-forward regexp nd t)
 	    (let* ((start (match-beginning group))
 		   (end (match-end group))
-		   (glyph (smiley-create-glyph (buffer-substring start end)
-					       file)))
+		   (glyph
+		    (and (or (eq start 1)
+			     (not (string-match "\\(\\^\\|;\\|_\\);)" 
+						(buffer-substring 
+						 (1- start) (+ start 2)))))
+			 (smiley-create-glyph (buffer-substring start end)
+					      file))))
 	      (when glyph
 		(mapcar 'delete-annotation (annotations-at end))
 		(let ((ext (make-extent start end))
