@@ -1,8 +1,3 @@
-2000-11-04  Hermit  <hermit@koka-in.org>
-
-	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
-	command in `gnus-topic-mode-map' instead of `gnus-group-mode-map'.
-
 2000-11-04  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
