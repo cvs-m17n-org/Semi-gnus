@@ -7196,6 +7196,8 @@ and `request-accept' functions."
 	    ;; Copy any marks over to the new group.
 	    (let ((marks gnus-article-mark-lists)
 		  (to-article (cdr art-group)))
+	      (unless (gnus-group-auto-expirable-p to-newsgroup)
+		(setq marks (delete '(expirable . expire) marks)))
 
 	      ;; See whether the article is to be put in the cache.
 	      (when gnus-use-cache
