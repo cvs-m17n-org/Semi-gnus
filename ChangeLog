@@ -1,7 +1,12 @@
 2003-04-03  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/pop3.el (pop3-get-message-numbers): Don't check uidls when
-	`pop3-leave-mail-on-server' is nil.
+	* lisp/pop3.el (pop3-uidl-support): Default to nil; change the
+	meaning of a value which it may contain into an alist of servers
+	and flags of whether they support UIDLs.
+	(pop3-get-message-numbers): Don't check uidls when
+	`pop3-leave-mail-on-server' is nil; synch it with the change of
+	`pop3-uidl-support'.
+	(pop3-get-uidl): Synch it with the change of `pop3-uidl-support'.
 
 2003-03-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 

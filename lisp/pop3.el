@@ -89,9 +89,9 @@ Used for APOP authentication.")
 (defvar pop3-uidl-file-name "~/.uidls"
   "File in which to store the UIDL of processed messages.")
 
-(defvar pop3-uidl-support 'dont-know
-  "Whether the server supports UIDL.
-Nil means no, t means yes, not-nil-or-t means yet to be determined.")
+(defvar pop3-uidl-support nil
+  "Alist of servers and flags of whether they support UIDLs.
+Users don't have to set this value.")
 
 (defvar pop3-uidl-obarray (make-vector 31 0)
   "Uidl hash table.")
@@ -415,7 +415,7 @@ If NOW, use that time instead."
       (when (and
 	     ;; remove elements not in the uidl, this assumes the uidl is short
 	     (or (not (and pop3-leave-mail-on-server
-			   (eq pop3-uidl-support t)))
+			   (cdr (assoc pop3-mailhost pop3-uidl-support))))
 		 (memq (caar messages) uidl))
 	     (caar messages)
 	     ;; don't download messages that are too large
@@ -426,14 +426,18 @@ If NOW, use that time instead."
 				     (pop3-top process (caar messages) 0)))))
 	(push (car messages) out))
       (setq messages (cdr messages)))
-    (cons total (reverse out))))
+    (cons total (nreverse out))))
 
 (defun pop3-get-uidl (process)
   "Use PROCESS to get a list of unread message numbers."
-  (let ((messages (pop3-uidl process)) uidl)
-    (if (or (null messages) (null pop3-uidl-support))
-	(setq pop3-uidl-support nil)
-      (setq pop3-uidl-support t)
+  (let ((messages (pop3-uidl process))
+	(support (assoc pop3-mailhost pop3-uidl-support))
+	uidl)
+    (if support
+	(setcdr support (and messages t))
+      (push (cons pop3-mailhost (and messages t))
+	    pop3-uidl-support))
+    (when messages
       (save-excursion
 	(with-temp-buffer
 	  (when (file-readable-p pop3-uidl-file-name)
@@ -442,15 +446,13 @@ If NOW, use that time instead."
 	  (while (looking-at "\\([^ \n\t]+\\)")
 	    (set (intern (match-string 1) pop3-uidl-obarray)
 		 (cons nil t))
-	    (forward-line 1))
-	  ))
+	    (forward-line 1))))
       (dolist (message (cdr messages))
 	(if (setq uidl (intern-soft (cdr message) pop3-uidl-obarray))
 	    (setcar (symbol-value uidl) (car message))
 	  (set (intern (cdr message) pop3-uidl-obarray)
 	       (cons (car message) nil))))
-      (pop3-get-unread-message-numbers))
-    ))
+      (pop3-get-unread-message-numbers))))
 
 (defun pop3-get-unread-message-numbers ()
   "Return a sorted list of unread msg numbers to retrieve."
