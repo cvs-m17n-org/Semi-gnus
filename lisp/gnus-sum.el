@@ -3034,7 +3034,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
   (let ((eol (gnus-point-at-eol))
 	(buffer (current-buffer))
-	header rawtext decoded)
+	header rawtext)
 
     ;; overview: [num subject from date id refs chars lines misc]
     (unwind-protect
