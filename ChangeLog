@@ -1,3 +1,18 @@
+2002-01-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-query-highlight): New option.
+	(gnus-namazu-query-highlight-face): New face.
+	(gnus-namazu/check-cache-group): New function.
+	(gnus-namazu/cache-group-candidates): Ditto.
+	(gnus-namazu/search): Call `gnus-namazu/check-cache-group' to get
+	groups for cached articles.
+	(gnus-namazu/highlight-words): New function.
+	(gnus-namazu-search): Set the group parameter `highlight-words'
+	when `gnus-namazu-query-highlight' is equal to the other value
+	than nil.
+
+	* lisp/gnus-ja.texi (Namazu Groups): Updated.
+
 2001-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Ignore
@@ -140,7 +155,7 @@
 	* lisp/message.el (message-strip-special-text-properties): Default
 	to t because of the new function `message-tamago-not-in-use-p'.
 
-2001-11-26  Kai Gro.AN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-11-26  Kai GroN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make-x.bat: Use parameter "/copy" rather than "copy" for increased
 	dwimishness for old-time DOS users.  From Frank Schmitt
