@@ -20041,6 +20041,9 @@ well as numerous other things).
 Luis Fernandes---design and graphics.
 
 @item
+Joe Reiss---creator of the smiley faces.
+
+@item
 Justin Sheehy--the FAQ maintainer.
 
 @item
@@ -22409,6 +22412,7 @@ Below is a slightly shortened version of the @code{nndir} backend.
 @subsubsection Hooking New Backends Into Gnus
 
 @vindex gnus-valid-select-methods
+@findex gnus-declare-backend
 Having Gnus start using your new backend is rather easy---you just
 declare it with the @code{gnus-declare-backend} functions.  This will
 enter the backend into the @code{gnus-valid-select-methods} variable.
@@ -22421,6 +22425,8 @@ Here's an example:
 @lisp
 (gnus-declare-backend "nnchoke" 'mail 'respool 'address)
 @end lisp
+
+The above line would then go in the @file{nnchoke.el} file.
 
 The abilities can be:
 

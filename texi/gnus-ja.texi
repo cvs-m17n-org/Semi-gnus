@@ -19550,6 +19550,9 @@ Per Abrahamsen--custom$B!"%9%3%"!"%O%$%i%$%H$H(B @sc{soup} $B%3!<%I(B ($BB>
 Luis Fernandes---$B%G%6%$%s$H%0%i%U%#%C%/!#(B
 
 @item
+Joe Reiss---$B%9%^%$%j!<$N4i$N:n<T!#(B
+
+@item
 Justin Sheehy--FAQ $B$N%a%$%s%F%$%J!<!#(B
 
 @item
@@ -21857,6 +21860,7 @@ description-buffer = *description-line
 @subsubsection $B?7$7$$%P%C%/%(%s%I$r(B gnus $B$K7R$2$k(B
 
 @vindex gnus-valid-select-methods
+@findex gnus-declare-backend
 $B$"$J$?$N?7$7$$%P%C%/%(%s%I$r(B gnus $B$G;H$$$O$8$a$k$N$O$H$F$b4JC1$G(B
 $B$9(B --- $BC1$K(B @code{gnus-declare-backend} $B4X?t$G@k8@$9$k$@$1$G$9!#$3$l$O%P%C(B
 $B%/%(%s%I$r(B @code{gnus-valid-select-methods} $BJQ?t$KDI2C$7$^$9!#(B
@@ -21869,6 +21873,8 @@ description-buffer = *description-line
 @lisp
 (gnus-declare-backend "nnchoke" 'mail 'respool 'address)
 @end lisp
+
+$B$=$7$F>e5-$N9T$O(B @file{nnchoke.el} $B%U%!%$%k$KF~$l$^$9!#(B
 
 $BG=NO$K$O0J2<$N$b$N$,$"$j$^$9!#(B
 
