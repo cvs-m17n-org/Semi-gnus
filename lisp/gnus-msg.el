@@ -939,14 +939,16 @@ If YANK is non-nil, include the original article."
       (insert gnus-bug-message)
       (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
-    (message-setup
-     `((To . ,gnus-maintainer) (Cc . ,semi-gnus-developers) (Subject . "")))
+    (message-setup `((To . ,gnus-maintainer) (Subject . "")))
     (when gnus-bug-create-help-buffer
       (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))
     (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
     (forward-line 1)
-    (insert (gnus-version) "\n"
+    (insert gnus-product-name " " gnus-version-number
+	    " (r" gnus-revision-number ") "
+	    "based on " gnus-original-product-name " v"
+	    gnus-original-version-number "\n"
 	    (emacs-version) "\n")
     (when (and (boundp 'nntp-server-type)
 	       (stringp nntp-server-type))
