@@ -1357,6 +1357,7 @@ should be sent in several parts. If it is nil, the size is unlimited."
   (autoload 'mh-send-letter "mh-comp")
   (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-point-at-bol "gnus-util")
+  (autoload 'gnus-output-to-rmail "gnus-util")
   (autoload 'gnus-output-to-mail "gnus-util")
   (autoload 'mail-abbrev-in-expansion-header-p "mailabbrev")
   (autoload 'nndraft-request-associate-buffer "nndraft")
@@ -3078,6 +3079,7 @@ This sub function is for exclusive use of `message-send-news'."
 	 (method (if (message-functionp message-post-method)
 		     (funcall message-post-method arg)
 		   message-post-method))
+	 (group-name-charset (gnus-group-name-charset method ""))
 	 (message-syntax-checks
 	  (if arg
 	      (cons '(existing-newsgroups . disabled)
@@ -3091,6 +3093,10 @@ This sub function is for exclusive use of `message-send-news'."
       (message-generate-headers message-required-news-headers)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
+    (if group-name-charset
+	(setq message-syntax-checks
+	      (cons '(valid-newsgroups . disabled)
+		    message-syntax-checks)))
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	nil
@@ -3523,7 +3529,7 @@ This sub function is for exclusive use of `message-send-news'."
   "Append this article to Unix/babyl mail file.."
   (if (and (file-readable-p filename)
 	   (mail-file-babyl-p filename))
-      (rmail-output-to-rmail-file filename t)
+      (gnus-output-to-rmail filename t)
     (gnus-output-to-mail filename t)))
 
 (defun message-cleanup-headers ()
