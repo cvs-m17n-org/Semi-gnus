@@ -44,6 +44,7 @@
 
 (eval-and-compile
   (autoload 'message-fetch-field "message")
+  (autoload 'gnus-get-buffer-window "gnus-win")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
   (autoload 'rmail-show-message "rmail"))
@@ -77,7 +78,7 @@
 	(frame (make-symbol "frame")))
     `(let* ((,tempvar (selected-window))
 	    (,buf ,buffer)
-	    (,w (get-buffer-window ,buf 'visible))
+	    (,w (gnus-get-buffer-window ,buf 'visible))
 	    ,frame)
        (unwind-protect
 	   (progn
@@ -516,9 +517,9 @@ If N, return the Nth ancestor instead."
 (defun gnus-horizontal-recenter ()
   "Recenter the current buffer horizontally."
   (if (< (current-column) (/ (window-width) 2))
-      (set-window-hscroll (get-buffer-window (current-buffer) t) 0)
+      (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0)
     (let* ((orig (point))
-	   (end (window-end (get-buffer-window (current-buffer) t)))
+	   (end (window-end (gnus-get-buffer-window (current-buffer) t)))
 	   (max 0))
       (when end
 	;; Find the longest line currently displayed in the window.
@@ -532,10 +533,10 @@ If N, return the Nth ancestor instead."
 	;; Scroll horizontally to center (sort of) the point.
 	(if (> max (window-width))
 	    (set-window-hscroll
-	     (get-buffer-window (current-buffer) t)
+	     (gnus-get-buffer-window (current-buffer) t)
 	     (min (- (current-column) (/ (window-width) 3))
 		  (+ 2 (- max (window-width)))))
-	  (set-window-hscroll (get-buffer-window (current-buffer) t) 0))
+	  (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0))
 	max))))
 
 (defun gnus-read-event-char ()
@@ -1066,7 +1067,7 @@ Return the modified alist."
 
 (defun gnus-set-window-start (&optional point)
   "Set the window start to POINT, or (point) if nil."
-  (let ((win (get-buffer-window (current-buffer) t)))
+  (let ((win (gnus-get-buffer-window (current-buffer) t)))
     (when win
       (set-window-start win (or point (point))))))
 

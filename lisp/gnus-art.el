@@ -36,6 +36,7 @@
 (require 'gnus-sum)
 (require 'gnus-spec)
 (require 'gnus-int)
+(require 'gnus-win)
 (require 'alist)
 (require 'mime-view)
 (require 'wid-edit)
@@ -3354,7 +3355,7 @@ commands:
 ;; from the head of the article.
 (defun gnus-article-set-window-start (&optional line)
   (set-window-start
-   (get-buffer-window gnus-article-buffer t)
+   (gnus-get-buffer-window gnus-article-buffer t)
    (save-excursion
      (set-buffer gnus-article-buffer)
      (goto-char (point-min))
@@ -4098,7 +4099,7 @@ If no internal viewer is available, use an external viewer."
 			       gnus-newsgroup-ignored-charsets)))
 	  (save-excursion
 	    (unwind-protect
-		(let ((win (get-buffer-window (current-buffer) t))
+		(let ((win (gnus-get-buffer-window (current-buffer) t))
 		      (beg (point)))
 		  (when win
 		    (select-window win))
@@ -4487,11 +4488,11 @@ If no internal viewer is available, use an external viewer."
       (goto-char point))))
 
 (defconst gnus-article-wash-status-strings
-  (let ((alist '((cite "c" "Possible hidden citation text" 
+  (let ((alist '((cite "c" "Possible hidden citation text"
 		       " " "All citation text visible")
 		 (headers "h" "Hidden headers"
 			  " " "All headers visible.")
-		 (pgp "p" "Encrypted or signed message status hidden" 
+		 (pgp "p" "Encrypted or signed message status hidden"
 		      " " "No hidden encryption nor digital signature status")
 		 (signature "s" "Signature has been hidden"
 			    " " "Signature is visible")
@@ -4937,7 +4938,7 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 			(gnus-group-enter-directory dir))))))))
 	  (setq gnus-original-article (cons group article))
 
-	  ;; The current buffer is `gnus-original-article-buffer'. 
+	  ;; The current buffer is `gnus-original-article-buffer'.
 	  (if (get-buffer gnus-original-article-buffer)
 	      (set-buffer gnus-original-article-buffer)
 	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
@@ -5033,7 +5034,7 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 	  (set-buffer gnus-summary-buffer)
 	  (gnus-summary-update-article do-update-line sparse-header)
 	  (gnus-summary-goto-subject do-update-line nil t)
-	  (set-window-point (get-buffer-window (current-buffer) t)
+	  (set-window-point (gnus-get-buffer-window (current-buffer) t)
 			    (point))
 	  (set-buffer buf))))))
 
@@ -5748,13 +5749,13 @@ specified by `gnus-button-alist'."
 
 (defun gnus-button-handle-info (url)
   "Fetch an info URL."
-  (if (string-match 
+  (if (string-match
        "^\\([^:/]+\\)?/\\(.*\\)"
        url)
       (gnus-info-find-node
        (concat "(" (or (gnus-url-unhex-string (match-string 1 url))
-		       "Gnus") 
-	       ")" 
+		       "Gnus")
+	       ")"
 	       (gnus-url-unhex-string (match-string 2 url))))
     (error "Can't parse %s" url)))
 
@@ -5878,7 +5879,7 @@ specified by `gnus-button-alist'."
   "Go to the next page."
   (interactive)
   (let ((win (selected-window)))
-    (select-window (get-buffer-window gnus-article-buffer t))
+    (select-window (gnus-get-buffer-window gnus-article-buffer t))
     (gnus-article-next-page)
     (select-window win)))
 
@@ -5886,7 +5887,7 @@ specified by `gnus-button-alist'."
   "Go to the prev page."
   (interactive)
   (let ((win (selected-window)))
-    (select-window (get-buffer-window gnus-article-buffer t))
+    (select-window (gnus-get-buffer-window gnus-article-buffer t))
     (gnus-article-prev-page)
     (select-window win)))
 
@@ -5914,7 +5915,7 @@ specified by `gnus-button-alist'."
   "Go to the next page."
   (interactive "P")
   (let ((win (selected-window)))
-    (select-window (get-buffer-window gnus-article-buffer t))
+    (select-window (gnus-get-buffer-window gnus-article-buffer t))
     (gnus-article-next-page)
     (select-window win)))
 
@@ -5922,7 +5923,7 @@ specified by `gnus-button-alist'."
   "Go to the prev page."
   (interactive "P")
   (let ((win (selected-window)))
-    (select-window (get-buffer-window gnus-article-buffer t))
+    (select-window (gnus-get-buffer-window gnus-article-buffer t))
     (gnus-article-prev-page)
     (select-window win)))
 
