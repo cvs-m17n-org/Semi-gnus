@@ -1,3 +1,19 @@
+1999-12-27  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.13.12 released.
+
+	* lisp/gnus-util.el (gnus-write-active-file): Copy from Gnus 5.8.2.
+
+	* lisp/gnus-score.el (gnus-enter-score-words-into-hashtb): Ignore
+	invalid character error.
+
+	* lisp/gnus-msg.el (gnus-post-method): Do not duplicate methods.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.12.
+
+	* lisp/gnus-agent.el (gnus-agent-expire): Sync up with Gnus
+	5.8.2.
+
 1999-12-09  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail-1): Fix bug for last
