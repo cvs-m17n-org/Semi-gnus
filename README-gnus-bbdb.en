@@ -43,9 +43,29 @@ though FLIM does not decode them, put the following lines in your
  This is a patch for bbdb.el / bbdb-hooks.el.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-2.2/lisp/bbdb-hooks.el~	Mon Jan  8 12:35:14 2001
-+++ bbdb-2.2/lisp/bbdb-hooks.el	Tue Feb  6 04:35:00 2001
-@@ -411,12 +411,23 @@
+--- bbdb-2.32/lisp/bbdb-com.el~	Sun Feb 18 08:00:39 2001
++++ bbdb-2.32/lisp/bbdb-com.el	Sun Feb 18 08:00:39 2001
+@@ -1620,7 +1620,7 @@
+           ;; to be enclosed in quotes.  Double-quotes and backslashes have
+           ;; already been escaped.  This quotes a few extra characters as
+           ;; well (!,%, and $) just for common sense.
+-          ((string-match "[][\000-\037\177()<>@,;:.!$%]" name)
++	  ((string-match "[][\000-\037\177<>@,;.!$%]" name)
+            (format "\"%s\" <%s>" name net))
+           (t
+            (format "%s <%s>" name net)))))
+--- bbdb-2.32/lisp/bbdb-hooks.el~	Tue Jan 30 08:00:56 2001
++++ bbdb-2.32/lisp/bbdb-hooks.el	Tue Jan 30 08:00:56 2001
+@@ -83,6 +83,8 @@
+ ;;
+ ;;
+ 
++(eval-when-compile (require 'cl))
++
+ (require 'bbdb)
+ 
+ (defmacro the-v18-byte-compiler-sucks-wet-farts-from-dead-pigeons ()
+@@ -415,12 +417,23 @@
           (marker (bbdb-header-start))
           field pairs fieldval  ; do all bindings here for speed
           regexp string notes-field-name notes
@@ -73,7 +93,7 @@ though FLIM does not decode them, put the following lines in your
                 (string-match (bbdb-user-mail-names) fieldval))
            ;; Don't do anything if this message is from us.  Note that we have
            ;; to look at the message instead of the record, because the record
-@@ -427,7 +438,7 @@
+@@ -431,7 +444,7 @@
            (goto-char marker)
            (setq field (car (car ignore-all))
                  regexp (cdr (car ignore-all))
@@ -82,7 +102,7 @@ though FLIM does not decode them, put the following lines in your
            (if (and fieldval
                     (string-match regexp fieldval))
                (setq ignore t)
-@@ -440,7 +451,8 @@
+@@ -444,7 +457,8 @@
                  pairs (cdr (car rest))  ; (REGEXP . STRING) or
                                          ; (REGEXP FIELD-NAME STRING) or
                                          ; (REGEXP FIELD-NAME STRING REPLACE-P)
@@ -92,9 +112,9 @@ though FLIM does not decode them, put the following lines in your
            (when fieldval
              (while pairs
                (setq regexp (car (car pairs))
---- bbdb-2.2/lisp/bbdb.el~	Wed Jan 24 23:14:00 2001
-+++ bbdb-2.2/lisp/bbdb.el	Tue Feb  6 04:35:00 2001
-@@ -681,6 +681,7 @@
+--- bbdb-2.32/lisp/bbdb.el~	Sun Mar  4 20:30:09 2001
++++ bbdb-2.32/lisp/bbdb.el	Sun Mar  4 20:30:09 2001
+@@ -710,6 +710,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
  (defvar bbdb-elided-display nil)
