@@ -1,6 +1,11 @@
+2002-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-clfns.el (find-cl-run-time-functions): Insert a
+	newline before filling a result; ignore non-list forms.
+
 2002-01-24  ARISAWA Akihiro  <ari@atesoft.advantest.co.jp>
 
-	* lisp/gnus-sum.el (gnus-summary-show-article): If coding-system is 
+	* lisp/gnus-sum.el (gnus-summary-show-article): If coding-system is
 	specified, bind `default-mime-charset' to it.
 
 2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
