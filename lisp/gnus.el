@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.051"
+(defconst gnus-version-number "6.10.052"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.68"
+(defconst gnus-original-version-number "0.69"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -2405,7 +2405,14 @@ that that variable is buffer-local to the summary buffers."
 		 (not (equal server (format "%s:%s" (caaar opened)
 					    (cadaar opened)))))
        (pop opened))
-     (caar opened))))
+     (caar opened))
+   ;; It could be a named method, search all servers
+   (let ((servers gnus-secondary-select-methods))
+     (while (and servers
+		 (not (equal server (format "%s:%s" (caar servers)
+					    (cadar servers)))))
+       (pop servers))
+     (car servers))))
 
 (defmacro gnus-method-equal (ss1 ss2)
   "Say whether two servers are equal."

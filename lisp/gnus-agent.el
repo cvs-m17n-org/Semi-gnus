@@ -223,7 +223,8 @@ for download via the Agent.")
   "Jj" gnus-agent-toggle-plugged
   "Js" gnus-agent-fetch-session
   "JS" gnus-group-send-drafts
-  "Ja" gnus-agent-add-group)
+  "Ja" gnus-agent-add-group
+  "Jr" gnus-agent-remove-group)
 
 (defun gnus-agent-group-make-menu-bar ()
   (unless (boundp 'gnus-agent-group-menu)
@@ -399,6 +400,16 @@ be a select method."
     (setf (cadddr cat) (nconc (cadddr cat) groups))
     (gnus-category-write)))
 
+(defun gnus-agent-remove-group (arg)
+  "Remove the current group from its agent category, if any."
+  (interactive "P")
+  (let (c)
+    (gnus-group-iterate arg
+      (lambda (group)
+	(when (cadddr (setq c (gnus-group-category group)))
+	  (setf (cadddr c) (delete group (cadddr c))))))
+    (gnus-category-write)))
+
 ;;;
 ;;; Server mode commands
 ;;;
@@ -436,6 +447,7 @@ be a select method."
 
 (defun gnus-agent-write-servers ()
   "Write the alist of covered servers."
+  (gnus-make-directory (nnheader-concat gnus-agent-directory "lib"))
   (with-temp-file (nnheader-concat gnus-agent-directory "lib/servers")
     (prin1 gnus-agent-covered-methods (current-buffer))))
 

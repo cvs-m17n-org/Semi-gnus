@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.1.2.7 $
+;; $Revision: 1.1.2.8 $
 ;; Keywords: news postscript uudecode binhex shar
   
 ;; This file is not part of GNU Emacs, but the same permissions
@@ -70,6 +70,10 @@
 (defvar mm-uu-identifier-alist
   '((?% . postscript) (?b . uu) (?: . binhex) (?# . shar)))
 
+(defvar mm-dissect-disposition "inline"
+  "The default disposition of uu parts.
+This can be either \"inline\" or \"attachment\".")
+
 ;;;### autoload
 
 (defun mm-uu-dissect ()
@@ -135,9 +139,9 @@
 				    (mailcap-extension-to-mime 
 				     (match-string 0 file-name)))
 			       "application/octet-stream"))
-		     mm-uu-decode-function nil 
+		     'x-uuencode nil 
 		     (if (and file-name (not (equal file-name "")))
-			 (list "inline" (cons 'filename file-name)))))
+			 (list mm-dissect-disposition (cons 'filename file-name)))))
 	      ((eq type 'binhex)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char) 
 		     (list (or (and file-name
@@ -145,9 +149,9 @@
 				    (mailcap-extension-to-mime 
 				     (match-string 0 file-name)))
 			       "application/octet-stream"))
-		     mm-uu-binhex-decode-function nil 
+		     'x-binhex nil 
 		     (if (and file-name (not (equal file-name "")))
-			 (list "inline" (cons 'filename file-name)))))
+			 (list mm-dissect-disposition (cons 'filename file-name)))))
 	      ((eq type 'shar)
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char) 
 		     '("application/x-shar")))) 

@@ -1831,8 +1831,7 @@ With the prefix argument FORCE, insert the header anyway."
 		 (eq force 0))
 	    (save-excursion
 	      (goto-char (point-max))
-	      (not (re-search-backward
-		    message-signature-separator nil t))))
+	      (not (re-search-backward message-signature-separator nil t))))
 	   ((and (null message-signature)
 		 force)
 	    t)
@@ -2054,7 +2053,7 @@ prefix, and don't delete any headers."
 	       message-indent-citation-function
 	     (list message-indent-citation-function)))))
     (goto-char end)
-    (when (re-search-backward "^-- $" start t)
+    (when (re-search-backward message-signature-separator start t)
       ;; Also peel off any blank lines before the signature.
       (forward-line -1)
       (while (looking-at "^[ \t]*$")
@@ -4786,11 +4785,40 @@ regexp varstr."
 ;;; MIME functions
 ;;;
 
+(defun message-mime-query-file (prompt)
+  (let ((file (read-file-name prompt nil nil t)))
+    ;; Prevent some common errors.  This is inspired by similar code in
+    ;; VM.
+    (when (file-directory-p file)
+      (error "%s is a directory, cannot attach" file))
+    (unless (file-exists-p file)
+      (error "No such file: %s" file))
+    (unless (file-readable-p file)
+      (error "Permission denied: %s" file))
+    file))
 
-;; I really think this function should be renamed.  It is only useful
-;; for inserting file attachments.
+(defun message-mime-query-type (file)
+  (let* ((default (or (mm-default-file-encoding file)
+		      ;; Perhaps here we should check what the file
+		      ;; looks like, and offer text/plain if it looks
+		      ;; like text/plain.
+		      "application/octet-stream"))
+	 (string (completing-read
+		  (format "Content type (default %s): " default)
+		  (delete-duplicates
+		   (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
+		   :test 'equal))))
+    (if (not (equal string ""))
+	string
+      default)))
 
-(defun message-mime-attach-file (file type description)
+(defun message-mime-query-description ()
+  (let ((description (read-string "One line description: ")))
+    (when (string-match "\\`[ \t]*\\'" description)
+      (setq description nil))
+    description))
+
+(defun message-mime-attach-file (file &optional type description)
   "Attach a file to the outgoing MIME message.
 The file is not inserted or encoded until you send the message with
 `\\[message-send-and-exit]' or `\\[message-send]'.
@@ -4799,51 +4827,29 @@ FILE is the name of the file to attach.  TYPE is its content-type, a
 string of the form \"type/subtype\".  DESCRIPTION is a one-line
 description of the attachment."
   (interactive
-   (let* ((file (read-file-name "Attach file: " nil nil t))
-	  (type (completing-read
-		 (format "Content type (default %s): "
-			 (or (mm-default-file-encoding file)
-			     ;; Perhaps here we should check
-			     ;; what the file looks like, and
-			     ;; offer text/plain if it looks
-			     ;; like text/plain.
-			     "application/octet-stream"))
-		 (delete-duplicates
-		  (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
-		  :test 'equal)))
-	  (description (read-string "One line description: ")))
+   (let* ((file (message-mime-query-file "Attach file: "))
+	  (type (message-mime-query-type file))
+	  (description (message-mime-query-description)))
      (list file type description)))
-  (when (string-match "\\`[ \t]*\\'" description)
-    (setq description nil))
-  (when (string-match "\\`[ \t]*\\'" type)
-    (setq type (mm-default-file-encoding file))) nil
-  ;; Prevent some common errors.  This is inspired by similar code in
-  ;; VM.
-  (when (file-directory-p file)
-    (error "%s is a directory, cannot attach" file))
-  (unless (file-exists-p file)
-    (error "No such file: %s" file))
-  (unless (file-readable-p file)
-    (error "Permission denied: %s" file))
-  (insert (format "<#part type=%s filename=%s%s><#/part>\n"
-		  type (prin1-to-string file)
-		  (if description
-		      (format " description=%s" (prin1-to-string description))
-		    ""))))
+  (insert (format
+	   "<#part type=%s filename=%s%s disposition=attachment><#/part>\n"
+	   type (prin1-to-string file)
+	   (if description
+	       (format " description=%s" (prin1-to-string description))
+	     ""))))
 
-(defun message-mime-insert-external (file type)
-  "Insert a message/external-body part into the buffer."
+(defun message-mime-attach-external (file &optional type description)
+  "Attach an external file into the buffer.
+FILE is an ange-ftp/efs specification of the part location.
+TYPE is the MIME type to use."
   (interactive
-   (let* ((file (read-file-name "Insert file: "))
-	  (type (mm-default-file-encoding file)))
-     (list file
-	   (completing-read
-	    (format "MIME type for %s: " file)
-	    (delete-duplicates
-	     (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions))
-	    nil nil type))))
-  (insert (format "<#external type=%s name=\"%s\"><#/external>\n"
-		  type file)))
+   (let* ((file (message-mime-query-file "Attach external file: "))
+	  (type (message-mime-query-type file))
+	  (description (message-mime-query-description)))
+     (list file type description)))
+  (insert (format
+	   "<#external type=%s name=%s disposition=attachment><#/external>\n"
+	   type (prin1-to-string file))))
 
 (defun message-encode-message-body ()
   (let ((mm-default-charset message-default-charset)
@@ -4870,6 +4876,10 @@ description of the attachment."
 	(insert lines))
       (setq multipart-p
 	    (re-search-backward "^Content-Type: multipart/" nil t)))
+    (save-restriction
+      (message-narrow-to-headers-or-head)
+      (message-remove-first-header "Content-Type")
+      (message-remove-first-header "Content-Transfer-Encoding"))
     (when multipart-p
       (save-restriction
 	(message-narrow-to-headers-or-head)

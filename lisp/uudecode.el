@@ -52,7 +52,10 @@ input and write the converted data to its standard output.")
       (setq str (concat str "[^a-z]")))
     (concat str ".?$")))
 
-(defvar uudecode-temporary-file-directory "/tmp/")
+(defvar uudecode-temporary-file-directory
+  (cond ((fboundp 'temp-directory) (temp-directory))
+	((boundp 'temporary-file-directory) temporary-file-directory)
+	("/tmp/")))
 
 ;;;###autoload
 (defun uudecode-decode-region-external (start end &optional file-name)
