@@ -1320,7 +1320,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
    ["Spellcheck" ispell-message t]
-   ["Attach file as MIME" message-mime-attach-file t]
+   ["Attach file as MIME" mml-attach-file t]
    "----"
    ["Send Message" message-send-and-exit t]
    ["Abort Message" message-dont-send t]
@@ -2088,14 +2088,12 @@ the user from the mailer."
 	(case-fold-search nil)
 	(news (message-news-p))
 	(mailbuf (current-buffer)))
-    (message-encode-message-body)
     (save-restriction
       (message-narrow-to-headers)
       ;; Insert some headers.
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
-      (mail-encode-encoded-word-buffer)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (unwind-protect
@@ -2108,10 +2106,12 @@ the user from the mailer."
 			  (set-buffer mailbuf)
 			  (buffer-string))))
 	  ;; Remove some headers.
+	  (message-encode-message-body)
 	  (save-restriction
 	    (message-narrow-to-headers)
 	    ;; Remove some headers.
-	    (message-remove-header message-ignored-mail-headers t))
+	    (message-remove-header message-ignored-mail-headers t)
+	    (mail-encode-encoded-word-buffer))
 	  (goto-char (point-max))
 	  ;; require one newline at the end.
 	  (or (= (preceding-char) ?\n)
@@ -2264,13 +2264,10 @@ to find out how to use this."
 	result)
     (if (not (message-check-news-body-syntax))
 	nil
-      (message-encode-message-body)
       (save-restriction
 	(message-narrow-to-headers)
 	;; Insert some headers.
 	(message-generate-headers message-required-news-headers)
-	(let ((mail-parse-charset message-posting-charset))
-	  (mail-encode-encoded-word-buffer))
 	;; Let the user do all of the above.
 	(run-hooks 'message-header-hook))
       (message-cleanup-headers)
@@ -2286,11 +2283,14 @@ to find out how to use this."
 		       "%s" (save-excursion
 			      (set-buffer messbuf)
 			      (buffer-string))))
+	      (message-encode-message-body)
 	      ;; Remove some headers.
 	      (save-restriction
 		(message-narrow-to-headers)
 		;; Remove some headers.
-		(message-remove-header message-ignored-news-headers t))
+		(message-remove-header message-ignored-news-headers t)
+		(let ((mail-parse-charset message-posting-charset))
+		  (mail-encode-encoded-word-buffer)))
 	      (goto-char (point-max))
 	      ;; require one newline at the end.
 	      (or (= (preceding-char) ?\n)
@@ -2988,7 +2988,7 @@ Headers already prepared in the buffer are not modified."
 		    ;; colon, if there is none.
 		    (if (/= (char-after) ? ) (insert " ") (forward-char 1))
 		    ;; Find out whether the header is empty...
-		    (looking-at "[ \t]*$")))
+		    (looking-at "[ \t]*\n[^ \t]")))
 	  ;; So we find out what value we should insert.
 	  (setq value
 		(cond
@@ -3830,7 +3830,8 @@ Optional NEWS will use news to forward instead of mail."
       (when (looking-at "From ")
 	(replace-match "X-From-Line: "))
       ;; Send it.
-      (let (message-required-mail-headers)
+      (let ((message-inhibit-body-encoding t)
+	    message-required-mail-headers)
 	(message-send-mail))
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
@@ -4105,10 +4106,10 @@ regexp varstr."
 ;;; MIME functions
 ;;;
 
-(defvar messgage-inhibit-body-encoding nil)
+(defvar message-inhibit-body-encoding nil)
 
 (defun message-encode-message-body ()
-  (unless messgage-inhibit-body-encoding 
+  (unless message-inhibit-body-encoding 
     (let ((mail-parse-charset (or mail-parse-charset
 				  message-default-charset
 				  message-posting-charset))
