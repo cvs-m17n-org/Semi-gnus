@@ -985,6 +985,15 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 			      gnus-offline-interval-time))
   (if (= gnus-offline-interval-time 0)
       (gnus-demon-remove-handler 'gnus-offline-gnus-get-new-news t)))
+
+;;
+;; Code for making Gnus and Gnus Offline cooperate each other.
+;;
+
+(defadvice gnus (after gnus-offline-ad activate)
+  "Synchronize `gnus-offline-connected' with `gnus-plugged'."
+  (and (featurep 'gnus-agent)
+       (setq gnus-offline-connected gnus-plugged)))
 ;;
 ;;
 ;;; gnus-offline.el ends here
