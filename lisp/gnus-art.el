@@ -4745,8 +4745,10 @@ If given a prefix, show the hidden text instead."
     (gnus-request-group gnus-newsgroup-name t)))
 
 (defun gnus-request-article-this-buffer (article group)
-  "Get an article and insert it into this buffer."
+  "Get an article and insert it into this buffer.
+T-gnus change: Insert an article into `gnus-original-article-buffer'."
   (let (do-update-line sparse-header)
+    ;; The current buffer is `gnus-article-buffer'.
     (prog1
 	(save-excursion
 	  (erase-buffer)
@@ -4801,7 +4803,9 @@ If given a prefix, show the hidden text instead."
 		      (when (file-directory-p dir)
 			(setq article 'nneething)
 			(gnus-group-enter-directory dir))))))))
+	  (setq gnus-original-article (cons group article))
 
+	  (set-buffer gnus-original-article-buffer)
 	  (cond
 	   ;; Refuse to select canceled articles.
 	   ((and (numberp article)
@@ -4869,28 +4873,10 @@ If given a prefix, show the hidden text instead."
       ;; Associate this article with the current summary buffer.
       (setq gnus-article-current-summary gnus-summary-buffer)
 
-      ;; Take the article from the original article buffer
-      ;; and place it in the buffer it's supposed to be in.
-      (when (and (get-buffer gnus-article-buffer)
-		 (equal (buffer-name (current-buffer))
-			(buffer-name (get-buffer gnus-article-buffer))))
-	(save-excursion
-	  (if (get-buffer gnus-original-article-buffer)
-	      (set-buffer gnus-original-article-buffer)
-	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
-	    (set-buffer-multibyte nil)
-	    (buffer-disable-undo)
-	    (setq major-mode 'gnus-original-article-mode)
-	    (setq buffer-read-only t))
-	  (let (buffer-read-only)
-	    (erase-buffer)
-	    (insert-buffer-substring gnus-article-buffer))
-	  (setq gnus-original-article (cons group article)))
-
-	;; Decode charsets.
-	(run-hooks 'gnus-article-decode-hook)
-	;; Mark article as decoded or not.
-	(setq gnus-article-decoded-p gnus-article-decode-hook))
+      ;; Decode charsets.
+      (run-hooks 'gnus-article-decode-hook)
+      ;; Mark article as decoded or not.
+      (setq gnus-article-decoded-p gnus-article-decode-hook)
 
       ;; Update sparse articles.
       (when (and do-update-line

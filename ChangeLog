@@ -1,3 +1,13 @@
+2001-08-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
+
+2001-08-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-request-article-this-buffer): Insert an
+	article into `gnus-original-article-buffer' instead of
+	`gnus-article-buffer'.
+
 2001-07-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-select-newsgroup): Don't examine cached
