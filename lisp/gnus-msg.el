@@ -209,8 +209,8 @@ Thank you for your help in stamping out bugs.
   "\M-c" gnus-summary-mail-crosspost-complaint
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
-  "Om" gnus-summary-mail-digest
-  "Op" gnus-summary-post-digest)
+  "Om" gnus-uu-digest-mail-forward
+  "Op" gnus-uu-digest-post-forward)
 
 (gnus-define-keys (gnus-send-bounce-map "D" gnus-summary-send-map)
   "b" gnus-summary-resend-bounced-mail
@@ -750,36 +750,36 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
 
-;;; XXX: generate Subject and ``Topics''?
-(defun gnus-summary-mail-digest (&optional n post)
-  "Digests and forwards all articles in this series."
-  (interactive "P")
-  (let ((subject "Digested Articles")
-	(articles (gnus-summary-work-articles n))
-	article frame)
-    (gnus-setup-message 'forward
-      (gnus-summary-select-article)
-      (if post (message-news nil subject) (message-mail nil subject))
-      (when (and message-use-multi-frames (cdr articles))
-	(setq frame (window-frame (get-buffer-window (current-buffer)))))
-      (message-goto-body)
-      (while (setq article (pop articles))
-	(save-window-excursion
-	  (set-buffer gnus-summary-buffer)
-	  (gnus-summary-select-article nil nil nil article)
-	  (gnus-summary-remove-process-mark article))
-	(when frame
-	  (select-frame frame))
-	(insert (mime-make-tag "message" "rfc822") "\n")
-	(insert-buffer-substring gnus-original-article-buffer))
-      (push-mark)
-      (message-goto-body)
-      (mime-edit-enclose-digest-region (point)(mark t)))))
-
-(defun gnus-summary-post-digest (&optional n)
-  "Digest and forwards all articles in this series to a newsgroup."
-  (interactive "P")
-  (gnus-summary-mail-digest n t))
+;;;;; XXX: generate Subject and ``Topics''?
+;;(defun gnus-summary-mail-digest (&optional n post)
+;;  "Digests and forwards all articles in this series."
+;;  (interactive "P")
+;;  (let ((subject "Digested Articles")
+;;	(articles (gnus-summary-work-articles n))
+;;	article frame)
+;;    (gnus-setup-message 'forward
+;;      (gnus-summary-select-article)
+;;      (if post (message-news nil subject) (message-mail nil subject))
+;;      (when (and message-use-multi-frames (cdr articles))
+;;	(setq frame (window-frame (get-buffer-window (current-buffer)))))
+;;      (message-goto-body)
+;;      (while (setq article (pop articles))
+;;	(save-window-excursion
+;;	  (set-buffer gnus-summary-buffer)
+;;	  (gnus-summary-select-article nil nil nil article)
+;;	  (gnus-summary-remove-process-mark article))
+;;	(when frame
+;;	  (select-frame frame))
+;;	(insert (mime-make-tag "message" "rfc822") "\n")
+;;	(insert-buffer-substring gnus-original-article-buffer))
+;;      (push-mark)
+;;      (message-goto-body)
+;;      (mime-edit-enclose-digest-region (point)(mark t)))))
+;;
+;;(defun gnus-summary-post-digest (&optional n)
+;;  "Digest and forwards all articles in this series to a newsgroup."
+;;  (interactive "P")
+;;  (gnus-summary-mail-digest n t))
 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."

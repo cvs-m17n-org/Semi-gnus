@@ -296,7 +296,7 @@ so I simply dropped them."
   '("^Date:" "^From:" "^To:" "^Cc:" "^Subject:" "^Message-ID:" "^Keywords:"
     "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:"
     "^MIME-Version:" "^Content-Disposition:" "^Content-Description:"
-    "^Content-ID:")
+    "^Content-ID:" "^User-Agent:" "^X-Face:")
   "*List of regexps to match headers included in digested messages.
 The headers will be included in the sequence they are matched."
   :group 'gnus-extract
@@ -549,21 +549,19 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 		(if (gnus-news-group-p gnus-newsgroup-name)
 		    gnus-newsgroup-name
 		  "Various"))))
-      (goto-char (point-min))
-      (when (re-search-forward "^Subject: ")
-	(delete-region (point) (gnus-point-at-eol))
-	(insert subject))
-      (goto-char (point-min))
-      (when (re-search-forward "^From: ")
-	(delete-region (point) (gnus-point-at-eol))
-	(insert from))
-      (message-forward post)
-      (save-excursion
-	(message-goto-body)
-	(delete-region (point)
-		       (progn
-			 (search-forward "\nTopics:\n")
-			 (1+ (match-beginning 0))))))
+      (mime-edit-enclose-digest-region (point-min) (point-max))
+      (if post
+	  (message-news nil (concat "[" from "] " subject))
+	(message-mail nil (concat "[" from "] " subject)))
+      (message-goto-body)
+      ;; Make sure we're at the start of the line.
+      (unless (bolp)
+	(insert "\n"))
+      ;; Insert the forwarded buffer.
+      (insert-buffer gnus-uu-digest-buffer)
+      (kill-buffer gnus-uu-digest-buffer)
+      (set-text-properties (point-min) (point-max) nil)
+      (message-position-point))
     (setq gnus-uu-digest-from-subject nil)))
 
 (defun gnus-uu-digest-post-forward (&optional n)
@@ -855,12 +853,8 @@ When called interactively, prompt for REGEXP."
 	    (save-excursion
 	      (set-buffer (gnus-get-buffer-create "*gnus-uu-pre*"))
 	      (erase-buffer)
-	      (insert (format "From: %s\nSubject: %s Digest\n\n" name name))
-	      (when gnus-uu-digest-buffer
-		;; The default part in multipart/digest is message/rfc822.
-		;; Subject is a fake head.
-		(let (mime-content-types)
-		  (mime-edit-insert-tag "text" "plain")))
+	      (unless gnus-uu-digest-buffer
+		(insert (format "From: %s\nSubject: %s Digest\n\n" name name)))
 	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))

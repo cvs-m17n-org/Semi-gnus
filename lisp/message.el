@@ -2276,7 +2276,7 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
       (message-delete-line))
     ;; Delete blank lines at the end of the buffer.
     (goto-char (point-max))
-    (unless (eolp)
+    (unless (bolp)
       (insert "\n"))
     (while (and (zerop (forward-line -1))
 		(looking-at "$"))
@@ -4922,7 +4922,7 @@ Optional NEWS will use news to forward instead of mail."
 	(message-goto-body)
       (goto-char (point-max)))
     ;; Make sure we're at the start of the line.
-    (unless (eolp)
+    (unless (bolp)
       (insert "\n"))
     ;; Narrow to the area we are to insert.
     (narrow-to-region (point) (point))
