@@ -1,7 +1,8 @@
-;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
+;;; gnus-int.el --- backend interface functions for Chaos
+;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -296,8 +297,9 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
   (let ((gnus-command-method (gnus-find-method-for-group group))
 	headers)
     (if (and gnus-use-cache (numberp (car articles)))
-	(setq gnus-headers-retrieved-by
-	      (gnus-cache-retrieve-headers articles group fetch-old))
+	(setq headers
+	      (gnus-cache-retrieve-parsed-headers articles group fetch-old
+						  dependencies force-new))
       (let ((func (gnus-get-function gnus-command-method
 				     'retrieve-parsed-headers 'no-error)))
 	(if func
