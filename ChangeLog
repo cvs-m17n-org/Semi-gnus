@@ -1,3 +1,10 @@
+2000-11-26  Tatsuya Ichikawa  <ichikawa@eitc.epson.com>
+
+	* lisp/message.el (message-send-mail-with-smtp): Change error
+	handling 'cause delete-process will return nil on most platform,
+	then message-send-mail-with-smtp seems fail to send message even
+	sending message success.
+
 2000-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
