@@ -1,3 +1,8 @@
+2001-06-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-display-x-face): Don't gather X-Face
+	fields in `gnus-original-article-buffer'.
+
 2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-find-parameter): Undo the last
