@@ -1004,7 +1004,6 @@ always hide."
 		(inhibit-point-motion-hooks t)
 		beg)
 	    ;; First we narrow to just the headers.
-	    (widen)
 	    (goto-char (point-min))
 	    ;; Hide any "From " lines at the beginning of (mail) articles.
 	    (while (looking-at "From ")
@@ -1059,7 +1058,7 @@ always hide."
 	      (list gnus-boring-article-headers)
 	      (inhibit-point-motion-hooks t)
 	      elem)
-	  (nnheader-narrow-to-headers)
+	  (article-narrow-to-head)
 	  (while list
 	    (setq elem (pop list))
 	    (goto-char (point-min))
@@ -1146,7 +1145,7 @@ always hide."
 	column)
     (save-excursion
       (save-restriction
-	(message-narrow-to-head)
+	(article-narrow-to-head)
 	(while (not (eobp))
 	  (cond
 	   ((< (setq column (- (gnus-point-at-eol) (point)))
@@ -1236,7 +1235,6 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
     (let ((buffer-read-only nil)
 	  (width (window-width (get-buffer-window (current-buffer)))))
       (save-restriction
-	(widen)
 	(article-goto-body)
 	(let ((adaptive-fill-mode nil))
 	  (while (not (eobp))
@@ -1299,7 +1297,7 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 	  (case-fold-search t)
 	  from last)
       (save-restriction
-	(message-narrow-to-head)
+	(article-narrow-to-head)
 	(goto-char (point-min))
 	(setq from (message-fetch-field "from"))
 	(goto-char (point-min))
@@ -1355,7 +1353,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
   (interactive "P")
   (save-excursion
     (save-restriction
-      (message-narrow-to-head)
+      (article-narrow-to-head)
       (let* ((inhibit-point-motion-hooks t)
 	     (case-fold-search t)
 	     (ct (message-fetch-field "Content-Type" t))
@@ -1414,37 +1412,37 @@ or not."
   "Remove any PGP headers and signatures in the current article."
   (interactive)
   (save-excursion
-    (let ((inhibit-point-motion-hooks t)
-	  buffer-read-only beg end)
-      (widen)
-      (goto-char (point-min))
-      ;; Hide the "header".
-      (when (search-forward "\n-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
-	(push 'pgp gnus-article-wash-types)
-	(delete-region (1+ (match-beginning 0)) (match-end 0))
-	;; PGP 5 and GNU PG add a `Hash: <>' comment, hide that too
-	(when (looking-at "Hash:.*$")
-	  (delete-region (point) (1+ (gnus-point-at-eol))))
-	(setq beg (point))
-	;; Hide the actual signature.
-	(and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
-	     (setq end (1+ (match-beginning 0)))
-	     (delete-region
-	      end
-	      (if (search-forward "\n-----END PGP SIGNATURE-----\n" nil t)
-		  (match-end 0)
-		;; Perhaps we shouldn't hide to the end of the buffer
-		;; if there is no end to the signature?
-		(point-max))))
-	;; Hide "- " PGP quotation markers.
-	(when (and beg end)
-	  (narrow-to-region beg end)
-	  (goto-char (point-min))
-	  (while (re-search-forward "^- " nil t)
-	    (delete-region
-	     (match-beginning 0) (match-end 0)))
-	  (widen))
-	(gnus-run-hooks 'gnus-article-hide-pgp-hook)))))
+    (save-restriction
+      (let ((inhibit-point-motion-hooks t)
+	    buffer-read-only beg end)
+	(article-goto-body)
+	;; Hide the "header".
+	(when (re-search-forward "^-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
+	  (push 'pgp gnus-article-wash-types)
+	  (delete-region (match-beginning 0) (match-end 0))
+	  ;; PGP 5 and GNU PG add a `Hash: <>' comment, hide that too
+	  (when (looking-at "Hash:.*$")
+	    (delete-region (point) (1+ (gnus-point-at-eol))))
+	  (setq beg (point))
+	  ;; Hide the actual signature.
+	  (and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
+	       (setq end (1+ (match-beginning 0)))
+	       (delete-region
+		end
+		(if (search-forward "\n-----END PGP SIGNATURE-----\n" nil t)
+		    (match-end 0)
+		  ;; Perhaps we shouldn't hide to the end of the buffer
+		  ;; if there is no end to the signature?
+		  (point-max))))
+	  ;; Hide "- " PGP quotation markers.
+	  (when (and beg end)
+	    (narrow-to-region beg end)
+	    (goto-char (point-min))
+	    (while (re-search-forward "^- " nil t)
+	      (delete-region
+	       (match-beginning 0) (match-end 0)))
+	    (widen))
+	  (gnus-run-hooks 'gnus-article-hide-pgp-hook))))))
 
 (defun article-hide-pem (&optional arg)
   "Toggle hiding of any PEM headers and signatures in the current article.
@@ -1454,7 +1452,6 @@ always hide."
   (unless (gnus-article-check-hidden-text 'pem arg)
     (save-excursion
       (let (buffer-read-only end)
-	(widen)
 	(goto-char (point-min))
 	;; Hide the horrendously ugly "header".
 	(when (and (search-forward
@@ -1479,21 +1476,21 @@ always hide."
   (interactive)
   (save-excursion
     (save-restriction
-    (let ((inhibit-point-motion-hooks t)
-	  (banner (gnus-group-get-parameter gnus-newsgroup-name 'banner))
-	  (gnus-signature-limit nil)
-	  buffer-read-only beg end)
-      (when banner
-	(article-goto-body)
-	(cond
-	 ((eq banner 'signature)
-	  (when (gnus-article-narrow-to-signature)
-	    (widen)
-	    (forward-line -1)
-	    (delete-region (point) (point-max))))
-	 ((stringp banner)
-	  (while (re-search-forward banner nil t)
-	    (delete-region (match-beginning 0) (match-end 0))))))))))
+      (let ((inhibit-point-motion-hooks t)
+	    (banner (gnus-group-get-parameter gnus-newsgroup-name 'banner))
+	    (gnus-signature-limit nil)
+	    buffer-read-only beg end)
+	(when banner
+	  (article-goto-body)
+	  (cond
+	   ((eq banner 'signature)
+	    (when (gnus-article-narrow-to-signature)
+	      (widen)
+	      (forward-line -1)
+	      (delete-region (point) (point-max))))
+	   ((stringp banner)
+	    (while (re-search-forward banner nil t)
+	      (delete-region (match-beginning 0) (match-end 0))))))))))
 
 (defun article-hide-signature (&optional arg)
   "Hide the signature in the current article.
@@ -1518,6 +1515,16 @@ always hide."
 	(while (and (not (eobp))
 		    (looking-at "[ \t]*$"))
 	  (gnus-delete-line))))))
+
+(defun article-narrow-to-head ()
+  "Narrow the buffer to the head of the message.
+Point is left at the beginning of the narrowed-to region."
+  (narrow-to-region
+   (goto-char (point-min))
+   (if (search-forward "\n\n" nil 1)
+       (1- (point))
+     (point-max)))
+  (goto-char (point-min)))
 
 (defun article-goto-body ()
   "Place point at the start of the body."
@@ -1591,7 +1598,6 @@ always hide."
 
 (defun gnus-article-narrow-to-signature ()
   "Narrow to the signature; return t if a signature is found, else nil."
-  (widen)
   (let ((inhibit-point-motion-hooks t))
     (when (gnus-article-search-signature)
       (forward-line 1)
@@ -1632,38 +1638,6 @@ Put point at the beginning of the signature separator."
       (goto-char cur)
       nil)))
 
-(eval-and-compile
-  (autoload 'w3-display "w3-parse")
-  (autoload 'w3-do-setup "w3" "" t)
-  (autoload 'w3-region "w3-display" "" t))
-
-(defun gnus-article-treat-html ()
-  "Render HTML."
-  (interactive)
-  (let ((cbuf (current-buffer)))
-    (set-buffer gnus-article-buffer)
-    (let (buf buffer-read-only b e)
-      (w3-do-setup)
-      (goto-char (point-min))
-      (narrow-to-region
-       (if (search-forward "\n\n" nil t)
-	   (setq b (point))
-	 (point-max))
-       (setq e (point-max)))
-      (with-temp-buffer
-	(insert-buffer-substring gnus-article-buffer b e)
-	(require 'url)
-	(save-window-excursion
-	  (w3-region (point-min) (point-max))
-	  (setq buf (buffer-substring-no-properties (point-min) (point-max)))))
-      (when buf
-	(delete-region (point-min) (point-max))
-	(insert buf))
-      (widen)
-      (goto-char (point-min))
-      (set-window-start (get-buffer-window (current-buffer)) (point-min))
-      (set-buffer cbuf))))
-
 (defun gnus-article-hidden-arg ()
   "Return the current prefix arg as a number, or 0 if no prefix."
   (list (if current-prefix-arg
@@ -1676,7 +1650,6 @@ Arg can be nil or a number.  Nil and positive means hide, negative
 means show, 0 means toggle."
   (save-excursion
     (save-restriction
-      (widen)
       (let ((hide (gnus-article-hidden-text-p type)))
 	(cond
 	 ((or (null arg)
@@ -1747,7 +1720,7 @@ how much time has lapsed since DATE."
     (when (and date (not (string= date "")))
       (save-excursion
 	(save-restriction
-	  (nnheader-narrow-to-headers)
+	  (article-narrow-to-head)
 	  (let ((buffer-read-only nil))
 	    ;; Delete any old Date headers.
 	    (if (re-search-forward date-regexp nil t)
@@ -2979,6 +2952,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (goto-char (widget-get elems :from))
   (gnus-article-press-button))
 
+(defvar gnus-displaying-mime nil)
+
 (defun gnus-display-mime (&optional ihandles)
   "Display the MIME parts."
   (save-excursion
@@ -2992,7 +2967,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (set-window-point window point)))
       (let* ((handles (or ihandles (mm-dissect-buffer) (mm-uu-dissect)))
 	     buffer-read-only handle name type b e display)
-	(unless ihandles
+	(when (and (not ihandles)
+		   (not gnus-displaying-mime))
 	  ;; Top-level call; we clean up.
 	  (mm-destroy-parts gnus-article-mime-handles)
 	  (setq gnus-article-mime-handles handles
@@ -3004,15 +2980,18 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		 (or (not (stringp (car handles)))
 		     (cdr handles)))
 	    (progn
-	      (unless ihandles
+	      (when (and (not ihandles)
+			 (not gnus-displaying-mime))
 		;; Clean up for mime parts.
 		(article-goto-body)
 		(delete-region (point) (point-max)))
-	      (gnus-mime-display-part handles))
+	      (let ((gnus-displaying-mime t))
+		(gnus-mime-display-part handles)))
 	  (save-restriction
 	    (article-goto-body)
 	    (narrow-to-region (point) (point-max))
-	    (gnus-treat-article nil 1 1)))
+	    (gnus-treat-article nil 1 1)
+	    (widen)))
 	;; Highlight the headers.
 	(save-excursion
 	  (save-restriction
@@ -3259,7 +3238,6 @@ If given a numerical ARG, move forward ARG pages."
   (save-excursion
     (set-buffer gnus-article-buffer)
     (goto-char (point-min))
-    (widen)
     ;; Remove any old next/prev buttons.
     (when (gnus-visual-p 'page-marker)
       (let ((buffer-read-only nil))
@@ -4062,7 +4040,7 @@ do the highlighting.  See the documentation for those functions."
 	    (case-fold-search t)
 	    (inhibit-point-motion-hooks t)
 	    entry regexp header-face field-face from hpoints fpoints)
-	(message-narrow-to-head)
+	(article-narrow-to-head)
 	(while (setq entry (pop alist))
 	  (goto-char (point-min))
 	  (setq regexp (concat "^\\("
@@ -4163,38 +4141,38 @@ specified by `gnus-button-alist'."
   (interactive)
   (save-excursion
     (set-buffer gnus-article-buffer)
-    (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t)
-	  (case-fold-search t)
-	  (alist gnus-header-button-alist)
-	  entry beg end)
-      (nnheader-narrow-to-headers)
-      (while alist
-	;; Each alist entry.
-	(setq entry (car alist)
-	      alist (cdr alist))
-	(goto-char (point-min))
-	(while (re-search-forward (car entry) nil t)
-	  ;; Each header matching the entry.
-	  (setq beg (match-beginning 0))
-	  (setq end (or (and (re-search-forward "^[^ \t]" nil t)
-			     (match-beginning 0))
-			(point-max)))
-	  (goto-char beg)
-	  (while (re-search-forward (nth 1 entry) end t)
-	    ;; Each match within a header.
-	    (let* ((entry (cdr entry))
-		   (start (match-beginning (nth 1 entry)))
-		   (end (match-end (nth 1 entry)))
-		   (form (nth 2 entry)))
-	      (goto-char (match-end 0))
-	      (when (eval form)
-		(gnus-article-add-button
-		 start end (nth 3 entry)
-		 (buffer-substring (match-beginning (nth 4 entry))
-				   (match-end (nth 4 entry)))))))
-	  (goto-char end))))
-    (widen)))
+    (save-restriction
+      (let ((buffer-read-only nil)
+	    (inhibit-point-motion-hooks t)
+	    (case-fold-search t)
+	    (alist gnus-header-button-alist)
+	    entry beg end)
+	(article-narrow-to-head)
+	(while alist
+	  ;; Each alist entry.
+	  (setq entry (car alist)
+		alist (cdr alist))
+	  (goto-char (point-min))
+	  (while (re-search-forward (car entry) nil t)
+	    ;; Each header matching the entry.
+	    (setq beg (match-beginning 0))
+	    (setq end (or (and (re-search-forward "^[^ \t]" nil t)
+			       (match-beginning 0))
+			  (point-max)))
+	    (goto-char beg)
+	    (while (re-search-forward (nth 1 entry) end t)
+	      ;; Each match within a header.
+	      (let* ((entry (cdr entry))
+		     (start (match-beginning (nth 1 entry)))
+		     (end (match-end (nth 1 entry)))
+		     (form (nth 2 entry)))
+		(goto-char (match-end 0))
+		(when (eval form)
+		  (gnus-article-add-button
+		   start end (nth 3 entry)
+		   (buffer-substring (match-beginning (nth 4 entry))
+				     (match-end (nth 4 entry)))))))
+	    (goto-char end)))))))
 
 ;;; External functions:
 
@@ -4509,7 +4487,8 @@ For example:
 	(when (and (or (consp val)
 		       treated-type)
 		   (gnus-treat-predicate val))
-	  (funcall (cadr elem)))))))
+	  (save-restriction
+	    (funcall (cadr elem))))))))
 
 ;; Dynamic variables.
 (defvar part-number)

@@ -264,13 +264,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.058"
+(defconst gnus-version-number "6.10.059"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "09"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.76"
+(defconst gnus-original-version-number "0.77"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
