@@ -1,3 +1,13 @@
+1999-02-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Ask save password
+	information to .newsrc file.
+
+1999-02-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): To work with
+	external movemail program.
+
 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/{gnus-cache,gnus-int,gnus-sum,gnus,nnheader,nnmh}.el: Undo
