@@ -1,3 +1,7 @@
+2002-03-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-md5): Treat a given string as binary.
+
 2002-03-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-resend-message-edit): Use

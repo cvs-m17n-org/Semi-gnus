@@ -5,10 +5,11 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-;; Maintainer: FSF
+;;      Katsumi Yamaoka <yamaoka@jpl.org>
+;; Maintainer: Volunteers
 ;; Keywords: mail
 
-;; This file is part of GNU Emacs.
+;; This file is part of T-gnus.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,7 +38,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'static))
 
 (require 'mail-utils)
 
@@ -507,28 +507,23 @@ If NOW, use that time instead."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-(static-unless (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-  (eval-and-compile
-    (require 'path-util)
-    (if (module-installed-p 'md5)
-	(progn
-	  (autoload 'md5 "md5")
-	  (fset 'pop3-md5 'md5))
-
-      (defvar pop3-md5-program "md5"
-	"*Program to encode its input in MD5.")
-
-      (defun pop3-md5 (string)
-	(with-temp-buffer
-	  (insert string)
-	  (call-process-region (point-min) (point-max)
-			       (or shell-file-name "/bin/sh")
-			       t (current-buffer) nil
-			       "-c" pop3-md5-program)
-	  ;; The meaningful output is the first 32 characters.
-	  ;; Don't return the newline that follows them!
-	  (buffer-substring (point-min) (+ (point-min) 32))))
-      )))
+;; Note that `pop3-md5' won't encode a given string to use for the
+;; apop authentication.
+(eval-and-compile
+  (if (and (fboundp 'md5)
+	   (subrp (symbol-function 'md5)))
+      (if (condition-case nil
+	      (md5 "Check whether the 3rd argument CODING is allowed"
+		   nil nil 'binary)
+	    (error nil))
+	  ;; XEmacs 20
+	  (defalias 'pop3-md5 'md5)
+	;; Emacs 21 or XEmacs 21
+	(defun pop3-md5 (string)
+	  (md5 string nil nil 'binary)))
+    ;; The lisp function provided by FLIM
+    (autoload 'md5 "md5")
+    (defalias 'pop3-md5 'md5)))
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
@@ -537,10 +532,7 @@ If NOW, use that time instead."
 	(setq pass
 	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
-	(let ((hash (static-if (and (fboundp 'md5)
-				    (subrp (symbol-function 'md5)))
-			(md5 (concat pop3-timestamp pass))
-		      (pop3-md5 (concat pop3-timestamp pass)))))
+	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
