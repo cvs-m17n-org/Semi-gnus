@@ -645,16 +645,6 @@ If SILENT, don't prompt the user."
 
 
 
-(defun gnus-extended-version ()
-  "Stringified gnus version."
-  (concat gnus-product-name "/" gnus-version-number
-	  " (based on "
-	  gnus-original-product-name " v" gnus-original-version-number ")"
-	  (if (zerop (string-to-number gnus-revision-number))
-	      ""
-	    (concat " (revision " gnus-revision-number ")"))
-	  ))
-
 (defun gnus-message-make-user-agent (&optional include-mime-info max-column)
   "Return user-agent info.
 INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable

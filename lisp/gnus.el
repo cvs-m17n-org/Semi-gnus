@@ -34,6 +34,7 @@
 (eval-when-compile (require 'static))
 
 (require 'custom)
+(require 'gnus-vers)
 (eval-and-compile
   (if (< emacs-major-version 20)
       (require 'gnus-load)))
@@ -261,29 +262,6 @@ is restarted, and sometimes reloaded."
   "Exiting gnus."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
-
-(defconst gnus-product-name "T-gnus"
-  "Product name of this version of gnus.")
-
-(defconst gnus-version-number "6.14.1"
-  "Version number for this version of gnus.")
-
-(defconst gnus-revision-number "14"
-  "Revision number for this version of gnus.")
-
-(defconst gnus-original-version-number "5.8.3"
-  "Version number for this version of Gnus.")
-
-(provide 'running-pterodactyl-gnus-0_73-or-later)
-
-(defconst gnus-original-product-name "Gnus"
-  "Product name of the original version of Gnus.")
-
-(defconst gnus-version
-  (format "%s %s r%s (based on %s v%s ; for SEMI 1.13, FLIM 1.13)"
-	  gnus-product-name gnus-version-number gnus-revision-number
-	  gnus-original-product-name gnus-original-version-number)
-  "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
@@ -1603,9 +1581,18 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-killed-list gnus-zombie-list
-			gnus-topic-topology gnus-topic-alist
-			gnus-format-specs)
+			gnus-topic-topology gnus-topic-alist)
   "Gnus variables saved in the quick startup file.")
+
+(defvar gnus-product-variable-file-list
+  (let ((version (product-version (product-find 'gnus-vers))))
+    `(("strict-cache" ((product-version ,version) (emacs-version))
+       binary
+       gnus-format-specs-compiled)
+      ("cache" ((product-version ,version))
+       ctext
+       gnus-format-specs)))
+  "Gnus variables are saved in the produce depend quick startup files.")
 
 (defcustom gnus-compile-user-specs t
   "If non-nil, the user-defined format specs will be byte-compiled
@@ -1764,8 +1751,7 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
       gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
-      gnus-article-mail gnus-copy-article-buffer gnus-extended-version
-      gnus-following-method)
+      gnus-article-mail gnus-copy-article-buffer gnus-following-method)
      ("gnus-msg" :interactive t
       gnus-group-post-news gnus-group-mail gnus-summary-post-news
       gnus-summary-followup gnus-summary-followup-with-original
@@ -2113,42 +2099,6 @@ STRINGS will be evaluated in normal `or' order."
 	  (setq string nil)
 	(setq strings nil)))
     string))
-
-(defun gnus-version (&optional arg)
-  "Version number of this version of Gnus.
-If ARG, insert string at point."
-  (interactive "P")
-  (if arg
-      (insert (message "%s" gnus-version))
-    (message "%s" gnus-version)))
-
-(defun gnus-continuum-version (version)
-  "Return VERSION as a floating point number."
-  (when (or (string-match "^\\([^ ]+\\)? ?Gnus v?\\([0-9.]+\\)$" version)
-	    (string-match "^\\(.?\\)gnus-\\([0-9.]+\\)$" version))
-    (let ((alpha (and (match-beginning 1) (match-string 1 version)))
-	  (number (match-string 2 version))
-	  major minor least)
-      (unless (string-match
-	       "\\([0-9]\\)\\.\\([0-9]+\\)\\.?\\([0-9]+\\)?" number)
-	(error "Invalid version string: %s" version))
-      (setq major (string-to-number (match-string 1 number))
-	    minor (string-to-number (match-string 2 number))
-	    least (if (match-beginning 3)
-		      (string-to-number (match-string 3 number))
-		    0))
-      (string-to-number
-       (if (zerop major)
-	   (format "%s00%02d%02d"
-		   (if (member alpha '("(ding)" "d"))
-		       "4.99"
-		     (+ 5 (* 0.02
-			     (abs
-			      (- (char-int (aref (downcase alpha) 0))
-				 (char-int ?t))))
-			-0.01))
-		   minor least)
-	 (format "%d.%02d%02d" major minor least))))))
 
 (defun gnus-info-find-node ()
   "Find Info documentation of Gnus."
@@ -2980,6 +2930,6 @@ prompt the user for the name of an NNTP server to use."
 
 (gnus-ems-redefine)
 
-(provide 'gnus)
+(product-provide (provide 'gnus) 'gnus-vers)
 
 ;;; gnus.el ends here
