@@ -1,7 +1,8 @@
-;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
+;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         Tatsuya Ichikawa <t-ichi@niagara.shiojiri.ne.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -57,9 +58,7 @@
 	  from to)
       (goto-line number)
       (unless (eobp)            ; Sometimes things become confused (broken).
-        (if (boundp 'MULE)
-            (forward-char (chars-in-string prefix))
-          (forward-char (length prefix)))
+	(forward-char (chars-in-string prefix))
         (skip-chars-forward " \t")
         (setq from (point))
         (end-of-line 1)
@@ -77,6 +76,56 @@
        (if (> (length valstr) (, max-width))
 	   (truncate-string valstr (, max-width))
 	 valstr))))
+
+(defvar gnus-mule-bitmap-image-file nil)
+(defun gnus-mule-group-startup-message (&optional x y)
+  "Insert startup message in current buffer."
+  ;; Insert the message.
+  (erase-buffer)
+  (insert
+   (if (featurep 'bitmap)
+     (format "              %s
+
+"
+	     "" (if (and (stringp gnus-mule-bitmap-image-file)
+			 (file-exists-p gnus-mule-bitmap-image-file))
+		    (insert-file gnus-mule-bitmap-image-file)))
+     (format "              %s
+          _    ___ _             _
+          _ ___ __ ___  __    _ ___
+          __   _     ___    __  ___
+              _           ___     _
+             _  _ __             _
+             ___   __            _
+                   __           _
+                    _      _   _
+                   _      _    _
+                      _  _    _
+                  __  ___
+                 _   _ _     _
+                _   _
+              _    _
+             _    _
+            _
+          __
+
+"
+	     "")))
+  ;; And then hack it.
+  (gnus-indent-rigidly (point-min) (point-max)
+		       (/ (max (- (window-width) (or x 46)) 0) 2))
+  (goto-char (point-min))
+  (forward-line 1)
+  (let* ((pheight (count-lines (point-min) (point-max)))
+	 (wheight (window-height))
+	 (rest (- wheight pheight)))
+    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+  ;; Fontify some.
+  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+  (goto-char (point-min))
+  (setq mode-line-buffer-identification (concat " " gnus-version))
+  (setq gnus-simple-splash t)
+  (set-buffer-modified-p t))
 
 (defun gnus-encode-coding-string (string system)
   string)
@@ -173,38 +222,48 @@
     ;; `emacs-version'. In this case, implementation for XEmacs/mule
     ;; may be able to share between XEmacs and XEmacs/mule.
 
-    (defalias 'gnus-truncate-string 'truncate-string)
-
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
-    (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
-    (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
     (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
-    
+
+    (when window-system
+      (require 'path-util)
+      (if (module-installed-p 'bitmap)
+	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
+	))
+
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (defun gnus-summary-line-format-spec ()
-      (insert gnus-tmp-unread gnus-tmp-replied
-	      gnus-tmp-score-char gnus-tmp-indentation)
-      (put-text-property
-       (point)
-       (progn
-	 (insert
-	  gnus-tmp-opening-bracket
-	  (format "%4d: %-20s"
-		  gnus-tmp-lines
-		  (if (> (length gnus-tmp-name) 20)
-		      (truncate-string gnus-tmp-name 20)
-		    gnus-tmp-name))
-	  gnus-tmp-closing-bracket)
-	 (point))
-       gnus-mouse-face-prop gnus-mouse-face)
-      (insert " " gnus-tmp-subject-or-nil "\n"))
+    (unless (and (fboundp 'set-buffer-multibyte)
+		 (subrp (symbol-function 'set-buffer-multibyte)))
+      ;; For Emacs 20.1 and 20.2
+      (defalias 'gnus-truncate-string 'truncate-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
+      (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
+
+      (defun gnus-summary-line-format-spec ()
+	(insert gnus-tmp-unread gnus-tmp-replied
+		gnus-tmp-score-char gnus-tmp-indentation)
+	(put-text-property
+	 (point)
+	 (progn
+	   (insert
+	    gnus-tmp-opening-bracket
+	    (format "%4d: %-20s"
+		    gnus-tmp-lines
+		    (if (> (length gnus-tmp-name) 20)
+			(truncate-string gnus-tmp-name 20)
+		      gnus-tmp-name))
+	    gnus-tmp-closing-bracket)
+	   (point))
+	 gnus-mouse-face-prop gnus-mouse-face)
+	(insert " " gnus-tmp-subject-or-nil "\n"))
+      )
     )))
 
 (defun gnus-region-active-p ()
