@@ -736,7 +736,6 @@ VALUE should have the form `(FOO nil)' or `(FOO t)', where FOO is an atom.
   :match 'gnus-widget-reversible-match
   :value-to-internal 'gnus-widget-reversible-to-internal
   :value-to-external 'gnus-widget-reversible-to-external)
-                        
 
 (defcustom gnus-article-sort-functions '(gnus-article-sort-by-number)
   "*List of functions used for sorting articles in the summary buffer.
@@ -2129,31 +2128,31 @@ increase the score of each group you read."
   (unless (boundp 'gnus-summary-misc-menu)
 
     (easy-menu-define
-     gnus-summary-kill-menu gnus-summary-mode-map ""
-     (cons
-      "Score"
-      (nconc
-       (list
-	["Customize" gnus-score-customize t])
-       (gnus-make-score-map 'increase)
-       (gnus-make-score-map 'lower)
-       '(("Mark"
-	  ["Kill below" gnus-summary-kill-below t]
-	  ["Mark above" gnus-summary-mark-above t]
-	  ["Tick above" gnus-summary-tick-above t]
-	  ["Clear above" gnus-summary-clear-above t])
-	 ["Current score" gnus-summary-current-score t]
-	 ["Set score" gnus-summary-set-score t]
-	 ["Switch current score file..." gnus-score-change-score-file t]
-	 ["Set mark below..." gnus-score-set-mark-below t]
-	 ["Set expunge below..." gnus-score-set-expunge-below t]
-	 ["Edit current score file" gnus-score-edit-current-scores t]
-	 ["Edit score file" gnus-score-edit-file t]
-	 ["Trace score" gnus-score-find-trace t]
-	 ["Find words" gnus-score-find-favourite-words t]
-	 ["Rescore buffer" gnus-summary-rescore t]
-	 ["Increase score..." gnus-summary-increase-score t]
-	 ["Lower score..." gnus-summary-lower-score t]))))
+      gnus-summary-kill-menu gnus-summary-mode-map ""
+      (cons
+       "Score"
+       (nconc
+	(list
+	 ["Customize" gnus-score-customize t])
+	(gnus-make-score-map 'increase)
+	(gnus-make-score-map 'lower)
+	'(("Mark"
+	   ["Kill below" gnus-summary-kill-below t]
+	   ["Mark above" gnus-summary-mark-above t]
+	   ["Tick above" gnus-summary-tick-above t]
+	   ["Clear above" gnus-summary-clear-above t])
+	  ["Current score" gnus-summary-current-score t]
+	  ["Set score" gnus-summary-set-score t]
+	  ["Switch current score file..." gnus-score-change-score-file t]
+	  ["Set mark below..." gnus-score-set-mark-below t]
+	  ["Set expunge below..." gnus-score-set-expunge-below t]
+	  ["Edit current score file" gnus-score-edit-current-scores t]
+	  ["Edit score file" gnus-score-edit-file t]
+	  ["Trace score" gnus-score-find-trace t]
+	  ["Find words" gnus-score-find-favourite-words t]
+	  ["Rescore buffer" gnus-summary-rescore t]
+	  ["Increase score..." gnus-summary-increase-score t]
+	  ["Lower score..." gnus-summary-lower-score t]))))
 
     ;; Define both the Article menu in the summary buffer and the
     ;; equivalent Commands menu in the article buffer here for
@@ -2265,8 +2264,12 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	      ["Pipe through a filter..." gnus-summary-pipe-output t]
 	      ["Add to SOUP packet" gnus-soup-add-article t]
 	      ["Print with Muttprint..." gnus-summary-muttprint t]
-	      ["Print" gnus-summary-print-article t])
-	     ("Backend"
+	      ["Print" gnus-summary-print-article
+	       ,@(if (featurep 'xemacs) '(t)
+		   '(:help "Generate and print a PostScript image"))])
+	     ("Copy, move,... (Backend)"
+	      ,@(if (featurep 'xemacs) '(t)
+		  '(:help "Copying, moving, expiring articles..."))
 	      ["Respool article..." gnus-summary-respool-article t]
 	      ["Move article..." gnus-summary-move-article
 	       (gnus-check-backend-function
@@ -2319,13 +2322,13 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	     ["Redisplay" gnus-summary-show-article t]
 	     ["Raw article" gnus-summary-show-raw-article :keys "C-u g"])))
       (easy-menu-define
-       gnus-summary-article-menu gnus-summary-mode-map ""
-       (cons "Article" innards))
+	gnus-summary-article-menu gnus-summary-mode-map ""
+	(cons "Article" innards))
 
       (if (not (keymapp gnus-summary-article-menu))
 	  (easy-menu-define
-	   gnus-article-commands-menu gnus-article-mode-map ""
-	   (cons "Commands" innards))
+	    gnus-article-commands-menu gnus-article-mode-map ""
+	    (cons "Commands" innards))
 	;; in Emacs, don't share menu.
 	(setq gnus-article-commands-menu
 	      (copy-keymap gnus-summary-article-menu))
@@ -2333,69 +2336,69 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	  (cons "Commands" gnus-article-commands-menu))))
 
     (easy-menu-define
-     gnus-summary-thread-menu gnus-summary-mode-map ""
-     '("Threads"
-       ["Find all messages in thread" gnus-summary-refer-thread t]
-       ["Toggle threading" gnus-summary-toggle-threads t]
-       ["Hide threads" gnus-summary-hide-all-threads t]
-       ["Show threads" gnus-summary-show-all-threads t]
-       ["Hide thread" gnus-summary-hide-thread t]
-       ["Show thread" gnus-summary-show-thread t]
-       ["Go to next thread" gnus-summary-next-thread t]
-       ["Go to previous thread" gnus-summary-prev-thread t]
-       ["Go down thread" gnus-summary-down-thread t]
-       ["Go up thread" gnus-summary-up-thread t]
-       ["Top of thread" gnus-summary-top-thread t]
-       ["Mark thread as read" gnus-summary-kill-thread t]
-       ["Lower thread score" gnus-summary-lower-thread t]
-       ["Raise thread score" gnus-summary-raise-thread t]
-       ["Rethread current" gnus-summary-rethread-current t]))
+      gnus-summary-thread-menu gnus-summary-mode-map ""
+      '("Threads"
+	["Find all messages in thread" gnus-summary-refer-thread t]
+	["Toggle threading" gnus-summary-toggle-threads t]
+	["Hide threads" gnus-summary-hide-all-threads t]
+	["Show threads" gnus-summary-show-all-threads t]
+	["Hide thread" gnus-summary-hide-thread t]
+	["Show thread" gnus-summary-show-thread t]
+	["Go to next thread" gnus-summary-next-thread t]
+	["Go to previous thread" gnus-summary-prev-thread t]
+	["Go down thread" gnus-summary-down-thread t]
+	["Go up thread" gnus-summary-up-thread t]
+	["Top of thread" gnus-summary-top-thread t]
+	["Mark thread as read" gnus-summary-kill-thread t]
+	["Lower thread score" gnus-summary-lower-thread t]
+	["Raise thread score" gnus-summary-raise-thread t]
+	["Rethread current" gnus-summary-rethread-current t]))
 
     (easy-menu-define
-     gnus-summary-post-menu gnus-summary-mode-map ""
-     `("Post"
-       ["Send a message (mail or news)" gnus-summary-post-news
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Post an article"))]
-       ["Followup" gnus-summary-followup
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Post followup to this article"))]
-       ["Followup and yank" gnus-summary-followup-with-original
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Post followup to this article, quoting its contents"))]
-       ["Supersede article" gnus-summary-supersede-article t]
-       ["Cancel article" gnus-summary-cancel-article
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Cancel an article you posted"))]
-       ["Reply" gnus-summary-reply t]
-       ["Reply and yank" gnus-summary-reply-with-original t]
-       ["Wide reply" gnus-summary-wide-reply t]
-       ["Wide reply and yank" gnus-summary-wide-reply-with-original
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Mail a reply, quoting this article"))]
-       ["Very wide reply" gnus-summary-very-wide-reply t]
-       ["Very wide reply and yank" gnus-summary-very-wide-reply-with-original
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Mail a very wide reply, quoting this article"))]
-       ["Mail forward" gnus-summary-mail-forward t]
-       ["Post forward" gnus-summary-post-forward t]
-       ["Digest and mail" gnus-summary-digest-mail-forward t]
-       ["Digest and post" gnus-summary-digest-post-forward t]
-       ["Resend message" gnus-summary-resend-message t]
-       ["Resend message edit" gnus-summary-resend-message-edit t]
-       ["Send bounced mail" gnus-summary-resend-bounced-mail t]
-       ["Send a mail" gnus-summary-mail-other-window t]
-       ["Create a local message" gnus-summary-news-other-window t]
-       ["Uuencode and post" gnus-uu-post-news
-	,@(if (featurep 'xemacs) '(t)
-	    '(:help "Post a uuencoded article"))]
-       ["Followup via news" gnus-summary-followup-to-mail t]
-       ["Followup via news and yank"
-	gnus-summary-followup-to-mail-with-original t]
-       ;;("Draft"
-       ;;["Send" gnus-summary-send-draft t]
-       ;;["Send bounced" gnus-resend-bounced-mail t])
-       ))
+      gnus-summary-post-menu gnus-summary-mode-map ""
+      `("Post"
+	["Send a message (mail or news)" gnus-summary-post-news
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Compose a new message (mail or news)"))]
+	["Followup" gnus-summary-followup
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Post followup to this article"))]
+	["Followup and yank" gnus-summary-followup-with-original
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Post followup to this article, quoting its contents"))]
+	["Supersede article" gnus-summary-supersede-article t]
+	["Cancel article" gnus-summary-cancel-article
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Cancel an article you posted"))]
+	["Reply" gnus-summary-reply t]
+	["Reply and yank" gnus-summary-reply-with-original t]
+	["Wide reply" gnus-summary-wide-reply t]
+	["Wide reply and yank" gnus-summary-wide-reply-with-original
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Mail a reply, quoting this article"))]
+	["Very wide reply" gnus-summary-very-wide-reply t]
+	["Very wide reply and yank" gnus-summary-very-wide-reply-with-original
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Mail a very wide reply, quoting this article"))]
+	["Mail forward" gnus-summary-mail-forward t]
+	["Post forward" gnus-summary-post-forward t]
+	["Digest and mail" gnus-summary-digest-mail-forward t]
+	["Digest and post" gnus-summary-digest-post-forward t]
+	["Resend message" gnus-summary-resend-message t]
+	["Resend message edit" gnus-summary-resend-message-edit t]
+	["Send bounced mail" gnus-summary-resend-bounced-mail t]
+	["Send a mail" gnus-summary-mail-other-window t]
+	["Create a local message" gnus-summary-news-other-window t]
+	["Uuencode and post" gnus-uu-post-news
+	 ,@(if (featurep 'xemacs) '(t)
+	     '(:help "Post a uuencoded article"))]
+	["Followup via news" gnus-summary-followup-to-mail t]
+	["Followup via news and yank"
+	 gnus-summary-followup-to-mail-with-original t]
+	;;("Draft"
+	;;["Send" gnus-summary-send-draft t]
+	;;["Send bounced" gnus-resend-bounced-mail t])
+	))
 
     (cond
      ((not (keymapp gnus-summary-post-menu))
@@ -2408,153 +2411,153 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
       (cons "Post" gnus-article-post-menu))
 
     (easy-menu-define
-     gnus-summary-misc-menu gnus-summary-mode-map ""
-     `("Gnus"
-       ("Mark Read"
-	["Mark as read" gnus-summary-mark-as-read-forward t]
-	["Mark same subject and select"
-	 gnus-summary-kill-same-subject-and-select t]
-	["Mark same subject" gnus-summary-kill-same-subject t]
-	["Catchup" gnus-summary-catchup
-	 ,@(if (featurep 'xemacs) '(t)
-	     '(:help "Mark unread articles in this group as read"))]
-	["Catchup all" gnus-summary-catchup-all t]
-	["Catchup to here" gnus-summary-catchup-to-here t]
-	["Catchup from here" gnus-summary-catchup-from-here t]
-	["Catchup region" gnus-summary-mark-region-as-read
-	 (gnus-mark-active-p)]
-	["Mark excluded" gnus-summary-limit-mark-excluded-as-read t])
-       ("Mark Various"
-	["Tick" gnus-summary-tick-article-forward t]
-	["Mark as dormant" gnus-summary-mark-as-dormant t]
-	["Remove marks" gnus-summary-clear-mark-forward t]
-	["Set expirable mark" gnus-summary-mark-as-expirable t]
-	["Set bookmark" gnus-summary-set-bookmark t]
-	["Remove bookmark" gnus-summary-remove-bookmark t])
-       ("Limit to"
-	["Marks..." gnus-summary-limit-to-marks t]
-	["Subject..." gnus-summary-limit-to-subject t]
-	["Author..." gnus-summary-limit-to-author t]
-	["Age..." gnus-summary-limit-to-age t]
-	["Extra..." gnus-summary-limit-to-extra t]
-	["Score..." gnus-summary-limit-to-score t]
-	["Display Predicate" gnus-summary-limit-to-display-predicate t]
-	["Unread" gnus-summary-limit-to-unread t]
-	["Unseen" gnus-summary-limit-to-unseen t]
-	["Replied" gnus-summary-limit-to-replied t]
-	["Non-dormant" gnus-summary-limit-exclude-dormant t]
-	["Next articles" gnus-summary-limit-to-articles t]
-	["Pop limit" gnus-summary-pop-limit t]
-	["Show dormant" gnus-summary-limit-include-dormant t]
-	["Hide childless dormant"
-	 gnus-summary-limit-exclude-childless-dormant t]
-	;;["Hide thread" gnus-summary-limit-exclude-thread t]
-	["Hide marked" gnus-summary-limit-exclude-marks t]
-	["Show expunged" gnus-summary-limit-include-expunged t])
-       ("Process Mark"
-	["Set mark" gnus-summary-mark-as-processable t]
-	["Remove mark" gnus-summary-unmark-as-processable t]
-	["Remove all marks" gnus-summary-unmark-all-processable t]
-	["Invert marks" gnus-uu-invert-processable t]
-	["Mark above" gnus-uu-mark-over t]
-	["Mark series" gnus-uu-mark-series t]
-	["Mark region" gnus-uu-mark-region (gnus-mark-active-p)]
-	["Unmark region" gnus-uu-unmark-region (gnus-mark-active-p)]
-	["Mark by regexp..." gnus-uu-mark-by-regexp t]
-	["Unmark by regexp..." gnus-uu-unmark-by-regexp t]
-	["Mark all" gnus-uu-mark-all t]
-	["Mark buffer" gnus-uu-mark-buffer t]
-	["Mark sparse" gnus-uu-mark-sparse t]
-	["Mark thread" gnus-uu-mark-thread t]
-	["Unmark thread" gnus-uu-unmark-thread t]
-	("Process Mark Sets"
-	 ["Kill" gnus-summary-kill-process-mark t]
-	 ["Yank" gnus-summary-yank-process-mark
-	  gnus-newsgroup-process-stack]
-	 ["Save" gnus-summary-save-process-mark t]
-	 ["Run command on marked..." gnus-summary-universal-argument t]))
-       ("Scroll article"
-	["Page forward" gnus-summary-next-page
-	 ,@(if (featurep 'xemacs) '(t)
-	     '(:help "Show next page of article"))]
-	["Page backward" gnus-summary-prev-page
-	 ,@(if (featurep 'xemacs) '(t)
-	     '(:help "Show previous page of article"))]
-	["Line forward" gnus-summary-scroll-up t])
-       ("Move"
-	["Next unread article" gnus-summary-next-unread-article t]
-	["Previous unread article" gnus-summary-prev-unread-article t]
-	["Next article" gnus-summary-next-article t]
-	["Previous article" gnus-summary-prev-article t]
-	["Next unread subject" gnus-summary-next-unread-subject t]
-	["Previous unread subject" gnus-summary-prev-unread-subject t]
-	["Next article same subject" gnus-summary-next-same-subject t]
-	["Previous article same subject" gnus-summary-prev-same-subject t]
-	["First unread article" gnus-summary-first-unread-article t]
-	["Best unread article" gnus-summary-best-unread-article t]
-	["Go to subject number..." gnus-summary-goto-subject t]
-	["Go to article number..." gnus-summary-goto-article t]
-	["Go to the last article" gnus-summary-goto-last-article t]
-	["Pop article off history" gnus-summary-pop-article t])
-       ("Sort"
-	["Sort by number" gnus-summary-sort-by-number t]
-	["Sort by author" gnus-summary-sort-by-author t]
-	["Sort by subject" gnus-summary-sort-by-subject t]
-	["Sort by date" gnus-summary-sort-by-date t]
-	["Sort by score" gnus-summary-sort-by-score t]
-	["Sort by lines" gnus-summary-sort-by-lines t]
-	["Sort by characters" gnus-summary-sort-by-chars t]
-	["Randomize" gnus-summary-sort-by-random t]
-	["Original sort" gnus-summary-sort-by-original t])
-       ("Help"
-	["Fetch group FAQ" gnus-summary-fetch-faq t]
-	["Describe group" gnus-summary-describe-group t]
-	["Fetch charter" gnus-group-fetch-charter
-	 ,@(if (featurep 'xemacs) nil
-	     '(:help "Display the charter of the current group"))]
-	["Fetch control message" gnus-group-fetch-control
-	 ,@(if (featurep 'xemacs) nil
-	     '(:help "Display the archived control message for the current group"))]
-	["Read manual" gnus-info-find-node t])
-       ("Modes"
-	["Pick and read" gnus-pick-mode t]
-	["Binary" gnus-binary-mode t])
-       ("Regeneration"
-	["Regenerate" gnus-summary-prepare t]
-	["Insert cached articles" gnus-summary-insert-cached-articles t]
-	["Insert dormant articles" gnus-summary-insert-dormant-articles t]
-	["Toggle threading" gnus-summary-toggle-threads t])
-       ["See old articles" gnus-summary-insert-old-articles t]
-       ["See new articles" gnus-summary-insert-new-articles t]
-       ["Filter articles..." gnus-summary-execute-command t]
-       ["Run command on articles..." gnus-summary-universal-argument t]
-       ["Search articles forward..." gnus-summary-search-article-forward t]
-       ["Search articles backward..." gnus-summary-search-article-backward t]
-       ["Toggle line truncation" gnus-summary-toggle-truncation t]
-       ["Expand window" gnus-summary-expand-window t]
-       ["Expire expirable articles" gnus-summary-expire-articles
-	(gnus-check-backend-function
-	 'request-expire-articles gnus-newsgroup-name)]
-       ["Edit local kill file" gnus-summary-edit-local-kill t]
-       ["Edit main kill file" gnus-summary-edit-global-kill t]
-       ["Edit group parameters" gnus-summary-edit-parameters t]
-       ["Customize group parameters" gnus-summary-customize-parameters t]
-       ["Send a bug report" gnus-bug t]
-       ("Exit"
-	["Catchup and exit" gnus-summary-catchup-and-exit
-	 ,@(if (featurep 'xemacs) '(t)
-	     '(:help "Mark unread articles in this group as read, then exit"))]
-	["Catchup all and exit" gnus-summary-catchup-all-and-exit t]
-	["Catchup and goto next" gnus-summary-catchup-and-goto-next-group t]
-	["Exit group" gnus-summary-exit
-	 ,@(if (featurep 'xemacs) '(t)
-	     '(:help "Exit current group, return to group selection mode"))]
-	["Exit group without updating" gnus-summary-exit-no-update t]
-	["Exit and goto next group" gnus-summary-next-group t]
-	["Exit and goto prev group" gnus-summary-prev-group t]
-	["Reselect group" gnus-summary-reselect-current-group t]
-	["Rescan group" gnus-summary-rescan-group t]
-	["Update dribble" gnus-summary-save-newsrc t])))
+      gnus-summary-misc-menu gnus-summary-mode-map ""
+      `("Gnus"
+	("Mark Read"
+	 ["Mark as read" gnus-summary-mark-as-read-forward t]
+	 ["Mark same subject and select"
+	  gnus-summary-kill-same-subject-and-select t]
+	 ["Mark same subject" gnus-summary-kill-same-subject t]
+	 ["Catchup" gnus-summary-catchup
+	  ,@(if (featurep 'xemacs) '(t)
+	      '(:help "Mark unread articles in this group as read"))]
+	 ["Catchup all" gnus-summary-catchup-all t]
+	 ["Catchup to here" gnus-summary-catchup-to-here t]
+	 ["Catchup from here" gnus-summary-catchup-from-here t]
+	 ["Catchup region" gnus-summary-mark-region-as-read
+	  (gnus-mark-active-p)]
+	 ["Mark excluded" gnus-summary-limit-mark-excluded-as-read t])
+	("Mark Various"
+	 ["Tick" gnus-summary-tick-article-forward t]
+	 ["Mark as dormant" gnus-summary-mark-as-dormant t]
+	 ["Remove marks" gnus-summary-clear-mark-forward t]
+	 ["Set expirable mark" gnus-summary-mark-as-expirable t]
+	 ["Set bookmark" gnus-summary-set-bookmark t]
+	 ["Remove bookmark" gnus-summary-remove-bookmark t])
+	("Limit to"
+	 ["Marks..." gnus-summary-limit-to-marks t]
+	 ["Subject..." gnus-summary-limit-to-subject t]
+	 ["Author..." gnus-summary-limit-to-author t]
+	 ["Age..." gnus-summary-limit-to-age t]
+	 ["Extra..." gnus-summary-limit-to-extra t]
+	 ["Score..." gnus-summary-limit-to-score t]
+	 ["Display Predicate" gnus-summary-limit-to-display-predicate t]
+	 ["Unread" gnus-summary-limit-to-unread t]
+	 ["Unseen" gnus-summary-limit-to-unseen t]
+	 ["Replied" gnus-summary-limit-to-replied t]
+	 ["Non-dormant" gnus-summary-limit-exclude-dormant t]
+	 ["Next articles" gnus-summary-limit-to-articles t]
+	 ["Pop limit" gnus-summary-pop-limit t]
+	 ["Show dormant" gnus-summary-limit-include-dormant t]
+	 ["Hide childless dormant"
+	  gnus-summary-limit-exclude-childless-dormant t]
+	 ;;["Hide thread" gnus-summary-limit-exclude-thread t]
+	 ["Hide marked" gnus-summary-limit-exclude-marks t]
+	 ["Show expunged" gnus-summary-limit-include-expunged t])
+	("Process Mark"
+	 ["Set mark" gnus-summary-mark-as-processable t]
+	 ["Remove mark" gnus-summary-unmark-as-processable t]
+	 ["Remove all marks" gnus-summary-unmark-all-processable t]
+	 ["Invert marks" gnus-uu-invert-processable t]
+	 ["Mark above" gnus-uu-mark-over t]
+	 ["Mark series" gnus-uu-mark-series t]
+	 ["Mark region" gnus-uu-mark-region (gnus-mark-active-p)]
+	 ["Unmark region" gnus-uu-unmark-region (gnus-mark-active-p)]
+	 ["Mark by regexp..." gnus-uu-mark-by-regexp t]
+	 ["Unmark by regexp..." gnus-uu-unmark-by-regexp t]
+	 ["Mark all" gnus-uu-mark-all t]
+	 ["Mark buffer" gnus-uu-mark-buffer t]
+	 ["Mark sparse" gnus-uu-mark-sparse t]
+	 ["Mark thread" gnus-uu-mark-thread t]
+	 ["Unmark thread" gnus-uu-unmark-thread t]
+	 ("Process Mark Sets"
+	  ["Kill" gnus-summary-kill-process-mark t]
+	  ["Yank" gnus-summary-yank-process-mark
+	   gnus-newsgroup-process-stack]
+	  ["Save" gnus-summary-save-process-mark t]
+	  ["Run command on marked..." gnus-summary-universal-argument t]))
+	("Scroll article"
+	 ["Page forward" gnus-summary-next-page
+	  ,@(if (featurep 'xemacs) '(t)
+	      '(:help "Show next page of article"))]
+	 ["Page backward" gnus-summary-prev-page
+	  ,@(if (featurep 'xemacs) '(t)
+	      '(:help "Show previous page of article"))]
+	 ["Line forward" gnus-summary-scroll-up t])
+	("Move"
+	 ["Next unread article" gnus-summary-next-unread-article t]
+	 ["Previous unread article" gnus-summary-prev-unread-article t]
+	 ["Next article" gnus-summary-next-article t]
+	 ["Previous article" gnus-summary-prev-article t]
+	 ["Next unread subject" gnus-summary-next-unread-subject t]
+	 ["Previous unread subject" gnus-summary-prev-unread-subject t]
+	 ["Next article same subject" gnus-summary-next-same-subject t]
+	 ["Previous article same subject" gnus-summary-prev-same-subject t]
+	 ["First unread article" gnus-summary-first-unread-article t]
+	 ["Best unread article" gnus-summary-best-unread-article t]
+	 ["Go to subject number..." gnus-summary-goto-subject t]
+	 ["Go to article number..." gnus-summary-goto-article t]
+	 ["Go to the last article" gnus-summary-goto-last-article t]
+	 ["Pop article off history" gnus-summary-pop-article t])
+	("Sort"
+	 ["Sort by number" gnus-summary-sort-by-number t]
+	 ["Sort by author" gnus-summary-sort-by-author t]
+	 ["Sort by subject" gnus-summary-sort-by-subject t]
+	 ["Sort by date" gnus-summary-sort-by-date t]
+	 ["Sort by score" gnus-summary-sort-by-score t]
+	 ["Sort by lines" gnus-summary-sort-by-lines t]
+	 ["Sort by characters" gnus-summary-sort-by-chars t]
+	 ["Randomize" gnus-summary-sort-by-random t]
+	 ["Original sort" gnus-summary-sort-by-original t])
+	("Help"
+	 ["Fetch group FAQ" gnus-summary-fetch-faq t]
+	 ["Describe group" gnus-summary-describe-group t]
+	 ["Fetch charter" gnus-group-fetch-charter
+	  ,@(if (featurep 'xemacs) nil
+	      '(:help "Display the charter of the current group"))]
+	 ["Fetch control message" gnus-group-fetch-control
+	  ,@(if (featurep 'xemacs) nil
+	      '(:help "Display the archived control message for the current group"))]
+	 ["Read manual" gnus-info-find-node t])
+	("Modes"
+	 ["Pick and read" gnus-pick-mode t]
+	 ["Binary" gnus-binary-mode t])
+	("Regeneration"
+	 ["Regenerate" gnus-summary-prepare t]
+	 ["Insert cached articles" gnus-summary-insert-cached-articles t]
+	 ["Insert dormant articles" gnus-summary-insert-dormant-articles t]
+	 ["Toggle threading" gnus-summary-toggle-threads t])
+	["See old articles" gnus-summary-insert-old-articles t]
+	["See new articles" gnus-summary-insert-new-articles t]
+	["Filter articles..." gnus-summary-execute-command t]
+	["Run command on articles..." gnus-summary-universal-argument t]
+	["Search articles forward..." gnus-summary-search-article-forward t]
+	["Search articles backward..." gnus-summary-search-article-backward t]
+	["Toggle line truncation" gnus-summary-toggle-truncation t]
+	["Expand window" gnus-summary-expand-window t]
+	["Expire expirable articles" gnus-summary-expire-articles
+	 (gnus-check-backend-function
+	  'request-expire-articles gnus-newsgroup-name)]
+	["Edit local kill file" gnus-summary-edit-local-kill t]
+	["Edit main kill file" gnus-summary-edit-global-kill t]
+	["Edit group parameters" gnus-summary-edit-parameters t]
+	["Customize group parameters" gnus-summary-customize-parameters t]
+	["Send a bug report" gnus-bug t]
+	("Exit"
+	 ["Catchup and exit" gnus-summary-catchup-and-exit
+	  ,@(if (featurep 'xemacs) '(t)
+	      '(:help "Mark unread articles in this group as read, then exit"))]
+	 ["Catchup all and exit" gnus-summary-catchup-all-and-exit t]
+	 ["Catchup and goto next" gnus-summary-catchup-and-goto-next-group t]
+	 ["Exit group" gnus-summary-exit
+	  ,@(if (featurep 'xemacs) '(t)
+	      '(:help "Exit current group, return to group selection mode"))]
+	 ["Exit group without updating" gnus-summary-exit-no-update t]
+	 ["Exit and goto next group" gnus-summary-next-group t]
+	 ["Exit and goto prev group" gnus-summary-prev-group t]
+	 ["Reselect group" gnus-summary-reselect-current-group t]
+	 ["Rescan group" gnus-summary-rescan-group t]
+	 ["Update dribble" gnus-summary-save-newsrc t])))
 
     (gnus-run-hooks 'gnus-summary-menu-hook)))
 

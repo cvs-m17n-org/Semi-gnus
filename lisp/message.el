@@ -2458,107 +2458,107 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-xk" 'message-mimic-kill-buffer))
 
 (easy-menu-define
- message-mode-menu message-mode-map "Message Menu."
- `("Message"
-   ["Yank Original" message-yank-original t]
-   ["Fill Yanked Message" message-fill-yanked-message t]
-   ["Insert Signature" message-insert-signature t]
-   ["Caesar (rot13) Message" message-caesar-buffer-body t]
-   ["Caesar (rot13) Region" message-caesar-region (message-mark-active-p)]
-   ["Elide Region" message-elide-region
-    :active (message-mark-active-p)
-    ,@(if (featurep 'xemacs) nil
-	'(:help "Replace text in region with an ellipsis"))]
-   ["Delete Outside Region" message-delete-not-region
-    :active (message-mark-active-p)
-    ,@(if (featurep 'xemacs) nil
-	'(:help "Delete all quoted text outside region"))]
-   ["Kill To Signature" message-kill-to-signature t]
-   ["Newline and Reformat" message-newline-and-reformat t]
-   ["Rename buffer" message-rename-buffer t]
-   ["Spellcheck" ispell-message
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Spellcheck this message"))]
-   ["Attach file as MIME" mime-edit-insert-file
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Attach a file at point"))]
-   "----"
-   ["Insert Region Marked" message-mark-inserted-region
-    :active (message-mark-active-p)
-    ,@(if (featurep 'xemacs) nil
-	'(:help "Mark region with enclosing tags"))]
-   ["Insert File Marked..." message-mark-insert-file
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Insert file at point marked with enclosing tags"))]
-   "----"
-   ["Send Message" message-send-and-exit
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Send this message"))]
-   ["Postpone Message" message-dont-send
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "File this draft message and exit"))]
-   ["Send at Specific Time..." gnus-delay-article
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Ask, then arrange to send message at that time"))]
-   ["Kill Message" message-kill-buffer
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Delete this message without sending"))]))
+  message-mode-menu message-mode-map "Message Menu."
+  `("Message"
+    ["Yank Original" message-yank-original t]
+    ["Fill Yanked Message" message-fill-yanked-message t]
+    ["Insert Signature" message-insert-signature t]
+    ["Caesar (rot13) Message" message-caesar-buffer-body t]
+    ["Caesar (rot13) Region" message-caesar-region (message-mark-active-p)]
+    ["Elide Region" message-elide-region
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Replace text in region with an ellipsis"))]
+    ["Delete Outside Region" message-delete-not-region
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Delete all quoted text outside region"))]
+    ["Kill To Signature" message-kill-to-signature t]
+    ["Newline and Reformat" message-newline-and-reformat t]
+    ["Rename buffer" message-rename-buffer t]
+    ["Spellcheck" ispell-message
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Spellcheck this message"))]
+    ["Attach file as MIME" mime-edit-insert-file
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Attach a file at point"))]
+    "----"
+    ["Insert Region Marked" message-mark-inserted-region
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Mark region with enclosing tags"))]
+    ["Insert File Marked..." message-mark-insert-file
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Insert file at point marked with enclosing tags"))]
+    "----"
+    ["Send Message" message-send-and-exit
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Send this message"))]
+    ["Postpone Message" message-dont-send
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "File this draft message and exit"))]
+    ["Send at Specific Time..." gnus-delay-article
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Ask, then arrange to send message at that time"))]
+    ["Kill Message" message-kill-buffer
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Delete this message without sending"))]))
 
 (easy-menu-define
- message-mode-field-menu message-mode-map ""
- `("Field"
-   ["To" message-goto-to t]
-   ["From" message-goto-from t]
-   ["Subject" message-goto-subject t]
-   ["Change subject..." message-change-subject t]
-   ["Cc" message-goto-cc t]
-   ["Bcc" message-goto-bcc t]
-   ["Fcc" message-goto-fcc t]
-   ["Reply-To" message-goto-reply-to t]
-   ["Flag As Important" message-insert-importance-high
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Mark this message as important"))]
-   ["Flag As Unimportant" message-insert-importance-low
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Mark this message as unimportant"))]
-   ["Request Receipt"
-    message-insert-disposition-notification-to
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Request a receipt notification"))]
-   "----"
-   ;; (typical) news stuff
-   ["Summary" message-goto-summary t]
-   ["Keywords" message-goto-keywords t]
-   ["Newsgroups" message-goto-newsgroups t]
-   ["Fetch Newsgroups" message-insert-newsgroups t]
-   ["Followup-To" message-goto-followup-to t]
-   ;; ["Followup-To (with note in body)" message-cross-post-followup-to t]
-   ["Crosspost / Followup-To..." message-cross-post-followup-to t]
-   ["Distribution" message-goto-distribution t]
-   ["X-No-Archive:" message-add-archive-header t ]
-   "----"
-   ;; (typical) mailing-lists stuff
-   ["Fetch To" message-insert-to
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Insert a To header that points to the author."))]
-   ["Fetch To and Cc" message-insert-wide-reply
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help
-	  "Insert To and Cc headers as if you were doing a wide reply."))]
-   "----"
-   ["Send to list only" message-to-list-only t]
-   ["Mail-Followup-To" message-goto-mail-followup-to t]
-   ["Mail-Reply-To" message-goto-mail-reply-to t]
-   ["Mail-Copies-To" message-goto-mail-copies-to t]
-   ["Unsubscribed list post" message-generate-unsubscribed-mail-followup-to
-    ,@(if (featurep 'xemacs) '(t)
-	'(:help "Insert a reasonable `Mail-Followup-To:' header."))]
-   ["Reduce To: to Cc:" message-reduce-to-to-cc t]
-   "----"
-   ["Sort Headers" message-sort-headers t]
-   ["Encode non-ASCII domain names" message-idna-to-ascii-rhs t]
-   ["Goto Body" message-goto-body t]
-   ["Goto Signature" message-goto-signature t]))
+  message-mode-field-menu message-mode-map ""
+  `("Field"
+    ["To" message-goto-to t]
+    ["From" message-goto-from t]
+    ["Subject" message-goto-subject t]
+    ["Change subject..." message-change-subject t]
+    ["Cc" message-goto-cc t]
+    ["Bcc" message-goto-bcc t]
+    ["Fcc" message-goto-fcc t]
+    ["Reply-To" message-goto-reply-to t]
+    ["Flag As Important" message-insert-importance-high
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Mark this message as important"))]
+    ["Flag As Unimportant" message-insert-importance-low
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Mark this message as unimportant"))]
+    ["Request Receipt"
+     message-insert-disposition-notification-to
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Request a receipt notification"))]
+    "----"
+    ;; (typical) news stuff
+    ["Summary" message-goto-summary t]
+    ["Keywords" message-goto-keywords t]
+    ["Newsgroups" message-goto-newsgroups t]
+    ["Fetch Newsgroups" message-insert-newsgroups t]
+    ["Followup-To" message-goto-followup-to t]
+    ;; ["Followup-To (with note in body)" message-cross-post-followup-to t]
+    ["Crosspost / Followup-To..." message-cross-post-followup-to t]
+    ["Distribution" message-goto-distribution t]
+    ["X-No-Archive:" message-add-archive-header t ]
+    "----"
+    ;; (typical) mailing-lists stuff
+    ["Fetch To" message-insert-to
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Insert a To header that points to the author."))]
+    ["Fetch To and Cc" message-insert-wide-reply
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help
+	   "Insert To and Cc headers as if you were doing a wide reply."))]
+    "----"
+    ["Send to list only" message-to-list-only t]
+    ["Mail-Followup-To" message-goto-mail-followup-to t]
+    ["Mail-Reply-To" message-goto-mail-reply-to t]
+    ["Mail-Copies-To" message-goto-mail-copies-to t]
+    ["Unsubscribed list post" message-generate-unsubscribed-mail-followup-to
+     ,@(if (featurep 'xemacs) '(t)
+	 '(:help "Insert a reasonable `Mail-Followup-To:' header."))]
+    ["Reduce To: to Cc:" message-reduce-to-to-cc t]
+    "----"
+    ["Sort Headers" message-sort-headers t]
+    ["Encode non-ASCII domain names" message-idna-to-ascii-rhs t]
+    ["Goto Body" message-goto-body t]
+    ["Goto Signature" message-goto-signature t]))
 
 (defvar message-tool-bar-map nil)
 
@@ -2830,10 +2830,11 @@ a string \"never\" is inserted in default."
   (message-position-on-field "Followup-To" "Newsgroups"))
 
 (defun message-goto-mail-followup-to ()
-  "Move point to the Mail-Followup-To header.  If the header is newly created
-and To field contains only one address, the address is inserted in default."
+  "Move point to the Mail-Followup-To header.
+If the header is newly created and To field contains only one address,
+the address is inserted by default."
   (interactive)
-  (unless (message-position-on-field "Mail-Followup-To" "Subject")
+  (unless (message-position-on-field "Mail-Followup-To" "To")
     (let ((start (point))
 	  addresses)
       (save-restriction
@@ -2953,6 +2954,7 @@ or in the synonym headers, defined by `message-header-synonyms'."
   ;; FIXME: Should compare only the address and not the full name.  Comparison
   ;; should be done case-folded (and with `string=' rather than
   ;; `string-match').
+  ;; (mail-strip-quoted-names "Foo Bar <foo@bar>, bla@fasel (Bla Fasel)")
   (dolist (header headers)
     (let* ((header-name (symbol-name (car header)))
            (new-header (cdr header))
