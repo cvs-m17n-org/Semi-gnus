@@ -956,7 +956,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 		 (const :tag "always" t)
 		 (const :tag "ask" ask)))
 
-(defvar message-send-coding-system *noconv*
+(defvar message-send-coding-system 'binary
   "Coding system to encode outgoing mail.")
 
 ;;; Internal variables.
@@ -2283,7 +2283,7 @@ the user from the mailer."
 	  (set-buffer errbuf)
 	  (erase-buffer))))
     (let ((default-directory "/")
-	  (output-coding-system message-send-coding-system))
+	  (coding-system-for-write message-send-coding-system))
       (apply 'call-process-region
 	     (append (list (point-min) (point-max)
 			   (if (boundp 'sendmail-program)
@@ -2332,7 +2332,7 @@ to find out how to use this."
   (run-hooks 'message-send-mail-hook)
   ;; send the message
   (case
-      (let ((output-coding-system message-send-coding-system))
+      (let ((coding-system-for-write message-send-coding-system))
 	(apply
 	 'call-process-region 1 (point-max) message-qmail-inject-program
 	 nil nil nil
@@ -2781,7 +2781,7 @@ to find out how to use this."
 (defun message-do-fcc ()
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
-	(output-coding-system *noconv*)
+	(coding-system-for-write 'raw-text)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
