@@ -21076,12 +21076,12 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8
 @enumerate
 @item
 
-@item
-
 @example
 (defvar spam-use-blackbox nil
   "Blackbox $B$r;H$&$H$-$O(B t $B$K$9$k!#(B")
 @end example
+
+@item
 
 @code{spam-list-of-checks} $B$K(B
 @example
