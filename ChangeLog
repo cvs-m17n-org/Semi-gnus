@@ -1,3 +1,14 @@
+1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header): Use
+	`defun' instead of `defsubst'.
+	(make-full-mail-header): Ditto.
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Fold up long lines.
+	(TopLevel): Autoload "texinfmt" for avoiding byte compile warning.
+
 1999-08-16  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
