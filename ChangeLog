@@ -1,3 +1,10 @@
+2002-06-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Add a comment for the use of `ssl' or `tls'
+	connection with Gnus; always require `pces' and `path-util' for
+	Gnus.
+	(pop3-open-ssl-stream-1): Don't require `path-util' here.
+
 2002-06-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Make it can be byte-compiled in the Gnus source

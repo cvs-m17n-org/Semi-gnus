@@ -35,9 +35,22 @@
 
 ;; This program was inspired by Kyle E. Jones's vm-pop program.
 
+;; You have to set the variable `pop3-connection-type' to `ssl' or
+;; `tls' expressly, if you would like to use this module with Gnus
+;; (not T-gnus) for those connection types.  For examples:
+;;
+;;(setq mail-sources '((pop :server "POPSERVER" :port 995 :connection ssl
+;;                          :authentication apop)))
+;;(setq pop3-connection-type 'ssl)
+
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
+;; as-binary-process, open-network-stream-as-binary, write-region-as-binary
+(require 'pces)
+;; exec-installed-p
+(require 'path-util)
 
 (require 'mail-utils)
 
@@ -211,7 +224,6 @@ Argument PORT specifies connecting port."
       process)))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
-  (require 'path-util)
   (let* ((ssl-program-name
 	  pop3-ssl-program-name)
 	 (ssl-program-arguments
