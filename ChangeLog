@@ -1,3 +1,13 @@
+1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.12.
+
+	* Sync up with Gnus 5.6.36.
+	
+1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Update.
+
 1998-08-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-save-newsrc-file): Bind
