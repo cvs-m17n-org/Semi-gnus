@@ -1,5 +1,11 @@
 2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnheader.el (std11-fold-region): New function copied from
+	`rfc2047-fold-region'.
+	(std11-fold-field): Use it.
+
+2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el: Don't autoload "gnus-bitmap".
 
 	* lisp/gnus-sum.el (gnus-summary-toggle-smiley): Replace

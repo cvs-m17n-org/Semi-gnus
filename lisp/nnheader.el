@@ -1232,15 +1232,77 @@ find-file-hooks, etc.
        (point-max)))
     (goto-char (point-min)))
 
+  (defun-maybe std11-fold-region (b e)
+    "Fold long lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((break nil)
+	    (qword-break nil)
+	    (first t)
+	    (bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol))))
+	(while (not (eobp))
+	  (when (and (or break qword-break)
+		     (> (- (point) bol) 76))
+	    (goto-char (or break qword-break))
+	    (setq break nil
+		  qword-break nil)
+	    (if (looking-at "[ \t]")
+		(insert "\n")
+	      (insert "\n "))
+	    (setq bol (1- (point)))
+	    ;; Don't break before the first non-LWSP characters.
+	    (skip-chars-forward " \t")
+	    (unless (eobp)
+	      (forward-char 1)))
+	  (cond
+	   ((eq (char-after) ?\n)
+	    (forward-char 1)
+	    (setq bol (point)
+		  break nil
+		  qword-break nil)
+	    (skip-chars-forward " \t")
+	    (unless (or (eobp) (eq (char-after) ?\n))
+	      (forward-char 1)))
+	   ((eq (char-after) ?\r)
+	    (forward-char 1))
+	   ((memq (char-after) '(?  ?\t))
+	    (skip-chars-forward " \t")
+	    (if first
+		;; Don't break just after the header name.
+		(setq first nil)
+	      (setq break (1- (point)))))
+	   ((not break)
+	    (if (not (looking-at "=\\?[^=]"))
+		(if (eq (char-after) ?=)
+		    (forward-char 1)
+		  (skip-chars-forward "^ \t\n\r="))
+	      (setq qword-break (point))
+	      (skip-chars-forward "^ \t\n\r")))
+	   (t
+	    (skip-chars-forward "^ \t\n\r"))))
+	(when (and (or break qword-break)
+		   (> (- (point) bol) 76))
+	  (goto-char (or break qword-break))
+	  (setq break nil
+		qword-break nil)
+	  (if (looking-at "[ \t]")
+	      (insert "\n")
+	    (insert "\n "))
+	  (setq bol (1- (point)))
+	  ;; Don't break before the first non-LWSP characters.
+	  (skip-chars-forward " \t")
+	  (unless (eobp)
+	    (forward-char 1))))))
+
   (defun-maybe std11-fold-field ()
     "Fold the current line."
     (save-excursion
       (save-restriction
 	(std11-narrow-to-field)
-	(let ((str (std11-unfold-string
-		    (buffer-substring (point-min) (point-max)))))
-	  (delete-region (point-min) (point-max))
-	  (insert str)))))
+	(std11-fold-region (point-min) (point-max)))))
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
