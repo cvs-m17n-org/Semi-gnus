@@ -2,6 +2,24 @@
 
 	* lisp/gnus.el (gnus-version-number): Change to 6.8.19.5.
 
+	* lisp/message.el (message-mode): Set file coding system in
+	message buffer.
+	(message-file-coding-system): New variable.
+	(message-maybe-setup-default-charset): Move to gnus-msg.el and
+	rename to `gnus-message-maybe-setup-default-charset'.
+
+	* lisp/gnus-msg.el (gnus-message-maybe-setup-default-charset):
+	Move from message.el and rename from
+	`message-maybe-setup-default-charset'.
+	(gnus-setup-message):
+	Call `gnus-message-maybe-setup-default-charset'.
+
+	* lisp/message.el 
+
+1998-10-16  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Change to 6.8.19.5.
+
 	* Sync up with Semi-gnus 6.8.19
 
 1998-10-15  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
