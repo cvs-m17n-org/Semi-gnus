@@ -1,3 +1,23 @@
+2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/{rfc2231.el,nnweb.el,nnultimate.el,nntp.el,nnspool.el,
+	nnslashdot.el,nnml.el,nnmh.el,nnkiboze.el,nnimap.el,gnus-topic.el,
+	gnus-ofsetup.el,gnus-offline.el,gnus-mlspl.el,gnus-cache.el,
+	gnus-agent.el}: Require `gnus-clfns' when compiling.
+
+	* lisp/rfc2231.el: Require `cl' when compiling.
+
+	* lisp/gnus-clfns.el: New file.
+
+	* lisp/dgnushack.el: Move compiler macros to gnus-clfns.el; load
+	gnus-clfns.el.
+
+	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Don't
+	rescan the current newsgroup before exiting; wear an imitation
+	summary buffer while rescanning.
+
 2000-01-06  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
 
 	* lisp/dgnushack.el (char-before): Use the byte-optimaization.
