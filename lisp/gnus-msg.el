@@ -197,7 +197,7 @@ Thank you for your help in stamping out bugs.
 (defun gnus-message-make-user-agent (&optional include-mime-info max-column)
   "Return user-agent info.
 INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable
-  `mime-edit-user-agent-value' is exists, the return value will include it.
+  `mime-edit-user-agent-value' exists, the return value will include it.
 MAX-COLUMN the optional second argument if it is specified, the return value
   will be folded up in the proper way."
   (let ((user-agent (if (and include-mime-info
