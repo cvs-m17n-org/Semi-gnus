@@ -41,6 +41,10 @@
 (require 'gnus-win)
 (require 'alist)
 (require 'mime-view)
+(when (static-if (featurep 'xemacs)
+	  (console-on-window-system-p)
+	window-system)
+  (require 'mime-image))
 (require 'wid-edit)
 
 ;; Avoid byte-compile warnings.
