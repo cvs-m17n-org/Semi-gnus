@@ -1,3 +1,39 @@
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* Sync up with Semi-gnus 6.8.1.
+
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.1.
+
+	* Sync up with Gnus 5.6.24.
+
+1998-07-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-ems.el (gnus-mule-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix. (for Emacs 20.1 and 20.2)
+	(gnus-ems-redefine): for Emacs 20.1 and 20.2
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Abolish my last bogus change.
+
+1998-07-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix.
+
+1998-07-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The End".
+
+1998-07-06  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Various".
+
+1998-07-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Various".
+	* texi/gnus-ja.texi: Sync up with Gnus 5.6.22
+
 1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus-msg.el (gnus-extended-version): Add comments.
@@ -10,6 +46,11 @@
 
 	* Sync up with Semi-gnus 6.8.0 and Gnus 5.6.23.
 	
+1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-header-format-alist): Repair to use
+	`message-fill-references' for References.
+
 1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-header-presentation-method):

@@ -58,9 +58,7 @@
 	  from to)
       (goto-line number)
       (unless (eobp)            ; Sometimes things become confused (broken).
-        (if (boundp 'MULE)
-            (forward-char (chars-in-string prefix))
-          (forward-char (length prefix)))
+	(forward-char (chars-in-string prefix))
         (skip-chars-forward " \t")
         (setq from (point))
         (end-of-line 1)
@@ -224,12 +222,8 @@
     ;; `emacs-version'. In this case, implementation for XEmacs/mule
     ;; may be able to share between XEmacs and XEmacs/mule.
 
-    (defalias 'gnus-truncate-string 'truncate-string)
-
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
-    (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
-    (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
     (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
@@ -245,23 +239,31 @@
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (defun gnus-summary-line-format-spec ()
-      (insert gnus-tmp-unread gnus-tmp-replied
-	      gnus-tmp-score-char gnus-tmp-indentation)
-      (put-text-property
-       (point)
-       (progn
-	 (insert
-	  gnus-tmp-opening-bracket
-	  (format "%4d: %-20s"
-		  gnus-tmp-lines
-		  (if (> (length gnus-tmp-name) 20)
-		      (truncate-string gnus-tmp-name 20)
-		    gnus-tmp-name))
-	  gnus-tmp-closing-bracket)
-	 (point))
-       gnus-mouse-face-prop gnus-mouse-face)
-      (insert " " gnus-tmp-subject-or-nil "\n"))
+    (unless (and (fboundp 'set-buffer-multibyte)
+		 (subrp (symbol-function 'set-buffer-multibyte)))
+      ;; For Emacs 20.1 and 20.2
+      (defalias 'gnus-truncate-string 'truncate-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
+      (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
+
+      (defun gnus-summary-line-format-spec ()
+	(insert gnus-tmp-unread gnus-tmp-replied
+		gnus-tmp-score-char gnus-tmp-indentation)
+	(put-text-property
+	 (point)
+	 (progn
+	   (insert
+	    gnus-tmp-opening-bracket
+	    (format "%4d: %-20s"
+		    gnus-tmp-lines
+		    (if (> (length gnus-tmp-name) 20)
+			(truncate-string gnus-tmp-name 20)
+		      gnus-tmp-name))
+	    gnus-tmp-closing-bracket)
+	   (point))
+	 gnus-mouse-face-prop gnus-mouse-face)
+	(insert " " gnus-tmp-subject-or-nil "\n"))
+      )
     )))
 
 (defun gnus-region-active-p ()
