@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Gnus
-;; Copyright (C) 1996,97 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
 ;; Keywords: news
@@ -37,7 +37,10 @@
 (require 'message)
 
 (eval-and-compile
-  (autoload 'nnmail-date-to-time "nnmail"))
+  (autoload 'nnmail-date-to-time "nnmail")
+  (autoload 'rmail-insert-rmail-file-header "rmail")
+  (autoload 'rmail-count-new-messages "rmail")
+  (autoload 'rmail-show-message "rmail"))
 
 (defun gnus-boundp (variable)
   "Return non-nil if VARIABLE is bound and non-nil."
@@ -72,9 +75,6 @@
 	 (set symbol nil))
      symbol))
 
-;; modified by MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;;   function `substring' might cut on a middle of multi-octet
-;;   character.
 (defun gnus-truncate-string (str width)
   (substring str 0 width))
 
@@ -145,7 +145,7 @@
 
 (defun gnus-byte-code (func)
   "Return a form that can be `eval'ed based on FUNC."
-  (let ((fval (symbol-function func)))
+  (let ((fval (indirect-function func)))
     (if (byte-code-function-p fval)
 	(let ((flist (append fval nil)))
 	  (setcar flist 'byte-code)
@@ -161,7 +161,6 @@
       (setq address (substring from (match-beginning 0) (match-end 0))))
     ;; Then we check whether the "name <address>" format is used.
     (and address
-	 ;; Fix by MORIOKA Tomohiko <morioka@jaist.ac.jp>
 	 ;; Linear white space is not required.
 	 (string-match (concat "[ \t]*<" (regexp-quote address) ">") from)
 	 (and (setq name (substring from 0 (match-beginning 0)))
@@ -175,7 +174,6 @@
 				   (1- (match-end 0)))))
 	(and (string-match "()" from)
 	     (setq name address))
-	;; Fix by MORIOKA Tomohiko <morioka@jaist.ac.jp>.
 	;; XOVER might not support folded From headers.
 	(and (string-match "(.*" from)
 	     (setq name (substring from (1+ (match-beginning 0))
@@ -346,19 +344,21 @@
 ;; it yet.  -erik selberg@cs.washington.edu
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string"
-  (let ((datevec (ignore-errors (timezone-parse-date messy-date))))
-    (if (not datevec)
-	"??-???"
-      (format "%2s-%s"
-	      (condition-case ()
-		  ;; Make sure leading zeroes are stripped.
-		  (number-to-string (string-to-number (aref datevec 2)))
-		(error "??"))
-	      (capitalize
-	       (or (car
-		    (nth (1- (string-to-number (aref datevec 1)))
-			 timezone-months-assoc))
-		   "???"))))))
+  (if (equal messy-date "")
+      "??-???"
+    (let ((datevec (ignore-errors (timezone-parse-date messy-date))))
+      (if (not datevec)
+	  "??-???"
+	(format "%2s-%s"
+		(condition-case ()
+		    ;; Make sure leading zeroes are stripped.
+		    (number-to-string (string-to-number (aref datevec 2)))
+		  (error "??"))
+		(capitalize
+		 (or (car
+		      (nth (1- (string-to-number (aref datevec 1)))
+			   timezone-months-assoc))
+		     "???")))))))
 
 (defmacro gnus-date-get-time (date)
   "Convert DATE string to Emacs time.
@@ -378,10 +378,10 @@ Cache the result as a text property stored in DATE."
   "Return a string of TIME in YYMMDDTHHMMSS format."
   (format-time-string "%Y%m%dT%H%M%S" time))
 
-(defun gnus-date-iso8601 (header)
-  "Convert the date field in HEADER to YYMMDDTHHMMSS"
+(defun gnus-date-iso8601 (date)
+  "Convert the DATE to YYMMDDTHHMMSS"
   (condition-case ()
-      (gnus-time-iso8601 (gnus-date-get-time header))
+      (gnus-time-iso8601 (gnus-date-get-time date))
     (error "")))
 
 (defun gnus-mode-string-quote (string)
@@ -475,22 +475,23 @@ If N, return the Nth ancestor instead."
     (let* ((orig (point))
 	   (end (window-end (get-buffer-window (current-buffer) t)))
 	   (max 0))
-      ;; Find the longest line currently displayed in the window.
-      (goto-char (window-start))
-      (while (and (not (eobp))
-		  (< (point) end))
-	(end-of-line)
-	(setq max (max max (current-column)))
-	(forward-line 1))
-      (goto-char orig)
-      ;; Scroll horizontally to center (sort of) the point.
-      (if (> max (window-width))
-	  (set-window-hscroll
-	   (get-buffer-window (current-buffer) t)
-	   (min (- (current-column) (/ (window-width) 3))
-		(+ 2 (- max (window-width)))))
-	(set-window-hscroll (get-buffer-window (current-buffer) t) 0))
-      max)))
+      (when end
+	;; Find the longest line currently displayed in the window.
+	(goto-char (window-start))
+	(while (and (not (eobp))
+		    (< (point) end))
+	  (end-of-line)
+	  (setq max (max max (current-column)))
+	  (forward-line 1))
+	(goto-char orig)
+	;; Scroll horizontally to center (sort of) the point.
+	(if (> max (window-width))
+	    (set-window-hscroll
+	     (get-buffer-window (current-buffer) t)
+	     (min (- (current-column) (/ (window-width) 3))
+		  (+ 2 (- max (window-width)))))
+	  (set-window-hscroll (get-buffer-window (current-buffer) t) 0))
+	max))))
 
 (defun gnus-read-event-char ()
   "Get the next event."
@@ -528,12 +529,11 @@ Timezone package is used."
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
-  (unless gnus-xemacs
-    (let* ((overlayss (overlay-lists))
-	   (buffer-read-only nil)
-	   (overlays (delq nil (nconc (car overlayss) (cdr overlayss)))))
-      (while overlays
-	(delete-overlay (pop overlays))))))
+  (let* ((overlayss (overlay-lists))
+	 (buffer-read-only nil)
+	 (overlays (delq nil (nconc (car overlayss) (cdr overlayss)))))
+    (while overlays
+      (delete-overlay (pop overlays)))))
 
 (defvar gnus-work-buffer " *gnus work*")
 
@@ -580,14 +580,16 @@ Timezone package is used."
 
 (defun gnus-prin1 (form)
   "Use `prin1' on FORM in the current buffer.
-Bind `print-quoted' to t while printing."
+Bind `print-quoted' and `print-readably' to t while printing."
   (let ((print-quoted t)
+	(print-readably t)
 	print-level print-length)
     (prin1 form (current-buffer))))
 
 (defun gnus-prin1-to-string (form)
-  "The same as `prin1', but but `print-quoted' to t."
-  (let ((print-quoted t))
+  "The same as `prin1', but bind `print-quoted' and `print-readably' to t."
+  (let ((print-quoted t)
+	(print-readably t))
     (prin1-to-string form)))
 
 (defun gnus-make-directory (directory)
@@ -759,7 +761,8 @@ with potentially long computations."
 	      (narrow-to-region (point) (point-max))
 	      (goto-char (1+ (point-min)))
 	      (rmail-count-new-messages t)
-	      (rmail-show-message msg))))))
+	      (rmail-show-message msg))
+	    (save-buffer)))))
     (kill-buffer tmpbuf)))
 
 (defun gnus-output-to-mail (filename &optional ask)
@@ -777,7 +780,8 @@ with potentially long computations."
 	    (let ((file-buffer (create-file-buffer filename)))
 	      (save-excursion
 		(set-buffer file-buffer)
-		(let ((require-final-newline nil))
+		(let ((require-final-newline nil)
+		      (coding-system-for-write 'binary))
 		  (gnus-write-buffer filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
@@ -795,7 +799,8 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((buffer-read-only nil))
+	    (let ((buffer-read-only nil)
+		  (coding-system-for-write 'binary))
 	      (save-excursion
 		(goto-char (point-max))
 		(forward-char -2)
@@ -835,6 +840,101 @@ ARG is passed to the first function."
     (while myfuns
       (setq arg (funcall (pop myfuns) arg)))
     arg))
+
+(defun gnus-run-hooks (&rest funcs)
+  "Does the same as `run-hooks', but saves excursion."
+  (let ((buf (current-buffer)))
+    (unwind-protect
+	(apply 'run-hooks funcs)
+      (set-buffer buf))))
+  
+;;;
+;;; .netrc and .authinforc parsing
+;;;
+
+(defvar gnus-netrc-syntax-table
+  (let ((table (copy-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?- "w" table)
+    (modify-syntax-entry ?_ "w" table)
+    (modify-syntax-entry ?! "w" table)
+    (modify-syntax-entry ?. "w" table)
+    (modify-syntax-entry ?, "w" table)
+    (modify-syntax-entry ?: "w" table)
+    (modify-syntax-entry ?\; "w" table)
+    (modify-syntax-entry ?% "w" table)
+    (modify-syntax-entry ?) "w" table)
+    (modify-syntax-entry ?( "w" table)
+    table)
+  "Syntax table when parsing .netrc files.")
+
+(defun gnus-parse-netrc (file)
+  "Parse FILE and return an list of all entries in the file."
+  (if (not (file-exists-p file))
+      ()
+    (save-excursion
+      (let ((tokens '("machine" "default" "login"
+		      "password" "account" "macdef" "force"))
+	    alist elem result pair)
+	(nnheader-set-temp-buffer " *netrc*")
+	(set-syntax-table gnus-netrc-syntax-table)
+	(insert-file-contents file)
+	(goto-char (point-min))
+	;; Go through the file, line by line.
+	(while (not (eobp))
+	  (narrow-to-region (point) (gnus-point-at-eol))
+	  ;; For each line, get the tokens and values.
+	  (while (not (eobp))
+	    (skip-chars-forward "\t ")
+	    (unless (eobp)
+	      (setq elem (buffer-substring
+			  (point) (progn (forward-sexp 1) (point))))
+	      (cond
+	       ((equal elem "macdef")
+		;; We skip past the macro definition.
+		(widen)
+		(while (and (zerop (forward-line 1))
+			    (looking-at "$")))
+		(narrow-to-region (point) (point)))
+	       ((member elem tokens)
+		;; Tokens that don't have a following value are ignored.
+		(when (and pair (cdr pair))
+		  (push pair alist))
+		(setq pair (list elem)))
+	       (t
+		;; Values that haven't got a preceding token are ignored.
+		(when pair
+		  (setcdr pair elem)
+		  (push pair alist)
+		  (setq pair nil))))))
+	  (push alist result)
+	  (setq alist nil
+		pair nil)
+	  (widen)
+	  (forward-line 1))
+	result))))
+
+(defun gnus-netrc-machine (list machine)
+  "Return the netrc values from LIST for MACHINE."
+  (while (and list
+	      (not (equal (cdr (assoc "machine" (car list))) machine)))
+    (pop list))
+  (when list
+    (car list)))
+
+(defun gnus-netrc-get (alist type)
+  "Return the value of token TYPE from ALIST."
+  (cdr (assoc type alist)))
+
+;;; Various
+
+(defun gnus-alive-p ()
+  "Say whether Gnus is running or not."
+  (and (boundp 'gnus-group-buffer)
+       (get-buffer gnus-group-buffer)
+       (save-excursion
+	 (set-buffer gnus-group-buffer)
+	 (eq major-mode 'gnus-group-mode))))
+
 
 (provide 'gnus-util)
 
