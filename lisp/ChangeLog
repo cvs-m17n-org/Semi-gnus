@@ -1,3 +1,83 @@
+2000-11-05  Simon Josefsson  <sj@extundo.com>
+
+	* mml-smime.el (mml-smime-sign): Not used.
+	(mml-smime-encrypt): Ditto.
+
+	* mm-decode.el (mml-smime-verify): Autoload mml-smime.
+
+	Verify S/MIME signature support.
+	
+	* mm-decode.el (mm-inline-media-tests): Add
+	application/{x-,}pkcs7-signature.
+	(mm-inlined-types): Ditto.
+	(mm-automatic-display): Ditto.
+	(mm-verify-function-alist): Ditto.  Add name of method.
+	(mm-decrypt-function-alist): Add name of method.
+	(mm-find-part-by-type): Add documentation.
+	(mm-possibly-verify-or-decrypt): Use new format of
+	mm-{verify,decrypt}-function-alist.  Use method names.
+
+	* mml-smime.el (mml-smime-verify): New function.
+
+2000-11-04 20:38:50  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text): Move point to the end of inserted text.
+
+2000-11-04 19:07:08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml2015.el (mml2015-function-alist): Clear verify and decrypt.
+	* mm-uu.el: Reorganized.  Add gnatsweb, pgp-signed, pgp-encrypted.
+	* mm-decode.el (mm-snarf-option): New.
+
+2000-11-04 13:08:02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-subst-char-in-string): New function.
+	(mm-replace-chars-in-string): Use it.
+	* message.el (message-replace-chars-in-string): Use it.
+	* nnheader.el (nnheader-replace-chars-in-string): Use it.
+	* gnus-mh.el (mh-lib-progs): Shut up.
+
+2000-11-04  ShengHuo Zhu  <zsh@cs.rochester.edu>
+
+	* base64.el, md5.el: Moved to contrib directory.
+
+2000-11-04 11:13:56  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-search-article-forward): Don't move
+	the last article when search.
+
+2000-11-04 10:34:29  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnheader.el (nnheader-pathname-coding-system): Default iso-8859-1.
+	* nnmail.el (nnmail-pathname-coding-system): Ditto.
+
+2000-09-29  David Edmondson  <dme@thus.net>
+
+	One-line patch.
+	
+	* message.el (message-newline-and-reformat): Typo.
+
+2000-11-04 10:11:05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2231.el (rfc2231-decode-encoded-string): Test mm-multibyte-p.
+
+2000-11-04 09:53:42  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-decode-text): Delete bogus status lines.
+
+2000-11-03  Stefan Monnier  <monnier@cs.yale.edu>
+
+	* message.el (message-font-lock-keywords): Match a final newline
+	to help font-lock's multiline support.
+	
+2000-11-04 09:11:44  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnoo.el (nnoo-set): New function.
+
+2000-11-04  ShengHuo Zhu  <zsh@cs.rochester.edu>
+
+	* gpg.el, gpg-ring.el: Moved to contrib directory.
+
 2000-11-04  Simon Josefsson  <sj@extundo.com>
 
 	* nnimap.el (nnimap-split-inbox): Typo.

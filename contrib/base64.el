@@ -25,31 +25,6 @@
 ;;; Boston, MA 02111-1307, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(eval-when-compile (require 'static))
-
-(require 'mel)
-
-(eval-and-compile
-  (defun autoload-functionp (object)
-    (if (functionp object)
-	(let ((def object))
-	  (while (and (symbolp def) (fboundp def))
-	    (setq def (symbol-function def)))
-	  (eq (car-safe def) 'autoload))))
-  (if (autoload-functionp 'base64-decode-string)
-      (fmakunbound 'base64-decode-string))
-  (if (autoload-functionp 'base64-decode-region)
-      (fmakunbound 'base64-decode-region))
-  (if (autoload-functionp 'base64-encode-string)
-      (fmakunbound 'base64-encode-string))
-  (if (autoload-functionp 'base64-encode-region)
-      (fmakunbound 'base64-encode-region))
-  (mel-find-function 'mime-decode-string "base64")
-  (mel-find-function 'mime-decode-region "base64")
-  (mel-find-function 'mime-encode-string "base64")
-  (mel-find-function 'mime-encode-region "base64"))
-
-(static-when nil
 (eval-when-compile (require 'cl))
 
 ;; For non-MULE
@@ -299,7 +274,5 @@ base64-encoder-program.")
 
 (defalias 'base64-decode-string 'base64-decode)
 (defalias 'base64-encode-string 'base64-encode)
-
-);; (static-when nil ...
 
 (provide 'base64)

@@ -369,15 +369,11 @@ Returns a vector of 16 bytes containing the message digest."
 ;;; Here begins the merger with the XEmacs API and the md5.el from the URL
 ;;; package.  Courtesy wmperry@spry.com
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun md5 (object &optional start end coding noerror)
+(defun md5 (object &optional start end)
   "Return the MD5 (a secure message digest algorithm) of an object.
 OBJECT is either a string or a buffer.
 Optional arguments START and END denote buffer positions for computing the
-hash of a portion of OBJECT.
-
-The optional CODING and NOERROR arguments are ignored.  They are only
-placeholders to ensure the compatibility with XEmacsen with file-coding or
-Mule support."
+hash of a portion of OBJECT."
   (let ((buffer nil))
     (unwind-protect
 	(save-excursion

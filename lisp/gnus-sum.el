@@ -1153,6 +1153,8 @@ end position and text.")
 (defvar gnus-newsgroup-ephemeral-charset nil)
 (defvar gnus-newsgroup-ephemeral-ignored-charsets nil)
 
+(defvar gnus-article-before-search nil)
+
 (defconst gnus-summary-local-variables
   '(gnus-newsgroup-name
     gnus-newsgroup-begin gnus-newsgroup-end
@@ -7116,10 +7118,14 @@ If BACKWARD, search backward instead."
 	 current-prefix-arg))
   (if (string-equal regexp "")
       (setq regexp (or gnus-last-search-regexp ""))
-    (setq gnus-last-search-regexp regexp))
-  (if (gnus-summary-search-article regexp backward)
-      (gnus-summary-show-thread)
-    (error "Search failed: \"%s\"" regexp)))
+    (setq gnus-last-search-regexp regexp)
+    (setq gnus-article-before-search gnus-current-article))
+  ;; Intentionally set gnus-last-article.
+  (setq gnus-last-article gnus-article-before-search)
+  (let ((gnus-last-article gnus-last-article))
+    (if (gnus-summary-search-article regexp backward)
+	(gnus-summary-show-thread)
+      (error "Search failed: \"%s\"" regexp))))
 
 (defun gnus-summary-search-article-backward (regexp)
   "Search for an article containing REGEXP backward."
