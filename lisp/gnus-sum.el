@@ -1524,7 +1524,8 @@ increase the score of each group you read."
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "H" gnus-article-strip-headers-in-body
-    "d" gnus-article-treat-dumbquotes)
+    "d" gnus-article-treat-dumbquotes
+    "s" gnus-smiley-display)
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide
@@ -1690,7 +1691,8 @@ increase the score of each group you read."
               ["Stop page breaking" gnus-summary-stop-page-breaking t]
               ["Toggle MIME" gnus-summary-toggle-mime t]
               ["Verbose header" gnus-summary-verbose-headers t]
-              ["Toggle header" gnus-summary-toggle-header t])
+              ["Toggle header" gnus-summary-toggle-header t]
+	      ["Toggle smileys" gnus-smiley-display t])
              ("Output"
               ["Save in default format" gnus-summary-save-article t]
               ["Save in file" gnus-summary-save-article-file t]
