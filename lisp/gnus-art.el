@@ -929,8 +929,23 @@ characters to translate to."
 (defun gnus-article-decode-rfc1522 ()
   "Decode MIME encoded-words in header fields."
   (let (buffer-read-only)
-    (eword-decode-header)
-    ))
+    (let ((charset (save-excursion
+		     (set-buffer gnus-summary-buffer)
+		     default-mime-charset)))
+      (save-restriction
+	(std11-narrow-to-header)
+	(goto-char (point-min))
+	(while (re-search-forward "^[^ \t:]+:" nil t)
+	  (let ((start (match-beginning 0))
+		(end (std11-field-end))
+		)
+	    (save-restriction
+	      (narrow-to-region start end)
+	      (decode-mime-charset-region start end charset)
+	      (goto-char (point-max))
+	      )))
+	(eword-decode-header)
+	))))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
