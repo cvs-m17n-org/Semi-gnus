@@ -58,9 +58,7 @@
 	  from to)
       (goto-line number)
       (unless (eobp)            ; Sometimes things become confused (broken).
-        (if (boundp 'MULE)
-            (forward-char (chars-in-string prefix))
-          (forward-char (length prefix)))
+	(forward-char (chars-in-string prefix))
         (skip-chars-forward " \t")
         (setq from (point))
         (end-of-line 1)
@@ -70,14 +68,6 @@
           (push (setq overlay (gnus-make-overlay from to))
                 gnus-cite-overlay-list)
           (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
-
-(defun gnus-mule-max-width-function (el max-width)
-  (` (let* ((val (eval (, el)))
-	    (valstr (if (numberp val)
-			(int-to-string val) val)))
-       (if (> (length valstr) (, max-width))
-	   (truncate-string valstr (, max-width))
-	 valstr))))
 
 (defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
@@ -224,15 +214,55 @@
     ;; `emacs-version'. In this case, implementation for XEmacs/mule
     ;; may be able to share between XEmacs and XEmacs/mule.
 
-    (defalias 'gnus-truncate-string 'truncate-string)
-
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
-    (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
-    (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
     (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
+
+    (if (fboundp 'truncate-string-to-width)
+	(fset 'gnus-truncate-string 'truncate-string-to-width)
+      (fset 'gnus-truncate-string 'truncate-string))
+
+    (defun gnus-tilde-max-form (el max-width)
+      "Return a form that limits EL to MAX-WIDTH."
+      (let ((max (abs max-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			,el (string-width ,el)
+			(- (string-width ,el) ,max))
+		    `(gnus-truncate-string ,el ,max))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,max)
+		 ,(if (< max-width 0)
+		      `(gnus-truncate-string
+			val (string-width val)
+			(- (string-width val) ,max))
+		    `(gnus-truncate-string val ,max))
+	       val)))))
+
+    (defun gnus-tilde-cut-form (el cut-width)
+      "Return a form that cuts CUT-WIDTH off of EL."
+      (let ((cut (abs cut-width)))
+	(if (symbolp el)
+	    `(if (> (string-width ,el) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			,el (- (string-width ,el) ,cut))
+		    `(gnus-truncate-string
+		      ,el (- (string-width ,el) ,cut) ,cut))
+	       ,el)
+	  `(let ((val (eval ,el)))
+	     (if (> (string-width val) ,cut)
+		 ,(if (< cut-width 0)
+		      `(gnus-truncate-string
+			val (- (string-width val) ,cut))
+		    `(gnus-truncate-string
+		      val (- (string-width val) ,cut) ,cut))
+	       val)))))
 
     (when window-system
       (require 'path-util)
@@ -245,23 +275,9 @@
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
 
-    (defun gnus-summary-line-format-spec ()
-      (insert gnus-tmp-unread gnus-tmp-replied
-	      gnus-tmp-score-char gnus-tmp-indentation)
-      (put-text-property
-       (point)
-       (progn
-	 (insert
-	  gnus-tmp-opening-bracket
-	  (format "%4d: %-20s"
-		  gnus-tmp-lines
-		  (if (> (length gnus-tmp-name) 20)
-		      (truncate-string gnus-tmp-name 20)
-		    gnus-tmp-name))
-	  gnus-tmp-closing-bracket)
-	 (point))
-       gnus-mouse-face-prop gnus-mouse-face)
-      (insert " " gnus-tmp-subject-or-nil "\n"))
+    (when (fboundp 'chars-in-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
+
     )))
 
 (defun gnus-region-active-p ()
@@ -274,6 +290,7 @@
 (defun gnus-add-minor-mode (mode name map)
   (if (fboundp 'add-minor-mode)
       (add-minor-mode mode name map)
+    (set (make-local-variable mode) t)
     (unless (assq mode minor-mode-alist)
       (push `(,mode ,name) minor-mode-alist))
     (unless (assq mode minor-mode-map-alist)
@@ -285,7 +302,7 @@
   (let ((dir (nnheader-find-etc-directory "gnus"))
 	pixmap file height beg i)
     (save-excursion
-      (switch-to-buffer (get-buffer-create gnus-group-buffer))
+      (switch-to-buffer (gnus-get-buffer-create gnus-group-buffer))
       (let ((buffer-read-only nil))
 	(erase-buffer)
 	(when (and dir

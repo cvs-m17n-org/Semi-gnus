@@ -500,12 +500,12 @@ used as score."
 	    (?b "body" "" nil body-string)
 	    (?h "head" "" nil body-string)
 	    (?i "message-id" nil t string)
-	    (?t "references" "message-id" nil string)
+	    (?r "references" "message-id" nil string)
 	    (?x "xref" nil nil string)
 	    (?l "lines" nil nil number)
 	    (?d "date" nil nil date)
 	    (?f "followup" nil nil string)
-	    (?T "thread" nil nil string)))
+	    (?t "thread" "message-id" nil string)))
 	 (char-to-type
 	  '((?s s "substring" string)
 	    (?e e "exact string" string)
@@ -591,7 +591,7 @@ used as score."
 	    ;; It was a majuscule, so we end reading and use the default.
 	    (if mimic (message "%c %c %c" prefix hchar tchar)
 	      (message ""))
-	    (setq pchar (or pchar ?p)))
+	    (setq pchar (or pchar ?t)))
 
 	  ;; We continue reading.
 	  (while (not pchar)
@@ -671,7 +671,7 @@ used as score."
 (defun gnus-score-insert-help (string alist idx)
   (setq gnus-score-help-winconf (current-window-configuration))
   (save-excursion
-    (set-buffer (get-buffer-create "*Score Help*"))
+    (set-buffer (gnus-get-buffer-create "*Score Help*"))
     (buffer-disable-undo (current-buffer))
     (delete-windows-on (current-buffer))
     (erase-buffer)
@@ -1121,7 +1121,7 @@ SCORE is the score to add."
 		 (or (not decay)
 		     (gnus-decay-scores alist decay)))
 	(gnus-score-set 'touched '(t) alist)
-	(gnus-score-set 'decay (list (gnus-time-to-day (current-time)))))
+	(gnus-score-set 'decay (list (gnus-time-to-day (current-time))) alist))
       ;; We do not respect eval and files atoms from global score
       ;; files.
       (when (and files (not global))
@@ -1213,10 +1213,16 @@ SCORE is the score to add."
 		    (read (current-buffer))
 		  (error
 		   (gnus-error 3.2 "Problem with score file %s" file))))))
-      (if (eq (car alist) 'setq)
-	  ;; This is an old-style score file.
-	  (setq gnus-score-alist (gnus-score-transform-old-to-new alist))
-	(setq gnus-score-alist alist))
+      (cond
+       ((and alist
+	     (atom alist))
+	;; Bogus score file.
+	(error "Invalid syntax with score file %s" file))
+       ((eq (car alist) 'setq)
+	;; This is an old-style score file.
+	(setq gnus-score-alist (gnus-score-transform-old-to-new alist)))
+       (t
+	(setq gnus-score-alist alist)))
       ;; Check the syntax of the score file.
       (setq gnus-score-alist
 	    (gnus-score-check-syntax gnus-score-alist file)))))
@@ -1397,7 +1403,7 @@ SCORE is the score to add."
 			  gnus-scores-articles))))
 
 	  (save-excursion
-	    (set-buffer (get-buffer-create "*Headers*"))
+	    (set-buffer (gnus-get-buffer-create "*Headers*"))
 	    (buffer-disable-undo (current-buffer))
 	    (when (gnus-buffer-live-p gnus-summary-buffer)
 	      (message-clone-locals gnus-summary-buffer))
@@ -2283,7 +2289,6 @@ SCORE is the score to add."
 	   1 "No score rules apply to the current article (default score %d)."
 	   gnus-summary-default-score)
 	(set-buffer "*Score Trace*")
-	(gnus-add-current-to-buffer-list)
 	(while trace
 	  (insert (format "%S  ->  %s\n" (cdar trace)
 			  (if (caar trace)
@@ -2329,7 +2334,6 @@ SCORE is the score to add."
       (while rules
 	(insert (format "%-5d: %s\n" (caar rules) (cdar rules)))
 	(pop rules))
-      (gnus-add-current-to-buffer-list)
       (goto-char (point-min))
       (gnus-configure-windows 'score-words))))
 
@@ -2500,7 +2504,7 @@ GROUP using BNews sys file syntax."
 	 (trans (cdr (assq ?: nnheader-file-name-translation-alist)))
 	 ofiles not-match regexp)
     (save-excursion
-      (set-buffer (get-buffer-create "*gnus score files*"))
+      (set-buffer (gnus-get-buffer-create "*gnus score files*"))
       (buffer-disable-undo (current-buffer))
       ;; Go through all score file names and create regexp with them
       ;; as the source.
@@ -2792,8 +2796,8 @@ If ADAPT, return the home adaptive file instead."
 	      (funcall elem group))
 	     ;; Regexp-file cons
 	     ((consp elem)
-	      (when (string-match (car elem) group)
-		(cadr elem))))))
+	      (when (string-match (gnus-globalify-regexp (car elem)) group)
+		(replace-match (cadr elem) t nil group ))))))
     (when found
       (nnheader-concat gnus-kill-files-directory found))))
 
@@ -2812,6 +2816,10 @@ If ADAPT, return the home adaptive file instead."
     ;; Group name without any dots.
     (concat group (if (gnus-use-long-file-name 'not-score) "." "/")
 	    gnus-adaptive-file-suffix)))
+
+(defun gnus-current-home-score-file (group)
+  "Return the \"current\" regular score file."
+  (car (nreverse (gnus-score-find-alist group))))
 
 ;;;
 ;;; Score decays

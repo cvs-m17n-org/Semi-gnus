@@ -1,5 +1,5 @@
 ;;; smiley.el --- displaying smiley faces
-;; Copyright (C) 1996,97 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Wes Hardaker <hardaker@ece.ucdavis.edu>
 ;; Keywords: fun
@@ -45,7 +45,7 @@
   :group 'gnus-visual)
 
 (defcustom smiley-data-directory (message-xmas-find-glyph-directory "smilies")
-  "Location of the smiley faces files."
+  "*Location of the smiley faces files."
   :type 'directory
   :group 'smiley)
 
@@ -76,7 +76,7 @@
     ("\\(;-*[>)}»]+\\)\\W" 1 "FaceWinking.xpm")
     ("\\(:-*[Vvµ]\\)\\W" 1 "FaceWry.xpm")
     ("\\([:|]-*P\\)\\W" 1 "FaceYukky.xpm"))
-  "Normal and deformed faces for smilies."
+  "*Normal and deformed faces for smilies."
   :type '(repeat (list regexp
 		       (integer :tag "Match")
 		       (string :tag "Image")))
@@ -102,14 +102,14 @@
     ("\\(:-+[Vvµ]\\)\\W" 1 "FaceWry.xpm")
     ("\\(][:8B]-[)>]\\)\\W" 1 "FaceDevilish.xpm")
     ("\\([:|]-+P\\)\\W" 1 "FaceYukky.xpm"))
-  "Smileys with noses.  These get less false matches."
+  "*Smileys with noses.  These get less false matches."
   :type '(repeat (list regexp
 		       (integer :tag "Match")
 		       (string :tag "Image")))
   :group 'smiley)
 
 (defcustom smiley-regexp-alist smiley-deformed-regexp-alist
-  "A list of regexps to map smilies to real images.
+  "*A list of regexps to map smilies to real images.
 Defaults to the contents of `smiley-deformed-regexp-alist'.
 An alternative is `smiley-nosey-regexp-alist' that matches less
 aggressively.
@@ -123,33 +123,32 @@ If this is a symbol, take its value."
   :group 'smiley)
 
 (defcustom smiley-flesh-color "yellow"
-  "Flesh color."
+  "*Flesh color."
   :type 'string
   :group 'smiley)
 
 (defcustom smiley-features-color "black"
-  "Features color."
+  "*Features color."
   :type 'string
   :group 'smiley)
 
 (defcustom smiley-tongue-color "red"
-  "Tongue color."
+  "*Tongue color."
   :type 'string
   :group 'smiley)
 
 (defcustom smiley-circle-color "black"
-  "Circle color."
+  "*Circle color."
   :type 'string
   :group 'smiley)
 
 (defcustom smiley-mouse-face 'highlight
-  "Face used for mouse highlighting in the smiley buffer.
+  "*Face used for mouse highlighting in the smiley buffer.
 
 Smiley buttons will be displayed in this face when the cursor is
 above them."
   :type 'face
   :group 'smiley)
-
 
 (defvar smiley-glyph-cache nil)
 (defvar smiley-running-xemacs (string-match "XEmacs" emacs-version))
@@ -158,6 +157,14 @@ above them."
  "Keymap to toggle smiley states.")
 
 (define-key smiley-map [(button2)] 'smiley-toggle-extent)
+(define-key smiley-map [(button3)] 'smiley-popup-menu)
+
+(defun smiley-popup-menu (e)
+  (interactive "e")
+  (popup-menu
+   `("Smilies" 
+     ["Toggle This Smiley" (smiley-toggle-extent ,e) t]
+     ["Toggle All Smilies" (smiley-toggle-extents ,e) t])))
 
 (defun smiley-create-glyph (smiley pixmap)
   (and
@@ -185,7 +192,7 @@ above them."
   (smiley-buffer (current-buffer) beg end))
 
 (defun smiley-toggle-extent (event)
-  "Toggle smiley at given point"
+  "Toggle smiley at given point."
   (interactive "e")
   (let* ((ant (event-glyph-extent event))
 	 (pt (event-closest-point event))
@@ -201,6 +208,23 @@ above them."
 	    (reveal-annotation ant)
 	    (set-extent-property ext 'invisible t)))))))
 
+(defun smiley-toggle-extents (e)
+  (interactive "e")
+  (map-extents
+   '(lambda (e void)
+      (let (ant)
+	(if (annotationp (setq ant (extent-property e 'smiley-annotation)))
+	    (progn
+	      (if (eq (extent-property e 'invisible) nil)
+		  (progn
+		    (reveal-annotation ant)
+		    (set-extent-property e 'invisible t)
+		    )
+		(hide-annotation ant)
+		(set-extent-property e 'invisible nil))))
+	nil))
+   (event-buffer e)))
+
 ;;;###autoload
 (defun smiley-buffer (&optional buffer st nd)
   (interactive)
@@ -214,6 +238,12 @@ above them."
 		     smiley-regexp-alist))
 	    (case-fold-search nil)
 	    entry regexp beg group file)
+	(map-extents
+	 '(lambda (e void)
+	    (when (or (extent-property e 'smiley-extent)
+		      (extent-property e 'smiley-annotation))
+	      (delete-extent e)))
+	 buffer st nd)
 	(goto-char (or st (point-min)))
 	(setq beg (point))
 	;; loop through alist
@@ -243,7 +273,18 @@ above them."
 		  (set-extent-property ant 'keymap smiley-map)
 		  ;; remember each other
 		  (set-extent-property ant 'smiley-extent ext)
-		  (set-extent-property ext 'smiley-annotation ant))
+		  (set-extent-property ext 'smiley-annotation ant)
+		  ;; Help
+		  (set-extent-property ext 'help-echo
+				       "button2 toggles smiley, button3 pops up menu")
+		  (set-extent-property ant 'help-echo
+				       "button2 toggles smiley, button3 pops up menu")
+		  (set-extent-property ext 'balloon-help
+				       "Mouse button2 - toggle smiley
+Mouse button3 - menu")
+		  (set-extent-property ant 'balloon-help
+				       "Mouse button2 - toggle smiley
+Mouse button3 - menu"))
 		(when (smiley-end-paren-p start end)
 		  (make-annotation ")" end 'text))
 		(goto-char end)))))))))
@@ -262,7 +303,7 @@ above them."
 (defvar gnus-article-buffer)
 ;;;###autoload
 (defun gnus-smiley-display ()
-  "Display \"smileys\" as small graphical icons." 
+  "Display \"smileys\" as small graphical icons."
   (interactive)
   (save-excursion
     (set-buffer gnus-article-buffer)

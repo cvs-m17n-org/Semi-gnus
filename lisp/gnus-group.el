@@ -730,6 +730,7 @@ ticked: The number of ticked articles."
        ["Read manual" gnus-info-find-node t]
        ["Flush score cache" gnus-score-flush-cache t]
        ["Toggle topics" gnus-topic-mode t]
+       ["Send a bug report" gnus-bug t]
        ["Exit from Gnus" gnus-group-exit t]
        ["Exit without saving" gnus-group-quit t]))
 
@@ -772,6 +773,8 @@ The following commands are available:
   (add-hook 'post-command-hook 'gnus-clear-inboxes-moved nil t)
   (when gnus-use-undo
     (gnus-undo-mode 1))
+  (when gnus-slave
+    (gnus-slave-mode))
   (gnus-run-hooks 'gnus-group-mode-hook))
 
 (defun gnus-update-group-mark-positions ()
@@ -815,9 +818,8 @@ The following commands are available:
     (or level gnus-group-default-list-level gnus-level-subscribed))))
 
 (defun gnus-group-setup-buffer ()
-  (set-buffer (get-buffer-create gnus-group-buffer))
+  (set-buffer (gnus-get-buffer-create gnus-group-buffer))
   (unless (eq major-mode 'gnus-group-mode)
-    (gnus-add-current-to-buffer-list)
     (gnus-group-mode)
     (when gnus-carpal
       (gnus-carpal-setup-buffer 'group))))
@@ -1150,7 +1152,8 @@ already."
 	    found buffer-read-only)
 	;; Enter the current status into the dribble buffer.
 	(let ((entry (gnus-gethash group gnus-newsrc-hashtb)))
-	  (when (and entry (not (gnus-ephemeral-group-p group)))
+	  (when (and entry
+		     (not (gnus-ephemeral-group-p group)))
 	    (gnus-dribble-enter
 	     (concat "(gnus-group-set-info '"
 		     (gnus-prin1-to-string (nth 2 entry))
@@ -1471,12 +1474,12 @@ and with point over the group in question."
 	    (save-selected-window
 	      (save-excursion
 		(funcall ,function ,group)))))))))
-  
+
 (put 'gnus-group-iterate 'lisp-indent-function 1)
 
 ;; Selecting groups.
 
-(defun gnus-group-read-group (&optional all no-article group)
+(defun gnus-group-read-group (&optional all no-article group select-articles)
   "Read news in this newsgroup.
 If the prefix argument ALL is non-nil, already read articles become
 readable.  IF ALL is a number, fetch this number of articles.  If the
@@ -1507,7 +1510,7 @@ group."
 					  (cdr (assq 'tick marked)))
 				  (gnus-range-length
 				   (cdr (assq 'dormant marked)))))))
-     no-article nil no-display)))
+     no-article nil no-display nil select-articles)))
 
 (defun gnus-group-select-group (&optional all)
   "Select this newsgroup.
@@ -1553,10 +1556,6 @@ be permanent."
 	 gnus-summary-mode-hook gnus-select-group-hook
 	 (group (gnus-group-group-name))
 	 (method (gnus-find-method-for-group group)))
-    (setq method
-	  `(,(car method) ,(concat (cadr method) "-ephemeral")
-	    (,(intern (format "%s-address" (car method))) ,(cadr method))
-	    ,@(cddr method)))
     (gnus-group-read-ephemeral-group
      (gnus-group-prefixed-name group method) method)))
 
@@ -1569,30 +1568,41 @@ Returns whether the fetching was successful or not."
     (gnus-no-server))
   (gnus-group-read-group nil nil group))
 
+;;;###autoload
+(defun gnus-fetch-group-other-frame (group)
+  "Pop up a frame and enter GROUP."
+  (interactive "P")
+  (let ((window (get-buffer-window gnus-group-buffer)))
+    (cond (window
+	   (select-frame (window-frame window)))
+	  ((= (length (frame-list)) 1)
+	   (select-frame (make-frame)))
+	  (t
+	   (other-frame 1))))
+  (gnus-fetch-group group))
+
 (defvar gnus-ephemeral-group-server 0)
 
 ;; Enter a group that is not in the group buffer.  Non-nil is returned
 ;; if selection was successful.
 (defun gnus-group-read-ephemeral-group (group method &optional activate
-					      quit-config request-only)
+					      quit-config request-only
+					      select-articles)
   "Read GROUP from METHOD as an ephemeral group.
 If ACTIVATE, request the group first.
 If QUIT-CONFIG, use that window configuration when exiting from the
 ephemeral group.
 If REQUEST-ONLY, don't actually read the group; just request it.
+If SELECT-ARTICLES, only select those articles.
 
 Return the name of the group is selection was successful."
   ;; Transform the select method into a unique server.
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
-;;;  (let ((saddr (intern (format "%s-address" (car method)))))
-;;;    (setq method (gnus-copy-sequence method))
-;;;    (require (car method))
-;;;    (when (boundp saddr)
-;;;      (unless (assq saddr method)
-;;;	(nconc method `((,saddr ,(cadr method))))
-;;;	(setf (cadr method) (format "%s-%d" (cadr method)
-;;;				    (incf gnus-ephemeral-group-server))))))
+  (setq method
+	`(,(car method) ,(concat (cadr method) "-ephemeral")
+	  (,(intern (format "%s-address" (car method))) ,(cadr method))
+	  ,@(cddr method)))
   (let ((group (if (gnus-group-foreign-p group) group
 		 (gnus-group-prefixed-name group method))))
     (gnus-sethash
@@ -1616,7 +1626,7 @@ Return the name of the group is selection was successful."
     (if request-only
 	group
       (condition-case ()
-	  (when (gnus-group-read-group t t group)
+	  (when (gnus-group-read-group t t group select-articles)
 	    group)
 	;;(error nil)
 	(quit nil)))))
@@ -1791,6 +1801,8 @@ ADDRESS."
     (gnus-read-group "Group name: ")
     (gnus-read-method "From method: ")))
 
+  (when (stringp method)
+    (setq method (gnus-server-to-method method)))
   (let* ((meth (when (and method
 			  (not (gnus-server-equal method gnus-select-method)))
 		 (if address (list (intern method) address)
@@ -1903,6 +1915,8 @@ and NEW-NAME will be prompted for."
 	(gnus-set-active new-name (gnus-active group))
 	(gnus-message 6 "Renaming group %s to %s...done" group new-name)
 	new-name)
+    (setq gnus-killed-list (delete group gnus-killed-list))
+    (gnus-set-active group nil)
     (gnus-dribble-touch)
     (gnus-group-position-point)))
 
@@ -1982,6 +1996,7 @@ and NEW-NAME will be prompted for."
     (gnus-group-position-point)))
 
 (defun gnus-group-make-useful-group (group method)
+  "Create one of the groups described in `gnus-useful-groups'."
   (interactive
    (let ((entry (assoc (completing-read "Create group: " gnus-useful-groups
 					nil t)
@@ -1997,8 +2012,7 @@ and NEW-NAME will be prompted for."
   "Create the Gnus documentation group."
   (interactive)
   (let ((name (gnus-group-prefixed-name "gnus-help" '(nndoc "gnus-help")))
-	(file (nnheader-find-etc-directory "gnus-tut.txt" t))
-	dir)
+	(file (nnheader-find-etc-directory "gnus-tut.txt" t)))
     (when (gnus-gethash name gnus-newsrc-hashtb)
       (error "Documentation group already exists"))
     (if (not file)
@@ -2391,7 +2405,7 @@ If REVERSE, sort in reverse order."
 	(when (gnus-group-native-p (gnus-info-group info))
 	  (gnus-info-clear-data info)))
       (gnus-get-unread-articles)
-      (gnus-dribble-enter "")
+      (gnus-dribble-touch)
       (when (gnus-y-or-n-p
 	     "Move the cache away to avoid problems in the future? ")
 	(call-interactively 'gnus-cache-move-cache)))))
@@ -2915,17 +2929,19 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	 (ret (if (numberp n) (- n (length groups)) 0))
 	 (beg (unless n
 		(point)))
-	 group)
+	 group method)
     (while (setq group (pop groups))
       (gnus-group-remove-mark group)
       ;; Bypass any previous denials from the server.
-      (gnus-remove-denial (gnus-find-method-for-group group))
+      (gnus-remove-denial (setq method (gnus-find-method-for-group group)))
       (if (gnus-activate-group group (if dont-scan nil 'scan))
 	  (progn
 	    (gnus-get-unread-articles-in-group
 	     (gnus-get-info group) (gnus-active group) t)
 	    (unless (gnus-virtual-group-p group)
 	      (gnus-close-group group))
+	    (gnus-agent-save-group-info
+	     method (gnus-group-real-name group) (gnus-active group))
 	    (gnus-group-update-group group))
 	(if (eq (gnus-server-status (gnus-find-method-for-group group))
 		'denied)
@@ -2959,8 +2975,6 @@ to use."
     (while (and (not found)
 		(setq dir (pop dirs)))
       (let ((name (gnus-group-real-name group)))
-	(while (string-match "\\." name)
-	  (setq name (replace-match "/" t t name)))
 	(setq file (concat (file-name-as-directory dir) name)))
       (if (not (file-exists-p file))
 	  (gnus-message 1 "No such file: %s" file)
@@ -3026,6 +3040,7 @@ to use."
      (lambda (group)
        (and (symbol-name group)
 	    (string-match regexp (symbol-name group))
+	    (symbol-value group)
 	    (push (symbol-name group) groups)))
      gnus-active-hashtb)
     ;; Also go through all descriptions that are known to Gnus.
@@ -3033,7 +3048,6 @@ to use."
       (mapatoms
        (lambda (group)
 	 (and (string-match regexp (symbol-value group))
-	      (gnus-active (symbol-name group))
 	      (push (symbol-name group) groups)))
        gnus-description-hashtb))
     (if (not groups)
@@ -3126,12 +3140,14 @@ group."
 (defun gnus-group-find-new-groups (&optional arg)
   "Search for new groups and add them.
 Each new group will be treated with `gnus-subscribe-newsgroup-method.'
-If ARG (the prefix), use the `ask-server' method to query
-the server for new groups."
-  (interactive "P")
-  (gnus-find-new-newsgroups arg)
+With 1 C-u, use the `ask-server' method to query the server for new
+groups.
+With 2 C-u's, use most complete method possible to query the server
+for new groups, and subscribe the new groups as zombies."
+  (interactive "p")
+  (gnus-find-new-newsgroups (or arg 1))
   (gnus-group-list-groups))
-  
+
 (defun gnus-group-edit-global-kill (&optional article group)
   "Edit the global kill file.
 If GROUP, edit that local kill file instead."
@@ -3161,16 +3177,13 @@ The hook gnus-suspend-gnus-hook is called before actually suspending."
   (interactive)
   (gnus-run-hooks 'gnus-suspend-gnus-hook)
   ;; Kill Gnus buffers except for group mode buffer.
-  (let* ((group-buf (get-buffer gnus-group-buffer))
-	 ;; Do this on a separate list in case the user does a ^G before we finish
-	 (gnus-buffer-list
-	  (delete group-buf (delete gnus-dribble-buffer
-				    (append gnus-buffer-list nil)))))
-    (while gnus-buffer-list
-      (gnus-kill-buffer (pop gnus-buffer-list)))
+  (let ((group-buf (get-buffer gnus-group-buffer)))
+    (mapcar (lambda (buf)
+	      (unless (member buf (list group-buf gnus-dribble-buffer))
+		(kill-buffer buf)))
+	    (gnus-buffers))
     (gnus-kill-gnus-frames)
     (when group-buf
-      (setq gnus-buffer-list (list group-buf))
       (bury-buffer group-buf)
       (delete-windows-on group-buf t))))
 
@@ -3317,7 +3330,6 @@ and the second element is the address."
   ;; If INFO is non-nil, use that info.	 If FORCE is non-nil, don't
   ;; add, but replace marked articles of TYPE with ARTICLES.
   (let ((info (or info (gnus-get-info group)))
-	(uncompressed '(score bookmark killed))
 	marked m)
     (or (not info)
 	(and (not (setq marked (nthcdr 3 info)))

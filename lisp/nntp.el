@@ -45,13 +45,11 @@
 (defvoo nntp-server-opened-hook '(nntp-send-mode-reader)
   "*Hook used for sending commands to the server at startup.
 The default value is `nntp-send-mode-reader', which makes an innd
-server spawn an nnrpd server.  Another useful function to put in this
-hook might be `nntp-send-authinfo', which will prompt for a password
-to allow posting from the server.  Note that this is only necessary to
-do on servers that use strict access control.")
+server spawn an nnrpd server.")
 
 (defvoo nntp-authinfo-function 'nntp-send-authinfo
-  "Function used to send AUTHINFO to the server.")
+  "Function used to send AUTHINFO to the server.
+It is called with no parameters.")
 
 (defvoo nntp-server-action-alist
   '(("nntpd 1\\.5\\.11t"
@@ -181,6 +179,10 @@ server there that you can connect to.  See also
 
 
 
+(defvoo nntp-connection-timeout nil
+  "*Number of seconds to wait before an nntp connection times out.
+If this variable is nil, which is the default, no timers are set.")
+
 ;;; Internal variables.
 
 (defvar nntp-record-commands nil
@@ -197,6 +199,7 @@ server there that you can connect to.  See also
 (defvoo nntp-last-command-time nil)
 (defvoo nntp-last-command nil)
 (defvoo nntp-authinfo-password nil)
+(defvoo nntp-authinfo-user nil)
 
 (defvar nntp-connection-list nil)
 
@@ -234,8 +237,10 @@ server there that you can connect to.  See also
   (save-excursion
     (set-buffer (get-buffer-create "*nntp-log*"))
     (goto-char (point-max))
-    (insert (format-time-string "%Y%m%dT%H%M%S" (current-time))
-	    " " nntp-address " " string "\n")))
+    (let ((time (current-time)))
+      (insert (format-time-string "%Y%m%dT%H%M%S" time)
+	      "." (format "%03d" (/ (nth 2 time) 1000))
+	      " " nntp-address " " string "\n"))))
 
 (defsubst nntp-wait-for (process wait-for buffer &optional decode discard)
   "Wait for WAIT-FOR to arrive from PROCESS."
@@ -392,18 +397,22 @@ server there that you can connect to.  See also
 (nnoo-define-basics nntp)
 
 (defsubst nntp-next-result-arrived-p ()
-  (let ((point (point)))
-    (cond
-     ((eq (following-char) ?2)
-      (if (re-search-forward "\n\\.\r?\n" nil t)
-	  t
-	(goto-char point)
-	nil))
-     ((looking-at "[34]")
-      (forward-line 1)
-      t)
-     (t
-      nil))))
+  (cond
+   ;; A result that starts with a 2xx code is terminated by
+   ;; a line with only a "." on it.
+   ((eq (following-char) ?2)
+    (if (re-search-forward "\n\\.\r?\n" nil t)
+	t
+      nil))
+   ;; A result that starts with a 3xx or 4xx code is terminated
+   ;; by a newline.
+   ((looking-at "[34]")
+    (if (search-forward "\n" nil t)
+	t
+      nil))
+   ;; No result here.
+   (t
+    nil)))
 
 (deffoo nntp-retrieve-headers (articles &optional group server fetch-old)
   "Retrieve the headers of ARTICLES."
@@ -540,7 +549,7 @@ server there that you can connect to.  See also
 	  (nntp-inhibit-erase t)
 	  (map (apply 'vector articles))
 	  (point 1)
-	  article alist)
+	  article)
       (set-buffer buf)
       (erase-buffer)
       ;; Send ARTICLE command.
@@ -580,7 +589,7 @@ server there that you can connect to.  See also
 	   (nnheader-message 6 "NNTP: Receiving articles...done"))
       
       ;; Now we have all the responses.  We go through the results,
-      ;; washes it and copies it over to the server buffer.
+      ;; wash it and copy it over to the server buffer.
       (set-buffer nntp-server-buffer)
       (erase-buffer)
       (setq last-point (point-min))
@@ -643,7 +652,7 @@ server there that you can connect to.  See also
 
 (deffoo nntp-request-group (group &optional server dont-check)
   (nntp-possibly-change-group nil server)
-  (when (nntp-send-command "^21.*\n" "GROUP" group)
+  (when (nntp-send-command "^[245].*\n" "GROUP" group)
     (let ((entry (nntp-find-connection-entry nntp-server-buffer)))
       (setcar (cddr entry) group))))
 
@@ -679,6 +688,10 @@ server there that you can connect to.  See also
 	(ignore-errors
 	  (nntp-send-string process "QUIT")
 	  (unless (eq nntp-open-connection-function 'nntp-open-network-stream)
+	    ;; Ok, this is evil, but when using telnet and stuff
+	    ;; as the connection method, it's important that the
+	    ;; QUIT command actually is sent out before we kill
+	    ;; the process.  
 	    (sleep-for 1))))
       (when (buffer-name (process-buffer process))
 	(kill-buffer (process-buffer process)))
@@ -742,33 +755,40 @@ reading."
   "Send the AUTHINFO to the nntp server.
 It will look in the \"~/.authinfo\" file for matching entries.  If
 nothing suitable is found there, it will prompt for a user name
-and a password."
+and a password.
+
+If SEND-IF-FORCE, only send authinfo to the server if the
+.authinfo file has the FORCE token."
   (let* ((list (gnus-parse-netrc nntp-authinfo-file))
 	 (alist (gnus-netrc-machine list nntp-address))
 	 (force (gnus-netrc-get alist "force"))
-	 (user (gnus-netrc-get alist "login"))
+	 (user (or (gnus-netrc-get alist "login") nntp-authinfo-user))
 	 (passwd (gnus-netrc-get alist "password")))
     (when (or (not send-if-force)
 	      force)
-      (nntp-send-command
-       "^3.*\r?\n" "AUTHINFO USER"
-       (or user (read-string (format "NNTP (%s) user name: " nntp-address))))
+      (unless user
+	(setq user (read-string (format "NNTP (%s) user name: " nntp-address))
+	      nntp-authinfo-user user))
+      (unless (member user '(nil ""))
+	(nntp-send-command "^3.*\r?\n" "AUTHINFO USER" user)
+	(when t				;???Should check if AUTHINFO succeeded
       (nntp-send-command
        "^2.*\r?\n" "AUTHINFO PASS"
        (or passwd
 	   nntp-authinfo-password
 	   (setq nntp-authinfo-password
-		 (nnmail-read-passwd (format "NNTP (%s) password: "
-					     nntp-address))))))))
+		     (nnmail-read-passwd (format "NNTP (%s@%s) password: "
+						 user nntp-address))))))))))
 
 (defun nntp-send-nosy-authinfo ()
   "Send the AUTHINFO to the nntp server."
-  (nntp-send-command
-   "^3.*\r?\n" "AUTHINFO USER"
-   (read-string (format "NNTP (%s) user name: " nntp-address)))
-  (nntp-send-command
-   "^2.*\r?\n" "AUTHINFO PASS"
-   (nnmail-read-passwd "NNTP (%s) password: " nntp-address)))
+  (let ((user (read-string (format "NNTP (%s) user name: " nntp-address))))
+    (unless (member user '(nil ""))
+      (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" user)
+      (when t				;???Should check if AUTHINFO succeeded
+	(nntp-send-command "^2.*\r?\n" "AUTHINFO PASS"
+			   (nnmail-read-passwd "NNTP (%s@%s) password: "
+					       user nntp-address))))))
 
 (defun nntp-send-authinfo-from-file ()
   "Send the AUTHINFO to the nntp server.
@@ -818,13 +838,24 @@ password contained in '~/.nntp-authinfo'."
   "Open a connection to PORT on ADDRESS delivering output to BUFFER."
   (run-hooks 'nntp-prepare-server-hook)
   (let* ((pbuffer (nntp-make-process-buffer buffer))
+	 (timer 
+	  (and nntp-connection-timeout 
+	       (nnheader-run-at-time
+		nntp-connection-timeout nil
+		`(lambda ()
+		   (when (buffer-name ,pbuffer)
+		     (kill-buffer ,pbuffer))))))
 	 (process
 	  (condition-case ()
-	      (let ((coding-system-for-read nntp-coding-system-for-read))
+	      (let ((coding-system-for-read nntp-coding-system-for-read)
+                    (coding-system-for-write nntp-coding-system-for-write))
 		(funcall nntp-open-connection-function pbuffer))
 	    (error nil)
 	    (quit nil))))
-    (when process
+    (when timer 
+      (nnheader-cancel-timer timer))
+    (when (and (buffer-name pbuffer)
+	       process)
       (process-kill-without-query process)
       (nntp-wait-for process "^.*\n" buffer nil t)
       (if (memq (process-status process) '(open run))
@@ -948,7 +979,9 @@ password contained in '~/.nntp-authinfo'."
 	  (set-buffer (process-buffer (car entry)))
 	  (erase-buffer)
 	  (nntp-send-string (car entry) (concat "GROUP " group))
-	  (nntp-wait-for-string "^2.*\n")
+	  ;; allow for unexpected responses, since this can be called
+	  ;; from a timer with quit inhibited
+	  (nntp-wait-for-string "^[245].*\n")
 	  (setcar (cddr entry) group)
 	  (erase-buffer))))))
 
@@ -988,10 +1021,7 @@ password contained in '~/.nntp-authinfo'."
     (while (not (eobp))
       (end-of-line)
       (delete-char 1)
-      (insert nntp-end-of-line))
-    (forward-char -1)
-    (unless (eq (char-after (1- (point))) ?\r)
-      (insert "\r"))))
+      (insert nntp-end-of-line))))
 
 (defun nntp-retrieve-headers-with-xover (articles &optional fetch-old)
   (set-buffer nntp-server-buffer)

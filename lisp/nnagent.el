@@ -73,7 +73,8 @@
 	     (ftp-error (setq err (format "%s" arg)))))
       (nnagent-close-server)
       (nnheader-report
-       'nnagent (or err "No such file or directory: %s" dir)))
+       'nnagent (or err 
+		    (format "No such file or directory: %s" dir))))
      ((not (file-directory-p (file-truename dir)))
       (nnagent-close-server)
       (nnheader-report 'nnagent "Not a directory: %s" dir))
@@ -94,12 +95,13 @@
      (t nil))))
 
 (defun nnagent-request-type (group article)
-  (let ((gnus-plugged t))
-    (if (not (gnus-check-backend-function
-	      'request-type (car gnus-command-method)))
-	'unknown
-      (funcall (gnus-get-function gnus-command-method 'request-type)
-	       (gnus-group-real-name group) article))))
+  (unless (stringp article)
+    (let ((gnus-plugged t))
+      (if (not (gnus-check-backend-function
+		'request-type (car gnus-command-method)))
+	  'unknown
+	(funcall (gnus-get-function gnus-command-method 'request-type)
+		 (gnus-group-real-name group) article)))))
 
 (deffoo nnagent-request-newgroups (date server)
   nil)

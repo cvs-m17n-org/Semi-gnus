@@ -149,10 +149,13 @@ If it is down, start it up (again)."
 		 (cdr method-fnlist-elt))))
     ;; Maybe complain if there is no function.
     (unless (fboundp func)
+      (unless (car method)
+	(error "Trying to require a method that doesn't exist"))
       (require (car method))
-      (when (and (not (fboundp func))
-		 (not noerror))
-	(error "No such function: %s" func)))
+      (when (not (fboundp func))
+	(if noerror
+	    (setq func nil)
+	  (error "No such function: %s" func))))
     func))
 
 
@@ -305,7 +308,7 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
 	       (gnus-group-real-name group) article))))
 
 (defun gnus-request-update-mark (group article mark)
-  "Return the type (`post' or `mail') of GROUP (and ARTICLE)."
+  "Allow the backend to change the mark the user tries to put on an article."
   (let ((gnus-command-method (gnus-find-method-for-group group)))
     (if (not (gnus-check-backend-function
 	      'request-update-mark (car gnus-command-method)))

@@ -8,13 +8,14 @@ all features of Gnus and gnus-mime, so there are no need to install
 Gnus to use it, and you must not use gnus-mime for SEMI.
 
   It requires SEMI package, so please get and install SEMI package
-before to install it.
-
+before to install it. You can get SEMI from
+ftp://ftp.jaist.ac.jp/pub/elisp/semi/
+Required environment for SEMI is written in README.en of SEMI package.
 
 How to get? (via CVS)
 =====================
 
-(0) cvs login
+(0) cvs login (first time only)
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
 	login
@@ -52,11 +53,14 @@ Major tags are following:
     himi		himi branch
 
     ichikawa		ichikawa branch
+			Based on pGnus.
 
     akr			akr branch
 
     shuhei-k		shuhei-k branch
 			Mail-Followup-To/Mail-Reply-To, gnus-cache fix.
+
+For more detailed information, please read README.branch.
 
 
 How to get? (via ftp)
@@ -92,4 +96,5 @@ Semi-gnus.  To join the Semi-gnus ML, send an empty e-mail to
     semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
-please send mail to cvs@chamonix.jaist.ac.jp.
+please send mail to cvs@chamonix.jaist.ac.jp with your account name
+and UNIX /etc/passwd style crypted password.

@@ -59,15 +59,15 @@ The following specs are understood:
 (defvar gnus-inserted-opened-servers nil)
 
 (defvar gnus-server-line-format-alist
-  `((?h how ?s)
-    (?n name ?s)
-    (?w where ?s)
-    (?s status ?s)))
+  `((?h gnus-tmp-how ?s)
+    (?n gnus-tmp-name ?s)
+    (?w gnus-tmp-where ?s)
+    (?s gnus-tmp-status ?s)))
 
 (defvar gnus-server-mode-line-format-alist
-  `((?S news-server ?s)
-    (?M news-method ?s)
-    (?u user-defined ?s)))
+  `((?S gnus-tmp-news-server ?s)
+    (?M gnus-tmp-news-method ?s)
+    (?u gnus-tmp-user-defined ?s)))
 
 (defvar gnus-server-line-format-spec nil)
 (defvar gnus-server-mode-line-format-spec nil)
@@ -166,11 +166,11 @@ The following commands are available:
   (setq buffer-read-only t)
   (gnus-run-hooks 'gnus-server-mode-hook))
 
-(defun gnus-server-insert-server-line (name method)
-  (let* ((how (car method))
-	 (where (nth 1 method))
+(defun gnus-server-insert-server-line (gnus-tmp-name method)
+  (let* ((gnus-tmp-how (car method))
+	 (gnus-tmp-where (nth 1 method))
 	 (elem (assoc method gnus-opened-servers))
-	 (status (cond ((eq (nth 1 elem) 'denied)
+	 (gnus-tmp-status (cond ((eq (nth 1 elem) 'denied)
 			"(denied)")
 		       ((or (gnus-server-opened method)
 			    (eq (nth 1 elem) 'ok))
@@ -183,7 +183,7 @@ The following commands are available:
      (prog1 (1+ (point))
        ;; Insert the text.
        (eval gnus-server-line-format-spec))
-     (list 'gnus-server (intern name)))))
+     (list 'gnus-server (intern gnus-tmp-name)))))
 
 (defun gnus-enter-server-buffer ()
   "Set up the server buffer."
@@ -195,7 +195,7 @@ The following commands are available:
   "Initialize the server buffer."
   (unless (get-buffer gnus-server-buffer)
     (save-excursion
-      (set-buffer (get-buffer-create gnus-server-buffer))
+      (set-buffer (gnus-get-buffer-create gnus-server-buffer))
       (gnus-server-mode)
       (when gnus-carpal
 	(gnus-carpal-setup-buffer 'server)))))
@@ -287,7 +287,7 @@ The following commands are available:
       (error "No server on the current line")))
   (unless (assoc server gnus-server-alist)
     (error "Read-only server %s" server))
-  (gnus-dribble-enter "")
+  (gnus-dribble-touch)
   (let ((buffer-read-only nil))
     (gnus-delete-line))
   (push (assoc server gnus-server-alist) gnus-server-killed-servers)
@@ -466,9 +466,12 @@ The following commands are available:
 (defun gnus-server-scan-server (server)
   "Request a scan from the current server."
   (interactive (list (gnus-server-server-name)))
-  (gnus-message 3 "Scanning %s...done" server)
-  (gnus-request-scan nil (gnus-server-to-method server))
-  (gnus-message 3 "Scanning %s...done" server))
+  (let ((method (gnus-server-to-method server)))
+    (if (not (gnus-get-function method 'request-scan))
+	(error "Server %s can't scan" (car method))
+      (gnus-message 3 "Scanning %s..." server)
+      (gnus-request-scan nil method)
+      (gnus-message 3 "Scanning %s...done" server))))
 
 (defun gnus-server-read-server (server)
   "Browse a server."
@@ -534,7 +537,7 @@ The following commands are available:
      '("Browse"
        ["Subscribe" gnus-browse-unsubscribe-current-group t]
        ["Read" gnus-browse-read-group t]
-       ["Select" gnus-browse-read-group t]
+       ["Select" gnus-browse-select-group t]
        ["Next" gnus-browse-next-group t]
        ["Prev" gnus-browse-next-group t]
        ["Exit" gnus-browse-exit t]))
@@ -568,8 +571,7 @@ The following commands are available:
        1 "Couldn't request list: %s" (gnus-status-message method))
       nil)
      (t
-      (get-buffer-create gnus-browse-buffer)
-      (gnus-add-current-to-buffer-list)
+      (gnus-get-buffer-create gnus-browse-buffer)
       (when gnus-carpal
 	(gnus-carpal-setup-buffer 'browse))
       (gnus-configure-windows 'browse)
@@ -590,9 +592,11 @@ The following commands are available:
 	  (while (re-search-forward
 		  "\\(^[^ \t]+\\)[ \t]+[0-9]+[ \t]+[0-9]+" nil t)
 	    (goto-char (match-end 1))
-	    (push (cons (match-string 1)
-			(max 0 (- (1+ (read cur)) (read cur))))
-		  groups))))
+	    (condition-case ()
+		(push (cons (match-string 1)
+			    (max 0 (- (1+ (read cur)) (read cur))))
+		      groups)
+	      (error nil)))))
       (setq groups (sort groups
 			 (lambda (l1 l2)
 			   (string< (car l1) (car l2)))))

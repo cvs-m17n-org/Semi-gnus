@@ -133,7 +133,7 @@ If N is nil and any articles have been marked with the process mark,
 move those articles instead."
   (interactive "P")
   (let* ((articles (gnus-summary-work-articles n))
-	 (tmp-buf (get-buffer-create "*soup work*"))
+	 (tmp-buf (gnus-get-buffer-create "*soup work*"))
 	 (area (gnus-soup-area gnus-newsgroup-name))
 	 (prefix (gnus-soup-area-prefix area))
 	 headers)
@@ -161,7 +161,8 @@ move those articles instead."
 	(gnus-summary-mark-as-read (car articles) gnus-souped-mark)
 	(setq articles (cdr articles)))
       (kill-buffer tmp-buf))
-    (gnus-soup-save-areas)))
+    (gnus-soup-save-areas)
+    (gnus-set-mode-line 'summary)))
 
 (defun gnus-soup-pack-packet ()
   "Make a SOUP packet from the SOUP areas."
@@ -204,7 +205,9 @@ for matching on group names.
 For instance, if you want to brew on all the nnml groups, as well as
 groups with \"emacs\" in the name, you could say something like:
 
-$ emacs -batch -f gnus-batch-brew-soup ^nnml \".*emacs.*\""
+$ emacs -batch -f gnus-batch-brew-soup ^nnml \".*emacs.*\"
+
+Note -- this function hasn't been implemented yet."
   (interactive)
   nil)
 
@@ -509,7 +512,7 @@ Return whether the unpacking was successful."
 				 ".MSG"))
 	       (msg-buf (and (file-exists-p msg-file)
 			     (nnheader-find-file-noselect msg-file)))
-	       (tmp-buf (get-buffer-create " *soup send*"))
+	       (tmp-buf (gnus-get-buffer-create " *soup send*"))
 	       beg end)
 	  (cond
 	   ((/= (gnus-soup-encoding-format
@@ -537,8 +540,7 @@ Return whether the unpacking was successful."
 	      (search-forward "\n\n")
 	      (forward-char -1)
 	      (insert mail-header-separator)
-	      (setq message-newsreader (setq message-mailer
-					     (gnus-extended-version)))
+	      (setq message-user-agent (gnus-extended-version))
 	      (cond
 	       ((string= (gnus-soup-reply-kind (car replies)) "news")
 		(gnus-message 5 "Sending news message to %s..."

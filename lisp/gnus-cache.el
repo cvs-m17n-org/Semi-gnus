@@ -50,14 +50,32 @@
   :group 'gnus-cache
   :type '(set (const ticked) (const dormant) (const unread) (const read)))
 
+(defcustom gnus-cacheable-groups nil
+  "*Groups that match this regexp will be cached.
+
+If you only want to cache your nntp groups, you could set this
+variable to \"^nntp\".
+
+If a group matches both gnus-cacheable-groups and gnus-uncacheable-groups
+it's not cached."
+  :group 'gnus-cache
+  :type '(choice (const :tag "off" nil)
+                regexp))
+
 (defcustom gnus-uncacheable-groups nil
   "*Groups that match this regexp will not be cached.
 
 If you want to avoid caching your nnml groups, you could set this
-variable to \"^nnml\"."
+variable to \"^nnml\".
+
+If a group matches both gnus-cacheable-groups and gnus-uncacheable-groups
+it's not cached."
   :group 'gnus-cache
   :type '(choice (const :tag "off" nil)
 		 regexp))
+
+(defvar gnus-cache-overview-coding-system 'raw-text
+  "Coding system used on Gnus cache files.")
 
 
 
@@ -106,7 +124,9 @@ variable to \"^nnml\"."
 	  (set-buffer buffer)
 	  (if (> (buffer-size) 0)
 	      ;; Non-empty overview, write it to a file.
-	      (gnus-write-buffer overview-file)
+	      (let ((coding-system-for-write
+		     gnus-cache-overview-coding-system))
+		(gnus-write-buffer overview-file))
 	    ;; Empty overview file, remove it
 	    (when (file-exists-p overview-file)
 	      (delete-file overview-file))
@@ -135,11 +155,13 @@ variable to \"^nnml\"."
 	      headers (copy-sequence headers))
 	(mail-header-set-number headers (cdr result))))
     (let ((number (mail-header-number headers))
-	  file dir)
+	  file)
       (when (and number
 		 (> number 0)		; Reffed article.
 		 (or force
-		     (and (or (not gnus-uncacheable-groups)
+                     (and (or (not gnus-cacheable-groups)
+                              (string-match gnus-cacheable-groups group))
+                          (or (not gnus-uncacheable-groups)
 			      (not (string-match
 				    gnus-uncacheable-groups group)))
 			  (gnus-cache-member-of-class
@@ -147,7 +169,7 @@ variable to \"^nnml\"."
 		 (not (file-exists-p (setq file (gnus-cache-file-name
 						 group number)))))
 	;; Possibly create the cache directory.
-	(gnus-make-directory (setq dir (file-name-directory file)))
+	(gnus-make-directory (file-name-directory file))
 	;; Save the article in the cache.
 	(if (file-exists-p file)
 	    t				; The article already is saved.
@@ -347,7 +369,7 @@ Returns the list of articles removed."
 (defun gnus-summary-insert-cached-articles ()
   "Insert all the articles cached for this group into the current buffer."
   (interactive)
-  (let ((cached gnus-newsgroup-cached)
+  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '<))
 	(gnus-verbose (max 6 gnus-verbose)))
     (unless cached
       (gnus-message 3 "No cached articles for this group"))
@@ -371,7 +393,8 @@ Returns the list of articles removed."
     (save-excursion
       (setq gnus-cache-buffer
 	    (cons group
-		  (set-buffer (get-buffer-create " *gnus-cache-overview*"))))
+		  (set-buffer (gnus-get-buffer-create
+			       " *gnus-cache-overview*"))))
       (buffer-disable-undo (current-buffer))
       ;; Insert the contents of this group's cache overview.
       (erase-buffer)
@@ -459,7 +482,7 @@ Returns the list of articles removed."
       articles)))
 
 (defun gnus-cache-braid-nov (group cached &optional file)
-  (let ((cache-buf (get-buffer-create " *gnus-cache*"))
+  (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*"))
 	beg end)
     (gnus-cache-save-buffers)
     (save-excursion
@@ -491,7 +514,7 @@ Returns the list of articles removed."
     (kill-buffer cache-buf)))
 
 (defun gnus-cache-braid-heads (group cached)
-  (let ((cache-buf (get-buffer-create " *gnus-cache*")))
+  (let ((cache-buf (gnus-get-buffer-create " *gnus-cache*")))
     (save-excursion
       (set-buffer cache-buf)
       (buffer-disable-undo (current-buffer))
@@ -619,6 +642,8 @@ If LOW, update the lower bound instead."
     (when top
       (gnus-message 5 "Generating the cache active file...")
       (setq gnus-cache-active-hashtb (gnus-make-hashtable 123)))
+    (when (string-match "^\\(nn[^_]+\\)_" group)
+      (setq group (replace-match "\\1:" t t group)))
     ;; Separate articles from all other files and directories.
     (while files
       (if (string-match "^[0-9]+$" (file-name-nondirectory (car files)))
@@ -631,7 +656,7 @@ If LOW, update the lower bound instead."
     ;; Go through all the other files.
     (while alphs
       (when (and (file-directory-p (car alphs))
-		 (not (string-match "^\\.\\.?$"
+		 (not (string-match "^\\."
 				    (file-name-nondirectory (car alphs)))))
 	;; We descend directories.
 	(gnus-cache-generate-active (car alphs)))

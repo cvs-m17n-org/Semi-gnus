@@ -400,7 +400,6 @@ the line could be found."
     (unless (gnus-buffer-live-p nntp-server-buffer)
       (setq nntp-server-buffer (get-buffer-create " *nntpd*")))
     (set-buffer nntp-server-buffer)
-    (buffer-disable-undo (current-buffer))
     (erase-buffer)
     (kill-all-local-variables)
     (setq case-fold-search t)		;Should ignore case.
@@ -856,6 +855,23 @@ find-file-hooks, etc.
 (fset 'nnheader-run-at-time 'run-at-time)
 (fset 'nnheader-cancel-timer 'cancel-timer)
 (fset 'nnheader-cancel-function-timers 'cancel-function-timers)
+
+(defun nnheader-Y-or-n-p (prompt)
+  "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
+  (let ((cursor-in-echo-area t)
+	(echo-keystrokes 0)
+	(inhibit-quit t)
+	ans)
+    (let (message-log-max)
+      (while (not (memq ans '(?\  ?N ?Y ?\C-g ?\e ?\n ?\r ?n ?y)))
+	(message "%s(Y/n) " prompt)
+	(setq ans (read-char-exclusive))))
+    (if (memq ans '(?\C-g ?N ?n))
+	(progn
+	  (message "%s(Y/n) No" prompt)
+	  nil)
+      (message "%s(Y/n) Yes" prompt)
+      t)))
 
 (when (string-match "XEmacs\\|Lucid" emacs-version)
   (require 'nnheaderxm))

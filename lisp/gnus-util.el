@@ -35,6 +35,9 @@
 (require 'nnheader)
 (require 'timezone)
 (require 'message)
+(eval-when-compile
+  (when (locate-library "rmail")
+    (require 'rmail)))
 
 (eval-and-compile
   (autoload 'nnmail-date-to-time "nnmail")
@@ -75,7 +78,10 @@
 	 (set symbol nil))
      symbol))
 
-(defun gnus-truncate-string (str width)
+;; Avoid byte-compile warning.
+;; In Mule, this function will be redefined to `truncate-string',
+;; which takes 3 or 4 args.
+(defun gnus-truncate-string (str width &rest ignore)
   (substring str 0 width))
 
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
@@ -540,7 +546,7 @@ Timezone package is used."
       (progn
 	(set-buffer gnus-work-buffer)
 	(erase-buffer))
-    (set-buffer (get-buffer-create gnus-work-buffer))
+    (set-buffer (gnus-get-buffer-create gnus-work-buffer))
     (kill-all-local-variables)
     (buffer-disable-undo (current-buffer))))
 
@@ -580,6 +586,7 @@ Timezone package is used."
 Bind `print-quoted' and `print-readably' to t while printing."
   (let ((print-quoted t)
 	(print-readably t)
+	(print-escape-multibyte nil)
 	print-level print-length)
     (prin1 form (current-buffer))))
 
@@ -722,8 +729,7 @@ with potentially long computations."
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
   (let ((artbuf (current-buffer))
-	(tmpbuf (get-buffer-create " *Gnus-output*"))
-	(coding-system-for-write 'binary))
+	(tmpbuf (get-buffer-create " *Gnus-output*")))
     (save-excursion
       (or (get-file-buffer filename)
 	  (file-exists-p filename)
@@ -759,9 +765,12 @@ with potentially long computations."
 	    (when msg
 	      (goto-char (point-min))
 	      (widen)
-	      (search-backward "\^_")
-	      (narrow-to-region (point) (point-max))
-	      (goto-char (1+ (point-min)))
+ 	      (search-backward "\n\^_")
+ 	      (narrow-to-region (point) (point-max))
+ 	      (rmail-count-new-messages t)
+ 	      (when (rmail-summary-exists)
+		(rmail-select-summary
+		 (rmail-update-summary)))
 	      (rmail-count-new-messages t)
 	      (rmail-show-message msg))
 	    (save-buffer)))))
@@ -837,8 +846,7 @@ with potentially long computations."
 (defun gnus-map-function (funs arg)
   "Applies the result of the first function in FUNS to the second, and so on.
 ARG is passed to the first function."
-  (let ((myfuns funs)
-        (myarg arg))
+  (let ((myfuns funs))
     (while myfuns
       (setq arg (funcall (pop myfuns) arg)))
     arg))
@@ -856,6 +864,7 @@ ARG is passed to the first function."
 
 (defvar gnus-netrc-syntax-table
   (let ((table (copy-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?@ "w" table)
     (modify-syntax-entry ?- "w" table)
     (modify-syntax-entry ?_ "w" table)
     (modify-syntax-entry ?! "w" table)
@@ -878,50 +887,59 @@ ARG is passed to the first function."
 		      "password" "account" "macdef" "force"))
 	    alist elem result pair)
 	(nnheader-set-temp-buffer " *netrc*")
-	(set-syntax-table gnus-netrc-syntax-table)
-	(insert-file-contents file)
-	(goto-char (point-min))
-	;; Go through the file, line by line.
-	(while (not (eobp))
-	  (narrow-to-region (point) (gnus-point-at-eol))
-	  ;; For each line, get the tokens and values.
-	  (while (not (eobp))
-	    (skip-chars-forward "\t ")
-	    (unless (eobp)
-	      (setq elem (buffer-substring
-			  (point) (progn (forward-sexp 1) (point))))
-	      (cond
-	       ((equal elem "macdef")
-		;; We skip past the macro definition.
+	(unwind-protect
+	    (progn
+	      (set-syntax-table gnus-netrc-syntax-table)
+	      (insert-file-contents file)
+	      (goto-char (point-min))
+	      ;; Go through the file, line by line.
+	      (while (not (eobp))
+		(narrow-to-region (point) (gnus-point-at-eol))
+		;; For each line, get the tokens and values.
+		(while (not (eobp))
+		  (skip-chars-forward "\t ")
+		  (unless (eobp)
+		    (setq elem (buffer-substring
+				(point) (progn (forward-sexp 1) (point))))
+		    (cond
+		     ((equal elem "macdef")
+		      ;; We skip past the macro definition.
+		      (widen)
+		      (while (and (zerop (forward-line 1))
+				  (looking-at "$")))
+		      (narrow-to-region (point) (point)))
+		     ((member elem tokens)
+		      ;; Tokens that don't have a following value are ignored,
+		      ;; except "default".
+		      (when (and pair (or (cdr pair)
+					  (equal (car pair) "default")))
+			(push pair alist))
+		      (setq pair (list elem)))
+		     (t
+		      ;; Values that haven't got a preceding token are ignored.
+		      (when pair
+			(setcdr pair elem)
+			(push pair alist)
+			(setq pair nil))))))
+		(if alist
+		    (push (nreverse alist) result))
+		(setq alist nil
+		      pair nil)
 		(widen)
-		(while (and (zerop (forward-line 1))
-			    (looking-at "$")))
-		(narrow-to-region (point) (point)))
-	       ((member elem tokens)
-		;; Tokens that don't have a following value are ignored.
-		(when (and pair (cdr pair))
-		  (push pair alist))
-		(setq pair (list elem)))
-	       (t
-		;; Values that haven't got a preceding token are ignored.
-		(when pair
-		  (setcdr pair elem)
-		  (push pair alist)
-		  (setq pair nil))))))
-	  (push alist result)
-	  (setq alist nil
-		pair nil)
-	  (widen)
-	  (forward-line 1))
-	result))))
+		(forward-line 1))
+	      (nreverse result))
+	  (kill-buffer " *netrc*"))))))
 
 (defun gnus-netrc-machine (list machine)
-  "Return the netrc values from LIST for MACHINE."
-  (while (and list
-	      (not (equal (cdr (assoc "machine" (car list))) machine)))
-    (pop list))
-  (when list
-    (car list)))
+  "Return the netrc values from LIST for MACHINE or for the default entry."
+  (let ((rest list))
+    (while (and list
+		(not (equal (cdr (assoc "machine" (car list))) machine)))
+      (pop list))
+    (car (or list
+	     (progn (while (and rest (not (assoc "default" (car rest))))
+		      (pop rest))
+		    rest)))))
 
 (defun gnus-netrc-get (alist type)
   "Return the value of token TYPE from ALIST."
@@ -929,6 +947,7 @@ ARG is passed to the first function."
 
 ;;; Various
 
+(defvar gnus-group-buffer) ; Compiler directive
 (defun gnus-alive-p ()
   "Say whether Gnus is running or not."
   (and (boundp 'gnus-group-buffer)
@@ -949,7 +968,7 @@ ARG is passed to the first function."
   "Delete elements from LIST that satisfy PREDICATE."
   (let (out)
     (while list
-      (when (funcall predicate (car list))
+      (unless (funcall predicate (car list))
 	(push (car list) out))
       (pop list))
     (nreverse out)))
@@ -966,6 +985,12 @@ ARG is passed to the first function."
   (unless (symbolp alist)
     (error "Not a symbol: %s" alist))
   `(setq ,alist (delq (assq ,key ,alist) ,alist)))
+
+(defun gnus-globalify-regexp (re)
+  "Returns a regexp that matches a whole line, iff RE matches a part of it."
+  (concat (unless (string-match "^\\^" re) "^.*")
+	  re
+	  (unless (string-match "\\$$" re) ".*$")))
 
 (provide 'gnus-util)
 

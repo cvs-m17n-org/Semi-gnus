@@ -361,7 +361,7 @@ don't define this value."
 	(setq this-line-end (point))
 	(setq sending-data nil)
 	(setq sending-data (buffer-substring this-line this-line-end))
-	(if (/= (forward-line 1) 0)
+	(if (or (/= (forward-line 1) 0) (eobp))
 	    (setq data-continue nil)))
 
       (smtp-send-data-1 process sending-data)

@@ -1,3 +1,5 @@
+prefix = @prefix@
+datadir = @datadir@
 lispdir = @lispdir@
 srcdir = @srcdir@
 
@@ -23,6 +25,9 @@ l:
 info:
 	cd texi && $(MAKE) EMACS=$(EMACS) all
 
+info-ja:
+	cd texi && $(MAKE) EMACS=$(EMACS) MAKEINFO=no ja
+
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
 
@@ -37,7 +42,7 @@ x:
 
 distclean:
 	make clean
-	rm -r *~
+	rm -rf *~
 	for i in lisp texi; do (cd $$i; make distclean); done
 	rm -f config.log config.status Makefile
 

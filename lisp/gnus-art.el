@@ -2,7 +2,8 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Katsumi Yamaoka  <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -94,10 +95,25 @@
   :group 'gnus-article)
 
 (defcustom gnus-ignored-headers
-  '("^Path:" "^Posting-Version:" "^Article-I.D.:" "^Expires:"
-    "^Date-Received:" "^References:" "^Control:" "^Xref:" "^Lines:"
-    "^Posted:" "^Relay-Version:" "^Message-ID:" "^Nf-ID:" "^Nf-From:"
-    "^Approved:" "^Sender:" "^Received:" "^Mail-from:")
+  '("^Path:" "^Expires:" "^Date-Received:" "^References:" "^Xref:" "^Lines:"
+    "^Relay-Version:" "^Message-ID:" "^Approved:" "^Sender:" "^Received:" 
+    "^X-UIDL:" "^MIME-Version:" "^Return-Path:" "^In-Reply-To:"
+    "^Content-Type:" "^Content-Transfer-Encoding:" "^X-WebTV-Signature:"
+    "^X-MimeOLE:" "^X-MSMail-Priority:" "^X-Priority:" "^X-Loop:"
+    "^X-Authentication-Warning:" "^X-MIME-Autoconverted:" "^X-Face:"
+    "^X-Attribution:" "^X-Originating-IP:" "^Delivered-To:"
+    "^NNTP-[-A-Za-z]+:" "^Distribution:" "^X-no-archive:" "^X-Trace:"
+    "^X-Complaints-To:" "^X-NNTP-Posting-Host:" "^X-Orig.*:"
+    "^Abuse-Reports-To:" "^Cache-Post-Path:" "^X-Article-Creation-Date:"
+    "^X-Poster:" "^X-Mail2News-Path:" "^X-Server-Date:" "^X-Cache:"
+    "^Originator:" "^X-Problems-To:" "^X-Auth-User:" "^X-Post-Time:" 
+    "^X-Admin:" "^X-UID:" "^Resent-[-A-Za-z]+:" "^X-Mailing-List:"
+    "^Precedence:" "^Original-[-A-Za-z]+:" "^X-filename:" "^X-Orcpt:"
+    "^Old-Received:" "^X-Pgp-Fingerprint:" "^X-Pgp-Key-Id:"
+    "^X-Pgp-Public-Key-Url:" "^X-Auth:" "^X-From-Line:"
+    "^X-Gnus-Article-Number:" "^X-Majordomo:" "^X-Url:" "^X-Sender:"
+    "^X-Mailing-List:" "^MBOX-Line" "^Priority:" "^X-Pgp" "^X400-[-A-Za-z]+:"
+    "^Status:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -107,7 +123,7 @@ If `gnus-visible-headers' is non-nil, this variable will be ignored."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-visible-headers
-  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
+  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^\\(Mail-\\)?Followup-To:\\|^\\(Mail-\\)?Reply-To:\\|^Mail-Copies-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
   "*All headers that do not match this regexp will be hidden.
 This variable can also be a list of regexp of headers to remain visible.
 If this variable is non-nil, `gnus-ignored-headers' will be ignored."
@@ -364,7 +380,7 @@ be used as possible file names."
 			 (sexp :value nil))))
 
 (defcustom gnus-strict-mime t
-  "*If nil, MIME-decode even if there is no Mime-Version header."
+  "*If nil, MIME-decode even if there is no MIME-Version header."
   :group 'gnus-article-mime
   :type 'boolean)
 
@@ -456,12 +472,12 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
 (defface gnus-header-from-face
   '((((class color)
       (background dark))
-     (:foreground "spring green" :bold t))
+     (:foreground "spring green"))
     (((class color)
       (background light))
-     (:foreground "red3" :bold t))
+     (:foreground "red3"))
     (t
-     (:bold t :italic t)))
+     (:italic t)))
   "Face used for displaying from headers."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
@@ -469,10 +485,10 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
 (defface gnus-header-subject-face
   '((((class color)
       (background dark))
-     (:foreground "SeaGreen3" :bold t))
+     (:foreground "SeaGreen3"))
     (((class color)
       (background light))
-     (:foreground "red4" :bold t))
+     (:foreground "red4"))
     (t
      (:bold t :italic t)))
   "Face used for displaying subject headers."
@@ -482,12 +498,12 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
 (defface gnus-header-newsgroups-face
   '((((class color)
       (background dark))
-     (:foreground "yellow" :bold t :italic t))
+     (:foreground "yellow" :italic t))
     (((class color)
       (background light))
-     (:foreground "MidnightBlue" :bold t :italic t))
+     (:foreground "MidnightBlue" :italic t))
     (t
-     (:bold t :italic t)))
+     (:italic t)))
   "Face used for displaying newsgroups headers."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
@@ -588,7 +604,7 @@ Initialized from `text-mode-syntax-table.")
    b e (cons 'article-type (cons type gnus-hidden-properties))))
 
 (defun gnus-article-unhide-text-type (b e type)
-  "Hide text of TYPE between B and E."
+  "Unhide text of TYPE between B and E."
   (remove-text-properties
    b e (cons 'article-type (cons type gnus-hidden-properties)))
   (when (memq 'intangible gnus-hidden-properties)
@@ -667,7 +683,7 @@ always hide."
 			     (listp gnus-visible-headers))
 			(mapconcat 'identity gnus-visible-headers "\\|"))))
 		(inhibit-point-motion-hooks t)
-		want-list beg)
+		beg)
 	    ;; First we narrow to just the headers.
 	    (widen)
 	    (goto-char (point-min))
@@ -760,8 +776,8 @@ always hide."
 		       from reply-to
 		       (ignore-errors
 			 (equal
-			  (nth 1 (mail-extract-address-components from))
-			  (nth 1 (mail-extract-address-components reply-to)))))
+			  (nth 1 (funcall gnus-extract-address-components from))
+			  (nth 1 (funcall gnus-extract-address-components reply-to)))))
 		  (gnus-article-hide-header "reply-to"))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
@@ -902,12 +918,13 @@ characters to translate to."
       (delete-process "article-x-face"))
     (let ((inhibit-point-motion-hooks t)
 	  (case-fold-search t)
-	  from)
+	  from last)
       (save-restriction
 	(nnheader-narrow-to-headers)
 	(setq from (message-fetch-field "from"))
 	(goto-char (point-min))
 	(while (and gnus-article-x-face-command
+		    (not last)
 		    (or force
 			;; Check whether this face is censored.
 			(not gnus-article-x-face-too-ugly)
@@ -916,6 +933,12 @@ characters to translate to."
 						from))))
 		    ;; Has to be present.
 		    (re-search-forward "^X-Face: " nil t))
+	  ;; This used to try to do multiple faces (`while' instead of
+	  ;; `when' above), but (a) sending multiple EOFs to xv doesn't
+	  ;; work (b) it can crash some versions of Emacs (c) are
+	  ;; multiple faces really something to encourage?
+	  (when (stringp gnus-article-x-face-command)
+	    (setq last t))
 	  ;; We now have the area of the buffer where the X-Face is stored.
 	  (save-excursion
 	    (let ((beg (point))
@@ -958,27 +981,25 @@ always hide."
 	(goto-char (point-min))
 	;; Hide the "header".
 	(when (search-forward "\n-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
-	  (gnus-article-hide-text-type (1+ (match-beginning 0))
-				       (match-end 0) 'pgp)
+	  (delete-region (1+ (match-beginning 0)) (match-end 0))
 	  (setq beg (point))
 	  ;; Hide the actual signature.
 	  (and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
 	       (setq end (1+ (match-beginning 0)))
-	       (gnus-article-hide-text-type
+	       (delete-region
 		end
 		(if (search-forward "\n-----END PGP SIGNATURE-----\n" nil t)
 		    (match-end 0)
 		  ;; Perhaps we shouldn't hide to the end of the buffer
 		  ;; if there is no end to the signature?
-		  (point-max))
-		'pgp))
+		  (point-max))))
 	  ;; Hide "- " PGP quotation markers.
 	  (when (and beg end)
 	    (narrow-to-region beg end)
 	    (goto-char (point-min))
 	    (while (re-search-forward "^- " nil t)
-	      (gnus-article-hide-text-type
-	       (match-beginning 0) (match-end 0) 'pgp))
+	      (delete-region
+	       (match-beginning 0) (match-end 0)))
 	    (widen))
 	  (gnus-run-hooks 'gnus-article-hide-pgp-hook))))))
 
@@ -1081,42 +1102,32 @@ always hide."
       (while (re-search-forward "^[ \t]*\n" nil t)
 	(replace-match "" t t)))))
 
-(defvar mime::preview/content-list)
-(defvar mime::preview-content-info/point-min)
 (defun gnus-article-narrow-to-signature ()
   "Narrow to the signature; return t if a signature is found, else nil."
   (widen)
-  (when (and (boundp 'mime::preview/content-list)
-	     mime::preview/content-list)
-    ;; We have a MIMEish article, so we use the MIME data to narrow.
-    (let ((pcinfo (car (last mime::preview/content-list))))
-      (ignore-errors
-	(narrow-to-region
-	 (funcall (intern "mime::preview-content-info/point-min") pcinfo)
-	 (point-max)))))
-
-  (when (gnus-article-search-signature)
-    (forward-line 1)
-    ;; Check whether we have some limits to what we consider
-    ;; to be a signature.
-    (let ((limits (if (listp gnus-signature-limit) gnus-signature-limit
-		    (list gnus-signature-limit)))
-	  limit limited)
-      (while (setq limit (pop limits))
-	(if (or (and (integerp limit)
-		     (< (- (point-max) (point)) limit))
-		(and (floatp limit)
-		     (< (count-lines (point) (point-max)) limit))
-		(and (gnus-functionp limit)
-		     (funcall limit))
-		(and (stringp limit)
-		     (not (re-search-forward limit nil t))))
-	    ()				; This limit did not succeed.
-	  (setq limited t
-		limits nil)))
-      (unless limited
-	(narrow-to-region (point) (point-max))
-	t))))
+  (let ((inhibit-point-motion-hooks t))
+    (when (gnus-article-search-signature)
+      (forward-line 1)
+      ;; Check whether we have some limits to what we consider
+      ;; to be a signature.
+      (let ((limits (if (listp gnus-signature-limit) gnus-signature-limit
+		      (list gnus-signature-limit)))
+	    limit limited)
+	(while (setq limit (pop limits))
+	  (if (or (and (integerp limit)
+		       (< (- (point-max) (point)) limit))
+		  (and (floatp limit)
+		       (< (count-lines (point) (point-max)) limit))
+		  (and (gnus-functionp limit)
+		       (funcall limit))
+		  (and (stringp limit)
+		       (not (re-search-forward limit nil t))))
+	      ()			; This limit did not succeed.
+	    (setq limited t
+		  limits nil)))
+	(unless limited
+	  (narrow-to-region (point) (point-max))
+	  t)))))
 
 (defun gnus-article-search-signature ()
   "Search the current buffer for the signature separator.
@@ -1193,8 +1204,7 @@ means show, 0 means toggle."
 
 (defun gnus-article-hidden-text-p (type)
   "Say whether the current buffer contains hidden text of type TYPE."
-  (let ((start (point-min))
-	(pos (text-property-any (point-min) (point-max) 'article-type type)))
+  (let ((pos (text-property-any (point-min) (point-max) 'article-type type)))
     (while (and pos
 		(not (get-text-property pos 'invisible)))
       (setq pos
@@ -1409,7 +1419,7 @@ is to run."
   (unless n
     (setq n 1))
   (gnus-stop-date-timer)
-  (setq article-lapsed-timer 
+  (setq article-lapsed-timer
 	(nnheader-run-at-time 1 n 'article-update-date-lapsed)))
 
 (defun gnus-stop-date-timer ()
@@ -1843,7 +1853,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Scroll backwards" gnus-article-goto-prev-page t]
        ["Show summary" gnus-article-show-summary t]
        ["Fetch Message-ID at point" gnus-article-refer-article t]
-       ["Mail to address at point" gnus-article-mail t]))
+       ["Mail to address at point" gnus-article-mail t]
+       ["Send a bug report" gnus-bug t]))
 
     (easy-menu-define
      gnus-article-treatment-menu gnus-article-mode-map ""
@@ -1890,9 +1901,9 @@ commands:
   (use-local-map gnus-article-mode-map)
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
-  (make-local-variable 'gnus-page-broken) 
-  (make-local-variable 'gnus-button-marker-list) 
-  (make-local-variable 'gnus-article-current-summary) 
+  (make-local-variable 'gnus-page-broken)
+  (make-local-variable 'gnus-button-marker-list)
+  (make-local-variable 'gnus-article-current-summary)
   (gnus-set-default-directory)
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
@@ -1918,23 +1929,20 @@ commands:
 	(gnus-set-global-variables)))
     ;; Init original article buffer.
     (save-excursion
-      (set-buffer (get-buffer-create gnus-original-article-buffer))
+      (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
       (buffer-disable-undo (current-buffer))
       (setq major-mode 'gnus-original-article-mode)
-      (gnus-add-current-to-buffer-list)
       (make-local-variable 'gnus-original-article))
     (if (get-buffer name)
 	(save-excursion
 	  (set-buffer name)
 	  (buffer-disable-undo (current-buffer))
 	  (setq buffer-read-only t)
-	  (gnus-add-current-to-buffer-list)
 	  (unless (eq major-mode 'gnus-article-mode)
 	    (gnus-article-mode))
 	  (current-buffer))
       (save-excursion
-	(set-buffer (get-buffer-create name))
-	(gnus-add-current-to-buffer-list)
+	(set-buffer (gnus-get-buffer-create name))
 	(gnus-article-mode)
 	(make-local-variable 'gnus-summary-buffer)
 	(current-buffer)))))
@@ -1959,27 +1967,24 @@ commands:
 
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
+  ;; called from `gnus-original-article-buffer'.
+  (let ((default-mime-charset (save-excursion
+				(set-buffer gnus-summary-buffer)
+				default-mime-charset)))
+    (mime-display-message mime-message-structure
+			  gnus-article-buffer nil gnus-article-mode-map))
+  ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
 	(function gnus-article-push-button))
-  (let ((default-mime-charset
-	  (save-excursion
-	    (set-buffer gnus-summary-buffer)
-	    default-mime-charset))
-	)
-    (mime-display-message mime-message-structure
-			  gnus-article-buffer nil gnus-article-mode-map)
-    )
-  (run-hooks 'gnus-mime-article-prepare-hook)
-  )
+  (run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-display-traditional-message ()
   "Article display method for traditional message."
   (set-buffer gnus-article-buffer)
   (let (buffer-read-only)
     (erase-buffer)
-    (insert-buffer-substring gnus-original-article-buffer)
-    ))
+    (insert-buffer-substring gnus-original-article-buffer)))
 
 (defun gnus-article-display-message-with-encoded-word ()
   "Article display method for message with encoded-words."
@@ -1991,12 +1996,41 @@ commands:
       (eword-decode-header charset)
       (goto-char (point-min))
       (if (search-forward "\n\n" nil t)
-	  (decode-mime-charset-region (match-end 0) (point-max) charset))
-      )
-    (mime-maybe-hide-echo-buffer)
-    )
-  (gnus-run-hooks 'gnus-mime-article-prepare-hook)
-  )
+	  (decode-mime-charset-region (match-end 0) (point-max) charset)))
+    (mime-maybe-hide-echo-buffer))
+  (gnus-run-hooks 'gnus-mime-article-prepare-hook))
+
+(defun gnus-article-make-full-mail-header (&optional number charset)
+  "Create a new mail header structure in a raw article buffer."
+  (unless (and number charset)
+    (save-current-buffer
+      (set-buffer gnus-summary-buffer)
+      (unless number
+	(setq number (or (cdr gnus-article-current) 0)))
+      (unless charset
+	(setq charset (or default-mime-charset 'x-ctext)))))
+  (goto-char (point-min))
+  (let ((header-end (if (search-forward "\n\n" nil t)
+			(1- (point))
+		      (goto-char (point-max))))
+	(chars (- (point-max) (point)))
+	(lines (count-lines (point) (point-max)))
+	(default-mime-charset charset)
+	xref)
+    (narrow-to-region (point-min) header-end)
+    (setq xref (std11-fetch-field "xref"))
+    (prog1
+	(make-full-mail-header
+	 number
+	 (std11-fetch-field "subject")
+	 (std11-fetch-field "from")
+	 (std11-fetch-field "date")
+	 (std11-fetch-field "message-id")
+	 (std11-fetch-field "references")
+	 chars
+	 lines
+	 (when xref (concat "Xref: " xref)))
+      (widen))))
 
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
@@ -2010,7 +2044,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (setq gnus-summary-buffer (current-buffer))
     (let* ((gnus-article (if header (mail-header-number header) article))
 	   (summary-buffer (current-buffer))
-	   (internal-hook gnus-article-internal-prepare-hook)
+	   (gnus-tmp-internal-hook gnus-article-internal-prepare-hook)
 	   (group gnus-newsgroup-name)
 	   result)
       (save-excursion
@@ -2037,9 +2071,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (message "Message marked for downloading"))
 		  (gnus-summary-mark-article article gnus-canceled-mark)
 		  (unless (memq article gnus-newsgroup-sparse)
-		    (gnus-error 1 
+		    (gnus-error 1
 		     "No such article (may have expired or been canceled)")))))
-	  (if (or (eq result 'pseudo) (eq result 'nneething))
+	  (if (or (eq result 'pseudo)
+		  (eq result 'nneething))
 	      (progn
 		(save-excursion
 		  (set-buffer summary-buffer)
@@ -2072,7 +2107,12 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(unless (vectorp gnus-current-headers)
 		  (setq gnus-current-headers nil))
 		(gnus-summary-goto-subject gnus-current-article)
-		(gnus-summary-show-thread)
+		(when (gnus-summary-show-thread)
+		  ;; If the summary buffer really was folded, the
+		  ;; previous goto may not actually have gone to
+		  ;; the right article, but the thread root instead.
+		  ;; So we go again.
+		  (gnus-summary-goto-subject gnus-current-article))
 		(gnus-run-hooks 'gnus-mark-article-hook)
 		(gnus-set-mode-line 'summary)
 		(when (gnus-visual-p 'article-highlight 'highlight)
@@ -2085,25 +2125,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      (let ((method
-		     (if gnus-show-mime
-			 (progn
-			   (mime-parse-buffer)
-			   (if (or (not gnus-strict-mime)
-				   (mime-fetch-field "MIME-Version"))
-			       gnus-article-display-method-for-mime
-			     gnus-article-display-method-for-encoded-word))
-		       gnus-article-display-method-for-traditional)))
-		;; Hooks for getting information from the article.
-		;; This hook must be called before being narrowed.
-		(gnus-run-hooks 'internal-hook)
-		(gnus-run-hooks 'gnus-article-prepare-hook)
-		;; Display message.
-		(funcall method)
-		;; Associate this article with the current summary buffer.
-		(setq gnus-article-current-summary summary-buffer)
-		;; Perform the article display hooks.
-		(gnus-run-hooks 'gnus-article-display-hook))
+	      (gnus-article-prepare-display)
 	      ;; Do page break.
 	      (goto-char (point-min))
 	      (setq gnus-page-broken
@@ -2113,7 +2135,29 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (gnus-set-mode-line 'article)
 	    (gnus-configure-windows 'article)
 	    (goto-char (point-min))
+	    (search-forward "\n\n" nil t)
+	    (set-window-point (get-buffer-window (current-buffer)) (point))
 	    t))))))
+
+(defun gnus-article-prepare-display ()
+  "Make the current buffer look like a nice article."
+  (let ((method
+	 (if gnus-show-mime
+	     (progn
+	       (mime-parse-buffer)
+	       (if (or (not gnus-strict-mime)
+		       (mime-fetch-field "MIME-Version"))
+		   gnus-article-display-method-for-mime
+		 gnus-article-display-method-for-encoded-word))
+	   gnus-article-display-method-for-traditional)))
+    (gnus-run-hooks 'gnus-tmp-internal-hook)
+    (gnus-run-hooks 'gnus-article-prepare-hook)
+    ;; Display message.
+    (funcall method)
+    ;; Associate this article with the current summary buffer.
+    (setq gnus-article-current-summary (current-buffer))
+    ;; Perform the article display hooks.
+    (gnus-run-hooks 'gnus-article-display-hook)))
 
 (defun gnus-article-wash-status ()
   "Return a string which display status of article washing."
@@ -2137,7 +2181,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	      (if mime ?m ? )
 	      (if emphasis ?e ? )))))
 
-(defun gnus-article-hide-headers-if-wanted ()
+(fset 'gnus-article-hide-headers-if-wanted 'gnus-article-maybe-hide-headers)
+
+(defun gnus-article-maybe-hide-headers ()
   "Hide unwanted headers if `gnus-have-all-headers' is nil.
 Provided for backwards compatibility."
   (or (save-excursion (set-buffer gnus-summary-buffer) gnus-have-all-headers)
@@ -2386,7 +2432,7 @@ If given a prefix, show the hidden text instead."
   (gnus-article-hide-signature arg))
 
 (defun gnus-article-maybe-highlight ()
-  "Do some article highlighting if `article-visual' is non-nil."
+  "Do some article highlighting if article highlighting is requested."
   (when (gnus-visual-p 'article-highlight 'highlight)
     (gnus-article-highlight-some)))
 
@@ -2399,7 +2445,7 @@ If given a prefix, show the hidden text instead."
 
 (defun gnus-request-article-this-buffer (article group)
   "Get an article and insert it into this buffer."
-  (let (do-update-line)
+  (let (do-update-line sparse-header)
     (prog1
 	(save-excursion
 	  (erase-buffer)
@@ -2433,7 +2479,7 @@ If given a prefix, show the hidden text instead."
 		    (setq do-update-line article)
 		    (setq article (mail-header-id header))
 		    (let ((gnus-override-method gnus-refer-article-method))
-		      (gnus-read-header article))
+		      (setq sparse-header (gnus-read-header article)))
 		    (setq gnus-newsgroup-sparse
 			  (delq article gnus-newsgroup-sparse)))
 		   ((vectorp header)
@@ -2448,8 +2494,11 @@ If given a prefix, show the hidden text instead."
 			       gnus-newsgroup-name)))
 		  (when (and (eq (car method) 'nneething)
 			     (vectorp header))
-		    (let ((dir (concat (file-name-as-directory (nth 1 method))
-				       (mail-header-subject header))))
+		    (let ((dir (concat
+				(file-name-as-directory
+				 (or (cadr (assq 'nneething-address method))
+				     (nth 1 method)))
+				(mail-header-subject header))))
 		      (when (file-directory-p dir)
 			(setq article 'nneething)
 			(gnus-group-enter-directory dir))))))))
@@ -2498,13 +2547,33 @@ If given a prefix, show the hidden text instead."
 	   ;; It was a pseudo.
 	   (t article)))
 
+      ;; Associate this article with the current summary buffer.
+      (setq gnus-article-current-summary gnus-summary-buffer)
+
+      ;; Take the article from the original article buffer
+      ;; and place it in the buffer it's supposed to be in.
+      (when (and (get-buffer gnus-article-buffer)
+		 (equal (buffer-name (current-buffer))
+			(buffer-name (get-buffer gnus-article-buffer))))
+	(save-excursion
+	  (if (get-buffer gnus-original-article-buffer)
+	      (set-buffer gnus-original-article-buffer)
+	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
+	    (buffer-disable-undo (current-buffer))
+	    (setq major-mode 'gnus-original-article-mode)
+	    (setq buffer-read-only t))
+	  (let (buffer-read-only)
+	    (erase-buffer)
+	    (insert-buffer-substring gnus-article-buffer))
+	  (setq gnus-original-article (cons group article))))
+
       ;; Update sparse articles.
       (when (and do-update-line
 		 (or (numberp article)
 		     (stringp article)))
 	(let ((buf (current-buffer)))
 	  (set-buffer gnus-summary-buffer)
-	  (gnus-summary-update-article do-update-line)
+	  (gnus-summary-update-article do-update-line sparse-header)
 	  (gnus-summary-goto-subject do-update-line nil t)
 	  (set-window-point (get-buffer-window (current-buffer) t)
 			    (point))
@@ -2518,6 +2587,12 @@ If given a prefix, show the hidden text instead."
   "Hook run in article edit mode buffers."
   :group 'gnus-article-various
   :type 'hook)
+
+(defcustom gnus-article-edit-article-setup-function
+  'gnus-article-mime-edit-article-setup
+  "Function called to setup an editing article buffer."
+  :group 'gnus-article-various
+  :type 'function)
 
 (defvar gnus-article-edit-done-function nil)
 
@@ -2571,10 +2646,13 @@ groups."
   (let ((winconf (current-window-configuration)))
     (set-buffer gnus-article-buffer)
     (gnus-article-edit-mode)
+    (gnus-article-delete-text-of-type 'annotation)
     (gnus-set-text-properties (point-min) (point-max) nil)
     (gnus-configure-windows 'edit-article)
     (setq gnus-article-edit-done-function exit-func)
     (setq gnus-prev-winconf winconf)
+    (when gnus-article-edit-article-setup-function
+      (funcall gnus-article-edit-article-setup-function))
     (gnus-message 6 "C-c C-c to end edits")))
 
 (defun gnus-article-edit-done (&optional arg)
@@ -2605,6 +2683,8 @@ groups."
   (let ((func gnus-article-edit-done-function)
 	(buf (current-buffer))
 	(start (window-start)))
+    (remove-hook 'gnus-article-mode-hook
+		 'gnus-article-mime-edit-article-unwind)
     (gnus-article-edit-exit)
     (save-excursion
       (set-buffer buf)
@@ -2654,6 +2734,86 @@ groups."
     (search-forward-regexp "^$" nil t)
     (let ((case-fold-search nil))
       (query-replace-regexp "\\([.!?][])}]* \\)\\([[({A-Z]\\)" "\\1 \\2"))))
+
+;;;
+;;; Article editing with MIME-Edit
+;;;
+
+(defcustom gnus-article-mime-edit-article-setup-hook nil
+  "Hook run after setting up a MIME editing article buffer."
+  :group 'gnus-article-various
+  :type 'hook)
+
+(defun gnus-article-mime-edit-article-unwind ()
+  "Unwind `gnus-article-buffer' if article editing was given up."
+  (remove-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (when mime-edit-mode-flag
+    (mime-edit-exit 'nomime 'no-error)
+    (message ""))
+  (when (featurep 'font-lock)
+    (setq font-lock-defaults nil)
+    (font-lock-mode 0)))
+
+(defun gnus-article-mime-edit-article-setup ()
+  "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
+after replacing with the original article."
+  (setq gnus-show-mime t)
+  (setq gnus-article-edit-done-function
+	`(lambda (&rest args)
+	   (when mime-edit-mode-flag
+	     (mime-edit-exit)
+	     (message ""))
+	   (goto-char (point-min))
+	   (let (case-fold-search)
+	     (when (re-search-forward
+		    (format "^%s$" (regexp-quote mail-header-separator))
+		    nil t)
+	       (replace-match "")))
+	   (when (featurep 'font-lock)
+	     (setq font-lock-defaults nil)
+	     (font-lock-mode 0))
+	   (apply ,gnus-article-edit-done-function args)
+	   (set-buffer gnus-original-article-buffer)
+	   (erase-buffer)
+	   (insert-buffer gnus-article-buffer)
+	   (setq gnus-current-headers (gnus-article-make-full-mail-header))
+	   (gnus-article-prepare-display)))
+  (define-key (current-local-map) "\C-c\C-k" 'gnus-article-mime-edit-exit)
+  (erase-buffer)
+  (insert-buffer gnus-original-article-buffer)
+  (mime-edit-again)
+  (when (featurep 'font-lock)
+    (set (make-local-variable 'font-lock-defaults)
+	 '(message-font-lock-keywords t))
+    (font-lock-set-defaults)
+    (turn-on-font-lock))
+  (add-hook 'gnus-article-mode-hook 'gnus-article-mime-edit-article-unwind)
+  (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
+
+(defun gnus-article-mime-edit-exit ()
+  "Exit the article MIME editing without updating."
+  (interactive)
+  (let ((winconf gnus-prev-winconf)
+	buf)
+    (when mime-edit-mode-flag
+      (mime-edit-exit)
+      (message ""))
+    (goto-char (point-min))
+    (let (case-fold-search)
+      (when (re-search-forward
+	     (format "^%s$" (regexp-quote mail-header-separator)) nil t)
+	(replace-match "")))
+    (when (featurep 'font-lock)
+      (setq font-lock-defaults nil)
+      (font-lock-mode 0))
+    ;; We remove all text props from the article buffer.
+    (setq buf (format "%s" (buffer-string)))
+    (set-buffer (get-buffer-create gnus-original-article-buffer))
+    (erase-buffer)
+    (insert buf)
+    (setq gnus-current-headers (gnus-article-make-full-mail-header))
+    (gnus-article-prepare-display)
+    (set-window-configuration winconf)))
 
 ;;;
 ;;; Article highlights
@@ -2755,6 +2915,7 @@ call it with the value of the `gnus-data' text property."
   (let* ((pos (posn-point (event-start event)))
          (data (get-text-property pos 'gnus-data))
 	 (fun (get-text-property pos 'gnus-callback)))
+    (goto-char pos)
     (when fun
       (funcall fun data))))
 
@@ -3113,7 +3274,7 @@ forbidden in URL encoding."
   ;; Send mail to someone
   (when (string-match "mailto:/*\\(.*\\)" url)
     (setq url (substring url (match-beginning 1) nil)))
-  (let (to args source-url subject func)
+  (let (to args subject func)
     (if (string-match (regexp-quote "?") url)
         (setq to (gnus-url-unhex-string (substring url 0 (match-beginning 0)))
               args (gnus-url-parse-query-string
@@ -3121,26 +3282,29 @@ forbidden in URL encoding."
       (setq to (gnus-url-unhex-string url)))
     (setq args (cons (list "to" to) args)
           subject (cdr-safe (assoc "subject" args)))
-    (message-mail)
-    (while args
-      (setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
-      (if (fboundp func)
-          (funcall func)
-        (message-position-on-field (caar args)))
-      (insert (mapconcat 'identity (cdar args) ", "))
-      (setq args (cdr args)))
-    (if subject
-        (message-goto-body)
-      (message-goto-subject))))
+    (gnus-setup-message 'reply
+      (message-mail)
+      (while args
+	(setq func (intern-soft (concat "message-goto-" (downcase (caar args)))))
+	(if (fboundp func)
+	    (funcall func)
+	  (message-position-on-field (caar args)))
+	(insert (mapconcat 'identity (cdar args) ", "))
+	(setq args (cdr args)))
+      (if subject
+	  (message-goto-body)
+	(message-goto-subject)))))
 
 (defun gnus-button-mailto (address)
   ;; Mail to ADDRESS.
   (set-buffer (gnus-copy-article-buffer))
-  (message-reply address))
+  (gnus-setup-message 'reply
+    (message-reply address)))
 
 (defun gnus-button-reply (address)
   ;; Reply to ADDRESS.
-  (message-reply address))
+  (gnus-setup-message 'reply
+    (message-reply address)))
 
 (defun gnus-button-url (address)
   "Browse ADDRESS."
@@ -3172,7 +3336,8 @@ forbidden in URL encoding."
     (gnus-eval-format
      gnus-prev-page-line-format nil
      `(gnus-prev t local-map ,gnus-prev-page-map
-		 gnus-callback gnus-article-button-prev-page))))
+		 gnus-callback gnus-article-button-prev-page
+		 gnus-type annotation))))
 
 (defvar gnus-next-page-map nil)
 (unless gnus-next-page-map
@@ -3200,9 +3365,10 @@ forbidden in URL encoding."
 (defun gnus-insert-next-page-button ()
   (let ((buffer-read-only nil))
     (gnus-eval-format gnus-next-page-line-format nil
-		      `(gnus-next t local-map ,gnus-next-page-map
-				  gnus-callback
-				  gnus-article-button-next-page))))
+		      `(gnus-next
+			t local-map ,gnus-next-page-map
+			gnus-callback gnus-article-button-next-page
+			gnus-type annotation))))
 
 (defun gnus-article-button-next-page (arg)
   "Go to the next page."
@@ -3225,7 +3391,7 @@ forbidden in URL encoding."
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity nil nil default-mime-charset)
+  (mime-insert-decoded-header entity)
   )
 
 (set-alist 'mime-header-presentation-method-alist
@@ -3240,9 +3406,6 @@ forbidden in URL encoding."
     (gnus-article-show-summary)
     (gnus-summary-select-article nil t)
     ))
-
-(set-alist 'mime-raw-representation-type-alist
-	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
 	   'gnus-original-article-mode #'gnus-mime-preview-quitting-method)
