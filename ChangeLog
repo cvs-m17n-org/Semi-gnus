@@ -1,3 +1,8 @@
+2000-05-10   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Don't bind
+	`bbdb-use-pop-up' while executing `bbdb-pop-up-bbdb-buffer'.
+
 2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-debug): Break MIME tags from the snoopies.
