@@ -3990,6 +3990,7 @@ This sub function is for exclusive use of `message-send-mail'."
 		  (message-narrow-to-headers)
 		  (and news
 		       (or (message-fetch-field "cc")
+			   (message-fetch-field "bcc")
 			   (message-fetch-field "to"))
 		       (let ((ct (mime-read-Content-Type)))
 			 (or (not ct)
