@@ -142,7 +142,7 @@
 	(message-setup-hook (and group (not (equal group "nndraft:queue"))
 				 message-setup-hook))
 	type method)
-    (gnus-draft-setup-for-sending article (or group "nndraft:queue"))
+    (gnus-draft-setup-for-editing article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
     (save-restriction
@@ -157,22 +157,16 @@
     (gnus-agent-restore-gcc)
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (when (let ((mail-header-separator ""))
-	    (cond ((eq type 'news)
-		   (mime-edit-maybe-split-and-send
-		    (function
-		     (lambda ()
-		       (interactive)
-		       (funcall message-send-news-function method))))
-		   (funcall message-send-news-function method))
-		  ((eq type 'mail)
-		   (mime-edit-maybe-split-and-send
-		    (function
-		     (lambda ()
-		       (interactive)
-		       (funcall message-send-mail-function))))
-		   (funcall message-send-mail-function)
-		   t)))
+    (when (and (or (null method)
+		   (gnus-server-opened method)
+		   (gnus-open-server method))
+	       (if type
+		   (let ((message-this-is-news (eq type 'news))
+			 (message-this-is-mail (eq type 'mail))
+			 (gnus-post-method method)
+			 (message-post-method method))
+		     (message-send-and-exit))
+		 (message-send-and-exit)))
       (let ((gnus-verbose-backends nil))
 	(gnus-request-expire-articles
 	 (list article) (or group "nndraft:queue") t)))))
