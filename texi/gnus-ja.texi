@@ -11801,15 +11801,29 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @item nntp-open-network-stream
 $B$3$l$O%G%#%U%)%k%H$G!"C1=c$K1s3V%7%9%F%`$N%]!<%H$J$I$K@\B3$7$^$9!#(B
 
+@findex nntp-open-tls-stream
+@item nntp-open-tls-stream
+@dfn{$B0BA4$J(B} $B%A%c%s%M%k$r;H$C$F%5!<%P!<$K@\B3$7$^$9!#$3$l$r;H$&$?$a$K$O!"(B
+GNUTLS (@uref{http://www.gnu.org/software/gnutls/} $B;2>H(B) $B$r%$%s%9%H!<%k(B
+$B$7$F$*$+$J$1$l$P$J$j$^$;$s!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5A$7$^$9(B:
+
+@lisp
+;; $B%]!<%H(B 563 $B$,(B "nntps" $B$H$7$F(B /etc/services $B$GDj5A:Q$_$G$"$C$F$b(B
+;; gnutls-cli -p $B$G$=$NL>A0$O;H$($^$;$s!#(B
+;;
+(nntp "snews.bar.com"
+      (nntp-open-connection-function nntp-open-tls-stream)
+      (nntp-port-number )
+      (nntp-address "snews.bar.com"))
+@end lisp
+
 @findex nntp-open-ssl-stream
 @item nntp-open-ssl-stream
 @dfn{$B0BA4$J(B} $B%A%c%s%M%k$r;H$C$F%5!<%P!<$K@\B3$7$^$9!#$3$l$r;H$&$?$a$K$O!"(B
-OpenSSL (@uref{http://www.openssl.org}) $B$+(B SSLeay $B$,%$%s%9%H!<%k$5$l$F$$(B
+OpenSSL (@uref{http://www.openssl.org}) $B$+(B SSLeay $B$r%$%s%9%H!<%k$7$F$*$+(B
 $B$J$1$l$P$J$j$^$;$s!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5A$7$^$9(B:
 
 @lisp
-;; $BJT=8$7=*$o$C$?$i(B `C-c C-c' $B$r%?%$%W$7$F2<$5$$!#(B
-;;
 ;; $B%]!<%H(B 563 $B$,(B "snews" $B$H$7$F(B /etc/services $B$GDj5A:Q$_$G$"$C$F$b(B
 ;; openssl s_client -port $B$G$=$NL>A0$O;H$($^$;$s!#(B
 ;;
@@ -11931,9 +11945,10 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 @item nntp-pre-command
 @vindex nntp-pre-command
 $BAG$N@\B3MQ$N4X(B
-$B?t(B (@code{nntp-open-network-stream} $B$H(B @code{nntp-open-ssl-stream} $B$@$1(B
-$B$@$H;W$&(B) $B$G$O$J$$$b$N$rDL$7$F@\B3$9$k$H$-$K;H$&%3%^%s%I%i%C%Q!<$G$9!#Nc(B
-$B$($P$"$J$?$O(B @samp{SOCKS} $B%i%C%Q!<$r3d$jEv$F$k$G$7$g$&!#(B
+$B?t(B (@code{nntp-open-network-stream}$B!"(B@code{nntp-open-tls-stream} $B$*$h(B
+$B$S(B @code{nntp-open-ssl-stream} $B$@$1$@$H;W$&(B) $B$G$O$J$$$b$N$rDL$7$F@\B3$9(B
+$B$k$H$-$K;H$&%3%^%s%I%i%C%Q!<$G$9!#Nc$($P$"$J$?$O(B @samp{SOCKS} $B%i%C%Q!<$r(B
+$B3d$jEv$F$k$G$7$g$&!#(B
 
 @item nntp-address
 @vindex nntp-address
@@ -11942,9 +11957,10 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 @item nntp-port-number
 @vindex nntp-port-number
 $B@\B3$9$k(B @sc{nntp} $B%5!<%P!<$N%]!<%HHV9f$G$9!#%G%#%U%)%k%H(B
-$B$O(B @samp{nntp} $B$G$9!#(B@sc{ssl} $B$r2p$7$?(B @sc{nntp} $B$r;H$&$K$O!"%]!<%H$NL>(B
-$BA0$G$O$J$/$F@0?t(B ($B$D$^$j(B @samp{snews} $B$G$O$J$/$F(B @samp{563}) $B$r;XDj$7$F(B
-$B2<$5$$!#30It$N(B SSL $B%D!<%k$O%]!<%H$NL>A0$G$OF0:n$7$J$$$+$i$G$9!#(B
+$B$O(B @samp{nntp} $B$G$9!#(B@sc{tls}/@sc{ssl} $B$r2p$7$?(B @sc{nntp} $B$r;H$&$K$O!"%]!<(B
+$B%H$NL>A0$G$O$J$/$F@0?t(B ($B$D$^$j(B @samp{snews} $B$d(B @samp{nntps} $B$G$O$J$/(B
+$B$F(B @samp{563}) $B$r;XDj$7$F2<$5$$!#30It$N(B TLS/SSL $B%D!<%k$O%]!<%H$NL>A0$G$O(B
+$BF0:n$7$J$$$+$i$G$9!#(B
 
 @item nntp-end-of-line
 @vindex nntp-end-of-line
@@ -12561,8 +12577,8 @@ Maildir $B%a!<%k%=!<%9$NNc$r$U$?$D(B:
 $B$?(B @sc{imap} $B%a!<%k%\%C%/%9$+$i5-;v$r<hF@$7$^$9!#>\$7$/$O(B @xref{IMAP} $B$r(B
 $B;2>H$7$F2<$5$$!#(B
 
-Kerberos, GSSAPI, SSL/TLS $B$*$h$S(B STARTTLS $B$N$?$a$N30It%W%m%0%i%`$H%i%$%V(B
-$B%i%j$,I,MW$G$"$k$3$H$KN10U$7$F2<$5$$!#(B@xref{IMAP}
+Kerberos, GSSAPI, TLS/SSL $B$*$h$S(B STARTTLS $B$N$?$a$N30It%W%m%0%i%`$H%i%$%V(B
+$B%i%j$,I,MW$G$"$k$3$H$KN10U$7$F2<$5$$!#(B@xref{IMAP}$B!#(B
 
 $B%-!<%o!<%I(B:
 
@@ -12571,7 +12587,7 @@ Kerberos, GSSAPI, SSL/TLS $B$*$h$S(B STARTTLS $B$N$?$a$N30It%W%m%0%i%`$H%i%$%
 @sc{imap} $B%5!<%P!<$NL>A0!#=i4|CM$O4D6-JQ?t(B @code{MAILHOST} $B$+$iF@$^$9!#(B
 
 @item :port
-@sc{imap} $B%5!<%P!<$N%]!<%HHV9f!#IaDL$O=i4|CM$O(B @samp{143} $B$G!"(BSSL/TLS $B@\(B
+@sc{imap} $B%5!<%P!<$N%]!<%HHV9f!#IaDL$O=i4|CM$O(B @samp{143} $B$G!"(BTLS/SSL $B@\(B
 $BB3$K$O(B @samp{993} $B$G$9!#(B
 
 @item :user
@@ -12584,8 +12600,8 @@ Kerberos, GSSAPI, SSL/TLS $B$*$h$S(B STARTTLS $B$N$?$a$N30It%W%m%0%i%`$H%i%$%
 @item :stream
 $B%5!<%P!<$K@\B3$9$k$H$-$K;H$&%9%H%j!<%`!#(B@code{imap-stream-alist} $B$K$"$k(B
 $B%7%s%\%k$NCf$N$R$H$D$r@_Dj$7$^$9!#8=>u$G$O(B @samp{gssapi},
-@samp{kerberos4}, @samp{starttls}, @samp{ssl}, @samp{shell} $B$^$?$O=i4|CM(B
-$B$N(B @samp{network} $B$K$J$j$^$9!#(B
+@samp{kerberos4}, @samp{starttls}, @samp{tls}, @samp{ssl},
+@samp{shell} $B$^$?$O=i4|CM$N(B @samp{network} $B$K$J$j$^$9!#(B
 
 @item :authentication
 $B%5!<%P!<$G$NG'>Z$K$I$NG'>ZK!$r;H$&$+!#$3$l(B
@@ -15028,7 +15044,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B$J$j$^$9!#$3$l$,$3$3$G@bL@$9$k;H$$J}$G$9!#(B
 
 $B$$$/$D$+$N(B @sc{imap} $B%5!<%P!<$r(B @file{~/.gnus} $B$G@_Dj$9$k$H!"$?$V$s0J2<(B
-$B$N$h$&$J$b$N$K$J$k$G$7$g$&!#(B($BCm(B: SSL/TLS $B$G$O30It%W%m%0%i%`$H%i%$%V%i%j(B
+$B$N$h$&$J$b$N$K$J$k$G$7$g$&!#(B($BCm(B: TLS/SSL $B$G$O30It%W%m%0%i%`$H%i%$%V%i%j(B
 $B$,I,MW$G$9!#0J2<$r;2>H$7$F2<$5$$!#(B)
 
 @lisp
@@ -15072,8 +15088,8 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 
 @item nnimap-server-port
 @vindex nnimap-server-port
-$B@\B3$r;n$_$k%5!<%P!<$N%]!<%H$G$9!#=i4|CM$G$O!"%]!<%H(B 143 $B$+!"(BSSL $B$G(B
-$B$O(B 993 $B$G$9!#(B
+$B@\B3$r;n$_$k%5!<%P!<$N%]!<%H$G$9!#%G%#%U%)%k%H$O%]!<%H(B 143$B!"$^$?(B
+$B$O(B TLS/SSL $B$G$O(B 993 $B$G$9!#(B
 
 $B$3$l$O@0?t$G$J$1$l$P$J$j$^$;$s!#0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
 
@@ -15105,8 +15121,8 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 @item nnimap-stream
 @vindex nnimap-stream
 $B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H%j!<%`$N7?$G$9!#=i4|@_Dj$G(B
-$B$O(B nnimap $B$O(B SSL/TLS $B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
-(SSL/TLS $B$r;H$&(B @sc{imap} $B$O(B STARTTLS $B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F0(B
+$B$O(B nnimap $B$O(B TLS/SSL $B$r=|$/0J2<$N$9$Y$F$r<+F0E*$K8!CN$7$F$=$l$r;H$$$^$9!#(B
+(TLS/SSL $B$r;H$&(B @sc{imap} $B$O(B STARTTLS $B$GCV$-49$($i$l$F$$$^$9!#$3$l$O<+F0(B
 $B8!=P$G$-$^$9$,!"$^$@9-HO0O$KG[Hw$5$l$F$$$^$;$s!#(B)
 
 $B0J2<$O%5!<%P!<;XDj$NNc$G$9!#(B
@@ -15127,8 +15143,11 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 @dfn{kerberos4:} Kerberos 4 $B$r;H$$$^$9!#(B@samp{imtest} $B%W%m%0%i%`$,I,MW$G(B
 $B$9!#(B
 @item
-@dfn{starttls:} STARTTLS (SSL $B$KN`;w(B) $B$r;H$$$^$9!#30It%i%$%V%i(B
+@dfn{starttls:} STARTTLS (TLS/SSL $B$KN`;w(B) $B$r;H$$$^$9!#30It%i%$%V%i(B
 $B%j(B @samp{starttls.el} $B$H(B @samp{starttls} $B%W%m%0%i%`$,I,MW$G$9!#(B
+@item
+@dfn{tls:} TLS $B$r;H$$$^$9!#(BGNUTLS (@samp{gnutls-cli} $B%W%m%0%i%`(B) $B$,I,MW(B
+$B$G$9!#(B
 @item
 @dfn{ssl:} SSL $B$r;H$$$^$9!#(BOpenSSL (@samp{openssl} $B%W%m%0%i%`(B) $B$+(B SSLeay
 (@samp{s_client}) $B$,I,MW$G$9!#(B
@@ -15149,6 +15168,10 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B$s$N5-;v$,$"$k$H$-$K(B Gnus $B$rL54|8B$K%O%s%0$5$;$F$7$^$&$+$b$7$l$^$;$s!#JQ(B
 $B?t(B @code{imap-kerberos4-program} $B$O(B imtest $B%W%m%0%i%`$KEO$9%Q%?%a!<%?$r(B
 $B4^$_$^$9!#(B
+
+TLS $B@\B3$G$O(B GNUTLS $BM3Mh$N(B @code{gnutls-cli} $B%W%m%0%i%`$,I,MW$G$9!#$3$l(B
+$B$O(B @uref{http://www.gnu.org/software/gnutls/} $B$+$i<j$KF~$l$k$3$H$,$G$-$^(B
+$B$9!#(B
 
 @vindex imap-ssl-program
 SSL $B@\B3$N$?$a$N(B OpenSSL $B%W%m%0%i%`$O(B @uref{http://www.openssl.org/} $B$+(B
