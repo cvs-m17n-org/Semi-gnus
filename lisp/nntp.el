@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 (require 'nnoo)
 (require 'gnus-util)

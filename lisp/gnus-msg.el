@@ -30,9 +30,8 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl)
-  (require 'static))
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'gnus)
 (require 'gnus-ems)

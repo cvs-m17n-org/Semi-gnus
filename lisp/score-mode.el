@@ -25,10 +25,9 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 (require 'easymenu)
-(eval-when-compile
-  (require 'cl)
-  (require 'static))
 
 (defvar gnus-score-mode-hook nil
   "*Hook run in score mode buffers.")

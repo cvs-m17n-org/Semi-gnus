@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'mail-utils)
 (require 'mime)
 

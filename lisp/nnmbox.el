@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 (require 'nnheader)
 (require 'message)

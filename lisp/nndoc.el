@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)

@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'parse-time)
 
 (defun date-to-time (date)

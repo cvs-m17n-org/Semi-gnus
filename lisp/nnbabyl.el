@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 (condition-case nil
     (require 'rmail)

@@ -31,7 +31,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'nntp)
 (require 'nnheader)
 (require 'gnus)

@@ -35,7 +35,7 @@
 
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'annotations)
 (require 'messagexmas)
 (require 'custom)

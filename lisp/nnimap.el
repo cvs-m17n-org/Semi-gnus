@@ -59,7 +59,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (eval-and-compile (require 'imap))
 
 (require 'nnoo)

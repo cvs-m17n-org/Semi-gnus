@@ -35,7 +35,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'mail-utils)
 
 (defconst pop3-version "1.3s")

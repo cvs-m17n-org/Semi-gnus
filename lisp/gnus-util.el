@@ -31,7 +31,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 (require 'custom)
 (require 'nnheader)

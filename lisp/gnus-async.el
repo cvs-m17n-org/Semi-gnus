@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'gnus)
 (require 'gnus-sum)
 (require 'nntp)
