@@ -1,3 +1,15 @@
+2000-07-18   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Don't refer
+	gnus-original-article-buffer.
+	(gnus-bbdb-insinuate): Set gnus-article-display-hook instead of
+	gnus-article-prepare-hook.
+	(gnus-bbdb/extract-field-value): Use mime-entity-fetch-field
+	instead of mail-fetch-field.
+	(gnus-bbdb/extract-field-value-init): Just return extractor.
+
 2000-07-15   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
