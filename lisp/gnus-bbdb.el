@@ -54,9 +54,9 @@ the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
     (save-excursion
-      (save-restriction
-	(let (from)
-	  (set-buffer gnus-original-article-buffer)
+      (let (from)
+	(set-buffer gnus-original-article-buffer)
+	(save-restriction
 	  (widen)
 	  (narrow-to-region (point-min)
 			    (progn (goto-char (point-min))
@@ -80,7 +80,7 @@ the user confirms the creation."
 					(or (bbdb-invoke-hook-for-value
 					     bbdb/news-auto-create-p)
 					    offer-to-create)
-					offer-to-create)))))))
+					offer-to-create)))))) )
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
