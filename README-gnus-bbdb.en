@@ -56,15 +56,13 @@ though FLIM does not decode them, put the following lines in your
             (format "%s <%s>" name net)))))
 --- bbdb-2.34/lisp/bbdb-hooks.el~	Tue Jan 15 09:00:11 2002
 +++ bbdb-2.34/lisp/bbdb-hooks.el	Thu Jan 31 03:55:01 2002
-@@ -35,6 +35,8 @@
- ;; $Id: README-gnus-bbdb.en,v 1.1.2.5.12.7 2002-01-31 04:33:20 yamaoka Exp $
+@@ -36,4 +36,6 @@
  ;;
  
 +(eval-when-compile (require 'cl))
 +
  (require 'bbdb)
  (require 'bbdb-com)
- 
 @@ -405,13 +407,23 @@
           ignore
           field pairs fieldval  ; do all bindings here for speed

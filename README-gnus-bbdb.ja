@@ -1,38 +1,38 @@
 -*- mode: text; fill-column: 70; -*-
 
 ---
-BBDB ~~~~~~~~~~~ bbdb-gnus.elc ~ Semi-gnus 6.8.X ~~~~
-~~~~~~~~~~~~~~~~~~ byte-compile ~~~~~~~~~
+BBDB を使用されている方は、 bbdb-gnus.elc を Semi-gnus 6.8.X 以前のも
+のと共有することはできません。必ず、 byte-compile し直してください。
 
-;; gnus ~~~~~~~~~ bbdb-gnus.el ~~~ byte-compile ~~~~~
-;; ~~~~~~~~ :-)
+;; gnus を起動したあとで、 bbdb-gnus.el のみを byte-compile するという
+;; のがお手軽です。 :-)
 
 ---
 gnus-bbdb.el
 
-Semi-gnus ~~~~~ BBDB API ~~~~~~~~~~~~~~~~~~~~
-~~~~~~~ Semi-gnus ~~~~~~~~~ mime-bbdb ~~~~~~~~~
+Semi-gnus に特化した BBDB API モジュールです。このモジュールを使用する
+ことによって、 Semi-gnus で使用する場合には mime-bbdb が不要になります。
 
-1.11.3 ~~~ FLIM ~~~~~~
+1.11.3 以降の FLIM が必要です。
 
-bbdb-auto-notes-hook ~~~~~~~~~~~~~~~~~~~~~~~~
-~ bbdb.el / bbdb-hooks.el ~~~~~~~~~~~~~ patch ~~~~~
-~~~~~~~
+bbdb-auto-notes-hook を使用していない方には不要ですが、使用している方
+は bbdb.el / bbdb-hooks.el にこのファイルの最後にある patch をあてる必
+要があります。
 
-~~~:
+設定例:
 
-;; mime-bbdb ~~~~~~~~~~~~
+;; mime-bbdb に関する設定は不要です。
 ;(setq mime-bbdb/use-mail-extr nil)
 ;(eval-after-load "mail-extr" '(require 'mime-bbdb))
 
 (require 'bbdb)
 (require 'gnus-bbdb)
-(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus ~~~~~~~~~~
+(bbdb-initialize 'sc)  ;; 'gnus / 'Gnus ははずしてください。
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
 (add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
 
-FLIM ~~ quote ~~~ eword encoded word ~ decode ~~~~~~~~~
-~~~~~ decode ~~~~~~~~~~~~~~~~~~~~~
+FLIM では quote された eword encoded word は decode されませんが、それ
+を強制的に decode したい場合には、次の設定を加えてください。
 
 (setq gnus-bbdb/decode-field-body-function
       (function
@@ -40,7 +40,7 @@ FLIM ~~ quote ~~~ eword encoded word ~ decode ~~~~~~~~~
          (eword-decode-string field-body))))
 
 ---
-~~~ bbdb-com.el~bbdb-hooks.el ~~~ bbdb.el ~~~~ patch ~~~
+以下は bbdb-com.el、bbdb-hooks.el および bbdb.el にあてる patch です。
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- bbdb-2.34/lisp/bbdb-com.el~	Tue Jan 15 23:00:57 2002
@@ -56,15 +56,13 @@ FLIM ~~ quote ~~~ eword encoded word ~ decode ~~~~~~~~~
             (format "%s <%s>" name net)))))
 --- bbdb-2.34/lisp/bbdb-hooks.el~	Tue Jan 15 09:00:11 2002
 +++ bbdb-2.34/lisp/bbdb-hooks.el	Thu Jan 31 03:55:01 2002
-@@ -35,6 +35,8 @@
- ;; $Id: README-gnus-bbdb.ja,v 1.1.2.5.10.7 2002-01-31 04:33:20 yamaoka Exp $
+@@ -36,4 +36,6 @@
  ;;
  
 +(eval-when-compile (require 'cl))
 +
  (require 'bbdb)
  (require 'bbdb-com)
- 
 @@ -405,13 +407,23 @@
           ignore
           field pairs fieldval  ; do all bindings here for speed
@@ -128,7 +126,7 @@ FLIM ~~ quote ~~~ eword encoded word ~ decode ~~~~~~~~~
 ---
 gnus-bbdb/split-mail()
 
-nnmail-split-fancy ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+nnmail-split-fancy で使用するための関数です。次のように使用してください。
 
 (setq nnmail-split-methods 'nnmail-split-fancy
       nnmail-split-fancy
@@ -147,16 +145,16 @@ nnmail-split-fancy ~~~~~~~~~~~~~~~~~~~~~~~~~~~
         .....
         ))
 
-*1 : From, To, Cc ~~~~~~~~~~~~~~~~~~~~~~~~~~
-     ~~~~~ BBDB ~ `company' ~~~~~~ `foo' ~~~~~~~~
-     `foo-group' ~~~~~~~~
+*1 : From, To, Cc いずれかのヘッダー・フィールドに含まれるメイル・アド
+     レスのうち BBDB の `company' フィールドに `foo' が含まれる場合、
+     `foo-group' に振り分けます。
 
-*2 : `company' ~~~~~~ `bar' ~~~~~~~~~~`company' ~~~
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*2 : `company' フィールドが `bar' で始まっている場合、`company' フィー
+     ルドの内容をそのままグループ名として使用し、振り分けます。
 
-*3 : `group' ~~~~~~~~~~~`group' ~~~~~~~~~~~~~
-     ~~~~~~~~~~~~~~~~~~~
+*3 : `group' フィールドがある場合、`group' フィールドの内容をそのまま
+     グループ名として使用し、振り分けます。
 
-*4 : `note' ~~~~~~ `my friend' ~~~~~~~~~~~~~~~~
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~
-     `nnmail-split-fancy' ~~~~~~~~~~~~~~
+*4 : `note' フィールドに `my friend' が含まれる場合、その後ろに指定さ
+     れた規則で振り分けます。この規則の記述方法は、通常の
+     `nnmail-split-fancy' での記述方法と同じものです。
