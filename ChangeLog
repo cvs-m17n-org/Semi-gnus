@@ -1,3 +1,8 @@
+1998-12-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-check-buffer): Rewrite (checking
+	for buffer object).
+
 1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (mime-preview-over-to-next-method-alist): Use
