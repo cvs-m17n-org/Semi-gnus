@@ -13349,62 +13349,60 @@ Rand MH $B%a!<%k1\Mw%7%9%F%`$O(B UNIX $B%7%9%F%`$K$+$J$jD9$$4VB8:_$7$F$$$^$9!
 $B$1<h$i$J$$$J$i!"$*$=$i$/(B @code{nnfolder} $B$OA4$F$NCf$G0lHVE,$7$?%P%C%/%((B
 $B%s%I$G$7$g$&!#(B
 
-@c TRANSLATE_ME
 @item nnmaildir
 
-@code{nnmaildir} is largely similar to @code{nnml}, with some notable
-differences.  Each message is stored in a separate file, but the
-filename is unrelated to the article number in Gnus.  @code{nnmaildir}
-also stores the equivalent of @code{nnml}'s overview files in one file
-per article, so it uses about twice as many inodes as @code{nnml}.  (Use
-@code{df -i} to see how plentiful your inode supply is.)  If this slows
-you down or takes up very much space, consider switching to ReiserFS
-(@uref{http://www.namesys.com/}) or another non-block-structured
-filesystem.
+@code{nnmaildir} $B$OBgJ}(B @code{nnml} $B$H;w$?$b$N$G$9$,!"$$$/$i$+82Cx$J0c$$(B
+$B$,$"$j$^$9!#$=$l$>$l$N%a%C%;!<%8$OJL!9$N%U%!%$%k$K3JG<$5$l$^$9$,!"%U%!%$(B
+$B%kL>$O(B gnus $B$N5-;vHV9f$H4X78$,$"$j$^$;$s!#$^(B
+$B$?(B @code{nnmaildir} $B$O(B @code{nnml} $B$N(B overview $B$KAjEv$9$k%U%!%$%k$r5-;v(B
+$B$4$H$K0l$D3JG<$9$k$N$G!"(B@code{nnml} $B$NLsFsG\$NNL$N(B i$B%N!<%I$r;H$$$^$9!#(B
+(@code{df -i} $B$r;H$C$F(B i$B%N!<%I$N3d$jEv$F$,$I$l$[$I$?$/$5$s$"$k$+$rD4$Y$F(B
+$B2<$5$$!#(B) $B$=$N$?$a$KCY$/$J$C$?$jB?$/$N>l=j$r<h$C$F$7$^$&$h$&$J$i$P!"(B
+ReiserFS (@uref{http://www.namesys.com/}) $B$dB>$NHs%V%m%C%/9=B$$N%U%!%$%k(B
+$B%7%9%F%`$X$NE>49$r8!F$$7$F2<$5$$!#(B
 
-Since maildirs don't require locking for delivery, the maildirs you use
-as groups can also be the maildirs your mail is directly delivered to.
-This means you can skip Gnus's mail splitting if your mail is already
-organized into different mailboxes during delivery.  A @code{directory}
-entry in @code{mail-sources} would have a similar effect, but would
-require one set of mailboxes for spooling deliveries (in mbox format,
-thus damaging message bodies), and another set to be used as groups (in
-whatever format you like).  A maildir has a built-in spool, in the
-@code{new/} subdirectory.  Beware that currently, mail moved from
-@code{new/} to @code{cur/} instead of via mail splitting will undergo
-treatment such as duplicate checking.
+maildir $B$O<u?.G[Aw$N$?$a$N%m%C%/$rI,MW$H$7$J$$$N$G!"$"$J$?$,%0%k!<%W$H$7(B
+$B$F;H$C$F$$$k(B maildir $B$O!"G[Aw$5$l$F$-$?%a!<%k$rD>@\<u$1<h$k$?$a(B
+$B$N(B maildir $B$K$9$k$3$H$b$G$-$^$9!#$3$l$O!"%a!<%k$,G[Aw$5$l$F$/$k2aDx$G0[(B
+$B$J$k%a!<%k%\%C%/%9$K;EJ,$5$l$k$h$&$K$J$C$F$$$k$N$J$i$P!"(Bgnus $B$N%a!<%kJ,(B
+$B3d$r>JN,$G$-$k$3$H$r0UL#$7$^$9!#(B@code{mail-sources} $B$K$*$1(B
+$B$k(B @code{directory} $B$N9`$K$O;w$?8z2L$,$"$j$^$9$,!"G[Aw$5$l$F$/$k%a!<%k$r(B
+$B%9%W!<%k$9$k$?$a$N%a!<%k%\%C%/%9$N0lB7$$(B (mbox $B7A<0$G$O$=$N$?$a$K%a%C%;!<(B
+$B%8$NK\J8$,2u$l$k(B) $B$H!"B>$N(B ($B2?$G$"$l$"$J$?$N9%$_$N7A<0$N(B) $B%0%k!<%W$H$7$F(B
+$B;H$o$l$kAH$,I,MW$G$9!#(Bmaildir $B$O(B @code{new/} $B%5%V%G%#%l%/%H%j$KCV$+$l$k(B
+$BAH$_9~$_%9%W!<%k$G$9!#%a!<%kJ,3d$,Fs=E%A%'%C%/$N$h$&$J07$$$r<u$1$kBe$o$j(B
+$B$K!"%a!<%k$r(B @code{new/} $B$+$i(B @code{cur/} $B$K0\F0$9$k$3$H$K!":#$N$H$3$m$O(B
+$B5$$rIU$1$F2<$5$$!#(B
 
-An article will not necessarily keep the same number across Gnus
-sessions; articles are renumbered starting from 1 for each Gnus session
-(more precisely, each time you open the @code{nnmaildir} server).  This
-way, you don't get gaps in your article number ranges, and when entering
-large groups, Gnus is likely to give a more accurate article count.  The
-price is that @code{nnmaildir} doesn't work with the cache or agent.
-This will probably be changed in the future.
+$B5-;v$O(B gnus $B$N%;%C%7%g%s$K$^$?$,$C$FF1$8HV9f$r0];}$9$kI,MW$O$"$j$^$;$s!#(B
+$B5-;v$K$O(B gnus $B$N%;%C%7%g%s$4$H(B ($B$b$C$H@53N$K$O(B @code{nnmaildir} $B%5!<%P!<(B
+$B$r%*!<%W%s$9$kEY$K(B) $B$K(B 1 $B$+$i;O$^$kHV9f$,?6$jD>$5$l$^$9!#$3$N$h$&$K$7$F(B
+$B5-;vHV9f$NHO0OFb$K7d4V$,L5$/$J$j!"$^$?Bg$-$$%0%k!<%W$KF~$k$H$-$O!"(Bgnus
+$B$O$h$j@53N$J5-;v?t$rEA$($F$/$l$k$G$7$g$&!#Be=~$H$7$F(B @code{nnmaildir} $B$O(B
+$B%-%c%C%7%e$d%(!<%8%'%s%H$G$OF0:n$7$^$;$s!#$3$l$O$*$=$i$/>-Mh$OJQ$o$k$G$7$g(B
+$B$&!#(B
 
-@code{nnmaildir} stores article marks for a given group in the
-corresponding maildir, in a way designed so that it's easy to manipulate
-them from outside Gnus.  You can tar up a maildir, unpack it somewhere
-else, and still have your marks.  @code{nnml} also stores marks, but
-it's not as easy to work with them from outside Gnus as with
-@code{nnmaildir}.
+@code{nnmaildir} $B$O%0%k!<%W$N5-;v$N0u$r!"$=$l$KBP1~$9$k(B maildir $B$K3JG<$7(B
+$B$^$9!#(Bgnus $B$N30$+$i$=$l$i$r4JC1$KA`:n$G$-$k$h$&$K$9$k$?$a$K!"$=$N$h$&$K(B
+$B:n$i$l$F$$$k$N$G$9!#(Bmaildir $B$r(B tar $B$G$^$H$a$F$+$iJL$N$I$3$+$GE83+$7$F$b!"(B
+$B0u$O$=$N$^$^$G$9!#(B@code{nnml} $B$b0u$r3JG<$7$^$9$,!"(B
+@code{nnmaildir} $B$G(B gnus $B$N30$+$i$=$l$i$r;H$&$h$&$K4JC1$G$O$"$j$^$;$s!#(B
 
-For configuring expiry and other things, @code{nnmaildir} uses group
-parameters slightly different from those of other mail backends.
+$B4|8B@Z$l>C5n$dB>$N$b$N$r@_Dj$9$k$?$a$K(B @code{nnmaildir} $B$O%0%k!<%W%Q%i%a!<(B
+$B%?$r;H$$$^$9$,!"B>$N%a!<%k%P%C%/%(%s%I$H$O>/$70c$$$^$9!#(B
 
-@code{nnmaildir} uses a significant amount of memory to speed things up.
-(It keeps in memory some of the things that @code{nnml} stores in files
-and that @code{nnmh} repeatedly parses out of message files.)  If this
-is a problem for you, you can set the @code{nov-cache-size} group
-parameter to somthing small (0 would probably not work, but 1 probably
-would) to make it use less memory.
+@code{nnmaildir} $B$OB.EY$r>e$2$k$?$a$K$+$J$j$NNL$N%a%b%j$r;H$$$^$9!#(B
+(@code{nnml} $B$N>l9g$O%U%!%$%k$K3JG<$7!"(B@code{nnmh} $B$G$O2?EY$b5-;v%U%!%$(B
+$B%k$r2r@O$7$FF@$k$b$N$4$H$r!"$=$l$O%a%b%j>e$KJ];}$7$^$9!#(B) $B$3$l$,$"$J$?$K(B
+$B$H$C$FLdBj$J$i$P!"(B@code{nov-cache-size} $B%0%k!<%W%Q%i%a!<%?$r2?$+>.$5$J(B
+$BCM(B (0 $B$O$*$=$i$/$@$a$@$,(B 1 $B$@$C$?$i$?$V$sF0$/(B) $B$K@_Dj$9$k$3$H$K$h$C$F!"(B
+$B>/$J$$%a%b%j$r;H$&$h$&$K$9$k$3$H$,$G$-$^$9!#(B
 
-Startup and shutdown are likely to be slower with @code{nnmaildir} than
-with other backends.  Everything in between is likely to be faster,
-depending in part on your filesystem.
+$B5/F0$H=*N;$OB>$N%P%C%/%(%s%I$h$j$b(B @code{nnmaildir} $B$,CY$$$G$7$g$&!#$=$N(B
+$B4V$K$"$k$9$Y$F$N%U%!%$%k%7%9%F%`$K0MB8$7$F$$$kItJ,$OB.$$$G$7$g$&!#(B
 
-@code{nnmaildir} does not use @code{nnoo}, so you cannot use @code{nnoo}
-to write an @code{nnmaildir}-derived backend.
+@code{nnmaildir} $B$O(B @code{nnoo} $B$r;H$o$J$$$N$G!"(B@code{nnmaildir} $B$+$iGI(B
+$B@8$7$?%P%C%/%(%s%I$r=q$/$N$K(B @code{nnoo} $B$O;H$($^$;$s!#(B
 @end table
 
 @node Browsing the Web

@@ -946,7 +946,6 @@ necessery.  If nil, the buffer name is generated."
 					(generate-new-buffer-name " *temp*"))
 		    (mapcar 'make-local-variable imap-local-variables)
 		    (set-buffer-multibyte nil)
-		    (imap-disable-multibyte)
 		    (buffer-disable-undo)
 		    (setq imap-server (or server imap-server))
 		    (setq imap-port imap-port)
