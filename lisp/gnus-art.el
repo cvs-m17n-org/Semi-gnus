@@ -3859,7 +3859,8 @@ Argument LINES specifies lines to be scrolled up."
 	  (t
 	   (if start
 	       (set-window-start (selected-window) start)
-	     (scroll-up lines))
+	     (let (window-pixel-scroll-increment)
+	       (scroll-up lines)))
 	   nil))))
 
 (defun gnus-article-prev-page (&optional lines)
@@ -3878,7 +3879,8 @@ Argument LINES specifies lines to be scrolled down."
 	   (gnus-narrow-to-page -1))
 	  (t
 	   (condition-case nil
-	       (scroll-down lines)
+	       (let (window-pixel-scroll-increment)
+		 (scroll-down lines))
 	     (beginning-of-buffer
 	      (goto-char (point-min))))))))
 
