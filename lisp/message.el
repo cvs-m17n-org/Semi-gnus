@@ -3313,8 +3313,9 @@ be added to the \"References\" field."
 			     refs)
 		;; If the References field has been changed, we make it
 		;; visible in the header.
-		(mail-header-set-message-id message-reply-headers nil)
-		(mail-header-set-references message-reply-headers nil)
+		(when message-reply-headers
+		  (mail-header-set-message-id message-reply-headers nil)
+		  (mail-header-set-references message-reply-headers nil))
 		(widen)
 		(message-narrow-to-headers)
 		(if (let ((case-fold-search t))
