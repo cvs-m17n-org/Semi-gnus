@@ -13373,8 +13373,8 @@ nnml:mail.others:
 @var{groups} は出力の分割を生成するためにパラメータが走査されるグループ
 名のリストか正規表現です。@var{no-crosspost} は相互投稿を使用禁止にるた
 めに使うことができます。その場合、単一の @code{|} 分割が出力されます。
-@var{catch-all} は @var{gnus-group-split-default-catch-all-group} のよう
-に、最後の手段として使われる特級分割です。
+@var{catch-all} は @code{gnus-group-split-default-catch-all-group} のよ
+うに、最後の手段として使われる特級分割です。
 @var{catch-all} が @code{nil} であるか、@var{split-regexp} がどれかの選
 択されたグループ空文字列に合致すると、全捕獲分割は行われません。そうでな
 い場合、グループに @var{split-spec} が @code{catch-all} に設定されている
