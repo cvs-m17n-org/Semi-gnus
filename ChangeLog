@@ -1,5 +1,54 @@
 1999-05-13  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/nnsoup.el (nnsoup-store-reply): Use `forward-char' instead
+	of `backward-char'.
+	* lisp/message.el (message-send-news-with-gnus,
+	message-send-mail-with-smtp, message-send-mail-with-qmail,
+	message-send-mail-with-sendmail): Ditto.
+	* lisp/gnus-picon.el (gnus-group-display-picons): Ditto.
+
+	* lisp/nnsoup.el (nnsoup-store-reply): Use `(bolp)' instead of
+	`(= (preceding-char) ?\n)'.
+	* lisp/message.el (message-send-news, message-send-mail): Ditto.
+
+	* lisp/gnus-sum.el (gnus-summary-reparent-thread): Use
+	`(end-of-line 0)' to go to the end of the previous line.
+
+	* lisp/nnmail.el (nnmail-decode-status): Don't use regexp search.
+	* lisp/message.el (message-next-header, message-remove-header):
+	Ditto.
+	* lisp/gnus-art.el (gnus-article-add-buttons-to-head,
+	gnus-article-highlight-headers, gnus-article-hide-header,
+	article-hide-boring-headers, article-hide-headers): Ditto.
+
+	* lisp/nntp.el (nntp-snarf-error-message, nntp-read-server-type):
+	Use `buffer-substring' instead of `buffer-string'.
+	* lisp/nnspool.el (nnspool-inews-sentinel): Ditto.
+	* lisp/message.el (message-wash-subject, message-reply,
+	message-make-from, message-make-organization): Ditto.
+	* lisp/md5.el (md5): Ditto.
+	* lisp/mail-source.el (mail-source-movemail): Ditto.
+	* lisp/gnus.el (gnus-getenv-nntpserver): Ditto.
+	* lisp/gnus-xmas.el (gnus-xmas-article-display-xface): Ditto.
+	* lisp/gnus-util.el (gnus-mode-string-quote): Ditto.
+	* lisp/gnus-sum.el (gnus-summary-edit-article-done,
+	gnus-simplify-subject-fuzzy): Ditto.
+	* lisp/gnus-spec.el (gnus-parse-simple-format): Ditto.
+	* lisp/gnus-picon.el (gnus-picons-make-glyph): Ditto.
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Ditto.
+	* lisp/gnus-mh.el (gnus-summary-save-in-folder): Ditto.
+	* lisp/gnus-kill.el (gnus-kill-file-apply-buffer): Ditto.
+	* lisp/gnus-art.el (gnus-article-mime-edit-exit,
+	gnus-article-edit-exit): Ditto.
+	* lisp/format-spec.el (format-spec): Ditto.
+	* lisp/dgnushack.el (dgnushack-make-package): Ditto.
+	* lisp/base64.el (base64-decode, base64-encode,
+	base64-run-command-on-region): Ditto.
+
+1999-05-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Don't specify
