@@ -1,3 +1,7 @@
+2000-11-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* texi/gnus-ja.texi (Drafts): Fix typo.
+
 2000-11-04  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
