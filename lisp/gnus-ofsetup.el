@@ -501,7 +501,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			  exec-directory "movemail"))
 	      (setq args (read-from-minibuffer
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-18) "-pf")))
+				  (gnus-ofsetup-gettext 'setup-18)) "-pf"))
 	      (setq program (format "%s %s %s %s %s"
 				    prog args "po:%u" "%t" "%p"))))
 	  (when (string= type "imap")
