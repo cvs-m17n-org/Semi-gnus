@@ -4542,8 +4542,7 @@ that further discussion should take place only in "
           (if (and mft
                    message-use-followup-to
                    (or (not (eq message-use-followup-to 'ask))
-                       (message-y-or-n-p
-		        (concat "Obey Mail-Followup-To? ") t "\
+                       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
 You should normally obey the Mail-Followup-To: header.  In this
 article, it has the value of
 

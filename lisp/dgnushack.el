@@ -182,10 +182,38 @@
 (defalias 'ange-ftp-re-read-dir 'ignore)
 (defalias 'define-mail-user-agent 'ignore)
 
-(defconst dgnushack-tool-files
-  '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el"))
 (defconst dgnushack-unexported-files
-  '("dgnuspath.el" "ptexinfmt.el"))
+  (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el")
+	  (condition-case nil
+	      (progn (require 'w3-forms) nil)
+	    (error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
+		     "nnslashdot.el" "nnwarchive.el" "webmail.el"
+		     "nnwfm.el")))
+	  (condition-case nil
+	      (progn (require 'bbdb) nil)
+	    (error '("gnus-bbdb.el")))
+	  (unless (featurep 'xemacs)
+	    '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
+	      "nnheaderxm.el" "smiley.el"))
+	  (when (or (featurep 'xemacs) (<= emacs-major-version 20))
+	    '("smiley-ems.el"))
+	  (when (and (fboundp 'base64-decode-string)
+		     (subrp (symbol-function 'base64-decode-string)))
+	    '("base64.el"))
+	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
+	    '("md5.el")))
+  "Files not to be installed.")
+
+(defconst dgnushack-exported-files
+  (let ((files (directory-files srcdir nil "^[^=].*\\.el$")))
+    (dolist (file dgnushack-unexported-files)
+      (setq files (delete file files)))
+    (sort files 'string-lessp))
+  "Files to be installed.")
+
+(defun dgnushack-exported-files ()
+  "Print files to be installed."
+  (princ (mapconcat 'identity dgnushack-exported-files " ")))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
@@ -200,41 +228,21 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (directory-files srcdir nil "^[^=].*\\.el$")))
-    (dolist (file
-	     (append
-	      dgnushack-tool-files
-	      (condition-case nil
-		  (progn (require 'w3-forms) nil)
-		(error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-			 "nnslashdot.el" "nnwarchive.el" "webmail.el"
-			 "nnwfm.el")))
-	      (condition-case nil
-		  (progn (require 'bbdb) nil)
-		(error '("gnus-bbdb.el")))
-	      (unless (featurep 'xemacs)
-		'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-		  "nnheaderxm.el" "smiley.el"))
-	      (when (or (featurep 'xemacs) (<= emacs-major-version 20))
-		'("smiley-ems.el"))
-	      (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-		'("md5.el"))))
-      (setq files (delete file files)))
+  (dolist (file dgnushack-exported-files)
+    (setq file (expand-file-name file srcdir))
+    (when (and (file-exists-p (setq elc (concat file "c")))
+	       (file-newer-than-file-p file elc))
+      (delete-file elc)))
 
-    (dolist (file files)
+  (let (;;(byte-compile-generate-call-tree t)
+	(files dgnushack-exported-files)
+	file elc)
+    (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
-      (when (and (file-exists-p (setq elc (concat file "c")))
-		 (file-newer-than-file-p file elc))
-	(delete-file elc)))
-
-    (let (;;(byte-compile-generate-call-tree t)
-	  file elc)
-      (while (setq file (pop files))
-	(setq file (expand-file-name file srcdir))
-	(when (or (not (file-exists-p (setq elc (concat file "c"))))
-		  (file-newer-than-file-p file elc))
-	  (ignore-errors
-	    (byte-compile-file file)))))))
+      (when (or (not (file-exists-p (setq elc (concat file "c"))))
+		(file-newer-than-file-p file elc))
+	(ignore-errors
+	  (byte-compile-file file))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)

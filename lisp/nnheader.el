@@ -950,7 +950,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'iso-8859-1
+(defvar nnheader-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)

@@ -1,3 +1,27 @@
+2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (install): Use the lisp function
+	`dgnushack-exported-files'.
+
+	* lisp/nnmail.el (nnmail-pathname-coding-system): Default to
+	`binary'.
+	* lisp/nnheader.el (nnheader-pathname-coding-system): Ditto.
+
+	* lisp/message.el (message-get-reply-headers): Remove useless
+	`concat'.
+
+	* lisp/md5.el: Restore the file.
+
+	* lisp/dgnushack.el (dgnushack-compile): Refer to the constant
+	`dgnushack-exported-files'.
+	(dgnushack-exported-files): New function.
+	(dgnushack-exported-files): New constant.
+	(dgnushack-unexported-files): Add some files.
+	(dgnushack-tool-files): Remove, merge it into
+	`dgnushack-unexported-files'.
+
+	* lisp/base64.el: New file -- base64 encoding functions using MEL.
+
 2000-11-05  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* lisp/smiley.el (smiley-deformed-regexp-alist): Modify regexp for

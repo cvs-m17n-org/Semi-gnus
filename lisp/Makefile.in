@@ -31,7 +31,8 @@ clever some:
 
 install: clever
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
-	@for p in *.el; do \
+	@for p in \
+	`$(EMACS) $(FLAGS) -f dgnushack-exported-files 2>/dev/null`; do \
 	  if test "$$p" != "dgnuspath.el" -a "$$p" != "ptexinfmt.el"; then \
 	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \

@@ -470,7 +470,7 @@ parameter.  It should return nil, `warn' or `delete'."
   nnheader-text-coding-system
   "Coding system used in reading inbox")
 
-(defvar nnmail-pathname-coding-system 'iso-8859-1
+(defvar nnmail-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnmail-find-file (file)
