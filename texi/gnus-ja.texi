@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.4.0 Manual
+@settitle Semi-gnus 6.7.7 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -342,7 +342,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.4.0 Manual
+@title Semi-gnus 6.7.7 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -396,7 +396,7 @@ Semi-gnus は、大きな絵が入っていたりさまざまな形式を用いたりしているちょっ
 な言語圏を差別しません。ああ、クリンゴンの方は Unicode Next Generationを
 お待ちください。
 
-この説明書は Semi-gnus 6.4.0 に対応します。
+この説明書は Semi-gnus 6.7.7 に対応します。
 
 @end ifinfo
 
@@ -11182,6 +11182,7 @@ Gnus を @code{gnus-unplugged} で起動します。これは gnus エージェ
 ($B通常) どの記事をダウンロードするかを決めるときのよりきめの細か
 いスコア規則。(このダウンロードスコア (@dfn{download score}) は
 通常のスコアとは全く関係が無いことに注意してください。)
+@end enumerate
 
 述語は論理演算子が間に散りばめられた述語の組み合わせからなります。
 
@@ -11588,5 +11589,1721 @@ Gnus エージェントに記事を取得させるのは (そしてあなたの書いた何
 #!/bin/sh
 emacs -batch -l ~/.emacs -f gnus-agent-batch >/dev/null
 @end example
+
+
+@node Scoring
+@chapter スコア
+@cindex scoring
+
+他の人々は @dfn{削除ファイル} を使いますが、ここ gnus タワーは削除よりも
+スコアの方を好みますので、他と格闘するよりは切り替える事にしました。それ
+らは完全に違う事をしますので、真っ直ぐに座って注意を払ってください！
+
+@vindex gnus-summary-below
+全ての記事はスコアの初期値を持っており 
+(@code{gnus-summary-default-score})、これはディフォルトで 0 です。このス
+コアは対話的や、スコアファイル (score file) の方法により、上げられたり下
+げられたりします。@code{gnus-summary-bark-below} よりも低いスコアの記事
+には既読の印が付きます。
+
+Gnus は概略バッファを作成する前に、現在のグループに適用されるどんな 
+@dfn{スコアファイル} も読み込みます。
+
+現在の記事に基づいてスコアの登録を挿入するいくつかの命令が概略バッファに
+あります。例えば、gnus に特定の表題の記事のスコアを下げたり上げたりする
+ように求める事ができます。
+
+2種類のスコア登録があります: 永続と一時的です。一時的スコア登録は自分自
+身で期限がくると削除する登録です。例えば、1週間以上使われていないどんな
+登録も、スコアファイルの大きさを小さくするために、静かに削除されます。
+
+@menu
+* Summary Score Commands::   現在のグループのためのスコア登録を追加する。
+* Group Score Commands::     一般的なスコア命令。
+* Score Variables::          あなたのスコアをカスタマイズする。 
+                             (まぁ、なんて用語でしょう)。
+* Score File Format::        スコアファイルに何を入れるか。
+* Score File Editing::       手でスコアファイルを編集する事もできる。
+* Adaptive Scoring::         大姉 gnus はあなたが何を読んだか知っている。
+* Home Score File::          新しいスコア登録がどこへ行くかをどのように指定するか。
+* Followups To Yourself::    人があなたに返答したときに gnus に気付かせる。
+* Scoring Tips::             どうやって効果的にスコアを付けるか。
+* Reverse Scoring::          古いものの子であるという問題は問題ではない。
+* Global Score Files::       地をつかみ、耳を切り裂くスコアファイル。
+* Kill Files::               それらはまだここにありますが、無視する事ができます。
+* Converting Kill Files::    削除ファイルをスコアファイルに変換する。
+* GroupLens::                どれを読むのが好きかの予言を得る。
+* Advanced Scoring::         スコアの法則を作るために論理表現を使う。
+* Score Decays::             スコアを枯れていかせるのは役に立つ事もある。
+@end menu
+
+
+@node Summary Score Commands
+@section 概略スコア命令
+@cindex score commands
+
+スコア登録を変更するスコア命令は実際に本当のスコアファイルを修正するわけ
+ではありません。それはあまりに非効率です。Gnus は以前にロードされたスコ
+アファイルのキャッシュを保持しており、その一つは @dfn{現在のスコアファイ
+ル連想リスト} (current score file alist) と考えられています。スコア命令
+は単純にこのリストに登録を挿入して、グループから出ると、このリストは保存
+されます。
+
+現在 (current) のスコアファイルは、実際にそのようなスコアファイルが存在
+していない場合でも、初期設定でグループのローカルスコアファイルになってい
+ます。スコア命令を何か他のスコアファイル (例、@file{all.SCORE}) に挿入し
+たいなら、まずこのスコアファイルを現在のものにしなければなりません。
+
+一般的なスコア命令は実際にはスコアファイルを変更しません:
+
+@table @kbd
+
+@item V s
+@kindex V s (概略)
+@findex gnus-summary-set-score
+現在の記事のスコアを設定します (@code{gnus-summary-set-score})。
+
+@item V S
+@kindex V S (概略)
+@findex gnus-summary-current-score
+現在の記事のスコアを表示します (@code{gnus-summary-current-score})。
+
+@item V t
+@kindex V t (概略)
+@findex gnus-score-find-trace
+現在の記事に使われている全てのスコア法則 (score rule) を表示します 
+(@code{gnus-score-find-trace})。
+
+@item V R
+@kindex V R (概略)
+@findex gnus-summary-rescore
+現在の概略でスコア過程を実行します (@code{gnus-summay-rescore})。これは 
+gnus の後ろでいろいろとスコアファイルで遊んで、それの効果を見たいときに
+役立つかもしれません。
+
+@item V a
+@kindex V a (概略)
+@findex gnus-summary-score-entry
+新しいスコア登録を付け加え、全ての要素の指定を許可します 
+(@code{gnus-summary-score-entry})。
+
+@item V c
+@kindex V c (概略)
+@findex gnus-score-change-score-file
+違ったスコアファイルを現在のものにします 
+(@code{gnus-score-change-score-file})。
+
+@item V e
+@kindex V e (概略)
+@findex gnus-score-edit-current-scores
+現在のスコアファイルを編集します (@code{gnus-score-edit-current-scores})。
+@code{gnus-score-mode} バッファに移動する事になるでしょう (@pxref{Score
+File Editing})。
+
+@item V f
+@kindex V f (概略)
+@findex gnus-score-edit-file
+スコアファイルを編集して、このスコアファイルを現在のものにします 
+(@code{gnus-score-edit-file})。
+
+@item V F
+@kindex V F (概略)
+@findex gnus-score-flush-cache
+現在のスコアキャッシュを書き込みます (@code{gnus-score-flush-cache})。こ
+れはスコアファイルを編集した後に役に立ちます。
+
+@item V C
+@kindex V C (概略)
+@findex gnus-score-customize
+視覚的で嬉しい方法でスコアファイルをカスタマイズします 
+(@code{gnus-score-customize})。
+
+@end table
+
+これらの命令の残りはローカルスコアファイルを修正します。
+
+@table @kbd
+
+@item V m
+@kindex V m (概略)
+@findex gnus-score-set-mark-below
+スコアの入力を促進し、それよりも低いスコアの全ての記事に既読の印を付けま
+す (@code{gnus-score-set-mark-below})。
+
+@item V x
+@kindex V x (概略)
+@findex gnus-score-set-expunge-below
+スコアの入力を促進し、そのスコアより低い全ての記事を削除するためのスコア
+法則を現在のスコアファイルに付け加えます 
+(@code{gnus-score-set-expunge-below})。
+@end table
+
+実際にスコア登録をするためのキー打ち込みは非常に規則正しい法則に従います
+ので、それらの命令全てを表に上げる必要はありません。(たーくさんあります。)
+
+@findex gnus-summary-increase-score
+@findex gnus-summary-lower-score
+
+@enumerate
+@item
+最初のキーはスコアを増やすための @kbd{I} (i の大文字) か、スコアを下げる
+ための @kbd{L} です。
+@item
+2番目のキーはどのヘッダーにスコアをしたいかを表します。以下のキーが使用
+可能です:
+@table @kbd
+
+@item a
+著者 (author) の名前にスコアを付けます。
+
+@item s
+表題 (subject) の行にスコアを付けます。
+
+@item x
+Xref 行にスコアを付けます---すなわち、相互投稿行です。
+
+@item t
+スレッド (thread) にスコアを付けます---References 行です。
+
+@item d
+日付 (date) にスコアを付けます。
+
+@item l
+行数 (number of lines) にスコアを付けます。
+
+@item i
+Messsage-ID にスコアを付けます。
+
+@item f
+フォローアップ (followup) にスコアを付けます。
+
+@item b
+本体 (body) にスコアを付けます。
+
+@item h
+ヘッダー (head) にスコアを付けます。
+@end table
+
+@item
+3番目のキーは合致する型です。どの合致の型が有効かはどのヘッダーにスコア
+を付けようとしているかに依ります。
+
+@table @code
+
+@item 文字列 (strings)
+
+@table @kbd
+
+@item e
+正確な (exact) 合致です。
+
+@item s
+文字列の一部の (substring) 合致です。
+
+@item f
+あいまいな (fuzzy) 合致です (@pxref{Fuzzy Matching})。
+
+@item r
+正規表現 (regexp) の合致です。
+@end table
+
+@item 日付 (date)
+@table @kbd
+
+@item b
+日付の前 (before) です。
+
+@item a
+日付の後 (after) です。
+
+@item n
+その日付です。
+@end table
+
+@item 数字 (number)
+@table @kbd
+
+@item <
+数字より小さいものです。
+
+@item =
+数字と等しいものです。
+
+@item >
+数字より大きいものです。
+@end table
+@end table
+
+@item
+4つめで、最後のキーはこれが一時的 (すなわち、期限切れ消去) のスコア登録
+か、永続的な (すなわち、期限切れ消去でない) スコア登録であるかということ、
+もしくはすぐになされるべきか、スコアファイルに追加する事はしないかという
+事を指定します。
+@table @kbd
+
+@item t
+一時的な (temporary) スコア登録です。
+
+@item p
+永続的な (permanent) スコア登録です。
+
+@item i
+即座の (immediate) スコア付けです。
+@end table
+
+@end enumerate
+
+ですから、現在の著者に正確な合致で永続的にスコアを増やしたいとしましょう:
+@kbd{I a e p}。表題に基づいてスコアを下げたくて、文字列の部分の合致を使
+い、一時的なスコア登録をしたいのであれば: @kbd{L s s t}。非常に簡単です。
+
+物事を複雑にするのは、短縮打鍵が存在するからです。2番目か3番目の文字に大
+文字を使うと、gnus は残る1つか2つの打鍵に初期値を使います。初期値は ``文
+字列の一部'' と ``一時的'' です。ですから、@kbd{I A} は @kbd{I a s t} と
+同じで、@kbd{I a R} は @kbd{I a r t} と同じです。
+
+これらの関数は数字接頭引数と、シンボル接頭引数を受け付けます 
+(@pxref{Symbolic Prefixes})。数字接頭引数はどのくらい記事のスコアを下げ
+る (もしくは上げる) かを指定します。シンボル接頭引数 @code{a} は命令が現
+在のスコアファイルではなくファイル @file{all.SCORE} を使う事を指定します。
+
+@vindex gnus-score-mimic-keymap
+@code{gnus-score-mimic-keymap} はこれらの命令がキーマップであるかのよう
+に振る舞うかどうかを指定します。
+
+
+@node Group Score Commands
+@section グループスコア命令
+@cindex group score commands
+
+残念ながら、まだたくさんはありません。
+
+@table @kbd
+
+@item W f
+@kindex W f (グループ)
+@findex gnus-score-flush-cache
+Gnus は何度もスコア連想リストを読み込むのを避けるために、それのキャッシュ
+を保持しています。この命令はキャッシュを書き出します 
+(@code{gnus-score-flush-cache})。
+
+@end table
+
+以下のような事をする事によって、コマンド行からスコア付けをする事がで
+きます。
+
+@findex gnus-batch-score
+@cindex batch scoring
+@example
+& emacs -batch -l ~/.emacs -l gnus -f gnus-batch-score
+@end example
+
+
+@node Score Variables
+@section スコア変数
+@cindex score variables
+
+@table @code
+
+@item gnus-use-scoring
+@vindex gnus-use-scoring
+@code{nil} であれば、gnus はスコアファイルを調べず、一般的に、スコア関連
+の仕事を全くしません。これは初期設定で @code{t} です。
+
+@item gnus-kill-killed
+@vindex gnus-kill-killed
+この変数が @code{nil} であれば、gnus は既に削除過程を実行された記事に決
+してスコアファイルを適用しません。これはたくさんの時間を節約するでしょう
+が、もし削除ファイルをグループに適用しているときに、削除ファイルを変更し、
+もっと多くの記事を削除するためにそれを再実行しても、それは動作しないとい
+う事になります。それをするためにはこの変数を @code{t} に実行しなければな
+りません。 (これは初期設定で @code{t} です。)
+
+@item gnus-kill-files-directory
+@vindex gnus-kill-files-directory
+全ての削除とスコアのファイルはこのディレクトリーに蓄積され、それは初期設
+定で環境変数 @code{SAVEDIR} によって初期化されます。これは初期設定で 
+@file{~/News/} です。
+
+@item gnus-score-file-suffix
+@vindex gnus-score-file-suffix
+スコアファイルにたどり着くためにグループ名に加える接尾語です (初期値で 
+@samp{SCORE} です。)
+
+@item gnus-score-uncacheable-files
+@vindex gnus-score-uncacheable-files
+@cindex score cache
+全てのスコアファイルは普通はスコアファイルの過剰読み込みを避けるために
+キャッシュされます。しかし、これによりあなたの Emacs が大きく肥大化する
+のであれば、再び必要とされないようなスコアファイルを除去するためにこの正
+規表現を使う事ができます。@file{all.SCORE} のキャッシュを止めるのは悪い
+考えですが、@file{comp.infosystems.www.authoring.misc.ADAPT} をキャッシュ
+しないのは良い考えでしょう。実際のところ、この変数は初期設定で 
+@samp{ADAPT$} で、適応スコアファイルはキャッシュされません。
+
+@item gnus-save-score
+@vindex gnus-save-score
+もし本当に複雑なスコアファイルを持っていて、たくさんの一括スコアをするの
+であれば、この変数を @code{t} に設定すると良いかもしれません。これは 
+gnus にスコアを @file{.newsrc.eld} ファイルに保存するようにさせます。
+
+@item gnus-score-interactive-default-score
+@vindex gnus-score-interactive-default-score
+全ての対話的スコア上げ/下げ命令によって使われる上げ/下げするスコアです。
+ディフォルトは1000で、過剰だと思うかもしれませんが、これは適応スコア付け
+をする余地の存在する事を確実にするためです。手で登録されたデータを適応ス
+コアでの小さな変更で上書きされたくはありません。
+
+@item gnus-summary-default-score
+@vindex gnus-summary-default-score
+記事のスコアの初期値で、初期設定では0になっています。
+
+@item gnus-summary-expunge-below
+@vindex gnus-summary-expunge-below
+この変数より低いスコアを持つ記事は概略の行に表示されません。これは初期設
+定で @code{nil} で、これはどの記事も隠されないという事です。この変数は各
+概略バッファに固有で、@code{gnus-summary-mode-hook} によって設定されるべ
+きです。
+
+@item gnus-score-over-mark
+@vindex gnus-score-over-mark
+初期設定のスコアより大きなスコアを持つ記事に対して (3桁目に) 使われる印
+です。初期設定は @samp{+} です。
+
+@item gnus-score-below-mark
+@vindex gnus-score-below-mark
+初期設定のスコアより小さなスコアを持つ記事に対して (3桁目に) 使われる印
+です。初期設定は @samp{-} です。
+
+@item gnus-score-find-score-files-function
+@vindex gnus-score-find-score-files-function
+現在のグループのスコアファイルを見つけるために使われる関数です。この関数
+はグループ名を引数として呼ばれます。
+
+使用可能な既定関数は:
+@table @code
+
+@item gnus-score-find-single
+@findex gnus-score-find-single
+グループ自身のスコアファイルだけを適用します。
+
+@item gnus-score-find-bnews
+@findex gnus-score-find-bnews
+bnews 構文を使って、全ての合致するスコアファイルを適用します。これが初期
+設定です。例えば、現在のグループが @samp{gnu.emacs.gnus} ならば、
+@file{gnu.all.SCORE}、@file{not.alt.SCORE} と @file{gnu.all.SCORE} がす
+べて適用されます。要するに、スコアファイル名の @samp{all} が @samp{.*} 
+に変換され、それから正規表現の合致がなされます。
+
+これは、全てのグループに適用したいスコア登録がいくつかある場合は、それら
+の登録を @file{all.SCORE} ファイルに入れるということです。
+
+Gnus は一般的なスコアファイルを特定のスコアファイル向けのものより前に適
+用しようと試みますが、スコアファイルはほとんど無作為の順番で適用されます。
+これはスコアファイル名の要素の数を調べる事によってなされます---
+@samp{all} 要素を取り除いて。
+
+@item gnus-score-find-hierarchical
+@findex gnus-score-find-hierarchical
+全ての親グループからの全てのスコアファイルを適用します。これは 
+@file{all.SCORE} のようなスコアファイルを持つ事はできないけれど、
+@file{SCORE}、@file{comp.SCORE} と @file{comp.emacs.SCORE} を持つ事がで
+きるという事です。
+
+@end table
+この変数は関数のリストである事もできます。その場合は、これらの全ての関数
+が呼ばれ、スコアファイルの返された全てのリストが適用されます。これらの関
+数は直接スコア連想リストのリストを返す事もできます。その場合は、それらの
+ファイルでないスコア連想リストを返す関数は、返される最後のスコアファイル
+がローカルスコアファイルである事を確実にするために、おそらく ``本当の'' 
+スコアファイル関数よりも前に置かれるべきでしょう。ふぅ。
+
+@item gnus-score-expiry-days
+@vindex gnus-score-expiry-days
+この変数は使われていないスコアファイル登録が期限切れ削除されるまでどのく
+らいの日が経つべきかを指定します。この変数が @code{nil} であると、スコア
+ファイル登録は削除されません。初期値は7です。
+
+@item gnus-update-score-entry-dates
+@vindex gnus-update-score-entry-dates
+この変数が @code{nil} でないと、合致するスコア登録は日付が更新されます。
+(これは gnus が期限切れ消去を操作している方法です---全ての合致しない登録
+は古くなりすぎ、合致する登録を新鮮で若いままです。) しかし、この変数を 
+@code{nil} に設定すると、合致する登録でさえも古くなり、あの嫌な死神と直
+面する事になるでしょう。
+
+@item gnus-score-after-write-file-function
+@vindex gnus-score-after-write-file-function
+そこでちょうど書かれたスコアファイルの名前と共に呼ばれる関数です。
+
+@item gnus-score-thread-simplify
+@vindex gnus-score-thread-simplify
+この変数が @code{nil} でないと、記事表題はスレッドと同じ方法で表題スコア
+のために単純化されます---現在の gnus-simplify-subject-functions の値によっ
+て。スコア登録が @code{文字列部分} か @code{正確な} 合致を使っていると、
+合致もこの方法で単純化されます。
+
+@end table
+
+
+@node Score File Format
+@section スコアファイル様式
+@cindex score file format
+
+スコアファイルは普通は単純な様式のものだけを含む @code{emacs-lisp} ファ
+イルです。無頓着な利用者はこれを編集しないでください。全ては概略バッファ
+から変更されるでしょう。
+
+とにかく、それを自分でいじってみたくなったのなら、例があります:
+
+@lisp
+(("from"
+  ("Lars Ingebrigtsen" -10000)
+  ("Per Abrahamsen")
+  ("larsi\\|lmi" -50000 nil R))
+ ("subject"
+  ("Ding is Badd" nil 728373))
+ ("xref"
+  ("alt.politics" -1000 728372 s))
+ ("lines"
+  (2 -100 nil <))
+ (mark 0)
+ (expunge -1000)
+ (mark-and-expunge -10)
+ (read-only nil)
+ (orphan -10)
+ (adapt t)
+ (files "/hom/larsi/News/gnu.SCORE")
+ (exclude-files "all.SCORE")
+ (local (gnus-newsgroup-auto-expire t)
+        (gnus-summary-make-false-root empty))
+ (eval (ding)))
+@end lisp
+
+この例はたいていのスコアファイルの要素を説明しています。違った方法につい
+ては、@pxref{Advanced Scoring} を見てください。
+
+これは lisp コードのように見えますが、実際はここにあるものは何も 
+@code{評価} (eval) されません。しかし、lisp リーダーがこの様式を読み込む
+のに使われますので、意味的に有効でないとしても、文法的には有効です。
+
+この連想リストでは6つのキーを使う事ができます。
+
+@table @code
+
+@item 文字列 (STRING)
+もしキーが文字列であると、それは合致が実行されるヘッダーの名前です。スコ
+アはこれらの8つのヘッダーだけに実行されます: @code{From}、@code{Subject}、
+@code{References}、@code{Message-ID}、@code{Xref}、@code{Lines}、
+@code{Chars}、@code{Date} です。これらのヘッダーに加えて、gnus に記事全
+体を取得して,記事のより大きな部分で合致を行うようにする3つの文字列があり
+ます: @code{Body} は記事の本体 (Body) で合致を実行し、@code{Head} は記事
+のヘッダー (Head) で合致を実行し、@code{All} は記事全体で合致を実行しま
+す。最後のこれらの3つのキーを使う事はグループに入るときに速度を @emph{か
+なり} 遅くする事に気を付けてください。スコアを付ける事のできる最後の 
+``ヘッダー'' は @code{Followup} です。これらのスコア登録はそれに合致する
+記事への全てのフォローアップのための新しいスコア登録が付け加えられる事に
+なります。
+
+このキーに続くのは任意の数のスコア登録で、それぞれのスコア登録は1つから4
+つまでの要素を持ちます。
+@enumerate
+
+@item
+最初の要素は @dfn{合致要素} です。たいていのヘッダーではこれは文字列です
+が、Lines と Chars ヘッダーではこれは整数でなければなりません。
+
+@item
+もし2番目の要素が存在するなら、それは数字であるべきです---@dfn{スコア要
+素}。この数字は負の無限大から正の無限大までの間の整数であるべきです。も
+し合致が成功すれば、この数字が記事のスコアに加えられます。もしこの要素が
+存在していなければ、数字 @code{gnus-score-interactive-default-score} が
+代わりに使われます。これは初期設定で1000です。
+
+@item
+もし3番目の要素が存在していると、それは数字であるべきです---@dfn{日付要
+素} です。この日付は最後にこのスコア登録が合致した時刻を示し、これはスコ
+ア登録の期限切れ消去機構の機能のために使われます。この要素が存在していな
+ければ、スコア登録は永続します。日付は紀元前1年12月31日から経過した日に
+ちの数で表されます。
+
+@item
+もし4番目の要素が存在していると、それはシンボルであるべきです---@dfn{型
+要素} です。この要素はこのスコア登録が記事に合致するかどうかを調べるのに
+どの関数が使われるべきであるかを指定します。
+
+@table @dfn
+
+@item From, Subject, References, Xref, Message-ID
+たいていのヘッダーの型に対して、@code{r} と @code{R} (正規表現) (regexp) 
+や、@code{s} と @code{S} (文字列の一部) (substring) 型、@code{e} と 
+@code{E} (正確な合致) (exact match)、@code{w} (語の合致) (word match) 型
+が存在します。もしこの要素が存在しないと、gnus は文字列の一部の合致が用
+いられるべきであるとみなします。@code{R}、@code{S}、@code{E} は合致が大文
+字と小文字を区別する方法で行われるという点で他のものと異なります。全ての
+これらの一文字型は本当は @code{regexp}、@code{exact}、@code{word} 型の短
+縮形で、もしそうしたいと思えばこちらを代わりに使う事ができます。
+
+@item Lines, Chars
+これらの2つのヘッダーは違った合致の型を使います: @code{<}、@code{>}、
+@code{=}、@code{>=}、@code{<=} です。合致が @code{Lines} でなされている
+と、いくつかのバックエンド (@code{nndir}のようなもの) は @code{Lines} ヘッ
+ダーを作成しないために全ての記事が0行であるとして扱われる事に気を付けて
+ください。これはもし少しの行しかない記事のスコアを下げているのなら、変な
+結果が起こり得る事になります。
+
+@item Date
+Date (日付) ヘッダーには3つのなんとなくばかげている合致の型があります:
+@code{before}、@code{at}、@code{after} です。私は本当にこれが役立つよう
+な機会を想像できないのですが、この関数を提供しないのもなんとなくばかげて
+います。そうした場合のためにあるのです。いつ必要になるかは誰にもわかりま
+せん。転ばぬ先の杖です。一度焼けると2度恥ずかしい、です。本をカバーで判
+断しては行けません。最初の日に性行為を行っていは行けません。 (しかし、私
+は少なくとも一人、引用しますが、``この関数は欠かせないものである事がわかっ
+た'' と言った人が入ると聞いています。)
+
+@cindex ISO8601
+@cindex date
+もっと役立つ合致の型は @code{正規表現} です。それによって日付文字列に正
+規表現を用いて合致させる事ができます。日付はまず ISO8601 短縮様式 
+(compact format) に標準化されます---@var{YYYYMMDD}@code{T}@var{HHMMSS} 
+です。例えば、もし全ての年の4月1日に投稿された全ての記事にが治させたいの
+であれば、@samp{....0401.........} を合致文字列として使う事ができます。
+(日付は元々の標準時で保存されていますので、その記事が投稿されたところで4
+月1日に投稿された記事に合致する事に注意してください。標準時は一家にとっ
+て非常に有益な楽しみでしょう？)
+
+@item Head, Body All
+これらの3つの合致のキーは @code{From} ヘッダー (など) と同じ合致の型を使
+います。
+
+@item Followup
+この合致のキーは少し特別で、それは @code{From} ヘッダーに合致し、合致し
+た記事だけでなくその記事への全てのフォローアップのスコアにも影響します。
+これはたとえば、あなた自身の記事へのフォローアップのスコアを増やしたり、
+良く知られた問題児へのフォローアップ記事のスコアを下げたりするのに使われ
+ます。@code{From} ヘッダーが使うのと同じ型の合致を使います。 (この合致キー
+を使うと、ファイル @file{ADAPT} を作る事になります。)
+
+@item Thread
+この合致キーは @code{Followup} 合致キーと同じ行に動作します。
+@code{Message-ID} @var{X} で始まっている (副)スレッドにスコアを付けたい
+のであれば、@samp{thread} 合致を付け加えます。これは @code{Reference} ヘッ
+ダーに @var{X} を持つそれぞれの記事に新しい @samp{thread} 合致を追加しま
+す。 (これらの新しい @samp{thread} 合致はこれらの合致する記事の 
+@code{Message-ID} を使います。) これはスレッドのいくつかの記事が完全な 
+@code{References} ヘッダーを持っていなかったとしても、スレッド全体のスコ
+アを上げ/下げできる事を保証します。これを使うと、スレッドの記事に決定的
+でないスコアが付くかもしれないということに注意してください。 (この合致キー
+を使うと、ファイル @file{ADAPT} を作る事になります。)
+@end table
+@end enumerate
+
+@cindex Score File Atoms
+@item mark
+この登録の値は数字であるべきです。この数字より低いスコアの記事には既読の
+印が付きます。
+
+@item expunge
+この登録の値は数字であるべきです。この数字より低いスコアの記事は概略バッ
+ファから削除されます。
+
+@item mark-and-expunge
+この登録の値は数字であるべきです。この数字より低いスコアの記事には既読の
+印が付き、概略バッファから削除されます。
+
+@item thread-mark-and-expunge
+この登録の値は数字であるべきです。スコアの総計がこの数字より低いスレッド
+には既読の印が付き、概略バッファから削除されます。
+@code{gnus-thread-score-function} はスレッドのスコアの総計をどのように計
+算するかを指定します。
+
+@item files
+この登録の値は任意の数のファイル名であるべきです。これらのファイルもスコ
+アファイルであるとみなされ、これがされたのと同じような方法で読み込まれま
+す。
+
+@item exclude-files
+この登録の手がかりは任意の数のファイル名であるべきです。これらのファイルは何
+らかの理由で普通は読み込まれるようになっていたとしても、読み込まれません。
+
+@item eval
+この登録の値は @code{評価} されます。この要素は全体的スコアファイルを扱っ
+ているときは無視されます。
+
+@item read-only
+読み込み専用スコアファイルは更新されたり保存されたりしません。全体的スコ
+アファイルはこのアトムを使用するべきです (@pxref{Global Score Files})。 
+(注意: @dfn{全体的} はここでは本当に @dfn{全体的} という意味です。個人的
+な全てのグループに適用するスコアファイルの事ではありません。)
+
+@item orphan
+この登録の値は数字であるべきです。親記事を持たない記事はスコアにこの数字
+が加えられます。@samp{comp.lang.c} のような量の多いニュースグループを追
+いかけているとしてください。おそらく2,3のスレッドと新しいスレッドだけを
+追いたいでしょう。
+
+以下の2つのスコアファイル登録によってそれをする事ができます:
+
+@example
+        (orphan -500)
+        (mark-and-expunge -100)
+@end example
+
+最初にこのグループに入ったときは、新しいスレッドだけを見ます。それからお
+もしろいと思ったスレッドのスコアを上げ (@kbd{I T} もしくは @kbd{I S} に
+よって)、残りを無視 (@kbd{C y}) します。次にグループに入ったときは、おも
+しろいスレッドの新しい記事と全く新しいスレッドを見る事になります。
+
+すなわち---orphan (孤児) スコアアトムは普通のスコア法則では発見できない興味深いスレッドが少し存在しする量の多いグループのためにあります。
+
+@item adapt
+この登録は適応スコアを制御します。もしこれが @code{t} であると、初期設定
+の適応スコア法則が使われます。もしこれが @code{ignore} であると、このグ
+ループには適応スコアは実行されません。もしリストであると、そのリストは適
+応スコア法則として用いられます。もしそれが存在しないか、@code{t} や 
+@code{ignore} でない他のものであれば、初期設定の適応スコア法則が使われま
+す。たいていのグループに適応スコアを使いたいのであれば、
+@code{gnus-use-adaptive-scorint} を @code{t} に設定し、@code{(adapt
+ignore)} を適応スコアをしたくないグループに挿入するでしょう。少しのグルー
+プでだけ適応スコアを行いたいのであれば、@code{gnus-use-adaptive-scoring} 
+を @code{nil} に設定し、@code{(adaptive t)} をそれを行いたいグループのス
+コアファイルに挿入するでしょう。
+
+@item adaptive-file
+全ての適応スコア登録はこの登録によって名づけられたファイルに入ります。そ
+れはグループに入るときにも適用されます。このアトムは多くのグループに同じ
+適応スコアファイルを用いる事によって、複数のグループに一度に適応スコアを
+付けたいときに便利でしょう。
+
+@item local
+@cindex local variables
+この登録の値は @code{(VAR VALUE)} 対のリストであるべきです。それぞれの 
+@var{var} は現在の概略バッファのバッファ固有になり、指定された値 (value) 
+に設定されます。これは便利な、もし少し変だとしても、フックをあまり好まな
+いいくつかのグループで変数を設定する方法です。@var{value} は評価されない
+事に注意してください。
+@end table
+
+
+@node Score File Editing
+@section スコアファイル編集
+
+普通は全てのスコア命令を概略バッファから発行しますが、手でそれらを編集し
+たい気に駆られるかもしれませんので、それのためのモードを提供しています。
+
+それは単純に少しカスタマイズされた @code{emacs-lisp} モードで、以下の追
+加の命令が存在します:
+
+@table @kbd
+
+@item C-c C-c
+@kindex C-c C-c (スコア)
+@findex gnus-score-edit-done
+あなたが行った変更を保存して概略バッファに戻ります 
+(@code{gnus-score-edit-done})。
+
+@item C-c C-d
+@kindex C-c C-d (スコア)
+@findex gnus-score-edit-insert-date
+現在の日付を数字様式で挿入します (@code{gnus-score-edit-insert-date})。
+もしこれがどのようなものであろうと考えているのであれば、これは本当に日の
+数字です。
+
+@item C-c C-p
+@kindex C-c C-p (スコア)
+@findex gnus-score-pretty-print
+適応スコアファイルは整えられていない流儀で保存されます。もしこれらのファ
+イルの内の一つを読みたいと思っているのであれば、まず @dfn{素敵な表示} を
+したいでしょう。この命令 (@code{gnus-score-pretty-print}) があなたのため
+にそれをします。
+
+@end table
+
+このモードを使うためには @kbd{M-x gnus-score-mode} と打ってください。
+
+@vindex gnus-score-mode-hook
+@code{gnus-score-menu-hook} がスコアモードバッファで実行されます。
+
+概略バッファでは、@kbd{V f} や @kbd{V e} のような命令でスコアファイルの
+編集を始める事ができます。
+
+
+@node Adaptive Scoring
+@section 適応性スコア
+@cindex adaptive scoring
+
+これらのスコア付けはあなたを憂鬱にさせてしまうかもしれないので、
+gnus にはこれらを全て自動的に --- まるで魔法でも使ったように作成
+する方法があります。いやむしろ、人工無能によって、という方が正確
+かな。
+
+@vindex gnus-use-adaptive-scoring
+記事を読んだとき、あるいは記事に既読の印をつけたとき、記事を削除
+したときに、その印を残しておいてください。グループから出るときに
+gnus は、それらの印の辺りを嗅ぎ回り、何の印を見つけたかに依存し
+てスコア要素を追加します。この機能は
+@code{gnus-use-adaptive-scoring} を @code{t} か @code{(line)} に
+設定することで有効になります。もしスコアを、表題に現れる個別の単
+語をもとに適応させたければ、この変数を @code{(word)} に設定して
+ください。両方の適応方法を使いたければ、この変数を@code{(word
+line)} に設定してください。
+
+@vindex gnus-default-adaptive-score-alist
+@code{gnus-default-adaptive-score-alist} 変数をカスタマイズする
+ことで、スコア付けの処理を完全に制御できます。例えば、このような
+感じになります。
+
+@lisp
+(defvar gnus-default-adaptive-score-alist
+  '((gnus-unread-mark)
+    (gnus-ticked-mark (from 4))
+    (gnus-dormant-mark (from 5))
+    (gnus-del-mark (from -4) (subject -1))
+    (gnus-read-mark (from 4) (subject 2))
+    (gnus-expirable-mark (from -1) (subject -1))
+    (gnus-killed-mark (from -1) (subject -3))
+    (gnus-kill-file-mark)
+    (gnus-ancient-mark)
+    (gnus-low-score-mark)
+    (gnus-catchup-mark (from -1) (subject -1))))
+@end lisp
+
+見てお分かりのように、この連想リストの各要素は、キーとして印 (変
+数名かもしくは ``本当の'' 印 --- つまり文字)を持ちます。このキー
+の後には任意の数のヘッダー/スコアの組が続きます。もしそのキーの
+後にヘッダー/スコアの組が一つもなければ、そのキーが記事の印とし
+てついている記事に対しては適応性スコアは実行されません。例えば上
+記の例では、@code{gnus-unread-mark} がついている記事は適応性スコ
+アの登録項目にはなりません。
+
+各記事はただ一つの印しか持ち得ないので、それぞれの記事にはこれら
+の規則のうちただ一つしか適用されません。
+
+@code{gnus-del-mark} を例に取りましょう --- この連想リストでの意
+味は、この印 (すなわち @samp{D} の印)がついている記事は全て、
+@code{From} ヘッダーをもとに -4 下げられ @code{Subject} で -1 下
+げられるスコア登録が追加されます。これをあなたの偏見に合わせて変
+更してください。
+
+もし 10 個の記事に同じ subject で @code{gnus-del-mark} の印がつ
+いていたとすると、この印に対する規則は十回適用されます。それはつ
+まり、その subject は -1 の十倍のスコアを得ます。その値は、私が
+大きく誤解していないかぎり、-10 のはずです。
+
+もし自動期限切れ消去 (メール) グループ (@pxref{Expiring Mail})
+があれば、既読記事には全て @samp{E} 印がつけられます。これはおそ
+らく、適応性スコア付けをちょっとばかり不可能にするので、自動期限
+切れ消去と適応性スコアは一緒にはうまくやっていけません。
+
+スコアをつけられるヘッダーには @code{from}、 @code{subject}、
+@code{message-id}、 @code{references}、 @code{xref}、 
+@code{lines}、@code{chars}、@code{date} があります。さらに
+@code{followup} にもスコア付けできます。これは現在の記事の
+@code{Message-ID} を使用して @code{References} ヘッダーにマッチ、
+すなわちこれに続いたスレッドにマッチする適応性スコア登録を作成し
+ます。
+
+また @code{thread} にもスコア付けすることができます。これはスレッ
+ド中の全ての記事にスコア付けしようとします。@code{thread} のマッ
+チは、@code{Message-ID} を使って記事の @code{References} ヘッダー
+にマッチさせます。マッチが起こったらその記事の @code{Message-ID}
+が @code{thread} 規則に追加されます。(ちょっと考えてみてください。
+後で頭痛薬を二粒お勧めしときますが)
+
+この機構を使うならば、ときどき記事を既読にしてしまう小さな変更を
+避けるために、スコアファイルの @code{mark} アトムを何か小さい値 
+--- ことによれば -300 くらいに設定しておいた方が良いです。
+
+適応性スコアを一週間かそこら使ってくると、gnus はそれ相応に調教
+され、あなたが何も言わなくても、あなたの好きな投稿者を強調し、あ
+まり好きではない投稿者を消去するようになるはずです。
+
+どのグループにおいて適応性スコアを作動させるかは、スコアファイル
+(@pxref{Score File Format}) を使うことによって制御できます。また
+これを使って、違ったグループに対して違った規則を使うようにもでき
+ます。
+
+@vindex gnus-adaptive-file-suffix
+適応性スコア登録項目は、グループ名に
+@code{gnus-adaptive-file-suffix} を付加した名前のファイルに入れ
+られます。初期設定値は @samp{ADAPT} です。
+
+@vindex gnus-score-exact-adapt-limit
+適応性スコアを行うときは、部分文字列一致やファジーな一致を行った
+方が、おそらくほとんどの場合において良い結果が得られるでしょう。
+しかし、ヘッダーの一致した部分が短い場合、意図に反するような動作
+をする可能性が大きくなるので、
+@code{gnus-score-exact-adapt-limit} より短い長さしか一致しない場
+合は完全一致が行われます。この変数が @code{nil} であれば、この問
+題が起こらないように常に完全一致が行われます。
+
+@vindex gnus-default-adaptive-word-score-alist
+上で述べたように、個別の単語に対してもヘッダー全体に対しても適応
+を行うことができます。単語に対して適応を行った場合、
+@code{gnus-default-adaptive-word-score-alist} 変数によって、各単
+語に対してある印へどんなスコアを与えるかを指定します。
+
+@lisp
+(setq gnus-default-adaptive-word-score-alist
+      `((,gnus-read-mark . 30)
+        (,gnus-catchup-mark . -10)
+        (,gnus-killed-mark . -20)
+        (,gnus-del-mark . -15)))
+@end lisp
+
+これが初期設定値です。単語に対する適応を有効にすると、
+@code{gnus-read-mark} の印のついた記事の表題に現れる全ての単語が、
+スコアに 30 点追加するというスコア規則を生み出します。
+
+@vindex gnus-default-ignored-adaptive-words
+@vindex gnus-ignored-adaptive-words
+@code{gnus-default-ignored-adaptive-words} のリストに現れる単語
+は無視されます。無視したい単語を追加したいときは、この変数ではな
+く @code{gnus-ignored-adaptive-words} リストの方を使ってください。
+
+@vindex gnus-adaptive-word-syntax-table
+スコア付けが終了したとき、@code{gnus-adaptive-word-syntax-table}
+の文法表がその影響を受けます。これは標準の文法表と似ていますが、
+単語の構成要素とならない文字の数も考慮します。
+
+@vindex gnus-adaptive-word-minimum
+もし @code{gnus-adaptive-word-minimum} に数字が設定されていると、
+単語適応性スコア付け処理において、記事のスコアがこの数字よりも小
+さくなることはありません。初期設定値は @code{nil} です。
+
+この機構をしばらく使ってみた後には、あなたがどんな単語が好きで
+どんな単語が嫌いかを、この規則を通して診断する利用者精神分析命令
+@code{gnus-psychoanalyze-user} を書いてみると良いかもしれません。
+いや、良くないかな。
+
+単語適応性スコア付けは非常に実験的なものであって、今後変更される
+であろうということは心に留めておいてください。第一印象では、これ
+は現状では全く使い物にならないように思えます。これをもっと使える
+ようにするためには、(より厳密な統計的手法を巻き添えにして) さら
+なる作業が必要となるでしょう。
+
+
+@node Home Score File
+@section ホームスコアファイル
+
+新しいスコアファイル登録項目が入れられるスコアファイルは、ホーム
+スコアファイル @dfn{home score file} と呼ばれます。これは通常
+(初期設定で) そのグループ用のスコアファイルになります。例えば、
+@samp{gnu.emacs.gnus} 用のホームスコアファイルは
+@file{gnu.emacs.gnus.SCORE} となるわけです。
+
+しかしながら、これはあなたのお望みではないかもしれません。たくさ
+んのグループ間で共通のホームスコアファイルを共有すると便利なとき
+が多いでしょう --- 例えば全ての @samp{emacs} グループで同じホー
+ムスコアファイルを使うこともできます。
+
+@vindex gnus-home-score-file
+これを制御する変数が @code{gnus-home-score-file} です。これは以
+下の値を取り得ます。
+
+@enumerate
+@item
+文字列。この場合このファイルが全てのグループでホームスコアファイ
+ルとして使用されます。
+
+@item
+関数。この関数の結果がホームスコアファイルとして使用されます。こ
+の関数はグループの名前を引数として呼び出されます。
+
+@item
+リスト。このリストの要素は以下の値を取り得ます。
+
+@enumerate
+@item
+@var{(regexp file-name)}。@var{regexp} がグループ名にマッチすれ
+ば、@var{file-name} がホームスコアファイルとして使用されます。
+
+@item
+関数。この関数が @code{nil} 以外を返せば、その返却値がホームスコ
+アファイルとして使用されます。
+
+@item
+文字列。 この文字列をホームスコアファイルとして使用します。
+@end enumerate
+
+このリストの中からマッチするものを、最初から後ろの方に向かって探
+していきます。
+
+@end enumerate
+
+というわけで、単に一個のスコアファイルを使いたい場合は、以下のよ
+うにすればできます。
+
+@lisp
+(setq gnus-home-score-file
+      "my-total-score-file.SCORE")
+@end lisp
+
+もし全 @samp{gnu} グループに対して @file{gnu.SCORE} を、
+全 @samp{rec} グループに対して @file{rec.SCORE} (等々) を使いた
+ければ、このようにできます。
+
+@lisp
+(setq gnus-home-score-file
+      'gnus-hierarchial-home-score-file)
+@end lisp
+
+これは便利なようにあらかじめ提供されている関数です。
+
+もし @samp{emacs} グループ用のスコアファイルと、それとは別の
+@samp{comp} グループ用のスコアファイルを使い、他の全部のグループ
+ではそれぞれ独自のスコアファイルを使いたいのであれば、
+
+@lisp
+(setq gnus-home-score-file
+      ;; All groups that match the regexp "\\.emacs"
+      '("\\.emacs" "emacs.SCORE")
+      ;; All the comp groups in one score file
+       ("^comp" "comp.SCORE"))
+@end lisp
+
+@vindex gnus-home-adapt-file
+@code{gnus-home-adapt-file} は @code{gnus-home-score-file} と全
+く同じように動作しますが、これは代わりに何をホーム適用スコアファ
+イルにするかを指定します。新しい適用ファイル登録項目は全て、この
+変数で指定されるファイルに入れられます。値には同じ文法が許されま
+す。
+
+@code{gnus-home-score-file} と @code{gnus-home-adapt-file} の使
+用に加えて、グループパラメータ (@pxref{Group Parameters}) とトピッ
+クパラメータ (@pxref{Topic Parameters}) を使ってほぼ同様のことが
+できます。グループ、トピックパラメータはこの変数よりも優先されます。
+
+
+@node Followups To Yourself
+@section 自分自身へのフォローアップ
+
+Gnus は現在のバッファーから @code{Message-ID} ヘッダーを見つけ出
+すために二つの命令を提供しています。 そして gnus は、他の記事に
+おける@code{References} ヘッダー中にこの @code{Message-ID} を使っ
+ている得点を、スコア規則として追加します。これは実質的に、その記
+事へ返答した記事で、現在のバッファーにあるもの全てに対してスコア
+を増加させます。これはあなたの言ったことに対してみんなが答えてく
+れたとき、すぐにそれに目を向けたいときにとても便利ですね。
+
+@table @code
+
+@item gnus-score-followup-article
+@findex gnus-score-followup-article
+これはあなた自身の記事に直接フォローアップした記事にスコアを加算
+します。
+
+@item gnus-score-followup-thread
+@findex gnus-score-followup-thread
+これはあなたの記事より ``下'' のスレッドに現れる記事全てに対して
+スコアを加算します。
+@end table
+
+@vindex message-sent-hook
+これら二つの関数は、基本的にはどちらも @code{message-sent-hook} 
+のようなフックの中で使うためのものです。
+
+あなたの自分の @code{Message-ID} をじっくりと眺めてみると、はじ
+めの二、三文字は常に同じであることに気がつくでしょう。以下の二つ
+は私のものです。
+
+@example
+<x6u3u47icf.fsf@@eyesore.no>
+<x6sp9o7ibw.fsf@@eyesore.no>
+@end example
+
+つまりこのマシン上での ``私の'' の識別は @samp{x6} であるという
+ことです。これは使えます --- 以下の規則は私自身へのフォローアッ
+プ全てに対してスコアを増加させるでしょう。
+
+@lisp
+("references"
+ ("<x6[0-9a-z]+\\.fsf\\(_-_\\)?@@.*eyesore.no>"
+  1000 nil r))
+@end lisp
+
+``あなたの'' が最初の二文字になるか最初の三文字になるかはシステ
+ムに依存します。
+
+
+@node Scoring Tips
+@section スコア付けの奥義
+@cindex scoring tips
+
+@table @dfn
+
+@item クロスポスト
+@cindex crossposts
+@cindex scoring crossposts
+クロスポストのスコアを低くしたければ、マッチさせるべき行は
+@code{Xref} ヘッダーです。
+@lisp
+("xref" (" talk.politics.misc:" -1000))
+@end lisp
+
+@item 複数のクロスポスト
+ある数、例えば 3 つ以上のグループにクロスポストされている記事の
+スコアを低くしたければ、
+@lisp
+("xref" ("[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+ +[^:\n]+:[0-9]+" -1000 nil r))
+@end lisp
+
+@item 本文へのマッチ
+これは一般的にはあまり良い考えではありません --- それはとても長
+時間かかってしまうからです。実際 gnus は、それぞれの記事を個別に
+サーバーから取得してこなければならないのです。でも、あなたはそれ
+でもやりたいかも知れませんね。マッチさせるキーは三つ 
+(@code{Head}、@code{Body}、 @code{All}) あるのですが、スコアファ
+イル毎に一つ選んでそれに固定した方が良いです。もし二つを使うと、
+それぞれの記事は @emph{二回} 取得されてしまいます。もし 
+@code{Head} からちょっとだけ、@code{Body} からちょっとだけマッチ
+させたい、というのであれば、素直に @code{All} を使って全部マッチ
+させてください。
+
+@item 既読の印付け
+ある一定数字以下のスコアを持つ記事には、おそらく既読の印をつけて
+しまいたくなるでしょう。これは @file{all.SCORE} ファイルに以下の
+ものを入れておくことによって最も簡単に実現できます。
+@lisp
+((mark -100))
+@end lisp
+@code{expunge} を使って同様のことを考えることもできます。
+
+@item 否定文字クラス
+もし @code{[^abcd]*} みたいなものを指定すると、たぶん期待通りの
+結果は得られないでしょう。これは改行文字にもマッチしてしまい、えー
+と、未知の世界まで続くかもしれません。代わりに@code{[^abcd\n]*} 
+を使ってください。
+@end table
+
+
+@node Reverse Scoring
+@section 逆スコア
+@cindex reverse scoring
+
+もし、表題ヘッダーに @samp{Sex with Emacs} という文字がある記事
+だけを残して、その他の記事全てを消去してしまいたければ、スコアファ
+イルに以下のようなものを入れることもできます。
+
+@lisp
+(("subject"
+  ("Sex with Emacs" 2))
+ (mark 1)
+ (expunge 1))
+@end lisp
+
+そして @samp{Sex with Emacs} にマッチする全ての記事を集めて、残
+りを蹴飛ばすために既読の印をつけ、消去します。
+
+
+@node Global Score Files
+@section グローバルスコアファイル
+@cindex global score files
+
+間違いなく、他のニュースリーダーは ``グローバル削除ファイル 
+(global kill file)'' を持っています。これは普通、全てのグループ
+に適用される、ユーザーのホームディレクトリーに格納されている一つ
+の削除ファイル以上の何物でもありません。はん! ちっぽけなニュース
+リーダーだね。弱すぎ。
+
+僕がここで話しているのはグローバルスコアファイルです。全世界中か
+らの、至る所からのユーザーによるスコアファイル、世界の国々を全て、
+巨大な一つの幸せなスコアファイル同盟に団結させるスコアファイル!
+Ange-score! 新しくてテストしていない!
+
+@vindex gnus-global-score-files
+他の人のスコアファイルを使うためにしなければならないことは、
+@code{gnus-global-score-files} 変数を設定することだけです。それ
+ぞれのスコアファイル毎に、あるいはそれぞれのスコアファイルディレ
+クトリ毎に対して一つの項目になります。Gnus はどのスコアファイル
+をどのグループに使うのが適切であるかを自分で決定します。
+
+例えば
+@file{/ftp@@ftp.gnus.org:/pub/larsi/ding/score/soc.motss.SCORE}
+のスコアファイルと @file{/ftp@@ftp.some-where:/pub/score} ディレ
+クトリにある全てのスコアファイルを使いたければ、
+
+@lisp
+(setq gnus-global-score-files
+      '("/ftp@@ftp.gnus.org:/pub/larsi/ding/score/soc.motss.SCORE"
+        "/ftp@@ftp.some-where:/pub/score/"))
+@end lisp
+
+@findex gnus-score-search-global-directories
+どうだい、簡単だろう? ディレクトリ名は @samp{/} で終わらなくては
+なりません。これらのディレクトリは普通は、一回の gnus 使用期間中
+に一回だけしか読み込みません。もし遠隔ディレクトリを手動で再読み
+込みする必要が出てきたら、
+@code{gnus-score-search-global-directories} 命令を使うことができ
+ます。
+
+ただし現時点では、このオプションを使うとグループに入るのがいくら
+か遅くなります。(つまり --- かなり、ですけど)
+
+もしスコアファイルを、他の人たちに使ってもらうように維持したくなっ
+てきたら、単にあなたのスコアファイルを匿名 FTP に置いて、世界中
+に公表してください。逆司会者になれるよ! その後に続いて間違いなく
+起こる逆司会者戦争、すなわち人々の共感を勝ち取るための逆司会者の
+戦いに参加することで、彼らのスコアファイルに間違った前提を使わせ
+るように誘導するのだ! やった! これでネットは救われる!
+
+以下に、逆司会者なりたがりのための秘技をいくつか、即席で述べます。
+
+@itemize @bullet
+
+@item
+非常に多くの場所にクロスポストされている記事は間違いなく屑である。
+@item
+一個の不適切な記事を減点するには、@code{Message-ID} で減点する。
+@item
+特に素晴らしい投稿者たちは永続的な主役達として加算する。
+@item
+そのグループの憲章無視の投稿を頻繁に繰り返す投稿者は、絶滅させて
+しまって差し支えない。
+@item
+@code{mark} と @code{expunge} アトムを設定し、汚らわしい記事を完
+全に葬り去る。
+
+@item
+消去のスコア項目を使ってファイルの大きさを小さく抑える。でもおそ
+らくは、サイトによって古い記事を長期間保存するように、期限切れ消
+去の期間は長く取るでしょうけれども。
+@end itemize
+
+... 果たして他のニュースリーダーは将来、グローバルスコアファイル
+をサポートするでしょうか? @emph{うふふ}。そう、どう考えてみたっ
+て、Blue Wave や xrn や 1stReader とかいったニュースリーダーはス
+コアをサポートするべきだね。今は固唾を飲んで見守ることにしましょ
+うか?
+
+
+@node Kill Files
+@section 消去ファイル
+@cindex kill files
+
+Gnus はまだ、あのうざったい古い消去ファイルをサポートしています。
+実際消去ファイルの項目はもう消してもよいのですが、それは Daniel
+Quinlan がスコアファイルを考え出す前に私が書いたものなので、その
+コードはまだ残っています。
+
+要するに、消去処理はスコア処理よりもかなり遅いので (私の言いたい
+のは @emph{ものすごく})、あなたの消去ファイルはスコアファイルに
+書き換えた方が良いかもしれません。
+
+いずれにせよ、消去ファイルは普通の @code{emacs-lisp} ファイルです。
+このファイルの中にはどんな形式でも入れることができます。つまり消
+去ファイルをグループに入ったときに実行する一種の原始的なフック関
+数のように使うことができます。まあそれがあまりいい方法ではないと
+してもね。
+
+通常の消去ファイルは以下のようになります。
+
+@lisp
+(gnus-kill "From" "Lars Ingebrigtsen")
+(gnus-kill "Subject" "ding")
+(gnus-expunge "X")
+@end lisp
+
+これは私が書いた全ての記事に既読の印をつけ、概略バッファから印の
+ついた記事を削除します。とっても便利です。あなたもそう思うでしょ。
+
+他のプログラムでは全く違う消去ファイルの構文を使っています。もし
+gnus が @code{rn} の消去ファイルらしきものに出会ったら、何とかそ
+れを解釈しようとします。
+
+GNUS 消去ファイルを編集するための二つの概略バッファ関数がありま
+す。
+
+@table @kbd
+
+@item M-k
+@kindex M-k (Summary)
+@findex gnus-summary-edit-local-kill
+そのグループの消去ファイルを編集する
+(@code{gnus-summary-edit-local-kill})。
+
+@item M-K
+@kindex M-K (Summary)
+@findex gnus-summary-edit-global-kill
+一般消去ファイルを編集する
+(@code{gnus-summary-edit-global-kill})。
+@end table
+
+消去ファイルを編集する二つのグループモード関数があります。
+
+@table @kbd
+
+@item M-k
+@kindex M-k (Group)
+@findex gnus-group-edit-local-kill
+そのグループの消去ファイルを編集する
+(@code{gnus-group-edit-local-kill})。
+
+@item M-K
+@kindex M-K (Group)
+@findex gnus-group-edit-global-kill
+一般消去ファイルを編集する (@code{gnus-group-edit-global-kill})。
+@end table
+
+消去ファイル変数。
+
+@table @code
+@item gnus-kill-file-name
+@vindex gnus-kill-file-name
+@samp{soc.motss} グループ用の消去ファイルは通常
+@file{soc.motss.KILL} という名前です。このファイル名を得るために
+グループ名に付加される接尾辞は、@code{gnus-kill-file-name} 変数
+で与えられます。``グローバル'' 消去ファイルは (スコアファイルの
+意味での ``グローバル'' じゃないよ、もちろん) 単に @file{KILL}と
+いう名前です。
+
+@vindex gnus-kill-save-kill-file
+@item gnus-kill-save-kill-file
+この変数が @code{nil} 以外であれば、gnus は処理の後に消去ファイ
+ルを保存します。これは期限切れ削除を行う消去を使っているときに必
+要です。
+
+@item gnus-apply-kill-hook
+@vindex gnus-apply-kill-hook
+@findex gnus-apply-kill-file-unless-scored
+@findex gnus-apply-kill-file
+グループに消去ファイルを適用するために呼び出されるフック。これは
+初期設定では @code{(gnus-apply-kill-file)} です。もし同じグルー
+プに対してスコアファイルがある場合には消去ファイルを無視したけれ
+ば、このフックを @code{(gnus-apply-kill-file-unless-scored)} に
+設定します。消去ファイルを処理させたくなければ、この変数を
+@code{nil} に設定してください。
+
+@item gnus-kill-file-mode-hook
+@vindex gnus-kill-file-mode-hook
+消去ファイルモードバッファ内で呼び出されるフック。
+
+@end table
+
+
+@node Converting Kill Files
+@section 消去ファイルの変換
+@cindex kill files
+@cindex converting kill files
+
+あなたが古い消去ファイルをどっさり持っているのであれば、それらを
+スコアファイルに変換したくなるでしょう。もしそれらが ``普通の'' 
+やつであれば、@file{gnus-kill-to-score.el} パッケージを使うこと
+ができます。そうでなければ、手で変換しなければならないでしょう。
+
+消去ファイルからスコアファイルへの変換パッケージは、標準では
+gnus には含まれません。
+@file{http://www.ifi.uio.no/~larsi/ding-other/gnus-kill-to-score}
+から入手することができます。
+
+もしあなたの消去ファイルが非常に複雑なものであれば --- それに
+@code{gnus-kill} 形式以外のものがたくさん含まれていれば、それら
+を手で変換しなければなりません。あるいは単にそれらを、そのままに
+しておいてください。Gnus は以前同様にそれらを使ってくれるでしょ
+う。
+
+
+@node GroupLens
+@section GroupLens
+@cindex GroupLens
+
+GoupLens は、毎日作成される多くの量のニュース記事から質の良い記事を他の
+人と共に見つけるのを助けるための共同選別機構です。
+
+これを達成するために、GroupLens 機構はあなたが既に読んだ記事に対する意見
+を、同じような事をした他の人の意見と結合して、それぞれの未読ニュース記事
+に個人化された予言を与えます。GroupLens を仲人のようなものだと見なしてく
+ださい。GroupLens はあなたがどのように記事の価値を付けるかを見て、同じよ
+うに記事の価値を付ける人を探します。一度あなたの意見と一致する人を発見す
+れば、予言の形で、それらの人が記事をどう思うかをあなたに告げます。あなた
+はこの予言を記事を読みたいかどうかを決定するのに役立てる事ができます。
+
+@menu
+* Using GroupLens::          どのように gnus に GroupLens を使わせるよう
+                             にするか。
+* Rating Articles::          GropLens にあなたがどのように値を付けるかを
+                             知らせる。
+* Displaying Predictions::   GropuLens によって与えられた予言を表示する。
+* GroupLens Variables::      GoupLens をカスタマイズする。
+@end menu
+
+
+@node Using GroupLens
+@subsection GroupLens を使う
+
+GroupLens を使うためには、ローカルの Better Bit Berau (BBB) に筆名 
+(pseudonym) を登録しなければなりません。
+@samp{http://www.cs.umn.edu/Research/GroupLens/bbb.html} が現在、ちまた
+に存在する唯一の better bit です。
+
+登録した後で、いくつかの変数を設定する必要があります。
+
+@table @code
+
+@item gnus-use-grouplens
+@vindex gnus-use-grouplens
+この変数を @code{nil} でない値に設定すると、Gnus が全ての GroupLens 関連
+関数をフックするようになります。
+
+@item grouplens-pseudonym
+@vindex grouplens-pseudonym
+この変数は Better Bit Bureau に登録したときにもらった筆名に設定されるべ
+きです。
+
+@item grouplens-newsgroups
+@vindex grouplens-newsgroups
+GroupLens の予言を得たいと思うグループのリストです。
+
+@end table
+
+これが起き上がって GroupLens を実行するために必要な最低限の設定です。一
+度登録すると、GroupLens はあなたに他の人が考える平均に基づいたスコアをあ
+なたに提供することを始めます。しかし、GroupLens の本当の利益を受けるため
+には、自分自身で記事の値付けを始めなければなりません。そうすると、
+GroupLens があなたに提供するスコアはあなたが普段納得するような意見を持っ
+た人が既に値を付けた基づいて個人化されます。
+
+
+@node Rating Articles
+@subsection Rating Articles
+
+GroupLens では、記事は1から5まででそれを含んだ範囲で値を付けられます。1
+は帯域の無駄遣いのようなものだと考えられ、5は記事が本当に良いと考えられ
+るいう事を意味します。あなたが自分自身に尋ねる基本的な質問は、``1から5の
+範囲の中で、これと同じような記事をもっと読みたいだろうか？'' です。
+
+GroupLens で、記事の値を登録するための4つの方法があります。
+
+@table @kbd
+
+@item r
+@kindex r (GroupLens)
+@findex bbb-summary-rate-article
+この関数は1から5の範囲の値付けの入力を促進します。
+
+@item k
+@kindex k (GroupLens)
+@findex grouplens-score-thread
+この関数は値付けの入力を促進し、スレッドの全ての記事を値付けます。これは 
+rec.humor にあるようなあの長い間続くスレッドに対して非常に役に立ちます。
+
+@end table
+
+次の2つの命令、@kbd{n} と @kbd{,} は、あなたが読んでいる記事のスコアにな
+る数値接頭引数をとります。
+
+@table @kbd
+
+@item 1-5 n
+@kindex n (GroupLens)
+@findex grouplens-next-unread-article
+記事の値を付けて、次の未読記事に移動します。
+
+@item 1-5 ,
+@kindex , (GroupLens)
+@findex grouplens-best-unread-article
+記事の値を付けて次の一番高いスコアの未読記事に移動します。
+
+@end table
+
+もし現在の記事にスコア4を付け、次の記事に移動したいのであれば、@kbd{4 n} 
+と叩いてください。
+
+
+@node Displaying Predictions
+@subsection 予言表示
+
+GroupLens はあなたがニュース記事をどれくらい気に入るかの予言をします。
+GroupLens からの予言は1から5の範囲にあり、1が最悪で5が最良です。
+GroupLens からの予言を変数 @code{gnus-grouplens-override-scoring} によっ
+て制御される3つの内の1つによって使う事ができます。
+
+@vindex gnus-grouplens-override-scoring
+grouplens で予言を表示するために3つの方法があります。GroupLens のスコア
+を普通の gnus スコア機構に貢献するか、上書きするかを選ぶ事ができます。上
+書きが初期設定です。しかし、gnus のスコアを grouplens のスコアに足すのを
+好む人もいます。分離スコアの振る舞いを得るためには、
+@code{gnus-grouplens-override-scoring} を @code{'separate} に設定する必
+要があります。GroupLens の予言と grouplens スコアを結合するためにはそれ
+を @code{'override} に設定し、スコアを結合するためには 
+@code{gnus-grouplens-override-scoring} を @code{'combine} に設定します。
+結合付加機能を用いるときは、@code{grouplens-prediction-offset} と 
+@code{grouplens-score-scale-factor} の値を設定したいと思うでしょう。
+
+@vindex grouplens-prediction-display
+どちらの場合でも、GroupLens は2,3の予言がどのよう表示されたいかの選択を
+与えます。予言の表示は変数 @code{grouplens-prediction-display} によって
+制御されます。
+
+以下のものがその変数で有効な値です。
+
+@table @code
+@item prediction-spot
+予言が高いほど、右の方に @samp{*} が表示されます。
+
+@item confidence-interval
+数字の確信 (confidence) 間隔です。
+
+@item prediction-bar
+予言が高いほど、棒が長くなります。
+
+@item confidence-bar
+数字確信です。
+
+@item confidence-spot
+確信が高いほど点が大きくなります。
+
+@item prediction-num
+普通の昔ながらの数値です。
+
+@item confidence-plus-minus
+予言の +/- 確信です。
+
+@end table
+
+
+@node GroupLens Variables
+@subsection GroupLens 変数
+
+@table @code
+
+@item gnus-summary-grouplens-line-format
+GropuLens 拡張の概略バッファで使われる概略行様式です。普通の概略行様式が
+受け付けるものと同じ指定を受け付けます (@pxref{Summary Buffer Lines})。
+初期設定は@samp{%U%R%z%l%I%(%[%4L: %-20,20n%]%) %s\n} です。
+
+@item grouplens-bbb-host
+bbbd サーバーが実行されているホストです。@samp{goruplens.cs.umn.edu} が
+初期設定です。
+
+@item grouplens-bbb-port
+bbbd サーバーが実行されているホストのポートです。初期値は9000です。
+
+@item grouplens-score-offset
+予言から差し引きされる値です。つまり、意味のあるスコアにするために予言の
+値からこの数字を引き算します。初期値は0です。
+
+@item grouplens-score-scale-factor
+利用者はこの変数を使って GroupLens のスコアを拡大する事ができます。掛け
+算の要素は差し引きの後に適用されます。初期値は1です。
+
+@end table
+
+
+@node Advanced Scoring
+@section 上級スコア付け
+
+表題や From ヘッダーにスコアを付けるのは十分素敵ですが、ある人特定の題に
+関して言っている事にだけ本当に興味がある場合はどうすれば良いのでしょう？
+もしくは、Aさんが Bさんにフォローアップしているときに言っている事を読み
+たくないけれど、Cさんにフォローアップしているときは何を言っているかを知
+りたいという場合は？
+
+上級スコア法則を使う事で、任意の複雑なスコアの付け方を作成する事ができま
+す。
+
+@menu
+* Advanced Scoring Syntax::     定義。
+* Advanced Scoring Examples::   どのように見えるか。
+* Advanced Scoring Tips::       それを最大限利用する。
+@end menu
+
+
+@node Advanced Scoring Syntax
+@subsection 上級スコア付け構文
+
+普通のスコア法則は法則の最初の要素に文字列があります。上級スコア付け法則
+は最初の要素にリストがあります。2番目のリストは最初の要素が @code{nil} 
+でない値に評価されたときに適用されます。
+
+これらのリストは3つの論理作用子からなっており、それらは1方向作用子で、色々
+な合致作用子です。
+
+論理作用子:
+
+@table @code
+@item &
+@itemx and
+この論理作用子はそれぞれの引数を @code{false} に評価されるものを見つける
+まで評価し、それから停止します。全ての引数が @code{true} の値に評価され
+た場合は、この作用子は @code{true} を返します。
+
+@item |
+@itemx or
+この論理作用子はそれぞれの引数を @code{true} に評価されるものを見つける
+まで評価します。もしどの引数も @code{true} でないと、この作用子は 
+@code{false} を返します。
+
+@item !
+@itemx not
+@itemx \254
+この論理作用子は単一の引数のみをとります。それはその引数の値の論理否定を
+返します。
+
+@end table
+
+引数をスコア付けされている現在の記事の祖先に適用する @dfn{間接作用子} が
+あります。例えば、@code{1-} は現在の記事の親にもスコア法則を適用します。
+@code{2-} は現在の記事の祖父母にスコア法則を適用します。代わりに、
+@code{^^} を書く事もでき、この時、@code{^} (キャラット) (carat) の数はど
+のくらい祖先の記事までさかのぼるかを示します。
+
+最後に、合致作用子があります。これらが本当の仕事をするものです。合致作用
+子はヘッダー名の文字列で、その後に合致と合致の型が続きます。典型的な合致
+作用子は @samp{("form" "Lars Ingebrigtsen" s)} のようなものです。ヘッダー
+名は単純なスコア付けをするときのものと同じで、合致の型も同じです。
+
+
+@node Advanced Scring Examples
+@subsection 上級スコア付けの例
+
+Lars が Gnus に関して話をしているときに彼によって書かれた記事のスコアを
+増やしたいとしましょう:
+
+@example
+((&
+  ("from" "Lars Ingebrigtsen")
+  ("subject" "Gnus"))
+ 1000)
+@end example
+
+ね、とても単純でしょ？
+
+長い記事を書いているときは、時々何か素敵な事を言います:
+
+@example
+((&
+  ("from" "Lars Ingebrigtsen")
+  (|
+   ("subject" "Gnus")
+   ("lines" 100 >)))
+ 1000)
+@end example
+
+しかし、彼が Reig Eigil Logge によって書かれたものに反応しているときは、
+彼が書いたものを読みたくありません:
+
+@example
+((&
+  ("from" "Lars Ingebrigtsen")
+  (1- ("from" "Reig Eigir Logge")))
+ -100000)
+@end example
+
+Redmondo が消えた靴下について書いたときにフォローアップした全ての人はス
+コアが上げられますが、それは彼らが白い靴下について語っているときのみです。
+しかし、Lars が靴下について話をしているときは、たいていあまりおもしろく
+ありません:
+
+@example
+((&
+  (1-
+   (&
+    ("from" "redmondo@@.*no" r)
+    ("body" "disappearing.*socks" t)))
+  (! ("from" "Lars Ingebrigtsen"))
+  ("body" "white.*socks"))
+ 1000)
+@end example
+
+可能性は無限大です。
+
+
+@node Advanced Scoring Tips
+@subsection 上級スコアのちょっとした秘訣
+
+@code{&} と @code{|} 論理作用子は、短縮回路論理を行います。すなわち、そ
+の作用の結果が明らかになって時点で、引数を実行過程にかける事を止めます。
+例えば、@code{&} の引数の評価が @code{false} になると、残りの引数を評価
+する目的は存在しなくなります。これは遅い合致 (@samp{body} や 
+@samp{header}) を最後に持ってきて、速い合致 (@samp{from} や 
+@samp{subject}) を最初に持ってくるべきであるという事を意味します。
+
+間接作用子 (@code{1-} など) はそれらの引数をスレッドの1世代前に作用する
+ようにします。次のような事をすれば:
+
+@example
+...
+(1-
+ (1-
+  ("from" "lars")))
+...
+@end example
+
+これは ``現在の記事の祖父母の from ヘッダーにスコアを付ける'' という事を
+意味します。間接はとても速いですが、次の方よりも:
+
+@example
+(1-
+ (&
+  ("from" "Lars")
+  ("subject" "Gnus")))
+@end example
+
+次の方が良いです:
+
+@example
+(&
+ (1- ("from" "Lars"))
+ (1- ("subject" "Gnus")))
+@end example
+
+
+@node Score Decays
+@section スコア腐敗
+@cindex score decays
+@cindex decays
+
+スコアは再現無く膨れ上がる傾向がある事に気付くかもしれません。特に、適応
+スコアを使っているときは。スコアが大きくなりすぎると、それらは意味を失い
+ます---それらは単に最大を通り越してしまって、それを意味のある方法で使う
+事は難しくなります。
+
+@vindex gnus-decay-scores
+@findex gnus-decay-score
+@vindex gnus-score-decay-function
+Gnus はこの問題の解決を助けるためにスコアを腐らせる機構を提供します。ス
+コアファイルは読み込まれ、 @code{gnus-decay-scores} が @code{nil} でない
+と、gnus はスコアファイルを腐敗機構を通し、全ての永続でないスコア法則の
+スコアを下げます。腐敗自身は関数 @code{gnus-score-decay-function} によっ
+て実行され、初期設定は @code{gnus-decay-score} です。以下はその関数の定
+義です:
+
+@lisp
+(defun gnus-decay-score (score)
+  "Decay SCORE according to `gnus-score-decay-constant' and `gnus-score-decay-scale'."
+  (floor
+   (- score
+      (* (if (< score 0) 1 -1)
+         (min (abs score)
+              (max gnus-score-decay-constant
+                   (* (abs score)
+                      gnus-score-decay-scale)))))))
+@end lisp
+
+@vindex gnus-score-decay-scale
+@vindex gnus-score-decay-constant
+@code{gnus-score-decay-constant} は初期値として3を持ちで、
+@code{gnus-score-decay-scale} は初期値として0.05を持ちます。これは以下の
+ような事を引き起こします:
+
+@enumerate
+@item
+-3から3の間のスコアはこの関数が呼ばれたときに0に設定されます。
+
+@item
+3から60までの間の大きさのスコアは3つ減らされます。
+
+@item
+60より大きいスコアはスコアの5%に減らされます。
+@end enumerate
+
+もしこの腐敗関数を好きでないなら、自分自身の関数を書いてください。それは
+腐敗するべきスコアを唯一の引数として呼ばれ、整数であるべき新しいスコアを
+返さなければなりません。
+
+Gnus は1日に1回スコアを腐敗させようとします。例えば、もし gnus を4日間実
+行していないと、gnus は4回スコアを腐らせます。
 
 

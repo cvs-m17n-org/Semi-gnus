@@ -6,6 +6,7 @@
 active				作動する、作動している
 active file			現状ファイル、アクティブファイル
 adapt				適用
+adaptive			適応性
 address				アドレス
 agent				エージェント
 alist				連想リスト
@@ -24,30 +25,38 @@ category			分類
 collapsed group	name		短縮グループ名
 combined groups			結合グループ
 command				命令
+command line			コマンド行
 configure (shell script)	環境設定
 copy				コピー、複写
 crosspost			相互投稿、クロスポスト
+current				現在の
 customize			カスタマイズ
-download			ダウンロード
 default				初期設定/初期設定値 (ディフォルト)?
 directory			ディレクトリー
 dormant article			保留記事
 dotted pair			ドットペア、ドット対
+download			ダウンロード
 draft				下書き
 dribble file			ドリブルファイル
 duplicate suppression		重複抑制
+entry				登録、登録項目
 expire				期限切れ消去、期限切れ削除
 expunge				消去
 field				フィールド
 firewall			防壁
+flush cache			キャッシュを書き込む
+follow up			フォローアップ
 foreign				外部
+format				様式、フォーマット
 frame				フレーム 
 gateway				ゲートウェイ
+global				グローバル
 Gnus				gnus
 group buffer			グループバッファ
 header				ヘッダー
 highlight			ハイライト
 history				履歴
+home score file			ホームスコアファイル
 hook				フック
 inbox				インボックス
 indentation			字下げ
@@ -55,9 +64,13 @@ interactive command		対話命令
 interface			インターフェース
 kiboze				kiboze
 key (alist)			キー
+keymap				キーマップ
 kiboze				kiboze
 kill				削除、切る、キル
+kill file			削除ファイル、(消去ファイル)
 level				レベル
+load				ロード
+local variable			局所変数、ローカル変数
 lower lebel			小さいレベル
 mail				メール
 mailbox				メールボックス
@@ -76,6 +89,7 @@ news				ニュース (ニューズ)
 newsgroup			ニュースグループ (ニューズグループ)
 news reader			ニュースリーダ
 numeric prefix			数字接頭引数
+operator			作用子
 outgoing			差出用
 overview			概観ファイル
 pack				梱包する
@@ -84,6 +98,7 @@ plugged				差し込み
 point				ポイント、カーソル位置
 predicate function		述語関数
 prefix				接頭引数
+process				プロセス
 process mark			(プロセスマーク)、プロセス印
 process/prefix convention	プロセス/接頭引数の習慣 (プロセスマーク・プレフィックスルール)
 prompt				入力促進
@@ -95,10 +110,12 @@ reply packet			返信パケット
 response packet			返信パケット
 startup file			起動ファイル
 score				スコア
+score entry			スコア登録
 secondary server		二次サーバー
 select method			選択方法
 server				サーバー
 sesssion			セッション
+shortcut			短縮打鍵
 solid group			固定グループ
 sort				ソート 並べ替え
 SOUP packets			SOUP パケット
@@ -109,6 +126,7 @@ subscribe			購読
 subscribedness			購読度
 summary buffer			概略バッファ
 superseding			代替
+syntax table			文法表
 text properties			テキスト属性
 thread				スレッド
 ticked article			(印付き記事)
