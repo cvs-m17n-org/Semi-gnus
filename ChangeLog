@@ -1,3 +1,23 @@
+1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/Makefile.in (all, total): Remove "auto-autoloads.el" and
+	"custom-load.el" as well.
+
+	* Makefile.in (xlick, xinfo, xinfo-ja): New targets.
+	(install-package-ja, package-ja, install-package, package): Use
+	them; use $XEMACS instead of $EMACS.
+	(osome): Use $XEMACS instead of "xemacs21".
+	(x): Ditto.
+	(XEMACS): Use "xemacs" instead of "xemacs21" in default.
+
+	* lisp/dgnushack.el (dgnushack-install-package): Remove extra files
+	in destination lisp directory.
+	(dgnushack-make-package): Don't generate "_pkg.el" file; don't
+	remove "auto-autoloads.el*" files.
+	(dgnushack-compile): Don't remove "_pkg.el" from the list.
+
 1999-02-23  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
