@@ -10103,7 +10103,6 @@ other naughty stuff in innocent-looking articles.
 
 @vindex gnus-show-mime
 @vindex gnus-article-display-method-for-mime
-@vindex gnus-strict-mime
 @findex gnus-article-display-mime-message
 Gnus handles @sc{mime} by pushing the articles through
 @code{gnus-article-display-method-for-mime}, which is
@@ -10113,11 +10112,9 @@ information on SEMI MIME-View, see its manual page (however it is not
 existed yet, sorry).
 
 Set @code{gnus-show-mime} to @code{t} if you want to use
-@sc{mime} all the time.  However, if @code{gnus-strict-mime} is
-non-@code{nil}, the @sc{mime} method will only be used if there are
-@sc{mime} headers in the article.  If you have @code{gnus-show-mime}
-set, then you'll see some unfortunate display glitches in the article
-buffer.  These can't be avoided.
+@sc{mime} all the time.  If you have @code{gnus-show-mime} set, then
+you'll see some unfortunate display glitches in the article buffer.
+These can't be avoided.
 
 In GNUS or Gnus, it might be best to just use the toggling functions
 from the summary buffer to avoid getting nasty surprises. (For instance,

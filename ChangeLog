@@ -1,3 +1,16 @@
+2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el: Require `base64' before `canlock-om' to avoid
+	damage to define `base64-encode-string' by MEL.
+
+	* lisp/dgnushack.el: Load base64.el before canlock-om.el to avoid
+	damage to define `base64-encode-string' by MEL.
+
+2002-01-21  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-traditional-message): Use
+	`set-buffer-multibyte'.
+
 2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.5 revision 02 (merged
