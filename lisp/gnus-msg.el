@@ -30,7 +30,9 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (require 'gnus)
 (require 'gnus-ems)
@@ -479,6 +481,10 @@ header line with the old Message-ID."
 	  (set-buffer gnus-article-copy)
 	  (delete-region (goto-char (point-min))
 			 (or (search-forward "\n\n" nil t) (point-max)))
+	  ;; Encode bitmap smileys to ordinary text.
+	  (static-unless (featurep 'xemacs)
+	    (when (featurep 'smiley-mule)
+	      (smiley-encode-buffer)))
 	  ;; Insert the original article headers.
 	  (insert-buffer-substring gnus-original-article-buffer beg end)
 	  (article-decode-encoded-words)))
