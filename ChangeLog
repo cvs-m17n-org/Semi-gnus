@@ -1,3 +1,20 @@
+1998-11-19  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-get-reply-buffer): Abolished.
+	(message-get-original-reply-buffer): Abolished.
+	(message-get-parameter): New inline function.
+	(message-get-parameter-with-eval): New macro.
+	(message-fetch-reply-field): Do not use `message-get-reply-buffer'.
+	(message-yank-original): Ditto.
+	(message-setup): Use `message-get-parameter'.
+	(message-mime-insert-article): Use
+	`message-get-parameter-with-eval' instead of
+	`message-get-original-reply-buffer'.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Do not add
+	`set-window-configuration' to action when
+	`message-use-multi-frames' is non-`nil'.
+
 1998-11-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-dont-send): Use `message-delete-frame'.
@@ -9,8 +26,6 @@
 * 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* README-gnus-bbdb.en, README-gnus-bbdb.ja: New files.
-
-	* lisp/gnus-bbdb.el: Replace string in comment "Nana-" to "Semi-".
 
 * 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
