@@ -1786,38 +1786,59 @@ should replace the \"Date:\" one, or should be added below it."
 					 gnus-current-headers))
 		     (message-fetch-field "date")
 		     ""))
-	 (tdate-regexp "^Date:[ \t]\\|^X-Sent:[ \t]")
- 	 (date-regexp
-	  (cond
-	   ((not gnus-article-date-lapsed-new-header)
-	    tdate-regexp)
-	   ((eq type 'lapsed)
-	    "^X-Sent:[ \t]")
-	   (t
-	    "^Date:[ \t]")))
 	 (date (if (vectorp header) (mail-header-date header)
 		 header))
 	 (inhibit-point-motion-hooks t)
-	 bface eface)
+	 bface eface date-pos)
     (when (and date (not (string= date "")))
       (save-excursion
 	(save-restriction
 	  (article-narrow-to-head)
-	  (when (re-search-forward tdate-regexp nil t)
+	  (when (or (and (eq type 'lapsed)
+			 gnus-article-date-lapsed-new-header
+			 ;; Attempt to get the face of X-Sent first.
+			 (re-search-forward "^X-Sent:[ \t]" nil t))
+		    (re-search-forward "^Date:[ \t]" nil t)
+		    ;; If Date is missing, try again for X-Sent.
+		    (re-search-forward "^X-Sent:[ \t]" nil t))
 	    (setq bface (get-text-property (gnus-point-at-bol) 'face)
 		  eface (get-text-property (1- (gnus-point-at-eol))
-					   'face))
-	    (forward-line 1))
-	  (goto-char (point-min))
+					   'face)))
 	  (let ((buffer-read-only nil))
+	    (goto-char (point-min))
+	    ;; Delete any old X-Sent headers.
+	    (while (re-search-forward "^X-Sent:[ \t]" nil t)
+	      (when (get-text-property (point) 'article-date-lapsed)
+		(setq date-pos (set-marker (make-marker) (match-beginning 0)))
+		(delete-region (match-beginning 0)
+			       (progn (forward-line 1) (point)))))
+	    (goto-char (point-min))
 	    ;; Delete any old Date headers.
-	    (while (re-search-forward date-regexp nil t)
-	      (delete-region (progn (beginning-of-line) (point))
-			     (progn (forward-line 1) (point))))
-	    (insert (article-make-date-line date type) "\n")
+	    (while (re-search-forward "^Date:[ \t]" nil t)
+	      (unless date-pos
+		(setq date-pos (match-beginning 0)))
+	      (unless (and (eq type 'lapsed)
+			   gnus-article-date-lapsed-new-header)
+		(delete-region (match-beginning 0)
+			       (progn (message-next-header) (point)))))
+	    (if date-pos
+		(progn
+		  (goto-char date-pos)
+		  (unless (bolp)
+		    ;; Possibly, Date has been deleted.
+		    (insert "\n"))
+		  (when (and (eq type 'lapsed)
+			     gnus-article-date-lapsed-new-header
+			     (looking-at "Date:"))
+		    (forward-line 1)))
+	      (goto-char (point-min)))
+	    (insert (article-make-date-line date type))
+	    (when (eq type 'lapsed)
+	      (put-text-property (gnus-point-at-bol) (point)
+				 'article-date-lapsed t))
+	    (insert "\n")
 	    (forward-line -1)
 	    ;; Do highlighting.
-	    (beginning-of-line)
 	    (when (looking-at "\\([^:]+\\): *\\(.*\\)$")
 	      (put-text-property (match-beginning 1) (1+ (match-end 1))
 				 'face bface)
