@@ -378,7 +378,9 @@ spaces.  Die Die Die."
        (encode-coding-string chunk
 			     (if (fboundp 'find-coding-systems-string)
 				 (car (find-coding-systems-string chunk))
-				 buffer-file-coding-system))
+			       (static-if (boundp 'MULE)
+				   file-coding-system
+				 buffer-file-coding-system)))
      chunk)
    ""))
 
