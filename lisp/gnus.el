@@ -267,7 +267,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.11.03"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "00"
+(defconst gnus-revision-number "01"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.88"
@@ -1747,7 +1747,8 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-offer-save-summaries gnus-make-thread-indent-array
       gnus-summary-exit gnus-update-read-articles gnus-summary-last-subject
       gnus-summary-skip-intangible gnus-summary-article-number
-      gnus-data-header gnus-data-find)
+      gnus-data-header gnus-data-find
+      gnus-summary-jump-to-other-group)
      ("gnus-group" gnus-group-insert-group-line gnus-group-quit
       gnus-group-list-groups gnus-group-first-unread-group
       gnus-group-set-mode-line gnus-group-set-info gnus-group-save-newsrc
