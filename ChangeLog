@@ -1,3 +1,24 @@
+2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Clean up.
+	(nnshimbun-nov-last-check): Removed.
+	(nnshimbun-nov-buffer-alist): Removed.
+	(nnshimbun-nov-buffer-file-name): Removed.
+	(nnshimbun-close-server): Use `nnshimbun-write-nov' instead of
+	`nnshimbun-save-nov'.
+	(nnshimbun-mail-header-subject): Removed.
+	(nnshimbun-mail-header-from): Removed.
+	(nnshimbun-make-shimbun-header): Removed.
+	(nnshimbun-parse-nov): New function.
+	(nnshimbun-request-article-1): Use `nnshimbun-parse-nov' instead
+	of `nnheader-parse-nov'.
+	(nnshimbun-retrieve-headers): Likewise.
+	(nnshimbun-nov-buffer-name): New function.
+	(nnshimbun-nov-file-name): Ditto.
+	(nnshimbun-open-nov): Clean up.
+	(nnshimbun-write-nov): Ditto; Aceept the 2nd optional argument.
+	(nnshimbun-save-nov): Removed.
+
 2002-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-dont-compile-files): New constant

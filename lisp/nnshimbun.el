@@ -210,9 +210,6 @@ the nnshimbun group parameter `index-range' for each nnshimbun group.")
 (defvoo nnshimbun-server-directory nil)
 
 (defvoo nnshimbun-status-string "")
-(defvoo nnshimbun-nov-last-check nil)
-(defvoo nnshimbun-nov-buffer-alist nil)
-(defvoo nnshimbun-nov-buffer-file-name nil)
 
 (defvoo nnshimbun-keep-backlog 300)
 (defvoo nnshimbun-backlog-articles nil)
@@ -321,49 +318,35 @@ GROUP has a full name."
 (deffoo nnshimbun-close-server (&optional server)
   (when (nnshimbun-server-opened server)
     (when nnshimbun-shimbun
+      (dolist (group (shimbun-groups nnshimbun-shimbun))
+	(nnshimbun-write-nov group t))
       (shimbun-close nnshimbun-shimbun))
     (when (gnus-buffer-live-p nnshimbun-buffer)
       (kill-buffer nnshimbun-buffer)))
   (nnshimbun-backlog (gnus-backlog-shutdown))
-  (nnshimbun-save-nov)
   (nnoo-close-server 'nnshimbun server)
   t)
 
-(eval-and-compile
-  (let ((Gnus-p
-	 (eval-when-compile
-	   (let ((gnus (locate-library "gnus")))
-	     (and gnus
-		  ;; Gnus has mailcap.el in the same directory of gnus.el.
-		  (file-exists-p (expand-file-name
-				  "mailcap.el"
-				  (file-name-directory gnus))))))))
-    (if Gnus-p
-	(progn
-	  (defmacro nnshimbun-mail-header-subject (header)
-	    `(mail-header-subject ,header))
-	  (defmacro nnshimbun-mail-header-from (header)
-	    `(mail-header-from ,header)))
-      (defmacro nnshimbun-mail-header-subject (header)
-	`(mime-entity-fetch-field ,header 'Subject))
-      (defmacro nnshimbun-mail-header-from (header)
-	`(mime-entity-fetch-field ,header 'From)))))
-
-(defun nnshimbun-make-shimbun-header (header)
-  (shimbun-make-header
-   (mail-header-number header)
-   (nnshimbun-mail-header-subject header)
-   (nnshimbun-mail-header-from header)
-   (mail-header-date header)
-   (or (cdr (assq 'X-Nnshimbun-Id (mail-header-extra header)))
-       (mail-header-id header))
-   (mail-header-references header)
-   (mail-header-chars header)
-   (mail-header-lines header)
-   (let ((xref (mail-header-xref header)))
-     (if (and xref (string-match "^Xref: " xref))
-	 (substring xref 6)
-       xref))))
+;; This function is defined as an alternative of `nnheader-parse-nov',
+;; in order to keep compatibility between T-gnus and Oort Gnus.
+(defun nnshimbun-parse-nov ()
+  (let ((eol (gnus-point-at-eol)))
+    (let ((number  (nnheader-nov-read-integer))
+	  (subject (nnheader-nov-field))
+	  (from    (nnheader-nov-field))
+	  (date    (nnheader-nov-field))
+	  (id      (nnheader-nov-read-message-id))
+	  (refs    (nnheader-nov-field))
+	  (chars   (nnheader-nov-read-integer))
+	  (lines   (nnheader-nov-read-integer))
+	  (xref    (unless (eq (char-after) ?\n)
+		     (when (looking-at "Xref: ")
+		       (goto-char (match-end 0)))
+		     (nnheader-nov-field)))
+	  (extra   (nnheader-nov-parse-extra)))
+      (shimbun-make-header number subject from date
+			   (or (cdr (assq 'X-Nnshimbun-Id extra)) id)
+			   refs chars lines xref))))
 
 (eval-when-compile
   (require 'gnus-sum));; For the macro `gnus-summary-article-header'.
@@ -375,8 +358,7 @@ GROUP has a full name."
       (cons group article)
     (let* ((header (with-current-buffer (nnshimbun-open-nov group)
 		     (and (nnheader-find-nov-line article)
-			  (nnshimbun-make-shimbun-header
-			   (nnheader-parse-nov)))))
+			  (nnshimbun-parse-nov))))
 	   (original-id (shimbun-header-id header)))
       (when header
 	(with-current-buffer (or to-buffer nntp-server-buffer)
@@ -479,11 +461,9 @@ GROUP has a full name."
 		(when (setq header
 			    (with-current-buffer (nnshimbun-open-nov group)
 			      (and (nnheader-find-nov-line art)
-				   (nnheader-parse-nov))))
+				   (nnshimbun-parse-nov))))
 		  (insert (format "220 %d Article retrieved.\n" art))
-		  (shimbun-header-insert
-		   nnshimbun-shimbun
-		   (nnshimbun-make-shimbun-header header))
+		  (shimbun-header-insert nnshimbun-shimbun header)
 		  (insert ".\n")
 		  (delete-region (point) (point-max))))))
 	'header))))
@@ -630,47 +610,35 @@ also be nil."
 	  ;; We return the article number.
 	  (ignore-errors (read (current-buffer))))))))
 
+(defsubst nnshimbun-nov-buffer-name (group)
+  (format " *nnshimbun overview %s %s*"
+	  (nnoo-current-server 'nnshimbun) group))
+
+(defsubst nnshimbun-nov-file-name (group)
+  (expand-file-name nnshimbun-nov-file-name
+		    (nnmail-group-pathname group nnshimbun-server-directory)))
+
 (defun nnshimbun-open-nov (group)
-  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
-    (if (buffer-live-p buffer)
-	buffer
-      (setq buffer (gnus-get-buffer-create
-		    (format " *nnshimbun overview %s %s*"
-			    (nnoo-current-server 'nnshimbun) group)))
-      (save-excursion
-	(set-buffer buffer)
-	(set (make-local-variable 'nnshimbun-nov-buffer-file-name)
-	     (expand-file-name
-	      nnshimbun-nov-file-name
-	      (nnmail-group-pathname group nnshimbun-server-directory)))
+  (let ((buffer (nnshimbun-nov-buffer-name group)))
+    (unless (gnus-buffer-live-p buffer)
+      (with-current-buffer (gnus-get-buffer-create buffer)
 	(erase-buffer)
-	(when (file-exists-p nnshimbun-nov-buffer-file-name)
-	  (nnheader-insert-file-contents nnshimbun-nov-buffer-file-name))
-	(set-buffer-modified-p nil))
-      (push (cons group buffer) nnshimbun-nov-buffer-alist)
-      buffer)))
+	(when (file-exists-p (nnshimbun-nov-file-name group))
+	  (nnheader-insert-file-contents (nnshimbun-nov-file-name group)))
+	(set-buffer-modified-p nil)))
+    buffer))
 
-(defun nnshimbun-write-nov (group)
-  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
-    (when (buffer-live-p buffer)
-      (save-excursion
-	(set-buffer buffer)
+(defun nnshimbun-write-nov (group &optional close)
+  (let ((buffer (get-buffer (nnshimbun-nov-buffer-name group))))
+    (when (gnus-buffer-live-p buffer)
+      (with-current-buffer buffer
 	(and (> (buffer-size) 0)
 	     (buffer-modified-p)
-	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-				  nil 'nomesg))))))
-
-(defun nnshimbun-save-nov ()
-  (save-excursion
-    (while nnshimbun-nov-buffer-alist
-      (when (buffer-name (cdar nnshimbun-nov-buffer-alist))
-	(set-buffer (cdar nnshimbun-nov-buffer-alist))
-	(and (> (buffer-size) 0)
-	     (buffer-modified-p)
-	     (nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+	     (nnmail-write-region 1 (point-max)
+				  (nnshimbun-nov-file-name group)
 				  nil 'nomesg))
-	(kill-buffer (current-buffer)))
-      (setq nnshimbun-nov-buffer-alist (cdr nnshimbun-nov-buffer-alist)))))
+	(when close
+	  (kill-buffer (current-buffer)))))))
 
 (deffoo nnshimbun-request-expire-articles (articles group
 						    &optional server force)
