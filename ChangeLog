@@ -1,15 +1,27 @@
+1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Protect
+	against forwarded messages without MIME structure.
+	(gnus-treatment-function-alist): Move
+	'gnus-treat-decode-article-as-default-mime-charset' to the top;
+	put `gnus-treat-emphasize' off after
+	`gnus-treat-highlight-headers'.
+
 1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
 
 1999-10-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* gnus-art.el (gnus-treat-predicate): Examine whether the argument
-	is list or not before condition.
+	* lisp/gnus-art.el (gnus-treat-predicate): Examine whether the
+	argument is list or not before condition.
 
 1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
 
-	* gnus-art.el (gnus-treat-predicate): Work for (typep "something").
+	* lisp/gnus-art.el (gnus-treat-predicate): Work for
+	(typep "something").
 
 1999-10-07  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
 
