@@ -1,3 +1,7 @@
+1998-08-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-yank-original): For citing any message.
+
 1998-08-10  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
