@@ -34,8 +34,10 @@
 (require 'gnus-int)
 (require 'browse-url)
 (require 'mm-bodies)
-(require 'drums)
+(require 'mail-parse)
 (require 'mm-decode)
+(require 'mm-view)
+(require 'wid-edit)
 
 (defgroup gnus-article nil
   "Article display."
@@ -531,7 +533,7 @@ displayed by the first non-nil matching CONTENT face."
 			       (face :value default)))))
 
 (defcustom gnus-article-decode-hook
-  '(article-decode-charset article-decode-rfc1522)
+  '(article-decode-charset article-decode-encoded-words)
   "*Hook run to decode charsets in articles."
   :group 'gnus-article-headers
   :type 'hook)
@@ -540,6 +542,9 @@ displayed by the first non-nil matching CONTENT face."
   "Function to display MIME articles."
   :group 'gnus-article-headers
   :type 'function)
+
+(defvar gnus-decode-header-function 'mail-decode-encoded-word-region
+  "Function used to decode headers.")
 
 ;;; Internal variables
 
@@ -950,7 +955,7 @@ characters to translate to."
     (set-buffer gnus-article-buffer)
     (let ((inhibit-point-motion-hooks t)
 	  buffer-read-only)
-      (rfc2047-decode-region (point-min) (point-max)))))
+      (mail-decode-encoded-word-region (point-min) (point-max)))))
 
 (defun article-decode-charset (&optional prompt)
   "Decode charset-encoded text in the article.
@@ -962,13 +967,14 @@ If PROMPT (the prefix), prompt for a coding system to use."
       (let* ((inhibit-point-motion-hooks t)
 	     (ct (message-fetch-field "Content-Type" t))
 	     (cte (message-fetch-field "Content-Transfer-Encoding" t))
-	     (ctl (and ct (condition-case () (drums-parse-content-type ct)
+	     (ctl (and ct (condition-case ()
+			      (mail-header-parse-content-type ct)
 			    (error nil))))
 	     (charset (cond
 		       (prompt
 			(mm-read-coding-system "Charset to decode: "))
 		       (ctl
-			(drums-content-type-get ctl 'charset))
+			(mail-content-type-get ctl 'charset))
 		       (gnus-newsgroup-name
 			(gnus-group-find-parameter
 			 gnus-newsgroup-name 'charset))))
@@ -982,15 +988,13 @@ If PROMPT (the prefix), prompt for a coding system to use."
 	   charset (and cte (intern (downcase
 				     (gnus-strip-whitespace cte))))))))))
 
-(defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
-(defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
-(defun article-decode-rfc1522 ()
-  "Remove QP encoding from headers."
+(defun article-decode-encoded-words ()
+  "Remove encoded-word encoding from headers."
   (let ((inhibit-point-motion-hooks t)
 	(buffer-read-only nil))
     (save-restriction
       (message-narrow-to-head)
-      (rfc2047-decode-region (point-min) (point-max)))))
+      (funcall gnus-decode-header-function (point-min) (point-max)))))
 
 (defun article-de-quoted-unreadable (&optional force)
   "Translate a quoted-printable-encoded article.
@@ -1000,7 +1004,6 @@ or not."
   (save-excursion
     (let ((buffer-read-only nil)
 	  (type (gnus-fetch-field "content-transfer-encoding")))
-      ;;(gnus-article-decode-rfc1522)
       (when (or force
 		(and type (string-match "quoted-printable" (downcase type))))
 	(goto-char (point-min))
@@ -1109,7 +1112,9 @@ always hide."
       (goto-char (point-min))
       (search-forward "\n\n" nil t)
       (while (re-search-forward "^[ \t]+$" nil t)
-	(replace-match "" nil t))
+	(unless (gnus-annotation-in-region-p
+		 (match-beginning 0) (match-end 0))
+	  (replace-match "" nil t)))
       ;; Then replace multiple empty lines with a single empty line.
       (goto-char (point-min))
       (search-forward "\n\n" nil t)
@@ -1851,6 +1856,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-date-original
      article-date-ut
      article-decode-mime-words
+     article-decode-charset
+     article-decode-encoded-words
      article-date-user
      article-date-lapsed
      article-emphasize
@@ -1863,19 +1870,18 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 
 (put 'gnus-article-mode 'mode-class 'special)
 
+(set-keymap-parent gnus-article-mode-map widget-keymap)
+
 (gnus-define-keys gnus-article-mode-map
   " " gnus-article-goto-next-page
   "\177" gnus-article-goto-prev-page
   [delete] gnus-article-goto-prev-page
+  "\r" widget-button-press
   "\C-c^" gnus-article-refer-article
   "h" gnus-article-show-summary
   "s" gnus-article-show-summary
   "\C-c\C-m" gnus-article-mail
   "?" gnus-article-describe-briefly
-  gnus-mouse-2 gnus-article-push-button
-  "\r" gnus-article-press-button
-  "\t" gnus-article-next-button
-  "\M-\t" gnus-article-prev-button
   "e" gnus-article-edit
   "<" beginning-of-buffer
   ">" end-of-buffer
@@ -2129,18 +2135,21 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 ;;; Gnus MIME viewing functions
 ;;;
 
-(defvar gnus-mime-button-line-format "%{%([%t%n]%)%}\n")
+(defvar gnus-mime-button-line-format "%{%([%t%d%n]%)%}\n")
 (defvar gnus-mime-button-line-format-alist
   '((?t gnus-tmp-type ?s)
-    (?n gnus-tmp-name ?s)))
+    (?n gnus-tmp-name ?s)
+    (?d gnus-tmp-description ?s)))
 
 (defvar gnus-mime-button-map nil)
 (unless gnus-mime-button-map
-  (setq gnus-mime-button-map (make-sparse-keymap))
+  (setq gnus-mime-button-map (copy-keymap gnus-article-mode-map))
   (define-key gnus-mime-button-map gnus-mouse-2 'gnus-article-push-button)
   (define-key gnus-mime-button-map "\r" 'gnus-article-press-button)
   (define-key gnus-mime-button-map "\M-\r" 'gnus-mime-view-part)
+  (define-key gnus-mime-button-map "v" 'gnus-mime-view-part)
   (define-key gnus-mime-button-map "o" 'gnus-mime-save-part)
+  (define-key gnus-mime-button-map "c" 'gnus-mime-copy-part)
   (define-key gnus-mime-button-map "|" 'gnus-mime-pipe-part))
 
 (defun gnus-mime-save-part ()
@@ -2161,35 +2170,99 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (let ((data (get-text-property (point) 'gnus-data)))
     (mm-interactively-view-part data)))
 
+(defun gnus-mime-copy-part ()
+  "Put the the MIME part under point into a new buffer."
+  (interactive)
+  (let* ((data (get-text-property (point) 'gnus-data))
+	 (contents (mm-get-part data)))
+    (switch-to-buffer (generate-new-buffer "*decoded*"))
+    (insert contents)
+    (goto-char (point-min))))
+
 (defun gnus-insert-mime-button (handle)
-  (let ((gnus-tmp-name (drums-content-type-get (cadr handle) 'name))
-	(gnus-tmp-type (caadr handle)))
-    (when gnus-tmp-name
-      (setq gnus-tmp-name (concat " (" gnus-tmp-name ")")))
+  (let ((gnus-tmp-name (mail-content-type-get (mm-handle-type handle) 'name))
+	(gnus-tmp-type (car (mm-handle-type handle)))
+	(gnus-tmp-description (mm-handle-description handle))
+	b e)
+    (setq gnus-tmp-name
+      (if gnus-tmp-name
+	  (concat " (" gnus-tmp-name ")")
+	""))
+    (setq gnus-tmp-description
+      (if gnus-tmp-description
+	  (concat " (" gnus-tmp-description ")")
+	""))
+    (setq b (point))
     (gnus-eval-format
      gnus-mime-button-line-format gnus-mime-button-line-format-alist
      `(local-map ,gnus-mime-button-map
 		 keymap ,gnus-mime-button-map
 		 gnus-callback mm-display-part
-		 gnus-data ,handle))))
+		 gnus-data ,handle))
+    (setq e (point))
+    (widget-convert-text 'link b e b e :action 'gnus-widget-press-button)))
+
+(defun gnus-widget-press-button (elems el)
+  (goto-char (widget-get elems :from))
+  (gnus-article-press-button))
 
 (defun gnus-display-mime ()
-  (let ((handles (mm-dissect-buffer))
-	handle name type b e)
-    (mapcar 'mm-destroy-part gnus-article-mime-handles)
-    (setq gnus-article-mime-handles nil)
-    (setq gnus-article-mime-handles (nconc gnus-article-mime-handles handles))
-    (when handles
-      (goto-char (point-min))
-      (search-forward "\n\n" nil t)
-      (delete-region (point) (point-max))
-      (while (setq handle (pop handles))
-	(gnus-insert-mime-button handle)
-	(insert "\n\n")
-	(when (mm-automatic-display-p (caadr handle))
-	  (forward-line -2)
-	  (mm-display-part handle)
-	  (goto-char (point-max)))))))
+  "Insert MIME buttons in the buffer."
+  (let (ct ctl)
+    (save-restriction
+      (mail-narrow-to-head)
+      (when (setq ct (mail-fetch-field "content-type"))
+	(setq ctl (mail-header-parse-content-type ct))))
+    (let* ((handles (mm-dissect-buffer))
+	   handle name type b e)
+      (mapcar 'mm-destroy-part gnus-article-mime-handles)
+      (setq gnus-article-mime-handles handles)
+      (when handles
+	(goto-char (point-min))
+	(search-forward "\n\n" nil t)
+	(delete-region (point) (point-max))
+	(if (not (equal (car ctl) "multipart/alternative"))
+	    (while (setq handle (pop handles))
+	      (gnus-insert-mime-button handle)
+	      (insert "\n\n")
+	      (when (and (mm-automatic-display-p (car (mm-handle-type handle)))
+			 (or (not (mm-handle-disposition handle))
+			     (equal (car (mm-handle-disposition handle))
+				    "inline")))
+		(forward-line -2)
+		(mm-display-part handle)
+		(goto-char (point-max))))
+	  ;; Here we have multipart/alternative
+	  (gnus-mime-display-alternative handles))))))
+
+(defun gnus-mime-display-alternative (handles &optional preferred)
+  (let* ((preferred (mm-preferred-alternative handles preferred))
+	 (ihandles handles)
+	 handle buffer-read-only)
+    (goto-char (point-min))
+    (search-forward "\n\n" nil t)
+    (delete-region (point) (point-max))
+    (mapcar 'mm-remove-part gnus-article-mime-handles)
+    (setq gnus-article-mime-handles handles)
+    (while (setq handle (pop handles))
+      (gnus-add-text-properties
+       (point)
+       (progn
+	 (insert (format "[%c] %-18s"
+			 (if (equal handle preferred) ?* ? )
+			 (car (mm-handle-type handle))))
+	 (point))
+       `(local-map ,gnus-mime-button-map
+		   keymap ,gnus-mime-button-map
+		   gnus-callback
+		   (lambda (handles)
+		     (gnus-mime-display-alternative
+		      ',ihandles ,(car (mm-handle-type handle))))
+		   gnus-data ,handle))
+      (insert "  "))
+    (insert "\n\n")
+    (when preferred
+      (mm-display-part preferred))))
 
 (defun gnus-article-wash-status ()
   "Return a string which display status of article washing."
@@ -2604,10 +2677,10 @@ If given a prefix, show the hidden text instead."
 	  (let (buffer-read-only)
 	    (erase-buffer)
 	    (insert-buffer-substring gnus-article-buffer))
-	  (setq gnus-original-article (cons group article))))
+	  (setq gnus-original-article (cons group article)))
 
-      ;; Decode charsets.
-      (run-hooks 'gnus-article-decode-hook)
+	;; Decode charsets.
+	(run-hooks 'gnus-article-decode-hook))
       
       ;; Update sparse articles.
       (when (and do-update-line
@@ -2881,40 +2954,6 @@ call it with the value of the `gnus-data' text property."
     (when fun
       (funcall fun data))))
 
-(defun gnus-article-prev-button (n)
-  "Move point to N buttons backward.
-If N is negative, move forward instead."
-  (interactive "p")
-  (gnus-article-next-button (- n)))
-
-(defun gnus-article-next-button (n)
-  "Move point to N buttons forward.
-If N is negative, move backward instead."
-  (interactive "p")
-  (let ((function (if (< n 0) 'previous-single-property-change
-		    'next-single-property-change))
-	(inhibit-point-motion-hooks t)
-	(backward (< n 0))
-	(limit (if (< n 0) (point-min) (point-max))))
-    (setq n (abs n))
-    (while (and (not (= limit (point)))
-		(> n 0))
-      ;; Skip past the current button.
-      (when (get-text-property (point) 'gnus-callback)
-	(goto-char (funcall function (point) 'gnus-callback nil limit)))
-      ;; Go to the next (or previous) button.
-      (gnus-goto-char (funcall function (point) 'gnus-callback nil limit))
-      ;; Put point at the start of the button.
-      (when (and backward (not (get-text-property (point) 'gnus-callback)))
-	(goto-char (funcall function (point) 'gnus-callback nil limit)))
-      ;; Skip past intangible buttons.
-      (when (get-text-property (point) 'intangible)
-	(incf n))
-      (decf n))
-    (unless (zerop n)
-      (gnus-message 5 "No more buttons"))
-    n))
-
 (defun gnus-article-highlight (&optional force)
   "Highlight current article.
 This function calls `gnus-article-highlight-headers',
@@ -3097,7 +3136,9 @@ specified by `gnus-button-alist'."
    (nconc (and gnus-article-mouse-face
 	       (list gnus-mouse-face-prop gnus-article-mouse-face))
 	  (list 'gnus-callback fun)
-	  (and data (list 'gnus-data data)))))
+	  (and data (list 'gnus-data data))))
+  (widget-convert-text 'link from to from to
+		       :action 'gnus-widget-press-button))
 
 ;;; Internal functions:
 

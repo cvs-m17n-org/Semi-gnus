@@ -36,7 +36,7 @@
 		     mule-write-region-no-coding-system
 		     find-charset-region base64-decode-string
 		     find-coding-systems-region get-charset-property
-		     coding-system-get))
+		     coding-system-get w3-region))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -66,7 +66,8 @@
 		 mm-copy-tree url-view-url w3-prepare-buffer
 		 mule-write-region-no-coding-system char-int
 		 annotationp delete-annotation make-image-specifier
-		 make-annotation)))
+		 make-annotation base64-decode-string
+		 w3-do-setup w3-region base64-decode)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

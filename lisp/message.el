@@ -38,8 +38,9 @@
 (if (string-match "XEmacs\\|Lucid" emacs-version)
     (require 'mail-abbrevs)
   (require 'mailabbrev))
-(require 'rfc2047)
+(require 'mail-parse)
 (require 'mm-bodies)
+(require 'mm-encode)
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -1135,6 +1136,21 @@ Point is left at the beginning of the narrowed-to region."
      (point-max)))
   (goto-char (point-min)))
 
+(defun message-narrow-to-headers-or-head ()
+  "Narrow the buffer to the head of the message."
+  (widen)
+  (narrow-to-region
+   (goto-char (point-min))
+   (cond
+    ((re-search-forward
+      (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+     (match-beginning 0))
+    ((search-forward "\n\n" nil t)
+     (1- (point)))
+    (t
+     (point-max))))
+  (goto-char (point-min)))
+
 (defun message-news-p ()
   "Say whether the current buffer contains a news message."
   (and (not message-this-is-mail)
@@ -2022,7 +2038,7 @@ the user from the mailer."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
-      (rfc2047-encode-message-header)
+      (mail-encode-encoded-word-buffer)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (message-encode-message-body)
@@ -2194,13 +2210,13 @@ to find out how to use this."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
-      (rfc2047-encode-message-header)
+      (mail-encode-encoded-word-buffer)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
-    (message-encode-message-body)
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	nil
+      (message-encode-message-body)
       (unwind-protect
 	  (save-excursion
 	    (set-buffer tembuf)
@@ -2541,7 +2557,6 @@ to find out how to use this."
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (insert-buffer-substring buf)
       (save-restriction
@@ -2619,6 +2634,8 @@ If NOW, use that time instead."
   (let* ((now (or now (current-time)))
 	 (zone (nth 8 (decode-time now)))
 	 (sign "+"))
+    (when (< zone 0)
+      (setq sign ""))
     ;; We do all of this because XEmacs doesn't have the %z spec.
     (concat (format-time-string "%d %b %Y %H:%M:%S " (or now (current-time)))
 	    (format "%s%02d%02d"
@@ -3531,7 +3548,6 @@ responses here are directed to other newsgroups."))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
-	(buffer-disable-undo (current-buffer))
 	(erase-buffer)
 	(insert "Newsgroups: " newsgroups "\n"
 		"From: " (message-make-from) "\n"
@@ -3722,7 +3738,6 @@ Optional NEWS will use news to forward instead of mail."
 	  beg)
       ;; We first set up a normal mail buffer.
       (set-buffer (get-buffer-create " *message resend*"))
-      (buffer-disable-undo (current-buffer))
       (erase-buffer)
       (message-setup `((To . ,address)))
       ;; Insert our usual headers.
@@ -4034,7 +4049,7 @@ regexp varstr."
   (when (featurep 'mule)
     (save-excursion
       (save-restriction
-	(message-narrow-to-headers)
+	(message-narrow-to-headers-or-head)
 	(message-remove-header
 	 "^Content-Transfer-Encoding:\\|^Content-Type:\\|^Mime-Version:" t)
 	(goto-char (point-max))
@@ -4045,7 +4060,7 @@ regexp varstr."
 	  (when (consp charset)
 	    (error "Can't encode messages with multiple charsets (yet)"))
 	  (widen)
-	  (message-narrow-to-headers)
+	  (message-narrow-to-headers-or-head)
 	  (goto-char (point-max))
 	  (setq charset (or charset (mm-mule-charset-to-mime-charset 'ascii)))
 	  ;; We don't insert MIME headers if they only say the default.

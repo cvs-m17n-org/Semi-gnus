@@ -1,8 +1,19 @@
+1998-09-13 08:58:56  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* dir (File): Updated.
+
+1998-09-12 08:53:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* emacs-mime.texi: New file.
+
+	* gnus.texi (Misc Article): Addition.
+
 1998-09-11 08:52:50  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Group Score Commands): Fix.
 	(Saving Articles): Fix.
 	(Agent Expiry): Fix.
+	(Using MIME): Change.
 
 1998-09-10 03:19:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
