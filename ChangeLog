@@ -1,3 +1,23 @@
+2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Add argument to
+	ignore w3's cache.
+
+2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Add
+	completion to the shimbun address; delete empty strings from
+	`gnus-group-shimbun-type-history' and
+	`gnus-group-shimbun-address-history'.
+
+	* lisp/nnshimbun.el (nnshimbun-asahi-get-headers): Don't use
+	`timezone'.
+	(nnshimbun-type-definition): Add address.
+
+2000-05-23  Tatsuya Ichikawa <ichikawa@erc.epson.com>
+
+	* lisp/nnshimbun.el: Add `sponichi' support.
+
 2000-05-23  KOSEKI Yoshinori  <kose@wizard.tamra.co.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-mime-encode-string): Fix wrong

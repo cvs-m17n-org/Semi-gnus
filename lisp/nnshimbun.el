@@ -33,7 +33,6 @@
 
 (eval-when-compile (require 'cl))
 
-(require 'timezone)
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
@@ -51,11 +50,20 @@
 
 (defvar nnshimbun-type-definition
   `((asahi
+     (address . "asahi")
      (url . "http://spin.asahi.com/")
      (groups "national" "business" "politics" "international" "sports" "personal" "feneral")
      (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov  . nnshimbun-asahi-generate-nov-database)
-     (make-contents . nnshimbun-asahi-make-contents))))
+     (make-contents . nnshimbun-asahi-make-contents))
+    (sponichi
+     (address . "sponichi")
+     (url . "http://www.sponichi.co.jp/")
+     (groups "baseball" "soccer" "usa" "others" "society" "entertainment" "horseracing")
+     (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (generate-nov  . nnshimbun-sponichi-generate-nov-database)
+     (make-contents . nnshimbun-sponichi-make-contents))
+    ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
   "Where nnshimbun will save its files.")
@@ -169,11 +177,36 @@
   (nnoo-close-server 'nnshimbun server)
   t)
 
-(defun nnshimbun-get-url (url)
+(defun nnshimbun-retrieve-url (url &optional no-cache)
+  "Rertrieve URL contents and insert to current buffer."
   (let ((coding-system-for-read 'binary)
 	(coding-system-for-write 'binary))
     (set-buffer-multibyte nil)
-    (nnweb-insert url)
+    ;; Following code is imported from `url-insert-file-contents'.
+    (save-excursion
+      (let ((old-asynch (default-value 'url-be-asynchronous))
+	    (old-caching (default-value 'url-automatic-caching))
+	    (old-mode (default-value 'url-standalone-mode)))
+	(unwind-protect
+	    (progn
+	      (setq-default url-be-asynchronous nil)
+	      (when no-cache
+		(setq-default url-automatic-caching nil)
+		(setq-default url-standalone-mode nil))
+	      (let ((buf (current-buffer))
+		    (url-working-buffer (cdr (url-retrieve url no-cache))))
+		(set-buffer url-working-buffer)
+		(url-uncompress)
+		(set-buffer buf)
+		(insert-buffer url-working-buffer)
+		(save-excursion
+		  (set-buffer url-working-buffer)
+		  (set-buffer-modified-p nil))
+		(kill-buffer url-working-buffer)))
+	  (setq-default url-be-asynchronous old-asynch)
+	  (setq-default url-automatic-caching old-caching)
+	  (setq-default url-standalone-mode old-mode))))
+    ;; Modify buffer coding system.
     (decode-coding-region (point-min) (point-max) nnshimbun-coding-system)
     (set-buffer-multibyte t)))
 
@@ -195,7 +228,7 @@
 		(save-excursion
 		  (set-buffer nnshimbun-buffer)
 		  (erase-buffer)
-		  (nnshimbun-get-url xref)
+		  (nnshimbun-retrieve-url xref)
 		  (nnheader-message 6 "nnshimbun: Make contents...")
 		  (setq contents (funcall nnshimbun-make-contents header))
 		  (nnheader-message 6 "nnshimbun: Make contents...done"))))
@@ -491,7 +524,7 @@
   (save-excursion
     (set-buffer nnshimbun-buffer)
     (erase-buffer)
-    (nnshimbun-get-url (format "%sp%s.html" nnshimbun-url group))
+    (nnshimbun-retrieve-url (format "%sp%s.html" nnshimbun-url group) t)
     (goto-char (point-min))
     (when (search-forward "\n<!-- Start of past -->\n" nil t)
       (delete-region (point-min) (point))
@@ -525,18 +558,19 @@
 			 "^\\[\\([0-9][0-9]\\)/\\([0-9][0-9]\\) \\([0-9][0-9]:[0-9][0-9]\\)\\]"
 			 nil t))
 	      (let ((month (string-to-number (match-string 1)))
-		    (day (string-to-number (match-string 2)))
-		    (time (match-string 3))
 		    (date (decode-time (current-time))))
 		(mail-header-set-date
 		 (nth i headers)
-		 (timezone-make-arpa-date (if (and (= 12 month) (= 1 (nth 4 date)))
-					      (1- (nth 5 date))
-					    (nth 5 date))
-					  month
-					  day
-					  time
-					  '(32400))))
+		 (format "%02d %s %d %s +0900"
+			 (string-to-number (match-string 2));; day
+			 (aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
+				    "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
+			       month)
+			 (if (and (eq 12 month) (eq 1 (nth 4 date)))
+			     (1- (nth 5 date))
+			   (nth 5 date))
+			 (match-string 3);; MM:SS
+			 )))
 	      (setq i (1+ i))))
 	  (nreverse headers))))))
 
@@ -578,7 +612,95 @@
     (insert "Content-Type: " (if html "text/html" "text/plain")
 	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
     (encode-coding-string (buffer-string)
-			  (if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))))
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+
+
+
+;;; www.sponichi.co.jp
+
+(defun nnshimbun-sponichi-get-headers (group)
+  (save-excursion
+    (set-buffer nnshimbun-buffer)
+    (erase-buffer)
+    (nnshimbun-retrieve-url (format "%s%s/index.html" nnshimbun-url group))
+    (goto-char (point-min))
+    (when (search-forward "ニュースインデックス" nil t)
+      (delete-region (point-min) (point))
+      (when (search-forward "アドタグ" nil t)
+	(forward-line 2)
+	(delete-region (point) (point-max))
+	(goto-char (point-min))
+	(let (headers)
+	  (while (re-search-forward
+		  "^<a href=\"/\\(\\([A-z]*\\)/kiji/\\([0-9][0-9][0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)/\\([0-9][0-9]\\)\\.html\\)\">"
+		  nil t)
+	    (let ((url (match-string 1))
+		  (id (format "<%s%s%s%s%%%s>"
+			      (match-string 3)
+			      (match-string 4)
+			      (match-string 5)
+			      (match-string 6)
+			      group))
+		  (date (format "%02d %s %s 00:00 +0900"
+				(string-to-number (match-string 5));; day
+				(aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
+					   "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
+				      (string-to-number (match-string 4)));; month
+				(match-string 3))));; year
+	      (push (make-full-mail-header
+		     0
+		     (nnshimbun-mime-encode-string
+		      (mapconcat 'identity
+				 (split-string
+				  (buffer-substring
+				   (match-end 0)
+				   (progn (search-forward "<br>" nil t) (point)))
+				  "<[^>]+>")
+				 ""))
+		     "webmaster@www.sponichi.co.jp"
+		     date id "" 0 0 (concat nnshimbun-url url))
+		    headers)))
+	  headers)))))
+
+(defun nnshimbun-sponichi-generate-nov-database (group)
+  (save-excursion
+    (set-buffer (nnshimbun-open-nov group))
+    (let (i)
+      (goto-char (point-max))
+      (forward-line -1)
+      (setq i (or (ignore-errors (read (current-buffer))) 0))
+      (goto-char (point-max))
+      (dolist (header (nnshimbun-sponichi-get-headers group))
+	(unless (nnshimbun-search-id group (mail-header-id header))
+	  (mail-header-set-number header (setq i (1+ i)))
+	  (nnheader-insert-nov header))))))
+
+(defun nnshimbun-sponichi-make-contents (header)
+  (goto-char (point-min))
+  (let (start (html t))
+    (when (and (search-forward "\n<span class=\"text\">　" nil t)
+	       (setq start (point))
+	       (search-forward "\n" nil t))
+      (delete-region (point-min) start)
+      (forward-line 1)
+      (delete-region (point) (point-max))
+      (goto-char (point-min))
+      (while (search-forward "<p>" nil t)
+	(insert "\n"))
+      (nnweb-remove-markup)
+      (nnweb-decode-entities)
+      (goto-char (point-min))
+      (while (not (eobp))
+	;(fill-region (point) (gnus-point-at-eol))
+	(nnshimbun-fill-line)
+	(forward-line 1))
+      (setq html nil))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: " (if html "text/html" "text/plain")
+	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (encode-coding-string (buffer-string)
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
 
 
