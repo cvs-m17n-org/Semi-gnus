@@ -1,3 +1,7 @@
+2001-08-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-util.el (gnus-truncate-string): Abolished.
+
 2001-08-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (gnus-group-make-shimbun-group): Call
