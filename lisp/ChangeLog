@@ -1,3 +1,16 @@
+2001-01-12 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-sort-by-score): Reverse order.
+
+2001-01-12 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-win.el (gnus-configure-windows): switch-to-buffer in XEmacs.
+	(gnus-remove-some-windows): Ditto.
+
+2001-01-12 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-make-date-line): 11th.
+
 2001-01-11 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* mml2015.el (mml2015-gpg-encrypt): Remove CR.

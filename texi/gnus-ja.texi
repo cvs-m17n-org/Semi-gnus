@@ -9159,12 +9159,6 @@ Superseding} を参照してください。
 @code{nil} でなければ、@kbd{a} をしたときに、@code{to-list} グループパラ
 メータをそれのないメールグループに付け加えます。
 
-@c @item message-send-mail-partially-limit
-@c @vindex message-send-mail-partially-limit
-@c The limitation of messages sent as message/partial.
-@c The lower bound of message size in characters, beyond which the message
-@c should be sent in several parts. If it is nil, the size is unlimited.
-
 @end table
 
 @node Posting Server
