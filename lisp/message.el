@@ -1243,6 +1243,21 @@ Return the number of headers removed."
      (point-max)))
   (goto-char (point-min)))
 
+(defun message-narrow-to-headers-or-head ()
+  "Narrow the buffer to the head of the message."
+  (widen)
+  (narrow-to-region
+   (goto-char (point-min))
+   (cond
+    ((re-search-forward
+      (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+     (match-beginning 0))
+    ((search-forward "\n\n" nil t)
+     (1- (point)))
+    (t
+     (point-max))))
+  (goto-char (point-min)))
+
 (defun message-news-p ()
   "Say whether the current buffer contains a news message."
   (and (not message-this-is-mail)
