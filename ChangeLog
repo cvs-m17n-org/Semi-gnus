@@ -1,5 +1,23 @@
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.8.
+
+	* lisp/message.el (message-fill-references): Reverted.
+
+	* Sync up with Semi-gnus 6.8.15. (except for multi-frame code.)
+
+1998-08-23  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): APOP support.
+	(pop3-fma-set-pop3-password): Ditto.
+
+1998-08-20  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/message.el (message-clone-locals): Add `user-full-name'
+	and `user-mail-address' to `regexp'.
+
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus-util.el (gnus-string-width): New function.
 
 	* lisp/gnus-ems.el (gnus-mule-max-width-function): Removed.
