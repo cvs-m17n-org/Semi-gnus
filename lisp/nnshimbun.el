@@ -610,7 +610,8 @@ is enclosed by at least one regexp grouping construct."
 (defun nnshimbun-fill-line ()
   (forward-line 0)
   (let ((top (point)) chr)
-    (while (if (>= (move-to-column fill-column) fill-column)
+    (while (if (>= (move-to-column nnshimbun-fill-column)
+		   nnshimbun-fill-column)
 	       (not (progn
 		      (if (memq (preceding-char) nnshimbun-kinsoku-eol-list)
 			  (progn
