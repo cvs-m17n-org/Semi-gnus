@@ -536,8 +536,8 @@ Group Buffer Format
 
 Group Topics
 
-* Topic Variables::             Lisp でトピックをカスタマイズする方法
 * Topic Commands::              超簡単対話型命令
+* Topic Variables::             Lisp でトピックをカスタマイズする方法
 * Topic Sorting::               トピック毎別々に並べ替える
 * Topic Topology::              全世界の地図
 * Topic Parameters::            あるトピックの全てのグループに適用される
@@ -1721,6 +1721,25 @@ Gnus の起動に成功した後に、一番最後に実行されるフックです。
 @node Group Buffer
 @chapter グループバッファ
 @cindex group buffer
+
+@c Alex Schroeder suggests to rearrange this as follows:
+@c
+@c <kensanata> ok, just save it for reference.  I'll go to bed in a minute.
+@c   1. Selecting a Group, 2. (new) Finding a Group, 3. Group Levels,
+@c   4. Subscription Commands, 5. Group Maneuvering, 6. Group Data,
+@c   7. Group Score, 8. Group Buffer Format
+@c <kensanata> Group Levels should have more information on levels 5 to 9.  I
+@c   suggest to split the 4th paragraph ("Gnus considers groups...") as follows:
+@c <kensanata> First, "Gnus considers groups... (default 9)."
+@c <kensanata> New, a table summarizing what levels 1 to 9 mean.
+@c <kensanata> Third, "Gnus treats subscribed ... reasons of efficiency"
+@c <kensanata> Then expand the next paragraph or add some more to it.
+@c    This short one sentence explains levels 1 and 2, therefore I understand
+@c    that I should keep important news at 3 and boring news at 4.
+@c    Say so!  Then go on to explain why I should bother with levels 6 to 9.
+@c    Maybe keep those that you don't want to read temporarily at 6,
+@c    those that you never want to read at 8, those that offend your
+@c    human rights at 9...
 
 グループバッファ (@dfn{group buffer}) は有効なグループを全部 (あるいは一
 部を) 一覧表示します。これは gnus を起動したときに最初に表示されるバッファ
@@ -3404,61 +3423,20 @@ Gnus
 て、いまいましいくらいでしょ?
 
 これをずっと有効にしたければ、グループモードのフックにこのマイナーモード
-を追加してください。
+を追加してください。以下の行を @file{~/.gnus} ファイルに入れて、ね。
 
 @lisp
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 @end lisp
 
 @menu
-* Topic Variables::             Lisp でトピックをカスタマイズする方法
 * Topic Commands::              超簡単対話型命令
+* Topic Variables::             Lisp でトピックをカスタマイズする方法
 * Topic Sorting::               トピック毎別々に並べ替える
 * Topic Topology::              全世界の地図
 * Topic Parameters::            あるトピックの全てのグループに適用される
                                 パラメータ
 @end menu
-
-@node Topic Variables
-@subsection トピック変数
-@cindex topic variables
-
-さて、トピックを選ぶと、トピックは折り畳まれます。これ、とってもステキだ
-と思うんだけど。
-
-@vindex gnus-topic-line-format
-トピック行は、@code{gnus-topic-line-format} 変数の値に従って作成されま
-す (@pxref{Formatting Variables})。有効な要素は、
-
-@table @samp
-@item i
-字下げ。
-@item n
-トピック名。
-@item v
-見えるかどうか。
-@item l
-レベル。
-@item g
-トピック中のグループの数。
-@item a
-トピック中の未読記事の数。
-@item A
-トピックと全ての副トピックの未読記事の数。
-@end table
-
-@vindex gnus-topic-indent-level
-各副トピック (と副トピック内のグループ) は、トピックレベル数
-の @code{gnus-topic-indent-level} 倍の空白分の字下げが行われます。初期値
-は 2 です。
-
-@vindex gnus-topic-mode-hook
-@code{gnus-topic-mode-hook} はトピックマイナーモードバッファで呼び出され
-ます。
-
-@vindex gnus-topic-display-empty-topics
-@code{gnus-topic-display-empty-topics} はトピックの中に未読記事が無い場
-合でもそのトピックを表示するようにします。初期値は @code{t} です。
 
 @node Topic Commands
 @subsection トピック命令
@@ -3468,19 +3446,93 @@ Gnus
 できるようになります。さらに標準キーの中でも、定義がちょっと変わるものが
 少しあります。
 
+だいたいにおいて、次のようなトピックの操作が可能です。まず第一に、あなた
+はトピックを作ることを望むでしょう。第二に、あなたはグループをトピックに
+入れて、それらをあなたの好みの順序になるまで、あちこちに移動することを望
+むでしょう。第三に行なう操作は、それらの一切合切を表示したり隠すことでしょ
+う。他のグループの概要を見やすくするために、あなたは副トピックやグループ
+によっては、トピックが隠れるようにしたいと思うかもしれませんね。
+
+ここには、あなたの好むやり方でトピックを設定するために必要になりそうな、
+基本的なキーのリストがあります。
+
 @table @kbd
 @item T n
 @kindex T n (Topic)
 @findex gnus-topic-create-topic
-新しいトピックの名前をプロンプト入力し、それを作成しま
+新しいトピック名の入力を促し、それを作成しま
 す (@code{gnus-topic-create-topic})。
 
+@item T TAB
+@itemx TAB
+@kindex T TAB (Topic)
+@kindex TAB (Topic)
+@findex gnus-topic-indent
+現在のトピックの ``字下げ'' を行い、その前のトピックの副トピックにしま
+す (@code{gnus-topic-indent})。接頭引数を与えると、反対にそのトピックの
+字下げを回復 (un-indent) します。
+
+@item M-TAB
+@kindex M-TAB (Topic)
+@findex gnus-topic-unindent
+現在のトピックの ``字下げ回復'' (un-indent) を行い、それが現在の親の親の
+副トピックになるようにします (@code{gnus-topic-unindent})。
+@end table
+
+以下の二つのキーは、グループとトピックをあちこち移動するために使われます。
+それらは、よく知られているカット＆ペーストのように動作します。
+@kbd{C-k} はカット、@kbd{C-y} はペーストです。もちろん、Emacs ではカット
+＆ペーストではなくて kill & yank という用語を使いますが。
+
+@table @kbd
+@item C-k
+@kindex C-k (Topic)
+@findex gnus-topic-kill-group
+グループあるいはトピックを kill します (@code{gnus-topic-kill-group})。
+トピック内にあったグループも全て、トピックと一緒に削除されます。
+
+@item C-y
+@kindex C-y (Topic)
+@findex gnus-topic-yank-group
+直前の kill されたグループあるいはトピックを yank しま
+す (@code{gnus-topic-yank-group})。全てのトピックは、全てのグループの前
+に yank されることに気をつけてください。
+
+ですから、あるトピックをトピックのリストの先頭に移動するには、単にそこ
+で @kbd{C-k} を叩きます。これはカット＆ペーストのカットに相当します。
+なあんだ、簡単じゃん。
+
+@kbd{C-k} と @kbd{C-y} はトピックと同様にグループにも使えます。すなわち、
+あなたはグループと同じようにトピックの移動もできるのです。
+@end table
+
+あなたの望みのままにトピックを使えるようにした後で、あなたはトピックを隠
+したり再び見えるようにしようと思うでしょう。そのために以下のキーを用意し
+ています。
+
+@table @kbd
+@item RET
+@kindex RET (Topic)
+@findex gnus-topic-select-group
+@itemx SPACE
+グループを選択するか、あるいはトピックを折りたたみま
+す (@code{gnus-topic-select-group})。グループの上でこのコマンドを実行す
+ると、通常通りそのグループに入ります。トピック行の上で行うと、そのトピッ
+クは (既に表示されているときは) 折りたたまれるか、(既に折りたたまれてい
+るときは) 展開されます。つまりトピックに対してはこれはトグルコマンドです。
+さらに、数字プレフィックスを与えると、そのレベル (とそれよりも小さいレベ
+ル) のグループが表示されます。
+@end table
+
+さてお次は、他のコマンドのリストです。順序には特に意味はありません。
+
+@table @kbd
 @item T m
 @kindex T m (Topic)
 @findex gnus-topic-move-group
 現在のグループを、どこか他のトピックに移動させま
-す (@code{gnus-topic-move-group})。このコマンドはプロセスマーク・プレフィッ
-クスルールに従います (@pxref{Process/Prefix})。
+す (@code{gnus-topic-move-group})。このコマンドはプロセス印/接頭引数の習
+慣に従います (@pxref{Process/Prefix})。
 
 @item T j
 @kindex T j (Topic)
@@ -3491,8 +3543,8 @@ Gnus
 @kindex T c (Topic)
 @findex gnus-topic-copy-group
 現在のグループを、どこか他のトピックにコピーしま
-す (@code{gnus-topic-copy-group})。このコマンドはプロセスマーク・プレフィッ
-クスルールに従います (@pxref{Process/Prefix})。
+す (@code{gnus-topic-copy-group})。このコマンドはプロセス印/接頭引数の習
+慣に従います (@pxref{Process/Prefix})。
 
 @item T h
 @kindex T h (Topic)
@@ -3531,8 +3583,8 @@ Gnus
 正規表現にマッチする全てのグループを、あるトピックにコピーしま
 す (@code{gnus-topic-copy-matching})。
 
-@item T h
-@kindex T h (Topic)
+@item T H
+@kindex T H (Topic)
 @findex gnus-topic-toggle-display-empty-topics
 空のトピックの表示・非表示を切り替えま
 す (@code{gnus-topic-toggle-display-empty-topics})。
@@ -3549,61 +3601,21 @@ Gnus
 現在のトピックにある全てのグループからプロセスマークを消しま
 す (@code{gnus-topic-unmark-topic})。
 
-@item T TAB
-@itemx TAB
-@kindex T TAB (Topic)
-@kindex TAB (Topic)
-@findex gnus-topic-indent
-現在のトピックの ``字下げ'' を行い、その前のトピックの副トピックにしま
-す (@code{gnus-topic-indent})。接頭引数を与えると、反対にそのトピックの
-字下げを戻します。
-
-@item M-TAB
-@kindex M-TAB (Topic)
-@findex gnus-topic-unindent
-現在のトピックの ``字下げ回復'' (un-indent) を行い、それが現在の親の親の
-副トピックになるようにします (@code{gnus-topic-unindent})。
-
-@item RET
-@kindex RET (Topic)
-@findex gnus-topic-select-group
-@itemx SPACE
-グループを選択するか、あるいはトピックを折りたたみま
-す (@code{gnus-topic-select-group})。グループの上でこのコマンドを実行す
-ると、通常通りそのグループに入ります。トピック行の上で行うと、そのトピッ
-クは (既に表示されているときは) 折りたたまれるか、(既に折りたたまれてい
-るときは) 展開されます。つまりトピックに対してはこれはトグルコマンドです。
-さらに、数字プレフィックスを与えると、そのレベル (とそれよりも小さいレベ
-ル) のグループが表示されます。
-
 @item C-c C-x
 @kindex C-c C-x (Topic)
 @findex gnus-topic-expire-articles
 (もしあれば) 現在のグループかトピックかの全ての時限消去可能記事を時限消
 去します (@code{gnus-topic-expire-articles})。(@pxref{Expiring Mail})。
 
-@item C-k
-@kindex C-k (Topic)
-@findex gnus-topic-kill-group
-グループあるいはトピックを kill します (@code{gnus-topic-kill-group})。
-トピック内にあったグループも全て、トピックと一緒に削除されます。
-
-@item C-y
-@kindex C-y (Topic)
-@findex gnus-topic-yank-group
-直前の kill されたグループあるいはトピックを yank しま
-す (@code{gnus-topic-yank-group})。全てのトピックは、全てのグループの前
-に yank されることに気をつけてください。
-
 @item T r
 @kindex T r (Topic)
 @findex gnus-topic-rename
-トピックの名前を変更する (@code{gnus-topic-rename})。
+トピックの名前を変更します (@code{gnus-topic-rename})。
 
 @item T DEL
 @kindex T DEL (Topic)
 @findex gnus-topic-delete
-空のトピックを削除する (@code{gnus-topic-delete})。
+空のトピックを削除します (@code{gnus-topic-delete})。
 
 @item A T
 @kindex A T (Topic)
@@ -3620,6 +3632,48 @@ Gnus が知っているトピック化されたグループを全て表示しま
 トピックパラメータを修正します (@code{gnus-topic-edit-parameters})。
 @xref{Topic Parameters}.
 @end table
+
+@node Topic Variables
+@subsection トピック変数
+@cindex topic variables
+
+前の項では、どのトピックを表示するかを gnus に言う方法を説明しました。
+この項では、それぞれのトピックの何を表示するかをgnus に言う方法を説明し
+ます。
+
+@vindex gnus-topic-line-format
+トピック行それ自体は、@code{gnus-topic-line-format} 変数の値に従って作成
+されます (@pxref{Formatting Variables})。有効な要素は、
+
+@table @samp
+@item i
+字下げ。
+@item n
+トピック名。
+@item v
+見えるかどうか。
+@item l
+レベル。
+@item g
+トピック中のグループの数。
+@item a
+トピック中の未読記事の数。
+@item A
+トピックと全ての副トピックの未読記事の数。
+@end table
+
+@vindex gnus-topic-indent-level
+各副トピック (と副トピック内のグループ) は、トピックレベル数
+の @code{gnus-topic-indent-level} 倍の空白分の字下げが行われます。初期値
+は 2 です。
+
+@vindex gnus-topic-mode-hook
+@code{gnus-topic-mode-hook} はトピックマイナーモードバッファで呼び出され
+ます。
+
+@vindex gnus-topic-display-empty-topics
+@code{gnus-topic-display-empty-topics} はトピックの中に未読記事が無い場
+合でもそのトピックを表示するようにします。初期値は @code{t} です。
 
 @node Topic Sorting
 @subsection トピックの並べ替え
