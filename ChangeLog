@@ -1,3 +1,8 @@
+2002-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* contrib/hashcash.el: Require `cl' when compiling.
+	(hashcash-strip-quoted-names): Replace `subseq' with `substring'.
+
 2002-06-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): When

@@ -1,6 +1,6 @@
 ;;; hashcash.el --- Add hashcash payments to email
 
-;; $Revision: 1.1.2.1 $
+;; $Revision: 1.1.2.2 $
 ;; Copyright (C) 1997,2001 Paul E. Foley
 
 ;; Maintainer: Paul Foley <mycroft@actrix.gen.nz>
@@ -19,6 +19,8 @@
 ;;    (add-hook 'message-send-hook 'mail-add-payment)
 
 ;;; Code:
+
+(eval-when-compile (require 'cl))
 
 (defcustom hashcash-default-payment 0
   "*The default number of bits to pay to unknown users.
@@ -41,7 +43,8 @@ present, is the string to be hashed; if not present ADDR will be used.")
 (defun hashcash-strip-quoted-names (addr)
   (setq addr (mail-strip-quoted-names addr))
   (if (and addr (string-match "^[^+@]+\\(\\+[^@]*\\)@" addr))
-      (concat (subseq addr 0 (match-beginning 1)) (subseq addr (match-end 1)))
+      (concat (substring addr 0 (match-beginning 1))
+	      (substring addr (match-end 1)))
     addr))
 
 (defun hashcash-payment-required (addr)
