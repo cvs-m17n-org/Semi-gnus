@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "09"
+(defconst gnus-revision-number "10"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -1827,7 +1827,9 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts)
      ("gnus-mlspl" gnus-group-split gnus-group-split-fancy)
      ("gnus-mlspl" :interactive t gnus-group-split-setup
-      gnus-group-split-update))))
+      gnus-group-split-update)
+     ("smiley-mule" smiley-buffer)
+     ("x-face-mule" x-face-mule-gnus-article-display-x-face))))
 
 ;;; gnus-sum.el thingies
 
