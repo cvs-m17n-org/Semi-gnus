@@ -204,151 +204,169 @@
   "A list of CL run-time functions.  Some functions were built-in, nowadays.")
 
 ;;;###autoload
-(defun find-cl-run-time-functions (file-or-directory in-this-emacs)
-  "Find CL run-time functions in the FILE-OR-DIRECTORY.  If the prefix
-argument IN-THIS-EMACS is non-nil, the built-in functions in this
-Emacs will not be reported."
+(defun find-cl-run-time-functions (file-or-directory arg)
+  "Find CL run-time functions in the FILE-OR-DIRECTORY.  You can alter
+the behavior of this command with the prefix ARG as described below.
+
+By default, it searches for all the CL run-time functions listed in
+ the variable `cl-run-time-functions'.
+With 1 or 3 \\[universal-argument]'s, the built-in functions in this Emacs\
+ will not be
+ reported.
+With 2 or 3 \\[universal-argument]'s, just the symbols will also be reported.
+
+You can use the `digit-argument' 1, 2 or 3 instead of\
+ \\[universal-argument]'s."
   (interactive (list (read-file-name "Find CL run-time functions in: "
 				     nil default-directory t)
 		     current-prefix-arg))
   (unless (interactive-p)
     (error "You should invoke `M-x find-cl-run-time-functions' interactively"))
-  (let (files clfns working file lines forms fns pt form fn buffer
-	      window height buffer-file-format format-alist
-	      insert-file-contents-post-hook insert-file-contents-pre-hook)
+  (let ((report-symbols (member arg '((16) (64) 2 3)))
+	files clfns working file lines form forms fns fn newform buffer
+	window scroll
+	buffer-file-format format-alist
+	insert-file-contents-post-hook insert-file-contents-pre-hook)
     (cond ((file-directory-p file-or-directory)
-	   (prog1
-	       (setq files (directory-files file-or-directory t "\\.el$"))
-	     (unless files
-	       (message "No files found in: %s" file-or-directory))))
+	   (setq files (directory-files file-or-directory t "\\.el$"))
+	   (dolist (file files)
+	     (unless (file-exists-p file)
+	       (setq files (delete file files))))
+	   (unless files
+	     (message "No files found in: %s" file-or-directory))
+	   files)
 	  ((file-exists-p file-or-directory)
 	   (setq files (list file-or-directory)))
 	  (t
 	   (message "No such file or directory: %s" file-or-directory)))
-    (dolist (file files)
-      (unless (file-exists-p file)
-	(setq files (delete file files))))
-    (if files
-	(progn
-	  (if in-this-emacs
-	      (dolist (fn cl-run-time-functions)
-		(unless (and (fboundp fn)
-			     (subrp (symbol-function fn)))
-		  (push fn clfns)))
-	    (setq clfns cl-run-time-functions))
-	  (set-buffer (setq working
-			    (get-buffer-create
-			     " *Searching for CL run-time functions*")))
-	  (let (emacs-lisp-mode-hook)
-	    (emacs-lisp-mode))
-	  (while files
-	    (setq file (pop files)
-		  lines (list nil 1))
-	    (message "Searching for CL run-time functions in: %s..."
-		     (file-name-nondirectory file))
-	    (insert-file-contents file nil nil nil t)
-	    ;; Why is the following needed for FSF Emacsen???
-	    (goto-char (point-min))
-	    ;;
-	    (while (setq forms (condition-case nil
-				   (list (read working))
-				 (error nil)))
-	      (setq fns nil
-		    pt (point)
-		    lines (list (cadr lines)
-				(count-lines (point-min) pt)))
-	      (condition-case nil
-		  (progn
-		    (forward-list -1)
-		    (setcar lines (+ (count-lines (point-min) (point))
-				     (if (bolp) 1 0))))
-		(error))
-	      (goto-char pt)
-	      (while forms
-		(setq form (pop forms))
-		(if (consp form)
-		    (progn
-		      (setq fn (pop form))
-		      (cond ((eq fn 'define-compiler-macro)
-			     (setq form nil))
-			    ((memq fn '(let let*))
-			     (setq form
-				   (append
-				    (delq nil
-					  (mapcar
-					   (lambda (element)
-					     (when (and (consp element)
-							(consp (cadr element)))
-					       (cadr element)))
-					   (car form)))
-				    (cdr form))))
-			    ((memq fn '(defadvice
-					 defmacro defsubst defun
-					 defmacro-maybe defmacro-maybe-cond
-					 defsubst-maybe defun-maybe
-					 defun-maybe-cond))
-			     (setq form (cddr form)))
-			    ((eq fn 'lambda)
-			     (setq form (cdr form)))
-			    ((memq fn '(\` backquote quote))
-			     (setq form (when (consp (car form))
-					  (car form))))
-			    ((eq fn 'dolist)
-			     (setcar form (cadar form)))
-			    ((and (memq fn clfns)
-				  (listp form))
-			     (push fn fns)))
-		      (when (and (consp form)
-				 (condition-case nil
-				     ;; Ignore a case `(a b . c)'.
-				     (length form)
-				   (error nil)))
-			(setq forms (append (delq nil
-						  (mapcar
-						   (lambda (element)
-						     (when (consp element)
-						       element))
-						   form))
-					    forms))))
-		  (goto-char (point-max))
-		  (setq lines (list (cadr lines)
-				    (count-lines (point-min) (point)))
-			fns '("Couldn't parse, check this file manually."))))
-	      (when fns
-		(if buffer
-		    (set-buffer buffer)
-		  (display-buffer
-		   (setq buffer (get-buffer-create
-				 (concat "*CL run-time functions in: "
-					 file-or-directory "*"))))
-		  (setq window (get-buffer-window buffer t)
-			height (window-height window))
+    (when files
+      (if (member arg '((4) (64) 1 3))
+	  (dolist (fn cl-run-time-functions)
+	    (unless (and (fboundp fn)
+			 (subrp (symbol-function fn)))
+	      (push fn clfns)))
+	(setq clfns cl-run-time-functions))
+      (set-buffer (setq working
+			(get-buffer-create
+			 " *Searching for CL run-time functions*")))
+      (let (emacs-lisp-mode-hook)
+	(emacs-lisp-mode))
+      (while files
+	(setq file (pop files)
+	      lines (list nil nil))
+	(message "Searching for CL run-time functions in: %s..."
+		 (file-name-nondirectory file))
+	(insert-file-contents file nil nil nil t)
+	;; XEmacs moves point to the beginning of the buffer after
+	;; inserting a file, FSFmacs doesn't so if the fifth argument
+	;; of `insert-file-contents' is specified.
+	(goto-char (point-min))
+	;;
+	(while (progn
+		 (while (and (looking-at "[\t\v\f\r ]*\\(;.*\\)?$")
+			     (zerop (forward-line 1))))
+		 (not (eobp)))
+	  (setcar lines (if (bolp)
+			    (1+ (count-lines (point-min) (point)))
+			  (count-lines (point-min) (point))))
+	  (when (consp;; Ignore stand-alone symbols, strings, etc.
+		 (setq form (condition-case nil
+				(read working)
+			      (error nil))))
+	    (setcdr lines (list (count-lines (point-min) (point))))
+	    (setq forms (list form)
+		  fns nil)
+	    (while forms
+	      (setq form (pop forms))
+	      (when (consp form)
+		(setq fn (pop form))
+		(cond ((memq fn '(apply mapatoms mapcar mapconcat
+					mapextent symbol-function))
+		       (if (consp (car form))
+			   (when (memq (caar form) '(\` backquote quote))
+			     (setcar form (cdar form)))
+			 (setq form (cdr form))))
+		      ((memq fn '(\` backquote quote))
+		       (if report-symbols
+			   (progn
+			     (setq form (car form)
+				   newform nil)
+			     (while form
+			       (push (list (or (car-safe form) form))
+				     newform)
+			       (setq form (cdr-safe form)))
+			     (setq form (nreverse newform)))
+			 (setq form nil)))
+		      ((memq fn '(defadvice
+				   defmacro defsubst defun
+				   defmacro-maybe defmacro-maybe-cond
+				   defsubst-maybe defun-maybe
+				   defun-maybe-cond))
+		       (setq form (cddr form)))
+		      ((memq fn '(defalias lambda fset))
+		       (setq form (cdr form)))
+		      ((eq fn 'define-compiler-macro)
+		       (setq form nil))
+		      ((eq fn 'dolist)
+		       (setcar form (cadar form)))
+		      ((memq fn '(let let*))
+		       (setq form
+			     (append
+			      (delq nil
+				    (mapcar
+				     (lambda (element)
+				       (when (and (consp element)
+						  (consp (cadr element)))
+					 (cadr element)))
+				     (car form)))
+			      (cdr form))))
+		      ((eq fn 'sort)
+		       (when (and (consp (cadr form))
+				  (memq (caadr form) '(\` backquote quote)))
+			 (setcdr form (list (cdadr form)))))
+		      ((and (memq fn clfns)
+			    (listp form))
+		       (push fn fns)))
+		(setq forms (append form forms))))
+	    (when fns
+	      (if buffer
 		  (set-buffer buffer)
-		  (erase-buffer))
-		(when file
-		  (insert file "\n")
-		  (setq file nil))
-		(insert (format "%5d - %5d: %s"
-				(car lines) (cadr lines)
-				(mapconcat (lambda (fn) (format "%s" fn))
-					   (nreverse fns) " ")))
-		(while (> (current-column) 78)
-		  (skip-chars-backward "^ ")
-		  (backward-char 1)
-		  (insert "\n              ")
-		  (end-of-line))
-		(insert "\n")
-		(when (zerop (forward-line (- 0 height -2)))
-		  (set-window-start window (point)))
-		(goto-char (point-max))
-		(sit-for 0)
-		(set-buffer working))))
-	  (kill-buffer working)
-	  (if buffer
-	      (message "Done")
-	    (message "No CL run-time functions found in: %s"
-		     file-or-directory)))
-      (message "No files found"))))
+		(display-buffer
+		 (setq buffer (get-buffer-create
+			       (concat "*CL run-time functions in: "
+				       file-or-directory "*"))))
+		(set-buffer buffer)
+		(erase-buffer)
+		(setq window (get-buffer-window buffer t)
+		      scroll (- 2 (window-height window))
+		      fill-column (max 16 (- (window-width window) 2))
+		      fill-prefix "               "))
+	      (when file
+		(insert file "\n")
+		(setq file nil))
+	      (narrow-to-region
+	       (point)
+	       (progn
+		 (insert fill-prefix
+			 (mapconcat (lambda (fn) (format "%s" fn))
+				    (nreverse fns) " "))
+		 (point)))
+	      (fill-region (point-min) (point-max))
+	      (goto-char (point-min))
+	      (widen)
+	      (delete-char 14)
+	      (insert (format "%5d - %5d:" (car lines) (cadr lines)))
+	      (goto-char (point-max))
+	      (forward-line scroll)
+	      (set-window-start window (point))
+	      (goto-char (point-max))
+	      (sit-for 0)
+	      (set-buffer working)))))
+      (kill-buffer working)
+      (if buffer
+	  (message "Done")
+	(message "No CL run-time functions found in: %s"
+		 file-or-directory)))))
 
 (provide 'gnus-clfns)
 
