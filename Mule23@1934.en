@@ -133,7 +133,7 @@ included in Emacs-W3M package (and the other web based backends of T-
 gnus requires Emacs W3).  Emacs-W3M is an interface program to the
 external command W3M, visit the following pages for more information.
 
-   http://namazu.org/~tsuchiya/emacs-w3m/
+   http://emacs-w3m.namazu.org/
    http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 If you wish to build T-gnus to be able to use Emacs-W3M and nnshimbun,
