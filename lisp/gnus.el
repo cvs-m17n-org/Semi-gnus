@@ -1428,6 +1428,7 @@ slower, and `std11-extract-address-components'."
     ("nnweb" none)
     ("nnslashdot" post)
     ("nnultimate" none)
+    ("nnrss" none)
     ("nnwfm" none)
     ("nnwarchive" none)
     ("nnlistserv" none)

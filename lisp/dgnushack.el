@@ -289,7 +289,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			  nil)))
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
 	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
-	      "nnwfm.el"))
+	      "nnwfm.el" "nnrss.el"))
 	  (condition-case nil
 	      (progn (require 'bbdb) nil)
 	    (error '("gnus-bbdb.el")))
