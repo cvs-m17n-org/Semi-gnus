@@ -1,3 +1,8 @@
+1998-04-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README.semi (How to get? (via CVS)): Modify descriptions about
+ 	TAG.
+
 1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.2.1.
