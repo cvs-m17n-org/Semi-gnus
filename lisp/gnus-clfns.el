@@ -370,7 +370,8 @@ You can use the `digit-argument' 1, 2 or 3 instead of\
 		      ((and (memq fn clfns)
 			    (listp form))
 		       (push fn fns)))
-		(setq forms (append form forms))))
+		(when (listp form)
+		  (setq forms (append form forms)))))
 	    (when fns
 	      (if buffer
 		  (set-buffer buffer)
@@ -392,7 +393,8 @@ You can use the `digit-argument' 1, 2 or 3 instead of\
 	       (progn
 		 (insert fill-prefix
 			 (mapconcat (lambda (fn) (format "%s" fn))
-				    (nreverse fns) " "))
+				    (nreverse fns) " ")
+			 "\n")
 		 (point)))
 	      (fill-region (point-min) (point-max))
 	      (goto-char (point-min))

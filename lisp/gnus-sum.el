@@ -8200,14 +8200,15 @@ are `C-u g'."
   (cond
    ((numberp arg)
     (gnus-summary-show-article t)
-    (let ((gnus-newsgroup-charset
-	   (or (cdr (assq arg gnus-summary-show-article-charset-alist))
-	       (mm-read-coding-system
-		"View as charset: " ;; actually it is coding system.
-		(save-excursion
-		  (set-buffer gnus-article-buffer)
-		  (mm-detect-coding-region (point) (point-max))))))
-	  (gnus-newsgroup-ignored-charsets 'gnus-all))
+    (let* ((gnus-newsgroup-charset
+	    (or (cdr (assq arg gnus-summary-show-article-charset-alist))
+		(mm-read-coding-system
+		 "View as charset: " ;; actually it is coding system.
+		 (save-excursion
+		   (set-buffer gnus-article-buffer)
+		   (mm-detect-coding-region (point) (point-max))))))
+	   (default-mime-charset gnus-newsgroup-charset)
+	   (gnus-newsgroup-ignored-charsets 'gnus-all))
       (gnus-summary-select-article nil 'force)
       (let ((deps gnus-newsgroup-dependencies)
 	    head header lines)
