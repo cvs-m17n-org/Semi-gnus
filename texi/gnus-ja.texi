@@ -863,7 +863,7 @@ Scoring
                                 $B$K;XDj$9$k$+(B
 * Followups To Yourself::       $B?M$,$"$J$?$KJVEz$7$?$H$-$K(B gnus $B$K5$IU$+(B
                                 $B$;$k(B
-* Scoring On Other Headers::    $BI8=`$G$O$J$$%X%C%@!<$G%9%3%"$rIU$1$k(B
+* Scoring On Other Headers::    $BI8=`$G$O$J$$%X%C%@!<$K%9%3%"$rIU$1$k(B
 * Scoring Tips::                $B$I$&$d$C$F8z2LE*$K%9%3%"$rIU$1$k$+(B
 * Reverse Scoring::             $B8E$$$b$N$N;R$G$"$k$H$$$&LdBj$OLdBj$G$O$J(B
                                 $B$$(B
@@ -5004,21 +5004,21 @@ Gnus $B$O!"<h$j>C$9$H$-$K!X8=:_!Y$NA*BrJ}K!$r;H$$$^$9!#I8=`$NEj9FJ}K!$r;H(B
 
 @itemize
 @item
-$B@0?t$H0l$D$NJ8;z$G;XDj$9$k4|4V!#Nc$($P(B @code{42d} $B$O(B 42 $BF|CY$i$;$k$3$H$r(B
-$B0UL#$7$^$9!#;H$&$3$H$,$G$-$kJ8;z$O(B @code{m} ($BJ,(B)$B!"(B@code{h} ($B;~(B)$B!"(B
+$B4|4V!#@0?t$H0l$D$NJ8;z$G;XDj$7$^$9!#Nc$($P(B @code{42d} $B$O(B 42 $BF|CY$i$;$k$3(B
+$B$H$r0UL#$7$^$9!#;H$&$3$H$,$G$-$kJ8;z$O(B @code{m} ($BJ,(B)$B!"(B@code{h} ($B;~(B)$B!"(B
 @code{d} ($BF|(B), @code{w} ($B=5(B), @code{M} ($B7n(B) $B$*$h$S(B @code{Y} ($BG/(B) $B$G$9!#(B
 
 @item
-@code{YYYYY-MM-DD} $B$N$h$&$J7A<0$G;XDj$9$kF|IU!#%a%C%;!<%8$NAw?.$O$=$NF|(B
-$B$NFCDj$N;~9o(B ($B%G%#%U%)%k%H$O(B 8 $B;~(B) $B$^$GCY$i$;$i$l$^$9!#(B
+$BF|IU!#(B@code{YYYYY-MM-DD} $B$N$h$&$J7A<0$G;XDj$7$^$9!#!#%a%C%;!<%8$NAw?.$O(B
+$B$=$NF|$NFCDj$N;~9o(B ($B%G%#%U%)%k%H$O(B 8 $B;~(B) $B$^$GCY$i$;$i$l$^$9!#(B
 @code{gnus-delay-default-hour} $B$b;2>H$7$F2<$5$$!#(B
 
 @item
-@code{hh:mm} $B$N7A<0$GM?$($i$l$k(B am/pm $B$r4^$^$J$$(B 24 $B;~4V@)$N;~9o!#Aw?.$5(B
-$B$l$k$N$O:#F|$N$=$N;~9o$G$9$,!"$9$G$K$=$N;~9o$r2a$.$F$7$^$C$F$$$?>l9g$OMb(B
-$BF|$N$=$N;~9o$K$J$j$^$9!#$G$9$+$i!"D+$N(B 10 $B;~$K(B @code{11:15} $B$r;XDj$7$?>l(B
-$B9g$O(B 1$B;~4V(B15$BJ,8e$KAw?.$5$l$k$3$H$K$J$j$^$9!#$7$+$7(B @code{9:20} $B$r;XDj$7(B
-$B$?>l9g$OMbF|$N;~9o$r0UL#$7$^$9!#(B
+$B;~9o!#(Bam/pm $B$r4^$^$J$$(B 24 $B;~4V@)$N!"(B@code{hh:mm} $B$N7A<0$GM?$($^$9!#Aw?.(B
+$B$5$l$k$N$O:#F|$N$=$N;~9o$G$9$,!"$9$G$K$=$N;~9o$r2a$.$F$7$^$C$F$$$?>l9g$O(B
+$BMbF|$N$=$N;~9o$K$J$j$^$9!#$G$9$+$i!"D+$N(B 10 $B;~$K(B @code{11:15} $B$r;XDj$7$?(B
+$B>l9g$O(B 1$B;~4V(B15$BJ,8e$KAw?.$5$l$k$3$H$K$J$j$^$9!#$7$+$7(B @code{9:20} $B$r;XDj(B
+$B$7$?>l9g$OMbF|$N;~9o$r0UL#$7$^$9!#(B
 @end itemize
 
 @code{gnus-delay-article} $B$NF0:n$O!"0J2<$N?t8D$NJQ?t$K1F6A$5$l$^$9(B:
@@ -5035,8 +5035,8 @@ Gnus $B$O!"<h$j>C$9$H$-$K!X8=:_!Y$NA*BrJ}K!$r;H$$$^$9!#I8=`$NEj9FJ}K!$r;H(B
 
 @item gnus-delay-group
 @vindex gnus-delay-group
-$BCY1d5-;v$O%I%i%U%H%5!<%P!<$N$3$N%0%k!<%W$K4|8B$,Mh$k$^$GJ]4I$5$l$^$9!#$?(B
-$B$V$s$"$J$?$O$3$l$rJQ99$9$kI,MW$OL5$$$G$7$g$&!#%G%#%U%)%k%H$NCM(B
+$BCY1d5-;v$O!"%I%i%U%H%5!<%P!<$N$3$N%0%k!<%W$K4|8B$,Mh$k$^$GJ]4I$5$l$^$9!#(B
+$B$?$V$s$"$J$?$O$3$l$rJQ99$9$kI,MW$OL5$$$G$7$g$&!#%G%#%U%)%k%H$NCM(B
 $B$O(B @code{"delayed"} $B$G$9!#(B
 
 @item gnus-delay-header
@@ -15534,7 +15534,7 @@ Gnus $B$O35N,%P%C%U%!$r:n@.$9$kA0$K!"8=:_$N%0%k!<%W$KE,MQ$5$l$k$I$s(B
                                 $B$K;XDj$9$k$+(B
 * Followups To Yourself::       $B?M$,$"$J$?$KJVEz$7$?$H$-$K(B gnus $B$K5$IU$+(B
                                 $B$;$k(B
-* Scoring On Other Headers::    $BI8=`$G$O$J$$%X%C%@!<$G%9%3%"$rIU$1$k(B
+* Scoring On Other Headers::    $BI8=`$G$O$J$$%X%C%@!<$K%9%3%"$rIU$1$k(B
 * Scoring Tips::                $B$I$&$d$C$F8z2LE*$K%9%3%"$rIU$1$k$+(B
 * Reverse Scoring::             $B8E$$$b$N$N;R$G$"$k$H$$$&LdBj$OLdBj$G$O$J(B
                                 $B$$(B
@@ -16569,38 +16569,38 @@ Gnus $B$O8=:_$N%P%C%U%!!<$+$i(B @code{Message-ID} $B%X%C%@!<$r8+$D$1=P$9$?$a$
 ``$B$"$J$?$N(B'' $B$,:G=i$NFsJ8;z$K$J$k$+:G=i$N;0J8;z$K$J$k$+$O%7%9%F%`$K0MB8(B
 $B$7$^$9!#(B
 
-@c TRANSLATEME
 @node Scoring On Other Headers
-@section Scoring On Other Headers
+@section $BB>$N%X%C%@!<$K%9%3%"$rIU$1$k(B
 @cindex scoring on other headers
 
-Gnus is quite fast when scoring the ``traditional''
-headers---@samp{From}, @samp{Subject} and so on.  However, scoring
-other headers requires writing a @code{head} scoring rule, which means
-that Gnus has to request every single article from the backend to find
-matches.  This takes a long time in big groups.
+gnus $B$,(B ``$BEAE}E*(B'' $B$J%X%C%@!<(B -- @samp{From}, @samp{Subject} $B$J$I(B -- $B$K(B
+$B%9%3%"$rIU$1$k$N$O$H$F$bB.$$$G$9!#$G$9$,!"B>$N%X%C%@!<$K%9%3%"$rIU$1$k$K(B
+$B$O(B @code{head} $B$N%9%3%"$N$?$a$N5,B'$r=q$/I,MW$,$"$j!"$=$l$O9gCW$rC5$9$?(B
+$B$a$K(B gnus $B$,Kh2s%P%C%/%(%s%I$+$iC1FH$N5-;v$r<h$j4s$;$J$1$l$P$J$i$J$$$3$H(B
+$B$r0UL#$7$^$9!#$3$l$OBg$-$J%0%k!<%W$G$OD9$$;~4V$,$+$+$j$^$9!#(B
 
-Now, there's not much you can do about this for news groups, but for
-mail groups, you have greater control.  In the @pxref{To From
-Newsgroups} section of the manual, it's explained in greater detail what
-this mechanism does, but here's a cookbook example for @code{nnml} on
-how to allow scoring on the @samp{To} and @samp{Cc} headers.
+$B$5$F!"%K%e!<%9%0%k!<%W$G$O$J$/$F%a!<%k%0%k!<%W$G$3$l$r9T$J$&$N$O$5$[$IBg(B
+$BJQ$G$O$J$/!"$=$N$?$a$N$9$0$l$?<jCJ$,MQ0U$5$l$F$$$^$9!#$3$N%^%K%e%"%k(B
+$B$N(B @pxref{To From Newsgroups} $B$N9`$G$O$3$N5!9=$,$I$&F/$/$+$,>\$7$/@bL@$5(B
+$B$l$F$$$^$9$,!"$3$3$G$O(B @code{nnml} $B$G(B @samp{To} $B$H(B @samp{Cc} $B%X%C%@!<$K(B
+$B%9%3%"$rIU$1$kJ}K!$ND4M}$NNc$r5s$2$^$7$g$&!#(B
 
-Put the following in your @file{.gnus.el} file.
+$B0J2<$r(B @file{.gnus.el} $B%U%!%$%k$KCV$$$F2<$5$$!#(B
 
 @lisp
 (setq gnus-extra-headers '(To Cc Newsgroups Keywords)
       nnmail-extra-headers gnus-extra-headers)
 @end lisp
 
-Restart Gnus and rebuild your @code{nnml} overview files with the
-@kbd{M-x nnml-generate-nov-databases} command.  This will take a long
-time if you have much mail.
+gnus $B$r:F5/F0$7$F!"(B@kbd{M-x nnml-generate-nov-databases} $B%3%^%s%I(B
+$B$G(B @code{nnml} $B$N(B overview $B%U%!%$%k$r:n$jD>$7$^$9!#$b$7$"$J$?$,$?$/$5$s(B
+$B$N%a!<%k$r;}$C$F$$$k$H!"$3$l$K$OD9$$;~4V$,$+$+$j$^$9!#(B
 
-Now you can score on @samp{To} and @samp{Cc} as ``extra headers'' like
-so: @kbd{I e s p To RET <your name> RET}.
+$B$=$7$F(B @kbd{I e s p To RET <your name> RET} $B$N$h$&$K$9$k$H!"$"$J$?(B
+$B$O(B @samp{To} $B$H(B @samp{Cc} $B%X%C%@!<$K(B ``extra headers'' $B$H$7$F%9%3%"$rIU(B
+$B$1$k$3$H$,$G$-$^$9!#(B
 
-See?  Simple.
+$B$o$+$C$?$+$J(B? $B4JC1$@$h$M!#(B
 
 @node Scoring Tips
 @section $B%9%3%"IU$1$N1|5A(B
