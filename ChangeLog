@@ -1,3 +1,7 @@
+1999-11-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
+
+	* lisp/gnus.el (gnus-version): Shows also gnus-revision-number.
+
 1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
