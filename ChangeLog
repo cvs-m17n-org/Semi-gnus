@@ -1,3 +1,8 @@
+2000-04-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
+
+	* lisp/dgnushack.el: Add code to avoid mule-2.3@19.34 failing to
+	make info from texi. Thanks to Hayashi-san.
+
 2000-04-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (union, member-if, mapcon, last): Remove
