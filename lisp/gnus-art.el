@@ -3281,6 +3281,18 @@ It is registered to variable `mime-view-content-header-filter-alist'."
 	   'gnus-original-article-mode
 	   #'mime-preview-quitting-method-for-gnus)
 
+(defun gnus-following-method (buf)
+  (set-buffer buf)
+  (message-followup)
+  (message-yank-original)
+  (kill-buffer buf)
+  (goto-char (point-min))
+  )
+
+(set-alist 'mime-view-following-method-alist
+	   'gnus-original-article-mode
+	   #'gnus-following-method)
+
 
 ;;; @ end
 ;;;
