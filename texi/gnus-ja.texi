@@ -4647,7 +4647,7 @@ Gnus $B$O%G%#%U%)%k%H$G5-;v$r%9%l%C%I$K$7$^$9!#(B@dfn{$B%9%l%C%I$K$9$k(B} $
 
 
 @node Loose Threads
-@subsection $BL5B+G{%9%l%C%I(B
+@subsubsection $BL5B+G{%9%l%C%I(B
 @cindex <
 @cindex >
 @cindex loose threads
@@ -4858,7 +4858,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 
 
 @node More Threading
-@subsection $B$b$C$H%9%l%C%I$r(B
+@subsubsection $B$b$C$H%9%l%C%I$r(B
 
 @table @code
 @item gnus-show-threads
@@ -4897,7 +4897,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 
 
 @node Low-Level Threading
-@subsection $BDc%l%Y%k$K$*$1$k%9%l%C%I:n@.(B
+@subsubsection $BDc%l%Y%k$K$*$1$k%9%l%C%I:n@.(B
 
 @table @code
 
@@ -5843,7 +5843,7 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 
 
 @node Other Decode Variables
-@subsection $BB>$NI|9f2=$NJQ?t(B
+@subsubsection $BB>$NI|9f2=$NJQ?t(B
 
 @table @code
 @vindex gnus-uu-grabbed-file-functions
@@ -5944,7 +5944,7 @@ Gnus $B$O%U%!%$%k$r1\Mw$9$k$N$r7hDj$9$k$N$K(B@dfn{$B5,B'JQ?t(B}$B$rMQ$$$^$9
 
 
 @node Uuencoding and Posting
-@subsection uuencode $B$HEj9F(B
+@subsubsection uuencode $B$HEj9F(B
 
 @table @code
 
@@ -8285,6 +8285,14 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$NCM$,;H$o$l$^$9(B)$B!"%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$jCM$,;H$o$l$^$9(B) 
 $B$G$"$k;v$,$G$-$^$9!#(B
 
+$B$b$7!":n@.$7$h$&$H$7$F$$$k%a%C%;!<%8$,%K%e!<%95-;v$+%a!<%k%a%C%;!<%8$G$"(B
+$B$k$+$rD4$Y$?$$$H$-$O!"(B2$B$D$NF0E*$KB+G{$5$l$kJQ?t(B 
+@code{message-this-is-news} $B$H(B @code{message-thiss-is-mail} $B$rD4$Y$k;v$,(B
+$B$G$-$^$9!#(B
+
+@vindex message-this-is-mail
+@vindex message-this-is-news
+
 $B$=$7$F!"$3$l$ONc$G$9(B:
 
 @lisp
@@ -8298,6 +8306,8 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
          (signature my-funny-signature-randomizer))
         ((equal (system-name) "gnarly")
          (signature my-quote-randomizer))
+        (message-this-is-news
+         (signature my-news-signature))
         (posting-from-work-p
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
@@ -10011,7 +10021,7 @@ Gnus $B$O%a!<%k%0%k!<%W$rF0:n$9$k$h$&$K$9$k$H%a!<%k%9%W!<%k$rFI$_9~$_$^$9!#(B
 
 
 @node Unix Mail Box
-@subsection Unix $B%a!<%k%\%C%/%9(B
+@subsubsection Unix $B%a!<%k%\%C%/%9(B
 @cindex nnmbox
 @cindex unix mail box
 
@@ -10040,7 +10050,7 @@ Gnus $B$O%a!<%k%0%k!<%W$rF0:n$9$k$h$&$K$9$k$H%a!<%k%9%W!<%k$rFI$_9~$_$^$9!#(B
 
 
 @node Rmail Babyl
-@subsection Rmail Babyl
+@subsubsection Rmail Babyl
 @cindex nnbabyl
 @cindex rmail mbox
 
@@ -10068,7 +10078,7 @@ rmail box $B$N$?$a$N8=>u%U%!%$%k$NL>A0!#(B
 
 
 @node Mail Spool
-@subsection $B%a!<%k%9%W!<%k(B
+@subsubsection $B%a!<%k%9%W!<%k(B
 @cindex nnml
 @cindex mail @sc{nov} spool
 
@@ -10142,7 +10152,7 @@ mbox $B%U%!%$%k$r=E$$B-<h$j$GC5$9I,MW$O$"$j$^$;$s!#(B
 
 
 @node MH Spool
-@subsection MH $B%9%W!<%k(B
+@subsubsection MH $B%9%W!<%k(B
 @cindex nnmh
 @cindex mh-e mail spool
 
@@ -10173,7 +10183,7 @@ procmail $B$N%9%/%j%W%H$r=q$/$?$a$K$:$C$H$d$j$d$9$/$J$C$F$b$$$^$9!#(B
 @end table
 
 @node Mail Folders
-@subsection $B%a!<%k%U%)%k%@!<(B
+@subsubsection $B%a!<%k%U%)%k%@!<(B
 @cindex nnfolder
 @cindex mbox folders
 @cindex mail folders
@@ -10202,6 +10212,22 @@ procmail $B$N%9%/%j%W%H$r=q$/$?$a$K$:$C$H$d$j$d$9$/$J$C$F$b$$$^$9!#(B
 @item nnfolder-get-new-mail
 @vindex nnfolder-get-new-mail
 @code{nil} $B$G$J$1$l$P!"(B@code{nnfolder} $B$OF~$C$F$/$k%a!<%k$rFI$_9~$_$^$9!#(B
+
+@item nnfolder-save-buffer-hook
+@vindex nnfolder-save-buffer-hook
+@cindex backup files
+$B%U%)%k%@!<$rJ]B8$9$kA0$K<B9T$5$l$k%U%C%/$G$9!#(B@code{nnfolder} $B%P%C%U%!$K(B
+$BBP$7$F$5$($b(B Emacs $B$ODL>o$N%P%C%/%"%C%W$NJQL>$r$9$k;v$KCm0U$7$F2<$5$$!#(B
+$B$3$N5!G=$rL58z$K$7$?$$$N$G$"$l$P!"%U%!%$%k(B @file{.emacs} $B$G<!$N$h$&$J;v(B
+$B$r$9$k;v$,$G$-$^$9(B:
+
+@lisp
+(defun turn off-backup ()
+  (set (make-local-variable 'backup-inhibited) t))
+
+(add-hook 'nnfolder-save-buffer-hook 'turn-off-backup)
+@end lisp
+
 @end table
 
 @findex nnfolder-generate-active-file
@@ -11087,6 +11113,19 @@ Distribution $B%X%C%@!<$r;H$C$FG[I[HO0O$r@)8B$7$F$$$k>l9g$O!"Hs>o(B
 $B$3$N1F6A$,$"$j$^$9!#$=$N>l9g$O$3$NJQ?t$r(B @code{t} $B$K$7$?J}$,NI$$(B
 $B$G$9!#$"$k$$$O2>A[%0%k!<%W$KF~$k;~$K!"Kh2s$=$N%0%k!<%W$N>e$G(B 
 @code{M-g} $B$rC!$$$F$bNI$$$G$9(B --- $B$3$l$O$[$\F1MM$N8z2L$,$"$j$^$9!#(B
+
+@code{nnvirtual} $B$O%a!<%k$H%K%e!<%9$NN>J}$N%0%k!<%W$r9=@.%0%k!<%W$H$9$k(B
+$B;v$,$G$-$^$9!#(B@code{nnvirtual} $B%0%k!<%W$N5-;v$KJVEz$9$k$H$-$O!"(B
+@code{nnvirtual} $B$O5-;v$N=P=j$N9=@.%0%k!<%W$N%P%C%/%(%s%I$K$=$l$,%K%e!<(B
+$B%9$N%P%C%/%(%s%I$G$"$k$+%a!<%k$N%P%C%/%(%s%I$G$"$k$+$r?R$M$J$1$l$P$J$j$^(B
+$B$;$s!#$7$+$7!"(B@kbd{^} $B$r$7$?$H$-$K$O!"IaDL$O9=@.%P%C%/%(%s%I$,$3$l$rCN$k(B
+$B3N$+$JJ}K!$O$J$/!"$=$N>l9g$O!"(B@code{nnvirtual} $B$O(B gnus $B$K5-;v$O%K%e!<%9(B
+$B$G$J$$%P%C%/%(%s%I$+$iMh$?$H9p$2$k;v$K$J$j$^$9!#(B ($B0BA4$N$?$a$K!#(B)
+
+$B$3$N$h$&$J>l9g$O!"%a%C%;!<%8%P%C%U%!$G$N(B @kbd{C-c C-t} $B$,1~Ez$7$h$&$H$7(B
+$B$F$$$k5-;v$+$i(B @code{Newsgroups} $B9T$rH4$-=P$7$FA^F~$7$^$9!#(B
+
+
 
 @node Kibozed Groups
 @subsection Kiboze $B%0%k!<%W(B
@@ -15818,7 +15857,7 @@ Shenghuo Zhu. @c Zhu
 * ding Gnus::          $B:G=i$N?7$7$$(B Gnus $B$G$"$k(B Gnus 5.0/5.1 $B$N?7$7$$;v!#(B
 * September Gnus::     $B8x<0$K(B GNus 5.2/5.3 $B$H$7$FCN$i$l$F$$$k$b$N!#(B
 * Red Gnus::           3$BHVL\$N:G>e$N$b$N(B---Gnus 5.4/5.5
-* Quassia Gnus::       2$B$+$1$k(B2$B$O(B4$B!"$b$7$/$O(B Gnus 5.6$B!#(B
+* Quassia Gnus::       2$B$+$1$k(B2$B$O(B4$B!"$b$7$/$O(B Gnus 5.6/5.7$B!#(B
 @end menu
 
 $B$3$N%j%9%H$O!"$b$A$m$s!"(B@emph{$B$?$$$F$$$N(B} $B=EMW$J?7$7$$5!G=$K4X$9$k(B 
@@ -17680,6 +17719,13 @@ Group parameters and summary commands for un/subscribing to mailing
 lists. 
 
 @item
+Introduce nnmail-home-directory.
+
+@item
+gnus-fetch-group and friends should exit Gnus when the user
+exits the group.
+
+@item
 Solve the halting problem.
 
 @c TODO
@@ -19492,7 +19538,7 @@ flag        = "y" / "n" / "m" / "j" / "x" / "=" group
 
 
 @node Newsgroups File Format
-@subsection $B%K%e!<%9%0%k!<%W%U%!%$%kMM<0(B
+@subsubsection $B%K%e!<%9%0%k!<%W%U%!%$%kMM<0(B
 
 $B%K%e!<%9%0%k!<%W%U%!%$%k$O%0%k!<%W$r$=$N5-=R$H6&$K0lMw$r5s$2$^$9!#%5!<%P!<(B
 $B$K$"$kA4$F$N%0%k!<%W$,0lMw$K$5$l$J$1$l$P$J$i$J$$$N$G$O$J$/!"$^$?!"%U%!%$(B
