@@ -1106,31 +1106,43 @@ This can be added to `gnus-select-article-hook' or
       (pop gnus-agent-group-alist))))
 
 (defun gnus-agent-fetch-headers (group &optional force)
-  (let* ((articles
-	  (if gnus-agent-consider-all-articles
-	      (gnus-uncompress-range (gnus-active group))
-	    (gnus-list-of-unread-articles group)))
-	 (len (length articles))
-	 (gnus-decode-encoded-word-function 'identity)
-	 (file (gnus-agent-article-name ".overview" group))
-	 i gnus-agent-cache)
-    ;; Check the number of articles is not too large.
+  (let ((articles
+	 (if (and gnus-agent-consider-all-articles
+		  ;; Do not fetch all headers if the predicate
+		  ;; implies that we only consider unread articles.
+		  (not (gnus-predicate-implies-unread
+			(or (gnus-group-find-parameter
+			     group 'agent-predicate t)
+			    (cadr (gnus-group-category group))))))
+	     (gnus-uncompress-range (gnus-active group))
+	   (gnus-list-of-unread-articles group)))
+	(gnus-decode-encoded-word-function 'identity)
+	(file (gnus-agent-article-name ".overview" group))
+	gnus-agent-cache)
+    ;; Check whether the number of articles is not too large.
     (when (and (integerp gnus-agent-large-newsgroup)
-	       (< 0 gnus-agent-large-newsgroup))
-      (and (< 0 (setq i (- len gnus-agent-large-newsgroup)))
-	   (setq articles (nthcdr i articles))))
-    ;; add article with marks to list of article headers we want to fetch.
+	       (> gnus-agent-large-newsgroup 0))
+      (setq articles (nthcdr (max (- (length articles)
+				     gnus-agent-large-newsgroup)
+				  0)
+			     articles)))
+    ;; Add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
-      (unless (memq (car arts) '(seen recent))
+      (unless (memq (car arts) '(unseen recent))
 	(setq articles (gnus-range-add articles (cdr arts)))))
     (setq articles (sort (gnus-uncompress-sequence articles) '<))
     ;; Remove known articles.
     (when (gnus-agent-load-alist group)
-      (setq articles (gnus-list-range-intersection
-		      articles
-		      (list
-		       (cons (1+ (caar (last gnus-agent-article-alist)))
-			     (cdr (gnus-active group)))))))
+      (let ((low (1+ (caar (last gnus-agent-article-alist))))
+	    (high (cdr (gnus-active group))))
+	;; I suspect a deeper problem here and I suspect that low
+	;; should never be greater than high.  But for the time being
+	;; we just work around the problem and abstain from frobbing
+	;; the article list in that case.  If anyone knows how to
+	;; properly deal with it, please holler.  -- kai
+	(when (<= low high)
+	  (setq articles (gnus-list-range-intersection
+			  articles (list (cons low high)))))))
     ;; Fetch them.
     (gnus-make-directory (nnheader-translate-file-chars
 			  (file-name-directory file) t))
@@ -1705,6 +1717,14 @@ The following commands are available:
 	      (nconc gnus-category-predicate-cache
 		     (list (cons predicate func))))
 	func)))
+
+(defun gnus-predicate-implies-unread (predicate)
+  "Say whether PREDICATE implies unread articles only.
+It is okay to miss some cases, but there must be no false positives.
+That is, if this function returns true, then indeed the predicate must
+return only unread articles."
+  ;; Todo: make this work in more cases.
+  (equal predicate '(not read)))
 
 (defun gnus-group-category (group)
   "Return the category GROUP belongs to."
