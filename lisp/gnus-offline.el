@@ -1,4 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.4 1998-10-17 03:27:06 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -125,8 +126,7 @@
 ;;  "This night"		; 1.51
 ;;  "Movin'out"			; 1.52
 ;;  "Longest night"		; 1.53
-  "Back in the U.S.S.R"		; 1.54
-;;  "Running on ice"
+  "Running on ice"		; 1.54
 ;;  "This is the time"
 ;;  "A matter of trust"
 ;;  "Modern Woman"
