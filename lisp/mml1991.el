@@ -55,7 +55,7 @@
     (while (looking-at "^Content[^ ]+:") (forward-line))
     (if (> (point) (point-min))
 	(progn
-	  (setq headers (buffer-substring (point-min) (point)))
+	  (setq headers (buffer-string))
 	  (kill-region (point-min) (point))))
     (goto-char (point-max))
     (unless (bolp)
@@ -140,7 +140,7 @@
     (while (looking-at "^Content[^ ]+:") (forward-line))
     (if (> (point) (point-min))
 	(progn
-	  (setq headers (buffer-substring (point-min) (point)))
+	  (setq headers (buffer-string))
 	  (kill-region (point-min) (point))))
     (goto-char (point-max))
     (unless (bolp)

@@ -312,7 +312,7 @@ If nil, the address field will always be empty after invoking
 (defcustom gnus-user-agent 'emacs-gnus-type
   "Which information should be exposed in the User-Agent header.
 
-It can be one of the symbols `gnus' \(show only Gnus version\) `emacs-gnus'
+It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
 \(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
 `emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
 `emacs-gnus' plus system type\) or a custom string.  If you set it to a

@@ -10553,13 +10553,12 @@ ISP が POP-before-SMTP の認証を要求している場合に有用です。関
 
 (訳注: T-gnus では現在この変数による制御は機能しません。) この変数は、ど
 の情報が User-Agent ヘッダーに陳列されるかを制御します。それは次のシンボ
-ルまたは文字列のうちのどれかであることができます: @code{full} (全情報を
-見せる、すなわち Emacs と Gnus のバージョンとシステム構成)、
-@code{emacs-gnus} (Emacs と Gnus のバージョンだけを見せる)、
-@code{emacs-gnus-type} (@code{emacs-gnus} と同じ＋システムタイプ)、
-@code{gnus} (Gnus のバージョンだけを見せる)、または好みの文字列。これを
-文字列にするときは、正しいフォーマットを使っていることを確認して下さ
-い (RFC2616 参照)。
+ルまたは文字列のうちのどれかであることができます: @code{gnus} (Gnus のバー
+ジョンのみ)、@code{emacs-gnus} (Emacs と Gnus のバージョンだけ)、
+@code{emacs-gnus-config} (@code{emacs-gnus} と同じ＋システム構成)、
+@code{emacs-gnus-type} (@code{emacs-gnus}) と同じ＋システムタイプ)、また
+は好みの文字列。これを文字列にするときは、正しいフォーマットになっている
+ことを確かめて下さい (RFC2616 参照)。
 @end table
 
 あなたは自分が送るメッセージの綴りを調べたいと思うかも知れません。もしく
@@ -12728,7 +12727,18 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @item mail-source-delete-incoming
 @vindex mail-source-delete-incoming
 @code{nil} でなければ、入って来たファイルは、それを処理した後に消去され
-ます。
+ます。@code{t} ではファイルをただちに消去し、@code{nil} ではいかなるファ
+イルも消しません。正の数だった場合は、その日数以上に古いファイルを消去し
+ます (これは新着メールを取り込むときだけ行なわれます)。
+@code{mail-source-delete-incoming} を @code{nil} にしておいて、
+@code{mail-source-delete-old-incoming} をフックまたは手動で呼んでも良い
+です。
+
+@item mail-source-delete-old-incoming-confirm
+@vindex mail-source-delete-old-incoming-confirm
+非-@code{nil} だったら、古い incoming (メールの到着時に使われた) ファイ
+ルを消去するときに確認を求めます。この変数
+は @code{mail-source-delete-incoming} が正の数である場合だけ使われます。
 
 @item mail-source-ignore-errors
 @vindex mail-source-ignore-errors
