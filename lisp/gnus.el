@@ -1033,12 +1033,12 @@ list, Gnus will try all the methods in the list until it finds a match."
   :type '(choice (const :tag "default" nil)
 		 (const :tag "DejaNews" (nnweb "refer" (nnweb-type dejanews)))
 		 gnus-select-method
-		 (repeat :menu-tag "Try multiple" 
+		 (repeat :menu-tag "Try multiple"
 			 :tag "Multiple"
 			 :value (current (nnweb "refer" (nnweb-type dejanews)))
 			 (choice :tag "Method"
 				 (const current)
-				 (const :tag "DejaNews" 
+				 (const :tag "DejaNews"
 					(nnweb "refer" (nnweb-type dejanews)))
 				 gnus-select-method))))
 
@@ -1301,21 +1301,28 @@ this variable.	I think."
 				   (const :format "%v " virtual)
 				   (const respool)))))
 
-(define-widget 'gnus-select-method 'list
-  "Widget for entering a select method."
-  :value '(nntp "")
-  :tag "Select Method"
-  :args `((choice :tag "Method"
-		  ,@(mapcar (lambda (entry)
-			      (list 'const :format "%v\n"
-				    (intern (car entry))))
-			    gnus-valid-select-methods))
-	  (string :tag "Address")
-	  (repeat :tag "Options"
-		  :inline t
-		  (list :format "%v"
-			variable
-			(sexp :tag "Value")))))
+(defun gnus-redefine-select-method-widget ()
+  "Recomputes the select-method widget based on the value of
+`gnus-valid-select-methods'."
+  (define-widget 'gnus-select-method 'list
+    "Widget for entering a select method."
+    :value '(nntp "")
+    :tag "Select Method"
+    :args `((choice :tag "Method"
+		    ,@(mapcar (lambda (entry)
+				(list 'const :format "%v\n"
+				      (intern (car entry))))
+			      gnus-valid-select-methods)
+		    (symbol :tag "other"))
+	    (string :tag "Address")
+	    (repeat :tag "Options"
+		    :inline t
+		    (list :format "%v"
+			  variable
+			  (sexp :tag "Value"))))
+    ))
+
+(gnus-redefine-select-method-widget)
 
 (defcustom gnus-updated-mode-lines '(group article summary tree)
   "List of buffers that should update their mode lines.
@@ -1810,7 +1817,7 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-article-delete-invisible-text gnus-treat-article)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
-      gnus-article-treat-overstrike 
+      gnus-article-treat-overstrike
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
       gnus-article-display-x-face
       gnus-article-decode-HZ
@@ -2862,7 +2869,7 @@ Allow completion over sensible values."
 	(or (let ((opened gnus-opened-servers))
 	      (while (and opened
 			  (not (equal (format "%s:%s" method address)
-				      (format "%s:%s" (caaar opened) 
+				      (format "%s:%s" (caaar opened)
 					      (cadaar opened)))))
 		(pop opened))
 	      (caar opened))
