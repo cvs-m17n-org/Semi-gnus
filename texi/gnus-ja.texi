@@ -2535,8 +2535,8 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 $B$F$-$^$9!#$h$j4JC1$K(B @sc{nntp} $B%0%k!<%W$r9XFI$9$kJ}K!$O!"(B
 @pxref{Browse Foreign Server}$B!#(B
 
-@item G s
-@kindex G s (Group)
+@item G n
+@kindex G n (Group)
 @findex gnus-group-make-shimbun-group
 @cindex making groups
 @cindex nnshimbun
@@ -13396,9 +13396,9 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
 @end example
 
 @findex gnus-group-make-shimbun-group
-@kindex G s (Group)
+@kindex G n (Group)
 @code{nnshimbun} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$NE,Ev$J(B
-$B>l=j$G(B @kbd{G s asahi RET national RET} $B$J$I$H%?%$%W$9$k$3$H$G$9!#(B
+$B>l=j$G(B @kbd{G n asahi RET national RET} $B$J$I$H%?%$%W$9$k$3$H$G$9!#(B
 @samp{asahi} $B$O@\B3$7$?$$%5!<%P!<$N%"%I%l%9$r<($9%7%s%\%k$K!"(B
 @samp{national} $B$O1\Mw$7$?$$5-;v%0%k!<%W$K$=$l$>$lCV$-49$($F$/$@$5$$!#N>(B
 $BJ}$H$bL>A0$NJd40$,$G$-$^$9!#(B

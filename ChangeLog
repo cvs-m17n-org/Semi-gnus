@@ -1,12 +1,12 @@
 2001-11-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-group.el (gnus-group-group-map): Bind `G s' key to the
+	* lisp/gnus-group.el (gnus-group-group-map): Bind `G n' key to the
 	command `gnus-group-make-shimbun-group'.
 	(gnus-group-group-menu): Add `gnus-group-make-shimbun-group'.
 
 	* texi/gnus-ja.texi (Foreign Groups): Add a documentation for the
 	shimbun groups.
-	(Web Newspaper): Use `G s' key for `gnus-group-make-shimbun-group'.
+	(Web Newspaper): Use `G n' key for `gnus-group-make-shimbun-group'.
 
 2001-11-15  Simon Josefsson  <jas@extundo.com>
 
