@@ -1,3 +1,8 @@
+2001-03-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-kinsoku-eol-list): Simplified.
+	(nnshimbun-kinsoku-bol-list): Ditto.
+
 2001-03-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.

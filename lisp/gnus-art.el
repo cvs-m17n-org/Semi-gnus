@@ -4692,10 +4692,16 @@ Argument LINES specifies lines to be scrolled down."
       (save-excursion
 	(set-buffer gnus-article-current-summary)
 	(let (gnus-pick-mode)
-	  (push (elt key 0) unread-command-events)
-	  (setq key (if (featurep 'xemacs)
-			(events-to-keys (read-key-sequence "Describe key: "))
-		      (read-key-sequence "Describe key: "))))
+	  (if (featurep 'xemacs)
+	      (progn
+		(push (elt key 0) unread-command-events)
+		(setq key (events-to-keys
+			   (read-key-sequence "Describe key: "))))
+	    (setq unread-command-events
+		  (mapcar
+		   (lambda (x) (if (>= x 128) (list 'meta (- x 128)) x))
+		   key))
+	    (setq key (read-key-sequence "Describe key: "))))
 	(describe-key key))
     (describe-key key)))
 
@@ -4707,10 +4713,16 @@ Argument LINES specifies lines to be scrolled down."
       (save-excursion
 	(set-buffer gnus-article-current-summary)
 	(let (gnus-pick-mode)
-	  (push (elt key 0) unread-command-events)
-	  (setq key (if (featurep 'xemacs)
-			(events-to-keys (read-key-sequence "Describe key: "))
-		      (read-key-sequence "Describe key: "))))
+	  (if (featurep 'xemacs)
+	      (progn
+		(push (elt key 0) unread-command-events)
+		(setq key (events-to-keys
+			   (read-key-sequence "Describe key: "))))
+	    (setq unread-command-events
+		  (mapcar
+		   (lambda (x) (if (>= x 128) (list 'meta (- x 128)) x))
+		   key))
+	    (setq key (read-key-sequence "Describe key: "))))
 	(describe-key-briefly key insert))
     (describe-key-briefly key insert)))
 
