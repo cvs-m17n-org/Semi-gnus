@@ -37,6 +37,15 @@
   (autoload 'gnus-error "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
+(eval-when-compile (require 'static))
+
+(static-condition-case nil
+    :symbol-for-testing-whether-colon-keyword-is-available-or-not
+  (void-variable
+   (defconst :user ':user)
+   (defconst :path ':path)
+   (defconst :predicate ':predicate)))
+
 (defgroup nnmail nil
   "Reading mail with Gnus."
   :group 'gnus)
