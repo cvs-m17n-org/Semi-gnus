@@ -188,8 +188,8 @@ options make any sense in this context."
   :group 'gnus-namazu)
 
 (defcustom gnus-namazu-need-path-normalization
-  (eq system-type 'windows-nt)
-  "*Non-nil means that outputs of namazu may contain a not normalized path."
+  (and (memq system-type '(windows-nt OS/2 emx)) t)
+  "*Non-nil means that outputs of namazu may contain drive letters."
   :type 'boolean
   :group 'gnus-namazu)
 
@@ -282,6 +282,9 @@ options make any sense in this context."
   "Normalize file names returned by Namazu in this current buffer."
   (goto-char (point-min))
   (while (not (eobp))
+    (when (looking-at "file://")
+      (delete-region (point) (match-end 0))
+      (forward-line 0))
     (when (if gnus-namazu-need-path-normalization
 	      (or (not (looking-at "/\\(.\\)|/"))
 		  (replace-match "\\1:/"))

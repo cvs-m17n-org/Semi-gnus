@@ -1,5 +1,9 @@
 2002-08-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-namazu.el (gnus-namazu-need-path-normalization):
+	Change its default value.
+	(gnus-namazu/normalize-results): Remove `file://' prefix.
+
 	* texi/gnus-ja.texi (Namazu Groups): Update documents.
 
 	* lisp/gnus-namazu.el (gnus-namazu/update-p): Print error
