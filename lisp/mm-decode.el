@@ -25,44 +25,65 @@
 ;;; Code:
 
 (require 'mail-parse)
-(require 'mailcap)
+(require 'mm-mailcap)
 (require 'mm-bodies)
+(require 'mmgnus)
 
 ;;; Convenience macros.
 
-(defmacro mm-handle-buffer (handle)
-  `(nth 0 ,handle))
-(defmacro mm-handle-type (handle)
-  `(nth 1 ,handle))
+(defsubst mm-handle-p (handle)
+  (memq (luna-class-name handle)
+	'(mime-gnus-handle-entity mime-gnus-entity)))
+(defalias 'mm-handle-buffer 'mime-buffer-entity-buffer-internal)
+(defalias 'mm-handle-set-buffer 'mime-buffer-entity-set-buffer-internal)
+(defsubst mm-handle-multipart/mixed-p (handle)
+  (string= (mime-entity-content-type-internal handle) "multipart/mixed"))
+(defalias 'mm-handle-type 'mime-entity-content-type-internal)
+(defsubst mm-handle-type-parameters (handle)
+  (mime-content-type-parameters (mm-handle-type handle)))
 (defsubst mm-handle-media-type (handle)
-  (if (stringp (car handle))
-      (car handle)
-    (car (mm-handle-type handle))))
+  (mime-type/subtype-string
+   (mime-content-type-primary-type (mm-handle-type handle))
+   (mime-content-type-subtype (mm-handle-type handle))))
 (defsubst mm-handle-media-supertype (handle)
-  (car (split-string (mm-handle-media-type handle) "/")))
+  (and (mime-content-type-primary-type (mm-handle-type handle))
+       (symbol-name (mime-content-type-primary-type (mm-handle-type handle)))))
 (defsubst mm-handle-media-subtype (handle)
-  (cadr (split-string (mm-handle-media-type handle) "/")))
-(defmacro mm-handle-encoding (handle)
-  `(nth 2 ,handle))
-(defmacro mm-handle-undisplayer (handle)
-  `(nth 3 ,handle))
-(defmacro mm-handle-set-undisplayer (handle function)
-  `(setcar (nthcdr 3 ,handle) ,function))
-(defmacro mm-handle-disposition (handle)
-  `(nth 4 ,handle))
-(defmacro mm-handle-description (handle)
-  `(nth 5 ,handle))
-(defmacro mm-handle-cache (handle)
-  `(nth 6 ,handle))
-(defmacro mm-handle-set-cache (handle contents)
-  `(setcar (nthcdr 6 ,handle) ,contents))
-(defmacro mm-handle-id (handle)
-  `(nth 7 ,handle))
-(defmacro mm-make-handle (&optional buffer type encoding undisplayer
+  (and (mime-content-type-subtype (mm-handle-type handle))
+       (symbol-name (mime-content-type-subtype (mm-handle-type handle)))))
+(defsubst mm-handle-encoding (handle)
+  (and (mime-entity-encoding-internal handle)
+       (intern (mime-entity-encoding-internal handle))))
+(defalias 'mm-handle-child 'mime-entity-children-internal)
+(defalias 'mm-handle-set-child 'mime-entity-set-children-internal)
+(defalias 'mm-handle-undisplayer 'mime-gnus-handle-entity-undisplayer-internal)
+(defalias 'mm-handle-set-undisplayer
+  'mime-gnus-handle-entity-set-undisplayer-internal)
+(defalias 'mm-handle-disposition 'mime-entity-content-disposition-internal)
+(defsubst mm-handle-disposition-type (handle)
+  (mime-content-disposition-type (mm-handle-disposition handle)))
+(defsubst mm-handle-disposition-parameters (handle)
+  (mime-content-disposition-parameters (mm-handle-disposition handle)))
+(defalias 'mm-handle-description
+  'mime-gnus-handle-entity-content-description-internal)
+(defalias 'mm-handle-cache 'mime-gnus-hendle-entity-cache-internal)
+(defalias 'mm-handle-set-cache 'mime-gnus-handle-entity-set-cache-internal)
+(defalias 'mm-handle-id 'mime-gnus-handle-entity-content-id-internal)
+(defsubst mm-make-handle (&optional buffer type encoding undisplayer
 				    disposition description cache
-				    id)
-  `(list ,buffer ,type ,encoding ,undisplayer
-	 ,disposition ,description ,cache ,id))
+				    id child)
+  (luna-make-entity (mm-expand-class-name 'gnus-handle)
+		    :buffer buffer
+		    :content-type type
+		    :encoding (if (symbolp encoding)
+				  (symbol-name encoding)
+				encoding)
+		    :undisplayer undisplayer
+		    :content-disposition disposition
+		    :content-description description
+		    :cache cache
+		    :content-id id
+		    :children child))
 
 (defvar mm-inline-media-tests
   '(("image/jpeg"
@@ -185,60 +206,71 @@ to:
 
 ;;; The functions.
 
-(defun mm-dissect-buffer (&optional no-strict-mime)
-  "Dissect the current buffer and return a list of MIME handles."
+(defun mm-dissect-buffer-header (parent &optional no-strict-mime)
   (save-excursion
-    (let (ct ctl type subtype cte cd description id result)
+    (let (ctl type cte cd description id result)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
 		  (mail-fetch-field "mime-version"))
-	  (setq ct (mail-fetch-field "content-type")
-		ctl (ignore-errors (mail-header-parse-content-type ct))
+	  (setq ctl (mail-fetch-field "content-type")
+		ctl (ignore-errors (mail-header-parse-content-type ctl))
 		cte (mail-fetch-field "content-transfer-encoding")
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
 		id (mail-fetch-field "content-id"))))
-      (if (or (not ctl)
-	      (not (string-match "/" (car ctl))))
-	  (mm-dissect-singlepart
-	   '("text/plain") 
-	   (and cte (intern (downcase (mail-header-remove-whitespace
-				       (mail-header-remove-comments
-					cte)))))
-	   no-strict-mime
-	   (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
-	   description)
-	(setq type (split-string (car ctl) "/"))
-	(setq subtype (cadr type)
-	      type (pop type))
-	(setq
-	 result
-	 (cond
-	  ((equal type "multipart")
-	   (cons (car ctl) (mm-dissect-multipart ctl)))
-	  (t
-	   (mm-dissect-singlepart
-	    ctl
-	    (and cte (intern (downcase (mail-header-remove-whitespace
-					(mail-header-remove-comments
-					 cte)))))
-	    no-strict-mime
-	    (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
-	    description id))))
-	(when id
-	  (when (string-match " *<\\(.*\\)> *" id)
-	    (setq id (match-string 1 id)))
-	  (push (cons id result) mm-content-id-alist))
-	result))))
+      (unless ctl
+	(setq ctl (mail-header-parse-content-type "text/plain")))
+      (setq cte (and cte (intern (downcase (mail-header-remove-whitespace
+					    (mail-header-remove-comments
+					     cte)))))
+	    cd (and cd (ignore-errors
+			 (mail-header-parse-content-disposition cd))))
+      (cond
+       ((null parent)
+	(setq result (mm-make-handle nil ctl cte nil cd
+				     description nil id nil)))
+       ((or (mm-handle-buffer parent)
+	    (mm-handle-child parent))
+	(setq result (mm-make-handle nil ctl cte nil cd
+				     description nil id nil))
+	(mm-handle-set-child parent (cons result (mm-handle-child parent))))
+       (t
+	(mime-entity-set-content-type-internal parent ctl)
+	(mime-entity-set-content-type-internal parent ctl)
+	(mime-entity-set-encoding-internal parent cte)
+	(mime-entity-set-content-disposition-internal parent cd)
+	(mime-gnus-handle-entity-set-content-description-internal parent
+								  description)
+	(setq result parent)))
+      (when id
+	(when (string-match " *<\\(.*\\)> *" id)
+	  (setq id (match-string 1 id)))
+	(mime-gnus-handle-entity-set-content-id-internal result id))
+      result)))
 
-(defun mm-dissect-singlepart (ctl cte &optional force cdl description id)
+(defun mm-dissect-buffer (parent &optional no-strict-mime)
+  "Dissect the current buffer and return a list of MIME handles."
+  (save-excursion
+    (let* ((result (mm-dissect-buffer-header parent no-strict-mime))
+	   (ctl (mime-entity-content-type-internal result))
+	   (type (mime-content-type-primary-type ctl)))
+      (cond
+       ((eq type 'multipart)
+	(mm-dissect-multipart parent ctl))
+       (t
+	(mm-dissect-singlepart result ctl no-strict-mime)))
+      (when (mm-handle-id result)
+	(push (cons (mm-handle-id result) result) mm-content-id-alist))
+      result)))
+
+(defun mm-dissect-singlepart (handle ctl &optional force)
+  (mime-buffer-entity-set-buffer-internal handle (mm-copy-to-buffer))
+  (push (mm-handle-buffer handle) mm-dissection-list)
   (when (or force
-	    (not (equal "text/plain" (car ctl))))
-    (let ((res (mm-make-handle
-		(mm-copy-to-buffer) ctl cte nil cdl description nil id)))
-      (push (car res) mm-dissection-list)
-      res)))
+	    (not (and (eq (mime-content-type-primary-type ctl) 'text)
+		      (eq (mime-content-type-subtype ctl) 'plane))))
+    handle))
 
 (defun mm-remove-all-parts ()
   "Remove all MIME handles."
@@ -246,10 +278,10 @@ to:
   (mapcar 'mm-remove-part mm-dissection-list)
   (setq mm-dissection-list nil))
 
-(defun mm-dissect-multipart (ctl)
+(defun mm-dissect-multipart (parent ctl)
   (goto-char (point-min))
   (let* ((boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
-	(close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
+	 (close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
 	start parts
 	(end (save-excursion
 	       (goto-char (point-max))
@@ -262,15 +294,16 @@ to:
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region start (point))
-	    (setq parts (nconc (list (mm-dissect-buffer t)) parts)))))
+	    (setq parts (cons (mm-dissect-buffer nil t) parts)))))
       (forward-line 2)
       (setq start (point)))
     (when start
       (save-excursion
 	(save-restriction
 	  (narrow-to-region start end)
-	  (setq parts (nconc (list (mm-dissect-buffer t)) parts)))))
-    (nreverse parts)))
+	  (setq parts (cons (mm-dissect-buffer nil t) parts)))))
+    (mime-entity-set-children-internal parent (nreverse parts))
+    parent))
 
 (defun mm-copy-to-buffer ()
   "Copy the contents of the current buffer to a fresh buffer."
@@ -289,11 +322,11 @@ to:
 Returns nil if the part is removed; inline if displayed inline;
 external if displayed external."
   (save-excursion
-    (mailcap-parse-mailcaps)
+    (mm-mailcap-parse-mailcaps)
     (if (mm-handle-displayed-p handle)
 	(mm-remove-part handle)
       (let* ((type (mm-handle-media-type handle))
-	     (method (mailcap-mime-info type)))
+	     (method (mm-mailcap-mime-info type)))
 	(if (mm-inlined-p handle)
 	    (progn
 	      (forward-line 1)
@@ -302,13 +335,13 @@ external if displayed external."
 	  (when (or method
 		    (not no-default))
 	    (if (and (not method)
-		     (equal "text" (car (split-string type))))
+		     (equal "text" (mm-handle-media-subtype handle)))
 		(progn
 		  (forward-line 1)
 		  (mm-insert-inline handle (mm-get-part handle))
 		  'inline)
 	      (mm-display-external
-	       handle (or method 'mailcap-save-binary-file))
+	       handle (or method 'mm-mailcap-save-binary-file))
 	      'external)))))))
 
 (defun mm-display-external (handle method)
@@ -316,7 +349,7 @@ external if displayed external."
   (mm-with-unibyte-buffer
     (if (functionp method)
 	(let ((cur (current-buffer)))
-	  (if (eq method 'mailcap-save-binary-file)
+	  (if (eq method 'mm-mailcap-save-binary-file)
 	      (progn
 		(set-buffer (generate-new-buffer "*mm*"))
 		(setq method nil))
@@ -331,7 +364,7 @@ external if displayed external."
 	  (message "Viewing with %s" method)
 	  (let ((mm (current-buffer))
 		(non-viewer (assq 'non-viewer
-				  (mailcap-mime-info
+				  (mm-mailcap-mime-info
 				   (mm-handle-media-type handle) t))))
 	    (unwind-protect
 		(if method
@@ -345,7 +378,7 @@ external if displayed external."
       (let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
 	     (filename (mail-content-type-get
 			(mm-handle-disposition handle) 'filename))
-	     (mime-info (mailcap-mime-info
+	     (mime-info (mm-mailcap-mime-info
 			 (mm-handle-media-type handle) t))
 	     (needsterm (or (assoc "needsterm" mime-info)
 			    (assoc "needsterminal" mime-info)))
@@ -405,45 +438,40 @@ external if displayed external."
        ((string= total "%t")
 	(push (mm-quote-arg (car type-list)) out))
        (t
-	(push (mm-quote-arg (or (cdr (assq (intern sub) ctl)) "")) out))))
+	(push (mm-quote-arg (or (mime-parameter sub ctl) "")) out))))
     (push (substring method beg (length method)) out)
     (mapconcat 'identity (nreverse out) "")))
     
 (defun mm-remove-parts (handles)
   "Remove the displayed MIME parts represented by HANDLE."
-  (if (and (listp handles)
-	   (bufferp (car handles)))
-      (mm-remove-part handles)
+  (cond
+   ((listp handles)
     (let (handle)
       (while (setq handle (pop handles))
-	(cond
-	 ((stringp handle)
-	  )
-	 ((and (listp handle)
-	       (stringp (car handle)))
-	  (mm-remove-parts (cdr handle)))
-	 (t
-	  (mm-remove-part handle)))))))
+	(mm-remove-parts handle))))
+   ((mm-handle-child handles)
+    (mm-remove-parts (mm-handle-child handles))
+    (mm-remove-part handles))
+   (t
+    (mm-remove-part handles))))
 
 (defun mm-destroy-parts (handles)
   "Remove the displayed MIME parts represented by HANDLE."
-  (if (and (listp handles)
-	   (bufferp (car handles)))
-      (mm-destroy-part handles)
+  (cond
+   ((listp handles)
     (let (handle)
       (while (setq handle (pop handles))
-	(cond
-	 ((stringp handle)
-	  )
-	 ((and (listp handle)
-	       (stringp (car handle)))
-	  (mm-destroy-parts (cdr handle)))
-	 (t
-	  (mm-destroy-part handle)))))))
+	(mm-destroy-parts handle))))
+   ((mm-handle-child handles)
+    (mm-destroy-parts (mm-handle-child handles))
+    (mm-destroy-part handles)
+    (mm-handle-set-child handles nil))
+   (t
+    (mm-destroy-part handles))))
 
 (defun mm-remove-part (handle)
   "Remove the displayed MIME part represented by HANDLE."
-  (when (listp handle)
+  (when (mm-handle-p handle)
     (let ((object (mm-handle-undisplayer handle)))
       (ignore-errors
 	(cond
@@ -547,10 +575,11 @@ external if displayed external."
 
 (defun mm-destroy-part (handle)
   "Destroy the data structures connected to HANDLE."
-  (when (listp handle)
+  (when (mm-handle-p handle)
     (mm-remove-part handle)
     (when (buffer-live-p (mm-handle-buffer handle))
-      (kill-buffer (mm-handle-buffer handle)))))
+      (kill-buffer (mm-handle-buffer handle))
+      (mm-handle-set-buffer handle nil))))
 
 (defun mm-handle-displayed-p (handle)
   "Say whether HANDLE is displayed or not."
@@ -635,7 +664,7 @@ external if displayed external."
   (let* ((type (mm-handle-media-type handle))
 	 (methods
 	  (mapcar (lambda (i) (list (cdr (assoc 'viewer i))))
-		  (mailcap-mime-info type 'all)))
+		  (mm-mailcap-mime-info type 'all)))
 	 (method (completing-read "Viewer: " methods)))
     (mm-display-external (copy-sequence handle) method)))
 
@@ -651,10 +680,9 @@ external if displayed external."
 	(setq type (mm-handle-media-type handle))
 	(when (and (equal p type)
 		   (mm-automatic-display-p handle)
-		   (or (stringp (car handle))
+		   (or (mm-handle-child handle)
 		       (not (mm-handle-disposition handle))
-		       (equal (car (mm-handle-disposition handle))
-			      "inline")))
+		       (eq (mm-handle-disposition-type handle) 'inline)))
 	  (setq result handle
 		h nil
 		prec nil))
