@@ -128,9 +128,11 @@
     ((bufferp (mmgnus-entity-body-internal entity))
      (with-current-buffer (mmgnus-entity-body-internal entity)
        (buffer-string)))
+    ((mime-entity-children-internal entity)
+     "")
     (t
-     (message "Invalid body object. %s"
-	      (mmgnus-entity-body-internal entity))
+     (message "Invalid body object. %s %s"
+	      (mmgnus-entity-body-internal entity) entity)
      "")))
 
 (luna-define-method mime-entity-content ((entity mmgnus-entity))
