@@ -4953,7 +4953,7 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 
 @item M
 @vindex gnus-duplicate-mark
-$B=EJ#M^@)$K$h$j4{FI$N0u$N$D$$$?5-;v(B (@code{gnus-duplicated-mark})$B!#(B
+$B=EJ#M^@)$K$h$j4{FI$N0u$N$D$$$?5-;v(B (@code{gnus-duplicate-mark})$B!#(B
 @xref{Duplicate Suppression}.
 @end table
 

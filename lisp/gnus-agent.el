@@ -730,7 +730,7 @@ the actual number of articles toggled is returned."
 	   (file-name-coding-system nnmail-pathname-coding-system)
 	   (pathname-coding-system nnmail-pathname-coding-system)
 	   (file (gnus-agent-lib-file "active"))
-	   oactive)
+	   oactive-min)
       (gnus-make-directory (file-name-directory file))
       (with-temp-file file
 	(when (file-exists-p file)
@@ -739,16 +739,12 @@ the actual number of articles toggled is returned."
 	(when (re-search-forward
 	       (concat "^" (regexp-quote group) " ") nil t)
 	  (save-excursion
-	    (save-restriction
-	      (narrow-to-region (match-beginning 0)
-				(progn
-				  (forward-line 1)
-				  (point)))
-	      (setq oactive (car (nnmail-parse-active)))))
+	    (read (current-buffer))			 ;; max
+	    (setq oactive-min (read (current-buffer))))  ;; min
 	  (gnus-delete-line))
 	(insert (format "%S %d %d y\n" (intern group)
 			(cdr active)
-			(or (car oactive) (car active))))
+			(or oactive-min (car active))))
 	(goto-char (point-max))
 	(while (search-backward "\\." nil t)
 	  (delete-char 1))))))

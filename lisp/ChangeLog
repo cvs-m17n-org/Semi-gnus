@@ -1,3 +1,107 @@
+2001-07-29  Simon Josefsson  <jas@extundo.com>
+
+	* mail-source.el (top-level): Require message for message-directory.
+	(mail-source-directory): Change default to message-directory.
+
+	* smime.el (smime-keys, smime-CA-directory, smime-CA-file) 
+	(smime-certificate-directory, smime-openssl-program) 
+	(smime-encrypt-cipher, smime-dns-server): Fix doc (leading "*").
+	(smime-extra-arguments): New variable.
+	(smime-dns-server): Fix customize group.
+	(smime-call-openssl-region): Use `smime-extra-arguments'.
+
+2001-07-29  Simon Josefsson  <jas@extundo.com>
+	From Vladimir Volovich <vvv@vsu.ru>
+
+	* smime.el (smime-call-openssl-region): Ignore stderr.
+
+2001-07-29  Simon Josefsson  <jas@extundo.com>
+	From Christoph Conrad <christoph.conrad@gmx.de>
+
+	* gnus-agent.el (gnus-agent-save-group-info): Don't destroy active
+	file.
+
+2001-07-29  Simon Josefsson  <jas@extundo.com>
+
+	* mm-view.el (mm-view-pkcs7-decrypt): Adhere to `mm-decrypt-option'.
+
+	Support S/MIME decryption.
+
+	* mm-decode.el (mm-inline-media-tests): 
+	(mm-inlined-types):
+	(mm-automatic-display):
+	(mm-attachment-override-types): Add application/{x-,}pkcs7-mime.
+
+	* mm-view.el (mm-pkcs7-signed-magic): 
+	(mm-pkcs7-enveloped-magic): New variables.
+	(mm-view-pkcs7-get-type): New function; identify PKCS#7 type.
+	(mm-view-pkcs7): New function; mm viewer for PKCS#7 blobs.
+	(mm-view-pkcs7-decrypt): New function; mm viewer for encrypted
+	PKCS#7 blobs.
+
+	* smime.el (smime-decrypt-region): Expand keyfile.
+
+2001-07-29  Simon Josefsson  <jas@extundo.com>
+
+	* nntp.el (nntp-open-ssl-stream): Don't mess with internal
+	`ssl.el' variables.
+
+	* gnus-agent.el (gnus-agent-save-group-info): Delete everything
+	but line instead of narrowing to it, because `nnmail-parse-active'
+	calls widen.  Thanks to Christoph Conrad
+	<christoph.conrad@gmx.de>.
+
+2001-07-29  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.el (gnus-summary-line-format): Mention `gnus-sum-thread-*'
+	for %B spec.
+
+	* gnus-sum.el (gnus-summary-prepare-threads): If
+	gnus-sum-thread-tree-root is nil, use subject instead.
+	(gnus-sum-thread-tree-root, gnus-sum-thread-tree-single-indent) 
+	(gnus-sum-thread-tree-vertical, gnus-sum-thread-tree-indent) 
+	(gnus-sum-thread-tree-leaf-with-other) 
+	(gnus-sum-thread-tree-single-leaf): Documentation.
+	(gnus-sum-thread-tree-single-indent): Allow nil.
+
+2001-07-28 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-fill-paragraph): Do nothing if the user
+	wants filladapt-mode.
+
+2001-07-27 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-image-type-from-buffer): New.
+	(mm-get-image): Use it.
+
+2001-07-27 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el (gnus-large-newsgroup): If it is nil, ...
+
+	* gnus-art.el (gnus-mime-view-all-parts): buffer-read-only covers
+	mm-display-parts too.
+
+2001-07-27 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnfolder.el (nnfolder-request-accept-article): Bind
+	nntp-server-buffer.
+
+	* nnmail.el (nnmail-parse-active): Read from buffer instead of
+	nntp-server-buffer.
+
+2001-07-27 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-check-news-header-syntax): Use
+	message-post-method.
+	(message-send-news): Bind message-post-method.
+
+2001-07-27 07:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-tweak-type-alist): New.
+	(mml-tweak-function-alist): New.
+	(mml-tweak-part): New.
+	(mml-generate-mime-1): Use it.
+
 2001-07-26 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* nnfolder.el (nnfolder-request-accept-article): Replace
@@ -714,7 +818,7 @@
 
 2001-06-03  Dale Hagglund  <rdh@best.com>
 
-       * gnus-mlspl.el (gnus-group-split-fancy): Fix generation of split
+	* gnus-mlspl.el (gnus-group-split-fancy): Fix generation of split
        restrict clauses.
 
 2001-06-07 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>

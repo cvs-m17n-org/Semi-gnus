@@ -1264,7 +1264,8 @@ newsgroups."
 (defcustom gnus-large-newsgroup 200
   "*The number of articles which indicates a large newsgroup.
 If the number of articles in a newsgroup is greater than this value,
-confirmation is required for selecting the newsgroup."
+confirmation is required for selecting the newsgroup.
+If it is `nil', no confirmation is required."
   :group 'gnus-group-select
   :type 'integer)
 
@@ -2166,6 +2167,7 @@ with some simple extensions.
 %L   Number of lines in the article (integer)
 %I   Indentation based on thread level (a string of spaces)
 %B   A complex trn-style thread tree (string)
+     The variables `gnus-sum-thread-*' can be used for customization.
 %T   A string with two possible values: 80 spaces if the article
      is on thread level two or larger and 0 spaces on level one
 %R   \"A\" if this article has been replied to, \" \" otherwise (character)
