@@ -7220,10 +7220,12 @@ Highlighting} も参照してください。
 の形式の、えーと、ちょっと簡単な暗号化を採用したという噂があるからです。
 
 @item W t
+@item t
 @kindex W t （概略）
-@findex gnus-summary-toggle-header
+@kindex t （概略）
+@findex gnus-article-toggle-headers
 記事バッファにすべてのヘッダーを表示するかどうかを切り替えます
-(@code{gnus-summary-toggle-header})。
+(@code{gnus-article-toggle-headers})。
 
 @item W v
 @kindex W v （概略）

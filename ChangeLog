@@ -1,3 +1,7 @@
+2000-07-13 10:09:52  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* acinclude.m4 (AC_CHECK_W3): Fix typo.
+
 2000-07-13  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* configure: Regenerate with autoconf v2.14.1.

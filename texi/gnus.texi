@@ -7289,10 +7289,12 @@ positions in the alphabet, e. g. @samp{B} (letter #2) -> @samp{O} (letter
 is rumored to have employed this form of, uh, somewhat weak encryption.
 
 @item W t
+@item t
 @kindex W t (Summary)
-@findex gnus-summary-toggle-header
+@kindex t (Summary)
+@findex gnus-article-toggle-headers
 Toggle whether to display all headers in the article buffer
-(@code{gnus-summary-toggle-header}).
+(@code{gnus-article-toggle-headers}).
 
 @item W v
 @kindex W v (Summary)
