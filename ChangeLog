@@ -1,3 +1,8 @@
+1999-09-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* gnus-agent.el (gnus-agent-toggle-plugged): Mark the current
+	modeline as modified.
+
 1999-09-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
