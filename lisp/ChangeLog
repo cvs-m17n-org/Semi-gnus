@@ -1,3 +1,16 @@
+2002-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* spam.el: Wrap autoload settings for executable-find and
+	ifile-spam-filter with eval-and-compile.
+	(spam-display-buffer-contents): Remove.
+	(spam-bogofilter-score): Merge spam-display-buffer-contents.
+
+2002-10-17  Ted Zlatanov <tzz@lifelogs.com>
+
+	* spam.el (spam-display-buffer-contents): New function.
+	(spam-bogofilter-score): use spam-display-buffer-contents, patch
+	from Katsumi Yamaoka <yamaoka@jpl.org>.
+
 2002-10-17  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* nnheader.el (nnheader-parse-naked-head): New function.
