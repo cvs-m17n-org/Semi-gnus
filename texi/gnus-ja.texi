@@ -10389,16 +10389,14 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B$3$l$,>e$G?($l$?6h@Z$jJ8;z$G$9!#%G%#%U%)%k%H$G$O(B @samp{^L} ($B%U%)!<%`(B
 $B%U%#!<%I!"2~JG(B) $B$G$9!#(B
 
-@c TRANSLATEME
 @cindex IDNA
-@cindex internationalized domain names
+@cindex $B9q:]2=%I%a%$%sL>(B
 @vindex gnus-use-idna
 @item gnus-use-idna
-This variable controls whether Gnus performs IDNA decoding of
-internationalized domain names inside @sc{From:}, @sc{To:} and
-@sc{Cc:} headers.  This requires GNU Libidn
-(@url{http://www.gnu.org/software/libidn/}, and this variable is only
-enabled if you have installed it.
+$B$3$NJQ?t$O(B @sc{From:}$B!"(B@sc{To:} $B$*$h$S(B @sc{Cc:} $B%X%C%@!<$K$"$k9q:]2=%I%a(B
+$B%$%sL>$r!"(Bgnus $B$,(B IDNA $B%G%3!<%I$9$k$+$I$&$+$r@)8f$7$^$9!#$3$l$K$O(B GNU
+Libidn (@url{http://www.gnu.org/software/libidn/}) $B$,I,MW$G!"$3$NJQ?t$O(B
+$B$=$l$r%$%s%9%H!<%k$7$F$"$k>l9g$@$1M-8z$K$J$j$^$9!#(B
 @end table
 
 @node Composing Messages
@@ -16623,19 +16621,18 @@ PPP $B4X78(B($B$J$I(B)$B$rJD$8$^$9!#$=$&$7$F%K%e!<%9$r%*%U%i%$%s$GFI$`$3$H$
 $B$9!#(B
 
 @item
-@c TRANSLATEME
-$B%@%&%s%m!<%IJ}?K$r7hDj$7$^$9!#(BIt's fairly simple once you decide whether
-you are going to use agent categories, topic parameters, and/or group
-parameters to implement your policy.  If you're new to gnus, it
-is probably best to start with a category @xref{Agent Categories}.
+$B%@%&%s%m!<%IJ}?K$r7hDj$7$^$9!#$"$J$?$NJ}?K$r<BAu$9$k$?$a$K%(!<%8%'%s%HJ,(B
+$BN`!"%H%T%C%/%Q%i%a!<%?!"%0%k!<%W%Q%i%a!<%?$N$I$l$r;H$&$+$r$$$C$?$s7h$a$F(B
+$B$7$^$($P!"$3$l$O$+$J$j4JC1$G$9!#$"$J$?$,(B gnus $B$N=i?4<T$J$i$P!"$?$V$sJ,N`(B
+$B$G;O$a$k$N$,:GNI$G$7$g$&(B @xref{Agent Categories}$B!#(B
 
-Both topic parameters (@pxref{Topic Parameters}) and agent categories
-(@pxref{Agent Categories}) provide for setting a policy that applies
-to multiple groups.  Which you use is entirely up to you.  Topic
-parameters do override categories so, if you mix the two, you'll have
-to take that into account.  If you have a few groups that deviate from
-your policy, you can use grou parameters (@pxref{Group Parameters}) to
-configure them.
+$B%H%T%C%/%Q%i%a!<%?(B (@pxref{Topic Parameters}) $B$H%(!<%8%'%s%HJ,(B
+$BN`(B (@pxref{Agent Categories}) $B$NN>J}$O!"B??t$N%0%k!<%W$KE,MQ$9$kJ}?K$N@_(B
+$BDj$rMQ0U$7$F$$$^$9!#$I$l$r;H$&$+$O40A4$K$"$J$?$N@UG$$G$9!#N>J}$r:.$<$F;H(B
+$B$&>l9g$O!"%H%T%C%/%Q%i%a!<%?$OJ,N`$rL58z$K$9$k$3$H$r9MN8$KF~$l$J$1$l$P$J(B
+$B$i$J$$$G$7$g$&!#$"$J$?$NJ}?K$K$=$0$o$J$$>/?t$N%0%k!<%W$,$"$k$N$J$i$P!"$=(B
+$B$l$i$N@_Dj$rJQ99$9$k$?$a$K%0%k!<%W%Q%i%a!<(B
+$B%?(B (@pxref{Group Parameters}) $B$r;H$&$3$H$,$G$-$^$9!#(B
 
 @item
 $B$($($H(B@dots{}$B!"0J>e$G$9!#(B
@@ -16657,21 +16654,19 @@ configure them.
 $B$O(B @code{$B=i4|(B} $BJ,N`$KB0$7$^$9!#(BGnus $B$OJ,N`$N:n@.$H4IM}$N$?$a$NFH<+$N%P%C(B
 $B%U%!!<$r;}$C$F$$$^$9!#(B
 
-@c TRANSLATEME
-If you prefer, you can also use group parameters (@pxref{Group
-Parameters}) and topic parameters (@pxref{Topic Parameters}) for an
-alternative approach to controlling the agent.  The only real
-difference is that categories are specific to the agent (so there is
-less to learn) while group and topic parameters include the kitchen
-sink.
+$B$b$7$=$&$7$?$1$l$P!"%0%k!<%W%Q%i%a!<%?(B (@pxref{Group Parameters}) $B$H%H%T%C(B
+$B%/%Q%i%a!<%?(B (@pxref{Topic Parameters}) $B$r!"%(!<%8%'%s%H$r@)8f$9$kBeBX<j(B
+$BCJ$K;H$&$3$H$,$G$-$^$9!#<B:]$K0c$&$N$O!"%0%k!<%W$H%H%T%C%/%Q%i%a!<%?$,2?(B
+$B$G$b$+$s$G$b(B (kitchen sink) $B4^$`$N$KBP$7$F!"J,N`$O%(!<%8%'%s%H$KFC2=$7$F(B
+$B$$$k(B ($B$7$?$,$C$F$"$^$j3X$P$J$/$F$bNI$$(B) $B$H$$$&$3$H$@$1$G$9!#(B
 
-Since you can set agent parameters in several different places we have
-a rule to decide which source to believe.  This rule specifies that
-the parameter sources are checked in the following order: group
-parameters, topic parameters, agent category, and finally customizable
-variables. So you can mix all of these sources to produce a wide range
-of behavior, just don't blame me if you don't remember where you put
-your settings.
+$B%(!<%8%'%s%H%Q%i%a!<%?$OJ#?t$N0c$&>l=j$G@_Dj$9$k$3$H$,$G$-$k$N$G!"$I$N%=!<(B
+$B%9$,?.MQ$G$-$k$+$r7h$a$k$?$a$N5,B'$r@_$1$^$7$?!#$3$N5,B'$O!"%Q%i%a!<%?$N(B
+$B%=!<%9$,<!$N=g=x$GD4$Y$i$l$k$3$H$rDj$a$^$9(B: $B%0%k!<%W%Q%i%a!<%?!"%H%T%C%/(B
+$B%Q%i%a!<%?!"%(!<%8%'%s%HJ,N`!"$=$7$F:G8e$O%+%9%?%^%$%:$G$-$kJQ?t72$G$9!#(B
+$B$7$?$,$C$F!"9-$$HO0O$GF0:n$r5/$3$5$;$k$?$a$K$3$l$i$N%=!<%9$r$9$Y$F:.9g$9(B
+$B$k$3$H$,$G$-$^$9!#$I$3$K@_Dj$rCV$$$?$N$+$rK:$l$F$7$^$C$?$+$i$H$$$C$F!";d(B
+$B$r@U$a$J$$$G2<$5$$$h!#(B
 
 @menu
 * Category Syntax::             $BJ,N`$H$O$I$s$J$b$N$+(B
@@ -16682,12 +16677,9 @@ your settings.
 @node Category Syntax
 @subsubsection $BJ,N`$NJ8K!(B
 
-@c TRANSLATEME
-$BJ,N`$O(B ** $B$N$b$N$+$i$J$j$^$9!#(B
-A category consists of a name, the list of groups belonging to the
-category, and a number of optional parameters that override the
-customizable variables.  The complete list of agent parameters are
-listed below.
+$BJ,N`$O!"L>A0!"$=$NJ,N`$KB0$9$k%0%k!<%W$N%j%9%H!"$*$h$S%+%9%?%^%$%:2DG=$J(B
+$BJQ?t$r>e=q$-$9$kB?$/$NG$0U$J%Q%i%a!<%?$+$i@.$j$^$9!#%(!<%8%'%s%H%Q%i%a!<(B
+$B%?$N40A4$J%j%9%H$r0J2<$K<($7$^$9!#(B
 
 @table @code
 @item gnus-agent-cat-name
@@ -16705,38 +16697,34 @@ The list of groups that are in this category.
 $B5,B'!#(B($B$3$N%@%&%s%m!<%I%9%3%"(B (@dfn{download score}) $B$ODL>o$N%9%3%"$H$O(B
 $BI,$:$7$b4X78$,L5$$$3$H$KCm0U$7$F$/$@$5$$!#(B)
 
-@c TRANSLATEME
 @item gnus-agent-cat-enable-expiration
-a boolean indicating whether the agent should expire old articles in
-this group.  Most groups should be expired to conserve disk space.  In
-fact, its probably safe to say that the gnus.* hierarchy contains the
-only groups that should not be expired.
+$B$3$N%0%k!<%W$N8E$$5-;v$r%(!<%8%'%s%H$,4|8B@Z$l>C5n$9$Y$-$+$I$&$+$r<($9(B
+$B%V!<%kJQ?t!#BgDq$N%0%k!<%W$O%G%#%9%/6u4V$rO2Hq$7$J$$$?$a$K4|8B@Z$l>C5n$5(B
+$B$l$k$Y$-$G$9!#$$$d!"<B:]$K$O(B gnus.* $B3,AX$O4|8B@Z$l>C5n$5$l$k$Y$-$G$O$J(B
+$B$$%0%k!<%W$@$1$r4^$s$G$$$k$H8@$C$F$b!"$?$V$s:9$7;Y$($"$j$^$;$s!#(B
 
 @item gnus-agent-cat-days-until-old
-an integer indicating the number of days that the agent should wait
-before deciding that a read article is safe to expire.
+$B4{FI$N5-;v$r4|8B@Z$l>C5n$7$F$b:9$7;Y$($J$$$3$H$rH=CG$9$kA0$K!"%(!<%8%'%s(B
+$B%H$,BT$C$F$$$k$Y$-F|?t$r<($9@0?t!#(B
 
 @item gnus-agent-cat-low-score
-an integer that overrides the value of @code{gnus-agent-low-score}.
+@code{gnus-agent-low-score} $B$r>e=q$-$9$k@0?t!#(B
 
 @item gnus-agent-cat-high-score
-an integer that overrides the value of @code{gnus-agent-high-score}.
+@code{gnus-agent-high-score} $B$r>e=q$-$9$k@0?t!#(B
 
 @item gnus-agent-cat-length-when-short
-an integer that overrides the value of
-@code{gnus-agent-short-article}.
+@code{gnus-agent-short-article} $B$r>e=q$-$9$k@0?t!#(B
 
 @item gnus-agent-cat-length-when-long
-an integer that overrides the value of @code{gnus-agent-long-article}.
+@code{gnus-agent-long-article} $B$r>e=q$-$9$k@0?t!#(B
 @end table
 
-The name of a category can not be changed once the category has been
-created.
+$B$$$C$?$sJ,N`$,:n$i$l$?$i!"J,N`$NL>A0$rJQ$($k$3$H$O$G$-$^$;$s!#(B
 
-Each category maintains a list of groups that are exclusive members of
-that category.  The exclusivity rule is automatically enforced, add a
-group to a new category and it is automatically removed from its old
-category.
+$B$=$l$>$l$NJ,N`$O!"$=$NJ,N`$N8B$i$l$?%a%s%P!<$G$"$k%0%k!<%W$N%j%9%H$r0];}(B
+$B$7$^$9!#8B$i$l$?5,B'$O<+F0E*$K<99T$5$l$^$9!#?7$7$$J,N`$K%0%k!<%W$rDI2C$9(B
+$B$k$H!"$=$l$O8E$$J,N`$+$i<+F0E*$K<h$j=|$+$l$^$9!#(B
 
 $B=R8l$N0lHVC1=c$J7A<0$O(B @code{true} $B$d(B @code{false} $B$N$h$&$JC1FH$N=R8l$+(B
 $B$i$J$j$^$9!#$3$l$i$NFs$D$O$=$l$>$l!"A4$F$N2DG=$J5-;v$r%@%&%s%m!<%I$9$k$+!"(B
@@ -16781,14 +16769,13 @@ short
 $B0J2<$N=R8l$O$"$i$+$8$aDj5A$5$l$F$$$^$9$,!"$3$l$i$N$I$l$b$"$J$?$N$d$j$?$$(B
 $B$3$H$K0lCW$7$J$1$l$P!"<+J,$GFH<+$N$b$N$r=q$/$3$H$b$G$-$^$9!#(B
 
-@c TRANSLATEME
-When evaluating each of these predicates, the named constant will be
-bound to the value determined by calling
-@code{gnus-agent-find-parameter} on the appropriate parameter.  For
-example, gnus-agent-short-article will be bound to
-@code{(gnus-agent-find-parameter group 'agent-short-article)}.  This
-means that you can specify a predicate in your category then tune that
-predicate to individual groups.
+$B$=$l$>$l$N$3$l$i$N=R8l$rI>2A$9$k$H$-!"L>A0$,IU$1$i$l$?Dj?t$O!"E,@Z$J%Q%i(B
+$B%a!<%?$N85$K(B @code{gnus-agent-find-parameter} $B$r8F$V$3$H$K$h$C$F7hDj$5$l(B
+$B$?CM$GB+G{$5$l$^$9!#Nc$((B
+$B$P(B gnus-agent-short-article $B$O(B @code{(gnus-agent-find-parameter group
+'agent-short-article)} $B$KB+G{$5$l$^$9!#$3$l$O!"$"$J$?$,$"$J$?$NJ,N`$G=R(B
+$B8l$r;XDj$7$F$+$i!"$=$N=R8l$r8D!9$N%0%k!<%W$K$D$$$FD4@0$G$-$k$3$H$r0UL#$7(B
+$B$^$9!#(B
 
 @table @code
 @item short
@@ -17007,10 +16994,12 @@ file
 @findex gnus-category-exit
 $B%0%k!<%W%P%C%U%!!<$KLa$k(B (@code{gnus-category-exit})$B!#(B
 
-@c TRANSLATEME
 @item e
-@kindex e (Category)
+@kindex e ($BJ,N`(B)
 @findex gnus-category-customize-category
+$BA*Br$5$l$?J,N`$N%Q%i%a!<%?$r0l3g$7$F@_Dj$9$k$?$a$K!"%+%9%?%^%$%:%P%C%U%!(B
+$B$r;H$$$^$9(B (@code{gnus-category-customize-category})$B!#(B
+
 Use a customization buffer to set all of the selected category's
 parameters at one time (@code{gnus-category-customize-category}).
 
@@ -17092,25 +17081,21 @@ parameters at one time (@code{gnus-category-customize-category}).
 @vindex gnus-agent-high-score
 $B$3$NCM$h$jBg$-$$%9%3%"$r;}$D5-;v$O9b%9%3%"$G$"$k!#=i4|@_DjCM$O(B 0$B!#(B
 
-@c TRANSLATEME
 @item gnus-agent-expire-days
 @vindex gnus-agent-expire-days
-The number of days that a @samp{read} article must stay in the agent's
-local disk before becoming eligible for expiration (While the name is
-the same, this doesn't mean expiring the article on the server.  It
-just means deleting the local copy of the article).  What is also
-important to understand is that the counter starts with the time the
-article was written to the local disk and not the time the article was
-read.
-Default 7.
+$B4|8B@Z$l>C5n$K$U$5$o$7$/$J$k$^$G4{FI5-;v$r%(!<%8%'%s%H$N%m!<%+%k%G%#%9%/(B
+$B$KN1$a$F$*$/F|?t(B ($B$G$bL>A0$,F1$8$@$C$?$i!"$3$l$O$=$N%5!<%P!<$K$*$1$k4|8B(B
+$B@Z$l>C5n$r0UL#$7$^$;$s!#$=$l$OC1$K5-;v$N%m!<%+%k$JJ#@=$r>C$9$3$H$r0UL#$7(B
+$B$^$9(B)$B!#$5$i$KM}2r$9$Y$-Bg;v$J$3$H$O!"5-;v$,FI$^$l$?;~$G$O$J$/%m!<%+%k%G%#(B
+$B%9%/$K5-;v$,=q$+$l$?;~$+$i7W?t$,;O$^$k$H$$$&$3$H$G$9!#%G%#%U%)%k%H$O(B 7$BF|!#(B
 
 @item gnus-agent-enable-expiration
 @vindex gnus-agent-enable-expiration
-Determines whether articles in a group are, by default, expired or
-retained indefinitely.  The default is @code{ENABLE} which means that
-you'll have to disable expiration when desired.  On the other hand,
-you could set this to @code{DISABLE}.  In that case, you would then
-have to enable expiration in selected groups.
+$B%0%k!<%W$N5-;v$,!"%G%#%U%)%k%H$G4|8B@Z$l>C5n$5$l$k$+!"L54|8B$KJ];}$5$l$k(B
+$B$+$r7hDj$7$^$9!#%G%#%U%)%k%H$O(B @code{ENABLE} $B$G!"K>$`$J$i$P4|8B@Z$l>C5n(B
+$B$r$5$;$J$$$h$&$K$7$J$1$l$P$J$i$J$$$3$H$r0UL#$7$^$9!#0lJ}!"$3$l(B
+$B$r(B @code{DISABLE} $B$K@_Dj$9$k$3$H$,$G$-$^$9!#$=$N>l9g!"A*Br$5$l$?%0%k!<%W(B
+$B$G$N4|8B@Z$l>C5n$rM-8z$K$7$J$1$l$P$J$j$^$;$s!#(B
 @end table
 
 @node Agent Commands
@@ -17250,12 +17235,12 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 $B$s$,!"$9$G$K%(!<%8%'%s%H$K%@%&%s%m!<%I$7$?5-;v$,$"$k$J$i$P!"(Bgnus $B$O%5!<(B
 $B%P!<$+$i:F$S5-;v$r%@%&%s%m!<%I$;$:$K!"<j85$K3JG<$5$l$?%3%T!<$r;H$$$^$9!#(B
 
-@c TRANSLATEME
-If you so desire, you can configure the agent (see @code{gnus-agent-cache}
-@pxref{Agent Variables}) to always download headers and articles while
-plugged.  Gnus will almost certainly be slower, but it will be kept
-synchronized with the server.  That last point probably won't make any
-sense if you are using a nntp or nnimap backend.
+$B$"$J$?$,$=$&K>$`$N$G$"$l$P!"(B@dfn{plugged} $B$J4|4V$O>o$K%X%C%@!<$H5-;v$r%@(B
+$B%&%s%m!<%I$9$k$h$&$K!"%(!<%8%'%s%H(B (@code{gnus-agent-cache} $B;2(B
+$B>H(B @pxref{Agent Variables}) $B$r@_Dj$9$k$3$H$,$G$-$^$9!#(Bgnus $B$O$[$H$s$I3N(B
+$B$+$K$b$C$HCY$/$J$j$^$9$,!"%5!<%P!<$H$NF14|$OJ]$?$l$^$9!#(B
+nntp $B$+(B nnimap $B%P%C%/%(%s%I$r;H$C$F$$$k>l9g$O!"$?$V$s$3$N:G8e$NE@$O0UL#(B
+$B$r$J$5$J$$$G$7$g$&!#(B
 
 @node Agent Expiry
 @subsection $B%(!<%8%'%s%H4|8B@Z$l>C5n(B
@@ -17474,19 +17459,19 @@ gnus $B$,%5!<%P!<$K@\B3$G$-$J$H$-$K2?$,5/$-$?$+$rJ*8l$j$^$9!#%(!<%8%'%s%H(B
 $B$NJQ?t$NB>$NA*Br;h$K$O(B @code{denied} $B$H(B @code{offline} $B$,$"$j!"%(!<%8%'(B
 $B%s%H$,;H$o$l$k>l9g$O8e<T$@$1$,M-8z$G$9!#(B
 
-@c TRANSLATEME
 @item gnus-auto-goto-ignores
 @vindex gnus-auto-goto-ignores
-Another variable that isn't a Agent variable, yet so closely related
-that most will look for it here, this variable tells the summary
-buffer how to maneuver around undownloaded (only headers stored in the
-agent) and unfetched (neither article nor headers stored) articles.
+$BBgDq$N?M$O!"%(!<%8%'%s%HJQ?t$G$O$J$$$,L)@\$K4XO"$9$k$b$&0l$D$NJQ?t$r$3$3(B
+$B$GC5$9$G$7$g$&!#$3$NJQ?t$O!"%@%&%s%m!<%I$5$l$F$$$J$$(B ($B%X%C%@!<$@$1$,%(!<(B
+$B%8%'%s%H$K3JG<$5$l$?(B)$B!"$=$7$F<h$j9~$^$l$F$$$J$$(B ($B5-;v$b%X%C%@!<$b3JG<$5(B
+$B$l$F$$$J$$(B) $B5-;v$r$I$&A`:n$9$k$+$r35N,%P%C%U%!$KEA$($^$9!#(B
 
-The legal values are @code{nil} (maneuver to any article),
-@code{undownloaded} (maneuvering while unplugged ignores articles that
-have not been fetched), @code{always-undownloaded} (maneuvering always
-ignores articles that have not been fetched), @code{unfetched}
-(maneuvering ignores articles whose headers have not been fetched).
+$B@5Ev$JCM$O(B @code{nil} ($B$I$N5-;v$bA`:n$9$k(B)$B!"(B
+@code{undownloaded} (@dfn{unplugged} $B$J4|4V$NA`:n$O<h$j9~$^$l$F$$$J$$5-(B
+$B;v$rL5;k$9$k$3$H(B)$B!"(B@code{always-undownloaded} ($BA`:n$O<h$j9~$^$l$F$$$J$$(B
+$B5-;v$r>o$KL5;k$9$k$3$H(B)$B!"(B@code{unfetched} ($BA`:n$O%X%C%@!<$,<h$j9~$^$l$F(B
+$B$$$J$$5-;v$rL5;k$9$k$3$H(B) $B$G$9!#(B($BLuCm(B: $B$&!<$`(B Kevin $B$5$s$O2?$r8@$C$F$k$s(B
+$B$@(B?)
 @end table
 
 @node Example Setup
