@@ -224,9 +224,9 @@ ex. nnimap+server:INBOX."
   :type 'string
   :group 'gnus-namazu)
 
-(defcustom gnus-namazu/directory-table-use t
-  "*Non-nil, use gnus-namazu/directory-table."
-  :type 'boolean
+(defcustom gnus-namazu-imap-maildir nil
+  "*Maildir directory name."
+  :type 'string
   :group 'gnus-namazu)
 
 ;;; Internal Variable:
@@ -392,7 +392,7 @@ ex. nnimap+server:INBOX."
 		       ;; as file names of articles.
 		       (skip-chars-backward "0-9")
 		       (point))))
-	(and (if gnus-namazu/directory-table-use
+	(and (if (not gnus-namazu-imap-maildir)
 		 (setq group
 		       (symbol-value
 			(intern-soft (if gnus-namazu-case-sensitive-filesystem
@@ -404,7 +404,7 @@ ex. nnimap+server:INBOX."
 	       ;; nnimap+server:INBOX.group = ~/Maildir/.group 
 	       ;; Namazu resault: ~/Maildir/.group/123
 	       (setq group (and (string-match 
-				 (concat (expand-file-name "~/Maildir") 
+				 (concat gnus-namazu-imap-maildir
 					 "/\\.\\(.*\\)/") group)
 				(concat gnus-namazu-imap-group-prefix 
 					(match-string 1 group)))))
@@ -794,7 +794,8 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 			 (mapcar 'list gnus-namazu-index-directories) nil t)
       (gnus-namazu/default-index-directory))
     t))
-  (when (setq directory (gnus-namazu/update-p directory force))
+  (when (and (not gnus-namazu-imap-maildir)
+	     (setq directory (gnus-namazu/update-p directory force)))
     (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
       (buffer-disable-undo)
       (erase-buffer)
@@ -829,9 +830,11 @@ than the period that is set to `gnus-namazu-index-update-interval'"
   (gnus-namazu-update-indices gnus-namazu-index-directories force))
 
 (defun gnus-namazu-update-indices (&optional directories force)
-  (when (setq directories
-	      (delq nil (mapcar (lambda (d) (gnus-namazu/update-p d force))
-				directories)))
+  (when (and (not gnus-namazu-imap-maildir)
+	     (setq directories
+		   (delq nil (mapcar (lambda (d) 
+				       (gnus-namazu/update-p d force)) 
+				     directories))))
     (setq gnus-namazu/update-directories (cons force (cdr directories)))
     (gnus-namazu-update-index (car directories) force)))
 

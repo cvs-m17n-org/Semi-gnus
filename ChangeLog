@@ -1,3 +1,8 @@
+2004-03-24  KOSEKI Yoshinori  <kose@meadowy.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/directory-table-use): Remove.
+	(gnus-namazu-imap-maildir): New variable.
+	
 2004-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
