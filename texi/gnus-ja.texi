@@ -774,19 +774,19 @@ Gnus $B$O!"IaDL$O%0%k!<%W$,?7$7$$$+$I$&$+$r!"9XFI$7$F$$$k%0%k!<%W$H:o=|$5(B
 
 @item gnus-subscribe-topics
 @vindex gnus-subscribe-topics
-Put the groups into the topic that has a matching @code{subscribe} topic 
-parameter (@pxref{Topic Parameters}).  For instance, a @code{subscribe}
-topic parameter that looks like
+$B%0%k!<%W$r9gCW$9$k(B @code{subscribe} $B%H%T%C%/%Q%i%a!<%?$N$"$k%0%k!<%W$KF~(B
+$B$l$^$9(B (@pxref{Topc Parameters})$B!#Nc$($P!"0J2<$N$h$&$J(B @code{subscribe}
+$B%Q%i%a!<%?(B
 
 @example
 "nnslashdot"
 @end example
 
-will mean that all groups that match that regex will be subscribed under 
-that topic.
+$B$O$=$N@55,I=8=$K9gCW$9$kA4$F$N%0%k!<%W$O$=$N%H%T%C%/$N2<$G9XFI$5$l$k$H$$(B
+$B$&$3$H$G$9!#(B
 
-If no topics match the groups, the groups will be subscribed in the
-top-level topic.
+$B%0%k!<%W$K9gCW$9$k%H%T%C%/$,L5$$>l9g!"%0%k!<%W$O:G>e0L$N%H%T%C%/$G9XFI$5(B
+$B$l$^$9!#(B
 
 @end table
 
@@ -1351,10 +1351,10 @@ Formatting}) $B$r@_Dj$9$k$3$H$GJQ99$G$-$^$9!#$3$$$D$O;XDjJ8;z$r$"$s$^$j$?(B
 @cindex group highlighting
 
 @vindex gnus-group-highlight
-$B%0%k!<%W%P%C%U%!$N%O%$%i%$%H$O(B @code{gnus-group-highlight} $BJQ?t(B
-$B$K$h$C$F@)8f$5$l$F$$$^$9!#$3$l$O(B @code{(@var{form} . @var{face})} $B$N$h(B
-$B$&$J$b$N$rMWAG$K;}$DO"A[%j%9%H$G$9!#(B@var{form} $B$,2?$+(B @code{nil} $B0J30(B
-$B$KI>2A$5$l$k$b$N$J$i!"$=$N9T$KBP$7$F(B @var{face} $B$,;HMQ$5$l$^$9!#(B
+$B%0%k!<%W%P%C%U%!$N%O%$%i%$%H$O(B @code{gnus-group-highlight} $BJQ?t$K$h$C$F(B
+$B@)8f$5$l$F$$$^$9!#$3$l$O(B @code{(@var{form} . @var{face})} $B$N$h$&$J$b$N$r(B
+$BMWAG$K;}$DO"A[%j%9%H$G$9!#(B@var{form} $B$,2?$+(B @code{nil} $B0J30$KI>2A$5$l$k(B
+$B$b$N$J$i!"$=$N9T$KBP$7$F(B @var{face} $B$,;HMQ$5$l$^$9!#(B
 
 $B0J2<$,$3$NJQ?t$NCM$NNc$G$9!#$3$l$OGX7J$,0E$$@_Dj$G$O$-$l$$$K8+$((B
 $B$k$+$bCN$l$^$;$s!#(B
@@ -3019,15 +3019,14 @@ Gnus
 $B%/%Q%i%a!<%?$+$i7Q>5$7$^$9!#%0%k!<%W%Q%i%a!<%?$H$7$F@5$7$$$b$N$OA4$F!"%H%T%C(B
 $B%/%Q%i%a!<%?$H$7$F$b@5$7$$$b$N$G$9(B(@pxref{Group Parameters})$B!#(B
 
-In addition, the following parameters are only valid as topic
-parameters:
+$B$5$i$K!"0J2<$N%Q%i%a!<%?$O%H%T%C%/%Q%i%a!<%?$H$7$F$N$_M-8z$G$9(B:
 
 @table @code
 @item subscribe
-When subscribing new groups by topic (@pxref{Subscription Methods}), the 
-@code{subscribe} topic parameter says what groups go in what topic.  Its 
-value should be a regexp to match the groups that should go in that
-topic. 
+$B%H%T%C%/$G?7$7$$%0%k!<%W$r9XFI$7$F$$$k>l9g(B (@pxref{Subscription
+Methods}) $B!"(B@code{subscribe} $B%H%T%C%/%Q%i%a!<%?$O$I$N%0%k!<%W$,$I$N%H%T%C(B
+$B%/$K9T$/$+$r;XDj$7$^$9!#CM$O$=$N%H%T%C%/$K9T$/%0%k!<%W$K9gCW$9$k@55,I=8=(B
+$B$G$"$kI,MW$,$"$j$^$9!#(B
 
 @end table
 
@@ -3342,8 +3341,6 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx(B
 * Choosing Articles::           $B5-;v$rFI$`!#(B
 * Paging the Article::          $BFI$s$G$$$k5-;v$r%9%/%m!<%k$9$k!#(B
 * Reply Followup and Post::     $B5-;v$rEj9F$9$k!#(B
-* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
-* Canceling and Superseding::   $B!X$"$!!"$"$s$J$U$&$K8@$&$s$8$c$J$+$C$?!#!Y(B
 * Marking Articles::            $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k!#(B
 * Limiting::                    $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k!#(B
 * Threading::                   $B%9%l%C%I$,$I$N$h$&$K:n$i$l$k$+!#(B
@@ -3980,10 +3977,10 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 @section $BJVEz!"%U%)%m!<%"%C%W!"Ej9F(B
 
 @menu
-* Summary Mail Commands::            $B%a!<%k$rAw$k!#(B
-* Summary Post Commands::            $B%K%e!<%9$rAw$k!#(B
-* Summary Message Commands::    Other Message-related commands.
-* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
+* Summary Mail Commands::       $B%a!<%k$rAw$k!#(B
+* Summary Post Commands::       $B%K%e!<%9$rAw$k!#(B
+* Summary Message Commands::    $BB>$N%a%C%;!<%84XO"$NL?Na!#(B
+* Canceling and Superseding::   $B!X$"$!!"$"$s$J$U$&$K8@$&$s$8$c$J$+$C$?!#!Y(B
 @end menu
 
 
@@ -4181,17 +4178,18 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 $B$^$?(B @pxref{(message)Header Commands} $B$K$5$i$J$k>pJs$,$"$j$^$9!#(B
 
 
+@c FIXME this is not implemented
 @node Summary Message Commands
-@subsection Summary Message Commands
+@subsection $B35N,%a%C%;!<%8L?Na(B
 
 @table @kbd
 @item S y
-@kindex S y (Summary)
+@kindex S y ($B35N,(B)
 @findex gnus-summary-yank-message
-Yank the current article into an already existing Message composition
-buffer (@code{gnus-summary-yank-message}).  This command prompts for
-what message buffer you want to yank into, and understands the
-process/prefix convention (@pxref{Process/Prefix}).
+$B8=:_$N5-;v$r4{$KB8:_$9$k(B Message $B:n@.%P%C%U%!$KE=$jIU$1$^$9(B
+(@code{gnus-summaryyank-message})$B!#(B $B$3$NL?Na$OE=$jIU$1$?$$%a%C%;!<%8%P%C(B
+$B%U%!$NF~NO$rB%$7!"%W%m%;%9(B/$B@\F,<-$N=,47$rM}2r$7$^$9(B
+(@pxref{Process/Prefix})$B!#(B
 
 @end table
 
@@ -7062,7 +7060,6 @@ son-of-RFC 1036 $B$G;X<($5$l$F$$$kI8=`$N(B @samp{^-- $} $B$G$9!#$7$+$7!"B?$/$
 @kindex A t (Summary)
 @findex gnus-article-babel
 $B5-;v$r$"$k8@8l$+$iJL$N$b$N$XJQ49$7$^$9!#(B
-Translate the article from one language to another
 (@code{gnus-article-babel}).
 
 @end table
@@ -7213,13 +7210,11 @@ Translate the article from one language to another
 $B$r99?7$7$F$$$k$HHs>o$KNI$$$G$7$g$&!#$7$+$7!"$=$l$O$I$&$7$F$bI,MW$J$o$1$G$O(B
 $B$"$j$^$;$s!#(B
 
-It can also be a list of select methods, as well as the special symbol
-@code{current}, which means to use the current select method.  If it
-is a list, Gnus will try all the methods in the list until it finds a
-match.
+$B$=$l$OA*BrJ}K!$N%j%9%H$G$"$k$3$H$b$G$-!"FCJL$J%7%s%\%k(B @code{current} $B$G(B
+$B$"$k$3$H$b$G$-$^$9!#8e<T$O!"8=:_$NA*BrJ}K!$r;H$&$H$$$&0UL#$G$9!#%j%9%H$N(B
+$B>l9g$O!"(Bgnus $B$O9g$&$b$N$rH/8+$9$k$^$G%j%9%H$NA4$F$NJ}K!$r;n$7$^$9!#(B
 
-Here's an example setting that will first try the current method, and
-then ask Deja if that fails:
+$B$3$l$O8=:_$NJ}K!$r;n$7$F!"$=$l$,<:GT$7$?>l9g$K$O(B Deja $B$K?V$/@_Dj$NNc$G$9(B:
 
 @lisp
 (setq gnus-refer-article-method
@@ -8772,14 +8767,12 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 
 $B$=$l$>$l$NMM<0$N:G=i$NMWAG$O(B @code{$B9gCW(B} (match) $B$H8F$P$l$^$9!#$b$7$=$l(B
 $B$,J8;zNs$G$"$l$P!"(Bgnus $B$O$=$l$r%0%k!<%WL>$K@55,I=8=$H$7$F9gCWA`:n$r9T$$(B
-$B$^$9!#(B
-If it is the symbol @code{header}, then Gnus will look for header that
-match the next element in the match, and compare that to the last header
-in the match.
-$B$b$7$=$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#$=$l$,(B
-$BJQ?t$N%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l$P!"$=(B
-$B$N%j%9%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil} $B$G$J$$(B
-$BCM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
+$B$^$9!#%7%s%\%k(B @code{header} $B$G$"$l$P!"(Bgnus $B$O$=$N9gCW$NCf$N<!$NMWAG$K9g(B
+$BCW$9$k%X%C%@!<$rC5$7!"$=$l$r$=$N9gCW$N:G8e$N%X%C%@!<$HHf3S$7$^$9!#$b$7$=(B
+$B$l$,4X?t$N%7%s%\%k$G$"$l$P!"$=$N4X?t$,0z?tL5$7$G8F$P$l$^$9!#$=$l$,JQ?t$N(B
+$B%7%s%\%k$G$"$l$P!"$=$NJQ?t$,;2>H$5$l$^$9!#$=$l$,%j%9%H$G$"$l$P!"$=$N%j%9(B
+$B%H$,(B @code{$BI>2A(B} $B$5$l$^$9!#$I$N>l9g$G$b!"$3$l$,(B @code{nil}$B$G$J$$CM$r5"$;(B
+$B$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
 $B$O(B @code{(@var{name} . @var{value})} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>(B
@@ -8954,7 +8947,7 @@ Buffer})$B!#(B
 * The Server Buffer::     $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k!#(B
 * Getting News::          USENET $B%K%e!<%9$r(B gnus $B$GFI$`!#(B
 * Getting Mail::          $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`!#(B
-* Browsing the Web::      Getting messages from a plethora of Web sources.
+* Browsing the Web::      $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k!#(B
 * Other Sources::         $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`!#(B
 * Combined Groups::       $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k!#(B
 * Gnus Unplugged::        $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`!#(B
@@ -9973,19 +9966,20 @@ Gnus $B$O$"$J$?$K<+J,<+?H$KD7$MJV$C$F$/$k$h$&$J2DG=@-$N$"$kA4$F$N5!2q$rDs(B
 (file)
 @end lisp
 
-If the mail spool file is not located on the local machine, it's best to 
-use POP or @sc{imap} or the like to fetch the mail.  You can not you ange-ftp 
-file names here---it has no way to lock the mail spool while moving the
-mail.
+$B%a!<%k%9%W!<%k%U%!%$%k$,%m!<%+%k%^%7%s$KL5$$>l9g$O!"(BPOP $B$d(B @sc{imap} $B$J(B
+$B$I$G%a!<%k$r<hF@$9$k$N$,:GA1$G$9!#$3$3$G$O(B ange-ftp $B$N%U%!%$%kL>$O;HMQ$G(B
+$B$-$^$;$s(B---$B%a!<%k$r0\F0$7$F$$$k$H$-$K%a!<%k%9%W!<%k$r%m%C%/$9$kJ}K!$,$"(B
+$B$j$^$;$s!#(B
 
-If it's impossible to set up a proper server, you can use ssh instead.
+$BE,@Z$J%5!<%P!<$r@_CV$9$k$3$H$,IT2DG=$J$i!"JQ$o$j$K(B  ssh $B$r;H$&$3$H$,$G$-(B
+$B$^$9!#(B
 
 @lisp
 (setq mail-sources
       '((file :prescript "ssh host bin/getmail >%t")))
 @end lisp
 
-The @samp{getmail} script would look something like the following:
+@samp{getmail} $B%9%/%j%W%H$O0J2<$N$h$&$J$b$N$K$J$j$^$9(B:
 
 @example
 #!/bin/sh
@@ -9997,7 +9991,8 @@ TMP=~/Mail/tmp
 rm -f $TMP; $MOVEMAIL $MAIL $TMP >/dev/null && cat $TMP
 @end example
 
-Alter this script to fit find the @samp{movemail} you want to use.
+$BL\E*$K9g$&$h$&$K;HMQ$7$?$$(B @samp{movemail} $B$K9g$o$;$F%9%/%j%W%H$r=q$-49(B
+$B$($F$/$@$5$$!#(B
 
 
 @item directory
@@ -10149,98 +10144,86 @@ maildir $B%a!<%k%=!<%9$NNc$G$9(B:
 @end lisp
 
 @item imap
-Get mail from a @sc{imap} server. If you don't want to use @sc{imap} as intended,
-as a network mail reading protocol (ie with nnimap), for some reason or
-other, Gnus let you treat it similar to a POP server and fetches
-articles from a given @sc{imap} mailbox.
+IMAP $B%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#2?$i$+$NM}M3$G(B IMAP $B$r0U?^$5$l$?$h(B
+$B$&$J%M%C%H%o!<%/>e$G%a!<%k$rFI$`%W%m%H%3%k$H$7$F07$$$?$/$J$$$H$-$O!"(Bgnus
+$B$G$O(B POP $B%5!<%P!<$HF1MM$K07$&$3$H$,$G$-!"M?$($i$l$?(B IMAP $B%a!<%k%\%C%/%9(B
+$B$+$i5-;v$r<hF@$7$^$9!#(B
 
-Keywords:
+$B%-!<%o!<%I(B:
 
 @table @code
 @item :server
-The name of the @sc{imap} server.  The default is taken from the
-@code{MAILHOST} environment variable.
+IMAP $B%5!<%P!<$NL>A0!#=i4|CM$O4D6-JQ?t(B @code{MAILHOST} $B$+$iF@$^$9!#(B
 
 @item :port
-The port number of the @sc{imap} server.  The default is @samp{143}, or
-@samp{993} for SSL connections.
+IMAP $B%5!<%P!<$N%]!<%HHV9f!#IaDL$O=i4|CM$O(B @samp{143} $B$G!"(BSSL $B@\B3$K$O(B
+@samp{993} $B$G$9!#(B
 
 @item :user
-The user name to give to the @sc{imap} server.  The default is the login
-name.
+IMAP $B%5!<%P!<$KEO$9MxMQ<TL>$G$9!#=i4|CM$O%m%0%$%sL>$G$9!#(B
 
 @item :password
-The password to give to the @sc{imap} server.  If not specified, the user is
-prompted.
+IMAP $B%5!<%P!<$KEO$9%Q%9%o!<%I$G$9!#;XDj$5$l$F$$$J$$$H$-$O!"MxMQ<T$OF~NO(B
+$B$rB%$5$l$^$9!#(B
 
 @item :stream
-What stream to use for connecting to the server, this is one of the
-symbols in @code{imap-stream-alist}. Right now, this means
-@samp{kerberos4}, @samp{ssl} or the default @samp{network}.
+$B%5!<%P!<$K@\B3$9$k$H$-$K;H$&%9%H%j!<%`!#(B@code{imap-stream-alist} $B$K$"$k(B
+$B%7%s%\%k$NCf$N$R$H$D$r@_Dj$7$^$9!#8=>u$G$O!"(B@samp{kerberos} $B$+(B 
+@samp{ssl} $B$+=i4|CM$N(B @samp{network} $B$K$J$j$^$9!#(B
 
 @item :authenticator
-Which authenticator to use for authenticating to the server, this is one
-of the symbols in @code{imap-authenticator-alist}. Right now, this means
-@samp{kerberos4}, @samp{cram-md5}, @samp{anonymous} or the default
-@samp{login}.
+$B%5!<%P!<$G$NG'>Z$K$I$NG'>ZK!$r;H$&$+!#$3$l$O(B
+@code{imap-authenticator-alist} $B$N%7%s%\%k$N0l$D$r@_Dj$7$^$9!#8=>u$G$O!"(B
+@samp{kerberos4}$B!"(B@samp{cram-md5}$B!"(B@samp{anonymous} $B$+=i4|CM$N(B 
+@samp{login} $B$K$J$j$^$9!#(B
 
 @item :mailbox
-The name of the mailbox to get mail from. The default is @samp{INBOX}
-which normally is the mailbox which receive incoming mail.
+$B%a!<%k$r<hF@$9$k%a!<%k%\%C%/%9$NL>A0!#=i4|CM$O(B @samp{INBOX} $B$G!"$3$l$OIa(B
+$BDL$OF~$C$F$/$k%a!<%k$r<u$1<h$k%a!<%k%\%C%/%9$G$9!#(B
 
 @item :predicate
-The predicate used to find articles to fetch. The default, 
-@samp{UNSEEN UNDELETED}, is probably the best choice for most people,
-but if you sometimes peek in your mailbox with a @sc{imap} client and mark
-some articles as read (or; SEEN) you might want to set this to
-@samp{nil}. Then all articles in the mailbox is fetched, no matter
-what. For a complete list of predicates, see RFC2060 §6.4.4.
-
-@item :fetchflag
-How to flag fetched articles on the server, the default @samp{\Deleted}
-will mark them as deleted, an alternative would be @samp{\Seen} which
-would simply mark them as read. Theese are the two most likely choices,
-but more flags are defined in RFC2060 §2.3.2.
-
-@item :dontexpunge
-If non-nil, don't remove all articles marked as deleted in the mailbox
-after finishing the fetch.
+$B<hF@$9$k5-;v$r7hDj$9$k$?$a$K;H$o$l$k=R8l!#=i4|CM$N!"(B@samp{UNSEEN
+UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I$-(B IMAP
+$B%/%i%$%"%s%H$G%a!<%k%\%C%/%9$r=|$-!"$$$/$D$+$N5-;v$K4{FI(B ($B$b$7$/$O!"(B
+SEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{nil} $B$K@_Dj$7$?$$$+$b$7$l$^$;$s!#$=$&$9$l(B
+$B$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:<hF@$5$l$^$9!#=R8l$N40(B
+$BA4$J0lMw$O!"(BRFC2060 §6.4.4 $B$rFI$s$G$/$@$5$$!#(B
 
 @end table
 
-An example @sc{imap} mail source:
+IMAP $B%a!<%k%=!<%9$NNc(B:
 
 @lisp
 (imap :server "mail.mycorp.com" :stream kerberos4)
 @end lisp
 
 @item webmail
-Get mail from a webmail server, such as www.hotmail.com, 
-mail.yahoo.com, and www.netaddress.com. 
+www.hotmail.com, mail.yahoo.com, www.netaddress.com $B$J$I$N%&%'%V%a!<%k%5!<(B
+$B%S%9$+$i%a!<%k$r<hF@$7$^$9!#(B
 
-NOTE: Webmail largely depends on w3 (url) package, whose version of "WWW
-4.0pre.46 1999/10/01" or previous ones may not work.
+$BCm(B: $B%&%'%V%a!<%k$O(B w3 (url) $B%Q%C%1!<%8$N%P!<%8%g%s(B "WWW 4.0pre.46
+1999/10/01" $B$KBg$-$/0MB8$7$^$9!#$=$l0JA0$N$b$N$O$*$=$i$/F0:n$7$J$$$G$7$g(B
+$B$&!#(B
 
-WARNING: Mails may lost. NO WARRANTY.
+$B7Y9p(B: $B%a!<%k$,<:$o$l$k$+$b$7$l$^$;$s!#L5J]>Z$G$9!#(B
 
-Keywords:
+$B%-!<%o!<%I(B:
 
 @table @code
 @item :subtype
-The type of the webmail server.  The default is @code{hotmail}. The
-alternatives are @code{yahoo}, @code{netaddress}.
+$B%&%'%V%a!<%k%5!<%P!<$N7?$G$9!#=i4|CM$O(B @code{hotmail} $B$G$9!#B>$N8uJd$O(B
+@code{yahoo}, @code{netaddress} $B$G$9!#(B
 
 @item :user
-The user name to give to the webmail server.  The default is the login
-name.
+$B%&%'%V%a!<%k%5!<%P!<$NMxMQ<TL>$G$9!#=i4|CM$O%m%0%$%sL>$G$9!#(B
 
 @item :password
-The password to give to the webmail server.  If not specified, the user is
-prompted.
+$B%&%'%V%a!<%k%5!<%P!<$N%Q%9%o!<%I$G$9!#;XDj$7$J$$>l9g$O!"MxMQ<T$KF~NO$rB%(B
+$B$7$^$9!#(B
 
 @end table
 
-An example webmail source:
+$B%&%'%V%a!<%k$N%=!<%9$NNc$G$9(B:
 
 @lisp
 (webmail :subtype 'yahoo :user "user-name" :password "secret")
@@ -11331,48 +11314,44 @@ gnus $B$,$=$l$>$l$NJL$N%0%k!<%W$K$I$N$/$i$$$N%a%C%;!<%8$,$"$k$+$rD4$Y$k$?(B
 @cindex www
 @cindex http
 
-Web-based discussion forums are getting more and more popular.  On many
-subjects, the web-based forums have become the most important forums,
-eclipsing the importance of mailing lists and news groups.  The reason
-is easy to understand---they are friendly to new users; you just point
-and click, and there's the discussion.  With mailing lists, you have to
-go through a cumbersome subscription procedure, and most people don't
-even know what a news group is.
+$B%&%'%V$K4p$E$$$?5DO@$N>l$O$I$s$I$s9-$^$C$F$$$^$9!#B?$/$NJ,Ln$G!"%&%'%V$N(B
+$B7G<(HD$O:G$b=EMW$J>l$K$J$j!"%a!<%j%s%0%j%9%H$d%K%e!<%9%0%k!<%W$N=EMW@-$r(B
+$BfJ$i$;$F$$$^$9!#M}M3$O4JC1$G$9(B---$B?7$7$$MxMQ<T$,;H$$0W$$$+$i$G$9!#$?$@>l(B
+$B=j$r%/%j%C%/$9$k$@$1$G!"5DO@$N>l$,$"$j$^$9!#%a!<%j%s%0%j%9%H$G$O!"LLE]$J(B
+$B9XFI<jB3$-$r$7$J$1$l$P$J$i$:!"$[$H$s$I$N?M$O%K%e!<%9%0%k!<%W$,$I$3$K$"$k(B
+$B$+$9$iCN$j$^$;$s!#(B
 
-The problem with this scenario is that web browsers are not very good at 
-being newsreaders.  They do not keep track of what articles you've read; 
-they do not allow you to score on subjects you're interested in; they do 
-not allow off-line browsing; they require you to click around and drive
-you mad in the end.
+$B$3$N6Z=q$-$NLdBj$O!"%&%'%V%V%i%&%6!<$O%K%e!<%9%j!<%@!<$H$7$F$O$"$^$jNI$/(B
+$B$J$$$H$$$&$3$H$G$9!#$I$s$J5-;v$rFI$s$@$+$r5-O?$7$^$;$s!#6=L#$N$"$kI=Bj$K(B
+$B%9%3%"$rIU$1$k$3$H$,$G$-$^$;$s!#%*%U%i%$%s$GFI$`$3$H$,$G$-$^$;$s!#2?EY$b(B
+$B%/%j%C%/$9$k$3$H$rMW5a$7!":G8e$K$O$"$J$?$O7y$K$J$j$^$9!#(B
 
-So---if web browsers suck at reading discussion forums, why not use Gnus 
-to do it instead?
+$B$=$l$G(B---$B%&%'%V%V%i%&%6!<$,7G<(HD$rFI$`$N$KE,$7$F$$$J$$$N$J$i!"$I$&$7$F(B
+$BBe$o$j$K(B gnus $B$r;H$O$J$$$N$G$7$g$&(B?
 
-Gnus has been getting a bit of a collection of backends for providing
-interfaces to these sources.
+Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
+$B$^$9!#(B
 
 @menu
-* Web Searches::          Creating groups from articles that match a string.
-* Slashdot::              Reading the Slashdot comments.
-* Ultimate::              The Ultimate Bulletin Board systems.
-* Web Archive::           Reading mailing list archived on web.
+* Web Searches::          $BJ8;zNs$K%^%C%A$9$k5-;v$+$i%0%k!<%W$r:n$k!#(B
+* Slashdot::              Slashdot $B$N%3%a%s%H$rFI$`!#(B
+* Ultimate::              Ultimate Bulletin Board $B%7%9%F%`(B.
+* Web Archive::           $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`!#(B
 @end menu
 
-The main caveat with all these web sources is that they probably won't
-work for a very long time.  Gleaning information from the @sc{html} data 
-is guesswork at best, and when the layout is altered, the Gnus backend
-will fail.  If you have reasonably new versions of these backends,
-though, you should be ok.
+$B$3$l$i$N%&%'%V%=!<%9$N0lHV$NLdBj$OD94|4V$OF0:n$7$J$$2DG=@-$,9b$$$3$H$G$9!#(B
+@sc{html} $B%G!<%?$+$i>pJs$r=8$a$k$N$O$;$$$<$$?dB,$G!"9=B$$,JQ2=$7$?$H$-$K(B
+$B$O!"(Bgnus $B%P%C%/%(%s%I$OF0:n$7$^$;$s!#$G$b!"$"$kDxEY?7$7$$%P!<%8%g%s$N%P%C(B
+$B%/%(%s%I$r;H$C$F$$$l$PBg>fIW$N$O$:$G$9!#(B
 
-One thing all these Web methods have in common is that the Web sources
-are often down, unavailable or just plain too slow to be fun.  In those
-cases, it makes a lot of sense to let the Gnus Agent (@pxref{Gnus
-Unplugged}) handle downloading articles, and then you can read them at
-leisure from your local disk.  No more World Wide Wait for you.
-
+$B$3$l$i$N%&%'%VJ}K!$K6&DL$9$k$3$H$O!"%&%'%V%=!<%9$O$7$P$7$PMn$A$F$$$?$j!"(B
+$B;HMQ2DG=$G$J$+$C$?$j!"C1=c$K3Z$7$`$K$OCY$9$.$k$3$H$,$"$k!"$H$$$&$3$H$G$9!#(B
+$B$=$&$$$&>l9g$K$O!"(BGnu Agent (@pxref{Gnus Unplugged}) $B$K5-;v$N%@%&%s%m!<(B
+$B%I$rG$$;$F!"%m!<%+%k%G%#%9%/$+$i9%$-$J$H$-$KFI$`$h$&$K$9$k$3$H$,$G$-$^$9!#(B
+$B$3$l$G!"(BWorld Wide Wait $B$H$O$*$5$i$P$G$9!#(B
 
 @node Web Searches
-@subsection Web Searches
+@subsection $B%&%'%V8!:w(B
 @cindex nnweb
 @cindex DejaNews
 @cindex Alta Vista
@@ -11380,81 +11359,80 @@ leisure from your local disk.  No more World Wide Wait for you.
 @cindex Usenet searches
 @cindex searching the Usenet
 
-It's, like, too neat to search the Usenet for articles that match a
-string, but it, like, totally @emph{sucks}, like, totally, to use one of
-those, like, Web browsers, and you, like, have to, rilly, like, look at
-the commercials, so, like, with Gnus you can do @emph{rad}, rilly,
-searches without having to use a browser.
+$B$=$l$O!"$J$s$H$$$&$+!"(BUsenet $B$+$iJ8;zNs$K%^%C%A$9$k5-;v$r8!:w$9(B
+$B$k$N$O$H$F$bAG@2$i$7$$$s$@$1$I!"$=$N!"$"$N%&%'%V%V%i%&%6!<$C$F$d(B
+$B$D$r;H$C$F!"$=$s$G$b$C$F!"@kEA$rFI$^$;$i$l$k$C$F$$$&$N$O!"$=$N!"(B
+$B$J$s$H$$$&$+!"$[$s$H$&$K(B @emph{$B!VITMM$M!W(B} $B$H$$$&$+!"$=$l$G!"(B
+gnus $B$G$O%V%i%&%6!<$r;H$o$:$K!"$=$N!"(B@emph{$BD6$+$C$3$h$/(B}$B$=$l$,$G(B
+$B$-$k!"$C$F$3$H$G$9!#(B
 
-The @code{nnweb} backend allows an easy interface to the mighty search
-engine.  You create an @code{nnweb} group, enter a search pattern, and
-then enter the group and read the articles like you would any normal
-group.  The @kbd{G w} command in the group buffer (@pxref{Foreign
-Groups}) will do this in an easy-to-use fashion.
+@code{nnweb} $B%P%C%/%(%s%I$O!"6/NO$J8!:w%(%s%8%s$KBP$7$F4JC1$J%$(B
+$B%s%?!<%U%'!<%9$rDs6!$7$^$9!#(B@code{nnweb} $B%0%k!<%W$r:n@.$7!"8!:w(B
+$B%Q%?!<%s$rF~NO$7!"$=$7$F$=$N%0%k!<%W$KF~$C$FB>$NIaDL$N%0%k!<%W$N(B
+$B$h$&$K5-;v$rFI$_$^$9!#%0%k!<%W%P%C%U%!(B (@pxref{Foreign
+Groups}) $B$N(B @kbd{G w} $BL?Na$K$h$C$F$*<j7Z$K$3$l$,$G$-$^$9!#(B
 
-@code{nnweb} groups don't really lend themselves to being solid
-groups---they have a very fleeting idea of article numbers.  In fact,
-each time you enter an @code{nnweb} group (not even changing the search
-pattern), you are likely to get the articles ordered in a different
-manner.  Not even using duplicate suppression (@pxref{Duplicate
-Suppression}) will help, since @code{nnweb} doesn't even know the
-@code{Message-ID} of the articles before reading them using some search
-engines (DejaNews, for instance).  The only possible way to keep track
-of which articles you've read is by scoring on the @code{Date}
-header---mark all articles posted before the last date you read the
-group as read.
+@code{nnweb} $B%0%k!<%W$O!"8GDj%0%k!<%W$K$J$m$&$H$O$7$^$;$s(B --- $B$3(B
+$B$N%0%k!<%W$G$O5-;vHV9f$O$4$/0l;~E*$J$b$N$H$7$F07$$$^$9!#$D$^$j!"(B
+@code{nnweb} $B%0%k!<%W$KF~$k$?$S$K(B($B$?$H$(8!:w%Q%?!<%s$rJQ99$7$F$$(B
+$B$J$/$H$b(B)$B!"5-;v$N=g=x$,0c$C$F$$$k$+$b$7$l$^$;$s!#$^$?!"=EJ#M^@)(B
+(@pxref{Duplicate Suppression}) $B$r;H$C$F$b$&$^$/F/$+$J$$$G$7$g$&!#(B
+$B$H$$$&$N$O!"(B@code{nnweb} $B$O8!:w%(%s%8%s(B($BNc$($P(B DejaNews) $B$r;H$C(B
+$B$F5-;v$rFI$_9~$`$^$G$O!"(B@code{Message-ID} $B$rCN$k$3$H$O$G$-$J$$$+(B
+$B$i$G$9!#$"$J$?$,FI$s$@5-;v$r21$($F$*$/$?$a$NM#0l$NJ}K!$O!"(B
+@code{Date} $B%X%C%@!<$r$b$H$K%9%3%"$rIU$1$k$3$H$@$1$G$9(B --- $B$D$^(B
+$B$j$"$J$?$,$=$N%0%k!<%W$r:G8e$KFI$s$@F|IU$h$j!"A0$KEj9F$5$l$?5-;v(B
+$B$rA4$F4{FI$K$9$k!"$H$$$&$3$H$G$9!#(B
 
-If the search engine changes its output substantially, @code{nnweb}
-won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'être} is to
-make money off of advertisements, not to provide services to the
-community.  Since @code{nnweb} washes the ads off all the articles, one
-might think that the providers might be somewhat miffed.  We'll see.
+$B$b$78!:w%(%s%8%s$N=PNO7A<0$,JQ99$5$l$k$H!"(B@code{nnweb} $B$O$=$l$r(B
+$B$&$^$/2r<a$G$-$:!"=hM}$O<:GT$9$k$G$7$g$&!#$b$7%&%'%VDs6!<TC#$,$=(B
+$B$s$J$3$H$r$7$?$i!"H`$i$r7c$7$/@U$a$k$Y$-$G$7$g$&(B --- $B$=$l$O9-9p(B
+$B$G6b$r2T$0$N$,H`$i$N(B @emph{$BB8:_M}M3(B} $B$G$"$j!"<R2q$K%5!<%S%9$rDs(B
+$B6!$9$k$3$H$G$O$J$$$+$i$G$9!#(B@code{nnweb} $B$OA4$F$N5-;v$+$i9-9p$r(B
+$B@v$$N.$7$F$7$^$&$N$G!"Ds6!<T$?$A$,%`%+$D$$$F$$$k$H;W$o$l$k$+$bCN(B
+$B$l$^$;$s!#$^$"8+$F$F$/$@$5$$!#(B
 
-You must have the @code{url} and @code{w3} package installed to be able
-to use @code{nnweb}.
+@code{nnweb} $B$r;H$&$K$O!"(B@code{url} $B$H(B @code{w3} $B%Q%C%1!<%8$r%$(B
+$B%s%9%H!<%k$7$F$*$+$J$/$F$J$J$j$^$;$s!#(B
 
-Virtual server variables:
+$B0J2<$O2>A[%5!<%P!<JQ?t$G$9!#(B
 
 @table @code
 @item nnweb-type
 @vindex nnweb-type
-What search engine type is being used.  The currently supported types
-are @code{dejanews}, @code{dejanewsold}, @code{altavista} and
-@code{reference}.
+$B$I$N8!:w%(%s%8%s$r;H$C$F$$$k$+!#8=:_%5%]!<%H$5$l$F$$$k<oN`$O!"(B
+@code{dejanews}$B!"(B @code{dejanewsold}$B!"(B @code{altavista}$B!"(B
+@code{reference} $B$G$9!#(B
 
 @item nnweb-search
 @vindex nnweb-search
-The search string to feed to the search engine.
+$B8!:w%(%s%8%s$KM?$($k8!:wJ8;zNs!#(B
 
 @item nnweb-max-hits
 @vindex nnweb-max-hits
-Advisory maximum number of hits per search to display.  The default is
-100.
+$BI=<($9$k8!:w7k2L$N:GBg?t!#=i4|CM$O(B 100 $B$G$9!#(B
 
 @item nnweb-type-definition
 @vindex nnweb-type-definition
-Type-to-definition alist.  This alist says what @code{nnweb} should do
-with the various search engine types.  The following elements must be
-present:
+$B7?!&Dj5AO"A[%j%9%H!#$3$NO"A[%j%9%H$O!"$5$^$6$^$J8!:w%(%s%8%s$N<o(B
+$BN`$KBP$7$F!"(B @code{nnweb} $B$,$I$&$9$Y$-$+$rM?$($^$9!#0J2<$K<($9MW(B
+$BAG$rM?$($J$/$F$O$J$j$^$;$s!#(B
 
 @table @code
 @item article
-Function to decode the article and provide something that Gnus
-understands.
+$B5-;v$rI|9f2=$7!"(Bgnus $B$,M}2r$G$-$k7A$GDs6!$9$k4X?t!#(B
 
 @item map
-Function to create an article number to message header and URL alist.
+$B5-;vHV9f$+$i%a%C%;!<%8%X%C%@!<$H(B URL $B$rF@$kO"A[%j%9%H$r:n@.$9$k4X?t!#(B
 
 @item search
-Function to send the search string to the search engine.
+$B8!:w%(%s%8%s$K8!:wJ8;zNs$rAw$k4X?t!#(B
 
 @item address
-The address the aforementioned function should send the search string
-to.
+$BA0=R$N4X?t$,8!:wJ8;zNs$rAw$k$Y$-%"%I%l%9!#(B
 
 @item id
-Format string URL to fetch an article by @code{Message-ID}.
+@code{Message-ID} $B$r$b$H$K5-;v$r<hF@$9$k$?$a$N(B URL $B7A<0J8;zNs!#(B
 @end table
 
 @end table
@@ -11465,83 +11443,79 @@ Format string URL to fetch an article by @code{Message-ID}.
 @cindex Slashdot
 @cindex nnslashdot
 
-Slashdot (@file{http://slashdot.org/}) is a popular news site, with
-lively discussion following the news articles.  @code{nnslashdot} will
-let you read this forum in a convenient manner.
+Slashdot (@file{http://slashdot.org/}) $B$O?M5$$N$"$k%K%e!<%9%5%$%H$G!"%K%e!<(B
+$B%95-;v$N8e$K3hH/$J5DO@$,$J$5$l$F$$$^$9!#(B@code{nnslashdot} $B$G$OJXMx$JJ}K!(B
+$B$G$3$N2q5D<<$rFI$`$3$H$,$G$-$^$9!#(B
 
-The easiest way to read this source is to put something like the
-following in your @file{.gnus.el} file:
+$B$3$3$+$iFI$`$?$a$N0lHV4JC1$JJ}K!$O0J2<$N$h$&$J$b$N$r(B @file{.gnus.el} $B%U%!(B
+$B%$%k$KF~$l$k$3$H$G$9!#(B
 
 @lisp
 (setq gnus-secondary-select-methods
       '((nnslashdot "")))
 @end lisp
 
-This will make Gnus query the @code{nnslashdot} backend for new comments
-and groups.  The @kbd{F} command will subscribe each new news article as
-a new Gnus group, and you can read the comments by entering these
-groups.  (Note that the default subscription method is to subscribe new
-groups as zombies.  Other methods are available (@pxref{Subscription
-Methods}).
+$B$3$l$O(B gnus $B$K(B @code{nnslashdot} $B%P%C%/%(%s%I$K?7$7$$%3%a%s%H$H%0%k!<%W(B
+$B$r?R$M$k$h$&$K$7$^$9!#(B@kbd{F} $BL?Na$O$=$l$>$l$N?7$7$$%K%e!<%95-;v$r?7$7$$(B
+gnus $B$N%0%k!<%W$H$7$F9XFI$7!"$3$l$i$N%0%k!<%W$KF~$k$3$H$G%3%a%s%H$rFI$`(B
+$B$3$H$,$G$-$^$9!#(B($B=i4|@_Dj$N9XFIJ}K!$G$O!"?7$7$$%0%k!<%W$r%>%s%S$H$7$F9X(B
+$BFI$9$k$3$H$KCm0U$7$F$/$@$5$$!#B>$NJ}K!$b;H$($^$9(B (@pxref{Subscription
+Methods})$B!#(B
 
-When following up to @code{nnslashdot} comments (or posting new
-comments), some light @sc{html}izations will be performed.  In
-particular, text quoted with @samp{> } will be quoted with
-@code{blockquote} instead, and signatures will have @code{br} added to
-the end of each line.  Other than that, you can just write @sc{html}
-directly into the message buffer.  Note that Slashdot filters out some
-@sc{html} forms.
+@code{nnslashdot} $B%3%a%s%H$K%U%)%m!<%"%C%W(B ($B?7$7$$%3%a%s%H$NEj9F(B) $B$r$9$k(B
+$B$H$-$O!">/$7(B @sc{html} $B$KJQ49$5$l$^$9!#FC$K!"(B@samp{> } $B$G0zMQ$5$l$?%F%-(B
+$B%9%H$O$=$NBe$o$j$K(B @code{blockquote} $B$G0zMQ$5$l!"=pL>$K$O$=$l$>$l$N9T$N(B
+$B:G8e$K(B @code{br} $B$,DI2C$5$l$^$9!#$=$l0J30$O!"%a%C%;!<%8%P%C%U%!$KD>@\(B
+@sc{html} $B$r=q$/$3$H$,$G$-$^$9!#(BSlashdot $B$O$$$/$D$+(B @sc{html} $B$rA*JL$9$k(B
+$B$3$H$K5$$r$D$1$F$/$@$5$$!#(B
 
-The following variables can be altered to change its behavior:
+$B0J2<$NJQ?t$G?6$kIq$$$rJQ$($k$3$H$,$G$-$^$9(B:
 
 @table @code
 @item nnslashdot-threaded
-Whether @code{nnslashdot} should display threaded groups or not.  The
-default is @code{t}.  To be able to display threads, @code{nnslashdot}
-has to retrieve absolutely all comments in a group upon entry.  If a
-threaded display is not required, @code{nnslashdot} will only retrieve
-the comments that are actually wanted by the user.  Threading is nicer,
-but much, much slower than untreaded.
+@code{nnslashdot} $B$,%0%k!<%W$r%9%l%C%I$GI=<($9$k$+$I$&$+!#=i4|CM$O(B
+@code{t} $B$G$9!#%9%l%C%I$rI=<($G$-$k$?$a$K$O!"(B@code{nnslashdot} $B$O%0%k!<(B
+$B%W$KF~$k:]$K$=$NA4$F$N%3%a%s%H$r<hF@$9$kI,MW$,$"$j$^$9!#%9%l%C%II=<($,MW(B
+$B5a$5$l$F$$$J$$$H!"(B@code{nnslashdot} $B$OMxMQ<T$,M_$7$$%3%a%s%H$@$1$r<hF@$7(B
+$B$^$9!#%9%l%C%I$NJ}$,$-$l$$$G$9$,!"%9%l%C%IL5$7I=<($h$j!"$:$C$H$:$C$HCY$/(B
+$B$J$j$^$9!#(B
 
 @item nnslashdot-login-name
 @vindex nnslashdot-login-name
-The login name to use when posting.
+$BEj9F;~$K;H$&%m%0%$%sL>$G$9!#(B
 
 @item nnslashdot-password
 @vindex nnslashdot-password
-The password to use when posting.
+$BEj9F;~$K;H$&%Q%9%o!<%I$G$9!#(B
 
 @item nnslashdot-directory
 @vindex nnslashdot-directory
-Where @code{nnslashdot} will store its files.  The default value is
-@samp{~/News/slashdot/}.
+@code{nnslashdot} $B$,%U%!%$%k$rJ]B8$9$k>l=j$G$9!#=i4|CM$O(B 
+@samp{~/News/slashdot/} $B$G$9!#(B
 
 @item nnslashdot-active-url
 @vindex nnslashdot-active-url
-The @sc{url} format string that will be used to fetch the information on 
-news articles and comments.  The default is
-@samp{http://slashdot.org/search.pl?section=&min=%d}.
+$B%K%e!<%95-;v$H%3%a%s%H$r<hF@$9$k$?$a$K;H$o$l$k(B @sc{url} $B$NJ8;zNs$G$9!#=i(B
+$B4|CM$O(B @samp{http://slashdot.org/search.pl?section=&min=%d} $B$G$9!#(B
 
 @item nnslashdot-comments-url
 @vindex nnslashdot-comments-url
-The @sc{url} format string that will be used to fetch comments.  The
-default is
-@samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=%d&mode=flat&startat=%d}.
+$B%3%a%s%H$r<hF@$9$k$?$a$K;HMQ$5$l$k(B @sc{url} $BJ8;zNs$G$9!#=i4|CM$O(B
+@samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=%d&mode=flat&startat=%d}
+$B$G$9!#(B
 
 @item nnslashdot-article-url
 @vindex nnslashdot-article-url
-The @sc{url} format string that will be used to fetch the news article.  The
-default is
-@samp{http://slashdot.org/article.pl?sid=%s&mode=nocomment}.
+$B%K%e!<%95-;v$r<hF@$9$k$?$a$K;H$o$l$k(B @sc{url} $BJ8;zNs$G$9!#=i4|CM$O(B
+@samp{http://slashdot.org/article.pl?sid=%s&mode=nocomment} $B$G$9!#(B
 
 @item nnslashdot-threshold
 @vindex nnslashdot-threshold
-The score threshold.  The default is -1.
+$B%9%3%"$N$7$-$$CM$G$9!#=i4|CM$O(B -1 $B$G$9!#(B
 
 @item nnslashdot-group-number
 @vindex nnslashdot-group-number
-The number of old groups, in addition to the ten latest, to keep
-updated.  The default is 0.
+$B:G?7$N(B10$B$K2C$($F99?7$rB3$1$k8E$$%0%k!<%W$N?t$G$9!#=i4|CM$O(B 0 $B$G$9!#(B
 
 @end table
 
@@ -11552,26 +11526,26 @@ updated.  The default is 0.
 @cindex nnultimate
 @cindex Ultimate Bulletin Board
 
-The Ultimate Bulletin Board (@file{http://www.ultimatebb.com/}) is
-probably the most popular Web bulletin board system used.  It has a
-quite regular and nice interface, and it's possible to get the
-information Gnus needs to keep groups updated.
+Ultimate Bulletin Board (@file{http://www.ultimatebb.com/}) $B$O$*$=$i$/0l(B
+$BHVNI$/;H$o$l$F$$$k%&%'%V7G<(HD%7%9%F%`$G$7$g$&!#$H$F$b@0A3$H$7$FNI$$3&LL(B
+$B$G!"(Bgnus $B$,%0%k!<%W$r:G?7$N>uBV$KJ]$C$F$*$/$?$a$K>pJs$rF@$k$3$H$,2DG=$G(B
+$B$9!#(B
 
-The easiest way to get started with @code{nnultimate} is to say
-something like the following in the group buffer:  @kbd{B nnultimate RET 
-http://www.tcj.com/messboard/ubbcgi/ RET}.  (Substitute the @sc{url}
-(not including @samp{Ultimate.cgi} or the like at the end) for a forum
-you're interested in; there's quite a list of them on the Ultimate web
-site.)  Then subscribe to the groups you're interested in from the
-server buffer, and read them from the group buffer.
+@code{nnultimate} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
+$B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{B nnultimate RET
+http://www.tcj.com/messboard.ubbcgi/ RET}$B!#(B($B6=L#$N$"$k2q5D<<$N(B @sc{url}
+(@samp{Ultimate.cgi} $BEy$r:G8e$K4^$s$G$$$J$$$b$N(B) $B$KJQ$($F$/$@$5$$!#(B
+Ultimate $B%&%'%V%5%$%H$K$O$?$/$5$s5s$2$i$l$F$$$^$9!#(B) $B$=$l$+$i%5!<%P!<%P%C(B
+$B%U%!$G6=L#$N$"$k%0%k!<%W$r9XFI$7!"%0%k!<%W%P%C%U%!$+$i$=$l$i$rFI$s$G$/$@(B
+$B$5$$!#(B
 
-The following @code{nnultimate} variables can be altered:
+$B0J2<$N(B @code{nnutimate} $BJQ?t$rJQ992DG=$G$9(B:
 
 @table @code
 @item nnultimate-directory
 @vindex nnultimate-directory
-The directory where @code{nnultimate} stores its files.  The default is
-@samp{~/News/ultimate/}.
+@code{nnultimate} $B$,%U%!%$%k$rJ]B8$9$k%G%#%l%/%H%j!<$G$9!#=i4|CM$O(B
+@samp{~/News/ultimate/} $B$G$9!#(B
 @end table
 
 @node Web Archive
@@ -11579,33 +11553,33 @@ The directory where @code{nnultimate} stores its files.  The default is
 @cindex nnwarchive
 @cindex Web Archive
 
-Some mailing lists only have archives on Web servers, such as
-(@file{http://www.egroups.com/}). It has a quite regular and nice
-interface, and it's possible to get the information Gnus needs to keep
-groups updated.
+$B%a!<%j%s%0%j%9%H$NCf$K$ONc$($P!"(B @file{http://www.egroups.com/} $B$N$h$&$K(B
+$B%&%'%V%5!<%P!<$K$7$+%"!<%+%$%V$,L5$$$b$N$b$"$j$^$9!#$H$F$b@0A3$H$7$FNI$$(B
+$B3&LL$G!"(Bgnus $B$,%0%k!<%W$r:G?7$N>uBV$KJ]$C$F$*$/$?$a$K>pJs$rF@$k$3$H$,2D(B
+$BG=$G$9!#(B
 
-The easiest way to get started with @code{nnwarchive} is to say
-something like the following in the group buffer: @kbd{M-x
-gnus-group-make-nnwarchive-group RET an_egroup RET egroups RET
-www.egroups.com RET your@@email.address RET}.  (Substitute the
-@sc{an_egroup} with the mailing list you subscribed, the
-@sc{your@@email.address} with your email address.)
 
-The following @code{nnwarchive} variables can be altered:
+@code{nnwarchive} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
+$B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{M-x gnus-group-make-nnwarchive-group RET
+an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
+(@sc{an_egroup} $B$r9XFI$7$F$$$k%a!<%j%s%0%j%9%H$K!"(B
+@sc{your@@emailaddress} $B$rEE;R%a!<%k%"%I%l%9$KCV$-49$($F$/$@$5$$!#(B)
+
+$B0J2<$N(B @code{nnwarchive} $BJQ?t$rJQ$($k$3$H$,2DG=$G$9(B:
 
 @table @code
 @item nnwarchive-directory
 @vindex nnwarchive-directory
-The directory where @code{nnwarchive} stores its files.  The default is
-@samp{~/News/warchive/}.
+@code{nnwarchive} $B$,%U%!%$%k$rJ]B8$9$k%G%#%l%/%H%j!<$G$9!#=i4|CM$O(B 
+@samp{~/News/warchive} $B$G$9!#(B
 
 @item nnwarchive-login
 @vindex nnwarchive-login
-The account name on the web server.
+$B%&%'%V%5!<%P!<$G$N%"%+%&%s%HL>$G$9!#(B
 
 @item nnwarchive-passwd
 @vindex nnwarchive-passwd
-The password for your account on the web server.
+$B%&%'%V%5!<%P!<$G$N%"%+%&%s%H$N%Q%9%o!<%I$G$9!#(B
 @end table
 
 @node Other Sources
@@ -11622,7 +11596,7 @@ Gnus $B$O$?$@C1$K%K%e!<%9$d%a!<%k$rFI$`0J>e$N$3$H$,$G$-$^$9!#0J2<(B
 * Document Groups::       $B8DJL$N%U%!%$%k72$O%0%k!<%W$NAG!#(B
 * SOUP::                  @sc{soup} $B%Q%1%C%H$r(B ``$B%*%U%i%$%s(B''$B$GFI$`!#(B
 * Mail-To-News Gateways:: $B%a!<%k$+$i%K%e!<%9$X$N%2!<%H%&%'%$$rDL$7$F5-;v$rEj9F$9$k!#(B
-* IMAP::                  Using Gnus as a @sc{imap} client.
+* IMAP::                  Gnus $B$r(B IMAP $B$N%/%i%$%"%s%H$H$7$F;H$&!#(B
 @end menu
 
 
@@ -12316,44 +12290,43 @@ To: alt-religion-emacs@@GATEWAY
 
 
 @node IMAP
-@subsection @sc{imap}
+@subsection IMAP
 @cindex nnimap
-@cindex @sc{imap}
+@cindex IMAP
 
-@sc{imap} is a network protocol for reading mail (or news, or ...), think of
-it as a modernized @sc{nntp}. Connecting to a @sc{imap} server is much similar to
-connecting to a news server, you just specify the network address of the
-server.
+IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C%H%o!<(B
+$B%/%W%m%H%3%k$G$9!#8=BeIw$N(B NNTP $B$H9M$($F$/$@$5$$!#(BIMAP $B%5!<%P!<$X$N@\B3(B
+$B$O%K%e!<%9%5!<%P!<$X$N@\B3$HHs>o$K;w$F$$$F!"$=$N%5!<%P!<$N%M%C%H%o!<%/%"(B
+$B%I%l%9$r;XDj$9$k$@$1$K$J$C$F$$$^$9!#(B
 
-The following variables can be used to create a virtual @code{nnimap}
-server:
+$B0J2<$KJQ?t$O2>A[(B @code{nnimap} $B%5!<%P!<$r:n@.$9$k$?$a$K;H$&$3$,$G$-$^$9!#(B
 
 @table @code
 
 @item nnimap-address
 @vindex nnimap-address
 
-The address of the remote @sc{imap} server. Defaults to the virtual server
-name if not specified.
+$B1s3V(B IMAP $B%5!<%P!<$N%"%I%l%9$G$9!#;XDj$5$l$F$$$J$$>l9g$O2>A[%5!<%P!<$N$b(B
+$B$N$K$J$j$^$9!#(B
 
 @item nnimap-server-port
 @vindex nnimap-server-port
-Port on server to contact. Defaults to port 143, or 993 for SSL.
+$B@\B3$r;n$_$k%5!<%P!<$N%]!<%H$G$9!#=i4|CM$G$O!"%]!<%H(B 143 $B$+!"(BSSL $B$G$O(B
+993 $B$G$9!#(B
 
 @item nnimap-list-pattern
 @vindex nnimap-list-pattern
-String or list of strings of mailboxes to limit available groups
-to. This is used when the server has very many mailboxes and you're only
-interested in a few -- some servers export your home directory via @sc{imap},
-you'll probably want to limit the mailboxes to those in @file{~/Mail/*}
-then.
+$B;HMQ2DG=$J%a!<%k%\%C%/%9$r@)8B$9$k$?$a$NJ8;zNs$+%j%9%H$G$9!#$3$l$O!"%5!<(B
+$B%P!<$KHs>o$KB?$/$N%a!<%k%\%C%/%9$,$"$k$1$l$I!"6=L#$N$"$k$b$N$O>/$7$@$1$G(B
+$B$"$k$H$-$K;HMQ$7$^$9!#%5!<%P!<$K$O%[!<%`%G%#%l%/%H%j!<$r(B IMAP $B7PM3$G=P$9(B
+$B$b$N$b$"$j$^$9$N$G!"$=$N>l9g$O$*$=$i$/%a!<%k%\%C%/%9$r(B @file{~/Mail/*} 
+$B$K@)8B$7$?$$$G$7$g$&!#(B
 
-The string can also be a cons of REFERENCE and the string as above, what
-REFERENCE is used for is server specific, but on the University of
-Washington server it's a directory that will be concatenated with the
-mailbox.
+$BJ8;zNs$O(B REFERENCE $B$H>e$NJ8;zNs$H$N(B cons $B$G$"$k$3$H$b$G$-$^$9!#$I$N(B 
+REFERENCE $B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<$G(B
+$B$O!"%a!<%k%\%C%/%9$HO"7k$5$l$?%G%#%l%/%H%j!<$G$9!#(B
 
-Example:
+$BNc$($P(B:
 
 @lisp
 ("INBOX" "Mail/*" "alt.sex.*" ("~friend/Mail/" . "list/*"))
@@ -12361,92 +12334,95 @@ Example:
 
 @item nnimap-stream
 @vindex nnimap-stream
-The type of stream used to connect to your server. By default, nnimap
-will use the most secure stream your server is capable of.
+$B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H!<%j%`$N7?$G$9!#=i4|@_Dj$G$O!"(Bnnimap
+$B$O%5!<%P!<$,BP1~$7$($$$k0lHV0BA4$J%9%H%j!<%`$r;H$$$^$9!#(B
 
 @itemize @bullet
 @item
-@dfn{kerberos4:} Uses the `imtest' program.
+@dfn{kerberos4:} `imtest' $B%W%m%0%i%`$r;H$$$^$9!#(B
 @item
-@dfn{ssl:} Uses OpenSSL or SSLeay.
+@dfn{ssl:} OpenSSL $B$+(B SSLeay $B$r;H$$$^$9!#(B
 @item
-@dfn{network:} Plain, TCP/IP network connection.
+@dfn{network:} $B@8$N!"(BTCP/IP $B$N%M%C%H%o!<%/@\B3$G$9!#(B
 @end itemize
 
 @item nnimap-authenticator
 @vindex nnimap-authenticator
 
-The authenticator used to connect to the server. By default, nnimap will
-use the most secure authenticator your server is capable of.
+$B%5!<%P!<$K@\B3$9$k$?$a$K;H$o$l$kG'>Z$G$9!#=i4|@_Dj$G$O!"(Bnnimap $B$O%5!<%P!<(B
+$B$,;HMQ2DG=$J0lHV0BA4$JG'>Z$r;HMQ$7$^$9!#(B
 
 @itemize @bullet
 @item
-@dfn{kerberos4:} Kerberos authentication.
+@dfn{kerberos4:} Kerberos $BG'>Z$G$9!#(B
 @item
-@dfn{cram-md5:} Encrypted username/password via CRAM-MD5.
+@dfn{cram-md5:} CRAM-MD5 $B$G0E9f2=$5$l$?(B $BMxMQ<TL>(B/$B%Q%9%o!<%I(B $B$G$9!#(B
 @item
-@dfn{login:} Plain-text username/password via LOGIN.
+@dfn{login:} LOGIN $B7PM3$G$N@8$N(B $BMxMQ<TL>(B/$B%Q%9%o!<%I(B $B$G$9!#(B
 @item
-@dfn{anonymous:} Login as `anonymous', supplying your emailadress as password.
+@dfn{anonymous:} $BEE;R%a!<%k%"%I%l%9$r%Q%9%o!<%I$H$7!"(B`anonymous' $B$H$7$F(B
+$B%m%0%$%s$7$^$9!#(B
 @end itemize
 
 @item nnimap-expunge-on-close
 @cindex Expunging
 @vindex nnimap-expunge-on-close
-Unlike Parmenides the @sc{imap} designers has decided that things that
-doesn't exist actually does exist. More specifically, @sc{imap} has this
-concept of marking articles @code{Deleted} which doesn't actually delete
-them, and this (marking them @code{Deleted}, that is) is what nnimap
-does when you delete a article in Gnus (with @kbd{G DEL} or similair).
+@c What does Parmenides mean?
 
-Since the articles aren't really removed when we mark them with the
-@code{Deleted} flag we'll need a way to actually delete them. Feel like
-running in circles yet?
+Parmenides $B$H0c$C$F!"(BIMAP $B$N@_7W<TC#$O!"B8:_$7$F$$$J$$$b$N$,<B:]$K$OB8:_(B
+$B$7$F$$$k$H7h$a$^$7$?!#$b$C$H>\$7$/@bL@$9$k$H!"(BIMAP $B$O<B:]$K$O5-;v$r>C5n(B
+$B$7$J$$!"5-;v$K(B @code{Deleted} $B$H$$$&0u$rIU$1$k35G0$,$"$j!"$3$l(B ($B$($C$H!"(B
+@code{Deleted} $B$H$$$&0u$rIU$1$k$3$H$G$9(B) $B$,(B nnimap $B$,(B Gnus $B$G5-;v$r>C5n(B
+$B$9$k$H$-$K$9$k$3$H$G$9(B (@kbd{G DEL} $B$J$I$G(B)$B!#(B
 
-Traditionally, nnimap has removed all articles marked as @code{Deleted}
-when closing a mailbox but this is now configurable by this server
-variable.
+$B5-;v$r(B @code{Deleted} $B%U%i%0$G0u$rIU$1$?$H$-$K$OK\Ev$O>C5n$5$l$F$$$J$$$N(B
+$B$G!"<B:]$K>C5n$9$k$?$a$NJ}K!$,I,MW$H$J$j$^$9!#=[4D$7$F$$$k$h$&$K46$8$^$9(B
+$B$+(B?
 
-The possible options are:
+$BEAE}E*$K!"(Bnnimap $B$O%a!<%k%\%C%/%9$rJD$8$k$H$-$K(B @code{Deleted} $B$H$$$&0u(B
+$B$NIU$$$?A4$F$N5-;v$r>C5n$7$F$-$^$7$?$,!":#$O%5!<%P!<JQ?t$K$h$j@_Dj2DG=$G(B
+$B$9!#(B
+
+$BA*Br;h$O(B:
 
 @table @code
 
 @item always
-The default behaviour, delete all articles marked as "Deleted" when
-closing a mailbox.
+$B=i4|@_Dj$N?6Iq$$!"%a!<%k%\%C%/%9$rJD$8$k$H$-$K(B @code{Deleted} $B$H0u$NIU$$(B
+$B$?5-;v$r>C5n$7$^$9!#(B
 @item never
-Never actually delete articles. Currently there is no way of showing the
-articles marked for deletion in nnimap, but other @sc{imap} clients may allow
-you to do this. If you ever want to run the EXPUNGE command manually,
-@xref{Expunging mailboxes}.
+$B7h$7$F5-;v$r>C5n$7$^$;$s!#8=:_$O!">C5n$N0u$,IU$$$?5-;v$r(B nnimap $B$GI=<($9(B
+$B$kJ}K!$O$"$j$^$;$s$,!"B>$N(B IMAP $B%/%i%$%"%s%H$O$G$O$G$-$k$+$b$7$l$^$;$s!#(B
+$B<j$G(B EXPUNGE $B%3%^%s%I$rH/9T$7$?$$$H$-$O!"(B@xref{Expunging mailboxes}$B!#(B
 @item ask
-When closing mailboxes, nnimap will ask if you wish to expunge deleted
-articles or not.
+$B%a!<%k%\%C%/%9$rJD$8$k$H$-$K!"(Bnnimap $B$,>C5n$5$l$?5-;v$r:o=|$9$k$+$I$&$+(B
+$B$r?R$M$^$9!#(B
 @end table
 
 @end table
 
 @menu
-* Splitting in IMAP::     Splitting mail with nnimap.
-* Editing IMAP ACLs::     Limiting/enabling other users access to a mailbox.
-* Expunging mailboxes::   Equivalent of a "compress mailbox" button.
+* Splitting in IMAP::     nnimap $B$G%a!<%k$rJ,3d$9$k(B.
+* Editing IMAP ACLs::     $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B/$B5v2D(B
+                            $B$9$k(B.
+* Expunging mailboxes::   "$B%a!<%k%\%C%/%905=L(B" $B%\%?%s$HEy2A$J$b$N(B.
 @end menu
 
 
 
 @node Splitting in IMAP
-@subsubsection Splitting in @sc{imap}
+@subsubsection IMAP $B$G$NJ,3d(B
 @cindex splitting imap mail
 
-Splitting is something Gnus users has loved and used for years, and now
-the rest of the world is catching up. Yeah, dream on, not many @sc{imap}
-server has server side splitting and those that have splitting seem to
-use some non-standard protocol. This means that @sc{imap} support for Gnus
-has to do it's own splitting.
+$BJ,3d$O(B gnus $B$NMxMQ<T$,2?G/$b$N4V0&$7$F$-$?$b$N$G!":#$d;D$j$N@$3&$bDI$$$D(B
+$B$3$&$H$7$F$$$^$9!#$O$$!"A[A|$7$F$/$@$5$$!"(BIMAP $B%5!<%P!<$N$J$+$K%5!<%P!<(B
+$BB&$GJ,3d$G$-$k$b$N$O$"$^$jB?$/$J$/!"$7$+$b$=$l$i$OI8=`$G$J$$%W%m%H%3%k$r(B
+$B;H$C$F$$$k$h$&$G$9!#$3$l$O!"(Bgnus $B$N(B IMAP $B%5%]!<%H$O<+J,<+?H$GJ,3d$r$7$J(B
+$B$1$l$P$J$i$J$$$H$$$&$3$H$G$9!#(B
 
-And it does.
+$B$=$7$F<B:]$K$7$^$9!#(B
 
-There are three variables of interest:
+$B4XO"$9$kJQ?t$O(B3$B$D$G$9(B:
 
 @table @code
 
@@ -12455,36 +12431,36 @@ There are three variables of interest:
 @cindex crosspost
 @vindex nnimap-split-crosspost
 
-If non-nil, do crossposting if several split methods match the mail. If
-nil, the first match in @code{nnimap-split-rule} found will be used.
+nil $B$G$J$1$l$P!"$$$/$D$+$NJ,3dJ}K!$,%a!<%k$H9gCW$7$?$H$-$KAj8_Ej9F$r$7$^(B
+$B$9!#(Bnil $B$J$i$P!"(B@code{nnimap-split-rule} $B$G:G=i$K8+$D$+$C$?$b$N$,;H$o$l(B
+$B$^$9!#(B
 
-Nnmail equivalent: @code{nnmail-crosspost}.
+Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-crosspost}.
 
 @item nnimap-split-inbox
 @cindex splitting, inbox
 @cindex inbox
 @vindex nnimap-split-inbox
 
-A string or a list of strings that gives the name(s) of @sc{imap} mailboxes
-to split from. Defaults to nil, which means that splitting is disabled!
+$BJ,3d$N85$H$J$k(B IMAP $B$N%a!<%k%\%C%/%9$NL>A0$r;XDj$7$?J8;zNs$+J8;zNs$N%j%9(B
+$B%H$G$9!#=i4|CM$O(B nil $B$G!"J,3d$O;HMQ$7$J$$$h$&$K$J$C$F$$$^$9(B!
 
 @lisp
 (setq nnimap-split-inbox '("INBOX" ("~/friend/Mail" . "lists/*") "lists.imap"))
 @end lisp
 
-No nnmail equivalent.
+Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 
 @item nnimap-split-rule
 @cindex Splitting, rules
 @vindex nnimap-split-rule
 
-New mail found in @code{nnimap-split-inbox} will be split according to
-this variable.
+@code{nnimap-split-inbox} $B$G8+$D$+$C$??7$7$$%a!<%k$O$3$NJQ?t$K=>$C$FJ,3d(B
+$B$5$l$^$9!#(B
 
-This variable contains a list of lists, where the first element in the
-sublist gives the name of the @sc{imap} mailbox to move articles matching the
-regexp in the second element in the sublist. Got that? Neither did I, we
-need examples.
+$B$3$NJQ?t$O%j%9%H$N%j%9%H$+$i@.$j$^$9!#I{%j%9%H$N:G=i$NMWAG$O(B IMAP $B$N%a!<(B
+$B%k%\%C%/%9$G!"(B2$B$D$a$NMWAG$N@55,I=8=$K9gCW$7$?5-;v$N0\F0@h$r;XDj$7$^$9!#(B
+$B$o$+$j$^$7$?$+(B? $B$$$$$(!";d$b$o$+$j$^$;$s!#Nc$,I,MW$G$9!#(B
 
 @lisp
 (setq nnimap-split-rule
@@ -12493,72 +12469,70 @@ need examples.
           ("INBOX.private"       "")))
 @end lisp
 
-This will put all articles from the nnimap mailing list into mailbox
-INBOX.nnimap, all articles containing MAKE MONEY in the Subject: line
-into INBOX.spam and everything else in INBOX.private.
+$B$3$l$O(B nnimap $B%a!<%j%s%0%j%9%H$+$i$NA4$F$N5-;v$r%a!<%k%\%C%/%9(B
+INBOX.nnimap $B$KF~$l!"(BSubject: $B9T$K(B MAKE MONEY $B$N$"$kA4$F$N5-;v$r(B
+INBOX.spam $B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $B$KF~$l$^$9!#(B
 
-The first string may contain `\\1' forms, like the ones used by
-replace-match to insert sub-expressions from the matched text. For
-instance:
+$B:G=i$NJ8;zNs$O!"(Breplace-match $B$G9gCW$7$?%F%-%9%H$+$iI{I=8=$rA^F~$9$k$H$-(B
+$B$K;HMQ$5$l$k$N$HF1$8$h$&$J!"(B`\\1' $B7A<0$r4^$`$3$H$,$G$-$^$9!#Nc$($P(B:
 
 @lisp
-("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
+          ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@")
 @end lisp
 
-The second element can also be a function. In that case, it will be
-called with the first element of the rule as the argument, in a buffer
-containing the headers of the article. It should return a non-nil value
-if it thinks that the mail belongs in that group.
+2$B$DL\$NMWAG$O4X?t$G$"$k$3$H$b$G$-$^$9!#$=$N>l9g$O!"5-;v$N%X%C%@!<$,$"$k(B
+$B%P%C%U%!$G!"$=$N5,B'$N:G=i$NMWAG$r0z?t$H$7$F8F$P$l$^$9!#%a!<%k$,$=$N%0%k!<(B
+$B%W$KB0$9$k$H9M$($k>l9g$O!"(Bnil $B$G$J$$CM$rJV$9I,MW$,$"$j$^$9!#(B
 
-Nnmail users might recollect that the last regexp had to be empty to
-match all articles (like in the example above). This is not required in
-nnimap. Articles not matching any of the regexps will not be moved out
-of your inbox. (This might might affect performance if you keep lots of
-unread articles in your inbox, since the splitting code would go over
-them every time you fetch new mail.)
+Nnmail $B$NMxMQ<T$O:G8e$N@55,I=8=$OA4$F$N5-;v$K9gCW$9$k$h$&$K6u$G$J$/$F$O(B
+$B$J$i$J$$$3$H$r3P$($F$$$k$+$b$7$l$^$;$s(B ($B>e$NNc$N$h$&$K(B)$B!#(B $B$3$l$O(B nnimap
+$B$G$OI,MW$G$O$"$j$^$;$s!#@55,I=8=$N$I$l$K$b9gCW$7$J$$5-;v$O(B inbox $B$+$i0\(B
+$BF0$5$l$^$;$s!#(B(inbox $B$KL$FI5-;v$rBgNL$KCV$$$F$*$/$H!"J,3d$N%3!<%I$O?7$7(B
+$B$$%a!<%k$r<hF@$9$k$H$-$K$=$l$iA4$F$rD4$Y$k$N$G!"<B9TB.EY$K1F6A$9$k2DG=@-(B
+$B$,$"$j$^$9!#(B)
 
-These rules are processed from the beginning of the alist toward the
-end. The first rule to make a match will "win", unless you have
-crossposting enabled. In that case, all matching rules will "win".
+$B$3$l$i$N5,B'$OO"A[%j%9%H$N:G=i$+$i=*$j$K8~$+$C$F<B9T$5$l$^$9!#Aj8_Ej9F$,(B
+$B;HMQ2DG=$K$J$C$F$$$J$$$+$.$j!":G=i$K9gCW$7$?5,B'$,(B "$B>!$A(B" $B$^$9!#Aj8_Ej9F(B
+$B$r$7$F$$$k>l9g$O!"A4$F$N9gCW$7$?5,B'$,(B "$B>!$A(B" $B$^$9!#(B
 
-The splitting code tries to create mailboxes if it need too.
+$BJ,3d%3!<%I$OI,MW$J$i%a!<%k%\%C%/%9$r:n@.$7$^$9!#(B
 
-Nnmail equivalent: @code{nnmail-split-methods}.
+Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-split-methods}.
 
 @end table
 
 @node Editing IMAP ACLs
-@subsubsection Editing @sc{imap} ACLs
+@subsubsection IMAP $B$N(B ACL $B$rJT=8$9$k!#(B
 @cindex editing imap acls
 @cindex Access Control Lists
-@cindex Editing @sc{imap} ACLs
+@cindex Editing IMAP ACLs
 @kindex G l
 @findex gnus-group-nnimap-edit-acl
 
-ACL stands for Access Control List.  ACLs are used in @sc{imap} for limiting
-(or enabling) other users access to your mail boxes. Not all @sc{imap}
-servers support this, this function will give an error if it doesn't.
+ACL $B$O(B Access Control List ($B;HMQ@)8B0lMw(B) $B$NN,$G$9!#(BIMAP $B$G$O(B ACL $B$OB>$N(B
+$BMxMQ<T$K$h$k$"$J$?$N%a!<%k%\%C%/%9$N;HMQ$r@)8B(B ($B$b$7$/$O5v2D(B) $B$9$k$?$a$K(B
+$B;H$o$l$F$$$^$9!#(BIMAP $B%5!<%P!<A4$F$K$3$N5!G=$,$"$k$o$1$G$O$J$/!"L5$$%5!<(B
+$B%P!<$G$3$l$i$N4X?t$r;H$&$H%(%i!<$,H/@8$7$^$9!#(B
 
-To edit a ACL for a mailbox, type @kbd{G l}
-(@code{gnus-group-edit-nnimap-acl}) and you'll be presented with a ACL
-editing window with detailed instructions.
+$B%a!<%k%\%C%/%9$X$N(B ACL $B$rJT=8$9$k$?$a$K$O!"(B@kbd{G l} 
+(@code{gnus-group-edit-nnimap-acl}) $B$rF~NO$7$^$9!#$=$&$9$k$H!">\$7$$;X<((B
+$B$H$H$b$K(B ACL $BJT=8%&%#%s%I%&$,8=$l$^$9!#(B
 
-Some possible uses:
+$B;HMQ$NNc(B:
 
 @itemize @bullet
 @item
-Giving "anyone" the "lrs" rights (lookup, read, keep seen/unseen flags)
-on your mailing list mailboxes enables other users on the same server to
-follow the list without subscribing to it.
+$B%a!<%j%s%0%j%9%H$N%a!<%k%\%C%/%9$G(B "anyone" $B$K(B "lrs" $B5v2D(B (lookup, read,
+seen/unseen $B%U%i%0$NJ];}(B) $B$rM?$($k$3$H$G!"F1$8%5!<%P!<$NB>$NMxMQ<T$,$=$l(B
+$B$r9XFI$9$k$3$H$J$/FI$`$3$H$,$G$-$^$9!#(B
 @item
-At least with the Cyrus server, you are required to give the user
-"anyone" posting ("p") capabilities to have "plussing" work (that is,
-mail sent to user+mailbox@@domain ending up in the @sc{imap} mailbox
-INBOX.mailbox).
+$B>/$J$/$H$b(B Cyrus $B$N%5!<%P!<$K$*$$$F$O!"(B"plussing" $B$,F0:n$9$k$?$a$K(B ($B$D$^(B
+$B$j!"(Buser+mail@@domain $B$,(B INBOX.mailbox $B$H$$$&(B IMAP $B$N%a!<%k%\%C%/%9$K$J(B
+$B$k(B)$B!"MxMQ<T(B "anyone" $B$KEj9F(B ("p") $B$N5v2D$rM?$($kI,MW$,$"$j$^$9!#(B
 @end itemize
 
 @node Expunging mailboxes
-@subsubsection Expunging mailboxes
+@subsubsection $B%a!<%k%\%C%/%9$N:o=|(B
 @cindex expunging
 
 @cindex Expunge
@@ -12566,13 +12540,12 @@ INBOX.mailbox).
 @kindex G x
 @findex gnus-group-nnimap-expunge
 
-If you're using the @code{never} setting of @code{nnimap-expunge-close},
-you may want the option of expunging all deleted articles in a mailbox
-manually. This is exactly what @kbd{G x} does.
+@code{nnimap-expunge-close} $B$K(B @code{never} $B$r@_Dj$7$F$$$l$P!"%a!<%k%\%C(B
+$B%/%9$NA4$F$N>C5n$5$l$?5-;v$r<jF0$G:o=|$7$?$$$H;W$&$G$7$g$&!#(B@kbd{G x} $B$,(B
+$B$^$5$K$3$N$3$H$r$7$^$9!#(B
 
-Currently there is no way of showing deleted articles, you can just
-delete them.
-
+$B8=;~E@$G$O!">C5n$5$l$?5-;v$rI=<($9$kJ}K!$O$"$j$^$;$s!#$?$@>C5n$G$-$k$@$1(B
+$B$G$9!#(B
 
 
 @node Combined Groups
@@ -17194,7 +17167,7 @@ but at the common table.@*
 
 @menu
 * History::                        $B$I$&$d$C$F(B gnus $B$,:#F|$N$h$&$K$J$C$?$+!#(B
-* On Writing Manuals::             Why this is not a beginner's guide.
+* On Writing Manuals::             $B$J$<$3$l$,=i?4<TMQ$N0FFb$G$J$$$+!#(B
 * Terminology::                    $B2f!9$OK\Ev$KFq$7$$!"8l$N$h$&$J8l$r;H$&!#(B
 * Customization::                  $B$"$J$?$NMW5a$K1h$C$F(B gnus $B$r;EN)$F$k!#(B
 * Troubleshooting::                $B>e<j$/9T$+$J$+$C$?$H$-$K;n$9$+$b$7$l$J$$;v!#(B
@@ -17495,9 +17468,8 @@ Micro$oft---$B$"$!!#%"%^%A%e%"!#;d$O(B @emph{$B$b$C$H(B} $B0-$$!#(B ($B$b
 
 @item
 Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el, webmail.el,
-nnwarchive and many, many other things connected with @sc{mime} and
-other types of en/decoding, as well as general bug fixing, new
-functionality and stuff.
+nnwarchive $B$H(B @sc{mime} $B$HB>$N7A<0$NId9f2=(B/$BI|9f2=$d%P%0=$@5!"?7$7$$5!G=(B
+$B$J$I$N$[$s$H$&$KB?$/$N$b$N!#(B
 
 @item
 Per Abrahamsen--custom$B!"%9%3%"!"%O%$%i%$%H$H(B @sc{soup} $B%3!<%I(B ($BB>$NB?$/(B
@@ -19784,23 +19756,22 @@ Solve the halting problem.
 
 
 @node On Writing Manuals
-@section On Writing Manuals
+@section $B%^%K%e%"%k$r=q$/(B
 
-I guess most manuals are written after-the-fact; documenting a program
-that's already there.  This is not how this manual is written.  When
-implementing something, I write the manual entry for that something
-straight away.  I then see that it's difficult to explain the
-functionality, so I write how it's supposed to be, and then I change the 
-implementation.  Writing the documentation and writing the code goes
-hand in hand.
+$B$*$=$i$/!"$?$$$F$$$N%^%K%e%"%k$O;v<B$N8e$G=q$+$l$F$$$k$H;W$$$^$9!#$9$G$K(B
+$B$"$k%W%m%0%i%`$rJ8=q2=$7$F$$$^$9!#$3$N%^%K%e%"%k$O$=$&$$$&J}K!$G=q$+$l$F(B
+$B$$$^$;$s!#2?$+$r<BAu$9$k$H$-$O!"2?$+$r$=$N$^$^%^%K%e%"%k$N0l@a$K=q$-$^$9!#(B
+$B$=$l$+$i5!G=$N@bL@$,Fq$7$$$3$H$rH/8+$7$F!"$=$l$,$I$N$h$&$K$"$k$Y$-$G$"$k(B
+$B$+$r=q$-!"$=$l$+$i<BAu$rJQ99$7$^$9!#J8=q$H%3!<%I$r=q$/$N$O0l=o$K9T$J$o$l(B
+$B$F$$$-$^$9!#(B
 
-This, of course, means that this manual has no, or little, flow.  It
-documents absolutely everything in Gnus, but often not where you're
-looking for it.  It is a reference manual, and not a guide to how to get 
-started with Gnus.
+$B$b$A$m$s!"$3$l$O$3$N%^%K%e%"%k$K$ON.$l9=B$$,$[$H$s$IL5$$$+!"$"$C$F$b>/$7(B
+$B$@$H$$$&$3$H$G$9!#(Bgnus $B$N40A4$KA4$F$N$3$H$,@bL@$5$l$F$$$^$9$,!"C5$7$F$$(B
+$B$k>l=j$G$O$J$$$H$$$&$3$H$,$h$/$"$j$^$9!#$3$l$O%j%U%!%l%s%9%^%K%e%"%k$G$"(B
+$B$j!"(Bgnus $B$r;O$a$k$?$a$N<j0z$-$G$O$"$j$^$;$s!#(B
 
-That would be a totally different book, that should be written using the 
-reference manual as source material.  It would look quite differently.
+$B$=$l$O$^$C$?$/0c$C$?K\$K$J$j!"$3$N%j%U%!%l%s%9%^%K%e%"%k$r85$H$7$F;H$C$F(B
+$B=q$+$l$?$b$N$K$J$k$G$7$g$&!#$H$F$b0c$C$?$b$N$K$J$k$O$:$G$9!#(B
 
 
 @page
