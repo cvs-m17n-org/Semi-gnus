@@ -1286,9 +1286,8 @@ follows this line--} です。
 @lisp
 (add-hook 'message-send-hook 'my-message-add-content)
 (defun my-message-add-content ()
-  (message-add-header
-   "X-In-No-Sense: Nonsense"
-   "X-Whatever: no"))
+  (message-add-header "X-In-No-Sense: Nonsense")
+  (message-add-header "X-Whatever: no"))
 @end lisp
 
 この関数は、ヘッダーが既に存在している場合はヘッダーを加えません。

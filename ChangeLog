@@ -1,3 +1,7 @@
+2001-01-15  Jesper Harder <harder@ifa.au.dk>
+
+	* make.bat: Fix doc.
+
 2001-01-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnheader.el: Require `pces', `poem' and `std11' to reduce
