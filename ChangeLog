@@ -1,3 +1,10 @@
+1999-12-05  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-offline.el (gnus): New advice. synchronize
+	`gnus-offline-connected' with `gnus-plugged'.
+
 1999-12-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.14.0.
