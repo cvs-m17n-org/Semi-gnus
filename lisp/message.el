@@ -205,6 +205,11 @@ shorten-followup-to existing-newsgroups buffer-file-name unchanged
 newsgroups."
   :group 'message-news)
 
+(defcustom message-check-ignore-invisible-x-face-field t
+  "Non-nil means don't check for invisible X-Face fields before sending."
+  :type 'boolean
+  :group 'message-sending)
+
 (defcustom message-required-news-headers
   '(From Newsgroups Subject Date Message-ID
 	 (optional . Organization) Lines
@@ -2614,6 +2619,7 @@ It should typically alter the sending method in some way or other."
     (undo-boundary)
     (let ((inhibit-read-only t))
       (put-text-property (point-min) (point-max) 'read-only nil))
+    (message-fix-before-sending)
     (run-hooks 'message-send-hook)
     (message "Sending...")
     (let ((message-encoding-buffer
@@ -2628,7 +2634,6 @@ It should typically alter the sending method in some way or other."
 	(erase-buffer)
 	(insert-buffer message-edit-buffer)
 	(funcall message-encode-function)
-	(message-fix-before-sending)
 	(while (and success
 		    (setq elem (pop alist)))
 	  (when (or (not (funcall (cadr elem)))
@@ -2682,7 +2687,22 @@ It should typically alter the sending method in some way or other."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  ;; Delete all invisible text.
+  ;; Expose all invisible X-Face fields.
+  (when message-check-ignore-invisible-x-face-field
+    (message-narrow-to-headers)
+    (let ((inhibit-point-motion-hooks t)
+	  (case-fold-search t))
+      (while (not (eobp))
+	(if (looking-at "X-Face:")
+	    (put-text-property (point)
+			       (progn
+				 (while (progn (forward-line 1)
+					       (looking-at "[\t ]")))
+				 (point))
+			       'invisible nil)
+	  (forward-line 1))))
+    (widen))
+  ;; Expose all invisible text.
   (message-check 'invisible-text
     (when (text-property-any (point-min) (point-max) 'invisible t)
       (put-text-property (point-min) (point-max) 'invisible nil)
