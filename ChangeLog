@@ -1,3 +1,22 @@
+2002-07-03  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.31 (This is alpha status.)
+	Error on `Advanced Scoring', fixed.
+	Fix creation rule for In-Reply-To.
+	Sync up gnus-namazu.el with T-gnus. (I forgot commit it.  Sorry.)
+
+	* lisp/gnus-namazu.el: Sync up with T-gnus.
+
+	* lisp/message.el (message-subject-re-regexp): Modify matching
+	pattern.
+	(message-yank-original): Don't add new Messagd-Id to In-Reply-To
+	field when it was already exists.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.31.
+
+	* lisp/gnus-logic.el (gnus-advanced-index): Use
+	`luna-class-slot-index'.
+
 2002-01-22  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.30 (This is alpha status.)
