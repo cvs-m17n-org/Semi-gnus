@@ -1,3 +1,8 @@
+2001-04-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el: Enclose w3m stuff with `eval-and-compile';
+	bind `w3m-work-buffer-name' and `w3m-retrieve' when compiling.
+
 2001-04-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 10.

@@ -313,8 +313,12 @@ for a charset indication")
   (eval-and-compile
     (defalias-maybe 'coding-system-category 'get-code-mnemonic)))
 
-(if (and (ignore-errors (require 'w3m))
-	 (fboundp 'w3m-retrieve))
+(eval-when-compile
+  (defvar w3m-work-buffer-name)
+  (autoload 'w3m-retrieve "w3m"))
+(eval-and-compile
+  (if (and (ignore-errors (require 'w3m))
+	   (fboundp 'w3m-retrieve))
 ;; When w3m.el is available.
 (defun nnshimbun-retrieve-url (url &optional no-cache)
   "Rertrieve URL contents and insert to current buffer."
@@ -388,7 +392,7 @@ for a charset indication")
     (set-buffer buf)
     (insert-buffer url-working-buffer)
     (kill-buffer url-working-buffer)))
-)
+))
 
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)
