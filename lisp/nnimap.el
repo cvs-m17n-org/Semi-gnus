@@ -620,16 +620,17 @@ function is generally only called when Gnus is shutting down."
 	      (erase-buffer)
 	      (setq fetch-data (imap-fetch article part
 					   prop nil nnimap-server-buffer))
-	      (if (eq prop 'BODYDETAIL)
-		  (insert (nth 2 (car fetch-data)))
-		(insert fetch-data))
-	      (nnheader-ms-strip-cr)
-	      (gnus-message 9 "nnimap: Fetching (part of) article %d...done"
-			    article)
-	      (if (bobp)
-		  (nnheader-report 'nnimap "No such article: %s"
-				   (imap-error-text nnimap-server-buffer))
-		(cons group article)))
+	      (when fetch-data
+		(if (eq prop 'BODYDETAIL)
+		    (insert (nth 2 (car fetch-data)))
+		  (insert fetch-data))
+		(nnheader-ms-strip-cr)
+		(gnus-message 9 "nnimap: Fetching (part of) article %d...done"
+			      article)
+		(if (bobp)
+		    (nnheader-report 'nnimap "No such article: %s"
+				     (imap-error-text nnimap-server-buffer))
+		  (cons group article))))
 	  (add-hook 'imap-fetch-data-hook 'nnimap-callback)
 	  (setq nnimap-callback-callback-function nnheader-callback-function
 		nnimap-callback-buffer nntp-server-buffer)
