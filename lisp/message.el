@@ -1282,6 +1282,7 @@ Return the number of headers removed."
 
   (define-key message-mode-map "\t" 'message-tab)
 
+  (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
   (define-key message-mode-map "\C-xk" 'message-kill-buffer))
 
 (easy-menu-define
