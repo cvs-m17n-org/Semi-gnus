@@ -1237,7 +1237,7 @@ find-file-hooks, etc.
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
-  (defun std11-extract-addresses-components (string)
+  (defun-maybe std11-extract-addresses-components (string)
     "Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
 If no name can be extracted, FULL-NAME will be nil."
