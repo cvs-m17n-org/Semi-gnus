@@ -1,3 +1,7 @@
+1999-04-15  NAKAGAWA Tsuneo <yaemon@alles.or.jp>
+
+	* REDME.semi.ja: Fix where the required packages are.
+
 1999-04-13  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-sum.el (gnus-summary-move-article): Fix,
