@@ -1,7 +1,7 @@
 1998-11-14  Kenji Itoh  <keit@tpj.co.jp>
 
 	* lisp/nnmail.el (nnmail-read-passwd): Use `read-passwd' if it
-	exists as a functon.
+	exists as a function.
 
 	* lisp/pop3.el (nnmail-read-passwd): Likewise.
 
