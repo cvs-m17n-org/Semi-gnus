@@ -273,10 +273,8 @@ time saver for large mailboxes.")
 (deffoo nnfolder-request-list (&optional server)
   (nnfolder-possibly-change-group nil server)
   (save-excursion
-    (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (pathname-coding-system 'binary))
-      (nnmail-find-file nnfolder-active-file)
-      (setq nnfolder-group-alist (nnmail-get-active)))
+    (nnmail-find-active-file nnfolder-active-file)
+    (setq nnfolder-group-alist (nnmail-get-active))
     t))
 
 (deffoo nnfolder-request-newgroups (date &optional server)
@@ -534,7 +532,7 @@ deleted.  Point is left where the deleted region was."
   ;; Change group.
   (when (and group
 	     (not (equal group nnfolder-current-group)))
-    (let ((pathname-coding-system 'binary))
+    (let ((pathname-coding-system nnheader-pathname-coding-system))
       (nnmail-activate 'nnfolder)
       (when (and (not (assoc group nnfolder-group-alist))
 		 (not (file-exists-p
@@ -797,7 +795,8 @@ deleted.  Point is left where the deleted region was."
 
 (defun nnfolder-group-pathname (group)
   "Make pathname for GROUP."
-  (setq group (gnus-encode-coding-string group nnmail-pathname-coding-system))
+  (setq group (gnus-encode-coding-string group
+					 nnheader-pathname-coding-system))
   (let ((dir (file-name-as-directory (expand-file-name nnfolder-directory))))
     ;; If this file exists, we use it directly.
     (if (or nnmail-use-long-file-names
