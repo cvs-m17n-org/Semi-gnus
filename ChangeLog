@@ -1,3 +1,10 @@
+1999-06-30  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
+
+	* lisp/gnus-spec.el (gnus-parse-simple-format): Ignore error in
+	`gnus-user-format-function-*'.
+
 1999-06-15  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-TIPS.ja: New section `Cancel sending message from hooks'.
