@@ -1,5 +1,8 @@
 1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (article-hide-headers): Show all headers when
+	unhiding.
+
 	* lisp/message.el (message-make-forward-subject): Use "(none)" if
 	the original article has no subject.
 
