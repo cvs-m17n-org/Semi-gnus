@@ -1,5 +1,13 @@
 2001-05-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el: Require `base64' if `base64-encode-string' is not a
+	built-in function.
+
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Ignore
+	`defgroup'.
+
+2001-05-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
 
 	* lisp/nnmail.el: Don't bind the colon keywords here.
@@ -10,6 +18,7 @@
 	(dgnushack-colon-keywords): New constant which will have the colon
 	keywords shuld be bound at run-time for old Emacsen; cache them in
 	the file dgnuskwds.el and bind them.
+	(dgnushack-bind-colon-keywords): New function.
 	(locate-library): Make the function to be silent for Mule.
 	* lisp/Makefile.in (clean): Remove dgnuskwds.el.
 
