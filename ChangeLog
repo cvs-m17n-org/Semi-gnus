@@ -1,3 +1,8 @@
+2003-03-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-yank-original): Check not only the
+	References field but the `message-reply-headers' variable.
+
 2003-03-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.16 revision 00.
