@@ -19,8 +19,8 @@
 	dgnushack-make-autoloads): New functions.
 	(dgnushack-install-package): Remove.
 	(dgnushack-compose-package): Rename from `dgnushack-make-package'.
-	(dgnushack-info-file-regexp-ja, dgnushack-info-file-regexp): Split
-	from `dgnushack-info-file-regexp'.
+	(dgnushack-info-file-regexp-ja, dgnushack-info-file-regexp-en):
+	Split from `dgnushack-info-file-regexp'.
 	(dgnushack-texi-file-regexp): Remove.
 
 2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
