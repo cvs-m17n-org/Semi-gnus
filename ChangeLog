@@ -1,3 +1,18 @@
+1999-08-02  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/Makefile.in (distclean): Remove dgnuspath.el instead of
+	paths.el.
+	(install): Don't install dgnuspath.el; don't touch the installed
+	files.
+
+1999-08-01  YAMAMOTO Kouji    <kouji@pobox.com>
+
+	* lisp/nnmail.el (nnmail-split-it): Don't compare ".*" and VALUE
+	of each element of `nnmail-split-fancy' if the length of VALUE is
+	less than 2.
+
 1999-07-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
