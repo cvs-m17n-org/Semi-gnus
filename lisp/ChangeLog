@@ -1,3 +1,18 @@
+2003-02-26  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el: add spam-stat-load to gnus-get-new-news-hook
+	(spam-split): remove spam-stat-load call
+
+2003-02-26  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-summary-toggle-header): Run
+	gnus-article-decode-hook instead of calling a-decode-encoded-words
+	directly (the latter is run as part of the former).
+
+2003-02-26  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-expire-group): Remove debug.
+
 2003-02-25  Jesper Harder  <harder@ifa.au.dk>
 
 	* message.el (message-sendmail-envelope-from): New option.
