@@ -1,3 +1,8 @@
+1999-05-28  Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/message.el (message-header-hook): Pass optional argument
+	code-conversion.
+
 1999-05-22  Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
 	    Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 

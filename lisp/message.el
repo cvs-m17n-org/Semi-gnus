@@ -513,7 +513,7 @@ The function `message-supersede' runs this hook."
   :group 'message-various
   :type 'hook)
 
-(defcustom message-header-hook '(eword-encode-header)
+(defcustom message-header-hook '(lambda () (eword-encode-header t))
   "Hook run in a message mode buffer narrowed to the headers."
   :group 'message-various
   :type 'hook)
