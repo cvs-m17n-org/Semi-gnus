@@ -1,3 +1,26 @@
+1999-12-24  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/mail-parse.el (mail-decode-encoded-word-region): Use
+	`mime-decode-header-in-region'.
+
+	* lisp/gnus-sum.el (TopLevel): Require `mcharset'.
+	(gnus-group-charset-alist): Use content of `default-mime-charset'
+	instead of `iso-8859-1' for default group charset.
+
+	* lisp/gnus-msg.el (gnus-setup-message): Restore to Gnus 5.8.2,
+	and use `default-mime-charset' instead of
+	`message-posting-charset'. (Do not need this part, probably.)
+
+	* lisp/gnus-art.el (gnus-decode-header-function): Use
+	`mail-decode-encoded-word-region'.
+	(article-decode-encoded-words): Bind `default-mime-charset'
+	instead of `mail-parse-charset'.
+
+	* Nana-gnus: Version 7.1.0.1 (This is very alpha status.)
+	See announcement of 7.1.0.0.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.1.
+
 1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/dgnushack.el (dgnushack-compile): Do not compile
