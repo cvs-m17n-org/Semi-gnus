@@ -1,5 +1,11 @@
 2002-11-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-summary-inherit-default-charset): Inherit
+	the value for `default-mime-charset-unlimited' as well.
+	(gnus-summary-setup-default-charset): Bind
+	`default-mime-charset-unlimited' to nil for nndraft:delayed or
+	nndraft:drafts groups.
+
 	* lisp/gnus-art.el (gnus-article-prepare-display): Don't use
 	MIME-View for nndraft:delayed or nndraft:drafts groups.
 	(gnus-article-decode-article-as-default-mime-charset): Don't

@@ -11127,23 +11127,37 @@ UNREAD is a sorted list."
 ;;;
 
 (defun gnus-summary-inherit-default-charset ()
-  "Import `default-mime-charset' from summary buffer."
+  "Import `default-mime-charset' from summary buffer.
+Also take care of `default-mime-charset-unlimited' if the LIMIT version
+of FLIM is used."
   (if (buffer-live-p gnus-summary-buffer)
-      (if (local-variable-p 'default-mime-charset gnus-summary-buffer)
-	  (progn
-	    (make-local-variable 'default-mime-charset)
-	    (setq default-mime-charset
-		  (with-current-buffer gnus-summary-buffer
-		    default-mime-charset)))
-	(kill-local-variable 'default-mime-charset))))
+      (let (d-m-c d-m-c-u)
+	(with-current-buffer gnus-summary-buffer
+	  (setq d-m-c (if (local-variable-p 'default-mime-charset
+					    gnus-summary-buffer)
+			  default-mime-charset
+			t)
+		;; LIMIT
+		d-m-c-u (if (local-variable-p 'default-mime-charset-unlimited
+					      gnus-summary-buffer)
+			    (symbol-value 'default-mime-charset-unlimited)
+			  t)))
+	(if (eq t d-m-c)
+	    (kill-local-variable 'default-mime-charset)
+	  (set (make-local-variable 'default-mime-charset) d-m-c))
+	(if (eq t d-m-c-u)
+	    (kill-local-variable 'default-mime-charset-unlimited)
+	  (set (make-local-variable 'default-mime-charset-unlimited)
+	       d-m-c-u)))))
 
 (defun gnus-summary-setup-default-charset ()
   "Setup newsgroup default charset."
   (if (member gnus-newsgroup-name '("nndraft:delayed" "nndraft:drafts"))
       (progn
 	(setq gnus-newsgroup-charset nil)
-	(make-local-variable 'default-mime-charset)
-	(setq default-mime-charset nil))
+	(set (make-local-variable 'default-mime-charset) nil)
+	(when (boundp 'default-mime-charset-unlimited);; LIMIT
+	  (set (make-local-variable 'default-mime-charset-unlimited) nil)))
     (let ((ignored-charsets
 	   (or gnus-newsgroup-ephemeral-ignored-charsets
 	       (append
