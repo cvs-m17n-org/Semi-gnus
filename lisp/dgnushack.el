@@ -58,7 +58,6 @@
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
 
 (push "." load-path)
-(load "./lpath.el" nil t)
 
 (condition-case nil
     (char-after)
@@ -79,6 +78,10 @@
      (if (null (cdr form))
 	 '(char-before (point))
        form))))
+
+;; `char-after' and `char-before' must be well-behaved before lpath.el
+;; is loaded.  Because it requires `poe' via `path-util'.
+(load "./lpath.el" nil t)
 
 (unless (fboundp 'byte-compile-file-form-custom-declare-variable)
   ;; Bind defcustom'ed variables.
