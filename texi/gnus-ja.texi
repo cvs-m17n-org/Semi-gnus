@@ -509,6 +509,7 @@ Other related manuals
 * Emacs-MIME:(emacs-mime).      Composing messages; @acronym{MIME}-specific parts.
 * Sieve:(sieve).                Managing Sieve scripts in Emacs.
 * PGG:(pgg).                    @acronym{PGP/MIME} with Gnus.
+* SASL:(sasl).                  @acronym{SASL} authentication in Emacs.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -18190,6 +18191,13 @@ File Editing})$B!#(B
 $B;DG0$J$,$i!"$^$@$?$/$5$s$O$"$j$^$;$s!#(B
 
 @table @kbd
+@item W e
+@kindex W e ($B%0%k!<%W(B)
+@findex gnus-score-edit-all-score
+$B$9$Y$F$N%0%k!<%W$KE,MQ$5$l$k(B all.SCORE $B%U%!%$%k$rJT=8$7$^$9!#%]%C%W%"%C(B
+$B%W$9$k(B @code{gnus-score-mode} $B$N%P%C%U%!$KF~$j$^$9(B (@pxref{Score File
+Editing})$B!#(B
+
 @item W f
 @kindex W f ($B%0%k!<%W(B)
 @findex gnus-score-flush-cache
@@ -19685,6 +19693,8 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 @include sieve.texi
 @c @chapter PGG
 @c @include pgg.texi
+@c @chapter SASL
+@c @include sasl.texi
 @end iflatex
 @end iftex
 
