@@ -1,5 +1,9 @@
 2001-09-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-art.el (gnus-request-article-this-buffer): Make a copy
+	of the requested article only when the current directory does noe
+	equal to `gnus-original-article-buffer'.
+
 	* lisp/gnus-art.el (gnus-request-article-this-buffer): Copy an
 	article from `gnus-original-article-buffer' to
 	`gnus-article-buffer'.  Generate `gnus-original-article-buffer'
