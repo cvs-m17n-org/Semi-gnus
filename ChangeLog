@@ -1,3 +1,8 @@
+1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Fix timing of
+	`save-restriction'.
+
 1999-12-21   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/imap.el (imap-streams,imap-stream-alist,
