@@ -6066,6 +6066,7 @@ Given a prefix, will force an `article' buffer configuration."
   "Display ARTICLE in article buffer."
   (when (gnus-buffer-live-p gnus-article-buffer)
     (with-current-buffer gnus-article-buffer
+      (set-buffer-multibyte t)))
       (mm-enable-multibyte-mule4)))
   (gnus-set-global-variables)
   (when (gnus-buffer-live-p gnus-article-buffer)

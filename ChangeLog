@@ -1,3 +1,8 @@
+2001-01-31  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-display-article): Replace
+	`mm-enable-multibyte-mule4' with `set-buffer-multibyte'.
+
 2001-01-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-mime-edit-exit): Use
