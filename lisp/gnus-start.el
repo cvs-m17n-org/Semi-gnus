@@ -1664,7 +1664,7 @@ newsgroup."
 	 (methods-cache nil)
 	 (type-cache nil)
 	 scanned-methods info group active method retrieve-groups cmethod
-	 method-type)
+	 method-type ignore)
     (gnus-message 6 "Checking new news...")
 
     (while newsrc
@@ -1701,6 +1701,7 @@ newsgroup."
 		     'foreign)))
 	(push (cons method method-type) type-cache))
 
+      (setq ignore nil)
       (cond ((and method (eq method-type 'foreign))
 	     ;; These groups are foreign.  Check the level.
 	     (if (<= (gnus-info-level info) foreign-level)
@@ -1715,7 +1716,7 @@ newsgroup."
 		   (when (fboundp (intern (concat (symbol-name (car method))
 						  "-request-update-info")))
 		     (inline (gnus-request-update-info info method))))
-	       (setq active nil)))
+	       (setq ignore t)))
 	    ;; These groups are native or secondary.
 	    ((> (gnus-info-level info) level)
 	     ;; We don't want these groups.
@@ -1755,7 +1756,8 @@ newsgroup."
 	;; Don't do anything.
 	)
        (active
-	(inline (gnus-get-unread-articles-in-group info active t)))
+	(unless ignore
+	  (inline (gnus-get-unread-articles-in-group info active t))))
        (t
 	;; The group couldn't be reached, so we nix out the number of
 	;; unread articles and stuff.
