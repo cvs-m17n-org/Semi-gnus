@@ -813,6 +813,7 @@ Browsing the Web
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B
                                 /$B5v2D$9$k(B
 * Expunging mailboxes::         "$B%a!<%k%\%C%/%905=L(B" $B%\%?%s$HEy2A$J$b$N(B
+* A note on namespaces::        gnus $B$G(B IMAP $BL>A06u4V$r;H$&(B($B;H$o$J$$(B)$BJ}K!(B
 
 Other Sources
 
@@ -14756,6 +14757,7 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 * Editing IMAP ACLs::           $B%a!<%k%\%C%/%9$X$NB>$NMxMQ<T$N;HMQ$r@)8B(B
                                 /$B5v2D$9$k(B
 * Expunging mailboxes::         "$B%a!<%k%\%C%/%905=L(B" $B%\%?%s$HEy2A$J$b$N(B
+* A note on namespaces::        gnus $B$G(B IMAP $BL>A06u4V$r;H$&(B($B;H$o$J$$(B)$BJ}K!(B
 @end menu
 
 @node Splitting in IMAP
@@ -14955,6 +14957,49 @@ ACL $B$O(B Access Control List ($B;HMQ@)8B0lMw(B) $B$NN,$G$9!#(B@sc{imap} 
 
 $B8=;~E@$G$O!">C5n$5$l$?5-;v$rI=<($9$kJ}K!$O$"$j$^$;$s!#$?$@>C5n$G$-$k$@$1(B
 $B$G$9!#(B
+
+@node A note on namespaces
+@subsection $BL>A06u4V$K4X$9$kCm0U(B
+@cindex IMAP namespace
+@cindex namespaces
+
+IMAP $B%W%m%H%3%k$K$OL>A06u4V(B (namespaces) $B$H8F$P$l$k35G0$,$"$j!"0J2<(B
+$B$N(B RFC2060 $B$NJ8=q$G5-=R$5$l$F$$$^$9!#(B
+
+@example
+5.1.2.  $B%a!<%k%\%C%/%9L>A06u4VL?L>5,B'(B
+
+   $B=,47$K$h$j(B "#" $B$G;O$^$C$F$$$k$9$Y$F$N%a!<%k%\%C%/%9L>$N:G=i$N3,AXMWAG(B
+   $B$O!";D$j$NL>A0$N(B "$BL>A06u4V(B" $B$r<($7$F$$$k!#$3$l$O!"$=$l$>$lFH<+$NL>A0(B
+   $B6u4V$r;}$D0[$J$k%a!<%k%\%C%/%9J]4I$N4V$G$N!"[#Kf$5$r<h$j=|$/$3$H$r2D(B
+   $BG=$K$9$k!#(B
+
+      $BNc$($P(B USENET $B%K%e!<%9%0%k!<%W$X$N%"%/%;%9$rDs6!$9$k<BAu$O!"(BUSENET
+      $B%K%e!<%9%0%k!<%WL>A06u4V$rB>$N%a!<%k%\%C%/%9$+$iJ,N%$9$k$?$a$K!"(B
+      "#news" $BL>A06u4V$rMQ$$$F$b$h$$!#$3$&$7$F(B comp.mail.misc $B%K%e!<%9%0(B
+      $B%k!<%W$O(B "#news.comp.mail.misc" $B$H$$$&%a!<%k%\%C%/%9L>$r;}$A!"L>A0(B
+      "comp.mail.misc" $B$OJL$N%*%V%8%'%/%H(B ($BNc$($P!"%f!<%6$N8D?M%a!<%k%\%C(B
+      $B%/%9(B) $B$r;X$9$3$H$O$"$j$&$k!#(B
+
+($BLuCp(B: http://kame.zit.to/~obata/imap/rfc/rfc2060ja.txt $B$h$jE>:\(B)
+@end example
+
+$B$3$3$K$O(B gnus $B$K$*$1$k(B IMAP $B$N<BAu$KBP$9$k4X78$rJ]>Z$9$kJ8=q$,L5$$$N$G$9(B
+$B$,!"$$$/$D$+$N%5!<%P!<$O(B gnus $B$N%a!<%k%\%C%/%9$NL>A0$N;H$$J}$G$OF0:n$7$J(B
+$B$$$d$jJ}$GL>A06u4V@\F,<-$r;H$C$F$$$^$9!#(B
+
+$B6qBNE*$K$O!"%o%7%s%H%sBg3X$N(B IMAP $B%5!<%P!<(B
+$B$O(B @code{#driver.mbx/read-mail} $B$N$h$&$J%a!<%k%\%C%/%9L>$r;H$C$F$$$F!"$=(B
+$B$l$O(B @sc{create} $B$H(B @sc{append} $B%3%^%s%I$G$@$1M-8z$G$9!#%a!<%k%\%C%/%9$,(B
+$B:n$i$l$?8e(B ($B$^$?$O%a%C%;!<%8$,%a!<%k%\%C%/%9$KDI2C$5$l$?8e(B) $B$G$O!"$=$l$O(B
+$BL>A06u4V@\F,<-$rIU$1$:$K%"%/%;%9!"$9$J$o$A(B @code{read-mail} $B$5$l$J$1$l$P(B
+$B$J$j$^$;$s!#(Bgnus $B$O%f!<%6!<$,(B CREATE $B$H(B APPEND $B%3%^%s%I$@$1$GF~NO$7$?%a!<(B
+$B%k%\%C%/%9L>$rJ]>Z$G$-$J$$$N$G!"@dBP$KL>A06u4V@\F,<-$,IU$$$?%a!<%k%\%C%/(B
+$B%9L>$r(B gnus $B$G;H$C$F$O$$$1$^$;$s!#(B
+
+@code{#driver.*/} $B@\F,<-$K$D$$$F$N$5$i$J$k;H$$J}$N>pJs(B
+$B$O(B UoW @sc{imapd} $B$NJ8=q$r8+$F2<$5$$!#$=$l$i$O6/NO$J9)6q$J$N$G!"$I$s$J8z(B
+$B2L$,$"$k$+$,3N$+$J>l9g$@$1;H$C$F2<$5$$!#(B
 
 @node Other Sources
 @section $B$=$NB>$N%0%k!<%W8;(B
