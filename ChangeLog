@@ -1,3 +1,14 @@
+2001-11-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-strip-special-text-properties): Default
+	to t because of the new function `message-tamago-not-in-use-p'.
+
+2001-11-26  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* make-x.bat: Use parameter "/copy" rather than "copy" for increased
+	dwimishness for old-time DOS users.  From Frank Schmitt
+	<ich@Frank-Schmitt.net>.
+
 2001-11-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-strip-special-text-properties): Default
@@ -63,7 +74,7 @@
 
 	* lisp/message.el (rfc822-goto-eoh): Remove.
 
-2001-10-19  Kai Gro.AN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-10-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Frank Schmitt <ich@Frank-Schmitt.net>.
 
 	* make-x.bat: Use correct directory structure for XEmacs on Windows.
@@ -161,7 +172,7 @@
 
 	* configure.in: Generate texi/ps/Makefile.
 
-2001-09-21  Kai GroN_johann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2001-09-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* make.bat: Use parameter "/copy" rather than "copy" for increased
 	dwimishness for old-time DOS users.
