@@ -956,7 +956,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 		 (const :tag "always" t)
 		 (const :tag "ask" ask)))
 
-(defvar message-send-coding-system 'binary
+(defvar message-send-coding-system *noconv*
   "Coding system to encode outgoing mail.")
 
 ;;; Internal variables.
@@ -2283,7 +2283,7 @@ the user from the mailer."
 	  (set-buffer errbuf)
 	  (erase-buffer))))
     (let ((default-directory "/")
-	  (coding-system-for-write message-send-coding-system))
+	  (output-coding-system message-send-coding-system))
       (apply 'call-process-region
 	     (append (list (point-min) (point-max)
 			   (if (boundp 'sendmail-program)
@@ -2332,7 +2332,7 @@ to find out how to use this."
   (run-hooks 'message-send-mail-hook)
   ;; send the message
   (case
-      (let ((coding-system-for-write message-send-coding-system))
+      (let ((output-coding-system message-send-coding-system))
 	(apply
 	 'call-process-region 1 (point-max) message-qmail-inject-program
 	 nil nil nil
@@ -2781,7 +2781,7 @@ to find out how to use this."
 (defun message-do-fcc ()
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
-	(coding-system-for-write 'raw-text)
+	(output-coding-system *noconv*)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
@@ -3134,8 +3134,9 @@ give as trustworthy answer as possible."
 (defvar xemacs-codename)
 (defvar gnus-inviolable-extended-version)
 
-(defun message-make-user-agent ()
-  "Return user-agent info."
+(defun message-make-user-agent (&optional max-column)
+  "Return user-agent info. If the optional arg MAX-COLUMN is specified,
+the return value will be folded up in the proper way."
   (let ((user-agent
 	 (or
 	  (if (eq message-encoding-buffer (current-buffer))
@@ -3196,6 +3197,7 @@ give as trustworthy answer as possible."
 		(if (and (boundp 'xemacs-codename) xemacs-codename)
 		    (concat " (" xemacs-codename ")")
 		  "")
+		" (" system-configuration ")"
 		)
 	     ;; not XEmacs
 	     (concat
@@ -3211,6 +3213,7 @@ give as trustworthy answer as possible."
 			   enable-multibyte-characters)
 		      ""		; Should return " (multibyte)"?
 		    " (unibyte)"))
+	      " (" system-configuration ")"
 	      ))
 	   ;; MULE[/VERSION]
 	   (if (featurep 'mule)
@@ -3231,11 +3234,38 @@ give as trustworthy answer as possible."
 	     "")			; not Meadow
 	   ))))
     (cond (message-user-agent
-	   (concat message-user-agent "\n " user-agent))
+	   (setq user-agent (concat message-user-agent "\n " user-agent)))
 	  ((boundp 'gnus-inviolable-extended-version)
-	   (concat gnus-inviolable-extended-version "\n " user-agent))
-	  (t
-	   user-agent))))
+	   (setq user-agent
+		 (concat gnus-inviolable-extended-version "\n " user-agent))))
+    (if max-column
+	(let (boundary)
+	  (unless (natnump max-column) (setq max-column 76))
+	  (with-temp-buffer
+	    (insert "            " user-agent)
+	    (goto-char 13)
+	    (while (re-search-forward "[\n\t ]+" nil t)
+	      (replace-match " "))
+	    (goto-char 13)
+	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
+	      (while (eq ?\( (char-after (point)))
+		(forward-list)
+		(skip-chars-forward " "))
+	      (skip-chars-backward " ")
+	      (if (> (current-column) max-column)
+		  (progn
+		    (if (or (not boundary) (eq ?\n (char-after boundary)))
+			(progn
+			  (setq boundary (point))
+			  (unless (eobp)
+			    (delete-char 1)
+			    (insert "\n ")))
+		      (goto-char boundary)
+		      (delete-char 1)
+		      (insert "\n ")))
+		(setq boundary (point))))
+	    (buffer-substring 13 (point-max))))
+      user-agent)))
 
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
