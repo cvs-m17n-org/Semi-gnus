@@ -3,7 +3,6 @@
 ;; Copyright (C) 1995, 1996, 1998 Free Software Foundation, Inc.
 
 ;; Author: Tomoji Kagatani <kagatani@rbc.ncl.omron.co.jp>
-;; Maintainer: Brian D. Carlstrom <bdc@ai.mit.edu>
 ;; ESMTP support: Simon Leinen <simon@switch.ch>
 ;; Keywords: SMTP, mail
 
