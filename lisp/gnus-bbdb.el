@@ -48,8 +48,8 @@
 
 ;;;###autoload
 (defun gnus-bbdb/update-record (&optional offer-to-create)
-  "returns the record corresponding to the current GNUS message, creating 
-or modifying it as necessary.  A record will be created if 
+  "returns the record corresponding to the current GNUS message, creating
+or modifying it as necessary.  A record will be created if
 bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
@@ -68,11 +68,12 @@ the user confirms the creation."
 		  (gnus-bbdb/extract-address-components
 		   (gnus-bbdb/decode-field-body to 'To))))))
       (when from
-	(bbdb-annotate-message-sender from t
-				      (or (bbdb-invoke-hook-for-value
-					   bbdb/news-auto-create-p)
-					  offer-to-create)
-				      offer-to-create)))))
+	(save-excursion
+	  (bbdb-annotate-message-sender from t
+					(or (bbdb-invoke-hook-for-value
+					     bbdb/news-auto-create-p)
+					    offer-to-create)
+					offer-to-create))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)

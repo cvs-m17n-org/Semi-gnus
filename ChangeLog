@@ -1,3 +1,8 @@
+2001-01-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Save excursion
+	while `bbdb-annotate-message-sender' is being done.
+
 2001-01-13  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
 
 	* Makefile.in (install-package-lisp): Specify EMACS=$(XEMACS).
