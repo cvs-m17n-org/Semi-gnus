@@ -2991,43 +2991,6 @@ value of the variable `gnus-show-mime' is non-nil."
 				(with-current-buffer gnus-summary-buffer
 				  default-mime-charset))))
 
-;; The following procedures will be abolished in the future.
-(autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
-(defvar x-face-mule-version-number)
-(defun gnus-article-display-x-face-with-x-face-mule (&rest args)
-  "Decode and show X-Face with the function
-`x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
-narrowed to just the headers of the article."
-  (when gnus-xemacs
-    (error "`%s' won't work under XEmacs."
-	   'gnus-article-display-x-face-with-x-face-mule))
-  (when window-system
-    (when (and (boundp 'x-face-mule-version-number)
-	       (> (string-to-number x-face-mule-version-number) 0.24)
-	       (not (gnus-buffer-live-p "*X-Face-Mule WARNING*")))
-      (let ((buffer (generate-new-buffer "*X-Face-Mule WARNING*")))
-	(save-window-excursion
-	  (pop-to-buffer buffer)
-	  (insert (format
-		   "WARNING:
-`%s' is an obsolete function.
-You have no use for setting the variable `%s',
-however, it will be set suitably by X-Face-Mule %s.
-Type any key: "
-		   'gnus-article-display-x-face-with-x-face-mule
-		   'gnus-article-x-face-command
-		   x-face-mule-version-number))
-	  (let ((inhibit-quit t) (echo-keystrokes 0) cursor-in-echo-area)
-	    (read-char-exclusive))
-	  (beginning-of-line)
-	  (delete-region (point) (point-max)))))
-    (condition-case err
-	(x-face-mule-x-face-decode-message-header)
-      (error (error "%s"
-		    (if (featurep 'x-face-mule)
-			"Please install x-face-mule 0.25 or later."
-		      err))))))
-
 ;;;
 ;;; Gnus MIME viewing functions
 ;;;
