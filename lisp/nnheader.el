@@ -110,16 +110,16 @@ on your system, you could say something like:
 (defalias 'nnheader-decode-from
   (mime-find-field-decoder 'From 'nov))
 
-(defalias 'mail-header-extra 'ignore)
-(defalias 'mail-header-set-extra 'ignore)
+(defalias 'mail-header-extra 'mime-gnus-entity-extra-internal)
+(defalias 'mail-header-set-extra 'mime-gnus-entity-set-extra-internal)
 
-(defsubst nnheader-decode-field-body (field-body field-name
-						 &optional mode max-column)
+(defun nnheader-decode-field-body (field-body field-name
+					      &optional mode max-column)
   (mime-decode-field-body field-body
-                          (if (stringp field-name)
-                              (intern (capitalize field-name))
-                            field-name)
-                          mode max-column))
+			  (if (stringp field-name)
+			      (intern (capitalize field-name))
+			    field-name)
+			  mode max-column))
 
 (defsubst make-full-mail-header
   (&optional number subject from date id references chars lines xref extra)
@@ -138,8 +138,7 @@ on your system, you could say something like:
 		    :xref xref
 		    :original-header (list (cons 'Subject subject)
 					   (cons 'From from))
-		    ;; :extra ???
-		    ))
+		    :extra extra))
 
 (defsubst make-full-mail-header-from-decoded-header
   (&optional number subject from date id references chars lines xref extra)
@@ -154,8 +153,7 @@ on your system, you could say something like:
 		    :chars chars
 		    :lines lines
 		    :xref xref
-		    ;; :extra ???
-		    ))
+		    :extra extra))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
