@@ -1,3 +1,12 @@
+1999-08-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-split-it): Match whole word for getting
+	group name with `\N'.
+
 1999-08-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el: T-gnus 6.12.0 is released.
