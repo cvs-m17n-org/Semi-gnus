@@ -1,6 +1,7 @@
 1998-06-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-art.el : Bug fix.
+	* lisp/gnus-spec.el : Bug fix.
 	
 1998-06-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
