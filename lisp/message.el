@@ -2202,8 +2202,7 @@ Prefix arg means justify as well."
 
 (defun message-do-auto-fill ()
   "Like `do-auto-fill', but don't fill in message header."
-  (unless (text-property-any (gnus-point-at-bol) (point)
-			     'message-field 'header)
+  (when (> (point) (save-excursion (rfc822-goto-eoh)))
     (do-auto-fill)))
 
 (defun message-insert-signature (&optional force)
@@ -2772,11 +2771,9 @@ It should typically alter the sending method in some way or other."
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
 	;; ;; Avoid copying text props.
-	;; T-gnus change: copy all text props, except for `field', from
-	;; the editing buffer into the encoding buffer.  `field' is the
-	;; special text property on Emacs 21, see NEWS for details.
+	;; T-gnus change: copy all text props from the editing buffer
+	;; into the encoding buffer.
 	(insert-buffer message-edit-buffer)
-	(put-text-property (point-min) (point-max) 'field nil)
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
@@ -4675,9 +4672,6 @@ than 988 characters long, and if they are not, trim them until they are."
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil)
   (run-hooks 'message-setup-hook)
-  (save-restriction
-    (message-narrow-to-headers)
-    (put-text-property (point-min) (point-max) 'field 'header))
   (message-position-point)
   (undo-boundary))
 
@@ -5428,8 +5422,7 @@ Optional NEWS will use news to forward instead of mail."
       ;; Send it.
       (let ((message-encoding-buffer (current-buffer))
 	    (message-edit-buffer (current-buffer))
-	    message-required-mail-headers
-	    (inhibit-field-text-motion t))
+	    message-required-mail-headers)
 	(message-send-mail))
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
