@@ -3122,31 +3122,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
-(defmacro gnus-nov-read-integer ()
-  '(prog1
-       (if (eq (char-after) ?\t)
-	   0
-	 (let ((num (ignore-errors (read buffer))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
-
-(defmacro gnus-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
-
-(defmacro gnus-nov-field ()
-  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
-
-(defmacro gnus-nov-parse-extra ()
-  '(let (out string)
-     (while (not (memq (char-after) '(?\n nil)))
-       (setq string (gnus-nov-field))
-       (when (string-match "^\\([^ :]+\\): " string)
-	 (push (cons (intern (match-string 1 string))
-		     (substring string (match-end 0)))
-	       out)))
-     out))
-
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
@@ -3155,28 +3130,23 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	header)
 
     ;; overview: [num subject from date id refs chars lines misc]
-    (unwind-protect
-	(progn
-	  (narrow-to-region (point) eol)
-	  (unless (eobp)
-	    (forward-char))
+    (unless (eobp)
+      (forward-char))
 
-	  (setq header
-		(make-full-mail-header
-		 number			; number
-		 (gnus-nov-field)	; subject
-		 (gnus-nov-field)	; from
-		 (gnus-nov-field)	; date
-		 (or (gnus-nov-field)
-		     (nnheader-generate-fake-message-id)) ; id
-		 (gnus-nov-field)	; refs
-		 (gnus-nov-read-integer) ; chars
-		 (gnus-nov-read-integer) ; lines
-		 (unless (eq (char-after) ?\n)
-		   (gnus-nov-field))	; misc
-		 (gnus-nov-parse-extra)))) ; extra
-
-      (widen))
+    (setq header
+	  (make-full-mail-header
+	   number				; number
+	   (nnheader-nov-field)			; subject
+	   (nnheader-nov-field)			; from
+	   (nnheader-nov-field)			; date
+	   (or (nnheader-nov-field)		; id
+	       (nnheader-generate-fake-message-id))
+	   (nnheader-nov-field)			; refs
+	   (nnheader-nov-read-integer)		; chars
+	   (nnheader-nov-read-integer)		; lines
+	   (unless (eq (char-after) ?\n)
+	     (nnheader-nov-field))		; misc
+	   (nnheader-nov-parse-extra)))		; extra
 
     (when gnus-alter-header-function
       (funcall gnus-alter-header-function header))
@@ -4700,8 +4670,8 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 	(let ((gnus-nov-is-evil t))
 	  (nconc
 	   (nreverse headers)
-	   (when (gnus-retrieve-headers sequence group)
-	     (gnus-get-newsgroup-headers))))))))
+	   (gnus-retrieve-parsed-headers sequence group)
+	   ))))))
 
 (defun gnus-article-get-xrefs ()
   "Fill in the Xref value in `gnus-current-headers', if necessary.

@@ -1,3 +1,57 @@
+1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-nov-parse-extra): Abolished.
+	(gnus-nov-parse-line): Use `char-after' instead of `following-char'
+	; use `nnheader-nov-parse-extra' instead of `gnus-nov-parse-extra'.
+
+1999-01-31  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Abolish macro `gnus-nov-read-integer',
+	`gnus-nov-skip-field' and `gnus-nov-field'.
+	(gnus-nov-parse-line): Use `nnheader-nov-field' and
+	`nnheader-nov-read-integer' instead of `gnus-nov-field' and
+	`gnus-nov-read-integer'.
+	(gnus-get-newsgroup-headers-xover): Use
+	`gnus-retrieve-parsed-headers'.
+
+	* lisp/gnus-cache.el (gnus-cache-retrieve-parsed-headers): Use
+	`gnus-cache-braid-headers',
+	`nnheader-get-newsgroup-headers-xover*' and
+	`nnheader-retrieve-headers-from-directory*' instead of
+	`gnus-get-newsgroup-headers-xover', `gnus-cache-braid-parsed-nov'
+	nor `gnus-cache-braid-parsed-heads'; abolish function
+	`gnus-cache-braid-parsed-nov' and `gnus-cache-braid-parsed-nov'.
+	(gnus-cache-braid-headers): New function.
+
+	* lisp/nnheader.el (nnheader-nov-read-integer): Use
+	`(search-forward "\t" eol 'move)' instead of `(forward-char 1)' as
+	same as `gnus-nov-read-integer'.
+	(nnheader-retrieve-headers-from-directory*): New function.
+	(nnheader-retrieve-headers-from-directory): Use
+	`nnheader-retrieve-headers-from-directory*'.
+	(nnheader-get-newsgroup-headers-xover*): New function.
+
+1999-01-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Use
+	`nnheader-retrieve-headers-from-directory'.
+
+	* lisp/nnheader.el (nnheader-retrieve-headers-from-directory): New
+	function.
+
+1999-01-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version): Modify for SEMI 1.13.
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Use
+	`gnus-cache-retrieve-parsed-headers' instead of
+	`gnus-cache-retrieve-headers'.
+
+	* lisp/gnus-cache.el (gnus-cache-retrieve-parsed-headers): New
+	function.
+	(gnus-cache-braid-parsed-nov): New function.
+	(gnus-cache-braid-parsed-heads): New function.
+
 1999-01-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: Rewrite to work with pGnus v0.74 based T-gnus.
