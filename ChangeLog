@@ -1,3 +1,16 @@
+1998-02-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.6.
+
+	* lisp/message.el (message-fill-references): Abolish unused local
+	variables.
+
+	* lisp/pop3.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.31.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.30.
+
 1998-02-20  Christophe Broult <christophe.broult@info.unicaen.fr>
 
 	* README.semi (How to get?): The command `update' must come before
