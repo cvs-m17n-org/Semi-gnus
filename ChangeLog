@@ -1,3 +1,12 @@
+1999-01-23  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Use
+	`message-list-references' for gathering IDs from yanked articles.
+
+	* lisp/message.el (message-list-references): New function.
+	(message-yank-original): Use it for gathering IDs from a yanked
+	article.
+
 1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-reply): Get the references from
