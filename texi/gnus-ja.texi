@@ -6083,6 +6083,13 @@ gnus $B%(!<%8%'%s%H(B (@pxref{Agent Basics}) $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&
 $B$9(B (@code{gnus-summary-limit-to-author})$B!#$b$7@\F,<-$,M?$($i$l$l$P!"9gCW(B
 $B$9$k5-;v$r=|30$7$^$9!#(B
 
+@item / R
+@kindex / R ($B35N,(B)
+@findex gnus-summary-limit-to-recipient
+$B35N,%P%C%U%!$r$$$/$D$+$N<u?.<T$K9gCW$9$k5-;v$@$1$K@)8B$7$^(B
+$B$9(B (@code{gnus-summary-limit-to-recipient})$B!#$b$7@\F,<-$,M?$($i$l$l$P!"(B
+$B9gCW$9$k5-;v$r=|30$7$^$9!#(B
+
 @item / x
 @kindex / x ($B35N,(B)
 @findex gnus-summary-limit-to-extra
@@ -6741,6 +6748,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @findex gnus-thread-sort-by-score
 @findex gnus-thread-sort-by-subject
 @findex gnus-thread-sort-by-author
+@c @findex gnus-thread-sort-by-recipient
 @findex gnus-thread-sort-by-number
 @findex gnus-thread-sort-by-random
 @vindex gnus-thread-sort-functions
@@ -8887,6 +8895,11 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @kindex C-c C-s C-a ($B35N,(B)
 @findex gnus-summary-sort-by-author
 $BCx<T$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-author})$B!#(B
+
+@item C-c C-s C-t
+@kindex C-c C-s C-t ($B35N,(B)
+@findex gnus-summary-sort-by-recipient
+$B<u?.<T$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-recipient})$B!#(B
 
 @item C-c C-s C-s
 @kindex C-c C-s C-s ($B35N,(B)
@@ -21711,6 +21724,7 @@ Gnus $B$O(B hashcash $B%/%C%-!<$rG'>Z$9$k$3$H$,$G$-$^$9$,!"<j$G%+%9%?%^%$%:$7
 @code{spam.el} $B%7!<%1%s%9$N%$%Y%s%H$N9`$r$A$c$s$HFI$_$^$7$g$&!#(B
 @ref{Spam ELisp Package Sequence of Events} $B$r;2>H$7$F2<$5$$!#(B
 
+@cindex spam-initialize
 @code{spam.el} $B$r;H$&$K$O!"(B@code{spam.el} $B$r<+F0FI$_9~$_(B (autoload) $B$7(B
 $B$F(B @code{spam.el} $B$N3F%U%C%/$r%$%s%9%H!<%k$9$k$?$a$K!"4X(B
 $B?t(B @code{spam-initialize} $B$r(B @strong{$B<B9T$7$J$1$l$P$J$j$^$;$s(B}$B!#0l$DNc30(B
