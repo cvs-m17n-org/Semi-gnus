@@ -1180,7 +1180,7 @@ This variable is used only in non-Mule Emacsen.")
   (cdr (assq key alist)))
 
 (defmacro message-get-parameter-with-eval (key &optional alist)
-  `(message-eval-parameter (message-get-parameter ,alist ,key)))
+  `(message-eval-parameter (message-get-parameter ,key ,alist)))
 
 (defmacro message-y-or-n-p (question show &rest text)
   "Ask QUESTION, displaying the rest of the arguments in a temp. buffer if SHOW"
