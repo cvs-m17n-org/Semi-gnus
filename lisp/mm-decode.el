@@ -280,7 +280,9 @@ to:
        ((and (eq gnus-mime-display-part-function
 		 'gnus-mime-display-part-with-mime-view)
 	     (eq type 'message))
-	(mm-dissect-message result ctl))
+	(if (eq (mime-content-type-subtype ctl) 'partial)
+	    (mm-dissect-singlepart result ctl no-strict-mime)
+	  (mm-dissect-message result ctl)))
        ((eq type 'multipart)
 	(mm-dissect-multipart result ctl))
        (t
