@@ -1,3 +1,22 @@
+2002-10-04  Simon Josefsson  <jas@extundo.com>
+
+	* pgg.texi: Document sign parameter.
+
+	* gnus.texi: Add \gnuskey tex command.
+
+	* texi2latex.el (latexi-translate-file): Do PGG.  (Poor) support
+	of @set, @deffn, @defvar, @defun, @key.  Improve error.
+
+	* Makefile.in: Add PGG.
+
+	* pgg.texi: New file.
+
+2002-10-03  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Group Information): Mention prefix argument for
+	gnus-group-fetch-charter and gnus-group-fetch-control.
+	From Jesper Harder.
+
 2002-09-26  Simon Josefsson  <jas@extundo.com>
 
 	* gnus.texi (Agent Variables): Add.

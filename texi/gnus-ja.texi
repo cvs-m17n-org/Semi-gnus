@@ -56,6 +56,7 @@
 \newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\gnusselectttfont{}#1}''}
 \newcommand{\gnuslisp}[1]{\gnustt{#1}}
 \newcommand{\gnuskbd}[1]{`\gnustt{#1}'}
+\newcommand{\gnuskey}[1]{`\gnustt{#1}'}
 \newcommand{\gnusfile}[1]{`\gnustt{#1}'}
 \newcommand{\gnusdfn}[1]{\textit{#1}}
 \newcommand{\gnusi}[1]{\textit{#1}}
@@ -4155,7 +4156,9 @@ gnus $B$O(B @code{gnus-group-faq-directory} $B$NCM$rA4$F!"0l$D0l$D%*!<%W%s$7$
 @vindex gnus-group-charter-alist
 @cindex charter
 $B8=:_$N%0%k!<%W$N7{>O$r(B web $B%V%i%&%6$G3+$3$&$H$7$^(B
-$B$9(B (@code{gnus-group-fetch-charter})$B!#(B
+$B$9(B (@code{gnus-group-fetch-charter})$B!#@\F,0z?t$,M?$($i$l$k$H%0%k!<%WL>$r(B
+$B?R$M$^$9!#(B
+
 gnus $B$O(B @code{gnus-group-charter-alist} $B$r;H$C$F7{>O$N=j:_$rC5$7$^$9!#=j(B
 $B:_$,$o$+$i$J$+$C$?$i!"(Bgnus $B$O$=$N%0%k!<%W$N%3%s%H%m!<%k%a%C%;!<%8$r<hF@(B
 $B$7$^$9!#$=$l$K$O7{>O$r4^$s$G$$$k$3$H$,$"$j$^$9$+$i!#(B
@@ -4166,7 +4169,8 @@ gnus $B$O(B @code{gnus-group-charter-alist} $B$r;H$C$F7{>O$N=j:_$rC5$7$^$9!#=
 @vindex gnus-group-fetch-control-use-browse-url
 @cindex control message
 $B$=$N%0%k!<%W$N%3%s%H%m!<%k%a%C%;!<%8$r(B @code{ftp.isc.org} $B$N5-O?8K$+$i<h(B
-$BF@$7$^$9(B (@code{gnus-group-fetch-control})$B!#(B
+$BF@$7$^$9(B (@code{gnus-group-fetch-control})$B!#@\F,0z?t$,M?$($i$l$k$H%0%k!<(B
+$B%WL>$r?R$M$^$9!#(B
 
 @code{gnus-group-fetch-control-use-browse-url} $B$,Hs(B-@code{nil} $B$@$C$?$i!"(B
 gnus $B$O(B @code{browse-url} $B$r;H$C$F%3%s%H%m!<%k%a%C%;!<%8$r3+$-$^$9!#$=$&(B
