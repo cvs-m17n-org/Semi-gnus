@@ -34,12 +34,12 @@
 (eval-when-compile
   (require 'gnus-win))
 
-(defvar gnus-bbeb/decode-field-body-function 'nnheader-decode-field-body
+(defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
   "*Field body decoder.")
 
 (defmacro gnus-bbdb/decode-field-body (field-body field-name)
-  `(or (and (functionp gnus-bbeb/decode-field-body-function)
-	    (funcall gnus-bbeb/decode-field-body-function
+  `(or (and (functionp gnus-bbdb/decode-field-body-function)
+	    (funcall gnus-bbdb/decode-field-body-function
 		     ,field-body ,field-name))
        ,field-body))
 
@@ -51,33 +51,34 @@ bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (let (from)
+    (save-excursion
       (save-restriction
-	(set-buffer gnus-original-article-buffer)
-	(widen)
-	(narrow-to-region (point-min)
-			  (progn (goto-char (point-min))
-				 (or (search-forward "\n\n" nil t)
-				     (error "message unexists"))
-				 (- (point) 2)))
-	(when (setq from (mail-fetch-field "from"))
-	  (setq from (gnus-bbdb/extract-address-components
-		      (gnus-bbdb/decode-field-body from 'From))))
-	(when (or (null from)
-		  (string-match (bbdb-user-mail-names)
-				(car (cdr from))))
-	  ;; if logged-in user sent this, use recipients.
-	  (let ((to (mail-fetch-field "to")))
-	    (when to
-	      (setq from
-		    (gnus-bbdb/extract-address-components
-		     (gnus-bbdb/decode-field-body to 'To)))))))
-      (when from
-	(bbdb-annotate-message-sender from t
-				      (or (bbdb-invoke-hook-for-value
-					   bbdb/news-auto-create-p)
-					  offer-to-create)
-				      offer-to-create)))))
+	(let (from)
+	  (set-buffer gnus-original-article-buffer)
+	  (widen)
+	  (narrow-to-region (point-min)
+			    (progn (goto-char (point-min))
+				   (or (search-forward "\n\n" nil t)
+				       (error "message unexists"))
+				   (- (point) 2)))
+	  (when (setq from (mail-fetch-field "from"))
+	    (setq from (gnus-bbdb/extract-address-components
+			(gnus-bbdb/decode-field-body from 'From))))
+	  (when (or (null from)
+		    (string-match (bbdb-user-mail-names)
+				  (car (cdr from))))
+	    ;; if logged-in user sent this, use recipients.
+	    (let ((to (mail-fetch-field "to")))
+	      (when to
+		(setq from
+		      (gnus-bbdb/extract-address-components
+		       (gnus-bbdb/decode-field-body to 'To))))))
+	(when from
+	  (bbdb-annotate-message-sender from t
+					(or (bbdb-invoke-hook-for-value
+					     bbdb/news-auto-create-p)
+					    offer-to-create)
+					offer-to-create)))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
