@@ -1069,6 +1069,8 @@ password contained in '~/.nntp-authinfo'."
 	  (erase-buffer)
 	  (nntp-send-command "^[245].*\n" "GROUP" group)
 	  (setcar (cddr entry) group)
+	  (erase-buffer)
+	  (set-buffer nntp-server-buffer)
 	  (erase-buffer))))))
 
 (defun nntp-decode-text (&optional cr-only)
