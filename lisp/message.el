@@ -6086,7 +6086,7 @@ that further discussion should take place only in "
      `((Subject . ,subject)
        ,@follow-to
        ,@(and mct (list (cons 'Cc mct)))
-       ,@(and distribution (list (cons 'Distribution distribution)))
+       ,@(and distribution (list (cons 'Distribution distribution))))
      cur)))
 
 ;;;###autoload
