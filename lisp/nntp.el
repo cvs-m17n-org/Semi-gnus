@@ -42,6 +42,40 @@
 (defvoo nntp-port-number "nntp"
   "Port number on the physical nntp server.")
 
+(defvoo nntp-list-options nil
+  "List of newsgroup name used for a option of the LIST command to
+restrict the listing output to only the specified newsgroups.
+Each newsgroup name can be a shell-style wildcard, for instance,
+\"fj.*\", \"japan.*\", etc.  Fortunately, if the server can accept
+such a option, it will probably make gnus run faster.  You may
+use it as a server variable as follows:
+
+\(setq gnus-select-method
+      '(nntp \"news.somewhere.edu\"
+	     (nntp-list-options (\"fj.*\" \"japan.*\"))))")
+
+(defvoo nntp-options-subscribe nil
+  "Regexp matching the newsgroup names which will be subscribed
+unconditionally.  It may be effective as well as `nntp-list-options'
+even though the server could not accept a shell-style wildcard as a
+option of the LIST command.  You may use it as a server variable as
+follows:
+
+\(setq gnus-select-method
+      '(nntp \"news.somewhere.edu\"
+	     (nntp-options-subscribe \"^fj\\\\.\\\\|^japan\\\\.\")))")
+
+(defvoo nntp-options-not-subscribe nil
+  "Regexp matching the newsgroup names which will not be subscribed
+unconditionally.  It may be effective as well as `nntp-list-options'
+even though the server could not accept a shell-style wildcard as a
+option of the LIST command.  You may use it as a server variable as
+follows:
+
+\(setq gnus-select-method
+      '(nntp \"news.somewhere.edu\"
+	     (nntp-options-not-subscribe \"\\\\.binaries\\\\.\")))")
+
 (defvoo nntp-server-opened-hook '(nntp-send-mode-reader)
   "*Hook used for sending commands to the server at startup.
 The default value is `nntp-send-mode-reader', which makes an innd
@@ -742,8 +776,40 @@ noticing asynchronous data.")
       (nntp-kill-buffer (process-buffer process)))))
 
 (deffoo nntp-request-list (&optional server)
+  "List active groups.  If `nntp-list-options' is non-nil, the listing
+output from the server will be restricted to the specified newsgroups.
+If `nntp-options-subscribe' is non-nil, remove newsgroups that do not
+match the regexp.  If `nntp-options-not-subscribe' is non-nil, remove
+newsgroups that match the regexp."
   (nntp-possibly-change-group nil server)
-  (nntp-send-command-and-decode "\r?\n\\.\r?\n" "LIST"))
+  (with-current-buffer nntp-server-buffer
+    (prog1
+	(if (not nntp-list-options)
+	    (nntp-send-command-and-decode "\r?\n\\.\r?\n" "LIST")
+	  (let ((options (if (consp nntp-list-options)
+			     nntp-list-options
+			   (list nntp-list-options)))
+		(ret t))
+	    (erase-buffer)
+	    (while options
+	      (goto-char (point-max))
+	      (narrow-to-region (point) (point))
+	      (setq ret (and ret
+			     (nntp-send-command-nodelete
+			      "\r?\n\\.\r?\n"
+			      (format "LIST ACTIVE %s" (car options))))
+		    options (cdr options))
+	      (nntp-decode-text))
+	    (widen)
+	    ret))
+      (when (and (stringp nntp-options-subscribe)
+		 (not (string-equal "" nntp-options-subscribe)))
+	(goto-char (point-min))
+	(keep-lines nntp-options-subscribe))
+      (when (and (stringp nntp-options-not-subscribe)
+		 (not (string-equal "" nntp-options-not-subscribe)))
+	(goto-char (point-min))
+	(flush-lines nntp-options-subscribe)))))
 
 (deffoo nntp-request-list-newsgroups (&optional server)
   (nntp-possibly-change-group nil server)

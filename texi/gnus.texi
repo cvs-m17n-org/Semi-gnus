@@ -10617,6 +10617,49 @@ The address of the remote system running the @sc{nntp} server.
 Port number to connect to when using the @code{nntp-open-network-stream}
 connect function.
 
+@item nntp-list-options
+@vindex nntp-list-options
+List of newsgroup name used for a option of the LIST command to restrict
+the listing output to only the specified newsgroups.  Each newsgroup name
+can be a shell-style wildcard, for instance, @dfn{fj.*}, @dfn{japan.*},
+etc.  Fortunately, if the server can accept such a option, it will
+probably make gnus run faster.  You may use it as a server variable as
+follows:
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-list-options ("fj.*" "japan.*"))))
+@end lisp
+
+@item nntp-options-subscribe
+@vindex nntp-options-subscribe
+Regexp matching the newsgroup names which will be subscribed
+unconditionally.  Use @dfn{ } instead of @dfn{$} for a regexp string.
+It may be effective as well as @code{nntp-list-options} even though the
+server could not accept a shell-style wildcard as a option of the LIST
+command.  You may use it as a server variable as follows:
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-options-subscribe "^fj\\.\\|^japan\\.")))
+@end lisp
+
+@item nntp-options-not-subscribe
+@vindex nntp-options-not-subscribe
+Regexp matching the newsgroup names which will not be subscribed
+unconditionally.  Use @dfn{ } instead of @dfn{$} for a regexp string.
+It may be effective as well as @code{nntp-list-options} even though the
+server could not accept a shell-style wildcard as a option of the LIST
+command.  You may use it as a server variable as follows:
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-options-not-subscribe "\\.binaries\\.")))
+@end lisp
+
 @item nntp-buggy-select
 @vindex nntp-buggy-select
 Set this to non-@code{nil} if your select routine is buggy.

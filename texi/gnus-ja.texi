@@ -10107,6 +10107,49 @@ default force yes
 @code{nntp-open-network-stream} 接続関数を使っているときの接続するポート
 番号です。
 
+@item nntp-list-options
+@vindex nntp-list-options
+LIST コマンドのオプションに使って、(サーバーの) リスト出力を設定したニュー
+スグループだけに制限するための、ニュースグループ名のリストです。それぞれ
+のニュースグループ名には @dfn{fj.*} や @dfn{japan.*} のような、シェル形
+式のワイルドカードを使うことができます。もし幸運にもサーバーがそのような
+オプションを受け付けてくれれば、gnus を速く動作させることができるかもし
+れません。これは、以下のようにサーバー変数として使うことができます。
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-list-options ("fj.*" "japan.*"))))
+@end lisp
+
+@item nntp-options-subscribe
+@vindex nntp-options-subscribe
+合致したら無条件で講読するニュースグループ名の正規表現です。正規表現の文
+字列では @dfn{$} の代わりに @dfn{ } を使って下さい。サーバーが LIST コマ
+ンドのオプションにシェル形式のワイルドカードを受け付けてくれない場合でも、
+@code{nntp-list-options} と同様の効果があるでしょう。これは、以下のよう
+にサーバー変数として使うことができます。
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-options-subscribe "^fj\\.\\|^japan\\.")))
+@end lisp
+
+@item nntp-options-not-subscribe
+@vindex nntp-options-not-subscribe
+合致しなかったら無条件で講読するニュースグループ名の正規表現です。正規表
+現の文字列では @dfn{$} の代わりに @dfn{ } を使って下さい。サーバー
+が LIST コマンドのオプションにシェル形式のワイルドカードを受け付けてくれ
+ない場合でも、@code{nntp-list-options} と同様の効果があるでしょう。これ
+は、以下のようにサーバー変数として使うことができます。
+
+@lisp
+(setq gnus-select-method
+      '(nntp "news.somewhere.edu"
+	     (nntp-options-not-subscribe "\\.binaries\\.")))
+@end lisp
+
 @item nntp-buggy-select
 @vindex nntp-buggy-select
 あなたの選択の一連の作業が故障がちであるときにこれを @code{nil} でない値
