@@ -3507,7 +3507,7 @@ be added to the \"References\" field."
 (defun message-yank-buffer (buffer)
   "Insert BUFFER into the current buffer and quote it."
   (interactive "bYank buffer: ")
-  (let ((message-reply-buffer buffer))
+  (let ((message-reply-buffer (get-buffer buffer)))
     (save-window-excursion
       (message-yank-original))))
 
