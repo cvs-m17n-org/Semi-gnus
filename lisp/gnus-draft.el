@@ -190,6 +190,20 @@
 			 (- total (length articles)) total)))
 	    (gnus-draft-send article)))))))
 
+;;;###autoload
+(defun gnus-draft-reminder ()
+  "Reminder user if there are unsent drafts."
+  (interactive)
+  (if (gnus-alive-p)
+      (let (active)
+	(catch 'continue
+	  (dolist (group '("nndraft:drafts" "nndraft:queue"))
+	    (setq active (gnus-activate-group group))
+	    (if (and active (>= (cdr active) (car active)))
+		(if (y-or-n-p "There are unsent drafts. Confirm to exit?")
+		    (throw 'continue t)
+		  (error "Stop!"))))))))
+
 ;;; Utility functions
 
 ;;;!!!If this is byte-compiled, it fails miserably.
@@ -199,21 +213,32 @@
 
 (progn
   (defun gnus-draft-setup (narticle group &optional restore)
-    (gnus-setup-message 'forward
-      (let ((article narticle))
-	(message-mail)
-	(erase-buffer)
-	(if (not (gnus-request-restore-buffer article group))
-	    (error "Couldn't restore the article")
-	  (if (and restore (equal group "nndraft:queue"))
+    (let (ga)
+      (gnus-setup-message 'forward
+	(let ((article narticle))
+	  (message-mail)
+	  (erase-buffer)
+	  (if (not (gnus-request-restore-buffer article group))
+	      (error "Couldn't restore the article")
+	    (when (and restore
+		       (equal group "nndraft:queue"))
 	      (mime-to-mml))
-	  ;; Insert the separator.
-	  (goto-char (point-min))
-	  (search-forward "\n\n")
-	  (forward-char -1)
-	  (insert mail-header-separator)
-	  (forward-line 1)
-	  (message-set-auto-save-file-name))))))
+	    ;; Insert the separator.
+	    (goto-char (point-min))
+	    (search-forward "\n\n")
+	    (forward-char -1)
+	    (insert mail-header-separator)
+	    (forward-line 1)
+	    (setq ga (message-fetch-field gnus-draft-meta-information-header))
+	    (message-set-auto-save-file-name))))
+      (when (and ga
+		 (ignore-errors (setq ga (car (read-from-string ga)))))
+	(setq message-post-method
+	      `(lambda (arg)
+		 (gnus-post-method arg ,(car ga))))
+	(message-add-action
+	 `(gnus-add-mark ,(car ga) 'replied ,(cadr ga))
+	 'send)))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."

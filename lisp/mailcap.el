@@ -1,5 +1,5 @@
 ;;; mailcap.el --- MIME media types configuration
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -36,6 +36,7 @@
 
 (defgroup mailcap nil
   "Definition of viewers for MIME types."
+  :version "21.1"
   :group 'mime)
 
 (defvar mailcap-parse-args-syntax-table
@@ -53,6 +54,10 @@
 ;; files for the rest?  -- fx
 (defvar mailcap-mime-data
   '(("application"
+     ("vnd.ms-excel"
+      (viewer . "gnumeric %s")
+      (test   . (getenv "DISPLAY"))
+      (type . "application/vnd.ms-excel"))
      ("x-x509-ca-cert"
       (viewer . ssl-view-site-cert)
       (test . (fboundp 'ssl-view-site-cert))
@@ -142,7 +147,11 @@
       (viewer . "ps2ascii %s")
       (type . "application/postscript")
       (test . (not (getenv "DISPLAY")))
-      ("copiousoutput")))
+      ("copiousoutput"))
+     ("sieve"
+      (viewer . sieve-mode)
+      (test   . (fboundp 'sieve-mode))
+      (type   . "application/sieve")))
     ("audio"
      ("x-mpeg"
       (viewer . "maplay %s")
@@ -305,7 +314,7 @@ If you are unsure what to do, please answer \"no\"."
   "Text of warning message displayed by `mailcap-maybe-eval'.
 Make sure that this text consists only of few text lines.  Otherwise,
 Gnus might fail to display all of it.")
-  
+ 
 (defun mailcap-maybe-eval ()
   "Maybe evaluate a buffer of Emacs Lisp code."
   (let ((lisp-buffer (current-buffer)))
@@ -806,6 +815,7 @@ this type is returned."
     (".rtx"   . "text/richtext")
     (".sh"    . "application/x-sh")
     (".sit"   . "application/x-stuffit")
+    (".siv"   . "application/sieve")
     (".snd"   . "audio/basic")
     (".src"   . "application/x-wais-source")
     (".tar"   . "archive/tar")
@@ -823,6 +833,7 @@ this type is returned."
     (".vox"   . "audio/basic")
     (".vrml"  . "x-world/x-vrml")
     (".wav"   . "audio/x-wav")
+    (".xls"   . "application/vnd.ms-excel")
     (".wrl"   . "x-world/x-vrml")
     (".xbm"   . "image/xbm")
     (".xpm"   . "image/xpm")

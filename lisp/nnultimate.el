@@ -80,7 +80,7 @@
 	    "postings.*editpost\\|forumdisplay\\|getbio")
 	   headers article subject score from date lines parent point
 	   contents tinfo fetchers map elem a href garticles topic old-max
-	   inc datel table string current-page total-contents pages
+	   inc datel table current-page total-contents pages
 	   farticles forum-contents parse furl-fetched mmap farticle)
       (setq map mapping)
       (while (and (setq article (car articles))
@@ -132,11 +132,9 @@
 	      (setq contents
 		    (ignore-errors (w3-parse-buffer (current-buffer))))
 	      (setq table (nnultimate-find-forum-table contents))
-	      (setq string (mapconcat 'identity (nnweb-text table) ""))
-	      (when (string-match "topic is \\([0-9]\\) pages" string)
-		(setq pages (string-to-number (match-string 1 string)))
-		(setcdr table nil)
-		(setq table (nnultimate-find-forum-table contents)))
+	      (goto-char (point-min))
+	      (when (re-search-forward "topic is \\([0-9]+\\) pages" nil t)
+		(setq pages (string-to-number (match-string 1))))
 	      (setq contents (cdr (nth 2 (car (nth 2 table)))))
 	      (setq total-contents (nconc total-contents contents))
 	      (incf current-page))
@@ -165,13 +163,21 @@
 	      (setq date (substring (car datel) (match-end 0))
 		    datel nil))
 	    (pop datel))
-	  (setq date (delete "" (split-string date "[- \n\t\r    ]")))
+	  (setq date (delete "" (split-string
+				 date "[-, \n\t\r    ]")))
 	  (if (or (member "AM" date)
 		  (member "PM" date))
-	      (setq date (format "%s %s %s %s"
-				 (car (rassq (string-to-number (nth 0 date))
-					     parse-time-months))
-				 (nth 1 date) (nth 2 date) (nth 3 date)))
+	      (setq date (format
+			  "%s %s %s %s"
+			  (nth 1 date)
+			  (if (and (>= (length (nth 0 date)) 3)
+				   (assoc (downcase
+					   (substring (nth 0 date) 0 3))
+					  parse-time-months))
+			      (substring (nth 0 date) 0 3)
+			    (car (rassq (string-to-number (nth 0 date))
+					parse-time-months)))
+			  (nth 2 date) (nth 3 date)))
 	    (setq date (format "%s %s %s %s"
 			       (car (rassq (string-to-number (nth 1 date))
 					   parse-time-months))

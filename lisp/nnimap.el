@@ -537,7 +537,7 @@ If EXAMINE is non-nil the group is selected read-only."
 	   (> nnimap-length nnmail-large-newsgroup)
 	   (nnheader-message 6 "nnimap: Retrieving headers...done")))))
 
-(defun nnimap-use-nov-p (group server)
+(defun nnimap-dont-use-nov-p (group server)
   (or gnus-nov-is-evil nnimap-nov-is-evil
       (unless (and (gnus-make-directory
 		    (file-name-directory
@@ -551,7 +551,7 @@ If EXAMINE is non-nil the group is selected read-only."
   (when (nnimap-possibly-change-group group server)
     (with-current-buffer nntp-server-buffer
       (erase-buffer)
-      (if (nnimap-use-nov-p group server)
+      (if (nnimap-dont-use-nov-p group server)
 	  (nnimap-retrieve-headers-from-server
 	   (gnus-compress-sequence articles) group server)
 	(let (uids cached low high)
@@ -1100,22 +1100,37 @@ function is generally only called when Gnus is shutting down."
   (gnus-message 5 "nnimap: Marking article %d for deletion..."
 		imap-current-message))
 
+
+(defun nnimap-expiry-target (arts group server)
+  (unless (eq nnmail-expiry-target 'delete)
+    (with-current-buffer nntp-server-buffer
+      (dolist (art (gnus-uncompress-sequence arts))
+	(nnimap-request-article art group server)
+	;; hints for optimization in `nnimap-request-accept-article'
+	(let ((nnimap-current-move-article art)
+	      (nnimap-current-move-group group)
+	      (nnimap-current-move-server server))
+	  (nnmail-expiry-target-group nnmail-expiry-target group))))))
+
 ;; Notice that we don't actually delete anything, we just mark them deleted.
 (deffoo nnimap-request-expire-articles (articles group &optional server force)
   (let ((artseq (gnus-compress-sequence articles)))
     (when (and artseq (nnimap-possibly-change-group group server))
       (with-current-buffer nnimap-server-buffer
 	(if force
-	    (and (imap-message-flags-add
-		  (imap-range-to-message-set artseq) "\\Deleted")
-		 (setq articles nil))
+	    (progn
+	      (nnimap-expiry-target artseq group server)
+	      (when (imap-message-flags-add (imap-range-to-message-set artseq)
+					    "\\Deleted")
+		(setq articles nil)))
 	  (let ((days (or (and nnmail-expiry-wait-function
 			       (funcall nnmail-expiry-wait-function group))
 			  nnmail-expiry-wait)))
 	    (cond ((eq days 'immediate)
-		   (and (imap-message-flags-add
-			 (imap-range-to-message-set artseq) "\\Deleted")
-			(setq articles nil)))
+		   (nnimap-expiry-target artseq group server)
+		   (when (imap-message-flags-add
+			  (imap-range-to-message-set artseq) "\\Deleted")
+		     (setq articles nil)))
 		  ((numberp days)
 		   (let ((oldarts (imap-search
 				   (format "UID %s NOT SINCE %s"
@@ -1123,6 +1138,7 @@ function is generally only called when Gnus is shutting down."
 					   (nnimap-date-days-ago days))))
 			 (imap-fetch-data-hook
 			  '(nnimap-request-expire-articles-progress)))
+		     (nnimap-expiry-target oldarts group server)
 		     (and oldarts
 			  (imap-message-flags-add
 			   (imap-range-to-message-set

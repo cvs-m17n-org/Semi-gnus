@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -32,7 +32,10 @@
 ;;; Code:
 
 (require 'custom)
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; Fixme: this should be a gnus variable, not nnmail-.
+  (defvar nnmail-pathname-coding-system))
 (require 'nnheader)
 (require 'time-date)
 
@@ -379,7 +382,7 @@ jabbering all the time."
   "Return a list of Message-IDs in REFERENCES."
   (let ((beg 0)
 	ids)
-    (while (string-match "<[^>]+>" references beg)
+    (while (string-match "<[^> \t]+>" references beg)
       (push (substring references (match-beginning 0) (setq beg (match-end 0)))
 	    ids))
     (nreverse ids)))
@@ -526,6 +529,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
+  (require 'nnmail)
   (let ((file-name-coding-system nnmail-pathname-coding-system))
     (when (and directory
 	       (not (file-exists-p directory)))
@@ -903,12 +907,15 @@ Entries without port tokens default to DEFAULTPORT."
       (pop list))
     (nreverse out)))
 
-(defun gnus-delete-alist (key alist)
-  "Delete all entries in ALIST that have a key eq to KEY."
-  (let (entry)
-    (while (setq entry (assq key alist))
-      (setq alist (delq entry alist)))
-    alist))
+(if (fboundp 'assq-delete-all)
+    (defalias 'gnus-delete-alist 'assq-delete-all)
+  (defun gnus-delete-alist (key alist)
+    "Delete from ALIST all elements whose car is KEY.
+Return the modified alist."
+    (let (entry)
+      (while (setq entry (assq key alist))
+        (setq alist (delq entry alist)))
+      alist)))
 
 (defmacro gnus-pull (key alist &optional assoc-p)
   "Modify ALIST to be without KEY."
@@ -989,7 +996,7 @@ Entries without port tokens default to DEFAULTPORT."
   (property value start end properties &optional object)
   "Like `gnus-add-text-properties', only applied on where PROPERTY is VALUE."
   (let (point)
-    (while (and start 
+    (while (and start
 		(< start end) ;; XEmacs will loop for every when start=end.
 		(setq point (text-property-not-all start end property value)))
       (gnus-add-text-properties start point properties object)
@@ -1001,7 +1008,7 @@ Entries without port tokens default to DEFAULTPORT."
   (property value start end properties &optional object)
   "Like `remove-text-properties', only applied on where PROPERTY is VALUE."
   (let (point)
-    (while (and start 
+    (while (and start
 		(< start end)
 		(setq point (text-property-not-all start end property value)))
       (remove-text-properties start point properties object)
@@ -1009,6 +1016,12 @@ Entries without port tokens default to DEFAULTPORT."
     (if start
 	(remove-text-properties start end properties object))
     t))
+
+(defun gnus-string-equal (x y)
+  "Like `string-equal', except it compares case-insensitively."
+  (and (= (length x) (length y))
+       (or (string-equal x y)
+	   (string-equal (downcase x) (downcase y)))))
 
 (provide 'gnus-util)
 

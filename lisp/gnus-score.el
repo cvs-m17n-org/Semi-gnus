@@ -1,5 +1,5 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
@@ -232,6 +232,11 @@ This variable allows the same syntax as `gnus-home-score-file'."
 					     (symbol :tag "other"))
 				     (integer :tag "Score"))))))
 
+(defcustom gnus-adaptive-word-length-limit nil
+  "*Words of a length lesser than this limit will be ignored when doing adaptive scoring."
+  :group 'gnus-score-adapt
+  :type 'integer)
+
 (defcustom gnus-ignored-adaptive-words nil
   "List of words to be ignored when doing adaptive word scoring."
   :group 'gnus-score-adapt
@@ -384,7 +389,7 @@ If nil, the user will be asked for a duration."
 (defcustom gnus-score-after-write-file-function nil
   "Function called with the name of the score file just written to disk."
   :group 'gnus-score-files
-  :type 'function)
+  :type '(choice (const nil) function))
 
 (defcustom gnus-score-thread-simplify nil
   "If non-nil, subjects will simplified as in threading."
@@ -808,11 +813,11 @@ If optional argument `EXTRA' is non-nil, it's a non-standard overview header."
 		       (int-to-string match)
 		     match))))
 
-    (set-text-properties 0 (length match) nil match)
-
     ;; If this is an integer comparison, we transform from string to int.
-    (when (eq (nth 2 (assoc header gnus-header-index)) 'gnus-score-integer)
-      (setq match (string-to-int match)))
+    (if (eq (nth 2 (assoc header gnus-header-index)) 'gnus-score-integer)
+	(if (stringp match)
+	    (setq match (string-to-int match)))
+      (set-text-properties 0 (length match) nil match))
 
     (unless (eq date 'now)
       ;; Add the score entry to the score file.
@@ -1492,7 +1497,7 @@ EXTRA is the possible non-standard header."
 	  (gnus-message 5 "Scoring...done"))))))
 
 (defun gnus-score-lower-thread (thread score-adjust)
-  "Lower the socre on THREAD with SCORE-ADJUST.
+  "Lower the score on THREAD with SCORE-ADJUST.
 THREAD is expected to contain a list of the form `(PARENT [CHILD1
 CHILD2 ...])' where PARENT is a header array and each CHILD is a list
 of the same form as THREAD.  The empty list `nil' is valid.  For each
@@ -1516,21 +1521,19 @@ A root is an article with no references.  An orphan is an article
 which has references, but is not connected via its references to a
 root article.  This function finds all the orphans, and adjusts their
 score in GNUS-NEWSGROUP-SCORED by SCORE."
-  (let ((threads (gnus-make-threads)))
-    ;; gnus-make-threads produces a list, where each entry is a "thread"
-    ;; as described in the gnus-score-lower-thread docs.  This function
-    ;; will be called again (after limiting has been done) if the display
-    ;; is threaded.  It would be nice to somehow save this info and use
-    ;; it later.
-    (while threads
-      (let* ((thread (car threads))
-	     (id (aref (car thread) gnus-score-index)))
-	;; If the parent of the thread is not a root, lower the score of
-	;; it and its descendants.  Note that some roots seem to satisfy
-	;; (eq id nil) and some (eq id "");  not sure why.
-	(if (and id (not (string= id "")))
-	    (gnus-score-lower-thread thread score)))
-      (setq threads (cdr threads)))))
+  ;; gnus-make-threads produces a list, where each entry is a "thread"
+  ;; as described in the gnus-score-lower-thread docs.  This function
+  ;; will be called again (after limiting has been done) if the display
+  ;; is threaded.  It would be nice to somehow save this info and use
+  ;; it later.
+  (dolist (thread (gnus-make-threads))
+    (let ((id (aref (car thread) gnus-score-index)))
+      ;; If the parent of the thread is not a root, lower the score of
+      ;; it and its descendants.  Note that some roots seem to satisfy
+      ;; (eq id nil) and some (eq id "");  not sure why.
+      (when (and id
+		 (not (string= id "")))
+	(gnus-score-lower-thread thread score)))))
 
 (defun gnus-score-integer (scores header now expire &optional trace)
   (let ((gnus-score-index (nth 1 (assoc header gnus-header-index)))
@@ -1750,7 +1753,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	  ;; gnus-score-index is used as a free variable.
 	  alike last this art entries alist articles
 	  new news)
-      
+
       ;; Change score file to the adaptive score file.  All entries that
       ;; this function makes will be put into this file.
       (save-excursion
@@ -1760,7 +1763,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	     (gnus-score-file-name
 	      gnus-newsgroup-name gnus-adaptive-file-suffix))))
 
-      (setq gnus-scores-articles (sort gnus-scores-articles 
+      (setq gnus-scores-articles (sort gnus-scores-articles
 				       'gnus-score-string<)
 	    articles gnus-scores-articles)
 
@@ -1829,7 +1832,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 		    (push new news)))))
 	    ;; Update expire date
 	    (cond ((null date))		;Permanent entry.
-		  ((and found gnus-update-score-entry-dates) 
+		  ((and found gnus-update-score-entry-dates)
 					;Match, update date.
 		   (gnus-score-set 'touched '(t) alist)
 		   (setcar (nthcdr 2 kill) now))
@@ -2275,11 +2278,14 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 		      ;; Put the word and score into the hashtb.
 		      (setq val (gnus-gethash (setq word (match-string 0))
 					      hashtb))
-		      (setq val (+ score (or val 0)))
-		      (if (and gnus-adaptive-word-minimum
-			       (< val gnus-adaptive-word-minimum))
-			  (setq val gnus-adaptive-word-minimum))
-		      (gnus-sethash word val hashtb))
+		      (when (or (not gnus-adaptive-word-length-limit)
+				(> (length word)
+				   gnus-adaptive-word-length-limit))
+			(setq val (+ score (or val 0)))
+			(if (and gnus-adaptive-word-minimum
+				 (< val gnus-adaptive-word-minimum))
+			    (setq val gnus-adaptive-word-minimum))
+			(gnus-sethash word val hashtb)))
 		    (erase-buffer))))
 	    (set-syntax-table syntab))
 	  ;; Make all the ignorable words ignored.
@@ -2460,7 +2466,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 (defun gnus-summary-lower-thread (&optional score)
   "Lower score of articles in the current thread with SCORE."
   (interactive "P")
-  (gnus-summary-raise-thread (- (1- (gnus-score-delta-default score)))))
+  (gnus-summary-raise-thread (- (gnus-score-delta-default score))))
 
 ;;; Finding score files.
 
@@ -2522,7 +2528,8 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	(push file out))))
     (or out
 	;; Return a dummy value.
-	(list "~/News/this.file.does.not.exist.SCORE"))))
+	(list (expand-file-name "this.file.does.not.exist.SCORE"
+				gnus-kill-files-directory)))))
 
 (defun gnus-score-file-regexp ()
   "Return a regexp that match all score files."
@@ -2560,8 +2567,10 @@ GROUP using BNews sys file syntax."
 	      ;; too much.
 	      (delete-char (min (1- (point-max)) klen))
 	    (goto-char (point-max))
-	    (search-backward (string directory-sep-char))
-	    (delete-region (1+ (point)) (point-min)))
+	    (if (search-backward (string directory-sep-char) nil t)
+		(delete-region (1+ (point)) (point-min))
+	      (gnus-message 1 "Can't find directory separator in %s"
+			    (car sfiles))))
 	  ;; If short file names were used, we have to translate slashes.
 	  (goto-char (point-min))
 	  (let ((regexp (concat
@@ -2800,7 +2809,7 @@ The list is determined from the variable gnus-score-file-alist."
   (let (out)
     (while files
       ;; #### /$ Unix-specific?
-      (if (string-match "/$" (car files))
+      (if (file-directory-p (car files))
 	  (setq out (nconc (directory-files
 			    (car files) t
 			    (concat (gnus-score-file-regexp) "$"))))

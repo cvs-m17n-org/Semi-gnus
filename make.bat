@@ -44,7 +44,7 @@ set EMACSINFOHACK="(while (re-search-forward \"@\\(end \\)?ifnottex\" nil t) (re
 cd ..\texi
 call %1\bin\%emacs% -batch -q -no-site-file message.texi -eval %EMACSINFOHACK% -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
 call %1\bin\%emacs% -batch -q -no-site-file emacs-mime.texi -eval %EMACSINFOHACK% -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-call %1\bin\%emacs% -batch -q -no-site-file gnus.texi -eval %EMACSINFOHACK% -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
+call %1\bin\%emacs% -batch -q -no-site-file gnus.texi -eval %EMACSINFOHACK% -eval "(setq max-lisp-eval-depth 600)" -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
 if not "%2" == "copy" goto done
 copy gnus %1\info
 copy gnus-?? %1\info
@@ -60,12 +60,16 @@ cd ..
 goto end
 
 :usage
-echo Usage: make ^<emacs-dir^> [copy]
+echo Usage: make :emacs-dir: [copy]
 echo.
-echo where: ^<emacs-dir^> is the directory you installed emacs in
+echo where: :emacs-dir: is the directory you installed emacs in
 echo                    eg. d:\emacs\20.4
 echo        copy indicates that the compiled files should be copied to your
 echo             emacs lisp, info, and etc directories
+echo.
+echo Note: If you have Emacs/w3 you should set the environment variable 
+echo       W3DIR to the directory where w3 is installed eg.
+echo                 set W3DIR=d:\lisp\w3-4.0pre46\lisp
 
 rem Restore PWD so whoever called this batch file doesn't get confused
 set PWD=%GNUS_PWD_SAVE%

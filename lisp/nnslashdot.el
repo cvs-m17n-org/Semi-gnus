@@ -1,5 +1,5 @@
 ;;; nnslashdot.el --- interfacing with Slashdot
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -56,6 +56,9 @@
 (defvoo nnslashdot-article-url
     "http://slashdot.org/article.pl?sid=%s&mode=nocomment"
   "Where nnslashdot will fetch the article from.")
+
+(defvoo nnslashdot-backslash-url "http://slashdot.org/slashdot.xml"
+  "Where nnslashdot will fetch the stories from.")
 
 (defvoo nnslashdot-threshold -1
   "The article threshold.")
@@ -155,7 +158,7 @@
 		 "by <a[^>]+>\\([^<]+\\)</a>[ \t\n]*.*(\\([^)]+\\))")
 		(progn
 		  (goto-char (- (match-end 0) 5))
-		  (setq from (concat 
+		  (setq from (concat
 			      (nnweb-decode-entities-string (match-string 1))
 			      " <" (match-string 2) ">")))
 	      (setq from "")
@@ -183,7 +186,7 @@
 	       (concat subject " (" score ")")
 	       from date
 	       (concat "<" (nnslashdot-sid-strip sid) "%"
-		       (number-to-string (1+ article)) 
+		       (number-to-string (1+ article))
 		       "@slashdot>")
 	       (if parent
 		   (concat "<" (nnslashdot-sid-strip sid) "%"
@@ -257,7 +260,7 @@
 	       "by <a[^>]+>\\([^<]+\\)</a>[ \t\n]*.*(\\([^)]+\\))")
 	      (progn
 		(goto-char (- (match-end 0) 5))
-		(setq from (concat 
+		(setq from (concat
 			    (nnweb-decode-entities-string (match-string 1))
 			    " <" (match-string 2) ">")))
 	    (setq from "")
@@ -284,7 +287,7 @@
 	     (1+ article) (concat subject " (" score ")")
 	     from date
 	     (concat "<" (nnslashdot-sid-strip sid) "%"
-		     (number-to-string (1+ article)) 
+		     (number-to-string (1+ article))
 		     "@slashdot>")
 	     (if parent
 		 (concat "<" (nnslashdot-sid-strip sid) "%"
@@ -385,9 +388,9 @@
 	sid elem description articles gname)
     (condition-case why
         ;; First we do the Ultramode to get info on all the latest groups.
-	(progn 
+	(progn
 	  (mm-with-unibyte-buffer
-	    (nnweb-insert "http://slashdot.org/slashdot.xml" t)
+	    (nnweb-insert nnslashdot-backslash-url t)
 	    (goto-char (point-min))
 	    (while (search-forward "<story>" nil t)
 	      (narrow-to-region (point) (search-forward "</story>"))
@@ -397,8 +400,8 @@
 		    (nnweb-decode-entities-string (match-string 1)))
 	      (re-search-forward "<url>\\([^<]+\\)</url>")
 	      (setq sid (match-string 1))
-	      (string-match "/\\([0-9/]+\\)\\(.shtml\\|$\\)" sid)
-	      (setq sid (concat "00/" (match-string 1 sid)))
+	      (string-match "sid=\\([0-9/]+\\)\\(.shtml\\|$\\)" sid)
+	      (setq sid (match-string 1 sid))
 	      (re-search-forward "<comments>\\([^<]+\\)</comments>")
 	      (setq articles (string-to-number (match-string 1)))
 	      (setq gname (concat description " (" sid ")"))
@@ -431,7 +434,7 @@
     (nnslashdot-write-groups)
     (nnslashdot-generate-active)
     t))
-  
+
 (deffoo nnslashdot-request-newgroups (date &optional server)
   (nnslashdot-possibly-change-server nil server)
   (nnslashdot-generate-active)
@@ -519,7 +522,7 @@
 (defun nnslashdot-write-groups ()
   (with-temp-file (expand-file-name "groups" nnslashdot-directory)
     (prin1 nnslashdot-groups (current-buffer))))
-    
+
 (defun nnslashdot-init (server)
   "Initialize buffers and such."
   (unless (file-exists-p nnslashdot-directory)

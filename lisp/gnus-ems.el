@@ -1,5 +1,5 @@
 ;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -209,14 +209,14 @@
 
 (defvar gnus-article-compface-xbm
   (condition-case ()
-      (eq 0 (string-match "#define" 
+      (eq 0 (string-match "#define"
 			  (shell-command-to-string "uncompface -X")))
     (error nil))
   "Non-nil means the compface program supports the -X option.
 That produces XBM output.")
 
-(defun gnus-article-display-xface (beg end)
-  "Display an XFace header from between BEG and END in the current article.
+(defun gnus-article-display-xface (beg end &optional buffer)
+  "Display an XFace header from between BEG and END in BUFFER.
 Requires support for images in your Emacs and the external programs
 `uncompface', and `icontopbm'.  On a GNU/Linux system these
 might be in packages with names like `compface' or `faces-xface' and
@@ -234,7 +234,10 @@ for XEmacs."
 	    (make-ring gnus-article-xface-ring-size)))
     (save-excursion
       (let* ((cur (current-buffer))
-	     (data (buffer-substring beg end))
+	     (data (if buffer
+		       (with-current-buffer buffer
+			 (buffer-substring beg end))
+		     (buffer-substring beg end)))
 	     (image (cdr-safe (assoc data (ring-elements
 					   gnus-article-xface-ring-internal))))
 	     default-enable-multibyte-characters)

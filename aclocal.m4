@@ -96,6 +96,17 @@ AC_DEFUN(AC_PATH_LISPDIR, [
   AC_SUBST(lispdir)
 ])
 
+AC_DEFUN(AC_PATH_ETCDIR, [
+  AC_ARG_WITH(etcdir,[  --with-etcdir=DIR       Where to install etc files], etcdir=${withval})
+  AC_MSG_CHECKING([where etc files should go])
+  if test -z "$etcdir"; then
+    dnl Set default value
+    etcdir="\$(lispdir)/../etc"
+  fi
+  AC_MSG_RESULT($etcdir)
+  AC_SUBST(etcdir)
+])
+
 dnl
 dnl Check whether a function exists in a library
 dnl All '_' characters in the first argument are converted to '-'
@@ -141,4 +152,28 @@ fi
    W3=${EMACS_cv_ACCEPTABLE_W3}
    AC_SUBST(W3)
    AC_MSG_RESULT("${W3}")
+])
+
+dnl
+dnl Perform sanity checking and try to locate the W3 package
+dnl
+AC_DEFUN(AC_CHECK_URL, [
+AC_MSG_CHECKING(for acceptable URL version)
+AC_CACHE_VAL(EMACS_cv_ACCEPTABLE_URL,[
+AC_EMACS_CHECK_LIB(url, url-retrieve, "noecho")
+if test "${HAVE_url}" = "yes"; then
+	EMACS_cv_ACCEPTABLE_URL=yes
+else
+	EMACS_cv_ACCEPTABLE_URL=no
+fi
+
+if test "${EMACS_cv_ACCEPTABLE_URL}" = "yes"; then
+	AC_EMACS_LISP(url_dir,(file-name-directory (locate-library \"url\")),"noecho")
+	EMACS_cv_ACCEPTABLE_URL=$EMACS_cv_SYS_url_dir
+fi
+])
+   AC_ARG_WITH(url,[  --with-url=DIR          Specify where to find the url package], [ EMACS_cv_ACCEPTABLE_URL=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` ])
+   URL=${EMACS_cv_ACCEPTABLE_URL}
+   AC_SUBST(URL)
+   AC_MSG_RESULT("${URL}")
 ])

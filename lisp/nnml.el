@@ -156,9 +156,9 @@ all.  This may very well take some time.")
 		     server nnml-directory)
     t)))
 
-(defun nnml-request-regenerate (server)
+(deffoo nnml-request-regenerate (server)
   (nnml-possibly-change-directory nil server)
-  (nnml-generate-nov-databases)
+  (nnml-generate-nov-databases server)
   t)
 
 (deffoo nnml-request-article (id &optional group server buffer)
@@ -707,13 +707,14 @@ all.  This may very well take some time.")
       (setq nnml-nov-buffer-alist (cdr nnml-nov-buffer-alist)))))
 
 ;;;###autoload
-(defun nnml-generate-nov-databases ()
+(defun nnml-generate-nov-databases (&optional server)
   "Generate NOV databases in all nnml directories."
-  (interactive)
+  (interactive (list (or (nnoo-current-server 'nnml) "")))
   ;; Read the active file to make sure we don't re-use articles
   ;; numbers in empty groups.
   (nnmail-activate 'nnml)
-  (nnml-open-server (or (nnoo-current-server 'nnml) ""))
+  (unless (nnml-server-opened server)
+    (nnml-open-server server))
   (setq nnml-directory (expand-file-name nnml-directory))
   ;; Recurse down the directories.
   (nnml-generate-nov-databases-1 nnml-directory nil t)
@@ -752,15 +753,18 @@ all.  This may very well take some time.")
 (eval-when-compile (defvar files))
 (defun nnml-generate-active-info (dir)
   ;; Update the active info for this group.
-  (let ((group (nnheader-file-to-group
-		(directory-file-name dir) nnml-directory)))
-    (setq nnml-group-alist
-	  (delq (assoc group nnml-group-alist) nnml-group-alist))
+  (let* ((group (nnheader-file-to-group
+		 (directory-file-name dir) nnml-directory))
+	 (entry (assoc group nnml-group-alist))
+	 (last (or (caadr entry) 0)))
+    (setq nnml-group-alist (delq entry nnml-group-alist))
     (push (list group
-		(cons (caar files)
-		      (let ((f files))
-			(while (cdr f) (setq f (cdr f)))
-			(caar f))))
+		(cons (or (caar files) (1+ last))
+		      (max last
+			   (or (let ((f files))
+				 (while (cdr f) (setq f (cdr f)))
+				 (caar f))
+			       0))))
 	  nnml-group-alist)))
 
 (defun nnml-generate-nov-file (dir files)

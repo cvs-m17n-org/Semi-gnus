@@ -9,10 +9,8 @@ TEXI2DVI=texi2dvi
 TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
 EMACS=@EMACS@
-EMACSINFO=$(EMACS) -batch -q -no-site-file
-INFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-XINFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-EMACSINFOHACK=-eval '(while (re-search-forward "@\\(end \\)?ifnottex" nil t) (replace-match ""))'
+EMACSCOMP=$(EMACS) -batch -q -no-site-file
+EMACSINFO=$(EMACSCOMP) -l $(srcdir)/infohack.el -f batch-makeinfo
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
@@ -30,9 +28,9 @@ most: texi2latex.elc latex latexps
 
 .texi:
 	if test "x$(MAKEINFO)" != "xno" ; then \
-	  makeinfo -I $(srcdir) -o $* $<; \
+	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	else \
-	  $(EMACSINFO) -eval '(find-file "$<")' $(EMACSINFOHACK) $(XINFOSWI); \
+	  $(EMACSINFO) $<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
@@ -71,10 +69,10 @@ makeinfo:
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	srcdir=$(srcdir)/../lisp $(EMACSINFO) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
+	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
 
 latex gnus.latexi gnus-faq.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi texi2latex.elc
-	srcdir=$(srcdir) $(EMACSINFO) -l ./texi2latex.elc -f latexi-translate
+	srcdir=$(srcdir) $(EMACSCOMP) -l ./texi2latex.elc -f latexi-translate
 
 latexps: gnus.latexi
 	make texi2latex.elc

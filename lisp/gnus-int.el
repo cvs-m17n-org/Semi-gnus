@@ -1,5 +1,5 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -124,7 +124,10 @@ If it is down, start it up (again)."
 			(format " on %s" (nth 1 method)))))
       (gnus-run-hooks 'gnus-open-server-hook)
       (prog1
-	  (gnus-open-server method)
+	  (condition-case ()
+	      (gnus-open-server method)
+	    (quit (message "Quit gnus-check-server")
+		  nil))
 	(unless silent
 	  (message ""))))))
 
@@ -457,11 +460,13 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
   (unless (bolp)
     (insert "\n"))
   (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (let ((mail-parse-charset message-default-charset))
-	(mail-encode-encoded-word-buffer)))
-    (message-encode-message-body))
+    (let ((message-options message-options))
+      (message-options-set-recipient)
+      (save-restriction
+	(message-narrow-to-head)
+	(let ((mail-parse-charset message-default-charset))
+	  (mail-encode-encoded-word-buffer)))
+      (message-encode-message-body)))
   (let ((func (car (or gnus-command-method
 		       (gnus-find-method-for-group group)))))
     (funcall (intern (format "%s-request-accept-article" func))
@@ -471,11 +476,13 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 
 (defun gnus-request-replace-article (article group buffer &optional no-encode)
   (unless no-encode
-    (save-restriction
-      (message-narrow-to-head)
-      (let ((mail-parse-charset message-default-charset))
-	(mail-encode-encoded-word-buffer)))
-    (message-encode-message-body))
+    (let ((message-options message-options))
+      (message-options-set-recipient)
+      (save-restriction
+	(message-narrow-to-head)
+	(let ((mail-parse-charset message-default-charset))
+	  (mail-encode-encoded-word-buffer)))
+      (message-encode-message-body)))
   (let ((func (car (gnus-group-name-to-method group))))
     (funcall (intern (format "%s-request-replace-article" func))
 	     article (gnus-group-real-name group) buffer)))

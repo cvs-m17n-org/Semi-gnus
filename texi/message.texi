@@ -1,11 +1,11 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle Message 5.8.8 Manual
+@settitle Message (Oort) Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@dircategory Editors
+@dircategory Emacs
 @direntry
 * Message: (message).   Mail and news composition mode that goes with Gnus.
 @end direntry
@@ -18,7 +18,7 @@
 
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996,97,98,99,2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -41,13 +41,14 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title Message 5.8.7 Manual
+@title Message (Oort) Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996,97,98,99,2000 Free Software Foundation, Inc.
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2000 
+     Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -86,7 +87,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Message 5.8.7.  Message is distributed with
+This manual corresponds to Oort Message.   Message is distributed with
 the Gnus distribution bearing the same version number as this manual.
 
 
@@ -324,6 +325,7 @@ will be removed before popping up the buffer.  The default is
 * Movement::            Moving around in message buffers.
 * Insertion::           Inserting things into message buffers.
 * MIME::                @sc{mime} considerations.
+* Security::            Signing and encrypting messages.
 * Various Commands::    Various things.
 * Sending::             Actually sending the message.
 * Mail Aliases::        How to use mail aliases.
@@ -481,6 +483,10 @@ All headers that match this regexp will be removed from yanked
 messages.  The default is @samp{.}, which means that all headers will be
 removed.
 
+@item message-cite-prefix-regexp
+@vindex message-cite-prefix-regexp
+Regexp matching the longest possible citation prefix on a line.
+
 @item message-citation-line-function
 @vindex message-citation-line-function
 Function called to insert the citation line.  The default is
@@ -574,6 +580,136 @@ You can also create arbitrarily complex multiparts using the MML
 language (@pxref{Composing, , Composing, emacs-mime, The Emacs MIME
 Manual}).
 
+@node Security
+@section Security
+@cindex Security
+@cindex S/MIME
+@cindex PGP/MIME
+@cindex sign
+@cindex encrypt
+
+Using the MML language, Message is able to create digitally signed and
+digitally encrypted messages.  Message (or rather MML) currently support
+PGP/MIME and S/MIME.  Instructing MML to perform security operations on
+a MIME part is done using the @code{C-c C-m s} key map for signing and the
+@code{C-c C-m c} key map for encryption, as follows.
+
+@table @kbd
+
+@item C-c C-m s s
+@kindex C-c C-m s s
+@findex mml-secure-sign-smime
+
+Digitally sign current MIME part using S/MIME.
+
+@item C-c C-m s p
+@kindex C-c C-m s p
+@findex mml-secure-sign-pgp
+
+Digitally sign current MIME part using PGP/MIME.
+
+@item C-c C-m c s
+@kindex C-c C-m c s
+@findex mml-secure-encrypt-smime
+
+Digitally encrypt current MIME part using S/MIME.
+
+@item C-c C-m c p
+@kindex C-c C-m c p
+@findex mml-secure-encrypt-pgpmime
+
+Digitally encrypt current MIME part using PGP/MIME.
+
+@end table
+
+These commands do not immediately sign or encrypt the message, they
+merely insert proper MML tags to instruct the MML engine to perform that
+operation when the message is actually sent.  They may perform other
+operations too, such as locating and retrieving a S/MIME certificate of
+the person you wish to send encrypted mail to.
+
+Since signing and especially encryption often is used when sensitive
+information is sent, you may want to have some way to ensure that your
+mail is actually signed or encrypted.  After invoking the above
+sign/encrypt commands, it is possible to preview the raw article by
+using @code{C-u C-m P} (@code{mml-preview}).  Then you can verify that
+your long rant about what your ex-significant other or whomever actually
+did with that funny looking person at that strange party the other
+night, actually will be sent encrypted.
+
+@emph{Note!}  Neither PGP/MIME nor S/MIME encrypt/signs RFC822 headers.
+They only operate on the MIME object.  Keep this in mind before sending
+mail with a sensitive Subject line.
+
+Actually using the security commands above is not very difficult.  At
+least not compared with making sure all involved programs talk with each
+other properly.  Thus, we now describe what external libraries or
+programs are required to make things work, and some small general hints.
+
+@subsection Using S/MIME
+
+@emph{Note!}  This section assume you have a basic familiarity with
+modern cryptography, S/MIME, various PKCS standards, OpenSSL and so on.
+
+The S/MIME support in Message (and MML) require OpenSSL.  OpenSSL
+perform the actual S/MIME sign/encrypt operations.  OpenSSL can be found
+at @code{http://www.openssl.org/}.  OpenSSL 0.9.6 and later should work.
+Version 0.9.5a cannot extract mail addresses from certificates, and it
+insert a spurious CR character into MIME separators so you may wish to
+avoid it if you would like to avoid being regarded as someone who send
+strange mail. (Although by sending S/MIME messages you've probably
+already lost that contest.)
+
+To be able to send encrypted mail, a personal certificate is not
+required.  Message (MML) need a certificate for the person to whom you
+wish to communicate with though.  You're asked for this when you type
+@code{C-c C-m c s}.  Currently there are two ways to retrieve this
+certificate, from a local file or from DNS.  If you chose a local file,
+it need to contain a X.509 certificate in PEM format.  If you chose DNS,
+you're asked for the domain name where the certificate is stored, the
+default is a good guess.  To my belief, Message (MML) is the first mail
+agent in the world to support retrieving S/MIME certificates from DNS,
+so you're not likely to find very many certificates out there.  At least
+there should be one, stored at the domain @code{simon.josefsson.org}.
+LDAP is a more popular method of distributing certificates, support for
+it is planned.  (Meanwhile, you can use @code{ldapsearch} from the
+command line to retrieve a certificate into a file and use it.)
+
+As for signing messages, OpenSSL can't perform signing operations
+without some kind of configuration.  Especially, you need to tell it
+where your private key and your certificate is stored.  MML uses an
+Emacs interface to OpenSSL, aptly named @code{smime.el}, and it contain
+a @code{custom} group used for this configuration.  So, try @code{M-x
+customize-group RET smime RET} and look around.
+
+Currently there is no support for talking to a CA (or RA) to create your
+own certificate.  None is planned either.  You need to do this manually
+with OpenSSL or using some other program.  I used Netscape and got a
+free S/MIME certificate from one of the big CA's on the net.  Netscape
+is able to export your private key and certificate in PKCS #12 format.
+Use OpenSSL to convert this into a plain X.509 certificate in PEM format
+as follows.
+
+@example
+$ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
+@end example
+
+The @code{key+cert.pem} file should be pointed to from the
+@code{smime-keys} variable.  You should now be able to send signed mail.
+
+@emph{Note!}  Your private key is store unencrypted in the file, so take
+care in handling it.
+
+@subsection Using PGP/MIME
+
+PGP/MIME requires an external OpenPGP implementation, such as GNU
+Privacy Guard (@code{http://www.gnupg.org/}).  It also requires an Emacs
+interface to it, such as Mailcrypt (available from
+@code{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
+Florian Weimer's @code{gpg.el}.
+
+Creating your own OpenPGP key is described in detail in the
+documentation of your OpenPGP implementation, so we refer to it.
 
 @node Various Commands
 @section Various Commands
@@ -785,8 +921,14 @@ look sufficiently similar.
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-If non-@code{nil}, generate all headers before starting to compose the
-message.
+If non-@code{nil}, generate all required headers before starting to
+compose the message.
+
+The variables @code{message-required-mail-headers} and
+@code{message-required-news-headers} specify which headers are required.
+
+Note that some headers will be removed and re-generated before posting,
+because of the variable @code{message-deletable-headers} (see below).
 
 @item message-from-style
 @vindex message-from-style
@@ -855,12 +997,12 @@ address (not primary one) is used in the @code{From} field.
 @vindex message-required-mail-headers
 @xref{News Headers}, for the syntax of this variable.  It is
 @code{(From Date Subject (optional . In-Reply-To) Message-ID Lines
-(optional . X-Mailer))} by default.
+(optional . User-Agent))} by default.
 
 @item message-ignored-mail-headers
 @vindex message-ignored-mail-headers
 Regexp of headers to be removed before mailing.  The default is
-@samp{^[GF]cc:\\|^Resent-Fcc:}.
+@samp{^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:}.
 
 @item message-default-mail-headers
 @vindex message-default-mail-headers
@@ -887,6 +1029,12 @@ headers in this variable.  If this variable is non-@code{nil} (which is
 the default), these headers will be removed before mailing when sending
 messages via MH.  Set it to @code{nil} if your MH can handle these
 headers.
+
+@item message-send-mail-partially-limit
+@vindex message-send-mail-partially-limit
+The limitation of messages sent as message/partial.
+The lower bound of message size in characters, beyond which the message 
+should be sent in several parts. If it is nil, the size is unlimited.
 
 @end table
 
@@ -943,15 +1091,10 @@ will use @code{system-name} to determine the name of the system.  If
 this isn't a fully qualified domain name (FQDN), Message will use
 @code{mail-host-address} as the FQDN of the machine.
 
-@item X-Newsreader
-@cindex X-Newsreader
+@item User-Agent
+@cindex User-Agent
 This optional header will be filled out according to the
 @code{message-newsreader} local variable.
-
-@item X-Mailer
-This optional header will be filled out according to the
-@code{message-mailer} local variable, unless there already is an
-@code{X-Newsreader} header present.
 
 @item In-Reply-To
 This optional header is filled out using the @code{Date} and @code{From}
@@ -1068,7 +1211,7 @@ All these conditions are checked by default.
 @item message-ignored-news-headers
 @vindex message-ignored-news-headers
 Regexp of headers to be removed before posting.  The default is@*
-@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:}.
+@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:}.
 
 @item message-default-news-headers
 @vindex message-default-news-headers
@@ -1165,9 +1308,8 @@ If you want to add certain headers before sending, you can use the
 @lisp
 (add-hook 'message-send-hook 'my-message-add-content)
 (defun my-message-add-content ()
-  (message-add-header
-   "X-In-No-Sense: Nonsense"
-   "X-Whatever: no"))
+  (message-add-header "X-In-No-Sense: Nonsense")
+  (message-add-header "X-Whatever: no"))
 @end lisp
 
 This function won't add the header if the header is already present.

@@ -1,3 +1,25 @@
+2001-02-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* GNUS-NEWS: Copyright and others.
+
+2001-02-09 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4 (AC_CHECK_URL): Add.
+
+	* configure.in: Use it.
+
+2001-01-15  Jesper Harder <harder@ifa.au.dk>
+
+	* make.bat: Fix doc.
+
+2000-12-22 03:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* configure.in: Add etc/Makefile.
+
+2000-12-20  Jesper Harder <jesper_harder@hotmail.com>
+
+	* make.bat: set max-lisp-eval-depth.
+
 2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
 
 	* make.bat: Makes it possible to generate the Info files on

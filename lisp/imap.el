@@ -166,6 +166,7 @@
 
 (defgroup imap nil
   "Low-level IMAP issues."
+  :version "21.1"
   :group 'mail)
 
 (defcustom imap-kerberos4-program '("imtest -m kerberos_v4 -u %l -p %p %s"
@@ -520,7 +521,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	     response)
 	(when process
 	  (with-current-buffer buffer
-	    (setq imap-client-eol "\n")
+	    (setq imap-client-eol "\n"
+		  imap-calculate-literal-size-first t)
 	    (while (and (memq (process-status process) '(open run))
 			(goto-char (point-min))
                         ;; cyrus 1.6.x (13? < x <= 22) queries capabilities
@@ -1460,8 +1462,11 @@ first element, rest of list contain the saved articles' UIDs."
 	      (if (imap-ok-p (imap-send-command-wait cmd))
 		  t
 		(when (and (not dont-create)
-			   (imap-mailbox-get-1 'trycreate mailbox))
-		  (imap-mailbox-create-1 mailbox)
+			   ;; removed because of buggy Oracle server
+			   ;; that doesn't send TRYCREATE tags (which
+			   ;; is a MUST according to specifications):
+			   ;;(imap-mailbox-get-1 'trycreate mailbox)
+			   (imap-mailbox-create-1 mailbox))
 		  (imap-ok-p (imap-send-command-wait cmd)))))
 	    (or no-copyuid
 		(imap-message-copyuid-1 mailbox)))))))
