@@ -5301,13 +5301,17 @@ The prefix argument ALL means to select all articles."
 	  (set-buffer-modified-p nil)
 	  (goto-char (1+ (max 0 pos)))
 	  (setq mode-line-buffer-identification id
-		mode-name "Masquerade"))))
+		mode-name "Masquerade"
+		truncate-lines t))))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
     (if rescan
 	(progn
 	  (switch-to-buffer masquerade)
 	  (set-window-start (selected-window) (point-min))
+	  (static-when (featurep 'xemacs)
+	    (gnus-xmas-switch-horizontal-scrollbar-off)
+	    (redraw-frame))
 	  (set-buffer gnus-group-buffer)
 	  (gnus-group-jump-to-group group)
 	  (unwind-protect
