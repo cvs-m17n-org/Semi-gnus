@@ -3281,19 +3281,35 @@ This sub function is for exclusive use of `message-send-news'."
 	 (method (if (message-functionp message-post-method)
 		     (funcall message-post-method arg)
 		   message-post-method))
-	 ;; BUG: We need to get the charset for each name in the
-	 ;; Newsgroups and Followup-To lines.  Using the empty string
-	 ;; "works" with the a default value of ".*" for
-	 ;; 'gnus-group-name-charset-group-alist', but not anything
-	 ;; more specifik.
-	 ;; -- Par Abrahamsen <abraham@dina.kvl.dk> 2001-10-07.
-	 (group-name-charset (gnus-group-name-charset method ""))
+	 (newsgroups-field (save-restriction
+			     (message-narrow-to-headers-or-head)
+			     (message-fetch-field "Newsgroups")))
+	 (followup-field (save-restriction
+			   (message-narrow-to-headers-or-head)
+			   (message-fetch-field "Followup-To")))
+	 ;; BUG: We really need to get the charset for each name in the
+	 ;; Newsgroups and Followup-To lines to allow crossposting
+	 ;; between group namess with incompatible character sets.
+	 ;; -- Per Abrahamsen <abraham@dina.kvl.dk> 2001-10-08.
+	 (group-field-charset
+	  (gnus-group-name-charset method newsgroups-field))
+	 (followup-field-charset
+	  (gnus-group-name-charset method (or followup-field "")))
+;;; FIXME: Newsgroups or Followup-To fields should be treated as UTF-8.
+;;;	 (rfc2047-header-encoding-alist
+;;;	  (append (when group-field-charset
+;;;		    (list (cons "Newsgroups" group-field-charset)))
+;;;		  (when followup-field-charset
+;;;		    (list (cons "Followup-To" followup-field-charset)))
+;;;		  rfc2047-header-encoding-alist))
 	 (message-syntax-checks
 	  (if arg
 	      (cons '(existing-newsgroups . disabled)
 		    message-syntax-checks)
 	    message-syntax-checks))
 	 (message-this-is-news t)
+;;;	 (message-posting-charset
+;;;	  (gnus-setup-posting-charset newsgroups-field))
 	 result)
     (save-restriction
       (message-narrow-to-headers)
@@ -3303,7 +3319,7 @@ This sub function is for exclusive use of `message-send-news'."
       (run-hooks 'message-header-hook))
     ;; Note: This check will be disabled by the ".*" default value for
     ;; gnus-group-name-charset-group-alist. -- Pa 2001-10-07.
-    (when group-name-charset
+    (when group-field-charset
       (setq message-syntax-checks
 	    (cons '(valid-newsgroups . disabled)
 		  message-syntax-checks)))
