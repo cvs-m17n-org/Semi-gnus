@@ -2912,6 +2912,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
   ">" end-of-buffer
   "\C-c\C-i" gnus-info-find-node
   "\C-c\C-b" gnus-bug
+  "\C-hk" gnus-article-describe-key
+  "\C-hc" gnus-article-describe-key-briefly
 
   "\C-d" gnus-article-read-summary-keys
   "\M-*" gnus-article-read-summary-keys
@@ -2942,6 +2944,9 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 	    (decf c))
 	  keys))))
 
+(eval-when-compile 
+  (defvar gnus-article-commands-menu))
+
 (defun gnus-article-make-menu-bar ()
   (gnus-turn-off-edit-menu 'article)
   (unless (boundp 'gnus-article-article-menu)
@@ -2971,7 +2976,12 @@ If variable `gnus-use-long-file-name' is non-nil, it is
       (define-key gnus-article-mode-map [menu-bar post]
 	(cons "Post" gnus-summary-post-menu)))
 
-    (gnus-run-hooks 'gnus-article-menu-hook)))
+    (gnus-run-hooks 'gnus-article-menu-hook))
+  ;; Add the menu.
+  (when (boundp 'gnus-article-commands-menu)
+    (easy-menu-add gnus-article-commands-menu gnus-article-mode-map))
+  (when (boundp 'gnus-summary-post-menu)
+    (easy-menu-add gnus-summary-post-menu gnus-article-mode-map)))
 
 (defun gnus-article-mode ()
   "Major mode for displaying an article.
@@ -4420,6 +4430,36 @@ Argument LINES specifies lines to be scrolled down."
 		    (set-window-point win new-sum-point))))    )
 	  (switch-to-buffer gnus-article-buffer)
           (ding))))))
+
+(defun gnus-article-describe-key (key)
+  "Display documentation of the function invoked by KEY.  KEY is a string."
+  (interactive "kDescribe key: ")
+  (gnus-article-check-buffer)
+  (if (eq (key-binding key) 'gnus-article-read-summary-keys)
+      (save-excursion
+	(set-buffer gnus-article-current-summary)
+	(let (gnus-pick-mode)
+	  (push (elt key 0) unread-command-events)
+	  (setq key (if (featurep 'xemacs)
+			(events-to-keys (read-key-sequence "Describe key: "))
+		      (read-key-sequence "Describe key: "))))
+	(describe-key key))
+    (describe-key key)))
+
+(defun gnus-article-describe-key-briefly (key &optional insert)
+  "Display documentation of the function invoked by KEY.  KEY is a string."
+  (interactive "kDescribe key: \nP")
+  (gnus-article-check-buffer)
+  (if (eq (key-binding key) 'gnus-article-read-summary-keys)
+      (save-excursion
+	(set-buffer gnus-article-current-summary)
+	(let (gnus-pick-mode)
+	  (push (elt key 0) unread-command-events)
+	  (setq key (if (featurep 'xemacs)
+			(events-to-keys (read-key-sequence "Describe key: "))
+		      (read-key-sequence "Describe key: "))))
+	(describe-key-briefly key insert))
+    (describe-key-briefly key insert)))
 
 (defun gnus-article-hide (&optional arg force)
   "Hide all the gruft in the current article.

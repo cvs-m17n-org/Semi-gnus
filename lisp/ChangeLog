@@ -1,3 +1,21 @@
+2000-11-20 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-make-menu-bar): Use easy-menu-add.
+
+2000-11-20 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-describe-key): Use prompt.
+	(gnus-article-describe-key-briefly): Ditto.
+
+2000-11-20 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-expire): Ignore corrupted history.
+
+2000-11-20 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-describe-key): New function.
+	(gnus-article-describe-key-briefly): New function.
+
 2000-11-19 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* mm-decode.el (mm-decrypt-option): Doc typo.
