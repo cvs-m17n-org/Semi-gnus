@@ -9300,7 +9300,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0(B
 $B$I$l$+$G$"$k;v$,$G$-$^$9!#B0@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"(B
 $B$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"$=$NCM$,5-;v$N%X%C%@!<$KA^F~$5$l$^$9!#$b$7(B
 $BB0@-L>$,(B @code{nil} $B$@$C$?$i$=$N%X%C%@!<L>$O:o=|$5$l$^$9!#$b$7B0@-L>(B
-$B$,(B @code{eval} $B$@$C$?$i$=$NMM<0$,I>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B 
+$B$,(B @code{eval} $B$@$C$?$i$=$NMM<0$,I>2A$5$l!"7k2L$O<N$F$i$l$^$9!#(B
 
 $BB0@-CM$OJ8;zNs(B ($B$=$N$^$^;H$o$l$^$9(B)$B!"0z?t$NL5$$4X?t(B ($BJV$jCM$,;H$o$l$^$9(B)$B!"(B
 $BJQ?t(B ($B$=$NCM$,;H$o$l$^$9(B) $B$^$?$O%j%9%H(B ($B$=$l$O(B @code{$BI>2A(B} $B$5$l$F!"JV$j(B
@@ -13046,7 +13046,7 @@ IMAP $B$O%a!<%k(B ($B$b$7$/$O!"%K%e!<%9!"$b$7$/$O(B ...) $B$rFI$`$?$a$N%M%C
 
 @lisp
 (nnimap "mail.server.com"
-        (nnimap-list-pattern ("INBOX" "Mail/*" "alt.sex.*" 
+        (nnimap-list-pattern ("INBOX" "Mail/*" "alt.sex.*"
                                ("~friend/Mail/" . "list/*"))))
 @end lisp
 
@@ -14097,7 +14097,8 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 @item J Y
 @kindex J Y (Agent Group)
 @findex gnus-agent-synchronize-flags
-Synchronize flags changed while unplugged with remote server, if any.
+$B%j%b!<%H%5!<%P!<$,(B @dfn{unplugged} $B$N$H$-$KJQ99$5$l$?%U%i%0$,$"$l$PF14|(B
+$B$5$;$^$9!#(B
 
 @end table
 
@@ -14170,57 +14171,60 @@ Synchronize flags changed while unplugged with remote server, if any.
 $B;v$O$5$i$KL54|8B$KJ];}$7$^$9!#(B
 
 @node Agent and IMAP
-@subsection Agent and IMAP
+@subsection $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
 
-The Agent work with any Gnus backend, including nnimap.  However, since
-there are some conceptual differences between NNTP and IMAP, this
-section (should) provide you with some information to make Gnus Agent
-work smoother as a IMAP Disconnected Mode client.
+$B%(!<%8%'%s%H$O(B nnimap $B$r4^$`(B gnus $B$N$I$s$J%P%C%/%(%s%I$G$bF0:n$7$^$9!#$7(B
+$B$+$7(B NNTP $B$H(B IMAP $B$K$O$$$/$D$+$N35G0$N0c$$$,$"$k$N$G!"$3$N9`$G$O(B gnus $B%(!<(B
+$B%8%'%s%H$r(B IMAP $B$N(B @dfn{unplugged} $B$J%b!<%I$N%/%i%$%"%s%H$H$7$F1_3j$K;H(B
+$B$($k$h$&$K$9$k$?$a$N!"$$$/$D$+$N>pJs$rDs6!$7$^$9!#(B
 
-The first thing to keep in mind is that all flags (read, ticked, etc)
-are kept on the IMAP server, rather than in @code{.newsrc} as is the
-case for nntp.  Thus Gnus need to remember flag changes when
-disconnected, and synchronize these flags when you plug back in.
+$B?4$KN1$a$F$*$/:G=i$N$3$H$O!"A4$F$N%U%i%0(B (read, ticked $B$J$I(B) $B$O(B nntp $B$N(B
+$B>l9g$K$*$1$k(B @code{.newsrc} $B$G$O$J$/$F(B IMAP $B%5!<%P!<$KJ];}$5$l$k$H$$$&$3(B
+$B$H$G$9!#$7$?$,$C$F!"(Bgnus $B$O(B @dfn{unplugged} $B$N$H$-$N%U%i%0$NJQ2=$r3P$($F(B
+$B$*$$$F!":F$S@\B3$7$?$H$-$K$=$l$i$N%U%i%0$rF14|$5$;$kI,MW$,$"$j$^$9!#(B
 
-Gnus keep track of flag changes when reading nnimap groups under the
-Agent by default.  When you plug back in, by default Gnus will check if
-you have any changed any flags and ask if you wish to synchronize theese
-with the server.  This behaviour is customizable with
-@code{gnus-agent-synchronize-flags}.
+gnus $B$O%(!<%8%'%s%H$N85$G(B nnimap $B%0%k!<%W$rFI$`$H$-!"%G%#%U%)%k%H$G%U%i(B
+$B%0$NJQ2=$K@d$($:Cm0U$7$F$$$^$9!#$"$J$?$,:F$S@\B3$7$?$H$-!"%G%#%U%)%k%H(B
+$B$G(B gnus $B$O$"$J$?$,2?$i$+$N%U%i%0$rJQ99$7$?$+$I$&$+$rD4$Y$F!"$"$J$?$,$=$l(B
+$B$i$r%5!<%P!<$HF14|$5$;$?$$$+$I$&$+$r?R$M$^$9!#$3$N5sF0(B
+$B$O(B @code{gnus-agent-synchronize-flags} $B$G%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9!#(B
 
 @vindex gnus-agent-synchronize-flags
-If @code{gnus-agent-synchronize-flags} is @code{nil}, the Agent will
-never automatically synchronize flags.  If it is @code{ask}, the
-default, the Agent will check if you made any changes and if so ask if
-you wish to synchronize these when you re-connect.  If it has any other
-value, all flags will be synchronized automatically.
+$B$b$7(B @code{gnus-agent-synchronize-flags} $B$,(B @code{nil} $B$@$C$?$i!"%(!<%8%'(B
+$B%s%H$O<+F0E*$K%U%i%0$rF14|$5$;$k$3$H$O$7$^$;$s!#$b$7$=$l$,=i4|CM(B
+$B$N(B @code{ask} $B$@$C$?$i!"%(!<%8%'%s%H$O$"$J$?$,:F@\B3$7$?$H$-$K$"$J$?$,2?(B
+$B$i$+$NJQ99$r9T$J$C$F$$$?$+$I$&$+$rD4$Y$F!"$=$l$i$rF14|$5$;$?$$$+$I$&$+$r(B
+$B?R$M$^$9!#$b$7$=$l$i0J30$NCM$@$C$?>l9g$O!"A4$F$N%U%i%0$O<+F0E*$KF14|$5$;(B
+$B$i$l$^$9!#(B
 
-If you do not wish to automatically synchronize flags when you
-re-connect, this can be done manually with the
-@code{gnus-agent-synchronize-flags} command that is bound to @kbd{J Y}
-in the group buffer by default.
+$B$b$7$"$J$?$,!":F@\B3$7$?$H$-$K<+F0$G%U%i%0$rF14|$5$;$?$/$J$$$J$i!"<jF0$G(B
+$B9T$J$&$3$H$b$G$-$^$9!#$3$l$K$O%G%#%U%)%k%H$G%0%k!<%W%P%C%U%!$N(B @kbd{J Y}
+$B%-!<$K3d$jEv$F$i$l$?(B @code{gnus-agent-synchronize-flags} $B%3%^%s%I$r;H$$(B
+$B$^$9!#(B
 
-Some things are currently not implemented in the Agent that you'd might
-expect from a disconnected IMAP client, including:
+$B$"$J$?$,!"(B@dfn{unplugged} $B$N$H$-$N(B IMAP $B%/%i%$%"%s%H$K4|BT$9$k$G$"$m$&$$(B
+$B$/$D$+$N5!G=$O!"8=:_$N%(!<%8%'%s%H$K$O@9$j9~$^$l$F$$$^$;$s!#$=$l$i$O0J2<(B
+$B$NDL$j$G$9!#(B
 
 @itemize @bullet
 
 @item
-Copying/moving articles into nnimap groups when unplugged.
+@dfn{unplugged} $B$N$H$-$N(B nnimap $B%0%k!<%W$X$N%3%T!<$H0\F0!#(B
 
 @item
-Creating/deleting nnimap groups when unplugged.
+@dfn{unplugged} $B$N$H$-$N(B nnimap $B%0%k!<%W$N:n@.$H:o=|!#(B
 
 @end itemize
 
-Technical note: the synchronization algorithm does not work by "pushing"
-all local flags to the server, but rather incrementally update the
-server view of flags by changing only those flags that were changed by
-the user.  Thus, if you set one flag on a article, quit the group and
-re-select the group and remove the flag; the flag will be set and
-removed from the server when you "synchronize".  The queued flag
-operations can be found in the per-server @code{flags} file in the Agent
-directory.  It's emptied when you synchronize flags.
+$B5;=QE*Cm<a(B: $BA4$F$N%m!<%+%k$J%U%i%0$r0lEY$K%5!<%P!<$K2!$79~$`F14|$O$G$-$^(B
+$B$;$s$,!"%f!<%6$,0l$D$:$D%U%i%0$r99?7$9$k$3$H$O2DG=$G$9!#$7$?$,$C$F!"$"$J(B
+$B$?$,5-;v$N0l$D$N%U%i%0$r%;%C%H$7$F!"$=$N%0%k!<%W$rH4$1=P$F$+$i:FEY$=$N%0(B
+$B%k!<%W$rA*Br$7$F$=$N%U%i%0$r>C$;$P!"$"$J$?$,!VF14|!W$NA`:n$r9T$J$C$?$H$-(B
+$B$K!"$=$N%U%i%0$O%;%C%H$5$l$F%5!<%P!<$+$i$O:o=|$5$l$^$9!#(B
+@c FIXMETGNUS Does it make sense?
+"The queued flag" $B$K4X$9$kF0:n$O!"%(!<%8%'%s%H%G%#%l%/%H%j$K$"$k%5!<%P!<(B
+$BKh$N(B @code{flags} $B%U%!%$%k$NCf$G8+$D$+$k$G$7$g$&!#$=$l$i$O$"$J$?$,%U%i%0(B
+$B$rF14|$5$;$?$H$-$K6u$K$J$j$^$9!#(B
 
 @node Outgoing Messages
 @subsection $B:9=PMQ%a%C%;!<%8(B
