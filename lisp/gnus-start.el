@@ -621,6 +621,7 @@ the first newsgroup."
 	gnus-newsgroup-unreads nil
 	nnoo-state-alist nil
 	gnus-current-select-method nil
+	nnmail-split-history nil
 	gnus-ephemeral-servers nil)
   (gnus-shutdown 'gnus)
   ;; Kill the startup file.
@@ -678,9 +679,9 @@ prompt the user for the name of an NNTP server to use."
     (when gnus-simple-splash
       (setq gnus-simple-splash nil)
       (cond
-       (gnus-xemacs
+       ((featurep 'xemacs)
 	(gnus-xmas-splash))
-       ((and (eq window-system 'x)
+       ((and window-system
 	     (= (frame-height) (1+ (window-height))))
 	(gnus-x-splash))))
 
@@ -1111,29 +1112,30 @@ for new groups, and subscribe the new groups as zombies."
 
 (defun gnus-check-first-time-used ()
   (catch 'ended
-    (let ((files (list gnus-current-startup-file
-		       (concat gnus-current-startup-file ".el")
-		       (concat gnus-current-startup-file ".eld")
-		       gnus-startup-file
-		       (concat gnus-startup-file ".el")
-		       (concat gnus-startup-file ".eld"))))
-      (while files
-	(when (file-exists-p (pop files))
-	  (throw 'ended nil))))
+    ;; First check if any of the following files exist.  If they do,
+    ;; it's not the first time the user has used Gnus.
+    (dolist (file (list gnus-current-startup-file
+			(concat gnus-current-startup-file ".el")
+			(concat gnus-current-startup-file ".eld")
+			gnus-startup-file
+			(concat gnus-startup-file ".el")
+			(concat gnus-startup-file ".eld")))
+      (when (file-exists-p file)
+	(throw 'ended nil)))
     (gnus-message 6 "First time user; subscribing you to default groups")
     (unless (gnus-read-active-file-p)
       (let ((gnus-read-active-file t))
 	(gnus-read-active-file)))
     (setq gnus-newsrc-last-checked-date (current-time-string))
-    (let ((groups gnus-default-subscribed-newsgroups)
+    ;; Subscribe to the default newsgroups.
+    (let ((groups (or gnus-default-subscribed-newsgroups
+		      gnus-backup-default-subscribed-newsgroups))
 	  group)
-      (if (eq groups t)
-	  nil
-	(setq groups (or groups gnus-backup-default-subscribed-newsgroups))
+      (when (eq groups t)
+	;; If t, we subscribe (or not) all groups as if they were new.
 	(mapatoms
 	 (lambda (sym)
-	   (if (null (setq group (symbol-name sym)))
-	       ()
+	   (when (setq group (symbol-name sym))
 	     (let ((do-sub (gnus-matches-options-n group)))
 	       (cond
 		((eq do-sub 'subscribe)
@@ -1144,17 +1146,16 @@ for new groups, and subscribe the new groups as zombies."
 		(t
 		 (push group gnus-killed-list))))))
 	 gnus-active-hashtb)
-	(while groups
-	  (when (gnus-active (car groups))
+	(dolist (group groups)
+	  ;; Only subscribe the default groups that are activated.
+	  (when (gnus-active group)
 	    (gnus-group-change-level
-	     (car groups) gnus-level-default-subscribed gnus-level-killed))
-	  (setq groups (cdr groups)))
+	     group gnus-level-default-subscribed gnus-level-killed)))
 	(save-excursion
 	  (set-buffer gnus-group-buffer)
 	  (gnus-group-make-help-group))
 	(when gnus-novice-user
 	  (gnus-message 7 "`A k' to list killed groups"))))))
-
 
 (defun gnus-subscribe-group (group &optional previous method)
   "Subcribe GROUP and put it after PREVIOUS."
@@ -1384,7 +1385,9 @@ newsgroup."
 	 (condition-case ()
 	     (inline (gnus-request-group group dont-check method))
 	   ;;(error nil)
-	   (quit nil))
+	   (quit
+	    (message "Quit activating %s" group)
+	    nil))
 	 (setq active (gnus-parse-active))
 	 ;; If there are no articles in the group, the GROUP
 	 ;; command may have responded with the `(0 . 0)'.  We
@@ -1737,7 +1740,9 @@ newsgroup."
 	      (gnus-read-active-file-1 method force)
 	    ;; We catch C-g so that we can continue past servers
 	    ;; that do not respond.
-	    (quit nil)))))))
+	    (quit
+	     (message "Quit reading the active file")
+	     nil)))))))
 
 (defun gnus-read-active-file-1 (method force)
   (let (where mesg)
@@ -2627,7 +2632,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	      (let ((str (buffer-substring
 			  (point) (progn (end-of-line) (point))))
 		    (coding
-		     (and (or gnus-xemacs
+		     (and (or (featurep 'xemacs)
 			      (and (boundp 'enable-multibyte-characters)
 				   enable-multibyte-characters))
 			  (fboundp 'gnus-mule-get-coding-system)

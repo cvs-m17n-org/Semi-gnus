@@ -192,8 +192,9 @@ If TOPIC, start with that topic."
     (beginning-of-line)
     (get-text-property (point) 'gnus-active)))
 
-(defun gnus-topic-find-groups (topic &optional level all lowest)
-  "Return entries for all visible groups in TOPIC."
+(defun gnus-topic-find-groups (topic &optional level all lowest recursive)
+  "Return entries for all visible groups in TOPIC.
+If RECURSIVE is t, return groups in its subtopics too."
   (let ((groups (cdr (assoc topic gnus-topic-alist)))
         info clevel unread group params visible-groups entry active)
     (setq lowest (or lowest 1))
@@ -231,7 +232,18 @@ If TOPIC, start with that topic."
 	   (cdr (assq 'visible params)))
        ;; Add this group to the list of visible groups.
        (push (or entry group) visible-groups)))
-    (nreverse visible-groups)))
+    (setq visible-groups (nreverse visible-groups))
+    (when recursive 
+      (if (eq recursive t)
+	  (setq recursive (cdr (gnus-topic-find-topology topic))))
+      (mapcar (lambda (topic-topology)
+		(setq visible-groups 
+		      (nconc visible-groups 
+			     (gnus-topic-find-groups
+			      (caar topic-topology) 
+			      level all lowest topic-topology))))
+	      (cdr recursive)))
+    visible-groups))
 
 (defun gnus-topic-previous-topic (topic)
   "Return the previous topic on the same level as TOPIC."
@@ -505,7 +517,7 @@ articles in the topic and its subtopics."
       (let ((data (cadr (gnus-topic-find-topology topic))))
 	(setcdr data
 		(list (if insert 'visible 'invisible)
-		      hide
+		      (caddr data)
 		      (cadddr data))))
       (if total-remove
 	  (setq gnus-topic-alist
@@ -1019,7 +1031,10 @@ articles in the topic and its subtopics."
       (when (gnus-visual-p 'topic-menu 'menu)
 	(gnus-topic-make-menu-bar))
       (gnus-set-format 'topic t)
-      (gnus-add-minor-mode 'gnus-topic-mode " Topic" gnus-topic-mode-map)
+      (gnus-add-minor-mode 'gnus-topic-mode " Topic"
+			   gnus-topic-mode-map nil (lambda (&rest junk)
+						     (interactive)
+						     (gnus-topic-mode nil t)))
       (add-hook 'gnus-group-catchup-group-hook 'gnus-topic-update-topic)
       (set (make-local-variable 'gnus-group-prepare-function)
 	   'gnus-group-prepare-topics)
@@ -1045,8 +1060,7 @@ articles in the topic and its subtopics."
     ;; Remove topic infestation.
     (unless gnus-topic-mode
       (remove-hook 'gnus-summary-exit-hook 'gnus-topic-update-topic)
-      (remove-hook 'gnus-group-change-level-function
-		   'gnus-topic-change-level)
+      (setq gnus-group-change-level-function nil)
       (remove-hook 'gnus-check-bogus-groups-hook 'gnus-topic-clean-alist)
       (setq gnus-group-prepare-function 'gnus-group-prepare-flat)
       (setq gnus-group-sort-alist-function 'gnus-group-sort-flat))
@@ -1064,7 +1078,8 @@ If performed over a topic line, toggle folding the topic."
   (if (gnus-group-topic-p)
       (let ((gnus-group-list-mode
 	     (if all (cons (if (numberp all) all 7) t) gnus-group-list-mode)))
-	(gnus-topic-fold all))
+	(gnus-topic-fold all)
+	(gnus-dribble-touch))
     (gnus-group-select-group all)))
 
 (defun gnus-mouse-pick-topic (e)
@@ -1115,7 +1130,7 @@ When used interactively, PARENT will be the topic under point."
   (unless parent
     (setq parent (caar gnus-topic-topology)))
   (let ((top (cdr (gnus-topic-find-topology parent)))
-	(full-topic (or full-topic `((,topic visible)))))
+	(full-topic (or full-topic (list (list topic 'visible nil nil)))))
     (unless top
       (error "No such parent topic: %s" parent))
     (if previous
@@ -1206,7 +1221,12 @@ If COPYP, copy the groups instead."
 	(gnus-topic-find-topology topic nil nil gnus-topic-topology)
 	(gnus-topic-enter-dribble))
     (gnus-group-kill-group n discard)
-    (gnus-topic-update-topic)))
+    (if (not (gnus-group-topic-p))
+	(gnus-topic-update-topic)
+      ;; Move up one line so that we update the right topic.
+      (forward-line -1)
+      (gnus-topic-update-topic)
+      (forward-line 1))))
 
 (defun gnus-topic-yank-group (&optional arg)
   "Yank the last topic."
@@ -1256,43 +1276,64 @@ If COPYP, copy the groups instead."
 	    (setq alist (cdr alist))))))
     (gnus-topic-update-topic)))
 
-(defun gnus-topic-hide-topic ()
-  "Hide the current topic."
-  (interactive)
+(defun gnus-topic-hide-topic (&optional permanent)
+  "Hide the current topic.
+If PERMANENT, make it stay hidden in subsequent sessions as well."
+  (interactive "P")
   (when (gnus-current-topic)
     (gnus-topic-goto-topic (gnus-current-topic))
+    (if permanent
+	(setcar (cddr 
+		 (cadr
+		  (gnus-topic-find-topology (gnus-current-topic))))
+		'hidden))
     (gnus-topic-remove-topic nil nil)))
 
-(defun gnus-topic-show-topic ()
-  "Show the hidden topic."
-  (interactive)
+(defun gnus-topic-show-topic (&optional permanent)
+  "Show the hidden topic.
+If PERMANENT, make it stay shown in subsequent sessions as well."
+  (interactive "P")
   (when (gnus-group-topic-p)
-    (gnus-topic-remove-topic t nil)))
+    (if (not permanent)
+	(gnus-topic-remove-topic t nil)
+      (let ((topic 
+	     (gnus-topic-find-topology 
+	      (completing-read "Show topic: " gnus-topic-alist nil t))))
+	(setcar (cddr (cadr topic)) nil)
+	(setcar (cdr (cadr topic)) 'visible)
+	(gnus-group-list-groups)))))
 
-(defun gnus-topic-mark-topic (topic &optional unmark)
-  "Mark all groups in the topic with the process mark."
-  (interactive (list (gnus-group-topic-name)))
+(defun gnus-topic-mark-topic (topic &optional unmark recursive)
+  "Mark all groups in the TOPIC with the process mark.
+If RECURSIVE is t, mark its subtopics too."
+  (interactive (list (gnus-group-topic-name)
+		     nil
+		     (and current-prefix-arg t)))
   (if (not topic)
       (call-interactively 'gnus-group-mark-group)
     (save-excursion
-      (let ((groups (gnus-topic-find-groups topic gnus-level-killed t)))
+      (let ((groups (gnus-topic-find-groups topic gnus-level-killed t nil 
+					    recursive)))
 	(while groups
 	  (funcall (if unmark 'gnus-group-remove-mark 'gnus-group-set-mark)
 		   (gnus-info-group (nth 2 (pop groups)))))))))
 
-(defun gnus-topic-unmark-topic (topic &optional unmark)
-  "Remove the process mark from all groups in the topic."
-  (interactive (list (gnus-group-topic-name)))
+(defun gnus-topic-unmark-topic (topic &optional dummy recursive)
+  "Remove the process mark from all groups in the TOPIC.
+If RECURSIVE is t, unmark its subtopics too."
+  (interactive (list (gnus-group-topic-name)
+		     nil
+		     (and current-prefix-arg t)))
   (if (not topic)
       (call-interactively 'gnus-group-unmark-group)
-    (gnus-topic-mark-topic topic t)))
+    (gnus-topic-mark-topic topic t recursive)))
 
 (defun gnus-topic-get-new-news-this-topic (&optional n)
   "Check for new news in the current topic."
   (interactive "P")
   (if (not (gnus-group-topic-p))
       (gnus-group-get-new-news-this-group n)
-    (gnus-topic-mark-topic (gnus-group-topic-name))
+    (gnus-topic-mark-topic (gnus-group-topic-name) nil (and n t))
     (gnus-group-get-new-news-this-group)))
 
 (defun gnus-topic-move-matching (regexp topic &optional copyp)

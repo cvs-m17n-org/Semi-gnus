@@ -26,20 +26,18 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'ring))
 
 ;;; Function aliases later to be redefined for XEmacs usage.
-
-(eval-and-compile
-  (defvar gnus-xemacs (string-match "XEmacs" emacs-version)
-    "Non-nil if running under XEmacs."))
 
 (defvar gnus-mouse-2 [mouse-2])
 (defvar gnus-down-mouse-3 [down-mouse-3])
 (defvar gnus-down-mouse-2 [down-mouse-2])
 (defvar gnus-widget-button-keymap nil)
 (defvar gnus-mode-line-modified
-  (if (or gnus-xemacs
+  (if (or (featurep 'xemacs)
 	  (< emacs-major-version 20))
       '("--**-" . "-----")
     '("**" "--")))
@@ -48,6 +46,18 @@
   (autoload 'gnus-xmas-define "gnus-xmas")
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
+
+(if (featurep 'xemacs)
+    (autoload 'gnus-smiley-display "smiley")
+  (autoload 'gnus-smiley-display "smiley-ems")) ; override XEmacs version
+
+(defun gnus-kill-all-overlays ()
+  "Delete all overlays in the current buffer."
+  (let* ((overlayss (overlay-lists))
+	 (buffer-read-only nil)
+	 (overlays (delq nil (nconc (car overlayss) (cdr overlayss)))))
+    (while overlays
+      (delete-overlay (pop overlays)))))
 
 ;;; Mule functions.
 
@@ -60,21 +70,10 @@
        valstr)))
 
 (eval-and-compile
-  (if gnus-xemacs
+  (if (featurep 'xemacs)
       (gnus-xmas-define)
     (defvar gnus-mouse-face-prop 'mouse-face
       "Property used for highlighting mouse regions.")))
-
-(eval-and-compile
-  (cond
-   ((not window-system)
-    (defun gnus-dummy-func (&rest args))
-    (let ((funcs '(mouse-set-point set-face-foreground
-				   set-face-background x-popup-menu)))
-      (while funcs
-	(unless (fboundp (car funcs))
-	  (defalias (car funcs) 'gnus-dummy-func))
-	(setq funcs (cdr funcs)))))))
 
 (eval-and-compile
   (let ((case-fold-search t))
@@ -96,10 +95,11 @@
 (defvar gnus-tmp-name)
 (defvar gnus-tmp-closing-bracket)
 (defvar gnus-tmp-subject-or-nil)
+(defvar gnus-check-before-posting)
 
 (defun gnus-ems-redefine ()
   (cond
-   (gnus-xemacs
+   ((featurep 'xemacs)
     (gnus-xmas-redefine))
 
    ((featurep 'mule)
@@ -124,7 +124,6 @@
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
     (defalias 'gnus-max-width-function 'gnus-mule-max-width-function)
-    (defalias 'gnus-summary-set-display-table (lambda ()))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
@@ -158,7 +157,7 @@
 
 (if (fboundp 'add-minor-mode)
     (defalias 'gnus-add-minor-mode 'add-minor-mode)
-  (defun gnus-add-minor-mode (mode name map)
+  (defun gnus-add-minor-mode (mode name map &rest rest)
     (set (make-local-variable mode) t)
     (unless (assq mode minor-mode-alist)
       (push `(,mode ,name) minor-mode-alist))
@@ -172,18 +171,19 @@
 	pixmap file height beg i)
     (save-excursion
       (switch-to-buffer (gnus-get-buffer-create gnus-group-buffer))
-      (let ((buffer-read-only nil))
+      (let ((buffer-read-only nil)
+	    width height)
 	(erase-buffer)
 	(when (and dir
-		   (file-exists-p (setq file (concat dir "x-splash"))))
+		   (file-exists-p (setq file
+					(expand-file-name "x-splash" dir))))
 	  (with-temp-buffer
 	    (insert-file-contents file)
 	    (goto-char (point-min))
 	    (ignore-errors
 	      (setq pixmap (read (current-buffer))))))
 	(when pixmap
-	  (unless (facep 'gnus-splash)
-	    (make-face 'gnus-splash))
+	  (make-face 'gnus-splash)
 	  (setq height (/ (car pixmap) (frame-char-height))
 		width (/ (cadr pixmap) (frame-char-width)))
 	  (set-face-foreground 'gnus-splash "Brown")
@@ -191,11 +191,11 @@
 	  (insert-char ?\n (* (/ (window-height) 2 height) height))
 	  (setq i height)
 	  (while (> i 0)
-	    (insert-char ?  (* (/ (window-width) 2 width) width))
+	    (insert-char ?\  (* (/ (window-width) 2 width) width))
 	    (setq beg (point))
-	    (insert-char ?  width)
+	    (insert-char ?\  width)
 	    (set-text-properties beg (point) '(face gnus-splash))
-	    (insert "\n")
+	    (insert ?\n)
 	    (decf i))
 	  (goto-char (point-min))
 	  (sit-for 0))))))
@@ -207,54 +207,76 @@
 (defvar gnus-article-xface-ring-size 6
   "Length of the ring used for `gnus-article-xface-ring-internal'.")
 
+(defvar gnus-article-compface-xbm
+  (condition-case ()
+      (eq 0 (string-match "#define" 
+			  (shell-command-to-string "uncompface -X")))
+    (error nil))
+  "Non-nil means the compface program supports the -X option.
+That produces XBM output.")
+
 (defun gnus-article-display-xface (beg end)
   "Display an XFace header from between BEG and END in the current article.
-This requires support images in your Emacs and the external programs
-`uncompface', `icontopbm' and `ppmtoxbm'.  On a GNU/Linux system these
+Requires support for images in your Emacs and the external programs
+`uncompface', and `icontopbm'.  On a GNU/Linux system these
 might be in packages with names like `compface' or `faces-xface' and
-`netpbm' or `libgr-progs', for instance.
+`netpbm' or `libgr-progs', for instance.  See also
+`gnus-article-compface-xbm'.
 
 This function is for Emacs 21+.  See `gnus-xmas-article-display-xface'
 for XEmacs."
   ;; It might be worth converting uncompface's output in Lisp.
 
-  (unless gnus-article-xface-ring-internal ; Only load ring when needed.
-    (setq gnus-article-xface-ring-internal
-	  (make-ring gnus-article-xface-ring-size)))
-  (save-excursion
-    (let* ((cur (current-buffer))
-	   (data (buffer-substring beg end))
-	   (image (cdr-safe (assoc data (ring-elements
-					 gnus-article-xface-ring-internal)))))
-      (when (if (fboundp 'display-graphic-p)
-		(display-graphic-p))
+  (when (if (fboundp 'display-graphic-p)
+	    (display-graphic-p))
+    (unless gnus-article-xface-ring-internal ; Only load ring when needed.
+      (setq gnus-article-xface-ring-internal
+	    (make-ring gnus-article-xface-ring-size)))
+    (save-excursion
+      (let* ((cur (current-buffer))
+	     (data (buffer-substring beg end))
+	     (image (cdr-safe (assoc data (ring-elements
+					   gnus-article-xface-ring-internal))))
+	     default-enable-multibyte-characters)
 	(unless image
-	  (let ((coding-system-for-read 'binary)
-		(coding-system-for-write 'binary))
-	    (with-temp-buffer
-	      (insert data)
-	      (and (eq 0 (call-process-region (point-min) (point-max)
-					      "uncompface"
-					      'delete '(t nil)))
+	  (with-temp-buffer
+	    (insert data)
+	    (and (eq 0 (apply #'call-process-region (point-min) (point-max)
+			      "uncompface"
+			      'delete '(t nil) nil
+			      (if gnus-article-compface-xbm
+				  '("-X"))))
+		 (if gnus-article-compface-xbm
+		     t
 		   (goto-char (point-min))
 		   (progn (insert "/* Width=48, Height=48 */\n") t)
 		   (eq 0 (call-process-region (point-min) (point-max)
 					      "icontopbm"
-					      'delete '(t nil)))
-		   (eq 0 (call-process-region (point-min) (point-max)
-					      "pbmtoxbm"
-					      'delete '(t nil)))
-		   (setq image (create-image (buffer-string) 'xbm t)))))
-	  (ring-insert gnus-article-xface-ring-internal (cons data image))))
-      (when image
-	(goto-char (point-min))
-	(re-search-forward "^From:" nil 'move)
-	(insert-image image)))))
+					      'delete '(t nil))))
+		 ;; Miles Bader says that faces don't look right as
+		 ;; light on dark.
+		 (if (eq 'dark (cdr-safe (assq 'background-mode
+					       (frame-parameters))))
+		     (setq image (create-image (buffer-string)
+					       (if gnus-article-compface-xbm
+						   'xbm
+						 'pbm)
+					       t
+					       :ascent 'center
+					       :foreground "black"
+					       :background "white"))
+		   (setq image (create-image (buffer-string)
+					     (if gnus-article-compface-xbm
+						 'xbm
+					       'pbm)
+					     t
+					     :ascent 'center)))))
+	  (ring-insert gnus-article-xface-ring-internal (cons data image)))
+	(when image
+	  (goto-char (point-min))
+	  (re-search-forward "^From:" nil 'move)
+	  (insert-image image))))))
 
 (provide 'gnus-ems)
-
-;; Local Variables:
-;; byte-compile-warnings: '(redefine callargs)
-;; End:
 
 ;;; gnus-ems.el ends here

@@ -8,60 +8,62 @@ VPATH=$(srcdir)
 TEXI2DVI=texi2dvi
 TEXI2PDF=texi2pdf
 MAKEINFO=@MAKEINFO@
+EMACS=@EMACS@
 EMACSINFO=$(EMACS) -batch -q -no-site-file
 INFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
 XINFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
+EMACSINFOHACK=-eval '(while (re-search-forward "@\\(end \\)?ifnottex" nil t) (replace-match ""))'
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
-PERL=perl
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 PAPERTYPE=a4
+INFO_DEPS=gnus message emacs-mime
 
-all: gnus message emacs-mime
+all: $(INFO_DEPS)
 
 most: texi2latex.elc latex latexps
 
 .SUFFIXES: .texi .dvi .ps .pdf
 
 .texi:
-	if test -x $(MAKEINFO); then \
-	  makeinfo -o $* $<; \
+	if test "x$(MAKEINFO)" != "xno" ; then \
+	  makeinfo -I $(srcdir) -o $* $<; \
 	else \
-	  $(EMACSINFO) -eval '(find-file "$<")' $(XINFOSWI); \
+	  $(EMACSINFO) -eval '(find-file "$<")' $(EMACSINFOHACK) $(XINFOSWI); \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi
 
 pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf
- 
+
 .texi.dvi :
-	$(PERL) -n -e 'print unless (/\@iflatex/ .. /\@end iflatex/)' $< > gnustmp.texi
-	$(TEXI2DVI) gnustmp.texi
+	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi 
+	$(TEXI2DVI) -I $(srcdir) gnustmp.texi
 	cp gnustmp.dvi $*.dvi
 	rm gnustmp.*
 
 .texi.pdf :
-	$(PERL) -n -e 'print unless (/\@iflatex/ .. /\@end iflatex/)' $< > gnustmp.texi
-	$(TEXI2PDF) gnustmp.texi
+	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi 
+	$(TEXI2PDF) -I $(srcdir) gnustmp.texi
 	cp gnustmp.pdf $*.pdf
 	rm gnustmp.*
 
 refcard.dvi: refcard.tex gnuslogo.refcard gnusref.tex
-	$(LATEX) refcard.tex
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) refcard.tex
 
 
 refcard.pdf: refcard.tex gnuslogo.refcard gnusref.tex
-	epstopdf gnuslogo.refcard --outfile=gnuslogo.refcard.pdf
-	$(PDFLATEX) refcard.tex
+	epstopdf $(srcdir)/gnuslogo.refcard --outfile=gnuslogo.refcard.pdf
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) refcard.tex
 
 clean:
 	rm -f gnus.*.bak *.ky *.cp *.fn *.cps *.kys *.log *.aux *.dvi *.vr \
-	*.tp *.toc *.pg gnus.latexi *.aux *.[cgk]idx \
+	*.pdf *.tp *.toc *.pg gnus.latexi *.aux *.[cgk]idx \
 	gnus.ilg gnus.ind gnus.[cgk]ind gnus.idx \
-	gnus.tmptexi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
+	gnustmp.texi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
 	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi
 
 makeinfo:
@@ -69,16 +71,16 @@ makeinfo:
 	makeinfo -o message message.texi
 
 texi2latex.elc: texi2latex.el
-	$(EMACSINFO) -batch -l bytecomp --eval '(byte-compile-file "texi2latex.el")'
+	srcdir=$(srcdir)/../lisp $(EMACSINFO) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
 
-latex: gnus.texi texi2latex.elc
-	$(EMACSINFO) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
+latex gnus.latexi gnus-faq.latexi: $(srcdir)/gnus.texi $(srcdir)/gnus-faq.texi texi2latex.elc
+	srcdir=$(srcdir) $(EMACSINFO) -l ./texi2latex.elc -f latexi-translate
 
-latexps:
+latexps: gnus.latexi
 	make texi2latex.elc
 	rm -f gnus.aux
 	egrep -v "label.*Index|chapter.*Index" gnus.latexi > gnus.tmplatexi1
-	$(LATEX) gnus.tmplatexi1
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) gnus.tmplatexi1
 	./splitindex
 	makeindex -o gnus.kind gnus.kidx
 	makeindex -o gnus.cind gnus.cidx
@@ -125,13 +127,14 @@ veryclean:
 
 distclean:
 	make clean
-	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9] Makefile
-	rm -f message message-[0-9]
-	rm -f emacs-mime
+	rm -f *.orig *.rej *.elc *~ gnus-[0-9] gnus-[0-9][0-9] Makefile
+	rm -f message-[0-9]
+	rm -f $(INFO_DEPS)
 
-install:
+install: $(INFO_DEPS)
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
-	@for file in gnus message emacs-mime; do \
+	@list='$(INFO_DEPS)'; \
+	for file in $$list; do \
 	  for ifile in `echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
 	    if test -f $$ifile; then \
 	      echo " $(INSTALL_DATA) $$ifile $(infodir)/$$ifile"; \
@@ -139,6 +142,13 @@ install:
 	    else : ; fi; \
 	  done; \
 	done
+	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
+	  list='$(INFO_DEPS)'; \
+	  for file in $$list; do \
+	    echo " install-info --info-dir=$(infodir) $(infodir)/$$file";\
+	    install-info --info-dir=$(infodir) $(infodir)/$$file || :;\
+	  done; \
+	else : ; fi
 
 tmps:
 	if [ ! -e tmp ]; then mkdir tmp; fi

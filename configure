@@ -11,6 +11,14 @@
 ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
+ac_help="$ac_help
+  --with-xemacs           Use XEmacs to build"
+ac_help="$ac_help
+  --with-emacs            Use Emacs to build"
+ac_help="$ac_help
+  --with-lispdir=DIR      Where to install lisp files"
+ac_help="$ac_help
+  --with-w3=DIR           Specify where to find the w3 package"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -519,7 +527,7 @@ fi
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:523: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:531: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -575,7 +583,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:579: checking for a BSD compatible install" >&5
+echo "configure:587: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -624,96 +632,274 @@ test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
-# If set to t, that means we are running in a shell under Emacs.
-  # If you have an Emacs named "t", then use the full path.
-  test "$EMACS" = t && EMACS=
-  # Extract the first word of "emacs xemacs", so it can be a program name with args.
-set dummy emacs xemacs; ac_word=$2
+
+if test "${EMACS}" = "t"; then
+   EMACS=""
+fi
+
+# Check whether --with-xemacs or --without-xemacs was given.
+if test "${with_xemacs+set}" = set; then
+  withval="$with_xemacs"
+   if test "${withval}" = "yes"; then EMACS=xemacs; else EMACS=${withval}; fi 
+fi
+
+# Check whether --with-emacs or --without-emacs was given.
+if test "${with_emacs+set}" = set; then
+  withval="$with_emacs"
+   if test "${withval}" = "yes"; then EMACS=emacs; else EMACS=${withval}; fi 
+fi
+
+# Extract the first word of "makeinfo", so it can be a program name with args.
+set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:634: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_path_EMACS'+set}'`\" = set"; then
+echo "configure:656: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  case "$EMACS" in
-  /*)
-  ac_cv_path_EMACS="$EMACS" # Let the user override the test with a path.
-  ;;
-  *)
+  if test -n "$MAKEINFO"; then
+  ac_cv_prog_MAKEINFO="$MAKEINFO" # Let the user override the test.
+else
   IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
-      ac_cv_path_EMACS="$ac_dir/$ac_word"
+      ac_cv_prog_MAKEINFO="makeinfo"
       break
     fi
   done
   IFS="$ac_save_ifs"
-  test -z "$ac_cv_path_EMACS" && ac_cv_path_EMACS="no"
-  ;;
-esac
+  test -z "$ac_cv_prog_MAKEINFO" && ac_cv_prog_MAKEINFO="no"
 fi
-EMACS="$ac_cv_path_EMACS"
+fi
+MAKEINFO="$ac_cv_prog_MAKEINFO"
+if test -n "$MAKEINFO"; then
+  echo "$ac_t""$MAKEINFO" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+# Extract the first word of "emacs", so it can be a program name with args.
+set dummy emacs; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:686: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_EMACS'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$EMACS"; then
+  ac_cv_prog_EMACS="$EMACS" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  for ac_dir in $PATH; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_EMACS="emacs"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_EMACS" && ac_cv_prog_EMACS="xemacs"
+fi
+fi
+EMACS="$ac_cv_prog_EMACS"
 if test -n "$EMACS"; then
   echo "$ac_t""$EMACS" 1>&6
 else
   echo "$ac_t""no" 1>&6
 fi
 
-  if test $EMACS != "no"; then
-    echo $ac_n "checking where .elc files should go""... $ac_c" 1>&6
-echo "configure:665: checking where .elc files should go" >&5
-        lispdir="\$(datadir)/emacs/site-lisp"
-    if test "x$prefix" = "xNONE"; then
-      if test -d $ac_default_prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp"
-      else
-	if test -d $ac_default_prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp"
-	fi
-      fi
-    else
-      if test -d $prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp"
-      else
-	if test -d $prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp"
-	fi
-      fi
-    fi
-    echo "$ac_t""$lispdir" 1>&6
-  fi
+
+
   
-# Extract the first word of "makeinfo", so it can be a program name with args.
-set dummy makeinfo; ac_word=$2
-echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:690: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_path_MAKEINFO'+set}'`\" = set"; then
+  echo $ac_n "checking if $EMACS is really XEmacs""... $ac_c" 1>&6
+echo "configure:716: checking if $EMACS is really XEmacs" >&5
+  
+elisp="(if (string-match \"XEmacs\" emacs-version) \"yes\" \"no\") "
+if test -z ""noecho""; then
+	echo $ac_n "checking for xemacsp""... $ac_c" 1>&6
+echo "configure:721: checking for xemacsp" >&5
+fi
+if eval "test \"`echo '$''{'EMACS_cv_SYS_xemacsp'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  case "$MAKEINFO" in
-  /*)
-  ac_cv_path_MAKEINFO="$MAKEINFO" # Let the user override the test with a path.
-  ;;
-  *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
-  for ac_dir in $PATH; do
-    test -z "$ac_dir" && ac_dir=.
-    if test -f $ac_dir/$ac_word; then
-      ac_cv_path_MAKEINFO="$ac_dir/$ac_word"
-      break
-    fi
-  done
-  IFS="$ac_save_ifs"
-  test -z "$ac_cv_path_MAKEINFO" && ac_cv_path_MAKEINFO="no"
-  ;;
-esac
+  
+	OUTPUT=./conftest-$$
+	echo ${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil \"${OUTPUT}\"))" >& 5 2>&1  
+	${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x 'ignore) (prin1-to-string x)) nil \"${OUTPUT}\"nil 5))" >& 5 2>&1
+	retval=`cat ${OUTPUT}`
+	echo "=> ${retval}" >& 5 2>&1
+	rm -f ${OUTPUT}
+	EMACS_cv_SYS_xemacsp=$retval
+
 fi
-MAKEINFO="$ac_cv_path_MAKEINFO"
-if test -n "$MAKEINFO"; then
-  echo "$ac_t""$MAKEINFO" 1>&6
+
+xemacsp=${EMACS_cv_SYS_xemacsp}
+if test -z ""noecho""; then
+	echo "$ac_t""$xemacsp" 1>&6
+fi
+
+  XEMACS=${EMACS_cv_SYS_xemacsp}
+  EMACS_FLAVOR=emacs
+  if test "$XEMACS" = "yes"; then
+     EMACS_FLAVOR=xemacs
+  fi
+  echo "$ac_t""$XEMACS" 1>&6
+  
+  
+
+  if test "$prefix" = "NONE"; then
+	echo $ac_n "checking prefix for your Emacs""... $ac_c" 1>&6
+echo "configure:753: checking prefix for your Emacs" >&5
+	
+elisp="(expand-file-name \"..\" invocation-directory)"
+if test -z ""noecho""; then
+	echo $ac_n "checking for prefix""... $ac_c" 1>&6
+echo "configure:758: checking for prefix" >&5
+fi
+if eval "test \"`echo '$''{'EMACS_cv_SYS_prefix'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
 else
-  echo "$ac_t""no" 1>&6
+  
+	OUTPUT=./conftest-$$
+	echo ${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil \"${OUTPUT}\"))" >& 5 2>&1  
+	${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x 'ignore) (prin1-to-string x)) nil \"${OUTPUT}\"nil 5))" >& 5 2>&1
+	retval=`cat ${OUTPUT}`
+	echo "=> ${retval}" >& 5 2>&1
+	rm -f ${OUTPUT}
+	EMACS_cv_SYS_prefix=$retval
+
 fi
+
+prefix=${EMACS_cv_SYS_prefix}
+if test -z ""noecho""; then
+	echo "$ac_t""$prefix" 1>&6
+fi
+
+	prefix=${EMACS_cv_SYS_prefix}
+	echo "$ac_t""$prefix" 1>&6
+  fi
+  # Check whether --with-lispdir or --without-lispdir was given.
+if test "${with_lispdir+set}" = set; then
+  withval="$with_lispdir"
+  lispdir=${withval}
+fi
+
+  echo $ac_n "checking where .elc files should go""... $ac_c" 1>&6
+echo "configure:789: checking where .elc files should go" >&5
+  if test -z "$lispdir"; then
+        theprefix=$prefix
+    if test "x$theprefix" = "xNONE"; then
+	theprefix=$ac_default_prefix
+    fi
+    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp"
+    for thedir in share lib; do
+	potential=
+	if test -d ${theprefix}/${thedir}/${EMACS_FLAVOR}/site-lisp; then
+	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp"
+	   break
+	fi
+    done
+  fi
+  echo "$ac_t""$lispdir" 1>&6
+  
+
+
+echo $ac_n "checking for acceptable W3 version""... $ac_c" 1>&6
+echo "configure:809: checking for acceptable W3 version" >&5
+if eval "test \"`echo '$''{'EMACS_cv_ACCEPTABLE_W3'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+
+if test -z ""noecho""; then
+	echo $ac_n "checking for w3-form-encode-xwfu in w3_forms""... $ac_c" 1>&6
+echo "configure:817: checking for w3-form-encode-xwfu in w3_forms" >&5
+fi
+library=`echo w3_forms | tr _ -`
+
+elisp="(progn (fmakunbound 'w3-form-encode-xwfu) (condition-case nil (progn (require '$library) (fboundp 'w3-form-encode-xwfu)) (error (prog1 nil (message \"$library not found\")))))"
+if test -z ""noecho""; then
+	echo $ac_n "checking for w3_forms""... $ac_c" 1>&6
+echo "configure:824: checking for w3_forms" >&5
+fi
+if eval "test \"`echo '$''{'EMACS_cv_SYS_w3_forms'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+	OUTPUT=./conftest-$$
+	echo ${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil \"${OUTPUT}\"))" >& 5 2>&1  
+	${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x 'ignore) (prin1-to-string x)) nil \"${OUTPUT}\"nil 5))" >& 5 2>&1
+	retval=`cat ${OUTPUT}`
+	echo "=> ${retval}" >& 5 2>&1
+	rm -f ${OUTPUT}
+	EMACS_cv_SYS_w3_forms=$retval
+
+fi
+
+w3_forms=${EMACS_cv_SYS_w3_forms}
+if test -z ""noecho""; then
+	echo "$ac_t""$w3_forms" 1>&6
+fi
+
+if test "${EMACS_cv_SYS_w3_forms}" = "nil"; then
+	EMACS_cv_SYS_w3_forms=no
+fi
+if test "${EMACS_cv_SYS_w3_forms}" = "t"; then
+	EMACS_cv_SYS_w3_forms=yes
+fi
+HAVE_w3_forms=${EMACS_cv_SYS_w3_forms}
+
+if test -z ""noecho""; then
+	echo "$ac_t""$HAVE_w3_forms" 1>&6
+fi
+
+if test "${HAVE_w3_forms}" = "yes"; then
+	EMACS_cv_ACCEPTABLE_W3=yes
+else
+	EMACS_cv_ACCEPTABLE_W3=no
+fi
+
+if test "${EMACS_cv_ACCEPTABLE_W3}" = "yes"; then
+	
+elisp="(file-name-directory (locate-library \"w3-forms\"))"
+if test -z ""noecho""; then
+	echo $ac_n "checking for w3_dir""... $ac_c" 1>&6
+echo "configure:868: checking for w3_dir" >&5
+fi
+if eval "test \"`echo '$''{'EMACS_cv_SYS_w3_dir'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+	OUTPUT=./conftest-$$
+	echo ${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x) (prin1-to-string x)) nil \"${OUTPUT}\"))" >& 5 2>&1  
+	${EMACS} -batch -eval "(let ((x ${elisp})) (write-region (if (stringp x) (princ x 'ignore) (prin1-to-string x)) nil \"${OUTPUT}\"nil 5))" >& 5 2>&1
+	retval=`cat ${OUTPUT}`
+	echo "=> ${retval}" >& 5 2>&1
+	rm -f ${OUTPUT}
+	EMACS_cv_SYS_w3_dir=$retval
+
+fi
+
+w3_dir=${EMACS_cv_SYS_w3_dir}
+if test -z ""noecho""; then
+	echo "$ac_t""$w3_dir" 1>&6
+fi
+
+	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_dir
+fi
+
+fi
+
+   # Check whether --with-w3 or --without-w3 was given.
+if test "${with_w3+set}" = set; then
+  withval="$with_w3"
+   EMACS_cv_ACCEPTABLE_W3=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` 
+fi
+
+   W3=${EMACS_cv_ACCEPTABLE_W3}
+   
+   echo "$ac_t"""${W3}"" 1>&6
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -861,9 +1047,13 @@ s%@mandir@%$mandir%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
-s%@EMACS@%$EMACS%g
-s%@lispdir@%$lispdir%g
 s%@MAKEINFO@%$MAKEINFO%g
+s%@EMACS@%$EMACS%g
+s%@XEMACS@%$XEMACS%g
+s%@EMACS_FLAVOR@%$EMACS_FLAVOR%g
+s%@lispdir@%$lispdir%g
+s%@HAVE_w3_forms@%$HAVE_w3_forms%g
+s%@W3@%$W3%g
 
 CEOF
 EOF

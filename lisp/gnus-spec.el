@@ -1,4 +1,4 @@
-;;; gnus-spec.el --- format spec functions for Gnus
+;;; gnus-spec.el --- format spec functions for Gnus  -*- coding: iso-latin-1 -*-
 ;; Copyright (C) 1996, 1997, 1998, 1999, 2000
 ;;        Free Software Foundation, Inc.
 
@@ -531,7 +531,7 @@ If PROPS, insert the result."
 		       ;; Under XEmacs, it's (funcall #<compiled-function ...>)
 		       (not (and (eq 'funcall (car form))
 				 (byte-code-function-p (cadr form)))))
-	      (fset 'gnus-tmp-func `(lambda () ,form))
+	      (defalias 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
 	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))
 

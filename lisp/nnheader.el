@@ -33,6 +33,10 @@
 
 (require 'mail-utils)
 (require 'mm-util)
+(eval-and-compile
+  (autoload 'gnus-sorted-intersection "gnus-range")
+  (autoload 'gnus-intersection "gnus-range")
+  (autoload 'gnus-sorted-complement "gnus-range"))
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -139,7 +143,7 @@ on your system, you could say something like:
   `(aref ,header 8))
 
 (defmacro mail-header-set-xref (header xref)
-  "Set article xref of HEADER to xref."
+  "Set article XREF of HEADER to xref."
   `(aset ,header 8 ,xref))
 
 (defmacro mail-header-extra (header)
@@ -216,7 +220,8 @@ on your system, you could say something like:
 	   ;; From.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nfrom: " nil t)
+	     (if (or (search-forward "\nfrom: " nil t)
+		     (search-forward "\nfrom:" nil t))
 		 (nnheader-header-value) "(nobody)"))
 	   ;; Date.
 	   (progn
@@ -332,36 +337,43 @@ on your system, you could say something like:
      (nnheader-nov-read-integer)	; lines
      (if (eq (char-after) ?\n)
 	 nil
-       (nnheader-nov-field))		; misc
+       (if (looking-at "Xref: ")
+	   (goto-char (match-end 0)))
+       (nnheader-nov-field))		; Xref
      (nnheader-nov-parse-extra))))	; extra
 
 (defun nnheader-insert-nov (header)
   (princ (mail-header-number header) (current-buffer))
-  (insert
-   "\t"
-   (or (mail-header-subject header) "(none)") "\t"
-   (or (mail-header-from header) "(nobody)") "\t"
-   (or (mail-header-date header) "") "\t"
-   (or (mail-header-id header)
-       (nnmail-message-id))
-   "\t"
-   (or (mail-header-references header) "") "\t")
-  (princ (or (mail-header-chars header) 0) (current-buffer))
-  (insert "\t")
-  (princ (or (mail-header-lines header) 0) (current-buffer))
-  (insert "\t")
-  (when (mail-header-xref header)
-    (insert "Xref: " (mail-header-xref header)))
-  (when (or (mail-header-xref header)
-	    (mail-header-extra header))
-    (insert "\t"))
-  (when (mail-header-extra header)
-    (let ((extra (mail-header-extra header)))
-      (while extra
-	(insert (symbol-name (caar extra))
-		": " (cdar extra) "\t")
-        (pop extra))))
-  (insert "\n"))
+  (let ((p (point)))
+    (insert
+     "\t"
+     (or (mail-header-subject header) "(none)") "\t"
+     (or (mail-header-from header) "(nobody)") "\t"
+     (or (mail-header-date header) "") "\t"
+     (or (mail-header-id header)
+	 (nnmail-message-id))
+     "\t"
+     (or (mail-header-references header) "") "\t")
+    (princ (or (mail-header-chars header) 0) (current-buffer))
+    (insert "\t")
+    (princ (or (mail-header-lines header) 0) (current-buffer))
+    (insert "\t")
+    (when (mail-header-xref header)
+      (insert "Xref: " (mail-header-xref header)))
+    (when (or (mail-header-xref header)
+	      (mail-header-extra header))
+      (insert "\t"))
+    (when (mail-header-extra header)
+      (let ((extra (mail-header-extra header)))
+	(while extra
+	  (insert (symbol-name (caar extra))
+		  ": " (cdar extra) "\t")
+	  (pop extra))))
+    (insert "\n")
+    (backward-char 1)
+    (while (search-backward "\n" p t)
+      (delete-char 1))
+    (forward-line 1)))
 
 (defun nnheader-insert-header (header)
   (insert
@@ -577,17 +589,20 @@ the line could be found."
   "Regexp that matches numerical full file paths.")
 
 (defsubst nnheader-file-to-number (file)
-  "Take a file name and return the article number."
+  "Take a FILE name and return the article number."
   (if (string= nnheader-numerical-short-files "^[0-9]+$")
       (string-to-int file)
     (string-match nnheader-numerical-short-files file)
     (string-to-int (match-string 0 file))))
 
+(defvar nnheader-directory-files-is-safe nil
+  "If non-nil, Gnus believes `directory-files' is safe.
+It has been reported numerous times that `directory-files' fails with
+an alarming frequency on NFS mounted file systems. If it is nil,
+`nnheader-directory-files-safe' is used.")
+
 (defun nnheader-directory-files-safe (&rest args)
-  ;; It has been reported numerous times that `directory-files'
-  ;; fails with an alarming frequency on NFS mounted file systems.
-  ;; This function executes that function twice and returns
-  ;; the longest result.
+  "Execute `directory-files' twice and returns the longer result."
   (let ((first (apply 'directory-files args))
 	(second (apply 'directory-files args)))
     (if (> (length first) (length second))
@@ -595,16 +610,22 @@ the line could be found."
       second)))
 
 (defun nnheader-directory-articles (dir)
-  "Return a list of all article files in a directory."
+  "Return a list of all article files in directory DIR."
   (mapcar 'nnheader-file-to-number
-	  (nnheader-directory-files-safe
-	   dir nil nnheader-numerical-short-files t)))
+	  (if nnheader-directory-files-is-safe 
+	      (directory-files
+	       dir nil nnheader-numerical-short-files t)
+	    (nnheader-directory-files-safe
+	     dir nil nnheader-numerical-short-files t))))
 
 (defun nnheader-article-to-file-alist (dir)
   "Return an alist of article/file pairs in DIR."
   (mapcar (lambda (file) (cons (nnheader-file-to-number file) file))
-	  (nnheader-directory-files-safe
-	   dir nil nnheader-numerical-short-files t)))
+	  (if nnheader-directory-files-is-safe 
+	      (directory-files
+	       dir nil nnheader-numerical-short-files t)
+	    (nnheader-directory-files-safe
+	     dir nil nnheader-numerical-short-files t))))
 
 (defun nnheader-fold-continuation-lines ()
   "Fold continuation lines in the current buffer."
@@ -622,15 +643,30 @@ If FULL, translate everything."
 	  ;; Do complete translation.
 	  (setq leaf (copy-sequence file)
 		path ""
-		i (if (and (< 1 (length leaf)) (eq ?: (aref leaf 1))) 
+		i (if (and (< 1 (length leaf)) (eq ?: (aref leaf 1)))
 		      2 0))
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
-	(if (string-match "/[^/]+\\'" file)
-	    ;; This is needed on NT's and stuff.
-	    (setq leaf (substring file (1+ (match-beginning 0)))
-		  path (substring file 0 (1+ (match-beginning 0))))
-	  ;; Fall back on this.
+	(if (and (featurep 'xemacs)
+		 (memq system-type '(win32 w32 mswindows windows-nt)))
+	    ;; This is needed on NT and stuff, because
+	    ;; file-name-nondirectory is not enough to split
+	    ;; file names, containing ':', e.g.
+	    ;; "d:\\Work\\News\\nntp+news.fido7.ru:fido7.ru.gnu.SCORE"
+	    ;; 
+	    ;; we are trying to correctly split such names:
+	    ;; "d:file.name" -> "a:" "file.name"
+	    ;; "aaa:bbb.ccc" -> "" "aaa:bbb.ccc"
+	    ;; "d:aaa\\bbb:ccc"   -> "d:aaa\\" "bbb:ccc"
+	    ;; etc.
+	    ;; to translate then only the file name part.
+	    (progn
+	      (setq leaf file
+		    path "")
+	      (if (string-match "\\(^\\w:\\|[/\\]\\)\\([^/\\]+\\)$" file)
+		  (setq leaf (substring file (match-beginning 2))
+			path (substring file 0 (match-beginning 2)))))
+	  ;; Emacs DTRT, says andrewi.
 	  (setq leaf (file-name-nondirectory file)
 		path (file-name-directory file))))
       (setq len (length leaf))
@@ -669,17 +705,8 @@ without formatting."
       (apply 'insert format args))
     t))
 
-(defun nnheader-replace-chars-in-string (string from to)
-  "Replace characters in STRING from FROM to TO."
-  (let ((string (substring string 0))	;Copy string.
-	(len (length string))
-	(idx 0))
-    ;; Replace all occurrences of FROM with TO.
-    (while (< idx len)
-      (when (= (aref string idx) from)
-	(aset string idx to))
-      (setq idx (1+ idx)))
-    string))
+(defsubst nnheader-replace-chars-in-string (string from to)
+  (mm-subst-char-in-string from to string))
 
 (defun nnheader-replace-duplicate-chars-in-string (string from to)
   "Replace characters in STRING from FROM to TO."
@@ -721,7 +748,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'binary
+(defvar nnheader-pathname-coding-system 'iso-8859-1
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)
@@ -747,7 +774,7 @@ without formatting."
       (and (listp form) (eq (car form) 'lambda))))
 
 (defun nnheader-concat (dir &rest files)
-  "Concat DIR as directory to FILE."
+  "Concat DIR as directory to FILES."
   (apply 'concat (file-name-as-directory dir) files))
 
 (defun nnheader-ms-strip-cr ()
@@ -782,8 +809,9 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
 	(setq path (cdr path))))
     result))
 
-(defvar ange-ftp-path-format)
-(defvar efs-path-regexp)
+(eval-when-compile
+  (defvar ange-ftp-path-format)
+  (defvar efs-path-regexp))
 (defun nnheader-re-read-dir (path)
   "Re-read directory PATH if PATH is on a remote system."
   (if (and (fboundp 'efs-re-read-dir) (boundp 'efs-path-regexp))
@@ -857,11 +885,11 @@ find-file-hooks, etc.
      (set-buffer cur)))
 
 (defun nnheader-replace-string (from to)
-  "Do a fast replacement of FROM to TO from point to point-max."
+  "Do a fast replacement of FROM to TO from point to `point-max'."
   (nnheader-skeleton-replace from to))
 
 (defun nnheader-replace-regexp (from to)
-  "Do a fast regexp replacement of FROM to TO from point to point-max."
+  "Do a fast regexp replacement of FROM to TO from point to `point-max'."
   (nnheader-skeleton-replace from to t))
 
 (defun nnheader-strip-cr ()
@@ -871,8 +899,9 @@ find-file-hooks, etc.
 (defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-string-as-multibyte 'string-as-multibyte)
 
-(when (string-match "XEmacs" emacs-version)
+(when (featurep 'xemacs)
   (require 'nnheaderxm))
 
 (run-hooks 'nnheader-load-hook)

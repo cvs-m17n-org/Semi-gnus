@@ -24,8 +24,11 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mail-parse)
 (require 'mailcap)
+(eval-and-compile
+  (autoload 'mm-body-7-or-8 "mm-bodies"))
 
 (defvar mm-content-transfer-encoding-defaults
   '(("text/x-patch" 8bit)
@@ -62,8 +65,7 @@ This variable should never be set directly, but bound before a call to
   "Insert multipart/mixed headers."
   (let ((boundary "=-=-="))
     (insert "MIME-Version: 1.0\n")
-    (insert (format "Content-Type: multipart/mixed; boundary=\"%s\"\n"
-		    boundary))
+    (insert "Content-Type: multipart/mixed; boundary=\"" boundary "\"\n")
     boundary))
 
 (defun mm-default-file-encoding (file)
@@ -142,9 +144,9 @@ The encoding used is returned."
 	(when (string-match (caar rules) type)
 	  (throw 'found
 		 (let ((encoding 
-			(if (eq (cadar rules) 'qp-or-base64)
+			(if (eq (cadr (car rules)) 'qp-or-base64)
 			    (mm-qp-or-base64)
-			  (cadar rules))))
+			  (cadr (car rules)))))
 		   (if mm-use-ultra-safe-encoding
 		       (mm-safer-encoding encoding)
 		     encoding))))

@@ -1,5 +1,7 @@
 ;;; nnmbox.el --- mail mbox access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -59,9 +61,9 @@
 (defvoo nnmbox-group-alist nil)
 (defvoo nnmbox-active-timestamp nil)
 
-(defvoo nnmbox-file-coding-system mm-text-coding-system)
+(defvoo nnmbox-file-coding-system mm-binary-coding-system)
 (defvoo nnmbox-file-coding-system-for-write nil)
-(defvoo nnmbox-active-file-coding-system mm-text-coding-system)
+(defvoo nnmbox-active-file-coding-system mm-binary-coding-system)
 (defvoo nnmbox-active-file-coding-system-for-write nil)
 
 

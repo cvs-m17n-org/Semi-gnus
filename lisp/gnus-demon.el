@@ -1,5 +1,7 @@
 ;;; gnus-demon.el --- daemonic Gnus behaviour
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;      Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -34,7 +36,7 @@
 (require 'nnmail)
 (require 'gnus-util)
 (eval-and-compile
-  (if (string-match "XEmacs" (emacs-version))
+  (if (featurep 'xemacs)
       (require 'itimer)
     (require 'timer)))
 
@@ -152,7 +154,7 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
            (nowParts (decode-time now))
            ;; obtain THEN as discrete components
            (thenParts (parse-time-string time))
-           (thenHour (elt thenParts 0))
+           (thenHour (elt thenParts 2))
            (thenMin (elt thenParts 1))
            ;; convert time as elements into number of seconds since EPOCH.
            (then (encode-time 0
@@ -191,6 +193,10 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
     ;; sufficiently ripe.
     (let ((handlers gnus-demon-handler-state)
 	  (gnus-inhibit-demon t)
+	  ;; Try to avoid dialog boxes, e.g. by Mailcrypt.
+	  ;; Unfortunately, Emacs 20's `message-or-box...' doesn't
+	  ;; obey `use-dialog-box'.
+	  use-dialog-box (last-nonmenu-event 10)
 	  handler time idle)
       (while handlers
 	(setq handler (pop handlers))

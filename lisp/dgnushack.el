@@ -27,11 +27,18 @@
 
 ;;; Code:
 
-(fset 'facep 'ignore)
+(defalias 'facep 'ignore)
 
 (require 'cl)
 
-(push "/usr/share/emacs/site-lisp" load-path)
+(defvar srcdir (or (getenv "srcdir") "."))
+
+(push (or (getenv "lispdir") 
+	  "/usr/share/emacs/site-lisp")
+      load-path)
+
+(push (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir)) 
+      load-path)
 
 (unless (featurep 'xemacs)
   (define-compiler-macro last (&whole form x &optional n)
@@ -55,57 +62,6 @@
 	   (while (consp (cdr x))
 	     (pop x))
 	   x))))
-
-  (define-compiler-macro mapcon (&whole form fn seq &rest rest)
-    (if (and (fboundp 'mapcon)
-	     (subrp (symbol-function 'mapcon)))
-	form
-      (if rest
-	  `(let (res
-		 (args (list ,seq ,@rest))
-		 p)
-	     (while (not (memq nil args))
-	       (push (apply ,fn args) res)
-	       (setq p args)
-	       (while p
-		 (setcar p (cdr (pop p)))
-		 ))
-	     (apply (function nconc) (nreverse res)))
-	`(let (res
-	       (arg ,seq))
-	   (while arg
-	     (push (funcall ,fn arg) res)
-	     (setq arg (cdr arg)))
-	   (apply (function nconc) (nreverse res))))))
-
-  (define-compiler-macro member-if (&whole form pred list)
-    (if (and (fboundp 'member-if)
-	     (subrp (symbol-function 'member-if)))
-	form
-      `(let ((fn ,pred)
-	     (seq ,list))
-	 (while (and seq
-		     (not (funcall fn (car seq))))
-	   (pop seq))
-	 seq)))
-
-  (define-compiler-macro union (&whole form list1 list2)
-    (if (and (fboundp 'union)
-	     (subrp (symbol-function 'union)))
-	form
-      `(let ((a ,list1)
-	     (b ,list2))
-	 (cond ((null a) b)
-	       ((null b) a)
-	       ((equal a b) a)
-	       (t
-		(or (>= (length a) (length b))
-		    (setq a (prog1 b (setq b a))))
-		(while b
-		  (or (memq (car b) a)
-		      (push (car b) a))
-		  (pop b))
-		a)))))
   )
 
 ;; If we are building w3 in a different directory than the source
@@ -128,10 +84,7 @@
 
 (require 'bytecomp)
 
-(defvar srcdir (or (getenv "srcdir") "."))
-
 (push srcdir load-path)
-;(push "/usr/share/emacs/site-lisp" load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t)
 
 (defalias 'device-sound-enabled-p 'ignore)
@@ -142,11 +95,11 @@
 (defalias 'define-mail-user-agent 'ignore)
 
 (eval-and-compile
-  (unless (string-match "XEmacs" emacs-version)
-    (fset 'get-popup-menu-response 'ignore)
-    (fset 'event-object 'ignore)
-    (fset 'x-defined-colors 'ignore)
-    (fset 'read-color 'ignore)))
+  (unless (featurep 'xemacs)
+    (defalias 'get-popup-menu-response 'ignore)
+    (defalias 'event-object 'ignore)
+    (defalias 'x-defined-colors 'ignore)
+    (defalias 'read-color 'ignore)))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
@@ -162,28 +115,41 @@ You also then need to add the following to the lisp/dgnushack.el file:
 
 Modify to suit your needs."))
   (let ((files (directory-files srcdir nil "^[^=].*\\.el$"))
-	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
-    (condition-case ()
- 	(require 'w3-forms)
+    (dolist (file '("dgnushack.el" "lpath.el"))
+      (setq files (delete file files)))
+    (when (featurep 'base64)
+      (setq files (delete "base64.el" files)))
+    (condition-case code
+	(require 'w3-forms)
       (error
+       (message "No w3: %s %s" code (locate-library "w3-forms"))
        (dolist (file '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-		       "nnslashdot.el" "nnwarchive.el" "webmail.el"))
+		       "nnslashdot.el" "nnwarchive.el" "webmail.el"
+		       "nnwfm.el"))
 	 (setq files (delete file files)))))
+    (dolist (file 
+	     (if (featurep 'xemacs)
+		 '("md5.el" "smiley-ems.el")
+	       '("gnus-xmas.el" "gnus-picon.el" "messagexmas.el" 
+		 "nnheaderxm.el" "smiley.el")))
+      (setq files (delete file files)))
+
+    (dolist (file files)
+      (setq file (expand-file-name file srcdir))
+      (when (and (file-exists-p 
+		  (setq elc (concat (file-name-nondirectory file) "c")))
+		 (file-newer-than-file-p file elc))
+	(delete-file elc)))
+    
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
-      (when (or (and (not xemacs)
- 		     (not (member (file-name-nondirectory file)
- 				  '("gnus-xmas.el" "gnus-picon.el"
- 				    "messagexmas.el" "nnheaderxm.el"
- 				    "smiley.el" "x-overlay.el"))))
- 		(and xemacs
-		     (not (member file '("md5.el")))))
-	(when (or (not (file-exists-p (setq elc (concat file "c"))))
-		  (file-newer-than-file-p file elc))
-	  (ignore-errors
-	    (byte-compile-file file)))))))
+      (when (or (not (file-exists-p 
+		      (setq elc (concat (file-name-nondirectory file) "c"))))
+		(file-newer-than-file-p file elc))
+	(ignore-errors
+	  (byte-compile-file file))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)

@@ -102,7 +102,7 @@ the second with the current group name.")
   "*Alist of styles to use when posting.")
 
 (defcustom gnus-group-posting-charset-alist
-  '(("^\\(no\\|fr\\|dk\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\|dk\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+  '(("^\\(no\\|fr\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
     ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
     (message-this-is-mail nil nil)
     (message-this-is-news nil t))
@@ -232,18 +232,31 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
 	 (gnus-run-hooks 'gnus-message-setup-hook)
 	 (if (eq major-mode 'message-mode)
-	     ;; Make mml-buffer-list local.
-	     ;; Restore global mml-buffer-list value as mbl.
-	     ;; What a hack! -- Shenghuo
-	     (let ((mml-buffer-list mml-buffer-list))
-	       (setq mml-buffer-list mbl)
-	       (make-local-variable 'mml-buffer-list)
+	     (let ((mbl1 mml-buffer-list))
+	       (setq mml-buffer-list mbl)  ;; Global value
+	       (set (make-local-variable 'mml-buffer-list) mbl1);; Local value
 	       (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t))
 	   (mml-destroy-buffers)
 	   (setq mml-buffer-list mbl)))
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
        (set-buffer-modified-p nil))))
+
+;;;###autoload
+(defun gnus-msg-mail (&rest args)
+  "Start editing a mail message to be sent.
+Like `message-mail', but with Gnus paraphernalia, particularly the
+Gcc: header for archiving purposes."
+  (interactive)
+  (gnus-setup-message 'message
+    (apply 'message-mail args))
+  ;; COMPOSEFUNC should return t if succeed.  Undocumented ???
+  t)
+
+;;;###autoload
+(define-mail-user-agent 'gnus-user-agent
+      'gnus-msg-mail 'message-send-and-exit
+      'message-kill-buffer 'message-send-hook)
 
 (defun gnus-setup-posting-charset (group)
   (let ((alist gnus-group-posting-charset-alist)
@@ -262,7 +275,11 @@ Thank you for your help in stamping out bugs.
 
 (defun gnus-inews-add-send-actions (winconf buffer article)
   (make-local-hook 'message-sent-hook)
-  (add-hook 'message-sent-hook 'gnus-inews-do-gcc nil t)
+  (add-hook 'message-sent-hook (if gnus-agent 'gnus-agent-possibly-do-gcc
+				 'gnus-inews-do-gcc) nil t)
+  (when gnus-agent
+    (make-local-hook 'message-header-hook)
+    (add-hook 'message-header-hook 'gnus-agent-possibly-save-gcc nil t))
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
@@ -574,7 +591,9 @@ If SILENT, don't prompt the user."
 	(setq method-alist
 	      (mapcar
 	       (lambda (m)
-		 (list (concat (cadr m) " (" (symbol-name (car m)) ")") m))
+		 (if (equal (cadr m) "")
+		     (list (symbol-name (car m)) m)
+		   (list (concat (cadr m) " (" (symbol-name (car m)) ")") m)))
 	       post-methods))
 	;; Query the user.
 	(cadr
@@ -603,8 +622,9 @@ If SILENT, don't prompt the user."
 
 
 ;; Dummies to avoid byte-compile warning.
-(defvar nnspool-rejected-article-hook)
-(defvar xemacs-codename)
+(eval-when-compile
+  (defvar nnspool-rejected-article-hook)
+  (defvar xemacs-codename))
 
 (defun gnus-extended-version ()
   "Stringified Gnus version and Emacs version."
@@ -683,9 +703,9 @@ The original article will be yanked."
   "Forward the current message to another user.  
 If ARG is nil, see `message-forward-as-mime' and `message-forward-show-mml';
 if ARG is 1, decode the message and forward directly inline;
-if ARG is 2, foward message as an rfc822 MIME section;
+if ARG is 2, forward message as an rfc822 MIME section;
 if ARG is 3, decode message and forward as an rfc822 MIME section;
-if ARG is 4, foward message directly inline;
+if ARG is 4, forward message directly inline;
 otherwise, use flipped `message-forward-as-mime'.
 If POST, post instead of mail."
   (interactive "P")
@@ -709,19 +729,18 @@ If POST, post instead of mail."
 	    text)
 	(save-excursion
 	  (set-buffer gnus-original-article-buffer)
-	  (mm-with-unibyte-current-buffer
-	    (setq text (buffer-string))))
+	  (setq text (buffer-string)))
 	(set-buffer 
 	 (gnus-get-buffer-create
 	  (generate-new-buffer-name " *Gnus forward*")))
 	(erase-buffer)
-	(mm-disable-multibyte)
+	(unless message-forward-show-mml
+	  (mm-disable-multibyte))
 	(insert text)
 	(goto-char (point-min))
 	(when (looking-at "From ")
 	  (replace-match "X-From-Line: ") )
 	(when message-forward-show-mml
-	  (mm-enable-multibyte)
 	  (mime-to-mml))
 	(message-forward post)))))
 
@@ -1024,6 +1043,21 @@ this is a reply."
 
 ;;; Gcc handling.
 
+(defun gnus-inews-group-method (group)
+  (cond ((and (null (gnus-get-info group))
+	      (eq (car gnus-message-archive-method)
+		  (car
+		   (gnus-server-to-method
+		    (gnus-group-method group)))))
+	 ;; If the group doesn't exist, we assume
+	 ;; it's an archive group...
+	 gnus-message-archive-method)
+	;; Use the method.
+	((gnus-info-method (gnus-get-info group))
+	 (gnus-info-method (gnus-get-info group)))
+	;; Find the method.
+	(t (gnus-group-method group))))
+
 ;; Do Gcc handling, which copied the message over to some group.
 (defun gnus-inews-do-gcc (&optional gcc)
   (interactive)
@@ -1042,21 +1076,7 @@ this is a reply."
 	    ;; Copy the article over to some group(s).
 	    (while (setq group (pop groups))
 	      (gnus-check-server
-	       (setq method
-		     (cond ((and (null (gnus-get-info group))
-				 (eq (car gnus-message-archive-method)
-				     (car
-				      (gnus-server-to-method
-				       (gnus-group-method group)))))
-			    ;; If the group doesn't exist, we assume
-			    ;; it's an archive group...
-			    gnus-message-archive-method)
-			   ;; Use the method.
-			   ((gnus-info-method (gnus-get-info group))
-			    (gnus-info-method (gnus-get-info group)))
-			   ;; Find the method.
-			   (t (gnus-group-method group)))))
-	      (gnus-check-server method)
+	       (setq method (gnus-inews-group-method group)))
 	      (unless (gnus-request-group group t method)
 		(gnus-request-create-group group method))
 	      (save-excursion

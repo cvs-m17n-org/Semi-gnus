@@ -34,10 +34,10 @@
 (require 'custom)
 (eval-when-compile (require 'cl))
 (require 'nnheader)
-(require 'message)
 (require 'time-date)
 
 (eval-and-compile
+  (autoload 'message-fetch-field "message")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
   (autoload 'rmail-show-message "rmail"))
@@ -103,15 +103,15 @@
      (when (gnus-buffer-exists-p buf)
        (kill-buffer buf))))
 
-(fset 'gnus-point-at-bol
-      (if (fboundp 'point-at-bol)
-	  'point-at-bol
-	'line-beginning-position))
+(defalias 'gnus-point-at-bol
+  (if (fboundp 'point-at-bol)
+      'point-at-bol
+    'line-beginning-position))
 
-(fset 'gnus-point-at-eol
-      (if (fboundp 'point-at-eol)
-	  'point-at-eol
-	'line-end-position))
+(defalias 'gnus-point-at-eol
+  (if (fboundp 'point-at-eol)
+      'point-at-eol
+    'line-end-position))
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -190,22 +190,17 @@
 	(delete-char 1))
       (goto-char (next-single-property-change (point) prop nil (point-max))))))
 
+(require 'nnheader)
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
-  (let ((newsgroup (gnus-newsgroup-savable-name newsgroup))
-	(len (length newsgroup))
-	idx)
-    ;; If this is a foreign group, we don't want to translate the
-    ;; entire name.
-    (if (setq idx (string-match ":" newsgroup))
-	(aset newsgroup idx ?/)
-      (setq idx 0))
-    ;; Replace all occurrences of `.' with `/'.
-    (while (< idx len)
-      (when (= (aref newsgroup idx) ?.)
-	(aset newsgroup idx ?/))
-      (setq idx (1+ idx)))
-    newsgroup))
+  (let* ((newsgroup (gnus-newsgroup-savable-name newsgroup))
+	 (idx (string-match ":" newsgroup)))
+    (concat
+     (if idx (substring newsgroup 0 idx))
+     (if idx "/")
+     (nnheader-replace-chars-in-string
+      (if idx (substring newsgroup (1+ idx)) newsgroup)
+      ?. ?/))))
 
 (defun gnus-newsgroup-savable-name (group)
   ;; Replace any slashes in a group name (eg. an ange-ftp nndoc group)
@@ -311,11 +306,11 @@ Cache the result as a text property stored in DATE."
 	     time)))))
 
 (defsubst gnus-time-iso8601 (time)
-  "Return a string of TIME in YYMMDDTHHMMSS format."
+  "Return a string of TIME in YYYYMMDDTHHMMSS format."
   (format-time-string "%Y%m%dT%H%M%S" time))
 
 (defun gnus-date-iso8601 (date)
-  "Convert the DATE to YYMMDDTHHMMSS."
+  "Convert the DATE to YYYYMMDDTHHMMSS."
   (condition-case ()
       (gnus-time-iso8601 (gnus-date-get-time date))
     (error "")))
@@ -450,14 +445,6 @@ If N, return the Nth ancestor instead."
     (setq to (concat (file-name-as-directory to)
 		     (file-name-nondirectory file))))
   (copy-file file to))
-
-(defun gnus-kill-all-overlays ()
-  "Delete all overlays in the current buffer."
-  (let* ((overlayss (overlay-lists))
-	 (buffer-read-only nil)
-	 (overlays (delq nil (nconc (car overlayss) (cdr overlayss)))))
-    (while overlays
-      (delete-overlay (pop overlays)))))
 
 (defvar gnus-work-buffer " *gnus work*")
 
@@ -963,23 +950,65 @@ Entries without port tokens default to DEFAULTPORT."
     t))
 
 (defun gnus-write-active-file (file hashtb &optional full-names)
-  (with-temp-file file
-    (mapatoms
-     (lambda (sym)
-       (when (and sym
-		  (boundp sym)
-		  (symbol-value sym))
-	 (insert (format "%S %d %d y\n"
-			 (if full-names
-			     sym
-			   (intern (gnus-group-real-name (symbol-name sym))))
-			 (or (cdr (symbol-value sym))
-			     (car (symbol-value sym)))
-			 (car (symbol-value sym))))))
-     hashtb)
-    (goto-char (point-max))
-    (while (search-backward "\\." nil t)
-      (delete-char 1))))
+  (let ((coding-system-for-write nnmail-active-file-coding-system))
+    (with-temp-file file
+      (mapatoms
+       (lambda (sym)
+	 (when (and sym
+		    (boundp sym)
+		    (symbol-value sym))
+	   (insert (format "%S %d %d y\n"
+			   (if full-names
+			       sym
+			     (intern (gnus-group-real-name (symbol-name sym))))
+			   (or (cdr (symbol-value sym))
+			       (car (symbol-value sym)))
+			   (car (symbol-value sym))))))
+       hashtb)
+      (goto-char (point-max))
+      (while (search-backward "\\." nil t)
+	(delete-char 1)))))
+
+(if (fboundp 'union)
+    (defalias 'gnus-union 'union)
+  (defun gnus-union (l1 l2)
+    "Set union of lists L1 and L2."
+    (cond ((null l1) l2)
+	  ((null l2) l1)
+	  ((equal l1 l2) l1)
+	  (t
+	   (or (>= (length l1) (length l2))
+	       (setq l1 (prog1 l2 (setq l2 l1))))
+	   (while l2
+	     (or (member (car l2) l1)
+		 (push (car l2) l1))
+	     (pop l2))
+	   l1))))
+
+(defun gnus-add-text-properties-when
+  (property value start end properties &optional object)
+  "Like `gnus-add-text-properties', only applied on where PROPERTY is VALUE."
+  (let (point)
+    (while (and start 
+		(< start end) ;; XEmacs will loop for every when start=end.
+		(setq point (text-property-not-all start end property value)))
+      (gnus-add-text-properties start point properties object)
+      (setq start (text-property-any point end property value)))
+    (if start
+	(gnus-add-text-properties start end properties object))))
+
+(defun gnus-remove-text-properties-when
+  (property value start end properties &optional object)
+  "Like `remove-text-properties', only applied on where PROPERTY is VALUE."
+  (let (point)
+    (while (and start 
+		(< start end)
+		(setq point (text-property-not-all start end property value)))
+      (remove-text-properties start point properties object)
+      (setq start (text-property-any point end property value)))
+    (if start
+	(remove-text-properties start end properties object))
+    t))
 
 (provide 'gnus-util)
 

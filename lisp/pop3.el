@@ -6,7 +6,6 @@
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Maintainer: FSF
 ;; Keywords: mail
-;; Version: 1.3s
 
 ;; This file is part of GNU Emacs.
 
@@ -38,8 +37,6 @@
 
 (require 'mail-utils)
 
-(defconst pop3-version "1.3s")
-
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
 (defvar pop3-mailhost (or (getenv "MAILHOST") nil)
@@ -60,9 +57,6 @@ values are 'apop.")
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
-
-(defvar pop3-movemail-file-coding-system nil
-  "Coding system for the crashbox made by `pop3-movemail'.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
@@ -96,7 +90,7 @@ Used for APOP authentication.")
 	  (pop3-retr process n crashbuf)
 	  (save-excursion
 	    (set-buffer crashbuf)
-	    (let ((coding-system-for-write pop3-movemail-file-coding-system))
+	    (let ((coding-system-for-write 'binary))
 	      (write-region (point-min) (point-max) crashbox t 'nomesg))
 	    (set-buffer (process-buffer process))
 	    (while (> (buffer-size) 5000)
@@ -195,9 +189,31 @@ Return the response string if optional second argument is non-nil."
       (forward-char)))
   (set-marker end nil))
 
+(eval-when-compile (defvar parse-time-months))
+
+;; Copied from message-make-date.
+(defun pop3-make-date (&optional now)
+  "Make a valid date header.
+If NOW, use that time instead."
+  (require 'parse-time)
+  (let* ((now (or now (current-time)))
+	 (zone (nth 8 (decode-time now)))
+	 (sign "+"))
+    (when (< zone 0)
+      (setq sign "-")
+      (setq zone (- zone)))
+    (concat
+     (format-time-string "%d" now)
+     ;; The month name of the %b spec is locale-specific.  Pfff.
+     (format " %s "
+	     (capitalize (car (rassoc (nth 4 (decode-time now))
+				      parse-time-months))))
+     (format-time-string "%Y %H:%M:%S " now)
+     ;; We do all of this because XEmacs doesn't have the %z spec.
+     (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60)))))
+
 (defun pop3-munge-message-separator (start end)
   "Check to see if a message separator exists.  If not, generate one."
-  (if (not (fboundp 'message-make-date)) (autoload 'message-make-date "message"))
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
@@ -208,7 +224,7 @@ Return the response string if optional second argument is non-nil."
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
 		(date (split-string (or (mail-fetch-field "Date")
-					(message-make-date))
+					(pop3-make-date))
 				    " "))
 		(From_))
 	    ;; sample date formats I have seen
@@ -234,7 +250,10 @@ Return the response string if optional second argument is non-nil."
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
 	    (insert From_)
-	    (re-search-forward "\n\n")
+	    (if (search-forward "\n\n" nil t)
+		nil
+	      (goto-char (point-max))
+	      (insert "\n"))
 	    (narrow-to-region (point) (point-max))
 	    (let ((size (- (point-max) (point-min))))
 	      (goto-char (point-min))
@@ -277,19 +296,21 @@ Return the response string if optional second argument is non-nil."
 
 ;; TRANSACTION STATE
 
-(defvar pop3-md5-program "md5"
-  "*Program to encode its input in MD5.")
+(eval-and-compile
+  (if (fboundp 'md5)
+      (defalias 'pop3-md5 'md5)
+    (defvar pop3-md5-program "md5"
+      "*Program to encode its input in MD5.")
 
-(defun pop3-md5 (string)
-  (with-temp-buffer
-    (insert string)
-    (call-process-region (point-min) (point-max)
-			 (or shell-file-name "/bin/sh")
-			 t (current-buffer) nil
-			 "-c" pop3-md5-program)
-    ;; The meaningful output is the first 32 characters.
-    ;; Don't return the newline that follows them!
-    (buffer-substring (point-min) (+ (point-min) 32))))
+    (defun pop3-md5 (string)
+      (with-temp-buffer
+	(insert string)
+	(call-process-region (point-min) (point-max)
+			     pop3-md5-program
+			     t (current-buffer) nil)
+	;; The meaningful output is the first 32 characters.
+	;; Don't return the newline that follows them!
+	(buffer-substring 1 33)))))
 
 (defun pop3-stat (process)
   "Return the number of messages in the maildrop and the maildrop's size."

@@ -35,7 +35,7 @@
 (eval-when-compile
   (require 'cl)
   ;; This is just to shut up the byte-compiler.
-  (fset 'nndraft-request-group 'ignore))
+  (defalias 'nndraft-request-group 'ignore))
 
 (nnoo-declare nndraft
   nnmh)
@@ -134,6 +134,7 @@
   (when (nndraft-request-article article group server (current-buffer))
     (message-remove-header "xref")
     (message-remove-header "lines")
+    (message-remove-header "date")
     t))
 
 (deffoo nndraft-request-update-info (group info &optional server)

@@ -168,14 +168,21 @@ Eg.:
 		 (function :format "%v" nnmail-)))
 
 (defcustom nnmail-expiry-target 'delete
-  "*Variable that says where expired messages should end up."
+  "*Variable that says where expired messages should end up.
+The default value is `delete' (which says to delete the messages),
+but it can also be a string or a function.  If it is a string, expired
+messages end up in that group.  If it is a function, the function is
+called in a buffer narrowed to the message in question.  The function
+receives one argument, the name of the group the message comes from.
+The return value should be `delete' or a group name (a string)."
     :group 'nnmail-expire
     :type '(choice (const delete)
 		   (function :format "%v" nnmail-)
 		   string))
 
 (defcustom nnmail-cache-accepted-message-ids nil
-  "If non-nil, put Message-IDs of Gcc'd articles into the duplicate cache."
+  "If non-nil, put Message-IDs of Gcc'd articles into the duplicate cache.
+If non-nil, also update the cache when copy or move articles."
   :group 'nnmail
   :type 'boolean)
 
@@ -220,7 +227,7 @@ links, you could set this variable to `copy-file' instead."
       '(nnheader-ms-strip-cr)
     nil)
   "*Hook that will be run after the incoming mail has been transferred.
-The incoming mail is moved from `nnmail-spool-file' (which normally is
+The incoming mail is moved from the specified spool file (which normally is
 something like \"/usr/spool/mail/$user\") to the user's home
 directory.  This hook is called after the incoming mail box has been
 emptied, and can be used to call any mail box programs you have
@@ -229,9 +236,9 @@ running (\"xwatch\", etc.)
 Eg.
 
 \(add-hook 'nnmail-read-incoming-hook
-	   (lambda ()
-	     (start-process \"mailsend\" nil
-			    \"/local/bin/mailsend\" \"read\" \"mbox\")))
+          (lambda ()
+            (call-process \"/local/bin/mailsend\" nil nil nil
+                          \"read\" nnmail-spool-file)))
 
 If you have xwatch running, this will alert it that mail has been
 read.
@@ -456,7 +463,7 @@ parameter.  It should return nil, `warn' or `delete'."
   mm-text-coding-system
   "Coding system used in reading inbox")
 
-(defvar nnmail-pathname-coding-system 'binary
+(defvar nnmail-pathname-coding-system 'iso-8859-1
   "*Coding system for pathname.")
 
 (defun nnmail-find-file (file)
@@ -1508,7 +1515,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	 (total 0)
 	 incoming incomings source)
     (when (and (nnmail-get-value "%s-get-new-mail" method)
-	       nnmail-spool-file)
+	       sources)
       (while (setq source (pop sources))
 	;; Be compatible with old values.
 	(cond
@@ -1610,7 +1617,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
   (when (nnheader-functionp target)
     (setq target (funcall target group)))
   (unless (eq target 'delete)
-    (gnus-request-accept-article target)))
+    (gnus-request-accept-article target nil nil t)))
 
 (defun nnmail-check-syntax ()
   "Check (and modify) the syntax of the message in the current buffer."

@@ -1,5 +1,7 @@
 ;;; nneething.el --- arbitrary file access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -231,13 +233,13 @@ included.")
       (let ((map nneething-map)
 	    prev)
 	(while map
-	  (if (and (member (cadar map) files)
+	  (if (and (member (cadr (car map)) files)
 		   ;; We also remove files that have changed mod times.
 		   (equal (nth 5 (file-attributes
-				  (nneething-file-name (cadar map))))
-			  (caddar map)))
+				  (nneething-file-name (cadr (car map)))))
+			  (cadr (cdar map))))
 	      (progn
-		(push (cadar map) map-files)
+		(push (cadr (car map)) map-files)
 		(setq prev map))
 	    (setq touched t)
 	    (if prev
@@ -362,9 +364,9 @@ included.")
         fname)
     (if (numberp article)
 	(if (setq fname (cadr (assq article nneething-map)))
-	    (concat dir fname)
-	  (make-temp-name (concat dir "nneething")))
-      (concat dir article))))
+	    (expand-file-name fname dir)
+	  (make-temp-name (expand-file-name "nneething" dir)))
+      (expand-file-name article dir))))
 
 (provide 'nneething)
 

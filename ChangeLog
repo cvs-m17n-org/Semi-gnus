@@ -1,0 +1,43 @@
+2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
+
+	* make.bat: Makes it possible to generate the Info files on
+	windows again.
+
+2000-08-24 Jesper Harder <jesper_harder@hotmail.com>
+
+	* make.bat: Use emacs.exe if emacs.bat does not exist.
+
+2000-05-07  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi: direntry added.
+
+	* message.texi: direntry added.
+
+	* emacs-mime.texi: direntry added.
+
+2000-07-13 10:09:52  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* aclocal.m4 (AC_CHECK_W3): Fix typo.
+
+2000-07-12 15:47:06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4: Stolen macros from w3.
+	* configure.in: Use them.
+	* configure: Generate it.
+
+2000-04-22 20:25:20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* GNUS-NEWS: Outline.
+
+2000-01-06  Dave Love  <fx@gnu.org>
+
+	* aclocal.m4 (AM_PATH_LISPDIR): Check for user's EMACS setting.
+
+1999-11-13  Adrian Aichner  <aichner@ecf.teradyne.com>
+
+	* xemacs.mak: New NMAKE file to support build and install on
+	Windows NT.
+
+;; Local Variables:
+;; coding: iso-2022-7bit
+;; End:

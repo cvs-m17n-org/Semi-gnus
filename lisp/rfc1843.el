@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; Keywords: news HZ HZ+
+;; Keywords: news HZ HZ+ mail i18n
 
 ;; This file is a part of GNU Emacs.
 
@@ -32,6 +32,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'mm-util)
 
 (defvar rfc1843-word-regexp

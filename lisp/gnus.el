@@ -32,8 +32,6 @@
 (eval-when-compile (require 'cl))
 (require 'mm-util)
 
-(require 'message)
-
 (defgroup gnus nil
   "The coffee-brewing, all singing, all dancing, kitchen sink newsreader."
   :group 'news
@@ -257,7 +255,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.8.7"
+(defconst gnus-version-number "5.8.8"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Gnus v%s" gnus-version-number)
@@ -275,27 +273,55 @@ be set in `.emacs' instead."
   :group 'gnus-start
   :type 'boolean)
 
+(unless (fboundp 'gnus-group-remove-excess-properties)
+  (defalias 'gnus-group-remove-excess-properties 'ignore))
+
+(unless (fboundp 'gnus-set-text-properties)
+  (defalias 'gnus-set-text-properties 'set-text-properties))
+
 (unless (featurep 'gnus-xmas)
   (defalias 'gnus-make-overlay 'make-overlay)
   (defalias 'gnus-delete-overlay 'delete-overlay)
   (defalias 'gnus-overlay-put 'overlay-put)
   (defalias 'gnus-move-overlay 'move-overlay)
+  (defalias 'gnus-overlay-buffer 'overlay-buffer)
+  (defalias 'gnus-overlay-start 'overlay-start)
   (defalias 'gnus-overlay-end 'overlay-end)
   (defalias 'gnus-extent-detached-p 'ignore)
   (defalias 'gnus-extent-start-open 'ignore)
-  (defalias 'gnus-set-text-properties 'set-text-properties)
-  (defalias 'gnus-group-remove-excess-properties 'ignore)
   (defalias 'gnus-appt-select-lowest-window 'appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'identity)
   (defalias 'gnus-add-text-properties 'add-text-properties)
   (defalias 'gnus-put-text-property 'put-text-property)
-  (defalias 'gnus-mode-line-buffer-identification 'identity)
+  (defvar gnus-mode-line-image-cache t)
+  (if (fboundp 'find-image)
+      (defun gnus-mode-line-buffer-identification (line)
+	(let ((str (car-safe line)))
+	  (if (and (stringp str)
+		   (string-match "^Gnus:" str))
+	      (progn (add-text-properties
+		      0 5
+		      (list 'display
+			    (if (eq t gnus-mode-line-image-cache)
+				(setq gnus-mode-line-image-cache
+				      (find-image
+				       '((:type xpm :file "gnus-pointer.xpm"
+						:ascent center)
+					 (:type xbm :file "gnus-pointer.xbm"
+						:ascent center))))
+			      gnus-mode-line-image-cache)
+			    'help-echo "This is Gnus")
+		      str)
+		     (list str))
+	    line)))
+    (defalias 'gnus-mode-line-buffer-identification 'identity))
   (defalias 'gnus-characterp 'numberp)
   (defalias 'gnus-deactivate-mark 'deactivate-mark)
   (defalias 'gnus-window-edges 'window-edges)
   (defalias 'gnus-key-press-event-p 'numberp)
-  (defalias 'gnus-decode-rfc1522 'ignore))
+  ;;(defalias 'gnus-decode-rfc1522 'ignore)
+  )
 
 ;; We define these group faces here to avoid the display
 ;; update forced when creating new faces.
@@ -748,21 +774,28 @@ be set in `.emacs' instead."
   ;; Insert the message.
   (erase-buffer)
   (cond
-   ((and (fboundp 'find-image)
-	 (display-graphic-p)
-	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
-				    (:type xbm :file "gnus.xbm")))))
-	   (when image
-	     (newline)			; Have somewhere for cursor to
-					; go, not stretched over image.
-	     (insert-image image)
-	     (goto-char (point-min))
-	     (while (not (eobp))
-	       (insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
-				    ?\ ))
-	       (forward-line 1))
-	     (setq gnus-simple-splash nil)
-	     t))))
+   ((and
+     (fboundp 'find-image)
+     (display-graphic-p)
+     (let ((image (find-image
+		   `((:type xpm :file "gnus.xpm")
+		     (:type pbm :file "gnus.pbm"
+			    ;; Account for the pbm's blackground.
+			    :background ,(face-foreground 'gnus-splash-face)
+			    :foreground ,(face-background 'default))
+		     (:type xbm :file "gnus.xbm"
+			    ;; Account for the xbm's blackground.
+			    :background ,(face-foreground 'gnus-splash-face)
+			    :foreground ,(face-background 'default))))))
+       (when image
+	 (let ((size (image-size image)))
+	   (insert-char ?\n (max 0 (round (- (window-height)
+					     (or y (cdr size)) 1) 2)))
+	   (insert-char ?\  (max 0 (round (- (window-width)
+					     (or x (car size))) 2)))
+	   (insert-image image))
+	 (setq gnus-simple-splash nil)
+	 t))))
    (t
     (insert
      (format "              %s
@@ -811,7 +844,6 @@ be set in `.emacs' instead."
 
 ;;; Do the rest.
 
-(require 'custom)
 (require 'gnus-util)
 (require 'nnheader)
 
@@ -915,13 +947,16 @@ see the manual for details."
   :type 'gnus-select-method)
 
 (defcustom gnus-message-archive-method
-  `(nnfolder
-    "archive"
-    (nnfolder-directory ,(nnheader-concat message-directory "archive"))
-    (nnfolder-active-file
-     ,(nnheader-concat message-directory "archive/active"))
-    (nnfolder-get-new-mail nil)
-    (nnfolder-inhibit-expiry t))
+  (progn
+    ;; Don't require it at top level to avoid circularity.
+    (require 'message)
+    `(nnfolder
+      "archive"
+      (nnfolder-directory ,(nnheader-concat message-directory "archive"))
+      (nnfolder-active-file
+       ,(nnheader-concat message-directory "archive/active"))
+      (nnfolder-get-new-mail nil)
+      (nnfolder-inhibit-expiry t)))
   "*Method used for archiving messages you've sent.
 This should be a mail method.
 
@@ -1259,6 +1294,7 @@ slower."
     ("nnweb" none)
     ("nnslashdot" post)
     ("nnultimate" none)
+    ("nnwfm" none)
     ("nnwarchive" none)
     ("nnlistserv" none)
     ("nnagent" post-mail)
@@ -1301,8 +1337,7 @@ this variable.	I think."
 		    :inline t
 		    (list :format "%v"
 			  variable
-			  (sexp :tag "Value"))))
-    ))
+			  (sexp :tag "Value"))))))
 
 (gnus-redefine-select-method-widget)
 
@@ -1477,6 +1512,7 @@ If nil, no default charset is assumed when posting."
 
 ;;; Internal variables
 
+(defvar gnus-agent-gcc-header "X-Gnus-Agent-Gcc")
 (defvar gnus-agent-meta-information-header "X-Gnus-Agent-Meta-Information")
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
 (defvar gnus-original-article-buffer " *Original Article*")
@@ -1485,6 +1521,9 @@ If nil, no default charset is assumed when posting."
 
 (defvar gnus-agent nil
   "Whether we want to use the Gnus agent or not.")
+
+(defvar gnus-agent-fetching nil
+  "Whether Gnus agent is in fetching mode.")
 
 (defvar gnus-command-method nil
   "Dynamically bound variable that says what the current backend is.")
@@ -1616,6 +1655,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-dead-summary nil)
 
+(defvar gnus-invalid-group-regexp "[: `'\"/]\\|^$"
+  "Regexp matching invalid groups.")
+
 ;;; End of variables.
 
 ;; Define some autoload functions Gnus might use.
@@ -1638,10 +1680,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	    (nthcdr 3 package)
 	  (cdr package)))))
    '(("info" :interactive t Info-goto-node)
-     ("pp" pp pp-to-string pp-eval-expression)
+     ("pp" pp-to-string)
      ("qp" quoted-printable-decode-region quoted-printable-decode-string)
      ("ps-print" ps-print-preprint)
-     ("browse-url" :interactive t browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
      ("babel" babel-as-string)
@@ -2639,9 +2680,21 @@ just the host name."
 		group (substring group (+ 1 colon))))
 	(setq foreign (concat foreign ":")))
       ;; Collapse group name leaving LEVELS uncollapsed elements
-      (let* ((glist (split-string group "\\."))
-	     (glen (length glist))
+      (let* ((slist (split-string group "/"))
+	     (slen (length slist))
+	     (dlist (split-string group "\\."))
+	     (dlen (length dlist))
+	     glist
+	     glen
+	     gsep
 	     res)
+	(if (> slen dlen)
+	    (setq glist slist
+		  glen slen
+		  gsep "/")
+	  (setq glist dlist
+		glen dlen
+		gsep "."))
 	(setq levels (- glen levels))
 	(dolist (g glist)
 	  (push (if (>= (decf levels) 0)
@@ -2650,7 +2703,7 @@ just the host name."
 		      (substring g 0 1))
 		  g)
 		res))
-	(concat foreign (mapconcat 'identity (nreverse res) "."))))))
+	(concat foreign (mapconcat 'identity (nreverse res) gsep))))))
 
 (defun gnus-narrow-to-body ()
   "Narrow to the body of an article."
@@ -2803,8 +2856,8 @@ Disallow invalid group names."
   (let ((prefix "")
 	group)
     (while (not group)
-      (when (string-match
-	     "[: `'\"/]\\|^$"
+      (when (string-match 
+	     gnus-invalid-group-regexp
 	     (setq group (read-string (concat prefix prompt)
 				      (cons (or default "") 0)
 				      'gnus-group-history)))

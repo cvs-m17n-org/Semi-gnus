@@ -36,7 +36,8 @@
   "Display of MIME in mail and news articles."
   :link '(custom-manual "(emacs-mime)Customization")
   :group 'mail
-  :group 'news)
+  :group 'news
+  :group 'multimedia)
 
 ;;; Convenience macros.
 
@@ -117,6 +118,7 @@
     ("text/x-patch" mm-display-patch-inline
      (lambda (handle)
        (locate-library "diff-mode")))
+    ("application/emacs-lisp" mm-display-elisp-inline identity)
     ("text/html"
      mm-inline-text
      (lambda (handle)
@@ -151,7 +153,7 @@
 
 (defcustom mm-inlined-types
   '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
-    "message/partial"
+    "message/partial" "application/emacs-lisp"
     "application/pgp-signature")
   "List of media types that are to be displayed inline."
   :type '(repeat string)
@@ -160,7 +162,8 @@
 (defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
-    "message/rfc822" "text/x-patch" "application/pgp-signature")
+    "message/rfc822" "text/x-patch" "application/pgp-signature" 
+    "application/emacs-lisp")
   "A list of MIME types to be displayed automatically."
   :type '(repeat string)
   :group 'mime-display)
@@ -214,6 +217,15 @@ to:
 ;; Content-Type value for a body part is changed from "text/plain" to
 ;; "message/rfc822".
 (defvar mm-dissect-default-type "text/plain")
+
+(defvar mm-viewer-completion-map
+  (let ((map (make-sparse-keymap 'mm-viewer-completion-map)))
+    (set-keymap-parent map minibuffer-local-completion-map)
+    map)
+  "Keymap for input viewer with completion.")
+
+;; Should we bind other key to minibuffer-complete-word?
+(define-key mm-viewer-completion-map " " 'self-insert-command) 
 
 ;;; The functions.
 
@@ -295,7 +307,8 @@ to:
 		(if (re-search-backward close-delimiter nil t)
 		    (match-beginning 0)
 		  (point-max)))))
-    (while (search-forward boundary end t)
+    (setq boundary (concat (regexp-quote boundary) "[ \t]*$"))
+    (while (re-search-forward boundary end t)
       (goto-char (match-beginning 0))
       (when start
 	(save-excursion
@@ -322,6 +335,16 @@ to:
       (set-buffer (generate-new-buffer " *mm*"))
       (insert-buffer-substring obuf beg)
       (current-buffer))))
+
+(defun mm-display-parts (handle &optional no-default)
+  (if (stringp (car handle))
+      (mapcar 'mm-display-parts (cdr handle))
+    (if (bufferp (car handle))
+	(save-restriction
+	  (narrow-to-region (point) (point))
+	  (mm-display-part handle)
+	  (goto-char (point-max)))
+      (mapcar 'mm-display-parts handle))))
 
 (defun mm-display-part (handle &optional no-default)
   "Display the MIME part represented by HANDLE.
@@ -367,6 +390,7 @@ external if displayed external."
 	    (buffer-disable-undo)
 	    (mm-set-buffer-file-coding-system mm-binary-coding-system)
 	    (insert-buffer-substring cur)
+	    (goto-char (point-min))
 	    (message "Viewing with %s" method)
 	    (let ((mm (current-buffer))
 		  (non-viewer (assq 'non-viewer
@@ -704,7 +728,9 @@ external if displayed external."
 	 (methods
 	  (mapcar (lambda (i) (list (cdr (assoc 'viewer i))))
 		  (mailcap-mime-info type 'all)))
-	 (method (completing-read "Viewer: " methods)))
+	 (method (let ((minibuffer-local-completion-map
+			mm-viewer-completion-map))
+		   (completing-read "Viewer: " methods))))
     (when (string= method "")
       (error "No method given"))
     (if (string-match "^[^% \t]+$" method) 
@@ -765,27 +791,29 @@ external if displayed external."
 	  (prog1
 	      (setq spec
 		    (ignore-errors
-		      (if (fboundp 'make-glyph)
-			  (cond
-			   ((equal type "xbm")
-			    ;; xbm images require special handling, since
-			    ;; the only way to create glyphs from these
-			    ;; (without a ton of work) is to write them
-			    ;; out to a file, and then create a file
-			    ;; specifier.
-			    (let ((file (make-temp-name
-					 (expand-file-name "emm.xbm"
-							   mm-tmp-directory))))
-			      (unwind-protect
-				  (progn
-				    (write-region (point-min) (point-max) file)
-				    (make-glyph (list (cons 'x file))))
-				(ignore-errors
-				  (delete-file file)))))
-			   (t
-			    (make-glyph
-			     (vector (intern type) :data (buffer-string)))))
-			(create-image (buffer-string) (intern type) 'data-p))))
+		     ;; Avoid testing `make-glyph' since W3 may define
+		     ;; a bogus version of it.
+		      (if (fboundp 'create-image)
+			  (create-image (buffer-string) (intern type) 'data-p)
+			(cond
+			 ((equal type "xbm")
+			  ;; xbm images require special handling, since
+			  ;; the only way to create glyphs from these
+			  ;; (without a ton of work) is to write them
+			  ;; out to a file, and then create a file
+			  ;; specifier.
+			  (let ((file (make-temp-name
+				       (expand-file-name "emm.xbm"
+							 mm-tmp-directory))))
+			    (unwind-protect
+				(progn
+				  (write-region (point-min) (point-max) file)
+				  (make-glyph (list (cons 'x file))))
+			      (ignore-errors
+			       (delete-file file)))))
+			 (t
+			  (make-glyph
+			   (vector (intern type) :data (buffer-string))))))))
 	    (mm-handle-set-cache handle spec))))))
 
 (defun mm-image-fit-p (handle)
@@ -820,8 +848,7 @@ external if displayed external."
 
 (defun mm-valid-and-fit-image-p (format handle)
   "Say whether FORMAT can be displayed natively and HANDLE fits the window."
-  (and window-system
-       (mm-valid-image-format-p format)
+  (and (mm-valid-image-format-p format)
        (mm-image-fit-p handle)))
 
 (provide 'mm-decode)

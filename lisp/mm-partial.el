@@ -36,7 +36,7 @@
   (let ((headers (save-excursion
 		   (set-buffer gnus-summary-buffer)
 		   gnus-newsgroup-headers))
-	phandles handles  header)
+	phandles header)
     (while (setq header (pop headers))
       (unless (eq (aref header 0) art)
 	(mm-with-unibyte-buffer
@@ -44,7 +44,6 @@
 					    gnus-newsgroup-name)
 	  (when (search-forward id nil t)
 	    (let ((nhandles (mm-dissect-buffer)) nid)
-	      (setq handles gnus-article-mime-handles)
 	      (if (consp (car nhandles))
 		  (mm-destroy-parts nhandles)
 		(setq nid (cdr (assq 'id 
@@ -89,7 +88,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 		      (list gnus-article-mime-handles))
 		    phandles))
       (save-excursion
-	(set-buffer (generate-new-buffer "*mm*"))
+	(set-buffer (generate-new-buffer " *mm*"))
 	(while (setq phandle (pop phandles))
 	  (setq nn (string-to-number 
 		    (cdr (assq 'number 
@@ -118,6 +117,13 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	(if (<= n total)
 	    (error "Missing part %d" n))
 	(kill-buffer (mm-handle-buffer handle))
+	(goto-char (point-min))
+	(let ((point (if (search-forward "\n\n" nil t) 
+			 (1- (point))
+		       (point-max))))
+	  (goto-char (point-min))
+	  (unless (re-search-forward "^mime-version:" point t)
+	    (insert "MIME-Version: 1.0\n")))
 	(setcar handle (current-buffer))
 	(mm-handle-set-cache handle t)))
     (unless no-display

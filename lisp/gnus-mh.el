@@ -40,6 +40,9 @@
 (require 'gnus-msg)
 (require 'gnus-sum)
 
+(eval-when-compile
+  (defvar mh-lib-progs))
+
 (defun gnus-summary-save-article-folder (&optional arg)
   "Append the current article to an mh folder.
 If N is a positive number, save the N next articles.
@@ -47,6 +50,7 @@ If N is a negative number, save the N previous articles.
 If N is nil and any articles have been marked with the process mark,
 save those articles instead."
   (interactive "P")
+  (require 'gnus-art)
   (let ((gnus-default-article-saver 'gnus-summary-save-in-folder))
     (gnus-summary-save-article arg)))
 
@@ -67,7 +71,11 @@ Optional argument FOLDER specifies folder name."
 		   t))))
 	(errbuf (gnus-get-buffer-create " *Gnus rcvstore*"))
 	;; Find the rcvstore program.
-	(exec-path (if mh-lib (cons mh-lib exec-path) exec-path)))
+	(exec-path (cond
+		    ((and (boundp 'mh-lib-progs) mh-lib-progs)
+		     (cons mh-lib-progs exec-path))
+		    (mh-lib (cons mh-lib exec-path))
+		    (t exec-path))))
     (with-current-buffer gnus-original-article-buffer
       (save-restriction
 	(widen)

@@ -36,7 +36,7 @@
   (require 'gnus-sum))
 
 (defcustom gnus-cache-active-file
-  (concat (file-name-as-directory gnus-cache-directory) "active")
+  (expand-file-name "active" gnus-cache-directory)
   "*The cache active file."
   :group 'gnus-cache
   :type 'file)
@@ -410,20 +410,23 @@ Returns the list of articles removed."
       (and (not unread) (not ticked) (not dormant) (memq 'read class))))
 
 (defun gnus-cache-file-name (group article)
-  (concat (file-name-as-directory gnus-cache-directory)
-	  (file-name-as-directory
-	   (nnheader-translate-file-chars
-	    (if (gnus-use-long-file-name 'not-cache)
-		group
-	      (let ((group (nnheader-replace-duplicate-chars-in-string
-			    (nnheader-replace-chars-in-string group ?/ ?_)
-			    ?. ?_)))
-		;; Translate the first colon into a slash.
-		(when (string-match ":" group)
-		  (aset group (match-beginning 0) ?/))
-		(nnheader-replace-chars-in-string group ?. ?/)))
-	    t))
-	  (if (stringp article) article (int-to-string article))))
+  (expand-file-name
+   (if (stringp article) article (int-to-string article))
+   (file-name-as-directory
+    (expand-file-name
+     (nnheader-translate-file-chars
+      (if (gnus-use-long-file-name 'not-cache)
+	  group
+	(let ((group (nnheader-replace-duplicate-chars-in-string
+		      (nnheader-replace-chars-in-string group ?/ ?_)
+		      ?. ?_)))
+	  ;; Translate the first colon into a slash.
+	  (when (string-match ":" group)
+		  (setq group (concat (substring group 0 (match-beginning 0))
+				      "/" (substring group (match-end 0)))))
+	  (nnheader-replace-chars-in-string group ?. ?/)))
+      t)
+     gnus-cache-directory))))
 
 (defun gnus-cache-update-article (group article)
   "If ARTICLE is in the cache, remove it and re-enter it."
@@ -557,6 +560,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (let ((gnus-mark-article-hook nil)
 	(gnus-expert-user t)
 	(nnmail-spool-file nil)
+	(mail-sources nil)
 	(gnus-use-dribble-file nil)
 	(gnus-novice-user nil)
 	(gnus-large-newsgroup nil))
@@ -667,7 +671,8 @@ If LOW, update the lower bound instead."
   (interactive (list gnus-cache-directory))
   (gnus-cache-close)
   (let ((nnml-generate-active-function 'identity))
-    (nnml-generate-nov-databases-1 dir)))
+    (nnml-generate-nov-databases-1 dir))
+  (gnus-cache-open))
 
 (defun gnus-cache-move-cache (dir)
   "Move the cache tree to somewhere else."

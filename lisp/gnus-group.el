@@ -37,6 +37,7 @@
 (require 'gnus-win)
 (require 'gnus-undo)
 (require 'time-date)
+(require 'gnus-ems)
 
 (defcustom gnus-group-archive-directory
   "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
@@ -481,7 +482,6 @@ For example:
 
 
 (defvar gnus-group-icon-cache nil)
-(defvar gnus-group-running-xemacs (string-match "XEmacs" emacs-version))
 
 ;;;
 ;;; Gnus group mode
@@ -1202,8 +1202,8 @@ If REGEXP, only list groups matching REGEXP."
 		  gnus-level ,gnus-tmp-level))
     (forward-line -1)
     (when (inline (gnus-visual-p 'group-highlight 'highlight))
-      (gnus-run-hooks 'gnus-group-update-hook)
-      (forward-line))
+      (gnus-run-hooks 'gnus-group-update-hook))
+    (forward-line)
     ;; Allow XEmacs to remove front-sticky text properties.
     (gnus-group-remove-excess-properties)))
 
@@ -1581,7 +1581,9 @@ and with point over the group in question."
 	(let ((,groups (gnus-group-process-prefix arg))
 	      (,window (selected-window))
 	      ,group)
-	  (while (setq ,group (pop ,groups))
+	  (while ,groups
+	    (setq ,group (car ,groups)
+		  ,groups (cdr ,groups))
 	    (select-window ,window)
 	    (gnus-group-remove-mark ,group)
 	    (save-selected-window
@@ -1742,7 +1744,9 @@ Return the name of the group if selection was successful."
 	  (when (gnus-group-read-group t t group select-articles)
 	    group)
 	;;(error nil)
-	(quit nil)))))
+	(quit
+	 (message "Quit reading the ephemeral group")
+	 nil)))))
 
 (defun gnus-group-jump-to-group (group)
   "Jump to newsgroup GROUP."
@@ -2045,10 +2049,12 @@ and NEW-NAME will be prompted for."
 
   (gnus-message 6 "Renaming group %s to %s..." group new-name)
   (prog1
-      (if (not (gnus-request-rename-group group new-name))
+      (if (progn
+	    (gnus-group-goto-group group)
+	    (not (when (< (gnus-group-group-level) gnus-level-zombie)
+		   (gnus-request-rename-group group new-name))))
 	  (gnus-error 3 "Couldn't rename group %s to %s" group new-name)
 	;; We rename the group internally by killing it...
-	(gnus-group-goto-group group)
 	(gnus-group-kill-group)
 	;; ... changing its name ...
 	(setcar (cdar gnus-list-of-killed-groups) new-name)
@@ -2303,14 +2309,14 @@ mail messages or news articles in files that have numeric names."
     (while (or (not group) (gnus-gethash group gnus-newsrc-hashtb))
       (setq group
 	    (gnus-group-prefixed-name
-	     (concat (file-name-as-directory (directory-file-name dir))
-		     ext)
+	     (expand-file-name ext dir)
 	     '(nndir "")))
       (setq ext (format "<%d>" (setq i (1+ i)))))
     (gnus-group-make-group
      (gnus-group-real-name group)
      (list 'nndir (gnus-group-real-name group) (list 'nndir-directory dir)))))
 
+(eval-when-compile (defvar nnkiboze-score-file))
 (defun gnus-group-make-kiboze-group (group address scores)
   "Create an nnkiboze group.
 The user will be prompted for a name, a regexp to match groups, and
@@ -2328,15 +2334,20 @@ score file entries for articles to include in the group."
 					  "Match on header: " headers nil t))))
 	(setq regexps nil)
 	(while (not (equal "" (setq regexp (read-string
-					    (format "Match on %s (string): "
+					    (format "Match on %s (regexp): "
 						    header)))))
 	  (push (list regexp nil nil 'r) regexps))
 	(push (cons header regexps) scores))
       scores)))
   (gnus-group-make-group group "nnkiboze" address)
-  (with-temp-file (gnus-score-file-name (concat "nnkiboze:" group))
-    (let (emacs-lisp-mode-hook)
-      (pp scores (current-buffer)))))
+  (let* ((nnkiboze-current-group group)
+	 (score-file (car (nnkiboze-score-file "")))
+	 (score-dir (file-name-directory score-file)))
+    (unless (file-exists-p score-dir)
+      (make-directory score-dir))
+    (with-temp-file score-file
+      (let (emacs-lisp-mode-hook)
+	(pp scores (current-buffer))))))
 
 (defun gnus-group-add-to-virtual (n vgroup)
   "Add the current group to a virtual group."
@@ -2415,8 +2426,9 @@ score file entries for articles to include in the group."
       (error "Killed group; can't be edited"))
     (unless (eq (car (setq method (gnus-find-method-for-group group))) 'nnimap)
       (error "%s is not an nnimap group" group))
-    (gnus-edit-form (setq acl (nnimap-acl-get mailbox (cadr method)))
-		    (format "Editing the access control list for `%s'.
+    (unless (setq acl (nnimap-acl-get mailbox (cadr method)))
+      (error "Server does not support ACL's"))
+    (gnus-edit-form acl (format "Editing the access control list for `%s'.
 
    An access control list is a list of (identifier . rights) elements.
 
@@ -2785,7 +2797,9 @@ or nil if no action could be taken."
 	    (gnus-request-expire-articles
 	     (gnus-uncompress-sequence (cdr expirable)) group))))
 	(gnus-close-group group))
-      (gnus-message 6 "Expiring articles in %s...done" group))))
+      (gnus-message 6 "Expiring articles in %s...done" group)
+      ;; Return the list of un-expired articles.
+      (cdr expirable))))
 
 (defun gnus-group-expire-all-groups ()
   "Expire all expirable articles in all newsgroups."
@@ -3232,7 +3246,7 @@ to use."
     (when current-prefix-arg
       (completing-read
        "Faq dir: " (and (listp gnus-group-faq-directory)
-			(mapcar (lambda (file) (list file))
+			(mapcar #'list
 				gnus-group-faq-directory))))))
   (unless group
     (error "No group name given"))
@@ -3243,7 +3257,7 @@ to use."
     (while (and (not found)
 		(setq dir (pop dirs)))
       (let ((name (gnus-group-real-name group)))
-	(setq file (concat (file-name-as-directory dir) name)))
+	(setq file (expand-file-name name dir)))
       (if (not (file-exists-p file))
 	  (gnus-message 1 "No such file: %s" file)
 	(let ((enable-local-variables nil))
@@ -3602,7 +3616,7 @@ and the second element is the address."
 
 (defun gnus-add-marked-articles (group type articles &optional info force)
   ;; Add ARTICLES of TYPE to the info of GROUP.
-  ;; If INFO is non-nil, use that info.         If FORCE is non-nil, don't
+  ;; If INFO is non-nil, use that info.  If FORCE is non-nil, don't
   ;; add, but replace marked articles of TYPE with ARTICLES.
   (let ((info (or info (gnus-get-info group)))
 	marked m)

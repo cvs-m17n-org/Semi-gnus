@@ -289,12 +289,13 @@ all.  This may very well take some time.")
 		;; Allow a special target group.
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnml-request-article article group server
+		    (nnml-request-article number group server
 					  (current-buffer))
-		    (nnmail-expiry-target-group
-		     nnmail-expiry-target group)))
+		    (let ((nnml-current-directory nil))
+		      (nnmail-expiry-target-group
+		       nnmail-expiry-target group))))
 		(nnheader-message 5 "Deleting article %s in %s"
-				  article group)
+				  number group)
 		(condition-case ()
 		    (funcall nnmail-delete-file-function article)
 		  (file-error
@@ -748,7 +749,7 @@ all.  This may very well take some time.")
 	(unless no-active
 	  (nnmail-save-active nnml-group-alist nnml-active-file))))))
 
-(defvar files)
+(eval-when-compile (defvar files))
 (defun nnml-generate-active-info (dir)
   ;; Update the active info for this group.
   (let ((group (nnheader-file-to-group
