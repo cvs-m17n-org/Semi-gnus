@@ -1,3 +1,22 @@
+2000-02-14  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.7 (This is alpha status.)
+	See announcement of 7.1.0.3.
+
+	Sync up with T-gnus 6.14 around POP3 mail retrieving.
+
+	I tested `gnus-agent'. It's probably fine.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.7.
+
+	* lisp/mail-source.el (mail-source-keyword-map): Sync up with
+	T-gnus 6.14 for supporting `pop3-connection-type'.
+	(mail-source-fetch-pop): Likewise.
+
+	* lisp/pop3.el: Sync up with T-gnus 6.14 for supporting
+	`pop3-connection-type', `pop3-leave-mail-on-server',
+	`pop3-maximum-message-size' and `pop3-except-header-regexp'.
+
 2000-02-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 7.1.0.6 (This is alpha status.)
