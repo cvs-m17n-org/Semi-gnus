@@ -124,7 +124,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
   :type '(choice (const nil)
 		 (integer :tag "Number")))
 
-(defcustom gnus-agent-synchronize-flags 'ask
+(defcustom gnus-agent-synchronize-flags nil
   "Indicate if flags are synchronized when you plug in.
 If this is `ask' the hook will query the user."
   :version "21.1"
@@ -3779,7 +3779,7 @@ entry of article %s deleted." l1))
 	(when regenerated
 	    (gnus-agent-update-files-total-fetched-for group nil)))
 
-      (gnus-message 5 nil)
+      (gnus-message 5 "")
       regenerated)))
 
 ;;;###autoload
