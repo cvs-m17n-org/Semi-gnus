@@ -1,8 +1,7 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -284,43 +283,6 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
       (funcall (gnus-get-function gnus-command-method 'retrieve-headers)
 	       articles (gnus-group-real-name group)
 	       (nth 1 gnus-command-method) fetch-old))))
-
-(defun gnus-retrieve-parsed-headers (articles group &optional fetch-old
-					      dependencies force-new)
-  "Request parsed-headers for ARTICLES in GROUP.
-If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
-  (unless dependencies
-    (setq dependencies
-	  (save-excursion
-	    (set-buffer gnus-summary-buffer)
-	    gnus-newsgroup-dependencies)))
-  (let ((gnus-command-method (gnus-find-method-for-group group))
-	headers)
-    (if (and gnus-use-cache (numberp (car articles)))
-	(setq headers
-	      (gnus-cache-retrieve-parsed-headers articles group fetch-old
-						  dependencies force-new))
-      (let ((func (gnus-get-function gnus-command-method
-				     'retrieve-parsed-headers 'no-error)))
-	(if func
-	    (setq headers (funcall func articles dependencies
-				   (gnus-group-real-name group)
-				   (nth 1 gnus-command-method) fetch-old
-				   force-new)
-		  gnus-headers-retrieved-by (car headers)
-		  headers (cdr headers))
-	  (setq gnus-headers-retrieved-by
-		(funcall
-		 (gnus-get-function gnus-command-method 'retrieve-headers)
-		 articles (gnus-group-real-name group)
-		 (nth 1 gnus-command-method) fetch-old))
-	  )))
-    (or headers
-	(if (eq gnus-headers-retrieved-by 'nov)
-	    (gnus-get-newsgroup-headers-xover
-	     articles nil dependencies gnus-newsgroup-name t)
-	  (gnus-get-newsgroup-headers dependencies)))
-    ))
 
 (defun gnus-retrieve-articles (articles group)
   "Request ARTICLES in GROUP."

@@ -1,9 +1,8 @@
 ;;; nnmh.el --- mhspool access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -112,29 +111,6 @@
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
 
 	'headers))))
-
-(deffoo nnmh-retrieve-parsed-headers (articles
-				      dependencies
-				      &optional newsgroup server fetch-old
-				      force-new)
-  (save-excursion
-    (set-buffer nntp-server-buffer)
-    (let* ((file nil)
-	   (number (length articles))
-	   (large (and (numberp nnmail-large-newsgroup)
-		       (> number nnmail-large-newsgroup)))
-	   (count 0)
-	   (pathname-coding-system 'binary)
-	   (case-fold-search t)
-	   ;;beg
-	   article
-	   headers header id end ref lines chars ctype)
-      (nnmh-possibly-change-directory newsgroup server)
-      ;; We don't support fetching by Message-ID.
-      (nnheader-retrieve-headers-from-directory
-       articles nnmh-current-directory dependencies
-       fetch-old force-new large "nnmh")
-      )))
 
 (deffoo nnmh-open-server (server &optional defs)
   (nnoo-change-server 'nnmh server defs)

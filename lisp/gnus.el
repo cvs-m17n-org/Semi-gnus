@@ -257,8 +257,8 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.45; for SEMI 1.12/1.13, FLIM 1.12)"
-	  gnus-product-name gnus-version-number)
+  (format "%s %s (based on Gnus 5.6.45; for SEMI 1.12, FLIM 1.12)"
+          gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
