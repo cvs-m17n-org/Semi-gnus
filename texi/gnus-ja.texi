@@ -15541,7 +15541,16 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 $B%5!<%P$K%m%0%$%s$9$k$?$a$K;H$&G'>Z>pJs(B (authinfo) $B$r4^$`%U%!%$%k$G$9!#$=(B
 $B$N7A<0$O(B ($B$[$H$s$I(B) @code{ftp} $B$N(B @file{~/.netrc} $B%U%!%$%k$HF1$8$G$9!#87(B
 $BL)$JDj5A$O!"JQ?t(B @code{nntp-authinfo-file} $B$r8+$F2<$5$$!#$=$7(B
-$B$F(B @ref{NNTP} $B$b8+$F2<$5$$!#(B
+$B$F(B @ref{NNTP} $B$b8+$F2<$5$$!#(BIMAP $B%5!<%P!<MQ$N(B .authinfo $B9T$NNc$G$9(B:
+
+@example
+machine students.uio.no login larsi password geheimnis port imap
+@end example
+
+$B0BA4$J(B imap $B$G;H$o$l$k<B:]$N%]!<%HHV9f$O(B port 993 $B$G$9$,!"(B
+@code{nnimap-stream} $B$H$7$F(B @code{tls} $B$^$?$O(B @code{ssl} $B$r;H$&>l9g!"$=(B
+$B$l$O(B @code{port imap} $B$^$?$O(B @code{port 143} $B$G$J$1$l$P$J$i$J$$$3$H$KCm(B
+$B0U$7$F2<$5$$!#(B
 
 @item nnimap-need-unselect-to-notice-new-mail
 @vindex nnimap-need-unselect-to-notice-new-mail
