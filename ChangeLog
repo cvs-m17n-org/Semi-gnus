@@ -1,5 +1,12 @@
 1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el: Delete setting for
+	`article-de-quoted-unreadable' and
+	`article-mime-decode-quoted-printable' because they have been
+	already abolished.
+
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* texi/gnus-ja.texi: Sync up with latest gnus.texi.
 
 	* texi/gnus.texi: Modify for Semi-gnus 6.4.0.
