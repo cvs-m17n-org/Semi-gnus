@@ -193,7 +193,7 @@ If `imap-ssl-program' is 'auto this variable has no effect.")
 (defvar imap-fetch-data-hook nil
   "Hooks called after receiving each FETCH response.")
 
-(defvar imap-streams '(kerberos4 ssl network)
+(defvar imap-streams '(kerberos4 starttls ssl network)
   "Priority of streams to consider when opening connection to
 server.")
 
@@ -201,7 +201,7 @@ server.")
   '((kerberos4 imap-kerberos4s-p imap-kerberos4-open)
     (ssl       imap-ssl-p        imap-ssl-open)
     (network   imap-network-p    imap-network-open)
-    (tls       imap-tls-p        imap-tls-open))
+    (starttls  imap-starttls-p   imap-starttls-open))
   "Definition of network streams.
 
 (NAME CHECK OPEN)
@@ -210,16 +210,16 @@ NAME names the stream, CHECK is a function returning non-nil if the
 server support the stream and OPEN is a function for opening the
 stream.")
 
-(defvar imap-authenticators '(kerberos4 cram-md5 digest-md5 login anonymous)
+(defvar imap-authenticators '(kerberos4 digest-md5 cram-md5 login anonymous)
   "Priority of authenticators to consider when authenticating to
 server.")
 
 (defvar imap-authenticator-alist 
   '((kerberos4   imap-kerberos4a-p imap-kerberos4-auth)
     (cram-md5    imap-cram-md5-p   imap-cram-md5-auth)
-    (digest-md5  imap-digest-md5-p imap-digest-md5-auth)
     (login       imap-login-p      imap-login-auth)
-    (anonymous   imap-anonymous-p  imap-anonymous-auth))
+    (anonymous   imap-anonymous-p  imap-anonymous-auth)
+    (digest-md5  imap-digest-md5-p imap-digest-md5-auth))
   "Definition of authenticators.
 
 (NAME CHECK AUTHENTICATE)
@@ -494,10 +494,13 @@ argument to `format'."
       (when (memq (process-status process) '(open run))
 	process))))
 
-(defun imap-tls-p (buffer)
-  (imap-capability 'STARTTLS buffer))
+(defun imap-starttls-p (buffer)
+  (and (condition-case ()
+	   (require 'starttls)
+	 (error nil))
+       (imap-capability 'STARTTLS buffer)))
 
-(defun imap-tls-open (name buffer server port)
+(defun imap-starttls-open (name buffer server port)
   (let* ((port (or port imap-default-port))
 	 (process (as-binary-process
 		   (starttls-open-stream name buffer server port))))
@@ -516,7 +519,7 @@ argument to `format'."
 	(unwind-protect
 	    (progn
 	      (set-process-filter imap-process 'imap-arrival-filter)
-	      (when (and (eq imap-stream 'tls)
+	      (when (and (eq imap-stream 'starttls)
 			 (imap-ok-p (imap-send-command-wait "STARTTLS")))
 		(starttls-negotiate imap-process)))
 	  (set-process-filter imap-process nil)))
@@ -594,7 +597,10 @@ successful, nil otherwise."
 	    encoded))))))))
 
 (defun imap-digest-md5-p (buffer)
-  (imap-capability 'AUTH=DIGEST-MD5 buffer))
+  (and (condition-case ()
+	   (require 'digest-md5)
+	 (error nil))
+       (imap-capability 'AUTH=DIGEST-MD5 buffer)))
 
 (defun imap-digest-md5-auth (buffer)
   "Login to server using the AUTH DIGEST-MD5 method."
