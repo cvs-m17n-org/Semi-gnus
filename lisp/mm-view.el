@@ -1,4 +1,4 @@
-;;; mm-view.el --- Functions for viewing MIME objects
+;;; mm-view.el --- functions for viewing MIME objects
 ;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -151,15 +151,6 @@
 			      '(background background-pixmap foreground)))
 		  (delete-region ,(point-min-marker)
 				 ,(point-max-marker)))))))))
-     ((or (equal type "enriched")
-	  (equal type "richtext"))
-      (save-excursion
-	(mm-with-unibyte-buffer
-	  (mm-insert-part handle)
-	  (save-window-excursion
-	    (enriched-decode (point-min) (point-max))
-	    (setq text (buffer-string)))))
-      (mm-insert-inline handle text))
      ((equal type "x-vcard")
       (mm-insert-inline
        handle
@@ -194,6 +185,9 @@
 	(save-restriction
 	  (narrow-to-region b (point))
 	  (set-text-properties (point-min) (point-max) nil)
+	  (when (or (equal type "enriched")
+		    (equal type "richtext"))
+	    (enriched-decode (point-min) (point-max)))
 	  (mm-handle-set-undisplayer
 	   handle
 	   `(lambda ()
