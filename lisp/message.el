@@ -4687,20 +4687,39 @@ regexp varstr."
 ;;; MIME functions
 ;;;
 
+(defun message-insert-mime-part (file type)
+  "Insert a multipart/alternative part into the buffer."
+  (interactive
+   (let* ((file (read-file-name "Insert file: " nil nil t))
+	  (type (mm-default-file-encoding file)))
+     (list file
+	   (completing-read
+	    (format "MIME type for %s: " file)
+	    (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
+	    nil nil type))))
+  (insert (format "<#part type=%s filename=\"%s\"><#/part>\n"
+		  type file)))
+
 (defun message-encode-message-body ()
   (message-goto-body)
-  (narrow-to-region (point) (point-max))
-  (let ((new (mml-generate-mime)))
-    (delete-region (point-min) (point-max))
-    (insert new)
-    (goto-char (point-min))
-    (widen)
-    (forward-line -1)
-    (let ((beg (point))
-	  (line (buffer-substring (point) (progn (forward-line 1) (point)))))
-      (delete-region beg (point))
-      (insert "Mime-Version: 1.0\n")
-      (insert line))))
+  (save-restriction
+    (narrow-to-region (point) (point-max))
+    (let ((new (mml-generate-mime)))
+      (delete-region (point-min) (point-max))
+      (insert new)
+      (goto-char (point-min))
+      (widen)
+      (forward-line -1)
+      (let ((beg (point))
+	    (line (buffer-substring (point) (progn (forward-line 1) (point)))))
+	(delete-region beg (point))
+	(insert "Mime-Version: 1.0\n")
+	(search-forward "\n\n")
+	(insert line)
+	(when (save-excursion
+		(re-search-backward "^Content-Type: multipart/" nil t))
+	  (insert "This is a MIME multipart message.  If you are reading\n")
+	  (insert "this, you shouldn't.\n\n"))))))
 
 (defvar message-save-buffer " *encoding")
 (defun message-save-drafts ()
@@ -4717,20 +4736,6 @@ regexp varstr."
     (set-buffer buffer)
     (set-buffer-modified-p nil)))
 
-(defun message-insert-mime-part (file type)
-  "Insert a multipart/alternative part into the buffer."
-  (interactive
-   (let* ((file (read-file-name "Insert file: " nil nil t))
-	  (type (mm-default-file-encoding file)))
-     (list file
-	   (completing-read
-	    (format "MIME type for %s: " file)
-	    (mapcar (lambda (m) (list (cdr m))) mailcap-mime-extensions)
-	    nil nil type))))
-  (insert (format "<part type=%s filename=\"%s\"></part>\n"
-		  type file)))
-
-    
 (run-hooks 'message-load-hook)
 
 (provide 'message)
