@@ -148,7 +148,7 @@
 (defvoo nnshimbun-pre-fetch-article nil
   "*Non nil means that nnshimbun fetch unread articles when scanning groups.")
 
-;; set by nnshimbun-possibly-change-server
+;; set by nnshimbun-possibly-change-group
 (defvoo nnshimbun-buffer nil)
 (defvoo nnshimbun-current-directory nil)
 (defvoo nnshimbun-current-group nil)
@@ -349,6 +349,7 @@
   (nnshimbun-generate-nov-database group))
 
 (deffoo nnshimbun-close-group (group &optional server)
+  (nnshimbun-write-nov group)
   t)
 
 (deffoo nnshimbun-request-list (&optional server)
@@ -435,11 +436,7 @@
 
 (defun nnshimbun-generate-nov-database (group)
   (prog1 (funcall nnshimbun-generate-nov group)
-    (save-excursion
-      (set-buffer (nnshimbun-open-nov group))
-      (when (buffer-modified-p)
-	(nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
-			     nil 'nomesg)))))
+    (nnshimbun-write-nov group)))
 
 (defun nnshimbun-generate-nov-for-each-group (group)
   (nnshimbun-possibly-change-group group)
@@ -449,7 +446,6 @@
       (goto-char (point-max))
       (forward-line -1)
       (setq i (or (ignore-errors (read (current-buffer))) 0))
-      (goto-char (point-max))
       (dolist (header (save-excursion
 			(set-buffer nnshimbun-buffer)
 			(erase-buffer)
@@ -458,6 +454,7 @@
 			(funcall nnshimbun-get-headers)))
 	(unless (nnshimbun-search-id group (mail-header-id header))
 	  (mail-header-set-number header (setq i (1+ i)))
+	  (goto-char (point-max))
 	  (nnheader-insert-nov header)
 	  (if nnshimbun-pre-fetch-article
 	      (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))))
@@ -476,32 +473,59 @@
 	      (goto-char (point-max))
 	      (forward-line -1)
 	      (setq i (or (ignore-errors (read (current-buffer))) 0))
-	      (goto-char (point-max))
 	      (dolist (header (cdr list))
 		(unless (nnshimbun-search-id group (mail-header-id header))
 		  (mail-header-set-number header (setq i (1+ i)))
+		  (goto-char (point-max))
 		  (nnheader-insert-nov header)
 		  (if nnshimbun-pre-fetch-article
 		      (nnshimbun-request-article-1 i group nil nnshimbun-buffer))))))))
       (nnshimbun-save-nov)
       (setq nnshimbun-nov-last-check (current-time)))))
 
-(defun nnshimbun-search-id (group id)
+(defun nnshimbun-search-id (group id &optional nov)
   (save-excursion
     (set-buffer (nnshimbun-open-nov group))
     (goto-char (point-min))
-    (let (number found)
+    (let (found)
       (while (and (not found)
 		  (search-forward id nil t)) ; We find the ID.
 	;; And the id is in the fourth field.
 	(if (not (and (search-backward "\t" nil t 4)
 		      (not (search-backward "\t" (gnus-point-at-bol) t))))
 	    (forward-line 1)
-	  (beginning-of-line)
-	  (setq found t)
-	  ;; We return the article number.
-	  (setq number (ignore-errors (read (current-buffer))))))
-      number)))
+	  (forward-line 0)
+	  (setq found t)))
+      (unless found
+	(goto-char (point-min))
+	(when (search-forward (concat "X-Nnshimbun-Original-Id: " id) nil t)
+	  (forward-line 0)
+	  (setq found t)))
+      (if found
+	  (if nov
+	      (nnheader-parse-nov)
+	    ;; We return the article number.
+	    (ignore-errors (read (current-buffer))))))))
+
+(defun nnshimbun-nov-fix-header (group header args)
+  (save-excursion
+    (set-buffer (nnshimbun-open-nov group))
+    (when (nnheader-find-nov-line (mail-header-number header))
+      (dolist (arg args)
+	(if (eq (car arg) 'id)
+	    (let ((extra (mail-header-extra header)) x)
+	      (when (setq x (assq 'X-Nnshimbun-Original-Id extra))
+		(setq extra (delq x extra)))
+	      (mail-header-set-extra
+	       header
+	       (cons (cons 'X-Nnshimbun-Original-Id (cdr arg)) extra)))
+	  (let ((func (intern (concat "mail-header-set-" (symbol-name (car arg))))))
+	    (if (cdr arg) (eval (list func header (cdr arg)))))))
+      (let ((xref (mail-header-xref header)))
+	(when (string-match "^Xref: " xref)
+	  (mail-header-set-xref header (substring xref 6))))
+      (delete-region (point) (progn (forward-line 1) (point)))
+      (nnheader-insert-nov header))))
 
 (defun nnshimbun-open-nov (group)
   (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
@@ -522,6 +546,15 @@
 	(set-buffer-modified-p nil))
       (push (cons group buffer) nnshimbun-nov-buffer-alist)
       buffer)))
+
+(defun nnshimbun-write-nov (group)
+  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
+    (when (buffer-live-p buffer)
+      (save-excursion
+	(set-buffer buffer)
+	(buffer-modified-p)
+	(nnmail-write-region 1 (point-max) nnshimbun-nov-buffer-file-name
+			     nil 'nomesg)))))
 
 (defun nnshimbun-save-nov ()
   (save-excursion
@@ -598,7 +631,13 @@
 	  (aref [nil "Jan" "Feb" "Mar" "Apr" "May" "Jun"
 		     "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"]
 		month)
-	  year
+	  (cond ((< year 69)
+		 (+ year 2000))
+		((< year 100)
+		 (+ year 1900))
+		((< year 1000)	; possible 3-digit years.
+		 (+ year 1900))
+		(t year))
 	  (or time "00:00")))
 
 (if (fboundp 'regexp-opt)
