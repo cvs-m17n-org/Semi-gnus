@@ -575,7 +575,7 @@ Summary Buffer
 * Choosing Articles::           記事を読む
 * Paging the Article::          読んでいる記事をスクロールする
 * Reply Followup and Post::     記事を投稿する
-* Delayed Articles::            
+* Delayed Articles::            記事を後で送る
 * Marking Articles::            記事に既読や期限切れ削除可能等の印を付け
                                 る
 * Limiting::                    概略バッファに制限を加えることができる
@@ -4371,7 +4371,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 * Choosing Articles::           記事を読む
 * Paging the Article::          読んでいる記事をスクロールする
 * Reply Followup and Post::     記事を投稿する
-* Delayed Articles::            
+* Delayed Articles::            記事を後で送る
 * Marking Articles::            記事に既読や期限切れ削除可能等の印を付け
                                 る
 * Limiting::                    概略バッファに制限を加えることができる
