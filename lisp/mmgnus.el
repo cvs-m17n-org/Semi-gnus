@@ -93,6 +93,15 @@
 	    (insert "\n")
 	    ))))))
 
+(defun mmgnus-entity-body (entity)
+   (cond
+    ((bufferp (mmgnus-entity-body-internal entity))
+     (with-current-buffer (mmgnus-entity-body-internal entity)
+       (buffer-string)))
+    (t
+     (error "Invalid body object. %s"
+	    (mmgnus-entity-body-internal entity)))))
+
 (luna-define-method mime-insert-header ((entity mmgnus-entity)
 					&optional invisible-fields
 					visible-fields)
@@ -101,14 +110,33 @@
    invisible-fields visible-fields))
 
 (luna-define-method mime-entity-content ((entity mmgnus-entity))
-  (save-excursion
-    (cond
-     ((bufferp (mmgnus-entity-body-internal entity))
-      (set-buffer (mmgnus-entity-body-internal entity))
-      (mime-decode-string (buffer-string) (mime-entity-encoding entity)))
-     (t
-      (error "Invalid body object. %s"
-	     (mmgnus-entity-body-internal entity))))))
+  (mime-decode-string (mmgnus-entity-body entity)
+		      (mime-entity-encoding entity)))
+
+(luna-define-method mime-insert-entity-content ((entity mmgnus-entity))
+  (insert (mime-entity-content entity)))
+
+(luna-define-method mime-write-entity-content ((entity mmgnus-entity) filename)
+  (with-temp-buffer
+    (insert (mmgnus-entity-body entity))
+    (mime-write-decoded-region (point-min) (point-max)
+			       filename
+			       (or (mime-entity-encoding entity) "7bit"))))
+
+(luna-define-method mime-insert-entity ((entity mmgnus-entity))
+  (insert (mmgnus-entity-header-internal entity)
+	  "\n"
+	  (mmgnus-entity-body entity)))
+
+(luna-define-method mime-write-entity ((entity mmgnus-entity) filename)
+  (with-temp-buffer
+    (mime-insert-entity entity)
+    (write-region-as-raw-text-CRLF (point-min) (point-max) filename)))
+
+(luna-define-method mime-write-entity-body ((entity mmgnus-entity) filename)
+  (with-temp-buffer
+    (insert (mmgnus-entity-body entity))
+    (write-region-as-binary (point-min) (point-max) filename)))
 
 (luna-define-class mime-gnus-entity (mmgnus-entity)
 		   (number
