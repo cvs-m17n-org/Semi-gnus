@@ -244,11 +244,12 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.11"
-  "Version number for this version of Gnus.")
+(defconst gnus-version-number "6.0.0"
+  "Version number for this version of gnus.")
 
-(defconst gnus-version (format "Quassia Gnus v%s" gnus-version-number)
-  "Version string for this version of Gnus.")
+(defconst gnus-version
+  (format "Open gnus %s (based on Quassia v0.16)" gnus-version-number)
+  "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
@@ -266,6 +267,7 @@ be set in `.emacs' instead."
 
 (unless (featurep 'gnus-xmas)
   (defalias 'gnus-make-overlay 'make-overlay)
+  (defalias 'gnus-delete-overlay 'delete-overlay)
   (defalias 'gnus-overlay-put 'overlay-put)
   (defalias 'gnus-move-overlay 'move-overlay)
   (defalias 'gnus-overlay-end 'overlay-end)
@@ -281,46 +283,8 @@ be set in `.emacs' instead."
   (defalias 'gnus-mode-line-buffer-identification 'identity)
   (defalias 'gnus-characterp 'numberp)
   (defalias 'gnus-deactivate-mark 'deactivate-mark)
+  (defalias 'gnus-window-edges 'window-edges)
   (defalias 'gnus-key-press-event-p 'numberp))
-
-;; The XEmacs people think this is evil, so it must go.
-(defun custom-face-lookup (&optional fg bg stipple bold italic underline)
-  "Lookup or create a face with specified attributes."
-  (let ((name (intern (format "custom-face-%s-%s-%s-%S-%S-%S"
-			      (or fg "default")
-			      (or bg "default")
-			      (or stipple "default")
-			      bold italic underline))))
-    (if (and (custom-facep name)
-	     (fboundp 'make-face))
-	()
-      (copy-face 'default name)
-      (when (and fg
-		 (not (string-equal fg "default")))
-	(ignore-errors
-	  (set-face-foreground name fg)))
-      (when (and bg
-		 (not (string-equal bg "default")))
-	(ignore-errors
-	  (set-face-background name bg)))
-      (when (and stipple
-		 (not (string-equal stipple "default"))
-		 (not (eq stipple 'custom:asis))
-		 (fboundp 'set-face-stipple))
-	(set-face-stipple name stipple))
-      (when (and bold
-		 (not (eq bold 'custom:asis)))
-	(ignore-errors
-	  (make-face-bold name)))
-      (when (and italic
-		 (not (eq italic 'custom:asis)))
-	(ignore-errors
-	  (make-face-italic name)))
-      (when (and underline
-		 (not (eq underline 'custom:asis)))
-	(ignore-errors
-	  (set-face-underline-p name t))))
-    name))
 
 ;; We define these group faces here to avoid the display
 ;; update forced when creating new faces.
@@ -1397,6 +1361,9 @@ want."
   :group 'gnus-article-saving
   :type 'directory)
 
+(defvar gnus-plugged t
+  "Whether Gnus is plugged or not.")
+
 
 ;;; Internal variables
 
@@ -1683,7 +1650,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-date-original gnus-article-date-lapsed
       gnus-article-show-all-headers
       gnus-article-edit-mode gnus-article-edit-article
-      gnus-article-edit-done gnus-decode-rfc1522 article-decode-rfc1522)
+      gnus-article-edit-done gnus-decode-rfc1522 article-decode-rfc1522
+      gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
       gnus-dribble-enter)
@@ -2331,7 +2299,8 @@ that that variable is buffer-local to the summary buffers."
 (defun gnus-group-prefixed-name (group method)
   "Return the whole name from GROUP and METHOD."
   (and (stringp method) (setq method (gnus-server-to-method method)))
-  (if (not method)
+  (if (or (not method)
+	  (gnus-server-equal method "native"))
       group
     (concat (format "%s" (car method))
 	    (when (and
