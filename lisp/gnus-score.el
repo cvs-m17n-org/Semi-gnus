@@ -308,6 +308,7 @@ Should be one of the following symbols.
  i: message-id
  t: references
  x: xref
+ e: `extra' (non-standard overview)
  l: lines
  d: date
  f: followup
@@ -321,6 +322,7 @@ If nil, the user will be asked for a header."
 		 (const :tag "message-id" i)
 		 (const :tag "references" t)
 		 (const :tag "xref" x)
+		 (const :tag "extra" e)
 		 (const :tag "lines" l)
 		 (const :tag "date" d)
 		 (const :tag "followup" f)
@@ -444,6 +446,7 @@ of the last successful match.")
     ("chars" 6 gnus-score-integer)
     ("lines" 7 gnus-score-integer)
     ("xref" 8 gnus-score-string)
+    ("extra" 9 gnus-score-string)
     ("head" -1 gnus-score-body)
     ("body" -1 gnus-score-body)
     ("all" -1 gnus-score-body)
@@ -502,6 +505,7 @@ used as score."
 	    (?i "message-id" nil t string)
 	    (?r "references" "message-id" nil string)
 	    (?x "xref" nil nil string)
+	    (?e "extra" nil nil string)
 	    (?l "lines" nil nil number)
 	    (?d "date" nil nil date)
 	    (?f "followup" nil nil string)
@@ -530,7 +534,7 @@ used as score."
 		     (aref (symbol-name gnus-score-default-type) 0)))
 	 (pchar (and gnus-score-default-duration
 		     (aref (symbol-name gnus-score-default-duration) 0)))
-	 entry temporary type match)
+	 entry temporary type match extra)
 
     (unwind-protect
 	(progn
@@ -622,9 +626,26 @@ used as score."
       ;; Always kill the score help buffer.
       (gnus-score-kill-help-buffer))
 
+    ;; If scoring an extra (non-standard overview) header,
+    ;; we must find out which header is in question.
+    (setq extra
+	  (and gnus-extra-headers
+	       (equal (nth 1 entry) "extra")
+	       (intern					; need symbol
+		(gnus-completing-read
+		 (symbol-name (car gnus-extra-headers))	; default response
+		 "Score extra header:"			; prompt
+		 (mapcar (lambda (x)			; completion list
+			   (cons (symbol-name x) x))
+			 gnus-extra-headers)
+		 nil					; no completion limit
+		 t))))					; require match
+    ;; extra is now nil or a symbol.
+
     ;; We have all the data, so we enter this score.
     (setq match (if (string= (nth 2 entry) "") ""
-		  (gnus-summary-header (or (nth 2 entry) (nth 1 entry)))))
+		  (gnus-summary-header (or (nth 2 entry) (nth 1 entry))
+				       nil extra)))
 
     ;; Modify the match, perhaps.
     (cond
@@ -660,7 +681,9 @@ used as score."
      (if (eq temporary 'perm)		; Temp
 	 nil
        temporary)
-     (not (nth 3 entry)))		; Prompt
+     (not (nth 3 entry))		; Prompt
+     nil				; not silent 
+     extra)				; non-standard overview.
 
     (when (eq symp 'a)
       ;; We change the score file back to the previous one.
@@ -672,7 +695,7 @@ used as score."
   (setq gnus-score-help-winconf (current-window-configuration))
   (save-excursion
     (set-buffer (gnus-get-buffer-create "*Score Help*"))
-    (buffer-disable-undo (current-buffer))
+    (buffer-disable-undo)
     (delete-windows-on (current-buffer))
     (erase-buffer)
     (insert string ":\n\n")
@@ -709,14 +732,16 @@ used as score."
       (shrink-window-if-larger-than-buffer))
     (select-window (get-buffer-window gnus-summary-buffer))))
 
-(defun gnus-summary-header (header &optional no-err)
+(defun gnus-summary-header (header &optional no-err extra)
   ;; Return HEADER for current articles, or error.
   (let ((article (gnus-summary-article-number))
 	headers)
     (if article
 	(if (and (setq headers (gnus-summary-article-header article))
 		 (vectorp headers))
-	    (aref headers (nth 1 (assoc header gnus-header-index)))
+	    (if extra			; `header' must be "extra"
+		(or (cdr (assq extra (mail-header-extra headers))) "")
+	      (aref headers (nth 1 (assoc header gnus-header-index))))
 	  (if no-err
 	      nil
 	    (error "Pseudo-articles can't be scored")))
@@ -742,7 +767,8 @@ used as score."
 		  (gnus-newsgroup-score-alist)))))
 
 (defun gnus-summary-score-entry (header match type score date
-					&optional prompt silent)
+					&optional prompt silent extra)
+  (interactive)
   "Enter score file entry.
 HEADER is the header being scored.
 MATCH is the string we are looking for.
@@ -750,7 +776,8 @@ TYPE is the match type: substring, regexp, exact, fuzzy.
 SCORE is the score to add.
 DATE is the expire date, or nil for no expire, or 'now for immediate expire.
 If optional argument `PROMPT' is non-nil, allow user to edit match.
-If optional argument `SILENT' is nil, show effect of score entry."
+If optional argument `SILENT' is nil, show effect of score entry.
+If optional argument `EXTRA' is non-nil, it's a non-standard overview header."
   ;; Regexp is the default type.
   (when (eq type t)
     (setq type 'r))
@@ -791,12 +818,17 @@ If optional argument `SILENT' is nil, show effect of score entry."
 	    elem)
 	(setq new
 	      (cond
+	       (extra
+		(list match score
+		      (and date (if (numberp date) date
+				  (date-to-day date)))
+		      type (symbol-name extra)))
 	       (type
 		(list match score
 		      (and date (if (numberp date) date
-				  (gnus-day-number date)))
+				  (date-to-day date)))
 		      type))
-	       (date (list match score (gnus-day-number date)))
+	       (date (list match score (date-to-day date)))
 	       (score (list match score))
 	       (t (list match))))
 	;; We see whether we can collapse some score entries.
@@ -821,18 +853,19 @@ If optional argument `SILENT' is nil, show effect of score entry."
       (if (and (>= (nth 1 (assoc header gnus-header-index)) 0)
 	       (eq (nth 2 (assoc header gnus-header-index))
 		   'gnus-score-string))
-	  (gnus-summary-score-effect header match type score)
+	  (gnus-summary-score-effect header match type score extra)
 	(gnus-summary-rescore)))
 
     ;; Return the new scoring rule.
     new))
 
-(defun gnus-summary-score-effect (header match type score)
+(defun gnus-summary-score-effect (header match type score extra)
   "Simulate the effect of a score file entry.
 HEADER is the header being scored.
 MATCH is the string we are looking for.
 TYPE is the score type.
-SCORE is the score to add."
+SCORE is the score to add.
+EXTRA is the possible non-standard header."
   (interactive (list (completing-read "Header: "
 				      gnus-header-index
 				      (lambda (x) (fboundp (nth 2 x)))
@@ -853,7 +886,7 @@ SCORE is the score to add."
 			(t
 			 (regexp-quote match)))))
       (while (not (eobp))
-	(let ((content (gnus-summary-header header 'noerr))
+	(let ((content (gnus-summary-header header 'noerr extra))
 	      (case-fold-search t))
 	  (and content
 	       (when (if (eq type 'f)
@@ -1121,7 +1154,7 @@ SCORE is the score to add."
 		 (or (not decay)
 		     (gnus-decay-scores alist decay)))
 	(gnus-score-set 'touched '(t) alist)
-	(gnus-score-set 'decay (list (gnus-time-to-day (current-time))) alist))
+	(gnus-score-set 'decay (list (time-to-days (current-time))) alist))
       ;; We do not respect eval and files atoms from global score
       ;; files.
       (when (and files (not global))
@@ -1202,9 +1235,9 @@ SCORE is the score to add."
 	;; Couldn't read file.
 	(setq gnus-score-alist nil)
       ;; Read file.
-      (save-excursion
-	(gnus-set-work-buffer)
-	(insert-file-contents file)
+      (with-temp-buffer
+	(let ((coding-system-for-write score-mode-coding-system))
+	  (insert-file-contents file))
 	(goto-char (point-min))
 	;; Only do the loading if the score file isn't empty.
 	(when (save-excursion (re-search-forward "[()0-9a-zA-Z]" nil t))
@@ -1290,7 +1323,7 @@ SCORE is the score to add."
 	      (setcar scor
 		      (list (caar scor) (nth 2 (car scor))
 			    (and (nth 3 (car scor))
-				 (gnus-day-number (nth 3 (car scor))))
+				 (date-to-day (nth 3 (car scor))))
 			    (if (nth 1 (car scor)) 'r 's)))
 	      (setq scor (cdr scor))))
 	(push (if (not (listp (cdr entry)))
@@ -1337,7 +1370,8 @@ SCORE is the score to add."
 	      (delete-file file)
 	    ;; There are scores, so we write the file.
 	    (when (file-writable-p file)
-	      (gnus-write-buffer file)
+	      (let ((coding-system-for-write score-mode-coding-system))
+		(gnus-write-buffer file))
 	      (when gnus-score-after-write-file-function
 		(funcall gnus-score-after-write-file-function file)))))
 	(and gnus-score-uncacheable-files
@@ -1385,7 +1419,7 @@ SCORE is the score to add."
       (when (and gnus-summary-default-score
 		 scores)
 	(let* ((entries gnus-header-index)
-	       (now (gnus-day-number (current-time-string)))
+	       (now (date-to-day (current-time-string)))
 	       (expire (and gnus-score-expiry-days
 			    (- now gnus-score-expiry-days)))
 	       (headers gnus-newsgroup-headers)
@@ -1404,7 +1438,7 @@ SCORE is the score to add."
 
 	  (save-excursion
 	    (set-buffer (gnus-get-buffer-create "*Headers*"))
-	    (buffer-disable-undo (current-buffer))
+	    (buffer-disable-undo)
 	    (when (gnus-buffer-live-p gnus-summary-buffer)
 	      (message-clone-locals gnus-summary-buffer))
 
@@ -1864,12 +1898,23 @@ SCORE is the score to add."
     ;; and U is the number of unique headers.  It is assumed (but
     ;; untested) this will be a net win because of the large constant
     ;; factor involved with string matching.
-    (setq gnus-scores-articles (sort gnus-scores-articles 'gnus-score-string<)
+    (setq gnus-scores-articles
+	  ;; We cannot string-sort the extra headers list.  *sigh*
+	  (if (= gnus-score-index 9)
+	      gnus-scores-articles
+	    (sort gnus-scores-articles 'gnus-score-string<))
 	  articles gnus-scores-articles)
 
     (erase-buffer)
     (while (setq art (pop articles))
       (setq this (aref (car art) gnus-score-index))
+
+      ;; If we're working with non-standard headers, we are stuck
+      ;; with working on them as a group.  What a hassle.
+      ;; Just wait 'til you see what horrors we commit against `match'...
+      (if (= gnus-score-index 9)
+	  (setq this (prin1-to-string this)))	; ick.
+
       (if simplify
 	  (setq this (gnus-map-function gnus-simplify-subject-functions this)))
       (if (equal last this)
@@ -1900,6 +1945,7 @@ SCORE is the score to add."
 	       (type (or (nth 3 kill) 's))
 	       (score (or (nth 1 kill) gnus-score-interactive-default-score))
 	       (date (nth 2 kill))
+	       (extra (nth 4 kill))	; non-standard header; string.
 	       (found nil)
 	       (mt (aref (symbol-name type) 0))
 	       (case-fold-search (not (memq mt '(?R ?S ?E ?F))))
@@ -1915,6 +1961,12 @@ SCORE is the score to add."
 		      ((or (= dmt ?e) (= dmt ?s) (= dmt ?f)) 'search-forward)
 		      ((= dmt ?w) nil)
 		      (t (error "Illegal match type: %s" type)))))
+
+	  ;; Evil hackery to make match usable in non-standard headers.
+	  (when extra
+	    (setq match (concat "[ (](" extra " \\. \"[^)]*" match "[^(]*\")[ )]")
+		  search-func 're-search-forward))	; XXX danger?!?
+
 	  (cond
 	   ;; Fuzzy matches.  We save these for later.
 	   ((= dmt ?f)
@@ -2209,9 +2261,9 @@ SCORE is the score to add."
     ;; Perform adaptive word scoring.
     (when (and (listp gnus-newsgroup-adaptive)
 	       (memq 'word gnus-newsgroup-adaptive))
-      (nnheader-temp-write nil
+      (with-temp-buffer
 	(let* ((hashtb (gnus-make-hashtable 1000))
-	       (date (gnus-day-number (current-time-string)))
+	       (date (date-to-day (current-time-string)))
 	       (data gnus-newsgroup-data)
 	       (syntab (syntax-table))
 	       word d score val)
@@ -2289,11 +2341,10 @@ SCORE is the score to add."
 	   1 "No score rules apply to the current article (default score %d)."
 	   gnus-summary-default-score)
 	(set-buffer "*Score Trace*")
+	(setq truncate-lines t)
 	(while trace
 	  (insert (format "%S  ->  %s\n" (cdar trace)
-			  (if (caar trace)
-			      (file-name-nondirectory (caar trace))
-			    "(non-file rule)")))
+			  (or (caar trace) "(non-file rule)")))
 	  (setq trace (cdr trace)))
 	(goto-char (point-min))
 	(gnus-configure-windows 'score-trace)))
@@ -2471,8 +2522,8 @@ SCORE is the score to add."
 	seen out file)
     (while (setq file (pop files))
       (cond
-       ;; Ignore "." and "..".
-       ((member (file-name-nondirectory file) '("." ".."))
+       ;; Ignore files that start with a dot.
+       ((string-match "^\\." (file-name-nondirectory file))
 	nil)
        ;; Add subtrees of directory to also be searched.
        ((and (file-directory-p file)
@@ -2505,7 +2556,7 @@ GROUP using BNews sys file syntax."
 	 ofiles not-match regexp)
     (save-excursion
       (set-buffer (gnus-get-buffer-create "*gnus score files*"))
-      (buffer-disable-undo (current-buffer))
+      (buffer-disable-undo)
       ;; Go through all score file names and create regexp with them
       ;; as the source.
       (while sfiles
@@ -2625,7 +2676,7 @@ Destroys the current buffer."
 
 (defun gnus-sort-score-files (files)
   "Sort FILES so that the most general files come first."
-  (nnheader-temp-write nil
+  (with-temp-buffer
     (let ((alist
 	   (mapcar
 	    (lambda (file)
@@ -2837,7 +2888,7 @@ If ADAPT, return the home adaptive file instead."
 
 (defun gnus-decay-scores (alist day)
   "Decay non-permanent scores in ALIST."
-  (let ((times (- (gnus-time-to-day (current-time)) day))
+  (let ((times (- (time-to-days (current-time)) day))
 	kill entry updated score n)
     (unless (zerop times)		;Done decays today already?
       (while (setq entry (pop alist))

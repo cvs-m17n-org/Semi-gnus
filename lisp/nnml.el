@@ -225,6 +225,7 @@ all.  This may very well take some time.")
   t)
 
 (deffoo nnml-request-create-group (group &optional server args)
+  (nnml-possibly-change-directory nil server)
   (nnmail-activate 'nnml)
   (cond
    ((assoc group nnml-group-alist)
@@ -249,9 +250,8 @@ all.  This may very well take some time.")
 (deffoo nnml-request-list (&optional server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (pathname-coding-system 'binary)) ; for XEmacs/mule
-      (nnmail-find-file nnml-active-file)
-      )
+	  (pathname-coding-system 'binary)) 
+      (nnmail-find-file nnml-active-file))
     (setq nnml-group-alist (nnmail-get-active))
     t))
 
@@ -469,7 +469,7 @@ all.  This may very well take some time.")
      ((not (file-exists-p file))
       (nnheader-report 'nnml "File %s does not exist" file))
      (t
-      (nnheader-temp-write file
+      (with-temp-file file
 	(nnheader-insert-file-contents file)
 	(nnmail-replace-status name value))
       t))))
@@ -503,7 +503,6 @@ all.  This may very well take some time.")
 (defun nnml-find-group-number (id)
   (save-excursion
     (set-buffer (get-buffer-create " *nnml id*"))
-    (buffer-disable-undo (current-buffer))
     (let ((alist nnml-group-alist)
 	  number)
       ;; We want to look through all .overview files, but we want to
@@ -576,15 +575,10 @@ all.  This may very well take some time.")
       (file-exists-p nnml-current-directory))))
 
 (defun nnml-possibly-create-directory (group)
-  (let (dir dirs)
-    (setq dir (nnmail-group-pathname group nnml-directory))
-    (while (not (file-directory-p dir))
-      (push dir dirs)
-      (setq dir (file-name-directory (directory-file-name dir))))
-    (while dirs
-      (make-directory (directory-file-name (car dirs)))
-      (nnheader-message 5 "Creating mail directory %s" (car dirs))
-      (setq dirs (cdr dirs)))))
+  (let ((dir (nnmail-group-pathname group nnml-directory)))
+    (unless (file-exists-p dir)
+      (make-directory (directory-file-name dir) t)
+      (nnheader-message 5 "Creating mail directory %s" dir))))
 
 (defun nnml-save-mail (group-art)
   "Called narrowed to an article."
@@ -733,7 +727,7 @@ all.  This may very well take some time.")
     (let ((dirs (directory-files dir t nil t))
 	  dir)
       (while (setq dir (pop dirs))
-	(when (and (not (member (file-name-nondirectory dir) '("." "..")))
+	(when (and (not (string-match "^\\." (file-name-nondirectory dir)))
 		   (file-directory-p dir))
 	  (nnml-generate-nov-databases-1 dir seen))))
     ;; Do this directory.
@@ -773,7 +767,7 @@ all.  This may very well take some time.")
     (save-excursion
       ;; Init the nov buffer.
       (set-buffer nov-buffer)
-      (buffer-disable-undo (current-buffer))
+      (buffer-disable-undo)
       (erase-buffer)
       (set-buffer nntp-server-buffer)
       ;; Delete the old NOV file.

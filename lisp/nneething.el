@@ -68,8 +68,6 @@ If this variable is nil, no files will be excluded.")
 
 
 
-(autoload 'gnus-encode-coding-string "gnus-ems")
-
 ;;; Interface functions.
 
 (nnoo-define-basics nneething)
@@ -243,7 +241,7 @@ If this variable is nil, no files will be excluded.")
 	(setq files (cdr files)))
       (when (and touched
 		 (not nneething-read-only))
-	(nnheader-temp-write map-file
+	(with-temp-file map-file
 	  (insert "(setq nneething-map '")
 	  (gnus-prin1 nneething-map)
 	  (insert ")\n(setq nneething-active '")
@@ -316,7 +314,7 @@ If this variable is nil, no files will be excluded.")
   (save-excursion
     (set-buffer (get-buffer-create nneething-work-buffer))
     (setq case-fold-search nil)
-    (buffer-disable-undo (current-buffer))
+    (buffer-disable-undo)
     (erase-buffer)
     (cond
      ((not (file-exists-p file))
@@ -344,10 +342,13 @@ If this variable is nil, no files will be excluded.")
 
 (defun nneething-file-name (article)
   "Return the file name of ARTICLE."
-  (concat (file-name-as-directory nneething-address)
-	  (if (numberp article)
-	      (cadr (assq article nneething-map))
-	    article)))
+  (let ((dir (file-name-as-directory nneething-address))
+        fname)
+    (if (numberp article)
+	(if (setq fname (cadr (assq article nneething-map)))
+	    (concat dir fname)
+	  (make-temp-name (concat dir "nneething")))
+      (concat dir article))))
 
 (provide 'nneething)
 

@@ -146,7 +146,7 @@ matches an previously scanned and verified nocem message."
 	  (save-excursion
 	    (let ((dependencies (make-vector 10 nil))
 		  headers header)
-	      (nnheader-temp-write nil
+	      (with-temp-buffer
 		(setq headers
 		      (if (eq 'nov
 			      (gnus-retrieve-headers
@@ -190,9 +190,9 @@ matches an previously scanned and verified nocem message."
   (let ((date (mail-header-date header))
 	issuer b e type)
     (when (or (not date)
-	      (nnmail-time-less
-	       (nnmail-time-since (nnmail-date-to-time date))
-	       (nnmail-days-to-time gnus-nocem-expiry-wait)))
+	      (time-less-p
+	       (time-since (date-to-time date))
+	       (days-to-time gnus-nocem-expiry-wait)))
       (gnus-request-article-this-buffer (mail-header-number header) group)
       (goto-char (point-min))
       (when (re-search-forward "-----BEGIN PGP MESSAGE-----" nil t)
@@ -271,7 +271,7 @@ matches an previously scanned and verified nocem message."
 			      gnus-nocem-real-group-hashtb)
 	    ;; Valid group.
 	    (beginning-of-line)
-	    (while (= (following-char) ?\t)
+	    (while (eq (char-after) ?\t)
 	      (forward-line -1))
 	    (setq id (buffer-substring (point) (1- (search-forward "\t"))))
 	    (unless (gnus-gethash id gnus-nocem-hashtb)
@@ -279,7 +279,7 @@ matches an previously scanned and verified nocem message."
 	      (gnus-sethash id t gnus-nocem-hashtb)
 	      (push id ncm))
 	    (forward-line 1)
-	    (while (= (following-char) ?\t)
+	    (while (eq (char-after) ?\t)
 	      (forward-line 1))))))
       (when ncm
 	(setq gnus-nocem-touched-alist t)
@@ -302,13 +302,13 @@ matches an previously scanned and verified nocem message."
   "Save the NoCeM cache."
   (when (and gnus-nocem-alist
 	     gnus-nocem-touched-alist)
-    (nnheader-temp-write (gnus-nocem-cache-file)
+    (with-temp-file (gnus-nocem-cache-file)
       (gnus-prin1 `(setq gnus-nocem-alist ',gnus-nocem-alist)))
     (setq gnus-nocem-touched-alist nil)))
 
 (defun gnus-nocem-save-active ()
   "Save the NoCeM active file."
-  (nnheader-temp-write (gnus-nocem-active-file)
+  (with-temp-file (gnus-nocem-active-file)
     (gnus-prin1 `(setq gnus-nocem-active ',gnus-nocem-active))))
 
 (defun gnus-nocem-alist-to-hashtb ()
@@ -316,11 +316,11 @@ matches an previously scanned and verified nocem message."
   (let* ((alist gnus-nocem-alist)
 	 (pprev (cons nil alist))
 	 (prev pprev)
-	 (expiry (nnmail-days-to-time gnus-nocem-expiry-wait))
+	 (expiry (days-to-time gnus-nocem-expiry-wait))
 	 entry)
     (setq gnus-nocem-hashtb (gnus-make-hashtable (* (length alist) 51)))
     (while (setq entry (car alist))
-      (if (not (nnmail-time-less (nnmail-time-since (car entry)) expiry))
+      (if (not (time-less-p (time-since (car entry)) expiry))
 	  ;; This entry has expired, so we remove it.
 	  (setcdr prev (cdr alist))
 	(setq prev alist)

@@ -97,6 +97,8 @@
     (gnus-draft-setup article gnus-newsgroup-name)
     (set-buffer-modified-p t)
     (save-buffer)
+    (let ((gnus-verbose-backends nil))
+      (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
      `((lambda ()
 	 (when (gnus-buffer-exists-p ,gnus-summary-buffer)

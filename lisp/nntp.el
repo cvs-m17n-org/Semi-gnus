@@ -1,5 +1,5 @@
 ;;; nntp.el --- nntp access for Gnus
-;;; Copyright (C) 1987-90,92-97 Free Software Foundation, Inc.
+;;; Copyright (C) 1987-90,92-98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -29,10 +29,6 @@
 (require 'gnus-util)
 
 (nnoo-declare nntp)
-
-(eval-and-compile
-  (unless (fboundp 'open-network-stream)
-    (require 'tcp)))
 
 (eval-when-compile (require 'cl))
 
@@ -274,9 +270,9 @@ If this variable is nil, which is the default, no timers are set.")
 	  (nntp-decode-text (not decode))
 	  (unless discard
 	    (save-excursion
-	      (set-buffer buffer)
-	      (goto-char (point-max))
-	      (insert-buffer-substring (process-buffer process))
+ 	      (set-buffer buffer)
+ 	      (goto-char (point-max))
+ 	      (insert-buffer-substring (process-buffer process))
 	      ;; Nix out "nntp reading...." message.
 	      (when nntp-have-messaged
 		(setq nntp-have-messaged nil)
@@ -400,7 +396,7 @@ If this variable is nil, which is the default, no timers are set.")
   (cond
    ;; A result that starts with a 2xx code is terminated by
    ;; a line with only a "." on it.
-   ((eq (following-char) ?2)
+   ((eq (char-after) ?2)
     (if (re-search-forward "\n\\.\r?\n" nil t)
 	t
       nil))
@@ -618,9 +614,14 @@ If this variable is nil, which is the default, no timers are set.")
 	   (setq nntp-server-list-active-group t)))))
 
 (deffoo nntp-list-active-group (group &optional server)
-  "Return the active info on GROUP (which can be a regexp."
+  "Return the active info on GROUP (which can be a regexp)."
   (nntp-possibly-change-group nil server)
-  (nntp-send-command "^.*\r?\n" "LIST ACTIVE" group))
+  (nntp-send-command "^\\.*\r?\n" "LIST ACTIVE" group))
+
+(deffoo nntp-request-group-articles (group &optional server)
+  "Return the list of existing articles in GROUP."
+  (nntp-possibly-change-group nil server)
+  (nntp-send-command "^\\.*\r?\n" "LISTGROUP" group))
 
 (deffoo nntp-request-article (article &optional group server buffer command)
   (nntp-possibly-change-group group server)
@@ -728,7 +729,7 @@ If this variable is nil, which is the default, no timers are set.")
     (prog1
 	(nntp-send-command
 	 "^\\.\r?\n" "NEWGROUPS"
-	 (format-time-string "%y%m%d %H%M%S" (nnmail-date-to-time date)))
+	 (format-time-string "%y%m%d %H%M%S" (date-to-time date)))
       (nntp-decode-text))))
 
 (deffoo nntp-request-post (&optional server)
@@ -749,7 +750,7 @@ If this variable is nil, which is the default, no timers are set.")
 This function is supposed to be called from `nntp-server-opened-hook'.
 It will make innd servers spawn an nnrpd process to allow actual article
 reading."
-  (nntp-send-command "^.*\r?\n" "MODE READER"))
+  (nntp-send-command "^.*\n" "MODE READER"))
 
 (defun nntp-send-authinfo (&optional send-if-force)
   "Send the AUTHINFO to the nntp server.
@@ -796,7 +797,7 @@ If SEND-IF-FORCE, only send authinfo to the server if the
 The authinfo login name is taken from the user's login name and the
 password contained in '~/.nntp-authinfo'."
   (when (file-exists-p "~/.nntp-authinfo")
-    (nnheader-temp-write nil
+    (with-temp-buffer
       (insert-file-contents "~/.nntp-authinfo")
       (goto-char (point-min))
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" (user-login-name))
@@ -825,7 +826,7 @@ password contained in '~/.nntp-authinfo'."
       (format " *server %s %s %s*"
 	      nntp-address nntp-port-number
 	      (gnus-buffer-exists-p buffer))))
-    (buffer-disable-undo (current-buffer))
+    (mm-enable-multibyte)
     (set (make-local-variable 'after-change-functions) nil)
     (set (make-local-variable 'nntp-process-wait-for) nil)
     (set (make-local-variable 'nntp-process-callback) nil)
@@ -1117,7 +1118,6 @@ password contained in '~/.nntp-authinfo'."
 	  (delete-char -1))
 	(goto-char (point-min))
 	(delete-matching-lines "^\\.$\\|^[1-5][0-9][0-9] ")
-	;;(copy-to-buffer nntp-server-buffer (point-min) (point-max))
 	t))))
 
   nntp-server-xover)

@@ -35,6 +35,7 @@
 (require 'gnus-range)
 (require 'gnus-win)
 (require 'gnus-undo)
+(require 'time-date)
 
 (defcustom gnus-group-archive-directory
   "*ftp@ftp.hpc.uh.edu:/pub/emacs/ding-list/"
@@ -298,6 +299,18 @@ variable."
      gnus-group-news-3-empty-face)
     ((and (not mailp) (eq level 3)) .
      gnus-group-news-3-face)
+    ((and (= unread 0) (not mailp) (eq level 4)) .
+     gnus-group-news-4-empty-face)
+    ((and (not mailp) (eq level 4)) .
+     gnus-group-news-4-face)
+    ((and (= unread 0) (not mailp) (eq level 5)) .
+     gnus-group-news-5-empty-face)
+    ((and (not mailp) (eq level 5)) .
+     gnus-group-news-5-face)
+    ((and (= unread 0) (not mailp) (eq level 6)) .
+     gnus-group-news-6-empty-face)
+    ((and (not mailp) (eq level 6)) .
+     gnus-group-news-6-face)
     ((and (= unread 0) (not mailp)) .
      gnus-group-news-low-empty-face)
     ((and (not mailp)) .
@@ -763,7 +776,7 @@ The following commands are available:
   (gnus-group-set-mode-line)
   (setq mode-line-process nil)
   (use-local-map gnus-group-mode-map)
-  (buffer-disable-undo (current-buffer))
+  (buffer-disable-undo)
   (setq truncate-lines t)
   (setq buffer-read-only t)
   (gnus-set-default-directory)
@@ -1327,7 +1340,7 @@ If FIRST-TOO, the current line is also eligible as a target."
 	(beginning-of-line)
 	(forward-char (or (cdr (assq 'process gnus-group-mark-positions)) 2))
 	(subst-char-in-region
-	 (point) (1+ (point)) (following-char)
+	 (point) (1+ (point)) (char-after)
 	 (if unmark
 	     (progn
 	       (setq gnus-group-marked (delete group gnus-group-marked))
@@ -1802,7 +1815,7 @@ ADDRESS."
     (gnus-read-method "From method: ")))
 
   (when (stringp method)
-    (setq method (gnus-server-to-method method)))
+    (setq method (or (gnus-server-to-method method) method)))
   (let* ((meth (when (and method
 			  (not (gnus-server-equal method gnus-select-method)))
 		 (if address (list (intern method) address)
@@ -2155,7 +2168,7 @@ score file entries for articles to include in the group."
 	(push (cons header regexps) scores))
       scores)))
   (gnus-group-make-group group "nnkiboze" address)
-  (nnheader-temp-write (gnus-score-file-name (concat "nnkiboze:" group))
+  (with-temp-file (gnus-score-file-name (concat "nnkiboze:" group))
     (let (emacs-lisp-mode-hook)
       (pp scores (current-buffer)))))
 
@@ -2300,46 +2313,52 @@ If REVERSE, sort in reverse order."
     ;; Go through all the infos and replace the old entries
     ;; with the new infos.
     (while infos
-      (setcar entries (pop infos))
+      (setcar (car entries) (pop infos))
       (pop entries))
     ;; Update the hashtable.
     (gnus-make-hashtable-from-newsrc-alist)))
 
-(defun gnus-group-sort-selected-groups-by-alphabet (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-alphabet (&optional n reverse)
   "Sort the group buffer alphabetically by group name.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-alphabet reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-alphabet reverse))
 
-(defun gnus-group-sort-selected-groups-by-unread (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-unread (&optional n reverse)
   "Sort the group buffer by number of unread articles.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-unread reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-unread reverse))
 
-(defun gnus-group-sort-selected-groups-by-level (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-level (&optional n reverse)
   "Sort the group buffer by group level.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-level reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-level reverse))
 
-(defun gnus-group-sort-selected-groups-by-score (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-score (&optional n reverse)
   "Sort the group buffer by group score.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-score reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-score reverse))
 
-(defun gnus-group-sort-selected-groups-by-rank (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-rank (&optional n reverse)
   "Sort the group buffer by group rank.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-rank reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-rank reverse))
 
-(defun gnus-group-sort-selected-groups-by-method (&optional reverse)
+(defun gnus-group-sort-selected-groups-by-method (&optional n reverse)
   "Sort the group buffer alphabetically by backend name.
-If REVERSE, sort in reverse order."
-  (interactive "P")
-  (gnus-group-sort-selected-groups 'gnus-group-sort-by-method reverse))
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-method reverse))
 
 ;;; Sorting predicates.
 
@@ -2940,8 +2959,9 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	     (gnus-get-info group) (gnus-active group) t)
 	    (unless (gnus-virtual-group-p group)
 	      (gnus-close-group group))
-	    (gnus-agent-save-group-info
-	     method (gnus-group-real-name group) (gnus-active group))
+	    (when gnus-agent
+	      (gnus-agent-save-group-info
+	       method (gnus-group-real-name group) (gnus-active group)))
 	    (gnus-group-update-group group))
 	(if (eq (gnus-server-status (gnus-find-method-for-group group))
 		'denied)
@@ -3055,7 +3075,7 @@ to use."
       ;; Print out all the groups.
       (save-excursion
 	(pop-to-buffer "*Gnus Help*")
-	(buffer-disable-undo (current-buffer))
+	(buffer-disable-undo)
 	(erase-buffer)
 	(setq groups (sort groups 'string<))
 	(while groups
@@ -3327,26 +3347,26 @@ and the second element is the address."
 
 (defun gnus-add-marked-articles (group type articles &optional info force)
   ;; Add ARTICLES of TYPE to the info of GROUP.
-  ;; If INFO is non-nil, use that info.	 If FORCE is non-nil, don't
+  ;; If INFO is non-nil, use that info.         If FORCE is non-nil, don't
   ;; add, but replace marked articles of TYPE with ARTICLES.
   (let ((info (or info (gnus-get-info group)))
 	marked m)
     (or (not info)
 	(and (not (setq marked (nthcdr 3 info)))
 	     (or (null articles)
-		 (setcdr (nthcdr 2 info)
-			 (list (list (cons type (gnus-compress-sequence
-						 articles t)))))))
+                (setcdr (nthcdr 2 info)
+                        (list (list (cons type (gnus-compress-sequence
+                                                articles t)))))))
 	(and (not (setq m (assq type (car marked))))
 	     (or (null articles)
-		 (setcar marked
-			 (cons (cons type (gnus-compress-sequence articles t) )
-			       (car marked)))))
+                (setcar marked
+                        (cons (cons type (gnus-compress-sequence articles t) )
+                              (car marked)))))
 	(if force
 	    (if (null articles)
-		(setcar (nthcdr 3 info)
-			(gnus-delete-alist type (car marked)))
-	      (setcdr m (gnus-compress-sequence articles t)))
+               (setcar (nthcdr 3 info)
+                       (gnus-delete-alist type (car marked)))
+             (setcdr m (gnus-compress-sequence articles t)))
 	  (setcdr m (gnus-compress-sequence
 		     (sort (nconc (gnus-uncompress-range (cdr m))
 				  (copy-sequence articles)) '<) t))))))
@@ -3372,7 +3392,7 @@ or `gnus-group-catchup-group-hook'."
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."
   (let* ((time (or (gnus-group-timestamp group)
 		  (list 0 0)))
-         (delta (gnus-time-minus (current-time) time)))
+         (delta (subtract-time (current-time) time)))
     (+ (* (nth 0 delta) 65536.0)
        (nth 1 delta))))
 

@@ -40,6 +40,7 @@
 (eval-when-compile (require 'cl))
 
 (require 'mail-utils)
+(require 'mm-util)
 
 (defvar nnheader-max-head-length 4096
   "*Max length of the head of articles.")
@@ -61,8 +62,7 @@ on your system, you could say something like:
  (autoload 'cancel-function-timers "timers")
  (autoload 'gnus-point-at-eol "gnus-util")
  (autoload 'gnus-delete-line "gnus-util")
- (autoload 'gnus-buffer-live-p "gnus-util")
- (autoload 'gnus-encode-coding-string "gnus-ems"))
+ (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
 
@@ -140,14 +140,23 @@ on your system, you could say something like:
   "Set article xref of HEADER to xref."
   `(aset ,header 8 ,xref))
 
+(defmacro mail-header-extra (header)
+  "Return the extra headers in HEADER."
+  `(aref ,header 9))
+
+(defmacro mail-header-set-extra (header extra)
+  "Set the extra headers in HEADER to EXTRA."
+  `(aset ,header 9 ',extra))
+
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
-  (make-vector 9 init))
+  (make-vector 10 init))
 
 (defun make-full-mail-header (&optional number subject from date id
-					references chars lines xref)
+					references chars lines xref
+					extra)
   "Create a new mail header structure initialized with the parameters given."
-  (vector number subject from date id references chars lines xref))
+  (vector number subject from date id references chars lines xref extra))
 
 ;; fake message-ids: generation and detection
 
@@ -257,7 +266,20 @@ on your system, you could say something like:
 	   (progn
 	     (goto-char p)
 	     (and (search-forward "\nxref: " nil t)
-		  (nnheader-header-value)))))
+		  (nnheader-header-value)))
+	   
+	   ;; Extra.
+	   (when nnmail-extra-headers
+	     (let ((extra nnmail-extra-headers)
+		   out)
+	       (while extra
+		 (goto-char p)
+		 (when (search-forward
+			(concat "\n" (symbol-name (car extra)) ": ") nil t)
+		   (push (cons (car extra) (nnheader-header-value))
+			 out))
+		 (pop extra))
+	       out))))
       (when naked
 	(goto-char (point-min))
 	(delete-char 1)))))
@@ -270,13 +292,21 @@ on your system, you could say something like:
 
 (defmacro nnheader-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read (current-buffer)))))
 	   (if (numberp num) num 0)))
      (or (eobp) (forward-char 1))))
 
-;; (defvar nnheader-none-counter 0)
+(defmacro nnheader-nov-parse-extra ()
+  '(let (out string)
+     (while (not (memq (char-after) '(?\n nil)))
+       (setq string (nnheader-nov-field))
+       (when (string-match "^\\([^ :]+\\): " string)
+	 (push (cons (intern (match-string 1 string))
+		     (substring string (match-end 0)))
+	       out)))
+     out))
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
@@ -290,10 +320,10 @@ on your system, you could say something like:
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
-     (if (= (following-char) ?\n)
+     (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
-     )))
+     (nnheader-nov-parse-extra))))	; extra
 
 (defun nnheader-insert-nov (header)
   (princ (mail-header-number header) (current-buffer))
@@ -311,7 +341,16 @@ on your system, you could say something like:
   (princ (or (mail-header-lines header) 0) (current-buffer))
   (insert "\t")
   (when (mail-header-xref header)
-    (insert "Xref: " (mail-header-xref header) "\t"))
+    (insert "Xref: " (mail-header-xref header)))
+  (when (or (mail-header-xref header)
+	    (mail-header-extra header))
+    (insert "\t"))
+  (when (mail-header-extra header)
+    (let ((extra (mail-header-extra header)))
+      (while extra
+	(insert (symbol-name (caar extra))
+		": " (cdar extra) "\t")
+        (pop extra))))
   (insert "\n"))
 
 (defun nnheader-insert-article-line (article)
@@ -399,6 +438,7 @@ the line could be found."
   (save-excursion
     (unless (gnus-buffer-live-p nntp-server-buffer)
       (setq nntp-server-buffer (get-buffer-create " *nntpd*")))
+    (mm-enable-multibyte)
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (kill-all-local-variables)
@@ -445,7 +485,7 @@ the line could be found."
       nil
     (narrow-to-region (point-min) (1- (point)))
     (goto-char (point-min))
-    (while (looking-at "[A-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
+    (while (looking-at "[a-zA-Z][^ \t]+:.*\n\\([ \t].*\n\\)*\\|From .*\n")
       (goto-char (match-end 0)))
     (prog1
 	(eobp)
@@ -493,56 +533,10 @@ the line could be found."
 (defun nnheader-set-temp-buffer (name &optional noerase)
   "Set-buffer to an empty (possibly new) buffer called NAME with undo disabled."
   (set-buffer (get-buffer-create name))
-  (buffer-disable-undo (current-buffer))
+  (buffer-disable-undo)
   (unless noerase
     (erase-buffer))
   (current-buffer))
-
-(defmacro nnheader-temp-write (file &rest forms)
-  "Create a new buffer, evaluate FORMS there, and write the buffer to FILE.
-Return the value of FORMS.
-If FILE is nil, just evaluate FORMS and don't save anything.
-If FILE is t, return the buffer contents as a string."
-  (let ((temp-file (make-symbol "temp-file"))
-	(temp-buffer (make-symbol "temp-buffer"))
-	(temp-results (make-symbol "temp-results")))
-    `(save-excursion
-       (let* ((,temp-file ,file)
-	      (default-major-mode 'fundamental-mode)
-	      (,temp-buffer
-	       (set-buffer
-		(get-buffer-create
-		 (generate-new-buffer-name " *nnheader temp*"))))
-	      ,temp-results)
-	 (unwind-protect
-	     (progn
-	       (setq ,temp-results (progn ,@forms))
-	       (cond
-		;; Don't save anything.
-		((null ,temp-file)
-		 ,temp-results)
-		;; Return the buffer contents.
-		((eq ,temp-file t)
-		 (set-buffer ,temp-buffer)
-		 (buffer-string))
-		;; Save a file.
-		(t
-		 (set-buffer ,temp-buffer)
-		 ;; Make sure the directory where this file is
-		 ;; to be saved exists.
-		 (when (not (file-directory-p
-			     (file-name-directory ,temp-file)))
-		   (make-directory (file-name-directory ,temp-file) t))
-		 ;; Save the file.
-		 (write-region (point-min) (point-max)
-			       ,temp-file nil 'nomesg)
-		 ,temp-results)))
-	   ;; Kill the buffer.
-	   (when (buffer-name ,temp-buffer)
-	     (kill-buffer ,temp-buffer)))))))
-
-(put 'nnheader-temp-write 'lisp-indent-function 1)
-(put 'nnheader-temp-write 'edebug-form-spec '(form body))
 
 (defvar jka-compr-compression-info-list)
 (defvar nnheader-numerical-files
@@ -688,7 +682,7 @@ without formatting."
   (or (not (numberp gnus-verbose-backends))
       (<= level gnus-verbose-backends)))
 
-(defvar nnheader-pathname-coding-system 'iso-8859-1
+(defvar nnheader-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnheader-group-pathname (group dir &optional file)
@@ -700,7 +694,7 @@ without formatting."
 	 (concat dir group "/")
        ;; If not, we translate dots into slashes.
        (concat dir
-	       (gnus-encode-coding-string
+	       (mm-encode-coding-string
 		(nnheader-replace-chars-in-string group ?. ?/)
 		nnheader-pathname-coding-system)
 	       "/")))
@@ -760,7 +754,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'raw-text
+(defvar nnheader-file-coding-system 'no-conversion
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)
@@ -822,8 +816,6 @@ find-file-hooks, etc.
   `(let ((new (generate-new-buffer " *nnheader replace*"))
 	 (cur (current-buffer))
 	 (start (point-min)))
-     (set-buffer new)
-     (buffer-disable-undo (current-buffer))
      (set-buffer cur)
      (goto-char (point-min))
      (while (,(if regexp 're-search-forward 'search-forward)
