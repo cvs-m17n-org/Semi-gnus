@@ -5281,57 +5281,54 @@ If given a numerical ARG, move forward ARG pages."
 If end of article, return non-nil.  Otherwise return nil.
 Argument LINES specifies lines to be scrolled up."
   (interactive "p")
-  (let ((start (window-start))
-	end-of-buffer end-of-page)
-    (save-excursion
-      (move-to-window-line -1)
-      (if (<= (point) start)
+  (move-to-window-line -1)
+  (if (save-excursion
+	(end-of-line)
+	(and (pos-visible-in-window-p)	;Not continuation line.
+	     (>= (1+ (point)) (point-max)))) ;Allow for trailing newline.
+      ;; Nothing in this page.
+      (if (or (not gnus-page-broken)
+	      (save-excursion
+		(save-restriction
+		  (widen) (forward-line 1) (eobp)))) ;Real end-of-buffer?
 	  (progn
-	    (forward-line 2)
-	    (setq start (point)))
-	(forward-line 1)
-	(setq start nil))
-      (unless (or (cond ((eq (1+ (buffer-size)) (point))
-			 (and (pos-visible-in-window-p)
-			      (setq end-of-buffer t)))
-			((eobp)
-			 (setq end-of-page t)))
-		  (not lines))
-	(move-to-window-line lines)
-	(unless (search-backward "\n\n" nil t)
-	  (setq start (point)))))
-    (cond (end-of-buffer
-	   (not gnus-article-over-scroll))
-	  (end-of-page
-	   (gnus-narrow-to-page 1)
-	   nil)
-	  (t
-	   (if start
-	       (set-window-start (selected-window) start)
-	     (let (window-pixel-scroll-increment)
-	       (scroll-up lines)))
-	   nil))))
+	    (when gnus-article-over-scroll
+	      (gnus-article-next-page-1 lines))
+	    t)			;Nothing more.
+	(gnus-narrow-to-page 1)		;Go to next page.
+	nil)
+    ;; More in this page.
+    (gnus-article-next-page-1 lines)
+    nil))
+
+(defun gnus-article-next-page-1 (lines)
+  (let ((scroll-in-place nil))
+    (condition-case ()
+	(scroll-up lines)
+      (end-of-buffer
+       ;; Long lines may cause an end-of-buffer error.
+       (goto-char (point-max)))))
+  (move-to-window-line 0))
 
 (defun gnus-article-prev-page (&optional lines)
   "Show previous page of current article.
 Argument LINES specifies lines to be scrolled down."
   (interactive "p")
-  (let (beginning-of-buffer beginning-of-page)
-    (save-excursion
-      (move-to-window-line 0)
-      (cond ((eq 1 (point))
-	     (setq beginning-of-buffer t))
-	    ((bobp)
-	     (setq beginning-of-page t))))
-    (cond (beginning-of-buffer)
-	  (beginning-of-page
-	   (gnus-narrow-to-page -1))
-	  (t
-	   (condition-case nil
-	       (let (window-pixel-scroll-increment)
-		 (scroll-down lines))
-	     (beginning-of-buffer
-	      (goto-char (point-min))))))))
+  (move-to-window-line 0)
+  (if (and gnus-page-broken
+	   (bobp)
+	   (not (save-restriction (widen) (bobp)))) ;Real beginning-of-buffer?
+      (progn
+	(gnus-narrow-to-page -1)	;Go to previous page.
+	(goto-char (point-max))
+	(recenter -1))
+    (let ((scroll-in-place nil))
+      (prog1
+	  (condition-case ()
+	      (scroll-down lines)
+	    (beginning-of-buffer
+	     (goto-char (point-min))))
+	(move-to-window-line 0)))))
 
 (defun gnus-article-only-boring-p ()
   "Decide whether there is only boring text remaining in the article.

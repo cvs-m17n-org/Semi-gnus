@@ -1,3 +1,23 @@
+2003-04-16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-next-page-1): New function.
+	(gnus-article-next-page): Use it.
+
+2003-04-15  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-split): added save-restriction to save-excursion
+
+2003-04-15  Reiner Steib  <Reiner.Steib@gmx.de>
+	From Julien Avarre <julien@avarre.com>
+
+	* gnus-fun.el: Fixed autoload cookie.
+
+2003-04-15  Paul Jarc  <prj@po.cwru.edu>
+	From Remi Letot  <remi.letot@easynet.be>
+
+	* nnmaildir.el (nnmaildir-request-scan): Use gnus-remove-if
+	instead of remove-if.
+
 2003-04-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-msg.el (gnus-summary-news-other-window): Use delq and
