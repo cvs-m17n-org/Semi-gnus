@@ -102,15 +102,21 @@ on your system, you could say something like:
 (defalias 'mail-header-xref 'mime-entity-xref-internal)
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
-(defmacro make-full-mail-header (&optional number subject from date id
-					references chars lines xref)
+(defsubst make-full-mail-header (&optional number subject from date id
+					   references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
-  `(make-mime-entity-internal 'gnus ,number
-			      nil
-			      nil nil nil
-			      ,subject ,from
-			      ,date ,id ,references
-			      ,chars ,lines ,xref))
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   (if subject
+       (eword-decode-and-unfold-unstructured-field subject)
+     )
+   (if from
+       (eword-decode-and-unfold-structured-field from)
+     )
+   date id references
+   chars lines xref))
 
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
