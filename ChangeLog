@@ -1,3 +1,10 @@
+1998-11-29  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: Fix typo of DOC string.
+
+	* lisp/score-mode.el: Change default value
+	score-mode-coding-system 'binary to 'ctext.
+
 1998-11-28  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.041.
