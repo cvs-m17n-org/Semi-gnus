@@ -27,6 +27,7 @@
 
 (eval-when-compile (require 'cl))
 
+(require 'alist)
 (require 'gnus)
 
 ;;; Internal variables.
@@ -126,6 +127,10 @@
 	     ,gnus-summary-line-format-spec))
   "Alist of format specs.")
 
+(defvar gnus-format-specs-compiled nil
+  "Alist of compiled format specs.
+Each element should be the form (TYPE . BYTECODE).")
+
 (defvar gnus-article-mode-line-format-spec nil)
 (defvar gnus-summary-mode-line-format-spec nil)
 (defvar gnus-group-mode-line-format-spec nil)
@@ -163,6 +168,25 @@
     (lisp-interaction-mode)
     (insert (pp-to-string spec))))
 
+(defun gnus-update-format-specification-1 (type val &optional new)
+  (if gnus-compile-user-specs
+      (let ((bytecode (if new
+			  nil
+			(cdr (assq type gnus-format-specs-compiled)))))
+	(unless bytecode
+	  (fset 'gnus-tmp-func `(lambda () ,val))
+	  (require 'bytecomp)
+	  (let (byte-compile-warnings)
+	    (byte-compile 'gnus-tmp-func))
+	  (setq bytecode (gnus-byte-code 'gnus-tmp-func))
+	  (when (get-buffer "*Compile-Log*")
+	    (bury-buffer "*Compile-Log*"))
+	  (when (get-buffer "*Compile-Log-Show*")
+	    (bury-buffer "*Compile-Log-Show*")))
+	(set (intern (format "gnus-%s-line-format-spec" type)) bytecode)
+	(set-alist 'gnus-format-specs-compiled type bytecode))
+    (set (intern (format "gnus-%s-line-format-spec" type)) val)))
+
 (defun gnus-update-format-specifications (&optional force &rest types)
   "Update all (necessary) format specifications."
   ;; Make the indentation array.
@@ -193,8 +217,7 @@
 	(if (and (car entry)
 		 (equal (car entry) new-format))
 	    ;; Use the old format.
-	    (set (intern (format "gnus-%s-line-format-spec" type))
-		 (cadr entry))
+	    (gnus-update-format-specification-1 type (cadr entry))
 	  ;; This is a new format.
 	  (setq val
 		(if (not (stringp new-format))
@@ -212,7 +235,7 @@
 		(setcar (cdr entry) val)
 		(setcar entry new-format))
 	    (push (list type new-format val) gnus-format-specs))
-	  (set (intern (format "gnus-%s-line-format-spec" type)) val)))))
+	  (gnus-update-format-specification-1 type val 'new)))))
 
   (unless (assq 'version gnus-format-specs)
     (push (cons 'version emacs-version) gnus-format-specs)))
@@ -525,13 +548,14 @@ If PROPS, insert the result."
   (require 'bytecomp)
   (let ((entries gnus-format-specs)
 	(byte-compile-warnings '(unresolved callargs redefine))
-	entry gnus-tmp-func)
+	entry type bytecode)
     (save-excursion
       (gnus-message 7 "Compiling format specs...")
 
       (while entries
-	(setq entry (pop entries))
-	(if (memq (car entry) '(version gnus-version))
+	(setq entry (pop entries)
+	      type (car entry))
+	(if (memq type '(version gnus-version))
 	    (setq gnus-format-specs (delq entry gnus-format-specs))
 	  (let ((form (caddr entry)))
 	    (when (and (listp form)
@@ -542,11 +566,11 @@ If PROPS, insert the result."
 				 (byte-code-function-p (cadr form)))))
 	      (fset 'gnus-tmp-func `(lambda () ,form))
 	      (byte-compile 'gnus-tmp-func)
-	      (setcar (cddr entry) (gnus-byte-code 'gnus-tmp-func))))))
+	      (setq bytecode (gnus-byte-code 'gnus-tmp-func))
+	      (set (intern (format "gnus-%s-line-format-spec" type)) bytecode)
+	      (set-alist 'gnus-format-specs-compiled type bytecode)))))
 
       (push (cons 'version emacs-version) gnus-format-specs)
-      ;; Mark the .newsrc.eld file as "dirty".
-      (gnus-dribble-touch)
       (gnus-message 7 "Compiling user specs...done"))))
 
 (defun gnus-set-format (type &optional insertable)
