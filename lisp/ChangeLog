@@ -1,3 +1,8 @@
+1997-11-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* gnus-draft.el (gnus-draft-decoding-function): New variable.
+	(gnus-draft-setup): Use `gnus-draft-decoding-function'.
+
 Wed Nov 26 17:40:57 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Quassia Gnus v0.17 is released.
