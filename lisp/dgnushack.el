@@ -473,6 +473,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
       (autoload 'custom-declare-face "cus-face" nil t)
       (autoload 'cl-compile-time-init "cl-macs" nil t)
       (autoload 'defadvice "advice" nil nil 'macro))
+    (when (eq emacs-minor-version 4)
+      (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
     (autoload 'Info-menu "info" nil t)
     (autoload 'annotations-at "annotations")

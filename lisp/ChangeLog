@@ -1,5 +1,14 @@
 2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
+	* message.el (message-forward-subject-name-subject): Decode
+	string when forwarding.
+
+2003-05-01  Oystein Viggen  <oysteivi@tihlde.org>
+
+	* dgnushack.el (when): Add defadvice.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
 	* gnus.el (gnus-version-number): Bump.
 
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
