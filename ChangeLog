@@ -9,7 +9,7 @@
 	(gnus-treatment-function-alist): Use it.
 
 	* lisp/dgnushack.el (byte-optimize-form-code-walker): Replace with
-	the bug fixed version rigidly instead of the use of `defcustom'.
+	the bug fixed version rigidly instead of the use of `defadvice'.
 
 	* lisp/message.el (font-lock-after-change-function): Don't use
 	`compile' for the arg of `defadvice'.
