@@ -1329,7 +1329,7 @@ These variables can be used to set variables in the group parameters
 while still allowing them to affect operations done in other
 buffers. For example:
 
-(setq gnus-newsgroup-variables
+\(setq gnus-newsgroup-variables
      '(message-use-followup-to
        (gnus-visible-headers .
 	 \"^From:\\\\|^Newsgroups:\\\\|^Subject:\\\\|^Date:\\\\|^To:\")))
@@ -1563,6 +1563,7 @@ increase the score of each group you read."
     gnus-mouse-2 gnus-mouse-pick-article
     "m" gnus-summary-mail-other-window
     "a" gnus-summary-post-news
+    "i" gnus-summary-news-other-window
     "x" gnus-summary-limit-to-unread
     "s" gnus-summary-isearch-article
     "t" gnus-article-toggle-headers
@@ -2014,7 +2015,7 @@ increase the score of each group you read."
     (easy-menu-define
      gnus-summary-post-menu gnus-summary-mode-map ""
      `("Post"
-       ["Post an article" gnus-summary-post-news
+       ["Send a message (mail or news)" gnus-summary-post-news
 	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post an article"))]
        ["Followup" gnus-summary-followup
@@ -2040,6 +2041,7 @@ increase the score of each group you read."
        ["Resend message" gnus-summary-resend-message t]
        ["Send bounced mail" gnus-summary-resend-bounced-mail t]
        ["Send a mail" gnus-summary-mail-other-window t]
+       ["Create a local message" gnus-summary-news-other-window t]
        ["Uuencode and post" gnus-uu-post-news
 	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post a uuencoded article"))]
@@ -7958,7 +7960,7 @@ article.  If BACKWARD (the prefix) is non-nil, search backward instead."
 (defun gnus-summary-print-truncate-and-quote (string &optional len)
   "Truncate to LEN and quote all \"(\"'s in STRING."
   (gnus-replace-in-string (if (and len (> (length string) len))
-			      (substring string 0 len) 
+			      (substring string 0 len)
 			    string)
 			  "[()]" "\\\\\\&"))
 
@@ -7992,11 +7994,11 @@ to save in."
 		     (list
 		      (concat "("
 			      (gnus-summary-print-truncate-and-quote
-			       (mail-header-subject gnus-current-headers) 
+			       (mail-header-subject gnus-current-headers)
 			       66) ")")
 		      (concat "("
 			      (gnus-summary-print-truncate-and-quote
-			       (mail-header-from gnus-current-headers) 
+			       (mail-header-from gnus-current-headers)
 			       45) ")")))
 		    (ps-right-header
 		     (list
@@ -8018,7 +8020,7 @@ If ARG (the prefix) is a number, show the article with the charset
 defined in `gnus-summary-show-article-charset-alist', or the charset
 input.
 If ARG (the prefix) is non-nil and not a number, show the raw article
-without any article massaging functions being run.  Normally, the key strokes 
+without any article massaging functions being run.  Normally, the key strokes
 are `C-u g'."
   (interactive "P")
   (cond

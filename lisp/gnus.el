@@ -1850,7 +1850,7 @@ covered by that variable."
 ;; `download' is a agent flag private to each gnus installation
 ;; `unsend' are for nndraft groups only
 ;; `score' is not a proper mark
-(defconst gnus-article-unpropagated-mark-lists 
+(defconst gnus-article-unpropagated-mark-lists
   '(seen cache download unsend score)
   "Marks that shouldn't be propagated to backends.
 Typical marks are those that make no sense in a standalone backend,
@@ -2077,7 +2077,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-msg" (gnus-summary-send-map keymap)
       gnus-article-mail gnus-copy-article-buffer gnus-following-method)
      ("gnus-msg" :interactive t
-      gnus-group-post-news gnus-group-mail gnus-summary-post-news
+      gnus-group-post-news gnus-group-mail gnus-group-news
+      gnus-summary-post-news gnus-summary-news-other-window
       gnus-summary-followup gnus-summary-followup-with-original
       gnus-summary-cancel-article gnus-summary-supersede-article
       gnus-post-news gnus-summary-reply gnus-summary-reply-with-original
@@ -2916,7 +2917,7 @@ You should probably use `gnus-find-method-for-group' instead."
 (defun gnus-group-fast-parameter (group symbol &optional allow-list)
   "For GROUP, return the value of SYMBOL.
 
-You should call this in the `gnus-group-buffer' buffer.  
+You should call this in the `gnus-group-buffer' buffer.
 The function `gnus-group-find-parameter' will do that for you."
   ;; The speed trick:  No cons'ing and quit early.
   (or (let ((params (funcall gnus-group-get-parameter-function group)))
@@ -2933,7 +2934,7 @@ The function `gnus-group-find-parameter' will do that for you."
 	  ;; The car is regexp matching for matching the group name.
 	  (when (string-match (car head) group)
 	    ;; The cdr is the parameters.
-	    (setq result (gnus-group-parameter-value (cdr head) 
+	    (setq result (gnus-group-parameter-value (cdr head)
 						     symbol allow-list))
 	    (when result
 	      ;; Expand if necessary.

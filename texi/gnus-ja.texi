@@ -574,7 +574,7 @@ Summary Buffer
 * Choosing Articles::           $B5-;v$rFI$`(B
 * Paging the Article::          $BFI$s$G$$$k5-;v$r%9%/%m!<%k$9$k(B
 * Reply Followup and Post::     $B5-;v$rEj9F$9$k(B
-* Delayed Articles::            
+* Delayed Articles::
 * Marking Articles::            $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1(B
                                 $B$k(B
 * Limiting::                    $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
@@ -628,7 +628,7 @@ Reply, Followup and Post
 * Summary Mail Commands::       $B%a!<%k$rAw$k(B
 * Summary Post Commands::       $B%K%e!<%9$rAw$k(B
 * Summary Message Commands::    $BB>$N%a%C%;!<%84XO"$NL?Na(B
-* Canceling and Superseding::   
+* Canceling and Superseding::
 
 Marking Articles
 
@@ -695,7 +695,7 @@ Various Summary Stuff
 
 * Summary Group Information::   $B>pJs;X8~$NL?Na(B
 * Searching for Articles::      $BJ#?t5-;vL?Na(B
-* Summary Generation Commands:: 
+* Summary Generation Commands::
 * Really Various Summary Commands::  $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 
 Article Buffer
@@ -860,9 +860,9 @@ Agent Categories
 
 Agent Commands
 
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::
+* Summary Agent Commands::
+* Server Agent Commands::
 
 Scoring
 
@@ -975,7 +975,7 @@ Appendices
                                 $B$3$H(B
 * Gnus Reference Guide::        $B?'!9$J5;=QE*$J$b$N(B
 * Emacs for Heathens::          Emacs $B$NMQ8l$N<jC;$JF3F~(B
-* Frequently Asked Questions::  
+* Frequently Asked Questions::
 
 History
 
@@ -3914,14 +3914,33 @@ Gnus
 @item a
 @kindex a (Group)
 @findex gnus-group-post-news
-$B$"$k%0%k!<%W$K5-;v$rEj9F$9$k(B (@code{gnus-group-post-news})$B!#%W%l%U%#%C%/(B
-$B%9$rM?$($k$H!"8=:_$N%0%k!<%WL>$,=i4|CM$H$7$F;HMQ$5$l$^$9!#(B
+$B%a%C%;!<%8(B ($B%G%#%U%)%k%H$O%K%e!<%9(B) $B$N:n@.$r3+;O$7$^(B
+$B$9(B (@code{gnus-group-post-news})$B!#$b$7@\F,<-$,M?$($i$l$?$i8=:_0LCV$N%0%k!<(B
+$B%W$KEj9F$7$^$9!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"$I$N%0%k!<%W$KEj9F$9$k$+$r?R$M(B
+$B$^$9!#$3$N4X?t$NL>A0$+$iO"A[$5$l$k$3$H$H$ON"J"$K!"@\F,<-$G%a!<%k%0%k!<%W(B
+$B$,;XDj$5$l$?>l9g$O!"%K%e!<%9$NBe$o$j$K%a!<%k$NMM<0$,MQ0U$5$l$^$9!#(B
 @xref{Composing Messages}$B!#(B
 
 @item m
 @kindex m (Group)
 @findex gnus-group-mail
-$B%a!<%k$r$I$3$+$KAw$k(B (@code{gnus-group-mail})$B!#(B@xref{Composing Messages}$B!#(B
+$B%a!<%k$r$I$3$+$KAw$j$^$9(B (@code{gnus-group-mail})$B!#$b$7@\F,<-$,M?$($i$l(B
+$B$?$i8=:_0LCV$N%0%k!<%W$NEj9FMM<0(B (posting style) $B$r;H$$$^$9!#$b$7@\F,<-(B
+$B$,(B 1 $B$@$C$?$i!"$I$N%0%k!<%W$NEj9FMM<0$r;H$&$+$r?R$M$^$9!#(B
+@xref{Composing Messages}$B!#(B
+
+@item i
+@kindex i (Group)
+@findex gnus-group-news
+$B%K%e!<%9$N:n@.$r3+;O$7$^$9(B (@code{gnus-group-news})$B!#$b$7@\F,<-$,M?$($i(B
+$B$l$?$i8=:_0LCV$N%0%k!<%W$KEj9F$7$^$9!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"$I$N%0%k!<(B
+$B%W$KEj9F$9$k$+$r?R$M$^$9!#(B@xref{Composing Messages}$B!#(B
+
+$B$3$N4X?t$O!"$?$H$(%a!<%k%0%k!<%W$G;H$o$l$?$H$7$F$b!"<B:]$K$O%K%e!<%9$NMM(B
+$B<0$rMQ0U$7$^$9!#$3$l$O!"%a%C%;!<%8$r<B:]$K$O%M%C%H%o!<%/7PM3$GAw$i$:$K!"(B
+$B%a!<%k%0%k!<%W$K(B "$BEj9F(B" $B$9$k$N$KJXMx$G$9(B; $B$=$l$i$OEv$N%0%k!<%W$KC1$KD>@\(B
+$B%;!<%V$5$l$^$9!#BP1~$9$k%P%C%/%(%s%I$,Ej9F$N$?$a$N%a%=%C%I(B (request-post
+method) $B$r;}$C$F$$$J$1$l$P$J$j$^$;$s$,!#(B
 @end table
 
 $B0J2<$O%0%k!<%W%P%C%U%!$N$?$a$NJQ?t$G$9(B:
@@ -4225,7 +4244,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 * Choosing Articles::           $B5-;v$rFI$`(B
 * Paging the Article::          $BFI$s$G$$$k5-;v$r%9%/%m!<%k$9$k(B
 * Reply Followup and Post::     $B5-;v$rEj9F$9$k(B
-* Delayed Articles::            
+* Delayed Articles::
 * Marking Articles::            $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1(B
                                 $B$k(B
 * Limiting::                    $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
@@ -4897,7 +4916,7 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 * Summary Mail Commands::       $B%a!<%k$rAw$k(B
 * Summary Post Commands::       $B%K%e!<%9$rAw$k(B
 * Summary Message Commands::    $BB>$N%a%C%;!<%84XO"$NL?Na(B
-* Canceling and Superseding::   
+* Canceling and Superseding::
 @end menu
 
 @node Summary Mail Commands
@@ -4973,7 +4992,26 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @kindex S m ($B35N,(B)
 @findex gnus-summary-mail-other-window
 @c @icon{gnus-summary-mail-originate}
-$BC/$+B>$N?M$K%a!<%k$rAw$j$^$9(B (@code{gnus-summary-mail-other-window})$B!#(B
+$B%a!<%k$r:n@.$7$^$9(B (@code{gnus-summary-mail-other-window})$B!#%G%#%U%)%k%H(B
+$B$G$O8=:_$N%0%k!<%W$NEj9FMM<0(B (posting style) $B$r;H$$$^$9!#$b$7@\F,<-$,M?(B
+$B$($i$l$?$i$=$l$O;H$$$^$;$s!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"$I$N%0%k!<%W$NEj9F(B
+$BMM<0$r;H$&$+$r?R$M$^$9!#(B
+
+@item S i
+@itemx i
+@kindex i (Summary)
+@kindex S i (Summary)
+@findex gnus-summary-news-other-window
+$B%K%e!<%9$r:n@.$7$^$9(B (@code{gnus-summary-news-other-window})$B!#%G%#%U%)%k(B
+$B%H$G$O8=:_$N%0%k!<%W$KEj9F$7$^$9!#$b$7@\F,<-$,M?$($i$l$?$i8=:_$N%0%k!<%W(B
+$BL>$O;H$o$l$^$;$s!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"$I$N%0%k!<%W$KEj9F$9$k$+$r?R(B
+$B$M$^$9!#(B
+
+$B$3$N4X?t$O!"$?$H$(%a!<%k%0%k!<%W$G;H$o$l$?$H$7$F$b!"<B:]$K$O%K%e!<%9$NMM(B
+$B<0$rMQ0U$7$^$9!#$3$l$O!"%a%C%;!<%8$r<B:]$K$O%M%C%H%o!<%/7PM3$GAw$i$:$K!"(B
+$B%a!<%k%0%k!<%W$K(B "$BEj9F(B" $B$9$k$N$KJXMx$G$9(B; $B$=$l$i$OEv$N%0%k!<%W$KC1$KD>@\(B
+$B%;!<%V$5$l$^$9!#BP1~$9$k%P%C%/%(%s%I$,Ej9F$N$?$a$N%a%=%C%I(B (request-post
+method) $B$r;}$C$F$$$J$1$l$P$J$j$^$;$s$,!#(B
 
 @item S D b
 @kindex S D b ($B35N,(B)
@@ -5048,7 +5086,10 @@ Manual}, $B$K$5$i$J$k>pJs$,$"$j$^$9!#(B
 @kindex S p ($B35N,(B)
 @findex gnus-summary-post-news
 @c @icon{gnus-summary-post-news}
-$B8=:_$N%0%k!<%W$K5-;v$rEj9F$7$^$9(B (@code{gnus-summary-post-news})$B!#(B
+$BEj9F$9$k$?$a$N5-;v$r:n@.$7$^$9(B (@code{gnus-summary-post-news})$B!#%G%#%U%)(B
+$B%k%H$G$O8=:_$N%0%k!<%W$KEj9F$7$^$9!#$b$7@\F,<-$,M?$($i$l$?$i8=:_$N%0%k!<(B
+$B%WL>$O;H$o$l$^$;$s!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"Be$o$j$KJL$N$I$N%0%k!<%W$K(B
+$BEj9F$9$k$+$r?R$M$^$9!#(B
 
 @item S f
 @itemx f
@@ -8753,7 +8794,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @menu
 * Summary Group Information::   $B>pJs;X8~$NL?Na(B
 * Searching for Articles::      $BJ#?t5-;vL?Na(B
-* Summary Generation Commands:: 
+* Summary Generation Commands::
 * Really Various Summary Commands::  $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 @end menu
 
@@ -9707,7 +9748,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item h
 $B5-;v%P%C%U%!$K$*$$$F!"%X%C%@!<$,1#$5$l$F$$$k>l9g$KI=<($5$l$^$9!#(B
 
-@c @item p 
+@c @item p
 @c Displayed when article is digitally signed or encrypted, and Gnus has
 @c hidden the security headers.  (N.B. does not tell anything about
 @c security status, i.e. good or bad signature.)
@@ -10627,7 +10668,7 @@ you've typed it correctly.
 $B$^$;$s!#0lEY(B ``connection refused'' ($B@\B3$O5qH]$5$l$^$7$?(B) $B$r<u$1<h$k$H!"(B
 $B$=$l$O%5!<%P!<$,(B ``down'' ($BMn$A$F$$$k(B) $B$G$"$k$H$_$J$7$^$9!#(B
 
-$B$=$l$G!"0l;~E*$K$=$N%^%7%s$N5!7y$,0-$$$@$1$@$C$?$i2?$,5/$3$k$N$G$7$g$&(B? 
+$B$=$l$G!"0l;~E*$K$=$N%^%7%s$N5!7y$,0-$$$@$1$@$C$?$i2?$,5/$3$k$N$G$7$g$&(B?
 $B%^%7%s$,I|3h$7$?$+$I$&$+$r$I$&$9$l$PD4$Y$k;v$,$G$-$k$N$G$7$g$&(B?
 
 $B%5!<%P!<%P%C%U%!$KHt$S0\$C$F(B (@pxref{Server Buffer})$B!"0J2<$NL?Na$G$D$D$/(B
@@ -15617,9 +15658,9 @@ file
 $B$GF0:n$7!"(Bgnus $B%(!<%8%'%s%H$N@Z$jN%$7(B/$B:9$79~$_>uBV$r@Z$jBX$($^$9!#(B
 
 @menu
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::
+* Summary Agent Commands::
+* Server Agent Commands::
 @end menu
 
 $B40A4$J0l3g<hF@$r9T$&$K$O!"%3%^%s%I9T$+$i0J2<$N$*$^$8$J$$$r(B
@@ -19661,7 +19702,7 @@ but at the common table.@*
                                 $B$3$H(B
 * Gnus Reference Guide::        $B?'!9$J5;=QE*$J$b$N(B
 * Emacs for Heathens::          Emacs $B$NMQ8l$N<jC;$JF3F~(B
-* Frequently Asked Questions::  
+* Frequently Asked Questions::
 @end menu
 
 @node History

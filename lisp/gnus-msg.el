@@ -234,6 +234,7 @@ Thank you for your help in stamping out bugs.
 
 (gnus-define-keys (gnus-summary-send-map "S" gnus-summary-mode-map)
   "p" gnus-summary-post-news
+  "i" gnus-summary-news-other-window
   "f" gnus-summary-followup
   "F" gnus-summary-followup-with-original
   "c" gnus-summary-cancel-article
@@ -283,7 +284,16 @@ Thank you for your help in stamping out bugs.
 	      (user-agent . Gnus))))
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-gcc)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-archive-gcc)
-       (add-hook 'message-mode-hook 'gnus-configure-posting-styles)
+       ;; #### FIXME: for a reason that I did not manage to identify yet,
+       ;; the variable `gnus-newsgroup-name' does not honor a dynamically
+       ;; scoped or setq'ed value from a caller like `C-u gnus-summary-mail'.
+       ;; After evaluation of @forms below, it gets the value we actually want
+       ;; to override, and the posting styles are used. For that reason, I've
+       ;; added an optional argument to `gnus-configure-posting-styles' to
+       ;; make sure that the correct value for the group name is used. -- drv
+       (add-hook 'message-mode-hook
+		 (lambda ()
+		   (gnus-configure-posting-styles ,group)))
        (unwind-protect
 	   (progn
 	     ,@forms)
@@ -421,15 +431,47 @@ If ARG is 1, prompt for a group name to find the posting style."
 					 (gnus-read-active-file-p))
 		      (gnus-group-group-name))
 		  ""))
+	  ;; #### see comment in gnus-setup-message -- drv
 	  (gnus-setup-message 'message (message-mail)))
       (save-excursion
 	(set-buffer buffer)
 	(setq gnus-newsgroup-name group)))))
 
+(defun gnus-group-news (&optional arg)
+  "Start composing a news.
+If ARG, post to group under point.
+If ARG is 1, prompt for group name to post to.
+
+This function prepares a news even when using mail groups.  This is useful
+for posting messages to mail groups without actually sending them over the
+network.  The corresponding backend must have a 'request-post method."
+  (interactive "P")
+  ;; We can't `let' gnus-newsgroup-name here, since that leads
+  ;; to local variables leaking.
+  (let ((group gnus-newsgroup-name)
+	(buffer (current-buffer)))
+    (unwind-protect
+	(progn
+	  (setq gnus-newsgroup-name
+		(if arg
+		    (if (= 1 (prefix-numeric-value arg))
+			(completing-read "Use group: "
+					 gnus-active-hashtb nil
+					 (gnus-read-active-file-p))
+		      (gnus-group-group-name))
+		  ""))
+	  ;; #### see comment in gnus-setup-message -- drv
+	  (gnus-setup-message 'message
+	    (message-news (gnus-group-real-name gnus-newsgroup-name))))
+      (save-excursion
+	(set-buffer buffer)
+	(setq gnus-newsgroup-name group)))))
+
 (defun gnus-group-post-news (&optional arg)
-  "Start composing a news message.
-If ARG, post to the group under point.
-If ARG is 1, prompt for a group name."
+  "Start composing a message (a news by default).
+If ARG, post to group under point.  If ARG is 1, prompt for group name.
+Depending on the selected group, the message might be either a mail or
+a news."
   (interactive "P")
   ;; Bind this variable here to make message mode hooks work ok.
   (let ((gnus-newsgroup-name
@@ -441,10 +483,78 @@ If ARG is 1, prompt for a group name."
 	   "")))
     (gnus-post-news 'post gnus-newsgroup-name)))
 
-(defun gnus-summary-post-news ()
-  "Start composing a news message."
-  (interactive)
-  (gnus-post-news 'post gnus-newsgroup-name))
+(defun gnus-summary-mail-other-window (&optional arg)
+  "Start composing a mail in another window.
+Use the posting of the current group by default.
+If ARG, don't do that.  If ARG is 1, prompt for group name to find the
+posting style."
+  (interactive "P")
+  ;; We can't `let' gnus-newsgroup-name here, since that leads
+  ;; to local variables leaking.
+  (let ((group gnus-newsgroup-name)
+	(buffer (current-buffer)))
+    (unwind-protect
+	(progn
+	  (setq gnus-newsgroup-name
+		(if arg
+		    (if (= 1 (prefix-numeric-value arg))
+			(completing-read "Use group: "
+					 gnus-active-hashtb nil
+					 (gnus-read-active-file-p))
+		      "")
+		  gnus-newsgroup-name))
+	  ;; #### see comment in gnus-setup-message -- drv
+	  (gnus-setup-message 'message (message-mail)))
+      (save-excursion
+	(set-buffer buffer)
+	(setq gnus-newsgroup-name group)))))
+
+(defun gnus-summary-news-other-window (&optional arg)
+  "Start composing a news in another window.
+Post to the current group by default.
+If ARG, don't do that.  If ARG is 1, prompt for group name to post to.
+
+This function prepares a news even when using mail groups.  This is useful
+for posting messages to mail groups without actually sending them over the
+network.  The corresponding backend must have a 'request-post method."
+  (interactive "P")
+  ;; We can't `let' gnus-newsgroup-name here, since that leads
+  ;; to local variables leaking.
+  (let ((group gnus-newsgroup-name)
+	(buffer (current-buffer)))
+    (unwind-protect
+	(progn
+	  (setq gnus-newsgroup-name
+		(if arg
+		    (if (= 1 (prefix-numeric-value arg))
+			(completing-read "Use group: "
+					 gnus-active-hashtb nil
+					 (gnus-read-active-file-p))
+		      "")
+		  gnus-newsgroup-name))
+	  ;; #### see comment in gnus-setup-message -- drv
+	  (gnus-setup-message 'message
+	    (message-news (gnus-group-real-name gnus-newsgroup-name))))
+      (save-excursion
+	(set-buffer buffer)
+	(setq gnus-newsgroup-name group)))))
+
+(defun gnus-summary-post-news (&optional arg)
+  "Start composing a message.  Post to the current group by default.
+If ARG, don't do that.  If ARG is 1, prompt for a group name to post to.
+Depending on the selected group, the message might be either a mail or
+a news."
+  (interactive "P")
+  ;; Bind this variable here to make message mode hooks work ok.
+  (let ((gnus-newsgroup-name
+	 (if arg
+	     (if (= 1 (prefix-numeric-value arg))
+		 (completing-read "Newsgroup: " gnus-active-hashtb nil
+				  (gnus-read-active-file-p))
+	       "")
+	   gnus-newsgroup-name)))
+    (gnus-post-news 'post gnus-newsgroup-name)))
+
 
 (defun gnus-summary-followup (yank &optional force-news)
   "Compose a followup to an article.
@@ -1122,12 +1232,6 @@ The current group name will be inserted at \"%s\".")
 	  (when (gnus-y-or-n-p "Send this complaint? ")
 	    (message-send-and-exit)))))))
 
-(defun gnus-summary-mail-other-window ()
-  "Compose mail in other window."
-  (interactive)
-  (gnus-setup-message 'message
-    (message-mail)))
-
 (defun gnus-mail-parse-comma-list ()
   (let (accumulated
 	beg)
@@ -1529,10 +1633,10 @@ this is a reply."
 
 ;;; Posting styles.
 
-(defun gnus-configure-posting-styles ()
+(defun gnus-configure-posting-styles (&optional group-name)
   "Configure posting styles according to `gnus-posting-styles'."
   (unless gnus-inhibit-posting-styles
-    (let ((group (or gnus-newsgroup-name ""))
+    (let ((group (or group-name gnus-newsgroup-name ""))
 	  (styles gnus-posting-styles)
 	  style match variable attribute value v results
 	  filep name address element)
