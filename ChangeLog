@@ -1,3 +1,17 @@
+1998-10-31  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.2.
+
+	* lisp/nnheader.el (nnheader-decode-field-body): New inline
+	function.
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
+	`mime-edit-decode-buffer' and `mime-decode-header-in-buffer'.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
+	`nnheader-decode-field-body' instead of `mime-decode-field-body'.
+	(gnus-bbdb/extract-field-value): Ditto.
+
 1998-10-30  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
