@@ -3516,7 +3516,10 @@ Optional NEWS will use news to forward instead of mail."
       (set-buffer (get-buffer-create " *message resend*"))
       (buffer-disable-undo (current-buffer))
       (erase-buffer)
-      (message-setup `((To . ,address)))
+      ;; avoid to turn-on-mime-edit
+      (let (message-setup-hook)
+	(message-setup `((To . ,address)))
+	)
       ;; Insert our usual headers.
       (message-generate-headers '(From Date To))
       (message-narrow-to-headers)
@@ -3547,7 +3550,9 @@ Optional NEWS will use news to forward instead of mail."
       (when (looking-at "From ")
 	(replace-match "X-From-Line: "))
       ;; Send it.
-      (message-send-mail)
+      (let ((message-encoding-buffer (current-buffer))
+	    (message-edit-buffer (current-buffer)))
+	(message-send-mail))
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
 
