@@ -1624,7 +1624,7 @@ This variable can be nil, gnus or gnus-ja."
     `(("strict-cache" ((product-version ,version) (emacs-version))
        binary
        gnus-format-specs-compiled)
-      ("cache" ((product-version ,version))
+      ("cache" ((product-version ,version) (emacs-version))
        ,codesys
        gnus-format-specs)))
   "Gnus variables are saved in the produce depend quick startup files.")
