@@ -1,3 +1,16 @@
+2002-07-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Replace
+	`gnus-article-toggle-headers' with `gnus-summary-toggle-header'.
+	(gnus-summary-wash-map): Ditto.
+	(gnus-summary-wash-hide-map): Replace
+	`gnus-article-toggle-headers' with `gnus-article-hide-headers'.
+	(gnus-summary-article-menu): Ditto.
+
+	* lisp/gnus.el: Remove autoload for `gnus-article-toggle-headers'.
+
+	* lisp/gnus-art.el (article-toggle-headers): Abolished.
+
 2002-07-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (byte-optimize-form-code-walker): Don't modify

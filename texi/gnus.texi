@@ -7866,8 +7866,8 @@ headers, PGP, cited text and the signature.
 
 @item W W h
 @kindex W W h (Summary)
-@findex gnus-article-toggle-headers
-Toggle hiding of headers (@code{gnus-article-toggle-headers}).  @xref{Hiding
+@findex gnus-article-hide-headers
+Hide headers (@code{gnus-article-hide-headers}).  @xref{Hiding
 Headers}.
 
 @item W W b
@@ -8072,9 +8072,9 @@ is rumored to have employed this form of, uh, somewhat weak encryption.
 @item t
 @kindex W t (Summary)
 @kindex t (Summary)
-@findex gnus-article-toggle-headers
+@findex gnus-summary-toggle-header
 Toggle whether to display all headers in the article buffer
-(@code{gnus-article-toggle-headers}).
+(@code{gnus-summary-toggle-header}).
 
 @item W v
 @kindex W v (Summary)

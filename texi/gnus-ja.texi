@@ -7734,8 +7734,8 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 
 @item W W h
 @kindex W W h ($B35N,(B)
-@findex gnus-article-toggle-headers
-$B%X%C%@!<$r1#$7$^$9(B (@code{gnus-article-toggle-headers})$B!#(B
+@findex gnus-article-hide-headers
+$B%X%C%@!<$r1#$7$^$9(B (@code{gnus-article-hide-headers})$B!#(B
 @xref{Hiding Headers}.
 
 @item W W b
@@ -7931,9 +7931,9 @@ gnus $B$,5-;v$rI=<($9$k4{Dj$N$d$jJ}$rJQ$($?$$$H$-(B
 @item t
 @kindex W t ($B35N,(B)
 @kindex t ($B35N,(B)
-@findex gnus-article-toggle-headers
+@findex gnus-summary-toggle-header
 $B5-;v%P%C%U%!$K$9$Y$F$N%X%C%@!<$rI=<($9$k$+$I$&$+$r@Z$jBX$($^(B
-$B$9(B (@code{gnus-article-toggle-headers})$B!#(B
+$B$9(B (@code{gnus-summary-toggle-header})$B!#(B
 
 @item W v
 @kindex W v ($B35N,(B)

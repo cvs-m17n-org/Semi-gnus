@@ -1598,7 +1598,7 @@ increase the score of each group you read."
     "i" gnus-summary-news-other-window
     "x" gnus-summary-limit-to-unread
     "s" gnus-summary-isearch-article
-    "t" gnus-article-toggle-headers
+    "t" gnus-summary-toggle-header
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
     "v" gnus-summary-preview-mime-message
@@ -1766,7 +1766,7 @@ increase the score of each group you read."
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
-    "t" gnus-article-toggle-headers
+    "t" gnus-summary-toggle-header
     "g" gnus-treat-smiley
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
@@ -1777,7 +1777,7 @@ increase the score of each group you read."
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide
-    "h" gnus-article-toggle-headers
+    "h" gnus-article-hide-headers
     "b" gnus-article-hide-boring-headers
     "s" gnus-article-hide-signature
     "c" gnus-article-hide-citation
@@ -1987,7 +1987,7 @@ increase the score of each group you read."
     (let ((innards
 	   `(("Hide"
 	      ["All" gnus-article-hide t]
-	      ["Headers" gnus-article-toggle-headers t]
+	      ["Headers" gnus-article-hide-headers t]
 	      ["Signature" gnus-article-hide-signature t]
 	      ["Citation" gnus-article-hide-citation t]
 	      ["List identifiers" gnus-article-hide-list-identifiers t]
@@ -8428,35 +8428,39 @@ If ARG is a negative number, turn header display off."
 If ARG is a positive number, show the entire header.
 If ARG is a negative number, hide the unwanted header lines."
   (interactive "P")
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (save-restriction
-      (let* ((buffer-read-only nil)
-	     (inhibit-point-motion-hooks t)
-	     hidden s e)
-	(save-restriction
-	  (article-narrow-to-head)
-	  (setq e (point-max)
-		hidden (if (numberp arg)
+  (let ((window (and (gnus-buffer-live-p gnus-article-buffer)
+		     (get-buffer-window gnus-article-buffer t))))
+    (when window
+      (with-current-buffer gnus-article-buffer
+	(widen)
+	(article-narrow-to-head)
+	(let* ((buffer-read-only nil)
+	       (inhibit-point-motion-hooks t)
+	       (hidden (if (numberp arg)
 			   (>= arg 0)
-			 (gnus-article-hidden-text-p 'headers))))
-	(delete-region (point-min) e)
-	(goto-char (point-min))
- 	(with-current-buffer gnus-original-article-buffer
- 	  (goto-char (setq s (point-min)))
-	  (setq e (search-forward "\n\n" nil t)
-		e (if e (1- e) (point-max))))
-	(insert-buffer-substring gnus-original-article-buffer s e)
-	(save-restriction
-	  (narrow-to-region (point-min) (point))
+			 (gnus-article-hidden-text-p 'headers)))
+	       s e)
+	  (delete-region (point-min) (point-max))
+	  (with-current-buffer gnus-original-article-buffer
+	    (goto-char (setq s (point-min)))
+	    (setq e (if (search-forward "\n\n" nil t)
+			(1- (point))
+		      (point-max))))
+	  (insert-buffer-substring gnus-original-article-buffer s e)
 	  (article-decode-encoded-words)
-	  (if  hidden
+	  (if hidden
 	      (let ((gnus-treat-hide-headers nil)
 		    (gnus-treat-hide-boring-headers nil))
 		(gnus-delete-wash-type 'headers)
 		(gnus-treat-article 'head))
-	    (gnus-treat-article 'head)))
-	(gnus-set-mode-line 'article)))))
+	    (gnus-treat-article 'head))
+	  (widen)
+	  (set-window-start window (goto-char (point-min)))
+	  (setq gnus-page-broken
+		(when gnus-break-pages
+		  (gnus-narrow-to-page)
+		  t))
+	  (gnus-set-mode-line 'article))))))
 
 (defun gnus-summary-show-all-headers ()
   "Make all header lines visible."

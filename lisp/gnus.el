@@ -2235,8 +2235,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       ;; gnus-article-show-all
       gnus-article-edit-mode gnus-article-edit-article
       gnus-article-edit-done article-decode-encoded-words
-      gnus-start-date-timer gnus-stop-date-timer
-      gnus-article-toggle-headers)
+      gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
       gnus-dribble-enter gnus-read-init-file gnus-dribble-touch)
