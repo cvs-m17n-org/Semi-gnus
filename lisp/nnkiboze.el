@@ -232,7 +232,7 @@ Finds out what articles are to be part of the nnkiboze groups."
       (load newsrc-file))
     (nnheader-temp-write nov-file
       (when (file-exists-p nov-file)
-	(insert-file-contents nov-file))
+	(nnheader-insert-file-contents nov-file))
       (setq nov-buffer (current-buffer))
       ;; Go through the active hashtb and add new all groups that match the
       ;; kiboze regexp.
@@ -331,10 +331,8 @@ Finds out what articles are to be part of the nnkiboze groups."
   (save-excursion
     (set-buffer buffer)
     (goto-char (point-max))
-    (let ((xref (mail-header-xref header))
-	  (prefix (gnus-group-real-prefix group))
+    (let ((prefix (gnus-group-real-prefix group))
 	  (oheader (copy-sequence header))
-	  (first t)
 	  article)
       (if (zerop (forward-line -1))
 	  (progn

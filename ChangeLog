@@ -1,3 +1,9 @@
+1998-08-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.16.
+
+	* Sync up with Gnus 5.6.41.
+
 1998-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-spec.el (gnus-parse-simple-format): Use
