@@ -298,7 +298,7 @@
 
 ;;; Setup Code:
 
-(defconst nnir-version "$Id: nnir.el,v 1.1.6.1.4.1 2004-01-17 00:28:17 yamaoka Exp $"
+(defconst nnir-version "$Id: nnir.el,v 1.1.6.1.4.2 2004-03-15 09:46:13 yamaoka Exp $"
   "Version of NNIR.")
 
 (require 'cl)
@@ -1194,7 +1194,7 @@ Tested with swish-e-2.0.1 on Windows NT 4.0."
 		  (error "Missing parameter `nnir-swish-e-index-file'")))
 	     (additional-switches
 	      (nnir-read-server-parm
-	       'nnir-swish++-additional-switches server))
+	       'nnir-swish-e-additional-switches server))
 	     (cp-list `(,nnir-swish-e-program
 			nil		; input from /dev/null
 			t		; output
