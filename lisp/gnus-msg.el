@@ -596,11 +596,7 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
   (interactive "P")
   (gnus-setup-message 'forward
     (gnus-summary-select-article)
-    (let ((charset default-mime-charset))
-      (set-buffer gnus-original-article-buffer)
-      (make-local-variable 'default-mime-charset)
-      (setq default-mime-charset charset)
-      )
+    (set-buffer gnus-original-article-buffer)
     (let ((message-included-forward-headers
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
