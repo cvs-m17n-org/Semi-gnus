@@ -1,3 +1,7 @@
+1997-11-27  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+
+	* message.el: Abolish `message-max-size' because it is not used.
+
 1997-11-26  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
 
 	* nnmh.el (nnmh-request-list-1): fix maybe.
