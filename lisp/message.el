@@ -1982,9 +1982,12 @@ The text will also be indented the normal way."
   (interactive)
   (set-buffer-modified-p t)
   (save-buffer)
-  (let ((actions message-postpone-actions))
+  (let ((actions message-postpone-actions)
+	(frame (selected-frame))
+	(org-frame message-original-frame))
     (message-bury (current-buffer))
-    (message-do-actions actions)))
+    (message-do-actions actions)
+    (message-delete-frame frame org-frame)))
 
 (defun message-kill-buffer ()
   "Kill the current buffer."
