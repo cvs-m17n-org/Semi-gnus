@@ -138,8 +138,6 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
-(eval-when-compile
-  (ignore-errors (require 'sasl)))
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
@@ -152,7 +150,8 @@
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
-  (autoload 'format-spec-make "format-spec"))
+  (autoload 'format-spec-make "format-spec")
+  (autoload 'sasl-digest-md5-digest-response "sasl"))
 
 ;; User variables.
 

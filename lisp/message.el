@@ -36,25 +36,20 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'smtp))
+(eval-when-compile
+  (require 'cl)
+  (require 'smtp)
+  (defvar gnus-list-identifiers))	; gnus-sum is required where necessary
 
 (require 'mailheader)
 (require 'nnheader)
-(require 'easymenu)
-(if (string-match "XEmacs\\|Lucid" emacs-version)
-    (require 'mail-abbrevs)
-  (require 'mailabbrev))
 (require 'mime-edit)
 (eval-when-compile (require 'static))
 
 ;; Avoid byte-compile warnings.
 (eval-when-compile
   (require 'mail-parse)
-  (require 'mm-bodies)
-  (require 'mm-encode)
-  (require 'mml)
-  )
+  (require 'mml))
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -1367,7 +1362,7 @@ should be sent in several parts. If it is nil, the size is unlimited."
   (autoload 'gnus-request-post "gnus-int")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
-  (autoload 'gnus-list-identifiers "gnus-sum")
+  (autoload 'gnus-group-name-charset "gnus-group")
   (autoload 'rmail-output "rmail")
   (autoload 'mu-cite-original "mu-cite"))
 
@@ -1464,8 +1459,8 @@ is used by default."
     (when value
       (while (string-match "\n[\t ]+" value)
 	(setq value (replace-match " " t t value)))
-      ;; We remove all text props.
-      (format "%s" value))))
+      (set-text-properties 0 (length value) nil value)
+      value)))
 
 (defun message-narrow-to-field ()
   "Narrow the buffer to the header on the current line."
@@ -1520,6 +1515,7 @@ is used by default."
 
 (defun message-strip-list-identifiers (subject)
   "Remove list identifiers in `gnus-list-identifiers'."
+  (require 'gnus-sum)			; for gnus-list-identifiers
   (let ((regexp (if (stringp gnus-list-identifiers)
 		    gnus-list-identifiers
 		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
@@ -1865,8 +1861,15 @@ M-RET    message-newline-and-reformat (break the line and reformat)."
 	(copy-sequence message-startup-parameter-alist))
   ;;(when (fboundp 'mail-hist-define-keys)
   ;;  (mail-hist-define-keys))
-  (when (string-match "XEmacs\\|Lucid" emacs-version)
-    (message-setup-toolbar))
+  (if (featurep 'xemacs)
+      (message-setup-toolbar)
+    (set (make-local-variable 'font-lock-defaults)
+	 '((message-font-lock-keywords
+	    message-font-lock-keywords-1
+	    message-font-lock-keywords-2)
+	   nil nil nil nil
+	   (font-lock-mark-block-function . mark-paragraph))))
+  (set (make-local-variable 'message-font-lock-last-position) nil)
   (easy-menu-add message-mode-menu message-mode-map)
   (easy-menu-add message-mode-field-menu message-mode-map)
   ;; Allow mail alias things.
@@ -1875,14 +1878,6 @@ M-RET    message-newline-and-reformat (break the line and reformat)."
 	(mail-abbrevs-setup)
       (mail-aliases-setup)))
   (message-set-auto-save-file-name)
-  (unless (string-match "XEmacs" emacs-version)
-    (set (make-local-variable 'font-lock-defaults)
-	 '((message-font-lock-keywords
-	    message-font-lock-keywords-1
-	    message-font-lock-keywords-2)
-	   nil nil nil nil
-	   (font-lock-mark-block-function . mark-paragraph))))
-  (set (make-local-variable 'message-font-lock-last-position) nil)
   (make-local-variable 'adaptive-fill-regexp)
   (setq adaptive-fill-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
@@ -4528,6 +4523,7 @@ that further discussion should take place only in "
 (defun message-reply (&optional to-address wide)
   "Start editing a reply to the article in the current buffer."
   (interactive)
+  (require 'gnus-sum)			; for gnus-list-identifiers
   (let ((cur (current-buffer))
 	from subject date
 	references message-id follow-to
@@ -5350,17 +5346,20 @@ regexp varstr."
 ;;; Miscellaneous functions
 
 ;; stolen (and renamed) from nnheader.el
-(defun message-replace-chars-in-string (string from to)
-  "Replace characters in STRING from FROM to TO."
-  (let ((string (substring string 0))	;Copy string.
-	(len (length string))
-	(idx 0))
-    ;; Replace all occurrences of FROM with TO.
-    (while (< idx len)
-      (when (= (aref string idx) from)
-	(aset string idx to))
-      (setq idx (1+ idx)))
-    string))
+(if (fboundp 'subst-char-in-string)
+    (defsubst message-replace-chars-in-string (string from to)
+      (subst-char-in-string from to string))
+  (defun message-replace-chars-in-string (string from to)
+    "Replace characters in STRING from FROM to TO."
+    (let ((string (substring string 0))	;Copy string.
+	  (len (length string))
+	  (idx 0))
+      ;; Replace all occurrences of FROM with TO.
+      (while (< idx len)
+	(when (= (aref string idx) from)
+	  (aset string idx to))
+	(setq idx (1+ idx)))
+      string)))
 
 ;;;
 ;;; MIME functions

@@ -488,9 +488,8 @@ header line with the old Message-ID."
 	    (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
 	    (insert
 	     (prog1
-		 (format "%s" (buffer-string))
-	       (erase-buffer)))
-	    )
+		 (buffer-substring-no-properties (point-min) (point-max))
+	       (erase-buffer))))
 	  ;; Find the original headers.
 	  (set-buffer gnus-original-article-buffer)
 	  (goto-char (point-min))
