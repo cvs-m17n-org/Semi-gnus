@@ -1998,15 +1998,15 @@ The text will also be indented the normal way."
 (defun message-mimic-kill-buffer ()
   "Kill the current buffer with query."
   (interactive)
-  (if (buffer-modified-p)
-      (message-kill-buffer)
-    (let ((command this-command)
-	  (bufname (read-buffer (format "Kill buffer: (default %s) "
-					(buffer-name)))))
-      (if (or (not bufname)
-	      (string-equal bufname (buffer-name)))
-	  (message-kill-buffer)
-	(message "%s must be invoked only for the current buffer." command)))))
+  (unless (eq 'message-mode major-mode)
+    (error "%s must be invoked from a message buffer." this-command))
+  (let ((command this-command)
+	(bufname (read-buffer (format "Kill buffer: (default %s) "
+				      (buffer-name)))))
+    (if (or (not bufname)
+	    (string-equal bufname (buffer-name)))
+	(message-kill-buffer)
+      (message "%s must be invoked only for the current buffer." command))))
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
