@@ -190,7 +190,7 @@ If mail , gnus-offline only fetch mail articles.
   :group 'gnus-offline
   :type 'function)
 
-(defcustom gnus-offline-agent-automatic-expire t
+(defcustom gnus-offline-auto-expire t
   "*Non-nil means expire articles on every session."
   :group 'gnus-offline
   :type 'boolean)
@@ -420,10 +420,10 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 
 (defadvice gnus-agent-expire (around gnus-offline-advice activate preactivate)
   "Advice not to delete new articles."
-  (and gnus-offline-agent-automatic-expire
-       (if (eq 0 gnus-agent-expire-days)
-	   (let (gnus-agent-expire-all)
-	     ad-do-it)
+  (cond ((eq 0 gnus-agent-expire-days)
+	 (let (gnus-agent-expire-all)
+	   ad-do-it))
+	(t
 	 ad-do-it)))
 
 ;;
@@ -665,7 +665,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (run-hooks 'gnus-offline-after-online-hook)
   (if (eq gnus-offline-articles-to-fetch 'mail)
       (gnus-offline-restore-mail-group-level))
-  (if (eq gnus-offline-news-fetch-method 'nnagent)
+  (if (and (eq gnus-offline-news-fetch-method 'nnagent)
+	   gnus-offline-auto-expire)
       (gnus-agent-expire))
   (if (and (featurep 'xemacs)
 	   (fboundp 'play-sound-file))
