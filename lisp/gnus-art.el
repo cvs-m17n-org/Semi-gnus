@@ -2945,6 +2945,17 @@ If given a prefix, show the hidden text instead."
   :group 'gnus-article-various
   :type 'hook)
 
+(defcustom gnus-article-edit-article-setup-function
+  'gnus-article-mime-edit-article-setup
+  "Function called to setup an editing article buffer."
+  :group 'gnus-article-various
+  :type 'function)
+
+(defcustom gnus-article-mime-edit-article-setup-hook nil
+  "Hook run after setting up a MIME editing article buffer."
+  :group 'gnus-article-various
+  :type 'hook)
+
 (defvar gnus-article-edit-done-function nil)
 
 (defvar gnus-article-edit-mode-map nil)
@@ -2994,6 +3005,28 @@ groups."
        ,(or (mail-header-references gnus-current-headers) "")
        ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight))))
 
+(defun gnus-article-mime-edit-article-setup ()
+  "Convert current buffer to MIME-Edit buffer and turn on MIME-Edit mode
+after replacing with the original article."
+  (setq gnus-article-edit-done-function
+	`(lambda (&rest args)
+	   (mime-edit-exit)
+	   (let (case-fold-search)
+	     (goto-char (point-min))
+	     (re-search-forward
+	      (format "^%s$" (regexp-quote mail-header-separator)))
+	     (replace-match ""))
+	   (apply ,gnus-article-edit-done-function args)
+	   (gnus-summary-show-article)))
+  (erase-buffer)
+  (insert-buffer gnus-original-article-buffer)
+  (mime-edit-again)
+  (when (featurep 'font-lock)
+    (set (make-local-variable 'font-lock-defaults)
+	 '(message-font-lock-keywords t))
+    (font-lock-set-defaults))
+  (gnus-run-hooks 'gnus-article-mime-edit-article-setup-hook))
+
 (defun gnus-article-edit-article (exit-func)
   "Start editing the contents of the current article buffer."
   (let ((winconf (current-window-configuration)))
@@ -3004,6 +3037,8 @@ groups."
     (gnus-configure-windows 'edit-article)
     (setq gnus-article-edit-done-function exit-func)
     (setq gnus-prev-winconf winconf)
+    (when gnus-article-edit-article-setup-function
+      (funcall gnus-article-edit-article-setup-function))
     (gnus-message 6 "C-c C-c to end edits")))
 
 (defun gnus-article-edit-done (&optional arg)
