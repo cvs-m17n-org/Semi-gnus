@@ -4389,7 +4389,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
-	    in-reply-to header p lines chars)
+	    in-reply-to header p lines chars ctype)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
 	;; do not begin with 2 or 3.
@@ -4497,6 +4497,11 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	      (goto-char p)
 	      (and (search-forward "\nxref: " nil t)
 		   (nnheader-header-value)))))
+	  (goto-char p)
+	  (if (and (search-forward "\ncontent-type: " nil t)
+		   (setq ctype (nnheader-header-value)))
+	      (mime-entity-set-content-type-internal
+	       header (mime-parse-Content-Type ctype)))
 	  (when (equal id ref)
 	    (setq ref nil))
 
