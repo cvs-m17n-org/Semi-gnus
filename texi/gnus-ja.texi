@@ -10005,7 +10005,7 @@ default force yes
 これは初期設定で、単純に遠隔システムの何らかのポートか他のもに接続します。
 
 @item nntp-open-rlogin
-@samp{rlogin} を遠隔システムに行って、そこから仕様可能な @sc{nntp} サー
+@samp{rlogin} を遠隔システムに行って、そこから使用可能な @sc{nntp} サー
 バーに @samp{telnet} をします。
 
 @code{nntp-open-rlogin} に関連した変数です:
@@ -16680,7 +16680,7 @@ The GNU Emacs Lisp Reference Manual}. XEmacs では、フレームプロパティリ
 たりしようとしません。これはファイル @file{gnus-vis.el} を読み込む事も禁
 止します。
 
-この変数は仕様可能な視覚的プロパティのリストである事ができます。以下の要
+この変数は使用可能な視覚的プロパティのリストである事ができます。以下の要
 素は有効で、初期設定ですべて含まれています:
 
 @table @code
