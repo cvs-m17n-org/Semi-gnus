@@ -1,5 +1,26 @@
 1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+	(TopLevel): Autoload "gnus-art" for the function
+	`gnus-article-show-all'.
+
+	* lisp/gnus-sum.el (gnus-summary-select-article): Expose all
+	hidden text if the command `gnus-summary-toggle-mime' is used.
+
+	* lisp/gnus-art.el (gnus-signature-toggle): Don't hide the
+	following parts.
+	(gnus-article-highlight-signature): Work for forwarded messages.
+	(gnus-article-show-all): New function based on `article-show-all'.
+	(gnus-article-show-all-headers): Based on
+	`article-show-all-headers'.
+	(article-show-all-headers): New function to show all *HEADERS*.
+	(article-show-all): Show *ALL* literally.
+	(article-hide-signature): Work for forwarded messages.
+	(gnus-treatment-function-alist): Put `gnus-treat-hide-signature'
+	off after `gnus-treat-highlight-signature'.
+
+1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
 
 	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Protect
