@@ -1,6 +1,7 @@
 ;;; gnus-namazu.el --- Search mail with Namazu -*- coding: iso-2022-7bit; -*-
 
-;; Copyright (C) 2000,2001,2002,2003 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004
+;; TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
@@ -287,8 +288,8 @@ options make any sense in this context."
 		  (replace-match "\\1:/"))
 	    (eq ?~ (char-after (point))))
       (insert (expand-file-name
-	       (buffer-substring (gnus-point-at-bol) (gnus-point-at-eol))))
-      (delete-region (point) (gnus-point-at-eol)))
+	       (buffer-substring (point-at-bol) (point-at-eol))))
+      (delete-region (point) (point-at-eol)))
     (forward-line 1)))
 
 (defsubst gnus-namazu/call-namazu (query)
@@ -376,7 +377,7 @@ options make any sense in this context."
 		    group
 		    (string-to-number
 		     (buffer-substring-no-properties (point)
-						     (gnus-point-at-eol))))
+						     (point-at-eol))))
 		   articles))
 	(forward-line 1))
       (nreverse articles))))

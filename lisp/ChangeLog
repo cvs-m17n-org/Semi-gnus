@@ -1,3 +1,199 @@
+2004-01-06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* run-at-time.el: New file.
+
+	* dgnushack.el (dgnushack-compile): Don't compile run-at-time
+	under Emacs.
+
+	* gnus.el ((fboundp 'gnus-set-text-properties)): Remove definition
+	of gnus-set-text-properties.
+
+	* gnus-uu.el (gnus-uu-save-article): Ditto.
+
+	* gnus-salt.el (gnus-carpal-setup-buffer): Ditto.
+
+	* gnus-cite.el (gnus-cite-parse): Ditto.
+
+	* gnus-art.el (gnus-button-push): Use set-text-properties instead
+	of gnus-.
+
+	* gnus-xmas.el (run-at-time): Require run-at-time.
+
+	* gnus.el: Changed calls to nnheader-run-at-time and
+	password-run-at-time throughout to use run-at-time directly.
+
+	* password.el: Removed definition of run-at-time.
+
+	* nnheaderxm.el: Remove definition of run-at-time.
+
+2004-01-05  Karl Pfl,Ad(Bsterer  <sigurd@12move.de>
+
+	* mml.el (mml-minibuffer-read-disposition): Show attachment type
+	in prompt (tiny change)
+
+2004-01-06  Steve Youngs  <sryoungs@bigpond.net.au>
+
+	* messagexmas.el (message-xmas-redefine): Alias
+	`message-make-caesar-translation-table' to
+	``message-xmas-make-caesar-translation-table' regardless of XEmacs
+	version.
+
+	* gnus-xmas.el (gnus-xmas-set-text-properties): Removed.
+	(gnus-xmas-define): Don't alias `gnus-set-text-properties' to
+	`gnus-xmas-set-text-properties'.
+	(gnus-xmas-redefine): Don't alias `gnus-completing-read' to
+	`gnus-xmas-completing-read'. 
+	(gnus-xmas-completing-read): Removed.
+	(gnus-xmas-open-network-stream): Removed.
+
+	* gnus-ems.el (gnus-mode-line-modified): Don't conditionalise on
+	XEmacs version.
+
+	* dns.el (dns-make-network-process): Use `open-network-stream'
+	instead of `gnus-xmas-open-network-stream'.
+
+	* dgnushack.el: Remove some XEmacs 21.1 specific stuff.
+
+	* .cvsignore: Add auto-autoloads.el, custom-load.el.
+
+2004-01-06  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-mime-display-alternative)
+	(gnus-insert-mime-button, gnus-insert-mime-security-button)
+	(gnus-insert-prev-page-button, gnus-insert-next-page-button):
+	Don't use gnus-local-map-property.
+
+	* gnus-util.el (gnus-local-map-property): Remove.
+
+	* mm-view.el (mm-view-pkcs7-decrypt): Replace
+	gnus-completing-read-maybe-default with completing-read.
+
+	* gnus-util.el (gnus-completing-read): do.
+	(gnus-completing-read-maybe-default): Remove.
+
+2004-01-06  Steve Youngs  <sryoungs@bigpond.net.au>
+
+	* password.el: Only autoload `run-at-time' if not XEmacs.
+	Only autoload the itimer functions if XEmacs.
+
+2004-01-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-xmas.el (gnus-xmas-define): Defun char-width for non-MULE
+	XEmacsen.
+
+	* dgnushack.el: Autoload executable-find for XEmacs.
+
+2004-01-06  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-read-string): Remove.
+	(gnus-summary-pipe-to-muttprint): Replace gnus-read-string with
+	read-string.
+
+2004-01-05  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* netrc.el: autoload password-read
+	(netrc): new configuration group
+	(netrc-encoding-method, netrc-openssl-path): configuration
+	variables for encoding and decoding of files with symmetric
+	ciphers
+	(netrc-encode): assistant function to encode a file with
+	netrc-encoding-method
+	(netrc-parse): added interactive parameter, added optional
+	decoding if netrc-encoding-method is non-nil but otherwise
+	behavior is standard
+	(netrc-encrypting-method, netrc-encrypt, netrc-parse):
+	s/encode/encrypt/ everywhere
+
+	* spam.el: remove executable-find autoload
+
+2004-01-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-registry.el: Remove Emacs 20 hash table compatibility code.
+
+	* gnus-uu.el (gnus-uu-post-encoded): bury-buffer is always fbound.
+
+2004-01-05  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-treat-ansi-sequences,
+	article-treat-ansi-sequences): New variable and function.
+	Suggested by Dan Jacobson <jidanni@jidanni.org>.
+
+	* gnus-sum.el (gnus-summary-wash-map, gnus-summary-make-menu-bar):
+	Use it.
+
+2004-01-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* mm-util.el (mm-quote-arg): Remove.
+
+	* mm-decode.el (mm-mailcap-command): Replace mm-quote-arg with
+	shell-quote-argument.
+
+	* gnus-uu.el (gnus-uu-command): do.
+
+	* gnus-sum.el (gnus-summary-insert-pseudos): do.
+
+	* ietf-drums.el (ietf-drums-token-to-list): Replace mm-make-char
+	with make-char.
+
+	* mm-util.el (mm-make-char): Remove.
+
+	* mml.el (mml-mode): Replace gnus-add-minor-mode with
+	add-minor-mode.
+
+	* gnus-undo.el (gnus-undo-mode): do.
+
+	* gnus-topic.el (gnus-topic-mode): do.
+
+	* gnus-sum.el (gnus-dead-summary-mode): do.
+
+	* gnus-start.el (gnus-slave-mode): do.
+
+	* gnus-salt.el (gnus-binary-mode, gnus-pick-mode): do.
+
+	* gnus-ml.el (gnus-mailing-list-mode): do.
+
+	* gnus-gl.el (gnus-grouplens-mode): do.
+
+	* gnus-draft.el (gnus-draft-mode): do.
+
+	* gnus-dired.el (gnus-dired-mode): do.
+
+	* gnus-ems.el (gnus-add-minor-mode): Remove.
+
+	* gnus-spec.el (gnus-correct-length, gnus-correct-substring):
+	Replace gnus-char-width with char-width.
+
+	* gnus-ems.el (gnus-char-width): Remove.
+
+	* gnus-spec.el (gnus-correct-length, gnus-correct-substring):
+	Replace gnus-char-width with char-width.
+
+	* gnus-ems.el (gnus-char-width): Remove.
+
+	* spam-stat.el (with-syntax-table): Remove with-syntax-table
+	definition.
+	Remove Emacs 20 hash table compatibility code.
+
+	* rfc2047.el (with-syntax-table): Remove with-syntax-table Emacs
+	20 compatibility code.
+
+	* spam.el (spam-point-at-eol): Replace with point-at-eol.
+
+	* smime.el (smime-point-at-eol): Replace with point-at-eol.
+
+	* rfc2047.el (rfc2047-point-at-bol, rfc2047-point-at-eol): Replace
+	with point-at-{eol,bol}.
+
+	* netrc.el (netrc-point-at-eol): Replace with point-at-eol.
+
+	* imap.el (imap-point-at-eol): Replace with point-at-eol.
+
+	* flow-fill.el (fill-flowed-point-at-bol,
+	fill-flowed-point-at-eol): Replace with point-at-{eol,bol}.
+
+	* gnus-util.el (gnus-point-at-bol, gnus-point-at-eol): Remove.
+	Replace with point-at-{eol,bol} throughout all files.
+
 2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* ntlm.el (ntlm-string-as-unibyte): New macro.

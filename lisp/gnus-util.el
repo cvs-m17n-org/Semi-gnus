@@ -130,35 +130,6 @@
        (funcall (if (stringp buffer) 'get-buffer 'buffer-name)
 		buffer))))
 
-(static-cond
- ((fboundp 'point-at-bol)
-  (defalias 'gnus-point-at-bol 'point-at-bol))
- ((fboundp 'line-beginning-position)
-  (defalias 'gnus-point-at-bol 'line-beginning-position))
- (t
-  (defun gnus-point-at-bol ()
-    "Return point at the beginning of the line."
-    (let ((p (point)))
-      (beginning-of-line)
-      (prog1
-	  (point)
-	(goto-char p))))
-  ))
-(static-cond
- ((fboundp 'point-at-eol)
-  (defalias 'gnus-point-at-eol 'point-at-eol))
- ((fboundp 'line-end-position)
-  (defalias 'gnus-point-at-eol 'line-end-position))
- (t
-  (defun gnus-point-at-eol ()
-    "Return point at the end of the line."
-    (let ((p (point)))
-      (end-of-line)
-      (prog1
-	  (point)
-	(goto-char p))))
-  ))
-
 ;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
 ;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
 ;; It's harmless, though, so the main purpose of this alias is to shut
@@ -183,7 +154,7 @@
 
 ;; Delete the current line (and the next N lines).
 (defmacro gnus-delete-line (&optional n)
-  `(delete-region (gnus-point-at-bol)
+  `(delete-region (point-at-bol)
 		  (progn (forward-line ,(or n 1)) (point))))
 
 (defun gnus-byte-code (func)
@@ -246,7 +217,7 @@ is slower."
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (let ((eol (gnus-point-at-eol)))
+  (let ((eol (point-at-eol)))
     (goto-char (or (text-property-any (point) eol 'gnus-position t)
 		   (search-forward ":" eol t)
 		   (point)))))
@@ -1286,32 +1257,12 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
 	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
       (error "Invalid predicate specifier: %s" spec)))))
 
-(defun gnus-local-map-property (map)
-  "Return a list suitable for a text property list specifying keymap MAP."
-  (cond
-   ((featurep 'xemacs)
-    (list 'keymap map))
-   ((>= emacs-major-version 21)
-    (list 'keymap map))
-   (t
-    (list 'local-map map))))
-
-(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate
-					      require-match initial-contents
-					      history default)
-  "Like `completing-read', allowing for non-existent 7th arg in older XEmacsen."
-  `(completing-read ,prompt ,table ,predicate ,require-match
-                    ,initial-contents ,history
-                    ,@(if (and (featurep 'xemacs) (< emacs-minor-version 2))
-                          ()
-                        (list default))))
-
 (defun gnus-completing-read (prompt table &optional predicate require-match
 				    history)
   (when (and history
 	     (not (boundp history)))
     (set history nil))
-  (gnus-completing-read-maybe-default
+  (completing-read
    (if (symbol-value history)
        (concat prompt " (" (car (symbol-value history)) "): ")
      (concat prompt ": "))
@@ -1521,7 +1472,7 @@ predicate on the elements."
      ((eq gnus-user-agent 'gnus)
       nil)
      ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
-      (concat "Emacs/%s" (match-string 1 emacs-version)
+      (concat "Emacs/" (match-string 1 emacs-version)
 	      (if system-v
 		  (concat " (" system-v ")")
 		"")))

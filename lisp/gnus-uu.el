@@ -509,11 +509,11 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 		    "Various"))))
 	(goto-char (point-min))
 	(when (re-search-forward "^Subject: ")
-	  (delete-region (point) (gnus-point-at-eol))
+	  (delete-region (point) (point-at-eol))
 	  (insert subject))
 	(goto-char (point-min))
 	(when (re-search-forward "^From:")
-	  (delete-region (point) (gnus-point-at-eol))
+	  (delete-region (point) (point-at-eol))
 	  (insert " " from))
 	(let ((message-forward-decoded-p t))
 	  (message-forward post))))
@@ -846,7 +846,7 @@ When called interactively, prompt for REGEXP."
 	  (save-restriction
 	    (set-buffer buffer)
 	    (let (buffer-read-only)
-	      (gnus-set-text-properties (point-min) (point-max) nil)
+	      (set-text-properties (point-min) (point-max) nil)
 	      ;; These two are necessary for XEmacs 19.12 fascism.
 	      (put-text-property (point-min) (point-max) 'invisible nil)
 	      (put-text-property (point-min) (point-max) 'intangible nil))
@@ -1767,7 +1767,7 @@ Gnus might fail to display all of it.")
 ;; that the filename will be treated as a single argument when the shell
 ;; executes the command.
 (defun gnus-uu-command (action file)
-  (let ((quoted-file (gnus-quote-arg-for-sh-or-csh file)))
+  (let ((quoted-file (shell-quote-argument file)))
     (if (string-match "%s" action)
 	(format action quoted-file)
       (concat action " " quoted-file))))
@@ -2099,8 +2099,7 @@ If no file has been included, the user will be asked for a file."
 
     (when (not gnus-uu-post-separate-description)
       (set-buffer-modified-p nil)
-      (when (fboundp 'bury-buffer)
-	(bury-buffer)))))
+      (bury-buffer))))
 
 (provide 'gnus-uu)
 

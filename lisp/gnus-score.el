@@ -28,7 +28,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'gnus)
 (require 'gnus-sum)
@@ -1157,9 +1156,9 @@ If FORMAT, also format the current score file."
 	 (reg " -> +")
 	 (file (save-excursion
 		 (end-of-line)
-		 (if (and (re-search-backward reg (gnus-point-at-bol) t)
-			  (re-search-forward  reg (gnus-point-at-eol) t))
-		     (buffer-substring (point) (gnus-point-at-eol))
+		 (if (and (re-search-backward reg (point-at-bol) t)
+			  (re-search-forward  reg (point-at-eol) t))
+		     (buffer-substring (point) (point-at-eol))
 		   nil))))
     (if (or (not file)
 	    (string-match "\\<\\(non-file rule\\|A file\\)\\>" file)
@@ -1889,7 +1888,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 	    (goto-char (point-min))
 	    (if (= dmt ?e)
 		(while (funcall search-func match nil t)
-		  (and (= (gnus-point-at-bol)
+		  (and (= (point-at-bol)
 			  (match-beginning 0))
 		       (= (progn (end-of-line) (point))
 			  (match-end 0))
@@ -2059,7 +2058,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 			(funcall search-func match nil t))
 	      ;; Is it really exact?
 	      (and (eolp)
-		   (= (gnus-point-at-bol) (match-beginning 0))
+		   (= (point-at-bol) (match-beginning 0))
 		   ;; Yup.
 		   (progn
 		     (setq found (setq arts (get-text-property
@@ -2149,7 +2148,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 	  (goto-char (point-min))
 	  (while (and (not (eobp))
 		      (search-forward match nil t))
-	    (when (and (= (gnus-point-at-bol) (match-beginning 0))
+	    (when (and (= (point-at-bol) (match-beginning 0))
 		       (eolp))
 	      (setq found (setq arts (get-text-property (point) 'articles)))
 	      (if trace
@@ -2237,7 +2236,7 @@ score in `gnus-newsgroup-scored' by SCORE."
 		   hashtb))
 	    (gnus-sethash
 	     word
-	     (append (get-text-property (gnus-point-at-eol) 'articles) val)
+	     (append (get-text-property (point-at-eol) 'articles) val)
 	     hashtb)))
       (set-syntax-table syntab))
     ;; Make all the ignorable words ignored.

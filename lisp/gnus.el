@@ -302,9 +302,6 @@ be set in `.emacs' instead."
 (unless (fboundp 'gnus-group-remove-excess-properties)
   (defalias 'gnus-group-remove-excess-properties 'ignore))
 
-(unless (fboundp 'gnus-set-text-properties)
-  (defalias 'gnus-set-text-properties 'set-text-properties))
-
 (unless (featurep 'gnus-xmas)
   (defalias 'gnus-make-overlay 'make-overlay)
   (defalias 'gnus-delete-overlay 'delete-overlay)
@@ -2846,11 +2843,7 @@ gnus-registry.el will populate this if it's loaded.")
 ;; To make shimbun groups.
 (autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
 
-;; A tool for the developers.
-(autoload 'find-cl-run-time-functions "gnus-clfns" nil t)
-
 ;;; gnus-sum.el thingies
-
 
 (defcustom gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n"
   "*The format specification of the lines in the summary buffer.

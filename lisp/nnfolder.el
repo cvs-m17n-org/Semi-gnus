@@ -31,7 +31,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'nnheader)
 (require 'message)
@@ -204,7 +203,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 			(goto-char (match-end 0))
 			(setq num (string-to-int
 				   (buffer-substring
-				    (point) (gnus-point-at-eol))))
+				    (point) (point-at-eol))))
 			(goto-char start)
 			(< num article)))
 		      ;; Check that we are before an article with a
@@ -214,7 +213,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		      (progn
 			(setq num (string-to-int
 				   (buffer-substring
-				    (point) (gnus-point-at-eol))))
+				    (point) (point-at-eol))))
 			(> num article))
 		      ;; Discard any article numbers before the one we're
 		      ;; now looking at.
@@ -288,7 +287,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		  (if (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
 		      (string-to-int (buffer-substring
-				      (point) (gnus-point-at-eol)))
+				      (point) (point-at-eol)))
 		    -1))))))))
 
 (deffoo nnfolder-request-group (group &optional server dont-check)

@@ -136,7 +136,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
-  (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
@@ -328,7 +327,7 @@ nil, ."
 		(first t)
 		(bol (save-restriction
 		       (widen)
-		       (gnus-point-at-bol))))
+		       (point-at-bol))))
 	    (while (not (eobp))
 	      (when (and (or break qword-break)
 			 (> (- (point) bol) 76))
@@ -404,18 +403,18 @@ nil, ."
 	  (goto-char (point-min))
 	  (let ((bol (save-restriction
 		       (widen)
-		       (gnus-point-at-bol)))
-		(eol (gnus-point-at-eol)))
+		       (point-at-bol)))
+		(eol (point-at-eol)))
 	    (forward-line 1)
 	    (while (not (eobp))
 	      (if (and (looking-at "[ \t]")
-		       (< (- (gnus-point-at-eol) bol) 76))
+		       (< (- (point-at-eol) bol) 76))
 		  (delete-region eol (progn
 				       (goto-char eol)
 				       (skip-chars-forward "\r\n")
 				       (point)))
-		(setq bol (gnus-point-at-bol)))
-	      (setq eol (gnus-point-at-eol))
+		(setq bol (point-at-bol)))
+	      (setq eol (point-at-eol))
 	      (forward-line 1)))))))
 
   (unless (fboundp 'std11-unfold-field)
@@ -664,9 +663,9 @@ given, the return value will not contain the last newline."
 	   (goto-char p)
 	   (if (search-forward "\nmessage-id:" nil t)
 	       (buffer-substring
-		(1- (or (search-forward "<" (gnus-point-at-eol) t)
+		(1- (or (search-forward "<" (point-at-eol) t)
 			(point)))
-		(or (search-forward ">" (gnus-point-at-eol) t) (point)))
+		(or (search-forward ">" (point-at-eol) t) (point)))
 	     ;; If there was no message-id, we just fake one to make
 	     ;; subsequent routines simpler.
 	     (nnheader-generate-fake-message-id)))
@@ -775,7 +774,7 @@ given, the return value will not contain the last newline."
        (nnheader-generate-fake-message-id))))
 
 (defun nnheader-parse-nov ()
-  (let ((eol (gnus-point-at-eol)))
+  (let ((eol (point-at-eol)))
     (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
@@ -1178,7 +1177,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
       ;; This is invalid, but not all articles have Message-IDs.
       ()
     (mail-position-on-field "References")
-    (let ((begin (gnus-point-at-bol))
+    (let ((begin (point-at-bol))
 	  (fill-column 78)
 	  (fill-prefix "\t"))
       (when references
@@ -1604,7 +1603,6 @@ find-file-hooks, etc.
   "Strip all \r's from the current buffer."
   (nnheader-skeleton-replace "\r"))
 
-(defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
 (defalias 'nnheader-string-as-multibyte 'string-as-multibyte)

@@ -1744,8 +1744,6 @@ no, only reply back to the author."
   (autoload 'message-setup-toolbar "messagexmas")
   (autoload 'mh-new-draft-name "mh-comp")
   (autoload 'mh-send-letter "mh-comp")
-  (autoload 'gnus-point-at-eol "gnus-util")
-  (autoload 'gnus-point-at-bol "gnus-util")
   (autoload 'gnus-output-to-rmail "gnus-util")
   (autoload 'gnus-output-to-mail "gnus-util")
   (autoload 'nndraft-request-associate-buffer "nndraft")
@@ -3942,7 +3940,7 @@ used to distinguish whether the invisible text is a MIME part or not."
 					   font-lock-face highlight))))
       (when hidden-start
 	(goto-char hidden-start)
-	(set-window-start (selected-window) (gnus-point-at-bol))
+	(set-window-start (selected-window) (point-at-bol))
 	(unless (yes-or-no-p
 		 "Invisible text found and made visible; continue sending? ")
 	  (error "Invisible text found and made visible")))))
@@ -5655,7 +5653,7 @@ Headers already prepared in the buffer are not modified."
 		      (forward-line -1)))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
-		(delete-region (point) (gnus-point-at-eol))
+		(delete-region (point) (point-at-eol))
 		;; If the header is optional, and the header was
 		;; empty, we can't insert it anyway.
 		(unless optionalp
@@ -5889,7 +5887,7 @@ beginning of line."
 	   (message-point-in-header-p))
       (let* ((here (point))
 	     (bol (progn (beginning-of-line n) (point)))
-	     (eol (gnus-point-at-eol))
+	     (eol (point-at-eol))
 	     (eoh (re-search-forward ": *" eol t)))
 	(if (or (not eoh) (equal here eoh))
 	    (goto-char bol)

@@ -211,7 +211,9 @@ It has already been fixed in XEmacs since 1999-12-06."
 	(push (file-name-as-directory path) adds)))
     (setq load-path (nconc (nreverse adds) load-path))))
 
-(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+(if (file-exists-p (expand-file-name "dgnuspath.el" srcdir))
+    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+  (message "  ** There's no dgnuspath.el file"))
 
 (condition-case err
     (load "~/.lpath.el" t nil t)
@@ -272,8 +274,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t t)
-
-(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
 (require 'custom)
 
@@ -419,11 +419,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (eval-and-compile
   (when (featurep 'xemacs)
-    ;; XEmacs 21.1 needs some extra hand holding
-    (when (eq emacs-minor-version 1)
-      (autoload 'custom-declare-face "cus-face" nil t)
-      (autoload 'cl-compile-time-init "cl-macs" nil t)
-      (autoload 'defadvice "advice" nil nil 'macro))
     (unless (fboundp 'defadvice)
       (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
@@ -439,6 +434,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
     (autoload 'enriched-decode "enriched")
+    (autoload 'executable-find "executable")
     (autoload 'info "info" nil t)
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
@@ -543,7 +539,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
+	      "run-at-time.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))

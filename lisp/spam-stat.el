@@ -193,36 +193,6 @@ This is set by hooking into Gnus.")
 (defvar spam-stat-buffer-name " *spam stat buffer*"
   "Name of the `spam-stat-buffer'.")
 
-;; Functions missing in Emacs 20
-
-(when (memq nil (mapcar 'fboundp
-			'(gethash hash-table-count make-hash-table
-				  mapc puthash)))
-  (require 'cl)
-  (unless (fboundp 'puthash)
-    ;; alias puthash is missing from Emacs 20 cl-extra.el
-    (defalias 'puthash 'cl-puthash)))
-
-(eval-when-compile
-  (unless (fboundp 'with-syntax-table)
-    ;; Imported from Emacs 21.2
-    (defmacro with-syntax-table (table &rest body) "\
-Evaluate BODY with syntax table of current buffer set to a copy of TABLE.
-The syntax table of the current buffer is saved, BODY is evaluated, and the
-saved table is restored, even in case of an abnormal exit.
-Value is what BODY returns."
-      (let ((old-table (make-symbol "table"))
-	    (old-buffer (make-symbol "buffer")))
-	`(let ((,old-table (syntax-table))
-	       (,old-buffer (current-buffer)))
-	   (unwind-protect
-	       (progn
-		 (set-syntax-table (copy-syntax-table ,table))
-		 ,@body)
-	     (save-current-buffer
-	       (set-buffer ,old-buffer)
-	       (set-syntax-table ,old-table))))))))
-
 ;; Hooking into Gnus
 
 (defun spam-stat-store-current-buffer ()

@@ -29,12 +29,11 @@
 (eval-when-compile
   (require 'cl)
   (require 'imap)
-  (defvar display-time-mail-function)
-  (autoload 'pop3-movemail "pop3")
-  (autoload 'pop3-get-message-count "pop3"))
+  (defvar display-time-mail-function))
 (eval-and-compile
-  (autoload 'nnheader-cancel-timer "nnheader")
-  (autoload 'nnheader-run-at-time "nnheader"))
+  (autoload 'pop3-movemail "pop3")
+  (autoload 'pop3-get-message-count "pop3")
+  (autoload 'nnheader-cancel-timer "nnheader"))
 (require 'format-spec)
 (require 'message) ;; for `message-directory'
 
@@ -909,7 +908,7 @@ This only works when `display-time' is enabled."
 	  (setq display-time-mail-function #'mail-source-new-mail-p)
 	  ;; Set up the main timer.
 	  (setq mail-source-report-new-mail-timer
-		(nnheader-run-at-time
+		(run-at-time
 		 (* 60 mail-source-report-new-mail-interval)
 		 (* 60 mail-source-report-new-mail-interval)
 		 #'mail-source-start-idle-timer))

@@ -38,8 +38,7 @@
 (defvar gnus-down-mouse-2 [down-mouse-2])
 (defvar gnus-widget-button-keymap nil)
 (defvar gnus-mode-line-modified
-  (if (or (featurep 'xemacs)
-	  (< emacs-major-version 20))
+  (if (featurep 'xemacs)
       '("--**-" . "-----")
     '("**" "--")))
 
@@ -63,12 +62,6 @@
       (delete-overlay (pop overlays)))))
 
 ;;; Mule functions.
-
-(eval-and-compile
-  (defalias 'gnus-char-width
-    (if (fboundp 'char-width)
-	'char-width
-      (lambda (ch) 1)))) ;; A simple hack.
 
 (eval-and-compile
   (if (featurep 'xemacs)
@@ -165,16 +158,6 @@
 (defun gnus-mark-active-p ()
   "Non-nil means the mark and region are currently active in this buffer."
   mark-active) ; aliased to region-exists-p in XEmacs.
-
-(if (fboundp 'add-minor-mode)
-    (defalias 'gnus-add-minor-mode 'add-minor-mode)
-  (defun gnus-add-minor-mode (mode name map &rest rest)
-    (set (make-local-variable mode) t)
-    (unless (assq mode minor-mode-alist)
-      (push `(,mode ,name) minor-mode-alist))
-    (unless (assq mode minor-mode-map-alist)
-      (push (cons mode map)
-	    minor-mode-map-alist))))
 
 (defun gnus-x-splash ()
   "Show a splash screen using a pixmap in the current buffer."

@@ -374,7 +374,7 @@ Lines matching `gnus-cite-attribution-suffix' and perhaps
 	(goto-char (point-min))
 	(forward-line (1- number))
 	(when (re-search-forward gnus-cite-attribution-suffix
-				 (gnus-point-at-eol)
+				 (point-at-eol)
 				 t)
 	  (gnus-article-add-button (match-beginning 1) (match-end 1)
 				   'gnus-cite-toggle prefix))
@@ -728,7 +728,7 @@ See also the documentation for `gnus-article-highlight-citation'."
       ;; Each line.
       (setq begin (point)
 	    guess-limit (progn (skip-chars-forward "^> \t\r\n") (point))
-	    end (gnus-point-at-bol 2)
+	    end (point-at-bol 2)
 	    start end)
       (goto-char begin)
       ;; Ignore standard Supercite attribution prefix.
@@ -744,7 +744,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	;; Each prefix.
 	(setq end (match-end 0)
 	      prefix (buffer-substring begin end))
-	(gnus-set-text-properties 0 (length prefix) nil prefix)
+	(set-text-properties 0 (length prefix) nil prefix)
 	(setq entry (assoc prefix alist))
 	(if entry
 	    (setcdr entry (cons line (cdr entry)))

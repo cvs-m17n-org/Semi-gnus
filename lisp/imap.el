@@ -145,22 +145,17 @@
 (eval-and-compile
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
+  (autoload 'digest-md5-parse-digest-challenge "digest-md5")
+  (autoload 'digest-md5-digest-response "digest-md5")
+  (autoload 'digest-md5-digest-uri "digest-md5")
+  (autoload 'digest-md5-challenge "digest-md5")
   (autoload 'rfc2104-hash "rfc2104")
   (autoload 'md5 "md5")
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec")
-  (autoload 'open-tls-stream "tls")
-  ;; Avoid use gnus-point-at-eol so we're independent of Gnus.  These
-  ;; days we have point-at-eol anyhow.
-  (if (fboundp 'point-at-eol)
-      (defalias 'imap-point-at-eol 'point-at-eol)
-    (defun imap-point-at-eol ()
-      (save-excursion
-	(end-of-line)
-	(point))))
-  (autoload 'sasl-digest-md5-digest-response "sasl"))
+  (autoload 'open-tls-stream "tls"))
 
 ;; User variables.
 
@@ -919,11 +914,16 @@ Returns t if login was successful, nil otherwise."
 	     (list
 	      "AUTHENTICATE DIGEST-MD5"
 	      (lambda (challenge)
-		(base64-encode-string
-		 (sasl-digest-md5-digest-response
-		  (base64-decode-string challenge)
-		  user passwd "imap" imap-server)
-		 'no-line-break))))))
+		(digest-md5-parse-digest-challenge
+		 (base64-decode-string challenge))
+		(let* ((digest-uri
+			(digest-md5-digest-uri
+			 "imap" (digest-md5-challenge 'realm)))
+		       (response
+			(digest-md5-digest-response
+			 user passwd digest-uri)))
+		  (base64-encode-string response 'no-line-break))))
+	     )))
        (if (not (eq (imap-wait-for-tag tag) 'INCOMPLETE))
 	   nil
 	 (setq imap-continuation nil)
@@ -2440,7 +2440,7 @@ Return nil if no complete line has arrived."
 			      ;; next line for Courier IMAP bug.
 			      (skip-chars-forward " ")
 			      (point)))
-		(> (skip-chars-forward "^ )" (imap-point-at-eol)) 0))
+		(> (skip-chars-forward "^ )" (point-at-eol)) 0))
       (push (buffer-substring start (point)) flag-list))
     (assert (eq (char-after) ?\)) t "In imap-parse-flag-list")
     (imap-forward)

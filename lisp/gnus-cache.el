@@ -29,7 +29,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'gnus)
 (require 'gnus-int)
@@ -528,7 +527,7 @@ Returns the list of articles removed."
       (set-buffer cache-buf)
       (if (search-forward (concat "\n" (int-to-string (car cached)) "\t")
 			  nil t)
-	  (setq beg (gnus-point-at-bol)
+	  (setq beg (point-at-bol)
 		end (progn (end-of-line) (point)))
 	(setq beg nil))
       (set-buffer nntp-server-buffer)

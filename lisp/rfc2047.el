@@ -29,24 +29,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (defvar message-posting-charset)
-  (unless (fboundp 'with-syntax-table)	; not in Emacs 20
-    (defmacro with-syntax-table (table &rest body)
-      "Evaluate BODY with syntax table of current buffer set to TABLE.
-The syntax table of the current buffer is saved, BODY is evaluated, and the
-saved table is restored, even in case of an abnormal exit.
-Value is what BODY returns."
-      (let ((old-table (make-symbol "table"))
-	    (old-buffer (make-symbol "buffer")))
-	`(let ((,old-table (syntax-table))
-	       (,old-buffer (current-buffer)))
-	   (unwind-protect
-	       (progn
-		 (set-syntax-table ,table)
-		 ,@body)
-	     (save-current-buffer
-	       (set-buffer ,old-buffer)
-	       (set-syntax-table ,old-table))))))))
+  (defvar message-posting-charset))
 
 (require 'qp)
 (require 'mm-util)
@@ -54,18 +37,6 @@ Value is what BODY returns."
 (require 'mail-prsvr)
 (require 'base64)
 (autoload 'mm-body-7-or-8 "mm-bodies")
-
-(eval-and-compile
-  ;; Avoid gnus-util for mm- code.
-  (defalias 'rfc2047-point-at-bol
-    (if (fboundp 'point-at-bol)
-	'point-at-bol
-      'line-beginning-position))
-
-  (defalias 'rfc2047-point-at-eol
-    (if (fboundp 'point-at-eol)
-	'point-at-eol
-      'line-end-position)))
 
 (defvar rfc2047-header-encoding-alist
   '(("Newsgroups" . nil)
@@ -134,7 +105,7 @@ quoted-printable and base64 respectively.")
    (progn
      (forward-line 1)
      (if (re-search-forward "^[^ \n\t]" nil t)
-	 (rfc2047-point-at-bol)
+	 (point-at-bol)
        (point-max))))
   (goto-char (point-min)))
 
@@ -424,7 +395,7 @@ By default, the region is treated as containing addresses (see
 		   (t 8)))
 	 (pre (- b (save-restriction
 		     (widen)
-		     (rfc2047-point-at-bol))))
+		     (point-at-bol))))
 	 ;; encoded-words must not be longer than 75 characters,
 	 ;; including charset, encoding etc.  This leaves us with
 	 ;; 75 - (length start) - 2 - 2 characters.  The last 2 is for
@@ -483,7 +454,7 @@ By default, the region is treated as containing addresses (see
 	  (first t)
 	  (bol (save-restriction
 		 (widen)
-		 (rfc2047-point-at-bol))))
+		 (point-at-bol))))
       (while (not (eobp))
 	(when (and (or break qword-break)
 		   (> (- (point) bol) 76))
@@ -554,18 +525,18 @@ By default, the region is treated as containing addresses (see
     (goto-char (point-min))
     (let ((bol (save-restriction
 		 (widen)
-		 (rfc2047-point-at-bol)))
-	  (eol (rfc2047-point-at-eol)))
+		 (point-at-bol)))
+	  (eol (point-at-eol)))
       (forward-line 1)
       (while (not (eobp))
 	(if (and (looking-at "[ \t]")
-		 (< (- (rfc2047-point-at-eol) bol) 76))
+		 (< (- (point-at-eol) bol) 76))
 	    (delete-region eol (progn
 				 (goto-char eol)
 				 (skip-chars-forward "\r\n")
 				 (point)))
-	  (setq bol (rfc2047-point-at-bol)))
-	(setq eol (rfc2047-point-at-eol))
+	  (setq bol (point-at-bol)))
+	(setq eol (point-at-eol))
 	(forward-line 1)))))
 
 (defun rfc2047-b-encode-region (b e)
@@ -585,7 +556,7 @@ By default, the region is treated as containing addresses (see
       (narrow-to-region (goto-char b) e)
       (let ((bol (save-restriction
 		   (widen)
-		   (rfc2047-point-at-bol))))
+		   (point-at-bol))))
 	(quoted-printable-encode-region
 	 b e nil
 	 ;; = (\075), _ (\137), ? (\077) are used in the encoded word.

@@ -29,7 +29,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 (require 'mm-decode)
 (require 'mm-util)
 (require 'mml)

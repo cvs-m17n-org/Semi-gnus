@@ -76,7 +76,7 @@
       ;; Set up the menu.
       (when (gnus-visual-p 'draft-menu 'menu)
 	(gnus-draft-make-menu-bar))
-      (gnus-add-minor-mode 'gnus-draft-mode " Draft" gnus-draft-mode-map)
+      (add-minor-mode 'gnus-draft-mode " Draft" gnus-draft-mode-map)
       (gnus-run-hooks 'gnus-draft-mode-hook))))
 
 ;;; Commands
@@ -153,7 +153,7 @@
 	     (concat "^" (regexp-quote gnus-agent-target-move-group-header)
 		     ":") nil t)
 	(skip-syntax-forward "-")
-	(setq move-to (buffer-substring (point) (gnus-point-at-eol)))
+	(setq move-to (buffer-substring (point) (point-at-eol)))
 	(message-remove-header gnus-agent-target-move-group-header))
       (goto-char (point-min))
       (when (re-search-forward
