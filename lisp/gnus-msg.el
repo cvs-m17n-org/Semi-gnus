@@ -535,7 +535,12 @@ header line with the old Message-ID."
 	      (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
 	      (insert
 	       (prog1
-		   (buffer-substring-no-properties (point-min) (point-max))
+		   (static-if (featurep 'xemacs)
+		       ;; Revome smiley extents for (possibly) XEmacs 21.1.
+		       (format "%s"
+			       (buffer-substring-no-properties (point-min)
+							       (point-max)))
+		     (buffer-substring-no-properties (point-min) (point-max)))
 		 (erase-buffer))))
 	    ;; Find the original headers.
 	    (set-buffer gnus-original-article-buffer)
