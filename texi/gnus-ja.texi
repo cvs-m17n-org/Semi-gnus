@@ -23695,7 +23695,7 @@ Hallvard B Furuseth---$B$$$m$$$m$J>.$5$JJ*$dItJ,!"FC$K(B .newsrc $B%U%!%$%k$r
 $B07$&ItJ,!#(B
 
 @item
-Brian Edmonds---@file{gnus-bbdbb.el}$B!#(B
+Brian Edmonds---@file{gnus-bbdb.el}$B!#(B
 
 @item
 David Moore--@file{nnvirtual.el} $B$N2~D{$HB?$/$NB>$N;v!#(B
