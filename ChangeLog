@@ -1,3 +1,7 @@
+2000-12-22  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* README.semi.ja: Fix typo.
+
 2000-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/lpath.el: Fbind `compose-mail' for Mule.
