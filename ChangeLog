@@ -1,3 +1,11 @@
+2000-09-25  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
+
+	* texi/gnus-faq-ja.texi, lisp/gnus.el, README.semi.ja, README.semi,
+	README: Replace "<semi-gnus-*@meadow.scphys.kyoto-u.ac.jp>" with
+	"<semi-gnus-*@meadowy.org>".
+
 2000-09-22  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* lisp/ptexinfmt.el (texinfo-format-printindex): Add

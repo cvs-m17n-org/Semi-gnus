@@ -14,49 +14,27 @@
 @end iftex
 @setchapternewpage odd
 
-@ifinfo
+@ifnottex
 
 This file documents Message, the Emacs message composition mode.  
 
 このファイルは Emacs のメッセージ作成モードである Message に関する説明文
 書です。
 
-Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+Copyright (C) 1996,97,98,99,2000 Free Software Foundation, Inc.
 
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being none, with the Front-Cover texts being ``A GNU
+Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License''.
 
-著作権表示とこの許可文がすべての複製に存在する限り、この説明書のまったく
-同一の複製を作り、配布することを許可する。
-
-@ignore
-Permission is granted to process this file through Tex and print the
-results, provided the printed document carries copying permission
-notice identical to this one except for the removal of this paragraph
-(this paragraph not being relevant to the printed manual).
-
-この段落が取り除かれているのを除き、これと同じ複製に関する許可文が表示さ
-れている限り、このファイルを Tex にかけて、その結果を印刷することを許可
-する (この段落は印刷されたマニュアルでは参照されません)。
-
-@end ignore
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided also that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-同一複製の条件の下で、それによって得られた結果もこの許可文の表示と同一の
-条件のもとで配布する限り、この説明書の修正版の複製をし、配布することを許
-可する。
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-
-上記の修正版に関する条件の下で、この説明書の翻訳の複製を作り、配布するこ
-とを許可する。
-
-@end ifinfo
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.''
+@end ifnottex
 
 @tex
 
@@ -68,30 +46,19 @@ into another language, under the above conditions for modified versions.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996,97,98,99 Free Software Foundation, Inc. 
+Copyright @copyright{} 1996,97,98,99,2000 Free Software Foundation, Inc.
 
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being none, with the Front-Cover texts being ``A GNU
+Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License''.
 
-著作権表示とこの許可文がすべての複製に存在する限り、この説明書のまったく
-同一の複製を作り、配布することを許可する。
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-同一複製の条件の下で、それによって得られた結果をこの許可文の表示と同一の
-条件のもとで配布する限り、この説明書の修正版の複製をし、配布することを許
-可する。
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-
-上記の修正版に関する条件の下で、この説明書の翻訳の複製を作り、配布するこ
-とを許可する。
-
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.''
 @end titlepage
 @page
 

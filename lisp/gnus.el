@@ -1597,7 +1597,7 @@ If nil, no default charset is assumed when posting."
 (defvar gnus-have-read-active-file nil)
 
 (defconst gnus-maintainer
-  "semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (T-gnus Bugfixing Girls + Boys)"
+  "semi-gnus-ja@meadowy.org (T-gnus Bugfixing Girls + Boys)"
   "The mail address of the T-gnus maintainers.")
 
 (defcustom gnus-info-filename nil

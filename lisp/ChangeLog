@@ -1,3 +1,42 @@
+2000-09-24  Simon Josefsson  <simon@josefsson.org>
+
+	* nnimap.el (nnimap-request-accept-article): Remove From[^:] lines.
+
+	* gnus-group.el (gnus-group-nnimap-edit-acl): Check if server
+	support ACL's.
+
+	* nnimap.el (nnimap-acl-get): Check capability.
+
+	* mail-source.el (mail-source-imap-file-coding-system): New variable.
+	(mail-source-fetch-imap): Use it.
+
+        * rfc2104.el (rfc2104-hexstring-to-bitstring): New function.
+        (rfc2104-hash): Use it.
+
+	* imap.el (imap-starttls-p): Check for starttls binary.
+	(imap-starttls-open): More verbose.
+	(imap-gssapi-auth): Ditto.
+	(imap-kerberos4-auth): Ditto.
+	(imap-cram-md5-auth): Ditto.
+	(imap-login-auth): Ditto.
+	(imap-anonymous-auth): Ditto.
+	(imap-digest-md5-auth): Ditto.
+	(imap-open): Ditto.
+	(imap-digest-md5-p): Check capability first.
+
+2000-09-24  Simon Josefsson  <simon@josefsson.org>
+
+	* imap.el (imap-parse-flag-list): Correctly parse empty lists.
+	(imap-login-p): Support LOGINDISABLED.
+
+2000-09-23  Simon Josefsson  <jas@nada.kth.se>
+
+	* rfc2104.el: Add SHA-1 example.
+
+2000-09-22  Simon Josefsson  <simon@josefsson.org>
+
+	* imap.el (imap-parse-body): Work around bug in Sun SIMS.
+
 2000-09-21 21:54:48  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* lpath.el: Bind nnkiboze-score-file.

@@ -1119,9 +1119,13 @@ function is generally only called when Gnus is shutting down."
 					     nnimap-current-move-article)
 					    group 'dontcreate nil
 					    nnimap-server-buffer))
-		  ;; turn into rfc822 format (\r\n eol's)
 		  (with-current-buffer (current-buffer)
 		    (goto-char (point-min))
+		    ;; remove any 'From blabla' lines, some IMAP servers
+		    ;; reject the entire message otherwise.
+		    (when (looking-at "^From[^:]")
+		      (kill-region (gnus-point-at-bol) (gnus-point-at-eol)))
+		    ;; turn into rfc822 format (\r\n eol's)
 		    (while (search-forward "\n" nil t)
 		      (replace-match "\r\n")))
                   ;; this 'or' is for Cyrus server bug
@@ -1151,7 +1155,8 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-acl-get (mailbox server)
   (when (nnimap-possibly-change-server server)
-    (imap-mailbox-acl-get mailbox nnimap-server-buffer)))
+    (and (imap-capability 'ACL nnimap-server-buffer)
+	 (imap-mailbox-acl-get mailbox nnimap-server-buffer))))
 
 (defun nnimap-acl-edit (mailbox method old-acls new-acls)
   (when (nnimap-possibly-change-server (cadr method))

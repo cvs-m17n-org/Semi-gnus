@@ -98,8 +98,8 @@ send a bug report to the Gnus maintainers.
 is a Gnus proper, please send a bug report to the Semi-gnus mailing
 list:
 
-    semi-gnus-en@meadow.scphys.kyoto-u.ac.jp	(English)
-    semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+    semi-gnus-en@meadowy.org	(English)
+    semi-gnus-ja@meadowy.org	(Japanese)
 
 Suggestions for T-gnus improvements are also welcome.
 
@@ -107,8 +107,8 @@ Suggestions for T-gnus improvements are also welcome.
 latest release of T-gnus, and discuss future enhancements to T-gnus.
 To join the Semi-gnus ML, send an empty e-mail to
 
-    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(English)
-    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
+    semi-gnus-en-help@meadowy.org	(English)
+    semi-gnus-ja-help@meadowy.org	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
 please send mail to cvs@cvs.m17n.org with your account name and your
