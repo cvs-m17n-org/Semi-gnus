@@ -112,6 +112,7 @@ Common keywords should be listed here.")
        (:program)
        (:function)
        (:password)
+       (:connection)
        (:authentication password))
       (maildir
        (:path "~/Maildir/new/")
@@ -476,7 +477,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    (pop3-mailhost server)
 		    (pop3-port port)
 		    (pop3-authentication-scheme
-		     (if (eq authentication 'apop) 'apop 'pass)))
+		     (if (eq authentication 'apop) 'apop 'pass))
+		    (pop3-connection-type connection))
 		(save-excursion (pop3-movemail mail-source-crash-box))))))
       (if result
 	  (progn
