@@ -145,6 +145,7 @@ Please describe the bug in annoying, painstaking detail.
 
 Thank you for your help in stamping out bugs.
 "
+
 	  gnus-product-name
 	  (if (string= gnus-product-name "Semi-gnus")
 	      ""
@@ -351,7 +352,8 @@ post using the current select method."
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((article (gnus-summary-article-number)))
+  (let ((article (gnus-summary-article-number))
+	gnus-message-setup-hook)
     (gnus-setup-message 'reply-yank
       (gnus-summary-select-article t)
       (set-buffer gnus-original-article-buffer)
@@ -547,7 +549,6 @@ If SILENT, don't prompt the user."
 ;;(defvar nnspool-rejected-article-hook)
 ;;(defvar xemacs-codename)
 
-;;; Since the User-Agent is ``vanity'' headers.
 (defun gnus-extended-version ()
   "Stringified gnus version."
   (interactive)

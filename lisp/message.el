@@ -236,12 +236,18 @@ included.  Organization, Lines and User-Agent are optional."
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:"
+(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:\\|^X-Trace:\\|^X-Complaints-To:"
   "*Header lines matching this regexp will be deleted before posting.
 It's best to delete old Path and Date headers before posting to avoid
 any confusion."
   :group 'message-interface
   :type 'regexp)
+
+(defcustom message-supersede-setup-function
+  'message-supersede-setup-for-mime-edit
+  "Function to setup a supersede message."
+  :group 'message-sending
+  :type 'function)
 
 (defcustom message-subject-re-regexp "^[ \t]*\\([Rr][Ee]:[ \t]*\\)*[ \t]*"
   "*Regexp matching \"Re: \" in the subject line."
@@ -493,6 +499,12 @@ The function `message-bounce' runs this hook."
   :group 'message-various
   :type 'hook)
 
+(defcustom message-supersede-setup-hook nil
+  "Normal hook, run each time a supersede message is initialized.
+The function `message-supersede' runs this hook."
+  :group 'message-various
+  :type 'hook)
+
 (defcustom message-mode-hook nil
   "Hook run in message mode buffers."
   :group 'message-various
@@ -501,8 +513,8 @@ The function `message-bounce' runs this hook."
 (defcustom message-header-hook nil
   "Hook run in a message mode before header encode. Buffer narrowed 
 to the headers."
-  :group 'message-various
-  :type 'hook)
+   :group 'message-various
+   :type 'hook)
 
 (defcustom message-header-encode-function
   'eword-encode-header
@@ -3842,6 +3854,10 @@ responses here are directed to other newsgroups."))
 	    (message "Canceling your article...done"))
 	(kill-buffer buf)))))
 
+(defun message-supersede-setup-for-mime-edit ()
+  (set (make-local-variable 'message-setup-hook) nil)
+  (mime-edit-again))
+
 ;;;###autoload
 (defun message-supersede ()
   "Start composing a message to supersede the current message.
@@ -3875,7 +3891,11 @@ header line with the old Message-ID."
     (goto-char (point-max))
     (insert mail-header-separator)
     (widen)
-    (forward-line 1)))
+    (when message-supersede-setup-function
+      (funcall message-supersede-setup-function))
+    (run-hooks 'message-supersede-setup-hook)
+    (goto-char (point-min))
+    (search-forward (concat "\n" mail-header-separator "\n") nil t)))
 
 ;;;###autoload
 (defun message-recover ()
@@ -4062,9 +4082,6 @@ Optional NEWS will use news to forward instead of mail."
     (message "Resending message to %s...done" address)))
 
 (defun message-bounce-setup-for-mime-edit ()
-  (goto-char (point-min))
-  (when (search-forward (concat "\n" mail-header-separator "\n") nil t)
-    (replace-match "\n\n"))
   (set (make-local-variable 'message-setup-hook) nil)
   (mime-edit-again))
 
