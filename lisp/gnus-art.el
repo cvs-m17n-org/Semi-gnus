@@ -1,8 +1,9 @@
-;;; gnus-art.el --- article mode commands for Gnus
+;;; gnus-art.el --- article mode commands for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -33,6 +34,8 @@
 (require 'gnus-spec)
 (require 'gnus-int)
 (require 'browse-url)
+(require 'alist)
+(require 'mime-view)
 
 (defgroup gnus-article nil
   "Article display."
@@ -365,13 +368,13 @@ be used as possible file names."
   :group 'gnus-article-mime
   :type 'boolean)
 
-(defcustom gnus-show-mime-method 'metamail-buffer
+(defcustom gnus-show-mime-method 'gnus-article-preview-mime-message
   "Function to process a MIME message.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
 
-(defcustom gnus-decode-encoded-word-method 'gnus-article-de-quoted-unreadable
+(defcustom gnus-decode-encoded-word-method 'gnus-article-decode-encoded-word
   "*Function to decode MIME encoded words.
 The function is called from the article buffer."
   :group 'gnus-article-mime
@@ -923,84 +926,14 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-(defun gnus-hack-decode-rfc1522 ()
-  "Emergency hack function for avoiding problems when decoding."
-  (let ((buffer-read-only nil))
-    (goto-char (point-min))
-    ;; Remove encoded TABs.
-    (while (search-forward "=09" nil t)
-      (replace-match " " t t))
-    ;; Remove encoded newlines.
-    (goto-char (point-min))
-    (while (search-forward "=10" nil t)
-      (replace-match " " t t))))
-
-(defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
-(defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
-(defun article-decode-rfc1522 ()
-  "Hack to remove QP encoding from headers."
-  (let ((case-fold-search t)
-	(inhibit-point-motion-hooks t)
-	(buffer-read-only nil)
-	string)
-    (save-restriction
-      (narrow-to-region
-       (goto-char (point-min))
-       (or (search-forward "\n\n" nil t) (point-max)))
-      (goto-char (point-min))
-      (while (re-search-forward
-	      "=\\?iso-8859-1\\?q\\?\\([^?\t\n]*\\)\\?=" nil t)
-	(setq string (match-string 1))
-	(save-restriction
-	  (narrow-to-region (match-beginning 0) (match-end 0))
-	  (delete-region (point-min) (point-max))
-	  (insert string)
-	  (article-mime-decode-quoted-printable
-	   (goto-char (point-min)) (point-max))
-	  (subst-char-in-region (point-min) (point-max) ?_ ? )
-	  (goto-char (point-max)))
-	(goto-char (point-min))))))
-
-(defun article-de-quoted-unreadable (&optional force)
-  "Do a naive translation of a quoted-printable-encoded article.
-This is in no way, shape or form meant as a replacement for real MIME
-processing, but is simply a stop-gap measure until MIME support is
-written.
-If FORCE, decode the article whether it is marked as quoted-printable
-or not."
-  (interactive (list 'force))
-  (save-excursion
-    (let ((case-fold-search t)
-	  (buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding")))
-      (gnus-article-decode-rfc1522)
-      (when (or force
-		(and type (string-match "quoted-printable" (downcase type))))
-	(goto-char (point-min))
-	(search-forward "\n\n" nil 'move)
-	(article-mime-decode-quoted-printable (point) (point-max))))))
-
-(defun article-mime-decode-quoted-printable-buffer ()
-  "Decode Quoted-Printable in the current buffer."
-  (article-mime-decode-quoted-printable (point-min) (point-max)))
-
-(defun article-mime-decode-quoted-printable (from to)
-  "Decode Quoted-Printable in the region between FROM and TO."
-  (interactive "r")
-  (goto-char from)
-  (while (search-forward "=" to t)
-    (cond ((eq (following-char) ?\n)
-	   (delete-char -1)
-	   (delete-char 1))
-	  ((looking-at "[0-9A-F][0-9A-F]")
-	   (subst-char-in-region
-	    (1- (point)) (point) ?=
-	    (hexl-hex-string-to-integer
-	     (buffer-substring (point) (+ 2 (point)))))
-	   (delete-char 2))
-	  ((looking-at "=")
-	   (delete-char 1))
-	  ((gnus-message 3 "Malformed MIME quoted-printable message")))))
+(defun gnus-article-decode-rfc1522 ()
+  "Decode MIME encoded-words in header fields."
+  (let (buffer-read-only)
+    (let ((charset (save-excursion
+		     (set-buffer gnus-summary-buffer)
+		     default-mime-charset)))
+      (eword-decode-header charset)
+      )))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1917,7 +1850,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
        ["Remove carriage return" gnus-article-remove-cr t]
-       ["Remove quoted-unreadable" gnus-article-de-quoted-unreadable t]))
+       ))
 
     (when nil
       (when (boundp 'gnus-summary-article-menu)
@@ -2022,6 +1955,41 @@ commands:
        (forward-line line)
        (point)))))
 
+;;; @@ article filters
+;;;
+
+(defun gnus-article-preview-mime-message ()
+  (make-local-variable 'mime-button-mother-dispatcher)
+  (setq mime-button-mother-dispatcher
+	(function gnus-article-push-button))
+  (let ((default-mime-charset
+	  (save-excursion
+	    (set-buffer gnus-summary-buffer)
+	    default-mime-charset))
+	)
+    (save-excursion
+      (mime-view-mode nil nil nil gnus-original-article-buffer
+		      gnus-article-buffer
+		      gnus-article-mode-map)
+      ))
+  (run-hooks 'gnus-mime-article-prepare-hook)
+  )
+
+(defun gnus-article-decode-encoded-word ()
+  "Header filter for gnus-article-mode.
+It is registered to variable `mime-view-content-header-filter-alist'."
+  (let ((charset (save-excursion
+		   (set-buffer gnus-summary-buffer)
+		   default-mime-charset)))
+    (eword-decode-header charset)
+    (goto-char (point-min))
+    (if (search-forward "\n\n" nil t)
+	(decode-mime-charset-region (match-end 0) (point-max) charset))
+    (mime-maybe-hide-echo-buffer)
+    )
+  (gnus-run-hooks 'gnus-mime-article-prepare-hook)
+  )
+
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
 ARTICLE should either be an article number or a Message-ID.
@@ -2119,9 +2087,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(when gnus-show-mime
 		  (if (or (not gnus-strict-mime)
 			  (gnus-fetch-field "Mime-Version"))
-		      (let ((coding-system-for-write 'binary)
-			    (coding-system-for-read 'binary))
-			(funcall gnus-show-mime-method))
+		      (funcall gnus-show-mime-method)
 		    (funcall gnus-decode-encoded-word-method)))
 		;; Perform the article display hooks.
 		(gnus-run-hooks 'gnus-article-display-hook))
@@ -3263,6 +3229,45 @@ forbidden in URL encoding."
     (select-window (get-buffer-window gnus-article-buffer t))
     (gnus-article-prev-page)
     (select-window win)))
+
+
+;;; @ for mime-view
+;;;
+
+(defun gnus-content-header-filter ()
+  "Header filter for mime-view.
+It is registered to variable `mime-view-content-header-filter-alist'."
+  (eword-decode-header default-mime-charset))
+
+(defun mime-view-quitting-method-for-gnus ()
+  (if (not gnus-show-mime)
+      (mime-view-kill-buffer))
+  (delete-other-windows)
+  (gnus-article-show-summary)
+  (if (or (not gnus-show-mime)
+	  (null gnus-have-all-headers))
+      (gnus-summary-select-article nil t)
+    ))
+
+(set-alist 'mime-view-content-header-filter-alist
+	   'gnus-original-article-mode
+	   (function gnus-content-header-filter))
+
+(set-alist 'mime-text-decoder-alist
+	   'gnus-original-article-mode
+	   (function mime-text-decode-buffer))
+
+(set-alist 'mime-view-quitting-method-alist
+	   'gnus-original-article-mode
+	   (function mime-view-quitting-method-for-gnus))
+
+(set-alist 'mime-view-show-summary-method
+	   'gnus-original-article-mode
+	   (function mime-view-quitting-method-for-gnus))
+
+
+;;; @ end
+;;;
 
 (gnus-ems-redefine)
 

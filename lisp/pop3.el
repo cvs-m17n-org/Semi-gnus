@@ -1,10 +1,10 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996,1997 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3l
+;; Version: 1.3l+himi-1
 
 ;; This file is part of GNU Emacs.
 
@@ -37,7 +37,7 @@
 (require 'mail-utils)
 (provide 'pop3)
 
-(defconst pop3-version "1.3l")
+(defconst pop3-version "1.3l+")
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -49,7 +49,10 @@
 (defvar pop3-password-required t
   "*Non-nil if a password is required when connecting to POP server.")
 (defvar pop3-password nil
-  "*Password to use when connecting to POP server.")
+  "*Password to use when connecting to POP server.
+If this variable is t, your input password would be memorized.")
+(defvar pop3-use-last-command nil
+  "*Non-nil when you want to use `LAST' command to get unread messages.")
 
 (defvar pop3-authentication-scheme 'pass
   "*POP3 authentication scheme.
@@ -59,6 +62,9 @@ values are 'apop.")
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
+
+(defvar pop3-movemail-file-coding-system 'binary
+  "Crashbox made by pop3-movemail with this coding system.")
 
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
@@ -70,28 +76,31 @@ Used for APOP authentication.")
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
 	 message-count
-	 (pop3-password pop3-password)
+	 password
 	 )
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
     ;; query for password
-    (if (and pop3-password-required (not pop3-password))
-	(setq pop3-password
+    (if (and pop3-password-required (not (stringp pop3-password)))
+	(setq password
 	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
     (cond ((equal 'apop pop3-authentication-scheme)
-	   (pop3-apop process pop3-maildrop))
+	   (pop3-apop process pop3-maildrop password))
 	  ((equal 'pass pop3-authentication-scheme)
 	   (pop3-user process pop3-maildrop)
-	   (pop3-pass process))
+	   (pop3-pass process password))
 	  (t (error "Invalid POP3 authentication scheme.")))
     (setq message-count (car (pop3-stat process)))
+    (if pop3-use-last-command
+	(setq n (+ 1 (pop3-last process))))
     (while (<= n message-count)
       (message (format "Retrieving message %d of %d from %s..."
 		       n message-count pop3-mailhost))
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(append-to-file (point-min) (point-max) crashbox)
+	(let ((coding-system-for-write pop3-movemail-file-coding-system))
+	  (append-to-file (point-min) (point-max) crashbox))
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))
@@ -103,6 +112,7 @@ Used for APOP authentication.")
       )
     (pop3-quit process)
     (kill-buffer crashbuf)
+    (if pop3-password (setq pop3-password password))
     )
   )
 
@@ -111,7 +121,8 @@ Used for APOP authentication.")
 Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
-	(process))
+	(process)
+	(coding-system-for-read 'binary))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
@@ -123,8 +134,7 @@ Returns the process associated with the connection."
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
 		       (+ 1 (or (string-match ">" response) -1)))))
-    process
-    ))
+    process))
 
 ;; Support functions
 
@@ -256,17 +266,17 @@ Return the response string if optional second argument is non-nil."
     (if (not (and response (string-match "+OK" response)))
 	(error (format "USER %s not valid." user)))))
 
-(defun pop3-pass (process)
+(defun pop3-pass (process password)
   "Send authentication information to the server."
-  (pop3-send-command process (format "PASS %s" pop3-password))
+  (pop3-send-command process (format "PASS %s" password))
   (let ((response (pop3-read-response process t)))
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-(defun pop3-apop (process user)
+(defun pop3-apop (process user password)
   "Send alternate authentication information to the server."
   (if (not (fboundp 'md5)) (autoload 'md5 "md5"))
-  (let ((hash (md5 (concat pop3-timestamp pop3-password))))
+  (let ((hash (md5 (concat pop3-timestamp password))))
     (pop3-send-command process (format "APOP %s %s" user hash))
     (let ((response (pop3-read-response process t)))
       (if (not (and response (string-match "+OK" response)))

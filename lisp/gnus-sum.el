@@ -1,8 +1,9 @@
-;;; gnus-sum.el --- summary mode commands for Gnus
+;;; gnus-sum.el --- summary mode commands for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;; Keywords: news
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -33,7 +34,14 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
+(require 'std11)
+(require 'mime-view)
+
+(or (string< "1" eword-decode-version)
+    (error "Please install latest SEMI."))
+
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
+(autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
 (defcustom gnus-kill-summary-on-exit t
   "*If non-nil, kill the summary buffer when you exit from it.
@@ -325,7 +333,7 @@ variable."
   :group 'gnus-article-various
   :type 'boolean)
 
-(defcustom gnus-show-mime nil
+(defcustom gnus-show-mime t
   "*If non-nil, do mime processing of articles.
 The articles will simply be fed to the function given by
 `gnus-show-mime-method'."
@@ -659,18 +667,24 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-structured-field-decoder 'identity
+(defcustom gnus-structured-field-decoder
+  #'eword-decode-and-unfold-structured-field
   "Function to decode non-ASCII characters in structured field for summary."
   :group 'gnus-various
   :type 'function)
 
-(defcustom gnus-unstructured-field-decoder 'identity
+(defcustom gnus-unstructured-field-decoder
+  (function
+   (lambda (string)
+     (eword-decode-unstructured-field-body
+      (std11-unfold-string string) 'must-unfold)
+     ))
   "Function to decode non-ASCII characters in unstructured field for summary."
   :group 'gnus-various
   :type 'function)
 
 (defcustom gnus-parse-headers-hook
-  (list 'gnus-hack-decode-rfc1522 'gnus-decode-rfc1522)
+  '(gnus-set-summary-default-charset)
   "*A hook called before parsing the headers."
   :group 'gnus-various
   :type 'hook)
@@ -1137,6 +1151,7 @@ increase the score of each group you read."
     [delete] gnus-summary-prev-page
     [backspace] gnus-summary-prev-page
     "\r" gnus-summary-scroll-up
+    "\e\r" gnus-summary-scroll-down
     "n" gnus-summary-next-unread-article
     "p" gnus-summary-prev-unread-article
     "N" gnus-summary-next-article
@@ -1218,6 +1233,7 @@ increase the score of each group you read."
     "t" gnus-article-hide-headers
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
+    "v" gnus-summary-preview-mime-message
     "\C-c\C-v\C-v" gnus-uu-decode-uu-view
     "\C-d" gnus-summary-enter-digest-group
     "\M-\C-d" gnus-summary-read-document
@@ -1361,7 +1377,6 @@ increase the score of each group you read."
     "e" gnus-article-emphasize
     "w" gnus-article-fill-cited-article
     "c" gnus-article-remove-cr
-    "q" gnus-article-de-quoted-unreadable
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
@@ -1614,7 +1629,6 @@ increase the score of each group you read."
 	["Word wrap" gnus-article-fill-cited-article t]
 	["CR" gnus-article-remove-cr t]
 	["Show X-Face" gnus-article-display-x-face t]
-	["Quoted-Printable" gnus-article-de-quoted-unreadable t]
 	["UnHTMLize" gnus-article-treat-html t]
 	["Rot 13" gnus-summary-caesar-message t]
 	["Unix pipe" gnus-summary-pipe-message t]
@@ -4716,7 +4730,7 @@ taken into consideration."
       (let ((max (max (point) (mark)))
 	    articles article)
 	(save-excursion
-	  (goto-char (min (min (point) (mark))))
+	  (goto-char (min (point) (mark)))
 	  (while
 	      (and
 	       (push (setq article (gnus-summary-article-number)) articles)
@@ -5229,6 +5243,28 @@ which existed when entering the ephemeral is reset."
       (gnus-summary-next-subject 1 nil t)
       (gnus-summary-recenter)
       (gnus-summary-position-point))))
+
+(defun gnus-summary-preview-mime-message (arg)
+  "MIME decode and play this message."
+  (interactive "P")
+  (let ((gnus-break-pages nil))
+    (gnus-summary-select-article t t)
+    )
+  (pop-to-buffer gnus-original-article-buffer t)
+  (let (buffer-read-only)
+    (if (text-property-any (point-min) (point-max) 'invisible t)
+	(remove-text-properties (point-min) (point-max)
+				gnus-hidden-properties)
+      ))
+  (mime-view-mode nil nil nil gnus-original-article-buffer
+		  gnus-article-buffer)
+  )
+
+(defun gnus-summary-scroll-down ()
+  "Scroll down one line current article."
+  (interactive)
+  (gnus-summary-scroll-up -1)
+  )
 
 ;;; Dead summaries.
 
@@ -8969,6 +9005,33 @@ save those articles instead."
 	   (switch-to-buffer buf)
 	   (gnus-summary-exit))
 	 buffers)))))
+
+
+;;; @ for mime-partial
+;;;
+
+(defun gnus-mime-partial-preview-function ()
+  (gnus-summary-preview-mime-message (gnus-summary-article-number))
+  )
+
+(autoload 'mime-combine-message/partials-automatically
+  "mime-partial"
+  "Internal method to combine message/partial messages automatically.")
+
+(set-atype 'mime-acting-condition
+	   '((type . "message/partial")
+	     (method . mime-combine-message/partials-automatically)
+	     (major-mode . gnus-original-article-mode)
+	     (summary-buffer-exp . gnus-summary-buffer)
+	     ))
+
+(set-alist 'mime-view-partial-message-method-alist
+	   'gnus-original-article-mode
+	   'gnus-mime-partial-preview-function)
+
+
+;;; @ end
+;;;
 
 (gnus-ems-redefine)
 
