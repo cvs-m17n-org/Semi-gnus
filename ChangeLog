@@ -1,3 +1,45 @@
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Use
+	`mime-display-message' instead of `mime-view-buffer'.
+	(gnus-article-display-traditional-message): Set
+	`gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Modify for
+	`gnus-article-display-traditional-message'.
+	(gnus-article-prepare): Use `mime-parse-buffer' and
+	`mime-entity-fetch-field'; don't set gnus-article-buffer.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi, texi/gnus.texi (Using MIME): Modify
+	description about new display mechanism.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for this branch.
+
+	* lisp/gnus-art.el (gnus-article-display-method-for-mime): New
+	variable; abolish `gnus-show-mime-method'.
+	(gnus-article-display-method-for-encoded-word): New variable;
+	abolish `gnus-decode-encoded-word-method'.
+	(gnus-article-display-method-for-traditional): New variable.
+	(gnus-article-display-mime-message): New function; abolish
+	`gnus-article-preview-mime-message'.
+	(gnus-article-display-traditional-message): New function.
+	(gnus-article-display-message-with-encoded-word): New function;
+	abolish `gnus-article-decode-encoded-word'.
+	(gnus-article-prepare): Change display mechanism; use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+	(gnus-request-original-article): New function.
+
 1998-06-22  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
