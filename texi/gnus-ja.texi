@@ -558,9 +558,6 @@ Marking Articles
 * Unread Articles::             未読記事への印
 * Read Articles::               既読記事への印
 * Other Marks::                 購読度に影響しない印
-
-Marking Articles
-
 * Setting Marks::               印の付け方と消し方
 * Generic Mark Commands::       印をどのようにカスタマイズするか
 * Setting Process Marks::       後の実行のための記事の印の付け方
@@ -5542,17 +5539,14 @@ News, , message, Message Manual}) を使って、あなただけがあなたのメッセー
 
 加えて、購読度に影響しない印もあります。
 
-@menu
-* Unread Articles::             未読記事への印
-* Read Articles::               既読記事への印
-* Other Marks::                 購読度に影響しない印
-@end menu
-
 @ifinfo
 これらの印を操作する過剰なくらいの命令があります:
 @end ifinfo
 
 @menu
+* Unread Articles::             未読記事への印
+* Read Articles::               既読記事への印
+* Other Marks::                 購読度に影響しない印
 * Setting Marks::               印の付け方と消し方
 * Generic Mark Commands::       印をどのようにカスタマイズするか
 * Setting Process Marks::       後の実行のための記事の印の付け方
@@ -13242,7 +13236,7 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
       ;; @r{うにしています。しかし本当に相互投稿された記事を相互投稿}
       ;; @r{することは許しています。}
       (any "bugs-mypackage@@somewhere" "mypkg.bugs")
-      (any "mypackage@@somewhere\" - "bugs-mypackage" "mypkg.list")
+      (any "mypackage@@somewhere" - "bugs-mypackage" "mypkg.list")
       ;; @r{人々@dots{}}
       (any "larsi@@ifi\\.uio\\.no" "people.Lars_Magne_Ingebrigtsen"))
    ;; @r{合致しなかったメールは全てを捕まえるグループへ行きます。}
