@@ -1,9 +1,16 @@
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.21 (quimby) revision 00.
+
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.20 revision 00.
+
 2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Added Article Buttons.  Added Upgrading (from Simon
 	Josefsson).  Add gnus-mime-delete-part, markup fixes and some
 	other corrections.  Mention Gnus FAQ.
-	
 
 2003-04-30  Jesper Harder  <harder@ifa.au.dk>
 
