@@ -1037,8 +1037,12 @@ The cdr of ech entry is a function for applying the face to a region.")
   "Coding system to encode outgoing mail.")
 
 (defvar message-draft-coding-system 
-  (if (string-match "XEmacs\\|Lucid" emacs-version)
-      'escape-quoted 'emacs-mule)
+  (cond 
+   ((not (fboundp 'coding-system-p)) nil)
+   ((coding-system-p 'emacs-mule) 'emacs-mule)
+   ((coding-system-p 'escape-quoted) 'escape-quoted)
+   ((coding-system-p 'no-conversion) 'no-conversion)
+   (t nil))
   "Coding system to compose mail.")
 
 (defvar message-default-charset 'iso-8859-1
@@ -2289,7 +2293,8 @@ the user from the mailer."
 	(message-do-fcc)
 	;;(when (fboundp 'mail-hist-put-headers-into-history)
 	;; (mail-hist-put-headers-into-history))
-	(run-hooks 'message-sent-hook)
+	(save-excursion
+	  (run-hooks 'message-sent-hook))
 	(message "Sending...done")
 	;; Mark the buffer as unmodified and delete autosave.
 	(set-buffer-modified-p nil)
@@ -4772,7 +4777,7 @@ regexp varstr."
 ;; I really think this function should be renamed.  It is only useful
 ;; for inserting file attachments.
 
-(defun message-insert-mime-part (file type description)
+(defun message-mime-attach-file (file type description)
   "Attach a file to the outgoing MIME message.
 The file is not inserted or encoded until you send the message with
 `\\[message-send-and-exit]' or `\\[message-send]'.

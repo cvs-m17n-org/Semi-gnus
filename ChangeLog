@@ -1,3 +1,9 @@
+1998-12-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.049.
+
+	* Sync up with Pterodactyl Gnus 0.64.
+
 1998-12-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-show-article): Don't use

@@ -944,7 +944,9 @@ always hide."
 	  (forward-line 1))))))
 
 (defun article-treat-dumbquotes ()
-  "Translate M******** sm*rtq**t*s into proper text."
+  "Translate M******** sm*rtq**t*s into proper text.
+Note that this function guesses whether a character is a sm*rtq**t* or
+not, so it should only be used interactively."
   (interactive)
   (article-translate-strings gnus-article-dumbquotes-map))
 
@@ -2467,6 +2469,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Interactively choose a view method for the MIME part under point."
   (interactive)
   (gnus-article-check-buffer)
+  (mm-setup-w3)
   (let ((data (get-text-property (point) 'gnus-data))
 	(url-standalone-mode (not gnus-plugged)))
     (mm-interactively-view-part data)))
@@ -2498,6 +2501,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Insert the MIME part under point into the current buffer."
   (interactive "P") ; For compatibility reasons we are not using "z".
   (gnus-article-check-buffer)
+  (mm-setup-w3)
   (let* ((data (get-text-property (point) 'gnus-data))
 	 contents
 	 (url-standalone-mode (not gnus-plugged))
@@ -2518,6 +2522,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "View the MIME part under point with an external viewer."
   (interactive)
   (gnus-article-check-buffer)
+  (mm-setup-w3)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (url-standalone-mode (not gnus-plugged))
 	 (mm-user-display-methods nil)
@@ -2532,6 +2537,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "View the MIME part under point with an internal viewer."
   (interactive)
   (gnus-article-check-buffer)
+  (mm-setup-w3)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
 	 (url-standalone-mode (not gnus-plugged))
 	 (mm-user-display-methods '((".*" . inline)))
@@ -2635,6 +2641,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(gnus-tmp-length (with-current-buffer (mm-handle-buffer handle)
 			   (buffer-size)))
 	gnus-tmp-type-long b e)
+    (when (string-match ".*/" gnus-tmp-name)
+      (setq gnus-tmp-name (replace-match "" t t gnus-tmp-name)))
     (setq gnus-tmp-type-long (concat gnus-tmp-type
 				     (and (not (equal gnus-tmp-name ""))
 					  (concat "; " gnus-tmp-name))))
@@ -2670,6 +2678,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 
 (defun gnus-widget-press-button (elems el)
   (goto-char (widget-get elems :from))
+  (mm-setup-w3)
   (let ((url-standalone-mode (not gnus-plugged)))
     (gnus-article-press-button)))
 
