@@ -1,3 +1,7 @@
+2002-01-12  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* texi/gnus-ja.texi (Article Date): Update Japanese translation.
+
 2002-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (butlast): Fix a serious bug that it behaved

@@ -8166,7 +8166,7 @@ UT (別名 GMT, ZULU) で日付を表示します (@code{gnus-article-date-ut})
 @item W T l
 @kindex W T l (概略)
 @findex gnus-article-date-local
-日付をその地域の時間帯で表示します (@code{gnus-article-date-local})。
+日付を利用者の地域の時間帯で表示します (@code{gnus-article-date-local})。
 
 @item W T p
 @kindex W T p (概略)
