@@ -5953,6 +5953,12 @@ be displayed."
 	  (gnus-article-show-all-headers))
 	'old))))
 
+(defun gnus-summary-force-verify-and-decrypt ()
+  (interactive)
+  (let ((mm-verify-option 'known)
+	(mm-decrypt-option 'known))
+    (gnus-summary-select-article nil 'force)))
+
 (defun gnus-summary-set-current-mark (&optional current-mark)
   "Obsolete function."
   nil)

@@ -219,7 +219,7 @@ one charsets.")
     (setq name (buffer-substring-no-properties
 		(point) (progn (forward-sexp 1) (point))))
     (skip-chars-forward " \t\n")
-    (while (not (looking-at ">"))
+    (while (not (looking-at ">[ \t]*\n?"))
       (setq elem (buffer-substring-no-properties
 		  (point) (progn (forward-sexp 1) (point))))
       (skip-chars-forward "= \t\n")
@@ -229,7 +229,7 @@ one charsets.")
 	(setq val (match-string 1 val)))
       (push (cons (intern elem) val) contents)
       (skip-chars-forward " \t\n"))
-    (forward-char 1)
+    (goto-char (match-end 0))
     ;; Don't skip the leading space.
     ;;(skip-chars-forward " \t\n")
     (cons (intern name) (nreverse contents))))
@@ -396,11 +396,21 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	      (insert "\n--" mml-boundary "--\n")))))
        (t
 	(error "Invalid element: %S" cont)))
-      (let ((item (assoc (cdr (assq 'sign cont)) mml-sign-alist)))
+      (let ((item (assoc (cdr (assq 'sign cont)) mml-sign-alist))
+	    sender recipients)
 	(when item
+	  (if (setq sender (cdr (assq 'sender cont)))
+	      (message-options-set 'message-sender sender))
+	  (if (setq recipients (cdr (assq 'recipients cont)))
+	      (message-options-set 'message-sender recipients))
 	  (funcall (nth 1 item) cont)))
-      (let ((item (assoc (cdr (assq 'encrypt cont)) mml-encrypt-alist)))
+      (let ((item (assoc (cdr (assq 'encrypt cont)) mml-encrypt-alist))
+	    sender recipients)
 	(when item
+	  (if (setq sender (cdr (assq 'sender cont)))
+	      (message-options-set 'message-sender sender))
+	  (if (setq recipients (cdr (assq 'recipients cont)))
+	      (message-options-set 'message-sender recipients))
 	  (funcall (nth 1 item) cont))))))
 
 (defun mml-compute-boundary (cont)

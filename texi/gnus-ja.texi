@@ -1021,7 +1021,7 @@ Emacs for Heathens
 @vindex gnus-nntpserver-file
 @cindex NNTPSERVER
 @cindex @sc{nntp} server
-もしこの変数が設定されていなければ、gnus は @env{NNTPSERVER} 環境変数を
+もしこの変数が設定されていなければ、gnus は @code{NNTPSERVER} 環境変数を
 読みにいきます。もしその変数が設定されていなければ、
 gnus は @code{gnus-nntpserver-file} (設定されていない場合
 は @file{/etc/nntpserver}) がこの件に関して何かを言っていないかを調べま
