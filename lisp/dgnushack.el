@@ -367,6 +367,7 @@ You must specify the name of the package path as follows:
 (defun dgnushack-texi-format (&optional addsuffix)
   (if (not noninteractive)
       (error "batch-texinfo-format may only be used -batch."))
+  (require 'ptexinfmt)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
 	coding-system-for-write

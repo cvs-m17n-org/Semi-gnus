@@ -1,9 +1,7 @@
 2000-08-17  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* texi/Makefile.in (INFOSWI, XINFOSWI): Load ptexinfmt.el.
-
-	* lisp/dgnushack.el (dgnushack-texi-format): Don't require
-	`texinfmt'.
+	* lisp/dgnushack.el (dgnushack-texi-format): Require `ptexinfmt'
+	instead of `texinfmt'.
 	(dgnushack-install-package): Don't install ptexinfmt.el.
 	(dgnushack-make-package): Don't include ptexinfmt.el in MANIFEST.
 	(dgnushack-compile): Don't compile dgnushack.el nor ptexinfmt.el.
