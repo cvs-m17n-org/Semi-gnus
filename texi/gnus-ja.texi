@@ -11472,10 +11472,11 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 ときにこの関数を使うと、この面倒な作業を 1 スレッドにつき 1 回きりで済ま
 すことができます。
 
-この機能を利用するためには、まず変数 @code{nnmail-treat-duplicates} の値
-を非 nil に設定する必要があります (既定値のままなら問題ありません)。それ
-ができたら @code{nnmail-split-fancy-with-parent} を使ってみてください。
-コロンを使ってこんな風に書きます:
+この機能を利用するためには、まず変
+数 @code{nnmail-treat-duplicates} と @code{nnmail-cache-accepted-message-ids} の
+値を非 nil に設定する必要があります。それができた
+ら @code{nnmail-split-fancy-with-parent} を使ってみてください。コロンを
+使ってこんな風に書きます:
 @lisp
 (setq nnmail-split-fancy
       '(| (: nnmail-split-fancy-with-parent)
