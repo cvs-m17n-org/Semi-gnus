@@ -77,7 +77,7 @@
 
 (eval '(run-hooks 'gnus-offline-load-hook))
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl) (require 'static))
 (require 'custom)
 (require 'easymenu)
 (provide 'gnus-offline)
@@ -119,17 +119,19 @@
      miee-popup-menu
      gnus-group-toolbar)))
 
-(put 'gnus-offline-set-unplugged-state 'menu-enable 'gnus-offline-connected)
-(if (eq system-type 'windows-nt)
+(static-if (eq system-type 'windows-nt)
     (define-process-argument-editing "/hang\\.exe\\'"
       (lambda (x)
 	(general-process-argument-editing-function
 	 x nil t t nil t t))))
 
-(defcustom gnus-offline-auto-hangup t
-  "*Whether dialup-network automatically hang up when all online jobs has done."
+(defcustom gnus-offline-auto-ppp '(connect disconnect)
+  "*This variable decides whether to connect and/or disconnect automatically."
   :group 'gnus-offline
-  :type 'boolean)
+  :type '(choice
+	  (const :tag "Connection and Disconnection" (connect disconnect))
+	  (const :tag "Connection Only" (connect))
+	  (const :tag "Do Everything Manually" nil)))
 
 (defcustom gnus-offline-load-hook nil
   "*Hook to be run after the gnus-offline package has been loaded."
@@ -254,9 +256,12 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
     (hangup-line-1 . "Hang up line ... ")
     (hangup-line-2 . "Hang up line ... done.")
     (after-jobs-done-1 . "All online jobs has done.")
-    (toggle-auto-hangup-1 . "Auto hang up logic")
-    (toggle-auto-hangup-2 . "disabled.")
-    (toggle-auto-hangup-3 . "enabled.")
+    (set-auto-ppp-1 . "Connect and disconnect automatically.")
+    (set-auto-ppp-2 . "Connect automatically.")
+    (set-auto-ppp-3 . "Connect and disconnect manually.")
+    (set-auto-ppp-menu-1 . "Automatically Connect/Disconnect")
+    (set-auto-ppp-menu-2 . "Automatically Connect")
+    (set-auto-ppp-menu-3 . "Manually Connect/Disconnect")
     (toggle-on/off-send-mail-1 . "Sending mail immidiately.")
     (toggle-on/off-send-mail-2 . "Sending mail temporary to spool directory.")
     (toggle-articles-to-fetch-1 . "Articles fetch from server.")
@@ -278,7 +283,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
     (menu-miee-4 . "Message Online")
     (menu-1 . "Toggle articles to fetch")
     (menu-2 . "Toggle online/offline send mail")
-    (menu-3 . "Toggle auto hangup")
+    (menu-3 . "Set auto PPP")
     (menu-4 . "Expire articles")
     (menu-5 . "Set interval time")
     (menu-6 . "Hang up Line.")
@@ -290,15 +295,15 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 .emacs または .gnus.el の gnus-agent の設定を正しくしてください。")
     (error-check-2 ."警告!!: nnspool.el がロードされていません。
 .emacs または .gnus.el の nnspool の設定を正しくしてください。")
-    (connect-server-1 . "ダイヤルしています...")
-    (connect-server-2 . "ダイヤルしています...完了。")
+    (connect-server-1 . "接続しています...")
+    (connect-server-2 . "接続しています...完了。")
     (get-new-news-function-1 . "オンライン状態です。")
+    (set-auto-ppp-1 . "自動的に PPP 接続・切断します。")
+    (set-auto-ppp-2 . "自動的に PPP 接続します。")
+    (set-auto-ppp-3 . "手動で PPP 接続・切断します。")
     (hangup-line-1 . "切断しています...")
     (hangup-line-2 . "切断しています...完了。")
     (after-jobs-done-1 . "全てのオンライン処理を完了しました。")
-    (toggle-auto-hangup-1 . "自動切断機能を ")
-    (toggle-auto-hangup-2 . "オフ にしました。")
-    (toggle-auto-hangup-3 . "オン にしました。")
     (toggle-on/off-send-mail-1 . "メールを直接送信します。")
     (toggle-on/off-send-mail-2 . "メールはキューに送られます。")
     (toggle-articles-to-fetch-1 . "受信するメッセージは... ")
@@ -324,11 +329,14 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
      (menu-miee-4 . "Online 状態へ")
      (menu-1 . "取得記事種類の変更")
      (menu-2 . "Mail 送信方法(On/Off)の切替え")
-     (menu-3 . "自動切断の切替え")
+     (menu-3 . "自動 PPP 制御の設定")
      (menu-4 . "取得済記事を消す")
      (menu-5 . "記事取得間隔時間の設定")
      (menu-6 . "回線の切断")
-     (menu-7 . "プロパティ..."))))
+     (menu-7 . "プロパティ...")
+     (set-auto-ppp-menu-1 . "自動的に PPP 接続・切断")
+     (set-auto-ppp-menu-2 . "自動的に PPP 接続")
+     (set-auto-ppp-menu-3 . "手動で PPP 接続・切断"))))
 
 ;;; Functions
 
@@ -347,7 +355,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 
   ;; Menu and keymap
   (gnus-offline-define-menu-and-key)
-  
+
   ;; To transfer Mail/News function.
   (cond ((eq gnus-offline-mail-treat-environ 'offline)
 	 ;; send mail under offline environ.
@@ -369,7 +377,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	     (erase-buffer)
 	     (insert (gnus-offline-get-message 'error-check-1))
 	     (pop-to-buffer buffer)))
-	
+
 	  ((eq gnus-offline-news-fetch-method 'nnspool)
 	   (unless (featurep 'nnspool)
 	     (set-buffer (gnus-get-buffer-create buffer))
@@ -413,7 +421,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   "*Override function \"gnus-group-get-new-news\"."
   (interactive "P")
   (run-hooks 'gnus-offline-before-online-hook)
-  (if (functionp gnus-offline-dialup-function)
+  (if (and (memq 'connect gnus-offline-auto-ppp)
+	   (functionp gnus-offline-dialup-function))
       (funcall gnus-offline-dialup-function))
   (gnus-offline-get-new-news-function)
   (gnus-group-get-new-news arg))
@@ -470,7 +479,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   "*Set nnm* group level."
   (switch-to-buffer gnus-group-buffer)
   (goto-char (point-min))
-  
+
   ;; Save current level
   (if (not gnus-offline-stored-group-level)
       (while (re-search-forward " nnm" nil t)
@@ -512,13 +521,12 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(if (eq gnus-offline-articles-to-fetch 'mail)
 	    (progn
 	      ;; Send only mail and hang up...
-	      (if (and gnus-offline-connected
-		       gnus-offline-auto-hangup)
+	      (if gnus-offline-connected
 		  (gnus-offline-set-unplugged-state))
 	      ;; Disable fetch mail.
 	      (gnus-offline-disable-fetch-mail)
 	      (gnus-offline-after-jobs-done)))))
-  
+
   ;; News/Both
   (if (memq gnus-offline-articles-to-fetch '(both news))
       (progn
@@ -526,15 +534,13 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	    (cond ((eq gnus-offline-news-fetch-method 'nnagent)
 		   ;; Get New News (gnus-agent)
 		   (gnus-agent-toggle-plugged t)
-		  
+
 		   ;; fetch articles
 		   (gnus-agent-fetch-session)
-		  
+
 		   ;; Hang Up line. then set to offline status.
-		   (if (and gnus-offline-connected
-			    gnus-offline-auto-hangup)
-		       (gnus-offline-set-unplugged-state))
-		   
+		   (gnus-offline-set-unplugged-state)
+
 		   ;; All online jobs has done.
 		   (gnus-offline-after-jobs-done))
 		  (t
@@ -621,7 +627,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   "*Set to unplugged state."
   (interactive)
   ;; Hang Up Line.
-  (if (functionp gnus-offline-hangup-function)
+  (if (and (memq 'disconnect gnus-offline-auto-ppp)
+	   (functionp gnus-offline-hangup-function))
       (funcall gnus-offline-hangup-function))
   (setq gnus-offline-connected nil)
   (if (eq gnus-offline-news-fetch-method 'nnagent)
@@ -646,8 +653,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;; Hang Up line routine whe using nnspool
 ;;
 (defun gnus-offline-nnspool-hangup-line ()
-  (if (and gnus-offline-connected
-	   gnus-offline-auto-hangup)
+  (if gnus-offline-connected
       (gnus-offline-set-unplugged-state))
   (gnus-offline-after-jobs-done))
 ;;
@@ -669,19 +675,51 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 
 
 ;;
-;; Toggle auto hang up
+;; Set auto PPP
 ;;
-(defun gnus-offline-toggle-auto-hangup ()
-  "*Toggle auto hangup flag."
+(defun gnus-offline-set-auto-ppp ()
+  "*Decide whether to connect and/or disconnect automatically."
   (interactive)
-  (let ((string (gnus-offline-get-message 'toggle-auto-hangup-1)) str)
-    (if gnus-offline-auto-hangup
-	(progn
-	  (setq gnus-offline-auto-hangup nil
-		str (gnus-offline-get-message 'toggle-auto-hangup-2)))
-      (setq gnus-offline-auto-hangup t
-	    str (gnus-offline-get-message 'toggle-auto-hangup-3)))
-    (message (format "%s %s" string str))))
+  (let ((keys (key-description (this-command-keys)))
+	menu title str)
+    (cond ((or (string= "misc-user" keys)
+	       (string-match "^menu-bar" keys)
+	       (string-match "^mouse" keys))
+	   (setq title (gnus-offline-get-message 'menu-3))
+	   (setq menu
+		 (cons
+		  title
+		  (gnus-offline-get-menu-items
+		   '((set-auto-ppp-menu-1
+		      (progn
+			(setq gnus-offline-auto-ppp '(connect disconnect))
+			(message (gnus-offline-get-message 'set-auto-ppp-1)))
+		      t)
+		     (set-auto-ppp-menu-2
+		      (progn
+			(setq gnus-offline-auto-ppp '(connect))
+			(message (gnus-offline-get-message 'set-auto-ppp-2)))
+		      t)
+		     (set-auto-ppp-menu-3
+		      (progn
+			(setq gnus-offline-auto-ppp nil)
+			(message (gnus-offline-get-message 'set-auto-ppp-3)))
+		      t)))))
+	   (gnus-offline-popup menu title))
+	  (t
+	   (cond ((eq gnus-offline-auto-ppp nil)
+		  (setq gnus-offline-auto-ppp '(connect disconnect))
+		  (setq str (gnus-offline-get-message 'set-auto-ppp-1)))
+		 ((memq 'connect gnus-offline-auto-ppp)
+		  (cond ((memq 'disconnect gnus-offline-auto-ppp)
+			 (setq gnus-offline-auto-ppp '(connect))
+			 (setq str
+			       (gnus-offline-get-message 'set-auto-ppp-2)))
+			(t
+			 (setq gnus-offline-auto-ppp nil)
+			 (setq str
+			       (gnus-offline-get-message 'set-auto-ppp-3))))))
+	   (message str)))))
 ;;
 ;; Toggle offline/online to send mail.
 ;;
@@ -782,7 +820,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 (defun gnus-offline-define-menu-and-key ()
   "*Set key and menu."
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (if (featurep 'xemacs)
+      (static-if (featurep 'xemacs)
 	  (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-miee)
 	(gnus-offline-define-menu-on-miee))
     (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-agent))
@@ -791,7 +829,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	       (local-set-key "\C-coh" 'gnus-offline-set-unplugged-state)
 	       (local-set-key "\C-cof" 'gnus-offline-toggle-articles-to-fetch)
 	       (local-set-key "\C-coo" 'gnus-offline-toggle-on/off-send-mail)
-	       (local-set-key "\C-cox" 'gnus-offline-toggle-auto-hangup)
+	       (local-set-key "\C-cox" 'gnus-offline-set-auto-ppp)
 	       (local-set-key "\C-cos" 'gnus-offline-set-interval-time)
 	       (substitute-key-definition
 		'gnus-group-get-new-news 'gnus-offline-gnus-get-new-news
@@ -801,29 +839,68 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 		     (substitute-key-definition
 		      'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
 		      gnus-agent-group-mode-map)
-		     (local-set-key "\C-coe" 'gnus-offline-agent-expire)))
-	       (or (featurep 'xemacs)
-		   (define-key gnus-group-mode-map 
-		     (if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
-		     'gnus-offline-popup-menu))))
+		     (local-set-key "\C-coe" 'gnus-offline-agent-expire)))))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
       (add-hook 'gnus-summary-mode-hook
 		'(lambda ()
 		   (substitute-key-definition
 		    'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
 		    gnus-agent-summary-mode-map))))
-  (if (featurep 'xemacs)
-      ;; Overwrite the toolbar spec for gnus-group-mode.
-      (add-hook 'gnus-startup-hook
-		#'(lambda ()
-		    (catch 'tag
-		      (mapc (lambda (but)
-			      (when (eq 'gnus-group-get-new-news (aref but 1))
-				(aset but 1 'gnus-offline-gnus-get-new-news)
-				(throw 'tag nil)))
-			    gnus-group-toolbar))))))
+  (static-cond
+   ((featurep 'xemacs)
+    ;; Overwrite the toolbar spec for gnus-group-mode.
+    (add-hook 'gnus-startup-hook
+	      #'(lambda ()
+		  (catch 'tag
+		    (mapc (lambda (but)
+			    (when (eq 'gnus-group-get-new-news (aref but 1))
+			      (aset but 1 'gnus-offline-gnus-get-new-news)
+			      (throw 'tag nil)))
+			  gnus-group-toolbar)))))
+   (t
+    (define-key gnus-group-mode-map
+      (static-if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
+      'gnus-offline-popup-menu))))
 ;;
 ;;
+(defun gnus-offline-popup (menu &optional title)
+  (static-cond
+   ((featurep 'xemacs)
+    (popup-menu menu))
+   (t
+    (let (keymap keymap pop func)
+      (static-cond ((< emacs-major-version 20)
+		    ;; For Emacsen from 19.34 down to 19.28.
+		    ;; Seems the first item in MENU will be ignored.
+		    (or (keymapp menu)
+			(setq menu
+			      (append (list ""  ;; This will be ignored.
+					    (or title "Popup Menu")
+					    "-----"
+					    "-----")
+				      (cdr menu))))
+		    (setq keymap
+			  (if (keymapp menu)
+			      (append (list 'keymap
+					    (if title
+						`(nil ,title)
+					      '(nil "Popup Menu"))
+					    '(nil "")
+					    '(nil ""))
+				      (cdr menu))
+			    (easy-menu-create-keymaps (car menu)
+						      (cdr menu)))))
+		   (t
+		    (if (keymapp menu)
+			(setq keymap menu)
+		      (easy-menu-define keymap nil "" menu))))
+      ;; Display the popup menu.
+      (if (and (setq pop (x-popup-menu t keymap))
+	       (setq func (lookup-key keymap
+				      (apply 'vector pop))))
+	  (prog1 keymap
+	    (funcall func)))))))
+
 (defun gnus-offline-get-menu-items (list)
   (mapcar
    #'(lambda (el)
@@ -837,7 +914,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (gnus-offline-get-menu-items
    '((menu-1 gnus-offline-toggle-articles-to-fetch t)
      (menu-2 gnus-offline-toggle-on/off-send-mail t)
-     (menu-3 gnus-offline-toggle-auto-hangup t)
+     (menu-3 gnus-offline-set-auto-ppp t)
      "----"
      (menu-4 gnus-offline-agent-expire
 	     (eq gnus-offline-news-fetch-method 'nnagent))
@@ -863,8 +940,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	   nil "Miee"
 	   (append miee-menu
 		   (list (cons "Gnus Offline" gnus-offline-menu)))))
-    (and (featurep 'xemacs)
-	 (easy-menu-add menu))))
+    (static-if (featurep 'xemacs)
+	(easy-menu-add menu))))
 ;;
 ;; define menu without miee.
 ;;
@@ -873,36 +950,23 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (easy-menu-define
    gnus-offline-menu-on-agent gnus-group-mode-map "Gnus offline Menu"
    (cons "Offline" gnus-offline-menu))
-  (and (featurep 'xemacs)
-       (easy-menu-add gnus-offline-menu-on-agent)))
+  (static-if (featurep 'xemacs)
+      (easy-menu-add gnus-offline-menu-on-agent)))
 ;;
 ;; Popup menu within the group buffer (under Emacs).
 ;;
-(defvar gnus-offline-popup-menu nil)
-(defun gnus-offline-popup-menu (event)
-  "Popup menu for Gnus Offline."
-  (interactive "e")
-  (unless gnus-offline-popup-menu
-    (setq gnus-offline-popup-menu
-	  (let ((menu
-		 (if (boundp 'miee-popup-menu)
-		     (or (assq 'keymap
-				(assq 'Miee (assq 'menu-bar global-map)))
+(static-unless (featurep 'xemacs)
+  (defun gnus-offline-popup-menu (event)
+    "Popup menu for Gnus Offline."
+    (interactive "e")
+    (apply 'gnus-offline-popup
+	   (if (boundp 'miee-popup-menu)
+	       (list (or (assq 'keymap
+			       (assq 'Miee (assq 'menu-bar global-map)))
 			 miee-popup-menu)
-		   (symbol-value 'gnus-offline-menu-on-agent))))
-	    (if (string< emacs-version "20")
-		(append (list 'keymap
-			      (if (boundp 'miee-popup-menu)
-				  '(nil "Miee")
-				'(nil "Offline"))
-			      '(nil "")
-			      '(nil ""))
-			(cdr menu))
-	      menu))))
-  (let* ((pop (x-popup-menu t gnus-offline-popup-menu))
-	 (func (and pop (lookup-key gnus-offline-popup-menu
-				    (apply 'vector pop)))))
-    (and pop func (funcall func))))
+		     "Miee")
+	     (list (symbol-value 'gnus-offline-menu-on-agent)
+		   "Offline")))))
 
 ;;
 ;; Timer Function
