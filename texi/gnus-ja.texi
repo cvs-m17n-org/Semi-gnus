@@ -68,6 +68,8 @@
 \newcommand{\gnusversion}[1]{{\small\textit{#1}}}
 \newcommand{\gnusauthor}[1]{{\large\textbf{#1}}}
 \newcommand{\gnusresult}[1]{\gnustt{=> #1}}
+\newcommand{\gnusacronym}[1]{\textit{#1}}
+\newcommand{\gnusemail}[1]{\textit{#1}}
 
 \newcommand{\gnusbullet}{{${\bullet}$}}
 \newcommand{\gnusdollar}{\$}
@@ -8114,7 +8116,6 @@ gnus が記事を表示する既定のやり方を変えたいとき
 @item W m
 @kindex W m (概略)
 @findex gnus-summary-morse-message
-@c @icon{gnus-summary-morse-message}
 記事バッファをモールス復号します (@code{gnus-summary-morse-message})。
 
 @item W t
@@ -10513,6 +10514,14 @@ ISP が POP-before-SMTP の認証を要求している場合に有用です。関
 なくとも、メーリングリストへのフォローアップはたいていのときに動作します。
 これらのグループに投稿する事は (@kbd{a}) それでも苦痛を引き起こすでしょ
 うけど。
+
+@item gnus-version-expose-system
+@vindex gnus-version-expose-system
+
+ディフォルトでシステムタイプ (@samp{i686-pc-linux} のよう
+な @code{system-configuration} 変数の値) が自動的に生成され
+る User-Agent ヘッダーに現れます。それは (主に美的感覚によって) 消すこと
+が望まれるかもしれません。そういう場合は、これを @code{nil} にして下さい。
 @end table
 
 あなたは自分が送るメッセージの綴りを調べたいと思うかも知れません。もしく
@@ -12679,6 +12688,11 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @item mail-source-delete-incoming
 @vindex mail-source-delete-incoming
 @code{nil} でなければ、入って来たファイルは、それを処理した後に消去され
+ます。
+
+@item mail-source-ignore-errors
+@vindex mail-source-ignore-errors
+非-@code{nil} だったら、メールソースからメールを読むときのエラーを無視し
 ます。
 
 @item mail-source-directory

@@ -309,6 +309,12 @@ If nil, the address field will always be empty after invoking
   :group 'gnus-message
   :type 'boolean)
 
+(defcustom gnus-version-expose-system nil
+  "If non-nil, `system-configuration' is exposed in `gnus-extended-version'.
+Note that this variable is ineffective in T-gnus."
+  :group 'gnus-message
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar gnus-inhibit-posting-styles nil
