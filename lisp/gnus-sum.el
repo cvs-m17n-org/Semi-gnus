@@ -51,7 +51,6 @@
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-cache-write-active "gnus-cache")
-(autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 (autoload 'gnus-mailing-list-insinuate "gnus-ml" nil t)
 (autoload 'turn-on-gnus-mailing-list-mode "gnus-ml" nil t)
 (autoload 'mm-uu-dissect "mm-uu")
@@ -816,7 +815,7 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-parse-headers-hook '(gnus-set-summary-default-charset)
+(defcustom gnus-parse-headers-hook '(gnus-summary-inherit-default-charset)
   "*A hook called before parsing the headers."
   :group 'gnus-various
   :type 'hook)
@@ -11004,20 +11003,38 @@ UNREAD is a sorted list."
 ;;; @ end
 ;;;
 
+(defun gnus-summary-inherit-default-charset ()
+  "Import `default-mime-charset' from summary buffer."
+  (if (buffer-live-p gnus-summary-buffer)
+      (if (local-variable-p 'default-mime-charset gnus-summary-buffer)
+	  (progn
+	    (make-local-variable 'default-mime-charset)
+	    (setq default-mime-charset
+		  (with-current-buffer gnus-summary-buffer
+		    default-mime-charset)))
+	(kill-local-variable 'default-mime-charset))))
+
 (defun gnus-summary-setup-default-charset ()
   "Setup newsgroup default charset."
   (if (equal gnus-newsgroup-name "nndraft:drafts")
-      (setq gnus-newsgroup-charset nil)
-    (let* ((ignored-charsets
-	    (or gnus-newsgroup-ephemeral-ignored-charsets
-		(append
-		 (and gnus-newsgroup-name
-		      (gnus-parameter-ignored-charsets gnus-newsgroup-name))
-		 gnus-newsgroup-ignored-charsets))))
+      (progn
+	(setq gnus-newsgroup-charset nil)
+	(make-local-variable 'default-mime-charset)
+	(setq default-mime-charset nil))
+    (let ((ignored-charsets
+	   (or gnus-newsgroup-ephemeral-ignored-charsets
+	       (append
+		(and gnus-newsgroup-name
+		     (gnus-parameter-ignored-charsets gnus-newsgroup-name))
+		gnus-newsgroup-ignored-charsets)))
+	  charset)
       (setq gnus-newsgroup-charset
 	    (or gnus-newsgroup-ephemeral-charset
-		(and gnus-newsgroup-name
-		     (gnus-parameter-charset gnus-newsgroup-name))
+		(when (and gnus-newsgroup-name
+			   (setq charset (gnus-parameter-charset
+					  gnus-newsgroup-name)))
+		  (make-local-variable 'default-mime-charset)
+		  (setq default-mime-charset charset))
 		gnus-default-charset))
       (set (make-local-variable 'gnus-newsgroup-ignored-charsets)
 	   ignored-charsets))))
