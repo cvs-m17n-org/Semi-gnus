@@ -751,17 +751,13 @@ the actual number of articles toggled is returned."
       (pop gnus-agent-group-alist))))
 
 (defun gnus-agent-fetch-headers (group &optional force)
-  (gnus-agent-load-alist group)
-  ;; Find out what headers we need to retrieve.
-  (when articles
-    (while (and articles
-		(assq (car articles) gnus-agent-article-alist))
-      (pop articles))
-    (let ((arts articles))
-      (while (cdr arts)
-	(if (assq (cadr arts) gnus-agent-article-alist)
-	    (setcdr arts (cddr arts))
-	  (setq arts (cdr arts)))))
+  (let ((articles (if (gnus-agent-load-alist group)   
+		      (gnus-sorted-intersection
+		       (gnus-list-of-unread-articles group)
+		       (gnus-uncompress-range
+			(cons (1+ (caar (last gnus-agent-article-alist)))
+			      (cdr (gnus-active group)))))
+		    (gnus-list-of-unread-articles group))))
     ;; Fetch them.
     (when articles
       (gnus-message 7 "Fetching headers for %s..." group)
@@ -779,11 +775,11 @@ the actual number of articles toggled is returned."
 				(file-name-directory file)))
 	  (write-region (point-min) (point-max) file nil 'silent)
 	  (gnus-agent-save-alist group articles nil)
-	  (gnus-agent-enter-history "last-header-fetched-for-session"
-				    (list (cons group (nth (- (length  articles) 1) articles)))
-				    (gnus-time-to-day (current-time)))
-	t)))))
-
+	  (gnus-agent-enter-history
+	   "last-header-fetched-for-session"
+	   (list (cons group (nth (- (length  articles) 1) articles)))
+	   (gnus-time-to-day (current-time)))
+	  articles)))))
 
 (defsubst gnus-agent-copy-nov-line (article)
   (let (b e)
@@ -1353,7 +1349,8 @@ The following commands are available:
 		   (sort gnus-agent-article-alist 'car-less-than-car))
 	     (let* ((alist gnus-agent-article-alist)
 		    (prev (cons nil alist))
-		    (first prev))
+		    (first prev)
+		    expired)
 	       (while (and alist
 			   (<= (caar alist) article))
 		 (if (or (not (cdar alist))
@@ -1362,7 +1359,9 @@ The following commands are available:
 				(number-to-string
 				 (caar alist))
 				group))))
-		     (setcdr prev (setq alist (cdr alist)))
+		     (progn
+		       (push (caar alist) expired)
+		       (setcdr prev (setq alist (cdr alist))))
 		   (setq prev alist
 			 alist (cdr alist))))
 	       (setq gnus-agent-article-alist (cdr first))
@@ -1373,11 +1372,19 @@ The following commands are available:
 			 (gnus-range-add
 			  (nth 2 info)
 			  (cons 1 (- (caar gnus-agent-article-alist) 1)))))
+	       ;; Maybe everything has been expired from `gnus-article-alist'
+	       ;; and so the above marking as read could not be conducted,
+	       ;; or there are expired article within the range of the alist.
+	       (when (or (not (caar gnus-agent-article-alist))
+			 (> (car expired) (caar gnus-agent-article-alist)))  
+	       (setcar (nthcdr 2 info)
+		       (gnus-add-to-range
+			(nth 2 info)
+			(nreverse expired))))
 	       (gnus-dribble-enter
 		(concat "(gnus-group-set-info '"
 			(gnus-prin1-to-string info)
-			")"))
-	       (gnus-agent-save-alist group)))
+			")"))))
 	   expiry-hashtb)
 	  (set-buffer history)
 	  (setq histories (nreverse (sort histories '<)))

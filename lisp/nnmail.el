@@ -532,7 +532,8 @@ parameter.  It should return nil, `warn' or `delete'."
 			(aref t1 2) (aref t1 1) (aref t1 0)
 			(aref d1 2) (aref d1 1) (aref d1 0)
 			(number-to-string
-			 (* 60 (timezone-zone-to-minute (aref d1 4))))))))
+			 (* 60 (timezone-zone-to-minute
+                                (or (aref d1 4) (current-time-zone)))))))))
     ;; If we get an error, then we just return a 0 time.
     (error (list 0 0))))
 

@@ -505,7 +505,7 @@ used as score."
 	    (?l "lines" nil nil number)
 	    (?d "date" nil nil date)
 	    (?f "followup" nil nil string)
-	    (?t "thread" nil nil string)))
+	    (?t "thread" "message-id" nil string)))
 	 (char-to-type
 	  '((?s s "substring" string)
 	    (?e e "exact string" string)
@@ -591,7 +591,7 @@ used as score."
 	    ;; It was a majuscule, so we end reading and use the default.
 	    (if mimic (message "%c %c %c" prefix hchar tchar)
 	      (message ""))
-	    (setq pchar (or pchar ?p)))
+	    (setq pchar (or pchar ?t)))
 
 	  ;; We continue reading.
 	  (while (not pchar)

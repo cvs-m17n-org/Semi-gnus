@@ -2046,6 +2046,7 @@ The following commands are available:
   (let ((data gnus-newsgroup-data))
     (save-excursion
       (gnus-save-hidden-threads
+	(gnus-summary-show-all-threads)
 	(goto-char (point-min))
 	(while data
 	  (while (get-text-property (point) 'gnus-intangible)
@@ -3398,6 +3399,7 @@ If LINE, insert the rebuilt thread starting on line LINE."
 		  (while thread
 		    (gnus-remove-thread-1 (car thread))
 		    (setq thread (cdr thread))))
+	      (gnus-summary-show-all-threads)
 	      (gnus-remove-thread-1 thread))))))))
 
 (defun gnus-remove-thread-1 (thread)
@@ -7668,6 +7670,8 @@ returned."
 		   (= mark gnus-read-mark) (= mark gnus-souped-mark)
 		   (= mark gnus-duplicate-mark)))
       (setq mark gnus-expirable-mark)
+      ;; Let the backend know about the mark change.
+      (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
       (push article gnus-newsgroup-expirable))
     ;; Set the mark in the buffer.
     (gnus-summary-update-mark mark 'unread)
@@ -7677,6 +7681,8 @@ returned."
   "Mark the current article quickly as unread with MARK."
   (let* ((article (gnus-summary-article-number))
 	 (old-mark (gnus-summary-article-mark article)))
+      ;; Let the backend know about the mark change.
+      (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
     (if (eq mark old-mark)
 	t
       (if (<= article 0)
@@ -7732,6 +7738,8 @@ marked."
   (let* ((mark (or mark gnus-del-mark))
 	 (article (or article (gnus-summary-article-number)))
 	 (old-mark (gnus-summary-article-mark article)))
+      ;; Let the backend know about the mark change.
+      (setq mark (gnus-request-update-mark gnus-newsgroup-name article mark))
     (if (eq mark old-mark)
 	t
       (unless article

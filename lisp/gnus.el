@@ -1663,8 +1663,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-post-news gnus-summary-reply gnus-summary-reply-with-original
       gnus-summary-mail-forward gnus-summary-mail-other-window
       gnus-summary-resend-message gnus-summary-resend-bounced-mail
-      gnus-summary-wide-reply
-      gnus-bug)
+      gnus-summary-wide-reply gnus-summary-followup-to-mail
+      gnus-summary-followup-to-mail-with-original gnus-bug)
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons gnus-picons-article-display-x-face
       gnus-picons-display-x-face)
