@@ -4894,7 +4894,9 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 		(setq gnus-override-method (pop methods)))
 	      (while (not result)
 		(when (eq gnus-override-method 'current)
-		  (setq gnus-override-method gnus-current-select-method))
+		  (setq gnus-override-method
+			(with-current-buffer gnus-summary-buffer
+			  gnus-current-select-method)))
 		(erase-buffer)
 		(gnus-kill-all-overlays)
 		(let ((gnus-newsgroup-name group))
