@@ -397,6 +397,10 @@ Modify to suit your needs."))
 				   (1+ (match-end 0))
 				 (point-max))))
 	      (goto-char (point-min))
+	      ;; formerly EMACSINFOHACK in texi/Makefile.
+	      (while (re-search-forward "@\\(end \\)?ifnottex\n*" nil t)
+		(replace-match ""))
+	      (goto-char (point-min))
 	      ;; Add suffix if it is needed.
 	      (when (and addsuffix
 			 (re-search-forward

@@ -13,7 +13,6 @@ EMACS=@EMACS@
 EMACSINFO=$(EMACS) -batch -q -no-site-file
 INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
 XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
-EMACSINFOHACK=-eval '(while (re-search-forward "@\\(end \\)?ifnottex" nil t) (replace-match ""))'
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
@@ -42,29 +41,29 @@ message-ja.info: message-ja.texi
 most: texi2latex.elc latex latexps
 
 %-ja: %-ja.texi
-	cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
-	  $(EMACSINFOHACK) $(INFOSWI) ../texi/$<; \
+	cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<
 
 %-ja.info: %-ja.texi
-	cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
-	  $(EMACSINFOHACK)  $(XINFOSWI) ../texi/$<; \
+	cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<
 
 %.info: %.texi
-	if test $(MAKEINFO) = no; then \
-	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
-	    $(EMACSINFOHACK)  $(XINFOSWI) ../texi/$<; \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
+	  cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<; \
 	else \
-	  makeinfo -o $@ $<; \
+	  $(MAKEINFO) -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf
 
 .texi:
-	if test "x$(MAKEINFO)" != "xno" ; then \
-	  makeinfo -I $(srcdir) -o $* $<; \
+	if test "x$(MAKEINFO)" = "xno" \
+	  -o "$<" = "gnus-ja.texi" \
+	  -o "$<" = "message-ja.texi"; then \
+	  cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<; \
 	else \
-	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
-	    $(EMACSINFOHACK) $(INFOSWI) ../texi/$<; \
+	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi

@@ -1,3 +1,14 @@
+2001-02-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-texi-format): A workaround for
+	@ifnottex.
+
+	* texi/Makefile.in (.texi, %.info): Don't use makeinfo command when
+	gnus-ja.texi or message-ja.texi is given.  It is needed for some
+	make command if which can not understand "%-ja:" or "%-ja.info:".
+	(.texi, %.info, %-ja.info, %-ja): Don't eval `EMACSINFOHACK'.
+	(EMACSINFOHACK): Move to lisp/dgnushack.el.
+
 2001-01-29  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-mime-edit-exit): Use
