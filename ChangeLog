@@ -1,3 +1,31 @@
+1999-12-15  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 12.
+
+	* lisp/nnimap.el (nnimap-request-newgroups): Use `member-if'.
+
+	* lisp/lpath.el (toolbar-gnus, get-charset-property,
+	font-lock-set-defaults, find-coding-system, coding-system-get):
+	Bind them for FSF Emacsen.
+	(read-color, x-defined-colors, compute-motion): Don't bind.
+
+	* lisp/imap.el (imap-digest-md5-auth, imap-cram-md5-auth): Use
+	`base64-encode-string' and `base64-decode-string' instead of
+	`imap-base64-encode-string' or `imap-base64-decode-string'.
+	(base64-encode-string): New function.  It won't be defined if it
+	is already bound and the optional second arg is allowed.
+	(base64-decode-string): New function defined by `defun-maybe'.
+	(imap-base64-encode-string, imap-base64-decode-string): Remove.
+	(mel-find-function): Autoload "mel".
+
+	* lisp/dgnushack.el (read-color, x-defined-colors, event-object,
+	get-popup-menu-response, toolbar-gnus, get-charset-property,
+	find-coding-system, coding-system-get, font-lock-set-defaults):
+	Don't bind.
+	(union, member-if, mapcon, mapc, last): Don't define as compiler
+	macros under XEmacs.  It is based on Hrvoje's advice.
+	(member-if): New compiler macro for emulating cl function.
+
 1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/imap.el (imap-base64-encode-string): Use `static-if' instead
