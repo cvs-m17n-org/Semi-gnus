@@ -257,7 +257,8 @@ Please do not set this valiable non-nil if you do not use Meadow.")
   (setq passwd (nth 2 (assoc mailhost pop3-fma-password)))
   (pop3-fma-decode-string passwd))
 
-(setq pop3-read-passwd 'pop3-fma-read-passwd)
+(setq pop3-read-passwd 'pop3-fma-read-passwd
+      nnmail-read-passwd 'pop3-fma-read-passwd)
 ;;
 ;; Set multiple pop3 server's password
 (defun pop3-fma-store-password (passwd)
