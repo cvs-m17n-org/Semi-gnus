@@ -1,3 +1,34 @@
+2002-07-28  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Niklas Morberg <niklas.morberg@axis.com>.
+
+	* nnweb.el (nnweb-type, nnweb-type-definition)
+	(nnweb-gmane-create-mapping, nnweb-gmane-wash-article)
+	(nnweb-gmane-search, nnweb-gmane-identity): Added gmane
+	functionality.
+	* nnweb.el: Removed old non-functioning search engines.
+
+2002-07-27  Simon Josefsson  <jas@extundo.com>
+
+	* message.el (message-forward-make-body): Don't use
+	`message-forward-ignored-headers' when doing a "raw" followup (it
+	is important to preserve e.g. CTE).
+
+	* flow-fill.el (fill-flowed): Disable filladapt-mode.
+
+	* gnus-sieve.el (gnus-sieve-guess-rule-for-article): Don't
+	regexp-quote, Cyrus Sieve is fixed.
+
+	* sieve-manage.el (sieve-manage-deletescript): New function.
+
+	* sieve.el (sieve-manage-mode-map): Fix down-mouse-2 and down-mouse-3.  
+	(sieve-manage-mode): Fix menubar.
+	(sieve-activate): Change some messages.
+	(sieve-deactivate-all): New function.
+	(sieve-deactivate): New alias.
+	(sieve-remove): New function.
+	(sieve-help): Fix help.
+	All suggested by Ned Ludd.
+
 2002-07-24  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* mm-decode.el (mm-inline-text-html-with-images): Doc fix.
