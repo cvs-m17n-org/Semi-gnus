@@ -1,5 +1,7 @@
 1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* README.semi: Add description of `shuhei-k' branch.
+
 	* lisp/gnus-art.el (gnus-visible-headers): Add "Mail-Followup-To:"
 	and "Mail-Reply-To:" fields.
 
