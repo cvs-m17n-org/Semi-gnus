@@ -386,6 +386,11 @@ be restored and the command retried."
     (kill-buffer buffer)
     (nnheader-init-server-buffer)))
 
+(defun nntp-erase-buffer (buffer)
+  "Erase contents of BUFFER."
+  (with-current-buffer buffer
+    (erase-buffer)))
+
 (defsubst nntp-find-connection (buffer)
   "Find the connection delivering to BUFFER."
   (let ((alist nntp-connection-alist)
@@ -420,9 +425,7 @@ be restored and the command retried."
     (if process
         (progn
           (unless (or nntp-inhibit-erase nnheader-callback-function)
-            (save-excursion
-              (set-buffer (process-buffer process))
-              (erase-buffer)))
+	    (nntp-erase-buffer (process-buffer process)))
           (condition-case err
               (progn
                 (when command
@@ -449,9 +452,7 @@ be restored and the command retried."
   "Send STRINGS to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer)))
+    (nntp-erase-buffer nntp-server-buffer))
   (let* ((command (mapconcat 'identity strings " "))
 	 (process (nntp-find-connection nntp-server-buffer))
 	 (buffer (and process (process-buffer process)))
@@ -507,9 +508,7 @@ be restored and the command retried."
   "Send STRINGS to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer)))
+    (nntp-erase-buffer nntp-server-buffer))
   (let* ((command (mapconcat 'identity strings " "))
 	 (process (nntp-find-connection nntp-server-buffer))
 	 (buffer (and process (process-buffer process)))
@@ -524,11 +523,11 @@ be restored and the command retried."
 	  (unless wait-for
 	    (nntp-accept-response)
 	    (save-excursion
-	  (set-buffer buffer)
-	  (goto-char pos)
-	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn (forward-line 1) (point-at-bol))))
-	  )))
+	      (set-buffer buffer)
+	      (goto-char pos)
+	      (if (looking-at (regexp-quote command))
+		  (delete-region pos (progn (forward-line 1) (point-at-bol))))
+	      )))
       (nnheader-report 'nntp "Couldn't open connection to %s."
 		       nntp-address))))
 
@@ -536,9 +535,8 @@ be restored and the command retried."
   "Send the current buffer to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
-      (erase-buffer)))
+    (nntp-erase-buffer
+     (nntp-find-connection-buffer nntp-server-buffer)))
   (nntp-encode-text)
   (let ((multibyte (and (boundp 'enable-multibyte-characters)
 			(symbol-value 'enable-multibyte-characters))))
@@ -708,8 +706,7 @@ command whose response triggered the error."
      (catch 'done
        (save-excursion
          ;; Erase nntp-server-buffer before nntp-inhibit-erase.
-         (set-buffer nntp-server-buffer)
-         (erase-buffer)
+	 (nntp-erase-buffer nntp-server-buffer)
          (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
          ;; The first time this is run, this variable is `try'.  So we
          ;; try.
@@ -1139,9 +1136,7 @@ password contained in '~/.nntp-authinfo'."
     (funcall nntp-authinfo-function)
     ;; We have to re-send the function that was interrupted by
     ;; the authinfo request.
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer))
+    (nntp-erase-buffer nntp-server-buffer)
     (nntp-send-string process last)))
 
 (defun nntp-make-process-buffer (buffer)
@@ -1403,9 +1398,7 @@ password contained in '~/.nntp-authinfo'."
                (nntp-send-command "^[245].*\n" "GROUP" group)
                (setcar (cddr entry) group)
                (erase-buffer)
-               (save-excursion
-                 (set-buffer nntp-server-buffer)
-                 (erase-buffer))))))))
+	       (nntp-erase-buffer nntp-server-buffer)))))))
 
 (defun nntp-decode-text (&optional cr-only)
   "Decode the text in the current buffer."
@@ -1614,10 +1607,8 @@ password contained in '~/.nntp-authinfo'."
 	  (setq commands (cdr commands)))
 	;; If none of the commands worked, we disable XOVER.
 	(when (eq nntp-server-xover 'try)
-	  (save-excursion
-	    (set-buffer nntp-server-buffer)
-	    (erase-buffer)
-	    (setq nntp-server-xover nil)))
+	  (nntp-erase-buffer nntp-server-buffer)
+	  (setq nntp-server-xover nil))
         nntp-server-xover))))
 
 (defun nntp-find-group-and-number (&optional group)
