@@ -49,8 +49,12 @@
 (defalias 'facep 'ignore)
 
 (require 'cl)
-(unless (dolist (var nil t))
-  ;; Override the macro `dolist' which may have been defined in egg.el.
+
+(unless (and
+	 ;; `dolist' might not be available because of ``-no-autoloads''.
+	 (fboundp 'dolist)
+	 ;; It may have been defined in egg.el.
+	 (dolist (var nil t)))
   (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
@@ -210,6 +214,7 @@ It has already been fixed in XEmacs since 1999-12-06."
 	  (unless (or (member parent load-path)
 		      (member (file-name-as-directory parent) load-path))
 	    (push parent (cdr load-path))))
+	(require 'advice)
 	(require 'path-util))
     (error "
 APEL modules are not found in %s.
@@ -461,6 +466,73 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defalias 'ange-ftp-re-read-dir 'ignore)
 (defalias 'define-mail-user-agent 'ignore)
 
+(eval-and-compile
+  (when (featurep 'xemacs)
+    ;; XEmacs 21.1 needs some extra hand holding
+    (when (eq emacs-minor-version 1)
+      (autoload 'custom-declare-face "cus-face" nil t)
+      (autoload 'cl-compile-time-init "cl-macs" nil t)
+      (autoload 'defadvice "advice" nil nil 'macro))
+    (autoload 'Info-directory "info" nil t)
+    (autoload 'Info-menu "info" nil t)
+    (autoload 'annotations-at "annotations")
+    (autoload 'apropos "apropos" nil t)
+    (autoload 'apropos-command "apropos" nil t)
+    (autoload 'bbdb-complete-name "bbdb-com" nil t)
+    (autoload 'browse-url "browse-url" nil t)
+    (autoload 'customize-apropos "cus-edit" nil t)
+    (autoload 'customize-save-variable "cus-edit" nil t)
+    (autoload 'customize-variable "cus-edit" nil t)
+    (autoload 'delete-annotation "annotations")
+    (autoload 'dolist "cl-macs" nil nil 'macro)
+    (autoload 'enriched-decode "enriched")
+    (autoload 'info "info" nil t)
+    (autoload 'make-annotation "annotations")
+    (autoload 'make-display-table "disp-table")
+    (autoload 'pp "pp")
+    (autoload 'ps-despool "ps-print" nil t)
+    (autoload 'ps-spool-buffer "ps-print" nil t)
+    (autoload 'ps-spool-buffer-with-faces "ps-print" nil t)
+    (autoload 'read-passwd "passwd")
+    (autoload 'regexp-opt "regexp-opt")
+    (autoload 'reporter-submit-bug-report "reporter")
+    (if (emacs-version>= 21 5)
+	(autoload 'setenv "process" nil t)
+      (autoload 'setenv "env" nil t))
+    (autoload 'smtpmail-send-it "smtpmail")
+    (autoload 'sort-numeric-fields "sort" nil t)
+    (autoload 'sort-subr "sort")
+    (autoload 'trace-function-background "trace" nil t)
+    (autoload 'w3-do-setup "w3")
+    (autoload 'w3-prepare-buffer "w3-display")
+    (autoload 'w3-region "w3-display" nil t)
+    (defalias 'frame-char-height 'frame-height)
+    (defalias 'frame-char-width 'frame-width)
+    (defalias 'frame-parameter 'frame-property)
+    (defalias 'make-overlay 'ignore)
+    (defalias 'overlay-end 'ignore)
+    (defalias 'overlay-get 'ignore)
+    (defalias 'overlay-put 'ignore)
+    (defalias 'overlay-start 'ignore)
+    (defalias 'overlays-in 'ignore)
+    (defalias 'replace-dehighlight 'ignore)
+    (defalias 'replace-highlight 'ignore)
+    (defalias 'run-with-idle-timer 'ignore)
+    (defalias 'w3-coding-system-for-mime-charset 'ignore)))
+
+;; T-gnus stuff.
+(eval-and-compile
+  (when (featurep 'xemacs)
+    (autoload 'c-mode "cc-mode" nil t)
+    (autoload 'font-lock-mode "font-lock" nil t)
+    (autoload 'read-kbd-macro "edmacro" nil t)
+    (autoload 'turn-on-font-lock "font-lock" nil t))
+  (autoload 'nnheader-detect-coding-region "nnheader")
+  (autoload 'std11-extract-addresses-components "nnheader")
+  (autoload 'std11-fold-region "nnheader")
+  (autoload 'std11-narrow-to-field "nnheader")
+  (autoload 'std11-unfold-region "nnheader"))
+
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
 	  (condition-case nil
@@ -550,6 +622,20 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
     "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
   "Files which should not be byte-compiled.")
+
+(defun dgnushack-compile-verbosely ()
+  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
+patches to gnus, you should consider modifying make.bat to call
+dgnushack-compile-verbosely.  All other users should continue to use
+dgnushack-compile."
+  (dgnushack-compile t))
+
+(defun dgnushack-compile-verbosely ()
+  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
+patches to gnus, you should consider modifying make.bat to call
+dgnushack-compile-verbosely.  All other users should continue to use
+dgnushack-compile."
+  (dgnushack-compile t))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)

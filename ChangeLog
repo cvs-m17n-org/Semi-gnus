@@ -1,10 +1,46 @@
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.20 revision 00.
+
+2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Added Article Buttons.  Added Upgrading (from Simon
+	Josefsson).  Add gnus-mime-delete-part, markup fixes and some
+	other corrections.  Mention Gnus FAQ.
+
+2003-04-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* GNUS-NEWS: Additions.
+
+2003-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Bind `default-mime-charset-unlimited'.
+
+2003-04-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Autoload font-lock and nnheader for XEmacs
+	-no-autoloads.
+
+	* lisp/pop3.el: Require `advice' for compiling it in Gnus.
+
+2003-04-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Fixed X-Draft-Headers entry.
+
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/dgnushack.el (dgnushack-remove-extra-files-in-package):
-	Clear the value for `command-line-args-left'.
+	* lisp/dgnushack.el: Make sure `dolist' is available; require
+	`advice' before `path-util'; revoke the bogus change of 2003-04-17
+	(removing function bindings for XEmacs).
+	(dgnushack-remove-extra-files-in-package): Clear the value for
+	`command-line-args-left'.
 	(dgnushack-install-package-manifest): Ditto.
 
 	* texi/infohack.el: Load dgnushack.el and ptexinfmt.el first.
+
+2003-04-27  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Fix PGP entry.  Doc GCC variable change.
 
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 

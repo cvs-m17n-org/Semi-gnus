@@ -3402,9 +3402,17 @@ The directory to save in defaults to `gnus-article-save-directory'."
       (shell-command-on-region (point-min) (point-max) command nil)))
   (setq gnus-last-shell-command command))
 
+(defmacro gnus-read-string (prompt &optional initial-contents history 
+			    default-value)
+  "Like `read-string' but allow for older XEmacsen that don't have the 5th arg."
+  (if (and (featurep 'xemacs)
+	   (< emacs-minor-version 2))
+      `(read-string ,prompt ,initial-contents ,history)
+    `(read-string ,prompt ,initial-contents ,history ,default-value)))
+
 (defun gnus-summary-pipe-to-muttprint (&optional command)
   "Pipe this article to muttprint."
-  (setq command (read-string
+  (setq command (gnus-read-string
 		 "Print using command: " gnus-summary-muttprint-program
 		 nil gnus-summary-muttprint-program))
   (gnus-summary-save-in-pipe command))
@@ -4889,9 +4897,28 @@ If no internal viewer is available, use an external viewer."
 	      (narrow-to-region (point-min) (point))
 	      (gnus-treat-article 'head))))))))
 
-(defvar gnus-mime-display-multipart-as-mixed nil)
-(defvar gnus-mime-display-multipart-alternative-as-mixed nil)
-(defvar gnus-mime-display-multipart-related-as-mixed nil)
+(defcustom gnus-mime-display-multipart-as-mixed nil
+  "Display \"multipart\" parts as  \"multipart/mixed\".
+
+If `t', it overrides `nil' values of
+`gnus-mime-display-multipart-alternative-as-mixed' and
+`gnus-mime-display-multipart-related-as-mixed'."
+  :group 'gnus-article-mime
+  :type 'boolean)
+
+(defcustom gnus-mime-display-multipart-alternative-as-mixed nil
+  "Display \"multipart/alternative\" parts as  \"multipart/mixed\"."
+  :group 'gnus-article-mime
+  :type 'boolean)
+
+(defcustom gnus-mime-display-multipart-related-as-mixed nil
+  "Display \"multipart/related\" parts as  \"multipart/mixed\".
+
+If displaying \"text/html\" is discouraged \(see
+`mm-discouraged-alternatives'\) images or other material inside a
+\"multipart/related\" part might be overlooked when this variable is `nil'."
+  :group 'gnus-article-mime
+  :type 'boolean)
 
 (defun gnus-mime-display-part (handle)
   (cond
@@ -5267,14 +5294,31 @@ If given a numerical ARG, move forward ARG pages."
 (defun gnus-article-goto-next-page ()
   "Show the next page of the article."
   (interactive)
-  (gnus-eval-in-buffer-window gnus-summary-buffer
-    (gnus-summary-next-page)))
+  (when (gnus-article-next-page)
+    (goto-char (point-min))
+    (gnus-article-read-summary-keys nil (gnus-character-to-event ?n))))
+
 
 (defun gnus-article-goto-prev-page ()
   "Show the next page of the article."
   (interactive)
-  (gnus-eval-in-buffer-window gnus-summary-buffer
-    (gnus-summary-prev-page)))
+  (if (bobp)
+      (gnus-article-read-summary-keys nil (gnus-character-to-event ?p))
+    (gnus-article-prev-page nil)))
+
+;; This is cleaner but currently breaks `gnus-pick-mode':
+;;
+;; (defun gnus-article-goto-next-page ()
+;;   "Show the next page of the article."
+;;   (interactive)
+;;   (gnus-eval-in-buffer-window gnus-summary-buffer
+;;     (gnus-summary-next-page)))
+;;
+;; (defun gnus-article-goto-prev-page ()
+;;   "Show the next page of the article."
+;;   (interactive)
+;;   (gnus-eval-in-buffer-window gnus-summary-buffer
+;;     (gnus-summary-prev-page)))
 
 (defun gnus-article-next-page (&optional lines)
   "Show the next page of the current article.
@@ -6148,7 +6192,7 @@ It should match all directories in the top level of `gnus-ctan-url'."
   "What to do when the button on a string as \"foo123@bar.invalid\" is pushed.
 Strings like this can be either a message ID or a mail address.  If it is one
 of the symbols `mid' or `mail', Gnus will always assume that the string is a
-message ID or a mail address, respectivly.  If this variable is set to the
+message ID or a mail address, respectively.  If this variable is set to the
 symbol `ask', always query the user what do do.  If it is a function, this
 function will be called with the string as it's only argument.  The function
 must return `mid', `mail', `invalid' or `ask'."
@@ -6456,7 +6500,9 @@ positives are possible."
     ("\\bmailto:\\([^ \n\t]+\\)"
      0 (>= gnus-button-message-level 0) gnus-url-mailto 1)
     ;; CTAN
-    ("\\bCTAN:[ \t\n]*\\([^>)!;:,'\n\t ]*\\)"
+    ((concat "\\bCTAN:[ \t\n]?[^>)!;:,'\n\t ]*\\("
+	     gnus-button-ctan-directory-regexp
+	     "[^][>)!;:,'\n\t ]+\\)")
      0 (>= gnus-button-tex-level 1) gnus-button-handle-ctan 1)
     ((concat "\\btex-archive/\\("
 	     gnus-button-ctan-directory-regexp
@@ -6496,9 +6542,9 @@ positives are possible."
      1 (>= gnus-button-emacs-level 8) gnus-button-handle-library 1)
     ("`\\([a-z][-a-z0-9]+\\.el\\)'"
      1 (>= gnus-button-emacs-level 8) gnus-button-handle-library 1)
-    ("`\\([a-z]+-[a-z]+-[-a-z]+\\|\\(gnus\\|message\\)-[-a-z]+\\)'"
+    ("`\\([a-z][a-z0-9]+-[a-z]+-[-a-z]+\\|\\(gnus\\|message\\)-[-a-z]+\\)'"
      0 (>= gnus-button-emacs-level 8) gnus-button-handle-symbol 1)
-    ("`\\([a-z]+-[a-z]+\\)'"
+    ("`\\([a-z][a-z0-9]+-[a-z]+\\)'"
      0 (>= gnus-button-emacs-level 9) gnus-button-handle-symbol 1)
     ("(setq[ \t\n]+\\([a-z][a-z0-9]+-[-a-z0-9]+\\)[ \t\n]+.+)"
      1 (>= gnus-button-emacs-level 7) gnus-button-handle-describe-variable 1)

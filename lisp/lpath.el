@@ -17,7 +17,7 @@
 	       propertize put-image replace-regexp-in-string
 	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
 	       sort-coding-systems spam-BBDB-register-routine
-	       spam-enter-ham-BBDB tool-bar-add-item
+	       spam-enter-ham-BBDB string-to-multibyte tool-bar-add-item
 	       tool-bar-add-item-from-menu tool-bar-local-item-from-menu
 	       url-http-file-exists-p vcard-pretty-print w32-focus-frame
 	       w3m-charset-to-coding-system x-focus-frame))
@@ -101,11 +101,17 @@
 	(t
 	 nil)))
       (common-vars
-       '(navi2ch-mona-font)))
+       '(default-mime-charset-unlimited navi2ch-mona-font)))
   (maybe-fbind functions)
   (maybe-fbind common-fns)
   (maybe-bind variables)
   (maybe-bind common-vars))
+
+(when (and (featurep 'xemacs)
+	   (not (featurep 'mule)))
+  (progn
+    (maybe-fbind '(coding-system-base find-charset-string))))
+
 
 (defun nnkiboze-score-file (a)
   )

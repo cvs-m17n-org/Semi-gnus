@@ -347,7 +347,7 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
   :type '(repeat sexp))			; Fixme: improve this
 
 (defcustom message-required-headers '((optional . References)
-				      From (optional . In-Reply-To))
+				      From)
   "*Headers to be generated or prompted for when sending a message.
 Also see `message-required-news-headers' and
 `message-required-mail-headers'."
@@ -4564,7 +4564,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 	      errors)
 	 (y-or-n-p
 	  (format
-	   "Really post to %s possibly unknown group%s: %s? "
+	   "Really use %s possibly unknown group%s: %s? "
 	   (if (= (length errors) 1) "this" "these")
 	   (if (= (length errors) 1) "" "s")
 	   (mapconcat 'identity errors ", "))))
