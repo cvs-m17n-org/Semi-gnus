@@ -253,11 +253,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Shoe-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.8.9"
+(defconst gnus-version-number "6.8.10"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.39; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "%s %s (based on Gnus 5.6.41; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -778,7 +778,7 @@ used to 899, you would say something along these lines:
   :group 'gnus-files
   :group 'gnus-server
   :type 'file)
-
+  
 ;; This function is used to check both the environment variable
 ;; NNTPSERVER and the /etc/nntpserver file to see whether one can find
 ;; an nntp server name default.
@@ -1717,7 +1717,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
-      gnus-dribble-enter gnus-read-init-file)
+      gnus-dribble-enter gnus-read-init-file gnus-dribble-touch)
      ("gnus-dup" gnus-dup-suppress-articles gnus-dup-unsuppress-article
       gnus-dup-enter-articles)
      ("gnus-range" gnus-copy-sequence)
@@ -1988,12 +1988,9 @@ STRINGS will be evaluated in normal `or' order."
   "Version number of this version of Gnus.
 If ARG, insert string at point."
   (interactive "P")
-  (let ((methods gnus-valid-select-methods)
-	(mess gnus-version)
-	meth)
-    (if arg
-	(insert (message mess))
-      (message mess))))
+  (if arg
+      (insert (message gnus-version))
+    (message gnus-version)))
 
 (defun gnus-continuum-version (version)
   "Return VERSION as a floating point number."

@@ -1,5 +1,11 @@
 1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.10.
+
+	* Sync up with Gnus 5.6.41.
+
+1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Try
 	"qualified" newsgroup name first.
 
@@ -90,7 +96,7 @@
 
 	* lisp/message.el (message-fill-references): Reverted.
 
-	* Sync up with Semi-gnus 6.8.15. (except for multi-frame code.)
+	* Sync up with Semi-gnus 6.8.15.
 
 1998-08-23  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
