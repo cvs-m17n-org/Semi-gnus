@@ -2139,7 +2139,8 @@ a string \"never\" is inserted in default."
     (expand-abbrev))
   (goto-char (point-min))
   (or (search-forward (concat "\n" mail-header-separator "\n") nil t)
-      (search-forward "\n\n" nil t)))
+      (search-forward-regexp "[^:]+:\\([^\n]\\|\n[ \t]\\)+\n\n" nil t)
+      (point-min)))
 
 (defun message-goto-eoh ()
   "Move point to the end of the headers."
@@ -3963,7 +3964,7 @@ If NOW, use that time instead."
       (setq sign "-")
       (setq zone (- zone)))
     (concat
-     (format-time-string "%d" now)
+     (format-time-string "%a, %d" now)
      ;; The month name of the %b spec is locale-specific.  Pfff.
      (format " %s "
 	     (capitalize (car (rassoc (nth 4 (decode-time now))
