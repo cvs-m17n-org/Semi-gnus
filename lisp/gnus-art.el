@@ -178,15 +178,23 @@ this list."
 
 (defcustom gnus-boring-article-headers '(empty followup-to reply-to)
   "Headers that are only to be displayed if they have interesting data.
-Possible values in this list are `empty', `newsgroups', `followup-to',
-`to-address', `reply-to', `date', `long-to', and `many-to'."
+Possible values in this list are:
+
+  'empty       Headers with no content.
+  'newsgroups  Newsgroup identical to Gnus group.
+  'to-address  To identical to To-address.
+  'followup-to Followup-to identical to Newsgroups.
+  'reply-to    Reply-to identical to From.
+  'date        Date less than four days old.
+  'long-to     To and/or Cc longer than 1024 characters.
+  'many-to     Multiple To and/or Cc."
   :type '(set (const :tag "Headers with no content." empty)
-	      (const :tag "Newsgroups with only one group." newsgroups)
-	      (const :tag "To identical to to-address." to-address)
-	      (const :tag "Followup-to identical to newsgroups." followup-to)
-	      (const :tag "Reply-to identical to from." reply-to)
+	      (const :tag "Newsgroups identical to Gnus group." newsgroups)
+	      (const :tag "To identical to To-address." to-address)
+	      (const :tag "Followup-to identical to Newsgroups." followup-to)
+	      (const :tag "Reply-to identical to From." reply-to)
 	      (const :tag "Date less than four days old." date)
-	      (const :tag "Very long To and/or Cc header." long-to)
+	      (const :tag "To and/or Cc longer than 1024 characters." long-to)
 	      (const :tag "Multiple To and/or Cc headers." many-to))
   :group 'gnus-article-hiding)
 
@@ -1336,7 +1344,7 @@ Initialized from `text-mode-syntax-table.")
 	  ;; `gnus-ignored-headers' and `gnus-visible-headers' to
 	  ;; select which header lines is to remain visible in the
 	  ;; article buffer.
-	  (while (re-search-forward "^[^ \t]*:" nil t)
+	  (while (re-search-forward "^[^ \t:]*:" nil t)
 	    (beginning-of-line)
 	    ;; Mark the rank of the header.
 	    (put-text-property
@@ -2905,7 +2913,7 @@ The directory to save in defaults to `gnus-article-save-directory'."
   (when (string-equal command "")
     (if gnus-last-shell-command
 	(setq command gnus-last-shell-command)
-      (error "A command is required.")))
+      (error "A command is required")))
   (gnus-eval-in-buffer-window gnus-article-buffer
     (save-restriction
       (widen)
@@ -3690,7 +3698,7 @@ value of the variable `gnus-show-mime' is non-nil."
   (let* ((data (get-text-property (point) 'gnus-data))
 	 file param)
     (if (mm-multiple-handles gnus-article-mime-handles)
-	(error "This function is not implemented."))
+	(error "This function is not implemented"))
     (setq file (and data (mm-save-part data)))
     (when file
       (with-current-buffer (mm-handle-buffer data)
@@ -5960,9 +5968,9 @@ For example:
     (unless func
       (error (format "Can't find the encrypt protocol %s" protocol)))
     (if (equal gnus-newsgroup-name "nndraft:drafts")
-	(error "Can't encrypt the article in group nndraft:drafts."))
+	(error "Can't encrypt the article in group nndraft:drafts"))
     (if (equal gnus-newsgroup-name "nndraft:queue")
-	(error "Don't encrypt the article in group nndraft:queue."))
+	(error "Don't encrypt the article in group nndraft:queue"))
     (gnus-summary-iterate n
       (save-excursion
 	(set-buffer gnus-summary-buffer)

@@ -2156,6 +2156,7 @@ with some simple extensions.
 %x   Contents of the Xref: header (string)
 %D   Date of the article (string)
 %d   Date of the article (string) in DD-MMM format
+%o   Date of the article (string) in YYYYMMDD`T'HHMMSS format
 %M   Message-id of the article (string)
 %r   References of the article (string)
 %c   Number of characters in the article (integer)

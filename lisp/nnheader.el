@@ -52,7 +52,14 @@
   (autoload 'gnus-sorted-complement "gnus-range"))
 
 (defvar nnheader-max-head-length 4096
-  "*Max length of the head of articles.")
+  "*Max length of the head of articles.
+
+Value is an integer, nil, or t.  Nil means read in chunks of a file
+indefinitely until a complete head is found\; t means always read the
+entire file immediately, disregarding `nnheader-head-chop-length'.
+
+Integer values will in effect be rounded up to the nearest multiple of
+`nnheader-head-chop-length'.")
 
 (defvar nnheader-head-chop-length 2048
   "*Length of each read operation when trying to fetch HEAD headers.")
@@ -204,7 +211,8 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 (defsubst nnheader-header-value ()
   (let ((pt (point)))
-    (prog1
+    (prog2
+	(skip-chars-forward " \t")
 	(buffer-substring (match-end 0) (std11-field-end))
       (goto-char pt))))
 
@@ -243,18 +251,17 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; Subject.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nsubject: " nil t)
+	     (if (search-forward "\nsubject:" nil t)
 		 (nnheader-header-value) "(none)"))
 	   ;; From.
 	   (progn
 	     (goto-char p)
-	     (if (or (search-forward "\nfrom: " nil t)
-		     (search-forward "\nfrom:" nil t))
+	     (if (search-forward "\nfrom:" nil t)
 		 (nnheader-header-value) "(nobody)"))
 	   ;; Date.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\ndate: " nil t)
+	     (if (search-forward "\ndate:" nil t)
 		 (nnheader-header-value) ""))
 	   ;; Message-ID.
 	   (progn
@@ -270,12 +277,12 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; References.
 	   (progn
 	     (goto-char p)
-	     (if (search-forward "\nreferences: " nil t)
+	     (if (search-forward "\nreferences:" nil t)
 		 (nnheader-header-value)
 	       ;; Get the references from the in-reply-to header if there
 	       ;; were no references and the in-reply-to header looks
 	       ;; promising.
-	       (if (and (search-forward "\nin-reply-to: " nil t)
+	       (if (and (search-forward "\nin-reply-to:" nil t)
 			(setq in-reply-to (nnheader-header-value))
 			(string-match "<[^\n>]+>" in-reply-to))
 		   (let (ref2)
@@ -301,7 +308,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	   ;; Xref.
 	   (progn
 	     (goto-char p)
-	     (and (search-forward "\nxref: " nil t)
+	     (and (search-forward "\nxref:" nil t)
 		  (nnheader-header-value)))
 
 	   ;; Extra.
@@ -311,7 +318,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 	       (while extra
 		 (goto-char p)
 		 (when (search-forward
-			(concat "\n" (symbol-name (car extra)) ": ") nil t)
+			(concat "\n" (symbol-name (car extra)) ":") nil t)
 		   (push (cons (car extra) (nnheader-header-value))
 			 out))
 		 (pop extra))

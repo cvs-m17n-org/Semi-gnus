@@ -320,3 +320,5 @@ Optional LAST is ignored."
   (nntp))
 
 (provide 'nndb)
+
+;;; nndb.el ends here

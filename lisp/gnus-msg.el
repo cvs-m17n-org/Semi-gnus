@@ -152,6 +152,8 @@ use this option with care."
 (defvar gnus-last-posting-server nil)
 (defvar gnus-message-group-art nil)
 
+(defvar gnus-msg-force-broken-reply-to nil)
+
 (defconst gnus-bug-message
   (format "Sending a bug report to the Gnus Towers.
 ========================================
@@ -213,6 +215,8 @@ Thank you for your help in stamping out bugs.
   "m" gnus-summary-mail-other-window
   "u" gnus-uu-post-news
   "\M-c" gnus-summary-mail-crosspost-complaint
+  "Br" gnus-summary-reply-broken-reply-to
+  "BR" gnus-summary-reply-broken-reply-to-with-original
   "om" gnus-summary-mail-forward
   "op" gnus-summary-post-forward
   "Om" gnus-summary-digest-mail-forward
@@ -651,10 +655,11 @@ header line with the old Message-ID."
 	(when yank
 	  (gnus-inews-yank-articles yank))))))
 
-(defun gnus-msg-treat-broken-reply-to ()
+(defun gnus-msg-treat-broken-reply-to (&optional force)
   "Remove the Reply-to header iff broken-reply-to."
-  (when (gnus-group-find-parameter
-	 gnus-newsgroup-name 'broken-reply-to)
+  (when (or force 
+            (gnus-group-find-parameter
+             gnus-newsgroup-name 'broken-reply-to))
     (save-restriction
       (message-narrow-to-head)
       (message-remove-header "reply-to"))))
@@ -808,7 +813,7 @@ If VERY-WIDE, make a very wide reply."
 	      (message-narrow-to-head)
 	      (setq headers (concat headers (buffer-string)))))))
       (set-buffer (gnus-copy-article-buffer))
-      (gnus-msg-treat-broken-reply-to)
+      (gnus-msg-treat-broken-reply-to gnus-msg-force-broken-reply-to)
       (save-restriction
 	(message-narrow-to-head)
 	(when very-wide
@@ -824,6 +829,24 @@ If VERY-WIDE, make a very wide reply."
 The original article will be yanked."
   (interactive "P")
   (gnus-summary-reply (gnus-summary-work-articles n) wide))
+
+(defun gnus-summary-reply-broken-reply-to (&optional yank wide very-wide)
+  "Like `gnus-summary-reply' except removing reply-to field.
+If prefix argument YANK is non-nil, the original article is yanked
+automatically.
+If WIDE, make a wide reply.
+If VERY-WIDE, make a very wide reply."
+  (interactive
+   (list (and current-prefix-arg
+	      (gnus-summary-work-articles 1))))
+  (let ((gnus-msg-force-broken-reply-to t))
+    (gnus-summary-reply yank wide very-wide)))
+
+(defun gnus-summary-reply-broken-reply-to-with-original (n &optional wide)
+  "Like `gnus-summary-reply-with-original' except removing reply-to field.
+The original article will be yanked."
+  (interactive "P")
+  (gnus-summary-reply-broken-reply-to (gnus-summary-work-articles n) wide))
 
 (defun gnus-summary-wide-reply (&optional yank)
   "Start composing a wide reply mail to the current message.

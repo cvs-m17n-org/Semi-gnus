@@ -2785,6 +2785,23 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 $B%9$rDs6!$7$^$9(B)$B!#%H%T%C%/%Q%i%a!<%?$K$D$$$FFI$s$G$_$k$3$H$bLLGr$$$G$7$g(B
 $B$&(B (@pxref{Topic Parameters})$B!#(B
 
+$B%0%k!<%W%Q%i%a!<%?$O(B @code{gnus-parameters} $B$K@_Dj$9$k$3$H$b$G$-$^$9!#$G(B
+$B$b$$$/$D$+$N%Q%i%a!<%?!"Nc$($P(B @code{visible} $B$O8zNO$rH/4x$7$^$;$s!#Nc$G(B
+$B$9!#(B
+
+@example
+(setq gnus-parameters
+  '(("mail\\..*"  (gnus-show-threads nil)
+                  (gnus-use-scoring nil)
+                  (gnus-summary-line-format
+                        "%U%R%z%I%(%[%d:%ub%-20,20f%]%) %s\n")
+                  (gcc-self . t)
+                  (display . all))
+     ("mail\\.me" (gnus-use-scoring  t))
+     ("list\\..*" (total-expire . t)
+                  (broken-reply-to . t)))
+@end example
+
 @node Listing Groups
 @section $B%0%k!<%W$N0lMwI=<((B
 @cindex group listing
@@ -6292,7 +6309,9 @@ Gnus $B$O$?$/$5$s$NJ}K!$G5-;v$rJ]B8$9$k;v$,$G$-$^$9!#0J2<$N$b$N$OHs>o$KN((B
 $B$9(B (@code{gnus-summary-save-article-vm})$B!#(B
 
 @item O p
+@itemx |
 @kindex O p ($B35N,(B)
+@kindex | ($B35N,(B)
 @findex gnus-summary-pipe-output
 $B8=:_$N5-;v$r%Q%$%W$KJ]B8$7$^$9!#$&!<$s$H!"$"$N$)!";d$,8@$*$&$H$7$F$$$k;v(B
 $B$O!=!=8=:_$N5-;v$r%W%m%;%9$K%Q%$%W$9$k$H$$$&$3$H$G(B
@@ -11636,6 +11655,8 @@ nnml:mail.others:
 
 @node Incorporating Old Mail
 @subsection $B8E$$%a!<%k$r<h$j9~$`(B
+@cindex incorporating old mail
+@cindex import old mail
 
 $B$?$$$F$$$N?M$O?'!9$J%U%!%$%k%U%)!<%^%C%H$GC_@Q$5$l$?$?$/$5$s$N8E$$%a!<%k(B
 $B$,$"$k$G$7$g$&!#$b$7(B gnus $B$K?h$J(B gnus $B%a!<%k%P%C%/%(%s%I$N0l$D$r;H$&$h$&(B
@@ -12921,6 +12942,28 @@ Web Newspaper $B$K4X$9$k0J2<$N(B @code{nnshimbun} $BJQ?t$rJQ$($k$3$H$,2DG=$G$
   (let ((descr
 	 (assq nnrss-description-field (mail-header-extra header))))
     (if descr (concat "\n\t" (cdr descr)) "")))
+@end lisp
+
+$B0J2<$N%3!<%I$O!"35N,%P%C%U%!$+$iD>@\(B nnrss $B$N(B url $B$r%*!<%W%s$9$k$N$KJXMx(B
+$B$+$b$7$l$^$;$s!#(B
+@lisp
+(require 'browse-url)
+
+(defun browse-nnrss-url( arg )
+  (interactive "p")
+  (let ((url (assq nnrss-url-field
+                   (mail-header-extra
+                    (gnus-data-header
+                     (assq (gnus-summary-article-number)
+                           gnus-newsgroup-data))))))
+    (if url
+        (browse-url (cdr url))
+      (gnus-summary-scroll-up arg))))
+
+(eval-after-load "gnus"
+  #'(define-key gnus-summary-mode-map
+      (kbd "<RET>") 'browse-nnrss-url))
+(add-to-list 'nnmail-extra-headers nnrss-url-field)
 @end lisp
 
 @node Customizing w3

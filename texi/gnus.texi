@@ -2771,6 +2771,21 @@ presents you with a Customize-like interface.  The latter helps avoid
 silly Lisp errors.)  You might also be interested in reading about topic
 parameters (@pxref{Topic Parameters}).
 
+Group parameters can be set in @code{gnus-parameters} too.  But some
+variables, such as @code{visible}, have no effect.  For example,
+
+@example
+(setq gnus-parameters
+  '(("mail\\..*"  (gnus-show-threads nil)
+                  (gnus-use-scoring nil)
+                  (gnus-summary-line-format
+                        "%U%R%z%I%(%[%d:%ub%-20,20f%]%) %s\n")
+                  (gcc-self . t)
+                  (display . all))
+     ("mail\\.me" (gnus-use-scoring  t))
+     ("list\\..*" (total-expire . t)
+                  (broken-reply-to . t)))
+@end example
 
 @node Listing Groups
 @section Listing Groups
@@ -6463,7 +6478,9 @@ Save the current article in a VM folder
 (@code{gnus-summary-save-article-vm}).
 
 @item O p
+@itemx |
 @kindex O p (Summary)
+@kindex | (Summary)
 @findex gnus-summary-pipe-output
 Save the current article in a pipe.  Uhm, like, what I mean is---Pipe
 the current article to a process (@code{gnus-summary-pipe-output}).
@@ -12298,6 +12315,8 @@ by @code{gnus-group-split-update}, this function will run
 
 @node Incorporating Old Mail
 @subsection Incorporating Old Mail
+@cindex incorporating old mail
+@cindex import old mail
 
 Most people have lots of old mail stored in various file formats.  If
 you have set up Gnus to read mail using one of the spiffy Gnus mail
@@ -13397,6 +13416,28 @@ the summary buffer.
   (let ((descr
 	 (assq nnrss-description-field (mail-header-extra header))))
     (if descr (concat "\n\t" (cdr descr)) "")))
+@end lisp
+
+The following code may be useful to open an nnrss url directly from the
+summary buffer.
+@lisp
+(require 'browse-url)
+
+(defun browse-nnrss-url( arg )
+  (interactive "p")
+  (let ((url (assq nnrss-url-field
+                   (mail-header-extra
+                    (gnus-data-header
+                     (assq (gnus-summary-article-number)
+                           gnus-newsgroup-data))))))
+    (if url
+        (browse-url (cdr url))
+      (gnus-summary-scroll-up arg))))
+
+(eval-after-load "gnus"
+  #'(define-key gnus-summary-mode-map
+      (kbd "<RET>") 'browse-nnrss-url))
+(add-to-list 'nnmail-extra-headers nnrss-url-field)
 @end lisp
 
 @node Customizing w3

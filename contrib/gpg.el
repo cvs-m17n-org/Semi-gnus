@@ -104,11 +104,10 @@
 ;; function (bound to `C-h l' by default).
 
 
-;;;; Code:
+;;; Code:
 
 (require 'timer)
-(eval-when-compile 
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 (eval-and-compile 
   (defalias 'gpg-point-at-eol
@@ -630,7 +629,7 @@ adjust according to `gpg-command-passphrase-env'."
       ;; temporary file resides in a world-writable directory.
       (unless (or (memq system-type '(windows-nt cygwin32 win32 w32 mswindows))
 		  (eq (file-modes gpg-temp-directory) 448)) ; mode 0700
-	(error "Directory for temporary files (%s) must have mode 0700." gpg-temp-directory))
+	(error "Directory for temporary files (%s) must have mode 0700" gpg-temp-directory))
       (setq name (make-temp-name name))
       (let ((mode (default-file-modes)))
 	(unwind-protect
@@ -762,7 +761,7 @@ Never set this variable directly, use `gpg-show-result' instead.")
       (save-window-excursion
 	(display-buffer (current-buffer))
 	(unless (y-or-n-p "Continue? ")
-	  (error "GnuPG operation aborted."))))))
+	  (error "GnuPG operation aborted"))))))
 
 (defmacro gpg-show-result (always-show &rest body)
   "Show GnuPG result to user for confirmation.
