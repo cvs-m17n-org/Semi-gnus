@@ -805,9 +805,10 @@ which it may alter in any way.")
     (?S ,(macroexpand '(mail-header-subject gnus-tmp-header)) ?s)
     (?s gnus-tmp-subject-or-nil ?s)
     (?n gnus-tmp-name ?s)
-    (?A (car (cdr (funcall gnus-extract-address-components gnus-tmp-from)))
-	?s)
-    (?a (or (car (funcall gnus-extract-address-components gnus-tmp-from))
+    (?A (std11-address-string
+	 (car (mime-read-field 'From gnus-tmp-header))) ?s)
+    (?a (or (std11-full-name-string
+	     (car (mime-read-field 'From gnus-tmp-header)))
 	    gnus-tmp-from) ?s)
     (?F gnus-tmp-from ?s)
     (?x ,(macroexpand '(mail-header-xref gnus-tmp-header)) ?s)
@@ -3453,14 +3454,15 @@ If LINE, insert the rebuilt thread starting on line LINE."
 (defsubst gnus-article-sort-by-author (h1 h2)
   "Sort articles by root author."
   (string-lessp
-   (let ((extract (funcall
-		   gnus-extract-address-components
-		   (mail-header-from h1))))
-     (or (car extract) (cadr extract) ""))
-   (let ((extract (funcall
-		   gnus-extract-address-components
-		   (mail-header-from h2))))
-     (or (car extract) (cadr extract) ""))))
+   (let ((addr (mime-read-field 'From h1)))
+     (or (std11-full-name-string addr)
+	 (std11-address-string addr)
+	 ""))
+   (let ((addr (mime-read-field 'From h2)))
+     (or (std11-full-name-string addr)
+	 (std11-address-string addr)
+	 ""))
+   ))
 
 (defun gnus-thread-sort-by-author (h1 h2)
   "Sort threads by root author."
