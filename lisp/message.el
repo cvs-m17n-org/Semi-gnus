@@ -4632,7 +4632,8 @@ regexp varstr."
   (let ((locals (save-excursion
 		  (set-buffer buffer)
 		  (buffer-local-variables)))
-	(regexp "^gnus\\|^nn\\|^message"))
+	(regexp
+	 "^\\(gnus\\|nn\\|message\\|user-\\(mail-address\\|full-name\\)\\)"))
     (mapcar
      (lambda (local)
        (when (and (consp local)
