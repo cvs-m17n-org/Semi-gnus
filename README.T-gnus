@@ -34,5 +34,4 @@ NEWS:
 * T-gnus 6.15 - this is based on Oort Gnus.
 
   The latest T-gnus is T-gnus 6.15.8 (based on Oort Gnus 0.08).  It
-  requires SEMI/WEMI (1.13.5 or later), FLIM (1.13.1 or later), and
-  APEL (10.0 or later).
+  requires SEMI 1.14, FLIM 1.14, and APEL 10.0 or later.

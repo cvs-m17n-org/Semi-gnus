@@ -13,7 +13,7 @@ gnus-bbdb.el
 Semi-gnus に特化した BBDB API モジュールです。このモジュールを使用する
 ことによって、 Semi-gnus で使用する場合には mime-bbdb が不要になります。
 
-1.11.3 以降の FLIM が必要です。
+1.11.3 以降の FLIM が必要 (T-gnus では FLIM 1.14 が必要) です。
 
 bbdb-auto-notes-hook を使用していない方には不要ですが、使用している方
 は bbdb.el / bbdb-hooks.el にこのファイルの最後にある patch をあてる必

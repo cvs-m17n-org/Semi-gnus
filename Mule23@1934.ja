@@ -36,13 +36,18 @@ lisp/loaddefs.el $B$+$i:o=|$7$F!"(BMule $B$r:n$jD>$5$J$1$l$P$J$j$^$;$s!#(B
     (makunbound (intern (format "message-%s" symbol)))))
 
 
-INSTALL CUSTOM, APEL, FLIM, SEMI
-================================
+INSTALL CUSTOM, APEL, CLIME, SEMI
+=================================
 
-T-gnus $B$O:G?7HG$N(B CUSTOM, APEL, FLIM $B$*$h$S(B SEMI $B$+(B WEMI $B$rI,MW$H$7$^(B
-$B$9!#$"$J$?$O$3$l$i$N%Q%C%1!<%8$r(B T-gnus $B$NA0$K%$%s%9%H!<%k$7$J$1$l$P$J(B
-$B$j$^$;$s!#(BCUSTOM $B$K$D$$$F$O!":n$kA0$K$"$J$?$O0J2<$N%Q%C%A$rEv$F$kI,MW(B
-$B$,$"$j$^$9!#(B
+T-gnus $B$O:G?7HG$N(B CUSTOM, APEL, CLIME $B$*$h$S(B SEMI $B$rI,MW$H$7$^$9!#(B
+CLIME 1.14 $B$O8E$$(B Emacs $B$K(B FLIM 1.14 $B$HF1$85!G=$rDs6!$9$k$b$N$G!"8=:_(B
+$B0J2<$N$b$N$,F~<j$G$-$^$9!#(B
+
+ftp://ftp.jpl.org/pub/m17n/clime-1_14-************.tar.gz
+
+$B$"$J$?$O$3$l$i$N%Q%C%1!<%8$r(B T-gnus $B$NA0$K%$%s%9%H!<%k$7$J$1$l$P$J$j$^(B
+$B$;$s!#(BCUSTOM $B$K$D$$$F$O!":n$kA0$K$"$J$?$O0J2<$N%Q%C%A$rEv$F$kI,MW$,$"(B
+$B$j$^$9!#(B
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- custom-1.9962/cus-face.el~	Wed Mar  4 19:52:39 1998
@@ -83,13 +88,13 @@ INSTALL T-gnus
 Emacs 19.34 $B$r%Y!<%9$K$7$?(B Mule 2.3 $B$G(B gnus $B$r:n$k$K$O;0$D$NJ}K!$,$"$j(B
 $B$^$9!#(B
 
-1. $B$b$7$"$J$?$,(B EMU, APEL, FLIM $B$*$h$S(B SEMI $B$^$?$O(B WEMI $B$N3F%Q%C%1!<(B
-   $B%8$rI8=`$N(B load-path $B$N2<$K%$%s%9%H!<%k$7$F$$$k$H$7$^$9!#Nc$($P$3$&!#(B
+1. $B$b$7$"$J$?$,(B EMU, APEL, CLIME $B$*$h$S(B SEMI $B$N3F%Q%C%1!<%8$rI8=`$N(B
+   load-path $B$N2<$K%$%s%9%H!<%k$7$F$$$k$H$7$^$9!#Nc$($P$3$&!#(B
 
-   EMU:  /usr/local/share/mule/19.34/site-lisp/
-   APEL: /usr/local/share/mule/site-lisp/apel/
-   FLIM: /usr/local/share/mule/site-lisp/flim/
-   SEMI: /usr/local/share/mule/site-lisp/semi/
+   EMU:   /usr/local/share/mule/19.34/site-lisp/
+   APEL:  /usr/local/share/mule/site-lisp/apel/
+   CLIME: /usr/local/share/mule/site-lisp/flim/
+   SEMI:  /usr/local/share/mule/site-lisp/semi/
 
    $B$7$+$b!"$b$7$"$J$?$,8E$$(B CUSTOM $B$r?7$7$$(B CUSTOM $B$GCV$-49$($F$$$k$+!"(B
    $B?7$7$$(B CUSTOM $B$r(B /usr/local/share/mule/19.34/site-lisp/ $B$N$h$&$JI8(B
@@ -120,25 +125,24 @@ Emacs 19.34 $B$r%Y!<%9$K$7$?(B Mule 2.3 $B$G(B gnus $B$r:n$k$K$O;0$D$NJ}K!$
 
    $B$H%?%$%W$7$F2<$5$$!#(B
 
-2. $B$b$7$"$J$?$,(B EMU, APEL, FLIM $B$*$h$S(B SEMI $B$^$?$O(B WEMI $B$N3F%Q%C%1!<(B
-   $B%8$rI8=`$G$O$J$$(B load-path $B$K%$%s%9%H!<%k$7$F$$$k$J$i$P!"%3%m%s$G(B
-   $B6h@Z$i$l$?(B EMU, APEL $B$*$h$S(B CUSTOM $B$,%$%s%9%H!<%k$5$l$F$$$k%G%#%l(B
-   $B%/%H%jL>$H(B configure $B%*%W%7%g%s$N(B `--with-addpath=' $B$r;H$C$F2<$5$$!#(B
-   $BNc$($P(B
+2. $B$b$7$"$J$?$,(B EMU, APEL, CLIME $B$*$h$S(B SEMI $B$N3F%Q%C%1!<%8$rI8=`$G$O(B
+   $B$J$$(B load-path $B$K%$%s%9%H!<%k$7$F$$$k$J$i$P!"%3%m%s$G6h@Z$i$l$?(B
+   EMU, APEL $B$*$h$S(B CUSTOM $B$,%$%s%9%H!<%k$5$l$F$$$k%G%#%l%/%H%jL>$H(B
+   configure $B%*%W%7%g%s$N(B `--with-addpath=' $B$r;H$C$F2<$5$$!#Nc$($P(B
 
    % ./configure --with-emacs=mule\
      --with-addpath=~/elisp/emu/:~/elisp/apel/:~/elisp/custom/
    % make
 
-   $B$3$N>l9g!"$b$7(B FLIM, SEMI $B$^$?$O(B WEMI $B$,(B APEL $B$N?F%G%#%l%/%H%j$HF1(B
-   $B$8%G%#%l%/%H%j$N2<$K%$%s%9%H!<%k$5$l$F$$$k$J$i$P!"$=$l$i$N(B path $B$r(B
-   $BDI2C$9$kI,MW$O$"$j$^$;$s!#(B
+   $B$3$N>l9g!"$b$7(B CLIME, SEMI $B$,(B APEL $B$N?F%G%#%l%/%H%j$HF1$8%G%#%l%/%H(B
+   $B%j$N2<$K%$%s%9%H!<%k$5$l$F$$$k$J$i$P!"$=$l$i$N(B path $B$rDI2C$9$kI,MW(B
+   $B$O$"$j$^$;$s!#(B
 
-3. $B$3$l$O!"(BEMU, APEL, FLIM $B$*$h$S(B SEMI $B$^$?$O(B WEMI $B$N3F%Q%C%1!<%8$rI8(B
-   $B=`$G$O$J$$(B load-path $B$K%$%s%9%H!<%k$7$F$$$k>l9g$N!"JL$NJ}K!$G$9!#(B
-   $BG[I[$K4^$^$l$F$$$k%U%!%$%k(B `sample.lpath.el' $B$r(B `~/.lpath.el' $B$K%3(B
-   $B%T!<$7$F!"$"$J$?$N4D6-$K9g$&$h$&$K=q$-49$($F2<$5$$!#$=$7$F<!$N%3%^(B
-   $B%s%I$r%?%$%W$7$F2<$5$$!#(B
+3. $B$3$l$O!"(BEMU, APEL, CLIME $B$*$h$S(B SEMI $B$N3F%Q%C%1!<%8$rI8=`$G$O$J$$(B
+   load-path $B$K%$%s%9%H!<%k$7$F$$$k>l9g$N!"JL$NJ}K!$G$9!#G[I[$K4^$^$l(B
+   $B$F$$$k%U%!%$%k(B `sample.lpath.el' $B$r(B `~/.lpath.el' $B$K%3%T!<$7$F!"$"(B
+   $B$J$?$N4D6-$K9g$&$h$&$K=q$-49$($F2<$5$$!#$=$7$F<!$N%3%^%s%I$r%?%$%W(B
+   $B$7$F2<$5$$!#(B
 
    % ./configure --with-emacs=mule
    % make install
@@ -149,7 +153,7 @@ USING emacs-w3m (and Emacs/W3)
 $B%&%'%V$K4p$E$$$?%P%C%/%(%s%I$G$"$k(B `nnshimbun' $B$O!"(Bemacs-w3m $B%Q%C%1!<(B
 $B%8$K4^$^$l$F$$$k(B shimbun $B%b%8%e!<%k$r;H$$$^$9(B ($BB>$N(B T-gnus $B$N%&%'%V$K(B
 $B4p$E$$$?%P%C%/%(%s%I$O(B Emacs/W3 $B$rI,MW$H$7$^$9(B)$B!#(Bemacs-w3m $B$O30It%3%^(B
-$B%s%I(B W3M $B$X$N%$%s%?!<%U%'!<%9$r9T$J$&%W%m%0%i%`$G!">\:Y>pJs$K$D$$$F$O(B
+$B%s%I(B w3m $B$X$N%$%s%?!<%U%'!<%9$r9T$J$&%W%m%0%i%`$G!">\:Y>pJs$K$D$$$F$O(B
 $B0J2<$N%Z!<%8$rK,$M$F$_$F2<$5$$!#(B
 
    http://emacs-w3m.namazu.org/
