@@ -1934,7 +1934,9 @@ These properties are essential to work, so we should never strip them."
 This function is intended to be called from `after-change-functions'.
 See also `message-forbidden-properties'."
   (when (and message-strip-special-text-properties
-	     (message-tamago-not-in-use-p begin))
+	     (message-tamago-not-in-use-p begin)
+	     ;; Check whether the invisible MIME part is not inserted.
+	     (not (text-property-any begin end 'mime-edit-invisible t)))
     (remove-text-properties begin end message-forbidden-properties)))
 
 ;;;###autoload
