@@ -397,7 +397,8 @@ parameter.  It should return nil, `warn' or `delete'."
 		 (const delete)))
 
 (defcustom nnmail-extra-headers nil
-  "*Extra headers to parse."
+  "*Extra headers to parse.
+Symbols must be catitalized."
   :group 'nnmail
   :type '(repeat symbol))
 
@@ -1398,7 +1399,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	 (total 0)
 	 incoming incomings source)
     (when (and (nnmail-get-value "%s-get-new-mail" method)
-	       nnmail-spool-file)
+	       sources)
       ;; We first activate all the groups.
       (nnmail-activate method)
       ;; Allow the user to hook.
