@@ -1,3 +1,12 @@
+1998-02-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-references-generator): New variable.
+	(message-generate-filled-references): New function.
+	(message-generate-folded-references): New function.
+	(message-generate-unfolded-references): New function.
+	(message-reply): Refer `message-references-generator'.
+	(message-followup): Refer `message-references-generator'.
+
 1998-01-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-send-mail-with-sendmail): Guard
