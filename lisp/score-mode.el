@@ -51,7 +51,7 @@
     table)
   "Syntax table used in score-mode buffers.")
 
-(defvar score-mode-coding-system 'binary)
+(defvar score-mode-coding-system nil)
 
 ;;;###autoload
 (defun gnus-score-mode ()
