@@ -2094,7 +2094,15 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (stringp article))
 	      ;; Hooks for getting information from the article.
 	      ;; This hook must be called before being narrowed.
-	      (let (buffer-read-only)
+	      (let ((method
+		     (if gnus-show-mime
+			 (progn
+			   (mime-parse-buffer)
+			   (if (or (not gnus-strict-mime)
+				   (mime-fetch-field "MIME-Version"))
+			       gnus-article-display-method-for-mime
+			     gnus-article-display-method-for-encoded-word))
+		       gnus-article-display-method-for-traditional)))
 		(gnus-run-hooks 'gnus-tmp-internal-hook)
 		(gnus-run-hooks 'gnus-article-prepare-hook)
 		;; Display message.
