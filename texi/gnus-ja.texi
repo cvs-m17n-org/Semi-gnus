@@ -5459,18 +5459,16 @@ Gnus は、取り消すときに『現在』の選択方法を使います。標準の投稿方法を使
 @table @code
 @item gnus-delay-initialize
 @findex gnus-delay-initialize
-ディフォルトでは、この関数は Message モードにおける @kbd{C-c C-j} キーの
-バインドと、
-@code{gnus-delay-send-queue} の @code{gnus-get-new-news-hook} への追加を
-行ないます。ですが、これは @code{no-keymap} と @code{no-check} の二つの
-オプション引数を受け付けます。もし @code{no-keymap} が非nil だった
-ら @kbd{C-c C-j} キーのバインドを行ないません。もし @code{no-check} が非
-nil だったら @code{gnus-get-new-news-hook} は変更されません。
+ディフォルトではこの関数
+は @code{gnus-delay-send-queue} の @code{gnus-get-new-news-hook} への追
+加を行ないます。ですが、これは第二オプション引数 @code{no-check} を受け
+付けます。もしそれが非-nil だったら @code{gnus-get-new-news-hook} は変更
+されません。第一オプション引数は無視されます。
 
-例えば @code{(gnus-delay-initialize nil t)} は、キーマップは変更する
-が @code{gnus-get-new-news-hook} は変更しないことを意味します。あなたは
-遅延記事の送信にデーモンを使いたいのでしょうね。でも、それを設定すること
-を忘れないで下さいね。:-)
+例え
+ば @code{(gnus-delay-initialize nil t)} は @code{gnus-get-new-news-hook} を
+変更しないことを意味します。あなたは遅延記事の送信にデーモンを使いたいの
+でしょうね。でも、それを設定することを忘れないで下さいね。:-)
 @end table
 
 @node Marking Articles
