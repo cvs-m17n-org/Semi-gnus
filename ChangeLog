@@ -1,3 +1,29 @@
+1999-12-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+	(smiley-toggle-buffer): Autoload "smiley" or "gnus-bitmap".
+
+	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Don't use
+	`get-text-property' in the outside of the boundary.
+	(gnus-article-smiley-display): New function.
+	(gnus-treatment-function-alist): Use it.
+
+	* lisp/dgnushack.el (byte-optimize-form-code-walker): Replace with
+	the bug fixed version rigidly instead of the use of `defcustom'.
+
+	* lisp/message.el (font-lock-after-change-function): Don't use
+	`compile' for the arg of `defadvice'.
+
+1999-12-06  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-yank-add-new-references): New option
+	value `message-id-only'.
+	(message-yank-original): Likewise.
+	(message-list-references-add-position): New user option.
+	(message-list-references): When
+	`message-list-references-add-position' is integer value, the order
+	of designate number message-ids is kept.
+
 1999-12-06  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
