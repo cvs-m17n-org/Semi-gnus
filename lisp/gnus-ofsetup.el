@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.4 1999-08-25 14:30:14 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.5 1999-08-27 16:57:12 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -33,7 +33,6 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'gnus-cus)
   (require 'gnus-offline))
 
 (defvar gnus-offline-setting-file
@@ -350,14 +349,16 @@ Semi-gnus. If you want to know about MIEE, see README-offline.{en,ja}.")
 		:value ,(cond ((and (boundp 'sendmail-to-spool-directory)
 				    sendmail-to-spool-directory)
 			       sendmail-to-spool-directory)
-			      (t "/usr/spool/mail.out"))))
+			      (t
+			       "/usr/spool/mail.out"))))
 
     (news-spool
      (directory :tag "News Spool Directory for MIEE"
 		:value ,(cond ((and (boundp 'news-spool-request-post-directory)
 				    news-spool-request-post-directory)
 			       news-spool-request-post-directory)
-			      (t "/usr/spool/news.out"))))
+			      (t
+			       "/usr/spool/news.out"))))
 
     (MTA-type
      (choice :tag "MTA Type" :value ,gnus-offline-MTA-type
@@ -392,7 +393,9 @@ If you want to know more about mail source specifiers and keywords,
 click the button below.")))
 
 (defvar gnus-ofsetup-params)
-(autoload 'gnus-custom-mode "gnus-cus" nil t)
+
+(eval-and-compile
+  (autoload 'gnus-custom-mode "gnus-cus"))
 
 (defun gnus-ofsetup-customize ()
   "Edit the gnus-offline parameters."
