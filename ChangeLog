@@ -1,3 +1,18 @@
+2000-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (TopLevel): Defalias `coding-system-category'
+	to `get-code-mnemonic' for Mule.
+	(TopLevel): Make codesys `euc-japan' and `shift_jis' for Mule.
+	(nnshimbun-type-definition): Use `static-if' to determine codesys.
+	(TopLevel): Require `static'.
+
+2000-12-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-url): coding detection is
+	improved.
+	(nnshimbun-meta-content-type-charset-regexp): New constant.
+	(nnshimbun-meta-charset-content-type-regexp): Ditto.
+
 2000-12-03  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* texi/gnus-ja.texi: Fixes for the last modification.
