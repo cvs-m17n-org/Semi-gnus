@@ -1,3 +1,32 @@
+2003-04-30  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: Add some missing autoloads for XEmacs 21.1.
+
+2003-04-29  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-fetch-group): faster
+	(gnus-registry-delete-group): new function
+	(gnus-registry-add-group): new function
+	(gnus-register-spool-action): use it
+	(gnus-register-action): use it
+	(gnus-registry-translate-from-alist) 
+	(gnus-registry-translate-to-alist): remove the headers registry
+	for now
+
+2003-04-29  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-alist): Fixed CTAN regexp.
+
+2003-04-29  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam-report.el (spam-report-gmane): gnus-summary-article-number
+	is not necessary, just use the function parameter
+
+2003-04-29  Karl Pflysterer  <sigurd@12move.de>
+
+	* spam-stat.el (spam-stat-save): No longer font-locks the file
+	when saving
+
 2003-04-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* canlock.el: Bind mail-header-separator when compiling (XEmacs
