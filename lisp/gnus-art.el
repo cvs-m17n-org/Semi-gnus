@@ -1013,7 +1013,7 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-x-pgp-sig 'head
+(defcustom gnus-treat-x-pgp-sig nil
   "Verify X-PGP-Sig.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -2755,6 +2755,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 	   newsgroup
 	 (expand-file-name "news" (gnus-newsgroup-directory-form newsgroup)))
        gnus-article-save-directory)))
+
+(autoload 'mm-uu-pgp-signed-test "mm-uu")
 
 (defun article-verify-x-pgp-sig ()
   "Verify X-PGP-Sig."
