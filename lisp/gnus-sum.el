@@ -820,6 +820,7 @@ following hook:
 (defcustom gnus-select-article-hook nil
   "*A hook called when an article is selected."
   :group 'gnus-summary-choose
+  :options '(gnus-agent-fetch-selected-article)
   :type 'hook)
 
 (defcustom gnus-visual-mark-article-hook
