@@ -1,3 +1,31 @@
+1998-08-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-narrow-to-signature):
+	Removed TM stuff.
+	(gnus-article-display-mime-message):
+	Set `mime-button-mother-dispatcher' in correct buffer.
+	(gnus-url-mailto): Use `gnus-setup-message'.
+	(gnus-button-mailto): Ditto.
+	(gnus-button-reply): Ditto.
+
+	* lisp/gnus-ems.el (gnus-mule-max-width-function): Removed.
+	(gnus-truncate-string): Use `truncate-string-to-width' if available.
+	(gnus-tilde-max-form): New implementation.
+	(gnus-tilde-cut-form): Ditto.
+
+	* lisp/gnus-msg.el (gnus-summary-mail-digest): New function.
+	(gnus-summary-post-digest): New function.
+
+	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Use
+	`gnus-summary-mail-digest' and `gnus-summary-post-digest' instead
+	of `gnus-uu-digest-mail-forward' and `gnus-uu-digest-post-forward'.
+
+	* lisp/gnus-util.el (gnus-truncate-string): Ignore more than two
+	arguments.
+
+	* lisp/message.el (message-forward-end-separator): Use
+	`text/plain' tag.
+
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el: Suppress some byte-compile warnings.
