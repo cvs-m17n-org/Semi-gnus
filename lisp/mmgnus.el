@@ -36,6 +36,7 @@
     (set-buffer gnus-original-article-buffer)
     (mime-entity-set-header-start-internal entity (point-min))
     (mime-entity-set-body-end-internal entity (point-max))
+    (goto-char (point-min))
     (if (re-search-forward "^$" nil t)
 	(progn
 	  (mime-entity-set-header-end-internal entity (match-end 0))

@@ -110,7 +110,7 @@
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
 
-	(nnheader-fold-continuation-lines)
+        ;; (nnheader-fold-continuation-lines)
 	'headers))))
 
 (deffoo nnmh-open-server (server &optional defs)
