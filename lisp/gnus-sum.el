@@ -8931,7 +8931,7 @@ save those articles instead."
       (set-buffer (get-buffer-create " *Partial Article*"))
       (erase-buffer)
       (setq mime-preview-buffer mother)
-      (gnus-request-original-article number group)
+      (gnus-request-article-this-buffer number group)
       (mime-parse-buffer)
       )))
 
