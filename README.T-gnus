@@ -1,7 +1,7 @@
 ========================================================================
 Codename:	T-gnus
 Branch Tag:	t-gnus-6_16-quimby
-Branch Status:	Develop, Synchronize with Oort Gnus
+Branch Status:	Develop, Synchronize with Gnus
 Branch Goal:	Implement latest features of gnus and offline features
 		Use Gnus in Offline status.
 Branch Policy:	(not defined yet)
@@ -31,7 +31,7 @@ NEWS:
 
   See TODO.ja
 
-* T-gnus 6.16 - this is based on Oort Gnus.
+* T-gnus 6.16 - this is based on Gnus.
 
   The latest T-gnus is T-gnus 6.16.3 (based on Gnus 5.10.3).  It
   requires SEMI 1.14, FLIM 1.14, and APEL 10.0 or later.
