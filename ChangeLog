@@ -1,5 +1,10 @@
 2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Truncate
+	lines in the imitation buffer; turn off h-scrollbar for XEmacs.
+
+2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
 	* lisp/{rfc2231.el,nnweb.el,nnultimate.el,nntp.el,nnspool.el,
