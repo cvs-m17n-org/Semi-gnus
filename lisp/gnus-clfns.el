@@ -37,8 +37,7 @@
 
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (and (fboundp 'butlast)
-	     (or (>= emacs-major-version 21)
-		 (subrp (symbol-function 'butlast))))
+	     (subrp (symbol-function 'butlast)))
 	form
       (if n
 	  `(let ((x ,x)
@@ -94,8 +93,7 @@
 
   (define-compiler-macro last (&whole form x &optional n)
     (if (and (fboundp 'last)
-	     (or (>= emacs-major-version 21)
-		 (subrp (symbol-function 'last))))
+	     (subrp (symbol-function 'last)))
 	form
       (if n
 	  `(let* ((x ,x)
