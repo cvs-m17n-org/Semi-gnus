@@ -187,7 +187,6 @@
     (setup-20 . "File: ")
     (setup-21 . "Directory: ")
     (setup-22 . "What network stream? ")
-    (setup-23 . "What authentication? ")
 
     (param-news-method-1 . "News Method")
     (param-news-method-2 . "Gnus Agent")
@@ -286,7 +285,7 @@ restarted.")
     (setup-11 . "設定するメール取得先の数は? (後で追加できます): ")
     (setup-12 . "メールのアカウント名: ")
     (setup-13 . "そのアカウントのあるメールサーバ名: ")
-    (setup-14 . "そのサーバでの認証方式は? ")
+    (setup-14 . "認証方式は? ")
     (setup-15 . "メールの受信には pop3.el を使いますか? ")
     (setup-16 . "movemail プログラムの名前: ")
     (setup-17 . "movemail プログラムに渡す引数: ")
@@ -295,7 +294,6 @@ restarted.")
     (setup-20 . "ファイル: ")
     (setup-21 . "ディレクトリ: ")
     (setup-22 . "接続方式は? ")
-    (setup-23 . "認証方式は? ")
 
     (param-news-method-4 . "\
 ニュース記事を取得する方法です。")
@@ -404,10 +402,10 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 		     syms)
 		    nil t nil)))
 
-(defun gnus-setup-for-offline ()
+(defun gnus-setup-for-offline (&optional force)
   "*Set up Gnus for offline environment."
-  (interactive)
-  (unless (file-exists-p gnus-offline-setting-file)
+  (interactive "P")
+  (unless (and (file-exists-p gnus-offline-setting-file) (not force))
     (let (news-method
 	  mail-method agent-directory drafts-queue-type news-spool mail-spool
 	  use-miee MTA-type dialup-program dialup-program-arguments
@@ -512,14 +510,14 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			  'kerberos4 'ssl 'network))
 	    (setq authentication (gnus-ofsetup-completing-read-symbol
 				  (format "<%d of %d> %s" j n
-					  (gnus-ofsetup-gettext 'setup-23))
+					  (gnus-ofsetup-gettext 'setup-14))
 				  'kerberos4 'cram-md5 'anonymous 'login)))
 	  (when (string= type "file")
 	    (setq path (read-file-name
 			(format "<%d of %d> %s" j n
 				(gnus-ofsetup-gettext 'setup-20)))))
 	  (when (or (string= type "directory") (string= type "maildir"))
-	    (setq path (read-directory-name
+	    (setq path (read-file-name
 			(format "<%d of %d> %s" j n
 				(gnus-ofsetup-gettext 'setup-21)))))
 	  ;; Now set a mail source specifier.
@@ -531,7 +529,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 		       (nconc source
 			      (list
 			       (make-symbol
-				(format ":%s" (prin1-to-string sym)))
+				(format ":%s" sym))
 			       (symbol-value sym))))))
 	   '(path user server authentication stream program))
 	  (setq mail-source (nconc mail-source (list source))))
