@@ -490,6 +490,13 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 * Index::                       $BJQ?t!"4X?t!"35G0$N:w0z(B
 * Key Index::                   $B%-!<:w0z(B
 
+Other related manuals
+
+* Message:(message).            Composing messages.
+* Emacs-MIME:(emacs-mime).      Composing messages; MIME-specific parts.
+* Sieve:(sieve).                Managing Sieve scripts in Emacs.
+* PGG:(pgg).                    PGP/MIME with Gnus.
+
 @detailmenu
  --- The Detailed Node Listing ---
 

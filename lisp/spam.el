@@ -538,20 +538,15 @@ spamicity coefficient of each, and the overall article spamicity."
 	      (message "%s %d" prefix counter))
 	    (setq article (pop articles))
 	    (gnus-summary-goto-subject article)
-	    (gnus-summary-select-article)
+	    (gnus-summary-show-article t)
 	    (gnus-eval-in-buffer-window article-copy
 	      (insert-buffer-substring gnus-original-article-buffer)
 	      ;; Remove spam classification redundant headers: they may induce
 	      ;; unwanted biases in later analysis.
-	      (goto-char (point-min))
-	      (while (not (or (eobp) (= (following-char) ?\n)))
-		(if (looking-at remove-regexp)
-		    (delete-region (point)
-				   (save-excursion (forward-line 1) (point)))
-		  (forward-line 1)))
-	      (goto-char (point-min))
+	      (message-remove-header remove-regexp t)
 	      ;; Bogofilter really wants From envelopes for counting articles.
 	      ;; Fake one at the beginning, make sure there will be no other.
+	      (goto-char (point-min))
 	      (if (looking-at "From ")
 		  (forward-line 1)
 		(insert "From nobody " (current-time-string) "\n"))
