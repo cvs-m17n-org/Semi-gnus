@@ -1721,6 +1721,8 @@ prefix, and don't delete any headers."
   (let ((modified (buffer-modified-p)))
     (when (and message-reply-buffer
 	       message-cite-function)
+      (gnus-copy-article-buffer)
+      (setq message-reply-buffer gnus-article-copy)
       (delete-windows-on message-reply-buffer t)
       (insert-buffer message-reply-buffer)
       (funcall message-cite-function)
