@@ -179,7 +179,7 @@ nnshimbun groups.  You can specify the nnshimbun group parameter
 `prefecth-articles' for each nnshimbun group.")
 
 (defvoo nnshimbun-encapsulate-images shimbun-encapsulate-images
-  "*If non-nil, inline images in the shimbun article are encapsulated.
+  "*If non-nil, inline images will be encapsulated in the articles.
 Note that this variable has just a default value for all the nnshimbun
 groups.  You can specify the nnshimbun group parameter
 `encapsulate-images' for each nnshimbun group.")
