@@ -8001,7 +8001,8 @@ w3 を使います (これがディフォルトです)。
 
 @item gnus-article-wash-html-with-w3m
 @findex gnus-article-wash-html-with-w3m
-外部プログラム @samp{w3m} を使います。
+外部プログラム @samp{w3m} を使います。もっと詳しいこと
+は @uref{http://w3m.sourceforge.net/} を参照して下さい。
 @end table
 
 @item W b
