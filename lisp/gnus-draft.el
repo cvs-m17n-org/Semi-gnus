@@ -1,5 +1,5 @@
 ;;; gnus-draft.el --- draft message support for Semi-gnus
-;; Copyright (C) 1997, 1998, 1999, 2000
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -104,7 +104,7 @@
       (save-restriction
 	(message-narrow-to-headers)
 	(message-remove-header "date")
-	(put-text-property (point-min) (point-max) 'field 'header)))
+	(put-text-property (point-min) (point-max) 'message-field 'header)))
     (message-save-drafts)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) group t))
