@@ -1,3 +1,29 @@
+1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-user-agent): Replace with the
+	new code.
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): New function.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Needn't be interactive.
+
+	* lisp/gnus-msg.el (gnus-inviolable-extended-version): Abolished.
+
+1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-kill-buffer): Change the prompt string.
+
+	* lisp/message.el (message-mode-map): Substitute key definition
+	`kill-buffer' to `message-kill-buffer'.
+
+1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Set the default value
+	to `message-maybe-setup-default-charset'.
+
+	* lisp/message.el (message-setup-hook): Move
+	'message-maybe-setup-default-charset' to `gnus-message-setup-hook'.
+
 1998-10-02  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-kill-buffer): Refer to
