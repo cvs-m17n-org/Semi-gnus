@@ -185,13 +185,6 @@ If nil, use system defaults."
 		 string)
   :group 'smime)
 
-(defcustom smime-extra-arguments nil
-  "*List of additional arguments passed to OpenSSL.
-For instance, if you don't have a /dev/random you might be forced
-to set this to e.g. `(\"-rand\" \"/etc/entropy\")'."
-  :type '(repeat string)
-  :group 'smime)
-
 (defvar smime-details-buffer "*OpenSSL output*")
 
 ;; Password dialog function
@@ -208,8 +201,7 @@ to set this to e.g. `(\"-rand\" \"/etc/entropy\")'."
 ;; OpenSSL wrappers.
 
 (defun smime-call-openssl-region (b e buf &rest args)
-  (case (apply 'call-process-region b e smime-openssl-program nil
-	       buf nil (append smime-extra-arguments args))
+  (case (apply 'call-process-region b e smime-openssl-program nil buf nil args)
     (0 t)
     (1 (message "OpenSSL: An error occurred parsing the command options.") nil)
     (2 (message "OpenSSL: One of the input files could not be read.") nil)
@@ -233,23 +225,28 @@ to include in its caar."
   (let ((keyfile (car keyfiles))
 	(certfiles (and (cdr keyfiles) (cadr keyfiles)))
 	(buffer (generate-new-buffer (generate-new-buffer-name " *smime*")))
-	(passphrase (smime-ask-passphrase)))
+	(passphrase (smime-ask-passphrase))
+	(tmpfile (make-temp-file "smime")))
     (if passphrase
 	(setenv "GNUS_SMIME_PASSPHRASE" passphrase))
     (prog1
-	(when (apply 'smime-call-openssl-region b e buffer "smime" "-sign"
-		     "-signer" (expand-file-name keyfile)
-		     (append
-		      (smime-make-certfiles certfiles)
-		      (if passphrase
-			  (list "-passin" "env:GNUS_SMIME_PASSPHRASE"))))
+	(when (prog1
+		  (apply 'smime-call-openssl-region b e (list buffer tmpfile)
+			 "smime" "-sign" "-signer" (expand-file-name keyfile)
+			 (append
+			  (smime-make-certfiles certfiles)
+			  (if passphrase
+			      (list "-passin" "env:GNUS_SMIME_PASSPHRASE"))))
+		(if passphrase
+		    (setenv "GNUS_SMIME_PASSPHRASE" "" t))
+		(with-current-buffer smime-details-buffer
+		  (insert-file-contents tmpfile)
+		  (delete-file tmpfile)))
 	  (delete-region b e)
 	  (insert-buffer-substring buffer)
 	  (when (looking-at "^MIME-Version: 1.0$")
 	    (delete-region (point) (progn (forward-line 1) (point))))
 	  t)
-      (if passphrase
-	  (setenv "GNUS_SMIME_PASSPHRASE" "" t))
       (with-current-buffer (get-buffer-create smime-details-buffer)
 	(goto-char (point-max))
 	(insert-buffer-substring buffer))
@@ -260,10 +257,16 @@ to include in its caar."
 If encryption fails, the buffer is not modified.  Region is assumed to
 have proper MIME tags.  CERTFILES is a list of filenames, each file
 is expected to contain of a PEM encoded certificate."
-  (let ((buffer (generate-new-buffer (generate-new-buffer-name " *smime*"))))
+  (let ((buffer (generate-new-buffer (generate-new-buffer-name " *smime*")))
+	(tmpfile (make-temp-file "smime")))
     (prog1
-	(when (apply 'smime-call-openssl-region b e buffer "smime" "-encrypt"
-		     smime-encrypt-cipher (mapcar 'expand-file-name certfiles))
+	(when (prog1
+		  (apply 'smime-call-openssl-region b e (list buffer tmpfile)
+			 "smime" "-encrypt" smime-encrypt-cipher
+			 (mapcar 'expand-file-name certfiles))
+		(with-current-buffer smime-details-buffer
+		  (insert-file-contents tmpfile)
+		  (delete-file tmpfile)))
 	  (delete-region b e)
 	  (insert-buffer-substring buffer)
 	  (when (looking-at "^MIME-Version: 1.0$")

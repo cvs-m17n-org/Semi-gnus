@@ -65,7 +65,7 @@
   '((trust-undefined . nil)
     (trust-none      . nil)
     (trust-marginal  . t)
-    (trust-fully     . t)
+    (trust-full      . t)
     (trust-ultimate  . t))
   "Trust boundaries for a signer's GnuPG key.
 This alist contains pairs of the form (trust-symbol . boolean), with
