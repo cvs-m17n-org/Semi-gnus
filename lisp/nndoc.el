@@ -290,7 +290,7 @@ from the document.")
 	(mm-enable-multibyte)
 	(erase-buffer)
 	(if (stringp nndoc-address)
-	    (mm-insert-file-contents nndoc-address)
+	    (nnheader-insert-file-contents nndoc-address)
 	  (insert-buffer-substring nndoc-address))
 	(run-hooks 'nndoc-open-document-hook))))
     ;; Initialize the nndoc structures according to this new document.
