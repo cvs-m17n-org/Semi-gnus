@@ -459,17 +459,20 @@ gnus にはこの変数の好適な候補であるところの、あらかじめ定義されている関
 他のヘッダーに付け加えられ、その値は To: と Cc: にあるすべてのアドレスに
 設定されます。
 
+@kindex C-c C-f C-a
+@findex message-gen-unsubscribed-mft
 @kindex C-c C-f C-m
 @findex message-goto-mail-followup-to
 うーむ。そうするとあなたは「購読していないメーリングリストにメールを送信
 するときはどうなるの?  私は余分のコピーが欲しいことを MFT で言いたい」と
 尋ねますね (たぶん他の人は MFT が無かった場合と同様に処理してしまうだろ
 うけれど、誰かの to-address グループパラメータを上書きするために、明示的
-な MFT を使うことができるのです)。えーと、親切な Gnus タワーの人たちが、
-この目的で使えるすべての既知のメーリングリストのアドレスのデータベースの
-作成にいそしんでいます。それまで
-は @kbd{C-c C-f C-m} (@code{message-goto-mail-followup-to}) を使って手動
-で MFT ヘッダーを挿入するなどして下さい!!
+な MFT を使うことができるのです)。関
+数 @code{message-gen-unsubscribed-mft} が役に立つことがあるでしょう。こ
+れはディフォルトで @kbd{C-c C-f C-a} に割り当てられています。どんな場合
+でも、あなたは自分が選んだ MFT を挿入することができます; それを始めるの
+に @kbd{C-c C-f C-m} (@code{message-goto-mail-followup-to}) が助けてくれ
+るでしょう。
 
 @c @node Honoring an MFT post
 @subsection MFT 投稿の尊重
