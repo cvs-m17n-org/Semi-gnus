@@ -230,8 +230,9 @@ Thank you for your help in stamping out bugs.
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
   (setq message-user-agent (gnus-extended-version))
-  (message-add-action
-   `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
+  (when (not message-use-multi-frames)
+    (message-add-action
+     `(set-window-configuration ,winconf) 'exit 'postpone 'kill))
   (message-add-action
    `(when (gnus-buffer-exists-p ,buffer)
       (save-excursion
