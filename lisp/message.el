@@ -3406,7 +3406,6 @@ Headers already prepared in the buffer are not modified."
   (when actions
     (setq message-send-actions actions))
   (setq message-reply-buffer replybuffer)
-  (goto-char (point-min))
   ;; Insert all the headers.
   (mail-header-format
    (let ((h headers)
@@ -3421,6 +3420,7 @@ Headers already prepared in the buffer are not modified."
   (when message-default-headers
     (insert message-default-headers)
     (or (bolp) (insert ?\n)))
+  (goto-char (point-max))
   (put-text-property
    (point)
    (progn
@@ -4216,7 +4216,7 @@ regexp varstr."
   (let ((locals (save-excursion
 		  (set-buffer buffer)
 		  (buffer-local-variables)))
-	(regexp "^gnus\\|^nn\\|^message"))
+	(regexp "^gnus\\|^nn\\|^message\\|user-mail-address\\|user-full-name"))
     (mapcar
      (lambda (local)
        (when (and (consp local)
