@@ -1235,20 +1235,22 @@ See also the documentations for the following variables:
 		 (not (equal mail-header-separator "")))
 	    `((,(concat "^\\(" (regexp-quote mail-header-separator) "\\)$")
 	       1 'message-separator-face))
-	  nil))))
+	  nil)
+      (,(concat "^\\(" message-cite-prefix-regexp "\\).*")
+       (0 'message-cited-text-face))
+      ("<#/?\\(multipart\\|part\\|external\\|mml\\).*>"
+       (0 'message-mml-face))))
+  "Additional expressions to highlight in Message mode.")
 
 (defvar message-font-lock-keywords-2
   (append message-font-lock-keywords-1
 	  `((message-font-lock-cited-text-matcher
 	     (1 'message-cited-text-face)
-	     (2 'message-cited-text-face))
-	    (,(concat "^\\(" message-cite-prefix-regexp "\\).*")
-	     (0 'message-cited-text-face))
-	    ("<#/?\\(multipart\\|part\\|external\\|mml\\).*>"
-	     (0 'message-mml-face)))))
+	     (2 'message-cited-text-face))))
+  "Auxiliary expressions to highlight in Message mode.")
 
 (defvar message-font-lock-keywords message-font-lock-keywords-2
-  "Additional expressions to highlight in Message mode.")
+  "Default expressions to highlight in Message mode.")
 
 ;; XEmacs does it like this.  For Emacs, we have to set the
 ;; `font-lock-defaults' buffer-local variable.
