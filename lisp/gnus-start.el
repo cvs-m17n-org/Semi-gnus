@@ -1,5 +1,5 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -677,9 +677,8 @@ the first newsgroup."
     (kill-buffer (get-file-buffer (gnus-newsgroup-kill-file nil))))
   (gnus-kill-buffer nntp-server-buffer)
   ;; Kill Gnus buffers.
-  (let ((buffers (gnus-buffers)))
-    (when buffers
-      (mapcar 'kill-buffer buffers)))
+  (dolist (buffer (gnus-buffers))
+    (gnus-kill-buffer buffer))
   ;; Remove Gnus frames.
   (gnus-kill-gnus-frames))
 
@@ -2622,7 +2621,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
 	  (save-buffer-as-coding-system gnus-ding-file-coding-system)
-	  (kill-buffer (current-buffer))
+	  (gnus-kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
 	(gnus-dribble-delete-file)
