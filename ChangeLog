@@ -1,5 +1,13 @@
 1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Add new
+	optional arguments `dependencies' and `force-new'; new
+	implementation; call `retrieve-parsed-headers' if it is found.
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): New function.
+
+1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus-sum.el (gnus-select-newsgroup): Use
 	`gnus-retrieve-parsed-headers' instead of `gnus-retrieve-headers'
 	and `gnus-get-newsgroup-headers-xover' or
