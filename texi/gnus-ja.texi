@@ -11294,8 +11294,12 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 は @code{gnus-group-split-default-catch-all-group} で指定されているグルー
 プに保存されます。@var{split-spec} が @code{catch-all} に設定されている
 グループがある場合は、そのグループが全てを捕獲するグループとして使用され
-ます。この場合は、@code{|} 特級分割が @code{&} 分割と全てを捕獲するグルー
-プを閉包するように、相互投稿は行われないことに注意してください。
+ます。この変数はしばしば単にグループを指定するために使われますが、任意の
+複雑な特級分割をも設定する (結局、グループ名は特級分割なのです) ので、個
+人のメールフォルダーのどのメーリングリストにも当てはまらないメールを分割
+するのに便利でしょう。なおこの特級分割は、@code{|} 分割リストの最後の要
+素 - グループパラメータから抽出された規則を持つ @code{&} 分割を含む - と
+して追加されることに注意してください。
 
 そろそろ例を出すべきでしょう。以下のグループパラメータが定義されていると
 します:
@@ -11337,17 +11341,18 @@ nnml:mail.others:
 @var{groups} は出力の分割を生成するためにパラメータが走査されるグループ
 名のリストか正規表現です。@var{no-crosspost} は相互投稿を使用禁止にるた
 めに使うことができます。その場合、単一の @code{|} 分割が出力されます。
-@var{catch-all} は初期全捕獲グループとして使用されるグループ名です。
-@var{catch-all} が @code{nil} であるか、@var{split-regexp} がどれかの選
-択されたグループ空文字列に合致すると、全捕獲分割は行われません。そうでな
-い場合、グループに @var{split-spec} が @code{catch-all} に設定されている
-ものがあると、このグループが @var{catch-all} 引数を上書きします。
+@var{catch-all} は @var{gnus-group-split-default-catch-all-group} のよう
+に、最後の手段として使われる特級分割です。@var{catch-all} が @code{nil} で
+あるか、@var{split-regexp} がどれかの選択されたグループ空文字列に合致す
+ると、全捕獲分割は行われません。そうでない場合、グループ
+に @var{split-spec} が @code{catch-all} に設定されているものがあると、こ
+のグループが @var{catch-all} 引数を上書きします。
 
 @findex gnus-group-split-setup
 不運なことに、全てのグルプとパラメータを走査することは非常に遅いです。特
 に全てのメッセージに対してなされることを考えると。けれども、絶望しない
 で! 関数 @code{gnus-group-split-setup} が @code{gnus-group-split} をより
-ずっと効率的な方法で選択するように使うことができます。それ
+ずっと効率的な方法で使うことができます。それ
 は @code{nnmail-split-methods} を @code{nnmail-split-fancy} に設定し、
 @code{nnmail-split-fancy} を @code{gnus-group-split-fancy} で生成された
 分割に設定します。こうしてどんなに分割するメッセージがたくさんあっても、
@@ -11367,9 +11372,8 @@ nnml:mail.others:
 @var{auto-update} が @code{nil} で無いと、
 @code{gnus-group-split-update} が @code{nnmail-pre-get-new-mail-hook} に
 追加され、二度と @code{nnmail-split-fancy} の更新を心配する必要はありま
-せん。@var{catch-all} を省略しない場合は (それはオプションで
-す) @code{gnus-group-split-default-catch-all-group} はその値に設定されま
-す。
+せん。@var{catch-all} を省略しない場合は (それはオプションで nil と同じ)、
+@code{gnus-group-split-default-catch-all-group} はその値に設定されます。
 
 @vindex gnus-group-split-updated-hook
 @code{nnmail-split-fancy} が @code{gnus-group-split-update} で設定された
