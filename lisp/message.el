@@ -1218,7 +1218,7 @@ candidates:
 (defcustom message-hidden-headers nil
   "Regexp of headers to be hidden when composing new messages.
 This can also be a list of regexps to match headers.  Or a list
-starting with `not' and followed by regexps.."
+starting with `not' and followed by regexps."
   :group 'message
   :type '(repeat regexp))
 
@@ -1797,6 +1797,13 @@ see `message-narrow-to-headers-or-head'."
 	(setq value (replace-match " " t t value)))
       (set-text-properties 0 (length value) nil value)
       value)))
+
+(defun message-field-value (header &optional not-all)
+  "The same as `message-fetch-field', only narrow to the headers first."
+  (save-excursion
+    (save-restriction
+      (message-narrow-to-headers-or-head)
+      (message-fetch-field header not-all))))
 
 (defun message-narrow-to-field ()
   "Narrow the buffer to the header on the current line."
@@ -3124,10 +3131,8 @@ Note that this should not be used in newsgroups."
       (message-remove-header "Disposition-Notification-To"))
     (message-goto-eoh)
     (insert (format "Disposition-Notification-To: %s\n"
-		    (or (save-excursion
-			  (save-restriction
-			    (message-narrow-to-headers)
-			    (message-fetch-field "From")))
+		    (or (message-field-value "Reply-to")
+			(message-field-value "From")
 			(message-make-from))))))
 
 (defun message-elide-region (b e)

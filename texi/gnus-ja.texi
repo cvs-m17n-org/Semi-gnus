@@ -12833,9 +12833,9 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @end lisp
 
 @item webmail
-@uref{www.hotmail.com}, @uref{webmail.netscape.com},
-@uref{www.netaddress.com}, @uref{www.yahoo.com} などのウェブメールサーバー
-からメールを取得します。
+@uref{http://www.hotmail.com/}, @uref{http://webmail.netscape.com/},
+@uref{http://www.netaddress.com/}, @uref{http://www.yahoo.com/} などのウェ
+ブメールサーバーからメールを取得します。
 
 注: ウェブメールはクッキーに大きく依存します。url "4.0pre.46" を使う場合
 は "one-line-cookie" パッチを当てる必要があります。

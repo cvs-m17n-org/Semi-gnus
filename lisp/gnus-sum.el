@@ -3983,6 +3983,13 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
+(defsubst gnus-remove-odd-characters (string)
+  "Translate STRING into something that doesn't contain weird characters."
+  (mm-subst-char-in-string
+   ?\r ?\-
+   (mm-subst-char-in-string
+    ?\n ?\- string)))
+
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
@@ -8106,6 +8113,7 @@ of what's specified by the `gnus-refer-thread-limit' variable."
   (interactive "sMessage-ID: ")
   (when (and (stringp message-id)
 	     (not (zerop (length message-id))))
+    (setq message-id (gnus-replace-in-string message-id " " ""))
     ;; Construct the correct Message-ID if necessary.
     ;; Suggested by tale@pawl.rpi.edu.
     (unless (string-match "^<" message-id)
@@ -11062,13 +11070,15 @@ If REVERSE, save parts that do not match TYPE."
 	      (not (string-match type (mm-handle-media-type handle)))
 	    (string-match type (mm-handle-media-type handle)))
       (let ((file (expand-file-name
-		   (file-name-nondirectory
-		    (or
-		     (mail-content-type-get
-		      (mm-handle-disposition handle) 'filename)
-		     (concat gnus-newsgroup-name
-			     "." (number-to-string
-				  (cdr gnus-article-current)))))
+		   (gnus-map-function
+		    mm-file-name-rewrite-functions
+		    (file-name-nondirectory
+		     (or
+		      (mail-content-type-get
+		       (mm-handle-disposition handle) 'filename)
+		      (concat gnus-newsgroup-name
+			      "." (number-to-string
+				   (cdr gnus-article-current))))))
 		   dir)))
 	(unless (file-exists-p file)
 	  (mm-save-part-to-file handle file))))))

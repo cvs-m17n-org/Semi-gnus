@@ -1913,14 +1913,15 @@ always hide."
 	  (forward-line 1))))))
 
 (defun article-treat-dumbquotes ()
-  "Translate M****s*** sm*rtq**t*s into proper text.
+  "Translate M****s*** sm*rtq**t*s and other symbols into proper text.
 Note that this function guesses whether a character is a sm*rtq**t* or
 not, so it should only be used interactively.
 
-Sm*rtq**t*s are M****s***'s unilateral extension to the character map
-in an attempt to provide more quoting characters.  If you see
-something like \\222 or \\264 where you're expecting some kind of
-apostrophe or quotation mark, then try this wash."
+Sm*rtq**t*s are M****s***'s unilateral extension to the
+iso-8859-1 character map in an attempt to provide more quoting
+characters.  If you see something like \\222 or \\264 where
+you're expecting some kind of apostrophe or quotation mark, then
+try this wash."
   (interactive)
   (article-translate-strings gnus-article-dumbquotes-map))
 
@@ -5322,21 +5323,22 @@ If given a numerical ARG, move forward ARG pages."
 	       (re-search-forward page-delimiter nil 'move arg)))
       (setq gnus-page-broken t)
       (goto-char (match-end 0)))
-    (narrow-to-region
-     (point)
-     (if (re-search-forward page-delimiter nil 'move)
-	 (match-beginning 0)
-       (point)))
-    (when (and (gnus-visual-p 'page-marker)
-	       (not (= (point-min) 1)))
-      (save-excursion
-	(goto-char (point-min))
-	(gnus-insert-prev-page-button)))
-    (when (and (gnus-visual-p 'page-marker)
-	       (< (+ (point-max) 2) (buffer-size)))
-      (save-excursion
-	(goto-char (point-max))
-	(gnus-insert-next-page-button)))))
+    (when gnus-page-broken
+      (narrow-to-region
+       (point)
+       (if (re-search-forward page-delimiter nil 'move)
+	   (match-beginning 0)
+	 (point)))
+      (when (and (gnus-visual-p 'page-marker)
+		 (not (= (point-min) 1)))
+	(save-excursion
+	  (goto-char (point-min))
+	  (gnus-insert-prev-page-button)))
+      (when (and (gnus-visual-p 'page-marker)
+		 (< (+ (point-max) 2) (buffer-size)))
+	(save-excursion
+	  (goto-char (point-max))
+	  (gnus-insert-next-page-button))))))
 
 ;; Article mode commands
 
