@@ -1,3 +1,54 @@
+2003-05-10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-logo-color-alist): Added no colours.
+
+2003-05-09  Dave Love  <fx@gnu.org>
+
+	* utf7.el (mm-util): Require.
+	(utf7-direct-encoding-chars, utf7-imap-direct-encoding-chars):
+	Defconst, not defvar.
+	(utf7-utf-16-coding-system): New.
+	(utf7-encode-internal): Hoist concat out of loop.
+	(utf7-fragment-encode): Use mm-with-unibyte-current-buffer.
+	(utf7-get-u16char-converter) [utf7-utf-16-coding-system]: New
+	case.
+	(utf7-latin1-u16-char-converter): Encode the region.
+	(utf7-u16-latin1-char-converter): Decode the region.
+	(utf7-encode, utf7-decode): Fix multibyteness.
+
+	* mm-bodies.el (mm-body-7-or-8): Don't special-case mule.
+	(mm-encode-body): Use mm-read-coding-system, not mm-read-charset.
+	(mm-uu-yenc-decode-function): Defvar when compiling.
+	(mm-encode-body, mm-decode-body): Doc fix.
+
+2003-05-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-unregistered-group-regex):
+	removed in favor of the group/topic/global variables
+	(gnus-registry-register-message-ids): fixed test to omit
+	gnus-registry-unregistered-group-regex
+
+	* gnus.el (gnus-variable-list): removed gnus-registry-alist and
+	gnus-registry-headers-alist from the list
+	(gnus-registry-headers-alist): removed
+	(registry-ignore): new parameter, with accompanying
+	gnus-registry-ignored-groups global variable
+
+	* gnus-start.el (gnus-clear-system): no need to clear the
+	registry, we can do it ourselves
+	(gnus-gnus-to-quick-newsrc-format): extra parameters so it can be
+	used by gnus-registry.el
+
+	* gnus-registry.el (gnus-registry-cache-file): new file variable
+	(gnus-registry-cache-read, gnus-registry-cache-save): new
+	functions
+	(gnus-registry-cache-whitespace): new function.  From Dan
+	Christensen <jdc@chow.mat.jhu.edu>
+	(gnus-registry-save, gnus-registry-read): use the new
+	gnus-registry-cache-{read|save} functions, and change the name
+	from gnus-registry-translate-{from|to}-alist
+	(gnus-registry-clear): fixed so it doesn't refer to old function name
+
 2003-05-09  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus-picon.el (gnus-picon-transform-address): Parse the encoded
