@@ -96,6 +96,8 @@
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup article gnus-newsgroup-name)
+    (let ((gnus-verbose-backends nil))
+      (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
      `((lambda ()
 	 (when (gnus-buffer-exists-p ,gnus-summary-buffer)
@@ -162,7 +164,8 @@
 	(message-remove-header gnus-agent-meta-information-header)))
     ;; Then we send it.  If we have no meta-information, we just send
     ;; it and let Message figure out how.
-    (gnus-draft-send-draft type method)))
+    (if type
+	(gnus-draft-send-draft type method))))
 ;;
 (defun gnus-draft-send-draft (type method)
   (if (eq type 'mail)
@@ -174,12 +177,17 @@
 			   (goto-char (point-min)) (search-forward "\n\n"))))
 	  (if (not (null recipients))
 	      (if (not (smtp-via-smtp user-mail-address recipients (current-buffer)))
-		  (error "Sending failed: SMTP protocol error")))))
+		  (error "Sending failed: SMTP protocol error")
+		(let ((gnus-verbose-backends nil))
+		  (gnus-request-expire-articles
+		   (list article) (or group "nndraft:queue") t))
+		(if (get-buffer gnus-draft-send-draft-buffer)
+		    (kill-buffer gnus-draft-send-draft-buffer))))))
     ;; Send draft via NNTP.
     (gnus-open-server method)
-    (gnus-request-post method))
-  (if (get-buffer gnus-draft-send-draft-buffer)
-      (kill-buffer gnus-draft-send-draft-buffer)))
+    (gnus-request-post method)
+    (if (get-buffer gnus-draft-send-draft-buffer)
+	(kill-buffer gnus-draft-send-draft-buffer))))
 ;; For draft TEST
 
 (defun gnus-draft-send-all-messages ()

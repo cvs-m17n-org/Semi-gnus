@@ -1,5 +1,24 @@
 1998-09-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.013.
+
+	* Sync up with Pterodactyl Gnus 0.19.
+
+1998-09-08  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send-draft) (gnus-draft-send): New
+	implementations for testing.
+
+	* lisp/gnus-agent.el (gnus-agent-expire) (gnus-agent-fetch-headers)
+ 	(gnus-agent-flush-cache) (gnus-agent-save-history)
+ 	(gnus-agent-save-groups): Bind `coding-system-for-write' by
+ 	`gnus-agent-file-coding-system' while writing a file.
+
+	* lisp/gnus-agent.el (gnus-agent-file-coding-system): Renamed from
+	`gnus-agent-article-file-coding-system'.
+
+1998-09-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.012.
 
 	* Sync up with Pterodactyl Gnus 0.18.
