@@ -1,5 +1,6 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98,99
+;;               Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -253,11 +254,11 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Chaos"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "1.12.1"
+(defconst gnus-version-number "1.12.2"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on Gnus 5.6.45; for SEMI 1.12, FLIM 1.12)"
+  (format "%s %s (based on Gnus 5.6.45; for SEMI 1.12/1.13, FLIM 1.12)"
           gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
