@@ -1,5 +1,5 @@
 ;;; nnrss.el --- interfacing with RSS
-;; Copyright (C) 2001  Free Software Foundation, Inc.
+;; Copyright (C) 2001, 2002  Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: RSS
@@ -39,7 +39,6 @@
 (eval-when-compile
   (ignore-errors
     (require 'xml)))
-;; Report failure to find w3 at load time if appropriate.
 (eval '(require 'xml))
 
 (nnoo-declare nnrss)
@@ -174,6 +173,12 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
   "Field name used for URL.
 To use the description in headers, put this name into `nnmail-extra-headers'.")
 
+(defvar nnrss-content-function nil
+  "A function which is called in `nnrss-request-article'.
+The arguments are (ENTRY GROUP ARTICLE).
+ENTRY is the record of the current headline. GROUP is the group name.
+ARTICLE is the article number of the current headline.")
+
 (nnoo-define-basics nnrss)
 
 ;;; Interface functions
@@ -265,7 +270,9 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 		(insert "\n\n")
 		(fill-region point (point))))
 	  (if (nth 2 e)
-	      (insert (nth 2 e) "\n")))))
+	      (insert (nth 2 e) "\n"))
+	  (if nnrss-content-function
+	      (funcall nnrss-content-function e group article)))))
     (cond
      (err
       (nnheader-report 'nnrss err))

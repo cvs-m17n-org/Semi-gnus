@@ -1,5 +1,5 @@
 ;;; mailcap.el --- MIME media types configuration
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -87,6 +87,9 @@
      ("emacs-lisp"
       (viewer . mailcap-maybe-eval)
       (type   . "application/emacs-lisp"))
+     ("x-emacs-lisp"
+      (viewer . mailcap-maybe-eval)
+      (type   . "application/x-emacs-lisp"))
      ("x-tar"
       (viewer . mailcap-save-binary-file)
       (non-viewer . t)
@@ -223,7 +226,7 @@
       (viewer  . fundamental-mode)
       (type    . "text/plain"))
      ("enriched"
-      (viewer . enriched-decode-region)
+      (viewer . enriched-decode)
       (test   . (fboundp 'enriched-decode))
       (type   . "text/enriched"))
      ("html"
@@ -640,18 +643,18 @@ to supply to the test."
 	(setq mailcap-mime-data
 	      (cons (cons major (list (cons minor info)))
 		    mailcap-mime-data))
-       (let ((cur-minor (assoc minor old-major)))
- 	(cond
- 	 ((or (null cur-minor)		; New minor area, or
- 	      (assq 'test info))	; Has a test, insert at beginning
- 	  (setcdr old-major (cons (cons minor info) (cdr old-major))))
- 	 ((and (not (assq 'test info))	; No test info, replace completely
- 	       (not (assq 'test cur-minor))
+      (let ((cur-minor (assoc minor old-major)))
+	(cond
+	 ((or (null cur-minor)		; New minor area, or
+	      (assq 'test info))	; Has a test, insert at beginning
+	  (setcdr old-major (cons (cons minor info) (cdr old-major))))
+	 ((and (not (assq 'test info))	; No test info, replace completely
+	       (not (assq 'test cur-minor))
 	       (equal (assq 'viewer info)  ; Keep alternative viewer
 		      (assq 'viewer cur-minor)))
- 	  (setcdr cur-minor info))
- 	 (t
- 	  (setcdr old-major (cons (cons minor info) (cdr old-major))))))
+	  (setcdr cur-minor info))
+	 (t
+	  (setcdr old-major (cons (cons minor info) (cdr old-major))))))
       )))
 
 (defun mailcap-add (type viewer &optional test)

@@ -159,6 +159,7 @@ with some simple extensions.
 %G    Group name (string)
 %g    Qualified group name (string)
 %c    Short (collapsed) group name.  See `gnus-group-uncollapsed-levels'.
+%C    Group comment (string)
 %D    Group description (string)
 %s    Select method (string)
 %o    Moderated group (char, \"m\")
@@ -190,8 +191,8 @@ Also note that if you change the format specification to include any
 of these specs, you must probably re-start Gnus to see them go into
 effect.
 
-General format specifiers can also be used.  
-See (gnus)Formatting Variables."
+General format specifiers can also be used.
+See `(gnus)Formatting Variables'."
   :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-group-visual
   :type 'string)
@@ -474,6 +475,7 @@ simple manner.")
     (?g gnus-tmp-group ?s)
     (?G gnus-tmp-qualified-group ?s)
     (?c (gnus-short-group-name gnus-tmp-group) ?s)
+    (?C gnus-tmp-comment ?s)
     (?D gnus-tmp-newsgroup-description ?s)
     (?o gnus-tmp-moderated ?c)
     (?O gnus-tmp-moderated-string ?s)
@@ -787,7 +789,8 @@ simple manner.")
 	["Sort by score" gnus-group-sort-groups-by-score t]
 	["Sort by level" gnus-group-sort-groups-by-level t]
 	["Sort by unread" gnus-group-sort-groups-by-unread t]
-	["Sort by name" gnus-group-sort-groups-by-alphabet t])
+	["Sort by name" gnus-group-sort-groups-by-alphabet t]
+	["Sort by real name" gnus-group-sort-groups-by-real-name t])
        ("Sort process/prefixed"
 	["Default sort" gnus-group-sort-selected-groups
 	 (or (not (boundp 'gnus-topic-mode)) (not gnus-topic-mode))]
@@ -802,6 +805,8 @@ simple manner.")
 	["Sort by unread" gnus-group-sort-selected-groups-by-unread
 	 (or (not (boundp 'gnus-topic-mode)) (not gnus-topic-mode))]
 	["Sort by name" gnus-group-sort-selected-groups-by-alphabet
+	 (or (not (boundp 'gnus-topic-mode)) (not gnus-topic-mode))]
+	["Sort by real name" gnus-group-sort-selected-groups-by-real-name
 	 (or (not (boundp 'gnus-topic-mode)) (not gnus-topic-mode))])
        ("Mark"
 	["Mark group" gnus-group-mark-group
@@ -905,9 +910,11 @@ simple manner.")
 
 ;; Emacs 21 tool bar.  Should be no-op otherwise.
 (defun gnus-group-make-tool-bar ()
-  (if (and (fboundp 'tool-bar-add-item-from-menu)
-	   (default-value 'tool-bar-mode)
-	   (not gnus-group-toolbar-map))
+  (if (and 
+       (condition-case nil (require 'tool-bar) (error nil))
+       (fboundp 'tool-bar-add-item-from-menu)
+       (default-value 'tool-bar-mode)
+       (not gnus-group-toolbar-map))
       (setq gnus-group-toolbar-map
 	    (let ((tool-bar-map (make-sparse-keymap))
 		  (load-path (mm-image-load-path)))
@@ -1030,8 +1037,7 @@ The following commands are available:
       result)))
 
 (defun gnus-group-name-decode (string charset)
-  (if (and string charset (featurep 'mule)
-	   (not (mm-multibyte-string-p string)))
+  (if (and string charset (featurep 'mule))
       (mm-decode-coding-string string charset)
     string))
 
@@ -1314,6 +1320,9 @@ if it is a string, only list groups matching REGEXP."
 	 (gnus-tmp-qualified-group
 	  (gnus-group-name-decode (gnus-group-real-name gnus-tmp-group)
 				  group-name-charset))
+	 (gnus-tmp-comment 
+	  (or (gnus-group-get-parameter gnus-tmp-group 'comment t)
+	      gnus-tmp-group))
 	 (gnus-tmp-newsgroup-description
 	  (if gnus-description-hashtb
 	      (or (gnus-group-name-decode
@@ -1711,7 +1720,7 @@ Take into consideration N (the prefix) and the list of marked groups."
 	  (setq n (1- n))
 	  (gnus-group-next-group way)))
       (nreverse groups)))
-   ((gnus-region-active-p)
+   ((and (gnus-region-active-p) (mark))
     ;; Work on the region between point and mark.
     (let ((max (max (point) (mark)))
 	  groups)
@@ -1888,14 +1897,14 @@ Return the name of the group if selection was successful."
 	  (,(intern (format "%s-address" (car method))) ,(cadr method))
 	  ,@(cddr method)))
   (let ((group (if (gnus-group-foreign-p group) group
-		 (gnus-group-prefixed-name (gnus-group-real-name group) 
+		 (gnus-group-prefixed-name (gnus-group-real-name group)
 					   method))))
     (gnus-sethash
      group
      `(-1 nil (,group
 	       ,gnus-level-default-subscribed nil nil ,method
 	       ,(cons
-		 (if quit-config 
+		 (if quit-config
 		     (cons 'quit-config quit-config)
 		   (cons 'quit-config
 			 (cons gnus-summary-buffer
@@ -2073,7 +2082,7 @@ If EXCLUDE-GROUP, do not go to that group."
       (forward-line 1))
     (when best-point
       (goto-char best-point))
-    (gnus-summary-position-point)
+    (gnus-group-position-point)
     (and best-point (gnus-group-group-name))))
 
 (defun gnus-group-first-unread-group ()
@@ -2186,6 +2195,9 @@ doing the deletion."
 	  (gnus-group-goto-group group)
 	  (gnus-group-kill-group 1 t)
 	  (gnus-sethash group nil gnus-active-hashtb)
+	  (when gnus-cache-active-hashtb
+	    (gnus-sethash group nil gnus-cache-active-hashtb)
+	    (setq gnus-cache-active-altered t))
 	  t))
     (gnus-group-position-point)))
 
@@ -2686,6 +2698,12 @@ If REVERSE, sort in reverse order."
   (interactive "P")
   (gnus-group-sort-groups 'gnus-group-sort-by-alphabet reverse))
 
+(defun gnus-group-sort-groups-by-real-name (&optional reverse)
+  "Sort the group buffer alphabetically by real (unprefixed) group name.
+If REVERSE, sort in reverse order."
+  (interactive "P")
+  (gnus-group-sort-groups 'gnus-group-sort-by-real-name reverse))
+
 (defun gnus-group-sort-groups-by-unread (&optional reverse)
   "Sort the group buffer by number of unread articles.
 If REVERSE, sort in reverse order."
@@ -2763,6 +2781,13 @@ Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
 sort in reverse order."
   (interactive (gnus-interactive "P\ny"))
   (gnus-group-sort-selected-groups n 'gnus-group-sort-by-alphabet reverse))
+
+(defun gnus-group-sort-selected-groups-by-real-name (&optional n reverse)
+  "Sort the group buffer alphabetically by real group name.
+Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
+sort in reverse order."
+  (interactive (gnus-interactive "P\ny"))
+  (gnus-group-sort-selected-groups n 'gnus-group-sort-by-real-name reverse))
 
 (defun gnus-group-sort-selected-groups-by-unread (&optional n reverse)
   "Sort the group buffer by number of unread articles.
@@ -3693,10 +3718,10 @@ The hook gnus-suspend-gnus-hook is called before actually suspending."
   (let ((group-buf (get-buffer gnus-group-buffer)))
     (mapcar (lambda (buf)
 	      (unless (or (member buf (list group-buf gnus-dribble-buffer))
-                          (progn
+			  (progn
 			    (save-excursion
-                              (set-buffer buf)
-                              (eq major-mode 'message-mode))))
+			      (set-buffer buf)
+			      (eq major-mode 'message-mode))))
 		(gnus-kill-buffer buf)))
 	    (gnus-buffers))
     (gnus-kill-gnus-frames)
@@ -4020,7 +4045,7 @@ This command may read the active file."
 	(mark gnus-read-mark)
 	active n)
     (if (get-buffer buffer)
-	(with-current-buffer buffer 
+	(with-current-buffer buffer
 	  (setq active gnus-newsgroup-active)
 	  (gnus-activate-group group)
 	  (when gnus-newsgroup-prepared
@@ -4036,7 +4061,9 @@ This command may read the active file."
 	      (while (<= n (cdr gnus-newsgroup-active))
 		(unless (eq n article)
 		  (push n gnus-newsgroup-unselected))
-		(setq n (1+ n))))))
+		(setq n (1+ n)))
+	      (setq gnus-newsgroup-unselected
+		    (nreverse gnus-newsgroup-unselected)))))
       (gnus-activate-group group)
       (gnus-group-make-articles-read group
 				     (list article))

@@ -38,6 +38,7 @@
   (defvar nnmail-pathname-coding-system))
 (require 'nnheader)
 (require 'time-date)
+(require 'netrc)
 
 (eval-and-compile
   (autoload 'message-fetch-field "message")
@@ -61,6 +62,11 @@
 	  (setq string (replace-match newtext nil literal string))
 	  (setq start (- (length string) tail))))
       string))))
+
+;;; bring in the netrc functions as aliases
+(defalias 'gnus-netrc-get 'netrc-get)
+(defalias 'gnus-netrc-machine 'netrc-machine)
+(defalias 'gnus-parse-netrc 'netrc-parse)
 
 (defun gnus-boundp (variable)
   "Return non-nil if VARIABLE is bound and non-nil."
@@ -172,7 +178,7 @@
 	 (string-match (concat "[ \t]*<" (regexp-quote address) ">") from)
 	 (and (setq name (substring from 0 (match-beginning 0)))
 	      ;; Strip any quotes from the name.
-	      (string-match "\".*\"" name)
+	      (string-match "^\".*\"$" name)
 	      (setq name (substring name 1 (1- (match-end 0))))))
     ;; If not, then "address (name)" is used.
     (or name
@@ -469,7 +475,7 @@ jabbering all the time."
   "Return a list of Message-IDs in REFERENCES."
   (let ((beg 0)
 	ids)
-    (while (string-match "<[^> \t]+>" references beg)
+    (while (string-match "<[^<]+[^< \t]" references beg)
       (push (substring references (match-beginning 0) (setq beg (match-end 0)))
 	    ids))
     (nreverse ids)))
@@ -484,8 +490,8 @@ If N, return the Nth ancestor instead."
 	  (while (nthcdr n ids)
 	    (setq ids (cdr ids)))
 	  (car ids))
-      (when (string-match "<[^> \t]+>\\'" references)
-	(match-string 0 references)))))
+      (when (string-match "\\(<[^<]+>\\)[ \t]*\\'" references)
+	(match-string 1 references)))))
 
 (defun gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
@@ -900,93 +906,6 @@ ARG is passed to the first function."
 	(apply 'run-hooks funcs)
       (set-buffer buf))))
 
-;;;
-;;; .netrc and .authinforc parsing
-;;;
-
-(defun gnus-parse-netrc (file)
-  "Parse FILE and return an list of all entries in the file."
-  (when (file-exists-p file)
-    (with-temp-buffer
-      (let ((tokens '("machine" "default" "login"
-		      "password" "account" "macdef" "force"
-		      "port"))
-	    alist elem result pair)
-	(insert-file-contents file)
-	(goto-char (point-min))
-	;; Go through the file, line by line.
-	(while (not (eobp))
-	  (narrow-to-region (point) (gnus-point-at-eol))
-	  ;; For each line, get the tokens and values.
-	  (while (not (eobp))
-	    (skip-chars-forward "\t ")
-	    ;; Skip lines that begin with a "#".
-	    (if (eq (char-after) ?#)
-		(goto-char (point-max))
-	      (unless (eobp)
-		(setq elem
-		      (if (= (following-char) ?\")
-			  (read (current-buffer))
-			(buffer-substring
-			 (point) (progn (skip-chars-forward "^\t ")
-					(point)))))
-		(cond
-		 ((equal elem "macdef")
-		  ;; We skip past the macro definition.
-		  (widen)
-		  (while (and (zerop (forward-line 1))
-			      (looking-at "$")))
-		  (narrow-to-region (point) (point)))
-		 ((member elem tokens)
-		  ;; Tokens that don't have a following value are ignored,
-		  ;; except "default".
-		  (when (and pair (or (cdr pair)
-				      (equal (car pair) "default")))
-		    (push pair alist))
-		  (setq pair (list elem)))
-		 (t
-		  ;; Values that haven't got a preceding token are ignored.
-		  (when pair
-		    (setcdr pair elem)
-		    (push pair alist)
-		    (setq pair nil)))))))
-	  (when alist
-	    (push (nreverse alist) result))
-	  (setq alist nil
-		pair nil)
-	  (widen)
-	  (forward-line 1))
-	(nreverse result)))))
-
-(defun gnus-netrc-machine (list machine &optional port defaultport)
-  "Return the netrc values from LIST for MACHINE or for the default entry.
-If PORT specified, only return entries with matching port tokens.
-Entries without port tokens default to DEFAULTPORT."
-  (let ((rest list)
-	result)
-    (while list
-      (when (equal (cdr (assoc "machine" (car list))) machine)
-	(push (car list) result))
-      (pop list))
-    (unless result
-      ;; No machine name matches, so we look for default entries.
-      (while rest
-	(when (assoc "default" (car rest))
-	  (push (car rest) result))
-	(pop rest)))
-    (when result
-      (setq result (nreverse result))
-      (while (and result
-		  (not (equal (or port defaultport "nntp")
-			      (or (gnus-netrc-get (car result) "port")
-				  defaultport "nntp"))))
-	(pop result))
-      (car result))))
-
-(defun gnus-netrc-get (alist type)
-  "Return the value of token TYPE from ALIST."
-  (cdr (assoc type alist)))
-
 ;;; Various
 
 (defvar gnus-group-buffer)		; Compiler directive
@@ -1132,7 +1051,9 @@ Return the modified alist."
 	   (string-equal (downcase x) (downcase y)))))
 
 (defcustom gnus-use-byte-compile t
-  "If non-nil, byte-compile crucial run-time codes."
+  "If non-nil, byte-compile crucial run-time codes.
+Setting it to `nil' has no effect after first time running
+`gnus-byte-compile'."
   :type 'boolean
   :version "21.1"
   :group 'gnus-various)
@@ -1141,6 +1062,10 @@ Return the modified alist."
   "Byte-compile FORM if `gnus-use-byte-compile' is non-nil."
   (if gnus-use-byte-compile
       (progn
+	(condition-case nil
+	    ;; Work around a bug in XEmacs 21.4
+	    (require 'byte-optimize)
+	  (error))
 	(require 'bytecomp)
 	(defalias 'gnus-byte-compile 'byte-compile)
 	(byte-compile form))
@@ -1217,7 +1142,7 @@ forbidden in URL encoding."
 SPEC is a predicate specifier that contains stuff like `or', `and',
 `not', lists and functions.  The functions all take one parameter."
   `(lambda (elem) ,(gnus-make-predicate-1 spec)))
-  
+
 (defun gnus-make-predicate-1 (spec)
   (cond
    ((symbolp spec)
@@ -1238,7 +1163,7 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
     (list 'local-map map))))
 
 (defun gnus-completing-read (prompt table &optional predicate require-match
-				    history inherit-input-method)
+				    history)
   (when (and history
 	     (not (boundp history)))
     (set history nil))
@@ -1251,8 +1176,93 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
    require-match
    nil
    history
-   (car (symbol-value history))
-   inherit-input-method))
+   (car (symbol-value history))))
+
+(defun gnus-graphic-display-p ()
+  (or (and (fboundp 'display-graphic-p)
+	   (display-graphic-p))
+      ;;;!!!This is bogus.  Fixme!
+      (and (featurep 'xemacs)
+	   t)))
+
+(put 'gnus-parse-without-error 'lisp-indent-function 0)
+(put 'gnus-parse-without-error 'edebug-form-spec '(body))
+
+(defmacro gnus-parse-without-error (&rest body)
+  "Allow continuing onto the next line even if an error occurs."
+  `(while (not (eobp))
+     (condition-case ()
+	 (progn
+	   ,@body
+	   (goto-char (point-max)))
+       (error
+	(gnus-error 4 "Invalid data on line %d"
+		    (count-lines (point-min) (point)))
+	(forward-line 1)))))
+
+(defun gnus-cache-file-contents (file variable function)
+  "Cache the contents of FILE in VARIABLE.  The contents come from FUNCTION."
+  (let ((time (nth 5 (file-attributes file)))
+	contents value)
+    (if (or (null (setq value (symbol-value variable)))
+	    (not (equal (car value) file))
+	    (not (equal (nth 1 value) time)))
+	(progn
+	  (setq contents (funcall function file))
+	  (set variable (list file time contents))
+	  contents)
+      (nth 2 value))))
+
+(defun gnus-multiple-choice (prompt choice &optional idx)
+  "Ask user a multiple choice question.
+CHOICE is a list of the choice char and help message at IDX."
+  (let (tchar buf)
+    (save-window-excursion
+      (save-excursion
+	(while (not tchar)
+	  (message "%s (%s?): "
+		   prompt
+		   (mapconcat (lambda (s) (char-to-string (car s)))
+			      choice ""))
+	  (setq tchar (read-char))
+	  (when (not (assq tchar choice))
+	    (setq tchar nil)
+	    (setq buf (get-buffer-create "*Gnus Help*"))
+	    (pop-to-buffer buf)
+	    (fundamental-mode)		; for Emacs 20.4+
+	    (buffer-disable-undo)
+	    (erase-buffer)
+	    (insert prompt ":\n\n")
+	    (let ((max -1)
+		  (list choice)
+		  (alist choice)
+		  (idx (or idx 1))
+		  (i 0)
+		  n width pad format)
+	      ;; find the longest string to display
+	      (while list
+		(setq n (length (nth idx (car list))))
+		(unless (> max n)
+		  (setq max n))
+		(setq list (cdr list)))
+	      (setq max (+ max 4))	; %c, `:', SPACE, a SPACE at end
+	      (setq n (/ (1- (window-width)) max)) ; items per line
+	      (setq width (/ (1- (window-width)) n)) ; width of each item
+	      ;; insert `n' items, each in a field of width `width'
+	      (while alist
+		(if (< i n)
+		    ()
+		  (setq i 0)
+		  (delete-char -1)		; the `\n' takes a char
+		  (insert "\n"))
+		(setq pad (- width 3))
+		(setq format (concat "%c: %-" (int-to-string pad) "s"))
+		(insert (format format (caar alist) (nth idx (car alist))))
+		(setq alist (cdr alist))
+		(setq i (1+ i))))))))
+    (if (buffer-live-p buf)
+	(kill-buffer buf))
+    tchar))
 
 (provide 'gnus-util)
 

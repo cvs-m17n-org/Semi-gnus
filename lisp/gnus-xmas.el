@@ -388,9 +388,9 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-put-text-property 'gnus-xmas-put-text-property)
   (defalias 'gnus-deactivate-mark 'ignore)
   (defalias 'gnus-window-edges 'window-pixel-edges)
-  
+
   (if (and (<= emacs-major-version 19)
- 	   (< emacs-minor-version 14))
+	   (< emacs-minor-version 14))
       (defalias 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
 
   (unless (boundp 'standard-display-table)
@@ -427,11 +427,11 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
   (defalias 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
   (defalias 'gnus-appt-select-lowest-window
-	'gnus-xmas-appt-select-lowest-window)
+    'gnus-xmas-appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'character-to-event)
   (defalias 'gnus-mode-line-buffer-identification
-	'gnus-xmas-mode-line-buffer-identification)
+    'gnus-xmas-mode-line-buffer-identification)
   (defalias 'gnus-key-press-event-p 'key-press-event-p)
   (defalias 'gnus-region-active-p 'region-active-p)
   (defalias 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
@@ -440,6 +440,11 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-put-image 'gnus-xmas-put-image)
   (defalias 'gnus-create-image 'gnus-xmas-create-image)
   (defalias 'gnus-remove-image 'gnus-xmas-remove-image)
+
+  (when (or (< emacs-major-version 21)
+	    (and (= emacs-major-version 21)
+		 (< emacs-minor-version 3)))
+    (defalias 'gnus-completing-read 'gnus-xmas-completing-read))
 
   ;; These ones are not defcutom'ed, sometimes not even defvar'ed. They
   ;; probably should. If that is done, the code below should then be moved
@@ -789,9 +794,8 @@ XEmacs compatibility workaround."
 		      gnus-mailing-list-menu))
 
 (defun gnus-xmas-image-type-available-p (type)
-  (when (eq type 'pbm)
-    (setq type 'xbm))
-  (featurep type))
+  (and window-system
+       (featurep (if (eq type 'pbm) 'xbm type))))
 
 (defun gnus-xmas-create-image (file &optional type data-p &rest props)
   (let ((type (if type
@@ -817,7 +821,7 @@ XEmacs compatibility workaround."
 		  (insert file)
 		(insert-file-contents file))
 	      (make-glyph
-	       (vector 
+	       (vector
 		(or (intern type)
 		    (mm-image-type-from-buffer))
 		:data (buffer-string))))))
@@ -832,7 +836,7 @@ Warning: Don't insert text immediately after the image."
 	extent)
     (if (and (bobp) (not string))
 	(setq string " "))
-    (if string 
+    (if string
 	(insert string)
       (setq begin (1- begin)))
     (setq extent (make-extent begin (point)))
@@ -851,6 +855,21 @@ Warning: Don't insert text immediately after the image."
        (set-extent-property ext 'end-glyph nil))
      nil)
    nil nil nil nil nil 'gnus-image))
+
+(defun gnus-xmas-completing-read (prompt table &optional
+					 predicate require-match history)
+  (when (and history
+	     (not (boundp history)))
+    (set history nil))
+  (completing-read
+   (if (symbol-value history)
+       (concat prompt " (" (car (symbol-value history)) "): ")
+     (concat prompt ": "))
+   table
+   predicate
+   require-match
+   nil
+   history))
 
 (provide 'gnus-xmas)
 

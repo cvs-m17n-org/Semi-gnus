@@ -1,12 +1,12 @@
 ;;; nnfolder.el --- mail folder access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org> (adding MARKS)
 ;;      ShengHuo Zhu <zsh@cs.rochester.edu> (adding NOV)
 ;;      Scott Byer <byer@mv.us.adobe.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: mail
 
 ;; This file is part of GNU Emacs.
@@ -428,7 +428,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
       (nnfolder-save-buffer)
       (nnfolder-adjust-min-active newsgroup)
       (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
-      (gnus-sorted-complement articles (nreverse deleted-articles)))))
+      (gnus-sorted-difference articles (nreverse deleted-articles)))))
 
 (deffoo nnfolder-request-move-article (article group server
 					       accept-form &optional last)
@@ -473,6 +473,8 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 	  result art-group)
       (goto-char (point-min))
       (when (looking-at "X-From-Line: ")
+	(save-match-data
+	  (mail-header-unfold-field))
 	(replace-match "From "))
       (with-temp-buffer
 	(let ((nnmail-file-coding-system nnfolder-active-file-coding-system)
@@ -513,15 +515,13 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
   (save-excursion
     (set-buffer buffer)
     (goto-char (point-min))
-    (let (xfrom)
-      (while (re-search-forward "^X-From-Line: \\(.*\\)$" nil t)
-	(setq xfrom (match-string 1))
-	(gnus-delete-line))
-      (goto-char (point-min))
-      (if xfrom
-	  (insert "From " xfrom "\n")
-	(unless (looking-at "From ")
-	  (insert "From nobody " (current-time-string) "\n"))))
+    (if (not (looking-at "X-From-Line: "))
+	(insert "From nobody " (current-time-string) "\n")
+      (replace-match "From ")
+      (forward-line 1)
+      (while (looking-at "[ \t]")
+	(delete-char -1)
+	(forward-line 1)))
     (nnfolder-normalize-buffer)
     (set-buffer nnfolder-current-buffer)
     (goto-char (point-min))
@@ -547,12 +547,12 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
   (if (not force)
       ()				; Don't delete the articles.
     ;; Delete the file that holds the group.
-    (ignore-errors
-      (delete-file (nnfolder-group-pathname group))
-      (when (file-exists-p (nnfolder-group-nov-pathname group))
-	(delete-file (nnfolder-group-nov-pathname group)))
-      (when (file-exists-p (nnfolder-group-marks-pathname group))
-	(delete-file (nnfolder-group-marks-pathname group)))))
+    (let ((data (nnfolder-group-pathname group))
+	  (nov (nnfolder-group-nov-pathname group))
+	  (mrk (nnfolder-group-marks-pathname group)))
+      (ignore-errors (delete-file data))
+      (ignore-errors (delete-file nov))
+      (ignore-errors (delete-file mrk))))
   ;; Remove the group from all structures.
   (setq nnfolder-group-alist
 	(delq (assoc group nnfolder-group-alist) nnfolder-group-alist)
@@ -711,7 +711,8 @@ deleted.  Point is left where the deleted region was."
 		(let ((nnmail-file-coding-system
 		       (or nnfolder-file-coding-system-for-write
 			   nnfolder-file-coding-system-for-write)))
-		  (nnmail-write-region 1 1 file t 'nomesg)))
+		  (nnmail-write-region (point-min) (point-min)
+				       file t 'nomesg)))
 	      (when (setq nnfolder-current-buffer (nnfolder-read-folder group))
 		(set-buffer nnfolder-current-buffer)
 		(push (list group nnfolder-current-buffer)
@@ -1214,7 +1215,7 @@ This command does not work if you use short group names."
     (if (file-exists-p file)
 	(condition-case err
 	    (with-temp-buffer
-	      (gnus-sethash file (nth 5 (file-attributes file)) 
+	      (gnus-sethash file (nth 5 (file-attributes file))
 			    nnfolder-marks-modtime)
 	      (nnheader-insert-file-contents file)
 	      (setq nnfolder-marks (read (current-buffer)))
@@ -1234,7 +1235,8 @@ This command does not work if you use short group names."
 	(push (cons 'read (gnus-info-read info)) nnfolder-marks)
 	(dolist (el gnus-article-unpropagated-mark-lists)
 	  (setq nnfolder-marks (gnus-remassoc el nnfolder-marks)))
-	(nnfolder-save-marks group server)))))
+	(nnfolder-save-marks group server)
+	(nnheader-message 7 "Bootstrapping marks for %s...done" group)))))
 
 (provide 'nnfolder)
 

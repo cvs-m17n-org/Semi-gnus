@@ -21,7 +21,9 @@
 	       find-coding-systems-string
 	       image-size image-type-available-p insert-image
 	       image-type-from-file-header
+	       make-symbolic-link
 	       make-temp-file message-xmas-redefine
+	       mail-abbrev-in-expansion-header-p
 	       mail-aliases-setup mm-copy-tree
 	       mule-write-region-no-coding-system put-image
 	       ring-elements
@@ -31,13 +33,15 @@
 	       frames-on-display-list
 	       make-mode-line-mouse-map
 	       rmail-select-summary rmail-summary-exists rmail-update-summary
-	       rmail-toggle-header
+	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
 	       sc-cite-regexp set-font-family set-font-size temp-directory
 	       string-as-multibyte
 	       tool-bar-add-item tool-bar-add-item-from-menu
+	       unix-sync
 	       url-view-url vcard-pretty-print
 	       url-insert-file-contents
 	       w3-coding-system-for-mime-charset w3-prepare-buffer w3-region
+	       w3m-charset-to-coding-system w3m-region
 	       widget-make-intangible x-defined-colors))
 
 (maybe-bind '(adaptive-fill-first-line-regexp
@@ -47,16 +51,20 @@
 	      display-time-mail-function imap-password mail-mode-hook
 	      filladapt-mode
 	      mc-pgp-always-sign
+	      gnus-message-group-art
 	      gpg-unabbrev-trust-alist
 	      nnoo-definition-alist
-	      current-language-environment   
+	      current-language-environment
 	      language-info-alist
 	      url-current-callback-func url-be-asynchronous
 	      url-current-callback-data url-working-buffer
 	      url-current-mime-headers w3-meta-charset-content-type-regexp
-	      rmail-enable-mime-composing 
-	      rmail-insert-mime-forwarded-message-function 
-	      w3-meta-content-type-charset-regexp))
+	      rmail-enable-mime-composing
+	      rmail-insert-mime-forwarded-message-function
+	      w3-meta-content-type-charset-regexp
+	      w3m-cid-retrieve-function-alist w3m-current-buffer
+	      w3m-meta-content-type-charset-regexp w3m-mode-map
+	      url-package-version url-package-name))
 
 (if (featurep 'xemacs)
     (progn
@@ -82,7 +90,8 @@
 		     url-retrieve w3-form-encode-xwfu window-at
 		     window-edges x-color-values x-popup-menu browse-url
 		     frame-char-height frame-char-width
-		     url-generic-parse-url xml-parse-region))
+		     url-generic-parse-url xml-parse-region
+		     make-network-process))
       (maybe-bind '(buffer-display-table
 		    buffer-file-coding-system font-lock-defaults
 		    global-face-data gnus-article-x-face-too-ugly
@@ -113,7 +122,7 @@
 		 specifier-instance url-generic-parse-url
 		 valid-image-instantiator-format-p w3-do-setup
 		 window-pixel-height window-pixel-width
-		 xml-parse-region)))
+		 xml-parse-region make-network-process)))
 
 (require 'custom)
 

@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
@@ -258,7 +258,9 @@ If NOW, use that time instead."
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
 	    (setq date
-		  (cond ((string-match "[A-Z]" (nth 0 date))
+		  (cond ((not date)
+			 "Tue Jan 1 00:00:0 1900")
+			((string-match "[A-Z]" (nth 0 date))
 			 (format "%s %s %s %s %s"
 				 (nth 0 date) (nth 2 date) (nth 1 date)
 				 (nth 4 date) (nth 3 date)))
@@ -335,7 +337,7 @@ If NOW, use that time instead."
 			     t (current-buffer) nil)
 	;; The meaningful output is the first 32 characters.
 	;; Don't return the newline that follows them!
-	(buffer-substring 1 33)))))
+	(buffer-substring (point-min) (+ 32 (point-min)))))))
 
 (defun pop3-stat (process)
   "Return the number of messages in the maildrop and the maildrop's size."

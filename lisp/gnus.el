@@ -277,7 +277,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.05"
+(defconst gnus-version-number "0.06"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -1085,8 +1085,8 @@ used to 899, you would say something along these lines:
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.
 
-For instance, if you want to get your news via NNTP from
-\"flab.flab.edu\", you could say:
+For instance, if you want to get your news via \"flab.flab.edu\" using
+NNTP, you could say:
 
 \(setq gnus-select-method '(nntp \"flab.flab.edu\"))
 
@@ -1154,7 +1154,7 @@ variable instead."
 This is a list where each element is a complete select method (see
 `gnus-select-method').
 
-If, for instance, you want to read your mail with the nnml backend,
+If, for instance, you want to read your mail with the nnml back end,
 you could set this variable:
 
 \(setq gnus-secondary-select-methods '((nnml \"\")))"
@@ -1195,15 +1195,15 @@ It can also be a list of select methods, as well as the special symbol
 list, Gnus will try all the methods in the list until it finds a match."
   :group 'gnus-server
   :type '(choice (const :tag "default" nil)
-		 (const :tag "DejaNews" (nnweb "refer" (nnweb-type dejanews)))
+		 (const :tag "Google" (nnweb "refer" (nnweb-type google)))
 		 gnus-select-method
 		 (repeat :menu-tag "Try multiple"
 			 :tag "Multiple"
-			 :value (current (nnweb "refer" (nnweb-type dejanews)))
+			 :value (current (nnweb "refer" (nnweb-type google)))
 			 (choice :tag "Method"
 				 (const current)
-				 (const :tag "DejaNews"
-					(nnweb "refer" (nnweb-type dejanews)))
+				 (const :tag "Google"
+					(nnweb "refer" (nnweb-type google)))
 				 gnus-select-method))))
 
 (defcustom gnus-group-faq-directory
@@ -1429,6 +1429,7 @@ slower."
     ("nnfolder" mail respool address)
     ("nngateway" post-mail address prompt-address physical-address)
     ("nnweb" none)
+    ("nngoogle" post)
     ("nnslashdot" post)
     ("nnultimate" none)
     ("nnrss" none)
@@ -1437,7 +1438,8 @@ slower."
     ("nnlistserv" none)
     ("nnagent" post-mail)
     ("nnimap" post-mail address prompt-address physical-address)
-    ("nnmaildir" mail respool address))
+    ("nnmaildir" mail respool address)
+    ("nnnil" none))
   "*An alist of valid select methods.
 The first element of each list lists should be a string with the name
 of the select method.  The other elements may be the category of
@@ -1609,8 +1611,7 @@ Use with caution.")
    ("\\(^\\|:\\)han\\>" euc-kr)
    ("\\(^\\|:\\)alt.chinese.text.big5\\>" chinese-big5)
    ("\\(^\\|:\\)soc.culture.vietnamese\\>" vietnamese-viqr)
-   ("\\(^\\|:\\)\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
-   (".*" iso-8859-1))
+   ("\\(^\\|:\\)\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1))
  :variable-document
  "Alist of regexps (to match group names) and default charsets to be used when reading."
  :variable-group gnus-charset
@@ -1640,6 +1641,23 @@ posting an article."
 			:value gnus-select-method))))
  :parameter-document
  "Posting method for this group.")
+
+(gnus-define-group-parameter
+ large-newsgroup-initial
+ :type integer
+ :function-document
+ "Return GROUP's initial input of the number of articles."
+ :variable-document
+ "*Alist of group regexps and its initial input of the number of articles."
+ :parameter-type '(choice :tag "Initial Input for Large Newsgroup"
+			  (const :tag "All" nil)
+			  (integer))
+ :parameter-document "\
+
+This number will be prompted as the initial value of the number of
+articles to list when the group is a large newsgroup (see
+`gnus-large-newsgroup').  If it is `nil', the default value is the
+total number of articles in the group.")
 
 (defcustom gnus-group-uncollapsed-levels 1
   "Number of group name elements to leave alone when making a short group name."
@@ -1764,16 +1782,26 @@ face."
 (defvar gnus-plugged t
   "Whether Gnus is plugged or not.")
 
-(defvar gnus-agent-cache t
-  "Whether Gnus use agent cache.")
+(defcustom gnus-agent-cache t
+  "Whether Gnus use agent cache."
+  :version "21.3"
+  :group 'gnus-agent
+  :type 'boolean)
 
-(defcustom gnus-default-charset 'iso-8859-1
+(defcustom gnus-default-charset (mm-guess-mime-charset)
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
 gnus-group-charset-alist variable and is only used on groups not
 covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
+
+(defcustom gnus-agent nil
+  "Whether we want to use the Gnus agent or not.
+Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
+  :version "21.3"
+  :group 'gnus-agent
+  :type 'boolean)
 
 
 ;;; Internal variables
@@ -1785,9 +1813,7 @@ covered by that variable."
 (defvar gnus-original-article-buffer " *Original Article*")
 (defvar gnus-newsgroup-name nil)
 (defvar gnus-ephemeral-servers nil)
-
-(defvar gnus-agent nil
-  "Whether we want to use the Gnus agent or not.")
+(defvar gnus-server-method-cache nil)
 
 (defvar gnus-agent-fetching nil
   "Whether Gnus agent is in fetching mode.")
@@ -1795,7 +1821,7 @@ covered by that variable."
 (defvar gnus-agent-covered-methods nil)
 
 (defvar gnus-command-method nil
-  "Dynamically bound variable that says what the current backend is.")
+  "Dynamically bound variable that says what the current back end is.")
 
 (defvar gnus-current-select-method nil
   "The current method for selecting a newsgroup.")
@@ -1856,12 +1882,13 @@ covered by that variable."
 ;; `download' is a agent flag private to each gnus installation
 ;; `unsend' are for nndraft groups only
 ;; `score' is not a proper mark
+;; `bookmark': don't propagated it, or fix the bug in update-mark.
 (defconst gnus-article-unpropagated-mark-lists
-  '(seen cache download unsend score)
-  "Marks that shouldn't be propagated to backends.
-Typical marks are those that make no sense in a standalone backend,
+  '(seen cache download unsend score bookmark)
+  "Marks that shouldn't be propagated to back ends.
+Typical marks are those that make no sense in a standalone back end,
 such as a mark that says whether an article is stored in the cache
-(which doesn't make sense in a standalone backend).")
+\(which doesn't make sense in a standalone back end).")
 
 (defvar gnus-headers-retrieved-by nil)
 (defvar gnus-article-reply nil)
@@ -2102,6 +2129,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-de-base64-unreadable
       gnus-article-decode-HZ
       gnus-article-wash-html
+      gnus-article-unsplit-urls
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
@@ -2203,8 +2231,8 @@ possible.
 
 This restriction may disappear in later versions of Gnus.
 
-General format specifiers can also be used.  
-See (gnus)Formatting Variables."
+General format specifiers can also be used.
+See `(gnus)Formatting Variables'."
   :link '(custom-manual "(gnus)Formatting Variables")
   :type 'string
   :group 'gnus-summary-format)
@@ -2376,11 +2404,13 @@ with a `subscribed' parameter."
     (dolist (entry (cdr gnus-newsrc-alist))
       (setq group (car entry))
       (when (gnus-group-find-parameter group 'subscribed)
-	(setq address (or (gnus-group-fast-parameter group 'to-address)
-			  (gnus-group-fast-parameter group 'to-list)))
+	(setq address (mail-strip-quoted-names
+		       (or (gnus-group-fast-parameter group 'to-address)
+			   (gnus-group-fast-parameter group 'to-list))))
 	(when address
 	  (push address addresses))))
-    (list (mapconcat 'regexp-quote addresses "\\|"))))
+    (when addresses
+      (list (mapconcat 'regexp-quote addresses "\\|")))))
 
 (defmacro gnus-string-or (&rest strings)
   "Return the first element of STRINGS that is a non-blank string.
@@ -2662,6 +2692,36 @@ that that variable is buffer-local to the summary buffers."
 				   (nth 1 method))))
       method)))
 
+(defsubst gnus-server-to-method (server)
+  "Map virtual server names to select methods."
+  (or (and server (listp server) server)
+      (cdr (assoc server gnus-server-method-cache))
+      (let ((result
+	     (or
+	      ;; Perhaps this is the native server?
+	      (and (equal server "native") gnus-select-method)
+	      ;; It should be in the server alist.
+	      (cdr (assoc server gnus-server-alist))
+	      ;; It could be in the predefined server alist.
+	      (cdr (assoc server gnus-predefined-server-alist))
+	      ;; If not, we look through all the opened server
+	      ;; to see whether we can find it there.
+	      (let ((opened gnus-opened-servers))
+		(while (and opened
+			    (not (equal server (format "%s:%s" (caaar opened)
+						       (cadaar opened)))))
+		  (pop opened))
+		(caar opened))
+	      ;; It could be a named method, search all servers
+	      (let ((servers gnus-secondary-select-methods))
+		(while (and servers
+			    (not (equal server (format "%s:%s" (caar servers)
+						       (cadar servers)))))
+		  (pop servers))
+		(car servers)))))
+	(push (cons server result) gnus-server-method-cache)
+	result)))
+
 (defsubst gnus-server-get-method (group method)
   ;; Input either a server name, and extended server name, or a
   ;; select method, and return a select method.
@@ -2678,33 +2738,6 @@ that that variable is buffer-local to the summary buffers."
 	 method)
 	(t
 	 (gnus-server-add-address method))))
-
-(defun gnus-server-to-method (server)
-  "Map virtual server names to select methods."
-  (or
-   ;; Is this a method, perhaps?
-   (and server (listp server) server)
-   ;; Perhaps this is the native server?
-   (and (equal server "native") gnus-select-method)
-   ;; It should be in the server alist.
-   (cdr (assoc server gnus-server-alist))
-   ;; It could be in the predefined server alist.
-   (cdr (assoc server gnus-predefined-server-alist))
-   ;; If not, we look through all the opened server
-   ;; to see whether we can find it there.
-   (let ((opened gnus-opened-servers))
-     (while (and opened
-		 (not (equal server (format "%s:%s" (caaar opened)
-					    (cadaar opened)))))
-       (pop opened))
-     (caar opened))
-   ;; It could be a named method, search all servers
-   (let ((servers gnus-secondary-select-methods))
-     (while (and servers
-		 (not (equal server (format "%s:%s" (caar servers)
-					    (cadar servers)))))
-       (pop servers))
-     (car servers))))
 
 (defmacro gnus-method-equal (ss1 ss2)
   "Say whether two servers are equal."
@@ -2918,7 +2951,7 @@ The function `gnus-group-find-parameter' will do that for you."
 						     symbol allow-list))
 	    (when result
 	      ;; Expand if necessary.
-	      (if (and (stringp result) (string-match "\\\\" result))
+	      (if (and (stringp result) (string-match "\\\\[0-9&]" result))
 		  (setq result (gnus-expand-group-parameter (car head)
 							    result group)))
 	      ;; Exit the loop early.
@@ -3177,7 +3210,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
 	 (address (nth 1 server)))
     (if (and address
 	     (not (zerop (length address))))
-	(format "%s via %s" address (car server))
+	(format "%s using %s" address (car server))
       (format "%s" (car server)))))
 
 (defun gnus-find-method-for-group (group &optional info)

@@ -34,7 +34,7 @@
 ;;
 ;; 2001-10-31 Committed to Oort Gnus.
 ;;
-;; $Id: sieve.el,v 1.1.1.1 2002-01-06 22:11:34 yamaoka Exp $
+;; $Id: sieve.el,v 1.1.1.2 2002-05-06 23:49:27 yamaoka Exp $
 ;;
 ;; Todo:
 ;;
@@ -144,7 +144,7 @@ require \"fileinto\";
     ["Activate script" sieve-activate t]
     ["Deactivate script" sieve-deactivate t]))
 
-;; This is necessary to allow correct handling of \\[cvs-mode-diff-map] 
+;; This is necessary to allow correct handling of \\[cvs-mode-diff-map]
 ;; in substitute-command-keys.
 ;(fset 'sieve-manage-mode-map sieve-manage-mode-map)
 

@@ -47,9 +47,7 @@
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
 
-(if (featurep 'xemacs)
-    (autoload 'smiley-region "smiley")
-  (autoload 'smiley-region "smiley-ems")) ; override XEmacs version
+(autoload 'smiley-region "smiley")
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
@@ -118,7 +116,7 @@
     ;; original MULE, XEmacs/mule and Emacs 20+ including
     ;; MULE features.  Unfortunately these API are different.  In
     ;; particular, Emacs (including original MULE) and XEmacs are
-    ;; quite different.  Howvere, this version of Gnus doesn't support
+    ;; quite different.  However, this version of Gnus doesn't support
     ;; anything other than XEmacs 20+ and Emacs 20.3+.
 
     ;; Predicates to check are following:
@@ -225,7 +223,7 @@
 (defun gnus-put-image (glyph &optional string)
   (insert-image glyph (or string " "))
   (unless string
-    (put-text-property (1- (point)) (point) 
+    (put-text-property (1- (point)) (point)
 		       'gnus-image-text-deletable t))
   glyph)
 

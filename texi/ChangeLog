@@ -1,3 +1,310 @@
+2002-05-01  Lars Magne Ingebrigtsen  <larsi@quimbies.gnus.org>
+
+	* message.texi (Message Headers): Remove colon from index
+	entries. 
+
+2002-05-01  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Group Mail Splitting): Fix example.
+	(Article Buttons): Document that REGEXP can be a variable as well.
+
+	* message.texi (Message Headers): Fix example.
+
+2002-04-26  Steve Youngs  <youngs@xemacs.org>
+
+	* Makefile.in (infodir): Set to '@info_dir@' so we can separate
+	defaults for XEmacs and Emacs.
+
+2002-04-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Customization): Update info on HTML renderers.
+
+	* gnus.texi (Article Washing): Update information on HTML washing.
+	Fix typos.
+
+2002-04-09  Paul Jarc  <prj@po.cwru.edu>
+
+	* .cvsignore: added message-[0-9]*
+
+2002-04-08  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus.texi (Group Parameters): Point to the message manual for a
+	full explanation of MFT.
+	* message.texi (Mailing Lists): Mention
+	message-gen-unsubscribed-mft.
+	From Karra <karra@cs.utah.edu>.
+
+2002-04-05  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Saving Articles): Add xref to Mail Group Commands
+	because people might be interested in `B c' for saving articles.
+	(Archived Messages): Ditto.
+
+2002-04-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Sorting Groups): Add gnus-group-sort-selected-groups.
+	(Article Washing): Fix typo.
+
+	* message.texi (Various Commands): Index message-elide-ellipsis.
+	Add message-sort-headers.
+	(Mail Variables): Add message-qmail-inject-args,
+	message-mailer-swallows-blank-line, message-sendmail-f-is-evil,
+	message-qmail-inject-program.
+	(Various Message Variables): Add message-auto-save-directory,
+	message-strip-special-text-properties, message-cancel-hook.
+	(News Headers): Index message-user-organization etc.
+	(Forwarding): Add message-forward-before-signature.
+	(Mailing Lists): Index message-subscribed-address-file.
+	(Wide Reply): Add message-wide-reply-confirm-recipients.
+	(Canceling News): Add message-cancel-message.
+	(Sending Variables): Add message-interactive.
+
+2002-03-25  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Mail Spool): Add cindex for marks.
+	(Mail Folders): Add cindex for marks.
+
+2002-03-24  Raymond Scholz <rscholz@zonix.de>
+
+	* gnus.texi (Summary Buffer Lines): Fix doc.
+
+2002-03-24  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (booklet.dvi, booklet.pdf): Support booklet.
+
+2002-03-24  Felix Natter <fnatter@gmx.net>
+
+	* booklet.tex, bk-at.tex, bk-lt.tex, gnuslog-booklet.eps: New file.
+	* gnusref.tex, refcard.tex: Support booklet.
+
+2002-03-24  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnusref.tex: Addition.
+
+	* gnus.texi: Don't use @sc in headings.
+	(Article Display): Fix.
+	(Signing and encrypting): Add mml-unsecure-message.
+	(IMAP): Remove @. to make texi2latex work.
+	(Thread Commands): Fix.
+	(Unavailable Servers): Add gnus-server-offline-server.
+	(Topic Sorting): Add gnus-topic-sort-groups.
+	(Limiting): Fix.
+	(Article Washing): Fix gnus-article-strip-headers-in-body, add
+	gnus-article-outlook-deuglify-article.
+	(Article Header):  Add gnus-article-remove-leading-whitespace.
+	(Customizing Articles): Add gnus-treat-leading-whitespace.
+	(Summary Score Commands): Add gnus-score-find-favourite-words.
+	(Mailing List): Index gnus-mailing-list-insinuate.
+	(Mail Group Commands): Add gnus-article-encrypt-body,
+	gnus-summary-create-article.  Don't use @var if not
+	metasyntactic. Index gnus-summary-edit-article-done.
+
+	* message.texi (Security): Add mml-unsecure-message.
+	(Mailing Lists): Index message-goto-mail-followup-to.
+
+2002-03-23  Jesper Harder <harder@ifa.au.dk>
+
+	* gnusref.tex, refcard.tex: Addition.
+
+2002-03-21  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Sending Variables): Fix typo.
+	Trivial change from Raymond Scholz <rscholz@zonix.de>
+
+2002-03-09  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Other Marks): Remove duplication.
+	Trivial change from David Aspinwall <aspinwall@timesten.com>
+
+2002-03-09  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus.texi: Mention nnmaildir where appropriate; fix some typos.
+
+2002-03-01  Paul Jarc  <prj@po.cwru.edu>
+
+	* message.texi (Mailing Lists): 'use is the default for
+	message-use-mail-followup-to, not nil; 'use is also not t.
+	Mention why an unsubscribed list poster might use MFT, and how to
+	disable MFT for a single message.
+
+2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Splitting Mail): Addition.
+
+2002-02-23  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnusref.tex (subsection*{Notes}): Addition.
+	Suggested by Felix Natter <fnatter@gmx.net>
+
+2002-02-22  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Splitting Mail): Addition.
+
+2002-02-20  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Slave Gnusae): Addition.
+	From  David S. Goldberg <david.goldberg6@verizon.net>
+
+2002-02-18  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* emacs-mime.texi (mailcap): Addition.
+
+	* gnus.texi (Using MIME): Rename functions. Addition.
+
+2002-02-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Top): Change description of Posting Server node.
+	(Composing Messages): Ditto.
+	(Posting Server): Add some mail stuff.
+	(IMAP): Terminate @, from Emacs Gnus manual.
+	(Thwarting Email Spam): Use @sc.
+
+2002-02-16  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnusref.tex (subsection*{Notes}): Update.
+	From: Felix Natter <fnatter@gmx.net>
+
+2002-02-14  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Document Groups): Addition.
+
+2002-02-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* message.texi (Security): Fix @findex for the key `C-c C-m s p'.
+
+2002-02-13  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	Reinstate some changes to make latexpdf work.
+
+	* message.texi (Security): Don't use @key.
+	(Various Commands): Don't use @point.
+
+	* gnus.texi (Mail Source Specifiers): Use @uref.
+
+2002-02-13  Jesper Harder <harder@ifa.au.dk>
+
+	* message.texi, gnus.texi, emacs-mime.texi: Use small caps
+	consistently.  MIME, NOV, NNTP, HTML, IMAP are written with @sc
+	most places -- it looks better if it's the same *everywhere*.
+	@kbd instead of @code for key sequences. @file instead of @code
+	for files.
+
+	* message.texi (Various Commands): use the proper @point glyph.
+
+	* gnus.texi (Summary Mail Commands): ,A_(B doesn't work.  A German
+	spelling reform changed the correct spelling to "muss" anyway (I
+	think).
+
+	* gnus.texi (Mail sources): ,A'(B doesn't work. Use "section" instead.
+
+	* gnus.texi (Mail Source Specifiers): use @url.
+
+	* message.texi, emacs-mime.texi: update copyright year.
+
+2002-02-12  Paul Jarc  <prj@po.cwru.edu>
+
+	* gnus.texi (Required Back End Functions): specify the lowest and
+	highest article numbers for empty groups for nnchoke-request-list
+	and nnchoke-request-group.
+
+2002-02-12  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Sending Variables): Addition.
+
+	* gnus.texi (Group Parameters): Add unread, not read.
+	(Archived Messages): Addition.
+
+2002-02-09  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Group Parameters): Addition.
+	From: Steinar Bang <steinar@bang.priv.no>
+
+2002-02-08  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Article Washing): Addition.
+	From: Michael Cook <michael.cook@cisco.com>
+
+2002-02-06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Gnus Unplugged): Use (setq gnus-agent t).
+	(Example Setup): Ditto.
+	(Category Syntax): Require gnus-agent.
+
+2002-02-06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Posting Styles): Addition.
+
+2002-02-05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.texi (Mailing Lists): Addition.
+	* gnus.texi (Group Parameters): Addition.
+	From Sriram Karra <karra@cs.utah.edu>.
+
+2002-02-03  Karl Kleinpaste  <karl@charcoal.com>
+
+	* gnus.texi (Summary Score Commands): Added detail on "extra"
+	header scoring.
+	(Score File Format): ditto
+
+2002-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Customization): Addition.
+
+2002-01-31  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Posting Styles): Addition. Suggested by
+	Michael Cook <michael@waxrat.com>.
+
+2002-01-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Customization): Move emacs-w3m stuff backward;
+	added documentation for `mm-inline-text-html-with-w3m-keymap'.
+
+2002-01-28  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Agent Expiry): Addition.
+
+2002-01-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Customization): Added documentation for
+	`mm-inline-text-html-with-images'.
+
+	* gnus.texi (Article Washing): Replace w3m to emacs-w3m.
+
+2002-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Mail Spool): Addition.
+
+2002-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Customization): Added documentation for
+	`mm-inline-text-html-renderer'.
+
+2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Article Washing): Add URL about w3m.
+
+2002-01-22  Josh Huber  <huber@alum.wpi.edu>
+
+	* emacs-mime.texi (MML Definition): Added a few words about the
+	recipients option.
+	* message.texi (Security): Changed documentation to reflect use of
+	the new secure tag.
+
+2002-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Article Washing): Addition.
+
+2002-01-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Document Groups): Added info on more doc types.
+	(More Threading): Move documentation here.
+
+2002-01-20  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Mailing Lists): Fix.  From Love
+	<lha@stacken.kth.se>.
+
 2002-01-20  Patric Mueller  <bhaak@gmx.net>
 
 	* gnus.texi (Group Timestamp): Typo fix.
@@ -9,7 +316,7 @@
 2002-01-19  Lars Magne Ingebrigtsen  <karra@cs.utah.edu>
 
 	* gnus.texi (Mail Spool): Note that the .marks files can be
-	removed. 
+	removed.
 
 2002-01-17  Paul Jarc  <prj@po.cwru.edu>
 
@@ -41,7 +348,7 @@
 2002-01-11  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.texi (Mailing Lists): Addition.
-	* gnus.texi (Group Parameters): Addition. 
+	* gnus.texi (Group Parameters): Addition.
 	From Sriram Karra <karra@cs.utah.edu>.
 
 2002-01-10  Colin Marquardt  <c.marquardt@alcatel.de>
@@ -98,7 +405,7 @@
 2002-01-02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Group Timestamp): Addition.  Example from Andras
-	BALI. 
+	BALI.
 	(X-Face): Addition.
 	(Advanced Formatting): Add example.
 

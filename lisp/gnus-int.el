@@ -202,16 +202,16 @@ If it is down, start it up (again)."
 	  (setq elem (list gnus-command-method nil)
 		gnus-opened-servers (cons elem gnus-opened-servers)))
 	;; Set the status of this server.
-	(setcar (cdr elem) 
-		(if result 
+	(setcar (cdr elem)
+		(if result
 		    (if (eq (cadr elem) 'offline)
 			'offline
 		      'ok)
-		  (if (and gnus-agent 
+		  (if (and gnus-agent
 			   (not (eq (cadr elem) 'offline))
 			   (gnus-agent-method-p gnus-command-method))
 		      (or gnus-server-unopen-status
-			  (if (gnus-y-or-n-p 
+			  (if (gnus-y-or-n-p
 			       (format "Unable to open %s:%s, go offline? "
 				       (car gnus-command-method)
 				       (cadr gnus-command-method)))
@@ -514,9 +514,9 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	(let ((mail-parse-charset message-default-charset))
 	  (mail-encode-encoded-word-buffer)))
       (message-encode-message-body)))
-  (let ((func (car (or gnus-command-method
-		       (gnus-find-method-for-group group)))))
-    (funcall (intern (format "%s-request-accept-article" func))
+  (let ((gnus-command-method (or gnus-command-method
+				 (gnus-find-method-for-group group))))
+    (funcall (gnus-get-function gnus-command-method 'request-accept-article)
 	     (if (stringp group) (gnus-group-real-name group) group)
 	     (cadr gnus-command-method)
 	     last)))

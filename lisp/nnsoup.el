@@ -1,10 +1,10 @@
 ;;; nnsoup.el --- SOUP access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -337,7 +337,7 @@ backend for the messages.")
 		  (delete-file (nnsoup-file prefix t)))
 		t)
 	  (setcdr (cdr total-infolist) (delq info (cddr total-infolist)))
-	  (setq articles (gnus-sorted-complement articles range-list))))
+	  (setq articles (gnus-sorted-difference articles range-list))))
       (when (not mod-time)
 	(setcdr (cdr total-infolist) (delq info (cddr total-infolist)))))
     (if (cddr total-infolist)

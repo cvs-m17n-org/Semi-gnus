@@ -1,5 +1,5 @@
 ;;; mml-sec.el --- A package with security functions for MML documents
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; This file is not part of GNU Emacs, but the same permissions apply.
@@ -126,6 +126,69 @@
   "Add MML tags to S/MIME encrypt this MML part."
   (interactive)
   (mml-secure-part "smime"))
+
+;; defuns that add the proper <#secure ...> tag to the top of the message body
+(defun mml-secure-message (method &optional modesym)
+  (let ((mode (prin1-to-string modesym))
+	insert-loc)
+    (mml-unsecure-message)
+    (save-excursion
+      (goto-char (point-min))
+      (cond ((re-search-forward
+	      (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+	     (goto-char (setq insert-loc (match-end 0)))
+	     (unless (looking-at "<#secure")
+	       (mml-insert-tag
+		'secure 'method method 'mode mode)))
+	    (t (error
+		"The message is corrupted. No mail header separator"))))
+    (when (eql insert-loc (point))
+      (forward-line 1))))
+
+(defun mml-unsecure-message ()
+  "Remove security related MML tags from message."
+  (interactive)
+  (save-excursion
+    (goto-char (point-max))
+    (when (re-search-backward "^<#secure.*>\n" nil t)
+      (kill-region (match-beginning 0) (match-end 0)))))
+
+(defun mml-secure-message-sign-smime ()
+  "Add MML tag to encrypt/sign the entire message."
+  (interactive)
+  (mml-secure-message "smime" 'sign))
+
+(defun mml-secure-message-sign-pgp ()
+  "Add MML tag to encrypt/sign the entire message."
+  (interactive)
+  (mml-secure-message "pgp" 'sign))
+
+(defun mml-secure-message-sign-pgpmime ()
+  "Add MML tag to encrypt/sign the entire message."
+  (interactive)
+  (mml-secure-message "pgpmime" 'sign))
+
+(defun mml-secure-message-encrypt-smime (&optional dontsign)
+  "Add MML tag to encrypt and sign the entire message.
+If called with a prefix argument, only encrypt (do NOT sign)."
+  (interactive "P")
+  (mml-secure-message "smime" (if dontsign 'encrypt 'signencrypt)))
+
+;;; NOTE: this should be switched to use signencrypt
+;;; once it does something sensible
+(defun mml-secure-message-encrypt-pgp (&optional dontsign)
+  "Add MML tag to encrypt and sign the entire message.
+If called with a prefix argument, only encrypt (do NOT sign)."
+  (interactive "P")
+  (mml-secure-message "pgp" (if dontsign 'encrypt 'encrypt)))
+
+;;; NOTE: this should be switched to use signencrypt
+;;; once it does something sensible
+(defun mml-secure-message-encrypt-pgpmime (&optional dontsign)
+  "Add MML tag to encrypt and sign the entire message.
+If called with a prefix argument, only encrypt (do NOT sign)."
+  (interactive "P")
+  (mml-secure-message "pgpmime" (if dontsign 'encrypt 'encrypt)))
 
 (provide 'mml-sec)
 

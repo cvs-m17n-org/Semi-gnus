@@ -1,5 +1,5 @@
 ;;; nnweb.el --- retrieving articles via web search engines
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -37,6 +37,9 @@
 (require 'nnmail)
 (require 'mm-util)
 (require 'mm-url)
+(eval-and-compile
+  (ignore-errors
+    (require 'url)))
 (autoload 'w3-parse-buffer "w3-parse")
 
 (nnoo-declare nnweb)
@@ -50,13 +53,9 @@ Valid types include `google', `dejanews', `dejanewsold', `reference',
 and `altavista'.")
 
 (defvar nnweb-type-definition
-  '(
-    (google
-     ;;(article . nnweb-google-wash-article)
-     ;;(id . "http://groups.google.com/groups?as_umsgid=%s")
+  '((google
      (article . ignore)
      (id . "http://groups.google.com/groups?selm=%s&output=gplain")
-     ;;(reference . nnweb-google-reference)
      (reference . identity)
      (map . nnweb-google-create-mapping)
      (search . nnweb-google-search)
@@ -73,19 +72,6 @@ and `altavista'.")
      (search . nnweb-google-search)
      (address . "http://groups.google.com/groups")
      (identifier . nnweb-google-identity))
-;;;     (dejanews
-;;;      (article . ignore)
-;;;      (id . "http://search.dejanews.com/msgid.xp?MID=%s&fmt=text")
-;;;      (map . nnweb-dejanews-create-mapping)
-;;;      (search . nnweb-dejanews-search)
-;;;      (address . "http://www.deja.com/=dnc/qs.xp")
-;;;      (identifier . nnweb-dejanews-identity))
-;;;     (dejanewsold
-;;;      (article . ignore)
-;;;      (map . nnweb-dejanews-create-mapping)
-;;;      (search . nnweb-dejanewsold-search)
-;;;      (address . "http://www.deja.com/dnquery.xp")
-;;;      (identifier . nnweb-dejanews-identity))
     (reference
      (article . nnweb-reference-wash-article)
      (map . nnweb-reference-create-mapping)
@@ -748,7 +734,7 @@ and `altavista'.")
     (while (re-search-forward
 	    "a href=/groups\\(\\?[^ \">]*selm=\\([^ &\">]+\\)\\)" nil t)
       (setq mid (match-string 2)
-	    url (format 
+	    url (format
 		 "http://groups.google.com/groups?selm=%s&output=gplain" mid))
       (narrow-to-region (search-forward ">" nil t)
 			(search-forward "</a>" nil t))
@@ -771,9 +757,11 @@ and `altavista'.")
 	(widen)
 	(skip-chars-forward "- \t"))
       (when (looking-at
-	     "\\([0-9]+[/ ][A-Za-z]+[/ ][0-9]+\\)[ \t]*by[ \t]*\\([^<]*\\) - <a")
-	(setq From (match-string 2)
-	      Date (match-string 1)))
+	     "\\([0-9]+\\)[/ ]\\([A-Za-z]+\\)[/ ]\\([0-9]+\\)[ \t]*by[ \t]*\\([^<]*\\) - <a")
+	(setq From (match-string 4)
+	      Date (format "%s %s 00:00:00 %s"
+			   (match-string 2) (match-string 1)
+			   (match-string 3))))
       (forward-line 1)
       (incf i)
       (unless (nnweb-get-hashtb url)

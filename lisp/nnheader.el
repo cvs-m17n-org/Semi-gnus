@@ -1,11 +1,11 @@
 ;;; nnheader.el --- header access macros for Gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001
+;;        1997, 1998, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -40,7 +40,8 @@
 (eval-and-compile
   (autoload 'gnus-sorted-intersection "gnus-range")
   (autoload 'gnus-intersection "gnus-range")
-  (autoload 'gnus-sorted-complement "gnus-range"))
+  (autoload 'gnus-sorted-complement "gnus-range")
+  (autoload 'gnus-sorted-difference "gnus-range"))
 
 (defcustom gnus-verbose-backends 7
   "Integer that says how verbose the Gnus backends should be.
@@ -398,6 +399,22 @@ on your system, you could say something like:
     (while (search-backward "\n" p t)
       (delete-char 1))
     (forward-line 1)))
+
+(defun nnheader-parse-overview-file (file)
+  "Parse FILE and return a list of headers."
+  (mm-with-unibyte-buffer
+    (nnheader-insert-file-contents file)
+    (goto-char (point-min))
+    (let (headers)
+      (while (not (eobp))
+	(push (nnheader-parse-nov) headers)
+	(forward-line 1))
+      (nreverse headers))))
+
+(defun nnheader-write-overview-file (file headers)
+  "Write HEADERS to FILE."
+  (with-temp-file file
+    (mapcar 'nnheader-insert-nov headers)))
 
 (defun nnheader-insert-header (header)
   (insert
@@ -858,6 +875,25 @@ find-file-hooks, etc.
   This function ensures that none of these modifications will take place."
   (let ((coding-system-for-read nnheader-file-coding-system))
     (mm-insert-file-contents filename visit beg end replace)))
+
+(defun nnheader-insert-nov-file (file first)
+  (let ((size (nth 7 (file-attributes file)))
+	(cutoff (* 32 1024)))
+    (if (< size cutoff)
+	;; If the file is small, we just load it.
+	(nnheader-insert-file-contents file)
+      ;; We start on the assumption that FIRST is pretty recent.  If
+      ;; not, we just insert the rest of the file as well.
+      (let (current)
+	(nnheader-insert-file-contents file nil (- size cutoff) size)
+	(goto-char (point-min))
+	(delete-region (point) (or (search-forward "\n" nil 'move) (point)))
+	(setq current (ignore-errors (read (current-buffer))))
+	(if (and (numberp current)
+		 (< current first))
+	    t
+	  (delete-region (point-min) (point-max))
+	  (nnheader-insert-file-contents file))))))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)

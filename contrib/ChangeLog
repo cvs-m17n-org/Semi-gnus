@@ -1,3 +1,21 @@
+2002-04-24  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* ucs-tables.el (featurep): Barf on XEmacs.
+
+2002-03-06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* ucs-tables.el: Copy from Emacs 21.
+	
+2002-03-05  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* xml.el: Sync with Emacs 21.
+
+2002-01-25  Josh Huber  <huber@alum.wpi.edu>
+
+	* gpg.el (gpg-command-decrypt): Enable the status-fd command line
+	option to gpg when decrypting so `mml2015-mailcrypt-decrypt' can
+	parse and display the output.
+
 2002-01-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus-mdrtn.el (gnus-moderation-cancel-article): Insert an extra

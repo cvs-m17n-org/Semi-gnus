@@ -140,7 +140,7 @@ certificates to be sent with every message to each address."
 Directory should contain files (in PEM format) named to the X.509
 hash of the certificate.  This can be done using OpenSSL such as:
 
-$ ln -s ca.pem `openssl x509 -noout -hash -in ca.pem`
+$ ln -s ca.pem `openssl x509 -noout -hash -in ca.pem`.0
 
 where `ca.pem' is the file containing a PEM encoded X.509 CA
 certificate."
@@ -201,7 +201,9 @@ If nil, use system defaults."
       (lambda (prefix &optional dir-flag) ;; Simple implementation
 	(expand-file-name
 	 (make-temp-name prefix)
-	 temporary-file-directory)))))
+	 (if (fboundp 'temp-directory)
+	     (temp-directory)
+	   temporary-file-directory))))))
 
 ;; Password dialog function
 
@@ -232,15 +234,17 @@ If nil, use system defaults."
 
 ;; Sign+encrypt region
 
-(defun smime-sign-region (b e keyfiles)
-  "Sign region with certified key in KEYFILES.
+(defun smime-sign-region (b e keyfile)
+  "Sign region with certified key in KEYFILE.
 If signing fails, the buffer is not modified.  Region is assumed to
-have proper MIME tags.  KEYFILES is expected to contain a PEM encoded
-private key and certificate as its car, and a list of additional certificates
-to include in its caar."
+have proper MIME tags.  KEYFILE is expected to contain a PEM encoded
+private key and certificate as its car, and a list of additional
+certificates to include in its caar.  If no additional certificates is
+included, KEYFILE may be the file containing the PEM encoded private
+key and certificate itself."
   (smime-new-details-buffer)
-  (let ((keyfile (car keyfiles))
-	(certfiles (and (cdr keyfiles) (cadr keyfiles)))
+  (let ((keyfile (or (car-safe keyfile) keyfile))
+	(certfiles (and (cdr-safe keyfile) (cadr keyfile)))
 	(buffer (generate-new-buffer (generate-new-buffer-name " *smime*")))
 	(passphrase (smime-ask-passphrase))
 	(tmpfile (smime-make-temp-file "smime")))
@@ -307,11 +311,13 @@ KEYFILE should contain a PEM encoded key and certificate."
     (smime-sign-region
      (point-min) (point-max)
      (if keyfile
-	 (list keyfile (smime-get-certfiles keyfile smime-keys))
+	 keyfile
        (smime-get-key-by-email
-	(completing-read "Sign using which signature? " smime-keys nil nil
-			 (and (listp (car-safe smime-keys))
-			      (cdr smime-keys))))))))
+	(completing-read
+	 (concat "Sign using which key? "
+		 (if smime-keys (concat "(default " (caar smime-keys) ") ")
+		   ""))
+	 smime-keys nil nil (car-safe (car-safe smime-keys))))))))
 
 (defun smime-encrypt-buffer (&optional certfiles buffer)
   "S/MIME encrypt BUFFER for recipients specified in CERTFILES.
@@ -428,9 +434,11 @@ in the buffer specified by `smime-details-buffer'."
      (expand-file-name
       (or keyfile
 	  (smime-get-key-by-email
-	   (completing-read "Decrypt with which key? " smime-keys nil nil
-			    (and (listp (car-safe smime-keys))
-				 (caar smime-keys)))))))))
+	   (completing-read
+	    (concat "Decipher using which key? "
+		    (if smime-keys (concat "(default " (caar smime-keys) ") ")
+		      ""))
+	    smime-keys nil nil (car-safe (car-safe smime-keys)))))))))
 
 ;; Various operations
 
@@ -459,7 +467,7 @@ in the buffer specified by `smime-details-buffer'."
   "Get email addresses contained in certificate between points B and E.
 A string or a list of strings is returned."
   (smime-new-details-buffer)
-  (when (smime-call-openssl-region 
+  (when (smime-call-openssl-region
 	 b e smime-details-buffer "x509" "-email" "-noout")
     (delete-region b e)
     (insert-buffer-substring smime-details-buffer)

@@ -189,6 +189,14 @@
 	(t (concat filename ".elc"))))
 
 (require 'bytecomp)
+;; To avoid having defsubsts and inlines happen.
+;(if (featurep 'xemacs)
+;    (require 'byte-optimize)
+;  (require 'byte-opt))
+;(defun byte-optimize-inline-handler (form)
+;  "byte-optimize-handler for the `inline' special-form."
+;  (cons 'progn (cdr form)))
+;(defalias 'byte-compile-file-form-defsubst 'byte-compile-file-form-defun)
 
 (push srcdir load-path)
 (load (expand-file-name "lpath.el" srcdir) nil t)
@@ -234,23 +242,23 @@ Modify to suit your needs."))
     (condition-case code
 	(require 'w3-parse)
       (error
-       (message "No w3: %s %s" code (locate-library "w3-parse"))
+       (message "No w3: %s %s" (cadr code) (or (locate-library "w3-parse") ""))
        (dolist (file '("nnultimate.el" "webmail.el" "nnwfm.el"))
 	 (setq files (delete file files)))))
     (condition-case code
 	(require 'mh-e)
       (error
-       (message "No mh-e: %s %s" code (locate-library "mh-e"))
+       (message "No mh-e: %s %s" (cadr code) (or (locate-library "mh-e") ""))
        (setq files (delete "gnus-mh.el" files))))
     (condition-case code
 	(require 'xml)
       (error
-       (message "No xml: %s %s" code (locate-library "xml"))
+       (message "No xml: %s %s" (cadr code) (or (locate-library "xml") ""))
        (setq files (delete "nnrss.el" files))))
     (dolist (file
 	     (if (featurep 'xemacs)
-		 '("md5.el" "smiley-ems.el")
-	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el" "smiley.el")))
+		 '("md5.el")
+	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el")))
       (setq files (delete file files)))
 
     (dolist (file files)
