@@ -1,3 +1,12 @@
+1999-08-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus.el (gnus-version-number): Change to 6.13.4b2.
+
+	* lisp/nnmail.el (nnmail-get-spool-files): Fix bug in latest changes.
+	(nnmail-pop3-movemail): Ditto.
+
+	* Nana-TIPS.ja : Fix typo.
+
 1999-08-02  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/nnmail.el (nnmail-get-new-mail): Fix typo.
