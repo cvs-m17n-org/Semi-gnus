@@ -254,7 +254,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Chaos"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "1.12.3"
+(defconst gnus-version-number "1.12.4"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
