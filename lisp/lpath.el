@@ -117,4 +117,7 @@
 (defun md5 (object &optional start end coding noerror)
   )
 
+(defun nnkiboze-score-file (a)
+  )
+
 (provide 'lpath)

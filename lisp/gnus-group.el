@@ -2365,13 +2365,14 @@ score file entries for articles to include in the group."
 					  "Match on header: " headers nil t))))
 	(setq regexps nil)
 	(while (not (equal "" (setq regexp (read-string
-					    (format "Match on %s (string): "
+					    (format "Match on %s (regexp): "
 						    header)))))
 	  (push (list regexp nil nil 'r) regexps))
 	(push (cons header regexps) scores))
       scores)))
   (gnus-group-make-group group "nnkiboze" address)
-  (let* ((score-file (gnus-score-file-name (concat "nnkiboze:" group)))
+  (let* ((nnkiboze-current-group group)
+	 (score-file (car (nnkiboze-score-file "")))
 	 (score-dir (file-name-directory score-file)))
     (unless (file-exists-p score-dir)
       (make-directory score-dir))
