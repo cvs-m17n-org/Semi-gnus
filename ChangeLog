@@ -1,0 +1,144 @@
+1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
+
+	*  (Repository): New branch Nana7 from gnus-5.8.2.
+
+	* lisp/score-mode.el (score-mode-coding-system): Do not specify
+	the coding system for score file in default.
+
+	* lisp/pop3.el (pop3-read-passwd): Check bounded function, before
+	load file.
+
+	* lisp/nnmail.el (nnmail-get-new-mail): Use `sources' insted of
+	`nnmail-spool-file'. (Maybe BUG of Gnus 5.8.2)
+
+	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Use
+	`make-full-mail-header'.
+
+	* lisp/nnheader.el: Sync with Nana-gnus 6.13.
+
+	* lisp/nndraft.el (nndraft-request-article): Use
+	`nnheader-file-coding-system'.
+
+	* lisp/mml.el: Abolished.
+
+	* lisp/mmgnus.el: Copy from Nana-gnus 6.13.
+	(mime-gnus-handle-entity): New class.
+	(mime-gnus-entity): Use `mime-gnus-handle-entity'.
+
+	* lisp/mm-view.el: Rename `mailcap-*' to `mm-mailcap-*'.
+	(mm-inline-message): Correspondence with FLIM.
+
+	* lisp/mm-uu.el: Rename `mailcap-*' to `mm-mailcap-*'.
+
+	* lisp/mm-mailcap.el:  Rename from `mailcap.el'.
+
+	* lisp/mm-encode.el: Rename `mailcap-*' to `mm-mailcap-*'.
+
+	* lisp/mm-decode.el (mm-handle-p): New inline funtion.
+	(mm-handle-set-buffer): Likewise.
+	(mm-handle-multipart/mixed-p): Likewise.
+	(mm-handle-type-parameters): Likewise.
+	(mm-handle-disposition-type): Likewise.
+	(mm-handle-disposition-parameters): Likewise.
+	(mm-handle-buffer): Correspondence with FLIM.
+	(mm-handle-type): Likewise.
+	(mm-handle-media-type): Likewise.
+	(mm-handle-media-supertype): Likewise.
+	(mm-handle-media-subtype): Likewise.
+	(mm-handle-undisplayer): Likewise.
+	(mm-handle-set-undisplayer): Likewise.
+	(mm-handle-disposition): Likewise.
+	(mm-handle-description): Likewise.
+	(mm-handle-cache): Likewise.
+	(mm-handle-set-cache): Likewise.
+	(mm-handle-id): Likewise.
+	(mm-make-handle): Likewise.
+	(mm-mailcap-command): Likewise.
+	(mm-remove-parts): Likewise.
+	(mm-destroy-parts): Likewise.
+	(mm-remove-part): Likewise.
+	(mm-destroy-part): Likewise.
+	(mm-preferred-alternative): Likewise.
+	(mm-handle-child): New alias.
+	(mm-handle-set-child): Likewise.
+	(mm-dissect-buffer-header): New function.
+	(mm-dissect-buffer): Use
+	`mm-dissect-buffer-header'. Correspondence with FLIM.
+	(mm-dissect-singlepart): Change arguments. Correspondence with
+	FLIM.
+	(mm-dissect-multipart): New required argument. Correspondence with
+	FLIM.
+	(mm-display-part): Rename `mailcap-*' to `mm-mailcap-*'. Use
+	`mm-handle-media-subtype'.
+	(mm-display-external): Rename `mailcap-*' to `mm-mailcap-*'.
+	(mm-interactively-view-part): Likewise.
+
+	* lisp/mm-bodies.el (TopLevel): Require `mm-encode'.
+
+	* lisp/message.el: Copy from Nana-gnus 6.13.
+
+	* lisp/mess-lcl.el: Copy from Nana-gnus 6.13.
+
+	* lisp/mess-bbdb.el: Ditto.
+
+	* lisp/mailcap.el: Rename to mm-mailcap.el
+
+	* lisp/mail-parse.el (mail-header-parse-content-type): Use
+	`mime-parse-Content-Type'.
+	(mail-header-parse-content-disposition): Use
+	`mime-parse-Content-Disposition'.
+	(mail-content-type-get): Use `mime-content-type-parameter'.
+
+	* lisp/gnus.el: Sync with Nana-gnus 6.13.
+	(gnus-version-number): Version 7.1.0.0.
+
+	* lisp/gnus-sum.el: Sync with Nana-gnus 6.13.
+	(gnus-update-summary-mark-positions): Correspondence with FLIM.
+	(gnus-nov-parse-line): Likewise.
+	(gnus-get-newsgroup-headers): Likewise.
+	(gnus-summary-save-parts): Likewise.
+
+	* lisp/gnus-spec.el: Sync with Nana-gnus 6.13.
+
+	* lisp/gnus-soup.el (gnus-soup-send-packet): Do not use
+	`message-newsreader' and `message-mailer'.
+
+	* lisp/gnus-score.el: Sync with Nana-gnus 6.13.
+	(gnus-score-save): Do not replace file name character in base
+	path.
+
+	* lisp/gnus-msg.el: Sync with Nana-gnus 6.13.
+
+	* lisp/gnus-int.el (gnus-request-accept-article): Do not encode
+	message.
+
+	* lisp/gnus-draft.el: Sync with Nana-gnus 6.13.
+
+	* lisp/gnus-cache.el (gnus-cache-file-name): Do not replace file
+	name character in base path.
+
+	* lisp/gnus-bbdb.el: Copy from Nana-gnus 6.13.
+
+	* lisp/gnus-art.el (gnus-decode-header-function): Use
+	`mime-decode-header-in-region'.
+	(article-decode-charset): Correspondence with FLIM.
+	(gnus-article-prepare): Likewise.
+	(gnus-article-prepare-display): New optional argument.
+	(gnus-mime-view-part-as-type): Rename `mailcap-*' to
+	`mm-mailcap-*'.
+	(gnus-display-mime): New required argument. Correspondence with
+	FLIM.
+	(gnus-mime-display-part): Likewise.
+	(gnus-mime-display-single): Likewise.
+	(gnus-mime-display-alternative): Likewise.
+	(gnus-mime-display-alternative): Likewise.
+
+	* lisp/dgnushack.el (dgnushack-compile): When BBDB is not
+	installed, do not compile `gnus-bbdb.el' and `mess-bbdb.el'.
+
+	* Nana-gnus: Version 7.1.0.0 (This is very alpha status.)
+	I tested only `nntp',`nnml (with pop3)' backend and `Message'
+	mode.
+
+	The test of implement that based on `luna' and the other FLIM
+	functions. But could not use MIME-View currently.
