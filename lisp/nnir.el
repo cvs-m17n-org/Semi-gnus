@@ -463,7 +463,7 @@ that it is for EWS, not Glimpse."
 
 (defcustom nnir-imap-default-charset nil
   "*Name of the charset of the strings that appear in the search criteria."
-  :type '(choice (const nil) string)
+  :type '(choice (const nil) symbol)
   :group 'nnir)
 
 ;; Swish++.  Next three variables Copyright (C) 2000, 2001 Christoph
