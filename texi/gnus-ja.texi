@@ -977,3 +977,121 @@ Gnus $B$O%I%j%V%k%U%!%$%k$r(B @code{gnus-dribble-directory} $B$KCV$-$^$9!#%G%
 $B%$%k$O(B @code{.newsrc} $B$HF1$85v2DB0@-$rM?$($i$l$^$9!#(B
 
 
+@node The Active File
+@section The Active File
+@cindex active file
+@cindex ignored groups
+
+Gnus $B$O5/F0$7$?$H$-$d!"<B:]$K?7$7$$5-;v$,E~Ce$7$F$$$k$+$r7hDj$7$h$&$H$9(B
+$B$k$H$-$K!"8=>u%U%!%$%k$rFI$_9~$_$^$9!#$3$l$O$H$F$bBg$-$J%U%!%$%k$G!"$=$N(B
+$B%5!<%P!<$N3hF0Cf$N%0%k!<%W$H5-;v$N$9$Y$F$N%j%9%H$,F~$C$F$$$^$9!#(B
+
+@vindex gnus-ignored-newsgroups
+$B8=>u%U%!%$%k$r8!::$9$kA0$K!"(Bgnus $B$O@55,I=8=(B 
+@code{gnus-ignored-newsgroups} $B$K9g$&$9$Y$F$N9T$r:o=|$7$^$9!#$3$l$O<g$K(B
+$B56$NL>A0$r;}$D%0%k!<%W$rGS=|$9$k$?$a$K;H$o$l$F$-$^$7$?$,!"6=L#$NL5$$%0%k!<(B
+$B%W$N3,AX$rL5;k$9$k$?$a$K;H$&$3$H$b$G$-$^$9!#$7$+$7!"$3$l$O$*4+$a$G$-$^$;(B
+$B$s!#K\Ev$N$3$H$r8@$&$H!"A4$/;?@.$G$-$^$;$s!#Be$o$j$K!"$=$N$h$&$JMQES$KMQ(B
+$B$$$i$l$kJQ?t$N35N,$rCN$k$?$a$K!"(B@pxref{New Groups} $B$r;2>H$7$F$/$@$5$$!#(B
+
+@c This variable is
+@c @code{nil} by default, and will slow down active file handling somewhat
+@c if you set it to anything else.
+
+@vindex gnus-read-active-file
+@c @head
+$B8=>u%U%!%$%k$OHf3SE*Bg$-$/$J$k798~$,$"$k$N$G!"CY$$2s@~$r;H$C$F$$$k$H$-$O!"(B
+$B8=>u%U%!%$%k$rFI$_9~$^$J$$$h$&$K(B @code{gnus-read-active-file} $B$r(B 
+@code{nil} $B$K@_Dj$9$k$3$H$,$G$-$^$9!#$3$NJQ?t$O%G%#%U%)%k%H$G$O(B
+@code{some} $B$G$9!#(B
+
+$B$=$N$h$&$J;~$O!"(Bgnus $B$O<B:]$K9XFI$5$l$F$$$k%0%k!<%W$K4X$9$k>pJs$@$1$rF@(B
+$B$F$d$C$F$$$3$&$H$7$^$9!#(B
+
+$B5$$rIU$1$F$[$7$$$N$O!"$"$J$?$,;3$[$I$N$?$/$5$s$N%0%k!<%W$r9XFI$7$F$$$k$H(B
+$B$-$K$3$NJQ?t$r(B @code{nil} $B@_Dj$9$k$H!"(Bgnus $B$OB.$/$J$k$I$3$m$+!"CY$/$J$C(B
+$B$F$7$^$&$H$$$&$3$H$G$9!#8=>u$G$O!"%K%e!<%:$r(B 2400bps $B0J>e$N%b%G%`$rDL$7(B
+$B$FFI$s$G$$$k$N$G$J$$8B$j!"(Bgnus $B$NB.EY$O$+$J$jCY$/$J$k$G$7$g$&!#(B
+
+$B$3$NJQ?t$O(B @code{some} $B$H$$$&CM$b<h$k$3$H$,$G$-$^$9!#$=$N;~$O!"(Bgnus $B$O8=(B
+$B>u$N>pJs$r9XFI$5$l$F$$$k%0%k!<%W$N$b$N$@$1$rF@$h$&$H$7$^$9!#$$$/$D$+$N%5!<(B
+$B%P!<(B ($BL?Na(B@code{LIST ACTIVE group} $B$r;H$&$3$H$N$G$-$k!":G?71T$N(B INN $B%5!<(B
+$B%P!<(B) $B$G$O!"Hs>o$KAa$/$J$k$G$7$g$&$,!"B>$N%5!<%P!<$G$OB.$/$O$"$j$^$;$s!#(B
+$B$I$N$h$&$K$;$h!"CY$$2s@~$G$O(B @code{some} $B$O(B @code{nil} $B$h$j$bB.$/!"$=$l(B
+$B$O$b$A$m$s(B@code{t} $B$h$j$bB.$/$J$j$^$9!#(B
+
+$B$b$7$3$NJQ?t$,(B @code{nil} $B$G$"$k$H!"(Bgnus $B$O40A4$K$,$s$8$,$i$a$NJ}K!$G%0(B
+$B%k!<%W$N>pJs$rF@$h$&$H$7$^$9!#$=$7$F!"$3$l$O$"$^$jB.$/$"$j$^$;$s!#$b$7$=(B
+$B$l$,(B @code{some} $B$G(B @sc{nntp} $B%5!<%P!<$r;H$C$F$$$k$H$-$O!"(Bgnus $B$O$G$-$k(B
+$B$@$1B.$/L?Na$r=P$7!"0l7b$G$9$Y$F$NJVEz$rFI$_9~$_$^$9!#$3$NJ}$,IaDL$O$h$j(B
+$BNI$$7k2L$r$b$?$i$7$^$9$,!"%5!<%P!<$,L?Na(B @code{LIST ACTIVE group} $B$rM}2r(B
+$B$7$J$$$J$i!"%5!<%P!<$K$H$C$F$O$"$^$jNI$$$H$O8@$($^$;$s!#(B
+
+@code{some} $B$+(B @code{nil} $B$r;H$&$N$G$"$l$P!"$I$A$i$K$7$mB.EY$r>e$2$k$?$a(B
+$B$K$9$Y$F$N6=L#$NL5$$%0%k!<%W$rI,$::o=|$9$k$Y$-$G$7$g$&!#(B
+
+$B$3$NJQ?t$O(B2$BHVL\$N(B (secondary) $BJ}K!$N8=>u%U%!%$%k<hF@$K$b1F6A$9$k$3$H$K5$(B
+$B$rIU$1$F$/$@$5$$!#(B
+
+
+@node Startup Variables
+@section Startup Variables
+
+@table @code
+
+@item gnus-load-hook
+@vindex gnus-load-hook
+Gnus $B$,FI$_9~$^$l$F$$$k$H$-$K<B9T$5$l$k%U%C%/$G$9!#2?EY(B gnus $B$r5/F0$7$F(B
+$B$b!"(BEmacs$B$,5/F0$7$F$+$i=*N;$9$k$^$G$KIaDL$O$3$N%U%C%/$O0l2s$7$+<B9T$5$l(B
+$B$J$$$3$H$KCm0U$7$F$/$@$5$$!#(B
+
+@item gnus-before-startup-hook
+@vindex gnus-before-startup-hook
+Gnus $B$N5/F0$K@.8y$7$?8e$K<B9T$5$l$k%U%C%/$G$9!#(B
+
+@item gnus-startup-hook
+@vindex gnus-startup-hook
+Gnus $B$,5/F0$5$l$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
+
+@item gnus-started-hook
+@vindex gnus-started-hook
+Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
+
+@item gnus-started-hook
+@vindex gnus-started-hook
+$B%U%!%$%k(B @file{.newsrc} $B$rFI$_9~$s$@8e$G!"%0%k!<%W%P%C%U%!$r:n@.$9$kA0$K(B
+$B<B9T$5$l$k%U%C%/$G$9!#(B
+
+@item gnus-check-bogus-newsgroups
+@vindex gnus-check-bogus-newsgroups
+$B$b$7(B @code{nil} $B$G$J$$$H!"(Bgnus $B$O5/F0;~$KD4$Y$F$9$Y$F$N56%0%k!<%W$r:o=|(B
+$B$7$^$9!#(B@dfn{$B56%0%k!<%W(B (bogus group)} $B$O$"$J$?$N(B @file{.newsrc} $B%U%!%$(B
+$B%k$K$OB8:_$9$k$1$l$I!"%K%e!<%:%5!<%P!<$K$O<B:]$K$OB8:_$7$J$$!"$H$$$&%0%k!<(B
+$B%W$N$3$H$G$9!#56%0%k!<%W$rD4$Y$k$N$K$O$+$J$j;~4V$,$+$+$j$^$9$N$G!";~4V$H(B
+$B;q8;$r@aLs$9$k$?$a$K!"$3$N5!G=$O;H$o$J$$$[$&$,$$$$$G$7$g$&!#$=$7$F!"Be$o(B
+$B$j$K%0%k!<%W%P%C%U%!$G;~!956%0%k!<%W$rD4$Y$k$N$,NI$$$G$7$g$&(B
+(@pxref{Group Maintenance} $B$r;2>H$7$F$/$@$5$$(B)$B!#(B
+
+@item gnus-inhibit-startup-message
+@vindex gnus-inhibit-startup-message
+$B$b$7(B @code{nil} $B$G$J$$$H!"5/F0;~$N%a%C%;!<%8$OI=<($5$l$^$;$s!#$=$N$h$&$K(B
+$B$9$l$P!";E;v$NBe$o$j$K%K%e!<%:$rFI$s$G$$$k$N$r>e;J$K5$IU$+$l$K$/$/$J$k$G(B
+$B$7$g$&!#$3$NJQ?t$O(B @file{.gnus.el} $B$,%m!<%I$5$l$kA0$K;H$o$l$^$9$N$G!"(B
+@code{.emacs} $B$K@_Dj$9$k$Y$-$G$"$kE@$rCm0U$7$F$/$@$5$$!#(B
+
+@item gnus-no-groups-message
+@vindex gnus-no-groups-message
+$B%0%k!<%W$,0l$D$bB8:_$7$J$$$H$-$K(B gnus $B$,I=<($9$k%a%C%;!<%8$G$9!#(B
+
+@item gnus-play-startup-jingle
+@vindex gnus-play-startup-jingle
+$B$b$7(B @code{nil} $B$G$J$$$H!"5/F0;~$K(B gnus $B$NC;$$6J$r1iAU$7$^$9!#(B
+
+@item gnus-startup-jingle
+@vindex gnus-startup-jingle
+$B>e$NJQ?t$,(B @code{nil} $B$G$J$$$H$-$K1iAU$5$l$kC;$$6J$G$9!#%G%#%U%)%k%H$O(B
+@samp{Tuxdemoon.Jingle4.au} $B$G$9!#(B
+
+@end table
+
+
