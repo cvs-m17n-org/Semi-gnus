@@ -1,3 +1,13 @@
+2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* lisp/message.el (message-fix-before-sending): Don't check for
+	invisible X-Face fields if
+	`message-check-ignore-invisible-x-face-field' is non-nil.
+	(message-send): Call `message-fix-before-sending' before encoding.
+	(message-check-ignore-invisible-x-face-field): New user option.
+
 2000-06-01  KANEMATSU Daiji <kanematu@sra.co.jp>
 
 	* texi/gnus-ja.texi (gnus-summary-hide-all-threads): Fix typo.
@@ -30,7 +40,7 @@
 
 2000-05-25  Tanaka Akira      <akr@m17n.org>
 
-        * README.semi, README.semi.ja: Update for CVS via SSH.
+	* README.semi, README.semi.ja: Update for CVS via SSH.
 
 2000-05-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
