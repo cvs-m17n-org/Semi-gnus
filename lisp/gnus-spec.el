@@ -333,7 +333,8 @@
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let ((max-width 0)
+  (let ((xemacs-mule-p (and gnus-xemacs (featurep 'mule)))
+	max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
 	tilde-form tilde elem-type)
@@ -341,7 +342,7 @@
       (gnus-set-work-buffer)
       (insert format)
       (goto-char (point-min))
-      (while (re-search-forward "%" nil t)
+      (while (search-forward "%" nil t)
 	(setq user-defined nil
 	      spec-beg nil
 	      pad-width nil
@@ -420,10 +421,11 @@
 	    (setq elem '("*" ?s))))
 	  (setq elem-type (cadr elem))
 	  ;; Insert the new format elements.
-	  (when pad-width
-	    (insert (number-to-string pad-width)))
+	  (and pad-width (not xemacs-mule-p)
+	       (insert (number-to-string pad-width)))
 	  ;; Create the form to be evaled.
-	  (if (or max-width cut-width ignore-value)
+	  (if (or max-width cut-width ignore-value
+		  (and pad-width xemacs-mule-p))
 	      (progn
 		(insert ?s)
 		(let ((el (car elem)))
@@ -437,6 +439,8 @@
 		    (setq el (gnus-tilde-cut-form el cut-width)))
 		  (when max-width
 		    (setq el (gnus-tilde-max-form el max-width)))
+		  (and pad-width xemacs-mule-p
+		       (setq el (gnus-tilde-pad-form el pad-width)))
 		  (push el flist)))
 	    (insert elem-type)
 	    (push (car elem) flist))))
