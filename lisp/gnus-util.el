@@ -37,6 +37,7 @@
 (require 'nnheader)
 (require 'message)
 (require 'time-date)
+(require 'gnus-ems)
 
 (eval-and-compile
   (autoload 'rmail-insert-rmail-file-header "rmail")
