@@ -234,9 +234,11 @@
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
 
-    (and window-system
-	 (module-installed-p 'bitmap)
-	 (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message))
+    (when window-system
+      (require 'path-util)
+      (if (module-installed-p 'bitmap)
+	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
+	))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
