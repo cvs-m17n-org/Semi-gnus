@@ -10,6 +10,12 @@ XEMACS = @XEMACS@
 PACKAGEDIR = @PACKAGEDIR@
 GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
 
+# It may be needed for Meadow/NTEmacs when sh.exe is used for SHELL.
+# Because Meadow/NTEmacs will get the value of the current-directory from
+# the environment variable PWD, but sh.exe will not take care of it even
+# if the current-directory has changed.  So we should invalidate it.
+PWD=
+
 # It will be used to look for the XEmacs package path if this file is
 # mis-configured (e.g. configured for FSFmacs).
 EXAMINE_PACKAGEDIR = $(XEMACS) -batch -q -no-site-file -eval \
@@ -48,11 +54,11 @@ install-info-ja:
 	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install-ja
 
 ## Rule for XEmacs package.
-install-package: xlick compose-package remove-extra-files-in-package \
+install-package: xclever compose-package remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-manifest
 
-install-package-ja: xlick compose-package remove-extra-files-in-package \
+install-package-ja: xclever compose-package remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-info-ja \
 	install-package-manifest
@@ -70,10 +76,10 @@ install-package-lisp:
 	fi; \
 	echo "cd lisp && $(MAKE) EMACS=$(XEMACS)" \
 		"lispdir=$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
-		"install-lisp"; \
+		"install"; \
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
 		lispdir="$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
-		install-lisp
+		install
 
 install-package-info:
 	@if test x$(PACKAGEDIR) = x; then \
@@ -122,6 +128,9 @@ remove-extra-files-in-package:
 compose-package:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" compose-package
 ##
+
+xclever:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" clever
 
 xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all

@@ -28,12 +28,28 @@ warn:
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
 clever some:
+	@if test -f $(srcdir)/gnus.elc; then \
+	  echo \
+	    "checking for whether the all elc files should be recompiled..."; \
+	  RM_ELC=nil; \
+	  if test `$(EMACS) -batch -q -no-site-file \
+		-eval "(princ (format \"%s\" (featurep (quote xemacs))))" \
+		2>/dev/null` = t; then \
+	    test ! -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	  else \
+	    test -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	  fi; \
+	  if test $$RM_ELC = t; then \
+	    echo " => yes; rm -f *.elc auto-autoloads.el custom-load.el"; \
+	    rm -f *.elc auto-autoloads.el custom-load.el; \
+	  else \
+	    echo " => unnecessary"; \
+	  fi; \
+	fi
 	W3DIR=$(W3DIR) lispdir=$(lispdir) \
 		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
-install: clever install-lisp
-
-install-lisp:
+install: clever
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	@for p in `$(EXPORTING_FILES)`; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \

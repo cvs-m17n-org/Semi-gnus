@@ -1,3 +1,26 @@
+2001-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+2001-01-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-make-autoloads): Do nothing if the
+	files for autoloads already exist.
+	(dgnushack-unexporting-files): More useful message.
+
+	* lisp/Makefile.in (install): Call `clever' before installing.
+	(install-lisp): Remove.
+	(clever): Check for whether the all elc files should be recompiled.
+
+	* Makefile.in (xclever): New target.
+	(install-package-lisp): Replace `install-lisp' with `instal'.
+	(install-package-ja): Replace `xlick' with `xclever'.
+	(install-package): Ditto.
+
+2001-01-17  KOSEKI Yoshinori  <kose@wizard.tamra.co.jp>
+
+	* Makefile.in: Unset `PWD' for Meadow/NTEmacs.
+
 2001-01-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnheader.el: Require `pces', `poem' and `std11' to reduce
