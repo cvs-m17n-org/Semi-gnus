@@ -10965,6 +10965,9 @@ default force yes
 (add-hook 'nntp-prepare-post-hook 'canlock-insert-header)
 @end lisp
 
+すべてのサーバーが推奨 ID をサポートしているわけではないことに注意して下
+さい。これは例えば INN 2.3.0 以上で動作します。
+
 @item nntp-list-options
 @vindex nntp-list-options
 LIST コマンドのオプションに使って、(サーバーの) リスト出力を設定したニュー
