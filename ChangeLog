@@ -1,10 +1,25 @@
+1999-02-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-start.el (save-buffers-kill-emacs): Advice. Call
+	`gnus-save-newsrc-file' before `save-some-buffers' is called.
+
+	* README-offline.en: Update.
+
+	* README-offline.ja: Fix typo.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Set
+	`gnus-offline-hangup-program' and `gnus-offline-dialup-program' to
+	nil when null string is given.
+
 1999-02-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* texi/Makefile.in: Change to work on Windows environment and
 	other platforms.
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
-	
+
 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-make-package): Fix typo.

@@ -2301,6 +2301,12 @@ If FORCE is non-nil, the .newsrc file is read."
 	(gnus-dribble-delete-file)
 	(gnus-group-set-mode-line)))))
 
+;; Call the function above at C-x C-c.
+(defadvice save-buffers-kill-emacs (before save-gnus-newsrc-file-maybe activate)
+  "Save .newsrc and .newsrc.eld when Emacs is killed."
+  (if (get-buffer gnus-group-buffer)
+      (gnus-save-newsrc-file)))
+
 (defun gnus-gnus-to-quick-newsrc-format ()
   "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
   (let ((print-quoted t)
