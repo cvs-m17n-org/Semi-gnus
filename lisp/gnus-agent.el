@@ -667,7 +667,7 @@ the actual number of articles toggled is returned."
 	(when (= (point-max) (point-min))
 	  (push (cons group (current-buffer)) gnus-agent-buffer-alist)
 	  (ignore-errors
-	    (insert-file-contents
+	    (nnheader-insert-file-contents
 	     (gnus-agent-article-name ".overview" group))))
 	(nnheader-find-nov-line (string-to-number (cdar crosses)))
 	(insert (string-to-number (cdar crosses)))
@@ -747,7 +747,7 @@ the actual number of articles toggled is returned."
     (goto-char (point-min))
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (insert-file-contents file)
+    (nnheader-insert-file-contents file)
     (goto-char (point-min))
     (if (or (= (point-min) (point-max))
 	    (progn
@@ -1253,7 +1253,7 @@ The following commands are available:
 	   (set-buffer overview)
 	   (erase-buffer)
 	   (when (file-exists-p nov-file)
-	     (insert-file-contents nov-file))
+	     (nnheader-insert-file-contents nov-file))
 	   (goto-char (point-min))
 	   (while (setq elem (pop articles))
 	     (setq article (car elem))
