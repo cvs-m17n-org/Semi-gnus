@@ -1,3 +1,9 @@
+2003-04-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Autoload font-lock for XEmacs -no-autoloads.
+
+	* lisp/pop3.el: Require `advice' for compiling it in Gnus.
+
 2003-04-28  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Fixed X-Draft-Headers entry.

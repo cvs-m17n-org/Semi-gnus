@@ -45,7 +45,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; For compiling this module in Gnus with XEmacs -no-autoloads.
+  (require 'advice))
 
 ;; as-binary-process, open-network-stream-as-binary, write-region-as-binary
 (require 'pces)
