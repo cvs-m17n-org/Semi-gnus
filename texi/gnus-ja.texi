@@ -618,7 +618,7 @@ Reply, Followup and Post
 * Summary Mail Commands::       $B%a!<%k$rAw$k(B
 * Summary Post Commands::       $B%K%e!<%9$rAw$k(B
 * Summary Message Commands::    $BB>$N%a%C%;!<%84XO"$NL?Na(B
-* Canceling and Superseding::   
+* Canceling and Superseding::
 
 Marking Articles
 
@@ -682,7 +682,7 @@ Various Summary Stuff
 
 * Summary Group Information::   $B>pJs;X8~$NL?Na(B
 * Searching for Articles::      $BJ#?t5-;vL?Na(B
-* Summary Generation Commands::  
+* Summary Generation Commands::
 * Really Various Summary Commands::  $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 
 Article Buffer
@@ -770,7 +770,7 @@ Choosing a Mail Back End
 
 Browsing the Web
 
-* Archiving Mail::              
+* Archiving Mail::
 * Web Searches::                $BJ8;zNs$K%^%C%A$9$k5-;v$+$i%0%k!<%W$r:n$k(B
 * Slashdot::                    Slashdot $B$N%3%a%s%H$rFI$`(B
 * Ultimate::                    Ultimate Bulletin Board $B%7%9%F%`(B
@@ -918,8 +918,8 @@ Thwarting Email Spam
 * Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
 * SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
 * Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
-* Filtering Spam Using The Spam ELisp Package::  
-* Filtering Spam Using Statistics with spam-stat::  
+* Filtering Spam Using The Spam ELisp Package::
+* Filtering Spam Using Statistics with spam-stat::
 
 Appendices
 
@@ -5092,7 +5092,7 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 * Summary Mail Commands::       $B%a!<%k$rAw$k(B
 * Summary Post Commands::       $B%K%e!<%9$rAw$k(B
 * Summary Message Commands::    $BB>$N%a%C%;!<%84XO"$NL?Na(B
-* Canceling and Superseding::   
+* Canceling and Superseding::
 @end menu
 
 @node Summary Mail Commands
@@ -8681,11 +8681,14 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @code{X-Face} $B%X%C%@!<$O>.$5$JGr9u2hA|$G!"%a%C%;!<%8%X%C%@!<$+$i6!5k$5$l(B
 $B$^$9(B (@pxref{X-Face})$B!#(B
 
-$B0lJ}(B Picon $B$O$"$J$?<+?H$N%7%9%F%`$K0MB8$7!"(Bgnus $B$O%X%C%@!<$K%^%C%A$9$k$"(B
-$B$J$?$N;}$AJ*$rC5$7$F$_$^$9(B (@pxref{Picons})$B!#(B
+@code{Face} $B%X%C%@!<$O>.$5$J%+%i!<2hA|$G!"%a%C%;!<%8%X%C%@!<$+$i6!5k$5$l(B
+$B$^$9(B (@pxref{Face})$B!#(B
 
 $B%9%^%$%j!<$O!"?M!9$,%a%C%;!<%8$K;6$i$+$7$?$,$k>.$5$J(B @samp{:-)} $B%7%s%\%k(B
 $B$G$9!#(B
+
+$B0lJ}(B Picon $B$O$"$J$?<+?H$N%7%9%F%`$K0MB8$7!"(Bgnus $B$O%X%C%@!<$K%^%C%A$9$k$"(B
+$B$J$?$N;}$AJ*$rC5$7$F$_$^$9(B (@pxref{Picons})$B!#(B
 
 $B$3$l$i$9$Y$F$N5!G=$O%H%0%k$G$9!#$b$7$9$G$K$=$l$i$,B8:_$7$F$$$?$J$i$P!"$=(B
 $B$l$i$O:o=|$5$l$^$9!#(B
@@ -9389,7 +9392,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @menu
 * Summary Group Information::   $B>pJs;X8~$NL?Na(B
 * Searching for Articles::      $BJ#?t5-;vL?Na(B
-* Summary Generation Commands::  
+* Summary Generation Commands::
 * Really Various Summary Commands::  $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 @end menu
 
@@ -10295,6 +10298,10 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-display-xface (head)
 
 @xref{X-Face}.
+
+@item gnus-treat-display-face (head)
+
+@xref{Face}.
 
 @item gnus-treat-emphasize (t, head, integer)
 @item gnus-treat-fill-article (t, integer)
@@ -14532,7 +14539,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 $B$^$9!#(B
 
 @menu
-* Archiving Mail::              
+* Archiving Mail::
 * Web Searches::                $BJ8;zNs$K%^%C%A$9$k5-;v$+$i%0%k!<%W$r:n$k(B
 * Slashdot::                    Slashdot $B$N%3%a%s%H$rFI$`(B
 * Ultimate::                    Ultimate Bulletin Board $B%7%9%F%`(B
@@ -15081,7 +15088,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B$,(B 2.0.14 $BL$K~$N(B Cyrus IMAPD $B$K4^$^$l$F$$$k(B @samp{imtest} ($B%P!<%8%g(B
 $B%s(B 1.5.x $B$H(B 1.6.x) $B$r;H$C$F$$$k$J$i!"(B
 @code{imap-process-connection-type} $B$r$$$8$j2s$7$F!"(B
-@code{imap.el} $B$,(B @samp{imtest} $B$HDL?.$9$k$H$-$K%Q%$%W$G$O$J$/(B
+@file{imap.el} $B$,(B @samp{imtest} $B$HDL?.$9$k$H$-$K%Q%$%W$G$O$J$/(B
 $B$F(B pty $B$r;H$&$h$&$K$5$;$kI,MW$,$"$j$^$9!#$=$&$9$k$H$"$J$?(B
 $B$O(B @acronym{IMAP} $B%3%^%s%I$N9T$ND9$5$N@)8B$KG:$^$5$l$k$G$7$g$&!#$=$l$O%a!<(B
 $B%k%\%C%/%9$K$?$/$5$s$N5-;v$,$"$k$H$-$K(B Gnus $B$rL54|8B$K%O%s%0$5$;$F$7$^$&(B
@@ -15138,7 +15145,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B%`(B @code{imtest} $B$,I,MW$G$9!#(B
 @item
 @dfn{digest-md5:} DIGEST-MD5 $B$G0E9f2=$5$l$?(B $BMxMQ<TL>(B/$B%Q%9%o!<%I(B $B$G$9!#30(B
-$BIt%i%$%V%i%j(B @code{digest-md5.el} $B$,I,MW$G$9!#(B
+$BIt%i%$%V%i%j(B @file{digest-md5.el} $B$,I,MW$G$9!#(B
 @item
 @dfn{cram-md5:} CRAM-MD5 $B$G0E9f2=$5$l$?(B $BMxMQ<TL>(B/$B%Q%9%o!<%I(B $B$G$9!#(B
 @item
@@ -20730,11 +20737,183 @@ XEmacs $B$=$l$K(B Emacs 21@footnote{MS $B%&%#%s%I%&%:$N(B Emacs 21 $B$O$^$@
 gnus $B$O$3$l$rMxMQ$9$k$3$H$K$7$^$9!#(B
 
 @menu
-* Picons::                      $B$"$J$?$,FI$s$G$$$k$b$N$N3($rI=<($9$kJ}K!(B
+* X-Face::                      $B%U%!%s%-!<$G$A$C$A$c$JGr9u$N3($rI=<($9$k(B
+* Face::                        $B$h$j%U%!%s%-!<$G$A$C$A$c$J%+%i!<$N3($rI=<($9$k(B
 * Smileys::                     $BI=<($5$l$k$Y$/@8$^$l$?9,$;$=$&$J4i$rI=<($9$kJ}K!(B
-* X-Face::                      $B%U%!%s%-!<$J$A$C$A$c$JGr9u$N3($rI=<($9$k(B
+* Picons::                      $B$"$J$?$,FI$s$G$$$k$b$N$N3($rI=<($9$kJ}K!(B
 * XVarious::                    $B$=$NB>$N(B XEmacs $B$G(B Gnus $B$JJQ?t(B
 @end menu
+
+@node X-Face
+@subsection X-Face
+@cindex x-face
+
+@code{X-Face} $B%X%C%@!<$O!"%a%C%;!<%8$NCx<T$rI=$o$9$3$H$K$J$C$F$$$k(B 48$B!_(B
+48 $B2hAG$NGr9u(B (1 bit $B$N?<$5(B) $B$N3($rIA$-$^$9!#$3$l$O?J2=$7B3$1$k$"$^$?$N(B
+$B%a!<%k$H%K%e!<%9%j!<%@!<$K$h$C$F%5%]!<%H$5$l$k$G$7$g$&!#(B
+
+@cindex x-face
+@findex gnus-article-display-x-face
+@vindex gnus-article-x-face-command
+@vindex gnus-article-x-face-too-ugly
+@iftex
+@iflatex
+\include{xface}
+@end iflatex
+@end iftex
+@c @anchor{X-Face}
+
+@code{X-Face} $B%X%C%@!<$NI|9f$K$O!"(BEmacs $B$,(B @samp{compface} $B$r%5%]!<(B
+$B%H(B (XEmacs $B$N$[$H$s$I$,%5%]!<%H(B) $B$7$F$$$k$+!"$"$J$?$N%7%9%F%`(B
+$B$K(B @samp{compface} $B$,%$%s%9%H!<%k$5$l$F$$$kI,MW$,$"$j$^$9!#$b$7$I$A$i$+(B
+$B$,??$J$i$P!"(Bgnus $B$O%G%#%U%)%k%H$G(B @code{X-Face} $B%X%C%@!<$rI=<($7$^$9!#(B
+
+$B$3$l$r@)8f$9$k$N$OJQ?t(B @code{gnus-article-x-face-command} $B$G$9!#$3$NJQ?t(B
+$B$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B9T$5$l$^$9!#4X?t$J$i$P!"$3$N4X(B
+$B?t$,4i$r0z?t$H$7$F8F$P$l$^$9!#$b(B
+$B$7(B @code{gnus-article-x-face-too-ugly} ($B$3$l$O@55,I=8=$G(B
+$B$9(B) $B$,(B @code{From} $BMs$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(B
+
+Emacs 20 $B$G$N%G%#%U%)%k%H$NF0:n$O(B @code{display} $B%W%m%0%i(B
+$B%`(B @footnote{@code{display} $B$O(B ImageMagick $B%Q%C%1!<%8$K4^$^$l$F$$$^$9!#(B
+@code{uncompface} $B$H(B @code{icontopbm} $B$NN>%W%m%0%i%`$K$D$$$F$O!"(B
+`compface' $B$d(B GNU/Linux $B%7%9%F%`$K$*$1$k(B `faces-xface' $B$N$h$&$J%Q%C%1!<(B
+$B%8$rC5$7$F2<$5$$!#(B} $B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(B
+
+XEmacs $B$+@E;_2h$r%5%]!<%H$7$F$$$k(B Emacs 21+ $B$G$N%G%#%U%)%k%H$NF0:n(B
+$B$O(B @code{From} $BMs$NA0$K4i$rI=<($9$k$3$H$G$9!#(B(XEmacs $B$,(B X-Face $B5!G=IU$-(B
+$B$G%3%s%Q%$%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l$OI=<($r>/$7Aa$/$7$^$9!#$b$7(B
+$B:,K\E*(B X-Face $B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $B$O(B @code{pbmplus} $B$d$=$NCg4V$N(B
+$B30It%W%m%0%i%`$r;H$C$F(B @code{X-Face} $BMs$rJQ49$7$h$&$H;n$_$^$9(B @footnote{
+GNU/Linux $B%7%9%F%`$G$O(B @code{netpbm}$B!"(B@code{libgr-progs} $B$^$?(B
+$B$O(B @code{compface} $B$N$h$&$JL>A0$N%Q%C%1!<%8$rC5$7$F2<$5$$!#(B}$B!#(B)
+
+($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
+
+gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX(B
+$BMx$J4X?t$HJQ?t$r>/$7$P$+$jDs6!$7$^$9!#(B
+
+@findex gnus-random-x-face
+@vindex gnus-convert-pbm-to-x-face-command
+@vindex gnus-x-face-directory
+@code{gnus-random-x-face} $B$O(B @code{gnus-x-face-directory} $B$K$"$k$9$Y$F(B
+$B$N(B @samp{pbm} $B$r$/$^$J$/C5$7$F%i%s%@%`$K0l$D$rA*$S<h$j!"%7%'%k%3%^%s(B
+$B%I(B @code{gnus-convert-pbm-to-x-face-command} $B$r;H$C$F$=$l$r(B X-Face $B$N7A(B
+$B<0$KJQ49$7$^$9!#(B@samp{pbm} $B%U%!%$%k$O(B 48$B!_(B48 $B2hAG$NBg$-$5$G$J$1$l$P$J$j(B
+$B$^$;$s!#$=$l$O(B X-Face $B%X%C%@!<$N%G!<%?$rJ8;zNs$GJV$7$^$9!#(B
+
+@findex gnus-insert-random-x-face-header
+@code{gnus-insert-random-x-face-header} $B$O(B @code{gnus-random-x-face} $B$r(B
+$B8F$s$G!"%i%s%@%`$K@8@.$5$l$?%G!<%?$K$h$k(B X-Face $B%X%C%@!<$rA^F~$7$^$9!#(B
+
+@findex gnus-x-face-from-file
+@vindex gnus-convert-image-to-x-face-command
+@code{gnus-x-face-from-file} $B$O%Q%i%a!<%?$H$7$F(B GIF $B%U%!%$%k$r<u$1<h$j!"(B
+$B%7%'%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N(B
+$B%U%!%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
+
+$B0lHVL\$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
+$B$r(B @file{~/.gnus.el} $B%U%!%$%k$K=q$$$F2<$5$$(B:
+
+@lisp
+(setq message-required-news-headers
+      (nconc message-required-news-headers
+             (list '(X-Face . gnus-random-x-face))))
+@end lisp
+
+$B:G8e$N4X?t$r;H$&$N$O!"$3$N$h$&$K$J$k$G$7$g$&(B:
+
+@lisp
+(setq message-required-news-headers
+      (nconc message-required-news-headers
+             (list '(X-Face . (lambda ()
+                                (gnus-x-face-from-file
+                                 "~/My-face.gif"))))))
+@end lisp
+
+@c TRANSLATEME
+@node Face
+@subsection Face
+@cindex face
+
+@c #### FIXME: faces and x-faces'implementations should really be harmonized.
+
+@code{Face} headers are essentially a funkier version of @code{X-Face}
+ones. They describe a 48x48 pixel colored image that's supposed to
+represent the author of the message.
+
+@cindex face
+@findex gnus-article-display-face
+The contents of a @code{Face} header must be a base64 encoded PNG image.
+See @url{http://quimby.gnus.org/circus/face/} for the precise
+specifications.
+
+Gnus provides a few convenience functions and variables to allow
+easier insertion of Face headers in outgoing messages.
+
+@findex gnus-convert-png-to-face
+@code{gnus-convert-png-to-face} takes a 48x48 PNG image, no longer than
+726 bytes long, and converts it to a face.
+
+@findex gnus-face-from-file
+@vindex gnus-convert-image-to-face-command
+@code{gnus-face-from-file} takes a JPEG file as the parameter, and then
+converts the file to Face format by using the
+@code{gnus-convert-image-to-face-command} shell command.
+
+Here's how you would typically use this function. Put something like the
+following in your @file{~/.gnus.el} file:
+
+@lisp
+(setq message-required-news-headers
+      (nconc message-required-news-headers
+             (list '(Face . (lambda ()
+                              (gnus-face-from-file "~/face.jpg"))))))
+@end lisp
+
+@node Smileys
+@subsection $B%9%^%$%j!<(B
+@cindex smileys
+
+@iftex
+@iflatex
+\gnusfig{-3cm}{0.5cm}{\epsfig{figure=ps/BigFace,height=20cm}}
+\input{smiley}
+@end iflatex
+@end iftex
+
+$B%9%^%$%j!<(B @dfn{smiley} $B$O(B gnus $B$H$OJL$N%Q%C%1!<%8$G$9$,!"%9%^%$%j!<$r;H$C(B
+$B$F$$$k%Q%C%1!<%8$O8=:_(B gnus $B$@$1$G$9$N$G!"$3$3$G@bL@$7$^$9!#(B
+
+$B0l8@$G8@$($P(B --- gnus $B$G%9%^%$%j!<$r;H$&$K$O!"0J2<(B
+$B$r(B @file{~/.gnus.el} $B%U%!%$%k$K=q$$$F$/$@$5$$!#(B
+
+@lisp
+(setq gnus-treat-display-smileys t)
+@end lisp
+
+$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{8-)}, @samp{:-(} $B$J$I(B
+$B$H$$$C$?$b$N(B --- $B$r3($KBP1~$5$;!"J8;z$N4i%^!<%/$NBe$o$j$K$=$N3($rI=<($7(B
+$B$^$9!#$3$NJQ49$OJ8;z$K%^%C%A$9$k@55,I=8=$H$=$l$N%U%!%$%kL>$X$NBP1~$N%j%9(B
+$B%H$G@)8f$5$l$^$9!#(B
+
+@vindex smiley-regexp-alist
+$B;H$o$l$kO"A[%j%9%H$O!"JQ?t(B @code{smiley-regexp-alist} $B$G@_Dj$7$^$9!#3FMW(B
+$BAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$($?$$(B
+$B%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$%k$N(B
+$BL>A0$G$9!#(B
+
+$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j$r%+%9%?%^%$%:$7$^$9(B:
+
+@table @code
+@item smiley-data-directory
+@vindex smiley-data-directory
+$B%9%^%$%j!<$,4i%U%!%$%k$rC5$9>l=j!#(B
+
+@item gnus-smiley-file-types
+@vindex gnus-smiley-file-types
+$B%9%^%$%j!<$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N%j%9%H$G$9!#(B
+@end table
 
 @node Picons
 @subsection Picons
@@ -20814,138 +20993,6 @@ Picon $B$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N=gHV%j%9%H$G$9!#%G%#%U%)%k%H$O!"(B
 @code{("xpm" "gif" "xbm")} $B$+$i(B Emacs $B$KAH$_9~$^$l$F$$$J$$$b$N$r=|30$7$?(B
 $B$b$N$G$9!#(B
 @end table
-
-@node Smileys
-@subsection $B%9%^%$%j!<(B
-@cindex smileys
-
-@iftex
-@iflatex
-\gnusfig{-3cm}{0.5cm}{\epsfig{figure=ps/BigFace,height=20cm}}
-\input{smiley}
-@end iflatex
-@end iftex
-
-$B%9%^%$%j!<(B @dfn{smiley} $B$O(B gnus $B$H$OJL$N%Q%C%1!<%8$G$9$,!"%9%^%$%j!<$r;H$C(B
-$B$F$$$k%Q%C%1!<%8$O8=:_(B gnus $B$@$1$G$9$N$G!"$3$3$G@bL@$7$^$9!#(B
-
-$B0l8@$G8@$($P(B --- gnus $B$G%9%^%$%j!<$r;H$&$K$O!"0J2<(B
-$B$r(B @file{~/.gnus.el} $B%U%!%$%k$K=q$$$F$/$@$5$$!#(B
-
-@lisp
-(setq gnus-treat-display-smileys t)
-@end lisp
-
-$B%9%^%$%j!<$O!"J8;z$N4i%^!<%/(B --- @samp{:-)}, @samp{8-)}, @samp{:-(} $B$J$I(B
-$B$H$$$C$?$b$N(B --- $B$r3($KBP1~$5$;!"J8;z$N4i%^!<%/$NBe$o$j$K$=$N3($rI=<($7(B
-$B$^$9!#$3$NJQ49$OJ8;z$K%^%C%A$9$k@55,I=8=$H$=$l$N%U%!%$%kL>$X$NBP1~$N%j%9(B
-$B%H$G@)8f$5$l$^$9!#(B
-
-@vindex smiley-regexp-alist
-$B;H$o$l$kO"A[%j%9%H$O!"JQ?t(B @code{smiley-regexp-alist} $B$G@_Dj$7$^$9!#3FMW(B
-$BAG$N:G=i$N9`L\$O%^%C%A$5$;$?$$@55,I=8=$G!"FsHVL\$NMWAG$O3($GCV$-49$($?$$(B
-$B%0%k!<%W$K%^%C%A$9$k@55,I=8=!"$=$7$F;0HVL\$NMWAG$OI=<($5$;$?$$%U%!%$%k$N(B
-$BL>A0$G$9!#(B
-
-$B0J2<$NJQ?t$O!"%9%^%$%j!<$,$3$l$i$N%U%!%$%k$rC5$9>l=j$r%+%9%?%^%$%:$7$^$9(B:
-
-@table @code
-@item smiley-data-directory
-@vindex smiley-data-directory
-$B%9%^%$%j!<$,4i%U%!%$%k$rC5$9>l=j!#(B
-
-@item gnus-smiley-file-types
-@vindex gnus-smiley-file-types
-$B%9%^%$%j!<$N%U%!%$%kL>$H$7$F;n$7$F$_$k3HD%;R$N%j%9%H$G$9!#(B
-@end table
-
-@node X-Face
-@subsection X-Face
-@cindex x-face
-
-@code{X-Face} $B%X%C%@!<$O!"%a%C%;!<%8$NCx<T$rI=$o$9$3$H$K$J$C$F$$$k(B 48$B!_(B
-48 $B2hAG$NGr9u(B (1 bit $B$N?<$5(B) $B$N3($rIA$-$^$9!#$3$l$O?J2=$7B3$1$k$"$^$?$N(B
-$B%a!<%k$H%K%e!<%9%j!<%@!<$K$h$C$F%5%]!<%H$5$l$k$G$7$g$&!#(B
-
-@cindex x-face
-@findex gnus-article-display-x-face
-@findex gnus-article-x-face-command
-@vindex gnus-article-x-face-command
-@vindex gnus-article-x-face-too-ugly
-@iftex
-@iflatex
-\include{xface}
-@end iflatex
-@end iftex
-@c @anchor{X-Face}
-
-@code{X-Face} $B%X%C%@!<$NI|9f$K$O!"(BEmacs $B$,(B @samp{compface} $B$r%5%]!<(B
-$B%H(B (XEmacs $B$N$[$H$s$I$,%5%]!<%H(B) $B$7$F$$$k$+!"$"$J$?$N%7%9%F%`(B
-$B$K(B @samp{compface} $B$,%$%s%9%H!<%k$5$l$F$$$kI,MW$,$"$j$^$9!#$b$7$I$A$i$+(B
-$B$,??$J$i$P!"(Bgnus $B$O%G%#%U%)%k%H$G(B @code{X-Face} $B%X%C%@!<$rI=<($7$^$9!#(B
-
-$B$3$l$r@)8f$9$k$N$OJQ?t(B @code{gnus-article-x-face-command} $B$G$9!#$3$NJQ?t(B
-$B$,J8;zNs$J$i$P!"$3$NJ8;zNs$,%5%V%7%'%k$G<B9T$5$l$^$9!#4X?t$J$i$P!"$3$N4X(B
-$B?t$,4i$r0z?t$H$7$F8F$P$l$^$9!#$b(B
-$B$7(B @code{gnus-article-x-face-too-ugly} ($B$3$l$O@55,I=8=$G(B
-$B$9(B) $B$,(B @code{From} $BMs$K9gCW$9$l$P!"4i$OI=<($5$l$^$;$s!#(B
-
-Emacs 20 $B$G$N%G%#%U%)%k%H$NF0:n$O(B @code{display} $B%W%m%0%i(B
-$B%`(B @footnote{@code{display} $B$O(B ImageMagick $B%Q%C%1!<%8$K4^$^$l$F$$$^$9!#(B
-@code{uncompface} $B$H(B @code{icontopbm} $B$NN>%W%m%0%i%`$K$D$$$F$O!"(B
-`compface' $B$d(B GNU/Linux $B%7%9%F%`$K$*$1$k(B `faces-xface' $B$N$h$&$J%Q%C%1!<(B
-$B%8$rC5$7$F2<$5$$!#(B} $B$r%U%)!<%/$7$F8+$h$&$H$7$^$9!#(B
-
-XEmacs $B$+@E;_2h$r%5%]!<%H$7$F$$$k(B Emacs 21+ $B$G$N%G%#%U%)%k%H$NF0:n(B
-$B$O(B @code{From} $BMs$NA0$K4i$rI=<($9$k$3$H$G$9!#(B(XEmacs $B$,(B X-Face $B5!G=IU$-(B
-$B$G%3%s%Q%$%k$5$l$F$$$k$HNI$$$G$7$g$&!=!=$=$l$OI=<($r>/$7Aa$/$7$^$9!#$b$7(B
-$B:,K\E*(B X-Face $B5!G=$,$J$$$N$G$"$l$P!"(Bgnus $B$O(B @code{pbmplus} $B$d$=$NCg4V$N(B
-$B30It%W%m%0%i%`$r;H$C$F(B @code{X-Face} $BMs$rJQ49$7$h$&$H;n$_$^$9(B @footnote{
-GNU/Linux $B%7%9%F%`$G$O(B @code{netpbm}$B!"(B@code{libgr-progs} $B$^$?(B
-$B$O(B @code{compface} $B$N$h$&$JL>A0$N%Q%C%1!<%8$rC5$7$F2<$5$$!#(B}$B!#(B)
-
-($BCm(B: $BJQ?t(B/$B4X?tL>$K$O(B @code{xface} $B$G$O$J$/(B @code{x-face} $B$,;H$o$l$^$9!#(B)
-
-gnus $B$O!"30$K=P$9%a%C%;!<%8$K(B X-Face $B%X%C%@!<$r4JC1$KA^F~$9$k$?$a$N!"JX(B
-$BMx$J4X?t$HJQ?t$r>/$7$P$+$jDs6!$7$^$9!#(B
-
-@findex gnus-random-x-face
-@vindex gnus-convert-pbm-to-x-face-command
-@vindex gnus-x-face-directory
-@code{gnus-random-x-face} $B$O(B @code{gnus-x-face-directory} $B$K$"$k$9$Y$F(B
-$B$N(B @samp{pbm} $B$r$/$^$J$/C5$7$F%i%s%@%`$K0l$D$rA*$S<h$j!"%7%'%k%3%^%s(B
-$B%I(B @code{gnus-convert-pbm-to-x-face-command} $B$r;H$C$F$=$l$r(B X-Face $B$N7A(B
-$B<0$KJQ49$7$^$9!#(B@samp{pbm} $B%U%!%$%k$O(B 48$B!_(B48 $B2hAG$NBg$-$5$G$J$1$l$P$J$j(B
-$B$^$;$s!#$=$l$O(B X-Face $B%X%C%@!<$N%G!<%?$rJ8;zNs$GJV$7$^$9!#(B
-
-@findex gnus-insert-random-x-face-header
-@code{gnus-insert-random-x-face-header} $B$O(B @code{gnus-random-x-face} $B$r(B
-$B8F$s$G!"%i%s%@%`$K@8@.$5$l$?%G!<%?$K$h$k(B X-Face $B%X%C%@!<$rA^F~$7$^$9!#(B
-
-@findex gnus-x-face-from-file
-@vindex gnus-convert-image-to-x-face-command
-@code{gnus-x-face-from-file} $B$O%Q%i%a!<%?$H$7$F(B GIF $B%U%!%$%k$r<u$1<h$j!"(B
-$B%7%'%k%3%^%s%I(B @code{gnus-convert-image-to-x-face-command} $B$r;H$C$F$=$N(B
-$B%U%!%$%k$r(B X-Face $B$N7A<0$KJQ49$7$^$9!#(B
-
-$B0lHVL\$O0lHLE*$K;H$&$G$"$m$&4X?t$G$9!#0J2<$N$h$&$J$b$N(B
-$B$r(B @file{~/.gnus.el} $B%U%!%$%k$K=q$$$F2<$5$$(B:
-
-@lisp
-(setq message-required-news-headers
-      (nconc message-required-news-headers
-             (list '(X-Face . gnus-random-x-face))))
-@end lisp
-
-$B:G8e$N4X?t$r;H$&$N$O!"$3$N$h$&$K$J$k$G$7$g$&(B:
-
-@lisp
-(setq message-required-news-headers
-      (nconc message-required-news-headers
-             (list '(X-Face . (lambda ()
-                                (gnus-x-face-from-file
-                                 "~/My-face.gif"))))))
-@end lisp
 
 @node XVarious
 @subsection $B$5$^$6$^$J(B XEmacs $BJQ?t(B
@@ -21051,8 +21098,8 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 * Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
 * SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
 * Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
-* Filtering Spam Using The Spam ELisp Package::  
-* Filtering Spam Using Statistics with spam-stat::  
+* Filtering Spam Using The Spam ELisp Package::
+* Filtering Spam Using Statistics with spam-stat::
 @end menu
 
 @node The problem of spam
@@ -21099,14 +21146,14 @@ Spam $B$N=|5n(B (filtering) $B$X$N:G$bC1=c$J<h$jAH$_$O_I2a$9$k$3(B
 $B$b$&0l$D$NEE;R%a!<%k_I2a$X$N<h$jAH$_$OJ,;67?(B spam $B=hM}$G!"(BDCC ($BLuCm(B:
 Distributed Checksum Clearinghouse --
 @uref{http://www.rhyolite.com/anti-spam/dcc/}) $B$,$=$N$h$&$J%7%9%F%`$rF3(B
-$BF~$7$F$$$^$9!#K\<AE*$K$O!"@$3&Cf$N(B @code{N} $B8D$N%7%9%F%`$,!"Cf9q!"%,!<%J(B
-$B$"$k$$$O%+%j%U%)%k%K%"$K$"$k%^%7%s(B @samp{X} $B$,(B spam $BEE;R%a!<%k$rAw=P$7$F(B
-$B$$$k$3$H$rG'$a$?$i!"$=$l$i(B @code{N} $B8D$N%7%9%F%`$O(B @samp{X} $B$^$?(B
-$B$O(B @samp{X} $B$+$i$d$C$FMh$?(B spam $B%a!<%k$r%G!<%?%Y!<%9$K5-F~$7$^$9!#(B
-Spam $B8!=P$N4p=`$OJQ$o$j$^$9!#$=$l$OAw$i$l$?%a%C%;!<%8$N?t$d%a%C%;!<%8$N(B
-$BFbMF$J$I$G$"$k$+$b$7$l$^$;$s!#%a%C%;!<%8$,(B spam $B$+$I$&$+$rJ,;6=hM}%7%9%F(B
-$B%`$N%f!<%6$,CN$j$?$$>l9g!"H`$O$=$l$i$N(B @code{N} $B8D$N%7%9%F%`$N$&$A$N0l$D(B
-$B$rD4$Y$^$9!#(B
+$BF~$7$F$$$^$9!#K\<AE*$K$O!"@$3&Cf$N(B @var{N} $B8D$N%7%9%F%`$,!"Cf9q!"%,!<%J(B
+$B$"$k$$$O%+%j%U%)%k%K%"$K$"$k%^%7%s(B @var{X} $B$,(B spam $BEE;R%a!<%k$rAw=P$7$F(B
+$B$$$k$3$H$rG'$a$?$i!"$=$l$i(B @var{N} $B8D$N%7%9%F%`$O(B @var{X} $B$^$?(B
+$B$O(B @var{X} $B$+$i$d$C$FMh$?(B spam $B%a!<%k$r%G!<%?%Y!<%9$K5-F~$7$^$9!#(BSpam $B8!(B
+$B=P$N4p=`$OJQ$o$j$^$9!#$=$l$OAw$i$l$?%a%C%;!<%8$N?t$d%a%C%;!<%8$NFbMF$J$I(B
+$B$G$"$k$+$b$7$l$^$;$s!#%a%C%;!<%8$,(B spam $B$+$I$&$+$rJ,;6=hM}%7%9%F%`$N%f!<(B
+$B%6$,CN$j$?$$>l9g!"H`$O$=$l$i$N(B @var{N} $B8D$N%7%9%F%`$N$&$A$N0l$D$rD4$Y$^(B
+$B$9!#(B
 
 $BJ,;67?(B spam $B=hM}$OF1;~$KB?$/$N%a%C%;!<%8$rAw$k(B spammers $B$HHs>o$K$h$/@o$C(B
 $B$F$/$l$^$9$,!"$=$l$O%f!<%6!<$,$+$J$jJ#;($J%A%'%C%/$r@_Dj$9$k$3$H$r5a$a$^(B
@@ -21217,9 +21264,10 @@ Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
              :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
 @end lisp
 
-$B$$$C$?$s%a!<%k$r<u$1$k%9%W!<%k$G!"Nc$($P(B spam $B$G$"$k$3$H$rI=<($9$k%X%C%@!<(B
-$B$r%a!<%k$K4^$a$k$h$&$K$7$F!"$=$l$r$U$k$$Mn$H$9=`Hw$r$7$^$9!#;H$&$N$OIaDL(B
-$B$NJ,3dJ}<0(B (@pxref{Splitting Mail}) $B$G$9(B:
+$B$$$C$?$s!"%a!<%k$r<u$1$k%9%W!<%k$r$I$&$K$+$7$F=hM}$9$k!"Nc$($P(B@: $B%a!<%k(B
+$B$K(B spam $B$G$"$k$3$H$rI=<($9$k%X%C%@!<$r4^$a$k!"$h$&$K$9$l$P!"$=$l$r$U$k$$(B
+$BMn$H$9=`Hw$O40N;$G$9!#;H$&$N$OIaDL$NJ,3dJ}<0(B (@pxref{Splitting Mail}) $B$G(B
+$B$9(B:
 
 @lisp
 (setq nnmail-split-methods '(("spam"  "^X-Spam-Flag: YES")
@@ -21305,7 +21353,7 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 (add-hook 'message-send-hook 'mail-add-payment)
 @end lisp
 
-@code{hashcash.el} $B%i%$%V%i%j(B
+@file{hashcash.el} $B%i%$%V%i%j(B
 $B$O(B @uref{http://users.actrix.gen.nz/mycroft/hashcash.el} $B$+3+H/HG(B
 $B$N(B gnus $B$N(B contrib $B%G%#%l%/%H%j$K$"$j$^$9!#(B
 
@@ -21342,14 +21390,14 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 @cindex spam filtering
 @cindex spam
 
-@code{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)%;%s%?!<(B
-$B$r(B gnus $B$NCf$K;}$D$3$H$G$9!#$=$N$?$a$K(B @code{spam.el} $B$OFs$D$N$3$H$r9T$J(B
+@file{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)%;%s%?!<(B
+$B$r(B gnus $B$NCf$K;}$D$3$H$G$9!#$=$N$?$a$K(B @file{spam.el} $B$OFs$D$N$3$H$r9T$J(B
 $B$$$^$9(B: $BF~$C$F$/$k%a!<%k$r_I2a$7!"(Bspam $B$^$?$O(B ham $B$H$7$FCN$i$l$k%a!<%k$r(B
-$BJ,@O$9$k$3$H$G$9!#(B@emph{Ham} $B$O(B @code{spam.el} $B$N$$$?$k=j$G(B spam $B$G$O$J(B
-$B$$%a%C%;!<%8$r<($9$?$a$K;H$&L>A0$G$9!#(B
+$BJ,@O$9$k$3$H$G$9!#(B@dfn{Ham} $B$O(B @file{spam.el} $B$N$$$?$k=j$G(B spam $B$G$O$J$$(B
+$B%a%C%;!<%8$r<($9$?$a$K;H$&L>A0$G$9!#(B
 
-$B$G$O(B @code{spam.el} $B$r(B load $B$9$k$H2?$,5/$-$k$G$7$g$&$+(B?  $BBh0l$K!"0J2<$N(B
-$B%-!<%\!<%IL?Na$,;H$($k$h$&$K$J$j$^$9(B:
+$B$G$O(B @file{spam.el} $B$rFI$_9~$`$H2?$,5/$-$k$G$7$g$&$+(B?  $BBh0l$K!"0J2<$N%-!<(B
+$B%\!<%IL?Na$,;H$($k$h$&$K$J$j$^$9(B:
 
 @table @kbd
 @item M-d
@@ -21380,8 +21428,8 @@ Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$
 
 @end table
 
-$B$^$?!"(B@code{spam.el} $B$r(B load $B$9$k$H!"$=$NJQ?t72$r%+%9%?%^%$%:$9$k$3$H$,(B
-$B$G$-$k$h$&$K$J$j$^$9!#(B@samp{spam} $BJQ?t%0%k!<%W$K$D$$(B
+$B$^$?!"(B@file{spam.el} $B$rFI$_9~$`$H!"$=$NJQ?t72$r%+%9%?%^%$%:$9$k$3$H$,$G(B
+$B$-$k$h$&$K$J$j$^$9!#(B@samp{spam} $BJQ?t%0%k!<%W$K$D$$(B
 $B$F(B @code{customize-group} $B$r;n$7$F$_$F2<$5$$!#(B
 
 @vindex gnus-spam-process-newsgroups
@@ -21484,7 +21532,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @code{spam-process-destination} $B%Q%i%a!<%?$,@_Dj$5$l$F$$$J$$$H!"(Bspam $B5-(B
 $B;v$OC1$K4|8B@Z$l>C5n$5$l$^$9!#(B
 
-$BF~$C$F$/$k%a!<%k$r_I2a$9$kL\E*$G(B @code{spam.el} $B$r;H$&$K$O!"FC5iJ,3d%j%9(B
+$BF~$C$F$/$k%a!<%k$r_I2a$9$kL\E*$G(B @file{spam.el} $B$r;H$&$K$O!"FC5iJ,3d%j%9(B
 $B%H(B @code{nnmail-split-fancy} $B$^$?$O(B @code{nnimap-split-fancy} $B$K0J2<$rDI(B
 $B2C$7$J$1$l$P$J$j$^$;$s(B:
 
@@ -21574,17 +21622,17 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 $BK!$H!"$=$l$i$KBP1~$9$k(B spam $B$H(B ham $B$N%W%m%;%C%5!<$G$9(B:
 
 @menu
-* Blacklists and Whitelists::   
-* BBDB Whitelists::             
-* Gmane Spam Reporting::        
-* Anti-spam Hashcash Payments::  
-* Blackholes::                  
-* Regular Expressions Header Matching::  
-* Bogofilter::                  
-* ifile spam filtering::        
-* spam-stat spam filtering::    
-* SpamOracle::                  
-* Extending the spam elisp package::  
+* Blacklists and Whitelists::
+* BBDB Whitelists::
+* Gmane Spam Reporting::
+* Anti-spam Hashcash Payments::
+* Blackholes::
+* Regular Expressions Header Matching::
+* Bogofilter::
+* ifile spam filtering::
+* spam-stat spam filtering::
+* SpamOracle::
+* Extending the spam elisp package::
 @end menu
 
 @node Blacklists and Whitelists
@@ -21751,9 +21799,9 @@ Hashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,3d(B (spam-split) $B5,B'$KAw
 $B$J$j9-HO0O$KEO$C$F$$$^$9$,!"$b$7;~BeCY$l$J%5!<%P!<$r4^$s$G$$$?$i;d$?$A$K(B
 $BCN$i$;$k$?$a$K!"3NG'$7$F2<$5$$!#(B
 
-$B%V%i%C%/%[!<%k!&%A%'%C%/$O(B @code{dig.el} $B%Q%C%1!<%8$r;H$$$^$9!#$7$+(B
+$B%V%i%C%/%[!<%k!&%A%'%C%/$O(B @file{dig.el} $B%Q%C%1!<%8$r;H$$$^$9!#$7$+(B
 $B$7(B @code{spam-use-dig} $B$r(B @code{nil} $B$K@_Dj$9$l$P!"$h$jNI$$@-G=$N$?$a(B
-$B$K(B @code{dns.el} $B$rBe$o$j$K;H$&$3$H$r(B @code{spam.el} $B$K;X<($9$k$3$H$,$G(B
+$B$K(B @file{dns.el} $B$rBe$o$j$K;H$&$3$H$r(B @file{spam.el} $B$K;X<($9$k$3$H$,$G(B
 $B$-$^$9!#8=>u$G$O(B @code{spam-use-dig} $B$r(B @code{nil} $B$K@_Dj$9$k$3$H$O!"$$(B
 $B$/?M$+$N%f!<%6!<$,;H$($J$$$+$b$7$l$J$$$N$G!"$=$l$,2DG=$J@-G=2~A1$G$"$k$K(B
 $B$b$+$+$o$i$:?d>)$5$l$^$;$s!#$7$+$7!"$=$l$,F0$/$+$I$&$+$r3N$+$a$k$3$H$O$G(B
@@ -21776,7 +21824,7 @@ Hashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,3d(B (spam-split) $B5,B'$KAw
 
 @defvar spam-use-dig
 
-@code{dns.el} $B%Q%C%1!<%8$NBe$o$j$K(B @code{dig.el} $B%Q%C%1!<%8$r;H$$$^$9!#(B
+@file{dns.el} $B%Q%C%1!<%8$NBe$o$j$K(B @file{dig.el} $B%Q%C%1!<%8$r;H$$$^$9!#(B
 $B%G%#%U%)%k%H$N@_Dj$G$"$k(B @code{t} $B$,?d>)$5$l$^$9!#(B
 
 @end defvar
@@ -21887,10 +21935,10 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 
 @end defvar
 
-Bogofilter $B$N%a!<%kJ,N`4o$O!"0U?^$HL\E*$NE@$G(B ifile $B$K;w$F$$$^$9!#(B
-Spam $B$H(B ham $B$N%W%m%;%C%5!<$,Ds6!$5$l!"2C$($F(B spam-$BJ,3d(B (spam-split) $B$K(B
-$B$b(B Bogofilter $B$,;H$o$l$k$Y$-$G$"$k$3$H!"$^$?$O$9$G$K5-;v$K;H$o$l$?$3$H$r(B
-$B<($9(B @code{spam-use-bogofilter} $B$*$h(B
+Bogofilter $B$N%a!<%kJ,N`4o$O!"0U?^$HL\E*$NE@$G(B @command{ifile} $B$K;w$F$$$^(B
+$B$9!#(BSpam $B$H(B ham $B$N%W%m%;%C%5!<$,Ds6!$5$l!"2C$($F(B spam-$BJ,(B
+$B3d(B (spam-split) $B$K$b(B Bogofilter $B$,;H$o$l$k$Y$-$G$"$k$3$H!"$^$?$O$9$G$K5-(B
+$B;v$K;H$o$l$?$3$H$r<($9(B @code{spam-use-bogofilter} $B$*$h(B
 $B$S(B @code{spam-use-bogofilter-headers} $BJQ?t$,Ds6!$5$l$^$9!#$3$N5!G=$r8!::(B
 $B$9$k$?$a$K(B Bogofilter $B$N%P!<%8%g%s(B 0.9.2.1 $B$,;H$o$l$^$7$?!#(B
 
@@ -21902,8 +21950,9 @@ Spam $B$H(B ham $B$N%W%m%;%C%5!<$,Ds6!$5$l!"2C$($F(B spam-$BJ,3d(B (spam-s
 
 @defvar spam-use-ifile
 
-Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B ifile $B$r(B @code{spam-split} $B$K;H$$$?$$(B
-$B>l9g$O!"$3$NJQ?t$rM-8z$K$7$F2<$5$$!#(B
+Bogofilter $B$K;w$?E}7WJ,@O4o$G$"(B
+$B$k(B @command{ifile} $B$r(B @code{spam-split} $B$K;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8z(B
+$B$K$7$F2<$5$$!#(B
 
 @end defvar
 
@@ -21969,9 +22018,9 @@ Emacs Lisp $B$K$h$kE}7WJ,@O4o$G$"$k(B spam-stat.el $B$r(B @code{spam-split} 
 $B%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
 @end defvar
 
-$B$3$l$O(B spam.el $B$,(B spam-stat.el $B$HF/$-9g$&$3$H$r2DG=$K$7$^$9!#(B
-spam-stat.el $B$O(B (Lisp $B$@$1$N(B) spam $BFbIt%G!<%?%Y!<%9$rDs6!$7$^$9$,!"$=$l(B
-$B$O(B ifile $B$d(B Bogofilter $B$H0c$C$F30It%W%m%0%i%`$rI,MW$H$7$^$;$s!#(B
+$B$3$l$O(B @file{spam.el} $B$,(B @file{spam-stat.el} $B$HF/$-9g$&$3$H$r2DG=$K$7$^(B
+$B$9!#(B@file{spam-stat.el} $B$O(B (Lisp $B$@$1$N(B) spam $BFbIt%G!<%?%Y!<%9$rDs6!$7$^(B
+$B$9$,!"$=$l$O(B ifile $B$d(B Bogofilter $B$H0c$C$F30It%W%m%0%i%`$rI,MW$H$7$^$;$s!#(B
 Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
 $B$N(B @code{spam-use-stat} $BJQ?t$,Ds6!$5$l$^$9!#(B
 
@@ -22211,9 +22260,9 @@ gnus $B$O$3$N<o$N_I2a$r%5%]!<%H$7$^$9!#$7$+$7$=$l$K$O$$$/$D$+$N@_Dj$,I,MW(B
 $B$N<-=q$r;H$C$F2<$5$$!#(B
 
 @menu
-* Creating a spam-stat dictionary::  
-* Splitting mail using spam-stat::  
-* Low-level interface to the spam-stat dictionary::  
+* Creating a spam-stat dictionary::
+* Splitting mail using spam-stat::
+* Low-level interface to the spam-stat dictionary::
 @end menu
 
 @node Creating a spam-stat dictionary
@@ -24291,6 +24340,9 @@ Gnus $B$OHs>o$KJQ2=$KIY$s$@%W%m%0%i%`$H_I2a$N5,B'$r;H$C$F!"%a!<%k$d%K%e!<(B
 
 @item
 X-Faces $B%X%C%@!<$NA^F~$,4JC1$K$J$j$^$7$?!#(B
+
+@item
+Face $B%X%C%@!<$r07$($k$h$&$K$J$j$^$7$?!#(B
 
 @item
 $B35N,%P%C%U%!$K!"?7$7$$%3%^%s%I(B @kbd{/ N} $B$O?7Ce%a%C%;!<%8$rA^F~$7!"(B
