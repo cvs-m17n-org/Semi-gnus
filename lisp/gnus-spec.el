@@ -172,6 +172,7 @@
 			(cdr (assq 'version gnus-format-specs))))
 	    (not (equal gnus-version gnus-newsrc-file-version)))
     (message "%s" "Force update format specs.")
+    (setq gnus-newsrc-file-version gnus-version)
     (setq gnus-format-specs nil))
 
   ;; Go through all the formats and see whether they need updating.
