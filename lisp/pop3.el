@@ -91,7 +91,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
   (autoload 'starttls-negotiate "starttls"))
 
 (defvar pop3-ssl-program-arguments
-  '("-quiet")
+  '("s_client" "-quiet")
   "Arguments to be passed to the program `pop3-ssl-program-name'.")
 
 (defun pop3-progress-message (format percent &rest args)
@@ -182,7 +182,13 @@ Argument PORT specifies connecting port."
     process))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
-  (let* ((ssl-program-arguments
+  (require 'path-util)
+  (let* ((ssl-program-name
+	  (cond ((exec-installed-p "openssl")
+		 "openssl")
+		(t
+		 "ssleay")))
+	 (ssl-program-arguments
 	  `(,@pop3-ssl-program-arguments ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
          (process (open-ssl-stream name buffer host service)))
@@ -203,9 +209,16 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (as-binary-process
-   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+  (cond ((eq system-type 'windows-nt)
+	 (let (selective-display
+	       (coding-system-for-write 'binary)
+	       (coding-system-for-read 'raw-text-dos))
+	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+	(t
+	 (as-binary-process
+	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
