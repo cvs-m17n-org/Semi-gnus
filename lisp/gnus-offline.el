@@ -607,7 +607,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (setq hdr (concat header " "))
       (setq str (concat hdr string))
       (setq hdr (concat str "\n"))
-      (insert-string hdr))))
+      (insert hdr))))
 ;;
 ;; Add X-Offline-Backend header.
 ;;

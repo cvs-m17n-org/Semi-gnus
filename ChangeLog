@@ -1,3 +1,9 @@
+2003-02-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-offline.el (gnus-offline-add-custom-header): Use
+	insert instead of insert-string which is obsolete in Emacs 21.4
+	(synch to the change of Jesper Harder at 2003-02-20).
+
 2003-02-19  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Renamed `gnus-unsightly-citation-regexp' to
