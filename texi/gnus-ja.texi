@@ -21836,9 +21836,8 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 
 @end defvar
 
-@c TRANSLATEME
 @node Gmane Spam Reporting
-@subsubsection Gmane Spam Reporting
+@subsubsection Gmane Spam $BJs9p(B
 @cindex spam reporting
 @cindex Gmane, spam reporting
 @cindex Gmane, spam reporting
@@ -21846,30 +21845,30 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 
 @defvar gnus-group-spam-exit-processor-report-gmane
 
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameters or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is
-added to a group's @code{spam-process} parameter, the spam-marked
-articles groups will be reported to the Gmane administrators.
+$B%0%k!<%W%Q%i%a!<%?$+JQ?t(B @code{gnus-spam-process-newsgroups} $B$r%+%9%?%^(B
+$B%$%:$7$F!"$3$N%7%s%\%k$r%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$((B
+$B$F2<$5$$!#$3$l$,2C$($i$l$k$H!"(Bspam $B0u$,IU$$$?5-;v$N%0%k!<%W$,(B Gmane $B$N4I(B
+$BM}<T$KJs9p$5$l$^$9!#(B($BLuCm(B: gmane $B%K%e!<%9%0%k!<%W$rFI$s$G$$$k$H$-$K8+$D(B
+$B$+$C$?(B spam $B$N5-;vHV9f$H%0%k!<%WL>$r(B http $B7PM3$GEA$($^$9!#(B
+@file{spam-report.el} $B;2>H!#(B)
 
 @end defvar
 
 @node Anti-spam Hashcash Payments
-@subsubsection Anti-spam Hashcash Payments
+@subsubsection $BHs(B-spam Hashcash $B0u(B
 @cindex spam filtering
 @cindex hashcash, spam filtering
 @cindex spam
 
 @defvar spam-use-hashcash
 
-Similar to @code{spam-use-whitelist} (@pxref{Blacklists and
-Whitelists}), but uses hashcash tokens for whitelisting messages
-instead of the sender address.  You must have the @code{hashcash.el}
-package loaded for @code{spam-use-hashcash} to work properly.
-Messages without a hashcash payment token will be sent to the next
-spam-split rule.  This is an explicit filter, meaning that unless a
-hashcash token is found, the messages are not assumed to be spam or
-ham.
+@code{spam-use-whitelist} (@pxref{Blacklists and Whitelists}) $B$K;w$F$$$^(B
+$B$9$,!"Aw?.<T$N%"%I%l%9$NBe$o$j$K!"7iGr$J%a%C%;!<%8$N$?$a$N(B hashcash $B$N(B
+$B0u(B (tokens) $B$r;H$$$^$9!#(B@code{spam-use-hashcash} $B$,@5$7$/F/$/$h$&$K$9$k(B
+$B$?$a$K!"(B@file{hashcash.el} $B$rFI$_9~$s$G$*$+$J$1$l$P$J$j$^$;$s!#(B
+Hashcash $B0u$,L5$$%a%C%;!<%8$O<!$N(B spam-$BJ,3d(B (spam-split) $B5,B'$KAw$i$l$^(B
+$B$9!#$3$l$O(B hashcash $B0u$,8+Ev$?$i$J$$%a%C%;!<%8$O(B spam $B$H$b(B ham $B$H$b8+$J(B
+$B$5$l$J$$$3$H$r0UL#$9$k!"L@<(E*$J_I2a4o$G$9!#(B
 
 @end defvar
 
@@ -22132,7 +22131,7 @@ Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
 
 @code{spam-list-of-checks} $B$K(B
 @example
-    (spam-use-blackbox	 . spam-check-blackbox)
+    (spam-use-blackbox . spam-check-blackbox)
 @end example
 $B$rDI2C!#(B
 
