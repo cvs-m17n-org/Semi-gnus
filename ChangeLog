@@ -1,3 +1,25 @@
+2000-06-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.21 (This is alpha status.)
+	Fix bugs.
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Do not disable
+	buffer multibyte, when use cached url content. (CAUTION: This is
+	``ad hok''. Please check ``WHY''.)
+
+	* lisp/mmgnus.el (mmgnus-entity-body): Change to method
+	`mime-entity-body'.
+	(mime-entity-content): Use `mime-entity-body' instead of
+	`mmgnus-entity-body'.
+	(mime-write-entity-content): Ditto.
+	(mime-insert-entity): Ditto.
+	(mime-write-entity-body): Ditto.
+
+	* lisp/message.el (message-fix-before-sending): Enable invisible
+	checking.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.22.
+
 2000-05-25  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.21 (This is alpha status.)
