@@ -239,7 +239,21 @@ Equivalent to `progn' in XEmacs"
 		 ((boundp 'MULE)
 		  (lambda nil mc-flag))
 		 (t
-		  (lambda nil enable-multibyte-characters)))))
+		  (lambda nil enable-multibyte-characters))))
+
+  ;; Should keep track of the same alias in mm-util.el.
+  (defalias 'mm-make-temp-file
+    (if (fboundp 'make-temp-file)
+	'make-temp-file
+      (lambda (prefix &optional dir-flag)
+	(let ((file (expand-file-name
+		     (make-temp-name prefix)
+		     (if (fboundp 'temp-directory)
+			 (temp-directory)
+		       temporary-file-directory))))
+	  (if dir-flag
+	      (make-directory file))
+	  file)))))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)

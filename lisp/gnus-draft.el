@@ -132,7 +132,7 @@
 
 (defun gnus-draft-send (article &optional group interactive)
   "Send message ARTICLE."
-  (let ((message-syntax-checks (if interactive nil
+  (let ((message-syntax-checks (if interactive message-syntax-checks
 				 'dont-check-for-anything-just-trust-me))
 	(message-inhibit-body-encoding (or (not group)
 					   (equal group "nndraft:queue")

@@ -2745,7 +2745,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
   (save-excursion
     (set-buffer gnus-dribble-buffer)
     (let ((slave-name
-	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
+	   (mm-make-temp-file (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
       (gnus-write-buffer-as-coding-system gnus-ding-file-coding-system
