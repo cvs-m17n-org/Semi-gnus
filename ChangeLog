@@ -1,5 +1,9 @@
 1998-10-30  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
+	`mime-decode-field-body'.
+	(gnus-bbdb/extract-field-value): Ditto.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.1.
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
