@@ -186,50 +186,33 @@ fixed in Emacs after 21.3."
     (setq load-path (nconc (nreverse adds) load-path))))
 
 (if (file-exists-p (expand-file-name "dgnuspath.el" srcdir))
-    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
-  (message "  ** There's no dgnuspath.el file"))
+    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t))
 
 (condition-case err
     (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
 
+(when (featurep 'xemacs)
+  (condition-case nil
+      (require 'timer-funcs)
+    (error "
+You should upgrade your XEmacs packages, especially xemacs-base.\n"))
+
+  ;; The reason that to load `advice' is necessary is:
+  ;; 1. `path-util' loads poe.elc.
+  ;; 2. poe.elc requires the `ad-add-advice' function which is expanded
+  ;;    from `defadvice'.
+  ;; 3. XEmacs is running with the -no-autoloads option.
+  (require 'advice))
+
 ;; Don't load path-util until `char-after' and `char-before' have been
 ;; optimized because it requires `poe' and then modify the functions.
-
-;; If the APEL modules are installed under the non-standard directory,
-;; for example "/var/home/john/lisp/apel-VERSION/", you should add that
-;; name using the configure option "--with-addpath=".
-;; And also the directory where the EMU modules are installed, for
-;; example "/usr/local/share/mule/19.34/site-lisp/", it should be
-;; included in the standard `load-path' or added by the configure
-;; option "--with-addpath=".
-(let ((path (or (locate-library "path-util")
-		(locate-library "apel/path-util")));; backward compat.
-      parent lpath)
-  (if path
-      (progn
-	(when (string-match "/$" (setq path (file-name-directory path)))
-	  (setq path (substring path 0 (match-beginning 0))))
-	;; path == "/var/home/john/lisp/apel-VERSION"
-	(when (string-match "/$" (setq parent (file-name-directory path)))
-	  (setq parent (substring path 0 (match-beginning 0))))
-	;; parent == "/var/home/john/lisp"
-	(if (setq lpath (or (member path load-path)
-			    (member (file-name-as-directory path) load-path)))
-	    (unless (or (member parent load-path)
-			(member (file-name-as-directory parent) load-path))
-	      (push parent (cdr lpath)))
-	  (push path load-path)
-	  (unless (or (member parent load-path)
-		      (member (file-name-as-directory parent) load-path))
-	    (push parent (cdr load-path))))
-	(require 'advice)
-	(require 'path-util))
-    (error "
-APEL modules are not found in %s.
-Try to re-configure with --with-addpath=APEL_PATH and run make again.
-"
-	   load-path)))
+(condition-case nil
+    (require 'path-util)
+  (error "\nIn %s,
+APEL was not found or an error occurred.  You will need to run the
+configure script again adding the --with-addpath=APEL_PATH option.\n"
+	 load-path))
 
 (unless (locate-library "mel")
   (add-path "flim"))
@@ -239,10 +222,9 @@ Try to re-configure with --with-addpath=APEL_PATH and run make again.
 			  (file-name-directory (get-latest-path "^apel$" t)))
 	load-path)
   (unless (module-installed-p 'mel)
-    (error "
-FLIM modules does not found in %s.
-Try to re-configure with --with-addpath=FLIM_PATH and run make again.
-"
+    (error "In %s,
+FLIM was not found.  You will need to run the configure script again
+adding the --with-addpath=FLIM_PATH option.\n"
 	   load-path)))
 (add-path "semi")
 

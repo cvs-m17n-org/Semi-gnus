@@ -1,3 +1,12 @@
+2005-02-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Load timer-funcs and advice for XEmacs;
+	simplify the way to check whether APEL is available.
+
+	* texi/infohack.el: Load dgnuspath.el; load timer-funcs for XEmacs;
+	load poe; don't load dgnushack.el, which is harmful to XEmacs since
+	some required functions, e.g., make-overlay, are invalidated.
+
 2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Makefile.in (EXAMINE_PACKAGEDIR): Use configure-package-path.

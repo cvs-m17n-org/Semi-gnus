@@ -26,10 +26,26 @@
 ;;; Code:
 
 (let ((default-directory (expand-file-name "../lisp/")))
-  ;; Adjust `load-path' for APEL.
-  (load-file "dgnushack.el")
+  (if (file-exists-p (expand-file-name "dgnuspath.el"))
+      (load (expand-file-name "dgnuspath.el") nil nil t))
   ;; Replace "./" with "../lisp/" in `load-path'.
   (setq load-path (mapcar 'expand-file-name load-path)))
+
+(when (featurep 'xemacs)
+  (condition-case nil
+      (require 'timer-funcs)
+    (error "
+You should upgrade your XEmacs packages, especially xemacs-base.\n")))
+
+;; XEmacs 21.4.17 doesn't provide `line-end-position' which is used
+;; when formatting Info files.  2005-02-23
+(condition-case nil
+    (require 'poe)
+  (error "\nIn %s,
+APEL was not found or an error occurred.  You will need to run the
+configure script again adding the --with-addpath=APEL_PATH option.\n"
+	 load-path))
+
 (load-file (expand-file-name "ptexinfmt.el" "./"))
 
 (if (fboundp 'texinfo-copying)
