@@ -12267,14 +12267,15 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$(B!#(B
 @cindex Web Newspaper
 
 $(B:G6a$G$O!"4v$D$+$N?7J9$,%&%'%V$G8x3+$5$l$F$$$^$9!#(BGnus $(B$O!"$3$l$i$bE,@Z(B
-$(B$K<h$j07$&$3$H$,=PMh$k$h$&$K$J$j$D$D$"$j$^$9!#8=;~E@$G$O!"D+F|?7J9$N$_$K(B
-$(BBP1~$7$F$$$^$9$,!"$=$NB>$N?7J9$K$D$$$F$bMF0W$KBP1~$G$-$k$O$:$G$9!#(B
+$(B$K<h$j07$&$3$H$,=PMh$k$h$&$K$J$j$D$D$"$j$^$9!#8=;~E@$G$O!"D+F|?7J9!"FIGd(B
+$(B?7J9!"%9%]%K%A!"(BCNET Japan$(B!"(BHOTWIRED Japan $(B$*$h$S(B ZDNet Japan $(B$KBP1~$7$F(B
+$(B$$$^$9!#(B
 
 @code{nnshimbun} $(B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
 $(B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{M-x gnus-group-make-shimbun-group RET
-asahi RET asahi RET an_group RET}$(B!#(B(@sc{an_group} $(B$r1\Mw$7$?$$5-;v%0%k!<(B
-$(B%W$KCV$-49$($F$/$@$5$$!#(B) $(B$^$?$O(B @kbd{B nnshimbun RET asahi RET} $(B$G%P%C(B
-$(B%/%(%s%I$r%V%i%&%:$7$F2<$5$$!#(B
+asahi RET an_group RET}$(B!#(B(@sc{an_group} $(B$r1\Mw$7$?$$5-;v%0%k!<%W$KCV$-49(B
+$(B$($F$/$@$5$$!#(B) $(B$^$?$O(B @kbd{B nnshimbun RET asahi RET} $(B$G%P%C%/%(%s%I$r(B
+$(B%V%i%&%:$7$F2<$5$$!#(B
 
 $(B0J2<$N(B @code{nnshimbun} $(BJQ?t$rJQ$($k$3$H$,2DG=$G$9(B:
 
@@ -12283,6 +12284,12 @@ asahi RET asahi RET an_group RET}$(B!#(B(@sc{an_group} $(B$r1\Mw$7$?$$5-;v%0%
 @vindex nnshimbun-directory
 @code{nnshimbun} $(B$,%U%!%$%k$rJ]B8$9$k%G%#%l%/%H%j!<$G$9!#=i4|CM$O(B 
 @samp{~/News/shimbun} $(B$G$9!#(B
+
+@item nnshimbun-pre-fetch-article
+@vindex nnshimbun-pre-fetch-article
+$(B$3$NJQ?t$,(B @code{nil} $(B0J30$NCM$K%;%C%H$5$l$F$$$k$H!"(B@code{nnshimbun} $(B$O(B
+$(B?7Ce5-;v$r8!:w$HF1;~$K5-;v$N%@%&%s%m!<%I$b9T$$$^$9!#$3$l$K$h$C$F!"?7Ce5-(B
+$(B;v$N8!:w$OCY$/$J$j$^$9$,!"5-;v$N1\Mw;~$KBT$?$5$l$k$3$H$O>/$J$/$J$j$^$9!#(B
 @end table
 
 $(B0lHL$K!"%&%'%V>e$G8x3+$5$l$F$$$k?7J9$OJ#?t$N%5!<%P!<$K$h$C$F%_%i!<$5$l$F(B
@@ -12290,9 +12297,7 @@ asahi RET asahi RET an_group RET}$(B!#(B(@sc{an_group} $(B$r1\Mw$7$?$$5-;v%0%
 $(BDj$7$F!"%5!<%P!<$rDj5A$7$F2<$5$$!#(B
 
 @lisp
-(nnshimbun "iij"
-           (nnshimbun-type asahi)
-           (nnshimbun-url "http://iij.asahi.com/"))
+(nnshimbun "asahi" (nnshimbun-url "http://iij.asahi.com/"))
 @end lisp
 
 

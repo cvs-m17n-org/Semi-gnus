@@ -4,6 +4,7 @@
 
 	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Follow
 	changes in nnshimbun.el.
+	* texi/gnus-ja.texi (nnshimbun): Ditto.
 
 2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
