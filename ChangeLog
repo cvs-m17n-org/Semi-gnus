@@ -1,5 +1,114 @@
 1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* Sync up with gnus-6_10.
+
+*1999-05-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnsoup.el (nnsoup-store-reply): Use `forward-char' instead
+	of `backward-char'.
+	* lisp/message.el (message-send-news-with-gnus,
+	message-send-mail-with-smtp, message-send-mail-with-sendmail):
+	Likewise.
+
+	* lisp/nnsoup.el (nnsoup-store-reply): Use `(bolp)' instead of
+	`(eq (char-before) ?\n)'.
+	* lisp/message.el (message-send-news, message-send-mail): Likewise.
+
+	* lisp/gnus-sum.el (gnus-summary-reparent-thread): Use
+	`(end-of-line 0)' to go to the end of the previous line.
+
+	* lisp/gnus-soup.el (gnus-soup-parse-replies, gnus-soup-parse-areas):
+	Use `preceding-char' instead of `char-before'.
+	* lisp/gnus-art.el (article-fill): Likewise.
+
+	* lisp/nnmail.el (nnmail-decode-status): Don't use regexp search.
+	* lisp/message.el (message-next-header, message-remove-header):
+	Likewise.
+	* lisp/gnus-art.el (gnus-article-add-buttons-to-head,
+	gnus-article-highlight-headers, gnus-article-hide-header,
+	article-hide-boring-headers, article-hide-headers): Likewise.
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Use `buffer-substring'
+	instead of `buffer-string'.
+	* lisp/nntp.el (nntp-snarf-error-message, nntp-read-server-type):
+	Likewise.
+	* lisp/nnspool.el (nnspool-inews-sentinel): Likewise.
+	* lisp/nnmail.el (nnmail-move-inbox): Likewise.
+	* lisp/nnheader.el (nnheader-temp-write): Likewise.
+	* lisp/nndb.el (nndb-status-message, nndb-request-accept-article):
+	Likewise.
+	* lisp/message.el (message-wash-subject, message-reply,
+	message-make-from, message-make-organization): Likewise.
+	* lisp/md5.el (md5): Likewise.
+	* lisp/gnus.el (gnus-getenv-nntpserver): Likewise.
+	* lisp/gnus-xmas.el (gnus-xmas-article-display-xface): Likewise.
+	* lisp/gnus-util.el (gnus-mode-string-quote): Likewise.
+	* lisp/gnus-sum.el (gnus-summary-reparent-thread,
+	gnus-summary-edit-article-done, gnus-simplify-subject-fuzzy):
+	Likewise.
+	* lisp/gnus-spec.el (gnus-parse-simple-format): Likewise.
+	* lisp/gnus-picon.el (gnus-picons-make-glyph): Likewise.
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Likewise.
+	* lisp/gnus-mh.el (gnus-summary-save-in-folder): Likewise.
+	* lisp/gnus-kill.el (gnus-kill-file-apply-buffer): Likewise.
+	* lisp/gnus-art.el (gnus-article-mime-edit-exit,
+	gnus-article-edit-exit): Likewise.
+	* lisp/dgnushack.el (dgnushack-make-package): Likewise.
+
+*1999-05-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Semi-gnus 6.10.12 is released.
+
+*1999-04-26  Robert Bihlmeyer  <robbe@orcus.priv.at>
+
+	* texi/gnus.texi, texi/gnus-ja.texi (Posting Styles): Typo.
+
+*1999-04-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-vm.el (gnus-summary-save-in-vm): Use
+	`vm-read-file-name' instead of `read-file-name'. This allows to use
+	the optional sixth argument HISTORY for the various environments.
+	(gnus-summary-save-article-vm): Likewise.
+	(TopLevel): Autoload "vm" for the function `vm-read-file-name'.
+
+*1999-04-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-vm.el (gnus-summary-save-in-vm): To read the name of
+	FOLDER in the way of VM; give the value of `gnus-current-article'
+	to the function `gnus-summary-select-article' if it is called non
+	interactively.
+	(gnus-summary-save-article-vm): Accept the optional 2nd arg FOLDER.
+	If it is called interactively the name of FOLDER is read from the
+	minibuffer; bind `mime-display-header-hook',
+	`mime-display-text/plain-hook', `mime-text-decode-hook',
+	`mime-view-define-keymap-hook' and `mime-view-mode-hook' to nil
+	when the function `gnus-summary-save-article' is called.
+	(gnus-summary-save-article-vm-count,
+	gnus-summary-save-article-vm-folder): New internal variables.
+	(gnus-vm-make-folder): Bind `mime-display-header-hook',
+	`mime-display-text/plain-hook', `mime-text-decode-hook',
+	`mime-view-define-keymap-hook' and `mime-view-mode-hook' to nil
+	when the function `vm-mode' is called.
+	(vm-use-toolbar, vm-primary-inbox, vm-folder-history,
+	vm-folder-directory): Define variables for avoiding byte compile
+	warning.
+	(gnus-vm-inhibit-window-system): Abolish variable; don't require
+	`win-vm'.
+	(TopLevel): Don't autoload "vm" for the functions
+	`vm-forward-message', `vm-reply' or `vm-mail'; don't require
+	`sendmail', `message', `gnus' or `gnus-msg' but `gnus-art'.
+
+*1999-04-18  Sin'ya Kanematsu <ksinya@quartz.ocn.ne.jp>
+
+	* texi/gnus-ja.texi: Fix typo - `gnus-auto-expirable-newgroups' ->
+	`gnus-auto-expirable-newsgroups'.
+
+*1999-04-15  NAKAGAWA Tsuneo <yaemon@alles.or.jp>
+
+	* REDME.semi.ja: Fix where the required packages are.
+
+1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.16.
 
 	* lisp/gnus-score.el (gnus-score-string): Remove score data, when
