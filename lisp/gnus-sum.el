@@ -27,6 +27,7 @@
 
 (eval-when-compile (require 'cl))
 
+(require 'mcharset)
 (require 'gnus)
 (require 'gnus-group)
 (require 'gnus-spec)
@@ -807,7 +808,7 @@ which it may alter in any way.")
   :type 'regexp)
 
 (defcustom gnus-group-charset-alist
-  '(("^hk\\>\\|^tw\\>\\|\\<big5\\>" cn-big5)
+  `(("^hk\\>\\|^tw\\>\\|\\<big5\\>" cn-big5)
     ("^cn\\>\\|\\<chinese\\>" cn-gb-2312)
     ("^fj\\>\\|^japan\\>" iso-2022-jp-2)
     ("^relcom\\>" koi8-r)
@@ -816,7 +817,7 @@ which it may alter in any way.")
     ("^israel\\>" iso-8859-1)
     ("^han\\>" euc-kr)
     ("^\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
-    (".*" iso-8859-1))
+    (".*" ,default-mime-charset))
   "Alist of regexps (to match group names) and default charsets to be used when reading."
   :type '(repeat (list (regexp :tag "Group")
 		       (symbol :tag "Charset")))
