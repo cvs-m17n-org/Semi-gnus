@@ -1071,20 +1071,13 @@ gnus-simplify-subject-fuzzy-regexp."
       (gnus-simplify-buffer-fuzzy-step
        "^ *\\(re\\|fw\\|fwd\\)[[{(^0-9]*[])}]?[:;] *")
       (gnus-simplify-buffer-fuzzy-step "^[[].*:\\( .*\\)[]]$" "\\1"))
-
     (gnus-simplify-buffer-fuzzy-step " *[[{(][^()\n]*[]})] *$")
-    (gnus-simplify-buffer-fuzzy-step " +" " ")
-    (setq modified-tick nil)
-    (while (not (eq modified-tick (buffer-modified-tick)))
-      (setq modified-tick (buffer-modified-tick))
-      (gnus-simplify-buffer-fuzzy-step
-       "\\([^\000-\177]\\) \\([^\000-\177]\\)" "\\1\\2")
-      (gnus-simplify-buffer-fuzzy-step
-       "\\([\000-\177]\\) \\([^\000-\177]\\)" "\\1\\2")
-      (gnus-simplify-buffer-fuzzy-step
-       "\\([^\000-\177]\\) \\([\000-\177]\\)" "\\1\\2"))
-    (gnus-simplify-buffer-fuzzy-step " $")
-    (gnus-simplify-buffer-fuzzy-step "^ +")))
+    (goto-char (point-min))
+    (while (re-search-forward " +" nil t)
+      (delete-region (match-beginning 0) (match-end 0))
+      (or (bolp) (eobp)
+	  (> (char-after) 127) (> (char-before) 127)
+	  (insert " ")))))
 
 (defun gnus-simplify-subject-fuzzy (subject)
   "Simplify a subject string fuzzily.
