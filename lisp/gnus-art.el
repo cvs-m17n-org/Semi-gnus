@@ -898,13 +898,15 @@ See the manual for details."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-decode-message-body-as-default-mime-charset nil
-  "Decode the message body as `default-mime-charset'.
-Recommended values are nil or `nomime'.
-See the manual for details."
+(defcustom gnus-treat-decode-article-as-default-mime-charset nil
+  "Decode an article as `default-mime-charset'.  For instance, if you want to
+attempt to decode an article even if the value of `gnus-show-mime' is nil,
+you could set this variable to something like: nil for don't decode, t for
+decode the body, '(or header t) for the whole article, etc."
   :group 'gnus-article-treat
-  :type '(choice (const :tag "Off" nil)
-		 (const :tag "On" nomime)))
+  :type '(radio (const :tag "Off" nil)
+		(const :tag "Decode body" t)
+		(const :tag "Decode all" (or head t))))
 
 ;;; Internal variables
 
@@ -948,8 +950,8 @@ See the manual for details."
     (gnus-treat-display-smileys gnus-smiley-display)
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)
-    (gnus-treat-decode-message-body-as-default-mime-charset
-     gnus-article-decode-message-body-as-default-mime-charset)))
+    (gnus-treat-decode-article-as-default-mime-charset
+     gnus-article-decode-article-as-default-mime-charset)))
 
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
@@ -2852,7 +2854,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	  (if (or (null entity)
 		  (< (length (mime-entity-node-id entity)) ids))
 	      (gnus-treat-article 'last number number type)
-	    (gnus-treat-article nil number nil type))
+	    (gnus-treat-article t number nil type))
 	  (goto-char (point-max)))))
     (unless (eobp)
       (save-restriction
@@ -2905,12 +2907,13 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   ;; an obsolete variable by now.
   (gnus-run-hooks 'gnus-article-display-hook))
 
-(defun gnus-article-decode-message-body-as-default-mime-charset ()
-  "Decode the message body as `default-mime-charset'.  The buffer is
-expected to be narrowed to the article body."
-  (decode-mime-charset-region (point-min) (point-max)
-			      (with-current-buffer gnus-summary-buffer
-				default-mime-charset)))
+(defun gnus-article-decode-article-as-default-mime-charset ()
+  "Decode an article as `default-mime-charset'.  It won't work if the
+value of the variable `gnus-show-mime' is non-nil."
+  (unless gnus-show-mime
+    (decode-mime-charset-region (point-min) (point-max)
+				(with-current-buffer gnus-summary-buffer
+				  default-mime-charset))))
 
 (autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
 
@@ -4795,9 +4798,7 @@ For example:
 (defun gnus-treat-predicate (val)
   (cond
    ((eq val 'mime)
-    (and gnus-show-mime t))
-   ((eq val 'nomime)
-    (not gnus-show-mime))
+    (not (not gnus-show-mime)))
    ((null val)
     nil)
    ((listp val)
