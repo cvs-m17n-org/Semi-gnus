@@ -1,3 +1,10 @@
+1999-02-24  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* README.ichikawa : Removed.
+
+	* README.T-gnus : Renamed from README.ichikawa
+	                  Remove description about T-gnus 6.8.
+
 1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
