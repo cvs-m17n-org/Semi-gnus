@@ -1459,7 +1459,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\t" 'message-tab)
 
   (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
-  (define-key message-mode-map "\C-xk" 'message-kill-buffer))
+  (define-key message-mode-map "\C-xk" 'message-mimic-kill-buffer))
 
 (easy-menu-define
  message-mode-menu message-mode-map "Message Menu."
@@ -2170,6 +2170,19 @@ The text will also be indented the normal way."
       (message-do-actions actions)
       (message-delete-frame frame org-frame)))
   (message ""))
+
+(defun message-mimic-kill-buffer ()
+  "Kill the current buffer with query."
+  (interactive)
+  (if (buffer-modified-p)
+      (message-kill-buffer)
+    (let ((command this-command)
+	  (bufname (read-buffer (format "Kill buffer: (default %s) "
+					(buffer-name)))))
+      (if (or (not bufname)
+	      (string-equal bufname (buffer-name)))
+	  (message-kill-buffer)
+	(message "%s must be invoked only for the current buffer." command)))))
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
