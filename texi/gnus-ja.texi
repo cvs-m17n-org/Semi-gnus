@@ -16727,6 +16727,30 @@ Gnus $B$r(B ``$B%*%U%i%$%s(B'' $B$N%K%e!<%9%j!<%@!<$H$7$F;EN)$F$k$N$O6K$a$F
 $B%^%7%s$K<h$C$F$/$k$3$H$r0UL#$7$^$9!#%"%C%W%m!<%I(B (@dfn{upload}) $B$O$=$N5U(B
 $B$r$9$k$3$H$G$9!#(B
 
+@c TRANSLATEME
+You know that Gnus gives you all the opportunity you'd ever want for
+shooting yourself in the foot.  Some people call it flexibility.  Gnus
+is also customizable to a great extent, which means that the user has a
+say on how Gnus behaves.  Other newsreaders might unconditionally shoot
+you in your foot, but with Gnus, you have a choice!
+
+Gnus is never really in plugged or unplugged state.  Rather, it applies
+that state to each server individually.  This means that some servers
+can be plugged while others can be unplugged.  Additionally, some
+servers can be ignored by the Agent altogether (which means that
+they're kinda like plugged always).
+
+So when you unplug the Agent and then wonder why is Gnus opening a
+connection to the Net, the next step to do is to look whether all
+servers are agentized.  If there is an unagentized server, you found
+the culprit.
+
+Another thing is the @dfn{offline} state.  Sometimes, servers aren't
+reachable.  When Gnus notices this, it asks you whether you want the
+server to be switched to offline state.  If you say yes, then the
+server will behave somewhat as if it was unplugged, except that Gnus
+will ask you whether you want to switch it back online again.
+
 $B%(!<%8%'%s%H$r;H$C$?E57?E*$J(B gnus $B$NBPOCA`:n$r8+$F$_$^$7$g$&!#(B
 
 @itemize @bullet
@@ -16770,11 +16794,11 @@ PPP $B4X78(B($B$J$I(B)$B$rJD$8$^$9!#$=$&$7$F%K%e!<%9$r%*%U%i%$%s$GFI$`$3$H$
 $B$I$N%5!<%P!<$r%(!<%8%'%s%H$GLLE]$r8+$k$+$r7h$a$^$9!#$b$7%a!<%k%P%C%/%(%s(B
 $B%I$,$"$l$P!"$=$l$r%(!<%8%'%s%H$KLLE]$r8+$5$;$k$N$O$*$=$i$/L50UL#$G$7$g$&!#(B
 $B%5!<%P!<%P%C%U%!!<$K0\F0$7(B ($B%0%k!<%W%P%C%U%!!<$G(B @kbd{^})$B!"%(!<%8%'%s%H(B
-$B$K07$C$FM_$7$$%5!<%P!<(B($BJ#?t2D(B)$B$G(B @kbd{J a} $B$r2!$9$+!"$^$?$O%(!<%8%'%s%H(B
-$B$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l$?%5!<%P!<$G(B @kbd{J r} $B$r2!$7$^$9!#(B
-$B%G%#%U%)%k%H$G(B
+$B$K07$C$FM_$7$$%5!<%P!<(B($BJ#?t2D(B)$B$G(B @kbd{J a} $B$r2!$9(B (@pxref{Server Agent
+Commands}) $B$+!"$^$?$O%(!<%8%'%s%H$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l(B
+$B$?%5!<%P!<$G(B @kbd{J r} $B$r2!$7$^$9!#%G%#%U%)%k%H$G(B
 $B$O(B @code{gnus-select-method} $B$H(B @code{gnus-secondary-select-methods} $B$K(B
-$B$"$k$9$Y$F$N(B @code{nntp} $B$H(B @code{nnimap} $B%0%k!<%W$,%(!<%8%'%s%H2=$5$l$^(B
+$B$"$k$9$Y$F$N(B @code{nntp} $B$H(B @code{nnimap} $B%5!<%P!<$,%(!<%8%'%s%H2=$5$l$^(B
 $B$9!#(B
 
 @item

@@ -30,6 +30,9 @@
 ;; used by Gnus and may be used by any other package without loading
 ;; Gnus first.
 
+;; [Unfortunately, it does depend on other parts of Gnus, e.g. the
+;; autoloads below...]
+
 ;;; Code:
 
 (eval-when-compile
@@ -846,10 +849,14 @@ with potentially long computations."
 
 ;;; Functions for saving to babyl/mail files.
 
-(defvar rmail-default-rmail-file)
+(eval-when-compile
+  (defvar rmail-default-rmail-file)
+  (defvar mm-text-coding-system))
+
 (defun gnus-output-to-rmail (filename &optional ask)
   "Append the current article to an Rmail file named FILENAME."
   (require 'rmail)
+  (require 'mm-util)
   ;; Most of these codes are borrowed from rmailout.el.
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
@@ -1347,8 +1354,9 @@ CHOICE is a list of the choice char and help message at IDX."
 	(while (not tchar)
 	  (message "%s (%s): "
 		   prompt
-		   (mapconcat (lambda (s) (char-to-string (car s)))
-			      choice ", "))
+		   (concat
+		    (mapconcat (lambda (s) (char-to-string (car s)))
+			       choice ", ") ", ?"))
 	  (setq tchar (read-char))
 	  (when (not (assq tchar choice))
 	    (setq tchar nil)

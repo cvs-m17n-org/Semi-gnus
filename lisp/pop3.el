@@ -705,6 +705,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (set-buffer (process-buffer process))
     (goto-char start)
     (while (not (re-search-forward "^\\.\r\n" nil t))
+      ;; Fixme: Shouldn't depend on nnheader.
       (nnheader-accept-process-output process)
       (goto-char start))
     (setq pop3-read-point (point-marker))

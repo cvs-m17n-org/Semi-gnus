@@ -1208,6 +1208,10 @@ password contained in '~/.nntp-authinfo'."
   (open-network-stream-as-binary
    "nntpd" buffer nntp-address nntp-port-number))
 
+(autoload 'format-spec "format")
+(autoload 'format-spec-make "format")
+(autoload 'open-tls-stream "tls")
+
 (defun nntp-open-ssl-stream (buffer)
   (let* ((process-connection-type nil)
 	 (proc (as-binary-process

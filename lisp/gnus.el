@@ -2160,7 +2160,7 @@ You also need to enable `gnus-agent' for this to have any affect."
   :group 'gnus-agent
   :type 'boolean)
 
-(defcustom gnus-default-charset 'iso-8859-1
+(defcustom gnus-default-charset 'undecided
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
 `gnus-group-charset-alist' variable and is only used on groups not
