@@ -165,6 +165,11 @@ If this variable is nil, no such courtesy message will be added."
   :group 'message-interface
   :type 'regexp)
 
+(defcustom message-bounce-setup-function 'message-bounce-setup-for-mime-edit
+  "Function to setup a re-sending bounced message."
+  :group 'message-sending
+  :type 'function)
+
 ;;;###autoload
 (defcustom message-from-style 'default
   "*Specifies how \"From\" headers look.
@@ -566,6 +571,12 @@ The function `message-setup' runs this hook."
   "Normal hook, run each time a new outgoing message is initialized.
 It is run after the headers have been inserted and before
 the signature is inserted."
+  :group 'message-various
+  :type 'hook)
+
+(defcustom message-bounce-setup-hook nil
+  "Normal hook, run each time a a re-sending bounced message is initialized.
+The function `message-bounce' runs this hook."
   :group 'message-various
   :type 'hook)
 
@@ -2277,7 +2288,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	 mime-edit-split-ignored-field-regexp)
 	(case-fold-search t)
 	failure)
-    (while (string-match "Message-Id" mime-edit-split-ignored-field-regexp)
+    (while (string-match "Message-ID" mime-edit-split-ignored-field-regexp)
       (setq mime-edit-split-ignored-field-regexp
 	    (concat (substring mime-edit-split-ignored-field-regexp
 			       0 (match-beginning 0))
@@ -2352,10 +2363,7 @@ This sub function is for exclusive use of `message-send-mail'."
       (set-buffer message-edit-buffer)
       (if failure
 	  (progn
-	    (message "Couldn't send message via mail: %s"
-		     (if (eq 'error (car failure))
-			 (cadr failure)
-		       failure))
+	    (message "Couldn't send message via mail: %s" failure)
 	    nil)
 	(push 'mail message-sent-message-via)))))
 
@@ -2519,7 +2527,7 @@ This sub function is for exclusive use of `message-send-news'."
   (let ((mime-edit-split-ignored-field-regexp
 	 mime-edit-split-ignored-field-regexp)
 	(case-fold-search t))
-    (while (string-match "Message-Id" mime-edit-split-ignored-field-regexp)
+    (while (string-match "Message-ID" mime-edit-split-ignored-field-regexp)
       (setq mime-edit-split-ignored-field-regexp
 	    (concat (substring mime-edit-split-ignored-field-regexp
 			       0 (match-beginning 0))
@@ -2528,7 +2536,7 @@ This sub function is for exclusive use of `message-send-news'."
 		    (substring mime-edit-split-ignored-field-regexp
 			       (match-end 0)))))
     (or
-     (catch 'message-sending-news-done
+     (catch 'message-sending-news-failure
        (mime-edit-maybe-split-and-send
 	(function
 	 (lambda ()
@@ -2540,7 +2548,7 @@ This sub function is for exclusive use of `message-send-news'."
 	       (delete-region (match-end 0) (std11-field-end))
 	       (insert " " (message-make-message-id))))
 	   (unless (funcall message-send-news-function method)
-	     (throw 'message-sending-news-done t)))))
+	     (throw 'message-sending-news-failure t)))))
        nil)
      (not (funcall message-send-news-function method)))))
 
@@ -4357,6 +4365,13 @@ Optional NEWS will use news to forward instead of mail."
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
 
+(defun message-bounce-setup-for-mime-edit ()
+  (goto-char (point-min))
+  (when (search-forward (concat "\n" mail-header-separator "\n") nil t)
+    (replace-match "\n\n"))
+  (set (make-local-variable 'message-setup-hook) nil)
+  (mime-edit-again))
+
 ;;;###autoload
 (defun message-bounce ()
   "Re-mail the current message.
@@ -4396,6 +4411,9 @@ you."
       (message-remove-header message-ignored-bounced-headers t)
       (goto-char (point-max))
       (insert mail-header-separator))
+    (when message-bounce-setup-function
+      (funcall message-bounce-setup-function))
+    (run-hooks 'message-bounce-setup-hook)
     (message-position-point)))
 
 ;;;

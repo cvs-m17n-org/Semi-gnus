@@ -958,14 +958,15 @@ this is a reply."
   (interactive "P")
   (gnus-summary-select-article t)
   (set-buffer gnus-original-article-buffer)
-  (gnus-setup-message 'compose-bounce
-    (let* ((references (mail-fetch-field "references"))
-	   (parent (and references (gnus-parent-id references))))
-      (message-bounce)
-      ;; If there are references, we fetch the article we answered to.
-      (and fetch parent
-	   (gnus-summary-refer-article parent)
-	   (gnus-summary-show-all-headers)))))
+  (let ((gnus-message-setup-hook '(gnus-maybe-setup-default-charset)))
+    (gnus-setup-message 'compose-bounce
+      (let* ((references (mail-fetch-field "references"))
+	     (parent (and references (gnus-parent-id references))))
+	(message-bounce)
+	;; If there are references, we fetch the article we answered to.
+	(and fetch parent
+	     (gnus-summary-refer-article parent)
+	     (gnus-summary-show-all-headers))))))
 
 ;;; Gcc handling.
 
