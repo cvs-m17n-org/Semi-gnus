@@ -2141,57 +2141,62 @@ or error messages, and inform user.
 Otherwise any failure is reported in a message back to
 the user from the mailer."
   (interactive "P")
-  ;; Disabled test.
-  (when (or (buffer-modified-p)
-	    (message-check-element 'unchanged)
-	    (y-or-n-p "No changes in the buffer; really send? "))
-    ;; Make it possible to undo the coming changes.
-    (undo-boundary)
-    (let ((inhibit-read-only t))
-      (put-text-property (point-min) (point-max) 'read-only nil))
-    (run-hooks 'message-send-hook)
-    (message "Sending...")
-    (let ((message-encoding-buffer
-	   (message-generate-new-buffer-clone-locals " message encoding"))
-	  (message-edit-buffer (current-buffer))
-	  (message-mime-mode mime-edit-mode-flag)
-	  (alist message-send-method-alist)
-	  (success t)
-	  elem sent)
-      (save-excursion
-	(set-buffer message-encoding-buffer)
-	(erase-buffer)
-	(insert-buffer message-edit-buffer)
-	(funcall message-encode-function)
-	(message-fix-before-sending)
-	(while (and success
-		    (setq elem (pop alist)))
-	  (when (and (or (not (funcall (cadr elem)))
-			 (and (or (not (memq (car elem)
-					     message-sent-message-via))
-				  (y-or-n-p
-				   (format
-				    "Already sent message via %s; resend? "
-				    (car elem))))
-			      (setq success (funcall (caddr elem) arg)))))
-	    (setq sent t))))
-      (prog1
-      (when (and success sent)
-	(message-do-fcc)
-	;;(when (fboundp 'mail-hist-put-headers-into-history)
-	;; (mail-hist-put-headers-into-history))
-	(run-hooks 'message-sent-hook)
-	(message "Sending...done")
-	;; Mark the buffer as unmodified and delete auto-save.
-	(set-buffer-modified-p nil)
-	(delete-auto-save-file-if-necessary t)
-	(message-disassociate-draft)
-	;; Delete other mail buffers and stuff.
-	(message-do-send-housekeeping)
-	(message-do-actions message-send-actions)
-	;; Return success.
-	t)
-      (kill-buffer message-encoding-buffer)))))
+  (if (catch 'message-sending-cancel
+	;; Disabled test.
+	(unless (or (buffer-modified-p)
+		    (message-check-element 'unchanged)
+		    (y-or-n-p "No changes in the buffer; really send? "))
+	  (throw 'message-sending-cancel t))
+	;; Make it possible to undo the coming changes.
+	(undo-boundary)
+	(let ((inhibit-read-only t))
+	  (put-text-property (point-min) (point-max) 'read-only nil))
+	(run-hooks 'message-send-hook)
+	(message "Sending...")
+	(let ((message-encoding-buffer
+	       (message-generate-new-buffer-clone-locals " message encoding"))
+	      (message-edit-buffer (current-buffer))
+	      (message-mime-mode mime-edit-mode-flag)
+	      (alist message-send-method-alist)
+	      (success t)
+	      elem sent)
+	  (unwind-protect
+	      (if (save-excursion
+		    (set-buffer message-encoding-buffer)
+		    (erase-buffer)
+		    (insert-buffer message-edit-buffer)
+		    (funcall message-encode-function)
+		    (message-fix-before-sending)
+		    (while (and success
+				(setq elem (pop alist)))
+		      (and (funcall (cadr elem))
+			   (and (or (not (memq (car elem)
+					       message-sent-message-via))
+				    (y-or-n-p
+				     (format
+				      "Already sent message via %s; resend? "
+				      (car elem))))
+				(setq success (funcall (caddr elem) arg)))
+			   (setq sent t)))
+		    (not (and success sent)))
+		  (throw 'message-sending-cancel t)
+		(message-do-fcc)
+		(run-hooks 'message-sent-hook)
+		(message "Sending...done")
+		;; Mark the buffer as unmodified and delete auto-save.
+		(set-buffer-modified-p nil)
+		(delete-auto-save-file-if-necessary t)
+		(message-disassociate-draft)
+		;; Delete other mail buffers and stuff.
+		(message-do-send-housekeeping)
+		(message-do-actions message-send-actions)
+		nil)
+	    (kill-buffer message-encoding-buffer))))
+      (progn
+	(message "Canceled")
+	nil)
+    ;; Return success.
+    t))
 
 (defun message-send-via-mail (arg)
   "Send the current message via mail."
