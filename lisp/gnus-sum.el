@@ -932,6 +932,8 @@ For example: ((1 . cn-gb-2312) (2 . big5))."
 
 ;;; Internal variables
 
+(defvar gnus-article-mime-handles nil)
+(defvar gnus-article-decoded-p nil)
 (defvar gnus-scores-exclude-files nil)
 (defvar gnus-page-broken nil)
 (defvar gnus-inhibit-mime-unbuttonizing nil)

@@ -41,8 +41,6 @@
 (require 'mime-view)
 
 ;; Avoid byte-compile warnings.
-(defvar gnus-article-decoded-p)
-(defvar gnus-article-mime-handles)
 (eval-when-compile
   (require 'mm-bodies)
   (require 'mail-parse)
