@@ -1,3 +1,10 @@
+2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
+	if the point is out of view.
+
 2000-01-15  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-art.el (gnus-article-next-page): Scroll up LINES if
