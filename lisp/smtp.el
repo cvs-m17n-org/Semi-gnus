@@ -429,7 +429,7 @@ don't define this value."
 		    (cons (buffer-substring (match-beginning 1) (match-end 1))
 			  recipient-address-list))
 	      )
-	    (setq smtp-recipient-address-list recipient-address-list))
+	    recipient-address-list)
 	  )
       (kill-buffer smtp-address-buffer))
     ))
