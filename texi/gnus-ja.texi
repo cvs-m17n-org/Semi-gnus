@@ -7026,7 +7026,9 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 $B$O(B @code{banner} $B%0%k!<%W%Q%i%a!<%?(B (@pxref{Group Parameters}) $B$r%P%J!<(B
 $B$r<h$j=|$-$?$$%0%k!<%W$KDI2C$7$^$9!#%Q%i%a!<%?>C5n$5$l$k%F%-%9%H$K9gCW$9(B
 $B$k@55,I=8=$H$7$F2r<a$5$l$kJ8;zNs$+!"(B($B:G8e$N(B) $B=pL>$,>C5n$5$l$k$H$$$&0UL#(B
-$B$G$"$k%7%s%\%k(B @code{signature} $B$G$"$k$3$H$,$G$-$^$9!#(B
+$B$G$"$k%7%s%\%k(B @code{signature}$B!"$^$?(B
+$B$O(B @code{gnus-article-banner-alist} $B$N@55,I=8=$KBP1~$7$?%7%s%\%k$G$"$k$3(B
+$B$H$,$G$-$^$9!#(B
 
 @item W W c
 @kindex W W c ($B35N,(B)
