@@ -1,3 +1,7 @@
+2000-09-15   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-art.el: Always require `wid-edit'.
+
 2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-compile): Don't compile gnus-ml.el
