@@ -1,5 +1,15 @@
 1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/message.el (message-reply): Get the references from
+	`In-Reply-To' field if there were no references and `In-Reply-To'
+	field looks promising.
+	(message-yank-original): Try to fetch ID from `In-Reply-To' field
+	if `References' field does not exist.
+	(message-yank-original): Use `std11-narrow-to-header' instead of
+	`message-narrow-to-head'.
+
+1999-01-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-msg.el (gnus-inews-yank-articles): Fetch IDs from
 	`gnus-current-headers' instead of article header.
 
