@@ -1489,7 +1489,7 @@ newsgroup."
 	  (when (<= (gnus-info-level info) foreign-level)
 	    (setq active (gnus-activate-group group 'scan))
 	    ;; Let the Gnus agent save the active file.
-	    (when (and gnus-agent gnus-plugged)
+	    (when (and gnus-agent gnus-plugged active)
 	      (gnus-agent-save-group-info
 	       method (gnus-group-real-name group) active))
 	    (unless (inline (gnus-virtual-group-p group))
