@@ -11843,6 +11843,19 @@ nnmail-split-history} を使う事ができます。これからスプールし直そうとする
 @code{nnmail-split-header-length-limit} の制限より長いヘッダー行は、分割
 関数の処理対象から除外されます。
 
+@vindex nnmail-mail-splitting-charset
+@vindex nnmail-mail-splitting-decodes
+(訳注: オリジナルの Gnus とは仕様が微妙に異なることに注意して下さい) ディ
+フォルトでは分割コードは @sc{mime} エンコードされたヘッダーをデコードす
+るので、非-ASCII 文字列にマッチさせることができます。変
+数 @code{nnmail-mail-splitting-charset} が @sc{mime} 文字集
+合 (mime-charset) であったらそれ、@sc{mime} 文字集合ではない
+非-@code{nil} な値だったらそのときの @code{default-mime-charset} の値で、
+(@sc{mime} エンコードされたものではない) 非-ASCII ビットパターンもデコー
+ドします。この動作は @code{nnmail-mail-splitting-decodes} を nil にする
+ことによって完全に止めることができ、生のヘッダーのデータを元に記事にマッ
+チさせたい場合には有効でしょう。
+
 Gnus はあなたに自分自身に跳ね返ってくるような可能性のある全ての機会を提
 供します。例えば、あなたの上司からくる全てのメールを含んだグループを作っ
 たとしましょう。それから、偶発的にそのグループの購読取り止めが起こったと

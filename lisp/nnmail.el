@@ -483,6 +483,11 @@ parameter.  It should return nil, `warn' or `delete'."
   :group 'nnmail
   :type 'symbol)
 
+(defcustom nnmail-mail-splitting-decodes t
+  "Whether the nnmail splitting functionality should MIME decode headers."
+  :group 'nnmail
+  :type 'boolean)
+
 ;;; Internal variables.
 
 (defvar nnmail-article-buffer " *nnmail incoming*"
@@ -1001,8 +1006,9 @@ FUNC will be called with the group name to determine the article number."
 	;; Copy the headers into the work buffer.
 	(insert-buffer-substring obuf beg end)
 	;; Decode MIME headers and charsets.
-	(mime-decode-header-in-region (point-min) (point-max)
-				      nnmail-mail-splitting-charset)
+	(when nnmail-mail-splitting-decodes
+	  (mime-decode-header-in-region (point-min) (point-max)
+					nnmail-mail-splitting-charset))
 	;; Fold continuation lines.
 	(goto-char (point-min))
 	(while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)

@@ -1,8 +1,6 @@
 ;;; nnir.el --- search mail with various search engines
 ;; Copyright (C) 1998 Kai Groﬂjohann
 
-;; $Id: nnir.el,v 1.72 2001/08/17 11:15:13 grossjoh Exp $
-
 ;; Author: Kai Groﬂjohann <grossjohann@ls6.cs.uni-dortmund.de>
 ;; Keywords: news, mail, searching, ir, glimpse, wais
 
@@ -287,7 +285,7 @@
 
 ;;; Setup Code:
 
-(defconst nnir-version "$Id: nnir.el,v 1.72 2001/08/17 11:15:13 grossjoh Exp $"
+(defconst nnir-version "1.72"
   "Version of NNIR.")
 
 (require 'cl)

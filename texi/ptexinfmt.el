@@ -3,7 +3,7 @@
 ;; Copyright (C) 1985, 1986, 1988, 1990, 1991, 1992, 1993,
 ;;               1994, 1995, 1996, 1997 Free Software Foundation, Inc.
 ;; Copyright (C) 1999 Yoshiki Hayashi <yoshiki@xemacs.org>
-;; Copyright (C) 2000, 2001 TAKAHASHI Kaoru <kaoru@kaisei.org>
+;; Copyright (C) 2000, 2001, 2002 TAKAHASHI Kaoru <kaoru@kaisei.org>
 
 ;; Author: TAKAHASHI Kaoru <kaoru@kaisei.org>
 ;;	Yoshiki Hayashi <yoshiki@xemacs.org>
@@ -47,7 +47,7 @@ This is NO-NOTICE argument in `broken-facility'.")
 (broken-facility texinfo-format-printindex
   "Can't sort on Mule for Windows."
   (if (and (memq system-type '(windows-nt ms-dos))
-;;; I don't know version threshold. 
+;;; I don't know version threshold.
 ;;;	   (string< texinfmt-version "2.37 of 24 May 1997")
 	   (boundp 'MULE) (not (featurep 'meadow))) ; Mule for Windows
       nil
@@ -158,7 +158,6 @@ This is NO-NOTICE argument in `broken-facility'.")
 
 ;; misc
 (put 'page 'texinfo-format 'texinfo-discard-line)
-(put 'hyphenation 'texinfo-format 'texinfo-discard-command-and-arg)
 
 
 
@@ -221,8 +220,12 @@ This is NO-NOTICE argument in `broken-facility'.")
 (put 'endhtml 'texinfo-format 'texinfo-discard-line)
 (defun-maybe texinfo-format-html ()
   (delete-region texinfo-command-start
-                 (progn (re-search-forward "@end html[ \t]*\n")
-                        (point))))
+		 (progn (re-search-forward "@end html[ \t]*\n")
+			(point))))
+
+;; @cartouche  ... @end cartouche
+(put 'cartouche 'texinfo-format 'texinfo-discard-line)
+(put 'cartouche 'texinfo-end 'texinfo-discard-command)
 
 
 
@@ -254,7 +257,7 @@ This is NO-NOTICE argument in `broken-facility'.")
   "Format EMAIL-ADDRESS and optional DISPLAYED-TXT.
 Insert < ... > around EMAIL-ADDRESS."
   (let ((args (texinfo-format-parse-args)))
-  (texinfo-discard-command)
+    (texinfo-discard-command)
     ;; if displayed-text
     (if (nth 1 args)
 	(insert (nth 1 args) " <" (nth 0 args) ">")
@@ -421,6 +424,21 @@ Insert < ... > around EMAIL-ADDRESS."
   (insert (texinfo-parse-arg-discard))
   (goto-char texinfo-command-start))
 
+;; @.
+(put '\. 'texinfo-format 'texinfo-format-\.)
+(defun-maybe texinfo-format-\. ()
+  (texinfo-discard-command)
+  (insert "."))
+
+;; @:
+(put '\: 'texinfo-format 'texinfo-format-\:)
+(defun-maybe texinfo-format-\: ()
+  (texinfo-discard-command))
+
+;; @-
+(put '\- 'texinfo-format 'texinfo-format-soft-hyphen)
+(defun-maybe texinfo-format-soft-hyphen ()
+  (texinfo-discard-command))
 
 
 ;;; Cross References
@@ -454,8 +472,26 @@ otherwise, insert URL-TITLE followed by URL in parentheses."
     (texinfo-discard-command)
     ;; if url-title
     (if (nth 1 args)
-        (insert  (nth 1 args) " (" (nth 0 args) ")")
+	(insert  (nth 1 args) " (" (nth 0 args) ")")
       (insert "`" (nth 0 args) "'"))))
+
+;; @inforef
+(put 'inforef 'texinfo-format 'texinfo-format-inforef)
+(defun-maybe texinfo-format-inforef ()
+  (let ((args (texinfo-format-parse-args)))
+    (texinfo-discard-command)
+    (if (nth 1 args)
+	(insert "*Note " (nth 1 args) ": (" (nth 2 args) ")" (car args))
+      (insert "*Note " "(" (nth 2 args) ")" (car args) "::"))))
+
+
+;; @anchor
+;; don't emulation
+;; If support @anchor for Mule 2.3, We must fix informat.el and info.el:
+;;  - Info-tagify suport @anthor-*-refill.
+;;  - info.el support Ref in Tag table.
+(unless (get 'anchor 'texinfo-format)
+  (put 'anchor 'texinfo-format 'texinfo-discard-command-and-arg))
 
 
 
@@ -497,6 +533,15 @@ otherwise, insert URL-TITLE followed by URL in parentheses."
     ;; verbatim for Info output
     (goto-char (+ (point) (cadr (insert-file-contents filename))))
     (message "Reading included file: %s...done" filename)))
+
+;; @hyphenation command discards an argument within braces
+(put 'hyphenation 'texinfo-format 'texinfo-discard-command-and-arg)
+(defun-maybe texinfo-discard-command-and-arg ()
+  "Discard both @-command and its argument in braces."
+  (goto-char texinfo-command-end)
+  (forward-list 1)
+  (setq texinfo-command-end (point))
+  (delete-region texinfo-command-start texinfo-command-end))
 
 
 ;; @exampleindent
@@ -561,37 +606,37 @@ otherwise, insert URL-TITLE followed by URL in parentheses."
      ((looking-at "@columnfractions")
       (forward-word 1)
       (while (not (eolp))
-        (setq texinfo-multitable-width-list
-              (cons
-               (truncate
-                (1-
-                 (* fill-column (read (get-buffer (current-buffer))))))
-               texinfo-multitable-width-list))))
+	(setq texinfo-multitable-width-list
+	      (cons
+	       (truncate
+		(1-
+		 (* fill-column (read (get-buffer (current-buffer))))))
+	       texinfo-multitable-width-list))))
      ;;
      ;; Case 2: {Column 1 template} {Column 2} {Column 3 example}
      ((looking-at "{")
       (let ((start-of-templates (point)))
-        (while (not (eolp))
-          (skip-chars-forward " \t")
-          (let* ((start-of-template (1+ (point)))
-                 (end-of-template
-                 ;; forward-sexp works with braces in Texinfo mode
-                  (progn (forward-sexp 1) (1- (point)))))
-            (setq texinfo-multitable-width-list
+	(while (not (eolp))
+	  (skip-chars-forward " \t")
+	  (let* ((start-of-template (1+ (point)))
+		 (end-of-template
+		  ;; forward-sexp works with braces in Texinfo mode
+		  (progn (forward-sexp 1) (1- (point)))))
+	    (setq texinfo-multitable-width-list
 		  (cons (- (progn (goto-char end-of-template) (current-column))
 			   (progn (goto-char start-of-template) (current-column)))
-                        texinfo-multitable-width-list))
-            ;; Remove carriage return from within a template, if any.
-            ;; This helps those those who want to use more than
-            ;; one line's worth of words in @multitable line.
-            (narrow-to-region start-of-template end-of-template)
-            (goto-char (point-min))
-            (while (search-forward "
+			texinfo-multitable-width-list))
+	    ;; Remove carriage return from within a template, if any.
+	    ;; This helps those those who want to use more than
+	    ;; one line's worth of words in @multitable line.
+	    (narrow-to-region start-of-template end-of-template)
+	    (goto-char (point-min))
+	    (while (search-forward "
 " nil t)
-              (delete-char -1))
-            (goto-char (point-max))
-            (widen)
-            (forward-char 1)))))
+	      (delete-char -1))
+	    (goto-char (point-max))
+	    (widen)
+	    (forward-char 1)))))
      ;;
      ;; Case 3: Trouble
      (t
@@ -599,18 +644,18 @@ otherwise, insert URL-TITLE followed by URL in parentheses."
        "You probably need to specify column widths for @multitable correctly")))
     ;; Check whether columns fit on page.
     (let ((desired-columns
-           (+
-            ;; between column spaces
-            (length texinfo-multitable-width-list)
-            ;; additional between column spaces, if any
-            texinfo-extra-inter-column-width
-            ;; sum of spaces for each entry
-            (apply '+ texinfo-multitable-width-list))))
+	   (+
+	    ;; between column spaces
+	    (length texinfo-multitable-width-list)
+	    ;; additional between column spaces, if any
+	    texinfo-extra-inter-column-width
+	    ;; sum of spaces for each entry
+	    (apply '+ texinfo-multitable-width-list))))
       (if (> desired-columns fill-column)
-          (error
-           (format
-            "Multi-column table width, %d chars, is greater than page width, %d chars."
-            desired-columns fill-column))))
+	  (error
+	   (format
+	    "Multi-column table width, %d chars, is greater than page width, %d chars."
+	    desired-columns fill-column))))
     texinfo-multitable-width-list))
 
 ;; @item  A1  @tab  A2  @tab  A3
@@ -620,14 +665,14 @@ End of row is beginning of next @item or beginning of @end.
 Cells within rows are separated by @tab."
   (skip-chars-forward " \t")
   (let* ((start (point))
-         (end (progn
-                (re-search-forward "@item\\|@end")
-                (match-beginning 0)))
-         (row (progn (goto-char end)
-                     (skip-chars-backward " ")
-                     ;; remove whitespace at end of argument
-                     (delete-region (point) end)
-                     (buffer-substring start (point)))))
+	 (end (progn
+		(re-search-forward "@item\\|@end")
+		(match-beginning 0)))
+	 (row (progn (goto-char end)
+		     (skip-chars-backward " ")
+		     ;; remove whitespace at end of argument
+		     (delete-region (point) end)
+		     (buffer-substring start (point)))))
     (delete-region texinfo-command-start end)
     row))
 
@@ -642,15 +687,15 @@ Widths of cells are specified by the arguments in the @multitable line.
 All cells are made to be the same height.
 This command is executed when texinfmt sees @item inside @multitable."
   (let ((original-buffer (current-buffer))
-        (table-widths (reverse (car (cdr (car texinfo-stack)))))
-        (existing-fill-column fill-column)
-        start
-        end
-        (table-column       0)
-        (table-entry-height 0)
-        ;; unformatted row looks like:  A1  @tab  A2  @tab  A3
-        ;; extract-row command deletes the source line in the table.
-        (unformated-row (texinfo-multitable-extract-row)))
+	(table-widths (reverse (car (cdr (car texinfo-stack)))))
+	(existing-fill-column fill-column)
+	start
+	end
+	(table-column       0)
+	(table-entry-height 0)
+	;; unformatted row looks like:  A1  @tab  A2  @tab  A3
+	;; extract-row command deletes the source line in the table.
+	(unformated-row (texinfo-multitable-extract-row)))
     ;; Use a temporary buffer
     (set-buffer (get-buffer-create texinfo-multitable-buffer-name))
     (delete-region (point-min) (point-max))
@@ -659,9 +704,9 @@ This command is executed when texinfmt sees @item inside @multitable."
 ;; 1. Check for correct number of @tab in line.
     (let ((tab-number 1))                       ; one @tab between two columns
       (while (search-forward "@tab" nil t)
-        (setq tab-number (1+ tab-number)))
+	(setq tab-number (1+ tab-number)))
       (if (/= tab-number (length table-widths))
-          (error "Wrong number of @tab's in a @multitable row")))
+	  (error "Wrong number of @tab's in a @multitable row")))
     (goto-char (point-min))
 ;; 2. Format each cell, and copy to a rectangle
     ;; buffer looks like this:    A1  @tab  A2  @tab  A3
@@ -671,16 +716,16 @@ This command is executed when texinfmt sees @item inside @multitable."
     (while (not (eobp))
       (setq start (point))
       (setq end (save-excursion
-                  (if (search-forward "@tab" nil 'move)
-                      ;; Delete the @tab command, including the @-sign
-                      (delete-region
-                       (point)
-                       (progn (forward-word -1) (1- (point)))))
-                  (point)))
+		  (if (search-forward "@tab" nil 'move)
+		      ;; Delete the @tab command, including the @-sign
+		      (delete-region
+		       (point)
+		       (progn (forward-word -1) (1- (point)))))
+		  (point)))
       ;; Set fill-column *wider* than needed to produce inter-column space
       (setq fill-column (+ 1
-                           texinfo-extra-inter-column-width
-                           (nth table-column table-widths)))
+			   texinfo-extra-inter-column-width
+			   (nth table-column table-widths)))
       (narrow-to-region start end)
       ;; Remove whitespace before and after entry.
       (skip-chars-forward " ")
@@ -691,52 +736,52 @@ This command is executed when texinfmt sees @item inside @multitable."
       ;; Temorarily set texinfo-stack to nil so texinfo-format-scan
       ;; does not see an unterminated @multitable.
       (let (texinfo-stack)                      ; nil
-        (texinfo-format-scan))
+	(texinfo-format-scan))
       (let (fill-prefix)                        ; no fill prefix
-        (fill-region (point-min) (point-max)))
+	(fill-region (point-min) (point-max)))
       (setq table-entry-height
-            (max table-entry-height (count-lines (point-min) (point-max))))
+	    (max table-entry-height (count-lines (point-min) (point-max))))
 ;; 3. Move point to end of bottom line, and pad that line to fill column.
       (goto-char (point-min))
       (forward-line (1- table-entry-height))
       (let* ((beg (point))                      ; beginning of line
-             ;; add one more space for inter-column spacing
-             (needed-whitespace
-              (1+
+	     ;; add one more space for inter-column spacing
+	     (needed-whitespace
+	      (1+
 	       (- fill-column
 		  (progn (end-of-line) (current-column)))))) ; end of existing line
-        (insert (make-string
-                 (if (> needed-whitespace 0) needed-whitespace 1)
-                 ? )))
+	(insert (make-string
+		 (if (> needed-whitespace 0) needed-whitespace 1)
+		 ? )))
       ;; now, put formatted cell into a rectangle
       (set (intern (concat texinfo-multitable-rectangle-name
-                           (int-to-string table-column)))
-           (extract-rectangle (point-min) (point)))
+			   (int-to-string table-column)))
+	   (extract-rectangle (point-min) (point)))
       (delete-region (point-min) (point))
       (goto-char (point-max))
       (setq table-column (1+ table-column))
       (widen))
 ;; 4. Add extra lines to rectangles so all are of same height
     (let ((total-number-of-columns table-column)
-          (column-number 0)
-          here)
+	  (column-number 0)
+	  here)
       (while (> table-column 0)
-        (let ((this-rectangle (int-to-string table-column)))
-          (while (< (length this-rectangle) table-entry-height)
-            (setq this-rectangle (append this-rectangle '("")))))
-        (setq table-column (1- table-column)))
+	(let ((this-rectangle (int-to-string table-column)))
+	  (while (< (length this-rectangle) table-entry-height)
+	    (setq this-rectangle (append this-rectangle '("")))))
+	(setq table-column (1- table-column)))
 ;; 5. Insert formatted rectangles in original buffer
       (switch-to-buffer original-buffer)
       (open-line table-entry-height)
       (while (< column-number total-number-of-columns)
-        (setq here (point))
-        (insert-rectangle
-         (eval (intern
-                (concat texinfo-multitable-rectangle-name
-                        (int-to-string column-number)))))
-        (goto-char here)
-        (end-of-line)
-        (setq column-number (1+ column-number))))
+	(setq here (point))
+	(insert-rectangle
+	 (eval (intern
+		(concat texinfo-multitable-rectangle-name
+			(int-to-string column-number)))))
+	(goto-char here)
+	(end-of-line)
+	(setq column-number (1+ column-number))))
     (kill-buffer texinfo-multitable-buffer-name)
     (setq fill-column existing-fill-column)))
 
@@ -746,15 +791,15 @@ This command is executed when texinfmt sees @item inside @multitable."
 
 (defun-maybe texinfo-format-printindex ()
   (let ((indexelts (symbol-value
-                    (cdr (assoc (texinfo-parse-arg-discard)
-                                texinfo-indexvar-alist))))
-        opoint)
+		    (cdr (assoc (texinfo-parse-arg-discard)
+				texinfo-indexvar-alist))))
+	opoint)
     (insert "\n* Menu:\n\n")
     (setq opoint (point))
     (texinfo-print-index nil indexelts)
 
     (if (memq system-type '(vax-vms windows-nt ms-dos))
-        (texinfo-sort-region opoint (point))
+	(texinfo-sort-region opoint (point))
       (shell-command-on-region opoint (point) "sort -fd" 1))))
 
 (provide 'ptexinfmt)
