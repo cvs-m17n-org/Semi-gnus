@@ -253,6 +253,8 @@ regexp.  If it matches, the text in question is not a signature."
 ;; non-graphical frames in a session.
 (defcustom gnus-article-x-face-command
   (cond
+   (noninteractive
+    'ignore)
    ((featurep 'xemacs)
     (if (or (gnus-image-type-available-p 'xface)
 	    (gnus-image-type-available-p 'pbm))
@@ -1225,12 +1227,14 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
   :group 'gnus-article-various
   :type 'boolean
   :get (lambda (symbol)
-	 (and (default-value symbol)
+	 (and (not noninteractive)
+	      (default-value symbol)
 	      (not (featurep 'xemacs))
 	      (module-installed-p 'smiley-mule)
 	      t))
   :set (lambda (symbol value)
-	 (set-default symbol (and value
+	 (set-default symbol (and (not noninteractive)
+				  value
 				  (not (featurep 'xemacs))
 				  (module-installed-p 'smiley-mule)
 				  t))))
@@ -1241,6 +1245,9 @@ smiley functions are not overridden by `smiley').")
 
 (defcustom gnus-treat-display-face
   (and (not noninteractive)
+       ;; x-face-e21 handles both X-Face and Face headers.
+       (not (and (eq gnus-article-x-face-command 'x-face-decode-message-header)
+		 (module-installed-p 'x-face-e21)))
        (or (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'png))
 	   (and (featurep 'xemacs)
@@ -1258,13 +1265,14 @@ See Info node `(gnus)Customizing Articles' and Info node
 (put 'gnus-treat-display-face 'highlight t)
 
 (defcustom gnus-treat-display-smileys
-  (if (or (and (featurep 'xemacs)
-	       (featurep 'xpm))
-	  (gnus-image-type-available-p 'xpm)
-	  (gnus-image-type-available-p 'pbm)
-	  (and (not (featurep 'xemacs))
-	       window-system
-	       (module-installed-p 'smiley-mule)))
+  (if (and (not noninteractive)
+	   (or (and (featurep 'xemacs)
+		    (featurep 'xpm))
+	       (gnus-image-type-available-p 'xpm)
+	       (gnus-image-type-available-p 'pbm)
+	       (and (not (featurep 'xemacs))
+		    window-system
+		    (module-installed-p 'smiley-mule))))
       t
     nil)
   "Display smileys.

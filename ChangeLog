@@ -1,5 +1,14 @@
 2003-03-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (gnus-article-x-face-command): Don't examine
+	functions if `noninteractive'.
+	(gnus-article-should-use-smiley-mule): Don't examine values if
+	`noninteractive'.
+	(gnus-treat-display-face): Default to nil if x-face-e21 is
+	available.
+	(gnus-treat-display-smileys): Don't examine values if
+	`noninteractive'.
+
 	* lisp/message.el (message-yank-original): Check not only the
 	References field but the `message-reply-headers' variable.
 
