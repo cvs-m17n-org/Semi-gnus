@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
@@ -97,6 +97,9 @@
   "*POP3 authentication scheme.
 Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
 values are 'apop.")
+
+(defvar pop3-leave-mail-on-server nil
+  "*Non-nil if the mail is to be left on the POP server after fetching.")
 
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.

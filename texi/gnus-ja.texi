@@ -12879,6 +12879,8 @@ fetchmail %u@@%s -P %p %t
 
 @code{:program} と @code{:function} キーワードが指定されていないと、
 @code{pop3-movemail} が使用されます。
+@code{pop3-leave-mail-on-server} が非-@code{nil} だったら、メールは取得
+後でも POP サーバーに残されます。
 
 これはいくつかの例です。初期利用者名で、初期 @acronym{POP} サーバーから
 取得し、初期取得方法を使用します:
