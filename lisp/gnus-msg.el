@@ -977,6 +977,8 @@ If YANK is non-nil, include the original article."
     (insert (with-temp-buffer
 	      (gnus-debug)
 	      (buffer-string)))
+    (let (mime-content-types)
+      (mime-edit-insert-tag "text" "plain"))
     (goto-char (point-min))
     (search-forward "Subject: " nil t)
     (message "")))
@@ -1045,9 +1047,7 @@ The source file has to be in the Emacs load path."
 	    (goto-char (point-min))
 	    (while (setq expr (ignore-errors (read (current-buffer))))
 	      (ignore-errors
-		(and (or (eq (car expr) 'defvar)
-			 (eq (car expr) 'defcustom)
-			 (eq (car expr) 'defvoo))
+		(and (memq (car expr) '(defvar defcustom defvoo))
 		     (stringp (nth 3 expr))
 		     (or (not (boundp (nth 1 expr)))
 			 (not (equal (eval (nth 2 expr))
@@ -1055,7 +1055,7 @@ The source file has to be in the Emacs load path."
 		     (push (nth 1 expr) olist)))))))
       (kill-buffer (current-buffer)))
     (when (setq olist (nreverse olist))
-      (insert "------------------ Environment follows ------------------\n\n"))
+      (insert ";----------------- Environment follows ------------------\n\n"))
     (while olist
       (if (boundp (car olist))
 	  (condition-case ()
@@ -1071,13 +1071,17 @@ The source file has to be in the Emacs load path."
 	     (format "(setq %s 'whatever)\n" (car olist))))
 	(insert ";; (makeunbound '" (symbol-name (car olist)) ")\n"))
       (setq olist (cdr olist)))
-    (insert "\n\n")
     ;; Remove any control chars - they seem to cause trouble for some
     ;; mailers.  (Byte-compiled output from the stuff above.)
     (goto-char point)
     (while (re-search-forward "[\000-\010\013-\037\200-\237]" nil t)
       (replace-match (format "\\%03o" (string-to-char (match-string 0)))
-		     t t))))
+		     t t))
+    ;; Break MIME tags purposely.
+    (goto-char point)
+    (while (re-search-forward mime-edit-tag-regexp nil t)
+      (goto-char (1+ (match-beginning 0)))
+      (insert "X"))))
 
 ;;; Treatment of rejected articles.
 ;;; Bounced mail.
