@@ -4142,6 +4142,34 @@ Gnus $B$O(B FAQ $B$r(B@code{gnus-group-faq-directory} $B$+$i<hF@$7$h$&$H$7$
 gnus $B$O(B @code{gnus-group-faq-directory} $B$NCM$rA4$F!"0l$D0l$D%*!<%W%s$7$F(B
 $B$_$h$&$H$7$^$9!#(B
 
+@item H c
+@kindex H c (Group)
+@findex gnus-group-fetch-charter
+@vindex gnus-group-charter-alist
+@cindex charter
+$B8=:_$N%0%k!<%W$N7{>O$r(B web $B%V%i%&%6$G3+$3$&$H$7$^(B
+$B$9(B (@code{gnus-group-fetch-charter})$B!#(B
+gnus $B$O(B @code{gnus-group-charter-alist} $B$r;H$C$F7{>O$N=j:_$rC5$7$^$9!#=j(B
+$B:_$,$o$+$i$J$+$C$?$i!"(Bgnus $B$O$=$N%0%k!<%W$N%3%s%H%m!<%k%a%C%;!<%8$r<hF@(B
+$B$7$^$9!#$=$l$K$O7{>O$r4^$s$G$$$k$3$H$,$"$j$^$9$+$i!#(B
+
+@item H C
+@kindex H C (Group)
+@findex gnus-group-fetch-control
+@vindex gnus-group-fetch-control-use-browse-url
+@cindex control message
+$B$=$N%0%k!<%W$N%3%s%H%m!<%k%a%C%;!<%8$r(B @code{ftp.isc.org} $B$N5-O?8K$+$i<h(B
+$BF@$7$^$9(B (@code{gnus-group-fetch-control})$B!#(B
+
+@code{gnus-group-fetch-control-use-browse-url} $B$,Hs(B-@code{nil} $B$@$C$?$i!"(B
+gnus $B$O(B @code{browse-url} $B$r;H$C$F%3%s%H%m!<%k%a%C%;!<%8$r3+$-$^$9!#$=$&(B
+$B$G$J$$>l9g$O(B @code{ange-ftp} $B$r;H$C$F<hF@$5$l!"0l;~%0%k!<%W(B $B$KI=<($5$l$^(B
+$B$9!#(B
+
+$B%3%s%H%m!<%k%a%C%;!<%8$O05=L$5$l$F$$$k$3$H$KCm0U$7$F2<$5$$!#$3$N%3%^%s%I(B
+$B$r;H$&$K$O(B @code{auto-compression-mode} $B$r(B on $B$K$7$F$*$/I,MW$,$"$j$^(B
+$B$9(B (@pxref{(emacs)Compressed Files})$B!#(B
+
 @item H d
 @itemx C-c C-d
 @c @icon{gnus-group-describe-group}
