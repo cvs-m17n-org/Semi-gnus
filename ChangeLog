@@ -1,3 +1,10 @@
+1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-check-buffer): Check a major-mode
+	in `gnus-original-article-buffer' as well.
+	(gnus-article-prepare-display): Set `gnus-article-current-summary'
+	to `gnus-summary-buffer'.
+
 1998-12-21  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el (pop3-fma-movemail): Work with movemail.exe
