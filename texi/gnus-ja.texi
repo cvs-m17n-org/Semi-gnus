@@ -11507,13 +11507,14 @@ OpenSSL (@uref{http://www.openssl.org}) か SSLeay
 からサーバーを次のように定義します:
 
 @lisp
-;; Type `C-c C-c' after you've finished editing.
+;; 編集し終わったら `C-c C-c' をタイプして下さい。
 ;;
-;; "snews" is port 563 and is predefined in our /etc/services
+;; ポート 563 が "snews" として /etc/services で定義済みであっても
+;; openssl s_client -port でその名前は使えません。
 ;;
 (nntp "snews.bar.com"
       (nntp-open-connection-function nntp-open-ssl-stream)
-      (nntp-port-number "snews")
+      (nntp-port-number 563)
       (nntp-address "snews.bar.com"))
 @end lisp
 
@@ -11640,7 +11641,9 @@ Emacs のセッション全体をラップして、ディフォルトのメソッドを使うというの
 @item nntp-port-number
 @vindex nntp-port-number
 接続する @sc{nntp} サーバーのポート番号です。ディフォルト
-は @samp{nntp} です。
+は @samp{nntp} です。@sc{ssl} を介した @sc{nntp} を使うには、ポートの名
+前ではなくて整数 (つまり @samp{snews} ではなくて @samp{563}) を指定して
+下さい。外部の SSL ツールはポートの名前では動作しないからです。
 
 @item nntp-end-of-line
 @vindex nntp-end-of-line
