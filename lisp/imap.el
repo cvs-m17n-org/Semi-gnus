@@ -132,17 +132,19 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
 (eval-and-compile
-  (require 'cl)
   (autoload 'open-ssl-stream "ssl")
-  (autoload 'base64-decode-string "base64")
+  (autoload 'base64-decode-string "mel")
   (autoload 'base64-encode-string "mel")
   (autoload 'rfc2104-hash "rfc2104")
-  (autoload 'md5 "md5")
   (autoload 'utf7-encode "utf7")
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec"))
+
+(autoload 'md5 "md5")
 
 ;; User variables.
 
@@ -312,7 +314,7 @@ string).")
   "Non-nil indicates that the server emitted a continuation request. The
 actually value is really the text on the continuation line.")
 
-(defvar imap-log "*imap-log*"
+(defvar imap-log nil
   "Imap session trace.")
 
 (defvar imap-debug nil;"*imap-debug*"
@@ -542,7 +544,12 @@ successful, nil otherwise."
 	"AUTHENTICATE CRAM-MD5"
 	(lambda (challenge)
 	  (let* ((decoded (base64-decode-string challenge))
-		 (hash (rfc2104-hash 'md5 64 16 passwd decoded))
+		 (hash-function (if (and (featurep 'xemacs)
+					 (>= (function-max-args 'md5) 4))
+				    (lambda (object &optional start end)
+				      (md5 object start end 'binary))
+				  'md5))
+		 (hash (rfc2104-hash hash-function 64 16 passwd decoded))
 		 (response (concat user " " hash))
 		 (encoded (base64-encode-string response)))
 	    encoded))))))))
