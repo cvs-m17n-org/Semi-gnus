@@ -174,35 +174,35 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 	       (substring inbox (match-end (string-match "^po:" inbox))
 			  (- (match-end (string-match "^.*@" inbox)) 1)))
 	      (pop3-mailhost
-	       (substring inbox (match-end (string-match "^.*@" inbox)))))
-	  (let ((pop3-password
-		 (pop3-fma-read-passwd pop3-mailhost)))
-	    (let ((pop3-authentication-scheme
-		   (nth 1 (assoc inbox pop3-fma-spool-file-alist))))
-	      (if (eq pop3-authentication-scheme 'pass)
-		  (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)
-		(message "Checking new mail user %s at %s using APOP ..." pop3-maildrop pop3-mailhost)
-		(setq pop3-fma-movemail-type 'lisp))
-	      (if (and (eq system-type 'windows-nt)
-		       (eq pop3-fma-movemail-type 'exe))
-		  (progn
-		    (setenv "MAILHOST" pop3-mailhost)
-		    (if (and (not (memq pop3-password pop3-fma-movemail-arguments))
-			     (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
-			(progn
-			  (setq pop3-fma-movemail-arguments nil)
-			  (setq pop3-fma-movemail-arguments
-				(append pop3-fma-movemail-options
-					(list
-					 (concat "po:" pop3-maildrop)
-					 crashbox
-					 pop3-password)))))
-		    (apply 'call-process (concat
-					  exec-directory
-					  pop3-fma-movemail-program)
-			   nil nil nil
-			   pop3-fma-movemail-arguments))
-		(pop3-movemail crashbox))))))
+	       (substring inbox (match-end (string-match "^.*@" inbox))))
+	      (pop3-password
+	       (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox)))))
+	      (pop3-authentication-scheme
+	       (nth 1 (assoc inbox pop3-fma-spool-file-alist)))
+	      (pop3-fma-movemail-type (pop3-fma-get-movemail-type inbox)))
+	  (if (eq pop3-authentication-scheme 'pass)
+	      (message "Checking new mail user %s at %s using USER/PASS ..." pop3-maildrop pop3-mailhost)
+	    (message "Checking new mail user %s at %s using APOP ..." pop3-maildrop pop3-mailhost))
+	  (if (and (eq system-type 'windows-nt)
+		   (eq pop3-fma-movemail-type 'exe))
+	      (progn
+		(setenv "MAILHOST" pop3-mailhost)
+		(if (and (not (memq pop3-password pop3-fma-movemail-arguments))
+			 (not (memq (concat "po:" pop3-maildrop) pop3-fma-movemail-arguments)))
+		    (progn
+		      (setq pop3-fma-movemail-arguments nil)
+		      (setq pop3-fma-movemail-arguments
+			    (append pop3-fma-movemail-options
+				    (list
+				     (concat "po:" pop3-maildrop)
+				     crashbox
+				     pop3-password)))))
+		(apply 'call-process (concat
+				      exec-directory
+				      pop3-fma-movemail-program)
+		       nil nil nil
+		       pop3-fma-movemail-arguments))
+	    (pop3-movemail crashbox))))
     (message "Checking new mail at %s ... " inbox)
     (call-process (concat exec-directory pop3-fma-movemail-program)
 		  nil
@@ -303,7 +303,6 @@ Argument PROMPT ."
   
 ;;
 ;; Add your custom header.
-;;
 (defun pop3-fma-add-custom-header (header string)
   (let ((delimline
 	 (progn (goto-char (point-min))
@@ -320,6 +319,12 @@ Argument PROMPT ."
 	  (setq str (concat hdr string))
 	  (setq hdr (concat str "\n"))
 	  (insert-string hdr)))))
+;;
+;;
+(defun pop3-fma-get-movemail-type (inbox)
+  (if (eq (nth 1 (assoc inbox pop3-fma-spool-file-alist)) 'apop)
+      lisp
+    pop3-fma-movemail-type))
 ;;
 (provide 'pop3-fma)
 ;;

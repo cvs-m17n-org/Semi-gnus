@@ -3246,8 +3246,8 @@ fast, and too simplistic solution;
 @code{mail-extract-address-components}, which works nicely, but is
 slower; and @code{std11-extract-address-components}, which works very
 nicely, but is slower.  The default function will return the wrong
-answer in 5% of the cases.  If this is unacceptable to you, use one of
-the other functions instead.
+answer in 5% of the cases.  If this is unacceptable to you, use the
+other function instead.
 
 @vindex gnus-summary-same-subject
 @code{gnus-summary-same-subject} is a string indicating that the current
@@ -3858,7 +3858,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung mu(I_(B sein!
+@code{postmaster}.  Ordnung mu,A_(B sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -7972,7 +7972,7 @@ Scroll backwards one page (@code{gnus-article-prev-page}).
 @kindex C-c ^ (Article)
 @findex gnus-article-refer-article
 If point is in the neighborhood of a @code{Message-ID} and you press
-@kbd{C-c ^}, gnus will try to get that article from the server
+@kbd{C-c ^}, Gnus will try to get that article from the server
 (@code{gnus-article-refer-article}).
 
 @item C-c C-m
@@ -11045,7 +11045,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'$BsU(Bre} is to
+providers if they were to do this---their @emph{raison d',Aj(Btre} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -12070,7 +12070,7 @@ Score on the body.
 Score on the head.
 
 @item t
-Score on thead.
+Score on thread.
 
 @end table
 
@@ -13457,7 +13457,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx (I,(B
+@itemx ,A,(B
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -15748,7 +15748,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-Fran$BmP(Bis Pinard---many, many interesting and thorough bug reports, as
+Fran,Ag(Bois Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -15761,7 +15761,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K$BiH(Bedal,
+David K,Ae(Bgedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -15832,7 +15832,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-Fran$BmP(Bis Felix Ingrand,
+Fran,Ag(Bois Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -17251,8 +17251,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at n$BiS(B du bruker `gnus-startup-file' som prefix (FOO) til íÈÅlete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v$BkS(Be en
+ tanken var at n,Ae(Br du bruker `gnus-startup-file' som prefix (FOO) til ilete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v,Af(Bre en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17325,8 +17325,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde v$BkS(Be en m$BiU(Be íÈÅsi slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  SíÈÅkunne score-regler legges til den
+Ja, det burde v,Af(Bre en m,Ae(Bte ,Ae(B si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  S,Ae(B kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -17656,7 +17656,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt íÈÅslette den dersom teksten matcher
+Selv ville jeg nok ha valgt islette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
