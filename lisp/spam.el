@@ -548,12 +548,12 @@ spamoracle database."
 (defun spam-mark-spam-as-expired-and-move-routine (&rest groups)
   (gnus-summary-kill-process-mark)
   (let ((articles gnus-newsgroup-articles)
-	article tomove)
+	article tomove todelete)
     (dolist (article articles)
       (when (eq (gnus-summary-article-mark article) gnus-spam-mark)
 	(gnus-summary-mark-article article gnus-expirable-mark)
 	(push article tomove)))
-
+    
     ;; now do the actual copies
     (dolist (group groups)
       (when (and tomove
@@ -561,20 +561,22 @@ spamoracle database."
 	(dolist (article tomove)
 	  (gnus-summary-set-process-mark article))
 	(when tomove
-	  (gnus-summary-copy-article nil group))))
-
-    ;; now delete the articles
-    (dolist (article tomove)
-      (gnus-summary-set-process-mark article))
-    (when tomove
-      (gnus-summary-delete-article nil)))
-
-  (gnus-summary-yank-process-mark))
+	  (gnus-summary-copy-article nil group)
+	  (setq todelete t))))
+    
+    ;; now delete the articles, if there was a copy done
+    (when todelete
+      (dolist (article tomove)
+	(gnus-summary-set-process-mark article))
+      (when tomove
+	(gnus-summary-delete-article nil)))
+    
+    (gnus-summary-yank-process-mark)))
  
 (defun spam-ham-copy-or-move-routine (copy groups)
   (gnus-summary-kill-process-mark)
   (let ((articles gnus-newsgroup-articles)
-	article mark todo)
+	article mark todo todelete)
     (dolist (article articles)
       (when (spam-group-ham-mark-p gnus-newsgroup-name
 				   (gnus-summary-article-mark article))
@@ -582,19 +584,21 @@ spamoracle database."
 
     ;; now do the actual move
     (dolist (group groups)
-      (when todo
+      (when (and todo (stringp group))
 	(dolist (article todo)
 	  (when spam-mark-ham-unread-before-move-from-spam-group
 	    (gnus-summary-mark-article article gnus-unread-mark))
 	  (gnus-summary-set-process-mark article))
-	(gnus-summary-copy-article nil group)))
+	(gnus-summary-copy-article nil group)
+	(setq todelete t)))
   
-    ;; now delete the articles, unless copy is t
+    ;; now delete the articles, unless copy is t, and when there was a copy done
     (unless copy
-      (dolist (article todo)
-	(gnus-summary-set-process-mark article))
-      (when todo
-	(gnus-summary-delete-article nil))))
+      (when todelete
+	(dolist (article todo)
+	  (gnus-summary-set-process-mark article))
+	(when todo
+	  (gnus-summary-delete-article nil)))))
   
   (gnus-summary-yank-process-mark))
  
