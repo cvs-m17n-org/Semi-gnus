@@ -1,3 +1,15 @@
+2000-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Makefile.in (info-ja, xinfo-ja): No need to use `MAKEINFO=no'.
+	(install-info-ja, install-info, install-lisp, install-ja): New
+	targets (possibly for FSF Emacsen).
+
+	* texi/Makefile.in (install-ja-info, install-info, install-ja,
+	%-ja.info, %-ja): New targets.
+
+	* texi/message-ja.texi (direntry): Replace "message" with
+	"message-ja".
+
 2000-10-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-type-definition): Fix regular

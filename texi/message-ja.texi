@@ -7,7 +7,7 @@
 @synindex pg cp
 @dircategory Editors
 @direntry
-* Message: (message).   Mail and news composition mode that goes with Gnus.
+* Message-ja: (message-ja).   Mail and news composition mode that goes with Gnus (日本語版).
 @end direntry
 @iftex
 @finalout

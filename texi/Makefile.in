@@ -41,6 +41,14 @@ message-ja.info: message-ja.texi
 
 most: texi2latex.elc latex latexps
 
+%-ja: %-ja.texi
+	cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
+	  $(EMACSINFOHACK) $(INFOSWI) ../texi/$<; \
+
+%-ja.info: %-ja.texi
+	cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
+	  $(EMACSINFOHACK)  $(XINFOSWI) ../texi/$<; \
+
 %.info: %.texi
 	if test $(MAKEINFO) = no; then \
 	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
