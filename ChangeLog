@@ -1,3 +1,29 @@
+1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* texi/gnus-ja.texi: Fix latin chars.
+	* texi/gnus.texi: Ditto.
+
+	* texi/ChangeLog: Shrunk.
+
+	* text/widget.texi: Removed.
+	* texi/custom.texi: Removed.
+
+	* lisp/ChangeLog: Fix latin chars.
+
+	* lisp/pop3.el (pop3-open-server): Use
+	`open-network-stream-as-binary' instead of `open-network-stream'.
+	* lisp/nntp.el (nntp-open-network-stream): Ditto.
+	* lisp/gnus-gl.el (bbb-connect-to-bbbd): Ditto.
+
+	* lisp/nntp.el (nntp-open-rlogin): Enclose `start-process' with
+	`as-binary-process'.
+	(nntp-open-telnet): Ditto.
+
+	* lisp/nntp.el (nntp-coding-system-for-write): Abolished.
+	(nntp-coding-system-for-read): Abolished.
+
+	* lisp/nndb.el: Don't require `tcp'.
+
 1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-get-parameter-with-eval): Call
@@ -13,9 +39,9 @@
 
 	* lisp/message.el (message-cite-original-without-signature): Do
 	not use mml-quote-region.
-	
+
 	* lisp/message.el (message-cite-original): Ditto.
-	
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.049.
 
 	* Sync up with Pterodactyl Gnus 0.64.
