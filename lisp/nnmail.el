@@ -1039,11 +1039,11 @@ Return the number of characters in the body."
 (defun nnmail-remove-list-identifiers ()
   "Remove list identifiers from Subject headers."
   (let ((regexp (if (stringp nnmail-list-identifiers) nnmail-list-identifiers
-		  (mapconcat 'identity nnmail-list-identifiers "\\|"))))
+		  (mapconcat 'identity nnmail-list-identifiers " *\\|"))))
     (when regexp
       (goto-char (point-min))
       (when (re-search-forward
-	     (concat "^Subject: +\\(Re: +\\)?\\(" regexp "\\) *")
+	     (concat "^Subject: +\\(Re: +\\)?\\(" regexp " *\\)")
 	     nil t)
 	(delete-region (match-beginning 2) (match-end 0))))))
 
@@ -1447,7 +1447,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	    (incf total new)
 	    (incf i))))
       ;; If we did indeed read any incoming spools, we save all info.
-      (unless (zerop total)
+      (if (zerop total)
+	  (nnheader-message 4 "%s: Reading incoming mail (no new mail)...done"
+			    method (car source))
 	(nnmail-save-active
 	 (nnmail-get-value "%s-group-alist" method)
 	 (nnmail-get-value "%s-active-file" method))

@@ -8195,37 +8195,39 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 $B0J2<$N07$$$N%*%W%7%g%s$,;HMQ2DG=$G$9!#$3$l$r%+%9%?%^%$%:$9$k$?$a$N:G$b4J(B
 $BC1$JJ}K!$O(B @code{gnus-article-treat} $B%+%9%?%^%$%:%0%k!<%W$rD4::$9$k$3$H(B
-$B$G$9!#(B
+$B$G$9!#(BValues in brackets are suggested sensible values. Others are possible
+but those listed are probably sufficient for most people.
 
 @table @code
-@item gnus-treat-buttonize
-@item gnus-treat-buttonize-head
-@item gnus-treat-emphasize
-@item gnus-treat-fill-article
-@item gnus-treat-strip-cr
-@item gnus-treat-hide-headers
-@item gnus-treat-hide-boring-headers
-@item gnus-treat-hide-signature
-@item gnus-treat-hide-citation
-@item gnus-treat-strip-pgp
-@item gnus-treat-strip-pem
-@item gnus-treat-highlight-headers
-@item gnus-treat-highlight-citation
-@item gnus-treat-highlight-signature
-@item gnus-treat-date-ut
-@item gnus-treat-date-local
-@item gnus-treat-date-lapsed
-@item gnus-treat-date-original
-@item gnus-treat-strip-headers-in-body
-@item gnus-treat-strip-trailing-blank-lines
-@item gnus-treat-strip-leading-blank-lines
-@item gnus-treat-strip-multiple-blank-lines
-@item gnus-treat-overstrike
-@item gnus-treat-display-xface
-@item gnus-treat-display-smileys
-@item gnus-treat-display-picons
-@item gnus-treat-capitalize-sentences
-@item gnus-treat-fill-long-lines
+@item gnus-treat-highlight-signature (t, last)
+@item gnus-treat-buttonize (t, integer)
+@item gnus-treat-buttonize-head (head)
+@item gnus-treat-emphasize (t, head, integer)
+@item gnus-treat-fill-article (t, integer)
+@item gnus-treat-strip-cr (t, integer)
+@item gnus-treat-hide-headers (head)
+@item gnus-treat-hide-boring-headers (head)
+@item gnus-treat-hide-signature (t, last)
+@item gnus-treat-hide-citation (t, integer)
+@item gnus-treat-strip-pgp (t, last, integer)
+@item gnus-treat-strip-pem (t, last, integer)
+@item gnus-treat-highlight-headers (head)
+@item gnus-treat-highlight-citation (t, integer)
+@item gnus-treat-highlight-signature (t, last, integer)
+@item gnus-treat-date-ut (head)
+@item gnus-treat-date-local (head)
+@item gnus-treat-date-lapsed (head)
+@item gnus-treat-date-original (head)
+@item gnus-treat-strip-headers-in-body (t, integer)
+@item gnus-treat-strip-trailing-blank-lines (t, last, integer)
+@item gnus-treat-strip-leading-blank-lines (t, integer)
+@item gnus-treat-strip-multiple-blank-lines (t, integer)
+@item gnus-treat-overstrike (t, integer)
+@item gnus-treat-display-xface (head)
+@item gnus-treat-display-smileys (t, integer)
+@item gnus-treat-display-picons (head)
+@item gnus-treat-capitalize-sentences (t, integer)
+@item gnus-treat-fill-long-lines (t, integer)
 @item gnus-treat-play-sounds
 @item gnus-treat-translate
 @item gnus-treat-decode-article-as-default-mime-charset
