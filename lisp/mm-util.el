@@ -72,6 +72,16 @@
      (string-make-unibyte . identity)
      (string-as-multibyte . identity)
      (multibyte-string-p . ignore)
+     ;; It is not a MIME function, but some MIME functions use it.
+     (make-temp-file . (lambda (prefix &optional dir-flag)
+			 (let ((file (expand-file-name
+				      (make-temp-name prefix)
+				      (if (fboundp 'temp-directory)
+					  (temp-directory)
+					temporary-file-directory))))
+			   (if dir-flag
+			       (make-directory file))
+			   file)))
      (insert-byte . insert-char)
      (multibyte-char-to-unibyte . identity))))
 
@@ -82,6 +92,14 @@
      ((fboundp 'char-valid-p) 'char-valid-p)
      (t 'identity))))
 
+;; Fixme:  This seems always to be used to read a MIME charset, so it
+;; should be re-named and fixed (in Emacs) to offer completion only on
+;; proper charset names (base coding systems which have a
+;; mime-charset defined).  XEmacs doesn't believe in mime-charset;
+;; test with
+;;   `(or (coding-system-get 'iso-8859-1 'mime-charset)
+;;        (coding-system-get 'iso-8859-1 :mime-charset))'
+;; Actually, there should be an `mm-coding-system-mime-charset'.
 (eval-and-compile
   (defalias 'mm-read-coding-system
     (cond
@@ -103,10 +121,15 @@
   (or mm-coding-system-list
       (setq mm-coding-system-list (mm-coding-system-list))))
 
-(defun mm-coding-system-p (sym)
-  "Return non-nil if SYM is a coding system."
-  (or (and (fboundp 'coding-system-p) (coding-system-p sym))
-      (memq sym (mm-get-coding-system-list))))
+(defun mm-coding-system-p (cs)
+  "Return non-nil if CS is a symbol naming a coding system.
+In XEmacs, also return non-nil if CS is a coding system object."
+  (if (fboundp 'find-coding-system)
+      (find-coding-system cs)
+    (if (fboundp 'coding-system-p)
+	(coding-system-p cs)
+      ;; Is this branch ever actually useful?
+      (memq cs (mm-get-coding-system-list)))))
 
 (defvar mm-charset-synonym-alist
   `(
@@ -119,8 +142,8 @@
     ;; Apparently not defined in Emacs 20, but is a valid MIME name.
     ,@(unless (mm-coding-system-p 'gb2312)
        '((gb2312 . cn-gb-2312)))
-    ;; ISO-8859-15 is very similar to ISO-8859-1.
-    ,@(unless (mm-coding-system-p 'iso-8859-15) ; Emacs 21 defines it.
+    ;; ISO-8859-15 is very similar to ISO-8859-1.  But it's _different_!
+    ,@(unless (mm-coding-system-p 'iso-8859-15)
        '((iso-8859-15 . iso-8859-1)))
     ;; Windows-1252 is actually a superset of Latin-1.  See also
     ;; `gnus-article-dumbquotes-map'.
@@ -380,12 +403,7 @@ used as the line break code type of the coding system."
 			     (boundp 'default-enable-multibyte-characters)
 			     default-enable-multibyte-characters
 			     (fboundp 'set-buffer-multibyte))
-    "Emacs mule.")
-
-  (defvar mm-mule4-p (and mm-emacs-mule
-			  (fboundp 'charsetp)
-			  (not (charsetp 'eight-bit-control)))
-    "Mule version 4.")
+    "True in Emacs with Mule.")
 
   (if mm-emacs-mule
       (defun mm-enable-multibyte ()
@@ -400,27 +418,14 @@ non-nil.  This is a no-op in XEmacs."
 	"Unset the multibyte flag of in the current buffer.
 This is a no-op in XEmacs."
 	(set-buffer-multibyte nil))
-    (defalias 'mm-disable-multibyte 'ignore))
-
-  (if mm-mule4-p
-      (defun mm-enable-multibyte-mule4  ()
-	"Enable multibyte in the current buffer.
-Only used in Emacs Mule 4."
-	(set-buffer-multibyte t))
-    (defalias 'mm-enable-multibyte-mule4 'ignore))
-
-  (if mm-mule4-p
-      (defun mm-disable-multibyte-mule4 ()
-	"Disable multibyte in the current buffer.
-Only used in Emacs Mule 4."
-	(set-buffer-multibyte nil))
-    (defalias 'mm-disable-multibyte-mule4 'ignore)))
+    (defalias 'mm-disable-multibyte 'ignore)))
 
 (defun mm-preferred-coding-system (charset)
   ;; A typo in some Emacs versions.
   (or (get-charset-property charset 'preferred-coding-system)
       (get-charset-property charset 'prefered-coding-system)))
 
+;; Mule charsets shouldn't be used.
 (defsubst mm-guess-charset ()
   "Guess Mule charset from the language environment."
   (or
@@ -451,7 +456,7 @@ If the charset is `composition', return the actual one."
 	(setq charset 'ascii)
       ;; charset-after is fake in some Emacsen.
       (setq charset (and (fboundp 'char-charset) (char-charset char)))
-      (if (eq charset 'composition)
+      (if (eq charset 'composition)	; Mule 4
 	  (let ((p (or pos (point))))
 	    (cadr (find-charset-region p (1+ p))))
 	(if (and charset (not (memq charset '(ascii eight-bit-control
@@ -487,13 +492,23 @@ If the charset is `composition', return the actual one."
       (setq result (cons head result)))
     (nreverse result)))
 
-(if (and (not (featurep 'xemacs))
-	 (boundp 'enable-multibyte-characters))
-    (defalias 'mm-multibyte-p
-      (lambda ()
-	"Say whether multibyte is enabled in the current buffer."
-	enable-multibyte-characters))
-  (defalias 'mm-multibyte-p (lambda () (featurep 'mule))))
+;; Fixme:  This is used in places when it should be testing the
+;; default multibyteness.  See mm-default-multibyte-p.
+(eval-and-compile
+  (if (and (not (featurep 'xemacs))
+	   (boundp 'enable-multibyte-characters))
+      (defun mm-multibyte-p ()
+	"Non-nil if multibyte is enabled in the current buffer."
+	enable-multibyte-characters)
+    (defun mm-multibyte-p () (featurep 'mule))))
+
+(defun mm-default-multibyte-p ()
+  "Return non-nil if the session is multibyte.
+This affects whether coding conversion should be attempted generally."
+  (if (featurep 'mule)
+      (if (boundp 'default-enable-multibyte-characters)
+	  default-enable-multibyte-characters
+	t)))
 
 (defun mm-iso-8859-x-to-15-region (&optional b e)
   (if (fboundp 'char-charset)
@@ -550,16 +565,24 @@ charset, and a longer list means no appropriate charset."
 		     ;; `compound-text' is not in the IANA list.  We
 		     ;; shouldn't normally use anything here with a
 		     ;; mime-charset having an `x-' prefix.
-		     ;; Fixme:  allow this to be overridden, since
+		     ;; Fixme:  Allow this to be overridden, since
 		     ;; there is existing use of x-ctext.
 		     ;; Also people apparently need the coding system
-		     ;; `iso-2022-jp-3', which Mule-UCS defines.
+		     ;; `iso-2022-jp-3' (which Mule-UCS defines with
+		     ;; mime-charset, though it's not valid).
 		     (if (and cs
-			      (not (string-match "^[Xx]-" (symbol-name cs))))
+			      (not (string-match "^[Xx]-" (symbol-name cs)))
+			      ;; UTF-16 of any variety is invalid for
+			      ;; text parts and, unfortunately, has
+			      ;; mime-charset defined both in Mule-UCS
+			      ;; and versions of Emacs.  (The name
+			      ;; might be `mule-utf-16...'  or
+			      ;; `utf-16...'.)
+			      (not (string-match "utf-16" (symbol-name cs))))
 			 (setq systems nil
 			       charsets (list cs))))))
 	       charsets))
-	;; Otherwise we're not multibyte, we're XEmacs or a single
+	;; Otherwise we're not multibyte, we're XEmacs, or a single
 	;; coding system won't cover it.
 	(setq charsets
 	      (mm-delete-duplicates
@@ -592,7 +615,7 @@ Equivalent to `progn' in XEmacs"
   (let ((multibyte (make-symbol "multibyte"))
 	(buffer (make-symbol "buffer")))
     `(if mm-emacs-mule
-	 (let ((,multibyte enable-multibyte-characters)
+ 	 (let ((,multibyte enable-multibyte-characters)
 	       (,buffer (current-buffer)))
 	   (unwind-protect
 	       (let (default-enable-multibyte-characters)
@@ -604,25 +627,6 @@ Equivalent to `progn' in XEmacs"
 	 ,@forms))))
 (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
 (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
-
-(defmacro mm-with-unibyte-current-buffer-mule4 (&rest forms)
-  "Evaluate FORMS there like `progn' in current buffer.
-Mule4 only."
-  (let ((multibyte (make-symbol "multibyte"))
-	(buffer (make-symbol "buffer")))
-    `(if mm-mule4-p
-	 (let ((,multibyte enable-multibyte-characters)
-	       (,buffer (current-buffer)))
-	   (unwind-protect
-	       (let (default-enable-multibyte-characters)
-		 (set-buffer-multibyte nil)
-		 ,@forms)
-	     (set-buffer ,buffer)
-	     (set-buffer-multibyte ,multibyte)))
-       (let (default-enable-multibyte-characters)
-	 ,@forms))))
-(put 'mm-with-unibyte-current-buffer-mule4 'lisp-indent-function 0)
-(put 'mm-with-unibyte-current-buffer-mule4 'edebug-form-spec '(body))
 
 (defmacro mm-with-unibyte (&rest forms)
   "Eval the FORMS with the default value of `enable-multibyte-characters' nil, ."
@@ -768,6 +772,7 @@ If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'."
 	  (push dir result))
       (push path result))))
 
+;; Fixme: This doesn't look useful where it's used.
 (if (fboundp 'detect-coding-region)
     (defun mm-detect-coding-region (start end)
       "Like `detect-coding-region' except returning the best one."
@@ -793,44 +798,6 @@ If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'."
     (let ((cs (mm-detect-coding-region start end)))
       cs)))
 
-(defun mm-guess-mime-charset ()
-  "Guess the default MIME charset from the language environment."
-  (let ((language-info
-	 (and (boundp 'current-language-environment)
-	      (assoc current-language-environment
-		     language-info-alist)))
-	item)
-    (cond
-     ((null language-info)
-      'iso-8859-1)
-     ((setq item
-	    (cadr
-	     (or (assq 'coding-priority language-info)
-		 (assq 'coding-system language-info))))
-      (if (fboundp 'coding-system-get)
-	  (or (coding-system-get item 'mime-charset)
-	      item)
-	item))
-     ((setq item (car (last (assq 'charset language-info))))
-      (if (eq item 'ascii)
-	  'iso-8859-1
-	(mm-mime-charset item)))
-     (t
-      'iso-8859-1))))
-
-;; It is not a MIME function, but some MIME functions use it.
-(defalias 'mm-make-temp-file
-  (if (fboundp 'make-temp-file)
-      'make-temp-file
-    (lambda (prefix &optional dir-flag)
-      (let ((file (expand-file-name
-		   (make-temp-name prefix)
-		   (if (fboundp 'temp-directory)
-		       (temp-directory)
-		     temporary-file-directory))))
-	(if dir-flag
-	    (make-directory file))
-	file))))
 
 (provide 'mm-util)
 

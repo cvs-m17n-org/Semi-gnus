@@ -27,6 +27,9 @@
 (eval-when-compile (require 'cl))
 (require 'ietf-drums)
 (require 'rfc2047)
+(autoload 'mm-encode-body "mm-bodies")
+(autoload 'mail-header-remove-whitespace "mail-parse")
+(autoload 'mail-header-remove-comments "mail-parse")
 
 (defun rfc2231-get-value (ct attribute)
   "Return the value of ATTRIBUTE from CT."
@@ -53,6 +56,7 @@ The list will be on the form
 			(mail-header-remove-comments string)))
       (let ((table (copy-syntax-table ietf-drums-syntax-table)))
 	(modify-syntax-entry ?\' "w" table)
+	(modify-syntax-entry ?= " " table)
 	;; The following isn't valid, but one should be liberal
 	;; in what one receives.
 	(modify-syntax-entry ?\: "w" table)

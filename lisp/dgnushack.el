@@ -50,6 +50,18 @@
 
 ;; Define compiler macros for the functions provided by cl in old Emacsen.
 (unless (featurep 'xemacs)
+  (define-compiler-macro assq-delete-all (&whole form key alist)
+    (if (>= emacs-major-version 21)
+	form
+      `(let* ((key ,key)
+	      (alist ,alist)
+	      (tail alist))
+	 (while tail
+	   (if (and (consp (car tail)) (eq (car (car tail)) key))
+	       (setq alist (delq (car tail) alist)))
+	   (setq tail (cdr tail)))
+	 alist)))
+
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (>= emacs-major-version 21)
 	form
@@ -290,7 +302,7 @@ Modify to suit your needs."))
     (batch-update-autoloads)))
 
 (defun dgnushack-make-load ()
-  (message (format "Generating %s..." dgnushack-gnus-load-file))
+  (message "Generating %s..." dgnushack-gnus-load-file)
   (with-temp-file dgnushack-gnus-load-file
     (insert-file-contents dgnushack-cus-load-file)
     (delete-file dgnushack-cus-load-file)
@@ -348,7 +360,7 @@ Modify to suit your needs."))
 	(search-forward "\n;;; Code:" nil t)
 	(forward-line 1)
 	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
-  (message (format "Compiling %s..." dgnushack-gnus-load-file))
+  (message "Compiling %s..." dgnushack-gnus-load-file)
   (byte-compile-file dgnushack-gnus-load-file))
 
 ;;; dgnushack.el ends here

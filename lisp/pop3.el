@@ -85,8 +85,8 @@ Used for APOP authentication.")
     (setq message-count (car (pop3-stat process)))
     (unwind-protect
 	(while (<= n message-count)
-	  (message (format "Retrieving message %d of %d from %s..."
-			   n message-count pop3-mailhost))
+	  (message "Retrieving message %d of %d from %s..."
+		   n message-count pop3-mailhost)
 	  (pop3-retr process n crashbuf)
 	  (save-excursion
 	    (set-buffer crashbuf)
@@ -348,6 +348,7 @@ This function currently does nothing.")
     (save-excursion
       (set-buffer (process-buffer process))
       (while (not (re-search-forward "^\\.\r\n" nil t))
+	;; Fixme: Shouldn't depend on nnheader.
 	(nnheader-accept-process-output process)
 	;; bill@att.com ... to save wear and tear on the heap
 	;; uncommented because the condensed version below is a problem for

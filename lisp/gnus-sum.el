@@ -348,7 +348,7 @@ the first unread article."
 (defcustom gnus-auto-goto-ignores 'unfetched
   "*Says how to handle unfetched articles when maneuvering.
 
-This variable can either be the symbols `nil' (maneuver to any
+This variable can either be the symbols nil (maneuver to any
 article), `undownloaded' (maneuvering while unplugged ignores articles
 that have not been fetched), `always-undownloaded' (maneuvering always
 ignores articles that have not been fetched), `unfetched' (maneuvering
@@ -1225,6 +1225,7 @@ the type of the variable (string, integer, character, etc).")
 (defvar gnus-newsgroup-data-reverse nil)
 (defvar gnus-newsgroup-limit nil)
 (defvar gnus-newsgroup-limits nil)
+(defvar gnus-summary-use-undownloaded-faces nil)
 
 (defvar gnus-newsgroup-unreads nil
   "Sorted list of unread articles in the current newsgroup.")
@@ -1365,7 +1366,8 @@ This list will always be a subset of gnus-newsgroup-undownloaded.")
     gnus-cache-removable-articles gnus-newsgroup-cached
     gnus-newsgroup-data gnus-newsgroup-data-reverse
     gnus-newsgroup-limit gnus-newsgroup-limits
-    gnus-newsgroup-charset gnus-newsgroup-display)
+    gnus-newsgroup-charset gnus-newsgroup-display
+    gnus-summary-use-undownloaded-faces)
   "Variables that are buffer-local to the summary buffers.")
 
 (defvar gnus-newsgroup-variables nil
@@ -5024,7 +5026,12 @@ If SELECT-ARTICLES, only select those articles from GROUP."
              (active (gnus-active group)))
         (if (and (car alist)
                  (< (caar alist) (car active)))
-            (gnus-set-active group (cons (caar alist) (cdr active))))))
+            (gnus-set-active group (cons (caar alist) (cdr active)))))
+
+      (setq gnus-summary-use-undownloaded-faces
+            (not (gnus-agent-find-parameter 
+                  group
+                  'agent-disable-undownloaded-faces))))
 
     (setq gnus-newsgroup-name group
 	  gnus-newsgroup-unselected nil
@@ -6088,7 +6095,8 @@ If EXCLUDE-GROUP, do not go to this group."
       (gnus-group-best-unread-group exclude-group))))
 
 (defun gnus-summary-find-next (&optional unread article backward)
-  (if backward (gnus-summary-find-prev unread article)
+  (if backward
+      (gnus-summary-find-prev unread article)
     (let* ((dummy (gnus-summary-article-intangible-p))
 	   (article (or article (gnus-summary-article-number)))
 	   (data (gnus-data-find-list article))
@@ -6103,14 +6111,18 @@ If EXCLUDE-GROUP, do not go to this group."
 		      (progn
 			(while data
                           (unless (memq (gnus-data-number (car data)) 
-                                        (cond ((eq gnus-auto-goto-ignores 'always-undownloaded)
-                                               gnus-newsgroup-undownloaded)
-                                              (gnus-plugged
-                                               nil)
-                                              ((eq gnus-auto-goto-ignores 'unfetched)
-                                               gnus-newsgroup-unfetched)
-                                              ((eq gnus-auto-goto-ignores 'undownloaded)
-                                               gnus-newsgroup-undownloaded)))
+                                        (cond
+					 ((eq gnus-auto-goto-ignores
+					      'always-undownloaded)
+					  gnus-newsgroup-undownloaded)
+					 (gnus-plugged
+					  nil)
+					 ((eq gnus-auto-goto-ignores
+					      'unfetched)
+					  gnus-newsgroup-unfetched)
+					 ((eq gnus-auto-goto-ignores
+					      'undownloaded)
+					  gnus-newsgroup-undownloaded)))
                             (when (gnus-data-unread-p (car data))
                               (setq result (car data)
                                     data nil)))
@@ -6135,14 +6147,18 @@ If EXCLUDE-GROUP, do not go to this group."
 		    (progn
 		      (while data
                         (unless (memq (gnus-data-number (car data))
-                                      (cond ((eq gnus-auto-goto-ignores 'always-undownloaded)
-                                             gnus-newsgroup-undownloaded)
-                                            (gnus-plugged
-                                             nil)
-                                            ((eq gnus-auto-goto-ignores 'unfetched)
-                                             gnus-newsgroup-unfetched)
-                                            ((eq gnus-auto-goto-ignores 'undownloaded)
-                                             gnus-newsgroup-undownloaded)))
+                                      (cond
+				       ((eq gnus-auto-goto-ignores
+					    'always-undownloaded)
+					gnus-newsgroup-undownloaded)
+				       (gnus-plugged
+					nil)
+				       ((eq gnus-auto-goto-ignores
+					    'unfetched)
+					gnus-newsgroup-unfetched)
+				       ((eq gnus-auto-goto-ignores
+					    'undownloaded)
+					gnus-newsgroup-undownloaded)))
                           (when (gnus-data-unread-p (car data))
                             (setq result (car data)
                                   data nil)))
@@ -6377,7 +6393,7 @@ The prefix argument ALL means to select all articles."
   (let ((current-subject (gnus-summary-find-for-reselect))
 	(group gnus-newsgroup-name))
     (setq gnus-newsgroup-begin nil)
-    (gnus-summary-exit)
+    (gnus-summary-exit nil 'leave-hidden)
     ;; We have to adjust the point of group mode buffer because
     ;; point was moved to the next unread newsgroup by exiting.
     (gnus-summary-jump-to-group group)
@@ -6440,7 +6456,7 @@ If FORCE (the prefix), also save the .newsrc file(s)."
       (gnus-save-newsrc-file)
     (gnus-dribble-save)))
 
-(defun gnus-summary-exit (&optional temporary)
+(defun gnus-summary-exit (&optional temporary leave-hidden)
   "Exit reading current newsgroup, and then return to group selection mode.
 `gnus-exit-group-hook' is called with no arguments if that value is non-nil."
   (interactive)
@@ -6530,11 +6546,14 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	(when (eq mode 'gnus-summary-mode)
 	  (gnus-kill-buffer buf)))
       (setq gnus-current-select-method gnus-select-method)
-      (pop-to-buffer gnus-group-buffer)
+      (if leave-hidden
+	  (set-buffer gnus-group-buffer)
+	(pop-to-buffer gnus-group-buffer))
       (if (not quit-config)
 	  (progn
 	    (goto-char group-point)
-	    (gnus-configure-windows 'group 'force))
+	    (unless leave-hidden
+	      (gnus-configure-windows 'group 'force)))
 	(gnus-handle-ephemeral-exit quit-config))
       ;; Clear the current group name.
       (unless quit-config
@@ -6616,7 +6635,10 @@ The state which existed when entering the ephemeral is reset."
 	(progn
 	  ;; The current article may be from the ephemeral group
 	  ;; thus it is best that we reload this article
-	  (gnus-summary-show-article)
+	  ;;
+	  ;; If we're exiting from a large digest, this can be
+	  ;; extremely slow.  So, it's better not to reload it. -- jh.
+	  ;;(gnus-summary-show-article)
 	  (if (and (boundp 'gnus-pick-mode) (symbol-value 'gnus-pick-mode))
 	      (gnus-configure-windows 'pick 'force)
 	    (gnus-configure-windows (cdr quit-config) 'force)))
@@ -7158,7 +7180,9 @@ If CIRCULAR is non-nil, go to the start of the article instead of
 selecting the next article when reaching the end of the current
 article.
 
-If STOP is non-nil, just stop when reaching the end of the message."
+If STOP is non-nil, just stop when reaching the end of the message.
+
+Also see the variable `gnus-article-skip-boring'."
   (interactive "P")
   (setq gnus-summary-buffer (current-buffer))
   (gnus-set-global-variables)
@@ -8140,8 +8164,12 @@ If FORCE, force a digest interpretation.  If not, try
 to guess what the document format is."
   (interactive "P")
   (let ((conf gnus-current-window-configuration))
-    (save-excursion
-      (gnus-summary-select-article))
+    (save-window-excursion
+      (save-excursion
+	(let (gnus-article-prepare-hook
+	      gnus-display-mime-function
+	      gnus-break-pages)
+	  (gnus-summary-select-article))))
     (setq gnus-current-window-configuration conf)
     (let* ((name (format "%s-%d"
 			 (gnus-group-prefixed-name
@@ -10017,6 +10045,14 @@ The difference between N and the number of marks cleared is returned."
       (gnus-summary-mark-article gnus-current-article
 				 (or new-mark gnus-read-mark)))))
 
+(defun gnus-summary-mark-current-read-and-unread-as-read (&optional new-mark)
+  "Intended to be used by `gnus-summary-mark-article-hook'."
+  (let ((mark (gnus-summary-article-mark)))
+    (when (or (gnus-unread-mark-p mark)
+	      (gnus-read-mark-p mark))
+      (gnus-summary-mark-article (gnus-summary-article-number)
+				 (or new-mark gnus-read-mark)))))
+
 (defun gnus-summary-mark-unread-as-ticked ()
   "Intended to be used by `gnus-summary-mark-article-hook'."
   (when (memq gnus-current-article gnus-newsgroup-unreads)
@@ -10119,10 +10155,14 @@ even ticked and dormant ones."
 If prefix argument ALL is non-nil, ticked and dormant articles will
 also be marked as read.
 If QUIETLY is non-nil, no questions will be asked.
+
 If TO-HERE is non-nil, it should be a point in the buffer.  All
-articles before (after, if REVERSE is set) this point will be marked as read.
+articles before (after, if REVERSE is set) this point will be marked
+as read.
+
 Note that this function will only catch up the unread article
 in the current summary buffer limitation.
+
 The number of articles marked as read is returned."
   (interactive "P")
   (prog1
@@ -10156,7 +10196,8 @@ The number of articles marked as read is returned."
 	    (if (and to-here reverse)
 		(progn
 		  (goto-char to-here)
-		  (gnus-summary-mark-read-and-unread-as-read gnus-catchup-mark)
+		  (gnus-summary-mark-current-read-and-unread-as-read
+		   gnus-catchup-mark)
 		  (while (gnus-summary-find-next (not all))
 		    (gnus-summary-mark-article-as-read gnus-catchup-mark)))
 	      (when (gnus-summary-first-subject (not all))
@@ -10190,8 +10231,8 @@ If ALL is non-nil, also mark ticked and dormant articles as read."
 	;; We check that there are unread articles.
 	(when (or all (gnus-summary-find-next))
 	  (gnus-summary-catchup all t beg nil t)))))
-
   (gnus-summary-position-point))
+
 (defun gnus-summary-catchup-all (&optional quietly)
   "Mark all articles in this newsgroup as read.
 This command is dangerous.  Normally, you want \\[gnus-summary-catchup]
@@ -11194,8 +11235,8 @@ If REVERSE, save parts that do not match TYPE."
 	 (default gnus-summary-default-score)
 	 (default-high gnus-summary-default-high-score)
 	 (default-low gnus-summary-default-low-score)
-	 (uncached (memq article gnus-newsgroup-undownloaded))
-	 (downloaded (not uncached)))
+	 (uncached (and gnus-summary-use-undownloaded-faces
+                        (memq article gnus-newsgroup-undownloaded))))
     (let ((face (funcall (gnus-summary-highlight-line-0))))
       (unless (eq face (get-text-property beg 'face))
 	(gnus-put-text-property-excluding-characters-with-faces

@@ -29,6 +29,9 @@
 ;; used by Gnus and may be used by any other package without loading
 ;; Gnus first.
 
+;; [Unfortunately, it does depend on other parts of Gnus, e.g. the
+;; autoloads below...]
+
 ;;; Code:
 
 (require 'custom)
@@ -332,6 +335,7 @@
 ;; age-depending date representations. (e.g. just the time if it's
 ;; from today, the day of the week if it's within the last 7 days and
 ;; the full date if it's older)
+
 (defun gnus-seconds-today ()
   "Returns the number of seconds passed today"
   (let ((now (decode-time (current-time))))
@@ -379,26 +383,21 @@ respectively.")
 Returns \"  ?  \" if there's bad input or if an other error occurs.
 Input should look like this: \"Sun, 14 Oct 2001 13:34:39 +0200\"."
   (condition-case ()
-      (let* ((messy-date (safe-date-to-time messy-date))
-	     (now (current-time))
+      (let* ((messy-date (time-to-seconds (safe-date-to-time messy-date)))
+	     (now (time-to-seconds (current-time)))
 	     ;;If we don't find something suitable we'll use this one
-	     (my-format "%b %m '%y")
-	     (high (lsh (- (car now) (car messy-date)) 16)))
-	(if (and (> high -1) (= (logand high 65535) 0))
-	    ;;overflow and bad input
-	    (let* ((difference (+ high (- (car (cdr now))
-					  (car (cdr messy-date)))))
-		   (templist gnus-user-date-format-alist)
-		   (top (eval (caar templist))))
-	      (while (if (numberp top) (< top difference) (not top))
-		(progn
-		  (setq templist (cdr templist))
-		  (setq top (eval (caar templist)))))
-	      (if (stringp (cdr (car templist)))
-		  (setq my-format (cdr (car templist))))))
-	(format-time-string (eval my-format) messy-date))
+	     (my-format "%b %d '%y"))
+	(let* ((difference (- now messy-date))
+	       (templist gnus-user-date-format-alist)
+	       (top (eval (caar templist))))
+	  (while (if (numberp top) (< top difference) (not top))
+	    (progn
+	      (setq templist (cdr templist))
+	      (setq top (eval (caar templist)))))
+	  (if (stringp (cdr (car templist)))
+	      (setq my-format (cdr (car templist)))))
+	(format-time-string (eval my-format) (seconds-to-time messy-date)))
     (error "  ?   ")))
-;;end of Frank's code
 
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
@@ -798,10 +797,14 @@ with potentially long computations."
 
 ;;; Functions for saving to babyl/mail files.
 
-(defvar rmail-default-rmail-file)
+(eval-when-compile
+  (defvar rmail-default-rmail-file)
+  (defvar mm-text-coding-system))
+
 (defun gnus-output-to-rmail (filename &optional ask)
   "Append the current article to an Rmail file named FILENAME."
   (require 'rmail)
+  (require 'mm-util)
   ;; Most of these codes are borrowed from rmailout.el.
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
@@ -1294,8 +1297,9 @@ CHOICE is a list of the choice char and help message at IDX."
 	(while (not tchar)
 	  (message "%s (%s): "
 		   prompt
-		   (mapconcat (lambda (s) (char-to-string (car s)))
-			      choice ", "))
+		   (concat
+		    (mapconcat (lambda (s) (char-to-string (car s)))
+			       choice ", ") ", ?"))
 	  (setq tchar (read-char))
 	  (when (not (assq tchar choice))
 	    (setq tchar nil)

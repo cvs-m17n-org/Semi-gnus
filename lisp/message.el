@@ -144,7 +144,8 @@ If this variable is nil, no such courtesy message will be added."
   :group 'message-sending
   :type 'string)
 
-(defcustom message-ignored-bounced-headers "^\\(Received\\|Return-Path\\):"
+(defcustom message-ignored-bounced-headers
+  "^\\(Received\\|Return-Path\\|Delivered-To\\):"
   "*Regexp that matches headers to be removed in resent bounced mail."
   :group 'message-interface
   :type 'regexp)
@@ -302,6 +303,8 @@ matched against `message-subject-trailing-was-regexp' in
 few false positives here."
   :group 'message-various
   :type 'regexp)
+
+;; Fixme: Why are all these things autoloaded?
 
 ;;; marking inserted text
 
@@ -1305,8 +1308,7 @@ no, only reply back to the author."
 
 (defcustom message-use-idna (and (condition-case nil (require 'idna)
 				   (file-error))
-				 (fboundp 'coding-system-p)
-				 (coding-system-p 'utf-8)
+				 (mm-coding-system-p 'utf-8)
 				 'ask)
   "Whether to encode non-ASCII in domain names into ASCII according to IDNA."
   :group 'message-headers
@@ -1494,8 +1496,8 @@ is used by default."
 	  (beg 1)
 	  (first t)
 	  quoted elems paren)
-      (save-excursion
-	(message-set-work-buffer)
+      (with-temp-buffer
+	(mm-enable-multibyte)
 	(insert header)
 	(goto-char (point-min))
 	(while (not (eobp))
@@ -1587,15 +1589,6 @@ is used by default."
     (save-restriction
       (mail-narrow-to-head)
       (message-fetch-field header))))
-
-(defun message-set-work-buffer ()
-  (if (get-buffer " *message work*")
-      (progn
-	(set-buffer " *message work*")
-	(erase-buffer))
-    (set-buffer (get-buffer-create " *message work*"))
-    (kill-all-local-variables)
-    (mm-enable-multibyte)))
 
 (defun message-functionp (form)
   "Return non-nil if FORM is funcallable."
@@ -2626,7 +2619,7 @@ With the prefix argument FORCE, insert the header anyway."
   (let ((point (point)))
     (message-goto-signature)
     (unless (eobp)
-      (forward-line -2))
+      (end-of-line -1))
     (kill-region point (point))
     (unless (bolp)
       (insert "\n"))))
@@ -2722,7 +2715,7 @@ Prefix arg means justify as well."
 (defun message-fill-paragraph (&optional arg)
   "Like `fill-paragraph'."
   (interactive (list (if current-prefix-arg 'full)))
-  (if (and (boundp 'filladapt-mode) filladapt-mode)
+  (if (if (boundp 'filladapt-mode) filladapt-mode)
       nil
     (message-newline-and-reformat arg t)
     t))
@@ -3928,7 +3921,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 		    (length
 		     (setq to (completing-read
 			       "Followups to (default: no Followup-To header) "
-			       (mapcar (lambda (g) (list g))
+			       (mapcar #'list
 				       (cons "poster"
 					     (message-tokenize-header
 					      newsgroups)))))))))
@@ -4411,8 +4404,8 @@ If NOW, use that time instead."
 	    (if (message-functionp message-user-organization)
 		(funcall message-user-organization)
 	      message-user-organization))))
-    (save-excursion
-      (message-set-work-buffer)
+    (with-temp-buffer
+      (mm-enable-multibyte)
       (cond ((stringp organization)
 	     (insert organization))
 	    ((and (eq t organization)
@@ -4496,8 +4489,8 @@ If NOW, use that time instead."
 	      (user-full-name))))
     (when (string= fullname "&")
       (setq fullname (user-login-name)))
-    (save-excursion
-      (message-set-work-buffer)
+    (with-temp-buffer
+      (mm-enable-multibyte)
       (cond
        ((or (null style)
 	    (equal fullname ""))
@@ -5260,6 +5253,10 @@ are not included."
     (when message-default-mail-headers
       (insert message-default-mail-headers)
       (or (bolp) (insert ?\n)))
+    (save-restriction
+      (message-narrow-to-headers)
+      (if message-alternative-emails
+	  (message-use-alternative-email-as-from)))
     (when message-generate-headers-first
       (message-generate-headers
        (message-headers-to-generate
@@ -5271,8 +5268,6 @@ are not included."
   (message-insert-signature)
   (save-restriction
     (message-narrow-to-headers)
-    (if message-alternative-emails
-	(message-use-alternative-email-as-from))
     (run-hooks 'message-header-setup-hook))
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil)
@@ -5857,10 +5852,9 @@ news, Source is the list of newsgroups is was posted to."
   (concat "["
 	  (let ((prefix
 		 (or (message-fetch-field "newsgroups")
-		     (cdr
-		      (mail-header-parse-address
-		       (mail-decode-encoded-word-string
-			(message-fetch-field "from"))))
+		     (let ((from (message-fetch-field "from")))
+		       (and from
+			    (cdr (mail-header-parse-address from))))
 		     "(nowhere)")))
 	    (if message-forward-decoded-p
 		prefix
@@ -5944,11 +5938,11 @@ Optional DIGEST will use digest to forward."
 	       (not message-forward-decoded-p))
 	  (insert
 	   (with-temp-buffer
-	     (mm-disable-multibyte-mule4)
+	     (mm-disable-multibyte)
 	     (insert
 	      (with-current-buffer forward-buffer
-		(mm-with-unibyte-current-buffer-mule4 (buffer-string))))
-	     (mm-enable-multibyte-mule4)
+		(mm-with-unibyte-current-buffer (buffer-string))))
+	     (mm-enable-multibyte)
 	     (mime-to-mml)
 	     (goto-char (point-min))
 	     (when (looking-at "From ")
@@ -6395,11 +6389,6 @@ regexp varstr."
 	   (set (make-local-variable (car local))
 		(cdr local)))))
      locals)))
-
-;;; Miscellaneous functions
-
-(defsubst message-replace-chars-in-string (string from to)
-  (mm-subst-char-in-string from to string))
 
 ;;;
 ;;; MIME functions

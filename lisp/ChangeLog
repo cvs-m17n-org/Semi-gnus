@@ -1,3 +1,389 @@
+2003-05-14 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Gnus v5.10.2 is released.
+
+2003-05-14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-delete-incoming): Changed to t. 
+
+	* rfc2047.el (rfc2047-syntax-table): Funcall.
+
+	* lpath.el ((featurep 'xemacs)): Added set-char-table-range. 
+	((featurep 'xemacs)): No, don't.
+
+	* rfc2047.el (rfc2047-encodable-p): Use the header charset. 
+
+	* gnus-sum.el (gnus-summary-reselect-current-group): Supply
+	leave-hidden. 
+
+2003-05-14  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* gnus-sum.el (gnus-summary-exit): Added `leave-hidden'.  (Tiny
+	patch.) 
+
+2003-05-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-registry.el (gnus-registry-store-extra-entry): Use
+	gnus-assq-delete-all. 
+
+	* gnus-xmas.el (gnus-xmas-assq-delete-all): New function.
+
+	* message.el (message-ignored-bounced-headers): Add Delivered-To. 
+
+	* gnus-sum.el (gnus-summary-find-next): Indent.
+	(gnus-summary-find-prev): Ditto.
+	(gnus-summary-catchup): Doc fix.
+	(gnus-summary-mark-current-read-and-unread-as-read): New function.
+	(gnus-summary-catchup): Really mark after point.
+
+	* gnus-util.el (gnus-user-date): Use %d instead of %m.
+	(gnus-user-date): Use floating point time so that we don't get
+	overflows. 
+
+	* gnus-sum.el (gnus-summary-local-variables): Clean up.
+
+	* gnus-fun.el (gnus-display-x-face-in-from): Don't use centering
+	since none of the other image things do.
+
+2003-05-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* dgnushack.el (assq-delete-all): New compiler macro for Emacs 20.
+
+2003-05-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind find-coding-system.
+
+	* dgnushack.el (dgnushack-make-load): Remove redundant format call
+	in message.  Suggested by Yoichi NAKAYAMA <yoichi@geiin.org>.
+	* pop3.el (pop3-movemail): Ditto.
+
+2003-05-12  Colin Marquardt <c.marquardt@alcatel.de>  (tiny change)
+
+	* gnus.el (gnus-agent): Docstring fix.
+
+2003-05-12  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-install): new variable
+	(gnus-registry-fetch-extra, gnus-registry-fetch-extra-entry) 
+	(gnus-registry-store-extra-entry, gnus-registry-delete-group) 
+	(gnus-registry-add-group): add a modification timestamp to each entry
+	(gnus-registry-install-hooks): new function
+
+2003-05-12  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-cat-name): Eval macro while compiling.
+	(gnus-agent-cat-disable-undownloaded-faces): New function.
+	Accessor for new agent property
+	'agent-disable-undownloaded-faces'.
+	gnus-cus.el (gnus-agent-parameters): Added
+	agent-disable-undownloaded-faces and corrected documentation.
+	(gnus-agent-cat-prepare-category-field,
+	gnus-agent-customize-category): Changed to avoid creating free
+	references to each field's symbol.
+	gnus-sum.el (gnus-summary-use-undownloaded-faces): New local variable.
+	(gnus-select-newgroup): Initialize it.
+	(gnus-summary-highlight-line): Use it.	
+
+2003-05-12  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (rfc2047-point-at-bol, rfc2047-point-at-bol): Eval
+	and compile.
+	(rfc2047-syntax-table): Fix building table to work in Emacs 22.
+	(rfc2047-unfold-region): Delete unused var `leading'.
+
+2003-05-12  Simon Josefsson  <jas@extundo.com>
+
+	* pgg.el (pgg-temp-buffer-show-function): Reuse existing visible
+	output window if one is available.  Tiny patch from Ville Skytt,Ad(B
+	<scop@xemacs.org>.
+
+2003-05-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-expire-unagentized-dirs): Added
+	space. 
+
+2003-05-11  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-enter-digest-group): Don't do article
+	washing etc.
+	(gnus-handle-ephemeral-exit): Don't reload article after exiting.
+
+	* nndoc.el (nndoc-type-alist): `mime-digest' should be before
+	`mime-parts'.
+
+2003-05-10  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-cite.el (gnus-article-hide-citation-maybe): Make toggling
+	work.  Update mode-line.
+
+2003-05-10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-logo-color-alist): Added no colours.
+
+2003-05-09  Dave Love  <fx@gnu.org>
+
+	* utf7.el (mm-util): Require.
+	(utf7-direct-encoding-chars, utf7-imap-direct-encoding-chars):
+	Defconst, not defvar.
+	(utf7-utf-16-coding-system): New.
+	(utf7-encode-internal): Hoist concat out of loop.
+	(utf7-fragment-encode): Use mm-with-unibyte-current-buffer.
+	(utf7-get-u16char-converter) [utf7-utf-16-coding-system]: New
+	case.
+	(utf7-latin1-u16-char-converter): Encode the region.
+	(utf7-u16-latin1-char-converter): Decode the region.
+	(utf7-encode, utf7-decode): Fix multibyteness.
+
+	* mm-bodies.el (mm-body-7-or-8): Don't special-case mule.
+	(mm-encode-body): Use mm-read-coding-system, not mm-read-charset.
+	(mm-uu-yenc-decode-function): Defvar when compiling.
+	(mm-encode-body, mm-decode-body): Doc fix.
+
+2003-05-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-registry-unregistered-group-regex):
+	removed in favor of the group/topic/global variables
+	(gnus-registry-register-message-ids): fixed test to omit
+	gnus-registry-unregistered-group-regex
+
+	* gnus.el (gnus-variable-list): removed gnus-registry-alist and
+	gnus-registry-headers-alist from the list
+	(gnus-registry-headers-alist): removed
+	(registry-ignore): new parameter, with accompanying
+	gnus-registry-ignored-groups global variable
+
+	* gnus-start.el (gnus-clear-system): no need to clear the
+	registry, we can do it ourselves
+	(gnus-gnus-to-quick-newsrc-format): extra parameters so it can be
+	used by gnus-registry.el
+
+	* gnus-registry.el (gnus-registry-cache-file): new file variable
+	(gnus-registry-cache-read, gnus-registry-cache-save): new
+	functions
+	(gnus-registry-cache-whitespace): new function.  From Dan
+	Christensen <jdc@chow.mat.jhu.edu>
+	(gnus-registry-save, gnus-registry-read): use the new
+	gnus-registry-cache-{read|save} functions, and change the name
+	from gnus-registry-translate-{from|to}-alist
+	(gnus-registry-clear): fixed so it doesn't refer to old function name
+
+2003-05-09  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-picon.el (gnus-picon-transform-address): Parse the encoded
+	address.
+
+2003-05-08  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-start.el (gnus-clear-system): added gnus-registry-alist to
+	the list of cleared variables
+
+	* gnus-registry.el (gnus-registry-split-fancy-with-parent):
+	nnmail-split-fancy-with-parent-ignore-groups can be a single regex
+	in addition to a list of regexes.
+
+	* spam.el (spam-use-regex-headers): docstring fix.  From Niklas
+	Morberg <niklas.morberg@axis.com>
+
+2003-05-08  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus-sum.el (gnus-summary-next-page): Mention
+	`gnus-article-skip-boring' in docstring.
+
+2003-05-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* rfc2231.el (rfc2231-parse-string): "=" should have whitespace
+	syntax here.
+
+	* ietf-drums.el (ietf-drums-syntax-table): "=" should not have
+	whitespace syntax class when parsing email addresses.
+
+	* message.el (message-forward-subject-name-subject): Don't use
+	mail-decode-encoded-word-string before parsing from.
+
+2003-05-07  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-setup-1): Setup alternative email before
+	generate-headers.
+	
+	(message-forward-subject-name-subject): Fix the case when the
+	field "from" doesn't exist.
+
+2003-05-07  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (rfc2047-encode-region): Skip \n as whitespace.
+
+	* mm-util.el (mm-find-mime-charset-region): Expurgate utf-16 from
+	possible values.
+
+2003-05-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.el (message-kill-to-signature): Fix.
+
+2003-05-06  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-auto-goto-ignores): Docstring fix.
+
+	* gnus-art.el (gnus-mime-display-multipart-as-mixed)
+	(gnus-mime-display-multipart-related-as-mixed)
+	(gnus-button-mid-or-mail-heuristic-alist): do.
+
+2003-05-05  Dave Love  <fx@gnu.org>
+
+	* mm-util.el (mm-default-multibyte-p): New.
+	(mm-coding-system-p): Maybe use find-coding-systems.
+
+2003-05-04  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (with-syntax-table): Define if necessary.
+	(rfc2047-syntax-table): Fix last change for XEmacs.
+	(rfc2047-parse-and-decode): Revert last change.
+
+2003-05-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.el: Don't test for `mm-guess-mime-charset'.
+
+	* mm-util.el (mm-guess-mime-charset): Remove.  Not used any more.
+
+	* gnus.el (gnus-default-charset): Set default value to
+	`undecided'.
+
+	* gnus-art.el (article-decode-charset): Don't supply 4th arg to
+	mm-decode-body.
+
+	* mm-bodies.el (mm-decode-coding-region-safely): Remove.
+	(mm-decode-body): Don't use mm-decode-coding-region-safely.
+
+2003-05-03  Vasily Korytov <deskpot@despammed.com>  (tiny change)
+
+	* gnus-util.el (gnus-multiple-choice): Add ", ?".
+
+2003-05-03  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (rfc2047-syntax-table): Don't call make-char-table
+	with 2 args.
+	(rfc2047-decode-string): Don't set the buffer multibyte before
+	calling buffer-string.
+
+	* mm-encode.el (mm-long-lines-p): Autoload.
+	(mm-encode-content-transfer-encoding): Doc fix.  Don't make buffer
+	unibyte.  Signal error on unknown encoding.
+	(mm-encode-buffer, mm-qp-or-base64): Doc fix.
+
+	* rfc2047.el (rfc2047-point-at-bol, rfc2047-point-at-eol): New.
+	Callers of gnus- versions changed to use them.
+	(rfc2047-header-encoding-alist): Add `address-mime' part.  Doc
+	fixes.
+	(rfc2047-encoding-type): New.
+	(rfc2047-encode-message-header): Use mm-charset-to-coding-system.
+	Don't include header name field in encoding.  Add `address-mime'
+	case and bind rfc2047-encoding-type for `mime' case.
+	(rfc2047-encodable-p): Deleted.
+	(rfc2047-syntax-table): New.
+	(rfc2047-encode-region, rfc2047-encode): Rewritten to take account
+	of rfc2047 rules with respect to rfc2822 tokens and to do encoding
+	in place rather than by passing strings.
+	(rfc2047-encode-string): Doc fix.
+	(rfc2047-q-encode-region): Don't use
+	mm-with-unibyte-current-buffer.
+	(rfc2047-encoded-word-regexp): eval-and-compile.
+	(rfc2047-decode-region): Avoid concatenation in loop.
+	(rfc2047-parse-and-decode): Remove useless disjunction.
+
+2003-05-02  Dave Love  <fx@gnu.org>
+
+	* rfc2047.el (rfc2047-q-encode-region, rfc2047-decode): Use
+	mm-with-unibyte-current-buffer.
+	(ietf-drums, gnus-util): don't require.
+
+	* sieve.el (sieve-manage-mode-menu): Define before use.
+
+	* mml-smime.el (message-narrow-to-headers): Autoload.
+
+	* mm-util.el (mm-coding-system-p): Don't override nil from
+	coding-system-p.
+	(mm-mule4-p, mm-disable-multibyte-mule4)
+	(mm-with-unibyte-current-buffer-mule4): Deleted.
+	(mm-multibyte-p): Use defun, not defalias.
+	(mm-make-temp-file): Moved to group at top of file.
+	(mm-point-at-eol, mm-point-at-bol): New.
+
+	* gnus-cite.el (gnus-art): Require.
+
+	* gnus-ems.el (gnus-get-buffer-create)
+	(nnheader-find-etc-directory, message-text-with-property):
+	Autoload.
+	(gnus-tmp-unread, gnus-tmp-replied, gnus-tmp-score-char)
+	(gnus-tmp-indentation, gnus-tmp-opening-bracket, gnus-tmp-lines)
+	(gnus-tmp-name, gnus-tmp-closing-bracket, gnus-tmp-subject-or-nil)
+	(gnus-check-before-posting): Only defvar when compiling.
+
+	* gnus-int.el (gnus-agent-expire): Autoload, don't defun.
+
+	* gnus-util.el (rmail-default-rmail-file, mm-text-coding-system):
+	Defvar when compiling.
+	(gnus-output-to-rmail): Require mm-util.
+
+	* mail-source.el (mail-source-callback): Use mm-make-temp-file.
+	(mail-source-make-complex-temp-name): Deleted.
+
+	* message.el (message-use-idna): Use mm-coding-system-p.
+	(message-tokenize-header, message-make-organization)
+	(message-make-from):  Use with-temp-buffer.
+	(message-set-work-buffer): Deleted.
+	(message-fill-paragraph): Use `if' not `and' for compiler warning.
+	(message-check-news-header-syntax): Remove useless lambda.
+	(message-forward-make-body): Use mm-disable-multibyte,
+	mm-with-unibyte-current-buffer, mm-enable-multibyte.
+	(message-replace-chars-in-string): Deleted.
+
+	* mm-extern.el (mm-extern-local-file): Use mm-disable-multibyte.
+	(mm-extern-url): Use mm-with-unibyte-current-buffer,
+	mm-disable-multibyte.
+	(mm-extern-anon-ftp): Use mm-disable-multibyte.
+
+	* mml1991.el (mml1991-mailcrypt-encrypt, mml1991-gpg-encrypt): Use
+	mm-with-unibyte-current-buffer.
+
+	* mml2015.el (mml): Require.
+	(mml2015-mailcrypt-encrypt, mml2015-gpg-encrypt): Use
+	mm-with-unibyte-current-buffer.
+
+	* nnheader.el (gnus-util): Require.
+
+	* nntp.el (format-spec, format-spec-make, open-tls-stream):
+	Autoload.
+
+	* rfc2231.el (mail-header-remove-comments, mm-encode-body)
+	(mail-header-remove-whitespace): Autoload.
+
+	* sieve-manage.el (starttls-negotiate): Autoload.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnrss.el (nnrss-find-rss-via-syndic8): Indent.
+
+2003-05-01  Mark A. Hershberger  <mah@everybody.org>
+
+	* nnrss.el (nnrss-find-rss-via-syndic8): Don't error out.
+
+2003-05-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bump.
+
+2003-05-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam-report.el (spam-report-gmane-regex): docstring fix.  From
+	Jon Ericson <Jon.Ericson@jpl.nasa.gov> (tiny change)
+
+	* gnus.el (gnus-install-group-spam-parameters): docstring fix.
+	From Jon Ericson <Jon.Ericson@jpl.nasa.gov> (tiny change)
+
+	* gnus-registry.el (gnus-registry-fetch-extra) 
+	(gnus-registry-store-extra, gnus-registry-group-count): new functions
+	(gnus-registry-fetch-group, gnus-registry-delete-group) 
+	(gnus-registry-add-group): changed to work with extra data element
+	if present
+
 2003-05-01 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Gnus v5.10.1 is released.
