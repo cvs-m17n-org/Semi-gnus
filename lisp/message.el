@@ -55,7 +55,8 @@
   (require 'mml))
 
 (require 'rfc822)
-(autoload 'sha1 "sha1-el")
+(eval-and-compile
+  (autoload 'sha1 "sha1-el"))
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -593,6 +594,16 @@ regular expressions can be used in conjuction with
 `message-subscribed-address-functions' and `message-subscribed-addresses'."
   :group 'message-interface
   :type '(repeat regexp))
+
+(defcustom message-allow-no-recipients 'ask
+  "Specifies what to do when there are no recipients other than Gcc/Fcc.
+If it is the symbol `always', the posting is allowed.  If it is the
+symbol `never', the posting is not allowed.  If it is the symbol
+`ask', you are prompted."
+  :group 'message-interface
+  :type '(choice (const always)
+		 (const never)
+		 (const ask)))
 
 (defcustom message-sendmail-f-is-evil nil
   "*Non-nil means don't add \"-f username\" to the sendmail command line.
@@ -2917,7 +2928,7 @@ It should typically alter the sending method in some way or other."
 	  (message-mime-mode mime-edit-mode-flag)
 	  (alist message-send-method-alist)
 	  (success t)
-	  elem sent
+	  elem sent dont-barf-on-no-method
 	  (message-options message-options))
       (message-options-set-recipient)
       (save-excursion
@@ -2942,10 +2953,23 @@ It should typically alter the sending method in some way or other."
 			     (error "Denied posting -- multiple copies")))
 		       (setq success (funcall (caddr elem) arg)))
 	      (setq sent t)))))
-      (unless (or sent (not success))
+      (unless
+	  (or sent (not success)
+	      (let ((fcc (message-fetch-field "Fcc"))
+		    (gcc (message-fetch-field "Gcc")))
+		(when (or fcc gcc)
+		  (or (eq message-allow-no-recipients 'always)
+		      (and (not (eq message-allow-no-recipients 'never))
+			   (setq dont-barf-on-no-method
+				 (gnus-y-or-n-p
+				  (format "No receiver, perform %s anyway? "
+					  (cond ((and fcc gcc) "Fcc and Gcc")
+						(fcc "Fcc")
+						(t "Gcc"))))))))))
 	(error "No methods specified to send by"))
       (prog1
-	  (when (and success sent)
+	  (when (or dont-barf-on-no-method
+		    (and success sent))
 	    (message-do-fcc)
 	    (save-excursion
 	      (run-hooks 'message-sent-hook))
