@@ -1,3 +1,18 @@
+1999-05-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 12.
+
+	* texi/gnus.texi (Customizing Articles): Remove duplicates; add the
+	function `gnus-treat-decode-message-body-as-default-mime-charset'.
+
+	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Rewrite.
+	(article-date-ut): If there is a forwarded message, fetch Date from
+	its header instead of `gnus-current-headers'.
+	(gnus-article-display-x-face-with-x-face-mule): New function.
+	(TopLevel): Autoload "x-face-mule" for the function
+	`x-face-mule-x-face-decode-message-header'.
+	(gnus-treatment-function-alist): Remove duplicates.
+
 1999-05-21  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
