@@ -1,5 +1,8 @@
 2002-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Also examine
+	backquote'd forms.
+
 	* lisp/nnheader.el (nnheader-with-unibyte): New macro.
 	(mm-with-unibyte): Alias to `nnheader-with-unibyte'.
 

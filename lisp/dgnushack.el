@@ -345,8 +345,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		     (while form
 		       (setq elem (pop form))
 		       (unless (memq (car-safe elem)
-				     '(\` backquote
-				       defcustom defface defgroup
+				     '(defcustom defface defgroup
 				       define-widget quote))
 			 (while (consp elem)
 			   (push (car elem) form)
