@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.4.1 1998-12-24 03:34:48 yamaoka Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.4.2 1999-02-01 06:45:23 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -41,8 +41,9 @@
 (defvar pop3-fma-movemail-type nil)
 (defvar pop3-fma-movemail-arguments nil)
 (defvar use-miee nil)
-(defvar address)
-(defvar options)
+(defvar address nil)
+(defvar mail-source nil)
+(defvar options nil)
 
 ;;; To silence byte compiler
 (and
@@ -172,43 +173,65 @@
 	  ;; Set E-Mail Address and pop3 movemail type.
 	  (setq i (string-to-int num-of-address))
 	  (setq address nil)
-	  (while (> i 0)
-	    (setq address
-		  (append address
-			  (list
-			   (list
-			    (concat "po:"
-				    (read-from-minibuffer
-				     "Email address (user@mailhost): "))
-			    (completing-read
-			     "Authentification Method (TAB to completion): "
-			     '(("pass" 1) ("apop" 2)) nil t nil)))))
-	    (setq i (- i 1)))
-	  
-	  ;; Replace "hoge" -> 'hoge
-	  (mapcar
-	   (lambda (x)
-	     (if (string-equal (nth 1 x) "pass")
-		 (setcar (cdr x) 'pass)
-	       (setcar (cdr x) 'apop)))
-	   address)
-	  (setq pop3-fma-spool-file-alist address)
-	  
-	  ;; Set movemail type.
-	  (let ((movemail-type
-		 (completing-read
-		  "Select movemail type for retreave mail (TAB to completion): "
-		  '(("exe" 1) ("lisp" 2))
-		  nil t nil))
-		)
-	    (if (string-equal movemail-type "exe")
-		(let ((options
-		       (read-from-minibuffer "movemail options: ")))
-		  (setq pop3-fma-movemail-arguments (split-string options "[\t ]+"))))
-	    (if (string-equal movemail-type "exe")
-		(setq pop3-fma-movemail-type 'exe)
-	      (setq pop3-fma-movemail-type 'lisp))))
-	
+	  (if (not (locate-library "mail-source"))
+	      (progn
+		(while (> i 0)
+		  (setq address
+			(append address
+				(list
+				 (list
+				  (concat "po:"
+					  (read-from-minibuffer
+					   "Email address (user@mailhost): "))
+				  (completing-read
+				   "Authentification Method (TAB to completion): "
+				   '(("pass" 1) ("apop" 2)) nil t nil)))))
+		  (setq i (- i 1)))
+		;; Replace "hoge" -> 'hoge
+		(mapcar
+		 (lambda (x)
+		   (if (string-equal (nth 1 x) "pass")
+		       (setcar (cdr x) 'pass)
+		     (setcar (cdr x) 'apop)))
+		 address)
+		(setq pop3-fma-spool-file-alist address)
+		;; Set movemail type.
+		(let ((movemail-type
+		       (completing-read
+			"Select movemail type for retreave mail (TAB to completion): "
+			'(("exe" 1) ("lisp" 2))
+			nil t nil))
+		      )
+		  (if (string-equal movemail-type "exe")
+		      (let ((options
+			     (read-from-minibuffer "movemail options: ")))
+			(setq pop3-fma-movemail-arguments (split-string options "[\t ]+"))))
+		  (if (string-equal movemail-type "exe")
+		      (setq pop3-fma-movemail-type 'exe)
+		    (setq pop3-fma-movemail-type 'lisp))))
+	    ;;
+	    ;; Use mail-source.el
+	    (setq mail-source nil)
+	    (while (> i 0)
+	      (setq user (read-from-minibuffer "Mail Account name : "))
+	      (setq server (read-from-minibuffer "Mail server : "))
+	      (setq auth (completing-read
+			  "Authentification Method (TAB to completion): "
+			  '(("pop" 1) ("apop" 2)) nil t nil))
+	      (setq mail-source
+		    (append mail-source
+			    (list
+			     (list
+			      auth :user user :server server))))
+	      (setq i (- i 1)))
+	    ;; Replace "hoge" -> 'hoge
+	    (mapcar
+	     (lambda (x)
+	       (if (string-equal (nth 0 x) "pop")
+		   (setcar x 'pop)
+		 (setcar x 'apop)))
+	     mail-source)
+	    (setq gnus-offline-mail-source mail-source)))
 	;; Write to setting file.
 	(setq tmp-buffer (get-buffer-create "* Setting"))
 	(set-buffer "* Setting")
@@ -283,7 +306,6 @@
 	;; Offline setting for gnus-nntp-*
 	(insert "(setq gnus-nntp-service nil)\n")
 	(insert "(setq gnus-nntp-server nil)\n")
-	(insert "(setq nnmail-spool-file nil)\n")
 
 	;; Write setting about hooks.
 	(insert "(add-hook 'gnus-group-mode-hook 'gnus-offline-processed-by-timer t)\n")
@@ -296,20 +318,32 @@
 	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
 	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
 
-	;; Write setting about pop3-fma.
-	(insert "(require 'pop3-fma)\n")
-	(insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
-	(insert "(setq pop3-fma-spool-file-alist '")
-	(insert (prin1-to-string pop3-fma-spool-file-alist))
-	(insert ")\n")
-	(insert "(setq pop3-fma-movemail-type '")
-	(insert (prin1-to-string pop3-fma-movemail-type))
-	(insert ")\n")
-	(if (eq pop3-fma-movemail-type 'exe)
+	(if (not (locate-library "mail-source"))
 	    (progn
-	      (insert "(setq pop3-fma-movemail-arguments '")
-	      (insert (prin1-to-string pop3-fma-movemail-arguments))
-	      (insert ")\n")))
+	      ;; Write setting about pop3-fma.
+	      (insert "(setq nnmail-spool-file nil)\n")
+	      (insert "(require 'pop3-fma)\n")
+	      (insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
+	      (insert "(setq pop3-fma-spool-file-alist '")
+	      (insert (prin1-to-string pop3-fma-spool-file-alist))
+	      (insert ")\n")
+	      (insert "(setq pop3-fma-movemail-type '")
+	      (insert (prin1-to-string pop3-fma-movemail-type))
+	      (insert ")\n")
+	      (if (eq pop3-fma-movemail-type 'exe)
+		  (progn
+		    (insert "(setq pop3-fma-movemail-arguments '")
+		    (insert (prin1-to-string pop3-fma-movemail-arguments))
+		    (insert ")\n"))))
+	  ;; Write stting about mail-source.el
+	  (insert "(setq gnus-offline-mail-source '")
+	  (insert (prin1-to-string gnus-offline-mail-source))
+	  (insert ")\n")
+	  (insert "(setq nnmail-spool-file gnus-offline-mail-source)\n")
+	  (insert "(require 'read-passwd)\n")
+	  (insert "(setq mail-source-read-passwd 'read-pw-read-passwd)\n")
+	  (insert "(add-hook 'gnus-before-startup-hook 'read-pw-set-mail-source-passwd-cache)\n");
+	  )
 	(write-region (point-min) (point-max) gnus-offline-setting-file)
 	(kill-buffer "* Setting"))
     )
