@@ -225,7 +225,8 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 			 (bury-buffer "*Compile-Log-Show*"))))))))
 
 (defun gnus-update-format-specifications (&optional force &rest types)
-  "Update all (necessary) format specifications."
+  "Update all (necessary) format specifications.
+Return a list of updated types."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
   (when force
@@ -244,26 +245,28 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 	    gnus-format-specs-compiled (delq spec gnus-format-specs-compiled))))
 
   ;; Go through all the formats and see whether they need updating.
-  (let (type val)
+  (let (type val updated)
     (save-excursion
       (while (setq type (pop types))
 	;; Jump to the proper buffer to find out the value of the
 	;; variable, if possible.  (It may be buffer-local.)
-	(let* ((new-format
-		(let ((buffer (intern (format "gnus-%s-buffer" type))))
-		  (when (and (boundp buffer)
-			     (setq val (symbol-value buffer))
-			     (gnus-buffer-exists-p val))
-		    (set-buffer val))
-		  (symbol-value
-		   (intern (format "gnus-%s-line-format" type))))))
-	  (or (gnus-update-format-specification-1 type new-format nil)
-	      ;; This is a new format.
-	      (gnus-update-format-specification-1
-	       type new-format
-	       (gnus-search-or-regist-spec (gnus-format-specs
-					    type new-format val entry elem)
-		 (setq val (if (stringp new-format)
+	(let ((new-format
+	       (let ((buffer (intern (format "gnus-%s-buffer" type))))
+		 (when (and (boundp buffer)
+			    (setq val (symbol-value buffer))
+			    (gnus-buffer-exists-p val))
+		   (set-buffer val))
+		 (symbol-value
+		  (intern (format "gnus-%s-line-format" type))))))
+	  (when
+	      (or (gnus-update-format-specification-1 type new-format nil)
+		  ;; This is a new format.
+		  (gnus-update-format-specification-1
+		   type new-format
+		   (gnus-search-or-regist-spec (gnus-format-specs
+						type new-format val entry elem)
+		     (setq val
+			   (if (stringp new-format)
 			       ;; This is a "real" format.
 			       (gnus-parse-format
 				new-format
@@ -273,7 +276,9 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 				(not (string-match "mode$"
 						   (symbol-name type))))
 			     ;; This is a function call or something.
-			     new-format))))))))))
+			     new-format)))))
+	    (push type updated)))))
+    updated))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
