@@ -1674,6 +1674,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-f\C-u" 'message-goto-summary)
   (define-key message-mode-map "\C-c\C-b" 'message-goto-body)
   (define-key message-mode-map "\C-c\C-i" 'message-goto-signature)
+  (define-key message-mode-map "\C-c\C-fc" 'message-goto-mail-copies-to)
 
   (define-key message-mode-map "\C-c\C-t" 'message-insert-to)
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
@@ -1899,14 +1900,29 @@ M-RET    message-newline-and-reformat (break the line and reformat)."
   (message-position-on-field "Mail-Reply-To" "Subject"))
 
 (defun message-goto-mail-followup-to ()
-  "Move point to the Mail-Followup-To header."
+  "Move point to the Mail-Followup-To header.  If the header is newly created
+and To field contains only one address, the address is inserted in default."
   (interactive)
-  (message-position-on-field "Mail-Followup-To" "Subject"))
+  (unless (message-position-on-field "Mail-Followup-To" "Subject")
+    (let ((start (point))
+	  addresses)
+      (save-restriction
+	(message-narrow-to-headers)
+	(setq addresses (split-string (mail-strip-quoted-names
+				       (or (std11-fetch-field "to") ""))
+				      "[ \f\t\n\r\v,]+"))
+	(when (eq 1 (length addresses))
+	  (goto-char start)
+	  (insert (car addresses))
+	  (goto-char start))))))
 
 (defun message-goto-mail-copies-to ()
-  "Move point to the Mail-Copies-To header."
+  "Move point to the Mail-Copies-To header.  If the header is newly created,
+a string \"never\" is inserted in default."
   (interactive)
-  (message-position-on-field "Mail-Copies-To" "Subject"))
+  (unless (message-position-on-field "Mail-Copies-To" "Subject")
+    (insert "never")
+    (backward-char 5)))
 
 (defun message-goto-newsgroups ()
   "Move point to the Newsgroups header."
