@@ -237,8 +237,11 @@ base64-encoder-program.")
 		(base64-insert-char (aref alphabet (logand (lsh bits -6) 63))
 				    1 nil work-buffer)
 		(base64-insert-char ?= 1 nil work-buffer)))
-	    (if (> cols 0)
-		(base64-insert-char ?\n 1 nil work-buffer)))
+	    ;;;!!! LMI removed this, because he didn't like having
+	    ;;;!!! newlines added to the end of the encoding.
+	    ;;(if (> cols 0)
+	    ;;	(base64-insert-char ?\n 1 nil work-buffer))
+	    )
 	  (or (markerp end) (setq end (set-marker (make-marker) end)))
 	  (goto-char start)
 	  (insert-buffer-substring work-buffer)
