@@ -1441,6 +1441,7 @@ Point is left at the beginning of the narrowed-to region."
 
   (define-key message-mode-map "\t" 'message-tab)
 
+  (define-key message-mode-map "\C-c\C-a" 'message-insert-mime-part)
   (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
   (define-key message-mode-map "\C-xk" 'message-kill-buffer))
 

@@ -1,5 +1,7 @@
 1998-11-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/message.el: Forget bind "\C-c\C-a" 'message-insert-mime-part
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.030.
 
 	* Sync up with Pterodactyl Gnus 0.44.
