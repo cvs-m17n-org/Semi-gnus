@@ -1,3 +1,8 @@
+2000-04-25  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (union, member-if, mapcon, last): Remove
+	compiler macros.
+
 2000-04-24  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.3.
