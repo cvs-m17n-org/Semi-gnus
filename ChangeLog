@@ -1,5 +1,11 @@
 2002-02-03  Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/nnir.el (nnir-run-namazu): According to SUSv3, LC_ALL is
+	prior to the other environment variables whose names are starting
+	with "LC_".  So there is no need to setting them.
+
+2002-02-03  Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/nnir.el (nnir-imap-default-charset): New user option.
 	(nnir-run-imap): Supply the charset of a search criteria.
 
