@@ -28,11 +28,16 @@ clever some:
 install: clever
 	rm -f dgnushack.elc
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
-	for p in *.el *.elc; do \
-	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	@for p in *.el; do \
+	  if test "$$p" != "dgnuspath.el"; then \
+	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	    if test -f $$p"c"; then \
+	      echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
+	      $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
+	    fi; \
+	  fi; \
 	done
-	touch $(lispdir)/*.elc
 
 package:
 	$(EMACS) $(FLAGS) -f dgnushack-make-package
@@ -68,7 +73,7 @@ clean:
 	rm -f auto-autoloads.el custom-load.el
 
 distclean: clean
-	rm -f Makefile paths.el
+	rm -f Makefile dgnuspath.el
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \
