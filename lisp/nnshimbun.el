@@ -97,8 +97,7 @@
 ;;; backlog
 (defmacro nnshimbun-backlog (&rest form)
   `(let ((gnus-keep-backlog nnshimbun-keep-backlog)
-	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*"
-				      (nnoo-current-server 'nnshimbun)))
+	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*" (nnoo-current-server 'nnshimbun)))
 	 (gnus-backlog-articles nnshimbun-backlog-articles)
 	 (gnus-backlog-hashtb nnshimbun-backlog-hashtb))
      (unwind-protect
@@ -116,8 +115,7 @@
   (push (list 'nnshimbun-shimbun
 	      (condition-case err
 		  (shimbun-open server (luna-make-entity 'shimbun-gnus-mua))
-		(error (nnheader-report 'nnshimbun "%s"
-					(error-message-string err)))))
+		(error (nnheader-report 'nnshimbun "%s" (error-message-string err)))))
 	defs)
   ;; Set directory for server working files.
   (push (list 'nnshimbun-server-directory
@@ -132,8 +130,7 @@
   (cond
    ((not (file-exists-p nnshimbun-directory))
     (nnshimbun-close-server)
-    (nnheader-report 'nnshimbun "Couldn't create directory: %s"
-		     nnshimbun-directory))
+    (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-directory))
    ((not (file-directory-p (file-truename nnshimbun-directory)))
     (nnshimbun-close-server)
     (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-directory))
@@ -143,12 +140,10 @@
     (cond
      ((not (file-exists-p nnshimbun-server-directory))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Couldn't create directory: %s"
-		       nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-server-directory))
      ((not (file-directory-p (file-truename nnshimbun-server-directory)))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Not a directory: %s"
-		       nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-server-directory))
      (t
       (nnheader-report 'nnshimbun "Opened server %s using directory %s"
 		       server nnshimbun-server-directory)
@@ -309,8 +304,7 @@
 (defun nnshimbun-retrieve-headers-with-nov (articles &optional fetch-old)
   (if (or gnus-nov-is-evil nnshimbun-nov-is-evil)
       nil
-    (let ((nov (expand-file-name nnshimbun-nov-file-name
-				 nnshimbun-current-directory)))
+    (let ((nov (expand-file-name nnshimbun-nov-file-name nnshimbun-current-directory)))
       (when (file-exists-p nov)
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
@@ -504,34 +498,37 @@ However, the optional FORCE if it is non-nil (it is supposed to be
 specified by the command `nnshimbun-expire-nov-databases'), it does
 expire for the SERVER:GROUP even if whose NOV is not open."
   (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist)))
+	(progress-msg (format "Expiring NOV database for nnshimbun+%s:%s "
+			      server group))
+	(pinwheel "-/|\\")
+	(counter 0)
 	should-close-nov name article expirable end time)
     (if (and
 	 server
-	 (let ((current (nnoo-current-server 'nnshimbun)))
-	   (or (and current
+	 (or (let ((current (nnoo-current-server 'nnshimbun)))
+	       (and current
 		    (string-equal server current)
-		    (buffer-live-p buffer))
-	       (when force
-		 (setq current server
-		       should-close-nov t
-		       buffer (gnus-get-buffer-create
-			       (format " *nnshimbun overview %s %s*"
-				       server group)))
-		 (save-excursion
-		   (set-buffer buffer)
-		   (set (make-local-variable 'nnshimbun-nov-buffer-file-name)
+		    (buffer-live-p buffer)))
+	     (when force
+	       (setq should-close-nov t
+		     buffer (gnus-get-buffer-create
+			     (format " *nnshimbun overview %s %s*"
+				     server group)))
+	       (save-excursion
+		 (set-buffer buffer)
+		 (set (make-local-variable 'nnshimbun-nov-buffer-file-name)
+		      (expand-file-name
+		       nnshimbun-nov-file-name
+		       (expand-file-name
+			group
 			(expand-file-name
-			 nnshimbun-nov-file-name
-			 (expand-file-name
-			  group
-			  (expand-file-name
-			   server
-			   nnshimbun-directory))))
-		   (erase-buffer)
-		   (nnheader-insert-file-contents
-		    nnshimbun-nov-buffer-file-name))
-		 (set-buffer-modified-p nil)
-		 t))))
+			 server
+			 nnshimbun-directory))))
+		 (erase-buffer)
+		 (nnheader-insert-file-contents
+		  nnshimbun-nov-buffer-file-name))
+	       (set-buffer-modified-p nil)
+	       t)))
 	(prog1
 	    (save-excursion
 	      (setq name (concat "nnshimbun+" server ":" group))
@@ -540,10 +537,8 @@ expire for the SERVER:GROUP even if whose NOV is not open."
 		(setq articles nil)
 		(goto-char (point-min))
 		(while (not (eobp))
-		  (when (numberp (setq article (condition-case nil
-						   (read buffer)
-						 (error nil))))
-		    (push article articles))
+		  (when (looking-at "[0-9]+\t")
+		    (push (read buffer) articles))
 		  (forward-line 1))
 		(setq articles (nreverse articles)))
 	      (setq expirable (copy-sequence articles))
@@ -553,31 +548,35 @@ expire for the SERVER:GROUP even if whose NOV is not open."
 			   (setq end (line-end-position))
 			   (not (and nnshimbun-keep-last-article
 				     (= (point-max) (1+ end)))))
-		  (setq time
-			(and
-			 (search-forward "\t" end t)
-			 (search-forward "\t" end t)
-			 (search-forward "\t" end t)
-			 (condition-case nil
-			     (apply 'encode-time
-				    (parse-time-string
-				     (buffer-substring
-				      (point)
-				      (if (search-forward "\t" end t)
-					  (1- (point))
-					end))))
-			   (error
-			    (when nnshimbun-keep-unparsable-dated-articles
-			      ;; Inhibit expiring.
-			      '(0 0))))))
-		  (when (nnmail-expired-article-p name time (not time))
+		  (setq time (and (search-forward "\t" end t)
+				  (search-forward "\t" end t)
+				  (search-forward "\t" end t)
+				  (parse-time-string
+				   (buffer-substring
+				    (point)
+				    (if (search-forward "\t" end t)
+					(1- (point))
+				      end)))))
+		  (if (and
+		       (or (setq time (condition-case nil
+					  (apply 'encode-time time)
+					(error nil)))
+			   ;; Inhibit expiring if there's no parsable date
+			   ;; and the following option is non-nil.
+			   (not nnshimbun-keep-unparsable-dated-articles))
+		       (nnmail-expired-article-p name time nil))
+		      (progn
+			(when force
+			  (message "%s(%c)..." progress-msg article))
+			(beginning-of-line)
+			(delete-region (point) (1+ end))
+			(setq articles (delq article articles)))
 		    (when force
-		      (message
-		       "Expiring NOV database for nnshimbun+%s:%s (%d)..."
-		       server group article))
-		    (beginning-of-line)
-		    (delete-region (point) (1+ end))
-		    (setq articles (delq article articles)))))
+		      (message "%s(%c)..."
+			       progress-msg
+			       (aref pinwheel
+				     (setq counter
+					   (logand 3 (1+ counter)))))))))
 	      (when (buffer-modified-p)
 		(nnmail-write-region 1 (point-max)
 				     nnshimbun-nov-buffer-file-name
@@ -588,6 +587,7 @@ expire for the SERVER:GROUP even if whose NOV is not open."
 	    (kill-buffer buffer)))
       t)))
 
+;;;###autoload
 (defun nnshimbun-expire-nov-databases (&optional arg)
   "Expire NOV databases for all the auto expirable nnshimbun groups.
 If the prefix argument is given, the value of
@@ -663,11 +663,9 @@ nil)."
 	(ignore-errors (make-directory nnshimbun-current-directory t)))
       (cond
        ((not (file-exists-p nnshimbun-current-directory))
-	(nnheader-report 'nnshimbun "Couldn't create directory: %s"
-			 nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-current-directory))
        ((not (file-directory-p (file-truename nnshimbun-current-directory)))
-	(nnheader-report 'nnshimbun "Not a directory: %s"
-			 nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-current-directory))
        (t t)))))
 
 
