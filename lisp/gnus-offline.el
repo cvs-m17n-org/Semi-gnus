@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.7 1998-11-11 14:36:13 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.8 1998-11-12 14:04:08 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -7,7 +7,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 2.00
+;;; Version: 2.00b4
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -47,11 +47,6 @@
 ;;;    (load "gnus-ofsetup")
 ;;;    (gnus-setup-for-offline)
 ;;;    (load gnus-offline-setting-file)
-;;;
-;;; put following code in you .gnus-offline.el.
-;;;
-;;;  (setq gnus-offline-dialup-program-arguments '("-a" "-b"))
-;;;  (setq gnus-offline-hangup-program-arguments '("-c" "-d"))
 ;;;
 ;;; If you use gnus-agent as souper , put gnus-agent setup code in you .gnus.el
 ;;;
@@ -103,9 +98,10 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.00")
+(defconst gnus-offline-version-number "2.00b4")
 (defconst gnus-offline-codename
-  "This is the time"		; 2.00
+  "Beta4"			; Beta
+;;  "This is the time"		; 2.00
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Code of silence"
@@ -221,6 +217,7 @@ If value is nil , dialup line is disconnected status.")
 (defvar ver)
 (defvar passwd)
 (defvar num)
+(defvar gnus-offline-error-buffer " *Error*")
 (defvar gnus-offline-map (make-sparse-keymap))
 
 ;;; To silence byte compiler
@@ -254,9 +251,10 @@ If value is nil , dialup line is disconnected status.")
      (setq byte-compile-warnings nil))))
        
 (put 'gnus-offline-set-unplugged-state 'menu-enable 'gnus-offline-connected)
-(define-process-argument-editing "/hang\\.exe\\'"
-  (lambda (x) (general-process-argument-editing-function
-	       x nil t t nil t t)))
+(if (eq system-type 'windows-nt)
+    (define-process-argument-editing "/hang\\.exe\\'"
+      (lambda (x) (general-process-argument-editing-function
+		   x nil t t nil t t))))
 ;;; Functions
 ;;
 ;; Setting up...
@@ -277,6 +275,32 @@ If value is nil , dialup line is disconnected status.")
 	((eq gnus-offline-mail-treat-environ 'online)
 	 ;; send mail under offline environ.
 	 (gnus-offline-set-online-sendmail-function))))
+
+;;
+;; Setting Error check.
+(defun gnus-offline-error-check ()
+  ;; Check gnus-agent and nnspool setting.
+  (cond ((eq gnus-offline-news-fetch-method 'nnagent)
+	 ;; nnagent and gnus-agent loaded ??
+	 (if (not (and (featurep 'gnus-agent)
+		       (featurep 'nnagent)))
+	     (progn
+	       (get-buffer-create gnus-offline-error-buffer)
+	       (set-buffer gnus-offline-error-buffer)
+	       (erase-buffer)
+	       (insert "WARNING!!: gnus-agent.el or nnagent.el is not loaded.\n")
+	       (insert "Please check your .emacs or .gnus.el to work gnus-agent fine.")
+	       (pop-to-buffer gnus-offline-error-buffer))))
+	
+	((eq gnus-offline-news-fetch-method 'nnspool)
+	 (if (not (featurep 'nnspool))
+	     (progn
+	       (get-buffer-create gnus-offline-error-buffer)
+	       (set-buffer gnus-offline-error-buffer)
+	       (erase-buffer)
+	       (insert "WARNING!!: nnspool.el is not loaded.\n")
+	       (insert "Please check your .emacs or .gnus.el to work nnspool fine.")
+	       (pop-to-buffer gnus-offline-error-buffer))))))
 ;;
 ;;
 (defun gnus-offline-set-offline-sendmail-function ()

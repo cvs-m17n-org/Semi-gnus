@@ -1,5 +1,33 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
-;;; $Id: gnus-ofsetup.el,v 1.1.2.3 1998-11-11 14:36:14 ichikawa Exp $
+;;;
+;;; $Id: gnus-ofsetup.el,v 1.1.2.5 1998-11-12 14:08:07 ichikawa Exp $
+;;;
+;;; Copyright (C) 1998 Tatsuya Ichikawa
+;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;;
+;;; This file is part of Semi-gnus.
+;;;
+;;; GNU Emacs is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 2, or (at your option)
+;;; any later version.
+
+;;; GNU Emacs is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;;; GNU General Public License for more details.
+
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;;; Boston, MA 02111-1307, USA.
+;;;
+;;;; Commentary:
+;;; How to use.
+;;;
+;;;      M-x load[RET]gnus-ofsetup
+;;;      M-x gnus-setup-for-offline
+;;;
 
 ;;; Code:
 
@@ -77,6 +105,7 @@
 	  ;;
 	  (setq gnus-offline-mail-fetch-method mail-method)
 	  (setq gnus-offline-use-miee use-miee)
+	  
 	  ;; Set programs.
 	  (if (string-equal program "nil")
 	      (progn
@@ -84,43 +113,53 @@
 		(setq gnus-offline-dialup-program nil))
 	    (let ((options
 		   (read-from-minibuffer "Dialup program options: ")))
-	      (setq gnus-offline-dialup-program-arguments (split-string options "[\t ]+")))
+	      (setq gnus-offline-dialup-program-arguments
+		    (split-string options "[\t ]+")))
 	    (let ((options
 		   (read-from-minibuffer "Hangup program options: ")))
-	      (setq gnus-offline-hangup-program-arguments (split-string options "[\t ]+")))
+	      (setq gnus-offline-hangup-program-arguments
+		    (split-string options "[\t ]+")))
 	    (setq gnus-offline-hangup-program program)
 	    (setq gnus-offline-dialup-program program))
-
-	  ;; Set spool directory for outgoing messages.
+	    
+	    ;; Set spool directory for outgoing messages.
 	  (if use-miee
 	      (progn
 		;; Setting for MIEE with nnspool.
 		(let ((news-spool
-		       (read-from-minibuffer "News spool directory for sending: " "~/spool/mail.out"))
+		       (read-from-minibuffer
+			"News spool directory for sending: "
+			"/usr/spool/news.out"))
 		      (mail-spool
-		       (read-from-minibuffer "Mail spool directory for sending: " "~/spool/news.out")))
+		       (read-from-minibuffer
+			"Mail spool directory for sending: "
+			"/usr/spool/mail.out")))
 		  (setq gnus-offline-mail-spool-directory mail-spool)
 		  (setq gnus-offline-news-spool-directory news-spool)
 		  (setq gnus-offline-drafts-queue-type 'miee)
-		
+		  
 		  ;; Load MIEE.
 		  (load "miee")
 		  ;; Set news post function for MIEE.
 		  (setq message-send-news-function 'gnspool-request-post)
-		  
 		  ;; Spool directory setting - MIEE.
 		  (if (not (file-exists-p gnus-offline-mail-spool-directory))
 		      (make-directory gnus-offline-mail-spool-directory t))
-		  (setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)
+		  (setq sendmail-to-spool-directory
+			gnus-offline-mail-spool-directory)
 		  (if (not (file-exists-p gnus-offline-news-spool-directory))
 		      (make-directory gnus-offline-news-spool-directory t))
-		  (setq news-spool-request-post-directory gnus-offline-news-spool-directory)))
-	    ;; Setting for gnus-agent.
-	    (setq gnus-offline-drafts-queue-type 'agent)
-	    (let ((agent-directory
-		   (read-from-minibuffer "Agent directory: " "~/News/agent")))
-	      (setq gnus-agent-directory agent-directory)))
+		  (setq news-spool-request-post-directory
+			gnus-offline-news-spool-directory)))
+	    
+	    ;; Set drafts type gnus-agent.
+	    (setq gnus-offline-drafts-queue-type 'agent))
 	  
+	  ;; Setting for gnus-agent.
+	  (let ((agent-directory
+		 (read-from-minibuffer "Agent directory: " "~/News/agent")))
+	    (setq gnus-agent-directory agent-directory))
+	    
 	  ;; Determin MTA type.
 	  (if (string-equal mta-type "smtp")
 	      (setq gnus-offline-MTA-type 'smtp)
@@ -131,13 +170,18 @@
 	  (setq i (string-to-int num-of-address))
 	  (setq address nil)
 	  (while (> i 0)
-	    (setq address (append address (list (list
-			       (concat "po:" (read-from-minibuffer "Email address (user@mailhost): "))
-			       (completing-read
-				"Authentification Method (TAB to completion): "
-				'(("pass" 1) ("apop" 2)) nil t nil)))))
+	    (setq address
+		  (append address
+			  (list
+			   (list
+			    (concat "po:"
+				    (read-from-minibuffer
+				     "Email address (user@mailhost): "))
+			    (completing-read
+			     "Authentification Method (TAB to completion): "
+			     '(("pass" 1) ("apop" 2)) nil t nil)))))
 	    (setq i (- i 1)))
-
+	  
 	  ;; Replace "hoge" -> 'hoge
 	  (mapcar
 	   (lambda (x)
@@ -146,7 +190,7 @@
 	       (setcar (cdr x) 'apop)))
 	   address)
 	  (setq pop3-fma-spool-file-alist address)
-
+	  
 	  ;; Set movemail type.
 	  (let ((movemail-type
 		 (completing-read
@@ -161,7 +205,7 @@
 	    (if (string-equal movemail-type "exe")
 		(setq pop3-fma-movemail-type 'exe)
 	      (setq pop3-fma-movemail-type 'lisp))))
-	  
+	
 	;; Write to setting file.
 	(setq tmp-buffer (get-buffer-create "* Setting"))
 	(set-buffer "* Setting")
@@ -172,6 +216,8 @@
 	(insert (current-time-string))
 	(insert "\n")
 	(insert ";;\n")
+
+	;; write Basic setting
 	(insert "(setq gnus-offline-news-fetch-method '")
 	(insert (prin1-to-string gnus-offline-news-fetch-method))
 	(insert ")\n")
@@ -184,6 +230,8 @@
 	(insert "(setq gnus-offline-dialup-program ")
 	(insert (prin1-to-string gnus-offline-dialup-program))
 	(insert ")\n")
+
+	;; write dialup/hangup program and options.
 	(if (stringp gnus-offline-dialup-program)
 	    (progn
 	      (insert "(setq gnus-offline-dialup-program-arguments '")
@@ -197,6 +245,8 @@
 	      (insert "(setq gnus-offline-hangup-program-arguments '")
 	      (insert (prin1-to-string gnus-offline-hangup-program-arguments))
 	      (insert ")\n")))
+
+	;; write setting about MIEE.
 	(if gnus-offline-use-miee
 	    (progn
 	      (insert "(setq gnus-offline-mail-spool-directory ")
@@ -205,24 +255,33 @@
 	      (insert "(setq gnus-offline-news-spool-directory ")
 	      (insert (prin1-to-string gnus-offline-news-spool-directory))
 	      (insert ")\n")
-	      (insert "(load \"miee\")\n")
-	      (if (equal gnus-offline-news-fetch-method 'nnspool)
-		  (insert "(message-offline-state)\n")))
-	  (insert "(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)\n")
-	  (insert "(setq news-spool-request-post-directory gnus-offline-news-spool-directory)\n")
+	      (insert "(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)\n")
+	      (insert "(setq news-spool-request-post-directory gnus-offline-news-spool-directory)\n")
+	      (insert "(load \"miee\")\n")))
+
+	;; write setting about nnspool and gnus-agent.
+	(if (equal gnus-offline-news-fetch-method 'nnspool)
+	    (insert "(message-offline-state)\n")
 	  (insert "(setq gnus-agent-directory ")
 	  (insert (prin1-to-string gnus-agent-directory))
 	  (insert ")\n"))
+
+	;; write setting about queue type -- MIEE or nnagent.
 	(insert "(setq gnus-offline-drafts-queue-type '")
 	(insert (prin1-to-string gnus-offline-drafts-queue-type))
 	(insert ")\n")
 	(insert "(setq gnus-offline-MTA-type '")
 	(insert (prin1-to-string gnus-offline-MTA-type))
 	(insert ")\n")
+
+	;; Offline setting for gnus-nntp-*
 	(insert "(setq gnus-nntp-service nil)\n")
 	(insert "(setq gnus-nntp-server nil)\n")
 	(insert "(setq nnmail-spool-file nil)\n")
-	(insert "(add-hook 'gnus-group-mode-hook 'gnus-offline-processed-by-timer)\n")
+
+	;; Write setting about hooks.
+	(insert "(add-hook 'gnus-group-mode-hook 'gnus-offline-processed-by-timer t)\n")
+	(insert "(add-hook 'gnus-group-mode-hook 'gnus-offline-error-check t)\n")
 	(insert "(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news)\n")
 	(insert "(add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)\n")
 	(if (eq gnus-offline-news-fetch-method 'nnspool)
@@ -230,6 +289,8 @@
 	(insert "(add-hook 'message-send-hook 'gnus-offline-message-add-header)\n")
 	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
 	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
+
+	;; Write setting about pop3-fma.
 	(insert "(require 'pop3-fma)\n")
 	(insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
 	(insert "(setq pop3-fma-spool-file-alist '")
@@ -245,6 +306,6 @@
 	      (insert ")\n")))
 	(write-region (point-min) (point-max) gnus-offline-setting-file)
 	(kill-buffer "* Setting"))
-	)
-  (load gnus-offline-setting-file)
-  )
+    )
+  (load gnus-offline-setting-file))
+;; gnus-ofsetup.el Ends here.
