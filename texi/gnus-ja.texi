@@ -20992,7 +20992,7 @@ Spam $B5-;v$r8+$?$H$-$O$$$D$G$b!"%0%k!<%W$rH4$1$kA0$KI,$:(B @kbd{M-d} $B$G$=$
 @findex spam-bogofilter-score
 @code{spam-bogofilter-score}$B!#(B
 
-$B$3$N%3%^%s%I$,$A$c$s$HF/$/$?$a$K$O(B bogofilter $B$N=hM}$rM-8z$K$7$J$1$l$P$J(B
+$B$3$N%3%^%s%I$,$A$c$s$HF/$/$?$a$K$O(B Bogofilter $B$r%$%s%9%H!<%k$7$J$1$l$P$J(B
 $B$j$^$;$s!#(B
 
 @xref{Bogofilter}$B!#(B
@@ -21070,8 +21070,10 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 $B$O(B @emph{$BL$J,N`(B} $B$^$?$O(B @emph{ham} $B%0%k!<%W$KBP$7$F$O9T$J$o$l$^$;$s!#$5(B
 $B$i$K(B spam $B%0%k!<%W$K$"$k$I$N(B @strong{ham} $B5-;v$b!"(B
 @code{ham-process-destination} $B%0%k!<%W%Q%i%a!<%?(B
-$B$+(B @code{gnus-ham-process-destinations} $BJQ?t$N$I$A$i$+$G7h$a$i$l$F$$$k>l(B
-$B=j$K0\$5$l$^$9!#>l=j$H$$$&$N$O%0%k!<%WL>$N$3$H$G$9!#(B
+$B$+(B @code{gnus-ham-process-destinations} $BJQ?t$N$I$A$i$+$K9gCW$9$k>l=j$K0\(B
+$B$5$l$^$9!#$=$l$i$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$N%j%9%H$G(B
+$B$9(B (@code{customize-variable gnus-ham-process-destinations} $B$K$h$C$F$3$N(B
+$BJQ?t$r%+%9%?%^%$%:$9$k$N$,:G$b4JC1$G$9(B)$B!#:G=*E*$J>l=j$O%0%k!<%WL>$G$9!#(B
 @code{ham-process-destination} $B%Q%i%a!<%?$,@_Dj$5$l$F$$$J$$$H!"(Bspam $B5-;v(B
 $B$OC1$K4|8B@Z$l>C5n$5$l$^$9!#(B
 
@@ -21080,8 +21082,10 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 
 @emph{Ham} $B$^$?$O(B @emph{$BL$J,N`(B} $B%0%k!<%W$rH4$1$k$H$-$K!"$9$Y$F(B
 $B$N(B @strong{spam} $B5-;v$O!"(B@code{spam-process-destination} $B%0%k!<%W%Q%i%a!<(B
-$B%?$+(B @code{gnus-spam-process-destinations} $BJQ?t$N$I$A$i$+$G7h$a$i$l$F$$(B
-$B$k>l=j$K0\$5$l$^$9!#>l=j$H$$$&$N$O%0%k!<%WL>$N$3$H$G$9!#(B
+$B%?$+(B @code{gnus-spam-process-destinations} $BJQ?t$N$I$A$i$+$K9gCW$9$k>l=j(B
+$B$K0\$5$l$^$9!#$=$l$i$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$N%j%9%H$G(B
+$B$9(B (@code{customize-variable gnus-spam-process-destinations} $B$K$h$C$F$3(B
+$B$NJQ?t$r%+%9%?%^%$%:$9$k$N$,:G$b4JC1$G$9(B)$B!#:G=*E*$J>l=j$O%0%k!<%WL>$G$9!#(B
 @code{spam-process-destination} $B%Q%i%a!<%?$,@_Dj$5$l$F$$$J$$$H!"(Bspam $B5-(B
 $B;v$OC1$K4|8B@Z$l>C5n$5$l$^$9!#(B
 
@@ -21259,21 +21263,36 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @defvar spam-use-bogofilter
 
 Eric Raymond $B$N?WB.$J(B Bogofilter $B$r(B @code{spam-split} $B$K;HMQ$7$?$$>l9g$O!"(B
-$B$3$NJQ?t$r%;%C%H$7$F$/$@$5$$!#$3$l$O!"%P!<%8%g%s(B 0.4 $B$N%m!<%+%k$K%Q%C%A(B
-$B$,Ev$?$C$?%3%T!<$G%F%9%H$5$l$^$7$?!#(B@code{spam.el} $B$K$"$k%$%s%9%H!<%k$K(B
-$B4X$9$k%3%a%s%H$rFI$s$G3N$+$a$F2<$5$$!#(B
+$B$3$NJQ?t$r%;%C%H$7$F$/$@$5$$!#(B
 
 Spam $B5-;v$@$1$N(B @samp{H} $B0u$r4XO"IU$1$k:G>.$N@$OC$K$h$C$F!"(BBogofilter $B%H(B
 $B%l!<%K%s%0$O$9$Y$F$+$J$j<+F0E*$K$J$j$^$9!#3F%+%F%4%j!<$N(B spam $B$+$=$&$G$J(B
 $B$$?tI4(B (a few hundreds) $B$N5-;v$rF~<j$9$k$^$G!"$3$l$r$d$i$J$1$l$P$J$j$^$;(B
-$B$s!#%7%'%k%3%^%s%I(B @command{head -1 ~/.bogofilter/*} $B$ON>J}$N5-;v$N7W?t(B
-$B$rI=<($7$^$9!#35N,%b!<%I$K$*$1$k%G%P%C%0$N$?$a$N!"$"$k$$$O9%4q?4$N$?$a$N(B
-$B%3%^%s%I(B @kbd{S t} $B$O!"(BBogofilter $B$,8=:_$N5-;v$N(B @emph{spamicity} ($BLuCm(B:
-spam $BEY(B?) $B%9%3%"(B (0.0$B!A(B1.0) $B$r!"%9%3%"$K:G$bCx$7$/4sM?$9$k5-;v$N8l$H$$$C(B
-$B$7$g$K!"B>$N%P%C%U%!$KI=<($9$k$3$H$rB%$7$^$9!#(B
+$B$s!#35N,%b!<%I$K$*$1$k%G%P%C%0$N$?$a$N!"$"$k$$$O9%4q?4$N$?$a$N%3%^%s(B
+$B%I(B @kbd{S t} $B$O!"8=:_$N5-;v$N(B @emph{spamicity} ($BLuCm(B: spam $BEY(B?) $B%9%3(B
+$B%"(B (0.0$B!A(B1.0) $B$rI=<($7$^$9!#(B
+
+Bogofilter $B$O!"%3%s%Q%$%k;~$K@_Dj$5$l$kFbIt$NogCM$K4p$E$$$F!"%a%C%;!<%8(B
+$B$,(B spam $B$+$I$&$+$r7hDj$7$^$9!#ogCM$O%+%9%?%^%$%:$G$-$^$;$s!#(B
 
 Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N=hM}$O(B
 $B<h$j>C$5$l$^$9!#(B
+
+@code{spam-use-bogofilter-headers} $B$r;H$&>l9g$O!"$3$l$rM-8z$K$7$F$O$$$1(B
+$B$^$;$s!#(B
+
+@end defvar
+
+@defvar spam-use-bogofilter-headers
+
+$B%a%C%;!<%8%X%C%@!<$@$1$rD4$Y$k$?$a$K(B Eric Raymond $B$N?WB.(B
+$B$J(B Bogofilter $B$r(B @code{spam-split} $B$K;HMQ$7$?$$>l9g$O!"$3$NJQ?t$r%;%C%H(B
+$B$7$F$/$@$5$$!#$3$l$O(B @code{spam-use-bogofilter} $B$HF1$8$h$&$KF0:n$7$^$9$,!"(B
+$B$"$i$+$8$a(B @code{X-Bogosity} $B%X%C%@!<$,%a%C%;!<%8$KB8:_$7$J$1$l$P$J$j$^(B
+$B$;$s!#DL>o$3$l$O(B procmail $B$N5;K!$+!"2?$+$=$l$K;w$?$b$N$G9T$J$&$3$H$K$J$k(B
+$B$G$7$g$&!#(BBogofilter $B$N%$%s%9%H!<%k$K4X$9$kJ8=q$rD4$Y$F2<$5$$!#(B
+
+@code{spam-use-bogofilter} $B$r;H$&>l9g$O!"$3$l$rM-8z$K$7$F$O$$$1$^$;$s!#(B
 
 @end defvar
 
@@ -21282,11 +21301,34 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 $B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bspam $B0u$,IU$$(B
-$B$?5-;v$,(B bogofilter $B$N(B spam $B%G!<%?%Y!<%9$K2C$($i$l!"(Bham $B0u$,IU$$$?5-;v(B
-$B$,(B bogofilter $B$N(B ham $B%G!<%?%Y!<%9$K2C$($i$l$^$9!#(B
-@strong{Bogofilter $B$N(B spam $B%W%m%;%C%5!<$O!"$5$i$K(B ham $B=hM}$b9T$J$&$?$@0l(B
-$B$D$N(B spam $B%W%m%;%C%5!<$G$"$k$3$H$KCm0U$7$F2<$5$$!#(B}
+$B$?5-;v$,(B bogofilter $B$N(B spam $B%G!<%?%Y!<%9$K2C$($i$^$9!#(B
 @end defvar
+
+@c TRANSLATEME!
+@defvar gnus-group-ham-exit-processor-bogofilter
+Add this symbol to a group's @code{spam-process} parameter by
+customizing the group parameters or the
+@code{gnus-spam-process-newsgroups} variable.  When this symbol is
+added to a group's @code{spam-process} parameter, the ham-marked
+articles in @emph{ham} groups will be added to the Bogofilter database
+of non-spam messages.  Note that this ham processor has no effect in
+@emph{spam} or @emph{unclassified} groups.
+@end defvar
+
+@defvar spam-bogofilter-database-directory
+
+This is the directory where Bogofilter will store its databases.  It
+is not specified by default, so Bogofilter will use its own default
+database directory.
+
+@end defvar
+
+The Bogofilter mail classifier is similar to ifile in intent and
+purpose.  A ham and a spam processor are provided, plus the
+@code{spam-use-bogofilter} and @code{spam-use-bogofilter-headers}
+variables to indicate to spam-split that Bogofilter should either be
+used, or has already been used on the article.  The 0.9.2.1 version of
+Bogofilter was used to test this functionality.
 
 @node ifile spam filtering
 @subsubsection ifile $B$K$h$k(B spam $B$N_I2a(B
