@@ -248,7 +248,7 @@ If there is any problem , please set this variable to nil(default).
 				      pop3-fma-movemail-program)
 		       nil movemail-output-buffer nil
 		       pop3-fma-commandline-arguments)
-		(let ((string (buffer-substring (point-min) (point-max))))
+		(let ((string (buffer-string)))
 		  (if (> (length string) 0)
 		      (progn
 			(if (y-or-n-p

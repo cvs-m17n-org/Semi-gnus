@@ -1089,7 +1089,7 @@ See `gnus-simplify-buffer-fuzzy' for details."
 	(setq subject (substring subject (match-end 0))))
       (insert subject)
       (inline (gnus-simplify-buffer-fuzzy))
-      (buffer-substring (point-min) (point-max)))))
+      (buffer-string))))
 
 (defsubst gnus-simplify-subject-fully (subject)
   "Simplify a subject string according to gnus-summary-gather-subject-limit."
@@ -7338,7 +7338,7 @@ groups."
 	    (save-excursion
 	      (save-restriction
 		(message-narrow-to-head)
-		(let ((head (buffer-substring (point-min) (point-max)))
+		(let ((head (buffer-string))
 		      header)
 		  (nnheader-temp-write nil
 		    (insert (format "211 %d Article retrieved.\n"
@@ -8159,14 +8159,15 @@ is non-nil or the Subject: of both articles are the same."
 	(let (gnus-mark-article-hook)
 	  (gnus-summary-select-article t t nil current-article))
 	(set-buffer gnus-original-article-buffer)
-	(let ((buf (format "%s" (buffer-substring (point-min) (point-max)))))
+	(let ((buf (format "%s" (buffer-string))))
 	  (nnheader-temp-write nil
 	    (insert buf)
 	    (goto-char (point-min))
 	    (if (re-search-forward "^References: " nil t)
 		(progn
 		  (re-search-forward "^[^ \t]" nil t)
-		  (end-of-line 0) ;; Go to the end of the previous line.
+		  (forward-line -1)
+		  (end-of-line)
 		  (insert " " message-id))
 	      (insert "References: " message-id "\n"))
 	    (unless (gnus-request-replace-article

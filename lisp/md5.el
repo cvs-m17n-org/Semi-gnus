@@ -391,7 +391,7 @@ hash of a portion of OBJECT."
 	      (if (<= (point-max) md5-maximum-internal-length)
 		  (mapconcat
 		   (function (lambda (node) (format "%02x" node)))
-		   (md5-encode (buffer-substring (point-min) (point-max)))
+		   (md5-encode (buffer-string))
 		   "")
 		(call-process-region (point-min) (point-max)
 				     (or shell-file-name "/bin/sh")
