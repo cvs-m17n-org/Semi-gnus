@@ -2,6 +2,9 @@
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.9.
 
+	* README.semi (How to get?): Add description of daily snapshot.
+	(How to join development): Change mailing list command address.
+
 	* Sync up with Gnus 5.6.2.
 
 1998-03-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
