@@ -27,8 +27,11 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
+(require 'path-util)
 (require 'custom)
 (require 'gnus)
 (require 'gnus-sum)
@@ -38,11 +41,10 @@
 (require 'alist)
 (require 'mime-view)
 
+;; Avoid byte-compile warnings.
+(defvar gnus-article-decoded-p)
+(defvar gnus-article-mime-handles)
 (eval-when-compile
-  (require 'static)
-  ;; Avoid byte-compile warnings.
-  (defvar gnus-article-decoded-p)
-  (defvar gnus-article-mime-handles)
   (require 'mm-bodies)
   (require 'mail-parse)
   (require 'mm-decode)
@@ -211,7 +213,10 @@ regexp.  If it matches, the text in question is not a signature."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-article-x-face-command
-  "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"
+  (if (module-installed-p 'x-face-mule)
+      'x-face-mule-gnus-article-display-x-face
+    "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"
+    )
   "*String or function to be executed to display an X-Face header.
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
@@ -865,8 +870,12 @@ See the manual for details."
   :type gnus-article-treat-custom)
 (put 'gnus-treat-overstrike 'highlight t)
 
-(defcustom gnus-treat-display-xface (if (and gnus-xemacs (featurep 'xface))
-					'head nil)
+(defcustom gnus-treat-display-xface
+  (if (or (and gnus-xemacs (featurep 'xface))
+	  (eq 'x-face-mule-gnus-article-display-x-face
+	      gnus-article-x-face-command))
+      'head
+    nil)
   "Display X-Face headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -874,9 +883,11 @@ See the manual for details."
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-display-xface 'highlight t)
 
-(defcustom gnus-treat-display-smileys (if (and gnus-xemacs
-					       (featurep 'xpm))
-					  t nil)
+(defcustom gnus-treat-display-smileys
+  (if (or (and gnus-xemacs (featurep 'xpm))
+	  (module-installed-p 'smiley-mule))
+      t
+    nil)
   "Display smileys.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -975,6 +986,10 @@ See the manual for details."
     (gnus-treat-display-smileys gnus-smiley-display)
     (gnus-treat-display-picons gnus-article-display-picons)
     (gnus-treat-play-sounds gnus-earcon-display)))
+
+(unless gnus-xemacs
+  (set-alist 'gnus-treatment-function-alist
+	     'gnus-treat-display-smileys '(smiley-buffer)))
 
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
@@ -2948,10 +2963,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (goto-char (point-min))
   (when (re-search-forward "^[^\t ]+:" nil t)
     (goto-char (match-beginning 0)))
-  (let* ((entity (if (eq 1 (point-min))
-		     (get-text-property 1 'mime-view-entity)
-		   (get-text-property (point) 'mime-view-entity)))
-	 last-entity child-entity next type)
+  (let ((entity (if (eq 1 (point-min))
+		    (get-text-property 1 'mime-view-entity)
+		  (get-text-property (point) 'mime-view-entity)))
+	last-entity child-entity next type)
     (setq child-entity (mime-entity-children entity))
     (if child-entity
 	(setq last-entity (nth (1- (length child-entity))
@@ -2968,9 +2983,11 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (while (and (not (eobp))
 		entity
 		(setq next
-		      (or (next-single-property-change (point)
-						       'mime-view-entity)
-			  (point-max))))
+		      (set-marker
+		       (make-marker)
+		       (or (next-single-property-change (point)
+							'mime-view-entity)
+			   (point-max)))))
       (let ((types (mime-entity-content-type entity)))
 	(while (eq 'multipart (mime-content-type-primary-type types))
 	  (setq entity (car (mime-entity-children entity))
@@ -3018,7 +3035,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (gnus-run-hooks 'gnus-tmp-internal-hook)
   (gnus-run-hooks 'gnus-article-prepare-hook)
   ;; Display message.
-  (let (mime-display-header-hook)
+  (let (mime-display-header-hook mime-display-text/plain-hook)
     (funcall (if gnus-show-mime
 		 (progn
 		   (setq mime-message-structure gnus-current-headers)
