@@ -1,3 +1,12 @@
+2001-07-20 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Jesper Harder <harder@myrealbox.com>
+
+	* message.texi (Insertion): Addition.
+
+2001-07-19 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Charsets): Addition.
+
 2001-07-17 22:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Searching for Articles): Raw articles.

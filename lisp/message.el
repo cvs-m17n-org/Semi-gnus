@@ -3448,17 +3448,23 @@ This sub function is for exclusive use of `message-send-news'."
 		     (if followup-to
 			 (concat newsgroups "," followup-to)
 		       newsgroups)))
-	    (hashtb (and (boundp 'gnus-active-hashtb)
-			 gnus-active-hashtb))
+            (known-groups
+             (mapcar '(lambda (n) (gnus-group-real-name n))
+                     (gnus-groups-from-server
+                      (cond ((equal gnus-post-method 'current)
+                             gnus-current-select-method)
+                            (gnus-post-method gnus-post-method)
+                            (t gnus-select-method)))))
 	    errors)
        (while groups
-	 (when (and (not (boundp (intern (car groups) hashtb)))
-		    (not (equal (car groups) "poster")))
-	   (push (car groups) errors))
-	 (pop groups))
+         (unless (or (equal (car groups) "poster")
+                     (member (car groups) known-groups))
+           (push (car groups) errors))
+         (pop groups))
        (cond
 	;; Gnus is not running.
-	((or (not hashtb)
+	((or (not (and (boundp 'gnus-active-hashtb)
+                       gnus-active-hashtb))
 	     (not (boundp 'gnus-read-active-file)))
 	 t)
 	;; We don't have all the group names.
@@ -4324,12 +4330,12 @@ Headers already prepared in the buffer are not modified."
 	  (nthcdr (+ (- cut 2) surplus 1) list)))
 
 (defun message-shorten-references (header references)
-  "Trim REFERENCES to be less than 31 Message-ID long, and fold them.
+  "Trim REFERENCES to be 21 Message-ID long or less, and fold them.
 If folding is disallowed, also check that the REFERENCES are less
 than 988 characters long, and if they are not, trim them until they are."
-  (let ((maxcount 31)
+  (let ((maxcount 21)
 	(count 0)
-	(cut 6)
+	(cut 2)
 	refs)
     (with-temp-buffer
       (insert references)

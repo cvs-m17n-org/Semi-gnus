@@ -1908,7 +1908,7 @@ If READ-CHARSET, ask for a coding system."
 	      (if (stringp charset)
 		  (setq charset (intern (downcase charset)))))))
       (if read-charset
-	  (setq charset (read-coding-system "Charset: " charset)))
+	  (setq charset (mm-read-coding-system "Charset: " charset)))
       (unless charset
 	(setq charset gnus-newsgroup-charset))
       (when (or force
@@ -1938,7 +1938,7 @@ If READ-CHARSET, ask for a coding system."
 	      (if (stringp charset)
 		  (setq charset (intern (downcase charset)))))))
       (if read-charset
-	  (setq charset (read-coding-system "Charset: " charset)))
+	  (setq charset (mm-read-coding-system "Charset: " charset)))
       (unless charset
 	(setq charset gnus-newsgroup-charset))
       (when (or force
@@ -1980,7 +1980,7 @@ If READ-CHARSET, ask for a coding system."
 	      (if (stringp charset)
 		  (setq charset (intern (downcase charset)))))))
       (if read-charset
-	  (setq charset (read-coding-system "Charset: " charset)))
+	  (setq charset (mm-read-coding-system "Charset: " charset)))
       (unless charset
 	(setq charset gnus-newsgroup-charset))
       (article-goto-body)
@@ -3729,10 +3729,12 @@ value of the variable `gnus-show-mime' is non-nil."
 	     (insert-buffer gnus-original-article-buffer)
 	     (mime-to-mml gnus-article-mime-handles)
 	     (setq gnus-article-mime-handles nil)
-	     (make-local-hook 'kill-buffer-hook)
 	     (let ((mbl1 mml-buffer-list))
 	       (setq mml-buffer-list mbl)
 	       (set (make-local-variable 'mml-buffer-list) mbl1))
+             ;; LOCAL argument of add-hook differs between GNU Emacs
+             ;; and XEmacs. make-local-hook makes sure they are local.
+	     (make-local-hook 'kill-buffer-hook)
 	     (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
        `(lambda (no-highlight)
 	  (let ((mail-parse-charset (or gnus-article-charset
@@ -3860,7 +3862,7 @@ value of the variable `gnus-show-mime' is non-nil."
 	  (setq charset
 		(or (cdr (assq arg
 			       gnus-summary-show-article-charset-alist))
-		    (read-coding-system "Charset: ")))))
+		    (mm-read-coding-system "Charset: ")))))
 	(forward-line 2)
 	(mm-insert-inline handle
 			  (if (and charset
@@ -3886,7 +3888,7 @@ specified charset."
       (let ((gnus-newsgroup-charset
 	     (or (cdr (assq arg
 			    gnus-summary-show-article-charset-alist))
-		 (read-coding-system "Charset: ")))
+		 (mm-read-coding-system "Charset: ")))
 	  (gnus-newsgroup-ignored-charsets 'gnus-all))
 	(gnus-article-press-button)))))
 

@@ -1181,6 +1181,14 @@ find-file-hooks, etc.
       (push path result))))
 (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
+(defalias 'mm-read-coding-system
+  (if (or (and (featurep 'xemacs)
+	       (<= (string-to-number emacs-version) 21.1))
+	  (boundp 'MULE))
+      (lambda (prompt &optional default-coding-system)
+	(read-coding-system prompt))
+    'read-coding-system))
+
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
 

@@ -1,3 +1,62 @@
+2001-07-22 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-setup-message): make-local-hook.
+
+2001-07-22  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-delay.el (gnus-delay-article): Fix `read-string' for
+	XEmacs.  Allow more units.  Submitted by Karl Kleinpaste
+	<karl@charcoal.com>, slightly changed by Kai.
+
+	* message.el (message-check-news-header-syntax): When checking
+	whether the groups exist, check the right server based on
+	`gnus-post-method'.
+
+2001-07-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-delay.el: New file.
+
+2001-07-21 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-read-coding-system): Take two arguments.
+
+	* gnus-sum.el (gnus-summary-show-article): Use
+	mm-read-coding-system.
+
+	* gnus-art.el (article-de-quoted-unreadable):
+	(article-de-base64-unreadable, article-wash-html): 
+	(gnus-mime-inline-part, gnus-mime-view-part-as-charset): Ditto.
+
+2001-07-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* nnml.el (nnml-request-post): New function.  Can be used for
+	annotations in nnml groups.
+
+2001-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nntp.el (nntp-request-newgroups): Use UTC date for NEWGROUPS
+	command.
+
+	* gnus-start.el (gnus-find-new-newsgroups): Use
+	`message-make-date' instead of `current-time-string'.
+	(gnus-ask-server-for-new-groups): Ditto.
+	(gnus-check-first-time-used): Ditto.
+
+2001-07-20 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-score.el (gnus-home-score-file): nnheader-translate-file-chars.
+
+2001-07-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.el (message-shorten-references): Change `maxcount' and
+	`cut' to obey USEFOR draft 5.
+
+2001-07-12  Colin Walters  <walters@cis.ohio-state.edu>
+
+	* gnus-sum.el (gnus-summary-display-arrow): New variable.
+	(gnus-summary-set-article-display-arrow): New function.
+	(gnus-summary-goto-subject): Use it.
+	
 2001-07-18 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-sum.el (gnus-summary-import-article): Insert date if

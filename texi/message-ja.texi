@@ -474,6 +474,7 @@ message buffer (@code{message-yank-buffer}).
 
 @item message-citation-line-function
 @vindex message-citation-line-function
+@cindex attribution line
 $B0zMQ9T$rA^F~$9$k$?$a$K8F$P$l$k4X?t$G$9!#=i4|CM(B
 $B$O(B @code{message-insert-citation-line} $B$G!"$3$l$O0zMQ9T$r<!$N$h$&$K$7$^(B
 $B$9(B:
@@ -954,8 +955,8 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-from-style
 @vindex message-from-style
-@code{From} $B%X%C%@!<$,$I$N$h$&$K8+$($k$+$r;XDj$7$^$9!#(B4$B$D$N9gK!E*CM$,$"(B
-$B$j$^$9(B:
+@code{From} $B%X%C%@!<$,$I$N$h$&$K8+$($k$+$r;XDj$7$^$9!#0J2<$N#4$D$NCM$,;H(B
+$B$($^$9(B:
 
 @table @code
 @item nil
@@ -1039,10 +1040,17 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @table @code
 @item message-send-mail-function
 @vindex message-send-mail-function
+@findex message-send-mail-with-sendmail
+@findex message-send-mail-with-mh
+@findex message-send-mail-with-qmail
+@findex message-send-mail-with-smtp
+@findex smtpmail-send-it
+@findex feedmail-send-it
 $B8=:_$N%P%C%U%!$r%a!<%k$H$7$FAw$k$?$a$K;H$o$l$k4X?t$G$9!#=i4|CM(B
-$B$O(B @code{message-send-mail-with-sendmail} $B$G$9!#$b$7Be$o$j$K(B MH $B$GAw$k$N(B
-$B$r9%$`$N$G$"$l$P!"$3$NJQ?t$r(B @code{message-send-mail-with-mh} $B$K@_Dj$7$F(B
-$B2<$5$$!#(B
+$B$O(B @code{message-send-mail-with-sendmail} $B$G$9!#B>(B
+$B$K(B @code{message-send-mail-with-mh},
+@code{message-send-mail-with-qmail}, @code{message-send-mail-with-smtp},
+@code{smtpmail-send-it} $B$*$h$S(B @code{feedmail-send-it} $B$,;H$($^$9!#(B
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1066,7 +1074,7 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @vindex message-required-news-headers
 @code{message-required-news-headers} $B$O%X%C%@!<%7%s%\%k$N%j%9%H$G$9!#$3(B
 $B$l$i$N%X%C%@!<$O<+F0E*$K:n@.$5$l$k$+!"$b$7$/$O$=$l$,IT2DG=$G$"$l$P!"F~NO(B
-$B$rB%?J$7$^$9!#0J2<$N%7%s%\%k$O9gK!E*$G$9(B:
+$B$rB%?J$7$^$9!#0J2<$N%7%s%\%k$,;H$($^$9(B:
 
 @table @code
 
@@ -1164,7 +1172,7 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @vindex message-syntax-checks
 @code{nil} $B$G$J$1$l$P!"(BMessage $B$OEj9F$NA0$K!"%X%C%@!<$HB>$N$b$N$N9gK!@-(B
 $B$rD4$Y$^$9!#$3$N%j%9%H$KMWAG$rIU$12C$($?$j<h$j=|$$$?$j$9$k;v$G!"D4$Y$kN3(B
-$B$NBg$-$5$r@)8f$9$k;v$,$G$-$^$9!#9gK!E*$JMWAG$O(B:
+$B$NBg$-$5$r@)8f$9$k;v$,$G$-$^$9!#;H$($kMWAG$O(B:
 
 @table @code
 @item subject-cmsg
@@ -1185,7 +1193,7 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @item long-lines
 $B$"$^$j$KD9$$9T$rD4$Y$^$9!#(B
 @item control-chars
-$BHs9gK!J8;z$rD4$Y$^$9!#(B
+$B;H$C$F$O$$$1$J$$J8;z$rD4$Y$^$9!#(B
 @item size
 $B2a>j$JBg$-$5$rD4$Y$^$9!#(B
 @item new-text

@@ -826,6 +826,15 @@ automatically when it is selected."
   :group 'gnus-summary
   :type 'hook)
 
+(defcustom gnus-summary-display-arrow
+  (and (string-match "GNU" (emacs-version))
+       (>= emacs-major-version 21)
+       (display-graphic-p))
+  "*If non-nil, display an arrow highlighting the current article."
+  :version "21.1"
+  :group 'gnus-summary
+  :type 'boolean)
+
 (defcustom gnus-summary-selected-face 'gnus-summary-selected-face
   "Face used for highlighting the current article in the summary buffer."
   :group 'gnus-summary-visual
@@ -2709,6 +2718,21 @@ display only a single character."
 	(unless (aref table i)
 	  (aset table i [??]))))
     (setq buffer-display-table table)))
+
+(defun gnus-summary-set-article-display-arrow (pos)
+  "Update the overlay arrow to point to line at position POS."
+  (when (and gnus-summary-display-arrow
+	     (boundp 'overlay-arrow-position)
+	     (boundp 'overlay-arrow-string))
+    (save-excursion
+      (goto-char pos)
+      (beginning-of-line)
+      (unless overlay-arrow-position
+	(setq overlay-arrow-position (make-marker)))
+      (setq overlay-arrow-string "=>"
+	    overlay-arrow-position (set-marker overlay-arrow-position
+					       (point)
+					       (current-buffer))))))
 
 (defun gnus-summary-buffer-name (group)
   "Return the summary buffer name of GROUP."
@@ -6175,7 +6199,9 @@ If FORCE, also allow jumping to articles not currently shown."
 	  (unless silent
 	    (gnus-message 3 "Can't find article %d" article))
 	  nil)
-      (goto-char (gnus-data-pos data))
+      (let ((pt (gnus-data-pos data)))
+	(goto-char pt)
+	(gnus-summary-set-article-display-arrow pt))
       (gnus-summary-position-point)
       article)))
 
@@ -7758,7 +7784,7 @@ without any article massaging functions being run."
    ((numberp arg)
     (let ((gnus-newsgroup-charset
 	   (or (cdr (assq arg gnus-summary-show-article-charset-alist))
-	       (read-coding-system "Charset: ")))
+	       (mm-read-coding-system "Charset: ")))
 	  (gnus-newsgroup-ignored-charsets 'gnus-all))
       (gnus-summary-select-article nil 'force)
       (let ((deps gnus-newsgroup-dependencies)

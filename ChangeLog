@@ -1,3 +1,11 @@
+2001-07-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-delay.el (gnus-delay-initialize): Don't use the macro
+	`kbd'.
+
+	* lisp/nnheader.el (mm-read-coding-system): New function which is
+	a substitute for mm-util.el.
+
 2001-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
