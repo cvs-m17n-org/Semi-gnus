@@ -1,5 +1,11 @@
 1998-12-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.048.
+
+	* Sync up with Pterodactyl Gnus 0.63.
+
+1998-12-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.047.
 
 	* Sync up with Pterodactyl Gnus 0.62.
