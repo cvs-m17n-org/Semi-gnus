@@ -12397,7 +12397,7 @@ REFERENCE $(B$,;HMQ$5$l$k$+$O%5!<%P!<FCM-$G$9$,!"%o%7%s%H%sBg3X$N%5!<%P!<$G(B
 
 @item nnimap-stream
 @vindex nnimap-stream
-$(B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H!<%j%`$N7?$G$9!#=i4|@_Dj$G$O!"(Bnnimap
+$(B%5!<%P!<$K@\B3$9$k$H$-$K;H$o$l$k%9%H%j!<%`$N7?$G$9!#=i4|@_Dj$G$O!"(Bnnimap
 $(B$O%5!<%P!<$,BP1~$7$($$$k0lHV0BA4$J%9%H%j!<%`$r;H$$$^$9!#(B
 
 @itemize @bullet
