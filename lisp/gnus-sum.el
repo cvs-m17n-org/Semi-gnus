@@ -1000,6 +1000,11 @@ variable (string, integer, character, etc).")
 (defvar gnus-last-search-regexp nil
   "Default regexp for article search command.")
 
+(defvar gnus-summary-search-article-matched-data nil
+  "Last matched data of article search command.  It is the local variable
+in `gnus-article-buffer' which consists of the list of start position,
+end position and text.")
+
 (defvar gnus-last-shell-command nil
   "Default shell command on article.")
 
@@ -6951,7 +6956,6 @@ If BACKWARD, search backward instead."
 		    "")))))
   (gnus-summary-search-article-forward regexp 'backward))
 
-(defvar gnus-summary-search-article-matched-data)
 (eval-when-compile
   (defmacro gnus-summary-search-article-position-point (regexp backward)
     "Dehighlight the last matched text and goto the beginning position."
@@ -7011,7 +7015,11 @@ If BACKWARD, search backward instead."
 		       gnus-treat-display-xface
 		       gnus-treat-buttonize-head
 		       gnus-treat-decode-article-as-default-mime-charset))
-		    items))
+		    (static-if (featurep 'xemacs)
+			items
+		      (cons '(x-face-mule-delete-x-face-field
+			      (quote never))
+			    items))))
 		 (gnus-treat-display-xface
 		  (when (, x-face) gnus-treat-display-xface)))
 	     (gnus-article-prepare-mime-display)))
@@ -7044,12 +7052,28 @@ Optional argument BACKWARD means do search for backward.
 	(found nil)
 	point treated)
     (gnus-save-hidden-threads
-      (let ((gnus-inhibit-treatment t))
-	(setq treated (eq 'old (gnus-summary-select-article))))
-      (unless (and (gnus-buffer-live-p gnus-article-buffer)
-		   (window-live-p (get-buffer-window gnus-article-buffer
-						     t)))
-	(setq treated (eq 'old (gnus-summary-select-article nil t))))
+      (static-if (featurep 'xemacs)
+	  (let ((gnus-inhibit-treatment t))
+	    (setq treated (eq 'old (gnus-summary-select-article)))
+	    (when (and treated
+		       (not (and (gnus-buffer-live-p gnus-article-buffer)
+				 (window-live-p (get-buffer-window
+						 gnus-article-buffer t)))))
+	      (gnus-summary-select-article nil t)
+	      (setq treated nil)))
+	(let ((gnus-inhibit-treatment t)
+	      (x-face-mule-delete-x-face-field 'never))
+	  (setq treated (eq 'old (gnus-summary-select-article)))
+	  (when (and treated
+		     (not
+		      (and (gnus-buffer-live-p gnus-article-buffer)
+			   (window-live-p (get-buffer-window
+					   gnus-article-buffer t))
+			   (or (not (string-match "^\\^X-Face:" regexp))
+			       (with-current-buffer gnus-article-buffer
+				 gnus-summary-search-article-matched-data)))))
+	    (gnus-summary-select-article nil t)
+	    (setq treated nil))))
       (set-buffer gnus-article-buffer)
       (widen)
       (if treated
