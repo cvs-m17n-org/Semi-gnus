@@ -1915,8 +1915,8 @@ If FORCE is non-nil, the .newsrc file is read."
   (let ((ding-file (concat file "d")))
     ;; We always, always read the .eld file.
     (gnus-message 5 "Reading %s..." ding-file)
-    (when (file-exists-p ding-file)
-      (let (gnus-newsrc-assoc)
+    (let (gnus-newsrc-assoc)
+      (when (file-exists-p ding-file)
 	(condition-case nil
 	    (with-temp-buffer
 	      (insert-file-contents-as-coding-system
