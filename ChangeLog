@@ -1,4 +1,23 @@
-1999-01-31  MORIOKA Tomohiko  <tomo@m17n.org>
+2000-03-02  MORIOKA Tomohiko  <tomo@m17n.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 1.13.1.
+
+	* lisp/smiley.el: Sync with nana-gnus-6_13_12.
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use
+	`mime-entity-fetch-field' instead of `mime-fetch-field'.
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-entity-read-field' instead of `mime-read-field'.
+	(gnus-article-sort-by-author): Likewise.
+
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`mime-entity-fetch-field' instead of `mime-fetch-field'.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use
+	`mime-entity-fetch-field' instead of `mime-fetch-field'.
+
+1999-06-01  MORIOKA Tomohiko  <tomo@m17n.org>
 
 	* Chaos: Version 1.13.0 released.
 
