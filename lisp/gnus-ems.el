@@ -145,52 +145,40 @@
 	(fset 'gnus-truncate-string 'truncate-string-to-width)
       (fset 'gnus-truncate-string 'truncate-string))
 
+    (when (boundp 'gnus-check-before-posting)
+      (setq gnus-check-before-posting
+	    (delq 'long-lines
+		  (delq 'control-chars gnus-check-before-posting))))
+    ))
+  (when (featurep 'mule)
     (defun gnus-tilde-max-form (el max-width)
       "Return a form that limits EL to MAX-WIDTH."
       (let ((max (abs max-width)))
 	(if (symbolp el)
-	    `(if (> (string-width ,el) ,max)
-		 ,(if (< max-width 0)
-		      `(gnus-truncate-string
-			,el (string-width ,el)
-			(- (string-width ,el) ,max))
-		    `(gnus-truncate-string ,el ,max))
-	       ,el)
-	  `(let ((val (eval ,el)))
-	     (if (> (string-width val) ,max)
-		 ,(if (< max-width 0)
-		      `(gnus-truncate-string
-			val (string-width val)
-			(- (string-width val) ,max))
-		    `(gnus-truncate-string val ,max))
-	       val)))))
+	    (if (< max-width 0)
+		`(let ((width (string-width ,el)))
+		   (gnus-truncate-string ,el width (- width ,max)))
+	      `(gnus-truncate-string ,el ,max))
+	  (if (< max-width 0)
+	      `(let* ((val (eval ,el))
+		      (width (string-width val)))
+		 (gnus-truncate-string val width (- width ,max)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val ,max))))))
 
     (defun gnus-tilde-cut-form (el cut-width)
       "Return a form that cuts CUT-WIDTH off of EL."
       (let ((cut (abs cut-width)))
 	(if (symbolp el)
-	    `(if (> (string-width ,el) ,cut)
-		 ,(if (< cut-width 0)
-		      `(gnus-truncate-string
-			,el (- (string-width ,el) ,cut))
-		    `(gnus-truncate-string
-		      ,el (- (string-width ,el) ,cut) ,cut))
-	       ,el)
-	  `(let ((val (eval ,el)))
-	     (if (> (string-width val) ,cut)
-		 ,(if (< cut-width 0)
-		      `(gnus-truncate-string
-			val (- (string-width val) ,cut))
-		    `(gnus-truncate-string
-		      val (- (string-width val) ,cut) ,cut))
-	       val)))))
-
-    (when (boundp 'gnus-check-before-posting)
-      (setq gnus-check-before-posting
-	    (delq 'long-lines
-		  (delq 'control-chars gnus-check-before-posting))))
-
-    )))
+	    (if (< cut-width 0)
+		`(gnus-truncate-string ,el (- (string-width ,el) ,cut))
+	      `(gnus-truncate-string ,el (string-width ,el) ,cut))
+	  (if (< cut-width 0)
+	      `(let ((val (eval ,el)))
+		 (gnus-truncate-string val (- (string-width val) ,cut)))
+	    `(let ((val (eval ,el)))
+	       (gnus-truncate-string val (string-width val) ,cut))))))
+    ))
 
 (defun gnus-region-active-p ()
   "Say whether the region is active."
