@@ -227,8 +227,8 @@
   (let (type val)
     (save-excursion
       (while (setq type (pop types))
-	;; Jump to the proper buffer to find out the value of
-	;; the variable, if possible.  (It may be buffer-local.)
+	;; Jump to the proper buffer to find out the value of the
+	;; variable, if possible.  (It may be buffer-local.)
 	(let* ((new-format
 		(let ((buffer (intern (format "gnus-%s-buffer" type))))
 		  (when (and (boundp buffer)
@@ -461,6 +461,9 @@ by `gnus-xmas-redefine'."
     ;; Convert the buffer into the spec.
     (goto-char (point-min))
     (let ((form (read (current-buffer))))
+      ;; If the first element is '(point), we just remove it.
+      (when (equal (car form) '(point))
+	(pop form))
       (cons 'progn (gnus-complex-form-to-spec form spec-alist)))))
 
 (defun gnus-complex-form-to-spec (form spec-alist)

@@ -2796,12 +2796,14 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%W$NE,1~%U%!%$%k$K$7$^$9!#A4$F$NE,1~%9%3%"EPO?$O$3$N%U%!%$%k$KF~$j$^$9!#(B
 
 @item admin-address
+@cindex admin-address
 $B%a!<%j%s%0%j%9%H$+$iC&2q$9$k$H$-$O!"C&2qDLCN%a!<%k$r$=$N%a!<%j%s%0%j%9%H(B
 $B<+?H$KAw?.$7$F$O$$$1$^$;$s!#Be$o$j$K4IM}MQ%"%I%l%9$K%a%C%;!<%8$rAw?.$7$^(B
 $B$9!#$3$N%Q%i%a!<%?$K$O$I$3$+JXMx$J4IM}MQ%"%I%l%9$r=q$$$F$*$/$3$H$,$G$-$^(B
 $B$9!#(B
 
 @item display
+@cindex display
 @code{(display . MODE)} $B$N$h$&$JMWAG$O!"%0%k!<%W$KF~$k$H$-$K$I$N5-;v$rI=(B
 $B<($9$k$+$r;XDj$7$^$9!#M-8z$JCM$O!"(B
 
@@ -2824,24 +2826,29 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @item [not expire]
 $B4|8B@Z$l>C5n2DG=$J5-;v0J30$N$9$Y$F$rI=<($7$^$9!#(B
 
-@item [and (not reply) (not expirable)]
+@item [and (not reply) (not expire)]
 $B4|8B@Z$l>C5n2DG=$H$9$G$KJV?.$7$?5-;v0J30$N$9$Y$F$rI=<($7$^$9!#(B
 @end table
 
 $BMxMQ$G$-$k1i;;;R$O(B @code{not}$B!"(B@code{and} $B$*$h$S(B @code{or} $B$G$9!#=R8l(B
-$B$O(B @code{tick}$B!"(B@code{unsend}$B!"(B@code{undownload}$B!"(B@code{unread}$B!"(B
-@code{read}$B!"(B@code{dormant}$B!"(B@code{}$B!"(B@code{}$B!"(B@code{}$B!"(B@code{expire}$B!"(B
-@code{reply}$B!"(B@code{killed}$B!"(B@code{bookmark}$B!"(B@code{score}$B!"(B@code{save}$B!"(B
-@code{cache}$B!"(B@code{forward} $B$*$h$S(B @code{recent} $B$r4^$_$^$9!#(B
+$B$O(B @code{read}$B!"(B@code{dormant}$B!"(B@code{expire}$B!"(B@code{reply}$B!"(B
+@code{killed}$B!"(B@code{bookmark}$B!"(B@code{score}$B!"(B@code{save}$B!"(B@code{cache}$B!"(B
+@code{forward}$B!"(B@code{seen} $B$*$h$S(B @code{recent} $B$r4^$_$^$9!#(B
 @end table
 
+@code{display} $B%Q%i%a!<%?$O!"35N,%P%C%U%!$r;XDj$7$?0lIt$NAH$@$1$K@)8B$9(B
+$B$k$h$&$KF/$-$^$9!#@)8B$r%9%?%C%/$+$i<h$j=P$9$N$O(B @kbd{/ w} $B%3%^%s%I$G$G(B
+$B$-$^$9(B (@pxref{Limiting})$B!#(B
+
 @item comment
+@cindex comment
 @code{(comment . "This is a comment")} $B$N$h$&$JMWAG$O!"$=$N%0%k!<%W$KBP(B
 $B$9$kG$0U$N%3%a%s%H$G$9!#$3$l$O8=:_$N(B gnus $B$G$OL5;k$5$l$^$9$,!"FCDj$N%0%k!<(B
 $B%W$KBP$9$k>pJs$r3JG<$9$k>l=j$rDs6!$7$^$9!#(B
 
 @ignore
 @item charset
+@cindex charset
 Elements that look like @code{(charset . iso-8859-1)} will make
 @code{iso-8859-1} the default charset; that is, the charset that will be
 used for all articles that do not specify a charset.
@@ -2849,6 +2856,7 @@ used for all articles that do not specify a charset.
 See also @code{gnus-group-charset-alist}.
 
 @item ignored-charsets
+@cindex ignored-charsets
 Elements that look like @code{(ignored-charsets x-known iso-8859-1)}
 will make @code{iso-8859-1} and @code{x-unknown} ignored; that is, the
 default charset will be used for decoding articles.
@@ -2856,6 +2864,7 @@ default charset will be used for decoding articles.
 See also @code{gnus-group-ignored-charsets-alist}.
 @end ignore
 @item posting-style
+@cindex posting-style
 $B$3$N%0%k!<%W$NDI2C$NEj9FMM<0$r$3$3$N$_$KJ]B8$9$k$3$H$,$G$-$^(B
 $B$9(B (@pxref{Posting Styles})$B!#=q<0$O(B @code{gnus-posting-style} $BO"A[%j%9%H(B
 $B$HF1$8$G$9$,!"$3$3$K$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$O$"$j$^$;$s(B ($BEvA3$G(B
@@ -2878,6 +2887,7 @@ See also @code{gnus-group-ignored-charsets-alist}.
 $B$F(B @code{gnus-post-method} $B$NBe$o$j$K;H$o$l$^$9!#(B
 
 @item banner
+@cindex banner
 @code{(banner . "regex")} $B$N$h$&$J9`L\$O!"5-;v$N$9$Y$F$N>l=j$G@55,I=(B
 $B8=(B "regex" $B$K%^%C%A$9$k$b$N$r:o=|$7$^$9!#(B"regex" $B$NBe$o$j$K%7%s%\(B
 $B%k(B @code{signature} ($B:G8e$N=pL>$r:o(B
@@ -5647,6 +5657,13 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @findex gnus-summary-limit-to-score
 $B35N,%P%C%U%!$r$"$k%9%3%"$HF1$8$+!"$=$l$h$jBg$-$J%9%3%"$r;}$D5-;v$K@)8B$7(B
 $B$^$9(B (@code{gnus-summary-limit-to-score})$B!#(B
+
+@item / p
+@kindex / p (Summary)
+@findex gnus-summary-limit-to-display-parameter
+$B35N,%P%C%U%!$r(B @code{display} $B%0%k!<%W%Q%i%a!<%?$N=R8l$rK~B-$5$;$k$h$&$K(B
+$B@)8B$7$^$9(B (@code{gnus-summary-limit-to-display-parameter})$B!#$3$N=R8l$K(B
+$B4X$9$k>\:Y$O(B @pxref{Group Parameters} $B$r;2>H$7$F2<$5$$!#(B
 
 @item / E
 @itemx M S
