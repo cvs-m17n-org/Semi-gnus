@@ -1,5 +1,20 @@
 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* texi/emacs-mime.texi: Fix iso-8859-1 chars.
+
+	* lisp/message.el (message-send-news): Call
+	`message-maybe-split-and-send-news' with an arg `method'.
+ 	(message-maybe-split-and-send-news): Accept an arg `method'.
+
+	* lisp/rfc1843.el: Defvar `gnus-decode-encoded-word-function'.
+
+	* lisp/mm-uu.el: Require `gnus-mailcap'.
+	* lisp/mm-decode.el: Require `gnus-mailcap' instead of `mailcap'.
+	* lisp/mm-encode.el: Ditto.
+	* lisp/gnus-mailcap.el: Provide `gnus-mailcap' instead of `mailcap'.
+
+1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.032.
 
 	* Sync up with Pterodactyl Gnus 0.47.
