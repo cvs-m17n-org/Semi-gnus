@@ -38,14 +38,15 @@
 (cond ((and (featurep 'xemacs) (featurep 'mule))
        (if (memq 'shift-jis (coding-priority-list))
 	   (set-coding-priority-list
-	    (nconc (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
+	    (append (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
       ((boundp 'MULE)
        (put '*coding-category-sjis* 'priority (length *predefined-category*)))
       ((featurep 'mule)
        (if (memq 'coding-category-sjis coding-category-list)
 	   (set-coding-priority
-	    (nconc (delq 'coding-category-sjis coding-category-list)
-		   '(coding-category-sjis))))))
+	    (append (delq 'coding-category-sjis
+			  (copy-sequence coding-category-list))
+		    '(coding-category-sjis))))))
 
 (fset 'facep 'ignore)
 
@@ -205,7 +206,7 @@ Modify to suit your needs."))
 	file elc)
     (mapcar
      (lambda (el) (setq files (delete el files)))
-     (nconc
+     (append
       dgnushack-tool-files
       (condition-case nil
 	  (progn (require 'w3-forms) nil)
@@ -214,9 +215,10 @@ Modify to suit your needs."))
       (condition-case nil
 	  (progn (require 'bbdb) nil)
 	(error '("gnus-bbdb.el")))
-      (unless (featurep 'xemacs)
+      (if (featurep 'xemacs)
+	  '("smiley-ems.el")
 	'("gnus-xmas.el" "gnus-picon.el" "messagexmas.el"
-	  "nnheaderxm.el" "gnus-ml.el"))
+	  "nnheaderxm.el" "smiley.el"))
       (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	'("md5.el"))))
     (while (setq file (pop files))

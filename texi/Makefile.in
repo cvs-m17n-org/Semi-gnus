@@ -13,6 +13,7 @@ EMACS=@EMACS@
 EMACSINFO=$(EMACS) -batch -q -no-site-file
 INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
 XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
+EMACSINFOHACK=-eval '(while (re-search-forward "@\\(end \\)?ifnottex" nil t) (replace-match ""))'
 PDFLATEX=pdflatex
 LATEX=latex
 DVIPS=dvips
@@ -38,7 +39,8 @@ most: texi2latex.elc latex latexps
 
 %.info: %.texi
 	if test $(MAKEINFO) = no; then \
-	  cd ../lisp && $(EMACSINFO) $(XINFOSWI) ../texi/$<; \
+	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
+	    $(EMACSINFOHACK)  $(XINFOSWI) ../texi/$<; \
 	else \
 	  makeinfo -o $@ $<; \
 	fi
@@ -49,7 +51,8 @@ most: texi2latex.elc latex latexps
 	if test "x$(MAKEINFO)" != "xno" ; then \
 	  makeinfo -o $* $<; \
 	else \
-	  cd ../lisp && $(EMACSINFO) $(INFOSWI) ../texi/$<; \
+	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
+	    $(EMACSINFOHACK) $(INFOSWI) ../texi/$<; \
 	fi
 
 dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi

@@ -31,11 +31,11 @@
 (require 'gnus-cache)
 (require 'nnvirtual)
 (require 'gnus-sum)
+(require 'gnus-score)
 (eval-when-compile
   (if (featurep 'xemacs)
       (require 'itimer)
     (require 'timer))
-  (require 'gnus-score)
   (require 'gnus-group))
 
 (defcustom gnus-agent-directory (nnheader-concat gnus-directory "agent/")
@@ -97,6 +97,14 @@ fetched will be limited to it. If not a positive integer, never consider it."
   :type '(choice (const nil)
 		 (integer :tag "Number")))
 
+(defcustom gnus-agent-synchronize-flags 'ask
+  "Indicate if flags are synchronized when you plug in.
+If this is `ask' the hook will query the user."
+  :type '(choice (const :tag "Always" t)
+		 (const :tag "Never" nil)
+		 (const :tag "Ask" ask))
+  :group 'gnus-agent)
+
 ;;; Internal variables
 
 (defvar gnus-agent-history-buffers nil)
@@ -113,10 +121,6 @@ fetched will be limited to it. If not a positive integer, never consider it."
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
 (defvar gnus-agent-file-coding-system 'raw-text)
-
-(defconst gnus-agent-scoreable-headers
-  '("subject" "from" "date" "message-id" "references" "chars" "lines" "xref")
-  "Headers that are considered when scoring articles for download via the Agent.")
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -247,7 +251,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
   "Jc" gnus-enter-category-buffer
   "Jj" gnus-agent-toggle-plugged
   "Js" gnus-agent-fetch-session
-  "JY" gnus-agent-synchronize
+  "JY" gnus-agent-synchronize-flags
   "JS" gnus-group-send-drafts
   "Ja" gnus-agent-add-group
   "Jr" gnus-agent-remove-group)
@@ -304,6 +308,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
   (if plugged
       (progn
 	(setq gnus-plugged plugged)
+	(gnus-agent-possibly-synchronize-flags)
 	(gnus-run-hooks 'gnus-agent-plugged-hook)
 	(setcar (cdr gnus-agent-mode-status) " Plugged"))
     (gnus-agent-close-connections)
@@ -385,6 +390,27 @@ be a select method."
     (while (search-backward "\n" nil t)
       (replace-match "\\n" t t))))
 
+(defun gnus-agent-restore-gcc ()
+  "Restore GCC field from saved header."
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward (concat gnus-agent-gcc-header ":") nil t)
+      (replace-match "Gcc:" 'fixedcase))))
+
+(defun gnus-agent-possibly-save-gcc ()
+  "Save GCC if Gnus is unplugged."
+  (unless gnus-plugged
+    (save-excursion
+      (goto-char (point-min))
+      (let ((case-fold-search t))
+	(while (re-search-forward "^gcc:" nil t)
+	  (replace-match (concat gnus-agent-gcc-header ":") 'fixedcase))))))
+
+(defun gnus-agent-possibly-do-gcc ()
+  "Do GCC if Gnus is plugged."
+  (when gnus-plugged
+    (gnus-inews-do-gcc)))
+
 ;;;
 ;;; Group mode commands
 ;;;
@@ -439,27 +465,49 @@ be a select method."
 	  (setf (cadddr c) (delete group (cadddr c))))))
     (gnus-category-write)))
 
-(defun gnus-agent-synchronize ()
-  "Synchronize local, unplugged, data with backend.
-Currently sends flag setting requests, if any."
+(defun gnus-agent-synchronize-flags ()
+  "Synchronize unplugged flags with servers."
   (interactive)
   (save-excursion
     (dolist (gnus-command-method gnus-agent-covered-methods)
       (when (file-exists-p (gnus-agent-lib-file "flags"))
-	(set-buffer (get-buffer-create " *Gnus Agent flag synchronize*"))
-	(erase-buffer)
-	(nnheader-insert-file-contents (gnus-agent-lib-file "flags"))
-	(if (null (gnus-check-server gnus-command-method))
-	    (message "Couldn't open server %s" (nth 1 gnus-command-method))
-	  (while (not (eobp))
-	    (if (null (eval (read (current-buffer))))
-		(progn (forward-line)
-		       (kill-line -1))
-	      (write-file (gnus-agent-lib-file "flags"))
-	      (error "Couldn't set flags from file %s"
-		     (gnus-agent-lib-file "flags"))))
-	  (write-file (gnus-agent-lib-file "flags")))
-        (kill-buffer nil)))))
+	(gnus-agent-synchronize-flags-server gnus-command-method)))))
+
+(defun gnus-agent-possibly-synchronize-flags ()
+  "Synchronize flags according to `gnus-agent-synchronize-flags'."
+  (interactive)
+  (save-excursion
+    (dolist (gnus-command-method gnus-agent-covered-methods)
+      (when (file-exists-p (gnus-agent-lib-file "flags"))
+	(gnus-agent-possibly-synchronize-flags-server gnus-command-method)))))
+
+(defun gnus-agent-synchronize-flags-server (method)
+  "Synchronize flags set when unplugged for server."
+  (let ((gnus-command-method method))
+    (when (file-exists-p (gnus-agent-lib-file "flags"))
+      (set-buffer (get-buffer-create " *Gnus Agent flag synchronize*"))
+      (erase-buffer)
+      (nnheader-insert-file-contents (gnus-agent-lib-file "flags"))
+      (if (null (gnus-check-server gnus-command-method))
+	  (message "Couldn't open server %s" (nth 1 gnus-command-method))
+	(while (not (eobp))
+	  (if (null (eval (read (current-buffer))))
+	      (progn (forward-line)
+		     (kill-line -1))
+	    (write-file (gnus-agent-lib-file "flags"))
+	    (error "Couldn't set flags from file %s"
+		   (gnus-agent-lib-file "flags"))))
+	(delete-file (gnus-agent-lib-file "flags")))
+      (kill-buffer nil))))
+
+(defun gnus-agent-possibly-synchronize-flags-server (method)
+  "Synchronize flags for server according to `gnus-agent-synchronize-flags'."
+  (when (or (and gnus-agent-synchronize-flags
+		 (not (eq gnus-agent-synchronize-flags 'ask)))
+	    (and (eq gnus-agent-synchronize-flags 'ask)
+		 (gnus-y-or-n-p (format "Synchronize flags on server `%s'? "
+					(cadr method)))))
+    (gnus-agent-synchronize-flags-server method)))
 
 ;;;
 ;;; Server mode commands
@@ -677,7 +725,7 @@ the actual number of articles toggled is returned."
     (nnheader-translate-file-chars
      (nnheader-replace-chars-in-string
       (nnheader-replace-duplicate-chars-in-string
-       (nnheader-replace-chars-in-string 
+       (nnheader-replace-chars-in-string
 	(gnus-group-real-name group)
 	?/ ?_)
        ?. ?_)
@@ -793,8 +841,8 @@ the actual number of articles toggled is returned."
 	  (with-temp-buffer
 	    (let (article)
 	      (while (setq article (pop articles))
-		(when (or 
-		       (gnus-backlog-request-article group article 
+		(when (or
+		       (gnus-backlog-request-article group article
 						     nntp-server-buffer)
 		       (gnus-request-article article group))
 		  (goto-char (point-max))
@@ -1047,7 +1095,7 @@ the actual number of articles toggled is returned."
 		  (while (setq group (pop groups))
 		    (when (<= (gnus-group-level group) gnus-agent-handle-level)
 		      (gnus-agent-fetch-group-1 group gnus-command-method))))))
-	  (error 
+	  (error
 	   (unless (funcall gnus-agent-confirmation-function
 			    (format "Error (%s).  Continue? " err))
 	     (error "Cannot fetch articles into the Gnus agent."))))
@@ -1073,17 +1121,13 @@ the actual number of articles toggled is returned."
     ;; Fetch headers.
     (when (and (or (gnus-active group) (gnus-activate-group group))
 	       (setq articles (gnus-agent-fetch-headers group))
-	       (progn
+	       (let ((nntp-server-buffer gnus-agent-overview-buffer))
 		 ;; Parse them and see which articles we want to fetch.
 		 (setq gnus-newsgroup-dependencies
 		       (make-vector (length articles) 0))
-		 ;; No need to call `gnus-get-newsgroup-headers-xover' with
-		 ;; the entire .overview for group as we still have the just
-		 ;; downloaded headers in `gnus-agent-overview-buffer'.
-		 (let ((nntp-server-buffer gnus-agent-overview-buffer))
-		   (setq gnus-newsgroup-headers
-			 (gnus-get-newsgroup-headers-xover articles nil nil
-							   group)))
+		 (setq gnus-newsgroup-headers
+		       (gnus-get-newsgroup-headers-xover articles nil nil
+							 group))
 		 ;; `gnus-agent-overview-buffer' may be killed for
 		 ;; timeout reason.  If so, recreate it.
 		 (gnus-agent-create-buffer)))
@@ -1092,45 +1136,23 @@ the actual number of articles toggled is returned."
 	    (gnus-get-predicate
 	     (or (gnus-group-find-parameter group 'agent-predicate t)
 		 (cadr category))))
-      ;; Do we want to download everything, or nothing?
-      (if (or (eq (caaddr predicate) 'gnus-agent-true)
-	      (eq (caaddr predicate) 'gnus-agent-false))
-	  ;; Yes.
-	  (setq arts (symbol-value
-		      (cadr (assoc (caaddr predicate)
-				   '((gnus-agent-true articles)
-				     (gnus-agent-false nil))))))
-	;; No, we need to decide what we want.
+      (if (memq (caaddr predicate) '(gnus-agent-true gnus-agent-false))
+	  ;; Simple implementation
+	  (setq arts
+		(and (eq (caaddr predicate) 'gnus-agent-true) articles))
+	(setq arts nil)
 	(setq score-param
-	      (let ((score-method
-		     (or
-		      (gnus-group-find-parameter group 'agent-score t)
-		      (caddr category))))
-		(when score-method
-		  (require 'gnus-score)
-		  (if (eq score-method 'file)
-		      (let ((entries
-			     (gnus-score-load-files
-			      (gnus-all-score-files group)))
-			    list score-file)
-			(while (setq list (car entries))
-			  (push (car list) score-file)
-			  (setq list (cdr list))
-			  (while list
-			    (when (member (caar list)
-					  gnus-agent-scoreable-headers)
-			      (push (car list) score-file))
-			    (setq list (cdr list)))
-			  (setq score-param
-				(append score-param (list (nreverse score-file)))
-				score-file nil entries (cdr entries)))
-			(list score-param))
-		    (if (stringp (car score-method))
-			score-method
-		      (list (list score-method)))))))
+	      (or (gnus-group-get-parameter group 'agent-score t)
+		  (caddr category)))
+	;; Translate score-param into real one
+	(cond
+	 ((eq score-param 'file)
+	  (setq score-param (gnus-all-score-files group)))
+	 ((stringp (car score-param)))
+	 (t
+	  (setq score-param (list (list score-param)))))
 	(when score-param
 	  (gnus-score-headers score-param))
-	(setq arts nil)
 	(while (setq gnus-headers (pop gnus-newsgroup-headers))
 	  (setq gnus-score
 		(or (cdr (assq (mail-header-number gnus-headers)

@@ -847,13 +847,13 @@ Valid valued are `unique' and `unsent'."
   :type '(choice (const :tag "unique" unique)
 		 (const :tag "unsent" unsent)))
 
-(defcustom message-default-charset 
+(defcustom message-default-charset
   (and (featurep 'xemacs) (not (featurep 'mule)) 'iso-8859-1)
   "Default charset used in non-MULE XEmacsen."
   :group 'message
   :type 'symbol)
 
-(defcustom message-dont-reply-to-names 
+(defcustom message-dont-reply-to-names
   (and (boundp 'rmail-dont-reply-to-names) rmail-dont-reply-to-names)
   "*A regexp specifying names to prune when doing wide replies.
 A value of nil means exclude your own name only."
@@ -1249,7 +1249,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defcustom message-send-mail-partially-limit 1000000
   "The limitation of messages sent as message/partial.
-The lower bound of message size in characters, beyond which the message 
+The lower bound of message size in characters, beyond which the message
 should be sent in several parts. If it is nil, the size is unlimited."
   :group 'message-buffers
   :type '(choice (const :tag "unlimited" nil)
@@ -1406,7 +1406,7 @@ should be sent in several parts. If it is nil, the size is unlimited."
   "Remove double quotes (\") from strings in list."
   (mapcar (lambda (item)
             (while (string-match "^\\(.*\\)\"\\(.*\\)$" item)
-              (setq item (concat (match-string 1 item) 
+              (setq item (concat (match-string 1 item)
                                  (match-string 2 item))))
             item)
           elems))
@@ -1524,7 +1524,7 @@ is used by default."
   (let ((regexp (if (stringp gnus-list-identifiers)
 		    gnus-list-identifiers
 		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
-    (if (string-match (concat "\\(\\(\\(Re: +\\)?\\(" regexp 
+    (if (string-match (concat "\\(\\(\\(Re: +\\)?\\(" regexp
 				" *\\)\\)+\\(Re: +\\)?\\)") subject)
 	(concat (substring subject 0 (match-beginning 1))
 		(or (match-string 3 subject)
@@ -2658,15 +2658,15 @@ It should typically alter the sending method in some way or other."
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
-	  (when (or (not (funcall (cadr elem)))
-		    (and (or (not (memq (car elem)
-					message-sent-message-via))
-			     (y-or-n-p
-			      (format
-			       "Already sent message via %s; resend? "
-			       (car elem))))
-			 (setq success (funcall (caddr elem) arg))))
-	    (setq sent t))))
+	  (when (funcall (cadr elem))
+	    (when (and (or (not (memq (car elem)
+				      message-sent-message-via))
+			   (y-or-n-p
+			    (format
+			     "Already sent message via %s; resend? "
+			     (car elem))))
+		       (setq success (funcall (caddr elem) arg)))
+	      (setq sent t)))))
       (unless (or sent (not success))
 	(error "No methods specified to send by"))
       (prog1

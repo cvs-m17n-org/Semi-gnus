@@ -737,6 +737,7 @@ Gnus Unplugged
 * Agent Categories::  何をダウンロードするかを gnus エージェントに教える方法
 * Agent Commands::    各バッファーでの新しい命令
 * Agent Expiry::      古い記事を消す方法
+* Agent and IMAP::    エージェントを IMAP で使う方法
 * Outgoing Messages:: 投稿、メールを出すときになにが起こるのか?
 * Agent Variables::   カスタマイズは楽し
 * Example Setup::     オフライン人間のための @file{.gnus.el} の例
@@ -772,7 +773,6 @@ Scoring
 * Reverse Scoring::        古いものの子であるという問題は問題ではない
 * Global Score Files::     地をつかみ、耳を切り裂くスコアファイル
 * Kill Files::             それらはまだここにありますが、無視する事ができる
-@c * Converting Kill Files::  削除ファイルをスコアファイルに変換する
 * GroupLens::              どれを読むのが好きかの予言を得る
 * Advanced Scoring::       スコアの法則を作るために論理表現を使う
 * Score Decays::           スコアを枯れていかせるのは役に立つ事もある
@@ -9331,7 +9331,7 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
          (signature my-quote-randomizer))
         ((message-news-p)
          (signature my-news-signature))
-        (header "From.*To" "larsi.*org"
+        (header "From\\|To" "larsi.*org"
          (Organization "Somewhere, Inc."))
         ((posting-from-work-p)
          (signature-file "~/.work-signature")
@@ -10762,8 +10762,8 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 ます。述語の完全な一覧は、RFC2060 §6.4.4 を読んでください。
 
 @item :fetchflag
-サーバーで、取得した記事に印を付ける方法。初期値の @samp{Deleted} はそれ
-らに消去の印を付けますが、他に @samp{Seen} では単に既読の印を付けます。
+サーバーで、取得した記事に印を付ける方法。初期値の @samp{\Deleted} はそ
+れらに消去の印を付けますが、他に @samp{\Seen} では単に既読の印を付けます。
 これらは最もありそうな二つの選択ですが、他の印も RFC2060 §2.3.2 で定義さ
 れています。
 
@@ -13228,7 +13228,8 @@ Nnmail で対応するもの: @code{nnmail-crosspost}.
 トです。初期値は @code{nil} で、分割は使用しないようになっています!
 
 @lisp
-(setq nnimap-split-inbox '("INBOX" ("~/friend/Mail" . "lists/*") "lists.imap"))
+(setq nnimap-split-inbox
+      '("INBOX" ("~/friend/Mail" . "lists/*") "lists.imap"))
 @end lisp
 
 Nnmail に対応するものはありません。
@@ -13246,9 +13247,9 @@ Nnmail に対応するものはありません。
 
 @lisp
 (setq nnimap-split-rule
-        '(("INBOX.nnimap"        "^Sender: owner-nnimap@@vic20.globalcom.se")
-          ("INBOX.junk"          "^Subject:.*MAKE MONEY")
-          ("INBOX.private"       "")))
+      '(("INBOX.nnimap"  "^Sender: owner-nnimap@@vic20.globalcom.se")
+        ("INBOX.junk"    "^Subject:.*MAKE MONEY")
+        ("INBOX.private" "")))
 @end lisp
 
 これは nnimap メーリングリストからの全ての記事をメールボック
@@ -13579,6 +13580,7 @@ gnus を設定します。まずやっておいで。僕はここで待ってるから。
 * Agent Categories::  何をダウンロードするかを gnus エージェントに教える方法
 * Agent Commands::    各バッファーでの新しい命令
 * Agent Expiry::      古い記事を消す方法
+* Agent and IMAP::    エージェントを IMAP で使う方法
 * Outgoing Messages:: 投稿、メールを出すときになにが起こるのか?
 * Agent Variables::   カスタマイズは楽し
 * Example Setup::     オフライン人間のための @file{.gnus.el} の例
@@ -14092,6 +14094,11 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 す (@code{gnus-agent-remove-group})。この命令はプロセス/接頭辞の習慣を理
 解します。(@pxref{Process/Prefix})。
 
+@item J Y
+@kindex J Y (Agent Group)
+@findex gnus-agent-synchronize-flags
+Synchronize flags changed while unplugged with remote server, if any.
+
 @end table
 
 @node Summary Agent Commands
@@ -14161,6 +14168,59 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 記事 --- 未読、既読、可視、保留記事を消去します。もし @code{nil} (これが
 初期設定値) であれば、既読記事のみが消去の対象となり、未読、可視、保留記
 事はさらに無期限に保持します。
+
+@node Agent and IMAP
+@subsection Agent and IMAP
+
+The Agent work with any Gnus backend, including nnimap.  However, since
+there are some conceptual differences between NNTP and IMAP, this
+section (should) provide you with some information to make Gnus Agent
+work smoother as a IMAP Disconnected Mode client.
+
+The first thing to keep in mind is that all flags (read, ticked, etc)
+are kept on the IMAP server, rather than in @code{.newsrc} as is the
+case for nntp.  Thus Gnus need to remember flag changes when
+disconnected, and synchronize these flags when you plug back in.
+
+Gnus keep track of flag changes when reading nnimap groups under the
+Agent by default.  When you plug back in, by default Gnus will check if
+you have any changed any flags and ask if you wish to synchronize theese
+with the server.  This behaviour is customizable with
+@code{gnus-agent-synchronize-flags}.
+
+@vindex gnus-agent-synchronize-flags
+If @code{gnus-agent-synchronize-flags} is @code{nil}, the Agent will
+never automatically synchronize flags.  If it is @code{ask}, the
+default, the Agent will check if you made any changes and if so ask if
+you wish to synchronize these when you re-connect.  If it has any other
+value, all flags will be synchronized automatically.
+
+If you do not wish to automatically synchronize flags when you
+re-connect, this can be done manually with the
+@code{gnus-agent-synchronize-flags} command that is bound to @kbd{J Y}
+in the group buffer by default.
+
+Some things are currently not implemented in the Agent that you'd might
+expect from a disconnected IMAP client, including:
+
+@itemize @bullet
+
+@item
+Copying/moving articles into nnimap groups when unplugged.
+
+@item
+Creating/deleting nnimap groups when unplugged.
+
+@end itemize
+
+Technical note: the synchronization algorithm does not work by "pushing"
+all local flags to the server, but rather incrementally update the
+server view of flags by changing only those flags that were changed by
+the user.  Thus, if you set one flag on a article, quit the group and
+re-select the group and remove the flag; the flag will be set and
+removed from the server when you "synchronize".  The queued flag
+operations can be found in the per-server @code{flags} file in the Agent
+directory.  It's emptied when you synchronize flags.
 
 @node Outgoing Messages
 @subsection 差出用メッセージ
@@ -14404,7 +14464,6 @@ Gnus は概略バッファを作成する前に、現在のグループに適用されるどん
 * Reverse Scoring::        古いものの子であるという問題は問題ではない
 * Global Score Files::     地をつかみ、耳を切り裂くスコアファイル
 * Kill Files::             それらはまだここにありますが、無視する事ができる
-@c * Converting Kill Files::  削除ファイルをスコアファイルに変換する
 * GroupLens::              どれを読むのが好きかの予言を得る
 * Advanced Scoring::       スコアの法則を作るために論理表現を使う
 * Score Decays::           スコアを枯れていかせるのは役に立つ事もある
@@ -15687,7 +15746,7 @@ GNUS 消去ファイルを編集するための二つの概略バッファ関数があります。
 
 消去ファイルからスコアファイルへの変換パッケージは、標準ではgnus には含
 まれません。
-@file{http://www.stud.ifi.uio.no/~larsi/ding-other/gnus-kill-to-score} か
+@file{http://www.stud.ifi.uio.no/~larsi/ding-various/gnus-kill-to-score.el} か
 ら入手することができます。
 
 もしあなたの消去ファイルが非常に複雑なものであれば --- それ

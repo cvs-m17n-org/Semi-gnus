@@ -17,7 +17,7 @@
 (defun maybe-bind (args)
   (mapcar (lambda (var) (unless (boundp var) (set var nil))) args))
 
-(if (string-match "XEmacs" emacs-version)
+(if (featurep 'xemacs)
     (progn
       (defvar track-mouse nil)
       (maybe-fbind '(posn-point
@@ -50,7 +50,8 @@
 		     vcard-pretty-print image-type-available-p
 		     put-image create-image  display-graphic-p
 		     find-image insert-image image-size
-		     make-overlay overlay-put make-symbolic-link))
+		     make-overlay overlay-put overlay-buffer overlay-start
+		     overlay-get overlay-end make-symbolic-link))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
