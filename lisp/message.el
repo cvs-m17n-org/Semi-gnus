@@ -3217,6 +3217,13 @@ Headers already prepared in the buffer are not modified."
     (widen)
     (forward-line 1)))
 
+(defun message-fill-references (header value)
+  (insert (capitalize (symbol-name header))
+	  ": "
+	  (std11-fill-msg-id-list-string
+	  (if (consp value) (car value) value))
+	  "\n"))
+
 (defun message-fill-header (header value)
   (let ((begin (point))
 	(fill-column 78)
