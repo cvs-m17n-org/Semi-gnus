@@ -33,6 +33,7 @@
 (gnus-declare-backend "nnshimbun" 'address)
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'nnheader)
 (require 'nnmail)
@@ -60,7 +61,7 @@
   `(("asahi"
      (url . "http://spin.asahi.com/")
      (groups "national" "business" "politics" "international" "sports" "personal" "feneral")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-asahi-get-headers)
      (index-url      . (format "%sp%s.html" nnshimbun-url nnshimbun-current-group))
@@ -71,7 +72,7 @@
     ("sponichi"
      (url . "http://www.sponichi.co.jp/")
      (groups "baseball" "soccer" "usa" "others" "society" "entertainment" "horseracing")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-sponichi-get-headers)
      (index-url      . (format "%s%s/index.html" nnshimbun-url nnshimbun-current-group))
@@ -82,7 +83,7 @@
     ("cnet"
      (url . "http://cnet.sphere.ne.jp/")
      (groups "comp")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-cnet-get-headers)
      (index-url      . (format "%s/News/Oneweek/" nnshimbun-url))
@@ -93,7 +94,7 @@
     ("wired"
      (url . "http://www.hotwired.co.jp/")
      (groups "business" "culture" "technology")
-     (coding-system  . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
+     (coding-system  . ,(static-if (boundp 'MULE) '*euc-japan* 'euc-jp))
      (generate-nov   . nnshimbun-generate-nov-for-all-groups)
      (get-headers    . nnshimbun-wired-get-all-headers)
      (index-url)
@@ -104,7 +105,7 @@
     ("yomiuri"
      (url . "http://www.yomiuri.co.jp/")
      (groups "shakai" "sports" "seiji" "keizai" "kokusai" "fuho")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-all-groups)
      (get-headers    . nnshimbun-yomiuri-get-all-headers)
      (index-url      . (concat nnshimbun-url "main.htm"))
@@ -115,7 +116,7 @@
     ("zdnet"
      (url . "http://www.zdnet.co.jp/news/")
      (groups "comp")
-     (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (coding-system  . ,(static-if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-zdnet-get-headers)
      (index-url      . nnshimbun-url)
@@ -126,7 +127,7 @@
     ("mew"
      (url . "http://www.mew.org/archive/")
      (groups ,@(mapcar #'car nnshimbun-mew-groups))
-     (coding-system . ,(if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
+     (coding-system . ,(static-if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
      (generate-nov  . nnshimbun-generate-nov-for-each-group)
      (get-headers   . nnshimbun-mew-get-headers)
      (index-url     . (nnshimbun-mew-concat-url "index.html"))
@@ -136,7 +137,7 @@
      (groups "xemacs-announce" "xemacs-beta-ja" "xemacs-beta"
 	     "xemacs-build-reports" "xemacs-cvs" "xemacs-mule"
 	     "xemacs-nt" "xemacs-patches" "xemacs-users-ja" "xemacs")
-     (coding-system . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
+     (coding-system . ,(static-if (boundp 'MULE) '*euc-japan* 'euc-jp))
      (generate-nov  . nnshimbun-generate-nov-for-each-group)
      (get-headers   . nnshimbun-xemacs-get-headers)
      (index-url     . (nnshimbun-xemacs-concat-url nil))
@@ -147,7 +148,7 @@
 	     "port-arm32-ja" "port-hpcmips-ja" "port-mac68k-ja"
 	     "port-mips-ja" "port-powerpc-ja" "hpcmips-changes-ja"
 	     "members-ja" "admin-ja" "www-changes-ja")
-     (coding-system  . ,(if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
+     (coding-system  . ,(static-if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-jp))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
      (get-headers    . nnshimbun-netbsd-get-headers)
      (index-url      . (format "%s%s/index.html" nnshimbun-url nnshimbun-current-group))
@@ -295,6 +296,14 @@ for a charset indication")
   (nnoo-close-server 'nnshimbun server)
   t)
 
+(static-when (boundp 'MULE)
+  (unless (coding-system-p 'euc-japan)
+    (copy-coding-system '*euc-japan* 'euc-japan))
+  (unless (coding-system-p 'shift_jis)
+    (copy-coding-system '*sjis* 'shift_jis))
+  (eval-and-compile
+    (defalias-maybe 'coding-system-category 'get-code-mnemonic)))
+
 (defun nnshimbun-retrieve-url (url &optional no-cache)
   "Rertrieve URL contents and insert to current buffer."
   (let ((buf (current-buffer))
@@ -323,9 +332,12 @@ for a charset indication")
 	   (or url-current-mime-charset
 	       (let ((case-fold-search t))
 		 (goto-char (point-min))
-		 (if (or (re-search-forward nnshimbun-meta-content-type-charset-regexp nil t)
-			 (re-search-forward nnshimbun-meta-charset-content-type-regexp nil t))
-		     (buffer-substring-no-properties (match-beginning 2) (match-end 2)))))))
+		 (if (or (re-search-forward
+			  nnshimbun-meta-content-type-charset-regexp nil t)
+			 (re-search-forward
+			  nnshimbun-meta-charset-content-type-regexp nil t))
+		     (buffer-substring-no-properties (match-beginning 2)
+						     (match-end 2)))))))
       (decode-coding-region
        (point-min) (point-max)
        (if charset
