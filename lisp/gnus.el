@@ -270,7 +270,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "7.1.0.10"
+(defconst gnus-version-number "7.1.0.11"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
@@ -2064,6 +2064,8 @@ If ARG, insert string at point."
 
 (defun gnus-continuum-version (version)
   "Return VERSION as a floating point number."
+  (when (string-match "(based on \\(.*Gnus[^;]+\\)" version)
+    (setq version (match-string 1 version)))
   (when (or (string-match "^\\([^ ]+\\)? ?Gnus v?\\([0-9.]+\\)$" version)
 	    (string-match "^\\(.?\\)gnus-\\([0-9.]+\\)$" version))
     (let ((alpha (and (match-beginning 1) (match-string 1 version)))
