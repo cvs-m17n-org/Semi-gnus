@@ -51,8 +51,6 @@
 
 (require 'cl)
 
-(push "/usr/share/emacs/site-lisp" load-path)
-
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
 ;; into the building directory.  For that, we define this function

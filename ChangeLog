@@ -1,3 +1,22 @@
+2000-07-24  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* configure: Regenerate with autoconf v2.14.1.
+
+	* configure.in: Rewrite for using new macros in aclocal.m4.
+
+	* aclocal.m4: (AC_ADD_LOAD_PATH, AC_PATH_PACKAGEDIR,
+	AC_CHECK_EMACS, AC_DEFINE_GNUS_PRODUCT_NAME): New macros.
+	(AC_PATH_LISPDIR): Set `lispdir' to ".../site-lisp/t-gnus" by
+	default.
+	(AM_PATH_LISPDIR): Remove.
+
+	* acinclude.m4: Remove.
+
+	* lisp/dgnushack.el: Don't add "/usr/share/emacs/site-lisp" to
+	`load-path'.
+
 2000-07-21   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
