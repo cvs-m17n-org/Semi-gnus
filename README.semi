@@ -26,7 +26,7 @@ How to get?
     Please do following in a directory to extract (ex. site-lisp):
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	co -r semi-gnus gnus
+	checkout -r semi-gnus gnus
 
 (2) compile
 
@@ -43,6 +43,14 @@ How to get?
     % cvs update -r semi-gnus
 
 
+  (semi-)daily snapshot is also available from
+
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+
+  Note that this snapshot is automatically created from our repository
+and will usually not be tested, and may not even work.
+
+
 How to join development
 =======================
 
@@ -54,10 +62,10 @@ send them to the Semi-gnus mailing list:
 
   Via the Semi-gnus ML, you can report Semi-gnus related bugs, obtain
 the latest release of Semi-gnus, and discuss future enhancements to
-Semi-gnus.  To join the Semi-gnus ML, send e-mail to
+Semi-gnus.  To join the Semi-gnus ML, send an empty e-mail to
 
-    semi-gnus-ja-subscribe@meadow.scphys.kyoto-u.ac.jp	(Japanese)
-    semi-gnus-en-subscribe@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-en-help@meadow.scphys.kyoto-u.ac.jp	(English)
+    semi-gnus-ja-help@meadow.scphys.kyoto-u.ac.jp	(Japanese)
 
   In addition, we need developers.  If you would like to develop it,
 please send mail to cvs@chamonix.jaist.ac.jp.
