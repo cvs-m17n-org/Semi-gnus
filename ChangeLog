@@ -1,3 +1,9 @@
+1998-11-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/extract-address-components): Normalize
+	return value.
+	(gnus-bbdb/update-record): Change condition for checking own message.
+
 1998-11-11  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* README.semi.ja, README.branch.ja: New file.
