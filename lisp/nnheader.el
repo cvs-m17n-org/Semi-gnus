@@ -172,7 +172,7 @@ on your system, you could say something like:
 	  ;; about twice as fast, even though it looks messier.	 You
 	  ;; can't have everything, I guess.  Speed and elegance
 	  ;; don't always go hand in hand.
-	  (make-full-mail-header-from-decoded-header
+	  (make-full-mail-header
 	   ;; Number.
 	   (if naked
 	       (progn
