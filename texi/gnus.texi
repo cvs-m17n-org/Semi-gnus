@@ -11135,6 +11135,28 @@ The @samp{nnml:.*} rule means that you use the @code{To} address as the
 @code{From} address in all your outgoing replies, which might be handy
 if you fill many roles.
 
+Setting the @code{gnus-named-posting-styles} variable will make
+posting-styles allow to have distinctive names.  It is an alist which
+maps the names to styles.  If an attribute has a name @code{import},
+Gnus will look for the attribute value in
+@code{gnus-named-posting-styles} and import user defined attributes.
+
+@lisp
+(setq gnus-named-posting-styles
+      '(("Default"
+         (signature-file "~/.signature")
+         (name "User Name")
+         ("X-Home-Page" (getenv "WWW_HOME"))
+         (organization "People's Front Against MWM"))
+	("Emacs"
+	 (import "Default")
+	 (organization "The Church of Emacs"))))
+@end lisp
+
+The posting-style named "Emacs" will take over all the attributes from
+"Default" except @code{organization}.  You can specify an arbitrary
+posting-style when article posting with @kbd{S P} in the summary buffer.
+
 
 @node Drafts
 @section Drafts

@@ -10628,6 +10628,29 @@ from date id references chars lines xref extra の各ヘッダーから成るベク
 を @code{From} アドレスとして使うことを意味します。これは、あなたがたく
 さんのメーリングリストに参加している場合に便利でしょう。
 
+変数 @code{gnus-named-posting-styles} を設定することで、よく利用する投稿
+様式に名前をつけることができます。それは名前と任意の量の属性からなる連想
+リストです。@code{gnus-posting-styles} に含まれる属性名が @code{import} 
+だったら、その属性値から @code{gnus-named-posting-styles} を引いて得られ
+た定型の属性を取り込みます。
+
+@lisp
+(setq gnus-named-posting-styles
+      '(("Default"
+         (signature-file "~/.signature")
+         (name "User Name")
+         ("X-Home-Page" (getenv "WWW_HOME"))
+         (organization "People's Front Against MWM"))
+	("Emacs"
+	 (import "Default")
+	 (organization "The Church of Emacs"))))
+@end lisp
+
+"Emacs" と名付けられた様式は、@code{organization} 以外の属性を "Default" 
+から引き継ぎます。概略バッファで @kbd{S P} とすることで、投稿の際に任意
+の様式を選択することもできます。
+
+
 @node Drafts
 @section 下書き
 @cindex drafts
