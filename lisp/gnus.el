@@ -40,9 +40,6 @@
 
 (require 'gnus-vers)
 
-;; For backward compatibility with old .newsrc.eld files.
-(defvar gnus-tmp-grouplens "")  
-
 (defgroup gnus nil
   "The coffee-brewing, all singing, all dancing, kitchen sink newsreader."
   :group 'news
@@ -2884,7 +2881,6 @@ with some simple extensions.
 %z   Article zcore (character)
 %t   Number of articles under the current thread (number).
 %e   Whether the thread is empty or not (character).
-%l   GroupLens score (string).
 %V   Total thread score (number).
 %P   The line number (number).
 %O   Download mark (character).
