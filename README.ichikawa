@@ -1,0 +1,22 @@
+========================================================================
+Codename:	T-gnus
+Branch Tag:	ichikawa
+Branch Owner:	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+Branch Goal:	Implement latest features of gnus and offline features
+Branch Policy:	(not defined yet)
+========================================================================
+NEWS:
+
+* New codename: "T-gnus"
+
+  In order to distinguish "ichikawa" branch from other branches, codename
+  was changed to "T-gnus".
+
+* New Features
+
+  Use T-gnus in offline(Unplugged) status using gnus-offline.
+  T-gnus have also features that have "shuhei-k" branch and MainTrunk.
+
+* TODO
+
+  ......

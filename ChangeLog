@@ -4,6 +4,9 @@
 
 	* Sync up with Gnus 5.6.36.
 	
+	* lisp/gnus-offline.el : New file.
+	Merge gnus-offline to ichikawa branch.
+	
 1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Update.
