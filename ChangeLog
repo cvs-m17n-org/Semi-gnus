@@ -1,3 +1,8 @@
+2002-12-16  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/nnimap.el (nnimap-callback): Use `nnimap-demule'.
+	(nnimap-request-article-part): Ditto.
+	
 2002-12-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/Makefile.in (%.info, .texi): Conceal control procedures.
