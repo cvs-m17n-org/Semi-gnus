@@ -4077,7 +4077,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 				  number)
 				 (number-to-string gnus-large-newsgroup))))
 		    (if (string-match "^[ \t]*$" input)
-			gnus-large-newsgroup
+			number
 		      input)))
 		 ((and (> scored marked) (< scored number)
 		       (> (- scored number) 20))
