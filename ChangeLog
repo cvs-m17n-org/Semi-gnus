@@ -1,3 +1,11 @@
+1999-12-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/pop3.el (pop3-ssl-program-arguments): Add "s_client".
+	(pop3-open-ssl-stream-1): Bind `ssl-program-name' because its
+	value depends on the version of ssl.el.
+	(pop3-open-ssl-stream): If `system-type' is windows-nt, bind
+	`coding-system-for-read' to raw-text-dos, else bind it to binary.
+
 1999-12-23  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Fix timing of
