@@ -121,6 +121,7 @@ Public Branches
 	gnus-6_10	Semi-gnus for SEMI 1.12, FLIM 1.12 API (develop)
 	pgnus-ichikawa	(Main trunk of T-gnus)
 	t-gnus-6_12	T-gnus for SEMI 1.12/1.13, FLIM 1.12 API (stable)
+	t-gnus-6_13	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 	t-gnus-6_14	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 
 Personal Branches
