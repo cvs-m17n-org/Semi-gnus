@@ -6532,15 +6532,17 @@ Optional NEWS will use news to forward instead of mail."
       ;; We first set up a normal mail buffer.
       (unless (message-mail-user-agent)
 	(set-buffer (get-buffer-create " *message resend*"))
-	(erase-buffer)
-	(let ((message-this-is-mail t)
-	      ;; avoid to turn-on-mime-edit
-	      message-setup-hook)
-	  (message-setup `((To . ,address)))))
+	(erase-buffer))
+      (let ((message-this-is-mail t)
+	    message-setup-hook)
+	(message-setup `((To . ,address))))
       ;; Insert our usual headers.
       (message-generate-headers '(From Date To))
       (message-narrow-to-headers)
+      ;; Remove X-Draft-From header etc.
+      (message-remove-header message-ignored-mail-headers t)
       ;; Rename them all to "Resent-*".
+      (goto-char (point-min))
       (while (re-search-forward "^[A-Za-z]" nil t)
 	(forward-char -1)
 	(insert "Resent-"))
