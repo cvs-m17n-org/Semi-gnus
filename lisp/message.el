@@ -2,8 +2,9 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;;	Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -103,6 +104,10 @@
   "Faces used for message composing."
   :group 'message
   :group 'faces)
+
+(defgroup message-frames nil
+  "Message frames"
+  :group 'message)
 
 (defcustom message-directory "~/Mail/"
   "*Directory from which all other mail file variables are derived."
@@ -648,6 +653,7 @@ If stringp, use this; if non-nil, use no host name (user name only)."
   "A list of actions to be performed before killing a message buffer.")
 (defvar message-postpone-actions nil
   "A list of actions to be performed after postponing a message.")
+(defvar message-original-frame nil)
 
 (define-widget 'message-header-lines 'text
   "All header lines must be LFD terminated."
@@ -938,6 +944,18 @@ The cdr of ech entry is a function for applying the face to a region.")
   "Hook run after sending messages."
   :group 'message-various
   :type 'hook)
+
+(defcustom message-use-multi-frames nil
+  "Make new frame when sending messages."
+  :group 'message-frames
+  :type 'boolean)
+
+(defcustom message-delete-frame-on-exit nil
+  "Delete frame after sending messages."
+  :group 'message-frames
+  :type '(choice (const :tag "off" nil)
+		 (const :tag "always" t)
+		 (const :tag "ask" ask)))
 
 (defvar message-send-coding-system 'binary
   "Coding system to encode outgoing mail.")
@@ -1987,7 +2005,9 @@ The text will also be indented the normal way."
   "Send message like `message-send', then, if no errors, exit from mail buffer."
   (interactive "P")
   (let ((buf (current-buffer))
-	(actions message-exit-actions))
+	(actions message-exit-actions)
+	(frame (selected-frame))
+	(org-frame message-original-frame))
     (when (and (message-send arg)
 	       (buffer-name buf))
       (if message-kill-buffer-on-exit
@@ -1995,7 +2015,8 @@ The text will also be indented the normal way."
 	(bury-buffer buf)
 	(when (eq buf (current-buffer))
 	  (message-bury buf)))
-      (message-do-actions actions))))
+      (message-do-actions actions)
+      (message-delete-frame frame org-frame))))
 
 (defun message-dont-send ()
   "Don't send the message you have been editing."
@@ -2011,10 +2032,32 @@ The text will also be indented the normal way."
   (interactive)
   (when (or (not (buffer-modified-p))
 	    (yes-or-no-p "Message modified; kill anyway? "))
-    (let ((actions message-kill-actions))
+    (let ((actions message-kill-actions)
+	  (frame (selected-frame))
+	  (org-frame message-original-frame))
       (setq buffer-file-name nil)
       (kill-buffer (current-buffer))
-      (message-do-actions actions))))
+      (message-do-actions actions)
+      (message-delete-frame frame org-frame))))
+
+(defun message-delete-frame (frame org-frame)
+  "Delete frame for editing message."
+  (when (and (or (and (featurep 'xemacs)
+		      (not (eq 'tty (device-type))))
+		 window-system
+		 (>= emacs-major-version 20))
+	     (or (and (eq message-delete-frame-on-exit t)
+		      (select-frame frame)
+		      (or (eq frame org-frame)
+			  (prog1
+			      (y-or-n-p "Delete this frame?")
+			    (message ""))))
+		 (and (eq message-delete-frame-on-exit 'ask)
+		      (select-frame frame)
+		      (prog1
+			  (y-or-n-p "Delete this frame?")
+			(message "")))))
+    (delete-frame frame)))
 
 (defun message-bury (buffer)
   "Bury this mail buffer."
@@ -3306,8 +3349,24 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((buffer (get-buffer name))
+  (let ((pop-up-frames pop-up-frames)
+	(special-display-buffer-names special-display-buffer-names)
+	(special-display-regexps special-display-regexps)
+	(same-window-buffer-names same-window-buffer-names)
+	(same-window-regexps same-window-regexps)
+	(buffer (get-buffer name))
 	(cur (current-buffer)))
+    (if (or (and (featurep 'xemacs)
+		 (not (eq 'tty (device-type))))
+	    window-system
+	    (>= emacs-major-version 20))
+	(when message-use-multi-frames
+	  (setq pop-up-frames t
+		special-display-buffer-names nil
+		special-display-regexps nil
+		same-window-buffer-names nil
+		same-window-regexps nil))
+      (setq pop-up-frames nil))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
@@ -3318,7 +3377,10 @@ Headers already prepared in the buffer are not modified."
 	    (error "Message being composed")))
       (set-buffer (pop-to-buffer name)))
     (erase-buffer)
-    (message-mode)))
+    (message-mode)
+    (when pop-up-frames
+      (make-local-variable 'message-original-frame)
+      (setq message-original-frame (selected-frame)))))
 
 (defun message-do-send-housekeeping ()
   "Kill old message buffers."
