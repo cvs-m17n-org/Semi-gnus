@@ -264,8 +264,11 @@ on your system, you could say something like:
        (1- (point))
      eol))
 
+(defmacro nnheader-nov-skip-field ()
+  '(search-forward "\t" eol 'move))
+
 (defmacro nnheader-nov-field ()
-  '(buffer-substring (point) (nnheader-nov-next-field)))
+  '(buffer-substring (point) (if (nnheader-nov-skip-field) (1- (point)) eol)))
 
 (defmacro nnheader-nov-read-integer ()
   '(let ((field (buffer-substring (point) (nnheader-nov-next-field))))
