@@ -405,9 +405,10 @@ Return the response string if optional second argument is non-nil."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
+(autoload 'md5 "md5")
+
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
-  (if (not (fboundp 'md5)) (autoload 'md5 "md5"))
   (let ((hash (md5 (concat pop3-timestamp pop3-password))))
     (pop3-send-command process (format "APOP %s %s" user hash))
     (let ((response (pop3-read-response process t)))
