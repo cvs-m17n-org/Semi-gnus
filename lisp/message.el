@@ -271,6 +271,15 @@ should return the new buffer name."
   :group 'message-buffers
   :type 'boolean)
 
+(defcustom message-kill-buffer-query-function 'yes-or-no-p
+  "*A function called to query the user whether to kill buffer anyway or not.
+If it is t, the buffer will be killed peremptorily."
+  :type '(radio (function-item yes-or-no-p)
+		(function-item y-or-n-p)
+		(function-item nnheader-Y-or-n-p)
+		(function :tag "Other" t))
+  :group 'message-buffers)
+
 (defvar gnus-local-organization)
 (defcustom message-user-organization
   (or (and (boundp 'gnus-local-organization)
@@ -1932,14 +1941,17 @@ The text will also be indented the normal way."
   "Kill the current buffer."
   (interactive)
   (when (or (not (buffer-modified-p))
-	    (yes-or-no-p "Message modified; kill anyway? "))
+	    (eq t message-kill-buffer-query-function)
+	    (funcall message-kill-buffer-query-function
+		     "The buffer modified; kill anyway? "))
     (let ((actions message-kill-actions)
 	  (frame (selected-frame))
 	  (org-frame message-original-frame))
       (setq buffer-file-name nil)
       (kill-buffer (current-buffer))
       (message-do-actions actions)
-      (message-delete-frame frame org-frame))))
+      (message-delete-frame frame org-frame)))
+  (message ""))
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
