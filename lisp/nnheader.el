@@ -300,7 +300,14 @@ nil, ."
 		       temporary-file-directory))))
 	  (if dir-flag
 	      (make-directory file))
-	  file)))))
+	  file))))
+
+  ;; Should keep track of `mm-coding-system-p' in mm-util.el.
+  (defun nnheader-coding-system-p (sym)
+    "Return non-nil if SYM is a coding system."
+    (or (and (fboundp 'find-coding-system) (find-coding-system sym))
+	(and (fboundp 'coding-system-p) (coding-system-p sym))))
+  (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)

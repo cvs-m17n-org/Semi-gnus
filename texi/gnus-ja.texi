@@ -2240,6 +2240,10 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 $B$r<hF@$7$^$9!#@5$N?t$G$"$l$P!"?7$7$/E~Ce$7$?J}$+$i(B @code{n} $B8D$N5-;v$r<h(B
 $BF@$7$^$9!#(B
 
+@vindex gnus-large-ephemeral-newsgroup
+@code{gnus-large-newsgroup} $B$HF1$8$G$9$,!"0l;~%K%e!<%9%0%k!<%W$N$?$a$K$@(B
+$B$1;H$o$l$^$9!#(B
+
 @vindex gnus-select-group-hook
 @vindex gnus-auto-select-first
 @vindex gnus-auto-select-subject
@@ -6528,6 +6532,11 @@ Gnus $B$O(B @code{Subject} $BMs$r8+$k$3$H$K$h$C$F%9%l%C%I$r=8$a$^$9!#$3$l$O!"
 $B$3$NJQ?t$O(B @code{invisible} $B$K@_Dj$9$k$3$H$b$G$-$^$9!#$3$l$O;k3PE*$J8z2L(B
 $B$O2?$b$"$j$^$;$s$,!"L?Na(B @kbd{A T} $B$r$h$/;H$&$N$G$"$l$PLr$KN)$D$G$7$g(B
 $B$&(B (@pxref{Finding the Parent})$B!#(B
+
+@item gnus-fetch-old-ephemeral-headers
+@vindex gnus-fetch-old-ephemeral-headers
+@code{gnus-fetch-old-headers} $B$HF1$8$G$9$,!"0l;~%K%e!<%9%0%k!<%W$N$?$a$K(B
+$B$@$1;H$o$l$^$9!#(B
 
 @item gnus-build-sparse-threads
 @vindex gnus-build-sparse-threads
@@ -24237,6 +24246,7 @@ Gnus $B$,%0%k!<%W$KF~$k$H!"%0%k!<%W$NA4$F$NL$FI5-;v$N%X%C%@!<$r%P%C%/%(%s(B
 
 @item $B0l;~%0%k!<%W(B (ephemeral groups)
 @cindex ephemeral groups
+@cindex temporary groups
 $B$?$$$F$$$N%0%k!<%W$O$I$N5-;v$rFI$s$@$+$N%G!<%?$rC_@Q$7$^$9!#(B
 @dfn{$B0l;~(B} $B%0%k!<%W$O%G!<%?$,N/$a$i$l$J$$%0%k!<%W$G$9(B---$B%0%k!<%W$r=P$k$H!"(B
 $B$=$l$OE76u$K>C$(5n$j$^$9!#(B

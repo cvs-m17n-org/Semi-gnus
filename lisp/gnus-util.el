@@ -111,11 +111,14 @@
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
 ;; to limit the length of a string.  This function is necessary since
 ;; `(substr "abc" 0 30)' pukes with "Args out of range".
+;; Fixme: Why not `truncate-string-to-width'?
 (defsubst gnus-limit-string (str width)
   (if (> (length str) width)
       (substring str 0 width)
     str))
 
+;; Fixme: This is incomplete, but why not just use functionp?  In
+;; fact, that is used in various places.
 (defsubst gnus-functionp (form)
   "Return non-nil if FORM is funcallable."
   (or (and (symbolp form) (fboundp form))
@@ -1079,6 +1082,7 @@ Return the modified alist."
       (while (search-backward "\\." nil t)
 	(delete-char 1)))))
 
+;; Fixme: Why not use `with-output-to-temp-buffer'?
 (defmacro gnus-with-output-to-file (file &rest body)
   (let ((buffer (make-symbol "output-buffer"))
         (size (make-symbol "output-buffer-size"))
@@ -1156,9 +1160,9 @@ Return the modified alist."
 	   (string-equal (downcase x) (downcase y)))))
 
 (defcustom gnus-use-byte-compile t
-  "If non-nil, byte-compile crucial run-time codes.
-Setting it to nil has no effect after first time running
-`gnus-byte-compile'."
+  "If non-nil, byte-compile crucial run-time code.
+Setting it to nil has no effect after the first time `gnus-byte-compile'
+is run."
   :type 'boolean
   :version "21.1"
   :group 'gnus-various)
@@ -1221,7 +1225,7 @@ If you find some problem with the directory separator character, try
     (- x ?0)))
 
 (defun gnus-url-unhex-string (str &optional allow-newlines)
-  "Remove %XXX embedded spaces, etc in a url.
+  "Remove %XX, embedded spaces, etc in a url.
 If optional second argument ALLOW-NEWLINES is non-nil, then allow the
 decoding of carriage returns and line feeds in the string, which is normally
 forbidden in URL encoding."
@@ -1418,6 +1422,7 @@ Return nil otherwise."
 				 display))
 	      display)))))
 
+;; Fixme: This has only one use (in gnus-agent), which isn't worthwhile.
 (defmacro gnus-mapcar (function seq1 &rest seqs2_n)
   "Apply FUNCTION to each element of the sequences, and make a list of the results.
 If there are several sequences, FUNCTION is called with that many arguments,
@@ -1457,6 +1462,7 @@ sequence, this is like `mapcar'.  With several, it is like the Common Lisp
   ;; Adapted from cl-seq.el
   (defun gnus-merge (type list1 list2 pred)
     "Destructively merge lists LIST1 and LIST2 to produce a new list.
+Argument TYPE is for compatibility and ignored.
 Ordering of the elements is preserved according to PRED, a `less-than'
 predicate on the elements."
     (let ((res nil))

@@ -1,3 +1,8 @@
+2003-04-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-coding-system-p): New function.
+	(mm-coding-system-p): Alias to `nnheader-coding-system-p'.
+
 2003-04-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (coerce, copy-list, merge, string, subseq):

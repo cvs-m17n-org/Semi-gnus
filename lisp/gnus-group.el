@@ -420,8 +420,7 @@ For example:
   :type '(repeat (cons (sexp :tag "Method") (symbol :tag "Charset"))))
 
 (defcustom gnus-group-name-charset-group-alist
-  (if (or (and (fboundp 'find-coding-system) (find-coding-system 'utf-8))
-	  (and (fboundp 'coding-system-p) (coding-system-p 'utf-8)))
+  (if (mm-coding-system-p 'utf-8)
       '(("[^\000-\177]" . utf-8))
     nil)
   "Alist of group regexp and the charset for group names.
@@ -1103,6 +1102,7 @@ The following commands are available:
       result)))
 
 (defun gnus-group-name-decode (string charset)
+  ;; Fixme: Don't decode in unibyte mode.
   (if (and string charset (featurep 'mule))
       (decode-coding-string string charset)
     string))
@@ -1989,6 +1989,25 @@ Returns whether the fetching was successful or not."
 
 (defvar gnus-ephemeral-group-server 0)
 
+(defcustom gnus-large-ephemeral-newsgroup 200
+  "The number of articles which indicates a large ephemeral newsgroup.
+Same as `gnus-large-newsgroup', but only used for ephemeral newsgroups.
+
+If the number of articles in a newsgroup is greater than this value,
+confirmation is required for selecting the newsgroup.  If it is nil, no
+confirmation is required."
+  :group 'gnus-group-select
+  :type '(choice (const :tag "No limit" nil)
+		 integer))
+
+(defcustom gnus-fetch-old-ephemeral-headers nil
+  "Same as `gnus-fetch-old-headers', but only used for ephemeral newsgroups."
+  :group 'gnus-thread
+  :type '(choice (const :tag "off" nil)
+		 (const some)
+		 number
+		 (sexp :menu-tag "other" t)))
+
 ;; Enter a group that is not in the group buffer.  Non-nil is returned
 ;; if selection was successful.
 (defun gnus-group-read-ephemeral-group (group method &optional activate
@@ -2038,7 +2057,10 @@ Return the name of the group if selection was successful."
     (if request-only
 	group
       (condition-case ()
-	  (when (gnus-group-read-group t t group select-articles)
+	  (when (let ((gnus-large-newsgroup gnus-large-ephemeral-newsgroup)
+		      (gnus-fetch-old-headers
+		       gnus-fetch-old-ephemeral-headers))
+		  (gnus-group-read-group t t group select-articles))
 	    group)
 	;;(error nil)
 	(quit
@@ -2285,6 +2307,8 @@ ADDRESS."
 	(lambda (group)
 	  (gnus-group-delete-group group nil t))))))
 
+(eval-when-compile (defvar gnus-cache-active-altered))
+
 (defun gnus-group-delete-group (group &optional force no-prompt)
   "Delete the current group.  Only meaningful with editable groups.
 If FORCE (the prefix) is non-nil, all the articles in the group will
@@ -2312,10 +2336,10 @@ doing the deletion."
 	  (gnus-group-goto-group group)
 	  (gnus-group-kill-group 1 t)
 	  (gnus-sethash group nil gnus-active-hashtb)
-	  (when (and (boundp 'gnus-cache-active-hashtb)
-		     gnus-cache-active-hashtb)
-	    (gnus-sethash group nil gnus-cache-active-hashtb)
-	    (setq gnus-cache-active-altered t))
+	  (if (boundp 'gnus-cache-active-hashtb)
+	      (when gnus-cache-active-hashtb
+		(gnus-sethash group nil gnus-cache-active-hashtb)
+		(setq gnus-cache-active-altered t)))
 	  t))
     (gnus-group-position-point)))
 
