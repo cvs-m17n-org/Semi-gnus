@@ -1,3 +1,40 @@
+2001-12-09 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-buffer-name): Decode group name.
+	* gnus-group.el (gnus-group-name-decode): Decode unibyte
+	strings only.
+	From TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+
+2001-12-08  Nevin Kapur  <nevin@jhu.edu>
+
+	* nnmail.el (nnmail-fancy-expiry-targets): New variable.
+	(nnmail-fancy-expiry-target): Use it.
+	Suggestions from Simon Josefsson <jas@extundo.com>.
+
+2001-12-07 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-show-article): Recount lines if not exist.
+
+2001-12-07 10:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwfm.el (nnwfm-create-mapping): Use gnus-url-unhex-string.
+
+	* gnus-util.el (gnus-url-unhex-string): Move here.
+
+2001-12-07 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnrss.el (nnrss-decode-entities-unibyte-string): Use
+	mm-url-decode-entities-nbsp.
+
+	* nnlistserv.el, nnultimate.el, nnwarchive.el, nnweb.el,
+	webmail.el, nnwfm.el: Use mm-url.
+
+	* mm-url.el (mm-url-fetch-form): Move from nnweb.
+	(mm-url-remove-markup): Move from nnweb.
+	(mm-url-fetch-simple): Move from webmail.
+
+	* nnslashdot.el (nnslashdot-request-post): mm-url-fetch-form.
+
 2001-12-07 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-sum.el (gnus-summary-print-truncate-and-quote): New.

@@ -37,11 +37,9 @@
 (require 'gnus)
 (require 'nnmail)
 (require 'mm-util)
-(eval-when-compile
-  (ignore-errors
-    (require 'nnweb)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(require 'nnweb))
+(require 'mm-url)
+(require 'nnweb)
+(autoload 'w3-parse-buffer "w3-parse")
 
 (nnoo-declare nnwfm)
 
@@ -117,7 +115,7 @@
 	    (erase-buffer)
 	    (setq subject (nth 2 (assq (car elem) topics))
 		  thread-id (nth 0 (assq (car elem) topics)))
-	    (nnweb-insert
+	    (mm-url-insert
 	     (concat nnwfm-address
 		     (format "Item.asp?GroupID=%d&ThreadID=%d" sid
 			     thread-id)))
@@ -217,7 +215,7 @@
 (deffoo nnwfm-request-list (&optional server)
   (nnwfm-possibly-change-server nil server)
   (mm-with-unibyte-buffer
-    (nnweb-insert
+    (mm-url-insert
      (if (string-match "/$" nnwfm-address)
 	 (concat nnwfm-address "Group.asp")
        nnwfm-address))
@@ -280,7 +278,7 @@
       (while furls
 	(erase-buffer)
 	(push (car furls) fetched-urls)
-	(nnweb-insert (pop furls))
+	(mm-url-insert (pop furls))
 	(goto-char (point-min))
 	(while (re-search-forward "  wr(" nil t)
 	  (forward-char -1)
@@ -300,12 +298,13 @@
 	(when (re-search-forward "href=\"\\(Thread.*DateLast=\\([^\"]+\\)\\)"
 				 nil t)
 	  (setq url (match-string 1)
-		time (nnwfm-date-to-time (url-unhex-string (match-string 2))))
+		time (nnwfm-date-to-time (gnus-url-unhex-string 
+					  (match-string 2))))
 	  (when (and (nnwfm-new-threads-p group time)
 		     (not (member
 			   (setq url (concat
 				      nnwfm-address
-				      (nnweb-decode-entities-string url)))
+				      (mm-url-decode-entities-string url)))
 			   fetched-urls)))
 	    (push url furls))))
       ;; The main idea here is to map Gnus article numbers to

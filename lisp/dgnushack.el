@@ -440,10 +440,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	      (progn (require 'shimbun) nil)
 	    (error '("nnshimbun.el")))
 	  (unless (or (condition-case code
-			  (require 'w3-forms)
+			  (require 'w3-parse)
 			(error
 			 (message "No w3: %s %s retrying..." code
-				  (locate-library "w3-forms"))
+				  (locate-library "w3-parse"))
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
@@ -451,19 +451,18 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 					(copy-sequence load-path))))
 			(if (let ((load-path lp))
 			      (condition-case nil
-				  (require 'w3-forms)
+				  (require 'w3-parse)
 				(error nil)))
 			    ;; If success, fix `load-path' for compiling.
 			    (progn
 			      (setq load-path lp)
 			      (message " => fixed; W3DIR=%s"
 				       (file-name-directory
-					(locate-library "w3-forms")))
+					(locate-library "w3-parse")))
 			      t)
 			  (message " => ignored")
 			  nil)))
-	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-	      "nnwarchive.el" "webmail.el" "nnwfm.el"))
+	    '("nnultimate.el" "webmail.el" "nnwfm.el"))
 	  (condition-case code
 	      (progn (require 'mh-e) nil)
 	    (error

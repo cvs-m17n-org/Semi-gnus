@@ -13,6 +13,7 @@
 
 (maybe-fbind '(babel-fetch
 	       babel-wash create-image decode-coding-string display-graphic-p
+	       replace-regexp-in-string
 	       bbdb-complete-name
 	       display-time-event-handler
 	       find-image font-create-object gnus-mule-get-coding-system
@@ -70,6 +71,7 @@
 		     make-overlay mouse-minibuffer-check mouse-movement-p
 		     mouse-scroll-subr overlay-buffer overlay-end
 		     overlay-get overlay-lists overlay-put
+		     overlays-in
 		     overlay-start posn-point posn-window
 		     read-event read-event run-with-idle-timer
 		     set-buffer-multibyte set-char-table-range
@@ -114,15 +116,15 @@
 (let ((functions-variables
        (cond
 	((featurep 'xemacs)
-	 '((replace-regexp-in-string)))
+	 nil)
 	((>= emacs-major-version 21)
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
 	 '((coding-system-get
 	    compose-mail file-name-extension
 	    find-coding-systems-for-charsets find-coding-systems-region
-	    function-max-args get-charset-property replace-regexp-in-string
-	    shell-command-to-string smiley-encode-buffer)))
+	    function-max-args get-charset-property shell-command-to-string
+	    smiley-encode-buffer)))
 	(t
 	 '((function-max-args smiley-encode-buffer))))))
   (maybe-fbind (car functions-variables))

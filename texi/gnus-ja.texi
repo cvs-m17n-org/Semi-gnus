@@ -12449,6 +12449,27 @@ Gnus は記事がどのグループに属しているかに基づいて、それがどのくらい生存
 (setq nnmail-expiry-target "nnml:expired")
 @end lisp
 
+@findex nnmail-fancy-expiry-target
+@vindex nnmail-fancy-expiry-targets
+gnus には変数 @code{nnmail-fancy-expiry-targets} に従ってメールを期限切
+れ消去するための関数 @code{nnmail-fancy-expiry-target} があります。これ
+は例です:
+
+@lisp
+ (setq nnmail-expiry-target 'nnmail-fancy-expiry-target
+       nnmail-fancy-expiry-targets
+       '((to-from "boss" "nnfolder:Work")
+         ("subject" "IMPORTANT" "nnfolder:IMPORTANT.%Y.%b")
+         ("from" ".*" "nnfolder:Archive-%Y")))
+@end lisp
+
+この設定によって、題名に @code{IMPORTANT} を持ち、
+@code{YYYY} 年 @code{MMM} 月に発信されたいかなるメールも、グルー
+プ @code{nnfolder:IMPORTANT.YYYY.MMM} に期限切れ消去 (訳注: 実際の動作は
+保存) されます。もし From または To ヘッダーが文字列 @code{boss} を含ん
+でいたら @code{nnfolder:Work} に期限切れ消去されます。それ以外のすべての
+メールは @code{nnfolder:Archive-YYYY} に期限切れ消去されます。
+
 @vindex nnmail-keep-last-article
 @code{nnmail-keep-last-article} が @code{nil} でないと、gnus はメールニュー
 スグループの最後の記事を決して期限切れ消去しません。これは procmail の利
