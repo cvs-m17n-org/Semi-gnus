@@ -2271,7 +2271,8 @@ If FORCE is non-nil, the .newsrc file is read."
 (defun gnus-convert-old-newsrc ()
   "Convert old newsrc formats into the current format, if needed."
   (let ((fcv (and gnus-newsrc-file-version
-		  (gnus-continuum-version gnus-newsrc-file-version))))
+		  (gnus-continuum-version gnus-newsrc-file-version)))
+	(gcv (gnus-continuum-version)))
     (when fcv
       ;; A newsrc file was loaded.
       (let (prompt-displayed
@@ -2304,7 +2305,8 @@ If FORCE is non-nil, the .newsrc file is read."
 
         ;; Perform converters to bring older version up to date.
 	(when (and converters (< fcv (caar converters)))
-	  (while (and converters (< fcv (caar converters)))
+	  (while (and converters (< fcv (caar converters))
+		      (<= (caar converters) gcv))
             (let* ((converter-spec  (pop converters))
                    (convert-to      (nth 1 converter-spec))
                    (load-from       (nth 2 converter-spec))
