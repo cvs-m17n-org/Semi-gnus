@@ -1,5 +1,11 @@
 2002-04-30  Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/message.el (message-expand-name-function): New user option.
+	(message-expand-name): Use it.
+	* lisp/lpath.el: Don't bind lsdb-complete-name and bbdb-complete-name.
+
+2002-04-30  Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/message.el (message-expand-name): Use lsdb-complete-name if
 	available.
 	* lisp/lpath.el: Bind lsdb-complete-name.
