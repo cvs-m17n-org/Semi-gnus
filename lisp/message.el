@@ -2200,6 +2200,13 @@ Prefix arg means justify as well."
     (message-newline-and-reformat arg t)
     t))
 
+(defun-maybe rfc822-goto-eoh ()
+  ;; Go to header delimiter line in a mail message, following RFC822 rules
+  (goto-char (point-min))
+  (while (looking-at "^[^: \n]+:\\|^[ \t]")
+    (forward-line 1))
+  (point))
+
 (defun message-do-auto-fill ()
   "Like `do-auto-fill', but don't fill in message header."
   (when (> (point) (save-excursion (rfc822-goto-eoh)))
