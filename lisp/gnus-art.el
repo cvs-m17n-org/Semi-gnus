@@ -5292,10 +5292,8 @@ If given a prefix, show the hidden text instead."
   (autoload 'nneething-get-file-name "nneething"))
 
 (defun gnus-request-article-this-buffer (article group)
-  "Get an article and insert it into this buffer.
-T-gnus change: Insert an article into `gnus-original-article-buffer'."
+  "Get an article and insert it into this buffer."
   (let (do-update-line sparse-header)
-    ;; The current buffer is `gnus-article-buffer'.
     (prog1
 	(save-excursion
 	  (erase-buffer)
@@ -5348,16 +5346,6 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 				 (file-directory-p dir))
 			(setq article 'nneething)
 			(gnus-group-enter-directory dir))))))))
-	  (setq gnus-original-article (cons group article))
-
-	  ;; The current buffer is `gnus-original-article-buffer'.
-	  (if (get-buffer gnus-original-article-buffer)
-	      (set-buffer gnus-original-article-buffer)
-	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
-	    (set-buffer-multibyte nil)
-	    (buffer-disable-undo)
-	    (setq major-mode 'gnus-original-article-mode)
-	    (setq buffer-read-only nil))
 
 	  (cond
 	   ;; Refuse to select canceled articles.
@@ -5370,6 +5358,15 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 			    (assq article gnus-newsgroup-reads)))
 		     gnus-canceled-mark))
 	    nil)
+	   ;; We first check `gnus-original-article-buffer'.
+	   ((and (get-buffer gnus-original-article-buffer)
+		 (numberp article)
+		 (save-excursion
+		   (set-buffer gnus-original-article-buffer)
+		   (and (equal (car gnus-original-article) group)
+			(eq (cdr gnus-original-article) article))))
+	    (insert-buffer-substring gnus-original-article-buffer)
+	    'article)
 	   ;; Check the backlog.
 	   ((and gnus-keep-backlog
 		 (gnus-backlog-request-article group article (current-buffer)))
@@ -5433,19 +5430,27 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
       ;; Associate this article with the current summary buffer.
       (setq gnus-article-current-summary gnus-summary-buffer)
 
-      ;; Copy the requested article from `gnus-original-article-buffer'.
-      (unless (equal (buffer-name (current-buffer))
-		     (buffer-name (get-buffer gnus-original-article-buffer)))
-	;; There may be the same article if the current buffer is
-	;; `nntp-server-buffer' (e.g. a case that the command
-	;; `gnus-cache-enter-article' is invoked), it should be erased.
-	(erase-buffer)
-	(insert-buffer gnus-original-article-buffer))
+      ;; Take the article from the original article buffer
+      ;; and place it in the buffer it's supposed to be in.
+      (when (and (get-buffer gnus-article-buffer)
+		 (equal (buffer-name (current-buffer))
+			(buffer-name (get-buffer gnus-article-buffer))))
+	(save-excursion
+	  (if (get-buffer gnus-original-article-buffer)
+	      (set-buffer gnus-original-article-buffer)
+	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
+	    (buffer-disable-undo)
+	    (setq major-mode 'gnus-original-article-mode)
+	    (setq buffer-read-only t))
+	  (let (buffer-read-only)
+	    (erase-buffer)
+	    (insert-buffer-substring gnus-article-buffer))
+	  (setq gnus-original-article (cons group article)))
 
-      ;; Decode charsets.
-      (run-hooks 'gnus-article-decode-hook)
-      ;; Mark article as decoded or not.
-      (setq gnus-article-decoded-p gnus-article-decode-hook)
+	;; Decode charsets.
+	(run-hooks 'gnus-article-decode-hook)
+	;; Mark article as decoded or not.
+	(setq gnus-article-decoded-p gnus-article-decode-hook))
 
       ;; Update sparse articles.
       (when (and do-update-line

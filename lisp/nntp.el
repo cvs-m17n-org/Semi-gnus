@@ -1681,7 +1681,8 @@ Please refer to the following variables to customize the connection:
     (push nntp-via-rlogin-command command)
     (and nntp-pre-command
 	 (push nntp-pre-command command))
-    (setq proc (apply 'start-process "nntpd" buffer command))
+    (setq proc (as-binary-process
+		(apply 'start-process "nntpd" buffer command)))
     (save-excursion
       (set-buffer buffer)
       (nntp-wait-for-string "^\r*20[01]")

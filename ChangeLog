@@ -1,3 +1,11 @@
+2002-02-26  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-art.el (gnus-request-article-this-buffer): Sync up
+	with Oort-gnus.
+
+	* lisp/nntp.el (nntp-open-via-rlogin-and-telnet): Wrap
+	`call-process' with `as-binary-process'.
+
 2002-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/smiley.el (smiley-regexp-alist): Fix the order of faces.
