@@ -2476,8 +2476,9 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	  (gnus-prin1 (symbol-value variable))
 	  (insert ")\n"))))))
 
-(defun gnus-product-variable-touch (variable)
-  (put variable 'gnus-product-variable 'dirty))
+(defun gnus-product-variable-touch (&rest variables)
+  (while variables
+    (put (pop variables) 'gnus-product-variable 'dirty)))
 
 (defun gnus-product-variables-dirty-p (variables)
   (catch 'done
