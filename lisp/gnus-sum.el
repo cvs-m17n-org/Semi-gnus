@@ -8916,9 +8916,6 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 		 (crosspost "Crosspost" "Crossposting")))
 	(copy-buf (save-excursion
 		    (nnheader-set-temp-buffer " *copy article*")))
-	(default-marks gnus-article-mark-lists)
-	(no-expire-marks (delete '(expirable . expire)
-				 (copy-sequence gnus-article-mark-lists)))
 	art-group to-method new-xref article to-groups)
     (unless (assq action names)
       (error "Unknown action %s" action))
@@ -9049,8 +9046,9 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 
 	    ;; See whether the article is to be put in the cache.
 	    (let ((marks (if (gnus-group-auto-expirable-p to-group)
-			     default-marks
-			   no-expire-marks))
+			     gnus-article-mark-lists
+			   (delete '(expirable . expire)
+				   (copy-sequence gnus-article-mark-lists))))
 		  (to-article (cdr art-group)))
 
 	      ;; Enter the article into the cache in the new group,
