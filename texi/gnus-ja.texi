@@ -26703,11 +26703,12 @@ group-buffer = *active-line / *group-status
 
 @item (nnchoke-request-update-info GROUP INFO &optional SERVER)
 
-Gnus グループ情報 (@pxref{Group Info}) が変更箇所としてバックエ
-ンドに渡されます。これはバックエンドが (仮想グループや imap グルー
-プの場合のように) 本当に全ての情報を持っている場合に便利になりま
-す。この関数は、その要求に適合させる情報を破壊的に置き換え、
-@code{nil} ではない値を返さなければなりません。
+Gnus グループ情報 (@pxref{Group Info}) が変更箇所としてバックエンドに渡
+されます。これはバックエンドが (仮想グループや imap グループの場合のよう
+に) 本当に全ての情報を持っている場合に便利になります。この関数は、その要
+求に適合させる情報を破壊的に置き換え、@code{nil} ではない値を返さなけれ
+ばなりません (例外的に、@code{nntp-request-update-info} はネットワーク資
+源を浪費しないように、常に @code{nil} を返します)。
 
 この関数から返される結果のデータはありません。
 
