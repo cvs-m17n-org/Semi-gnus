@@ -1144,7 +1144,9 @@ This command does not work if you use short group names."
     (nnheader-insert-nov headers)))
 
 (deffoo nnfolder-request-set-mark (group actions &optional server)
-  (nnfolder-possibly-change-group group server)
+  (when (and server
+	     (not (nnfolder-server-opened server)))
+    (nnfolder-open-server server))
   (unless nnfolder-marks-is-evil
     (nnfolder-open-marks group server)
     (dolist (action actions)
@@ -1164,8 +1166,12 @@ This command does not work if you use short group names."
   nil)
 
 (deffoo nnfolder-request-update-info (group info &optional server)
-  (nnfolder-possibly-change-group group server)
+  ;; Change servers.
+  (when (and server
+	     (not (nnfolder-server-opened server)))
+    (nnfolder-open-server server))
   (unless nnfolder-marks-is-evil
+    (nnheader-message 8 "Updating marks for %s..." group)
     (nnfolder-open-marks group server)
     ;; Update info using `nnfolder-marks'.
     (mapcar (lambda (pred)
@@ -1218,7 +1224,7 @@ This command does not work if you use short group names."
 		   (gnus-group-prefixed-name
 		    group
 		    (gnus-server-to-method (format "nnfolder:%s" server))))))
-	(nnheader-message 6 "Bootstrapping nnfolder marks...")
+	(nnheader-message 7 "Bootstrapping marks for %s..." group)
 	(setq nnfolder-marks (gnus-info-marks info))
 	(push (cons 'read (gnus-info-read info)) nnfolder-marks)
 	(nnfolder-save-marks group server)))))

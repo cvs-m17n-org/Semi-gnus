@@ -758,6 +758,7 @@ Getting Mail
 * Not Reading Mail::            他のファイルを読むためにメールバックエ
                                 ンドを使う
 * Choosing a Mail Backend::     Gnus は色々なメール様式を読む事ができる
+* Archiving Mail::              メールをバックアップするには
 
 Mail Sources
 
@@ -10928,6 +10929,7 @@ Emacs のセッション全体をラップして、ディフォルトのメソッドを使うというの
 * Not Reading Mail::            他のファイルを読むためにメールバックエ
                                 ンドを使う
 * Choosing a Mail Backend::     Gnus は色々なメール様式を読む事ができる
+* Archiving Mail::              メールをバックアップするには
 @end menu
 
 @node Mail in a Newsreader
@@ -12808,6 +12810,35 @@ Gnus はこれらのソースへの界面を提供するバックエンド群を少し備えつつあり
 そういう場合には、Gnu Agent (@pxref{Gnus Unplugged}) に記事のダウンロー
 ドを任せて、ローカルディスクから好きなときに読むようにすることができます。
 これで、World Wide Wait とはおさらばです。
+
+@node Archiving Mail
+@subsection メールの保存
+@cindex archiving mail
+@cindex backup of mail
+
+いくつかのバックエンド、特に nnml と nnfolder は、それぞれのグループの記
+事の印を本当に保持します。これらのサーバーで、グループの印を保ちつつ保存
+したり元に戻すのはかなり簡単です。
+
+(でも、グループレベルとグループパラメータをも保持するには、今までとお
+り @code{.newsrc.eld} の神に、舞いと生贄を捧げなければなりません。)
+
+@code{nnml} か @code{nnfolder} にまるごと保存するには、サーバーのディレ
+クトリを再帰的にコピーします。gnus を終了する必要は無いので、保存
+は @code{cron} やそれに類するものが行なうことができます。データを復帰さ
+せるにはディレクトリ木 (tree) を元に戻すことで行ない、そのディレクトリを
+指し示すように gnus のサーバーの定義に追加します。@ref{Article Backlog}、
+@ref{Asynchronous Fetching} およびその他は、データを上書きして邪魔をする
+かもしれないので、あなたはデータを復帰させる前に gnus を終了したいかもし
+れません。
+
+個々の @code{nnml} や @code{nnfolder} のグループを、印を保持しつつ保存す
+ることもできます。@code{nnml} では、そのグループのディレクトリにあるすべ
+てのファイルをコピーします。@code{nnfolder} では、基本のフォルダーファイ
+ル (@code{FOO}) と印ファイル (@code{FOO.mrk}) の両方をコピーする必要があ
+ります。グループを元に戻すのは、グループバッファで @kbd{G m} キーを使い
+ます。その最後の手順によって、gnus は新しいディレクトリができたことを知
+ります。
 
 @node Web Searches
 @subsection ウェブ検索
