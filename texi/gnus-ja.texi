@@ -9670,8 +9670,10 @@ Parameters}) $B$rJT=8$7$^$9(B (@code{gnus-summary-edit-parameters})$B!#(B
 
 @table @kbd
 @item Z Z
+@itemx Z Q
 @itemx q
 @kindex Z Z ($B35N,(B)
+@kindex Z Q ($B35N,(B)
 @findex q ($B35N,(B)
 @findex gnus-summary-exit
 @vindex gnus-summary-exit-hook
@@ -9716,7 +9718,9 @@ Parameters}) $B$rJT=8$7$^$9(B (@code{gnus-summary-edit-parameters})$B!#(B
 $B$9(B (@code{gnus-summary-catchup-and-goto-next-group})$B!#(B
 
 @item Z R
+@itemx C-x C-s
 @kindex Z R ($B35N,(B)
+@kindex C-x C-s ($B35N,(B)
 @findex gnus-summary-reselect-current-group
 $B8=:_$N%0%k!<%W$r=P$F!"$=$l$+$iF~$jD>$7$^(B
 $B$9(B (@code{gnus-summary-reselect-current-group})$B!#$b$7@\F,0z?t$rM?$($i$l(B
@@ -21627,8 +21631,8 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @code{spam-split-group} $B$r%+%9%?%^%$%:$9$k$3$H$,2DG=$G$9!#(B
 
 $B$^$?!"(B@code{spam-split} $B$K%Q%i%a!<%?!"Nc$((B
-$B$P(B @samp{spam-use-regex-headers} $B$rM?$($k$3$H$b$G$-$^$9!#$J$<$3$l$,M-MQ(B
-$B$J$N$G$7$g$&$+(B?
+$B$P(B @samp{spam-use-regex-headers} $B$^$?$O(B @samp{"maybe-spam"} $B$rM?$($k$3$H(B
+$B$b$G$-$^$9!#$J$<$3$l$,M-MQ$J$N$G$7$g$&$+(B?
 
 $B$3$l$i$N(B (@code{spam-use-regex-headers} $B$H(B @code{spam-use-blackholes} $B$N(B
 $B@_Dj$K$h$k(B) $BJ,3d$N5,B'$r8+$F2<$5$$(B:
@@ -21654,19 +21658,22 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 
 @example
  nnimap-split-fancy '(|
-		      (: spam-split 'spam-use-regex-headers)
+;;; spam-use-regex-headers $B$G8!=P$5$l$?$9$Y$F$N(B spam $B$O(B "regex-spam" $B$X!#(B
+		      (: spam-split "regex-spam" 'spam-use-regex-headers)
 		      (any "ding" "ding")
+;;; spam-split $B$G8!=P$5$l$?B>$N$9$Y$F$N(B spam $B$O(B spam-split-group $B$X!#(B
 		      (: spam-split)
 		      ;; default mailbox
 		      "mail")
 @end example
 
 $B4pK\E*$K!"$3$l$OFC$K$"$J$?$NI,MW$K0MB8$7$?FCDj$N(B @code{spam-split} $B8!(B
-$B::$r5/F0$5$;$^$9!#$9$Y$F$N%a!<%k$r$9$Y$F$N(B spam $B%F%9%H$KEj$2$kI,MW$O$"$j(B
-$B$^$;$s!#$3$l$,NI$$JL$NM}M3$O!"5,B'$r;}$C$F$$$k%a!<%j%s%0%j%9%H$X$N%a%C%;!<(B
-$B%8$KBP$7$F!";q8;=8LsE*$J%V%i%C%/%[!<%k!&%A%'%C%/$r<B9T$9$kI,MW$,$J$$$H$$(B
-$B$&$3$H$G$9!#$5$i$K(B nnmail $BJ,3d$KBP$7$F(B nnimap $BJ,3d$N$?$a$N!"0[$J(B
-$B$k(B spam $B8!::$r;XDj$9$k$3$H$b$G$-$^$9!#5$$,68$&!<!#(B
+$B::$r5/F0$5$;!"$=$l$i$N8!::$N7k2L$OFCDj$N(B spam $B%0%k!<%W$r;X$7<($7$^$9!#$9(B
+$B$Y$F$N%a!<%k$r$9$Y$F$N(B spam $B%F%9%H$KEj$2$kI,MW$O$"$j$^$;$s!#$3$l$,NI$$JL(B
+$B$NM}M3$O!"5,B'$r;}$C$F$$$k%a!<%j%s%0%j%9%H$X$N%a%C%;!<%8$KBP$7$F!";q8;=8(B
+$BLsE*$J%V%i%C%/%[!<%k!&%A%'%C%/$r<B9T$9$kI,MW$,$J$$$H$$$&$3$H$G$9!#$5$i(B
+$B$K(B nnmail $BJ,3d$KBP$7$F(B nnimap $BJ,3d$N$?$a$N!"0[$J$k(B spam $B8!::$r;XDj$9$k$3(B
+$B$H$b$G$-$^$9!#5$$,68$&!<!#(B
 
 $B8!::$HF1;~$KL@$i$+$K(B @code{spam-split} $B$r<B9T$9$k$H$7$F$b!":#$^$G$H$*(B
 $B$j(B @code{spam-use-regex-headers} $B$r(B @code{t} $B$K@_Dj$9$k$h$&$J8!::$r9T$C(B

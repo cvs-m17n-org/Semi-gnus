@@ -10314,8 +10314,10 @@ group and return you to the group buffer.
 @table @kbd
 
 @item Z Z
+@itemx Z Q
 @itemx q
 @kindex Z Z (Summary)
+@kindex Z Q (Summary)
 @kindex q (Summary)
 @findex gnus-summary-exit
 @vindex gnus-summary-exit-hook
@@ -10360,7 +10362,9 @@ Mark all articles as read and go to the next group
 (@code{gnus-summary-catchup-and-goto-next-group}).
 
 @item Z R
+@itemx C-x C-s
 @kindex Z R (Summary)
+@kindex C-x C-s (Summary)
 @findex gnus-summary-reselect-current-group
 Exit this group, and then enter it again
 (@code{gnus-summary-reselect-current-group}).  If given a prefix, select
@@ -22492,7 +22496,8 @@ mail considered to be spam into the group name given by the variable
 but you can customize @code{spam-split-group}.
 
 You can also give @code{spam-split} a parameter,
-e.g. @samp{'spam-use-regex-headers}.  Why is this useful?
+e.g. @samp{'spam-use-regex-headers} or @samp{"maybe-spam"}.  Why is
+this useful?
 
 Take these split rules (with @code{spam-use-regex-headers} and
 @code{spam-use-blackholes} set):
@@ -22518,15 +22523,18 @@ regex-headers check) will be after the ding rule:
 
 @example
  nnimap-split-fancy '(|
-		      (: spam-split 'spam-use-regex-headers)
+;;; all spam detected by spam-use-regex-headers goes to "regex-spam"
+		      (: spam-split "regex-spam" 'spam-use-regex-headers)
 		      (any "ding" "ding")
+;;; all other spam detected by spam-split goes to spam-split-group
 		      (: spam-split)
 		      ;; default mailbox
 		      "mail")
 @end example
 
 Basically, this lets you invoke specific @code{spam-split} checks
-depending on your particular needs.  You don't have to throw all mail
+depending on your particular needs, and to target the results of those
+checks to a particular spam group.  You don't have to throw all mail
 into all the spam tests.  Another reason why this is nice is that
 messages to mailing lists you have rules for don't have to have
 resource-intensive blackhole checks performed on them.  You could also
