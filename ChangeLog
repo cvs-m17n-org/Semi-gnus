@@ -1,3 +1,10 @@
+1999-02-15  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix when
+	using nnspool.
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
 1999-02-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 	
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.

@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.14 1999-02-12 06:57:10 ichikawa Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.15 1999-02-15 06:24:21 ichikawa Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -340,7 +340,9 @@
 	(insert "(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news)\n")
 	(insert "(add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)\n")
 	(if (eq gnus-offline-news-fetch-method 'nnspool)
-	    (insert "(add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n"))
+	    (progn
+	      (insert "(add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n")
+	      (insert "(add-hook 'gnus-before-startup-hook (lambda () (setq nnmail-spool-file nil)))\n")))
 	(insert "(add-hook 'message-send-hook 'gnus-offline-message-add-header)\n")
 	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
 	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
@@ -348,7 +350,6 @@
 	(if (not (locate-library "mail-source"))
 	    (progn
 	      ;; Write setting about pop3-fma.
-	      (insert "(setq nnmail-spool-file nil)\n")
 	      (insert "(require 'pop3-fma)\n")
 	      (insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
 	      (insert "(setq pop3-fma-spool-file-alist '")
