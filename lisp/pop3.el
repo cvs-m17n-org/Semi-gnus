@@ -168,22 +168,6 @@ Return the response string if optional second argument is non-nil."
 	    t)
 	  )))))
 
-(defun pop3-string-to-list (string &optional regexp)
-  "Chop up a string into a list."
-  (let ((list)
-	(regexp (or regexp " "))
-	(string (if (string-match "\r" string)
-		    (substring string 0 (match-beginning 0))
-		  string)))
-    (store-match-data nil)
-    (while string
-      (if (string-match regexp string)
-	  (setq list (cons (substring string 0 (- (match-end 0) 1)) list)
-		string (substring string (match-end 0)))
-	(setq list (cons string list)
-	      string nil)))
-    (nreverse list)))
-
 (defvar pop3-read-passwd nil)
 (defun pop3-read-passwd (prompt)
   (if (not pop3-read-passwd)
@@ -219,8 +203,8 @@ Return the response string if optional second argument is non-nil."
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (pop3-string-to-list (or (mail-fetch-field "Date")
-					       (message-make-date))))
+		(date (split-string (or (mail-fetch-field "Date")
+					(message-make-date))))
 		(From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
@@ -279,8 +263,8 @@ Return the response string if optional second argument is non-nil."
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (pop3-string-to-list response)))
-	  (string-to-int (nth 2 (pop3-string-to-list response))))
+    (list (string-to-int (nth 1 (split-string response)))
+	  (string-to-int (nth 2 (split-string response))))
     ))
 
 (defun pop3-list (process &optional msg)
@@ -342,7 +326,7 @@ This function currently does nothing.")
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (pop3-string-to-list response)))
+    (string-to-int (nth 1 (split-string response)))
     ))
 
 (defun pop3-rset (process)
