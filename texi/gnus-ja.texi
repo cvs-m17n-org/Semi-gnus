@@ -494,7 +494,7 @@ New Groups
 * Subscription Methods:: $B?7$7$$%0%k!<%W$KBP$7$F(B gnus $B$O2?$r$9$Y$-$+(B
 * Filtering New Groups:: Gnus $B$KFCDj$N?7$7$$%0%k!<%W$rL5;k$5$;$k(B
 
-The Group Buffer
+Group Buffer
 
 * Group Buffer Format::   $BI=<($5$l$F$$$k>pJs$HJQ99$NJ}K!(B
 * Group Maneuvering::     $B%0%k!<%W%P%C%U%!$r0\F0$9$k%3%^%s%I(B
@@ -535,7 +535,7 @@ Misc Group Stuff
 * Group Timestamp::       Gnus $B$K:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k(B
 * File Commands::         Gnus $B$N%U%!%$%k$NFI$_=q$-(B
 
-The Summary Buffer
+Summary Buffer
 
 * Summary Buffer Format::      $B35N,%P%C%U%!$N304Q$r7hDj$9$k(B
 * Summary Maneuvering::        $B35N,%P%C%U%!$rF0$-2s$k(B
@@ -648,7 +648,7 @@ Various Summary Stuff
 * Summary Generation Commands::     $B35N,%P%C%U%!$N(B ($B:F(B) $B:n@.(B
 * Really Various Summary Commands:: $B$"$N$d$C$+$$$JB>$KE,9g$7$J$$L?Na(B
 
-The Article Buffer
+Article Buffer
 
 * Hiding Headers::       $B$I$N%X%C%@!<$rI=<($9$k$+$r7h$a$k(B
 * Using MIME::           @sc{mime} $B5-;v$H$7$F8+$;$k(B
@@ -677,7 +677,7 @@ Select Methods
 * Combined Groups::   $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
 * Gnus Unplugged::    $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
 
-The Server Buffer
+Server Buffer
 
 * Server Buffer Format::      $B$3$N%P%C%U%!$N308+$r%+%9%?%^%$%:$G$-$k(B
 * Server Commands::           $B%5!<%P!<$rA`$kL?Na(B
@@ -735,6 +735,7 @@ Browsing the Web
 * Ultimate::       Ultimate Bulletin Board $B%7%9%F%`(B
 * Web Archive::    $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::  $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
+* RSS::            RDF Site Summary $B$rFI$`(B
 * Customizing w3:: Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
 
 Other Sources
@@ -4901,7 +4902,8 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 
 @dfn{$BJ]N15-;v(B}$B$O%U%)%m!<%"%C%W$,$"$C$?$H$-$K$@$135N,%P%C%U%!$K8=$l$^$9!#(B
 $B%U%)%m!<%"%C%W$,L5$$$H$-$bI=<($5$;$?$$$H$-$O!"L?Na(B @kbd{/ D} $B$r;H$&$3$H(B
-$B$,$G$-$^$9!#(B
+$B$,$G$-$^$9!#$=$l0J30$O(B ($B8+$($k$+$I$&$+$OJL$K$7$F(B)$B!"2D;k5-;v(B (Ticked) $B$H(B
+$B;w$?$h$&$J$b$N$G$9!#(B
 
 @item SPACE
 @vindex gnus-unread-mark
@@ -5724,6 +5726,17 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B!X$:$l!Y$r%9%l%C%I$rJd40$9$k$N$KLr$KN)$D$+$r9MN8$;$:$KI=<($7$^$9!#:G8e$K!"(B
 $B$3$NJQ?t$,(B @code{more} $B$G$"$k$H!"(Bgnus $B$O$I$3$K$b$D$J$,$C$F$$$J$$;^MU$N$^(B
 $B$P$i$J@a$r@Z$jMn$H$7$^$;$s!#$3$NJQ?t$O%G%#%U%)%k%H$G$O(B @code{nil} $B$G$9!#(B
+
+@item gnus-read-all-available-headers
+@vindex gnus-read-all-available-headers
+$B$3$l$O$I$A$i$+$H8@$($P$"$^$jLr$KN)$?$J$$JQ?t$G$9!#%K%e!<%9$G$O$J$$%0%k!<(B
+$B%W$K$*$$$F35N,%P%C%U%!$,$H$F$bBg$-$/$J$j!"$7$+$b?F5-;v$rC)$k$3$H$,$G$-$J(B
+$B$$>l9g$K;H$&$3$H$rA[Dj$7$F$$$^$9!#$=$l$O<g$K(B @code{nnultimate} $B%0%k!<%W(B
+$B$N$h$&$J!"%&%'%V$K4p$E$$$?%0%k!<%W$G$9!#(B
+
+$B$3$l$r;H$o$J$$>l9g$O%G%#%U%)%k%H$N(B @code{nil} $B$N$^$^$K$7$F$*$/$N$,L5Fq$G(B
+$B$9!#;H$$$?$$>l9g$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$+!"$9$Y$F$N%0%k!<%WL>$K9g(B
+$BCW$9$k(B @code{t} $B$K$7$F2<$5$$!#(B
 @end table
 
 @node More Threading
@@ -9298,12 +9311,13 @@ gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 
 @lisp
 (add-hook 'gnus-select-group-hook
-          (lambda ()
-            (cond
-             ((string-match "^de\\." gnus-newsgroup-name)
-              (ispell-change-dictionary "deutsch"))
-             (t
-              (ispell-change-dictionary "english")))))
+	  (lambda ()
+	    (cond
+	     ((string-match
+	       "^de\\." (gnus-group-real-name gnus-newsgroup-name))
+	      (ispell-change-dictionary "deutsch"))
+	     (t
+	      (ispell-change-dictionary "english")))))
 @end lisp
 
 $B$"$J$?$NI,MW$K1~$8$FJQ99$7$F2<$5$$!#(B
@@ -12371,6 +12385,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 * Ultimate::       Ultimate Bulletin Board $B%7%9%F%`(B
 * Web Archive::    $B%&%'%V$KJ]4I$5$l$?%a!<%j%s%0%j%9%H$rFI$`(B
 * Web Newspaper::  $B%&%'%V$KJ]4I$5$l$??7J9$rFI$`(B
+* RSS::            RDF Site Summary $B$rFI$`(B
 * Customizing w3:: Gnus $B$+$i(B Emacs/w3 $B$rA`:n$9$k(B
 @end menu
 
@@ -12657,6 +12672,28 @@ asahi RET an_group RET}$B!#(B(@sc{an_group} $B$r1\Mw$7$?$$5-;v%0%k!<%W$KCV$-4
 @lisp
 (nnshimbun "asahi" (nnshimbun-url "http://iij.asahi.com/"))
 @end lisp
+
+@node RSS
+@subsection RSS
+@cindex nnrss
+@cindex RSS
+
+$B$$$/$D$+$N%5%$%H$O(B RDF site summary (RSS) $B$r;}$C$F$$$^(B
+$B$9(B @uref{http://purl.org/rss/1.0/spec}$B!#$3$l$O$H$F$b5,B'E*$+$DNI<A$J%$%s(B
+$B%?!<%U%'!<%9$G!"(Bgnus $B$,%0%k!<%W$r>o$K?7$7$/$7$F$*$/$?$a$N>pJs$rF@$k$3$H(B
+$B$,$G$-$^$9!#(B
+
+$B4JC1$K(B @code{nnrss} $B$r;H$$;O$a$k$K$O!"%0%k!<%W%P%C%U%!(B
+$B$G(B @kbd{B nnrss RET RET} $B$H%?%$%W$7$F!"%0%k!<%W$r9VFI$7$F2<$5$$!#(B
+
+$B0J2<$N(B @code{nnrss} $BJQ?t$,JQ992DG=$G$9(B:
+
+@table @code
+@item nnrss-directory
+@vindex nnrss-directory
+@code{nnrss} $B$,%U%!%$%k$r=q$-9~$`%G%#%l%/%H%j!<$G!"%G%#%U%)%k%H(B
+$B$O(B @samp{~/News/rss/} $B$G$9!#(B
+@end table
 
 @node Customizing w3
 @subsection w3 $B$N%+%9%?%^%$%:(B

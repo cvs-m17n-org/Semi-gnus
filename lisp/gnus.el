@@ -1822,10 +1822,10 @@ This variable can be nil, gnus or gnus-ja."
 		 (const :tag "Japanese" gnus-ja)))
 
 (defvar gnus-info-nodes
-  '((gnus-group-mode "The Group Buffer")
-    (gnus-summary-mode "The Summary Buffer")
-    (gnus-article-mode "The Article Buffer")
-    (gnus-server-mode "The Server Buffer")
+  '((gnus-group-mode "Group Buffer")
+    (gnus-summary-mode "Summary Buffer")
+    (gnus-article-mode "Article Buffer")
+    (gnus-server-mode "Server Buffer")
     (gnus-browse-mode "Browse Foreign Server")
     (gnus-tree-mode "Tree Display"))
   "Alist of major modes and related Info nodes.")
