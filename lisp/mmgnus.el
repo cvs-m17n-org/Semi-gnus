@@ -28,7 +28,7 @@
 
 (luna-define-class mime-gnus-entity (mime-buffer-entity)
 		   (number
-		    subject from date id references chars lines xref))
+		    subject from date id references chars lines xref extra))
 
 (luna-define-internal-accessors 'mime-gnus-entity)
 
