@@ -1,3 +1,151 @@
+Fri Jun 26 04:23:12 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.15 is released.
+
+Fri Jun 26 03:39:32 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nnfolder.el (nnfolder-request-replace-article): Delete old
+	delimiter. 
+
+	* gnus-msg.el (gnus-summary-reply): Use it.
+
+	* message.el (message-reply): Removed parameter.
+	(message-wide-reply): Ditto.
+
+	* gnus-msg.el (gnus-msg-treat-broken-reply-to): New function.
+
+	* gnus-art.el (gnus-check-group-server): New function.
+	(gnus-request-article-this-buffer): Don't try to waken the server
+	before needing to.
+
+Thu Jun 25 10:35:48 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-summary-delete-article): Sort the articles
+	before deleting.
+
+	* nngateway.el (nngateway-request-post): Return success.
+
+	* nnheader.el (nnheader-insert-file-contents): Bind more hooks.
+
+	* gnus-sum.el (gnus-summary-limit-to-age): Reverse logic.
+
+	* gnus-score.el (gnus-summary-score-entry): Removed interactive
+	spec. 
+	((gnus-summary-score-map "V" gnus-summary-mode-map)): Removed
+	keystroke. 
+
+	* gnus-art.el (gnus-article-show-summary): Position point.
+
+	* gnus-cache.el (gnus-cache-update-article): Change group first.
+
+	* gnus.el (gnus-short-group-name): Collapse more.
+
+Thu Jun 25 08:48:06 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.14 is released.
+
+Thu Jun 25 05:13:31 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-rebuild-thread): Accept a line argument.
+	(gnus-rebuild-thread): Would skip around a lot when `P'-ing past
+	the beginning.
+
+	* gnus-msg.el (gnus-post-method): Present all known servers if
+	`C-u 0'.
+
+	* gnus-salt.el (gnus-pick-mode-map): Reinstated keymap.
+
+	* gnus-sum.el (gnus-build-sparse-threads): Put the proper date
+	in. 
+
+Wed Jun 24 07:52:30 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.13 is released.
+
+Wed Jun 24 07:47:04 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-topic.el (gnus-topic-rename): Disallow "nil".
+
+Wed Jun 24 07:33:17 1998  Vladimir Alexiev  <vladimir@cs.ualberta.ca>
+
+	* nnvirtual.el (nnvirtual-update-xref-header): Regexp-quote group
+	name. 
+
+Wed Jun 24 06:15:27 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-build-sparse-threads): Give all the sparse
+	articles the date of the current child.  
+
+	* gnus-topic.el (gnus-group-topic-parameters): Didn't compute.
+
+Wed Jun 24 03:27:44 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Gnus v5.6.12 is released.
+
+Wed Jun 10 11:06:35 1998  Andreas Schwab  <schwab@issan.informatik.uni-dortmund.de>
+
+	* message.el (message-mail-other-window): Bind message-this-is-mail.
+	(message-mail-other-frame): Likewise.
+	(message-news-other-window): Bind message-this-is-news.
+	(message-news-other-frame): Likewise.
+
+1998-06-09  Sam Steingold  <sds@goems.com>
+
+        * gnus-uu.el (gnus-uu-default-view-rules): make sed kill ^M only
+        at the end of line.
+
+1998-06-05  Hrvoje Niksic  <hniksic@srce.hr>
+
+	* nnmail.el (nnmail-get-split-group): Don't regexp-quote
+ 	nnmail-procmail-suffix.
+
+Wed Jun 24 03:04:05 1998  Kim-Minh Kaplan  <kaplan@sky.fr>
+
+	* gnus-sum.el (gnus-build-get-header): Fix obarray.
+
+Wed Jun 24 02:49:57 1998  Castor  <castor@my-dejanews.com>
+
+	* nntp.el (nntp-open-ssl-stream): 
+
+Wed Jun 24 02:31:46 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-nov-parse-line): Cleaned up.
+	(gnus-build-all-threads): Put things in the wrong obarray.
+
+Wed Jun 24 01:43:26 1998  Decklin Foster  <djarum@base.org>
+
+	* nngateway.el (nngateway-mail2news-header-transformation): New
+	function. 
+
+Wed Jun 24 00:25:45 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.el (message-shorten-references): New function.
+	(message-header-format-alist): Use it.
+
+	* gnus-start.el (gnus-always-read-dribble-file): Customized.
+
+	* message.el (message-generate-new-buffers): Dox fox.
+
+Tue Jun 23 23:58:48 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-topic.el (gnus-topic-prepare-topic): Respect visible topic
+	param. 
+	(gnus-topic-hierarchical-parameters): New function.
+
+1998-06-02  Didier Verna  <verna@inf.enst.fr>
+
+	* gnus-picon.el (gnus-get-buffer-name): use get-buffer-create
+	instead of get-buffer 
+
+Wed Jun  3 04:41:45 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* nnkiboze.el (nnkiboze-request-delete-group): Delete .newsrc
+	file. 
+
+	* nnmail.el (nnmail-article-group): Nuke looong lines.
+
+	* gnus-art.el (gnus-button-alist): Buggy default.
+
 Wed Jun  3 04:03:37 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Gnus v5.6.11 is released.
