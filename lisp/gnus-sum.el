@@ -34,6 +34,7 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
+(require 'gnus-util)
 (require 'mime-view)
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
@@ -2934,7 +2935,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	    ;; Yuk!  This is a reference loop.  Make the article be a
 	    ;; root article.
 	    (progn
-	      (debug)
 	      (mail-header-set-references (car (symbol-value id-dep)) "none")
 	      (setq ref nil))
 	  (setq ref (gnus-parent-id (mail-header-references ref-header)))))
@@ -2949,6 +2949,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 (defun gnus-build-sparse-threads ()
   (let ((headers gnus-newsgroup-headers)
+	(gnus-summary-ignore-duplicates t)
 	header references generation relations
 	cthread subject child end pthread relation new-child date)
     ;; First we create an alist of generations/relations, where
@@ -2967,12 +2968,14 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 		generation 0)
 	  (while (search-backward ">" nil t)
 	    (setq end (1+ (point)))
-	    (if (search-backward "<" nil t)
-		(push (list (incf generation)
-			    child (setq child new-child)
-			    subject date)
-		      relations)))
-	  (push (list (1+ generation) child nil subject) relations)
+	    (when (search-backward "<" nil t)
+	      (setq new-child (buffer-substring (point) end))
+	      (push (list (incf generation)
+			  child (setq child new-child)
+			  subject date)
+		    relations)))
+	  (when child
+	    (push (list (1+ generation) child nil subject) relations))
 	  (erase-buffer)))
       (kill-buffer (current-buffer)))
     ;; Sort over trustworthiness.
@@ -6085,7 +6088,9 @@ If ALL, mark even excluded ticked and dormants as read."
 		    '<)
 		   (sort gnus-newsgroup-limit '<)))
 	article)
-    (setq gnus-newsgroup-unreads gnus-newsgroup-limit)
+    (setq gnus-newsgroup-unreads
+	  (delete-duplicates (append gnus-newsgroup-unreads
+				     gnus-newsgroup-limit)))
     (if all
 	(setq gnus-newsgroup-dormant nil
 	      gnus-newsgroup-marked nil
