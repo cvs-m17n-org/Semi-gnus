@@ -840,11 +840,11 @@ that you have on your native groups.  Use with caution.
 Now, you all know about the @file{.newsrc} file.  All subscription
 information is traditionally stored in this file.
 
-Things got a bit more complicated with @sc{gnus}.  In addition to
+Things got a bit more complicated with @sc{GNUS}.  In addition to
 keeping the @file{.newsrc} file updated, it also used a file called
 @file{.newsrc.el} for storing all the information that didn't fit into
 the @file{.newsrc} file.  (Actually, it also duplicated everything in
-the @file{.newsrc} file.)  @sc{gnus} would read whichever one of these
+the @file{.newsrc} file.)  @sc{GNUS} would read whichever one of these
 files was the most recently saved, which enabled people to swap between
 @sc{gnus} and other newsreaders.
 
@@ -858,9 +858,9 @@ not stored in the @file{.newsrc} file.
 @vindex gnus-save-newsrc-file
 You can turn off writing the @file{.newsrc} file by setting
 @code{gnus-save-newsrc-file} to @code{nil}, which means you can delete
-the file and save some space, as well as making exit from Gnus faster.
+the file and save some space, as well as making exit from gnus faster.
 However, this will make it impossible to use other newsreaders than
-Gnus.  But hey, who would want to, right?
+gnus.  But hey, who would want to, right?
 
 @vindex gnus-save-killed-list
 If @code{gnus-save-killed-list} (default @code{t}) is @code{nil}, Gnus
@@ -900,11 +900,11 @@ startup files.  If you want to turn backup creation off, say something like:
 @end lisp
 
 @vindex gnus-init-file
-When Gnus starts, it will read the @code{gnus-site-init-file}
+When gnus starts, it will read the @code{gnus-site-init-file}
 (@file{.../site-lisp/gnus} by default) and @code{gnus-init-file}
 (@file{~/.gnus} by default) files.  These are normal Emacs Lisp files
 and can be used to avoid cluttering your @file{~/.emacs} and
-@file{site-init} files with Gnus stuff.  Gnus will also check for files
+@file{site-init} files with gnus stuff.  Gnus will also check for files
 with the same names as these, but with @file{.elc} and @file{.el}
 suffixes.  In other words, if you have set @code{gnus-init-file} to
 @file{~/.gnus}, it will look for @file{~/.gnus.elc}, @file{~/.gnus.el},
@@ -917,24 +917,24 @@ and finally @file{~/.gnus} (in this order).
 @cindex dribble file
 @cindex auto-save
 
-Whenever you do something that changes the Gnus data (reading articles,
+Whenever you do something that changes the gnus data (reading articles,
 catching up, killing/subscribing groups), the change is added to a
 special @dfn{dribble buffer}.  This buffer is auto-saved the normal
 Emacs way.  If your Emacs should crash before you have saved the
 @file{.newsrc} files, all changes you have made can be recovered from
 this file.
 
-If Gnus detects this file at startup, it will ask the user whether to
-read it.  The auto save file is deleted whenever the real startup file is
-saved.
+If gnus detects this file at startup, it will ask the user whether to
+read it.  The auto save file is deleted whenever the real startup file
+is saved.
 
 @vindex gnus-use-dribble-file
-If @code{gnus-use-dribble-file} is @code{nil}, Gnus won't create and
+If @code{gnus-use-dribble-file} is @code{nil}, gnus won't create and
 maintain a dribble buffer.  The default is @code{t}.
 
 @vindex gnus-dribble-directory
 Gnus will put the dribble file(s) in @code{gnus-dribble-directory}.  If
-this variable is @code{nil}, which it is by default, Gnus will dribble
+this variable is @code{nil}, which it is by default, gnus will dribble
 into the directory where the @file{.newsrc} file is located.  (This is
 normally the user's home directory.)  The dribble file will get the same
 file permissions as the @code{.newsrc} file.
