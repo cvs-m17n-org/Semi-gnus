@@ -1,4 +1,4 @@
-;;; gnus-namazu.el --- Search mail with Namazu.
+;;; gnus-namazu.el --- Search mail with Namazu. -*- coding: iso-2022-7bit; -*-
 
 ;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
@@ -162,8 +162,6 @@ options make any sense in this context."
   :group 'gnus-namazu)
 
 ;;; Internal Variable:
-(defvar gnus-namazu/group-alist nil
-  "Associative list to map groups in lower case to official names.")
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
 ;; Multibyte group name:
@@ -207,21 +205,7 @@ options make any sense in this context."
 	     (setcdr pair gnus-namazu-coding-system)
 	   (push (cons gnus-namazu/group-name-regexp
 		       gnus-namazu-coding-system)
-		 gnus-group-name-charset-group-alist))))
-  (unless gnus-namazu-case-sensitive-filesystem
-    ;; FIXME: The alist to map group names in lower case to real names
-    ;; is reconstructed every when gnus-namazu/setup() is called.
-    ;; This reconstruction make gnus-namazu-search() slow.
-    (setq gnus-namazu/group-alist nil)
-    (dolist (server (gnus-namazu/indexed-servers))
-      (dolist (group (gnus-namazu/request-list server))
-	(let ((name (gnus-group-prefixed-name group server)))
-	  (unless (assoc name gnus-namazu/group-alist)
-	    (push (cons (downcase name) name) gnus-namazu/group-alist)))))))
-
-(defun gnus-namazu/shutdown ()
-  (setq gnus-namazu/group-alist nil))
-(add-hook 'gnus-exit-gnus-hook 'gnus-namazu/shutdown)
+		 gnus-group-name-charset-group-alist)))))
 
 (defun gnus-namazu/request-list (server)
   "Return groups of the server SERVER."
@@ -279,9 +263,14 @@ options make any sense in this context."
   "Return the whole name from GROUP and METHOD."
   (if gnus-namazu-case-sensitive-filesystem
       (gnus-group-prefixed-name group method)
-    (let ((name (gnus-group-prefixed-name group method)))
-      (or (cdr (assoc (downcase name) gnus-namazu/group-alist))
-	  name))))
+    (let* ((orig (gnus-group-prefixed-name group method))
+	   (name (downcase orig)))
+      (catch 'found-group
+	(mapatoms (lambda (sym)
+		    (when (string= name (downcase (symbol-name sym)))
+		      (throw 'found-group (symbol-name sym))))
+		  gnus-newsrc-hashtb)
+	orig))))
 
 (defun gnus-namazu/check-cache-group (str)
   "Get the news group from the partial path STR of the cached article."
@@ -454,7 +443,7 @@ generate possible group names from it."
   (interactive)
   (let ((pos (point)))
     (cond
-     ((and (re-search-backward "\\+\\([a-z]*\\)" nil t)
+     ((and (re-search-backward "\\+\\([-a-z]*\\)" nil t)
 	   (= pos (match-end 0)))
       (let* ((partial (match-string 1))
 	     (completions
@@ -514,33 +503,34 @@ generate possible group names from it."
 			  'gnus-namazu/read-query-history)))
 
 (defun gnus-namazu/highlight-words (query)
-  (let ((strings)
-	(start 0))
-    (while (string-match
-	    "[ \t\r\f\n]*\\(\\(and\\|or\\|\\(not\\)\\)[ \t\r\f\n]+\\)?\
-\\(\\+[^ \t\r\f\n]+:\\)?\\(/\\([^/]+\\)/\\|\\(\"\\([^\"]+\\)\"\\|\
-{\\([^{}]+\\)}\\)\\|[^ \t\r\f\n]+\\)" query start)
-      (setq start (match-end 0))
-      (or (match-beginning 3)		; NOT search
-	  (match-beginning 4)		; Field search
-	  (match-beginning 6)		; Regular expression search
-	  (if (match-beginning 7)	; Phrase search
-	      (dolist (str (split-string
-			    (if (match-beginning 8)
-				(match-string 8 query)
-			      (match-string 9 query))))
-		(when (> (length str) 0)
-		  (push str strings)))
-	    (push (match-string 5 query) strings))))
-    (and strings
-	 (list
-	  (list
-	   (regexp-opt (mapcar
-			(lambda (str)
-			  (if (string-match "\\`\\*?\\([^\\*]*\\)\\*?\\'" str)
-			      (match-string 1 str) str))
-			strings))
-	   0 0 'gnus-namazu-query-highlight-face)))))
+  (with-temp-buffer
+    (insert " " query)
+    ;; Remove tokens for NOT search
+    (goto-char (point-min))
+    (while (re-search-forward "[　 \t\r\f\n]+not[　 \t\r\f\n]+\
+\\([^　 \t\r\f\n\"{(/]+\\|\"[^\"]+\"\\|{[^}]+}\\|([^)]+)\\|/[^/]+/\\)+" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove tokens for Field search
+    (goto-char (point-min))
+    (while (re-search-forward "[　 \t\r\f\n]+\\+[^　 \t\r\f\n:]+:\
+\\([^　 \t\r\f\n\"{(/]+\\|\"[^\"]+\"\\|{[^}]+}\\|([^)]+)\\|/[^/]+/\\)+" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove tokens for Regexp search
+    (goto-char (point-min))
+    (while (re-search-forward "/[^/]+/" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Remove brackets, double quote, asterisk and operators
+    (goto-char (point-min))
+    (while (re-search-forward "\\([(){}\"*]\\|\\b\\(and\\|or\\)\\b\\)" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    ;; Collect all keywords
+    (setq query nil)
+    (goto-char (point-min))
+    (while (re-search-forward "[^　 \t\r\f\n]+" nil t)
+      (push (match-string 0) query))
+    (when query
+      (list (list (regexp-opt query)
+		  0 0 'gnus-namazu-query-highlight-face)))))
 
 (defun gnus-namazu/truncate-article-list (articles)
   (let ((hit (length articles)))
@@ -607,6 +597,23 @@ and make a virtual group contains its results."
 			articles))
 		 '<)))
       (message "No entry."))))
+
+(let (current-load-list)
+  (defadvice gnus-offer-save-summaries
+    (before gnus-namazu-kill-summary-buffers activate compile)
+    "Advised by `gnus-namazu'.
+In order to avoid annoying questions, kill summary buffers which
+generated by `gnus-namazu' itself before `gnus-offer-save-summaries'
+is called."
+    (let ((buffers (buffer-list)))
+      (while buffers
+	(when (with-current-buffer (car buffers)
+		(and (eq major-mode 'gnus-summary-mode)
+		     (gnus-ephemeral-group-p gnus-newsgroup-name)
+		     (string-match gnus-namazu/group-name-regexp
+				   gnus-newsgroup-name)))
+	  (kill-buffer (car buffers)))
+	(setq buffers (cdr buffers))))))
 
 (defun gnus-namazu-insinuate ()
   (add-hook
