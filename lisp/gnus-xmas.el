@@ -442,7 +442,7 @@ call it with the value of the `gnus-data' text property."
   (when (or (< emacs-major-version 21)
 	    (and (= emacs-major-version 21)
 		 (< emacs-minor-version 3)))
-    (defalias gnus-completing-read gnus-xmas-completing-read))
+    (defalias 'gnus-completing-read 'gnus-xmas-completing-read))
 
   ;; These ones are not defcutom'ed, sometimes not even defvar'ed. They
   ;; probably should. If that is done, the code below should then be moved
