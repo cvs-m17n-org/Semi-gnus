@@ -288,8 +288,8 @@ on your system, you could say something like:
   (princ (mail-header-number header) (current-buffer))
   (insert
    "\t"
-   (or (mail-header-subject header) "(none)") "\t"
-   (or (mail-header-from header) "(nobody)") "\t"
+   (or (mime-fetch-field 'Subject header) "(none)") "\t"
+   (or (mime-fetch-field 'From header) "(nobody)") "\t"
    (or (mail-header-date header) "") "\t"
    (or (mail-header-id header)
        (nnmail-message-id))
