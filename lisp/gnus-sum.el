@@ -3508,7 +3508,7 @@ If LINE, insert the rebuilt thread starting on line LINE."
 
 (defsubst gnus-article-sort-by-date (h1 h2)
   "Sort articles by root article date."
-  (gnus-time-less
+  (time-less-p
    (gnus-date-get-time (mail-header-date h1))
    (gnus-date-get-time (mail-header-date h2))))
 
@@ -4569,9 +4569,10 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 				     number dependencies force-new))))
 		   (push header headers))
 	      (forward-line 1))
-	  (error
-	   (gnus-error 4 "Strange nov line (%d)"
-		       (count-lines (point-min) (point)))))
+	  ;(error
+	  ; (gnus-error 4 "Strange nov line (%d)"
+	;	       (count-lines (point-min) (point))))
+	  )
 	(forward-line 1))
       ;; A common bug in inn is that if you have posted an article and
       ;; then retrieves the active file, it will answer correctly --
@@ -5979,13 +5980,13 @@ articles that are younger than AGE days."
   (interactive "nTime in days: \nP")
   (prog1
       (let ((data gnus-newsgroup-data)
-	    (cutoff (nnmail-days-to-time age))
+	    (cutoff (days-to-time age))
 	    articles d date is-younger)
 	(while (setq d (pop data))
 	  (when (and (vectorp (gnus-data-header d))
 		     (setq date (mail-header-date (gnus-data-header d))))
-	    (setq is-younger (nnmail-time-less
-			      (nnmail-time-since (nnmail-date-to-time date))
+	    (setq is-younger (time-less-p
+			      (time-since (date-to-time date))
 			      cutoff))
 	    (when (if younger-p
 		      is-younger
@@ -8538,7 +8539,7 @@ If N is a negative number, save the N previous articles.
 If N is nil and any articles have been marked with the process mark,
 save those articles instead."
   (interactive "P")
-  (let ((gnus-default-article-saver 'gnus-summary-save-in-rmail))
+  (let ((gnus-default-article-saver 'rmail-output-to-rmail-file))
     (gnus-summary-save-article arg)))
 
 (defun gnus-summary-save-article-file (&optional arg)

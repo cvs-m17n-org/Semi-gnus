@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.9.09"
+(defconst gnus-version-number "6.10.010"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.14"
+(defconst gnus-original-version-number "0.16"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1591,13 +1591,13 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("browse-url" browse-url)
      ("message" :interactive t
       message-send-and-exit message-yank-original)
-     ("nnmail" nnmail-split-fancy nnmail-article-group nnmail-date-to-time)
+     ("nnmail" nnmail-split-fancy nnmail-article-group)
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
      ("timezone" timezone-make-date-arpa-standard timezone-fix-time
       timezone-make-sortable-date timezone-make-time-string)
      ("rmailout" rmail-output)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message)
+      rmail-show-message rmail-output-to-rmail-file)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t
@@ -2019,8 +2019,8 @@ If ARG, insert string at point."
 		       "4.99"
 		     (+ 5 (* 0.02
 			     (abs
-			      (- (char-int (aref (downcase alpha) 0))
-				 (char-int ?t))))
+			      (- (mm-char-int (aref (downcase alpha) 0))
+				 (mm-char-int ?t))))
 			-0.01))
 		   minor least)
 	 (format "%d.%02d%02d" major minor least))))))
