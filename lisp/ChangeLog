@@ -1,10 +1,36 @@
+2003-03-12  Paul Jarc  <prj@po.cwru.edu>
+
+	* nnmail.el (nnmail-cache-primary-mail-backend): Not all
+	'respool-able backends define a global nnchoke-get-new-mail
+	variable.
+
+2003-03-17  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-mime-delete-part): New function.
+	(gnus-mime-action-alist, gnus-mime-button-commands): Use it.
+
 2003-03-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-check-news-header-syntax): Don't push
+	groups twice onto list of unknown groups.
+
+	* nndoc.el (nndoc-type-alist): Move exim-bounce a bit further
+	back.
+
+	* nnheader.el (nnheader-find-etc-directory): Doc fix.
+
+	* gnus-msg.el (gnus-inews-add-send-actions): Don't restore window
+	config unless the summary buffer exists.
+
+	* gnus-sum.el (gnus-summary-next-group): Semi-exit group first to
+	that target group is computed correctly when articles are marked
+	as read by Xref handling.
 
 	* mail-source.el (mail-source-fetch-imap): Pass buffer-name to
 	imap-open.
 
 	* message.el (message-send-mail): Add courtesy string to Bcc's,
-	too. 
+	too.
 
 	* gnus-cite.el (gnus-cited-line-p): New function.
 

@@ -561,9 +561,11 @@ Gcc: header for archiving purposes."
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
   (setq message-user-agent (gnus-extended-version))
-  (when (not message-use-multi-frames)
+  (unless message-use-multi-frames
     (message-add-action
-     `(set-window-configuration ,winconf) 'exit 'postpone 'kill))
+     `(if (gnus-buffer-exists-p ,buffer)
+	  (set-window-configuration ,winconf))
+     'exit 'postpone 'kill))
   (let ((to-be-marked (cond
 		       (yanked yanked)
 		       (article (if (listp article) article (list article)))
