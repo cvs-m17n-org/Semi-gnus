@@ -2359,6 +2359,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (set-window-point (get-buffer-window (current-buffer)) (point))
 	    t))))))
 
+;;;###autoload
 (defun gnus-article-prepare-display ()
   "Make the current buffer look like a nice article."
   (let ((method
@@ -2624,8 +2625,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 				    'filename)
 	     ""))
 	(gnus-tmp-type (car (mm-handle-type handle)))
-	(gnus-tmp-description (or (mm-handle-description handle)
-				  ""))
+	(gnus-tmp-description
+	 (mail-decode-encoded-word-string (or (mm-handle-description handle)
+					      "")))
 	(gnus-tmp-dots
 	 (if (if displayed (car displayed)
 	       (mm-handle-displayed-p handle))
@@ -2702,18 +2704,22 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	    (delete-region (point) (point-max)))
 	  (gnus-mime-display-part handles))))))
 
+(defvar gnus-mime-display-multipart-as-mixed nil)
+
 (defun gnus-mime-display-part (handle)
   (cond
    ;; Single part.
    ((not (stringp (car handle)))
     (gnus-mime-display-single handle))
    ;; multipart/alternative
-   ((equal (car handle) "multipart/alternative")
+   ((and (equal (car handle) "multipart/alternative")
+	 (not gnus-mime-display-multipart-as-mixed))
     (let ((id (1+ (length gnus-article-mime-handle-alist))))
       (push (cons id handle) gnus-article-mime-handle-alist)
       (gnus-mime-display-alternative (cdr handle) nil nil id)))
    ;; multipart/related
-   ((equal (car handle) "multipart/related")
+   ((and (equal (car handle) "multipart/related")
+	 (not gnus-mime-display-multipart-as-mixed))
     ;;;!!!We should find the start part, but we just default
     ;;;!!!to the first part.
     (gnus-mime-display-part (cadr handle)))
@@ -4115,7 +4121,7 @@ forbidden in URL encoding."
     (select-window win)))
 
 (defvar gnus-decode-header-methods
-  '(gnus-decode-with-mail-decode-encoded-word-region)
+  '(mail-decode-encoded-word-region)
   "List of methods used to decode headers.
 
 This variable is a list of FUNCTION or (REGEXP . FUNCTION). If item is
@@ -4130,11 +4136,6 @@ For example:
 ")
 
 (defvar gnus-decode-header-methods-cache nil)
-
-(defun gnus-decode-with-mail-decode-encoded-word-region (start end)
-  (let ((rfc2047-default-charset gnus-newsgroup-default-charset)
-	(mm-charset-iso-8859-1-forced gnus-newsgroup-iso-8859-1-forced))
-    (mail-decode-encoded-word-region start end)))
 
 (defun gnus-multi-decode-header (start end)
   "Apply the functions from `gnus-encoded-word-methods' that match."
