@@ -1,4 +1,4 @@
-This package contains Semi-gnus.
+This package contains T-gnus 6.10.
 
 What is Semi-gnus?
 ==================
@@ -7,16 +7,11 @@ What is Semi-gnus?
 all features of Gnus and gnus-mime, so there are no need to install
 Gnus to use it, and you must not use gnus-mime for SEMI.
 
-  It requires SEMI package, so please get and install SEMI package
-before to install it. You can get SEMI from
-ftp://ftp.jaist.ac.jp/pub/elisp/semi/
+  It requires APEL, FLIM and SEMI packages, so please get and install
+them before to install it. T-gnus 6.10 requires the latest APEL, the
+latest FLIM 1.12 and SEMI 1.12. You can get these packages from
+ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 Required environment for SEMI is written in README.en of SEMI package.
-
-  T-gnus major change has been done. It won't work with the old versions
-of SEMI packages, e.g. FLIM 1.11.3, SEMI 1.10.2, etc. If you have that one,
-please update your environment before installing it. The recommended
-versions of SEMI packages are APEL 9.11, FLIM 1.12.0 and SEMI 1.11.0 or
-newer than them.
 
 
 How to get? (via CVS)
