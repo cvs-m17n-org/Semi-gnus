@@ -1,3 +1,9 @@
+1999-07-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-ems.el (gnus-mule-cite-add-face): New implementation.
+
 1999-07-20   Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
