@@ -1,6 +1,6 @@
 2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* texi/gnus-ja.texi: Comment the @copying section temporally.
+	* texi/gnus-ja.texi: Comment the @copying section temporarily.
 	* texi/message-ja.texi: Ditto.
 
 2004-08-27  Katsumi Yamaoka  <yamaoka@jpl.org>
