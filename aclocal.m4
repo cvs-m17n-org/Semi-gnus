@@ -4,9 +4,14 @@ AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
 
 AC_DEFUN(AC_CHECK_EMACS,
  [dnl Check for Emacsen.
+
+  dnl Apparently, if you run a shell window in Emacs, it sets the EMACS
+  dnl environment variable to 't'.  Lets undo the damage.
+  test x$EMACS = xt && EMACS=
+
   AC_ARG_WITH(emacs,
    [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
-   [if test x$withval = xyes -o x$withval = xt -o x$withval = x; then
+   [if test x$withval = xyes -o x$withval = x; then
       AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)
     else
       AC_CHECK_PROG(EMACS, $withval, $withval, emacs)
@@ -20,7 +25,7 @@ AC_DEFUN(AC_CHECK_EMACS,
     fi
     EMACS=$XEMACS],
    [XEMACS=xemacs
-    test x$EMACS = xt -o x$EMACS = x &&\
+    test x$EMACS = x &&\
       AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)])
   AC_SUBST(EMACS)
   AC_SUBST(XEMACS)])
