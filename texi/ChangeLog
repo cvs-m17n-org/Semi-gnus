@@ -1,3 +1,18 @@
+2002-07-28  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Web Searches): Added gmane and removed old
+	non-functioning search engines.  From Niklas Morberg
+	<niklas.morberg@axis.com>.
+
+2002-05-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Buffer Lines): Fix typo.
+
+2002-07-27  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Summary Mail Commands): Trivial fix from Reiner Steib
+	<4uce.02.r.steib@gmx.net>.
+
 2002-07-18  Karl Kleinpaste  <karl@charcoal.com>
 
 	* gnus.texi (To From Newsgroups): Additional text regarding how to

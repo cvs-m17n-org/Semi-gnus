@@ -2674,20 +2674,19 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @item G w
 @kindex G w ($B%0%k!<%W(B)
 @findex gnus-group-make-web-group
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
+@cindex Google
 @cindex nnweb
+@cindex gmane
 $B%&%'%V8!:w7k2L$r$b$H$K0l;~E*$J%0%k!<%W$r:n@.$7$^(B
 $B$9(B (@code{gnus-group-make-web-group})$B!#$3$N%3%^%s%I$K@\F,<-$rM?$($k$H!"(B
-$B0l;~E*$G$O$J$/8GDj$7$?%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$G8!:w5!4X$N<o(B
-$BN`(B (search engine type) $B$H8!:wJ8;zNs$rF~NO$7$^$9!#M-8z$J8!:w5!4X$N<oN`$K(B
-$B$O(B @code{dejanews}, @code{altavista}, @code{reference} $B$,$"$j$^$9!#(B
+$B0l;~E*$G$O$J$/8GDj$7$?%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$G8!:w%(%s%8%s$N<o(B
+$BN`(B (search engine type) $B$H8!:wJ8;zNs$rF~NO$7$^$9!#M-8z$J8!:w%(%s%8%s$N<o(B
+$BN`$K$O(B @code{google}, @code{dejanews}, @code{gmane} $B$,$"$j$^$9!#(B
 @xref{Web Searches}.
 
-$B$b$7!"(B@code{dejanews} $B8!:w5!4X$rMQ$$$k>l9g$K$O!"(B
-@samp{~g alt.sysadmin.recovery shaving} $B$N$h$&$J9gCW$9$kJ8;zNs$rMQ$$$k$3(B
-$B$H$K$h$C$F!"8!:wBP>]$rFCDj$N%0%k!<%W$K8BDj$9$k$3$H$,2DG=$G$9!#(B
+$B$b$7!"(B@code{google} $B8!:w%(%s%8%s$rMQ$$$k>l9g$K$O!"(B
+@samp{shaving group:alt.sysadmin.recovery} $B$N$h$&$J9gCW$9$kJ8;zNs$rMQ$$(B
+$B$k$3$H$K$h$C$F!"8!:wBP>]$rFCDj$N%0%k!<%W$K8BDj$9$k$3$H$,2DG=$G$9!#(B
 
 @item G DEL
 @kindex G DEL ($B%0%k!<%W(B)
@@ -8637,12 +8636,13 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 $B$"$k$3$H$b$G$-$^$9!#8e<T$O!"8=:_$NA*BrJ}K!$r;H$&$H$$$&0UL#$G$9!#%j%9%H$N(B
 $B>l9g$O!"(Bgnus $B$O9g$&$b$N$rH/8+$9$k$^$G%j%9%H$NA4$F$NJ}K!$r;n$7$^$9!#(B
 
-$B$3$l$O8=:_$NJ}K!$r;n$7$F!"$=$l$,<:GT$7$?>l9g$K$O(B Deja $B$K?V$/@_Dj$NNc$G$9(B:
+$B$3$l$O8=:_$NJ}K!$r;n$7$F!"$=$l$,<:GT$7$?>l9g$K$O(B Google $B$K?V$/@_Dj$NNc$G(B
+$B$9(B:
 
 @lisp
 (setq gnus-refer-article-method
       '(current
-        (nnweb "refer" (nnweb-type dejanews))))
+        (nnweb "refer" (nnweb-type google))))
 @end lisp
 
 $B$[$H$s$I$N%a!<%k%P%C%/%(%s%I$O(B @code{Message-ID} $B$G$N<hF@$,2DG=$G$9$,!"(B
@@ -12255,11 +12255,8 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 
 @item webmail
 @uref{www.hotmail.com}, @uref{webmail.netscape.com},
-@uref{www.netaddress.com}, @uref{www.my-deja.com} $B$J$I$N%&%'%V%a!<%k%5!<(B
-$B%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
-
-$BCm(B: $B8=:_(B @uref{mail.yahoo.com} $B$O(B POP3 $B%5!<%S%9$rDs6!$7$F$$$^$9$N$G!"(B
-@sc{pop} $B%a!<%k%=!<%9$r;H$&$N$,NI$$$N$G$O$J$$$G$7$g$&$+!#(B
+@uref{www.netaddress.com}, @uref{www.yahoo.com} $B$J$I$N%&%'%V%a!<%k%5!<%P!<(B
+$B$+$i%a!<%k$r<hF@$7$^$9!#(B
 
 $BCm(B: $B%&%'%V%a!<%k$O%/%C%-!<$KBg$-$/0MB8$7$^$9!#(Burl "4.0pre.46" $B$r;H$&>l9g(B
 $B$O(B "one-line-cookie" $B%Q%C%A$rEv$F$kI,MW$,$"$j$^$9!#(B
@@ -13778,9 +13775,8 @@ gnus $B$r=*N;$7$?$$$+$b$7$l$^$;$s!#(B
 @subsection $B%&%'%V8!:w(B
 @cindex nnweb
 @cindex Google
-@cindex DejaNews
-@cindex Alta Vista
-@cindex InReference
+@cindex dejanews
+@cindex gmane
 @cindex Usenet searches
 @cindex searching the Usenet
 
@@ -13801,11 +13797,11 @@ gnus $B$r=*N;$7$?$$$+$b$7$l$^$;$s!#(B
 $B%k!<%W$KF~$k$?$S$K(B($B$?$H$(8!:w%Q%?!<%s$rJQ99$7$F$$$J$/$H$b(B)$B!"5-;v$N=g=x$,(B
 $B0c$C$F$$$k$+$b$7$l$^$;$s!#$^$?!"=EJ#M^(B
 $B@)(B (@pxref{Duplicate Suppression}) $B$r;H$C$F$b$&$^$/F/$+$J$$$G$7$g$&!#$H(B
-$B$$$&$N$O!"(B@code{nnweb} $B$O8!:w%(%s%8%s(B ($BNc$($P(B DejaNews) $B$r;H$C$F5-;v$rFI(B
-$B$_9~$`$^$G$O!"(B@code{Message-ID} $B$rCN$k$3$H$O$G$-$J$$$+$i$G$9!#$"$J$?$,FI(B
-$B$s$@5-;v$r21$($F$*$/$?$a$NM#0l$NJ}K!$O!"(B@code{Date} $B%X%C%@!<$r$b$H$K%9%3(B
-$B%"$rIU$1$k$3$H$@$1$G$9(B --- $B$D$^$j$"$J$?$,$=$N%0%k!<%W$r:G8e$KFI$s$@F|IU(B
-$B$h$j!"A0$KEj9F$5$l$?5-;v$rA4$F4{FI$K$9$k!"$H$$$&$3$H$G$9!#(B
+$B$$$&$N$O!"(B@code{nnweb} $B$O8!:w%(%s%8%s(B ($BNc$($P(B Google) $B$r;H$C$F5-;v$rFI$_(B
+$B9~$`$^$G$O!"(B@code{Message-ID} $B$rCN$k$3$H$O$G$-$J$$$+$i$G$9!#$"$J$?$,FI$s(B
+$B$@5-;v$r21$($F$*$/$?$a$NM#0l$NJ}K!$O!"(B@code{Date} $B%X%C%@!<$r$b$H$K%9%3%"(B
+$B$rIU$1$k$3$H$@$1$G$9(B --- $B$D$^$j$"$J$?$,$=$N%0%k!<%W$r:G8e$KFI$s$@F|IU$h(B
+$B$j!"A0$KEj9F$5$l$?5-;v$rA4$F4{FI$K$9$k!"$H$$$&$3$H$G$9!#(B
 
 $B$b$78!:w%(%s%8%s$N=PNO7A<0$,JQ99$5$l$k$H!"(B@code{nnweb} $B$O$=$l$r$&$^$/2r(B
 $B<a$G$-$:!"=hM}$O<:GT$9$k$G$7$g$&!#$b$7%&%'%VDs6!<TC#$,$=$s$J$3$H$r$7$?$i!"(B
@@ -13823,8 +13819,8 @@ gnus $B$r=*N;$7$?$$$+$b$7$l$^$;$s!#(B
 @item nnweb-type
 @vindex nnweb-type
 $B$I$N8!:w%(%s%8%s$r;H$C$F$$$k$+!#8=:_%5%]!<%H$5$l$F$$$k<oN`$O!"(B
-@code{google}, @code{dejanews}, @code{altavista} $B$=$7(B
-$B$F(B @code{reference} $B$G$9!#(B
+@code{google}, @code{dejanews} $B$=$7$F(B @code{gmane} $B$G$9!#(B
+@code{dejanews} $B$O(B @code{google} $B$NJLL>$K$J$C$F$$$k$3$H$KCm0U$7$F2<$5$$!#(B
 
 @item nnweb-search
 @vindex nnweb-search
@@ -13832,7 +13828,7 @@ gnus $B$r=*N;$7$?$$$+$b$7$l$^$;$s!#(B
 
 @item nnweb-max-hits
 @vindex nnweb-max-hits
-$BI=<($9$k8!:w7k2L$N:GBg?t!#=i4|CM$O(B 100 $B$G$9!#(B
+$BI=<($9$k8!:w7k2L$N:GBg?t!#=i4|CM$O(B 999 $B$G$9!#(B
 
 @item nnweb-type-definition
 @vindex nnweb-type-definition
