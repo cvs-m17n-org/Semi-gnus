@@ -29,6 +29,7 @@
       (require 'base64))
   (autoload 'binhex-decode-region "binhex"))
 
+(require 'mm-encode)
 (require 'mm-util)
 (require 'rfc2047)
 (require 'qp)
