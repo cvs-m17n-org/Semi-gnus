@@ -1,5 +1,14 @@
 1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* README.semi.ja: Add keiichi and nana-gnus to the branches info.
+	Modify the directory name for the daily snapshots.
+	* README.semi: Likewise.
+
+	* README.branch.ja: Modified for Semi-gnus 6.10, etc.
+	* README.branch: Likewise.
+
+1999-01-19  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-reply): Cancel the last change.
 	(message-followup): Cancel the last change.
 	(message-wide-reply): Cancel the last change.
