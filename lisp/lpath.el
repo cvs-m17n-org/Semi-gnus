@@ -43,6 +43,8 @@
 		     temp-directory babel-fetch babel-wash
 		     find-coding-systems-for-charsets sc-cite-regexp
 		     vcard-pretty-print image-type-available-p
+		     put-image create-image  display-graphic-p
+		     find-image insert-image
 		     make-overlay overlay-put))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
@@ -95,6 +97,8 @@
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
 		 babel-fetch babel-wash babel-as-string sc-cite-regexp
+		 put-image create-image display-graphic-p
+		 find-image insert-image
 		 vcard-pretty-print image-type-available-p)))
 
 (setq load-path (cons "." load-path))

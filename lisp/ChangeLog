@@ -1,3 +1,210 @@
+Mon May  1 15:09:46 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
+
+	* gnus.el: Gnus v5.8.6 is released.
+
+2000-04-28 21:14:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-q-encoding-alist): Encode HTAB.
+
+2000-04-28 16:37:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially): Use forward-line.
+
+2000-04-28 16:01:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-mime-button-menu): Use call-interactively.
+
+2000-04-28 15:30:17  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-generate-mime-1): Ignore 0x1b.
+	(mml-insert-mime): No markup only for text/plain.
+	(mime-to-mml): Remove MIME headers.
+
+2000-04-28 14:23:14  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-preview): Set gnus-newsgroup-charset.
+	* rfc2047.el (rfc2047-encode-message-header): Encode non-ascii 
+	as 8-bit.
+	* lpath.el: Fbind image functions.
+
+2000-04-28  Dave Love  <fx@gnu.org>
+
+	* gnus.el (gnus-group-startup-message): Maybe use image in Emacs
+	21.
+
+	* mailcap.el (mailcap-parse-mailcaps): Revert last change to
+	search order.  Use parse-colon-path and remove some redundancy.
+	Doc fix.
+	(mailcap-parse-mimetypes): Code consistently with
+	mailcap-parse-mailcaps.  Doc fix.
+
+	* gnus-start.el (gnus-unload): Iterate over `features', not
+	`load-history'.
+
+2000-04-28 09:52:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-parse-1): Don't create blank parts.
+	(mml-read-part): Fix mml tag.
+	(mml-insert-mime): Convert message/rfc822.
+	(mml-insert-mml-markup): Add mmlp parameter.
+
+2000-04-28 01:16:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially): Remove CTE.
+
+2000-04-28 00:31:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* lpath.el: Fbind put-image for XEmacs.
+	* mm-view.el (mm-inline-image): Fset it.
+
+2000-04-27 23:23:37  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndoc.el (nndoc-type-alist): Change forward regexp. 
+
+2000-04-27 21:57:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially-limit): Change the
+	default value.
+
+2000-04-27 21:53:32  Erik Toubro Nielsen <erik@ifad.dk>
+
+	* gnus-util.el (gnus-extract-address-components): Name might be
+	"".
+
+2000-04-27 20:32:06  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-summary-mail-forward): Use ARG.
+	(gnus-summary-post-forward): Ditto.
+	* message.el (message-forward-show-mml): New variable.
+	(message-forward): Use it.
+	* mml.el (mml-parse-1): Add tag mml.
+	(mml-read-part): Ditto.
+	(mml-generate-mime): Support reentance.
+	(mml-generate-mime-1): Support mml tag.
+
+2000-04-27  Dave Love  <fx@gnu.org>
+
+	* gnus-art.el: Don't bother to require custom, browse-url.
+	(gnus-article-x-face-command): Include gnus-article-display-xface.
+
+	* gnus-ems.el: Assume only (X)Emacs 20+.  Simplify XEmacs checks.
+	Use defalias, not fset.
+	(gnus-article-display-xface): New function.
+
+	* mm-view.el (mm-inline-image-emacs): Use put-image, remove-images.
+
+	* mm-decode.el: Small doc fixes.  Require cl when compiling.
+	(mm-xemacs-p): Deleted.
+	(mm-get-image-emacs, mm-get-image-xemacs): Deleted.
+	(mm-get-image): Amalgamate Emacs and XEmacs code here; for Emacs,
+	use create-image and don't special-case xbm.
+	(mm-valid-image-format-p): Use display-graphic-p.
+
+2000-04-27 15:27:54  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially-limit): New variable.
+	(message-send-mail-partially): New function.
+	(message-send-mail): Use it.
+	* mm-bodies.el (mm-decode-content-transfer-encoding): Remove 
+	all blank lines inside of base64.
+	* mm-partial.el (mm-inline-partial): Add an option. Remove tail
+	blank lines.
+
+2000-04-27 10:03:36  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-insert-tag): Match more special characters.
+
+2000-04-27 09:06:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-bug): Avoid attaching the external buffer.
+
+2000-04-27 00:58:43  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-inline-media-tests): Add message/partial.
+	(mm-inlined-types): Ditto.
+	* mm-partial.el: New file.
+
+2000-04-27  Dave Love  <fx@gnu.org>
+
+	* mailcap.el (mailcap-mime-data): Fix octet-stream syntax -- might
+	matter in Emacs 21.
+
+2000-04-26  Florian Weimer  <fw@deneb.cygnus.argh.org>
+
+	* mm-bodies.el (mm-encode-body): Remove reference to
+	mm-default-charset in comment.
+
+2000-04-24 00:56:00  Björn Torkelsson  <torkel@hpc2n.umu.se>
+
+	* rfc2047.el (rfc2047-encode-message-header): Fixing typo.
+	
+2000-04-26 12:27:41  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-draft.el (gnus-draft-send): Move gnus-draft-setup inside of
+	let.
+
+2000-04-26 12:26:10  Pavel Janik ml. <Pavel.Janik@inet.cz>
+
+	* gnus-draft.el (gnus-draft-setup): Fix comments.
+
+2000-04-26 10:06:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnmbox.el (nnmbox-create-mbox): Use nnmbox-file-coding-system,
+	if nnmbox-file-coding-system-for-write is nil.
+
+2000-04-26 02:17:44  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-configure-posting-styles): Just remove the
+	header if nil.
+
+2000-04-26 00:23:46  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text): Insert directly if decoded.
+	* mml.el (autoload): Typo.
+
+2000-04-25 22:46:36  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-preview): Set up posting-charset.
+	* gnus-msg.el (gnus-group-posting-charset-alist): Add koi8-r.
+
+2000-04-25 21:23:54  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Fix yahoo mail.
+
+2000-04-25 20:12:17  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-dissect-region): Don't include LWS ahead of
+	word if not necessary.
+	(rfc2047-encode-region): Put space between encoded words.
+
+2000-04-24 21:11:48  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-netrc-machine): Another default to nntp.
+
+2000-04-24 18:14:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-draft.el (gnus-draft-setup): Restore mml only when
+	required.
+	(gnus-draft-edit-message): Require restoration.
+
+2000-04-24 16:51:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-score.el (gnus-score-headers): Copy gnus-newsgrou-scored
+	back.
+
+2000-04-24 16:01:15  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-treat-article): Make sure that the summary
+	buffer is live.
+
+2000-04-24 15:42:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mailcap.el (mailcap-parse-mailcaps): Reorder.
+	(mailcap-parse-mailcap): Backwards parsing.
+	(mailcap-possible-viewers): Remove nreverse.
+	(mailcap-mime-info): Ditto.
+	(mailcap-add-mailcap-entry): Keep alternative viewer.
+
 Mon Apr 24 21:12:06 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
 
 	* gnus.el: Gnus v5.8.5 is released.

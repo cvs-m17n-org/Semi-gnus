@@ -103,6 +103,7 @@ the second with the current group name.")
 
 (defcustom gnus-group-posting-charset-alist
   '(("^\\(no\\|fr\\|dk\\)\\.[^,]*\\(,[ \t\n]*\\(no\\|fr\\|dk\\)\\.[^,]*\\)*$" iso-8859-1 (iso-8859-1))
+    ("^\\(fido7\\|relcom\\)\\.[^,]*\\(,[ \t\n]*\\(fido7\\|relcom\\)\\.[^,]*\\)*$" koi8-r (koi8-r))
     (message-this-is-mail nil nil)
     (message-this-is-news nil t))
   "Alist of regexps and permitted unencoded charsets for posting.
@@ -660,25 +661,53 @@ The original article will be yanked."
   (interactive "P")
   (gnus-summary-reply-with-original n t))
 
-(defun gnus-summary-mail-forward (&optional not-used post)
-  "Forward the current message to another user.
+(defun gnus-summary-mail-forward (&optional arg post)
+  "Forward the current message to another user.  
+If ARG is nil, see `message-forward-as-mime' and `message-forward-show-mml';
+if ARG is 1, decode the message and forward directly inline;
+if ARG is 2, foward message as an rfc822 MIME section;
+if ARG is 3, decode message and forward as an rfc822 MIME section;
+if ARG is 4, foward message directly inline;
+otherwise, use flipped `message-forward-as-mime'.
 If POST, post instead of mail."
   (interactive "P")
-  (gnus-setup-message 'forward
-    (gnus-summary-select-article)
-    (let (text)
-      (save-excursion
-	(set-buffer gnus-original-article-buffer)
-	(setq text (buffer-string)))
-      (set-buffer (gnus-get-buffer-create
-		   (generate-new-buffer-name " *Gnus forward*")))
-      (erase-buffer)
-      (insert text)
-      (goto-char (point-min))
-      (when (looking-at "From ")
-	(replace-match "X-From-Line: ") )
-      (run-hooks 'gnus-article-decode-hook)
-      (message-forward post))))
+  (let ((message-forward-as-mime message-forward-as-mime)
+	(message-forward-show-mml message-forward-show-mml))
+    (cond 
+     ((null arg))
+     ((eq arg 1) (setq message-forward-as-mime nil
+		       message-forward-show-mml t))
+     ((eq arg 2) (setq message-forward-as-mime t
+		       message-forward-show-mml nil))
+     ((eq arg 3) (setq message-forward-as-mime t
+		       message-forward-show-mml t))
+     ((eq arg 4) (setq message-forward-as-mime nil
+		       message-forward-show-mml nil))
+     (t (setq message-forward-as-mime (not message-forward-as-mime))))
+    (gnus-setup-message 'forward
+      (gnus-summary-select-article)
+      (let ((mail-parse-charset gnus-newsgroup-charset)
+	    (mail-parse-ignored-charsets gnus-newsgroup-ignored-charsets)
+	    text)
+	(save-excursion
+	  (set-buffer gnus-original-article-buffer)
+	  (setq text (buffer-string)))
+	(set-buffer 
+	 (if message-forward-show-mml
+	     (gnus-get-buffer-create
+	      (generate-new-buffer-name " *Gnus forward*"))
+	   (mm-with-unibyte-current-buffer
+	     ;; create an unibyte buffer
+	     (gnus-get-buffer-create
+	      (generate-new-buffer-name " *Gnus forward*")))))
+	(erase-buffer)
+	(insert text)
+	(goto-char (point-min))
+	(when (looking-at "From ")
+	  (replace-match "X-From-Line: ") )
+	(if message-forward-show-mml
+	    (mime-to-mml))
+	(message-forward post)))))
 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
@@ -691,11 +720,11 @@ If POST, post instead of mail."
 	(set-buffer gnus-original-article-buffer)
 	(message-resend address)))))
 
-(defun gnus-summary-post-forward (&optional full-headers)
+(defun gnus-summary-post-forward (&optional arg)
   "Forward the current article to a newsgroup.
-If FULL-HEADERS (the prefix), include full headers when forwarding."
+See `gnus-summary-mail-forward' for ARG."
   (interactive "P")
-  (gnus-summary-mail-forward full-headers t))
+  (gnus-summary-mail-forward arg t))
 
 (defvar gnus-nastygram-message
   "The following article was inappropriately posted to %s.\n\n"
@@ -868,10 +897,12 @@ If YANK is non-nil, include the original article."
 	       (stringp nntp-server-type))
       (insert nntp-server-type))
     (insert "\n\n\n\n\n")
-    (save-excursion
-      (set-buffer (gnus-get-buffer-create " *gnus environment info*"))
-      (gnus-debug))
-    (insert "<#part type=application/x-emacs-lisp buffer=\" *gnus environment info*\" disposition=inline description=\"User settings\"><#/part>")
+    (let (text)
+      (save-excursion
+	(set-buffer (gnus-get-buffer-create " *gnus environment info*"))
+	(gnus-debug)
+	(setq text (buffer-string)))
+      (insert "<#part type=application/x-emacs-lisp disposition=inline description=\"User settings\">\n" text "\n<#/part>"))
     (goto-char (point-min))
     (search-forward "Subject: " nil t)
     (message "")))
@@ -1232,8 +1263,10 @@ this is a reply."
 		      `(lambda ()
 			 (save-excursion
 			   (message-remove-header ,header)
-			   (message-goto-eoh)
-			   (insert ,header ": " ,(cdr result) "\n"))))))))
+			   (let ((value ,(cdr result)))
+			     (when value
+			       (message-goto-eoh)
+			       (insert ,header ": " value "\n"))))))))))
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()

@@ -1,7 +1,6 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000
-;;        Free Software Foundation, Inc.
+;;        1997, 1998, 2000 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -258,7 +257,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.8.5"
+(defconst gnus-version-number "5.8.6"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Gnus v%s" gnus-version-number)
@@ -748,8 +747,23 @@ be set in `.emacs' instead."
   "Insert startup message in current buffer."
   ;; Insert the message.
   (erase-buffer)
-  (insert
-   (format "              %s
+  (cond
+   ((and (fboundp 'find-image)
+	 (display-graphic-p)
+	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
+				    (:type xbm :file "gnus.xbm")))))
+	   (when image
+	     (insert-image image " ")
+	     (goto-char (point-min))
+	     (while (not (eobp))
+	       (insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
+				    ?\ ))
+	       (forward-line 1))
+	     (setq gnus-simple-splash nil)
+	     t))))
+   (t
+    (insert
+     (format "              %s
           _    ___ _             _
           _ ___ __ ___  __    _ ___
           __   _     ___    __  ___
@@ -769,21 +783,21 @@ be set in `.emacs' instead."
           __
 
 "
-           ""))
-  ;; And then hack it.
-  (gnus-indent-rigidly (point-min) (point-max)
-		       (/ (max (- (window-width) (or x 46)) 0) 2))
-  (goto-char (point-min))
-  (forward-line 1)
-  (let* ((pheight (count-lines (point-min) (point-max)))
-	 (wheight (window-height))
-	 (rest (- wheight pheight)))
-    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
-  ;; Fontify some.
-  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+	     ""))
+    ;; And then hack it.
+    (gnus-indent-rigidly (point-min) (point-max)
+			 (/ (max (- (window-width) (or x 46)) 0) 2))
+    (goto-char (point-min))
+    (forward-line 1)
+    (let* ((pheight (count-lines (point-min) (point-max)))
+	   (wheight (window-height))
+	   (rest (- wheight pheight)))
+      (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+    ;; Fontify some.
+    (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+    (setq gnus-simple-splash t)))
   (goto-char (point-min))
   (setq mode-line-buffer-identification (concat " " gnus-version))
-  (setq gnus-simple-splash t)
   (set-buffer-modified-p t))
 
 (eval-when (load)
@@ -909,7 +923,7 @@ see the manual for details."
   "*Method used for archiving messages you've sent.
 This should be a mail method.
 
-It's probably not a very effective to change this variable once you've
+It's probably not very effective to change this variable once you've
 run Gnus once.  After doing that, you must edit this server from the
 server buffer."
   :group 'gnus-server

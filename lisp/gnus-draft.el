@@ -96,7 +96,7 @@
   (interactive)
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup article gnus-newsgroup-name)
+    (gnus-draft-setup article gnus-newsgroup-name t)
     (set-buffer-modified-p t)
     (save-buffer)
     (let ((gnus-verbose-backends nil))
@@ -122,7 +122,6 @@
 
 (defun gnus-draft-send (article &optional group interactive)
   "Send message ARTICLE."
-  (gnus-draft-setup article (or group "nndraft:queue"))
   (let ((message-syntax-checks (if interactive nil
 				 'dont-check-for-anything-just-trust-me))
 	(message-inhibit-body-encoding (or (not group) 
@@ -130,8 +129,10 @@
 					   message-inhibit-body-encoding))
 	(message-send-hook (and group (not (equal group "nndraft:queue"))
 				message-send-hook))
-	(message-setup-hook nil)
+	(message-setup-hook (and group (not (equal group "nndraft:queue"))
+				 message-setup-hook))
 	type method)
+    (gnus-draft-setup article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
     (save-restriction
@@ -187,16 +188,16 @@
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
 (progn
-  (defun gnus-draft-setup (narticle group)
+  (defun gnus-draft-setup (narticle group &optional restore)
     (gnus-setup-message 'forward
       (let ((article narticle))
 	(message-mail)
 	(erase-buffer)
 	(if (not (gnus-request-restore-buffer article group))
 	    (error "Couldn't restore the article")
-	  ;; Insert the separator.
-	  (if (equal group "nndraft:queue")
+	  (if (and restore (equal group "nndraft:queue"))
 	      (mime-to-mml))
+	  ;; Insert the separator.
 	  (goto-char (point-min))
 	  (search-forward "\n\n")
 	  (forward-char -1)

@@ -80,7 +80,7 @@ Valid encodings are nil, `Q' and `B'.")
 
 (defvar rfc2047-q-encoding-alist
   '(("\\(From\\|Cc\\|To\\|Bcc\||Reply-To\\):" . "-A-Za-z0-9!*+/=_")
-    ("." . "^\000-\007\013\015-\037\200-\377=_?"))
+    ("." . "^\000-\007\011\013\015-\037\200-\377=_?"))
   "Alist of header regexps and valid Q characters.")
 
 ;;;
@@ -112,7 +112,13 @@ Should be called narrowed to the head of the message."
       (while (not (eobp))
 	(save-restriction
 	  (rfc2047-narrow-to-field)
-	  (when (rfc2047-encodable-p)
+	  (if (not (rfc2047-encodable-p))
+	      (if (mm-body-7-or-8)
+		  ;; 8 bit must be decoded.
+		  (if (car message-posting-charset)
+		      ;; Is message-posting-charset a coding system?
+		      (mm-encode-coding-region (point-min) (point-max)
+					       (car message-posting-charset))))
 	    ;; We found something that may perhaps be encoded.
 	    (while (setq elem (pop alist))
 	      (when (or (and (stringp (car elem))
@@ -128,7 +134,7 @@ Should be called narrowed to the head of the message."
 	     (t)))
 	  (goto-char (point-max)))))
     (when mail-parse-charset
-      (encode-coding-region
+      (mm-encode-coding-region
        (point-min) (point-max) mail-parse-charset))))
 
 (defun rfc2047-encodable-p (&optional header)
@@ -158,11 +164,9 @@ Should be called narrowed to the head of the message."
       (while (not (eobp))
 	(cond
 	 ((not state)
-	  (if (memq (char-after) blank-list)
-	      (setq state 'blank)
-	    (setq state 'word)
-	    (if (not (eq (setq cs (mm-charset-after)) 'ascii))
-		(setq current cs)))
+	  (setq state 'word)
+	  (if (not (eq (setq cs (mm-charset-after)) 'ascii))
+	      (setq current cs))
 	  (setq b (point)))
 	 ((eq state 'blank)
 	  (cond 
@@ -171,6 +175,8 @@ Should be called narrowed to the head of the message."
 	   ((memq (char-after) blank-list))
 	   (t
 	    (setq state 'word)
+	    (unless b
+		(setq b (point)))
 	    (if (not (eq (setq cs (mm-charset-after)) 'ascii))
 		(setq current cs)))))
 	 ((eq state 'word)
@@ -181,9 +187,11 @@ Should be called narrowed to the head of the message."
 	    (setq current nil))
 	   ((memq (char-after) blank-list)
 	    (setq state 'blank)
-	    (push (list b (point) current) words)
-	    (setq current nil)
-	    (setq b (point)))
+	    (if (not current)
+		(setq b nil)
+	      (push (list b (point) current) words)
+	      (setq b (point))
+	      (setq current nil)))
 	   ((or (eq (setq cs (mm-charset-after)) 'ascii)
 		(if current
 		    (eq current cs)
@@ -207,7 +215,10 @@ Should be called narrowed to the head of the message."
       (if (equal (nth 2 word) current)
 	  (setq beg (nth 0 word))
 	(when current
-	  (rfc2047-encode beg end current))
+	  (when (prog1 (and (eq beg (nth 1 word)) (nth 2 word))
+		  (rfc2047-encode beg end current))
+	    (goto-char beg)
+	    (insert " ")))
 	(setq current (nth 2 word)
 	      beg (nth 0 word)
 	      end (nth 1 word))))

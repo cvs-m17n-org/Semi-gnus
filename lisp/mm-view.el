@@ -40,23 +40,13 @@
 ;;; Functions for displaying various formats inline
 ;;;
 (defun mm-inline-image-emacs (handle)
-  (let ((b (point))
-	(overlay nil)
-	(string (copy-sequence "[MM-INLINED-IMAGE]"))
+  (let ((b (point-marker))
 	buffer-read-only)
     (insert "\n")
-    (buffer-name)
-    (setq overlay (make-overlay (point) (point) (current-buffer)))
-    (put-text-property 0 (length string) 'display (mm-get-image handle) string)
-    (overlay-put overlay 'before-string string)
-
+    (put-image (mm-get-image handle) b "x")
     (mm-handle-set-undisplayer
      handle
-     `(lambda ()
-	(let (buffer-read-only)
-	  (delete-overlay ,overlay)
-	  (delete-region ,(set-marker (make-marker) b)
-			 ,(set-marker (make-marker) (point))))))))
+     `(lambda () (remove-images ,b (1+ ,b))))))
 
 (defun mm-inline-image-xemacs (handle)
   (let ((b (point))
@@ -73,10 +63,10 @@
     (set-extent-property annot 'mm t)
     (set-extent-property annot 'duplicable t)))
 
-(defun mm-inline-image (handle)
-  (if mm-xemacs-p
-      (mm-inline-image-xemacs handle)
-    (mm-inline-image-emacs handle)))
+(eval-and-compile
+  (if (string-match "XEmacs" (emacs-version))
+      (fset 'mm-inline-image 'mm-inline-image-xemacs)
+    (fset 'mm-inline-image 'mm-inline-image-emacs)))
 
 (defvar mm-w3-setup nil)
 (defun mm-setup-w3 ()
@@ -157,11 +147,12 @@
 		  (vcard-parse-string (mm-get-part handle)
 				      'vcard-standard-filter))))))
      (t
-      (setq text (mm-get-part handle))
       (let ((b (point))
 	    (charset (mail-content-type-get
 		      (mm-handle-type handle) 'charset)))
-	(insert (mm-decode-string text charset))
+	(if (eq charset 'gnus-decoded)
+	    (mm-insert-part handle)
+	  (insert (mm-decode-string (mm-get-part handle) charset)))
 	(when (and (equal type "plain")
 		   (equal (cdr (assoc 'format (mm-handle-type handle)))
 			  "flowed"))

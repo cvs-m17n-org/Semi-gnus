@@ -27,9 +27,13 @@
 (require 'mm-bodies)
 (require 'mm-encode)
 (require 'mm-decode)
+(eval-when-compile 'cl)
 
 (eval-and-compile
-  (autoload 'message-make-message-id "message"))
+  (autoload 'message-make-message-id "message")
+  (autoload 'gnus-setup-posting-charset "gnus-msg")
+  (autoload 'message-fetch-field "message")
+  (autoload 'message-posting-charset "message"))
 
 (defvar mml-generate-multipart-alist nil
   "*Alist of multipart generation functions.
@@ -80,7 +84,7 @@ one charsets.")
 
 (defun mml-parse-1 ()
   "Parse the current buffer as an MML document."
-  (let (struct tag point contents charsets warn use-ascii)
+  (let (struct tag point contents charsets warn use-ascii no-markup-p)
     (while (and (not (eobp))
 		(not (looking-at "<#/multipart")))
       (cond
@@ -90,12 +94,13 @@ one charsets.")
 	(push (nconc (mml-read-tag) (list (cons 'contents (mml-read-part))))
 	      struct))
        (t
-	(if (looking-at "<#part")
+	(if (or (looking-at "<#part") (looking-at "<#mml"))
 	    (setq tag (mml-read-tag))
 	  (setq tag (list 'part '(type . "text/plain"))
+		no-markup-p t
 		warn t))
 	(setq point (point)
-	      contents (mml-read-part)
+	      contents (mml-read-part (eq 'mml (car tag)))
 	      charsets (mm-find-mime-charset-region point (point)))
 	(when (memq nil charsets)
 	  (if (or (memq 'unknown-encoding mml-confirmation-set)
@@ -108,8 +113,11 @@ one charsets.")
 		(setq warn nil))
 	    (error "Edit your message to remove those characters")))
 	(if (< (length charsets) 2)
-	    (push (nconc tag (list (cons 'contents contents)))
-		  struct)
+	    (if (or (not no-markup-p)
+		    (string-match "[^ \t\r\n]" contents))
+		;; Don't create blank parts.
+		(push (nconc tag (list (cons 'contents contents)))
+		      struct))
 	  (let ((nstruct (mml-parse-singlepart-with-multiple-charsets
 			  tag point (point) use-ascii)))
 	    (when (and warn
@@ -200,22 +208,32 @@ one charsets.")
     (skip-chars-forward " \t\n")
     (cons (intern name) (nreverse contents))))
 
-(defun mml-read-part ()
-  "Return the buffer up till the next part, multipart or closing part or multipart."
-  (let ((beg (point)))
+(defun mml-read-part (&optional mml)
+  "Return the buffer up till the next part, multipart or closing part or multipart.
+If MML is non-nil, return the buffer up till the correspondent mml tag."
+  (let ((beg (point)) (count 1))
     ;; If the tag ended at the end of the line, we go to the next line.
     (when (looking-at "[ \t]*\n")
       (forward-line 1))
-    (if (re-search-forward
-	 "<#\\(/\\)?\\(multipart\\|part\\|external\\)." nil t)
-	(prog1
-	    (buffer-substring-no-properties beg (match-beginning 0))
-	  (if (or (not (match-beginning 1))
-		  (equal (match-string 2) "multipart"))
-	      (goto-char (match-beginning 0))
-	    (when (looking-at "[ \t]*\n")
-	      (forward-line 1))))
-      (buffer-substring-no-properties beg (goto-char (point-max))))))
+    (if mml
+	(progn
+	  (while (and (> count 0) (not (eobp)))
+	    (if (re-search-forward "<#\\(/\\)?mml." nil t)
+		(setq count (+ count (if (match-beginning 1) -1 1)))
+	      (goto-char (point-max))))
+	  (buffer-substring-no-properties beg (if (> count 0) 
+						  (point)
+						(match-beginning 0))))
+      (if (re-search-forward
+	   "<#\\(/\\)?\\(multipart\\|part\\|external\\|mml\\)." nil t)
+	  (prog1
+	      (buffer-substring-no-properties beg (match-beginning 0))
+	    (if (or (not (match-beginning 1))
+		    (equal (match-string 2) "multipart"))
+		(goto-char (match-beginning 0))
+	      (when (looking-at "[ \t]*\n")
+		(forward-line 1))))
+	(buffer-substring-no-properties beg (goto-char (point-max)))))))
 
 (defvar mml-boundary nil)
 (defvar mml-base-boundary "-=-=")
@@ -224,7 +242,7 @@ one charsets.")
 (defun mml-generate-mime ()
   "Generate a MIME message based on the current MML document."
   (let ((cont (mml-parse))
-	(mml-multipart-number 0))
+	(mml-multipart-number mml-multipart-number))
     (if (not cont)
 	nil
       (with-temp-buffer
@@ -237,7 +255,7 @@ one charsets.")
 
 (defun mml-generate-mime-1 (cont)
   (cond
-   ((eq (car cont) 'part)
+   ((or (eq (car cont) 'part) (eq (car cont) 'mml))
     (let (coded encoding charset filename type)
       (setq type (or (cdr (assq 'type cont)) "text/plain"))
       (if (member (car (split-string type "/")) '("text" "message"))
@@ -248,6 +266,8 @@ one charsets.")
 	     ((and (setq filename (cdr (assq 'filename cont)))
 		   (not (equal (cdr (assq 'nofile cont)) "yes")))
 	      (mm-insert-file-contents filename))
+	     ((eq 'mml (car cont))
+	      (insert (cdr (assq 'contents cont))))
 	     (t
 	      (save-restriction
 		(narrow-to-region (point) (point))
@@ -255,22 +275,25 @@ one charsets.")
 		;; Remove quotes from quoted tags.
 		(goto-char (point-min))
 		(while (re-search-forward
-			"<#!+/?\\(part\\|multipart\\|external\\)" nil t)
+			"<#!+/?\\(part\\|multipart\\|external\\|mml\\)" nil t)
 		  (delete-region (+ (match-beginning 0) 2)
 				 (+ (match-beginning 0) 3))))))
-	    (when (string= (car (split-string type "/")) "message")
-	      ;; message/rfc822 parts have to have their heads encoded.
-	      (save-restriction
-		(message-narrow-to-head)
-		(let ((rfc2047-header-encoding-alist nil))
-		  (mail-encode-encoded-word-buffer))))
-	    (setq charset (mm-encode-body))
-	    (setq encoding (mm-body-encoding
-			    charset
-			    (if (string= (car (split-string type "/"))
-					 "message")
-				'8bit
-			      (cdr (assq 'encoding cont)))))
+	    (cond 
+	     ((eq (car cont) 'mml)
+	      (let ((mml-boundary (funcall mml-boundary-function
+					   (incf mml-multipart-number))))
+		(mml-to-mime))
+	      (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
+		;; ignore 0x1b, it is part of iso-2022-jp
+		(setq encoding (mm-body-7-or-8))))
+	     ((string= (car (split-string type "/")) "message")
+	      (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
+		;; ignore 0x1b, it is part of iso-2022-jp
+		(setq encoding (mm-body-7-or-8))))
+	     (t 
+	      (setq charset (mm-encode-body))
+	      (setq encoding (mm-body-encoding
+			      charset (cdr (assq 'encoding cont))))))
 	    (setq coded (buffer-string)))
 	(mm-with-unibyte-buffer
 	  (cond
@@ -479,7 +502,13 @@ one charsets.")
     (if (stringp (car handles))
 	(mml-insert-mime handles)
       (mml-insert-mime handles t))
-    (mm-destroy-parts handles)))
+    (mm-destroy-parts handles))
+  (save-restriction
+    (message-narrow-to-head)
+    ;; Remove them, they are confusing.
+    (message-remove-header "Content-Type")
+    (message-remove-header "MIME-Version")
+    (message-remove-header "Content-Transfer-Encoding")))
 
 (defun mml-to-mime ()
   "Translate the current buffer from MML to MIME."
@@ -489,17 +518,26 @@ one charsets.")
     (mail-encode-encoded-word-buffer)))
 
 (defun mml-insert-mime (handle &optional no-markup)
-  (let (textp buffer)
+  (let (textp buffer mmlp)
     ;; Determine type and stuff.
     (unless (stringp (car handle))
-      (unless (setq textp (equal (mm-handle-media-supertype handle)
-				 "text"))
+      (unless (setq textp (equal (mm-handle-media-supertype handle) "text"))
 	(save-excursion
 	  (set-buffer (setq buffer (generate-new-buffer " *mml*")))
-	  (mm-insert-part handle))))
-    (unless no-markup
-      (mml-insert-mml-markup handle buffer textp))
+	  (mm-insert-part handle)
+	  (if (setq mmlp (equal (mm-handle-media-type handle) 
+				"message/rfc822"))
+	      (mime-to-mml)))))
+    (if mmlp
+	(mml-insert-mml-markup handle nil t t)
+      (unless (and no-markup
+		   (equal (mm-handle-media-type handle) "text/plain"))
+	(mml-insert-mml-markup handle buffer textp)))
     (cond
+     (mmlp 
+      (insert-buffer buffer)
+      (goto-char (point-max))
+      (insert "<#/mml>\n"))
      ((stringp (car handle))
       (mapcar 'mml-insert-mime (cdr handle))
       (insert "<#/multipart>\n"))
@@ -512,12 +550,14 @@ one charsets.")
      (t
       (insert "<#/part>\n")))))
 
-(defun mml-insert-mml-markup (handle &optional buffer nofile)
+(defun mml-insert-mml-markup (handle &optional buffer nofile mmlp)
   "Take a MIME handle and insert an MML tag."
   (if (stringp (car handle))
       (insert "<#multipart type=" (mm-handle-media-subtype handle)
 	      ">\n")
-    (insert "<#part type=" (mm-handle-media-type handle))
+    (if mmlp
+	(insert "<#mml type=" (mm-handle-media-type handle))
+      (insert "<#part type=" (mm-handle-media-type handle)))
     (dolist (elem (append (cdr (mm-handle-type handle))
 			  (cdr (mm-handle-disposition handle))))
       (insert " " (symbol-name (car elem)) "=\"" (cdr elem) "\""))
@@ -626,8 +666,7 @@ one charsets.")
 		   'list
 		   (mm-delete-duplicates
 		    (nconc
-		     (mapcar (lambda (m) (cdr m))
-			     mailcap-mime-extensions)
+		     (mapcar 'cdr mailcap-mime-extensions)
 		     (apply
 		      'nconc
 		      (mapcar
@@ -663,7 +702,7 @@ one charsets.")
       (goto-char (point-min))
       ;; Quote parts.
       (while (re-search-forward
-	      "<#/?!*\\(multipart\\|part\\|external\\)" nil t)
+	      "<#/?!*\\(multipart\\|part\\|external\\|mml\\)" nil t)
 	;; Insert ! after the #.
 	(goto-char (+ (match-beginning 0) 2))
 	(insert "!")))))
@@ -678,7 +717,7 @@ one charsets.")
 	  (value (pop plist)))
       (when value
 	;; Quote VALUE if it contains suspicious characters.
-	(when (string-match "[\"\\~/* \t\n]" value)
+	(when (string-match "[\"'\\~/*;() \t\n]" value)
 	  (setq value (prin1-to-string value)))
 	(insert (format " %s=%s" key value)))))
   (insert ">\n"))
@@ -751,7 +790,10 @@ TYPE is the MIME type to use."
   "Display current buffer with Gnus, in a new buffer.
 If RAW, don't highlight the article."
   (interactive "P")
-  (let ((buf (current-buffer)))
+  (let ((buf (current-buffer))
+	(message-posting-charset (or (gnus-setup-posting-charset 
+				      (message-fetch-field "Newsgroups"))
+				     message-posting-charset)))
     (switch-to-buffer (get-buffer-create 
 		       (concat (if raw "*Raw MIME preview of "
 				 "*MIME preview of ") (buffer-name))))
@@ -762,9 +804,10 @@ If RAW, don't highlight the article."
 	(replace-match "\n"))
     (mml-to-mime)
     (unless raw
-      (run-hooks 'gnus-article-decode-hook)
-      (let ((gnus-newsgroup-name "dummy"))
-	(gnus-article-prepare-display)))
+      (let ((gnus-newsgroup-charset (car message-posting-charset)))
+	(run-hooks 'gnus-article-decode-hook)
+	(let ((gnus-newsgroup-name "dummy"))
+	  (gnus-article-prepare-display))))
     (fundamental-mode)
     (setq buffer-read-only t)
     (goto-char (point-min))))

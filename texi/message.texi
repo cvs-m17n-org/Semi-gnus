@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle Message 5.8.5 Manual
+@settitle Message 5.8.6 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -42,7 +42,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Message 5.8.5 Manual
+@title Message 5.8.6 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -83,7 +83,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Message 5.8.5.  Message is distributed with
+This manual corresponds to Message 5.8.6.  Message is distributed with
 the Gnus distribution bearing the same version number as this manual.
 
 
@@ -1028,6 +1028,17 @@ posting a prepared news message.
 @section Various Message Variables
 
 @table @code
+@item message-default-charset
+@vindex message-default-charset
+@cindex charset
+Symbol naming a @sc{mime} charset.  Non-ASCII characters in messages are
+assumed to be encoded using this charset.  The default is @code{nil},
+which means ask the user.  (This variable is used only on non-@sc{mule}
+Emacsen.  
+@xref{Charset Translation, , Charset Translation, emacs-mime, 
+      Emacs MIME Manual}, for details on the @sc{mule}-to-@sc{mime}
+translation process.
+
 @item message-signature-separator
 @vindex message-signature-separator
 Regexp matching the signature separator.  It is @samp{^-- *$} by

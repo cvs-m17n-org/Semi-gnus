@@ -299,6 +299,11 @@ The provided functions are:
   :group 'message-forwarding
   :type 'boolean)
 
+(defcustom message-forward-show-mml t
+  "*If non-nil, forward messages are shown as mml.  Otherwise, forward messages are unchanged."
+  :group 'message-forwarding
+  :type 'boolean)
+
 (defcustom message-forward-before-signature t
   "*If non-nil, put forwarded message before signature, else after."
   :group 'message-forwarding
@@ -844,7 +849,7 @@ Defaults to `text-mode-abbrev-table'.")
 		"\\([" cite-prefix "]+[" cite-suffix "]*\\)?"
 		"[:>|}].*")
        (0 'message-cited-text-face))
-      ("<#/?\\(multipart\\|part\\|external\\).*>"
+      ("<#/?\\(multipart\\|part\\|external\\|mml\\).*>"
        (0 'message-mml-face))))
   "Additional expressions to highlight in Message mode.")
 
@@ -888,6 +893,14 @@ The cdr of ech entry is a function for applying the face to a region.")
 (defvar message-draft-coding-system
   mm-auto-save-coding-system
   "Coding system to compose mail.")
+
+(defcustom message-send-mail-partially-limit 1000000
+  "The limitation of messages sent as message/partial.
+The lower bound of message size in characters, beyond which the message 
+should be sent in several parts. If it is nil, the size is unlimited."
+  :group 'message-buffers
+  :type '(choice (const :tag "unlimited" nil)
+		 (integer 1000000)))
 
 ;;; Internal variables.
 
@@ -2146,6 +2159,71 @@ It should typically alter the sending method in some way or other."
 	(eval (car actions)))))
     (pop actions)))
 
+(defun message-send-mail-partially ()
+  "Sendmail as message/partial."
+  (let ((p (goto-char (point-min)))
+	(tembuf (message-generate-new-buffer-clone-locals " message temp"))
+	(curbuf (current-buffer))
+	(id (message-make-message-id)) (n 1)
+	plist total  header required-mail-headers)
+    (while (not (eobp))
+      (if (< (point-max) (+ p message-send-mail-partially-limit))
+	  (goto-char (point-max))
+	(goto-char (+ p message-send-mail-partially-limit))
+	(beginning-of-line)
+	(if (<= (point) p) (forward-line 1))) ;; In case of bad message.
+      (push p plist)
+      (setq p (point)))
+    (setq total (length plist))
+    (push (point-max) plist)
+    (setq plist (nreverse plist))
+    (unwind-protect
+	(save-excursion
+	  (setq p (pop plist))
+	  (while plist
+	    (set-buffer curbuf)
+	    (copy-to-buffer tembuf p (car plist))
+	    (set-buffer tembuf)
+	    (goto-char (point-min))
+	    (if header
+		(progn
+		  (goto-char (point-min))
+		  (narrow-to-region (point) (point))
+		  (insert header))
+	      (message-goto-eoh)
+	      (setq header (buffer-substring (point-min) (point)))
+	      (goto-char (point-min))
+	      (narrow-to-region (point) (point))
+	      (insert header)
+	      (message-remove-header "Mime-Version")
+	      (message-remove-header "Content-Type")
+	      (message-remove-header "Content-Transfer-Encoding")
+	      (message-remove-header "Message-ID")
+	      (message-remove-header "Lines")
+	      (goto-char (point-max))
+	      (insert "Mime-Version: 1.0\n")
+	      (setq header (buffer-substring (point-min) (point-max))))
+	    (goto-char (point-max))
+	    (insert (format "Content-Type: message/partial; id=\"%s\"; number=%d; total=%d\n"
+			    id n total))
+	    (let ((mail-header-separator ""))
+	      (when (memq 'Message-ID message-required-mail-headers)
+		(insert "Message-ID: " (message-make-message-id) "\n"))
+	      (when (memq 'Lines message-required-mail-headers)
+		(let ((mail-header-separator ""))
+		  (insert "Lines: " (message-make-lines) "\n")))
+	      (message-goto-subject)
+	      (end-of-line)
+	      (insert (format " (%d/%d)" n total))
+	      (goto-char (point-max))
+	      (insert "\n")
+	      (widen)
+	      (funcall message-send-mail-function))
+	    (setq n (+ n 1))
+	    (setq p (pop plist))
+	    (erase-buffer)))
+      (kill-buffer tembuf))))
+
 (defun message-send-mail (&optional arg)
   (require 'mail-utils)
   (let* ((tembuf (message-generate-new-buffer-clone-locals " message temp"))
@@ -2192,7 +2270,11 @@ It should typically alter the sending method in some way or other."
 		     (or (message-fetch-field "cc")
 			 (message-fetch-field "to")))
 	    (message-insert-courtesy-copy))
-	  (funcall message-send-mail-function))
+	  (if (or (not message-send-mail-partially-limit)
+		  (< (point-max) message-send-mail-partially-limit)
+		  (not (y-or-n-p "The message size is too large, should it be sent partially?")))
+	      (funcall message-send-mail-function)
+	    (message-send-mail-partially)))
       (kill-buffer tembuf))
     (set-buffer mailbuf)
     (push 'mail message-sent-message-via)))
@@ -3921,9 +4003,12 @@ the message."
   "Forward the current message via mail.
 Optional NEWS will use news to forward instead of mail."
   (interactive "P")
-  (let ((cur (current-buffer))
-	(subject (message-make-forward-subject))
-	art-beg)
+  (let* ((cur (current-buffer))
+	 (subject (if message-forward-show-mml
+		      (message-make-forward-subject)
+		    (mail-decode-encoded-word-string
+		     (message-make-forward-subject))))
+	 art-beg)
     (if news
 	(message-news nil subject)
       (message-mail nil subject))
@@ -3933,17 +4018,27 @@ Optional NEWS will use news to forward instead of mail."
         (message-goto-body)
       (goto-char (point-max)))
     (if message-forward-as-mime
-	(insert "\n\n<#part type=message/rfc822 disposition=inline>\n")
+	(if message-forward-show-mml
+	    (insert "\n\n<#mml type=message/rfc822 disposition=inline>\n")
+	  (insert "\n\n<#part type=message/rfc822 disposition=inline"
+		  " buffer=\"" (buffer-name cur) "\">\n"))
       (insert "\n-------------------- Start of forwarded message --------------------\n"))
     (let ((b (point))
 	  e)
-      (mml-insert-buffer cur)
+      (if message-forward-show-mml
+	  (insert-buffer-substring cur)
+	(unless message-forward-as-mime
+	  (mml-insert-buffer cur)))
       (setq e (point))
       (if message-forward-as-mime
-	  (insert "<#/part>\n")
+	  (if message-forward-show-mml
+	      (insert "<#/mml>\n")
+	    (insert "<#/part>\n"))
 	(insert "\n-------------------- End of forwarded message --------------------\n"))
-      (when (and (not current-prefix-arg)
-		 message-forward-ignored-headers)
+      (when (and (or message-forward-show-mml
+		     (not message-forward-as-mime))
+	     (not current-prefix-arg)
+	     message-forward-ignored-headers)
 	(save-restriction
 	  (narrow-to-region b e)
 	  (goto-char b)
