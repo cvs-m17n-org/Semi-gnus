@@ -1209,7 +1209,7 @@ find-file-hooks, etc.
 	'multibyte-string-p
       'ignore)))
 
-;; rfc-2047 stuff.
+;; rfc2047 stuff.
 (unless (featurep 'mail-parse)
   (defun-maybe std11-narrow-to-field ()
     "Narrow the buffer to the header on the current line."
