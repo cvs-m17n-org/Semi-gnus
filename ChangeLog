@@ -1,3 +1,41 @@
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header):
+	New function.
+
+	* lisp/message.el (message-reply): Use
+	`make-full-mail-header-from-decoded-header' instead of
+	`make-full-mail-header'.
+	(message-followup): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-set-default-charset): New
+	function.
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up
+	buffer local variable `default-mime-charset' of
+	`gnus-original-article-buffer' and `gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Add
+	`gnus-maybe-setup-default-charset'.
+	Delete dummy definition for `nnspool-rejected-article-hook' and
+	`xemacs-codename'
+	(gnus-maybe-setup-default-charset): New function.
+
+	* lisp/message.el (message-setup-hook): Delete
+	`message-maybe-setup-default-charset'.	
+	Abolish variable `message-newsreader' and `message-mailer'.
+	(message-user-agent): New variable.
+	Abolish function `message-maybe-setup-default-charset'.
+
 1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.4.
