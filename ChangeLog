@@ -1,3 +1,10 @@
+2000-06-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): Use
+	`mime-insert-entity-content' instead of obsolete functions.
+
 2000-06-13  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
 
 	* lisp/gnus-bbdb.el(gnus-bbdb/update-record): Fix to fetch last
