@@ -1,3 +1,15 @@
+2000-08-23  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.24 (This is alpha status.)
+	Sync up with T-gnus.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.24.
+
+*2000-08-23  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-rename-group): Inhibit renaming of
+	zombie or killed groups.
+
 2000-07-18  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.23 (This is alpha status.)
