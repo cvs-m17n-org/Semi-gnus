@@ -4561,8 +4561,10 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	headers id end ref
 	(mail-parse-charset gnus-newsgroup-charset)
 	(mail-parse-ignored-charsets 
-	     (save-excursion (set-buffer gnus-summary-buffer)
-			     gnus-newsgroup-ignored-charsets)))
+	 (or (and (gnus-buffer-live-p gnus-summary-buffer)
+		  (save-excursion (set-buffer gnus-summary-buffer)
+				  gnus-newsgroup-ignored-charsets))
+	     gnus-newsgroup-ignored-charsets)))
     (save-excursion
       (set-buffer nntp-server-buffer)
       ;; Translate all TAB characters into SPACE characters.
