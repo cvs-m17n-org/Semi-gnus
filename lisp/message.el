@@ -2084,16 +2084,11 @@ to find out how to use this."
   (let ((errbuf (if mail-interactive
 		    (generate-new-buffer " smtp errors")
 		  0))
-	(tembuf (generate-new-buffer " smtp temp"))
 	(case-fold-search nil)
 	resend-to-addresses
-	delimline
-	(mailbuf (current-buffer)))
+	delimline)
     (unwind-protect
 	(save-excursion
-	  (set-buffer tembuf)
-	  (erase-buffer)
-	  (insert-buffer-substring mailbuf)
 	  (goto-char (point-max))
 	  ;; require one newline at the end.
 	  (or (= (preceding-char) ?\n)
@@ -2207,12 +2202,11 @@ to find out how to use this."
 	  ;;
 	  ;;
 	  ;;
-	  (setq smtp-address-buffer (generate-new-buffer "*smtp-mail*"))
 	  (setq smtp-recipient-address-list
 		(or resend-to-addresses
-		    (smtp-deduce-address-list tembuf (point-min) delimline)))
-	  (kill-buffer smtp-address-buffer)
-	  
+		    (smtp-deduce-address-list (current-buffer)
+					      (point-min) delimline)))
+
 	  (smtp-do-bcc delimline)
 
 	  (if (not (null smtp-recipient-address-list))
@@ -2220,7 +2214,6 @@ to find out how to use this."
 		  (error "Sending failed; SMTP protocol error"))
 	    (error "Sending failed; no recipients"))
 	  )
-      (kill-buffer tembuf)
       (if (bufferp errbuf)
 	  (kill-buffer errbuf)))))
 
