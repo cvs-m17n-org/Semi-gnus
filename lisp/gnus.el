@@ -1818,7 +1818,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts)
      ("gnus-mlspl" gnus-group-split gnus-group-split-fancy)
      ("gnus-mlspl" :interactive t gnus-group-split-setup
-      gnus-group-split-update))))
+      gnus-group-split-update)
+     ("gnus-namazu" :interactive t gnus-namazu-search))))
 
 ;;; gnus-sum.el thingies
 
