@@ -1,3 +1,19 @@
+1998-11-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-supersede-article): Bind
+	`gnus-message-setup-hook' to minimum setting.
+
+	* lisp/message.el (message-supersede-setup-for-mime-edit): New
+	function.
+	(message-supersede-setup-function): New user option. Use
+	`message-supersede-setup-for-mime-edit' in default.
+	(message-supersede): Call `message-supersede-setup-function' if it
+ 	is non-nil.
+	(message-supersede-setup-hook): New user option.
+
+	* lisp/message.el (message-bounce-setup-for-mime-edit): Don't
+	delete header separator. It is up to MIME-Edit to do so.
+
 1998-11-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.040.
@@ -28,7 +44,7 @@
 1998-11-20  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: Update to beta5.
-	
+
 	* lisp/gnus-ofsetup.el: Update to beta5.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.038.
