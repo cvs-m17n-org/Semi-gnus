@@ -1286,7 +1286,7 @@ increase the score of each group you read."
     "a" gnus-summary-post-news
     "x" gnus-summary-limit-to-unread
     "s" gnus-summary-isearch-article
-    "t" gnus-article-hide-headers
+    "t" gnus-article-toggle-headers
     "g" gnus-summary-show-article
     "l" gnus-summary-goto-last-article
     "v" gnus-summary-preview-mime-message
@@ -1442,7 +1442,7 @@ increase the score of each group you read."
     "f" gnus-article-display-x-face
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
-    "t" gnus-article-hide-headers
+    "t" gnus-article-toggle-headers
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "h" gnus-article-treat-html
@@ -1451,7 +1451,7 @@ increase the score of each group you read."
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide
-    "h" gnus-article-hide-headers
+    "h" gnus-article-toggle-headers
     "b" gnus-article-hide-boring-headers
     "s" gnus-article-hide-signature
     "c" gnus-article-hide-citation
@@ -1568,7 +1568,7 @@ increase the score of each group you read."
     (let ((innards
            '(("Hide"
               ["All" gnus-article-hide t]
-              ["Headers" gnus-article-hide-headers t]
+              ["Headers" gnus-article-toggle-headers t]
               ["Signature" gnus-article-hide-signature t]
               ["Citation" gnus-article-hide-citation t]
               ["PGP" gnus-article-hide-pgp t]
