@@ -31,6 +31,8 @@
 
 (require 'mm-util)
 
+(require 'path-util)
+
 (eval-when-compile (require 'cl))
 
 (eval-and-compile
@@ -53,14 +55,14 @@
     (lynx "lynx" "-source")
     (curl "curl")))
 
-(defcustom mm-url-program 
+(defcustom mm-url-program
   (cond
-   ((executable-find "wget") 'wget)
-   ((executable-find "lynx") 'lynx)
-   ((executable-find "curl") 'curl)
+   ((exec-installed-p "wget") 'wget)
+   ((exec-installed-p "lynx") 'lynx)
+   ((exec-installed-p "curl") 'curl)
    (t "GET"))
   "The url grab program."
-  :type '(choice 
+  :type '(choice
 	  (symbol :tag "wget" wget)
 	  (symbol :tag "lynx" lynx)
 	  (symbol :tag "curl" curl)

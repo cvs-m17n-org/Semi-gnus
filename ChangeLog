@@ -1,3 +1,8 @@
+2001-12-03  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/mm-url.el: Require `path-util'.
+	(mm-url-program): Replace `executable-find' to `exec-installed-p'.
+
 2001-11-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
