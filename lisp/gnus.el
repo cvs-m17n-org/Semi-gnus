@@ -269,8 +269,8 @@ is restarted, and sometimes reloaded."
   "Version string for this version of Gnus.")
 
 (defconst gnus-version
-  (format "%s (based on %s; for SEMI 1.13, FLIM 1.13)"
-          (product-string 'gnus-vers) gnus-original-version)
+  (format "%s %s (based on %s; for SEMI 1.13, FLIM 1.13)"
+          gnus-product-name gnus-version-number gnus-original-version)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1575,10 +1575,10 @@ If nil, no default charset is assumed when posting."
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-product-variable-file-list
-  '(("strict-cache" ((product-version (7 1 0 14)) (emacs-version))
+  '(("strict-cache" ((product-version (7 1 0 15)) (emacs-version))
      binary
      gnus-format-specs-compiled)
-    ("cache" ((product-version (7 1 0 14)))
+    ("cache" ((product-version (7 1 0 15)))
      ctext
      gnus-format-specs))
   "Gnus variables are saved in the produce depend quick startup files.")
