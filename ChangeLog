@@ -1,5 +1,11 @@
 2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnshimbun.el (nnshimbun-find-parameter): Use the value of
+	`nnshimbun-pre-fetch-article' if the value of the group parameter
+	`prefetch-articles' is `off'; do likewise for `encapsulate-images'.
+
+2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnshimbun.el (nnshimbun-encapsulate-images): Fix a
 	doc-string that both the values `off' and nil specifies not to
 	encapsulate images.
