@@ -2838,7 +2838,6 @@ to find out how to use this."
 	(while (setq file (message-fetch-field "fcc"))
 	  (push file list)
 	  (message-remove-header "fcc" nil t)))
-      (run-hooks 'message-header-hook 'message-before-do-fcc-hook)
       (goto-char (point-min))
       (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
       (replace-match "" t t)
