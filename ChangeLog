@@ -1,3 +1,108 @@
+1999-03-31  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* Nana-gnus: Version 6.12.11 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.11.
+
+	* Sync up with gnus-6_10.
+
+*1999-03-30  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/nnheader.el (nnheader-skip-field): New macro.
+	(nnheader-nov-field): Use it.
+	Merged from pgnus 0.80.
+
+*1999-03-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-munge-message-separator): If a retrieved
+	message has a illegal date field, use `(current-time)' instead.
+
+*1999-03-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-send): Kill `message-encoding-buffer'
+	after sending.
+	(message-maybe-encode): Inherit the buffer local variable
+	`mime-edit-pgp-processing' and call `mime-edit-pgp-enclose-buffer'.
+
+*1999-02-26 20:35:57  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* pop3.el (pop3-movemail): Use write-region instead of
+	append-to-file to avoid excessive messaging.
+
+*1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up the
+	buffer local variable `default-mime-charset' of
+	`gnus-article-buffer' before `mime-display-message' is called.
+
+	* lisp/gnus-i18n.el (gnus-newsgroup-default-charset-alist): Be also
+	matched with the group name which has a method name and/or a
+	foreign server name.
+	(gnus-set-summary-default-charset): Cancel the last change.
+
+*1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Strip
+	method and foreign server name from the newsgroup name.
+
+*1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Fix.
+
+*1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-popup-menu): Modify so that
+	the title of a popup menu is displayed under Emacs 19.34.
+	(gnus-offline-define-menu-and-key): Rewrite the function to change
+	the behavior of "Get new news" button, under XEmacs.
+
+*1999-03-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-yank-original): Keep the existing
+	references.
+
+*1999-03-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-ofsetup.el: Modify for Semi-gnus 6.10.xx so that
+	`pop3-fma-password' can be saved in .newsrc.eld.
+	* lisp/pop3-fma.el: Ditto.
+
+	* README-offline.en: Update.
+	* README-offline.ja: Ditto.
+
+*1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-install-package): Don't refer to
+	`configure-package-path'. Use `early-packages', `late-packages' or
+	`last-packages' instead.
+
+	* README.semi: Note that APEL 9.13 or later is required.
+	* README.semi.ja: Likewise.
+
+	* lisp/gnus-start.el (save-buffer-as-coding-system): Abolished.
+	This function is given in APEL 9.13 by now.
+
+*1999-02-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in (add-info-suffix, remove-info-suffix): New targets.
+	(package, install-package, package-ja, install-package-ja): Use
+	them.
+	(xinfo, xinfo-ja): Only build infos.
+
+	* texi/Makefile.in (add-info-suffix): Chdir ../lisp first.
+
+	* lisp/dgnushack.el (dgnushack-add-info-suffix-maybe): Chdir
+	../texi first.
+	(dgnushack-install-package): Don't refer to `package-path'; error
+	if the package path does not found.
+	(TopLevel): Don't define `gnus-revision-number',
+	`gnus-version-number' and `package-path'.
+
+1999-03-29  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-simplify-buffer-fuzzy): Add regexp for
+	MIME en/decoding.
+
 1999-03-24  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Nana-gnus: Version 6.12.10 released.
@@ -145,8 +250,6 @@
 * 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-make-package): Fix typo.
-
-* 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* Makefile.in (install-package-ja, package-ja, install-package,
 	package): New targets.
@@ -385,10 +488,7 @@
 	parentheses.
 	(gnus-offline-define-menu-on-agent): Ditto.
 
-* 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.10.3.
-	(gnus-version): Modify for SEMI 1.13.
+1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `char-after' instead
 	of `following-char'.
