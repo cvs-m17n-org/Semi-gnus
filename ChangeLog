@@ -1,5 +1,14 @@
 2002-09-26  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Don't refer group
+	parameter here.
+	(gnus-bbdb/article-prepare-hook): New function.
+	(gnus-bbdb-insinuate): Add hook `gnus-bbdb/article-prepare-hook'
+	to `gnus-article-prepare-hook' instead of
+	`gnus-bbdb/update-record'.
+
+2002-09-26  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* lisp/gnus-cus.el (gnus-user-group-parameters): New variable.
 	(gnus-group-customize): Add `gnus-user-group-parameters' to
 	customize list.
