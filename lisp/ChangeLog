@@ -68,7 +68,7 @@
 
 2002-07-31  Danny Siu  <dsiu@adobe.com>
 
-	* nnimap.el (nnimap-split-articles): do not call nnmail-fetch-field 
+	* nnimap.el (nnimap-split-articles): do not call nnmail-fetch-field
 	when splitting malformed messages without message-id
 
 2002-07-28  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
@@ -93,7 +93,7 @@
 
 	* sieve-manage.el (sieve-manage-deletescript): New function.
 
-	* sieve.el (sieve-manage-mode-map): Fix down-mouse-2 and down-mouse-3.  
+	* sieve.el (sieve-manage-mode-map): Fix down-mouse-2 and down-mouse-3.
 	(sieve-manage-mode): Fix menubar.
 	(sieve-activate): Change some messages.
 	(sieve-deactivate-all): New function.
