@@ -296,7 +296,7 @@ If t, use `message-user-organization-file'."
   :type 'string)
 
 (defcustom message-forward-end-separator
-  ""
+  (concat (mime-make-tag "text" "plain") "\n")
   "*Delimiter inserted after forwarded messages."
   :group 'message-forwarding
   :type 'string)
