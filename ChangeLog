@@ -1,8 +1,8 @@
 2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/nnshimbun.el (nnshimbun-find-parameter): Treat the value
-	nil as `off' for the group parameters `prefetch-articles',
-	`encapsulate-images' and the related variables.
+	* lisp/nnshimbun.el (nnshimbun-encapsulate-images): Fix a
+	doc-string that both the values `off' and nil specifies not to
+	encapsulate images.
 	(nnshimbun-encapsulate-images): Fix a doc-string that both the
 	values `off' and nil specifies not to encapsulate images.
 	(nnshimbun-pre-fetch-article): Default to `off'.
