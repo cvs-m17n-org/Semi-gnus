@@ -3096,7 +3096,7 @@ Headers already prepared in the buffer are not modified."
 	    (insert "Original-")
 	    (beginning-of-line))
 	  (when (or (message-news-p)
- 		    (string-match "^[^@]+@.+\\..+" secure-sender))
+		    (string-match "@.+\\.." secure-sender))
 	    (insert "Sender: " secure-sender "\n")))))))
 
 (defun message-insert-courtesy-copy ()

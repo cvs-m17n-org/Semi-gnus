@@ -8954,13 +8954,12 @@ save those articles instead."
   "mime-partial"
   "Internal method to combine message/partial messages automatically.")
 
-(ctree-set-calist-strictly
- 'mime-acting-condition
- '((type . message)(subtype . partial)
-   (method . mime-method-to-combine-message/partial-pieces)
-   (major-mode . gnus-original-article-mode)
-   (summary-buffer-exp . gnus-summary-buffer)
-   ))
+(mime-add-condition
+ 'action '((type . message)(subtype . partial)
+	   (method . mime-method-to-combine-message/partial-pieces)
+	   (major-mode . gnus-original-article-mode)
+	   (summary-buffer-exp . gnus-summary-buffer)
+	   ))
 
 (set-alist 'mime-view-partial-message-method-alist
 	   'gnus-original-article-mode
