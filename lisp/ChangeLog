@@ -1,21 +1,3 @@
-1997-09-29  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
-
-	* message.el (message-send-news-function): Use
- 	`message-send-news-with-gnus' in default.
-	(message-send-via-news): Use `message-send-news' instead of
- 	`message-send-news-function'.
-	(message-send-mail): Don't avoid text properties; run
- 	`message-encode-mail-hook'.
-	(message-send-news): Don't avoid text properties; run
- 	`message-encode-news-hook'; use `message-send-news-function'.
-	(message-send-news-with-gnus): New function.
-	(message-cancel-news): Use `message-send-news' instead of
- 	`message-send-news-function'.
-
-Sat Sep 13 21:21:38 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
-
-	* gnus.el: Quassia Gnus v0.1 is released.
-
 Sat Oct  4 00:53:55 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Quassia Gnus v0.12 is released.
@@ -110,6 +92,20 @@ Sat Sep 27 05:36:11 1997  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 	* gnus-agent.el (gnus-agent-with-fetch): Moved.
 
 	* gnus-sum.el (gnus-nov-read-integer): Really skip to next field.
+
+1997-09-29  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
+
+	* message.el (message-send-news-function): Use
+ 	`message-send-news-with-gnus' in default.
+	(message-send-via-news): Use `message-send-news' instead of
+ 	`message-send-news-function'.
+	(message-send-mail): Don't avoid text properties; run
+ 	`message-encode-mail-hook'.
+	(message-send-news): Don't avoid text properties; run
+ 	`message-encode-news-hook'; use `message-send-news-function'.
+	(message-send-news-with-gnus): New function.
+	(message-cancel-news): Use `message-send-news' instead of
+ 	`message-send-news-function'.
 
 Sat Sep 27 04:32:45 1997  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
