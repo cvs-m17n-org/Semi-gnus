@@ -1,3 +1,8 @@
+1998-10-10  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Fix typo in doc
+	string.
+
 1998-10-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* lisp/nnagent.el (nnagent-open-server): Small bug fix.
