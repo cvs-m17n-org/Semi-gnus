@@ -511,7 +511,7 @@ parameter.  It should return nil, `warn' or `delete'."
 	(let ((auto-mode-alist (nnheader-auto-mode-alist))
 	      (pathname-coding-system nnmail-file-coding-system))
 	  (insert-file-contents-as-coding-system
-	   file nnmail-file-coding-system)
+	   nnmail-file-coding-system file)
 	  t)
       (file-error nil))))
 
@@ -1681,7 +1681,7 @@ If ARGS, PROMPT is used as an argument to `format'."
   "Do a `write-region', and then set the file modes."
   (let ((pathname-coding-system 'binary))
     (write-region-as-coding-system
-     start end filename nnmail-file-coding-system append visit lockname)
+     nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
 
 ;;;

@@ -101,7 +101,7 @@ This mode is an extended emacs-lisp mode.
   (unless (file-exists-p (file-name-directory (buffer-file-name)))
     (make-directory (file-name-directory (buffer-file-name)) t))
   (write-region-as-coding-system
-   (point-min) (point-max) (buffer-file-name) score-mode-coding-system)
+   score-mode-coding-system (point-min) (point-max) (buffer-file-name))
   (set-buffer-modified-p nil)
   (bury-buffer (current-buffer))
   (let ((buf (current-buffer)))

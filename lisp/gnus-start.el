@@ -1924,7 +1924,7 @@ If FORCE is non-nil, the .newsrc file is read."
       (condition-case nil
 	  (with-temp-buffer
 	    (insert-file-contents-as-coding-system
-	     ding-file gnus-startup-file-coding-system)
+	     gnus-startup-file-coding-system ding-file)
 	    (eval-region (point-min) (point-max)))
 	(error
 	 (ding)
@@ -2287,8 +2287,8 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
 	  (write-region-as-coding-system
-	   (point-min) (point-max) (buffer-file-name)
-	   gnus-startup-file-coding-system)
+	   gnus-startup-file-coding-system
+	   (point-min) (point-max) (buffer-file-name))
 	  (set-buffer-modified-p nil)
 	  (kill-buffer (current-buffer))
 	  (gnus-message
