@@ -1,3 +1,77 @@
+2000-08-13 18:53:08  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-topic.el (gnus-topic-select-group): Touch the dribble
+	buffer.
+	(gnus-topic-hide-topic): Take a PERMANENT parameter.
+	(gnus-topic-show-topic): Ditto.
+
+	* gnus-dup.el (gnus-dup-suppress-articles): Do auto-expiry.
+
+2000-08-12 21:48:00  John H. Palmieri  <palmieri@math.washington.edu>
+
+	* mail-source.el (mail-source-incoming-file-prefix): New
+	variable. 
+
+2000-08-12 20:29:53  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-start.el (gnus-check-first-time-used): Clean up a bit.
+
+	* mailcap.el (mailcap-maybe-eval): Be even more warning.
+
+2000-08-11  Florian Weimer  <fw@deneb.enyo.de>
+
+	* message.el (message-syntax-checks): New check quotin-style: 
+	Text must be written below quoted text.
+	(message-check-news-body-syntax): Check it.
+
+2000-08-11  Simon Josefsson  <simon@josefsson.org>
+
+	* imap.el (imap-authenticator-alist): Fix typo.
+	(imap-gssapi-open): Copy krb4 fixes for modern imtest's, thanks to
+	Jonas Oberg for debugging.
+
+2000-08-11  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus-async.el (gnus-asynchronous): Disable by default.
+
+2000-08-10 20:22:09  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-view.el (mm-inline-text): Bind fill-column.
+
+	* nnvirtual.el (nnvirtual-request-expire-articles): Return the
+	list of unexpired articles.
+
+	* gnus-group.el (gnus-group-expire-articles-1): Return the list of
+	un-expired articles. 
+
+	* gnus-sum.el (gnus-summary-reparent-thread): Narrow to the
+	headers. 
+
+	* gnus-topic.el (gnus-topic-kill-group): Move up one line so that
+	we update the right topic.. 
+
+	* mm-decode.el (mm-display-external): Put point at start. 
+
+2000-08-10  Kai Groﬂjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* nnmail.el (nnmail-expiry-target): More explicit documentation.
+
+	* gnus-cus.el (gnus-group-parameters): Add parameter `expiry-wait'.
+
+2000-08-09  Simon Josefsson <simon@josefsson.org>
+
+	* imap.el (imap-parse-body):
+	(imap-parse-string-list): Add bug workarounds for Stalker
+	Communigate Pro 3.0 server.
+	(imap-body-lines): Remove bogus comment.
+
+	* imap.el (imap-range-to-message-set): Move from nnimap.el.
+
+	* nnimap.el (nnimap-retrieve-which-headers):
+	(nnimap-retrieve-headers-from-server):
+	(nnimap-request-set-mark):
+	(nnimap-request-expire-articles): Use `i-r-t-m-set' instead.
+
 2000-08-08 00:53:41  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-dont-reply-to-names):

@@ -2821,7 +2821,9 @@ or nil if no action could be taken."
 	    (gnus-request-expire-articles
 	     (gnus-uncompress-sequence (cdr expirable)) group))))
 	(gnus-close-group group))
-      (gnus-message 6 "Expiring articles in %s...done" group))))
+      (gnus-message 6 "Expiring articles in %s...done" group)
+      ;; Return the list of un-expired articles.
+      (cdr expirable))))
 
 (defun gnus-group-expire-all-groups ()
   "Expire all expirable articles in all newsgroups."
@@ -3638,7 +3640,7 @@ and the second element is the address."
 
 (defun gnus-add-marked-articles (group type articles &optional info force)
   ;; Add ARTICLES of TYPE to the info of GROUP.
-  ;; If INFO is non-nil, use that info.         If FORCE is non-nil, don't
+  ;; If INFO is non-nil, use that info.  If FORCE is non-nil, don't
   ;; add, but replace marked articles of TYPE with ARTICLES.
   (let ((info (or info (gnus-get-info group)))
 	marked m)

@@ -5,9 +5,10 @@
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@c @direntry
-@c * Gnus-ja: (gnus-ja).   The news reader gnus (日本語版).
-@c @end direntry
+@dircategory Editors
+@direntry
+* Gnus-ja: (gnus-ja).         The newsreader gnus (日本語版).
+@end direntry
 @iftex
 @finalout
 @end iftex
@@ -3269,6 +3270,18 @@ Gnus
 現在のグループを、どこか他のトピックにコピーします
 (@code{gnus-topic-copy-group})。このコマンドはプロセスマーク・プ
 レフィックスルールに従います (@pxref{Process/Prefix})。
+
+@item T h
+@kindex T h (Topic)
+@findex gnus-topic-hide-topic
+現在のトピックを隠します。もしプレフィックスが与えられたなら、そのトピッ
+クを永久に隠します。
+
+@item T s
+@kindex T s (Topic)
+@findex gnus-topic-show-topic
+現在のトピックを表示します。もしプレフィックスが与えられたなら、そのトピッ
+クを永久に表示します。
 
 @item T D
 @kindex T D (Topic)
@@ -11426,12 +11439,20 @@ Gnus は記事がどのグループに属しているかに基づいて、それがどのくらい生存
 @vindex nnmail-expiry-target
 記事の期限切れ消去の普通の動作はそれらを消去することです。しかし、場合に
 よってはそれらを消去するよりも別のグループに移動した方が有意義かもしれま
-せん。@code{nnmail-expiry-target} (とグループパラメータ
-@code{expiry-target}) はこれを制御します。ディフォルトの値は
+せん。変数 @code{nnmail-expiry-target} (とグループパラメータ
+@code{expiry-target}) はこれを制御します。この変数の値はすべてのグループ
+に対するディフォルトになりますが、特定のグループごとにグループパラメータ
+を使って指定すれば上書きすることができます。ディフォルトの値は
 @code{delete} ですが、文字列 (記事を移動する先のグループ名) または移動先
 のグループ名か @code{delete} を返す関数 (記事に範囲を狭めたバッファで、
 その記事が存在しているグループ名が引数として与えられます) にすることがで
 きます。
+
+グループ名を指定する場合の例:
+@lisp
+(setq nnmail-expiry-target "nnml:expired")
+@end lisp
+
 
 @vindex nnmail-keep-last-article
 @code{nnmail-keep-last-article} が @code{nil} でないと、gnus はメールニュー
@@ -20647,6 +20668,9 @@ Allow mail splitting on bodies when using advanced mail splitting.
 @lisp
   (body "whatever.text")
 @end lisp
+
+@item
+Be able to run `J u' from summary buffers.
 
 @item
 Solve the halting problem.

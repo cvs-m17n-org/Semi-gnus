@@ -245,7 +245,7 @@ stream.")
   "Priority of authenticators to consider when authenticating to server.")
 
 (defvar imap-authenticator-alist 
-  '((gssapi     imap-gssapi-auth-p    imap-gssapia-auth)
+  '((gssapi     imap-gssapi-auth-p    imap-gssapi-auth)
     (kerberos4  imap-kerberos4-auth-p imap-kerberos4-auth)
     (cram-md5   imap-cram-md5-p       imap-cram-md5-auth)
     (login      imap-login-p          imap-login-auth)
@@ -502,6 +502,10 @@ If ARGS, PROMPT is used as an argument to `format'."
 	    (setq imap-client-eol "\n")
 	    (while (and (memq (process-status process) '(open run))
 			(goto-char (point-min))
+                        ;; cyrus 1.6.x (13? < x <= 22) queries capabilities
+		        (or (while (looking-at "^C:")
+			      (forward-line))
+			    t)
 			;; cyrus 1.6 imtest print "S: " before server greeting
 			(or (not (looking-at "S: "))
 			    (forward-char 3)
@@ -1222,6 +1226,18 @@ returned, if ITEMS is a symbol only it's value is returned."
 	       (list list))
 	     ","))
 
+(defun imap-range-to-message-set (range)
+  (mapconcat
+   (lambda (item)
+     (if (consp item)
+         (format "%d:%d"
+                 (car item) (cdr item))
+       (format "%d" item)))
+   (if (and (listp range) (not (listp (cdr range))))
+       (list range) ;; make (1 . 2) into ((1 . 2))
+     range)
+   ","))
+
 (defun imap-fetch-asynch (uids props &optional nouidfetch buffer)
   (with-current-buffer (or buffer (current-buffer))
     (imap-send-command (format "%sFETCH %s %s" (if nouidfetch "" "UID ")
@@ -1435,7 +1451,6 @@ on failure."
   "Return number of lines in article by looking at the mime bodystructure BODY."
   (if (listp body)
       (if (stringp (car body))
-	  ;; upcase for bug in courier imap server
 	  (cond ((and (string= (upcase (car body)) "TEXT")
 		      (numberp (nth 7 body)))
 		 (nth 7 body))
@@ -2212,7 +2227,10 @@ Return nil if no complete line has arrived."
 	   (imap-forward)
 	   (while (setq str (imap-parse-string))
 	     (push str strlist)
-	     (imap-forward))
+	     ;; buggy stalker communigate pro 3.0 doesn't print SPC
+	     ;; between body-fld-param's sometimes
+	     (or (eq (char-after) ?\")
+		 (imap-forward)))
 	   (nreverse strlist)))
 	((imap-parse-nil)
 	 nil)))
@@ -2343,6 +2361,11 @@ Return nil if no complete line has arrived."
 	  (let (subbody)
 	    (while (and (eq (char-after) ?\()
 			(setq subbody (imap-parse-body)))
+	      ;; buggy stalker communigate pro 3.0 insert a SPC between
+	      ;; parts in multiparts
+	      (when (and (eq (char-after) ?\ )
+			 (eq (char-after (1+ (point))) ?\())
+		(imap-forward))
 	      (push subbody body))
 	    (imap-forward)
 	    (push (imap-parse-string) body);; media-subtype
@@ -2392,12 +2415,16 @@ Return nil if no complete line has arrived."
 		   (push (imap-parse-envelope) body);; envelope
 		   (imap-forward)
 		   (push (imap-parse-body) body);; body
-		   (imap-forward)
-		   (push (imap-parse-number) body));; body-fld-lines
-		  ((setq lines (imap-parse-number));; body-type-text:
-		   (push lines body));; body-fld-lines
+		   ;; buggy stalker communigate pro 3.0 doesn't print
+		   ;; number of lines in message/rfc822 attachment
+		   (if (eq (char-after) ?\))
+		       (push 0 body)
+		     (imap-forward)
+		     (push (imap-parse-number) body))) ;; body-fld-lines
+		  ((setq lines (imap-parse-number))    ;; body-type-text:
+		   (push lines body))                  ;; body-fld-lines
 		  (t
-		   (backward-char)))));; no match...
+		   (backward-char)))))                 ;; no match...
 
 	;; ...and then parse the third one here...
 

@@ -5,9 +5,10 @@
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@c @direntry
-@c * Message: (message).   Mail and news composition mode that goes with Gnus.
-@c @end direntry
+@dircategory Editors
+@direntry
+* Message: (message).   Mail and news composition mode that goes with Gnus.
+@end direntry
 @iftex
 @finalout
 @end iftex
@@ -579,7 +580,8 @@ RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$
 @kindex C-c C-e
 @findex message-elide-region
 $B%]%$%s%H$H%^!<%/$N4V$NJ8$r>J$-$^$9(B (@code{message-elide-region})$B!#J8>O$O(B
-$B@Z$i$l$F(B (killed) $B>JN,Id9f(B (@samp{[...]} $B$,$=$N>l=j$KA^F~$5$l$^$9!#(B
+$B@Z$i$l$F(B (killed) $BJQ?t(B @code{message-elide-ellipsis} $B$NCM$GCV$-49$($i$l(B
+$B$^$9!#%G%#%U%)%k%H$N>JN,Id9f$H$7$F;H$o$l$kCM$O(B (@samp{[...]}) $B$G$9!#(B
 
 @item C-c C-z
 @kindex C-c C-x

@@ -1,3 +1,26 @@
+2000-08-13 20:00:35  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Topic Commands): Fix typo.
+
+2000-08-13 20:20:56  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Topic Commands): Addition.
+
+2000-08-11  Kai Grossjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Expiring Mail): Extend documentation of variable
+	`nnmail-expiry-target' and of group parameter `expiry-target'.
+	Explain interaction between these.  Add Lisp example for setting
+	`nnmail-expiry-target'.
+
+2000-05-07  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi: direntry added.
+
+	* message.texi: direntry added.
+
+	* emacs-mime.texi: direntry added.
+
 2000-08-04  Andreas Oeldenberger <andreas.oeldenberger@gmx.net>
 
 	* message.texi (Forwarding): Fix.
@@ -45,6 +68,14 @@
 2000-05-15 10:16:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Mail Source Specifiers): Update maildir.
+
+2000-05-07  Pavel Janik  <Pavel.Janik@inet.cz>
+
+	* gnus.texi: direntry added.
+
+	* message.texi: direntry added.
+
+	* emacs-mime.texi: direntry added.
 
 2000-05-02  Pavel Janik  <Pavel.Janik@inet.cz>
 
