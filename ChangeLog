@@ -1,3 +1,8 @@
+1998-11-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-maybe-split-and-send-mail): Discard
+	a return from `message-send-mail-function'.
+
 1998-11-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: bug fix.
