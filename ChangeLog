@@ -2,15 +2,15 @@
 
 	* lisp/Makefile.in (install): Don't check for the file names.
 
-2000-11-04  Hermit  <hermit@koka-in.org>
+2000-11-04  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
 	command in `gnus-topic-mode-map' instead of `gnus-group-mode-map'.
 
-2000-10-25  Hermit  <hermit@tomato.saino.ne.jp>
+2000-10-25  Katsuhiro Hermit Endo  <hermit@tomato.saino.ne.jp>
 
-	* lisp/gnus-topic.el (gnus-topic-rename): Shrink the length of the
-	prompt string.
+	* lisp/gnus-topic.el (gnus-topic-rename): Use current topic as
+	initial value for read-string.
 
 2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
