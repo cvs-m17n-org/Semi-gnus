@@ -4,6 +4,12 @@
 
 	* Sync up with Pterodactyl Gnus 0.51.
 
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Force set
+	`use-miee' to t if `news-method' is equal to "nnspool".
+	(gnus-setup-for-offline): Put a question for "Agent directory"
+	only if `gnus-offline-news-fetch-method' is equal to `nnagent'.
+	(Top-Level): Defvar `use-miee' for avoiding byte-compile warning.
+
 1998-11-18  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-save-article-rmail): Use
