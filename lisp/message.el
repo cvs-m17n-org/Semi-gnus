@@ -3181,7 +3181,45 @@ used to distinguish whether the invisible text is a MIME part or not."
 	(set-window-start (selected-window) (gnus-point-at-bol))
 	(unless (yes-or-no-p
 		 "Invisible text found and made visible; continue posting? ")
-	  (error "Invisible text found and made visible"))))))
+	  (error "Invisible text found and made visible")))))
+  (message-check 'illegible-text
+    (let (found choice)
+      (message-goto-body)
+      (skip-chars-forward mm-7bit-chars)
+      (while (not (eobp))
+	(when (let ((char (char-after)))
+		(or (< (mm-char-int char) 128)
+		    (and (mm-multibyte-p)
+			 (memq (char-charset char)
+			       '(eight-bit-control eight-bit-graphic
+						   control-1)))))
+	  (add-text-properties (point) (1+ (point)) '(highlight t))
+	  (setq found t))
+	(forward-char)
+	(skip-chars-forward mm-7bit-chars))
+      (when found
+	(setq choice
+	      (gnus-multiple-choice
+	       "Illegible text found. Continue posting? "
+	       '((?d "Remove and continue posting")
+		 (?r "Replace with dots and continue posting")
+		 (?e "Continue editing"))))
+	(if (eq choice ?e)
+	  (error "Illegible text found"))
+	(message-goto-body)
+	(skip-chars-forward mm-7bit-chars)
+	(while (not (eobp))
+	  (when (let ((char (char-after)))
+		  (or (< (mm-char-int char) 128)
+		      (and (mm-multibyte-p)
+			   (memq (char-charset char)
+				 '(eight-bit-control eight-bit-graphic
+						     control-1)))))
+	    (delete-char 1)
+	    (if (eq choice ?r)
+		(insert ".")))
+	  (forward-char)
+	  (skip-chars-forward mm-7bit-chars))))))
 
 (defun message-add-action (action &rest types)
   "Add ACTION to be performed when doing an exit of type TYPES."
@@ -5244,11 +5282,11 @@ responses here are directed to other addresses.")))
       ;; Perhaps "Mail-Copies-To: never" removed the only address?
       (if (string-equal recipients "")
 	  (setq recipients author))
-      ;; Convert string to a list of (("foo@bar" . "Name <foo@bar>") ...).
+      ;; Convert string to a list of (("foo@bar" . "Name <Foo@BAR>") ...).
       (setq recipients
 	    (mapcar
 	     (lambda (addr)
-	       (cons (mail-strip-quoted-names addr) addr))
+	       (cons (downcase (mail-strip-quoted-names addr)) addr))
 	     (message-tokenize-header recipients)))
       ;; Remove first duplicates.  (Why not all duplicates?  Is this a bug?)
       (let ((s recipients))

@@ -1,3 +1,41 @@
+2002-03-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-multiple-choice): Use message. XEmacs only
+	takes one argument in read-char.
+
+	* message.el (message-fix-before-sending): Forward a char.
+	Check mmu-multibyte-p, add control-1.
+
+2002-03-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-start.el (gnus-read-init-file): Ditto.
+
+	* gnus-agent.el (gnus-agent-fetch-session): Ditto.
+
+	* dgnushack.el (dgnushack-make-load): Ditto.
+
+	* mail-source.el (mail-source-fetch): Extract the right error
+	code.
+
+	* message.el (message-fix-before-sending): Check illegible text.
+
+	* gnus-util.el (gnus-multiple-choice): New function.
+
+	* gnus-kill.el (gnus-score-insert-help): Removed, because it is
+	also defined in gnus-score.el.
+
+2002-03-01  Paul Jarc  <prj@po.cwru.edu>
+
+	* message.el (message-get-reply-headers): downcase email addresses
+	for comaparisons for duplicate removal.
+
+2002-03-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-view-pkcs7-verify): New function. A bogus
+	implementation of PKCS#7, which just allows users read the
+	message.
+	(mm-view-pkcs7): Use it.
+
 2002-02-27  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.el (large-newsgroup-initial): New parameter.
@@ -22,7 +60,7 @@
 
 	* html2text.el (html2text-clean-anchor): If there is no HREF,
 	insert nothing.
-	
+
 	* mml.el (mml-generate-mime-1): Add cdr.
 	From: andre@slamdunknetworks.com
 
@@ -40,7 +78,7 @@
 	* gnus-sum.el: Add gnus-article-outlook-deuglify-article.
 
 	* deuglify.el: Change copy right. Add autoload. Add coding-system.
-	
+
 	* deuglify.el: New file. The original file name is
 	gnus-outlook-deuglify.el from Raymond Scholz <rscholz@zonix.de>.
 

@@ -104,7 +104,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
-;; mm- stuff.
+;; mm-util stuff.
 (unless (featurep 'mm-util)
   ;; Should keep track of `mm-image-load-path' in mm-util.el.
   (defun nnheader-image-load-path (&optional package)
@@ -226,7 +226,20 @@ Equivalent to `progn' in XEmacs"
 	 (charsets-to-mime-charset (list item))))
      (t
       'iso-8859-1))))
-  (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset))
+  (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
+
+  (defalias 'mm-char-int 'char-int)
+
+  ;; Should keep track of the same alias in mm-util.el.
+  (defalias 'mm-multibyte-p
+    (static-cond ((and (featurep 'xemacs) (featurep 'mule))
+		  (lambda nil t))
+		 ((featurep 'xemacs)
+		  (lambda nil nil))
+		 ((boundp 'MULE)
+		  (lambda nil mc-flag))
+		 (t
+		  (lambda nil enable-multibyte-characters)))))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
@@ -406,6 +419,12 @@ given, the return value will not contain the last newline."
       value))
 
   (defalias 'mail-header-field-value 'std11-field-value))
+
+;; Should keep track of the same variable in mm-bodies.el.
+;; Don't use `defvar-maybe', it won't create a byte-code!!!
+;; 8bit treatment gets any char except: 0x32 - 0x7f, CR, LF, TAB, BEL,
+;; BS, vertical TAB, form feed, and ^_
+(defvar mm-7bit-chars "\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f")
 
 ;;; Header access macros.
 

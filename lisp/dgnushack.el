@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -465,8 +465,11 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error
-			 (message "No w3: %s %s retrying..." code
-				  (locate-library "w3-parse"))
+			 (message "No w3: %s%s, retrying..."
+				  (error-message-string code)
+				  (if (setq code (locate-library "w3-parse"))
+				      (concat " (" code ")")
+				    ""))
 			 nil))
 		      ;; Maybe mis-configured Makefile is used (e.g.
 		      ;; configured for FSFmacs but XEmacs is running).
@@ -489,17 +492,29 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	  (condition-case code
 	      (progn (require 'mh-e) nil)
 	    (error
-	     (message "No mh-e: %s %s (ignored)" code (locate-library "mh-e"))
+	     (message "No mh-e: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "mh-e"))
+			  (concat " (" code ")")
+			""))
 	     '("gnus-mh.el")))
 	  (condition-case code
 	      (progn (require 'xml) nil)
 	    (error
-	     (message "No xml: %s %s (ignored)" code (locate-library "xml"))
+	     (message "No xml: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "xml"))
+			  (concat " (" code ")")
+			""))
 	     '("nnrss.el")))
 	  (condition-case code
 	      (progn (require 'bbdb) nil)
 	    (error
-	     (message "No bbdb: %s %s (ignored)" code (locate-library "bbdb"))
+	     (message "No bbdb: %s%s (ignored)"
+		      (error-message-string code)
+		      (if (setq code (locate-library "bbdb"))
+			  (concat " (" code ")")
+			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
 	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
