@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.036"
+(defconst gnus-version-number "6.10.037"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.50"
+(defconst gnus-original-version-number "0.51"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -949,6 +949,8 @@ that case, just return a fully prefixed name of the group --
 \"nnml+private:mail.misc\", for instance."
   :group 'gnus-message
   :type '(choice (const :tag "none" nil)
+		 function
+		 sexp
 		 string))
 
 (defcustom gnus-secondary-servers nil
@@ -1676,7 +1678,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("nnvirtual" nnvirtual-catchup-group nnvirtual-convert-headers)
      ("rmailout" rmail-output rmail-output-to-rmail-file)
      ("rmail" rmail-insert-rmail-file-header rmail-count-new-messages
-      rmail-show-message)
+      rmail-show-message rmail-summary-exists
+      rmail-select-summary rmail-update-summary)
      ("gnus-audio" :interactive t gnus-audio-play)
      ("gnus-xmas" gnus-xmas-splash)
      ("gnus-soup" :interactive t

@@ -78,6 +78,9 @@ it's not cached."
 (defvar gnus-cache-overview-coding-system 'raw-text
   "Coding system used on Gnus cache files.")
 
+(defvar gnus-cache-coding-system 'binary
+  "Coding system used on Gnus cache files.")
+
 
 
 ;;; Internal variables.
@@ -259,7 +262,8 @@ it's not cached."
     (when (file-exists-p file)
       (erase-buffer)
       (gnus-kill-all-overlays)
-      (nnheader-insert-file-contents file)
+      (let ((nnheader-file-coding-system gnus-cache-coding-system))
+	(nnheader-insert-file-contents file))
       t)))
 
 (defun gnus-cache-possibly-alter-active (group active)
@@ -648,7 +652,7 @@ If LOW, update the lower bound instead."
     ;; Go through all the other files.
     (while alphs
       (when (and (file-directory-p (car alphs))
-		 (not (string-match "^\\.\\.?$"
+		 (not (string-match "^\\."
 				    (file-name-nondirectory (car alphs)))))
 	;; We descend directories.
 	(gnus-cache-generate-active (car alphs)))
