@@ -24201,63 +24201,61 @@ MS $B%&%#%s%I%&%:$G(B Gnus $B$r%$%s%9%H!<%k$9$k$K$O(B @file{make.bat} $B$r;
 $B%k$7$F$+$i(B Gnus $B$r%$%s%9%H!<%k$7$?$$$H$-$O!"(B@file{make.bat} $B$NBhFs0z?t(B
 $B$K(B @code{/copy} $B$rM?$($F2<$5$$!#(B
 
-@c TRANSLATEME
-@file{make.bat} has been rewritten from scratch, it now features
-automatic recognition of XEmacs and GNU Emacs, generates
-@file{gnus-load.el}, checks if errors occur while compilation and
-generation of info files and reports them at the end of the build
-process. It now uses @code{makeinfo} if it is available and falls
-back to @file{infohack.el} otherwise.  @file{make.bat} should now
-install all files which are necessary to run Gnus and be generally a
-complete replacement for the @code{configure; make; make install}
-cycle used under Unix systems.
+@file{make.bat} $B$O%<%m$+$i=q$-D>$5$l$^$7$?!#(BXEmacs $B$H(B GNU Emacs $B$r<+F0G'(B
+$B<1$7!"(B@file{gnus-load.el} $B$r@8@.$7!"%3%s%Q%$%kCf$H(B info $B%U%!%$%k$N@8@.Cf(B
+$B$K%(%i!<$,5/$-$?$i9=C[=hM}$N:G8e$KJs9p$7$^$9!#(B@code{makeinfo} $B$,MxMQ2DG=(B
+$B$G$"$l$P$=$l$r;H$$!"$5$b$J$1$l$P(B @file{infohack.el} $B$KMj$j$^$9!#:#(B
+$B$d(B @file{make.bat} $B$O(B Gnus $B$rF0:n$5$;$k$?$a$KI,MW$J$9$Y$F$N%U%!%$%k$r%$(B
+$B%s%9%H!<%k$9$k$O$:$G!"BgBN$K$*$$$F(B Unix $B%7%9%F%`$K$*$1(B
+$B$k(B @code{configure; make; make install} $B%5%$%/%k$N40A4$JCV$-49$($K$J$j$^(B
+$B$7$?!#(B
 
-The new @file{make.bat} makes @file{make-x.bat} superfluous, so it has
-been removed.
+$B?7$7$$(B @file{make.bat} $B$O(B @file{make-x.bat} $B$rITMW$K$7$?$N$G!"$=$l$O:o=|(B
+$B$5$l$^$7$?!#(B
 
 @item
-Support for non-@acronym{ASCII} domain names
+$BHs(B-@acronym{ASCII} $B%I%a%$%sL>$N%5%]!<%H(B
 
-Message supports non-@acronym{ASCII} domain names in From:, To: and
-Cc: and will query you whether to perform encoding when you try to
-send a message.  The variable @code{message-use-idna} controls this.
-Gnus will also decode non-@acronym{ASCII} domain names in From:, To:
-and Cc: when you view a message.  The variable @code{gnus-use-idna}
-controls this.
+Message $B$O(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%I%a%$%sL>$r%5(B
+$B%]!<%H$7!"%a%C%;!<%8$NAw?.$r;n$_$k$H$-$K%(%s%3!<%I$9$k$+$I$&$+$r?R$M$^$9!#(B
+@code{message-use-idna} $BJQ?t$G$3$l$r@)8f$7$^$9!#(BGnus $B$b$^$?!"%a%C%;!<%8(B
+$B$r8+$k$H$-$K(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%I%a%$%sL>$r(B
+$B%G%3!<%I$7$^$9!#$3$l$r@)8f$9$k$N$O(B @code{gnus-use-idna} $BJQ?t$G$9!#(B
 
 @item
-Better handling of Microsoft citation styles
+$B%^%$%/%m%=%U%H0zMQMM<0$N$h$jNI$$<h$j07$$(B
 
-Gnus now tries to recognize the mangled header block that some Microsoft
-mailers use to indicate that the rest of the message is a citation, even
-though it is not quoted in any way.  The variable
-@code{gnus-cite-unsightly-citation-regexp} matches the start of these
-citations.
+$B$$$/$D$+$N%^%$%/%m%=%U%H$N%a%$%i!<$,!"%a%C%;!<%8$N;D$j$NItJ,$,0zMQ$G$"$k(B
+$B$3$H$r<($9$?$a$K;H$&BfL5$7$K$5$l$?%X%C%@!<%V%m%C%/$r!"$?$H$($=$l$,0zMQId(B
+$B$G0O$^$l$F$$$J$/$F$b!"(BGnus $B$OG'<1$7$h$&$H$7$^$9!#JQ(B
+$B?t(B @code{gnus-cite-unsightly-citation-regexp} $B$O!"$=$l$i$N0zMQ$N@hF,$K9g(B
+$BCW$7$^$9!#(B
 
 @item
 @code{gnus-article-skip-boring}
 
-If you set @code{gnus-article-skip-boring} to @code{t}, then Gnus will
-not scroll down to show you a page that contains only boring text,
-which by default means cited text and signature.  You can customize
-what is skippable using @code{gnus-article-boring-faces}.
+@code{gnus-article-skip-boring} $B$r(B @code{t} $B$K@_Dj$9$k$H!"(BGnus $B$O$&$s$6(B
+$B$j$9$kJ8$7$+4^$s$G$$$J$$%Z!<%8$r8+$;$k$?$a$K!"2<J}$K%9%/%m!<%k$7$^$;$s!#(B
+@code{gnus-article-boring-faces} $B$r;H$C$F!"2?$rFI$_Ht$P$7$F$7$^$C$F$bNI(B
+$B$$$+$r%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9!#(B
 
-This feature is especially useful if you read many articles that
-consist of a little new content at the top with a long, untrimmed
-message cited below.
-
-@item
-The format spec @code{%C} for positioning point has changed to @code{%*}.
+$BD9$/$F4"$j9~$^$l$F$$$J$$0zMQ$,!"$F$C$Z$s$K>/$7$@$1$"$k?75,$JFbMF$KB3$$$F(B
+$B$$$k$?$/$5$s$N5-;v$rFI$`>l9g$K!"$3$l$OFC$KLr$KN)$A$^$9!#(B
 
 @item
-The new variable @code{gnus-parameters} can be used to set group parameters.
+$B%]%$%s%H$N0LCV7h$a$N$?$a$N%U%)!<%^%C%H$N;EMM(B (format spec) $B$G$"(B
+$B$k(B @code{%C} $B$O!"(B@code{%*} $B$KJQ99$5$l$^$7$?!#(B
 
-Earlier this was done only via @kbd{G p} (or @kbd{G c}), which stored
-the parameters in @file{~/.newsrc.eld}, but via this variable you can
-enjoy the powers of customize, and simplified backups since you set the
-variable in @file{~/.emacs} instead of @file{~/.newsrc.eld}.  The
-variable maps regular expressions matching group names to group
-parameters, a'la:
+@item
+$B?7$7$$JQ?t(B @code{gnus-parameters} $B$,!"%0%k!<%W%Q%i%a!<%?$r@_Dj$9$k$?$a$K(B
+$B;H$&$3$H$,$G$-$^$9!#(B
+
+$B$3$l$O=i4|$K$O!"%Q%i%a!<%?$r(B @file{~/.newsrc.eld} $B$K3JG<$9$k(B @kbd{G p}
+($B$^$?$O(B @kbd{G c}) $B$G$7$+9T$J$&$3$H$,$G$-$^$;$s$G$7$?$,!"$3$NJQ?t$K$h$C(B
+$B$F%+%9%?%^%$%:$N0RNO$r4.G=$9$k$3$H$,$G$-$^$9!#$^$?!"$=$NJQ?t(B
+$B$O(B @file{~/.newsrc.eld} $B$G$O$J$/$F(B @file{~/.emacs} $B$G@_Dj$9$k$N$G!"%P%C(B
+$B%/%"%C%W$,4JC1$K$J$j$^$9!#$=$NJQ?t$O!"%0%k!<%WL>$K9gCW$9$k@55,I=8=$r!"0J(B
+$B2<$N$h$&$JN.57$G%0%k!<%W%Q%i%a!<%?$K3d$jEv$F$^$9(B:
 @lisp
 (setq gnus-parameters
       '(("mail\\..*"
@@ -24268,11 +24266,13 @@ parameters, a'la:
 @end lisp
 
 @item
-Smileys (@samp{:-)}, @samp{;-)} etc) are now iconized for Emacs too.
+$B%9%^%$%j!<(B (@samp{:-)}, @samp{;-)} $B$J$I(B) $B$,(B Emacs $B$G$b%"%$%3%s2=$5$l$k$h(B
+$B$&$K$J$j$^$7$?!#(B
 
-Put @code{(setq gnus-treat-display-smileys nil)} in @file{~/.emacs} to
-disable it.
+$B$3$l$rF/$+$J$$$h$&$K$9$k$K$O!"(B@code{(setq gnus-treat-display-smileys
+nil)} $B$r(B @file{~/.emacs} $B$KCV$$$F2<$5$$!#(B
 
+@c TRANSLATEME
 @item
 Gnus no longer generate the Sender: header automatically.
 
