@@ -1,3 +1,22 @@
+2000-07-15   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* README-gnus-bbdb.{ja|en}: Add example setting about
+	gnus-bbdb-insinuate-message.
+	(bbdb-auto-notes-hook): Don't use pop.
+
+	* lisp/gnus-bbdb.el: Check defvaralias when compiling.
+
+	* lisp/gnus-art.el (gnus-article-setup-buffer): Set
+	gnus-original-article-buffer as unibyte.
+	(gnus-request-article-this-buffer): Ditto.
+
+	* lisp/nnimap.el (nnimap-callback): Don't use nnimap-demule.
+	(nnimap-request-article-part): Ditto.
+
+	* lisp/imap.el (imap-open): Set process buffer as unibyte.
+
 2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.
