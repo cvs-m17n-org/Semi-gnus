@@ -1,3 +1,10 @@
+2002-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
+
+	* lisp/nnheader.el (nnheader-auto-save-coding-system): Default to
+	`iso-2022-7bit'.
+
 2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (nnshimbun-request-article-1): Install trick
@@ -89,7 +96,7 @@
 	gnus-configure-posting-styles.
 	(gnus-summary-execute-command-with-posting-style): Fix prompt string.
 
-	* lisp/gnus-cus.el (gnus-group-parameters): Allow (import "...") 
+	* lisp/gnus-cus.el (gnus-group-parameters): Allow (import "...")
 	in posting-styles.
 
 2002-09-08  Daiki Ueno  <ueno@unixuser.org>
@@ -429,7 +436,7 @@
 	(gnus-summary-inherit-default-charset): New function.
 	(gnus-parse-headers-hook): Use it.
 	(gnus-summary-setup-default-charset): Set default-mime-charset here.
-	
+
 	* lisp/gnus-delay.el (gnus-delay-article): Undo the last change.
 
 	* lisp/gnus-draft.el: Revert to the original implementation.

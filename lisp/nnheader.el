@@ -108,17 +108,12 @@ This variable is a substitute for `mm-text-coding-system'.")
   "Text coding system for write.
 This variable is a substitute for `mm-text-coding-system-for-write'.")
 
-(defvar nnheader-auto-save-coding-system
-  (cond
-   ((boundp 'MULE) '*internal*)
-   ((not (fboundp 'find-coding-system)) nil)
-   ((find-coding-system 'emacs-mule)
-    (if (memq system-type '(windows-nt ms-dos ms-windows))
-	'emacs-mule-dos 'emacs-mule))
-   ((find-coding-system 'escape-quoted) 'escape-quoted)
-   ((find-coding-system 'no-conversion) 'no-conversion)
-   (t nil))
-  "Coding system of auto save file.")
+(defvar nnheader-auto-save-coding-system (static-if (boundp 'MULE)
+					     '*iso-2022-jp*
+					   'iso-2022-7bit)
+  "Coding system of auto save file.
+Note that the default value for this variable was emacs-mule for Emacs
+or escape-quoted for XEmacs-MULE in the past.")
 
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
