@@ -497,164 +497,68 @@ last.")
 
 (defvar nnshimbun-keep-unparsable-dated-articles t
   "*If non-nil, nnshimbun will never delete articles whose NOV date is
-unparsable.  Even so, you can expire such articles using the command
-`nnshimbun-expire-nov-databases' with a prefix argument.")
+unparsable.")
 
 (deffoo nnshimbun-request-expire-articles (articles group
 						    &optional server force)
-  "Do expire for the specified ARTICLES in the nnshimbun GROUP.  Notice
-that nnshimbun does not actually delete any articles, it just delete
-the corresponding entries in the NOV database locally.  If ARTICLES is
-`all', the expiring is performed on all the NOV lines.  It does expire
-only when the current SERVER is specified and the NOV is open.
-However, the optional FORCE if it is non-nil (it is supposed to be
-specified by the command `nnshimbun-expire-nov-databases'), it does
-expire for the SERVER:GROUP even if whose NOV is not open."
-  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist)))
-	(nnmail-expiry-wait-function nnmail-expiry-wait-function)
-	(nnmail-expiry-wait nnmail-expiry-wait)
-	(progress-msg (format "Expiring NOV database for nnshimbun+%s:%s "
-			      server group))
-	(pinwheel "-/|\\")
-	(counter 0)
-	name should-close-nov article expirable end time)
-    (if (and
-	 server
-	 (setq name (concat "nnshimbun+" server ":" group))
-	 (or (let ((current (nnoo-current-server 'nnshimbun)))
-	       (and current
-		    (string-equal server current)
-		    (buffer-live-p buffer)))
-	     (when force
-	       (setq should-close-nov t
-		     buffer (gnus-get-buffer-create
-			     (format " *nnshimbun overview %s %s*"
-				     server group)))
-	       (let ((expiry-wait (gnus-group-find-parameter name
-							     'expiry-wait)))
-		 (when expiry-wait
-		   ;; Prefer the group parameter `expiry-wait'.
-		   (setq nnmail-expiry-wait-function nil
-			 nnmail-expiry-wait expiry-wait)))
-	       (save-excursion
-		 (set-buffer buffer)
-		 (set (make-local-variable 'nnshimbun-nov-buffer-file-name)
-		      (expand-file-name
-		       nnshimbun-nov-file-name
-		       (expand-file-name
-			group
-			(expand-file-name
-			 server
-			 nnshimbun-directory))))
-		 (erase-buffer)
-		 (nnheader-insert-file-contents
-		  nnshimbun-nov-buffer-file-name))
-	       (set-buffer-modified-p nil)
-	       t)))
-	(prog1
-	    (save-excursion
-	      (set-buffer buffer)
-	      (when (eq 'all articles)
-		(setq articles nil)
-		(goto-char (point-min))
-		(while (not (eobp))
-		  (when (looking-at "[0-9]+\t")
-		    (push (read buffer) articles))
-		  (forward-line 1))
-		(setq articles (nreverse articles)))
-	      (setq expirable (copy-sequence articles))
-	      (while expirable
-		(setq article (pop expirable))
-		(when (and (nnheader-find-nov-line article)
-			   (setq end (line-end-position))
-			   (not (and nnshimbun-keep-last-article
-				     (= (point-max) (1+ end)))))
-		  (setq time (and (search-forward "\t" end t)
-				  (search-forward "\t" end t)
-				  (search-forward "\t" end t)
-				  (parse-time-string
-				   (buffer-substring
-				    (point)
-				    (if (search-forward "\t" end t)
-					(1- (point))
-				      end)))))
-		  (if (and
-		       (or (setq time (condition-case nil
-					  (apply 'encode-time time)
-					(error nil)))
-			   ;; Inhibit expiring if there's no parsable date
-			   ;; and the following option is non-nil.
-			   (not nnshimbun-keep-unparsable-dated-articles))
-		       (nnmail-expired-article-p name time nil))
-		      (progn
-			(when force
-			  (message "%s(%c)..." progress-msg article))
-			(beginning-of-line)
-			(delete-region (point) (1+ end))
-			(setq articles (delq article articles)))
-		    (when force
-		      (message "%s(%c)..."
-			       progress-msg
-			       (aref pinwheel
-				     (setq counter
-					   (logand 3 (1+ counter)))))))))
-	      (when (buffer-modified-p)
-		(nnmail-write-region 1 (point-max)
-				     nnshimbun-nov-buffer-file-name
-				     nil 'nomesg)
-		(set-buffer-modified-p nil))
-	      articles)
-	  (when should-close-nov
-	    (kill-buffer buffer)))
+  "Do expiration for the specified ARTICLES in the nnshimbun GROUP.
+Notice that nnshimbun does not actually delete any articles, it just
+delete the corresponding entries in the NOV database locally.  The
+expiration will be performed only when the current SERVER is specified
+and the NOV is open.  The optional fourth argument FORCE is ignored."
+  (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
+    (if (and server
+	     ;; Don't use 'string-equal' in the following.
+	     (equal server (nnoo-current-server 'nnshimbun))
+	     (buffer-live-p buffer))
+	(let* ((expirable (copy-sequence articles))
+	       (name (concat "nnshimbun+" server ":" group))
+	       ;; If the group's parameter `expiry-wait' is non-nil,
+	       ;; `nnmail-expiry-wait' is bound to that value, and
+	       ;; `nnmail-expiry-wait-function' is bound to nil.
+	       ;; See the source code of `gnus-summary-expire-articles'.
+	       ;; Prefer the shimbun's default to `nnmail-expiry-wait'
+	       ;; only when the group's parameter is nil.
+	       (nnmail-expiry-wait
+		(if (gnus-group-find-parameter name 'expiry-wait)
+		    nnmail-expiry-wait
+		  (or (shimbun-article-expiration-days nnshimbun-shimbun)
+		      nnmail-expiry-wait)))
+	       article end time)
+	  (save-excursion
+	    (set-buffer buffer)
+	    (while expirable
+	      (setq article (pop expirable))
+	      (when (and (nnheader-find-nov-line article)
+			 (setq end (line-end-position))
+			 (not (and nnshimbun-keep-last-article
+				   (= (point-max) (1+ end)))))
+		(setq time (and (search-forward "\t" end t)
+				(search-forward "\t" end t)
+				(search-forward "\t" end t)
+				(parse-time-string
+				 (buffer-substring
+				  (point)
+				  (if (search-forward "\t" end t)
+				      (1- (point))
+				    end)))))
+		(when (and (or (setq time (condition-case nil
+					      (apply 'encode-time time)
+					    (error nil)))
+			       ;; Inhibit expiration if there's no parsable
+			       ;; date and the following option is non-nil.
+			       (not nnshimbun-keep-unparsable-dated-articles))
+			   (nnmail-expired-article-p name time nil))
+		  (beginning-of-line)
+		  (delete-region (point) (1+ end))
+		  (setq articles (delq article articles)))))
+	    (when (buffer-modified-p)
+	      (nnmail-write-region 1 (point-max)
+				   nnshimbun-nov-buffer-file-name
+				   nil 'nomesg)
+	      (set-buffer-modified-p nil))
+	    articles))
       t)))
-
-;;;###autoload
-(defun nnshimbun-expire-nov-databases (&optional arg)
-  "Expire NOV databases for all the auto expirable nnshimbun groups.
-If the prefix argument is given, the value of
-`nnshimbun-keep-unparsable-dated-articles' will be ignored (treated as
-nil)."
-  (interactive "P")
-  (let ((nnshimbun-keep-unparsable-dated-articles
-	 (unless arg
-	   nnshimbun-keep-unparsable-dated-articles))
-	(servers (delq nil
-		       (mapcar
-			(lambda (dir)
-			  (if (and (not (string-equal ".." dir))
-				   (file-directory-p (expand-file-name
-						      dir
-						      nnshimbun-directory)))
-			      dir))
-			(directory-files nnshimbun-directory))))
-	server directory groups group nov did)
-    (while servers
-      (setq server (car servers)
-	    servers (cdr servers)
-	    directory (expand-file-name server nnshimbun-directory)
-	    groups (delq nil
-			 (mapcar (lambda (dir)
-				   (if (and (not (string-equal ".." dir))
-					    (file-directory-p
-					     (expand-file-name
-					      dir directory)))
-				       dir))
-				 (directory-files directory))))
-      (while groups
-	(setq group (car groups)
-	      groups (cdr groups)
-	      nov (expand-file-name nnshimbun-nov-file-name
-				    (expand-file-name group directory)))
-	(when (and (gnus-group-auto-expirable-p (concat "nnshimbun+"
-							server ":" group))
-		   (file-exists-p nov))
-	  (message "Expiring NOV database for nnshimbun+%s:%s..."
-		   server group)
-	  (nnshimbun-request-expire-articles 'all group server t)
-	  (setq did t))))
-    (message (if did
-		 "Expiring NOV databases...done"
-	       "Nothing to be done"))))
 
 
 

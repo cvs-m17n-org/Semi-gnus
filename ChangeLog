@@ -1,5 +1,11 @@
 2001-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnshimbun.el (nnshimbun-expire-nov-databases): Removed.
+	(nnshimbun-request-expire-articles): Simplified; refer to the
+	shimbun's default expiration days.
+
+2001-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/lpath.el: Fbind `xml-node-children' for XEmacsen and old FSF
 	Emacsen.
 
