@@ -75,7 +75,7 @@
 	    (if (not (file-exists-p news-spool))
 		(make-directory news-spool t)))
 	(error
-	 (error (gnus-ofsetup-get-message 'prepare-miee-1))))))
+	 (error (gnus-ofsetup-gettext 'prepare-miee-1))))))
 
   (defvar gnus-ofsetup-update-setting-file
     '((save-excursion
@@ -399,7 +399,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
      (param-save-passwd-3 . "危険だからやめとく")
      (param-mail-source-1 . "メール取得先の情報"))))
 
-(defun gnus-ofsetup-get-message (symbol &optional lang)
+(defsubst gnus-ofsetup-gettext (symbol &optional lang)
   (setq lang (or lang gnus-offline-lang))
   (or
    (cdr (assq symbol (symbol-value
@@ -410,7 +410,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
   (intern
    (completing-read (concat
 		     msg
-		     (gnus-ofsetup-get-message 'completing-read-symbol-1))
+		     (gnus-ofsetup-gettext 'completing-read-symbol-1))
 		    (mapcar
 		     (lambda (sym)
 		       (list (symbol-name sym)))
@@ -428,52 +428,52 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	  num-of-address i mail-source save-passwd)
       (setq news-method
 	    (gnus-ofsetup-completing-read-symbol
-	     (gnus-ofsetup-get-message 'setup-1)
+	     (gnus-ofsetup-gettext 'setup-1)
 	     'nnagent 'nnspool))
       ;; Setting for gnus-agent.
       (if (eq news-method 'nnagent)
 	  (setq agent-directory
 		(read-from-minibuffer
-		 (gnus-ofsetup-get-message 'setup-2) "~/News/agent")))
+		 (gnus-ofsetup-gettext 'setup-2) "~/News/agent")))
       (setq mail-method 'nnmail)
       (setq dialup-program
 	    (read-file-name
-	     (gnus-ofsetup-get-message 'setup-3)
+	     (gnus-ofsetup-gettext 'setup-3)
 	     nil nil t))
       (if (string-match "^[ \t]*$" dialup-program)
 	  (setq dialup-program nil)
 	(setq dialup-program-arguments
 	      (delete "" (split-string
 			  (read-from-minibuffer
-			   (gnus-ofsetup-get-message 'setup-4))
+			   (gnus-ofsetup-gettext 'setup-4))
 			  "[\t ]+"))))
       (setq hangup-program
 	    (read-file-name
-	     (gnus-ofsetup-get-message 'setup-5)
+	     (gnus-ofsetup-gettext 'setup-5)
 	     nil nil t))
       (if (string-match "^[ \t]*$" hangup-program)
 	  (setq hangup-program nil)
 	(setq hangup-program-arguments
 	      (delete "" (split-string
 			  (read-from-minibuffer
-			   (gnus-ofsetup-get-message 'setup-6))
+			   (gnus-ofsetup-gettext 'setup-6))
 			  "[\t ]+"))))
       (setq MTA-type (gnus-ofsetup-completing-read-symbol
-		      (gnus-ofsetup-get-message 'setup-7)
+		      (gnus-ofsetup-gettext 'setup-7)
 		      'smtp 'sendmail))
       (if (eq news-method 'nnspool)
 	  (setq use-miee t)
-	(setq use-miee (y-or-n-p (gnus-ofsetup-get-message 'setup-8))))
+	(setq use-miee (y-or-n-p (gnus-ofsetup-gettext 'setup-8))))
       (if use-miee
 	  (progn
 	    ;; Setting for MIEE.
 	    (setq news-spool
 		  (read-from-minibuffer
-		   (gnus-ofsetup-get-message 'setup-9)
+		   (gnus-ofsetup-gettext 'setup-9)
 		   "/usr/spool/news.out"))
 	    (setq mail-spool
 		  (read-from-minibuffer
-		   (gnus-ofsetup-get-message 'setup-10)
+		   (gnus-ofsetup-gettext 'setup-10)
 		   "/usr/spool/mail.out"))
 	    (setq drafts-queue-type 'miee)
 	    (gnus-ofsetup-prepare gnus-ofsetup-prepare-for-miee))
@@ -481,22 +481,22 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	(setq drafts-queue-type 'agent))
       ;; Set E-Mail Address and pop3 movemail type.
       (setq num-of-address
-	    (read-from-minibuffer (gnus-ofsetup-get-message 'setup-11)))
+	    (read-from-minibuffer (gnus-ofsetup-gettext 'setup-11)))
       (setq i (string-to-int num-of-address))
       (while (> i 0)
-	(let ((user (read-from-minibuffer (gnus-ofsetup-get-message 'setup-12)))
+	(let ((user (read-from-minibuffer (gnus-ofsetup-gettext 'setup-12)))
 	      (server (read-from-minibuffer
-		       (gnus-ofsetup-get-message 'setup-13)))
+		       (gnus-ofsetup-gettext 'setup-13)))
 	      (auth (completing-read
-		     (gnus-ofsetup-get-message 'setup-14)
+		     (gnus-ofsetup-gettext 'setup-14)
 		     '(("password") ("apop")) nil t nil))
-	      (islisp (y-or-n-p (gnus-ofsetup-get-message 'setup-15)))
+	      (islisp (y-or-n-p (gnus-ofsetup-gettext 'setup-15)))
 	      source)
 	  (if (not islisp)
-	      (let ((prog (read-file-name (gnus-ofsetup-get-message 'setup-16)
+	      (let ((prog (read-file-name (gnus-ofsetup-gettext 'setup-16)
 					  exec-directory "movemail"))
 		    (args (read-from-minibuffer
-			   (gnus-ofsetup-get-message 'setup-17)
+			   (gnus-ofsetup-gettext 'setup-17)
 			   "-pf")))
 		(setq source `(pop
 			       :user ,user
@@ -518,7 +518,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			  source)))))
 	(setq i (1- i)))
       (setq save-passwd
-	    (y-or-n-p (gnus-ofsetup-get-message 'setup-18)))
+	    (y-or-n-p (gnus-ofsetup-gettext 'setup-18)))
       ;;
       (gnus-ofsetup-prepare gnus-ofsetup-update-setting-file)))
   (load gnus-offline-setting-file))
@@ -532,60 +532,60 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 (defun gnus-ofsetup-find-parameters ()
   "Return the each current value of gnus-offline parameters."
   `((news-method
-     (choice :tag ,(gnus-ofsetup-get-message 'param-news-method-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-news-method-1)
 	     :value ,gnus-offline-news-fetch-method
-	     (const :tag ,(gnus-ofsetup-get-message 'param-news-method-2)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-news-method-2)
 		    nnagent)
-	     (const :tag ,(gnus-ofsetup-get-message 'param-news-method-3)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-news-method-3)
 		    nnspool))
-     ,(gnus-ofsetup-get-message 'param-news-method-4))
+     ,(gnus-ofsetup-gettext 'param-news-method-4))
 
     (dialup-program
-     (choice :tag ,(gnus-ofsetup-get-message 'param-dialup-program-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-dialup-program-1)
 	     :value ,gnus-offline-dialup-program
-	     (string :tag ,(gnus-ofsetup-get-message 'param-dialup-program-2))
-	     (const :tag ,(gnus-ofsetup-get-message
+	     (string :tag ,(gnus-ofsetup-gettext 'param-dialup-program-2))
+	     (const :tag ,(gnus-ofsetup-gettext
 			   'param-dialup-program-3) nil))
-     ,(gnus-ofsetup-get-message 'param-dialup-program-4))
+     ,(gnus-ofsetup-gettext 'param-dialup-program-4))
 
     (dialup-program-arguments
-     (repeat :tag ,(gnus-ofsetup-get-message 'param-dialup-program-arg-1)
+     (repeat :tag ,(gnus-ofsetup-gettext 'param-dialup-program-arg-1)
 	     :value ,gnus-offline-dialup-program-arguments
-	     (string :tag ,(gnus-ofsetup-get-message
+	     (string :tag ,(gnus-ofsetup-gettext
 			    'param-dialup-program-arg-2)))
-     ,(gnus-ofsetup-get-message 'param-dialup-program-arg-3))
+     ,(gnus-ofsetup-gettext 'param-dialup-program-arg-3))
 
     (hangup-program
-     (choice :tag ,(gnus-ofsetup-get-message 'param-hangup-program-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-hangup-program-1)
 	     :value ,gnus-offline-hangup-program
-	     (string :tag ,(gnus-ofsetup-get-message 'param-hangup-program-2))
-	     (const :tag ,(gnus-ofsetup-get-message 'param-hangup-program-3)
+	     (string :tag ,(gnus-ofsetup-gettext 'param-hangup-program-2))
+	     (const :tag ,(gnus-ofsetup-gettext 'param-hangup-program-3)
 		    nil))
-     ,(gnus-ofsetup-get-message 'param-hangup-program-4))
+     ,(gnus-ofsetup-gettext 'param-hangup-program-4))
 
     (hangup-program-arguments
-     (repeat :tag ,(gnus-ofsetup-get-message 'param-hangup-program-arg-1)
+     (repeat :tag ,(gnus-ofsetup-gettext 'param-hangup-program-arg-1)
 	     :value ,gnus-offline-hangup-program-arguments
-	     (string :tag ,(gnus-ofsetup-get-message
+	     (string :tag ,(gnus-ofsetup-gettext
 			    'param-hangup-program-arg-2)))
-     ,(gnus-ofsetup-get-message 'param-hangup-program-arg-3))
+     ,(gnus-ofsetup-gettext 'param-hangup-program-arg-3))
 
     (interval
-     (integer :tag ,(gnus-ofsetup-get-message 'param-interval-1)
+     (integer :tag ,(gnus-ofsetup-gettext 'param-interval-1)
 	      :value ,gnus-offline-interval-time)
-     ,(gnus-ofsetup-get-message 'param-interval-2))
+     ,(gnus-ofsetup-gettext 'param-interval-2))
 
     (drafts-queue-type
-     (choice :tag ,(gnus-ofsetup-get-message 'param-drafts-queue-type-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-drafts-queue-type-1)
 	     :value ,gnus-offline-drafts-queue-type
-	     (const :tag ,(gnus-ofsetup-get-message 'param-drafts-queue-type-2)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-drafts-queue-type-2)
 		    agent)
-	     (const :tag ,(gnus-ofsetup-get-message 'param-drafts-queue-type-3)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-drafts-queue-type-3)
 		    miee))
-     ,(gnus-ofsetup-get-message 'param-drafts-queue-type-4))
+     ,(gnus-ofsetup-gettext 'param-drafts-queue-type-4))
 
     (mail-spool
-     (directory :tag ,(gnus-ofsetup-get-message 'param-mail-spool-1)
+     (directory :tag ,(gnus-ofsetup-gettext 'param-mail-spool-1)
 		:value ,(cond ((and (boundp 'sendmail-to-spool-directory)
 				    sendmail-to-spool-directory)
 			       sendmail-to-spool-directory)
@@ -593,7 +593,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			       "/usr/spool/mail.out"))))
 
     (news-spool
-     (directory :tag ,(gnus-ofsetup-get-message 'param-news-spool-1)
+     (directory :tag ,(gnus-ofsetup-gettext 'param-news-spool-1)
 		:value ,(cond ((and (boundp 'news-spool-request-post-directory)
 				    news-spool-request-post-directory)
 			       news-spool-request-post-directory)
@@ -601,26 +601,26 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 			       "/usr/spool/news.out"))))
 
     (MTA-type
-     (choice :tag ,(gnus-ofsetup-get-message 'param-MTA-type-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-MTA-type-1)
 	     :value ,gnus-offline-MTA-type
-	     (const :tag ,(gnus-ofsetup-get-message 'param-MTA-type-2) smtp)
-	     (const :tag ,(gnus-ofsetup-get-message 'param-MTA-type-3)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-MTA-type-2) smtp)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-MTA-type-3)
 		    sendmail))
-     ,(gnus-ofsetup-get-message 'param-MTA-type-4))
+     ,(gnus-ofsetup-gettext 'param-MTA-type-4))
 
     (save-passwd
-     (choice :tag ,(gnus-ofsetup-get-message 'param-save-passwd-1)
+     (choice :tag ,(gnus-ofsetup-gettext 'param-save-passwd-1)
 	     :value ,(if (memq 'mail-source-password-cache gnus-variable-list)
 			 t
 			 nil)
-	     (const :tag ,(gnus-ofsetup-get-message 'param-save-passwd-2) t)
-	     (const :tag ,(gnus-ofsetup-get-message 'param-save-passwd-3) nil))
-     ,(gnus-ofsetup-get-message 'param-save-passwd-4))
+	     (const :tag ,(gnus-ofsetup-gettext 'param-save-passwd-2) t)
+	     (const :tag ,(gnus-ofsetup-gettext 'param-save-passwd-3) nil))
+     ,(gnus-ofsetup-gettext 'param-save-passwd-4))
 
     (mail-source
-     (sexp :tag ,(gnus-ofsetup-get-message 'param-mail-source-1)
+     (sexp :tag ,(gnus-ofsetup-gettext 'param-mail-source-1)
 	   :value ,gnus-offline-mail-source)
-     ,(gnus-ofsetup-get-message 'param-mail-source-2))))
+     ,(gnus-ofsetup-gettext 'param-mail-source-2))))
 
 (defvar gnus-ofsetup-params)
 
@@ -637,10 +637,10 @@ mail source specifier とか上記のようなキーワードについてもっとよく
   (kill-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
   (switch-to-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
   (gnus-custom-mode)
-  (widget-insert (gnus-ofsetup-get-message 'customize-1))
+  (widget-insert (gnus-ofsetup-gettext 'customize-1))
   (widget-create 'push-button
-		   :tag (gnus-ofsetup-get-message 'customize-2)
-		   :help-echo (gnus-ofsetup-get-message 'customize-3)
+		   :tag (gnus-ofsetup-gettext 'customize-2)
+		   :help-echo (gnus-ofsetup-gettext 'customize-3)
 		   :action 'gnus-ofsetup-customize-done)
   (widget-insert "\n\n")
   (make-local-variable 'gnus-ofsetup-params)
@@ -648,13 +648,13 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	(widget-create 'group
 		       `(set :inline t
 			     :greedy t
-			     :tag ,(gnus-ofsetup-get-message 'customize-4)
+			     :tag ,(gnus-ofsetup-gettext 'customize-4)
 			     :format "%t:\n%h%v"
-			     :doc ,(gnus-ofsetup-get-message 'customize-5)
+			     :doc ,(gnus-ofsetup-gettext 'customize-5)
 			     ,@types)))
 
   (widget-create 'info-link
-		 :help-echo (gnus-ofsetup-get-message 'customize-6)
+		 :help-echo (gnus-ofsetup-gettext 'customize-6)
 		 :tag "<Info> mail sources"
 		 (if (string-match "^ja" gnus-offline-lang)
 		     "(gnus-ja)Mail Sources"
@@ -692,7 +692,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	(save-passwd (and (memq 'mail-source-password-cache gnus-variable-list)
 			  t)))
     (if (null params)
-	(gnus-message 4 (gnus-ofsetup-get-message 'customize-done-1))
+	(gnus-message 4 (gnus-ofsetup-gettext 'customize-done-1))
       (mapc #'(lambda (el)
 		(let ((sym (car el))
 		      (val (cdr el)))
@@ -713,7 +713,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	    params)
       (if (and (eq news-method 'nnspool)
 	       (not (eq drafts-queue-type 'miee)))
-	  (error (gnus-ofsetup-get-message 'customize-done-2)))
+	  (error (gnus-ofsetup-gettext 'customize-done-2)))
       (if use-miee
 	  (gnus-ofsetup-prepare gnus-ofsetup-prepare-for-miee))
       (gnus-ofsetup-prepare gnus-ofsetup-update-setting-file)
