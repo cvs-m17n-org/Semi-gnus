@@ -1,3 +1,9 @@
+1999-12-30  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (TopLevel): Call
+	`define-process-argument-editiong' only under Meadow -- i.e. don't
+	call this function under NTEmacs.
+
 1999-12-28  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 15.
