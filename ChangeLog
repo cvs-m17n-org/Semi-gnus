@@ -1,3 +1,7 @@
+2001-07-05  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
 2001-06-28  Akitada Koyama  <cx2@kh.rim.or.jp>
 
 	* texi/gnus-ja.texi (Web Newspaper): Add a description how to show
