@@ -745,7 +745,7 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
 	(ange-ftp-re-read-dir path)))))
 
 ;; 1997/5/4 by MORIOKA Tomohiko <morioka@jaist.ac.jp>
-(defvar nnheader-file-coding-system nil
+(defvar nnheader-file-coding-system 'raw-text
   "Coding system used in file backends of Gnus.")
 
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)
@@ -788,6 +788,16 @@ find-file-hooks, etc.
 	out)
     (while files
       (when (file-regular-p (car files))
+	(push (car files) out))
+      (pop files))
+    (nreverse out)))
+
+(defun nnheader-directory-files (&rest args)
+  "Same as `directory-files', but prune \".\" and \"..\"."
+  (let ((files (apply 'directory-files args))
+	out)
+    (while files
+      (unless (member (file-name-nondirectory (car files)) '("." ".."))
 	(push (car files) out))
       (pop files))
     (nreverse out)))
