@@ -1553,6 +1553,7 @@ no, only reply back to the author."
 (defvar message-draft-article nil)
 (defvar message-mime-part nil)
 (defvar message-posting-charset nil)
+(defvar message-inserted-headers nil)
 
 ;; Byte-compiler warning
 (eval-when-compile
@@ -2564,11 +2565,12 @@ C-c M-f  `message-mark-insert-file' (insert file marked with enclosing tags).
 M-RET    `message-newline-and-reformat' (break the line and reformat)."
   (setq local-abbrev-table text-mode-abbrev-table)
   (set (make-local-variable 'message-reply-buffer) nil)
-  (make-local-variable 'message-send-actions)
-  (make-local-variable 'message-exit-actions)
-  (make-local-variable 'message-kill-actions)
-  (make-local-variable 'message-postpone-actions)
-  (make-local-variable 'message-draft-article)
+  (set (make-local-variable 'message-inserted-headers) nil)
+  (set (make-local-variable 'message-send-actions) nil)
+  (set (make-local-variable 'message-exit-actions) nil)
+  (set (make-local-variable 'message-kill-actions) nil)
+  (set (make-local-variable 'message-postpone-actions) nil)
+  (set (make-local-variable 'message-draft-article) nil)
   (setq buffer-offer-save t)
   (set (make-local-variable 'facemenu-add-face-function)
        (lambda (face end)
@@ -5439,7 +5441,7 @@ Headers already prepared in the buffer are not modified."
 	   (Expires (message-make-expires))
 	   (case-fold-search t)
 	   (optionalp nil)
-	   header value elem)
+	   header value elem header-string)
       ;; First we remove any old generated headers.
       (let ((headers message-deletable-headers))
 	(unless (buffer-modified-p)
@@ -5464,13 +5466,12 @@ Headers already prepared in the buffer are not modified."
 		      optionalp t)
 	      (setq header (car elem)))
 	  (setq header elem))
+	(setq header-string  (if (stringp header)
+				 header
+			       (symbol-name header)))
 	(when (or (not (re-search-forward
 			(concat "^"
-				(regexp-quote
-				 (downcase
-				  (if (stringp header)
-				      header
-				    (symbol-name header))))
+				(regexp-quote (downcase header-string))
 				":")
 			nil t))
 		  (progn
@@ -5483,7 +5484,8 @@ Headers already prepared in the buffer are not modified."
 	  (setq value
 		(cond
 		 ((and (consp elem)
-		       (eq (car elem) 'optional))
+		       (eq (car elem) 'optional)
+		       (not (member header-string message-inserted-headers)))
 		  ;; This is an optional header.  If the cdr of this
 		  ;; is something that is nil, then we do not insert
 		  ;; this header.
@@ -5523,9 +5525,7 @@ Headers already prepared in the buffer are not modified."
 			   (cdr (assq header message-header-format-alist))))
 		      (if formatter
 			  (funcall formatter header value)
-			(insert (if (stringp header)
-				    header (symbol-name header))
-				": " value))
+			(insert header-string ": " value))
 		      ;; We check whether the value was ended by a
 		      ;; newline.  If now, we insert one.
 		      (unless (bolp)
@@ -5537,6 +5537,7 @@ Headers already prepared in the buffer are not modified."
 		;; If the header is optional, and the header was
 		;; empty, we can't insert it anyway.
 		(unless optionalp
+		  (push header-string message-inserted-headers)
 		  (insert value)
 		  (when (bolp)
 		    (delete-char -1))))
