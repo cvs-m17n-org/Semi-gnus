@@ -1,3 +1,32 @@
+1999-06-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+1999-06-22  NAKAJI Hiroyuki   <nakaji@tutrp.tut.ac.jp>
+
+	* texi/Makefile.in (distclean, veryclean): Use `clean' instead of
+	`make clean'.
+	(complete, tmps, latexboth, psout, pss, latexps): Use `$(MAKE)'
+	instead of `make'.
+	(TopLevel): Use `@SET_MAKE@'.
+
+	* lisp/Makefile.in (distclean): New target.
+	(clean): Renamed from `distclean'; don't remove Makefile.
+
+	* Makefile.in (distclean): Use `clean' instead of `make clean'.
+	(x, osome): Use `$(MAKE)' instead of `make'.
+	(elclean): Use the arg `-f'.
+	(clean): Remove MANIFEST.*.
+
+1999-06-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-dont-select-after-jump-to-other-group):
+	New user option.
+	(gnus-summary-jump-to-other-group): Use it.
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Add check for Emacs 21 or
+	later.
+
 1999-06-21  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
