@@ -10448,6 +10448,9 @@ gnus $B$O>o$KEj9F$K$I$NJ}K!$r;H$&$+$r$"$J$?$K?R$M$^$9!#(B
 @lisp
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-default-smtp-server "YOUR SMTP HOST")
+;; FLIM $BHG$N(B smtpmail.el $B$N$?$a$K!"0J2<$NJQ?t$r@_Dj$9$kI,MQ$,$"$j$^$9!#(B
+;; $B$I$A$i$N(B smtpmail.el $B$,;H$o$l$k$+$O(B `load-path' $B$K0M$j$^$9!#(B
+(setq smtp-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
 $B$3$l$H;w$?$b$N$K(B @code{message-smtpmail-send-it} $B$,$"$j$^$9!#(B
@@ -21106,6 +21109,18 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 $B%U%)%k%H$G$O$=$N%0%k!<%WL>$O(B @samp{spam} $B$G$9$,!"%+%9%?%^%$%:$9$k$3$H$O(B
 $B2DG=$G$9!#(B
 
+@emph{IMAP $BMxMQ<T$X$NCm0U(B}
+
+$B%X%C%@!<$@$1$G$O$J$/$F%a%C%;!<%8A4BN$K4p$E$$$FJ,3d$r9T$J$$$?$$>l9g$O!"%V!<(B
+$B%kJQ?t(B @code{nnimap-split-download-body} $B$,@_Dj$5$l$kI,MW$,$"$j$^$9!#%G%#(B
+$B%U%)%k%H$G$O!"(Bnnimap $B%P%C%/%(%s%I$O%a%C%;!<%8%X%C%@!<$@$1$r<h$j9~$_$^$9!#(B
+spam-check-bogofilter$B!"(Bspam-check-ifile $B$^$?$O(B spam-check-stat ($B$=$l$i$N(B
+$BJ,3d4o$O%a%C%;!<%8$NK\J8A4BN$+$i>pJs$rF@$k(B) $B$r;H$&$J$i$P!"$3$NJQ?t$r@_Dj(B
+$B$7$J$1$l$P$J$j$^$;$s!#(BIMAP $B$NF0:n$rCY$/$7$F$7$^$&$N$G!"%G%#%U%)%k%H$G$O(B
+$B@_Dj$5$l$F$$$^$;$s!#(B
+
+@xref{Splitting in IMAP}.
+
 @emph{TODO: $B8=>u(B spam.el $B$O5-;v$r%P%C%/%(%s%I$KEjF~$9$k$3$H$@$1$r%5%]!<(B
 $B%H$7$^$9!#5-;v$,$b$O$d(B spam $B$^$?$O(B ham $B$G$O$J$$$H(B spam.el $B$KEA$($kJ}K!$O(B
 $B$"$j$^$;$s!#(B}
@@ -21304,31 +21319,30 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 $B$?5-;v$,(B bogofilter $B$N(B spam $B%G!<%?%Y!<%9$K2C$($i$^$9!#(B
 @end defvar
 
-@c TRANSLATEME!
 @defvar gnus-group-ham-exit-processor-bogofilter
-Add this symbol to a group's @code{spam-process} parameter by
-customizing the group parameters or the
-@code{gnus-spam-process-newsgroups} variable.  When this symbol is
-added to a group's @code{spam-process} parameter, the ham-marked
-articles in @emph{ham} groups will be added to the Bogofilter database
-of non-spam messages.  Note that this ham processor has no effect in
-@emph{spam} or @emph{unclassified} groups.
+$B$3$N%7%s%\%k$r!"%0%k!<%W%Q%i%a!<%?$N%+%9%?%^%$%:$K$h$C$F%0%k!<%W(B
+$B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
+$B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
+$B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
+$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$,Hs(B-spam $B5-;vMQ$N(B Bogofilter $B%G!<%?%Y!<%9$K(B
+$BDI2C$5$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<(B
+$B%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
 @end defvar
 
 @defvar spam-bogofilter-database-directory
 
-This is the directory where Bogofilter will store its databases.  It
-is not specified by default, so Bogofilter will use its own default
-database directory.
+$B$3$l$O(B Bogofilter $B$,$=$N%G!<%?%Y!<%9$r3JG<$9$k%G%#%l%/%H%j$G$9!#%G%#%U%)(B
+$B%k%H$G$O@_Dj$5$l$F$$$J$$$N$G!"(BBogofilter $B$O$=$l<+?H$N%G%#%U%)%k%H$N%G!<(B
+$B%?%Y!<%9!&%G%#%l%/%H%j$r;H$$$^$9!#(B
 
 @end defvar
 
-The Bogofilter mail classifier is similar to ifile in intent and
-purpose.  A ham and a spam processor are provided, plus the
-@code{spam-use-bogofilter} and @code{spam-use-bogofilter-headers}
-variables to indicate to spam-split that Bogofilter should either be
-used, or has already been used on the article.  The 0.9.2.1 version of
-Bogofilter was used to test this functionality.
+Bogofilter $B$N%a!<%kJ,N`4o$O!"0U?^$HL\E*$NE@$G(B ifile $B$K;w$F$$$^$9!#(B
+Spam $B$H(B ham $B$N%W%m%;%C%5!<$,Ds6!$5$l!"2C$($F(B spam-$BJ,3d(B (spam-split) $B$K(B
+$B$b(B Bogofilter $B$,;H$o$l$k$Y$-$G$"$k$3$H!"$^$?$O$9$G$K5-;v$K;H$o$l$?$3$H$r(B
+$B<($9(B @code{spam-use-bogofilter} $B$*$h(B
+$B$S(B @code{spam-use-bogofilter-headers} $BJQ?t$,Ds6!$5$l$^$9!#$3$N5!G=$r8!::(B
+$B$9$k$?$a$K(B Bogofilter $B$N%P!<%8%g%s(B 0.9.2.1 $B$,;H$o$l$^$7$?!#(B
 
 @node ifile spam filtering
 @subsubsection ifile $B$K$h$k(B spam $B$N_I2a(B

@@ -10987,6 +10987,9 @@ package correctly.  An example:
 @lisp
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-default-smtp-server "YOUR SMTP HOST")
+;; The following variable needs to be set because of the FLIM version of
+;; smtpmail.el.  Which smtpmail.el is used depends on the `load-path'.
+(setq smtp-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
 To the thing similar to this, there is @code{message-smtpmail-send-it}.
@@ -21591,6 +21594,18 @@ The @code{spam-split} function will process incoming mail and send the
 mail considered to be spam into the group name given by the variable
 @code{spam-split-group}.  By default that group name is @samp{spam},
 but you can customize it.
+
+@emph{Note for IMAP users}
+
+The boolean variable @code{nnimap-split-download-body} needs to be
+set, if you want to split based on the whole message instead of just
+the headers.  By default, the nnimap backend will only retrieve the
+message headers.  If you use spam-check-bogofilter, spam-check-ifile,
+or spam-check-stat (the splitters that can benefit from the full
+message body), you should set this variable.  It is not set by default
+because it will slow IMAP down.
+
+@xref{Splitting in IMAP}.
 
 @emph{TODO: Currently, spam.el only supports insertion of articles
 into a backend.  There is no way to tell spam.el that an article is no

@@ -948,7 +948,10 @@ mark:         The articles mark."
 (defcustom gnus-alter-header-function nil
   "Function called to allow alteration of article header structures.
 The function is called with one parameter, the article header vector,
-which it may alter in any way.")
+which it may alter in any way."
+  :type '(choice (const :tag "None" nil)
+		 function)
+  :group 'gnus-summary)
 
 (defvar gnus-decode-encoded-word-function
   (mime-find-field-decoder 'From 'nov)
