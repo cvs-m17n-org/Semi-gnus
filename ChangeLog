@@ -1,3 +1,15 @@
+2002-01-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nneething.el (nneething-mime-extensions): New variable.
+	(nneething-request-article): Refer it.
+
+	* lisp/nnheader.el (mm-detect-coding-region): Alias to
+	`nnheader-detect-coding-region'.
+	(nnheader-detect-coding-region): New function.
+	(mm-detect-mime-charset-region): Alias to
+	`nnheader-detect-mime-charset-region'.
+	(nnheader-detect-mime-charset-region) New function.
+
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* texi/gnus-ja.texi (Web Newspaper): Update the document of

@@ -1207,7 +1207,23 @@ find-file-hooks, etc.
   (defalias 'mm-multibyte-string-p
     (if (fboundp 'multibyte-string-p)
 	'multibyte-string-p
-      'ignore)))
+      'ignore))
+
+  (defun nnheader-detect-coding-region (start end)
+    "Like 'detect-coding-region' except returning the best one."
+    (let ((coding-systems
+	   (static-if (boundp 'MULE)
+	       (code-detect-region (point) (point-max))
+	     (detect-coding-region (point) (point-max)))))
+      (or (car-safe coding-systems)
+	  coding-systems)))
+  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+
+  (defun nnheader-detect-mime-charset-region (start end)
+    "Detect MIME charset of the text in the region between START and END."
+    (coding-system-to-mime-charset
+     (nnheader-detect-coding-region start end)))
+  (defalias 'mm-detect-mime-charset-region 'nnheader-detect-mime-charset-region))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
