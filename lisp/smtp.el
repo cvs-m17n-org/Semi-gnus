@@ -74,10 +74,9 @@ don't define this value."
      (smtp-local-domain
       (concat system-name "." smtp-local-domain))
      ((string-match "[^.]\\.[^.]" system-name)
-      ;; `system-name' returned the right result.
-      system-name))
-    (t
-     (error "Cannot generate valid FQDN. Set `smtp-local-domain' correctly."))))
+      system-name)
+     (t
+      (error "Cannot generate valid FQDN. Set `smtp-local-domain' correctly.")))))
 
 (defun smtp-via-smtp (sender recipients smtp-text-buffer)
   (let ((coding-system-for-read smtp-coding-system)
