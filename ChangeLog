@@ -1,5 +1,11 @@
 1998-08-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.11.
+
+	* Sync up with Gnus 5.6.42.
+
+1998-08-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): comment.
 	(gnus-get-summary-default-charset): New function; not used yet.
 

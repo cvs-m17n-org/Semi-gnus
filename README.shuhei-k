@@ -5,6 +5,7 @@ Branch Owner:	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 Branch Goal:	Implement latest proposals for message header fields.
 		Test for overview hack (avoid corrupting overview data).
 Branch Policy:	(not defined yet)
+Status:		Sync up to Gnus 5.6.42, Semi-gnus 6.8.17.
 ========================================================================
 NEWS:
 
