@@ -9854,7 +9854,7 @@ If N, the prefix, then repeat N times.
 If N is negative, move in reverse order.
 The difference between N and the actual number of articles marked is
 returned."
-       name (cadr lway))
+       name (car (cdr lway)))
      (interactive "p")
      (gnus-summary-generic-mark n ,mark ',(nth 2 lway) ,(nth 3 lway))))
     
