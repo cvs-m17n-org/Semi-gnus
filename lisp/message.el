@@ -138,6 +138,11 @@ mailbox format."
   :group 'message-sending
   :type 'function)
 
+(defcustom message-default-encoding "7bit"
+  "*Default content transfer encoding type."
+  :group 'message-sending
+  :type 'string)
+
 (defcustom message-courtesy-message
   "The following message is a courtesy copy of an article\nthat has been posted to %s as well.\n\n"
   "*This is inserted at the start of a mailed copy of a posted message.
@@ -464,17 +469,11 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook nil
+(defcustom message-setup-hook 'turn-on-mime-edit
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
   :type 'hook)
-
-(defcustom message-mime-setup-function
-  'turn-on-mime-edit
-  "*A function called to set up MIME edit mode."
-  :group 'message-various
-  :type 'function)
 
 (defcustom message-signature-setup-hook nil
   "Normal hook, run each time a new outgoing message is initialized.
@@ -494,13 +493,13 @@ to the headers."
   :group 'message-various
   :type 'hook)
 
-(defcustom message-encode-header-function
+(defcustom message-header-encode-function
   'eword-encode-header
-  "A function called to after header encode."
+  "A function called to encode header."
   :group 'message-various
   :type 'function)
 
-(defcustom message-after-header-encode-hook nil
+(defcustom message-header-encoded-hook nil
   "Hook run in a message mode after header encoded. Buffer narrowed 
 to the headers."
   :group 'message-various
@@ -2133,37 +2132,42 @@ the user from the mailer."
 	(message-generate-headers message-required-mail-headers))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook)
-      (when (functionp message-encode-header-function)
-	(funcall message-encode-header-function))
-      (run-hooks 'message-after-header-encode-hook))
-    (unwind-protect
-	(save-excursion
-	  (set-buffer tembuf)
-	  (erase-buffer)
-	  (insert-buffer message-encoding-buffer)
-	  ;; Remove some headers.
-	  (save-restriction
-	    (message-narrow-to-headers)
+      (when (functionp message-header-encode-function)
+	(funcall message-header-encode-function))
+      (run-hooks 'message-header-encoded-hook))
+    (if (not (message-check-mail-syntax))
+	(progn
+	  (message "")
+	  ;;(message "Posting not performed")
+	  nil)
+      (unwind-protect
+	  (save-excursion
+	    (set-buffer tembuf)
+	    (erase-buffer)
+	    (insert-buffer message-encoding-buffer)
 	    ;; Remove some headers.
-	    (message-remove-header message-ignored-mail-headers t))
-	  (goto-char (point-max))
-	  ;; require one newline at the end.
-	  (or (= (preceding-char) ?\n)
-	      (insert ?\n))
-	  (when (and news
-		     (or (message-fetch-field "cc")
-			 (message-fetch-field "to")))
-	    (message-insert-courtesy-copy))
-	  (mime-edit-maybe-split-and-send
-	   (function
-	    (lambda ()
-	      (interactive)
-	      (funcall message-send-mail-function)
-	      )))
-	  (funcall message-send-mail-function))
-      (kill-buffer tembuf))
-    (set-buffer message-edit-buffer)
-    (push 'mail message-sent-message-via)))
+	    (save-restriction
+	      (message-narrow-to-headers)
+	      ;; Remove some headers.
+	      (message-remove-header message-ignored-mail-headers t))
+	    (goto-char (point-max))
+	    ;; require one newline at the end.
+	    (or (= (preceding-char) ?\n)
+		(insert ?\n))
+	    (when (and news
+		       (or (message-fetch-field "cc")
+			   (message-fetch-field "to")))
+	      (message-insert-courtesy-copy))
+	    (mime-edit-maybe-split-and-send
+	     (function
+	      (lambda ()
+		(interactive)
+		(funcall message-send-mail-function)
+		)))
+	    (funcall message-send-mail-function))
+	(kill-buffer tembuf))
+      (set-buffer message-edit-buffer)
+      (push 'mail message-sent-message-via))))
 
 (defun message-send-mail-with-sendmail ()
   "Send off the prepared buffer with sendmail."
@@ -2446,12 +2450,13 @@ to find out how to use this."
       (message-generate-headers message-required-news-headers)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook)
-      (when (functionp message-encode-header-function)
-	(funcall message-encode-header-function))
-      (run-hooks 'message-after-header-encode-hook))
+      (when (functionp message-header-encode-function)
+	(funcall message-header-encode-function))
+      (run-hooks 'message-header-encoded-hook))
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	(progn
+	  (message "")
 	  ;;(message "Posting not performed")
 	  nil)
       (unwind-protect
@@ -2762,6 +2767,9 @@ to find out how to use this."
 	 (y-or-n-p
 	  "The article contains control characters.  Really post? ")
        t))
+   ;; Check content transfer encoding.
+   (message-check 'encoding
+     (message-check-encoding))
    ;; Check excessive size.
    (message-check 'size
      (if (> (buffer-size) 60000)
@@ -2788,6 +2796,56 @@ to find out how to use this."
 	     "Your .sig is %d lines; it should be max 4.  Really post? "
 	     (1- (count-lines (point) (point-max)))))
 	 t)))))
+
+(defun message-check-mail-syntax ()
+  "Check the syntax of the message."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (and
+       ;; We narrow to the headers and check them first.
+       (save-excursion
+	 (save-restriction
+	   (message-narrow-to-headers)
+	   (message-check-mail-header-syntax)))
+       ;; Check the body.
+       (save-excursion
+	 (set-buffer message-edit-buffer)
+	 (message-check-mail-body-syntax))))))
+
+(defun message-check-mail-header-syntax ()
+  t)
+
+(defun message-check-mail-body-syntax ()
+  (and
+   ;; Check content transfer encoding.
+   (message-check 'encoding
+     (message-check-encoding)
+     )))
+
+(defun message-check-encoding ()
+  "Check content encoding type."
+  (save-excursion
+    (set-buffer message-encoding-buffer)
+    (message-narrow-to-headers)
+    (let* ((case-fold-search t)
+	   (encoding-string
+	    (message-fetch-field "content-transfer-encoding"))
+	   (encoding (or encoding-string
+			 message-default-encoding)))
+      (message "%s %s" encoding-string encoding)
+      (if (not (string-match "^7bit" encoding))
+	  t
+	(widen)
+	(set-buffer (get-buffer-create " message syntax"))
+	(erase-buffer)
+	(set-buffer-multibyte nil)
+	(insert-buffer message-encoding-buffer)
+	(goto-char (point-min))
+	(if (re-search-forward "[\200-\377]" nil t)
+	    (y-or-n-p
+	     "The article contains 8bit characters.  Really post? ")
+	  t)))))
 
 (defun message-checksum ()
   "Return a \"checksum\" for the current buffer."
@@ -2819,9 +2877,9 @@ to find out how to use this."
 	  (push file list)
 	  (message-remove-header "fcc" nil t))
 	(run-hooks 'message-header-hook)
-	(when (functionp message-encode-header-function)
-	  (funcall message-encode-header-function))
-	(run-hooks 'message-after-header-encode-hook))
+	(when (functionp message-header-encode-function)
+	  (funcall message-header-encode-function))
+	(run-hooks 'message-header-encoded-hook))
       (run-hooks 'message-before-do-fcc-hook)
       (goto-char (point-min))
       (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
@@ -3545,8 +3603,6 @@ Headers already prepared in the buffer are not modified."
     (run-hooks 'message-header-setup-hook))
   (set-buffer-modified-p nil)
   (setq buffer-undo-list nil)
-  (when (functionp message-mime-setup-function)
-    (funcall message-mime-setup-function))
   (run-hooks 'message-setup-hook)
   (message-position-point)
   (undo-boundary))
