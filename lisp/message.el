@@ -3020,16 +3020,23 @@ or in the synonym headers, defined by `message-header-synonyms'."
   (when (message-goto-signature)
     (forward-line -2)))
 
-(defun message-kill-to-signature ()
-  "Deletes all text up to the signature."
-  (interactive)
-  (let ((point (point)))
-    (message-goto-signature)
-    (unless (eobp)
-      (end-of-line -1))
-    (kill-region point (point))
-    (unless (bolp)
-      (insert "\n"))))
+(defun message-kill-to-signature (&optional arg)
+  "Kill all text up to the signature.
+If a numberic argument or prefix arg is given, leave that number
+of lines before the signature intact."
+  (interactive "p")
+  (save-excursion
+    (save-restriction
+      (let ((point (point)))
+	(narrow-to-region point (point-max))
+	(message-goto-signature)
+	(unless (eobp)
+	  (if (and arg (numberp arg))
+	      (forward-line (- -1 arg))
+	    (end-of-line -1)))
+	(unless (= point (point))
+	  (kill-region point (point))
+	  (insert "\n"))))))
 
 (defun message-newline-and-reformat (&optional arg not-break)
   "Insert four newlines, and then reformat if inside quoted text.
