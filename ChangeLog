@@ -1,3 +1,8 @@
+2000-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Restore
+	the original code; hide group contents while rescanning.
+
 2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Truncate
