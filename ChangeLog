@@ -1,3 +1,12 @@
+1998-06-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.7.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Set up
+	`gnus-article-current-summary' of gnus-article-buffer.
+	(gnus-request-article-this-buffer): Don't set up
+	`gnus-article-current-summary'.
+
 1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.6.
@@ -24,12 +33,12 @@
 
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
-	* readme, README, texi/ChangeLog, texi/gnus.texi,
-	texi/message.texi, lisp/ChangeLog, lisp/nnweb.el, lisp/nnmail.el,
-	lisp/nndoc.el, lisp/message.el, lisp/lpath.el, lisp/gnus.el,
-	lisp/gnus-util.el, lisp/gnus-topic.el, lisp/gnus-sum.el,
-	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-ems.el,
-	lisp/gnus-demon.el, lisp/gnus-art.el: Sync up with Gnus 5.6.16.
+	* README, texi/ChangeLog, texi/gnus.texi, texi/message.texi,
+	lisp/ChangeLog, lisp/nnweb.el, lisp/nnmail.el, lisp/nndoc.el,
+	lisp/message.el, lisp/lpath.el, lisp/gnus.el, lisp/gnus-util.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-score.el,
+	lisp/gnus-group.el, lisp/gnus-ems.el, lisp/gnus-demon.el,
+	lisp/gnus-art.el: Sync up with Gnus 5.6.16.
 
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
