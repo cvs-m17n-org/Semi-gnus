@@ -50,7 +50,7 @@
 
 (require 'cl)
 (unless (dolist (var nil t))
-  ;; Override the macro `dolist' which might be defined in egg.el.
+  ;; Override the macro `dolist' which may have been defined in egg.el.
   (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
