@@ -5787,7 +5787,10 @@ be displayed."
 		  (gnus-summary-display-article article all-headers)
 		(setq did article)
 		(when (or all-headers gnus-show-all-headers)
-		  (gnus-article-show-all-headers)))
+		  (gnus-article-show-all-headers))
+		(with-current-buffer gnus-article-buffer
+		  (set (make-local-variable
+			'gnus-summary-search-article-matched-data) nil)))
 	    (when (or all-headers gnus-show-all-headers)
 	      (gnus-article-show-all-headers))
 	    'old))
@@ -6857,20 +6860,17 @@ Obeys the standard process/prefix convention."
   "Do incremental search forward on the current article.
 If REGEXP-P (the prefix) is non-nil, do regexp isearch."
   (interactive "P")
-  (let (gnus-treat-hide-headers
-	gnus-treat-hide-boring-headers
-	gnus-treat-display-xface
-	gnus-treat-display-smileys
-	gnus-treat-display-picons
-	gnus-treat-play-sounds)
-    (gnus-summary-select-article nil t))
-  (gnus-configure-windows 'article)
-  (gnus-eval-in-buffer-window gnus-article-buffer
-    (set (make-local-variable 'isearch-lazy-highlight) t)
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      (isearch-forward regexp-p))))
+  (let* ((gnus-inhibit-treatment t)
+	 (old (gnus-summary-select-article)))
+    (gnus-configure-windows 'article)
+    (gnus-eval-in-buffer-window gnus-article-buffer
+      (set (make-local-variable 'isearch-lazy-highlight) t)
+      (save-restriction
+	(widen)
+	(when (eq 'old old)
+	  (gnus-article-show-all-headers))
+	(goto-char (point-min))
+	(isearch-forward regexp-p)))))
 
 (defun gnus-summary-search-article-forward (regexp &optional backward)
   "Search for an article containing REGEXP forward.
@@ -6900,29 +6900,34 @@ If BACKWARD, search backward instead."
 		    "")))))
   (gnus-summary-search-article-forward regexp 'backward))
 
-(defvar gnus-summary-search-article-matched-text)
+(defvar gnus-summary-search-article-matched-data)
 (eval-when-compile
+  (defmacro gnus-summary-search-article-position-point (backward)
+    "Dehighlight the last matched text and goto the beginning position."
+    `(if gnus-summary-search-article-matched-data
+	 (let ((start (car gnus-summary-search-article-matched-data))
+	       (end (cadr gnus-summary-search-article-matched-data))
+	       (text (caddr gnus-summary-search-article-matched-data))
+	       (inhibit-read-only t)
+	       buffer-read-only)
+	   (delete-region (goto-char start) end)
+	   (insert text)
+	   (set-buffer-modified-p nil)
+	   (when ,backward
+	     (goto-char start)))
+       (goto-char (if ,backward (point-max) (point-min)))))
+
   (defmacro gnus-summary-search-article-highlight-matched-text ()
     "Highlight matched text in the function `gnus-summary-search-article'."
     '(let ((start (match-beginning 0))
 	   (end (match-end 0))
-	   (old (if (boundp 'gnus-summary-search-article-matched-text)
-		    gnus-summary-search-article-matched-text))
 	   (inhibit-read-only t)
 	   buffer-read-only)
-       (when old
-	 (let ((old-start (car old))
-	       (old-end (cadr old))
-	       (old-text (caddr old)))
-	   (when (string-equal (buffer-substring old-start old-end) old-text)
-	     (goto-char old-start)
-	     (delete-region old-start old-end)
-	     (insert old-text)
-	     (goto-char end))))
-       (set (make-local-variable 'gnus-summary-search-article-matched-text)
-	    (list start end (buffer-substring start end)))
+       (setq gnus-summary-search-article-matched-data
+	     (list start end (buffer-substring start end)))
        (put-text-property start end 'face
-			  (or (find-face 'isearch) 'secondary-selection))))
+			  (or (find-face 'isearch) 'secondary-selection))
+       (set-buffer-modified-p nil)))
   )
 
 (defun gnus-summary-search-article (regexp &optional backward)
@@ -6943,14 +6948,15 @@ Optional argument BACKWARD means do search for backward.
 	(found nil)
 	point)
     (gnus-save-hidden-threads
-      (let (gnus-treat-hide-headers
-	    gnus-treat-hide-boring-headers
-	    gnus-treat-display-xface
-	    gnus-treat-display-smileys
-	    gnus-treat-display-picons
-	    gnus-treat-play-sounds)
-	(gnus-summary-select-article nil t))
-      (set-buffer gnus-article-buffer)
+      (let* ((gnus-inhibit-treatment t)
+	     (old (gnus-summary-select-article)))
+	(set-buffer gnus-article-buffer)
+	(widen)
+	(if (eq 'old old)
+	    (progn
+	      (gnus-article-show-all-headers)
+	      (gnus-summary-search-article-position-point backward))
+	  (goto-char (if backward (point-max) (point-min)))))
       (when backward
 	(forward-line -1))
       (while (not found)
@@ -6981,13 +6987,8 @@ Optional argument BACKWARD means do search for backward.
 	      (unless (gnus-summary-article-sparse-p
 		       (gnus-summary-article-number))
 		(setq found nil)
-		(let (gnus-treat-hide-headers
-		      gnus-treat-hide-boring-headers
-		      gnus-treat-display-xface
-		      gnus-treat-display-smileys
-		      gnus-treat-display-picons
-		      gnus-treat-play-sounds)
-		  (gnus-summary-select-article nil t))
+		(let ((gnus-inhibit-treatment t))
+		  (gnus-summary-select-article))
 		(set-buffer gnus-article-buffer)
 		(widen)
 		(goto-char (if backward (point-max) (point-min))))))))
