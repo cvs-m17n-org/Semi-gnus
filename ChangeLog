@@ -5,10 +5,8 @@
 
 1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/nnheader.el (nnheader-parse-head): Use
-	`make-full-mail-header-from-decoded-header' instead of
+	* lisp/nnheader.el (nnheader-parse-nov): Use
 	`make-full-mail-header'.
- 	(nnheader-parse-nov): Use `make-full-mail-header'.
 
 1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
