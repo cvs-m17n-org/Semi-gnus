@@ -1,5 +1,36 @@
 2002-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* dgnushack.el: Commented out the experimental code.
+
+2002-01-25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-range.el (gnus-inverse-list-range-intersection): Off-by-one
+	error.
+
+	* gnus.el (gnus-server-to-method): Made into subst.
+	(gnus-server-method-cache): New variable.
+	(gnus-server-to-method): Use it.
+	(gnus-group-method-cache): New variable.
+	(gnus-find-method-for-group-1): Renamed.
+	(gnus-find-method-for-group): New function.
+	(gnus-group-method-cache): Removed.
+
+	* gnus-sum.el (gnus-compute-unseen-list): Use new optimized
+	function.
+
+	* gnus-range.el (gnus-members-of-range): New function.
+	(gnus-list-range-intersection): Renamed.
+	(gnus-inverse-list-range-intersection): New function.
+
+	* gnus-sum.el (gnus-compute-unseen-list): Made into own function.
+
+	* nnagent.el (nnagent-retrieve-headers): New implementation.
+
+	* gnus-agent.el (gnus-agent-get-undownloaded-list): New, faster
+	implementation.
+
+2002-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lpath.el: Fbind `w3m-charset-to-coding-system'; bind
 	`w3m-meta-content-type-charset-regexp'.
 

@@ -86,6 +86,14 @@
 	(t (concat filename ".elc"))))
 
 (require 'bytecomp)
+;; To avoid having defsubsts and inlines happen.
+;(if (featurep 'xemacs)
+;    (require 'byte-optimize)
+;  (require 'byte-opt))
+;(defun byte-optimize-inline-handler (form)
+;  "byte-optimize-handler for the `inline' special-form."
+;  (cons 'progn (cdr form)))
+;(defalias 'byte-compile-file-form-defsubst 'byte-compile-file-form-defun)
 
 (when (boundp 'MULE)
   (let (current-load-list)
