@@ -41,15 +41,42 @@
 
 (defconst gnus-advanced-index
   ;; Name to index alist.
-  '(("number" 0 gnus-advanced-integer)
-    ("subject" 1 gnus-advanced-string)
-    ("from" 2 gnus-advanced-string)
-    ("date" 3 gnus-advanced-date)
-    ("message-id" 4 gnus-advanced-string)
-    ("references" 5 gnus-advanced-string)
-    ("chars" 6 gnus-advanced-integer)
-    ("lines" 7 gnus-advanced-integer)
-    ("xref" 8 gnus-advanced-string)
+  `(("number"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'location)
+     gnus-advanced-integer)
+    ("subject"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'subject)
+     gnus-advanced-string)
+    ("from" 
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'from)
+     gnus-advanced-string)
+    ("date"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'date)
+     gnus-advanced-date)
+    ("message-id"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'id)
+     gnus-advanced-string)
+    ("references"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'references)
+     gnus-advanced-string)
+    ("chars"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'chars)
+     gnus-advanced-integer)
+    ("lines" 
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'lines)
+     gnus-advanced-integer)
+    ("xref"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'xref)
+     gnus-advanced-string)
     ("head" nil gnus-advanced-body)
     ("body" nil gnus-advanced-body)
     ("all" nil gnus-advanced-body)))
