@@ -1526,7 +1526,7 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 			     (not (string-match gnus-article-x-face-too-ugly
 						from))))
 		    ;; Has to be present.
-		    (re-search-forward "^X-Face: " nil t))
+		    (re-search-forward "^X-Face:[ \t]*" nil t))
 	  ;; This used to try to do multiple faces (`while' instead of
 	  ;; `when' above), but (a) sending multiple EOFs to xv doesn't
 	  ;; work (b) it can crash some versions of Emacs (c) are

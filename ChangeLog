@@ -1,3 +1,7 @@
+2000-02-08  Yoshiki Hayashi <yoshiki@xemacs.org>
+
+	* gnus-art.el (article-display-face): Show folded X-Face.
+
 2000-02-08  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
