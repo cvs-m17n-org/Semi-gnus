@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.0"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "10"
+(defconst gnus-revision-number "11"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.95"
@@ -656,6 +656,11 @@ be set in `.emacs' instead."
   '((t
      ()))
   "Face used for normal interest unread articles.")
+
+(defface gnus-summary-incorporated-face
+  '((t
+     ()))
+  "Face used for incorporated articles.")
 
 (defface gnus-summary-high-read-face
   '((((class color)
