@@ -1,5 +1,24 @@
 2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 14.
+	(gnus-compile-user-specs): New user option.
+
+	* texi/gnus.texi: Update.
+	* texi/gnus-ja.texi: Update.
+
+	* lisp/gnus-start.el (gnus-setup-news): Revert.
+	(gnus-setup-news-hook): Revert.
+
+	* lisp/gnus-spec.el (gnus-compile): Modify the actual format specs
+	as well; don't bind `gnus-tmp-func'.
+	(gnus-update-format-specifications): Revert; use
+	`gnus-update-format-specification-1'.
+	(gnus-update-format-specification-1): New function.
+	(gnus-format-specs-compiled): Modify the form.
+	(TopLevel): Require `alist'.
+
+2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
 
 	* texi/gnus.texi: Update.
