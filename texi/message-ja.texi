@@ -474,6 +474,23 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 によってなされ、それぞれの貼り付けられた引用行はその前に 
 @code{message-yank-prefix} を付けられます。初期値は @samp{> } です。
 
+@item message-yank-add-new-references
+@vindex message-yank-add-new-references
+@cindex yanking
+コマンド @code{message-yank-original} を対話的に使ったときに、この値が
+@code{nil} でなかったら、References フィールドに ID が追加されます。も
+し値がシンボル @code{message-id-only} だったら Message-ID フィールドの
+ID だけが使われますが、そうでなければ References、In-Reply-To および
+Message-ID フィールドから抽出された ID が使われます。
+
+@item message-list-references-add-position
+@vindex message-list-references-add-position
+@cindex yanking
+コマンド @code{message-yank-original} を対話的に使ったときに、この値が
+正の整数だったら、すでにある References フィールドの最後からその個数の
+ID だけ離れた場所に新しい ID が挿入されます。それ以外の場合は最後に挿入
+されます。
+
 @item message-indentation-spaces
 @vindex message-indentation-spaces
 貼り付けられたメッセージを字下げするための空白の数です。

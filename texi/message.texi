@@ -479,6 +479,22 @@ to quote the person you are answering.  Inserting quoted text is done by
 @dfn{yanking}, and each quoted line you yank will have
 @code{message-yank-prefix} prepended to it.  The default is @samp{> }.
 
+@item message-yank-add-new-references
+@vindex message-yank-add-new-references
+@cindex yanking
+Non-@code{nil} means new IDs will be added to References field when an
+article is yanked by the command @code{message-yank-original}
+interactively.  If it is a symbol @code{message-id-only}, only an ID
+from Message-ID field is used, otherwise IDs extracted from References,
+In-Reply-To and Message-ID fields are used.
+
+@item message-list-references-add-position
+@vindex message-list-references-add-position
+@cindex yanking
+Integer value means position for adding to References field when an
+article is yanked by the command @code{message-yank-original}
+interactively.
+
 @item message-indentation-spaces
 @vindex message-indentation-spaces
 Number of spaces to indent yanked messages.
