@@ -1,10 +1,26 @@
+1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.8.
+
+	* Makefile.in (install-package-ja, package-ja, install-package,
+	package): New targets.
+	(PACKAGEDIR): New user option.
+
+	* lisp/Makefile.in (install-package, package): New targets.
+	(PACKAGEDIR): New user option.
+
+	* lisp/dgnushack.el (dgnushack-install-package): New function.
+	(dgnushack-make-package): New function.
+	(dgnushack-info-file-regexp): New constant.
+	(dgnushack-compile): Remove "_pkg.el" from the list.
+
 1999-02-17  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* aclocal.m4: install .el files to site-lisp/gnus instead of
 	site-lisp.
 	* configure: Ditto.
 	* Makefile.in: add new rule `all-ja'.
-	
+
 1999-02-15  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix when
@@ -14,7 +30,7 @@
 	code.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.7.
-	
+
 1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-hide-headers): Show all headers when
