@@ -8633,7 +8633,8 @@ Message-ID$B!"%a!<%k%"%I%l%9$*$h$S%K%e!<%9$N(B URL $B$NI=<($r@)8f$7$^$9!#4XO"
 @vindex gnus-button-tex-level
 Tex $B$^$?$O(B LaTex $B$K4X$9$k;29MJ88%!"Nc$($P(B CTAN $B$N(B URL$B!"$NI=<($r@)8f$7$^(B
 $B$9!#JQ?t(B @code{gnus-ctan-url},
-@code{gnus-button-ctan-handler} $B$*$h$S(B
+@code{gnus-button-ctan-handler},
+@code{gnus-button-ctan-directory-regexp} $B$*$h$S(B
 @code{gnus-button-handle-ctan-bogus-regexp} $B$r;2>H$7$F2<$5$$!#(B
 @end table
 
@@ -12006,7 +12007,8 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 $B$7(B @samp{ssh} $B$r(B @code{nntp-via-rlogin-command} $B$NCM$H$7$F;H$&$J$i$P!"%G!<(B
 $B%?@\B3$r05=L$9$k$?$a$K(B @samp{("-C")} $B$r;H$&$3$H$,$G$-$^$9!#$"$k$$$O!"$b(B
 $B$7Cf4V$N%[%9%H$G(B telnet $B%3%^%s%I$,5?;wC<Kv$rI,MW$H$9$k$J$i$P!"$3$l(B
-$B$r(B @samp{("-t")} $B$^$?$O(B @samp{("-C" "-t")} $B$K$7$F2<$5$$!#(B
+$B$r(B @samp{("-t" "-e" "none")} $B$^$?$O(B @samp{("-C" "-t" "-e" "none")} $B$K$7(B
+$B$F2<$5$$!#(B
 @end table
 
 @item nntp-open-via-telnet-and-telnet
@@ -17896,7 +17898,10 @@ Gnus $B$O35N,%P%C%U%!$r:n@.$9$kA0$K!"8=:_$N%0%k!<%W$KE,MQ$5$l$k$I$s(B
 @kindex V t ($B35N,(B)
 @findex gnus-score-find-trace
 $B8=:_$N5-;v$K;H$o$l$F$$$kA4$F$N%9%3%"K!B'(B (score rule) $B$rI=<($7$^(B
-$B$9(B (@code{gnus-score-find-trace})$B!#(B
+$B$9(B (@code{gnus-score-find-trace})$B!#(B@code{*Score Trace*} $B%P%C%U%!$G(B
+$B$O(B @kbd{q} $B$G=*N;$9$k$3$H$,$G$-$^$9!#(B@kbd{e} $B$GBP1~$9$k%9%3%"%U%!%$%k$r(B
+$BJT=8$7$^$9!#%]%$%s%H$,9gCW$7$?AG;R$NCf$NJ8;zNs>e$K$"$k$H$-!"(B@kbd{e} $B$O%9(B
+$B%3%"%U%!%$%k$NCf$N$3$NJ8;zNs$N>l=j$X0\F0$7$h$&$H$7$^$9!#(B
 
 @item V w
 @kindex V w ($B35N,(B)
@@ -22598,6 +22603,7 @@ XEmacs $B$O%Q%C%1!<%8$N=/=8$H$7$FG[I[$5$l$F$$$^$9!#(Bgnus $B$N(B XEmacs $B%
 @cindex Pterodactyl Gnus
 @cindex Oort Gnus
 @cindex No Gnus
+@cindex Gnus versions
 
 $B:G=i$N(B ``$BE,@Z$J(B'' Gnus 5 $B$N%j%j!<%9$O(B 1995$BG/(B11$B7n$K(B Emacs 19.30 $B$NG[I[$K(B
 $B4^$^$l$?$H$-$K$J$5$l$^$7$?(B (132 $B$N(B (ding) Gnus $B$N%j%j!<%9(B $BB-$9$3$H(B

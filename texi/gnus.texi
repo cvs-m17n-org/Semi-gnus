@@ -8806,7 +8806,8 @@ Related variables and functions include
 @vindex gnus-button-tex-level
 Controls the display of references to TeX or LaTeX stuff, e.g. for CTAN
 URLs.  See the variables @code{gnus-ctan-url},
-@code{gnus-button-ctan-handler} and
+@code{gnus-button-ctan-handler},
+@code{gnus-button-ctan-directory-regexp}, and
 @code{gnus-button-handle-ctan-bogus-regexp}.
 
 @end table
@@ -12600,8 +12601,9 @@ List of strings to be used as the switches to
 @code{nntp-via-rlogin-command}.  The default is @code{nil}.  If you use
 @samp{ssh} for @code{nntp-via-rlogin-command}, you may set this to
 @samp{("-C")} in order to compress all data connections, otherwise set
-this to @samp{("-t")} or @samp{("-C" "-t")} if the telnet command
-requires a pseudo-tty allocation on an intermediate host.
+this to @samp{("-t" "-e" "none")} or @samp{("-C" "-t" "-e" "none")} if
+the telnet command requires a pseudo-tty allocation on an intermediate
+host.
 @end table
 
 @item nntp-open-via-telnet-and-telnet
@@ -18262,7 +18264,10 @@ Display the score of the current article
 @kindex V t (Summary)
 @findex gnus-score-find-trace
 Display all score rules that have been used on the current article
-(@code{gnus-score-find-trace}).
+(@code{gnus-score-find-trace}).  In the @code{*Score Trace*} buffer, you
+can use @kbd{q} to quit.  @kbd{e} edits the corresponding score file.
+When point is on a string within the match element, @kbd{e} will try to
+bring you to this string in the score file.
 
 @item V w
 @kindex V w (Summary)
@@ -23097,6 +23102,7 @@ renamed it back again to ``Gnus''.  But in mixed case.  ``Gnus'' vs.
 @cindex Pterodactyl Gnus
 @cindex Oort Gnus
 @cindex No Gnus
+@cindex Gnus versions
 
 The first ``proper'' release of Gnus 5 was done in November 1995 when it
 was included in the Emacs 19.30 distribution (132 (ding) Gnus releases

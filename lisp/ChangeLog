@@ -1,3 +1,30 @@
+2003-04-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind Info-directory and Info-menu.
+
+2003-04-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-util.el (gnus-message): Added doc-string.
+
+	* gnus-score.el (gnus-score-find-trace): Changed behavior of `q'.
+	(gnus-score-edit-file-at-point): Goto first match when using `e'.
+
+2003-04-01  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-button-ctan-directory-regexp): New variable.
+	(gnus-button-alist): Use it.  Changed CTAN and "setq" entries.
+
+2003-04-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nntp.el (nntp-via-rlogin-command-switches): Doc fix.
+	(nntp-open-via-rlogin-and-telnet): Disable the telnet linemode.
+
+2003-03-31  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus-start.el (gnus-gnus-to-quick-newsrc-format): Bound
+	print-escape-newlines to print escape sequences rather than
+	literal newline characters.
+
 2003-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* gnus-art.el (gnus-button-valid-fqdn-regexp): Use
@@ -66,7 +93,7 @@
 2003-03-28  Vasily Korytov  <deskpot@myrealbox.com>
 
 	* message.el (message-make-in-reply-to): Use
-	mail-extract-address-components to dentermine sender's
+	mail-extract-address-components to determine sender's
 	name/address.
 
 2003-03-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
