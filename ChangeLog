@@ -1,5 +1,10 @@
 2002-02-21   Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/nnheader.el (mm-string-as-unibyte): Undo the last change.
+	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Ditto.
+
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/nnheader.el (mm-string-as-unibyte): Alias to
 	`string-as-unibyte'.
 
