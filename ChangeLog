@@ -1,5 +1,13 @@
 2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/lpath.el: Fbind `coding-system-to-mime-charset' for Mule 2.
+
+	* lisp/nnheader.el (std11-fold-region): New function copied from
+	`rfc2047-fold-region'.
+	(std11-fold-field): Use it.
+
+2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el: Don't autoload "gnus-bitmap".
 
 	* lisp/gnus-ems.el: Autoload "smiley-mule" if running Emacs
