@@ -1,5 +1,10 @@
 1998-12-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/message.el (message-cite-original-without-signature): Do
+	not use mml-quote-region.
+	
+	* lisp/message.el (message-cite-original): Ditto.
+	
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.049.
 
 	* Sync up with Pterodactyl Gnus 0.64.

@@ -2055,7 +2055,6 @@ prefix, and don't delete any headers."
 	   (if (listp message-indent-citation-function)
 	       message-indent-citation-function
 	     (list message-indent-citation-function)))))
-    (mml-quote-region start end)
     (goto-char end)
     (when (re-search-backward "^-- $" start t)
       ;; Also peel off any blank lines before the signature.
@@ -2085,7 +2084,6 @@ prefix, and don't delete any headers."
 	     (if (listp message-indent-citation-function)
 		 message-indent-citation-function
 	       (list message-indent-citation-function)))))
-      (mml-quote-region start end)
       (goto-char start)
       (while functions
 	(funcall (pop functions)))
