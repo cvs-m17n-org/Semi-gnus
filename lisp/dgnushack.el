@@ -113,6 +113,24 @@
 	   (setq arg (cdr arg)))
 	 (apply (function nconc) (nreverse res))))))
 
+(define-compiler-macro union (&whole form list1 list2)
+  (if (and (fboundp 'union)
+	   (subrp (symbol-function 'union)))
+      form
+    `(let ((a ,list1)
+	   (b ,list2))
+       (cond ((null a) b)
+	     ((null b) a)
+	     ((equal a b) a)
+	     (t
+	      (or (>= (length a) (length b))
+		  (setq a (prog1 b (setq b a))))
+	      (while b
+		(or (memq (car b) a)
+		    (push (car b) a))
+		(pop b))
+	      a)))))
+
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
 ;; into the building directory.  For that, we define this function
