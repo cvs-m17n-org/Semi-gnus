@@ -20,17 +20,17 @@ install:
 	cd texi && $(MAKE) EMACS=$(EMACS) install
 
 # Rule for XEmacs package.
-package: xlick xinfo
+package: xlick add-info-suffix xinfo remove-info-suffix
 	cd lisp && $(MAKE) EMACS=$(XEMACS) package
 
-install-package: xinfo
+install-package: add-info-suffix xinfo xinfo remove-info-suffix
 	cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$(PACKAGEDIR) \
 		install-package
 
-package-ja: xlick xinfo xinfo-ja
+package-ja: xlick add-info-suffix xinfo xinfo-ja remove-info-suffix
 	cd lisp && $(MAKE) EMACS=$(XEMACS) package
 
-install-package-ja: xinfo xinfo-ja
+install-package-ja: add-info-suffix xinfo xinfo-ja remove-info-suffix
 	cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$(PACKAGEDIR) \
 		install-package
 
@@ -38,13 +38,15 @@ xlick:
 	cd lisp && $(MAKE) EMACS=$(XEMACS) lispdir=$(lispdir) all
 
 xinfo:
-	cd texi && $(MAKE) EMACS=$(XEMACS) add-info-suffix
 	cd texi && $(MAKE) EMACS=$(XEMACS) all
-	cd texi && $(MAKE) remove-info-suffix
 
 xinfo-ja:
-	cd texi && $(MAKE) EMACS=$(XEMACS) add-info-suffix
 	cd texi && $(MAKE) EMACS=$(XEMACS) MAKEINFO=no ja
+
+add-info-suffix:
+	cd texi && $(MAKE) EMACS="$(XEMACS)" add-info-suffix
+
+remove-info-suffix:
 	cd texi && $(MAKE) remove-info-suffix
 
 # Rule for Lars and nobody else.
