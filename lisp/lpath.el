@@ -22,6 +22,7 @@
 	       mail-aliases-setup mm-copy-tree
 	       mule-write-region-no-coding-system put-image
 	       ring-elements
+	       propertize make-mode-line-mouse2-map
 	       rmail-select-summary rmail-summary-exists rmail-update-summary
 	       sc-cite-regexp set-font-family set-font-size temp-directory
 	       string-as-multibyte
@@ -102,19 +103,16 @@
 (let ((functions-variables
        (cond
 	((featurep 'xemacs)
-	 '((propertize xml-parse-region)))
+	 '((xml-parse-region)))
 	((>= emacs-major-version 21)
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
 	 '((charsetp
 	    coding-system-get compose-mail file-name-extension
 	    find-coding-systems-region function-max-args get-charset-property
-	    propertize shell-command-to-string smiley-encode-buffer
-	    xml-parse-region)))
+	    shell-command-to-string smiley-encode-buffer xml-parse-region)))
 	(t
-	 '((function-max-args
-	    propertize smiley-encode-buffer
-	    xml-parse-region))))))
+	 '((function-max-args smiley-encode-buffer xml-parse-region))))))
   (maybe-fbind (car functions-variables))
   (maybe-bind (car (cdr functions-variables))))
 

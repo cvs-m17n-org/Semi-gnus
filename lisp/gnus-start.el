@@ -414,6 +414,10 @@ Can be used to turn version control on or off."
 					  'ctext)
   "*Coding system for startup file.")
 
+(defvar gnus-ding-file-coding-system gnus-startup-file-coding-system
+  "*Coding system for ding file.")
+;; Note that the ding file for T-gnus ought not to have byte-codes.
+
 ;;; Internal variables
 
 (defvar gnus-newsrc-file-version nil)
@@ -2065,7 +2069,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (condition-case nil
 	      (progn
 		(insert-file-contents-as-coding-system
-		 gnus-startup-file-coding-system ding-file)
+		 gnus-ding-file-coding-system ding-file)
 		(eval-region (point-min) (point-max)))
 	    (error
 	     (ding)
@@ -2494,7 +2498,7 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (save-buffer-as-coding-system gnus-startup-file-coding-system)
+	  (save-buffer-as-coding-system gnus-ding-file-coding-system)
 	  (kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
@@ -2700,8 +2704,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 	   (make-temp-name (concat gnus-current-startup-file "-slave-")))
 	  (modes (ignore-errors
 		   (file-modes (concat gnus-current-startup-file ".eld")))))
-      (gnus-write-buffer-as-coding-system
-       gnus-startup-file-coding-system slave-name)
+      (gnus-write-buffer-as-coding-system gnus-ding-file-coding-system
+					  slave-name)
       (when modes
 	(set-file-modes slave-name modes)))))
 
