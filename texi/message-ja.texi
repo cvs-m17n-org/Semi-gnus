@@ -11,7 +11,7 @@ This file documents Message, the Emacs message composition mode.
 $B$3$N%U%!%$%k$O(B Emacs $B$N%a%C%;!<%8:n@.%b!<%I$G$"$k(B Message $B$K4X$9$k@bL@J8(B
 $B=q$G$9!#(B
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 Free Software Foundation, Inc.
 
 @quotation
@@ -1416,6 +1416,9 @@ Message $B$,(B gnus $B>e$GAv$C$F$$$k>l9g!"%a%C%;!<%8%P%C%U%!$O%I%i%U%H%0%k!<%
 (setq message-hidden-headers
       '(not "From" "Subject" "To" "Cc" "Newsgroups"))
 @end lisp
+
+$B%X%C%@!<$O(B narrowing $B$r;H$C$F1#$5$l$^$9!#$=$l$i$r%P%C%U%!$GO*=P$5$;$k$?(B
+$B$a$K(B @kbd{M-x widen} $B$r;H$&$3$H$,$G$-$^$9!#(B
 
 @item message-header-synonyms
 @vindex message-header-synonyms
