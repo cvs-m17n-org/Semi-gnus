@@ -504,8 +504,7 @@ parameter.  It should return nil, `warn' or `delete'."
 	  t)
       (file-error nil))))
 
-(defvar nnmail-pathname-coding-system
-  'iso-8859-1
+(defvar nnmail-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
 (defun nnmail-group-pathname (group dir &optional file)
