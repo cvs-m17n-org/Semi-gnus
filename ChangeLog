@@ -1,3 +1,7 @@
+1998-10-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/uudecode.el: New file.
+
 1998-10-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.023.
