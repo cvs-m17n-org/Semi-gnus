@@ -17,12 +17,6 @@ To do list.
 
     現行の ctext では byte code を破壊してしまう。
 
-*1998/10/02-7 smtp.el 移動
-
-    smtp.el は、他の package でも使用する可能性があるので、 FLIM に移
-    動する。
-    その前に、 shuhei-k 枝の smtp.el との仕様を共通化する必要がある。
-
 *1998/10/02-12 ヘッダー・フィールドに対する不要な decode を排除
 
     既に decode されているヘッダー・フィールドを再度 decode してしまう
@@ -106,3 +100,11 @@ To do list.
     Cancel/Replaces/Supersedes のときは Cancel-Key フィールドを付加する。
 
     1999/01/12 - 完了
+
+*1998/10/02-7 smtp.el 移動
+
+    smtp.el は、他の package でも使用する可能性があるので、 FLIM に移
+    動する。
+    その前に、 shuhei-k 枝の smtp.el との仕様を共通化する必要がある。
+
+    1998/12/02 - 完了
