@@ -3571,7 +3571,10 @@ be added to the \"References\" field."
 			   '(References . message-fill-references)))
 		 (list (cons 'References (mapconcat 'identity
 						    (nreverse newrefs) " "))))
-		(backward-delete-char 1))))))
+		(delete-region (point)
+			       (progn
+				 (skip-chars-backward "\n")
+				 (1+ (point)))))))))
       (unless arg
 	(if (and message-suspend-font-lock-when-citing
 		 (boundp 'font-lock-mode)
