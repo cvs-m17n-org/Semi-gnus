@@ -325,7 +325,7 @@ arguments necessary for the job.")
 		(let ((article-goto-body-goes-to-point-min-p nil))
 		  (article-goto-body))
 		(unless (bobp)
-		  (backward-char 1)))))
+		  (forward-char -1)))))
 	  (if (null gnus-picons-piconsearch-url)
 	      (gnus-picons-display-pairs
 	       (gnus-picons-lookup-pairs
@@ -506,7 +506,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 					nil 'quiet)
 			  (prog1 (make-glyph (vector 'xbm :file fname))
 			    (delete-file fname))))
-	(t (make-glyph (vector type :data (buffer-string))))))
+	(t (make-glyph (vector type :data (buffer-substring
+					   (point-min) (point-max)))))))
 
 ;;; Parsing of piconsearch result page.
 

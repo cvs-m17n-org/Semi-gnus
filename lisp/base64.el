@@ -93,7 +93,8 @@ base64-encoder-program.")
 		 t)
 		(t (save-excursion
 		     (set-buffer (find-file-noselect tempfile))
-		     (setq errstring (buffer-string))
+		     (setq errstring (buffer-substring
+				      (point-min) (point-max)))
 		     (kill-buffer nil)
 		     (cons status errstring)))))
       (ignore-errors
@@ -251,7 +252,7 @@ base64-encoder-program.")
     (skip-chars-backward " \t\r\n")
     (delete-region (point-max) (point))
     (prog1
-	(buffer-string)
+	(buffer-substring (point-min) (point-max))
       (kill-buffer (current-buffer)))))
 
 (defun base64-decode (string)
@@ -264,7 +265,7 @@ base64-encoder-program.")
     (skip-chars-backward " \t\r\n")
     (delete-region (point-max) (point))
     (prog1
-	(buffer-string)
+	(buffer-substring (point-min) (point-max))
       (kill-buffer (current-buffer)))))
 
 (fset 'base64-decode-string 'base64-decode)
