@@ -1133,13 +1133,15 @@ If SILENT, don't prompt the user."
 						 newline-product)
   "Return a user-agent info.  If INCLUDE-MIME-INFO is non-nil and the
 variable `mime-edit-user-agent-value' is bound, the value will be
-included in the return value.  If MAX-COLUMN is specified, the return
-value will be folded up as it were filled.  NEWLINE-PRODUCT specifies
-whether a newline should be inserted in front of each product-token.
-If the value is t or `hard', it works strictly.  Otherwise, if it is
-non-nil (e.g. `soft'), it works semi-strictly.
+included in the return value, and `gnus-user-agent' is ignored.  If
+MAX-COLUMN is specified, the return value will be folded up as it were
+filled.  NEWLINE-PRODUCT specifies whether a newline should be
+inserted in front of each product-token.  If the value is t or `hard',
+it works strictly.  Otherwise, if it is non-nil (e.g. `soft'), it
+works semi-strictly.
 
-Here is an example of how to use this function:
+Here is an odd example, which inserts a User-Agent: header when you
+begin to compose a message:
 
 \(add-hook 'gnus-message-setup-hook
 	  (lambda nil
@@ -1176,7 +1178,10 @@ Here is an example of how to use this function:
 		     nil)
 		    ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$"
 				   emacs-version)
-		     (concat "Emacs/" (match-string 1 emacs-version)
+		     (concat (if (boundp 'MULE)
+				 "Mule/2.3@"
+			       "Emacs/")
+			     (match-string 1 emacs-version)
 			     (if system-v
 				 (concat " (" system-v ")")
 			       "")))
