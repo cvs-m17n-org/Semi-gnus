@@ -6219,20 +6219,22 @@ OTHER-HEADERS is an alist of header/value pairs."
 (defun message-get-reply-headers (wide &optional to-address address-headers)
   (let (follow-to mct never-mct to cc author mft recipients)
     ;; Find all relevant headers we need.
-    (let ((mrt (when message-use-mail-reply-to
-		 (message-fetch-field "mail-reply-to")))
-	  (reply-to (message-fetch-field "reply-to")))
-      (setq to (message-fetch-field "to")
-	    cc (message-fetch-field "cc")
-	    mct (when message-use-mail-copies-to
-		  (message-fetch-field "mail-copies-to"))
-	    author (or mrt
-		       reply-to
-		       (message-fetch-field "from")
-		       "")
-	    mft (when (and (not (or to-address mrt reply-to))
-			   message-use-mail-followup-to)
-		  (message-fetch-field "mail-followup-to"))))
+    (save-restriction
+      (message-narrow-to-headers-or-head)
+      (let ((mrt (when message-use-mail-reply-to
+		   (message-fetch-field "mail-reply-to")))
+	    (reply-to (message-fetch-field "reply-to")))
+	(setq to (message-fetch-field "to")
+	      cc (message-fetch-field "cc")
+	      mct (when message-use-mail-copies-to
+		    (message-fetch-field "mail-copies-to"))
+	      author (or mrt
+			 reply-to
+			 (message-fetch-field "from")
+			 "")
+	      mft (when (and (not (or to-address mrt reply-to))
+			     message-use-mail-followup-to)
+		    (message-fetch-field "mail-followup-to")))))
 
     (save-match-data
       ;; Handle special values of Mail-Copies-To.
