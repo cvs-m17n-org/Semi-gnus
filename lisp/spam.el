@@ -423,7 +423,7 @@ your main source of newsgroup names."
     (when (stringp group)
       (dolist (article tomove)
 	(gnus-summary-set-process-mark article))
-      (gnus-summary-move-article nil group))))
+      (when tomove (gnus-summary-move-article nil group)))))
  
 (defun spam-ham-move-routine (&optional group)
   (let ((articles gnus-newsgroup-articles)
@@ -440,7 +440,7 @@ your main source of newsgroup names."
       ;; now do the actual move
       (dolist (article tomove)
 	(gnus-summary-set-process-mark article))
-      (gnus-summary-move-article nil group))))
+      (when tomove (gnus-summary-move-article nil group)))))
  
 (defun spam-generic-register-routine (spam-func ham-func)
   (let ((articles gnus-newsgroup-articles)

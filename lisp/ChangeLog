@@ -1,3 +1,13 @@
+2003-02-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-util.el (gnus-faces-at): Simplify.
+
+2003-02-13  Teodor Zlatanov  <tzz@bwh.harvard.edu>
+
+	* spam.el (spam-ham-move-routine) 
+	(spam-mark-spam-as-expired-and-move-routine): made the article
+	move conditional, so it's not called even if there's nothing to move
+
 2003-02-13  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
 
 	* message.el (message-unix-mail-delimiter): Accept any whitespace
