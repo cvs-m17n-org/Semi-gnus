@@ -11152,9 +11152,9 @@ Here's an example:
          (name "User Name")
          ("X-Home-Page" (getenv "WWW_HOME"))
          (organization "People's Front Against MWM"))
-	("Emacs"
-	 (import "Default")
-	 (organization "The Church of Emacs"))))
+        ("Emacs"
+         (import "Default")
+         (organization "The Church of Emacs"))))
 @end lisp
 
 The posting-style named "Emacs" will inherit all the attributes from
