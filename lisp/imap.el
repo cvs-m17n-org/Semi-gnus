@@ -139,10 +139,10 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 
+(require 'base64)
+
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
-  (autoload 'base64-decode-string "base64")
-  (autoload 'base64-encode-string "base64")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
   (autoload 'rfc2104-hash "rfc2104")
