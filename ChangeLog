@@ -1,3 +1,10 @@
+1999-08-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-sum.el (gnus-wheel-summary-scroll): Use
+	`event-basic-type' instead of `event-button' under FSF Emacsen.
+
 1999-08-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
