@@ -681,8 +681,7 @@ and `print-level' to nil."
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
   (require 'nnmail)
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (when (and directory
 	       (not (file-exists-p directory)))
       (make-directory directory t)))
@@ -692,8 +691,7 @@ and `print-level' to nil."
   "Write the current buffer's contents to FILE."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     ;; Write the buffer.
     (write-region (point-min) (point-max) file nil 'quietly)))
 
@@ -902,8 +900,7 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((file-name-coding-system nnmail-pathname-coding-system)
-		  (pathname-coding-system nnmail-pathname-coding-system))
+	    (let ((file-name-coding-system nnmail-pathname-coding-system))
 	      (write-region-as-binary (point-min) (point-max)
 				      filename 'append))
 	  ;; File has been visited, in buffer OUTBUF.
@@ -974,8 +971,7 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(let ((file-name-coding-system nnmail-pathname-coding-system)
-		      (pathname-coding-system nnmail-pathname-coding-system))
+		(let ((file-name-coding-system nnmail-pathname-coding-system))
 		  (write-region-as-binary (point-min) (point-max)
 					  filename 'append))))
 	  ;; File has been visited, in buffer OUTBUF.
@@ -1089,8 +1085,7 @@ Return the modified alist."
     t))
 
 (defun gnus-write-active-file (file hashtb &optional full-names)
-  (let ((output-coding-system nnmail-active-file-coding-system)
-	(coding-system-for-write nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system))
     (with-temp-file file
       (mapatoms
        (lambda (sym)
@@ -1526,10 +1521,7 @@ predicate on the elements."
      ((eq gnus-user-agent 'gnus)
       nil)
      ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
-      (concat (format (if (boundp 'MULE)
-			  "Mule/2.3 (based on Emacs %s)"
-			"Emacs/%s")
-		      (match-string 1 emacs-version))
+      (concat "Emacs/%s" (match-string 1 emacs-version)
 	      (if system-v
 		  (concat " (" system-v ")")
 		"")))

@@ -939,10 +939,6 @@ This only works when `display-time' is enabled."
 			      (let ((coding-system-for-write
 				     nnheader-text-coding-system)
 				    (coding-system-for-read
-				     nnheader-text-coding-system)
-				    (output-coding-system
-				     nnheader-text-coding-system)
-				    (input-coding-system
 				     nnheader-text-coding-system))
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
@@ -997,7 +993,6 @@ This only works when `display-time' is enabled."
 			 password) buf)
 	       (imap-mailbox-select mailbox nil buf))
 	  (let ((coding-system-for-write mail-source-imap-file-coding-system)
-		(output-coding-system mail-source-imap-file-coding-system)
 		str)
 	    (with-temp-file mail-source-crash-box
 	      ;; Avoid converting 8-bit chars from inserted strings to

@@ -713,8 +713,7 @@ deleted.  Point is left where the deleted region was."
     (setq nnfolder-current-buffer nil
 	  nnfolder-current-group nil))
   ;; Change group.
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (when (and group
 	       (not (equal group nnfolder-current-group))
 	       (progn
@@ -1072,10 +1071,9 @@ This command does not work if you use short group names."
   (when (buffer-modified-p)
     (run-hooks 'nnfolder-save-buffer-hook)
     (gnus-make-directory (file-name-directory (buffer-file-name)))
-    (let* ((coding-system-for-write
-	    (or nnfolder-file-coding-system-for-write
-		nnfolder-file-coding-system))
-	   (output-coding-system coding-system-for-write))
+    (let ((coding-system-for-write
+	   (or nnfolder-file-coding-system-for-write
+	       nnfolder-file-coding-system)))
       (save-buffer)))
   (unless (or gnus-nov-is-evil nnfolder-nov-is-evil)
     (nnfolder-save-nov)))

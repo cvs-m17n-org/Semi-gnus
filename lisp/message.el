@@ -41,12 +41,7 @@
   (require 'smtp)
   (defvar gnus-message-group-art)
   (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
-(eval-and-compile
-  (if (boundp 'MULE)
-      (progn
-	(require 'base64)
-	(require 'canlock-om))
-    (require 'canlock)))
+(require 'canlock)
 (require 'mailheader)
 (require 'nnheader)
 ;; This is apparently necessary even though things are autoloaded.
@@ -1205,9 +1200,6 @@ actually occur."
 ;;; XXX: This symbol is overloaded!  See below.
 (defvar message-user-agent nil
   "String of the form of PRODUCT/VERSION.  Used for User-Agent header field.")
-
-(static-when (boundp 'MULE)
-  (require 'reporter));; `define-mail-user-agent' is here.
 
 ;;;###autoload
 (define-mail-user-agent 'message-user-agent
@@ -3743,10 +3735,9 @@ Instead, just auto-save the buffer and then bury it."
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
-  (when (and (or (static-if (featurep 'xemacs)
-		     (device-on-window-system-p)
-		   window-system)
-		 (>= emacs-major-version 20))
+  (when (and (static-if (featurep 'xemacs)
+		 (device-on-window-system-p)
+	       window-system)
 	     (or (and (eq message-delete-frame-on-exit t)
 		      (select-frame frame)
 		      (or (eq frame org-frame)
@@ -5023,7 +5014,6 @@ Otherwise, generate and save a value for `canlock-password' first."
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
 	(coding-system-for-write 'raw-text)
-	(output-coding-system 'raw-text)
 	list file
 	(mml-externalize-attachments message-fcc-externalize-attachments))
     (save-excursion
@@ -5950,10 +5940,9 @@ beginning of line."
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
   (let ((buffer (get-buffer name))
-	(pop-up-frames (and (or (static-if (featurep 'xemacs)
-				    (device-on-window-system-p)
-				  window-system)
-				(>= emacs-major-version 20))
+	(pop-up-frames (and (static-if (featurep 'xemacs)
+				(device-on-window-system-p)
+			      window-system)
 			    message-use-multi-frames)))
     (if (and buffer
 	     (buffer-name buffer))
@@ -6160,9 +6149,7 @@ are not included."
 			      message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)
-    (static-if (boundp 'MULE)
-	(set-file-coding-system message-draft-coding-system)
-      (setq buffer-file-coding-system message-draft-coding-system))))
+    (setq buffer-file-coding-system message-draft-coding-system)))
 
 (defun message-disassociate-draft ()
   "Disassociate the message buffer from the drafts directory."

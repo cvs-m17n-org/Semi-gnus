@@ -545,7 +545,7 @@ be restored and the command retried."
 			(symbol-value 'enable-multibyte-characters))))
     (unwind-protect
 	;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
-	(let (default-enable-multibyte-characters mc-flag)
+	(let (default-enable-multibyte-characters)
 	  ;; `set-buffer-multibyte' will be provided by APEL for all Emacsen.
 	  (set-buffer-multibyte nil)
 	  (process-send-region (nntp-find-connection nntp-server-buffer)

@@ -722,7 +722,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (gnus-article-search-signature)
 	       (point)))
 	(prefix-regexp (concat "^\\(" message-cite-prefix-regexp "\\)"))
-	alist entry start begin end numbers prefix guess-limit mc-flag)
+	alist entry start begin end numbers prefix guess-limit)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)
       ;; Each line.

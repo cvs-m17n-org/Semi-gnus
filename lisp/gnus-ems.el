@@ -50,11 +50,7 @@
   (autoload 'gnus-get-buffer-create "gnus")
   (autoload 'nnheader-find-etc-directory "nnheader"))
 
-(if (or (featurep 'xemacs)
-	(>= emacs-major-version 21))
-    (autoload 'smiley-region "smiley")
-  (autoload 'smiley-region "smiley-mule"))
-
+(autoload 'smiley-region "smiley")
 ;; Fixme: shouldn't require message
 (autoload 'message-text-with-property "message")
 
@@ -102,16 +98,13 @@
    ((featurep 'mule)
     ;; Mule and new Emacs definitions
 
-    ;; [Note] Now there are three kinds of mule implementations,
-    ;; original MULE, XEmacs/mule and Emacs 20+ including
-    ;; MULE features.  Unfortunately these APIs are different.  In
-    ;; particular, Emacs (including original Mule) and XEmacs are
-    ;; quite different.  However, this version of Gnus doesn't support
-    ;; anything other than XEmacs 20+ and Emacs 20.3+.
+    ;; [Note] Now there are two kinds of mule implementations,
+    ;; XEmacs/mule and Emacs 20+ including Mule features.
+    ;; Unfortunately these APIs are different.  In particular, Emacs
+    ;; and XEmacs are quite different.  However, this version of Gnus
+    ;; doesn't support anything other than XEmacs 21+ and Emacs 21+.
 
-    ;; Predicates to check are following:
-    ;; (boundp 'MULE) is t only if Mule (original; anything older than
-    ;;                     Mule 2.3) is running.
+    ;; Predicate to check is the following:
     ;; (featurep 'mule) is t when other mule variants are running.
 
     ;; It is possible to detect XEmacs/mule by (featurep 'mule) and

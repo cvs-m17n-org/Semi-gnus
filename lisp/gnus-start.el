@@ -454,9 +454,7 @@ Can be used to turn version control on or off."
 
 ;;; Internal variables
 
-(defvar gnus-ding-file-coding-system (static-if (boundp 'MULE)
-					 '*ctext*
-				       'ctext)
+(defvar gnus-ding-file-coding-system 'ctext
   "Coding system for ding file.")
 ;; Note that the ding file for T-gnus ought not to have byte-codes.
 
@@ -2303,8 +2301,7 @@ If FORCE is non-nil, the .newsrc file is read."
 					       &rest variables)
   (let (error gnus-product-file-version method file-ver)
     (when (or (condition-case err
-		  (let ((coding-system-for-read coding)
-			(input-coding-system coding))
+		  (let ((coding-system-for-read coding))
 		    (load (expand-file-name file gnus-product-directory)
 			  nil nil t)
 		    nil)
@@ -2692,13 +2689,11 @@ If FORCE is non-nil, the .newsrc file is read."
 
           (if gnus-save-startup-file-via-temp-buffer
               (let ((coding-system-for-write gnus-ding-file-coding-system)
-		    (output-coding-system gnus-ding-file-coding-system)
                     (standard-output (current-buffer)))
                 (gnus-gnus-to-quick-newsrc-format)
                 (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
                 (save-buffer))
             (let ((coding-system-for-write gnus-ding-file-coding-system)
-		  (output-coding-system gnus-ding-file-coding-system)
                   (version-control gnus-backup-startup-file)
                   (startup-file (concat gnus-current-startup-file ".eld"))
                   (working-dir (file-name-directory gnus-current-startup-file))

@@ -100,12 +100,7 @@ DOCSTRING will be printed if ASSERTION is nil and
 ;; sort -fd
 (ptexinfmt-broken-facility texinfo-format-printindex
   "Can't sort on Mule for Windows."
-  (if (and (memq system-type '(windows-nt ms-dos))
-;;; I don't know version threshold.
-;;;	   (string< texinfmt-version "2.37 of 24 May 1997")
-	   (boundp 'MULE) (not (featurep 'meadow))) ; Mule for Windows
-      nil
-    t))
+  t)
 
 ;; @var
 (ptexinfmt-broken-facility texinfo-format-var

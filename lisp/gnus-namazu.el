@@ -164,10 +164,9 @@ options make any sense in this context."
 (defcustom gnus-namazu-make-index-arguments
   (nconc
    (list "--all" "--mailnews" "--deny=^.*[^0-9].*$")
-   (when (or (and (boundp 'current-language-environment)
-		  (string= "Japanese"
-			   (symbol-value 'current-language-environment)))
-	     (boundp 'MULE))
+   (when (and (boundp 'current-language-environment)
+	      (string= "Japanese"
+		       (symbol-value 'current-language-environment)))
      (list "--indexing-lang=ja")))
   "*Arguments of the indexer of Namazu."
   :type '(repeat string)
@@ -181,8 +180,8 @@ options make any sense in this context."
 
 (defcustom gnus-namazu-coding-system
   (if (memq system-type '(windows-nt OS/2 emx))
-      (if (boundp 'MULE) '*sjis* 'shift_jis)
-    (if (boundp 'MULE) '*euc-japan* 'euc-japan))
+      'shift_jis
+    'euc-japan)
   "*Coding system for Namazu process."
   :type 'coding-system
   :group 'gnus-namazu)
@@ -223,9 +222,8 @@ options make any sense in this context."
  (fboundp 'gnus-group-decoded-name)
  (let ((gnus-group-name-charset-group-alist
 	(list (cons gnus-namazu/group-name-regexp gnus-namazu-coding-system)))
-       (query (decode-coding-string
-	       (string 27 36 66 52 65 59 122 27 40 66)
-	       (if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-7bit))))
+       (query (decode-coding-string (string 27 36 66 52 65 59 122 27 40 66)
+				    'iso-2022-7bit)))
    (not (string-match query
 		      (gnus-summary-buffer-name
 		       (encode-coding-string
@@ -296,13 +294,10 @@ options make any sense in this context."
 (defsubst gnus-namazu/call-namazu (query)
   (let ((coding-system-for-read gnus-namazu-coding-system)
 	(coding-system-for-write gnus-namazu-coding-system)
-	(input-coding-system gnus-namazu-coding-system)
-	(output-coding-system gnus-namazu-coding-system)
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
 	program-coding-system-alist
-	(file-name-coding-system gnus-namazu-coding-system)
-	(pathname-coding-system gnus-namazu-coding-system))
+	(file-name-coding-system gnus-namazu-coding-system))
     (apply 'call-process
 	   `(,gnus-namazu-command
 	     nil			; input from /dev/null

@@ -85,16 +85,6 @@
        (cond
 	((featurep 'xemacs)
 	 '(frame-char-height frame-char-width))
-	((>= emacs-major-version 21)
-	 '(function-max-args smiley-encode-buffer))
-	((boundp 'MULE)
-	 '(charsetp
-	   coding-system-base coding-system-get coding-system-list
-	   coding-system-to-mime-charset compose-mail
-	   file-name-extension find-coding-systems-for-charsets
-	   find-coding-systems-region function-max-args get-charset-property
-	   read-passwd ;; See the Mule23@1934 file.
-	   smiley-encode-buffer smtpmail-send-it))
 	(t
 	 '(function-max-args smiley-encode-buffer))))
       (common-fns
@@ -103,11 +93,6 @@
        (cond
 	((featurep 'xemacs)
 	 '(font-lock-defaults))
-	((>= emacs-major-version 21)
-	 nil)
-	((boundp 'MULE)
-	 '(adaptive-fill-first-line-regexp
-	   default-enable-multibyte-characters enable-multibyte-characters))
 	(t
 	 nil)))
       (common-vars

@@ -119,7 +119,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 (defvar nnheader-auto-save-coding-system
   (cond
-   ((boundp 'MULE) '*junet*)
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule)
     (if (memq system-type '(windows-nt ms-dos ms-windows))
@@ -155,13 +154,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
   ;; Should keep track of `mm-read-coding-system' in mm-util.el.
-  (defalias 'mm-read-coding-system
-    (if (or (and (featurep 'xemacs)
-		 (<= (string-to-number emacs-version) 21.1))
-	    (boundp 'MULE))
-	(lambda (prompt &optional default-coding-system)
-	  (read-coding-system prompt))
-      'read-coding-system))
+  (defalias 'mm-read-coding-system 'read-coding-system)
 
   ;; Should keep track of `mm-%s' in mm-util.el.
   (defalias 'mm-multibyte-string-p
@@ -174,10 +167,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
     "Like 'detect-coding-region' except returning the best one."
-    (let ((coding-systems
-	   (static-if (boundp 'MULE)
-	       (code-detect-region (point) (point-max))
-	     (detect-coding-region (point) (point-max)))))
+    (let ((coding-systems (detect-coding-region (point) (point-max))))
       (or (car-safe coding-systems)
 	  coding-systems)))
   (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
@@ -194,7 +184,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters default-mc-flag)
+  `(let (default-enable-multibyte-characters)
      (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
@@ -212,15 +202,6 @@ Equivalent to `progn' in XEmacs"
       (cond ((featurep 'xemacs)
 	     `(let (default-enable-multibyte-characters)
 		,@forms))
-	    ((boundp 'MULE)
-	     `(let ((,multibyte mc-flag)
-		    (,buffer (current-buffer)))
-		(unwind-protect
-		    (let (default-enable-multibyte-characters default-mc-flag)
-		      (setq mc-flag nil)
-		      ,@forms)
-		  (set-buffer ,buffer)
-		  (setq mc-flag ,multibyte))))
 	    (t
 	     `(let ((,multibyte enable-multibyte-characters)
 		    (,buffer (current-buffer)))
@@ -284,8 +265,6 @@ nil, ."
 		  (lambda nil t))
 		 ((featurep 'xemacs)
 		  (lambda nil nil))
-		 ((boundp 'MULE)
-		  (lambda nil mc-flag))
 		 (t
 		  (lambda nil enable-multibyte-characters))))
 
@@ -951,7 +930,6 @@ the line could be found."
 	   (number (length articles))
 	   (count 0)
 	   (file-name-coding-system 'binary)
-	   (pathname-coding-system 'binary)
 	   (case-fold-search t)
 	   (cur (current-buffer))
 	   article

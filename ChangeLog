@@ -1,5 +1,46 @@
 2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* sample.lpath.el: Remove.
+	* contrib/cus-dep.el: Remove.
+	* contrib/gnus-idna.el: Remove.
+	* contrib/passwd.el: Remove.
+	* contrib/regexp-opt.el: Remove.
+	* contrib/timer.el: Remove.
+	* lisp/canlock-om.el: Remove.
+	* lisp/dgnushack.el: Add `early-package-load-path' to `load-path'
+	for XEmacs 21.5; remove Mule 2 stuff.
+	* lisp/gnus-agent.el: Remove Mule 2 stuff.
+	* lisp/gnus-art.el: Ditto.
+	* lisp/gnus-cite.el: Ditto.
+	* lisp/gnus-ems.el: Ditto.
+	* lisp/gnus-msg.el: Ditto.
+	* lisp/gnus-namazu.el: Ditto.
+	* lisp/gnus-offline.el: Ditto.
+	* lisp/gnus-start.el: Ditto.
+	* lisp/gnus-util.el: Ditto.
+	* lisp/gnus-uu.el: Ditto.
+	* lisp/gnus.el: Ditto.
+	* lisp/lpath.el: Ditto.
+	* lisp/mail-source.el: Ditto.
+	* lisp/message.el: Ditto.
+	* lisp/mm-url.el: Ditto.
+	* lisp/nnfolder.el: Ditto.
+	* lisp/nnheader.el: Ditto.
+	* lisp/nnkiboze.el: Ditto.
+	* lisp/nnmail.el: Ditto.
+	* lisp/nnmaildir.el: Ditto.
+	* lisp/nnmbox.el: Ditto.
+	* lisp/nnmh.el: Ditto.
+	* lisp/nnml.el: Ditto.
+	* lisp/nnrss.el: Ditto.
+	* lisp/nnshimbun.el: Ditto.
+	* lisp/nntp.el: Ditto.
+	* lisp/score-mode.el: Ditto.
+	* texi/infohack.el: Ditto.
+	* texi/ptexinfmt.el: Ditto.
+
+2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/hex-util.el: Remove.
 	* lisp/md5.el: Remove.
 	* lisp/sha1-el.el: Remove.

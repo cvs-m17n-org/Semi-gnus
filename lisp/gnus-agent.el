@@ -899,9 +899,7 @@ be a select method."
   "Write the alist of covered servers."
   (gnus-make-directory (nnheader-concat gnus-agent-directory "lib"))
   (let ((coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
-	(file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+	(file-name-coding-system nnmail-pathname-coding-system))
     (with-temp-file (nnheader-concat gnus-agent-directory "lib/servers")
       (prin1 gnus-agent-covered-methods
 	     (current-buffer)))))
@@ -1203,9 +1201,7 @@ downloaded into the agent."
   (when (gnus-agent-method-p method)
     (let* ((gnus-command-method method)
 	   (coding-system-for-write nnheader-file-coding-system)
-	   (output-coding-system nnheader-file-coding-system)
 	   (file-name-coding-system nnmail-pathname-coding-system)
-	   (pathname-coding-system nnmail-pathname-coding-system)
 	   (file (gnus-agent-lib-file "active"))
 	   oactive-min oactive-max)
       (gnus-make-directory (file-name-directory file))
@@ -1806,7 +1802,6 @@ FILE and places the combined headers into `nntp-server-buffer'."
 (defun gnus-agent-save-alist (group &optional articles state dir)
   "Save the article-state alist for GROUP."
   (let* ((file-name-coding-system nnmail-pathname-coding-system)
-	 (pathname-coding-system nnmail-pathname-coding-system)
 	 (prev (cons nil gnus-agent-article-alist))
 	 (all prev)
 	 print-level print-length item article)

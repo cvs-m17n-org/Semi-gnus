@@ -37,8 +37,6 @@
        (if (memq 'shift-jis (coding-priority-list))
 	   (set-coding-priority-list
 	    (append (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
-      ((boundp 'MULE)
-       (put '*coding-category-sjis* 'priority (length *predefined-category*)))
       ((featurep 'mule)
        (if (memq 'coding-category-sjis coding-category-list)
 	   (set-coding-priority
@@ -136,35 +134,6 @@ than subr.el."
 	      (put 'car 'side-effect-free tmp)))
 	ad-do-it))))
 
-(when (boundp 'MULE)
-  (let (current-load-list)
-    ;; Make the function to be silent at compile-time.
-    (defun locate-library (library &optional nosuffix)
-      "Show the full path name of Emacs library LIBRARY.
-This command searches the directories in `load-path' like `M-x load-library'
-to find the file that `M-x load-library RET LIBRARY RET' would load.
-Optional second arg NOSUFFIX non-nil means don't add suffixes `.elc' or `.el'
-to the specified name LIBRARY (a la calling `load' instead of `load-library')."
-      (interactive "sLocate library: ")
-      (catch 'answer
-	(mapcar
-	 '(lambda (dir)
-	    (mapcar
-	     '(lambda (suf)
-		(let ((try (expand-file-name (concat library suf) dir)))
-		  (and (file-readable-p try)
-		       (null (file-directory-p try))
-		       (progn
-			 (or noninteractive
-			     (message "Library is file %s" try))
-			 (throw 'answer try)))))
-	     (if nosuffix '("") '(".elc" ".el" ""))))
-	 load-path)
-	(or noninteractive
-	    (message "No library %s in search path" library))
-	nil))
-    (byte-compile 'locate-library)))
-
 (setq max-specpdl-size 3000)
 
 (when (equal
@@ -214,6 +183,33 @@ It has already been fixed in XEmacs since 1999-12-06."
      (if (null (cdr form))
 	 '(char-before (point))
        form))))
+
+;; Add `early-package-load-path' to `load-path' for XEmacs.  Those paths
+;; won't appear in `load-path' when XEmacs starts with the `-no-autoloads'
+;; option because of a bug. :<
+(when (and (featurep 'xemacs)
+	   (string-match "--package-path=\\([^ ]+\\)"
+			 system-configuration-options))
+  (let ((paths
+	 (apply 'nconc
+		(mapcar
+		 (lambda (path)
+		   (when (file-directory-p
+			  (setq path (expand-file-name "lisp" path)))
+		     (directory-files path t)))
+		 (split-string (match-string 1 system-configuration-options)
+			       "::"))))
+	path adds)
+    (while paths
+      (setq path (car paths)
+	    paths (cdr paths))
+      (when (and path
+		 (not (or (string-match "/\\.\\.?\\'" path)
+			  (member (file-name-as-directory path) load-path)
+			  (member path load-path)))
+		 (file-directory-p path))
+	(push (file-name-as-directory path) adds)))
+    (setq load-path (nconc (nreverse adds) load-path))))
 
 (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
 
@@ -279,14 +275,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
-(when (boundp 'MULE)
-  ;; Bind the function `base64-encode-string' before loading canlock.
-  ;; Since canlock will bind it as an autoloaded function, it causes
-  ;; damage to define the function by MEL.
-  (load (expand-file-name "base64.el" srcdir) nil t t)
-  ;; Load special macros for compiling canlock.el.
-  (load (expand-file-name "canlock-om.el" srcdir) nil t t))
-
 (require 'custom)
 
 ;; Bind functions defined by `defun-maybe'.
@@ -351,16 +339,11 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		 (if (string-match "\\(\\.gz$\\)\\|\\.bz2$" file)
 		     (let ((temp (expand-file-name "dgnustemp.el" srcdir)))
 		       (when
-			   (let* ((binary (if (boundp 'MULE)
-					      '*noconv*
-					    'binary))
-				  (coding-system-for-read binary)
-				  (coding-system-for-write binary)
-				  (input-coding-system binary)
-				  (output-coding-system binary)
-				  (default-process-coding-system
-				    (cons binary binary))
-				  call-process-hook)
+			   (let ((coding-system-for-read 'binary)
+				 (coding-system-for-write 'binary)
+				 (default-process-coding-system
+				   '(binary . binary))
+				 call-process-hook)
 			     (insert-file-contents file nil nil nil t)
 			     (when
 				 (condition-case code
@@ -422,76 +405,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
    (byte-compile 'dgnushack-bind-colon-keywords)
    (dgnushack-bind-colon-keywords)))
 
-(when (boundp 'MULE)
-  (setq :version ':version
-	:set-after ':set-after)
-  (require 'custom)
-  (defadvice custom-handle-keyword
-    (around dont-signal-an-error-even-if-unsupported-keyword-is-given
-	    activate)
-    "Don't signal an error even if unsupported keyword is given."
-    (if (not (memq (ad-get-arg 1) '(:version :set-after)))
-	ad-do-it)))
-
-(when (boundp 'MULE)
-  (put 'custom-declare-face 'byte-optimizer
-       'byte-optimize-ignore-unsupported-custom-keywords)
-  (put 'custom-declare-group 'byte-optimizer
-       'byte-optimize-ignore-unsupported-custom-keywords)
-  (defun byte-optimize-ignore-unsupported-custom-keywords (form)
-    (if (or (memq ':version (nthcdr 4 form))
-	    (memq ':set-after (nthcdr 4 form)))
-	(let ((newform (list (car form) (nth 1 form)
-			     (nth 2 form) (nth 3 form)))
-	      (args (nthcdr 4 form)))
-	  (while args
-	    (or (memq (car args) '(:version :set-after))
-		(setq newform (nconc newform (list (car args)
-						   (car (cdr args))))))
-	    (setq args (cdr (cdr args))))
-	  newform)
-      form))
-
-  (put 'custom-declare-variable 'byte-hunk-handler
-       'byte-compile-file-form-custom-declare-variable)
-  (defun byte-compile-file-form-custom-declare-variable (form)
-    ;; Bind defcustom'ed variables.
-    (if (memq 'free-vars byte-compile-warnings)
-	(setq byte-compile-bound-variables
-	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
-    (if (memq ':version (nthcdr 4 form))
-	;; Make the variable uncustomizable.
-	`(defvar ,(nth 1 (nth 1 form)) ,(nth 1 (nth 2 form))
-	   ,(substring (nth 3 form) (if (string-match "^[\t *]+" (nth 3 form))
-					(match-end 0)
-				      0)))
-      ;; Ignore unsupported keyword(s).
-      (if (memq ':set-after (nthcdr 4 form))
-	  (let ((newform (list (car form) (nth 1 form)
-			       (nth 2 form) (nth 3 form)))
-		(args (nthcdr 4 form)))
-	    (while args
-	      (or (eq (car args) ':set-after)
-		  (setq newform (nconc newform (list (car args)
-						     (car (cdr args))))))
-	      (setq args (cdr (cdr args))))
-	    newform)
-	form)))
-
-  (defadvice byte-compile-inline-expand (around ignore-built-in-functions
-						(form) activate)
-    "Ignore built-in functions."
-    (let* ((name (car form))
-	   (fn (and (fboundp name)
-		    (symbol-function name))))
-      (if (subrp fn)
-	  ;; Give up on inlining.
-	  (setq ad-return-value form)
-	ad-do-it))))
-
 ;; Unknown variables and functions.
-(unless (boundp 'buffer-file-coding-system)
-  (defvar buffer-file-coding-system (symbol-value 'file-coding-system)))
 (unless (featurep 'xemacs)
   (defalias 'Custom-make-dependencies 'ignore)
   (defalias 'update-autoloads-from-directory 'ignore))
@@ -630,16 +544,11 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
 	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
-	  (when (and (not (featurep 'xemacs))
-		     (<= emacs-major-version 20))
-	    '("smiley.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	    '("md5.el"))
-	  (unless (boundp 'MULE)
-	    '("canlock-om.el"))
 	  (when (featurep 'xemacs)
 	    '("gnus-load.el")))
   "Files which will not be installed.")
@@ -671,9 +580,6 @@ dgnushack-compile."
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
-  (when (and (not (featurep 'xemacs))
-	     (< emacs-major-version 21))
-    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
@@ -729,22 +635,14 @@ Modify to suit your needs."))
     (expand-file-name "cus-load.el" srcdir)))
 
 (defun dgnushack-make-cus-load ()
-  (when (condition-case nil
-	    (load "cus-dep")
-	  (error
-	   (when (boundp 'MULE)
-	     (if (file-exists-p "../contrib/cus-dep.el")
-		 ;; Use cus-dep.el of the version of Emacs 20.7.
-		 (load-file "../contrib/cus-dep.el")
-	       (error "\
-You need contrib/cus-dep.el to build T-gnus with Mule 2.3@19.34; exiting.")))))
-    (let ((cusload-base-file dgnushack-cus-load-file))
-      (if (fboundp 'custom-make-dependencies)
-	  (custom-make-dependencies)
-	(Custom-make-dependencies))
-      (when (featurep 'xemacs)
-	(message "Compiling %s..." dgnushack-cus-load-file)
-	(byte-compile-file dgnushack-cus-load-file)))))
+  (load "cus-dep")
+  (let ((cusload-base-file dgnushack-cus-load-file))
+    (if (fboundp 'custom-make-dependencies)
+	(custom-make-dependencies)
+      (Custom-make-dependencies))
+    (when (featurep 'xemacs)
+      (message "Compiling %s..." dgnushack-cus-load-file)
+      (byte-compile-file dgnushack-cus-load-file))))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)

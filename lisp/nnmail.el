@@ -622,8 +622,7 @@ by anything."
 	(after-insert-file-functions nil))
     (condition-case ()
 	(let ((auto-mode-alist (nnheader-auto-mode-alist))
-	      (file-name-coding-system nnmail-pathname-coding-system)
-	      (pathname-coding-system nnmail-pathname-coding-system))
+	      (file-name-coding-system nnmail-pathname-coding-system))
 	  (insert-file-contents-as-coding-system
 	   nnmail-file-coding-system file)
 	  t)
@@ -689,8 +688,7 @@ nn*-request-list should have been called before calling this function."
 
 (defun nnmail-save-active (group-assoc file-name)
   "Save GROUP-ASSOC in ACTIVE-FILE."
-  (let ((coding-system-for-write nnmail-active-file-coding-system)
-	(output-coding-system nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system))
     (when file-name
       (with-temp-file file-name
 	(nnmail-generate-active group-assoc)))))
@@ -1889,8 +1887,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (write-region-as-coding-system
      nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))

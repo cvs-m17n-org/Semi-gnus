@@ -915,8 +915,7 @@ When called interactively, prompt for REGEXP."
 		(with-current-buffer gnus-uu-digest-buffer
 		  (goto-char (point-max))
 		  (insert-buffer "*gnus-uu-body*"))
-	      (let ((file-name-coding-system nnmail-pathname-coding-system)
-		    (pathname-coding-system nnmail-pathname-coding-system))
+	      (let ((file-name-coding-system nnmail-pathname-coding-system))
 		(write-region-as-coding-system
 		 nnheader-text-coding-system
 		 (point-min) (point-max) gnus-uu-saved-article-name t)))))

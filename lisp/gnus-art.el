@@ -5294,8 +5294,7 @@ Provided for backwards compatibility."
       ;; save it to file.
       (goto-char (point-max))
       (insert "\n")
-      (let ((file-name-coding-system nnmail-pathname-coding-system)
-	    (pathname-coding-system nnmail-pathname-coding-system))
+      (let ((file-name-coding-system nnmail-pathname-coding-system))
 	(write-region-as-binary (point-min) (point-max) file-name 'append))
       t)))
 

@@ -2536,8 +2536,7 @@ This variable can be nil, gnus or gnus-ja."
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-product-variable-file-list
-  (let ((version (product-version (product-find 'gnus-vers)))
-	(codesys (static-if (boundp 'MULE) '*ctext* 'ctext)))
+  (let ((version (product-version (product-find 'gnus-vers))))
     `(("strict-cache"
        ((product-version ,version)
 	(emacs-version)
@@ -2548,7 +2547,7 @@ This variable can be nil, gnus or gnus-ja."
        ((product-version ,version)
 	(emacs-version)
 	(correct-string-widths))
-       ,codesys
+       ctext
        gnus-format-specs)))
   "Alist of the methods for checking whether the contents of the T-gnus
 quick startup files are valid.  One is for the byte-compiled format

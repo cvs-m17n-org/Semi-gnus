@@ -150,8 +150,7 @@
   ;; Remove NOV lines of articles that are marked as read.
   (when (and (file-exists-p (nnkiboze-nov-file-name))
 	     nnkiboze-remove-read-articles)
-    (let ((coding-system-for-write nnkiboze-file-coding-system)
-	  (output-coding-system nnkiboze-file-coding-system))
+    (let ((coding-system-for-write nnkiboze-file-coding-system))
       (with-temp-file (nnkiboze-nov-file-name)
 	(let ((cur (current-buffer))
 	      (nnheader-file-coding-system nnkiboze-file-coding-system))
@@ -255,8 +254,7 @@ Finds out what articles are to be part of the nnkiboze groups."
     (mm-with-unibyte
      (when (file-exists-p newsrc-file)
        (load newsrc-file))
-     (let ((coding-system-for-write nnkiboze-file-coding-system)
-	   (output-coding-system nnkiboze-file-coding-system))
+     (let ((coding-system-for-write nnkiboze-file-coding-system))
        (gnus-make-directory (file-name-directory nov-file))
        (with-temp-file nov-file
 	 (when (file-exists-p nov-file)

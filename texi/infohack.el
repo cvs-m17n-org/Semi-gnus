@@ -47,9 +47,7 @@
 	coding-system)
     (find-file file)
     (setq buffer-read-only nil)
-    (setq coding-system (if (boundp 'buffer-file-coding-system)
-			    buffer-file-coding-system
-			  file-coding-system))
+    (setq coding-system buffer-file-coding-system)
     (infohack-remove-unsupported)
     (texinfo-every-node-update)
     (texinfo-format-buffer t) ;; Don't save any file.
@@ -57,8 +55,7 @@
     (setq buffer-file-name
 	  (expand-file-name (file-name-nondirectory buffer-file-name)
 			    default-directory))
-    (setq buffer-file-coding-system coding-system
-	  file-coding-system coding-system)
+    (setq buffer-file-coding-system coding-system)
     (if (> (buffer-size) 100000)
 	(Info-split))
     (save-buffer)))
@@ -97,16 +94,13 @@ Both characters must have the same length of multi-byte form."
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
 	coding-system-for-write
-	output-coding-system
 	(error 0))
     (condition-case err
 	(progn
 	  (find-file file)
 	  (setq buffer-read-only nil)
 	  (buffer-disable-undo (current-buffer))
-	  (if (boundp 'MULE)
-	      (setq output-coding-system file-coding-system)
-	    (setq coding-system-for-write buffer-file-coding-system))
+	  (setq coding-system-for-write buffer-file-coding-system)
 	  ;; process @include before updating node
 	  ;; This might produce some problem if we use @lowersection or
 	  ;; such.
@@ -165,17 +159,11 @@ Both characters must have the same length of multi-byte form."
 	      (let ((si:message (symbol-function 'message)))
 		(fset 'message
 		      (byte-compile
-		       (if (boundp 'MULE)
-			   `(lambda (fmt &rest args)
-			      (funcall ,si:message "%s"
-				       (code-convert-string
-					(apply 'format fmt args)
-					'*internal* '*junet*)))
-			 `(lambda (fmt &rest args)
-			    (funcall ,si:message "%s"
-				     (encode-coding-string
-				      (apply 'format fmt args)
-				      'iso-2022-7bit))))))
+		       `(lambda (fmt &rest args)
+			  (funcall ,si:message "%s"
+				   (encode-coding-string
+				    (apply 'format fmt args)
+				    'iso-2022-7bit)))))
 		(unwind-protect
 		    (texinfo-format-buffer nil)
 		  (fset 'message si:message)))

@@ -289,7 +289,6 @@ GROUP has a full name."
 		(error
 		 (nnheader-report 'nnshimbun "%s" (error-message-string err))))
 	  (let ((file-name-coding-system nnmail-pathname-coding-system)
-		(pathname-coding-system nnmail-pathname-coding-system)
 		(dir (nnshimbun-current-directory group)))
 	    (or (file-directory-p dir)
 		(ignore-errors
@@ -304,7 +303,6 @@ GROUP has a full name."
 (deffoo nnshimbun-open-server (server &optional defs)
   (or (nnshimbun-server-opened server)
       (let ((file-name-coding-system nnmail-pathname-coding-system)
-	    (pathname-coding-system nnmail-pathname-coding-system)
 	    (shimbun))
 	(when (condition-case err
 		  (setq shimbun
@@ -636,7 +634,6 @@ also be nil."
       (with-current-buffer (gnus-get-buffer-create buffer)
 	(erase-buffer)
 	(let ((file-name-coding-system nnmail-pathname-coding-system)
-	      (pathname-coding-system nnmail-pathname-coding-system)
 	      (nov (nnshimbun-nov-file-name group)))
 	  (when (file-exists-p nov)
 	    (nnheader-insert-file-contents nov)))
@@ -648,7 +645,6 @@ also be nil."
     (when (gnus-buffer-live-p buffer)
       (with-current-buffer buffer
 	(let ((file-name-coding-system nnmail-pathname-coding-system)
-	      (pathname-coding-system nnmail-pathname-coding-system)
 	      (nov (nnshimbun-nov-file-name group)))
 	  (when (and (buffer-modified-p)
 		     (or (> (buffer-size) 0)

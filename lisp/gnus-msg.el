@@ -1830,7 +1830,6 @@ this is a reply."
       (message-narrow-to-headers)
       (let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	    (coding-system-for-write 'raw-text)
-	    (output-coding-system 'raw-text)
 	    groups group method group-art
 	    mml-externalize-attachments)
 	(when gcc
