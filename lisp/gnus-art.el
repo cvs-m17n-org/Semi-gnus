@@ -2645,6 +2645,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (save-excursion
 	(gnus-article-setup-buffer)
 	(set-buffer gnus-article-buffer)
+	(mm-disable-multibyte)
 	;; Deactivate active regions.
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
@@ -3153,16 +3154,17 @@ In no internal viewer is available, use an external viewer."
 	  (set-window-point window point)))
       (let* ((handles (or ihandles (mm-dissect-buffer parent) (mm-uu-dissect)))
 	     buffer-read-only handle name type b e display)
-	(when (and (not ihandles)
-		   (not gnus-displaying-mime))
-	  ;; Top-level call; we clean up.
-	  (unless (eq parent gnus-article-mime-handles)
-	    (mm-destroy-parts gnus-article-mime-handles)
-	    (setq gnus-article-mime-handle-alist nil));; A trick.
-	  (setq gnus-article-mime-handles handles)
-	  ;; We allow users to glean info from the handles.
-	  (when gnus-article-mime-part-function
-	    (gnus-mime-part-function handles)))
+	(when (not ihandles)
+	  (mm-enable-multibyte)
+	  (when (not gnus-displaying-mime)
+	    ;; Top-level call; we clean up.
+	    (unless (eq parent gnus-article-mime-handles)
+	      (mm-destroy-parts gnus-article-mime-handles)
+	      (setq gnus-article-mime-handle-alist nil));; A trick.
+	    (setq gnus-article-mime-handles handles)
+	    ;; We allow users to glean info from the handles.
+	    (when gnus-article-mime-part-function
+	      (gnus-mime-part-function handles))))
 	(if handles
 	    (progn
 	      (when (and (not ihandles)
