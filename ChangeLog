@@ -1,3 +1,17 @@
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.1.
+
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-util.el (gnus-output-to-rmail): Guard as binary.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Guard as binary.
+
+1998-04-24  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Active File".
+
 1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.3.0.

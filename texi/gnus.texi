@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.2.5 Manual
+@settitle Semi-gnus 6.3.0 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.2.5 Manual
+@title Semi-gnus 6.3.0 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.2.5.
+This manual corresponds to Semi-gnus 6.3.0.
 
 @end ifinfo
 
@@ -945,14 +945,14 @@ file permissions as the @code{.newsrc} file.
 @cindex active file
 @cindex ignored groups
 
-When Gnus starts, or indeed whenever it tries to determine whether new
+When gnus starts, or indeed whenever it tries to determine whether new
 articles have arrived, it reads the active file.  This is a very large
 file that lists all the active groups and articles on the server.
 
 @vindex gnus-ignored-newsgroups
-Before examining the active file, Gnus deletes all lines that match the
+Before examining the active file, gnus deletes all lines that match the
 regexp @code{gnus-ignored-newsgroups}.  This is done primarily to reject
-any groups with bogus names, but you can use this variable to make Gnus
+any groups with bogus names, but you can use this variable to make gnus
 ignore hierarchies you aren't ever interested in.  However, this is not
 recommended.  In fact, it's highly discouraged.  Instead, @pxref{New
 Groups} for an overview of other variables that can be used instead.
@@ -964,15 +964,15 @@ Groups} for an overview of other variables that can be used instead.
 @vindex gnus-read-active-file
 @c @head
 The active file can be rather Huge, so if you have a slow network, you
-can set @code{gnus-read-active-file} to @code{nil} to prevent Gnus from
+can set @code{gnus-read-active-file} to @code{nil} to prevent gnus from
 reading the active file.  This variable is @code{some} by default.
 
 Gnus will try to make do by getting information just on the groups that
 you actually subscribe to.
 
 Note that if you subscribe to lots and lots of groups, setting this
-variable to @code{nil} will probably make Gnus slower, not faster.  At
-present, having this variable @code{nil} will slow Gnus down
+variable to @code{nil} will probably make gnus slower, not faster.  At
+present, having this variable @code{nil} will slow gnus down
 considerably, unless you read news over a 2400 baud modem.
 
 This variable can also have the value @code{some}.  Gnus will then
@@ -982,9 +982,9 @@ support the @code{LIST ACTIVE group} command), on others this isn't fast
 at all.  In any case, @code{some} should be faster than @code{nil}, and
 is certainly faster than @code{t} over slow lines.
 
-If this variable is @code{nil}, Gnus will ask for group info in total
+If this variable is @code{nil}, gnus will ask for group info in total
 lock-step, which isn't very fast.  If it is @code{some} and you use an
-@sc{nntp} server, Gnus will pump out commands as fast as it can, and
+@sc{nntp} server, gnus will pump out commands as fast as it can, and
 read all the replies in one swoop.  This will normally result in better
 performance, but if the server does not support the aforementioned
 @code{LIST ACTIVE group} command, this isn't very nice to the server.
@@ -1003,21 +1003,21 @@ secondary select methods.
 
 @item gnus-load-hook
 @vindex gnus-load-hook
-A hook run while Gnus is being loaded.  Note that this hook will
+A hook run while gnus is being loaded.  Note that this hook will
 normally be run just once in each Emacs session, no matter how many
-times you start Gnus.
+times you start gnus.
 
 @item gnus-before-startup-hook
 @vindex gnus-before-startup-hook
-A hook run after starting up Gnus successfully.
+A hook run after starting up gnus successfully.
 
 @item gnus-startup-hook
 @vindex gnus-startup-hook
-A hook run as the very last thing after starting up Gnus
+A hook run as the very last thing after starting up gnus
 
 @item gnus-started-hook
 @vindex gnus-started-hook
-A hook that is run as the very last thing after starting up Gnus
+A hook that is run as the very last thing after starting up gnus
 successfully.
 
 @item gnus-started-hook
@@ -1027,7 +1027,7 @@ generating the group buffer.
 
 @item gnus-check-bogus-newsgroups
 @vindex gnus-check-bogus-newsgroups
-If non-@code{nil}, Gnus will check for and delete all bogus groups at
+If non-@code{nil}, gnus will check for and delete all bogus groups at
 startup.  A @dfn{bogus group} is a group that you have in your
 @file{.newsrc} file, but doesn't exist on the news server.  Checking for
 bogus groups can take quite a while, so to save time and resources it's
@@ -1043,11 +1043,11 @@ of doing your job.  Note that this variable is used before
 
 @item gnus-no-groups-message
 @vindex gnus-no-groups-message
-Message displayed by Gnus when no groups are available.
+Message displayed by gnus when no groups are available.
 
 @item gnus-play-startup-jingle
 @vindex gnus-play-startup-jingle
-If non-@code{nil}, play the Gnus jingle at startup.
+If non-@code{nil}, play the gnus jingle at startup.
 
 @item gnus-startup-jingle
 @vindex gnus-startup-jingle
