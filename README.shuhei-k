@@ -1,4 +1,5 @@
 ========================================================================
+Codename:	Shoe-gnus
 Branch Tag:	shuhei-k
 Branch Owner:	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 Branch Goal:	Implement latest proposals for message header fields.
@@ -6,6 +7,11 @@ Branch Goal:	Implement latest proposals for message header fields.
 Branch Policy:	(not defined yet)
 ========================================================================
 NEWS:
+
+* New codename: "Shoe-gnus"
+
+  In order to distinguish "shuhei-k" branch from other branches, codename
+  was changed to "Shoe-gnus", gnu with shoes, or shoed gnu.
 
 * overview hack
 
@@ -43,6 +49,8 @@ TODO:
 * Don't insert Sender: for most cases?
 
 * Cleanup smtp.el? (-> public branches?)
+
+* Change splash image to gnu with shoes. (???)
 
 References:
 
