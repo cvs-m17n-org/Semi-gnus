@@ -1,3 +1,24 @@
+2002-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind `w3m-region'; bind `w3m-mode-map'.
+
+	* mm-decode.el (mm-inline-text-html-renderer): New user option.
+	(mm-inline-media-tests): Test whether the value of
+	`mm-inline-text-html-renderer' is a function for text/html.
+
+	* mm-view.el (mm-inline-text-html-render-with-w3): New function
+	separated from `mm-inline-text'.
+	(mm-w3m-minor-mode): New variable.
+	(mm-w3m-setup): New variable.
+	(mm-setup-w3m): New function.
+	(mm-inline-text-html-render-with-w3m): New function.
+	(mm-inline-text): Funcall `mm-inline-text-html-renderer' for
+	text/html.
+
+2002-01-23  Paul Jarc  <prj@po.cwru.edu>
+
+	* lpath.el: fbind make-symbolic-link and unix-sync for nnmaildir.
+
 2002-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-xmas.el (gnus-xmas-redefine): Quote `gnus-completing-read'
