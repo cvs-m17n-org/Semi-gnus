@@ -329,7 +329,8 @@ Legal values include `message-send-mail-with-sendmail' (the default),
   :group 'message-sending
   :group 'message-mail)
 
-(defcustom message-send-news-function 'message-send-news
+;; 1997-09-29 by MORIOKA Tomohiko
+(defcustom message-send-news-function 'message-send-news-with-gnus
   "Function to call to send the current buffer as news.
 The headers should be delimited by a line whose contents match the
 variable `mail-header-separator'."
@@ -1840,7 +1841,7 @@ the user from the mailer."
 
 (defun message-send-via-news (arg)
   "Send the current message via news."
-  (funcall message-send-news-function arg))
+  (message-send-news arg))
 
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
@@ -1875,7 +1876,7 @@ the user from the mailer."
   (let ((tembuf (message-generate-new-buffer-clone-locals " message temp"))
 	(case-fold-search nil)
 	(news (message-news-p))
-	(mailbuf (current-buffer)))
+	(message-buffer (current-buffer)))
     (save-restriction
       (message-narrow-to-headers)
       ;; Insert some headers.
@@ -1889,10 +1890,13 @@ the user from the mailer."
 	  (set-buffer tembuf)
 	  (erase-buffer)
 	  ;; Avoid copying text props.
-	  (insert (format
-		   "%s" (save-excursion
-			  (set-buffer mailbuf)
-			  (buffer-string))))
+          ;; (insert (format
+          ;;          "%s" (save-excursion
+          ;;                 (set-buffer message-buffer)
+          ;;                 (buffer-string))))
+	  ;; 1997-09-29 by MORIOKA Tomohiko
+	  ;;	Don't avoid text properties.
+	  (insert-buffer message-buffer)
 	  ;; Remove some headers.
 	  (save-restriction
 	    (message-narrow-to-headers)
@@ -1906,9 +1910,11 @@ the user from the mailer."
 		     (or (message-fetch-field "cc")
 			 (message-fetch-field "to")))
 	    (message-insert-courtesy-copy))
+	  ;; 1997-09-29 by MORIOKA Tomohiko
+	  (run-hooks 'message-encode-mail-hook)
 	  (funcall message-send-mail-function))
       (kill-buffer tembuf))
-    (set-buffer mailbuf)
+    (set-buffer message-buffer)
     (push 'mail message-sent-message-via)))
 
 (defun message-send-mail-with-sendmail ()
@@ -2042,7 +2048,7 @@ to find out how to use this."
 	(method (if (message-functionp message-post-method)
 		    (funcall message-post-method arg)
 		  message-post-method))
-	(messbuf (current-buffer))
+	(message-buffer (current-buffer))
 	(message-syntax-checks
 	 (if arg
 	     (cons '(existing-newsgroups . disabled)
@@ -2066,10 +2072,13 @@ to find out how to use this."
 	    (buffer-disable-undo (current-buffer))
 	    (erase-buffer)
 	    ;; Avoid copying text props.
-	    (insert (format
-		     "%s" (save-excursion
-			    (set-buffer messbuf)
-			    (buffer-string))))
+            ;; (insert (format
+            ;;          "%s" (save-excursion
+            ;;                 (set-buffer message-buffer)
+            ;;                 (buffer-string))))
+	    ;; 1997-09-29 by MORIOKA Tomohiko
+	    ;;	Don't avoid text properties.
+	    (insert-buffer message-buffer)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
@@ -2079,29 +2088,36 @@ to find out how to use this."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
-	    (let ((case-fold-search t))
-	      ;; Remove the delimiter.
-	      (goto-char (point-min))
-	      (re-search-forward
-	       (concat "^" (regexp-quote mail-header-separator) "\n"))
-	      (replace-match "\n")
-	      (backward-char 1))
-	    (run-hooks 'message-send-news-hook)
-	    ;;(require (car method))
-	    ;;(funcall (intern (format "%s-open-server" (car method)))
-	    ;;(cadr method) (cddr method))
-	    ;;(setq result
-	    ;;	  (funcall (intern (format "%s-request-post" (car method)))
-	    ;;		   (cadr method)))
-	    (gnus-open-server method)
-	    (setq result (gnus-request-post method)))
+	    ;; 1997-09-29 by MORIOKA Tomohiko
+	    (run-hooks 'message-encode-news-hook)
+	    (setq result (funcall message-send-news-function method)))
 	(kill-buffer tembuf))
-      (set-buffer messbuf)
+      (set-buffer message-buffer)
       (if result
 	  (push 'news message-sent-message-via)
 	(message "Couldn't send message via news: %s"
 		 (nnheader-get-report (car method)))
 	nil))))
+
+;; 1997-09-29 by MORIOKA Tomohiko
+(defun message-send-news-with-gnus (method)
+  (let ((case-fold-search t))
+    ;; Remove the delimiter.
+    (goto-char (point-min))
+    (re-search-forward
+     (concat "^" (regexp-quote mail-header-separator) "\n"))
+    (replace-match "\n")
+    (backward-char 1)
+    (run-hooks 'message-send-news-hook)
+    ;;(require (car method))
+    ;;(funcall (intern (format "%s-open-server" (car method)))
+    ;;(cadr method) (cddr method))
+    ;;(setq result
+    ;;	  (funcall (intern (format "%s-request-post" (car method)))
+    ;;		   (cadr method)))
+    (gnus-open-server method)
+    (gnus-request-post method)
+    ))
 
 ;;;
 ;;; Header generation & syntax checking.
@@ -2313,6 +2329,8 @@ to find out how to use this."
 	  "Denied posting -- the From looks strange: \"%s\"." from)
 	 nil)
 	(t t))))))
+
+(defconst message-max-size 60000)
 
 (defun message-check-news-body-syntax ()
   (and
@@ -3353,7 +3371,7 @@ responses here are directed to other newsgroups."))
 	(message "Canceling your article...")
 	(if (let ((message-syntax-checks
 		   'dont-check-for-anything-just-trust-me))
-	      (funcall message-send-news-function))
+	      (message-send-news))
 	    (message "Canceling your article...done"))
 	(kill-buffer buf)))))
 
