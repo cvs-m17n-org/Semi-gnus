@@ -1,5 +1,10 @@
 2001-07-25  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/mm-decode.el (mm-dissect-buffer): Could not handle
+	message/partial message, fixed.
+
+2001-07-25  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 7.1.0.25 (This is alpha status.)
 	Set unibyte mode to `gnus-original-article-buffer'.
 	Fix bugs. (Thanks to Yamaoka-san.)
