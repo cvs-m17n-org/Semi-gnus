@@ -114,7 +114,7 @@
      (contents-start . "\n<!--  honbun start  -->\n")
      (contents-end   . "\n<!--  honbun end  -->\n"))
     ("zdnet"
-     (url . "http://zdseek.pub.softbank.co.jp/news/")
+     (url . "http://www.zdnet.co.jp/news/")
      (groups "comp")
      (coding-system  . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov   . nnshimbun-generate-nov-for-each-group)
