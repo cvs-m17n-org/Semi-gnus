@@ -1,3 +1,19 @@
+1999-09-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.2.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi,
+	emacs-mime.texi,ChangeLog}: Sync up with Pterodactyl Gnus v0.97.
+
+	* lisp/{qp.el,nntp.el,nnmail.el,mml.el,mm-util.el,mm-encode.el,
+	mm-decode.el,message.el,mail-source.el,gnus.el,gnus-xmas.el,
+	gnus-util.el,gnus-sum.el,gnus-srvr.el,gnus-score.el,gnus-nocem.el,
+	gnus-msg.el,gnus-group.el,gnus-cache.el,gnus-art.el,gnus-agent.el,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.97.
+
 1999-09-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
