@@ -664,8 +664,10 @@ this type is returned."
 	ctl)
     (save-excursion
       (setq ctl (mail-header-parse-content-type (or string "text/plain")))
-      (setq major (symbol-name (mime-content-type-primary-type ctl)))
-      (setq minor (symbol-name (mime-content-type-subtype ctl)))
+      (setq major (if ctl
+		      (symbol-name (mime-content-type-primary-type ctl))
+		    string))
+      (setq minor (and ctl (symbol-name (mime-content-type-subtype ctl))))
       (when (setq major-info (cdr (assoc major mm-mailcap-mime-data)))
 	(when (setq viewers (mm-mailcap-possible-viewers major-info minor))
 	  (setq info (mapcar (lambda (a) (cons (symbol-name (car a))
