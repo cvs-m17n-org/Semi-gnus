@@ -1,3 +1,16 @@
+2003-05-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+2001-07-11 18:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	We thanks to Thierry Emery <thierry.emery@club-internet.fr> who
+	made it notice that there was a change to have to be merged from
+	Gnus. -- ky
+
+	* lisp/nnfolder.el (nnfolder-read-folder): Force to use a
+	multibyte buffer.
+
 2003-05-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.16.2 revision 00.
