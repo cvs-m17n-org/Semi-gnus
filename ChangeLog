@@ -1,3 +1,18 @@
+1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+1999-12-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/dgnushack.el (dgnushack-install-package): Preserve any file
+	in $(PACKAGEDIR)/lisp/t-gnus if it is without .el or .elc suffix.
+
+1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (mapcon): New compiler macro for emulating cl
+	function.
+	(mapc): Bug fix - treat the last arg as a list.
+
 1999-12-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
