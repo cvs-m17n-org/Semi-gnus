@@ -19,6 +19,8 @@ ac_help="$ac_help
   --with-lispdir=DIR      Where to install lisp files
                           (for XEmacs package, use --with-packagedir instead)"
 ac_help="$ac_help
+  --with-etcdir=DIR       Where to install etc files"
+ac_help="$ac_help
   --with-w3=DIR           Specify where to find the w3 package"
 ac_help="$ac_help
   --with-packagedir=DIR   package DIR for XEmacs"
@@ -546,7 +548,7 @@ fi
   echo "$ac_t""${GNUS_PRODUCT_NAME}" 1>&6
   
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:550: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:552: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"\${ac_cv_prog_make_${ac_make}_set+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -603,7 +605,7 @@ ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:607: checking for a BSD compatible install" >&5
+echo "configure:609: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"\${ac_cv_path_install+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -662,7 +664,7 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:666: checking for $ac_word" >&5
+echo "configure:668: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_MAKEINFO+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -703,7 +705,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:707: checking for $ac_word" >&5
+echo "configure:709: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_EMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -737,7 +739,7 @@ test -n "$EMACS" || EMACS="emacs"
       # Extract the first word of "$withval", so it can be a program name with args.
 set dummy $withval; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:741: checking for $ac_word" >&5
+echo "configure:743: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_EMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -774,7 +776,7 @@ if test "${with_xemacs+set}" = set; then
       # Extract the first word of "xemacs", so it can be a program name with args.
 set dummy xemacs; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:778: checking for $ac_word" >&5
+echo "configure:780: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_XEMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -805,7 +807,7 @@ fi
       # Extract the first word of "$withval", so it can be a program name with args.
 set dummy $withval; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:809: checking for $ac_word" >&5
+echo "configure:811: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_XEMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -842,7 +844,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:846: checking for $ac_word" >&5
+echo "configure:848: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_prog_EMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -878,7 +880,7 @@ fi
   
 
   echo $ac_n "checking what a flavor does $EMACS have""... $ac_c" 1>&6
-echo "configure:882: checking what a flavor does $EMACS have" >&5
+echo "configure:884: checking what a flavor does $EMACS have" >&5
 
     unset EMACS_cv_SYS_flavor;
 
@@ -888,7 +890,7 @@ elisp="(cond ((featurep (quote xemacs)) \"XEmacs\")\
           (t \"FSF Emacs\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for flavor""... $ac_c" 1>&6
-echo "configure:892: checking for flavor" >&5
+echo "configure:894: checking for flavor" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_flavor+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -920,12 +922,12 @@ fi
   echo "$ac_t""$EMACS_cv_SYS_flavor" 1>&6
   if test "$prefix" = "NONE"; then
 	echo $ac_n "checking prefix for your Emacs""... $ac_c" 1>&6
-echo "configure:924: checking prefix for your Emacs" >&5
+echo "configure:926: checking prefix for your Emacs" >&5
 	
 elisp="(expand-file-name \"..\" invocation-directory)"
 if test -z ""noecho""; then
 	echo $ac_n "checking for prefix""... $ac_c" 1>&6
-echo "configure:929: checking for prefix" >&5
+echo "configure:931: checking for prefix" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_prefix+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -956,7 +958,7 @@ if test "${with_lispdir+set}" = set; then
 fi
 
   echo $ac_n "checking where lisp files should go""... $ac_c" 1>&6
-echo "configure:960: checking where lisp files should go" >&5
+echo "configure:962: checking where lisp files should go" >&5
   if test -z "$lispdir"; then
         theprefix=$prefix
     if test "x$theprefix" = "xNONE"; then
@@ -980,8 +982,23 @@ echo "configure:960: checking where lisp files should go" >&5
   
 
 
+  # Check whether --with-etcdir or --without-etcdir was given.
+if test "${with_etcdir+set}" = set; then
+  withval="$with_etcdir"
+  etcdir=${withval}
+fi
+
+  echo $ac_n "checking where etc files should go""... $ac_c" 1>&6
+echo "configure:993: checking where etc files should go" >&5
+  if test -z "$etcdir"; then
+        etcdir="\$(lispdir)/../etc"
+  fi
+  echo "$ac_t""$etcdir" 1>&6
+  
+
+
 echo $ac_n "checking for acceptable W3 version""... $ac_c" 1>&6
-echo "configure:985: checking for acceptable W3 version" >&5
+echo "configure:1002: checking for acceptable W3 version" >&5
 
 unset EMACS_cv_ACCEPTABLE_W3;
 unset EMACS_cv_SYS_w3_dir;
@@ -994,14 +1011,14 @@ else
 
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3-form-encode-xwfu in w3_forms""... $ac_c" 1>&6
-echo "configure:998: checking for w3-form-encode-xwfu in w3_forms" >&5
+echo "configure:1015: checking for w3-form-encode-xwfu in w3_forms" >&5
 fi
 library=`echo w3_forms | tr _ -`
 
 elisp="(progn (fmakunbound (quote w3-form-encode-xwfu)) (condition-case nil (progn (require (quote $library)) (fboundp (quote w3-form-encode-xwfu))) (error (prog1 nil (message \"$library not found\")))))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_forms""... $ac_c" 1>&6
-echo "configure:1005: checking for w3_forms" >&5
+echo "configure:1022: checking for w3_forms" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_w3_forms+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1045,7 +1062,7 @@ if test "x${EMACS_cv_ACCEPTABLE_W3}" = "xyes"; then
 elisp="(file-name-directory (locate-library \"w3-forms\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for w3_dir""... $ac_c" 1>&6
-echo "configure:1049: checking for w3_dir" >&5
+echo "configure:1066: checking for w3_dir" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_w3_dir+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1087,7 +1104,7 @@ fi
 
   if test ${EMACS_FLAVOR} = xemacs; then
     echo $ac_n "checking where the XEmacs package is""... $ac_c" 1>&6
-echo "configure:1091: checking where the XEmacs package is" >&5
+echo "configure:1108: checking where the XEmacs package is" >&5
     # Check whether --with-packagedir or --without-packagedir was given.
 if test "${with_packagedir+set}" = set; then
   withval="$with_packagedir"
@@ -1110,7 +1127,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1114: checking for PACKAGEDIR" >&5
+echo "configure:1131: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1149,7 +1166,7 @@ elisp="(let (package-dir)\
       (or package-dir \"\"))"
 if test -z ""noecho""; then
 	echo $ac_n "checking for PACKAGEDIR""... $ac_c" 1>&6
-echo "configure:1153: checking for PACKAGEDIR" >&5
+echo "configure:1170: checking for PACKAGEDIR" >&5
 fi
 if eval "test \"\${EMACS_cv_SYS_PACKAGEDIR+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1186,7 +1203,7 @@ if test "${with_addpath+set}" = set; then
   withval="$with_addpath"
   if test x$withval != xyes -a x$withval != x; then
       echo $ac_n "checking where to find the additional elisp libraries""... $ac_c" 1>&6
-echo "configure:1190: checking where to find the additional elisp libraries" >&5
+echo "configure:1207: checking where to find the additional elisp libraries" >&5
       ADDITIONAL_LOAD_PATH=$withval
       echo "$ac_t""$ADDITIONAL_LOAD_PATH" 1>&6
     fi
@@ -1308,7 +1325,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile etc/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -1349,6 +1366,7 @@ s%@MAKEINFO@%$MAKEINFO%g
 s%@EMACS@%$EMACS%g
 s%@XEMACS@%$XEMACS%g
 s%@lispdir@%$lispdir%g
+s%@etcdir@%$etcdir%g
 s%@HAVE_w3_forms@%$HAVE_w3_forms%g
 s%@W3@%$W3%g
 s%@PACKAGEDIR@%$PACKAGEDIR%g
@@ -1394,7 +1412,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile etc/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

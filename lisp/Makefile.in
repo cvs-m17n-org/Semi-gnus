@@ -59,6 +59,14 @@ remove-extra-files-in-package:
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 #
 
+install-el:
+	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
+	cd $(srcdir) \
+	&& for p in *.el; do \
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	done
+
 tags:
 	etags *.el
 

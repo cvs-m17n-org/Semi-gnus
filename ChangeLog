@@ -1,5 +1,22 @@
 2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* configure: Regenerate.
+	* configure.in: Add `AC_PATH_ETCDIR'.
+	* Makefile.in (install-etc): New target.
+
+	* lisp/nnheader.el (mm-image-load-path): Alias to
+	`nnheader-image-load-path'.
+	(nnheader-image-load-path): New function copied from
+	the function `mm-image-load-path' in mm-util.el.
+
+	* lisp/drums.el: Remove.
+
+2000-12-22 03:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* configure.in: Add etc/Makefile.
+
+2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-msg.el (gnus-debug): Use `sit-for' in the inside of
 	`save-excursion'.
 	(gnus-bug): Pop up the sending buffer first.

@@ -5,7 +5,8 @@ AC_PROG_INSTALL
 AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, no)
 AC_CHECK_EMACS
 AC_PATH_LISPDIR
+AC_PATH_ETCDIR
 AC_CHECK_W3
 AC_PATH_PACKAGEDIR
 AC_ADD_LOAD_PATH
-AC_OUTPUT(Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile)
+AC_OUTPUT(Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile etc/Makefile)

@@ -34,6 +34,7 @@ all-ja: lick info info-ja
 lick:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" all
 
+#install: install-lisp install-info install-etc
 install: install-lisp install-info
 
 install-ja: install install-info-ja
@@ -43,6 +44,9 @@ install-lisp:
 
 install-info:
 	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install
+
+install-etc:
+	cd etc && $(MAKE) EMACS="$(EMACS)" install
 
 install-info-ja:
 	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install-ja

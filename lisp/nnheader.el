@@ -1151,6 +1151,17 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
+(defun nnheader-image-load-path (&optional package)
+  (let (dir result)
+    (dolist (path load-path (nreverse result))
+      (if (file-directory-p
+	   (setq dir (concat (file-name-directory
+			      (directory-file-name path))
+			     "etc/" (or package "gnus/"))))
+	  (push dir result))
+      (push path result))))
+(defalias 'mm-image-load-path 'nnheader-image-load-path)
+
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
 
