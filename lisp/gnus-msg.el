@@ -983,13 +983,15 @@ If YANK is non-nil, include the original article."
     (error "Gnus has been shut down"))
   (gnus-setup-message (if (message-mail-user-agent) 'message 'bug)
     (unless (message-mail-user-agent)
+      (message-pop-to-buffer "*Gnus Bug*")
       (delete-other-windows)
       (when gnus-bug-create-help-buffer
 	(switch-to-buffer "*Gnus Help Bug*")
 	(erase-buffer)
 	(insert gnus-bug-message)
-	(goto-char (point-min)))
-      (message-pop-to-buffer "*Gnus Bug*"))
+	(goto-char (point-min))
+	(sit-for 0)
+	(set-buffer "*Gnus Bug*")))
     (let ((message-this-is-mail t))
       (message-setup `((To . ,gnus-maintainer) (Subject . ""))))
     (when gnus-bug-create-help-buffer
@@ -1006,6 +1008,8 @@ If YANK is non-nil, include the original article."
 	       (stringp nntp-server-type))
       (insert nntp-server-type))
     (insert "\n\n\n\n\n")
+    (let (mime-content-types)
+      (mime-edit-insert-tag "text" "plain" "; type=emacs-lisp"))
     (insert (with-temp-buffer
 	      (gnus-debug)
 	      (buffer-string)))
@@ -1063,9 +1067,9 @@ The source file has to be in the Emacs load path."
 	(point (point))
 	file expr olist sym)
     (gnus-message 4 "Please wait while we snoop your variables...")
-    (sit-for 0)
     ;; Go through all the files looking for non-default values for variables.
     (save-excursion
+      (sit-for 0)
       (set-buffer (gnus-get-buffer-create " *gnus bug info*"))
       (while files
 	(erase-buffer)

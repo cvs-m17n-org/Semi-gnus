@@ -1,5 +1,9 @@
 2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-msg.el (gnus-debug): Use `sit-for' in the inside of
+	`save-excursion'.
+	(gnus-bug): Pop up the sending buffer first.
+
 	* lisp/gnus-art.el (article-treat-dumbquotes): Quote backslashes in
 	doc-string.
 
