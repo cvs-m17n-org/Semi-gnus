@@ -2,9 +2,9 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
-;;         Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+;;	Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -1050,7 +1050,8 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    (References . message-fill-references)
+    ;; (References . message-shorten-references)
+    (References . message-fill-header)
     (User-Agent))
   "Alist used for formatting headers.")
 
@@ -3404,10 +3405,12 @@ Headers already prepared in the buffer are not modified."
 	(special-display-regexps special-display-regexps)
 	(same-window-buffer-names same-window-buffer-names)
 	(same-window-regexps same-window-regexps)
-	(buffer (get-buffer name)))
+	(buffer (get-buffer name))
+	(cur (current-buffer)))
     (if (or (and (featurep 'xemacs)
 		 (not (eq 'tty (device-type))))
-	    window-system)
+	    window-system
+	    (>= emacs-major-version 20))
 	(when message-use-multi-frames
 	  (setq pop-up-frames t
 		special-display-buffer-names nil
@@ -3938,13 +3941,18 @@ that further discussion should take place only in "
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((cur (current-buffer)))
+  (let ((cur (current-buffer))
+	(sender (message-fetch-field "sender"))
+	(from (message-fetch-field "from")))
     ;; Check whether the user owns the article that is to be superseded.
-    (unless (string-equal
-	     (downcase (or (message-fetch-field "sender")
-			   (cadr (std11-extract-address-components
-				  (message-fetch-field "from")))))
-	     (downcase (message-make-sender)))
+    (unless (or (and sender
+		     (string-equal
+		      (downcase sender)
+		      (downcase (message-make-sender))))
+		(string-equal
+		 (downcase (cadr (std11-extract-address-components from)))
+		 (downcase (cadr (std11-extract-address-components
+				  (message-make-from))))))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
     (message-pop-to-buffer (message-buffer-name "supersede"))
@@ -4425,6 +4433,7 @@ regexp varstr."
     (run-hooks 'mime-edit-exit-hook)
     ))
 
+;;; XXX: currently broken; message-yank-original resets message-reply-buffer.
 (defun message-mime-insert-article (&optional message)
   (interactive)
   (let ((message-cite-function 'mime-edit-inserted-message-filter)

@@ -333,11 +333,11 @@
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let (max-width
+  (let ((xemacs-mule-p (and gnus-xemacs (featurep 'mule)))
+	max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
-	tilde-form tilde elem-type
-	(xemacs-mule-p (and gnus-xemacs (featurep 'mule))))
+	tilde-form tilde elem-type)
     (save-excursion
       (gnus-set-work-buffer)
       (insert format)
