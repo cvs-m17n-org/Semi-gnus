@@ -397,9 +397,25 @@ be a select method."
     (while (re-search-forward (concat gnus-agent-gcc-header ":") nil t)
       (replace-match "Gcc:" 'fixedcase))))
 
+(defun gnus-agent-any-covered-gcc ()
+  (save-restriction
+    (message-narrow-to-headers)
+    (let* ((gcc (mail-fetch-field "gcc" nil t))
+	   (methods (and gcc
+			 (mapcar 'gnus-inews-group-method
+				 (message-unquote-tokens
+				  (message-tokenize-header
+				   gcc " ,")))))
+	   covered)
+      (while (and (not covered) methods)
+	(setq covered
+	      (member (car methods) gnus-agent-covered-methods)
+	      methods (cdr methods)))
+      covered)))
+
 (defun gnus-agent-possibly-save-gcc ()
   "Save GCC if Gnus is unplugged."
-  (unless gnus-plugged
+  (when (and (not gnus-plugged) (gnus-agent-any-covered-gcc))
     (save-excursion
       (goto-char (point-min))
       (let ((case-fold-search t))
@@ -408,7 +424,7 @@ be a select method."
 
 (defun gnus-agent-possibly-do-gcc ()
   "Do GCC if Gnus is plugged."
-  (when gnus-plugged
+  (when (or gnus-plugged (not (gnus-agent-any-covered-gcc)))
     (gnus-inews-do-gcc)))
 
 ;;;
