@@ -1,7 +1,7 @@
 \input texinfo
 
 @setfilename gnus
-@settitle T-gnus 6.15 Manual
+@settitle T-gnus 6.16 Manual
 @syncodeindex fn cp
 @syncodeindex vr cp
 @syncodeindex pg cp
@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{T-gnus v6.15}
+\newcommand{\gnusversionname}{T-gnus v6.16}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -346,7 +346,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.15 Manual
+@title T-gnus 6.16 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -396,7 +396,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So T-gnus does not discriminate various language communities.  Oh,
 if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to T-gnus 6.15.
+This manual corresponds to T-gnus 6.16.
 
 @end ifinfo
 
@@ -25682,7 +25682,7 @@ Gnus will work.
 
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
-like @samp{T-gnus 6.15.* (based on Oort Gnus v0.*; for SEMI 1.1*, FLIM
+like @samp{T-gnus 6.16.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
 1.1*)} you have the right files loaded.  If, on the other hand, you get
 something like @samp{NNTP 3.x} or @samp{nntp flee}, you have some old
 @file{.el} files lying around.  Delete these.
