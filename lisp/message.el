@@ -555,7 +555,16 @@ nil means use indentation."
 (defcustom message-yank-add-new-references t
   "*Non-nil means new IDs will be added to \"References\" field when an
 article is yanked by the command `message-yank-original' interactively."
-  :type 'boolean
+  :type '(radio (const :tag "Do not add anything" nil)
+		(const :tag "From Message-Id, References and In-Reply-To fields" t)
+		(const :tag "From only Message-Id field." message-id-only))
+  :group 'message-insertion)
+
+(defcustom message-list-references-add-position nil
+  "*Integer value means position for adding to \"References\" field when
+an article is yanked by the command `message-yank-original' interactively."
+  :type '(radio (const :tag "Add to last" nil)
+		(integer :tag "Position from last ID"))
   :group 'message-insertion)
 
 (defcustom message-indentation-spaces 3
@@ -1851,7 +1860,15 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
 (defun message-list-references (refs-list &rest refs-strs)
   "Add `Message-ID's which appear in REFS-STRS but not in REFS-LIST,
 to REFS-LIST."
-  (let (refs ref id)
+  (let (refs ref id saved-id)
+    (when (and refs-list
+	       (integerp message-list-references-add-position))
+      (let ((pos message-list-references-add-position))
+	(while (and refs-list
+		    (> pos 0))
+	  (setq saved-id (cons (car refs-list) saved-id)
+		refs-list (cdr refs-list)
+		pos (1- pos)))))
     (while refs-strs
       (setq refs (car refs-strs)
 	    refs-strs (cdr refs-strs))
@@ -1868,6 +1885,9 @@ to REFS-LIST."
 			     ">"))
 	    (or (member id refs-list)
 		(push id refs-list))))))
+    (while saved-id
+      (setq refs-list (cons (car saved-id) refs-list)
+	    saved-id (cdr saved-id)))
     refs-list))
 
 (defvar gnus-article-copy)
@@ -1884,7 +1904,8 @@ prefix, and don't delete any headers.
 
 In addition, if `message-yank-add-new-references' is non-nil and this
 command is called interactively, new IDs from the yanked article will
-be added to \"References\" field."
+be added to \"References\" field.
+\(See also `message-yank-add-new-references'.)"
   (interactive "P")
   (let ((modified (buffer-modified-p))
 	(buffer (message-eval-parameter message-reply-buffer))
@@ -1909,8 +1930,10 @@ be added to \"References\" field."
 	    (std11-narrow-to-header)
 	    (when (setq refs (message-list-references
 			      refs
-			      (or (message-fetch-field "References")
-				  (message-fetch-field "In-Reply-To"))
+			      (unless (eq message-yank-add-new-references
+					  'message-id-only)
+				(or (message-fetch-field "References")
+				    (message-fetch-field "In-Reply-To")))
 			      (message-fetch-field "Message-ID")))
 	      (widen)
 	      (message-narrow-to-headers)
