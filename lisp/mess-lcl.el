@@ -278,7 +278,7 @@ then set this function to `message-encode-function'."
 	  (when (eq type 'region)
 	    (narrow-to-region (car args) (car (cdr args)))
 	    (message-mime-highlight-illegal-chars charsets)
-	    (pop-to-buffer (current-buffer) nil t)
+	    (pop-to-buffer (current-buffer))
 	    (recenter 1))
 	  (if (setq charset
 		    (funcall message-mime-charset-recover-ask-function
