@@ -1,3 +1,17 @@
+1998-12-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.11.2.
+
+	* Sync up with gnus-6_9.
+
+* 1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/smtp.el (smtp-via-smtp): Use `open-network-stream-as-binary'
+	instead of `open-network-stream'.
+	* lisp/pop3.el (pop3-open-server): Likewise.
+	* lisp/nntp.el (nntp-open-network-stream): Likewise.
+	* lisp/gnus-gl.el (bbb-connect-to-bbbd): Likewise.
+
 1998-12-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-get-parameter-with-eval): Call

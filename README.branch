@@ -1,7 +1,7 @@
 README.branch --- description of branches and tags. (DRAFT)
 ========================================================================
 
-Semi-gnus revision tree (1998-07-16)
+Semi-gnus revision tree (1998-12-09)
 
     vendor      personal    main trunk      public
     branch      branches                    branches
@@ -26,15 +26,21 @@ Gnus 5.6.11 ------>           6.3.3
        :                        |    \        6.6.0        stable branch
        :                        |     \
        :                        |      ---> 6.7 (for SEMI 1.8, FLIM 1.7)
-       :                        |             6.7.0       develop branch
+       :                        |             6.7.0        stable branch
        :     sync               |               :
 Gnus 5.6.22 ------>             |   feedback  6.7.7
        :                     (6.7.8)<------   6.7.8
        :                        |    \
        :                        |     \
        :                        |      ---> 6.8 (for SEMI 1.8, FLIM 1.8)
-       :     sync               |             6.8.0
-Gnus 5.6.24 ------>             |             6.8.1
+       :        keiichi  <--  6.8.18          6.8.0        stable branch
+       :     sync               |               :
+Gnus 5.6.45 ------>             |   feedback  6.8.20
+       :                     (6.8.20)<------  6.8.20
+       :                        |     \
+       :                        |      \
+       :                        |       --> 6.9 (for SEMI 1.11, FLIM 1.12)
+       :                        |             6.9.1       develop branch
        :                        :               :
        :                        :               :
 ========================================================================
@@ -82,8 +88,9 @@ Public Branches
 	for-semi-1_6	Semi-gnus for SEMI 1.6 API
 	gnus-6_5	Semi-gnus for SEMI 1.7 API
 	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
-	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
-	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API
+	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API (stable)
+	gnus-6_9	Semi-gnus for SEMI 1.11,FLIM 1.12 API (develop)
 
 Personal Branches
 
@@ -97,6 +104,7 @@ Personal Branches
 	ichikawa	Owner: Tatsuya Ichikawa
 	akr		Owner: Tanaka Akira
 	shuhei-k	Owner: Shuhei KOBAYASHI
+	keiichi	        Owner: Keiichi Suzuki
 
 "semi-gnus" Tag
 
