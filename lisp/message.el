@@ -33,7 +33,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (require 'smtp)
+  (require 'std10)
   )
 
 (require 'mailheader)
@@ -293,7 +293,7 @@ nil means let mailer mail back a message to report errors."
   :type 'boolean)
 
 (defcustom message-generate-new-buffers t
-  "*Non-nil means that a new message buffer will be created whenever `mail-setup' is called.
+  "*Non-nil means that a new message buffer will be created whenever `message-setup' is called.
 If this is a function, call that function with three parameters:  The type,
 the to address and the group name.  (Any of these may be nil.)  The function
 should return the new buffer name."
@@ -1006,6 +1006,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
+    ;; (References . message-shorten-references)
     (References . message-fill-header)
     (User-Agent))
   "Alist used for formatting headers.")
@@ -2241,8 +2242,8 @@ to find out how to use this."
       (message-narrow-to-headers)
       (setq recipients
 	    ;; XXX: Should be replaced by better one.
-	    (smtp-deduce-address-list (current-buffer)
-				      (point-min) (point-max)))
+	    (std10-deduce-address-list (current-buffer)
+				       (point-min) (point-max)))
       ;; Remove BCC lines.
       (message-remove-header "bcc"))
     ;; replace the header delimiter with a blank line.
@@ -2253,9 +2254,8 @@ to find out how to use this."
     (backward-char 1)
     (run-hooks 'message-send-mail-hook)
     (if recipients
-	(let ((result (smtp-via-smtp user-mail-address
-				     recipients
-				     (current-buffer))))
+	(let ((result (std10-send-buffer user-mail-address recipients
+					 nil t)))
 	  (unless (eq result t)
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
@@ -3174,6 +3174,24 @@ Headers already prepared in the buffer are not modified."
 	(replace-match " " t t))
       (goto-char (point-max)))))
 
+(defun message-shorten-references (header references)
+  "Limit REFERENCES to be shorter than 988 characters."
+  (let ((max 988)
+	(cut 4)
+	refs)
+    (nnheader-temp-write nil
+      (insert references)
+      (goto-char (point-min))
+      (while (re-search-forward "<[^>]+>" nil t)
+	(push (match-string 0) refs))
+      (setq refs (nreverse refs))
+      (while (> (length (mapconcat 'identity refs " ")) max)
+	(when (< (length refs) (1+ cut))
+	  (decf cut))
+	(setcdr (nthcdr cut refs) (cddr (nthcdr cut refs)))))
+    (insert (capitalize (symbol-name header)) ": "
+	    (mapconcat 'identity refs " ") "\n")))
+
 (defun message-position-point ()
   "Move point to where the user probably wants to find it."
   (message-narrow-to-headers)
@@ -3938,7 +3956,8 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "mail" to)))
-  (message-setup `((To . ,(or to "")) (Subject . ,(or subject "")))))
+  (let ((message-this-is-mail t))
+    (message-setup `((To . ,(or to "")) (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-mail-other-frame (&optional to subject)
@@ -3950,7 +3969,8 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "mail" to)))
-  (message-setup `((To . ,(or to "")) (Subject . ,(or subject "")))))
+  (let ((message-this-is-mail t))
+    (message-setup `((To . ,(or to "")) (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-news-other-window (&optional newsgroups subject)
@@ -3962,8 +3982,9 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
-  (message-setup `((Newsgroups . ,(or newsgroups ""))
-		   (Subject . ,(or subject "")))))
+  (let ((message-this-is-news t))
+    (message-setup `((Newsgroups . ,(or newsgroups ""))
+		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
 (defun message-news-other-frame (&optional newsgroups subject)
@@ -3975,8 +3996,9 @@ you."
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
     (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
-  (message-setup `((Newsgroups . ,(or newsgroups ""))
-		   (Subject . ,(or subject "")))))
+  (let ((message-this-is-news t))
+    (message-setup `((Newsgroups . ,(or newsgroups ""))
+		     (Subject . ,(or subject ""))))))
 
 ;;; underline.el
 

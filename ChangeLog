@@ -1,3 +1,69 @@
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi, texi/message.texi, texi/ChangeLog: Sync up with
+	Gnus 5.6.13.
+
+1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* Sync up with Gnus 5.6.13.
+	
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Don't
+	`save-excursion'.
+	(gnus-article-prepare): Use `mime-fetch-field' instead of
+	`mime-entity-fetch-field'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Use
+	`mime-display-message' instead of `mime-view-buffer'.
+	(gnus-article-display-traditional-message): Set
+	`gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Modify for
+	`gnus-article-display-traditional-message'.
+	(gnus-article-prepare): Use `mime-parse-buffer' and
+	`mime-entity-fetch-field'; don't set gnus-article-buffer.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi, texi/gnus.texi (Using MIME): Modify
+	description about new display mechanism.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for this branch.
+
+	* lisp/gnus-art.el (gnus-article-display-method-for-mime): New
+	variable; abolish `gnus-show-mime-method'.
+	(gnus-article-display-method-for-encoded-word): New variable;
+	abolish `gnus-decode-encoded-word-method'.
+	(gnus-article-display-method-for-traditional): New variable.
+	(gnus-article-display-mime-message): New function; abolish
+	`gnus-article-preview-mime-message'.
+	(gnus-article-display-traditional-message): New function.
+	(gnus-article-display-message-with-encoded-word): New function;
+	abolish `gnus-article-decode-encoded-word'.
+	(gnus-article-prepare): Change display mechanism; use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+	(gnus-request-original-article): New function.
+
+1998-06-22  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for SEMI 1.8.
+
+	* lisp/gnus-sum.el: Modify for interface change in SEMI 1.8 about
+	automatic message/partial combining.
+
 1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.5.0.
