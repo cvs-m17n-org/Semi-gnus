@@ -46,34 +46,48 @@
 		     ,field-body ,field-name))
        ,field-body))
 
+(defvar gnus-bbdb/extract-message-sender-function
+  'gnus-bbdb/extract-message-sender)
+
+(defun gnus-bbdb/extract-message-sender ()
+  (let ((from (mail-header-from gnus-current-headers))
+	to)
+    (when from
+      (setq from (gnus-bbdb/extract-address-components
+		  (gnus-bbdb/decode-field-body from 'From)))
+      (if (and (car (cdr from))
+	       (string-match (bbdb-user-mail-names) (car (cdr from)))
+	       ;; if logged-in user sent this, use recipients.
+	       (setq to (mime-entity-fetch-field gnus-current-headers "to")))
+	  (gnus-bbdb/extract-address-components
+	   (gnus-bbdb/decode-field-body to 'To))
+	from))))
+
 ;;;###autoload
 (defun gnus-bbdb/update-record (&optional offer-to-create)
-  "returns the record corresponding to the current GNUS message, creating
+  "Return the record corresponding to the current GNUS message, creating
 or modifying it as necessary.  A record will be created if
 bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (let ((from (mime-entity-fetch-field gnus-current-headers "from")))
-      (when from
-	(setq from (gnus-bbdb/extract-address-components
-		    (gnus-bbdb/decode-field-body from 'From))))
-      (when (and (car (cdr from))
-		 (string-match (bbdb-user-mail-names)
-			       (car (cdr from))))
-	;; if logged-in user sent this, use recipients.
-	(let ((to (mime-entity-fetch-field gnus-current-headers "to")))
-	  (when to
-	    (setq from
-		  (gnus-bbdb/extract-address-components
-		   (gnus-bbdb/decode-field-body to 'To))))))
-      (when from
-	(save-excursion
-	  (bbdb-annotate-message-sender from t
-					(or (bbdb-invoke-hook-for-value
-					     bbdb/news-auto-create-p)
-					    offer-to-create)
-					offer-to-create))))))
+    (let ((message-key
+	   (intern (mail-header-id gnus-current-headers)))
+	  record sender)
+      (or (and (setq record (bbdb-message-cache-lookup message-key))
+	       (if (listp record)
+		   (nth 1 record)
+		 record))
+	  (when (setq sender
+		      (funcall gnus-bbdb/extract-message-sender-function))
+	    (save-excursion
+	      (bbdb-encache-message
+	       message-key
+	       (bbdb-annotate-message-sender sender t
+					     (or (bbdb-invoke-hook-for-value
+						  bbdb/news-auto-create-p)
+						 offer-to-create)
+					     offer-to-create))))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
@@ -601,6 +615,7 @@ beginning of the message headers."
     (add-to-list 'bbdb-extract-field-value-function-list
 		 'gnus-bbdb/extract-field-value-init))
   (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
+  (add-hook 'gnus-summary-exit-hook 'bbdb-flush-all-caches)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)
