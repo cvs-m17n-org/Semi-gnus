@@ -75,6 +75,9 @@
 	 (set symbol nil))
      symbol))
 
+(defun gnus-string-width (str)
+  (length str))
+
 (defun gnus-truncate-string (str width)
   (substring str 0 width))
 
@@ -723,7 +726,8 @@ with potentially long computations."
   (setq filename (expand-file-name filename))
   (setq rmail-default-rmail-file filename)
   (let ((artbuf (current-buffer))
-	(tmpbuf (gnus-get-buffer-create " *Gnus-output*")))
+	(tmpbuf (gnus-get-buffer-create " *Gnus-output*"))
+	(coding-system-for-write 'binary))
     (save-excursion
       (or (get-file-buffer filename)
 	  (file-exists-p filename)
