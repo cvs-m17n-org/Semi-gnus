@@ -3648,9 +3648,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 
     (gnus-run-hooks 'gnus-article-menu-hook)))
 
-;; Fixme: do something for the Emacs tool bar in Article mode a la
-;; Summary.
-
 (defun gnus-article-mode ()
   "Major mode for displaying an article.
 
@@ -3675,7 +3672,9 @@ commands:
     (push (list 'gnus-show-mime " MIME") minor-mode-alist))
   (use-local-map gnus-article-mode-map)
   (when (gnus-visual-p 'article-menu 'menu)
-    (gnus-article-make-menu-bar))
+    (gnus-article-make-menu-bar)
+    (when gnus-summary-tool-bar-map
+      (set (make-local-variable 'tool-bar-map) gnus-summary-tool-bar-map)))
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
   (make-local-variable 'gnus-page-broken)
