@@ -1,3 +1,13 @@
+1999-11-08  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
+	`message-save-drafts' instead of `set-buffer-modified-p' and
+	`save-buffer'.
+	* lisp/message.el (message-save-drafts): Insert In-Reply-To header
+	because the reply data is lost in Drafts.
+	* lisp/gnus-art.el (gnus-signature-face): Don't check
+	window-system type.
+
 1999-11-08   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/pop3.el (pop3-progress-message): New function.
