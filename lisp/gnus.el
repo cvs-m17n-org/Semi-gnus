@@ -1523,7 +1523,7 @@ slower, and `std11-extract-address-components'."
   :type 'boolean)
 
 (defcustom gnus-shell-command-separator ";"
-  "String used to separate to shell commands."
+  "String used to separate shell commands."
   :group 'gnus-files
   :type 'string)
 
@@ -1621,7 +1621,7 @@ to be desirable; see the manual for further details."
 
 ;; There should be special validation for this.
 (define-widget 'gnus-email-address 'string
-  "An email address")
+  "An email address.")
 
 (gnus-define-group-parameter
  to-address
@@ -2112,7 +2112,7 @@ You also need to enable `gnus-agent'."
 (defcustom gnus-default-charset 'iso-8859-1
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
-gnus-group-charset-alist variable and is only used on groups not
+`gnus-group-charset-alist' variable and is only used on groups not
 covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
@@ -2134,7 +2134,7 @@ Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
 
 (defcustom gnus-other-frame-parameters nil
   "Frame parameters used by `gnus-other-frame' to create a Gnus frame.
-This should be an alist for FSF Emacs, or a plist for XEmacs."
+This should be an alist for Emacs, or a plist for XEmacs."
   :group 'gnus-start
   :type (if (featurep 'xemacs)
 	    '(repeat (list :inline t :format "%v"
