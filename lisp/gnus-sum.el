@@ -7955,6 +7955,13 @@ article.  If BACKWARD (the prefix) is non-nil, search backward instead."
     (when gnus-page-broken
       (gnus-narrow-to-page))))
 
+(defun gnus-summary-print-truncate-and-quote (string &optional len)
+  "Truncate to LEN and quote all \"(\"'s in STRING."
+  (gnus-replace-in-string (if (and len (> (length string) len))
+			      (substring string 0 len) 
+			    string)
+			  "[()]" "\\\\\\&"))
+
 (defun gnus-summary-print-article (&optional filename n)
   "Generate and print a PostScript image of the N next (mail) articles.
 
@@ -7984,9 +7991,13 @@ to save in."
 	      (let ((ps-left-header
 		     (list
 		      (concat "("
-			      (mail-header-subject gnus-current-headers) ")")
+			      (gnus-summary-print-truncate-and-quote
+			       (mail-header-subject gnus-current-headers) 
+			       66) ")")
 		      (concat "("
-			      (mail-header-from gnus-current-headers) ")")))
+			      (gnus-summary-print-truncate-and-quote
+			       (mail-header-from gnus-current-headers) 
+			       45) ")")))
 		    (ps-right-header
 		     (list
 		      "/pagenumberstring load"
