@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.5 1998-11-09 14:44:06 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.6 1998-11-10 14:53:51 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -7,7 +7,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 2.00b1
+;;; Version: 2.00
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -103,10 +103,9 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.00b1")
+(defconst gnus-offline-version-number "2.00")
 (defconst gnus-offline-codename
-  "Beta1"
-;;  "This is the time"		; 2.00
+  "This is the time"		; 2.00
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Code of silence"
@@ -265,7 +264,7 @@ If value is nil , dialup line is disconnected status.")
   ;; Load setting file - required.
   (load gnus-offline-setting-file)
 
-  ;; Menus.
+  ;; Menu and keymap
   (gnus-offline-define-menu-and-key)
   
   ;; To transfer Mail/News function.
