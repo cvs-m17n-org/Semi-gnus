@@ -1,0 +1,1526 @@
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.7.
+	(gnus-version): Modify for SEMI 1.10.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
+	for Subject and From field.
+
+1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-parse-nov): Use
+	`make-full-mail-header'.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-parse-head): Use
+	`make-full-mail-header'.
+
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.6.
+	(gnus-version): Modify for SEMI 1.9.
+
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-read-field', `std11-address-string' and
+	`std11-full-name-string' instead of
+	`gnus-extract-address-components'.
+	(gnus-article-sort-by-author): Likewise.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header):
+	New function.
+
+	* lisp/message.el (message-reply): Use
+	`make-full-mail-header-from-decoded-header' instead of
+	`make-full-mail-header'.
+	(message-followup): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-set-default-charset): New
+	function.
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up
+	buffer local variable `default-mime-charset' of
+	`gnus-original-article-buffer' and `gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Add
+	`gnus-maybe-setup-default-charset'.
+	Delete dummy definition for `nnspool-rejected-article-hook' and
+	`xemacs-codename'
+	(gnus-maybe-setup-default-charset): New function.
+
+	* lisp/message.el (message-setup-hook): Delete
+	`message-maybe-setup-default-charset'.	
+	Abolish variable `message-newsreader' and `message-mailer'.
+	(message-user-agent): New variable.
+	Abolish function `message-maybe-setup-default-charset'.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.4.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send): Call
+	`message-send-news-function' or `message-send-mail-function'
+	instead of `message-send-and-exit'.
+
+1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
+	`gnus-draft-setup-for-editing' instead of `gnus-draft-setup'.
+	(gnus-draft-send): Use `gnus-draft-setup-for-sending' instead of
+	`gnus-draft-setup'.
+	(gnus-draft-setup-for-editing): New function (renamed from
+	`gnus-draft-setup').
+	(gnus-draft-setup-for-sending): New function.
+	(gnus-draft-send-draft-buffer): New variable.
+
+1998-10-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare): Don't store original
+	buffer to the entity.
+
+	* lisp/mmgnus.el: Use `generic' as mother backend; abolish method
+	`entity-header-start', `entity-header-end' and `fetch-field'.
+	(entity-buffer): New method.
+
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`mime-fetch-field' to refer Subject and From field for saving
+	cache file.
+
+1998-10-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.
+
+	* lisp/nnheader.el (make-full-mail-header): Store original subject
+	and from fields.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Abolish variable
+	`gnus-structured-field-decoder' and
+	`gnus-unstructured-field-decoder'.
+	(gnus-nov-parse-line): Don't decode from and subject.
+	(gnus-get-newsgroup-headers): Likewise.
+
+	* lisp/nnheader.el (make-full-mail-header): Decode subject and
+	from; changed to inline function.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Store
+	content-type.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
+
+	* lisp/mmgnus.el: New module.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use content of
+	`gnus-current-headers' as mime-message-structure.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.1.
+	(gnus-version): Modify for Chao 1.11.
+
+	* lisp/nnheader.el (make-full-mail-header): Changed to macro.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version): Modify for Chao 1.10.
+
+	* lisp/gnus-score.el (gnus-header-index): Modify to use
+	mime-entity structure as gnus-header structure.
+
+	* lisp/nnheader.el: Use `mime-entity' as gnus-header structure.
+	(mail-header-number): Use `mime-entity-location-internal'.
+	(mail-header-set-number): Use `mime-entity-set-location-internal'.
+	- Change other `mail-header-*' and `mail-header-set-*' to alias of
+	  reference and set functions for mime-entity-internal.
+	(make-full-mail-header): Use `make-mime-entity-internal'.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-reply): Use `make-full-mail-header'.
+	(message-followup): Likewise.
+
+	* lisp/nnheader.el (mail-header-references): Use
+	`mime-fetch-field' and `mail-header-entity'.
+	(mail-header-set-references): Use `mail-header-set-field'.
+	Define mm-backend `nil' and its method `fetch-field'.
+	(make-full-mail-header): Modify data structure to store References
+	to mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-id): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-id): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Message-Id
+	to mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-entity): New macro.
+	(mail-header-set-entity): New macro.
+	(mail-header-set-field): New macro.
+	(mail-header-set-parsed-field): New macro.
+	(mail-header-subject): Use `mail-header-entity'.
+	(mail-header-set-subject): Use `mail-header-set-parsed-field'.
+	(mail-header-from): Use `mail-header-entity'.
+	(mail-header-set-from): Use `mail-header-set-parsed-field'.
+	(mail-header-date): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-date): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Date to
+	mime-entity.
+	(make-mail-header): Use `make-full-mail-header'.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-from): Use `mime-read-field'.
+	(mail-header-set-from): Store to mime-entity.
+	(make-full-mail-header): Modify data structure to store Subject to
+	mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-subject): Use `mime-read-field'.
+	(mail-header-set-subject): Store to mime-entity.
+	(make-full-mail-header): Modify data structure to store Subject to
+	mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Use
+	`make-full-mail-header'.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-make-user-agent): New implementation.
+
+1998-08-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-bug-message): About Semi-gnus.
+	(gnus-extended-version): Return gnus version only.
+	(gnus-bug): Add Semi-gnus developers to recipients.
+
+	* lisp/message.el (message-make-user-agent): New function.
+	(message-generate-headers): Use it.
+
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-required-news-headers): `X-Newsreader'
+	was replaced by `User-Agent'.
+	(message-required-mail-headers): `X-Mailer' was replaced by
+	`User-Agent'.
+	(message-header-format-alist): `X-Mailer' and `X-Newsreader' were
+	replaced by `User-Agent'.
+	(message-generate-headers): Ditto.
+
+	(message-user-agent): New variable.
+	(message-newsreader): Replaced by `message-user-agent'.
+	(message-mailer): Ditto.
+	(message-mode): `message-mailer' and `message-newsreader' were
+	replaced by `message-user-agent'.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): `message-mailer'
+	and `message-newsreader' were replaced by `message-user-agent'.
+	(gnus-extended-version): Generate "PRODUCT/VERSION" style strings.
+
+	* lisp/gnus-soup.el (gnus-soup-send-packet): `message-mailer' and
+	`message-newsreader' were replaced by `message-user-agent'.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Use
+	`make-full-mail-header'.
+
+1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.19.
+
+	* Sync up with Gnus 5.6.44.
+
+1998-09-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in: Add entry `info-ja'.
+	* texi/Makefile.in: Add entry `ja'.
+
+1998-09-11  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-send): Don't call
+ 	`message-fix-before-sending' before `message-encode-function' is
+ 	called.
+
+1998-09-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Add error handle and fix typo.
+	
+1998-08-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el: Repair `multi frame control'.
+
+1998-08-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.16.
+
+	* Sync up with Gnus 5.6.41.
+
+1998-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-spec.el (gnus-parse-simple-format): Use
+	`gnus-tilde-pad-form' instead of the padding faculty of `format'
+	under XEmacs-mule.
+
+	* lisp/gnus-xmas.el
+	(gnus-xmas-redefine): Redifine `gnus-truncate-string',
+	`gnus-tilde-max-form' and `gnus-tilde-cut-form' for XEmacs-mule.
+	(gnus-xmas-define): New function 'gnus-tilde-pad-form' for
+	XEmacs-mule.
+
+1998-08-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-narrow-to-signature):
+	Removed TM stuff.
+	(gnus-article-display-mime-message):
+	Set `mime-button-mother-dispatcher' in correct buffer.
+	(gnus-url-mailto): Use `gnus-setup-message'.
+	(gnus-button-mailto): Ditto.
+	(gnus-button-reply): Ditto.
+
+	* lisp/gnus-ems.el (gnus-mule-max-width-function): Removed.
+	(gnus-truncate-string): Use `truncate-string-to-width' if available.
+	(gnus-tilde-max-form): New implementation.
+	(gnus-tilde-cut-form): Ditto.
+
+	* lisp/gnus-msg.el (gnus-summary-mail-digest): New function.
+	(gnus-summary-post-digest): New function.
+
+	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Use
+	`gnus-summary-mail-digest' and `gnus-summary-post-digest' instead
+	of `gnus-uu-digest-mail-forward' and `gnus-uu-digest-post-forward'.
+
+	* lisp/gnus-util.el (gnus-truncate-string): Ignore more than two
+	arguments.
+
+	* lisp/message.el (message-forward-end-separator): Use
+	`text/plain' tag.
+
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el: Suppress some byte-compile warnings.
+	(message-make-forward-subject): Failed to sync.
+	(message-setup): Ditto.
+	(message-clone-locals): Modify regexp.
+
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-braid-nov): Use
+	`nnheader-insert-file-contents'.
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Sync up
+	with "akr" branch.
+
+1998-08-23  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.15.
+
+	* Sync up with Gnus 5.6.39.
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Enable to get from APOP server.
+	(pop3-fma-set-pop3-password) Enable to get from APOP server.
+
+1998-08-20  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/message.el (message-clone-locals): Add `user-full-name'
+	and `user-mail-address' to regexp.
+
+1998-08-20  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.14.
+
+	* Sync up with Gnus 5.6.38.
+	
+1998-08-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-frames): New custom group.
+	(message-original-frame): New variable.
+	(message-use-multi-frames): New variable.
+	(message-delete-frame-on-exit): New variable.
+	(message-send-and-exit): Delete frame which made for editing
+	message.
+	(message-kill-buffer): Ditto.
+	(message-delete-frame): New function.
+	(message-pop-to-buffer): Make new frame when edit message.
+
+1998-08-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.13.
+
+	* Sync up with Gnus 5.6.37.
+	
+1998-08-16  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-scroll-down): Failed to sync.
+
+1998-08-16  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.12.
+
+	* Sync up with Gnus 5.6.36.
+	
+1998-08-15  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Update.
+
+1998-08-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Bind
+	`coding-system-for-write' by `gnus-startup-file-coding-system'
+	while saving the quick newsrc file.
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system): Change
+	default value to `ctext'.
+
+1998-08-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Fix typo.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.11.
+
+	* Sync up with Gnus 5.6.34.
+	
+1998-08-12  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.10.
+
+	* Sync up with Gnus 5.6.33.
+	
+1998-08-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.9.
+
+	* Sync up with Gnus 5.6.31.
+	
+1998-08-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.8.
+
+	* Sync up with Gnus 5.6.30.
+	
+1998-08-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-yank-original): For citing any message.
+
+1998-08-10  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
+
+1998-08-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	*lisp/smtp.el: Do not insert empty line at the end of message.
+	
+1998-08-06  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.6.
+
+	* Sync up with Gnus 5.6.29.
+	
+1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-start.el (gnus-read-init-file): Fix indent.
+	* lisp/gnus-ems.el (gnus-tilde-max-form): Redefine instead of
+       	(gnus-summary-line-format-spec) to display Japanese character
+	correctly in Gnus summaly.
+
+1998-08-05  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-start.el (gnus-read-init-file): Don't restrict
+	`coding-system-for-read' by `binary' when loading `.gnus'.
+
+1998-08-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.5.
+
+	* Sync up with Gnus 5.6.28.
+
+1998-07-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.4.
+
+	* Sync up with Gnus 5.6.27.
+
+1998-07-27  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/message-ja.texi: Japanese translation of "message.texi".
+
+1998-07-26  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.3.
+
+	* Sync up with Gnus 5.6.26.
+
+1998-07-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.2.
+	(gnus-version): Change to "Semi-gnus". Change comment format.
+
+1998-07-21  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Appendices".
+
+1998-07-21  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Appendices".
+
+1998-07-16  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.1.
+
+	* Sync up with Gnus 5.6.24.
+
+1998-07-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-ems.el (gnus-mule-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix. (for Emacs 20.1 and 20.2)
+	(gnus-ems-redefine): for Emacs 20.1 and 20.2
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Abolish my last bogus change.
+
+1998-07-09  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Fix problem when multi
+	bytes charactors are used in cite prefix.
+
+1998-07-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The End".
+
+1998-07-06  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Various".
+
+1998-07-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Various".
+	* texi/gnus-ja.texi: Sync up with Gnus 5.6.22
+
+1998-07-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-header-format-alist): Repair to use
+	`message-fill-references' for References.
+
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Delete nil optional arguments.
+	- Delete setting for `mime-raw-representation-type-alist'.
+
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.8.0.
+	(gnus-version): Modify for FLIM 1.8.
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Modify for FLIM 1.8.
+
+1998-06-30  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Scroing".
+
+1998-06-30  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Scoring".
+
+1998-06-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* Sync up with Gnus 5.6.22
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.8.
+	* lisp/pop3-fma.el : Enable to get localhost mail spool.
+	
+1998-06-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.7.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Set up
+	`gnus-article-current-summary' of gnus-article-buffer.
+	(gnus-request-article-this-buffer): Don't set up
+	`gnus-article-current-summary'.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.6.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-mime-preview-quitting-method): Renamed
+	from `mime-preview-quitting-method-for-gnus'.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-preview-mime-message): New
+	implementation.
+
+	* lisp/gnus-art.el (mime-preview-quitting-method-for-gnus): Use
+	`gnus-article-show-summary' is `gnus-show-mime' is not nil.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/ChangeLog, texi/gnus.texi, texi/message.texi,
+	lisp/ChangeLog, lisp/gnus.el, lisp/nngateway.el, lisp/nnfolder.el,
+	lisp/message.el, lisp/gnus-sum.el, lisp/gnus-soup.el: Sync up with
+	Gnus 5.6.20.
+
+1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README, texi/ChangeLog, texi/gnus.texi, texi/message.texi,
+	lisp/ChangeLog, lisp/nnweb.el, lisp/nnmail.el, lisp/nndoc.el,
+	lisp/message.el, lisp/lpath.el, lisp/gnus.el, lisp/gnus-util.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-score.el,
+	lisp/gnus-group.el, lisp/gnus-ems.el, lisp/gnus-demon.el,
+	lisp/gnus-art.el: Sync up with Gnus 5.6.16.
+
+1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.3.
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-article-this-buffer'.
+	(gnus-request-partial-message): Likewise.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use
+	`gnus-request-article-this-buffer'.
+	(gnus-request-article-this-buffer): Renamed from
+	`gnus-request-original-article'; abolish conventional
+	implementation.
+	- Abolish unused setting for `mime-view-show-summary-method'.
+
+1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* readme, texi/ChangeLog, texi/gnus.texi, texi/message.texi,
+	lisp/ChangeLog, lisp/gnus.el, lisp/nnmail.el, lisp/nnheader.el,
+	lisp/nngateway.el, lisp/nnfolder.el, lisp/nnagent.el,
+	lisp/message.el, lisp/gnus-sum.el, lisp/gnus-score.el,
+	lisp/gnus-salt.el, lisp/gnus-msg.el, lisp/gnus-cus.el,
+	lisp/gnus-cache.el, lisp/gnus-art.el: Sync up with Gnus 5.6.15.
+
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi, texi/message.texi, texi/ChangeLog: Sync up with
+	Gnus 5.6.13.
+
+1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* Sync up with Gnus 5.6.13.
+	
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Don't
+	`save-excursion'.
+	(gnus-article-prepare): Use `mime-fetch-field' instead of
+	`mime-entity-fetch-field'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Use
+	`mime-display-message' instead of `mime-view-buffer'.
+	(gnus-article-display-traditional-message): Set
+	`gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Modify for
+	`gnus-article-display-traditional-message'.
+	(gnus-article-prepare): Use `mime-parse-buffer' and
+	`mime-entity-fetch-field'; don't set gnus-article-buffer.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi, texi/gnus.texi (Using MIME): Modify
+	description about new display mechanism.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for this branch.
+
+	* lisp/gnus-art.el (gnus-article-display-method-for-mime): New
+	variable; abolish `gnus-show-mime-method'.
+	(gnus-article-display-method-for-encoded-word): New variable;
+	abolish `gnus-decode-encoded-word-method'.
+	(gnus-article-display-method-for-traditional): New variable.
+	(gnus-article-display-mime-message): New function; abolish
+	`gnus-article-preview-mime-message'.
+	(gnus-article-display-traditional-message): New function.
+	(gnus-article-display-message-with-encoded-word): New function;
+	abolish `gnus-article-decode-encoded-word'.
+	(gnus-article-prepare): Change display mechanism; use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+	(gnus-request-original-article): New function.
+
+1998-06-22  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.6.0.
+	(gnus-version): Modify for SEMI 1.8.
+
+	* lisp/gnus-sum.el: Modify for interface change in SEMI 1.8 about
+	automatic message/partial combining.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.5.0.
+	(gnus-version): Modify for SEMI 1.7.
+
+	* lisp/gnus-sum.el: Rename
+	`mime-method-to-combine-message/partial-pieces' to
+	`mime-combine-message/partial-pieces-automatically'.
+
+	* lisp/gnus-art.el (gnus-article-preview-mime-message): Use
+	`mime-view-buffer'.
+	(gnus-article-decode-encoded-word): Fix DOC-string.
+	(gnus-article-header-presentation-method): New function; abolish
+	`gnus-content-header-filter'.
+	Modify for SEMI 1.7.
+
+1998-06-18  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Select Methods".
+
+1998-06-18  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Select Methods".
+
+1998-06-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Small bug fix.
+	
+	* lisp/pop3-fma.el: Delete variable pop3-fma-cypher-key
+	Use base64-encode-string , base64-decode-string instead. 
+	Both change by Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
+
+1998-06-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: New function pop3-fma-cypher-string
+	 New variable pop3-fma-cypher-key
+
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Delete setting for
+	`article-de-quoted-unreadable' and
+	`article-mime-decode-quoted-printable' because they have been
+	already abolished.
+
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Sync up with latest gnus.texi.
+
+	* texi/gnus.texi: Modify for Semi-gnus 6.4.0.
+
+1998-06-06  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-extract-address-components): Add
+	`std11-extract-address-components' as a choice.
+
+1998-06-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Composing Messages".
+
+1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Must require 'path-util
+	before call `module-installed-p'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.4.0.
+	(gnus-version): Modify for SEMI 1.5.
+
+	* lisp/gnus-art.el: Modify for SEMI 1.5 API.
+
+1998-06-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: New file. To handle multiple POP account.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.4.
+	And fix typo 5.6.10 -> 5.6.11.
+	
+1998-06-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.3.
+
+	* Sync up with Gnus 5.6.11.
+
+1998-06-03  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "The Article Buffer".
+
+1998-06-03  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Summary Buffer".
+
+1998-06-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.2.
+
+	* Sync up with Gnus 5.6.10.
+
+1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* README.semi: Add description of `shuhei-k' branch.
+
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.1.
+
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-util.el (gnus-output-to-rmail): Guard as binary.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Guard as binary.
+
+1998-04-24  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Active File".
+
+1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.0.
+	(gnus-version): Modify for SEMI 1.4.
+
+	* lisp/gnus-sum.el: Use 'mime-add-condition to set up
+ 	acting-condition.
+
+1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/lpath.el: Must add "flim" instead of "mel" to load-path.
+
+1998-05-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.5.
+
+	* texi/gnus.texi, lisp/ChangeLog: Sync up with Gnus v5.6.9.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-msg.el, lisp/gnus-draft.el, lisp/gnus-agent.el: Sync up
+	with Gnus v5.6.9.
+
+1998-04-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.4.
+
+	* texi/gnus.texi, lisp/ChangeLog: Sync up with Gnus 5.6.7.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+ 	lisp/gnus-msg.el, lisp/gnus-cache.el, lisp/gnus-art.el: Sync up
+ 	with Gnus 5.6.7.
+
+1998-04-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.3.
+
+	* Sync up with Gnus 5.6.6.
+
+1998-04-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el: Sync up with Gnus 5.6.5.
+
+1998-04-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.2.
+
+	* Sync up with Gnus 5.6.5.
+
+	* texi/custom.texi, texi/widget.texi: Removed from Semi-gnus.
+
+1998-04-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README.semi (How to get? (via CVS)): Modify descriptions about
+ 	TAG.
+
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.1.
+
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-make-forward-subject): Use
+ 	`eword-decode-unstructured-field-body' for subject.
+
+	* lisp/gnus-msg.el (gnus-summary-mail-forward): Make local
+ 	variable `default-mime-charset' of `gnus-original-article-buffer'
+ 	and set up by `default-mime-charset' of `gnus-summary-buffer'.
+
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Fix typos.
+
+	* texi/gnus.texi: Modify for Semi-gnus.
+
+1998-04-23  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Auto Save".
+
+1998-04-22  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Startup Files".
+
+1998-04-21  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.0.
+	(gnus-version): Modify for SEMI 1.3.
+
+	* lisp/gnus-sum.el: Use 'ctree-set-calist-strictly instead of
+ 	'set-atype to set up for 'mime-acting-condition.
+
+1998-04-21  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Changing Servers".
+
+1998-04-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Modify styles.
+
+	* texi/gnus.texi: Modify for Semi-gnus (sync up with
+ 	gnus-ja.texi).
+
+1998-04-20  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "New Groups".
+
+1998-04-20  Yoshiki Hayashi   <penny@tb3.so-net.ne.jp>
+
+	* texi/gnus-ja.texi: Modify styles.
+
+1998-04-18  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Check and modify for Semi-gnus.
+
+1998-04-18  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: New file.
+
+1998-04-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.1.3.
+
+1998-04-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-following-method): New function; set up
+ 	for 'mime-view-following-method-alist.
+
+1998-04-18  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi: Add and modify description for Semi-gnus.
+
+1998-04-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi: "Gnus 5.6.4" -> "Semi-gnus 6.1.2".
+	(Top): "Gnus" -> "gnus".
+	(Starting Up): "Gnus" -> "gnus".
+
+1998-04-10  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/ChangeLog, lisp/gnus-agent.el: Sync up with Gnus 5.6.4.
+
+1998-04-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.1.2.
+	(gnus-version): Include corresponding SEMI version.
+
+	* lisp/gnus.el, lisp/nnkiboze.el, lisp/message.el,
+	lisp/gnus-sum.el, lisp/gnus-agent.el: Sync up with Gnus 5.6.4.
+
+1998-03-27  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* README.semi: Change descriptions of sending bug report.
+
+1998-03-20  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.1.1.
+	(gnus-version): Include corresponding SEMI version.
+
+	* Sync up with Gnus 5.6.3.
+
+1998-03-15  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-crosspost): Use
+	`nnheader-insert-file-contents'.
+	(gnus-agent-braid-nov): Ditto.
+	(gnus-agent-expire): Ditto.
+	
+	* lisp/gnus-cache.el (gnus-cache-request-article): Ditto.
+	(gnus-cache-retrieve-headers): Ditto.
+	(gnus-cache-change-buffer): Ditto.
+	(gnus-cache-braid-nov): Ditto.
+	
+	* lisp/gnus-sum.el (gnus-summary-import-article): Ditto.
+	
+	* lisp/nnkiboze.el (nnkiboze-retrieve-headers): Ditto.
+
+	* lisp/message.el (message-generate-headers): Fix regexp.
+	(cf. [semi-gnus-ja:107])
+
+1998-03-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Add setting for
+ 	`mime-raw-buffer-coding-system-alist'.
+
+1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-for-gnus' ->
+ 	`mime-preview-quitting-method-for-gnus'.
+
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-alist' ->
+ 	`mime-preview-quitting-method-alist'.
+
+	* lisp/gnus-art.el: Rename `mime-view-kill-buffer' ->
+ 	`mime-preview-kill-buffer'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.10.
+
+	* lisp/gnus-sum.el: Add code to check latest SEMI.
+	(mime-acting-condition): Separate type and subtype; rename
+ 	`mime-combine-message/partials-automatically' ->
+ 	`mime-method-to-combine-message/partial-pieces'.
+
+1998-03-08  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.9.
+
+	* README.semi (How to get?): Add description of daily snapshot.
+	(How to join development): Change mailing list command address.
+
+	* Sync up with Gnus 5.6.2.
+
+1998-03-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ems.el: Change variable name
+	  gnus-bdf-image-file to gnus-mule-bitmap-image-file.
+
+1998-02-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.8.
+
+	* lisp/gnus.el: Sync up with qgnus-0.34.
+
+1998-02-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el: Sync up with qgnus-0.33.
+
+	* lisp/gnus-ems.el (gnus-bdf-image-file): New variable; moved from
+	gnus.el.
+	(gnus-mule-group-startup-message): New function; moved and renamed
+	from `gnus-group-startup-message' of gnus.el.
+
+	* lisp/gnus.el, lisp/gnus-sum.el, lisp/gnus-art.el,
+	lisp/gnus-agent.el: Sync up with qgnus-0.33.
+
+1998-02-28  Tatsuya Ichikawa  <t-ichi@niagara.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-bdf-image-file): New variable.
+	(gnus-mule-group-startup-message): Display bitmap image using
+	bitmap.el running with Emacs 20.
+	
+	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Fix problem when
+	Xref field is not exist.
+
+1998-02-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README.semi (How to join development): Modify for Semi-gnus
+	mailing list.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.7.
+
+	* lisp/gnus.el (gnus-article-display-hook): Delete
+	`gnus-article-de-quoted-unreadable' from options.
+
+	* lisp/gnus-sum.el (gnus-article-make-menu-bar): Delete key for
+	`gnus-article-de-quoted-unreadable'.
+	(gnus-summary-make-menu-bar): Delete menu for
+	`gnus-article-de-quoted-unreadable'.
+
+	* lisp/gnus-art.el (gnus-article-make-menu-bar): Delete menu for
+	`gnus-article-de-quoted-unreadable'.
+
+1998-02-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el, lisp/message.el: Sync up with qgnus-0.32.
+
+1998-02-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.6.
+
+	* lisp/message.el (message-fill-references): Abolish unused local
+	variables.
+
+	* lisp/pop3.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.31.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.30.
+
+1998-02-20  Christophe Broult <christophe.broult@info.unicaen.fr>
+
+	* README.semi (How to get?): The command `update' must come before
+ 	`-r semi-gnus'. (cf. [tm-en:1559])
+
+1998-02-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el: Sync up with qgnus-0.29.
+
+	* lisp/gnus.el, lisp/message.el: Sync up with qgnus-0.28.
+
+	* lisp/message.el: Abolish variable
+ 	`message-references-generator'.  Abolish function
+ 	`message-generate-filled-references',
+ 	`message-generate-folded-references' and
+ 	`message-generate-unfolded-references'.
+	(message-reply): Don't use `message-references-generator'.
+	(message-followup): Don't use `message-references-generator'.
+
+	(message-fill-references): New function.
+	(message-header-format-alist): Use `message-fill-references' for
+ 	References.
+
+1998-02-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.5.
+
+1998-02-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Check SEMI-0.118.2 (Otomaru) or later.
+	(gnus-structured-field-decoder): Use
+ 	`eword-decode-and-unfold-structured-field'.
+
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Use charset
+ 	conversion option of `eword-decode-header'.
+	(gnus-article-decode-encoded-word): Use charset conversion option
+ 	of `eword-decode-header'; use `gnus-run-hooks'.
+	(gnus-content-header-filter): Use charset conversion option of
+ 	`eword-decode-header'.
+
+	* README.semi (How to get?): Should specify "-r semi-gnus".
+
+1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Decode header by
+ 	localized code.
+
+1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-msg.el: Delete commented-out function
+	`gnus-inews-insert-mime-headers'.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el: Sync up with qgnus-0.27.
+
+1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el: Use original.
+
+	* lisp/gnus.el, lisp/pop3.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-msg.el, lisp/gnus-draft.el, lisp/gnus-art.el: Sync up
+	with qgnus-0.26.
+
+1998-02-15  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/nnmh.el: Use original.
+
+	* lisp/gnus.el, lisp/gnus-draft.el, lisp/gnus-sum.el,
+ 	lisp/message.el, lisp/gnus-art.el: Sync up with qgnus-0.25.
+
+1998-02-11  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+ 	lisp/message.el, lisp/gnus.el, lisp/gnus-uu.el,
+ 	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+ 	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-art.el,
+ 	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.24
+
+1998-02-10  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare): Don't bind coding
+	systems.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.4.
+	(gnus-version): Sync with qgnus-0.23.
+
+	* lisp/pop3.el, lisp/nnmh.el, lisp/nnheader.el, lisp/message.el,
+	lisp/gnus-sum.el, lisp/gnus-msg.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el: Merge qgnus-0.23.
+
+1998-02-09  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nntp.el,
+	lisp/nnheader.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-xmas.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-msg.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el, lisp/gnus-agent.el, lisp/ChangeLog: Importing
+	qgnus-0.23
+
+1998-02-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-references-generator): New variable.
+	(message-generate-filled-references): New function.
+	(message-generate-folded-references): New function.
+	(message-generate-unfolded-references): New function.
+	(message-reply): Refer `message-references-generator'.
+	(message-followup): Refer `message-references-generator'.
+
+1998-01-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-sendmail): Guard
+ 	`coding-system-for-write' by binary.
+	(message-send-mail-with-qmail): Likewise.
+
+1998-01-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/lpath.el: Require path-util; add load-path of APEL, MEL and
+	SEMI.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el: Require smtp.el when compile.
+
+	* lisp/message.el (message-send-mail-with-smtp): Use
+	`(current-buffer)' instead of `tembuf'; rename
+	`smtp-recipient-address-list' -> `recipient-address-list'.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/smtp.el (smtp-deduce-address-list): Don't use
+ 	`smtp-recipient-address-list' as global variable.
+
+	* lisp/message.el (message-send-mail-with-smtp): Don't use
+ 	`smtp-recipient-address-list' as global variable.
+
+	* lisp/smtpmail.el (smtpmail-recipient-address-list): New
+ 	variable; renamed from `smtp-recipient-address-list'.
+	(smtpmail-send-it): Remove `(not (null ...))'.
+	(smtpmail-send-queued-mail): Likewise.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): Don't generate
+ 	temporary buffer for message; don't generate and kill
+ 	`smtp-address-buffer' for `smtp-deduce-address-list'.
+
+	* lisp/smtpmail.el (smtpmail-send-it): Don't generate and kill
+ 	`smtp-address-buffer' for `smtp-deduce-address-list'.
+
+	* lisp/smtp.el (smtp-deduce-address-list): Bind and generate
+ 	`smtp-address-buffer' in itself.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to version 6.0.3.
+
+1998-01-11  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/smtp.el: New file.
+
+	* lisp/smtpmail.el: Split basic features into smtp.el.
+
+	* lisp/message.el (message-send-mail-function): Add
+ 	`message-send-mail-with-smtp' as an item.
+	(message-send-mail-with-smtp): New function.
+
+	* ChangeLog: New file.
+
+1998-01-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/smtpmail.el (smtpmail-via-smtp): Bind
+	`coding-system-for-read' by `smtpmail-coding-system' to avoid
+	dead-locking in Emacs 20.
+
+	* lisp/gnus.el: gnus.el (gnus-version-number): Update to version
+	6.0.2.
+
+1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/message.el: Sync with Quassia Gnus v0.22.
+
+	* lisp/gnus.el: Delete autoload setting for `metamail-buffer'.
+
+	* lisp/gnus.el, lisp/gnus-sum.el: Sync with Quassia Gnus v0.22.
+
+	* lisp/gnus-msg.el: Abolish function
+	`gnus-inews-insert-mime-headers'.
+
+	* lisp/gnus-msg.el, lisp/gnus-draft.el, lisp/gnus-art.el: Sync
+	with Quassia Gnus v0.22.
+
+	* lisp/smtpmail.el (smtpmail-coding-system): New variable; abolish
+	`smtpmail-code-conv-from'.
+	(smtpmail-via-smtp): Guard `coding-system-for-write' by
+	`smtpmail-coding-system'.
+
+	* lisp/smtpmail.el: Imported from Emacs 20.2.
+
+	* lisp/pop3.el (pop3-movemail-file-coding-system): Change default
+	value to `binary'.
+	(pop3-open-server): Guard `coding-system-for-read' by `binary'.
+
+1998-01-06  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nnoo.el,
+	lisp/nnml.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-start.el, lisp/gnus-ems.el, lisp/gnus-draft.el,
+	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.22
+
+	* texi/message.texi, texi/gnus.texi, lisp/gnus.el, lisp/ChangeLog:
+	Importing qgnus-0.21
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+	lisp/nnvirtual.el, lisp/nnsoup.el, lisp/nnoo.el, lisp/nnmh.el,
+	lisp/nnmail.el, lisp/nndraft.el, lisp/gnus.el, lisp/gnus-xmas.el,
+	lisp/gnus-sum.el, lisp/gnus-start.el, lisp/gnus-score.el,
+	lisp/gnus-msg.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el, lisp/ChangeLog: Importing qgnus-0.20
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/pop3.el,
+	lisp/nntp.el, lisp/nnml.el, lisp/nnmail.el, lisp/nndoc.el,
+	lisp/message.el, lisp/gnus.el, lisp/gnus-uu.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-cache.el,
+	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.19
+
+1997-12-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to version 6.0.1.
+
+	* lisp/message.el (message-resend): Enclose `message-setup' with
+	`(let (message-setup-hook) ...)' to avoid to `turn-on-mime-edit';
+	must setup `message-encoding-buffer' and `message-edit-buffer' for
+	`message-send-mail'.
+
+1997-12-08  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* lisp/pop3.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el, lisp/ChangeLog: Synch'ed up to qgnus-0.18.
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+	lisp/smiley.el, lisp/pop3.el, lisp/nnweb.el, lisp/nntp.el,
+	lisp/nnml.el, lisp/nnmail.el, lisp/nnheader.el, lisp/nndraft.el,
+	lisp/message.el, lisp/lpath.el, lisp/gnus.el, lisp/gnus-util.el,
+	lisp/gnus-sum.el, lisp/gnus-start.el, lisp/gnus-picon.el,
+	lisp/gnus-nocem.el, lisp/gnus-mh.el, lisp/gnus-group.el,
+	lisp/gnus-ems.el, lisp/gnus-cite.el, lisp/gnus-art.el,
+	lisp/gnus-agent.el, lisp/dgnushack.el, lisp/ChangeLog: Importing
+	qgnus-0.18
+
+1997-11-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README.semi: New file.
+
+	* lisp/gnus.el (gnus-version): Rename to "Semi-gnus".
+
+1997-11-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): New variable.
+	(gnus-draft-setup): Use `gnus-draft-decoding-function'.
+
+1997-11-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/nnheader.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-sum.el, lisp/gnus-msg.el, lisp/gnus-art.el: sync with
+	qgnus-0.17.
+
+	* texi/message.texi, texi/gnus.texi, lisp/smiley.el, lisp/nnoo.el,
+	lisp/nnml.el, lisp/nnmail.el, lisp/nnheader.el,
+	lisp/messagexmas.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-xmas.el, lisp/gnus-util.el, lisp/gnus-sum.el,
+	lisp/gnus-start.el, lisp/gnus-spec.el, lisp/gnus-score.el,
+	lisp/gnus-picon.el, lisp/gnus-move.el, lisp/gnus-msg.el,
+	lisp/gnus-kill.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-demon.el, lisp/gnus-cite.el, lisp/gnus-art.el,
+	lisp/ChangeLog: Quassia Gnus v0.17.
+
+	* lisp/gnus-i18n.el: New file.
+
+	* lisp/nnmail.el (nnmail-file-coding-system): Use `raw-text' in
+	default.
+
+	* lisp/nnheader.el (nnheader-file-coding-system): Use `raw-text'
+	in default.
+
+	* lisp/message.el (message-encode-function): New variable.
+	(message-forward-start-separator): Modify for mime-edit.
+	(message-forward-end-separator): Modify for mime-edit.
+	(message-setup-hook): Use `(message-maybe-setup-default-charset
+	turn-on-mime-edit)' in default.
+	(message-header-hook): Use `(eword-encode-header)' in default.
+
+	(message-send): Use local variable `message-encoding-buffer',
+	`message-edit-buffer' and `message-mime-mode' as public variables;
+	use `message-encode-function'.
+	(message-send-mail): Use `message-encoding-buffer' to get contents
+	of body; abolish `message-encode-mail-hook'; use
+	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+	refer original editing buffer.
+	(message-send-news): Use `message-encoding-buffer' to get contents
+	of body; abolish `message-encode-news-hook'; use
+	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+	refer original editing buffer.
+	(message-check-news-syntax): Call `message-check-news-body-syntax'
+	in `mime-edit-buffer'.
+	(message-do-fcc): Use `message-encoding-buffer' to get contents;
+	run `message-header-hook'.
+	(message-cancel-news): Use `std11-extract-address-components'
+	instead of `mail-extract-address-components'; bind
+	`message-encoding-buffer' and `message-edit-buffer'.
+
+	(message-maybe-setup-default-charset): New function.
+	(message-maybe-encode): New function.
+	(message-mime-insert-article): New function.
+	Add setting for mime-view.
+
+	* lisp/gnus.el (gnus-version-number): for version number for Open
+	gnus.
+	(gnus-version): Modify for Open gnus.
+
+	* lisp/gnus-sum.el: Autoload gnus-i18n.
+
+	(gnus-show-mime): `t' in default.
+	(gnus-structured-field-decoder): Use
+	`eword-decode-structured-field-body' in default.
+	(gnus-unstructured-field-decoder): Use
+	`eword-decode-unstructured-field-body' in default.
+
+	(gnus-parse-headers-hook): Use
+	`(gnus-set-summary-default-charset)' in default.
+
+	(gnus-summary-mode-map): Add binding for
+	`gnus-summary-scroll-down' and
+	`gnus-summary-preview-mime-message'.
+
+	(gnus-summary-preview-mime-message): New function.
+	(gnus-mime-partial-preview-function): New function.
+	Add setting for mime-view.
+
+	* lisp/gnus-msg.el (gnus-summary-cancel-article): Display
+	`gnus-article-buffer' instead ofb `gnus-original-article-buffer'.
+	(gnus-extended-version): Don't return version of emacsen.
+	(gnus-inews-do-gcc): Refer `message-encoding-buffer'.
+
+	* lisp/gnus-art.el (gnus-show-mime-method): Use
+	`gnus-article-preview-mime-message' instead of `metamail-buffer'
+	in default.
+	(gnus-decode-encoded-word-method): Use
+	`gnus-article-decode-encoded-word' instead of
+	`gnus-article-de-quoted-unreadable' in default.
+
+	Abolish `gnus-hack-decode-rfc1522', `gnus-decode-rfc1522',
+	`article-decode-rfc1522', `article-de-quoted-unreadable',
+	`article-mime-decode-quoted-printable-buffer' and
+	`article-mime-decode-quoted-printable'.
+	(gnus-article-decode-rfc1522): New implementation (use
+	`eword-decode-header').
+
+	(gnus-article-preview-mime-message): New function.
+	(gnus-article-decode-encoded-word): New function.
+	(gnus-content-header-filter): New function.
+	(mime-view-quitting-method-for-gnus): New function.
+	Add setting for mime-view.
+
+	* lisp/message.el: Abolish `message-max-size' because it is not
+	used.
+
+	* lisp/message.el: sync with qgnus-0.16.
+
+	* texi/Makefile, texi/message.texi, texi/gnus.texi, lisp/nnweb.el,
+	lisp/nnmh.el, lisp/nnheader.el, lisp/nnfolder.el, lisp/message.el,
+	lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-sum.el, lisp/gnus-srvr.el, lisp/gnus-picon.el,
+	lisp/gnus-group.el, lisp/gnus-cite.el, lisp/gnus-art.el: Quassia
+	Gnus v0.16.
+
+	* lisp/nnmh.el (nnmh-request-list-1): fix maybe.
+
+	* lisp/message.el (message-do-fcc): Guard
+	`coding-system-for-write' by `raw-text'; run
+	`message-before-do-fcc-hook'.
+
+	* lisp/gnus-msg.el (gnus-inews-do-gcc): Guard
+	`coding-system-for-write' by `raw-text'; run
+	`gnus-before-do-gcc-hook'.
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nntp.el,
+	lisp/nnoo.el, lisp/nnml.el, lisp/nndraft.el, lisp/nnbabyl.el,
+	lisp/message.el, lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-util.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-spec.el, lisp/gnus-soup.el, lisp/gnus-score.el,
+	lisp/gnus-msg.el, lisp/gnus-gl.el, lisp/gnus-ems.el,
+	lisp/gnus-draft.el, lisp/gnus-cache.el, lisp/gnus-audio.el,
+	lisp/gnus-art.el, lisp/gnus-agent.el, lisp/ChangeLog: Quassia Gnus
+	v0.15.
+
+	* lisp/message.el, lisp/ChangeLog: sync with qgnus-0.14.
+
+	* texi/Makefile, texi/gnus.texi: Quassia Gnus v0.14.
+
+	* texi/dir: New file.
+
+	* texi/dir, lisp/pop3.el, lisp/nntp.el, lisp/nnml.el,
+	lisp/nnmail.el, lisp/nnfolder.el, lisp/message.el, lisp/lpath.el,
+	lisp/gnus.el, lisp/gnus-win.el, lisp/gnus-util.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-score.el, lisp/gnus-msg.el, lisp/gnus-mh.el,
+	lisp/gnus-cus.el, lisp/gnus-art.el, lisp/gnus-agent.el,
+	lisp/ChangeLog: Quassia Gnus v0.14.
+
+	* lisp/message.el, lisp/ChangeLog: sync with qgnus-0.13.
+
+	* texi/gnus.texi, texi/ChangeLog, lisp/pop3.el, lisp/nnweb.el,
+	lisp/nnmail.el: Quassia Gnus v0.13.
+
+	* lisp/nnlistserv.el: New file.
+
+	* lisp/nnlistserv.el, lisp/message.el, lisp/md5.el, lisp/lpath.el,
+	lisp/gnus.el, lisp/gnus-topic.el, lisp/gnus-sum.el,
+	lisp/gnus-score.el, lisp/gnus-picon.el, lisp/gnus-msg.el,
+	lisp/gnus-group.el, lisp/gnus-art.el, lisp/gnus-agent.el,
+	lisp/dgnushack.el, lisp/ChangeLog, GNUS-NEWS: Quassia Gnus v0.13.
+
+	* lisp/message.el: sync with qgnus-0.12.
+
+	* texi/message.texi, texi/gnus.texi, texi/gnus-faq.texi,
+	texi/ChangeLog, lisp/nntp.el, lisp/nnmh.el, lisp/nnmail.el,
+	lisp/nndraft.el, lisp/messcompat.el, lisp/message.el,
+	lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-sum.el, lisp/gnus-score.el, lisp/gnus-salt.el,
+	lisp/gnus-msg.el, lisp/gnus-int.el, lisp/gnus-group.el,
+	lisp/gnus-demon.el, lisp/gnus-cache.el, lisp/gnus-art.el,
+	lisp/gnus-agent.el, lisp/ChangeLog, GNUS-NEWS: Quassia Gnus v0.12.
+
+	* lisp/message.el (message-send-news-function): Use
+	`message-send-news-with-gnus' in default.
+	(message-send-via-news): Use `message-send-news' instead of
+	`message-send-news-function'.
+	(message-send-mail): Don't avoid text properties; run
+	`message-encode-mail-hook'.
+	(message-send-news): Don't avoid text properties; run
+	`message-encode-news-hook'; use `message-send-news-function'.
+	(message-send-news-with-gnus): New function.
+	(message-cancel-news): Use `message-send-news' instead of
+	`message-send-news-function'.

@@ -1,0 +1,468 @@
+@c Insert  "\input texinfo" at 1st line before texing this file alone.
+@c -*-texinfo-*-
+@c Copyright (C) 1998 Keiichi Suzuki
+@setfilename gnus-faq-ja.info
+
+@node Frequently Asked Questions
+@section 頻繁に尋ねられる質問
+
+これは Semi-gnus に対する良くある質問と、それに対する回答集です。もしあ
+なたがウェブブラウザーを持っているなら、ハイパーテキスト版が 
+@file{http://www.mdcnet.co.jp/%7Ekeiichi/semi-gnus-faq-ja.shtml} で手に
+入り、おそらくあなたがこれを受け取ってから更新されているでしょう。
+
+@menu
+* Introduction::          Gnus の紹介。
+* Installation FAQ::      Gnus の導入。
+* Customization FAQ::     Gnus のカスタマイズ。
+* Reading News FAQ::      ニュースを読む事に関する質問。
+* Reading Mail FAQ::      メールを読む事に関する質問。
+* Mailing list FAQ::      メーリングリストに関する質問。
+@end menu
+
+
+@node Introduction
+@subsection 紹介
+この文書は、 Semi-gnus に対するよくある質問と、それに対する回答集です。
+
+Semi-gnus は Emacs 上で動作するネットニュース・リーダー / 電子メール・ユー
+ザー・エイジェント (MUA) です。Semi-gnus のオリジナルとなっている Gnus 
+は、現在6周年を迎え、その間 Emacs の標準パッケージとしても配布されてきま
+した。 Gnus 5 は最新の(そして最高の)ものです。 Gnus のオリジナル・バージョ
+ンは Masanobu UMEDA によるGNUS です。 1994年の秋が忍び寄る頃、 Lars
+Magne Ingebrigtsen は Gnus を書き直そうと決意しました。
+
+しかし、 Gnus 単独では MIME 化された記事・メールを読むことはできません。 
+そこで、 Emacs 上で MIME サポートをするためのパッケージである SEMI を使
+用して一部の人たちが Gnus を使用するようになりました。しかし、これには 
+Gnus に patch をあてる必要がある上にオリジナルの Gnus (こちらも 
+Quassia-Gnus と呼ばれ開発途中でした)の変更内容によってはその patch 自体
+も作り直さなければなりませんでした。そんな 1997年の11月、守岡知彦 
+<morioka@@jaist.ac.jp> は周囲(好き者たち)の期待に押され SEMI に対応した、
+多国語のための Gnus、 Semi-gnus を公開したのです。
+
+Semi-gnus のソース・コードは現在 CVS で管理されており、有志の方々によっ
+て日々改善がなされています。
+
+Semi-gnus の最大の強みはオリジナルの Gnus から引き継がれた、強力なカスタ
+マイズ機能と SEMI がもたらす強力なMIME サポートにあります。最初の一瞥で
+はこのカスタマイズ機能の豊富さに多少恐怖を感じるかも知れません、しかし、
+あなたがその機能を必要になるまでは複雑な機能のほとんどを無視することがで
+きます。 もし、あなたがまあまあの量のメイルを受け取る(いくつものメーリン
+グリストに参加している)、または、非常に流量の多いメーリングリストに参加
+しているのであれば、あなたは Semi-gnus でメイルを読むための調査をはじめ
+たくなるでしょう。
+
+この FAQ は、鈴木圭一によって保守されています。 この FAQ の基礎となって
+いるオリジナル Gnus の FAQ を保守されている Justin Sheehy 氏に感謝を捧げ、
+また Justin Sheehy 氏以前に Gnus FAQ ですばらしい作業をされていた、Steve
+Baur 氏、 Per Abrahamsen 氏に感謝します。
+
+他の方法(メイル、ネットニュース等)で情報を得ようとする前に、まずこの FAQ 
+を見てみてください。
+
+この情報は Semi-gnus (Ja) メイリング・リストの援助を受けて編集したもので、
+文責は私、鈴木圭一にあります。
+
+@node Installation FAQ
+@subsection 導入
+
+@itemize @bullet
+@item 
+Q1.1: 最新のバージョンは? 
+
+現在の標準パッケージの最新バージョンは Semi-gnus 6.7 (tag: gnus-6_7) で、
+開発版の最新バージョンは Semi-gnus 6.8 (tag: gnus-6_8) です。
+
+Semi-gnus 6.7 を使用するためには別パッケージの FLIM 1.7 / SEMI (または 
+WEMI) 1.8 が必要です。 その他、 APEL が必要になりますが、必要なバージョ
+ンは FLIM / SEMI (WEMI) パッケージ内の README を参照してください。
+
+Semi-gnus のバージョンは、必要な SEMI (WEMI) および FLIM のバージョンに
+深く関係しています。 必ず、 Semi-gnus のバージョンにあった SEMI (WEMI) 
+および FLIM を使用してください。
+
+現在、かなりのハイペースでバージョンが上がっています。 CVS の main trunk
+(tag 無し) が安定バージョンです。
+
+@item 
+Q1.2: 入手方法は? 
+
+CVS による配布を主とし、anonymous ftp による配布はそれを別の形で配布して
+いるだけのものという位置づけになっています。
+
+CVS での取得
+
+初めて CVS で取得するときは以下のようにします。
+
+@itemize @bullet
+@item login
+次の方法でログインします。% はプロンプトです。
+
+% cvs -d \
+   :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root login
+
+  CVS password: [CR] # NULL string
+
+@item checkout
+Semi-gnus をチェックアウトします。実際には、-r gnus-6_8 のようにタグを付
+けて実行します。
+
+% cvs -d \
+   :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root \
+   checkout [-r TAG] gnus
+
+@end itemize
+
+2回目からは、
+
+% cvs -d :pserver:anonymous@@chamonix.jaist.ac.jp:/hare/cvs/root \
+   update [-r TAG] gnus
+
+により取得します。
+
+anonymous ftp での取得
+
+anonymous ftp では以下の場所から取得できます。
+
+@file{ftp://ftp.jaist.ac.jp/GNU/elisp/semi-gnus/snapshots/}
+
+SEMI, FLIM, APEL の取得
+
+SEMI, FLIM, APEL は、anonymous ftp で以下の場所から取得します。
+
+@table @var
+@item SEMI
+@file{ftp://ftp.jaist.ac.jp/GNU/elisp/semi/}
+
+@item FLIM
+@file{ftp://ftp.jaist.ac.jp/GNU/elisp/flim/}
+
+@item APEL
+@file{ftp://ftp.jaist.ac.jp/GNU/elisp/apel/}
+
+@end table
+
+@item 
+Q1.3: 必要な Emacs のバージョンは? 
+
+Semi-gnus が公式に対応している Emacs のバージョンは次の通りです。
+
+@itemize @bullet
+@item 
+GNU Emacs
+
+バージョン 20.1 以上。
+
+@item 
+XEmacs
+
+バージョン 20.2 以上のMule 機能付き
+
+@item
+Meadow
+
+バージョン 1.00 以上。(Mule for Windows では動きません。)
+@end itemize
+
+山岡克美さん <yamaoka@@ga.sony.co.jp> 作の非公式の 
+@file{semi-mule23@@1934-YYMMDD.tar.gz} を使用すれば Mule 2.3 / Emacs
+19.34 では動作するでしょう。
+
+これは、次のところから取得して下さい。
+
+@file{http://www.jpl.org/elips}
+
+@item
+Q1.4: Semi-gnus を GNU Emacs と XEmacs の両方で動かすことはできますか? 
+
+ソース・レベル( *.el )では可能です。 
+
+しかし、バイト・コンパイルしたファイル ( *.elc ) は共有できませんので、
+それぞれ使用する emacs でバイトコンパイルする必要があります。
+
+@item
+Q1.5: Semi-gnus についての情報源は?
+
+@table @var
+
+@item ニュースグループ
+
+fj.news.reader.gnus がありますが、 Semi-gnus に関しての質問で回答を得ら
+れるとすれば、ほとんど Semi-gnus-ja メイリング・リストのメンバーでしょう。
+
+@item メーリングリスト
+
+詳しくは、@xref{Mailing list FAQ, メーリングリスト}, を参照してください。
+
+現在、これがもっとも確実な情報源でしょう。 Semi-gnus を使うのであれば、
+是非参加することをおすすめします。
+
+ダイジェスト版サービスはありません。
+
+@item WWW
+
+公式の Semi-gnus ホームページができる予定です。執筆者募集中です。
+
+@end table
+
+@item
+Q1.6: Semi-gnus と連携するパッケージは?
+
+@table @var
+
+@item SEMI
+
+Semi-gnus では TM は使用できません。代わりに SEMI を使用します。
+Semi-gnus を使用するためには SEMI, FLIM, APEL は必須です。
+
+.emacs の gnus の初期設定より前に以下の設定を書いて下さい:
+
+@lisp
+(load "mime-setup")
+@end lisp
+
+@item Insidious Big Brother Database 
+
+BBDB は Netscape で有名な Jamie Zawinski <jwz@@netscape.com> の作で、GNU
+Emacs 用のrolodex-like なデータベースプログラムです。 Jamie は BBDB の 
+Web ページを持っています。 @file{http://people.netscape.com/jwz/bbdb/}こ
+れは、次のところにもあります。 
+@file{ftp://ftp.xemacs.org/pub/xemacs/bbdb/} gnus-bbdb は Brian Edmonds 
+の次のところからも入手できます。 
+@file{http://www.cs.ubc.ca/spider/edmonds/usenet/gnus/gnus-bbdb.el}これ
+は、 BBDB の新しいバージョン用で、内容が gnus-bbdb.el です。
+
+Jamie は公式には BBDB のメインテナーシップを Matt Simmons に引き渡してい
+ます。 彼の新しいバージョンは存在しますが、あくまでも“非公式”なもので
+す。 これは次の場所にあります。 
+@file{http://www.netcom.com/%7Esimmonmt/index.html}
+
+Semi-gnus で使用する場合には、必ず Q2.1 を参照してください。 
+
+@item gnus-offline
+gnus-offline は、市川達哉 <t-ichi@@po.shiojiri.ne.jp> の作で、 Semi-gnus 
+をいわゆる「オフライン使用」(ニュース記事、メイルの送受信を一括して行い、
+それらのメッセージの読み書きはサーバーに未接続の状態で行う)することを容
+易にするためのパッケージです。
+
+入手先と、使用方法は次のところです。 
+@file{http://www.shiojiri.ne.jp/%7Et-ichi/meadow.html}
+ミラーはこちらです。 
+@file{http://www.jpl.org/elips/}
+
+T-gnus (tag: ichikawa) には標準で含まれています。
+
+@end table
+
+@item
+Q1.7: Draft に保存したメッセージを開くと文字が化けてしまいます。
+
+gnus が読み込みに使用しているものと違うコーディングシステムで保存されて
+いる事が原因です。以下の設定で解決するはずです。
+
+@lisp
+(add-hook 'message-setup-hook
+          (lambda ()
+            (set-buffer-file-coding-system 'iso-2022-7bit)))
+@end lisp
+
+Q2.2 も参照して下さい。
+
+@item 
+Q1.8: Semi-gnus の起動を早くするには? 
+
+購読していないグループを ``kill'' (*Group* バッファーで C-k) してあるこ
+とを確認してください。そして、常に ``.newsrc'' を小さく保つようにしてく
+ださい。
+
+@end itemize
+
+@node Customization FAQ
+@subsection カスタマイズに関する FAQ
+
+@itemize @bullet
+@item
+Q2.1: Semi-gnus のバージョンをあげたら BBDB が動かなくなってしまいました。
+
+Semi-gnus 6.8 以降のバージョンでは、オリジナルの bbdb-gnus.el は動作しま
+せん。 次のように対応してください。 
+
+@enumerate a
+@item
+bbdb-gnus.el で、 gnus-article-buffer の代りに 
+gnus-original-article-buffer を参照するようにする。
+
+もし、オリジナルの Gnus (September 以降) を使っているのであれば、この方
+法が良いでしょう。
+
+@item
+bbdb/gnus-update-record を gnus-article-prepare-hook の代りに 
+gnus-article-display-hook に追加する。
+
+@end enumerate
+
+a の方法、および bbdb-user-mail-names に対応した BBDB 2.00.01 に対する 
+patch 、基本的な設定例が、 
+@file{http://www.mdcnet.co.jp/~keiichi/bbdb.shtml} にあります。
+
+@item
+Q2.2: hook を設定したら Semi-gnus の動作がおかしくなった
+
+通常の変数でも同様ですが、 Semi-gnus では多くの hook に初期値が設定され
+ています。
+
+この値を変更しようとして、変数が定義されているファイルをロードする前に 
+setq / add-hook 等を行うと、これらの初期値が設定されず、 Semi-gnus が正
+常に動作しなくなる場合があります。(特に Semi-gnus のバージョンが変った場
+合)
+
+これを防ぐためにも、 Semi-gnus に関する設定はできるだけ ~/.gnus.el 内で
+行うようにしてください。
+
+@item
+Q2.3: 宛先によって Signature を変更するには? 
+
+SEMI には signature.el というこのためのツールが付属しています。使用方法は以下のとおりです。 
+
+tm の info の内容を SEMI に合わせて変更したものです。
+
+SEMI には *signature* という signature の自動切替え tool が附属しており、
+`semi-setup.el' はこの設定も行ないます。message header の field に合わせ
+て signature の自動切替を行ないたい場合は `~/.emacs' に以下のようなもの
+を入れて下さい。（詳しくは signature.el の説明書を参照して下さい）
+
+@lisp
+(setq signature-file-alist
+      '((("Newsgroups" . "jokes")       . "~/.signature-jokes")
+        (("Newsgroups" . ("zxr" "nzr")) . "~/.signature-sun")
+        (("To" . ("ishimaru" "z-suzuki")) . "~/.signature-sun")
+        (("To" . "tea")                 . "~/.signature-jokes")
+        (("To" . ("sim" "oku" "takuo")) . "~/.signature-formal")
+        ))
+@end lisp
+
+@defvar mime-setup-use-signature
+
+この変数が @code{nil} 以外の時、@file{signature.el} を使います。初期値は 
+@code{t} です。
+@end defvar
+
+@defvar mime-setup-signature-key-alist
+
+各 major-mode において signature 挿入命令を設定すべき key を指定します。
+初期値は
+
+@lisp
+	((mail-mode . "\C-c\C-w"))
+@end lisp
+
+です。
+
+これを変更したい場合は、関数 set-alist などを使ってこの変数を書き換え
+て下さい。
+
+@lisp
+(set-alist 'mime-setup-signature-key-alist
+	   'news-reply-mode "\C-c\C-w")
+@end lisp
+
+@end defvar
+
+@defvar mime-setup-default-signature-key
+
+ある major-mode において signature 挿入命令を設定すべき key が見つからな
+い場合、この変数に設定された key が用いられます。初期値は、
+@code{"\C-c\C-s"} です。
+@end defvar
+
+gnus-posting-style を使用する事もできます。
+
+@end itemize
+
+@node Reading News FAQ
+@subsection ニュースを読む
+
+@node Reading Mail FAQ
+@subsection メールを読む
+
+@node Mailing list FAQ
+@subsection メーリングリスト
+
+@itemize bullet
+@item
+Q5.1: メイリング・リストから脱退するには? 
+
+@table @var
+@item 日本語用 
+@file{semi-gnus-ja-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} に空のメイ
+ルを送って下さい。(Subject も不要です。)
+
+@item 英語用 
+@file{semi-gnus-en-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} に空のメイ
+ルを送って下さい。(Subject も不要です。)
+
+@end table
+
+@item
+Q5.2: メイリング・リストに参加するには? 
+
+Semi-gnus では、利用者と維持者という従来の多くのパッケージで採用されてい
+る開発体制は取っていません。 そのため、メーリングリストとしても利用者用、
+開発者用という区別を行っていません。
+
+@table @var
+@item 日本語用 
+@file{semi-gnus-ja-help@@meadow.scphys.kyoto-u.ac.jp} に空のメールを送っ
+て、送られてくるメールの指示に従ってくください。(Subject も不要です。) 
+
+@item 英語用 
+@file{semi-gnus-en-help@@meadow.scphys.kyoto-u.ac.jp} に空のメールを送っ
+て、送られてくるメールの指示に従ってください。(Subject も不要です。)
+
+@end table
+
+@item
+Q5.3: Semi-gnus に関する方針決定は? 
+
+Semi-gnus の開発等に関する方針の決定は全て Semi-gnus-ja/en メーリングリ
+スト内で行われます。 各メンバーからの提案はアンケートの形で提案され決議
+されますが、その方法は次の手順で行われます。
+
+@enumerate
+@item
+この手順は、公的な枝の作成や、枝の管理法、snapshot の扱いなどの、公的な
+案件に関して、単一の方針を決定される場合に適用される。 私的な枝や版に関
+しては適用されない。
+
+@item
+公的な案件の提案および議論は semi-gnus-ja@@meadow.scphys.kyoto-u.ac.jp も
+しくはsemi-gnus-en@@meadow.scphys.kyoto-u.ac.jp で行う。
+
+@item
+最終的な方針はアンケート結果の多数意見を採用する。 
+
+@item
+提案者はアンケートの回答期限を設けることができる。これは１日以上でなけれ
+ばならない。
+
+@item
+提案者がアンケートの回答期限を指定しなかった場合、提案日より１週間後を回
+答期限とする。
+
+@item
+提案者は、アンケートの回答期限内に、このアンケートに５名以上の回答があっ
+た時点でアンケートの終了を宣言できる。 この場合、アンケートの多数意見を
+結論とする。
+
+@item
+回答期限が過ぎても、５名以上の回答がない場合は、提案者がその結論を決定す
+ることができる。
+
+@item
+参加者はアンケートの回答期限内にアンケートの回答期限の延長を要求できる。
+提案者がこれを認めるか５人以上の参加者がこれを認めた場合、回答期限は延長
+される。
+@end enumerate
+
+@end itemize
