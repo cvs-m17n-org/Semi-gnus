@@ -482,6 +482,11 @@ header line with the old Message-ID."
 	  (let ((inhibit-read-only t))
 	    (copy-to-buffer gnus-article-copy (point-min) (point-max))
 	    (set-buffer gnus-article-copy)
+	    ;; Encode bitmap smileys to ordinary text.
+	    ;; Possibly, the original text might be restored.
+	    (static-unless (featurep 'xemacs)
+	      (when (featurep 'smiley-mule)
+		(smiley-encode-buffer)))
 	    (gnus-article-delete-text-of-type 'annotation)
 	    (gnus-remove-text-with-property 'gnus-prev)
 	    (gnus-remove-text-with-property 'gnus-next)
@@ -501,10 +506,6 @@ header line with the old Message-ID."
 	  (set-buffer gnus-article-copy)
 	  (delete-region (goto-char (point-min))
 			 (or (search-forward "\n\n" nil t) (point-max)))
-	  ;; Encode bitmap smileys to ordinary text.
-	  (static-unless (featurep 'xemacs)
-	    (when (featurep 'smiley-mule)
-	      (smiley-encode-buffer)))
 	  ;; Insert the original article headers.
 	  (insert-buffer-substring gnus-original-article-buffer beg end)
 	  (article-decode-encoded-words)))
