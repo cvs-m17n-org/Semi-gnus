@@ -35,13 +35,17 @@ beginning of .emacs file instead of rebuilding Mule.
     (makunbound (intern (format "message-%s" symbol)))))
 
 
-INSTALL CUSTOM, APEL, FLIM, SEMI/WEMI
-=====================================
+INSTALL CUSTOM, APEL, CLIME, SEMI
+=================================
 
-T-gnus requires the latest version of CUSTOM, APEL, FLIM and SEMI or
-WEMI; you should install these packages before installing T-gnus.
+T-gnus requires the latest version of CUSTOM, APEL, CLIME and SEMI;
+CLIME 1.14 provides the same features as FLIM 1.14 for old Emacsen,
+which is currently available from:
 
-As for CUSTOM, you should apply the following patch before building it.
+ftp://ftp.jpl.org/pub/m17n/clime-1_14-************.tar.gz
+
+You should install these packages before installing T-gnus.  As for
+CUSTOM, you should apply the following patch before building it.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- custom-1.9962/cus-face.el~	Wed Mar  4 19:52:39 1998
@@ -81,13 +85,13 @@ INSTALL T-gnus
 
 There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
 
-1. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages
-   under the standard load-path, for instance:
+1. If you have installed EMU, APEL, CLIME and SEMI packages under the
+   standard load-path, for instance:
 
-   EMU:  /usr/local/share/mule/19.34/site-lisp/
-   APEL: /usr/local/share/mule/site-lisp/apel/
-   FLIM: /usr/local/share/mule/site-lisp/flim/
-   SEMI: /usr/local/share/mule/site-lisp/semi/
+   EMU:   /usr/local/share/mule/19.34/site-lisp/
+   APEL:  /usr/local/share/mule/site-lisp/apel/
+   CLIME: /usr/local/share/mule/site-lisp/flim/
+   SEMI:  /usr/local/share/mule/site-lisp/semi/
 
    What is more, if you have been replaced old CUSTOM with new CUSTOM
    or if you have installed new CUSTOM directly under the standard
@@ -117,24 +121,24 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
    % ./configure --with-emacs=mule
    % make install
 
-2. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages in
-   the non-standard load-path, use the configure option
-   `--with-addpath=' with the colon separated directory names where
-   EMU, APEL or CUSTOM packages are installed.  For example:
+2. If you have installed EMU, APEL, CLIME and SEMI packages in the
+   non-standard load-path, use the configure option `--with-addpath='
+   with the colon separated directory names where EMU, APEL or CUSTOM
+   packages are installed.  For example:
 
    % ./configure --with-emacs=mule\
      --with-addpath=~/elisp/emu/:~/elisp/apel/:~/elisp/custom/
    % make install
 
-   In this case, you have no need to add paths of FLIM, SEMI or WEMI
-   if they are installed under the directory which is same as the
-   parent directory of APEL.
+   In this case, you have no need to add paths of CLIME, SEMI if they
+   are installed under the directory which is same as the parent
+   directory of APEL.
 
 3. This is another way to install T-gnus when you have installed EMU,
-   APEL, FLIM and SEMI or WEMI packages in the non-standard load-path.
-   Copy the file `sample.lpath.el' which is included in the
-   distribution to `~/.lpath.el' and modify it suitably for your
-   environment.  And then type the following command.
+   APEL, CLIME and SEMI packages in the non-standard load-path.  Copy
+   the file `sample.lpath.el' which is included in the distribution to
+   `~/.lpath.el' and modify it suitably for your environment.  And
+   then type the following command.
 
    % ./configure --with-emacs=mule
    % make install

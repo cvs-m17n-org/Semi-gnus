@@ -749,7 +749,7 @@ The function `message-supersede' runs this hook."
   :group 'message-various
   :type 'hook)
 
-(defcustom message-header-hook '((lambda () (eword-encode-header t)))
+(defcustom message-header-hook '((lambda () (mime-encode-header-in-buffer t)))
   "Hook run in a message mode buffer narrowed to the headers."
   :group 'message-various
   :type 'hook)
@@ -3633,13 +3633,7 @@ to find out how to use this."
     (backward-char 1)
     (run-hooks 'message-send-mail-hook)
     (if recipients
-	(static-if (fboundp 'smtp-send-buffer)
-	    (smtp-send-buffer user-mail-address recipients
-			      (current-buffer))
-	  (let ((result (smtp-via-smtp user-mail-address recipients
-				       (current-buffer))))
-	    (unless (eq result t)
-	      (error "Sending failed; %s" result))))
+	(smtp-send-buffer user-mail-address recipients (current-buffer))
       (error "Sending failed; no recipients"))))
 
 (defsubst message-maybe-split-and-send-news (method)

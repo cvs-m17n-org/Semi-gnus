@@ -9,12 +9,11 @@ to use it, and you must not use gnus-mime for SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
 them before to install it.  T-gnus 6.15 requires APEL 10.0 or later,
-FLIM (1.13.1 or later) and SEMI/WEMI (1.13.5 or later).  You can get
-these packages from:
+FLIM 1.14 and SEMI 1.14.  You can get these packages from:
 
 ftp://ftp.m17n.org/pub/mule/apel/
-ftp://ftp.m17n.org/pub/mule/flim/flim-1.13/
-ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
+ftp://ftp.m17n.org/pub/mule/flim/flim-1.14/
+ftp://ftp.m17n.org/pub/mule/semi/semi-1.14-for-flim-1.14/
 
 Required environment for SEMI is written in README.en of SEMI package.
 

@@ -34,7 +34,7 @@
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "01"
+(defconst gnus-revision-number "02"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.
@@ -62,7 +62,7 @@
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s r%s (based on %s v%s ; for SEMI 1.13, FLIM 1.13)"
+  (format "%s %s r%s (based on %s v%s ; for SEMI 1.14, FLIM 1.14)"
 	  gnus-product-name gnus-version-number gnus-revision-number
 	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")

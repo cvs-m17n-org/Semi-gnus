@@ -10,12 +10,11 @@ T-gnus とは？
 
   APEL, FLIM および SEMI パッケージが必要ですので、インストールする前
 にそれらをインストールしてください。T-gnus 6.15 は APEL 10.0 以上、
-FLIM (1.13.1 以上) および SEMI/WEMI (1.13.5 以上) を必要とします。それ
-らのパッケージは
+FLIM 1.14 および SEMI 1.14 を必要とします。それらのパッケージは
 
 ftp://ftp.m17n.org/pub/mule/apel/
-ftp://ftp.m17n.org/pub/mule/flim/flim-1.13/
-ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
+ftp://ftp.m17n.org/pub/mule/flim/flim-1.14/
+ftp://ftp.m17n.org/pub/mule/semi/semi-1.14-for-flim-1.14/
 
 から取得することができます。必要な環境は SEMI の README.ja を参照して
 ください。

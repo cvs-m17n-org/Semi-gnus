@@ -18,8 +18,8 @@
 	    ;; Where is CUSTOM package?
 	    "/usr/local/share/mule/site-lisp/custom/"
 
-	    ;; Note that you have no need to specify paths of FLIM, SEMI
-	    ;; or WEMI if they are installed under the directory which is
+	    ;; Note that you have no need to specify paths of FLIM and
+	    ;; SEMI if they are installed under the directory which is
 	    ;; same as the parent directory of APEL.
 
 	    ;; If you have installed Emacs/W3 package,

@@ -1,3 +1,14 @@
+2002-10-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+	(gnus-version): T-gnus supports SEMI 1.14 and FLIM 1.14.
+
+	* lisp/mmgnus.el: Remove commented obsolete definitions.
+
+	* lisp/message.el (message-header-hook): Replace
+	`eword-encode-header' with `mime-encode-header-in-buffer'.
+	(message-send-mail-with-smtp): Don't use `smtp-via-smtp'.
+
 2002-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/mm-url.el (mm-url-form-encode-xwfu): Use

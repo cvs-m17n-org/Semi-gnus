@@ -13,7 +13,7 @@ gnus-bbdb.el
  This is the BBDB API module for Semi-gnus. `mime-bbdb' should not be
 necessary for Semi-gnus, if that module were used.
 
- You need FLIM 1.11.3 or later.
+ You need FLIM 1.11.3 or later (T-gnus requires FLIM 1.14).
 
  If you are using bbdb-auto-notes-hook, the patch listed at the end
 of this file should be applied. If not, it might not.

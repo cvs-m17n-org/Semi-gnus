@@ -43,7 +43,7 @@ qGnus 0.??  ------> Semi-gnus 6.0.0
        :                        :               +<--------------+
        :                        :               |               |
        :        akr      <--  6.2.3             :            t-gnus-6_15
-       :        shuhei-k <--  6.3.1                          (for FLIM 1.13,
+       :        shuhei-k <--  6.3.1                          (for FLIM 1.14,
 Gnus 5.6.11 ------>           6.3.3                           develop)
        :                      6.4.0 (for SEMI 1.5)              |
        :                      (6.4.?)------> for SEMI 1.5       :
@@ -134,8 +134,11 @@ Public Branches
 	t-gnus-6_12	T-gnus for SEMI 1.12/1.13, FLIM 1.12 API (stable)
 	t-gnus-6_13	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 	t-gnus-6_14	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
-	t-gnus-6_15	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
-     t-gnus-6_15-quimby	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
+	t-gnus-6_15	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+     t-gnus-6_15-quimby	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+
+    Note: T-gnus versions 6.15 based on Oort Gnus v0.03 and earlier
+          had supported SEMI 1.13 and FLIM 1.13 as well.
 
 Personal Branches
 
