@@ -4074,7 +4074,7 @@ General format specifiers can also be used.  See Info node
     (gnus-mime-view-part-externally "e" "View Externally")
     (gnus-mime-print-part "p" "Print")
     (gnus-mime-pipe-part "|" "Pipe To Command...")
-    (gnus-mime-action-on-part "." "Take action on the part")))
+    (gnus-mime-action-on-part "." "Take action on the part...")))
 
 (defun gnus-article-mime-part-status ()
   (with-current-buffer gnus-article-buffer
@@ -4099,21 +4099,20 @@ General format specifiers can also be used.  See Info node
       (define-key map (cadr c) (car c)))
     map))
 
-(defun gnus-mime-button-menu (event)
-  "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
-  (save-window-excursion
-    (let ((pos (event-start event)))
-      (select-window (posn-window pos))
-      (goto-char (posn-point pos))
-      (gnus-article-check-buffer)
-      (let ((response (x-popup-menu
-		       t `("MIME Part"
-			   ("" ,@(mapcar (lambda (c)
-					   (cons (caddr c) (car c)))
-					 gnus-mime-button-commands))))))
-	(if response
-	    (call-interactively response))))))
+(easy-menu-define gnus-mime-button-menu gnus-mime-button-map "MIME button menu."
+  `("MIME Part"
+    ,@(mapcar (lambda (c)
+		(vector (caddr c) (car c) :enable t)) gnus-mime-button-commands)))
+
+(defun gnus-mime-button-menu (event prefix)
+ "Construct a context-sensitive menu of MIME commands."
+ (interactive "e\nP")
+ (save-window-excursion
+   (let ((pos (event-start event)))
+     (select-window (posn-window pos))
+     (goto-char (posn-point pos))
+     (gnus-article-check-buffer)
+     (popup-menu gnus-mime-button-menu nil prefix))))
 
 (defun gnus-mime-view-all-parts (&optional handles)
   "View all the MIME parts."
@@ -4430,9 +4429,9 @@ If no internal viewer is available, use an external viewer."
 (defun gnus-mime-action-on-part (&optional action)
   "Do something with the MIME attachment at \(point\)."
   (interactive
-   (list (completing-read "Action: " gnus-mime-action-alist)))
+   (list (completing-read "Action: " gnus-mime-action-alist nil t)))
   (gnus-article-check-buffer)
-  (let ((action-pair (assoc action gnus-mime-action-alist)))
+  (let ((action-pair (assoc action gnus-mime-action-alistq)))
     (if action-pair
 	(funcall (cdr action-pair)))))
 
@@ -5884,8 +5883,8 @@ after replacing with the original article."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~`%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~`%&*+\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~`%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~`%&*+\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)

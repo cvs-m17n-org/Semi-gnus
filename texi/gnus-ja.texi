@@ -1582,9 +1582,14 @@ gnus $B$,$I$N%0%k!<%W$,?7$7$$$+$N5-O?$r;}$C$F$$$J$$$3$H$K$J$j$^$9$N$G!"?7(B
 $B$&!#(B
 
 @vindex gnus-startup-file
+@vindex gnus-backup-startup-file
+@vindex version-control
 $BJQ?t(B @code{gnus-startup-file} $B$O5/F0%U%!%$%k$,$I$3$K$"$k$+$r;XDj$7$^$9!#(B
 $B=i4|CM$O(B @file{~/.newsrc} $B$G!"$=$l$,$I$N$h$&$J$b$N$G$"$l!"KvHx(B
 $B$K(B @samp{.eld} $B$r$D$1$?$b$N$,(B gnus (El Dingo) $B$N5/F0%U%!%$%k$K$J$j$^$9!#(B
+$B$3$N%U%!%$%k$N%P!<%8%g%s@)8f$r$7$?$$$H$-(B
+$B$O(B @code{gnus-backup-startup-file} $B$r%;%C%H$7$F2<$5$$!#$=$l(B
+$B$O(B @code{version-control} $BJQ?t$HF1$8CM$r<h$j$^$9!#(B
 
 @vindex gnus-save-newsrc-hook
 @vindex gnus-save-quick-newsrc-hook
@@ -12281,6 +12286,10 @@ POP $B%a!<%k%5!<%P!<!"(Bprocmail $B%G%#%l%/%H%j!<!"(Bmaildir $B$J$I$,Nc$H$7
 $B%U%!%$%k$NL>A0$G$9!#=i4|CM$O(B @code{MAIL} $B4D6-JQ?t$NCM(B
 $B$+(B @code{rmail-spool-directory} $B$NCM(B ($BIaDL(B
 $B$O(B @file{usr-mail/spool/user-name} $B$N$h$&$J$b$N(B) $B$G$9!#(B
+
+@item :prescript
+@itemx :postscript
+$B%a!<%k$r<hF@$9$kA08e$K<B9T$9$k%9%/%j%W%H$G$9!#(B
 @end table
 
 $B%U%!%$%k%a!<%k%=!<%9$NNc(B:

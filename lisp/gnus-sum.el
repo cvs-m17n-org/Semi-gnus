@@ -3027,10 +3027,6 @@ display only a single character."
 					       (point)
 					       (current-buffer))))))
 
-(defun gnus-summary-buffer-name (group)
-  "Return the summary buffer name of GROUP."
-  (concat "*Summary " (gnus-group-decoded-name group) "*"))
-
 (defun gnus-summary-setup-buffer (group)
   "Initialize summary buffer."
   (let ((buffer (gnus-summary-buffer-name group))
@@ -8039,9 +8035,10 @@ of what's specified by the `gnus-refer-thread-limit' variable."
 	;; We fetch the article.
 	(catch 'found
 	  (dolist (gnus-override-method (gnus-refer-article-methods))
-	    (gnus-check-server gnus-override-method)
-	    ;; Fetch the header, and display the article.
-	    (when (setq number (gnus-summary-insert-subject message-id))
+	    (when (and (gnus-check-server gnus-override-method)
+		       ;; Fetch the header,
+		       (setq number (gnus-summary-insert-subject message-id)))
+	      ;; and display the article.
 	      (gnus-summary-select-article nil nil nil number)
 	      (throw 'found t)))
 	  (gnus-message 3 "Couldn't fetch article %s" message-id)))))))
