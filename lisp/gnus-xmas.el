@@ -466,11 +466,11 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
   (defalias 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
   (defalias 'gnus-appt-select-lowest-window
-	'gnus-xmas-appt-select-lowest-window)
+    'gnus-xmas-appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'character-to-event)
   (defalias 'gnus-mode-line-buffer-identification
-	'gnus-xmas-mode-line-buffer-identification)
+    'gnus-xmas-mode-line-buffer-identification)
   (defalias 'gnus-key-press-event-p 'key-press-event-p)
   (defalias 'gnus-region-active-p 'region-active-p)
   (defalias 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
@@ -958,7 +958,7 @@ XEmacs compatibility workaround."
 
 (defun gnus-xmas-mailing-list-menu-add ()
   (gnus-xmas-menu-add mailing-list
-		      gnus-mailing-list-menu))
+    gnus-mailing-list-menu))
 
 (provide 'gnus-xmas)
 

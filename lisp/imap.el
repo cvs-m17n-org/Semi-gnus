@@ -606,7 +606,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(progn
 	  (message "imap: Opening SSL connection with `%s'...done" cmd)
 	  done)
-	  (message "imap: Opening SSL connection with `%s'...failed" cmd)
+      (message "imap: Opening SSL connection with `%s'...failed" cmd)
       nil)))
 
 (defun imap-network-p (buffer)
@@ -1862,13 +1862,13 @@ Return nil if no complete line has arrived."
 ;;   resp-cond-bye   = "BYE" SP resp-text
 ;;
 ;;   mailbox-data    =  "FLAGS" SP flag-list /
-;;		        "LIST" SP mailbox-list /
+;;                      "LIST" SP mailbox-list /
 ;;                      "LSUB" SP mailbox-list /
-;;		        "SEARCH" *(SP nz-number) /
+;;                      "SEARCH" *(SP nz-number) /
 ;;                      "STATUS" SP mailbox SP "("
-;;	                      [status-att SP number *(SP status-att SP number)] ")" /
+;;                            [status-att SP number *(SP status-att SP number)] ")" /
 ;;                      number SP "EXISTS" /
-;;		        number SP "RECENT"
+;;                      number SP "RECENT"
 ;;
 ;;   message-data    = nz-number SP ("EXPUNGE" / ("FETCH" SP msg-att))
 ;;
@@ -1958,14 +1958,14 @@ Return nil if no complete line has arrived."
 ;;   resp-text-code  = "ALERT" /
 ;;                     "BADCHARSET [SP "(" astring *(SP astring) ")" ] /
 ;;                     "NEWNAME" SP string SP string /
-;;		       "PARSE" /
+;;                     "PARSE" /
 ;;                     "PERMANENTFLAGS" SP "("
 ;;                               [flag-perm *(SP flag-perm)] ")" /
 ;;                     "READ-ONLY" /
-;;		       "READ-WRITE" /
-;;		       "TRYCREATE" /
+;;                     "READ-WRITE" /
+;;                     "TRYCREATE" /
 ;;                     "UIDNEXT" SP nz-number /
-;;		       "UIDVALIDITY" SP nz-number /
+;;                     "UIDVALIDITY" SP nz-number /
 ;;                     "UNSEEN" SP nz-number /
 ;;                     resp-text-atom [SP 1*<any TEXT-CHAR except "]">]
 ;;
@@ -2170,7 +2170,7 @@ Return nil if no complete line has arrived."
 
 ;;   mailbox-data    =  ...
 ;;                      "STATUS" SP mailbox SP "("
-;;	                      [status-att SP number
+;;                            [status-att SP number
 ;;                            *(SP status-att SP number)] ")"
 ;;                      ...
 ;;

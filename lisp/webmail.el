@@ -422,7 +422,7 @@
     (unless (equal total "0")
       (goto-char (point-min))
       (if (re-search-forward
-	 "https?://\\([^/]+hotmail\\.msn\\.com\\)/cgi-bin/" nil t)
+	   "https?://\\([^/]+hotmail\\.msn\\.com\\)/cgi-bin/" nil t)
 	  (setq site (match-string 1))
 	(webmail-error "list@1"))
       (goto-char (point-min))
@@ -1120,7 +1120,7 @@
 		  "type=hidden name=\"\\([^\"]+\\)\" value=\"\\([^\"]+\\)"
 		  nil t)
 	    (setq url (concat url "&" (match-string 1) "="
-				  (match-string 2))))
+			      (match-string 2))))
 	  (delete-region (point-min) (point-max))
 	  (save-excursion
 	    (set-buffer (generate-new-buffer " *webmail-att*"))

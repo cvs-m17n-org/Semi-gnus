@@ -69,10 +69,10 @@
 	  b)
       (if (memq ident gnus-backlog-articles)
 	  ()				; It's already kept.
-      ;; Remove the oldest article, if necessary.
+	;; Remove the oldest article, if necessary.
 	(and (numberp gnus-keep-backlog)
 	     (>= (length gnus-backlog-articles) gnus-keep-backlog)
-	   (gnus-backlog-remove-oldest-article))
+	     (gnus-backlog-remove-oldest-article))
 	(push ident gnus-backlog-articles)
 	;; Insert the new article.
 	(save-excursion
@@ -85,7 +85,7 @@
 	    (insert-buffer-substring buffer)
 	    ;; Tag the beginning of the article with the ident.
 	    (if (> (point-max) b)
-	      (gnus-put-text-property b (1+ b) 'gnus-backlog ident)
+		(gnus-put-text-property b (1+ b) 'gnus-backlog ident)
 	      (gnus-error 3 "Article %d is blank" number))))))))
 
 (defun gnus-backlog-remove-oldest-article ()

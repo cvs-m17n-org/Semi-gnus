@@ -272,8 +272,8 @@
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
 		    (nnmbox-request-article (car articles)
-					     newsgroup server
-					     (current-buffer))
+					    newsgroup server
+					    (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group
 		       nnmail-expiry-target newsgroup))))

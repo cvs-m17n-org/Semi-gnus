@@ -128,15 +128,15 @@ Should be called narrowed to the head of the message."
 	  (rfc2047-narrow-to-field)
 	  (if (not (rfc2047-encodable-p))
 	      (prog1
-		(if (and (eq (mm-body-7-or-8) '8bit)
-			 (mm-multibyte-p)
-			 (mm-coding-system-p
-			  (car message-posting-charset)))
-		    ;; 8 bit must be decoded.
-		    ;; Is message-posting-charset a coding system?
-		    (mm-encode-coding-region
-		     (point-min) (point-max)
-		     (car message-posting-charset)))
+		  (if (and (eq (mm-body-7-or-8) '8bit)
+			   (mm-multibyte-p)
+			   (mm-coding-system-p
+			    (car message-posting-charset)))
+		      ;; 8 bit must be decoded.
+		      ;; Is message-posting-charset a coding system?
+		      (mm-encode-coding-region
+		       (point-min) (point-max)
+		       (car message-posting-charset)))
 		;; No encoding necessary, but folding is nice
 		(rfc2047-fold-region (save-excursion
 				       (goto-char (point-min))
@@ -373,9 +373,9 @@ The buffer may be narrowed."
 	(goto-char (or break qword-break))
 	(setq break nil
 	      qword-break nil)
-	  (if (looking-at "[ \t]")
-	      (insert "\n")
-	    (insert "\n "))
+	(if (looking-at "[ \t]")
+	    (insert "\n")
+	  (insert "\n "))
 	(setq bol (1- (point)))
 	;; Don't break before the first non-LWSP characters.
 	(skip-chars-forward " \t")

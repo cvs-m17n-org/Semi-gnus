@@ -486,8 +486,8 @@ Returns the list of articles removed."
 		      ?. ?_)))
 	  ;; Translate the first colon into a slash.
 	  (when (string-match ":" group)
-		  (setq group (concat (substring group 0 (match-beginning 0))
-				      "/" (substring group (match-end 0)))))
+	    (setq group (concat (substring group 0 (match-beginning 0))
+				"/" (substring group (match-end 0)))))
 	  (nnheader-replace-chars-in-string group ?. ?/)))
       t)
      gnus-cache-directory))))

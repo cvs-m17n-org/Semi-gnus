@@ -2101,7 +2101,7 @@ Prefix arg means justify as well."
     (if not-break
 	(while (and (not (eobp))
 		    (not (looking-at message-cite-prefix-regexp))
-		(looking-at paragraph-start))
+		    (looking-at paragraph-start))
 	  (forward-line 1)))
     ;; Find the prefix
     (when (looking-at message-cite-prefix-regexp)
@@ -2164,7 +2164,7 @@ Prefix arg means justify as well."
 	  (insert quoted leading-space)))
       (if quoted
 	  (let* ((adaptive-fill-regexp
-		 (regexp-quote (concat quoted leading-space)))
+		  (regexp-quote (concat quoted leading-space)))
 		 (adaptive-fill-first-line-regexp
 		  adaptive-fill-regexp ))
 	    (fill-paragraph arg))
@@ -3488,95 +3488,95 @@ This sub function is for exclusive use of `message-send-news'."
 	   (if (= (length errors) 1) "this" "these")
 	   (if (= (length errors) 1) "" "s")
 	   (mapconcat 'identity errors ", ")))))))
-     ;; Check the Newsgroups & Followup-To headers for syntax errors.
-     (message-check 'valid-newsgroups
-       (let ((case-fold-search t)
-	     (headers '("Newsgroups" "Followup-To"))
-	     header error)
-	 (while (and headers (not error))
-	   (when (setq header (mail-fetch-field (car headers)))
-	     (if (or
-		  (not
-		   (string-match
-		    "\\`\\([-+_&.a-zA-Z0-9]+\\)?\\(,[-+_&.a-zA-Z0-9]+\\)*\\'"
-		    header))
-		  (memq
-		   nil (mapcar
-			(lambda (g)
-			  (not (string-match "\\.\\'\\|\\.\\." g)))
-			(message-tokenize-header header ","))))
-		 (setq error t)))
-	   (unless error
-	     (pop headers)))
-	 (if (not error)
-	     t
-	   (y-or-n-p
-	    (format "The %s header looks odd: \"%s\".  Really post? "
-		    (car headers) header)))))
-     (message-check 'repeated-newsgroups
-       (let ((case-fold-search t)
-	     (headers '("Newsgroups" "Followup-To"))
-	     header error groups group)
-	 (while (and headers
-		     (not error))
-	   (when (setq header (mail-fetch-field (pop headers)))
-	     (setq groups (message-tokenize-header header ","))
-	     (while (setq group (pop groups))
-	       (when (member group groups)
-		 (setq error group
-		       groups nil)))))
-	 (if (not error)
-	     t
-	   (y-or-n-p
-	    (format "Group %s is repeated in headers.  Really post? " error)))))
-     ;; Check the From header.
-     (message-check 'from
-       (let* ((case-fold-search t)
-	      (from (message-fetch-field "from"))
-	      ad)
-	 (cond
-	  ((not from)
-	   (message "There is no From line.  Posting is denied.")
-	   nil)
-	  ((or (not (string-match
-		     "@[^\\.]*\\."
-		     (setq ad (nth 1 (mail-extract-address-components
-				      from))))) ;larsi@ifi
-	       (string-match "\\.\\." ad) ;larsi@ifi..uio
-	       (string-match "@\\." ad)	;larsi@.ifi.uio
-	       (string-match "\\.$" ad)	;larsi@ifi.uio.
-	       (not (string-match "^[^@]+@[^@]+$" ad)) ;larsi.ifi.uio
-	       (string-match "(.*).*(.*)" from)) ;(lars) (lars)
-	   (message
-	    "Denied posting -- the From looks strange: \"%s\"." from)
-	   nil)
-	  (t t))))
-     ;; Check the Reply-To header.
-     (message-check 'reply-to
-       (let* ((case-fold-search t)
-	      (reply-to (message-fetch-field "reply-to"))
-	      ad)
-	 (cond
-	  ((not reply-to)
-	   t)
-	  ((string-match "," reply-to)
-	   (y-or-n-p
-	    (format "Multiple Reply-To addresses: \"%s\". Really post? "
-		    reply-to)))
-	  ((or (not (string-match
-		     "@[^\\.]*\\."
-		     (setq ad (nth 1 (mail-extract-address-components
-				      reply-to))))) ;larsi@ifi
-	       (string-match "\\.\\." ad) ;larsi@ifi..uio
-	       (string-match "@\\." ad)	;larsi@.ifi.uio
-	       (string-match "\\.$" ad)	;larsi@ifi.uio.
-	       (not (string-match "^[^@]+@[^@]+$" ad)) ;larsi.ifi.uio
-	       (string-match "(.*).*(.*)" reply-to)) ;(lars) (lars)
-	   (y-or-n-p
-	    (format
-	     "The Reply-To looks strange: \"%s\". Really post? "
-	     reply-to)))
-	  (t t))))))
+   ;; Check the Newsgroups & Followup-To headers for syntax errors.
+   (message-check 'valid-newsgroups
+     (let ((case-fold-search t)
+	   (headers '("Newsgroups" "Followup-To"))
+	   header error)
+       (while (and headers (not error))
+	 (when (setq header (mail-fetch-field (car headers)))
+	   (if (or
+		(not
+		 (string-match
+		  "\\`\\([-+_&.a-zA-Z0-9]+\\)?\\(,[-+_&.a-zA-Z0-9]+\\)*\\'"
+		  header))
+		(memq
+		 nil (mapcar
+		      (lambda (g)
+			(not (string-match "\\.\\'\\|\\.\\." g)))
+		      (message-tokenize-header header ","))))
+	       (setq error t)))
+	 (unless error
+	   (pop headers)))
+       (if (not error)
+	   t
+	 (y-or-n-p
+	  (format "The %s header looks odd: \"%s\".  Really post? "
+		  (car headers) header)))))
+   (message-check 'repeated-newsgroups
+     (let ((case-fold-search t)
+	   (headers '("Newsgroups" "Followup-To"))
+	   header error groups group)
+       (while (and headers
+		   (not error))
+	 (when (setq header (mail-fetch-field (pop headers)))
+	   (setq groups (message-tokenize-header header ","))
+	   (while (setq group (pop groups))
+	     (when (member group groups)
+	       (setq error group
+		     groups nil)))))
+       (if (not error)
+	   t
+	 (y-or-n-p
+	  (format "Group %s is repeated in headers.  Really post? " error)))))
+   ;; Check the From header.
+   (message-check 'from
+     (let* ((case-fold-search t)
+	    (from (message-fetch-field "from"))
+	    ad)
+       (cond
+	((not from)
+	 (message "There is no From line.  Posting is denied.")
+	 nil)
+	((or (not (string-match
+		   "@[^\\.]*\\."
+		   (setq ad (nth 1 (mail-extract-address-components
+				    from))))) ;larsi@ifi
+	     (string-match "\\.\\." ad) ;larsi@ifi..uio
+	     (string-match "@\\." ad)	;larsi@.ifi.uio
+	     (string-match "\\.$" ad)	;larsi@ifi.uio.
+	     (not (string-match "^[^@]+@[^@]+$" ad)) ;larsi.ifi.uio
+	     (string-match "(.*).*(.*)" from)) ;(lars) (lars)
+	 (message
+	  "Denied posting -- the From looks strange: \"%s\"." from)
+	 nil)
+	(t t))))
+   ;; Check the Reply-To header.
+   (message-check 'reply-to
+     (let* ((case-fold-search t)
+	    (reply-to (message-fetch-field "reply-to"))
+	    ad)
+       (cond
+	((not reply-to)
+	 t)
+	((string-match "," reply-to)
+	 (y-or-n-p
+	  (format "Multiple Reply-To addresses: \"%s\". Really post? "
+		  reply-to)))
+	((or (not (string-match
+		   "@[^\\.]*\\."
+		   (setq ad (nth 1 (mail-extract-address-components
+				    reply-to))))) ;larsi@ifi
+	     (string-match "\\.\\." ad) ;larsi@ifi..uio
+	     (string-match "@\\." ad)	;larsi@.ifi.uio
+	     (string-match "\\.$" ad)	;larsi@ifi.uio.
+	     (not (string-match "^[^@]+@[^@]+$" ad)) ;larsi.ifi.uio
+	     (string-match "(.*).*(.*)" reply-to)) ;(lars) (lars)
+	 (y-or-n-p
+	  (format
+	   "The Reply-To looks strange: \"%s\". Really post? "
+	   reply-to)))
+	(t t))))))
 
 (defun message-check-news-body-syntax ()
   (and
@@ -4300,7 +4300,7 @@ Headers already prepared in the buffer are not modified."
   (insert (capitalize (symbol-name header))
 	  ": "
 	  (std11-fill-msg-id-list-string
-	  (if (consp value) (car value) value))
+	   (if (consp value) (car value) value))
 	  "\n"))
 
 (defun message-fill-header (header value)

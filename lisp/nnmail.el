@@ -175,10 +175,10 @@ called in a buffer narrowed to the message in question.  The function
 receives one argument, the name of the group the message comes from.
 The return value should be `delete' or a group name (a string)."
   :version "21.1"
-    :group 'nnmail-expire
-    :type '(choice (const delete)
-		   (function :format "%v" nnmail-)
-		   string))
+  :group 'nnmail-expire
+  :type '(choice (const delete)
+		 (function :format "%v" nnmail-)
+		 string))
 
 (defcustom nnmail-cache-accepted-message-ids nil
   "If non-nil, put Message-IDs of Gcc'd articles into the duplicate cache.

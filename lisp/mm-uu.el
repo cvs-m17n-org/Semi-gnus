@@ -58,7 +58,7 @@ decoder, such as hexbin."
   :group 'gnus-article-mime)
 
 (defvar mm-uu-pgp-beginning-signature
-     "^-----BEGIN PGP SIGNATURE-----")
+  "^-----BEGIN PGP SIGNATURE-----")
 
 (defvar mm-uu-beginning-regexp nil)
 
@@ -173,12 +173,12 @@ Return that buffer."
   (if symbol (set-default symbol value))
   (setq mm-uu-beginning-regexp nil)
   (mapcar (lambda (entry)
-	     (if (mm-uu-configure-p (mm-uu-type entry) 'disabled)
-		 nil
-	       (setq mm-uu-beginning-regexp
-		     (concat mm-uu-beginning-regexp
-			     (if mm-uu-beginning-regexp "\\|")
-			     (mm-uu-beginning-regexp entry)))))
+	    (if (mm-uu-configure-p (mm-uu-type entry) 'disabled)
+		nil
+	      (setq mm-uu-beginning-regexp
+		    (concat mm-uu-beginning-regexp
+			    (if mm-uu-beginning-regexp "\\|")
+			    (mm-uu-beginning-regexp entry)))))
 	  mm-uu-type-alist))
 
 (mm-uu-configure)

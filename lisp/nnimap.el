@@ -825,9 +825,9 @@ function is generally only called when Gnus is shutting down."
 	      (let ((info (nnimap-find-minmax-uid mbx 'examine)))
 		(when info
 		  (with-current-buffer nntp-server-buffer
-		   (insert (format "\"%s\" %d %d y\n"
-				   mbx (or (nth 2 info) 0)
-				   (max 1 (or (nth 1 info) 1)))))))))))
+		    (insert (format "\"%s\" %d %d y\n"
+				    mbx (or (nth 2 info) 0)
+				    (max 1 (or (nth 1 info) 1)))))))))))
     (gnus-message 5 "nnimap: Generating active list%s...done"
 		  (if (> (length server) 0) (concat " for " server) ""))
     t))
@@ -1362,65 +1362,65 @@ sure of changing the value of `foo'."
   (require 'trace)
   (buffer-disable-undo (get-buffer-create nnimap-debug))
   (mapcar (lambda (f) (trace-function-background f nnimap-debug))
-	'(
-	  nnimap-possibly-change-server
-	  nnimap-verify-uidvalidity
-	  nnimap-find-minmax-uid
-	  nnimap-before-find-minmax-bugworkaround
-	  nnimap-possibly-change-group
-	  ;;nnimap-replace-whitespace
-	  nnimap-retrieve-headers-progress
-	  nnimap-retrieve-which-headers
-	  nnimap-group-overview-filename
-	  nnimap-retrieve-headers-from-file
-	  nnimap-retrieve-headers-from-server
-	  nnimap-retrieve-headers
-	  nnimap-open-connection
-	  nnimap-open-server
-	  nnimap-server-opened
-	  nnimap-close-server
-	  nnimap-request-close
-	  nnimap-status-message
-	  ;;nnimap-demule
-	  nnimap-request-article-part
-	  nnimap-request-article
-	  nnimap-request-head
-	  nnimap-request-body
-	  nnimap-request-group
-	  nnimap-close-group
-	  nnimap-pattern-to-list-arguments
-	  nnimap-request-list
-	  nnimap-request-post
-	  nnimap-retrieve-groups
-	  nnimap-request-update-info-internal
-	  nnimap-request-type
-	  nnimap-request-set-mark
-	  nnimap-split-to-groups
-	  nnimap-split-find-rule
-	  nnimap-split-find-inbox
-	  nnimap-split-articles
-	  nnimap-request-scan
-	  nnimap-request-newgroups
-	  nnimap-request-create-group
-	  nnimap-time-substract
-	  nnimap-date-days-ago
-	  nnimap-request-expire-articles-progress
-	  nnimap-request-expire-articles
-	  nnimap-request-move-article
-	  nnimap-request-accept-article
-	  nnimap-request-delete-group
-	  nnimap-request-rename-group
-	  gnus-group-nnimap-expunge
-	  gnus-group-nnimap-edit-acl
-	  gnus-group-nnimap-edit-acl-done
-	  nnimap-group-mode-hook
-	  nnimap-mark-to-predicate
-	  nnimap-mark-to-flag-1
-	  nnimap-mark-to-flag
-	  nnimap-mark-permanent-p
-	  nnimap-remassoc
-	  nnimap-update-alist-soft
-	  )))
+	  '(
+	    nnimap-possibly-change-server
+	    nnimap-verify-uidvalidity
+	    nnimap-find-minmax-uid
+	    nnimap-before-find-minmax-bugworkaround
+	    nnimap-possibly-change-group
+	    ;;nnimap-replace-whitespace
+	    nnimap-retrieve-headers-progress
+	    nnimap-retrieve-which-headers
+	    nnimap-group-overview-filename
+	    nnimap-retrieve-headers-from-file
+	    nnimap-retrieve-headers-from-server
+	    nnimap-retrieve-headers
+	    nnimap-open-connection
+	    nnimap-open-server
+	    nnimap-server-opened
+	    nnimap-close-server
+	    nnimap-request-close
+	    nnimap-status-message
+	    ;;nnimap-demule
+	    nnimap-request-article-part
+	    nnimap-request-article
+	    nnimap-request-head
+	    nnimap-request-body
+	    nnimap-request-group
+	    nnimap-close-group
+	    nnimap-pattern-to-list-arguments
+	    nnimap-request-list
+	    nnimap-request-post
+	    nnimap-retrieve-groups
+	    nnimap-request-update-info-internal
+	    nnimap-request-type
+	    nnimap-request-set-mark
+	    nnimap-split-to-groups
+	    nnimap-split-find-rule
+	    nnimap-split-find-inbox
+	    nnimap-split-articles
+	    nnimap-request-scan
+	    nnimap-request-newgroups
+	    nnimap-request-create-group
+	    nnimap-time-substract
+	    nnimap-date-days-ago
+	    nnimap-request-expire-articles-progress
+	    nnimap-request-expire-articles
+	    nnimap-request-move-article
+	    nnimap-request-accept-article
+	    nnimap-request-delete-group
+	    nnimap-request-rename-group
+	    gnus-group-nnimap-expunge
+	    gnus-group-nnimap-edit-acl
+	    gnus-group-nnimap-edit-acl-done
+	    nnimap-group-mode-hook
+	    nnimap-mark-to-predicate
+	    nnimap-mark-to-flag-1
+	    nnimap-mark-to-flag
+	    nnimap-mark-permanent-p
+	    nnimap-remassoc
+	    nnimap-update-alist-soft
+	    )))
 
 (provide 'nnimap)
 

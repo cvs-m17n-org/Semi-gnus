@@ -1231,9 +1231,9 @@ If the default site is too slow, try one of these:
 		  ftp.seas.gwu.edu		 /pub/rtfm
 		  rtfm.mit.edu			 /pub/usenet
    Europe:	  ftp.uni-paderborn.de		 /pub/FAQ
-		  src.doc.ic.ac.uk               /usenet/news-FAQS
+		  src.doc.ic.ac.uk		 /usenet/news-FAQS
 		  ftp.sunet.se			 /pub/usenet
-	          sunsite.auc.dk                 /pub/usenet
+		  sunsite.auc.dk		 /pub/usenet
    Asia:	  nctuccca.edu.tw		 /USENET/FAQ
 		  hwarang.postech.ac.kr		 /pub/usenet
 		  ftp.hk.super.net		 /mirror/faqs"
@@ -1510,9 +1510,9 @@ to be desirable; see the manual for further details."
  :function-document
  "Return GROUP's to-address."
  :variable-document
-  "*Alist of group regexps and correspondent to-addresses."
-  :parameter-type '(gnus-email-address :tag "To Address")
-  :parameter-document "\
+ "*Alist of group regexps and correspondent to-addresses."
+ :parameter-type '(gnus-email-address :tag "To Address")
+ :parameter-document "\
 This will be used when doing followups and posts.
 
 This is primarily useful in mail groups that represent closed
@@ -1557,15 +1557,15 @@ address was listed in gnus-group-split Addresses (see below).")
  :variable gnus-auto-expirable-newsgroups
  :variable-default nil
  :variable-document
-  "*Groups in which to automatically mark read articles as expirable.
+ "*Groups in which to automatically mark read articles as expirable.
 If non-nil, this should be a regexp that should match all groups in
 which to perform auto-expiry.  This only makes sense for mail groups."
-  :variable-group nnmail-expire
-  :variable-type '(choice (const nil)
-			  regexp)
-  :parameter-type '(const :tag "Automatic Expire" t)
-  :parameter-document
-  "All articles that are read will be marked as expirable.")
+ :variable-group nnmail-expire
+ :variable-type '(choice (const nil)
+			 regexp)
+ :parameter-type '(const :tag "Automatic Expire" t)
+ :parameter-document
+ "All articles that are read will be marked as expirable.")
 
 (gnus-define-group-parameter
  total-expire
@@ -1581,12 +1581,12 @@ Use with extreme caution.  All groups that match this regexp will be
 expiring - which means that all read articles will be deleted after
 \(say) one week.	 (This only goes for mail groups and the like, of
 course.)"
-  :variable-group nnmail-expire
-  :variable-type '(choice (const nil)
-			  regexp)
-  :parameter-type '(const :tag "Total Expire" t)
-  :parameter-document
-  "All read articles will be put through the expiry process
+ :variable-group nnmail-expire
+ :variable-type '(choice (const nil)
+			 regexp)
+ :parameter-type '(const :tag "Total Expire" t)
+ :parameter-document
+ "All read articles will be put through the expiry process
 
 This happens even if they are not marked as expirable.
 Use with caution.")
@@ -1611,12 +1611,12 @@ Use with caution.")
    ("\\(^\\|:\\)\\(comp\\|rec\\|alt\\|sci\\|soc\\|news\\|gnu\\|bofh\\)\\>" iso-8859-1)
    (".*" iso-8859-1))
  :variable-document
-  "Alist of regexps (to match group names) and default charsets to be used when reading."
-  :variable-group gnus-charset
-  :variable-type '(repeat (list (regexp :tag "Group")
-				(symbol :tag "Charset")))
-  :parameter-type '(symbol :tag "Charset")
-  :parameter-document "\
+ "Alist of regexps (to match group names) and default charsets to be used when reading."
+ :variable-group gnus-charset
+ :variable-type '(repeat (list (regexp :tag "Group")
+			       (symbol :tag "Charset")))
+ :parameter-type '(symbol :tag "Charset")
+ :parameter-document "\
 The default charset to use in the group.")
 
 (defcustom gnus-group-uncollapsed-levels 1

@@ -103,7 +103,7 @@ This buffer will be in bbdb-mode, with associated keybindings."
   (let ((record (gnus-bbdb/update-record t)))
     (if record
 	(bbdb-display-records (list record))
-	(error "unperson"))))
+      (error "unperson"))))
 
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
@@ -336,7 +336,8 @@ strings.  In the future this should change."
 	 (name (car data))
 	 (net (car (cdr data)))
 	 (record (and data
-		      (bbdb-search-simple name
+		      (bbdb-search-simple
+		       name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net))))
@@ -357,22 +358,22 @@ strings.  In the future this should change."
 			    net)
 		       name))
 	      net from "**UNKNOWN**"))
-      ;; GNUS can't cope with extra square-brackets appearing in the summary.
-      (if (and name (string-match "[][]" name))
-	  (progn (setq name (copy-sequence name))
-		 (while (string-match "[][]" name)
-		   (aset name (match-beginning 0) ? ))))
-      (setq string (format "%s%3d:%s"
-			   (if (and record gnus-bbdb/summary-mark-known-posters)
-			       (or (bbdb-record-getprop
-				    record bbdb-message-marker-field)
-				   "*")
-			     " ")
-			   lines (or name from))
-	    L (length string))
-      (cond ((> L length) (substring string 0 length))
-	    ((< L length) (concat string (make-string (- length L) ? )))
-	    (t string))))
+    ;; GNUS can't cope with extra square-brackets appearing in the summary.
+    (if (and name (string-match "[][]" name))
+	(progn (setq name (copy-sequence name))
+	       (while (string-match "[][]" name)
+		 (aset name (match-beginning 0) ? ))))
+    (setq string (format "%s%3d:%s"
+			 (if (and record gnus-bbdb/summary-mark-known-posters)
+			     (or (bbdb-record-getprop
+				  record bbdb-message-marker-field)
+				 "*")
+			   " ")
+			 lines (or name from))
+	  L (length string))
+    (cond ((> L length) (substring string 0 length))
+	  ((< L length) (concat string (make-string (- length L) ? )))
+	  (t string))))
 
 (defun gnus-bbdb/summary-get-author (header)
   "Given a Gnus message header, returns the appropriate piece of
@@ -393,7 +394,8 @@ This function is meant to be used with the user function defined in
 	 (name (car data))
 	 (net (car (cdr data)))
 	 (record (and data
-		      (bbdb-search-simple name
+		      (bbdb-search-simple
+		       name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net)))))
@@ -486,12 +488,12 @@ field.  This allows the BBDB to serve as a supplemental global score
 file, with the advantage that it can keep up with multiple and changing
 addresses better than the traditionally static global scorefile."
   (list (list
-   (condition-case nil
-       (read (gnus-bbdb/score-as-text group))
-     (error (setq gnus-bbdb/score-rebuild-alist t)
-	    (message "Problem building BBDB score table.")
-	    (ding) (sit-for 2)
-	    nil)))))
+	 (condition-case nil
+	     (read (gnus-bbdb/score-as-text group))
+	   (error (setq gnus-bbdb/score-rebuild-alist t)
+		  (message "Problem building BBDB score table.")
+		  (ding) (sit-for 2)
+		  nil)))))
 
 (defun gnus-bbdb/score-as-text (group)
   "Returns a SCORE file format string built from the BBDB."
@@ -500,24 +502,25 @@ addresses better than the traditionally static global scorefile."
 		    (setq gnus-bbdb/score-default-internal
 			  gnus-bbdb/score-default)
 		    t))
-	    (not gnus-bbdb/score-alist)
-	    gnus-bbdb/score-rebuild-alist)
-    (setq gnus-bbdb/score-rebuild-alist nil)
-    (setq gnus-bbdb/score-alist
-	  (concat "((touched nil) (\"from\"\n"
-		  (mapconcat
-		   (lambda (rec)
-		     (let ((score (or (bbdb-record-getprop rec
-							   gnus-bbdb/score-field)
-				      gnus-bbdb/score-default))
-			   (net (bbdb-record-net rec)))
-		       (if (not (and score net)) nil
-			 (mapconcat
-			  (lambda (addr)
-			    (concat "(\"" addr "\" " score ")\n"))
-			  net ""))))
-		   (bbdb-records) "")
-		  "))"))))
+	     (not gnus-bbdb/score-alist)
+	     gnus-bbdb/score-rebuild-alist)
+	 (setq gnus-bbdb/score-rebuild-alist nil)
+	 (setq gnus-bbdb/score-alist
+	       (concat "((touched nil) (\"from\"\n"
+		       (mapconcat
+			(lambda (rec)
+			  (let ((score (or (bbdb-record-getprop
+					    rec
+					    gnus-bbdb/score-field)
+					   gnus-bbdb/score-default))
+				(net (bbdb-record-net rec)))
+			    (if (not (and score net)) nil
+			      (mapconcat
+			       (lambda (addr)
+				 (concat "(\"" addr "\" " score ")\n"))
+			       net ""))))
+			(bbdb-records) "")
+		       "))"))))
   gnus-bbdb/score-alist)
 
 (defun gnus-bbdb/extract-field-value-init ()

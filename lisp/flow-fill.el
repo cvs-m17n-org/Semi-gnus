@@ -53,14 +53,14 @@
 
 (eval-and-compile
   (defalias 'fill-flowed-point-at-bol
-	(if (fboundp 'point-at-bol)
-	    'point-at-bol
-	  'line-beginning-position))
+    (if (fboundp 'point-at-bol)
+	'point-at-bol
+      'line-beginning-position))
 
-   (defalias 'fill-flowed-point-at-eol
-	(if (fboundp 'point-at-eol)
-	    'point-at-eol
-	  'line-end-position)))
+  (defalias 'fill-flowed-point-at-eol
+    (if (fboundp 'point-at-eol)
+	'point-at-eol
+      'line-end-position)))
 
 (defun fill-flowed (&optional buffer)
   (save-excursion
@@ -86,7 +86,8 @@
 		      (save-excursion
 			(unless (eobp)
 			  (forward-char 1)
-			  (looking-at (format "^\\(%s\\)\\([^>]\\)" (or quote " ?"))))))
+			  (looking-at (format "^\\(%s\\)\\([^>]\\)"
+					      (or quote " ?"))))))
 	    (save-excursion
 	      (replace-match (if (string= (match-string 2) " ")
 				 "" "\\2")))

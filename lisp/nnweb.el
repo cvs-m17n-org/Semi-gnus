@@ -800,15 +800,15 @@ and `altavista'.")
     (set-buffer nnweb-buffer)
     (erase-buffer)
     (when (funcall (nnweb-definition 'search) nnweb-search)
-	(let ((more t))
-	  (while more
-	    (setq nnweb-articles
-		  (nconc nnweb-articles (nnweb-google-parse-1)))
-	    ;; FIXME: There is more.
-	    (setq more nil))
-	  ;; Return the articles in the right order.
+      (let ((more t))
+	(while more
 	  (setq nnweb-articles
-		(sort nnweb-articles 'car-less-than-car))))))
+		(nconc nnweb-articles (nnweb-google-parse-1)))
+	  ;; FIXME: There is more.
+	  (setq more nil))
+	;; Return the articles in the right order.
+	(setq nnweb-articles
+	      (sort nnweb-articles 'car-less-than-car))))))
 
 (defun nnweb-google-search (search)
   (nnweb-insert
@@ -877,13 +877,13 @@ and `altavista'.")
   (goto-char (point-min))
   (while (re-search-forward "&\\(#[0-9]+\\|[a-z]+\\);" nil t)
     (let ((elem (if (eq (aref (match-string 1) 0) ?\#)
-			(let ((c
-			       (string-to-number (substring
-						  (match-string 1) 1))))
-			  (if (mm-char-or-char-int-p c) c 32))
-		      (or (cdr (assq (intern (match-string 1))
-				     w3-html-entities))
-			  ?#))))
+		    (let ((c
+			   (string-to-number (substring
+					      (match-string 1) 1))))
+		      (if (mm-char-or-char-int-p c) c 32))
+		  (or (cdr (assq (intern (match-string 1))
+				 w3-html-entities))
+		      ?#))))
       (unless (stringp elem)
 	(setq elem (char-to-string elem)))
       (replace-match elem t t))))

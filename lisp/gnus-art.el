@@ -634,7 +634,8 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
       (background light))
      (:foreground "indianred4" :italic t))
     (t
-     (:italic t)))  "Face used for displaying header content."
+     (:italic t)))
+  "Face used for displaying header content."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
 
@@ -1308,65 +1309,65 @@ Initialized from `text-mode-syntax-table.")
 	(gnus-article-show-hidden-text 'boring-headers)
 	(when (eq 1 (point-min))
 	  (set-window-start (get-buffer-window (current-buffer)) 1)))
-  (unless gnus-inhibit-hiding
-    (save-excursion
-      (save-restriction
-	(let ((inhibit-read-only t)
-	      (case-fold-search t)
-	      (max (1+ (length gnus-sorted-header-list)))
-	      (ignored (when (not gnus-visible-headers)
-			 (cond ((stringp gnus-ignored-headers)
-				gnus-ignored-headers)
-			       ((listp gnus-ignored-headers)
-				(mapconcat 'identity gnus-ignored-headers
-					   "\\|")))))
-	      (visible
-	       (cond ((stringp gnus-visible-headers)
-		      gnus-visible-headers)
-		     ((and gnus-visible-headers
-			   (listp gnus-visible-headers))
-		      (mapconcat 'identity gnus-visible-headers "\\|"))))
-	      (inhibit-point-motion-hooks t)
-	      beg)
-	  ;; First we narrow to just the headers.
-	  (article-narrow-to-head)
-	  ;; Hide any "From " lines at the beginning of (mail) articles.
-	  (while (looking-at "From ")
-	    (forward-line 1))
-	  (unless (bobp)
-	    (if delete
-		(delete-region (point-min) (point))
-	      (gnus-article-hide-text (point-min) (point)
-				      (nconc (list 'article-type 'headers)
-					     gnus-hidden-properties))))
-	  ;; Then treat the rest of the header lines.
-	  ;; Then we use the two regular expressions
-	  ;; `gnus-ignored-headers' and `gnus-visible-headers' to
-	  ;; select which header lines is to remain visible in the
-	  ;; article buffer.
-	  (while (re-search-forward "^[^ \t:]*:" nil t)
-	    (beginning-of-line)
-	    ;; Mark the rank of the header.
-	    (put-text-property
-	     (point) (1+ (point)) 'message-rank
-	     (if (or (and visible (looking-at visible))
-		     (and ignored
-			  (not (looking-at ignored))))
-		 (gnus-article-header-rank)
-	       (+ 2 max)))
-	    (forward-line 1))
-	  (message-sort-headers-1)
-	  (when (setq beg (text-property-any
-			   (point-min) (point-max) 'message-rank (+ 2 max)))
-	    ;; We delete or make invisible the unwanted headers.
-	    (push 'headers gnus-article-wash-types)
-	    (if delete
-		(progn
-		  (add-text-properties
-		   (point-min) (+ 5 (point-min))
-		   '(article-type headers dummy-invisible t))
-		  (delete-region beg (point-max)))
-	      (gnus-article-hide-text-type beg (point-max) 'headers))))))))
+    (unless gnus-inhibit-hiding
+      (save-excursion
+	(save-restriction
+	  (let ((inhibit-read-only t)
+		(case-fold-search t)
+		(max (1+ (length gnus-sorted-header-list)))
+		(ignored (when (not gnus-visible-headers)
+			   (cond ((stringp gnus-ignored-headers)
+				  gnus-ignored-headers)
+				 ((listp gnus-ignored-headers)
+				  (mapconcat 'identity gnus-ignored-headers
+					     "\\|")))))
+		(visible
+		 (cond ((stringp gnus-visible-headers)
+			gnus-visible-headers)
+		       ((and gnus-visible-headers
+			     (listp gnus-visible-headers))
+			(mapconcat 'identity gnus-visible-headers "\\|"))))
+		(inhibit-point-motion-hooks t)
+		beg)
+	    ;; First we narrow to just the headers.
+	    (article-narrow-to-head)
+	    ;; Hide any "From " lines at the beginning of (mail) articles.
+	    (while (looking-at "From ")
+	      (forward-line 1))
+	    (unless (bobp)
+	      (if delete
+		  (delete-region (point-min) (point))
+		(gnus-article-hide-text (point-min) (point)
+					(nconc (list 'article-type 'headers)
+					       gnus-hidden-properties))))
+	    ;; Then treat the rest of the header lines.
+	    ;; Then we use the two regular expressions
+	    ;; `gnus-ignored-headers' and `gnus-visible-headers' to
+	    ;; select which header lines is to remain visible in the
+	    ;; article buffer.
+	    (while (re-search-forward "^[^ \t:]*:" nil t)
+	      (beginning-of-line)
+	      ;; Mark the rank of the header.
+	      (put-text-property
+	       (point) (1+ (point)) 'message-rank
+	       (if (or (and visible (looking-at visible))
+		       (and ignored
+			    (not (looking-at ignored))))
+		   (gnus-article-header-rank)
+		 (+ 2 max)))
+	      (forward-line 1))
+	    (message-sort-headers-1)
+	    (when (setq beg (text-property-any
+			     (point-min) (point-max) 'message-rank (+ 2 max)))
+	      ;; We delete or make invisible the unwanted headers.
+	      (push 'headers gnus-article-wash-types)
+	      (if delete
+		  (progn
+		    (add-text-properties
+		     (point-min) (+ 5 (point-min))
+		     '(article-type headers dummy-invisible t))
+		    (delete-region beg (point-max)))
+		(gnus-article-hide-text-type beg (point-max) 'headers))))))))
   )
 
 (defun article-hide-boring-headers (&optional arg)
@@ -1845,38 +1846,38 @@ If PROMPT (the prefix), prompt for a coding system to use."
 			   (error))
 			 gnus-newsgroup-ignored-charsets))
 	ct cte ctl charset format)
-  (save-excursion
-    (save-restriction
-      (article-narrow-to-head)
-      (setq ct (message-fetch-field "Content-Type" t)
-	    cte (message-fetch-field "Content-Transfer-Encoding" t)
-	    ctl (and ct (ignore-errors
-			  (mail-header-parse-content-type ct)))
-	    charset (cond
-		     (prompt
-		      (mm-read-coding-system "Charset to decode: "))
-		     (ctl
-		      (mail-content-type-get ctl 'charset)))
-	    format (and ctl (mail-content-type-get ctl 'format)))
-      (when cte
-	(setq cte (mail-header-strip cte)))
-      (if (and ctl (not (string-match "/" (car ctl))))
-	  (setq ctl nil))
-      (goto-char (point-max)))
-    (forward-line 1)
-    (save-restriction
-      (narrow-to-region (point) (point-max))
-      (when (and (eq mail-parse-charset 'gnus-decoded)
-		 (eq (mm-body-7-or-8) '8bit))
-	;; The text code could have been decoded.
-	(setq charset mail-parse-charset))
-      (when (and (or (not ctl)
-		     (equal (car ctl) "text/plain"))
-		 (not format)) ;; article with format will decode later.
-	(mm-decode-body
-	 charset (and cte (intern (downcase
-				   (gnus-strip-whitespace cte))))
-	 (car ctl)))))))
+    (save-excursion
+      (save-restriction
+	(article-narrow-to-head)
+	(setq ct (message-fetch-field "Content-Type" t)
+	      cte (message-fetch-field "Content-Transfer-Encoding" t)
+	      ctl (and ct (ignore-errors
+			    (mail-header-parse-content-type ct)))
+	      charset (cond
+		       (prompt
+			(mm-read-coding-system "Charset to decode: "))
+		       (ctl
+			(mail-content-type-get ctl 'charset)))
+	      format (and ctl (mail-content-type-get ctl 'format)))
+	(when cte
+	  (setq cte (mail-header-strip cte)))
+	(if (and ctl (not (string-match "/" (car ctl))))
+	    (setq ctl nil))
+	(goto-char (point-max)))
+      (forward-line 1)
+      (save-restriction
+	(narrow-to-region (point) (point-max))
+	(when (and (eq mail-parse-charset 'gnus-decoded)
+		   (eq (mm-body-7-or-8) '8bit))
+	  ;; The text code could have been decoded.
+	  (setq charset mail-parse-charset))
+	(when (and (or (not ctl)
+		       (equal (car ctl) "text/plain"))
+		   (not format)) ;; article with format will decode later.
+	  (mm-decode-body
+	   charset (and cte (intern (downcase
+				     (gnus-strip-whitespace cte))))
+	   (car ctl)))))))
 
 (defun article-decode-encoded-words ()
   "Remove encoded-word encoding from headers."
@@ -2382,8 +2383,8 @@ should replace the \"Date:\" one, or should be added below it."
 		    (re-search-forward "^X-Sent:[ \t]" nil t))
 	    (setq bface (get-text-property (gnus-point-at-bol) 'face)
 		  date (or (get-text-property (gnus-point-at-bol)
-						'original-date)
-			     date)
+					      'original-date)
+			   date)
 		  eface (get-text-property (1- (gnus-point-at-eol))
 					   'face)))
 	  (let ((buffer-read-only nil))
@@ -2539,8 +2540,8 @@ should replace the \"Date:\" one, or should be added below it."
 	     (format "%02d" (nth 2 dtime))
 	     ":"
 	     (format "%02d" (nth 1 dtime)))))))
-	(error
-	 (format "Date: %s (from Oort)" date))))
+    (error
+     (format "Date: %s (from Oort)" date))))
 
 (defun article-date-local (&optional highlight)
   "Convert the current article date to the local timezone."
@@ -2797,7 +2798,7 @@ This format is defined by the `gnus-article-time-format' variable."
 			 (car (push result file-name-history)))))))
 	       ;; Create the directory.
 	       (gnus-make-directory (file-name-directory file))
-      ;; If we have read a directory, we append the default file name.
+	       ;; If we have read a directory, we append the default file name.
 	       (when (file-directory-p file)
 		 (setq file (expand-file-name (file-name-nondirectory
 					       default-name)
@@ -3070,14 +3071,14 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 	       gfunc (intern (format "gnus-%s" func))))
        (defalias gfunc
 	 (if (fboundp afunc)
-	   `(lambda (&optional interactive &rest args)
-	      ,(documentation afunc t)
-	      (interactive (list t))
-	      (save-excursion
-		(set-buffer gnus-article-buffer)
-		(if interactive
-		    (call-interactively ',afunc)
-		  (apply ',afunc args))))))))
+	     `(lambda (&optional interactive &rest args)
+		,(documentation afunc t)
+		(interactive (list t))
+		(save-excursion
+		  (set-buffer gnus-article-buffer)
+		  (if interactive
+		      (call-interactively ',afunc)
+		    (apply ',afunc args))))))))
    '(article-hide-headers
      article-verify-x-pgp-sig
      article-hide-boring-headers
@@ -3718,24 +3719,24 @@ value of the variable `gnus-show-mime' is non-nil."
       (set-buffer gnus-summary-buffer)
       (gnus-article-edit-article
        `(lambda ()
-	   (erase-buffer)
-	   (let ((mail-parse-charset (or gnus-article-charset
-					 ',gnus-newsgroup-charset))
-		 (mail-parse-ignored-charsets
-		  (or gnus-article-ignored-charsets
-		      ',gnus-newsgroup-ignored-charsets))
-		 (mbl mml-buffer-list))
-	     (setq mml-buffer-list nil)
-	     (insert-buffer gnus-original-article-buffer)
-	     (mime-to-mml gnus-article-mime-handles)
-	     (setq gnus-article-mime-handles nil)
-	     (let ((mbl1 mml-buffer-list))
-	       (setq mml-buffer-list mbl)
-	       (set (make-local-variable 'mml-buffer-list) mbl1))
-	     ;; LOCAL argument of add-hook differs between GNU Emacs
-	     ;; and XEmacs. make-local-hook makes sure they are local.
-	     (make-local-hook 'kill-buffer-hook)
-	     (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
+	  (erase-buffer)
+	  (let ((mail-parse-charset (or gnus-article-charset
+					',gnus-newsgroup-charset))
+		(mail-parse-ignored-charsets
+		 (or gnus-article-ignored-charsets
+		     ',gnus-newsgroup-ignored-charsets))
+		(mbl mml-buffer-list))
+	    (setq mml-buffer-list nil)
+	    (insert-buffer gnus-original-article-buffer)
+	    (mime-to-mml gnus-article-mime-handles)
+	    (setq gnus-article-mime-handles nil)
+	    (let ((mbl1 mml-buffer-list))
+	      (setq mml-buffer-list mbl)
+	      (set (make-local-variable 'mml-buffer-list) mbl1))
+	    ;; LOCAL argument of add-hook differs between GNU Emacs
+	    ;; and XEmacs. make-local-hook makes sure they are local.
+	    (make-local-hook 'kill-buffer-hook)
+	    (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
        `(lambda (no-highlight)
 	  (let ((mail-parse-charset (or gnus-article-charset
 					',gnus-newsgroup-charset))
@@ -3744,11 +3745,11 @@ value of the variable `gnus-show-mime' is non-nil."
 		(mail-parse-ignored-charsets
 		 (or gnus-article-ignored-charsets
 		     ',gnus-newsgroup-ignored-charsets)))
-	   (mml-to-mime)
-	   (mml-destroy-buffers)
-	   (remove-hook 'kill-buffer-hook
-			'mml-destroy-buffers t)
-	   (kill-local-variable 'mml-buffer-list))
+	    (mml-to-mime)
+	    (mml-destroy-buffers)
+	    (remove-hook 'kill-buffer-hook
+			 'mml-destroy-buffers t)
+	    (kill-local-variable 'mml-buffer-list))
 	  (gnus-summary-edit-article-done
 	   ,(or (mail-header-references gnus-current-headers) "")
 	   ,(gnus-group-read-only-p)
@@ -3889,7 +3890,7 @@ specified charset."
 	     (or (cdr (assq arg
 			    gnus-summary-show-article-charset-alist))
 		 (mm-read-coding-system "Charset: ")))
-	  (gnus-newsgroup-ignored-charsets 'gnus-all))
+	    (gnus-newsgroup-ignored-charsets 'gnus-all))
 	(gnus-article-press-button)))))
 
 (defun gnus-mime-externalize-part (&optional handle)
@@ -5657,7 +5658,7 @@ specified by `gnus-button-alist'."
       (setq cur (car pairs)
 	    pairs (cdr pairs))
       (if (not (string-match "=" cur))
-	  nil                           ; Grace
+	  nil				; Grace
 	(setq key (gnus-url-unhex-string (substring cur 0 (match-beginning 0)))
 	      val (gnus-url-unhex-string (substring cur (match-end 0) nil)))
 	(if downcase
@@ -5854,7 +5855,7 @@ For example:
 			 (string-match (car x) gnus-newsgroup-name))
 		    (nconc gnus-decode-header-methods-cache
 			   (list (cdr x))))))
-	  gnus-decode-header-methods))
+	    gnus-decode-header-methods))
   (let ((xlist gnus-decode-header-methods-cache))
     (pop xlist)
     (save-restriction
@@ -5983,7 +5984,7 @@ For example:
 	    (error "The current newsgroup does not support article encrypt"))
 	  (gnus-summary-show-article t)
 	  (setq references
-	      (or (mail-header-references gnus-current-headers) ""))
+		(or (mail-header-references gnus-current-headers) ""))
 	  (set-buffer gnus-article-buffer)
 	  (let* ((buffer-read-only nil)
 		 (headers
@@ -6089,7 +6090,7 @@ For example:
 	    (let ((gnus-mime-security-button-pressed t)
 		  (gnus-mime-security-button-line-format
 		   (get-text-property (point) 'gnus-line-format))
-		buffer-read-only)
+		  buffer-read-only)
 	      (forward-char -1)
 	      (while (eq (get-text-property (point) 'gnus-line-format)
 			 gnus-mime-security-button-line-format)
@@ -6098,8 +6099,8 @@ For example:
 	      (delete-region (point)
 			     (or (text-property-not-all
 				  (point) (point-max)
-				'gnus-line-format
-				gnus-mime-security-button-line-format)
+				  'gnus-line-format
+				  gnus-mime-security-button-line-format)
 				 (point-max)))
 	      (gnus-insert-mime-security-button handle))
 	  (if (gnus-buffer-live-p gnus-mime-security-details-buffer)

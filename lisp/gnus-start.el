@@ -857,7 +857,7 @@ cautiously -- unloading may cause trouble."
 		    (gnus-y-or-n-p
 		     (if purpose
 			 "Gnus exited on purpose without saving; read auto-save file anyway? "
-		     "Gnus auto-save file exists.  Do you want to read it? ")))
+		       "Gnus auto-save file exists.  Do you want to read it? ")))
 	    (setq gnus-dribble-eval-file t)))))))
 
 (defun gnus-dribble-eval-file ()
@@ -2611,9 +2611,9 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
     (while variables
       (when (and (boundp (setq variable (pop variables)))
 		 (symbol-value variable))
-	  (insert "(setq " (symbol-name variable) " '")
-	  (gnus-prin1 (symbol-value variable))
-	  (insert ")\n")))))
+	(insert "(setq " (symbol-name variable) " '")
+	(gnus-prin1 (symbol-value variable))
+	(insert ")\n")))))
 
 (defun gnus-strip-killed-list ()
   "Return the killed list minus the groups that match `gnus-save-killed-list'."

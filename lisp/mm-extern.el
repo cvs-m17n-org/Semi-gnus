@@ -157,8 +157,8 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 		(condition-case nil
 		    ;; This is only valid on XEmacs.
 		    (mapcar (lambda (prop)
-			    (remove-specifier
-			     (face-property 'default prop) (current-buffer)))
+			      (remove-specifier
+			       (face-property 'default prop) (current-buffer)))
 			    '(background background-pixmap foreground))
 		  (error nil))
 		(delete-region ,(point-min-marker) ,(point-max-marker))))))))))

@@ -912,7 +912,7 @@ deleted.  Point is left where the deleted region was."
 			   (nnfolder-active-number nnfolder-current-group))))
 	      (when novbuf
 		(let ((headers (nnfolder-parse-head newnum (point-min)
-						      (point-max))))
+						    (point-max))))
 		  (with-current-buffer novbuf
 		    (goto-char (point-max))
 		    (nnheader-insert-nov headers))))
@@ -1061,29 +1061,29 @@ This command does not work if you use short group names."
   "Parse the head of the current buffer."
   (let ((buf (current-buffer))
 	chars)
-  (save-excursion
-    (unless b
-      (setq b (if (nnmail-search-unix-mail-delim-backward)
-		  (point) (point-min)))
-      (forward-line 1)
-      (setq e (if (nnmail-search-unix-mail-delim)
-		  (point) (point-max))))
-    (setq chars (- e b))
-    (unless (zerop chars)
-      (goto-char b)
-      (if (search-forward "\n\n" e t) (setq e (1- (point)))))
-    (with-temp-buffer
-      (insert-buffer-substring buf b e)
-      ;; Fold continuation lines.
-      (goto-char (point-min))
-      (while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)
-	(replace-match " " t t))
-      ;; Remove any tabs; they are too confusing.
-      (subst-char-in-region (point-min) (point-max) ?\t ? )
-      (let ((headers (nnheader-parse-head t)))
-	(mail-header-set-chars headers chars)
-	(mail-header-set-number headers number)
-	headers)))))
+    (save-excursion
+      (unless b
+	(setq b (if (nnmail-search-unix-mail-delim-backward)
+		    (point) (point-min)))
+	(forward-line 1)
+	(setq e (if (nnmail-search-unix-mail-delim)
+		    (point) (point-max))))
+      (setq chars (- e b))
+      (unless (zerop chars)
+	(goto-char b)
+	(if (search-forward "\n\n" e t) (setq e (1- (point)))))
+      (with-temp-buffer
+	(insert-buffer-substring buf b e)
+	;; Fold continuation lines.
+	(goto-char (point-min))
+	(while (re-search-forward "\\(\r?\n[ \t]+\\)+" nil t)
+	  (replace-match " " t t))
+	;; Remove any tabs; they are too confusing.
+	(subst-char-in-region (point-min) (point-max) ?\t ? )
+	(let ((headers (nnheader-parse-head t)))
+	  (mail-header-set-chars headers chars)
+	  (mail-header-set-number headers number)
+	  headers)))))
 
 (defun nnfolder-add-nov (group article headers)
   "Add a nov line for the GROUP base."

@@ -866,10 +866,10 @@ automatically when it is selected."
     ((= mark gnus-unread-mark)
      . gnus-summary-normal-unread-face)
     ((and (> score default-high) (memq mark (list gnus-downloadable-mark
-					     gnus-undownloaded-mark)))
+						  gnus-undownloaded-mark)))
      . gnus-summary-high-unread-face)
     ((and (< score default-low) (memq mark (list gnus-downloadable-mark
-					     gnus-undownloaded-mark)))
+						 gnus-undownloaded-mark)))
      . gnus-summary-low-unread-face)
     ((and (memq mark (list gnus-downloadable-mark gnus-undownloaded-mark))
 	  (memq article gnus-newsgroup-unreads))
@@ -1943,8 +1943,8 @@ increase the score of each group you read."
 
       (if (not (keymapp gnus-summary-article-menu))
 	  (easy-menu-define
-	    gnus-article-commands-menu gnus-article-mode-map ""
-	    (cons "Commands" innards))
+	   gnus-article-commands-menu gnus-article-mode-map ""
+	   (cons "Commands" innards))
 	;; in Emacs, don't share menu.
 	(setq gnus-article-commands-menu
 	      (copy-keymap gnus-summary-article-menu))
@@ -6872,10 +6872,10 @@ article."
 		   (gnus-id-to-thread (gnus-root-id id)))))
     (prog1
 	(gnus-summary-limit (nconc articles gnus-newsgroup-limit))
-	(gnus-summary-limit-include-matching-articles
-	 "subject"
-	 (regexp-quote (gnus-simplify-subject-re
-			(mail-header-subject (gnus-id-to-header id)))))
+      (gnus-summary-limit-include-matching-articles
+       "subject"
+       (regexp-quote (gnus-simplify-subject-re
+		      (mail-header-subject (gnus-id-to-header id)))))
       (gnus-summary-position-point))))
 
 (defun gnus-summary-limit-include-matching-articles (header regexp)
@@ -7991,7 +7991,7 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	 (error "The current group does not support article editing")))
   (let ((articles (gnus-summary-work-articles n))
 	(prefix (if (gnus-check-backend-function
-		    'request-move-article gnus-newsgroup-name)
+		     'request-move-article gnus-newsgroup-name)
 		    (gnus-group-real-prefix gnus-newsgroup-name)
 		  ""))
 	(names '((move "Move" "Moving")
@@ -8671,8 +8671,8 @@ number of articles marked is returned."
       (while (and
 	      (> n 0)
 	      (if unmark
-		(gnus-summary-remove-process-mark
-		 (gnus-summary-article-number))
+		  (gnus-summary-remove-process-mark
+		   (gnus-summary-article-number))
 		(gnus-summary-set-process-mark (gnus-summary-article-number)))
 	      (zerop (gnus-summary-next-subject (if backward -1 1) nil t)))
 	(setq n (1- n)))
@@ -9112,7 +9112,7 @@ The difference between N and the number of marks cleared is returned."
       (gnus-summary-mark-article gnus-current-article gnus-read-mark))))
 
 (defun gnus-summary-mark-unread-as-ticked ()
-   "Intended to be used by `gnus-summary-mark-article-hook'."
+  "Intended to be used by `gnus-summary-mark-article-hook'."
   (when (memq gnus-current-article gnus-newsgroup-unreads)
     (gnus-summary-mark-article gnus-current-article gnus-ticked-mark)))
 
@@ -10680,7 +10680,7 @@ returned."
     (when (and gnus-fetch-old-headers
 	       (eq gnus-headers-retrieved-by 'nov))
       (if (eq gnus-fetch-old-headers 'invisible)
-	(gnus-build-all-threads)
+	  (gnus-build-all-threads)
 	(gnus-build-old-threads)))
     ;; Let the Gnus agent mark articles as read.
     (when gnus-agent

@@ -341,7 +341,7 @@ variable."
     ((and (= unread 0)) .
      gnus-group-news-low-empty-face)
     (t .
-     gnus-group-news-low-face))
+       gnus-group-news-low-face))
   "*Controls the highlighting of group buffer lines.
 
 Below is a list of `Form'/`Face' pairs.  When deciding how a a
@@ -737,7 +737,7 @@ simple manner.")
 	(gnus-group-group-name)]
        ["Kill" gnus-group-kill-group :active (gnus-group-group-name)
 	,@(if (featurep 'xemacs) nil
-	      '(:help "Kill (remove) current group"))]
+	    '(:help "Kill (remove) current group"))]
        ["Yank" gnus-group-yank-group gnus-list-of-killed-groups]
        ["Describe" gnus-group-describe-group :active (gnus-group-group-name)
 	,@(if (featurep 'xemacs) nil
@@ -3552,7 +3552,7 @@ This command may read the active file."
 	     (> (prefix-numeric-value level) gnus-level-killed))
     (gnus-get-killed-groups))
   (funcall gnus-group-prepare-function
-   (or level gnus-level-subscribed) (and all t) (or lowest 1) regexp)
+	   (or level gnus-level-subscribed) (and all t) (or lowest 1) regexp)
   (goto-char (point-min))
   (gnus-group-position-point))
 
@@ -3690,8 +3690,8 @@ The hook `gnus-exit-gnus-hook' is called before actually exiting."
     (gnus-configure-windows 'group t)
     (when (and (gnus-buffer-live-p gnus-dribble-buffer)
 	       (not (zerop (save-excursion
-			    (set-buffer gnus-dribble-buffer)
-			    (buffer-size)))))
+			     (set-buffer gnus-dribble-buffer)
+			     (buffer-size)))))
       (gnus-dribble-enter
        ";;; Gnus was exited on purpose without saving the .newsrc files."))
     (gnus-dribble-save)

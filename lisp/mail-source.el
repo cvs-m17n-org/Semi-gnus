@@ -47,12 +47,12 @@
   (eval-when-compile
     (mapcar (lambda (a)
 	      (list 'const (car a)))
-     imap-authenticator-alist)))
+	    imap-authenticator-alist)))
 (defconst mail-source-imap-streams
   (eval-when-compile
     (mapcar (lambda (a)
 	      (list 'const (car a)))
-     imap-stream-alist)))
+	    imap-stream-alist)))
 
 (defcustom mail-sources nil
   "*Where the mail backends will look for incoming mail.
@@ -192,17 +192,17 @@ See Info node `(gnus)Mail Source Specifiers'."
 			(const :format "" webmail)
 			(checklist :tag "Options" :greedy t
 				   (group :inline t
-					 (const :format "" :value :subtype)
-					 ;; Should be generated from
-					 ;; `webmail-type-definition', but we
-					 ;; can't require webmail without W3.
-					 (choice :tag "Subtype"
-						 :value hotmail
-						 (const hotmail)
-						 (const yahoo)
-						 (const netaddress)
-						 (const netscape)
-						 (const my-deja)))
+					  (const :format "" :value :subtype)
+					  ;; Should be generated from
+					  ;; `webmail-type-definition', but we
+					  ;; can't require webmail without W3.
+					  (choice :tag "Subtype"
+						  :value hotmail
+						  (const hotmail)
+						  (const yahoo)
+						  (const netaddress)
+						  (const netscape)
+						  (const my-deja)))
 				   (group :inline t
 					  (const :format "" :value :user)
 					  (string :tag "User"))
@@ -841,13 +841,13 @@ This only works when `display-time' is enabled."
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
 				  (goto-char (point-min))
-;;;                               ;; Unix mail format
+;;;				  ;; Unix mail format
 ;;;				  (unless (looking-at "\n*From ")
 ;;;				    (insert "From maildir "
 ;;;					    (current-time-string) "\n"))
 ;;;				  (while (re-search-forward "^From " nil t)
 ;;;				    (replace-match ">From "))
-;;;                               (goto-char (point-max))
+;;;				  (goto-char (point-max))
 ;;;				  (insert "\n\n")
 				  ;; MMDF mail format
 				  (insert "\001\001\001\001\n"))

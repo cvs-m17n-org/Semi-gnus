@@ -387,14 +387,14 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 	  (throw 'found t))))))
 
 (defun mm-handle-set-external-undisplayer (handle function)
- "Set the undisplayer for this handle; postpone undisplaying of viewers
+  "Set the undisplayer for this handle; postpone undisplaying of viewers
 for types in mm-keep-viewer-alive-types."
- (if (mm-keep-viewer-alive-p handle)
-     (let ((new-handle (copy-sequence handle)))
-       (mm-handle-set-undisplayer new-handle function)
-       (mm-handle-set-undisplayer handle nil)
-       (push new-handle mm-postponed-undisplay-list))
-   (mm-handle-set-undisplayer handle function)))
+  (if (mm-keep-viewer-alive-p handle)
+      (let ((new-handle (copy-sequence handle)))
+	(mm-handle-set-undisplayer new-handle function)
+	(mm-handle-set-undisplayer handle nil)
+	(push new-handle mm-postponed-undisplay-list))
+    (mm-handle-set-undisplayer handle function)))
 
 (defun mm-destroy-postponed-undisplay-list ()
   (message "Destroying external MIME viewers")
@@ -1045,8 +1045,8 @@ like underscores."
 	  (prog1
 	      (setq spec
 		    (ignore-errors
-		     ;; Avoid testing `make-glyph' since W3 may define
-		     ;; a bogus version of it.
+		      ;; Avoid testing `make-glyph' since W3 may define
+		      ;; a bogus version of it.
 		      (if (fboundp 'create-image)
 			  (create-image (buffer-string) (intern type) 'data-p)
 			(cond
@@ -1064,7 +1064,7 @@ like underscores."
 				  (write-region (point-min) (point-max) file)
 				  (make-glyph (list (cons 'x file))))
 			      (ignore-errors
-			       (delete-file file)))))
+				(delete-file file)))))
 			 (t
 			  (make-glyph
 			   (vector (intern type) :data (buffer-string))))))))
@@ -1246,8 +1246,8 @@ If RECURSIVE, search recursively."
     parts))
 
 (defun mm-multiple-handles (handles)
-   (and (listp (car handles))
-	(> (length handles) 1)))
+  (and (listp (car handles))
+       (> (length handles) 1)))
 
 (defun mm-merge-handles (handles1 handles2)
   (append

@@ -446,19 +446,19 @@ A string or a list of strings is returned."
 	 (certrr (with-current-buffer digbuf
 		   (dig-extract-rr (smime-mail-to-domain mail) "cert")))
 	 (cert (and certrr (dig-rr-get-pkix-cert certrr))))
-      (if cert
-	  (with-current-buffer retbuf
-	    (insert "-----BEGIN CERTIFICATE-----\n")
-	    (let ((i 0) (len (length cert)))
-	      (while (> (- len 64) i)
-		(insert (substring cert i (+ i 64)) "\n")
-		(setq i (+ i 64)))
-	      (insert (substring cert i len) "\n"))
-	    (insert "-----END CERTIFICATE-----\n"))
-	(kill-buffer retbuf)
-	(setq retbuf nil))
-      (kill-buffer digbuf)
-      retbuf))
+    (if cert
+	(with-current-buffer retbuf
+	  (insert "-----BEGIN CERTIFICATE-----\n")
+	  (let ((i 0) (len (length cert)))
+	    (while (> (- len 64) i)
+	      (insert (substring cert i (+ i 64)) "\n")
+	      (setq i (+ i 64)))
+	    (insert (substring cert i len) "\n"))
+	  (insert "-----END CERTIFICATE-----\n"))
+      (kill-buffer retbuf)
+      (setq retbuf nil))
+    (kill-buffer digbuf)
+    retbuf))
 
 ;; User interface.
 

@@ -476,15 +476,15 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 	(mm-with-unibyte-buffer
 	  (if (and nnrss-use-local
 		   (file-exists-p (setq file (expand-file-name
-					  (nnrss-translate-file-chars
-					   (concat group ".xml"))
-					  nnrss-directory))))
+					      (nnrss-translate-file-chars
+					       (concat group ".xml"))
+					      nnrss-directory))))
 	      (insert-file-contents file)
 	    (setq url (or (nth 2 (assoc group nnrss-server-data))
 			  (second (assoc group nnrss-group-alist))))
 	    (unless url
 	      (setq url
-		(read-string (format "RSS url of %s: " group "http://")))
+		    (read-string (format "RSS url of %s: " group "http://")))
 	      (let ((pair (assoc group nnrss-server-data)))
 		(if pair
 		    (setcdr (cdr pair) (list url))
@@ -504,29 +504,29 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
       (unless (listp (car (setq xml (cddar xml))))
 	(setq xml nil)))
     (dolist (item (nreverse xml))
-       (when (and (listp item)
-		  (eq 'item (car item))
-		  (setq url (nnrss-node-text (assq 'link (cddr item))))
-		  (setq url (nnrss-decode-entities-unibyte-string url))
-		  (not (gnus-gethash url nnrss-group-hashtb)))
-	 (setq subject (nnrss-node-text (assq 'title (cddr item))))
-	 (setq extra (or (nnrss-node-text (assq 'description (cddr item)))
-			 (nnrss-node-text (assq 'dc:description (cddr item)))))
-	 (setq author (nnrss-node-text (assq 'dc:creator (cddr item))))
-	 (setq date (or (nnrss-node-text (assq 'dc:date (cddr item)))
-			(message-make-date)))
-	 (push
-	  (list
-	   (incf nnrss-group-max)
-	   (current-time)
-	   url
-	   (and subject (nnrss-decode-entities-unibyte-string subject))
-	   (and author (nnrss-decode-entities-unibyte-string author))
-	   date
-	   (and extra (nnrss-decode-entities-unibyte-string extra)))
-	  nnrss-group-data)
-	 (gnus-sethash url (car nnrss-group-data) nnrss-group-hashtb)
-	 (setq changed t)))
+      (when (and (listp item)
+		 (eq 'item (car item))
+		 (setq url (nnrss-node-text (assq 'link (cddr item))))
+		 (setq url (nnrss-decode-entities-unibyte-string url))
+		 (not (gnus-gethash url nnrss-group-hashtb)))
+	(setq subject (nnrss-node-text (assq 'title (cddr item))))
+	(setq extra (or (nnrss-node-text (assq 'description (cddr item)))
+			(nnrss-node-text (assq 'dc:description (cddr item)))))
+	(setq author (nnrss-node-text (assq 'dc:creator (cddr item))))
+	(setq date (or (nnrss-node-text (assq 'dc:date (cddr item)))
+		       (message-make-date)))
+	(push
+	 (list
+	  (incf nnrss-group-max)
+	  (current-time)
+	  url
+	  (and subject (nnrss-decode-entities-unibyte-string subject))
+	  (and author (nnrss-decode-entities-unibyte-string author))
+	  date
+	  (and extra (nnrss-decode-entities-unibyte-string extra)))
+	 nnrss-group-data)
+	(gnus-sethash url (car nnrss-group-data) nnrss-group-hashtb)
+	(setq changed t)))
     (when changed
       (nnrss-save-group-data group server)
       (let ((pair (assoc group nnrss-server-data)))
@@ -545,9 +545,9 @@ It is useful when `(setq nnrss-use-local t)'."
   (dolist (elem nnrss-server-data)
     (let ((url (or (nth 2 elem)
 		   (second (assoc (car elem) nnrss-group-alist)))))
-    (insert "$WGET -q -O \"$RSSDIR\"/'"
-	    (nnrss-translate-file-chars (concat (car elem) ".xml"))
-	    "' '" url "'\n"))))
+      (insert "$WGET -q -O \"$RSSDIR\"/'"
+	      (nnrss-translate-file-chars (concat (car elem) ".xml"))
+	      "' '" url "'\n"))))
 
 (defun nnrss-translate-file-chars (name)
   (let ((nnheader-file-name-translation-alist

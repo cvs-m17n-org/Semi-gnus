@@ -101,7 +101,7 @@
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Ahhhhhhh!!"		; 2.10b1
-  "Cup of life"                 ; 2.20
+  "Cup of life"			; 2.20
 ;;  "Code of silence"
   )
 
@@ -515,7 +515,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; fetch only mail for gnus-agent
   (if (and (eq gnus-offline-news-fetch-method 'nnagent)
 	   (eq gnus-offline-articles-to-fetch 'mail))
-	  (setq gnus-agent-handle-level gnus-offline-mail-group-level)))
+      (setq gnus-agent-handle-level gnus-offline-mail-group-level)))
 
 ;;
 ;; Change mail group level to handle only mail.
@@ -618,8 +618,8 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 		    nnagent-version
 		  nnspool-version))
 	   (str (format "\n                        with %s" ver)))
-    (gnus-offline-add-custom-header
-     "X-Gnus-Offline-Backend:" (concat gnus-offline-header-string str)))))
+      (gnus-offline-add-custom-header
+       "X-Gnus-Offline-Backend:" (concat gnus-offline-header-string str)))))
 
 
 ;;

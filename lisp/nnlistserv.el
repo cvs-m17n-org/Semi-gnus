@@ -34,7 +34,7 @@
 (require 'nnoo)
 (eval-when-compile
   (ignore-errors
-   (require 'nnweb))			; requires W3
+    (require 'nnweb))			; requires W3
   (autoload 'url-insert-file-contents "nnweb"))
 
 (nnoo-declare nnlistserv

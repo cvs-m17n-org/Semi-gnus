@@ -381,7 +381,7 @@ MAILCAPS if set; otherwise (on Unix) use the path from RFC 1524, plus
 		 (file-regular-p fname))
 	    (mailcap-parse-mailcap fname))
 	(setq fnames (cdr fnames))))
-      (setq mailcap-parsed-p t)))
+    (setq mailcap-parsed-p t)))
 
 (defun mailcap-parse-mailcap (fname)
   "Parse out the mailcap file specified by FNAME."
@@ -636,7 +636,7 @@ to supply to the test."
 	(setq mailcap-mime-data
 	      (cons (cons major (list (cons minor info)))
 		    mailcap-mime-data))
-       (let ((cur-minor (assoc minor old-major)))
+      (let ((cur-minor (assoc minor old-major)))
 	(cond
 	 ((or (null cur-minor)		; New minor area, or
 	      (assq 'test info))	; Has a test, insert at beginning
@@ -749,7 +749,7 @@ this type is returned."
 ;;;
 
 (defvar mailcap-mime-extensions
-  '((""        . "text/plain")
+  '((""       . "text/plain")
     (".abs"   . "audio/x-mpeg")
     (".aif"   . "audio/aiff")
     (".aifc"  . "audio/aiff")

@@ -312,10 +312,10 @@ If the charset is `composition', return the actual one."
 	   (progn
 	     (setq mail-parse-mule-charset
 		   (and (boundp 'current-language-environment)
-		      (car (last
-			    (assq 'charset
-				  (assoc current-language-environment
-					 language-info-alist))))))
+			(car (last
+			      (assq 'charset
+				    (assoc current-language-environment
+					   language-info-alist))))))
 	     (if (or (not mail-parse-mule-charset)
 		     (eq mail-parse-mule-charset 'ascii))
 		 (setq mail-parse-mule-charset
@@ -412,13 +412,13 @@ Mule4 only."
 	      (fboundp 'set-buffer-multibyte)
 	      (fboundp 'charsetp)
 	      (not (charsetp 'eight-bit-control))) ;; For Emacs Mule 4 only.
-       (let ((,buffer (current-buffer)))
-	 (unwind-protect
-	     (let (default-enable-multibyte-characters)
-	       (set-buffer-multibyte nil)
-	       ,@forms)
-	   (set-buffer ,buffer)
-	   (set-buffer-multibyte t)))
+	 (let ((,buffer (current-buffer)))
+	   (unwind-protect
+	       (let (default-enable-multibyte-characters)
+		 (set-buffer-multibyte nil)
+		 ,@forms)
+	     (set-buffer ,buffer)
+	     (set-buffer-multibyte t)))
        (let (default-enable-multibyte-characters)
 	 ,@forms))))
 (put 'mm-with-unibyte-current-buffer-mule4 'lisp-indent-function 0)

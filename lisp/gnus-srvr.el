@@ -668,11 +668,11 @@ The following commands are available:
 				 (gnus-group-level
 				  (gnus-group-prefixed-name (car group)
 							    method)))))
-			      (cond
-			       ((<= level gnus-level-subscribed) ? )
-			       ((<= level gnus-level-unsubscribed) ?U)
-			       ((= level gnus-level-zombie) ?Z)
-			       (t ?K)))
+			  (cond
+			   ((<= level gnus-level-subscribed) ? )
+			   ((<= level gnus-level-unsubscribed) ?U)
+			   ((= level gnus-level-zombie) ?Z)
+			   (t ?K)))
 			(max 0 (- (1+ (cddr group)) (cadr group)))
 			(gnus-group-name-decode (car group) charset))))
 	     (list 'gnus-group (car group)))
@@ -839,7 +839,7 @@ buffer.
 	(gnus-get-function (gnus-server-to-method server)
 			   'request-regenerate)
       (error
-	(error "This backend doesn't support regeneration")))
+       (error "This backend doesn't support regeneration")))
     (gnus-message 5 "Requesting regeneration of %s..." server)
     (unless (gnus-open-server server)
       (error "Couldn't open server"))

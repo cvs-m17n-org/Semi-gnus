@@ -141,10 +141,10 @@
 		  (push (list from time bstuff) contents))))
 	    (setq contents (nreverse contents))
 	    (dolist (art (cdr elem))
-		(push (list (car art)
-			    (nth (1- (cdr art)) contents)
-			    subject)
-		      nnwfm-articles))))
+	      (push (list (car art)
+			  (nth (1- (cdr art)) contents)
+			  subject)
+		    nnwfm-articles))))
 	(setq nnwfm-articles
 	      (sort nnwfm-articles 'car-less-than-car))
 	;; Now we have all the articles, conveniently in an alist
@@ -351,7 +351,7 @@
   (unless nnwfm-groups-alist
     (nnwfm-read-groups)
     (setq nnwfm-groups (cdr (assoc nnwfm-address
-					nnwfm-groups-alist)))))
+				   nnwfm-groups-alist)))))
 
 (deffoo nnwfm-open-server (server &optional defs connectionless)
   (nnheader-init-server-buffer)

@@ -105,7 +105,7 @@
   "Where nnwarchive will save its files.")
 
 (defvoo nnwarchive-type nil
-    "The type of nnwarchive.")
+  "The type of nnwarchive.")
 
 (defvoo nnwarchive-address ""
   "The address of nnwarchive.")
@@ -234,9 +234,9 @@
       (set-buffer nntp-server-buffer)
       (erase-buffer)
       (let (header)
-      (dolist (art articles)
-	(if (setq header (assq art nnwarchive-headers))
-	    (nnheader-insert-nov (cdr header))))))
+	(dolist (art articles)
+	  (if (setq header (assq art nnwarchive-headers))
+	      (nnheader-insert-nov (cdr header))))))
     (let ((elem (assoc group nnwarchive-headers-cache)))
       (if elem
 	  (setcdr elem nnwarchive-headers)
@@ -293,8 +293,8 @@
     (setq nnwarchive-login
 	  (or nnwarchive-login
 	      (read-string
-		 (format "Login at %s: " server)
-		 user-mail-address)))
+	       (format "Login at %s: " server)
+	       user-mail-address)))
     (setq nnwarchive-passwd
 	  (or nnwarchive-passwd
 	      (mail-source-read-passwd

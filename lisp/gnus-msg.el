@@ -127,18 +127,20 @@ nil (always encode using quoted-printable) or t (always use 8bit).
 Note that any value other than nil for HEADER infringes some RFCs, so
 use this option with care."
   :type '(repeat (list :tag "Permitted unencoded charsets"
-		  (choice :tag "Where"
-		   (regexp :tag "Group")
-		   (const :tag "Mail message" :value message-this-is-mail)
-		   (const :tag "News article" :value message-this-is-news))
-		  (choice :tag "Header"
-		   (const :tag "None" nil)
-		   (symbol :tag "Charset"))
-		  (choice :tag "Body"
-			  (const :tag "Any" :value t)
-			  (const :tag "None" :value nil)
-			  (repeat :tag "Charsets"
-				  (symbol :tag "Charset")))))
+		       (choice :tag "Where"
+			       (regexp :tag "Group")
+			       (const :tag "Mail message"
+				      :value message-this-is-mail)
+			       (const :tag "News article"
+				      :value message-this-is-news))
+		       (choice :tag "Header"
+			       (const :tag "None" nil)
+			       (symbol :tag "Charset"))
+		       (choice :tag "Body"
+			       (const :tag "Any" :value t)
+			       (const :tag "None" :value nil)
+			       (repeat :tag "Charsets"
+				       (symbol :tag "Charset")))))
   :group 'gnus-charset)
 
 ;;; Internal variables.

@@ -419,8 +419,8 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
        regexp))
 
     (when (or gnus-group-listed-groups
-	       (and (>= level gnus-level-killed)
-		    (<= lowest gnus-level-killed)))
+	      (and (>= level gnus-level-killed)
+		   (<= lowest gnus-level-killed)))
       (gnus-group-prepare-flat-list-dead
        (setq gnus-killed-list (sort gnus-killed-list 'string<))
        gnus-level-killed ?K regexp)

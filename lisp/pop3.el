@@ -215,7 +215,8 @@ Argument PORT specifies connecting port."
   (let* ((ssl-program-name
 	  pop3-ssl-program-name)
 	 (ssl-program-arguments
-	  `(,@pop3-ssl-program-arguments ,extra-arg
+	  `(,@pop3-ssl-program-arguments
+	    ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
 	 (process (open-ssl-stream name buffer host service)))
     (when process
@@ -243,8 +244,8 @@ Args are NAME BUFFER HOST SERVICE."
 	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 	(t
 	 (as-binary-process
-	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
+	  (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	      (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
@@ -266,15 +267,15 @@ Args are NAME BUFFER HOST SERVICE."
     (insert output)))
 
 (defun pop3-send-command (process command)
-    (set-buffer (process-buffer process))
-    (goto-char (point-max))
-;;    (if (= (aref command 0) ?P)
-;;	(insert "PASS <omitted>\r\n")
-;;      (insert command "\r\n"))
-    (setq pop3-read-point (point))
-    (goto-char (point-max))
-    (process-send-string process (concat command "\r\n"))
-    )
+  (set-buffer (process-buffer process))
+  (goto-char (point-max))
+;;  (if (= (aref command 0) ?P)
+;;      (insert "PASS <omitted>\r\n")
+;;    (insert command "\r\n"))
+  (setq pop3-read-point (point))
+  (goto-char (point-max))
+  (process-send-string process (concat command "\r\n"))
+  )
 
 (defun pop3-read-response (process &optional return)
   "Read the response from the server PROCESS.

@@ -137,7 +137,7 @@ encode lines starting with \"From\"."
 		(if (looking-at "From ")
 		    (replace-match "From=20" nil t)
 		  (if (looking-at "-")
-			(replace-match "=2D" nil t))))
+		      (replace-match "=2D" nil t))))
 	      (end-of-line)
 	      ;; Fold long lines.
 	      (while (> (current-column) 76) ; tab-width must be 1.

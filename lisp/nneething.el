@@ -352,7 +352,7 @@ included.")
 		 (progn
 		   (goto-char (point-min))
 		   (or (and (search-forward "\n\n" nil t)
-		      (1- (point)))
+			    (1- (point)))
 		       (point-max)))
 		 (point-max))
 	      (goto-char (point-min))

@@ -1697,7 +1697,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	       entries alist ofunc article last)
 	  (when articles
 	    (setq last (mail-header-number (caar (last articles))))
-	  ;; Not all backends support partial fetching.  In that case,
+	    ;; Not all backends support partial fetching.  In that case,
 	    ;; we just fetch the entire article.
 	    (unless (gnus-check-backend-function
 		     (and (string-match "^gnus-" (symbol-name request-func))
@@ -1712,8 +1712,8 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	      (widen)
 	      (when (funcall request-func article gnus-newsgroup-name)
 		(goto-char (point-min))
-	    ;; If just parts of the article is to be searched, but the
-	    ;; backend didn't support partial fetching, we just narrow
+		;; If just parts of the article is to be searched, but the
+		;; backend didn't support partial fetching, we just narrow
 		;; to the relevant parts.
 		(when ofunc
 		  (if (eq ofunc 'gnus-request-head)
@@ -1868,7 +1868,7 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 	    ;; Update expire date
 	    (cond ((null date))		;Permanent entry.
 		  ((and found gnus-update-score-entry-dates)
-					;Match, update date.
+		   ;Match, update date.
 		   (gnus-score-set 'touched '(t) alist)
 		   (setcar (nthcdr 2 kill) now))
 		  ((and expire (< date expire))	;Old entry, remove.

@@ -302,8 +302,8 @@
       (mc-encrypt-generic
        (or (message-options-get 'message-recipients)
 	   (message-options-set 'message-recipients
-			      (mc-cleanup-recipient-headers
-			       (read-string "Recipients: "))))
+				(mc-cleanup-recipient-headers
+				 (read-string "Recipients: "))))
        nil nil nil
        (message-options-get 'message-sender))))
   (goto-char (point-min))

@@ -201,8 +201,8 @@
       (set-buffer nntp-server-buffer)
       (erase-buffer)
       (mm-with-unibyte-current-buffer
-       (dolist (header nnslashdot-headers)
-	 (nnheader-insert-nov (cdr header)))))
+	(dolist (header nnslashdot-headers)
+	  (nnheader-insert-nov (cdr header)))))
     'nov))
 
 (deffoo nnslashdot-sane-retrieve-headers (articles group)
@@ -248,7 +248,7 @@
 	 t)
 	(goto-char point)
 	(while (re-search-forward
-		  "<a name=\"\\([0-9]+\\)\"><\\(b\\|H4\\)>\\([^<]+\\)</\\(b\\|H4\\)>.*score:\\([^)]+\\))"
+		"<a name=\"\\([0-9]+\\)\"><\\(b\\|H4\\)>\\([^<]+\\)</\\(b\\|H4\\)>.*score:\\([^)]+\\))"
 		nil t)
 	  (setq article (string-to-number (match-string 1))
 		subject (match-string 3)

@@ -99,12 +99,12 @@
 		      (expand-file-name file gnus-audio-directory))))
     (when (file-exists-p sound-file)
       (cond ((and gnus-audio-inline-sound
-		 (condition-case nil
-		     ;; Even if we have audio, we may fail with the
-		     ;; wrong sort of sound file.
-		     (progn (play-sound-file sound-file)
-			    t)
-		   (error nil))))
+		  (condition-case nil
+		      ;; Even if we have audio, we may fail with the
+		      ;; wrong sort of sound file.
+		      (progn (play-sound-file sound-file)
+			     t)
+		    (error nil))))
 	    ;; If we don't have built-in sound, or playing it failed,
 	    ;; try with external program.
 	    ((equal "wav" (file-name-extension sound-file))
