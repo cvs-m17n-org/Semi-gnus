@@ -60,11 +60,11 @@
 
 (require 'rfc822)
 (eval-and-compile
-  (autoload 'customize-save-variable "cus-edit") ;; for Mule 2.
-  (autoload 'sha1 "sha1-el")
   (autoload 'gnus-find-method-for-group "gnus")
   (autoload 'nnvirtual-find-group-art "nnvirtual")
   (autoload 'gnus-group-decoded-name "gnus-group"))
+(eval-when-compile
+  (autoload 'sha1 "sha1-el"))
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
