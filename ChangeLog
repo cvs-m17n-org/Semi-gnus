@@ -1,8 +1,14 @@
+1998-12-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.051.
+
+	* Sync up with Pterodactyl Gnus v0.68.
+
 1998-12-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
 	fix.
-	
+
 1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Call
