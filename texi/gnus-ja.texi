@@ -11187,9 +11187,9 @@ are in reply to encrypted messages.  Gnus offers
 @code{gnus-message-replysignencrypted} (on by default) will sign
 automatically encrypted messages.
 
-Instructing MML to perform security operations on a @acronym{MIME} part is
-done using the @kbd{C-c C-m s} key map for signing and the @kbd{C-c
-C-m c} key map for encryption, as follows.
+Instructing @acronym{MML} to perform security operations on a
+@acronym{MIME} part is done using the @kbd{C-c C-m s} key map for
+signing and the @kbd{C-c C-m c} key map for encryption, as follows.
 
 @table @kbd
 
@@ -11232,7 +11232,7 @@ Digitally encrypt current message using @acronym{PGP/MIME}.
 @item C-c C-m C-n
 @kindex C-c C-m C-n
 @findex mml-unsecure-message
-Remove security related MML tags from message.
+Remove security related @acronym{MML} tags from message.
 
 @end table
 
@@ -24737,10 +24737,10 @@ C-m} に変わりました。
 @code{message-forward-show-mml} のディフォルトが @code{best} に変わりま
 した。
 
-値 @code{best} の振る舞いは、それがふさわしい場合は MML を表示する (すな
-わち MIME を MML に変換する) ことです。変換がディジタル署名を無効にして
-しまうので、署名された、または暗号化されたメッセージを転送するとき
-は MML は使われません。
+値 @code{best} の振る舞いは、それがふさわしい場合は @acronym{MML} を表示
+する (すなわち @acronym{MIME} に変換する) ことです。変換がディジタル署名
+を無効にしてしまうので、署名された、または暗号化されたメッセージを転送す
+るときは @acronym{MML} は使われません。
 @end itemize
 
 @iftex
