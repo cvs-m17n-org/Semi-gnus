@@ -767,8 +767,8 @@ Getting Mail
 * Mail Sources::                Gnus $B$K$I$3$+$i%a!<%k$r<h$C$F$/$k$+$rCN(B
                                 $B$i$;$k(B
 * Mail Back End Variables::     $B%a!<%k$N07$$$r%+%9%?%^%$%:$9$k$?$a$NJQ?t(B
-* Fancy Mail Splitting::        Gnus $B$OF~$C$FMh$?%a!<%k$NLS$N$h$&$JJ,N%(B
-                                $B$r$9$k$3$H$,$G$-$k(B
+* Fancy Mail Splitting::        Gnus $B$OF~$C$FMh$?%a!<%k$r!"?H$NLS$N$h$@(B
+                                $B$D$h$&$JJ,3d$r$9$k$3$H$,$G$-$k(B
 * Group Mail Splitting::        $B%a!<%kJ,3d$r6nF0$9$k$?$a$K%0%k!<%W%+%9%?(B
                                 $B%^%$%:$r;H$&(B
 * Incorporating Old Mail::      $B$"$J$?$,;}$C$F$$$k8E$$%a!<%k$r$I$&$9$k$+(B?
@@ -935,7 +935,6 @@ Various
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
-* Pay Hashcash::                CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 
 Formatting Variables
@@ -970,6 +969,12 @@ Picons
                                 $B$m$&(B
 * Picon Useless Configuration::  $B$=$NB>$N$V$C2u$7$?$j$R$M$C$?$j$$$8$C$?(B
                                 $B$jM7$s$@$j$9$kJQ?t(B
+
+Thwarting Email Spam
+
+* Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
+* SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
+* Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
 
 Appendices
 
@@ -11668,8 +11673,8 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 * Mail Sources::                Gnus $B$K$I$3$+$i%a!<%k$r<h$C$F$/$k$+$rCN(B
                                 $B$i$;$k(B
 * Mail Back End Variables::     $B%a!<%k$N07$$$r%+%9%?%^%$%:$9$k$?$a$NJQ?t(B
-* Fancy Mail Splitting::        Gnus $B$OF~$C$FMh$?%a!<%k$NLS$N$h$&$JJ,N%(B
-                                $B$r$9$k$3$H$,$G$-$k(B
+* Fancy Mail Splitting::        Gnus $B$OF~$C$FMh$?%a!<%k$r!"?H$NLS$N$h$@(B
+                                $B$D$h$&$JJ,3d$r$9$k$3$H$,$G$-$k(B
 * Group Mail Splitting::        $B%a!<%kJ,3d$r6nF0$9$k$?$a$K%0%k!<%W%+%9%?(B
                                 $B%^%$%:$r;H$&(B
 * Incorporating Old Mail::      $B$"$J$?$,;}$C$F$$$k8E$$%a!<%k$r$I$&$9$k$+(B?
@@ -14523,7 +14528,7 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 $B$OB8:_$7$F$$$k$H7h$a$^$7$?!#$b$C$H>\$7$/@bL@$9$k$H!"(B@sc{imap} $B$O<B:]$K$O(B
 $B5-;v$r>C5n$7$J$$!"5-;v$K(B @code{Deleted} $B$H$$$&0u$rIU$1$k35G0$,$"$j!"$3(B
 $B$l(B ($B$($C$H!"(B@code{Deleted} $B$H$$$&0u$rIU$1$k$3$H$G(B
-$B$9(B) $B$,(B nnimap $B$,(B Gnus $B$G5-;v$r>C5n$9$k$H$-$K$9$k$3$H$G$9(B (@kbd{G DEL} $B$J(B
+$B$9(B) $B$,(B nnimap $B$,(B Gnus $B$G5-;v$r>C5n$9$k$H$-$K$9$k$3$H$G$9(B (@kbd{B DEL} $B$J(B
 $B$I$G(B)$B!#(B
 ($BLuCm(B: $B%Q%k%a%K%G%9$O5*85A0(B 5 $B@$5*$N%.%j%7%"$N(B Elea $BGI$NE/3X<T(B)
 
@@ -14553,11 +14558,12 @@ nnimap $B$O$=$l$b%5%]!<%H$7$^$9!#$7$+$7!"(BSSLeay $B$N:G?7HG$G$"$k(B 0.9.x 
 @item nnimap-importantize-dormant
 @vindex nnimap-importantize-dormant
 
-$BHs(B-nil $B$@$C$?$i!"B>$N(B @sc{imap} $B%/%i%$%"%s%H$N$?$a$KJ]N15-;v$r0uIU$-$H$7(B
-$B$F$b0u$rIU$1$^$9!#(Bgnus $B$NFbIt$G$O!"J]N15-;v$O85!9$9$G$K0uIU$-$H$7$F$N$_(B
-$B0u$,IU$1$i$l$F$$$^$9!#$3$l$O!"B>$N(B @sc{imap} $B%/%i%$%"%s%H$K$*$1$kJ]N15-(B
-$B;v$r!"$"$?$+$b0uIU$-$N$h$&$K$-$oN)$?$;$^$9!#(B($BJL$N8@$$J}$r$9$k$H!"(Bgnus $B$O(B
-$BFs$D$N0u$rIU$1!"(B@sc{imap} $B$O$?$C$?0l$D$@$H$$$&$3$H$G$9!#(B)
+$BHs(B-nil ($B%G%#%U%)%k%H(B) $B$@$C$?$i!"B>$N(B @sc{imap} $B%/%i%$%"%s%H$N$?$a$KJ]N1(B
+$B5-;v$r0uIU$-$H$7$F$b0u$rIU$1$^$9!#(Bgnus $B$NFbIt$G$O!"J]N15-;v$O85!9$9$G$K(B
+$BJ]N15-;v$H$7$F$N$_0u$,IU$1$i$l$F$$$^$9!#$3$l$O!"B>$N(B @sc{imap} $B%/%i%$%"(B
+$B%s%H$K$*$1$kJ]N15-;v$r!"$"$?$+$b0uIU$-$N$h$&$K$-$oN)$?$;$^$9!#(B($BJL$N8@$$(B
+$BJ}$r$9$k$H!"(Bgnus $B$OFs$D$N0u$rIU$1!"(B@sc{imap} $B$O$?$C$?0l$D$@$H$$$&$3$H$G(B
+$B$9!#(B)
 
 $B$?$V$s$3$l$r$$$8$j$^$o$9$N$O!"$"$J$?$,%f!<%6C10L$NJ]N1%U%i%0$rIU$1$h$&$H(B
 $B$9$k$@$1$NM}M3$K$h$k$G$7$g$&!#$3$s$J46$8$G(B:
@@ -18491,7 +18497,6 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
-* Pay Hashcash::                CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 @end menu
 
@@ -20226,8 +20231,21 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 
 $B$3$l$OITL{2w$G$9!#(B
 
-$B$3$l$KBP=h$9$kJ}K!$O!"(Bgnus $B$KA4$F$N(B spam $B$r(B @samp{spam} $B%a!<%k%0%k!<%W$K(B
-$BJ,N%$5$;$F$7$^$&$3$H$G$9(B (@pxref{Splitting Mail})$B!#(B
+@menu
+* Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
+* SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
+* Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
+@end menu
+
+@node Anti-Spam Basics
+@subsection Spam $BB`<#$N4pAC(B
+@cindex email spam
+@cindex spam
+@cindex UCE
+@cindex unsolicited commercial email
+
+Spam $B$KBP=h$9$k0l$D$NJ}K!$O!"(Bgnus $B$KA4$F$N(B spam $B$r(B @samp{spam} $B%a!<%k%0(B
+$B%k!<%W$KJ,N%$5$;$F$7$^$&$3$H$G$9(B (@pxref{Splitting Mail})$B!#(B
 
 $B:G=i$K!"$"$J$?$KE~C#@-$N$"$k@5$7$$%a!<%k%"%I%l%9$r0l$DA*$S!"$=$l$rA4$F$N(B
 $B$"$J$?$N%K%e!<%95-;v$N(B @code{From} $B%X%C%@!<$KF~$l$^$9!#(B($B$3$3$G$O(B
@@ -20294,15 +20312,102 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 $B$3$H$OA4$/$"$j$^$;$s!#F@!9>uBV$G$9!#;d$N0U8+$H$7$F$O!"(B@code{From} $B%X%C%@!<(B
 $B$r56B$$7$FB8:_$7$J$$%I%a%$%s$KAw$i$;$k$N$O%-%?%J%$$G$9!#(B
 
-@node Pay Hashcash
-@section Pay Hashcash
+@node SpamAssassin
+@subsection SpamAssassin, Vipul's Razor, DCC, etc
+@cindex SpamAssassin
+@cindex Vipul's Razor
+@cindex DCC
+
+Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
+$B<u$1<h$C$?$?$/$5$s$N(B spam $B$r8:$i$9$?$a$NB?$/$NF;6q$,$"$j$^$9!#$3$N9`$O?7(B
+$B5lCV$-49$($K$h$C$F$9$0$K;~BeCY$l$K$J$C$F$7$^$&$G$7$g$&$,!"9,$$$J$3$H$K$[(B
+$B$H$s$I$NF;6q$ON`;w$N%$%s%?!<%U%'!<%9$r;}$C$F$$$^$9!#$3$N9`$ONc$H$7(B
+$B$F(B SpamAssassin $B$r;H$C$F$$$^$9$,!"B>$N$[$H$s$I$NF;6q$K$b4JC1$KE,9g$9$k$O(B
+$B$:$G$9!#(B
+
+$B$b$7$"$J$?$,;H$&F;6q$,%a!<%k%5!<%P!<$K%$%s%9%H!<%k$5$l$F$$$J$$$J$i$P!"$"(B
+$B$J$?<+?H$,$=$l$r8F$S=P$9I,MW$,$"$j$^$9!#0J2<$K(B @code{:postscript} $B%a!<%k(B
+$B%=!<%9;X<(;R(B (@pxref{Mail Source Specifiers}) $B$r;H$&>l9g$N9M$(J}$r<($7$^(B
+$B$9!#(B
+
+@lisp
+(setq mail-sources
+      '((file :prescript "formail -bs spamassassin < /var/mail/%u")
+        (pop :user "jrl"
+             :server "pophost" 
+             :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
+@end lisp
+
+$B$$$C$?$s%a!<%k$r<u$1$k%9%W!<%k$G!"Nc$($P(B spam $B$G$"$k$3$H$rI=<($9$k%X%C%@!<(B
+$B$r%a!<%k$K4^$a$k$h$&$K$7$F!"$=$l$r$U$k$$Mn$H$9=`Hw$r$7$^$9!#;H$&$N$OIaDL(B
+$B$NJ,3dJ}<0(B (@pxref{Splitting Mail}) $B$G$9(B:
+
+@lisp
+(setq nnmail-split-methods '(("spam"  "^X-Spam-Flag: YES")
+                             ...))
+@end lisp
+
+Or using fancy split methods (@pxref{Fancy Mail Splitting}):
+
+@lisp
+(setq nnmail-split-methods 'nnmail-split-fancy
+      nnmail-split-fancy '(| ("X-Spam-Flag" "YES" "spam")
+                             ...))
+@end lisp
+
+$B$$$/$i$+$N?M$?$A$O(B @code{:prescript} $B$r;H$C$F%a!<%k$r$$$m$s$J%W%m%0%i%`(B
+$B$K%Q%$%W$9$k$3$H$r7y$&$+$b$7$l$^$;$s(B ($B$b$72?$+$N%W%m%0%i%`$K%P%0$,$"$C$?(B
+$B$i!"$9$Y$F$N%a!<%k$r<:$C$F$7$^$&$+$b$7$l$^$;$s(B)$B!#$"$J$?$,$=$l$i$N0l?M$J(B
+$B$i$P!"JL$N2r$OJ,3d$9$k$H$-$K30It$NF;6q$r8F$V$3$H$G$9!#FC5iJ,3dJ}<0$NNc$G(B
+$B$9(B:
+
+@lisp
+(setq nnmail-split-fancy '(| (: kevin-spamassassin)
+                             ...))
+(defun kevin-spamassassin ()
+  (save-excursion
+    (let ((buf (or (get-buffer " *nnmail incoming*")
+		   (get-buffer " *nnml move*"))))
+      (if (not buf)
+	  (progn (message "Oops, cannot find message buffer") nil)
+	(set-buffer buf)
+	(if (eq 1 (call-process-region (point-min) (point-max)
+				       "spamc" nil nil nil "-c"))
+	    "spam")))))
+@end lisp
+
+$B0J>e$,$3$l$K4X$9$k$3$H$G$9!#$$$/$D$+$N(B spam $B$O$I$&$7$F$bAGDL$j$7$F$7$^$&(B
+$B$N$G!"(Bspam $B$rFI$`$O$a$K$J$C$?$H$-$K8F$V$?$a$N5$$NMx$$$?4X?t$,M_$7$$$G$7$g(B
+$B$&!#$3$l$,$=$N5$$NMx$$$?4X?t$G$9(B:
+
+@lisp
+ (defun my-gnus-raze-spam ()
+  "Submit SPAM to Vipul's Razor, then mark it as expirable."
+  (interactive)
+  (gnus-summary-show-raw-article)
+  (gnus-summary-save-in-pipe "razor-report -f -d")
+  (gnus-summary-mark-as-expirable 1))
+@end lisp
+
+@node Hashcash
+@subsection Hashcash
 @cindex hashcash
-@cindex spam
 
 Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
-$B$rAw?.<T$K6/$$$^$9!#$3$l$OG$0U$J$N$G!"$9$Y$F$N?M$,$3$N5;K!$r;H$&$3$H$OEv(B
-$B$F$K$G$-$J$$$H$$$&L@$i$+$J7gE@$,$"$j$^$9$,!">.5,LO$J6&F1BN$G$OLr$KN)$D$G(B
-$B$7$g$&!#(B
+$B$rAw?.<T$K6/$$$^$9!#$3$l$O%$%s%?!<%M%C%HI8=`$N0lIt$G$O$J$$$N$G!"@$3&Cf$N(B
+$B$9$Y$F$N?M$,$3$N5;K!$r;H$&$3$H$OEv$F$K$G$-$J$$$H$$$&L@$i$+$J7gE@$,$"$j$^(B
+$B$9$,!">.5,LO$J6&F1BN$G$OLr$KN)$D$G$7$g$&!#(B
+
+$BA09`$NF;6qN`$,<B:]$K$&$^$/F/$$$?$H$7$F$b!"?7$7$$7A<0$N(B spam $B$,8=$l$k$?$S(B
+$B$K$7$g$C$A$e$&99?7$+$D@0Hw$5$l$k$3$H$K$h$C$F$N$_F0:n$7$^$9!#$3$N$3$H$O!"(B
+$B>.$5$J%Q!<%;%s%F!<%8$N(B spam $B$,$$$D$bAGDL$j$7$F$7$^$&$3$H$r0UL#$7$^$9!#$=(B
+$B$l$O$^$?!"$I$3$+$G$@$l$+$,$=$l$i$NF;6q$r99?7$9$k$?$a$K!"$?$/$5$s(B
+$B$N(B spam $B$rFI$^$J$1$l$P$J$i$J$$$3$H$r$b0UL#$7$^$9!#(BHashcash $B$O$=$l$r2sHr(B
+$B$7$^$9$,!"Be$o$j$K$"$J$?$,DL?.$9$k$9$Y$F$N?M$?$A$,!"$=$N;EAH$_$r;H$C$F$$(B
+$B$k$3$H$,I,MW$G$9!#$"$J$?$O<BMQ(B (pragmatic) $B$H65>r(B (dogmatic) $B$NFs$D$N<h(B
+$B$jAH$_$r9M$($k$3$H$,$G$-$^$9!#$=$l$i$N<h$jAH$_$K$OMxE@$b$"$l$PITMx$JE@$b(B
+$B$"$j$^$9$,!"$=$l$O@$$NCf$G$OIaDL$N$3$H$G!"$=$l$i$rO"78$5$;$?$b$N$,B>$N$P(B
+$B$i$P$i$J$b$N$h$j6/NO$J$N$G$9!#(B
 
 @cindex X-Hashcash
 $B!V$$$/$P$/$+$NIiC4!W$H$O(B CPU $B;~4V$r>CHq$9$k$3$H$G!"6qBNE*$K$O0lDj?t$N%S%C(B
