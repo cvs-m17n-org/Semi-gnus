@@ -1,3 +1,10 @@
+1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Strip
+	method and foreign server name from the newsgroup name.
+
 1999-03-22  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-popup-menu): Fix.
