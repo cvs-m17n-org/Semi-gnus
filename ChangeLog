@@ -1,3 +1,15 @@
+2001-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* lisp/nntp.el (nntp-request-newgroups): Use UTC date for
+	NEWGROUPS command.
+
+	* lisp/gnus-start.el (gnus-find-new-newsgroups): Use
+	`message-make-date' instead of `current-time-string'.
+	(gnus-ask-server-for-new-groups): Ditto.
+	(gnus-check-first-time-used): Ditto.
+
 2001-07-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-yank-original): Unwind-protect while
