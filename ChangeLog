@@ -1,5 +1,11 @@
 2003-06-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/nnshimbun.el: Moved to the emacs-w3m package.
+
+2003-06-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* texi/infohack.el (infohack-texi-format): Encode messages to
 	terminal while formatting info pages.
 

@@ -537,9 +537,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
-	  (condition-case nil
-	      (progn (require 'shimbun) nil)
-	    (error '("nnshimbun.el")))
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error

@@ -162,16 +162,16 @@ Both characters must have the same length of multi-byte form."
 		(fset 'message
 		      (byte-compile
 		       (if (boundp 'MULE)
-			   (lambda (fmt &rest args)
-			     (funcall si:message "%s"
-				      (code-convert-string
-				       (apply 'format fmt args)
-				       '*internal* '*junet*)))
-			 (lambda (fmt &rest args)
-			   (funcall si:message "%s"
-				    (encode-coding-string
-				     (apply 'format fmt args)
-				     'iso-2022-7bit))))))
+			   `(lambda (fmt &rest args)
+			      (funcall ,si:message "%s"
+				       (code-convert-string
+					(apply 'format fmt args)
+					'*internal* '*junet*)))
+			 `(lambda (fmt &rest args)
+			    (funcall ,si:message "%s"
+				     (encode-coding-string
+				      (apply 'format fmt args)
+				      'iso-2022-7bit))))))
 		(unwind-protect
 		    (texinfo-format-buffer nil)
 		  (fset 'message si:message)))
