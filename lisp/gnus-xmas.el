@@ -482,28 +482,7 @@ call it with the value of the `gnus-data' text property."
 	    'x-color-values
 	  (lambda (color)
 	    (color-instance-rgb-components
-	     (make-color-instance color)))))
-
-  (when (featurep 'mule)
-    (defun gnus-tilde-pad-form (el pad-width)
-      "Return a form that pads EL to PAD-WIDTH."
-      (let ((pad (abs pad-width)))
-	(if (symbolp el)
-	    (if (< pad-width 0)
-		`(concat ,el (make-string
-			      (max 0 (- ,pad (string-width ,el))) ?\ ))
-	      `(concat (make-string
-			(max 0 (- ,pad (string-width ,el))) ?\ )
-		       ,el))
-	  (if (< pad-width 0)
-	      `(let ((val (eval ,el)))
-		 (concat val (make-string
-			      (max 0 (- ,pad (string-width val))) ?\ )))
-	    `(let ((val (eval ,el)))
-	       (concat (make-string
-			(max 0 (- ,pad (string-width val))) ?\ )
-		       val))))))
-    ))
+	     (make-color-instance color))))))
 
 (defun gnus-xmas-redefine ()
   "Redefine lots of Gnus functions for XEmacs."
@@ -605,6 +584,25 @@ the resulting string may be narrower than END-COLUMN.
 	  (if padding
 	      (concat head-padding str tail-padding)
 	    str))))
+
+    (defun gnus-tilde-pad-form (el pad-width)
+      "Return a form that pads EL to PAD-WIDTH."
+      (let ((pad (abs pad-width)))
+	(if (symbolp el)
+	    (if (< pad-width 0)
+		`(concat ,el (make-string
+			      (max 0 (- ,pad (string-width ,el))) ?\ ))
+	      `(concat (make-string
+			(max 0 (- ,pad (string-width ,el))) ?\ )
+		       ,el))
+	  (if (< pad-width 0)
+	      `(let ((val (eval ,el)))
+		 (concat val (make-string
+			      (max 0 (- ,pad (string-width val))) ?\ )))
+	    `(let ((val (eval ,el)))
+	       (concat (make-string
+			(max 0 (- ,pad (string-width val))) ?\ )
+		       val))))))
 
     (defun gnus-tilde-max-form (el max-width)
       "Return a form that limits EL to MAX-WIDTH."

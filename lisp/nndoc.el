@@ -468,7 +468,7 @@ from the document.")
 	  (limit (point)))
       (goto-char (point-min))
       (or (save-excursion (re-search-forward "^MIME-Version:" limit t))
-	  (insert "Mime-Version: 1.0\n")))
+	  (insert "MIME-Version: 1.0\n")))
     ;; Generate default header before entity fields.
     (goto-char (point-min))
     (nndoc-generate-mime-parts-head article t)))

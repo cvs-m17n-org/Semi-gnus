@@ -1405,10 +1405,6 @@ increase the score of each group you read."
     "c" gnus-article-highlight-citation
     "s" gnus-article-highlight-signature)
 
-  (gnus-define-keys (gnus-summary-wash-mime-map "M" gnus-summary-wash-map)
-    "w" gnus-article-decode-mime-words
-    "c" gnus-article-decode-charset)
-  
   (gnus-define-keys (gnus-summary-wash-time-map "T" gnus-summary-wash-map)
     "z" gnus-article-date-ut
     "u" gnus-article-date-ut
@@ -1508,10 +1504,6 @@ increase the score of each group you read."
               ["Headers" gnus-article-highlight-headers t]
               ["Signature" gnus-article-highlight-signature t]
               ["Citation" gnus-article-highlight-citation t])
-	     ("MIME"
-	      ["Words" gnus-article-decode-mime-words t]
-	      ["Charset" gnus-article-decode-charset t]
-	      ["QP" gnus-article-de-quoted-unreadable t])
              ("Date"
               ["Local" gnus-article-date-local t]
               ["ISO8601" gnus-article-date-iso8601 t]
@@ -1903,7 +1895,6 @@ The following commands are available:
   (make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
-  (mm-enable-multibyte)
   (gnus-update-format-specifications nil 'summary 'summary-mode 'summary-dummy)
   (gnus-update-summary-mark-positions))
 
@@ -4237,7 +4228,7 @@ If WHERE is `summary', the summary mode line format will be used."
 	  ;; We might have to chop a bit of the string off...
 	  (when (> (length mode-string) max-len)
 	    (setq mode-string
-		  (concat (truncate-string mode-string (- max-len 3))
+		  (concat (gnus-truncate-string mode-string (- max-len 3))
 			  "...")))
 	  ;; Pad the mode string a bit.
 	  (setq mode-string (format (format "%%-%ds" max-len) mode-string))))

@@ -36,7 +36,6 @@
 (require 'browse-url)
 (require 'alist)
 (require 'mime-view)
-(require 'mm-bodies)
 
 (defgroup gnus-article nil
   "Article display."
@@ -958,8 +957,6 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-;;
-;; Semi-gnus specific
 (defun gnus-article-decode-rfc1522 ()
   "Decode MIME encoded-words in header fields."
   (let (buffer-read-only)
@@ -968,73 +965,6 @@ characters to translate to."
 		     default-mime-charset)))
       (eword-decode-header charset)
       )))
-;; Semi-gnus specific
-;;
-
-;; - pgnus specific
-(defun gnus-article-decode-mime-words ()
-  "Decode all MIME-encoded words in the article."
-  (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let ((inhibit-point-motion-hooks t)
-	  buffer-read-only)
-      (rfc2047-decode-region (point-min) (point-max)))))
-
-(defun gnus-article-decode-charset (&optional prompt)
-  "Decode charset-encoded text in the article.
-If PROMPT (the prefix), prompt for a coding system to use."
-  (interactive "P")
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let* ((inhibit-point-motion-hooks t)
-	   (ct (message-fetch-field "Content-Type" t))
-	   (cte (message-fetch-field "Content-Transfer-Encoding" t))
-	   (charset (cond
-		     (prompt
-		      (mm-read-coding-system "Charset to decode: "))
-		     (ct
-		      (mm-content-type-charset ct))
-		     (gnus-newsgroup-name
-		      (gnus-group-find-parameter
-		       gnus-newsgroup-name 'charset))))
-	   buffer-read-only)
-      (save-restriction
-	(goto-char (point-min))
-	(search-forward "\n\n" nil 'move)
-	(narrow-to-region (point) (point-max))
-	(mm-decode-body
-	 charset (and cte (intern (downcase (gnus-strip-whitespace cte)))))))))
-
-(defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
-(defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
-(defun article-decode-rfc1522 ()
-  "Remove QP encoding from headers."
-  (let ((inhibit-point-motion-hooks t)
-	(buffer-read-only nil))
-    (save-restriction
-      (message-narrow-to-head)
-      (rfc2047-decode-region (point-min) (point-max)))))
-
-(defun article-de-quoted-unreadable (&optional force)
-  "Translate a quoted-printable-encoded article.
-If FORCE, decode the article whether it is marked as quoted-printable
-or not."
-  (interactive (list 'force))
-  (save-excursion
-    (let ((buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding")))
-      (gnus-article-decode-rfc1522)
-      (when (or force
-		(and type (string-match "quoted-printable" (downcase type))))
-	(goto-char (point-min))
-	(search-forward "\n\n" nil 'move)
-	(quoted-printable-decode-region (point) (point-max))))))
-
-(defun article-mime-decode-quoted-printable-buffer ()
-  "Decode Quoted-Printable in the current buffer."
-  (quoted-printable-decode-region (point-min) (point-max)))
-;; - pgnus specific
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1931,8 +1861,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Hide signature" gnus-article-hide-signature t]
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
-       ["Remove carriage return" gnus-article-remove-cr t]
-       ))
+       ["Remove carriage return" gnus-article-remove-cr t]))
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency
 
@@ -1976,7 +1905,6 @@ commands:
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (set-syntax-table gnus-article-mode-syntax-table)
-  (mm-enable-multibyte)
   (gnus-run-hooks 'gnus-article-mode-hook))
 
 (defun gnus-article-setup-buffer ()
@@ -2162,8 +2090,6 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      ;; Hooks for getting information from the article.
-	      ;; This hook must be called before being narrowed.
 	      (let ((method
 		     (if gnus-show-mime
 			 (progn
@@ -2173,6 +2099,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			       gnus-article-display-method-for-mime
 			     gnus-article-display-method-for-encoded-word))
 		       gnus-article-display-method-for-traditional)))
+		;; Hooks for getting information from the article.
+		;; This hook must be called before being narrowed.
 		(gnus-run-hooks 'gnus-tmp-internal-hook)
 		(gnus-run-hooks 'gnus-article-prepare-hook)
 		;; Display message.

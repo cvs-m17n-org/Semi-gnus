@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.9.07"
+(defconst gnus-version-number "6.9.08"
   "Version number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.13"
@@ -1358,15 +1358,11 @@ face."
 (defcustom gnus-article-display-hook
   (if (and (string-match "XEmacs" emacs-version)
 	   (featurep 'xface))
-;;    '(gnus-article-decode-charset	- comment out for Semi-gnus
-;;	gnus-article-decode-rfc1522	- comment out for Semi-gnus
       '(gnus-article-hide-headers-if-wanted
 	gnus-article-hide-boring-headers
 	gnus-article-treat-overstrike
 	gnus-article-maybe-highlight
 	gnus-article-display-x-face)
-;;    '(gnus-article-decode-charset	- comment out for Semi-gnus
-;;      gnus-article-decode-rfc1522	- comment out for Semi-gnus
     '(gnus-article-hide-headers-if-wanted
       gnus-article-hide-boring-headers
       gnus-article-treat-overstrike
@@ -1494,6 +1490,12 @@ want."
   "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
   "The mail address of the Gnus maintainers.")
 
+(defconst semi-gnus-developers
+  "Semi-gnus Developers:
+ semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
+ semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
+  "The mail address of the Semi-gnus developers.")
+
 (defvar gnus-info-nodes
   '((gnus-group-mode "(gnus)The Group Buffer")
     (gnus-summary-mode "(gnus)The Summary Buffer")
@@ -1584,8 +1586,6 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	  (cdr package)))))
    '(("info" Info-goto-node)
      ("pp" pp pp-to-string pp-eval-expression)
-     ("qp" quoted-printable-decode-region quoted-printable-decode-string)
-     ("rfc2047" rfc2047-decode-region rfc2047-decode-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
@@ -1718,7 +1718,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-date-original gnus-article-date-lapsed
       gnus-article-show-all-headers
       gnus-article-edit-mode gnus-article-edit-article
-      gnus-article-edit-done gnus-decode-rfc1522 article-decode-rfc1522
+      gnus-article-edit-done
       gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1

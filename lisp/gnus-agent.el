@@ -655,15 +655,14 @@ the actual number of articles toggled is returned."
 		  (gnus-agent-group-path group) "/"))
 	    (date (gnus-time-to-day (current-time)))
 	    (case-fold-search t)
-	    pos alists crosses id elem)
+	    pos crosses id elem)
 	(gnus-make-directory dir)
 	(gnus-message 7 "Fetching articles for %s..." group)
 	;; Fetch the articles from the backend.
 	(if (gnus-check-backend-function 'retrieve-articles group)
 	    (setq pos (gnus-retrieve-articles articles group))
 	  (with-temp-file nil
-	    (let ((buf (current-buffer))
-		  article)
+	    (let (article)
 	      (while (setq article (pop articles))
 		(when (gnus-request-article article group)
 		  (goto-char (point-max))
@@ -975,8 +974,8 @@ the actual number of articles toggled is returned."
 (defvar gnus-category-buffer "*Agent Category*")
 
 (defvar gnus-category-line-format-alist
-  `((?c name ?s)
-    (?g groups ?d)))
+  `((?c gnus-tmp-name ?s)
+    (?g gnus-tmp-groups ?d)))
 
 (defvar gnus-category-mode-line-format-alist
   `((?u user-defined ?s)))
@@ -1052,15 +1051,15 @@ The following commands are available:
 (defalias 'gnus-category-position-point 'gnus-goto-colon)
 
 (defun gnus-category-insert-line (category)
-  (let* ((name (car category))
-	 (groups (length (cadddr category))))
+  (let* ((gnus-tmp-name (car category))
+	 (gnus-tmp-groups (length (cadddr category))))
     (beginning-of-line)
     (gnus-add-text-properties
      (point)
      (prog1 (1+ (point))
        ;; Insert the text.
        (eval gnus-category-line-format-spec))
-     (list 'gnus-category name))))
+     (list 'gnus-category gnus-tmp-name))))
 
 (defun gnus-enter-category-buffer ()
   "Go to the Category buffer."
@@ -1319,14 +1318,14 @@ The following commands are available:
 				  (cdr (assq 'dormant
 					     (gnus-info-marks info)))))
 		   nov-file (gnus-agent-article-name ".overview" group))
- 	     (gnus-agent-load-alist group)
+	     (gnus-agent-load-alist group)
 	     (gnus-message 5 "Expiring articles in %s" group)
 	     (set-buffer overview)
 	     (erase-buffer)
 	     (when (file-exists-p nov-file)
 	       (nnheader-insert-file-contents nov-file))
 	     (goto-char (point-min))
- 	     (setq article 0)
+	     (setq article 0)
 	     (while (setq elem (pop articles))
 	       (setq article (car elem))
 	       (when (or (null low)

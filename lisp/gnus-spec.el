@@ -241,6 +241,14 @@
     (point) (progn ,@form (point))
     '(gnus-face t face ,(symbol-value (intern (format "gnus-face-%d" type))))))
 
+;;; Avoid byte-compile warning.
+(defun gnus-tilde-pad-form (el pad-width)
+  "Dummy function except for XEmacs-mule. It will be redefined
+by `gnus-xmas-redefine'."
+  (if (symbolp el)
+      `(eval ,el)
+    `,el))
+
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
   (let ((max (abs max-width)))
@@ -281,11 +289,6 @@
     `(let ((val (eval ,el)))
        (if (equal val ,ignore-value)
 	   "" val))))
-
-;;; dummy function. XEmacs will redefine this.
-(defun gnus-tilde-pad-form (el pad-width)
-  "Return a form that pads EL to PAD-WIDTH."
-  )
 
 (defun gnus-parse-format (format spec-alist &optional insert)
   ;; This function parses the FORMAT string with the help of the

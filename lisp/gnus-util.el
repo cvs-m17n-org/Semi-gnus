@@ -534,8 +534,7 @@ Timezone package is used."
 	(set-buffer gnus-work-buffer)
 	(erase-buffer))
     (set-buffer (gnus-get-buffer-create gnus-work-buffer))
-    (kill-all-local-variables)
-    (mm-enable-multibyte)))
+    (kill-all-local-variables)))
 
 (defmacro gnus-group-real-name (group)
   "Find the real name of a foreign newsgroup."
