@@ -3058,9 +3058,11 @@ value of the variable `gnus-show-mime' is non-nil."
     (gnus-mime-pipe-part "|" "Pipe To Command...")))
 
 (defun gnus-article-mime-part-status ()
-  (if gnus-article-mime-handle-alist-1
-      (format " (%d parts)" (length gnus-article-mime-handle-alist-1))
-    ""))
+  (with-current-buffer gnus-article-buffer
+    (let ((entity (get-text-property (point-min) 'mime-view-entity)))
+      (if (and entity (mime-entity-children entity))
+	  (format " (%d parts)" (length (mime-entity-children entity)))
+	""))))
 
 (defvar gnus-mime-button-map nil)
 (unless gnus-mime-button-map
