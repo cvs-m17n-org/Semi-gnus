@@ -1,3 +1,11 @@
+1999-09-04   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-configure-posting-styles): Quote `:file'.
+
+	* lisp/pop3.el (pop3-save-uidls): Don't use `dotimes' to check
+	backets of `pop3-uidl-obarray'; don't clear `pop3-uidl-obarray'.
+	(pop3-quit): Clear `pop3-uidl-obarray'.
+
 1999-09-03  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
