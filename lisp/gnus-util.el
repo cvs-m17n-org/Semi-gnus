@@ -1335,6 +1335,13 @@ CHOICE is a list of the choice char and help message at IDX."
 		   (symbol-value 'focus-follows-mouse))
 	   (set-mouse-position frame (1- (frame-width frame)) 0)))))
 
+(unless (fboundp 'frame-parameter)
+  (defalias 'frame-parameter
+    (lambda (frame parameter)
+      "Return FRAME's value for parameter PARAMETER.
+If FRAME is nil, describe the currently selected frame."
+      (cdr (assq parameter (frame-parameters frame))))))
+
 (defun gnus-frame-or-window-display-name (object)
   "Given a frame or window, return the associated display name.
 Return nil otherwise."
