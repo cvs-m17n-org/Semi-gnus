@@ -4589,35 +4589,37 @@ when could not found legal MIME charset for sending message."
   (when (or message-locale-detect-for-news
 	    message-locale-detect-for-mail)
     (save-excursion
-      (message-narrow-to-head)
-      (let (lc dest)
-	(when message-locale-detect-for-news
-	  (setq lc (mapcar
-		    (lambda (newsgroup)
-		      (funcall message-locale-detect-for-news
-			       (and (string-match "[^ \t]+" newsgroup)
-				    (match-string 0 newsgroup))))
-		    (message-tokenize-header
-		     (message-fetch-field "newsgroups")))))
-	(when message-locale-detect-for-mail
-	  (let ((field-list '("to" "cc" "bcc")))
-	    (while (car field-list)
-	      (setq lc (append
-			lc
-			(mapcar
-			 (lambda (address)
-			   (funcall message-locale-detect-for-mail
-				    (car (cdr (std11-extract-address-components
-					       address)))))
-			 (message-tokenize-header
-			  (message-fetch-field (pop field-list)))))))))
-	(setq lc (delq nil lc))
-	(while lc
-	  (setq dest (cons (car lc) dest)
-		lc (delq (car lc) lc)))
-	(or dest
-	    (list message-locale-default))
-      ))))
+      (save-restriction
+	(message-narrow-to-head)
+	(let (lc dest)
+	  (when message-locale-detect-for-news
+	    (setq lc (mapcar
+		      (lambda (newsgroup)
+			(funcall message-locale-detect-for-news
+				 (and (string-match "[^ \t]+" newsgroup)
+				      (match-string 0 newsgroup))))
+		      (message-tokenize-header
+		       (message-fetch-field "newsgroups")))))
+	  (when message-locale-detect-for-mail
+	    (let ((field-list '("to" "cc" "bcc")))
+	      (while (car field-list)
+		(setq lc (append
+			  lc
+			  (mapcar
+			   (lambda (address)
+			     (funcall message-locale-detect-for-mail
+				      (car
+				       (cdr (std11-extract-address-components
+					     address)))))
+			   (message-tokenize-header
+			    (message-fetch-field (pop field-list)))))))))
+	  (setq lc (delq nil lc))
+	  (while lc
+	    (setq dest (cons (car lc) dest)
+		  lc (delq (car lc) lc)))
+	  (or dest
+	      (list message-locale-default))
+	  )))))
 
 (defvar message-locale-newsgroup-alist
   '(("^fj\\." . fj)
