@@ -5,8 +5,8 @@ srcdir = @srcdir@
 
 @SET_MAKE@
 EMACS = @EMACS@
-XEMACS = xemacs
-PACKAGEDIR =
+XEMACS = @XEMACS@
+PACKAGEDIR = @PACKAGEDIR@
 
 all: lick info
 
