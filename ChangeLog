@@ -1,3 +1,23 @@
+2001-12-25  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.27 (This is alpha status.)
+	Import `gnus-namazu.el' from T-gnus. (Thanks Tsuchiya-SAN.)
+	Fix a bug.
+
+	* lisp/gnus-namazu.el: Import from T-gnus.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.27.
+
+	* lisp/gnus-group.el (gnus-group-mode-map): Define "\C-c\C-n" as
+	`gnus-namazu-search'.
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Ditto.
+
+	* lisp/gnus.el (TopLevel): Add autoload of `gnus-namazu-search'.
+
+	* lisp/message.el (message-cancel-news): Could not cancel article,
+	fixed.
+
 2001-09-17  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.26 (This is alpha status.)
@@ -441,7 +461,7 @@
 	`pop3-connection-type', `pop3-leave-mail-on-server',
 	`pop3-maximum-message-size' and `pop3-except-header-regexp'.
 
-2000-02-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+2000-02-11  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.6 (This is alpha status.)
 	See announcement of 7.1.0.3.
