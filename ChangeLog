@@ -1,3 +1,7 @@
+1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* TODO.ja: New file.
+
 1998-10-05  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus.el (gnus-info-filename): New variable.
@@ -10,6 +14,12 @@
 	`message-send-news-function' or `message-send-mail-function'
 	instead of `message-send-and-exit'.
 
+1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Bug fix.
+	Delete variable pop3-fma-movemail options.
+	Add new variabel pop3-fma-commandline-arguments.
+
 1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
@@ -20,12 +30,6 @@
 	`gnus-draft-setup').
 	(gnus-draft-setup-for-sending): New function.
 	(gnus-draft-send-draft-buffer): New variable.
-
-1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
-
-	* lisp/pop3-fma.el (pop3-fma-movemail): Bug fix.
-	Delete variable pop3-fma-movemail options.
-	Add new variabel pop3-fma-commandline-arguments.
 
 1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
