@@ -1,6 +1,6 @@
 ========================================================================
 Codename:	T-gnus
-Branch Tag:	t-gnus-6_15-quimby
+Branch Tag:	t-gnus-6_15
 Branch Status:	Develop, Synchronize with Oort Gnus
 Branch Goal:	Implement latest features of gnus and offline features
 		Use Gnus in Offline status.
