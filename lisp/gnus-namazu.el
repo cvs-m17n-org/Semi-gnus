@@ -359,13 +359,17 @@ options make any sense in this context."
 	(error "Namazu finished abnormally: %d" exit-status)))
     (gnus-namazu/normalize-results)
     (goto-char (point-min))
-    (let (articles group file)
+    (let (articles group)
       (while (not (eobp))
-	(setq file (buffer-substring-no-properties (point) (gnus-point-at-eol))
-	      group (file-name-directory file)
-	      file (file-name-nondirectory file))
-	(and (not (string-match "[^0-9]" file))
-	     (setq group
+	(setq group (buffer-substring-no-properties
+		     (point)
+		     (progn
+		       (end-of-line)
+		       ;; NOTE: Only numeric characters are permitted
+		       ;; as file names of articles.
+		       (skip-chars-backward "0-9")
+		       (point))))
+	(and (setq group
 		   (symbol-value
 		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
 				     group
@@ -373,7 +377,11 @@ options make any sense in this context."
 				 (cdr gnus-namazu/directory-table))))
 	     (or (not groups)
 		 (member group groups))
-	     (push (gnus-namazu/make-article group (string-to-number file))
+	     (push (gnus-namazu/make-article
+		    group
+		    (string-to-number
+		     (buffer-substring-no-properties (point)
+						     (gnus-point-at-eol))))
 		   articles))
 	(forward-line 1))
       (nreverse articles))))

@@ -1,3 +1,8 @@
+2003-08-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/search): Small modified to
+	reduce its spending time.
+
 2003-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* gnus-namazu.el (gnus-namazu/group-prefixed-name): Removed.
