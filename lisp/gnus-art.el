@@ -1120,7 +1120,8 @@ See Info node `(gnus)Customizing Articles' for details."
 (put 'gnus-treat-overstrike 'highlight t)
 
 (defcustom gnus-treat-display-xface
-  (and (or (and (fboundp 'image-type-available-p)
+  (and (not noninteractive)
+       (or (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'xbm)
 		(string-match "^0x" (shell-command-to-string "uncompface")))
 	   (and (featurep 'xemacs)
@@ -1163,7 +1164,8 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
 smiley functions are not overridden by `smiley').")
 
 (defcustom gnus-treat-display-grey-xface
-  (and (string-match "^0x" (shell-command-to-string "uncompface"))
+  (and (not noninteractive)
+       (string-match "^0x" (shell-command-to-string "uncompface"))
        t)
   "Display grey X-Face headers.
 Valid values are nil, t."
