@@ -11507,27 +11507,26 @@ Remove security related MML tags from message.
 せん。
 
 最初に、新しいサーバーを付け加える必要があります。命令 @kbd{a} がそれを
-します。おそらくキャッシュを読むためには @code{nnspool} を使うのが一番良
-いでしょう。@code{nnml} や @code{nnmh} も使う事ができますけど。
+します。おそらくキャッシュを読むためには @code{nnml} を使うのが一番良い
+でしょう。@code{nnspool} や @code{nnmh} も使う事ができますけど。
 
-@kbd{a nnspool RET cache RET} と打ってください。
+@kbd{a nnml RET cache RET} と打ってください。
 
-すると @samp{cache} と呼ばれる， @code{nnspool} の事実上のサーバー
-ができるはずです。次はそれを編集して、正しい定義を与えるだけです。サーバー
-を編集するために @kbd{e} を打ってください。以下のものを含むバッファに入
-るでしょう。
+すると @samp{cache} と呼ばれる、@code{nnml} の事実上のサーバーができるは
+ずです。次はそれを編集して、正しい定義を与えるだけです。サーバーを編集す
+るために @kbd{e} を打ってください。以下のものを含むバッファに入るでしょ
+う。
 
 @lisp
-(nnspool "cache")
+(nnml "cache")
 @end lisp
 
 それを次のものに変更してください:
 
 @lisp
-(nnspool "cache"
-         (nnspool-spool-directory "~/News/cache/")
-         (nnspool-nov-directory "~/News/cache/")
-         (nnspool-active-file "~/News/cache/active"))
+(nnml "cache"
+      (nnml-directory "~/News/cache/")
+      (nnml-active-file "~/News/cache/active"))
 @end lisp
 
 サーバーバッファに戻るために @kbd{C-c C-c} と打ってください。今やこの事
