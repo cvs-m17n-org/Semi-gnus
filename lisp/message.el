@@ -2269,6 +2269,48 @@ the user from the mailer."
 	(eval (car actions)))))
     (pop actions)))
 
+(defun message-maybe-split-and-send-mail ()
+  "Split a message if necessary, and send it via mail.
+Returns nil if sending succeeded, returns any string if sending failed.
+This sub function is for exclusive use of `message-send-mail'."
+  (let ((mime-edit-split-ignored-field-regexp
+	 mime-edit-split-ignored-field-regexp)
+	(case-fold-search t)
+	failure)
+    (while (string-match "Message-Id" mime-edit-split-ignored-field-regexp)
+      (setq mime-edit-split-ignored-field-regexp
+	    (concat (substring mime-edit-split-ignored-field-regexp
+			       0 (match-beginning 0))
+		    "Hey_MIME-Edit,_there_is_an_inviolable_Message_ID"
+		    "_so_don't_rape_it!"
+		    (substring mime-edit-split-ignored-field-regexp
+			       (match-end 0)))))
+    (setq failure
+	  (or
+	   (catch 'message-sending-mail-failure
+	     (mime-edit-maybe-split-and-send
+	      (function
+	       (lambda ()
+		 (interactive)
+		 (save-restriction
+		   (std11-narrow-to-header mail-header-separator)
+		   (goto-char (point-min))
+		   (when (re-search-forward "^Message-ID:" nil t)
+		     (delete-region (match-end 0) (std11-field-end))
+		     (insert " " (message-make-message-id))))
+		 (condition-case err
+		     (funcall message-send-mail-function)
+		   (error
+		    (throw 'message-sending-mail-failure err))))))
+	     nil)
+	   (condition-case err
+	       (funcall message-send-mail-function)
+	     (error err))))
+    (when failure
+      (if (eq 'error (car failure))
+	  (cadr failure)
+	(prin1-to-string failure)))))
+
 (defun message-send-mail (&optional arg)
   (require 'mail-utils)
   (let ((tembuf (message-generate-new-buffer-clone-locals " message temp"))
@@ -2305,27 +2347,7 @@ the user from the mailer."
 		       (or (message-fetch-field "cc")
 			   (message-fetch-field "to")))
 	      (message-insert-courtesy-copy))
-	    (setq failure
-		  (or
-		   (catch 'message-sending-mail-failure
-		     (mime-edit-maybe-split-and-send
-		      (function
-		       (lambda ()
-			 (interactive)
-			 (save-restriction
-			   (std11-narrow-to-header mail-header-separator)
-			   (goto-char (point-min))
-			   (when (re-search-forward "^Message-Id:" nil t)
-			     (delete-region (match-end 0) (std11-field-end))
-			     (insert " " (message-make-message-id))))
-			 (condition-case err
-			     (funcall message-send-mail-function)
-			   (error
-			    (throw 'message-sending-mail-failure err))))))
-		     nil)
-		   (condition-case err
-		       (funcall message-send-mail-function)
-		     (error err)))))
+	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
       (if failure
@@ -2490,6 +2512,38 @@ to find out how to use this."
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
 
+(defun message-maybe-split-and-send-news ()
+  "Split a message if necessary, and send it via news.
+Returns nil if sending succeeded, returns t if sending failed.
+This sub function is for exclusive use of `message-send-news'."
+  (let ((mime-edit-split-ignored-field-regexp
+	 mime-edit-split-ignored-field-regexp)
+	(case-fold-search t))
+    (while (string-match "Message-Id" mime-edit-split-ignored-field-regexp)
+      (setq mime-edit-split-ignored-field-regexp
+	    (concat (substring mime-edit-split-ignored-field-regexp
+			       0 (match-beginning 0))
+		    "Hey_MIME-Edit,_there_is_an_inviolable_Message_ID"
+		    "_so_don't_rape_it!"
+		    (substring mime-edit-split-ignored-field-regexp
+			       (match-end 0)))))
+    (or
+     (catch 'message-sending-news-done
+       (mime-edit-maybe-split-and-send
+	(function
+	 (lambda ()
+	   (interactive)
+	   (save-restriction
+	     (std11-narrow-to-header mail-header-separator)
+	     (goto-char (point-min))
+	     (when (re-search-forward "^Message-ID:" nil t)
+	       (delete-region (match-end 0) (std11-field-end))
+	       (insert " " (message-make-message-id))))
+	   (unless (funcall message-send-news-function method)
+	     (throw 'message-sending-news-done t)))))
+       nil)
+     (not (funcall message-send-news-function method)))))
+
 (defun message-send-news (&optional arg)
   (let ((tembuf (message-generate-new-buffer-clone-locals " *message temp*"))
 	(case-fold-search nil)
@@ -2526,30 +2580,15 @@ to find out how to use this."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
-	    (setq result
-		  (and
-		   (catch 'message-sending-news-done
-		     (mime-edit-maybe-split-and-send
-		      (function
-		       (lambda ()
-			 (interactive)
-			 (save-restriction
-			   (std11-narrow-to-header mail-header-separator)
-			   (goto-char (point-min))
-			   (when (re-search-forward "^Message-Id:" nil t)
-			     (delete-region (match-end 0)(std11-field-end))
-			     (insert " " (message-make-message-id))))
-			 (unless (funcall message-send-news-function method)
-			   (throw 'message-sending-news-done nil)))))
-		     t)
-		   (funcall message-send-news-function method))))
+	    (setq result (message-maybe-split-and-send-news)))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
       (if result
-	  (push 'news message-sent-message-via)
-	(message "Couldn't send message via news: %s"
-		 (nnheader-get-report (car method)))
-	nil))))
+	  (progn
+	    (message "Couldn't send message via news: %s"
+		     (nnheader-get-report (car method)))
+	    nil)
+	(push 'news message-sent-message-via)))))
 
 ;; 1997-09-29 by MORIOKA Tomohiko
 (defun message-send-news-with-gnus (method)
