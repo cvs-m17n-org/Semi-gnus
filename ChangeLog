@@ -1,3 +1,8 @@
+1998-02-20  Christophe Broult <christophe.broult@info.unicaen.fr>
+
+	* README.semi (How to get?): The command `update' must come before
+ 	`-r semi-gnus'. (cf. [tm-en:1559])
+
 1998-02-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el: Sync up with qgnus-0.29.
