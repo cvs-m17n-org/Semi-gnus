@@ -7879,6 +7879,8 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 @item W W B
 @kindex W W B ($B35N,(B)
 @findex gnus-article-strip-banner
+@vindex gnus-article-banner-alist
+@vindex gnus-article-address-banner-alist
 @cindex banner
 @cindex OneList
 @cindex stripping advertisements
@@ -7893,6 +7895,28 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 $B0UL#$G$"$k%7%s%\%k(B @code{signature} $B$^$?(B
 $B$O(B @code{gnus-article-banner-alist} $B$N@55,I=8=$KBP1~$7$?%7%s%\%k$G$"$k$3(B
 $B$H$,$G$-$^$9!#(B
+
+$B%0%k!<%W$K$+$+$o$i$:!"5-;v$NAw?.<T(B
+$B$,(B @code{gnus-article-address-banner-alist} $B$K@_Dj$5$l$?!"$"$k%a!<%k%"%I(B
+$B%l%9$r;}$C$F$$$k$H$-$@$1!"9-9p$N$h$&$J$b$N$r1#$9$3$H$,$G$-$^$9!#(B
+
+@table @code
+@item gnus-article-address-banner-alist
+@vindex gnus-article-address-banner-alist
+$B%a!<%k%"%I%l%9$H%P%J!<$NO"A[%j%9%H$G$9!#$=$l$>$l$NMWAG(B
+$B$O(B @code{(ADDRESS . BANNER)} $B$N7A<0$r;}$A!"$3$3$G(B ADDRESS $B$O(B From $B%X%C%@!<(B
+$B$K$"$k%a!<%k%"%I%l%9$K%^%C%A$9$k@55,I=8=!"(BBANNER $B$O%7%s%\(B
+$B%k(B @code{signature}$B!"(B@code{gnus-article-banner-alist} $B$NMWAG!"@55,I=8=$^(B
+$B$?$O(B @code{nil} $B$N$&$A$N0l$D$G$9!#(BADDRESS $B$,Cx<T$N%a!<%k%"%I%l%9$K%^%C%A(B
+$B$9$k$H!"9-9p$N$h$&$J$b$N$r>C$7$^$9!#Nc$($P!"Aw?.<T(B
+$B$,(B @samp{hail@@yoo-hoo.co.jp} $B$H$$$&%a!<%k%"%I%l%9$r;}$C$F$$$F!"H`$,Aw?.(B
+$B$9$k$9$Y$F$N5-;v$K(B @samp{Do You Yoo-hoo!?} $B$N$h$&$J$b$N$,$"$k>l9g!"0J2<(B
+$B$NMWAG$G$=$l$i$r>C$9$3$H$,$G$-$^$9!#(B
+
+@lisp
+("@@yoo-hoo\.co\.jp\\'" . "\n_+\nDo You Yoo-hoo!\\?\n.*\n.*\n")
+@end lisp
+@end table
 
 @item W W c
 @kindex W W c ($B35N,(B)
@@ -14803,6 +14827,9 @@ Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 @lisp
 ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
 @end lisp
+
+$B:G=i$NMWAG$r%7%s%\%k(B @code{junk} $B$K$7$F!"%^%C%A$9$k%a%C%;!<%8$rC1$K>C$9(B
+$B$Y$-$G$"$k$3$H$rI=$9$3$H$b$G$-$^$9!#5$$rIU$1$F;H$C$F2<$5$$!#(B
 
 $BFs$DL\$NMWAG$O4X?t$G$"$k$3$H$b$G$-$^$9!#$=$N>l9g$O!"5-;v$N%X%C%@!<$,$"$k(B
 $B%P%C%U%!$G!"$=$N5,B'$N:G=i$NMWAG$r0z?t$H$7$F8F$P$l$^$9!#%a!<%k$,$=$N%0%k!<(B
