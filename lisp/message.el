@@ -30,7 +30,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'smtp)
+  )
 
 (require 'mailheader)
 (require 'nnheader)
