@@ -13119,16 +13119,15 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @end lisp
 
 この変数は @dfn{分割} の様式になっています。分割は (あるいは) それぞれの
-分割が他の分割を含む再帰的構造です。これは使用可能な五つの分割構文です:
+分割が他の分割を含む再帰的構造です。これは使用可能な分割構文です:
 
-@enumerate
+@table @code
 
-@item
-@samp{group}: もし分割が文字列であると、それはグループ名としてみなされま
-す。普通の正規表現の合致がなされます。例は下の方を見て下さい。
+@item group
+もし分割が文字列であると、それはグループ名としてみなされます。普通の正規
+表現の合致がなされます。例は下の方を見て下さい。
 
-@item
-@code{(@var{field} @var{value} @code{[-} @var{restrict} @code{[@dots{}]}@code{]} @var{split})}:
+@item (@var{field} @var{value} [- @var{restrict} [@dots{}] ] @var{split})
 もし分割がリストで、最初の要素が文字列であり、ヘッダー @var{field} (正規
 表現) が @var{value} (これも正規表現) を含んでいる場合、メッセージ
 を @var{split} で指定されたところに蓄積します。@var{restrict} (また他の
@@ -13136,24 +13135,24 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 かの文字列に合致したら、@var{split} は無視されます。@var{restrict} の閉
 包のどれもが合致しなければ @var{split} が実行されます。
 
-@item
-@code{(| @var{split}@dots{})}: 分割がリストで、最初の要素
-が @code{|} (垂直棒) であると、それぞれの @var{split} をそのうちの一つが
-合致するまで実行します。@var{split} はメールメッセージが一つ以上のグルー
-プに蓄積されたときに ``合致した'' とします。
+@item (| @var{split} @dots{})
+分割がリストで、最初の要素が @code{|} (垂直棒) であると、それぞれ
+の @var{split} をそのうちの一つが合致するまで実行します。@var{split} は
+メールメッセージが一つ以上のグループに蓄積されたときに ``合致した'' とし
+ます。
 
-@item
-@code{(& @var{split}@dots{})}: 分割がリストで、最初の要素が @code{&} で
-あると、リストの全ての @var{split} (複数) を実行します。
+@item (& @var{split} @dots{})
+分割がリストで、最初の要素が @code{&} であると、リストの全て
+の @var{split} (複数) を実行します。
 
-@item
-@code{junk}: もし分割がシンボル @code{junk} であると、そのメッセージを保
-存しません (すなわち、消去してしまいます)。非常に注意して使って下さい。
+@item junk
+もし分割がシンボル @code{junk} であると、そのメッセージを保存しませ
+ん (すなわち、消去してしまいます)。非常に注意して使って下さい。
 
-@item
-@code{(: @var{function} @var{arg1} @var{arg2} @dots{})}: もし分割がリス
-トで、最初の要素が @code{:} であると、二番目の要素が @var{args} を引数と
-して関数として呼ばれます。関数は @var{split} を返すべきです。
+@item (: @var{function} @var{arg1} @var{arg2} @dots{})
+もし分割がリストで、最初の要素が @code{:} であると、二番目の要素
+が @var{args} を引数として関数として呼ばれます。関数は @var{split} を返
+すべきです。
 
 @cindex body split
 例えば以下の関数は、記事のボディに基づいた分割に使えるでしょう:
@@ -13161,25 +13160,26 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @lisp
 (defun split-on-body ()
   (save-excursion
-    (set-buffer " *nnmail incoming*")
+    (set-buffer
+     (or (get-buffer " *nnmail incoming*")
+         (get-buffer " *nnml move*")))
     (goto-char (point-min))
     (when (re-search-forward "Some.*string" nil t)
       "string.group")))
 @end lisp
 
-@code{:} が使われるとき、バッファ @samp{" *nnmail incoming*"} はメッセー
-ジの部分に狭められます。
+@var{function} が走らされるとき、バッファはメッセージの部分に狭められま
+す。
 
-@item
-@code{(! @var{func} @var{split})}: 分割がリストで、最初の要素
-が @code{!} であると @var{split} が実行され、
+@item (! @var{func} @var{split})
+分割がリストで、最初の要素が @code{!} であると @var{split} が実行され、
 @var{func} は @var{split} の結果を引数として呼ばれます。@var{func} は分
 割を返すべきです。
 
-@item
-@code{nil}: もし分割が @code{nil} であれば、それは無視されます。
+@item nil
+もし分割が @code{nil} であれば、それは無視されます。
 
-@end enumerate
+@end table
 
 これらの分割で、@var{fileld} は完全なフィールド名に合致しなければなりま
 せん。@var{value} は基礎モード (fundamental mode) 構文テーブル (syntax
@@ -13190,9 +13190,9 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 @vindex nnmail-split-abbrev-alist
 @var{field} と @var{value} は Lisp シンボル (symbol) である事もでき、そ
 の場合それらは @code{nnmail-split-abbrev-alist} で指定されているように展
-開されます。これはセルの @code{car} がキーを含んでいて、@code{cdr} が関
-連付けられた値を持っているコンスセル (cons cell) の連想リストです。以下
-の項目が、あらかじめ @code{nnmail-split-abbrev-alist} に定義されています:
+開されます。これはセルの @sc{car} がキーを含んでいて、@sc{cdr} が関連付
+けられた値を持っているコンスセル (cons cell) の連想リストです。以下の項
+目が、あらかじめ @code{nnmail-split-abbrev-alist} に定義されています:
 
 @table @code
 @item from

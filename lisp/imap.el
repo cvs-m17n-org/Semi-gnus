@@ -738,13 +738,22 @@ sure of changing the value of `foo'."
   (let* ((port (or port imap-default-port))
 	 (process (as-binary-process
 		   (starttls-open-stream name buffer server port)))
-	 done)
+	 done tls-info)
     (message "imap: Connecting with STARTTLS...")
     (when process
       (while (and (memq (process-status process) '(open run))
 		  (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
-		  (goto-char (point-min))
+		  (goto-char (point-max))
+		  (forward-line -1)
 		  (not (imap-parse-greeting)))
+	(accept-process-output process 1)
+	(sit-for 1))
+      (imap-send-command "STARTTLS")
+      (while (and (memq (process-status process) '(open run))
+		  (set-buffer buffer) ;; XXX "blue moon" nntp.el bug
+		  (goto-char (point-max))
+		  (forward-line -1)
+		  (not (re-search-forward "[0-9]+ OK.*\r?\n" nil t)))
 	(accept-process-output process 1)
 	(sit-for 1))
       (and imap-log
@@ -752,24 +761,13 @@ sure of changing the value of `foo'."
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))
-      (let ((imap-process process))
-	(unwind-protect
-	    (progn
-	      (set-process-filter imap-process 'imap-arrival-filter)
-	      (erase-buffer)
-	      (when (and (eq imap-stream 'starttls)
-			 (imap-ok-p (imap-send-command-wait "STARTTLS")))
-		(set-process-filter imap-process nil)
-		(starttls-negotiate imap-process)))
-	  (set-process-filter imap-process nil)))
-      (when (memq (process-status process) '(open run))
+      (when (and (setq tls-info (starttls-negotiate process))
+		 (memq (process-status process) '(open run)))
 	(setq done process)))
-    (if done
-	(progn
-	  (message "imap: Connecting with STARTTLS...done")
-	  done)
-      (message "imap: Connecting with STARTTLS...failed")
-      nil)))
+    (if (stringp tls-info)
+	(message "imap: STARTTLS info: %s" tls-info))
+    (message "imap: Connecting with STARTTLS...%s" (if done "done" "failed"))
+    done))
 
 ;; Server functions; authenticator stuff:
 
