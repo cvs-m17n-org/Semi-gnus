@@ -691,19 +691,4 @@ dgnushack-compile."
 	(while (setq file (pop files))
 	  (insert "info/" file "\n"))))))
 
-
-(define-compiler-macro describe-key-briefly (&whole form key &optional insert)
-  (if (condition-case nil
-	  (progn
-	    (describe-key-briefly '((())) nil)
-	    t)
-	(wrong-number-of-arguments nil);; Old Emacsen.
-	(error t))
-      form
-    (if insert
-	`(if ,insert
-	     (insert (funcall 'describe-key-briefly ,key))
-	   (funcall 'describe-key-briefly ,key))
-      `(funcall 'describe-key-briefly ,key))))
-
 ;;; dgnushack.el ends here
