@@ -5224,13 +5224,12 @@ gnus $B$O$=$N%a!<%k$r<hF@$7$F!"$=$l$N%X%C%@!<$N@:L)D4::$,$G$-$k$h$&$K2hLL(B
 $B$7$^$&$H$$$&$3$H$G$9!#$3$l$O:.Mp$r>7$/$G$7$g$&!#$G$9$+$i!"$b$A$m$s!"K\Ev(B
 $B$K(B $B<Y0-(B $B$J5$J,$N$H$-$K$@$1$3$l$r;H$&$G$7$g$&!#(B
 
-$B$3$NL?Na$O<g$K!"$"$J$?$,$$$/$D$+$N%a!<%k%"%+%&%s%H(B (account) $B$r;}$C$F$$(B
-$B$F!"<+J,<+?H$N0c$C$?%"%+%&%s%H$K%a!<%k$rE>Aw$7$?$$$H$-$KMQ$$$i$l$^$9!#(B
-($B$b$7$"$J$?$,!"(B@code{$B%k!<%H(B} (root) $B$G$"$j!"(B
-@code{$B%]%9%H%^%9%?!<(B} (postmaster) $B$G$b$"$j!"(B@code{$B%k!<%H(B} $B$K(B @code{$B%]%9(B
-$B%H%^%9%?!<(B} $B$X$N%a!<%k$r<u$1<h$C$?>l9g$O!"$=$l(B
-$B$r(B @code{$B%]%9%H%^%9%?!<(B} $B$K$b:FAw$7$?$$$H;W$&$G$7$g(B
-$B$&!#(BOrdnung muss sein!)
+$B$3$NL?Na$O<g$K!"$"$J$?$,$$$/$D$+$N%a!<%k%"%+%&%s%H$r;}$C$F$$$F!"<+J,<+?H(B
+$B$N0c$C$?%"%+%&%s%H$K%a!<%k$rE>Aw$7$?$$$H$-$KMQ$$$i$l$^$9!#(B($B$b$7$"$J$?(B
+$B$,(B @code{root} $B$G$"$j!"(B@code{postmaster} $B$G$b$"$j!"(B
+@code{root} $B$K(B @code{postmaster} $B$X$N%a!<%k$r<u$1<h$C$?>l9g$O!"$=$l(B
+$B$r(B @code{postmaster} $B$K$b:FAw$7$?$$$H;W$&$G$7$g$&!#Ca=x$,$J$1$l$P$J$j$^(B
+$B$;$s(B! (Ordnung muss sein!))
 
 $B$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
@@ -9747,9 +9746,9 @@ Parameters}) $B$rJT=8$7$^$9(B (@code{gnus-summary-edit-parameters})$B!#(B
 $B>eFI$^$J$$$G$9$`$H$$$&;v$rJ]>Z$7$^$9!#$b$A$m$s!"$@$l$+$,$=$l$r$$$/$D$+$N(B
 $B%0%k!<%W$KJL!9$KEj9F$7$J$$8B$j$O!#F1$85-;v$r$$$/$D$+$N%0%k!<%W$KEj9F$9$k(B
 $B;v(B ($BAj8_Ej9F$G$J$/$F(B) $B$O(B @dfn{spamming} $B$H8F$P$l!"$"$J$?$O$=$N$h$&$JA~$`(B
-$B$Y$-HH:a$r9T$&$b$N$K$KBP$7$F!"K!N'$K$h$C$FIT2w$J5-;v$rAw$k$3$H$,5AL3$E$1(B
-$B$i$l$F$$$^$9!#(Bspam $B$rA*JL$9$k$?$a$K!"(BNoCeM $B<h07$r;n$7$?$$$H;W$&$+$b$7$l(B
-$B$^$;$s(B (@pxref{NoCeM})$B!#(B
+$B$Y$-HH:a$r9T$J$&$b$N$KBP$7$F!"K!N'$K$h$C$FIT2w$J5-;v$rAw$k$3$H$,5AL3$E$1(B
+$B$i$l$F$$$^$9!#(Bspam $B$rA*JL$9$k$?$a$K$O!"(BNoCeM $B$N<h07$r;n$7$F$_$kI,MW$,$"(B
+$B$k$+$b$7$l$^$;$s(B (@pxref{NoCeM})$B!#(B
 
 $B3P$($F$/$@$5$$(B: $BAj8_Ej9F$O9=$$$^$;$s$,!"F1$85-;v$rJL!9$K$$$/$D$+$N%0%k!<(B
 $B%W$KEj9F$9$k$N$O5v$5$l$^$;$s!#BgNL$NAj8_Ej9F(B (@dfn{velveeta}) $B$O$I$&$7$F(B
@@ -10681,8 +10680,8 @@ ISP $B$,(B @acronym{POP}-before-@acronym{SMTP} $B$NG'>Z$rMW5a$7$F$$$k>l9g$KM-
 $B$K$J$C$F$$$k$3$H$r3N$+$a$F2<$5$$(B (RFC2616 $B;2>H(B)$B!#(B
 @end table
 
-$B$"$J$?$O<+J,$,Aw$k%a%C%;!<%8$NDV$j$rD4$Y$?$$$H;W$&$+$bCN$l$^$;$s!#$b$7$/(B
-$B$O!"$b$7<j$GDV$jD4$Y$r$7$?$/$J$$$N$G$"$l$P!"<+F0DV$jD4$Y(B
+$B$"$J$?$O<+J,$,Aw$k%a%C%;!<%8$NDV$j$rD4$Y$kI,MW$,$"$k$+$b$7$l$^$;$s!#$b$7(B
+$B$/$O!"$b$7<j$GDV$jD4$Y$r$7$?$/$J$$$N$G$"$l$P!"<+F0DV$jD4$Y(B
 $B$r(B @code{ispell} $B%Q%C%1!<%8$r;H$&;v$K$h$C$FIU$12C$($k;v$,$G$-$^$9(B:
 
 @cindex ispell
@@ -11461,7 +11460,7 @@ Remove security related MML tags from message.
 @subsection $B;v<B>e$N%5!<%P!<$r:n@.$9$k(B
 
 $B$b$7$"$J$?$,1JB35-;v$r;H$C$F$?$/$5$s$N5-;v$r%-%c%C%7%e$KJ]B8$7$F$$$k$N$G(B
-$B$"$l$P!"%-%c%C%7%e$rFI$`$?$a$N;v<B>e$N%5!<%P!<$r:n$j$?$$$H;W$&$+$b$7$l$^(B
+$B$"$l$P!"%-%c%C%7%e$rFI$`$?$a$N;v<B>e$N%5!<%P!<$r:n$kI,MW$,$"$k$+$b$7$l$^(B
 $B$;$s!#(B
 
 $B:G=i$K!"?7$7$$%5!<%P!<$rIU$12C$($kI,MW$,$"$j$^$9!#L?Na(B @kbd{a} $B$,$=$l$r(B
@@ -12069,9 +12068,9 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 $B@\B3$9$k(B @acronym{NNTP} $B%5!<%P!<$N%]!<%HHV9f$G$9!#%G%#%U%)%k%H(B
 $B$O(B @samp{nntp} $B$G$9!#(B@acronym{TLS}/@acronym{SSL} $B$r2p$7(B
 $B$?(B @acronym{NNTP} $B$r;H$&$K$O!"%]!<%H$NL>A0$G$O$J$/$F@0?t(B ($B$D$^(B
-$B$j(B @samp{snews} $B$d(B @samp{nntps} $B$G$O$J$/$F(B @samp{563}) $B$r;XDj$7$F2<$5$$!#(B
-$B30It$N(B @acronym{TLS}/@acronym{SSL} $B%D!<%k$O%]!<%H$NL>A0$G$OF0:n$7$J$$$+(B
-$B$i$G$9!#(B
+$B$j(B @samp{snews} $B$d(B @samp{nntps} $B$G$O$J$/$F(B @samp{563}) $B$r;XDj$9$kI,MW$,(B
+$B$"$j$^$9!#30It$N(B @acronym{TLS}/@acronym{SSL} $B%D!<%k$O%]!<%H$NL>A0$G$OF0(B
+$B:n$7$J$$$+$i$G$9!#(B
 
 @item nntp-end-of-line
 @vindex nntp-end-of-line
@@ -12281,7 +12280,7 @@ Gnus $B$r;H$C$F?7$7$$%a!<%k$rFI$`;v$OHs>o$K4JC1$G$9!#$"$J$?$N%a!<%k%P%C%/(B
 $B$NFs$D$N%0%k!<%W$K9g$o$J$$%a!<%k$OA4$F:G8e$N%0%k!<%W$KF~$l$i$l$^$9!#(B
 
 $B$3$l$O(B gnus $B$G%a!<%k$rFI$`$?$a$K=<J,$G$"$k$O$:$G$9!#%^%K%e%"%k$N$3$NItJ,(B
-$B$NB>$N9`$r=OFI$7$?$$$H;W$&$+$b$7$l$^$;$s$,!#FC(B
+$B$NB>$N9`$r=OFI$9$kI,MW$,$"$k$+$b$7$l$^$;$s$,!#FC(B
 $B$K(B @pxref{Choosing a Mail Back End} $B$H(B @pxref{Expiring Mail} $B$r!#(B
 
 @node Splitting Mail
@@ -12752,9 +12751,9 @@ ssh %s imapd
 $B<hF@$9$k5-;v$r7hDj$9$k$?$a$K;H$o$l$k=R8l!#=i4|CM$N!"(B@samp{UNSEEN
 UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 $B$-(B @acronym{IMAP} $B%/%i%$%"%s%H$G%a!<%k%\%C%/%9$rGA$-!"$$$/$D$+$N5-;v$K4{(B
-$BFI(B ($B$b$7$/$O!"(BSEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{1:*} $B$K@_Dj$7$?$$$+$b$7$l$^(B
-$B$;$s!#$=$&$9$l$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:<hF@$5$l(B
-$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 $B$N(B 6.4.4 $B@a$rFI$s$G$/$@$5$$!#(B
+$BFI(B ($B$b$7$/$O!"(BSEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{1:*} $B$K@_Dj$9$kI,MW$,$"$k$+(B
+$B$b$7$l$^$;$s!#$=$&$9$l$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:(B
+$B<hF@$5$l$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 $B$N(B 6.4.4 $B@a$rFI$s$G$/$@$5$$!#(B
 
 @item :fetchflag
 $B%5!<%P!<$G!"<hF@$7$?5-;v$K0u$rIU$1$kJ}K!!#=i4|CM$N(B @samp{\Deleted} $B$O$=(B
@@ -13235,9 +13234,9 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $B$b$N$+!"$=$N%"%I%l%9$XEj9F$5$l$?%a%C%;!<%8$,$=$N%0%k!<%W$KJ]B8$5$l$^$9!#(B
 
 $B$H$-$K$O!"%a!<%j%s%0%j%9%H$K$OJ#?t$N%"%I%l%9$,$"$j!"%a!<%kJ,3d$K$=$l$iA4(B
-$B$F$rG'<1$5$;$?$$$H;W$&$H$-$,$"$k$+$b$7$l$^$;$s(B: @var{extra-aliases} $B%0%k!<(B
-$B%W%Q%i%a!<%?$rDI2C$N%"%I%l%9$N%j%9%H$K@_Dj$9$k$@$1$G=*$j$G$9!#@55,I=8=$r(B
-$B;H$$$?$1$l$P!"(B@var{split-regexp} $B$r@_Dj$7$F$/$@$5$$!#(B
+$B$F$rG'<1$5$;$kI,MW$,$"$k$+$b$7$l$^$;$s(B: @var{extra-aliases} $B%0%k!<%W%Q%i(B
+$B%a!<%?$rDI2C$N%"%I%l%9$N%j%9%H$K@_Dj$9$k$@$1$G=*$j$G$9!#@55,I=8=$r;H$$$?(B
+$B$1$l$P!"(B@var{split-regexp} $B$r@_Dj$7$F$/$@$5$$!#(B
 
 $B$3$l$i$NA4$F$N%0%k!<%W$N%Q%i%a!<%?$O!"(B@code{nnmail-split-fancy} $BJ,3d$r:n(B
 $B@.$9$k$?$a$K;HMQ$5$l!"$=$l$O(B @var{field} $B$,(B @samp{any} $B$G!"(B
@@ -13347,7 +13346,7 @@ nnml:mail.others:
 
 @vindex gnus-group-split-updated-hook
 @code{nnmail-split-fancy} $B$,(B @code{gnus-group-split-update} $B$G@_Dj$5$l$?(B
-$B8e$K!"JQ99$7$?$$$H$-$N$?$a$K!"$3$N4X?t(B
+$B8e$GJQ99$9$kI,MW$,$"$k$H$-$N$?$a$K!"$3$N4X?t(B
 $B$O(B @code{gnus-group-split-update-hook} $B$r=*N;$9$kD>A0$K<B9T$7$^$9!#(B
 
 @node Incorporating Old Mail
@@ -14559,7 +14558,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 $B$J$$!"$=$N%G%#%l%/%H%j$r;X$7<($9$h$&$K(B gnus $B$N%5!<%P!<$NDj5A$KDI2C$7$^$9!#(B
 @ref{Article Backlog}, @ref{Asynchronous Fetching} $B$*$h$S$=$NB>$O!"%G!<(B
 $B%?$r>e=q$-$7$F<YKb$r$9$k$+$b$7$l$J$$$N$G!"$"$J$?$O%G!<%?$rI|5"$5$;$kA0$K(B
-gnus $B$r=*N;$7$?$$$+$b$7$l$^$;$s!#(B
+gnus $B$r=*N;$9$kI,MW$,$"$k$+$b$7$l$^$;$s!#(B
 
 $B8D!9$N(B @code{nnml}, @code{nnfolder} $B$^$?$O(B @code{nnmaildir} $B$N%0%k!<%W$r!"(B
 $B0u$rJ];}$7$D$DJ]B8$9$k$3$H$b$G$-$^$9!#(B@code{nnml} $B$+(B @code{nnmaildir} $B$G(B
@@ -17407,68 +17406,68 @@ parameters at one time (@code{gnus-category-customize-category}).
 $B$k(B (@code{gnus-agent-remove-server})$B!#(B
 @end table
 
-@c TRANSLATEME
 @node Agent Visuals
-@subsection Agent Visuals
+@subsection $B%(!<%8%'%s%H$N;k3P8z2L(B
 
-If you open a summary while unplugged and, Gnus knows from the group's
-active range that there are more articles than the headers currently
-stored in the Agent, you may see some articles whose subject looks
-something like @samp{[Undownloaded article #####]}.  These are
-placeholders for the missing headers.  Aside from setting a mark,
-there is not much that can be done with one of these placeholders.
-When Gnus finally gets a chance to fetch the group's headers, the
-placeholders will automatically be replaced by the actual headers.
-You can configure the summary buffer's maneuvering to skip over the
-placeholders if you care (See @code{gnus-auto-goto-ignores}).
+$B%*%U%i%$%s(B (unplugged) $B$N$H$-$K35N,$r3+$$$?>l9g$K!"(Bgnus $B$,8=:_%(!<%8%'%s(B
+$B%H$K3JG<$5$l$F$$$k%X%C%@!<$h$j$bB?$/$N5-;v$,$"$k$3$H$r!"$=$N%0%k!<%W(B
+$B$N(B active ($BLuCm(B: $B2?HV$+$i2?HV$^$G$N5-;v$,$"$k$+$r<($94IM}>pJs(B) $B$NHO0O$+(B
+$B$iCN$C$F$$$k>l9g!"I=Bj$,(B @samp{[Undownloaded article #####]} $B$N$h$&$K$J$C(B
+$B$F$$$k$$$/$D$+$N5-;v$r8+$k$+$b$7$l$^$;$s!#$=$l$i$O8+Ev$?$i$J$$%X%C%@!<$N(B
+$B$?$a$N7jKd$a(B (placeholders) $B$G$9!#0u(B (mark) $B$r@_Dj$9$k$3$H$O$H$b$+$/!"$=(B
+$B$l$i$N7jKd$a$N0l$D$G$G$-$k$3$H$OB?$/$O$"$j$^$;$s!#:G=*E*$K(B gnus $B$,%0%k!<(B
+$B%W$N%X%C%@!<$r<h$C$FMh$k5!2q$rF@$?$H$-$K!"$=$l$i$N7jKd$a$O<B:]$N%X%C%@!<(B
+$B$G<+F0E*$KCV$-49$($i$l$k$G$7$g$&!#5$$K$J$k$J$i$P!"$=$l$i$N7jKd$a$rFI$_Ht(B
+$B$P$9$?$a$K!"35N,%P%C%U%!$NF0:n$rA`:n$9$k$3$H$,$G$-$^(B
+$B$9(B (@code{gnus-auto-goto-ignores} $B;2>H(B)$B!#(B
 
-While it may be obvious to all, the only headers and articles
-available while unplugged are those headers and articles that were
-fetched into the Agent while previously plugged.  To put it another
-way, "If you forget to fetch something while plugged, you might have a
-less than satisfying unplugged session".  For this reason, the Agent
-adds two visual effects to your summary buffer.  These effects display
-the download status of each article so that you always know which
-articles will be available when unplugged.
+$B$9$Y$F$N?M$K$H$C$FL@Gr$+$b$7$l$^$;$s$,!"%*%U%i%$%s$N$H$-$KMxMQ$G$-$k$N$O!"(B
+$B0JA0$K:9$79~$^$l$F$$$?4V(B (plugged) $B$K%(!<%8%'%s%H$K<h$j9~$^$l$?%X%C%@!<(B
+$B$H5-;v$@$1$G$9!#8@$$49$($k$H!V:9$79~$^$l$F$$$?4V$K<h$j9~$`$3$H$rK:$l$k$H!"(B
+$B%*%U%i%$%s$N%;%C%7%g%s$rK~B-$G$-$k$b$N$K$9$k$K$OB-$j$J$$!W$H$$$&$3$H$G$9!#(B
+$B$3$NM}M3$N$?$a$K!"%(!<%8%'%s%H$O35N,%P%C%U%!$KFs$D$N;k3P8z2L$r2C$($^$9!#(B
+$B$3$l$i$N8z2L$O!"%*%U%i%$%s$N$H$-$K$I$N5-;v$,MxMQ$G$-$k$+$r$$$D$bCN$i$;$k(B
+$B$?$a$K!"%@%&%s%m!<%I$N>uBV$rI=<($7$^$9!#(B
 
-The first visual effect is the @samp{%O} spec.  If you customize
-gnus-summary-line-format to include this specifier, you will add a
-single character field that indicates an article's download status.
-Articles that have been fetched into either the Agent or the Cache,
-will display @code{gnus-downloaded-mark} (defaults to @samp{+}).  All
-other articles will display @code{gnus-undownloaded-mark} (defaults to
-@samp{-}).  If you open a group that has not been agentized, a space
-(@samp{ }) will be displayed.
+$BBh0l$N;k3P8z2L$O(B @samp{%O} $B;EMM$G$9!#$3$N;X<(;R$r4^$a$k$?$a(B
+$B$K(B @code{gnus-summary-line-format} $B$r%+%9%?%^%$%:$9$k$H!"5-;v$N%@%&%s%m!<(B
+$B%I$N>uBV$r<($9C10l$NJ8;z$,2C$o$k$G$7$g$&!#%(!<%8%'%s%H$+%-%c%C%7%e$N$I$A(B
+$B$i$+$K<h$j9~$^$l$?5-;v$O!"(B@code{gnus-downloaded-mark} ($B%G%#%U%)%k%H(B
+$B$O(B @samp{+}) $B$rI=<($7$^$9!#$=$l$i0J30$N$9$Y$F$N5-;v(B
+$B$O(B @code{gnus-undownloaded-mark} ($B%G%#%U%)%k%H$O(B @samp{-}) $B$rI=<($7$^$9!#(B
+$B%(!<%8%'%s%H2=$5$l$F$$$J$$%0%k!<%W$r3+$/$H!"6uGr(B (@samp{ }) $B$,I=<($5$l$^(B
+$B$9!#(B
 
-The second visual effect are the undownloaded faces.  The faces, there
-are three indicating the article's score (low, normal, high), seem to
-result in a love/hate response from many Gnus users.  The problem is
-that the face selection is controlled by a list of condition tests and
-face names (See @code{gnus-summary-highlight}).  Each condition is
-tested in the order in which it appears in the list so early
-conditions have precedence over later conditions.  All of this means
-that, if you tick an undownloaded article, the article will continue
-to be displayed in the undownloaded face rather than the ticked face.
+$BBhFs$N;k3P8z2L$O%@%&%s%m!<%I$5$l$F$$$J$$$3$H$r<($9%U%'!<%9$G$9!#B?$/(B
+$B$N(B gnus $B$N%f!<%6$K9%46$H7y0-$r$b$?$i$9$G$"$m$&!"5-;v$N%9%3%"$r;0CJ(B
+$B3,(B (low, normal, high) $B$GI=<($9$k%U%'!<%9$,$"$j$^$9!#LdBj$O!"%U%'!<%9$N(B
+$BA*Br$,>r7o8!::$H%U%'!<%9L>$N%j%9%H(B (@code{gnus-summary-highlight} $B;2(B
+$B>H(B) $B$G@)8f$5$l$k$3$H$G$9!#$=$l$>$l$N>r7o$O!"$=$l$,%j%9%H$NCf$K8=$l$k=g$K(B
+$B8!::$5$l$k$N$G!"8e$N>r7o$h$j$bA0$N>r7o$,M%@h$5$l$^$9!#$3$l$,0UL#$9$k$9$Y(B
+$B$F$O!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$K2D;k5-;v(B (ticked) $B$N0u$rIU$1$F$b!"$=(B
+$B$N5-;v$O2D;k5-;v$N%U%'!<%9$G$O$J$/$F!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<(B
+$B%9$GI=<($7B3$1$i$l$k$H$$$&$3$H$G$9!#(B
 
-If you use the Agent as a cache (to avoid downloading the same article
-each time you visit it or to minimize your connection time), the
-undownloaded face will probably seem like a good idea.  The reason
-being that you do all of our work (marking, reading, deleting) with
-downloaded articles so the normal faces always appear.
+($B5-;v$rFI$`$?$S$KF1$85-;v$r%@%&%s%m!<%I$7$J$$$h$&$K$9$k$?$a!"$^$?$O@\B3(B
+$B;~4V$r:G>.$K$9$k$?$a$K(B) $B%(!<%8%'%s%H$r%-%c%C%7%e$H$7$F;H$&>l9g$O!"%@%&%s(B
+$B%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$O$*$=$i$/NI$$9M$($N$h$&$K;W$($k$G$7$g$&!#(B
+$B%@%&%s%m!<%I$5$l$?5-;v$KBP$7$F$9$Y$F$N;E;v(B ($B0u$rIU$1$k!"FI$`!":o=|$9(B
+$B$k(B) $B$r9T$J$($P!"$$$D$bDL>o$N%U%'!<%9$,8=$l$k$+$i$G$9!#(B
 
-For occasional Agent users, the undownloaded faces may appear to be an
-absolutely horrible idea.  The issue being that, since most of their
-articles have not been fetched into the Agent, most of the normal
-faces will be obscured by the undownloaded faces.  If this is your
-situation, you have two choices available.  First, you can completely
-disable the undownload faces by customizing
-@code{gnus-summary-highlight} to delete the three cons-cells that
-refer to the gnus-summary*-undownloaded-face faces.  Second, if you
-prefer to take a more fine-grained approach, you may set the
-@code{agent-disable-undownloaded-faces} group parameter to t.  This
-parameter, like all other agent parameters, may be set on an Agent
-Category (@pxref{Agent Categories}), a Group Topic (@pxref{Topic
-Parameters}), or an individual group (@pxref{Group Parameters}).
+$B$H$-$?$^%(!<%8%'%s%H$r;H$&%f!<%6$K$H$C$F$O!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v(B
+$B$N%U%'!<%9$O!"$I$&$7$h$&$b$J$/$R$I$$9M$($G$"$k$h$&$K;W$($k$+$b$7$l$^$;$s!#(B
+$BO@E@$O!"H`$i$NBgDq$N5-;v$O%(!<%8%'%s%H$K<h$j9~$^$l$F$$$J$$$N$G!"B?$/$NDL(B
+$B>o$N%U%'!<%9$,!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$N1"$K2b$s$G$7$^$&(B
+$B$3$H$G$9!#$3$l$,$"$J$?$N6-6x$J$i$P!"$"$J$?$K$OFs$D$NA*Br;h$,$"$j$^$9!#Bh(B
+$B0l$K!"(B@code{gnus-summary-*-undownloaded-face} $B$N%U%'!<%972$K4X$o$k;0$D$N(B
+$B%3%s%9%;%k$r>C5n$9$k$?$a$K(B @code{gnus-summary-highlight} $B$r%+%9%?%^%$%:(B
+$B$9$k$3$H$K$h$C$F!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$r40A4$KM^@)$9$k(B
+$B$3$H$,$G$-$^$9!#BhFs$K!"$b$C$H@vN}$5$l$?%"%W%m!<%A$,9%$_$J$i$P!"(B
+@code{agent-disable-undownloaded-faces} $B%0%k!<%W%Q%i%a!<%?$r(B t $B$K@_Dj$7(B
+$B$F$bNI$$$G$7$g$&!#$3$N%Q%i%a!<%?$OB>$N$9$Y$F$N%(!<%8%'%s%H%Q%i%a!<%?$HF1(B
+$BMM$K!"%(!<%8%'%s%HJ,N`(B (@pxref{Agent Categories})$B!"%0%k!<%W%H%T%C(B
+$B%/(B (@pxref{Topic Parameters})$B!"$"$k$$$O8D!9$N%0%k!<%W(B (@pxref{Group
+Parameters}) $B$KBP$7$F@_Dj$9$k$3$H$,$G$-$^$9!#(B
 
 @node Agent as Cache
 @subsection $B%-%c%C%7%e$H$7$F$N%(!<%8%'%s%H(B
@@ -19268,7 +19267,7 @@ Gnus $B$O$^$@!"$"$N$&$6$C$?$$8E$$>C5n%U%!%$%k$r%5%]!<%H$7$F$$$^$9!#<B:]>C(B
 @cindex converting kill files
 
 $B$"$J$?$,8E$$>C5n%U%!%$%k$r$I$C$5$j;}$C$F$$$k$N$G$"$l$P!"$=$l$i$r%9%3%"%U%!(B
-$B%$%k$KJQ49$7$?$/$J$k$G$7$g$&!#$b$7$=$l$i$,(B ``$BIaDL$N(B''$B$d$D$G$"$l$P!"(B
+$B%$%k$KJQ49$7$?$/$J$k$G$7$g$&!#$b$7$=$l$i$,(B ``$BIaDL$N(B'' $B$d$D$G$"$l$P!"(B
 @file{gnus-kill-to-score.el} $B%Q%C%1!<%8$r;H$&$3$H$,$G$-$^$9!#$=$&$G$J$1(B
 $B$l$P!"<j$GJQ49$7$J$1$l$P$J$i$J$$$G$7$g$&!#(B
 
@@ -20980,8 +20979,8 @@ Picon $B$NI=<($,$G$-$k$h$&$K$9$k$?$a$K$O!"(Bpicon $B%G!<%?%Y!<%9$,$"$k%G%#%l%
 $B$b$N$4$H$N=j:_$r4IM}$9$k$?$a$K!"0J2<$NJQ?t$r@_$1$F$$$^$9!#(B
 
 @table @code
-@item gnus-picons-database
-@vindex gnus-picons-database
+@item gnus-picon-database
+@vindex gnus-picon-database
 Picon $B%G!<%?%Y!<%9$N>l=j$G$9!#$3$l$O(B @file{news}, @file{domains},
 @file{users} ($B$J$I$J$I(B) $B$N%5%V%G%#%l%/%H%j!<$,4^$^$l$F$$$k%G%#%l%/%H%j!<(B
 $B$N%j%9%H$G$9!#(B@code{("/usr/lib/picon" "/usr/local/faces")} $B$,%G%#%U%)%k(B
@@ -20989,18 +20988,18 @@ Picon $B%G!<%?%Y!<%9$N>l=j$G$9!#$3$l$O(B @file{news}, @file{domains},
 
 @item gnus-picon-news-directories
 @vindex gnus-picon-news-directories
-@code{gnus-picons-database} $B$+$i%K%e!<%9%0%k!<%WMQ$N%U%'!<%9$rC5$9$?$a$N(B
+@code{gnus-picon-database} $B$+$i%K%e!<%9%0%k!<%WMQ$N%U%'!<%9$rC5$9$?$a$N(B
 $B%5%V%G%#%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("news")} $B$G$9!#(B
 
-@item gnus-picons-user-directories
-@vindex gnus-picons-user-directories
-@code{gnus-picons-database} $B$+$i%f!<%6$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#%l%/(B
+@item gnus-picon-user-directories
+@vindex gnus-picon-user-directories
+@code{gnus-picon-database} $B$+$i%f!<%6$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#%l%/(B
 $B%H%j!<$N%j%9%H$G$9!#(B@code{("local" "users" "usenix" "misc")} $B$,%G%#%U%)(B
 $B%k%H$G$9!#(B
 
-@item gnus-picons-domain-directories
-@vindex gnus-picons-domain-directories
-@code{gnus-picons-database} $B$+$i%I%a%$%sL>$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#(B
+@item gnus-picon-domain-directories
+@vindex gnus-picon-domain-directories
+@code{gnus-picon-database} $B$+$i%I%a%$%sL>$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#(B
 $B%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("domains")} $B$G$9!#$3$N%j%9(B
 $B%H$K(B @samp{"unknown"} $B$rDI2C$7$F$*$-$?$/$J$k?M$b$$$k$G$7$g$&!#(B
 
@@ -25049,8 +25048,8 @@ Gnus $B$,>o$K35N,%P%C%U%!$rCf?4:F@_Dj$r$9$k$3$H$r6X;_$9$k$?$a$K$3$l(B
 @subsection $B>/$7$N%G%#%9%/MFNL(B
 @cindex disk space
 
-$B5/F0%U%!%$%k$OHf3SE*Bg$-$/$J$j$^$9$N$G!"6u$-MFNL$,>/$J$/$J$C$F$-$F$$$k$H(B
-$B$-$O$=$NBg$-$5$r>/$7>.$5$/$7$?$$$H;W$&$G$7$g$&!#(B
+$B5/F0%U%!%$%k$OHf3SE*Bg$-$/$J$k$N$G!"6u$-MFNL$,>/$J$/$J$C$F$-$F$$$k$H$-$O(B
+$B$=$NBg$-$5$r>/$7>.$5$/$9$kI,MW$,$"$k$G$7$g$&!#(B
 
 @table @code
 @item gnus-save-newsrc-file
@@ -25078,11 +25077,11 @@ Gnus $B$,>o$K35N,%P%C%U%!$rCf?4:F@_Dj$r$9$k$3$H$r6X;_$9$k$?$a$K$3$l(B
 $B$b$7CY$$5!3#$r;}$C$F$$$k$+!"$b$7$/$OC1$KK\Ev$KG&BQNO$,$J$$;~$O!"(Bgnus $B$N(B
 $B<B9T$rGD0.$9$k$?$a$K$G$-$k;v$,>/$7$"$j$^$9!#(B
 
-$B5/F0$rB.$/$9$k$?$a(B
-$B$K(B @code{gnus-check-new-newsgroups} $B$H(B @code{gnus-check-bogus-newsgroups} $B$r(B @code{nil} $B$K(B
-$B@_Dj$7$F2<$5$$!#35N,%P%C%U%!$KF~$k;v$HH4$1$k;v$rB.$/$9$k$?$a$K!"(B
-@code{gnus-show-threads} $B$H(B @code{gnus-use-cross-reference} $B$H(B @code{gnus-nov-is-evil} $B$r(B @code{nil} $B$K(B
-$B@_Dj$7$F2<$5$$!#(B
+$B5/F0$rB.$/$9$k$?$a$K(B @code{gnus-check-new-newsgroups} $B$*$h(B
+$B$S(B @code{gnus-check-bogus-newsgroups} $B$r(B @code{nil} $B$K@_Dj$7$F2<$5$$!#35(B
+$BN,%P%C%U%!$KF~$k;v$HH4$1$k;v$rB.$/$9$k$?$a(B
+$B$K(B @code{gnus-show-threads} $B$H(B @code{gnus-use-cross-reference}$B!"$=$l(B
+$B$K(B @code{gnus-nov-is-evil} $B$r(B @code{nil} $B$K@_Dj$7$F2<$5$$!#(B
 
 @page
 @node Troubleshooting
@@ -25138,9 +25137,10 @@ Gnus $B$OB?$/$NB?$/$N:F5"9=B$$GF0:n$7!"2?$i$+$N6KC<$J(B ($B$=$7$FHs>o$K$^$l(
 $B%0$r:F8=$5$;$kJ}K!$r@53N$K=q$$$F$/$l$?$H$-$N$_!"$=$l$r=$@5$9$k;v$,$G$-$^(B
 $B$9!#(B
 
-$B%P%0Js9p$G$O!">\:Y$9$.$k$3$H$O7h$7$F$"$j$^$;$s!#%P%0Js9p$r$9$k$H$-$O!"$=(B
-$B$l$,;H$&$?$S$K(B 10Kb $B%a!<%k$r:n$j!"$b$7$"$J$?$N4D6-$r0JA0;d$K(B 500 $B2sAw$C(B
-$B$F$-$?$H$7$F$b!"L?Na(B @kbd{M-x gnus-bug} $B$r;H$C$F2<$5$$!#(B
+$B%P%0Js9p$G$O!">\:Y$9$.$k$3$H$O7h$7$F$"$j$^$;$s!#%P%0Js9p$r$9$k$H$-$O!"$$(B
+$B$D$b(B @kbd{M-x gnus-bug} $BL?Na$r;H$C$F2<$5$$!#$=$l$r;H$&$?$S$K(B 10Kb $B$N%a!<(B
+$B%k$,$G$-$F$7$^$C$F$b!"$=$7$F$"$J$?$N4D6-$r0JA0;d$K(B 500 $B2sAw$C$?$H$7$F$b(B
+$B$G$9!#(B
 
 $B;d$O!"5-21$H$$$&<oN`$N$b$N$OA4$/;}$C$F$$$J$$;v$r3P$($F$*$/;v$b=EMW$G$9!#(B
 $B$b$7$"$J$?$,%P%0Js9p$rAw$k$H!";d$,JVEz$rAw$j$^$9!#$=$7$F!"$=$l$+$i$"$J$?(B
