@@ -1,3 +1,10 @@
+1998-06-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/messge.el (message-use-followup-to): Change menu tag.
+	(message-use-mail-copies-to): Ditto.
+	(message-use-mail-followup-to): Ditto.
+	(message-use-mail-reply-to): Ditto. Also change default.
+
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* readme, texi/ChangeLog, texi/gnus.texi, texi/message.texi,
