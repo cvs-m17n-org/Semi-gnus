@@ -2100,6 +2100,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		(gnus-run-hooks 'gnus-article-prepare-hook)
 		;; Display message.
 		(funcall method)
+		;; Associate this article with the current summary buffer.
+		(setq gnus-article-current-summary summary-buffer)
 		;; Perform the article display hooks.
 		(gnus-run-hooks 'gnus-article-display-hook))
 	      ;; Do page break.
@@ -2495,9 +2497,6 @@ If given a prefix, show the hidden text instead."
 		'article)))
 	   ;; It was a pseudo.
 	   (t article)))
-
-      ;; Associate this article with the current summary buffer.
-      (setq gnus-article-current-summary gnus-summary-buffer)
 
       ;; Update sparse articles.
       (when (and do-update-line
