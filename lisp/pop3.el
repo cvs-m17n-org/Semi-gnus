@@ -420,10 +420,11 @@ Return the response string if optional second argument is non-nil."
   (pop3-send-command process (format "RETR %s" msg))
   (pop3-read-response process)
   (save-excursion
-    (let ((region (pop3-get-extended-response process)))
-      (apply 'pop3-munge-message-separator region)
-      (apply 'append-to-buffer crashbuf region)
-      (apply 'delete-region region)
+    (save-restriction
+      (apply 'narrow-to-region (pop3-get-extended-response process))
+      (pop3-munge-message-separator (point-min) (point-max))
+      (append-to-buffer crashbuf (point-min) (point-max))
+      (delete-region (point-min) (point-max))
       )))
 
 (defun pop3-dele (process msg)
