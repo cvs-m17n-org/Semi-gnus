@@ -1837,7 +1837,8 @@ face."
   "Whether Gnus is plugged or not.")
 
 (defcustom gnus-agent-cache t
-  "Whether Gnus use agent cache."
+  "Whether Gnus use agent cache.
+You also need to enable `gnus-agent'."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -1850,7 +1851,7 @@ covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
 
-(defcustom gnus-agent nil
+(defcustom gnus-agent t
   "Whether we want to use the Gnus agent or not.
 Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
   :version "21.3"
