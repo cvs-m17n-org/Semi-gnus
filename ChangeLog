@@ -1,3 +1,15 @@
+1998-01-11  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/smtp.el: New file.
+
+	* lisp/smtpmail.el: Split basic features into smtp.el.
+
+	* lisp/message.el (message-send-mail-function): Add
+ 	`message-send-mail-with-smtp' as an item.
+	(message-send-mail-with-smtp): New function.
+
+	* ChangeLog: New file.
+
 1998-01-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/smtpmail.el (smtpmail-via-smtp): Bind
