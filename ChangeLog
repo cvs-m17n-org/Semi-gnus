@@ -1,3 +1,9 @@
+2000-10-04  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* gnus-sum.el (gnus-build-sparse-threads): Use
+	`make-full-mail-header-from-decoded-header' instead of
+	`make-full-mail-header'.
+
 2000-10-03  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-get-new-news): Update modeline
