@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.6 1999-09-03 15:44:25 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.19.4.7 1999-09-12 05:02:43 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -31,6 +31,18 @@
 ;;;
 
 ;;; Code:
+
+(eval-and-compile
+  (defvar gnus-offline-lang
+    (cond ((and (featurep 'meadow)
+		(string= current-language-environment "Japanese"))
+	   "ja_complete")
+	  ((and (boundp 'current-language-environment)
+		(string= current-language-environment "Japanese"))
+	   "ja")
+	  (t
+	   "en"))
+    "This variable decides which language will be used for display."))
 
 (eval-when-compile
   (require 'gnus-offline))
@@ -177,17 +189,6 @@
   (defmacro gnus-ofsetup-prepare (list)
     (let ((forms (symbol-value list)))
       `(progn ,@forms))))
-
-(defvar gnus-offline-lang
-  (cond ((and (featurep 'meadow)
-	      (string= current-language-environment "Japanese"))
-	 "ja_complete")
-	((and (boundp 'current-language-environment)
-	      (string= current-language-environment "Japanese"))
-	 "ja")
-	(t
-	 "en"))
-  "This variable decides which language will be used for display.")
 
 (defvar gnus-ofsetup-resource-en
   '((prepare-miee-1
