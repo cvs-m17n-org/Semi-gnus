@@ -70,6 +70,13 @@
      (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
      (generate-nov  . nnshimbun-cnet-generate-nov-database)
      (make-contents . nnshimbun-cnet-make-contents))
+    (wired
+     (address . "wired")
+     (url . "http://www.hotwired.co.jp/")
+     (groups "business" "culture" "technology")
+     (coding-system . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
+     (generate-nov  . nnshimbun-wired-generate-nov-database)
+     (make-contents . nnshimbun-wired-make-contents))
     ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
@@ -769,6 +776,102 @@
     (goto-char (point-min))
     (nnshimbun-insert-header header)
     (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (encode-coding-string (buffer-string)
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+
+
+
+;;; Wired
+
+(defun nnshimbun-wired-get-headers ()
+  (save-excursion
+    (set-buffer nnshimbun-buffer)
+    (let ((group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups))
+	  (case-fold-search t)
+	  (regexp (format
+		   "<a href=\"\\(%s\\|/\\)\\(news/news/\\(%s\\)/story/\\(\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)[0-9]+\\)\\.html\\)\"><b>"
+		   (regexp-quote nnshimbun-url)
+		   (regexp-opt nnshimbun-groups))))
+      (dolist (xover (list (concat nnshimbun-url "news/news/index.html")
+			   (concat nnshimbun-url "news/news/last_seven.html")))
+	(erase-buffer)
+	(nnshimbun-retrieve-url xover t)
+	(goto-char (point-min))
+	(while (re-search-forward regexp nil t)
+	  (let* ((url   (concat nnshimbun-url (match-string 2)))
+		 (group (downcase (match-string 3)))
+		 (id    (format "<%s%%%s>" (match-string 4) group))
+		 (date  (nnshimbun-make-date-string
+			 (string-to-number (match-string 5))
+			 (string-to-number (match-string 6))
+			 (string-to-number (match-string 7))))
+		 (header (make-full-mail-header
+			  0
+			  (nnshimbun-mime-encode-string
+			   (mapconcat 'identity
+				      (split-string
+				       (buffer-substring
+					(match-end 0)
+					(progn (search-forward "</b>" nil t) (point)))
+				       "<[^>]+>")
+				      ""))
+			  "webmaster@www.hotwired.co.jp"
+			  date id "" 0 0 url))
+		 (x (assoc group group-header-alist)))
+	    (setcdr x (cons header (cdr x))))))
+      group-header-alist)))
+
+(defvar nnshimbun-wired-last-check nil)
+(defvar nnshimbun-wired-check-interval 300)
+
+(defun nnshimbun-wired-generate-nov-database (&rest args)
+  (unless (and nnshimbun-wired-last-check
+	       (< (nnshimbun-lapse-seconds nnshimbun-wired-last-check)
+		  nnshimbun-wired-check-interval))
+    (save-excursion
+      (dolist (list (nnshimbun-wired-get-headers))
+	(let ((group (car list)))
+	  (nnshimbun-possibly-change-server group)
+	  (when (cdr list)
+	    (set-buffer (nnshimbun-open-nov group))
+	    (let (i)
+	      (goto-char (point-max))
+	      (forward-line -1)
+	      (setq i (or (ignore-errors (read (current-buffer))) 0))
+	      (goto-char (point-max))
+	      (dolist (header (cdr list))
+		(unless (nnshimbun-search-id group (mail-header-id header))
+		  (mail-header-set-number header (setq i (1+ i)))
+		  (nnheader-insert-nov header)))))))
+      (nnshimbun-save-nov)
+      (setq nnshimbun-wired-last-check (current-time)))))
+
+(defun nnshimbun-wired-make-contents (header)
+  (goto-char (point-min))
+  (let (start (html t))
+    (when (and (search-forward "\n<!-- START_OF_BODY -->\n" nil t)
+	       (setq start (point))
+	       (search-forward "\n<!-- END_OF_BODY -->\n" nil t))
+      (delete-region (point-min) start)
+      (forward-line -2)
+      (delete-region (point) (point-max))
+      (when (search-backward "<DIV ALIGN=\"RIGHT\">[日本語" nil t)
+	(delete-region (point) (point-max)))
+      (goto-char (point-min))
+      (while (search-forward "<br>" nil t)
+	(insert "\n"))
+      (nnweb-remove-markup)
+      (nnweb-decode-entities)
+      (goto-char (point-min))
+      (when (skip-chars-forward "\n")
+	(delete-region (point-min) (point)))
+      (while (not (eobp))
+	(nnshimbun-fill-line))
+      (setq html nil))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: " (if html "text/html" "text/plain")
+	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
