@@ -1,5 +1,10 @@
 1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/imap.el: Remove autoload settings for `base64-decode-string'
+	and `base64-encode-string'.
+
+1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
 	(gnus-revision-number): Clear to 00.
 
