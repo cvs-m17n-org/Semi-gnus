@@ -315,53 +315,51 @@ options make any sense in this context."
 	     ,query
 	     ,@gnus-namazu-index-directories))))
 
-(defsubst gnus-namazu/group-prefixed-name (group method)
+(defsubst gnus-namazu/group-prefixed-name (group &optional method)
   "Return the whole name from GROUP and METHOD."
+  (setq group (gnus-group-prefixed-name group method))
   (if gnus-namazu-case-sensitive-filesystem
-      (gnus-group-prefixed-name group method)
-    (let* ((orig (gnus-group-prefixed-name group method))
-	   (name (downcase orig)))
+      (when (gnus-gethash group gnus-newsrc-hashtb)
+	group)
+    (let ((key (downcase group)))
       (catch 'found-group
 	(mapatoms (lambda (sym)
-		    (when (string= name (downcase (symbol-name sym)))
+		    (when (string= key (downcase (symbol-name sym)))
 		      (throw 'found-group (symbol-name sym))))
-		  gnus-newsrc-hashtb)
-	orig))))
+		  gnus-newsrc-hashtb)))))
 
-(defun gnus-namazu/real-group-name (cond str)
+(defun gnus-namazu/real-group-name (cond group &optional method)
   "Generate the real group name from the partial path, STR."
   (if cond
-      str
-    (catch 'found-group
-      (dolist (group (gnus-namazu/possible-real-groups
-		      (nnheader-replace-chars-in-string str ?/ ?.)))
-	(when (gnus-gethash group gnus-newsrc-hashtb)
-	  (throw 'found-group group))))))
+      (gnus-namazu/group-prefixed-name group method)
+    (gnus-namazu/decode-group-name
+     (nnheader-replace-chars-in-string group ?/ ?.)
+     method)))
 
-(defun gnus-namazu/possible-real-groups (str)
-  "Regard the string STR as the partial path of the cached article and
-generate possible group names from it."
+(defun gnus-namazu/decode-group-name (str &optional method)
+  "Decode the string STR as the partial path of the cached article."
   (if (string-match "_\\(_\\(_\\)?\\)?" str)
       (let ((prefix (substring str 0 (match-beginning 0)))
 	    (suffix (substring str (match-end 0))))
 	(cond
 	 ((match-beginning 2) ;; The number of discoverd underscores = 3
-	  (nconc
-	   (gnus-namazu/possible-real-groups (concat prefix "/__" suffix))
-	   (gnus-namazu/possible-real-groups (concat prefix ".._" suffix))))
-	 ((match-beginning 1) ;; The number of discoverd underscores = 2
-	  (nconc
-	   (gnus-namazu/possible-real-groups (concat prefix "//" suffix))
-	   (gnus-namazu/possible-real-groups (concat prefix ".." suffix))))
+	  (or
+	   (gnus-namazu/decode-group-name (concat prefix "/__" suffix) method)
+	   (gnus-namazu/decode-group-name (concat prefix ".._" suffix) method)))
+	 ((match-beginning 1) ;; The number of disucoverd underscores = 2
+	  (or
+	   (gnus-namazu/decode-group-name (concat prefix "//" suffix) method)
+	   (gnus-namazu/decode-group-name (concat prefix ".." suffix) method)))
 	 (t ;; The number of discoverd underscores = 1
-	  (gnus-namazu/possible-real-groups (concat prefix "/" suffix)))))
-    (if (string-match "\\." str)
-	;; Handle the first occurence of period.
-	(list (concat (substring str 0 (match-beginning 0))
+	  (gnus-namazu/decode-group-name (concat prefix "/" suffix) method))))
+    (or (and (not method)
+	     (string-match "\\." str)
+	     ;; Handle the first occurence of period.
+	     (gnus-namazu/group-prefixed-name
+	      (concat (substring str 0 (match-beginning 0))
 		      ":"
-		      (substring str (match-end 0)))
-	      str)
-      (list str))))
+		      (substring str (match-end 0)))))
+	(gnus-namazu/group-prefixed-name str method))))
 
 (defun gnus-namazu/search (groups query)
   (with-temp-buffer
@@ -393,18 +391,6 @@ generate possible group names from it."
 	(while (not (eobp))
 	  (let (server group file)
 	    (and (or
-		  ;; Check the discoverd file is the persistent article.
-		  (and (looking-at cache-regexp)
-		       (setq file (match-string-no-properties 2)
-			     group (gnus-namazu/real-group-name
-				    (gnus-use-long-file-name 'not-cache)
-				    (match-string-no-properties 1))))
-		  ;; Check the discoverd file is covered by the agent.
-		  (and (looking-at agent-regexp)
-		       (setq file (match-string-no-properties 2)
-			     group (gnus-namazu/real-group-name
-				    nnmail-use-long-file-names
-				    (match-string-no-properties 1))))
 		  ;; Check the discovered file is managed by Gnus servers.
 		  (and (looking-at topdir-regexp)
 		       (setq file (buffer-substring-no-properties
@@ -416,13 +402,21 @@ generate possible group names from it."
 		       (progn
 			 (setq group (substring file 0 (match-beginning 0))
 			       file (match-string 1 file))
-			 (setq group
-			       (gnus-namazu/group-prefixed-name
-				(if nnmail-use-long-file-names
-				    group
-				  (nnheader-replace-chars-in-string group
-								    ?/ ?.))
-				server)))))
+			 (setq group (gnus-namazu/real-group-name
+				      nnmail-use-long-file-names
+				      group server))))
+		  ;; Check the discoverd file is the persistent article.
+		  (and (looking-at cache-regexp)
+		       (setq file (match-string-no-properties 2)
+			     group (gnus-namazu/real-group-name
+				    (gnus-use-long-file-name 'not-cache)
+				    (match-string-no-properties 1))))
+		  ;; Check the discoverd file is covered by the agent.
+		  (and (looking-at agent-regexp)
+		       (setq file (match-string-no-properties 2)
+			     group (gnus-namazu/real-group-name
+				    nnmail-use-long-file-names
+				    (match-string-no-properties 1)))))
 		 (or (not groups)
 		     (member group groups))
 		 (push (gnus-namazu/make-article group (string-to-number file))
