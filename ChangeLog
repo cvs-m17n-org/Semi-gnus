@@ -1,3 +1,16 @@
+1998-10-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare): Don't store original
+	buffer to the entity.
+
+	* lisp/mmgnus.el: Use `generic' as mother backend; abolish method
+	`entity-header-start', `entity-header-end' and `fetch-field'.
+	(entity-buffer): New method.
+
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`mime-fetch-field' to refer Subject and From field for saving
+	cache file.
+
 1998-10-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.
