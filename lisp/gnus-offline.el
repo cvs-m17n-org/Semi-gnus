@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.31 1999-02-01 11:02:59 yamaoka Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.32 1999-02-07 07:33:18 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -59,27 +59,6 @@
 ;;; In Gnus group buffer , type g to get all news and mail.
 ;;; Then send mail and news in spool directory.
 ;;;
-;;; Security Notice. (This is available before version 2.02)
-;;;
-;;; You can set the variable gnus-offline-pop-password-file to save your POP
-;;; passwords. But TAKE CARE. Use it at your own risk.
-;;; If you decide to use it, then write in .emacs or .gnus-offline.el 
-;;; something like:
-;;;
-;;;  (setq gnus-offline-pop-password-file "~/.pop.passwd")
-;;;
-;;; and write in this file something like:
-;;;
-;;;  (setq pop3-fma-password
-;;;	 '(("SERVER1" "ACCOUNT1" "PASSWORD1")
-;;;	   ("SERVER2" "ACCOUNT2" "PASSWORD2")
-;;;        ............................
-;;;        ))
-;;;
-;;; If you want to encode the file with base64, try:
-;;;
-;;;    M-: (base64-encode-region (point-min) (point-max))
-;;;
 ;;; Variables.
 ;;;  gnus-offline-dialup-program-arguments
 ;;;                                   ... List of dialup program arguments.
@@ -95,9 +74,6 @@
 ;;;                                        (minutes)
 ;;;  gnus-offline-dialup-function     ... Function to diualup.
 ;;;  gnus-offline-hangup-function     ... Function to hangup.
-;;;  gnus-offline-pop-password-file   ... File to keep the POP password info.
-;;;  gnus-offline-pop-password-decoding-function
-;;;                                   ... Function to decode the password info.
 
 ;;; Code:
 
@@ -210,23 +186,6 @@ If set to 0 , timer call is disabled."
 
 (defcustom gnus-offline-hangup-function 'gnus-offline-hangup-line
   "*Function to hangup."
-  :group 'gnus-offline
-  :type 'function)
-
-(defcustom gnus-offline-pop-password-file nil
-  "*File name for saving one's POP password information.
-This variable should be nil if there's some possibility that
-your passwords be stolen."
-  :group 'gnus-offline
-  :type '(choice (file :tag "File")
-		 (const nil)))
-
-(defcustom gnus-offline-pop-password-decoding-function 
-  (function (lambda () (base64-decode-region (point-min) (point-max))))
-  "*Function for decoding one's password information.
-The value has no effect when `gnus-offline-pop-password-file'
-is nil.
-This variable might be nil if you don't need to encode your passwords."
   :group 'gnus-offline
   :type 'function)
 
@@ -384,26 +343,7 @@ If value is nil , dialup line is disconnected status.")
   (if (functionp gnus-offline-dialup-function)
       (funcall gnus-offline-dialup-function))
   (gnus-offline-get-new-news-function)
-  (if (null gnus-offline-pop-password-file)
-      (gnus-group-get-new-news arg)
-    (let ((buffer (get-buffer-create "*offline-temp*")))
-      (unwind-protect
-	  (progn
-	    (if (boundp 'pop3-fma-password)
-		(setq pop3-fma-save-password-information t))
-	    (save-excursion
-	      (set-buffer buffer)
-	      (erase-buffer)
-	      (insert-file-contents-as-binary gnus-offline-pop-password-file)
-	      (and gnus-offline-pop-password-decoding-function
-		   (funcall gnus-offline-pop-password-decoding-function))
-	      (eval-buffer))
-	    (gnus-group-get-new-news arg))
-	(if (boundp 'pop3-fma-password)
-	    (setq pop3-fma-password nil
-		  pop3-fma-save-password-information nil)
-	  (setq mail-source-password-cache nil))
-	(kill-buffer buffer)))))
+  (gnus-group-get-new-news arg))
 
 ;;
 ;; dialup...

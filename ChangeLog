@@ -1,3 +1,14 @@
+1999-02-07  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+1999-02-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+	
+	* lisp/gnus-offline.el: Delete security notice.
+	(gnus-offline-pop-password-file): Removed.
+	(gnus-offline-pop-password-decoding-function): Removed.
+	(gnus-offline-gnus-get-new-news): Revert to its original.
+
 1999-02-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
