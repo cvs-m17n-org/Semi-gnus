@@ -311,6 +311,13 @@ is the symbol `guess', try to detect \"Re: \" within an encoded-word."
   :type 'regexp
   :group 'message-various)
 
+(defcustom message-signature-separator-for-insertion "-- \n"
+  "*Signature separator. This value will be inserted as signature separator
+when composing message. Default value is \"-- \\n\". Notice: Changing this
+value may go against RFC-1036 and draft-ietf-usefor-article-05.txt. "
+  :type 'string
+  :group 'message-insertion)
+
 (defcustom message-elide-ellipsis "\n[...]\n\n"
   "*The string which is inserted for elided text."
   :type 'string
@@ -2212,7 +2219,9 @@ Prefix arg means justify as well."
       ;; Insert the signature.
       (unless (bolp)
 	(insert "\n"))
-      (insert "\n-- \n")
+      (insert "\n" message-signature-separator-for-insertion)
+      (unless (bolp)
+	(insert "\n"))
       (if (eq signature t)
 	  (insert-file-contents message-signature-file)
 	(insert signature))
