@@ -1,6 +1,7 @@
 1999-01-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/nnmail.el (nnmail-article-group): Don't infloop.
+	* lisp/nnmail.el (nnmail-article-group): Shrink pathologically
+	long headers.
 
 1998-12-19 23:02:26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
