@@ -551,11 +551,13 @@ the resulting string may be narrower than END-COLUMN.
       (let ((pad (abs pad-width)))
 	(if (symbolp el)
 	    (if (< pad-width 0)
-		`(concat ,el (make-string
-			      (max 0 (- ,pad (string-width ,el))) ?\ ))
-	      `(concat (make-string
-			(max 0 (- ,pad (string-width ,el))) ?\ )
-		       ,el))
+		`(let ((val (format "%s" ,el)))
+		   (concat val (make-string
+				(max 0 (- ,pad (string-width val))) ?\ )))
+	      `(let ((val (format "%s" ,el)))
+		 (concat (make-string
+			  (max 0 (- ,pad (string-width val))) ?\ )
+			 val)))
 	  (if (< pad-width 0)
 	      `(let ((val (eval ,el)))
 		 (concat val (make-string
