@@ -30,7 +30,9 @@
 
 (eval '(run-hooks 'gnus-load-hook))
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (require 'custom)
 (eval-and-compile
@@ -267,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.11.04"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "01"
+(defconst gnus-revision-number "02"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.89"
@@ -2877,7 +2879,7 @@ the variable `toolbar-news-frame-plist' will be refered instead."
 (defun gnus-other-frame (&optional arg)
   "Pop up a frame to read news."
   (interactive "P")
-  (if (featurep 'xemacs)
+  (static-if (featurep 'xemacs)
       (let ((toolbar-news-use-separate-frame t))
 	(toolbar-gnus))
     (if (frame-live-p gnus-frame)
