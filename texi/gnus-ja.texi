@@ -7448,6 +7448,18 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 $B%/%j%C%/$G$-$k%\%?%s$r5-;v$N%X%C%@!<$K2C$($^(B
 $B$9(B (@code{gnus-article-add-buttons-to-head})$B!#(B
 
+@item W p
+@kindex W p ($B35N,(B)
+@findex gnus-article-verify-x-pgp-sig
+$B=pL>IU$-%3%s%H%m!<%k%a%C%;!<%8$NG'>Z$r9T$J$$$^(B
+$B$9(B (@code{gnus-article-verify-x-pgp-sig})$B!#(B
+@code{newgroup} $B$d(B @code{checkgroups} $B$H$$$C$?%3%s%H%m!<%k%a%C%;!<%8$O!"(B
+$BDL>o$=$N%K%e!<%9%0%k!<%W3,AX$N%a%$%s%F%$%J!<$K$h$C$F=pL>$5$l$F$$$^$9!#G'(B
+$B>Z$r9T$J$&$?$a$K$O!"%a%$%s%F%$%J!<$N8x3+80$r$"$J$?$N%-!<%j%s%0$KDI2C$7$J(B
+$B$1$l$P$J$j$^$;$s!#(B@footnote{$BB?$/$N%K%e!<%9%0%k!<%W3,AX$N%a%$%s%F%$%J!<(B
+$B$N(B PGP $B$N80$O(B @uref{ftp://ftp.isc.org/pub/pgpcontrol/README.html} $B$+$iF~(B
+$B<j$9$k$3$H$,$G$-$^$9!#(B}
+
 @item W W H
 @kindex W W H ($B35N,(B)
 @findex gnus-article-strip-headers-from-body
@@ -9041,6 +9053,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item gnus-treat-hide-citation (t, integer)
 @item gnus-treat-hide-citation-maybe (t, integer)
 @item gnus-treat-strip-pgp (t, last, integer)
+@item gnus-treat-x-pgp-sig (head)
 @item gnus-treat-strip-pem (t, last, integer)
 @item gnus-treat-highlight-headers (head)
 @item gnus-treat-highlight-citation (t, integer)
